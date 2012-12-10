@@ -35,7 +35,7 @@ int tstat25_register_var[TSTAT25_VAR_NUM]={	118,121,185,128,111,	112,114,115,119
 											188,189,190,204,205,	206,207,208,209,210,
 											211,213,214};
 //NEW Tstat6
-int tstat26_register_var[TSTAT26_VAR_NUM]={	103,104,110,395/*这个需要延时*/,382,	212,385,386,346,347,
+int tstat26_register_var[TSTAT26_VAR_NUM]={	103,104,110,395/*这个需要重启*/,382,	212,385,386,346,347,
 											105,352,353,364,106,	107,207,208,365,366,//
 											369,348,349,273,354,	355,242,397,241,122/*这个需要延时*/,//
 											123,111,142,113,383,	360/*这个需要延时*/,361,387,388,359,
@@ -49,21 +49,6 @@ int tstat26_register_var[TSTAT26_VAR_NUM]={	103,104,110,395/*这个需要延时*/,382,
 int net_work_controller[NET_WORK_CONTROLLER_NUM]={	106,107,108,109,110,	111,112,113,114,115,
 													116,117,118,119,120,	121,122,123,124,125,
 													126,127,129,130};
-
-/*
-int tstat29_register_var[TSTAT29_VAR_NUM]={	118,121,185,128,111,	112,114,115,119,120,
-122,123,124,125,126,	127,129,186,187,131,
-132,133,135,136,137,	182,183,202,203,201,
-188,189,190,204,205,	206,207,208,209,210,
-211,213,214,
-241,242,243,244,245,	246,247,248,249,250,
-251,252,253,
-268,269,270,271,272,	273,274,275,276,277,
-286,287,288,289,290,	291,292,285,293,
-301,302,303,309,310,	314,315,316,317,318,
-319,320,321,322,323,	324,325,326,327,328,
-329,330,331,332,333,     334,335,};
-*/
 
 _TCHAR * NET_WORK_CONTROLLER[] = {                  //attention:该数组中的值，不要有完全包含的出现
 						_T("ip Mode:"),		//0
@@ -347,6 +332,9 @@ _TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要
 						_T("Input8 Fun")
 						};
 _TCHAR *STRINGCONST[] ={_T("Off"),_T("On"),_T("Close"),_T("Open"),_T("0-100"),_T("50-100"),_T("0-50")};
+//PWM output range in COAST mode. 0 = CLOSE, 1 = OPEN, 2 = 0-100%, 3 = 50-100%,
+//	4 = 0-50%. MSb 4 bits correspond to output4 and LSB 4 bits correspond to output5
+_TCHAR *PWMCONST[] ={_T("Close"),_T("Open"),_T("0-100"),_T("50-100"),_T("0-50")};
 
 bool string2digital(CString str,unsigned char & val ,bool & type )   // type false = digital ,true = analog
 {
@@ -361,33 +349,7 @@ bool string2digital(CString str,unsigned char & val ,bool & type )   // type fal
 		}
 	}
 	switch(SN)
-	{/*
-		case 0 :
-			val = 0 ;
-		break;
-		case 1 :
-			val = 1 ;
-		break;
-		case 2 :
-			val = 0 ;
-		break;
-		case 3 :
-			val = 3 ;
-		break;
-		case 4 :
-			val = 1 ;
-		break;
-
-		case 5:
-			val = 2 ;
-		break;
-		case 6:
-			val = 4 ;///bit 7 or 8 and defferent from others
-		break;
-
-		default:
-		break;
-		*/
+	{ 
 		case 0 :
 			val = 0 ;
 		break;
@@ -2096,7 +2058,7 @@ void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,lo
 		j=-4;
 	 
 
-	else if(register_id==122 )
+	 if(register_id==122 )
 	{
 		int real_fan_number=get_real_number_fan_speeds(fan_number);
 		if(register_value!=real_fan_number && real_fan_number!=-1)
@@ -2106,18 +2068,30 @@ void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,lo
 		}
 		j=write_one(now_tstat_id,register_id,register_value);	
 	}
-	else
-		j=write_one(now_tstat_id,register_id,register_value);	
-	if(register_id==360||register_id==122)
-	{
-		/*Sleep(10000);*/
-	}
+
+		//j=write_one(now_tstat_id,register_id,register_value);	
+	 
 	if (register_id==395)
 	{
-		Sleep(15000);
-	}
+	/*	CString str;
+		str.Format(_T("%d"),register_value);
+		AfxMessageBox(str);*/
+	     Sleep(3000);
+		j=write_one(now_tstat_id,register_id,register_value);
+		 Sleep(5000);
+		//int i=-1;//当>0说明重启好了 一直读直到读到数据
+		//while(i<=-1)
+		//{
+		//	i=read_one(now_tstat_id,register_id);
+		//}
+		 
 
-	 
+	}
+	else
+	{ 
+		j=write_one(now_tstat_id,register_id,register_value);
+	}
+	
 
 	if(j==-2 && tstat_version<25 && tstat_version >0)  ////////////////////////if the version is 24.4 ,write_one some register will restart,for example 118,121
 	{
@@ -2133,7 +2107,7 @@ void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,lo
 			for_showing_text.Format(_T("NUMBER_OF_FAN_SPEEDS IS INCORRECT,try correct value :%d "),register_value);
 			for_showing_text=t_str+for_showing_text;
 		}*/
-		if(j>0)
+		if(j>0/*||register_id==395*/)//395
 			for_showing_text=for_showing_text+_T("OK\r\n");
 		else
 		{
@@ -2525,31 +2499,7 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 					}
 				}
 			}
-			/*
-			memset(value_setting,0,sizeof(value_setting));
-			get_value_setting(inf,value_setting);//value setting			
-			Show_load_file_error_message(load_file_one_time,2,p_log_file);
-			load_file_one_time.second_step=true;
-			for(int i=0;i<7;i++)
-			{
-				if(value_setting[i]>=0)
-				{
-					int i_i=write_one(now_tstat_id,351+i,value_setting[i]);
-					if(p_log_file!=NULL)
-					{
-						if(i_i>0)
-							for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),351+i,value_setting[i]);
-						else
-						{
-							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),351+i,value_setting[i]);
-							load_file_one_time.second_step=false;
-						}
-						change_showing_text_variable(for_showing_text);
-						p_log_file->WriteString(for_showing_text);
-					}
-				}
-			}
-			*/
+		
 
 
 

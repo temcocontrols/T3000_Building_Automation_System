@@ -1,4 +1,15 @@
+ver2.5.0.102, date released:2012/12/1 
+*************************************************************************************
+<1>Fix Tstat6/7 config file read /write error .
+<2>Be able to Load the correct config file
+<3>write to the value of register ,according to the config file.
+<4>support windows xp/vista/win7
+*************************************************************************************
+
+ver2.5.0.101, date released:2012/12/1
+*************************************************************************************
 <1>Fix the Error about 102,101 and so on .
 <2>Don't limit the T3000 client time of users.
 <3>Fix the About Dialog Time.can link to the website of www.temcocontrols.com
 <4>Fix the Error about "Contact Software Developer,Please!"
+*************************************************************************************
