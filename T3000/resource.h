@@ -928,6 +928,7 @@
 #define ID_SETMAP_SETTINGSAVE           32863
 #define ID_SETMAPPING_SAND              32864
 #define ID_FILE_ISPTOOL                 32865
+#define ID_TOOL_ISPTOOLFORMANY          32866
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
 
@@ -936,7 +937,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        440
-#define _APS_NEXT_COMMAND_VALUE         32866
+#define _APS_NEXT_COMMAND_VALUE         32870
 #define _APS_NEXT_CONTROL_VALUE         1571
 #define _APS_NEXT_SYMED_VALUE           320
 #endif

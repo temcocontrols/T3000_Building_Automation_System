@@ -328,6 +328,7 @@ public:
 
 	UINT FlagSerialNumber;
 	void Treestatus();
+	afx_msg void OnToolIsptoolformany();
 };
 
 
