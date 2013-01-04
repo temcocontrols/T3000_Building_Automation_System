@@ -1002,15 +1002,7 @@ void CInputSetDlg::add_analog_rang(int i)
 }
 void CInputSetDlg::OnCbnSelchangeInputfuncombo()
 {
-//	298	167	1	Low byte	W/R	Analog input1 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-//	299	168	1	Low byte	W/R	Analog input2 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-//	300	169	1	Low byte	W/R	(future)Analog input3 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-//	301	170	1	Low byte	W/R	(future)Analog input4 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-//	302	171	1	Low byte	W/R	(future)Analog input5 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-//	303	172	1	Low byte	W/R	(future)Analog input6 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-//	304	173	1	Low byte	W/R	(future)Analog input7 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-//	305	174	1	Low byte	W/R	(future)Analog input8 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-
+ 
 
 
 	if (newtstat6[7] ==6)

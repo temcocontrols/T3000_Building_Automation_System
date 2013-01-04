@@ -388,37 +388,6 @@ BOOL CT3000App::InitInstance()//Alex-
 	}
 	catch (...)
 	{
-
-
-	//	AfxMessageBox(_T("Double click 'REG_msado15.dll',Please!\nAt C:\\Program Files\\Temcocontrols\\T3000"));
-// 		CString strFilter = _T("hex File;bin File|*.hex;*.bin|all File|*.*||");
-// 		CFileDialog dlg(true,_T("hex"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
-// 		dlg.DoModal();
-
-//		CFileDialog dlg(true,NULL,_T("C:\Program Files\Common Files\System\ado"));
-		//dlg.lpstrInitialDir = "..\\hisdata";
-		//dlg.op
-////
-	//		OPENFILENAME
-
-		
-//		if (dlg.DoModal()==IDOK)
-//		{
-// 			path = dlg.GetPathName();
-// 			pLogFile = fopen("Log.txt", "wt+");   
-// 			fprintf(pLogFile, "%s", (LPCSTR)path); 
-// 			fclose(pLogFile);
-// 			pLogFile = NULL; 
-//		}
-
-
-// 		CFileDialog fileDlg(TRUE,NULL,NULL,OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,
-// 			NULL,NULL);//_T("工作表(*.xls)|*.xls|文本文件(*.txt)|*.txt||")
-// 		fileDlg.m_ofn.lpstrInitialDir = _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat");
-// 		fileDlg.DoModal();
-
-
-
 		::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat"), _T(""), _T(""), SW_SHOW);
 		//vcredist_x86.zip
 		

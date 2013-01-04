@@ -3,7 +3,7 @@
 #include "afxcmn.h"
 #include "msflexgrid1.h"
 
-//////////////
+
 // CNetworkControllView form view
 class CNetworkControllView : public CFormView
 {

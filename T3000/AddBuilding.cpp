@@ -237,8 +237,8 @@ BOOL CAddBuilding::OnInitDialog()
 	::InitializeCriticalSection(&g_Lock);
 
 	//GetSerialComm(m_szComm);
-	//GetSerialComPortNumber(m_szComm);
-	GetSerialComPortNumber1(m_szComm);
+	  GetSerialComPortNumber(m_szComm);
+	//GetSerialComPortNumber1(m_szComm);
 	CString strIPTest;
 //	GetIPbyHostName(_T("www.google.com"),strIPTest);
 	m_AddBuiding_SetComBox.ShowWindow(SW_HIDE);

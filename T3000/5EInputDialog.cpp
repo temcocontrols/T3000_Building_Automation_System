@@ -1,11 +1,11 @@
 // 5EInputDialog.cpp : implementation file
-//test
+//
 
 #include "stdafx.h"
 #include "T3000.h"
 #include "5EInputDialog.h"
 #include "globle_function.h"
-//////////////////////
+
 
 // C5EInputDialog dialog
 CString g_str5ERange[5]={_T("Raw"),_T("Thermistor"),_T("On/Off"),_T("Off/On"),_T("%")};

@@ -69,7 +69,10 @@ void CTStat_Dev::SetComPort(int nComPort)
 
 int CTStat_Dev::GetEPSize()const
 {
-	return m_nEPSize;	
+	 return m_nEPSize;	
+	 
+
+
 }
 
 void CTStat_Dev::SetEPSize(int nEPSize)

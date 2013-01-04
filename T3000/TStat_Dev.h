@@ -32,11 +32,12 @@ public:
 	void SetEPSize(int nEPSize);
 	
 	CString GetProductName();
+	 
 // 	int GetAddrID()const;
 // 	void SetAddrID(int nID);
 
 	
-	BOOL CTStat_Dev::operator==(const CTStat_Dev& dev);
+   BOOL CTStat_Dev::operator==(const CTStat_Dev& dev);
 
 
 

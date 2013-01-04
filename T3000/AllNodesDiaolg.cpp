@@ -284,7 +284,7 @@ void CAllNodesDiaolg::SetBuildingMainName(CString strBuildName)
 
 void CAllNodesDiaolg::OnBnClickedDelbutton()
 {
-#if 0
+#if 1
 	if(m_nCurRow==0||m_nCurRow==m_FlexGrid.get_Rows()-1)
 	{
 		AfxMessageBox(_T("Please select a item first!"));
@@ -345,7 +345,7 @@ void CAllNodesDiaolg::OnBnClickedDelallbutton()
 
 void CAllNodesDiaolg::OnBnClickedExitbutton()
 {
-#if 0
+#if 1
 	CAllNodesDiaolg::OnCancel();
 
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
@@ -590,7 +590,7 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 	//AfxMessageBox(_T("Not realized!"));
 
 /*alex*/
-#if 0
+#if 1
 CString strSql;
 	int nMaxRowIndext=m_FlexGrid.get_Rows()-1;
 

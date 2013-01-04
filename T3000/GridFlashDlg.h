@@ -1,5 +1,6 @@
 #include "msflexgrid1.h"
 #include "afxwin.h"
+#include "DialogInfo.h"
 #pragma once
 
 
@@ -67,7 +68,7 @@ public:
 	CButton m_AllCheckBtn;
 	CEdit m_hexFilePathNameEdit;
 	CString m_strLogFilePath;
-   
+ 
 
 	afx_msg void OnBnClickedChecktoall();
 	afx_msg void OnBnClickedFlashbutton();

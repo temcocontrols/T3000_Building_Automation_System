@@ -481,132 +481,7 @@ void COutputSetDlg::Fresh_Grid()
 		m_FlexGrid.put_TextMatrix(3,FUN_OUTFIELD,strTemp);
 	}
 
-	//BCDE 4,5 D/O
-/*  commented by zgq; 2010-12-7; 新的需求，5E需要当选择float和PMW时输入值，并存在348， 349
-	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16)//||m_nModeType==17||m_nModeType==18)
-	{
-		if(nVAlue&8)
-		{
-			strTemp=_T("On");
-		}
-		else
-		{
-			strTemp=_T("Off");
-		}
-		m_FlexGrid.put_TextMatrix(4,VALUE_OUTFIELD,strTemp);
-		if((int)(nAMVAlue & 8))
-		{
-			strTemp=_T("Manual");
-			m_FlexGrid.put_Col(VALUE_OUTFIELD);
-			m_FlexGrid.put_Row(4);
-			m_FlexGrid.put_CellBackColor(RGB(255,255,255));
-		}
-		else
-		{
-			strTemp=_T("Auto");
-			m_FlexGrid.put_Col(VALUE_OUTFIELD);
-			m_FlexGrid.put_Row(4);
-			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
-		}
-		m_FlexGrid.put_TextMatrix(4,AM_OUTFIELD,strTemp);
-		strTemp.Empty();		
-	//	strTemp=_T("On/Off");
-	//	m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
-		nRange=multi_register_value[283];
-		if(nRange>=0&&nRange<3)
-		{
-			strTemp=OUTPUT_RANGE45[nRange];
-		}
-		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 
-		strTemp.Empty();
-		if (m_version<32.2)
-		{
-			short nFun=multi_register_value[328];
-			int nMask;
-			nMask=nFun&0x4;
-			if (nMask>0)
-			{
-				strTemp=ONTPUT_FUNS[1];
-			}
-			else
-			{
-				strTemp=ONTPUT_FUNS[0];
-			}
-			m_FlexGrid.put_TextMatrix(4,FUN_OUTFIELD,strTemp);
-		}
-		else
-		{
-			int indext=-1;
-			indext=multi_register_value[336];
-			if(indext>=0&&indext<=3)
-				strTemp=ONTPUT_FUNS[indext];
-			m_FlexGrid.put_TextMatrix(4,FUN_OUTFIELD,strTemp);
-		}
-
-		if(nVAlue&16)
-		{
-			strTemp=_T("On");
-		}
-		else
-		{
-			strTemp=_T("Off");
-		}
-		m_FlexGrid.put_TextMatrix(5,VALUE_OUTFIELD,strTemp);
-
-		if((int)(nAMVAlue & 16))
-		{
-			strTemp=_T("Manual");
-			m_FlexGrid.put_Col(VALUE_OUTFIELD);
-			m_FlexGrid.put_Row(5);
-			m_FlexGrid.put_CellBackColor(RGB(255,255,255));
-		}
-		else
-		{
-			strTemp=_T("Auto");
-			m_FlexGrid.put_Col(VALUE_OUTFIELD);
-			m_FlexGrid.put_Row(5);
-			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
-		}
-		m_FlexGrid.put_TextMatrix(5,AM_OUTFIELD,strTemp);
-		strTemp.Empty();
-		
-	//	strTemp=_T("On/Off");
-	//	m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
-		nRange=multi_register_value[284];
-		if(nRange>=0&&nRange<3)
-		{
-			strTemp=OUTPUT_RANGE45[nRange];
-		}
-		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
-
-		if (m_version<32.2)
-		{
-			short nFun=multi_register_value[328];
-			int nMask;
-			nMask=nFun&0x8;
-			if (nMask>0)
-			{
-				strTemp=ONTPUT_FUNS[1];
-			}
-			else
-			{
-				strTemp=ONTPUT_FUNS[0];
-			}
-			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
-		}
-		else
-		{
-			int indext=-1;
-			indext=multi_register_value[337];
-			if(indext>=0&&indext<=3)
-				strTemp=ONTPUT_FUNS[indext];
-			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
-		}
-	}
-*/
-
-	//BCDE 4,5 D/O
 	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16 
 		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)//||m_nModeType==17||m_nModeType==18)
 	{
@@ -638,14 +513,19 @@ void COutputSetDlg::Fresh_Grid()
 
 		if ((newtstat6[7] ==PM_TSTAT6)||(newtstat6[7] ==PM_TSTAT6))
 			nRange = newtstat6[205];
+		   
 		else
 			nRange = multi_register_value[283];
 
+		CString str;
+		str.Format(_T("Read:%d"),nRange);
+	//	AfxMessageBox(str);
 		
 		if(nRange>=0&&nRange<2)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
+		/*AfxMessageBox(strTemp);*/
 		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 
 		if(nRange == 0 || !(nAMVAlue & 8)) // AM栏选择了Auto或者Range 栏选择了On/Off，value都显示ON/Off
@@ -2452,7 +2332,8 @@ void COutputSetDlg::OnCbnSelchangeOvaluecombo()
 // 		int num = reg_tststold[108];
 // 		n = multi_register_value[num];
 		n = newtstat6[209];
-	}else
+	}
+	else
 		n=multi_register_value[108];
 
 	int i;
@@ -2478,7 +2359,8 @@ void COutputSetDlg::OnCbnSelchangeOvaluecombo()
 				//int num = reg_tststold[108];
 				write_one(g_tstat_id,209,nchange);
 				newtstat6[209] = nchange;
-			}else
+			}
+			else
 				write_one(g_tstat_id,108,nchange);
 
 //tstat6
@@ -3194,9 +3076,19 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 	{
 		if(m_nCurRow>0&&m_nCurRow<=5)
 		{	
+		 
+		 
+	 
+		    	 
 			ret = write_one(g_tstat_id,202+(m_nCurRow-1) ,nIndext );
 			if (ret>0)
 				newtstat6[202+m_nCurRow-1] = nIndext;
+
+
+			CString str;
+			str.Format(_T("Add:%d,Value:%d"),202+(m_nCurRow-1),newtstat6[202+m_nCurRow-1]);
+			//AfxMessageBox(str);
+
 		}
 
 		if(m_nCurRow==6)

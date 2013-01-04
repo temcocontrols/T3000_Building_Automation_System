@@ -64,9 +64,9 @@ using namespace Gdiplus;
 #pragma comment(lib, "WS2_32")
 #pragma comment(lib,"ModbusDllforVc")
 #pragma comment(lib,"FlexSlideBar")
-#pragma comment(lib,"ISP")
+//#pragma comment(lib,"ISP")
  
-INPUT void  show_ISPDlg();
+//INPUT void  show_ISPDlg();
 INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
 INPUT int Read_One(unsigned char device_var,unsigned short address);
 INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);

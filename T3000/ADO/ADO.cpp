@@ -56,13 +56,13 @@ void CADO::OnInitADOConn()
 
 
 		m_pConnection.CreateInstance("ADODB.Connection");
-		_bstr_t strConnect = "DRIVER={Microsoft Access Driver (*.mdb)};\
-							 uid=;pwd=;DBQ=t3000.mdb;";
+		/*_bstr_t strConnect = "DRIVER={Microsoft Access Driver (*.mdb)};\
+                              uid=;pwd=;DBQ=t3000.mdb;";*/
 		m_pConnection->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
 	}
 	catch(_com_error e)
 	{   //e.Description()
-		AfxMessageBox(_T("Code Error:104\nSystem Close"));
+		AfxMessageBox(_T("Can't Find T3000 DataBase\nSystem Close"));
 	}
 
 

@@ -747,7 +747,7 @@ void CGridLoad::OnBnClickedConfigbutton()
 	GetDlgItem(IDC_CONFIGBUTTON)->EnableWindow(FALSE);
 
 	for(iitemp=0;iitemp<m_grid_load.size();iitemp++)
-	{//get the grid value
+	{    //get the grid value
 		m_grid_load.at(iitemp).hardware_revisin = _wtoi(m_FlexGrid.get_TextMatrix(iitemp+1,COL_HWVERSION));//hardware rev
 		CString str_temp=m_FlexGrid.get_TextMatrix(iitemp+1,COL_DEVICETYPE);//software version ;;;;;product model
 			
@@ -811,6 +811,8 @@ void CGridLoad::OnBnClickedConfigbutton()
 		}
 	//	showing_text="";
 		SetTimer(1,10,NULL);/////////////10 ms is better 
+
+	
 
 }
 
