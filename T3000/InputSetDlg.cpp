@@ -2388,14 +2388,14 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 			}
 			else // 如果是值，用edit
 			{		
-				m_inValueEdit.MoveWindow(rcCell); //移动到选中格的位置，覆盖
-				m_inValueEdit.ShowWindow(SW_SHOW);
+				//m_inValueEdit.MoveWindow(rcCell); //移动到选中格的位置，覆盖
+				//m_inValueEdit.ShowWindow(SW_SHOW);
 
-				m_inValueEdit.BringWindowToTop();
-				//m_RangCombox.SelectString(-1,strValue);
+				//m_inValueEdit.BringWindowToTop();
+				////m_RangCombox.SelectString(-1,strValue);
 
-				m_inValueEdit.SetWindowText(strValue);
-				m_inValueEdit.SetFocus(); //获取焦点
+				//m_inValueEdit.SetWindowText(strValue);
+				//m_inValueEdit.SetFocus(); //获取焦点
 
 			}		
 		}

@@ -287,7 +287,7 @@ BOOL CParameterDlg::OnInitDialog()
 	// initialize PID2 combo box
 
 	pProgess->ShowProgress(5,50);
-	InitPID2ComboBox();
+	//InitPID2ComboBox();
 	pProgess->ShowProgress(7,70);
 	Refresh();
 	pProgess->ShowProgress(8,80);
@@ -449,6 +449,33 @@ BOOL CParameterDlg::OnInitDialog()
 
 	}
 
+
+ 
+	//if (multi_register_value[111]<1)
+	//	{
+	//	m_InputSelect1.SetCurSel(0);
+	//	}else if(multi_register_value[111]>3)
+	//	{
+	//	m_InputSelect1.SetCurSel(2);
+
+	//		}else
+	//		{
+	//		m_InputSelect1.SetCurSel(multi_register_value[111]-1);
+	//			}
+
+
+	//		if (multi_register_value[241]<0)
+	//			{
+	//			m_inputSelect2.SetCurSel(0);
+	//			}else if (multi_register_value[241]>5)
+	//			{
+	//			m_inputSelect2.SetCurSel(5);
+	//				}else
+	//				{
+	//				//m_InputSelect1.SetCurSel(multi_register_value[111]-1);
+	//				m_inputSelect2.SetCurSel(multi_register_value[241]-1);
+	//					}
+
 	 UpdateData(FALSE);
 
 	 // #define  DaySP		0  //address 345
@@ -466,6 +493,11 @@ BOOL CParameterDlg::OnInitDialog()
 
 	 //tstat6flex
 
+
+
+
+	
+	 
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -520,8 +552,7 @@ void CParameterDlg::OnBnClickedRefreshbutton()
 
 void CParameterDlg::OnBnClickedEnableidbutton()
 {
-// 	m_idAdressEdit.EnableWindow(TRUE);
-// 	// TODO: Add your control notification handler code here
+
 
 	if(m_idAdressEdit.IsWindowEnabled())
 		m_idAdressEdit.EnableWindow(FALSE);
@@ -695,37 +726,13 @@ void CParameterDlg::Refresh()
 	strTemp.Format(_T("%d"),multi_register_value[211]);
 	m_OverRideEdit.SetWindowText(strTemp);
 
-	if (multi_register_value[111]<1)
-	{
-		m_InputSelect1.SetCurSel(0);
-	}else if(multi_register_value[111]>3)
-	{
-		m_InputSelect1.SetCurSel(2);
-
-	}else
-	{
-		m_InputSelect1.SetCurSel(multi_register_value[111]-1);
-	}
-
-
-	if (multi_register_value[241]<0)
-	{
-		m_inputSelect2.SetCurSel(0);
-	}else if (multi_register_value[241]>5)
-	{
-		m_inputSelect2.SetCurSel(5);
-	}else
-	{
-		//m_InputSelect1.SetCurSel(multi_register_value[111]-1);
-		m_inputSelect2.SetCurSel(multi_register_value[241]);
-	}
 	
 	
 	strTemp.Format(_T("%.1f"),multi_register_value[101]/10.0);
 	m_inputvalue1.SetWindowText(strTemp+strUnit);
 	
-	//////////////////////////////////////////////////////////////////////////
-	// PID2 m_inputValue2 m_inputSelect2 关联设置
+//////////////////////////////////////////////////////////////////////////
+// PID2 m_inputValue2 m_inputSelect2 关联设置
 // 
 // 	if(multi_register_value[7]== 18)//18是tstat5G
 // 	{
@@ -796,7 +803,8 @@ void CParameterDlg::Refresh()
 // 
 // 	}else
 // 	{
-		if(multi_register_value[241]==1) // input1
+////////////////////////////////////////////////////////////////////////////////////////
+		if(multi_register_value[241]==1) // input2
 		{	
 			if(multi_register_value[7]== PM_PRESSURE)  // pressure
 			{
@@ -822,12 +830,7 @@ void CParameterDlg::Refresh()
 				}
 			}
 			m_inputValue2.SetWindowText(strTemp);
-		}//else //if(multi_register_value[241]!=2)
-		//{
-		//	m_inputValue2.SetWindowText(_T("UNUSED"));
-		//	}
-
-
+		}
 		else if(multi_register_value[241]==2) // input2 //m_inputvalue1
 		{
 			if(multi_register_value[189]==4||multi_register_value[189]==1)
@@ -836,6 +839,7 @@ void CParameterDlg::Refresh()
 				strTemp=strTemp+strUnit;
 			}
 	//if (strUnit==""||strUnit=="%")//0914
+	       else
 			{
 				//strTemp.Format(_T("%d"),multi_register_value[181]);//0914
 				strTemp.Format(_T("%.1f"),(float)multi_register_value[181]/10);
@@ -909,10 +913,7 @@ void CParameterDlg::Refresh()
 	switch(index)
 	{
 	case 0:
-// 		CWnd *pSPWnd1 = GetDlgItem(IDC_STATIC_CSP);
-// 		pSPWnd1->SetWindowText(_T("Cooling Set Point"));
-// 		CWnd *pSPWnd2 = GetDlgItem(IDC_STATIC_HSP);
-// 		pSPWnd2->SetWindowText(_T("Heating Set Point"));
+
 		GetDlgItem(IDC_STATIC_CSP)->SetWindowText(_T("Cooling Set Point"));
 		GetDlgItem(IDC_STATIC_HSP)->SetWindowText(_T("Heating Set Point"));
 
@@ -924,71 +925,12 @@ void CParameterDlg::Refresh()
 
 
 	}
-	//int GetCursor( ) const;
-
-
-	//OnCbnSelchangeEapplication();
-
-// 	strTemp.Empty();
-// 	int nSelect=multi_register_value[241];
-// 	if(nSelect==1)
-// 	{
-// 		if(multi_register_value[188]==4||multi_register_value[188]==1)
-// 		{
-// 			strTemp.Format(_T("%.1f"),(float)multi_register_value[180]/10);
-// 			strTemp=strTemp+strUnit;
-// 		}
-// 		if (strUnit==""||strUnit=="%")
-// 		{
-// 			strTemp.Format(_T("%d"),multi_register_value[180]);
-// 		}
-// 		if(multi_register_value[180]==3)
-// 		{
-// 			if(multi_register_value[180]==0)
-// 				strTemp=_T("OFF");
-// 			if(multi_register_value[180]==1)
-// 				strTemp=_T("ON");
-// 		}
-// 		
-// 		m_inputValue2.SetWindowText(strTemp);
-// 	}
-// 	if(nSelect==2)
-// 	{	
-// 		if(multi_register_value[189]==4||multi_register_value[189]==1)
-// 		{
-// 			strTemp.Format(_T("%.1f"),(float)multi_register_value[181]/10.0);	
-// 			strTemp=strTemp+strUnit;
-// 		}
-// 		if (strUnit==""||strUnit=="%")
-// 		{
-// 			strTemp.Format(_T("%d"),multi_register_value[181]);
-// 		}
-// 		if(multi_register_value[189]==3)
-// 		{
-// 			if(multi_register_value[181]==0)
-// 				strTemp=_T("OFF");
-// 			if(multi_register_value[181]==1)
-// 				strTemp=_T("ON");
-// 		}
-// 		m_inputValue2.SetWindowText(strTemp);
-// 	}
+ 
 
 	strTemp.Empty();
 	m_version=get_curtstat_version();
 
-// 	if (multi_register_value[7] == PM_TSTAT7)
-// 	{
-// 		strTemp.Format(_T("%.1f"),multi_register_value[380]/10.0);	//	set point 
-// 	}
-// 	else if(m_version<34.9|| multi_register_value[7] == 16)  // 老版本不除10，
-// 	{
-// 		strTemp.Format(_T("%d"),(int)multi_register_value[135]);	//	set point 
-// 	}
-// 	else
-// 	{
-// 		strTemp.Format(_T("%.1f"),multi_register_value[374]/10.0);		// set point for TStat A,B,C,D
-// 	}
-// 	m_pid_setptEdt1.SetWindowText(strTemp);
+
 
 	strTemp.Empty();
 	strTemp.Format(_T("%.1f"),multi_register_value[246]/10.0);	
@@ -1032,10 +974,7 @@ void CParameterDlg::Refresh()
 	strTemp.Empty();
 
 
-// 	if (m_version>=SETPOINT_SPECIAL_VERSION)//
-// 	{
-// 		strTemp.Format(_T("%.1f"),multi_register_value[374]/10.0);
-// 	}
+
 	if((multi_register_value[7] == PM_TSTAT7)||(multi_register_value[7] == PM_TSTAT6))
 	{
 		strTemp.Format(_T("%.1f"),multi_register_value[380]/10.0);//	set point 
@@ -1128,6 +1067,33 @@ void CParameterDlg::Refresh()
 		}
 
 
+
+
+		if (multi_register_value[111]<1)
+			{
+			m_InputSelect1.SetCurSel(0);
+			}else if(multi_register_value[111]>3)
+			{
+			m_InputSelect1.SetCurSel(2);
+
+				}else
+				{
+				m_InputSelect1.SetCurSel(multi_register_value[111]-1);
+					}
+
+
+				if (multi_register_value[241]<0)
+					{
+					m_inputSelect2.SetCurSel(0);
+					}else if (multi_register_value[241]>3)
+					{
+					m_inputSelect2.SetCurSel(3);
+					}
+					else
+					{
+						 
+					    m_inputSelect2.SetCurSel(multi_register_value[241]);
+					}
 }
 
 
@@ -1619,11 +1585,15 @@ void CParameterDlg::OnCbnSelchangeInputselect1()
 
 void CParameterDlg::OnCbnSelchangeInputselect2()
 {
+    CString str;
+	
 	
 	if(g_ParamLevel==1)
 		return;
 
 	int nSel = m_inputSelect2.GetCurSel();	
+
+	 
 	g_bPauseMultiRead = TRUE;	
 	int nRet = 0;
 	if ((multi_register_value[7] == 6)||(multi_register_value[7] == 7))//tstat6
@@ -1633,6 +1603,9 @@ void CParameterDlg::OnCbnSelchangeInputselect2()
 	g_bPauseMultiRead = FALSE;
 	if(nRet>0)
 		multi_register_value [241] = nSel;
+
+
+	 
 	Refresh();
 }
 
@@ -2915,16 +2888,34 @@ void CParameterDlg::OnEnKillfocusEditPid2offsetpoint()
 	CString str;
 	//str.Format(_T("%d"),multi_register_value[275]);
 	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->GetWindowText(str);
-	int nValue= _wtoi(str);
-	int ret =0;
-	ret = write_one(g_tstat_id,275,nValue*10,5);
-	if (ret>0)
+	if (str.IsEmpty())
 	{
-		multi_register_value[275] = nValue;
-	}else
-	{
-		AfxMessageBox(_T("Pleas try again"));
+	return;
+	} 
+	else
+	{int nValue= _wtoi(str);
+	if (nValue>=100)
+		{
+		AfxMessageBox(_T("Out of range"));
+		return;
+		} 
+	else
+		{
+		int ret =0;
+		ret = write_one(g_tstat_id,275,nValue*10,5);
+		if (ret>0)
+			{
+			multi_register_value[275] = nValue;
+			AfxMessageBox(_T("Write Ok!"));
+			}
+		else
+			{
+			AfxMessageBox(_T("Please try again"));
+			}
+		}
 	}
+	
+	
 
 
 

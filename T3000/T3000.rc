@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, PRC) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -1020,12 +1020,12 @@ BEGIN
     IDR_TOOLBAR_CONNECT     "Connect"
 END
 
-#endif    // Chinese (Simplified, PRC) resources
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// 英语(美国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -1244,7 +1244,7 @@ CAPTION "About T3000"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,18,20,20,20
-    LTEXT           "T3000 Version 2.5.0.103",IDC_STATIC,54,27,82,8,SS_NOPREFIX
+    LTEXT           "T3000 Version 2.5.0.104",IDC_STATIC,54,27,82,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2005-2013 Temcocontrols.Ltd.",IDC_STATIC,36,43,149,8
     PUSHBUTTON      "http://www.temcocontrols.com",IDC_BUTTON1,7,53,189,14
     DEFPUSHBUTTON   "OK",IDOK,148,11,48,14,WS_GROUP
@@ -4091,12 +4091,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "Show building config"
 END
 
-#endif    // English (United States) resources
+#endif    // 英语(美国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United Kingdom) resources
+// 英语(英国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -4257,7 +4257,7 @@ BEGIN
     0
 END
 
-#endif    // English (United Kingdom) resources
+#endif    // 英语(英国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
