@@ -513,15 +513,25 @@ void COutputSetDlg::Fresh_Grid()
 
 		if ((newtstat6[7] ==PM_TSTAT6)||(newtstat6[7] ==PM_TSTAT6))
 			nRange = newtstat6[205];
-		   
-		else
-			nRange = multi_register_value[283];
+		else//ÆäËûµÄ
+			{
+
+			if (multi_register_value[336]<2)
+				{
+				nRange = multi_register_value[283];
+				}
+			else
+				{
+				nRange = multi_register_value[336];
+				}
+			
+			}
 
 		CString str;
 		str.Format(_T("Read:%d"),nRange);
 	//	AfxMessageBox(str);
 		
-		if(nRange>=0&&nRange<2)
+		if(nRange>=0&&nRange<=2)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
@@ -638,13 +648,26 @@ void COutputSetDlg::Fresh_Grid()
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 
 		//if (newtstat6[7] ==PM_TSTAT6)
+	 
+	/*	str.Format(_T("newtstat6[7]=%d"),multi_register_value[7]);
+		AfxMessageBox(str);*/
 		if ((newtstat6[7] ==PM_TSTAT6)||(newtstat6[7] ==PM_TSTAT7))
-			nRange = newtstat6[206];
+			{nRange = newtstat6[206];}
 		else
+		{
+		if (multi_register_value[337]<2)
+			{
 			nRange = multi_register_value[284];
+			} 
+		else
+			{
+			nRange = multi_register_value[337];
+			}
+		}
+			
 
 
-		if(nRange>=0&&nRange<2)
+		if(nRange>=0&&nRange<=2)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
@@ -979,11 +1002,7 @@ void COutputSetDlg::Fresh_Grid()
 			//2.5.0.94
 			if(multi_register_value[284]==0)
 			{
-			//int autmanl = multi_register_value[310];
-			//int xx_ = 1;
-			//xx_ = xx_<<4;
-			//int flag_ =autmanl&xx_; 
-			//if(flag_)
+		 
 			{
 				if(nValue1 &( 1<<4))//2.5.0.94
 					strTemp=_T("ON");
@@ -2976,39 +2995,80 @@ void COutputSetDlg::OnCbnKillfocusOrangcombo()
 
 void COutputSetDlg::OnCbnSelchangeOrangcombo()
 {
-	/*
-	if(m_nModeType==2)
-	{
-		int nIndext=m_outRangCmbox.GetCurSel();
-		write_one(g_tstat_id,186 ,nIndext );
-		if (nIndext==2)
-		{
-			int	indext=3;
-			write_one(g_tstat_id,327,3);//timer on register
-		}
-	}else
-	{
-		short nIndext=m_outRangCmbox.GetCurSel();
-		write_one(g_tstat_id,283 ,nIndext);
-	}
-	*/
+	 
 	int  ret =0;
+	int ret1=0;
 	BeginWaitCursor();
 	int nIndext=m_outRangCmbox.GetCurSel();
 	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16||m_nModeType==17
 		//||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)//0914
 		||m_nModeType==18||m_nModeType==PM_PRESSURE)
 	{
-		if(m_nCurRow>0&&m_nCurRow<=5)
+	if(m_nCurRow>0&&m_nCurRow<=5)
 		{	
-			ret = write_one(g_tstat_id,280+(m_nCurRow-1) ,nIndext );
-			if (ret<=0)
-			{
-				AfxMessageBox(_T("setting failure"));
-			}else
-			{
-				multi_register_value[280+(m_nCurRow-1)] = nIndext;
-			}
+		   
+			   if (m_nCurRow==4)
+			   {
+			   if (nIndext<2)
+				   {
+				   ret = write_one(g_tstat_id,283 ,nIndext );
+				   ret1=write_one(g_tstat_id,336,0 );
+				   if ((ret<=0)||(ret1<=0))
+					   {
+					   AfxMessageBox(_T("setting failure"));
+					   }
+					   else
+					   {
+					    multi_register_value[283] = nIndext;
+						multi_register_value[284] = nIndext;
+					    multi_register_value[336] = 0;
+					   }
+				   } 
+				   else
+				   {
+			   ret = write_one(g_tstat_id,336,nIndext );
+			   if (ret<=0)
+				   {
+				   AfxMessageBox(_T("setting failure"));
+				   }else
+				   {
+				   multi_register_value[336] = nIndext;
+				   }
+				   }
+			   }
+		   if (m_nCurRow==5)
+			   {
+			   
+			   if (nIndext<2)
+				   {
+				   ret = write_one(g_tstat_id,284 ,nIndext );
+				   ret1=write_one(g_tstat_id,337,0 );
+				   if ((ret<=0)||(ret1<=0))
+					   {
+					   AfxMessageBox(_T("setting failure"));
+					   }
+				   else
+					   {
+					   multi_register_value[283] = nIndext;
+					   multi_register_value[284] = nIndext;
+					   multi_register_value[337] = 0;
+					   }
+				   } 
+			   else
+				   {
+				   ret = write_one(g_tstat_id,337,nIndext );
+				   if (ret<=0)
+					   {
+					   AfxMessageBox(_T("setting failure"));
+					   }else
+					   {
+					   multi_register_value[337] = nIndext;
+						}
+				   }
+			   }
+		       
+		 //  }
+		
 		}
 		if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_TSTAT6
 			||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE) //

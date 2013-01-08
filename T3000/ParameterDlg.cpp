@@ -1586,56 +1586,49 @@ void CParameterDlg::OnCbnSelchangeInputselect1()
 void CParameterDlg::OnCbnSelchangeInputselect2()
 {
     CString str;
-	
-	
 	if(g_ParamLevel==1)
 		return;
-
 	int nSel = m_inputSelect2.GetCurSel();	
-
-	 
 	g_bPauseMultiRead = TRUE;	
 	int nRet = 0;
 	if ((multi_register_value[7] == 6)||(multi_register_value[7] == 7))//tstat6
 		 nRet = write_one(g_tstat_id, reg_tststold[241], nSel);//380
 	else
-		nRet = write_one(g_tstat_id, 241, nSel);
+		 nRet = write_one(g_tstat_id, 241, nSel);
 	g_bPauseMultiRead = FALSE;
 	if(nRet>0)
 		multi_register_value [241] = nSel;
 
-
-	 
 	Refresh();
 }
 
 void CParameterDlg::OnEnKillfocusInputvalue2()
 {
 
-	if(g_ParamLevel==1)
-		return;
-	CString strTemp;
-	m_inputValue2.GetWindowText(strTemp);
-	if(strTemp.IsEmpty())
-		return;
-	int nValue=_wtoi(strTemp);
-		g_bPauseMultiRead = TRUE;	
-	if(multi_register_value[241]==2)
-	{
-		if(multi_register_value[189]==4||multi_register_value[189]==1)
-			write_one(g_tstat_id, 181,nValue*10);
-		else
-			write_one(g_tstat_id, 181,nValue);
+/*if(g_ParamLevel==1)
+return;
+CString strTemp;
+m_inputValue2.GetWindowText(strTemp);
+if(strTemp.IsEmpty())
+return;
+int nValue=_wtoi(strTemp);
+g_bPauseMultiRead = TRUE;	
+if(multi_register_value[241]==2)
+{
+if(multi_register_value[189]==4||multi_register_value[189]==1)
+write_one(g_tstat_id, 181,nValue*10);
+else
+write_one(g_tstat_id, 181,nValue);
 
-	}
-	else
-	{
-		if(multi_register_value[188]==4||multi_register_value[188]==1)
-			write_one(g_tstat_id, 180,nValue*10);
-		else
-			write_one(g_tstat_id, 180,nValue);
-	}
-g_bPauseMultiRead = FALSE;
+}
+else
+{
+if(multi_register_value[188]==4||multi_register_value[188]==1)
+write_one(g_tstat_id, 180,nValue*10);
+else
+write_one(g_tstat_id, 180,nValue);
+}
+g_bPauseMultiRead = FALSE;*/
 }
 
 void CParameterDlg::OnCbnSelchangeEapplication()

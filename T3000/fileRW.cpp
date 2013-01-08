@@ -1477,7 +1477,7 @@ int get_real_number_fan_speeds(int fan_number)
 }
 
 bool find_load_file_error(load_file_every_step temppp)
-{//return value true == found ,false == no found
+{  //return value true == found ,false == no found
 	int i=0;
 	/*
 	if(temppp.seven_step==false || temppp.first_step ==false || temppp.second_step ==false || 
