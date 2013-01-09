@@ -567,7 +567,7 @@ void CParameterDlg::OnCbnSelchangeAutoonlycombo()
 
 	// TODO: Add your control notification handler code here
 }
-void CParameterDlg::Refresh()
+ void CParameterDlg::Refresh()
 {
 	CString strTemp;
 	strTemp.Format(_T("%d"),g_tstat_id);
@@ -643,8 +643,7 @@ void CParameterDlg::Refresh()
 	strTemp.Format(_T("%d"),multi_register_value[338]);
 	m_defSetPointEdit.SetWindowText(strTemp);
 
-//	strTemp.Format(_T("%d"),multi_register_value[339]);
-//	m_setPointCtrlEdit.SetWindowText(strTemp);
+
 	if(multi_register_value[339]>=0&&multi_register_value[339]<3)
 	{
 		m_occupiedSetPointModeCmbox.SetCurSel(multi_register_value[339]);
@@ -726,155 +725,156 @@ void CParameterDlg::Refresh()
 	strTemp.Format(_T("%d"),multi_register_value[211]);
 	m_OverRideEdit.SetWindowText(strTemp);
 
+	if (multi_register_value[111]<1)
+	{
+		m_InputSelect1.SetCurSel(0);
+	}else if(multi_register_value[111]>3)
+	{
+		m_InputSelect1.SetCurSel(2);
+
+	}else
+	{
+		m_InputSelect1.SetCurSel(multi_register_value[111]-1);
+	}
+
+
+	if (multi_register_value[241]<0)
+	{
+		m_inputSelect2.SetCurSel(0);
+	}else if (multi_register_value[241]>5)
+	{
+		m_inputSelect2.SetCurSel(5);
+	}else
+	{
+		m_inputSelect2.SetCurSel(multi_register_value[241]);
+	}
 	
 	
-	strTemp.Format(_T("%.1f"),multi_register_value[101]/10.0);
-	m_inputvalue1.SetWindowText(strTemp+strUnit);
-	
-//////////////////////////////////////////////////////////////////////////
-// PID2 m_inputValue2 m_inputSelect2 关联设置
-// 
-// 	if(multi_register_value[7]== 18)//18是tstat5G
-// 	{
-// 		if(multi_register_value[241]==2) // input1
-// 		{	
-// 			if(multi_register_value[7]== PM_PRESSURE)  // pressure
-// 			{
-// 				strTemp.Format(_T("%.1f W.C"),multi_register_value[180]/100.0);
-// 			}
-// 			else
-// 			{
-// 				if(multi_register_value[188]==4||multi_register_value[188]==1)
-// 				{
-// 					strTemp.Format(_T("%.1f"),(float)multi_register_value[180]/10);
-// 					strTemp=strTemp+strUnit;
-// 				}
-// 				if (strUnit==""||strUnit=="%")
-// 				{
-// 					strTemp.Format(_T("%d"),multi_register_value[180]);
-// 				}
-// 				if(multi_register_value[180]==3)
-// 				{
-// 					if(multi_register_value[180]==0)
-// 						strTemp=_T("OFF");
-// 					if(multi_register_value[180]==1)
-// 						strTemp=_T("ON");
-// 				}
-// 			}
-// 			m_inputValue2.SetWindowText(strTemp);
-// 		}else if(multi_register_value[241]==1) // input2 //m_inputvalue1
-// 		{
-// 			if(multi_register_value[189]==4||multi_register_value[189]==1)
-// 			{
-// 				strTemp.Format(_T("%.1f"),(float)multi_register_value[181]/10.0);	
-// 				strTemp=strTemp+strUnit;
-// 			}
-// 			if (strUnit==""||strUnit=="%")
-// 			{
-// 				strTemp.Format(_T("%d"),multi_register_value[181]);
-// 			}
-// 			if(multi_register_value[189]==3)
-// 			{
-// 				if(multi_register_value[181]==0)
-// 					strTemp=_T("OFF");
-// 				if(multi_register_value[181]==1)
-// 					strTemp=_T("ON");
-// 			}
-// 			m_inputValue2.SetWindowText(strTemp);
-// 		}
-// 		else //if(multi_register_value[241]!=1)
-// 		{
-// 			m_inputValue2.SetWindowText(_T("UNUSED"));
-// 			//		m_hotelCoolEdt.SetWindowText(_T("N/A"));
-// 		}
-// 
-// 		//0914
-// 		// 	if (multi_register_value[241]==3) // humidity
-// 		// 	{
-// 		// 		strTemp.Format(_T("%.1f%%"),multi_register_value[422]/10.0);
-// 		// 		m_inputValue2.SetWindowText(strTemp);
-// 		// 	}else
-// 		// 	{
-// 		// 		m_inputValue2.SetWindowText(_T("0"));
-// 		// 
-// 		// 	}
-// 
-// 		//
-// 
-// 	}else
-// 	{
-////////////////////////////////////////////////////////////////////////////////////////
-		if(multi_register_value[241]==1) // input2
+
+
+ #if 1
+	 strTemp.Format(_T("%.1f"),multi_register_value[101]/10.0);
+	 m_inputvalue1.SetWindowText(strTemp+strUnit);
+	float fValue;int nValue=0;
+ CString strValueUnit=GetTempUnit(multi_register_value[359], 1);
+	if(multi_register_value[241]==1) // input1
 		{	
-			if(multi_register_value[7]== PM_PRESSURE)  // pressure
+		if(multi_register_value[7]== PM_PRESSURE)  // pressure
 			{
-				strTemp.Format(_T("%.1f W.C"),multi_register_value[180]/100.0);
+			strTemp.Format(_T("%.1f W.C"),multi_register_value[180]/100.0);
 			}
+		else if (multi_register_value[7]==16)
+		{
+		if(multi_register_value[359]==1)
+			{				
+			fValue=float(multi_register_value[367]/10.0);
+			strTemp.Format(_T("%.1f"),fValue);	
+
+			strTemp +=strValueUnit;
+			}
+		else if(multi_register_value[359]==3 || multi_register_value[359]==5) // On/Off or Off/On ==1 On ==0 Off
+			{						
+			int nValue=(multi_register_value[367]);
+			if (nValue == 1)
+				{
+				strTemp = _T("On");
+				}
 			else
-			{
-				if(multi_register_value[188]==4||multi_register_value[188]==1)
 				{
-					strTemp.Format(_T("%.1f"),(float)multi_register_value[180]/10);
-					strTemp=strTemp+strUnit;
-				}
-				if (strUnit==""||strUnit=="%")
-				{
-					strTemp.Format(_T("%d"),multi_register_value[180]);
-				}
-				if(multi_register_value[180]==3)
-				{
-					if(multi_register_value[180]==0)
-						strTemp=_T("OFF");
-					if(multi_register_value[180]==1)
-						strTemp=_T("ON");
-				}
+				strTemp = _T("Off");
+				}					
 			}
-			m_inputValue2.SetWindowText(strTemp);
-		}
-		else if(multi_register_value[241]==2) // input2 //m_inputvalue1
-		{
-			if(multi_register_value[189]==4||multi_register_value[189]==1)
+		else if (multi_register_value[359]==4 )  // custom sensor
+			{					
+			fValue=float(multi_register_value[367]/10.0);
+			strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
+			strTemp +=strValueUnit;
+			}
+		else if(multi_register_value[359]==2)
 			{
-				strTemp.Format(_T("%.1f"),(float)multi_register_value[181]/10.0);	
+			   nValue=multi_register_value[367];
+			   strTemp.Format(_T("%d%%"), nValue);
+			}
+		else
+			{
+			 
+			strTemp=_T("UNUSED");
+			}
+		
+		
+		} 
+		else
+			{
+			if(multi_register_value[188]==4||multi_register_value[188]==1)
+				{
+				strTemp.Format(_T("%.1f"),(float)multi_register_value[180]/10);
 				strTemp=strTemp+strUnit;
-			}
-	//if (strUnit==""||strUnit=="%")//0914
-	       else
-			{
-				//strTemp.Format(_T("%d"),multi_register_value[181]);//0914
-				strTemp.Format(_T("%.1f"),(float)multi_register_value[181]/10);
-				strTemp=strTemp+strUnit;
-			}
-			if(multi_register_value[189]==3)
-			{
-				if(multi_register_value[181]==0)
+				}
+			if (strUnit==""||strUnit=="%")
+				{
+				strTemp.Format(_T("%d"),multi_register_value[180]);
+				}
+			if(multi_register_value[180]==3)
+				{
+				if(multi_register_value[180]==0)
 					strTemp=_T("OFF");
-				if(multi_register_value[181]==1)
+				if(multi_register_value[180]==1)
 					strTemp=_T("ON");
+				}
 			}
-			m_inputValue2.SetWindowText(strTemp);
+		m_inputValue2.SetWindowText(strTemp);
 		}
-		else //if(multi_register_value[241]!=1)
+	else if(multi_register_value[241]==2) // input2 //m_inputvalue1
 		{
-			m_inputValue2.SetWindowText(_T("UNUSED"));
-			//		m_hotelCoolEdt.SetWindowText(_T("N/A"));
+	     if (multi_register_value[7]==16)//5E
+		 {
+		 if(multi_register_value[360]==1)
+			 {				
+			 fValue=float(multi_register_value[368]/10.0);
+			 strTemp.Format(_T("%.1f"),fValue);	
+
+			 strTemp +=strValueUnit;
+			 }
+		 else if(multi_register_value[360]==3 || multi_register_value[360]==5) // On/Off or Off/On ==1 On ==0 Off
+			 {						
+			 int nValue=(multi_register_value[368]);
+			 if (nValue == 1)
+				 {
+				 strTemp = _T("On");
+				 }
+			 else
+				 {
+				 strTemp = _T("Off");
+				 }					
+			 }
+		 else if (multi_register_value[360]==4 )  // custom sensor
+			 {					
+			 fValue=float(multi_register_value[368]/10.0);
+			 strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
+			 strTemp +=strValueUnit;
+			 }
+		 else if(multi_register_value[360]==2)
+			 {
+			 nValue=multi_register_value[368];
+			 strTemp.Format(_T("%d%%"), nValue);
+			 }
+		 else
+			 {
+
+			 strTemp=_T("UNUSED");
+			 }
+		 }
+
+		m_inputValue2.SetWindowText(strTemp);
 		}
+	else //if(multi_register_value[241]!=1)
+		{
+		m_inputValue2.SetWindowText(_T("UNUSED"));
+		}
+#endif
 
-		//0914
-		// 	if (multi_register_value[241]==3) // humidity
-		// 	{
-		// 		strTemp.Format(_T("%.1f%%"),multi_register_value[422]/10.0);
-		// 		m_inputValue2.SetWindowText(strTemp);
-		// 	}else
-		// 	{
-		// 		m_inputValue2.SetWindowText(_T("0"));
-		// 
-		// 	}
 
-		//
-//	}
 
-	//////////////////////////////////////////////////////////////////////////
 
  float m_fFirmwareVersion=get_curtstat_version();//0912
  	if (multi_register_value[7] == PM_TSTAT5E)//0912
@@ -913,7 +913,10 @@ void CParameterDlg::Refresh()
 	switch(index)
 	{
 	case 0:
-
+// 		CWnd *pSPWnd1 = GetDlgItem(IDC_STATIC_CSP);
+// 		pSPWnd1->SetWindowText(_T("Cooling Set Point"));
+// 		CWnd *pSPWnd2 = GetDlgItem(IDC_STATIC_HSP);
+// 		pSPWnd2->SetWindowText(_T("Heating Set Point"));
 		GetDlgItem(IDC_STATIC_CSP)->SetWindowText(_T("Cooling Set Point"));
 		GetDlgItem(IDC_STATIC_HSP)->SetWindowText(_T("Heating Set Point"));
 
@@ -925,12 +928,71 @@ void CParameterDlg::Refresh()
 
 
 	}
- 
+	//int GetCursor( ) const;
+
+
+	//OnCbnSelchangeEapplication();
+
+// 	strTemp.Empty();
+// 	int nSelect=multi_register_value[241];
+// 	if(nSelect==1)
+// 	{
+// 		if(multi_register_value[188]==4||multi_register_value[188]==1)
+// 		{
+// 			strTemp.Format(_T("%.1f"),(float)multi_register_value[180]/10);
+// 			strTemp=strTemp+strUnit;
+// 		}
+// 		if (strUnit==""||strUnit=="%")
+// 		{
+// 			strTemp.Format(_T("%d"),multi_register_value[180]);
+// 		}
+// 		if(multi_register_value[180]==3)
+// 		{
+// 			if(multi_register_value[180]==0)
+// 				strTemp=_T("OFF");
+// 			if(multi_register_value[180]==1)
+// 				strTemp=_T("ON");
+// 		}
+// 		
+// 		m_inputValue2.SetWindowText(strTemp);
+// 	}
+// 	if(nSelect==2)
+// 	{	
+// 		if(multi_register_value[189]==4||multi_register_value[189]==1)
+// 		{
+// 			strTemp.Format(_T("%.1f"),(float)multi_register_value[181]/10.0);	
+// 			strTemp=strTemp+strUnit;
+// 		}
+// 		if (strUnit==""||strUnit=="%")
+// 		{
+// 			strTemp.Format(_T("%d"),multi_register_value[181]);
+// 		}
+// 		if(multi_register_value[189]==3)
+// 		{
+// 			if(multi_register_value[181]==0)
+// 				strTemp=_T("OFF");
+// 			if(multi_register_value[181]==1)
+// 				strTemp=_T("ON");
+// 		}
+// 		m_inputValue2.SetWindowText(strTemp);
+// 	}
 
 	strTemp.Empty();
 	m_version=get_curtstat_version();
 
-
+// 	if (multi_register_value[7] == PM_TSTAT7)
+// 	{
+// 		strTemp.Format(_T("%.1f"),multi_register_value[380]/10.0);	//	set point 
+// 	}
+// 	else if(m_version<34.9|| multi_register_value[7] == 16)  // 老版本不除10，
+// 	{
+// 		strTemp.Format(_T("%d"),(int)multi_register_value[135]);	//	set point 
+// 	}
+// 	else
+// 	{
+// 		strTemp.Format(_T("%.1f"),multi_register_value[374]/10.0);		// set point for TStat A,B,C,D
+// 	}
+// 	m_pid_setptEdt1.SetWindowText(strTemp);
 
 	strTemp.Empty();
 	strTemp.Format(_T("%.1f"),multi_register_value[246]/10.0);	
@@ -974,7 +1036,10 @@ void CParameterDlg::Refresh()
 	strTemp.Empty();
 
 
-
+// 	if (m_version>=SETPOINT_SPECIAL_VERSION)//
+// 	{
+// 		strTemp.Format(_T("%.1f"),multi_register_value[374]/10.0);
+// 	}
 	if((multi_register_value[7] == PM_TSTAT7)||(multi_register_value[7] == PM_TSTAT6))
 	{
 		strTemp.Format(_T("%.1f"),multi_register_value[380]/10.0);//	set point 
@@ -1067,33 +1132,6 @@ void CParameterDlg::Refresh()
 		}
 
 
-
-
-		if (multi_register_value[111]<1)
-			{
-			m_InputSelect1.SetCurSel(0);
-			}else if(multi_register_value[111]>3)
-			{
-			m_InputSelect1.SetCurSel(2);
-
-				}else
-				{
-				m_InputSelect1.SetCurSel(multi_register_value[111]-1);
-					}
-
-
-				if (multi_register_value[241]<0)
-					{
-					m_inputSelect2.SetCurSel(0);
-					}else if (multi_register_value[241]>3)
-					{
-					m_inputSelect2.SetCurSel(3);
-					}
-					else
-					{
-						 
-					    m_inputSelect2.SetCurSel(multi_register_value[241]);
-					}
 }
 
 
@@ -1594,7 +1632,7 @@ void CParameterDlg::OnCbnSelchangeInputselect2()
 	if ((multi_register_value[7] == 6)||(multi_register_value[7] == 7))//tstat6
 		 nRet = write_one(g_tstat_id, reg_tststold[241], nSel);//380
 	else
-		 nRet = write_one(g_tstat_id, 241, nSel);
+		nRet = write_one(g_tstat_id, 241, nSel);
 	g_bPauseMultiRead = FALSE;
 	if(nRet>0)
 		multi_register_value [241] = nSel;

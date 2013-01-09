@@ -2170,8 +2170,9 @@ void CInputSetDlg::OnCbnSelchangeRangComboFor5E()
 			write_one(g_tstat_id,359+m_nCurRow-2,nindext);
 	}
 
+
 	//OnBnClickedRefreshbutton();//stat6 TSTAT6点击这时，再去刷新则会出现错误，崩溃.
-	Fresh_Grid();
+    	Fresh_Grid();
 }
 
 void CInputSetDlg::OnBnClickedUpbuttonFor5E()
@@ -2665,7 +2666,6 @@ void CInputSetDlg::InitGrid5EnoTSTAT6()
 				{
 					//strTemp.Format(_T("%d"),multi_register_value[367+i-2]);
 					strTemp=_T("UNUSED");
-
 				}						
 				m_FlexGrid.put_TextMatrix(i,VALUE_FIELD,strTemp);
 				strTemp.Empty();
