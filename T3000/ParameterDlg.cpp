@@ -191,6 +191,7 @@ ON_EN_KILLFOCUS(IDC_EDIT38, &CParameterDlg::OnEnKillfocusEdit38)
 ON_BN_CLICKED(IDCANCEL, &CParameterDlg::OnBnClickedCancel)
 ON_EN_KILLFOCUS(IDC_EDIT_ValueTravelTime, &CParameterDlg::OnEnKillfocusEditValuetraveltime)
 ON_EN_KILLFOCUS(IDC_EDIT_PID2OFFSETPOINT, &CParameterDlg::OnEnKillfocusEditPid2offsetpoint)
+ON_EN_CHANGE(IDC_EDIT26, &CParameterDlg::OnEnChangeEdit26)
 END_MESSAGE_MAP()
 
 
@@ -1864,34 +1865,39 @@ void CParameterDlg::OnEnKillfocusEcoolingpterm1()
 	m_pternEdt1.GetWindowText(strText);
 	float ftemp =(float) _wtof(strText);		
 	g_bPauseMultiRead = TRUE;	
-	write_one(g_tstat_id,114 , short(ftemp*10));
+	int ret=write_one(g_tstat_id,114 , short(ftemp*10));
+ 
 	g_bPauseMultiRead = FALSE;
 }
 
 void CParameterDlg::OnEnKillfocusEcoolingpterm2()
 {
-	if(g_ParamLevel==1)
-		return;
+if(g_ParamLevel==1)
+	return;
 
-	CString strText;
-	m_ptermEdt2.GetWindowText(strText);
-	float ftemp = (float)_wtof(strText);
-			g_bPauseMultiRead = TRUE;	
-	write_one(g_tstat_id, 244, short(ftemp*10));
+CString strText;
+m_ptermEdt2.GetWindowText(strText);
+float ftemp = (float)_wtof(strText);
+g_bPauseMultiRead = TRUE;	
+	int ret=write_one(g_tstat_id, 244, short(ftemp*10));
+	 
 	g_bPauseMultiRead = FALSE;
 }
 
 void CParameterDlg::OnEnKillfocusEdit26()
 {
-	if(g_ParamLevel==1)
-		return;
+ 
+if(g_ParamLevel==1)
+	return;
 
-	CString strText;
-	m_coolingPitemEdt1.GetWindowText(strText);
-	float ftemp = (float)_wtof(strText);
-			g_bPauseMultiRead = TRUE;
-	write_one(g_tstat_id, 115, short(ftemp*10));	
-	g_bPauseMultiRead = FALSE;
+CString strText;
+m_coolingPitemEdt1.GetWindowText(strText);
+float ftemp = (float)_wtof(strText);
+g_bPauseMultiRead = TRUE;
+int ret=write_one(g_tstat_id, 115, short(ftemp*10));	
+ 
+g_bPauseMultiRead = FALSE;
+
 }
 
 void CParameterDlg::OnEnKillfocusEdit27()
@@ -1903,7 +1909,8 @@ void CParameterDlg::OnEnKillfocusEdit27()
 	m_pidPitemEdt2.GetWindowText(strText);
 	float ftemp = (float)_wtof(strText);
 			g_bPauseMultiRead = TRUE;
-	write_one(g_tstat_id, 245, short(ftemp*10));	
+	int ret=write_one(g_tstat_id, 245, short(ftemp*10));
+	 
 	g_bPauseMultiRead = FALSE;
 }
 void CParameterDlg::OnEnKillfocusSpset1()
@@ -2951,3 +2958,15 @@ void CParameterDlg::OnEnKillfocusEditPid2offsetpoint()
 
 
 }
+
+
+void CParameterDlg::OnEnChangeEdit26()
+	{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 CDialog::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+	  
+
+	// TODO:  在此添加控件通知处理程序代码
+	}
