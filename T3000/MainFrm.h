@@ -112,8 +112,8 @@ protected: // create from serialization only
 
 public:
 
-    CView * m_pViews[NUMVIEWS];
-    UINT m_nCurView;    
+	CView * m_pViews[NUMVIEWS];
+	UINT m_nCurView;    
 	void InitViews();
 
 public://for scan
