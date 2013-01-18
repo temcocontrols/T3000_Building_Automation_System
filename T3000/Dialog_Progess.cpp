@@ -141,7 +141,7 @@ if(nIDEvent == 1)
 
 void CDialog_Progess::settimer( BOOL bpram,int lower,int upper,BOOL bend )
 {
-	//this->ShowWindow(SW_SHOW);
+//this->ShowWindow(SW_SHOW);
 //	this->CenterWindow();
 	
 // 	m_lower = lower;

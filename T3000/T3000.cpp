@@ -36,9 +36,6 @@ CT3000App::CT3000App()
 // 		
 // 		AfxMessageBox(_T("1111"));
 // 	}
-
-
-	
 }
 // The one and only CT3000App object
 CT3000App theApp;
@@ -54,10 +51,8 @@ BOOL CT3000App::user_login()
 	return true;
 }
 // CT3000App initialization
-
 /*
 FunctionName:RegisterOcx
-
 Comment:Alex
 Date:2012-11-29
 Purpose:这个函数的作用，获取控件的位置，注册到注册表中
@@ -690,7 +685,6 @@ Comment:Alex
 Date:2012/11/29
 Purpose:
 从一个注册表中读取相应的值给类中的成员变量
-
 */
 void CT3000App::ReadREG()
 {

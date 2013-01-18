@@ -86,8 +86,8 @@ void SetPaneString(int nIndext,CString str)
 		return;
 	pStatusBar = (CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR);
 	pStatusBar->SetPaneText(nIndext,str.GetString());
-	//pStatusBar->SetPaneTextColor (RGB(128,0,0));
 
+//pStatusBar->SetPaneTextColor (RGB(128,0,0));
 // 	CRect rc;
 // 	pStatusBar->GetItemRect(0, &rc);
 // 	CDC* pDC = pStatusBar->GetWindowDC();
@@ -123,7 +123,9 @@ int write_one(unsigned char device_var,unsigned short address,short value,int re
 }
 
 int write_one_org(unsigned char device_var,unsigned short address,short value,int retry_times)
-{//retry 
+{
+
+//retry 
 // 	CString str;
 // 	str.Format(_T("ID :%d Writing %d"),device_var,address);
 // 	SetPaneString(0,str);

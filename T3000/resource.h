@@ -141,6 +141,7 @@
 #define IDB_BITMAP_SCHEDULE             438
 #define IDD_DIALOG_INFO                 439
 #define IDD_DIALOG_MINIPANEL            440
+#define IDD_DIALOG10                    441
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -845,6 +846,13 @@
 #define IDC_SLIDER_NIGHT                1568
 #define IDC_STATICDAY                   1569
 #define IDC_STATICNIGHT                 1570
+#define IDC_FREEZEFUNC                  1572
+#define IDC_TEMPTURE                    1573
+#define IDC_OPEN                        1574
+#define IDC_CLOSE                       1575
+#define IDC_TEMP                        1576
+#define IDC_TEMP2                       1577
+#define IDC_TEMP3                       1578
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -936,9 +944,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        440
+#define _APS_NEXT_RESOURCE_VALUE        442
 #define _APS_NEXT_COMMAND_VALUE         32870
-#define _APS_NEXT_CONTROL_VALUE         1571
+#define _APS_NEXT_CONTROL_VALUE         1577
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

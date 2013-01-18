@@ -265,6 +265,8 @@ void EnumPortsW9x(CArray<SSerInfo,SSerInfo&> &asi)
 	// Search all subkeys of HKLM\Enum\USBPORTS for PORTNAME entries.
 
 	// First, open HKLM\Enum
+
+
 	HKEY hkEnum = NULL;
 	HKEY hkSubEnum = NULL;
 	HKEY hkSubSubEnum = NULL;

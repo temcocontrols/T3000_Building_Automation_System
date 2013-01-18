@@ -23,16 +23,10 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 
-
 //#include "MainFrm.h"
-
-
-
 const int nBorderSize = 1;
-
 /////////////////////////////////////////////////////////////////////////////
 // CWorkspaceBar
-
 BEGIN_MESSAGE_MAP(CWorkspaceBar, CDockablePane)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
@@ -52,42 +46,35 @@ END_MESSAGE_MAP()
 CWorkspaceBar::CWorkspaceBar()
 {
 	// TODO: add one-time construction code here
-
 }
 
 CWorkspaceBar::~CWorkspaceBar()
 {
-
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // CWorkspaceBar message handlers
-
 int CWorkspaceBar::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
 	if (CDockablePane::OnCreate(lpCreateStruct) == -1)
 		return -1;
-
 	CRect rectDummy (0, 0,200, 600);
 	const DWORD dwViewStyle =	WS_VISIBLE | WS_TABSTOP | WS_CHILD | WS_BORDER
    | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_HASLINES
    | TVS_DISABLEDRAGDROP | TVS_EDITLABELS;
 
-
    m_TreeCtrl.Create(dwViewStyle,CRect(10, 10, 300, 100), this,ID_SHELLTREE);
- //  m_image_list.Create(IDB_TREENODE_BMP,16,1,RGB(255,255,255));
+ //m_image_list.Create(IDB_TREENODE_BMP,16,1,RGB(255,255,255));
 	CBitmap a;
 	a.LoadBitmap(IDB_TREENODE_BMP);
 	m_image_list.Create(24,24,ILC_COLOR24,1,1);
 	m_image_list.Add(&a,RGB(0,0,0));
     m_TreeCtrl.SetImageList(&m_image_list,TVSIL_NORMAL);
 
-
-
 // Setup trees content:
-//	HTREEITEM hRoot1 = m_TreeCtrl.InsertItem (_T("Root 1"));
-//m_TreeCtrl.InsertItem (_T("Item 1"), hRoot1);
-//	m_TreeCtrl.InsertItem (_T("Item 2"), hRoot1);
+// HTREEITEM hRoot1 = m_TreeCtrl.InsertItem (_T("Root 1"));
+// m_TreeCtrl.InsertItem (_T("Item 1"), hRoot1);
+// m_TreeCtrl.InsertItem (_T("Item 2"), hRoot1);
 	return 0;
 }
 void CWorkspaceBar::OnSize(UINT nType, int cx, int cy) 

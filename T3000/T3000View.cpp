@@ -360,13 +360,11 @@ void CT3000View::OnInitialUpdate()
 
 	m_singleslidernight.SetThumbColor(RGB(0, 0, 255));
 	m_singleslidernight.SetSelectionColor(RGB(64, 64, 255)); 
-	m_singleslidernight.SetChannelColor(RGB(196, 196, 255)); 
-	//m_singleslidernight.SetChannelColor(RGB(212, 208, 200)); 
-
-
-
-//	m_singleslidernight.SetRange(0, 100);
-// 	m_singleslidernight.SetPos(50);
+	m_singleslidernight.SetChannelColor(RGB(196, 196, 255));
+	 
+//m_singleslidernight.SetChannelColor(RGB(212, 208, 200)); 
+//m_singleslidernight.SetRange(0, 100);
+//m_singleslidernight.SetPos(50);
 
  	GetDlgItem(IDC_SLIDER_DAY)->ShowWindow(SW_HIDE);
  	GetDlgItem(IDC_SLIDER_NIGHT)->ShowWindow(SW_HIDE);
@@ -433,6 +431,7 @@ void CT3000View::CreateFlexSilde()
 		ScreenToClient(&rc);
 
 		//m_pFswHotel->Create( NULL, s1->GetStyle()|s1->GetExStyle()|SS_SUNKEN, rc, this, 10001);
+
 		m_pNightSingleSP->CreateInstance(s1, s1->GetStyle()|s1->GetExStyle()|SS_SUNKEN, rc);
 		m_pNightSingleSP->SetParentWnd(this);
 
@@ -600,7 +599,7 @@ void CT3000View::Fresh()
 // 	strInfo.Format(_T("CT3000View::Fresh():FreshIOGridTable()"));			
 // 	SetPaneString(2, strInfo);
 //Alex-Changed
-FreshCtrl();
+    FreshCtrl();
 	FreshIOGridTable();
 }
 void CT3000View::FreshCtrl()
@@ -615,7 +614,7 @@ if (multi_register_value[121] == 1)
 	{
 	g_unint = TRUE;
 	GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("°C"));
-		}
+	}
 
 	m_nID=g_tstat_id;
 	m_fFirmwareVersion=get_curtstat_version();
@@ -2291,14 +2290,8 @@ void CT3000View::InitSliderBars2()
 	  
 
 	   m_pDayTwoSP->ShowWindow(SW_NORMAL);
-	    m_pDaySingleSP->ShowWindow(SW_HIDE);
+	   m_pDaySingleSP->ShowWindow(SW_HIDE);
 
-	 // m_pDayTwoSP->EnableWindows(TRUE);
-	   /* m_pDaySingleSP->EnableWindows(FALSE);
-	   m_pNightTwoSP->EnableWindows(FALSE);
-	   m_pNightSingleSP->EnableWindows(FALSE); */
-	   
-	   
 	   } 
 	   else
 	   {
@@ -4156,7 +4149,7 @@ void CT3000View::OnBnClickedUnoccupiedMark()
 			/*GetDlgItem(IDC_SLIDER_DAY)->ShowWindow(SW_SHOW);
 			GetDlgItem(IDC_SLIDER_NIGHT)->ShowWindow(SW_HIDE);*/
 	       // m_pNightTwoSP->ShowWindow(SW_NORMAL);
-		m_OcupiedBtn.SetCheck(1);
+		  m_OcupiedBtn.SetCheck(1);
 
 	}
 
@@ -4262,7 +4255,7 @@ void CT3000View::OnSize(UINT nType, int cx, int cy)
 	/*
 	if(m_pSetPtDayDlg!=NULL)
 	{
-			CRect rcSetptWnd;
+		CRect rcSetptWnd;
 		m_SetptStatic.GetWindowRect(rcSetptWnd);
 		rcSetptWnd.right=rcSetptWnd.left+450;
 		rcSetptWnd.bottom=rcSetptWnd.top+600;
@@ -4317,12 +4310,12 @@ void CT3000View::OnMoving(UINT fwSide, LPRECT pRect)
 	/*
 	if(m_pSetPtDayDlg!=NULL)
 	{
-			CRect rcSetptWnd;
-		m_SetptStatic.GetWindowRect(rcSetptWnd);
-		rcSetptWnd.right=rcSetptWnd.left+450;
-		rcSetptWnd.bottom=rcSetptWnd.top+600;
-		m_pSetPtDayDlg->MoveWindow(&rcSetptWnd);
-		m_pSetPtDayDlg->ShowWindow(SW_SHOW);
+	CRect rcSetptWnd;
+	m_SetptStatic.GetWindowRect(rcSetptWnd);
+	rcSetptWnd.right=rcSetptWnd.left+450;
+	rcSetptWnd.bottom=rcSetptWnd.top+600;
+	m_pSetPtDayDlg->MoveWindow(&rcSetptWnd);
+	m_pSetPtDayDlg->ShowWindow(SW_SHOW);
 	}
 	*/
 }
@@ -4332,8 +4325,6 @@ LRESULT CT3000View::OnFreshView(WPARAM wParam, LPARAM lParam)
 	Fresh();
 	return 0;
 }
-
-
 
 void CT3000View::OnBnClickedBtnSynctime()
 {
@@ -4376,9 +4367,6 @@ void CT3000View::OnBnClickedButtonSchedule()
 // 	g_bPauseMultiRead = FALSE;
 	
 }
-
-
-
 
 // 这个函数是给新的Model，TStat6，TStat7使用
 // 使用了新的寄存器和新的寄存器逻辑
@@ -5515,7 +5503,6 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			}else 
 			{
 
-
 // 				if (nCoolSP<nRangeMin)
 // 				{
 // 					nCoolSP = nRangeMin;
@@ -5537,8 +5524,6 @@ void CT3000View::InitFlexSliderBars_tstat6()
 // 					nRangeMax = nHeatSP+1;
 // 					tstat6flex[Max] = nRangeMax;
 // 				}	
-
-
 //0910
 				if (nHeatSP<nRangeMin)
 				{
@@ -5671,7 +5656,7 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//349	2	Full	W/R	(Day)Occupied  heating setpoint (day heating setpoint)
 
 			GetDlgItem(IDC_DAY_EDIT)->EnableWindow(FALSE);
-			//GetDlgItem(IDC_DAY_EDIT)->ShowWindow(SW_SHOW);
+//GetDlgItem(IDC_DAY_EDIT)->ShowWindow(SW_SHOW);
 
 //  			int nCoolingDBRegister = 348;
 //  			int nHeatingDBRegister = 349;
@@ -5846,7 +5831,7 @@ void CT3000View::InitFlexSliderBars_tstat6()
 
 
  
- 			//////////////////////////////////////////////////////////////////////////
+ 		//////////////////////////////////////////////////////////////////////////
 		//	nRangeMax = nHeatSP > nRangeMax ? nHeatSP : nRangeMax;
  		//	nRangeMax = nCoolSP > nRangeMax ? nCoolSP : nRangeMax;
  		//	nRangeMin = nHeatSP < nRangeMin ? nHeatSP : nRangeMin;

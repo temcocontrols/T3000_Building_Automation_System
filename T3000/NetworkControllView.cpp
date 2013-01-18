@@ -156,7 +156,12 @@ void CNetworkControllView::OnInitialUpdate()
 	// init timesever combobox
 	initTimeServerList();
 
-
+	m_ipModelComBox.EnableWindow(TRUE);
+	//m_listenPortEdit.EnableWindow(TRUE);
+	//m_ip_addressCtrl.EnableWindow(TRUE);
+	//m_subnet_addressCtrl.EnableWindow(TRUE);
+	//m_gateway_addressCtrl.EnableWindow(TRUE);
+	GetDlgItem(IDC_APPLYBUTTON)->EnableWindow(TRUE);
 	//InitGrid();
 
 	
@@ -200,7 +205,7 @@ void CNetworkControllView::Fresh()
 	m_ip_addressCtrl.SetAddress((BYTE)multi_register_value[107],(BYTE)multi_register_value[108],(BYTE)multi_register_value[109],(BYTE)multi_register_value[110]);
 	m_subnet_addressCtrl.SetAddress((BYTE)multi_register_value[111],(BYTE)multi_register_value[112],(BYTE)multi_register_value[113],(BYTE)multi_register_value[114]);
 	m_gateway_addressCtrl.SetAddress((BYTE)multi_register_value[115],(BYTE)multi_register_value[116],(BYTE)multi_register_value[117],(BYTE)multi_register_value[118]);
-	OnBnClickedCheck1();
+	//OnBnClickedCheck1();
 		
 	if(multi_register_value[12]==0)
 	{
@@ -671,10 +676,10 @@ void CNetworkControllView::OnBnClickedButtonUpdatetimeserver()
 		sockaddr.sin_addr.S_un.S_addr =inet_addr(szIP);
 	}
 	// write to nc
-	int n=write_one(g_tstat_id,178, BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b1 ));
-	n=write_one(g_tstat_id,179,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b2 ));
-	n=write_one(g_tstat_id,180,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b3 ));
-	n=write_one(g_tstat_id,181,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b4 ));
+	int n=write_one(g_tstat_id,178,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b1 ));
+	    n=write_one(g_tstat_id,179,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b2 ));
+	    n=write_one(g_tstat_id,180,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b3 ));
+	    n=write_one(g_tstat_id,181,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b4 ));
 
 	n=write_one(g_tstat_id,177,6); // ÃüÁî¼Ä´æÆ÷£¬Í¬²½ÃüÁî
 
@@ -864,8 +869,6 @@ BOOL CNetworkControllView::CheckSettingChanged()
 }
 
 //*
-
-
 
 //HKEY_CURRENT_USER\Software\Temco T3000 Application\T3000\Timeserver
 

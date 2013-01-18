@@ -484,7 +484,7 @@ void COutPutDlg::FreshGrids()
 	{
 	  FreshGrid_PID1tstat6();
 	  FreshGrid_PID2tstat6();
-	  FreshGrid_PID1tstat6();
+	 // FreshGrid_PID1tstat6();
 
 	}else
 	{
@@ -580,6 +580,7 @@ void COutPutDlg::FreshGrid_PID1()
 	m_FlexGrid1.put_TextMatrix(0,1,_T("Description"));
 	m_FlexGrid1.put_TextMatrix(0,2,_T("Function"));
 	m_FlexGrid1.put_TextMatrix(0,3,_T("Rotation"));
+	m_FlexGrid1.put_ColWidth(3,0);//Rotation--不要了 
 	m_FlexGrid1.put_TextMatrix(0,4,_T("Control"));
 	m_FlexGrid1.put_TextMatrix(0,5,_T("InterLock"));
 	int i=0;
@@ -675,6 +676,7 @@ void COutPutDlg::FreshGrid_PID1()
 		nRotation=multi_register_value[329+k];
 		strTemp.Format(_T("%d"),nRotation);
 		m_FlexGrid1.put_TextMatrix(k+2,3,strTemp);
+		/*m_FlexGrid1.put_CellBackColor(FLEXGRID_CELL_COLOR);*/
 		if ((nFunction& (1<<k))>0)
 		{
 			m_FlexGrid1.put_TextMatrix(k+2,2,_T("Rotation"));
@@ -1386,6 +1388,7 @@ void COutPutDlg::FreshGrid_PID2()
 	m_FlexGrid2.put_TextMatrix(0,1,_T("Description"));
 	m_FlexGrid2.put_TextMatrix(0,2,_T("Function"));
 	m_FlexGrid2.put_TextMatrix(0,3,_T("Rotation"));
+	m_FlexGrid2.put_ColWidth(3,0);//Rotation--不要了 
 	m_FlexGrid2.put_TextMatrix(0,4,_T("Control"));
 	m_FlexGrid2.put_TextMatrix(0,5,_T("Interlock"));
 	int i=0;
@@ -1967,21 +1970,21 @@ if(lCol==5)
 		if(multi_register_value[188]==3)//on/off mode  //找不到对应的tstat6
 			m_ItemValueCombx.AddString(_T("AI1"));
 		else
-			m_ItemValueCombx.AddString(_T("//AI1"));
+			m_ItemValueCombx.AddString(_T("AI1"));
 		if(multi_register_value[189]==3)//on/off mode
 			m_ItemValueCombx.AddString(_T("AI2"));
 		else
-			m_ItemValueCombx.AddString(_T("//AI2"));
+			m_ItemValueCombx.AddString(_T("AI2"));
 		}else
 		{
 		if(multi_register_value[188]==3)//on/off mode
 			m_ItemValueCombx.AddString(_T("AI1"));
 		else
-			m_ItemValueCombx.AddString(_T("//AI1"));
+			m_ItemValueCombx.AddString(_T("AI1"));
 		if(multi_register_value[189]==3)//on/off mode
 			m_ItemValueCombx.AddString(_T("AI2"));
 		else
-			m_ItemValueCombx.AddString(_T("//AI2"));
+			m_ItemValueCombx.AddString(_T("AI2"));
 			}
 
 		m_ItemValueCombx.AddString(_T("Timer Or"));
@@ -4038,11 +4041,11 @@ void COutPutDlg::ClickMsflexgrid2()
 		if(multi_register_value[188]==3)//on/off mode
 			m_ItemValueCombx.AddString(_T("AI1"));
 		else
-			m_ItemValueCombx.AddString(_T("//AI1"));
+			m_ItemValueCombx.AddString(_T("AI1"));
 		if(multi_register_value[189]==3)//on/off
 			m_ItemValueCombx.AddString(_T("AI2"));
 		else
-			m_ItemValueCombx.AddString(_T("//AI2"));
+			m_ItemValueCombx.AddString(_T("AI2"));
 		m_ItemValueCombx.AddString(_T("Timer Or"));
 		m_ItemValueCombx.AddString(_T("Timer And"));
 		m_ItemValueCombx.AddString(_T("InterLock Timer"));
@@ -4289,7 +4292,7 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 	CString strText;
 	m_DescriptEdt.GetWindowText(strText);
 	m_DescriptEdt.ShowWindow(SW_HIDE);
-	//int lRow = m_Output_Grid.get_RowSel();//获取点击的行号	
+//int lRow = m_Output_Grid.get_RowSel();//获取点击的行号	
 //	int lCol = m_Output_Grid.get_ColSel(); //获取点击的列号
 
 	CString strInName;
@@ -4498,9 +4501,8 @@ void COutPutDlg::OnEnSetfocusDescriptedit()
 
 void COutPutDlg::FreshGrid_PID1tstat6()
 {
-
 //	129	107	1	Low byte	W/R	"AUTO_ONLY , enables or disables manual mode. 0 = Manual Fan Modes 1-x Allowed 
-//		(depending on R122 value, 1 = Auto Mode Only, 2 = DDC mode,the user can not change setpoint and fan speed from keypad."
+//	(depending on R122 value, 1 = Auto Mode Only, 2 = DDC mode,the user can not change setpoint and fan speed from keypad."
 
 	strdemo = _T("2,");
 	SetPaneString(2,strdemo);
@@ -4595,7 +4597,8 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 
 
  	m_FlexGrid1.put_Rows(8);
- 	m_FlexGrid1.put_Cols(m_PID1_heat_stages+m_PID1_cool_stages+7);//interlock control first_blank coast
+ 	m_FlexGrid1.put_Cols(m_PID1_heat_stages+m_PID1_cool_stages+7);
+	//interlock control first_blank coast
 	//m_FlexGrid1.put_Cols(m_PID1_heat_stages+m_PID1_cool_stages+7);//interlock control first_blank coast
 	//long colum = 0;
 	//colum = m_PID1_heat_stages+m_PID1_cool_stages;
@@ -4608,6 +4611,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 	m_FlexGrid1.put_TextMatrix(0,1,_T("Description"));
 	m_FlexGrid1.put_TextMatrix(0,2,_T("Function"));
 	m_FlexGrid1.put_TextMatrix(0,3,_T("Rotation"));
+	m_FlexGrid1.put_ColWidth(3,0);//Rotation--不要了 
 	m_FlexGrid1.put_TextMatrix(0,4,_T("Control"));
 	m_FlexGrid1.put_TextMatrix(0,5,_T("InterLock"));
 	int i=0;
@@ -5249,6 +5253,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 	m_FlexGrid2.put_TextMatrix(0,1,_T("Description"));
 	m_FlexGrid2.put_TextMatrix(0,2,_T("Function"));
 	m_FlexGrid2.put_TextMatrix(0,3,_T("Rotation"));
+	m_FlexGrid2.put_ColWidth(3,0);//Rotation--不要了 
 	m_FlexGrid2.put_TextMatrix(0,4,_T("Control"));
 	m_FlexGrid2.put_TextMatrix(0,5,_T("Interlock"));
 	int i=0;

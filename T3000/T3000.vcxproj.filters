@@ -285,6 +285,9 @@
     <ClCompile Include="singleslider\MacSliderCtrl.cpp">
       <Filter>singleslider</Filter>
     </ClCompile>
+    <ClCompile Include="FreezeFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -693,6 +696,9 @@
     </ClInclude>
     <ClInclude Include="singleslider\MacSliderCtrl.h">
       <Filter>singleslider</Filter>
+    </ClInclude>
+    <ClInclude Include="FreezeFunction.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -18,7 +18,7 @@
 #include "Dialog_Progess.h"//tstat6
 
 
-
+#include "FreezeFunction.h"
 // CParameterDlg dialog
 
 IMPLEMENT_DYNAMIC(CParameterDlg, CDialog)
@@ -192,6 +192,7 @@ ON_BN_CLICKED(IDCANCEL, &CParameterDlg::OnBnClickedCancel)
 ON_EN_KILLFOCUS(IDC_EDIT_ValueTravelTime, &CParameterDlg::OnEnKillfocusEditValuetraveltime)
 ON_EN_KILLFOCUS(IDC_EDIT_PID2OFFSETPOINT, &CParameterDlg::OnEnKillfocusEditPid2offsetpoint)
 ON_EN_CHANGE(IDC_EDIT26, &CParameterDlg::OnEnChangeEdit26)
+ON_BN_CLICKED(IDC_FREEZEFUNC, &CParameterDlg::OnBnClickedFreezefunc)
 END_MESSAGE_MAP()
 
 
@@ -1643,7 +1644,6 @@ void CParameterDlg::OnCbnSelchangeInputselect2()
 
 void CParameterDlg::OnEnKillfocusInputvalue2()
 {
-
 /*if(g_ParamLevel==1)
 return;
 CString strTemp;
@@ -2969,4 +2969,11 @@ void CParameterDlg::OnEnChangeEdit26()
 	  
 
 	// TODO:  在此添加控件通知处理程序代码
+	}
+
+
+void CParameterDlg::OnBnClickedFreezefunc()
+	{
+	   CFreezeFunction fzfdlg;
+	   fzfdlg.DoModal();
 	}

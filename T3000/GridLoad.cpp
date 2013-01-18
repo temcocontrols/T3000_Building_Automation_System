@@ -291,7 +291,8 @@ END_MESSAGE_MAP()
 
 void CGridLoad::OnBnClickedButton4()
 {
-	SendMessage(WM_CLOSE,0,0);
+	//SendMessage(WM_CLOSE,0,0);
+	 CDialog::OnOK();
 	// TODO: Add your control notification handler code here
 }
 //³õÊ¼OnInitDialog
@@ -892,30 +893,30 @@ void CGridLoad::OnDestroy()
 {
 	CDialog::OnDestroy();
 
-	m_bStopLoadingfile=TRUE;
-	Sleep(200);
-	DWORD dwExidCode;
-	if(m_pLoadBackCheckThread)
-	{
-		//Sleep(300);
-		GetExitCodeThread(m_pLoadBackCheckThread->m_hThread,&dwExidCode);
-		if(dwExidCode==STILL_ACTIVE)
-		{
-			TerminateThread(m_pLoadBackCheckThread->m_hThread,dwExidCode);
-			m_pLoadBackCheckThread=NULL;
-		}
-	}
+	//m_bStopLoadingfile=TRUE;
+	//Sleep(200);
+	//DWORD dwExidCode;
+	//if(m_pLoadBackCheckThread)
+	//{
+	//	//Sleep(300);
+	//	GetExitCodeThread(m_pLoadBackCheckThread->m_hThread,&dwExidCode);
+	//	if(dwExidCode==STILL_ACTIVE)
+	//	{
+	//		TerminateThread(m_pLoadBackCheckThread->m_hThread,dwExidCode);
+	//		m_pLoadBackCheckThread=NULL;
+	//	}
+	//}
 
-	if(m_ploadThread!=NULL)
-	{
-		GetExitCodeThread(m_ploadThread->m_hThread,&dwExidCode);
-		if(dwExidCode==STILL_ACTIVE)
-		{
-			TerminateThread(m_ploadThread->m_hThread,dwExidCode);
-			m_ploadThread=NULL;
-			Sleep(300);
-		}
-	}
+	//if(m_ploadThread!=NULL)
+	//{
+	//	GetExitCodeThread(m_ploadThread->m_hThread,&dwExidCode);
+	//	if(dwExidCode==STILL_ACTIVE)
+	//	{
+	//		TerminateThread(m_ploadThread->m_hThread,dwExidCode);
+	//		m_ploadThread=NULL;
+	//		Sleep(300);
+	//	}
+	//}
 
 }
 

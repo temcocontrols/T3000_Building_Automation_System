@@ -138,6 +138,7 @@
     <ClCompile Include="BuildTable1.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
+    <ClCompile Include="FreezeFunction.cpp" />
     <ClCompile Include="LightingController\configure.cpp" />
     <ClCompile Include="Dialog_Progess.cpp" />
     <ClCompile Include="DialogInfo.cpp" />
@@ -262,6 +263,7 @@
     <None Include="UserImages.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FreezeFunction.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="WeeklySchedule.h" />
     <ClInclude Include="5EInputDialog.h" />

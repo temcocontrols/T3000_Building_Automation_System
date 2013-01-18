@@ -181,4 +181,5 @@ public:
 	afx_msg void OnEnKillfocusEditValuetraveltime();
 	afx_msg void OnEnKillfocusEditPid2offsetpoint();
 	afx_msg void OnEnChangeEdit26();
+	afx_msg void OnBnClickedFreezefunc();
 };

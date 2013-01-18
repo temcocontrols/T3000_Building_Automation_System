@@ -18,7 +18,7 @@
 
 
 
-#define TSTAT25_VAR_NUM 43
+#define TSTAT25_VAR_NUM 115
 #define TSTAT24_VAR_NUM 30
 #define NET_WORK_CONTROLLER_NUM 24
 #define TSTAT26_VAR_NUM 112
@@ -33,7 +33,14 @@ int tstat25_register_var[TSTAT25_VAR_NUM]={	118,121,185,128,111,	112,114,115,119
 											122,123,124,125,126,	127,129,186,187,131,
 											132,133,135,136,137,	182,183,202,203,201,
 											188,189,190,204,205,	206,207,208,209,210,
-											211,213,214};
+											211,213,214,241,242,    243,244,245,246,247,
+											248,249,250,251,252,    253,268,269,270,271,
+											272,273,274,275,276,    277,286,287,288,289,
+											290,291,292,285,293,    301,302,303,309,310,
+											328,329,330,331,332,    327,333,319,320,321,
+											322,323,325,334,335,    336,337,338,339,327,
+											283,284,341,342,343,    344,345,346,347,398,
+											299,300,295,296,297};
 //NEW Tstat6
 int tstat26_register_var[TSTAT26_VAR_NUM]={	103,104,110,395/*这个需要重启*/,382,	212,385,386,346,347,
 											105,352,353,364,106,	107,207,208,365,366,//
@@ -205,7 +212,94 @@ _TCHAR * TSTATVAR_CONST_25[] = {                  //attention:该数组中的值，不要
 
 						_T("OVERIDE_TIMER"),//211
 						_T("FILTER"),//213
-						_T("HEAT_COOL_CONFIG")//214
+						_T("HEAT_COOL_CONFIG"),//214
+						_T("Universal PID input select"),
+						_T("Universal PID upper deadband"),
+						
+						_T("Universal PID lower deadband"),
+						_T("Universal PID pterm"),
+						_T("Universal PID iterm"),
+						_T("Universal PID setpoint"),
+						_T("Output 1 PID Control"),
+						
+						_T("Output 2 PID Control"),
+						_T("Output 3 PID Control"),
+						_T("Output 4 PID Control"),
+						_T("Output 5 PID Control"),
+						_T("Output 6 PID Control"),
+						
+						_T("Output 7 PID Control"),
+						_T("Heating Stages in Universal Table"),
+						_T("Cooling Stages in Universal Table"),
+						_T("Universal PID"),
+						_T("PID1 Units hi"),
+						
+						_T("PID1 Units lo"),
+						_T("PID2 Units hi"),
+						_T("PID2 Units lo"),
+						_T("Universal Night Setpoint"),
+						_T("Heating Stages in Original Table"),
+
+						_T("Cooling Stages in Original Table"),
+						_T("Interlock Output1"),
+						_T("Interlock Output2"),
+						_T("Interlock Output3"),
+						_T("Interlock Output4"),
+
+						_T("Interlock Output5"),
+						_T("Interlock Output6"),
+						_T("Interlock Output7"),
+						_T("Value Percent"),
+						_T("Setpoint Increase Step"),
+
+						_T("Time On"),
+						_T("Time Off"),
+						_T("Units"),
+						_T("Input Auto or Manual"),
+						_T("Output Auto or Manual"),
+						 
+						_T("Rotation Flag"),
+						_T("Rotation out2"),
+						_T("Rotation out3"),
+						_T("Rotation out4"),
+						_T("Rotation out5"),
+
+						_T("Timer Select"),
+						_T("Timer Left"),
+						_T("Min Address"),
+						_T("Max Address"),
+						_T("Fan Button"),
+
+						_T("Mode Button"),
+						_T("Hold"),
+						_T("Util"),
+						_T("Fun1"),
+						_T("Fun2"),
+
+						_T("Fun3"),
+						_T("Fun4"),
+						_T("Default Setpoint"),
+						_T("Mode"),
+						_T("PWM Timer"),
+
+						_T("PWM Out1"),
+						_T("PWM Out2"),
+						_T("Coast"),
+						_T("Cool1"),
+						_T("Cool2"),
+
+						_T("Cool3"),
+						_T("Heat1"),
+						_T("Heat2"),
+						_T("Heat3"),
+						_T("Input Fun1"),
+
+						_T("Input Fun2"),
+						_T("Input Fun3"),
+						_T("Freeze protect setpoint"),
+						_T("Delay to open"),
+						_T("Delay to close")
+
 						};
 _TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要有完全包含的出现
 						_T("SEQUENCE"),		
@@ -1082,6 +1176,293 @@ void Save2File(CString fn)
 	//write_one(tstat_id,16,159);//////
 	//close_com();//close the com port 
 }
+
+void Save2File_ForTstat5E5C(TCHAR* fn)
+{
+
+	CString strTips;
+	int nValue;
+	//nValue=read_one(g_tstat_id,324);
+//	write_one(g_tstat_id,324,0);//////
+	// save tstat register value to file
+	int m_25_heat_stages,m_25_cool_stages,m_26_heat_stages,m_26_cool_stages;
+	m_25_heat_stages=read_one(g_tstat_id,276);
+	m_25_cool_stages=read_one(g_tstat_id,277);
+	m_26_heat_stages=read_one(g_tstat_id,268);
+	m_26_cool_stages=read_one(g_tstat_id,269);
+	if(m_25_heat_stages==0 && m_25_cool_stages==0)
+	{
+		m_25_heat_stages=3;
+		m_25_cool_stages=3;
+	}
+	#if 1
+	//////////////////////////////////////////////////////////////////////////
+	strTips = _T("Config file saved 10%...");
+	SetPaneString(1, strTips);
+	//////////////////////////////////////////////////////////////////////////
+
+	CString str;
+	//25
+	str=_T("");
+	m_25=_T("//	");
+	for(int i=0;i<m_25_heat_stages;i++)
+	{
+		str.Format(_T("%s "),temp_heating[m_25_heat_stages-i-1]);
+		m_25+=str;
+	}
+	str.Format(_T("%s "),_T("Coasting"));
+	m_25+=str;
+	for(int i=0;i<m_25_cool_stages;i++)
+	{
+		str.Format(_T("%s "),temp_cooling[i]);
+		m_25+=str;
+	}
+	//////////////////////////////////////////////////////////////////////////
+	strTips = _T("Config file saved 15%...");
+	SetPaneString(1, strTips);
+	//////////////////////////////////////////////////////////////////////////
+
+	//26
+	str=_T("");
+	m_26=_T("//	");
+	for(int i=0;i<m_26_heat_stages;i++)
+	{
+		str.Format(_T("%s "),temp_heating[m_26_heat_stages-i-1]);
+		m_26+=str;
+	}
+	str.Format(_T("%s "),_T("Coasting"));
+	m_26+=str;
+	for(int i=0;i<m_26_cool_stages;i++)
+	{
+		str.Format(_T("%s "),temp_cooling[i]);
+		m_26+=str;
+	}	
+	float version=get_tstat_version(g_tstat_id);
+	TCHAR a[3]={'\0','\0','\0'};
+	if(version >= 26)
+	{
+		a[0]='2';
+		a[1]='6';
+		a[2]='\0';
+	}
+	else if(version >= 25)
+	{
+		a[0]='2';
+		a[1]='5';
+		a[2]='\0';
+	}
+	else
+	{
+		a[0]='2';
+		a[1]='4';
+		a[2]='\0';
+	}
+	//////////////////////////////////////////////////////////////////////////
+	strTips = _T("Config file saved 20%...");
+	SetPaneString(1, strTips);
+	//////////////////////////////////////////////////////////////////////////
+
+	wofstream out;
+	out.open(fn,ios_base::out) ;
+	
+	_Twrite_to_file_a_line(out,_T("Tstat Config File"));//added the header marker.
+
+	int nModelID = read_one(g_tstat_id, 7);
+	CString strProductClassName = get_product_class_name_by_model_ID(nModelID);
+	strProductClassName = _T("Model : ") + strProductClassName;
+	_Twrite_to_file_a_line(out, strProductClassName);//added the model
+	//////////////////////////////////////////////////////////////////////////
+	strTips = _T("Config file saved 30%...");
+	SetPaneString(1, strTips);
+	//////////////////////////////////////////////////////////////////////////
+	out<<"version:"<<version<<endl;
+	fan_write(out,m_25_heat_stages,m_25_cool_stages);//fan value	
+	_Twrite_to_file_a_line(out,_T(" "));//space
+	//////////////////////////////////////////////////////////////////////////
+	strTips = _T("Config file saved 40%...");
+	SetPaneString(1, strTips);
+	//////////////////////////////////////////////////////////////////////////
+	value_setting_write(out,m_25_heat_stages,m_25_cool_stages);//value setting
+	write_to_file_a_line(out," ");//space
+	//////////////////////////////////////////////////////////////////////////
+	strTips = _T("Config file saved 50%...");
+	SetPaneString(1, strTips);
+	//////////////////////////////////////////////////////////////////////////
+
+	if(version>=25)
+		delay_time_write(out);//delay time write
+	if(version>=26)
+	{
+		_Twrite_to_file_a_line(out,_T(" "));//space
+		lookup_table_write(out);//lookup table 26 only
+		_Twrite_to_file_a_line(out,_T(" "));//space
+		//////////////////////////////////////////////////////////////////////////
+		strTips = _T("Config file saved 60%...");
+		SetPaneString(1, strTips);
+		//////////////////////////////////////////////////////////////////////////
+		universal_relay_write(out,m_26_heat_stages,m_26_cool_stages);//UNIVERSAL RELAY OUTPUTS vlaue
+		_Twrite_to_file_a_line(out,_T(" "));//space
+		//////////////////////////////////////////////////////////////////////////
+		strTips = _T("Config file saved 70%...");
+		SetPaneString(1, strTips);
+		//////////////////////////////////////////////////////////////////////////
+		universal_value_setting_write(out,m_26_heat_stages,m_26_cool_stages);
+	}
+	//////////////////////////////////////////////////////////////////////////
+	strTips = _T("Config file saved 80%...");
+	SetPaneString(1, strTips);
+	//////////////////////////////////////////////////////////////////////////
+	_Twrite_to_file_a_line(out,_T(" "));//space
+	WriteSerialNumber(out);
+	//////////////////////////////////////////////////////////////////////////
+	strTips = _T("Config file saved 90%...");
+	SetPaneString(1, strTips);
+	//////////////////////////////////////////////////////////////////////////
+	WriteAddress(out);
+	_Twrite_to_file_a_line(out,_T(" "));//space
+	//////////////////////////////////////////////////////////////////////////
+	strTips = _T("Config file saved 99%...");
+	SetPaneString(1, strTips);
+	//////////////////////////////////////////////////////////////////////////
+//	var_write(out);	
+	//_Twrite_to_file_a_line(out,_T("OK!"));//space
+	//return;
+
+//	_Twrite_to_file_a_line(out,_T("//END CONFIG 1 ********************************// "));//space
+//	int nvalue=0;
+//
+//	//nvalue=read_one(g_tstat_id,326);
+//	/*
+//	if(nvalue==0)
+//	{
+//		if (nValue>=0)
+//		{
+//			write_one(g_tstat_id,324,nValue);
+//		}
+//		return;
+//	}
+//		
+//
+//	if(nvalue==1)
+//		write_one(g_tstat_id,324,1);//////	
+//	else
+//	*/
+//		//return;
+//
+//	/*******************************************************************************************************
+//	
+//	SetPaneString("Begin to save configuration file 2...");
+//
+//	*******************************************************************************************************/
+//
+//	m_25_heat_stages=read_one(g_tstat_id,276);
+//	m_25_cool_stages=read_one(g_tstat_id,277);
+//	m_26_heat_stages=read_one(g_tstat_id,268);
+//	m_26_cool_stages=read_one(g_tstat_id,269);
+//	if(m_25_heat_stages==0 && m_25_cool_stages==0)
+//	{
+//		m_25_heat_stages=3;
+//		m_25_cool_stages=3;
+//	}
+//
+////	CString str;
+//	//25
+//	str=_T("");
+//	m_25=_T("//	");
+//	for(int i=0;i<m_25_heat_stages;i++)
+//	{
+//		str.Format(_T("%s "),temp_heating[m_25_heat_stages-i-1]);
+//		m_25+=str;
+//	}
+//	str.Format(_T("%s "),_T("Coasting"));
+//	m_25+=str;
+//	for(int i=0;i<m_25_cool_stages;i++)
+//	{
+//		str.Format(_T("%s "),temp_cooling[i]);
+//		m_25+=str;
+//	}
+//
+//	//26
+//	str=_T("");
+//	m_26=_T("//	");
+//	for(int i=0;i<m_26_heat_stages;i++)
+//	{
+//		str.Format(_T("%s "),temp_heating[m_26_heat_stages-i-1]);
+//		m_26+=str;
+//	}
+//	str.Format(_T("%s "),_T("Coasting"));
+//	m_26+=str;
+//	for(int i=0;i<m_26_cool_stages;i++)
+//	{
+//		str.Format(_T("%s "),temp_cooling[i]);
+//		m_26+=str;
+//	}	
+//	version=get_tstat_version(g_tstat_id);
+////	a[3]={'\0','\0','\0'};
+//	if(version >= 26)
+//	{
+//		a[0]='2';
+//		a[1]='6';
+//		a[2]='\0';
+//	}
+//	else if(version >= 25)
+//	{
+//		a[0]='2';
+//		a[1]='5';
+//		a[2]='\0';
+//	}
+//	else
+//	{
+//		a[0]='2';
+//		a[1]='4';
+//		a[2]='\0';
+//	}
+//
+//
+//	fan_write(out,m_25_heat_stages,m_25_cool_stages);//fan value	
+//	_Twrite_to_file_a_line(out,_T(" "));//space
+//	value_setting_write(out,m_25_heat_stages,m_25_cool_stages);//value setting
+//	_Twrite_to_file_a_line(out,_T(" "));//space
+//	if(version>=25)
+//		delay_time_write(out);//delay time write
+//	if(version>=26)
+//	{
+//		_Twrite_to_file_a_line(out,_T(" "));//space
+//		lookup_table_write(out);//lookup table 26 only
+//		_Twrite_to_file_a_line(out,_T(" "));//space
+//		universal_relay_write(out,m_26_heat_stages,m_26_cool_stages);//UNIVERSAL RELAY OUTPUTS vlaue
+//		_Twrite_to_file_a_line(out,_T(" "));//space
+//		universal_value_setting_write(out,m_26_heat_stages,m_26_cool_stages);
+//	}
+//	_Twrite_to_file_a_line(out,_T(" "));//space
+//	WriteSerialNumber(out);
+//	WriteAddress(out);
+//	_Twrite_to_file_a_line(out,_T(" "));//space
+	//var_write(out);	
+	CString str1;
+
+	for(int i=0;i<TSTAT25_VAR_NUM;i++)
+		{
+		str1.Format(_T("%d,\t%d,\t%s"),tstat25_register_var[i],read_one(g_tstat_id,tstat25_register_var[i]),TSTATVAR_CONST_25[i]);
+		_Twrite_to_file_a_line(out,str1);
+		if((i%5)==4)
+			_Twrite_to_file_a_line(out,_T(" "));//a space line
+		}
+
+
+	out.close();
+
+	if (nValue>=0)
+	{
+		write_one(g_tstat_id,324,nValue);
+	}
+
+
+    #endif
+
+}
+
+
 void Save2File_ForTwoFiles(TCHAR* fn)
 {
 	CString strTips;
@@ -1342,7 +1723,12 @@ void Save2File_ForTwoFiles(TCHAR* fn)
 	WriteSerialNumber(out);
 	WriteAddress(out);
 	_Twrite_to_file_a_line(out,_T(" "));//space
-	var_write(out);	
+	 var_write(out);	
+
+
+ 
+
+
 	out.close();
 
 	if (nValue>=0)

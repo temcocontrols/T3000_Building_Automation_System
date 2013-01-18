@@ -2704,8 +2704,10 @@ void CTStatScanner::ScanOldNC(BYTE devLo, BYTE devHi)
 void CTStatScanner::ScanAll()
 {	
 
-	ScanComDevice();//lsc		
+	
 	ScanNetworkDevice();//lsc
+	ScanComDevice();//lsc	
+	//ScanComDevice();//多扫描一次串口
 	AfxBeginThread(_WaitScanThread, this);
 
 }
