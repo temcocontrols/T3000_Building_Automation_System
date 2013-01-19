@@ -236,7 +236,7 @@ public:
 	void  OnHTreeItemClick(NMHDR *pNMHDR, LRESULT *pResult);
 	
 			
-			BOOL ValidAddress(CString sAddress);
+	BOOL ValidAddress(CString sAddress);
 	BOOL ValidAddress(CString sAddress,UINT& n1,UINT& n2,UINT& n3,UINT& n4);
 	 
 	void CheckConnectFailure(const CString& strIP);// 检查失败的原因，并给出详细的提示信息

@@ -4448,8 +4448,7 @@ void CT3000View::InitFlexSliderBars()
 			strTemp.Format(_T("%d"), nSP);
 			m_dayInfoEdit.SetWindowText(strTemp);
 
-			//CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
-			//pSPWnd->SetWindowText(strTemp);	
+		 
 
 			m_DayCoolStatic.SetWindowText(_T("Cooling SP"));
 			m_DayHeatStatic.SetWindowText(_T("Heating SP"));
