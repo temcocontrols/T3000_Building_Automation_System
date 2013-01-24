@@ -64,18 +64,10 @@ void CMannageBuidingDlg::OnBnClickedDelbutton()
 		return;
 	}
 
-	try
-	{
-
 	CString strSql;
 
 	strSql.Format(_T("delete *  from Building_ALL where Building_Name='%s'"), m_strMainBuiding);
 	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-	}
-	catch(_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
 	reLoadMainBuilding();
 }
 
@@ -90,101 +82,14 @@ void CMannageBuidingDlg::OnBnClickedAddbutton()
 		AfxMessageBox(_T("The new Main building's NAME can not be empty, please input."));
 		return ;
 	}
-	try
-	{
-
 	m_strMainBuiding=strBuildingName;
 	strSql.Format(_T("insert into Building_ALL (Building_Name,Telephone ,Address) values('"+m_strMainBuiding+"','"+m_strTelPhone+"','"+m_strAddress+"')"));
 	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-	}
-	catch(_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
 	Update_Recorder();
 
 }
 
-/*
 
-void CMannageBuidingDlg::OnBnClickedInputbutton()
-{
-	// TODO: 在此添加控件通知处理程序代码
-
-	
-	CString strSql;
-	CString strName;
-	m_NameEdt.GetWindowText(strName);
-	
-
-	if(m_bIsAddOrModify)//add
-	{
-
-		if(strName.IsEmpty())
-		{
-			AfxMessageBox(_T("Please input the building name!"));
-			return;
-		}
-		int nCouts;
-		nCouts=m_BuildingNameLst.GetCount();
-		if(nCouts>0)
-		{
-			for(int i=0;i<nCouts;i++)
-			{
-				CString strBuildingname;
-				m_BuildingNameLst.GetText(i,strBuildingname);
-				if(strName.CompareNoCase(strBuildingname)==0)
-				{
-					AfxMessageBox(_T("The building has been existed,please input another one!"));
-					return;
-				}
-			}
-		}
-
-		strSql.Format(_T("insert into Building_ALL (Building_Name) values('%s')"), strName);
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);			
-	//	m_pRs->Open("select * from Building_ALL",_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-		m_BuildingNameLst.AddString(strName);
-
-		m_NameEdt.ShowWindow(SW_HIDE);
-		m_InputBtn.ShowWindow(SW_HIDE);
-	}
-	else
-	{
-		if(strName.IsEmpty())
-		{
-			AfxMessageBox(_T("Please input the building name!"));
-			return;
-		}
-		int nIndext;
-		nIndext=m_BuildingNameLst.GetCurSel();
-		if(nIndext<0)
-		{
-			AfxMessageBox(_T("Please select the building name which will be changed"));
-			return;
-		}
-		CString strBuildingname;
-		m_BuildingNameLst.GetText(nIndext,strBuildingname);
-		if(strName.CompareNoCase(strBuildingname)==0)
-		{
-			AfxMessageBox(_T("The building has been existed,please input another one!"));
-			return;
-		}
-
-		strSql.Format(_T("update Building_ALL set Building_Name ='%s' where Building_Name='%s'"), strName,strBuildingname);
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);			
-		m_BuildingNameLst.DeleteString(nIndext);
-		m_BuildingNameLst.AddString(strName);
-
-		m_NameEdt.ShowWindow(SW_HIDE);
-		m_InputBtn.ShowWindow(SW_HIDE);
-		
-
-	}
-
-
-	
-}*/
 		
 
 void CMannageBuidingDlg::OnBnClickedCancel()
@@ -227,7 +132,7 @@ void CMannageBuidingDlg::OnBnClickedNext()
 
 	if(m_mainBuildingLst.size()<=0)
 		return;
-	int lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	int lRow = m_FlexGrid.get_RowSel();//
 	if(lRow<=0)
 		return;
 	if(lRow==m_FlexGrid.get_Rows()-1)
@@ -262,16 +167,9 @@ void CMannageBuidingDlg::OnBnClickedDefaultbuildingCheck()
 			//m_defaultBuildignCheck.SetCheck(BST_CHECKED)
 			return;
 		}
-		try
-		{
-
+		
 		CString execute_str=_T("update Building_ALL set Default_Build = 0 where Default_Build = -1");
-		m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);
-		}
-		catch(_com_error *e)
-		{
-			AfxMessageBox(e->ErrorMessage());
-		}	
+		m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);	
 	}
 
 	if(m_defaultBuildignCheck.GetCheck()==BST_CHECKED)
@@ -281,18 +179,10 @@ void CMannageBuidingDlg::OnBnClickedDefaultbuildingCheck()
 			m_defaultBuildignCheck.SetCheck(BST_UNCHECKED);
 			return;
 		}
-		try
-		{
-
 		CString execute_str=_T("update Building_ALL set Default_Build = 0 where Default_Build = -1");
 		m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);	
 		execute_str.Format(_T("update Building_ALL set Default_Build = -1 where Building_Name = '%s'"),m_strMainBuiding);
 		m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);
-		}
-		catch(_com_error *e)
-		{
-			AfxMessageBox(e->ErrorMessage());
-		}
 	}
 	reLoadMainBuilding();
 }
@@ -366,8 +256,8 @@ END_EVENTSINK_MAP()
 void CMannageBuidingDlg::ClickMsflexgrid1()
 {
 	long lRow,lCol;
-	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
-	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
+	lRow = m_FlexGrid.get_RowSel();//
+	lCol = m_FlexGrid.get_ColSel(); 
 
 	m_nCurRow=lRow;
 	m_nCurCol=lCol;
@@ -390,21 +280,21 @@ void CMannageBuidingDlg::ClickMsflexgrid1()
 
 
 	CRect rect;
-	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
+	m_FlexGrid.GetWindowRect(rect); //
+	ScreenToClient(rect); //
 	CDC* pDC =GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+	//
 	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	//
 	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+	//
 	CRect rcCell(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
+	//
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
 	CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
@@ -516,54 +406,30 @@ void CMannageBuidingDlg::Update_Recorder()
 {
 	return;
 	
-	try
-	{
-
 	CString strSql;
 	strSql.Format(_T("update Building_ALL set Building_Name='%s',Telephone='%s',Address='%s'"),m_strMainBuiding,m_strTelPhone,m_strAddress);
 	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
 	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
 	if(m_pRs->State) 
 		m_pRs->Close(); 	
-	}
-	catch(_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
 	reLoadMainBuilding();
 
 }
 
 void CMannageBuidingDlg::OnMainBuildingSelect()
 {
-	try
-	{
-
 
 	CString execute_str=_T("update Building_ALL set Default_Build = 0 where Default_Build = -1");
 	m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);	
 	execute_str.Format(_T("update Building_ALL set Default_Build = -1 where Building_Name = '%s'"),m_strMainBuiding);
 	m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);
-	}
-	catch(_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
 
 	reLoadMainBuilding();
 }
 void CMannageBuidingDlg::OnMainBuildingUnSelect()
 {
-	try
-	{
-
 
 	CString execute_str=_T("update Building_ALL set Default_Build = 0 where Default_Build = -1");
-	m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);
-	}
-	catch(_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}	
+	m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);	
 	reLoadMainBuilding();
 }

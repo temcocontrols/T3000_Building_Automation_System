@@ -3,18 +3,7 @@
 extern	unsigned short multi_register_value[513];
 extern unsigned short cm5_register_value[512]; //CM5
 extern unsigned short m_buffer[512];//CM5
-extern unsigned short reg_tstat6[1024];//tstat6_new
 extern unsigned short reg_tststold[1024];
-extern char charr[600][2][600];
-extern unsigned short newtstat6[512];
-
-extern int parameterSet;
-extern BOOL Flexflash;
-extern BOOL FlexSP;
-extern int FlexSPN;
-extern int  MDAY,MNIGHT;
-extern int tstat6flex[12];
-extern int m_slidertsta6[12];
 extern int nCom;
 extern	CString program_path;
 extern	int g_tstat_id;
@@ -101,6 +90,7 @@ extern BOOL g_bScanStart;
 extern int g_llTxCount;
 extern int g_llRxCount;
 extern BOOL g_unint;
+extern BOOL allend;
 
 
 //////////////////////////////////////////////////////////////////////////

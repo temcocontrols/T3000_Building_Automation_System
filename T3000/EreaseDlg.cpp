@@ -18,6 +18,7 @@ CEreaseDlg::CEreaseDlg(CWnd* pParent /*=NULL*/)
 
 CEreaseDlg::~CEreaseDlg()
 {
+
 }
 
 void CEreaseDlg::DoDataExchange(CDataExchange* pDX)
@@ -30,7 +31,6 @@ void CEreaseDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CEreaseDlg, CDialog)
 	ON_BN_CLICKED(ID_MYOK, &CEreaseDlg::OnBnClickedMyOk)
 	ON_EN_KILLFOCUS(IDC_EDIT1, &CEreaseDlg::OnEnKillfocusEdit1)
-	ON_BN_CLICKED(IDCANCEL, &CEreaseDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 
@@ -39,16 +39,7 @@ END_MESSAGE_MAP()
 void CEreaseDlg::OnBnClickedMyOk()
 {
 	// TODO: Add your control notification handler code here
-	if(AfxMessageBox(_T("Are you sure to erease the config parameters?"))==IDOK)
-	{
-		if(write_one(m_nTstatID,16,143)>0)
-			AfxMessageBox(_T("Ereased successfully!"));
-	}
-	else
-	{
-		return;
-	}
-	
+
 	OnOK();
 }
 
@@ -65,19 +56,6 @@ BOOL CEreaseDlg::PreTranslateMessage(MSG* pMsg)
 
 void CEreaseDlg::OnEnKillfocusEdit1()
 {
-	CString strText;
-	m_tstatIDEdit.GetWindowText(strText);
-	if(strText.IsEmpty())
-		return;
-	int nID=_wtoi(strText);
-	if(nID<=0||nID>255)
-	{
-		AfxMessageBox(_T("Error, the modbus ID should be in the rang from 0 to 255!"));
-		strText.Format(_T("%d"),m_nTstatID);
-		m_tstatIDEdit.SetWindowText(strText);
-		return;
-	}
-	m_nTstatID=nID;
 
 }
 
@@ -90,15 +68,6 @@ BOOL CEreaseDlg::OnInitDialog()
 	m_tstatIDEdit.SetWindowText(strText);
 
 
-	// TODO:  Add extra initialization here
-
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
-}
-
-
-void CEreaseDlg::OnBnClickedCancel()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	CDialog::OnCancel();
 }

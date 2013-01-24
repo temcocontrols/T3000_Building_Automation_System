@@ -6,25 +6,36 @@
 
 #include "WorkspaceBar.h"
 #include "IODisplayBar.h"
-#include "GraphicView.h"
-#include "TrendLogView.h"
 #include "RefreshTreeThread.h"
+#include "ConfigFileWR.h"
 //#include "TStatScanner.h"
 /*
 #define	ID_BUILDING_INFO	100
 #define	ID_RW_INFO			101
 #define	ID_PROTOCOL_INFO	102
 */
+ 
 
-#include "CM5/DialogCM5.h"  //CM5
-#include "T3/DialogT3.h"	//T3
-#include "MiniPanel/DialgMiniPanel.h" //Mini Panel
-#include "AirQuality/AirQuality.h"//AirQuality
-
-#define NUMVIEWS 8
+#define NUMVIEWS 1
 
 
-
+typedef struct _flash_tstat
+{
+	CString ID;
+	CString COM;
+}  flash_tStat;
+typedef struct _flash_NC
+{
+	CString IP;
+	CString port;
+}  flash_NC;
+typedef struct _flash_LC
+{
+	CString IP;
+	CString port;
+	CString flashType;
+    CString mdbid;
+}  flash_LC;
 
 	
 
@@ -61,7 +72,6 @@ typedef struct _BUILDING_TAG
 	CString strComPort;
 	CString strIpPort;
 	CString strBaudRate;
-
 	CString strMainBuildingname;
 	CString strConnectionType;
 }Building_info;
@@ -109,11 +119,11 @@ protected: // create from serialization only
 	void OnToolErease();
 	void OnToolFresh();
 	void OnToolRefreshLeftTreee();
-
+    
 public:
 
-	CView * m_pViews[NUMVIEWS];
-	UINT m_nCurView;    
+    CView * m_pViews[NUMVIEWS];
+    UINT m_nCurView;    
 	void InitViews();
 
 public://for scan
@@ -150,8 +160,10 @@ public://scan
 	CTStatScanner* m_pScanner;
 	CWinThread *m_pThreadScan;
 	CWinThread* m_pFreshMultiRegisters;
-	vector <binary_search_result> m_binary_search_networkcontroller_background_thread;	////background thread search result
-	vector <binary_search_result> m_binary_search_product_background_thread;				////background thread search result
+	vector <binary_search_result> m_binary_search_networkcontroller_background_thread;
+////background thread search result
+	vector <binary_search_result> m_binary_search_product_background_thread;			
+////background thread search result
 	
 	
 	CScanDbWaitDlg*		m_pWaitScanDlg;	
@@ -236,16 +248,15 @@ public:
 	void  OnHTreeItemClick(NMHDR *pNMHDR, LRESULT *pResult);
 	
 			
-	BOOL ValidAddress(CString sAddress);
+			BOOL ValidAddress(CString sAddress);
 	BOOL ValidAddress(CString sAddress,UINT& n1,UINT& n2,UINT& n3,UINT& n4);
 	 
-	void CheckConnectFailure(const CString& strIP);// 检查失败的原因，并给出详细的提示信息
+	void CheckConnectFailure(const CString& strIP);// 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	BOOL ConnectSubBuilding(Building_info build_info);
 
 
-
-	//scan funtion:
+	
 	void background_binarysearch_netcontroller();
 	void binarySearchforview_networkcontroller(BYTE devLo=1, BYTE devHi=254);
 	void binarySearchforview(BYTE devLo=1, BYTE devHi=254);
@@ -269,7 +280,7 @@ public:
 	BOOL GetIPbyHostName(CString strHostName,CString& strIP);
 
 	//////////////////////////////////////////////////////////////////////////
-	//  below Added by zgq; from 2010-11-29; 
+
 	//
 
 	void DoConnectToANode( const HTREEITEM& hTreeItem );
@@ -297,38 +308,40 @@ protected:
 	BOOL ImportDataBaseForFirstRun();
 	CString GetCurrentFileVersion();
 	CString ReadFileVersionFromRegister(CRegKey& reg);
-//protected://lsc20111213修改
 public:
 	BOOL m_bEnableRefreshTreeView;
 	CRefreshTreeThread*	m_pRefreshThread;
 
-	CString						m_strCurSelNodeName;  // 记录当前点击树节点的name
-		
-	//HTREEITEM				m_htiCurSel;  // 记录当前点击树节点
+	CString						m_strCurSelNodeName;  
+	CString	m_strModelName;
+
 	CString						m_strFileVersion;
 
 	void EnableMyToolBarButton(int nIndex, int nID, BOOL bEnable);
 public:
-//	afx_msg void OnDatabaseTemcoproducts();
+	afx_msg void OnDatabaseTemcoproducts();
 
 	void ReadExcel();
 
-	unsigned short tempchange[512];//for tstat6
-	unsigned short temptstat6[512];
+
 	unsigned short nFlag;
 	
-	void Tstat6_func();
-	void JudgeTstat6dbExist(CString strtable,CString strsql);
-	void Updata_db_tstat6(unsigned short imodel);
-	BOOL FistWdb;
-	//afx_msg void OnFileIsptool();
-	void JudgeTstat6SliderExist(CString strtable,CString strsql);
-	void UpdataSlider(int Flag);
-	void ReadSlider();
 
-	UINT FlagSerialNumber;
-	void Treestatus();
-	afx_msg void OnToolIsptoolformany();
+	BOOL FistWdb;
+
+	afx_msg void OnGridFlashhex();
+
+	/////////////////////Save Parameter to configfile///////////////////////////////////
+	BOOL SaveParameterToConfig();
+
+flash_tStat  m_tstat;
+flash_NC m_nc;
+flash_LC m_lc;
+CConfigFileWR m_configFile;
+   
+afx_msg void OnIspToolForOne();
 };
+
+
 
 

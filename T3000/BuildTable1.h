@@ -3,6 +3,9 @@
 #include "resource.h"
 // CBuildTable1 ¶Ô»°¿ò
 
+
+
+
 class CBuildTable1 : public CDialog
 {
 	DECLARE_DYNAMIC(CBuildTable1)

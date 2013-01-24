@@ -11,7 +11,7 @@
 // CLedsDialog dialog
 
 
-	char *m_led_value[32]={//to 对应the mobus.h中的表示led内容的enum
+	char *m_led_value[32]={
 		    "NONE",
 			"RELAY1",
 			"RELAY2",

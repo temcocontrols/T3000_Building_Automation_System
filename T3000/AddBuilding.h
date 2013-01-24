@@ -92,7 +92,7 @@ public:
 	afx_msg void OnEnKillfocusMainbuildedit();
 	afx_msg void OnEnSetfocusMainbuildedit();
 	void DblClickAddbuildingMsflexgrid();
-	afx_msg void OnBnClickedScanncbtn();
+
 	
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CButton m_NCScanBtn;
@@ -100,18 +100,7 @@ public:
 	CButton m_SaveBtn;
 
 	vector<CString> m_szComm;
-
-
-
-	//////////////////////////////////////////////////////////////////////////
-	//	Added by zgq; 2010-11-29;
-	//  把按钮Exit和Save功能合并
-	//
+	 
 	void CAddBuilding::SaveAll();
-
-	///////////////////////////////////////////////////////////////////////////
-	// added by zgq; 2010-12-09; 获得计算机上的串口号
-	//BOOL GetSerialComm(vector<CString>& szComm);
-
 
 };

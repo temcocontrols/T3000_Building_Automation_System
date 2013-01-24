@@ -527,24 +527,7 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 
 
 
-/*
 
-
-
-	//
-	if(nModel==17)//F out4 out5
-	{
-
-	}
-
-	if(nModel==18)//G out4 out5
-	{
-
-	}
-	if(nModel==19)//H out1 out7
-	{
-	}
-	*/
 
 }
 void CRelayLabel::DispalyRigesterValue(int nStatus,COLORREF textClr,COLORREF bkClr)

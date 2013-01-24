@@ -10,54 +10,7 @@
 #define	SLIDER_RANGE 65535
 #define MAX_VALUE atoi(m_max)
 #define OVER_MAX_OR_BELOW_MIN AfxMessageBox(_T("Please verify the value is between the minimum and maximum readings!"))
-/*// CBuildTable1 对话框
-    // Address 219
-#define    MODBUS_TABLE1_ZERO  219
-#define	MODBUS_TABLE1_ZERO_HI  220              u// 1     254    the range from reg 20 to reg 41.A changable look up table for "custom" sensor 
-#define	MODBUS_TABLE1_HALFONE  221   
-#define	MODBUS_TABLE1_HALFONE_HI 222               //              the range of input voltage is 0----5v and the range is divided 10 equal partions,at 0.5v interval
-#define	MODBUS_TABLE1_ONE       223
-#define	MODBUS_TABLE1_ONE_HI    224             //              the value's unit in the table is different according to different sensor
-#define	MODBUS_TABLE1_HALFTWO   225
-#define	MODBUS_TABLE1_HALFTWO_HI 226             
-#define	MODBUS_TABLE1_TWO       227
-#define	MODBUS_TABLE1_TWO_HI    228
-#define	MODBUS_TABLE1_HALFTHREE 229
-#define	MODBUS_TABLE1_HALFTHREE_HI 230
-#define	MODBUS_TABLE1_THREE     231
-#define	MODBUS_TABLE1_THREE_HI 232
-#define	MODBUS_TABLE1_HALFFOUR 233
-#define	MODBUS_TABLE1_HALFFOUR_HI 234
-#define	MODBUS_TABLE1_FOUR     235
-#define	MODBUS_TABLE1_FOUR_HI  236
-#define	MODBUS_TABLE1_HALFFIVE 237
-#define	MODBUS_TABLE1_HALFFIVE_HI 238
-#define	MODBUS_TABLE1_FIVE 239
-#define	MODBUS_TABLE1_FIVE_HI 240
 
-#define MODBUS_TABLE2_ZERO        314  
-#define	MODBUS_TABLE2_ZERO_HI     315                   // 1     254    the range from reg 20 to reg 41.A changable look up table for "custom" sensor 
-#define	MODBUS_TABLE2_HALFONE     316
-#define	MODBUS_TABLE2_HALFONE_HI  317             //              the range of input voltage is 0----5v and the range is divided 10 equal partions,at 0.5v interval
-#define	MODBUS_TABLE2_ONE         318
-#define	MODBUS_TABLE2_ONE_HI      319                   //              the value's unit in the table is different according to different sensor
-#define	MODBUS_TABLE2_HALFTWO     320
-#define	MODBUS_TABLE2_HALFTWO_HI  321          
-#define	MODBUS_TABLE2_TWO         322
-#define	MODBUS_TABLE2_TWO_HI      323
-#define	MODBUS_TABLE2_HALFTHREE   324
-#define	MODBUS_TABLE2_HALFTHREE_HI 325
-#define	MODBUS_TABLE2_THREE        326
-#define	MODBUS_TABLE2_THREE_HI     327
-#define	MODBUS_TABLE2_HALFFOUR     328
-#define	MODBUS_TABLE2_HALFFOUR_HI  329
-#define	MODBUS_TABLE2_FOUR         330
-#define	MODBUS_TABLE2_FOUR_HI      331
-#define	MODBUS_TABLE2_HALFFIVE     332
-#define	MODBUS_TABLE2_HALFFIVE_HI  333
-#define	MODBUS_TABLE2_FIVE         334
-#define	MODBUS_TABLE2_FIVE_HI      335
-*/
 IMPLEMENT_DYNAMIC(CBuildTable1, CDialog)
 CBuildTable1::CBuildTable1(bool table1_table2,CWnd* pParent /*=NULL*/)
 	: CDialog(CBuildTable1::IDD, pParent)	
@@ -101,17 +54,7 @@ void CBuildTable1::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SLIDER10, m_slider10_ctrl);
 	DDX_Control(pDX, IDC_SLIDER11, m_slider11_ctrl);
 
-//	DDX_Text(pDX, IDC_EDIT1, m_slider1_i);
-//	DDX_Text(pDX, IDC_EDIT8, m_slider2_i);
-//	DDX_Text(pDX, IDC_EDIT9, m_slider3_i);
-//	DDX_Text(pDX, IDC_EDIT13, m_slider4_i);
-//	DDX_Text(pDX, IDC_EDIT14, m_slider5_i);
-//	DDX_Text(pDX, IDC_EDIT15, m_slider6_i);
-//	DDX_Text(pDX, IDC_EDIT16, m_slider7_i);
-//	DDX_Text(pDX, IDC_EDIT17, m_slider8_i);
-//	DDX_Text(pDX, IDC_EDIT18, m_slider9_i);
-//	DDX_Text(pDX, IDC_EDIT19, m_slider10_i);
-//	DDX_Text(pDX, IDC_EDIT20, m_slider11_i);
+
 	DDX_Text(pDX, IDC_EDIT10, m_max);
 	DDX_Text(pDX, IDC_EDIT11, m_min);
 
@@ -121,19 +64,7 @@ void CBuildTable1::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CBuildTable1, CDialog)
 	ON_WM_VSCROLL()
 	ON_BN_CLICKED(IDOK, OnBnClickedOk)
-/*
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER1, OnNMCustomdrawSlider1)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER2, OnNMCustomdrawSlider2)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER3, OnNMCustomdrawSlider3)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER4, OnNMCustomdrawSlider4)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER5, OnNMCustomdrawSlider5)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER6, OnNMCustomdrawSlider6)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER7, OnNMCustomdrawSlider7)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER8, OnNMCustomdrawSlider8)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER9, OnNMCustomdrawSlider9)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER10, OnNMCustomdrawSlider10)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER11, OnNMCustomdrawSlider11)
-	*/
+
 	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER1, OnNMReleasedcaptureSlider1)
 	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER2, OnNMReleasedcaptureSlider2)
 	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER3, OnNMReleasedcaptureSlider3)
@@ -205,34 +136,7 @@ BOOL CBuildTable1::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	m_version=get_tstat_version(g_tstat_id);
-//	CMainFrame *pMain=(CMainFrame *)AfxGetApp()->m_pMainWnd;
-//CyouView *pView=(CyouView *)pMain->GetActiveView();
 
-	// TODO:  在此添加额外的初始化
-	/*
-	CString Max_value_path;
-	if(m_table1_table2==true)
-		Max_value_path=program_path+"\\Max_value_1.CNF";
-	else
-		Max_value_path=program_path+"\\Max_value_2.CNF";
-	CStdioFile default_file;
-	if(default_file.Open(_T(Max_value_path.GetString()),CFile::modeRead )!=0)
-	{
-		CString a_line;	
-		default_file.ReadString(a_line);
-		m_max=a_line;
-		UpdateData(false);
-		default_file.Close();
-	}
-	*/
-	/*
-	short n=multi_register_value[121];
-	if(n==0)
-		((CComboBox *)(GetDlgItem(IDC_UNITCOMBOX)))->SetCurSel(0);
-	if(n==1)
-		((CComboBox *)(GetDlgItem(IDC_UNITCOMBOX)))->SetCurSel(1);
-	refresh_rule();*/
-//	GetDlgItem(IDC_UNITCOMBOX)->ShowWindow(SW_HIDE);
 	to_fresh();
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
@@ -351,20 +255,7 @@ void CBuildTable1::to_fresh()
 	m_slider11_ctrl.SetRange(m_nMin,m_nMax);
 
 	if(m_table1_table2==false)
-	{//table1 is click
-		/*
-		m_slider1_i=multi_register_value[219];
-		m_slider2_i=multi_register_value[220];
-		m_slider3_i=multi_register_value[221];
-		m_slider4_i=multi_register_value[222];
-		m_slider5_i=multi_register_value[223];
-		m_slider6_i=multi_register_value[224];
-		m_slider7_i=multi_register_value[225];
-		m_slider8_i=multi_register_value[226];
-		m_slider9_i=multi_register_value[227];
-		m_slider10_i=multi_register_value[228];
-		m_slider11_i=multi_register_value[229];
-		*/
+	{
 		if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 		{
 		short slider1_low=multi_register_value[MODBUS_TABLE1_ZERO];
@@ -436,22 +327,7 @@ void CBuildTable1::to_fresh()
 		GetDlgItem(IDC_EDIT12)->SetWindowText(m_units_s);
 	}
 	else
-	{//table2 is click
-		/*
-		this->SetWindowText("Build Table for Analog Input2");
-		m_slider1_i=multi_register_value[230];
-		m_slider2_i=multi_register_value[231];
-		m_slider3_i=multi_register_value[232];
-		m_slider4_i=multi_register_value[233];
-		m_slider5_i=multi_register_value[234];
-		m_slider6_i=multi_register_value[235];
-		m_slider7_i=multi_register_value[236];
-		m_slider8_i=multi_register_value[237];
-		m_slider9_i=multi_register_value[238];
-		m_slider10_i=multi_register_value[239];
-		m_slider11_i=multi_register_value[240];
-		UpdateData(FALSE);
-	*/
+	{
 		if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 		{
 			short slider1_low=multi_register_value[MODBUS_TABLE2_ZERO];
@@ -658,27 +534,7 @@ void CBuildTable1::to_fresh()
 }
 void CBuildTable1::OnNMCustomdrawSlider1(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	/*
-	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
-	short nTemp;
-	short pos=m_slider1_ctrl.GetPos();
-//	m_slider1_i=MAX_VALUE-pos;
-	//m_slider1_i=m_nMax+m_nMin-pos;
-	nTemp=m_nMax+m_nMin-pos;
-	if(m_bIncreasingMode)
-	{
-		if(nTemp<m_slider2_i)
-			m_slider1_i=nTemp;
-		else
-			return;
-	}
-	else
-	{
-	}
-	UpdateData(false);
-	*pResult = 0;
-	*/
+
 
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
@@ -705,26 +561,7 @@ void CBuildTable1::OnNMCustomdrawSlider1(NMHDR *pNMHDR, LRESULT *pResult)
 }
 void CBuildTable1::OnNMCustomdrawSlider2(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	/*
-	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
-	short nTemp;
-	int pos=m_slider2_ctrl.GetPos();
-//	m_slider2_i=m_nMax+m_nMin-pos;
-	nTemp=m_nMax+m_nMin-pos;
-	if(m_bIncreasingMode)
-	{
-		if(nTemp<m_slider3_i&&nTemp>m_slider1_i)
-			m_slider2_i=nTemp;
-		else
-			return;
-	}
-	else
-	{
-	}
-	UpdateData(false);
-	*pResult = 0;
-	*/
+
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider2_ctrl.GetPos();
@@ -751,26 +588,7 @@ void CBuildTable1::OnNMCustomdrawSlider2(NMHDR *pNMHDR, LRESULT *pResult)
 }
 void CBuildTable1::OnNMCustomdrawSlider3(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	/*
-	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	short nTemp;
-	int pos=m_slider3_ctrl.GetPos();
-	nTemp=m_nMax+m_nMin-pos;
-	if(m_bIncreasingMode)
-	{
-		if(nTemp<m_slider4_i&&nTemp>m_slider2_i)
-			m_slider3_i=nTemp;
-		else
-			return;
-	}
-	else
-	{
 
-	}
-
-	UpdateData(false);
-	*pResult = 0;
-*/
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider3_ctrl.GetPos();
@@ -799,25 +617,7 @@ void CBuildTable1::OnNMCustomdrawSlider3(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBuildTable1::OnNMCustomdrawSlider4(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	/*
-	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
-	short nTemp;
-	int pos=m_slider4_ctrl.GetPos();
-	nTemp=m_nMax+m_nMin-pos;
-	if(m_bIncreasingMode)
-	{
-		if(nTemp<m_slider5_i&&nTemp>m_slider3_i)
-			m_slider4_i=nTemp;
-		else
-			return;
-	}
-	else
-	{
-	}
-	UpdateData(false);
-	*pResult = 0;
-	*/
+
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider4_ctrl.GetPos();
@@ -844,25 +644,7 @@ void CBuildTable1::OnNMCustomdrawSlider4(NMHDR *pNMHDR, LRESULT *pResult)
 }
 void CBuildTable1::OnNMCustomdrawSlider5(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	/*
-	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	short nTemp;
-	int pos=m_slider5_ctrl.GetPos();
-	nTemp=m_nMax+m_nMin-pos;
-		if(m_bIncreasingMode)
-	{
-		if(nTemp<m_slider6_i&&m_slider3_i&&nTemp>m_slider4_i)
-			m_slider5_i=nTemp;
-		else
-			return;
-	}
-	else
-	{
 
-	}
-	UpdateData(false);
-	*pResult = 0;
-	*/
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider5_ctrl.GetPos();
@@ -889,26 +671,7 @@ void CBuildTable1::OnNMCustomdrawSlider5(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBuildTable1::OnNMCustomdrawSlider6(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	/*
-	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	short nTemp;
-	int pos=m_slider6_ctrl.GetPos();
 
-	nTemp=m_nMax+m_nMin-pos;
-	if(m_bIncreasingMode)
-	{
-		if(nTemp<m_slider7_i&&nTemp>m_slider5_i)
-			m_slider6_i=nTemp;
-		else
-			return;
-	}
-	else
-	{
-
-	}
-	UpdateData(false);
-	*pResult = 0;
-	*/
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider6_ctrl.GetPos();
@@ -936,25 +699,7 @@ void CBuildTable1::OnNMCustomdrawSlider6(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBuildTable1::OnNMCustomdrawSlider7(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	/*
-	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	int nTemp;
-	int pos=m_slider7_ctrl.GetPos();
-	nTemp=m_nMax+m_nMin-pos;
-	if(m_bIncreasingMode)
-	{
-		if(nTemp<m_slider8_i&&nTemp>m_slider6_i)
-			m_slider7_i=nTemp;
-		else
-			return;
-	}
-	else
-	{
 
-	}
-	UpdateData(false);
-	*pResult = 0;
-	*/
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider7_ctrl.GetPos();
@@ -1029,27 +774,7 @@ void CBuildTable1::OnNMCustomdrawSlider8(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBuildTable1::OnNMCustomdrawSlider9(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	/*
-	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	
-	short nTemp;
-	int pos=m_slider9_ctrl.GetPos();
-	nTemp=m_nMax+m_nMin-pos;
-	if(m_bIncreasingMode)
-	{
-		if(nTemp<m_slider10_i&&nTemp>m_slider8_i)
-			m_slider9_i=nTemp;
-		else
-			return;
-	}
-	else
-	{
 
-	}
-
-	UpdateData(false);
-	*pResult = 0;
-	*/
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider9_ctrl.GetPos();
@@ -1076,26 +801,7 @@ void CBuildTable1::OnNMCustomdrawSlider9(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBuildTable1::OnNMCustomdrawSlider10(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	/*
-	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	int nTemp;
-	int pos=m_slider10_ctrl.GetPos();
-	//	m_slider10_i=MAX_VALUE-pos;
-	nTemp=m_nMax+m_nMin-pos;
-	if(m_bIncreasingMode)
-	{
-		if(nTemp<m_slider11_i&&nTemp>m_slider9_i)
-			m_slider10_i=nTemp;
-		else
-			return;
-	}
-	else
-	{
 
-	}
-	UpdateData(false);
-	*pResult = 0;
-	*/
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider10_ctrl.GetPos();
@@ -1122,26 +828,7 @@ void CBuildTable1::OnNMCustomdrawSlider10(NMHDR *pNMHDR, LRESULT *pResult)
 }
 void CBuildTable1::OnNMCustomdrawSlider11(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	/*
-	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
-	int nTemp;
-	int pos=m_slider11_ctrl.GetPos();
 
-	nTemp=m_nMax+m_nMin-pos;
-	
-	if(m_bIncreasingMode)
-	{
-		if(nTemp>m_slider10_i)
-			m_slider11_i=nTemp;
-		else
-			return;
-	}
-	else
-	{
-	}
-	UpdateData(false);
-	*pResult = 0;
-	*/
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider11_ctrl.GetPos();
@@ -1168,194 +855,67 @@ void CBuildTable1::OnNMCustomdrawSlider11(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBuildTable1::OnNMReleasedcaptureSlider1(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
 
-//	if(m_bIncreasingMode)
-//	{
-//		m_slider1_ctrl.SetPos(m_nMax - (m_slider1_i-m_nMin));
-//	}
-	
-	/*
-	if(m_table1_table2==false)
-		write_one(tstat_id,219,m_slider1_i);
-	else
-		write_one(tstat_id,230,m_slider1_i);
-	*/
-	//AfxMessageBox("");
-//	refresh();
 	*pResult = 0;
 }
 
 void CBuildTable1::OnNMReleasedcaptureSlider2(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
-	/*if(m_bIncreasingMode)
-	{
-		m_slider2_ctrl.SetPos(m_nMax - (m_slider2_i-m_nMin));
-	}
-	*/
 
-/*	if(m_table1_table2==false)
-		write_one(tstat_id,220,m_slider2_i);
-	else
-		write_one(tstat_id,231,m_slider2_i);
-*/
 	*pResult = 0;
 }
 
 void CBuildTable1::OnNMReleasedcaptureSlider3(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
-	/*if(m_bIncreasingMode)
-	{
-		m_slider3_ctrl.SetPos(m_nMax - (m_slider3_i-m_nMin));
-	}
-	*/
-/*
-	if(m_table1_table2==false)
-		write_one(tstat_id,221,m_slider3_i);
-	else
-		write_one(tstat_id,232,m_slider3_i);
-	*/
+
 	*pResult = 0;
 }
 
 void CBuildTable1::OnNMReleasedcaptureSlider4(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
-	/*if(m_bIncreasingMode)
-	{
-		m_slider4_ctrl.SetPos(m_nMax - (m_slider4_i-m_nMin));
-	}
-	*/
-/*
-	if(m_table1_table2==false)
-		write_one(tstat_id,222,m_slider4_i);
-	else
-		write_one(tstat_id,233,m_slider4_i);
-	*/
+
 	*pResult = 0;
 }
 
 void CBuildTable1::OnNMReleasedcaptureSlider5(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
-/*	if(m_bIncreasingMode)
-	{
-		m_slider5_ctrl.SetPos(m_nMax - (m_slider5_i-m_nMin));
-	}
-	*/
-/*
-	if(m_table1_table2==false)
-		write_one(tstat_id,223,m_slider5_i);
-	else
-		write_one(tstat_id,234,m_slider5_i);
-	*/
+
 	*pResult = 0;
 }
 
 void CBuildTable1::OnNMReleasedcaptureSlider6(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
-/*	if(m_bIncreasingMode)
-	{
-		m_slider6_ctrl.SetPos(m_nMax - (m_slider6_i-m_nMin));
-	}
-	*/
-/*
-	if(m_table1_table2==false)
-		write_one(tstat_id,224,m_slider6_i);
-	else
-		write_one(tstat_id,235,m_slider6_i);
-	*/
+
 	*pResult = 0;
 }
 
 void CBuildTable1::OnNMReleasedcaptureSlider7(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
-	/*if(m_bIncreasingMode)
-	{
-		m_slider7_ctrl.SetPos(m_nMax - (m_slider7_i-m_nMin));
-	}
-	*/
 
-	/*
-	if(m_table1_table2==false)
-		write_one(tstat_id,225,m_slider7_i);
-	else
-		write_one(tstat_id,236,m_slider7_i);
-	*/
 	*pResult = 0;
 }
 
 void CBuildTable1::OnNMReleasedcaptureSlider8(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
-/*	if(m_bIncreasingMode)
-	{
-		m_slider8_ctrl.SetPos(m_nMax - (m_slider8_i-m_nMin));
-	}
-	*/
-	/*
-	if(m_table1_table2==false)
-		write_one(tstat_id,226,m_slider8_i);
-	else
-		write_one(tstat_id,237,m_slider8_i);
-	*/
+
 	*pResult = 0;
 }
 
 void CBuildTable1::OnNMReleasedcaptureSlider9(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
-/*	if(m_bIncreasingMode)
-	{
-		m_slider9_ctrl.SetPos(m_nMax - (m_slider9_i-m_nMin));
-	}
-	*/
-/*
-	if(m_table1_table2==false)
-		write_one(tstat_id,227,m_slider9_i);
-	else
-		write_one(tstat_id,238,m_slider9_i);
-		*/
+
 	*pResult = 0;
 }
 
 void CBuildTable1::OnNMReleasedcaptureSlider10(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
-	/*if(m_bIncreasingMode)
-	{
-		m_slider10_ctrl.SetPos(m_nMax - (m_slider10_i-m_nMin));
-	}
-	*/
 
-	/*
-	if(m_table1_table2==false)
-		write_one(tstat_id,228,m_slider10_i);
-	else
-		write_one(tstat_id,239,m_slider10_i);
-	*/
 	*pResult = 0;
 }
 
 void CBuildTable1::OnNMReleasedcaptureSlider11(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	// TODO: 在此添加控件通知处理程序代码
-/*	if(m_bIncreasingMode)
-	{
-		m_slider11_ctrl.SetPos(m_nMax - (m_slider11_i-m_nMin));
-	}
-	*/
-/*
-	if(m_table1_table2==false)
-		write_one(tstat_id,229,m_slider11_i);
-	else
-		write_one(tstat_id,240,m_slider11_i);
-	*/
-//	refresh();
+
 	*pResult = 0;
 }
 
@@ -1569,45 +1129,12 @@ void CBuildTable1::OnEnChangeEdit20()
 
 void CBuildTable1::OnEnChangeEdit12()
 {
-	// TODO:  如果该控件是 RICHEDIT 控件，则它将不会
-	// 发送该通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
-	// TODO:  在此添加控件通知处理程序代码
 	IsModfied=true;
 }
 
 void CBuildTable1::OnEnKillfocusEdit1()
 {
-/*	// TODO: 在此添加控件通知处理程序代码
-	short ntemp;
-
-	CString strtxt;
-	GetDlgItem(IDC_EDIT1)->GetWindowText(strtxt);
-	ntemp=atoi(strtxt);
-
-	UpdateData();		
-	if(m_slider1_i>atoi(m_max))
-	{
-		OVER_MAX_OR_BELOW_MIN;
-		to_fresh();
-		return;
-	}
-		
-	if(IsModfied)
-	{
-		UpdateData();
-	
-		if(m_table1_table2==false)
-			write_one(tstat_id, 219,m_slider1_i);
-		else
-			write_one(tstat_id, 230,m_slider1_i);
-		IsModfied = false;
-		
-	//	to_fresh();
-		refresh();
-	}*/
 
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
@@ -1679,52 +1206,12 @@ else
 
 	//UpdateData();	
 	refresh();
-	/*
-	if(m_slider2_i>atoi(m_max) || m_slider2_i<m_nMin)
-	{
-		OVER_MAX_OR_BELOW_MIN;
-		to_fresh();
-		return;
-	}
-	if(IsModfied)
-	{
-		UpdateData();		
-		if(m_table1_table2==false)
-			write_one(tstat_id, 220,m_slider2_i);
-		else
-			write_one(tstat_id, 231,m_slider2_i);
-		IsModfied = false;
-	//	to_fresh();
-		refresh();
-	}
-	*/
-//	SetTimer(1,ONTIMER_TIME,NULL);//设定每五秒更新一次开始	
+
 }
 
 void CBuildTable1::OnEnKillfocusEdit9()
 {
-	// TODO: 在此添加控件通知处理程序代码
-	/*
-	UpdateData();		
 
-	if(m_slider3_i>atoi(m_max) || m_slider3_i<m_nMin)
-	{
-		OVER_MAX_OR_BELOW_MIN		;
-		to_fresh();
-		return;
-	}
-	if(IsModfied)
-	{
-		UpdateData();		
-		if(m_table1_table2==false)
-			write_one(tstat_id, 221,m_slider3_i);
-		else
-			write_one(tstat_id, 232,m_slider3_i);
-		IsModfied = false;
-		//to_fresh();
-		refresh();
-	}
-	*/
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		float ftemp;
@@ -1837,26 +1324,7 @@ void CBuildTable1::OnEnKillfocusEdit14()
 
 	//UpdateData();		
 	refresh();
-	/*
-	if(m_slider5_i>atoi(m_max) || m_slider5_i<m_nMin)
-	{
-		OVER_MAX_OR_BELOW_MIN;
-		to_fresh();
-		return;
-	}
-	if(IsModfied)
-	{
-		UpdateData();		
-		if(m_table1_table2==false)
-			write_one(tstat_id, 223,m_slider5_i);
-		else
-			write_one(tstat_id, 234,m_slider5_i);
-		IsModfied = false;
-		//to_fresh();
-		refresh();
-	}
-	*/
-//	SetTimer(1,ONTIMER_TIME,NULL);//设定每五秒更新一次开始	
+
 }
 
 void CBuildTable1::OnEnKillfocusEdit15()
@@ -1896,27 +1364,7 @@ void CBuildTable1::OnEnKillfocusEdit15()
 	
 	//	UpdateData();		
 	refresh();
-	/*
-	UpdateData();		
-	if(m_slider6_i>atoi(m_max) || m_slider6_i<m_nMin)
-	{
-		OVER_MAX_OR_BELOW_MIN;
-		to_fresh();
-		return;
-	}
-	if(IsModfied)
-	{
-		UpdateData();		
-		if(m_table1_table2==false)
-			write_one(tstat_id, 224,m_slider6_i);
-		else
-			write_one(tstat_id, 235,m_slider6_i);
-		IsModfied = false;
-	//	to_fresh();
-		refresh();
-	}
-	*/
-//	SetTimer(1,ONTIMER_TIME,NULL);//设定每五秒更新一次开始	
+
 }
 
 void CBuildTable1::OnEnKillfocusEdit16()
@@ -1955,27 +1403,7 @@ void CBuildTable1::OnEnKillfocusEdit16()
 	
 	//UpdateData();		
 	refresh();
-	/*
-	UpdateData();		
-	if(m_slider7_i>atoi(m_max) || m_slider7_i<m_nMin)
-	{
-		OVER_MAX_OR_BELOW_MIN;
-		to_fresh();
-		return;
-	}
-	if(IsModfied)
-	{
-		UpdateData();		
-		if(m_table1_table2==false)
-			write_one(tstat_id, 225,m_slider7_i);
-		else
-			write_one(tstat_id, 236,m_slider7_i);
-		IsModfied = false;
-	//	to_fresh();
-		refresh();
-	}
-	*/
-//	SetTimer(1,ONTIMER_TIME,NULL);//设定每五秒更新一次开始	
+
 }
 
 void CBuildTable1::OnEnKillfocusEdit17()
@@ -2013,27 +1441,7 @@ void CBuildTable1::OnEnKillfocusEdit17()
 	}
 
 	//UpdateData();		
-	refresh();/*
-	UpdateData();		
-	if(m_slider8_i>atoi(m_max) || m_slider8_i<m_nMin)
-	{
-		OVER_MAX_OR_BELOW_MIN;
-		to_fresh();
-		return;
-	}
-	if(IsModfied)
-	{
-		UpdateData();		
-		if(m_table1_table2==false)
-			write_one(tstat_id, 226,m_slider8_i);
-		else
-			write_one(tstat_id, 237,m_slider8_i);
-		IsModfied = false;
-		//to_fresh();
-		refresh();
-	}
-	*/
-//	SetTimer(1,ONTIMER_TIME,NULL);//设定每五秒更新一次开始	
+	refresh();
 }
 
 void CBuildTable1::OnEnKillfocusEdit18()
@@ -2072,27 +1480,7 @@ void CBuildTable1::OnEnKillfocusEdit18()
 	}
 	
 	//UpdateData();		
-	refresh();/*
-	UpdateData();		
-	if(m_slider9_i>atoi(m_max) || m_slider9_i<m_nMin)
-	{
-		OVER_MAX_OR_BELOW_MIN;
-		to_fresh();
-		return;
-	}
-	if(IsModfied)
-	{
-		UpdateData();		
-		if(m_table1_table2==false)
-			write_one(tstat_id, 227,m_slider9_i);
-		else
-			write_one(tstat_id, 238,m_slider9_i);
-		IsModfied = false;
-		//to_fresh();
-		refresh();
-	}
-	*/
-//	SetTimer(1,ONTIMER_TIME,NULL);//设定每五秒更新一次开始	
+	refresh();
 }
 
 void CBuildTable1::OnEnKillfocusEdit19()

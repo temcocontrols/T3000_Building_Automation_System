@@ -236,11 +236,6 @@ void CUserAcessSetDlg::InserProductToUserSetDB()
 			
 		if(!bFind)//insert to userlevel table.
 		{
-
-			try
-			{
-
-
 			strSql.Format(_T("insert into user_level values('%s','%s',%i,'%i','%s','%s','%s','%i','%i','%i','%i','%i','%i','%i','%i',%i)"),
 			m_VeryProdctLst.at(i).strMainBuildingName,
 			m_VeryProdctLst.at(i).strBuildingName,
@@ -260,11 +255,6 @@ void CUserAcessSetDlg::InserProductToUserSetDB()
 			0
 			);				
 			m_pConTmp->Execute(strSql.GetString(),NULL,adCmdText);
-			}
-			catch(_com_error *e)
-			{
-				AfxMessageBox(e->ErrorMessage());
-			}
 		}
 		
 	
@@ -606,8 +596,8 @@ END_EVENTSINK_MAP()
 void CUserAcessSetDlg::ClickAddbuildingMsflexgrid()
 {
 	long lRow,lCol;
-	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
-	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
+	lRow = m_FlexGrid.get_RowSel();//
+	lCol = m_FlexGrid.get_ColSel(); //
 
 	m_nCurRow=lRow;
 	m_nCurCol=lCol;
@@ -617,21 +607,21 @@ void CUserAcessSetDlg::ClickAddbuildingMsflexgrid()
 		return;
 
 	CRect rect;
-	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
+	m_FlexGrid.GetWindowRect(rect); //
+	ScreenToClient(rect); //	
 	CDC* pDC =GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+
 	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+
 	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+
 	CRect rcCell(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
+	
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
 	CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
@@ -704,9 +694,7 @@ void CUserAcessSetDlg::OnCbnSelchangeLevelsetcombo()
 			strSerial.TrimLeft();
 			strSerial.TrimRight();
 			int nSerial=_wtol(strSerial);
-			try
-			{
-
+			
 			_ConnectionPtr m_pConTmp;
 			_RecordsetPtr m_pRsTemp;
 			m_pConTmp.CreateInstance("ADODB.Connection");
@@ -718,12 +706,7 @@ void CUserAcessSetDlg::OnCbnSelchangeLevelsetcombo()
 			m_pConTmp->Execute(strSql.GetString(),NULL,adCmdText);
 
 			if(m_pConTmp->State)
-				m_pConTmp->Close();
-			}
-			catch(_com_error *e)
-			{
-				AfxMessageBox(e->ErrorMessage());
-			}	 
+				m_pConTmp->Close(); 
 
 		}
 	}
@@ -799,8 +782,8 @@ void CUserAcessSetDlg::OnBnClickedCancel()
 void CUserAcessSetDlg::ClickAddbuildingMsflexgrid2()
 {
 	long lRow,lCol;
-	lRow = m_FlexGrid2.get_RowSel();//获取点击的行号	
-	lCol = m_FlexGrid2.get_ColSel(); //获取点击的列号
+	lRow = m_FlexGrid2.get_RowSel();//
+	lCol = m_FlexGrid2.get_ColSel(); //
 
 	
 	//if(RGB(215,215,215)==m_FlexGrid.get_CellBackColor())
@@ -811,21 +794,21 @@ void CUserAcessSetDlg::ClickAddbuildingMsflexgrid2()
 	m_nCurCol2=lCol;
 
 	CRect rect;
-	m_FlexGrid2.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
+	m_FlexGrid2.GetWindowRect(rect); //
+	ScreenToClient(rect); 	
 	CDC* pDC =GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
+
 	long y = m_FlexGrid2.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid2.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+
 	long width = m_FlexGrid2.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid2.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
+
 	CRect rcCell(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
+
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
 	CString strValue = m_FlexGrid2.get_TextMatrix(lRow,lCol);
@@ -855,10 +838,6 @@ void CUserAcessSetDlg::InserSingleSetConfig()
 	m_pRsTemp->Open((_variant_t)(strSql),_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);	
 	_variant_t temp_variant;
 	BOOL b_useLogin=false;
-
-	try
-	{
-
 	if(m_pRsTemp->GetRecordCount()<=0)
 	{
 		strSql.Format(_T("insert into UserLevelSingleSet values('%s','%s','%s',%i,%i)"),m_strMainBuilding,m_strSubNetName,m_strUserName,0,0);		
@@ -868,11 +847,6 @@ void CUserAcessSetDlg::InserSingleSetConfig()
 		m_pConTmp->Close(); 
 	if(m_pRsTemp->State) 
 		m_pRsTemp->Close(); 
-	}
-	catch(_com_error *e)
-	{
-		AfxMessageBox(e->ErrorMessage());
-	}
 
 
 
@@ -983,8 +957,6 @@ void CUserAcessSetDlg::OnCbnSelchangeSinglesetcombo()
 			if(m_nCurCol2==3)
 				strField="database_limition";
 	
-			try
-			{
 
 	
 			_ConnectionPtr m_pConTmp;
@@ -999,11 +971,6 @@ void CUserAcessSetDlg::OnCbnSelchangeSinglesetcombo()
 
 			if(m_pConTmp->State)
 				m_pConTmp->Close(); 
-			}
-			catch(_com_error *e)
-			{
-				AfxMessageBox(e->ErrorMessage());
-			}
 
 		}
 	}

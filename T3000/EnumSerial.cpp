@@ -147,7 +147,6 @@ void EnumPortsWdm(CArray<SSerInfo,SSerInfo&> &asi)
 	HDEVINFO hDevInfo = INVALID_HANDLE_VALUE;
 	SP_DEVICE_INTERFACE_DETAIL_DATA *pDetData = NULL;
 
-	try {
 		hDevInfo = SetupDiGetClassDevs( guidDev,
 			NULL,
 			NULL,
@@ -228,10 +227,7 @@ void EnumPortsWdm(CArray<SSerInfo,SSerInfo&> &asi)
 				}
 			}
 		}
-	}
-	catch (CString strCatchErr) {
-		strErr = strCatchErr;
-	}
+
 
 	if (pDetData != NULL)
 		delete [] (char*)pDetData;
@@ -265,8 +261,6 @@ void EnumPortsW9x(CArray<SSerInfo,SSerInfo&> &asi)
 	// Search all subkeys of HKLM\Enum\USBPORTS for PORTNAME entries.
 
 	// First, open HKLM\Enum
-
-
 	HKEY hkEnum = NULL;
 	HKEY hkSubEnum = NULL;
 	HKEY hkSubSubEnum = NULL;

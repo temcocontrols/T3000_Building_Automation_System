@@ -1,6 +1,6 @@
 #pragma once
 #include "afxcmn.h"
-#include "LightingController/LightingController.h"
+
 
 
 // CDialog_Progess dialog

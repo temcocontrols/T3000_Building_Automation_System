@@ -155,6 +155,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="setupapi.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;..\T3000 Output\release&quot;"
 				UACExecutionLevel="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -212,18 +213,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Annual_Routines.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\AnnualRout_InsertDia.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ApplyGraphicLabelsDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\BuildTable1.cpp"
 				>
 			</File>
@@ -232,15 +221,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Config_Routines.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LightingController\configure.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DBOprator.cpp"
+				RelativePath=".\ConfigFileWR.cpp"
 				>
 			</File>
 			<File
@@ -260,10 +241,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\excel9.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\extern_function.cpp"
 				>
 			</File>
@@ -280,19 +257,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GraphicView.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\GridButton.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\GridFlashDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\GridLoad.cpp"
 				>
 			</File>
 			<File
@@ -320,23 +289,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\IOSetDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LabelEditDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\LedsDialog.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LightingController\LightingController.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LightingController\LightingSet.cpp"
 				>
 			</File>
 			<File
@@ -361,10 +314,6 @@
 			</File>
 			<File
 				RelativePath=".\msflexgrid1.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\NetworkControllView.cpp"
 				>
 			</File>
 			<File
@@ -413,14 +362,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SetPtDayDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SetptGraphicBar.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -461,15 +402,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Timer_Calibrate.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ToolCalibrateDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TrendLogView.cpp"
 				>
 			</File>
 			<File
@@ -497,27 +430,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\TStatScheduleDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\UserAcessSetDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Weekly_Routines.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WeeklyRout_InsertDia.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WeeklySchedule.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WeeklySchedule.h"
 				>
 			</File>
 			<File
@@ -547,18 +460,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Annual_Routines.h"
-				>
-			</File>
-			<File
-				RelativePath=".\AnnualRout_InsertDia.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ApplyGraphicLabelsDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\BuildTable1.h"
 				>
 			</File>
@@ -567,15 +468,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Config_Routines.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LightingController\configure.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DBOprator.h"
+				RelativePath=".\ConfigFileWR.h"
 				>
 			</File>
 			<File
@@ -596,10 +489,6 @@
 			</File>
 			<File
 				RelativePath=".\EreaseDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\excel9.h"
 				>
 			</File>
 			<File
@@ -627,19 +516,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GraphicView.h"
-				>
-			</File>
-			<File
 				RelativePath=".\GridButton.h"
 				>
 			</File>
 			<File
 				RelativePath=".\GridFlashDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\GridLoad.h"
 				>
 			</File>
 			<File
@@ -667,23 +548,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\IOSetDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LabelEditDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\LedsDialog.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LightingController\LightingController.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LightingController\LightingSet.h"
 				>
 			</File>
 			<File
@@ -716,10 +581,6 @@
 			</File>
 			<File
 				RelativePath=".\NcModbus.h"
-				>
-			</File>
-			<File
-				RelativePath=".\NetworkControllView.h"
 				>
 			</File>
 			<File
@@ -775,14 +636,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SetPtDayDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SetptGraphicBar.h"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.h"
 				>
 			</File>
@@ -811,15 +664,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Timer_Calibrate.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ToolCalibrateDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TrendLogView.h"
 				>
 			</File>
 			<File
@@ -839,10 +684,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\TStatScheduleDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\UserAcessSetDlg.h"
 				>
 			</File>
@@ -851,91 +692,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Weekly_Routines.h"
-				>
-			</File>
-			<File
-				RelativePath=".\WeeklyRout_InsertDia.h"
-				>
-			</File>
-			<File
 				RelativePath=".\WorkspaceBar.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="T3"
-			>
-			<File
-				RelativePath=".\T3\DialogT3.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\T3\DialogT3.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="MiniPanel"
-			>
-			<File
-				RelativePath=".\MiniPanel\DialgMiniPanel.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MiniPanel\DialgMiniPanel.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="CADO"
-			>
-			<File
-				RelativePath=".\ADO\ADO.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ADO\ADO.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="CM5"
-			>
-			<File
-				RelativePath=".\CM5\DialogCM5.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CM5\DialogCM5.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CM5\SliderBoth.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CM5\SliderBoth.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CM5\SliderBothBtn.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CM5\SliderBothBtn.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="AirQuality"
-			>
-			<File
-				RelativePath=".\AirQuality\AirQuality.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\AirQuality\AirQuality.h"
 				>
 			</File>
 		</Filter>
@@ -1113,38 +870,6 @@
 				>
 			</File>
 		</Filter>
-		<Filter
-			Name="ISP"
-			>
-			<File
-				RelativePath=".\ISP\CDialogISPTOOL.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ISP\CDialogISPTOOL.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="singleslider"
-			>
-			<File
-				RelativePath=".\singleslider\MacSliderCtrl.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\singleslider\MacSliderCtrl.h"
-				>
-			</File>
-		</Filter>
-		<File
-			RelativePath=".\ReadMe.txt"
-			>
-		</File>
-		<File
-			RelativePath="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt"
-			>
-		</File>
 	</Files>
 	<Globals>
 		<Global

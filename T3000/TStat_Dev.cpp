@@ -3,16 +3,12 @@
 //#include "global_variable_extern.h"
 #include "define.h"
 
-
 CTStat_Dev::CTStat_Dev(void)
 {
 }
-
 CTStat_Dev::~CTStat_Dev(void)
 {
 }
-
-
 int CTStat_Dev::ReadOneReg(int nRegAddr, OUT int& nVal)
 {
 	return 0;
@@ -40,7 +36,7 @@ int CTStat_Dev::WriteMultiReg(int nRegAddrStart, int nRegAddrEnd, OUT int* nVal)
 
 
 
-// 也必须通过读写寄存器来实现
+
 BOOL CTStat_Dev::IsOnLine()
 {
 	return FALSE;
@@ -69,10 +65,7 @@ void CTStat_Dev::SetComPort(int nComPort)
 
 int CTStat_Dev::GetEPSize()const
 {
-	 return m_nEPSize;	
-	 
-
-
+	return m_nEPSize;	
 }
 
 void CTStat_Dev::SetEPSize(int nEPSize)

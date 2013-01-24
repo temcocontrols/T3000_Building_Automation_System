@@ -3,11 +3,11 @@
 #include "TStatBase.h"
 #include "define.h"
 CTStat_Net::CTStat_Net(void)
-:m_nBaudRate(0),				// 波特率
-m_nComPort(0),				// 串口	
-m_dwIPAddr(0),				// IP Address
-m_nPort(0)					// 当前端口
-//CTStatBase::m_nProductType(100)				// 产品ID
+:m_nBaudRate(0),			
+m_nComPort(0),		
+m_dwIPAddr(0),			
+m_nPort(0)				
+
 {
 
 }
@@ -99,7 +99,7 @@ void CTStat_Net::SetIPAddr(char* szIPAddr)
 // 	
 // }
 
-// 网络端口
+
 int CTStat_Net::GetIPPort()const
 {
 	return m_nPort;
@@ -110,7 +110,7 @@ void CTStat_Net::SetIPPort(int nPort)
 	m_nPort = nPort;
 }
 
-// 波特率
+
 int CTStat_Net::GetBaudRate()const
 {
 	return m_nBaudRate;
@@ -121,8 +121,6 @@ void CTStat_Net::SetBaudRate(int nBaudRate)
 }
 
 
-//----------------------------------------------------------------
-// 以下两个才需要去读写寄存器
 
 int CTStat_Net:: WriteDevID(int nID)const
 {
@@ -145,9 +143,7 @@ BOOL CTStat_Net::operator==(const CTStat_Net& dev)
 
 		&&  m_nBaudRate == dev.m_nBaudRate 
 		&&  m_nComPort == dev.m_nComPort
-		//&&  m_dwIPAddr == dev.m_nProductID				// IP Address
-		//&&  m_nPort == dev.m_nProductID					// 当前端口
-		//&&  m_nProductID == dev.m_nProductID				// 产品ID
+
 		);	
 }
 
@@ -171,8 +167,8 @@ CString CTStat_Net::GetProductName()
 	}
 
 	CString strID;
-	//strID.Format(_T("%ul"), m_dwSerialID);//20120424
-	strID.Format(_T("%u"), m_dwSerialID);//20120424  //scan 系列号总多出l
+	strID.Format(_T("%ul"), m_dwSerialID);//20120424
+	
 
 	CString strDevID;
 	strDevID.Format(_T("%d"), m_nDevID);
