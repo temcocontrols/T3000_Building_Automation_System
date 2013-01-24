@@ -28,12 +28,12 @@ IMPLEMENT_DYNAMIC(CAllNodesDiaolg, CDialog)
 CAllNodesDiaolg::CAllNodesDiaolg(CWnd* pParent /*=NULL*/)
 	: CDialog(CAllNodesDiaolg::IDD, pParent)
 {
-
 	m_bChanged=FALSE;
 }
 
 CAllNodesDiaolg::~CAllNodesDiaolg()
 {
+
 }
 
 void CAllNodesDiaolg::DoDataExchange(CDataExchange* pDX)
@@ -64,14 +64,24 @@ END_MESSAGE_MAP()
 
 
 // CAllNodesDiaolg message handlers
+/*
+OnInitDialog();
+这个函数用来初始化数据库中的界面的
 
+*/
 BOOL CAllNodesDiaolg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	//设置输入文本隐藏，Combox隐藏起来
 	m_InputTextEdt.ShowWindow(SW_HIDE);
 	m_productCombox.ShowWindow(SW_HIDE);
 	//GetDlgItem(IDC_ADDBUTTON)->ShowWindow(SW_HIDE);
-
+/*
+获取CMainFrame 指针
+获得指针后就可以获取成员变量的数据
+m_subNetLst=vector 
+用来保存子节点的信息
+*/
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	m_strMainBuildingName= pFrame->m_strCurMainBuildingName;
 	m_strSubNetName= pFrame->m_strCurSubBuldingName;
@@ -86,18 +96,24 @@ BOOL CAllNodesDiaolg::OnInitDialog()
 
 	m_SubLstCombox.ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
-	
+	//初始化数据库的链接+记录集组件
 	m_pCon.CreateInstance(_T("ADODB.Connection"));
 	m_pRs.CreateInstance(_T("ADODB.Recordset"));
 	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 
+	//下载数据从数据库中
+	//ReloadAddBuildingDB
+	//包括了初始化控件
 	ReloadAddBuildingDB();
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
 
 void CAllNodesDiaolg::OnBnClickedOk()
 {
- 
+	// TODO: Add your control notification handler code here
+	//OnOK();
+	/*
+	*/
 
 }
 
@@ -262,13 +278,13 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
 }
 void CAllNodesDiaolg::SetBuildingMainName(CString strBuildName)
 {
-m_strMainBuildingName=strBuildName;
+	m_strMainBuildingName=strBuildName;
 }
 
 
 void CAllNodesDiaolg::OnBnClickedDelbutton()
 {
-
+#if 1
 	if(m_nCurRow==0||m_nCurRow==m_FlexGrid.get_Rows()-1)
 	{
 		AfxMessageBox(_T("Please select a item first!"));
@@ -288,6 +304,34 @@ void CAllNodesDiaolg::OnBnClickedDelbutton()
 	{
 		try
 		{
+
+
+			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
+		}
+		catch(_com_error *e)
+		{
+			AfxMessageBox(e->ErrorMessage());
+		}
+	}
+	ReloadAddBuildingDB();
+	m_bChanged=TRUE;
+#endif
+	
+
+}
+
+void CAllNodesDiaolg::OnBnClickedDelallbutton()
+{
+	CString strSql;
+	strSql=_T("delete * from ALL_NODE ");
+	CString strTemp;
+	strTemp.Format(_T("Are you sure to delete all the sub node(s)"));
+	if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
+	{
+		try
+		{
+
+
 			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
 		}
 		catch(_com_error *e)
@@ -299,31 +343,15 @@ void CAllNodesDiaolg::OnBnClickedDelbutton()
 	m_bChanged=TRUE;
 }
 
-void CAllNodesDiaolg::OnBnClickedDelallbutton()
-{
-	CString strSql;
-	strSql=_T("delete * from ALL_NODE ");
-	CString strTemp;
-	strTemp.Format(_T("Are you sure to delete all the sub node(s)"));
-	if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
-	{
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-	}
-	ReloadAddBuildingDB();
-	m_bChanged=TRUE;
-}
-
 void CAllNodesDiaolg::OnBnClickedExitbutton()
 {
 #if 1
+	CAllNodesDiaolg::OnCancel();
 
-    CAllNodesDiaolg::OnCancel();
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
-
 #endif
 	
-
 }
 
 void CAllNodesDiaolg::OnBnClickedCancel()
@@ -342,7 +370,106 @@ END_EVENTSINK_MAP()
 
 void CAllNodesDiaolg::ClickMsflexgrid1()
 {
+	long lRow,lCol;
+	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
+	if(lRow==0)
+		return;
+	CRect rect;
+	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形	
+	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
+	//需要将其转化为像素，1440缇= 1英寸
+	CDC* pDC =GetDC();
+	//计算象素点和缇的转换比例
+	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
+	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//计算选中格的左上角的坐标(象素为单位)
+	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
+	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
+	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	//形成选中个所在的矩形区域
+	CRect rc(x,y,x+width,y+height);
+	//转换成相对对话框的坐标
+	rc.OffsetRect(rect.left+1,rect.top+1);
+	//获取选中格的文本信息	
+	CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
+	m_nCurRow=lRow;
+	m_nCurCol=lCol;
 
+	if(m_nCurCol==1)
+	{
+		if(m_nCurRow<m_FlexGrid.get_Rows()-1)
+			return;
+	}
+// 	if(m_nCurCol==AN_PRODUCTTYPE)
+// 	{
+// 		if(m_nCurRow<m_FlexGrid.get_Rows()-1)
+// 			return;
+// 		m_productCombox.ResetContent();
+// 		m_productCombox.AddString(_T("Tstat"));
+// 		m_productCombox.AddString(_T("NC"));
+// 		m_productCombox.ShowWindow(SW_SHOW);//显示控件		
+// 		m_productCombox.SetWindowText(strValue); //显示文本
+// 		m_productCombox.SelectString(-1,strValue); //内容全选。方便直接修改		this line must before setfocus
+// 		m_productCombox.SetFocus(); //获取焦点
+// 		m_productCombox.MoveWindow(rc); //移动到选中格的位置，覆盖		
+// 	}
+//	if(m_nCurCol==AN_PRUDUCTNAME||m_nCurCol==AN_ROOMNAME||m_nCurCol==AN_FLOORNAME)
+	if(m_nCurCol > 0 && m_nCurCol != AN_GRAPHICID  && m_nCurCol != AN_MAINNAME)
+	{
+		m_InputTextEdt.ShowWindow(SW_SHOW);
+
+		m_InputTextEdt.SetWindowText(strValue); //显示文本
+	//	m_InputTextEdt(-1,strValue); //内容全选。方便直接修改		this line must before setfocus
+		
+		m_InputTextEdt.SetFocus();
+		int nLenth=strValue.GetLength();
+		m_InputTextEdt.SetSel(0,nLenth); 
+		m_InputTextEdt.SetFocus(); //获取焦点
+		m_InputTextEdt.MoveWindow(rc); //移动到选中格的位置，覆盖	
+
+	}
+	if(m_nCurCol==AN_GRAPHICID)
+	{
+		CString strFilter = _T("bmp file|*.bmp|jpg file|*.jpg|png file|*.png|tif file|*.tif|all file|*.*||");
+		CFileDialog dlg(true,_T("Open image file"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
+		if(IDOK==dlg.DoModal())
+		{
+			//=program_path+"image\\"+short_name;
+
+			CString strImgFilePathName=dlg.GetPathName();
+			CString strImgFileName=dlg.GetFileName();
+			CString strDestFileName=g_strImgeFolder+strImgFileName;
+
+			CopyFile(strImgFilePathName,strDestFileName,FALSE);
+			m_FlexGrid.put_TextMatrix(m_nCurRow,m_nCurCol,strImgFileName);
+			//update recorder;
+
+			if(m_nCurRow<m_FlexGrid.get_Rows())
+			{
+				CString strSerial=m_FlexGrid.get_TextMatrix(m_nCurRow,AN_SerialID);
+				if(strSerial.IsEmpty())
+					return;
+				try
+				{
+
+
+				CString strSql;
+				strSql.Format(_T("update ALL_NODE set Background_imgID ='%s' where Serial_ID = '%s' "/*and Building_Name = '%s'*/),strImgFileName,strSerial/*,m_strSubNetName*/);
+				m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+				m_bChanged=TRUE;
+				g_strImagePathName=strImgFileName;			
+				}
+				catch(_com_error *e)
+				{
+					AfxMessageBox(e->ErrorMessage());
+				}
+				}
+		}
+	}
 }
 
 void CAllNodesDiaolg::OnCbnSelchangeCombo1()
@@ -359,8 +486,85 @@ void CAllNodesDiaolg::OnCbnSelchangeCombo1()
 
 void CAllNodesDiaolg::OnEnKillfocusTextedit()
 {
+	// TODO: Add your control notification handler code here
 	if(m_nCurRow==0)
 		return;
+	if(m_FlexGrid.get_RowSel()==0)
+		return;
+	m_InputTextEdt.ShowWindow(SW_HIDE);
+	CString strName;
+	m_InputTextEdt.GetWindowText(strName);
+	
+	if (m_nCurRow < m_FlexGrid.get_Rows()-1)
+	{
+		if(m_nCurCol==AN_PRUDUCTNAME)
+		{
+			CString strSerial=m_FlexGrid.get_TextMatrix(m_nCurRow,AN_SerialID);
+			if(strSerial.IsEmpty())
+				return;
+			CString strSql;
+			try
+			{
+
+
+			strSql.Format(_T("update ALL_NODE set Product_name ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
+			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+			}
+			catch(_com_error *e)
+			{
+				AfxMessageBox(e->ErrorMessage());
+			}
+			ReloadAddBuildingDB();
+		}
+		if(m_nCurCol==AN_ROOMNAME)
+		{
+			CString strSerial=m_FlexGrid.get_TextMatrix(m_nCurRow,AN_SerialID);
+			if(strSerial.IsEmpty())
+				return;
+			CString strSql;
+			try
+			{
+
+
+			strSql.Format(_T("update ALL_NODE set Room_name ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
+			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
+			}
+			catch(_com_error *e)
+			{
+				AfxMessageBox(e->ErrorMessage());
+			}
+			ReloadAddBuildingDB();
+		}
+		if(m_nCurCol==AN_FLOORNAME)
+		{
+			CString strSerial=m_FlexGrid.get_TextMatrix(m_nCurRow,AN_SerialID);
+			if(strSerial.IsEmpty())
+				return;
+			try
+			{
+
+
+			CString strSql;
+
+			strSql.Format(_T("update ALL_NODE set Floor_name ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
+			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+			}
+			catch(_com_error *e)
+			{
+				AfxMessageBox(e->ErrorMessage());
+			}
+
+			ReloadAddBuildingDB();
+		}
+	}
+	else // 最后一行，用来增加
+	{
+		//if(m_nCurCol==AN_PRODUCTTYPE)
+		{
+			m_FlexGrid.put_TextMatrix(m_nCurRow, m_nCurCol, strName);
+		}
+
+	}
 }
 
 void CAllNodesDiaolg::OnEnSetfocusTextedit()
@@ -370,15 +574,24 @@ void CAllNodesDiaolg::OnEnSetfocusTextedit()
 
 BOOL CAllNodesDiaolg::PreTranslateMessage(MSG* pMsg)
 {
+	// TODO: Add your specialized code here and/or call the base class
+	if(pMsg->wParam == VK_RETURN )
+	{ 
+		GetDlgItem(IDC_EXITBUTTON)->SetFocus();
+		return true; 
+	} 
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
 
 void CAllNodesDiaolg::OnBnClickedAddbutton()
 {
-	/*alex*/
+	// TODO: Add your control notification handler code here
+	//AfxMessageBox(_T("Not realized!"));
+
+/*alex*/
 #if 1
-	CString strSql;
+CString strSql;
 	int nMaxRowIndext=m_FlexGrid.get_Rows()-1;
 
 	//CString strSBuildingNameTemp;
@@ -438,7 +651,7 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 		AfxMessageBox(_T("The Product type can not be empty, please input."));
 		return ;
 	}
-
+	
 	// product ID
 	CString strProID;
 	strProID=m_FlexGrid.get_TextMatrix(nMaxRowIndext, AN_PRODUCTID);
@@ -480,7 +693,7 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 	{		
 		strGraphicID = _T("Clicking here to add a image");
 	}
-
+	
 	// Hard VERSION
 	CString strHdVersion;
 	strHdVersion=m_FlexGrid.get_TextMatrix(nMaxRowIndext, AN_HDVERSION);
@@ -505,7 +718,7 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 	}
 
 	CString strCom = _T("0");
-
+	
 	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"')"));
 	//new nc//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Mainnet_info) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
 	try
@@ -513,9 +726,9 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 
 
 
-		TRACE(strSql);
-
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	TRACE(strSql);
+	
+	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
 	}
 	catch(_com_error *e)
 	{
@@ -523,4 +736,7 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 	}
 	ReloadAddBuildingDB();
 #endif
+	
+
+
 }

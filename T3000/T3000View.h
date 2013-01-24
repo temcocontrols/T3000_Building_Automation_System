@@ -10,12 +10,29 @@
 
 #include "msflexgrid1.h"
 
+#include "SetPtDayDlg.h"
 #include "OfficeStPtDlg.h"
 #include "../FlexSlideBar/FlexSlideBarDef.h"
 //#include "../FlexSlideBar/FlexSlideWnd.h"
 #include "../FlexSlideBar/FSBContainer.h"
 
+#include "singleslider/MacSliderCtrl.h"
+
 #define WM_FRESHVIEW WM_USER + 1100
+
+
+#define  DaySP		0  //address 345
+#define  DcoolDB	1  //address 346
+#define  DheatDB	2  //address 347
+#define  DcoolSP	3  //address 348
+#define  DheatSP	4  //address 349
+#define  NightSP	5  //address 350
+#define  NheatDB	6  //address 352
+#define  NcoolDB	7  //address 353
+#define  NheatSP	8  //address 354
+#define  NcoolSP	9  //address 355
+#define  Max		10  //address 365
+#define  Min		11  //address 366
 
 class CFSBContainer;
 class CT3000View : public CFormView
@@ -36,6 +53,7 @@ public:
 
 	CString	g_strIpAdress;
 	CMFCTabCtrl	m_wndTab;
+	CSetPtDayDlg* m_pSetPtDayDlg;
 	CRect m_rcTabCtrl;
 	COfficeStPtDlg* m_pSetPtOffceDlg;
 	
@@ -81,16 +99,20 @@ public:
 	void OnAddBuildingConfig();
 	//void OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult);
 	void Fresh();
-
+	void FreshCtrl();
 	void InitSliderBars();
-
+	// 这个函数是为了与之前的版本兼容
+	// 使用新的Slider，但是寄存器逻辑使用原来的
 	void InitSliderBars2();
 	
-	
+	void InitFlexSliderBars();
 	void Fresh_In();
 	void Fresh_Out();
 
 	void FreshIOGridTable();
+
+	void OnFlexSlideCallBackFor5E();
+	void OnFlexSlideCallBackFor5ABCD(CFSBContainer* pSlider);
 
 	void InitFanSpeed();
 public:
@@ -104,7 +126,8 @@ public:
 	afx_msg void OnNMReleasedcaptureNightSlider(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMReleasedcaptureNightheatSlider(NMHDR *pNMHDR, LRESULT *pResult);
 
-	HANDLE m_hSerial;//
+	HANDLE m_hSerial;
+	//串口句柄
 	SOCKET m_hSocket;
 
 	int m_nID;
@@ -155,6 +178,8 @@ public:
 	CFSBContainer*  m_pDayTwoSP;
 	CFSBContainer*  m_pDaySingleSP;
 
+//	CFSBContainer*  m_pTemperSP;
+
 	CEdit m_TempInfoEdit;
 	CEdit m_dayInfoEdit;
 	CEdit m_nightInfoEdit;
@@ -201,17 +226,29 @@ public:
 	afx_msg void OnMoving(UINT fwSide, LPRECT pRect);
 	afx_msg void OnBnClickedBtnSynctime();
 	afx_msg void OnBnClickedButtonSchedule();
-
+	afx_msg LRESULT OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedUnoccupiedMark();
 
 
-
+//tstat6
+	unsigned short tempchange[512];//for tstat6
+	unsigned short temptstat6[512];
+//tstat6
 
 
 	void HandleSliderSetPos(BOOL bRight);
 	BOOL				m_bSliderSetPosWarning;
-
-	afx_msg void OnBnClickedFlash();
+	void InitFlexSliderBars_tstat6();//tsat6
+	void OnFlexSlideCallBackFortstat6();
+	void TemperatureSlider();
+	afx_msg void OnNMReleasedcaptureTempretureSlider(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnEnKillfocusDayEdit();
+	int m_daysetpoint;//0907
+	afx_msg void OnEnKillfocusEditCurSp();
+	int m_nightpot;//0907
+	//CSliderCtrl m_singlesliderday;
+	CMacSliderCtrl m_singlesliderday;
+	CMacSliderCtrl m_singleslidernight;
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

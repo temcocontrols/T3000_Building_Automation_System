@@ -32,7 +32,7 @@ void _Twrite_to_file_a_line(wofstream & out,const TCHAR * format, ... );
 
 
 using namespace std;
-
+void Save2File_ForTstat5E5C(TCHAR* fn);
 bool digital2string(int val,CString & str,unsigned char type);
 bool string2digital(CString str,unsigned char & val ,bool & type ); // type false = digital ,true = analog
 void WriteSerialNumber(wofstream & out);
@@ -40,6 +40,8 @@ void WriteAddress(wofstream & out) ;
 void Save2File(const char* fn);
 //void Save2File_ForTwoFiles(const char* fn);
 void Save2File_ForTwoFiles(TCHAR* fn);
+
+void Save2File_ForTwoFilesTSTAT67(TCHAR* fn);//((LPTSTR)(LPCTSTR)strFilename);
 void change_showing_text_variable(CString str);
 bool before_load_file_inspect(CString path_name,CString name,int i_tstat_id,bool show_message=true);
 int get_real_number_fan_speeds(int fan_number);

@@ -26,4 +26,5 @@ public:
 	virtual BOOL OnInitDialog();
 	CEdit m_tstatIDEdit;
 	int m_nTstatID;
+	afx_msg void OnBnClickedCancel();
 };

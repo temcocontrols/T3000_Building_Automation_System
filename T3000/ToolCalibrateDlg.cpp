@@ -115,8 +115,8 @@ END_EVENTSINK_MAP()
 void CToolCalibrateDlg::ClickGridflashMsflexgrid()
 {
 	int lRow,lCol;
-	lRow = m_FlexGrid.get_RowSel();//
-	lCol = m_FlexGrid.get_ColSel(); //
+	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
 	UpdateData(false);
 	if(lRow==0 || lCol==0)
 		return;
@@ -133,24 +133,25 @@ void CToolCalibrateDlg::ClickGridflashMsflexgrid()
 	*/
 
 	CRect rect;
-	m_FlexGrid.GetWindowRect(rect); //
-	ScreenToClient(rect); //
-	
+	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形	
+	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
+	//需要将其转化为像素，1440缇= 1英寸
 	CDC* pDC =GetDC();
-	
+	//计算象素点和缇的转换比例
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-
+	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
-
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-
+	//形成选中个所在的矩形区域
 	CRect rc(x,y,x+width,y+height);
-
+	//转换成相对对话框的坐标
 	rc.OffsetRect(rect.left+1,rect.top+1);
-
+	//获取选中格的文本信息
 	CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
 	row_row=lRow;
 	row_col=lCol;

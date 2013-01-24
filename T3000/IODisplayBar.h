@@ -1,6 +1,7 @@
 #pragma once
 
- 
+//#include "IOSetDlg.h"
+// CIODisplayBar
 
 class CIODisplayBar : public CDockablePane
 {
@@ -17,6 +18,6 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 public:
- 
+	//CIOSetDlg* m_pSetDlg;
 	
 };

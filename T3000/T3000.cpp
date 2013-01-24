@@ -6,13 +6,10 @@
 #include "afxwinappex.h"
 #include "T3000.h"
 #include "MainFrm.h"
-
 #include "T3000Doc.h"
 #include "T3000View.h"
 #include "T3000TableView.h"
-
 #include "LoginDlg.h"
-
 #include "iniFile.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -30,8 +27,15 @@ END_MESSAGE_MAP()
 // CT3000App construction
 CT3000App::CT3000App()
 {
-	m_bHiColorIcons = TRUE;
-	
+//	try
+///	{
+		m_bHiColorIcons = TRUE;
+//	}
+// 	catch (...)
+// 	{
+// 		
+// 		AfxMessageBox(_T("1111"));
+// 	}
 }
 // The one and only CT3000App object
 CT3000App theApp;
@@ -47,20 +51,29 @@ BOOL CT3000App::user_login()
 	return true;
 }
 // CT3000App initialization
+/*
+FunctionName:RegisterOcx
+Comment:Alex
+Date:2012-11-29
+Purpose:这个函数的作用，获取控件的位置，注册到注册表中
+也可以通过Bat文件注册
+*/
 BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 {
-	LPCTSTR   pszDllName   =   OcxFileName   ;     
-	HINSTANCE   hLib   =   LoadLibrary(pszDllName);   
+	LPCTSTR   pszDllName   =   OcxFileName   ;     //ActiveX控件的路径及文件名       
+	HINSTANCE   hLib   =   LoadLibrary(pszDllName);   //装载ActiveX控件   
 	if   (hLib   <   (HINSTANCE)HINSTANCE_ERROR)   
 	{   
 		return   FALSE;   
 	}   
 	FARPROC   lpDllEntryPoint;     
-	lpDllEntryPoint   =   GetProcAddress(hLib,(LPCSTR)(_T("DllRegisterServer")));  
+	lpDllEntryPoint   =   GetProcAddress(hLib,(LPCSTR)(_T("DllRegisterServer")));   //获取注册函数DllRegisterServer地址   
 	if(lpDllEntryPoint!=NULL)      
+	 //调用注册函数DllRegisterServer   
 	{   
 		if(FAILED((*lpDllEntryPoint)()))   
-		{//   AfxMessageBox(_T("false"));
+		{
+		//   AfxMessageBox(_T("false"));
 			FreeLibrary(hLib);   
 			return   FALSE;   
 			
@@ -76,9 +89,21 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 	}
 	
 }
-BOOL CT3000App::InitInstance()
-{
+/*
+FunctionName:InitInstance
 
+Comment:Alex
+Date:2012-11-29
+Purpose:这个是T3000的入口函数，从这里开始初始化，
+然后进入T3000的MainFrm界面
+*/
+BOOL CT3000App::InitInstance()//Alex-
+{
+	try
+	{
+	// InitCommonControlsEx() is required on Windows XP if an application
+	// manifest specifies use of ComCtl32.dll version 6 or later to enable
+	// visual styles.  Otherwise, any window creation will fail.
  	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
 	// Set this to include all the common control classes you want to use
@@ -86,61 +111,43 @@ BOOL CT3000App::InitInstance()
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
-	 
-
-	CWinAppEx::InitInstance();
-	HRESULT hr;//
-/********************************************************************
-	created:	2012/11/27
-	created:	27:11:2012   13:29
-	filename: 	T3000\T3000\T3000.cpp
-	file path:	T3000\T3000
-	file base:	T3000
-	file ext:	cpp
-	author:		Alex
-	
-	purpose:	使用是1 不使用设置成0
-*********************************************************************/
-
-
 	Judgestore();
 	ReadREG();
  
-
 #if 0
 
 	// 检测注册信息
-
+ 
 	//Here is for Register information.
 	if(haveRegister())
 	{
-		int days = GetSoftInstallDays();
-		// 		 		if(days<=30&&days>=20)
-		// 		 		{
-		// 		 			CString msg;
-		// 		 			msg.Format(_T("please update new version on the website"));
-		// 		 			AfxMessageBox(msg);
-		// 		 		}
-		// 		 		else if(days>30)
-		// 		 		{
-		// 		 			AfxMessageBox(_T("please update new version on the website"));
-		// 		 			return FALSE;
-		// }
-
+ 		int days = GetSoftInstallDays();
+ 		// 		 		if(days<=30&&days>=20)
+ 		// 		 		{
+ 		// 		 			CString msg;
+ 		// 		 			msg.Format(_T("please update new version on the website"));
+ 		// 		 			AfxMessageBox(msg);
+ 		// 		 		}
+ 		// 		 		else if(days>30)
+ 		// 		 		{
+ 		// 		 			AfxMessageBox(_T("please update new version on the website"));
+ 		// 		 			return FALSE;
+ 		// }
+		
 		CString strDays;
 		strDays.Format(_T("%d"),days);
 		AfxMessageBox(strDays);
+				 		
+ 		if(days>160)
+ 		{
+ 			AfxMessageBox(_T("please update new version on the website!"));
+ 			return FALSE;
+ 
+ 		}
 
-		if(days>160)
-		{
-			AfxMessageBox(_T("please update new version on the website!"));
-			return FALSE;
 
-		}
-
-
-		//int days = GetSoftInstallDays();
-
+		  days =0 /*GetSoftInstallDays()*/;
+	
 		if (((m_maxClients-days)<=5)&&(days<=m_maxClients))
 		{
 			CString msg;
@@ -166,22 +173,26 @@ BOOL CT3000App::InitInstance()
 
 
 	}
-	else
+	/*else
 	{
-		AfxMessageBox(_T("Error code: 102 \nSystem closed!"));
-		return FALSE;
-	}
+	AfxMessageBox(_T("Error code: 102 \nSystem closed!"));
+	return FALSE;
+	}*/
 #endif
 
+	CWinAppEx::InitInstance();
+	HRESULT hr;//
 
 
-	if (!AfxSocketInit())//初始化socket
+
+	 
+	if (!AfxSocketInit())//
 	{
 		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);//
 		return FALSE;//
 	}
 	// Initialize OLE libraries
-	if (!AfxOleInit())//
+	if (!AfxOleInit())
 	{
 		AfxMessageBox(IDP_OLE_INIT_FAILED);
 		return FALSE;
@@ -189,6 +200,9 @@ BOOL CT3000App::InitInstance()
 	AfxEnableControlContainer();
 
 #if 1	
+	try
+	{
+
 	TCHAR exeFullPath[MAX_PATH+1]; //
 	GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
 	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
@@ -204,6 +218,7 @@ BOOL CT3000App::InitInstance()
 	hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
 	if (hFind==INVALID_HANDLE_VALUE)//
 	{
+	//GOOD==GOOD
 		CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
 	}//
 	else//
@@ -216,9 +231,13 @@ BOOL CT3000App::InitInstance()
 	g_strImgeFolder=g_strExePth+_T("Database\\image\\");//
 	CreateDirectory(g_strImgeFolder,NULL);//
 	
-	 CString strocx=g_strExePth+_T("MSFLXGRD.OCX");
-	 RegisterOcx(strocx);
+	//CString strocx=g_strExePth+_T("MSFLXGRD.OCX");
+
+
 	InitModeName();//
+
+
+
 #endif
 
 	// Standard initialization
@@ -249,10 +268,14 @@ BOOL CT3000App::InitInstance()
 #endif
 
 
+	}
+	catch (...)
+	{
+		AfxMessageBox(_T("Database operation to stop!"));
 
-
-	 //Register the application's document templates.  Document templates
-	 // serve as the connection between documents, frame windows and views
+	}
+	// Register the application's document templates.  Document templates
+	//  serve as the connection between documents, frame windows and views
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
 		IDR_MAINFRAME,
@@ -267,15 +290,12 @@ BOOL CT3000App::InitInstance()
 		return FALSE;
 
 
-	
-
-
 	AddDocTemplate(pDocTemplate);
 	// Parse command line for standard shell commands, DDE, file open
 	CCommandLineInfo cmdInfo;	
 	ParseCommandLine(cmdInfo);
 
-//	cmdInfo.m_nShellCommand   =   CCommandLineInfo::FileNothing; //lsc
+	//cmdInfo.m_nShellCommand   =   CCommandLineInfo::FileNothing; //lsc
 
 
 	// Dispatch commands specified on the command line.  Will return FALSE if
@@ -287,6 +307,8 @@ BOOL CT3000App::InitInstance()
 	GdiplusStartupInput gdiplusStartupInput;//
 	GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);//
 #if 1
+//这个活动片段的目的：初始g_bPrivilegeMannage的值
+//当是否有用户登录到系统
 ////////////////////////////////////////////////////////
 	_ConnectionPtr m_pCon;
 	_RecordsetPtr m_pRs;
@@ -325,6 +347,8 @@ BOOL CT3000App::InitInstance()
 	m_pRs->Close();
 	m_pCon->Close();
 
+
+
 	if (g_bPrivilegeMannage)
 	{//for just quick debug,only on this computer
 		if(!user_login())
@@ -332,18 +356,44 @@ BOOL CT3000App::InitInstance()
 			AfxMessageBox(_T("Error password!"));	
 			return false;
 		}
+		else
+		{
+			
+
+		}
 		
 	}
 
 #endif
 
-  	((CMainFrame*)m_pMainWnd)->InitViews();//
- // 	// The one and only window has been initialized, so show and update it
-   	m_pMainWnd->SetWindowText(_T("T3000 Building Automation System"));//
-  	m_pMainWnd->ShowWindow(SW_SHOW);
-  	m_pMainWnd->UpdateWindow();
+  	
+	((CMainFrame*)m_pMainWnd)->InitViews();//
+
+	m_pMainWnd->SetWindowText(_T("T3000 Building Automation System"));//
+	m_pMainWnd->ShowWindow(SW_SHOW);
+	m_pMainWnd->UpdateWindow();
+
+	//::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat"), _T(""), _T(""), SW_SHOW);
+	//vcredist_x86.zip
+
+	//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
+	//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
+	//AfxMessageBox(_T("Open'T3000'Again,Please!"));
+
+	}
+	catch (...)
+	{
+		::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat"), _T(""), _T(""), SW_SHOW);
+		//vcredist_x86.zip
+		
+	//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
+		//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
+		AfxMessageBox(_T("Open'T3000'Again,Please!"));
 
 
+		return TRUE;
+
+	}
 
 
 	return TRUE;
@@ -401,11 +451,22 @@ void CT3000App::PreLoadState()
 
 void CT3000App::LoadCustomState()
 {
+
+	//Black 
 }
 
 void CT3000App::SaveCustomState()
 {
+	//Black 
+	 
 }
+/*
+FunctionName:InitModeName
+Comment:Alex
+Date:2012/11/29
+Purpose:
+初始化设备的名字
+*/
 void CT3000App::InitModeName()
 {
 	CString strInfoFile=g_strExePth+_T("CustomInfo.ini");
@@ -487,26 +548,32 @@ void CT3000App::OnVersionInfo()
 
 BOOL CT3000App::haveRegister()
 {
-	// 	CString strPath;
-	// 	CFile tempFile;
-	// 
-	// 	strPath=GetModulePath();
-	// 	strPath=strPath.Left(strPath.ReverseFind(_T('\\'))+1);
-	// 	strPath+=_T("77984329");
-	// 
-	// 	if(!tempFile.Open(strPath,CFile::modeRead))
-	// 		return FALSE;
-	// 
-	// 	tempFile.Close();
-	// 	return TRUE;
-	//Alex
-
-	if (m_maxClients == 0)
+// 	CString strPath;
+// 	CFile tempFile;
+// 
+// 	strPath=GetModulePath();
+// 	strPath=strPath.Left(strPath.ReverseFind(_T('\\'))+1);
+// 	strPath+=_T("77984329");
+// 
+// 	if(!tempFile.Open(strPath,CFile::modeRead))
+// 		return FALSE;
+// 
+// 	tempFile.Close();
+// 	return TRUE;
+//Alex
+//如果使用天数为0的话.就弹出让用户注册
+if (m_maxClients == 0)
 		return FALSE;
 	else 
 		return TRUE;
 }
-
+/*
+FunctionName:GetModulePath
+Comment:Alex
+Date:2012/11/29
+Purpose:
+这个函数的作用是获取可执行文件的路径
+*/
 CString CT3000App::GetModulePath()
 {
 	wchar_t path[MAX_PATH];
@@ -514,7 +581,13 @@ CString CT3000App::GetModulePath()
 	GetModuleFileName(NULL,path,MAX_PATH);
 	return CString(path);
 }
-
+/*
+FunctionName:GetSoftInstallDays
+Comment:Alex
+Date:2012/11/29
+Purpose:
+获取客户端该版本T3000，距当天的天数
+*/
 int CT3000App::GetSoftInstallDays()
 {
 	CFileStatus fileStatus;
@@ -526,9 +599,9 @@ int CT3000App::GetSoftInstallDays()
 	strPath=GetModulePath();
 
 	strPath=strPath.Left(strPath.ReverseFind(_T('\\'))+1);
-	strPath+=_T("T3000_Rev2.5.0.99.exe");
-
-	//	strPath+=_T("T3000.exe");
+	//strPath+=_T("T3000_Rev2.5.0.99.exe");
+	strPath+=_T("T3000.exe");
+//	strPath+=_T("T3000.exe");
 	CFile::GetStatus(strPath,fileStatus);
 
 	//timeSpan=curTime-fileStatus.m_ctime;
@@ -536,12 +609,24 @@ int CT3000App::GetSoftInstallDays()
 
 	return timeSpan.GetDays();
 }
-
+/*
+FunctionName:WriteNumber
+Comment:Alex
+Date:2012/11/29
+Purpose:
+向一个指定注册表项里面写一个值
+*/
 void CT3000App::WriteNumber( CRegKey& key,CStringW valueName,DWORD value )
 {
 	key.SetDWORDValue(valueName,value);
 }
-
+/*
+FunctionName:ReadNameber
+Comment:Alex
+Date:2012/11/29
+Purpose:
+读一个值，从指定注册表项目
+*/
 BOOL CT3000App::ReadNameber( CRegKey& key,CStringW valueName,DWORD& value )
 {
 	DWORD s;
@@ -554,7 +639,14 @@ BOOL CT3000App::ReadNameber( CRegKey& key,CStringW valueName,DWORD& value )
 		return FALSE;
 	}
 }
-
+/*
+FunctionName:Judgestore
+Comment:Alex
+Date:2012/11/29
+Purpose:判断 HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\KEY_READ
+查看是否有改项目
+没有创建，并写入一个定值到该表项中
+*/
 void CT3000App::Judgestore()
 {
 	HKEY hKEY;
@@ -587,7 +679,13 @@ void CT3000App::Judgestore()
 	delete[] owner_Get;
 	::RegCloseKey(hKEY);
 }
-
+/*
+FunctionName:ReadREG
+Comment:Alex
+Date:2012/11/29
+Purpose:
+从一个注册表中读取相应的值给类中的成员变量
+*/
 void CT3000App::ReadREG()
 {
 	CRegKey key;
@@ -617,3 +715,4 @@ void CT3000App::ReadREG()
 		}
 	}
 }
+

@@ -10,7 +10,7 @@ class CParameterDlg : public CDialog
 	DECLARE_DYNAMIC(CParameterDlg)
 
 public:
-	CParameterDlg(CWnd* pParent = NULL);   // standard constructor
+	CParameterDlg(CWnd* pParent = NULL,CString str=_T(""));   // standard constructor
 	virtual ~CParameterDlg();
 
 // Dialog Data
@@ -18,6 +18,8 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+public:
+	CString strparamode;
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -83,6 +85,7 @@ public:
 	virtual BOOL OnInitDialog();
 
 	void Refresh();
+	 void Refresh6();
 	void InitPID2ComboBox();
 	void  UpdateCoolingandHeatingData();
 public:
@@ -152,5 +155,31 @@ public:
 
 
 
+	afx_msg void OnCbnKillfocusCombo1();
+	afx_msg void OnCbnKillfocusCombo4();
+	int m_coolsp;
+	int m_cooldb;
+	int m_setpoint;
+	int m_heatdb;
+	int m_heatsp;
+	int m_coolspN;
+	int m_cooldbN;
+	int m_setpointN;
+	int m_heatdbN;
+	int m_heatspN;
+	afx_msg void OnEnKillfocusEditCspd();
+	afx_msg void OnEnKillfocusEditCdbdn();
+	afx_msg void OnEnKillfocusEdit31();
+	afx_msg void OnEnKillfocusEdit34();
+	afx_msg void OnEnKillfocusEdit37();
+	afx_msg void OnEnKillfocusEditCspnn();
+	afx_msg void OnEnKillfocusEditCdbnn();
+	afx_msg void OnEnKillfocusEdit32();
+	afx_msg void OnEnKillfocusEdit35();
+	afx_msg void OnEnKillfocusEdit38();
 	afx_msg void OnBnClickedCancel();
+	afx_msg void OnEnKillfocusEditValuetraveltime();
+	afx_msg void OnEnKillfocusEditPid2offsetpoint();
+	afx_msg void OnEnChangeEdit26();
+	afx_msg void OnBnClickedFreezefunc();
 };

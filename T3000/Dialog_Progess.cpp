@@ -22,7 +22,6 @@ CDialog_Progess::CDialog_Progess(CWnd* pParent /*=NULL*/,int lower,int upper)
 
 CDialog_Progess::~CDialog_Progess()
 {
-
 }
 
 void CDialog_Progess::DoDataExchange(CDataExchange* pDX)
@@ -44,27 +43,35 @@ BOOL CDialog_Progess::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	CRect  rcDesktop;
-	CRect  rcDlg;
-	CPoint pt;
+	// TODO:  Add extra initialization here		
+	//设置进度条的范围
+		m_progress.SetRange(m_lower,m_upper);
+	//设置进度条的每一步的增量
+	//	m_progress.SetStep(m_setsetup);
+	//设置进度条的当前位置
+//	SetTimer(1, 1000, NULL);
 
-	SystemParametersInfo ( SPI_GETWORKAREA, 0, &rcDesktop, 0 );
-	GetWindowRect ( &rcDlg );
-
-	pt.x = rcDesktop.right - rcDlg.Width();
-	pt.y = rcDesktop.bottom - rcDlg.Height();
-
-	SetWindowPos ( NULL, pt.y, pt.x, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
-
-
-   m_progress.SetRange(m_lower,m_upper);
-	return TRUE;  
-	// return TRUE unless you set the focus to a control
+	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
 BOOL CDialog_Progess::PreTranslateMessage(MSG* pMsg)
 {
+
+
+// 	int x;
+// 	for (int i = 1;i<101;i++)
+// 	{
+// 		CString CStemp;
+// 		CStemp.Format(_T("%d％"),i);
+// 		SetDlgItemText(IDC_STATIC1,CStemp);
+// 
+// 		m_progress.SetPos(i);
+// 	}	
+// 	x = 100;
+
+
+
 	if (pMsg->message == WM_KEYDOWN)
 	{
 		if (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)
@@ -72,6 +79,7 @@ BOOL CDialog_Progess::PreTranslateMessage(MSG* pMsg)
 			return TRUE;
 		}
 	}
+
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
@@ -79,20 +87,29 @@ BOOL CDialog_Progess::PreTranslateMessage(MSG* pMsg)
 
 void CDialog_Progess::OnClose()
 {
-CDialog::OnClose();
+	// TODO: Add your message handler code here and/or call default
+
+	CDialog::OnClose();
+	
 }
 
 void CDialog_Progess::OnOK()
 {
-CDialog::OnOK();
+	// TODO: Add your specialized code here and/or call the base class
+
+	CDialog::OnOK();
 }
 
 void CDialog_Progess::ShowProgress( int setpos,int percent )
 {
+
 	CString CStemp;
 	CStemp.Format(_T("%d％"),percent);
 	SetDlgItemText(IDC_STATIC1,CStemp);
+
 	m_progress.SetPos(setpos);
+
+
 }
 void CDialog_Progess::OnTimer(UINT_PTR nIDEvent)
 {
@@ -124,8 +141,9 @@ if(nIDEvent == 1)
 
 void CDialog_Progess::settimer( BOOL bpram,int lower,int upper,BOOL bend )
 {
-	//this->ShowWindow(SW_SHOW);
+//this->ShowWindow(SW_SHOW);
 //	this->CenterWindow();
+	
 // 	m_lower = lower;
 // 	m_upper = upper;
 	m_start = bpram;

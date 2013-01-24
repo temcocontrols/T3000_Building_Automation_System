@@ -72,11 +72,43 @@ int read_one_org(unsigned char device_var,unsigned short address,int retry_times
 
 void SetPaneString(int nIndext,CString str)
 {
+	/*
+//	static CMFCStatusBar * pStatusBar=NULL;
+	CMFCStatusBar * pStatusBar=NULL;
+	if(AfxGetMainWnd()->GetActiveWindow()==NULL)//if this function is called by a thread ,return 
+		return;
+	if(pStatusBar==NULL)
+		pStatusBar = (CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR);
+	pStatusBar->SetPaneText(nIndext,str.GetString());
+	*/
 	CMFCStatusBar * pStatusBar=NULL;
 	if(AfxGetMainWnd()->GetActiveWindow()==NULL)//if this function is called by a thread ,return 
 		return;
 	pStatusBar = (CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR);
 	pStatusBar->SetPaneText(nIndext,str.GetString());
+
+//pStatusBar->SetPaneTextColor (RGB(128,0,0));
+// 	CRect rc;
+// 	pStatusBar->GetItemRect(0, &rc);
+// 	CDC* pDC = pStatusBar->GetWindowDC();
+// 	rc.DeflateRect(2,0,2,0);
+// 	pDC->Rectangle(rc);
+
+
+// 	if (nIndext == 0)
+// 	{
+// 		HBITMAP hBmp = LoadBitmap(AfxGetResourceHandle(),  MAKEINTRESOURCE(IDB_UPBMP));
+// 		pStatusBar->SetPaneIcon(nIndext, hBmp, RGB(192,192,192));
+// 
+// 	}
+	/*
+	status_info infoStatusbar;
+	infoStatusbar.nIndex=nIndext;
+	infoStatusbar.strInfoText=str;
+	::PostMessage(AfxGetMainWnd()->GetActiveWindow()->m_hWnd,WM_USER_FRESHSTATUSBAR,0,(WPARAM)&infoStatusbar);
+*/
+
+
 }
 
 
@@ -91,7 +123,9 @@ int write_one(unsigned char device_var,unsigned short address,short value,int re
 }
 
 int write_one_org(unsigned char device_var,unsigned short address,short value,int retry_times)
-{//retry 
+{
+
+//retry 
 // 	CString str;
 // 	str.Format(_T("ID :%d Writing %d"),device_var,address);
 // 	SetPaneString(0,str);
@@ -433,8 +467,7 @@ void delete_folder(CString DirName)
 }
 
 CString get_units_from_now_range(int the_tstat_id,int analog1_or_analog2)
-{
-	//parameter analog1_or_analog2 is the register id
+{//parameter analog1_or_analog2 is the register id
 	//analog1 is 180;analog2 is 181
 	//if analog1_or_analog2 is negative ,only get temperature units ,
 	CString geted_units;
@@ -583,8 +616,7 @@ void clear_a_char_array(char *p,char t)
 			p[i]=t;
 }
 float get_tstat_version(unsigned short tstat_id)
-{
-	//get tstat version and judge the tstat is online or no
+{//get tstat version and judge the tstat is online or no
 	//tstat is online ,return >0
 	//tstat is not online ,return -2
 	
@@ -678,7 +710,13 @@ void message_box_function(CString content,CString title,UINT Utype)
 
 void button_load_bitmap(CButton &p_wnd,CString name)
 {
-	
+	/*
+	CString temp_path=program_path+_T("\\")+name;//////////////////////*******path
+	HBITMAP hbitmap=(HBITMAP)LoadImage(NULL,temp_path.GetString(),//更改你喜欢的位图文件
+	IMAGE_BITMAP,0,0,                              //parameter
+	LR_LOADFROMFILE|LR_CREATEDIBSECTION);
+	p_wnd.SetBitmap(hbitmap);
+	*/
 
 }
 
@@ -731,7 +769,19 @@ bool multi_read_tstat(int id)
 
 bool can_be_writed_hex_file(int product_model,int hex_file_product_model)
 {
-
+	//product model
+	// T3-8IO-------------20
+	// T3-32I-------------22
+	// T3-8i/60-----------23
+	// Flexdriver---------25
+	//Tstat5A-------------2
+	//Tstat5B-------------1
+	//Tstat5B2------------3
+	//Tstat5C-------------4
+	//Tstat5D-------------12
+	//Solar---------------30
+	//hex_file_product_model parameter is the hex_file_register 0x100 (256)
+//	if (product_model==18||product_model==17)
 	{
 		return true;
 	}
@@ -903,7 +953,11 @@ CString GetTempUnit(int analog1_or_analog2)
 
 
 
-
+// Function : 获得单位名称，此单位用于Input Grid，Output Grid，Output Set Grid，主界面的Grid等等。
+// Param: int nRange: 指示当前的Range的选择值。函数应该根据Range的选择以及TStat的型号，
+//					获得单位名称，如摄氏度，华氏度，百分比，自定义的单位等。
+//           int nPIDNO: 区分PID1 还是PID2，1＝PID1，2＝PID2
+// return ： 单位名称 
 CString GetTempUnit(int nRange, int nPIDNO)
 {
 	CString strTemp=_T("");
@@ -938,7 +992,7 @@ CString GetTempUnit(int nRange, int nPIDNO)
 	}
 
 	if(nRange==0)		// Raw value, no unit
-	strTemp=_T("");
+		strTemp=_T("");
 	else if(nRange==1)
 	{//
 		UINT uint_temp=GetOEMCP();//get system is for chinese or english

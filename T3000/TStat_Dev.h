@@ -32,18 +32,19 @@ public:
 	void SetEPSize(int nEPSize);
 	
 	CString GetProductName();
+	 
 // 	int GetAddrID()const;
 // 	void SetAddrID(int nID);
 
 	
-	BOOL CTStat_Dev::operator==(const CTStat_Dev& dev);
+   BOOL CTStat_Dev::operator==(const CTStat_Dev& dev);
 
 
 
 protected:
 	
-	int				m_nBaudRate;				// 
-	int				m_nComPort;				//
-	int				m_nEPSize;					// 
-	//int				m_nAddrID;				// 
+	int				m_nBaudRate;				// 波特率
+	int				m_nComPort;				// 串口	
+	int				m_nEPSize;					// ??
+	//int				m_nAddrID;				// 地址ID，表示在ModBus中的地址==不需要，就是devID
 };

@@ -1,5 +1,5 @@
 // 5EInputDialog.cpp : implementation file
-//、、、
+//
 
 #include "stdafx.h"
 #include "T3000.h"
@@ -173,38 +173,38 @@ END_EVENTSINK_MAP()
 void C5EInputDialog::Click5emsflexgrid()
 {
 	
-// 	long lRow,lCol;
-// 	lRow = m_flexGrd.get_RowSel();//
-// 	lCol = m_flexGrd.get_ColSel(); //
-// 
-// 	CRect rect;
-// 	m_flexGrd.GetWindowRect(rect); //
-// 	ScreenToClient(rect); //
-// // 	CDC* pDC =GetDC();
-// // 
-// // 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
-// // 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-// 	//
-// 	long y = m_flexGrd.get_RowPos(lRow)/nTwipsPerDotY;
-// 	long x = m_flexGrd.get_ColPos(lCol)/nTwipsPerDotX;
-// 	//
-// 	long width = m_flexGrd.get_ColWidth(lCol)/nTwipsPerDotX+1;
-// 	long height = m_flexGrd.get_RowHeight(lRow)/nTwipsPerDotY+1;
-// 	//
-// 	CRect rcCell(x,y,x+width,y+height);
-// 	
-// 	rcCell.OffsetRect(rect.left+1,rect.top+1);
-// 	ReleaseDC(pDC);
-// 
-// 	CString strValue = m_flexGrd.get_TextMatrix(lRow,lCol);
-// 	if(lCol==2)
-// 	{
-// 		m_nCurRow=lRow;
-// 		m_rangeCombx.MoveWindow(&rcCell,1); //
-// 		m_rangeCombx.BringWindowToTop();
-// 		m_rangeCombx.ShowWindow(SW_SHOW);//
-// 		m_rangeCombx.SetFocus(); //
-// 	}
+	long lRow,lCol;
+	lRow = m_flexGrd.get_RowSel();//获取点击的行号	
+	lCol = m_flexGrd.get_ColSel(); //获取点击的列号
+
+	CRect rect;
+	m_flexGrd.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形	
+	CDC* pDC =GetDC();
+
+	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
+	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//计算选中格的左上角的坐标(象素为单位)
+	long y = m_flexGrd.get_RowPos(lRow)/nTwipsPerDotY;
+	long x = m_flexGrd.get_ColPos(lCol)/nTwipsPerDotX;
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	long width = m_flexGrd.get_ColWidth(lCol)/nTwipsPerDotX+1;
+	long height = m_flexGrd.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	//形成选中个所在的矩形区域
+	CRect rcCell(x,y,x+width,y+height);
+	//转换成相对对话框的坐标
+	rcCell.OffsetRect(rect.left+1,rect.top+1);
+	ReleaseDC(pDC);
+
+	CString strValue = m_flexGrd.get_TextMatrix(lRow,lCol);
+	if(lCol==2)
+	{
+		m_nCurRow=lRow;
+		m_rangeCombx.MoveWindow(&rcCell,1); //移动到选中格的位置
+		m_rangeCombx.BringWindowToTop();
+		m_rangeCombx.ShowWindow(SW_SHOW);//显示控件
+		m_rangeCombx.SetFocus(); //获取焦点
+	}
 }
 
 void C5EInputDialog::OnCbnSetfocus5erangecombo()

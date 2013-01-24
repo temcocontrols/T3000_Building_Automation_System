@@ -8,14 +8,12 @@
 
 // CIODisplayBar
 
-
-
 IMPLEMENT_DYNAMIC(CIODisplayBar, CDockablePane)
 
 CIODisplayBar::CIODisplayBar()
 {
 
-	 
+	//m_pSetDlg= new CIOSetDlg();
 
 }
 

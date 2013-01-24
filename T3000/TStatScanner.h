@@ -20,11 +20,11 @@
 struct _ComDeviceInfo
 {
 	CTStat_Dev*	m_pDev;
-	BOOL				m_bConflict;		// 
-	int					m_nTempID;      //
-	int					m_nSourceID;		// 
+	BOOL				m_bConflict;		// 是否与其他设备有冲突,TRUE 有，FALSE 无
+	int					m_nTempID;      // 临时ID，在scan过程中，为了能正常读写设备
+	int					m_nSourceID;		// 原始的ID, ....
 
-	// 
+	// added for NC table
 	int					m_nCoolingSP;
 	int					m_nSP;
 	int					m_nHeatingSP;
@@ -64,7 +64,7 @@ struct _ComDeviceInfo
 struct _NetDeviceInfo
 {	
 	CTStat_Net*	m_pNet;
-	BOOL				m_bConflict;		// 
+	BOOL				m_bConflict;		// 是否与其他设备有冲突 TRUE 有，FALSE 无
 	DWORD			m_dwIPDB;			// 
 	DWORD			m_dwIPScan;		// 
 	_NetDeviceInfo()
@@ -85,30 +85,31 @@ public:
 	CTStatScanner(void);
 	~CTStatScanner(void);
 
-	// 
+	// 搜索网口设备
  	BOOL ScanNetworkDevice(); 
- 	// 
+ 	// 搜索串口设备
  	BOOL ScanComDevice();
 
 	void SetComPort(int nCom);
 public:
-	// 
+	// 释放资源
 	void		Release();
-	// 
+	// 是否正在搜索串口设备
 	BOOL		IsComScanRunning();
-	// 
+	// 搜索函数
 	void		background_binarysearch(int nComPort);
 	// bForTstat = TRUE : scan tstat, = FALSE : scan NC
 	void		binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254);
-	// 
+	//void        SequenceSearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254);
+	// 校验
 	BOOL		binary_search_crc(int a);
-	// 
+	// 搜索NC的函数
 	int _ScanNCFunc();
 	
-	// 
+	// 获得计算机上的所有串口,返回串口数量
 	//int GetAllComPort();
 
-	// 
+	// 在开始搜索之前，设置当前的搜索类型，是scan com or net
 	// True = scan com; FALSE = scan net
 	void SetScanType( BOOL bScanCom);
 
@@ -119,24 +120,24 @@ public:
 
 	void SendScanEndMsg();
 
-	// 
+	// 打开串口
 	BOOL OpenCom(int nCom);
 
 	BOOL IsRepeatedID(int nID);
 	
 	void ResetRepeatedID();
-	// 
+	// 从数据库中取出所有的node，从All_Nodes表
 	int GetAllNodeFromDataBase();
-	// 
+	// 找到冲突
 	void FindComConflict();
 	void FindNetConflict();
-	// 
+	// 解决冲突
 	void  ResolveComConflict();
 	void  ResolveNetConflict();
-	// 
+	// 把新找到的tstat写到数据库All_Nodes表
 	void AddNewTStatToDB();
 	void AddNewNetToDB();
-	//  
+	//  把一个tstat写到数据库里 All_Nodes表
 	void WriteOneDevInfoToDB( _ComDeviceInfo* pInfo);
 	void WriteOneNetInfoToDB( _NetDeviceInfo* pInfo);
 
@@ -151,21 +152,22 @@ public:
 	void ScanOldNC(BYTE devLo, BYTE devHi);
 
 	//////////////////////////////////////////////////////////////////////////
-	// 
+	// 搜索到的设备	写入数据库时，给他们写上subnet name这一项，在tree node显示时有用
 	CString GetNetDevSubnetName(const CString& strIP);
 	CString GetTstatSubnetName(const CString& strComPort);
 	CString GetTstatMBuildingName(const CString& strComPort);
 	void SetSubnetInfo(vector<Building_info>& szSubnets);
 	void SetBaudRate(const CString& strBaudrate);
 	
-	// 
+	// 手动搜索TStat，
 	void ScanTstatFromNCForManual();
 	void BinaryScanNCByComPort(BYTE devLo = 1, BYTE devHi = 254);
 	void ScanTstatFromNCForAuto();
 	void GetTstatInfoFromID(int nTstatID);
 
 	void ScanAll();
-	void WaitScan();//scan
+	void WaitScan();
+	//scan
 	int  m_scantype;
 	void CombineScanResult();
 
@@ -179,7 +181,7 @@ public:
 	void GetTstatFromNCTable2();
 	void GetTstatFromNCTableByComport();
 
-	BOOL ReadOneCheckOnline(int nCOMPort); // 
+	BOOL ReadOneCheckOnline(int nCOMPort); // 读255，确定是否只有一个Tstat连接。
 
 	BOOL IsNetDevice(const CString& strDevType);
 
@@ -195,25 +197,22 @@ public:
 	CEvent*							m_eScanNCEnd;
 	CEvent*							m_eScanOldNCEnd;
 
-	BOOL								m_bStopScan;					// 
-	BOOL								m_bNetScanFinish;			// 
+	BOOL								m_bStopScan;					// 强制结束SCAN，由用户选择exit时，停止两个搜索线程
+	BOOL								m_bNetScanFinish;			// 网络scan完成
 	int									m_nBaudrate;
 	int									m_nComPort;
 	CWnd*							m_pParent;	
 
 protected:
-	BOOL								m_bComScanRunning;		// 
+	BOOL								m_bComScanRunning;		// 是否是Com scan, TRUE = scan com, FALSE = scan net
 	int									m_ScannedNum;
 
 	CWinThread*					m_pScanNCThread;
 	CWinThread*					m_pScanTstatThread;
 	CWinThread*					m_pWaitScanThread;
 
-
-
-
 	//vector<int>						m_szRepeatedID;
-	int									m_szRepeatedID[255];				// 
+	int									m_szRepeatedID[255];				// 记录重复ID，下标表示现在的ID，内容表示老ID。如果出现重复，那么该下标内容不为0。
 	//	vector <binary_search_result> m_szNCScanRet;				////background thread search result
 	//	vector <binary_search_result> m_szTstatScandRet;			////background thread search result
 

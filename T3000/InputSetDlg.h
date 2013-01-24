@@ -24,6 +24,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	void Init5EGrid();
+	void InitGrid5EnoTSTAT6();
+	void Fresh_Data();
+//	void Init5EGridtstat6();
 	
 
 	void OnCbnSelchangeRangComboFor5E();
@@ -37,6 +40,9 @@ public:
 	void add_analog_rang(int i);
 	void Fresh_Grid();
 	void ClickMsflexgrid1();
+	void ClickMsflexgrid5E(int nRow, int nCol, CRect rcCell);
+
+
 
 	afx_msg void OnBnClickedOk();
 	virtual BOOL OnInitDialog();
@@ -81,6 +87,9 @@ public:
 	CComboBox m_AmCombox;
 	CString		m_strCustomsensorUnit;
 
+	//tstat6
+	unsigned short tempchange[512];//for tstat6
+	//tstat6
 
-
-};
+//	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	};

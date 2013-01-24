@@ -284,7 +284,7 @@ void TDelayForm::OnDestroy()
 	CDialog::OnDestroy();
 	
 	// TODO: Add your message handler code here
-	KillTimer(1);
+	KillTimer(1);////解除设定每五秒更新一次开始
 	//close_com();
 }
 

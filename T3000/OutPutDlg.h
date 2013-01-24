@@ -82,4 +82,14 @@ public:
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnEnKillfocusDescriptedit();
 	afx_msg void OnEnSetfocusDescriptedit();
+
+
+	void FreshGrid_PID1tstat6();
+	void FreshGrid_PID2tstat6();
+	CString strdemo;
+	CComboBox m_fan2;
+	int m_pids;
+	long pid2lrow;//2.5.0.94
+	long pid1lrow;//2.5.0.96
+
 };

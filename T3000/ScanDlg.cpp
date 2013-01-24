@@ -16,7 +16,7 @@
 
 
 
-
+// scan dialog 中表格的列的定义
 #define SCAN_TABLE_TYPE					0
 #define SCAN_TABLE_BUILDING				1
 #define SCAN_TABLE_FLOOR					2
@@ -262,6 +262,10 @@ int CScanDlg::GetAllNodeFromDataBase()
 		pNode->SetHardwareVersion(float(_wtof(strHwv)));
 		CString strSwv = m_pRs->GetCollect("Software_Ver");
 		pNode->SetSoftwareVersion(float(_wtof(strSwv)));
+	
+
+
+
 
 		CString strSerialID = m_pRs->GetCollect("Serial_ID");		
 		(pNode)->SetSerialID(_wtoi(strSerialID));
@@ -272,15 +276,17 @@ int CScanDlg::GetAllNodeFromDataBase()
 }
 
 
+
+
 LRESULT CScanDlg::OnAddComScanRet(WPARAM wParam, LPARAM lParam)
 {
-	//AddComDeviceToGrid(m_pScanner->m_szTsatScandRet);
+	// AddComDeviceToGrid(m_pScanner->m_szTsatScandRet);
 	return 1;
 }
 
 LRESULT CScanDlg::OnAddNetScanRet(WPARAM wParam, LPARAM lParam)
 {
-	 
+	// AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
 	return 1;
 }
 
@@ -341,13 +347,6 @@ void CScanDlg::OpenDefaultCom()
 {	
 	CString strSql;
 	strSql.Format(_T("select * from Building order by Main_BuildingName"));
-	//_RecordsetPtr pRs;
-	//_ConnectionPtr pCon;
-	
-	//pCon.CreateInstance("ADODB.Connection");
-	//pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-	//pRs.CreateInstance("ADODB.Recordset");
-
 	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);			
 	_variant_t temp_variant;
 	CString strDefaultCom = 0;		
@@ -458,7 +457,7 @@ void CScanDlg::ShowInputEditBox(int iRow, int iCol)
 {	
 //	int iRow,iCol;
 	m_editGrid.SetWindowText(_T(""));
-	CRect rc = CalcGridCellRect(iRow, iCol);  //
+	CRect rc = CalcGridCellRect(iRow, iCol);  // 肯定ID列
 	m_editGrid.MoveWindow(rc, TRUE);
 	m_editGrid.SetFocus();
 	m_editGrid.BringWindowToTop();
@@ -472,23 +471,27 @@ void CScanDlg::ShowInputEditBox(int iRow, int iCol)
 CRect CScanDlg::CalcGridCellRect(int iRow, int iCol )
 {
 	CRect rect;
-	m_flexGrid.GetWindowRect(rect); //
-	ScreenToClient(rect); //
+	m_flexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形	
 	CDC* pDC = GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	
+	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_flexGrid.get_RowPos(iRow)/nTwipsPerDotY;
 	long x = m_flexGrid.get_ColPos(iCol)/nTwipsPerDotX;
-
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_flexGrid.get_ColWidth(iCol)/nTwipsPerDotX+1;
 	long height = m_flexGrid.get_RowHeight(iRow)/nTwipsPerDotY+1;
-
+	//形成选中个所在的矩形区域
 	CRect rcCell(x,y,x+width,y+height);
-
+	//转换成相对对话框的坐标
 	rcCell.OffsetRect(rect.left+2,rect.top+2);	
 	rcCell.InflateRect(-1,-1,-1,-1);
+	//CString strValue = m_flexGrid.get_TextMatrix(iRow,iCol);
+
+	//pDC->Draw3dRect(rcCell, RGB(255,0,0), RGB(192,192,192));
+	//pDC->DrawText(_T("Fix"), &rcCell, DT_CENTER);
 
 	return rcCell;
 	ReleaseDC(pDC);
@@ -503,26 +506,30 @@ END_EVENTSINK_MAP()
 void CScanDlg::ClickMsflexgrid1()
 {
 	CSize szTemp;
-	CalcClickPos(szTemp);// 
+	CalcClickPos(szTemp);// 计算点中的位置
 	if (szTemp == m_szGridEditPos)
 	{
 		return;	
 	}
 	
-
+	
+	// 3种情况
+	// 1，点在其他有效处，显示，记录，数据并移动edit
+	// 2，点在无效处，并失去焦点，关掉edit，显示，记录，数据
+	// 3，退出，关掉edit，显示，记录，数据，并保存至数据库
 
 	if (IsValidClick(szTemp))  
 	{	
-		if(m_szGridEditPos.cx != -1) // 
+		if(m_szGridEditPos.cx != -1) // 不是第一次点击才需要记录上一次的数据
 		{
-			GetGridEditString();    // 	
+			GetGridEditString();    // 记录edit的数据			
 		}
 		ShowInputEditBox(szTemp.cx, szTemp.cy);		
 		m_szGridEditPos = szTemp;							
 	}	
-	else// 
+	else// 点在不相干的地方就 destroy
 	{	
-		GetGridEditString();    // 
+		GetGridEditString();    // 记录edit的数据
 		DestroyFlexEdit();	     
 	}
 // 	if(GetFocus()->m_hWnd != m_editGrid.m_hWnd)
@@ -534,7 +541,7 @@ void CScanDlg::ClickMsflexgrid1()
 
 }
 
-void CScanDlg::GetGridEditString() // 
+void CScanDlg::GetGridEditString() // 记录edit的数据
 {
 	CString strText ;
 	m_editGrid.GetWindowText(strText)	;
@@ -567,7 +574,10 @@ void CScanDlg::GetGridEditString() //
 }
 
 
-
+//////////////////////////////////////////////////////////////////////////
+// return 1, 正常 
+// return 0, 无效点击，就是不应该反应的
+// return 3, 在grid之外或者不知道什么地方
 int CScanDlg::IsValidClick(CSize szTemp)
 {
 	if (szTemp.cy  <= 4 && szTemp.cy >0 &&
@@ -583,8 +593,8 @@ int CScanDlg::IsValidClick(CSize szTemp)
 void CScanDlg::CalcClickPos(CSize& size)
 {
 	long lRow,lCol;
-	lRow = m_flexGrid.get_RowSel();
-	lCol = m_flexGrid.get_ColSel(); 
+	lRow = m_flexGrid.get_RowSel();//获取点击的行号	
+	lCol = m_flexGrid.get_ColSel(); //获取点击的列号
 
 	if(lRow<=0)
 		return;
@@ -601,8 +611,11 @@ void CScanDlg::DestroyFlexEdit()
 }
 
 
-
-
+// 将数据库里的值取出放到内存
+// 将内存的值将被写入数据库
+//
+// 只允许写 buildingname，floorname，roomname，address
+// 因此，需要向寄存器写的只有address
 void CScanDlg::GetDataFromGrid()
 {
 	int nCount = m_flexGrid.get_Rows();
@@ -638,11 +651,12 @@ void CScanDlg::GetDataFromGrid()
 		pInfo->SetFloorName(strFloorName);
 		pInfo->SetRoomName(strRoomName);
 		pInfo->SetSubnetName(strSubnetName);
-
+		//pInfo->m_pDev->SetDevID(nAddress);
+		//Write_One(pInfo->m_pDev->GetDevID(), 6, nAddress);  // 此时写ID到寄存器	
 	}
 }
 
-
+// 将所有节点保存到数据库，AllNodes
 void CScanDlg::SaveAllNodeToDB()
 {
 	GetAllNodeFromDataBase();
@@ -652,11 +666,20 @@ void CScanDlg::SaveAllNodeToDB()
 	m_pCon.CreateInstance("ADODB.Connection");
 	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
 
+	// 先删除数据库 // maurice说不要删
+
+	try
+	{
 
 	CString strSql;
 	strSql.Format(_T("delete * from ALL_NODE"));
 	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
 
+	}
+	catch(_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
+	}
 
 	for (UINT i = 0; i < m_pScanner->m_szTstatScandRet.size(); i++)
 	{
@@ -670,7 +693,7 @@ void CScanDlg::SaveAllNodeToDB()
 		WriteOneNetInfoToDB(pNetInfo);
 	}
 
-
+	// 数据库的写回去.
 	for (UINT i = 0; i < m_szComNodes.size(); i++)
 	{
 		CTStat_Dev* pDevInfo = m_szComNodes[i];
@@ -688,6 +711,8 @@ void CScanDlg::SaveAllNodeToDB()
 }
 
 
+// 合并数据库和scan结果，以便存入数据库
+// 如果Serial ID相同的，则以grid的数据为准
 void CScanDlg::CombineDBandScanRet()
 {
 	//vector<CTStat_Dev*> szDB;
@@ -701,7 +726,7 @@ void CScanDlg::CombineDBandScanRet()
 		{
 			CTStat_Dev* pDBDev = m_szComNodes[j];
 			int nDBSID= pDBDev->GetSerialID();
-			if (nDBSID == nSID) 
+			if (nDBSID == nSID) // 相等，删掉数据库这项，保留scan 结果
 			{
 // 				pDBDev->SetBuildingName(pDev->GetBuildingName());
 // 				pDBDev->SetFloorName(pDev->GetFloorName());
@@ -796,10 +821,17 @@ void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 	CString strEpSize;
 	strEpSize.Format(_T("%d"), pDev->GetEPSize());
 
+	try
+	{
 
 	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+"','"+strEpSize+"')"));
 	//new nc // strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
 	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	}
+	catch(_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
+	}
 }
 
 void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
@@ -864,8 +896,15 @@ void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
 
 	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"')"));
 	//new nc // strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"','"+strMainnetInfo+"')"));
+	try
+	{
 
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	}
+	catch(_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
+	}
 
 }
 
@@ -885,8 +924,8 @@ void CScanDlg::AddComDeviceToGrid(vector<_ComDeviceInfo*>& szList)
 {
 	int nSize = 1;//m_flexGrid.get_Rows();
 	VARIANT vRow; 
-	vRow.vt = VT_I4;//
-	vRow.lVal =1;     
+	vRow.vt = VT_I4;//指定变量类型 
+	vRow.lVal =1;     //赋值 
 	//EnterCriticalSection(&m_csGrid);
 	TRACE(_T("scan has found node == %d\n"), szList.size());
 	m_flexGrid.put_Rows(szList.size() + nSize);

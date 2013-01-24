@@ -1,4 +1,26 @@
+/*#pragma once
 
+
+// COutsidDailog dialog
+
+class COutsidDailog : public CDialog
+{
+	DECLARE_DYNAMIC(COutsidDailog)
+
+public:
+	COutsidDailog(CWnd* pParent = NULL);   // standard constructor
+	virtual ~COutsidDailog();
+
+// Dialog Data
+	enum { IDD = IDD_OUTSIDEDOORDLG };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+	DECLARE_MESSAGE_MAP()
+};
+
+*/
 #pragma once
 #include "afxwin.h"
 

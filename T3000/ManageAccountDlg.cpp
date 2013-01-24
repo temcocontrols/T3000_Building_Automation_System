@@ -171,8 +171,8 @@ void CManageAccountDlg::ClickMsflexgrid1()
 {
 	long lRow,lCol;
 	m_FlexGrid.put_TextMatrix(m_nCurRow,0,_T(""));
-	lRow = m_FlexGrid.get_RowSel();//
-	lCol = m_FlexGrid.get_ColSel(); //
+	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
 	m_nCurRow=lRow;
 	m_nCurCol=lCol;
 
@@ -180,21 +180,21 @@ void CManageAccountDlg::ClickMsflexgrid1()
 	m_strPassword=m_FlexGrid.get_TextMatrix(m_nCurRow,2);
 
 	CRect rect;
-	m_FlexGrid.GetWindowRect(rect); //
-	ScreenToClient(rect); //
+	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形	
 	CDC* pDC =GetDC();
 
 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//
+	//计算选中格的左上角的坐标(象素为单位)
 	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
 	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
-	//
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
 	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
 	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//
+	//形成选中个所在的矩形区域
 	CRect rcCell(x,y,x+width,y+height);
-	//
+	//转换成相对对话框的坐标
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
 	CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
@@ -277,6 +277,21 @@ void CManageAccountDlg::OnEnKillfocusValueedit()
 
 			}
 
+			/*
+			if(m_strUserName.CompareNoCase(strText)==0)
+				return;
+			CString strTemp;
+			for(int i=0;i++;i<m_AccountLst.size())
+			{
+				strTemp=m_AccountLst.at(i).strName;
+				if(strText.CompareNoCase(strTemp)==0)
+				{
+					AfxMessageBox(_T("The building Name has exist,please change another one!"));
+					return;
+				}
+			}
+				m_strUserName=strText;
+				*/
 				
 		}
 		if(m_nCurCol==2)
@@ -293,6 +308,9 @@ void CManageAccountDlg::OnEnKillfocusValueedit()
 void CManageAccountDlg::Update_Recorder()
 {
 	
+	try
+	{
+
 	CString strSql;
 	CString strOldUser;
 	strOldUser=m_AccountLst.at(m_nCurRow-1).strName;
@@ -302,6 +320,11 @@ void CManageAccountDlg::Update_Recorder()
 
 	if(m_pRs->State) 
 		m_pRs->Close(); 
+	}
+	catch(_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
+	}
 	ReloadUserDB();
 }
 BOOL CManageAccountDlg::PreTranslateMessage(MSG* pMsg)
@@ -369,7 +392,17 @@ void CManageAccountDlg::OnBnClickedDelbutton()
 	strTemp.Format(_T("Are you sure to delete the user:'%s'"),m_strUserName);
 	if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
 	{
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		try
+		{
+
+
+			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		}
+		catch(_com_error *e)
+		{
+			AfxMessageBox(e->ErrorMessage());
+		}
+
 	}
 	ReloadUserDB();
 }
@@ -380,9 +413,18 @@ void CManageAccountDlg::OnBnClickedButton1()
 	CString strUserName,strPassword;
 	strUserName=m_FlexGrid.get_TextMatrix(nLastRow,1);
 	strPassword=m_FlexGrid.get_TextMatrix(nLastRow,2);
+
+	try
+	{
+
 	CString strSql;
 	strSql.Format(_T("insert into users values('%s','%s')"),strUserName,strPassword);		
 	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	}
+	catch(_com_error *e)
+	{
+		AfxMessageBox(e->ErrorMessage());
+	}
 	ReloadUserDB();
 }
 
@@ -403,7 +445,17 @@ void CManageAccountDlg::OnBnClickedUseprivilegecheck()
 		 strSql.Format(_T("update Userlogin set USE_PASSWORD = -1"));
 	
 	}
+
+	try
+	{
+
 	m_pConTmp->Execute(strSql.GetString(),NULL,adCmdText);
 	if(m_pConTmp->State) 
 		m_pConTmp->Close(); 
+}
+catch(_com_error *e)
+{
+	AfxMessageBox(e->ErrorMessage());
+
+}
 }

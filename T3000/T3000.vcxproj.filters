@@ -9,15 +9,30 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="T3">
+      <UniqueIdentifier>{1ce28af3-4c48-4bd4-96b5-0a1292661b94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MiniPanel">
+      <UniqueIdentifier>{767ebf3d-bc63-4607-83d9-0cf36e565050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CADO">
+      <UniqueIdentifier>{b0c19caf-57ca-4e84-9cee-d722b3eac48f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CM5">
+      <UniqueIdentifier>{2603a978-64b3-4265-aaf8-37c399f107ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AirQuality">
+      <UniqueIdentifier>{aadaf6fe-499e-426b-a0ab-f26afe4e305b}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
-    <Filter Include="CAirQuality">
-      <UniqueIdentifier>{da4dd6e8-da7b-4c5e-8377-d69a6b5419cf}</UniqueIdentifier>
+    <Filter Include="ISP">
+      <UniqueIdentifier>{5140d509-0a69-43e0-97dd-1e1b0307caf8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CADO">
-      <UniqueIdentifier>{3c0feff9-75ed-4f66-b1dc-40ebe08ff010}</UniqueIdentifier>
+    <Filter Include="singleslider">
+      <UniqueIdentifier>{724c7054-8a85-4d9d-ac03-8298dc910250}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -33,13 +48,25 @@
     <ClCompile Include="AllNodesDiaolg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Annual_Routines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AnnualRout_InsertDia.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplyGraphicLabelsDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="BuildTable1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ChangePasswordDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigFileWR.cpp">
+    <ClCompile Include="Config_Routines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LightingController\configure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Dialog_Progess.cpp">
@@ -54,6 +81,9 @@
     <ClCompile Include="EreaseDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="excel9.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="extern_function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,10 +96,16 @@
     <ClCompile Include="globle_function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GraphicView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="GridButton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GridFlashDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GridLoad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="hangeIDDlg.cpp">
@@ -90,7 +126,19 @@
     <ClCompile Include="IODisplayBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IOSetDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LabelEditDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="LedsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LightingController\LightingController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LightingController\LightingSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LoginDlg.cpp">
@@ -109,6 +157,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="msflexgrid1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkControllView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OfficeStPtDlg.cpp">
@@ -141,6 +192,12 @@
     <ClCompile Include="ScanSelectDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SetPtDayDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SetptGraphicBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -159,7 +216,13 @@
     <ClCompile Include="TDelayForm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Timer_Calibrate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ToolCalibrateDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TrendLogView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TrendLogWnd.cpp">
@@ -177,17 +240,53 @@
     <ClCompile Include="TStatScanner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TStatScheduleDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="UserAcessSetDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Weekly_Routines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WeeklyRout_InsertDia.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WeeklySchedule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WorkspaceBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OperateDB.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="T3\DialogT3.cpp">
+      <Filter>T3</Filter>
+    </ClCompile>
+    <ClCompile Include="MiniPanel\DialgMiniPanel.cpp">
+      <Filter>MiniPanel</Filter>
     </ClCompile>
     <ClCompile Include="ADO\ADO.cpp">
       <Filter>CADO</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\DialogCM5.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\SliderBoth.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\SliderBothBtn.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="AirQuality\AirQuality.cpp">
+      <Filter>AirQuality</Filter>
+    </ClCompile>
+    <ClCompile Include="ISP\CDialogISPTOOL.cpp">
+      <Filter>ISP</Filter>
+    </ClCompile>
+    <ClCompile Include="singleslider\MacSliderCtrl.cpp">
+      <Filter>singleslider</Filter>
+    </ClCompile>
+    <ClCompile Include="FreezeFunction.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -322,6 +421,9 @@
     <ClInclude Include="TrendLogWnd.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="WeeklySchedule.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="5EInputDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -334,13 +436,25 @@
     <ClInclude Include="AllNodesDiaolg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Annual_Routines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AnnualRout_InsertDia.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplyGraphicLabelsDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="BuildTable1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ChangePasswordDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ConfigFileWR.h">
+    <ClInclude Include="Config_Routines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LightingController\configure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="define.h">
@@ -356,6 +470,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EreaseDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="excel9.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="extern_function.h">
@@ -376,10 +493,16 @@
     <ClInclude Include="globle_function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GraphicView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="GridButton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GridFlashDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GridLoad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hangeIDDlg.h">
@@ -400,7 +523,19 @@
     <ClInclude Include="IODisplayBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IOSetDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LabelEditDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="LedsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LightingController\LightingController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LightingController\LightingSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LoginDlg.h">
@@ -425,6 +560,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NcModbus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkControllView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OfficeStPtDlg.h">
@@ -466,6 +604,12 @@
     <ClInclude Include="Schedule_grid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SetPtDayDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SetptGraphicBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -487,7 +631,13 @@
     <ClInclude Include="TDelayForm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Timer_Calibrate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="ToolCalibrateDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrendLogView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TStat_Dev.h">
@@ -502,23 +652,53 @@
     <ClInclude Include="TStatScanner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TStatScheduleDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="UserAcessSetDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vector_declare.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Weekly_Routines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WeeklyRout_InsertDia.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="WorkspaceBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OperateDB.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="T3\DialogT3.h">
+      <Filter>T3</Filter>
     </ClInclude>
-    <ClInclude Include="AirQuality.h">
-      <Filter>CAirQuality</Filter>
+    <ClInclude Include="MiniPanel\DialgMiniPanel.h">
+      <Filter>MiniPanel</Filter>
     </ClInclude>
     <ClInclude Include="ADO\ADO.h">
       <Filter>CADO</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\DialogCM5.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\SliderBoth.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\SliderBothBtn.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="AirQuality\AirQuality.h">
+      <Filter>AirQuality</Filter>
+    </ClInclude>
+    <ClInclude Include="ISP\CDialogISPTOOL.h">
+      <Filter>ISP</Filter>
+    </ClInclude>
+    <ClInclude Include="singleslider\MacSliderCtrl.h">
+      <Filter>singleslider</Filter>
+    </ClInclude>
+    <ClInclude Include="FreezeFunction.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

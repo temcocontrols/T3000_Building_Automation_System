@@ -22,7 +22,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>Dynamic</UseOfMfc>
+    <UseOfMfc>Static</UseOfMfc>
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -61,7 +61,9 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" />
-    <ReferencePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">E:\MyWork\T3000-my\T3000 Output\release;$(ReferencePath)</ReferencePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\release;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\release;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">E:\AlexWorkSpace\T3000_Building_Automation_System\T3000 Output\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -117,7 +119,6 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -129,37 +130,48 @@
   <ItemGroup>
     <ClCompile Include="5EInputDialog.cpp" />
     <ClCompile Include="AddBuilding.cpp" />
-    <ClCompile Include="ADO\ADO.cpp" />
     <ClCompile Include="AfxMessageDialog.cpp" />
     <ClCompile Include="AllNodesDiaolg.cpp" />
+    <ClCompile Include="Annual_Routines.cpp" />
+    <ClCompile Include="AnnualRout_InsertDia.cpp" />
+    <ClCompile Include="ApplyGraphicLabelsDlg.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
-    <ClCompile Include="ConfigFileWR.cpp" />
+    <ClCompile Include="Config_Routines.cpp" />
+    <ClCompile Include="FreezeFunction.cpp" />
+    <ClCompile Include="LightingController\configure.cpp" />
     <ClCompile Include="Dialog_Progess.cpp" />
     <ClCompile Include="DialogInfo.cpp" />
     <ClCompile Include="EnumSerial.cpp" />
     <ClCompile Include="EreaseDlg.cpp" />
+    <ClCompile Include="excel9.cpp" />
     <ClCompile Include="extern_function.cpp" />
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="FreeCoolDlg.cpp" />
     <ClCompile Include="globle_function.cpp" />
+    <ClCompile Include="GraphicView.cpp" />
     <ClCompile Include="GridButton.cpp" />
     <ClCompile Include="GridFlashDlg.cpp" />
+    <ClCompile Include="GridLoad.cpp" />
     <ClCompile Include="hangeIDDlg.cpp" />
     <ClCompile Include="ImageTreeCtrl.cpp" />
     <ClCompile Include="ImportDatabaseDlg.cpp" />
     <ClCompile Include="IniFile.cpp" />
     <ClCompile Include="InputSetDlg.cpp" />
     <ClCompile Include="IODisplayBar.cpp" />
+    <ClCompile Include="IOSetDlg.cpp" />
+    <ClCompile Include="LabelEditDlg.cpp" />
     <ClCompile Include="LedsDialog.cpp" />
+    <ClCompile Include="LightingController\LightingController.cpp" />
+    <ClCompile Include="LightingController\LightingSet.cpp" />
     <ClCompile Include="LoginDlg.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="ManageAccountDlg.cpp" />
     <ClCompile Include="MannageBuidingDlg.cpp" />
     <ClCompile Include="monthview1.cpp" />
     <ClCompile Include="msflexgrid1.cpp" />
+    <ClCompile Include="NetworkControllView.cpp" />
     <ClCompile Include="OfficeStPtDlg.cpp" />
-    <ClCompile Include="OperateDB.cpp" />
     <ClCompile Include="OutPutDlg.cpp" />
     <ClCompile Include="OutputSetDlg.cpp" />
     <ClCompile Include="OutsidDailog.cpp" />
@@ -169,6 +181,8 @@
     <ClCompile Include="ScanDbWaitDlg.cpp" />
     <ClCompile Include="ScanDlg.cpp" />
     <ClCompile Include="ScanSelectDlg.cpp" />
+    <ClCompile Include="SetPtDayDlg.cpp" />
+    <ClCompile Include="SetptGraphicBar.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -178,14 +192,29 @@
     <ClCompile Include="T3000TableView.cpp" />
     <ClCompile Include="T3000View.cpp" />
     <ClCompile Include="TDelayForm.cpp" />
+    <ClCompile Include="Timer_Calibrate.cpp" />
     <ClCompile Include="ToolCalibrateDlg.cpp" />
+    <ClCompile Include="TrendLogView.cpp" />
     <ClCompile Include="TrendLogWnd.cpp" />
     <ClCompile Include="TStat_Dev.cpp" />
     <ClCompile Include="TStat_Net.cpp" />
     <ClCompile Include="TStatBase.cpp" />
     <ClCompile Include="TStatScanner.cpp" />
+    <ClCompile Include="TStatScheduleDlg.cpp" />
     <ClCompile Include="UserAcessSetDlg.cpp" />
+    <ClCompile Include="Weekly_Routines.cpp" />
+    <ClCompile Include="WeeklyRout_InsertDia.cpp" />
+    <ClCompile Include="WeeklySchedule.cpp" />
     <ClCompile Include="WorkspaceBar.cpp" />
+    <ClCompile Include="T3\DialogT3.cpp" />
+    <ClCompile Include="MiniPanel\DialgMiniPanel.cpp" />
+    <ClCompile Include="ADO\ADO.cpp" />
+    <ClCompile Include="CM5\DialogCM5.cpp" />
+    <ClCompile Include="CM5\SliderBoth.cpp" />
+    <ClCompile Include="CM5\SliderBothBtn.cpp" />
+    <ClCompile Include="AirQuality\AirQuality.cpp" />
+    <ClCompile Include="ISP\CDialogISPTOOL.cpp" />
+    <ClCompile Include="singleslider\MacSliderCtrl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -234,37 +263,47 @@
     <None Include="UserImages.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ADO\ADO.h" />
-    <ClInclude Include="AirQuality.h" />
-    <ClInclude Include="OperateDB.h" />
+    <ClInclude Include="FreezeFunction.h" />
     <ClInclude Include="TrendLogWnd.h" />
+    <ClInclude Include="WeeklySchedule.h" />
     <ClInclude Include="5EInputDialog.h" />
     <ClInclude Include="AddBuilding.h" />
     <ClInclude Include="AfxMessageDialog.h" />
     <ClInclude Include="AllNodesDiaolg.h" />
+    <ClInclude Include="Annual_Routines.h" />
+    <ClInclude Include="AnnualRout_InsertDia.h" />
+    <ClInclude Include="ApplyGraphicLabelsDlg.h" />
     <ClInclude Include="BuildTable1.h" />
     <ClInclude Include="ChangePasswordDlg.h" />
-    <ClInclude Include="ConfigFileWR.h" />
+    <ClInclude Include="Config_Routines.h" />
+    <ClInclude Include="LightingController\configure.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="Dialog_Progess.h" />
     <ClInclude Include="DialogInfo.h" />
     <ClInclude Include="EnumSerial.h" />
     <ClInclude Include="EreaseDlg.h" />
+    <ClInclude Include="excel9.h" />
     <ClInclude Include="extern_function.h" />
     <ClInclude Include="fileRW.h" />
     <ClInclude Include="FreeCoolDlg.h" />
     <ClInclude Include="global_variable.h" />
     <ClInclude Include="global_variable_extern.h" />
     <ClInclude Include="globle_function.h" />
+    <ClInclude Include="GraphicView.h" />
     <ClInclude Include="GridButton.h" />
     <ClInclude Include="GridFlashDlg.h" />
+    <ClInclude Include="GridLoad.h" />
     <ClInclude Include="hangeIDDlg.h" />
     <ClInclude Include="ImageTreeCtrl.h" />
     <ClInclude Include="ImportDatabaseDlg.h" />
     <ClInclude Include="IniFile.h" />
     <ClInclude Include="InputSetDlg.h" />
     <ClInclude Include="IODisplayBar.h" />
+    <ClInclude Include="IOSetDlg.h" />
+    <ClInclude Include="LabelEditDlg.h" />
     <ClInclude Include="LedsDialog.h" />
+    <ClInclude Include="LightingController\LightingController.h" />
+    <ClInclude Include="LightingController\LightingSet.h" />
     <ClInclude Include="LoginDlg.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="ManageAccountDlg.h" />
@@ -273,6 +312,7 @@
     <ClInclude Include="monthview1.h" />
     <ClInclude Include="msflexgrid1.h" />
     <ClInclude Include="NcModbus.h" />
+    <ClInclude Include="NetworkControllView.h" />
     <ClInclude Include="OfficeStPtDlg.h" />
     <ClInclude Include="OutPutDlg.h" />
     <ClInclude Include="OutputSetDlg.h" />
@@ -286,6 +326,8 @@
     <ClInclude Include="ScanSelectDlg.h" />
     <ClInclude Include="schedule.h" />
     <ClInclude Include="Schedule_grid.h" />
+    <ClInclude Include="SetPtDayDlg.h" />
+    <ClInclude Include="SetptGraphicBar.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="T3000.h" />
     <ClInclude Include="T3000Doc.h" />
@@ -293,14 +335,28 @@
     <ClInclude Include="T3000View.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TDelayForm.h" />
+    <ClInclude Include="Timer_Calibrate.h" />
     <ClInclude Include="ToolCalibrateDlg.h" />
+    <ClInclude Include="TrendLogView.h" />
     <ClInclude Include="TStat_Dev.h" />
     <ClInclude Include="TStat_Net.h" />
     <ClInclude Include="TStatBase.h" />
     <ClInclude Include="TStatScanner.h" />
+    <ClInclude Include="TStatScheduleDlg.h" />
     <ClInclude Include="UserAcessSetDlg.h" />
     <ClInclude Include="vector_declare.h" />
+    <ClInclude Include="Weekly_Routines.h" />
+    <ClInclude Include="WeeklyRout_InsertDia.h" />
     <ClInclude Include="WorkspaceBar.h" />
+    <ClInclude Include="T3\DialogT3.h" />
+    <ClInclude Include="MiniPanel\DialgMiniPanel.h" />
+    <ClInclude Include="ADO\ADO.h" />
+    <ClInclude Include="CM5\DialogCM5.h" />
+    <ClInclude Include="CM5\SliderBoth.h" />
+    <ClInclude Include="CM5\SliderBothBtn.h" />
+    <ClInclude Include="AirQuality\AirQuality.h" />
+    <ClInclude Include="ISP\CDialogISPTOOL.h" />
+    <ClInclude Include="singleslider\MacSliderCtrl.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc" />

@@ -8,7 +8,8 @@
 #include "T3000TableView.h"
 
 #include "T3000View.h"
-
+#include "GraphicView.h"
+#include "NetworkControllView.h"
 // CT3000TableView
 
 IMPLEMENT_DYNCREATE(CT3000TableView, CTabView)
@@ -48,6 +49,7 @@ void CT3000TableView::Dump(CDumpContext& dc) const
 
 // CT3000TableView message handlers
 CT3000TableView* pTableView=NULL;
+
 int CT3000TableView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CTabView::OnCreate(lpCreateStruct) == -1)
@@ -55,10 +57,12 @@ int CT3000TableView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	pTableView=this;
 	AddView (RUNTIME_CLASS (CT3000View), _T("Tstate"), 100);
-
-	this->SetActiveView(0);
+	AddView (RUNTIME_CLASS (CGraphicView), _T("Graphic"), 101);
+	AddView (RUNTIME_CLASS (CNetworkControllView), _T("Network Ctrl"), 102);
+	AddView (RUNTIME_CLASS (CTrendLogView), _T("Trend Log View"), 101);
 	
 
+	this->SetActiveView(0);
 	return 0;
 }
 LRESULT CT3000TableView::OnChangeActiveTab(WPARAM wp,LPARAM lp)
@@ -73,5 +77,4 @@ void CT3000TableView::OnSize(UINT nType, int cx, int cy)
 {
 	CTabView::OnSize(nType, cx, cy);
 
-	// TODO: Add your message handler code here
 }
