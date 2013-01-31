@@ -30,6 +30,7 @@ public:
 	void put_fan_variable();
 	int get_real_fan_select();
 	void OnWrite(bool bflexgrid1_or_2,int col,int row);
+	void OnWriteReg(bool bflexgrid1_or_2,int col,int row);
 	afx_msg void OnCbnSelchangeFanmode();
 	afx_msg void OnCbnSelchangeCbfan();
 	afx_msg void OnEnKillfocusPid1Heatstageedit();

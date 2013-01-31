@@ -6,6 +6,8 @@
 #include "OutPutDlg.h"
 #include "globle_function.h"
 #include "AfxMessageDialog.h"
+//#include "winsocket.h"
+#include "winsock.h"
 // COutPutDlg dialog
 #define FLEXGRID_CELL_COLOR RGB(128,128,128)
 #define FLEX_GRID1_PUT_COLOR_STR(row,col,str)	{m_FlexGrid1.put_TextMatrix(row,col+5,_T(""));m_FlexGrid1.put_Row(row);m_FlexGrid1.put_Col(col+5);m_FlexGrid1.put_CellBackColor(FLEXGRID_CELL_COLOR);}
@@ -364,6 +366,7 @@ void COutPutDlg::OnCbnSelchangeFanmode()
 	//	The mode of operation (coasting, cooling, heating) is determined by the PID parameter.
 
 	//if (newtstat6[7] == PM_TSTAT6)
+
 	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
 	{
 		write_one(g_tstat_id, 105,m_fan_mode_ctrl.GetCurSel()+1);
@@ -387,12 +390,7 @@ void COutPutDlg::OnCbnSelchangeCbfan()
 	//m_fan.GetWindowText(g_strFan);
 	m_fan.GetLBText(g_ifanStatus,g_strFan);
 
-// 	137	273	1	Low byte	W/R	FAN_SPEED, current operating fan speed   
-// 		Relay Output Tables (bit0 = relay1, bit1 = relay2, bit2 = relay3, bit3 = relay4, bit4 = relay5)
-// 		"Fan0 table is for the off state. Fan1, Fan2, and Fan3 are for the manual states. 
-//		Fan4 is for the Auto state.  These states are controlled by the user."
-// 		The mode of operation (coasting, cooling, heating) is determined by the PID parameter.
-	//if (newtstat6[7] == PM_TSTAT6)
+ 
 	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
 	{
 		write_one(g_tstat_id, 273,m_fan.GetCurSel());
@@ -431,9 +429,17 @@ void COutPutDlg::OnEnKillfocusPid1Heatstageedit()
 			FreshGrid_PID1tstat6();
 		}else
 		{
-			write_one(g_tstat_id,276,m_PID1_heat_stages);
+			int ret=write_one(g_tstat_id,276,m_PID1_heat_stages);
+			if (ret>0)
+			{
 			m_PID1_heat_stages=multi_register_value[276];
 			FreshGrid_PID1();
+			} 
+			else
+			{
+			//AfxMessageBox(_T("Try again."));
+			}
+			
 		}
 
 		
@@ -469,9 +475,18 @@ void COutPutDlg::OnEnKillfocusPid1coolstageedit()
 			FreshGrid_PID1tstat6();
 		}else
 		{
-			write_one(g_tstat_id,277,m_PID1_cool_stages);
-			m_PID1_cool_stages=multi_register_value[277];
-			FreshGrid_PID1();
+			
+			int ret=write_one(g_tstat_id,277,m_PID1_cool_stages);
+			
+			if (ret>0)
+				{
+				m_PID1_cool_stages=multi_register_value[277];
+				FreshGrid_PID1();
+				} 
+			else
+				{
+				//AfxMessageBox(_T("Try again."));
+				}
 		}
 		
 
@@ -1187,20 +1202,21 @@ void COutPutDlg::FreshGrid_PID1()
     } 
     else
     {
-	if(m_bOut4PWM) // 2±íÊ¾PWM
+	  	if(m_bOut4PWM) // 2±íÊ¾PWM
 		{
-
+		 
+		 
 		for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
 			{
 			int nValue=0;
-			if(col < (m_PID1_heat_stages+1))
-				pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
+			/*if(col < (m_PID1_heat_stages+1))
+			pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
 			else
-				pos = col - (m_PID1_heat_stages+1);			
-			tstatval = multi_register_value[173+ pos];
+			pos = col - (m_PID1_heat_stages+1);		*/	
+			//tstatval = multi_register_value[173+ pos];
 			int indext=-1;
 			//nValue=read_one(tstat_id,341+pos);
-			nValue=multi_register_value[341+pos];
+			nValue=multi_register_value[340+col];
 			nValue=nValue>>4;
 			switch(nValue)
 				{
@@ -1225,7 +1241,7 @@ void COutPutDlg::FreshGrid_PID1()
 			if(pid_select2[4-1]==1)//2.5.0.98  1±íÊ¾pid2
 				FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp)
 			else
-			FLEX_GRID1_PUT_STR(4,col,strTemp)//col +1
+			    FLEX_GRID1_PUT_STR(4,col,strTemp)//col +1
 			}
 		}	
 	if(m_bOut5PWM)
@@ -1233,15 +1249,15 @@ void COutPutDlg::FreshGrid_PID1()
 		for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
 			{
 			int nValue=0;
-			if(col < (m_PID1_heat_stages+1))
+			/*if(col < (m_PID1_heat_stages+1))
 				pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
 			else
-				pos = col - (m_PID1_heat_stages+1);			
-			tstatval = multi_register_value[173+ pos];
+				pos = col - (m_PID1_heat_stages+1);*/			
+			//tstatval = multi_register_value[173+ pos];
 			int indext=-1;
 
 			//nValue=read_one(tstat_id,341+pos);	
-			nValue=multi_register_value[341+pos];
+			nValue=multi_register_value[340+col];
 			nValue=nValue&0x0f;
 			switch(nValue)
 				{
@@ -1278,89 +1294,87 @@ void COutPutDlg::FreshGrid_PID1()
 
 
 
-//		for( row = 1;row<=totalrows;row++)//****************************
-//	    
-//		{
-//			int nOutReg;
-//			nOutReg=286+row-1;
-////			int nValue=read_one(tstat_id,nOutReg);
-//			int nValue=multi_register_value[nOutReg];
-//			if(nValue!=7)
-//					continue;
-//			for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
-//			{
-//				int nValue=0;
-//				if(col < (m_PID1_heat_stages+1))
-//					pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
-//				else
-//					pos = col - (m_PID1_heat_stages+1);			
-//				int indext=-1;
-//
-//				int nReg=362+pos;
-//				nValue=multi_register_value[nReg]; 
-//
-//				if(m_fan.GetCurSel()==0)
-//				{
-//					nValue=(nValue&0xF0)>>4;
-//					switch(nValue)
-//					{
-//						case 0:
-//							strTemp=_T("0%");
-//							break;
-//						case 1:
-//							strTemp=_T("100%");
-//							break;
-//						case 2:
-//							strTemp=_T("Min->100%");
-//							break;
-//						case 3:
-//							strTemp=_T("Min|100%");
-//							break;
-//						case 4:
-//							strTemp=_T("Min");
-//							break;
-//						default:
-//							strTemp=_T("0%");
-//					}
-//				//	FLEX_GRID1_PUT_STR(row,col,strTemp)//col +1
-//					FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
-//					FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
-//				}
-//				else
-//				{
-//					nValue=(nValue&0x0F);
-//					switch(nValue)
-//					{
-//						case 0:
-//							strTemp=_T("0%");
-//							break;
-//						case 1:
-//							strTemp=_T("100%");
-//							break;
-//						case 2:
-//							strTemp=_T("Min->100%");
-//							break;
-//						case 3:
-//							strTemp=_T("Min|100%");
-//							break;
-//						case 4:
-//							strTemp=_T("Min");
-//							break;
-//						default:
-//							strTemp=_T("0%");
-//					}
-//				//	FLEX_GRID1_PUT_STR(row,col,strTemp)//col +1
-//					FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
-//					FLEX_GRID1_PUT_STR(totalrows,col,strTemp);//col +1
-//
-//				}
-//		}		
-//	}
+		for( row = 1;row<=totalrows;row++)//****************************
+	    
+		{
+			int nOutReg;
+			nOutReg=286+row-1;
+//			int nValue=read_one(tstat_id,nOutReg);
+			int nValue=multi_register_value[nOutReg];
+			if(nValue!=7)
+					continue;
+			for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
+			{
+				int nValue=0;
+				if(col < (m_PID1_heat_stages+1))
+					pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
+				else
+					pos = col - (m_PID1_heat_stages+1);			
+				int indext=-1;
+
+				int nReg=362+pos;
+				nValue=multi_register_value[nReg]; 
+
+				if(m_fan.GetCurSel()==0)
+				{
+					nValue=(nValue&0xF0)>>4;
+					switch(nValue)
+					{
+						case 0:
+							strTemp=_T("0%");
+							break;
+						case 1:
+							strTemp=_T("100%");
+							break;
+						case 2:
+							strTemp=_T("Min->100%");
+							break;
+						case 3:
+							strTemp=_T("Min|100%");
+							break;
+						case 4:
+							strTemp=_T("Min");
+							break;
+						default:
+							strTemp=_T("0%");
+					}
+				//	FLEX_GRID1_PUT_STR(row,col,strTemp)//col +1
+					FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
+					FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
+				}
+				else
+				{
+					nValue=(nValue&0x0F);
+					switch(nValue)
+					{
+						case 0:
+							strTemp=_T("0%");
+							break;
+						case 1:
+							strTemp=_T("100%");
+							break;
+						case 2:
+							strTemp=_T("Min->100%");
+							break;
+						case 3:
+							strTemp=_T("Min|100%");
+							break;
+						case 4:
+							strTemp=_T("Min");
+							break;
+						default:
+							strTemp=_T("0%");
+					}
+				//	FLEX_GRID1_PUT_STR(row,col,strTemp)//col +1
+					FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
+					FLEX_GRID1_PUT_STR(totalrows,col,strTemp);//col +1
+
+				}
+		}		
+	}
  
 
 }
-
-
 void COutPutDlg::FreshGrid_PID2()
 {
 	CString strTemp;
@@ -1882,6 +1896,7 @@ BEGIN_EVENTSINK_MAP(COutPutDlg, CDialog)
 
 END_EVENTSINK_MAP()
 
+
 void COutPutDlg::ClickMsflexgrid1()
 {
 if(g_OutPutLevel==1)
@@ -2014,7 +2029,7 @@ if(lCol>5)
 		{
 		nOutReg=286+m_nCurRow-1;
 		nValue=multi_register_value[nOutReg];
-			}
+		}
 
 
 			if (multi_register_value[336]==2)
@@ -2156,416 +2171,10 @@ if(lCol>5)
 	}
 
 }
-
-
 void COutPutDlg::OnCbnKillfocusValueitemcombo()
 {
 
-//	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
-//	{
-//#if 1//0911
-//		if(g_OutPutLevel==1)
-//			return;
-//
-//		m_ItemValueCombx.ShowWindow(SW_HIDE);
-//
-//		long lRow,lCol,nCounts;
-//		CString strOldText;
-//		CString strNewText;
-//		if(!m_bflexgrid1_or_2)
-//		{
-//			lRow = m_FlexGrid1.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ	
-//			lCol = m_FlexGrid1.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
-//			nCounts=m_FlexGrid1.get_Rows();
-//
-//			strOldText=m_FlexGrid1.get_TextMatrix(lRow,lCol);
-//			if(strOldText.IsEmpty())
-//				return;
-//			m_ItemValueCombx.GetWindowText(strNewText);
-//			int nItem=m_ItemValueCombx.GetCurSel();
-//			if(nItem<0)
-//				return;
-//			m_ItemValueCombx.GetLBText(nItem,strNewText);
-//			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-//			OnWrite(m_bflexgrid1_or_2,lCol,lRow);	
-//
-//		}
-//		else//grid 2
-//		{
-//			lRow = m_FlexGrid2.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ	
-//			lCol = m_FlexGrid2.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
-//			nCounts=m_FlexGrid2.get_Rows();
-//
-//			strOldText=m_FlexGrid2.get_TextMatrix(lRow,lCol);
-//			if(strOldText.IsEmpty())
-//				return;
-//			m_ItemValueCombx.GetWindowText(strNewText);
-//			int nItem=m_ItemValueCombx.GetCurSel();
-//			if(nItem<0)
-//				return;
-//			m_ItemValueCombx.GetLBText(nItem,strNewText);
-//			m_FlexGrid2.put_TextMatrix(lRow,lCol,strNewText);
-//			OnWrite(m_bflexgrid1_or_2,lCol,lRow);
-//
-//
-//
-//		}
-//		m_ItemValueCombx.ShowWindow(SW_HIDE);
-//		//float are realized in onwrite:
-//
-//		BYTE nreg;
-//		BYTE ntemp;
-//		if(lRow==4 && m_bOut4PWM&&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
-//		{
-//			int CoastCol=m_PID1_heat_stages+6;
-//			int nPos;
-//			//	nPos=m_PID1_cool_stages;
-//
-//			//	CString strValue;
-//			//	m_ItemValueCombx.GetWindowText(strValue);
-//			//	int nValue=atoi(strValue);
-//			int nValue=m_ItemValueCombx.GetCurSel();
-//
-//
-//			int nCol= m_FlexGrid1.get_ColSel()-5;	
-//
-//			if(nCol < (m_PID1_heat_stages+1))
-//				nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
-//			else
-//				nPos = nCol - (m_PID1_heat_stages+1);
-//
-//			//nreg=read_one(tstat_id,341+nPos);
-//			nreg=multi_register_value[375+nPos];
-//			nreg=nreg&0x0f;
-//			nValue=nValue<<4;
-//			nValue=nreg|nValue;
-//			write_one(g_tstat_id,375+nPos,nValue);
-//			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-//			m_FlexGrid1.SetFocus();
-//			FreshGrids();
-//			return;
-//		}
-//		if(lRow==5 && m_bOut5PWM&&lCol>=6&&!m_bflexgrid1_or_2)
-//		{
-//			int CoastCol=m_PID1_heat_stages+6;
-//			int nPos;
-//			//	CString strValue;
-//			//	m_ItemValueCombx.GetWindowText(strValue);
-//
-//			int nValue=m_ItemValueCombx.GetCurSel();
-//
-//			int nCol= m_FlexGrid1.get_ColSel()-5;
-//			if(nCol < (m_PID1_heat_stages+1))
-//				nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
-//			else
-//				nPos = nCol - (m_PID1_heat_stages+1);
-//			//	nreg=read_one(tstat_id,341+nPos);
-//			nreg=multi_register_value[375+nPos];
-//			nreg=nreg&0xf0;
-//			nValue=nreg|nValue;
-//
-//			write_one(g_tstat_id,375+nPos,nValue);
-//			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-//			m_FlexGrid1.SetFocus();
-//			FreshGrids();
-//			return;
-//		}
-//		/////FREE COOL:
-//		//286	245	1	Low byte	W/R	Interlock for  output1
-//
-//		int nOutReg;
-//		nOutReg=245+lRow-1;
-//		int	nValue=multi_register_value[nOutReg];
-//		if(nValue==7&&lCol>=6&&!m_bflexgrid1_or_2)
-//		{
-//
-//			int nPos;
-//			//CString strValue;
-//			//m_ItemValueCombx.GetWindowText(strValue);
-//			int nValue=m_ItemValueCombx.GetCurSel();
-//
-//			lCol=lCol-5;	
-//
-//			if(lCol < (m_PID1_heat_stages+1))
-//				nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - lCol ;
-//			else
-//				nPos = lCol - (m_PID1_heat_stages+1);	
-//			//362	125	1	Low byte	W/R	ANALOG INPUT4 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
-//
-//			if(m_fan.GetCurSel()==0)
-//			{
-//				int ndata;
-//				nValue=nValue<<4;
-//				int nReg=125+nPos;
-//				ndata=multi_register_value[125+nPos];
-//				if(ndata>=0)
-//				{
-//					ndata=ndata&0x0F;//Çåµô4-7Î»
-//					nValue=nValue|ndata;
-//					write_one(g_tstat_id,362+nPos,nValue);
-//				}
-//			}
-//			else//fan speed is not off.
-//			{
-//				int ndata;
-//				int nReg=125+nPos;
-//				ndata=multi_register_value[125+nPos];
-//				ndata=ndata&0xF0;
-//				if(ndata>=0)
-//				{
-//					nValue=nValue|ndata;
-//					write_one(g_tstat_id,125+nPos,nValue);
-//				}
-//			}
-//			m_FlexGrid1.SetFocus();
-//			FreshGrids();
-//			return;
-//		}
-//
-//#endif
-//	}
-//	else
-//	{
-//#if 1//0911
-//	if(g_OutPutLevel==1)
-//		return;
-//
-//	m_ItemValueCombx.ShowWindow(SW_HIDE);
-//
-//	long lRow,lCol,nCounts;
-//	CString strOldText;
-//	CString strNewText;
-//
-//#if 1
-//	if(!m_bflexgrid1_or_2)
-//	{
-//	//	lRow = m_FlexGrid1.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ	
-//		lRow = pid1lrow; //Èç¹û²»ÕâÑù£¬ÄÇÃ´£¬ÐÞ¸ÄµÚÒ»ÈÎÒâÅÅ£¬ÔòµÚ5ÅÅ»á×Ô¶¯±ä»á¡£
-//		lCol = m_FlexGrid1.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
-//		nCounts=m_FlexGrid1.get_Rows();
-//
-//		strOldText=m_FlexGrid1.get_TextMatrix(lRow,lCol);
-//		if(strOldText.IsEmpty())
-//			return;
-//
-//		m_ItemValueCombx.GetWindowText(strNewText);
-//		int nItem=m_ItemValueCombx.GetCurSel();
-//		if(nItem<0)
-//			return;
-//		m_ItemValueCombx.GetLBText(nItem,strNewText);
-//		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-//		OnWrite(m_bflexgrid1_or_2,lCol,lRow);	
-//	
-//	}
-//	else//grid 2
-//	{		//lRow = m_FlexGrid2.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ
-//		lRow = pid2lrow;
-//
-//		//lRow = m_FlexGrid2.get_Row();//»ñÈ¡µã»÷µÄÐÐºÅ	 2.5.0.94 ÒÔÇ°Ö»ÒªPID£¬OUTPUT6£¬7£¬Ö»ÒªÐÞ¸Ä6ÐÐ£¬7ÐÐ×Ô¶¯¸Ä±ä¡£
-//		lCol = m_FlexGrid2.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
-//		nCounts=m_FlexGrid2.get_Rows();
-//
-//
-//
-//		//////////////////////////////////////////////////////////////////////////2.5.0.99
-//
-//
-//
-//		BYTE nreg;
-//		BYTE ntemp;
-//		if(lRow==4 && m_bOut4PWM&&lCol>=6)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
-//		{
-//			int CoastCol=m_PID2_heat_stages+6;
-//			int nPos;
-//			//	nPos=m_PID1_cool_stages;
-//
-//			//	CString strValue;
-//			//	m_ItemValueCombx.GetWindowText(strValue);
-//			//	int nValue=atoi(strValue);
-//			int nValue=m_ItemValueCombx.GetCurSel();
-//
-//
-//			int nCol= m_FlexGrid2.get_ColSel()-5;	
-//
-//			if(nCol < (m_PID2_heat_stages+1))
-//				nPos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - nCol ;
-//			else
-//				nPos = nCol - (m_PID2_heat_stages+1);
-//
-//			//nreg=read_one(tstat_id,341+nPos);
-//			nreg=multi_register_value[341+nPos];
-//			nreg=nreg&0x0f;
-//			nValue=nValue<<4;
-//			nValue=nreg|nValue;
-//			write_one(g_tstat_id,341+nPos,nValue);
-//			multi_register_value[341+nPos] = nValue;//2.5.0.99
-//			m_FlexGrid2.put_TextMatrix(lRow,lCol,strNewText);
-//			m_FlexGrid2.SetFocus();
-//				FreshGrids();//lsc 20120928 2.5.0.99
-//			return;
-//		}
-//		if(lRow==5 && m_bOut5PWM&&lCol>=6)
-//		{
-//			int CoastCol=m_PID2_heat_stages+6;
-//			int nPos;
-//			//	CString strValue;
-//			//	m_ItemValueCombx.GetWindowText(strValue);
-//
-//			int nValue=m_ItemValueCombx.GetCurSel();
-//
-//			int nCol= m_FlexGrid1.get_ColSel()-5;
-//			if(nCol < (m_PID2_heat_stages+1))
-//				nPos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - nCol ;
-//			else
-//				nPos = nCol - (m_PID2_heat_stages+1);
-//			//	nreg=read_one(tstat_id,341+nPos);
-//			nreg=multi_register_value[341+nPos];
-//			nreg=nreg&0xf0;
-//			nValue=nreg|nValue;
-//
-//			write_one(g_tstat_id,341+nPos,nValue);
-//			multi_register_value[341+nPos] = nValue;//2.5.0.99
-//			m_FlexGrid2.put_TextMatrix(lRow,lCol,strNewText);
-//			m_FlexGrid2.SetFocus();
-//			FreshGrids(); //lsc 20120928  2.5.0.99
-//			return;
-//		}
-//		//////////////////////////////////////////////////////////////////////////
-//
-//// 		//lRow = m_FlexGrid2.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ//2.5.0.99
-//// 		lRow = pid2lrow;
-//// 	
-//// 		//lRow = m_FlexGrid2.get_Row();//»ñÈ¡µã»÷µÄÐÐºÅ	 2.5.0.94 ÒÔÇ°Ö»ÒªPID£¬OUTPUT6£¬7£¬Ö»ÒªÐÞ¸Ä6ÐÐ£¬7ÐÐ×Ô¶¯¸Ä±ä¡£
-//// 		lCol = m_FlexGrid2.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
-//// 		nCounts=m_FlexGrid2.get_Rows();
-//
-//		strOldText=m_FlexGrid2.get_TextMatrix(lRow,lCol);
-//		if(strOldText.IsEmpty())
-//			return;
-//		m_ItemValueCombx.GetWindowText(strNewText);
-//		int nItem=m_ItemValueCombx.GetCurSel();
-//		if(nItem<0)
-//			return;
-//		m_ItemValueCombx.GetLBText(nItem,strNewText);
-//		m_FlexGrid2.put_TextMatrix(lRow,lCol,strNewText); //2.5.0.94
-//		OnWrite(m_bflexgrid1_or_2,lCol,lRow);//2.5.0.94
-//
-//
-//
-//	}
-//#endif
-//	m_ItemValueCombx.ShowWindow(SW_HIDE);
-//	//float are realized in onwrite:
-//
-//		BYTE nreg;
-//		BYTE ntemp;
-//		if(lRow==4 && m_bOut4PWM&&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
-//		{
-//			int CoastCol=m_PID1_heat_stages+6;
-//			int nPos;
-//		//	nPos=m_PID1_cool_stages;
-//
-//		//	CString strValue;
-//		//	m_ItemValueCombx.GetWindowText(strValue);
-//		//	int nValue=atoi(strValue);
-//			int nValue=m_ItemValueCombx.GetCurSel();
-//
-//
-//			int nCol= m_FlexGrid1.get_ColSel()-5;	
-//				
-//			if(nCol < (m_PID1_heat_stages+1))
-//				nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
-//			else
-//				nPos = nCol - (m_PID1_heat_stages+1);
-//
-//			//nreg=read_one(tstat_id,341+nPos);
-//			nreg=multi_register_value[341+nPos];
-//			nreg=nreg&0x0f;
-//			nValue=nValue<<4;
-//			nValue=nreg|nValue;
-//			write_one(g_tstat_id,341+nPos,nValue);
-//			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-//			m_FlexGrid1.SetFocus();
-//		//	FreshGrids();//lsc 20120928
-//			return;
-//		}
-//		if(lRow==5 && m_bOut5PWM&&lCol>=6&&!m_bflexgrid1_or_2)
-//		{
-//			int CoastCol=m_PID1_heat_stages+6;
-//			int nPos;
-//		//	CString strValue;
-//		//	m_ItemValueCombx.GetWindowText(strValue);
-//
-//			int nValue=m_ItemValueCombx.GetCurSel();
-//
-//			int nCol= m_FlexGrid1.get_ColSel()-5;
-//			if(nCol < (m_PID1_heat_stages+1))
-//				nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
-//			else
-//				nPos = nCol - (m_PID1_heat_stages+1);
-//		//	nreg=read_one(tstat_id,341+nPos);
-//			nreg=multi_register_value[341+nPos];
-//			nreg=nreg&0xf0;
-//			nValue=nreg|nValue;
-//
-//			write_one(g_tstat_id,341+nPos,nValue);
-//			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-//			m_FlexGrid1.SetFocus();
-//			//FreshGrids(); //lsc 20120928
-//			return;
-//		}
-///////FREE COOL:
-////
-//	int nOutReg;
-//	nOutReg=286+lRow-1;
-//	int	nValue=multi_register_value[nOutReg];
-//	if(nValue==7&&lCol>=6&&!m_bflexgrid1_or_2)
-//	{
-//
-//		int nPos;
-//		//CString strValue;
-//		//m_ItemValueCombx.GetWindowText(strValue);
-//		int nValue=m_ItemValueCombx.GetCurSel();
-//
-//		lCol=lCol-5;	
-//		
-//		if(lCol < (m_PID1_heat_stages+1))
-//			nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - lCol ;
-//		else
-//			nPos = lCol - (m_PID1_heat_stages+1);	
-//
-//		if(m_fan.GetCurSel()==0)
-//		{
-//			int ndata;
-//			nValue=nValue<<4;
-//			int nReg=362+nPos;
-//			ndata=multi_register_value[362+nPos];
-//			if(ndata>=0)
-//			{
-//				ndata=ndata&0x0F;//Çåµô4-7Î»
-//				nValue=nValue|ndata;
-//				write_one(g_tstat_id,362+nPos,nValue);
-//			}
-//		}
-//		else//fan speed is not off.
-//		{
-//			int ndata;
-//			int nReg=362+nPos;
-//			ndata=multi_register_value[362+nPos];
-//			ndata=ndata&0xF0;
-//			if(ndata>=0)
-//			{
-//				nValue=nValue|ndata;
-//				write_one(g_tstat_id,362+nPos,nValue);
-//			}
-//		}
-//		m_FlexGrid1.SetFocus();
-//	//	FreshGrids(); //lsc20120928
-//		return;
-//	}
-//
-//#endif
-//	}
+
 }
 void COutPutDlg::OnWrite(bool bflexgrid1_or_2/*±í1»¹ÊÇ±í2*/,int col,int row/*ÐÐÁÐ*/)//
 {
@@ -3137,7 +2746,8 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2/*±í1»¹ÊÇ±í2*/,int col,int row/*ÐÐÁ
 		}
 		FreshGrids();
 
-	}else
+	}
+	else
 	{
 	if(g_OutPutLevel==1)
 		return;
@@ -3667,7 +3277,1107 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2/*±í1»¹ÊÇ±í2*/,int col,int row/*ÐÐÁ
 	FreshGrids();//2.5.0.98
 	}
 }
+void COutPutDlg::OnWriteReg(bool bflexgrid1_or_2/*±í1»¹ÊÇ±í2*/,int col,int row/*ÐÐÁÐ*/)//
+{
+	 
+ if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+	{
+		if(g_OutPutLevel==1)
+			return;
+		unsigned char tstatval=0,pos,cellval=0;
+		int row_temp,totalrows;
+		bool ty;
+		if(m_nmoduleType == 1)//5a
+			totalrows = 3;
+		else
+			totalrows = 5 ;
+		if(col==4)
+		{//pid
+			CString str2;
+			if (m_nmoduleType==1)
+			{
 
+// 			    	247	274	1	Low byte	W/R	Output 1 PID Interlock                    0 = PID1, can assign each output to either PID1 or 2, the max or the min of the two PIDS
+// 					248	275	1	Low byte	W/R	Output 2 PID Interlock                    1 = PID2
+// 					249	276	1	Low byte	W/R	Output 3 PID Interlock                    2 = Maximum of PID1 and PID2
+// 					250	277	1	Low byte	W/R	Output 4 PID Interlock                    3 = Minimum of PID1 and PID2
+// 					251	278	1	Low byte	W/R	Output 5 PID Interlock
+// 					252	279	1	Low byte	W/R	Output 6 PID Interlock
+// 					253	280	1	Low byte	W/R	Output 7 PID Interlock
+
+
+
+				if (row<4)
+				{
+					if(bflexgrid1_or_2==false)
+						str2=m_FlexGrid1.get_TextMatrix(row,col);
+					else
+						str2=m_FlexGrid2.get_TextMatrix(row,col);
+					if(str2.CompareNoCase(_T("PID1"))==0)
+					{
+						write_one(g_tstat_id,274+row-1,0);
+						newtstat6[274+row-1] =0;
+					}
+					
+					else if(str2.CompareNoCase(_T("PID2"))==0)
+					{
+						write_one(g_tstat_id,274+row-1,1);
+						newtstat6[274+row-1] =1;
+
+					}
+					else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
+					{
+						write_one(g_tstat_id,274+row-1,2);
+						newtstat6[274+row-1] =2;
+					}
+					else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
+					{
+						write_one(g_tstat_id,274+row-1,3);
+						newtstat6[274+row-1] =3;
+					}
+				}
+				else
+				{
+
+					if(bflexgrid1_or_2==false)
+						str2=m_FlexGrid1.get_TextMatrix(row,col);
+					else
+						str2=m_FlexGrid2.get_TextMatrix(row,col);
+					if(str2.CompareNoCase(_T("PID1"))==0)
+					{
+						if (row==4) 
+						{
+							write_one(g_tstat_id,279,0);
+							newtstat6[279] = 0;
+						}
+						if (row==5)
+						{
+							write_one(g_tstat_id,280,0);
+							newtstat6[280] = 0;
+						}
+
+					}
+					// 					252	279	1	Low byte	W/R	Output 6 PID Interlock
+					// 					253	280	1	Low byte	W/R	Output 7 PID Interlock
+					if(str2.CompareNoCase(_T("PID2"))==0)
+						//write_one(tstat_id,247+row-1,1);
+					{
+						if (row==4) 
+						{
+							write_one(g_tstat_id,279,1);
+							newtstat6[279] = 1;
+						}
+						if (row==5)
+						{
+							write_one(g_tstat_id,280,1);
+							newtstat6[280] =1;
+						}
+
+					}
+					if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
+						//write_one(tstat_id,247+row-1,2);
+					{
+						if (row==4) 
+						{
+							write_one(g_tstat_id,279,2);
+							newtstat6[279] = 2;
+						}
+						if (row==5)
+						{
+							write_one(g_tstat_id,280,2);
+							newtstat6[280] = 2;
+						}
+
+					}
+					if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
+					{
+						if (row==4) 
+						{
+							write_one(g_tstat_id,279,3);
+							newtstat6[279] = 3;
+						}
+						if (row==5)
+						{
+							write_one(g_tstat_id,280,3);
+							newtstat6[280] = 3;
+						}
+					}
+					//write_one(tstat_id,247+row-1,3);
+				}
+			}
+			else
+			{
+
+				if(bflexgrid1_or_2==false)
+					str2=m_FlexGrid1.get_TextMatrix(row,col);
+				else
+					str2=m_FlexGrid2.get_TextMatrix(row,col);
+				if(str2.CompareNoCase(_T("PID1"))==0)
+				{
+					write_one(g_tstat_id,274+row-1,0);
+					newtstat6[274+row-1] = 0;
+
+				}
+				else if(str2.CompareNoCase(_T("PID2"))==0)
+				{
+					write_one(g_tstat_id,274+row-1,1);
+					newtstat6[274+row-1] = 1;
+					
+				}
+				else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
+				{
+					write_one(g_tstat_id,274+row-1,2);
+					newtstat6[274+row-1] = 2;
+				}
+				else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
+				{
+					write_one(g_tstat_id,274+row-1,3);
+					newtstat6[274+row-1] = 3;
+				}
+			}
+// 			    247	274	1	Low byte	W/R	Output 1 PID Interlock                    0 = PID1, can assign each output to either PID1 or 2, the max or the min of the two PIDS
+// 				286	245	1	Low byte	W/R	Interlock for  output1
+// 				287	246	1	Low byte	W/R	Interlock for  output2
+// 				288	247	1	Low byte	W/R	Interlock for  output3
+// 				289	248	1	Low byte	W/R	Interlock for  output4
+// 				290	249	1	Low byte	W/R	Interlock for  output5
+// 				291	250	1	Low byte	W/R	Interlock for  output6
+// 				292	251	1	Low byte	W/R	Interlock for  output7
+
+
+			//FreshGrids(); //lsc add
+		}
+		else if(col==5)
+		{
+			CString str2;
+			if(bflexgrid1_or_2==false)
+				str2=m_FlexGrid1.get_TextMatrix(row,col);
+			else
+				str2=m_FlexGrid2.get_TextMatrix(row,col);
+			if((str2.CompareNoCase(_T("On"))==0)||str2==_T("      -"))
+			{
+				write_one(g_tstat_id,245+row-1,0);
+				newtstat6[245+row-1] = 0;
+			}
+			else if(str2.CompareNoCase(_T("DI1"))==0)
+			{
+				write_one(g_tstat_id,245+row-1,1);
+				newtstat6[245+row-1] = 1;
+			}
+			else if((str2.CompareNoCase(_T("AI1"))==0)||str2.CompareNoCase(_T("//AI1"))==0)
+			{
+				write_one(g_tstat_id,245+row-1,2);
+				newtstat6[245+row-1] = 2;
+			}
+			else if((str2.CompareNoCase(_T("AI2"))==0)||str2.CompareNoCase(_T("//AI2"))==0)
+			{
+				write_one(g_tstat_id,245+row-1,3);
+				newtstat6[245+row-1] = 3;
+			}
+			else if(str2.CompareNoCase(_T("Timer OR"))==0)
+			{
+				write_one(g_tstat_id,245+row-1,4);
+				newtstat6[245+row-1] = 4;
+			}
+			else if(str2.CompareNoCase(_T("Timer And"))==0)
+			{
+				write_one(g_tstat_id,245+row-1,5);
+				newtstat6[245+row-1] = 5;
+			}
+			else if(str2.CompareNoCase(_T("InterLock Timer"))==0)
+			{
+				write_one(g_tstat_id,245+row-1,6);
+				newtstat6[245+row-1] = 6;
+			}
+			else if(str2.CompareNoCase(_T("FreeCool"))==0)
+			{
+				write_one(g_tstat_id,245+row-1,7);
+				newtstat6[245+row-1] = 7;
+			}
+
+		}
+		CString strItem;
+
+		if(col>5)
+		{
+
+			//	283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
+			//	284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
+
+
+
+			// 		int output3_value=multi_register_value[283];//2 rows plug in one row//out 4
+			// 		int output4_value=multi_register_value[284];//out 5;
+
+
+			int output3_value;//=multi_register_value[283];//2 rows plug in one row//out 4
+			int output4_value;//=multi_register_value[284];//out 5;
+			//if (newtstat6[7] == 6)
+			if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+			{
+				output3_value=newtstat6[205];//2 rows plug in one row//out 4
+				output4_value=newtstat6[206];//out 5;
+			}else
+			{
+				output3_value=multi_register_value[283];//2 rows plug in one row//out 4
+				output4_value=multi_register_value[284];//out 5;
+			}
+			BOOL bFloat=FALSE;
+			BOOL bONOFF=TRUE;
+
+			if(bflexgrid1_or_2==false)
+			{//grid one 1
+
+				if((col-5) < (m_PID1_heat_stages+1))
+					pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - (col-5) ;
+				else
+					pos = (col-5) - (m_PID1_heat_stages+1);
+				m_FlexGrid1.put_Col(col);
+
+				for( row_temp = 1;row_temp<=totalrows;row_temp++)//***********************row_temp==totalrows+1
+				{
+					m_FlexGrid1.put_Row(row_temp);	
+					strItem=m_FlexGrid1.get_TextMatrix(row_temp,col);
+					if(string2digital(strItem,cellval,ty))
+					{
+						if(row_temp == 1)
+							tstatval &= 0xFE;
+						if(row_temp == 2)
+							tstatval &= 0xFD;
+						if(row_temp == 3)
+							tstatval &= 0xFB ;
+						if(!m_bFloat)//not floater out 4 and out5
+						{
+							if(row_temp == 4&&!m_bOut4PWM)
+								tstatval &= 0xF7;
+							if(row_temp == 5&&!m_bOut5PWM)
+								tstatval &= 0xEF;
+						}
+						else
+						{
+							if(row_temp==4)
+								break;
+						}
+
+						tstatval |= cellval << (row_temp -1) ;
+					}
+				}
+				int n=get_real_fan_select() ;
+				//138	288	1	Low byte	W/R	FAN0_OPERATION_TABLE_COAST
+				//if (newtstat6[7] ==6)
+				if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+				{
+					write_one(g_tstat_id,288+get_real_fan_select() * 7 + pos,tstatval);		
+					newtstat6[288+get_real_fan_select() * 7+pos] = tstatval;
+				}
+				else
+				{
+					write_one(g_tstat_id,138+get_real_fan_select() * 7 + pos,tstatval);
+				}
+
+				if(m_bFloat)
+				{
+					int nValue=0;
+					if(row==4&&output3_value==1)
+					{
+						strItem=m_FlexGrid1.get_TextMatrix(row,col);
+						if(string2digital(strItem,cellval,ty) )
+						{
+							tstatval=tstatval&0xCF;
+							nValue= cellval << 4 ;
+							tstatval|=nValue;
+						}
+						//351	334	1	Low byte	W/R	analog output in OFF table, coating mode,bit1 means AO1 : 1 = on, 0 = off    bit3 means AO2 : 1 = on, 0 = off
+						//173	323	1	Low byte	W/R	VALVE_OPER_TABLE_COAST, Analog output state for each of the 7 modes of operation
+
+						if(m_fan.GetCurSel()==0)
+						{
+							//if (newtstat6[7] == 6)
+							if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+							{
+								write_one(g_tstat_id,334+pos,tstatval);
+								newtstat6[334+pos] = tstatval;
+							}
+							else
+							{
+								write_one(g_tstat_id,351+pos,tstatval);
+							}
+						}
+						else
+						{
+							//if (newtstat6[7] == 6)
+							if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+							{
+								write_one(g_tstat_id,323+pos,tstatval);
+								newtstat6[323+pos] = tstatval;
+							}
+							else
+							{
+								write_one(g_tstat_id,173+pos,tstatval);
+							}
+						}
+					}
+					if(row==5&&output4_value==1)
+					{
+						strItem=m_FlexGrid1.get_TextMatrix(row,col);
+						if(string2digital(strItem,cellval,ty) )
+						{
+							tstatval=tstatval&0xCF;
+							nValue= cellval << 4 ;
+							tstatval|=nValue;
+						}
+						if(m_fan.GetCurSel()==0)
+							// 						write_one(g_tstat_id,351+pos,tstatval);
+							// 					else
+							// 						write_one(g_tstat_id,173+pos,tstatval);
+
+						{
+							//if (newtstat6[7] == 6)
+							if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+							{
+								write_one(g_tstat_id,334+pos,tstatval);
+								newtstat6[334+pos] = tstatval;
+							}
+							else
+							{
+								write_one(g_tstat_id,351+pos,tstatval);
+							}
+						}
+						else
+						{
+							//if (newtstat6[7] == 6)
+							if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+							{
+								write_one(g_tstat_id,323+pos,tstatval);
+								newtstat6[323+pos]= tstatval;
+							}
+							else
+							{
+								write_one(g_tstat_id,173+pos,tstatval);
+							}
+						}
+					}
+				}
+
+				if(m_fan.GetCurSel()==0)
+				{
+					//if (newtstat6[7] == 6)
+					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+					{
+						tstatval=newtstat6[334+pos];
+					}
+					else
+					{
+						tstatval=multi_register_value[351+pos];
+					}
+				}
+				else
+				{
+					//if (newtstat6[7] == 6)
+					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+					{
+						tstatval=newtstat6[323+pos];
+					}
+					else
+					{
+						tstatval=multi_register_value[173+pos];
+					}
+				}
+				// 				tstatval=multi_register_value[351+pos];
+				// 			else
+				// 				tstatval=multi_register_value[173+pos];
+
+				if(m_nmoduleType == 1 || m_nmoduleType == 3)
+				{
+					if(m_nmoduleType == 1)
+						totalrows = 4 ;////////////////
+					else
+						totalrows = 6 ;////////////////
+					if((col-5) < (m_PID1_heat_stages+1))
+						pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - (col-5) ;
+					else
+						pos = (col-5) - (m_PID1_heat_stages+1);
+					m_FlexGrid1.put_Col(col);
+					tstatval &= 0x3F ;//clear 7 bit and 8 bit  for 0-50
+
+					for( row_temp=totalrows;row_temp<=totalrows+1;row_temp++)
+					{
+						CString strItemText=m_FlexGrid1.get_TextMatrix(row_temp,col);
+						//	m_FlexGrid1.put_Row(row_temp);	
+						if(string2digital(strItemText,cellval,ty))
+						{						
+							if(cellval==4 )
+							{//for 0-50
+								if(row_temp==totalrows)
+									tstatval |=64;//µÚ6Î»
+								else if(row_temp==(totalrows+1))//0-50
+									tstatval |=128;//µÚ7Î»
+							}
+							else
+							{
+								if(row_temp == totalrows)
+								{
+									tstatval &= 0xFC ;//1111 1100
+								}
+								if(row_temp == totalrows+1)
+								{
+									tstatval &= 0xF3 ;//1111 0011
+									cellval <<= 2 ; 
+								}
+								tstatval |= cellval  ;
+							}						
+						}
+					}
+					if(m_fan.GetCurSel()==0)
+						// 					write_one(g_tstat_id,351+pos,tstatval);
+						// 				else
+						// 					write_one(g_tstat_id,173+pos,tstatval);
+					{
+						//if (newtstat6[7] == 6)
+						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+						{
+							write_one(g_tstat_id,334+pos,tstatval);
+							newtstat6[334+pos] = tstatval;
+						}
+						else
+						{
+							write_one(g_tstat_id,351+pos,tstatval);
+						}
+					}
+					else
+					{
+						//if (newtstat6[7] == 6)
+						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+						{
+							write_one(g_tstat_id,323+pos,tstatval);
+							newtstat6[323+pos] = tstatval;
+						}
+						else
+						{
+							write_one(g_tstat_id,173+pos,tstatval);
+						}
+					}
+
+				}
+			}
+			else//grid 2:
+			{
+				if((col-5) < (m_PID2_heat_stages+1))
+					pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+				else
+					pos = (col-5) - (m_PID2_heat_stages+1);
+				m_FlexGrid2.put_Col(col);////////////////////////////////////////////////////////
+				for( row_temp = 1;row_temp<=totalrows;row_temp++)//***********************row_temp==totalrows+1
+				{
+					m_FlexGrid2.put_Row(row_temp);////////////////////////////////////////////////////
+					if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+					{
+						if(row_temp == 1)
+							tstatval &= 0xFE;
+						if(row_temp == 2)
+							tstatval &= 0xFD;
+						if(row_temp == 3)
+							tstatval &= 0xFB ;
+						if(row_temp == 4)
+							tstatval &= 0xF7;
+						if(row_temp == 5)
+							tstatval &= 0xEF;
+						tstatval |= cellval << (row_temp -1) ;
+					}
+
+				}
+				//254	281	1	Low byte	W/R	PID2 Output table- Coasting
+
+				if (newtstat6[7] ==6)
+				{
+					write_one(g_tstat_id,281 + pos,tstatval);
+					newtstat6[281 + pos] = tstatval;
+				}
+				else
+				{
+					write_one(g_tstat_id,254 + pos,tstatval);
+				}
+
+				if(m_nmoduleType == 1 || m_nmoduleType == 3)
+				{
+					if(m_nmoduleType == 1)
+						totalrows = 4 ;////////////////
+					else
+						totalrows = 6 ;////////////////
+					if((col-5) < (m_PID2_heat_stages+1))
+						pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+					else
+						pos = (col-5) - (m_PID2_heat_stages+1);
+					m_FlexGrid2.put_Col(col);
+					//tstatval &= 0x3F ;//clear 7 bit and 8 bit  for 0-50
+					tstatval=0;
+					for( row_temp=totalrows;row_temp<=totalrows+1;row_temp++)
+					{
+						m_FlexGrid2.put_Row(row_temp);	
+						if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+						{
+							if(cellval==4 )
+							{//for 0-50
+								if(row_temp==totalrows)
+									tstatval |=64;
+								else if(row_temp==(totalrows+1))
+									tstatval |=128;
+							}
+							else
+							{
+								if(row_temp == totalrows)
+								{
+									tstatval &= 0xFC ;
+								}
+								if(row_temp == totalrows+1)
+								{
+									tstatval &= 0xF3 ;
+									cellval <<= 2 ; 
+								}
+								tstatval |= cellval  ;
+							}
+						}
+
+					}
+					//
+
+					write_one(g_tstat_id,261+pos,tstatval);//Ã»ÕÒµ½¶ÔÓ¦µÄÖµ¡£
+				}
+			}
+		}
+		FreshGrids();
+
+	}
+	else
+	{
+	if(g_OutPutLevel==1)
+		return;
+	unsigned char tstatval=0,pos,cellval=0;
+	int row_temp,totalrows;
+	bool ty;
+	if(m_nmoduleType == 1)//5a
+		totalrows = 3;
+	else
+		totalrows = 5 ;
+	if(col==4)
+	{//PID 
+		CString str2;
+		//1==Tstat5B
+		if (m_nmoduleType==1)
+		{
+			if (row<4)
+			{
+				if(bflexgrid1_or_2==false)
+					str2=m_FlexGrid1.get_TextMatrix(row,col);
+				else
+					str2=m_FlexGrid2.get_TextMatrix(row,col);
+				if(str2.CompareNoCase(_T("PID1"))==0)
+					write_one(g_tstat_id,247+row-1,0);
+				else if(str2.CompareNoCase(_T("PID2"))==0)
+					write_one(g_tstat_id,247+row-1,1);
+				else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
+					write_one(g_tstat_id,247+row-1,2);
+				else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
+					write_one(g_tstat_id,247+row-1,3);
+			}
+			else
+			{
+				if(bflexgrid1_or_2==false)
+					str2=m_FlexGrid1.get_TextMatrix(row,col);
+				else
+					str2=m_FlexGrid2.get_TextMatrix(row,col);
+				if(str2.CompareNoCase(_T("PID1"))==0)
+				{
+					if (row==4) 
+					{
+						write_one(g_tstat_id,252,0);
+					}
+					if (row==5)
+					{
+						write_one(g_tstat_id,253,0);
+					}
+						
+				}
+				
+				if(str2.CompareNoCase(_T("PID2"))==0)
+					//write_one(tstat_id,247+row-1,1);
+				{
+					if (row==4) 
+					{
+						write_one(g_tstat_id,252,1);
+					}
+					if (row==5)
+					{
+						write_one(g_tstat_id,253,1);
+					}
+
+				}
+				if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
+					//write_one(tstat_id,247+row-1,2);
+				{
+					if (row==4) 
+					{
+						write_one(g_tstat_id,252,2);
+					}
+					if (row==5)
+					{
+						write_one(g_tstat_id,253,2);
+					}
+
+				}
+				if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
+				{
+					if (row==4) 
+					{
+						write_one(g_tstat_id,252,3);
+					}
+					if (row==5)
+					{
+						write_one(g_tstat_id,253,3);
+					}
+				}
+					//write_one(tstat_id,247+row-1,3);
+			}
+		}
+		else
+		{
+			if(bflexgrid1_or_2==false)
+				str2=m_FlexGrid1.get_TextMatrix(row,col);
+			else
+				str2=m_FlexGrid2.get_TextMatrix(row,col);
+			if(str2.CompareNoCase(_T("PID1"))==0)
+				write_one(g_tstat_id,247+row-1,0);
+			else if(str2.CompareNoCase(_T("PID2"))==0)
+				write_one(g_tstat_id,247+row-1,1);
+			else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
+				write_one(g_tstat_id,247+row-1,2);
+			else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
+				write_one(g_tstat_id,247+row-1,3);
+		}
+		//FreshGrids();//lsc add
+	
+	}
+	else if(col==5)
+	{
+		CString str2;
+		if(bflexgrid1_or_2==false)
+			str2=m_FlexGrid1.get_TextMatrix(row,col);
+		else
+			str2=m_FlexGrid2.get_TextMatrix(row,col);
+		if((str2.CompareNoCase(_T("On"))==0)||str2==_T("      -"))
+			write_one(g_tstat_id,286+row-1,0);
+		else if(str2.CompareNoCase(_T("DI1"))==0)
+			write_one(g_tstat_id,286+row-1,1);
+		else if((str2.CompareNoCase(_T("AI1"))==0)||str2.CompareNoCase(_T("//AI1"))==0)
+			write_one(g_tstat_id,286+row-1,2);
+		else if((str2.CompareNoCase(_T("AI2"))==0)||str2.CompareNoCase(_T("//AI2"))==0)
+			write_one(g_tstat_id,286+row-1,3);
+		else if(str2.CompareNoCase(_T("Timer OR"))==0)
+			write_one(g_tstat_id,286+row-1,4);
+		else if(str2.CompareNoCase(_T("Timer And"))==0)
+			write_one(g_tstat_id,286+row-1,5);
+		else if(str2.CompareNoCase(_T("InterLock Timer"))==0)
+			write_one(g_tstat_id,286+row-1,6);
+		else if(str2.CompareNoCase(_T("FreeCool"))==0)
+			write_one(g_tstat_id,286+row-1,7);
+
+	}
+	CString strItem;
+
+	if(col>5)
+	{
+		int output3_value;//=multi_register_value[283];//2 rows plug in one row//out 4
+	 	int output4_value;//=multi_register_value[284];//out 5;
+		//if (newtstat6[7] == 6)
+		if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+		{
+			output3_value=newtstat6[205];//2 rows plug in one row//out 4
+		    output4_value=newtstat6[206];//out 5;
+		}else
+		{
+			output3_value=multi_register_value[283];//2 rows plug in one row//out 4
+			output4_value=multi_register_value[284];//out 5;
+		}
+		BOOL bFloat=FALSE;
+		BOOL bONOFF=TRUE;
+
+		if(bflexgrid1_or_2==false)
+		{//grid one 1
+
+			if((col-5) < (m_PID1_heat_stages+1))
+				pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - (col-5) ;
+			else
+				pos = (col-5) - (m_PID1_heat_stages+1);
+			m_FlexGrid1.put_Col(col);
+	
+			for( row_temp = 1;row_temp<=totalrows;row_temp++)//***********************row_temp==totalrows+1
+			{
+				m_FlexGrid1.put_Row(row_temp);	
+				strItem=m_FlexGrid1.get_TextMatrix(row_temp,col);
+				if(string2digital(strItem,cellval,ty))
+				{
+					if(row_temp == 1)
+						tstatval &= 0xFE;
+					if(row_temp == 2)
+						tstatval &= 0xFD;
+					if(row_temp == 3)
+						tstatval &= 0xFB ;
+					if(!m_bFloat)//not floater out 4 and out5
+					{
+						if(row_temp == 4&&!m_bOut4PWM)
+							tstatval &= 0xF7;
+						if(row_temp == 5&&!m_bOut5PWM)
+							tstatval &= 0xEF;
+					}
+					else
+					{
+						if(row_temp==4)
+							break;
+					}
+					
+					tstatval |= cellval << (row_temp -1) ;
+				}
+			}
+			int n=get_real_fan_select() ;
+			//138	288	1	Low byte	W/R	FAN0_OPERATION_TABLE_COAST
+			if ((newtstat6[7] ==7)||(newtstat6[7] ==6))
+			{
+				write_one(g_tstat_id,288+get_real_fan_select() * 7 + pos,tstatval);		
+				newtstat6[288+get_real_fan_select() * 7] = tstatval;
+			}
+			else
+			{
+				write_one(g_tstat_id,138+get_real_fan_select() * 7 + pos,tstatval);
+			}
+
+			if(m_bFloat)
+			{
+				int nValue=0;
+				if(row==4&&output3_value==1)
+				{
+					strItem=m_FlexGrid1.get_TextMatrix(row,col);
+					if(string2digital(strItem,cellval,ty) )
+					{
+						tstatval=tstatval&0xCF;
+						nValue= cellval << 4 ;
+						tstatval|=nValue;
+					}
+					//351	334	1	Low byte	W/R	analog output in OFF table, coating mode,bit1 means AO1 : 1 = on, 0 = off    bit3 means AO2 : 1 = on, 0 = off
+					//173	323	1	Low byte	W/R	VALVE_OPER_TABLE_COAST, Analog output state for each of the 7 modes of operation
+
+					if(m_fan.GetCurSel()==0)
+					{
+						//if (newtstat6[7] == 6)
+// 						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+// 						{
+// 							write_one(g_tstat_id,334+pos,tstatval);
+// 							newtstat6[334+pos] = tstatval;
+// 						}
+// 						else
+// 						{
+							//write_one(g_tstat_id,351+pos,tstatval);
+//						}
+						if (m_pids == 1)
+						{
+							write_one(g_tstat_id,385+pos,tstatval);//lsc add ,Ä¿Ç°Ö»ÓÐµ±µÚÒ»¸öÑ¡ÔñÎªPID2£¬ÏÂÃæµÄ²ÅÐ´µ½Õâ¸ö¼Ä´æÆ÷ÖÐ
+						}else
+						{
+							write_one(g_tstat_id,351+pos,tstatval);
+						}
+					}
+					else
+					{
+						//if (newtstat6[7] == 6)
+						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+						{
+							write_one(g_tstat_id,323+pos,tstatval);
+							newtstat6[323+pos] = tstatval;
+						}
+						else
+						{
+							write_one(g_tstat_id,173+pos,tstatval);
+						}
+					}
+				}
+				if(row==5&&output4_value==1)
+				{
+					strItem=m_FlexGrid1.get_TextMatrix(row,col);
+					if(string2digital(strItem,cellval,ty) )
+					{
+						tstatval=tstatval&0xCF;
+						nValue= cellval << 4 ;
+						tstatval|=nValue;
+					}
+					if(m_fan.GetCurSel()==0)
+// 						write_one(g_tstat_id,351+pos,tstatval);
+// 					else
+// 						write_one(g_tstat_id,173+pos,tstatval);
+
+					{
+						//if (newtstat6[7] == 6)
+						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+						{
+							write_one(g_tstat_id,334+pos,tstatval);
+							newtstat6[334+pos] = tstatval;
+						}
+						else
+						{
+							write_one(g_tstat_id,351+pos,tstatval);
+						}
+					}
+					else
+					{
+						//if (newtstat6[7] == 6)
+						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+						{
+							write_one(g_tstat_id,323+pos,tstatval);
+							newtstat6[323+pos]= tstatval;
+						}
+						else
+						{
+							write_one(g_tstat_id,173+pos,tstatval);
+						}
+					}
+				}
+			}
+						
+			if(m_fan.GetCurSel()==0)
+			{
+				//if (newtstat6[7] == 6)
+				if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+				{
+					tstatval=newtstat6[334+pos];
+				}
+				else
+				{
+					tstatval=multi_register_value[351+pos];
+				}
+			}
+			else
+			{
+				//if (newtstat6[7] == 6)
+				if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+				{
+					tstatval=newtstat6[323+pos];
+				}
+				else
+				{
+					tstatval=multi_register_value[173+pos];
+				}
+			}
+// 				tstatval=multi_register_value[351+pos];
+// 			else
+// 				tstatval=multi_register_value[173+pos];
+
+			if(m_nmoduleType == 1 || m_nmoduleType == 3)
+			{
+				if(m_nmoduleType == 1)
+					totalrows = 4 ;////////////////
+				else
+					totalrows = 6 ;////////////////
+				if((col-5) < (m_PID1_heat_stages+1))
+					pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - (col-5) ;
+				else
+					pos = (col-5) - (m_PID1_heat_stages+1);
+				m_FlexGrid1.put_Col(col);
+				tstatval &= 0x3F ;//clear 7 bit and 8 bit  for 0-50
+			
+				for( row_temp=totalrows;row_temp<=totalrows+1;row_temp++)
+				{
+					CString strItemText=m_FlexGrid1.get_TextMatrix(row_temp,col);
+				//	m_FlexGrid1.put_Row(row_temp);	
+					if(string2digital(strItemText,cellval,ty))
+					{						
+						if(cellval==4 )
+						{//for 0-50
+							if(row_temp==totalrows)
+								tstatval |=64;//µÚ6Î»
+							else if(row_temp==(totalrows+1))//0-50
+								tstatval |=128;//µÚ7Î»
+						}
+						else
+						{
+							if(row_temp == totalrows)
+							{
+								tstatval &= 0xFC ;//1111 1100
+							}
+							if(row_temp == totalrows+1)
+							{
+								tstatval &= 0xF3 ;//1111 0011
+								cellval <<= 2 ; 
+							}
+								tstatval |= cellval  ;
+						}						
+					}
+				}
+				int ret = 0;
+				if(m_fan.GetCurSel()==0)
+ 
+				{
+				 
+					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+					{
+						write_one(g_tstat_id,334+pos,tstatval);
+						newtstat6[334+pos] = tstatval;
+					}
+					else
+					{
+						ret = write_one(g_tstat_id,351+pos,tstatval);
+ 						 
+
+					}
+				}
+				else
+				{
+					//if (newtstat6[7] == 6)
+					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+					{
+						write_one(g_tstat_id,323+pos,tstatval);
+						newtstat6[323+pos] = tstatval;
+					}
+					else
+					{
+						ret = write_one(g_tstat_id,173+pos,tstatval);
+// 						if (ret<=0)
+// 							AfxMessageBox(_T("setting failure!"));
+					}
+				}
+
+			}
+		}
+		else//grid 2:
+		{
+			int ret1= 0;
+			if((col-5) < (m_PID2_heat_stages+1))
+				pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+			else
+				pos = (col-5) - (m_PID2_heat_stages+1);
+			m_FlexGrid2.put_Col(col);////////////////////////////////////////////////////////
+			for( row_temp = 1;row_temp<=totalrows;row_temp++)//***********************row_temp==totalrows+1
+			{
+				m_FlexGrid2.put_Row(row_temp);////////////////////////////////////////////////////
+				if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+				{
+					if(row_temp == 1)
+						tstatval &= 0xFE;
+					if(row_temp == 2)
+						tstatval &= 0xFD;
+					if(row_temp == 3)
+						tstatval &= 0xFB ;
+					if(row_temp == 4)
+						tstatval &= 0xF7;
+					if(row_temp == 5)
+						tstatval &= 0xEF;
+					tstatval |= cellval << (row_temp -1) ;
+				}
+
+			}
+			//254	281	1	Low byte	W/R	PID2 Output table- Coasting
+
+			if ((newtstat6[7] ==6)||(newtstat6[7] ==7))
+			{
+				write_one(g_tstat_id,281 + pos,tstatval);
+				newtstat6[281 + pos] = tstatval;
+			}
+			else if (multi_register_value[7] == 18 )//2.5.0.94
+			{	
+				if(m_fan.GetCurSel()==0)
+				{
+					ret1 = write_one(g_tstat_id,385 + pos,tstatval);
+// 					if (ret1<=0)
+// 						AfxMessageBox(_T("setting failure!"));
+				}else
+				{
+					ret1 = write_one(g_tstat_id,254 + pos,tstatval);
+// 					if (ret1<=0)
+// 						AfxMessageBox(_T("setting failure!"));
+				}
+			}
+			else
+			{
+				write_one(g_tstat_id,254 + pos,tstatval);
+			}
+
+			if(m_nmoduleType == 1 || m_nmoduleType == 3)
+			{
+				if(m_nmoduleType == 1)
+					totalrows = 4 ;////////////////
+				else
+					totalrows = 6 ;////////////////
+				if((col-5) < (m_PID2_heat_stages+1))
+					pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+				else
+					pos = (col-5) - (m_PID2_heat_stages+1);
+				m_FlexGrid2.put_Col(col);
+				//tstatval &= 0x3F ;//clear 7 bit and 8 bit  for 0-50
+				tstatval=0;
+				for( row_temp=totalrows;row_temp<=totalrows+1;row_temp++)
+				{
+					m_FlexGrid2.put_Row(row_temp);	
+					if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+					{
+						if(cellval==4 )
+						{//for 0-50
+							if(row_temp==totalrows)
+								tstatval |=64;
+							else if(row_temp==(totalrows+1))
+								tstatval |=128;
+						}
+						else
+						{
+							if(row_temp == totalrows)
+							{
+								tstatval &= 0xFC ;
+							}
+							if(row_temp == totalrows+1)
+							{
+								tstatval &= 0xF3 ;
+								cellval <<= 2 ; 
+							}
+							tstatval |= cellval  ;
+						}
+					}
+
+				}
+ 
+
+
+				if(m_fan.GetCurSel()==0)
+				{
+					//write_one(g_tstat_id,351+pos,tstatval);
+
+					int ret392 = 0;
+					ret392 = write_one(g_tstat_id,392+pos,tstatval);//2.5.0.93
+					if (ret392>0)
+					{
+						multi_register_value[392+pos] = tstatval;
+					}else
+					{
+							//AfxMessageBox(_T("setting failure!"));
+					}
+					
+				}
+				else
+				{
+					//write_one(g_tstat_id,173+pos,tstatval);
+					int ret392 = 0;
+					ret392 = write_one(g_tstat_id,261+pos,tstatval);//2.5.0.93
+					if (ret392>0)
+					{
+						multi_register_value[261+pos] = tstatval;
+					}else
+					{
+						//AfxMessageBox(_T("setting failure!"));
+					}
+					
+				}
+
+			}
+		}
+	}
+	//FreshGrids();//2.5.0.98
+	}
+}
 BOOL COutPutDlg::PreTranslateMessage(MSG* pMsg) 
 {
 	// TODO: Add your specialized code here and/or call the base class
@@ -3689,15 +4399,322 @@ BOOL COutPutDlg::PreTranslateMessage(MSG* pMsg)
 void COutPutDlg::OnCbnSelchangeValueitemcombo()
 {
 
- 	if(g_OutPutLevel==1)
+ //	if(g_OutPutLevel==1)
+	//	return;
+	//long lRow,lCol,nCounts;
+	//CString strOldText;
+	//CString strNewText;
+	//if(!m_bflexgrid1_or_2)//m_bflexgrid1_or_2=0
+	//{
+	//	lRow = m_FlexGrid1.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ	
+	//	lCol = m_FlexGrid1.get_ColSel();//»ñÈ¡µã»÷µÄÁÐºÅ
+	//	nCounts=m_FlexGrid1.get_Rows();
+
+	//	strOldText=m_FlexGrid1.get_TextMatrix(lRow,lCol);
+	//	if(strOldText.IsEmpty())
+	//		return;
+	//	m_ItemValueCombx.GetWindowText(strNewText);
+	//	int nItem=m_ItemValueCombx.GetCurSel();
+	//	if(nItem<0)
+	//		return;
+	//	m_ItemValueCombx.GetLBText(nItem,strNewText);
+	//	m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+	//	if (lCol<=5)
+	//	{
+	//	  OnWrite(m_bflexgrid1_or_2,lCol,lRow);
+	//	}
+	//	else
+	//	{
+	//	  OnWriteReg(m_bflexgrid1_or_2,lCol,lRow);
+	//	}
+	//		
+	//}
+	//else//grid 2
+	//{
+	//	lRow = m_FlexGrid2.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ	
+	//	lCol = m_FlexGrid2.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
+	//	nCounts=m_FlexGrid2.get_Rows();
+	//	strOldText=m_FlexGrid2.get_TextMatrix(lRow,lCol);
+	//	if(strOldText.IsEmpty())
+	//		return;
+	//	m_ItemValueCombx.GetWindowText(strNewText);
+	//	int nItem=m_ItemValueCombx.GetCurSel();
+	//	if(nItem<0)
+	//		return;
+	//	m_ItemValueCombx.GetLBText(nItem,strNewText);
+	//	m_FlexGrid2.put_TextMatrix(lRow,lCol,strNewText);
+	//	if (lCol<=5)
+	//	{
+	//	  OnWrite(m_bflexgrid1_or_2,lCol,lRow);
+	//	}
+	//	else
+	//	{
+	//	   OnWriteReg(m_bflexgrid1_or_2,lCol,lRow);
+	//	}
+	//	
+	//}
+	//m_ItemValueCombx.ShowWindow(SW_HIDE);
+	////float are realized in onwrite:
+	//
+	//	BYTE nreg;
+	//	BYTE ntemp;
+
+
+	//int nOutReg;
+	//int	nValue;
+
+	////if (newtstat6[7] ==6)
+	//if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+	//{
+	//	nOutReg = 245 + lRow-1;
+	//	nValue=newtstat6[nOutReg];
+
+	//}else
+	//{
+	//	nOutReg=286+lRow-1;
+	//	nValue=multi_register_value[nOutReg];
+	//}
+	//
+	////int	nValue=multi_register_value[nOutReg];
+	//if(nValue==7&&lCol>=6&&!m_bflexgrid1_or_2)
+	//{
+
+	//	int nPos;
+	//	//CString strValue;
+	//	//m_ItemValueCombx.GetWindowText(strValue);
+	//	int nValue=m_ItemValueCombx.GetCurSel();
+
+	//	lCol=lCol-5;
+	//	if(lCol < (m_PID1_heat_stages+1))
+	//		nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - lCol ;
+	//	else
+	//		nPos = lCol - (m_PID1_heat_stages+1);	
+
+	//	if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+	//	{
+	//		if(m_fan.GetCurSel()==0)
+	//		{
+	//			int ndata;
+	//			nValue=nValue<<4;
+	//			int nReg=362+nPos;
+	//			ndata=newtstat6[125+nPos];
+	//			if(ndata>=0)
+	//			{
+	//				ndata=ndata&0x0F;//Çåµô4-7Î»
+	//				nValue=nValue|ndata;
+	//				write_one(g_tstat_id,125+nPos,nValue);
+	//				newtstat6[125] = nValue;
+
+	//				m_ItemValueCombx.GetWindowText(strNewText);
+	//				//int nItemwww=m_ItemValueCombx.GetCurSel();
+	//				m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+	//			}
+	//		}
+	//		else//fan speed is not off.
+	//		{
+	//			int ndata;
+	//			int nReg=125+nPos;
+	//			ndata=multi_register_value[125+nPos];
+	//			ndata=ndata&0xF0;
+	//			if(ndata>=0)
+	//			{
+	//				nValue=nValue|ndata;
+	//				write_one(g_tstat_id,125+nPos,nValue);
+	//				newtstat6[125] = nValue;
+	//			}
+	//		}
+	//	}
+	//	else
+	//	{
+	//	if(m_fan.GetCurSel()==0)
+	//	{
+	//		int ndata;
+	//		nValue=nValue<<4;
+	//		int nReg=362+nPos;
+	//		ndata=multi_register_value[362+nPos];
+	//		if(ndata>=0)
+	//		{
+	//			ndata=ndata&0x0F;//Çåµô4-7Î»
+	//			nValue=nValue|ndata;
+	//			write_one(g_tstat_id,362+nPos,nValue);
+
+	//			m_ItemValueCombx.GetWindowText(strNewText);
+	//			//int nItemwww=m_ItemValueCombx.GetCurSel();
+	//			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+	//		}
+	//	}
+	//	else//fan speed is not off.
+	//	{
+	//	int ndata;
+	//	int nReg=362+nPos;
+	//	ndata=multi_register_value[362+nPos];
+	//	ndata=ndata&0xF0;
+	//	if(ndata>=0)
+	//		{
+	//		nValue=nValue|ndata;
+	//		write_one(g_tstat_id,362+nPos,nValue);
+	//		}
+	//	}
+	//	}
+
+	//	m_FlexGrid1.SetFocus();
+	////	FreshGrids();//lsc0928
+	//	return;
+	//}
+	//if (multi_register_value[7]==16)//5E
+	//	{
+	//	if(lRow==4 && m_bOut4PWM&&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
+	//		{
+	//		int CoastCol=m_PID1_heat_stages+6;
+	//		int nregNo;
+	//		int nValue=m_ItemValueCombx.GetCurSel();
+	//		int nCol= lCol-5;	
+
+	//	/*	if(nCol < (m_PID1_heat_stages+1))
+	//			nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
+	//		else
+	//			nPos = nCol - (m_PID1_heat_stages+1);*/
+
+	//		//nreg=read_one(tstat_id,341+nPos);
+	//		nregNo=340+nCol;
+	//		nreg=multi_register_value[nregNo];//341TSTAT6ÕÒ²»µ½¶ÔÓ¦
+	//		nreg=nreg&0x0f;
+	//		nValue=nValue<<4;
+	//		nValue=nreg|nValue;
+	//		int ret=write_one(g_tstat_id,nregNo,nValue);
+	//		if (ret>0)
+	//			{
+	//			   multi_register_value[nregNo]=nValue;
+	//			}
+	//			else
+	//			{
+	//			   AfxMessageBox(_T("Try again"));
+	//			}
+	//		 
+	//		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+	//		m_FlexGrid1.SetFocus();
+	//		//FreshGrids();//lsc0928
+	//		return;
+	//		}
+	//	if(lRow==5 && m_bOut5PWM&&lCol>=6&&!m_bflexgrid1_or_2)
+	//		{
+	//		int CoastCol=m_PID1_heat_stages+6;
+	//		int nregNo;
+	//	 
+
+	//		int nValue=m_ItemValueCombx.GetCurSel();
+
+	//		//int nCol= m_FlexGrid1.get_ColSel()-5;
+	//		int nCol= lCol-5;
+	//	    nregNo=340+nCol;
+	//		nreg=multi_register_value[nregNo];
+	//		nreg=nreg&0xf0;
+	//		nValue=nreg|nValue;
+
+	//		int ret=write_one(g_tstat_id,nregNo,nValue);
+	//		if (ret>0)
+	//		{
+	//		  multi_register_value[nregNo]=nValue;
+	//		   
+	//		} 
+	//		else
+	//		{
+	//		  AfxMessageBox(_T("Try again"));
+	//		}
+	//		 
+	//		
+	//		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+	//		m_FlexGrid1.SetFocus();
+	//		//FreshGrids();//lsc0928
+	//		 return;
+	//		}
+	//	} 
+	//else
+	//	{
+	//				if(lRow==4 && m_bOut4PWM&&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
+	//		{
+	//		int CoastCol=m_PID1_heat_stages+6;
+	//		int nregNo;
+	//		int nValue=m_ItemValueCombx.GetCurSel();
+	//		int nCol= lCol-5;	
+
+	//	/*	if(nCol < (m_PID1_heat_stages+1))
+	//			nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
+	//		else
+	//			nPos = nCol - (m_PID1_heat_stages+1);*/
+
+	//		//nreg=read_one(tstat_id,341+nPos);
+	//		nregNo=340+nCol;
+	//		nreg=multi_register_value[nregNo];//341TSTAT6ÕÒ²»µ½¶ÔÓ¦
+	//		nreg=nreg&0x0f;
+	//		nValue=nValue<<4;
+	//		nValue=nreg|nValue;
+	//		int ret=write_one(g_tstat_id,nregNo,nValue);
+	//		if (ret>0)
+	//			{
+	//			   multi_register_value[nregNo]=nValue;
+	//			}
+	//			else
+	//			{
+	//			   AfxMessageBox(_T("Try again"));
+	//			}
+	//		 
+	//		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+	//		m_FlexGrid1.SetFocus();
+	//		//FreshGrids();//lsc0928
+	//		return;
+	//		}
+	//	if(lRow==5 && m_bOut5PWM&&lCol>=6&&!m_bflexgrid1_or_2)
+	//		{
+	//		int CoastCol=m_PID1_heat_stages+6;
+	//		int nregNo;
+	//	 
+
+	//		int nValue=m_ItemValueCombx.GetCurSel();
+
+	//		//int nCol= m_FlexGrid1.get_ColSel()-5;
+	//		int nCol= lCol-5;
+	//	    nregNo=340+nCol;
+	//		nreg=multi_register_value[nregNo];
+	//		nreg=nreg&0xf0;
+	//		nValue=nreg|nValue;
+
+	//		int ret=write_one(g_tstat_id,nregNo,nValue);
+	//		if (ret>0)
+	//		{
+	//		  multi_register_value[nregNo]=nValue;
+	//		   
+	//		} 
+	//		else
+	//		{
+	//		  AfxMessageBox(_T("Try again"));
+	//		}
+	//		 
+	//		
+	//		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+	//		m_FlexGrid1.SetFocus();
+	//		//FreshGrids();//lsc0928
+	//		 return;
+	//		} 
+	//	}
+
+
+	 
+if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
+	{
+#if 1//0911
+	if(g_OutPutLevel==1)
 		return;
+
+	m_ItemValueCombx.ShowWindow(SW_HIDE);
+
 	long lRow,lCol,nCounts;
 	CString strOldText;
 	CString strNewText;
-	if(!m_bflexgrid1_or_2)//m_bflexgrid1_or_2=0
-	{
+	if(!m_bflexgrid1_or_2)
+		{
 		lRow = m_FlexGrid1.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ	
-		lCol = m_FlexGrid1.get_ColSel();//»ñÈ¡µã»÷µÄÁÐºÅ
+		lCol = m_FlexGrid1.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
 		nCounts=m_FlexGrid1.get_Rows();
 
 		strOldText=m_FlexGrid1.get_TextMatrix(lRow,lCol);
@@ -3709,17 +4726,15 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 			return;
 		m_ItemValueCombx.GetLBText(nItem,strNewText);
 		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-		if (lCol<=5)
-		{
-		  OnWrite(m_bflexgrid1_or_2,lCol,lRow);
+		OnWrite(m_bflexgrid1_or_2,lCol,lRow);	
+
 		}
-			
-	}
 	else//grid 2
-	{
+		{
 		lRow = m_FlexGrid2.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ	
 		lCol = m_FlexGrid2.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
 		nCounts=m_FlexGrid2.get_Rows();
+
 		strOldText=m_FlexGrid2.get_TextMatrix(lRow,lCol);
 		if(strOldText.IsEmpty())
 			return;
@@ -3729,242 +4744,689 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 			return;
 		m_ItemValueCombx.GetLBText(nItem,strNewText);
 		m_FlexGrid2.put_TextMatrix(lRow,lCol,strNewText);
-		if (lCol<=5)
-		{
-		  OnWrite(m_bflexgrid1_or_2,lCol,lRow);
+		OnWrite(m_bflexgrid1_or_2,lCol,lRow);
+
+
+
 		}
-		
-	}
 	m_ItemValueCombx.ShowWindow(SW_HIDE);
 	//float are realized in onwrite:
-	
-		BYTE nreg;
-		BYTE ntemp;
 
+	BYTE nreg;
+	BYTE ntemp;
+	if(lRow==4 && m_bOut4PWM&&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
+		{
+		int CoastCol=m_PID1_heat_stages+6;
+		int nPos;
+		//	nPos=m_PID1_cool_stages;
+
+		//	CString strValue;
+		//	m_ItemValueCombx.GetWindowText(strValue);
+		//	int nValue=atoi(strValue);
+		int nValue=m_ItemValueCombx.GetCurSel();
+
+
+		int nCol= m_FlexGrid1.get_ColSel()-5;	
+
+		if(nCol < (m_PID1_heat_stages+1))
+			nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
+		else
+			nPos = nCol - (m_PID1_heat_stages+1);
+
+		//nreg=read_one(tstat_id,341+nPos);
+		nreg=multi_register_value[375+nPos];
+		nreg=nreg&0x0f;
+		nValue=nValue<<4;
+		nValue=nreg|nValue;
+		write_one(g_tstat_id,375+nPos,nValue);
+		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+		m_FlexGrid1.SetFocus();
+		FreshGrids();
+		return;
+		}
+	if(lRow==5 && m_bOut5PWM&&lCol>=6&&!m_bflexgrid1_or_2)
+		{
+		int CoastCol=m_PID1_heat_stages+6;
+		int nPos;
+		//	CString strValue;
+		//	m_ItemValueCombx.GetWindowText(strValue);
+
+		int nValue=m_ItemValueCombx.GetCurSel();
+
+		int nCol= m_FlexGrid1.get_ColSel()-5;
+		if(nCol < (m_PID1_heat_stages+1))
+			nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
+		else
+			nPos = nCol - (m_PID1_heat_stages+1);
+		//	nreg=read_one(tstat_id,341+nPos);
+		nreg=multi_register_value[375+nPos];
+		nreg=nreg&0xf0;
+		nValue=nreg|nValue;
+
+		write_one(g_tstat_id,375+nPos,nValue);
+		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+		m_FlexGrid1.SetFocus();
+		FreshGrids();
+		return;
+		}
+	/////FREE COOL:
+	//286	245	1	Low byte	W/R	Interlock for  output1
 
 	int nOutReg;
-	int	nValue;
-
-	//if (newtstat6[7] ==6)
-	if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
-	{
-		nOutReg = 245 + lRow-1;
-		nValue=newtstat6[nOutReg];
-
-	}else
-	{
-		nOutReg=286+lRow-1;
-		nValue=multi_register_value[nOutReg];
-	}
-	
-	//int	nValue=multi_register_value[nOutReg];
+	nOutReg=245+lRow-1;
+	int	nValue=multi_register_value[nOutReg];
 	if(nValue==7&&lCol>=6&&!m_bflexgrid1_or_2)
-	{
+		{
 
 		int nPos;
 		//CString strValue;
 		//m_ItemValueCombx.GetWindowText(strValue);
 		int nValue=m_ItemValueCombx.GetCurSel();
 
-		lCol=lCol-5;
+		lCol=lCol-5;	
+
+		if(lCol < (m_PID1_heat_stages+1))
+			nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - lCol ;
+		else
+			nPos = lCol - (m_PID1_heat_stages+1);	
+		//362	125	1	Low byte	W/R	ANALOG INPUT4 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
+
+		if(m_fan.GetCurSel()==0)
+			{
+			int ndata;
+			nValue=nValue<<4;
+			int nReg=125+nPos;
+			ndata=multi_register_value[125+nPos];
+			if(ndata>=0)
+				{
+				ndata=ndata&0x0F;//Çåµô4-7Î»
+				nValue=nValue|ndata;
+				write_one(g_tstat_id,362+nPos,nValue);
+				}
+			}
+		else//fan speed is not off.
+			{
+			int ndata;
+			int nReg=125+nPos;
+			ndata=multi_register_value[125+nPos];
+			ndata=ndata&0xF0;
+			if(ndata>=0)
+				{
+				nValue=nValue|ndata;
+				write_one(g_tstat_id,125+nPos,nValue);
+				}
+			}
+		m_FlexGrid1.SetFocus();
+		FreshGrids();
+		return;
+		}
+
+#endif
+	}
+else
+	{
+#if 1//0911
+	if(g_OutPutLevel==1)
+		return;
+
+	m_ItemValueCombx.ShowWindow(SW_HIDE);
+
+	long lRow,lCol,nCounts;
+	CString strOldText;
+	CString strNewText;
+
+#if 1
+	if(!m_bflexgrid1_or_2)//´¦Àí1-3ÐÐ
+		{
+		//	lRow = m_FlexGrid1.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ	
+		lRow = pid1lrow; //Èç¹û²»ÕâÑù£¬ÄÇÃ´£¬ÐÞ¸ÄµÚÒ»ÈÎÒâÅÅ£¬ÔòµÚ5ÅÅ»á×Ô¶¯±ä»á¡£
+		lCol = m_FlexGrid1.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
+		nCounts=m_FlexGrid1.get_Rows();
+
+		strOldText=m_FlexGrid1.get_TextMatrix(lRow,lCol);
+		if(strOldText.IsEmpty())
+			return;
+
+		m_ItemValueCombx.GetWindowText(strNewText);
+		int nItem=m_ItemValueCombx.GetCurSel();
+		if(nItem<0)
+			return;
+		m_ItemValueCombx.GetLBText(nItem,strNewText);
+		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+		if (lCol<=5)
+			{
+			OnWrite(m_bflexgrid1_or_2,lCol,lRow);
+			} 
+		
+		}
+	else//grid 2
+		{		//lRow = m_FlexGrid2.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ
+		lRow = pid2lrow;
+
+		//lRow = m_FlexGrid2.get_Row();//»ñÈ¡µã»÷µÄÐÐºÅ	 2.5.0.94 ÒÔÇ°Ö»ÒªPID£¬OUTPUT6£¬7£¬Ö»ÒªÐÞ¸Ä6ÐÐ£¬7ÐÐ×Ô¶¯¸Ä±ä¡£
+		lCol = m_FlexGrid2.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
+		nCounts=m_FlexGrid2.get_Rows();
+
+
+
+		//////////////////////////////////////////////////////////////////////////2.5.0.99
+
+
+
+	
+		strOldText=m_FlexGrid2.get_TextMatrix(lRow,lCol);
+		if(strOldText.IsEmpty())
+			return;
+		m_ItemValueCombx.GetWindowText(strNewText);
+		int nItem=m_ItemValueCombx.GetCurSel();
+		if(nItem<0)
+			return;
+		m_ItemValueCombx.GetLBText(nItem,strNewText);
+		m_FlexGrid2.put_TextMatrix(lRow,lCol,strNewText); //2.5.0.94
+
+		 
+		if (lCol<=5)
+			{
+			OnWrite(m_bflexgrid1_or_2,lCol,lRow);
+			} 
+
+
+		}
+#endif
+	m_ItemValueCombx.ShowWindow(SW_HIDE);
+	//float are realized in onwrite:
+	////---4-5ÐÐ
+	BYTE nreg;
+	BYTE ntemp;
+	if(lRow==4 && m_bOut4PWM&&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
+		{
+		int CoastCol=m_PID1_heat_stages+6;
+		int nPos;
+		//	nPos=m_PID1_cool_stages;
+
+		//	CString strValue;
+		//	m_ItemValueCombx.GetWindowText(strValue);
+		//	int nValue=atoi(strValue);
+		int nValue=m_ItemValueCombx.GetCurSel();
+
+
+		int nCol= m_FlexGrid1.get_ColSel()-5;	
+
+		if(nCol < (m_PID1_heat_stages+1))
+			nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
+		else
+			nPos = nCol - (m_PID1_heat_stages+1);
+
+		//nreg=read_one(tstat_id,341+nPos);
+		nreg=multi_register_value[341+nPos];
+		nreg=nreg&0x0f;
+		nValue=nValue<<4;
+		nValue=nreg|nValue;
+		write_one(g_tstat_id,341+nPos,nValue);
+		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+		m_FlexGrid1.SetFocus();
+		//	FreshGrids();//lsc 20120928
+		return;
+		}
+	if(lRow==5 && m_bOut5PWM&&lCol>=6&&!m_bflexgrid1_or_2)
+		{
+		int CoastCol=m_PID1_heat_stages+6;
+		int nPos;
+		//	CString strValue;
+		//	m_ItemValueCombx.GetWindowText(strValue);
+
+		int nValue=m_ItemValueCombx.GetCurSel();
+
+		int nCol= m_FlexGrid1.get_ColSel()-5;
+		if(nCol < (m_PID1_heat_stages+1))
+			nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
+		else
+			nPos = nCol - (m_PID1_heat_stages+1);
+		//	nreg=read_one(tstat_id,341+nPos);
+		nreg=multi_register_value[341+nPos];
+		nreg=nreg&0xf0;
+		nValue=nreg|nValue;
+
+		write_one(g_tstat_id,341+nPos,nValue);
+		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+		m_FlexGrid1.SetFocus();
+		//FreshGrids(); //lsc 20120928
+		return;
+		}
+/////////////6-7ÐÐ
+//if ((lRow>=6)&&lCol>=6)
+//{
+//  if(bflexgrid1_or_2==false)
+//		{//grid one 1
+//
+//			if((col-5) < (m_PID1_heat_stages+1))
+//				pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - (col-5) ;
+//			else
+//				pos = (col-5) - (m_PID1_heat_stages+1);
+//			m_FlexGrid1.put_Col(col);
+//	
+//			for( row_temp = 1;row_temp<=totalrows;row_temp++)//***********************row_temp==totalrows+1
+//			{
+//				m_FlexGrid1.put_Row(row_temp);	
+//				strItem=m_FlexGrid1.get_TextMatrix(row_temp,col);
+//				if(string2digital(strItem,cellval,ty))
+//				{
+//					if(row_temp == 1)
+//						tstatval &= 0xFE;
+//					if(row_temp == 2)
+//						tstatval &= 0xFD;
+//					if(row_temp == 3)
+//						tstatval &= 0xFB ;
+//					if(!m_bFloat)//not floater out 4 and out5
+//					{
+//						if(row_temp == 4&&!m_bOut4PWM)
+//							tstatval &= 0xF7;
+//						if(row_temp == 5&&!m_bOut5PWM)
+//							tstatval &= 0xEF;
+//					}
+//					else
+//					{
+//						if(row_temp==4)
+//							break;
+//					}
+//					
+//					tstatval |= cellval << (row_temp -1) ;
+//				}
+//			}
+//			int n=get_real_fan_select() ;
+//			//138	288	1	Low byte	W/R	FAN0_OPERATION_TABLE_COAST
+//			if ((newtstat6[7] ==7)||(newtstat6[7] ==6))
+//			{
+//				write_one(g_tstat_id,288+get_real_fan_select() * 7 + pos,tstatval);		
+//				newtstat6[288+get_real_fan_select() * 7] = tstatval;
+//			}
+//			else
+//			{
+//				write_one(g_tstat_id,138+get_real_fan_select() * 7 + pos,tstatval);
+//			}
+//
+//			if(m_bFloat)
+//			{
+//				int nValue=0;
+//				if(row==4&&output3_value==1)
+//				{
+//					strItem=m_FlexGrid1.get_TextMatrix(row,col);
+//					if(string2digital(strItem,cellval,ty) )
+//					{
+//						tstatval=tstatval&0xCF;
+//						nValue= cellval << 4 ;
+//						tstatval|=nValue;
+//					}
+//					//351	334	1	Low byte	W/R	analog output in OFF table, coating mode,bit1 means AO1 : 1 = on, 0 = off    bit3 means AO2 : 1 = on, 0 = off
+//					//173	323	1	Low byte	W/R	VALVE_OPER_TABLE_COAST, Analog output state for each of the 7 modes of operation
+//
+//					if(m_fan.GetCurSel()==0)
+//					{
+//						//if (newtstat6[7] == 6)
+//// 						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+//// 						{
+//// 							write_one(g_tstat_id,334+pos,tstatval);
+//// 							newtstat6[334+pos] = tstatval;
+//// 						}
+//// 						else
+//// 						{
+//							//write_one(g_tstat_id,351+pos,tstatval);
+////						}
+//						if (m_pids == 1)
+//						{
+//							write_one(g_tstat_id,385+pos,tstatval);//lsc add ,Ä¿Ç°Ö»ÓÐµ±µÚÒ»¸öÑ¡ÔñÎªPID2£¬ÏÂÃæµÄ²ÅÐ´µ½Õâ¸ö¼Ä´æÆ÷ÖÐ
+//						}else
+//						{
+//							write_one(g_tstat_id,351+pos,tstatval);
+//						}
+//					}
+//					else
+//					{
+//						//if (newtstat6[7] == 6)
+//						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+//						{
+//							write_one(g_tstat_id,323+pos,tstatval);
+//							newtstat6[323+pos] = tstatval;
+//						}
+//						else
+//						{
+//							write_one(g_tstat_id,173+pos,tstatval);
+//						}
+//					}
+//				}
+//				if(row==5&&output4_value==1)
+//				{
+//					strItem=m_FlexGrid1.get_TextMatrix(row,col);
+//					if(string2digital(strItem,cellval,ty) )
+//					{
+//						tstatval=tstatval&0xCF;
+//						nValue= cellval << 4 ;
+//						tstatval|=nValue;
+//					}
+//					if(m_fan.GetCurSel()==0)
+//// 						write_one(g_tstat_id,351+pos,tstatval);
+//// 					else
+//// 						write_one(g_tstat_id,173+pos,tstatval);
+//
+//					{
+//						//if (newtstat6[7] == 6)
+//						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+//						{
+//							write_one(g_tstat_id,334+pos,tstatval);
+//							newtstat6[334+pos] = tstatval;
+//						}
+//						else
+//						{
+//							write_one(g_tstat_id,351+pos,tstatval);
+//						}
+//					}
+//					else
+//					{
+//						//if (newtstat6[7] == 6)
+//						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+//						{
+//							write_one(g_tstat_id,323+pos,tstatval);
+//							newtstat6[323+pos]= tstatval;
+//						}
+//						else
+//						{
+//							write_one(g_tstat_id,173+pos,tstatval);
+//						}
+//					}
+//				}
+//			}
+//						
+//			if(m_fan.GetCurSel()==0)
+//			{
+//				//if (newtstat6[7] == 6)
+//				if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+//				{
+//					tstatval=newtstat6[334+pos];
+//				}
+//				else
+//				{
+//					tstatval=multi_register_value[351+pos];
+//				}
+//			}
+//			else
+//			{
+//				//if (newtstat6[7] == 6)
+//				if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+//				{
+//					tstatval=newtstat6[323+pos];
+//				}
+//				else
+//				{
+//					tstatval=multi_register_value[173+pos];
+//				}
+//			}
+//// 				tstatval=multi_register_value[351+pos];
+//// 			else
+//// 				tstatval=multi_register_value[173+pos];
+//
+//			if(m_nmoduleType == 1 || m_nmoduleType == 3)
+//			{
+//				if(m_nmoduleType == 1)
+//					totalrows = 4 ;////////////////
+//				else
+//					totalrows = 6 ;////////////////
+//				if((col-5) < (m_PID1_heat_stages+1))
+//					pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - (col-5) ;
+//				else
+//					pos = (col-5) - (m_PID1_heat_stages+1);
+//				m_FlexGrid1.put_Col(col);
+//				tstatval &= 0x3F ;//clear 7 bit and 8 bit  for 0-50
+//			
+//				for( row_temp=totalrows;row_temp<=totalrows+1;row_temp++)
+//				{
+//					CString strItemText=m_FlexGrid1.get_TextMatrix(row_temp,col);
+//				//	m_FlexGrid1.put_Row(row_temp);	
+//					if(string2digital(strItemText,cellval,ty))
+//					{						
+//						if(cellval==4 )
+//						{//for 0-50
+//							if(row_temp==totalrows)
+//								tstatval |=64;//µÚ6Î»
+//							else if(row_temp==(totalrows+1))//0-50
+//								tstatval |=128;//µÚ7Î»
+//						}
+//						else
+//						{
+//							if(row_temp == totalrows)
+//							{
+//								tstatval &= 0xFC ;//1111 1100
+//							}
+//							if(row_temp == totalrows+1)
+//							{
+//								tstatval &= 0xF3 ;//1111 0011
+//								cellval <<= 2 ; 
+//							}
+//								tstatval |= cellval  ;
+//						}						
+//					}
+//				}
+//				int ret = 0;
+//				if(m_fan.GetCurSel()==0)
+// 
+//				{
+//				 
+//					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+//					{
+//						write_one(g_tstat_id,334+pos,tstatval);
+//						newtstat6[334+pos] = tstatval;
+//					}
+//					else
+//					{
+//						ret = write_one(g_tstat_id,351+pos,tstatval);
+// 						 
+//
+//					}
+//				}
+//				else
+//				{
+//					//if (newtstat6[7] == 6)
+//					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+//					{
+//						write_one(g_tstat_id,323+pos,tstatval);
+//						newtstat6[323+pos] = tstatval;
+//					}
+//					else
+//					{
+//						ret = write_one(g_tstat_id,173+pos,tstatval);
+//// 						if (ret<=0)
+//// 							AfxMessageBox(_T("setting failure!"));
+//					}
+//				}
+//
+//			}
+//		}
+//   else//grid 2:
+//		{
+//			int ret1= 0;
+//			if((col-5) < (m_PID2_heat_stages+1))
+//				pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+//			else
+//				pos = (col-5) - (m_PID2_heat_stages+1);
+//			m_FlexGrid2.put_Col(col);////////////////////////////////////////////////////////
+//			for( row_temp = 1;row_temp<=totalrows;row_temp++)//***********************row_temp==totalrows+1
+//			{
+//				m_FlexGrid2.put_Row(row_temp);////////////////////////////////////////////////////
+//				if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+//				{
+//					if(row_temp == 1)
+//						tstatval &= 0xFE;
+//					if(row_temp == 2)
+//						tstatval &= 0xFD;
+//					if(row_temp == 3)
+//						tstatval &= 0xFB ;
+//					if(row_temp == 4)
+//						tstatval &= 0xF7;
+//					if(row_temp == 5)
+//						tstatval &= 0xEF;
+//					tstatval |= cellval << (row_temp -1) ;
+//				}
+//
+//			}
+//			//254	281	1	Low byte	W/R	PID2 Output table- Coasting
+//
+//			if ((newtstat6[7] ==6)||(newtstat6[7] ==7))
+//			{
+//				write_one(g_tstat_id,281 + pos,tstatval);
+//				newtstat6[281 + pos] = tstatval;
+//			}
+//			else if (multi_register_value[7] == 18 )//2.5.0.94
+//			{	
+//				if(m_fan.GetCurSel()==0)
+//				{
+//					ret1 = write_one(g_tstat_id,385 + pos,tstatval);
+//// 					if (ret1<=0)
+//// 						AfxMessageBox(_T("setting failure!"));
+//				}else
+//				{
+//					ret1 = write_one(g_tstat_id,254 + pos,tstatval);
+//// 					if (ret1<=0)
+//// 						AfxMessageBox(_T("setting failure!"));
+//				}
+//			}
+//			else
+//			{
+//				write_one(g_tstat_id,254 + pos,tstatval);
+//			}
+//
+//			if(m_nmoduleType == 1 || m_nmoduleType == 3)
+//			{
+//				if(m_nmoduleType == 1)
+//					totalrows = 4 ;////////////////
+//				else
+//					totalrows = 6 ;////////////////
+//				if((col-5) < (m_PID2_heat_stages+1))
+//					pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+//				else
+//					pos = (col-5) - (m_PID2_heat_stages+1);
+//				m_FlexGrid2.put_Col(col);
+//				//tstatval &= 0x3F ;//clear 7 bit and 8 bit  for 0-50
+//				tstatval=0;
+//				for( row_temp=totalrows;row_temp<=totalrows+1;row_temp++)
+//				{
+//					m_FlexGrid2.put_Row(row_temp);	
+//					if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+//					{
+//						if(cellval==4 )
+//						{//for 0-50
+//							if(row_temp==totalrows)
+//								tstatval |=64;
+//							else if(row_temp==(totalrows+1))
+//								tstatval |=128;
+//						}
+//						else
+//						{
+//							if(row_temp == totalrows)
+//							{
+//								tstatval &= 0xFC ;
+//							}
+//							if(row_temp == totalrows+1)
+//							{
+//								tstatval &= 0xF3 ;
+//								cellval <<= 2 ; 
+//							}
+//							tstatval |= cellval  ;
+//						}
+//					}
+//
+//				}
+// 
+//
+//
+//				if(m_fan.GetCurSel()==0)
+//				{
+//					//write_one(g_tstat_id,351+pos,tstatval);
+//
+//					int ret392 = 0;
+//					ret392 = write_one(g_tstat_id,392+pos,tstatval);//2.5.0.93
+//					if (ret392>0)
+//					{
+//						multi_register_value[392+pos] = tstatval;
+//					}else
+//					{
+//							//AfxMessageBox(_T("setting failure!"));
+//					}
+//					
+//				}
+//				else
+//				{
+//					//write_one(g_tstat_id,173+pos,tstatval);
+//					int ret392 = 0;
+//					ret392 = write_one(g_tstat_id,261+pos,tstatval);//2.5.0.93
+//					if (ret392>0)
+//					{
+//						multi_register_value[261+pos] = tstatval;
+//					}else
+//					{
+//						//AfxMessageBox(_T("setting failure!"));
+//					}
+//					
+//				}
+//
+//			}
+//		}
+//}
+
+
+
+
+
+	int nOutReg;
+	nOutReg=286+lRow-1;
+	int	nValue=multi_register_value[nOutReg];
+	if(nValue==7&&lCol>=6&&!m_bflexgrid1_or_2)
+		{
+
+		int nPos;
+		//CString strValue;
+		//m_ItemValueCombx.GetWindowText(strValue);
+		int nValue=m_ItemValueCombx.GetCurSel();
+
+		lCol=lCol-5;	
+
 		if(lCol < (m_PID1_heat_stages+1))
 			nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - lCol ;
 		else
 			nPos = lCol - (m_PID1_heat_stages+1);	
 
-		if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
-		{
-			if(m_fan.GetCurSel()==0)
-			{
-				int ndata;
-				nValue=nValue<<4;
-				int nReg=362+nPos;
-				ndata=newtstat6[125+nPos];
-				if(ndata>=0)
-				{
-					ndata=ndata&0x0F;//Çåµô4-7Î»
-					nValue=nValue|ndata;
-					write_one(g_tstat_id,125+nPos,nValue);
-					newtstat6[125] = nValue;
-
-					m_ItemValueCombx.GetWindowText(strNewText);
-					//int nItemwww=m_ItemValueCombx.GetCurSel();
-					m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-				}
-			}
-			else//fan speed is not off.
-			{
-				int ndata;
-				int nReg=125+nPos;
-				ndata=multi_register_value[125+nPos];
-				ndata=ndata&0xF0;
-				if(ndata>=0)
-				{
-					nValue=nValue|ndata;
-					write_one(g_tstat_id,125+nPos,nValue);
-					newtstat6[125] = nValue;
-				}
-			}
-		}
-		else
-		{
 		if(m_fan.GetCurSel()==0)
-		{
+			{
 			int ndata;
 			nValue=nValue<<4;
 			int nReg=362+nPos;
 			ndata=multi_register_value[362+nPos];
 			if(ndata>=0)
-			{
+				{
 				ndata=ndata&0x0F;//Çåµô4-7Î»
 				nValue=nValue|ndata;
 				write_one(g_tstat_id,362+nPos,nValue);
-
-				m_ItemValueCombx.GetWindowText(strNewText);
-				//int nItemwww=m_ItemValueCombx.GetCurSel();
-				m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
+				}
 			}
-		}
 		else//fan speed is not off.
-		{
-		int ndata;
-		int nReg=362+nPos;
-		ndata=multi_register_value[362+nPos];
-		ndata=ndata&0xF0;
-		if(ndata>=0)
 			{
-			nValue=nValue|ndata;
-			write_one(g_tstat_id,362+nPos,nValue);
+			int ndata;
+			int nReg=362+nPos;
+			ndata=multi_register_value[362+nPos];
+			ndata=ndata&0xF0;
+			if(ndata>=0)
+				{
+				nValue=nValue|ndata;
+				write_one(g_tstat_id,362+nPos,nValue);
+				}
 			}
-		}
-		}
-
 		m_FlexGrid1.SetFocus();
-	//	FreshGrids();//lsc0928
+		//	FreshGrids(); //lsc20120928
 		return;
-	}
-	if (multi_register_value[7]==16)//5E
-		{
-		if(lRow==4 && m_bOut4PWM&&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
-			{
-			int CoastCol=m_PID1_heat_stages+6;
-			int nregNo;
-			int nValue=m_ItemValueCombx.GetCurSel();
-			int nCol= lCol-5;	
-
-		/*	if(nCol < (m_PID1_heat_stages+1))
-				nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
-			else
-				nPos = nCol - (m_PID1_heat_stages+1);*/
-
-			//nreg=read_one(tstat_id,341+nPos);
-			nregNo=340+nCol;
-			nreg=multi_register_value[nregNo];//341TSTAT6ÕÒ²»µ½¶ÔÓ¦
-			nreg=nreg&0x0f;
-			nValue=nValue<<4;
-			nValue=nreg|nValue;
-			int ret=write_one(g_tstat_id,nregNo,nValue);
-			if (ret>0)
-				{
-				   multi_register_value[nregNo]=nValue;
-				}
-				else
-				{
-				   AfxMessageBox(_T("Try again"));
-				}
-			 
-			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-			m_FlexGrid1.SetFocus();
-			//FreshGrids();//lsc0928
-			return;
-			}
-		if(lRow==5 && m_bOut5PWM&&lCol>=6&&!m_bflexgrid1_or_2)
-			{
-			int CoastCol=m_PID1_heat_stages+6;
-			int nregNo;
-		 
-
-			int nValue=m_ItemValueCombx.GetCurSel();
-
-			//int nCol= m_FlexGrid1.get_ColSel()-5;
-			int nCol= lCol-5;
-		    nregNo=340+nCol;
-			nreg=multi_register_value[nregNo];
-			nreg=nreg&0xf0;
-			nValue=nreg|nValue;
-
-			int ret=write_one(g_tstat_id,nregNo,nValue);
-			if (ret>0)
-			{
-			  multi_register_value[nregNo]=nValue;
-			   
-			} 
-			else
-			{
-			  AfxMessageBox(_T("Try again"));
-			}
-			 
-			
-			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-			m_FlexGrid1.SetFocus();
-			//FreshGrids();//lsc0928
-			 return;
-			}
-		} 
-	else
-		{
-		if(lRow==4 && m_bOut4PWM&&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
-			{
-			int CoastCol=m_PID1_heat_stages+6;
-			int nPos;
-			int nValue=m_ItemValueCombx.GetCurSel();
-			int nCol= lCol-5;	
-
-			if(nCol < (m_PID1_heat_stages+1))
-				nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
-			else
-				nPos = nCol - (m_PID1_heat_stages+1);
-
-			//nreg=read_one(tstat_id,341+nPos);
-			nreg=multi_register_value[341+nPos];//341TSTAT6ÕÒ²»µ½¶ÔÓ¦
-			nreg=nreg&0x0f;
-			nValue=nValue<<4;
-			nValue=nreg|nValue;
-			write_one(g_tstat_id,341+nPos,nValue);
-			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-			m_FlexGrid1.SetFocus();
-			//FreshGrids();//lsc0928
-			return;
-			}
-		if(lRow==5 && m_bOut5PWM&&lCol>=6&&!m_bflexgrid1_or_2)
-			{
-			int CoastCol=m_PID1_heat_stages+6;
-			int nPos;
-			//	CString strValue;
-			//	m_ItemValueCombx.GetWindowText(strValue);
-
-			int nValue=m_ItemValueCombx.GetCurSel();
-
-			//int nCol= m_FlexGrid1.get_ColSel()-5;
-			int nCol= lCol-5;
-			if(nCol < (m_PID1_heat_stages+1))
-				nPos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - nCol ;
-			else
-				nPos = nCol - (m_PID1_heat_stages+1);
-			//	nreg=read_one(tstat_id,341+nPos);
-			nreg=multi_register_value[341+nPos];
-			nreg=nreg&0xf0;
-			nValue=nreg|nValue;
-
-			write_one(g_tstat_id,341+nPos,nValue);
-			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-			m_FlexGrid1.SetFocus();
-			//FreshGrids();//lsc0928
-			return;
-			}
 		}
 
 
+#endif
+	}
+ 
 }
 
 void COutPutDlg::ClickMsflexgrid2()
@@ -4065,13 +5527,11 @@ void COutPutDlg::ClickMsflexgrid2()
 			 {
 			 nOutReg=245+m_nCurRow-1;
 			 nValue=newtstat6[nOutReg];
-
-
 			 }else
 			 {
 			 nOutReg=286+m_nCurRow-1;
 			 nValue=multi_register_value[nOutReg];
-				 }
+			 }
 
 
 			 if (multi_register_value[336]==2)
@@ -4091,11 +5551,9 @@ void COutPutDlg::ClickMsflexgrid2()
 				 m_bOut5PWM=FALSE;
 				 }
 
-			 //int nValue=read_one(tstat_id,nOutReg);
-			 //nValue=multi_register_value[nOutReg];
+		
 #if 1
-			 //if(nValue==7&&(!m_bOut4PWM)&&(!m_bOut5PWM))
-			 //if((nValue==7&&lRow<4)||(lRow==4 && !m_bOut4PWM&&nValue==7)||(lRow==5 && !m_bOut5PWM&&nValue==7))
+			
 			 if((nValue==7&&lRow<4)||(lRow==4 && !m_bOut4PWM&&nValue==7)||(lRow==5 && !m_bOut5PWM&&nValue==7)||(nValue==7&&lRow>5))//20121008
 				 {
 				 m_ItemValueCombx.ResetContent();
@@ -4129,14 +5587,7 @@ void COutPutDlg::ClickMsflexgrid2()
 					 {
 					 if (multi_register_value[280+lRow-1]==1)
 						 {
-						 //m_ItemValueCombx.ResetContent();
-
-
-						 //m_ItemValueCombx.ShowWindow(SW_SHOW);//ÏÔÊ¾¿Ø¼þ
-						 //m_ItemValueCombx.MoveWindow(rc); //ÒÆ¶¯µ½Ñ¡ÖÐ¸ñµÄÎ»ÖÃ£¬¸²¸Ç
-						 //m_ItemValueCombx.BringWindowToTop();
-						 //m_ItemValueCombx.SelectString(-1,strValue); //ÄÚÈÝÈ«Ñ¡¡£·½±ãÖ±½ÓÐÞ¸Ä		
-						 //m_ItemValueCombx.SetFocus(); //»ñÈ¡½¹µã
+						 
 						 } 
 					 else
 						 {
@@ -4154,8 +5605,7 @@ void COutPutDlg::ClickMsflexgrid2()
 				 else
 					 {
 					 m_ItemValueCombx.ResetContent();
-					 //m_ItemValueCombx.AddString(_T("Off"));
-					 //m_ItemValueCombx.AddString(_T("On"));
+ 
 					 m_ItemValueCombx.AddString(_T("Close"));
 					 m_ItemValueCombx.AddString(_T("Open"));
 					 m_ItemValueCombx.AddString(_T("0-100"));
@@ -4231,7 +5681,6 @@ void COutPutDlg::OnEnKillfocusPid2Heatstageedit2()
 	else
 	{
 		//268	330	1	Low byte	W/R	Number of Heating Stages (Max heat+cool = 6)
-
 		//if (newtstat6[7] == PM_TSTAT6)
 		if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
 		{
@@ -4240,8 +5689,15 @@ void COutPutDlg::OnEnKillfocusPid2Heatstageedit2()
 			FreshGrid_PID2tstat6();
 		}else
 		{
-			write_one(g_tstat_id,268,m_PID2_heat_stages);
-			FreshGrid_PID2();
+			        int ret=write_one(g_tstat_id,268,m_PID2_heat_stages);
+			        if (ret>0)
+			        {
+					FreshGrid_PID2();
+			        } 
+			        else
+			        {
+			        }
+			        
 		}
 
 	}
@@ -4274,8 +5730,15 @@ void COutPutDlg::OnEnKillfocusPid2coolstageedit2()
 			FreshGrid_PID2tstat6();
 		}else
 		{
-			write_one(g_tstat_id,269,m_PID2_cool_stages);
+			int ret=write_one(g_tstat_id,269,m_PID2_cool_stages);
+			if (ret>0)
+			{
 			FreshGrid_PID2();
+			} 
+			else
+			{
+			}
+			
 		}
 
 	}
@@ -4293,7 +5756,7 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 	m_DescriptEdt.GetWindowText(strText);
 	m_DescriptEdt.ShowWindow(SW_HIDE);
 //int lRow = m_Output_Grid.get_RowSel();//»ñÈ¡µã»÷µÄÐÐºÅ	
-//	int lCol = m_Output_Grid.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
+//int lCol = m_Output_Grid.get_ColSel(); //»ñÈ¡µã»÷µÄÁÐºÅ
 
 	CString strInName;
 	switch (m_nCurRow)
@@ -4323,8 +5786,6 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 	if(strText.CompareNoCase(strInName)==0)
 		return;
 		
-
-	//if(g_serialNum>0&&multi_register_value[6]>0)
 	if(multi_register_value[6]>0)
 	{
 		_ConnectionPtr m_ConTmp;

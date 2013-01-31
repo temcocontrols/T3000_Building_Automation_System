@@ -39,7 +39,8 @@ CNetworkControllView::CNetworkControllView()
 	, m_strTime(_T(""))
 	, m_nListenPort(6001)
 	, m_bWarningBldVersion(FALSE)
-{
+	, m_Mac_Address(_T(""))
+	{
 	
 }
 
@@ -50,27 +51,28 @@ CNetworkControllView::~CNetworkControllView()
 
 void CNetworkControllView::DoDataExchange(CDataExchange* pDX)
 {
-	CFormView::DoDataExchange(pDX);
+CFormView::DoDataExchange(pDX);
 
-	DDX_Text(pDX, IDC_IDADDRESS_EDIT, m_IDaddress);
-	DDX_Text(pDX, IDC_SERIALNUM_EDIT, m_nSerialNum);
-	DDX_Text(pDX, IDC_EDIT4, m_firmwareVersion);
-	DDX_Text(pDX, IDC_EDIT5, m_hardware_version);
-	DDX_Text(pDX, IDC_EDIT6, m_strDate);
-	DDX_Text(pDX, IDC_EDIT7, m_strTime);
-	DDX_Text(pDX, IDC_EDIT8, m_nListenPort);
+DDX_Text(pDX, IDC_IDADDRESS_EDIT, m_IDaddress);
+DDX_Text(pDX, IDC_SERIALNUM_EDIT, m_nSerialNum);
+DDX_Text(pDX, IDC_EDIT4, m_firmwareVersion);
+DDX_Text(pDX, IDC_EDIT5, m_hardware_version);
+DDX_Text(pDX, IDC_EDIT6, m_strDate);
+DDX_Text(pDX, IDC_EDIT7, m_strTime);
+DDX_Text(pDX, IDC_EDIT8, m_nListenPort);
 
 
-	DDX_Control(pDX, IDC_CHECK1, m_ReadOnlyCheckBtn);
-	DDX_Control(pDX, IDC_IPMODEL_COMBO, m_ipModelComBox);
-	DDX_Control(pDX, IDC_IPADDRESS1, m_ip_addressCtrl);
-	DDX_Control(pDX, IDC_IPADDRESS2, m_subnet_addressCtrl);
-	DDX_Control(pDX, IDC_IPADDRESS3, m_gateway_addressCtrl);
-	DDX_Control(pDX, IDC_EDIT8, m_listenPortEdit);
-	DDX_Control(pDX, IDC_BAUDRATE_COMBX, m_baudRateCombox);
-	DDX_Control(pDX, IDC_IDADDRESS_EDIT, m_idEdt);
-	DDX_Control(pDX, IDC_MSFLEXGRID_SUB, m_gridSub);
-}
+DDX_Control(pDX, IDC_CHECK1, m_ReadOnlyCheckBtn);
+DDX_Control(pDX, IDC_IPMODEL_COMBO, m_ipModelComBox);
+DDX_Control(pDX, IDC_IPADDRESS1, m_ip_addressCtrl);
+DDX_Control(pDX, IDC_IPADDRESS2, m_subnet_addressCtrl);
+DDX_Control(pDX, IDC_IPADDRESS3, m_gateway_addressCtrl);
+DDX_Control(pDX, IDC_EDIT8, m_listenPortEdit);
+DDX_Control(pDX, IDC_BAUDRATE_COMBX, m_baudRateCombox);
+DDX_Control(pDX, IDC_IDADDRESS_EDIT, m_idEdt);
+DDX_Control(pDX, IDC_MSFLEXGRID_SUB, m_gridSub);
+DDX_Text(pDX, IDC_MAC_ADDRESS, m_Mac_Address);
+	}
 
 BEGIN_MESSAGE_MAP(CNetworkControllView, CFormView)
 	ON_WM_ERASEBKGND()
@@ -227,9 +229,8 @@ void CNetworkControllView::Fresh()
 		m_ipModelComBox.SetCurSel(1);
 	}
 
-
-	
 	m_nListenPort=multi_register_value[120];
+	m_Mac_Address=Get_MAC_Address();
 	InitGrid();
 
 	UpdateData(false);
@@ -815,6 +816,12 @@ float CNetworkControllView::GetFirmwareVersion()
 	
 	return m_firmwareVersion;
 }
+CString CNetworkControllView::Get_MAC_Address()
+{
+  CString Mac_ADD;
+  Mac_ADD.Format(_T("%02x-%02x-%02x-%02x-%02x-%02x"),multi_register_value[100],multi_register_value[101],multi_register_value[102],multi_register_value[103],multi_register_value[104],multi_register_value[105]);
+  return Mac_ADD;
+}
 
 /*
 FunctionName:CheckSettingChanged
@@ -1093,7 +1100,7 @@ void CNetworkControllView::InitGrid()
 	WORD data[30*500+2];
 	memset(data,0,sizeof(data));
 	int ret3 = Read_One(g_tstat_id,7001);
-	int ret = Read_One(g_tstat_id,7000);//NC扫描到的TSTAT数量,2个字节 先放在高字节
+	 int ret = Read_One(g_tstat_id,7000);//NC扫描到的TSTAT数量,2个字节 先放在高字节
 	if (ret>0&&ret<4)
 	{
 		Read_Multi(g_tstat_id,&data[0],7002,ret*30);
@@ -1122,7 +1129,8 @@ void CNetworkControllView::InitGrid()
 		}
 
 		
-	}else
+	}
+	else
 	{
 		ret = 0;
 	}
@@ -1184,7 +1192,7 @@ void CNetworkControllView::InitGrid()
 		case 27:strtemp1=g_strTstat7;break;
 		case 13:
 		case 14:break;
-		default:strtemp1=g_strTstat5a;break;
+		default:strtemp1=_T("UNUSED")/*g_strTstat5a*/;break;
 		}
 		m_gridSub.put_TextMatrix(i,1,strtemp1);
 
@@ -1316,9 +1324,6 @@ void  CNetworkControllView::AddNodeToNCTable(unsigned short* pNode)
 	
 	strTemp.Format(_T("%d:%d"), nHour, nMin);
 	m_gridSub.put_TextMatrix(nRow,TIMESINCE_FIELD,strTemp);
-
-
-
 }
 
 

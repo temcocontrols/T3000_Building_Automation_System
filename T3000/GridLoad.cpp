@@ -89,11 +89,8 @@ UINT Check_LoadStatus(LPVOID pParameter)
 	//pDlg->EndWaitCursor();
 	return 1;
 }
-/*
-run_back_ground_load_thread
-Only For Tstat.
 
-*/
+
 UINT run_back_ground_load_thread(LPVOID pParam)
 {
 	CGridLoad* pDlg=(CGridLoad*)pParam;
@@ -291,11 +288,10 @@ END_MESSAGE_MAP()
 
 void CGridLoad::OnBnClickedButton4()
 {
-	//SendMessage(WM_CLOSE,0,0);
-	 CDialog::OnOK();
+	SendMessage(WM_CLOSE,0,0);
 	// TODO: Add your control notification handler code here
 }
-//初始OnInitDialog
+
 BOOL CGridLoad::OnInitDialog()
 {
 	CDialog::OnInitDialog();
@@ -477,7 +473,7 @@ BOOL CGridLoad::OnInitDialog()
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
-//初始radio
+
 void CGridLoad::initRadio()
 {
 	CButton* pBtn = (CButton*)GetDlgItem(IDC_RADIO1);
@@ -489,7 +485,7 @@ void CGridLoad::initRadio()
 	
 }
 
-//打开路径
+
 void CGridLoad::OnBnClickedOpenbutton()
 {
 	CString strFilter = _T("txt File|*.txt|all File|*.*||");
@@ -514,14 +510,7 @@ void CGridLoad::OnBnClickedOpenbutton()
 	//UpdateData(false);
 	//click_1=true;
 }
-/*
-FunctionName:
-Comment:Alex
-Date:2012/12/01
-Purpose:
-这个是如果选中的话，就把config文件路径
-都传递给下面的Grid中的路径一列
-*/
+
 void CGridLoad::OnBnClickedAllcheck()
 {	
 	if(m_AllCheckBtn.GetCheck()==BST_CHECKED)
@@ -535,16 +524,10 @@ void CGridLoad::OnBnClickedAllcheck()
 			m_FlexGrid.put_TextMatrix(i+1,COL_FILENAME,_T(""));
 	}
 }
-/*
-FunctionName:OnCbnSelchangeSublist
-Comment:Alex
-Date:2012/12/01
-Purpose:
-这个是一个列表 For All
-*/
+
 void CGridLoad::OnCbnSelchangeSublist()
 {
-	//return;--在这里啥用呢？
+	return;
 
 	const CString strSERIALNO= _T("Serial#");
 	const CString strMBID = _T("ID");
@@ -654,13 +637,6 @@ BEGIN_EVENTSINK_MAP(CGridLoad, CDialog)
 	ON_EVENT(CGridLoad, IDC_MSFLEXGRID1, DISPID_CLICK, CGridLoad::ClickMsflexgrid1, VTS_NONE)
 END_EVENTSINK_MAP()
 
-/*
-FunctionName:ClickMsflexgrid1
-Comment:Alex
-Date:2012/12/01
-Purpose:
-双击可以编辑
-*/
 void CGridLoad::ClickMsflexgrid1()
 {
 	long lRow,lCol;
@@ -731,14 +707,7 @@ void CGridLoad::ClickMsflexgrid1()
 	}
 
 }
-/*
-FunctionName:OnBnClickedConfigbutton
-Comment:Alex
-Date:2012/12/01
-Purpose:
-这个是下载配置文件到Tstat中
-这个也可以在ISP中集成这个功能
-*/
+
 void CGridLoad::OnBnClickedConfigbutton()
 {
 	UINT iitemp;
@@ -748,7 +717,7 @@ void CGridLoad::OnBnClickedConfigbutton()
 	GetDlgItem(IDC_CONFIGBUTTON)->EnableWindow(FALSE);
 
 	for(iitemp=0;iitemp<m_grid_load.size();iitemp++)
-	{    //get the grid value
+	{//get the grid value
 		m_grid_load.at(iitemp).hardware_revisin = _wtoi(m_FlexGrid.get_TextMatrix(iitemp+1,COL_HWVERSION));//hardware rev
 		CString str_temp=m_FlexGrid.get_TextMatrix(iitemp+1,COL_DEVICETYPE);//software version ;;;;;product model
 			
@@ -813,8 +782,6 @@ void CGridLoad::OnBnClickedConfigbutton()
 	//	showing_text="";
 		SetTimer(1,10,NULL);/////////////10 ms is better 
 
-	
-
 }
 
 
@@ -861,7 +828,7 @@ void CGridLoad::OnTimer(UINT_PTR nIDEvent)
 
 	CDialog::OnTimer(nIDEvent);
 }
-/*--disable.
+/*
 void CGridLoad::_change_showing_text_variable(CString str)
 {
 	critical_section.Lock();
@@ -869,16 +836,10 @@ void CGridLoad::_change_showing_text_variable(CString str)
 	critical_section.Unlock();
 	
 }
-*/
+\*/
 
 
-/*
-FunctionName:OnBnClickedBrowsetlogbtn
-Comment:Alex
-Date:2012/12/01
-Purpose:
-打开日志文件
-*/
+
 void CGridLoad::OnBnClickedBrowsetlogbtn()
 {
 	ShellExecute(this->m_hWnd, _T("open"), m_strLogFilePath, NULL, NULL, SW_SHOWNORMAL);
@@ -893,36 +854,35 @@ void CGridLoad::OnDestroy()
 {
 	CDialog::OnDestroy();
 
-	//m_bStopLoadingfile=TRUE;
-	//Sleep(200);
-	//DWORD dwExidCode;
-	//if(m_pLoadBackCheckThread)
-	//{
-	//	//Sleep(300);
-	//	GetExitCodeThread(m_pLoadBackCheckThread->m_hThread,&dwExidCode);
-	//	if(dwExidCode==STILL_ACTIVE)
-	//	{
-	//		TerminateThread(m_pLoadBackCheckThread->m_hThread,dwExidCode);
-	//		m_pLoadBackCheckThread=NULL;
-	//	}
-	//}
+	m_bStopLoadingfile=TRUE;
+	Sleep(200);
+	DWORD dwExidCode;
+	if(m_pLoadBackCheckThread)
+	{
+		//Sleep(300);
+		GetExitCodeThread(m_pLoadBackCheckThread->m_hThread,&dwExidCode);
+		if(dwExidCode==STILL_ACTIVE)
+		{
+			TerminateThread(m_pLoadBackCheckThread->m_hThread,dwExidCode);
+			m_pLoadBackCheckThread=NULL;
+		}
+	}
 
-	//if(m_ploadThread!=NULL)
-	//{
-	//	GetExitCodeThread(m_ploadThread->m_hThread,&dwExidCode);
-	//	if(dwExidCode==STILL_ACTIVE)
-	//	{
-	//		TerminateThread(m_ploadThread->m_hThread,dwExidCode);
-	//		m_ploadThread=NULL;
-	//		Sleep(300);
-	//	}
-	//}
+	if(m_ploadThread!=NULL)
+	{
+		GetExitCodeThread(m_ploadThread->m_hThread,&dwExidCode);
+		if(dwExidCode==STILL_ACTIVE)
+		{
+			TerminateThread(m_ploadThread->m_hThread,dwExidCode);
+			m_ploadThread=NULL;
+			Sleep(300);
+		}
+	}
 
 }
 
 void CGridLoad::OnBnClickedRadio1()
 {
-	//For NC if m_bProductType=TRUE 说明是Tstat，FALSE说明书NC
 	m_bProductType = TRUE;
 	m_FlexGrid.Clear();
 	LoadDeviceToGrid();
@@ -934,13 +894,9 @@ void CGridLoad::OnBnClickedRadio2()
 	m_FlexGrid.Clear();
 	LoadDeviceToGrid();
 }
-/*
-FunctionName:LoadDeviceToGrid
-Comment:Alex
-Date:2012/12/01
-Purpose:
-把CMainFrame中的信息->m_grid_load->m_FlexGrid.
-*/
+
+
+
 void CGridLoad::LoadDeviceToGrid()
 {
 	m_SubListCtrl.ShowWindow(SW_HIDE);
@@ -1118,13 +1074,7 @@ void CGridLoad::LoadDeviceToGrid()
 	
 }
 
-/*
-_NC_LoadThread
-For NC 
-这个函数可以下载配置参数到 NC中
-有配置文件中读取数据，
-然后写入到NC中区
-*/
+
 UINT _NC_LoadThread(LPVOID pParam)
 {
 	CGridLoad* pDlg = (CGridLoad*)(pParam);
@@ -1262,11 +1212,6 @@ UINT _NC_LoadThread(LPVOID pParam)
 }
 
 
-/*
-CheckLoadFileForNC
-识别是否下载配置文件到NC中
-*/
-
 BOOL CGridLoad::CheckLoadFileForNC(GRID_LOAD& glItem)
 {
 	BOOL bRet = FALSE;
@@ -1292,12 +1237,7 @@ BOOL CGridLoad::CheckLoadFileForNC(GRID_LOAD& glItem)
 
 	return bRet;			
 }
-/*
-CheckLoadFileForTStat
 
-For TStat.
-
-*/
 
 BOOL CGridLoad::CheckLoadFileForTStat(GRID_LOAD& glItem)
 {
@@ -1310,7 +1250,7 @@ BOOL CGridLoad::CheckLoadFileForTStat(GRID_LOAD& glItem)
 	if(file.Open(glItem.hex_file_path,CFile::modeRead | CFile::shareDenyNone))
 	{
 		CString strRead;
-		file.ReadString(strRead);
+		file.ReadString(	strRead);
 		strRead.Trim();
 		if(strRead.Find(_T("Tstat")) != -1)
 		{

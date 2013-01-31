@@ -58,7 +58,7 @@ BEGIN_MESSAGE_MAP(COutputSetDlg, CDialog)
 	ON_CBN_KILLFOCUS(IDC_OAMCOMBO, &COutputSetDlg::OnCbnKillfocusOamcombo)
 	ON_CBN_SELCHANGE(IDC_OVALUECOMBO, &COutputSetDlg::OnCbnSelchangeOvaluecombo)
 	ON_CBN_SELCHANGE(IDC_OAMCOMBO, &COutputSetDlg::OnCbnSelchangeOamcombo)
-	ON_CBN_KILLFOCUS(IDC_ORANGCOMBO, &COutputSetDlg::OnCbnKillfocusOrangcombo)
+//	ON_CBN_KILLFOCUS(IDC_ORANGCOMBO, &COutputSetDlg::OnCbnKillfocusOrangcombo)
 	ON_CBN_SELCHANGE(IDC_ORANGCOMBO, &COutputSetDlg::OnCbnSelchangeOrangcombo)
 	ON_CBN_KILLFOCUS(IDC_OFUNCOMBO, &COutputSetDlg::OnCbnKillfocusOfuncombo)
 	ON_CBN_SELCHANGE(IDC_OFUNCOMBO, &COutputSetDlg::OnCbnSelchangeOfuncombo)
@@ -219,15 +219,6 @@ void COutputSetDlg::Fresh_Grid()
 	//row1:
 	int nVAlue;
 
-
-//	108	209	1	Low byte	W/R	Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.
-
-	//tstat6
-// 	if (multi_register_value[7] == 6)
-// 	{
-// 	
-// 	}else
-	//if (newtstat6[7] == PM_TSTAT6)
 	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
 	{
 		nVAlue = newtstat6[209];
@@ -527,9 +518,7 @@ void COutputSetDlg::Fresh_Grid()
 			
 			}
 
-		CString str;
-		str.Format(_T("Read:%d"),nRange);
-	//	AfxMessageBox(str);
+
 		
 		if(nRange>=0&&nRange<=2)
 		{
@@ -651,6 +640,7 @@ void COutputSetDlg::Fresh_Grid()
 	 
 	/*	str.Format(_T("newtstat6[7]=%d"),multi_register_value[7]);
 		AfxMessageBox(str);*/
+
 		if ((newtstat6[7] ==PM_TSTAT6)||(newtstat6[7] ==PM_TSTAT7))
 			{nRange = newtstat6[206];}
 		else
@@ -749,8 +739,6 @@ void COutputSetDlg::Fresh_Grid()
 		}
 	}
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 	//row4,5,for 5F,5G:
 	if(m_nModeType==17||m_nModeType==18)
@@ -768,20 +756,13 @@ void COutputSetDlg::Fresh_Grid()
 		else
 		{
 			nRang = multi_register_value[328];
-			//nRang = multi_register_value[280];
+			
 		}
-// 		if (multi_register_value[7] == 18)//2.5.0.94
-// 		{
-// 			nRang = multi_register_value[310];
-// 		}
-		
 
-		//int nValue;
 		int nValue1;//=multi_register_value[108];
 
 
-		//tstat6
-		//if (multi_register_value[7] == 6)
+	
 		if ((newtstat6[7] ==PM_TSTAT6)||(newtstat6[7] ==PM_TSTAT7))
 		{
 			int num = reg_tststold[108];
@@ -817,7 +798,7 @@ void COutputSetDlg::Fresh_Grid()
 			{
 				strTemp.Format(_T("%d%%"),multi_register_value[348]);
 			}
-			m_FlexGrid.put_TextMatrix(4,VALUE_OUTFIELD,strTemp);
+			    m_FlexGrid.put_TextMatrix(4,VALUE_OUTFIELD,strTemp);
 
 		}
 
@@ -884,15 +865,7 @@ void COutputSetDlg::Fresh_Grid()
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
 
-#if 0
-		if (multi_register_value[336] == 3)//2.5.0.96
-		{
-			strTemp=OUTPUT_RANGE45[1];
-		}else
-		{
-			strTemp=OUTPUT_RANGE45[0];
-		}
-#endif
+ 
 		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 		
 		strTemp.Empty();
@@ -997,7 +970,8 @@ void COutputSetDlg::Fresh_Grid()
 			}
 			m_FlexGrid.put_TextMatrix(5,VALUE_OUTFIELD,strTemp);
 
-		}else if (multi_register_value[7]==18)
+		}
+		else if (multi_register_value[7]==18)
 		{
 			//2.5.0.94
 			if(multi_register_value[284]==0)
@@ -1073,14 +1047,7 @@ void COutputSetDlg::Fresh_Grid()
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
-//2.5.0.98
-// 		if (multi_register_value[337]== 3)
-// 		{
-// 			strTemp=OUTPUT_RANGE45[1];
-// 		}else
-// 		{
-// 			strTemp=OUTPUT_RANGE45[0];
-// 		}
+ 
 		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
 		
 		strTemp.Empty();
@@ -1135,8 +1102,8 @@ void COutputSetDlg::Fresh_Grid()
 			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
 		}
 	}
-//row45/67 ANALOG
-	if (m_nModeType==2||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PRESSURE
+    //row45/67 ANALOG
+	 if (m_nModeType==2||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PRESSURE
 		||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7)//5ADEG
 	{
 		if(m_nModeType==2)
@@ -1263,12 +1230,7 @@ void COutputSetDlg::Fresh_Grid()
 					strTemp=_T("Off");
 				if(nValue==1)
 					strTemp=_T("On");
-				/*	
-			if(nValue<500)
-					strTemp=_T("Off");
-				else
-					strTemp=_T("On");
-					*/
+			 
 
 
 			}
@@ -1346,7 +1308,8 @@ void COutputSetDlg::Fresh_Grid()
 			}
 			m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
 		}
-		else//out6/7
+		//out6/7
+		else
 		{
 
 			//186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
@@ -1449,7 +1412,8 @@ void COutputSetDlg::Fresh_Grid()
 			m_FlexGrid.put_TextMatrix(6,RANG_OUTFIELD,strTemp);
 
 
-			//103	211	2	Full	W/R(write only when manual output7 enable)	Output7 Analog output2, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.    
+			//103	211	2	Full	W/R(write only when manual output7 enable)	Output7 Analog output2, 
+			//a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.    
 			//187	208	1	Low byte	W/R	Analog Output2 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
 			//if (newtstat6[7] == 6)
 			if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
@@ -1472,12 +1436,7 @@ void COutputSetDlg::Fresh_Grid()
 					strTemp=_T("Off");
 				if(nValue==1000)
 					strTemp=_T("On");
-					/*
-				if(nValue<500)
-					strTemp=_T("Off");
-				else
-					strTemp=_T("On");
-					*/
+					 
 			}
 			else
 			{
@@ -1544,17 +1503,63 @@ void COutputSetDlg::Fresh_Grid()
 			m_FlexGrid.put_TextMatrix(7,AM_OUTFIELD,strTemp);
 			strTemp.Empty();
 			if(nRange>=0&&nRange<5)
-			{
+				{
 				strTemp=OUTPUT_ANRANGE[nRange];
-			}
+				}
 			m_FlexGrid.put_TextMatrix(7,RANG_OUTFIELD,strTemp);
 
 
 		}
 		strTemp.Empty();
 
-	}
-	//286	245	1	Low byte	W/R	Interlock for  output1
+	} 
+	
+	if ((newtstat6[7] ==PM_TSTAT6)||(newtstat6[7] ==PM_TSTAT6))
+		nRange = newtstat6[205];
+	else//其他的
+		{
+
+		if (multi_register_value[336]<2)
+			{
+			nRange = multi_register_value[283];
+			}
+		else
+			{
+			nRange = multi_register_value[336];
+			}
+
+		}
+
+
+
+	if(nRange>=0&&nRange<=2)
+		{
+		strTemp=OUTPUT_RANGE45[nRange];
+		}
+	/*AfxMessageBox(strTemp);*/
+	m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
+
+	if ((newtstat6[7] ==PM_TSTAT6)||(newtstat6[7] ==PM_TSTAT7))
+		{nRange = newtstat6[206];}
+	else
+		{
+		if (multi_register_value[337]<2)
+			{
+			nRange = multi_register_value[284];
+			} 
+		else
+			{
+			nRange = multi_register_value[337];
+			}
+		}
+
+
+
+	if(nRange>=0&&nRange<=2)
+		{
+		strTemp=OUTPUT_RANGE45[nRange];
+		}
+	m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
 
 	CString strlock;
 	int stradd;// = 286;
@@ -1570,7 +1575,9 @@ void COutputSetDlg::Fresh_Grid()
 				m_FlexGrid.put_TextMatrix(i+1,6,Interlock[itemp]);
 
 		}
-	}else
+	}
+	
+	else
 	{
 		stradd = 286;
 		for (int i = 0;i<7;i++)
@@ -2096,41 +2103,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 
 			}
 //2.5.0.94
-#if 0
-			if((m_nModeType==18)&&lRow==4)
-			{
-// 				if(multi_register_value[283]==0)//ON/oFF
-// 					m_OutValueEdt.ShowWindow(SW_HIDE);	
-// 				else
-// 				{
-// 					m_OutValueCmbox.ShowWindow(SW_HIDE);
-// 					m_OutValueEdt.ShowWindow(SW_SHOW);	
-// 					m_OutValueEdt.SetWindowText(strValue);
-// 					m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
-// 					m_OutValueEdt.BringWindowToTop();
-// 					m_OutValueEdt.SetFocus(); //获取焦点
-// 				}
-
-			}
-
-			if((m_nModeType==17||m_nModeType==18)&&lRow==5)
-			{
-// 				if(multi_register_value[284]==0)//ON/oFF
-// 					m_OutValueEdt.ShowWindow(SW_HIDE);	
-// 				else
-// 				{
-// 					m_OutValueCmbox.ShowWindow(SW_HIDE);
-// 					m_OutValueEdt.ShowWindow(SW_SHOW);	
-// 					m_OutValueEdt.SetWindowText(strValue);
-// 					m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
-// 					m_OutValueEdt.BringWindowToTop();
-// 					m_OutValueEdt.SetFocus(); //获取焦点
-// 				}
-
-			}
-
-#endif
-
+ 
 
 
 
@@ -2988,10 +2961,10 @@ void COutputSetDlg::OnCbnSelchangeOamcombo()
 	EndWaitCursor();
 }
 
-void COutputSetDlg::OnCbnKillfocusOrangcombo()
-{
-	m_outRangCmbox.ShowWindow(SW_HIDE);
-}
+//void COutputSetDlg::OnCbnKillfocusOrangcombo()
+//{
+//	//m_outRangCmbox.ShowWindow(SW_HIDE);
+//}
 
 void COutputSetDlg::OnCbnSelchangeOrangcombo()
 {
@@ -3000,8 +2973,8 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 	int ret1=0;
 	BeginWaitCursor();
 	int nIndext=m_outRangCmbox.GetCurSel();
+	//Row 4.5
 	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16||m_nModeType==17
-		//||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)//0914
 		||m_nModeType==18||m_nModeType==PM_PRESSURE)
 	{
 	if(m_nCurRow>0&&m_nCurRow<=5)
@@ -3012,10 +2985,10 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 			   if (nIndext<2)
 				   {
 				   ret = write_one(g_tstat_id,283 ,nIndext );
-				   ret1=write_one(g_tstat_id,336,0 );
+				    ret1=write_one(g_tstat_id,336,0 );
 				   if ((ret<=0)||(ret1<=0))
 					   {
-					   AfxMessageBox(_T("setting failure"));
+					  // AfxMessageBox(_T("setting failure"));
 					   }
 					   else
 					   {
@@ -3029,14 +3002,14 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 			   ret = write_one(g_tstat_id,336,nIndext );
 			   if (ret<=0)
 				   {
-				   AfxMessageBox(_T("setting failure"));
+				  // AfxMessageBox(_T("setting failure"));
 				   }else
 				   {
 				   multi_register_value[336] = nIndext;
 				   }
 				   }
 			   }
-		   if (m_nCurRow==5)
+		       if (m_nCurRow==5)
 			   {
 			   
 			   if (nIndext<2)
@@ -3045,7 +3018,7 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 				   ret1=write_one(g_tstat_id,337,0 );
 				   if ((ret<=0)||(ret1<=0))
 					   {
-					   AfxMessageBox(_T("setting failure"));
+					  // AfxMessageBox(_T("setting failure"));
 					   }
 				   else
 					   {
@@ -3059,7 +3032,7 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 				   ret = write_one(g_tstat_id,337,nIndext );
 				   if (ret<=0)
 					   {
-					   AfxMessageBox(_T("setting failure"));
+					  // AfxMessageBox(_T("setting failure"));
 					   }else
 					   {
 					   multi_register_value[337] = nIndext;
@@ -3067,9 +3040,10 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 				   }
 			   }
 		       
-		 //  }
+		 
 		
 		}
+		//Row 6.7
 		if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_TSTAT6
 			||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE) //
 		{
@@ -3079,7 +3053,7 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 				ret = write_one(g_tstat_id,186 ,nIndext );
 			if (ret<=0)
 			{
-				AfxMessageBox(_T("setting failure"));
+				//AfxMessageBox(_T("setting failure"));
 			}else
 			{
 				multi_register_value[186] = nIndext;
@@ -3091,7 +3065,7 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 				ret = write_one(g_tstat_id,187 ,nIndext );
 				if (ret<=0)
 				{
-					AfxMessageBox(_T("setting failure"));
+					//AfxMessageBox(_T("setting failure"));
 				}else
 				{
 					multi_register_value[187] = nIndext;
@@ -3113,22 +3087,7 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 			write_one(g_tstat_id,187 ,nIndext );
 	}
 
-//以下//0914
-//range
-// 	280	202	1	Low byte	W/R	Determine the output1 mode. Output1 always is ON/OFF mode
-// 	281	203	1	Low byte	W/R	Determine the output2 mode. Output2 always is ON/OFF mode
-// 	282	204	1	Low byte	W/R	Determine the output3 mode. Output3 always is ON/OFF mode
-// 	283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
-// 	284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
-//	186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
-//	187	208	1	Low byte	W/R	Analog Output2 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
 
-
-//row4+1 	283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
-//row5+1 	284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
-
-//row6+1	102	210	2	Full	W/R(write only when manual output6 enable)	Output6 ,Analog output1, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.
-//row7+1	103	211	2	Full	W/R(write only when manual output7 enable)	Output7 Analog output2, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.    
 
 
 	 ret =0;
@@ -3137,9 +3096,6 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 		if(m_nCurRow>0&&m_nCurRow<=5)
 		{	
 		 
-		 
-	 
-		    	 
 			ret = write_one(g_tstat_id,202+(m_nCurRow-1) ,nIndext );
 			if (ret>0)
 				newtstat6[202+m_nCurRow-1] = nIndext;

@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(简体，中国) resources
+// Chinese (Simplified, PRC) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -1045,12 +1045,12 @@ BEGIN
     IDR_TOOLBAR_CONNECT     "Connect"
 END
 
-#endif    // 中文(简体，中国) resources
+#endif    // Chinese (Simplified, PRC) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英语(美国) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -1240,11 +1240,11 @@ BEGIN
     CONTROL         "Enable Edit",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,426,102,52,10
     LTEXT           "Serial Baudrate :",IDC_STATIC,173,21,59,8
     COMBOBOX        IDC_BAUDRATE_COMBX,236,19,40,40,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Get",IDC_GETBTN,60,145,50,14
-    PUSHBUTTON      "Save",IDC_SAVEBTN,116,145,50,14
-    PUSHBUTTON      "Reboot",IDC_REBOOTBTN,172,145,50,14
-    PUSHBUTTON      "Reset to Factory Defaults",IDC_FARCALLBTN,228,145,91,14
-    PUSHBUTTON      "Far Call IP",IDC_FARCALLIP_BTN,325,145,50,14
+    PUSHBUTTON      "Get",IDC_GETBTN,429,137,50,14
+    PUSHBUTTON      "Save",IDC_SAVEBTN,433,145,50,14
+    PUSHBUTTON      "Reboot",IDC_REBOOTBTN,190,145,50,14
+    PUSHBUTTON      "Reset to Factory Defaults",IDC_FARCALLBTN,281,145,91,14
+    PUSHBUTTON      "Far Call IP",IDC_FARCALLIP_BTN,433,152,50,14
     GROUPBOX        "Schedule",IDC_STATIC,7,165,476,33,0,WS_EX_TRANSPARENT
     PUSHBUTTON      "Weekly Routines",IDC_BUTTON8,27,177,78,14
     PUSHBUTTON      "Anuual Routines",IDC_ANUUALBTN,148,178,78,13
@@ -1261,6 +1261,8 @@ BEGIN
     CONTROL         "",IDC_MSFLEXGRID_SUB,
                     "{6262D3A0-531B-11CF-91F6-C2863C385E30}",WS_TABSTOP,18,214,451,313
     PUSHBUTTON      "Clear schedules",IDC_BUTTON1,390,177,78,14
+    LTEXT           "MAC Address:",IDC_STATIC,14,146,47,8
+    LTEXT           "",IDC_MAC_ADDRESS,67,146,109,10
 END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 203, 74
@@ -1269,7 +1271,7 @@ CAPTION "About T3000"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,18,20,20,20
-    LTEXT           "T3000 Version 2.5.0.106",IDC_STATIC,54,27,82,8,SS_NOPREFIX
+    LTEXT           "T3000 Version 2.5.0.107",IDC_STATIC,54,27,82,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2005-2013 Temcocontrols.Ltd.",IDC_STATIC,36,43,149,8
     PUSHBUTTON      "http://www.temcocontrols.com",IDC_BUTTON1,7,53,189,14
     DEFPUSHBUTTON   "OK",IDOK,148,11,48,14,WS_GROUP
@@ -1290,7 +1292,7 @@ BEGIN
     LTEXT           "Temperature",IDC_STATIC,23,136,45,10
     EDITTEXT        IDC_TEMPERATURE_EDIT,73,133,48,14,ES_AUTOHSCROLL | ES_READONLY
     LTEXT           "Fan Mode",IDC_STATIC,159,136,34,8
-    COMBOBOX        IDC_FANSPEEDCOMBO,196,133,48,71,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_FANSPEEDCOMBO,196,133,48,71,CBS_DROPDOWN | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Overide Period",IDC_STATIC,23,153,48,8
     EDITTEXT        IDC_OVERIDETIME_EDIT,73,150,48,14,ES_AUTOHSCROLL | WS_DISABLED
     LTEXT           "Time Left",IDC_STATIC,159,153,32,8
@@ -3094,8 +3096,8 @@ BEGIN
 0x0032, 0x0038, 0x0036, 0x0033, 0x0043, 0x0033, 0x0038, 0x0035, 0x0045, 
 0x0033, 0x0030, 0x0029, 0x0000, 0x0001, 0x0000, 0x0021, 0x0000, 0x004c, 
 0x0000, 0x0000, 0x0001, 0x8001, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 
-0x0002, 0x8001, 0x0001, 0x0000, 0x2100, 0x3443, 0x0812, 0x0000, 0xf300, 
-0x0035, 0xcf00, 0x0012, 0x4200, 0x6f6f, 0x0050, 0x0600, 0x8000, 0x0000, 
+0x0002, 0x8001, 0x0001, 0x0000, 0x2100, 0x3443, 0x0812, 0x0000, 0x5b00, 
+0x0032, 0x8500, 0x0012, 0x4200, 0x6f6f, 0x0050, 0x0600, 0x8000, 0x0000, 
 0x0200, 0x0000, 0x0200, 0x0000, 0x0100, 0x0000, 0x0100, 0x0000, 0x0000, 
 0x0000, 0x0500, 0x0000, 0x0880, 0x0000, 0x0f80, 0x0000, 0x1280, 0x0000, 
 0x0d80, 0x0000, 0x0e80, 0x0000, 0xfa80, 0xe6f0, 0xc000, 0xc0c0, 0x0000, 
@@ -3103,8 +3105,8 @@ BEGIN
 0x0100, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0100, 0x0100, 0x0000, 
 0x0100, 0x0200, 0x0300, 0x0000, 0x0000, 0x0000, 0x0000, 0x0100, 0x0100, 
 0x0000, 0x0100, 0x0400, 0x0000, 0x0000, 0x0000, 0x0300, 0xe352, 0x910b, 
-0xce8f, 0x9d11, 0x00e3, 0x00aa, 0xb84b, 0x0151, 0x0000, 0x9000, 0xf801, 
-0x0124, 0x0600, 0x6154, 0x6f68, 0x616d, 0x5204, 0x0be3, 0x8f91, 0x11ce, 
+0xce8f, 0x9d11, 0x00e3, 0x00aa, 0xb84b, 0x0151, 0x0000, 0x9000, 0xb001, 
+0x0130, 0x0600, 0x6154, 0x6f68, 0x616d, 0x5204, 0x0be3, 0x8f91, 0x11ce, 
 0xe39d, 0xaa00, 0x4b00, 0x51b8, 0x746c, 0x0000, 0x0000, 0x0000, 
     0
 END
@@ -4113,12 +4115,12 @@ BEGIN
     ID_BUILDINGCONFIGDB     "Show building config"
 END
 
-#endif    // 英语(美国) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英语(英国) resources
+// English (United Kingdom) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -4279,7 +4281,7 @@ BEGIN
     0
 END
 
-#endif    // 英语(英国) resources
+#endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -853,6 +853,7 @@
 #define IDC_TEMP                        1576
 #define IDC_TEMP2                       1577
 #define IDC_TEMP3                       1578
+#define IDC_MAC_ADDRESS                 1585
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -937,6 +938,7 @@
 #define ID_SETMAPPING_SAND              32864
 #define ID_FILE_ISPTOOL                 32865
 #define ID_TOOL_ISPTOOLFORMANY          32866
+#define ID_FILE_CONFIGFILE              32870
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
 
@@ -944,9 +946,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        442
-#define _APS_NEXT_COMMAND_VALUE         32870
-#define _APS_NEXT_CONTROL_VALUE         1577
+#define _APS_NEXT_RESOURCE_VALUE        444
+#define _APS_NEXT_COMMAND_VALUE         32871
+#define _APS_NEXT_CONTROL_VALUE         1586
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
