@@ -288,6 +288,9 @@
     <ClCompile Include="FreezeFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DisplayConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -698,6 +701,9 @@
       <Filter>singleslider</Filter>
     </ClInclude>
     <ClInclude Include="FreezeFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DisplayConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

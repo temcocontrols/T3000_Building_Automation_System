@@ -249,6 +249,7 @@ public:
 	//CSliderCtrl m_singlesliderday;
 	CMacSliderCtrl m_singlesliderday;
 	CMacSliderCtrl m_singleslidernight;
+	afx_msg void OnBnClickedDisplayConfig();
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

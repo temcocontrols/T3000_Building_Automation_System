@@ -9,7 +9,7 @@
 #include <fstream>
 
 typedef struct _load_file_every_step
-{
+	{
 	bool first_step;
 	bool second_step;
 	bool third_step;
@@ -19,20 +19,20 @@ typedef struct _load_file_every_step
 	bool seven_step;
 	bool eight_step;
 	bool keep_down;
-}load_file_every_step;
+	}load_file_every_step;
 enum 
-{
+	{
 	FAN,
 	VALVE,
 	HEATPUMP,
-};
+	};
 
 
 void _Twrite_to_file_a_line(wofstream & out,const TCHAR * format, ... );
 
 
 using namespace std;
-void Save2File_ForTstat5E5C(TCHAR* fn);
+
 bool digital2string(int val,CString & str,unsigned char type);
 bool string2digital(CString str,unsigned char & val ,bool & type ); // type false = digital ,true = analog
 void WriteSerialNumber(wofstream & out);

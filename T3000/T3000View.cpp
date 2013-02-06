@@ -22,7 +22,7 @@
 
 #include "../FlexSlideBar/FlexSlideWnd.h"
 #include "../FlexSlideBar/FSBContainer.h"
-
+#include "DisplayConfig.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -68,6 +68,7 @@ BEGIN_MESSAGE_MAP(CT3000View, CFormView)
 	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_TEMPRETURE_SLIDER, &CT3000View::OnNMReleasedcaptureTempretureSlider)
 	ON_EN_KILLFOCUS(IDC_DAY_EDIT, &CT3000View::OnEnKillfocusDayEdit)
 	ON_EN_KILLFOCUS(IDC_EDIT_CUR_SP, &CT3000View::OnEnKillfocusEditCurSp)
+	ON_BN_CLICKED(IDC_DISPLAY_CONFIG, &CT3000View::OnBnClickedDisplayConfig)
 END_MESSAGE_MAP()
 
 // CT3000View construction/destruction
@@ -7082,7 +7083,7 @@ BeginWaitCursor();
 	{
 		tstat6flex[NightSP] = m_nightpot;
 	}	
-	//newtstat6[350] = m_nightpot;
+//newtstat6[350] = m_nightpot;
 // 	newtstat6[352] = itemp;
 // 	newtstat6[353] = itemp2;
 
@@ -7097,4 +7098,20 @@ BeginWaitCursor();
 	GetDlgItem(IDC_SETPTSTATIC)->ShowWindow(SW_SHOW);
 	EndWaitCursor();
 #endif
+}
+
+
+void CT3000View::OnBnClickedDisplayConfig()
+{  
+   if ((multi_register_value[7]==PM_TSTAT5E)||(multi_register_value[7]==PM_TSTAT6))
+   {
+      CDisplayConfig display_cfg;
+      display_cfg.DoModal();
+   } 
+   else
+   {
+   AfxMessageBox(_T("This model of TStat don't support Display Config!"));
+   return;
+   }
+
 }

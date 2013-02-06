@@ -29,8 +29,6 @@ typedef struct Subnetwork
 	CString	m_nightCooling;				
 	int	m_tstatProduct;				
 	CString m_modbusaddr;					
-
-
 }subnetwork;
 
 

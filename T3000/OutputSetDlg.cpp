@@ -645,7 +645,7 @@ void COutputSetDlg::Fresh_Grid()
 			{nRange = newtstat6[206];}
 		else
 		{
-		if (multi_register_value[337]<2)
+		if (multi_register_value[337]==0)
 			{
 			nRange = multi_register_value[284];
 			} 
@@ -3053,7 +3053,7 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 				ret = write_one(g_tstat_id,186 ,nIndext );
 			if (ret<=0)
 			{
-				//AfxMessageBox(_T("setting failure"));
+				 AfxMessageBox(_T("setting failure"));
 			}else
 			{
 				multi_register_value[186] = nIndext;
@@ -3065,7 +3065,7 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 				ret = write_one(g_tstat_id,187 ,nIndext );
 				if (ret<=0)
 				{
-					//AfxMessageBox(_T("setting failure"));
+					 AfxMessageBox(_T("setting failure"));
 				}else
 				{
 					multi_register_value[187] = nIndext;
@@ -3139,12 +3139,10 @@ void COutputSetDlg::OnCbnSelchangeOfuncombo()
 	int retfun =0;
 	int nItem=-1;
 	nItem=m_outFunCmbox.GetCurSel();
-	short nFun;//=multi_register_value[328];
-
-	//328	266	1	Low byte	W/R	"Output1 Function setting:
-	//	0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
-
-
+	short nFun;
+//=multi_register_value[328];
+//328	266	1	Low byte	W/R	"Output1 Function setting:
+//	0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
 // 
 //		280	1	Determine the output1 mode. Output1 always is ON/OFF mode
 // 		281	1	Determine the output2 mode. Output2 always is ON/OFF mode
@@ -3434,7 +3432,6 @@ void COutputSetDlg::OnCbnSelchangeOfuncombo()
 			}else
 			{
 				write_one(g_tstat_id,328,nFun);
-
 			}
 			
 		}
@@ -3541,10 +3538,10 @@ void COutputSetDlg::OnEnKillfocusValueedit()
 // 
 // 		}
 
-		//{
-			//  commented by zgq;2010-12-06; 写入的值应当为实际设置电压值×100。
-			//  但界面输入的值为range值中标定范围的百分比。例如，输入50，range为0－10v(100%)，
-			//   则实际电压为10×50% = 5V。写入为5×100 = 500。
+//{
+//  commented by zgq;2010-12-06; 写入的值应当为实际设置电压值×100。
+//  但界面输入的值为range值中标定范围的百分比。例如，输入50，range为0－10v(100%)，
+//   则实际电压为10×50% = 5V。写入为5×100 = 500。
 			if((m_nCurRow==4)||(m_nCurRow == 5))
 			{	
 			//	write_one(g_tstat_id,348,nSrcValue);

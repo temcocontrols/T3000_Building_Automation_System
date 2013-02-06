@@ -18,11 +18,11 @@
 
 
 
-#define TSTAT25_VAR_NUM 115
+#define TSTAT25_VAR_NUM 43
 #define TSTAT24_VAR_NUM 30
 #define NET_WORK_CONTROLLER_NUM 24
 #define TSTAT26_VAR_NUM 112
-#define TSTAT26_VAR_NUM_USEING 97
+
 #define NET_WORK_DEFFERENT_TSTAT_FILE "NET WORK\n"
 using namespace std;
 
@@ -33,29 +33,40 @@ int tstat25_register_var[TSTAT25_VAR_NUM]={	118,121,185,128,111,	112,114,115,119
 											122,123,124,125,126,	127,129,186,187,131,
 											132,133,135,136,137,	182,183,202,203,201,
 											188,189,190,204,205,	206,207,208,209,210,
-											211,213,214,241,242,    243,244,245,246,247,
-											248,249,250,251,252,    253,268,269,270,271,
-											272,273,274,275,276,    277,286,287,288,289,
-											290,291,292,285,293,    301,302,303,309,310,
-											328,329,330,331,332,    327,333,319,320,321,
-											322,323,325,334,335,    336,337,338,339,327,
-											283,284,341,342,343,    344,345,346,347,398,
-											299,300,295,296,297};
-//NEW Tstat6
-int tstat26_register_var[TSTAT26_VAR_NUM]={	103,104,110,395,382,	212,385,386,346,347,
-											105,352,353,364,106,	107,207,208,365,366,
-											369,348,349,273,354,	355,242,397,241,122,
-											123,111,142,113,383,	360,361,387,388,359,
-											274,275,276,277,278,    279,280,330,331,389,
-											390,391,392,393,358,    332,333,245,246,247,
-											248,249,250,251,244,    373,114,115,116,141,
-											254,409,406,407,266,    267,268,269,270,341,
-											205,206,587,588,589,    590,591,592,593,167,
-											168,169,170,171,172,    173,174};
+											211,213,214};
+int tstat26_register_var[TSTAT26_VAR_NUM]={	118,121,185,128,111,	112,114,115,119,120,
+											122,123,124,125,126,	127,129,186,187,131,
+											132,133,135,136,137,	182,183,202,203,201,
+											188,189,190,204,205,	206,207,208,209,210,
+											211,213,214,
+											241,242,243,244,245,	246,247,248,249,250,
+											251,252,253,
+											268,269,270,271,272,	273,274,275,276,277,
+											286,287,288,289,290,	291,292,285,293,
+											301,302,303,309,310,    328,329,330,331,332,
+											327,333,319,320,321,    322,323,325,334,335,
+											336,337,338,339,		327,283,284,
+											341,342,343,344,345,346,347,
+                                            298,299,300};
 
 int net_work_controller[NET_WORK_CONTROLLER_NUM]={	106,107,108,109,110,	111,112,113,114,115,
 													116,117,118,119,120,	121,122,123,124,125,
 													126,127,129,130};
+
+/*
+int tstat29_register_var[TSTAT29_VAR_NUM]={	118,121,185,128,111,	112,114,115,119,120,
+											122,123,124,125,126,	127,129,186,187,131,
+											132,133,135,136,137,	182,183,202,203,201,
+											188,189,190,204,205,	206,207,208,209,210,
+											211,213,214,
+											241,242,243,244,245,	246,247,248,249,250,
+											251,252,253,
+											268,269,270,271,272,	273,274,275,276,277,
+											286,287,288,289,290,	291,292,285,293,
+											301,302,303,309,310,	314,315,316,317,318,
+											319,320,321,322,323,	324,325,326,327,328,
+											329,330,331,332,333,     334,335,};
+*/
 
 _TCHAR * NET_WORK_CONTROLLER[] = {                  //attention:该数组中的值，不要有完全包含的出现
 						_T("ip Mode:"),		//0
@@ -212,52 +223,107 @@ _TCHAR * TSTATVAR_CONST_25[] = {                  //attention:该数组中的值，不要
 
 						_T("OVERIDE_TIMER"),//211
 						_T("FILTER"),//213
+						_T("HEAT_COOL_CONFIG")//214
+						};
+_TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要有完全包含的出现
+						_T("SEQUENCE"),		
+						_T("DEGC_OR_F"),                   
+						_T("baudrate"),                    
+						_T("KEYPAD_SELECT"),  //128             
+						_T("TEMP_SELECT"),                 
+
+						_T("DAC_OFFSET"),     
+						_T("COOLING_P_TERM"),		          
+						_T("COOLING_I_TERM"),
+						_T("DAY_COOLING_DEADBAND"),        
+						_T("DAY_HEATING_DEADBAND"),        
+
+						_T("NUMBER_OF_FAN_SPEEDS"),                    
+						_T("NIGHT_HEATING_DEADBAND"),      
+						_T("NIGHT_COOLING_DEADBAND"),      
+						_T("APPLICATION"),                 
+						_T("POWERUP_SETPOINT"),            
+
+						_T("POWERUP_ON_OFF"),              
+					//	_T("OUTPUT1_SCALE"),               
+					//	_T("OUTPUT1_SCALE"),               
+						_T("AUTO_ONLY"),                   
+						_T("OUTPUT1_SCALE"),               
+						_T("OUTPUT2_SCALE"),               
+						_T("SETPOINT_HI"),                 
+
+						_T("SETPOINT_LO"),                 
+						_T("MENU_LOCK"),                   
+						_T("DAY_COOLING_SETPOINT"),        
+						_T("DAY_HEATING_SETPOINT"),        
+						_T("CURRENT_FAN_SPEED"),                   
+
+						_T("NIGHT_HEATING_SETPOINT"),      
+						_T("NIGHT_COOLING_SETPOINT"),      
+						_T("Changeover_Delay"),            
+						_T("Display"),                     
+						_T("Cycling_Delay"),               
+
+						_T("ANALOG_IN1_RANGE"),            
+						_T("ANALOG_IN2_RANGE"),            
+						_T("DIGITAL_IN1"),                 
+						_T("LED1_CONTROL"),                
+						_T("LED2_CONTROL"),               
+
+						_T("LED3_CONTROL"),                
+						_T("LED4_CONTROL"),                
+						_T("LED5_CONTROL"),                
+						_T("LED6_CONTROL"),                
+						_T("LED7_CONTROL"),
+
+						_T("OVERIDE_TIMER"),//211
+						_T("FILTER"),//213
 						_T("HEAT_COOL_CONFIG"),//214
+
 						_T("Universal PID input select"),
 						_T("Universal PID upper deadband"),
-						
 						_T("Universal PID lower deadband"),
 						_T("Universal PID pterm"),
 						_T("Universal PID iterm"),
 						_T("Universal PID setpoint"),
+
 						_T("Output 1 PID Control"),
-						
 						_T("Output 2 PID Control"),
 						_T("Output 3 PID Control"),
 						_T("Output 4 PID Control"),
 						_T("Output 5 PID Control"),
 						_T("Output 6 PID Control"),
-						
 						_T("Output 7 PID Control"),
+
 						_T("Heating Stages in Universal Table"),
 						_T("Cooling Stages in Universal Table"),
 						_T("Universal PID"),
 						_T("PID1 Units hi"),
-						
 						_T("PID1 Units lo"),
+
 						_T("PID2 Units hi"),
 						_T("PID2 Units lo"),
 						_T("Universal Night Setpoint"),
 						_T("Heating Stages in Original Table"),
-
 						_T("Cooling Stages in Original Table"),
+
 						_T("Interlock Output1"),
 						_T("Interlock Output2"),
 						_T("Interlock Output3"),
 						_T("Interlock Output4"),
-
 						_T("Interlock Output5"),
+
 						_T("Interlock Output6"),
 						_T("Interlock Output7"),
 						_T("Value Percent"),
 						_T("Setpoint Increase Step"),
-
 						_T("Time On"),
 						_T("Time Off"),
 						_T("Units"),
 						_T("Input Auto or Manual"),
 						_T("Output Auto or Manual"),
-						 
+
+						//320:
 						_T("Rotation Flag"),
 						_T("Rotation out2"),
 						_T("Rotation out3"),
@@ -269,144 +335,16 @@ _TCHAR * TSTATVAR_CONST_25[] = {                  //attention:该数组中的值，不要
 						_T("Min Address"),
 						_T("Max Address"),
 						_T("Fan Button"),
-
-						_T("Mode Button"),
+						_T( "Mode Button"),
 						_T("Hold"),
 						_T("Util"),
-						_T("Fun1"),
-						_T("Fun2"),
-
-						_T("Fun3"),
-						_T("Fun4"),
-						_T("Default Setpoint"),
-						_T("Mode"),
-						_T("PWM Timer"),
-
-						_T("PWM Out1"),
-						_T("PWM Out2"),
-						_T("Coast"),
-						_T("Cool1"),
-						_T("Cool2"),
-
-						_T("Cool3"),
-						_T("Heat1"),
-						_T("Heat2"),
-						_T("Heat3"),
-						_T("Input Fun1"),
-
-						_T("Input Fun2"),
-						_T("Input Fun3"),
-						_T("Freeze protect setpoint"),
-						_T("Delay to open"),
-						_T("Delay to close")
-
-						};
-_TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要有完全包含的出现
-						_T("SEQUENCE"),		
-						_T("DEGC_OR_F"),                   
-						_T("baudrate"),                    
-						_T("KEYPAD_SELECT"),  //395             
-						_T("TEMP_SELECT"),                 
-
-						_T("DAC_OFFSET"),     
-						_T("COOLING_P_TERM"),		          
-						_T("COOLING_I_TERM"),
-						_T("DAY_COOLING_DEADBAND"),        
-						_T("DAY_HEATING_DEADBAND"),        
-
-						_T("NUMBER_OF_FAN_SPEEDS"),                    
-						_T("NIGHT_HEATING_DEADBAND"),      
-						_T("NIGHT_COOLING_DEADBAND"),                 
-						_T("POWERUP_SETPOINT"),            
-						_T("POWERUP_ON_OFF"),              
-              
-						_T("AUTO_ONLY"),                   
-						_T("OUTPUT1_SCALE"),               
-						_T("OUTPUT2_SCALE"),               
-						_T("SETPOINT_HI"),                 
-						_T("SETPOINT_LO"),
-
-						_T("MENU_LOCK"),                   
-						_T("DAY_COOLING_SETPOINT"),        
-						_T("DAY_HEATING_SETPOINT"),        
-						_T("CURRENT_FAN_SPEED"),                   
-						_T("NIGHT_HEATING_SETPOINT"), 
-
-						_T("NIGHT_COOLING_SETPOINT"),      
-						_T("Changeover_Delay"),            
-						_T("Display"),                     
-						_T("Cycling_Delay"),               
-						_T("ANALOG_IN1_RANGE"),  //122
-
-						_T("ANALOG_IN2_RANGE"),            
-						_T("OVERIDE_TIMER"),//211
-						_T("FILTER"),//213
-						_T("HEAT_COOL_CONFIG"),//214
-						_T("Universal PID input select"),
-
-						_T("Universal PID upper deadband"),//360
-						_T("Universal PID lower deadband"),
-						_T("Universal PID pterm"),
-						_T("Universal PID iterm"),
-						_T("Universal PID setpoint"),
-
-						_T("Output 1 PID Control"),
-						_T("Output 2 PID Control"),
-						_T("Output 3 PID Control"),
-						_T("Output 4 PID Control"),
-						_T("Output 5 PID Control"),
-						_T("Output 6 PID Control"),
-						_T("Output 7 PID Control"),
-
-						_T("Heating Stages in Universal Table"),
-						_T("Cooling Stages in Universal Table"),
-						_T("Universal PID"),
-						_T("PID1 Units hi"),
-						_T("PID1 Units lo"),
-						_T("PID2 Units hi"),
-						_T("PID2 Units lo"),
-						_T("Universal Night Setpoint"),
-						_T("Heating Stages in Original Table"),
-						_T("Cooling Stages in Original Table"),
-
-						_T("Interlock Output1"),
-						_T("Interlock Output2"),
-						_T("Interlock Output3"),
-						_T("Interlock Output4"),
-						_T("Interlock Output5"),
-						_T("Interlock Output6"),
-						_T("Interlock Output7"),
-
-						_T("Value Percent"),
-						_T("Setpoint Increase Step"),
-						_T("Time On"),
-						_T("Time Off"),
-						_T("Units"),
-						_T("Input Auto or Manual"),
-						_T("Output Auto or Manual"),
-
-						//320:
-					//	_T("Rotation Flag"),
-						//_T("Rotation out2"),
-						//_T("Rotation out3"),
-						//_T("Rotation out4"),
-						//_T("Rotation out5"),
-
-						_T("Timer Select"),
-						_T("Timer Left"),
-						_T("Min Address"),
-						_T("Max Address"),
-						//_T("Fan Button"),
-						//_T( "Mode Button"),
-						//_T("Hold"),
-						//_T("Util"),
 						_T("Fun1"),
 						_T("Fun2"),
 						_T("Fun3"),
 						_T("Fun4"),
 						_T("Default Setpoint "),
-						//_T("Mode"),
-						//_T("PWM Timer"),
+						_T("Mode"),
+						_T("PWM Timer"),
 						_T("PWM Out1"),
 						_T("PWM Out2"),
 						_T("Coast"),
@@ -416,19 +354,11 @@ _TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要
 						_T("Heat1"),
 						_T("Heat2"),
 						_T("Heat3"),
-						_T("Input1 Fun"),
-						_T("Input2 Fun"),
-						_T("Input3 Fun"),
-						_T("Input4 Fun"),
-						_T("Input5 Fun"),
-						_T("Input6 Fun"),
-						_T("Input7 Fun"),
-						_T("Input8 Fun")
+						_T("Input Fun1"),
+						_T("Input Fun2"),
+						_T("Input Fun3"),
 						};
 _TCHAR *STRINGCONST[] ={_T("Off"),_T("On"),_T("Close"),_T("Open"),_T("0-100"),_T("50-100"),_T("0-50")};
-//PWM output range in COAST mode. 0 = CLOSE, 1 = OPEN, 2 = 0-100%, 3 = 50-100%,
-//	4 = 0-50%. MSb 4 bits correspond to output4 and LSB 4 bits correspond to output5
-_TCHAR *PWMCONST[] ={_T("Close"),_T("Open"),_T("0-100"),_T("50-100"),_T("0-50")};
 
 bool string2digital(CString str,unsigned char & val ,bool & type )   // type false = digital ,true = analog
 {
@@ -443,7 +373,33 @@ bool string2digital(CString str,unsigned char & val ,bool & type )   // type fal
 		}
 	}
 	switch(SN)
-	{ 
+	{/*
+		case 0 :
+			val = 0 ;
+		break;
+		case 1 :
+			val = 1 ;
+		break;
+		case 2 :
+			val = 0 ;
+		break;
+		case 3 :
+			val = 3 ;
+		break;
+		case 4 :
+			val = 1 ;
+		break;
+
+		case 5:
+			val = 2 ;
+		break;
+		case 6:
+			val = 4 ;///bit 7 or 8 and defferent from others
+		break;
+
+		default:
+		break;
+		*/
 		case 0 :
 			val = 0 ;
 		break;
@@ -591,8 +547,7 @@ void write_to_file_a_line(wofstream & out,const char * format, ... )
 	char buf[2048];	
 	vsprintf( buf, format, marker );
 	va_end(marker);
-	out<< buf << endl ;
-
+	out<< buf << endl 
 	*/
 }
 void _Twrite_to_file_a_line(wofstream & out,const TCHAR * format, ... )
@@ -609,8 +564,7 @@ void _Twrite_to_file_a_line(wofstream & out,const TCHAR * format, ... )
 int get_real_fan_address(int fan_speed,int fan_place,int place)
 {
 	int return_value=0;
-	//int fan_register[5]={138,145,152,159,166};//*******************old********
-	int fan_register[5]={228,295,302,309,316};
+	int fan_register[5]={138,145,152,159,166};//*************************************
 	switch(fan_speed)
 	{
 	case 0: if(fan_place==0)
@@ -661,10 +615,9 @@ int get_real_fan_address(int fan_speed,int fan_place,int place)
 	return return_value;
 }
 void fan_write(wofstream & out,int m_25_heat_stages,int m_25_cool_stages)
-{
-	//write the fan register
-	//used by save2file functiojn  122-》237
-	int fan_speed=read_one(g_tstat_id,237);//1,2,3
+{//write the fan register
+	//used by save2file functiojn
+	int fan_speed=read_one(g_tstat_id,122);//1,2,3
 	if(read_one(g_tstat_id,129)==1)
 		fan_speed=0;
 	_TCHAR * temp_fan_const[5];
@@ -725,7 +678,7 @@ void universal_relay_write(wofstream & out,int m_26_heat_stages,int m_26_cool_st
 				pos = m_26_heat_stages+m_26_cool_stages - col ;
 			else
 				pos = col - m_26_heat_stages;
-			fan_value[col] = read_one(g_tstat_id,281+pos);//j
+			fan_value[col] = read_one(g_tstat_id,254+pos);//j
 		}
 		CString str,str1;
 		for(int row = 0 ;row <5 ;row++)
@@ -748,7 +701,7 @@ void universal_relay_write(wofstream & out,int m_26_heat_stages,int m_26_cool_st
 		_Twrite_to_file_a_line(out,_T("//   UNIVERSAL FAN END"));	
 }
 void value_setting_write(wofstream & out,int m_25_heat_stages,int m_25_cool_stages)
-{    //write the value register
+{//write the value register
 	//used by save2file functiojn
 	int Array[7];
 	CString str,str1;
@@ -759,9 +712,7 @@ void value_setting_write(wofstream & out,int m_25_heat_stages,int m_25_cool_stag
 			pos = (m_25_heat_stages+m_25_cool_stages+1) - col ;
 		else
 			pos = col - (m_25_heat_stages+1);
-		//////////////////
-		///Array[col-1] = read_one(g_tstat_id,173+pos);//j
-		Array[col-1] = read_one(g_tstat_id,323+pos);
+		Array[col-1] = read_one(g_tstat_id,173+pos);//j
 	}
 	_Twrite_to_file_a_line(out,_T("//   VALVE SETTING"));
 	_Twrite_to_file_a_line(out,m_25.GetString());
@@ -915,7 +866,7 @@ void lookup_table_write(wofstream & out)
 	int Array[23];
 	CString str,str1;
 	for(int i = 0 ;i <22;i++)
-		Array[i] = read_one(g_tstat_id,175+i);
+		Array[i] = read_one(g_tstat_id,219+i);
 	_Twrite_to_file_a_line(out,_T("//   LOOKUP TABLE"));
 	_Twrite_to_file_a_line(out,_T("//			0.0V	0.5V	1.0V	1.5V	2.0V	2.5V	3.0V	3.5V	4.0V	4.5V	5.0V"));
 	str.Format(_T("Lookup Table 1:	\t%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d"),
@@ -1023,7 +974,24 @@ void lookup_table_write(wofstream & out)
 		_Twrite_to_file_a_line(out,str);
 		_Twrite_to_file_a_line(out,_T("//   LOOKUP TABLE END"));
 		}
- 
+//
+	/*
+	int Array[23];
+	CString str,str1;
+	for(int i = 0 ;i <22;i++)
+		Array[i] = read_one(tstat_id,219+i);
+	write_to_file_a_line(out,"//   LOOKUP TABLE");
+	write_to_file_a_line(out,"//			0.0V	0.5V	1.0V	1.5V	2.0V	2.5V	3.0V	3.5V	4.0V	4.5V	5.0V");
+	str.Format("Lookup Table 1:	\t%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d",
+		Array[0],Array[1],Array[2],Array[3],Array[4],Array[5],
+		Array[6],Array[7],Array[8],Array[9],Array[10]);
+	write_to_file_a_line(out,LPCSTR(str));
+	str.Format("Lookup Table 2:	\t%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d",
+		Array[11],Array[12],Array[13],Array[14],Array[15],Array[16],
+		Array[17],Array[18],Array[19],Array[20],Array[21]);
+	write_to_file_a_line(out,LPCSTR(str));
+	write_to_file_a_line(out,"//   LOOKUP TABLE END");
+	*/
 	}
 }
 void var_write(wofstream & out)
@@ -1054,9 +1022,7 @@ void var_write(wofstream & out)
 		}
 		else //if(version<=29)
 		{
-			//这个地方把寄存器地址更改了TSTAT25_VAR_NUM 这个太大了，现在变成一个正在用的TSTAT26_VAR_NUM_USEING
-
-			for(int i=0;i<TSTAT26_VAR_NUM_USEING;i++)
+			for(int i=0;i<TSTAT26_VAR_NUM;i++)
 			{
 				/*
 				if(version>=28.0&&i==23)//register 135:
@@ -1176,293 +1142,6 @@ void Save2File(CString fn)
 	//write_one(tstat_id,16,159);//////
 	//close_com();//close the com port 
 }
-
-void Save2File_ForTstat5E5C(TCHAR* fn)
-{
-
-	CString strTips;
-	int nValue;
-	//nValue=read_one(g_tstat_id,324);
-//	write_one(g_tstat_id,324,0);//////
-	// save tstat register value to file
-	int m_25_heat_stages,m_25_cool_stages,m_26_heat_stages,m_26_cool_stages;
-	m_25_heat_stages=read_one(g_tstat_id,276);
-	m_25_cool_stages=read_one(g_tstat_id,277);
-	m_26_heat_stages=read_one(g_tstat_id,268);
-	m_26_cool_stages=read_one(g_tstat_id,269);
-	if(m_25_heat_stages==0 && m_25_cool_stages==0)
-	{
-		m_25_heat_stages=3;
-		m_25_cool_stages=3;
-	}
-	#if 1
-	//////////////////////////////////////////////////////////////////////////
-	strTips = _T("Config file saved 10%...");
-	SetPaneString(1, strTips);
-	//////////////////////////////////////////////////////////////////////////
-
-	CString str;
-	//25
-	str=_T("");
-	m_25=_T("//	");
-	for(int i=0;i<m_25_heat_stages;i++)
-	{
-		str.Format(_T("%s "),temp_heating[m_25_heat_stages-i-1]);
-		m_25+=str;
-	}
-	str.Format(_T("%s "),_T("Coasting"));
-	m_25+=str;
-	for(int i=0;i<m_25_cool_stages;i++)
-	{
-		str.Format(_T("%s "),temp_cooling[i]);
-		m_25+=str;
-	}
-	//////////////////////////////////////////////////////////////////////////
-	strTips = _T("Config file saved 15%...");
-	SetPaneString(1, strTips);
-	//////////////////////////////////////////////////////////////////////////
-
-	//26
-	str=_T("");
-	m_26=_T("//	");
-	for(int i=0;i<m_26_heat_stages;i++)
-	{
-		str.Format(_T("%s "),temp_heating[m_26_heat_stages-i-1]);
-		m_26+=str;
-	}
-	str.Format(_T("%s "),_T("Coasting"));
-	m_26+=str;
-	for(int i=0;i<m_26_cool_stages;i++)
-	{
-		str.Format(_T("%s "),temp_cooling[i]);
-		m_26+=str;
-	}	
-	float version=get_tstat_version(g_tstat_id);
-	TCHAR a[3]={'\0','\0','\0'};
-	if(version >= 26)
-	{
-		a[0]='2';
-		a[1]='6';
-		a[2]='\0';
-	}
-	else if(version >= 25)
-	{
-		a[0]='2';
-		a[1]='5';
-		a[2]='\0';
-	}
-	else
-	{
-		a[0]='2';
-		a[1]='4';
-		a[2]='\0';
-	}
-	//////////////////////////////////////////////////////////////////////////
-	strTips = _T("Config file saved 20%...");
-	SetPaneString(1, strTips);
-	//////////////////////////////////////////////////////////////////////////
-
-	wofstream out;
-	out.open(fn,ios_base::out) ;
-	
-	_Twrite_to_file_a_line(out,_T("Tstat Config File"));//added the header marker.
-
-	int nModelID = read_one(g_tstat_id, 7);
-	CString strProductClassName = get_product_class_name_by_model_ID(nModelID);
-	strProductClassName = _T("Model : ") + strProductClassName;
-	_Twrite_to_file_a_line(out, strProductClassName);//added the model
-	//////////////////////////////////////////////////////////////////////////
-	strTips = _T("Config file saved 30%...");
-	SetPaneString(1, strTips);
-	//////////////////////////////////////////////////////////////////////////
-	out<<"version:"<<version<<endl;
-	fan_write(out,m_25_heat_stages,m_25_cool_stages);//fan value	
-	_Twrite_to_file_a_line(out,_T(" "));//space
-	//////////////////////////////////////////////////////////////////////////
-	strTips = _T("Config file saved 40%...");
-	SetPaneString(1, strTips);
-	//////////////////////////////////////////////////////////////////////////
-	value_setting_write(out,m_25_heat_stages,m_25_cool_stages);//value setting
-	write_to_file_a_line(out," ");//space
-	//////////////////////////////////////////////////////////////////////////
-	strTips = _T("Config file saved 50%...");
-	SetPaneString(1, strTips);
-	//////////////////////////////////////////////////////////////////////////
-
-	if(version>=25)
-		delay_time_write(out);//delay time write
-	if(version>=26)
-	{
-		_Twrite_to_file_a_line(out,_T(" "));//space
-		lookup_table_write(out);//lookup table 26 only
-		_Twrite_to_file_a_line(out,_T(" "));//space
-		//////////////////////////////////////////////////////////////////////////
-		strTips = _T("Config file saved 60%...");
-		SetPaneString(1, strTips);
-		//////////////////////////////////////////////////////////////////////////
-		universal_relay_write(out,m_26_heat_stages,m_26_cool_stages);//UNIVERSAL RELAY OUTPUTS vlaue
-		_Twrite_to_file_a_line(out,_T(" "));//space
-		//////////////////////////////////////////////////////////////////////////
-		strTips = _T("Config file saved 70%...");
-		SetPaneString(1, strTips);
-		//////////////////////////////////////////////////////////////////////////
-		universal_value_setting_write(out,m_26_heat_stages,m_26_cool_stages);
-	}
-	//////////////////////////////////////////////////////////////////////////
-	strTips = _T("Config file saved 80%...");
-	SetPaneString(1, strTips);
-	//////////////////////////////////////////////////////////////////////////
-	_Twrite_to_file_a_line(out,_T(" "));//space
-	WriteSerialNumber(out);
-	//////////////////////////////////////////////////////////////////////////
-	strTips = _T("Config file saved 90%...");
-	SetPaneString(1, strTips);
-	//////////////////////////////////////////////////////////////////////////
-	WriteAddress(out);
-	_Twrite_to_file_a_line(out,_T(" "));//space
-	//////////////////////////////////////////////////////////////////////////
-	strTips = _T("Config file saved 99%...");
-	SetPaneString(1, strTips);
-	//////////////////////////////////////////////////////////////////////////
-//	var_write(out);	
-	//_Twrite_to_file_a_line(out,_T("OK!"));//space
-	//return;
-
-//	_Twrite_to_file_a_line(out,_T("//END CONFIG 1 ********************************// "));//space
-//	int nvalue=0;
-//
-//	//nvalue=read_one(g_tstat_id,326);
-//	/*
-//	if(nvalue==0)
-//	{
-//		if (nValue>=0)
-//		{
-//			write_one(g_tstat_id,324,nValue);
-//		}
-//		return;
-//	}
-//		
-//
-//	if(nvalue==1)
-//		write_one(g_tstat_id,324,1);//////	
-//	else
-//	*/
-//		//return;
-//
-//	/*******************************************************************************************************
-//	
-//	SetPaneString("Begin to save configuration file 2...");
-//
-//	*******************************************************************************************************/
-//
-//	m_25_heat_stages=read_one(g_tstat_id,276);
-//	m_25_cool_stages=read_one(g_tstat_id,277);
-//	m_26_heat_stages=read_one(g_tstat_id,268);
-//	m_26_cool_stages=read_one(g_tstat_id,269);
-//	if(m_25_heat_stages==0 && m_25_cool_stages==0)
-//	{
-//		m_25_heat_stages=3;
-//		m_25_cool_stages=3;
-//	}
-//
-////	CString str;
-//	//25
-//	str=_T("");
-//	m_25=_T("//	");
-//	for(int i=0;i<m_25_heat_stages;i++)
-//	{
-//		str.Format(_T("%s "),temp_heating[m_25_heat_stages-i-1]);
-//		m_25+=str;
-//	}
-//	str.Format(_T("%s "),_T("Coasting"));
-//	m_25+=str;
-//	for(int i=0;i<m_25_cool_stages;i++)
-//	{
-//		str.Format(_T("%s "),temp_cooling[i]);
-//		m_25+=str;
-//	}
-//
-//	//26
-//	str=_T("");
-//	m_26=_T("//	");
-//	for(int i=0;i<m_26_heat_stages;i++)
-//	{
-//		str.Format(_T("%s "),temp_heating[m_26_heat_stages-i-1]);
-//		m_26+=str;
-//	}
-//	str.Format(_T("%s "),_T("Coasting"));
-//	m_26+=str;
-//	for(int i=0;i<m_26_cool_stages;i++)
-//	{
-//		str.Format(_T("%s "),temp_cooling[i]);
-//		m_26+=str;
-//	}	
-//	version=get_tstat_version(g_tstat_id);
-////	a[3]={'\0','\0','\0'};
-//	if(version >= 26)
-//	{
-//		a[0]='2';
-//		a[1]='6';
-//		a[2]='\0';
-//	}
-//	else if(version >= 25)
-//	{
-//		a[0]='2';
-//		a[1]='5';
-//		a[2]='\0';
-//	}
-//	else
-//	{
-//		a[0]='2';
-//		a[1]='4';
-//		a[2]='\0';
-//	}
-//
-//
-//	fan_write(out,m_25_heat_stages,m_25_cool_stages);//fan value	
-//	_Twrite_to_file_a_line(out,_T(" "));//space
-//	value_setting_write(out,m_25_heat_stages,m_25_cool_stages);//value setting
-//	_Twrite_to_file_a_line(out,_T(" "));//space
-//	if(version>=25)
-//		delay_time_write(out);//delay time write
-//	if(version>=26)
-//	{
-//		_Twrite_to_file_a_line(out,_T(" "));//space
-//		lookup_table_write(out);//lookup table 26 only
-//		_Twrite_to_file_a_line(out,_T(" "));//space
-//		universal_relay_write(out,m_26_heat_stages,m_26_cool_stages);//UNIVERSAL RELAY OUTPUTS vlaue
-//		_Twrite_to_file_a_line(out,_T(" "));//space
-//		universal_value_setting_write(out,m_26_heat_stages,m_26_cool_stages);
-//	}
-//	_Twrite_to_file_a_line(out,_T(" "));//space
-//	WriteSerialNumber(out);
-//	WriteAddress(out);
-//	_Twrite_to_file_a_line(out,_T(" "));//space
-	//var_write(out);	
-	CString str1;
-
-	for(int i=0;i<TSTAT25_VAR_NUM;i++)
-		{
-		str1.Format(_T("%d,\t%d,\t%s"),tstat25_register_var[i],read_one(g_tstat_id,tstat25_register_var[i]),TSTATVAR_CONST_25[i]);
-		_Twrite_to_file_a_line(out,str1);
-		if((i%5)==4)
-			_Twrite_to_file_a_line(out,_T(" "));//a space line
-		}
-
-
-	out.close();
-
-	if (nValue>=0)
-	{
-		write_one(g_tstat_id,324,nValue);
-	}
-
-
-    #endif
-
-}
-
-
 void Save2File_ForTwoFiles(TCHAR* fn)
 {
 	CString strTips;
@@ -1723,12 +1402,7 @@ void Save2File_ForTwoFiles(TCHAR* fn)
 	WriteSerialNumber(out);
 	WriteAddress(out);
 	_Twrite_to_file_a_line(out,_T(" "));//space
-	 var_write(out);	
-
-
- 
-
-
+	var_write(out);	
 	out.close();
 
 	if (nValue>=0)
@@ -1863,7 +1537,7 @@ int get_real_number_fan_speeds(int fan_number)
 }
 
 bool find_load_file_error(load_file_every_step temppp)
-{  //return value true == found ,false == no found
+{//return value true == found ,false == no found
 	int i=0;
 	/*
 	if(temppp.seven_step==false || temppp.first_step ==false || temppp.second_step ==false || 
@@ -1907,9 +1581,8 @@ int get_fan_var(wifstream & inf,int fan_value[])
 		inf.getline(buf,1024);
 		if(m_heat_stages==0 && m_cool_stages==0)
 			if(find_sub_chars(buf,_T("Heating")) || find_sub_chars(buf,_T("Cooling")))
-				get_heat_and_cool_stages_from_file_line(buf,m_heat_stages,m_cool_stages);//找到热状态，冷状态的数量
-
-		if(section_end_find(buf))//for the value setting start and fan value end 从FAN的开始到结束
+				get_heat_and_cool_stages_from_file_line(buf,m_heat_stages,m_cool_stages);
+		if(section_end_find(buf))//for the value setting start and fan value end
 			break;
 		if(wcsstr(buf,_T("RELAY 1"))!=NULL)
 		{
@@ -1971,18 +1644,18 @@ int get_fan_var(wifstream & inf,int fan_value[])
 
 void get_heat_and_cool_stages_from_file_line(TCHAR *buf,int &m_heat_stages,int & m_cool_stages)
 {
-	if(find_sub_chars(buf,temp_heating[5]))
-		m_heat_stages=6;
-	else if(find_sub_chars(buf,temp_heating[4]))
-		m_heat_stages=5;
-	else if(find_sub_chars(buf,temp_heating[3]))
-		m_heat_stages=4;
-	else if(find_sub_chars(buf,temp_heating[2]))
-		m_heat_stages=3;
-	else if(find_sub_chars(buf,temp_heating[1]))
-		m_heat_stages=2;
-	else if(find_sub_chars(buf,temp_heating[0]))
-		m_heat_stages=1;
+		if(find_sub_chars(buf,temp_heating[5]))
+			m_heat_stages=6;
+		else if(find_sub_chars(buf,temp_heating[4]))
+			m_heat_stages=5;
+		else if(find_sub_chars(buf,temp_heating[3]))
+			m_heat_stages=4;
+		else if(find_sub_chars(buf,temp_heating[2]))
+			m_heat_stages=3;
+		else if(find_sub_chars(buf,temp_heating[1]))
+			m_heat_stages=2;
+		else if(find_sub_chars(buf,temp_heating[0]))
+			m_heat_stages=1;
 
 		if(find_sub_chars(buf,temp_cooling[5]))
 			m_cool_stages=6;
@@ -2200,8 +1873,8 @@ void Show_load_file_error_message(load_file_every_step temppp,int section,CFile 
 	{
 		if(temppp.third_step ==false)
 		{
-			/*for_showing_text=for_showing_text+LOAD_FAILURE_THREE+STEP_FAILURE+_T("*********************");
-			change_showing_text_variable(for_showing_text);*/
+			for_showing_text=for_showing_text+LOAD_FAILURE_THREE+STEP_FAILURE+_T("*********************");
+			change_showing_text_variable(for_showing_text);
 		}
 		if(p_log_file!=NULL && !for_showing_text.IsEmpty())
 			p_log_file->Write(for_showing_text+_T("\r\n"),for_showing_text.GetLength()+2);
@@ -2438,13 +2111,17 @@ void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,lo
 	temp++;	
 	int register_id=_wtoi(buf);
 	int register_value=_wtoi(temp);
- 	int j;
+	int j;
 	int register_122=0;
 	if(register_id==121 && register_value>1)
-		j=-4;
-	 
+		j=-4;//wrong value
+	/*
+	else if(register_id==128 && register_value>5)
+		j=-4;//wrong value
+		//comment on 09-02-03
+		*/
 
-	 if(register_id==122 )
+	else if(register_id==122 )
 	{
 		int real_fan_number=get_real_number_fan_speeds(fan_number);
 		if(register_value!=real_fan_number && real_fan_number!=-1)
@@ -2454,30 +2131,14 @@ void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,lo
 		}
 		j=write_one(now_tstat_id,register_id,register_value);	
 	}
-
-		//j=write_one(now_tstat_id,register_id,register_value);	
-	 
-	if (register_id==395)
-	{
-	/*	CString str;
-		str.Format(_T("%d"),register_value);
-		AfxMessageBox(str);*/
-	     Sleep(3000);
-		j=write_one(now_tstat_id,register_id,register_value);
-		 Sleep(5000);
-		//int i=-1;//当>0说明重启好了 一直读直到读到数据
-		//while(i<=-1)
-		//{
-		//	i=read_one(now_tstat_id,register_id);
-		//}
-		 
-
-	}
 	else
-	{ 
-		j=write_one(now_tstat_id,register_id,register_value);
+		j=write_one(now_tstat_id,register_id,register_value);	
+	if(register_id==185)
+	{
+		Sleep(14000);	
+		//if(register_value==1)Change_BaudRate(19200);
+		//if(register_value==0)Change_BaudRate(9600);
 	}
-	
 
 	if(j==-2 && tstat_version<25 && tstat_version >0)  ////////////////////////if the version is 24.4 ,write_one some register will restart,for example 118,121
 	{
@@ -2487,13 +2148,13 @@ void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,lo
 	if(p_log_file!=NULL)
 	{
 		for_showing_text.Format(_T("register ID:%d,VALUE:%d write "),register_id,register_value);
-		/*if(register_122==-100)
+		if(register_122==-100)
 		{
 			CString t_str=for_showing_text;
 			for_showing_text.Format(_T("NUMBER_OF_FAN_SPEEDS IS INCORRECT,try correct value :%d "),register_value);
 			for_showing_text=t_str+for_showing_text;
-		}*/
-		if(j>0/*||register_id==395*/)//395
+		}
+		if(j>0)
 			for_showing_text=for_showing_text+_T("OK\r\n");
 		else
 		{
@@ -2522,9 +2183,12 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 
 
 	int m_25_heat_stages,m_25_cool_stages,m_26_heat_stages,m_26_cool_stages;
- 
+// 	m_25_heat_stages=read_one(g_tstat_id,276);
+// 	m_25_cool_stages=read_one(g_tstat_id,277);
+// 	m_26_heat_stages=read_one(g_tstat_id,268);
+// 	m_26_cool_stages=read_one(g_tstat_id,269);
 
-	//读取25,26 的热冷状态
+
 	m_25_heat_stages=read_one(g_tstat_id,332);
 	m_25_cool_stages=read_one(g_tstat_id,333);
 	m_26_heat_stages=read_one(g_tstat_id,330);
@@ -2606,31 +2270,23 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 
 	_Twrite_to_file_a_line(out,_T("Tstat Config File"));//added the header marker.
 
-	int nModelID = read_one(g_tstat_id, 7);//读出产品号
-	CString strProductClassName = get_product_class_name_by_model_ID(nModelID);//得到产品的名字
-	strProductClassName = _T("Model : ") + strProductClassName;//Model：+产品名称
-	_Twrite_to_file_a_line(out, strProductClassName);//added the model 到文件
+	int nModelID = read_one(g_tstat_id, 7);
+	CString strProductClassName = get_product_class_name_by_model_ID(nModelID);
+	strProductClassName = _T("Model : ") + strProductClassName;
+	_Twrite_to_file_a_line(out, strProductClassName);//added the model
 	//////////////////////////////////////////////////////////////////////////
 	strTips = _T("Config file saved 30%...");
 	SetPaneString(1, strTips);
 	//////////////////////////////////////////////////////////////////////////
-	out<<"version:"<<version<<endl; //把版本号写入文件中
-
-
+	out<<"version:"<<version<<endl;
 	fan_write(out,m_25_heat_stages,m_25_cool_stages);//fan value	
-	
-	
 	_Twrite_to_file_a_line(out,_T(" "));//space
-
-
 	//////////////////////////////////////////////////////////////////////////
 	strTips = _T("Config file saved 40%...");
 	SetPaneString(1, strTips);
 	//////////////////////////////////////////////////////////////////////////
 	value_setting_write(out,m_25_heat_stages,m_25_cool_stages);//value setting
 	write_to_file_a_line(out," ");//space
-
-
 	//////////////////////////////////////////////////////////////////////////
 	strTips = _T("Config file saved 50%...");
 	SetPaneString(1, strTips);
@@ -2638,26 +2294,21 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 
 	if(version>=25)
 		delay_time_write(out);//delay time write
-
-
 	if(version>=26)
 	{
 		_Twrite_to_file_a_line(out,_T(" "));//space
-
 		lookup_table_write(out);//lookup table 26 only
 		_Twrite_to_file_a_line(out,_T(" "));//space
 		//////////////////////////////////////////////////////////////////////////
 		strTips = _T("Config file saved 60%...");
 		SetPaneString(1, strTips);
 		//////////////////////////////////////////////////////////////////////////
-
 		universal_relay_write(out,m_26_heat_stages,m_26_cool_stages);//UNIVERSAL RELAY OUTPUTS vlaue
 		_Twrite_to_file_a_line(out,_T(" "));//space
 		//////////////////////////////////////////////////////////////////////////
 		strTips = _T("Config file saved 70%...");
 		SetPaneString(1, strTips);
 		//////////////////////////////////////////////////////////////////////////
-
 		universal_value_setting_write(out,m_26_heat_stages,m_26_cool_stages);
 	}
 	//////////////////////////////////////////////////////////////////////////
@@ -2675,7 +2326,7 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 	//////////////////////////////////////////////////////////////////////////
 	strTips = _T("Config file saved 99%...");
 	SetPaneString(1, strTips);
-	///////////////////向文件中写入寄存器变量的值//////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
 	var_write(out);	
 	//_Twrite_to_file_a_line(out,_T("OK!"));//space
 	return;
@@ -2812,7 +2463,382 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 
 #endif
 }
+#if 0
+void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFile*p_log_file)
+{
+  // int nSpecialValue=read_one(now_tstat_id,326);
+//	write_one(now_tstat_id,324,0);
+	//every step is false
 
+	CString for_showing_text;
+	load_file_one_time.first_step=load_file_one_time.second_step=load_file_one_time.third_step=load_file_one_time.thurth_step=load_file_one_time.fifth_step=load_file_one_time.sixth_step=load_file_one_time.seven_step=load_file_one_time.eight_step=false;
+	float tstat_version;
+	tstat_version=get_tstat_version(now_tstat_id);///////////////////get version
+	wifstream inf;//file
+	inf.open(fn,ios_base::in);
+	int fan_value[35]={0};//fan_value 
+	for(int i=0;i<35;i++)
+		fan_value[i]=0;	
+
+	fan_number=get_fan_var(inf,fan_value);//fan value			
+	load_file_one_time.first_step=true;
+	for(int i=0;i<fan_number;i++)
+	{
+		for(int t_i=0;t_i<7;t_i++)
+			{
+				int real_fan_address=get_real_fan_address(fan_number-2,i,t_i);
+				if(fan_value[i]>=0)
+				{
+					int i_i=write_one(now_tstat_id,real_fan_address,fan_value[i*7+t_i]);
+					if(p_log_file!=NULL)
+					{
+						if(i_i>0)
+							for_showing_text.Format(_T("register ID: %d value:%d write OK")"),real_fan_address,fan_value[i*7+t_i]);
+						else
+						{
+							for_showing_text.Format(_T("register ID:%d value:%d write Error******************"),real_fan_address,fan_value[i*7+t_i]);
+							load_file_one_time.first_step=false;
+						}
+						change_showing_text_variable(for_showing_text);
+							p_log_file->WriteString(for_showing_text+_T("\r\n"));
+					}
+				}
+			}
+		}
+			if(p_log_file!=NULL)
+				p_log_file->WriteString(_T("\r\n"));	
+			int value_setting[7]={0};			
+
+			get_value_setting(inf,value_setting);//value setting
+			Show_load_file_error_message(load_file_one_time,2,p_log_file);
+			load_file_one_time.second_step=true;
+			for(int i=0;i<7;i++)
+			{
+				if(value_setting[i]>=0)
+				{
+					int i_i=write_one(now_tstat_id,173+i,value_setting[i]);
+					if(p_log_file!=NULL)
+					{
+						if(i_i>0)
+							for_showing_text.Format(_T("register ID:%d value:%d write OK"),173+i,value_setting[i]);
+						else
+						{
+							for_showing_text.Format(_T("register ID:%d value:%d write Error******************"),173+i,value_setting[i]);
+							load_file_one_time.second_step=false;
+						}
+						change_showing_text_variable(for_showing_text);
+						p_log_file->WriteString(for_showing_text+_T("\r\n"));
+					}
+				}
+			}
+			if(p_log_file!=NULL)
+			p_log_file->WriteString(_T("\r\n"));
+	TCHAR buf[1024];
+	
+	while(!inf.eof())
+	{
+		inf.getline(buf,1024);
+		if(find_sub_chars(buf,_T("//   FAN OFF")))
+			break;
+
+		if(wcscmp(buf,_T("//   DELAY TIMES"))==0)
+		{
+			int delay_setting[10]={0};
+			get_delay_setting(inf,delay_setting);
+			Show_load_file_error_message(load_file_one_time,3,p_log_file);
+			load_file_one_time.third_step=true;
+			for(int i=0;i<10;i++)
+			{
+				if(delay_setting[i]>=0)
+				{
+					int i_i=write_one(now_tstat_id,191+i,delay_setting[i]);
+					if(p_log_file!=NULL)
+					{
+						if(i_i>0)
+							for_showing_text.Format(_T("register ID:%d vlaue:%d write OK"),191+i,delay_setting[i]);
+						else
+						{
+							for_showing_text.Format(_T("register ID:%d value:%d write Error******************"),191+i,delay_setting[i]);
+							load_file_one_time.third_step=false;
+						}
+						change_showing_text_variable(for_showing_text);
+						p_log_file->WriteString(for_showing_text+_T("\r\n"));
+					}
+				}
+			}
+			//26
+			//lookup table setting
+			if(p_log_file!=NULL)
+			p_log_file->WriteString(_T("\r\n"));
+		}
+		else if(wcscmp(buf,_T("//   LOOKUP TABLE"))==0)
+		{
+			if(tstat_version<CUSTOM_TABLE_FLOAT_VERSION)
+			{
+				int lookup_table_setting[23]={0};
+				get_lookup_table_setting(inf,lookup_table_setting);
+				Show_load_file_error_message(load_file_one_time,4,p_log_file);
+				load_file_one_time.thurth_step=true;
+				for(int i=0;i<22;i++)
+				{
+					if(lookup_table_setting[i]>=0)
+					{
+						int i_i=write_one(now_tstat_id,219+i,lookup_table_setting[i]);
+						if(p_log_file!=NULL)
+						{
+							if(i_i>0)
+								for_showing_text.Format(_T("register ID:%d value:%d write OK"),219+i,lookup_table_setting[i]);
+							else
+							{							
+								for_showing_text.Format(_T("register ID:%d value:%d write Error******************"),219+i,lookup_table_setting[i]);
+								load_file_one_time.thurth_step=false;
+							}
+							change_showing_text_variable(for_showing_text);
+							p_log_file->WriteString(for_showing_text+_T("\r\n"));
+						}
+					}					
+				}
+				if(p_log_file!=NULL)
+				p_log_file->WriteString(_T("\r\n"));
+			}
+			else if(tstat_version>=CUSTOM_TABLE_FLOAT_VERSION)
+			{
+				int lookup_table_setting[23]={0};
+				get_lookup_table_setting(inf,lookup_table_setting);
+				Show_load_file_error_message(load_file_one_time,4,p_log_file);
+				load_file_one_time.thurth_step=true;
+
+				int ntemp=(int)lookup_table_setting[0];
+
+				//table1
+				{
+				short high=ntemp/65536;
+				short low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE1_ZERO,low);
+				write_one(now_tstat_id, MODBUS_TABLE1_ZERO_HI,high);
+				//2
+				ntemp=lookup_table_setting[1];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE1_HALFONE,low);
+				write_one(now_tstat_id, MODBUS_TABLE1_HALFONE_HI,high);
+				//3
+				ntemp=lookup_table_setting[2];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE1_ONE,low);
+				write_one(now_tstat_id, MODBUS_TABLE1_ONE_HI,high);
+				//4
+				ntemp=(int)lookup_table_setting[3];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE1_HALFTWO,low);
+				write_one(now_tstat_id, MODBUS_TABLE1_HALFTWO_HI,high);
+				//5
+				ntemp=lookup_table_setting[4];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE1_TWO,low);
+				write_one(now_tstat_id, MODBUS_TABLE1_TWO_HI,high);
+				//6
+				ntemp=lookup_table_setting[5];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE1_HALFTHREE,low);
+				write_one(now_tstat_id, MODBUS_TABLE1_HALFTHREE_HI,high);
+				//7
+				ntemp=lookup_table_setting[6];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE1_THREE,low);
+				write_one(now_tstat_id, MODBUS_TABLE1_THREE_HI,high);
+				//8
+
+				ntemp=lookup_table_setting[7];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE1_HALFFOUR,low);
+				write_one(now_tstat_id, MODBUS_TABLE1_HALFFOUR_HI,high);
+				//9
+				ntemp=lookup_table_setting[8];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE1_FOUR,low);
+				write_one(now_tstat_id, MODBUS_TABLE1_FOUR_HI,high);
+				//10
+				ntemp=lookup_table_setting[9];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE1_HALFFIVE,low);
+				write_one(now_tstat_id, MODBUS_TABLE1_HALFFIVE_HI,high);
+				//11
+				ntemp=lookup_table_setting[10];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE1_FIVE,low);
+				write_one(now_tstat_id, MODBUS_TABLE1_FIVE_HI,high);
+				}
+
+				//table 2
+				{
+				int ntemp=(int)lookup_table_setting[11];
+				short high=ntemp/65536;
+				short low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE2_ZERO,low);
+				write_one(now_tstat_id, MODBUS_TABLE2_ZERO_HI,high);
+				//2
+				ntemp=lookup_table_setting[12];
+				high=ntemp/65536;
+				low=ntemp%65536;		
+				write_one(now_tstat_id, MODBUS_TABLE2_HALFONE,low);
+				write_one(now_tstat_id, MODBUS_TABLE2_HALFONE_HI,high);
+				//3
+				ntemp=lookup_table_setting[13];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE2_ONE,low);
+				write_one(now_tstat_id, MODBUS_TABLE2_ONE_HI,high);
+				//4
+				ntemp=(int)lookup_table_setting[14];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE2_HALFTWO,low);
+				write_one(now_tstat_id, MODBUS_TABLE2_HALFTWO_HI,high);
+				//5
+				ntemp=lookup_table_setting[15];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE2_TWO,low);
+				write_one(now_tstat_id, MODBUS_TABLE2_TWO_HI,high);
+				//6
+				ntemp=lookup_table_setting[16];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE2_HALFTHREE,low);
+				write_one(now_tstat_id, MODBUS_TABLE2_HALFTHREE_HI,high);
+				//7
+				ntemp=lookup_table_setting[17];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE2_THREE,low);
+				write_one(now_tstat_id, MODBUS_TABLE2_THREE_HI,high);
+				//8
+
+				ntemp=lookup_table_setting[18];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE2_HALFFOUR,low);
+				write_one(now_tstat_id, MODBUS_TABLE2_HALFFOUR_HI,high);
+				//9
+				ntemp=lookup_table_setting[19];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE2_FOUR,low);
+				write_one(now_tstat_id, MODBUS_TABLE2_FOUR_HI,high);
+				//10
+				ntemp=lookup_table_setting[20];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE2_HALFFIVE,low);
+				write_one(now_tstat_id, MODBUS_TABLE2_HALFFIVE_HI,high);
+				//11
+				ntemp=lookup_table_setting[21];
+				high=ntemp/65536;
+				low=ntemp%65536;
+				write_one(now_tstat_id, MODBUS_TABLE2_FIVE,low);
+				write_one(now_tstat_id, MODBUS_TABLE2_FIVE_HI,high);
+				
+				}
+			}
+		}
+			else if(wcscmp(buf,_T("//   UNIVERSAL RELAY OUTPUTS"))==0)
+			{
+				int universal_value[7]={0};
+				get_universal_fan_var(inf,universal_value);
+				Show_load_file_error_message(load_file_one_time,5,p_log_file);
+				load_file_one_time.fifth_step=true;
+				for(int i=0;i<7;i++)
+				{
+					if(universal_value[i]>=0)
+					{
+						int i_i=write_one(now_tstat_id,254+i,universal_value[i]);
+						if(p_log_file!=NULL)
+						{
+							if(i_i>0)
+								for_showing_text.Format(_T("register ID:%d value:%d write OK"),254+i,universal_value[i]);
+							else
+							{
+								for_showing_text.Format(_T("register ID:%d vlaue:%d write Error******************"),254+i,universal_value[i]);
+								load_file_one_time.fifth_step=false;
+							}
+							change_showing_text_variable(for_showing_text);
+							p_log_file->WriteString(for_showing_text+_T("\r\n"));
+						}
+					}						
+				}	
+				if(p_log_file!=NULL)
+				p_log_file->WriteString(_T("\r\n"));
+			}
+
+			else if(wcscmp(buf,_T("//   UNIVERSAL VALVE"))==0)
+			{
+				//universal value setting
+				int value_setting[7]={0};
+				for(int i=0;i<7;i++)
+					value_setting[i]=0;
+				get_value_setting(inf,value_setting);//universal value setting
+				Show_load_file_error_message(load_file_one_time,6,p_log_file);
+				load_file_one_time.sixth_step=true;
+				for(int i=0;i<7;i++)
+				{
+					if(value_setting[i]>=0)
+
+					{
+						int i_i=write_one(now_tstat_id,261+i,value_setting[i]);
+						if(p_log_file!=NULL)
+						{
+							if(i_i>0)
+								for_showing_text.Format(_T("register ID:%d value:%d write OK"),261+i,value_setting[i]);
+							else
+							{
+								for_showing_text.Format(_T("register ID:%d value:%d write Error******************"),261+i,value_setting[i]);
+								load_file_one_time.sixth_step=false;
+							}
+							change_showing_text_variable(for_showing_text);
+							p_log_file->WriteString(for_showing_text+_T("\r\n"));
+						}
+					}						
+				}
+				//26 end 
+				if(p_log_file!=NULL)
+				p_log_file->WriteString(_T("\r\n"));			
+		}
+		else if(wcsstr(buf,_T("serialnumber"))!=NULL || wcsstr(buf,_T("address:"))!=NULL )
+		{
+			/////////////////////////////////////var setting
+			Show_load_file_error_message(load_file_one_time,7,p_log_file);
+			write_one(now_tstat_id,184,5);//184 register,to no restart,when you write the 185,118,121,128 register
+			load_file_one_time.seven_step=true;
+			get_var_write_var(inf,tstat_version,p_log_file,&load_file_one_time);//////a line //////////// a line
+			write_one(now_tstat_id,16,159);//////
+			//reset 
+			write_one(now_tstat_id,184,0);//184 register,to no restart,when you write the 185,118,121,128 register
+			if(p_log_file!=NULL)
+			p_log_file->WriteString(_T("\r\n"));
+		}
+	}
+
+
+		
+	inf.close();
+	return;
+	//Sleep(15000);
+
+//
+//	LoadFile2Tstat_twofile(load_file_one_time,fn,p_log_file);
+
+}
+#endif
 
 void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFile*p_log_file)
 {
@@ -2867,14 +2893,14 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 			{
 				if(value_setting[i]>=0)
 				{
-					int i_i=write_one(now_tstat_id,323+i,value_setting[i]);
+					int i_i=write_one(now_tstat_id,173+i,value_setting[i]);
 					if(p_log_file!=NULL)
 					{
 						if(i_i>0)
-							for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),323+i,value_setting[i]);
+							for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),173+i,value_setting[i]);
 						else
 						{
-							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),323+i,value_setting[i]);
+							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),173+i,value_setting[i]);
 							load_file_one_time.second_step=false;
 						}
 						change_showing_text_variable(for_showing_text);
@@ -2882,7 +2908,31 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 					}
 				}
 			}
-		
+			/*
+			memset(value_setting,0,sizeof(value_setting));
+			get_value_setting(inf,value_setting);//value setting			
+			Show_load_file_error_message(load_file_one_time,2,p_log_file);
+			load_file_one_time.second_step=true;
+			for(int i=0;i<7;i++)
+			{
+				if(value_setting[i]>=0)
+				{
+					int i_i=write_one(now_tstat_id,351+i,value_setting[i]);
+					if(p_log_file!=NULL)
+					{
+						if(i_i>0)
+							for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),351+i,value_setting[i]);
+						else
+						{
+							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),351+i,value_setting[i]);
+							load_file_one_time.second_step=false;
+						}
+						change_showing_text_variable(for_showing_text);
+						p_log_file->WriteString(for_showing_text);
+					}
+				}
+			}
+			*/
 
 
 
@@ -2938,14 +2988,14 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 				{
 					if(lookup_table_setting[i]>=0)
 					{
-						int i_i=write_one(now_tstat_id,175+i,lookup_table_setting[i]);
+						int i_i=write_one(now_tstat_id,219+i,lookup_table_setting[i]);
 						if(p_log_file!=NULL)
 						{
 							if(i_i>0)
-								for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),175+i,lookup_table_setting[i]);
+								for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),219+i,lookup_table_setting[i]);
 							else
 							{							
-								for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),175+i,lookup_table_setting[i]);
+								for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),219+i,lookup_table_setting[i]);
 								load_file_one_time.thurth_step=false;
 							}
 							change_showing_text_variable(for_showing_text);
@@ -3118,14 +3168,14 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 				{
 					if(universal_value[i]>=0)
 					{
-						int i_i=write_one(now_tstat_id,281+i,universal_value[i]);
+						int i_i=write_one(now_tstat_id,254+i,universal_value[i]);
 						if(p_log_file!=NULL)
 						{
 							if(i_i>0)
-								for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),281+i,universal_value[i]);
+								for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),254+i,universal_value[i]);
 							else
 							{
-								for_showing_text.Format(_T("register ID:%d vlaue:%d write Error******************\r\n"),281+i,universal_value[i]);
+								for_showing_text.Format(_T("register ID:%d vlaue:%d write Error******************\r\n"),254+i,universal_value[i]);
 								load_file_one_time.fifth_step=false;
 							}
 							change_showing_text_variable(for_showing_text);
@@ -3159,8 +3209,6 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 								for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
 								load_file_one_time.sixth_step=false;
 							}
-							
-							//
 							change_showing_text_variable(for_showing_text);
 							p_log_file->WriteString(for_showing_text.GetString());
 						}
@@ -3200,7 +3248,388 @@ void LoadFile2Tstat_twofile(load_file_every_step &load_file_one_time,TCHAR* fn,C
 {
 	return;
 #if 0
- 
+//	int nSpecialValue=read_one(g_tstat_id,326);
+//	if(nSpecialValue!=1)
+//		return;
+		
+
+	//every step is false
+	CString for_showing_text;
+
+	float tstat_version;
+	tstat_version=get_tstat_version(g_tstat_id);///////////////////get version
+	wifstream inf;//file
+	inf.open(fn,ios_base::in);
+
+	//找到第二个文件的起始位置。
+	TCHAR bufLine[1024];
+	BOOL bFind=false;
+	while(!inf.eof())
+	{
+		inf.getline(bufLine,1024);
+		if(find_sub_chars(bufLine,_T("END CONFIG")))
+		{
+			bFind=true;
+			break;
+		}
+		else//has no second file;
+		{
+			continue;
+
+		}
+	}
+	if(!bFind)
+		return;
+	load_file_one_time.first_step=load_file_one_time.second_step=load_file_one_time.third_step=load_file_one_time.thurth_step=load_file_one_time.fifth_step=load_file_one_time.sixth_step=load_file_one_time.seven_step=load_file_one_time.eight_step=false;
+		//	inf.close();
+	write_one(g_tstat_id,324,1);
+
+			int fan_value[35]={0};//fan_value 
+			for(int i=0;i<35;i++)
+				fan_value[i]=0;			
+			fan_number=get_fan_var(inf,fan_value);//fan value			
+			load_file_one_time.first_step=true;
+			for(int i=0;i<fan_number;i++)
+			{
+				for(int t_i=0;t_i<7;t_i++)
+				{
+					int real_fan_address=get_real_fan_address(fan_number-2,i,t_i);
+					if(fan_value[i]>=0)
+					{
+						int i_i=write_one(g_tstat_id,real_fan_address,fan_value[i*7+t_i]);
+						if(p_log_file!=NULL)
+						{
+							if(i_i>0)
+								for_showing_text.Format(_T("register ID: %d value:%d write OK\r\n"),real_fan_address,fan_value[i*7+t_i]);
+							else
+							{
+								for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),real_fan_address,fan_value[i*7+t_i]);
+								load_file_one_time.first_step=false;
+							}
+							change_showing_text_variable(for_showing_text);
+							p_log_file->WriteString(for_showing_text);
+						}
+					}
+				}
+			}
+			if(p_log_file!=NULL)
+				p_log_file->WriteString(_T("\r\n"));	
+			int value_setting[7]={0};			
+			get_value_setting(inf,value_setting);//value setting
+			Show_load_file_error_message(load_file_one_time,2,p_log_file);
+			load_file_one_time.second_step=true;
+			for(int i=0;i<7;i++)
+			{
+				if(value_setting[i]>=0)
+				{
+					int i_i=write_one(g_tstat_id,173+i,value_setting[i]);
+					if(p_log_file!=NULL)
+					{
+						if(i_i>0)
+							for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),173+i,value_setting[i]);
+						else
+						{
+							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),173+i,value_setting[i]);
+							load_file_one_time.second_step=false;
+						}
+						change_showing_text_variable(for_showing_text);
+						p_log_file->WriteString(for_showing_text);
+					}
+				}
+			}
+			if(p_log_file!=NULL)
+			p_log_file->WriteString(_T("\r\n"));
+	TCHAR buf[1024];
+
+#if 1
+	while(!inf.eof())
+	{
+		inf.getline(buf,1024);
+		if(wcscmp(buf,_T("//   DELAY TIMES"))==0)
+		{
+			int delay_setting[10]={0};
+			get_delay_setting(inf,delay_setting);
+			Show_load_file_error_message(load_file_one_time,3,p_log_file);
+			load_file_one_time.third_step=true;
+			for(int i=0;i<10;i++)
+			{
+				if(delay_setting[i]>=0)
+				{
+					int i_i=write_one(g_tstat_id,191+i,delay_setting[i]);
+					if(p_log_file!=NULL)
+					{
+						if(i_i>0)
+							for_showing_text.Format(_T("register ID:%d vlaue:%d write OK\r\n"),191+i,delay_setting[i]);
+						else
+						{
+							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),191+i,delay_setting[i]);
+							load_file_one_time.third_step=false;
+						}
+						change_showing_text_variable(for_showing_text);
+						p_log_file->WriteString(for_showing_text);
+					}
+				}
+			}
+			//26
+			//lookup table setting
+			if(p_log_file!=NULL)
+			p_log_file->WriteString(_T("\r\n"));
+		}
+		else if(wcscmp(buf,_T("//   LOOKUP TABLE"))==0)
+		{
+			if(tstat_version<CUSTOM_TABLE_FLOAT_VERSION)
+			{
+				int lookup_table_setting[23]={0};
+				get_lookup_table_setting(inf,lookup_table_setting);
+				Show_load_file_error_message(load_file_one_time,4,p_log_file);
+				load_file_one_time.thurth_step=true;
+				for(int i=0;i<22;i++)
+				{
+					if(lookup_table_setting[i]>=0)
+					{
+						int i_i=write_one(g_tstat_id,219+i,lookup_table_setting[i]);
+						if(p_log_file!=NULL)
+						{
+							if(i_i>0)
+								for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),219+i,lookup_table_setting[i]);
+							else
+							{							
+								for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),219+i,lookup_table_setting[i]);
+								load_file_one_time.thurth_step=false;
+							}
+							change_showing_text_variable(for_showing_text);
+							p_log_file->WriteString(for_showing_text);
+						}
+					}					
+				}
+				if(p_log_file!=NULL)
+				p_log_file->WriteString(_T("\r\n"));
+			}
+			else if(tstat_version>=CUSTOM_TABLE_FLOAT_VERSION)
+			{
+				int lookup_table_setting[23]={0};
+				get_lookup_table_setting(inf,lookup_table_setting);
+				Show_load_file_error_message(load_file_one_time,4,p_log_file);
+				load_file_one_time.thurth_step=true;
+
+		{
+		int ntemp=(int)lookup_table_setting[0];
+		short high=ntemp/65536;
+		short low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE1_ZERO,low);
+		write_one(g_tstat_id, MODBUS_TABLE1_ZERO_HI,high);
+		//2
+		ntemp=lookup_table_setting[1];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE1_HALFONE,low);
+		write_one(g_tstat_id, MODBUS_TABLE1_HALFONE_HI,high);
+		//3
+		ntemp=lookup_table_setting[2];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE1_ONE,low);
+		write_one(g_tstat_id, MODBUS_TABLE1_ONE_HI,high);
+		//4
+		ntemp=(int)lookup_table_setting[3];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE1_HALFTWO,low);
+		write_one(g_tstat_id, MODBUS_TABLE1_HALFTWO_HI,high);
+		//5
+		ntemp=lookup_table_setting[4];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE1_TWO,low);
+		write_one(g_tstat_id, MODBUS_TABLE1_TWO_HI,high);
+		//6
+		ntemp=lookup_table_setting[5];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE1_HALFTHREE,low);
+		write_one(g_tstat_id, MODBUS_TABLE1_HALFTHREE_HI,high);
+		//7
+		ntemp=lookup_table_setting[6];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE1_THREE,low);
+		write_one(g_tstat_id, MODBUS_TABLE1_THREE_HI,high);
+		//8
+
+		ntemp=lookup_table_setting[7];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE1_HALFFOUR,low);
+		write_one(g_tstat_id, MODBUS_TABLE1_HALFFOUR_HI,high);
+		//9
+		ntemp=lookup_table_setting[8];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE1_FOUR,low);
+		write_one(g_tstat_id, MODBUS_TABLE1_FOUR_HI,high);
+		//10
+		ntemp=lookup_table_setting[9];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE1_HALFFIVE,low);
+		write_one(g_tstat_id, MODBUS_TABLE1_HALFFIVE_HI,high);
+		//11
+		ntemp=lookup_table_setting[10];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE1_FIVE,low);
+		write_one(g_tstat_id, MODBUS_TABLE1_FIVE_HI,high);
+		}
+
+		//table 2
+		{
+		int ntemp=(int)lookup_table_setting[11];
+		short high=ntemp/65536;
+		short low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE2_ZERO,low);
+		write_one(g_tstat_id, MODBUS_TABLE2_ZERO_HI,high);
+		//2
+		ntemp=lookup_table_setting[12];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE2_HALFONE,low);
+		write_one(g_tstat_id, MODBUS_TABLE2_HALFONE_HI,high);
+		//3
+		ntemp=lookup_table_setting[13];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE2_ONE,low);
+		write_one(g_tstat_id, MODBUS_TABLE2_ONE_HI,high);
+		//4
+		ntemp=(int)lookup_table_setting[14];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE2_HALFTWO,low);
+		write_one(g_tstat_id, MODBUS_TABLE2_HALFTWO_HI,high);
+		//5
+		ntemp=lookup_table_setting[15];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE2_TWO,low);
+		write_one(g_tstat_id, MODBUS_TABLE2_TWO_HI,high);
+		//6
+		ntemp=lookup_table_setting[16];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE2_HALFTHREE,low);
+		write_one(g_tstat_id, MODBUS_TABLE2_HALFTHREE_HI,high);
+		//7
+		ntemp=lookup_table_setting[17];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE2_THREE,low);
+		write_one(g_tstat_id, MODBUS_TABLE2_THREE_HI,high);
+		//8
+
+		ntemp=lookup_table_setting[18];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE2_HALFFOUR,low);
+		write_one(g_tstat_id, MODBUS_TABLE2_HALFFOUR_HI,high);
+		//9
+		ntemp=lookup_table_setting[19];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE2_FOUR,low);
+		write_one(g_tstat_id, MODBUS_TABLE2_FOUR_HI,high);
+		//10
+		ntemp=lookup_table_setting[20];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE2_HALFFIVE,low);
+		write_one(g_tstat_id, MODBUS_TABLE2_HALFFIVE_HI,high);
+		//11
+		ntemp=lookup_table_setting[21];
+		high=ntemp/65536;
+		low=ntemp%65536;
+		write_one(g_tstat_id, MODBUS_TABLE2_FIVE,low);
+		write_one(g_tstat_id, MODBUS_TABLE2_FIVE_HI,high);
+
+		}
+			}
+		}
+		else if(wcscmp(buf,_T("//   UNIVERSAL RELAY OUTPUTS"))==0)
+		{
+			int universal_value[7]={0};
+			get_universal_fan_var(inf,universal_value);
+			Show_load_file_error_message(load_file_one_time,5,p_log_file);
+			load_file_one_time.fifth_step=true;
+			for(int i=0;i<7;i++)
+			{
+				if(universal_value[i]>=0)
+				{
+					int i_i=write_one(g_tstat_id,254+i,universal_value[i]);
+					if(p_log_file!=NULL)
+					{
+						if(i_i>0)
+							for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),254+i,universal_value[i]);
+						else
+						{
+							for_showing_text.Format(_T("register ID:%d vlaue:%d write Error******************\r\n"),254+i,universal_value[i]);
+							load_file_one_time.fifth_step=false;
+						}
+						change_showing_text_variable(for_showing_text);
+						p_log_file->WriteString(for_showing_text);
+					}
+				}						
+			}	
+			if(p_log_file!=NULL)
+			p_log_file->WriteString(_T("\r\n"));
+		}
+		else if(wcscmp(buf,_T("//   UNIVERSAL VALVE"))==0)
+		{
+			//universal value setting
+			int value_setting[7]={0};
+			for(int i=0;i<7;i++)
+				value_setting[i]=0;
+			get_value_setting(inf,value_setting);//universal value setting
+			Show_load_file_error_message(load_file_one_time,6,p_log_file);
+			load_file_one_time.sixth_step=true;
+			for(int i=0;i<7;i++)
+			{
+				if(value_setting[i]>=0)
+				{
+					int i_i=write_one(g_tstat_id,261+i,value_setting[i]);
+					if(p_log_file!=NULL)
+					{
+						if(i_i>0)
+							for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),261+i,value_setting[i]);
+						else
+						{
+							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
+							load_file_one_time.sixth_step=false;
+						}
+						change_showing_text_variable(for_showing_text);
+						p_log_file->WriteString(for_showing_text);
+					}
+				}						
+			}	
+			//26 end 
+			if(p_log_file!=NULL)
+			p_log_file->WriteString(_T("\r\n"));			
+		}
+		else if(wcsstr(buf,_T("serialnumber"))!=NULL || wcsstr(buf,_T("address:"))!=NULL )
+		{
+			/////////////////////////////////////var setting
+			Show_load_file_error_message(load_file_one_time,7,p_log_file);
+			write_one(g_tstat_id,184,5);//184 register,to no restart,when you write the 185,118,121,128 register
+			load_file_one_time.seven_step=true;
+			get_var_write_var(inf,tstat_version,p_log_file,&load_file_one_time);//////a line //////////// a line
+			write_one(g_tstat_id,16,159);/////
+			write_one(g_tstat_id,184,0);//184 register,to no restart,when you write the 185,118,121,128 register
+			if(p_log_file!=NULL)
+			p_log_file->WriteString(_T("\r\n"));
+		}
+	}
+	inf.close();
+	Sleep(14000);
+//	write_one(tstat_id,16,159);//////
+#endif
 
 
 #endif 
@@ -3538,7 +3967,346 @@ void configure_write(CStdioFile &default_file,int schedule_id)
 }
 
 
- 
+#if 0
+CString Show_load_file_result_message(load_file_every_step temppp,bool show_message_dialog)
+{//true show message box ,false no 
+	CString showing_message;
+	showing_message= _T("^^^^^^^^^^Summary^^^^^^^^^^\r\n");
+	if(temppp.first_step ==true)
+		showing_message=showing_message+LOAD_FAILURE_ONE+STEP_FINISH;
+	else
+		showing_message=showing_message+LOAD_FAILURE_ONE+STEP_FAILURE;
+	if(temppp.second_step ==true)
+		showing_message=showing_message+LOAD_FAILURE_TWO+STEP_FINISH;
+	else
+		showing_message=showing_message+LOAD_FAILURE_TWO+STEP_FAILURE;
+	if(temppp.third_step ==true)
+		showing_message=showing_message+LOAD_FAILURE_THREE+STEP_FINISH;
+	else
+		showing_message=showing_message+LOAD_FAILURE_THREE+STEP_FAILURE;
+	if(temppp.thurth_step ==true)
+		showing_message=showing_message+LOAD_FAILURE_FOUR+STEP_FINISH;
+	else
+		showing_message=showing_message+LOAD_FAILURE_FOUR+STEP_FAILURE;
+	if(temppp.fifth_step ==true)
+		showing_message=showing_message+LOAD_FAILURE_FIVE+STEP_FINISH;
+	else
+		showing_message=showing_message+LOAD_FAILURE_FIVE+STEP_FAILURE;
+	if(temppp.sixth_step ==true)
+		showing_message=showing_message+LOAD_FAILURE_SIX+STEP_FINISH;
+	else
+		showing_message=showing_message+LOAD_FAILURE_SIX+STEP_FAILURE;
+	if(temppp.seven_step==true)
+		showing_message=showing_message+LOAD_FAILURE_SEVEN+STEP_FINISH;
+	else
+		showing_message=showing_message+LOAD_FAILURE_SEVEN+STEP_FAILURE;
+	if(show_message_dialog==true)
+	{
+		if(temppp.seven_step==true)
+			message_box_function(showing_message,_T("Finish"));
+		else
+			AfxMessageBox(showing_message);
+	}
+	return showing_message;
+
+}
+
+void weekly_write(CStdioFile &default_file,int schedule_id)
+{
+	CString a_line;	
+	int i=0;
+	a_line=_T("WEEKLY ROUTINES\n");
+	default_file.WriteString(a_line.GetString());
+
+	a_line=_T("Num\tFULL_LABEL\t\tA/M\tOutput\tHoliday1 State1\tHoliday2 State2\tLabel\n");
+	default_file.WriteString(a_line.GetString());
+	unsigned short temp_buffer[WR_DESCRIPTION_SIZE]={0};
+	memset(&temp_buffer[0],0,sizeof(temp_buffer));
+	for(i=0;i<MAX_WR;i++)
+	{
+		a_line=_T("");//clear
+		Read_Multi(schedule_id,temp_buffer,MODBUS_WR_DESCRIP_FIRST+i*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
+		if(temp_buffer[0]==255)
+		{
+			for(int itt=0;itt<WR_DESCRIPTION_SIZE;itt++)
+				temp_buffer[itt]=0;
+		}			
+		description temp_description;
+		memset(&temp_description,0,sizeof(description));
+		TCHAR *p=NULL;
+		p=(char *)&temp_description;///////////////*****pointer   attention
+		for(int j=0;j<WR_DESCRIPTION_SIZE;j++)
+			(*(p++))=temp_buffer[j];
+		CString a_m,output,state1,state2;
+		if(temp_description.flag & 128)
+			a_m=_T("MAN");
+		else
+			a_m=_T("AUTO");
+		if(temp_description.flag & 64)
+			output=_T("ON");
+		else
+			output=_T("OFF");
+		if(temp_description.flag & 32)
+			state1=_T("ON");
+		else
+			state1=_T("OFF");
+		if(temp_description.flag & 16)
+			state2=_T("ON");
+		else
+			state2=_T("OFF");			
+		if(strlen(temp_description.full_label)<8)
+			a_line.Format(_T("\t%s\t\t\t"),temp_description.full_label);
+		else if(strlen(temp_description.full_label)<16)
+			a_line.Format(_T("\t%s\t\t"),temp_description.full_label);
+		else if(strlen(temp_description.full_label)<20)
+			a_line.Format(_T("\t%s\t"),temp_description.full_label);
+		CString temp;
+		a_line=a_line+a_m+_T("\t");
+		a_line=a_line+output+_T("\t");
+		temp.Format(_T("%d"),temp_description.holiday1);
+		a_line=a_line+temp+_T("\t");
+		a_line=a_line+state1+_T("\t");
+		temp.Format(_T("%d"),temp_description.holiday2);
+		a_line=a_line+temp+_T("\t");
+		a_line=a_line+state2+_T("\t");
+		temp.Format(_T("%s\n"),temp_description.label);
+		a_line=a_line+temp;
+		temp.Format(_T("%d:"),i+1);
+		a_line=temp+a_line;
+		default_file.WriteString(a_line.GetString());////////////////write
+		weekly_routines_insert_write(default_file,schedule_id,i);
+	}
+}
+void weekly_routines_insert_write(CStdioFile &default_file,int schedule_id,int weekly_row_number)
+{
+	CString a_line;	
+	int i=0;
+//	a_line="WEEKLY ROUTINES INSERT\n";
+//	default_file.WriteString(a_line.GetString());
+	a_line=_T("\tMon\tTue\tWed\tThu\tFri\tSat\tSun\tHoliday1Holiday2\n");
+	default_file.WriteString(a_line.GetString());
+	unsigned short on[72]={0};
+	unsigned short off[72]={0};
+//	for(i=0;i<MAX_WR;i++)
+//	{
+		Read_Multi(schedule_id,on,MODBUS_WR_ONTIME_FIRST + WR_TIME_SIZE*weekly_row_number,0x48);
+		//由上到下，由左到右，from up to lower ,from left to right
+		Read_Multi(schedule_id,off,MODBUS_WR_OFFTIME_FIRST + WR_TIME_SIZE*weekly_row_number,0x48);
+		//由上到下，由左到右，from up to lower ,from left to right
+		for(int i=0;i<0x48;i++)
+		{
+			if(on[i]==255)
+				on[i]=0;
+			if(off[i]==255)
+				off[i]=0;
+		}
+		for(int w=0;w<4;w++)
+		{
+			int itemp=w*2;
+			a_line.Format(_T("ON:\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\n"),on[itemp+0*8],on[itemp+0*8+1],on[itemp+1*8],on[itemp+1*8+1],on[itemp+2*8],on[itemp+2*8+1],on[itemp+3*8],on[itemp+3*8+1],on[itemp+4*8],on[itemp+4*8+1],on[itemp+5*8],on[itemp+5*8+1],on[itemp+6*8],on[itemp+6*8+1],on[itemp+7*8],on[itemp+7*8+1],on[itemp+8*8],on[itemp+8*8+1]);
+			default_file.WriteString(a_line.GetString());
+			a_line.Format(_T("OFF:\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\n"),off[itemp+0*8],off[itemp+0*8+1],off[itemp+1*8],off[itemp+1*8+1],off[itemp+2*8],off[itemp+2*8+1],off[itemp+3*8],off[itemp+3*8+1],off[itemp+4*8],off[itemp+4*8+1],off[itemp+5*8],off[itemp+5*8+1],off[itemp+6*8],off[itemp+6*8+1],off[itemp+7*8],off[itemp+7*8+1],off[itemp+8*8],off[itemp+8*8+1]);
+			default_file.WriteString(a_line.GetString());
+		}
+		default_file.WriteString(_T("\n"));
+//	}
+}
+
+void annual_write(CStdioFile &default_file,int schedule_id)
+{
+	CString a_line;	
+	int i=0;
+	a_line=_T("ANNUAL ROUTINES\n");
+	default_file.WriteString(a_line.GetString());
+
+	a_line=_T("Num\tFULL_LABEL\t\tA/M\tValue\tLabel\n");
+	default_file.WriteString(a_line.GetString());
+	unsigned short temp_buffer[AR_DESCRIPTION_SIZE]={0};
+	memset(&temp_buffer[0],0,sizeof(temp_buffer));
+	for(i=0;i<MAX_AR;i++)
+	{
+		a_line="";//clear
+		Read_Multi(schedule_id,temp_buffer,MODBUS_AR_DESCRIP_FIRST+i*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
+		if(temp_buffer[0]==255)
+		{
+			for(int itt=0;itt<AR_DESCRIPTION_SIZE;itt++)
+				temp_buffer[itt]=0;
+		}			
+		description2 temp_description;
+
+		memset(&temp_description,0,sizeof(description2));
+		char *p;
+		p=(char *)&temp_description;///////////////*****pointer   attention
+		for(int j=0;j<AR_DESCRIPTION_SIZE;j++)
+			(*(p++))=temp_buffer[j];
+		CString a_m,value;
+		if(temp_description.flag & 128)
+			a_m=_T("MAN");
+		else
+			a_m=_T("AUTO");
+		if(temp_description.flag & 64)
+			value=_T("ON");
+		else
+			value=_T("OFF");
+		if(strlen(temp_description.full_label)<8)
+			a_line.Format(_T("%s\t\t\t"),temp_description.full_label);
+		else if(strlen(temp_description.full_label)<16)
+			a_line.Format(_T("\t%s\t\t"),temp_description.full_label);
+		else if(strlen(temp_description.full_label)<20)
+			a_line.Format(_T("\t%s\t"),temp_description.full_label);
+		a_line=a_line+a_m+_T("\t");
+		a_line=a_line+value+_T("\t");	
+		CString temp;
+		temp.Format(_T("%s\n"),temp_description.label);
+		a_line=a_line+temp;
+		temp.Format(_T("%d:\t"),i+1);
+		a_line=temp+a_line;
+		default_file.WriteString(a_line.GetString());////////////////write
+		annual_routines_insert_write(default_file,schedule_id,i);
+	}
+}
+void annual_routines_insert_write(CStdioFile &default_file,int schedule_id,int weekly_row_number)
+{
+	unsigned short the_days[AR_TIME_SIZE];
+	CString a_line=_T("\t"),temp=_T("");	
+    Read_Multi(schedule_id,the_days,MODBUS_AR_TIME_FIRST + AR_TIME_SIZE*weekly_row_number,AR_TIME_SIZE);//get from network
+	for(int i=0;i<AR_TIME_SIZE;i++)
+	{
+		int j;
+		for(j=0;j<AR_TIME_SIZE;j++)
+		{
+			if(the_days[j]!=255)
+				break;
+		}
+		if(j==AR_TIME_SIZE)
+		{
+			for(j=0;j<AR_TIME_SIZE;j++)
+				the_days[j]=0;
+		}
+		temp.Format(_T("%d,"),the_days[i]);
+		a_line+=temp;
+	}
+	a_line+=_T('\n');
+	default_file.WriteString(a_line.GetString());////////////////write
+}
+void configure_write(CStdioFile &default_file,int schedule_id)
+{
+	CString a_line;	
+	int i=0;
+	a_line=_T("ID ROUTINES\n");
+	default_file.WriteString(a_line.GetString());
+
+	a_line=_T("Num\tA/M\tValue\tSchedule1\tstate1\tSchedule2\tstate2\n");
+	default_file.WriteString(a_line.GetString());
+	unsigned short temp_buffer[ID_SIZE]={0};
+	for(i=0;i<MAX_ID;i++)
+	{
+		a_line=_T("");//clear
+		Read_Multi(schedule_id,temp_buffer,MODBUS_ID_FIRST+i*ID_SIZE,ID_SIZE);
+		if(temp_buffer[0]==255)
+		{
+			for(int itt=0;itt<ID_SIZE;itt++)
+				temp_buffer[itt]=0;
+		}			
+		description3 temp_description;
+		char *p;
+		p=(char *)&temp_description;///////////////*****pointer   attention
+		for(int j=0;j<ID_SIZE;j++)
+			(*(p++))=temp_buffer[j];
+		CString state1,state2,a_m,value;
+		if(temp_description.flag & 128)
+			a_m=_T("MAN\t");
+		else
+			a_m=_T("AUTO\t");
+		if(temp_description.flag & 64)
+			value=_T("ON\t");
+		else
+			value=_T("OFF\t");
+		if(temp_description.flag & 32)
+			state1=_T("ON\t");
+		else
+			state1=_T("OFF\t");
+		if(temp_description.flag & 16)
+			state2=_T("ON\n");
+		else
+			state2=_T("OFF\n");
+		a_line.Format(_T("%d:\t"),i+1);
+		a_line+=a_m;
+		a_line+=value;
+		CString temp;		
+		temp.Format(_T("%d\t\t"),temp_description.schedul1);
+		a_line+=temp;
+		a_line+=state1;
+		temp.Format(_T("%d\t\t"),temp_description.schedul2);
+		a_line+=temp;
+		a_line+=state2;
+		default_file.WriteString(a_line.GetString());
+	}
+}
+void variable_write(CStdioFile &default_file,int schedule_id)
+{
+	CString a_line;	
+	a_line=_T("VARIABLE LIST\n");
+	default_file.WriteString(a_line.GetString());
+	unsigned short varliable[NET_WORK_CONTROLLER_NUM+1]={0};
+	Read_Multi(schedule_id,varliable,106,NET_WORK_CONTROLLER_NUM+1);
+	a_line.Format(_T("\t%d"),varliable[0]);
+	a_line=NET_WORK_CONTROLLER[0]+a_line+_T("\n");
+	default_file.WriteString(a_line);
+	a_line.Format(_T("\t%d:%d:%d:%d"),varliable[1],varliable[2],varliable[3],varliable[4]);
+	a_line=NET_WORK_CONTROLLER[1]+a_line+_T("\n");
+	default_file.WriteString(a_line);
+	a_line.Format(_T("\t%d:%d:%d:%d"),varliable[5],varliable[6],varliable[7],varliable[8]);
+	a_line=NET_WORK_CONTROLLER[2]+a_line+_T("\n");
+	default_file.WriteString(a_line);
+	a_line.Format(_T("\t%d:%d:%d:%d"),varliable[9],varliable[10],varliable[11],varliable[12]);
+	a_line=NET_WORK_CONTROLLER[3]+a_line+_T("\n");
+	default_file.WriteString(a_line);
+	a_line.Format(_T("\t%d"),varliable[13]);
+	a_line=NET_WORK_CONTROLLER[4]+a_line+_T("\n");
+	default_file.WriteString(a_line);
+	a_line.Format(_T("\t%d"),varliable[14]);
+	a_line=NET_WORK_CONTROLLER[5]+a_line+_T("\n");////////Listenning Port
+	default_file.WriteString(a_line);
+	a_line.Format(_T("\t%d"),varliable[21]);
+	a_line=NET_WORK_CONTROLLER[6]+a_line+_T("\n");////////Inactivity Timeout
+	default_file.WriteString(a_line);
+	a_line.Format(_T("\t%d:%d:%d:%d"),varliable[15],varliable[16],varliable[17],varliable[18]);
+	a_line=NET_WORK_CONTROLLER[7]+a_line+_T("\n");
+	default_file.WriteString(a_line);
+	a_line.Format(_T("\t%d"),varliable[19]);
+	a_line=NET_WORK_CONTROLLER[8]+a_line+_T("\n");////////Listenning Port
+	default_file.WriteString(a_line);
+	a_line.Format(_T("\t%d"),varliable[20]);
+	a_line=NET_WORK_CONTROLLER[9]+a_line+_T("\n");////////Listenning Port
+	default_file.WriteString(a_line);
+	a_line.Format(_T("\t%d"),varliable[23]);
+	a_line=NET_WORK_CONTROLLER[10]+a_line+_T("\n");////////Listenning Port
+	default_file.WriteString(a_line);
+	a_line.Format(_T("\t%d"),varliable[24]);
+	a_line=NET_WORK_CONTROLLER[11]+a_line+_T("\n");////////Listenning Port
+	default_file.WriteString(a_line);	
+}
+void save_schedule_2_file(const char* fn,int schedule_id)
+{
+	CStdioFile default_file;
+	if(default_file.Open(_T(fn),CFile::modeCreate | CFile::modeWrite)!=0)
+	{
+		default_file.WriteString(NET_WORK_DEFFERENT_TSTAT_FILE);
+		weekly_write(default_file,schedule_id);
+		annual_write(default_file,schedule_id);
+		configure_write(default_file,schedule_id);
+		variable_write(default_file,schedule_id);
+		/////////////////////////////////////////////last work
+		default_file.Flush();
+		default_file.Close();
+	}
+	else
+		AfxMessageBox(_T("Open file failure!"));
+	
+}
+
+#endif
 CString get_left_first_array(CString &a_line)
 {
 	bool found_first_char=false;
