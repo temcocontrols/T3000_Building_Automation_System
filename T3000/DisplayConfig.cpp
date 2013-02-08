@@ -313,7 +313,6 @@ void CDisplayConfig::OnBnClickedSave2()
        }
 }
 
-
 void CDisplayConfig::OnBnClickedSaveLine2()
 {
 CString input;
