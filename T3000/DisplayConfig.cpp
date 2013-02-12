@@ -335,7 +335,8 @@ else
 		else
 			p[i-1]=' ';
 		}
-	if (UpdateTextToReg(input,429)Write_Multi(g_tstat_id,to_write,start_address,length))
+	//if (UpdateTextToReg(input,429)Write_Multi(g_tstat_id,to_write,start_address,length))
+	if (UpdateTextToReg(input,429))
 		{
 		GetDlgItem(IDC_LINE2)->SetWindowText(_T("OK"));
 		} 
