@@ -230,6 +230,7 @@
     <ClCompile Include="singleslider\MacSliderCtrl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram11.cd" />
     <None Include="OutputTableDlg.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
