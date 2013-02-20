@@ -23,7 +23,8 @@ BEGIN_MESSAGE_MAP(CT3000App, CWinAppEx)
 	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
 	ON_COMMAND(ID_FILE_SAVE_CONFIG, &CWinAppEx::OnFileOpen)
 	ON_COMMAND(ID_VERSIONHISTORY,OnVersionInfo)
-END_MESSAGE_MAP()	
+END_MESSAGE_MAP()
+
 // CT3000App construction
 CT3000App::CT3000App()
 {
@@ -37,6 +38,7 @@ CT3000App::CT3000App()
 // 		AfxMessageBox(_T("1111"));
 // 	}
 }
+
 // The one and only CT3000App object
 CT3000App theApp;
 
@@ -55,35 +57,118 @@ BOOL CT3000App::user_login()
 FunctionName:RegisterOcx
 Comment:Alex
 Date:2012-11-29
-Purpose:这个函数的作用，获取控件的位置，注册到注册表中
-也可以通过Bat文件注册
 */
+
+/* Comment by Jay:
+RegisterOcx:
+This function is used to register a .dll or library file passed to it. 
+Function returns TRUE if it is able to successfully load the file. 
+It returns FALSE if it fails to load the file. 
+*/
+
 BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 {
-	LPCTSTR   pszDllName   =   OcxFileName   ;     //ActiveX控件的路径及文件名       
-	HINSTANCE   hLib   =   LoadLibrary(pszDllName);   //装载ActiveX控件   
+	LPCTSTR   pszDllName   =   OcxFileName   ;
+
+	/* Comment by Jay:
+	LoadLibrary - Loads the specified module into the address space of the calling process. 
+	The specified module may cause other modules to be loaded. 
+	If the function succeeds, the return value is a handle to the module.
+	If the function fails, the return value is NULL. To get extended error information, 
+	call GetLastError.
+	http://social.msdn.microsoft.com/Forums/en-US/vclanguage/thread/1b994ff3-da28-46a8-90ef-6c7fab8dcd21/
+	http://msdn.microsoft.com/en-us/library/windows/desktop/ms684175(v=vs.85).aspx
+	*/
+	HINSTANCE   hLib   =   LoadLibrary(pszDllName);
+	
+	/* Suggestion by Jay: 
+	As per documentation of LoadLibrary API, it returns a handle or NULL. LoadLibrary used to
+	return HINSTANCE_ERROR during 16-bit windows era. If this still holds true or not shall be 
+	checked by actually calling this function and checking value of hLib variable. 
+	*/
+	
+	/* Comment by Jay:
+	Check if library got loaded properly or not? */
 	if   (hLib   <   (HINSTANCE)HINSTANCE_ERROR)   
 	{   
 		return   FALSE;   
 	}   
+
 	FARPROC   lpDllEntryPoint;     
-	lpDllEntryPoint   =   GetProcAddress(hLib,(LPCSTR)(_T("DllRegisterServer")));   //获取注册函数DllRegisterServer地址   
-	if(lpDllEntryPoint!=NULL)      
-	 //调用注册函数DllRegisterServer   
+	
+	/* Comment by Jay: 
+	GetProcAddress - Retrieves the address of an exported function or variable from 
+	the specified dynamic-link library (DLL).
+	If the function succeeds, the return value is the address of the 
+	exported function or variable.
+	If the function fails, the return value is NULL. To get extended error 
+	information, call GetLastError.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/ms683212(v=vs.85).aspx
+	*/
+	/* Comment by Jay: 
+	_T macro - will add L as prefix to Unicode builds, hence making code as portable
+	as possible. 
+	*/
+	lpDllEntryPoint   =   GetProcAddress(hLib,(LPCSTR)(_T("DllRegisterServer")));
+	
+	/* Comment by Jay: 
+	Check if entry point function is identified or not? If it is not identified, then
+	the library loaded by LoadLibrary function shall be unloaded using FreeLibrary function. 
+	*/
+	if(lpDllEntryPoint != NULL)      
 	{   
-		if(FAILED((*lpDllEntryPoint)()))   
+		/* Comment by Jay: 
+		FAILED - this function is defiend in WinError.h as 
+		#define FAILED(hr) (((HRESULT)(hr)) < 0)
+		It checks if the return value by the function is negative. If it is,
+		FAILED() returns a true value meaning that the function has failed. 
+		http://stackoverflow.com/questions/377322/can-someone-explain-the-c-failed-function
+		*/
+		/* Comment by Jay: 
+		If lpDllEntryPoint fails, unload the loaded DLL / library. 
+		*/
+		if(FAILED((*lpDllEntryPoint)()))
 		{
-		//   AfxMessageBox(_T("false"));
+			//   AfxMessageBox(_T("false"));
+			/* Comment by Jay: 
+			FreeLibrary - frees the loaded DLL module.
+			If the function succeeds, the return value is nonzero.
+			If the function fails, the return value is zero. 
+			To get extended error information, call the GetLastError function.
+			http://msdn.microsoft.com/en-us/library/windows/desktop/ms683152(v=vs.85).aspx
+			*/
+			/* Suggestion by Jay:
+			If possible check return value of FreeLibrary also. It returns 
+			zero or non-zero values as commented above.
+			*/
 			FreeLibrary(hLib);   
+
+			/* Comment by Jay:
+			Registration of OCX failed. 
+			*/
 			return   FALSE;   
 			
-		}   
+		}
+		/* Comment by Jay:
+		Registration of OCX succeeded. 
+		*/
 		return   TRUE;   
-	}   
+	}
 	else   
 	{
-	//	AfxMessageBox(_T("false"));
-			return   FALSE;
+		//	AfxMessageBox(_T("false"));
+	
+		/* Comment by Jay:
+		GetProcAddress returned NULL and hence entry point was not found. 
+		Registration of OCX failed. 
+		*/
+		/* Suggestion by Jay:
+		In this case also, check if there is necessity to call FreeLibrary 
+		function. If called, in that case, 
+		if possible check return value of FreeLibrary also. It returns 
+		zero or non-zero values as commented above.
+		*/
+		return   FALSE;
 
 
 	}
@@ -94,8 +179,6 @@ FunctionName:InitInstance
 
 Comment:Alex
 Date:2012-11-29
-Purpose:这个是T3000的入口函数，从这里开始初始化，
-然后进入T3000的MainFrm界面
 */
 BOOL CT3000App::InitInstance()//Alex-
 {
@@ -104,14 +187,52 @@ BOOL CT3000App::InitInstance()//Alex-
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
+
+	/* Comment by Jay:
+	INITCOMMONCONTROLSEX structure Carries information used to load 
+	common control classes from the dynamic-link library (DLL). 
+	This structure is used with the InitCommonControlsEx function.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb775507(v=vs.85).aspx
+	*/
  	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
 	// Set this to include all the common control classes you want to use
 	// in your application.
+
+	/* Comment by Jay:
+	ICC_WIN95_CLASSES loads following:
+	Loads animate control, header, hot key, list-view, progress bar, 
+	status bar, tab, tooltip, toolbar, trackbar, tree-view, 
+	and up-down control classes.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb775507(v=vs.85).aspx
+	*/
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
+	
+	/* Comment by Jay:
+	This function nsures that the common control DLL (Comctl32.dll) is loaded, 
+	and registers specific common control classes from the DLL. 
+	An application must call this function before creating 
+	a common control.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb775697(v=vs.85).aspx
+	*/
+	/* Suggestion by Jay: 
+	Return type (TRUE or FALSE) must be checked to ensure that Common Control
+	DLL is loaded successfully. If the same is not checked then there could be 
+	issues later on. Also, if it is found that common controls are not 
+	loaded properly, then the same can be managed in a more meaningful way at 
+	this stage. 
+	*/
 	InitCommonControlsEx(&InitCtrls);
 
+	/* Comment by Jay:
+	This function checks a registries. If the same is not existing, then it creates them.
+	*/
 	Judgestore();
+
+	/* Comment by Jay:
+	This function is used to update m_maxClients and password variables 
+	with the values contained in maxClients and Regvalue registries.
+	*/
 	ReadREG();
  
 #if 0
@@ -180,61 +301,141 @@ BOOL CT3000App::InitInstance()//Alex-
 	}*/
 #endif
 
+	/* Comment by Jay:
+	Call InitInstance of parent class. 
+	*/
 	CWinAppEx::InitInstance();
-	HRESULT hr;//
+	HRESULT hr;
 
 
-
-	 
-	if (!AfxSocketInit())//
+	/* Comment by Jay:
+	AfxSocketInit - This function is called in CWinApp::InitInstance override to initialize Windows Sockets.
+	It returns nonzero if the function is successful; otherwise 0.
+	http://msdn.microsoft.com/en-us/library/x12941w5(v=vs.80).aspx
+	*/
+	if (!AfxSocketInit())
 	{
-		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);//
-		return FALSE;//
+		/* Comment by Jay:
+		AfxMessageBox - Displays a message box on the screen.
+		Return: Zero if there is not enough memory to display the message box; otherwise nonzero.
+		http://msdn.microsoft.com/en-us/library/as6se7cb(v=vs.80).aspx
+		*/
+		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);
+		return FALSE;
 	}
 	// Initialize OLE libraries
+
+	/* Comment by Jay:
+	AfxOleInit - Initializes OLE support for the application.
+	Return: Nonzero if successful; 0 if initialization fails, possibly because incorrect versions of the 
+	OLE system DLLs are installed. 
+	http://msdn.microsoft.com/en-us/library/e91aseaz(v=vs.80).aspx
+	*/
 	if (!AfxOleInit())
 	{
 		AfxMessageBox(IDP_OLE_INIT_FAILED);
 		return FALSE;
 	}
+
+	/* Comment by Jay:
+	AfxEnableControlContainer - Call this function in your application object's InitInstance function 
+	to enable support for containment of OLE controls.
+	http://msdn.microsoft.com/en-us/library/x1se4y1y(v=vs.80).aspx
+	*/
 	AfxEnableControlContainer();
 
 #if 1	
 	try
 	{
 
-	TCHAR exeFullPath[MAX_PATH+1]; //
-	GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
-	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
-	g_strDatabasefilepath=exeFullPath;//
-	g_strExePth=g_strDatabasefilepath;//
-	CreateDirectory(g_strExePth+_T("Database"),NULL);//creat database folder;//
-	g_strOrigDatabaseFilePath=g_strExePth+_T("t3000.mdb");//
-	g_strDatabasefilepath+=_T("Database\\t3000.mdb");//
+	TCHAR exeFullPath[MAX_PATH+1];
+
+	/* Comment by Jay:
+	GetModuleFileName - Retrieves the fully qualified path for the file that contains 
+	the specified module. The module must have been loaded by the current process.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/ms683197(v=vs.85).aspx
+	*/
+	GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
+
+	/* Comment by Jay:
+	_tcsrchr function scans a string for the last occurrence of a character.
+	Its parameters are: a null-terminated string to search, and character to be located.
+	It returns a pointer to the last occurrence of ChartoLocate in string, or NULL 
+	if ChartoLocate is not found. 
+	http://rosasm.freeforums.org/tcsrchr-t78.html
+
+	So, following statement is used to add NULL to the end of exeFullPath string. 
+	This is because array a[1] internally expands like *(a + 1). 
+	Here, a is the pointer returned by _tcsrchr. +1 is done so that NULL character
+	is added next to the last character. 
+	*/
+	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
+	g_strDatabasefilepath=exeFullPath;
+	g_strExePth=g_strDatabasefilepath;
 
 
-	HANDLE hFind;//
-	WIN32_FIND_DATA wfd;//
-	hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
-	if (hFind==INVALID_HANDLE_VALUE)//
+	/* Comment by Jay:
+	CreateDirectory - Creates a new directory. If the underlying file system supports security 
+	on files and directories, the function applies a specified security descriptor to 
+	the new directory.
+	If the function succeeds, the return value is nonzero.
+	Possible errors include the following:
+	ERROR_ALREADY_EXISTS
+	ERROR_PATH_NOT_FOUND
+	http://msdn.microsoft.com/en-us/library/windows/desktop/aa363855(v=vs.85).aspx
+	*/
+	/* Suggestion by Jay:
+	Here, in the following statement, its return type shall be checked for above mentioned
+	errors. This will also result in handling things properly in a nice way.
+	*/
+	CreateDirectory(g_strExePth+_T("Database"),NULL);
+
+	g_strOrigDatabaseFilePath=g_strExePth+_T("t3000.mdb");
+	g_strDatabasefilepath+=_T("Database\\t3000.mdb");
+
+
+	HANDLE hFind;
+	WIN32_FIND_DATA wfd;
+
+	/* Comment by Jay:
+	FindFirstFile - Searches a directory for a file or subdirectory with a name that matches 
+	a specific name (or partial name if wildcards are used).
+	If the function succeeds, the return value is a search handle used in a subsequent 
+	call to FindNextFile or FindClose. Second parameter contains information about 
+	the first file or directory found.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/aa364418(v=vs.85).aspx
+	*/
+	hFind = FindFirstFile(g_strDatabasefilepath, &wfd);
+	if (hFind==INVALID_HANDLE_VALUE)
 	{
 	//GOOD==GOOD
-		CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
-	}//
-	else//
+		/* Comment by Jay:
+		CopyFile - This function copies an existing file to a new file. 
+		http://msdn.microsoft.com/en-us/library/windows/desktop/aa363851(v=vs.85).aspx
+
+		Since the third argument is FALSE, this function will overwrite already existing 
+		file, if any. 
+		*/
+		CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);
+	}
+	else
 	{
 	
 	}
-	FindClose(hFind);//
+	/* Comment by Jay:
+	FindClose - Closes a file search handle. 
+	http://msdn.microsoft.com/en-us/library/windows/desktop/aa364413(v=vs.85).aspx
+	*/
+	FindClose(hFind);
 
-	g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;//
-	g_strImgeFolder=g_strExePth+_T("Database\\image\\");//
-	CreateDirectory(g_strImgeFolder,NULL);//
+	g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;
+	g_strImgeFolder=g_strExePth+_T("Database\\image\\");
+	CreateDirectory(g_strImgeFolder,NULL);
 	
 	//CString strocx=g_strExePth+_T("MSFLXGRD.OCX");
 
 
-	InitModeName();//
+	InitModeName();
 
 
 
@@ -247,7 +448,7 @@ BOOL CT3000App::InitInstance()//Alex-
 	// Change the registry key under which our settings are stored
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization
-	SetRegistryKey(_T("Temco T3000 Application"));//
+	SetRegistryKey(_T("Temco T3000 Application"));
 //	LoadStdProfileSettings(12);  // Load standard INI file options (including MRU)//
 	InitContextMenuManager();
 	InitKeyboardManager();
@@ -258,11 +459,11 @@ BOOL CT3000App::InitInstance()//Alex-
 	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
 		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams); 
 #if 1
-	hr=CoInitialize(NULL);//
-	if(FAILED(hr)) 	//
+	hr=CoInitialize(NULL);
+	if(FAILED(hr))
 	{
-		AfxMessageBox(_T("Error Initialize the COM Interface"));//
-		return FALSE;//
+		AfxMessageBox(_T("Error Initialize the COM Interface"));
+		return FALSE;
 	}
 
 #endif
@@ -304,23 +505,20 @@ BOOL CT3000App::InitInstance()//Alex-
 		return FALSE;
 
 	
-	GdiplusStartupInput gdiplusStartupInput;//
-	GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);//
+	GdiplusStartupInput gdiplusStartupInput;
+	GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);
 #if 1
-//这个活动片段的目的：初始g_bPrivilegeMannage的值
-//当是否有用户登录到系统
-////////////////////////////////////////////////////////
 	_ConnectionPtr m_pCon;
 	_RecordsetPtr m_pRs;
 	m_pCon.CreateInstance(_T("ADODB.Connection"));
 	hr=m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	if(FAILED(hr)) 	
+	if(FAILED(hr))
 	{
 	    AfxMessageBox(_T("Load msado12.dll erro"));
 	      return FALSE;
 	}
 	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-	m_pRs->Open(_T("select * from Userlogin"),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);		
+	m_pRs->Open(_T("select * from Userlogin"),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 	int nRecord=m_pRs->GetRecordCount();
 	if (nRecord<=0)
 	{
@@ -330,7 +528,7 @@ BOOL CT3000App::InitInstance()//Alex-
 	{
 		int nUse;
 		_variant_t temp_variant;
-		temp_variant=m_pRs->GetCollect("USE_PASSWORD");//
+		temp_variant=m_pRs->GetCollect("USE_PASSWORD");
 		if(temp_variant.vt!=VT_NULL)
 			nUse=temp_variant;
 		else
@@ -466,6 +664,11 @@ Comment:Alex
 Date:2012/11/29
 Purpose:
 初始化设备的名字
+*/
+
+/* Comment by Jay:
+This function deals with .ini file present in the directory. 
+The name of the ini file is CustomInfo.ini. 
 */
 void CT3000App::InitModeName()
 {
@@ -616,8 +819,15 @@ Date:2012/11/29
 Purpose:
 向一个指定注册表项里面写一个值
 */
+/* Comment by Jay:
+This function is used to set a DWORD value of the key passed to it. 
+*/
 void CT3000App::WriteNumber( CRegKey& key,CStringW valueName,DWORD value )
 {
+	/* Comment by Jay:
+	This method sets the DWORD value of the registry key.
+	http://msdn.microsoft.com/en-us/library/1y3z5z87(v=vs.80).aspx
+	*/
 	key.SetDWORDValue(valueName,value);
 }
 /*
@@ -627,9 +837,18 @@ Date:2012/11/29
 Purpose:
 读一个值，从指定注册表项目
 */
+
+/* Comment by Jay:
+This is a user defined function to read value of registry key
+*/
 BOOL CT3000App::ReadNameber( CRegKey& key,CStringW valueName,DWORD& value )
 {
 	DWORD s;
+
+	/* Comment by Jay:
+	QueryDWORDValue - Call this method to retrieve the DWORD data for a specified value name.
+	http://msdn.microsoft.com/en-us/library/5sts2k7t(v=vs.80).aspx
+	*/
 	if (key.QueryDWORDValue(valueName,s) == ERROR_SUCCESS)
 	{
 		value = s;
@@ -647,11 +866,26 @@ Purpose:判断 HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion
 查看是否有改项目
 没有创建，并写入一个定值到该表项中
 */
+
+/* Comment by Jay:
+Check if maxClients and RegValue registry keys are existing or not? If they are 
+existing, then simply return. Else create them with specified value and return.
+*/
 void CT3000App::Judgestore()
 {
 	HKEY hKEY;
-	LPCTSTR data_Set = _T("Software\\Microsoft\\Windows NT\\CurrentVersion\\");//_T("Software\\Microsoft\\");//
+	LPCTSTR data_Set = _T("Software\\Microsoft\\Windows NT\\CurrentVersion\\");
+	/* Comment by Jay:
+	RegOpenKeyEx - Opens the specified registry key. 
+	If the function succeeds, the return value is ERROR_SUCCESS.
+	If the function fails, the return value is a nonzero error code defined in Winerror.h.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/ms724897(v=vs.85).aspx
+	*/
 	long ret0 = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,data_Set,0,KEY_READ,&hKEY);
+
+	/* Comment by Jay:
+	Return if RegOpenKeyEx fails to open specified registry. 
+	*/
 	if (ret0!=ERROR_SUCCESS)
 	{
 		return;
@@ -661,14 +895,39 @@ void CT3000App::Judgestore()
 	DWORD type_1 = REG_SZ;
 	DWORD cbData_1 = 80;
 
+	/* Comment by Jay:
+	RegQueryValueEx - Retrieves the type and data for the specified value name associated 
+	with an open registry key.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/ms724911(v=vs.85).aspx
+	*/
 	long ret1 = ::RegQueryValueEx(hKEY,_T("maxClients"),NULL,&type_1,owner_Get,&cbData_1);
+
+	/* Comment by Jay:
+	If there is no registry with name "maxClients", create a new key.
+	*/
 	if (ret1!=ERROR_SUCCESS)
 	{
+		/* Comment by Jay:
+		CRegKey - This class provides methods for manipulating entries in the 
+		system registry.
+		http://msdn.microsoft.com/en-in/library/xka57xy4(v=vs.80).aspx
+		*/
 		CRegKey key;
+
+		/* Comment by Jay:
+		Call this method to create the specified key, if it does not exist as a subkey of hKeyParent.
+		*/
 		key.Create(HKEY_LOCAL_MACHINE,data_Set);
+		/* Comment by Jay:
+		This function is used to assign value to the given registry name. It is a user-defined function. 
+		*/
 		WriteNumber(key,_T("maxClients"),4315);
 
 	}
+
+	/* Comment by Jay:
+	All comments as above apply here also. 
+	*/
 	long ret2 = ::RegQueryValueEx(hKEY,_T("Regvalue"),NULL,&type_1,owner_Get,&cbData_1);
 	if (ret2!=ERROR_SUCCESS)
 	{
@@ -676,9 +935,20 @@ void CT3000App::Judgestore()
 		key.Create(HKEY_LOCAL_MACHINE,data_Set);
 		WriteNumber(key,_T("Regvalue"),100);
 	}
+
+	/* Comment by Jay:
+	Release memory assigned to owner_get variable. 
+	*/
 	delete[] owner_Get;
+
+	/* Comment by Jay:
+	RegCloseKey - Closes a handle to the specified registry key.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/ms724837(v=vs.85).aspx
+	*/
 	::RegCloseKey(hKEY);
 }
+
+
 /*
 FunctionName:ReadREG
 Comment:Alex
@@ -686,11 +956,27 @@ Date:2012/11/29
 Purpose:
 从一个注册表中读取相应的值给类中的成员变量
 */
+
+/* Comment by Jay:
+This function is used to check values of maxClients and Regvalue registries.
+And sets values of m_maxClients and password variables. 
+There is some conditional checking also. If m_maxClients is greater than password, 
+m_maxClients is made 0.
+*/
 void CT3000App::ReadREG()
 {
 	CRegKey key;
 	LPCTSTR data_Set = _T("Software\\Microsoft\\Windows NT\\CurrentVersion");//_T("Software\\Microsoft\\");//
+	/* Comment by Jay:
+	opens registry key
+	*/
 	key.Open(HKEY_LOCAL_MACHINE,data_Set);
+	/* Comment by Jay:
+	User defined function to read value of registry key.
+	*/
+	/* Suggestion by Jay:
+	Spelling of number in ReadNameber can be corrected and new name could be ReadNumber().
+	*/
 	ReadNameber(key,_T("maxClients"),m_maxClients);
 	ReadNameber(key,_T("Regvalue"),password);
 	if (password != 100)
