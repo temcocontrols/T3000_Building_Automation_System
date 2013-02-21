@@ -42,7 +42,13 @@ CT3000App::CT3000App()
 // The one and only CT3000App object
 CT3000App theApp;
 
-
+/* Comment by Jay:
+This user-defined function is used to verify if password authentication is 
+passed or not. 
+There is a user defined class CLoginDlg. It updates g_buser_log_in variable by
+comparing the credentials entered by user and those present in the database. 
+If they match, g_buser_log_in variable is populated with true; else false.
+*/
 BOOL CT3000App::user_login()
 {
 	BOOL bRet=FALSE;
@@ -169,10 +175,7 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 		zero or non-zero values as commented above.
 		*/
 		return   FALSE;
-
-
 	}
-	
 }
 /*
 FunctionName:InitInstance
@@ -184,56 +187,56 @@ BOOL CT3000App::InitInstance()//Alex-
 {
 	try
 	{
-	// InitCommonControlsEx() is required on Windows XP if an application
-	// manifest specifies use of ComCtl32.dll version 6 or later to enable
-	// visual styles.  Otherwise, any window creation will fail.
+		// InitCommonControlsEx() is required on Windows XP if an application
+		// manifest specifies use of ComCtl32.dll version 6 or later to enable
+		// visual styles.  Otherwise, any window creation will fail.
 
-	/* Comment by Jay:
-	INITCOMMONCONTROLSEX structure Carries information used to load 
-	common control classes from the dynamic-link library (DLL). 
-	This structure is used with the InitCommonControlsEx function.
-	http://msdn.microsoft.com/en-us/library/windows/desktop/bb775507(v=vs.85).aspx
-	*/
- 	INITCOMMONCONTROLSEX InitCtrls;
-	InitCtrls.dwSize = sizeof(InitCtrls);
-	// Set this to include all the common control classes you want to use
-	// in your application.
+		/* Comment by Jay:
+		INITCOMMONCONTROLSEX structure Carries information used to load 
+		common control classes from the dynamic-link library (DLL). 
+		This structure is used with the InitCommonControlsEx function.
+		http://msdn.microsoft.com/en-us/library/windows/desktop/bb775507(v=vs.85).aspx
+		*/
+ 		INITCOMMONCONTROLSEX InitCtrls;
+		InitCtrls.dwSize = sizeof(InitCtrls);
+		// Set this to include all the common control classes you want to use
+		// in your application.
 
-	/* Comment by Jay:
-	ICC_WIN95_CLASSES loads following:
-	Loads animate control, header, hot key, list-view, progress bar, 
-	status bar, tab, tooltip, toolbar, trackbar, tree-view, 
-	and up-down control classes.
-	http://msdn.microsoft.com/en-us/library/windows/desktop/bb775507(v=vs.85).aspx
-	*/
-	InitCtrls.dwICC = ICC_WIN95_CLASSES;
+		/* Comment by Jay:
+		ICC_WIN95_CLASSES loads following:
+		Loads animate control, header, hot key, list-view, progress bar, 
+		status bar, tab, tooltip, toolbar, trackbar, tree-view, 
+		and up-down control classes.
+		http://msdn.microsoft.com/en-us/library/windows/desktop/bb775507(v=vs.85).aspx
+		*/
+		InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	
-	/* Comment by Jay:
-	This function nsures that the common control DLL (Comctl32.dll) is loaded, 
-	and registers specific common control classes from the DLL. 
-	An application must call this function before creating 
-	a common control.
-	http://msdn.microsoft.com/en-us/library/windows/desktop/bb775697(v=vs.85).aspx
-	*/
-	/* Suggestion by Jay: 
-	Return type (TRUE or FALSE) must be checked to ensure that Common Control
-	DLL is loaded successfully. If the same is not checked then there could be 
-	issues later on. Also, if it is found that common controls are not 
-	loaded properly, then the same can be managed in a more meaningful way at 
-	this stage. 
-	*/
-	InitCommonControlsEx(&InitCtrls);
+		/* Comment by Jay:
+		This function nsures that the common control DLL (Comctl32.dll) is loaded, 
+		and registers specific common control classes from the DLL. 
+		An application must call this function before creating 
+		a common control.
+		http://msdn.microsoft.com/en-us/library/windows/desktop/bb775697(v=vs.85).aspx
+		*/
+		/* Suggestion by Jay: 
+		Return type (TRUE or FALSE) must be checked to ensure that Common Control
+		DLL is loaded successfully. If the same is not checked then there could be 
+		issues later on. Also, if it is found that common controls are not 
+		loaded properly, then the same can be managed in a more meaningful way at 
+		this stage. 
+		*/
+		InitCommonControlsEx(&InitCtrls);
 
-	/* Comment by Jay:
-	This function checks a registries. If the same is not existing, then it creates them.
-	*/
-	Judgestore();
+		/* Comment by Jay:
+		This function checks a registries. If the same is not existing, then it creates them.
+		*/
+		Judgestore();
 
-	/* Comment by Jay:
-	This function is used to update m_maxClients and password variables 
-	with the values contained in maxClients and Regvalue registries.
-	*/
-	ReadREG();
+		/* Comment by Jay:
+		This function is used to update m_maxClients and password variables 
+		with the values contained in maxClients and Regvalue registries.
+		*/
+		ReadREG();
  
 #if 0
 
@@ -301,282 +304,466 @@ BOOL CT3000App::InitInstance()//Alex-
 	}*/
 #endif
 
-	/* Comment by Jay:
-	Call InitInstance of parent class. 
-	*/
-	CWinAppEx::InitInstance();
-	HRESULT hr;
-
-
-	/* Comment by Jay:
-	AfxSocketInit - This function is called in CWinApp::InitInstance override to initialize Windows Sockets.
-	It returns nonzero if the function is successful; otherwise 0.
-	http://msdn.microsoft.com/en-us/library/x12941w5(v=vs.80).aspx
-	*/
-	if (!AfxSocketInit())
-	{
 		/* Comment by Jay:
-		AfxMessageBox - Displays a message box on the screen.
-		Return: Zero if there is not enough memory to display the message box; otherwise nonzero.
-		http://msdn.microsoft.com/en-us/library/as6se7cb(v=vs.80).aspx
+		Call InitInstance of parent class. 
 		*/
-		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);
-		return FALSE;
-	}
-	// Initialize OLE libraries
+		CWinAppEx::InitInstance();
+		HRESULT hr;
 
-	/* Comment by Jay:
-	AfxOleInit - Initializes OLE support for the application.
-	Return: Nonzero if successful; 0 if initialization fails, possibly because incorrect versions of the 
-	OLE system DLLs are installed. 
-	http://msdn.microsoft.com/en-us/library/e91aseaz(v=vs.80).aspx
-	*/
-	if (!AfxOleInit())
-	{
-		AfxMessageBox(IDP_OLE_INIT_FAILED);
-		return FALSE;
-	}
 
-	/* Comment by Jay:
-	AfxEnableControlContainer - Call this function in your application object's InitInstance function 
-	to enable support for containment of OLE controls.
-	http://msdn.microsoft.com/en-us/library/x1se4y1y(v=vs.80).aspx
-	*/
-	AfxEnableControlContainer();
+		/* Comment by Jay:
+		AfxSocketInit - This function is called in CWinApp::InitInstance override to initialize Windows Sockets.
+		It returns nonzero if the function is successful; otherwise 0.
+		http://msdn.microsoft.com/en-us/library/x12941w5(v=vs.80).aspx
+		*/
+		if (!AfxSocketInit())
+		{
+			/* Comment by Jay:
+			AfxMessageBox - Displays a message box on the screen.
+			Return: Zero if there is not enough memory to display the message box; otherwise nonzero.
+			http://msdn.microsoft.com/en-us/library/as6se7cb(v=vs.80).aspx
+			*/
+			AfxMessageBox(IDP_SOCKETS_INIT_FAILED);
+			return FALSE;
+		}
+		// Initialize OLE libraries
+
+		/* Comment by Jay:
+		AfxOleInit - Initializes OLE support for the application.
+		Return: Nonzero if successful; 0 if initialization fails, possibly because incorrect versions of the 
+		OLE system DLLs are installed. 
+		http://msdn.microsoft.com/en-us/library/e91aseaz(v=vs.80).aspx
+		*/
+		if (!AfxOleInit())
+		{
+			AfxMessageBox(IDP_OLE_INIT_FAILED);
+			return FALSE;
+		}
+
+		/* Comment by Jay:
+		AfxEnableControlContainer - Call this function in your application object's InitInstance function 
+		to enable support for containment of OLE controls.
+		http://msdn.microsoft.com/en-us/library/x1se4y1y(v=vs.80).aspx
+		*/
+		AfxEnableControlContainer();
 
 #if 1	
-	try
-	{
-
-	TCHAR exeFullPath[MAX_PATH+1];
-
-	/* Comment by Jay:
-	GetModuleFileName - Retrieves the fully qualified path for the file that contains 
-	the specified module. The module must have been loaded by the current process.
-	http://msdn.microsoft.com/en-us/library/windows/desktop/ms683197(v=vs.85).aspx
-	*/
-	GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
-
-	/* Comment by Jay:
-	_tcsrchr function scans a string for the last occurrence of a character.
-	Its parameters are: a null-terminated string to search, and character to be located.
-	It returns a pointer to the last occurrence of ChartoLocate in string, or NULL 
-	if ChartoLocate is not found. 
-	http://rosasm.freeforums.org/tcsrchr-t78.html
-
-	So, following statement is used to add NULL to the end of exeFullPath string. 
-	This is because array a[1] internally expands like *(a + 1). 
-	Here, a is the pointer returned by _tcsrchr. +1 is done so that NULL character
-	is added next to the last character. 
-	*/
-	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
-	g_strDatabasefilepath=exeFullPath;
-	g_strExePth=g_strDatabasefilepath;
-
-
-	/* Comment by Jay:
-	CreateDirectory - Creates a new directory. If the underlying file system supports security 
-	on files and directories, the function applies a specified security descriptor to 
-	the new directory.
-	If the function succeeds, the return value is nonzero.
-	Possible errors include the following:
-	ERROR_ALREADY_EXISTS
-	ERROR_PATH_NOT_FOUND
-	http://msdn.microsoft.com/en-us/library/windows/desktop/aa363855(v=vs.85).aspx
-	*/
-	/* Suggestion by Jay:
-	Here, in the following statement, its return type shall be checked for above mentioned
-	errors. This will also result in handling things properly in a nice way.
-	*/
-	CreateDirectory(g_strExePth+_T("Database"),NULL);
-
-	g_strOrigDatabaseFilePath=g_strExePth+_T("t3000.mdb");
-	g_strDatabasefilepath+=_T("Database\\t3000.mdb");
-
-
-	HANDLE hFind;
-	WIN32_FIND_DATA wfd;
-
-	/* Comment by Jay:
-	FindFirstFile - Searches a directory for a file or subdirectory with a name that matches 
-	a specific name (or partial name if wildcards are used).
-	If the function succeeds, the return value is a search handle used in a subsequent 
-	call to FindNextFile or FindClose. Second parameter contains information about 
-	the first file or directory found.
-	http://msdn.microsoft.com/en-us/library/windows/desktop/aa364418(v=vs.85).aspx
-	*/
-	hFind = FindFirstFile(g_strDatabasefilepath, &wfd);
-	if (hFind==INVALID_HANDLE_VALUE)
-	{
-	//GOOD==GOOD
-		/* Comment by Jay:
-		CopyFile - This function copies an existing file to a new file. 
-		http://msdn.microsoft.com/en-us/library/windows/desktop/aa363851(v=vs.85).aspx
-
-		Since the third argument is FALSE, this function will overwrite already existing 
-		file, if any. 
-		*/
-		CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);
-	}
-	else
-	{
-	
-	}
-	/* Comment by Jay:
-	FindClose - Closes a file search handle. 
-	http://msdn.microsoft.com/en-us/library/windows/desktop/aa364413(v=vs.85).aspx
-	*/
-	FindClose(hFind);
-
-	g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;
-	g_strImgeFolder=g_strExePth+_T("Database\\image\\");
-	CreateDirectory(g_strImgeFolder,NULL);
-	
-	//CString strocx=g_strExePth+_T("MSFLXGRD.OCX");
-
-
-	InitModeName();
-
-
-
-#endif
-
-	// Standard initialization
-	// If you are not using these features and wish to reduce the size
-	// of your final executable, you should remove from the following
-	// the specific initialization routines you do not need
-	// Change the registry key under which our settings are stored
-	// TODO: You should modify this string to be something appropriate
-	// such as the name of your company or organization
-	SetRegistryKey(_T("Temco T3000 Application"));
-//	LoadStdProfileSettings(12);  // Load standard INI file options (including MRU)//
-	InitContextMenuManager();
-	InitKeyboardManager();
-
-	InitTooltipManager();
-	CMFCToolTipInfo ttParams;
-	ttParams.m_bVislManagerTheme = TRUE;
-	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
-		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams); 
-#if 1
-	hr=CoInitialize(NULL);
-	if(FAILED(hr))
-	{
-		AfxMessageBox(_T("Error Initialize the COM Interface"));
-		return FALSE;
-	}
-
-#endif
-
-
-	}
-	catch (...)
-	{
-		AfxMessageBox(_T("Database operation to stop!"));
-
-	}
-	// Register the application's document templates.  Document templates
-	//  serve as the connection between documents, frame windows and views
-	CSingleDocTemplate* pDocTemplate;
-	pDocTemplate = new CSingleDocTemplate(
-		IDR_MAINFRAME,
-		RUNTIME_CLASS(CT3000Doc),
-		RUNTIME_CLASS(CMainFrame),       // main SDI frame window
-		RUNTIME_CLASS(CT3000View));
-
-
-
-
-	if (!pDocTemplate)
-		return FALSE;
-
-
-	AddDocTemplate(pDocTemplate);
-	// Parse command line for standard shell commands, DDE, file open
-	CCommandLineInfo cmdInfo;	
-	ParseCommandLine(cmdInfo);
-
-	//cmdInfo.m_nShellCommand   =   CCommandLineInfo::FileNothing; //lsc
-
-
-	// Dispatch commands specified on the command line.  Will return FALSE if
-	// app was launched with /RegServer, /Register, /Unregserver or /Unregister.
-	if (!ProcessShellCommand(cmdInfo))
-		return FALSE;
-
-	
-	GdiplusStartupInput gdiplusStartupInput;
-	GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);
-#if 1
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
-	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	hr=m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	if(FAILED(hr))
-	{
-	    AfxMessageBox(_T("Load msado12.dll erro"));
-	      return FALSE;
-	}
-	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-	m_pRs->Open(_T("select * from Userlogin"),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-	int nRecord=m_pRs->GetRecordCount();
-	if (nRecord<=0)
-	{
-		g_bPrivilegeMannage=FALSE;
-	}
-	else
-	{
-		int nUse;
-		_variant_t temp_variant;
-		temp_variant=m_pRs->GetCollect("USE_PASSWORD");
-		if(temp_variant.vt!=VT_NULL)
-			nUse=temp_variant;
-		else
-			nUse=0;
-		if(nUse==-1)
+		try
 		{
-			g_bPrivilegeMannage=TRUE;
+
+			TCHAR exeFullPath[MAX_PATH+1];
+
+			/* Comment by Jay:
+			GetModuleFileName - Retrieves the fully qualified path for the file that contains 
+			the specified module. The module must have been loaded by the current process.
+			http://msdn.microsoft.com/en-us/library/windows/desktop/ms683197(v=vs.85).aspx
+			*/
+			GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
+
+			/* Comment by Jay:
+			_tcsrchr function scans a string for the last occurrence of a character.
+			Its parameters are: a null-terminated string to search, and character to be located.
+			It returns a pointer to the last occurrence of ChartoLocate in string, or NULL 
+			if ChartoLocate is not found. 
+			http://rosasm.freeforums.org/tcsrchr-t78.html
+
+			So, following statement is used to add NULL to the end of exeFullPath string. 
+			This is because array a[1] internally expands like *(a + 1). 
+			Here, a is the pointer returned by _tcsrchr. +1 is done so that NULL character
+			is added next to the last character. 
+			*/
+			(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
+			g_strDatabasefilepath=exeFullPath;
+			g_strExePth=g_strDatabasefilepath;
+
+
+			/* Comment by Jay:
+			CreateDirectory - Creates a new directory. If the underlying file system supports security 
+			on files and directories, the function applies a specified security descriptor to 
+			the new directory.
+			If the function succeeds, the return value is nonzero.
+			Possible errors include the following:
+			ERROR_ALREADY_EXISTS
+			ERROR_PATH_NOT_FOUND
+			http://msdn.microsoft.com/en-us/library/windows/desktop/aa363855(v=vs.85).aspx
+			*/
+			/* Suggestion by Jay:
+			Here, in the following statement, its return type shall be checked for above mentioned
+			errors. This will also result in handling things properly in a nice way.
+			*/
+			CreateDirectory(g_strExePth+_T("Database"),NULL);
+
+			g_strOrigDatabaseFilePath=g_strExePth+_T("t3000.mdb");
+			g_strDatabasefilepath+=_T("Database\\t3000.mdb");
+
+
+			HANDLE hFind;
+			WIN32_FIND_DATA wfd;
+
+			/* Comment by Jay:
+			FindFirstFile - Searches a directory for a file or subdirectory with a name that matches 
+			a specific name (or partial name if wildcards are used).
+			If the function succeeds, the return value is a search handle used in a subsequent 
+			call to FindNextFile or FindClose. Second parameter contains information about 
+			the first file or directory found.
+			http://msdn.microsoft.com/en-us/library/windows/desktop/aa364418(v=vs.85).aspx
+			*/
+			hFind = FindFirstFile(g_strDatabasefilepath, &wfd);
+			if (hFind==INVALID_HANDLE_VALUE)
+			{
+			//GOOD==GOOD
+				/* Comment by Jay:
+				CopyFile - This function copies an existing file to a new file. 
+				http://msdn.microsoft.com/en-us/library/windows/desktop/aa363851(v=vs.85).aspx
+
+				Since the third argument is FALSE, this function will overwrite already existing 
+				file, if any. 
+				*/
+				CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);
+			}
+			else
+			{
+	
+			}
+			/* Comment by Jay:
+			FindClose - Closes a file search handle. 
+			http://msdn.microsoft.com/en-us/library/windows/desktop/aa364413(v=vs.85).aspx
+			*/
+			FindClose(hFind);
+
+			g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;
+			g_strImgeFolder=g_strExePth+_T("Database\\image\\");
+	
+			/* Comment by Jay:
+			Comment same as above. 
+			*/
+			CreateDirectory(g_strImgeFolder,NULL);
+	
+			//CString strocx=g_strExePth+_T("MSFLXGRD.OCX");
+
+			/* Comment by Jay:
+			This function is used to populate various global variables from ini file.
+			*/
+			InitModeName();
+
+#endif
+
+			// Standard initialization
+			// If you are not using these features and wish to reduce the size
+			// of your final executable, you should remove from the following
+			// the specific initialization routines you do not need
+			// Change the registry key under which our settings are stored
+			// TODO: You should modify this string to be something appropriate
+			// such as the name of your company or organization
+
+			/* Comment by Jay:
+			SetRegistryKey - Causes application settings to be stored in the 
+			registry instead of INI files.
+			http://msdn.microsoft.com/en-us/library/7c2w6z4k(v=vs.80).aspx
+			*/
+			SetRegistryKey(_T("Temco T3000 Application"));
+		//	LoadStdProfileSettings(12);  // Load standard INI file options (including MRU)//
+
+			/* Comment by Jay:
+			InitContextMenuManager - Initializes the CContextMenuManager object.
+			http://msdn.microsoft.com/en-us/library/vstudio/bb984201.aspx
+			*/
+			InitContextMenuManager();
+
+			/* Comment by Jay:
+			InitKeyboardManager - Initializes the CKeyboardManager object.
+			http://msdn.microsoft.com/en-us/library/vstudio/bb984437.aspx
+			*/
+			InitKeyboardManager();
+
+			/* Comment by Jay:
+			InitTooltipManager - Initializes the CTooltipManager object.
+			http://msdn.microsoft.com/en-us/library/vstudio/bb983420.aspx
+			*/
+			InitTooltipManager();
+
+			/* Comment by Jay:
+			CMFCToolTipInfo class - Stores information about the visual appearance of 
+			tooltips.
+			http://msdn.microsoft.com/en-us/library/vstudio/bb984634.aspx
+			*/
+			CMFCToolTipInfo ttParams;
+
+			/* Comment by Jay:
+			Appearance of tooltip is controlled by visual manager. 
+			*/
+			ttParams.m_bVislManagerTheme = TRUE;
+			
+			/* Comment by Jay:
+			GetTooltipManager - Returns a pointer to the global CTooltipManager object.
+			http://msdn.microsoft.com/en-us/library/vstudio/bb983587.aspx
+			*/
+			/* Comment by Jay:
+			SetTooltipParams - Customizes the appearance of the tooltip control for 
+			the specified Windows control types.
+			http://msdn.microsoft.com/en-us/library/vstudio/bb983692.aspx
+			*/
+			theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
+				RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams); 
+
+#if 1
+			/* Comment by Jay:
+			CoInitialize - Initializes the COM library on the current thread and identifies 
+			the concurrency model as single-thread apartment (STA).
+			*/
+			hr=CoInitialize(NULL);
+
+			/* Comment by Jay:
+			FAILED() function - Same as elsewhere in the file.
+			*/
+			if(FAILED(hr))
+			{
+				AfxMessageBox(_T("Error Initialize the COM Interface"));
+				return FALSE;
+			}
+
+#endif
 		}
-		else
+		catch (...)
+		{
+			AfxMessageBox(_T("Database operation to stop!"));
+		}
+
+		// Register the application's document templates.  Document templates
+		//  serve as the connection between documents, frame windows and views
+
+		/* Comment by Jay:
+		CSingleDocTemplate - This class defines a document template that 
+		implements the Single Document Interface (SDI).
+		An SDI application uses the main frame window to display a document; 
+		only one document can be open at a time.
+		A document template defines the relationship between three types of classes:
+		Document Class, View Class, Frame Window Class.
+		In this class only constructor is supposed to be called. 
+		http://msdn.microsoft.com/en-us/library/7yha6tek(v=vs.80).aspx
+		*/
+		CSingleDocTemplate* pDocTemplate;
+		/* Comment by Jay:
+		CSingleDocTemplate - Constructs a CSingleDocTemplate object. 
+		http://msdn.microsoft.com/en-us/library/4x1xy43a(v=vs.80).aspx
+
+		Here, this application follows document/frame/view architecture for windows program.
+
+		RUNTIME_CLASS - Gets the run-time class structure from the name of a C++ 
+		class.
+		RUNTIME_CLASS returns a pointer to a CRuntimeClass structure for the 
+		class specified by class_name. Only CObject-derived classes declared 
+		with DECLARE_DYNAMIC, DECLARE_DYNCREATE, or DECLARE_SERIAL will return 
+		pointers to a CRuntimeClass structure.
+		http://msdn.microsoft.com/en-us/library/a3tc49sy(v=vs.80).aspx
+
+		Here, RUNTIME_CLASS() macro is used to get runtime type information
+		for the doc, frame and view classes.
+		*/
+		pDocTemplate = new CSingleDocTemplate(
+			IDR_MAINFRAME,
+			RUNTIME_CLASS(CT3000Doc),
+			RUNTIME_CLASS(CMainFrame),       // main SDI frame window
+			RUNTIME_CLASS(CT3000View));
+
+		/* Comment by Jay:
+		If system is not able to allocate memory, then return FALSE.
+		*/
+		if (!pDocTemplate)
+		return FALSE;
+
+		/* Comment by Jay:
+		Call this member function to add a document template to the list of 
+		available document templates that the application maintains.
+		http://msdn.microsoft.com/en-us/library/dwece4tk(v=vs.80).aspx
+		*/
+		AddDocTemplate(pDocTemplate);
+
+		// Parse command line for standard shell commands, DDE, file open
+		/* Comment by Jay:
+		CCommandLineInfo class - aids in parsing the command line at application 
+		startup.
+		http://msdn.microsoft.com/en-us/library/zaydx040(v=vs.80).aspx
+		*/
+		CCommandLineInfo cmdInfo;
+
+		/* Comment by Jay:
+		ParseCommandLine - This is used to parse the command line and send the 
+		parameters, one at a time, to CCommandLineInfo::ParseParam.
+		http://msdn.microsoft.com/en-us/library/64c73803(v=vs.80).aspx
+		*/
+		ParseCommandLine(cmdInfo);
+
+		//cmdInfo.m_nShellCommand   =   CCommandLineInfo::FileNothing; //lsc
+
+
+		// Dispatch commands specified on the command line.  Will return FALSE if
+		// app was launched with /RegServer, /Register, /Unregserver or /Unregister.
+
+		/* Comment by Jay:
+		ProcessShellCommand - This member function is called by InitInstance to accept the 
+		parameters passed from the CCommandLineInfo object identified by rCmdInfo, and 
+		perform the indicated action.
+		It returns non-zero if the shell command is processed successfully. If 0, 
+		return FALSE from InitInstance.
+		http://msdn.microsoft.com/en-us/library/zatkyh2a(v=vs.80).aspx
+		*/
+		if (!ProcessShellCommand(cmdInfo))
+			return FALSE;
+
+		/* Comment by Jay:
+		GDI = Graphic Device Interface
+		The MS Windows GDI enables applications to use graphics and formatted text on 
+		both the video display and the printer. Windows-based applications do not 
+		access the graphics hardware directly. Instead, GDI interacts with device 
+		drivers on behalf of applications.
+		GDI can be used in all Windows-based applications.
+		http://msdn.microsoft.com/en-us/library/windows/desktop/dd145203(v=vs.85).aspx
+		*/		
+		GdiplusStartupInput gdiplusStartupInput;
+
+		/* Comment by Jay:
+		GdiplusStartup - The GdiplusStartup function initializes Windows GDI+.
+		Windows GDI+ is a class-based API for C/C++ programmers.
+		GdiplusStartup shall be called before making any other GDI+ calls, and 
+		GdiplusShutdown shall be called whan we have finished using GDI+.
+		http://msdn.microsoft.com/en-us/library/windows/desktop/ms534077(v=vs.85).aspx
+		*/
+		GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);
+#if 1
+		
+		/* Comment by Jay:
+		Connection pointer to a database connection. 
+		*/
+		_ConnectionPtr m_pCon;
+
+		/* Comment by Jay:
+		Pointer to a record set in a database.
+		*/
+		_RecordsetPtr m_pRs;
+
+		/* Comment by Jay:
+		CreateInstance - Creates an instance of the specified type using the 
+		constructor that best matches the specified parameters.
+		http://msdn.microsoft.com/en-us/library/system.activator.createinstance.aspx
+
+		So, for using _ConnectionPtr variable, it creates an instance of ADODB connection 
+		and using _RecordsetPtr variable, it creates an instance of SDODB recordset. 
+		*/
+		m_pCon.CreateInstance(_T("ADODB.Connection"));
+		hr=m_pRs.CreateInstance(_T("ADODB.Recordset"));
+		if(FAILED(hr))
+		{
+			AfxMessageBox(_T("Load msado12.dll erro"));
+			  return FALSE;
+		}
+
+		/* Comment by Jay:
+		Open function opens a connection to a data source. 
+		http://msdn.microsoft.com/en-us/library/windows/desktop/ms676505(v=vs.85).aspx
+		Using the Open method on a Connection object establishes the physical connection 
+		to a data source. After this method successfully completes, the connection is 
+		live and you can issue commands against it and process the results.
+		*/
+		m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+
+		/* Comment by Jay:
+		Select all data from UserLogin table of t3000.mdb. 
+		*/
+		m_pRs->Open(_T("select * from Userlogin"),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+
+		/* Comment by Jay:
+		Get no of records in UserLogin table. 
+		*/
+		int nRecord=m_pRs->GetRecordCount();
+
+		/* Comment by Jay:
+		If there are zero or less records, then there is some error. 
+		g_bPrivilegeMannage variable is used to hold the information about whether to 
+		use password privilege or not. If there is issue in UserLogin table ( <= 0 records), 
+		then do not use password privilege. Hence, the variable is assigned FALSE. 
+		*/
+		if (nRecord<=0)
 		{
 			g_bPrivilegeMannage=FALSE;
 		}
-	}
-	m_pRs->Close();
-	m_pCon->Close();
-
-
-
-	if (g_bPrivilegeMannage)
-	{//for just quick debug,only on this computer
-		if(!user_login())
-		{
-			AfxMessageBox(_T("Error password!"));	
-			return false;
-		}
 		else
 		{
+			/* Comment by Jay:
+			There is only one record in UserLogin table. The table has only one column. 
+			This column is named "USE_PASSWORD". The datatype of this column is Yes/No.
+			That is, whether to use password (Yes) or not (No). 
+			*/
+			int nUse;
+			_variant_t temp_variant;
+
+			/* Comment by Jay:
+			GetCollect is not a documented method. 
+			*/
+			temp_variant=m_pRs->GetCollect("USE_PASSWORD");
+			if(temp_variant.vt!=VT_NULL)
+				nUse=temp_variant;
+			else
+				nUse=0;
+			if(nUse==-1)
+			{
+				g_bPrivilegeMannage=TRUE;
+			}
+			else
+			{
+				g_bPrivilegeMannage=FALSE;
+			}
+		}
+
+		/* Comment by Jay:
+		Close recordset first and then connection. 
+		*/
+		m_pRs->Close();
+		m_pCon->Close();
+
+
+		if (g_bPrivilegeMannage)
+		{//for just quick debug,only on this computer
+			/* Suggestion by Jay:
+			Probably this negation operator would have to be removed. 
+			*/
+			if(!user_login())
+			{
+				AfxMessageBox(_T("Error password!"));	
+				return false;
+			}
+			else
+			{
 			
 
-		}
+			}
 		
-	}
+		}
 
-#endif
+#endif  	
+		/* Comment by Jay:
+		CMainFrame is type of application's main window. 
+		*/
+		((CMainFrame*)m_pMainWnd)->InitViews();//
 
-  	
-	((CMainFrame*)m_pMainWnd)->InitViews();//
+		/* Comment by Jay:
+		These are the some of the standard APIs for any windows based desktop application. 
+		Here, APIs are used to set the text on the title bar of the application window. 
+		Then the window is shown and updated on the desktop. 
+		*/
+		m_pMainWnd->SetWindowText(_T("T3000 Building Automation System"));//
+		m_pMainWnd->ShowWindow(SW_SHOW);
+		m_pMainWnd->UpdateWindow();
 
-	m_pMainWnd->SetWindowText(_T("T3000 Building Automation System"));//
-	m_pMainWnd->ShowWindow(SW_SHOW);
-	m_pMainWnd->UpdateWindow();
+		/* Comment by Jay:
+		batch file is executed. 
+		*/
+		::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat"), _T(""), _T(""), SW_SHOW);
+		//vcredist_x86.zip
 
-	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat"), _T(""), _T(""), SW_SHOW);
-	//vcredist_x86.zip
-
-	//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
-	//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
-	//AfxMessageBox(_T("Open'T3000'Again,Please!"));
+		//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
+		//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
+		//AfxMessageBox(_T("Open'T3000'Again,Please!"));
 
 	}
 	catch (...)
@@ -588,14 +775,12 @@ BOOL CT3000App::InitInstance()//Alex-
 		//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
 		AfxMessageBox(_T("Open'T3000'Again,Please!"));
 
-
 		return TRUE;
-
 	}
-
 
 	return TRUE;
 }
+
 // CAboutDlg dialog used for App About
 
 class CAboutDlg : public CDialog
@@ -625,11 +810,8 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-	ON_BN_CLICKED(IDC_BUTTON1, &CAboutDlg::OnBnClickedButton1)
-END_MESSAGE_MAP()
-
 // App command to run the dialog
+
 void CT3000App::OnAppAbout()
 {
 	CAboutDlg aboutDlg;
@@ -658,6 +840,7 @@ void CT3000App::SaveCustomState()
 	//Black 
 	 
 }
+
 /*
 FunctionName:InitModeName
 Comment:Alex
@@ -675,7 +858,16 @@ void CT3000App::InitModeName()
 	CString strInfoFile=g_strExePth+_T("CustomInfo.ini");
 	HANDLE hFile;
 	WIN32_FIND_DATA fData;
+
+	/* Comment by Jay:
+	Comment same as above in this file for FindFirstFile.
+	*/
 	hFile = FindFirstFile(strInfoFile,&fData);
+	
+	/* Comment by Jay:
+	If file is not found, populate mentioned global vaiables with values as 
+	shown. These variables are defined in global_variable.h.
+	*/
 	if(hFile == INVALID_HANDLE_VALUE)
 	{
 		//m_strCompany=_T("Temco Controls LTD.");
@@ -698,6 +890,11 @@ void CT3000App::InitModeName()
 	}
 	else
 	{
+		/* Comment by Jay:  
+		Here, CIniFile class is created to work with ini file. 
+		It has a constructor which accepts string argument and the same is 
+		used below with file object. 
+		*/
 		CIniFile file(strInfoFile);
 		g_strTstat5a = file.GetProfileString(_T("Section 3"),_T("Product1A"),_T("Tstat5A"));
 		g_strTstat5b = file.GetProfileString(_T("Section 4"),_T("Product1B"),_T("Tstat5B"));
@@ -710,23 +907,64 @@ void CT3000App::InitModeName()
 		g_strTstat5e=file.GetProfileString(_T("Section 11"),_T("Product1E"),_T("Tstat5E"));
 		g_strTstat5h=file.GetProfileString(_T("Section 12"),_T("Product1H"),_T("Tstat5H"));
 
+		/* Suggestion by Jay:
+		g_strTstat6, g_strTstat7, g_strPressure, g_strOR485: These four variables are not 
+		loaded in this case when file is found. However, they were initialized in the default 
+		case when ini file is not found. Please check if this is what is expected. 
+		*/
 // 		g_strTstat6=file.GetProfileString(_T("Section 13"),_T("Product6"),_T("Tstat6"));
 // 		g_strTstat7=file.GetProfileString(_T("Section 14"),_T("Product7"),_T("Tstat7"));
 	}
+
+	/* Comment by Jay:
+	FindClose - Closes a file search handle. 
+	http://msdn.microsoft.com/en-us/library/windows/desktop/aa364413(v=vs.85).aspx
+	*/
 	FindClose(hFile);
 }
+
 // CT3000App message handlers
+
+BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
+	ON_BN_CLICKED(IDC_BUTTON1, &CAboutDlg::OnBnClickedButton1)
+END_MESSAGE_MAP()
+
 void CAboutDlg::OnBnClickedButton1()
 {
 	CString m_strWebLinker=_T("http://www.temcocontrols.com");
+	/* Comment by Jay:
+	ShellExecute - Performs an operation on a specified file.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/bb762153(v=vs.85).aspx
+
+	In this case, instead of file, a link to Temco Controls website is used.
+	So, the website would be opened in browser. 
+	*/
+
+	/* Comment by Jay:
+	GetSafeHwnd - Returns window handle for window. 
+	http://msdn.microsoft.com/en-us/library/d64ehwhz(v=vs.80).aspx
+	*/
 	ShellExecute(GetSafeHwnd(), NULL,m_strWebLinker,   NULL, NULL,   SW_SHOWNORMAL);
 }
+
 int CT3000App::ExitInstance()
 {
 	// TODO: Add your specialized code here and/or call the base class
+
+	/* Comment by Jay:
+	Closes the COM library on the current thread, unloads all DLLs loaded 
+	by the thread, frees any other resources that the thread maintains, and 
+	forces all RPC connections on the thread to close.
+	http://msdn.microsoft.com/en-us/library/windows/desktop/ms688715(v=vs.85).aspx
+	*/
 	CoUninitialize( );
+
+	/* Comment by Jay:
+	Exit the instance of application. 
+	*/
 	return CWinAppEx::ExitInstance();
 }
+
 void CT3000App::CopyDirectory(CString strSrcPath,CString strDstPath)
 {
 	SHFILEOPSTRUCT FileOp;
@@ -742,7 +980,8 @@ void CT3000App::CopyDirectory(CString strSrcPath,CString strDstPath)
 		AfxMessageBox(_T("Success"));
 	else
 		AfxMessageBox(_T("Failed"));
-  }
+}
+
 void CT3000App::OnVersionInfo()
 {
 	CString strHistotyFile=g_strExePth+_T("history.txt");
@@ -770,6 +1009,7 @@ if (m_maxClients == 0)
 	else 
 		return TRUE;
 }
+
 /*
 FunctionName:GetModulePath
 Comment:Alex
@@ -784,6 +1024,7 @@ CString CT3000App::GetModulePath()
 	GetModuleFileName(NULL,path,MAX_PATH);
 	return CString(path);
 }
+
 /*
 FunctionName:GetSoftInstallDays
 Comment:Alex
@@ -812,6 +1053,7 @@ int CT3000App::GetSoftInstallDays()
 
 	return timeSpan.GetDays();
 }
+
 /*
 FunctionName:WriteNumber
 Comment:Alex
@@ -830,6 +1072,7 @@ void CT3000App::WriteNumber( CRegKey& key,CStringW valueName,DWORD value )
 	*/
 	key.SetDWORDValue(valueName,value);
 }
+
 /*
 FunctionName:ReadNameber
 Comment:Alex
@@ -858,6 +1101,7 @@ BOOL CT3000App::ReadNameber( CRegKey& key,CStringW valueName,DWORD& value )
 		return FALSE;
 	}
 }
+
 /*
 FunctionName:Judgestore
 Comment:Alex
@@ -947,7 +1191,6 @@ void CT3000App::Judgestore()
 	*/
 	::RegCloseKey(hKEY);
 }
-
 
 /*
 FunctionName:ReadREG
