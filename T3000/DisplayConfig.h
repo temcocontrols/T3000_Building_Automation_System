@@ -1,6 +1,7 @@
 #pragma once
 #include "msflexgrid1.h"
 #include "afxwin.h"
+#include "afxcmn.h"
 
 // CDisplayConfig dialog
 
@@ -33,17 +34,30 @@ private:
 	int m_nCurRow;
 	int m_nCurCol;
 	CComboBox m_ItemValueCombx;
-	CString m_Choice_Array[14];
+
 public:
+    int Get_RegID(int Model_ID,CString Name);
 	afx_msg void OnEnKillfocusInput9();
 //	afx_msg void OnEnHscrollInput9();
 //	afx_msg void OnEnChangeInput9();
 	afx_msg void OnCbnSelchangeSeqCom();
- BOOL UpdateTextToReg(CString input_str,UINT Reg);
- CString GetTextFromReg(UINT reg);
-//	afx_msg void OnEnSetfocusLine1();
-//	afx_msg void OnEnKillfocusLine1();
+ BOOL UpdateTextToReg(CString input_str,UINT Reg,int lenght);
+ CString GetTextFromReg(unsigned short reg);
+ CString GetTextReg(unsigned short reg);
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnBnClickedSave2();
 	afx_msg void OnBnClickedSaveLine2();
+	afx_msg void OnBnClickedSave();
+	afx_msg void OnBnClickedSaveInput1();
+	afx_msg void OnBnClickedSaveInput2();
+	afx_msg void OnBnClickedSaveInput3();
+	afx_msg void OnBnClickedSaveInput4();
+	afx_msg void OnBnClickedSaveInput5();
+	afx_msg void OnBnClickedSaveInput6();
+	afx_msg void OnBnClickedSaveInput7();
+	afx_msg void OnBnClickedSaveInput8();
+	CProgressCtrl m_progress;
+	afx_msg void OnBnClickedFreshTable();
+	afx_msg void OnBnClickedFresh();
+	CString GetSel(int ID);
 	};
