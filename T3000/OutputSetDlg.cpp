@@ -58,7 +58,7 @@ BEGIN_MESSAGE_MAP(COutputSetDlg, CDialog)
 	ON_CBN_KILLFOCUS(IDC_OAMCOMBO, &COutputSetDlg::OnCbnKillfocusOamcombo)
 	ON_CBN_SELCHANGE(IDC_OVALUECOMBO, &COutputSetDlg::OnCbnSelchangeOvaluecombo)
 	ON_CBN_SELCHANGE(IDC_OAMCOMBO, &COutputSetDlg::OnCbnSelchangeOamcombo)
-//	ON_CBN_KILLFOCUS(IDC_ORANGCOMBO, &COutputSetDlg::OnCbnKillfocusOrangcombo)
+	ON_CBN_KILLFOCUS(IDC_ORANGCOMBO, &COutputSetDlg::OnCbnKillfocusOrangcombo)
 	ON_CBN_SELCHANGE(IDC_ORANGCOMBO, &COutputSetDlg::OnCbnSelchangeOrangcombo)
 	ON_CBN_KILLFOCUS(IDC_OFUNCOMBO, &COutputSetDlg::OnCbnKillfocusOfuncombo)
 	ON_CBN_SELCHANGE(IDC_OFUNCOMBO, &COutputSetDlg::OnCbnSelchangeOfuncombo)
@@ -219,6 +219,15 @@ void COutputSetDlg::Fresh_Grid()
 	//row1:
 	int nVAlue;
 
+
+//	108	209	1	Low byte	W/R	Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.
+
+	//tstat6
+// 	if (multi_register_value[7] == 6)
+// 	{
+// 	
+// 	}else
+	//if (newtstat6[7] == PM_TSTAT6)
 	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
 	{
 		nVAlue = newtstat6[209];
@@ -472,7 +481,132 @@ void COutputSetDlg::Fresh_Grid()
 		m_FlexGrid.put_TextMatrix(3,FUN_OUTFIELD,strTemp);
 	}
 
+	//BCDE 4,5 D/O
+/*  commented by zgq; 2010-12-7; 新的需求，5E需要当选择float和PMW时输入值，并存在348， 349
+	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16)//||m_nModeType==17||m_nModeType==18)
+	{
+		if(nVAlue&8)
+		{
+			strTemp=_T("On");
+		}
+		else
+		{
+			strTemp=_T("Off");
+		}
+		m_FlexGrid.put_TextMatrix(4,VALUE_OUTFIELD,strTemp);
+		if((int)(nAMVAlue & 8))
+		{
+			strTemp=_T("Manual");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(4);
+			m_FlexGrid.put_CellBackColor(RGB(255,255,255));
+		}
+		else
+		{
+			strTemp=_T("Auto");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(4);
+			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+		}
+		m_FlexGrid.put_TextMatrix(4,AM_OUTFIELD,strTemp);
+		strTemp.Empty();		
+	//	strTemp=_T("On/Off");
+	//	m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
+		nRange=multi_register_value[283];
+		if(nRange>=0&&nRange<3)
+		{
+			strTemp=OUTPUT_RANGE45[nRange];
+		}
+		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 
+		strTemp.Empty();
+		if (m_version<32.2)
+		{
+			short nFun=multi_register_value[328];
+			int nMask;
+			nMask=nFun&0x4;
+			if (nMask>0)
+			{
+				strTemp=ONTPUT_FUNS[1];
+			}
+			else
+			{
+				strTemp=ONTPUT_FUNS[0];
+			}
+			m_FlexGrid.put_TextMatrix(4,FUN_OUTFIELD,strTemp);
+		}
+		else
+		{
+			int indext=-1;
+			indext=multi_register_value[336];
+			if(indext>=0&&indext<=3)
+				strTemp=ONTPUT_FUNS[indext];
+			m_FlexGrid.put_TextMatrix(4,FUN_OUTFIELD,strTemp);
+		}
+
+		if(nVAlue&16)
+		{
+			strTemp=_T("On");
+		}
+		else
+		{
+			strTemp=_T("Off");
+		}
+		m_FlexGrid.put_TextMatrix(5,VALUE_OUTFIELD,strTemp);
+
+		if((int)(nAMVAlue & 16))
+		{
+			strTemp=_T("Manual");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(5);
+			m_FlexGrid.put_CellBackColor(RGB(255,255,255));
+		}
+		else
+		{
+			strTemp=_T("Auto");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(5);
+			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+		}
+		m_FlexGrid.put_TextMatrix(5,AM_OUTFIELD,strTemp);
+		strTemp.Empty();
+		
+	//	strTemp=_T("On/Off");
+	//	m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
+		nRange=multi_register_value[284];
+		if(nRange>=0&&nRange<3)
+		{
+			strTemp=OUTPUT_RANGE45[nRange];
+		}
+		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
+
+		if (m_version<32.2)
+		{
+			short nFun=multi_register_value[328];
+			int nMask;
+			nMask=nFun&0x8;
+			if (nMask>0)
+			{
+				strTemp=ONTPUT_FUNS[1];
+			}
+			else
+			{
+				strTemp=ONTPUT_FUNS[0];
+			}
+			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
+		}
+		else
+		{
+			int indext=-1;
+			indext=multi_register_value[337];
+			if(indext>=0&&indext<=3)
+				strTemp=ONTPUT_FUNS[indext];
+			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
+		}
+	}
+*/
+
+	//BCDE 4,5 D/O
 	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16 
 		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)//||m_nModeType==17||m_nModeType==18)
 	{
@@ -504,27 +638,14 @@ void COutputSetDlg::Fresh_Grid()
 
 		if ((newtstat6[7] ==PM_TSTAT6)||(newtstat6[7] ==PM_TSTAT6))
 			nRange = newtstat6[205];
-		else//其他的
-			{
-
-			if (multi_register_value[336]<2)
-				{
-				nRange = multi_register_value[283];
-				}
-			else
-				{
-				nRange = multi_register_value[336];
-				}
-			
-			}
-
+		else
+			nRange = multi_register_value[283];
 
 		
-		if(nRange>=0&&nRange<=2)
+		if(nRange>=0&&nRange<2)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
-		/*AfxMessageBox(strTemp);*/
 		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 
 		if(nRange == 0 || !(nAMVAlue & 8)) // AM栏选择了Auto或者Range 栏选择了On/Off，value都显示ON/Off
@@ -637,27 +758,13 @@ void COutputSetDlg::Fresh_Grid()
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 
 		//if (newtstat6[7] ==PM_TSTAT6)
-	 
-	/*	str.Format(_T("newtstat6[7]=%d"),multi_register_value[7]);
-		AfxMessageBox(str);*/
-
 		if ((newtstat6[7] ==PM_TSTAT6)||(newtstat6[7] ==PM_TSTAT7))
-			{nRange = newtstat6[206];}
+			nRange = newtstat6[206];
 		else
-		{
-		if (multi_register_value[337]==0)
-			{
 			nRange = multi_register_value[284];
-			} 
-		else
-			{
-			nRange = multi_register_value[337];
-			}
-		}
-			
 
 
-		if(nRange>=0&&nRange<=2)
+		if(nRange>=0&&nRange<2)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
@@ -739,6 +846,8 @@ void COutputSetDlg::Fresh_Grid()
 		}
 	}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 	//row4,5,for 5F,5G:
 	if(m_nModeType==17||m_nModeType==18)
@@ -756,13 +865,20 @@ void COutputSetDlg::Fresh_Grid()
 		else
 		{
 			nRang = multi_register_value[328];
-			
+			//nRang = multi_register_value[280];
 		}
+// 		if (multi_register_value[7] == 18)//2.5.0.94
+// 		{
+// 			nRang = multi_register_value[310];
+// 		}
+		
 
+		//int nValue;
 		int nValue1;//=multi_register_value[108];
 
 
-	
+		//tstat6
+		//if (multi_register_value[7] == 6)
 		if ((newtstat6[7] ==PM_TSTAT6)||(newtstat6[7] ==PM_TSTAT7))
 		{
 			int num = reg_tststold[108];
@@ -798,7 +914,7 @@ void COutputSetDlg::Fresh_Grid()
 			{
 				strTemp.Format(_T("%d%%"),multi_register_value[348]);
 			}
-			    m_FlexGrid.put_TextMatrix(4,VALUE_OUTFIELD,strTemp);
+			m_FlexGrid.put_TextMatrix(4,VALUE_OUTFIELD,strTemp);
 
 		}
 
@@ -865,7 +981,15 @@ void COutputSetDlg::Fresh_Grid()
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
 
- 
+#if 0
+		if (multi_register_value[336] == 3)//2.5.0.96
+		{
+			strTemp=OUTPUT_RANGE45[1];
+		}else
+		{
+			strTemp=OUTPUT_RANGE45[0];
+		}
+#endif
 		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 		
 		strTemp.Empty();
@@ -970,13 +1094,16 @@ void COutputSetDlg::Fresh_Grid()
 			}
 			m_FlexGrid.put_TextMatrix(5,VALUE_OUTFIELD,strTemp);
 
-		}
-		else if (multi_register_value[7]==18)
+		}else if (multi_register_value[7]==18)
 		{
 			//2.5.0.94
 			if(multi_register_value[284]==0)
 			{
-		 
+			//int autmanl = multi_register_value[310];
+			//int xx_ = 1;
+			//xx_ = xx_<<4;
+			//int flag_ =autmanl&xx_; 
+			//if(flag_)
 			{
 				if(nValue1 &( 1<<4))//2.5.0.94
 					strTemp=_T("ON");
@@ -1047,7 +1174,14 @@ void COutputSetDlg::Fresh_Grid()
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
- 
+//2.5.0.98
+// 		if (multi_register_value[337]== 3)
+// 		{
+// 			strTemp=OUTPUT_RANGE45[1];
+// 		}else
+// 		{
+// 			strTemp=OUTPUT_RANGE45[0];
+// 		}
 		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
 		
 		strTemp.Empty();
@@ -1102,8 +1236,8 @@ void COutputSetDlg::Fresh_Grid()
 			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
 		}
 	}
-    //row45/67 ANALOG
-	 if (m_nModeType==2||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PRESSURE
+//row45/67 ANALOG
+	if (m_nModeType==2||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PRESSURE
 		||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7)//5ADEG
 	{
 		if(m_nModeType==2)
@@ -1230,7 +1364,12 @@ void COutputSetDlg::Fresh_Grid()
 					strTemp=_T("Off");
 				if(nValue==1)
 					strTemp=_T("On");
-			 
+				/*	
+			if(nValue<500)
+					strTemp=_T("Off");
+				else
+					strTemp=_T("On");
+					*/
 
 
 			}
@@ -1308,8 +1447,7 @@ void COutputSetDlg::Fresh_Grid()
 			}
 			m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
 		}
-		//out6/7
-		else
+		else//out6/7
 		{
 
 			//186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
@@ -1412,8 +1550,7 @@ void COutputSetDlg::Fresh_Grid()
 			m_FlexGrid.put_TextMatrix(6,RANG_OUTFIELD,strTemp);
 
 
-			//103	211	2	Full	W/R(write only when manual output7 enable)	Output7 Analog output2, 
-			//a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.    
+			//103	211	2	Full	W/R(write only when manual output7 enable)	Output7 Analog output2, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.    
 			//187	208	1	Low byte	W/R	Analog Output2 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
 			//if (newtstat6[7] == 6)
 			if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
@@ -1436,7 +1573,12 @@ void COutputSetDlg::Fresh_Grid()
 					strTemp=_T("Off");
 				if(nValue==1000)
 					strTemp=_T("On");
-					 
+					/*
+				if(nValue<500)
+					strTemp=_T("Off");
+				else
+					strTemp=_T("On");
+					*/
 			}
 			else
 			{
@@ -1503,63 +1645,17 @@ void COutputSetDlg::Fresh_Grid()
 			m_FlexGrid.put_TextMatrix(7,AM_OUTFIELD,strTemp);
 			strTemp.Empty();
 			if(nRange>=0&&nRange<5)
-				{
+			{
 				strTemp=OUTPUT_ANRANGE[nRange];
-				}
+			}
 			m_FlexGrid.put_TextMatrix(7,RANG_OUTFIELD,strTemp);
 
 
 		}
 		strTemp.Empty();
 
-	} 
-	
-	if ((newtstat6[7] ==PM_TSTAT6)||(newtstat6[7] ==PM_TSTAT6))
-		nRange = newtstat6[205];
-	else//其他的
-		{
-
-		if (multi_register_value[336]<2)
-			{
-			nRange = multi_register_value[283];
-			}
-		else
-			{
-			nRange = multi_register_value[336];
-			}
-
-		}
-
-
-
-	if(nRange>=0&&nRange<=2)
-		{
-		strTemp=OUTPUT_RANGE45[nRange];
-		}
-	/*AfxMessageBox(strTemp);*/
-	m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
-
-	if ((newtstat6[7] ==PM_TSTAT6)||(newtstat6[7] ==PM_TSTAT7))
-		{nRange = newtstat6[206];}
-	else
-		{
-		if (multi_register_value[337]<2)
-			{
-			nRange = multi_register_value[284];
-			} 
-		else
-			{
-			nRange = multi_register_value[337];
-			}
-		}
-
-
-
-	if(nRange>=0&&nRange<=2)
-		{
-		strTemp=OUTPUT_RANGE45[nRange];
-		}
-	m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
+	}
+	//286	245	1	Low byte	W/R	Interlock for  output1
 
 	CString strlock;
 	int stradd;// = 286;
@@ -1575,9 +1671,7 @@ void COutputSetDlg::Fresh_Grid()
 				m_FlexGrid.put_TextMatrix(i+1,6,Interlock[itemp]);
 
 		}
-	}
-	
-	else
+	}else
 	{
 		stradd = 286;
 		for (int i = 0;i<7;i++)
@@ -2103,7 +2197,41 @@ void COutputSetDlg::ClickMsflexgrid1()
 
 			}
 //2.5.0.94
- 
+#if 0
+			if((m_nModeType==18)&&lRow==4)
+			{
+// 				if(multi_register_value[283]==0)//ON/oFF
+// 					m_OutValueEdt.ShowWindow(SW_HIDE);	
+// 				else
+// 				{
+// 					m_OutValueCmbox.ShowWindow(SW_HIDE);
+// 					m_OutValueEdt.ShowWindow(SW_SHOW);	
+// 					m_OutValueEdt.SetWindowText(strValue);
+// 					m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
+// 					m_OutValueEdt.BringWindowToTop();
+// 					m_OutValueEdt.SetFocus(); //获取焦点
+// 				}
+
+			}
+
+			if((m_nModeType==17||m_nModeType==18)&&lRow==5)
+			{
+// 				if(multi_register_value[284]==0)//ON/oFF
+// 					m_OutValueEdt.ShowWindow(SW_HIDE);	
+// 				else
+// 				{
+// 					m_OutValueCmbox.ShowWindow(SW_HIDE);
+// 					m_OutValueEdt.ShowWindow(SW_SHOW);	
+// 					m_OutValueEdt.SetWindowText(strValue);
+// 					m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
+// 					m_OutValueEdt.BringWindowToTop();
+// 					m_OutValueEdt.SetFocus(); //获取焦点
+// 				}
+
+			}
+
+#endif
+
 
 
 
@@ -2324,8 +2452,7 @@ void COutputSetDlg::OnCbnSelchangeOvaluecombo()
 // 		int num = reg_tststold[108];
 // 		n = multi_register_value[num];
 		n = newtstat6[209];
-	}
-	else
+	}else
 		n=multi_register_value[108];
 
 	int i;
@@ -2351,8 +2478,7 @@ void COutputSetDlg::OnCbnSelchangeOvaluecombo()
 				//int num = reg_tststold[108];
 				write_one(g_tstat_id,209,nchange);
 				newtstat6[209] = nchange;
-			}
-			else
+			}else
 				write_one(g_tstat_id,108,nchange);
 
 //tstat6
@@ -2961,89 +3087,47 @@ void COutputSetDlg::OnCbnSelchangeOamcombo()
 	EndWaitCursor();
 }
 
-//void COutputSetDlg::OnCbnKillfocusOrangcombo()
-//{
-//	//m_outRangCmbox.ShowWindow(SW_HIDE);
-//}
+void COutputSetDlg::OnCbnKillfocusOrangcombo()
+{
+	m_outRangCmbox.ShowWindow(SW_HIDE);
+}
 
 void COutputSetDlg::OnCbnSelchangeOrangcombo()
 {
-	 
+	/*
+	if(m_nModeType==2)
+	{
+		int nIndext=m_outRangCmbox.GetCurSel();
+		write_one(g_tstat_id,186 ,nIndext );
+		if (nIndext==2)
+		{
+			int	indext=3;
+			write_one(g_tstat_id,327,3);//timer on register
+		}
+	}else
+	{
+		short nIndext=m_outRangCmbox.GetCurSel();
+		write_one(g_tstat_id,283 ,nIndext);
+	}
+	*/
 	int  ret =0;
-	int ret1=0;
 	BeginWaitCursor();
 	int nIndext=m_outRangCmbox.GetCurSel();
-	//Row 4.5
 	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16||m_nModeType==17
+		//||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)//0914
 		||m_nModeType==18||m_nModeType==PM_PRESSURE)
 	{
-	if(m_nCurRow>0&&m_nCurRow<=5)
+		if(m_nCurRow>0&&m_nCurRow<=5)
 		{	
-		   
-			   if (m_nCurRow==4)
-			   {
-			   if (nIndext<2)
-				   {
-				   ret = write_one(g_tstat_id,283 ,nIndext );
-				    ret1=write_one(g_tstat_id,336,0 );
-				   if ((ret<=0)||(ret1<=0))
-					   {
-					  // AfxMessageBox(_T("setting failure"));
-					   }
-					   else
-					   {
-					    multi_register_value[283] = nIndext;
-						multi_register_value[284] = nIndext;
-					    multi_register_value[336] = 0;
-					   }
-				   } 
-				   else
-				   {
-			   ret = write_one(g_tstat_id,336,nIndext );
-			   if (ret<=0)
-				   {
-				  // AfxMessageBox(_T("setting failure"));
-				   }else
-				   {
-				   multi_register_value[336] = nIndext;
-				   }
-				   }
-			   }
-		       if (m_nCurRow==5)
-			   {
-			   
-			   if (nIndext<2)
-				   {
-				   ret = write_one(g_tstat_id,284 ,nIndext );
-				   ret1=write_one(g_tstat_id,337,0 );
-				   if ((ret<=0)||(ret1<=0))
-					   {
-					  // AfxMessageBox(_T("setting failure"));
-					   }
-				   else
-					   {
-					   multi_register_value[283] = nIndext;
-					   multi_register_value[284] = nIndext;
-					   multi_register_value[337] = 0;
-					   }
-				   } 
-			   else
-				   {
-				   ret = write_one(g_tstat_id,337,nIndext );
-				   if (ret<=0)
-					   {
-					  // AfxMessageBox(_T("setting failure"));
-					   }else
-					   {
-					   multi_register_value[337] = nIndext;
-						}
-				   }
-			   }
-		       
-		 
-		
+			ret = write_one(g_tstat_id,280+(m_nCurRow-1) ,nIndext );
+			if (ret<=0)
+			{
+				AfxMessageBox(_T("setting failure"));
+			}else
+			{
+				multi_register_value[280+(m_nCurRow-1)] = nIndext;
+			}
 		}
-		//Row 6.7
 		if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_TSTAT6
 			||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE) //
 		{
@@ -3053,7 +3137,7 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 				ret = write_one(g_tstat_id,186 ,nIndext );
 			if (ret<=0)
 			{
-				 AfxMessageBox(_T("setting failure"));
+				AfxMessageBox(_T("setting failure"));
 			}else
 			{
 				multi_register_value[186] = nIndext;
@@ -3065,7 +3149,7 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 				ret = write_one(g_tstat_id,187 ,nIndext );
 				if (ret<=0)
 				{
-					 AfxMessageBox(_T("setting failure"));
+					AfxMessageBox(_T("setting failure"));
 				}else
 				{
 					multi_register_value[187] = nIndext;
@@ -3087,7 +3171,22 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 			write_one(g_tstat_id,187 ,nIndext );
 	}
 
+//以下//0914
+//range
+// 	280	202	1	Low byte	W/R	Determine the output1 mode. Output1 always is ON/OFF mode
+// 	281	203	1	Low byte	W/R	Determine the output2 mode. Output2 always is ON/OFF mode
+// 	282	204	1	Low byte	W/R	Determine the output3 mode. Output3 always is ON/OFF mode
+// 	283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
+// 	284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
+//	186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
+//	187	208	1	Low byte	W/R	Analog Output2 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
 
+
+//row4+1 	283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
+//row5+1 	284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
+
+//row6+1	102	210	2	Full	W/R(write only when manual output6 enable)	Output6 ,Analog output1, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.
+//row7+1	103	211	2	Full	W/R(write only when manual output7 enable)	Output7 Analog output2, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.    
 
 
 	 ret =0;
@@ -3095,16 +3194,9 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 	{
 		if(m_nCurRow>0&&m_nCurRow<=5)
 		{	
-		 
 			ret = write_one(g_tstat_id,202+(m_nCurRow-1) ,nIndext );
 			if (ret>0)
 				newtstat6[202+m_nCurRow-1] = nIndext;
-
-
-			CString str;
-			str.Format(_T("Add:%d,Value:%d"),202+(m_nCurRow-1),newtstat6[202+m_nCurRow-1]);
-			//AfxMessageBox(str);
-
 		}
 
 		if(m_nCurRow==6)
@@ -3139,10 +3231,12 @@ void COutputSetDlg::OnCbnSelchangeOfuncombo()
 	int retfun =0;
 	int nItem=-1;
 	nItem=m_outFunCmbox.GetCurSel();
-	short nFun;
-//=multi_register_value[328];
-//328	266	1	Low byte	W/R	"Output1 Function setting:
-//	0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
+	short nFun;//=multi_register_value[328];
+
+	//328	266	1	Low byte	W/R	"Output1 Function setting:
+	//	0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
+
+
 // 
 //		280	1	Determine the output1 mode. Output1 always is ON/OFF mode
 // 		281	1	Determine the output2 mode. Output2 always is ON/OFF mode
@@ -3432,6 +3526,7 @@ void COutputSetDlg::OnCbnSelchangeOfuncombo()
 			}else
 			{
 				write_one(g_tstat_id,328,nFun);
+
 			}
 			
 		}
@@ -3538,10 +3633,10 @@ void COutputSetDlg::OnEnKillfocusValueedit()
 // 
 // 		}
 
-//{
-//  commented by zgq;2010-12-06; 写入的值应当为实际设置电压值×100。
-//  但界面输入的值为range值中标定范围的百分比。例如，输入50，range为0－10v(100%)，
-//   则实际电压为10×50% = 5V。写入为5×100 = 500。
+		//{
+			//  commented by zgq;2010-12-06; 写入的值应当为实际设置电压值×100。
+			//  但界面输入的值为range值中标定范围的百分比。例如，输入50，range为0－10v(100%)，
+			//   则实际电压为10×50% = 5V。写入为5×100 = 500。
 			if((m_nCurRow==4)||(m_nCurRow == 5))
 			{	
 			//	write_one(g_tstat_id,348,nSrcValue);

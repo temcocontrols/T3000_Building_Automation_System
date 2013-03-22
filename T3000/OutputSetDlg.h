@@ -42,7 +42,7 @@ public:
 	afx_msg void OnCbnKillfocusOamcombo();
 	afx_msg void OnCbnSelchangeOvaluecombo();
 	afx_msg void OnCbnSelchangeOamcombo();
-//	afx_msg void OnCbnKillfocusOrangcombo();
+	afx_msg void OnCbnKillfocusOrangcombo();
 	afx_msg void OnCbnSelchangeOrangcombo();
 	afx_msg void OnCbnKillfocusOfuncombo();
 	afx_msg void OnCbnSelchangeOfuncombo();

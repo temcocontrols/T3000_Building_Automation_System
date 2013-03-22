@@ -18,7 +18,7 @@
 #include "Dialog_Progess.h"//tstat6
 
 
-#include "FreezeFunction.h"
+
 // CParameterDlg dialog
 
 IMPLEMENT_DYNAMIC(CParameterDlg, CDialog)
@@ -38,7 +38,7 @@ CParameterDlg::CParameterDlg(CWnd* pParent /*=NULL*/,CString str)
 {
 	//memset(&multi_register_value[0],0,sizeof(multi_register_value));
 	m_version=1.0;
-	pProgess = new CDialog_Progess(this/*,1,10*/);
+	pProgess = new CDialog_Progess(this,1,10);
 	strparamode = str;
 
 }
@@ -191,8 +191,6 @@ ON_EN_KILLFOCUS(IDC_EDIT38, &CParameterDlg::OnEnKillfocusEdit38)
 ON_BN_CLICKED(IDCANCEL, &CParameterDlg::OnBnClickedCancel)
 ON_EN_KILLFOCUS(IDC_EDIT_ValueTravelTime, &CParameterDlg::OnEnKillfocusEditValuetraveltime)
 ON_EN_KILLFOCUS(IDC_EDIT_PID2OFFSETPOINT, &CParameterDlg::OnEnKillfocusEditPid2offsetpoint)
-ON_EN_CHANGE(IDC_EDIT26, &CParameterDlg::OnEnChangeEdit26)
-ON_BN_CLICKED(IDC_FREEZEFUNC, &CParameterDlg::OnBnClickedFreezefunc)
 END_MESSAGE_MAP()
 
 
@@ -226,8 +224,7 @@ BOOL CParameterDlg::OnInitDialog()
 	pProgess->Create(IDD_DIALOG10_Progress, this);
 
 	//居中显示
-	//pProgess->CenterWindow();//2.5.0.98
-	//底下显示
+//	pProgess->CenterWindow();//2.5.0.98
 	pProgess->ShowProgress(0,0);
 	//显示对话框窗口
 	pProgess->ShowWindow(SW_SHOW);
@@ -244,6 +241,8 @@ BOOL CParameterDlg::OnInitDialog()
 
 	pProgess->ShowProgress(4,40);
 	//
+
+
 	//
 
 
@@ -289,7 +288,7 @@ BOOL CParameterDlg::OnInitDialog()
 	// initialize PID2 combo box
 
 	pProgess->ShowProgress(5,50);
-	//InitPID2ComboBox();
+	InitPID2ComboBox();
 	pProgess->ShowProgress(7,70);
 	Refresh();
 	pProgess->ShowProgress(8,80);
@@ -451,33 +450,6 @@ BOOL CParameterDlg::OnInitDialog()
 
 	}
 
-
- 
-	//if (multi_register_value[111]<1)
-	//	{
-	//	m_InputSelect1.SetCurSel(0);
-	//	}else if(multi_register_value[111]>3)
-	//	{
-	//	m_InputSelect1.SetCurSel(2);
-
-	//		}else
-	//		{
-	//		m_InputSelect1.SetCurSel(multi_register_value[111]-1);
-	//			}
-
-
-	//		if (multi_register_value[241]<0)
-	//			{
-	//			m_inputSelect2.SetCurSel(0);
-	//			}else if (multi_register_value[241]>5)
-	//			{
-	//			m_inputSelect2.SetCurSel(5);
-	//				}else
-	//				{
-	//				//m_InputSelect1.SetCurSel(multi_register_value[111]-1);
-	//				m_inputSelect2.SetCurSel(multi_register_value[241]-1);
-	//					}
-
 	 UpdateData(FALSE);
 
 	 // #define  DaySP		0  //address 345
@@ -495,11 +467,6 @@ BOOL CParameterDlg::OnInitDialog()
 
 	 //tstat6flex
 
-
-
-
-	
-	 
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -554,7 +521,8 @@ void CParameterDlg::OnBnClickedRefreshbutton()
 
 void CParameterDlg::OnBnClickedEnableidbutton()
 {
-
+// 	m_idAdressEdit.EnableWindow(TRUE);
+// 	// TODO: Add your control notification handler code here
 
 	if(m_idAdressEdit.IsWindowEnabled())
 		m_idAdressEdit.EnableWindow(FALSE);
@@ -569,7 +537,7 @@ void CParameterDlg::OnCbnSelchangeAutoonlycombo()
 
 	// TODO: Add your control notification handler code here
 }
- void CParameterDlg::Refresh()
+void CParameterDlg::Refresh()
 {
 	CString strTemp;
 	strTemp.Format(_T("%d"),g_tstat_id);
@@ -645,7 +613,8 @@ void CParameterDlg::OnCbnSelchangeAutoonlycombo()
 	strTemp.Format(_T("%d"),multi_register_value[338]);
 	m_defSetPointEdit.SetWindowText(strTemp);
 
-
+//	strTemp.Format(_T("%d"),multi_register_value[339]);
+//	m_setPointCtrlEdit.SetWindowText(strTemp);
 	if(multi_register_value[339]>=0&&multi_register_value[339]<3)
 	{
 		m_occupiedSetPointModeCmbox.SetCurSel(multi_register_value[339]);
@@ -694,30 +663,30 @@ void CParameterDlg::OnCbnSelchangeAutoonlycombo()
 
 	}
 
-	if(multi_register_value[283]==2)
-	{
-			
-		CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMERON_STATIC);
-		ptimerout->SetWindowText(_T("Out4:"));
-	}
-	else
-	{
-		CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMERON_STATIC);
-		ptimerout->SetWindowText(_T("Timer On:"));
-	}
+	//if(multi_register_value[283]==2)
+	//{
+	//		
+	//	CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMERON_STATIC);
+	//	ptimerout->SetWindowText(_T("Out4:"));
+	//}
+	//else
+	//{
+	//	CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMERON_STATIC);
+	//	ptimerout->SetWindowText(_T("Timer On:"));
+	//}
 
-	if(multi_register_value[284]==2)
-	{
-		
-		CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMEOFF_STATIC);
-		ptimerout->SetWindowText(_T("Out5:"));
+	//if(multi_register_value[284]==2)
+	//{
+	//	
+	//	CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMEOFF_STATIC);
+	//	ptimerout->SetWindowText(_T("Out5:"));
 
-	}
-	else
-	{
-		CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMEOFF_STATIC);
-		ptimerout->SetWindowText(_T("Timer Off:"));
-	}
+	//}
+	//else
+	//{
+	//	CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMEOFF_STATIC);
+	//	ptimerout->SetWindowText(_T("Timer Off:"));
+	//}
 
 
 	m_timerSelectCombox.SetCurSel(multi_register_value[327]);
@@ -748,135 +717,161 @@ void CParameterDlg::OnCbnSelchangeAutoonlycombo()
 		m_inputSelect2.SetCurSel(5);
 	}else
 	{
+		//m_InputSelect1.SetCurSel(multi_register_value[111]-1);
 		m_inputSelect2.SetCurSel(multi_register_value[241]);
 	}
 	
 	
-
-
- #if 1
-	 strTemp.Format(_T("%.1f"),multi_register_value[101]/10.0);
-	 m_inputvalue1.SetWindowText(strTemp+strUnit);
-	float fValue;int nValue=0;
- CString strValueUnit=GetTempUnit(multi_register_value[359], 1);
-	if(multi_register_value[241]==1) // input1
+	strTemp.Format(_T("%.1f"),multi_register_value[101]/10.0);
+	m_inputvalue1.SetWindowText(strTemp+strUnit);
+	
+	//////////////////////////////////////////////////////////////////////////
+	// PID2 m_inputValue2 m_inputSelect2 关联设置
+// 
+// 	if(multi_register_value[7]== 18)//18是tstat5G
+// 	{
+// 		if(multi_register_value[241]==2) // input1
+// 		{	
+// 			if(multi_register_value[7]== PM_PRESSURE)  // pressure
+// 			{
+// 				strTemp.Format(_T("%.1f W.C"),multi_register_value[180]/100.0);
+// 			}
+// 			else
+// 			{
+// 				if(multi_register_value[188]==4||multi_register_value[188]==1)
+// 				{
+// 					strTemp.Format(_T("%.1f"),(float)multi_register_value[180]/10);
+// 					strTemp=strTemp+strUnit;
+// 				}
+// 				if (strUnit==""||strUnit=="%")
+// 				{
+// 					strTemp.Format(_T("%d"),multi_register_value[180]);
+// 				}
+// 				if(multi_register_value[180]==3)
+// 				{
+// 					if(multi_register_value[180]==0)
+// 						strTemp=_T("OFF");
+// 					if(multi_register_value[180]==1)
+// 						strTemp=_T("ON");
+// 				}
+// 			}
+// 			m_inputValue2.SetWindowText(strTemp);
+// 		}else if(multi_register_value[241]==1) // input2 //m_inputvalue1
+// 		{
+// 			if(multi_register_value[189]==4||multi_register_value[189]==1)
+// 			{
+// 				strTemp.Format(_T("%.1f"),(float)multi_register_value[181]/10.0);	
+// 				strTemp=strTemp+strUnit;
+// 			}
+// 			if (strUnit==""||strUnit=="%")
+// 			{
+// 				strTemp.Format(_T("%d"),multi_register_value[181]);
+// 			}
+// 			if(multi_register_value[189]==3)
+// 			{
+// 				if(multi_register_value[181]==0)
+// 					strTemp=_T("OFF");
+// 				if(multi_register_value[181]==1)
+// 					strTemp=_T("ON");
+// 			}
+// 			m_inputValue2.SetWindowText(strTemp);
+// 		}
+// 		else //if(multi_register_value[241]!=1)
+// 		{
+// 			m_inputValue2.SetWindowText(_T("UNUSED"));
+// 			//		m_hotelCoolEdt.SetWindowText(_T("N/A"));
+// 		}
+// 
+// 		//0914
+// 		// 	if (multi_register_value[241]==3) // humidity
+// 		// 	{
+// 		// 		strTemp.Format(_T("%.1f%%"),multi_register_value[422]/10.0);
+// 		// 		m_inputValue2.SetWindowText(strTemp);
+// 		// 	}else
+// 		// 	{
+// 		// 		m_inputValue2.SetWindowText(_T("0"));
+// 		// 
+// 		// 	}
+// 
+// 		//
+// 
+// 	}else
+// 	{
+		if(multi_register_value[241]==1) // input1
 		{	
-		if(multi_register_value[7]== PM_PRESSURE)  // pressure
+			if(multi_register_value[7]== PM_PRESSURE)  // pressure
 			{
-			strTemp.Format(_T("%.1f W.C"),multi_register_value[180]/100.0);
+				strTemp.Format(_T("%.1f W.C"),multi_register_value[180]/100.0);
 			}
-		else if (multi_register_value[7]==16)
-		{
-		if(multi_register_value[359]==1)
-			{				
-			fValue=float(multi_register_value[367]/10.0);
-			strTemp.Format(_T("%.1f"),fValue);	
-
-			strTemp +=strValueUnit;
-			}
-		else if(multi_register_value[359]==3 || multi_register_value[359]==5) // On/Off or Off/On ==1 On ==0 Off
-			{						
-			int nValue=(multi_register_value[367]);
-			if (nValue == 1)
-				{
-				strTemp = _T("On");
-				}
 			else
+			{
+				if(multi_register_value[188]==4||multi_register_value[188]==1)
 				{
-				strTemp = _T("Off");
-				}					
-			}
-		else if (multi_register_value[359]==4 )  // custom sensor
-			{					
-			fValue=float(multi_register_value[367]/10.0);
-			strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
-			strTemp +=strValueUnit;
-			}
-		else if(multi_register_value[359]==2)
-			{
-			   nValue=multi_register_value[367];
-			   strTemp.Format(_T("%d%%"), nValue);
-			}
-		else
-			{
-			 
-			strTemp=_T("UNUSED");
-			}
-		
-		
-		} 
-		else
-			{
-			if(multi_register_value[188]==4||multi_register_value[188]==1)
+					strTemp.Format(_T("%.1f"),(float)multi_register_value[180]/10);
+					strTemp=strTemp+strUnit;
+				}
+				if (strUnit==""||strUnit=="%")
 				{
-				strTemp.Format(_T("%.1f"),(float)multi_register_value[180]/10);
+					strTemp.Format(_T("%d"),multi_register_value[180]);
+				}
+				if(multi_register_value[180]==3)
+				{
+					if(multi_register_value[180]==0)
+						strTemp=_T("OFF");
+					if(multi_register_value[180]==1)
+						strTemp=_T("ON");
+				}
+			}
+			m_inputValue2.SetWindowText(strTemp);
+		}//else //if(multi_register_value[241]!=2)
+		//{
+		//	m_inputValue2.SetWindowText(_T("UNUSED"));
+		//	}
+
+
+		else if(multi_register_value[241]==2) // input2 //m_inputvalue1
+		{
+			if(multi_register_value[189]==4||multi_register_value[189]==1)
+			{
+				strTemp.Format(_T("%.1f"),(float)multi_register_value[181]/10.0);	
 				strTemp=strTemp+strUnit;
-				}
-			if (strUnit==""||strUnit=="%")
-				{
-				strTemp.Format(_T("%d"),multi_register_value[180]);
-				}
-			if(multi_register_value[180]==3)
-				{
-				if(multi_register_value[180]==0)
-					strTemp=_T("OFF");
-				if(multi_register_value[180]==1)
-					strTemp=_T("ON");
-				}
 			}
-		m_inputValue2.SetWindowText(strTemp);
+	//if (strUnit==""||strUnit=="%")//0914
+			{
+				//strTemp.Format(_T("%d"),multi_register_value[181]);//0914
+				strTemp.Format(_T("%.1f"),(float)multi_register_value[181]/10);
+				strTemp=strTemp+strUnit;
+			}
+			if(multi_register_value[189]==3)
+			{
+				if(multi_register_value[181]==0)
+					strTemp=_T("OFF");
+				if(multi_register_value[181]==1)
+					strTemp=_T("ON");
+			}
+			m_inputValue2.SetWindowText(strTemp);
 		}
-	else if(multi_register_value[241]==2) // input2 //m_inputvalue1
+		else //if(multi_register_value[241]!=1)
 		{
-	     if (multi_register_value[7]==16)//5E
-		 {
-		 if(multi_register_value[360]==1)
-			 {				
-			 fValue=float(multi_register_value[368]/10.0);
-			 strTemp.Format(_T("%.1f"),fValue);	
-
-			 strTemp +=strValueUnit;
-			 }
-		 else if(multi_register_value[360]==3 || multi_register_value[360]==5) // On/Off or Off/On ==1 On ==0 Off
-			 {						
-			 int nValue=(multi_register_value[368]);
-			 if (nValue == 1)
-				 {
-				 strTemp = _T("On");
-				 }
-			 else
-				 {
-				 strTemp = _T("Off");
-				 }					
-			 }
-		 else if (multi_register_value[360]==4 )  // custom sensor
-			 {					
-			 fValue=float(multi_register_value[368]/10.0);
-			 strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
-			 strTemp +=strValueUnit;
-			 }
-		 else if(multi_register_value[360]==2)
-			 {
-			 nValue=multi_register_value[368];
-			 strTemp.Format(_T("%d%%"), nValue);
-			 }
-		 else
-			 {
-
-			 strTemp=_T("UNUSED");
-			 }
-		 }
-
-		m_inputValue2.SetWindowText(strTemp);
+			m_inputValue2.SetWindowText(_T("UNUSED"));
+			//		m_hotelCoolEdt.SetWindowText(_T("N/A"));
 		}
-	else //if(multi_register_value[241]!=1)
-		{
-		m_inputValue2.SetWindowText(_T("UNUSED"));
-		}
-#endif
 
+		//0914
+		// 	if (multi_register_value[241]==3) // humidity
+		// 	{
+		// 		strTemp.Format(_T("%.1f%%"),multi_register_value[422]/10.0);
+		// 		m_inputValue2.SetWindowText(strTemp);
+		// 	}else
+		// 	{
+		// 		m_inputValue2.SetWindowText(_T("0"));
+		// 
+		// 	}
 
+		//
+//	}
 
+	//////////////////////////////////////////////////////////////////////////
 
  float m_fFirmwareVersion=get_curtstat_version();//0912
  	if (multi_register_value[7] == PM_TSTAT5E)//0912
@@ -1625,9 +1620,10 @@ void CParameterDlg::OnCbnSelchangeInputselect1()
 
 void CParameterDlg::OnCbnSelchangeInputselect2()
 {
-    CString str;
+	
 	if(g_ParamLevel==1)
 		return;
+
 	int nSel = m_inputSelect2.GetCurSel();	
 	g_bPauseMultiRead = TRUE;	
 	int nRet = 0;
@@ -1638,36 +1634,36 @@ void CParameterDlg::OnCbnSelchangeInputselect2()
 	g_bPauseMultiRead = FALSE;
 	if(nRet>0)
 		multi_register_value [241] = nSel;
-
 	Refresh();
 }
 
 void CParameterDlg::OnEnKillfocusInputvalue2()
 {
-/*if(g_ParamLevel==1)
-return;
-CString strTemp;
-m_inputValue2.GetWindowText(strTemp);
-if(strTemp.IsEmpty())
-return;
-int nValue=_wtoi(strTemp);
-g_bPauseMultiRead = TRUE;	
-if(multi_register_value[241]==2)
-{
-if(multi_register_value[189]==4||multi_register_value[189]==1)
-write_one(g_tstat_id, 181,nValue*10);
-else
-write_one(g_tstat_id, 181,nValue);
 
-}
-else
-{
-if(multi_register_value[188]==4||multi_register_value[188]==1)
-write_one(g_tstat_id, 180,nValue*10);
-else
-write_one(g_tstat_id, 180,nValue);
-}
-g_bPauseMultiRead = FALSE;*/
+	if(g_ParamLevel==1)
+		return;
+	CString strTemp;
+	m_inputValue2.GetWindowText(strTemp);
+	if(strTemp.IsEmpty())
+		return;
+	int nValue=_wtoi(strTemp);
+		g_bPauseMultiRead = TRUE;	
+	if(multi_register_value[241]==2)
+	{
+		if(multi_register_value[189]==4||multi_register_value[189]==1)
+			write_one(g_tstat_id, 181,nValue*10);
+		else
+			write_one(g_tstat_id, 181,nValue);
+
+	}
+	else
+	{
+		if(multi_register_value[188]==4||multi_register_value[188]==1)
+			write_one(g_tstat_id, 180,nValue*10);
+		else
+			write_one(g_tstat_id, 180,nValue);
+	}
+g_bPauseMultiRead = FALSE;
 }
 
 void CParameterDlg::OnCbnSelchangeEapplication()
@@ -1865,39 +1861,34 @@ void CParameterDlg::OnEnKillfocusEcoolingpterm1()
 	m_pternEdt1.GetWindowText(strText);
 	float ftemp =(float) _wtof(strText);		
 	g_bPauseMultiRead = TRUE;	
-	int ret=write_one(g_tstat_id,114 , short(ftemp*10));
- 
+	write_one(g_tstat_id,114 , short(ftemp*10));
 	g_bPauseMultiRead = FALSE;
 }
 
 void CParameterDlg::OnEnKillfocusEcoolingpterm2()
 {
-if(g_ParamLevel==1)
-	return;
+	if(g_ParamLevel==1)
+		return;
 
-CString strText;
-m_ptermEdt2.GetWindowText(strText);
-float ftemp = (float)_wtof(strText);
-g_bPauseMultiRead = TRUE;	
-	int ret=write_one(g_tstat_id, 244, short(ftemp*10));
-	 
+	CString strText;
+	m_ptermEdt2.GetWindowText(strText);
+	float ftemp = (float)_wtof(strText);
+			g_bPauseMultiRead = TRUE;	
+	write_one(g_tstat_id, 244, short(ftemp*10));
 	g_bPauseMultiRead = FALSE;
 }
 
 void CParameterDlg::OnEnKillfocusEdit26()
 {
- 
-if(g_ParamLevel==1)
-	return;
+	if(g_ParamLevel==1)
+		return;
 
-CString strText;
-m_coolingPitemEdt1.GetWindowText(strText);
-float ftemp = (float)_wtof(strText);
-g_bPauseMultiRead = TRUE;
-int ret=write_one(g_tstat_id, 115, short(ftemp*10));	
- 
-g_bPauseMultiRead = FALSE;
-
+	CString strText;
+	m_coolingPitemEdt1.GetWindowText(strText);
+	float ftemp = (float)_wtof(strText);
+			g_bPauseMultiRead = TRUE;
+	write_one(g_tstat_id, 115, short(ftemp*10));	
+	g_bPauseMultiRead = FALSE;
 }
 
 void CParameterDlg::OnEnKillfocusEdit27()
@@ -1909,8 +1900,7 @@ void CParameterDlg::OnEnKillfocusEdit27()
 	m_pidPitemEdt2.GetWindowText(strText);
 	float ftemp = (float)_wtof(strText);
 			g_bPauseMultiRead = TRUE;
-	int ret=write_one(g_tstat_id, 245, short(ftemp*10));
-	 
+	write_one(g_tstat_id, 245, short(ftemp*10));	
 	g_bPauseMultiRead = FALSE;
 }
 void CParameterDlg::OnEnKillfocusSpset1()
@@ -2926,54 +2916,17 @@ void CParameterDlg::OnEnKillfocusEditPid2offsetpoint()
 	CString str;
 	//str.Format(_T("%d"),multi_register_value[275]);
 	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->GetWindowText(str);
-	if (str.IsEmpty())
+	int nValue= _wtoi(str);
+	int ret =0;
+	ret = write_one(g_tstat_id,275,nValue*10,5);
+	if (ret>0)
 	{
-	return;
-	} 
-	else
-	{int nValue= _wtoi(str);
-	if (nValue>=100)
-		{
-		AfxMessageBox(_T("Out of range"));
-		return;
-		} 
-	else
-		{
-		int ret =0;
-		ret = write_one(g_tstat_id,275,nValue*10,5);
-		if (ret>0)
-			{
-			multi_register_value[275] = nValue;
-			AfxMessageBox(_T("Write Ok!"));
-			}
-		else
-			{
-			AfxMessageBox(_T("Please try again"));
-			}
-		}
+		multi_register_value[275] = nValue;
+	}else
+	{
+		AfxMessageBox(_T("Pleas try again"));
 	}
-	
-	
 
 
 
 }
-
-
-void CParameterDlg::OnEnChangeEdit26()
-	{
-	// TODO:  如果该控件是 RICHEDIT 控件，它将不
-	// 发送此通知，除非重写 CDialog::OnInitDialog()
-	// 函数并调用 CRichEditCtrl().SetEventMask()，
-	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
-	  
-
-	// TODO:  在此添加控件通知处理程序代码
-	}
-
-
-void CParameterDlg::OnBnClickedFreezefunc()
-	{
-	   CFreezeFunction fzfdlg;
-	   fzfdlg.DoModal();
-	}

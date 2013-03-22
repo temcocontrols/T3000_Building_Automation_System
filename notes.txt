@@ -1,5 +1,5 @@
-Change a lot
-Notes Change000000
+ 2013/3/22
+change output table PWM Model
 ver2.5.0.103, date released:2012/12/11 
 *************************************************************************************
 <1>Merge ISPTool into T3000.
