@@ -7,6 +7,6 @@ If you're concerned about putting in effort into a project which suddenly goes d
 
 Please refer to Wiki for details on how you can get started with contributing towards the project. 
 
-Regards,
+Regards,   
 Maurice Duteau
 
