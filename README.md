@@ -10,5 +10,5 @@ Please refer to [Wiki](https://github.com/temcocontrols/T3000_Building_Automatio
 Regards,   
 Maurice Duteau     
 General Manager    
-Temco Controls    
+[Temco Controls](http://www.temcocontrols.com/)    
 maurice@temcocontrols.com    
