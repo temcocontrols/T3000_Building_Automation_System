@@ -5,7 +5,7 @@ This is our T3000 Building Automation front end, a mature project for managing t
 
 If you're concerned about putting in effort into a project which suddenly goes dark or becomes closed source Temco has been around for a while, since 1969 actually. And we've never charged licence fees for our software since we started making building automation gear 25 years ago. Drop me an email and I'll hook you up with the developers.
 
-Please refer to Wiki for details on how you can get started with contributing towards the project. 
+Please refer to [Wiki](https://github.com/temcocontrols/T3000_Building_Automation_System/wiki) for details on how you can get started with contributing towards the project. 
 
 Regards,   
 Maurice Duteau
