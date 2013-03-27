@@ -8,5 +8,7 @@ If you're concerned about putting in effort into a project which suddenly goes d
 Please refer to [Wiki](https://github.com/temcocontrols/T3000_Building_Automation_System/wiki) for details on how you can get started with contributing towards the project. 
 
 Regards,   
-Maurice Duteau
-
+Maurice Duteau     
+General Manager    
+Temco Controls    
+maurice@temcocontrols.com    
