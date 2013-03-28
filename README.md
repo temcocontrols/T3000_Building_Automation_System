@@ -11,4 +11,4 @@ Regards,
 Maurice Duteau     
 General Manager    
 [Temco Controls](http://www.temcocontrols.com/)    
-maurice@temcocontrols.com    
+maurice (at) temcocontrols (dot) com    
