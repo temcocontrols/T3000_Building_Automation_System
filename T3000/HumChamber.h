@@ -4,6 +4,7 @@
 #include "msflexgrid1.h"
 #include "globle_function.h"
 #include "afxwin.h"
+#include "afxcmn.h"
 // CHumChamber form view
 struct  Register_info 
 {
@@ -42,43 +43,46 @@ protected:
 	virtual void OnInitialUpdate();
 public:
 	void Fresh();
+ 
+	void InitialRegisterNo();
 	void ShowDialogData();
 	BOOL GetRegInfoFromDB(Register_info &reg_data,CString Area_Name);
-	void UPdate_Time();
+	void Update_AllData();
 	void Update_SensorTable();
-	void Update_SensorReadingTable();
+	 
+	void Show_AllData();
 	BOOL WriteValueToRegID(UINT RegID,UINT &Value); 
 	/*void CreatDBTable();
 	BOOL GetDatabase();*/
 
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnBnClickedRefresh();
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
+//	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CMsflexgrid m_msflexgrid;
 //	afx_msg void OnEnChangeHumTol();
 private:
-Register_info MasterID;
-Register_info SlaveID;
-Register_info CurrentTemp;
-Register_info TempTolerence;
-Register_info NumSensors;
-Register_info StartPoint;
-Register_info CurrentHum;
-Register_info HumTolenrence;
-Register_info NumBadSensors;
-Register_info TestState;
-Register_info SensorTemp;
-Register_info First_Calibration_Points_Temp;
-Register_info First_Calibration_Points_Hum;
-Register_info First_Calibration_Points_Time;
-Register_info First_Sensor_Fr;
-Register_info First_Sensor_RH;
-Register_info First_Sensor_State;
-Register_info CurrentTestSensor;
-Register_info CurrentTestSensorTemp;
-Register_info CurrentTestSensorHum;
-Register_info CurrentCalibrationTimeLeft;
-Register_info CurrentCalibrationID;
+	Register_info MasterID;
+	Register_info SlaveID;
+	Register_info CurrentTemp;
+	Register_info TempTolerence;
+	Register_info NumSensors;
+	Register_info StartPoint;
+	Register_info CurrentHum;
+	Register_info HumTolenrence;
+	Register_info NumBadSensors;
+	Register_info TestState;
+	Register_info SensorTemp;
+	Register_info First_Calibration_Points_Temp;
+	Register_info First_Calibration_Points_Hum;
+	Register_info First_Calibration_Points_Time;
+	Register_info First_Sensor_Fr;
+	Register_info First_Sensor_RH;
+	Register_info First_Sensor_State;
+	Register_info CurrentTestSensor;
+	Register_info CurrentTestSensorTemp;
+	Register_info CurrentTestSensorHum;
+	Register_info CurrentCalibrationTimeLeft;
+	Register_info CurrentCalibrationID;
 public:
 //	afx_msg void OnEnUpdateMasterId();
 	afx_msg void OnEnKillfocusMasterId();
@@ -201,6 +205,14 @@ private:
 		CStatic m_tolerance;
 
 		BOOL m_Start;
+//		void MouseMoveMsflexgridInput3(short Button, short Shift, long x, long y);
+//		void KeyDownMsflexgridInput3(short* KeyCode, short Shift);
+//		void KeyUpMsflexgridInput3(short* KeyCode, short Shift);
+//		void KeyPressMsflexgridInput3(short* KeyAscii);
+//		void KeyDownMsflexgridInput3(short* KeyCode, short Shift);
+		void KeyUpMsflexgridInput3(short* KeyCode, short Shift);
+		// //process
+		CProgressCtrl m_progress;
 };
 
 
