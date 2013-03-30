@@ -1,0 +1,59 @@
+﻿Build started 2010/3/26 10:11:52.
+     1>Project "E:\T3000_Building_Automation_System\FlexSlideBar\FlexSlideBar.vcxproj" on node 3 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "..\T3000 Output\FlexSlideBar object\release\FlexSlideBar.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         E:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D _WINDOWS /D NDEBUG /D _AFXEXT /D _WINDLL /D _UNICODE /D UNICODE /D _ATL_STATIC_REGISTRY /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yc"StdAfx.h" /Fp"..\T3000 Output\FlexSlideBar object\release\FlexSlideBar.pch" /Fo"..\T3000 Output\FlexSlideBar object\release\\" /Fd"..\T3000 Output\FlexSlideBar object\release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
+         stdafx.cpp
+         E:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D _WINDOWS /D NDEBUG /D _AFXEXT /D _WINDLL /D _UNICODE /D UNICODE /D _ATL_STATIC_REGISTRY /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"..\T3000 Output\FlexSlideBar object\release\FlexSlideBar.pch" /Fo"..\T3000 Output\FlexSlideBar object\release\\" /Fd"..\T3000 Output\FlexSlideBar object\release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt CalcTics.cpp DoubleLinkageOpt.cpp DoubleThumbOpt.cpp FSBChannel.cpp FSBContainer.cpp FSBThumb.cpp FlexSlideBar.cpp FlexSlideWnd.cpp MultiThumbOpt.cpp SingleThumbOpt.cpp ThumbOperator.cpp TripleLinkageOpt.cpp TripleThumbOpt.cpp
+         CalcTics.cpp
+         DoubleLinkageOpt.cpp
+         DoubleThumbOpt.cpp
+         FSBChannel.cpp
+         FSBContainer.cpp
+         >>>FlexSliderBar.dll ExPorted
+         FSBThumb.cpp
+         FlexSlideBar.cpp
+         FlexSlideWnd.cpp
+         >>>FlexSliderBar.dll ExPorted
+         MultiThumbOpt.cpp
+     1>MultiThumbOpt.cpp(500): warning C4018: '>=' : signed/unsigned mismatch
+         SingleThumbOpt.cpp
+         ThumbOperator.cpp
+         TripleLinkageOpt.cpp
+         TripleThumbOpt.cpp
+         E:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D _WINDOWS /D NDEBUG /D _AFXEXT /D _WINDLL /D _UNICODE /D UNICODE /D _ATL_STATIC_REGISTRY /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"..\T3000 Output\FlexSlideBar object\release\\" /Fd"..\T3000 Output\FlexSlideBar object\release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt dllmain.cpp
+         dllmain.cpp
+       ResourceCompile:
+         c:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /D NDEBUG /D _UNICODE /D UNICODE /l"0x0409" /I"..\T3000 Output\FlexSlideBar object\release\\" /nologo /fo"..\T3000 Output\FlexSlideBar object\release\FlexSlideBar.res" FlexSlideBar.rc 
+       Link:
+         E:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"..\T3000 Output\release\FlexSlideBar.dll" /INCREMENTAL:NO /NOLOGO /DEF:".\FlexSlideBar.def" /MANIFEST /ManifestFile:"..\T3000 Output\FlexSlideBar object\release\FlexSlideBar.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"E:\T3000_Building_Automation_System\T3000 Output\release\FlexSlideBar.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"..\T3000 Output\release\FlexSlideBar.lib" /MACHINE:X86 /DLL "..\T3000 Output\FlexSlideBar object\release\FlexSlideBar.res"
+         "..\T3000 Output\FlexSlideBar object\release\CalcTics.obj"
+         "..\T3000 Output\FlexSlideBar object\release\dllmain.obj"
+         "..\T3000 Output\FlexSlideBar object\release\DoubleLinkageOpt.obj"
+         "..\T3000 Output\FlexSlideBar object\release\DoubleThumbOpt.obj"
+         "..\T3000 Output\FlexSlideBar object\release\FlexSlideBar.obj"
+         "..\T3000 Output\FlexSlideBar object\release\FlexSlideWnd.obj"
+         "..\T3000 Output\FlexSlideBar object\release\FSBChannel.obj"
+         "..\T3000 Output\FlexSlideBar object\release\FSBContainer.obj"
+         "..\T3000 Output\FlexSlideBar object\release\FSBThumb.obj"
+         "..\T3000 Output\FlexSlideBar object\release\MultiThumbOpt.obj"
+         "..\T3000 Output\FlexSlideBar object\release\SingleThumbOpt.obj"
+         "..\T3000 Output\FlexSlideBar object\release\stdafx.obj"
+         "..\T3000 Output\FlexSlideBar object\release\ThumbOperator.obj"
+         "..\T3000 Output\FlexSlideBar object\release\TripleLinkageOpt.obj"
+         "..\T3000 Output\FlexSlideBar object\release\TripleThumbOpt.obj"
+            Creating library ..\T3000 Output\release\FlexSlideBar.lib and object ..\T3000 Output\release\FlexSlideBar.exp
+         Generating code
+         Finished generating code
+         FlexSlideBar.vcxproj -> E:\T3000_Building_Automation_System\FlexSlideBar\..\T3000 Output\release\FlexSlideBar.dll
+       Manifest:
+         c:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"..\T3000 Output\release\FlexSlideBar.dll;#2" /manifest "..\T3000 Output\FlexSlideBar object\release\FlexSlideBar.dll.intermediate.manifest" "E:\Program Files\Microsoft Visual Studio 10.0\VC\Include\Manifest\dpiaware.manifest"
+       FinalizeBuildStatus:
+         Deleting file "..\T3000 Output\FlexSlideBar object\release\FlexSlideBar.unsuccessfulbuild".
+         Touching "..\T3000 Output\FlexSlideBar object\release\FlexSlideBar.lastbuildstate".
+     1>Done Building Project "E:\T3000_Building_Automation_System\FlexSlideBar\FlexSlideBar.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:33.73

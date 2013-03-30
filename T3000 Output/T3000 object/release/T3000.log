@@ -1,0 +1,436 @@
+﻿Build started 2010/3/26 10:12:31.
+     1>Project "E:\T3000_Building_Automation_System\T3000\T3000.vcxproj" on node 3 (build target(s)).
+     1>InitializeBuildStatus:
+         Touching "..\T3000 Output\T3000 object\release\T3000.unsuccessfulbuild".
+       ClCompile:
+         E:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D _WINDOWS /D NDEBUG /D _UNICODE /D UNICODE /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yc"StdAfx.h" /Fp"..\T3000 Output\T3000 object\release\T3000.pch" /Fo"..\T3000 Output\T3000 object\release\\" /Fd"..\T3000 Output\T3000 object\release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
+         stdafx.cpp
+         E:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D _WINDOWS /D NDEBUG /D _UNICODE /D UNICODE /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"..\T3000 Output\T3000 object\release\T3000.pch" /Fo"..\T3000 Output\T3000 object\release\\" /Fd"..\T3000 Output\T3000 object\release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt 5EInputDialog.cpp AddBuilding.cpp AfxMessageDialog.cpp AllNodesDiaolg.cpp Annual_Routines.cpp AnnualRout_InsertDia.cpp ApplyGraphicLabelsDlg.cpp BuildTable1.cpp ChangePasswordDlg.cpp Config_Routines.cpp DisplayConfig.cpp FreezeFunction.cpp LightingController\configure.cpp Dialog_Progess.cpp DialogInfo.cpp EnumSerial.cpp EreaseDlg.cpp excel9.cpp extern_function.cpp fileRW.cpp FreeCoolDlg.cpp globle_function.cpp GraphicView.cpp GridButton.cpp GridFlashDlg.cpp GridLoad.cpp hangeIDDlg.cpp ImageTreeCtrl.cpp ImportDatabaseDlg.cpp IniFile.cpp InputSetDlg.cpp IODisplayBar.cpp IOSetDlg.cpp LabelEditDlg.cpp LedsDialog.cpp LightingController\LightingController.cpp LightingController\LightingSet.cpp LoginDlg.cpp MainFrm.cpp ManageAccountDlg.cpp MannageBuidingDlg.cpp monthview1.cpp msflexgrid1.cpp NetworkControllView.cpp OfficeStPtDlg.cpp OutPutDlg.cpp OutputSetDlg.cpp OutsidDailog.cpp ParameterDlg.cpp RefreshTreeThread.cpp RelayLabel.cpp ScanDbWaitDlg.cpp ScanDlg.cpp ScanSelectDlg.cpp SetPtDayDlg.cpp SetptGraphicBar.cpp T3000.cpp T3000Doc.cpp T3000TableView.cpp T3000View.cpp TDelayForm.cpp Timer_Calibrate.cpp ToolCalibrateDlg.cpp TrendLogView.cpp TrendLogWnd.cpp TStat_Dev.cpp TStat_Net.cpp TStatBase.cpp TStatScanner.cpp TStatScheduleDlg.cpp UserAcessSetDlg.cpp Weekly_Routines.cpp WeeklyRout_InsertDia.cpp WeeklySchedule.cpp WorkspaceBar.cpp T3\DialogT3.cpp MiniPanel\DialgMiniPanel.cpp ADO\ADO.cpp CM5\DialogCM5.cpp CM5\SliderBoth.cpp CM5\SliderBothBtn.cpp AirQuality\AirQuality.cpp ISP\CDialogISPTOOL.cpp singleslider\MacSliderCtrl.cpp
+         5EInputDialog.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         AddBuilding.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         AfxMessageDialog.cpp
+         AllNodesDiaolg.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         Annual_Routines.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>e:\t3000_building_automation_system\t3000\monthview1.h(67): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>Annual_Routines.cpp(75): warning C4244: '=' : conversion from 'unsigned short' to 'char', possible loss of data
+     1>Annual_Routines.cpp(152): warning C4244: '=' : conversion from 'wchar_t' to 'char', possible loss of data
+         AnnualRout_InsertDia.cpp
+     1>e:\t3000_building_automation_system\t3000\monthview1.h(67): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>AnnualRout_InsertDia.cpp(307): warning C4101: 'temp_description' : unreferenced local variable
+     1>AnnualRout_InsertDia.cpp(371): warning C4018: '<' : signed/unsigned mismatch
+     1>AnnualRout_InsertDia.cpp(448): warning C4244: '=' : conversion from 'unsigned short' to 'unsigned char', possible loss of data
+     1>AnnualRout_InsertDia.cpp(523): warning C4244: '=' : conversion from 'unsigned short' to 'unsigned char', possible loss of data
+         ApplyGraphicLabelsDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>ApplyGraphicLabelsDlg.cpp(64): warning C4018: '<' : signed/unsigned mismatch
+     1>ApplyGraphicLabelsDlg.cpp(329): warning C4018: '<' : signed/unsigned mismatch
+         BuildTable1.cpp
+     1>BuildTable1.cpp(296): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(296): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(300): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>BuildTable1.cpp(300): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>BuildTable1.cpp(556): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(561): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(565): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(570): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(574): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(578): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(582): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(587): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(591): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(595): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(600): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(686): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(731): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(777): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(824): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(869): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(915): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(961): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1009): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1056): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1102): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1148): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1617): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1620): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1621): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(1653): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1657): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1658): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(1733): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1737): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1738): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(1775): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1779): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1780): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(1813): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1817): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1818): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(1870): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1874): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1875): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(1930): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1934): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1935): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(1989): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1993): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(1994): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2048): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2052): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2053): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2106): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2110): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2111): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2166): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2170): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2171): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2383): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2383): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2389): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>BuildTable1.cpp(2389): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>BuildTable1.cpp(2512): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2520): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2528): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2536): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2544): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2552): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2560): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2568): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2576): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2584): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2592): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2636): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2644): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2652): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2660): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2668): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2676): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2684): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2692): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2700): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2708): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2716): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2767): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2768): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2771): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2772): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2775): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2776): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2779): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2780): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2783): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2784): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2787): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2788): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2791): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2792): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2795): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2796): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2799): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2800): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2803): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2804): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2807): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2808): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2886): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2896): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2906): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2917): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2929): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2933): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2940): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2944): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2951): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2955): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2961): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2965): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2971): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2975): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2981): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2985): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(2991): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>BuildTable1.cpp(2995): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>BuildTable1.cpp(3127): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+         ChangePasswordDlg.cpp
+         Config_Routines.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>Config_Routines.cpp(74): warning C4244: '=' : conversion from 'unsigned short' to 'char', possible loss of data
+     1>Config_Routines.cpp(95): warning C4244: '=' : conversion from 'unsigned short' to 'char', possible loss of data
+     1>Config_Routines.cpp(244): warning C4101: 'intemp2' : unreferenced local variable
+         DisplayConfig.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>DisplayConfig.cpp(46): error C2065: 'IDC_PROCESS' : undeclared identifier
+     1>DisplayConfig.cpp(65): error C2065: 'IDC_FRESH_TABLE' : undeclared identifier
+     1>DisplayConfig.cpp(65): error C2065: 'IDC_FRESH_TABLE' : undeclared identifier
+     1>DisplayConfig.cpp(416): warning C4553: '==' : operator has no effect; did you intend '='?
+     1>DisplayConfig.cpp(472): warning C4553: '==' : operator has no effect; did you intend '='?
+     1>DisplayConfig.cpp(477): warning C4553: '==' : operator has no effect; did you intend '='?
+     1>DisplayConfig.cpp(529): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+     1>DisplayConfig.cpp(692): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+     1>DisplayConfig.cpp(700): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+     1>DisplayConfig.cpp(737): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+     1>DisplayConfig.cpp(745): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+     1>DisplayConfig.cpp(807): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+     1>DisplayConfig.cpp(841): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+     1>DisplayConfig.cpp(874): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+     1>DisplayConfig.cpp(907): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+     1>DisplayConfig.cpp(940): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+     1>DisplayConfig.cpp(973): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+     1>DisplayConfig.cpp(1006): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+     1>DisplayConfig.cpp(1039): warning C4244: '=' : conversion from 'wchar_t' to 'unsigned char', possible loss of data
+         FreezeFunction.cpp
+         configure.cpp
+     1>e:\t3000_building_automation_system\t3000\lightingcontroller\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         Dialog_Progess.cpp
+     1>e:\t3000_building_automation_system\t3000\lightingcontroller\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         DialogInfo.cpp
+         EnumSerial.cpp
+         EreaseDlg.cpp
+         excel9.cpp
+         extern_function.cpp
+         fileRW.cpp
+     1>fileRW.cpp(3648): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+         Compiling...
+         FreeCoolDlg.cpp
+     1>FreeCoolDlg.cpp(213): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>FreeCoolDlg.cpp(215): warning C4244: 'argument' : conversion from 'float' to 'short', possible loss of data
+     1>FreeCoolDlg.cpp(215): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+         globle_function.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>globle_function.cpp(432): warning C4996: 'strrev': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _strrev. See online help for details.
+                 E:\Program Files\Microsoft Visual Studio 10.0\VC\include\string.h(250) : see declaration of 'strrev'
+         GraphicView.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>GraphicView.cpp(127): warning C4018: '<' : signed/unsigned mismatch
+     1>GraphicView.cpp(267): warning C4018: '<' : signed/unsigned mismatch
+     1>GraphicView.cpp(451): warning C4018: '<' : signed/unsigned mismatch
+     1>GraphicView.cpp(613): warning C4018: '>=' : signed/unsigned mismatch
+         GridButton.cpp
+         GridFlashDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>GridFlashDlg.cpp(163): warning C4018: '<' : signed/unsigned mismatch
+     1>GridFlashDlg.cpp(315): warning C4018: '<' : signed/unsigned mismatch
+     1>GridFlashDlg.cpp(326): warning C4244: '=' : conversion from 'float' to 'short', possible loss of data
+     1>GridFlashDlg.cpp(348): warning C4018: '<' : signed/unsigned mismatch
+     1>GridFlashDlg.cpp(404): warning C4101: 'pbuf' : unreferenced local variable
+     1>GridFlashDlg.cpp(470): warning C4018: '<' : signed/unsigned mismatch
+     1>GridFlashDlg.cpp(479): warning C4018: '<' : signed/unsigned mismatch
+     1>GridFlashDlg.cpp(484): warning C4018: '<' : signed/unsigned mismatch
+     1>GridFlashDlg.cpp(495): warning C4018: '<' : signed/unsigned mismatch
+     1>GridFlashDlg.cpp(784): warning C4018: '<' : signed/unsigned mismatch
+     1>GridFlashDlg.cpp(990): warning C4244: '=' : conversion from 'wchar_t' to 'char', possible loss of data
+         GridLoad.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         hangeIDDlg.cpp
+         ImageTreeCtrl.cpp
+         ImportDatabaseDlg.cpp
+     1>ImportDatabaseDlg.cpp(143): warning C4091: 'extern ' : ignored on left of 'Label_information' when no variable is declared
+         IniFile.cpp
+         InputSetDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         IODisplayBar.cpp
+         IOSetDlg.cpp
+         LabelEditDlg.cpp
+         LedsDialog.cpp
+         LightingController.cpp
+     1>e:\t3000_building_automation_system\t3000\lightingcontroller\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>LightingController\LightingController.cpp(14): warning C4005: 'IDC_BUTTON_Configure' : macro redefinition
+                 e:\t3000_building_automation_system\t3000\t3\../resource.h(823) : see previous definition of 'IDC_BUTTON_Configure'
+         LightingSet.cpp
+     1>e:\t3000_building_automation_system\t3000\lightingcontroller\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         LoginDlg.cpp
+         MainFrm.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         <<<FlexSliderBar.dll Imported
+     1>e:\t3000_building_automation_system\t3000\HumChamber.h(32): error C2065: 'IDD_HUM_CHAMBER' : undeclared identifier
+     1>MainFrm.cpp(1478): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>MainFrm.cpp(4651): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>MainFrm.cpp(4652): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>MainFrm.cpp(4652): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>MainFrm.cpp(4808): error C2065: 'PM_TSTAT6_HUM_Chamber' : undeclared identifier
+         ManageAccountDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>ManageAccountDlg.cpp(229): warning C4552: '<' : operator has no effect; expected operator with side-effect
+         Compiling...
+         MannageBuidingDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>MannageBuidingDlg.cpp(450): warning C4552: '<' : operator has no effect; expected operator with side-effect
+     1>MannageBuidingDlg.cpp(484): warning C4018: '<' : signed/unsigned mismatch
+     1>MannageBuidingDlg.cpp(484): warning C4552: '<' : operator has no effect; expected operator with side-effect
+         monthview1.cpp
+     1>e:\t3000_building_automation_system\t3000\monthview1.h(67): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         msflexgrid1.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         NetworkControllView.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>NetworkControllView.cpp(1296): warning C4244: 'initializing' : conversion from 'int' to 'float', possible loss of data
+         OfficeStPtDlg.cpp
+         OutPutDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>OutPutDlg.cpp(1399): warning C4101: 'nValue' : unreferenced local variable
+     1>OutPutDlg.cpp(2389): warning C4800: 'BOOL' : forcing value to bool 'true' or 'false' (performance warning)
+     1>OutPutDlg.cpp(2407): warning C4800: 'BOOL' : forcing value to bool 'true' or 'false' (performance warning)
+     1>OutPutDlg.cpp(2437): warning C4244: '=' : conversion from 'unsigned short' to 'BYTE', possible loss of data
+     1>OutPutDlg.cpp(2462): warning C4244: '=' : conversion from 'unsigned short' to 'BYTE', possible loss of data
+     1>OutPutDlg.cpp(2557): warning C4800: 'BOOL' : forcing value to bool 'true' or 'false' (performance warning)
+     1>OutPutDlg.cpp(2596): warning C4244: '=' : conversion from 'unsigned short' to 'BYTE', possible loss of data
+     1>OutPutDlg.cpp(2622): warning C4244: '=' : conversion from 'unsigned short' to 'BYTE', possible loss of data
+     1>OutPutDlg.cpp(2651): warning C4800: 'BOOL' : forcing value to bool 'true' or 'false' (performance warning)
+     1>OutPutDlg.cpp(2682): warning C4244: '=' : conversion from 'unsigned short' to 'BYTE', possible loss of data
+     1>OutPutDlg.cpp(2707): warning C4244: '=' : conversion from 'unsigned short' to 'BYTE', possible loss of data
+     1>OutPutDlg.cpp(2416): warning C4101: 'ntemp' : unreferenced local variable
+     1>OutPutDlg.cpp(2661): warning C4101: 'ntemp' : unreferenced local variable
+     1>OutPutDlg.cpp(2575): warning C4101: 'ntemp' : unreferenced local variable
+     1>OutPutDlg.cpp(3157): warning C4244: '=' : conversion from 'unsigned short' to 'unsigned char', possible loss of data
+     1>OutPutDlg.cpp(3161): warning C4244: '=' : conversion from 'unsigned short' to 'unsigned char', possible loss of data
+     1>OutPutDlg.cpp(3169): warning C4244: '=' : conversion from 'unsigned short' to 'unsigned char', possible loss of data
+     1>OutPutDlg.cpp(3173): warning C4244: '=' : conversion from 'unsigned short' to 'unsigned char', possible loss of data
+     1>OutPutDlg.cpp(3648): warning C4244: '=' : conversion from 'unsigned short' to 'unsigned char', possible loss of data
+     1>OutPutDlg.cpp(3652): warning C4244: '=' : conversion from 'unsigned short' to 'unsigned char', possible loss of data
+     1>OutPutDlg.cpp(3660): warning C4244: '=' : conversion from 'unsigned short' to 'unsigned char', possible loss of data
+     1>OutPutDlg.cpp(3664): warning C4244: '=' : conversion from 'unsigned short' to 'unsigned char', possible loss of data
+     1>OutPutDlg.cpp(3932): warning C4800: 'BOOL' : forcing value to bool 'true' or 'false' (performance warning)
+     1>OutPutDlg.cpp(3950): warning C4800: 'BOOL' : forcing value to bool 'true' or 'false' (performance warning)
+     1>OutPutDlg.cpp(3980): warning C4244: '=' : conversion from 'unsigned short' to 'BYTE', possible loss of data
+     1>OutPutDlg.cpp(4006): warning C4244: '=' : conversion from 'unsigned short' to 'BYTE', possible loss of data
+     1>OutPutDlg.cpp(3959): warning C4101: 'ntemp' : unreferenced local variable
+     1>OutPutDlg.cpp(5571): warning C4101: 'nValue' : unreferenced local variable
+         OutputSetDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>OutputSetDlg.cpp(151): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>OutputSetDlg.cpp(1783): warning C4800: 'DWORD' : forcing value to bool 'true' or 'false' (performance warning)
+     1>OutputSetDlg.cpp(2111): warning C4800: 'DWORD' : forcing value to bool 'true' or 'false' (performance warning)
+         OutsidDailog.cpp
+         ParameterDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\lightingcontroller\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         RefreshTreeThread.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         RelayLabel.cpp
+     1>RelayLabel.cpp(217): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+     1>RelayLabel.cpp(233): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+     1>RelayLabel.cpp(334): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(338): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(342): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(346): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(372): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(376): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(380): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(384): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(418): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(422): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(426): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(430): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(457): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(461): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(465): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RelayLabel.cpp(469): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+         ScanDbWaitDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         ScanDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         ScanSelectDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>ScanSelectDlg.cpp(166): warning C4018: '<' : signed/unsigned mismatch
+         SetPtDayDlg.cpp
+         SetptGraphicBar.cpp
+     1>SetptGraphicBar.cpp(96): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+     1>SetptGraphicBar.cpp(99): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>SetptGraphicBar.cpp(99): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>SetptGraphicBar.cpp(132): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>SetptGraphicBar.cpp(132): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>SetptGraphicBar.cpp(164): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>SetptGraphicBar.cpp(164): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>SetptGraphicBar.cpp(233): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>SetptGraphicBar.cpp(233): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>SetptGraphicBar.cpp(259): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>SetptGraphicBar.cpp(259): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>SetptGraphicBar.cpp(558): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+         T3000.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         <<<FlexSliderBar.dll Imported
+     1>T3000.cpp(1054): warning C4244: 'return' : conversion from 'LONGLONG' to 'int', possible loss of data
+         T3000Doc.cpp
+         T3000TableView.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         <<<FlexSliderBar.dll Imported
+         T3000View.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         <<<FlexSliderBar.dll Imported
+     1>T3000View.cpp(2360): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
+     1>T3000View.cpp(2366): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+         Compiling...
+         TDelayForm.cpp
+         Timer_Calibrate.cpp
+     1>Timer_Calibrate.cpp(114): warning C4244: 'argument' : conversion from 'LONG' to 'short', possible loss of data
+     1>Timer_Calibrate.cpp(128): warning C4244: 'argument' : conversion from 'LONG' to 'short', possible loss of data
+     1>Timer_Calibrate.cpp(181): warning C4244: 'argument' : conversion from 'LONG' to 'short', possible loss of data
+         ToolCalibrateDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>ToolCalibrateDlg.cpp(67): warning C4018: '<' : signed/unsigned mismatch
+         TrendLogView.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         TrendLogWnd.cpp
+         TStat_Dev.cpp
+         TStat_Net.cpp
+         TStatBase.cpp
+         TStatScanner.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>TStatScanner.cpp(813): warning C4101: 'chBroadCast' : unreferenced local variable
+     1>TStatScanner.cpp(2657): warning C4244: '=' : conversion from 'unsigned short' to 'UCHAR', possible loss of data
+     1>TStatScanner.cpp(2658): warning C4244: '=' : conversion from 'unsigned short' to 'UCHAR', possible loss of data
+     1>TStatScanner.cpp(2659): warning C4244: '=' : conversion from 'unsigned short' to 'UCHAR', possible loss of data
+     1>TStatScanner.cpp(2660): warning C4244: '=' : conversion from 'unsigned short' to 'UCHAR', possible loss of data
+     1>TStatScanner.cpp(2957): warning C4244: 'initializing' : conversion from 'int' to 'float', possible loss of data
+     1>TStatScanner.cpp(3006): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+         TStatScheduleDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         UserAcessSetDlg.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         Weekly_Routines.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>Weekly_Routines.cpp(84): warning C4244: '=' : conversion from 'unsigned short' to 'char', possible loss of data
+     1>Weekly_Routines.cpp(185): warning C4244: '=' : conversion from 'wchar_t' to 'char', possible loss of data
+         WeeklyRout_InsertDia.cpp
+     1>e:\t3000_building_automation_system\t3000\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         WeeklySchedule.cpp
+         WorkspaceBar.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         DialogT3.cpp
+     1>e:\t3000_building_automation_system\t3000\t3\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         DialgMiniPanel.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         ADO.cpp
+         DialogCM5.cpp
+     1>e:\t3000_building_automation_system\t3000\cm5\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+     1>CM5\DialogCM5.cpp(788): warning C4554: '&' : check operator precedence for possible error; use parentheses to clarify precedence
+     1>CM5\DialogCM5.cpp(767): warning C4101: 'addr' : unreferenced local variable
+     1>CM5\DialogCM5.cpp(842): warning C4101: 'addr' : unreferenced local variable
+     1>CM5\DialogCM5.cpp(962): warning C4101: 'addr' : unreferenced local variable
+     1>CM5\DialogCM5.cpp(1048): warning C4101: 'addr' : unreferenced local variable
+     1>CM5\DialogCM5.cpp(1200): warning C4305: '=' : truncation from 'double' to 'float'
+     1>CM5\DialogCM5.cpp(1379): warning C4101: 'm_tempi' : unreferenced local variable
+     1>CM5\DialogCM5.cpp(1378): warning C4101: 'm_tempf' : unreferenced local variable
+     1>CM5\DialogCM5.cpp(1577): warning C4172: returning address of local variable or temporary
+     1>CM5\DialogCM5.cpp(1547): warning C4101: 'ret3' : unreferenced local variable
+     1>CM5\DialogCM5.cpp(1873): warning C4554: '<<' : check operator precedence for possible error; use parentheses to clarify precedence
+     1>CM5\DialogCM5.cpp(1912): warning C4554: '<<' : check operator precedence for possible error; use parentheses to clarify precedence
+     1>CM5\DialogCM5.cpp(2229): warning C4554: '<<' : check operator precedence for possible error; use parentheses to clarify precedence
+     1>CM5\DialogCM5.cpp(2251): warning C4554: '<<' : check operator precedence for possible error; use parentheses to clarify precedence
+         SliderBoth.cpp
+         Compiling...
+         SliderBothBtn.cpp
+         AirQuality.cpp
+     1>e:\t3000_building_automation_system\t3000\airquality\../msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         CDialogISPTOOL.cpp
+     1>e:\t3000_building_automation_system\t3000\isp\..\msflexgrid1.h(72): warning C4146: unary minus operator applied to unsigned type, result still unsigned
+         MacSliderCtrl.cpp
+     1>Done Building Project "E:\T3000_Building_Automation_System\T3000\T3000.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:22.03
