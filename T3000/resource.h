@@ -143,6 +143,8 @@
 #define IDD_DIALOG_MINIPANEL            440
 #define IDD_DIALOG10                    441
 #define IDD_DISPLAY_CONFIG              444
+#define IDD_DIALOG11                    446
+#define IDD_HUM_CHAMBER                 446
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -983,7 +985,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        446
+#define _APS_NEXT_RESOURCE_VALUE        447
 #define _APS_NEXT_COMMAND_VALUE         32871
 #define _APS_NEXT_CONTROL_VALUE         1605
 #define _APS_NEXT_SYMED_VALUE           320

@@ -7,8 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModbusDllforVc", "..\Modbus
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlexSlideBar", "..\FlexSlideBar\FlexSlideBar.vcxproj", "{9560EBEA-EB58-44F6-BB62-189833713FC0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ISP", "..\ISP\ISP.vcxproj", "{15C9D098-ACBF-40B0-9B67-CF94560453CB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -41,12 +39,6 @@ Global
 		{9560EBEA-EB58-44F6-BB62-189833713FC0}.Release|Win32.Build.0 = Release|Win32
 		{9560EBEA-EB58-44F6-BB62-189833713FC0}.Release|x64.ActiveCfg = Release|x64
 		{9560EBEA-EB58-44F6-BB62-189833713FC0}.Release|x64.Build.0 = Release|x64
-		{15C9D098-ACBF-40B0-9B67-CF94560453CB}.Debug|Win32.ActiveCfg = Debug|Win32
-		{15C9D098-ACBF-40B0-9B67-CF94560453CB}.Debug|Win32.Build.0 = Debug|Win32
-		{15C9D098-ACBF-40B0-9B67-CF94560453CB}.Debug|x64.ActiveCfg = Debug|Win32
-		{15C9D098-ACBF-40B0-9B67-CF94560453CB}.Release|Win32.ActiveCfg = Release|Win32
-		{15C9D098-ACBF-40B0-9B67-CF94560453CB}.Release|Win32.Build.0 = Release|Win32
-		{15C9D098-ACBF-40B0-9B67-CF94560453CB}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

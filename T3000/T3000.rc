@@ -2151,6 +2151,15 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,90,81,50,14
 END
 
+IDD_HUM_CHAMBER DIALOGEX 0, 0, 316, 180
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,205,159,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,259,159,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -2486,6 +2495,14 @@ BEGIN
         RIGHTMARGIN, 174
         TOPMARGIN, 7
         BOTTOMMARGIN, 95
+    END
+
+    IDD_HUM_CHAMBER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 173
     END
 END
 #endif    // APSTUDIO_INVOKED
