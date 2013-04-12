@@ -69,6 +69,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="setupapi.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\..\T3000 Output\debug&quot;"
 				UACExecutionLevel="2"
 				GenerateDebugInformation="true"
 				GenerateMapFile="true"
