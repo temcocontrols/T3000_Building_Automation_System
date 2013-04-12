@@ -25,7 +25,6 @@ protected:
 public:
 	void Init5EGrid();
 	void InitGrid5EnoTSTAT6();
-	void Fresh_Data();
 //	void Init5EGridtstat6();
 	
 
@@ -91,5 +90,4 @@ public:
 	unsigned short tempchange[512];//for tstat6
 	//tstat6
 
-//	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	};
+};

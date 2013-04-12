@@ -1,6 +1,6 @@
 #pragma once
 
-extern	unsigned short multi_register_value[513];
+extern	unsigned short multi_register_value[1024];
 extern unsigned short cm5_register_value[512]; //CM5
 extern unsigned short m_buffer[512];//CM5
 extern unsigned short reg_tstat6[1024];//tstat6_new
@@ -103,6 +103,8 @@ extern int g_llRxCount;
 extern BOOL g_unint;
 
 
+
+
 //////////////////////////////////////////////////////////////////////////
 // extern int const PM_TSTAT5A;
 // extern int const PM_TSTAT5B;
@@ -147,4 +149,5 @@ int const PM_CM5 = 50;
 int const PM_NC = 100;
 int const PM_AirQuality = 13;
 int const PM_LightingController = 103;
+int const PM_TSTAT6_HUM_Chamber=64;
 

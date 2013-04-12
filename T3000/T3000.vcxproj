@@ -5,25 +5,13 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Template|Win32">
       <Configuration>Template</Configuration>
       <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Template|x64">
-      <Configuration>Template</Configuration>
-      <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -73,9 +61,6 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" />
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\release;$(LibraryPath)</LibraryPath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\release;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">E:\AlexWorkSpace\T3000_Building_Automation_System\T3000 Output\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -150,9 +135,9 @@
     <ClCompile Include="BuildTable1.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
-    <ClCompile Include="DisplayConfig.cpp" />
-    <ClCompile Include="FreezeFunction.cpp" />
+    <ClCompile Include="HumChamber.cpp" />
     <ClCompile Include="LightingController\configure.cpp" />
+    <ClCompile Include="DBOprator.cpp" />
     <ClCompile Include="Dialog_Progess.cpp" />
     <ClCompile Include="DialogInfo.cpp" />
     <ClCompile Include="EnumSerial.cpp" />
@@ -230,7 +215,6 @@
     <ClCompile Include="singleslider\MacSliderCtrl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram11.cd" />
     <None Include="OutputTableDlg.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -275,10 +259,10 @@
     <None Include="res\ToolbarOwn.bmp" />
     <None Include="res\treenode.bmp" />
     <None Include="UserImages.bmp" />
+    <None Include="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DisplayConfig.h" />
-    <ClInclude Include="FreezeFunction.h" />
+    <ClInclude Include="HumChamber.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="WeeklySchedule.h" />
     <ClInclude Include="5EInputDialog.h" />
@@ -292,6 +276,7 @@
     <ClInclude Include="ChangePasswordDlg.h" />
     <ClInclude Include="Config_Routines.h" />
     <ClInclude Include="LightingController\configure.h" />
+    <ClInclude Include="DBOprator.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="Dialog_Progess.h" />
     <ClInclude Include="DialogInfo.h" />

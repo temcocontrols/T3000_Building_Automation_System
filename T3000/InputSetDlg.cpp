@@ -6,7 +6,6 @@
 #include "InputSetDlg.h"
 #include "globle_function.h"
 #include "BuildTable1.h"
-#include "Dialog_Progess.h"
 #define INDEX_FIELD 0
 #define NAME_FIELD 1
 #define VALUE_FIELD 2
@@ -75,7 +74,6 @@ BEGIN_MESSAGE_MAP(CInputSetDlg, CDialog)
 	ON_CBN_KILLFOCUS(IDC_VALUECOMBO, &CInputSetDlg::OnCbnKillfocusValuecombo)
 	ON_BN_CLICKED(IDC_REFRESHBUTTON, &CInputSetDlg::OnBnClickedRefreshbutton)
 	ON_EN_KILLFOCUS(IDC_INPUTNAMEEDIT, &CInputSetDlg::OnEnKillfocusInputnameedit)
-	//ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -209,8 +207,6 @@ BOOL CInputSetDlg::OnInitDialog()
 	if (m_nModel == PM_TSTAT5E)
 	{
 		InitGrid5EnoTSTAT6();
-
-	//	SetTimer(1, 5000, NULL);
 		return TRUE;
 	}
 	for(int i=1;i<m_inRows;i++)
@@ -292,7 +288,6 @@ void CInputSetDlg::Fresh_Grid()
 	if (m_nModel == PM_TSTAT5E)
 	{
 		InitGrid5EnoTSTAT6();
-		//Fresh_Data();
 		return;
 	}
 
@@ -508,10 +503,10 @@ void CInputSetDlg::Fresh_Grid()
 		nValue=multi_register_value[309];
 		if(((int)((nValue & 0x04)>>2)==1))
 		{
-		m_FlexGrid.put_TextMatrix(4,AM_FIELD,strman);
-		m_FlexGrid.put_Col(VALUE_FIELD);
-		m_FlexGrid.put_Row(4);
-		m_FlexGrid.put_CellBackColor(COLOR_CELL);
+			m_FlexGrid.put_TextMatrix(4,AM_FIELD,strman);
+			m_FlexGrid.put_Col(VALUE_FIELD);
+			m_FlexGrid.put_Row(4);
+			m_FlexGrid.put_CellBackColor(COLOR_CELL);
 		}
 		else
 		{
@@ -521,6 +516,7 @@ void CInputSetDlg::Fresh_Grid()
 			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
 		}
 		m_FlexGrid.put_TextMatrix(4,CAL_FIELD,NO_APPLICATION);
+		
 		strTemp.Empty();
 		nValue=multi_register_value[300];
 		if(nValue>=0)
@@ -1006,7 +1002,15 @@ void CInputSetDlg::add_analog_rang(int i)
 }
 void CInputSetDlg::OnCbnSelchangeInputfuncombo()
 {
- 
+//	298	167	1	Low byte	W/R	Analog input1 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
+//	299	168	1	Low byte	W/R	Analog input2 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
+//	300	169	1	Low byte	W/R	(future)Analog input3 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
+//	301	170	1	Low byte	W/R	(future)Analog input4 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
+//	302	171	1	Low byte	W/R	(future)Analog input5 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
+//	303	172	1	Low byte	W/R	(future)Analog input6 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
+//	304	173	1	Low byte	W/R	(future)Analog input7 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
+//	305	174	1	Low byte	W/R	(future)Analog input8 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
+
 
 
 	if (newtstat6[7] ==6)
@@ -1097,7 +1101,7 @@ void CInputSetDlg::OnCbnSelchangeInputfuncombo()
 
 void CInputSetDlg::OnCbnKillfocusInputfuncombo()
 {
-	 m_inputFinCombox.ShowWindow(SW_HIDE);
+	m_inputFinCombox.ShowWindow(SW_HIDE);
 }
 
 void CInputSetDlg::OnBnClickedCustombutton()
@@ -1121,7 +1125,6 @@ void CInputSetDlg::OnBnKillfocusCustombutton()
 
 void CInputSetDlg::OnBnClickedExit()
 {
-   // KillTimer(1);
 	CDialog::OnOK();
 }
 
@@ -1255,52 +1258,36 @@ void CInputSetDlg::OnCbnKillfocusValuecombo()
 
 void CInputSetDlg::OnBnClickedRefreshbutton()
 {
-
-CDialog_Progess* pDlg = new CDialog_Progess(this);
-//创建对话框窗口
-pDlg->Create(IDD_DIALOG10_Progress, this);
-
-//居中显示
-//pDlg->CenterWindow();
-//void MoveWindow( LPCRECT lpRect, BOOL bRepaint = TRUE );
-//pDlg->MoveWindow(100,100,500,1000);
-pDlg->ShowProgress(0,0);
-//显示对话框窗口
-pDlg->ShowWindow(SW_SHOW);
-
-
 #if 1
 	int i;
+	register_critical_section.Lock();
+	
 	for(i=0;i<7;i++)
 	{
-		register_critical_section.Lock();
+
 		Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);
-		register_critical_section.Unlock();
-		pDlg->ShowProgress((i+2)*10,(i+2)*10);
+
 	}
-	
+	register_critical_section.Unlock();
+
 	if ((multi_register_value[7] == 6)||(multi_register_value[7] == 7))//tstat6
 	{
 			//multi_register_value[]列表交换。
-	memset(tempchange,0,sizeof(tempchange));
-	int index = 0;
+			memset(tempchange,0,sizeof(tempchange));
+			int index = 0;
 
-	for (int i = 0;i<512;i++)
-		{
-		index = reg_tstat6[i];
-		tempchange[index] = multi_register_value[i];
-		}
+			for (int i = 0;i<512;i++)
+			{
+				index = reg_tstat6[i];
+				tempchange[index] = multi_register_value[i];
+			}
 
-	memcpy(multi_register_value,tempchange,sizeof(multi_register_value));
+			memcpy(multi_register_value,tempchange,sizeof(multi_register_value));
 
 	}
-	pDlg->ShowProgress(100,100);
 
-	pDlg->ShowWindow(SW_HIDE);
-	delete pDlg;
 #endif
-	//Fresh_Grid();
-	//Fresh_Data();
+	Fresh_Grid();
 }
 
 void CInputSetDlg::OnEnKillfocusInputnameedit()
@@ -1536,6 +1523,9 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 // 
 // #define TOTAL_COLS 8
 // #define TOTAL_ROWS 7
+
+
+
 
 void CInputSetDlg::Init5EGrid()
 {
@@ -2090,12 +2080,10 @@ void CInputSetDlg::OnClick5EGrid(int nRow, int nCol, CRect rcCell)
 	//////////////////////////////////////////////////////////////////////////
 	if(nCol == FUN_FIELD)
 	{
-		
-		if (nRow>1)
-		{
 		m_inputFinCombox.ResetContent();
 		for(int i=0;i<7;i++)
 			m_inputFinCombox.AddString(INPUT_FUNS[i]);
+		
 		m_inputFinCombox.ShowWindow(SW_SHOW);//显示控件
 		m_inputFinCombox.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 		m_inputFinCombox.BringWindowToTop();
@@ -2106,19 +2094,14 @@ void CInputSetDlg::OnClick5EGrid(int nRow, int nCol, CRect rcCell)
 		int nValue;//=multi_register_value[298+nRow-2];
 		//if (newtstat6[7] == 6)
 		if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
-			{
-			nValue=newtstat6[167+nRow-2];
-			}else
-			{
-			nValue=multi_register_value[298+nRow-2];
-				}
-			CString strTemp(INPUT_FUNS[nValue]);
-			m_inputFinCombox.SetWindowText(strTemp);
-		} 
-		else
 		{
+			nValue=newtstat6[167+nRow-2];
+		}else
+		{
+			nValue=multi_register_value[298+nRow-2];
 		}
-		
+		CString strTemp(INPUT_FUNS[nValue]);
+		m_inputFinCombox.SetWindowText(strTemp);
 
 	}
 
@@ -2198,9 +2181,8 @@ void CInputSetDlg::OnCbnSelchangeRangComboFor5E()
 			write_one(g_tstat_id,359+m_nCurRow-2,nindext);
 	}
 
-
 	//OnBnClickedRefreshbutton();//stat6 TSTAT6点击这时，再去刷新则会出现错误，崩溃.
-    	Fresh_Grid();
+	Fresh_Grid();
 }
 
 void CInputSetDlg::OnBnClickedUpbuttonFor5E()
@@ -2417,14 +2399,14 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 			}
 			else // 如果是值，用edit
 			{		
-				//m_inValueEdit.MoveWindow(rcCell); //移动到选中格的位置，覆盖
-				//m_inValueEdit.ShowWindow(SW_SHOW);
+				m_inValueEdit.MoveWindow(rcCell); //移动到选中格的位置，覆盖
+				m_inValueEdit.ShowWindow(SW_SHOW);
 
-				//m_inValueEdit.BringWindowToTop();
-				////m_RangCombox.SelectString(-1,strValue);
+				m_inValueEdit.BringWindowToTop();
+				//m_RangCombox.SelectString(-1,strValue);
 
-				//m_inValueEdit.SetWindowText(strValue);
-				//m_inValueEdit.SetFocus(); //获取焦点
+				m_inValueEdit.SetWindowText(strValue);
+				m_inValueEdit.SetFocus(); //获取焦点
 
 			}		
 		}
@@ -2559,26 +2541,19 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 	//////////////////////////////////////////////////////////////////////////
 	if(nCol == FUN_FIELD)
 	{
-	    if (nRow>1)
-	    {
 		m_inputFinCombox.ResetContent();
 		for(int i=0;i<7;i++)
-			m_inputFinCombox.AddString(INPUT_FUNS[i]); 
+			m_inputFinCombox.AddString(INPUT_FUNS[i]);
 
 		m_inputFinCombox.ShowWindow(SW_SHOW);//显示控件
 		m_inputFinCombox.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 		m_inputFinCombox.BringWindowToTop();
 		//m_inputFinCombox.SelectString(-1,strValue);
-		//m_inputFinCombox.SetFocus(); //获取焦点
+		m_inputFinCombox.SetFocus(); //获取焦点
 
 		int nValue=multi_register_value[298+nRow-2];
 		CString strTemp(INPUT_FUNS[nValue]);
 		m_inputFinCombox.SetWindowText(strTemp);
-	    } 
-	    else
-	    {
-	    }
-		 
 
 	}
 
@@ -2603,28 +2578,27 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 	
 }
 
-
 void CInputSetDlg::InitGrid5EnoTSTAT6()
 {
 
-m_FlexGrid.put_TextMatrix(1,NAME_FIELD,g_strSensorName);
-m_FlexGrid.put_TextMatrix(2,NAME_FIELD,g_strInName1);
-m_FlexGrid.put_TextMatrix(3,NAME_FIELD,g_strInName2);
-m_FlexGrid.put_TextMatrix(4,NAME_FIELD,g_strInName3);
-m_FlexGrid.put_TextMatrix(5,NAME_FIELD,g_strInName4);
-m_FlexGrid.put_TextMatrix(6,NAME_FIELD,g_strInName5);
-m_FlexGrid.put_TextMatrix(7,NAME_FIELD,g_strInName6);
-m_FlexGrid.put_TextMatrix(8,NAME_FIELD,g_strInName7);
-m_FlexGrid.put_TextMatrix(9,NAME_FIELD,g_strInName8);
+	m_FlexGrid.put_TextMatrix(1,NAME_FIELD,g_strSensorName);
+	m_FlexGrid.put_TextMatrix(2,NAME_FIELD,g_strInName1);
+	m_FlexGrid.put_TextMatrix(3,NAME_FIELD,g_strInName2);
+	m_FlexGrid.put_TextMatrix(4,NAME_FIELD,g_strInName3);
+	m_FlexGrid.put_TextMatrix(5,NAME_FIELD,g_strInName4);
+	m_FlexGrid.put_TextMatrix(6,NAME_FIELD,g_strInName5);
+	m_FlexGrid.put_TextMatrix(7,NAME_FIELD,g_strInName6);
+	m_FlexGrid.put_TextMatrix(8,NAME_FIELD,g_strInName7);
+	m_FlexGrid.put_TextMatrix(9,NAME_FIELD,g_strInName8);
 
-CString strUnit=GetTempUnit();
-CString strTemp;	
-int nValue=0;
-CString strAuto=_T("Auto");
-CString strman=_T("Manual");
+	CString strUnit=GetTempUnit();
+	CString strTemp;	
+	int nValue=0;
+	CString strAuto=_T("Auto");
+	CString strman=_T("Manual");
 
 
-for(int i=1;i<=9;i++)
+	for(int i=1;i<=9;i++)
 	{	
 		CString strIndex;
 		strIndex.Format(_T("%d"), i);
@@ -2702,6 +2676,7 @@ for(int i=1;i<=9;i++)
 				{
 					//strTemp.Format(_T("%d"),multi_register_value[367+i-2]);
 					strTemp=_T("UNUSED");
+
 				}						
 				m_FlexGrid.put_TextMatrix(i,VALUE_FIELD,strTemp);
 				strTemp.Empty();
@@ -2806,207 +2781,4 @@ for(int i=1;i<=9;i++)
 			m_FlexGrid.put_TextMatrix(i,AM_FIELD,strTemp);
 		}
 	}	
-}
-void CInputSetDlg::Fresh_Data()
-{
-m_FlexGrid.put_TextMatrix(1,NAME_FIELD,g_strSensorName);
-m_FlexGrid.put_TextMatrix(2,NAME_FIELD,g_strInName1);
-m_FlexGrid.put_TextMatrix(3,NAME_FIELD,g_strInName2);
-m_FlexGrid.put_TextMatrix(4,NAME_FIELD,g_strInName3);
-m_FlexGrid.put_TextMatrix(5,NAME_FIELD,g_strInName4);
-m_FlexGrid.put_TextMatrix(6,NAME_FIELD,g_strInName5);
-m_FlexGrid.put_TextMatrix(7,NAME_FIELD,g_strInName6);
-m_FlexGrid.put_TextMatrix(8,NAME_FIELD,g_strInName7);
-m_FlexGrid.put_TextMatrix(9,NAME_FIELD,g_strInName8);
-
-CString strUnit=GetTempUnit();
-CString strTemp;	
-int nValue=0;
-CString strAuto=_T("Auto");
-CString strman=_T("Manual");
-
-
-for(int i=1;i<=9;i++)
-	{	
-	CString strIndex;
-	strIndex.Format(_T("%d"), i);
-	m_FlexGrid.put_TextMatrix(i,INDEX_FIELD,strIndex);
-
-	/*for(int k=0;k<=6;k++)
-	{
-	m_FlexGrid.put_ColAlignment(k,4);
-	if (i%2==1)
-	{
-	m_FlexGrid.put_Row(i);m_FlexGrid.put_Col(k);m_FlexGrid.put_CellBackColor(RGB(255,255,255));
-	}
-	else
-	{
-	m_FlexGrid.put_Row(i);m_FlexGrid.put_Col(k);m_FlexGrid.put_CellBackColor(COLOR_CELL);
-	}
-	}*/
-
-	CString strTemp;
-	m_fFirmwareVersion = get_curtstat_version();
-	if(m_fFirmwareVersion>33.3)
-		{
-		float fValue;
-
-		// Row1
-		if(i==1)
-			{
-			strTemp.Format(_T("%.1f"),multi_register_value[216]/10.0);
-			strTemp=strTemp+strUnit;
-			m_FlexGrid.put_TextMatrix(1,VALUE_FIELD,strTemp);
-			m_FlexGrid.put_TextMatrix(1,AM_FIELD,NO_APPLICATION);
-			m_FlexGrid.put_TextMatrix(1,CAL_FIELD,_T("Adjust..."));
-			m_FlexGrid.put_TextMatrix(1,RANG_FIELD,strUnit);
-			m_FlexGrid.put_TextMatrix(1,FUN_FIELD,NO_APPLICATION);
-			m_FlexGrid.put_TextMatrix(1,CUST_FIELD,NO_APPLICATION);
-			continue;
-			}
-
-		//////////////////////////////////////////////////////////////////////////
-		// column 1  Value
-
-		CString strValueUnit=GetTempUnit(multi_register_value[359+i-2], 1);
-			{
-			if(multi_register_value[359+i-2]==1)
-				{				
-				fValue=float(multi_register_value[367+i-2]/10.0);
-				strTemp.Format(_T("%.1f"),fValue);	
-
-				strTemp +=strValueUnit;
-				}
-			else if(multi_register_value[359+i-2]==3 || multi_register_value[359+i-2]==5) // On/Off or Off/On ==1 On ==0 Off
-				{						
-				int nValue=(multi_register_value[367+i-2]);
-				if (nValue == 1)
-					{
-					strTemp = _T("On");
-					}
-				else
-					{
-					strTemp = _T("Off");
-					}					
-				}
-			else if (multi_register_value[359+i-2]==4 )  // custom sensor
-				{					
-				fValue=float(multi_register_value[367+i-2]/10.0);
-				strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
-				strTemp +=strValueUnit;
-				}
-			else if(multi_register_value[359+i-2]==2)
-				{
-				nValue=multi_register_value[367+i-2];
-				strTemp.Format(_T("%d%%"), nValue);
-				}
-			else
-				{
-				//strTemp.Format(_T("%d"),multi_register_value[367+i-2]);
-				strTemp=_T("UNUSED");
-				}						
-			m_FlexGrid.put_TextMatrix(i,VALUE_FIELD,strTemp);
-			strTemp.Empty();
-			}
-
-
-			// column 2  Auto/Manual // 只有IN1，2才有,internal sensor 没有，大于1 // 
-			if(i>1)//( i== 2 || i == 3)
-				{
-				nValue=multi_register_value[309];
-				BYTE bFilter=0x01;
-				bFilter = bFilter<< (i-2);
-				if((nValue & bFilter))
-					{
-					m_FlexGrid.put_TextMatrix(i,AM_FIELD,strman);			
-					}
-				else
-					{
-					m_FlexGrid.put_TextMatrix(i,AM_FIELD,strAuto);				
-					}
-				}
-			else
-				{
-				m_FlexGrid.put_Col(AM_FIELD);
-				m_FlexGrid.put_Row(i);
-				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);				
-				}
-
-			// column 3  Calibrate			
-				{
-				m_FlexGrid.put_TextMatrix(i,CAL_FIELD,_T("Adjust..."));				
-				}
-
-				// column 4  Range 
-				//if( i >= 2 )
-				{
-				int nItem=multi_register_value[359+i-2];
-				if(nItem>=0 && nItem<=5)
-					{
-					strTemp=analog_range_0[nItem];
-					}
-				m_FlexGrid.put_TextMatrix(i,RANG_FIELD,strTemp);
-				}
-
-
-				// column 5 Function 只有IN1，2才有
-				if(i== 2 || i==3)
-					{
-					nValue=multi_register_value[298+i-2];
-					strTemp=INPUT_FUNS[nValue];
-					m_FlexGrid.put_TextMatrix(i,FUN_FIELD,strTemp);
-					}
-				else
-					{
-					m_FlexGrid.put_Col(FUN_FIELD);
-					m_FlexGrid.put_Row(i);
-					m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);				
-					}
-
-				// column 6 custom tables
-				if( i== 2 || i==3)
-					//if(i!=9)
-					{
-					if(multi_register_value[188]==4)
-						{
-						m_FlexGrid.put_TextMatrix(i,CUST_FIELD,_T("Custom..."));
-						}
-					else
-						{
-						m_customBtn.ShowWindow(SW_HIDE);
-						m_FlexGrid.put_TextMatrix(i,CUST_FIELD,NO_APPLICATION);
-						}
-					}
-				else
-					{
-					m_FlexGrid.put_Col(CUST_FIELD);
-					m_FlexGrid.put_Row(i);
-					m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);				
-					}
-		}
-	else  // another lower version of software
-		{
-		int nValue;
-
-		if(multi_register_value[341+i-2]==1)
-			{
-			nValue=(int)(multi_register_value[349+i-2]/10.0);
-			strTemp.Format(_T("%.1f"),nValue);
-			}
-		else
-			{
-			strTemp.Format(_T("%d"),multi_register_value[349+i-2]);
-			}
-		m_FlexGrid.put_TextMatrix(i,VALUE_FIELD,strTemp);
-
-		strTemp.Empty();
-		int nItem=multi_register_value[341+i-2];
-		if(nItem>=0&&nItem<=4)
-			{
-			strTemp=analog_range_0[nItem];					
-			}
-		m_FlexGrid.put_TextMatrix(i,AM_FIELD,strTemp);
-		}
-	}	
-
 }

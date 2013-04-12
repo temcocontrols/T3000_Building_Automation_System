@@ -3,7 +3,7 @@
 #include "afxmt.h"
 
 //#include "stdafx.h"
-unsigned short multi_register_value[513]={-1};
+unsigned short multi_register_value[1024]={-1};
 
 unsigned short cm5_register_value[512]; //CM5
 unsigned short m_buffer[512];//CM5
@@ -96,6 +96,7 @@ int g_ifanStatus;
 CString g_strFan=_T("");
 
 
+// CString g_strScanInfo=_T("");
 
 BOOL g_bEnableRefreshTreeView = TRUE;
 BOOL g_bScanStart = FALSE;
@@ -1040,10 +1041,5 @@ char charr[600][2][600] ={
 {"UI","Schedule_B  character 1"},{"UI","Schedule_B  character 2"},
 {"UI","Schedule_B  character 3"},{"UI","Schedule_B  character 4"},
 {"UI","Schedule_C  character 1"},
-
-//512-539
-//{"UI",""},{"UI",""},
-
-
 
 }; 

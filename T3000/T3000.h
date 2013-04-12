@@ -11,13 +11,6 @@
 #include "define.h"
 
 #include "global_variable_extern.h"
-/************************************************************************/
-/*Author:Alex 
-/*Date£º2012/11/26
-/*FileName:D:\T3000\T3000\T3000.H
-/*Functionality:                                                        */
-//this is globe variable
-/************************************************************************/
 
 
 extern int g_MainScreenLevel;
@@ -33,16 +26,7 @@ extern int g_AllscreensetLevel;
 // CT3000App:
 // See T3000.cpp for the implementation of this class
 //
-/********************************************************************
-	created:	2012/11/26
-	created:	26:11:2012   18:11
-	filename: 	D:\T3000\T3000\T3000.h
-	file path:	D:\T3000\T3000
-	file base:	T3000
-	file ext:	h
-	author:		alex
-	function:  COwnMemDC
-*********************************************************************/
+
 class COwnMemDC : public CDC {
 	private:
 		CBitmap m_bitmap; // Offscreen bitmap
@@ -111,6 +95,7 @@ class CT3000App : public CWinAppEx
 {
 public:
 	CT3000App();
+
 // Overrides
 public:
 	virtual BOOL InitInstance();

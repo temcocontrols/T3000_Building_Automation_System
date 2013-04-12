@@ -547,7 +547,8 @@ void write_to_file_a_line(wofstream & out,const char * format, ... )
 	char buf[2048];	
 	vsprintf( buf, format, marker );
 	va_end(marker);
-	out<< buf << endl 
+	out<< buf << endl ;
+
 	*/
 }
 void _Twrite_to_file_a_line(wofstream & out,const TCHAR * format, ... )

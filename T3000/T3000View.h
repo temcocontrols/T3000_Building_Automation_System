@@ -99,7 +99,7 @@ public:
 	void OnAddBuildingConfig();
 	//void OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult);
 	void Fresh();
-	void FreshCtrl();
+
 	void InitSliderBars();
 	// 这个函数是为了与之前的版本兼容
 	// 使用新的Slider，但是寄存器逻辑使用原来的
@@ -126,8 +126,7 @@ public:
 	afx_msg void OnNMReleasedcaptureNightSlider(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMReleasedcaptureNightheatSlider(NMHDR *pNMHDR, LRESULT *pResult);
 
-	HANDLE m_hSerial;
-	//串口句柄
+	HANDLE m_hSerial;//串口句柄
 	SOCKET m_hSocket;
 
 	int m_nID;
@@ -249,7 +248,6 @@ public:
 	//CSliderCtrl m_singlesliderday;
 	CMacSliderCtrl m_singlesliderday;
 	CMacSliderCtrl m_singleslidernight;
-	afx_msg void OnBnClickedDisplayConfig();
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

@@ -85,8 +85,7 @@ BOOL CLoginDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	m_pCon.CreateInstance("ADODB.Connection");
-	m_pRs.CreateInstance("ADODB.Recordset");
-	//初始化环境
+	m_pRs.CreateInstance("ADODB.Recordset");//初始化环境
 	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -96,7 +95,6 @@ BOOL CLoginDlg::OnInitDialog()
 void CLoginDlg::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
-
 	OnCancel();
 }
 
@@ -107,6 +105,5 @@ void CLoginDlg::OnDestroy()
 		m_pRs->Close(); 
 	if(m_pCon->State) 
 		m_pCon->Close();
-
 	// TODO: Add your message handler code here
 }

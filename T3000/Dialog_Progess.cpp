@@ -51,6 +51,12 @@ BOOL CDialog_Progess::OnInitDialog()
 	//设置进度条的当前位置
 //	SetTimer(1, 1000, NULL);
 
+
+	
+	
+
+
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -106,7 +112,6 @@ void CDialog_Progess::ShowProgress( int setpos,int percent )
 	CString CStemp;
 	CStemp.Format(_T("%d％"),percent);
 	SetDlgItemText(IDC_STATIC1,CStemp);
-
 	m_progress.SetPos(setpos);
 
 
@@ -141,7 +146,7 @@ if(nIDEvent == 1)
 
 void CDialog_Progess::settimer( BOOL bpram,int lower,int upper,BOOL bend )
 {
-//this->ShowWindow(SW_SHOW);
+	//this->ShowWindow(SW_SHOW);
 //	this->CenterWindow();
 	
 // 	m_lower = lower;

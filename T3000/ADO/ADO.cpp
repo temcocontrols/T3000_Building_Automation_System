@@ -33,12 +33,12 @@ void CADO::OnInitADOConn()
 		g_strDatabasefilepath+=_T("Database\\t3000.mdb");
 
 
-		 	HANDLE hFind;
+		HANDLE hFind;
 		WIN32_FIND_DATA wfd;
 		hFind = FindFirstFile(g_strDatabasefilepath, &wfd);
 		if (hFind==INVALID_HANDLE_VALUE)
 		{
-		CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);
+			CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);
 		}
 		else
 		{
@@ -46,23 +46,23 @@ void CADO::OnInitADOConn()
 		}
 		FindClose(hFind);
 
-
+	
 		g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;
 		g_strImgeFolder=g_strExePth+_T("Database\\image\\");
-		CreateDirectory(g_strImgeFolder,NULL); 
+		CreateDirectory(g_strImgeFolder,NULL);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 						//连接数据库
 
 
 		m_pConnection.CreateInstance("ADODB.Connection");
-		/*_bstr_t strConnect = "DRIVER={Microsoft Access Driver (*.mdb)};\
-                              uid=;pwd=;DBQ=t3000.mdb;";*/
+		_bstr_t strConnect = "DRIVER={Microsoft Access Driver (*.mdb)};\
+							 uid=;pwd=;DBQ=t3000.mdb;";
 		m_pConnection->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
 	}
 	catch(_com_error e)
-	{   //e.Description()
-		AfxMessageBox(_T("Can't Find T3000 DataBase\nSystem Close"));
+	{
+		AfxMessageBox(e.Description());
 	}
 
 
@@ -142,7 +142,7 @@ void CADO::Createtable( CString strSQL )
 *   Functions           -   IsHaveTable(_ConnectionPtr   pConnection,   CString   strTableName) 
 *   Parameter:         -   pConnection：数据库对象； 
 -   strTableName：数据库中是否有此表？ 
-*   Return   Value:   -   bool。FALSE：无表，TRUE：有表 
+*   Return   Value:   -  ，TRUE bool。FALSE：无表：有表 
 *   Description:     -   从数据库中查表看是否有要打开的表[strTableName]，有无表，给出提示返回FALSE； 
 -   因而在应用此函数时，只需决定是否要继续进行，不需再给出提示。 
 *   Author:               -   lishancai 

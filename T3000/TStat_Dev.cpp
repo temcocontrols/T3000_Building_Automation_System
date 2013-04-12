@@ -69,10 +69,7 @@ void CTStat_Dev::SetComPort(int nComPort)
 
 int CTStat_Dev::GetEPSize()const
 {
-	 return m_nEPSize;	
-	 
-
-
+	return m_nEPSize;	
 }
 
 void CTStat_Dev::SetEPSize(int nEPSize)
@@ -164,6 +161,9 @@ CString CTStat_Dev::GetProductName()
 //20120424
 	case PM_LightingController:
 		strProductName = "LC";
+		break;
+	case PM_TSTAT6_HUM_Chamber:
+		strProductName = "Tstat6HC";
 		break;
 	default:
 		strProductName="TStat";

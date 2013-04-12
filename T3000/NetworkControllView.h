@@ -38,7 +38,7 @@ public:
 	CString GetIPFromHostName(CString& strHostName);
 	void GetTstatInfo(int nID);
 	void Fresh();
-	CString Get_MAC_Address();
+
 	DECLARE_MESSAGE_MAP()
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnBnClickedCheck1();
@@ -118,7 +118,7 @@ public:
 	vector<subnetwork>_subnetwork;
 	subnetwork m_subetwork;
 	afx_msg void OnBnClickedButton1();
-	CString m_Mac_Address;
+//	afx_msg void OnBnClickedStatic3();
 };
 
 

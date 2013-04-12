@@ -542,18 +542,9 @@ void CLightingController::Fresh()
 	m_comboboxpanel.SetCurSel(0);
 
 	//打开IP
-
-
-
-
-
-
 	//UpdateData(FALSE);
-
 //	ShowLighContDlg();
-
 	//AfxGetMainWnd()->ShowWindow(SW_MAXIMIZE);//最大化显示界面
-
 	//HICON hIcon = AfxGetApp()->LoadIcon(IDR_T3000TYPE);
 	//ASSERT(hIcon);
 	//AfxGetMainWnd()->SendMessage(WM_SETICON,TRUE,(LPARAM)hIcon);//消息，就是并不会立即执行
@@ -1214,10 +1205,12 @@ void CLightingController::OnLbnSelchangeListInput()
 
 		
 			register_critical_section.Lock();
+			
 			//AfxMessageBox(_T("start read 100 register"));
 		 int 	flg = Read_Multi(g_tstat_id,SerialNum,startaddr,100);
 		//int 	flg = Read_Multi(100,SerialNum,startaddr,100);
 		 register_critical_section.Unlock();
+		
 		 CString st;
 		 st.Format(_T("%d"),flg);
 		// AfxMessageBox(_T("start read 100 register return%d"),flg);
@@ -3091,8 +3084,8 @@ void CLightingController::OnBnClickedButtonLightingcontorlGroups()
 void CLightingController::OnBnClickedButtonLightingcontorlSyncwithPC()
 {
 	if (g_CommunicationType == 0)
-		open_com(comnum);
-	UpdateData();
+     open_com(comnum);
+	 UpdateData();
 	BYTE t_time[8]={0};
 	WORD temp_us=0;
 	CTime time = CTime::GetCurrentTime();

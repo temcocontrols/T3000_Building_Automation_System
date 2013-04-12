@@ -44,8 +44,7 @@ BOOL SliderBoth::Create(CWnd*pMum,CRect rcBd,BOOL bHorz,int iID)
 	i_ID	=iID;
 	b_Horz	=bHorz;
 	
-//	i_SliderY=5+6+8;	
-//top+tic+gap;//原代码执行此句
+//	i_SliderY=5+6+8;	//top+tic+gap;//原代码执行此句
 
 	i_SliderY = 5+6+8;
 	int iH=i_SliderY+3+5;	//sliderH+bottom; 
@@ -118,6 +117,7 @@ void SliderBoth::P_SetPosition_Horz(int iL,int iR,BOOL bFst,BOOL bSnd)
 
 	const int iXL=MARGIN_ME;
 	const int iXR=rcMe.right-MARGIN_ME;
+
 	const double dbOne=(iXR-iXL)*1.0/(pos.iMax-pos.iMin);
 
 	CRect rc;
@@ -159,8 +159,8 @@ void SliderBoth::P_SetPosition_Horz(int iL,int iR,BOOL bFst,BOOL bSnd)
 		rc.right=rc.left+iW;
 		tic1.MoveWindow(&rc);
 	}
+	//LSC 以下新增加的
 
-//LSC 以下新增加的
 // 	if(bFst)
 // 	{
 // 		pos.iL=iL;
@@ -230,15 +230,13 @@ void SliderBoth::GetPosition(int &iL,int &iR)
 void SliderBoth::SetPosition(int iL,int iR)
 {
 	P_SetPosition(iL,iR,1,1);
-
 }
 
 void SliderBoth::OnPaint() 
 {
 	if(b_Initialized==0)
 	{
-		PostMessage(WM_USER+100); 
-		//确定滑块初始位置状态
+		PostMessage(WM_USER+100); //确定滑块初始位置状态
 	}
 
 	CPaintDC dc(this);
@@ -246,19 +244,14 @@ void SliderBoth::OnPaint()
 	CRect rc;
 	GetClientRect(&rc);
 
-	rc.bottom = rc.bottom-5;
-
-//LSC 增加 Slider控件底部减小
-//COLORREF clrBk=::GetSysColor(COLOR_BTNFACE);//LSC 原执行此句
+	rc.bottom = rc.bottom-5;//LSC 增加 Slider控件底部减小
+//	COLORREF clrBk=::GetSysColor(COLOR_BTNFACE);//LSC 原执行此句
 	int iV=209;
 //	COLORREF clrBk=RGB(iV,iV,iV);//LSC 原屏蔽此句
-	COLORREF clrBk=RGB(17,74,126); 
-	//LSC  修改整个slider控件的背景色
-	dc.FillRect(&rc,&CBrush(clrBk));
-	//LSC原代码执行此句
+	COLORREF clrBk=RGB(17,74,126); //LSC  修改整个slider控件的背景色
+	dc.FillRect(&rc,&CBrush(clrBk));//LSC原代码执行此句
 
-	P_PaintHorz(&dc,rc); 
-	//LSC 绘制刻度线
+	P_PaintHorz(&dc,rc); //LSC 绘制刻度线
 	SetBlockColor();
 }
 
@@ -280,10 +273,8 @@ void SliderBoth::P_PaintHorz(CDC*pDC,const CRect &rcMe)
 // 		const double dbStep=(iR-iL)*1.0/iNumTic;
 
 
-		const int iL=1;
-//LSC 修改 原代码执行此句 画刻度的 表示刻度线在左边向右移动多少，即起止点离滑块左边多远。
-		const int iR=rcMe.right; 
-//LSC 修改 表示刻度在滑块的右边向左移动多少。
+		const int iL=1;//LSC 修改 原代码执行此句 画刻度的 表示刻度线在左边向右移动多少，即起止点离滑块左边多远。
+		const int iR=rcMe.right; //LSC 修改 表示刻度在滑块的右边向左移动多少。
 		const double dbStep=(iR-iL)*1.0/iNumTic;
  		double db=iL;
 		int iX;

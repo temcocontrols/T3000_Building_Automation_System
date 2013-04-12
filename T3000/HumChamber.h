@@ -5,6 +5,9 @@
 #include "globle_function.h"
 #include "afxwin.h"
 #include "afxcmn.h"
+
+#define  WM_MY_MESSAGE  WM_USER + 101
+
 // CHumChamber form view
 struct  Register_info 
 {
@@ -43,7 +46,7 @@ protected:
 	virtual void OnInitialUpdate();
 public:
 	void Fresh();
- 
+    void Fresh_Hum_Temp();
 	void InitialRegisterNo();
 	void ShowDialogData();
 	BOOL GetRegInfoFromDB(Register_info &reg_data,CString Area_Name);
@@ -59,6 +62,7 @@ public:
 	afx_msg void OnBnClickedRefresh();
 //	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CMsflexgrid m_msflexgrid;
+	CString g_strScanInfo;
 //	afx_msg void OnEnChangeHumTol();
 private:
 	Register_info MasterID;
@@ -148,6 +152,8 @@ private:
 	int Minute;
 	
 	HANDLE hFirstThread;
+	//CWinThread* hFirstThread;
+	//HANDLE hSecondThread;
 	public:
 		afx_msg void OnEnKillfocusSlaveId();
 		afx_msg void OnEnKillfocusTemp1();
@@ -189,6 +195,8 @@ private:
 		afx_msg void OnEnKillfocusStartPoint();
 		afx_msg void OnEnKillfocusNumErrorSensor();
 		afx_msg void OnEnKillfocusNumSensor();
+
+		afx_msg LRESULT my_message(WPARAM wParam,LPARAM lParam);
 		DECLARE_EVENTSINK_MAP()
 		void DblClickMsflexgridInput3();
 		CButton m_StartBtn;
@@ -210,9 +218,11 @@ private:
 //		void KeyUpMsflexgridInput3(short* KeyCode, short Shift);
 //		void KeyPressMsflexgridInput3(short* KeyAscii);
 //		void KeyDownMsflexgridInput3(short* KeyCode, short Shift);
-		void KeyUpMsflexgridInput3(short* KeyCode, short Shift);
+//		void KeyUpMsflexgridInput3(short* KeyCode, short Shift);
 		// //process
 		CProgressCtrl m_progress;
+//		void KeyDownMsflexgridInput3(short* KeyCode, short Shift);
+		void RowColChangeMsflexgridInput3();
 };
 
 

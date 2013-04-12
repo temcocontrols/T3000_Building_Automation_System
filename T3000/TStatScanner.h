@@ -100,7 +100,6 @@ public:
 	void		background_binarysearch(int nComPort);
 	// bForTstat = TRUE : scan tstat, = FALSE : scan NC
 	void		binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254);
-	//void        SequenceSearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254);
 	// 校验
 	BOOL		binary_search_crc(int a);
 	// 搜索NC的函数
@@ -166,8 +165,7 @@ public:
 	void GetTstatInfoFromID(int nTstatID);
 
 	void ScanAll();
-	void WaitScan();
-	//scan
+	void WaitScan();//scan
 	int  m_scantype;
 	void CombineScanResult();
 
@@ -191,7 +189,6 @@ public:
 	vector<_ComDeviceInfo*>		m_szTstatScandRet;
 	vector<_NetDeviceInfo*>		m_szNCScanRet;
 	vector<_NetDeviceInfo*>		m_szNCScanRet2; // NC find by com port
-
 	vector<CString>				m_szComs;
 	CEvent*							m_eScanComEnd;
 	CEvent*							m_eScanNCEnd;
@@ -210,6 +207,9 @@ protected:
 	CWinThread*					m_pScanNCThread;
 	CWinThread*					m_pScanTstatThread;
 	CWinThread*					m_pWaitScanThread;
+
+
+
 
 	//vector<int>						m_szRepeatedID;
 	int									m_szRepeatedID[255];				// 记录重复ID，下标表示现在的ID，内容表示老ID。如果出现重复，那么该下标内容不为0。

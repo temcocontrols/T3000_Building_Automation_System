@@ -3866,12 +3866,14 @@ BOOL COutputSetDlg::PreTranslateMessage(MSG* pMsg)
 void COutputSetDlg::OnBnClickedRefreshbutton()
 {
 	int i;
+	register_critical_section.Lock();
+
 	for(i=0;i<7;i++)
 	{
-		register_critical_section.Lock();
 		Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);
-		register_critical_section.Unlock();
 	}
+	register_critical_section.Unlock();
+	
 	Fresh_Grid();
 }
 

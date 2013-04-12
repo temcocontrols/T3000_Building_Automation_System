@@ -237,8 +237,8 @@ BOOL CAddBuilding::OnInitDialog()
 	::InitializeCriticalSection(&g_Lock);
 
 	//GetSerialComm(m_szComm);
-	  GetSerialComPortNumber(m_szComm);
-	//GetSerialComPortNumber1(m_szComm);
+	//GetSerialComPortNumber(m_szComm);
+	GetSerialComPortNumber1(m_szComm);
 	CString strIPTest;
 //	GetIPbyHostName(_T("www.google.com"),strIPTest);
 	m_AddBuiding_SetComBox.ShowWindow(SW_HIDE);
@@ -846,11 +846,10 @@ void CAddBuilding::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
 
-		SaveAll();
-//   scan，常要特意选择一个COM，即使看到的是正确也要选一下，否则就说串口号不对
-// 	 CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
-// 	 pMain->Treestatus();
-//	 OnOK();
+		SaveAll();//scan，常要特意选择一个COM，即使看到的是正确也要选一下，否则就说串口号不对
+// 		CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+// 		pMain->Treestatus();
+//	OnOK();
 }
 void CAddBuilding::OnEnSetfocusAddbuidingSetedit()
 {
