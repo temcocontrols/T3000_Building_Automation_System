@@ -1,0 +1,20 @@
+# cache files created and maintained by Visual Studio
+
+*.pdb
+*.user
+*.suo
+*.ncb
+
+# folders containing intermediate files created during build
+
+T3000 Output/T3000 object/*
+T3000 Output/modbusdll object/*
+T3000 Output/FlexSlideBar object/*
+
+# created by build
+
+*.dll
+*.exp
+*.lib
+*.exe
+
