@@ -155,6 +155,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="setupapi.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\..\T3000 Output\release&quot;"
 				UACExecutionLevel="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -297,6 +298,10 @@
 			</File>
 			<File
 				RelativePath=".\hangeIDDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HumChamber.cpp"
 				>
 			</File>
 			<File
@@ -644,6 +649,10 @@
 			</File>
 			<File
 				RelativePath=".\hangeIDDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HumChamber.h"
 				>
 			</File>
 			<File
@@ -1138,11 +1147,11 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\ReadMe.txt"
+			RelativePath="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt"
 			>
 		</File>
 		<File
-			RelativePath="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt"
+			RelativePath=".\ReadMe.txt"
 			>
 		</File>
 	</Files>
