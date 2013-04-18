@@ -606,13 +606,7 @@ bool judgement_file_or_path_exist(CString path)
 	}
 }
 
-void clear_a_char_array(char *p,char t)
-{
-	int j=strlen(p);
-	if(j<1000)
-		for(int i=0;i<j;i++)
-			p[i]=t;
-}
+
 float get_tstat_version(unsigned short tstat_id)
 {//get tstat version and judge the tstat is online or no
 	//tstat is online ,return >0

@@ -23,7 +23,6 @@ void delete_folder(CString DirName);
 CString get_units_from_now_range(int the_tstat_id,int analog1_or_analog2);//for picturetstatmanager 
 
 bool judgement_file_or_path_exist(CString path);
-void clear_a_char_array(char *p,char t='\0');
 float get_tstat_version(unsigned short tstat_id);
 
 float get_curtstat_version();
