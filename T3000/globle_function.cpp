@@ -1,6 +1,4 @@
 
-#pragma once
-
 #include "stdafx.h"
 #include "globle_function.h"
 #include "Windows.h"
@@ -14,9 +12,6 @@
 #define Modbus_Serial	0
 #define	Modbus_TCP	1
 
-#include "MainFrm.h"
-//#include "global_variable.h"
-//#include "global_variable_extern.h"
 
 //how to linker the modbus.dll;;
 int read_one(unsigned char device_var,unsigned short address,int retry_times)
@@ -292,7 +287,6 @@ int turn_hex_str_to_ten_num(char *source)
 		l+=k;
 	return l;
 }
-
 
 int turn_hex_char_to_int(char c)
 {
