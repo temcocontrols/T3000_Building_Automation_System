@@ -680,20 +680,7 @@ bool get_serialnumber(long & serial,int the_id_of_product)
 		return FALSE;
 }
 
-bool Get_SerialNumberA(long & serial,int the_id_of_product)
-{
-	unsigned short SerialNum[4]={0};
-	int nRet=0;
-	nRet=Read_Multi(the_id_of_product,&SerialNum[0],0,4);
-	serial=0;
-	if(nRet>0)
-	{
-		serial=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
-		return TRUE;
-	}
-		return FALSE;
 
-}
 UINT get_serialnumber()
 {
 	return multi_register_value[MODBUS_SERIALNUMBER_LOWORD]+multi_register_value[MODBUS_SERIALNUMBER_LOWORD+1]*256+multi_register_value[MODBUS_SERIALNUMBER_HIWORD]*256*256+multi_register_value[MODBUS_SERIALNUMBER_HIWORD+1]*256*256*256;

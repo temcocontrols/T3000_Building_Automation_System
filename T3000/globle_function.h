@@ -36,7 +36,6 @@ bool multi_read_tstat(int id);
 void SetPaneCommunicationPrompt(CString strComInfo);
 void SetPaneString(int nIndext,CString str);
 
-bool Get_SerialNumberA(long & serial,int the_id_of_product);
 UINT get_serialnumber();
 bool can_be_writed_hex_file(int product_model,int hex_file_product_model);
 CString get_product_name_by_product_model(int product_model);
