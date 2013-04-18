@@ -20,7 +20,6 @@ void turn_int_to_unsigned_char(char *source,int length_source,unsigned char *aim
 void turn_unsigned_short_to_hex_char(char *order,unsigned short source);
 char turn_unsigned_to_char(unsigned short source);
 void delete_folder(CString DirName);
-CString get_units_from_now_range(int the_tstat_id,int analog1_or_analog2);//for picturetstatmanager 
 
 float get_tstat_version(unsigned short tstat_id);
 
