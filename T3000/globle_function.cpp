@@ -699,10 +699,7 @@ UINT get_serialnumber()
 	return multi_register_value[MODBUS_SERIALNUMBER_LOWORD]+multi_register_value[MODBUS_SERIALNUMBER_LOWORD+1]*256+multi_register_value[MODBUS_SERIALNUMBER_HIWORD]*256*256+multi_register_value[MODBUS_SERIALNUMBER_HIWORD+1]*256*256*256;
 }
 
-void message_box_function(CString content,CString title,UINT Utype)
-{
-	MessageBox(NULL,content,title,Utype);	
-}
+
 
 
 

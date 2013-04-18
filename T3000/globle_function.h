@@ -30,7 +30,6 @@ float get_curtstat_version();
 
 int make_sure_isp_mode(int the_tstat_id);
 bool get_serialnumber(long & serial,int the_id_of_product=-1);
-void message_box_function(CString content,CString title,UINT Utype=MB_OK);
 bool multi_read_tstat(int id);
 
 //
