@@ -706,19 +706,6 @@ void message_box_function(CString content,CString title,UINT Utype)
 
 
 
-void button_load_bitmap(CButton &p_wnd,CString name)
-{
-	/*
-	CString temp_path=program_path+_T("\\")+name;//////////////////////*******path
-	HBITMAP hbitmap=(HBITMAP)LoadImage(NULL,temp_path.GetString(),//更改你喜欢的位图文件
-	IMAGE_BITMAP,0,0,                              //parameter
-	LR_LOADFROMFILE|LR_CREATEDIBSECTION);
-	p_wnd.SetBitmap(hbitmap);
-	*/
-
-}
-
-
 bool multi_read_tstat(int id)
 {
 
