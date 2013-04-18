@@ -266,10 +266,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\extern_function.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\fileRW.cpp"
 				>
 			</File>
@@ -606,10 +602,6 @@
 			</File>
 			<File
 				RelativePath=".\excel9.h"
-				>
-			</File>
-			<File
-				RelativePath=".\extern_function.h"
 				>
 			</File>
 			<File
@@ -1148,11 +1140,11 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt"
+			RelativePath=".\ReadMe.txt"
 			>
 		</File>
 		<File
-			RelativePath=".\ReadMe.txt"
+			RelativePath="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt"
 			>
 		</File>
 	</Files>
