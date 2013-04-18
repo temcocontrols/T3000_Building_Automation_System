@@ -22,7 +22,6 @@ char turn_unsigned_to_char(unsigned short source);
 void delete_folder(CString DirName);
 CString get_units_from_now_range(int the_tstat_id,int analog1_or_analog2);//for picturetstatmanager 
 
-bool judgement_file_or_path_exist(CString path);
 float get_tstat_version(unsigned short tstat_id);
 
 float get_curtstat_version();

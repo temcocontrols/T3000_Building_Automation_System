@@ -581,30 +581,7 @@ void SetPaneCommunicationPrompt(CString strComInfo)
 	*/
 
 }
-bool judgement_file_or_path_exist(CString path)
-{
-	HANDLE hFile;
-	WIN32_FIND_DATA fData;
-	hFile = FindFirstFile(path,&fData);
-	if(hFile == INVALID_HANDLE_VALUE)
-	{
-		CString str;
-		str=path.Right(3);
-		str.MakeUpper();
-		if(str=="MDB")
-		{
-			str=_T("The file :")+path+_T(".\n\nDoesn't exist.Please reinstall or verify!");
-			FindClose(hFile);
-			AfxMessageBox(str);
-		}
-		return false;
-	}
-	else
-	{
-		FindClose(hFile);
-		return true;
-	}
-}
+
 
 
 float get_tstat_version(unsigned short tstat_id)
