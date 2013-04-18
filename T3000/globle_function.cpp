@@ -5,7 +5,7 @@
 #include "globle_function.h"
 #include "Windows.h"
 #include "T3000.h"
-#include "EnumSerial.h"
+
 
 
 
@@ -1147,31 +1147,4 @@ BOOL GetSerialComPortNumber1(vector<CString>& szComm)
 	}
 
 	return FALSE;   
-}
-
-
-BOOL GetSerialComPortNumber(vector<CString>& szComm)
-{
-	CArray<SSerInfo,SSerInfo&> asi;
-
-	// Populate the list of serial ports.
-	EnumSerialPorts(asi,FALSE/*include all*/);
-	szComm.clear();
-	for (int ii=0; ii<asi.GetSize(); ii++) 
-	{
-		//m_listPorts.AddString(asi[ii].strFriendlyName);
-		CString strCom = asi[ii].strFriendlyName;
-		int nPos;
-		if ((nPos = strCom.Find(_T("COM")))!=-1)
-		{
-			int startdex = strCom.ReverseFind(_T('('));
-			int enddex = strCom.ReverseFind(_T(')'));
-			//if (startdex > 0 && enddex == (strCom.GetLength()-1))
-				strCom = strCom.Mid(startdex+1, enddex-startdex-1);
-		}
-		szComm.push_back(strCom);
-			
-	}
-
-	return (szComm.size() !=0);
 }

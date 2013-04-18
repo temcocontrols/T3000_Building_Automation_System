@@ -254,10 +254,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\EnumSerial.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\EreaseDlg.cpp"
 				>
 			</File>
@@ -590,10 +586,6 @@
 			</File>
 			<File
 				RelativePath=".\DialogInfo.h"
-				>
-			</File>
-			<File
-				RelativePath=".\EnumSerial.h"
 				>
 			</File>
 			<File

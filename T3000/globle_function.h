@@ -51,7 +51,5 @@ CString get_product_class_name_by_model_ID(int nModelID);
 
 
 
-// 获得本地串口号
-BOOL GetSerialComPortNumber(vector<CString>& szComm);
 BOOL GetSerialComPortNumber1(vector<CString>& szComm);
 #endif
