@@ -719,24 +719,6 @@ void button_load_bitmap(CButton &p_wnd,CString name)
 }
 
 
-CString get_unit_a_str(CString have_unit_str)
-{
-	CString str_temp=have_unit_str;
-	for(int i=0;i<str_temp.GetLength();i++)
-	{
-		char c_temp= (char)str_temp.GetAt(i);
-		if(c_temp!='0' && c_temp!='1' && c_temp!='2' && c_temp!='3' && c_temp!='4' && c_temp!='5' && 
-			c_temp!='6' && c_temp!='7' && c_temp!='8' && c_temp!='9' && c_temp!='.' && c_temp!='-')
-		{
-			str_temp=str_temp.Right(str_temp.GetLength()-i);
-			break;
-		}
-	}
-	if(str_temp==have_unit_str)
-		str_temp="";
-	return str_temp;
-}
-
 bool multi_read_tstat(int id)
 {
 
