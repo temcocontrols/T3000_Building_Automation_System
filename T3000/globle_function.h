@@ -31,7 +31,6 @@ bool get_serialnumber(long & serial,int the_id_of_product=-1);
 bool multi_read_tstat(int id);
 
 //
-void SetPaneCommunicationPrompt(CString strComInfo);
 void SetPaneString(int nIndext,CString str);
 
 UINT get_serialnumber();

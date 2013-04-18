@@ -569,18 +569,6 @@ CString get_units_from_now_range(int the_tstat_id,int analog1_or_analog2)
 	return geted_units;
 }
 
-void SetPaneCommunicationPrompt(CString strComInfo)
-{
-	/*
-	static CStatusBar * pStatusBar=NULL;
-	if(AfxGetMainWnd()->GetActiveWindow()==NULL)//if this function is called by a thread ,return 
-		return;
-	if(pStatusBar==NULL)
-		pStatusBar = (CStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR);
-	pStatusBar->SetPaneText(2,strComInfo.GetString(),true);
-	*/
-
-}
 
 
 
