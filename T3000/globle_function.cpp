@@ -293,54 +293,7 @@ int turn_hex_str_to_ten_num(char *source)
 	return l;
 }
 
-unsigned short turn_4_hex_char_to_unsigned_short(char *source)
-{//can only turn four char(hex string) to int
-	//return -1,the wrong input ,the char number>4;or the input char is not hex string;
 
-	int a=strlen(source);
-	if(a>4)
-	{
-//		AfxMessageBox("wrong input!\nthat the length of the input string !=2!");
-//		for(int i=0;i<a;i++)
-//			*source='\0';
-		return -1;//input wrong 1
-	}
-	unsigned short k=0,l=0;
-	for(int j=0;j<a;j++)
-	{
-		switch(source[j])
-		{
-		case '0':k=0;break;
-		case '1':k=1;break;
-		case '2':k=2;break;
-		case '3':k=3;break;
-		case '4':k=4;break;
-		case '5':k=5;break;
-		case '6':k=6;break;
-		case '7':k=7;break;
-		case '8':k=8;break;
-		case '9':k=9;break;
-
-		case 'a':k=10;break;
-		case 'b':k=11;break;
-		case 'c':k=12;break;
-		case 'd':k=13;break;
-		case 'e':k=14;break;
-		case 'f':k=15;break;
-		case 'A':k=10;break;
-		case 'B':k=11;break;
-		case 'C':k=12;break;
-		case 'D':k=13;break;
-		case 'E':k=14;break;
-		case 'F':k=15;break;
-
-		default: return -1;//2
-		}
-		l*=16;
-		l+=k;
-	}
-	return l;
-}
 int turn_hex_char_to_int(char c)
 {
 		int k=0;
@@ -409,37 +362,7 @@ void turn_int_to_unsigned_char(char *source,int length_source,unsigned char *aim
 		}
 }
 
-void turn_unsigned_short_to_hex_char(char *order,unsigned short source)
-{//return value ,1 is success ,0 is failure
-	//the number of the order ,should >=5,is good
-	//the source must >0 and <65535
-	int itemp=0;
-	unsigned short ustemp=0;
-	do{
-		ustemp=source%16;
-		order[itemp]=turn_unsigned_to_char(ustemp);
-		source/=16;
-		itemp++;
-	}while(source!=0);
-	order[itemp]='\0';	
-	if(strlen(order)%2)
-	{		
-		order[itemp]='0';
-		order[itemp+1]='\0';
-	}
-	order=strrev(order);
-}
-char turn_unsigned_to_char(unsigned short source)
-{//return value ,is the char 
-	//0 is failure
-	if(source>15)
-		return 0;
-	if(source>=0 && source<=9)
-		return source+48;
-	else
-		if(source>=10 && source<=15)
-			return source+55;
-}
+
 
 
 

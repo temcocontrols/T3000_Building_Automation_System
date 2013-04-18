@@ -13,12 +13,9 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
 int Read_Multi_org(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times=3);
 
 int turn_hex_str_to_ten_num(char *str);
-unsigned short turn_4_hex_char_to_unsigned_short(char *source);
 bool turn_hex_file_line_to_unsigned_char(char *str);
 int turn_hex_char_to_int(char c);
 void turn_int_to_unsigned_char(char *source,int length_source,unsigned char *aim);
-void turn_unsigned_short_to_hex_char(char *order,unsigned short source);
-char turn_unsigned_to_char(unsigned short source);
 
 float get_tstat_version(unsigned short tstat_id);
 
