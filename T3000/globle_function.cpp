@@ -441,28 +441,7 @@ char turn_unsigned_to_char(unsigned short source)
 			return source+55;
 }
 
-void delete_folder(CString DirName)
-{
-	CFileFind tempFind; 
-	CString temp_str;
-	temp_str=DirName+_T("\\*.*");
-	BOOL IsFinded=(BOOL)tempFind.FindFile(temp_str.GetString()); 
-	while(IsFinded) 
-	{ 
-		IsFinded=(BOOL)tempFind.FindNextFile(); 
-		if(!tempFind.IsDots()) 
-		{ 
-			CString file_name=tempFind.GetFileName();			
-			file_name=DirName+"\\"+file_name;				
-			if(tempFind.IsDirectory()) 
-				delete_folder(file_name); 
-			else 
-				DeleteFile(file_name); 
-		} 
-	} 
-	tempFind.Close(); 
-	RemoveDirectory(DirName);//delete blank directory
-}
+
 
 
 float get_tstat_version(unsigned short tstat_id)
