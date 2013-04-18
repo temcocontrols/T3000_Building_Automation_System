@@ -33,7 +33,6 @@ bool get_serialnumber(long & serial,int the_id_of_product=-1);
 void message_box_function(CString content,CString title,UINT Utype=MB_OK);
 void button_load_bitmap(CButton &p_wnd,CString name);
 CString get_unit_a_str(CString have_unit_str);
-bool is_a_float_str(CString str);
 bool multi_read_tstat(int id);
 
 //

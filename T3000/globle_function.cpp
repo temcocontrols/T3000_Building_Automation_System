@@ -737,14 +737,6 @@ CString get_unit_a_str(CString have_unit_str)
 	return str_temp;
 }
 
-bool is_a_float_str(CString str)
-{
-	if(str.Find(_T("."))==-1)
-		return false;
-	else
-		return true;
-}
-
 bool multi_read_tstat(int id)
 {
 
