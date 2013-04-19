@@ -6,7 +6,7 @@
 #include "MainFrm.h"
 
 // CInputSetDlg dialog
-
+#define  WM_REFRESH_INPUTDLG WM_USER + 101
 class CInputSetDlg : public CDialog
 {
 	DECLARE_DYNAMIC(CInputSetDlg)
@@ -25,6 +25,8 @@ protected:
 public:
 	void Init5EGrid();
 	void InitGrid5EnoTSTAT6();
+
+	void Init_not_5ABCD_Grid();
 //	void Init5EGridtstat6();
 	
 
@@ -64,7 +66,11 @@ public:
 	afx_msg void OnCbnKillfocusValuecombo();
 	afx_msg void OnBnClickedRefreshbutton();
 	afx_msg void OnEnKillfocusInputnameedit();
-
+	afx_msg LRESULT DealMessage(WPARAM wParam,LPARAM lParam);
+	static DWORD WINAPI StartRefresh(LPVOID lpVoid);
+	HANDLE InputThread;
+	HICON hIcon;
+	HICON hIcon_Exit;
 public:
 	//int m1_inRows;
 	CEdit m_inputNameEdt;
@@ -89,5 +95,6 @@ public:
 	//tstat6
 	unsigned short tempchange[512];//for tstat6
 	//tstat6
-
+	bool b_is_fresh; 
+	afx_msg void OnClose();
 };

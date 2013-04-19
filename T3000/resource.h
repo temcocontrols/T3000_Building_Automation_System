@@ -142,6 +142,9 @@
 #define IDD_DIALOG_INFO                 439
 #define IDD_DIALOG_MINIPANEL            440
 #define IDD_HUM_CHAMBER                 441
+#define IDI_ICON_REFRESH                443
+#define IDI_ICON2                       444
+#define IDI_ICON_EXIT                   444
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -157,8 +160,10 @@
 #define IDC_USEREDIT                    1027
 #define IDC_OUTPUT2_DELAY_OFF_EDIT      1027
 #define IDC_SLAVE_ID                    1027
+#define IDC_EDIT41                      1027
 #define IDC_OUTPUT3_DELAY_OFF_EDIT      1028
 #define IDC_CUR_TEMP                    1028
+#define IDC_EDIT42                      1028
 #define IDC_BUTTON3                     1029
 #define IDC_DELAYTABBTN                 1029
 #define IDC_OUTPUT5_DELAY_OFF_EDIT      1029
@@ -166,18 +171,27 @@
 #define IDC_RADIO1                      1030
 #define IDC_OUTPUT4_DELAY_OFF_EDIT      1030
 #define IDC_HUM1                        1030
+#define IDC_EDIT43                      1030
 #define IDC_RADIO2                      1031
 #define IDC_OUTPUTBTN                   1031
 #define IDC_NUM_SENSOR                  1031
+#define IDC_EDIT44                      1031
 #define IDC_PARAMETERBTN                1032
+#define IDC_EDIT45                      1032
 #define IDC_LEDTABLEBTN                 1033
+#define IDC_EDIT46                      1033
+#define IDC_EDIT47                      1034
 #define IDC_MODEL_EDIT                  1035
+#define IDC_EDIT48                      1035
 #define IDC_FIRMWARV_EDIT               1036
 #define IDC_START_POINT                 1036
+#define IDC_EDIT49                      1036
 #define IDC_HARDWAREV_EDIT              1037
 #define IDC_TEMP_TOL                    1037
+#define IDC_EDIT50                      1037
 #define IDC_SERIALNUM_EDIT              1038
 #define IDC_HUM_TOL                     1038
+#define IDC_EDIT51                      1038
 #define IDC_TEMPERATURE_EDIT            1039
 #define IDC_TEST_STATE                  1039
 #define IDC_EDIT_HUMIDITY               1040
@@ -312,6 +326,7 @@
 #define IDC_SLIDER7                     1076
 #define IDC_EDIT_DAYCOOL                1076
 #define IDC_TIME10                      1076
+#define IDC_BUTTON9                     1076
 #define IDC_EDIT5                       1077
 #define IDC_TEMP_LEFT10                 1077
 #define IDC_EDIT6                       1078
@@ -926,6 +941,8 @@
 #define IDC_RUNNING                     1589
 #define IDC_RAMPING                     1590
 #define IDC_TOLERANCE                   1591
+#define IDC_MAC_ADDRESS                 1592
+#define IDC_CHECK_DEMO                  1594
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1016,9 +1033,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        443
+#define _APS_NEXT_RESOURCE_VALUE        445
 #define _APS_NEXT_COMMAND_VALUE         32866
-#define _APS_NEXT_CONTROL_VALUE         1592
+#define _APS_NEXT_CONTROL_VALUE         1595
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

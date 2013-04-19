@@ -9,6 +9,7 @@
 #include "../global_variable_extern.h"
 
 #include "../MainFrm.h"
+#include "afxcmn.h"
 
 
 
@@ -28,10 +29,14 @@ typedef struct Subnetwork
 	CString	m_nightHeating;				
 	CString	m_nightCooling;				
 	int	m_tstatProduct;				
-	CString m_modbusaddr;					
-
-
+	CString m_modbusaddr;
+	int  m_Occupied;
+	CString  m_overridevalue;
+	CString m_SerialNumber; 
+	CString	m_nightHeatingDB;				
+	CString	m_nightCoolingDB;						
 }subnetwork;
+
 
 
 
@@ -96,7 +101,7 @@ public://messages override
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	virtual void OnInitialUpdate();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-
+	CString GetTextReg(unsigned short reg);
 
 public:
 	void Fresh();
@@ -126,6 +131,15 @@ private:
 
 	void JudgeTableExist(CString strtable,CString strsql);
 	
+public:
+	CString m_bootloaderversion;
+	CComboBox m_Baudrate;
+	CComboBox m_ipModelComBox;
+	CIPAddressCtrl m_ip_addressCtrl;
+	CIPAddressCtrl m_subnet_addressCtrl;
+	CIPAddressCtrl m_gateway_addressCtrl;
+	CString m_nListenPort;
+	CEdit m_Mac_Address;
 };
 
 

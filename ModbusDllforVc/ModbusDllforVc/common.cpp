@@ -3960,7 +3960,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		{			
 			return -1;
 		}
-		::send(m_hSocket,(char*)pval,sizeof(pval),0);//scan 扫NC中的TSTAT
+		int nRet =::send(m_hSocket,(char*)pval,sizeof(pval),0);//scan 扫NC中的TSTAT
 
 		//Sleep(SLEEP_TIME+8);
 		Sleep(LATENCY_TIME_NET+100);

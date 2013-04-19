@@ -189,14 +189,14 @@ void CHumChamber::Fresh()
 //初始化寄存器的值
 //底下直接应用这些寄存器号码
 	register_critical_section.Lock();
-
+	g_register_occuppied=TRUE;
 for(int  i=0;i<3;i++)
 	{
 	Read_Multi(g_tstat_id,&multi_register_value[584+i*50],584+i*50,50);
 	}
 
    register_critical_section.Unlock();
-
+   g_register_occuppied=FALSE;
    InitialRegisterNo();
    
    m_msflexgrid.put_Cols(4);
@@ -316,7 +316,7 @@ void CHumChamber::Fresh_Hum_Temp()
 	{
 		Sleep(1000);
 		register_critical_section.Lock();
-	
+		g_register_occuppied=TRUE;
 		for(int  i=0;i<3;i++)
 		{
 
@@ -324,7 +324,7 @@ void CHumChamber::Fresh_Hum_Temp()
 
 		}
 		register_critical_section.Unlock();
-	
+		g_register_occuppied=FALSE;
 		if (ADD)
 		{
 			times++;
@@ -444,8 +444,6 @@ void CHumChamber::Show_AllData(){
 		m_msflexgrid.put_TextMatrix(i,3,temp);
 		} 
 	// multi_register_value[626]=1;//test use
-
-	//
 	//把温度和湿度显示在当时测试的表格中...
 	/*temp.Format(_T("%d"),multi_register_value[CurrentTestSensorTemp.Start_ID]);
 	m_msflexgrid.put_TextMatrix(multi_register_value[CurrentTestSensor.Start_ID],2,temp);
@@ -558,11 +556,11 @@ BOOL CHumChamber::GetRegInfoFromDB(Register_info &reg_data,CString Area_Name)
 {
 CADO m_cado;  
 m_cado.OnInitADOConn();
-bool ret = m_cado.IsHaveTable(m_cado,_T("HC_RegisterTable"));
+bool ret = m_cado.IsHaveTable(m_cado,_T("TstatHumChamber"));
 if (ret)
 	{
 	CString strsql;
-	strsql=_T("select * from HC_RegisterTable where T3000_ID ='");
+	strsql=_T("select * from TstatHumChamber where T3000_ID ='");
 	strsql+=Area_Name;
 	strsql+=_T("'");
  

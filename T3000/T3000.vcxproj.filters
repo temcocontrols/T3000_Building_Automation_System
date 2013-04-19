@@ -171,9 +171,6 @@
     <ClCompile Include="OutPutDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OutputSetDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="OutsidDailog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -289,6 +286,12 @@
       <Filter>singleslider</Filter>
     </ClCompile>
     <ClCompile Include="HumChamber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T3000RegAddress.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputSetDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -419,7 +422,14 @@
     <None Include="UserImages.bmp">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="ReadMe.txt" />
     <None Include="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt" />
+    <None Include="res\Refresh.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Exit.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">

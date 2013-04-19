@@ -99,13 +99,23 @@ INPUT void Createfile();//scan
 
 //INPUT SOCKET GetSocketHandle();
 
-#include "modbus.h"
+//#include "modbus.h"
 #include <vector>  // STL vector header. There is no ".h"
 #include <afxdhtml.h>
 using namespace std;  // Ensure that the namespace is set to std
 
 #define CUSTOM_TABLE_FLOAT_VERSION 50.1
 #define SETPOINT_SPECIAL_VERSION	50
+
+
+#pragma warning(disable:4244)
+#pragma warning(disable:4018)
+#pragma warning(disable:4146)
+#pragma warning(disable:4800)
+#pragma warning(disable:4101)
+#pragma warning(disable:4554)
+#pragma warning(disable:4305)
+#pragma warning(disable:4005)
 
 typedef struct _STATUSBARINFO
 {
@@ -114,7 +124,7 @@ typedef struct _STATUSBARINFO
 }status_info;
 #include "fileRW.h"
 
-
+#include "T3000RegAddress.h"
 
 //#define _DEBUG
 //*********************************link to dll***************************
