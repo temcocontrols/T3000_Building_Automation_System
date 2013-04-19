@@ -33,7 +33,10 @@ public:
 	afx_msg void OnCbnSelchangeAutoonlycombo();
 	afx_msg void OnEnKillfocusIdaddressedit();
 	afx_msg void OnDestroy();
-	afx_msg void OnCbnKillfocusKeypadselect();
+
+	afx_msg void OnCbnSelchangekeypadcombo();
+
+	//afx_msg void OnCbnKillfocusKeypadselect();
 	afx_msg void OnEnKillfocusValuposedit();
 	afx_msg void OnCbnSelchangeSequencecombox();
 	afx_msg void OnCbnSelchangeHcchangecombo();
@@ -86,6 +89,8 @@ public:
 
 	void Refresh();
 	 void Refresh6();
+	 void Reflesh_new();
+
 	void InitPID2ComboBox();
 	void  UpdateCoolingandHeatingData();
 public:

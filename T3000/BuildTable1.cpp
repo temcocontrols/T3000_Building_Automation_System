@@ -2345,7 +2345,7 @@ short CBuildTable1::GetValueFromEdtCtrol(UINT ID_EDIT)
 CString CBuildTable1::GetValueFromRegister(short nValue)
 {
 	CString strTxt;
-	int nNum;
+	int nNum=0;
 	if((nValue & 0x1000)>>15==1)//Îª¸ºÊý;
 	{
 		nNum= (0x7fff & nValue);

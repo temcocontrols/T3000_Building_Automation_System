@@ -162,9 +162,6 @@ CString CTStat_Dev::GetProductName()
 	case PM_LightingController:
 		strProductName = "LC";
 		break;
-	case PM_TSTAT6_HUM_Chamber:
-		strProductName = "Tstat6HC";
-		break;
 	default:
 		strProductName="TStat";
 		break;

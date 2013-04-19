@@ -150,6 +150,9 @@ public://scan
 	CTStatScanner* m_pScanner;
 	CWinThread *m_pThreadScan;
 	CWinThread* m_pFreshMultiRegisters;
+
+	CWinThread* m_pFreshTree;
+
 	vector <binary_search_result> m_binary_search_networkcontroller_background_thread;	////background thread search result
 	vector <binary_search_result> m_binary_search_product_background_thread;				////background thread search result
 	
@@ -303,7 +306,7 @@ public:
 	CRefreshTreeThread*	m_pRefreshThread;
 
 	CString						m_strCurSelNodeName;  // 记录当前点击树节点的name
-		
+	BOOL m_isCM5;
 	//HTREEITEM				m_htiCurSel;  // 记录当前点击树节点
 	CString						m_strFileVersion;
 

@@ -227,9 +227,9 @@ LRESULT CScanDbWaitDlg::OnNetScanInfo(WPARAM wParam, LPARAM lParam)
 	m_strNetScanInfo = _T("Net Scan : ")  + *pStr;
 	
 	TRACE(_T("net scan info ! \n"));
-//	UpdateData(FALSE);
-	 CWnd* pWnd = GetDlgItem(IDC_INFO_NET);
-	 pWnd->SetWindowText(m_strNetScanInfo);
+	//UpdateData(FALSE);
+	CWnd* pWnd = GetDlgItem(IDC_INFO_NET);
+	pWnd->SetWindowText(m_strNetScanInfo);
 	
 
 	delete pStr;

@@ -93,7 +93,6 @@ BEGIN_MESSAGE_MAP(CNetworkControllView, CFormView)
 	ON_BN_CLICKED(IDC_BUTTON_UPDATETIMESERVER, &CNetworkControllView::OnBnClickedButtonUpdatetimeserver)
 	//ON_BN_CLICKED(IDC_FIND_TSTAT, &CNetworkControllView::OnBnClickedFindTstat)
 	ON_BN_CLICKED(IDC_BUTTON1, &CNetworkControllView::OnBnClickedButton1)
-//	ON_BN_CLICKED(IDC_STATIC3, &CNetworkControllView::OnBnClickedStatic3)
 END_MESSAGE_MAP()
 
 
@@ -1324,9 +1323,3 @@ void CNetworkControllView::OnBnClickedButton1()
 
 	}
 }
-
-
-//void CNetworkControllView::OnBnClickedStatic3()
-//{
-//	// TODO: Add your control notification handler code here
-//}
