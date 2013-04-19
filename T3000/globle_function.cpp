@@ -14,57 +14,159 @@
 #define	Modbus_TCP	1
 
 
-//how to linker the modbus.dll;;
-int read_one(unsigned char device_var,unsigned short address,int retry_times)
-{//programmer can control retry times,by parameter retry_times
-	BOOL bTemp = g_bEnableRefreshTreeView;
-	g_bEnableRefreshTreeView = FALSE;
-	int j = read_one_org(device_var,address,retry_times);
-	g_bEnableRefreshTreeView |= bTemp;
-	return j;
-}
 
-// 这个是原始的
-int read_one_org(unsigned char device_var,unsigned short address,int retry_times)
-{//programmer can control retry times,by parameter retry_times	
-// 	CString str;
-// 	str.Format(_T("ID:%d [Tx=%d : Rx=%d]"), device_var, g_llTxCount++, g_llRxCount);
-// 	SetPaneString(0,str);
-	int j=0;
+/**
+
+  Read one value from a modbus device
+
+  @param[out]  value		the value read, cast to an integer
+  @param[in]   device_var	the modbus device address
+  @param[in]   address		the offset of the value to be read in the device
+  @param[in]   retry_times	the number of times to retry on read failure before giving up
+
+  @return  0 if there were no errors
+  */
+int modbus_read_one_value( 
+				int& value, 
+				unsigned char device_var,
+				unsigned short address, 
+				int retry_times )
+{
+
+	BOOL EnableRefreshTreeView_original_value = g_bEnableRefreshTreeView;
+
+	/** This will prevent a refresh of the tree view while we are doing the read
+	 It seems to be a sort of home made mutex.
+	 There are all sorts of probems with this, including the fact that the tree refresh
+	 is abandoned, not just delayed.
+	 But it is used in over 40 places in the rest of the code, so leave it alone
+	 */
+	g_bEnableRefreshTreeView = FALSE;
+
+	// clear the value read from the device
+	value = 0;
+
+	// clear the error return flag
+	int error_ret = 0;
+
+	// clear the value/error flag from the modbus DLL
+	int j = 0;
+
+	// loop over number of retries requested
 	for(int i=0;i<retry_times;i++)
 	{
-		register_critical_section.Lock();
+		// ensure no other threads attempt to access modbus communications
+		CSingleLock singleLock(&register_critical_section);
+		singleLock.Lock();
+
+		// call the modbus DLL method
 		j=Read_One(device_var,address);
-		register_critical_section.Unlock();
-		if (g_CommunicationType==Modbus_Serial)
-		{
+
+		// free the modbus communications for other threads
+		singleLock.Unlock();
+
+		// increment the number of transmissions we have done
+		g_llTxCount++;
+
+		// check for no connection error
+		if( j == -1 ) {
+
+			error_ret = j;
+
+			// give up
+			break;
 		}
 
-		if(j!=-2 && j!=-3)
-		{
-			CString str;
-		
-			if (j == -1) // no connection
-			{
-				str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d]"), device_var, ++g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
-			}
-			else
-			{
-				str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d]"), device_var, ++g_llTxCount, ++g_llRxCount, g_llTxCount-g_llRxCount);
-			}
-			SetPaneString(0,str);
-			if(address==101 && j>32767)
-			{//the temperature is below zero;;;;;-23.3
-				j=0-65535+j;
-			}
-			return j;//return reght ,success
-		}	 
+		// check for other errors
+		if ( j == -2 || j == -3 ) {
+
+			error_ret = j;
+
+			// try again, if more retries available
+			continue;
+		}
+
+
+		// increment the number or replies we have received
+		g_llRxCount++;
+
+		// set value that we received
+		value = (int) j;
+
+
+		// we have a good value, so no need to try again
+		break;
+
 	}
-	CString str;
-	str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount,g_llTxCount-g_llRxCount );
-	SetPaneString(0,str);
-	return j;
+
+	// Special handling for a particular address  101
+	// ( This probably should not be done here! 
+	// Presumably it is done because the old version
+	// returned a negative value as an error flag
+	// and it was neccessary to elude that check )
+	if( address == 101 ) {
+		if( value > 32767) {
+			// assume this is a temperature below zero
+			value = 0 - 65535 + value;
+		}
+	}
+
+	// check for running in the main GUI thread
+	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
+
+		// construct status message string
+		CString str;
+		str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d]"), 
+			device_var, g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+
+		//Display it
+		((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
+
+	}
+
+	/**  Restore original value of tree refresh flag
+
+	Note that we do an OR here, so if the flag has been set true somewhere else
+	then we will not set it false if it was false when we started.
+
+	*/
+	g_bEnableRefreshTreeView |= EnableRefreshTreeView_original_value;
+
+	return error_ret;
+
 }
+
+
+/**
+
+A wrapper for modbus_read_one_value which returns BOTH read value and error flag
+
+  @param[in]   device_var	the modbus device address
+  @param[in]   address		the offset of the value to be read in the device
+  @param[in]   retry_times	the number of times to retry on read failure before giving up
+
+  @return -1, -2, -3 on error, otherwise value read cast to integer
+
+  This interface is provided for compatibility with existing code.
+  New code should use modbus_read_one_value() directly,
+  since it returns a separate error flag and read value -
+  allowing simpler, more easily understood calling code design.
+
+*/
+
+int read_one(unsigned char device_var,unsigned short address,int retry_times)
+{
+	int value;
+	int j = modbus_read_one_value( value, device_var, address, retry_times );
+	if( j != 0 ) {
+		// there was an error, so return the error flag
+		return j;
+	} else {
+		// no error, so return value read
+		return value;
+	}
+}
+
 
 void SetPaneString(int nIndext,CString str)
 {
