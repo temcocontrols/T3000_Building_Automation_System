@@ -164,6 +164,9 @@ CString CTStat_Net::GetProductName()
 		strProductName = "LC";
 		break;
 //20120424
+    case PM_CM5:
+	    strProductName="CM5_Ethernet";
+		break;
 	default:
 		strProductName="WIFI";
 

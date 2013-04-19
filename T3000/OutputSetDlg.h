@@ -3,6 +3,8 @@
 #include "msflexgrid1.h"
 
 // COutputSetDlg dialog
+#define  WM_REFRESH_OUTPUTDLG WM_USER + 100
+
 
 class COutputSetDlg : public CDialog
 {
@@ -55,4 +57,14 @@ public:
 	CComboBox m_Interlockcombo;
 	afx_msg void OnCbnSelchangeCombolock();
 	afx_msg void OnCbnKillfocusCombolock();
+
+	afx_msg LRESULT RefreshGrid(WPARAM wParam,LPARAM lParam);//Add by Fance
+
+	HICON hIcon;
+	HICON hIcon_Exit;
+
+	HANDLE OutputThread;
+	bool b_is_fresh; //When it is freshing ,can not be exit at this time.
+	static DWORD WINAPI StartRefresh(LPVOID lpVoid);
+	afx_msg void OnClose();
 };

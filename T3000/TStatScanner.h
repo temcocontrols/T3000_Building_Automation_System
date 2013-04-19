@@ -189,6 +189,7 @@ public:
 	vector<_ComDeviceInfo*>		m_szTstatScandRet;
 	vector<_NetDeviceInfo*>		m_szNCScanRet;
 	vector<_NetDeviceInfo*>		m_szNCScanRet2; // NC find by com port
+
 	vector<CString>				m_szComs;
 	CEvent*							m_eScanComEnd;
 	CEvent*							m_eScanNCEnd;

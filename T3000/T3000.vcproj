@@ -447,6 +447,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\T3000RegAddress.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\T3000TableView.cpp"
 				>
 			</File>
@@ -786,6 +790,10 @@
 			</File>
 			<File
 				RelativePath=".\T3000Doc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\T3000RegAddress.h"
 				>
 			</File>
 			<File

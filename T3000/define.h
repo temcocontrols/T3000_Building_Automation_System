@@ -58,6 +58,11 @@
 #define LOAD_FAILURE_SEVEN							_T("Section7:VARIABLE ")
 #define STEP_FAILURE								_T(" Error\r\n")
 #define STEP_FINISH									_T(" Success\r\n")
+
+
+
+
+
 // CBuildTable1 ¶Ô»°¿ò
     // Address 219
 #define    MODBUS_TABLE1_ZERO  219

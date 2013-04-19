@@ -6,6 +6,7 @@
 
 
 
+#include "T3000RegAddress.h"
 
 
 #define DELAY_TIME	 10	//MS
@@ -378,21 +379,39 @@ float get_tstat_version(unsigned short tstat_id)
 	}//tstat_version
 	return tstat_version2;
 }
+
 float get_curtstat_version()
 {
-	float tstat_version2=multi_register_value[MODBUS_VERSION_NUMBER_LO];//tstat version			
+	float tstat_version2= product_register_value[MODBUS_VERSION_NUMBER_LO];//tstat version			
 	if(tstat_version2<=0)
 		return tstat_version2;
 	if(tstat_version2 >=240 && tstat_version2 <250)
 		tstat_version2 /=10;
 	else 
 	{
-		tstat_version2 = (float)(multi_register_value[MODBUS_VERSION_NUMBER_HI]*256+multi_register_value[MODBUS_VERSION_NUMBER_LO]);	
+		tstat_version2 = (float)(product_register_value[MODBUS_VERSION_NUMBER_HI]*256+product_register_value[MODBUS_VERSION_NUMBER_LO]);	
 		tstat_version2 /=10;
 	}//tstat_version
 	return tstat_version2;
 
 }
+
+//Marked by Fance 2013/03 28 
+//float get_curtstat_version()
+//{
+//	float tstat_version2=multi_register_value[MODBUS_VERSION_NUMBER_LO];//tstat version			
+//	if(tstat_version2<=0)
+//		return tstat_version2;
+//	if(tstat_version2 >=240 && tstat_version2 <250)
+//		tstat_version2 /=10;
+//	else 
+//	{
+//		tstat_version2 = (float)(multi_register_value[MODBUS_VERSION_NUMBER_HI]*256+multi_register_value[MODBUS_VERSION_NUMBER_LO]);	
+//		tstat_version2 /=10;
+//	}//tstat_version
+//	return tstat_version2;
+//
+//}
 
 int make_sure_isp_mode(int the_tstat_id)
 {
@@ -525,13 +544,13 @@ CString get_product_name_by_product_model(int product_model)
 CString GetTempUnit(int nRange, int nPIDNO)
 {
 	CString strTemp=_T("");
-	
+
 	if(nRange<0) // 使用默认的温度单位
 	{
 		UINT uint_temp=GetOEMCP();//get system is for chinese or english
 		if(uint_temp!=936 && uint_temp!=950)
 		{
-			if(multi_register_value[121]==0)
+			if(product_register_value[MODBUS_DEGC_OR_F]==0)	//121
 			{
 				strTemp.Format(_T("%cC"),176);
 			}
@@ -543,7 +562,7 @@ CString GetTempUnit(int nRange, int nPIDNO)
 		else
 		{
 			//Chinese.
-			if(multi_register_value[121]==0)
+			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 			{
 				strTemp=_T("°C");
 			}
@@ -562,7 +581,7 @@ CString GetTempUnit(int nRange, int nPIDNO)
 		UINT uint_temp=GetOEMCP();//get system is for chinese or english
 		if(uint_temp!=936 && uint_temp!=950)
 		{
-			if(multi_register_value[121]==0)
+			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 			{
 				strTemp.Format(_T("%cC"),176);
 			}
@@ -574,7 +593,7 @@ CString GetTempUnit(int nRange, int nPIDNO)
 		else
 		{
 			//chinese.
-			if(multi_register_value[121]==0)
+			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 			{
 				strTemp=_T("°C");
 			}
@@ -597,8 +616,8 @@ CString GetTempUnit(int nRange, int nPIDNO)
 	{//Customer Sersor
 		if(nPIDNO==1)
 		{
-			int m_271=multi_register_value[271];
-			int m_272=multi_register_value[272];
+			int m_271=product_register_value[MODBUS_UNITS1_HIGH];//271 390
+			int m_272=product_register_value[MODBUS_UNITS1_LOW];//272  391
 			if(m_271>>8=='0')
 			{
 				if((m_271 & 0xFF) =='0')
@@ -616,8 +635,8 @@ CString GetTempUnit(int nRange, int nPIDNO)
 		}
 		else if(nPIDNO==2)
 		{
-			int m_273=multi_register_value[273];
-			int m_274=multi_register_value[274];
+			int m_273=product_register_value[MODBUS_UNITS2_HIGH];//273  392;
+			int m_274=product_register_value[MODBUS_UNITS2_LOW];//274 393;
 			if(m_273>>8=='0')
 			{
 				if((m_273 & 0xFF)=='0')
@@ -636,6 +655,119 @@ CString GetTempUnit(int nRange, int nPIDNO)
 		}
 	}	
 	return strTemp;
+
+	//CString strTemp=_T("");
+	//
+	//if(nRange<0) // 使用默认的温度单位
+	//{
+	//	UINT uint_temp=GetOEMCP();//get system is for chinese or english
+	//	if(uint_temp!=936 && uint_temp!=950)
+	//	{
+	//		if(multi_register_value[121]==0)
+	//		{
+	//			strTemp.Format(_T("%cC"),176);
+	//		}
+	//		else
+	//		{
+	//			strTemp.Format(_T("%cF"),176);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		//Chinese.
+	//		if(multi_register_value[121]==0)
+	//		{
+	//			strTemp=_T("°C");
+	//		}
+	//		else
+	//		{
+	//			strTemp=_T("°F");
+	//		}
+	//	}
+	//	return strTemp;
+	//}
+
+	//if(nRange==0)		// Raw value, no unit
+	//	strTemp=_T("");
+	//else if(nRange==1)
+	//{//
+	//	UINT uint_temp=GetOEMCP();//get system is for chinese or english
+	//	if(uint_temp!=936 && uint_temp!=950)
+	//	{
+	//		if(multi_register_value[121]==0)
+	//		{
+	//			strTemp.Format(_T("%cC"),176);
+	//		}
+	//		else
+	//		{
+	//			strTemp.Format(_T("%cF"),176);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		//chinese.
+	//		if(multi_register_value[121]==0)
+	//		{
+	//			strTemp=_T("°C");
+	//		}
+	//		else
+	//		{
+	//			strTemp=_T("°F");
+	//		}
+	//	}
+	//	return strTemp;
+	//}
+	//else if(nRange==2)
+	//{//
+	//	strTemp=_T("%");
+	//}
+	//else if(nRange==3)
+	//{//ON/OFF
+	//	strTemp=_T("");
+	//}
+	//else if(nRange==4)
+	//{//Customer Sersor
+	//	if(nPIDNO==1)
+	//	{
+	//		int m_271=multi_register_value[271];
+	//		int m_272=multi_register_value[272];
+	//		if(m_271>>8=='0')
+	//		{
+	//			if((m_271 & 0xFF) =='0')
+	//			{
+	//				if(m_272>>8=='0')
+	//					strTemp.Format(_T("%c"),m_272 & 0xFF);
+	//				else
+	//					strTemp.Format(_T("%c%c"),m_272>>8,m_272 & 0xFF);
+	//			}
+	//			else
+	//				strTemp.Format(_T("%c%c%c"),m_271 & 0xFF,m_272>>8,m_272 & 0xFF);
+	//		}
+	//		else
+	//			strTemp.Format(_T("%c%c%c%c"),m_271>>8,m_271 & 0xFF,m_272>>8,m_272 & 0xFF);
+	//	}
+	//	else if(nPIDNO==2)
+	//	{
+	//		int m_273=multi_register_value[273];
+	//		int m_274=multi_register_value[274];
+	//		if(m_273>>8=='0')
+	//		{
+	//			if((m_273 & 0xFF)=='0')
+	//			{
+	//				if(m_274>>8=='0')
+	//					strTemp.Format(_T("%c"),m_274 & 0xFF);
+	//				else
+	//					strTemp.Format(_T("%c%c"),m_274>>8,m_274 & 0xFF);
+	//			}
+	//			else
+	//				strTemp.Format(_T("%c%c%c"),m_273 & 0xFF,m_274>>8,m_274 & 0xFF);
+	//		}		
+	//		else
+	//			strTemp.Format(_T("%c%c%c%c"),m_273>>8,m_273 & 0xFF,m_274>>8,m_274 & 0xFF);
+
+	//	}
+	//}	
+	//return strTemp;
 }
 
 CString get_product_class_name_by_model_ID(int nModelID)

@@ -1,6 +1,9 @@
 #ifndef _GLOBLE_FUNCTION_H
 #define _GLOBLE_FUNCTION_H
 
+
+
+
 #include "global_variable_extern.h"
 
 int read_one(unsigned char device_var,unsigned short address,int retry_times=3);

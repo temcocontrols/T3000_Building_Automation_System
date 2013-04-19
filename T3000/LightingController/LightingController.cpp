@@ -1205,12 +1205,10 @@ void CLightingController::OnLbnSelchangeListInput()
 
 		
 			register_critical_section.Lock();
-			
 			//AfxMessageBox(_T("start read 100 register"));
 		 int 	flg = Read_Multi(g_tstat_id,SerialNum,startaddr,100);
 		//int 	flg = Read_Multi(100,SerialNum,startaddr,100);
 		 register_critical_section.Unlock();
-		
 		 CString st;
 		 st.Format(_T("%d"),flg);
 		// AfxMessageBox(_T("start read 100 register return%d"),flg);

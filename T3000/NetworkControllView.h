@@ -118,7 +118,6 @@ public:
 	vector<subnetwork>_subnetwork;
 	subnetwork m_subetwork;
 	afx_msg void OnBnClickedButton1();
-//	afx_msg void OnBnClickedStatic3();
 };
 
 

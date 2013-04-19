@@ -99,7 +99,7 @@ public:
 	void OnAddBuildingConfig();
 	//void OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult);
 	void Fresh();
-
+	void FreshCtrl();
 	void InitSliderBars();
 	// 这个函数是为了与之前的版本兼容
 	// 使用新的Slider，但是寄存器逻辑使用原来的
