@@ -236,8 +236,6 @@ BOOL CAddBuilding::OnInitDialog()
 	CDialog::OnInitDialog();
 	::InitializeCriticalSection(&g_Lock);
 
-	//GetSerialComm(m_szComm);
-	//GetSerialComPortNumber(m_szComm);
 	GetSerialComPortNumber1(m_szComm);
 	CString strIPTest;
 //	GetIPbyHostName(_T("www.google.com"),strIPTest);

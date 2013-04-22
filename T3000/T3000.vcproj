@@ -254,19 +254,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\EnumSerial.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\EreaseDlg.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\excel9.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\extern_function.cpp"
 				>
 			</File>
 			<File
@@ -601,19 +593,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\EnumSerial.h"
-				>
-			</File>
-			<File
 				RelativePath=".\EreaseDlg.h"
 				>
 			</File>
 			<File
 				RelativePath=".\excel9.h"
-				>
-			</File>
-			<File
-				RelativePath=".\extern_function.h"
 				>
 			</File>
 			<File
