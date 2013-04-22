@@ -4004,7 +4004,7 @@ CString Show_load_file_result_message(load_file_every_step temppp,bool show_mess
 	if(show_message_dialog==true)
 	{
 		if(temppp.seven_step==true)
-			message_box_function(showing_message,_T("Finish"));
+			MessageBox(NULL,showing_message,_T("Finish"));
 		else
 			AfxMessageBox(showing_message);
 	}
