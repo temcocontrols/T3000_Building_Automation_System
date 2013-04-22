@@ -89,7 +89,7 @@ public:
 
 	void Refresh();
 	 void Refresh6();
-	 void Reflesh_new();
+	 void Reflesh_ParameterDlg();
 
 	void InitPID2ComboBox();
 	void  UpdateCoolingandHeatingData();
