@@ -6,11 +6,16 @@
 
 #include "global_variable_extern.h"
 
+int modbus_read_one_value( 
+				int& value, 
+				unsigned char device_var,
+				unsigned short address, 
+				int retry_times );
+
 int read_one(unsigned char device_var,unsigned short address,int retry_times=3);
 int write_one(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times=3);
-int read_one_org(unsigned char device_var,unsigned short address,int retry_times=3);
 int write_one_org(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
 int Read_Multi_org(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times=3);
