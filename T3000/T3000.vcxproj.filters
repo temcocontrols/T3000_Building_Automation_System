@@ -78,16 +78,10 @@
     <ClCompile Include="DialogInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EnumSerial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EreaseDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="excel9.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="extern_function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="fileRW.cpp">

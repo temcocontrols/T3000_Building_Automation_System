@@ -1,5 +1,8 @@
-10:52 2013-4-22
-angree some james requests
+2013-4-22
+1>delete code in MainFrm.cpp which change the Baud rate to 9600  unpredictable .
+2>Modify the code in ParameterDlg.cpp,fix  some of the "Edit" and "ComboBox" don't surpport TSTAT6 7. 
+3>delete useless function in T3000RegAddress.cpp
+4>Open warning in stdafx.h
 16:25 2013/4/12
 Ver 110
 1>>Add HumChamber res files

@@ -23,11 +23,6 @@ AddressMap TSTAT_5EH_LCD_ADDRESS[1000];
 AddressMap TSTAT_5ABCDFG_LED_ADDRESS[1000];
 
 
-//AddressMap1 TSTAT_6_ADDRESS1[1000];
-//AddressMap1 TSTAT_5EH_LCD_ADDRESS1[1000];
-//AddressMap1 TSTAT_5ABCDFG_LED_ADDRESS1[1000];
-
-
 T3000RegAddress::T3000RegAddress(void)
 {
 	memset(m_ini_path_t3000,0,sizeof(m_ini_path_t3000));
@@ -90,46 +85,6 @@ int _P(char *str,int mMdb_Adress_Map)
 
 	return -1;
 }
-
-
-
-//
-//int _G(char *str,int mMdb_Adress_Map)
-//{
-//	if(mMdb_Adress_Map==T3000_5ABCDFG_LED_ADDRESS)
-//	{
-//		for (int i=0;i<sizeof(TSTAT_5ABCDFG_LED_ADDRESS)/sizeof(TSTAT_5ABCDFG_LED_ADDRESS[0]);i++)
-//		{
-//			if(strcmp(TSTAT_5ABCDFG_LED_ADDRESS[i].AddressName,str)==0)
-//			{
-//				return TSTAT_5ABCDFG_LED_ADDRESS[i].AddressValue;
-//			}
-//		}
-//	}
-//	else if(mMdb_Adress_Map==T3000_5EH_LCD_ADDRESS)
-//	{
-//		for (int i=0;i<sizeof(TSTAT_5EH_LCD_ADDRESS)/sizeof(TSTAT_5EH_LCD_ADDRESS[0]);i++)
-//		{
-//			if(strcmp(TSTAT_5EH_LCD_ADDRESS[i].AddressName,str)==0)
-//			{
-//				return TSTAT_5EH_LCD_ADDRESS[i].AddressValue;
-//			}
-//		}
-//	}
-//	else if(mMdb_Adress_Map==T3000_6_ADDRESS)
-//	{
-//		for (int i=0;i<sizeof(TSTAT_6_ADDRESS)/sizeof(TSTAT_6_ADDRESS[0]);i++)
-//		{
-//			if(strcmp(TSTAT_6_ADDRESS[i].AddressName,str)==0)
-//			{
-//				return TSTAT_6_ADDRESS[i].AddressValue;
-//			}
-//		}
-//	}
-//
-//	return -1;
-//}
-
 
 bool T3000RegAddress::MatchMoudleAddress(void)
 {
@@ -195,38 +150,6 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 	return true;
 }
 
-
-
- BOOL DelDirW(CString strSrcPath)
- {
-	 if(!PathIsDirectory(strSrcPath))//源目录是否存在
-		 return false;
-	 CFileFind finder;
-	 // 打开指定的文件夹进行搜索
-	 BOOL bWorking = (BOOL)finder.FindFile(strSrcPath + _T("\\") + _T("*.*"));
-	 while(bWorking)
-	 {
-		 // 从当前目录搜索文件
-		 bWorking = finder.FindNextFile();
-		 CString strFileName = finder.GetFileName();
-		 CString strSrc = strSrcPath + _T("\\") + strFileName;
-
-		 // 判断搜索到的是不是"."和".."目录
-		 if(!finder.IsDots())
-		 {// 判断搜索到的目录是否是文件夹
-			 if(finder.IsDirectory())
-			 { // 如果是文件夹的话，进行递归
-				 DelDirW(strSrc);
-			 }
-			 else
-			 {// 如果是文件，直接删除
-				 DeleteFileW(strSrc);
-			 }
-		 }
-	 }
-	 finder.Close();
-	 return RemoveDirectory(strSrcPath);
- }
 
  bool T3000RegAddress::Change_Register_Table(void)
  {

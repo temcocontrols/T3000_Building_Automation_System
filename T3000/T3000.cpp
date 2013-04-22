@@ -341,7 +341,7 @@ BOOL CT3000App::InitInstance()
 
   	((CMainFrame*)m_pMainWnd)->InitViews();//
 
-   	m_pMainWnd->SetWindowText(_T("T3000 Building Automation System Test version-0.1"));//
+   	m_pMainWnd->SetWindowText(_T("T3000 Building Automation System"));//
   	m_pMainWnd->ShowWindow(SW_SHOW);
   	m_pMainWnd->UpdateWindow();
 

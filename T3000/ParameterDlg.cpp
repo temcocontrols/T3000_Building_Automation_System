@@ -208,7 +208,7 @@ UINT BackparaFreshProc(LPVOID pParam)
 	//else
 	//	pdlg->Refresh();
 
-	pdlg->Reflesh_new();
+	pdlg->Reflesh_ParameterDlg();
 	while(1)
 	{
 		Sleep(15*1000);
@@ -217,7 +217,7 @@ UINT BackparaFreshProc(LPVOID pParam)
 		//	pdlg->Refresh6();
 		//else
 		//	pdlg->Refresh();
-		pdlg->Reflesh_new();
+		pdlg->Reflesh_ParameterDlg();
 	}
 
 	return 0;
@@ -282,7 +282,7 @@ BOOL CParameterDlg::OnInitDialog()
 	////	Refresh6();
 	////else
 	////	Refresh();
-	Reflesh_new();
+	Reflesh_ParameterDlg();
 
 	pProgess->ShowProgress(8,80);
 
@@ -304,8 +304,9 @@ BOOL CParameterDlg::OnInitDialog()
 	else
 		GetDlgItem(IDC_COMBO4)->SetWindowText(_T("2 SP"));
 
-
-
+	CString str;//add by Fance. T5 also support this function
+	str.Format(_T("%d"),product_register_value[MODBUS_VALVE_TRAVEL_TIME]);	//279  243  
+	GetDlgItem(IDC_EDIT_ValueTravelTime)->SetWindowText(str);
 
 	//////////////////////////////////////////////////////////////////////////
 	if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))
@@ -322,8 +323,8 @@ BOOL CParameterDlg::OnInitDialog()
 		/*GetDlgItem(IDC_ECOOLDEADBAND2)->EnableWindow(FALSE);*/GetDlgItem(IDC_ECOOLDEADBAND2)->EnableWindow(TRUE);
 		/*GetDlgItem(IDC_ECOOLINGITERM2)->EnableWindow(FALSE);*/GetDlgItem(IDC_ECOOLINGITERM2)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EAPPLICATION)->EnableWindow(FALSE);
-		/*GetDlgItem(IDC_ENIGNTCOOLING1)->EnableWindow(FALSE);*/GetDlgItem(IDC_ENIGNTCOOLING1)->EnableWindow(TRUE);
-		/*GetDlgItem(IDC_ENIGNTHEATING)->EnableWindow(FALSE);*/GetDlgItem(IDC_ENIGNTHEATING)->EnableWindow(TRUE);
+		GetDlgItem(IDC_ENIGNTCOOLING1)->EnableWindow(FALSE);//GetDlgItem(IDC_ENIGNTCOOLING1)->EnableWindow(TRUE);
+		GetDlgItem(IDC_ENIGNTHEATING)->EnableWindow(FALSE);//GetDlgItem(IDC_ENIGNTHEATING)->EnableWindow(TRUE);
 		
 		
 
@@ -345,9 +346,9 @@ BOOL CParameterDlg::OnInitDialog()
 		GetDlgItem(IDC_EDIT_CSPWN)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT39)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT_ValueTravelTime)->EnableWindow(TRUE);
-		CString str;
+		/*CString str;
 		str.Format(_T("%d"),newtstat6[243]);
-		GetDlgItem(IDC_EDIT_ValueTravelTime)->SetWindowText(str);
+		GetDlgItem(IDC_EDIT_ValueTravelTime)->SetWindowText(str);*/	//Fance comments  TSTAT 5 also support this function ,so recode it
 
 
 	}
@@ -382,7 +383,7 @@ BOOL CParameterDlg::OnInitDialog()
 		GetDlgItem(IDC_EAPPLICATION)->EnableWindow(TRUE);
 		GetDlgItem(IDC_ENIGNTCOOLING1)->EnableWindow(TRUE);
 		GetDlgItem(IDC_ENIGNTHEATING)->EnableWindow(TRUE);
-		GetDlgItem(IDC_EDIT_ValueTravelTime)->EnableWindow(FALSE);
+		/*GetDlgItem(IDC_EDIT_ValueTravelTime)->EnableWindow(FALSE);*/
 		
 	
 	}
@@ -523,7 +524,7 @@ void CParameterDlg::OnBnClickedRefreshbutton()
 	////	Refresh();
 
 
-	Reflesh_new();
+	Reflesh_ParameterDlg();
 
 }
 
@@ -1581,7 +1582,7 @@ void CParameterDlg::OnEnKillfocusDefSetpointEdt()
 	//	Refresh6();
 	//else
 	//	Refresh();//Annul by Fance 
-	Reflesh_new();
+	Reflesh_ParameterDlg();
 	
 }
 
@@ -1839,7 +1840,7 @@ void CParameterDlg::OnCbnSelchangeInputselect1()
 		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
 	product_register_value[MODBUS_TEMP_SELECT] = m_InputSelect1.GetCurSel()+1;
 	g_bPauseMultiRead = FALSE;
-	Reflesh_new();
+	Reflesh_ParameterDlg();
 }
 //Annul by Fance 20130411
 //void CParameterDlg::OnCbnSelchangeInputselect1()
@@ -1861,7 +1862,7 @@ void CParameterDlg::OnCbnSelchangeInputselect1()
 //	//	Refresh6();
 //	//else
 //	//	Refresh();
-//	Reflesh_new();
+//	Reflesh_ParameterDlg();
 //}
 
 //void CParameterDlg::OnCbnSelchangeInputselect2()
@@ -1884,7 +1885,7 @@ void CParameterDlg::OnCbnSelchangeInputselect1()
 //	//	Refresh6();
 //	//else
 //	//	Refresh();
-//	Reflesh_new();
+//	Reflesh_ParameterDlg();
 //}
 
 
@@ -1903,7 +1904,7 @@ void CParameterDlg::OnCbnSelchangeInputselect2()
 		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
 	product_register_value[MODBUS_INPUT1_SELECT] =nSel;	//T5=241  T6=383
 	g_bPauseMultiRead = FALSE;
-	Reflesh_new();
+	Reflesh_ParameterDlg();
 }
 
 
@@ -2038,17 +2039,17 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
 		{
 			if (g_unint)
 			{
-				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
+				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10);
 				m_nightheating.SetWindowText(strText);
 
-				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
+				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10);//183
 				m_nightcooling.SetWindowText(strText);
 			}else
 			{
-				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
+				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10);
 				m_nightheating.SetWindowText(strText);
 
-				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
+				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10);//183
 				m_nightcooling.SetWindowText(strText);
 			}
 
@@ -2057,17 +2058,17 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
 		{
 			if (g_unint)
 			{		
-				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]);//123
+				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10);//123
 				m_nightheating.SetWindowText(strText);
 
-				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]);//124
+				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10);//124
 				m_nightcooling.SetWindowText(strText);
 			}else
 			{
-				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);//182
+				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10);//182
 				m_nightheating.SetWindowText(strText);
 
-				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
+				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10);//183
 				m_nightcooling.SetWindowText(strText);
 
 			}
@@ -2191,10 +2192,24 @@ void CParameterDlg::OnEnKillfocusOutput1()
 	CString strText;
 	m_pid_outputEdt1.GetWindowText(strText);
 	int nValue=_wtoi(strText);		
-	g_bPauseMultiRead = TRUE;	
-	write_one(g_tstat_id, 104,nValue);
+	
+	if(product_register_value[MODBUS_COOLING_PID]==nValue)	//Add this to judge weather this value need to change.
+		return;
+	g_bPauseMultiRead = TRUE;
+	//write_one(g_tstat_id, 104,nValue);	recode by Fance ,this code not support T6 T7;
+	if(write_one(g_tstat_id, MODBUS_COOLING_PID,nValue)<0)		//when t5 MODBUS_COOLING_PID=104  ,when t6 t7 MODBUS_COOLING_PID=384	
+	{
+		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+		strText.Format(_T("%d"),product_register_value[MODBUS_COOLING_PID]);		//104 384
+		m_pid_outputEdt1.SetWindowText(strText);//if wrote fail, resume the last data.
+	}
+	else
+		product_register_value[MODBUS_COOLING_PID] = nValue;
 	g_bPauseMultiRead = FALSE;
 }
+
+
+
 
 void CParameterDlg::OnEnKillfocusOutput2()
 {
@@ -2204,54 +2219,111 @@ void CParameterDlg::OnEnKillfocusOutput2()
 
 	CString strText;
 	m_pid_outputEdt2.GetWindowText(strText);
-	int nValue=_wtoi(strText);	
-	
-	g_bPauseMultiRead = TRUE;	
-	write_one(g_tstat_id, 270,nValue);
-	
+	int nValue=_wtoi(strText);		
+
+	if(product_register_value[MODBUS_PID_UNIVERSAL]==nValue)	//Add this to judge weather this value need to change.
+		return;
+	g_bPauseMultiRead = TRUE;
+	//write_one(g_tstat_id, 270,nValue);	recode by Fance ,this code not support T6 T7;
+	if(write_one(g_tstat_id, MODBUS_PID_UNIVERSAL,nValue)<0)		//when t5 MODBUS_PID_UNIVERSAL=270  ,when t6 t7 MODBUS_PID_UNIVERSAL=389	
+	{
+		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+		strText.Format(_T("%d"),product_register_value[MODBUS_PID_UNIVERSAL]);		//270 389
+		m_pid_outputEdt2.SetWindowText(strText);//if wrote fail, resume the last data.
+	}
+	else
+		product_register_value[MODBUS_PID_UNIVERSAL] = nValue;
 	g_bPauseMultiRead = FALSE;
 }
 
+
+
+
 void CParameterDlg::OnEnKillfocusEcoolingpterm1()
 {
-	
+
 	if(g_ParamLevel==1)
 		return;
 
 	CString strText;
 	m_pternEdt1.GetWindowText(strText);
-	float ftemp =(float) _wtof(strText);		
-	g_bPauseMultiRead = TRUE;	
-	write_one(g_tstat_id,114 , short(ftemp*10));
+	int nValue=(int)( _wtof(strText) * 10);	
+
+
+	if(product_register_value[MODBUS_COOLING_PTERM]==nValue)	//Add this to judge weather this value need to change.
+		return;
+	g_bPauseMultiRead = TRUE;
+	//write_one(g_tstat_id, 114,nValue);	recode by Fance ,this code not support T6 T7;
+	if(write_one(g_tstat_id, MODBUS_COOLING_PTERM,nValue)<0)		//when t5 MODBUS_COOLING_PTERM=114  ,when t6 t7 MODBUS_COOLING_PTERM=385	
+	{
+		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+		strText.Format(_T("%d"),product_register_value[MODBUS_COOLING_PTERM]);		//114 385
+		m_pternEdt1.SetWindowText(strText);//if wrote fail, resume the last data.
+	}
+	else
+		product_register_value[MODBUS_COOLING_PTERM] = nValue;
 	g_bPauseMultiRead = FALSE;
 }
 
+
 void CParameterDlg::OnEnKillfocusEcoolingpterm2()
 {
+
 	if(g_ParamLevel==1)
 		return;
 
 	CString strText;
 	m_ptermEdt2.GetWindowText(strText);
-	float ftemp = (float)_wtof(strText);
-			g_bPauseMultiRead = TRUE;	
-	write_one(g_tstat_id, 244, short(ftemp*10));
+	int nValue=(int)( _wtof(strText) * 10);	
+
+
+	if(product_register_value[MODBUS_UNIVERSAL_PTERM]==nValue)	//Add this to judge weather this value need to change.
+		return;
+	g_bPauseMultiRead = TRUE;
+	//write_one(g_tstat_id, 244,nValue);	recode by Fance ,this code not support T6 T7;
+	if(write_one(g_tstat_id, MODBUS_UNIVERSAL_PTERM,nValue)<0)		//when t5 MODBUS_UNIVERSAL_PTERM=244  ,when t6 t7 MODBUS_UNIVERSAL_PTERM=387	
+	{
+		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+		strText.Format(_T("%d"),product_register_value[MODBUS_UNIVERSAL_PTERM]);		//244 387
+		m_ptermEdt2.SetWindowText(strText);//if wrote fail, resume the last data.
+	}
+	else
+		product_register_value[MODBUS_UNIVERSAL_PTERM] = nValue;
 	g_bPauseMultiRead = FALSE;
 }
 
+
+
+
+
 void CParameterDlg::OnEnKillfocusEdit26()
 {
+
 	if(g_ParamLevel==1)
 		return;
 
 	CString strText;
 	m_coolingPitemEdt1.GetWindowText(strText);
-	float ftemp = (float)_wtof(strText);
-			g_bPauseMultiRead = TRUE;
-//int ret=write_one(g_tstat_id, 115, short(ftemp*10));	
- int ret=write_one(g_tstat_id,MODBUS_COOLING_ITERM, short(ftemp*10));	
+	int nValue=(int)( _wtof(strText) * 10);	
+
+
+	if(product_register_value[MODBUS_COOLING_ITERM]==nValue)	//Add this to judge weather this value need to change.
+		return;
+	g_bPauseMultiRead = TRUE;
+	//write_one(g_tstat_id, 115,nValue);	recode by Fance ,this code not support T6 T7;
+	if(write_one(g_tstat_id, MODBUS_COOLING_ITERM,nValue)<0)		//when t5 MODBUS_COOLING_ITERM=115  ,when t6 t7 MODBUS_COOLING_ITERM=386	
+	{
+		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+		strText.Format(_T("%d"),product_register_value[MODBUS_COOLING_ITERM]);		//115  386
+		m_coolingPitemEdt1.SetWindowText(strText);//if wrote fail, resume the last data.
+	}
+	else
+		product_register_value[MODBUS_COOLING_ITERM] = nValue;
 	g_bPauseMultiRead = FALSE;
 }
+
+
+
 
 void CParameterDlg::OnEnKillfocusEdit27()
 {
@@ -2260,10 +2332,21 @@ void CParameterDlg::OnEnKillfocusEdit27()
 
 	CString strText;
 	m_pidPitemEdt2.GetWindowText(strText);
-	float ftemp = (float)_wtof(strText);
-			g_bPauseMultiRead = TRUE;
-	//int ret=write_one(g_tstat_id, 245, short(ftemp*10));
-	 int ret=write_one(g_tstat_id, MODBUS_UNIVERSAL_ITERM, short(ftemp*10));	//245  388
+	int nValue=(int)( _wtof(strText) * 10);	
+
+
+	if(product_register_value[MODBUS_UNIVERSAL_ITERM]==nValue)	//Add this to judge weather this value need to change.
+		return;
+	g_bPauseMultiRead = TRUE;
+	//write_one(g_tstat_id, 245,nValue);	recode by Fance ,this code not support T6 T7;
+	if(write_one(g_tstat_id, MODBUS_UNIVERSAL_ITERM,nValue)<0)		//when t5 MODBUS_UNIVERSAL_ITERM=245  ,when t6 t7 MODBUS_UNIVERSAL_ITERM=388	
+	{
+		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+		strText.Format(_T("%d"),product_register_value[MODBUS_UNIVERSAL_ITERM]);		//245  388
+		m_pidPitemEdt2.SetWindowText(strText);//if wrote fail, resume the last data.
+	}
+	else
+		product_register_value[MODBUS_UNIVERSAL_ITERM] = nValue;
 	g_bPauseMultiRead = FALSE;
 }
 
@@ -2306,28 +2389,33 @@ void CParameterDlg::OnEnKillfocusSpset1()
 		if ((product_register_value[7] == PM_TSTAT7)||(product_register_value[7]==PM_TSTAT6))
 		{
 			if(product_register_value[MODBUS_DAY_SETPOINT]==short(nOrig*10))
+			{
+				g_bPauseMultiRead = FALSE;
 				return;
+			}
 			if(write_one(g_tstat_id, MODBUS_DAY_SETPOINT, short(nOrig*10))<0)
 			{
 				MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 				CString strTemp;
 				strTemp.Format(_T("%.1f"),product_register_value[MODBUS_DAY_SETPOINT]/10.0);//345	set point 
 				m_dayOccEdt1.SetWindowText(strTemp);
+				g_bPauseMultiRead = FALSE;
 				return;
 			}
 			product_register_value[MODBUS_DAY_SETPOINT] = short(nOrig*10);
 		}
 		else if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E)
 		{
-			int nRet = write_one(g_tstat_id, 135, short(nOrig));
+			int nRet = write_one(g_tstat_id, 135, short(nOrig));	//Fance comments: because the version which below 34.9 is too low ,135 register I Don't know it's real meaning. 
 		}
 		else 
 		{
-			write_one(g_tstat_id, 374,short(fValue*10+0.5));
+			//write_one(g_tstat_id, 374,short(fValue*10+0.5));//374
+			write_one(g_tstat_id, MODBUS_TWO_BYTE_SETPOINT,short(fValue*10+0.5));	//Changed by Fance
 		}
 	}
 	g_bPauseMultiRead = FALSE;
-	Reflesh_new();
+	Reflesh_ParameterDlg();
 }
 
 
@@ -2372,7 +2460,7 @@ void CParameterDlg::OnEnKillfocusEsetpointhi()
 		product_register_value[MODBUS_MAX_SETPOINT] = nValue;
 	}
 	g_bPauseMultiRead = FALSE; //Modify by Fance support T6 T7
-	Reflesh_new();
+	Reflesh_ParameterDlg();
 }
 
 void CParameterDlg::OnEnKillfocusEsetpointlo()
@@ -2402,7 +2490,7 @@ void CParameterDlg::OnEnKillfocusEsetpointlo()
 	//	Refresh6();
 	//else
 	//	Refresh();
-	Reflesh_new();
+	Reflesh_ParameterDlg();
 }
 
 void CParameterDlg::OnEnKillfocusEcooldeadband1()
@@ -2459,6 +2547,9 @@ void CParameterDlg::OnEnKillfocusEcooldeadband1()
 
 }
 
+
+
+
 void CParameterDlg::OnEnKillfocusEcooldeadband2()
 {
 	if(g_ParamLevel==1)
@@ -2466,11 +2557,41 @@ void CParameterDlg::OnEnKillfocusEcooldeadband2()
 
 	CString strText;
 	m_setptCCDEdt2.GetWindowText(strText);
-	float nValue= (float)_wtof(strText);
-			g_bPauseMultiRead = TRUE;	
-	write_one(g_tstat_id, 243,(int)(nValue*10));g_bPauseMultiRead = FALSE;
+	int nValue=(int)( _wtof(strText) * 10);	
 
+
+	if(product_register_value[MODBUS_UNIVERSAL_DB_LO]==nValue)	//Add this to judge weather this value need to change.
+		return;
+	g_bPauseMultiRead = TRUE;
+	//write_one(g_tstat_id, 243,nValue);	recode by Fance ,this code not support T6 T7;
+	if(write_one(g_tstat_id, MODBUS_UNIVERSAL_DB_LO,nValue)<0)		//when t5 MODBUS_UNIVERSAL_DB_LO=243  ,when t6 t7 MODBUS_UNIVERSAL_DB_LO=361	
+	{
+		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+		strText.Format(_T("%d"),product_register_value[MODBUS_UNIVERSAL_DB_LO]);		//243   361
+		m_setptCCDEdt2.SetWindowText(strText);//if wrote fail, resume the last data.
+	}
+	else
+		product_register_value[MODBUS_UNIVERSAL_DB_LO] = nValue;
+	g_bPauseMultiRead = FALSE;
 }
+
+
+
+//
+//void CParameterDlg::OnEnKillfocusEcooldeadband2()
+//{
+//	if(g_ParamLevel==1)
+//		return;
+//
+//	CString strText;
+//	m_setptCCDEdt2.GetWindowText(strText);
+//	float nValue= (float)_wtof(strText);
+//			g_bPauseMultiRead = TRUE;	
+//	write_one(g_tstat_id, 243,(int)(nValue*10));g_bPauseMultiRead = FALSE;
+//
+//
+//	MODBUS_UNIVERSAL_DB_LO
+//}
 
 void CParameterDlg::OnEnKillfocusEcoolingiterm1()
 {
@@ -2520,6 +2641,10 @@ void CParameterDlg::OnEnKillfocusEcoolingiterm1()
 
 }
 
+
+
+
+
 void CParameterDlg::OnEnKillfocusEcoolingiterm2()
 {
 	if(g_ParamLevel==1)
@@ -2527,10 +2652,39 @@ void CParameterDlg::OnEnKillfocusEcoolingiterm2()
 
 	CString strText;
 	m_HeadDEdt2.GetWindowText(strText);
-	float nValue= (float)_wtof(strText);
-			g_bPauseMultiRead = TRUE;	
-	write_one(g_tstat_id, 242,(int)(nValue*10));g_bPauseMultiRead = FALSE;
+	int nValue=(int)( _wtof(strText) * 10);	
+
+
+	if(product_register_value[MODBUS_UNIVERSAL_DB_HI]==nValue)	//Add this to judge weather this value need to change.
+		return;
+	g_bPauseMultiRead = TRUE;
+	//write_one(g_tstat_id, 242,nValue);	recode by Fance ,this code not support T6 T7;
+	if(write_one(g_tstat_id, MODBUS_UNIVERSAL_DB_HI,nValue)<0)		//when t5 MODBUS_UNIVERSAL_DB_HI=242  ,when t6 t7 MODBUS_UNIVERSAL_DB_HI=360	
+	{
+		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+		strText.Format(_T("%d"),product_register_value[MODBUS_UNIVERSAL_DB_HI]);		//242   360
+		m_HeadDEdt2.SetWindowText(strText);//if wrote fail, resume the last data.
+	}
+	else
+		product_register_value[MODBUS_UNIVERSAL_DB_HI] = nValue;
+	g_bPauseMultiRead = FALSE;
 }
+
+
+//void CParameterDlg::OnEnKillfocusEcoolingiterm2()
+//{
+//	if(g_ParamLevel==1)
+//		return;
+//
+//	CString strText;
+//	m_HeadDEdt2.GetWindowText(strText);
+//	float nValue= (float)_wtof(strText);
+//			g_bPauseMultiRead = TRUE;	
+//	write_one(g_tstat_id, 242,(int)(nValue*10));g_bPauseMultiRead = FALSE;
+//}
+
+
+
 
 void CParameterDlg::OnBnClickedInputsbutton()
 {
@@ -2545,7 +2699,7 @@ void CParameterDlg::OnBnClickedInputsbutton()
 	//	Refresh6();
 	//else
 	//	Refresh();
-	Reflesh_new();
+	Reflesh_ParameterDlg();
 
 //	pMain->m_pFreshMultiRegisters->ResumeThread();//tstat6
 	pMain->m_pRefreshThread->ResumeThread();
@@ -2562,7 +2716,7 @@ void CParameterDlg::OnBnClickedOutputsbutton()
 	//	Refresh6();
 	//else
 	//	Refresh();
-	Reflesh_new();//Recode by Fance
+	Reflesh_ParameterDlg();//Recode by Fance
 }
 
 void CParameterDlg::OnBnClickedOutputstablebutton()
@@ -2579,7 +2733,7 @@ void CParameterDlg::OnBnClickedOutputstablebutton()
 	//	Refresh6();
 	//else
 	//	Refresh();
-	Reflesh_new();
+	Reflesh_ParameterDlg();
 }
 void CParameterDlg::OnEnKillfocusEnigntheating()
 {
@@ -2679,7 +2833,7 @@ void CParameterDlg::OnCbnSelchangeOccupiedmodecombo()
 		m_defSetPointEdit.EnableWindow(TRUE);
 	}	
 	g_bPauseMultiRead = FALSE;
-	Reflesh_new();
+	Reflesh_ParameterDlg();
 }
 
 //Annul by Fance ,this code not support T5T6
@@ -2705,7 +2859,7 @@ void CParameterDlg::OnCbnSelchangeOccupiedmodecombo()
 //	//	Refresh6();
 //	//else
 //	//	Refresh();
-//	Reflesh_new();
+//	Reflesh_ParameterDlg();
 //}
 
 
@@ -3030,7 +3184,7 @@ void CParameterDlg::OnEnKillfocusEdit38()
 
 
 //Add by Fance ,use this function to replace the  Reflash() and Reflash6();
-void CParameterDlg::Reflesh_new()
+void CParameterDlg::Reflesh_ParameterDlg()
 {
 	CString strTemp;
 	strTemp.Format(_T("%d"),g_tstat_id);
@@ -3369,10 +3523,10 @@ void CParameterDlg::Reflesh_new()
 			{
 				m_application_ctrl.SetCurSel(product_register_value[125]); 
 			}
-
+			UpdateCoolingandHeatingData();
 			if(product_type!=3)
 			{
-				UpdateCoolingandHeatingData();
+				//UpdateCoolingandHeatingData();
 				int index = 0;
 				index = m_application_ctrl.GetCurSel();
 				switch(index)
@@ -3389,7 +3543,7 @@ void CParameterDlg::Reflesh_new()
 			}
 			else
 			{
-				UpdateCoolingandHeatingData();
+				//UpdateCoolingandHeatingData();
 			}
 
 			strTemp.Empty();
