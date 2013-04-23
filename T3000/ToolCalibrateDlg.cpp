@@ -64,7 +64,7 @@ BOOL CToolCalibrateDlg::OnInitDialog()
 	CString m_strSubNetName= pFrame->m_strCurSubBuldingName;
 //	m_strScanSubNetNameCobox.AddString(_T("All subNets..."));
 	int k=0;
-	for(int i=0;i<pFrame->m_subNetLst.size();i++)
+	for(int i=0;i<(int)pFrame->m_subNetLst.size();i++)
 	{
 		if(m_strSubNetName.CompareNoCase(pFrame->m_subNetLst.at(i).strBuildingName)==0)
 			k=i;

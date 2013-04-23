@@ -806,7 +806,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 	//nMaskIP=inet_addr(pAdapterInfo.IpAddressList.IpMask.String);
 	//UINT nBroadCastIP;
 	//nBroadCastIP=(~nMaskIP)|nLocalIP;
-	char* chBroadCast;
+//	char* chBroadCast;
 	//in_addr in;
 	//in.S_un.S_addr=nBroadCastIP;
 	//chBroadCast=inet_ntoa(in);
@@ -2655,10 +2655,10 @@ void CTStatScanner::ScanOldNC(BYTE devLo, BYTE devHi)
 				// IP
 				nRet=read_multi2(a,&SerialNum[0],107,4,true);
 				IN_ADDR ia;
-				ia.S_un.S_un_b.s_b1 = SerialNum[0];
-				ia.S_un.S_un_b.s_b2 = SerialNum[1];
-				ia.S_un.S_un_b.s_b3 = SerialNum[2];
-				ia.S_un.S_un_b.s_b4 = SerialNum[3];
+				ia.S_un.S_un_b.s_b1 = (UCHAR)SerialNum[0];
+				ia.S_un.S_un_b.s_b2 = (UCHAR)SerialNum[1];
+				ia.S_un.S_un_b.s_b3 = (UCHAR)SerialNum[2];
+				ia.S_un.S_un_b.s_b4 = (UCHAR)SerialNum[3];
 				pNet->SetIPAddr(ia.S_un.S_addr);
 
 				// port
@@ -2953,7 +2953,7 @@ void  CTStatScanner::AddNodeToTable(_NetDeviceInfo* pNCInfo, unsigned short* pNo
 	int nAddress = pNode[1];
 	long nSerialNo = pNode[2]+pNode[3]*256+pNode[4]*256*256+pNode[5]*256*256*256;
 
-	float fSWVersion = pNode[6] + pNode[7]*256;
+	float fSWVersion =(float) (pNode[6] + pNode[7]*256);
 	int nProductType = pNode[9];
 	int nHWVersion = pNode[10];
 
@@ -3002,7 +3002,7 @@ void  CTStatScanner::AddNodeToTable(_NetDeviceInfo* pNCInfo, unsigned short* pNo
 	pDev->m_pDev->SetSerialID(nSerialNo);
 	pDev->m_pDev->SetDevID(nAddress);
 	pDev->m_pDev->SetSoftwareVersion(fSWVersion);
-	pDev->m_pDev->SetHardwareVersion(nHWVersion);
+	pDev->m_pDev->SetHardwareVersion(float(nHWVersion));
 	pDev->m_pDev->SetProductType(nProductType);
 	pDev->m_pDev->SetComPort(nSubnet);
 

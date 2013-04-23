@@ -1266,7 +1266,7 @@ void  CNetworkControllView::AddNodeToNCTable(unsigned short* pNode)
 	int nAddress = pNode[1];
 	long nSerialNo = pNode[2]+pNode[3]*256+pNode[4]*256*256+pNode[5]*256*256*256;
 	
-	float fSWVersion = pNode[6] + pNode[7]*256;
+	float fSWVersion =float( pNode[6] + pNode[7]*256);
 	int nProductType = pNode[9];
 	
 	int nStatus = pNode[17];

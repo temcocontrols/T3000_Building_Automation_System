@@ -1884,6 +1884,45 @@ void CAddBuilding::OnBnClickedAddbuiding()
 		strCOMPortBraud=_T("19200");
 	}
 
+	//----------------------Add by Fance 2013 04 23-------------------------------------------------------
+	//judge whether the building name you added is exist
+	//if not exist we need to add this building in table Building_ALL in t3000.mdb
+	//and then we can insert this building into table Building.if not ,it will crash when insert data into Building
+	//Because the table Building is associated with  Building_ALL 
+	strSql.Format(_T("Select * from Building_ALL"));
+	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+	_variant_t temp_variant_name;
+	bool findMainBuilding=false;
+	while(VARIANT_FALSE==m_pRs->EndOfFile)	
+	{
+		temp_variant_name = m_pRs->GetCollect(_T("Building_Name"));
+		CString cs_temp=temp_variant_name;
+
+		if(cs_temp.CompareNoCase(strMainBuildName)!=0)
+		{
+			findMainBuilding=false;
+			m_pRs->MoveNext();
+		}
+		else
+		{
+			findMainBuilding=true;
+			break;
+		}
+	}
+
+	if(m_pRs->State)
+		m_pRs->Close();
+
+
+	if(!findMainBuilding)
+	{
+		strSql.Format(_T("insert into Building_ALL (Building_Name,Telephone,Address) values('"+strMainBuildName+"','"+ _T("") +"','"+_T("") +"')"));
+		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	}
+	//---------------------------------------------------------------------------------------------
+
+
+
 	try
 	{
 	BOOL bDefault =FALSE;

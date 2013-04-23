@@ -124,7 +124,7 @@ void CGraphicView::OnPaint()
 			graphics.DrawImage(&bitmap,XStart,YStart,bitmap.GetWidth(),bitmap.GetHeight());
 
 	}
-	for(int i=0;i<m_RelayLabelLst.size();i++)
+	for(int i=0;i<(int)m_RelayLabelLst.size();i++)
 	{
 		if(i==m_nFoucsIndext&& !m_LbtDown)
 		{
@@ -264,7 +264,7 @@ void CGraphicView::OnMouseMove(UINT nFlags, CPoint point)
 }
 int CGraphicView::HitTestEx(CPoint & point)
 {
-	for(int i=0;i<m_RelayLabelLst.size();i++)
+	for(int i=0;i<(int)m_RelayLabelLst.size();i++)
 	{
 		CRect rcItem;
 		m_RelayLabelLst.at(i).plabelCtrl->GetWindowRect(&rcItem);
@@ -448,7 +448,7 @@ void CGraphicView::ClearAllLabels()
 {
 	if(g_GraphicModelevel==1)
 		return;
-	for(int i=0;i<m_RelayLabelLst.size();i++)
+	for(int i=0;i<(int)m_RelayLabelLst.size();i++)
 	{
 		if(m_RelayLabelLst.at(i).plabelCtrl!=NULL&&m_RelayLabelLst.at(i).plabelCtrl->m_hWnd!=NULL)
 		{
@@ -610,7 +610,7 @@ void CGraphicView::saveLabelInfo(int nItem)
 		return;
 	if(nItem<0)
 		return;
-	if(nItem>=m_RelayLabelLst.size())
+	if(nItem>=(int)m_RelayLabelLst.size())
 		return;
 	m_pCon.CreateInstance(_T("ADODB.Connection"));
 	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);

@@ -304,7 +304,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 
 	// TODO:  在此添加额外的初始化	
 	CString str;
-	description2 temp_description;
+//	description2 temp_description;
 //	Annual_Routines temp;
 	for(unsigned char i=1;i<=16;i++)
 	{//////////////////////////////////////////////////get information from network
@@ -368,7 +368,7 @@ void AnnualRout_InsertDia::set_day_state(CString month_day)///////////////attent
 
 bool AnnualRout_InsertDia::the_holiday_is_exist(CString var1)
 {//return value ,true is exist ,false is no exist
-	for(int i=0;i<holiday_list.size();i++)
+	for(int i=0;i<(int)holiday_list.size();i++)
 		if(var1==holiday_list.at(i))
 			return true;
     return false;
@@ -445,7 +445,7 @@ void AnnualRout_InsertDia::OnBnClickedButton2()
 	the_days[day_number/8]=the_days[day_number/8] ^ l;
 	unsigned char ttt[ONE_YEAR_BETYS];
 	for(int i=0;i<ONE_YEAR_BETYS;i++)
-		ttt[i]=the_days[i];
+		ttt[i]=(unsigned char)the_days[i];
 	Write_Multi(g_tstat_id,ttt,MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 	NET_WORK_SLEEP_BETWEEN_WRITE_READ
 	load();
@@ -520,7 +520,7 @@ void AnnualRout_InsertDia::OnAnnualroutAdd()
 	the_days[day_number/8]=the_days[day_number/8] ^ l;//异或。
 	unsigned char ttt[ONE_YEAR_BETYS];
 	for(int i=0;i<ONE_YEAR_BETYS;i++)
-		ttt[i]=the_days[i];
+		ttt[i]=(unsigned char)the_days[i];
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
 		Write_Multi(254,ttt,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 	else

@@ -1385,7 +1385,7 @@ void COutPutDlg::FreshGrid_PID2()
 	m_FlexGrid2.put_ColAlignment(1,4);
 	//*****************************888、
 	int totalrows,row;
-	unsigned short tstatval,pos,nValue;
+	unsigned short tstatval,pos;
 
 	if(m_nmoduleType == 3)//5d
 		m_FlexGrid2.put_Rows(8);
@@ -2379,7 +2379,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 				return;
 			m_ItemValueCombx.GetLBText(nItem,strNewText);
 			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-			OnWrite(m_bflexgrid1_or_2,lCol,lRow);	
+			OnWrite(MKBOOL(m_bflexgrid1_or_2),lCol,lRow);	
 
 		}
 		else//grid 2
@@ -2397,7 +2397,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 				return;
 			m_ItemValueCombx.GetLBText(nItem,strNewText);
 			m_FlexGrid2.put_TextMatrix(lRow,lCol,strNewText);
-			OnWrite(m_bflexgrid1_or_2,lCol,lRow);
+			OnWrite(MKBOOL(m_bflexgrid1_or_2),lCol,lRow);
 
 
 
@@ -2406,7 +2406,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 		//float are realized in onwrite:
 
 		BYTE nreg;
-		BYTE ntemp;
+//		BYTE ntemp;
 		if(lRow==4 && m_bOut4PWM&&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
 		{
 			int CoastCol=m_PID1_heat_stages+6;
@@ -2427,7 +2427,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 				nPos = nCol - (m_PID1_heat_stages+1);
 
 			//nreg=read_one(tstat_id,341+nPos);
-			nreg=multi_register_value[375+nPos];
+			nreg=(BYTE)multi_register_value[375+nPos];
 			nreg=nreg&0x0f;
 			nValue=nValue<<4;
 			nValue=nreg|nValue;
@@ -2452,7 +2452,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 			else
 				nPos = nCol - (m_PID1_heat_stages+1);
 			//	nreg=read_one(tstat_id,341+nPos);
-			nreg=multi_register_value[375+nPos];
+			nreg=(BYTE)multi_register_value[375+nPos];
 			nreg=nreg&0xf0;
 			nValue=nreg|nValue;
 
@@ -2547,7 +2547,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 			return;
 		m_ItemValueCombx.GetLBText(nItem,strNewText);
 		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-		OnWrite(m_bflexgrid1_or_2,lCol,lRow);	
+		OnWrite(MKBOOL(m_bflexgrid1_or_2),lCol,lRow);	
 	
 	}
 	else//grid 2
@@ -2565,7 +2565,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 
 
 		BYTE nreg;
-		BYTE ntemp;
+//		BYTE ntemp;
 		if(lRow==4 && m_bOut4PWM&&lCol>=6)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
 		{
 			int CoastCol=m_PID2_heat_stages+6;
@@ -2586,7 +2586,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 				nPos = nCol - (m_PID2_heat_stages+1);
 
 			//nreg=read_one(tstat_id,341+nPos);
-			nreg=multi_register_value[341+nPos];
+			nreg=(BYTE)multi_register_value[341+nPos];
 			nreg=nreg&0x0f;
 			nValue=nValue<<4;
 			nValue=nreg|nValue;
@@ -2612,7 +2612,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 			else
 				nPos = nCol - (m_PID2_heat_stages+1);
 			//	nreg=read_one(tstat_id,341+nPos);
-			nreg=multi_register_value[341+nPos];
+			nreg=(BYTE)multi_register_value[341+nPos];
 			nreg=nreg&0xf0;
 			nValue=nreg|nValue;
 
@@ -2641,7 +2641,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 			return;
 		m_ItemValueCombx.GetLBText(nItem,strNewText);
 		m_FlexGrid2.put_TextMatrix(lRow,lCol,strNewText); //2.5.0.94
-		OnWrite(m_bflexgrid1_or_2,lCol,lRow);//2.5.0.94
+		OnWrite(MKBOOL(m_bflexgrid1_or_2),lCol,lRow);//2.5.0.94
 
 
 
@@ -2651,7 +2651,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 	//float are realized in onwrite:
 
 		BYTE nreg;
-		BYTE ntemp;
+//		BYTE ntemp;
 		if(lRow==4 && m_bOut4PWM&&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
 		{
 			int CoastCol=m_PID1_heat_stages+6;
@@ -2672,7 +2672,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 				nPos = nCol - (m_PID1_heat_stages+1);
 
 			//nreg=read_one(tstat_id,341+nPos);
-			nreg=multi_register_value[341+nPos];
+			nreg=(BYTE)multi_register_value[341+nPos];
 			nreg=nreg&0x0f;
 			nValue=nValue<<4;
 			nValue=nreg|nValue;
@@ -2697,7 +2697,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 			else
 				nPos = nCol - (m_PID1_heat_stages+1);
 		//	nreg=read_one(tstat_id,341+nPos);
-			nreg=multi_register_value[341+nPos];
+			nreg=(BYTE)multi_register_value[341+nPos];
 			nreg=nreg&0xf0;
 			nValue=nreg|nValue;
 
@@ -3188,11 +3188,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 					//if (newtstat6[7] == 6)
 					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
 					{
-						tstatval=newtstat6[334+pos];
+						tstatval=(unsigned char)newtstat6[334+pos];
 					}
 					else
 					{
-						tstatval=multi_register_value[351+pos];
+						tstatval=(unsigned char)multi_register_value[351+pos];
 					}
 				}
 				else
@@ -3200,11 +3200,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 					//if (newtstat6[7] == 6)
 					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
 					{
-						tstatval=newtstat6[323+pos];
+						tstatval=(unsigned char)newtstat6[323+pos];
 					}
 					else
 					{
-						tstatval=multi_register_value[173+pos];
+						tstatval=(unsigned char)multi_register_value[173+pos];
 					}
 				}
 				// 				tstatval=multi_register_value[351+pos];
@@ -3687,11 +3687,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 					//if (newtstat6[7] == 6)
 					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
 					{
-						tstatval=newtstat6[334+pos];
+						tstatval=(unsigned char)newtstat6[334+pos];
 					}
 					else
 					{
-						tstatval=multi_register_value[351+pos];
+						tstatval=(unsigned char)multi_register_value[351+pos];
 					}
 				}
 				else
@@ -3699,11 +3699,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 					//if (newtstat6[7] == 6)
 					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
 					{
-						tstatval=newtstat6[323+pos];
+						tstatval=(unsigned char)newtstat6[323+pos];
 					}
 					else
 					{
-						tstatval=multi_register_value[173+pos];
+						tstatval=(unsigned char)multi_register_value[173+pos];
 					}
 				}
 				// 				tstatval=multi_register_value[351+pos];
@@ -3973,7 +3973,7 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 			return;
 		m_ItemValueCombx.GetLBText(nItem,strNewText);
 		m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
-		OnWrite(m_bflexgrid1_or_2,lCol,lRow);	
+		OnWrite(MKBOOL(m_bflexgrid1_or_2),lCol,lRow);	
 	
 	}
 	else//grid 2
@@ -3991,7 +3991,7 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 			return;
 		m_ItemValueCombx.GetLBText(nItem,strNewText);
 		m_FlexGrid2.put_TextMatrix(lRow,lCol,strNewText);
-		OnWrite(m_bflexgrid1_or_2,lCol,lRow);
+		OnWrite(MKBOOL(m_bflexgrid1_or_2),lCol,lRow);
 
 
 
@@ -4000,7 +4000,7 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 	//float are realized in onwrite:
 	
 		BYTE nreg;
-		BYTE ntemp;
+//		BYTE ntemp;
 		if(lRow==4 && m_bOut4PWM&&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
 		{
 			int CoastCol=m_PID1_heat_stages+6;
@@ -4020,7 +4020,7 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 				nPos = nCol - (m_PID1_heat_stages+1);
 
 			//nreg=read_one(tstat_id,341+nPos);
-			nreg=multi_register_value[341+nPos];//341TSTAT6找不到对应
+			nreg=(BYTE)multi_register_value[341+nPos];//341TSTAT6找不到对应
 			nreg=nreg&0x0f;
 			nValue=nValue<<4;
 			nValue=nreg|nValue;
@@ -4046,7 +4046,7 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 			else
 				nPos = nCol - (m_PID1_heat_stages+1);
 		//	nreg=read_one(tstat_id,341+nPos);
-			nreg=multi_register_value[341+nPos];
+			nreg=(BYTE)multi_register_value[341+nPos];
 			nreg=nreg&0xf0;
 			nValue=nreg|nValue;
 
@@ -5631,7 +5631,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 
 
 	int totalrows,row;
-	unsigned short tstatval,pos,nValue;
+	unsigned short tstatval,pos;
 
 	if(m_nmoduleType == 3)//5d
 		m_FlexGrid2.put_Rows(8);

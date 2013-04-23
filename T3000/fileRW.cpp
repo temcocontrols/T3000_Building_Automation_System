@@ -3646,7 +3646,7 @@ void save_schedule_2_file(TCHAR* fn,int schedule_id)
 		default_file.WriteString(_T("Model : NC \n"));
 		int nVersionLo = Read_One(g_tstat_id, 4);
 		int	nVersionHi = Read_One(g_tstat_id, 5);
-		int firmwareVersion = float(nVersionHi) + float(nVersionLo/100.0);
+		int firmwareVersion =int(float(nVersionHi) + float(nVersionLo/100.0));
 		CString strFirmware;
 		strFirmware.Format(_T("%0.2f"), firmwareVersion);
 		default_file.WriteString(_T("version : ")+strFirmware+_T("\n"));

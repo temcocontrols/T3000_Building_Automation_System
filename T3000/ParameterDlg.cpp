@@ -1543,7 +1543,7 @@ void CParameterDlg::OnEnKillfocusStincreaedit()	//recode by Fance,for support T6
 	m_setpointIncreasement.GetWindowText(strTemp);
 	if(strTemp.IsEmpty())
 		return;	
-	int nvalue = _wtof(strTemp) *10;
+	int nvalue = (int)(_wtof(strTemp) *10);
 	if(nvalue>10)
 	{
 	  MessageBox(_T("Please Input the value between 0 - 1 "),_T("Warning"),MB_OK | MB_ICONINFORMATION);

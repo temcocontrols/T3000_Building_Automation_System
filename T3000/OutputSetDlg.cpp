@@ -165,7 +165,7 @@ BOOL COutputSetDlg::OnInitDialog()
 	hIcon_Exit = AfxGetApp()->LoadIcon(IDI_ICON_EXIT);
 	((CButton *)GetDlgItem(ID_EXIT))->SetIcon(hIcon_Exit);
 
-	m_version=get_curtstat_version();
+	m_version=(int)get_curtstat_version();
 	Fresh_Grid();
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -2722,7 +2722,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 				//	int nTempValue = newtstat6[254];		//Marked by Fance 2013 04 11
 					int nTempValue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];  //T5=310  //T6=254
 					DWORD dwFlag = 0x01;
-					bool bRowAuto = nTempValue & (dwFlag << (lRow-1));
+					bool bRowAuto =MKBOOL(nTempValue & (dwFlag << (lRow-1)));
 
 					if(!bRowAuto)	 // A/M，如选择Auto，不动，否则看Range
 						m_OutValueCmbox.ShowWindow(SW_HIDE);	
@@ -3050,7 +3050,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 			{
 				int nTempValue = multi_register_value[310];
 				DWORD dwFlag = 0x01;
-				bool bRowAuto = nTempValue & (dwFlag << (lRow-1));
+				bool bRowAuto =MKBOOL(nTempValue & (dwFlag << (lRow-1)));
 				
 				if(!bRowAuto)	 // A/M，如选择Auto，不动，否则看Range
 					m_OutValueCmbox.ShowWindow(SW_HIDE);	

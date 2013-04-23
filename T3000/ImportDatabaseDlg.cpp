@@ -140,7 +140,7 @@ struct _IONameNodes
 
 };
 
-extern struct Label_information;
+//extern struct Label_information;	//warning C4091: 'extern ' : ignored on left of 'Label_information' when no variable is declared
 
 IMPLEMENT_DYNAMIC(CImportDatabaseDlg, CDialog)
 

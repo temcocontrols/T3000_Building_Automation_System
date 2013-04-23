@@ -72,7 +72,7 @@ description2 Annual_Routines::read_addr(unsigned char addr2)
 	p=(char *)&temp_description;///////////////*****pointer   attention
 	for(i=0;i<AR_DESCRIPTION_SIZE;i++)
 	{
-		(*p)=temp_buffer[i];
+		(*p)=(char)temp_buffer[i];
 		p++;
 	}
 	return temp_description;

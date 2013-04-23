@@ -160,7 +160,7 @@
 		UINT nSerial=0;
 		UINT nSerialNumber=0;
 		pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-		for(iitemp=0;iitemp<pDlg->m_grid_flash.size();iitemp++)
+		for(iitemp=0;iitemp<(int)pDlg->m_grid_flash.size();iitemp++)
 		{
 			int nTempID;
 			int nID=-1;
@@ -312,7 +312,7 @@
 		 
 		
 		m_grid_flash.clear();
-		for(int i=0;i<pFrame->m_product.size();i++)
+		for(int i=0;i<(int)pFrame->m_product.size();i++)
 		{
 			int j=pFrame->m_product.at(i).product_id;
 			grid_flash temp_grid_flash;
@@ -323,7 +323,7 @@
 			temp_grid_flash.serialnumber =pFrame->m_product.at(i).serial_number ;
 			//serialnumber			
 			temp_grid_flash.flash_or_no=true;
-			temp_grid_flash.hardware_revisin=pFrame->m_product.at(i).hardware_version;
+			temp_grid_flash.hardware_revisin=(short)pFrame->m_product.at(i).hardware_version;
 			//read_one(j ,8); ;
 			temp_grid_flash.device=pFrame->m_product.at(i).product_class_id ;
 			temp_grid_flash.software_version=pFrame->m_product.at(i).software_version;
@@ -345,7 +345,7 @@
 		CString stemp;
 		m_FlexGrid.put_Rows(m_grid_flash.size()+2);
 		
-		for(int i=0;i<m_grid_flash.size();i++)
+		for(int i=0;i<(int)m_grid_flash.size();i++)
 		{
 				stemp.Format(_T("%ld"),m_grid_flash.at(i).serialnumber);
 				m_FlexGrid.put_TextMatrix(i+1,1,stemp);//serialnumber
@@ -401,7 +401,7 @@
 				{
 					CFileStatus   st;
 					CStdioFile fileLog(strLogFile,CFile::modeReadWrite | CFile::modeNoTruncate|CFile::typeText);
-					TCHAR pbuf[50];
+//					TCHAR pbuf[50];
 					CString strLine;
 					CString strLastLine;
 					fileLog.GetStatus(st);
@@ -467,7 +467,7 @@
 		m_hexFilePathNameEdit.SetWindowText(m_strHexFile);
 		if(m_AllCheckBtn.GetCheck()==BST_CHECKED)
 		{
-			for(int i=0;i<m_grid_flash.size();i++)
+			for(int i=0;i<(int)m_grid_flash.size();i++)
 				m_FlexGrid.put_TextMatrix(i+1,8,m_strHexFile);
 		}
 	}
@@ -476,12 +476,12 @@
 	{	
 		if(m_AllCheckBtn.GetCheck()==BST_CHECKED)
 		{
-			for(int i=0;i<m_grid_flash.size();i++)
+			for(int i=0;i<(int)m_grid_flash.size();i++)
 				m_FlexGrid.put_TextMatrix(i+1,8,m_strHexFile);
 		}
 		if(m_AllCheckBtn.GetCheck()==BST_UNCHECKED)
 		{
-			for(int i=0;i<m_grid_flash.size();i++)
+			for(int i=0;i<(int)m_grid_flash.size();i++)
 				m_FlexGrid.put_TextMatrix(i+1,8,_T(""));
 		}
 	}
@@ -492,7 +492,7 @@
 		int iitemp;
 		m_bFinished=FALSE;
 		GetDlgItem(IDC_FLASHBUTTON)->EnableWindow(FALSE);
-		for(iitemp=0;iitemp<m_grid_flash.size();iitemp++)
+		for(iitemp=0;iitemp<(int)m_grid_flash.size();iitemp++)
 		{//get the grid value
 			m_grid_flash.at(iitemp).hardware_revisin = _wtoi(m_FlexGrid.get_TextMatrix(iitemp+1,4));//hardware rev
 			CString str_temp=m_FlexGrid.get_TextMatrix(iitemp+1,5);//software version ;;;;;product model
@@ -781,7 +781,7 @@
 		int baudrate=19200; 
 		////Model查询 From Products
 
-		for(iitemp=0;iitemp<pDlg->m_grid_flash.size();iitemp++) 
+		for(iitemp=0;iitemp<(int)pDlg->m_grid_flash.size();iitemp++) 
 //从第一个开始 到最后一个 
 		{
 	//-------------FOR Begin------------------------//
@@ -1088,7 +1088,7 @@
 						int ddd=m_get_data_from_file.GetLength();
 						int i=0;
 						for(i=1;i<ddd;i++)//get a line
-							a[i-1]=m_get_data_from_file.GetAt(i);
+							a[i-1]=(char)m_get_data_from_file.GetAt(i);
 						if(strlen(a)%2==0)//偶数位置
 							turn_hex_file_line_to_unsigned_char(a);//turn every char to int 
 						else

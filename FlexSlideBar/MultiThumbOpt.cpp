@@ -497,7 +497,7 @@ int CMultiThumbOpt::GetThumbPosition()
 
 void CMultiThumbOpt::SetThumbPosition(int nIndex, int nPosition)
 {	
-	if (nPosition >= m_szTicMarks->size())   // 超过刻度那么裁减掉
+	if (nPosition >= (int)m_szTicMarks->size())   // 超过刻度那么裁减掉
 	{
 		nPosition = m_szTicMarks->size()-1;
 	}

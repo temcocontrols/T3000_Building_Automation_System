@@ -582,7 +582,7 @@ int CT3000App::GetSoftInstallDays()
 	//timeSpan=curTime-fileStatus.m_ctime;
 	timeSpan=curTime-fileStatus.m_mtime;//这个是修改时间，不论你CUT，COPY都不会修改的
 
-	return timeSpan.GetDays();
+	return (int)timeSpan.GetDays();
 }
 
 void CT3000App::WriteNumber( CRegKey& key,CStringW valueName,DWORD value )

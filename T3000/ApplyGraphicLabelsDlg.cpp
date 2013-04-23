@@ -61,7 +61,7 @@ void ApplyGraphicLabelsDlg::OnSelectAll()
 void ApplyGraphicLabelsDlg::SetLabelLst(vector<Label_information>* pLabelLst)
 {
 	m_labelList.clear();
-	for(int i=0;i<pLabelLst->size();i++)
+	for(int i=0;i<(int)pLabelLst->size();i++)
 	{
 		m_labelList.push_back(pLabelLst->at(i));
 	}
@@ -326,7 +326,7 @@ void ApplyGraphicLabelsDlg::ApplyTo()
 				AfxMessageBox(e->ErrorMessage());
 			}
 			int nContyrolID=20000;
-			for(int i=0;i<m_labelList.size();i++)
+			for(int i=0;i<(int)m_labelList.size();i++)
 			{
 				/*
 	int cstatic_id;//the id of the CStatic control button

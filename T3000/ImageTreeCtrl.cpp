@@ -371,7 +371,7 @@ BOOL CImageTreeCtrl::is_connection_by_image(int nImage,int nSelectedImage)
 	}
 
 //tree0412
-
+	return false;
 }
 int CImageTreeCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {

@@ -293,11 +293,11 @@ void CBuildTable1::to_fresh()
 
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
-		refresh_rule(m_nMin/10.0,m_nMax/10.0);
+		refresh_rule((float)(m_nMin/10.0),(float)(m_nMax/10.0));
 	}
 	else
 	{
-		refresh_rule(m_nMin,m_nMax);
+		refresh_rule((float)m_nMin,(float)m_nMax);
 	}
 	
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
@@ -553,51 +553,51 @@ void CBuildTable1::to_fresh()
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION) 
 	{
 		int npos=m_slider1_ctrl.GetPos();
-		float fvalue=(m_nMax+m_nMin-npos)/10.0;//IDC_EDIT1
+		float fvalue=(float)((m_nMax+m_nMin-npos)/10.0);//IDC_EDIT1
 		CString strtext;
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT1)->SetWindowText(strtext);
 
-		fvalue=m_slider2_i/10.0;//IDC_EDIT1
+		fvalue=(float)(m_slider2_i/10.0);//IDC_EDIT1
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT8)->SetWindowText(strtext);
 
-		fvalue=m_slider3_i/10.0;//IDC_EDIT1
+		fvalue=(float)(m_slider3_i/10.0);//IDC_EDIT1
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT9)->SetWindowText(strtext);
 
 
-		fvalue=m_slider4_i/10.0;//IDC_EDIT1
+		fvalue=(float)(m_slider4_i/10.0);//IDC_EDIT1
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT13)->SetWindowText(strtext);
 
-		fvalue=m_slider5_i/10.0;//IDC_EDIT1
+		fvalue=(float)(m_slider5_i/10.0);//IDC_EDIT1
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT14)->SetWindowText(strtext);
 
-		fvalue=m_slider6_i/10.0;//IDC_EDIT1
+		fvalue=(float)(m_slider6_i/10.0);//IDC_EDIT1
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT15)->SetWindowText(strtext);
 
-		fvalue=m_slider7_i/10.0;//IDC_EDIT1
+		fvalue=(float)(m_slider7_i/10.0);//IDC_EDIT1
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT16)->SetWindowText(strtext);
 
 
-		fvalue=m_slider8_i/10.0;//IDC_EDIT1
+		fvalue=(float)(m_slider8_i/10.0);//IDC_EDIT1
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT17)->SetWindowText(strtext);
 
-		fvalue=m_slider9_i/10.0;//IDC_EDIT1
+		fvalue=(float)(m_slider9_i/10.0);//IDC_EDIT1
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT18)->SetWindowText(strtext);
 
-		fvalue=m_slider10_i/10.0;//IDC_EDIT1
+		fvalue=(float)(m_slider10_i/10.0);//IDC_EDIT1
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT19)->SetWindowText(strtext);
 
 
-		fvalue=m_slider11_i/10.0;//IDC_EDIT1
+		fvalue=(float)(m_slider11_i/10.0);//IDC_EDIT1
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT20)->SetWindowText(strtext);
 	}
@@ -683,7 +683,7 @@ void CBuildTable1::OnNMCustomdrawSlider1(NMHDR *pNMHDR, LRESULT *pResult)
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider1_ctrl.GetPos();
-		float fvalue=(m_nMax+m_nMin-npos)/10.0;//IDC_EDIT1
+		float fvalue=(float)((m_nMax+m_nMin-npos)/10.0);//IDC_EDIT1
 		CString strtext;
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT1)->SetWindowText(strtext);
@@ -728,7 +728,7 @@ void CBuildTable1::OnNMCustomdrawSlider2(NMHDR *pNMHDR, LRESULT *pResult)
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider2_ctrl.GetPos();
-		float fvalue=(m_nMax+m_nMin-npos)/10.0;
+		float fvalue=(float)((m_nMax+m_nMin-npos)/10.0);
 		CString strtext;
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT8)->SetWindowText(strtext);
@@ -774,7 +774,7 @@ void CBuildTable1::OnNMCustomdrawSlider3(NMHDR *pNMHDR, LRESULT *pResult)
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider3_ctrl.GetPos();
-		float fvalue=(m_nMax+m_nMin-npos)/10.0;
+		float fvalue=(float)((m_nMax+m_nMin-npos)/10.0);
 		CString strtext;
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT9)->SetWindowText(strtext);
@@ -821,7 +821,7 @@ void CBuildTable1::OnNMCustomdrawSlider4(NMHDR *pNMHDR, LRESULT *pResult)
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider4_ctrl.GetPos();
-		float fvalue=(m_nMax+m_nMin-npos)/10.0;
+		float fvalue=(float)((m_nMax+m_nMin-npos)/10.0);
 		CString strtext;
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT13)->SetWindowText(strtext);
@@ -866,7 +866,7 @@ void CBuildTable1::OnNMCustomdrawSlider5(NMHDR *pNMHDR, LRESULT *pResult)
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider5_ctrl.GetPos();
-		float fvalue=(m_nMax+m_nMin-npos)/10.0;
+		float fvalue=(float)((m_nMax+m_nMin-npos)/10.0);
 		CString strtext;
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT14)->SetWindowText(strtext);
@@ -912,7 +912,7 @@ void CBuildTable1::OnNMCustomdrawSlider6(NMHDR *pNMHDR, LRESULT *pResult)
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider6_ctrl.GetPos();
-		float fvalue=(m_nMax+m_nMin-npos)/10.0;
+		float fvalue=(float)((m_nMax+m_nMin-npos)/10.0);
 		CString strtext;
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT15)->SetWindowText(strtext);
@@ -958,7 +958,7 @@ void CBuildTable1::OnNMCustomdrawSlider7(NMHDR *pNMHDR, LRESULT *pResult)
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider7_ctrl.GetPos();
-		float fvalue=(m_nMax+m_nMin-npos)/10.0;
+		float fvalue=(float)((m_nMax+m_nMin-npos)/10.0);
 		CString strtext;
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT16)->SetWindowText(strtext);
@@ -1006,7 +1006,7 @@ void CBuildTable1::OnNMCustomdrawSlider8(NMHDR *pNMHDR, LRESULT *pResult)
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider8_ctrl.GetPos();
-		float fvalue=(m_nMax+m_nMin-npos)/10.0;
+		float fvalue=(float)((m_nMax+m_nMin-npos)/10.0);
 		CString strtext;
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT17)->SetWindowText(strtext);
@@ -1053,7 +1053,7 @@ void CBuildTable1::OnNMCustomdrawSlider9(NMHDR *pNMHDR, LRESULT *pResult)
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider9_ctrl.GetPos();
-		float fvalue=(m_nMax+m_nMin-npos)/10.0;
+		float fvalue=(float)((m_nMax+m_nMin-npos)/10.0);
 		CString strtext;
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT18)->SetWindowText(strtext);
@@ -1099,7 +1099,7 @@ void CBuildTable1::OnNMCustomdrawSlider10(NMHDR *pNMHDR, LRESULT *pResult)
 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider10_ctrl.GetPos();
-		float fvalue=(m_nMax+m_nMin-npos)/10.0;
+		float fvalue=(float)((m_nMax+m_nMin-npos)/10.0);
 		CString strtext;
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT19)->SetWindowText(strtext);
@@ -1145,7 +1145,7 @@ void CBuildTable1::OnNMCustomdrawSlider11(NMHDR *pNMHDR, LRESULT *pResult)
 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	{
 		int npos=m_slider11_ctrl.GetPos();
-		float fvalue=(m_nMax+m_nMin-npos)/10.0;
+		float fvalue=(float)((m_nMax+m_nMin-npos)/10.0);
 		CString strtext;
 		strtext.Format(_T("%.1f"),fvalue);
 		GetDlgItem(IDC_EDIT20)->SetWindowText(strtext);
@@ -1614,11 +1614,11 @@ void CBuildTable1::OnEnKillfocusEdit1()
 		float ftemp;
 		CString strtxt;
 		GetDlgItem(IDC_EDIT1)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 		strtxt.Format(_T("%.1f"),ftemp);
 		GetDlgItem(IDC_EDIT1)->SetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider1_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider1_i=(int)(ftemp*10);
 	}
 	else
 	{
@@ -1650,12 +1650,12 @@ if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 	float ftemp;
 	CString strtxt;
 	GetDlgItem(IDC_EDIT8)->GetWindowText(strtxt);
-	ftemp=_wtof(strtxt);
+	ftemp=(float)_wtof(strtxt);
 
 	strtxt.Format(_T("%.1f"),ftemp);
 	GetDlgItem(IDC_EDIT8)->SetWindowText(strtxt);
-	ftemp=_wtof(strtxt);
-	m_slider2_i=ftemp*10;
+	ftemp=(float)_wtof(strtxt);
+	m_slider2_i=(int)(ftemp*10);
 }
 else
 {
@@ -1730,12 +1730,12 @@ void CBuildTable1::OnEnKillfocusEdit9()
 		float ftemp;
 		CString strtxt;
 		GetDlgItem(IDC_EDIT9)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 
 		strtxt.Format(_T("%.1f"),ftemp);
 		GetDlgItem(IDC_EDIT9)->SetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider3_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider3_i=(int)(ftemp*10);
 	}
 	else
 	{
@@ -1772,12 +1772,12 @@ void CBuildTable1::OnEnKillfocusEdit13()
 		float ftemp;
 		CString strtxt;
 		GetDlgItem(IDC_EDIT13)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 
 		strtxt.Format(_T("%.1f"),ftemp);
 		GetDlgItem(IDC_EDIT13)->SetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider4_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider4_i=(int)(ftemp*10);
 	}
 	else
 	{
@@ -1810,12 +1810,12 @@ void CBuildTable1::OnEnKillfocusEdit14()
 		float ftemp;
 		CString strtxt;
 		GetDlgItem(IDC_EDIT14)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 
 		strtxt.Format(_T("%.1f"),ftemp);
 		GetDlgItem(IDC_EDIT14)->SetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider5_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider5_i=(int)(ftemp*10);
 	}
 	else
 	{
@@ -1867,12 +1867,12 @@ void CBuildTable1::OnEnKillfocusEdit15()
 		float ftemp;
 		CString strtxt;
 		GetDlgItem(IDC_EDIT15)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 
 		strtxt.Format(_T("%.1f"),ftemp);
 		GetDlgItem(IDC_EDIT15)->SetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider6_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider6_i=(int)(ftemp*10);
 
 	}
 	else
@@ -1927,12 +1927,12 @@ void CBuildTable1::OnEnKillfocusEdit16()
 		float ftemp;
 		CString strtxt;
 		GetDlgItem(IDC_EDIT16)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 
 		strtxt.Format(_T("%.1f"),ftemp);
 		GetDlgItem(IDC_EDIT16)->SetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider7_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider7_i=(int)(ftemp*10);
 	}
 	else
 	{
@@ -1986,12 +1986,12 @@ void CBuildTable1::OnEnKillfocusEdit17()
 		float ftemp;
 		CString strtxt;
 		GetDlgItem(IDC_EDIT17)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 
 		strtxt.Format(_T("%.1f"),ftemp);
 		GetDlgItem(IDC_EDIT17)->SetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider8_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider8_i=(int)(ftemp*10);
 	}
 	else
 	{
@@ -2045,12 +2045,12 @@ void CBuildTable1::OnEnKillfocusEdit18()
 		float ftemp;
 		CString strtxt;
 		GetDlgItem(IDC_EDIT18)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 
 		strtxt.Format(_T("%.1f"),ftemp);
 		GetDlgItem(IDC_EDIT18)->SetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider9_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider9_i=(int)(ftemp*10);
 	}
 	else
 	{
@@ -2103,12 +2103,12 @@ void CBuildTable1::OnEnKillfocusEdit19()
 		float ftemp;
 		CString strtxt;
 		GetDlgItem(IDC_EDIT19)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 
 		strtxt.Format(_T("%.1f"),ftemp);
 		GetDlgItem(IDC_EDIT19)->SetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider10_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider10_i=(int)(ftemp*10);
 
 	}
 	else
@@ -2163,12 +2163,12 @@ void CBuildTable1::OnEnKillfocusEdit20()
 		float ftemp;
 		CString strtxt;
 		GetDlgItem(IDC_EDIT20)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 
 		strtxt.Format(_T("%.1f"),ftemp);
 		GetDlgItem(IDC_EDIT20)->SetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider11_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider11_i=(int)(ftemp*10);
 	}
 	else
 	{
@@ -2380,13 +2380,13 @@ void CBuildTable1::refresh()
 	{
 		m_max.Format(_T("%.1f"),m_nMax/10.0);
 		m_min.Format(_T("%.1f"),m_nMin/10.0);
-		refresh_rule(m_nMin/10.0,m_nMax/10.0);
+		refresh_rule((float)(m_nMin/10.0),(float)(m_nMax/10.0));
 	}
 	else
 	{
 		m_max.Format(_T("%d"),m_nMax);
 		m_min.Format(_T("%d"),m_nMin);
-		refresh_rule(m_nMin,m_nMax);
+		refresh_rule((float)m_nMin,(float)m_nMax);
 	}
 
 
@@ -2509,7 +2509,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 	{
 		CString strtxt;
 		GetDlgItem(IDC_EDIT1)->GetWindowText(strtxt);
-		float ftemp=_wtof(strtxt);
+		float ftemp=(float)_wtof(strtxt);
 		int ntemp=(int)(ftemp*10);
 		short high=ntemp/65536;
 		short low=ntemp%65536;
@@ -2517,7 +2517,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 		write_one(g_tstat_id, MODBUS_TABLE1_ZERO_HI,high);
 
 		GetDlgItem(IDC_EDIT8)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 		ntemp=(int)(ftemp*10);
 		high=ntemp/65536;
 		low=ntemp%65536;
@@ -2525,7 +2525,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 		write_one(g_tstat_id, MODBUS_TABLE1_HALFONE_HI,high);
 		//3
 		GetDlgItem(IDC_EDIT9)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 		ntemp=(int)(ftemp*10);
 		high=ntemp/65536;
 		low=ntemp%65536;
@@ -2533,7 +2533,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 		write_one(g_tstat_id, MODBUS_TABLE1_ONE_HI,high);
 		//4
 		GetDlgItem(IDC_EDIT13)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 		ntemp=(int)(ftemp*10);
 		high=ntemp/65536;
 		low=ntemp%65536;
@@ -2541,7 +2541,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 		write_one(g_tstat_id, MODBUS_TABLE1_HALFTWO_HI,high);
 		//5
 		GetDlgItem(IDC_EDIT14)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 		ntemp=(int)(ftemp*10);
 		high=ntemp/65536;
 		low=ntemp%65536;
@@ -2549,7 +2549,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 		write_one(g_tstat_id, MODBUS_TABLE1_TWO_HI,high);
 		//6
 		GetDlgItem(IDC_EDIT15)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 		ntemp=(int)(ftemp*10);
 		high=ntemp/65536;
 		low=ntemp%65536;
@@ -2557,7 +2557,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 		write_one(g_tstat_id, MODBUS_TABLE1_HALFTHREE_HI,high);
 		//7
 		GetDlgItem(IDC_EDIT16)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 		ntemp=(int)(ftemp*10);
 		high=ntemp/65536;
 		low=ntemp%65536;
@@ -2565,7 +2565,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 		write_one(g_tstat_id, MODBUS_TABLE1_THREE_HI,high);
 		//8
 		GetDlgItem(IDC_EDIT17)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 		ntemp=(int)(ftemp*10);
 		high=ntemp/65536;
 		low=ntemp%65536;
@@ -2573,7 +2573,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 		write_one(g_tstat_id, MODBUS_TABLE1_HALFFOUR_HI,high);
 		//9
 		GetDlgItem(IDC_EDIT18)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 		ntemp=(int)(ftemp*10);
 		high=ntemp/65536;
 		low=ntemp%65536;
@@ -2581,7 +2581,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 		write_one(g_tstat_id, MODBUS_TABLE1_FOUR_HI,high);
 		//10
 		GetDlgItem(IDC_EDIT19)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 		ntemp=(int)(ftemp*10);
 		high=ntemp/65536;
 		low=ntemp%65536;
@@ -2589,7 +2589,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 		write_one(g_tstat_id, MODBUS_TABLE1_HALFFIVE_HI,high);
 		//11
 		GetDlgItem(IDC_EDIT20)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
+		ftemp=(float)_wtof(strtxt);
 		ntemp=(int)(ftemp*10);
 		high=ntemp/65536;
 		low=ntemp%65536;
@@ -2633,7 +2633,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 		{
 			CString strtxt;
 			GetDlgItem(IDC_EDIT1)->GetWindowText(strtxt);
-			float ftemp=_wtof(strtxt);
+			float ftemp=(float)_wtof(strtxt);
 			int ntemp=(int)(ftemp*10);
 			short high=ntemp/65536;
 			short low=ntemp%65536;
@@ -2641,7 +2641,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 			write_one(g_tstat_id, MODBUS_TABLE2_ZERO_HI,high);
 
 			GetDlgItem(IDC_EDIT8)->GetWindowText(strtxt);
-			ftemp=_wtof(strtxt);
+			ftemp=(float)_wtof(strtxt);
 			ntemp=(int)(ftemp*10);
 			high=ntemp/65536;
 			low=ntemp%65536;
@@ -2649,7 +2649,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 			write_one(g_tstat_id, MODBUS_TABLE2_HALFONE_HI,high);
 			//3
 			GetDlgItem(IDC_EDIT9)->GetWindowText(strtxt);
-			ftemp=_wtof(strtxt);
+			ftemp=(float)_wtof(strtxt);
 			ntemp=(int)(ftemp*10);
 			high=ntemp/65536;
 			low=ntemp%65536;
@@ -2657,7 +2657,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 			write_one(g_tstat_id, MODBUS_TABLE2_ONE_HI,high);
 			//4
 			GetDlgItem(IDC_EDIT13)->GetWindowText(strtxt);
-			ftemp=_wtof(strtxt);
+			ftemp=(float)_wtof(strtxt);
 			ntemp=(int)(ftemp*10);
 			high=ntemp/65536;
 			low=ntemp%65536;
@@ -2665,7 +2665,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 			write_one(g_tstat_id, MODBUS_TABLE2_HALFTWO_HI,high);
 			//5
 			GetDlgItem(IDC_EDIT14)->GetWindowText(strtxt);
-			ftemp=_wtof(strtxt);
+			ftemp=(float)_wtof(strtxt);
 			ntemp=(int)(ftemp*10);
 			high=ntemp/65536;
 			low=ntemp%65536;
@@ -2673,7 +2673,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 			write_one(g_tstat_id, MODBUS_TABLE2_TWO_HI,high);
 			//6
 			GetDlgItem(IDC_EDIT15)->GetWindowText(strtxt);
-			ftemp=_wtof(strtxt);
+			ftemp=(float)_wtof(strtxt);
 			ntemp=(int)(ftemp*10);
 			high=ntemp/65536;
 			low=ntemp%65536;
@@ -2681,7 +2681,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 			write_one(g_tstat_id, MODBUS_TABLE2_HALFTHREE_HI,high);
 			//7
 			GetDlgItem(IDC_EDIT16)->GetWindowText(strtxt);
-			ftemp=_wtof(strtxt);
+			ftemp=(float)_wtof(strtxt);
 			ntemp=(int)(ftemp*10);
 			high=ntemp/65536;
 			low=ntemp%65536;
@@ -2689,7 +2689,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 			write_one(g_tstat_id, MODBUS_TABLE2_THREE_HI,high);
 			//8
 			GetDlgItem(IDC_EDIT17)->GetWindowText(strtxt);
-			ftemp=_wtof(strtxt);
+			ftemp=(float)_wtof(strtxt);
 			ntemp=(int)(ftemp*10);
 			high=ntemp/65536;
 			low=ntemp%65536;
@@ -2697,7 +2697,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 			write_one(g_tstat_id, MODBUS_TABLE2_HALFFOUR_HI,high);
 			//9
 			GetDlgItem(IDC_EDIT18)->GetWindowText(strtxt);
-			ftemp=_wtof(strtxt);
+			ftemp=(float)_wtof(strtxt);
 			ntemp=(int)(ftemp*10);
 			high=ntemp/65536;
 			low=ntemp%65536;
@@ -2705,7 +2705,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 			write_one(g_tstat_id, MODBUS_TABLE2_FOUR_HI,high);
 			//10
 			GetDlgItem(IDC_EDIT19)->GetWindowText(strtxt);
-			ftemp=_wtof(strtxt);
+			ftemp=(float)_wtof(strtxt);
 			ntemp=(int)(ftemp*10);
 			high=ntemp/65536;
 			low=ntemp%65536;
@@ -2713,7 +2713,7 @@ void CBuildTable1::SaveInfoDataToRegister()
 			write_one(g_tstat_id, MODBUS_TABLE2_HALFFIVE_HI,high);
 			//11
 			GetDlgItem(IDC_EDIT20)->GetWindowText(strtxt);
-			ftemp=_wtof(strtxt);
+			ftemp=(float)_wtof(strtxt);
 			ntemp=(int)(ftemp*10);
 			high=ntemp/65536;
 			low=ntemp%65536;
@@ -2764,48 +2764,48 @@ BOOL CBuildTable1::CheckDataisRight()
 	{
 		CString strtxt;
 		GetDlgItem(IDC_EDIT1)->GetWindowText(strtxt);
-		float ftemp=_wtof(strtxt);
-		m_slider1_i=ftemp*10;
+		float ftemp=(float)_wtof(strtxt);
+		m_slider1_i=(int)(ftemp*10);
 
 		GetDlgItem(IDC_EDIT8)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider2_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider2_i=(int)(ftemp*10);
 
 		GetDlgItem(IDC_EDIT9)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider3_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider3_i=(int)(ftemp*10);
 
 		GetDlgItem(IDC_EDIT13)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider4_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider4_i=(int)(ftemp*10);
 
 		GetDlgItem(IDC_EDIT14)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider5_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider5_i=(int)(ftemp*10);
 
 		GetDlgItem(IDC_EDIT15)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider6_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider6_i=(int)(ftemp*10);
 
 		GetDlgItem(IDC_EDIT16)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider7_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider7_i=(int)(ftemp*10);
 
 		GetDlgItem(IDC_EDIT17)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider8_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider8_i=(int)(ftemp*10);
 
 		GetDlgItem(IDC_EDIT18)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider9_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider9_i=(int)(ftemp*10);
 
 		GetDlgItem(IDC_EDIT19)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider10_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider10_i=(int)(ftemp*10);
 
 		GetDlgItem(IDC_EDIT20)->GetWindowText(strtxt);
-		ftemp=_wtof(strtxt);
-		m_slider11_i=ftemp*10;
+		ftemp=(float)_wtof(strtxt);
+		m_slider11_i=(int)(ftemp*10);
 
 	}
 	else
@@ -2883,7 +2883,7 @@ void CBuildTable1::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 			CurPos= m_slider1_ctrl.GetPos();
 		//	m_slider1_i=m_nMax+m_nMin-CurPos;
-			fvalue=(m_nMax+m_nMin-CurPos)/10.0;
+			fvalue=(float)((m_nMax+m_nMin-CurPos)/10.0);
 			CString strtext;
 			strtext.Format(_T("%.1f"),fvalue);
 			GetDlgItem(IDC_EDIT1)->SetWindowText(strtext);
@@ -2893,7 +2893,7 @@ void CBuildTable1::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 			CurPos= m_slider2_ctrl.GetPos();
 
 		//	m_slider2_i=m_nMax+m_nMin-CurPos;
-			fvalue=(m_nMax+m_nMin-CurPos)/10.0;
+			fvalue=(float)((m_nMax+m_nMin-CurPos)/10.0);
 			CString strtext;
 			strtext.Format(_T("%.1f"),fvalue);
 			GetDlgItem(IDC_EDIT8)->SetWindowText(strtext);
@@ -2903,7 +2903,7 @@ void CBuildTable1::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 			CurPos= m_slider3_ctrl.GetPos();
 
 		//	m_slider3_i==m_nMax+m_nMin-CurPos;
-			fvalue=(m_nMax+m_nMin-CurPos)/10.0;
+			fvalue=(float)((m_nMax+m_nMin-CurPos)/10.0);
 			CString strtext;
 			strtext.Format(_T("%.1f"),fvalue);
 			GetDlgItem(IDC_EDIT9)->SetWindowText(strtext);
@@ -2914,7 +2914,7 @@ void CBuildTable1::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		{
 			CurPos= m_slider4_ctrl.GetPos();
 		//	m_slider4_i==m_nMax+m_nMin-CurPos;
-			fvalue=(m_nMax+m_nMin-CurPos)/10.0;
+			fvalue=(float)((m_nMax+m_nMin-CurPos)/10.0);
 			CString strtext;
 			strtext.Format(_T("%.1f"),fvalue);
 			GetDlgItem(IDC_EDIT13)->SetWindowText(strtext);
@@ -2926,73 +2926,73 @@ void CBuildTable1::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 			CurPos= m_slider5_ctrl.GetPos();
 		//	m_slider5_i==m_nMax+m_nMin-CurPos;
 
-			fvalue=(m_nMax+m_nMin-CurPos)/10.0;
+			fvalue=(float)((m_nMax+m_nMin-CurPos)/10.0);
 			CString strtext;
 			strtext.Format(_T("%.1f"),fvalue);
 			GetDlgItem(IDC_EDIT14)->SetWindowText(strtext);
-			m_slider5_i=fvalue;
+			m_slider5_i=(int)fvalue;
 		}
 		if(pScrollBar->m_hWnd==m_slider6_ctrl.m_hWnd)
 		{
 			CurPos= m_slider6_ctrl.GetPos();
 
 		//	m_slider6_i==m_nMax+m_nMin-CurPos;
-			fvalue=(m_nMax+m_nMin-CurPos)/10.0;
+			fvalue=(float)((m_nMax+m_nMin-CurPos)/10.0);
 			CString strtext;
 			strtext.Format(_T("%.1f"),fvalue);
 			GetDlgItem(IDC_EDIT15)->SetWindowText(strtext);
-			m_slider6_i=fvalue;
+			m_slider6_i=(int)fvalue;
 
 		}
 		if(pScrollBar->m_hWnd==m_slider7_ctrl.m_hWnd)
 		{
 			CurPos= m_slider7_ctrl.GetPos();
 		//	m_slider7_i==m_nMax+m_nMin-CurPos;
-			fvalue=(m_nMax+m_nMin-CurPos)/10.0;
+			fvalue=(float)((m_nMax+m_nMin-CurPos)/10.0);
 			CString strtext;
 			strtext.Format(_T("%.1f"),fvalue);
 			GetDlgItem(IDC_EDIT16)->SetWindowText(strtext);
-			m_slider7_i=fvalue;
+			m_slider7_i=(int)fvalue;
 		}
 		if(pScrollBar->m_hWnd==m_slider8_ctrl.m_hWnd)
 		{
 			CurPos= m_slider8_ctrl.GetPos();	
 		//	m_slider8_i==m_nMax+m_nMin-CurPos;
-			fvalue=(m_nMax+m_nMin-CurPos)/10.0;
+			fvalue=(float)((m_nMax+m_nMin-CurPos)/10.0);
 			CString strtext;
 			strtext.Format(_T("%.1f"),fvalue);
 			GetDlgItem(IDC_EDIT17)->SetWindowText(strtext);
-			m_slider8_i=fvalue;
+			m_slider8_i=(int)fvalue;
 		}
 		if(pScrollBar->m_hWnd==m_slider9_ctrl.m_hWnd)
 		{
 			CurPos= m_slider9_ctrl.GetPos();
 		//	m_slider9_i==m_nMax+m_nMin-CurPos;
-			fvalue=(m_nMax+m_nMin-CurPos)/10.0;
+			fvalue=(float)((m_nMax+m_nMin-CurPos)/10.0);
 			CString strtext;
 			strtext.Format(_T("%.1f"),fvalue);
 			GetDlgItem(IDC_EDIT18)->SetWindowText(strtext);
-			m_slider9_i=fvalue;
+			m_slider9_i=(int)fvalue;
 		}
 		if(pScrollBar->m_hWnd==m_slider10_ctrl.m_hWnd)
 		{
 			CurPos= m_slider10_ctrl.GetPos();
 	//		m_slider10_i==m_nMax+m_nMin-CurPos;
-			fvalue=(m_nMax+m_nMin-CurPos)/10.0;
+			fvalue=(float)((m_nMax+m_nMin-CurPos)/10.0);
 			CString strtext;
 			strtext.Format(_T("%.1f"),fvalue);
 			GetDlgItem(IDC_EDIT19)->SetWindowText(strtext);
-			m_slider10_i=fvalue;
+			m_slider10_i=(int)fvalue;
 		}
 		if(pScrollBar->m_hWnd==m_slider11_ctrl.m_hWnd)
 		{
 			CurPos= m_slider11_ctrl.GetPos();
 	//		m_slider11_i==m_nMax+m_nMin-CurPos;
-			fvalue=(m_nMax+m_nMin-CurPos)/10.0;
+			fvalue=(float)((m_nMax+m_nMin-CurPos)/10.0);
 			CString strtext;
 			strtext.Format(_T("%.1f"),fvalue);
 			GetDlgItem(IDC_EDIT20)->SetWindowText(strtext);
-			m_slider11_i=fvalue;
+			m_slider11_i=(int)fvalue;
 		}
 		
 
@@ -3124,7 +3124,7 @@ void CBuildTable1::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 }
 void CBuildTable1::refresh_rule(float fMin,float fMax)
 {
-	float faverage=(fMax-fMin)/10.0;
+	float faverage=(float)((fMax-fMin)/10.0);
 	CString strTmp;
 	float fTmp;
 	strTmp.Format(_T("%.1f"),fMin);

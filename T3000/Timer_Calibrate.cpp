@@ -111,7 +111,7 @@ BOOL Timer_Calibrate::OnInitDialog()
 		if(i_temp==255)
 		{
 			m_building_time_zone.SetCurSel(12-temp.Bias/60);
-			write_one(g_tstat_id,11,12-temp.Bias/60);
+			write_one(g_tstat_id,11,short(12-temp.Bias/60));
 		}
 		else if(i_temp>=0)
 			m_building_time_zone.SetCurSel(i_temp);
@@ -125,7 +125,7 @@ BOOL Timer_Calibrate::OnInitDialog()
 		if(i_temp==255)
 		{
 			m_building_time_zone.SetCurSel(12-temp.Bias/60);
-			write_one(g_tstat_id,11,12-temp.Bias/60);
+			write_one(g_tstat_id,11,short(12-temp.Bias/60));
 		}
 		else if(i_temp>=0)
 			m_building_time_zone.SetCurSel(i_temp);
@@ -178,7 +178,7 @@ void Timer_Calibrate::OnTimer(UINT nIDEvent)
 			if(i_temp==255)
 			{
 				m_building_time_zone.SetCurSel(12-temp.Bias/60);
-				write_one(g_tstat_id,11,12-temp.Bias/60);
+				write_one(g_tstat_id,11,short(12-temp.Bias/60));
 			}
 			else if(i_temp>=0)
 				m_building_time_zone.SetCurSel(i_temp);

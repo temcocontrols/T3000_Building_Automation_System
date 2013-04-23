@@ -71,7 +71,7 @@ void CConfig_Routines::read_addr(description3 *temp_description,int number,unsig
 			p=(char *)&temp;///////////////*****pointer   attention
 			for(i=0;i<SIZEOF_DESCRIPTION;i++)
 			{
-				(*p)=temp_buffer[j*SIZEOF_DESCRIPTION+i];//3 is size of 
+				(*p)=(char)temp_buffer[j*SIZEOF_DESCRIPTION+i];//3 is size of 
 				p++;
 			}
 			*temp_description=temp;
@@ -92,7 +92,7 @@ void CConfig_Routines::read_addr(description3 *temp_description,int number,unsig
 			p=(char *)&temp;///////////////*****pointer   attention
 			for(i=0;i<SIZEOF_DESCRIPTION;i++)
 			{
-				(*p)=temp_buffer[j*SIZEOF_DESCRIPTION+i];//3 is size of 
+				(*p)=(char)temp_buffer[j*SIZEOF_DESCRIPTION+i];//3 is size of 
 				p++;
 			}
 			*temp_description=temp;
@@ -241,7 +241,7 @@ void CConfig_Routines::load_grid()
 	m_FlexGrid.put_TextMatrix(0,6,_T("state2"));
 
 	CString str;
-	int intemp,intemp2;
+	int intemp;
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
 	{
 		intemp = 20;

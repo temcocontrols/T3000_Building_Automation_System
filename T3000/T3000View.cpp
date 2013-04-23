@@ -878,13 +878,13 @@ void CT3000View::InitSliderBars2()
 
 		itemp=multi_register_value[422];
 		//m_nightSlider.SetPos((int)(max-(itemp-min)));
-		int nCoolSP = itemp/10.0;//(int)(max-(itemp-min));
+		int nCoolSP =(int) (itemp/10.0);//(int)(max-(itemp-min));
 		strTemp.Format(_T("%.1f"),float(nCoolSP-nSP));
 		m_DayCoolEdit.SetWindowText(strTemp);
 
 		itemp=multi_register_value[136];//heat
 		//m_nightHeatSlider.SetPos((int)(max-(itemp-min)));
-		int nHeatSP = itemp;//((int)(max-(itemp-min)));
+		int nHeatSP = (int)itemp;//((int)(max-(itemp-min)));
 		strTemp.Format(_T("%.1f"),float(nSP-nHeatSP));
 		m_DayHeatEdit.SetWindowText(strTemp);
 
