@@ -140,10 +140,8 @@
     <ClCompile Include="DBOprator.cpp" />
     <ClCompile Include="Dialog_Progess.cpp" />
     <ClCompile Include="DialogInfo.cpp" />
-    <ClCompile Include="EnumSerial.cpp" />
     <ClCompile Include="EreaseDlg.cpp" />
     <ClCompile Include="excel9.cpp" />
-    <ClCompile Include="extern_function.cpp" />
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="FreeCoolDlg.cpp" />
     <ClCompile Include="globle_function.cpp" />
