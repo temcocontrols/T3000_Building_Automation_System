@@ -1366,6 +1366,8 @@ void CParameterDlg::OnCbnSelchangekeypadcombo()
 //		g_bPauseMultiRead = FALSE;
 //}
 
+
+//This Edit is invisible for all product, May be it can be delete.
 void CParameterDlg::OnEnKillfocusValuposedit()
 {
 
@@ -1483,6 +1485,9 @@ g_bPauseMultiRead = TRUE;
 g_bPauseMultiRead = FALSE;
 }
 
+
+
+//This Edit is invisible for every product.May be we can delete it.
 void CParameterDlg::OnEnKillfocusValveedit()
 {
 
@@ -1780,33 +1785,54 @@ void CParameterDlg::OnCbnSelchangeTimerdelectcombo()
 //	g_bPauseMultiRead = FALSE;
 //}
 
+//modify for support t6 t7.
 void CParameterDlg::OnEnKillfocusTimeedit()
 {
-
 	if(g_ParamLevel==1)
 		return;
+
 	CString strTemp;
 	m_TimeEdit.GetWindowText(strTemp);
-	if(strTemp.IsEmpty())
-		return;	
-	g_bPauseMultiRead = TRUE;	
-	write_one(g_tstat_id,212,_wtoi(strTemp));
-g_bPauseMultiRead = FALSE;
-}
+		int nValue=_wtoi(strTemp);
 
-void CParameterDlg::OnEnKillfocusOverridetimeedit()
-{
-
-	if(g_ParamLevel==1)
+	if (strTemp.IsEmpty()) 
 		return;
-	CString strTemp;
-	m_OverRideEdit.GetWindowText(strTemp);
-	if(strTemp.IsEmpty())
-		return;	
-	g_bPauseMultiRead = TRUE;
-	write_one(g_tstat_id,211,_wtoi(strTemp));
+
+	if(product_register_value[MODBUS_OVERRIDE_TIMER_LEFT] ==nValue)	//if not changed ,return  .
+		return;
+	g_bPauseMultiRead = TRUE;	
+	if(write_one(g_tstat_id, MODBUS_OVERRIDE_TIMER_LEFT,nValue)<0)//T5=212  T6=112
+		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+	else
+		product_register_value[MODBUS_OVERRIDE_TIMER_LEFT] = nValue;
 	g_bPauseMultiRead = FALSE;
 }
+
+
+
+//modify for support t6 t7.
+void CParameterDlg::OnEnKillfocusOverridetimeedit()
+{
+	if(g_ParamLevel==1)
+		return;
+
+	CString strTemp;
+	m_OverRideEdit.GetWindowText(strTemp);
+	int nValue=_wtoi(strTemp);
+
+	if (strTemp.IsEmpty()) 
+		return;
+
+	if(product_register_value[MODBUS_OVERRIDE_TIMER] ==nValue)	//if not changed ,return  .
+		return;
+	g_bPauseMultiRead = TRUE;	
+	if(write_one(g_tstat_id, MODBUS_OVERRIDE_TIMER,nValue)<0)//T5=211  T6=111
+		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+	else
+		product_register_value[MODBUS_OVERRIDE_TIMER] = nValue;
+	g_bPauseMultiRead = FALSE;
+}
+
 
 void CParameterDlg::OnBnClickedFreecoolbgtn()
 {
