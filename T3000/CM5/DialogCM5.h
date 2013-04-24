@@ -146,7 +146,7 @@ private:
 
 	void ClickOutputMsflexgrid();
 	void DblClickOutputMsflexgrid();
-
+	void DBClickInputMsflexgrid2();
 	void ClickSubTstatgrid();
 	void ClickInputMsflexgrid2();
 
