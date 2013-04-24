@@ -10,6 +10,7 @@
 
 #include "../MainFrm.h"
 #include "afxcmn.h"
+#include "f:\mywork\t3000_building_automation_system\t3000\msflexgrid1.h"
 
 
 
@@ -149,8 +150,8 @@ private:
 	void DBClickInputMsflexgrid2();
 	void ClickSubTstatgrid();
 	void ClickInputMsflexgrid2();
-
-	
+	void DblClickInputMsflexgrid2()	;
+	void OnCbnSelchangeCombx();
 public:
 	CString m_bootloaderversion;
 	CComboBox m_Baudrate;
