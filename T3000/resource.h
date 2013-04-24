@@ -161,9 +161,11 @@
 #define IDC_OUTPUT2_DELAY_OFF_EDIT      1027
 #define IDC_SLAVE_ID                    1027
 #define IDC_EDIT41                      1027
+#define IDC_INTERVAL                    1027
 #define IDC_OUTPUT3_DELAY_OFF_EDIT      1028
 #define IDC_CUR_TEMP                    1028
 #define IDC_EDIT42                      1028
+#define IDC_DTS1                        1028
 #define IDC_BUTTON3                     1029
 #define IDC_DELAYTABBTN                 1029
 #define IDC_OUTPUT5_DELAY_OFF_EDIT      1029
@@ -172,26 +174,35 @@
 #define IDC_OUTPUT4_DELAY_OFF_EDIT      1030
 #define IDC_HUM1                        1030
 #define IDC_EDIT43                      1030
+#define IDC_DTS2                        1030
 #define IDC_RADIO2                      1031
 #define IDC_OUTPUTBTN                   1031
 #define IDC_NUM_SENSOR                  1031
 #define IDC_EDIT44                      1031
+#define IDC_DTS3                        1031
 #define IDC_PARAMETERBTN                1032
 #define IDC_EDIT45                      1032
+#define IDC_DTS4                        1032
 #define IDC_LEDTABLEBTN                 1033
 #define IDC_EDIT46                      1033
+#define IDC_DTS5                        1033
 #define IDC_EDIT47                      1034
+#define IDC_DTS6                        1034
 #define IDC_MODEL_EDIT                  1035
 #define IDC_EDIT48                      1035
+#define IDC_DTS7                        1035
 #define IDC_FIRMWARV_EDIT               1036
 #define IDC_START_POINT                 1036
 #define IDC_EDIT49                      1036
+#define IDC_DTS8                        1036
 #define IDC_HARDWAREV_EDIT              1037
 #define IDC_TEMP_TOL                    1037
 #define IDC_EDIT50                      1037
+#define IDC_DTS9                        1037
 #define IDC_SERIALNUM_EDIT              1038
 #define IDC_HUM_TOL                     1038
 #define IDC_EDIT51                      1038
+#define IDC_DTS10                       1038
 #define IDC_TEMPERATURE_EDIT            1039
 #define IDC_TEST_STATE                  1039
 #define IDC_EDIT_HUMIDITY               1040
@@ -255,6 +266,7 @@
 #define IDC_IOSET_BUTTON                1057
 #define IDC_FARCALLIP_BTN               1057
 #define IDC_TEMP_LEFT5                  1057
+#define IDC_SAVE_CONFIG                 1057
 #define IDC_TEMP6                       1058
 #define IDC_HUM6                        1059
 #define IDC_MSFLEXGRID2                 1060
@@ -262,6 +274,7 @@
 #define IDC_TIME6                       1060
 #define IDC_MSFLEXGRID_INPUT            1061
 #define IDC_TEMP_LEFT6                  1061
+#define IDC_INPUT_MSFLEXGRID2           1061
 #define IDC_MSFLEXGRID3                 1062
 #define IDC_OUTPUT_MSFLEXGRID           1062
 #define IDC_MSFLEXGRID_INPUT2           1062
@@ -270,6 +283,7 @@
 #define IDC_SLIDER1                     1063
 #define IDC_TEMPRETURE_SLIDER           1063
 #define IDC_HUM7                        1063
+#define IDC_SUBTSTAT_INPUT              1063
 #define IDC_SLIDER2                     1064
 #define IDC_NIGHTHEAT_SLIDER            1064
 #define IDC_TIME7                       1064
@@ -449,6 +463,7 @@
 #define IDC_COMBO_TIMESERVERLIST2       1130
 #define IDC_BRAUDRATECOMBO              1131
 #define IDC_CHECK57                     1131
+#define IDC_COMBO_ENABLE_INOUTPUT       1131
 #define IDC_DISPLAYCOMBO                1132
 #define IDC_CHECK66                     1132
 #define IDC_KEYPADLOCKCOMBO             1133
@@ -943,6 +958,8 @@
 #define IDC_TOLERANCE                   1591
 #define IDC_MAC_ADDRESS                 1592
 #define IDC_CHECK_DEMO                  1594
+#define IDC_NUM                         1595
+#define IDC_PROGRESS                    1596
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1035,7 +1052,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        445
 #define _APS_NEXT_COMMAND_VALUE         32866
-#define _APS_NEXT_CONTROL_VALUE         1595
+#define _APS_NEXT_CONTROL_VALUE         1598
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
