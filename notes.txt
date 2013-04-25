@@ -5,5 +5,3 @@ Ver 110
 
 16:50 2013/4/11
 Fixed Some compile errors.
-
-Fance Test

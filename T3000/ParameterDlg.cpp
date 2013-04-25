@@ -534,9 +534,15 @@ void CParameterDlg::OnBnClickedEnableidbutton()
 // 	// TODO: Add your control notification handler code here
 
 	if(m_idAdressEdit.IsWindowEnabled())
+	{
 		m_idAdressEdit.EnableWindow(FALSE);
+		((CButton *)GetDlgItem(IDC_ENABLEIDBUTTON))->SetWindowTextW(_T("Enable Change"));
+	}
 	else
+	{
 		m_idAdressEdit.EnableWindow(TRUE);
+		((CButton *)GetDlgItem(IDC_ENABLEIDBUTTON))->SetWindowTextW(_T("Disable Change"));
+	}
 }
 
 
