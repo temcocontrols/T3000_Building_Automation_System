@@ -275,6 +275,7 @@
 #define IDC_MSFLEXGRID_INPUT            1061
 #define IDC_TEMP_LEFT6                  1061
 #define IDC_INPUT_MSFLEXGRID2           1061
+#define IDC_AI_Grid                     1061
 #define IDC_MSFLEXGRID3                 1062
 #define IDC_OUTPUT_MSFLEXGRID           1062
 #define IDC_MSFLEXGRID_INPUT2           1062
