@@ -13,6 +13,7 @@
 
 
 
+
 #define FLEXGRID_CELL_COLOR						13421772
 #define FLEXGRID_CELL_GRAY_COLOR				13421772	
 
@@ -149,8 +150,8 @@ private:
 	void DBClickInputMsflexgrid2();
 	void ClickSubTstatgrid();
 	void ClickInputMsflexgrid2();
-
-	
+	void DblClickInputMsflexgrid2()	;
+	void OnCbnSelchangeCombx();
 public:
 	CString m_bootloaderversion;
 	CComboBox m_Baudrate;
