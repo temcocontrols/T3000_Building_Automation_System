@@ -10,6 +10,9 @@
   @param[in]   retry_times	the number of times to retry on read failure before giving up
 
   @return  0 if there were no errors
+
+  This does NOT lock the register_critical_section
+
   */
 int modbus_read_one_value( 
 				int& value, 
@@ -119,4 +122,81 @@ int modbus_read_one_value(
 
 	return error_ret;
 
+}
+
+
+/**
+
+  Read multiple values from a modbus device
+
+  @param[out]  put_data_into_here	the values read
+  @param[in]   device_var			the modbus device address
+  @param[in]   start_address		the offset of thefirt value to be read in the device
+  @param[in]   length				number of values to be read
+  @param[in]   retry_times			the number of times to retry on read failure before giving up
+
+  @return  negative if there were errors, otherwise length of data read
+
+  This does NOT lock the register_critical_section
+
+  */
+int modbus_read_multi_value( 
+		unsigned short *put_data_into_here,
+		unsigned char device_var,
+		unsigned short start_address,
+		int length,
+		int retry_times )
+{
+	BOOL EnableRefreshTreeView_original_value = g_bEnableRefreshTreeView;
+
+	/** This will prevent a refresh of the tree view while we are doing the read
+	 It seems to be a sort of home made mutex.
+	 There are all sorts of probems with this, including the fact that the tree refresh
+	 is abandoned, not just delayed.
+	 But it is used in over 40 places in the rest of the code, so leave it alone
+	 */
+	g_bEnableRefreshTreeView = false;
+
+	int error=0;
+	for(int i=0;i<retry_times;i++)
+	{
+
+		// call the modbus DLL method
+		error=read_multi(device_var,put_data_into_here,start_address,length);
+
+		// increment the number of transmissions we have done
+		g_llTxCount++;
+
+		// accept any return other than -2
+		if( error !=-2 )
+		{
+			// increment the number or replies we have received
+			g_llRxCount++;
+			break;
+		}
+	}
+
+	// check for running in the main GUI thread
+	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
+
+		// construct status message string
+		CString str;
+		str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d]"), 
+			device_var, g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+
+		//Display it
+		((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
+
+	}
+
+	/**  Restore original value of tree refresh flag
+
+	Note that we do an OR here, so if the flag has been set true somewhere else
+	then we will not set it false if it was false when we started.
+
+	*/
+	g_bEnableRefreshTreeView |= EnableRefreshTreeView_original_value;
+
+
+	return error;
 }

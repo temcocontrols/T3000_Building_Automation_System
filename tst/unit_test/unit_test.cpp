@@ -40,6 +40,7 @@ AfxMainWndStub * AfxGetMainWnd() {
 #pragma comment(lib,"ModbusDllforVc")
 #define INPUT extern "C" __declspec(dllimport)
 INPUT int Read_One(unsigned char device_var,unsigned short address);
+INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
 INPUT bool open_com(int m_com);
 
 // the code to be tested
@@ -98,6 +99,34 @@ TEST( modbus_read_one_value )
 
 	// the simulator always returns a value of 1
 	CHECK_EQUAL( 1, value );
+
+}
+
+TEST( modbus_read_multi_value )
+{
+	unsigned short put_data_into_here[100];
+	unsigned char device_var = 1;
+	unsigned short start_address = 1;
+	int length = 10;
+	int retry_times = 1;
+
+	int ret = modbus_read_multi_value( 
+		put_data_into_here,
+		device_var,
+		start_address,
+		length,
+		retry_times );
+
+	// check we got all the data we reuested
+	CHECK_EQUAL( 10, ret);
+	// check the values were good
+	for( int k = 0; k < 10; k++ ) {
+		CHECK_EQUAL( k+1, put_data_into_here[k] );
+	}
+	// check global counters
+	CHECK_EQUAL( 4,  g_llTxCount);
+	CHECK_EQUAL( 3, g_llRxCount ); 
+
 
 }
 

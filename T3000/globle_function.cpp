@@ -180,45 +180,39 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
 	SetPaneString(0,str);
 	return j;
 }
+/**
 
+  Read multiple values from a modbus device
+
+  @param[out]  put_data_into_here	the values read
+  @param[in]   device_var			the modbus device address
+  @param[in]   start_address		the offset of thefirt value to be read in the device
+  @param[in]   length				number of values to be read
+  @param[in]   retry_times			the number of times to retry on read failure before giving up
+
+  @return  0 if there were no errors
+
+  This does NOT lock the register_critical_section
+
+  This is a wrapper for modbus_read_multi_value
+  It is provided for compatibility with existing code.
+  New code should use modbus_read_multi_value() directly.
+
+  This does NOT lock the critical section.
+
+  */
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times)
 {
-	BOOL bTemp = g_bEnableRefreshTreeView;
-	g_bEnableRefreshTreeView = FALSE;
-	int j = Read_Multi_org(device_var,put_data_into_here,start_address,length,retry_times);
-	g_bEnableRefreshTreeView |= bTemp;
-	return j;
+	return modbus_read_multi_value(
+		put_data_into_here,
+		device_var,
+		start_address,
+		length,
+		retry_times );
 }
 
 
-int Read_Multi_org(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times)
-{
-// 	CString str;
-// 	str.Format(_T("ID:%d [Tx=%d : Rx=%d]"), device_var, g_llTxCount++, g_llRxCount++);
-// 	SetPaneString(0,str);
 
-	int j=0;
-	for(int i=0;i<retry_times;i++)
-	{
-
-		j=read_multi(device_var,put_data_into_here,start_address,length);
-		if (g_CommunicationType==Modbus_Serial)
-		{
-			Sleep(DELAY_TIME*3);//do this for better quickly
-		}
-		if(j!=-2)
-		{
-			CString str;
-			str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, ++g_llRxCount, g_llTxCount-g_llRxCount);
-			SetPaneString(0,str);
-			return j;
-		}
-	}
-	CString str;
-	str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
-	SetPaneString(0,str);
-	return j;
-}
 
 int turn_hex_str_to_ten_num(char *source)
 {
@@ -374,22 +368,6 @@ float get_curtstat_version()
 
 }
 
-//Marked by Fance 2013/03 28 
-//float get_curtstat_version()
-//{
-//	float tstat_version2=multi_register_value[MODBUS_VERSION_NUMBER_LO];//tstat version			
-//	if(tstat_version2<=0)
-//		return tstat_version2;
-//	if(tstat_version2 >=240 && tstat_version2 <250)
-//		tstat_version2 /=10;
-//	else 
-//	{
-//		tstat_version2 = (float)(multi_register_value[MODBUS_VERSION_NUMBER_HI]*256+multi_register_value[MODBUS_VERSION_NUMBER_LO]);	
-//		tstat_version2 /=10;
-//	}//tstat_version
-//	return tstat_version2;
-//
-//}
 
 int make_sure_isp_mode(int the_tstat_id)
 {
