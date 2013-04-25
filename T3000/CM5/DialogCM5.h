@@ -10,7 +10,7 @@
 
 #include "../MainFrm.h"
 #include "afxcmn.h"
-#include "f:\mywork\t3000_building_automation_system\t3000\msflexgrid1.h"
+
 
 
 

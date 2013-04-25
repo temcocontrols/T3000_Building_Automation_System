@@ -11,7 +11,7 @@
 static BOOL ifLCdb = TRUE;
 static BOOL ifUpdatedb = TRUE;
 
-#define  IDC_BUTTON_Configure 7001
+//#define  IDC_BUTTON_Configure 7001
 
 
 
