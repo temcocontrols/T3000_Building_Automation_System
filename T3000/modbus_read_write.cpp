@@ -11,7 +11,7 @@
 
   @return  0 if there were no errors
 
-  This does NOT lock the register_critical_section
+  This DOES lock the register_critical_section
 
   */
 int modbus_read_one_value( 
