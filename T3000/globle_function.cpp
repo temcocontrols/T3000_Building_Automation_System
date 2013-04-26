@@ -88,59 +88,6 @@ void SetPaneString(int nIndext,CString str)
 }
 
 
-int write_one(unsigned char device_var,unsigned short address,short value,int retry_times)
-{//retry 
-
-	BOOL bTemp = g_bEnableRefreshTreeView;
-	g_bEnableRefreshTreeView = FALSE;
-	int j = write_one_org(device_var,address,value,retry_times);
-	g_bEnableRefreshTreeView |= bTemp;
-	return j;
-}
-
-int write_one_org(unsigned char device_var,unsigned short address,short value,int retry_times)
-{//retry 
-// 	CString str;
-// 	str.Format(_T("ID :%d Writing %d"),device_var,address);
-// 	SetPaneString(0,str);
-	short temp_value=value;
-	if(address==101 && temp_value<0)
-	{//for the temperature is below zero;;;;;;;;-23.3
-		temp_value=65535+temp_value;
-	}
-	int j=0;
-	for(int i=0;i<retry_times;i++)
-	{
-		//register_critical_section.Lock();
-		j=Write_One(device_var,address,temp_value);
-		multi_register_value[address]=value;//mark***********************
-		//register_critical_section.Unlock();
-		if (g_CommunicationType==Modbus_Serial)
-		{
-			//Sleep(DELAY_TIME);//do this for better quickly
-		}
-
-		if(j!=-2 && j!=-3)
-		{
-			CString str;
-			if (j == -1) // no connetiong
-			{
-				str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
-			}
-			else
-			{
-				str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, ++g_llRxCount, g_llTxCount-g_llRxCount);
-			}
-			SetPaneString(0,str);
-			return j;//return right success
-		}
-	}
-	CString str;
-	str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
-	SetPaneString(0,str);
-	return j;
-}
-
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
 {
 	BOOL bTemp = g_bEnableRefreshTreeView;
