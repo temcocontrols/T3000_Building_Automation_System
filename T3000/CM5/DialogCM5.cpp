@@ -1,6 +1,6 @@
 // DialogCM5.cpp : implementation file
 //
-
+///test
 #include "stdafx.h"
 #include "../T3000.h"
 #include "DialogCM5.h"
