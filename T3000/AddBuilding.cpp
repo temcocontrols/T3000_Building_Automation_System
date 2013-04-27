@@ -1889,25 +1889,13 @@ void CAddBuilding::OnBnClickedAddbuiding()
 	//if not exist we need to add this building in table Building_ALL in t3000.mdb
 	//and then we can insert this building into table Building.if not ,it will crash when insert data into Building
 	//Because the table Building is associated with  Building_ALL 
-	strSql.Format(_T("Select * from Building_ALL"));
+	strSql.Format(_T("Select * from Building_ALL where Building_Name = '%s'"),strMainBuildName);
 	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 	_variant_t temp_variant_name;
 	bool findMainBuilding=false;
-	while(VARIANT_FALSE==m_pRs->EndOfFile)	
+	if(VARIANT_FALSE==m_pRs->EndOfFile)		//If it's not empty , means the input Building has exist in Main Building.
 	{
-		temp_variant_name = m_pRs->GetCollect(_T("Building_Name"));
-		CString cs_temp=temp_variant_name;
-
-		if(cs_temp.CompareNoCase(strMainBuildName)!=0)
-		{
-			findMainBuilding=false;
-			m_pRs->MoveNext();
-		}
-		else
-		{
-			findMainBuilding=true;
-			break;
-		}
+		findMainBuilding=true;
 	}
 
 	if(m_pRs->State)
