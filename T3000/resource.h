@@ -961,6 +961,7 @@
 #define IDC_CHECK_DEMO                  1594
 #define IDC_NUM                         1595
 #define IDC_PROGRESS                    1596
+#define IDC_REFRESH_ALL                 1598
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1053,7 +1054,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        445
 #define _APS_NEXT_COMMAND_VALUE         32866
-#define _APS_NEXT_CONTROL_VALUE         1598
+#define _APS_NEXT_CONTROL_VALUE         1599
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
