@@ -547,7 +547,8 @@ void write_to_file_a_line(wofstream & out,const char * format, ... )
 	char buf[2048];	
 	vsprintf( buf, format, marker );
 	va_end(marker);
-	out<< buf << endl 
+	out<< buf << endl ;
+
 	*/
 }
 void _Twrite_to_file_a_line(wofstream & out,const TCHAR * format, ... )
@@ -3645,7 +3646,7 @@ void save_schedule_2_file(TCHAR* fn,int schedule_id)
 		default_file.WriteString(_T("Model : NC \n"));
 		int nVersionLo = Read_One(g_tstat_id, 4);
 		int	nVersionHi = Read_One(g_tstat_id, 5);
-		int firmwareVersion = float(nVersionHi) + float(nVersionLo/100.0);
+		int firmwareVersion =int(float(nVersionHi) + float(nVersionLo/100.0));
 		CString strFirmware;
 		strFirmware.Format(_T("%0.2f"), firmwareVersion);
 		default_file.WriteString(_T("version : ")+strFirmware+_T("\n"));
@@ -4003,7 +4004,7 @@ CString Show_load_file_result_message(load_file_every_step temppp,bool show_mess
 	if(show_message_dialog==true)
 	{
 		if(temppp.seven_step==true)
-			message_box_function(showing_message,_T("Finish"));
+			MessageBox(NULL,showing_message,_T("Finish"));
 		else
 			AfxMessageBox(showing_message);
 	}

@@ -20,7 +20,6 @@ Cconfigure::Cconfigure(CWnd* pParent /*=NULL*/)
 
 Cconfigure::~Cconfigure()
 {
-
 }
 
 void Cconfigure::DoDataExchange(CDataExchange* pDX)

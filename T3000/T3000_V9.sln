@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T3000", "T3000.vcproj", "{F7226464-C41C-4909-BF74-97328B72FFC8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModbusDllforVc", "..\ModbusDllforVc\ModbusDllforVc\ModbusDllforVc.vcproj", "{86C4A754-63F3-44A8-949D-E01D4FACA97A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlexSlideBar", "..\FlexSlideBar\FlexSlideBar.vcproj", "{9560EBEA-EB58-44F6-BB62-189833713FC0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unit_test", "..\tst\unit_test\unit_test.vcproj", "{66A4BD62-4150-42BA-9A46-18A136D70882}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F7226464-C41C-4909-BF74-97328B72FFC8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F7226464-C41C-4909-BF74-97328B72FFC8}.Debug|Win32.Build.0 = Debug|Win32
+		{F7226464-C41C-4909-BF74-97328B72FFC8}.Release|Win32.ActiveCfg = Release|Win32
+		{F7226464-C41C-4909-BF74-97328B72FFC8}.Release|Win32.Build.0 = Release|Win32
+		{86C4A754-63F3-44A8-949D-E01D4FACA97A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{86C4A754-63F3-44A8-949D-E01D4FACA97A}.Debug|Win32.Build.0 = Debug|Win32
+		{86C4A754-63F3-44A8-949D-E01D4FACA97A}.Release|Win32.ActiveCfg = Release|Win32
+		{86C4A754-63F3-44A8-949D-E01D4FACA97A}.Release|Win32.Build.0 = Release|Win32
+		{9560EBEA-EB58-44F6-BB62-189833713FC0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9560EBEA-EB58-44F6-BB62-189833713FC0}.Debug|Win32.Build.0 = Debug|Win32
+		{9560EBEA-EB58-44F6-BB62-189833713FC0}.Release|Win32.ActiveCfg = Release|Win32
+		{9560EBEA-EB58-44F6-BB62-189833713FC0}.Release|Win32.Build.0 = Release|Win32
+		{66A4BD62-4150-42BA-9A46-18A136D70882}.Debug|Win32.ActiveCfg = Debug|Win32
+		{66A4BD62-4150-42BA-9A46-18A136D70882}.Debug|Win32.Build.0 = Debug|Win32
+		{66A4BD62-4150-42BA-9A46-18A136D70882}.Release|Win32.ActiveCfg = Release|Win32
+		{66A4BD62-4150-42BA-9A46-18A136D70882}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

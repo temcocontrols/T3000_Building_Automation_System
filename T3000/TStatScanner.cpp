@@ -195,11 +195,10 @@ BOOL CTStatScanner::ScanNetworkDevice()
 {
 	//m_pScanNCThread = AfxBeginThread(_ScanNCThread,this);
 	m_pScanNCThread = AfxBeginThread(_ScanNCByUDPFunc,this);//lsc
-	 
+
 	CWinThread * pTempThread= AfxBeginThread(_ScanOldNC, this);//这个是为扫描NC下面的TSTAT
 
 	//m_pWaitScanThread = AfxBeginThread(_WaitScanThread, this);
- 
 	return TRUE;
 }
 
@@ -207,7 +206,6 @@ BOOL CTStatScanner::ScanComDevice()//02
 {
 	//background_binarysearch_netcontroller();
 	//GetAllComPort();
- 
 	GetSerialComPortNumber1(m_szComs);
 
 	if (m_szComs.size() <= 0)
@@ -215,13 +213,11 @@ BOOL CTStatScanner::ScanComDevice()//02
 		AfxMessageBox(_T("Can't scan without any com port installed."));
 		return FALSE;
 	}
- 
+	
 	SetCommunicationType(0);   //设置为串口通信方式
 
-	//串口通信方式下的通信--
-
 	m_pScanTstatThread = AfxBeginThread(_ScanTstatThread2,this);	
-
+	
 	//background_binarysearch();
 	//m_ScannedNum=254;
 	
@@ -264,13 +260,13 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 	g_strScanInfoPrompt.Format(_T("COM%d"), nComPort);
 
 
-#ifdef _DEBUG
-	if (nComPort == 4)	
-	//if (devLo == devHi && devLo == 252)
-	{
-		int n = 0;
-	}
-#endif
+//#ifdef _DEBUG
+	//if (nComPort == -1)	
+	////if (devLo == devHi && devLo == 252)
+	//{
+	//	return;
+	//}
+//#endif
 	g_nStartID = devLo;
 	g_nEndID = devHi;
 
@@ -810,7 +806,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 	//nMaskIP=inet_addr(pAdapterInfo.IpAddressList.IpMask.String);
 	//UINT nBroadCastIP;
 	//nBroadCastIP=(~nMaskIP)|nLocalIP;
-	char* chBroadCast;
+//	char* chBroadCast;
 	//in_addr in;
 	//in.S_un.S_addr=nBroadCastIP;
 	//chBroadCast=inet_ntoa(in);
@@ -883,9 +879,13 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 		memcpy(pSendBuf + nSendLen, (BYTE*)&END_FLAG, 4);
 	}
 /////////////////////////////////////////////////////////////////////////*/
+	int time_out=0;
 	BOOL bTimeOut = FALSE;
 	while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
 	{
+		time_out++;
+		if(time_out>100)
+			 bTimeOut = TRUE;
 		if(pScanner->m_bStopScan)
 		{
 			break;
@@ -1125,9 +1125,7 @@ UINT _ScanTstatThread2(LPVOID pParam)
 	{
 		//if (WaitForSingleObject(pScan->m_eScanComEnd->m_hObject, 0) == WAIT_OBJECT_0 )
 		if(pScan->m_bStopScan)
-		{  
-		
-		   // 有信号，就结束scan
+		{ // 有信号，就结束scan
 			//g_ScnnedNum=254;
 			//return;
 			break;
@@ -1208,7 +1206,7 @@ UINT _ScanTstatThread(LPVOID pParam)
 			ASSERT(bRet);
 			g_strScanInfoPrompt.Format(_T("COM%d"), pScan->m_nComPort);
 			pScan->background_binarysearch(pScan->m_nComPort);
-            //使用二分法查找
+
 			close_com();
 			Sleep(1000);
 			TRACE(_T("Success open the COM%d\n"), pScan->m_nComPort); 
@@ -1332,11 +1330,12 @@ void CTStatScanner::SendScanEndMsg()
 {
 	//m_pParent->PostMessage(WM_SCANFINISH, 0, 0);
 	// scan完成，开始冲突检查
+		
 	// 合并同类项
 	CombineScanResult();
 	GetBuildingName();	// 获得当前选择的buildingname
 	GetAllNodeFromDataBase();
- 	if (TRUE/*m_bComScanRunning*/)
+//	if (m_bComScanRunning)
 	{
 		FindNetConflict();
 		ResolveNetConflict();
@@ -1353,7 +1352,7 @@ void CTStatScanner::SendScanEndMsg()
 	}
    // below is nc scan handle
 	// 找到nc与数据库的冲突
- 	else
+//	else
 	{
 // 		FindNetConflict();
 // 		ResolveNetConflict();
@@ -2289,6 +2288,9 @@ void CTStatScanner::ScanTstatFromNCForAuto()//scan 分别扫描各个NC中的TSTAT
 		int nIPPort=pNCInfo->m_pNet->GetIPPort();
 
 		CString strIP=pNCInfo->m_pNet->GetIPAddrStr();
+		//if(strIP.CompareNoCase(_T("192.168.0.145"))!=0)
+		//	continue;
+
 		//##############################
 		CString strInfo;strInfo.Format(_T("Scan Tstat connected to %s"), pNCInfo->m_pNet->GetProductName());
 		ShowNetScanInfo(strInfo);
@@ -2596,7 +2598,6 @@ UINT _ScanOldNC(LPVOID pParam)
 		pScan->m_eScanOldNCEnd->SetEvent();
 		return 0;
 	}
-
 	WaitForSingleObject(	pScan->m_eScanNCEnd, INFINITE);
 	
 // 	BOOL bConnect = ((CMainFrame*)(pScan->m_pParent))->ConnectSubBuilding(((CMainFrame*)(pScan->m_pParent))->m_subNetLst.at(((CMainFrame*)(pScan->m_pParent))->m_nCurSubBuildingIndex));//scan
@@ -2654,10 +2655,10 @@ void CTStatScanner::ScanOldNC(BYTE devLo, BYTE devHi)
 				// IP
 				nRet=read_multi2(a,&SerialNum[0],107,4,true);
 				IN_ADDR ia;
-				ia.S_un.S_un_b.s_b1 = SerialNum[0];
-				ia.S_un.S_un_b.s_b2 = SerialNum[1];
-				ia.S_un.S_un_b.s_b3 = SerialNum[2];
-				ia.S_un.S_un_b.s_b4 = SerialNum[3];
+				ia.S_un.S_un_b.s_b1 = (UCHAR)SerialNum[0];
+				ia.S_un.S_un_b.s_b2 = (UCHAR)SerialNum[1];
+				ia.S_un.S_un_b.s_b3 = (UCHAR)SerialNum[2];
+				ia.S_un.S_un_b.s_b4 = (UCHAR)SerialNum[3];
 				pNet->SetIPAddr(ia.S_un.S_addr);
 
 				// port
@@ -2704,10 +2705,8 @@ void CTStatScanner::ScanOldNC(BYTE devLo, BYTE devHi)
 void CTStatScanner::ScanAll()
 {	
 
-	
+	ScanComDevice();//lsc		
 	ScanNetworkDevice();//lsc
-	ScanComDevice();//lsc	
-	//ScanComDevice();//多扫描一次串口
 	AfxBeginThread(_WaitScanThread, this);
 
 }
@@ -2954,7 +2953,7 @@ void  CTStatScanner::AddNodeToTable(_NetDeviceInfo* pNCInfo, unsigned short* pNo
 	int nAddress = pNode[1];
 	long nSerialNo = pNode[2]+pNode[3]*256+pNode[4]*256*256+pNode[5]*256*256*256;
 
-	float fSWVersion = pNode[6] + pNode[7]*256;
+	float fSWVersion =(float) (pNode[6] + pNode[7]*256);
 	int nProductType = pNode[9];
 	int nHWVersion = pNode[10];
 
@@ -3003,7 +3002,7 @@ void  CTStatScanner::AddNodeToTable(_NetDeviceInfo* pNCInfo, unsigned short* pNo
 	pDev->m_pDev->SetSerialID(nSerialNo);
 	pDev->m_pDev->SetDevID(nAddress);
 	pDev->m_pDev->SetSoftwareVersion(fSWVersion);
-	pDev->m_pDev->SetHardwareVersion(nHWVersion);
+	pDev->m_pDev->SetHardwareVersion(float(nHWVersion));
 	pDev->m_pDev->SetProductType(nProductType);
 	pDev->m_pDev->SetComPort(nSubnet);
 

@@ -1,74 +1,50 @@
 
-#pragma once
-
 #include "stdafx.h"
 #include "globle_function.h"
 #include "Windows.h"
 #include "T3000.h"
-#include "EnumSerial.h"
 
 
+
+#include "T3000RegAddress.h"
 
 
 #define DELAY_TIME	 10	//MS
 #define Modbus_Serial	0
 #define	Modbus_TCP	1
 
-#include "MainFrm.h"
-//#include "global_variable.h"
-//#include "global_variable_extern.h"
+#include "modbus_read_write.cpp"
 
-//how to linker the modbus.dll;;
+/**
+
+A wrapper for modbus_read_one_value which returns BOTH read value and error flag
+
+  @param[in]   device_var	the modbus device address
+  @param[in]   address		the offset of the value to be read in the device
+  @param[in]   retry_times	the number of times to retry on read failure before giving up
+
+  @return -1, -2, -3 on error, otherwise value read cast to integer
+
+  This interface is provided for compatibility with existing code.
+  New code should use modbus_read_one_value() directly,
+  since it returns a separate error flag and read value -
+  allowing simpler, more easily understood calling code design.
+
+*/
+
 int read_one(unsigned char device_var,unsigned short address,int retry_times)
-{//programmer can control retry times,by parameter retry_times
-	BOOL bTemp = g_bEnableRefreshTreeView;
-	g_bEnableRefreshTreeView = FALSE;
-	int j = read_one_org(device_var,address,retry_times);
-	g_bEnableRefreshTreeView |= bTemp;
-	return j;
-}
-
-// 这个是原始的
-int read_one_org(unsigned char device_var,unsigned short address,int retry_times)
-{//programmer can control retry times,by parameter retry_times	
-// 	CString str;
-// 	str.Format(_T("ID:%d [Tx=%d : Rx=%d]"), device_var, g_llTxCount++, g_llRxCount);
-// 	SetPaneString(0,str);
-	int j=0;
-	for(int i=0;i<retry_times;i++)
-	{
-		register_critical_section.Lock();
-		j=Read_One(device_var,address);
-		register_critical_section.Unlock();
-		if (g_CommunicationType==Modbus_Serial)
-		{
-		}
-
-		if(j!=-2 && j!=-3)
-		{
-			CString str;
-		
-			if (j == -1) // no connection
-			{
-				str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d]"), device_var, ++g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
-			}
-			else
-			{
-				str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d]"), device_var, ++g_llTxCount, ++g_llRxCount, g_llTxCount-g_llRxCount);
-			}
-			SetPaneString(0,str);
-			if(address==101 && j>32767)
-			{//the temperature is below zero;;;;;-23.3
-				j=0-65535+j;
-			}
-			return j;//return reght ,success
-		}	 
+{
+	int value;
+	int j = modbus_read_one_value( value, device_var, address, retry_times );
+	if( j != 0 ) {
+		// there was an error, so return the error flag
+		return j;
+	} else {
+		// no error, so return value read
+		return value;
 	}
-	CString str;
-	str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount,g_llTxCount-g_llRxCount );
-	SetPaneString(0,str);
-	return j;
 }
+
 
 void SetPaneString(int nIndext,CString str)
 {
@@ -86,8 +62,8 @@ void SetPaneString(int nIndext,CString str)
 		return;
 	pStatusBar = (CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR);
 	pStatusBar->SetPaneText(nIndext,str.GetString());
+	//pStatusBar->SetPaneTextColor (RGB(128,0,0));
 
-//pStatusBar->SetPaneTextColor (RGB(128,0,0));
 // 	CRect rc;
 // 	pStatusBar->GetItemRect(0, &rc);
 // 	CDC* pDC = pStatusBar->GetWindowDC();
@@ -123,9 +99,7 @@ int write_one(unsigned char device_var,unsigned short address,short value,int re
 }
 
 int write_one_org(unsigned char device_var,unsigned short address,short value,int retry_times)
-{
-
-//retry 
+{//retry 
 // 	CString str;
 // 	str.Format(_T("ID :%d Writing %d"),device_var,address);
 // 	SetPaneString(0,str);
@@ -246,8 +220,6 @@ int Read_Multi_org(unsigned char device_var,unsigned short *put_data_into_here,u
 	return j;
 }
 
-
-
 int turn_hex_str_to_ten_num(char *source)
 {
 	int j=0,k=0,l=0;
@@ -295,54 +267,6 @@ int turn_hex_str_to_ten_num(char *source)
 	return l;
 }
 
-unsigned short turn_4_hex_char_to_unsigned_short(char *source)
-{//can only turn four char(hex string) to int
-	//return -1,the wrong input ,the char number>4;or the input char is not hex string;
-
-	int a=strlen(source);
-	if(a>4)
-	{
-//		AfxMessageBox("wrong input!\nthat the length of the input string !=2!");
-//		for(int i=0;i<a;i++)
-//			*source='\0';
-		return -1;//input wrong 1
-	}
-	unsigned short k=0,l=0;
-	for(int j=0;j<a;j++)
-	{
-		switch(source[j])
-		{
-		case '0':k=0;break;
-		case '1':k=1;break;
-		case '2':k=2;break;
-		case '3':k=3;break;
-		case '4':k=4;break;
-		case '5':k=5;break;
-		case '6':k=6;break;
-		case '7':k=7;break;
-		case '8':k=8;break;
-		case '9':k=9;break;
-
-		case 'a':k=10;break;
-		case 'b':k=11;break;
-		case 'c':k=12;break;
-		case 'd':k=13;break;
-		case 'e':k=14;break;
-		case 'f':k=15;break;
-		case 'A':k=10;break;
-		case 'B':k=11;break;
-		case 'C':k=12;break;
-		case 'D':k=13;break;
-		case 'E':k=14;break;
-		case 'F':k=15;break;
-
-		default: return -1;//2
-		}
-		l*=16;
-		l+=k;
-	}
-	return l;
-}
 int turn_hex_char_to_int(char c)
 {
 		int k=0;
@@ -411,210 +335,11 @@ void turn_int_to_unsigned_char(char *source,int length_source,unsigned char *aim
 		}
 }
 
-void turn_unsigned_short_to_hex_char(char *order,unsigned short source)
-{//return value ,1 is success ,0 is failure
-	//the number of the order ,should >=5,is good
-	//the source must >0 and <65535
-	int itemp=0;
-	unsigned short ustemp=0;
-	do{
-		ustemp=source%16;
-		order[itemp]=turn_unsigned_to_char(ustemp);
-		source/=16;
-		itemp++;
-	}while(source!=0);
-	order[itemp]='\0';	
-	if(strlen(order)%2)
-	{		
-		order[itemp]='0';
-		order[itemp+1]='\0';
-	}
-	order=strrev(order);
-}
-char turn_unsigned_to_char(unsigned short source)
-{//return value ,is the char 
-	//0 is failure
-	if(source>15)
-		return 0;
-	if(source>=0 && source<=9)
-		return source+48;
-	else
-		if(source>=10 && source<=15)
-			return source+55;
-}
 
-void delete_folder(CString DirName)
-{
-	CFileFind tempFind; 
-	CString temp_str;
-	temp_str=DirName+_T("\\*.*");
-	BOOL IsFinded=(BOOL)tempFind.FindFile(temp_str.GetString()); 
-	while(IsFinded) 
-	{ 
-		IsFinded=(BOOL)tempFind.FindNextFile(); 
-		if(!tempFind.IsDots()) 
-		{ 
-			CString file_name=tempFind.GetFileName();			
-			file_name=DirName+"\\"+file_name;				
-			if(tempFind.IsDirectory()) 
-				delete_folder(file_name); 
-			else 
-				DeleteFile(file_name); 
-		} 
-	} 
-	tempFind.Close(); 
-	RemoveDirectory(DirName);//delete blank directory
-}
 
-CString get_units_from_now_range(int the_tstat_id,int analog1_or_analog2)
-{//parameter analog1_or_analog2 is the register id
-	//analog1 is 180;analog2 is 181
-	//if analog1_or_analog2 is negative ,only get temperature units ,
-	CString geted_units;
-	int the_rang;
-	if(analog1_or_analog2<0)
-	{
-		the_rang=read_one(the_tstat_id,121);
-		UINT uint_temp=GetOEMCP();//get system is for chinese or english
-		if(the_rang==0)
-		{
-			if(uint_temp!=936 && uint_temp!=950)
-				geted_units.Format(_T("%dC"),176);
-			else
-				geted_units=_T("°C");
-		}
-		else
-		{
-			if(uint_temp!=936 && uint_temp!=950)
-				geted_units.Format(_T("%dF"),176);
-			else
-				geted_units=_T("°F");
-		}
-		return geted_units;
-	}
-	if(analog1_or_analog2==180)
-		the_rang=read_one(the_tstat_id,188);
-	else if(analog1_or_analog2==181)
-		the_rang=read_one(the_tstat_id,189);
-	if(the_rang==0)
-		//Raw
-		geted_units="";
-	else if(the_rang==1)
-	{//
-		the_rang=read_one(the_tstat_id,121);
-		UINT uint_temp=GetOEMCP();//get system is for chinese or english
-		if(the_rang==0)
-		{
-			if(uint_temp!=936 && uint_temp!=950)
-				geted_units.Format(_T("%dC"),176);
-			else
-				geted_units=_T("°C");
-		}
-		else
-		{
-			if(uint_temp!=936 && uint_temp!=950)
-				geted_units.Format(_T("%dF"),176);
-			else
-				geted_units=_T("°F");
-		}
-	}
-	else if(the_rang==2)
-	{//
-		geted_units=_T("%");
-	}
-	else if(the_rang==3)
-	{//ON/OFF
-		geted_units=_T("");
-	}
-	else if(the_rang==4)
-	{//Customer Sersor
-		if(analog1_or_analog2==180)
-		{
-			int m_271=read_one(the_tstat_id,271);
-			int m_272=read_one(the_tstat_id,272);
-			if(m_271>>8=='0')
-			{
-				if((m_271 & 0xFF) =='0')
-				{
-					if(m_272>>8=='0')
-						geted_units.Format(_T("%c"),m_272 & 0xFF);
-					else
-						geted_units.Format(_T("%c%c"),m_272>>8,m_272 & 0xFF);
-				}
-				else
-					geted_units.Format(_T("%c%c%c"),m_271 & 0xFF,m_272>>8,m_272 & 0xFF);
-			}
-			else
-				geted_units.Format(_T("%c%c%c%c"),m_271>>8,m_271 & 0xFF,m_272>>8,m_272 & 0xFF);
-		}
-		else if(analog1_or_analog2==181)
-		{
-			int m_273=read_one(the_tstat_id,273);
-			int m_274=read_one(the_tstat_id,274);
-			if(m_273>>8=='0')
-			{
-				if((m_273 & 0xFF)=='0')
-				{
-					if(m_274>>8=='0')
-						geted_units.Format(_T("%c"),m_274 & 0xFF);
-					else
-						geted_units.Format(_T("%c%c"),m_274>>8,m_274 & 0xFF);
-				}
-				else
-					geted_units.Format(_T("%c%c%c"),m_273 & 0xFF,m_274>>8,m_274 & 0xFF);
-			}		
-			else
-				geted_units.Format(_T("%c%c%c%c"),m_273>>8,m_273 & 0xFF,m_274>>8,m_274 & 0xFF);
 
-		}
-	}	
-	return geted_units;
-}
 
-void SetPaneCommunicationPrompt(CString strComInfo)
-{
-	/*
-	static CStatusBar * pStatusBar=NULL;
-	if(AfxGetMainWnd()->GetActiveWindow()==NULL)//if this function is called by a thread ,return 
-		return;
-	if(pStatusBar==NULL)
-		pStatusBar = (CStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR);
-	pStatusBar->SetPaneText(2,strComInfo.GetString(),true);
-	*/
 
-}
-bool judgement_file_or_path_exist(CString path)
-{
-	HANDLE hFile;
-	WIN32_FIND_DATA fData;
-	hFile = FindFirstFile(path,&fData);
-	if(hFile == INVALID_HANDLE_VALUE)
-	{
-		CString str;
-		str=path.Right(3);
-		str.MakeUpper();
-		if(str=="MDB")
-		{
-			str=_T("The file :")+path+_T(".\n\nDoesn't exist.Please reinstall or verify!");
-			FindClose(hFile);
-			AfxMessageBox(str);
-		}
-		return false;
-	}
-	else
-	{
-		FindClose(hFile);
-		return true;
-	}
-}
-
-void clear_a_char_array(char *p,char t)
-{
-	int j=strlen(p);
-	if(j<1000)
-		for(int i=0;i<j;i++)
-			p[i]=t;
-}
 float get_tstat_version(unsigned short tstat_id)
 {//get tstat version and judge the tstat is online or no
 	//tstat is online ,return >0
@@ -632,21 +357,39 @@ float get_tstat_version(unsigned short tstat_id)
 	}//tstat_version
 	return tstat_version2;
 }
+
 float get_curtstat_version()
 {
-	float tstat_version2=multi_register_value[MODBUS_VERSION_NUMBER_LO];//tstat version			
+	float tstat_version2= product_register_value[MODBUS_VERSION_NUMBER_LO];//tstat version			
 	if(tstat_version2<=0)
 		return tstat_version2;
 	if(tstat_version2 >=240 && tstat_version2 <250)
 		tstat_version2 /=10;
 	else 
 	{
-		tstat_version2 = (float)(multi_register_value[MODBUS_VERSION_NUMBER_HI]*256+multi_register_value[MODBUS_VERSION_NUMBER_LO]);	
+		tstat_version2 = (float)(product_register_value[MODBUS_VERSION_NUMBER_HI]*256+product_register_value[MODBUS_VERSION_NUMBER_LO]);	
 		tstat_version2 /=10;
 	}//tstat_version
 	return tstat_version2;
 
 }
+
+//Marked by Fance 2013/03 28 
+//float get_curtstat_version()
+//{
+//	float tstat_version2=multi_register_value[MODBUS_VERSION_NUMBER_LO];//tstat version			
+//	if(tstat_version2<=0)
+//		return tstat_version2;
+//	if(tstat_version2 >=240 && tstat_version2 <250)
+//		tstat_version2 /=10;
+//	else 
+//	{
+//		tstat_version2 = (float)(multi_register_value[MODBUS_VERSION_NUMBER_HI]*256+multi_register_value[MODBUS_VERSION_NUMBER_LO]);	
+//		tstat_version2 /=10;
+//	}//tstat_version
+//	return tstat_version2;
+//
+//}
 
 int make_sure_isp_mode(int the_tstat_id)
 {
@@ -682,70 +425,15 @@ bool get_serialnumber(long & serial,int the_id_of_product)
 		return FALSE;
 }
 
-bool Get_SerialNumberA(long & serial,int the_id_of_product)
-{
-	unsigned short SerialNum[4]={0};
-	int nRet=0;
-	nRet=Read_Multi(the_id_of_product,&SerialNum[0],0,4);
-	serial=0;
-	if(nRet>0)
-	{
-		serial=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
-		return TRUE;
-	}
-		return FALSE;
 
-}
 UINT get_serialnumber()
 {
 	return multi_register_value[MODBUS_SERIALNUMBER_LOWORD]+multi_register_value[MODBUS_SERIALNUMBER_LOWORD+1]*256+multi_register_value[MODBUS_SERIALNUMBER_HIWORD]*256*256+multi_register_value[MODBUS_SERIALNUMBER_HIWORD+1]*256*256*256;
 }
 
-void message_box_function(CString content,CString title,UINT Utype)
-{
-	MessageBox(NULL,content,title,Utype);	
-}
 
 
 
-void button_load_bitmap(CButton &p_wnd,CString name)
-{
-	/*
-	CString temp_path=program_path+_T("\\")+name;//////////////////////*******path
-	HBITMAP hbitmap=(HBITMAP)LoadImage(NULL,temp_path.GetString(),//更改你喜欢的位图文件
-	IMAGE_BITMAP,0,0,                              //parameter
-	LR_LOADFROMFILE|LR_CREATEDIBSECTION);
-	p_wnd.SetBitmap(hbitmap);
-	*/
-
-}
-
-
-CString get_unit_a_str(CString have_unit_str)
-{
-	CString str_temp=have_unit_str;
-	for(int i=0;i<str_temp.GetLength();i++)
-	{
-		char c_temp= (char)str_temp.GetAt(i);
-		if(c_temp!='0' && c_temp!='1' && c_temp!='2' && c_temp!='3' && c_temp!='4' && c_temp!='5' && 
-			c_temp!='6' && c_temp!='7' && c_temp!='8' && c_temp!='9' && c_temp!='.' && c_temp!='-')
-		{
-			str_temp=str_temp.Right(str_temp.GetLength()-i);
-			break;
-		}
-	}
-	if(str_temp==have_unit_str)
-		str_temp="";
-	return str_temp;
-}
-
-bool is_a_float_str(CString str)
-{
-	if(str.Find(_T("."))==-1)
-		return false;
-	else
-		return true;
-}
 
 bool multi_read_tstat(int id)
 {
@@ -826,133 +514,6 @@ CString get_product_name_by_product_model(int product_model)
 	return return_str;
 }
 
-/* 1，变量命名难以理解，2，逻辑混乱，故重写之 ，2011.07.01, by zgq
-CString GetTempUnit(int analog1_or_analog2)
-{
-	CString strTemp=_T("");
-	if(analog1_or_analog2<0)
-	{
-		UINT uint_temp=GetOEMCP();//get system is for chinese or english
-		if(uint_temp!=936 && uint_temp!=950)
-		{
-			if(multi_register_value[121]==0)
-			{
-				strTemp.Format(_T("%cC"),176);
-			}
-			else
-			{
-				strTemp.Format(_T("%cF"),176);
-			}
-		}
-		else
-		{
-			//Chinese.
-			if(multi_register_value[121]==0)
-			{
-				strTemp=_T("°C");
-			}
-			else
-			{
-				strTemp=_T("°F");
-			}
-		}
-		return strTemp;
-	}
-
-
-	int the_rang;
-	if(analog1_or_analog2==180)
-		the_rang=multi_register_value[188];
-	else if(analog1_or_analog2==181)
-		the_rang=multi_register_value[189];
-	if(the_rang==0)
-		//Raw
-		strTemp=_T("");
-	else if(the_rang==1)
-	{//
-			UINT uint_temp=GetOEMCP();//get system is for chinese or english
-		if(uint_temp!=936 && uint_temp!=950)
-		{
-			if(multi_register_value[121]==0)
-			{
-				strTemp.Format(_T("%cC"),176);
-			}
-			else
-			{
-				strTemp.Format(_T("%cF"),176);
-			}
-		}
-		else
-		{
-			//hinese.
-			if(multi_register_value[121]==0)
-			{
-				strTemp=_T("°C");
-			}
-			else
-			{
-				strTemp=_T("°F");
-			}
-		}
-		return strTemp;
-	}
-	else if(the_rang==2)
-	{//
-		strTemp=_T("%");
-	}
-	else if(the_rang==3)
-	{//ON/OFF
-		strTemp=_T("");
-	}
-	else if(the_rang==4)
-	{//Customer Sersor
-		if(analog1_or_analog2==180)
-		{
-			int m_271=multi_register_value[271];
-			int m_272=multi_register_value[272];
-			if(m_271>>8=='0')
-			{
-				if((m_271 & 0xFF) =='0')
-				{
-					if(m_272>>8=='0')
-						strTemp.Format(_T("%c"),m_272 & 0xFF);
-					else
-						strTemp.Format(_T("%c%c"),m_272>>8,m_272 & 0xFF);
-				}
-				else
-					strTemp.Format(_T("%c%c%c"),m_271 & 0xFF,m_272>>8,m_272 & 0xFF);
-			}
-			else
-				strTemp.Format(_T("%c%c%c%c"),m_271>>8,m_271 & 0xFF,m_272>>8,m_272 & 0xFF);
-		}
-		else if(analog1_or_analog2==181)
-		{
-			int m_273=multi_register_value[273];
-			int m_274=multi_register_value[274];
-			if(m_273>>8=='0')
-			{
-				if((m_273 & 0xFF)=='0')
-				{
-					if(m_274>>8=='0')
-						strTemp.Format(_T("%c"),m_274 & 0xFF);
-					else
-						strTemp.Format(_T("%c%c"),m_274>>8,m_274 & 0xFF);
-				}
-				else
-					strTemp.Format(_T("%c%c%c"),m_273 & 0xFF,m_274>>8,m_274 & 0xFF);
-			}		
-			else
-				strTemp.Format(_T("%c%c%c%c"),m_273>>8,m_273 & 0xFF,m_274>>8,m_274 & 0xFF);
-
-		}
-	}	
-	return strTemp;
-}
-
-*/
-
-
-
 // Function : 获得单位名称，此单位用于Input Grid，Output Grid，Output Set Grid，主界面的Grid等等。
 // Param: int nRange: 指示当前的Range的选择值。函数应该根据Range的选择以及TStat的型号，
 //					获得单位名称，如摄氏度，华氏度，百分比，自定义的单位等。
@@ -961,13 +522,13 @@ CString GetTempUnit(int analog1_or_analog2)
 CString GetTempUnit(int nRange, int nPIDNO)
 {
 	CString strTemp=_T("");
-	
+
 	if(nRange<0) // 使用默认的温度单位
 	{
 		UINT uint_temp=GetOEMCP();//get system is for chinese or english
 		if(uint_temp!=936 && uint_temp!=950)
 		{
-			if(multi_register_value[121]==0)
+			if(product_register_value[MODBUS_DEGC_OR_F]==0)	//121
 			{
 				strTemp.Format(_T("%cC"),176);
 			}
@@ -979,7 +540,7 @@ CString GetTempUnit(int nRange, int nPIDNO)
 		else
 		{
 			//Chinese.
-			if(multi_register_value[121]==0)
+			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 			{
 				strTemp=_T("°C");
 			}
@@ -998,7 +559,7 @@ CString GetTempUnit(int nRange, int nPIDNO)
 		UINT uint_temp=GetOEMCP();//get system is for chinese or english
 		if(uint_temp!=936 && uint_temp!=950)
 		{
-			if(multi_register_value[121]==0)
+			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 			{
 				strTemp.Format(_T("%cC"),176);
 			}
@@ -1010,7 +571,7 @@ CString GetTempUnit(int nRange, int nPIDNO)
 		else
 		{
 			//chinese.
-			if(multi_register_value[121]==0)
+			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 			{
 				strTemp=_T("°C");
 			}
@@ -1033,8 +594,8 @@ CString GetTempUnit(int nRange, int nPIDNO)
 	{//Customer Sersor
 		if(nPIDNO==1)
 		{
-			int m_271=multi_register_value[271];
-			int m_272=multi_register_value[272];
+			int m_271=product_register_value[MODBUS_UNITS1_HIGH];//271 390
+			int m_272=product_register_value[MODBUS_UNITS1_LOW];//272  391
 			if(m_271>>8=='0')
 			{
 				if((m_271 & 0xFF) =='0')
@@ -1052,8 +613,8 @@ CString GetTempUnit(int nRange, int nPIDNO)
 		}
 		else if(nPIDNO==2)
 		{
-			int m_273=multi_register_value[273];
-			int m_274=multi_register_value[274];
+			int m_273=product_register_value[MODBUS_UNITS2_HIGH];//273  392;
+			int m_274=product_register_value[MODBUS_UNITS2_LOW];//274 393;
 			if(m_273>>8=='0')
 			{
 				if((m_273 & 0xFF)=='0')
@@ -1072,6 +633,119 @@ CString GetTempUnit(int nRange, int nPIDNO)
 		}
 	}	
 	return strTemp;
+
+	//CString strTemp=_T("");
+	//
+	//if(nRange<0) // 使用默认的温度单位
+	//{
+	//	UINT uint_temp=GetOEMCP();//get system is for chinese or english
+	//	if(uint_temp!=936 && uint_temp!=950)
+	//	{
+	//		if(multi_register_value[121]==0)
+	//		{
+	//			strTemp.Format(_T("%cC"),176);
+	//		}
+	//		else
+	//		{
+	//			strTemp.Format(_T("%cF"),176);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		//Chinese.
+	//		if(multi_register_value[121]==0)
+	//		{
+	//			strTemp=_T("°C");
+	//		}
+	//		else
+	//		{
+	//			strTemp=_T("°F");
+	//		}
+	//	}
+	//	return strTemp;
+	//}
+
+	//if(nRange==0)		// Raw value, no unit
+	//	strTemp=_T("");
+	//else if(nRange==1)
+	//{//
+	//	UINT uint_temp=GetOEMCP();//get system is for chinese or english
+	//	if(uint_temp!=936 && uint_temp!=950)
+	//	{
+	//		if(multi_register_value[121]==0)
+	//		{
+	//			strTemp.Format(_T("%cC"),176);
+	//		}
+	//		else
+	//		{
+	//			strTemp.Format(_T("%cF"),176);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		//chinese.
+	//		if(multi_register_value[121]==0)
+	//		{
+	//			strTemp=_T("°C");
+	//		}
+	//		else
+	//		{
+	//			strTemp=_T("°F");
+	//		}
+	//	}
+	//	return strTemp;
+	//}
+	//else if(nRange==2)
+	//{//
+	//	strTemp=_T("%");
+	//}
+	//else if(nRange==3)
+	//{//ON/OFF
+	//	strTemp=_T("");
+	//}
+	//else if(nRange==4)
+	//{//Customer Sersor
+	//	if(nPIDNO==1)
+	//	{
+	//		int m_271=multi_register_value[271];
+	//		int m_272=multi_register_value[272];
+	//		if(m_271>>8=='0')
+	//		{
+	//			if((m_271 & 0xFF) =='0')
+	//			{
+	//				if(m_272>>8=='0')
+	//					strTemp.Format(_T("%c"),m_272 & 0xFF);
+	//				else
+	//					strTemp.Format(_T("%c%c"),m_272>>8,m_272 & 0xFF);
+	//			}
+	//			else
+	//				strTemp.Format(_T("%c%c%c"),m_271 & 0xFF,m_272>>8,m_272 & 0xFF);
+	//		}
+	//		else
+	//			strTemp.Format(_T("%c%c%c%c"),m_271>>8,m_271 & 0xFF,m_272>>8,m_272 & 0xFF);
+	//	}
+	//	else if(nPIDNO==2)
+	//	{
+	//		int m_273=multi_register_value[273];
+	//		int m_274=multi_register_value[274];
+	//		if(m_273>>8=='0')
+	//		{
+	//			if((m_273 & 0xFF)=='0')
+	//			{
+	//				if(m_274>>8=='0')
+	//					strTemp.Format(_T("%c"),m_274 & 0xFF);
+	//				else
+	//					strTemp.Format(_T("%c%c"),m_274>>8,m_274 & 0xFF);
+	//			}
+	//			else
+	//				strTemp.Format(_T("%c%c%c"),m_273 & 0xFF,m_274>>8,m_274 & 0xFF);
+	//		}		
+	//		else
+	//			strTemp.Format(_T("%c%c%c%c"),m_273>>8,m_273 & 0xFF,m_274>>8,m_274 & 0xFF);
+
+	//	}
+	//}	
+	//return strTemp;
 }
 
 CString get_product_class_name_by_model_ID(int nModelID)
@@ -1149,31 +823,4 @@ BOOL GetSerialComPortNumber1(vector<CString>& szComm)
 	}
 
 	return FALSE;   
-}
-
-
-BOOL GetSerialComPortNumber(vector<CString>& szComm)
-{
-	CArray<SSerInfo,SSerInfo&> asi;
-
-	// Populate the list of serial ports.
-	EnumSerialPorts(asi,FALSE/*include all*/);
-	szComm.clear();
-	for (int ii=0; ii<asi.GetSize(); ii++) 
-	{
-		//m_listPorts.AddString(asi[ii].strFriendlyName);
-		CString strCom = asi[ii].strFriendlyName;
-		int nPos;
-		if ((nPos = strCom.Find(_T("COM")))!=-1)
-		{
-			int startdex = strCom.ReverseFind(_T('('));
-			int enddex = strCom.ReverseFind(_T(')'));
-			//if (startdex > 0 && enddex == (strCom.GetLength()-1))
-				strCom = strCom.Mid(startdex+1, enddex-startdex-1);
-		}
-		szComm.push_back(strCom);
-			
-	}
-
-	return (szComm.size() !=0);
 }

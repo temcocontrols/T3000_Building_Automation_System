@@ -10,29 +10,29 @@
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
     <Filter Include="T3">
-      <UniqueIdentifier>{1ce28af3-4c48-4bd4-96b5-0a1292661b94}</UniqueIdentifier>
+      <UniqueIdentifier>{491ab79e-3026-45a4-85e4-ec41cec87837}</UniqueIdentifier>
     </Filter>
     <Filter Include="MiniPanel">
-      <UniqueIdentifier>{767ebf3d-bc63-4607-83d9-0cf36e565050}</UniqueIdentifier>
+      <UniqueIdentifier>{0df3ed59-d767-4c3d-b29b-b00458ae49ff}</UniqueIdentifier>
     </Filter>
     <Filter Include="CADO">
-      <UniqueIdentifier>{b0c19caf-57ca-4e84-9cee-d722b3eac48f}</UniqueIdentifier>
+      <UniqueIdentifier>{48b58ac0-1edd-4abb-a57c-c4b2e22ec2f7}</UniqueIdentifier>
     </Filter>
     <Filter Include="CM5">
-      <UniqueIdentifier>{2603a978-64b3-4265-aaf8-37c399f107ba}</UniqueIdentifier>
+      <UniqueIdentifier>{9235cbf0-8a36-4a35-abc3-a96571334992}</UniqueIdentifier>
     </Filter>
     <Filter Include="AirQuality">
-      <UniqueIdentifier>{aadaf6fe-499e-426b-a0ab-f26afe4e305b}</UniqueIdentifier>
+      <UniqueIdentifier>{2535fb5b-69b2-435a-9d07-57f479d0b136}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
     <Filter Include="ISP">
-      <UniqueIdentifier>{5140d509-0a69-43e0-97dd-1e1b0307caf8}</UniqueIdentifier>
+      <UniqueIdentifier>{81280580-ae71-4047-8cd6-69ab8bdcbf9e}</UniqueIdentifier>
     </Filter>
     <Filter Include="singleslider">
-      <UniqueIdentifier>{724c7054-8a85-4d9d-ac03-8298dc910250}</UniqueIdentifier>
+      <UniqueIdentifier>{66f2d924-ec41-4e18-8c58-35e5484ea4a0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,22 +69,19 @@
     <ClCompile Include="LightingController\configure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DBOprator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Dialog_Progess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DialogInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EnumSerial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EreaseDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="excel9.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="extern_function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="fileRW.cpp">
@@ -166,9 +163,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OutPutDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OutputSetDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OutsidDailog.cpp">
@@ -285,10 +279,13 @@
     <ClCompile Include="singleslider\MacSliderCtrl.cpp">
       <Filter>singleslider</Filter>
     </ClCompile>
-    <ClCompile Include="FreezeFunction.cpp">
+    <ClCompile Include="HumChamber.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DisplayConfig.cpp">
+    <ClCompile Include="T3000RegAddress.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputSetDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -419,6 +416,14 @@
     <None Include="UserImages.bmp">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="ReadMe.txt" />
+    <None Include="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt" />
+    <None Include="res\Refresh.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Exit.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -458,6 +463,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LightingController\configure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DBOprator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="define.h">
@@ -700,10 +708,7 @@
     <ClInclude Include="singleslider\MacSliderCtrl.h">
       <Filter>singleslider</Filter>
     </ClInclude>
-    <ClInclude Include="FreezeFunction.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DisplayConfig.h">
+    <ClInclude Include="HumChamber.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -126,8 +126,7 @@ public:
 	afx_msg void OnNMReleasedcaptureNightSlider(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMReleasedcaptureNightheatSlider(NMHDR *pNMHDR, LRESULT *pResult);
 
-	HANDLE m_hSerial;
-	//´®¿Ú¾ä±ú
+	HANDLE m_hSerial;//´®¿Ú¾ä±ú
 	SOCKET m_hSocket;
 
 	int m_nID;
@@ -249,7 +248,6 @@ public:
 	//CSliderCtrl m_singlesliderday;
 	CMacSliderCtrl m_singlesliderday;
 	CMacSliderCtrl m_singleslidernight;
-	afx_msg void OnBnClickedDisplayConfig();
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

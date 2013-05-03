@@ -214,7 +214,7 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 			
 				if(multi_register_value[359+nStatus]==1)
 				{
-					nValue=multi_register_value[367+nStatus]/10.0;
+					nValue=(int)(multi_register_value[367+nStatus]/10.0);
 					strTemp.Format(_T("%.1f"),nValue);
 				}
 				else
@@ -230,7 +230,7 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 				int nValue;
 				if(multi_register_value[341+nStatus]==1)
 				{
-					nValue=multi_register_value[349+nStatus]/10.0;
+					nValue=(int)(multi_register_value[349+nStatus]/10.0);
 					strTemp.Format(_T("%.1f"),nValue);
 				}
 				else
@@ -331,19 +331,19 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 					if(nRange==1)//0-10v
 					{
 						//nvalue=multi_register_value[102]/100 /10.0 * 100%;
-						nvalue=multi_register_value[102]/10.0;
+						nvalue=(float)(multi_register_value[102]/10.0);
 					}
 					if(nRange==2)//0-5v
 					{
-						nvalue=multi_register_value[102]/5.0;
+						nvalue=(float)(multi_register_value[102]/5.0);
 					}
 					if(nRange==3)//2-10v
 					{
-						nvalue=multi_register_value[102]/8.0;
+						nvalue=(float)(multi_register_value[102]/8.0);
 					}
 					if(nRange==4)//10-0v
 					{
-						nvalue=(10-multi_register_value[102]/100.0)/10.0 *100;
+						nvalue=(float)((10-multi_register_value[102]/100.0)/10.0 *100);
 					}
 					strTemp.Format(_T("%.1f%%"),nvalue);
 				}
@@ -369,19 +369,19 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 						if(nRange==1)//0-10v
 						{
 							//nvalue=multi_register_value[102]/100 /10.0 * 100%;
-							nvalue=multi_register_value[103]/10.0;
+							nvalue=(float)(multi_register_value[103]/10.0);
 						}
 						if(nRange==2)//0-5v
 						{
-							nvalue=multi_register_value[103]/5.0;
+							nvalue=(float)(multi_register_value[103]/5.0);
 						}
 						if(nRange==3)//2-10v
 						{
-							nvalue=multi_register_value[103]/8.0;
+							nvalue=(float)(multi_register_value[103]/8.0);
 						}
 						if(nRange==4)//10-0v
 						{
-							nvalue=(10-multi_register_value[103]/100.0)/10.0 *100;
+							nvalue=(float)((10-multi_register_value[103]/100.0)/10.0 *100);
 						}
 						strTemp.Format(_T("%.1f%%"),nvalue);
 
@@ -415,19 +415,19 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 					if(nRange==1)//0-10v
 					{
 						//nvalue=multi_register_value[102]/100 /10.0 * 100%;
-						nvalue=multi_register_value[102]/10.0;
+						nvalue=(float)(multi_register_value[102]/10.0);
 					}
 					if(nRange==2)//0-5v
 					{
-						nvalue=multi_register_value[102]/5.0;
+						nvalue=(float)(multi_register_value[102]/5.0);
 					}
 					if(nRange==3)//2-10v
 					{
-						nvalue=multi_register_value[102]/8.0;
+						nvalue=(float)(multi_register_value[102]/8.0);
 					}
 					if(nRange==4)//10-0v
 					{
-						nvalue=(10-multi_register_value[102]/100.0)/10.0 *100;
+						nvalue=(float)((10-multi_register_value[102]/100.0)/10.0 *100);
 					}
 					strTemp.Format(_T("%.1f%%"),nvalue);
 				
@@ -454,19 +454,19 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 					if(nRange==1)//0-10v
 					{
 						//nvalue=multi_register_value[102]/100 /10.0 * 100%;
-						nvalue=multi_register_value[103]/10.0;
+						nvalue=(float)(multi_register_value[103]/10.0);
 					}
 					if(nRange==2)//0-5v
 					{
-						nvalue=multi_register_value[103]/5.0;
+						nvalue=(float)(multi_register_value[103]/5.0);
 					}
 					if(nRange==3)//2-10v
 					{
-						nvalue=multi_register_value[103]/8.0;
+						nvalue=(float)(multi_register_value[103]/8.0);
 					}
 					if(nRange==4)//10-0v
 					{
-						nvalue=(10-multi_register_value[103]/100.0)/10.0 *100;
+						nvalue=(float)((10-multi_register_value[103]/100.0)/10.0 *100);
 					}
 					strTemp.Format(_T("%.1f%%"),nvalue);
 				}

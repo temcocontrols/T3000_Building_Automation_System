@@ -236,9 +236,7 @@ BOOL CAddBuilding::OnInitDialog()
 	CDialog::OnInitDialog();
 	::InitializeCriticalSection(&g_Lock);
 
-	//GetSerialComm(m_szComm);
-	  GetSerialComPortNumber(m_szComm);
-	//GetSerialComPortNumber1(m_szComm);
+	GetSerialComPortNumber1(m_szComm);
 	CString strIPTest;
 //	GetIPbyHostName(_T("www.google.com"),strIPTest);
 	m_AddBuiding_SetComBox.ShowWindow(SW_HIDE);
@@ -846,11 +844,10 @@ void CAddBuilding::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
 
-		SaveAll();
-//   scan，常要特意选择一个COM，即使看到的是正确也要选一下，否则就说串口号不对
-// 	 CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
-// 	 pMain->Treestatus();
-//	 OnOK();
+		SaveAll();//scan，常要特意选择一个COM，即使看到的是正确也要选一下，否则就说串口号不对
+// 		CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+// 		pMain->Treestatus();
+//	OnOK();
 }
 void CAddBuilding::OnEnSetfocusAddbuidingSetedit()
 {
@@ -1886,6 +1883,33 @@ void CAddBuilding::OnBnClickedAddbuiding()
 	{
 		strCOMPortBraud=_T("19200");
 	}
+
+	//----------------------Add by Fance 2013 04 23-------------------------------------------------------
+	//judge whether the building name you added is exist
+	//if not exist we need to add this building in table Building_ALL in t3000.mdb
+	//and then we can insert this building into table Building.if not ,it will crash when insert data into Building
+	//Because the table Building is associated with  Building_ALL 
+	strSql.Format(_T("Select * from Building_ALL where Building_Name = '%s'"),strMainBuildName);
+	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+	_variant_t temp_variant_name;
+	bool findMainBuilding=false;
+	if(VARIANT_FALSE==m_pRs->EndOfFile)		//If it's not empty , means the input Building has exist in Main Building.
+	{
+		findMainBuilding=true;
+	}
+
+	if(m_pRs->State)
+		m_pRs->Close();
+
+
+	if(!findMainBuilding)
+	{
+		strSql.Format(_T("insert into Building_ALL (Building_Name,Telephone,Address) values('"+strMainBuildName+"','"+ _T("") +"','"+_T("") +"')"));
+		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	}
+	//---------------------------------------------------------------------------------------------
+
+
 
 	try
 	{

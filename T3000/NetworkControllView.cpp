@@ -39,8 +39,7 @@ CNetworkControllView::CNetworkControllView()
 	, m_strTime(_T(""))
 	, m_nListenPort(6001)
 	, m_bWarningBldVersion(FALSE)
-	, m_Mac_Address(_T(""))
-	{
+{
 	
 }
 
@@ -51,28 +50,27 @@ CNetworkControllView::~CNetworkControllView()
 
 void CNetworkControllView::DoDataExchange(CDataExchange* pDX)
 {
-CFormView::DoDataExchange(pDX);
+	CFormView::DoDataExchange(pDX);
 
-DDX_Text(pDX, IDC_IDADDRESS_EDIT, m_IDaddress);
-DDX_Text(pDX, IDC_SERIALNUM_EDIT, m_nSerialNum);
-DDX_Text(pDX, IDC_EDIT4, m_firmwareVersion);
-DDX_Text(pDX, IDC_EDIT5, m_hardware_version);
-DDX_Text(pDX, IDC_EDIT6, m_strDate);
-DDX_Text(pDX, IDC_EDIT7, m_strTime);
-DDX_Text(pDX, IDC_EDIT8, m_nListenPort);
+	DDX_Text(pDX, IDC_IDADDRESS_EDIT, m_IDaddress);
+	DDX_Text(pDX, IDC_SERIALNUM_EDIT, m_nSerialNum);
+	DDX_Text(pDX, IDC_EDIT4, m_firmwareVersion);
+	DDX_Text(pDX, IDC_EDIT5, m_hardware_version);
+	DDX_Text(pDX, IDC_EDIT6, m_strDate);
+	DDX_Text(pDX, IDC_EDIT7, m_strTime);
+	DDX_Text(pDX, IDC_EDIT8, m_nListenPort);
 
 
-DDX_Control(pDX, IDC_CHECK1, m_ReadOnlyCheckBtn);
-DDX_Control(pDX, IDC_IPMODEL_COMBO, m_ipModelComBox);
-DDX_Control(pDX, IDC_IPADDRESS1, m_ip_addressCtrl);
-DDX_Control(pDX, IDC_IPADDRESS2, m_subnet_addressCtrl);
-DDX_Control(pDX, IDC_IPADDRESS3, m_gateway_addressCtrl);
-DDX_Control(pDX, IDC_EDIT8, m_listenPortEdit);
-DDX_Control(pDX, IDC_BAUDRATE_COMBX, m_baudRateCombox);
-DDX_Control(pDX, IDC_IDADDRESS_EDIT, m_idEdt);
-DDX_Control(pDX, IDC_MSFLEXGRID_SUB, m_gridSub);
-DDX_Text(pDX, IDC_MAC_ADDRESS, m_Mac_Address);
-	}
+	DDX_Control(pDX, IDC_CHECK1, m_ReadOnlyCheckBtn);
+	DDX_Control(pDX, IDC_IPMODEL_COMBO, m_ipModelComBox);
+	DDX_Control(pDX, IDC_IPADDRESS1, m_ip_addressCtrl);
+	DDX_Control(pDX, IDC_IPADDRESS2, m_subnet_addressCtrl);
+	DDX_Control(pDX, IDC_IPADDRESS3, m_gateway_addressCtrl);
+	DDX_Control(pDX, IDC_EDIT8, m_listenPortEdit);
+	DDX_Control(pDX, IDC_BAUDRATE_COMBX, m_baudRateCombox);
+	DDX_Control(pDX, IDC_IDADDRESS_EDIT, m_idEdt);
+	DDX_Control(pDX, IDC_MSFLEXGRID_SUB, m_gridSub);
+}
 
 BEGIN_MESSAGE_MAP(CNetworkControllView, CFormView)
 	ON_WM_ERASEBKGND()
@@ -158,12 +156,7 @@ void CNetworkControllView::OnInitialUpdate()
 	// init timesever combobox
 	initTimeServerList();
 
-	m_ipModelComBox.EnableWindow(TRUE);
-	//m_listenPortEdit.EnableWindow(TRUE);
-	//m_ip_addressCtrl.EnableWindow(TRUE);
-	//m_subnet_addressCtrl.EnableWindow(TRUE);
-	//m_gateway_addressCtrl.EnableWindow(TRUE);
-	GetDlgItem(IDC_APPLYBUTTON)->EnableWindow(TRUE);
+
 	//InitGrid();
 
 	
@@ -207,7 +200,7 @@ void CNetworkControllView::Fresh()
 	m_ip_addressCtrl.SetAddress((BYTE)multi_register_value[107],(BYTE)multi_register_value[108],(BYTE)multi_register_value[109],(BYTE)multi_register_value[110]);
 	m_subnet_addressCtrl.SetAddress((BYTE)multi_register_value[111],(BYTE)multi_register_value[112],(BYTE)multi_register_value[113],(BYTE)multi_register_value[114]);
 	m_gateway_addressCtrl.SetAddress((BYTE)multi_register_value[115],(BYTE)multi_register_value[116],(BYTE)multi_register_value[117],(BYTE)multi_register_value[118]);
-	//OnBnClickedCheck1();
+	OnBnClickedCheck1();
 		
 	if(multi_register_value[12]==0)
 	{
@@ -229,8 +222,9 @@ void CNetworkControllView::Fresh()
 		m_ipModelComBox.SetCurSel(1);
 	}
 
+
+	
 	m_nListenPort=multi_register_value[120];
-	m_Mac_Address=Get_MAC_Address();
 	InitGrid();
 
 	UpdateData(false);
@@ -677,10 +671,10 @@ void CNetworkControllView::OnBnClickedButtonUpdatetimeserver()
 		sockaddr.sin_addr.S_un.S_addr =inet_addr(szIP);
 	}
 	// write to nc
-	int n=write_one(g_tstat_id,178,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b1 ));
-	    n=write_one(g_tstat_id,179,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b2 ));
-	    n=write_one(g_tstat_id,180,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b3 ));
-	    n=write_one(g_tstat_id,181,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b4 ));
+	int n=write_one(g_tstat_id,178, BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b1 ));
+	n=write_one(g_tstat_id,179,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b2 ));
+	n=write_one(g_tstat_id,180,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b3 ));
+	n=write_one(g_tstat_id,181,BYTE(sockaddr.sin_addr.S_un.S_un_b.s_b4 ));
 
 	n=write_one(g_tstat_id,177,6); // 命令寄存器，同步命令
 
@@ -731,7 +725,8 @@ void CNetworkControllView::TestFunc(CString strIP)
 	{
 		DWORD IpAddr = *test->h_name;
 		CString temp;
- 
+		//        temp.Format("%d",IpAddr);
+		//        MessageBox(temp);
 		sockaddr.sin_addr.S_un.S_addr = htonl(*(DWORD*)test->h_addr_list[0]); // host
 		sockaddr1.sin_addr.S_un.S_addr = ntohl(*(DWORD*)test->h_addr_list[0]); // net
 		sockaddr2.sin_addr.S_un.S_addr = (*(DWORD*)test->h_addr_list[0]);
@@ -742,44 +737,33 @@ void CNetworkControllView::TestFunc(CString strIP)
 	WSACleanup();
 }
 
-/*
-FunctionName:GetIPFromHostName
-Comment:Alex
-Date:2012/11/30
-Purpose:
-可以通过域名解析服务器
-得到一个网站或者主机对应的IP地址
-*/
+
 CString CNetworkControllView::GetIPFromHostName(CString& strHostName) 
 { 
-	  
-	   CString	str=_T(""); //For IP
+	//char	szhostname[128]; 
+	CString	str; 
+	//获得主机名 
+//	if(   gethostname(szhostname,   128)   ==   0   ) 
+	{
+		//   获得主机ip地址 
 		struct hostent* phost;
 		int i;
 		USES_CONVERSION;
 		LPCSTR szHost = LPCSTR(W2A(strHostName));
 		phost = gethostbyname(szHost);
 		// m_hostname=szhostname;
-		if (phost!=NULL)
-		{
-			i=0;
+		i=0;
 		int j;
 		int h_length=4;
 		for( j =0; j < h_length; j++)
 		{
 			CString addr;
-			//这里当时IP的时候如何处理
 			if( j > 0)
 				str += ".";
 			addr.Format(_T("%u"), (unsigned int)((unsigned char*)phost->h_addr_list[i])[j]);
 			str += addr;
 		} 
-		} 
-		else
-		{
-		}
-		
-	 
+	} 
 	return str; 
 } 
 
@@ -816,20 +800,8 @@ float CNetworkControllView::GetFirmwareVersion()
 	
 	return m_firmwareVersion;
 }
-CString CNetworkControllView::Get_MAC_Address()
-{
-  CString Mac_ADD;
-  Mac_ADD.Format(_T("%02x-%02x-%02x-%02x-%02x-%02x"),multi_register_value[100],multi_register_value[101],multi_register_value[102],multi_register_value[103],multi_register_value[104],multi_register_value[105]);
-  return Mac_ADD;
-}
 
-/*
-FunctionName:CheckSettingChanged
-Comment:Alex
-Date:2012/11/30
-Purpose:
-确定设定变化的状态
-*/
+
 BOOL CNetworkControllView::CheckSettingChanged()
 {
 	BYTE f1,f2,f3,f4;
@@ -876,6 +848,8 @@ BOOL CNetworkControllView::CheckSettingChanged()
 }
 
 //*
+
+
 
 //HKEY_CURRENT_USER\Software\Temco T3000 Application\T3000\Timeserver
 
@@ -1059,13 +1033,13 @@ void CNetworkControllView::InitGrid()
 
 
 	//设置排/行数量
-	
-	
 	m_gridSub.put_Cols(10);//这句一定要有，如果下面再增加显示一外，而这里不变还是5，则会出错
 	m_gridSub.put_Rows(501);//包括标题栏
+
 	//set row high
 	m_gridSub.put_WordWrap(TRUE);
 	m_gridSub.put_RowHeight(0,500);
+
 	//设置列宽
 	m_gridSub.put_ColWidth(0,400);
 	m_gridSub.put_ColWidth(1,800);
@@ -1100,7 +1074,7 @@ void CNetworkControllView::InitGrid()
 	WORD data[30*500+2];
 	memset(data,0,sizeof(data));
 	int ret3 = Read_One(g_tstat_id,7001);
-	 int ret = Read_One(g_tstat_id,7000);//NC扫描到的TSTAT数量,2个字节 先放在高字节
+	int ret = Read_One(g_tstat_id,7000);//NC扫描到的TSTAT数量,2个字节 先放在高字节
 	if (ret>0&&ret<4)
 	{
 		Read_Multi(g_tstat_id,&data[0],7002,ret*30);
@@ -1129,8 +1103,7 @@ void CNetworkControllView::InitGrid()
 		}
 
 		
-	}
-	else
+	}else
 	{
 		ret = 0;
 	}
@@ -1192,7 +1165,7 @@ void CNetworkControllView::InitGrid()
 		case 27:strtemp1=g_strTstat7;break;
 		case 13:
 		case 14:break;
-		default:strtemp1=_T("UNUSED")/*g_strTstat5a*/;break;
+		default:strtemp1=g_strTstat5a;break;
 		}
 		m_gridSub.put_TextMatrix(i,1,strtemp1);
 
@@ -1293,7 +1266,7 @@ void  CNetworkControllView::AddNodeToNCTable(unsigned short* pNode)
 	int nAddress = pNode[1];
 	long nSerialNo = pNode[2]+pNode[3]*256+pNode[4]*256*256+pNode[5]*256*256*256;
 	
-	float fSWVersion = pNode[6] + pNode[7]*256;
+	float fSWVersion =float( pNode[6] + pNode[7]*256);
 	int nProductType = pNode[9];
 	
 	int nStatus = pNode[17];
@@ -1324,6 +1297,9 @@ void  CNetworkControllView::AddNodeToNCTable(unsigned short* pNode)
 	
 	strTemp.Format(_T("%d:%d"), nHour, nMin);
 	m_gridSub.put_TextMatrix(nRow,TIMESINCE_FIELD,strTemp);
+
+
+
 }
 
 

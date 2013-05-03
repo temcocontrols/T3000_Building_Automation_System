@@ -210,9 +210,9 @@ void CFreeCoolDlg::OnEnKillfocusTrgedit()
 	CString strTemp; 
 	GetDlgItem(IDC_TRGEDIT)->GetWindowText(strTemp);
 
-	float nValue=_wtof(strTemp);
+	float nValue=(float)_wtof(strTemp);
 	strTemp.Format(_T("%.1f"),nValue);
-	nValue=write_one(g_tstat_id,361,nValue*10);
+	write_one(g_tstat_id,361,short(nValue*10));
 	
 }
 

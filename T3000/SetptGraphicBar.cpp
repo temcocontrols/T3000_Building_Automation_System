@@ -93,10 +93,10 @@ void CSetptGraphicBar::DrawGraphicBar(CDC* pDC)
 					}
 					else
 					{
-						nValue=multi_register_value[374]/10.0;
+						nValue=(int)(multi_register_value[374]/10.0);
 					}
 					float bYpos=m_rcClient.top+RulerBeginPix-(float)nValue/(m_nRulerEnd-m_nRulerBegin)*m_nRulerHeight;
-					m_SetPtImg.rcImg=CRect(nThumLeftBase+m_rcClient.left,bYpos-m_nThumbHeight/2,nThumLeftBase+m_rcClient.left+m_nThumbWidth,bYpos+m_nThumbHeight/2);
+					m_SetPtImg.rcImg=CRect(nThumLeftBase+m_rcClient.left,(int)(bYpos-m_nThumbHeight/2),nThumLeftBase+m_rcClient.left+m_nThumbWidth,(int)(bYpos+m_nThumbHeight/2));
 					m_SetPtImg.pImg=m_pThumbImg;
 					graphics.DrawImage(m_SetPtImg.pImg,m_SetPtImg.rcImg.left,m_SetPtImg.rcImg.top,m_SetPtImg.rcImg.Width(),m_SetPtImg.rcImg.Height());
 					
@@ -129,7 +129,7 @@ void CSetptGraphicBar::DrawGraphicBar(CDC* pDC)
 				int nValue;
 				nValue=multi_register_value[131];
 				float bYpos=m_rcClient.top+RulerBeginPix-(float)nValue/(m_nRulerEnd-m_nRulerBegin)*m_nRulerHeight;
-				m_MaxImg.rcImg=CRect(nThumLeftBase+m_rcClient.left,bYpos-m_nThumbHeight/2,nThumLeftBase+m_rcClient.left+m_nThumbWidth,bYpos+m_nThumbHeight/2);
+				m_MaxImg.rcImg=CRect(nThumLeftBase+m_rcClient.left,(int)(bYpos-m_nThumbHeight/2),nThumLeftBase+m_rcClient.left+m_nThumbWidth,(int)(bYpos+m_nThumbHeight/2));
 				m_MaxImg.pImg=m_pThumbImg;
 				graphics.DrawImage(m_MaxImg.pImg,m_MaxImg.rcImg.left,m_MaxImg.rcImg.top,m_MaxImg.rcImg.Width(),m_MaxImg.rcImg.Height());
 			
@@ -161,7 +161,7 @@ void CSetptGraphicBar::DrawGraphicBar(CDC* pDC)
 				int nValue;
 				nValue=multi_register_value[132];
 				float bYpos=m_rcClient.top+RulerBeginPix-(float)nValue/(m_nRulerEnd-m_nRulerBegin)*m_nRulerHeight;
-				m_MinImg.rcImg=CRect(nThumLeftBase+m_rcClient.left,bYpos-m_nThumbHeight/2,nThumLeftBase+m_rcClient.left+m_nThumbWidth,bYpos+m_nThumbHeight/2);
+				m_MinImg.rcImg=CRect(nThumLeftBase+m_rcClient.left,(int)(bYpos-m_nThumbHeight/2),nThumLeftBase+m_rcClient.left+m_nThumbWidth,(int)(bYpos+m_nThumbHeight/2));
 				m_MinImg.pImg=m_pThumbImg;
 				graphics.DrawImage(m_MinImg.pImg,m_MaxImg.rcImg.left,m_MinImg.rcImg.top,m_MinImg.rcImg.Width(),m_MinImg.rcImg.Height());
 			
@@ -230,7 +230,7 @@ void CSetptGraphicBar::DrawGraphicBar(CDC* pDC)
 					{
 					
 						float bYpos=m_rcClient.top+RulerBeginPix-(float)nValueHeat/(m_nRulerEnd-m_nRulerBegin)*m_nRulerHeight;
-						m_HeatSetPt.rcImg=CRect(nThumLeftBase+m_rcClient.left,bYpos-m_nThumbHeight/2,nThumLeftBase+m_rcClient.left+m_nThumbWidth,bYpos+m_nThumbHeight/2);
+						m_HeatSetPt.rcImg=CRect(nThumLeftBase+m_rcClient.left,(int)(bYpos-m_nThumbHeight/2),nThumLeftBase+m_rcClient.left+m_nThumbWidth,(int)(bYpos+m_nThumbHeight/2));
 						m_HeatSetPt.pImg=m_pThumbImg;
 						graphics.DrawImage(m_HeatSetPt.pImg,m_HeatSetPt.rcImg.left,m_HeatSetPt.rcImg.top,m_HeatSetPt.rcImg.Width(),m_HeatSetPt.rcImg.Height());
 						CString strText;
@@ -256,7 +256,7 @@ void CSetptGraphicBar::DrawGraphicBar(CDC* pDC)
 					{
 						
 						float bYpos=m_rcClient.top+RulerBeginPix-(float)nValueCool/(m_nRulerEnd-m_nRulerBegin)*m_nRulerHeight;
-						m_CoolSetPt.rcImg=CRect(nThumLeftBase+m_rcClient.left,bYpos-m_nThumbHeight/2,nThumLeftBase+m_rcClient.left+m_nThumbWidth,bYpos+m_nThumbHeight/2);
+						m_CoolSetPt.rcImg=CRect(nThumLeftBase+m_rcClient.left,(int)(bYpos-m_nThumbHeight/2),nThumLeftBase+m_rcClient.left+m_nThumbWidth,(int)(bYpos+m_nThumbHeight/2));
 						m_CoolSetPt.pImg=m_pThumbImg;
 						graphics.DrawImage(m_CoolSetPt.pImg,m_CoolSetPt.rcImg.left,m_CoolSetPt.rcImg.top,m_CoolSetPt.rcImg.Width(),m_CoolSetPt.rcImg.Height());
 			
@@ -555,6 +555,6 @@ void CSetptGraphicBar::OnMouseMove(UINT nFlags, CPoint point)
 }
 int CSetptGraphicBar::PosTOValue(int nPix)
 {
-	int nValue=(m_rcClient.top+RulerBeginPix-nPix)/(float)m_nRulerHeight*(m_nRulerEnd-m_nRulerBegin)+m_nRulerBegin;
+	int nValue=(int)((m_rcClient.top+RulerBeginPix-nPix)/(float)m_nRulerHeight*(m_nRulerEnd-m_nRulerBegin)+m_nRulerBegin);
 	return nValue;
 }

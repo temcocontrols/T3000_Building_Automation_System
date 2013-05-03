@@ -81,7 +81,7 @@ description Weekly_Routines::read_addr(unsigned char addr2)
 	char *p;
 	p=(char *)&temp_description;///////////////*****pointer   attention
 	for(i=0;i<WR_DESCRIPTION_SIZE;i++)
-		(*(p++))=temp_buffer[i];
+		(*(p++))=(char)temp_buffer[i];
 	return temp_description;
 }
 void Weekly_Routines::put_row_col(description temp,unsigned char t_addr)

@@ -447,7 +447,8 @@ void CMannageBuidingDlg::OnEnKillfocusEdit1()
 			if(m_strMainBuiding.CompareNoCase(strText)==0)
 				return;
 			CString strTemp;
-			for(UINT i=0;i++;i<m_mainBuildingLst.size())
+			for(UINT i=0;i<m_mainBuildingLst.size();i++)		//modify by fance.
+			//for(UINT i=0;i++;i<m_mainBuildingLst.size())
 			{
 				strTemp=m_mainBuildingLst.at(i).strMainName;
 				if(strText.CompareNoCase(strTemp)==0)
@@ -481,7 +482,8 @@ void CMannageBuidingDlg::OnEnKillfocusEdit1()
 			if(m_strMainBuiding.CompareNoCase(strText)==0)
 				return;
 			CString strTemp;
-			for(int i=0;i++;i<m_mainBuildingLst.size())
+			for(UINT i=0;i<m_mainBuildingLst.size();i++)		//modify by fance.
+			//for(int i=0;i++;i<m_mainBuildingLst.size())
 			{
 				strTemp=m_mainBuildingLst.at(i).strMainName;
 				if(strText.CompareNoCase(strTemp)==0)

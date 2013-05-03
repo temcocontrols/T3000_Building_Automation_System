@@ -28,12 +28,12 @@ IMPLEMENT_DYNAMIC(CAllNodesDiaolg, CDialog)
 CAllNodesDiaolg::CAllNodesDiaolg(CWnd* pParent /*=NULL*/)
 	: CDialog(CAllNodesDiaolg::IDD, pParent)
 {
+
 	m_bChanged=FALSE;
 }
 
 CAllNodesDiaolg::~CAllNodesDiaolg()
 {
-
 }
 
 void CAllNodesDiaolg::DoDataExchange(CDataExchange* pDX)
@@ -64,24 +64,14 @@ END_MESSAGE_MAP()
 
 
 // CAllNodesDiaolg message handlers
-/*
-OnInitDialog();
-这个函数用来初始化数据库中的界面的
 
-*/
 BOOL CAllNodesDiaolg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	//设置输入文本隐藏，Combox隐藏起来
 	m_InputTextEdt.ShowWindow(SW_HIDE);
 	m_productCombox.ShowWindow(SW_HIDE);
 	//GetDlgItem(IDC_ADDBUTTON)->ShowWindow(SW_HIDE);
-/*
-获取CMainFrame 指针
-获得指针后就可以获取成员变量的数据
-m_subNetLst=vector 
-用来保存子节点的信息
-*/
+
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	m_strMainBuildingName= pFrame->m_strCurMainBuildingName;
 	m_strSubNetName= pFrame->m_strCurSubBuldingName;
@@ -96,14 +86,11 @@ m_subNetLst=vector
 
 	m_SubLstCombox.ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
-	//初始化数据库的链接+记录集组件
+	
 	m_pCon.CreateInstance(_T("ADODB.Connection"));
 	m_pRs.CreateInstance(_T("ADODB.Recordset"));
 	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 
-	//下载数据从数据库中
-	//ReloadAddBuildingDB
-	//包括了初始化控件
 	ReloadAddBuildingDB();
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
@@ -284,7 +271,6 @@ void CAllNodesDiaolg::SetBuildingMainName(CString strBuildName)
 
 void CAllNodesDiaolg::OnBnClickedDelbutton()
 {
-#if 1
 	if(m_nCurRow==0||m_nCurRow==m_FlexGrid.get_Rows()-1)
 	{
 		AfxMessageBox(_T("Please select a item first!"));
@@ -315,8 +301,6 @@ void CAllNodesDiaolg::OnBnClickedDelbutton()
 	}
 	ReloadAddBuildingDB();
 	m_bChanged=TRUE;
-#endif
-	
 
 }
 
@@ -345,13 +329,10 @@ void CAllNodesDiaolg::OnBnClickedDelallbutton()
 
 void CAllNodesDiaolg::OnBnClickedExitbutton()
 {
-#if 1
 	CAllNodesDiaolg::OnCancel();
-
+	
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
-#endif
-	
 }
 
 void CAllNodesDiaolg::OnBnClickedCancel()
@@ -589,9 +570,7 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 	// TODO: Add your control notification handler code here
 	//AfxMessageBox(_T("Not realized!"));
 
-/*alex*/
-#if 1
-CString strSql;
+	CString strSql;
 	int nMaxRowIndext=m_FlexGrid.get_Rows()-1;
 
 	//CString strSBuildingNameTemp;
@@ -735,8 +714,6 @@ CString strSql;
 		AfxMessageBox(e->ErrorMessage());
 	}
 	ReloadAddBuildingDB();
-#endif
-	
 
 
 }

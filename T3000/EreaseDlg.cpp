@@ -30,7 +30,6 @@ void CEreaseDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CEreaseDlg, CDialog)
 	ON_BN_CLICKED(ID_MYOK, &CEreaseDlg::OnBnClickedMyOk)
 	ON_EN_KILLFOCUS(IDC_EDIT1, &CEreaseDlg::OnEnKillfocusEdit1)
-	ON_BN_CLICKED(IDCANCEL, &CEreaseDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 
@@ -94,11 +93,4 @@ BOOL CEreaseDlg::OnInitDialog()
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
-}
-
-
-void CEreaseDlg::OnBnClickedCancel()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	CDialog::OnCancel();
 }

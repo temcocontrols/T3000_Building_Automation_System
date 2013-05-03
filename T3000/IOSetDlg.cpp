@@ -27,7 +27,6 @@ void CIOSetDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CIOSetDlg, CDialog)
-	ON_BN_CLICKED(IDC_BUTTON1, &CIOSetDlg::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 BOOL CIOSetDlg::CReate()
@@ -37,9 +36,3 @@ BOOL CIOSetDlg::CReate()
 }
 
 // CIOSetDlg message handlers
-
-
-void CIOSetDlg::OnBnClickedButton1()
-	{
-	// TODO: 在此添加控件通知处理程序代码
-	}

@@ -55,12 +55,17 @@ public:
 	CMsflexgrid m_msflexgrid_input;
 	CMsflexgrid m_msflexgrid_output;
 	virtual void OnInitialUpdate();
+
 public:
 	void Fresh();
 	void ShowDialogData();
 	void CreatDBTable();
 	BOOL GetDatabase();
+
+
+
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
 	unsigned short shmPRegister[512];
 	vector<t3model>vect3model;
 	t3model m_t3model;

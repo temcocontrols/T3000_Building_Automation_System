@@ -280,13 +280,13 @@ int CScanDlg::GetAllNodeFromDataBase()
 
 LRESULT CScanDlg::OnAddComScanRet(WPARAM wParam, LPARAM lParam)
 {
-	// AddComDeviceToGrid(m_pScanner->m_szTsatScandRet);
+	//AddComDeviceToGrid(m_pScanner->m_szTsatScandRet);
 	return 1;
 }
 
 LRESULT CScanDlg::OnAddNetScanRet(WPARAM wParam, LPARAM lParam)
 {
-	// AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
+	//AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
 	return 1;
 }
 
@@ -347,6 +347,13 @@ void CScanDlg::OpenDefaultCom()
 {	
 	CString strSql;
 	strSql.Format(_T("select * from Building order by Main_BuildingName"));
+	//_RecordsetPtr pRs;
+	//_ConnectionPtr pCon;
+	
+	//pCon.CreateInstance("ADODB.Connection");
+	//pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	//pRs.CreateInstance("ADODB.Recordset");
+
 	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);			
 	_variant_t temp_variant;
 	CString strDefaultCom = 0;		

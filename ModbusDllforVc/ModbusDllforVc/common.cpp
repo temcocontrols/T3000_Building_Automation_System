@@ -378,7 +378,7 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 		default_file.Flush();
 		default_file.Close();
 		}*/
-		return gval[2];
+	//	return gval[2];
 	}
 
 	if(g_Commu_type==1)
@@ -401,8 +401,8 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 
 		TS_UC  pval[10];
-		TS_US crc;
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+	//	TS_US crc;
+	//	DWORD m_had_send_data_number;//已经发送的数据的字节数
 		pval[0]=1;
 		pval[1]=2;
 		pval[2]=3;
@@ -497,12 +497,16 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 				return -2;
 				*/
 		}
-		return gval[2];
+	//	return gval[2];
 	}
+	//Modify by Fance , both "if"  and "else" all return gval[2] ,so it can be moved to this ;
+	//the warning not all control paths return a value will be disappeared.
+	return gval[2];
 }
 
 OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
 {	
+	int the_return_value;
 	if(g_Commu_type==0)
 	{
 		//val         the value that you want to write to the register
@@ -521,7 +525,6 @@ OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
 		{			
 			return -1;
 		}
-		int the_return_value;
 		int the_return_value2=0;
 		the_return_value=CheckTstatOnline2(devLo,devHi);
 		//down is inspect result first scan
@@ -556,7 +559,7 @@ OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
 		}
 		//	if(the_return_value>0)
 		//		TRACE("^-^ ^-^ %d\n",the_return_value);
-		return the_return_value;
+		//return the_return_value;
 	}
 
 	if(g_Commu_type==1)//
@@ -577,7 +580,6 @@ OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
 		{			
 			return -1;
 		}
-		int the_return_value;
 		int the_return_value2=0;
 		the_return_value=CheckTstatOnline2(devLo,devHi);
 		//down is inspect result first scan
@@ -618,9 +620,11 @@ OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
 		}
 		//	if(the_return_value>0)
 		//		TRACE("^-^ ^-^ %d\n",the_return_value);
-		return the_return_value;
+		//return the_return_value;
 	}
-
+	//Modify by Fance , both "if"  and "else" all return the_return_value ,so it can be moved to this ;
+	//the warning not all control paths return a value will be disappeared.
+	return the_return_value;
 }
 OUTPUT bool Change_BaudRate(TS_US new_baudrate)
 {
@@ -660,9 +664,10 @@ OUTPUT bool Change_BaudRate(TS_US new_baudrate)
 	}
 	return(successful);
 }
+
 OUTPUT bool SetComm_Timeouts(LPCOMMTIMEOUTS lpCommTimeouts)
 {
-	return SetCommTimeouts(m_hSerial,lpCommTimeouts);
+	return MKBOOL(SetCommTimeouts(m_hSerial,lpCommTimeouts));
 }
 //socket dll.
 OUTPUT bool Open_Socket(CString strIPAdress)
@@ -790,13 +795,14 @@ OUTPUT bool is_connect()
 		else
 			return TRUE;
 	}
-	if (g_Commu_type==1)
+	else if (g_Commu_type==1)
 	{
 		if(m_hSocket==NULL)
 			return false;//disconnected
 		else
 			return true;//connected
 	}
+	return false; //add by Fance
 }
 //device_var:priduct ID,address:a regster;
 OUTPUT int Read_One(TS_UC device_var,TS_US address)
@@ -982,8 +988,8 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
 //		DataPack dataInfo;
 		for(int i=0;i<11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
-		TS_US crc;		
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		//TS_US crc;		
+		//DWORD m_had_send_data_number;//已经发送的数据的字节数
 
 		pval[0] = device_var;
 		pval[1] = 3;
@@ -1082,6 +1088,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
 			nTemp=-1;
 		return (gval[3]*256+gval[4]);
 	}
+	return -1; //add by Fance
 //	singlock.Unlock();
 }
 
@@ -1306,7 +1313,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
 		data[3]=4;
 		data[4]=5;
 		data[5]=6;
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
 		data[6] = device_var;
 		data[7] = 6;
 		data[8] = address>>8 & 0xFF ;
@@ -1337,7 +1344,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
 
 		for(int i=0;i<=11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
-		TS_US crc;		
+	//	TS_US crc;		
 	//	DWORD m_had_send_data_number;//已经发送的数据的字节数
 		pval[0] = device_var;
 		pval[1] = 6;
@@ -1444,7 +1451,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
 		//delete []data;
 		return 1;
 	}
-
+	return -1;//add by Fance 
 	///////////////////////////////////////////////////////////
 }
 
@@ -1625,7 +1632,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 		//data_to_send[6]=(crc>>8) & 0xff;
 		//data_to_send[7]=crc & 0xff;/
 
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
 		if(m_hSocket==INVALID_SOCKET)
 		{
 			return -1;
@@ -1653,6 +1660,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 			put_data_into_here[i]=to_send_data[3+2*i]*256+to_send_data[4+2*i];
 		return length;
 	}
+	return -1;
 }
 
 OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
@@ -1785,7 +1793,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int 
 		hc = LoadCursor(NULL,IDC_WAIT);
 		hc = SetCursor(hc);
 		//length is the data length,if you want to write 128 bite,the length == 128
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
 		if(m_hSocket==INVALID_SOCKET)
 		{
 			return -1;
@@ -1804,6 +1812,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int 
 		return 1;
 
 	}
+	return -1;
 }
 
 /*
@@ -2260,8 +2269,8 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 		for(int i=0;i<13;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_UC  pval[10];
-		TS_US crc;
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		TS_US crc;
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
 
 		
 		pval[0]=1;
@@ -2337,6 +2346,7 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 		*/
 		return gval[2];
 	}
+	return -1;
 }
 
 ///also return the serial communication handle;
@@ -2354,7 +2364,7 @@ OUTPUT HANDLE GetCommunicationHandle()
 	if(g_Commu_type==0) 
 		return m_hSerial;
 
-	
+	return NULL;
 }
 OUTPUT BOOL bTCPDisconnected()
 {
@@ -2657,8 +2667,8 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
 //		DataPack dataInfo;
 		for(int i=0;i<11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
-		TS_US crc;		
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		TS_US crc;		
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
 
 		pval[0] = device_var;
 		pval[1] = 3;
@@ -2757,6 +2767,7 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
 			nTemp=-1;
 		return (gval[3]*256+gval[4]);
 	}
+	return -1;
 //	singlock.Unlock();
 }
 
@@ -2982,7 +2993,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
 		data[3]=4;
 		data[4]=5;
 		data[5]=6;
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
 		data[6] = device_var;
 		data[7] = 6;
 		data[8] = address>>8 & 0xFF ;
@@ -3013,7 +3024,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
 
 		for(int i=0;i<=11;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
-		TS_US crc;		
+//		TS_US crc;		
 	//	DWORD m_had_send_data_number;//已经发送的数据的字节数
 		pval[0] = device_var;
 		pval[1] = 6;
@@ -3120,7 +3131,7 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
 		//delete []data;
 		return 1;
 	}
-
+	return -1;
 	///////////////////////////////////////////////////////////
 }
 
@@ -3429,8 +3440,8 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 		for(int i=0;i<13;i++)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 		TS_UC  pval[10];
-		TS_US crc;
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		TS_US crc;
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
 
 		
 		pval[0]=1;
@@ -3506,6 +3517,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 		*/
 		return gval[2];
 	}
+	return -1;
 }
 
 OUTPUT int read_multi2(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length,bool bComm_Type)
@@ -3681,7 +3693,7 @@ OUTPUT int read_multi2(TS_UC device_var,TS_US *put_data_into_here,TS_US start_ad
 		//data_to_send[6]=(crc>>8) & 0xff;
 		//data_to_send[7]=crc & 0xff;/
 
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
 		if(m_hSocket==INVALID_SOCKET)
 		{
 			return -1;
@@ -3709,6 +3721,7 @@ OUTPUT int read_multi2(TS_UC device_var,TS_US *put_data_into_here,TS_US start_ad
 			put_data_into_here[i]=to_send_data[3+2*i]*256+to_send_data[4+2*i];
 		return length;
 	}
+	return -1;
 }
 
 
@@ -3936,8 +3949,8 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 			gval[i]=0;/////////////////////////////////////////clear buffer
 
 		TS_UC  pval[10];
-		TS_US crc;
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
+//		TS_US crc;
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
 		pval[0]=1;
 		pval[1]=2;
 		pval[2]=3;
@@ -3960,7 +3973,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		{			
 			return -1;
 		}
-		::send(m_hSocket,(char*)pval,sizeof(pval),0);//scan 扫NC中的TSTAT
+		int nRet =::send(m_hSocket,(char*)pval,sizeof(pval),0);//scan 扫NC中的TSTAT
 
 		//Sleep(SLEEP_TIME+8);
 		Sleep(LATENCY_TIME_NET+100);
@@ -4149,6 +4162,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		}
 		return gval[2];
 	}
+	return -1;
 }
 
 OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
@@ -4270,7 +4284,7 @@ OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		//		TRACE("^-^ ^-^ %d\n",the_return_value);
 		return the_return_value;
 	}
-
+	return -1; 
 }
 
 OUTPUT void closefile()
