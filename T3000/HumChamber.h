@@ -5,12 +5,9 @@
 #include "globle_function.h"
 #include "afxwin.h"
 #include "afxcmn.h"
-<<<<<<< HEAD
-=======
 
 #define  WM_MY_MESSAGE  WM_USER + 101
 
->>>>>>> 2055a623be99ab648f3d1e19843761578b8bcfcb
 // CHumChamber form view
 struct  Register_info 
 {
@@ -49,11 +46,7 @@ protected:
 	virtual void OnInitialUpdate();
 public:
 	void Fresh();
-<<<<<<< HEAD
- 
-=======
     void Fresh_Hum_Temp();
->>>>>>> 2055a623be99ab648f3d1e19843761578b8bcfcb
 	void InitialRegisterNo();
 	void ShowDialogData();
 	BOOL GetRegInfoFromDB(Register_info &reg_data,CString Area_Name);
@@ -225,17 +218,11 @@ private:
 //		void KeyUpMsflexgridInput3(short* KeyCode, short Shift);
 //		void KeyPressMsflexgridInput3(short* KeyAscii);
 //		void KeyDownMsflexgridInput3(short* KeyCode, short Shift);
-<<<<<<< HEAD
-		void KeyUpMsflexgridInput3(short* KeyCode, short Shift);
-		// //process
-		CProgressCtrl m_progress;
-=======
 //		void KeyUpMsflexgridInput3(short* KeyCode, short Shift);
 		// //process
 		CProgressCtrl m_progress;
 //		void KeyDownMsflexgridInput3(short* KeyCode, short Shift);
 		void RowColChangeMsflexgridInput3();
->>>>>>> 2055a623be99ab648f3d1e19843761578b8bcfcb
 };
 
 

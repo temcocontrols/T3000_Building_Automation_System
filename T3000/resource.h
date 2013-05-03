@@ -141,17 +141,10 @@
 #define IDB_BITMAP_SCHEDULE             438
 #define IDD_DIALOG_INFO                 439
 #define IDD_DIALOG_MINIPANEL            440
-<<<<<<< HEAD
-#define IDD_DIALOG10                    441
-#define IDD_DISPLAY_CONFIG              444
-#define IDD_DIALOG11                    446
-#define IDD_HUM_CHAMBER                 446
-=======
 #define IDD_HUM_CHAMBER                 441
 #define IDI_ICON_REFRESH                443
 #define IDI_ICON2                       444
 #define IDI_ICON_EXIT                   444
->>>>>>> 2055a623be99ab648f3d1e19843761578b8bcfcb
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -1058,15 +1051,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-<<<<<<< HEAD
-#define _APS_NEXT_RESOURCE_VALUE        447
-#define _APS_NEXT_COMMAND_VALUE         32871
-#define _APS_NEXT_CONTROL_VALUE         1605
-=======
 #define _APS_NEXT_RESOURCE_VALUE        445
 #define _APS_NEXT_COMMAND_VALUE         32866
 #define _APS_NEXT_CONTROL_VALUE         1598
->>>>>>> 2055a623be99ab648f3d1e19843761578b8bcfcb
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

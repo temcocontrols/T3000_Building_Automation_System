@@ -25,11 +25,6 @@ Global
 		{9560EBEA-EB58-44F6-BB62-189833713FC0}.Debug|Win32.Build.0 = Debug|Win32
 		{9560EBEA-EB58-44F6-BB62-189833713FC0}.Release|Win32.ActiveCfg = Release|Win32
 		{9560EBEA-EB58-44F6-BB62-189833713FC0}.Release|Win32.Build.0 = Release|Win32
-<<<<<<< HEAD
-		{9560EBEA-EB58-44F6-BB62-189833713FC0}.Release|x64.ActiveCfg = Release|x64
-		{9560EBEA-EB58-44F6-BB62-189833713FC0}.Release|x64.Build.0 = Release|x64
-=======
->>>>>>> 2055a623be99ab648f3d1e19843761578b8bcfcb
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

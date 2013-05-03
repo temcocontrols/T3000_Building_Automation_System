@@ -43,7 +43,7 @@ CDialog::DoDataExchange(pDX);
 DDX_Control(pDX, IDC_INPUT_MSFLEXGRID, m_FlexGrid1);
 DDX_Text(pDX, IDC_INPUT_9, m_display_number);
 DDX_Control(pDX, IDC_SEQ_COM, m_ItemValueCombx);
-//DDX_Control(pDX, IDC_PROCESS, m_progress);
+DDX_Control(pDX, IDC_PROCESS, m_progress);
 }
 BEGIN_MESSAGE_MAP(CDisplayConfig, CDialog)
 	ON_BN_CLICKED(IDOK, &CDisplayConfig::OnBnClickedOk)
@@ -63,7 +63,7 @@ ON_BN_CLICKED(IDC_SAVE_INPUT6, &CDisplayConfig::OnBnClickedSaveInput6)
 ON_BN_CLICKED(IDC_SAVE_INPUT7, &CDisplayConfig::OnBnClickedSaveInput7)
 ON_BN_CLICKED(IDC_SAVE_INPUT8, &CDisplayConfig::OnBnClickedSaveInput8)
 ON_BN_CLICKED(IDC_FRESH_TABLE, &CDisplayConfig::OnBnClickedFreshTable)
-ON_BN_CLICKED(IDC_FRESH, &CDisplayConfig::OnBnClickedFresh)
+//ON_BN_CLICKED(IDC_FRESH, &CDisplayConfig::OnBnClickedFresh)
 END_MESSAGE_MAP()
 
 
