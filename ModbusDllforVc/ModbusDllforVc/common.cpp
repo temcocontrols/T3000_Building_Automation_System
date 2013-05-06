@@ -206,7 +206,21 @@ OUTPUT void close_com()
 	
 }
 
-
+ /*
+  	Date:2013/05/06
+  	Purpose:
+	This is a original function for Scan 
+	//the second time
+	//val         the value that you want to write to the register
+	//the return value == -1 ,no connecting
+	//the return value == -2 ,try it again
+	//the return value == -3,Maybe that have more than 2 Tstat is connecting
+	//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
+	//the return value == -5 ,the input have some trouble
+	//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
+	  
+	//the return value is the register address
+  	*/
 OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 {
 	if(g_Commu_type==0)
@@ -503,7 +517,21 @@ OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 	//the warning not all control paths return a value will be disappeared.
 	return gval[2];
 }
-
+ 	/*
+   	Date:2013/05/06
+   	Purpose:
+	 this function will call CheckTstatOnline2
+	//val         the value that you want to write to the register
+	//the return value == -1 ,no connecting
+	//the return value == -2 ,try it again
+	//the return value == -3,Maybe that have more than 2 Tstat is connecting
+	//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
+	//the return value == -5 ,the input have some trouble
+	//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
+	//清空串口缓冲区
+	//the return value is the register address
+	//Sleep(50);       //must use this function to slow computer
+   	*/
 OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
 {	
 	int the_return_value;
@@ -670,6 +698,11 @@ OUTPUT bool SetComm_Timeouts(LPCOMMTIMEOUTS lpCommTimeouts)
 	return MKBOOL(SetCommTimeouts(m_hSerial,lpCommTimeouts));
 }
 //socket dll.
+/*
+Date:2013/05/06
+Purpose:
+Judge Ip Address is online or not
+*/
 OUTPUT bool Open_Socket(CString strIPAdress)
 {
 	if(g_Commu_type==0)
@@ -723,6 +756,11 @@ OUTPUT bool Open_Socket(CString strIPAdress)
 }
 
 //socket dll.
+/*
+	Date:2013/05/06
+	Purpose:
+	Open one IP Address + Port.
+	*/
 OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
 {
 	if(g_Commu_type==0)
@@ -805,6 +843,13 @@ OUTPUT bool is_connect()
 	return false; //add by Fance
 }
 //device_var:priduct ID,address:a regster;
+//device_var:priduct ID,address:a regster;
+	/*
+	Date:2013/05/06
+	Purpose:
+	Read One Register From Device ID ,Only one time
+	The standard protocol 
+	*/
 OUTPUT int Read_One(TS_UC device_var,TS_US address)
 {
 
@@ -1091,7 +1136,17 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
 	return -1; //add by Fance
 //	singlock.Unlock();
 }
-
+ 	/*
+	Date:2013/05/06
+	Purpose:
+	The standard protocol 
+	Write one register to a device ,only one time.
+	it is original function. 
+	//address        the register
+	//val         the value that you want to write to the register
+	//the return value == -1 ,no connecting
+	//the return value == -3 , no response 
+	*/
 OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
 {
 	if (g_Commu_type==0)
@@ -1454,7 +1509,17 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
 	return -1;//add by Fance 
 	///////////////////////////////////////////////////////////
 }
-
+ /*
+  	Date:2013/05/06
+  	Purpose:
+  	 The standard protocol 
+	 read multi registers from one device id.
+	 parameter meaning:
+	 device_var
+	 *put_data_into_here
+	 start_address
+	 length:how many registers 
+  	*/
 OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length)
 {
 	if(g_Commu_type==0)
@@ -1662,7 +1727,17 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 	}
 	return -1;
 }
-
+   	/*
+  	Date:2013/05/06
+  	Purpose:
+  	 The standard protocol 
+	 writer multi registers from one device id.
+	 parameter meaning:
+	device_var,
+	 *to_write,
+	  start_address,
+	   length:How many chars
+  	*/
 OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 {	
 	if(g_Commu_type==0)//
@@ -1815,156 +1890,21 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int 
 	return -1;
 }
 
-/*
-OUTPUT int Read_One2(TS_UC device_var,TS_US address)
-{
-	if(g_Commu_type==0)//serial
-	{
-		TS_UC to_send_data[300]={'\0'};
-		//address        the register
-		//the return value ,-2 is wrong
-		//the return value == -1 ,no connecting
-		//return value == -3 ,no response
-		//清空串口缓冲区
-		//TS_UC  gval[8]={'\0'};//the data that get
-		//      TS_UC  pval[9];
-		for(int i=0;i<11;i++)
-			gval[i]=0;/////////////////////////////////////////clear buffer
-		TS_US crc;		
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
-		pval[0] = device_var;
-		pval[1] = 3;
-		pval[2] =0;//address>>8 & 0xFF ;//起始地址从而开始.
-		pval[3] =0;//address & 0xFF;
-
-		pval[4] = 0;//(val>>8) & 0xff;//number hi
-		pval[5] = 0x78;//val & 0xff;//number lo    //120Byte
-		crc = CRC16(pval,6);
-		pval[6] = (crc >>8) & 0xff;
-		pval[7] = crc & 0xff;
-		if(m_hSerial==NULL)
-		{
-			return -1;
-		}
-		////////////////////////////////////////////////////////////overlapped declare
-		////////////////////////////////////////////////clear com error
-		COMSTAT ComStat;
-		DWORD dwErrorFlags;
-
-		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
-		PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
-		///////////////////////////////////////////////////////send the to read message
-		memset(&m_osWrite, 0, sizeof(OVERLAPPED));
-		if((m_osWrite.hEvent = CreateEvent(NULL,true,false,_T("Write")))==NULL)
-			return -2; 
-		m_osWrite.Offset = 0;
-		m_osWrite.OffsetHigh = 0 ;
-
-		int fState=WriteFile(m_hSerial,// 句柄
-			pval,// 数据缓冲区地址
-			8,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
-			&m_osWrite);
-		if(!fState)// 不支持重叠	
-		{
-			if(GetLastError()==ERROR_IO_PENDING)
-			{
-				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
-				//			if(GetLastError()==ERROR_IO_PENDING)
-				//				AfxMessageBox("wrong1");
-			}
-			else
-				m_had_send_data_number=0;
-		}
-		//////////////////////////////////////////the message had send ,now to read
-		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
-		memset(&m_osRead, 0, sizeof(OVERLAPPED));
-		if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
-			return -2; 
-		m_osRead.Offset = 0;
-		m_osRead.OffsetHigh = 0 ;
-		////////////////////////////////////////////////clear com error
-		Sleep(LATENCY_TIME_COM);
-		if(address==10)
-		{
-			serinumber_in_dll[0]=serinumber_in_dll[1]=serinumber_in_dll[2]=serinumber_in_dll[3]=0;//this line is for new protocal			
-			fState=ReadFile(m_hSerial,// 句柄
-				to_send_data,// 数据缓冲区地址
-				145,// 数据大小70*2+3+2
-				&m_had_send_data_number,// 返回发送出去的字节数
-				&m_osRead);
-		}
-		else
-		{
-			fState=ReadFile(m_hSerial,// 句柄
-				to_send_data,// 数据缓冲区地址
-				245,// 数据大小120*2+3+2
-				&m_had_send_data_number,// 返回发送出去的字节数
-				&m_osRead);
-		}
-		if(!fState)// 不支持重叠	
-		{
-			if(GetLastError()==ERROR_IO_PENDING)
-			{
-				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
-			}
-			else
-				m_had_send_data_number=0;
-		}
-
-		if(address!=10)
-		{//old protocal
-			if(to_send_data[0]==0 && to_send_data[1]==0 && to_send_data[2]==0 && to_send_data[3]==0 && to_send_data[4]==0 && to_send_data[5]==0 && to_send_data[6]==0 )
-				return -3;
-			if(to_send_data[0]!=pval[0] || to_send_data[1]!=pval[1] ||to_send_data[2]!=240 )//120*2 bytes data?
-				return -2;
-			//crc=CRC16(gval,5);
-			crc=CRC16(to_send_data,243);//3+120*2
-			if(to_send_data[243]!=((crc>>8)&0xff))
-				return -2;
-			if(to_send_data[244]!=(crc & 0xff))
-				return -2;	
-		}
-
-	
-// 		else
-// 		{
-// 			if(gval[7]!=0 || gval[8]!=0 || gval[9]!=0 || gval[10]!=0)
-// 			{//new protocal
-// 				if(gval[0]!=pval[0] || gval[1]!=pval[1])//6
-// 					return -2;
-// 				crc=CRC16(gval,9);
-// 				if(gval[9]!=((crc>>8)&0xff))
-// 					return -2;
-// 				if(gval[10]!=(crc & 0xff))
-// 					return -2;		
-// 				serinumber_in_dll[0]=gval[5];
-// 				serinumber_in_dll[1]=gval[6];
-// 				serinumber_in_dll[2]=gval[7];
-// 				serinumber_in_dll[3]=gval[8];//stay serialnumber	
-// 				//			TRACE("R:%x %x %x %x\n",serinumber_in_dll[0],serinumber_in_dll[1],serinumber_in_dll[2],serinumber_in_dll[3]);
-// 			}
-// 			else
-// 			{//old protocal
-// 				if(gval[0]!=pval[0] || gval[1]!=pval[1] || gval[2]!=2 )//2
-// 					return -2;
-// 				crc=CRC16(gval,5);
-// 				if(gval[5]!=((crc>>8)&0xff))
-// 					return -2;
-// 				if(gval[6]!=(crc & 0xff))
-// 					return -2;	
-// 			}
-// 		}
-		
-		return (to_send_data[15]*256+to_send_data[16]);
-	}
-	//return 1;
-}
-*/
-
-
+  /*
+	Date:2013/05/06
+	Purpose:
+	 Check how many net controller are online
+	 it will be called in the binary search
+	 //val         the value that you want to write to the register
+	 //the return value == -1 ,no connecting
+	 //the return value == -2 ,try it again
+	 //the return value == -3,Maybe that have more than 2 Tstat is connecting
+	 //the return value == -4 ,between devLo and devHi,no Tstat is connected ,
+	 //the return value == -5 ,the input have some trouble
+	 //the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
+	 //清空串口缓冲区
+	 //the return value is the register address
+	*/
 OUTPUT int NetController_CheckTstatOnline(TS_UC devLo,TS_UC devHi)
 {
 	if(g_Commu_type==0)
@@ -2085,6 +2025,23 @@ OUTPUT int NetController_CheckTstatOnline(TS_UC devLo,TS_UC devHi)
 
 
 
+	/*
+	Date:2013/05/06
+	Purpose:
+	//the second time
+	//val         the value that you want to write to the register
+	//the return value == -1 ,no connecting
+	//the return value == -2 ,try it again
+	//the return value == -3,Maybe that have more than 2 Tstat is connecting
+	//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
+	//the return value == -5 ,the input have some trouble
+	//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
+	//清空串口缓冲区
+	//the return value is the register address
+
+	it will be called in the  NetController_CheckTstatOnline
+	it is the original function for checkTstatOnline.
+	*/
 
 OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 {
@@ -2483,7 +2440,12 @@ OUTPUT bool open_com(int m_com)
 }
 
 
-
+ 	/*
+ 	Date:2013/05/06
+ 	Purpose:
+ 	  All ****2 function is added a parameter communication Type 
+	  Use the some code with ****
+ 	*/
 OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
 {
 
