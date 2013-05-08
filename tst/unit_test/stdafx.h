@@ -10,6 +10,12 @@
 #include <stdio.h>
 #include <tchar.h>
 
-#include "cutest.h"
+
+
+
+
+#include <afxwin.h>
 
 #include <afxmt.h>
+
+#include "cutest.h"
