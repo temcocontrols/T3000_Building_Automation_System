@@ -106,56 +106,7 @@ void CScanDbWaitDlg::OnTimer(UINT_PTR nIDEvent)
 		}
 	}
 
-	/*
-	//if(g_Scanfully)
-	if (m_pScaner)
-	{
-		//if(g_ScnnedNum<254)
-		if(!m_pScaner->IsAllScanFinished())
-		{
-					
-			if (nCount++ > 30)
-			{
-				nCount = 0;
-			}
-			switch(nCount)
-			{
-			case 5:m_strDot = _T(".");break;
-			case 10:m_strDot = _T("..");break;
-			case 15:m_strDot = _T("...");break;
-			case 20:m_strDot = _T("....");break;
-			case 25:m_strDot = _T(".....");break;
-			case 30:m_strDot = _T("......");break;
-			
-			//default:strDot = _T("......");break;
-			}
-			CString strTemp;
-			if (g_nStartID == -1) // 用这个来区分是scan TStat 还是scan NC
-			{
-				strTemp = _T("sending scan broadcast");
-			}
-			else
-			{
-				strTemp.Format(_T("from address ID %d to %d"),g_nStartID,g_nEndID);
-			}
-		
-			CString strTip;
-			strTip.Format(_T("Scanning %s, %s. Please wait%s"), g_strScanInfoPrompt, strTemp, m_strDot);
-			
-			m_strInfopromp=strTip;
-			UpdateData(FALSE);
-		}
-		else
-		{
-
-			//CString strTem;
-			//strTem=g_strScanInfoPrompt;
-			//m_strInfopromp=g_strScanInfoPrompt;
-			//UpdateData(FALSE);
-		}
-	}
-	*/
-//		if(g_ScnnedNum>=254)
+	 
 
 	if (m_pScaner)
 	{		

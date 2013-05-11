@@ -1,11 +1,7 @@
 #pragma once
 #include "msflexgrid1.h"
 #include "afxwin.h"
-<<<<<<< HEAD
-=======
 #include "afxcmn.h"
->>>>>>> 81517f4cbbed910a44d63749dcc3bff4741a0ddf
-
 // CDisplayConfig dialog
 
 class CDisplayConfig : public CDialog
@@ -37,19 +33,19 @@ private:
 	int m_nCurRow;
 	int m_nCurCol;
 	CComboBox m_ItemValueCombx;
-<<<<<<< HEAD
+
 	CString m_Choice_Array[14];
 public:
-=======
+
 
 public:
     int Get_RegID(int Model_ID,CString Name);
->>>>>>> 81517f4cbbed910a44d63749dcc3bff4741a0ddf
+
 	afx_msg void OnEnKillfocusInput9();
 //	afx_msg void OnEnHscrollInput9();
 //	afx_msg void OnEnChangeInput9();
 	afx_msg void OnCbnSelchangeSeqCom();
-<<<<<<< HEAD
+
  BOOL UpdateTextToReg(CString input_str,UINT Reg);
  CString GetTextFromReg(UINT reg);
 //	afx_msg void OnEnSetfocusLine1();
@@ -57,7 +53,7 @@ public:
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnBnClickedSave2();
 	afx_msg void OnBnClickedSaveLine2();
-=======
+
  BOOL UpdateTextToReg(CString input_str,UINT Reg,int lenght);
  CString GetTextFromReg(unsigned short reg);
  CString GetTextReg(unsigned short reg);
@@ -77,5 +73,4 @@ public:
 	afx_msg void OnBnClickedFreshTable();
 	afx_msg void OnBnClickedFresh();
 	CString GetSel(int ID);
->>>>>>> 81517f4cbbed910a44d63749dcc3bff4741a0ddf
 	};

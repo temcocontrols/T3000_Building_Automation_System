@@ -277,11 +277,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 
 	if (a == -3 || a > 0)
 	{
-// 		int nnn = -2;
-// 		while (nnn == -2)
-// 		{
-// 			nnn = Read_One2(253, 7);
-// 		}
+
 		
 		a=CheckTstatOnline_a(devLo,devHi, bForTStat);
 	}
@@ -325,13 +321,10 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 			pInfo->m_tstatport = m_port;//scan
 			
 			m_szTstatScandRet.push_back(pInfo);
-// 			temp.id=a;
-// 			temp.serialnumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
-			//int nSerialNumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;//20120424
+
 			unsigned int nSerialNumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;//20120424
 			pTemp->SetSerialID(nSerialNumber);
-// 			temp.product_class_id=SerialNum[7];
-// 			temp.hardware_version=SerialNum[8];
+ 
 			pTemp->SetDevID(a);
 			
 			float tstat_version2;
@@ -346,21 +339,45 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 			
 			//temp.software_version=tstat_version2;
 			pTemp->SetSoftwareVersion(tstat_version2);
-			if(Read_One2(a, 185, bForTStat)==0)	
-			//if(pTemp->ReadOneReg(185)==0)
-			{
-				//temp.baudrate=9600;
-				pTemp->SetBaudRate(9600);//scan
+			//if(Read_One2(a, 185, bForTStat)==0)	
+			////if(pTemp->ReadOneReg(185)==0)
+			//{
+			//	//temp.baudrate=9600;
+			//	pTemp->SetBaudRate(9600);//scan
 
-			}
-			else
-			{
-					//temp.baudrate=19200;
-				pTemp->SetBaudRate(19200);//scan
-			}
-			//temp.nEPsize=Read_One2(temp.id,326, bForTStat);
-			pTemp->SetEPSize(pTemp->ReadOneReg(326));
+			//}
+			//else
+			//{
+			//		//temp.baudrate=19200;
+			//	pTemp->SetBaudRate(19200);//scan
+			//}
+			////temp.nEPsize=Read_One2(temp.id,326, bForTStat);
+			//pTemp->SetEPSize(pTemp->ReadOneReg(326));
+				if ((SerialNum[7]==PM_TSTAT6)||(SerialNum[7]==PM_TSTAT7))
+				{
+					if(Read_One2(a,110, true)==0)
+						pTemp->SetBaudRate(9600);
+					else
+					{
+						pTemp->SetBaudRate(19200);
+					}
+					int nEPsize=Read_One2(a,408, true);
+					pTemp->SetEPSize(nEPsize);
+					 
 
+				} 
+				else
+				{
+					if(Read_One2(a,185, true)==0)
+						pTemp->SetBaudRate(9600);
+					else
+					{
+						pTemp->SetBaudRate(19200);
+					}
+					int nEPsize=Read_One2(a,326, true);
+					pTemp->SetEPSize(nEPsize);
+					
+				}
 			//if(pTemp->GetComPort()>=0)
 			pTemp->SetComPort(nComPort);
 			// product type
@@ -491,20 +508,32 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 													
 													//temp.software_version=tstat_version2;
 													pTemp->SetSoftwareVersion(tstat_version2);
-													if(Read_One2(j,185, bForTStat)==0)
-													//if(pTemp->ReadOneReg(185)==0)
-													{
-														//temp.baudrate=9600;
-														pTemp->SetBaudRate(9600);
-													}
-													else
-													{
-														pTemp->SetBaudRate(19200);
-													}
+													 
+				if ((SerialNum[7]==PM_TSTAT6)||(SerialNum[7]==PM_TSTAT7))
+				{
+					if(Read_One2(j,110, true)==0)
+						pTemp->SetBaudRate(9600);
+					else
+					{
+						pTemp->SetBaudRate(19200);
+					}
+					int nEPsize=Read_One2(j,408, true);
+					pTemp->SetEPSize(nEPsize);
+					// pTemp->SetEPSize(pTemp->ReadOneReg(408));
 
-													int nEPsize=Read_One2(j,326, bForTStat);
-													pTemp->SetEPSize(nEPsize);
-											
+				} 
+				else
+				{
+					if(Read_One2(j,185, true)==0)
+						pTemp->SetBaudRate(9600);
+					else
+					{
+						pTemp->SetBaudRate(19200);
+					}
+					int nEPsize=Read_One2(j,326, true);
+					pTemp->SetEPSize(nEPsize);
+					//pTemp->SetEPSize(pTemp->ReadOneReg(326));
+				}
 													pTemp->SetComPort(nComPort);
 
 													pTemp->SetBuildingName(m_strBuildingName);
@@ -773,23 +802,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 	CTStatScanner* pScanner = (CTStatScanner*)pParam;
 	SOCKET hBroad=NULL;
 	SOCKET sListen=NULL;
-//	IP_ADAPTER_INFO pAdapterInfo;
-//	ULONG len = sizeof(pAdapterInfo); 
-// 	if(1) // XP and below
-// 	{
-// 		if(GetAdaptersInfo(&pAdapterInfo, &len) != ERROR_SUCCESS) 
-// 		{
-// 			AfxMessageBox(_T("Can't get local IP address, scan failed!"));
-// 			goto END_SCAN;
-// 			return 0;
-// 		}
-// 	}
-// 	else  if(0) // VISTA, Win7 or up
-// 	{
-// 
-// 	}
 
-//SOCKADDR_IN sockAddress;   // commented by zgq;2010-12-06; unreferenced local variable
 
 	
 	CString strScanInfo = _T("Start UDP scan.");
@@ -973,40 +986,8 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 						pSendBuf[nSendLen-1] = szIPAddr[3];
 						memcpy(pSendBuf + nSendLen, (BYTE*)&END_FLAG, 4);
 						//////////////////////////////////////////////////////////////////////////
-						
-						//pSendBuf[nSendLen+3] = 0xFF;
 						nSendLen+=4;
 					}
-
-// 					nLen=buffer[2]+buffer[3]*256;
-// 					//int n =sizeof(char)+sizeof(unsigned char)+sizeof( unsigned short)*9;
-// 					if(nLen>=0)
-// 					{
-// 						CTStat_Net* pT = new CTStat_Net;
-// 						unsigned short dataPackage[13];
-// 						memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
-// 						
-// 						DWORD nSerial=dataPackage[0]+dataPackage[1]*256+dataPackage[2]*256*256+dataPackage[3]*256*256*256;
-// 						int nProductID=dataPackage[5];
-// 						int modbusID=dataPackage[6];
-// 						CString strTemp;
-// 						strTemp.Format(_T("%d.%d.%d.%d"),dataPackage[7],dataPackage[8],dataPackage[9],dataPackage[10]);
-// 						CString strIP=strTemp;
-// 						int nPort=(dataPackage[11]);
-// 												
-// 						pT->SetSerialID(nSerial);
-// 						pT->SetDevID(modbusID);
-// 						pT->SetProductType(nProductID);
-// 						pT->SetIPPort(ntohs(siBind.sin_port));
-// 						LPSTR szIP = inet_ntoa(siBind.sin_addr);
-// 						pT->SetIPAddr((char*)szIP);
-// 
-// 						_NetDeviceInfo* pni = new _NetDeviceInfo;
-// 						pni->m_pNet = pT;										
-// 						pScanner->m_szNCScanRet.push_back(pni);
-				
-
-					//}
 				}	
 			}
 		}	
@@ -1294,37 +1275,6 @@ void CTStatScanner::AddComDeviceToGrid()
 //	m_pParent->PostMessage(WM_ADDCOMSCAN);
 }
 
-/*
-UINT _WaitScanThread(PVOID pParam)
-{
-	CTStatScanner* pScanner = (CTStatScanner*)(pParam);
-
-	if(pScanner->IsComScanRunning())
-	{
-		if (	WaitForSingleObject(pScanner->m_eScanComEnd->m_hObject, INFINITE) == WAIT_OBJECT_0 )
-		{
-			pScanner->SendScanEndMsg();
-		}
-	}
-	else
-	{
-		if ((WaitForSingleObject(pScanner->m_eScanNCEnd->m_hObject, INFINITE) == WAIT_OBJECT_0 )
-			&&(WaitForSingleObject(pScanner->m_eScanOldNCEnd->m_hObject, INFINITE) == WAIT_OBJECT_0 ))
-		{
-			//////////////////////////////////////////////////////////////////////////
-			// scan tstat
-			g_strScanInfoPrompt = _T("TStat connected with NC");
-			g_nStartID = 1;
-			pScanner->ScanTstatFromNCForAuto();	
-
-			pScanner->m_bNetScanFinish = TRUE; // at this time, two thread end, all scan end
-			pScanner->SendScanEndMsg();
-		}
-	}
-
-	return 1;
-}
-*/
 
 void CTStatScanner::SendScanEndMsg()
 {
@@ -1832,8 +1782,8 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
 	CString strSql;
 	//	CString strSubNetName;
 
-	//CString strEpSize;
-	//strEpSize.Format(_T("%d"), pInfo->m_pNet->GetEPSize());
+	/*CString strEpSize;
+	strEpSize.Format(_T("%d"), pInfo->m_pNet->GetEPSize());*/
 
 	CString strIP;
 	in_addr ia;
@@ -1850,7 +1800,7 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
 	CString strSubnetName = m_strSubNet;
 	//GetNetDevSubnetName(strIP);
 	
-	CString strEPSize;
+	 CString strEPSize;
 
 	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize)					  values('"+m_strBuildingName+"','"+m_strSubNet+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"')"));
 //new nc//  strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize, Mainnet_info) values('"+m_strBuildingName+"','"+m_strSubNet+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEpSize+"','"+strMainnetInfo+"')"));
@@ -1898,7 +1848,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 
 	CString strBaudRate;//scan
 // 	in_addr ia;
-// 	ia.S_un.S_addr = pInfo->m_pNet->GetIPAddr();
+  //	ia.S_un.S_addr = pInfo->m_pNet->GetIPAddr();
 // 	strBaudRate = CString(inet_ntoa(ia));	
 	strBaudRate = pInfo->m_tstatip;
 
@@ -1922,31 +1872,6 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 	
 	CString strMainetInfo = pInfo->m_pDev->m_mainnet_info.GetMainnetInfo();
 
-
-
-
-
-
-
-	//strBaudRate
-	//strCom
-
-//20120424
-// 	CString strIP;
-// 	in_addr ia;
-// 	ia.S_un.S_addr = pInfo->m_pNet->GetIPAddr();
-// 	strIP = CString(inet_ntoa(ia));	
-// 
-// 	CString strPort;
-// 	strPort.Format(_T("%d"), pInfo->m_pNet->GetIPPort());
-//20120424
-
-//	CString strSubNetName = GetTstatSubnetName(strCom);
-// 	pInfo->m_pDev->SetSubnetName(strSubNetName);
-	
- 
-// 	CString strMBuildingName = GetTstatMBuildingName(strCom);
-// 	pInfo->m_pDev->SetBuildingName(strMBuildingName);
 try
 {
 
@@ -2637,7 +2562,7 @@ void CTStatScanner::ScanOldNC(BYTE devLo, BYTE devHi)
 			nRet=read_multi2(a,&SerialNum[0],0,9,true);
 			if(nRet>0)
 			{
-				if(SerialNum[0]==255&&SerialNum[1]==255&&SerialNum[2]==255&&SerialNum[3]==255)
+				/*if(SerialNum[0]==255&&SerialNum[1]==255&&SerialNum[2]==255&&SerialNum[3]==255)
 				{
 					srand((unsigned)time(NULL)); 
 					SerialNum[0]=rand()%255; 
@@ -2649,7 +2574,7 @@ void CTStatScanner::ScanOldNC(BYTE devLo, BYTE devHi)
 					Write_One2(a,1,SerialNum[1],true);
 					Write_One2(a,2,SerialNum[2],true);
 					Write_One2(a,3,SerialNum[3],true);
-				}
+				}*/
 				DWORD serialnumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
 				pNet->SetSerialID(serialnumber);
 				// IP
@@ -2678,12 +2603,29 @@ void CTStatScanner::ScanOldNC(BYTE devLo, BYTE devHi)
 				}//tstat_version
 			
 				pNet->SetSoftwareVersion(tstat_version2);
-				if(Read_One2(a,185, true)==0)
-					pNet->SetBaudRate(9600);
+				if ((SerialNum[7]==PM_TSTAT6)||(SerialNum[7]==PM_TSTAT7))
+				{
+					if(Read_One2(a,110, true)==0)
+						pNet->SetBaudRate(9600);
+					else
+					{
+						pNet->SetBaudRate(19200);
+					}
+					/*int nEPsize=Read_One2(a,408, true);
+					pNet->SetEPSize(nEPsize);*/
+				} 
 				else
 				{
-					pNet->SetBaudRate(19200);
+					if(Read_One2(a,185, true)==0)
+						pNet->SetBaudRate(9600);
+					else
+					{
+						pNet->SetBaudRate(19200);
+					}
+					/*int nEPsize=Read_One2(a,326, true);
+					pNet->SetEPSize(nEPsize);*/
 				}
+			
 				//int nEPsize=Read_One2(a,326, true);
 				//pNet->SetEPSize(nEPsize);
 				if(serialnumber>=0)

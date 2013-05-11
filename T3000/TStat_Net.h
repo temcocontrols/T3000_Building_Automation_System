@@ -56,7 +56,7 @@ protected:
 
 	int				m_nBaudRate;				// 波特率
 	int				m_nComPort;				// 串口	
-	DWORD		m_dwIPAddr;				// IP Address
+	DWORD		    m_dwIPAddr;				// IP Address
 	int				m_nPort;					// 当前端口
 
 	

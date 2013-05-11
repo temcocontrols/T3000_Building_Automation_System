@@ -887,7 +887,7 @@ void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
 	//CString strSubNetName=_T("Sub_net1");
 
 	//CString strEpSize;
-	//strEpSize.Format(_T("%d"), pInfo->m_pNet->GetEPSize());
+//	strEpSize.Format(_T("%d"), m_pNet->GetEPSize());
 
 	CString strIP;
 	in_addr ia;
