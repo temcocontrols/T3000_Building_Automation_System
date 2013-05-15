@@ -12,13 +12,19 @@ int modbus_read_one_value(
 				unsigned short address, 
 				int retry_times );
 
+int modbus_read_multi_value( 
+		unsigned short *put_data_into_here,
+		unsigned char device_var,
+		unsigned short start_address,
+		int length,
+		int retry_times );
+
 int read_one(unsigned char device_var,unsigned short address,int retry_times=3);
 int write_one(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times=3);
 int write_one_org(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
-int Read_Multi_org(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times=3);
 
 int turn_hex_str_to_ten_num(char *str);
 bool turn_hex_file_line_to_unsigned_char(char *str);
