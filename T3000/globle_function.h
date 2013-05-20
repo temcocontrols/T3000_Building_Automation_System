@@ -53,4 +53,13 @@ CString get_product_class_name_by_model_ID(int nModelID);
 
 
 BOOL GetSerialComPortNumber1(vector<CString>& szComm);
+
+BOOL Post_Thread_Message(UINT MsgType,
+	unsigned char device_id,
+	unsigned short address,
+	short new_value,
+	short old_value,
+	HWND Dlg_hwnd,
+	UINT CTRL_ID,
+	CString Changed_Name);
 #endif
