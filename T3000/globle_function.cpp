@@ -824,3 +824,53 @@ BOOL GetSerialComPortNumber1(vector<CString>& szComm)
 
 	return FALSE;   
 }
+
+//Add 20130516  by Fance
+//UINT MsgType
+//unsigned char device_id
+//unsigned short address
+//short new_value
+//short old_value
+
+
+BOOL Post_Thread_Message(UINT MsgType,
+	unsigned char device_id,
+	unsigned short address,
+	short new_value,
+	short old_value,
+	HWND Dlg_hwnd,
+	UINT CTRL_ID,
+	CString Changed_Name)
+{
+	_MessageWriteOneInfo *My_Write_Struct = new _MessageWriteOneInfo;
+	My_Write_Struct->device_id = device_id;
+	My_Write_Struct->address = address;
+	My_Write_Struct->new_value = new_value;
+	My_Write_Struct->old_value = old_value;
+	My_Write_Struct->hwnd = Dlg_hwnd;
+	My_Write_Struct->CTRL_ID = CTRL_ID;
+	My_Write_Struct->Changed_Name = Changed_Name;
+
+	//search the id ,if not in the vector, push back into the vector.
+	bool find_id=false;
+	for (int i=0;i<Change_Color_ID.size();i++)
+	{
+		if(Change_Color_ID.at(i)!=CTRL_ID)
+			continue;
+		else
+			find_id = true;
+	}
+	if(!find_id)
+		Change_Color_ID.push_back(CTRL_ID);
+	else
+		return FALSE;//如果此ID正在队列中，则直接返回。
+	
+	if(!PostThreadMessage(nThreadID,MY_WRITE_ONE,(WPARAM)My_Write_Struct,NULL))//post thread msg
+	{
+		return FALSE;
+	}
+	else
+	{
+		return TRUE;
+	}
+}
