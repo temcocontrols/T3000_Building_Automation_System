@@ -2,6 +2,12 @@
 #pragma once
 #include "afxmt.h"
 
+vector <int> Change_Color_ID;
+const bool WRITE_SUCCESS = true;
+const bool WRITE_FAIL    = false;
+
+HANDLE hThread;
+DWORD nThreadID;
 //#include "stdafx.h"
 unsigned short multi_register_value[1024]={-1};
 unsigned short multi_register_value_tcp[10000]={-1};

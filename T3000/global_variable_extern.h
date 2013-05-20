@@ -1,5 +1,10 @@
 #pragma once
+extern vector <int> Change_Color_ID;
+extern HANDLE hThread;
+extern DWORD nThreadID;
 
+extern const bool WRITE_SUCCESS;
+extern const bool WRITE_FAIL ;
 
 extern bool g_register_occuppied ; //Add by Alex
 
