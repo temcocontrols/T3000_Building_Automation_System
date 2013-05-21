@@ -134,5 +134,20 @@ typedef struct _STATUSBARINFO
 
 #define MKBOOL(_VALUE) ((_VALUE) != 0)		//Add by Fance .Use this macro to solve the warning warning C4800: 'BOOL' : forcing value to bool 'true' or 'false'
 
+
+#define MY_WRITE_ONE WM_USER+100
+#define MY_CLOSE WM_USER+101
+#define MY_RESUME_DATA  WM_USER+200
+typedef struct _MessageWriteOneInfo
+{
+	unsigned char device_id;
+	unsigned short address;
+	short new_value;
+	short old_value;
+	HWND hwnd;
+	UINT CTRL_ID;
+	CString Changed_Name;
+
+}MessageWriteOneInfo;
 //#define _DEBUG
 //*********************************link to dll***************************

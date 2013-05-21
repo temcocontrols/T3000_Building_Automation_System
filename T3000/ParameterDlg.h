@@ -87,6 +87,9 @@ public:
 	afx_msg void OnCbnSelchangeOccupiedmodecombo();
 	virtual BOOL OnInitDialog();
 
+
+	afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
+
 	void Refresh();
 	 void Refresh6();
 	 void Reflesh_ParameterDlg();
@@ -185,4 +188,9 @@ public:
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnEnKillfocusEditValuetraveltime();
 	afx_msg void OnEnKillfocusEditPid2offsetpoint();
+//	afx_msg void OnKillFocus(CWnd* pNewWnd);
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+
+	public:
+		CBrush m_brush;
 };
