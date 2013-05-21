@@ -42,6 +42,23 @@
 //////////////////////////////
 #include "isp/CDialogISPTOOL.h"
 
+#pragma region Fance Test
+//For Test
+
+
+
+HANDLE hStartEvent; // thread start event
+
+vector <MSG> My_Receive_msg;
+
+
+HANDLE hDeal_thread;
+DWORD nThreadID_Do;
+
+CCriticalSection MyCriticalSection;
+
+//End for Test
+#pragma endregion 
 // #ifdef _DEBUG
 // #define new DEBUG_NEW
 // #undef THIS_FILE
@@ -570,6 +587,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_pTreeViewCrl->Expand(hChilder1,TVE_EXPAND);
 
 
+	hThread =CreateThread(NULL,NULL,Get_All_Dlg_Message,this,NULL, &nThreadID);
+	hDeal_thread =CreateThread(NULL,NULL,DoMSG,this,NULL, &nThreadID_Do);
 
 
 	MyRegAddress.MatchMoudleAddress();
@@ -5922,4 +5941,86 @@ void CMainFrame::Treestatus()
 {
 
 
+}
+
+
+DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
+//unsigned __stdcall fun	(WPARAM wParam, LPARAM lParam)
+{
+	_MessageWriteOneInfo *My_Write_Struct=NULL;
+	MSG msg;
+	PeekMessage(&msg, NULL, MY_WRITE_ONE, MY_CLOSE, PM_REMOVE);
+	//if(!SetEvent(hStartEvent)) //set thread start event 
+	//{
+	//	printf("set start event failed,errno:%d\n",::GetLastError());
+	//	return 1;
+	//}
+	while(true)
+	{
+		if(GetMessage(&msg,0,0,0)) //get msg from message queue
+		{
+			//char * pInfo = (char *)msg.wParam;
+			switch(msg.message)
+			{
+			case MY_WRITE_ONE:	
+				MyCriticalSection.Lock();
+				My_Receive_msg.push_back(msg);
+				MyCriticalSection.Unlock();
+
+				 My_Write_Struct= (_MessageWriteOneInfo *)msg.wParam;
+				product_register_value[My_Write_Struct->address] = My_Write_Struct->new_value;//先变过来，免得后台更新的时候 乱变。
+				//Sleep(5000);
+				//AfxMessageBox(_T("1"));
+				//printf("recv %s\n",pInfo);
+				//delete[] pInfo;
+				break;
+			case MY_CLOSE:
+				//goto myend;
+				break;
+			}
+			
+		}
+	}
+//myend:
+	return 0;
+}
+
+
+DWORD WINAPI  CMainFrame::DoMSG(LPVOID lpVoid)
+{
+	MSG msg;
+	while(1)
+	{
+
+		if(My_Receive_msg.size()>0)
+		{
+			MyCriticalSection.Lock();
+			msg=My_Receive_msg.at(0);
+			_MessageWriteOneInfo *My_Write_Struct = (_MessageWriteOneInfo *)msg.wParam;
+			My_Receive_msg.erase(My_Receive_msg.begin());
+			MyCriticalSection.Unlock();
+
+			if(write_one(My_Write_Struct->device_id, My_Write_Struct->address,My_Write_Struct->new_value,10)<0)
+			{
+				::PostMessage(My_Write_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_FAIL,(LPARAM)My_Write_Struct);
+				//((CT3000View*)m_pViews[0])->PostMessage(WM_FRESHVIEW,0,0)	;
+				//AfxMessageBox(_T("Write Register Fail!Please try it again!"),MB_OK | MB_ICONINFORMATION);
+			}
+			else
+			{
+
+				::PostMessage(My_Write_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_SUCCESS,(LPARAM)My_Write_Struct);
+
+				//AfxMessageBox(_T("Success!!"),MB_OK | MB_ICONINFORMATION);
+			}
+			//Sleep(2000);
+			//MyCriticalSection.Lock();
+			//msg=My_Receive_msg.at(0);
+			//char * message=(char *)msg.wParam;
+			//My_Receive_msg.erase(My_Receive_msg.begin());
+			//MyCriticalSection.Unlock();
+			//AfxMessageBox(_T("2"));
+		}
+	}
+	return 0;
 }
