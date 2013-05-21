@@ -467,11 +467,11 @@ CString GetTempUnit(int nRange, int nPIDNO)
 			//Chinese.
 			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 			{
-				strTemp=_T("°C");
+				strTemp=_T("¡æ");
 			}
 			else
 			{
-				strTemp=_T("°F");
+				strTemp=_T("¨H");
 			}
 		}
 		return strTemp;
@@ -498,11 +498,11 @@ CString GetTempUnit(int nRange, int nPIDNO)
 			//chinese.
 			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 			{
-				strTemp=_T("°C");
+				strTemp=_T("¡æ");
 			}
 			else
 			{
-				strTemp=_T("°F");
+				strTemp=_T("¨H");
 			}
 		}
 		return strTemp;
