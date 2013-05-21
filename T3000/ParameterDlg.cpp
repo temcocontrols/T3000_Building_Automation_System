@@ -196,6 +196,11 @@ ON_EN_KILLFOCUS(IDC_EDIT38, &CParameterDlg::OnEnKillfocusEdit38)
 ON_BN_CLICKED(IDCANCEL, &CParameterDlg::OnBnClickedCancel)
 ON_EN_KILLFOCUS(IDC_EDIT_ValueTravelTime, &CParameterDlg::OnEnKillfocusEditValuetraveltime)
 ON_EN_KILLFOCUS(IDC_EDIT_PID2OFFSETPOINT, &CParameterDlg::OnEnKillfocusEditPid2offsetpoint)
+
+ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
+
+//ON_WM_KILLFOCUS()
+ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 
@@ -471,6 +476,7 @@ BOOL CParameterDlg::OnInitDialog()
 	 hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_REFRESH), IMAGE_ICON, 16, 16, 0); 
 	 ((CButton *)GetDlgItem(IDC_REFRESHBUTTON))->SetIcon(hIcon);
 
+	 m_brush.CreateSolidBrush(RGB(255,0,0));
 	//////////////////////////////////////////////////////////////////////////
 	// TODO:  Add extra initialization here
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -551,19 +557,18 @@ void CParameterDlg::OnCbnSelchangeAutoonlycombo()
 {
 	int nindext=m_autoOnlyCombox.GetCurSel();
 
-	if(write_one(g_tstat_id,MODBUS_AUTO_ONLY,nindext)<0)	// 129  107
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		m_autoOnlyCombox.SetCurSel(product_register_value[MODBUS_AUTO_ONLY]);
-	}
-	else
-		product_register_value[MODBUS_AUTO_ONLY] = nindext;
+
+	if(product_register_value[MODBUS_AUTO_ONLY]==nindext)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_AUTO_ONLY,nindext,
+		product_register_value[MODBUS_AUTO_ONLY],this->m_hWnd,IDC_AUTOONLYCOMBO,_T("AUTO ONLY"));
 
 	
 	// TODO: Add your control notification handler code here
 }
 
-//Annule by Fance recode
+//Annull by Fance recode
 //void CParameterDlg::Refresh()
 //{
 //	CString strTemp;
@@ -1299,31 +1304,40 @@ void CParameterDlg::OnCbnSelchangekeypadcombo()
 	case 8:nItem=8;break;
 	default :nItem=0;break;
 	}	
-	g_bPauseMultiRead = TRUE;	
-	if(write_one(g_tstat_id,MODBUS_KEYPAD_SELECT,nItem)<0)// 128 395
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		nItem = product_register_value[MODBUS_KEYPAD_SELECT];// resume the old status.
-		switch(nItem)
-		{
-		case 0:nItem=0;break;
-		case 1:nItem=2;break;
-		case 2:nItem=4;break;
-		case 3:nItem=5;break;
-		case 4:nItem=3;break;
-		case 5:nItem=1;break;
-		case 6:nItem=6;break;
-		case 7:nItem=7;break;
-		case 8:nItem=8;break;
-		default :nItem=0;break;
-		}
-		m_keySelectCombox.SetCurSel(nItem);
-	}
-	else
-		product_register_value[MODBUS_KEYPAD_SELECT] = nItem;
-	//	write_one(g_tstat_id,128,nItem,5);	//Marked by Fance
 
-	g_bPauseMultiRead = FALSE;
+	if(product_register_value[MODBUS_KEYPAD_SELECT]==nItem)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_KEYPAD_SELECT,nItem,
+		product_register_value[MODBUS_KEYPAD_SELECT],this->m_hWnd,IDC_KEYPADSELECT,_T("KEYPAD SELECT"));
+
+
+
+	//g_bPauseMultiRead = TRUE;	
+	//if(write_one(g_tstat_id,MODBUS_KEYPAD_SELECT,nItem)<0)// 128 395
+	//{
+	//	MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+	//	nItem = product_register_value[MODBUS_KEYPAD_SELECT];// resume the old status.
+	//	switch(nItem)
+	//	{
+	//	case 0:nItem=0;break;
+	//	case 1:nItem=2;break;
+	//	case 2:nItem=4;break;
+	//	case 3:nItem=5;break;
+	//	case 4:nItem=3;break;
+	//	case 5:nItem=1;break;
+	//	case 6:nItem=6;break;
+	//	case 7:nItem=7;break;
+	//	case 8:nItem=8;break;
+	//	default :nItem=0;break;
+	//	}
+	//	m_keySelectCombox.SetCurSel(nItem);
+	//}
+	//else
+	//	product_register_value[MODBUS_KEYPAD_SELECT] = nItem;
+	////	write_one(g_tstat_id,128,nItem,5);	//Marked by Fance
+
+	//g_bPauseMultiRead = FALSE;
 }
 
 //void CParameterDlg::OnCbnKillfocusKeypadselect()
@@ -1383,9 +1397,17 @@ void CParameterDlg::OnEnKillfocusValuposedit()
 	m_value_percentEdit.GetWindowText(strTemp);
 	if(strTemp.IsEmpty())
 		return;
-	g_bPauseMultiRead = TRUE;
-	write_one(g_tstat_id, 285,_wtoi(strTemp), 5);
-	g_bPauseMultiRead = FALSE;
+
+	//MODBUS_VALVE_PERCENT
+	if(product_register_value[MODBUS_VALVE_PERCENT]==_wtoi(strTemp))	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_VALVE_PERCENT,_wtoi(strTemp),
+		product_register_value[MODBUS_VALVE_PERCENT],this->m_hWnd,IDC_VALUPOSEDIT,_T("VALVE_PERCENT"));
+
+	//g_bPauseMultiRead = TRUE;
+	//write_one(g_tstat_id, 285,_wtoi(strTemp), 5);
+	//g_bPauseMultiRead = FALSE;
 }
 
 void CParameterDlg::OnCbnSelendcancelBraudratecombo()
@@ -1393,13 +1415,21 @@ void CParameterDlg::OnCbnSelendcancelBraudratecombo()
 
 	if(g_ParamLevel==1)
 		return;	
-	g_bPauseMultiRead = TRUE;
 
-	if(write_one(g_tstat_id, MODBUS_BAUDRATE, m_braudRateCombox.GetCurSel())<0)	//Modify by Fance
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-		product_register_value[MODBUS_BAUDRATE] = m_braudRateCombox.GetCurSel();
-	g_bPauseMultiRead = FALSE;
+	if(product_register_value[MODBUS_BAUDRATE]==m_braudRateCombox.GetCurSel())	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_BAUDRATE,m_braudRateCombox.GetCurSel(),
+		product_register_value[MODBUS_BAUDRATE],this->m_hWnd,IDC_BRAUDRATECOMBO,_T("BAUDRATE"));
+
+
+	//g_bPauseMultiRead = TRUE;
+
+	//if(write_one(g_tstat_id, MODBUS_BAUDRATE, m_braudRateCombox.GetCurSel())<0)	//Modify by Fance
+	//	MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+	//else
+	//	product_register_value[MODBUS_BAUDRATE] = m_braudRateCombox.GetCurSel();
+	//g_bPauseMultiRead = FALSE;
 }
 
 
@@ -1409,23 +1439,39 @@ void CParameterDlg::OnCbnSelchangePowermodelcombo()
 
 	if(g_ParamLevel==1)
 		return;	
-	g_bPauseMultiRead = TRUE;
-	if(write_one(g_tstat_id, MODBUS_POWERUP_MODE, m_powerupModelCombox.GetCurSel())<0)	//127  106
-		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
-	else
-		product_register_value[MODBUS_POWERUP_MODE] = m_powerupModelCombox.GetCurSel();
-	g_bPauseMultiRead = FALSE;
+
+	if(product_register_value[MODBUS_POWERUP_MODE]==m_powerupModelCombox.GetCurSel())	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_POWERUP_MODE,m_powerupModelCombox.GetCurSel(),
+		product_register_value[MODBUS_POWERUP_MODE],this->m_hWnd,IDC_POWERMODELCOMBO,_T("POWERUP_MODE"));
+
+
+
+	//g_bPauseMultiRead = TRUE;
+	//if(write_one(g_tstat_id, MODBUS_POWERUP_MODE, m_powerupModelCombox.GetCurSel())<0)	//127  106
+	//	{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
+	//else
+	//	product_register_value[MODBUS_POWERUP_MODE] = m_powerupModelCombox.GetCurSel();
+	//g_bPauseMultiRead = FALSE;
 }
 
 
 void CParameterDlg::OnCbnSelchangeKeypadlockcombo()
 {
-	g_bPauseMultiRead = TRUE;	
-	if(write_one(g_tstat_id, MODBUS_SPECIAL_MENU_LOCK, m_keyLockCombox.GetCurSel())<0)	//133  396
-		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
-	else
-		product_register_value[MODBUS_SPECIAL_MENU_LOCK] =  m_keyLockCombox.GetCurSel();
-	g_bPauseMultiRead = FALSE;
+	if(product_register_value[MODBUS_SPECIAL_MENU_LOCK]==m_keyLockCombox.GetCurSel())	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_SPECIAL_MENU_LOCK,m_keyLockCombox.GetCurSel(),
+		product_register_value[MODBUS_SPECIAL_MENU_LOCK],this->m_hWnd,IDC_KEYPADLOCKCOMBO,_T("SPECIAL MENU LOCK"));
+
+
+	//g_bPauseMultiRead = TRUE;	
+	//if(write_one(g_tstat_id, MODBUS_SPECIAL_MENU_LOCK, m_keyLockCombox.GetCurSel())<0)	//133  396
+	//	{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
+	//else
+	//	product_register_value[MODBUS_SPECIAL_MENU_LOCK] =  m_keyLockCombox.GetCurSel();
+	//g_bPauseMultiRead = FALSE;
 }
 
 //Annul by Fance 2013 04 15
@@ -1460,20 +1506,13 @@ void CParameterDlg::OnCbnSelchangeKeypadlockcombo()
 
 void CParameterDlg::OnCbnSelchangeDisplaycombo()
 {
-
 	if(g_ParamLevel==1)
 		return;
+	if(product_register_value[MODBUS_DISPLAY]==m_displayCombox.GetCurSel())	//Add this to judge weather this value need to change.
+		return;
 
-	g_bPauseMultiRead = TRUE;	
-
-	if(write_one(g_tstat_id, MODBUS_DISPLAY, m_displayCombox.GetCurSel())<0)//203   397
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		m_autoOnlyCombox.SetCurSel(product_register_value[MODBUS_DISPLAY]);
-	}
-	else
-		product_register_value[MODBUS_DISPLAY] = m_displayCombox.GetCurSel();
-	g_bPauseMultiRead = FALSE;
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DISPLAY,m_displayCombox.GetCurSel(),
+		product_register_value[MODBUS_DISPLAY],this->m_hWnd,IDC_DISPLAYCOMBO,_T("DISPLAY"));
 
 }
 
@@ -1482,13 +1521,12 @@ void CParameterDlg::OnCbnSelchangeSequencecombox()
 
 	if(g_ParamLevel==1)
 		return;
-g_bPauseMultiRead = TRUE;	
-	//write_one(g_tstat_id, 118, m_SequenceCombox.GetCurSel());
-	if(write_one(g_tstat_id, MODBUS_SEQUENCE, m_SequenceCombox.GetCurSel())<0)	//118 103	Modify by Fance support T6 T7
-		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
-	else
-		product_register_value[MODBUS_SEQUENCE] =  m_SequenceCombox.GetCurSel();
-g_bPauseMultiRead = FALSE;
+
+	if(product_register_value[MODBUS_SEQUENCE]==m_SequenceCombox.GetCurSel())	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_SEQUENCE,m_SequenceCombox.GetCurSel(),
+		product_register_value[MODBUS_SEQUENCE],this->m_hWnd,IDC_SEQUENCECOMBOX,_T("SEQUENCE"));
 }
 
 
@@ -1503,24 +1541,24 @@ void CParameterDlg::OnEnKillfocusValveedit()
 	m_valveEdit.GetWindowText(strTemp);
 	if(strTemp.IsEmpty())
 		return;	
-	g_bPauseMultiRead = TRUE;
-	write_one(g_tstat_id, 279,(int)(_wtof(strTemp)*10));
-	g_bPauseMultiRead = FALSE;
+
+	if(product_register_value[MODBUS_VALVE_TRAVEL_TIME]==(int)(_wtof(strTemp)*10))	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_VALVE_TRAVEL_TIME,(int)(_wtof(strTemp)*10),
+		product_register_value[MODBUS_VALVE_TRAVEL_TIME],this->m_hWnd,IDC_VALVEEDIT,_T("VALVE TRAVEL TIME"));
+
 }
 
 void CParameterDlg::OnCbnSelchangeHcchangecombo()
 {
-
 	if(g_ParamLevel==1)
 		return;	
-	g_bPauseMultiRead = TRUE;
-	
-	//write_one(g_tstat_id, 214, m_hcChangeCombox.GetCurSel());	
-	if(write_one(g_tstat_id, MODBUS_HEAT_COOL_CONFIG, m_hcChangeCombox.GetCurSel())<0)	//214  113  Modify by Fance  support t6 t7
-		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
-	else
-		product_register_value[MODBUS_HEAT_COOL_CONFIG] = m_hcChangeCombox.GetCurSel();
-	g_bPauseMultiRead = FALSE;
+	if(product_register_value[MODBUS_HEAT_COOL_CONFIG]==m_hcChangeCombox.GetCurSel())	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_HEAT_COOL_CONFIG,m_hcChangeCombox.GetCurSel(),
+		product_register_value[MODBUS_HEAT_COOL_CONFIG],this->m_hWnd,IDC_HCCHANGECOMBO,_T("HEAT_COOL_CONFIG"));
 }
 
 
@@ -1537,12 +1575,10 @@ void CParameterDlg::OnEnKillfocusPowsetpomitedit()
 		return;	
 	if(product_register_value[MODBUS_POWERUP_SETPOINT]==_wtoi(strTemp))		//if not changed ,return  .Add by Fance
 		return;
-	g_bPauseMultiRead = TRUE;
-	if(write_one(g_tstat_id, MODBUS_POWERUP_SETPOINT,(int)(_wtoi(strTemp)))<0)//126  364
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-		product_register_value[MODBUS_POWERUP_SETPOINT] = _wtoi(strTemp);
-	g_bPauseMultiRead = FALSE;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_POWERUP_SETPOINT,_wtoi(strTemp),
+		product_register_value[MODBUS_POWERUP_SETPOINT],this->m_hWnd,IDC_POWSETPOMITEDIT,_T("POWERUP SETPOINT"));
+
 }
 
 
@@ -1563,13 +1599,9 @@ void CParameterDlg::OnEnKillfocusStincreaedit()	//recode by Fance,for support T6
 	if(product_register_value[MODBUS_SETPOINT_INCREASE] == nvalue)	//if not changed ,return  .Add by Fance
 		return;
 
-	g_bPauseMultiRead = TRUE;	
-	if(write_one(g_tstat_id, MODBUS_SETPOINT_INCREASE,(int)(nvalue))<0)//293  373
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-		product_register_value[MODBUS_SETPOINT_INCREASE] = nvalue;
-	g_bPauseMultiRead = FALSE;
 
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_SETPOINT_INCREASE,nvalue,
+		product_register_value[MODBUS_SETPOINT_INCREASE],this->m_hWnd,IDC_STINCREAEDIT,_T("SETPOINT INCREASE"));
 }
 
 
@@ -1583,42 +1615,19 @@ void CParameterDlg::OnEnKillfocusDefSetpointEdt()
 	m_defSetPointEdit.GetWindowText(strTemp);
 	if (strTemp.IsEmpty()) 
 		return;	
-	g_bPauseMultiRead = TRUE;	
-	if(write_one(g_tstat_id, MODBUS_DEFAULT_SETPOINT,_wtoi(strTemp))<0)	//338  341
-		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION); }
-	else
-		product_register_value[MODBUS_DEFAULT_SETPOINT] = _wtoi(strTemp) ;
-	g_bPauseMultiRead = FALSE;
-	//if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))
-	//	Refresh6();
-	//else
-	//	Refresh();//Annul by Fance 
-	Reflesh_ParameterDlg();
-	
+
+	if(product_register_value[MODBUS_DEFAULT_SETPOINT]==_wtoi(strTemp))	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DEFAULT_SETPOINT,_wtoi(strTemp),
+		product_register_value[MODBUS_DEFAULT_SETPOINT],this->m_hWnd,IDC_DEF_SETPOINT_EDT,_T("DEFAULT_SETPOINT"));
+
 }
 
 void CParameterDlg::OnEnKillfocusSetpointctledit()
 {
 	if(g_ParamLevel==1)
 		return;
-	/*
-
-	CString strTemp;
-	m_setPointCtrlEdit.GetWindowText(strTemp);
-	if (strTemp.IsEmpty()) 
-		return;
-	write_one(g_tstat_id, 339,_wtoi(strTemp));
-	strTemp.Format(_T("%d"),multi_register_value[339]);
-	m_setPointCtrlEdit.SetWindowText(strTemp);
-	if(multi_register_value[339]==0||multi_register_value[339]==1)
-	{
-		m_defSetPointEdit.EnableWindow(FALSE);
-	}
-	if(multi_register_value[339]==2)
-	{
-		m_defSetPointEdit.EnableWindow(TRUE);
-	}
-	*/
 
 }
 
@@ -1638,17 +1647,11 @@ void CParameterDlg::OnEnKillfocusInfileredit()
 		return;//213  142
 
 
-	g_bPauseMultiRead = TRUE;	
-	if(write_one(g_tstat_id,MODBUS_FILTER,ndata)<0)	//213	142
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-		product_register_value[MODBUS_FILTER] = ndata;
+	if(product_register_value[MODBUS_FILTER]==ndata)	//Add this to judge weather this value need to change.
+		return;
 
-	strTemp.Format(_T("%d"),product_register_value[MODBUS_FILTER]);
-	m_inputFilterEdit.SetWindowText(strTemp);
-	
-	g_bPauseMultiRead = FALSE;
-	// TODO: Add your control notification handler code here
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_FILTER,ndata,
+		product_register_value[MODBUS_FILTER],this->m_hWnd,IDC_INFILEREDIT,_T("FILTER"));
 }
 
 void CParameterDlg::OnEnKillfocusCycleedit()
@@ -1663,13 +1666,9 @@ void CParameterDlg::OnEnKillfocusCycleedit()
 	int nValue=_wtoi(strTemp);
 	if(product_register_value[MODBUS_CYCLING_DELAY] ==nValue)	//if not changed ,return  .Add by Fance
 		return;
-	g_bPauseMultiRead = TRUE;	
-	if(write_one(g_tstat_id, MODBUS_CYCLING_DELAY,nValue)<0)//201  241
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-		product_register_value[MODBUS_CYCLING_DELAY] = nValue;
-	//write_one(g_tstat_id, 201,nValue); //Marked by Fance
-	g_bPauseMultiRead = FALSE;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_CYCLING_DELAY,nValue,
+		product_register_value[MODBUS_CYCLING_DELAY],this->m_hWnd,IDC_CYCLEEDIT,_T("CYCLING_DELAY"));
 }
 
 void CParameterDlg::OnEnKillfocusTempalarmedit()
@@ -1689,11 +1688,12 @@ void CParameterDlg::OnEnKillfocusTimeronedit()
 	m_timerOnEdit.GetWindowText(strTemp);
 	if(strTemp.IsEmpty())
 		return;	
-	g_bPauseMultiRead = TRUE;	
-	//write_one(g_tstat_id,301,_wtoi(strTemp));		marked by fance
-	if(write_one(g_tstat_id,MODBUS_TIMER_ON,_wtoi(strTemp))<0)	//T5 = 301   T6 =114
-		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
-	g_bPauseMultiRead = FALSE;
+	if(product_register_value[MODBUS_TIMER_ON]==_wtoi(strTemp))
+		return;
+	//Change_Color_ID.push_back(IDC_TIMERONEDIT);
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TIMER_ON,
+		_wtoi(strTemp),product_register_value[MODBUS_TIMER_ON],
+		this->m_hWnd,IDC_TIMERONEDIT,_T("Time On"));
 }
 
 
@@ -1708,11 +1708,15 @@ void CParameterDlg::OnEnKillfocusEdit12()
 	m_timerOffEdit.GetWindowText(strTemp);
 	if(strTemp.IsEmpty())
 		return;		
-	g_bPauseMultiRead = TRUE;	
-	//write_one(g_tstat_id,302,_wtoi(strTemp));marked by fance
-	if(write_one(g_tstat_id,MODBUS_TIMER_OFF,_wtoi(strTemp))<0)	//T5=302  T6=115
-		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
-	g_bPauseMultiRead = FALSE;
+
+	if(product_register_value[MODBUS_TIMER_OFF]==_wtoi(strTemp))
+		return;
+
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TIMER_OFF,_wtoi(strTemp),
+		product_register_value[MODBUS_TIMER_OFF],this->m_hWnd,IDC_EDIT12,_T("Time Off"));
+
+
 }
 
 
@@ -1721,75 +1725,49 @@ void CParameterDlg::OnCbnSelchangeUnitcombo()
 {
 	if(g_ParamLevel==1)
 		return;		
-	g_bPauseMultiRead = TRUE;
-	if(write_one(g_tstat_id,MODBUS_TIMER_UNITS,m_uniteCombox.GetCurSel())<0)		//T5= 303    T6=116
-		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
-	g_bPauseMultiRead = FALSE;
-	product_register_value[MODBUS_TIMER_UNITS] = m_uniteCombox.GetCurSel();
-}
+	if(product_register_value[MODBUS_TIMER_UNITS]==m_uniteCombox.GetCurSel())
+		return;
 
-//Annul by Fance 2013 04 11
-//void CParameterDlg::OnCbnSelchangeUnitcombo()
-//{
-//
-//	if(g_ParamLevel==1)
-//		return;		
-//	g_bPauseMultiRead = TRUE;
-//	int nRet = 0;
-//	if ((multi_register_value[7] == 6)||(multi_register_value[7] == 7))
-//		nRet = write_one(g_tstat_id,reg_tststold[303],m_uniteCombox.GetCurSel());//tstat6 116
-//	else
-//		nRet = write_one(g_tstat_id,303,m_uniteCombox.GetCurSel());
-//	g_bPauseMultiRead = FALSE;
-//
-//	if(nRet>0)
-//		multi_register_value[303] = m_uniteCombox.GetCurSel();
-//}
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TIMER_UNITS,m_uniteCombox.GetCurSel(),
+		product_register_value[MODBUS_TIMER_UNITS],this->m_hWnd,IDC_UNITCOMBO,_T("Units"));
+
+}
 
 void CParameterDlg::OnEnKillfocusTimerleft()
 {
 
-if(g_ParamLevel==1)
+	if(g_ParamLevel==1)
 		return;
 	CString strTemp;
 	m_timerLeft.GetWindowText(strTemp);
 	if(strTemp.IsEmpty())
 		return;	
-	g_bPauseMultiRead = TRUE;	
-	write_one(g_tstat_id,333,_wtoi(strTemp));
-g_bPauseMultiRead = FALSE;
+
+
+	
+
+	if(product_register_value[MODBUS_ROTATION_TIME_LEFT]==_wtoi(strTemp))	//Add this to judge weather this value need to change.
+			return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_ROTATION_TIME_LEFT,_wtoi(strTemp),
+		product_register_value[MODBUS_ROTATION_TIME_LEFT],this->m_hWnd,IDC_TIMERLEFT,_T("ROTATION TIME LEFT"));
+
 }
+
 
 //modify by Fance 2013 04 11     Fance_0411
 void CParameterDlg::OnCbnSelchangeTimerdelectcombo()
 {
 	if(g_ParamLevel==1)
 		return;	
-	g_bPauseMultiRead = TRUE;
-	if(write_one(g_tstat_id,MODBUS_TIMER_SELECT,m_timerSelectCombox.GetCurSel())<0)  // T5=327   //T6=409
-	{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
-	product_register_value[MODBUS_TIMER_SELECT]=m_timerSelectCombox.GetCurSel();
-	g_bPauseMultiRead = FALSE;
+
+	if(product_register_value[MODBUS_TIMER_SELECT]==m_timerSelectCombox.GetCurSel())	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TIMER_SELECT,m_timerSelectCombox.GetCurSel(),
+		product_register_value[MODBUS_TIMER_SELECT],this->m_hWnd,IDC_TIMERDELECTCOMBO,_T("TIMER_SELECT"));
+
 }
-
-
-//Annul by Fance 
-//void CParameterDlg::OnCbnSelchangeTimerdelectcombo()
-//{
-//
-//	if(g_ParamLevel==1)
-//		return;	
-//	g_bPauseMultiRead = TRUE;
-//	int nRet = 0;
-//	if ((multi_register_value[7] == 6) ||(multi_register_value[7] == 7))
-//		nRet = write_one(g_tstat_id,reg_tststold[327],m_timerSelectCombox.GetCurSel());	//tstat6   406
-//	else
-//		nRet = write_one(g_tstat_id,327,m_timerSelectCombox.GetCurSel());	
-//	if(nRet>0)
-//		multi_register_value[327] = m_timerSelectCombox.GetCurSel();
-//		
-//	g_bPauseMultiRead = FALSE;
-//}
 
 //modify for support t6 t7.
 void CParameterDlg::OnEnKillfocusTimeedit()
@@ -1806,12 +1784,13 @@ void CParameterDlg::OnEnKillfocusTimeedit()
 
 	if(product_register_value[MODBUS_OVERRIDE_TIMER_LEFT] ==nValue)	//if not changed ,return  .
 		return;
-	g_bPauseMultiRead = TRUE;	
-	if(write_one(g_tstat_id, MODBUS_OVERRIDE_TIMER_LEFT,nValue)<0)//T5=212  T6=112
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-		product_register_value[MODBUS_OVERRIDE_TIMER_LEFT] = nValue;
-	g_bPauseMultiRead = FALSE;
+
+	//m_hWnd
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,
+		MODBUS_OVERRIDE_TIMER_LEFT,nValue,
+		product_register_value[MODBUS_OVERRIDE_TIMER_LEFT],
+		this->m_hWnd,IDC_TIMEEDIT,_T("Time Left"));
+
 }
 
 
@@ -1831,12 +1810,11 @@ void CParameterDlg::OnEnKillfocusOverridetimeedit()
 
 	if(product_register_value[MODBUS_OVERRIDE_TIMER] ==nValue)	//if not changed ,return  .
 		return;
-	g_bPauseMultiRead = TRUE;	
-	if(write_one(g_tstat_id, MODBUS_OVERRIDE_TIMER,nValue)<0)//T5=211  T6=111
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-		product_register_value[MODBUS_OVERRIDE_TIMER] = nValue;
-	g_bPauseMultiRead = FALSE;
+
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_OVERRIDE_TIMER,nValue,
+		product_register_value[MODBUS_OVERRIDE_TIMER],this->m_hWnd,IDC_OVERRIDETIMEEDIT,_T("OVERRIDE TIMER"));
+
 }
 
 
@@ -1866,77 +1844,25 @@ void CParameterDlg::OnCbnSelchangeInputselect1()
 
 	if(g_ParamLevel==1)
 		return;
-	g_bPauseMultiRead = TRUE;	
 
-	if(write_one(g_tstat_id, MODBUS_TEMP_SELECT,m_InputSelect1.GetCurSel()+1)<0)//T5 =111   T6 =382
-		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
-	product_register_value[MODBUS_TEMP_SELECT] = m_InputSelect1.GetCurSel()+1;
-	g_bPauseMultiRead = FALSE;
-	Reflesh_ParameterDlg();
+	if(product_register_value[MODBUS_TEMP_SELECT]==m_InputSelect1.GetCurSel()+1)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TEMP_SELECT,m_InputSelect1.GetCurSel()+1,
+		product_register_value[MODBUS_TEMP_SELECT],this->m_hWnd,IDC_INPUTSELECT1,_T("TEMP SELECT"));
 }
-//Annul by Fance 20130411
-//void CParameterDlg::OnCbnSelchangeInputselect1()
-//{
-//
-//	if(g_ParamLevel==1)
-//		return;
-//	g_bPauseMultiRead = TRUE;	
-//	int nRet = 0;
-//	if ((multi_register_value[7] == 6)||(multi_register_value[7] == 7))//tstat6
-//		nRet = write_one(g_tstat_id,reg_tststold[111] ,m_InputSelect1.GetCurSel()+1);//379
-//	else
-//		nRet = write_one(g_tstat_id, 111,m_InputSelect1.GetCurSel()+1);
-//	g_bPauseMultiRead = FALSE;
-//
-//	if(nRet>0)
-//		multi_register_value[111] = m_InputSelect1.GetCurSel()+1;
-//	//if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))
-//	//	Refresh6();
-//	//else
-//	//	Refresh();
-//	Reflesh_ParameterDlg();
-//}
-
-//void CParameterDlg::OnCbnSelchangeInputselect2()
-//{
-//	
-//	if(g_ParamLevel==1)
-//		return;
-//
-//	int nSel = m_inputSelect2.GetCurSel();	
-//	g_bPauseMultiRead = TRUE;	
-//	int nRet = 0;
-//	if ((multi_register_value[7] == 6)||(multi_register_value[7] == 7))//tstat6
-//		 nRet = write_one(g_tstat_id, reg_tststold[241], nSel);//380
-//	else
-//		nRet = write_one(g_tstat_id, 241, nSel);
-//	g_bPauseMultiRead = FALSE;
-//	if(nRet>0)
-//		multi_register_value [241] = nSel;
-//	//if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))
-//	//	Refresh6();
-//	//else
-//	//	Refresh();
-//	Reflesh_ParameterDlg();
-//}
-
 
 
 //Recode by Fance 2013 04 11
 void CParameterDlg::OnCbnSelchangeInputselect2()
 {
-
 	if(g_ParamLevel==1)
 		return;
 	int nSel = m_inputSelect2.GetCurSel();	
-	g_bPauseMultiRead = TRUE;	
-	int nRet = 0;
-
-	if(write_one(g_tstat_id, MODBUS_INPUT1_SELECT, nSel)<0)		//T5=241  T6=383
-		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
-	product_register_value[MODBUS_INPUT1_SELECT] =nSel;	//T5=241  T6=383
-	g_bPauseMultiRead = FALSE;
-	Reflesh_ParameterDlg();
+	if(product_register_value[MODBUS_INPUT1_SELECT]==nSel)	//Add this to judge weather this value need to change.
+		return;
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_INPUT1_SELECT,nSel,
+		product_register_value[MODBUS_INPUT1_SELECT],this->m_hWnd,IDC_INPUTSELECT2,_T("INPUT1_SELECT"));
 }
 
 
@@ -2108,94 +2034,6 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
 		}
 	}
 
-
-	//CString strText;
-	//UINT uint_temp=GetOEMCP();		//get system is for chinese or english'
-
-	//if(uint_temp!=936 && uint_temp!=950)
-	//{//not chinese
-	//	if(m_application_ctrl.GetCurSel()==0)
-	//	{	
-	//		if (g_unint)
-	//		{
-	//			strText.Format(_T("%d°C"),multi_register_value[182]);
-	//			m_nightheating.SetWindowText(strText);
-	//			strText.Format(_T("%d°C"),multi_register_value[183]);
-	//			m_nightcooling.SetWindowText(strText);
-	//		}
-	//		else
-	//		{
-	//			strText.Format(_T("%d°F"),multi_register_value[182]);
-	//			m_nightheating.SetWindowText(strText);
-	//			strText.Format(_T("%d°F"),multi_register_value[183]);
-	//			m_nightcooling.SetWindowText(strText);
-	//		}
-
-	//	}
-	//	else
-	//	{
-	//		if (g_unint)
-	//		{		
-	//			strText.Format(_T("%d°C"),multi_register_value[123]);
-	//		m_nightheating.SetWindowText(strText);
-
-	//		//m_nightheating.Format("%d%c",multi_register_value[123],176);//night heating deadband
-	//		strText.Format(_T("%d°C"),multi_register_value[124]);
-	//		m_nightcooling.SetWindowText(strText);
-	//		//m_nightcooling.Format("%d%c",multi_register_value[124],176);//night cooling deadband
-	//		}else
-	//		{
-	//			strText.Format(_T("%d°F"),multi_register_value[182]);
-	//			m_nightheating.SetWindowText(strText);
-	//			strText.Format(_T("%d°F"),multi_register_value[183]);
-	//			m_nightcooling.SetWindowText(strText);
-
-	//		}
-
-	//	}
-	//}
-	//else
-	//	{
-	//		if(m_application_ctrl.GetCurSel()==0)
-	//		{
-	//			if (g_unint)
-	//			{
-	//				strText.Format(_T("%d°C"),multi_register_value[182]);
-	//				m_nightheating.SetWindowText(strText);
-
-	//				strText.Format(_T("%d°C"),multi_register_value[183]);
-	//				m_nightcooling.SetWindowText(strText);
-	//			}else
-	//			{
-	//				strText.Format(_T("%d°F"),multi_register_value[182]);
-	//				m_nightheating.SetWindowText(strText);
-
-	//				strText.Format(_T("%d°F"),multi_register_value[183]);
-	//				m_nightcooling.SetWindowText(strText);
-	//			}
-
-	//		}
-	//		else
-	//		{
-	//			if (g_unint)
-	//			{		
-	//				strText.Format(_T("%d°C"),multi_register_value[123]);
-	//			m_nightheating.SetWindowText(strText);
-
-	//			strText.Format(_T("%d°C"),multi_register_value[124]);
-	//			m_nightcooling.SetWindowText(strText);
-	//			}else
-	//			{
-	//				strText.Format(_T("%d°F"),multi_register_value[182]);
-	//				m_nightheating.SetWindowText(strText);
-
-	//				strText.Format(_T("%d°F"),multi_register_value[183]);
-	//				m_nightcooling.SetWindowText(strText);
-
-	//			}
-
-	//		}
-	//	}
 }
 
 void CParameterDlg::OnEnKillfocusSetvalue2()
@@ -2208,11 +2046,13 @@ void CParameterDlg::OnEnKillfocusSetvalue2()
 	m_pid_setptEdt2.GetWindowText(strText);
 	int nValue=_wtoi(strText);
 	
-	g_bPauseMultiRead = TRUE;	
-	write_one(g_tstat_id, 246,nValue*10);
-	//	refresh();
-	
-	g_bPauseMultiRead = FALSE;
+
+	if(product_register_value[MODBUS_UNIVERSAL_SET]==nValue)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_UNIVERSAL_SET,nValue,
+		product_register_value[MODBUS_UNIVERSAL_SET],this->m_hWnd,IDC_SETVALUE2,_T("UNIVERSAL SET"));
+
 }
 
 void CParameterDlg::OnEnKillfocusOutput1()
@@ -2227,17 +2067,12 @@ void CParameterDlg::OnEnKillfocusOutput1()
 	
 	if(product_register_value[MODBUS_COOLING_PID]==nValue)	//Add this to judge weather this value need to change.
 		return;
-	g_bPauseMultiRead = TRUE;
-	//write_one(g_tstat_id, 104,nValue);	recode by Fance ,this code not support T6 T7;
-	if(write_one(g_tstat_id, MODBUS_COOLING_PID,nValue)<0)		//when t5 MODBUS_COOLING_PID=104  ,when t6 t7 MODBUS_COOLING_PID=384	
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		strText.Format(_T("%d"),product_register_value[MODBUS_COOLING_PID]);		//104 384
-		m_pid_outputEdt1.SetWindowText(strText);//if wrote fail, resume the last data.
-	}
-	else
-		product_register_value[MODBUS_COOLING_PID] = nValue;
-	g_bPauseMultiRead = FALSE;
+
+
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_COOLING_PID,nValue,
+		product_register_value[MODBUS_COOLING_PID],this->m_hWnd,IDC_OUTPUT1,_T("COOLING PID"));
+
 }
 
 
@@ -2255,17 +2090,10 @@ void CParameterDlg::OnEnKillfocusOutput2()
 
 	if(product_register_value[MODBUS_PID_UNIVERSAL]==nValue)	//Add this to judge weather this value need to change.
 		return;
-	g_bPauseMultiRead = TRUE;
-	//write_one(g_tstat_id, 270,nValue);	recode by Fance ,this code not support T6 T7;
-	if(write_one(g_tstat_id, MODBUS_PID_UNIVERSAL,nValue)<0)		//when t5 MODBUS_PID_UNIVERSAL=270  ,when t6 t7 MODBUS_PID_UNIVERSAL=389	
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		strText.Format(_T("%d"),product_register_value[MODBUS_PID_UNIVERSAL]);		//270 389
-		m_pid_outputEdt2.SetWindowText(strText);//if wrote fail, resume the last data.
-	}
-	else
-		product_register_value[MODBUS_PID_UNIVERSAL] = nValue;
-	g_bPauseMultiRead = FALSE;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_PID_UNIVERSAL,nValue,
+		product_register_value[MODBUS_PID_UNIVERSAL],this->m_hWnd,IDC_OUTPUT2,_T("PID UNIVERSAL"));
+
 }
 
 
@@ -2284,17 +2112,9 @@ void CParameterDlg::OnEnKillfocusEcoolingpterm1()
 
 	if(product_register_value[MODBUS_COOLING_PTERM]==nValue)	//Add this to judge weather this value need to change.
 		return;
-	g_bPauseMultiRead = TRUE;
-	//write_one(g_tstat_id, 114,nValue);	recode by Fance ,this code not support T6 T7;
-	if(write_one(g_tstat_id, MODBUS_COOLING_PTERM,nValue)<0)		//when t5 MODBUS_COOLING_PTERM=114  ,when t6 t7 MODBUS_COOLING_PTERM=385	
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		strText.Format(_T("%d"),product_register_value[MODBUS_COOLING_PTERM]);		//114 385
-		m_pternEdt1.SetWindowText(strText);//if wrote fail, resume the last data.
-	}
-	else
-		product_register_value[MODBUS_COOLING_PTERM] = nValue;
-	g_bPauseMultiRead = FALSE;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_COOLING_PTERM,nValue,
+		product_register_value[MODBUS_COOLING_PTERM],this->m_hWnd,IDC_ECOOLINGPTERM1,_T("COOLING PTERM"));
 }
 
 
@@ -2311,17 +2131,9 @@ void CParameterDlg::OnEnKillfocusEcoolingpterm2()
 
 	if(product_register_value[MODBUS_UNIVERSAL_PTERM]==nValue)	//Add this to judge weather this value need to change.
 		return;
-	g_bPauseMultiRead = TRUE;
-	//write_one(g_tstat_id, 244,nValue);	recode by Fance ,this code not support T6 T7;
-	if(write_one(g_tstat_id, MODBUS_UNIVERSAL_PTERM,nValue)<0)		//when t5 MODBUS_UNIVERSAL_PTERM=244  ,when t6 t7 MODBUS_UNIVERSAL_PTERM=387	
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		strText.Format(_T("%d"),product_register_value[MODBUS_UNIVERSAL_PTERM]);		//244 387
-		m_ptermEdt2.SetWindowText(strText);//if wrote fail, resume the last data.
-	}
-	else
-		product_register_value[MODBUS_UNIVERSAL_PTERM] = nValue;
-	g_bPauseMultiRead = FALSE;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_UNIVERSAL_PTERM,nValue,
+		product_register_value[MODBUS_UNIVERSAL_PTERM],this->m_hWnd,IDC_ECOOLINGPTERM2,_T("UNIVERSAL_PTERM"));
 }
 
 
@@ -2330,6 +2142,7 @@ void CParameterDlg::OnEnKillfocusEcoolingpterm2()
 
 void CParameterDlg::OnEnKillfocusEdit26()
 {
+
 
 	if(g_ParamLevel==1)
 		return;
@@ -2341,17 +2154,11 @@ void CParameterDlg::OnEnKillfocusEdit26()
 
 	if(product_register_value[MODBUS_COOLING_ITERM]==nValue)	//Add this to judge weather this value need to change.
 		return;
-	g_bPauseMultiRead = TRUE;
-	//write_one(g_tstat_id, 115,nValue);	recode by Fance ,this code not support T6 T7;
-	if(write_one(g_tstat_id, MODBUS_COOLING_ITERM,nValue)<0)		//when t5 MODBUS_COOLING_ITERM=115  ,when t6 t7 MODBUS_COOLING_ITERM=386	
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		strText.Format(_T("%d"),product_register_value[MODBUS_COOLING_ITERM]);		//115  386
-		m_coolingPitemEdt1.SetWindowText(strText);//if wrote fail, resume the last data.
-	}
-	else
-		product_register_value[MODBUS_COOLING_ITERM] = nValue;
-	g_bPauseMultiRead = FALSE;
+
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TIMER_OFF,nValue,
+		product_register_value[MODBUS_COOLING_ITERM],this->m_hWnd,IDC_EDIT26,_T("COOLING ITERM"));
+
 }
 
 
@@ -2369,17 +2176,10 @@ void CParameterDlg::OnEnKillfocusEdit27()
 
 	if(product_register_value[MODBUS_UNIVERSAL_ITERM]==nValue)	//Add this to judge weather this value need to change.
 		return;
-	g_bPauseMultiRead = TRUE;
-	//write_one(g_tstat_id, 245,nValue);	recode by Fance ,this code not support T6 T7;
-	if(write_one(g_tstat_id, MODBUS_UNIVERSAL_ITERM,nValue)<0)		//when t5 MODBUS_UNIVERSAL_ITERM=245  ,when t6 t7 MODBUS_UNIVERSAL_ITERM=388	
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		strText.Format(_T("%d"),product_register_value[MODBUS_UNIVERSAL_ITERM]);		//245  388
-		m_pidPitemEdt2.SetWindowText(strText);//if wrote fail, resume the last data.
-	}
-	else
-		product_register_value[MODBUS_UNIVERSAL_ITERM] = nValue;
-	g_bPauseMultiRead = FALSE;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_UNIVERSAL_ITERM,nValue,
+		product_register_value[MODBUS_UNIVERSAL_ITERM],this->m_hWnd,IDC_EDIT27,_T("UNIVERSAL ITERM"));
+
 }
 
 
@@ -2459,10 +2259,14 @@ void CParameterDlg::OnEnKillfocusSpset2()
 
 	CString strText;
 	m_dayOccEdt2.GetWindowText(strText);
-			g_bPauseMultiRead = TRUE;	
-	write_one(g_tstat_id, MODBUS_UNIVERSAL_SET,(int)(_wtof(strText)*10));//246  359
-	g_bPauseMultiRead = FALSE;
-	//	nret=read_one(tstat_id,246);
+	int nValue=(int)(_wtof(strText)*10);
+
+	if(product_register_value[MODBUS_UNIVERSAL_SET]==nValue)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_UNIVERSAL_SET,nValue,
+		product_register_value[MODBUS_UNIVERSAL_SET],this->m_hWnd,IDC_SPSET2,_T("UNIVERSAL SET"));
+
 }
 
 void CParameterDlg::OnEnKillfocusEsetpointhi()
@@ -2478,21 +2282,13 @@ void CParameterDlg::OnEnKillfocusEsetpointhi()
 		AfxMessageBox(_T("Setpoint Max must between 10 and 99"));
 		return;
 	}
-			g_bPauseMultiRead = TRUE;	
-	//write_one(g_tstat_id,131 , nValue);g_bPauseMultiRead = FALSE;
-	if(write_one(g_tstat_id,MODBUS_MAX_SETPOINT , nValue)<0)
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		CString strTemp;
-		strTemp.Format(_T("%d"),product_register_value[MODBUS_MAX_SETPOINT]);	//if change fail,resume the last data;
-		m_setptHiEdit.SetWindowText(strTemp);
-	}
-	else
-	{
-		product_register_value[MODBUS_MAX_SETPOINT] = nValue;
-	}
-	g_bPauseMultiRead = FALSE; //Modify by Fance support T6 T7
-	Reflesh_ParameterDlg();
+
+	if(product_register_value[MODBUS_MAX_SETPOINT]==nValue)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_MAX_SETPOINT,nValue,
+		product_register_value[MODBUS_MAX_SETPOINT],this->m_hWnd,IDC_ESETPOINTHI,_T("MAX SETPOINT"));
+
 }
 
 void CParameterDlg::OnEnKillfocusEsetpointlo()
@@ -2503,26 +2299,13 @@ void CParameterDlg::OnEnKillfocusEsetpointlo()
 	CString strText;
 	m_setptLoEdit.GetWindowText(strText);
 	int nValue= _wtoi(strText);
-	g_bPauseMultiRead = TRUE;
 
-	if(write_one(g_tstat_id,MODBUS_MIN_SETPOINT , nValue)<0)//132  366
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		CString strTemp;
-		strTemp.Format(_T("%d"),product_register_value[MODBUS_MIN_SETPOINT]);//132  366
-		m_setptLoEdit.SetWindowText(strTemp);//Add by Fance ,if change fail.resume the data.
-	}
-	else
-	{
-		product_register_value[MODBUS_MIN_SETPOINT] = nValue;
-	}
-	
-	g_bPauseMultiRead = FALSE;
-	//if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))
-	//	Refresh6();
-	//else
-	//	Refresh();
-	Reflesh_ParameterDlg();
+
+	if(product_register_value[MODBUS_MIN_SETPOINT]==nValue)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_MIN_SETPOINT,nValue,
+		product_register_value[MODBUS_MIN_SETPOINT],this->m_hWnd,IDC_ESETPOINTLO,_T("MIN SETPOINT"));
 }
 
 void CParameterDlg::OnEnKillfocusEcooldeadband1()
@@ -2539,43 +2322,19 @@ void CParameterDlg::OnEnKillfocusEcooldeadband1()
 	{
 		if(nValue == product_register_value[MODBUS_DAY_COOLING_DEADBAND]/10)	//346
 			return;
-		if(write_one(g_tstat_id,MODBUS_DAY_COOLING_DEADBAND,int(nValue *10))<0)
-		{
-			MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-			strTemp.Format(_T("%.1f"),product_register_value[MODBUS_DAY_COOLING_DEADBAND]/10.0);
-			m_setptCDDEdt1.SetWindowText(strTemp);
-		}
-		else
-		{
-			product_register_value[MODBUS_DAY_COOLING_DEADBAND] = int(nValue *10);
-		}
+
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_COOLING_DEADBAND,int(nValue *10),
+			product_register_value[MODBUS_DAY_COOLING_DEADBAND],this->m_hWnd,IDC_ECOOLDEADBAND1,_T("DAY COOLING DEADBAND"));
 	}
 	else
 	{
 		if(nValue == product_register_value[MODBUS_COOLING_DEADBAND]/10)	//119
 			return;
-		if(write_one(g_tstat_id,MODBUS_COOLING_DEADBAND,int(nValue *10))<0)
-		{
-			MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-			strTemp.Format(_T("%.1f"),product_register_value[MODBUS_COOLING_DEADBAND]/10.0);
-			m_setptCDDEdt1.SetWindowText(strTemp);
-		}
-		else
-		{
-			product_register_value[MODBUS_COOLING_DEADBAND] = int(nValue *10);
-		}
+
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_COOLING_DEADBAND,int(nValue *10),
+			product_register_value[MODBUS_COOLING_DEADBAND],this->m_hWnd,IDC_ECOOLDEADBAND1,_T("COOLING DEADBAND"));
 	}
 	
-	
-	g_bPauseMultiRead = FALSE;
-
-
-	/*
-	float version=get_tstat_version(tstat_id);
-	ftemp = atof(m_cooldeadband);
-	itemp = int(ftemp *10);
-	write_one(tstat_id,119,itemp);
-	*/
 
 }
 
@@ -2594,36 +2353,11 @@ void CParameterDlg::OnEnKillfocusEcooldeadband2()
 
 	if(product_register_value[MODBUS_UNIVERSAL_DB_LO]==nValue)	//Add this to judge weather this value need to change.
 		return;
-	g_bPauseMultiRead = TRUE;
-	//write_one(g_tstat_id, 243,nValue);	recode by Fance ,this code not support T6 T7;
-	if(write_one(g_tstat_id, MODBUS_UNIVERSAL_DB_LO,nValue)<0)		//when t5 MODBUS_UNIVERSAL_DB_LO=243  ,when t6 t7 MODBUS_UNIVERSAL_DB_LO=361	
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		strText.Format(_T("%d"),product_register_value[MODBUS_UNIVERSAL_DB_LO]);		//243   361
-		m_setptCCDEdt2.SetWindowText(strText);//if wrote fail, resume the last data.
-	}
-	else
-		product_register_value[MODBUS_UNIVERSAL_DB_LO] = nValue;
-	g_bPauseMultiRead = FALSE;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_UNIVERSAL_DB_LO,nValue,
+		product_register_value[MODBUS_UNIVERSAL_DB_LO],this->m_hWnd,IDC_ECOOLDEADBAND2,_T("cool dead band"));
 }
 
-
-
-//
-//void CParameterDlg::OnEnKillfocusEcooldeadband2()
-//{
-//	if(g_ParamLevel==1)
-//		return;
-//
-//	CString strText;
-//	m_setptCCDEdt2.GetWindowText(strText);
-//	float nValue= (float)_wtof(strText);
-//			g_bPauseMultiRead = TRUE;	
-//	write_one(g_tstat_id, 243,(int)(nValue*10));g_bPauseMultiRead = FALSE;
-//
-//
-//	MODBUS_UNIVERSAL_DB_LO
-//}
 
 void CParameterDlg::OnEnKillfocusEcoolingiterm1()
 {
@@ -2640,37 +2374,20 @@ void CParameterDlg::OnEnKillfocusEcoolingiterm1()
 	{
 		if(nValue == product_register_value[MODBUS_DAY_HEATING_DEADBAND]/10)	//347
 			return;
-		if(write_one(g_tstat_id,MODBUS_DAY_HEATING_DEADBAND,int(nValue *10))<0)
-		{
-			MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-			strTemp.Format(_T("%.1f"),product_register_value[MODBUS_DAY_HEATING_DEADBAND]/10.0);
-			m_HeadDEdt1.SetWindowText(strTemp);
-		}
-		else
-		{
-			product_register_value[MODBUS_DAY_HEATING_DEADBAND] =int(nValue *10);
-		}
+
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_HEATING_DEADBAND,(short)nValue,
+			product_register_value[MODBUS_DAY_HEATING_DEADBAND],this->m_hWnd,IDC_ECOOLINGITERM1,_T("DAY HEATING DEADBAND"));
 	}
 	else
 	{
 		if(nValue == product_register_value[MODBUS_HEATING_DEADBAND]/10)	//120
 			return;
-		if(write_one(g_tstat_id,MODBUS_HEATING_DEADBAND,int(nValue *10))<0)
-		{
-			MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-			strTemp.Format(_T("%.1f"),product_register_value[MODBUS_HEATING_DEADBAND]/10.0);
-			m_HeadDEdt1.SetWindowText(strTemp);
-		}
-		else
-		{
-			product_register_value[MODBUS_HEATING_DEADBAND] = int(nValue *10);
-		}
+
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_HEATING_DEADBAND,(short)nValue,
+			product_register_value[MODBUS_HEATING_DEADBAND],this->m_hWnd,IDC_ECOOLINGITERM1,_T("HEATING DEADBAND"));
+
 	}
-
-
 	g_bPauseMultiRead = FALSE;
-
-
 }
 
 
@@ -2689,33 +2406,10 @@ void CParameterDlg::OnEnKillfocusEcoolingiterm2()
 
 	if(product_register_value[MODBUS_UNIVERSAL_DB_HI]==nValue)	//Add this to judge weather this value need to change.
 		return;
-	g_bPauseMultiRead = TRUE;
-	//write_one(g_tstat_id, 242,nValue);	recode by Fance ,this code not support T6 T7;
-	if(write_one(g_tstat_id, MODBUS_UNIVERSAL_DB_HI,nValue)<0)		//when t5 MODBUS_UNIVERSAL_DB_HI=242  ,when t6 t7 MODBUS_UNIVERSAL_DB_HI=360	
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		strText.Format(_T("%d"),product_register_value[MODBUS_UNIVERSAL_DB_HI]);		//242   360
-		m_HeadDEdt2.SetWindowText(strText);//if wrote fail, resume the last data.
-	}
-	else
-		product_register_value[MODBUS_UNIVERSAL_DB_HI] = nValue;
-	g_bPauseMultiRead = FALSE;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_UNIVERSAL_DB_HI,nValue,
+		product_register_value[MODBUS_UNIVERSAL_DB_HI],this->m_hWnd,IDC_ECOOLINGITERM2,_T("cooling iterm"));
 }
-
-
-//void CParameterDlg::OnEnKillfocusEcoolingiterm2()
-//{
-//	if(g_ParamLevel==1)
-//		return;
-//
-//	CString strText;
-//	m_HeadDEdt2.GetWindowText(strText);
-//	float nValue= (float)_wtof(strText);
-//			g_bPauseMultiRead = TRUE;	
-//	write_one(g_tstat_id, 242,(int)(nValue*10));g_bPauseMultiRead = FALSE;
-//}
-
-
 
 
 void CParameterDlg::OnBnClickedInputsbutton()
@@ -2727,10 +2421,7 @@ void CParameterDlg::OnBnClickedInputsbutton()
 	CInputSetDlg dlg;
 	dlg.DoModal();	
 	InitPID2ComboBox();
-	//if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))
-	//	Refresh6();
-	//else
-	//	Refresh();
+
 	Reflesh_ParameterDlg();
 
 //	pMain->m_pFreshMultiRegisters->ResumeThread();//tstat6
@@ -2744,10 +2435,6 @@ void CParameterDlg::OnBnClickedOutputsbutton()
 	COutputSetDlg dlg;
 	dlg.DoModal();
 	g_bPauseMultiRead =FALSE;		//Add by Fance 
-	//if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))
-	//	Refresh6();
-	//else
-	//	Refresh();
 	Reflesh_ParameterDlg();//Recode by Fance
 }
 
@@ -2761,10 +2448,6 @@ void CParameterDlg::OnBnClickedOutputstablebutton()
 	Dlg.DoModal();
 	g_bPauseMultiRead =FALSE;	//Add by Fance 
 
-	//if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))
-	//	Refresh6();
-	//else
-	//	Refresh();
 	Reflesh_ParameterDlg();
 }
 void CParameterDlg::OnEnKillfocusEnigntheating()
@@ -2775,13 +2458,24 @@ void CParameterDlg::OnEnKillfocusEnigntheating()
 	m_nightheating.GetWindowText(strText);
 	int nValue= _wtoi(strText);
 
-			g_bPauseMultiRead = TRUE;
+
+
 	if(m_application_ctrl.GetCurSel()==0)
-		write_one(g_tstat_id,182 ,nValue);
+	{
+		if(product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]==nValue)	//Add this to judge weather this value need to change.
+			return;
+
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,nValue,
+			product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],this->m_hWnd,IDC_ENIGNTHEATING,_T("NIGHT HEATING SETPOINT"));
+	}
 	else
-		write_one(g_tstat_id,123 ,nValue);
-	
-	g_bPauseMultiRead = FALSE;
+	{
+		if(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]==nValue)	//Add this to judge weather this value need to change.
+			return;
+
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,nValue,
+			product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],this->m_hWnd,IDC_ENIGNTHEATING,_T("NIGHT HEATING DEADBAND"));
+	}
 
 }
 
@@ -2793,13 +2487,23 @@ void CParameterDlg::OnEnKillfocusEnigntcooling1()
 	CString strText;
 	m_nightcooling.GetWindowText(strText);
 	int nValue= _wtoi(strText);
-			g_bPauseMultiRead = TRUE;	
+
 	if(m_application_ctrl.GetCurSel()==0)
-		write_one(g_tstat_id,183 ,nValue);
+	{
+		if(product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]==nValue)	//Add this to judge weather this value need to change.
+			return;
+
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_SETPOINT,nValue,
+			product_register_value[MODBUS_NIGHT_COOLING_SETPOINT],this->m_hWnd,IDC_ENIGNTCOOLING1,_T("NIGHT COOLING SETPOINT"));
+	}
 	else
-		write_one(g_tstat_id,124 ,nValue);
-	
-	g_bPauseMultiRead = FALSE;
+	{
+		if(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]==nValue)	//Add this to judge weather this value need to change.
+			return;
+
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,nValue,
+			product_register_value[MODBUS_NIGHT_COOLING_DEADBAND],this->m_hWnd,IDC_ENIGNTCOOLING1,_T("NIGHT COOLING DEADBAND"));
+	}
 }
 
 BOOL CParameterDlg::PreTranslateMessage(MSG* pMsg)
@@ -2809,7 +2513,9 @@ BOOL CParameterDlg::PreTranslateMessage(MSG* pMsg)
 	{
 		if(pMsg->wParam == VK_RETURN)
 		{
+			CWnd *temp_focus=GetFocus();	//Maurice require ,click enter and the cursor still in this edit or combobox.
 			GetDlgItem(IDC_REFRESHBUTTON)->SetFocus();
+			temp_focus->SetFocus();
 			return 1;
 		}
 	}
@@ -2828,19 +2534,26 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 		return;
 	float fValue=(float)_wtoi(strText);
 	
+
 			g_bPauseMultiRead = TRUE;	
 	if (multi_register_value[7] == PM_TSTAT7)
 	{
-		write_one(g_tstat_id, 380,short(fValue*10));
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,380,short(fValue*10),
+			product_register_value[380],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));
+		//write_one(g_tstat_id, 380,short(fValue*10));
 	}
 	else if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E)  // 只有5E使用135
 	{
 		short nVal = short(fValue);
-		write_one(g_tstat_id, 135, nVal);
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,135,nVal,
+			product_register_value[380],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));
+		//write_one(g_tstat_id, 135, nVal);
 	}
 	else
 	{
-		write_one(g_tstat_id, 374,short(fValue*10));
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,374,short(fValue*10),
+			product_register_value[380],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));
+		//write_one(g_tstat_id, 374,short(fValue*10));
 	}
 g_bPauseMultiRead = FALSE;
 }
@@ -2851,21 +2564,13 @@ void CParameterDlg::OnCbnSelchangeOccupiedmodecombo()
 	if(g_ParamLevel==1)
 		return;
 	int nItem=m_occupiedSetPointModeCmbox.GetCurSel();	
-	g_bPauseMultiRead = TRUE;
-	if(write_one(g_tstat_id, MODBUS_SETPOINT_CONTROL,nItem)<0)  //339->342
-	{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);}
-	else
-		product_register_value[MODBUS_SETPOINT_CONTROL] = nItem;
-	if(product_register_value[MODBUS_SETPOINT_CONTROL]==0||product_register_value[MODBUS_SETPOINT_CONTROL]==2)
-	{
-		m_defSetPointEdit.EnableWindow(FALSE);
-	}
-	else if(product_register_value[MODBUS_SETPOINT_CONTROL]==1)
-	{
-		m_defSetPointEdit.EnableWindow(TRUE);
-	}	
-	g_bPauseMultiRead = FALSE;
-	Reflesh_ParameterDlg();
+
+
+	if(product_register_value[MODBUS_SETPOINT_CONTROL]==nItem)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_SETPOINT_CONTROL,nItem,
+		product_register_value[MODBUS_SETPOINT_CONTROL],this->m_hWnd,IDC_OCCUPIEDMODECOMBO,_T("SETPOINT CONTROL"));
 }
 
 //Annul by Fance ,this code not support T5T6
@@ -2900,11 +2605,13 @@ void CParameterDlg::OnCbnSelchangeComboLcdscrn1()
 {
 	CComboBox* pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_LCDSCRN1);
 	int nSel = pCbx->GetCurSel();
-	g_bPauseMultiRead = TRUE;
-	if(write_one(g_tstat_id, MODBUS_LCD_SCREEN1, nSel)<0)	//5E = 400   T6 = 539
-		{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
-	//write_one(g_tstat_id, 400, nSel);	//Marked by Fance 
-	g_bPauseMultiRead = FALSE;
+
+	if(product_register_value[MODBUS_LCD_SCREEN1]==nSel)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_LCD_SCREEN1,nSel,
+		product_register_value[MODBUS_LCD_SCREEN1],this->m_hWnd,IDC_COMBO_LCDSCRN1,_T("LCD_SCREEN1"));
+
 }
 
 void CParameterDlg::OnCbnSelchangeComboLcdscrn2()
@@ -2912,10 +2619,12 @@ void CParameterDlg::OnCbnSelchangeComboLcdscrn2()
 	CComboBox* pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_LCDSCRN2);
 	int nSel = pCbx->GetCurSel();
 
-	g_bPauseMultiRead = TRUE;
-	if(write_one(g_tstat_id, MODBUS_LCD_SCREEN2, nSel)<0)	//5E = 401   T6 = 540
-	{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);g_bPauseMultiRead = FALSE;return;}
-	g_bPauseMultiRead = FALSE;
+	if(product_register_value[MODBUS_LCD_SCREEN2]==nSel)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_LCD_SCREEN2,nSel,
+		product_register_value[MODBUS_LCD_SCREEN2],this->m_hWnd,IDC_COMBO_LCDSCRN2,_T("LCD SCREEN2"));
+
 }
 
 //Recode by Fance,Also Support T6 T7
@@ -2927,53 +2636,26 @@ void CParameterDlg::OnCbnSelchangeComboRounddis()
 	bool write_error_flag = false;
 	g_bPauseMultiRead = TRUE;	
 	int round_display = MODBUS_ROUND_DISPLAY;//318  405
+
+	if(product_register_value[MODBUS_ROUND_DISPLAY]==nCursel)	//Add this to judge weather this value need to change.
+		return;
+
+
+
 	if(nCursel == 0)
 	{
-		if(write_one(g_tstat_id,round_display, 0)<0)	//318  405
-		{
-			MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-			write_error_flag = true;
-		}
-		else
-			product_register_value[round_display] = 0;
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_ROUND_DISPLAY,0,
+			product_register_value[MODBUS_ROUND_DISPLAY],this->m_hWnd,IDC_COMBO_ROUNDDIS,_T("ROUND_DISPLAY"));
 	}
 	else if(nCursel == 1)
 	{
-		if(write_one(g_tstat_id,round_display, 1)<0)	//318  405
-		{
-			MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-			write_error_flag = true;
-		}
-		else
-			product_register_value[round_display] = 1;
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_ROUND_DISPLAY,1,
+			product_register_value[MODBUS_ROUND_DISPLAY],this->m_hWnd,IDC_COMBO_ROUNDDIS,_T("ROUND_DISPLAY"));
 	}
 	else if(nCursel == 2)
 	{
-		if(write_one(g_tstat_id, round_display, 5)<0)	//318  405
-		{
-			MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-			write_error_flag = true;
-		}
-		else
-			product_register_value[round_display] = 5;
-	}
-
-	g_bPauseMultiRead = FALSE;
-
-	if(write_error_flag)	//resume the combobox 
-	{
-		if(product_register_value[round_display] == 0)	//318->405
-		{
-			pCbx->SetCurSel(0);
-		}
-		else if(product_register_value[round_display] == 1)//318->405
-		{
-			pCbx->SetCurSel(1);
-		}
-		else if(product_register_value[round_display] == 5)//318->405
-		{
-			pCbx->SetCurSel(2);
-		}
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_ROUND_DISPLAY,5,
+			product_register_value[MODBUS_ROUND_DISPLAY],this->m_hWnd,IDC_COMBO_ROUNDDIS,_T("ROUND_DISPLAY"));
 	}
 }
 
@@ -3055,102 +2737,67 @@ void CParameterDlg::OnCbnKillfocusCombo4()
 
 void CParameterDlg::OnEnKillfocusEditCspd()
 {
-	//m_coolsp= newtstat6[348]/10;
-	//m_coolsp;
-
-	BeginWaitCursor();
 	UpdateData();
-	if(write_one(g_tstat_id,MODBUS_DAY_COOLING_SETPOINT,m_coolsp*10)<0)
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-	product_register_value[MODBUS_DAY_COOLING_SETPOINT]=m_coolsp*10;
-	EndWaitCursor();
+	if(product_register_value[MODBUS_DAY_COOLING_SETPOINT]==m_coolsp*10)	//Add this to judge weather this value need to change.
+		return;
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_COOLING_SETPOINT,m_coolsp*10,
+		product_register_value[MODBUS_DAY_COOLING_SETPOINT],this->m_hWnd,IDC_EDIT_CSPD,_T("DAY COOLING SETPOINT"));
 }
 
 void CParameterDlg::OnEnKillfocusEditCdbdn()
 {
-	//m_cooldb=newtstat6[346]/10;
-//m_cooldb;
-	BeginWaitCursor();
 	UpdateData();
-	if(write_one(g_tstat_id,MODBUS_DAY_COOLING_DEADBAND,m_cooldb*10)<0)	//Modify by Fance
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-	product_register_value[MODBUS_DAY_COOLING_DEADBAND] = m_cooldb*10;
-	EndWaitCursor();
-
+	if(product_register_value[MODBUS_DAY_COOLING_DEADBAND]==m_cooldb*10)	//Add this to judge weather this value need to change.
+		return;
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_COOLING_DEADBAND,m_cooldb*10,
+		product_register_value[MODBUS_DAY_COOLING_DEADBAND],this->m_hWnd,IDC_EDIT_CDBDN,_T("DAY COOLING DEADBAND"));
 }
 
 void CParameterDlg::OnEnKillfocusEdit31()
 {
-	//m_setpoint = newtstat6[345]/10;
-	//m_setpoint;
-	BeginWaitCursor();
 	UpdateData();
-	if(write_one(g_tstat_id,MODBUS_DAY_SETPOINT,m_setpoint*10)<0)	//Modify by  Fance 2013 04 11
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-	product_register_value[MODBUS_DAY_SETPOINT] = m_setpoint*10;
-	EndWaitCursor();
-
+	if(product_register_value[MODBUS_DAY_SETPOINT]==m_setpoint*10)	//Add this to judge weather this value need to change.
+		return;
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_SETPOINT,m_setpoint*10,
+		product_register_value[MODBUS_DAY_SETPOINT],this->m_hWnd,IDC_EDIT31,_T("DAY SETPOINT"));
 }
 
 void CParameterDlg::OnEnKillfocusEdit34()
 {
-	//m_heatdb = newtstat6[347]/10;
-	//m_heatdb;
-
-	BeginWaitCursor();
 	UpdateData();
 	if(write_one(g_tstat_id,MODBUS_DAY_HEATING_DEADBAND,m_heatdb*10)<0)//Modify by Fance  2013 04 11
 	  MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 	else
 	product_register_value[MODBUS_DAY_HEATING_DEADBAND] = m_heatdb*10;
-	EndWaitCursor();
-
 }
 
 void CParameterDlg::OnEnKillfocusEdit37()
 {
-	//m_heatsp = newtstat6[349]/10;
-	//m_heatsp;
-
-	BeginWaitCursor();
 	UpdateData();
-	if(write_one(g_tstat_id,MODBUS_DAY_HEATING_SETPOINT,m_heatsp*10)<0)	//349 only t5 no this item
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-	product_register_value[MODBUS_DAY_HEATING_SETPOINT] = m_heatsp*10;
-	EndWaitCursor();
-
+	if(product_register_value[MODBUS_DAY_HEATING_SETPOINT]==m_heatsp*10)	//Add this to judge weather this value need to change.
+		return;
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_HEATING_SETPOINT,m_heatsp*10,
+		product_register_value[MODBUS_DAY_HEATING_SETPOINT],this->m_hWnd,IDC_EDIT37,_T("DAY HEATING SETPOINT"));
 }
 
 void CParameterDlg::OnEnKillfocusEditCspnn()
 {
-	BeginWaitCursor();
 	UpdateData();
-
-	//write_one(g_tstat_id,355,m_coolspN*10);
-	//newtstat6[355] = m_coolspN*10;
-
-	if(write_one(g_tstat_id,MODBUS_NIGHT_COOLING_SETPOINT,m_coolspN*10)<0)	//Add by Fance ,also support t6
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-		product_register_value[MODBUS_NIGHT_COOLING_SETPOINT] = m_coolspN*10;
-	EndWaitCursor();
+	if(product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]==m_coolspN*10)	//Add this to judge weather this value need to change.
+		return;
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_SETPOINT,m_coolspN*10,
+		product_register_value[MODBUS_NIGHT_COOLING_SETPOINT],this->m_hWnd,IDC_EDIT_CSPNN,_T("NIGHT COOLING SETPOINT"));
 }
 
 //Recode by Fance
 void CParameterDlg::OnEnKillfocusEditCdbnn()
 {
-	BeginWaitCursor();
-	UpdateData();
 
-	if(write_one(g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,m_cooldbN*10)<0)		//T5=124  T6=353
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-		product_register_value[MODBUS_NIGHT_COOLING_DEADBAND] = m_cooldbN*10;
-	EndWaitCursor();
+	UpdateData();
+	if(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]==m_cooldbN*10)	//Add this to judge weather this value need to change.
+		return;
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,m_cooldbN*10,
+		product_register_value[MODBUS_NIGHT_COOLING_DEADBAND],this->m_hWnd,IDC_EDIT_CDBNN,_T("NIGHT COOLING DEADBAND"));
 }
 
 
@@ -3170,48 +2817,32 @@ void CParameterDlg::OnEnKillfocusEditCdbnn()
 
 void CParameterDlg::OnEnKillfocusEdit32()
 {
-	BeginWaitCursor();
 	UpdateData();
-	if(write_one(g_tstat_id,MODBUS_NIGHT_SETPOINT,m_setpointN*10)<0)	//T6 T7 =350		//Modify by Fance
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-		product_register_value[MODBUS_NIGHT_SETPOINT] = m_setpointN*10;
-	EndWaitCursor();
+
+	if(product_register_value[MODBUS_NIGHT_SETPOINT]==m_setpointN*10)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_SETPOINT,m_setpointN*10,
+		product_register_value[MODBUS_NIGHT_SETPOINT],this->m_hWnd,IDC_EDIT32,_T("NIGHT SETPOINT"));
 }
 
 void CParameterDlg::OnEnKillfocusEdit35()
 {
-	BeginWaitCursor();
 	UpdateData();
+	if(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]==m_heatdbN*10)	//Add this to judge weather this value need to change.
+		return;
 
-	//write_one(g_tstat_id,352,m_heatdbN*10);//Annul by Fance
-	//newtstat6[352] = m_heatdbN*10;
-	if(write_one(g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,m_heatdbN*10)<0)	//this change can support T5 T6
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-		product_register_value[MODBUS_NIGHT_HEATING_DEADBAND] = m_heatdbN*10;
-
-	EndWaitCursor();
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,m_heatdbN*10,
+		product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],this->m_hWnd,IDC_EDIT35,_T("NIGHT HEATING DEADBAND"));
 }
 
 void CParameterDlg::OnEnKillfocusEdit38()
 {
-	//m_heatspN=newtstat6[354]/10;
-	//m_heatspN;
 	UpdateData();
 	if(product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] == m_heatspN*10)
 		return;
-	BeginWaitCursor();
-
-
-	//write_one(g_tstat_id,354,m_heatspN*10);	//Annul by Fance
-	//newtstat6[354] = m_heatspN*10;
-	if(write_one(g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,m_heatspN*10)<0)	//Add by Fance,this change can support t5 t6
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	else
-		product_register_value[MODBUS_NIGHT_HEATING_SETPOINT] = m_heatspN*10;
-
-	EndWaitCursor();
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,m_heatspN*10,
+		product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],this->m_hWnd,IDC_EDIT38,_T("NIGHT HEATING SETPOINT"));
 }
 
 
@@ -3741,521 +3372,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 				pCbx->SetCurSel(2);
 			}
 }
-//Annule by Fance recode
-//void CParameterDlg::Refresh6()
-//{
-//
-//	CString strTemp;
-//	strTemp.Format(_T("%d"),g_tstat_id);
-//	m_idAdressEdit.SetWindowText(strTemp);
-//	CString strUnit=GetTempUnit();//Unit string.
-//	//185	110	1	Low byte	W/R(Reboot after write)	Bau - Baudrate, 0=9600, 1=19.2kbaud
-//	if(newtstat6[_G("MODBUS_BAUDRATE",3)]>=0&&newtstat6[_G("MODBUS_BAUDRATE",3)]<=1)	//110
-//		//m_braudRateCombox.SetCurSel(multi_register_value[110]);
-//		m_braudRateCombox.SetCurSel(newtstat6[_G("MODBUS_BAUDRATE",3)]);//110 //Modify by Fance
-//	else
-//		//m_braudRateCombox.SetCurSel(-1);
-//		m_braudRateCombox.SetCurSel(0);
-//
-//
-//	//128	395	1	Low byte	W/R(Reboot after write)
-//
-//	int nItem;
-//	nItem = newtstat6[_G("MODBUS_KEYPAD_SELECT",3)];//395
-//	switch(nItem)
-//	{
-//	case 0:nItem=0;break;
-//	case 1:nItem=2;break;
-//	case 2:nItem=4;break;
-//	case 3:nItem=5;break;
-//	case 4:nItem=3;break;
-//	case 5:nItem=1;break;
-//	case 6:nItem=6;break;
-//	case 7:nItem=7;break;
-//	case 8:nItem=8;break;
-//	default :nItem=0;break;
-//	}
-//	m_keySelectCombox.SetCurSel(nItem);
-//
-//	//127	106	1	Low byte	W/R	"POWER UP_MODE, mode of operation on power up. 0 = power off, 
-//	//1 = power up in on mode, 2 = last value (default), 3 =  auto mode."
-//
-//	//m_powerupModelCombox.SetCurSel(multi_register_value[127]);
-//	m_powerupModelCombox.SetCurSel(newtstat6[_G("MODBUS_POWERUP_MODE",3)]);//106
-//
-//
-//	//285	244	1	Low byte	R	Valve percent. Show the valve opened how much percent.  READ ONLY
-//	//strTemp.Format(_T("%d"),multi_register_value[285]);
-//	strTemp.Format(_T("%d"),newtstat6[_G("MODBUS_VALVE_PERCENT",3)]);	//244 
-//	m_value_percentEdit.SetWindowText(strTemp);
-//
-//// 	203	397	1	Low byte	W/R	"dIS – Display.  This sets the display to either room temperature or setpoint.  0 = room temp, 
-//// 		1 = setpoint, 2 = Blank Display,3 = PID2 value,4 = PID2 setpoint,
-//// 		5 = set segment code by manually, 6 = Display sleep"//
-//
-//
-//	//m_displayCombox.SetCurSel(multi_register_value[203]);
-//	m_displayCombox.SetCurSel(newtstat6[_G("MODBUS_DISPLAY",3)]);	//397 MODBUS_DISPLAY
-//
-////	133	396	1	Low byte	W/R	"SPECIAL_MENU_LOCK, Special menu lockout via keypad, serial port only, 
-//
-//	//m_keyLockCombox.SetCurSel(multi_register_value[133]);
-//	m_keyLockCombox.SetCurSel(newtstat6[_G("MODBUS_SPECIAL_MENU_LOCK",3)]);		//396 
-//
-//
-//	//129	107	1	Low byte	W/R	"AUTO_ONLY , enables or disables manual mode. 0 = Manual Fan Modes 1-x Allowed 
-//	
-//	//m_autoOnlyCombox.SetCurSel(multi_register_value[129]);
-//	m_autoOnlyCombox.SetCurSel(newtstat6[_G("MODBUS_AUTO_ONLY",3)]);		//107
-//
-//	//118	103	1	Low byte	W/R(Reboot after write)	SEQUENCE , 0 = internal test sequence, outputs slowly cycle on/off or ramp up & down. 1 = normal, operation according to the output tables.
-//	//m_SequenceCombox.SetCurSel(multi_register_value[118]);
-//	m_SequenceCombox.SetCurSel(newtstat6[_G("MODBUS_SEQUENCE",3)]);	//103
-//
-//	//279	243	1	Low byte	W/R	Valve travel time. The time of the valve travel  from one end to another end. The units is second.
-//	//strTemp.Format(_T("%.1f"),multi_register_value[279]/10.0);
-//	strTemp.Format(_T("%.1f"),newtstat6[_G("MODBUS_VALVE_TRAVEL_TIME",3)]/10.0);	//243
-//	m_valveEdit.SetWindowText(strTemp);
-//
-//	//214	113	1	Low byte	W/R(not to eeprom)
-//	//m_hcChangeCombox.SetCurSel(multi_register_value[214]);
-//	m_hcChangeCombox.SetCurSel(newtstat6[_G("MODBUS_HEAT_COOL_CONFIG",3)]);	//113 
-//
-//	//126	364	1	Low byte	W/R	POWERUP_SETPOINT , setpoint on power up
-//	//strTemp.Format(_T("%d"),multi_register_value[126]);
-//	strTemp.Format(_T("%d"),newtstat6[_G("MODBUS_POWERUP_SETPOINT",3)]);		//364
-//
-//	m_powerSetPointEdit.SetWindowText(strTemp);
-//
-//	//293	373	1	Low byte	W/R	Setpoint increment on the display each time the user hits the up/down buttons. Units are 0.1Deg, 10 = 1Deg and so on. 
-//	//strTemp.Format(_T("%.1f"),multi_register_value[293]/10.0);
-//	strTemp.Format(_T("%.1f"),newtstat6[_G("MODBUS_SETPOINT_INCREASE",3)]/10.0);		//373
-//
-//	m_setpointIncreasement.SetWindowText(strTemp);
-//
-//
-////	338	341	1	Low byte	W/R	Default occupied setpoint. Works in concert with the "occupied setpoint control register", register 339
-//	//strTemp.Format(_T("%d"),multi_register_value[338]);
-//	strTemp.Format(_T("%d"),newtstat6[_G("MODBUS_DEFAULT_SETPOINT",3)]);	//341
-//	
-//	m_defSetPointEdit.SetWindowText(strTemp);
-//
-//
-//	//339	342	1	Low byte	W/R	Occupied Setpoint Control Register: 0 = normal, setpoint is managed by the serial port and keypad, the stat will remember the last occupied setpoint and use that during the next occupied period. 1 = Default mode, the last occupied setpoint if forgotten and the occupied setpoint gets reset to the default. 2 = trigger an event, when a master controller writes 2 to this register, the default setpoint will be copied to the occupied setpoint after which the Tstat will set the value back to 1 to show the event has been serviced. 
-//
-//	if(newtstat6[_G("MODBUS_SETPOINT_CONTROL",3)]>=0&&newtstat6[_G("MODBUS_SETPOINT_CONTROL",3)]<3)	//342
-//	{
-//		m_occupiedSetPointModeCmbox.SetCurSel(newtstat6[_G("MODBUS_SETPOINT_CONTROL",3)]);//342
-//	}
-//
-//	if(newtstat6[_G("MODBUS_SETPOINT_CONTROL",3)]==0||newtstat6[_G("MODBUS_SETPOINT_CONTROL",3)]==2)//342
-//	{
-//		m_defSetPointEdit.EnableWindow(FALSE);
-//	}
-//	//if(multi_register_value[339]==1)
-//	if(newtstat6[_G("MODBUS_SETPOINT_CONTROL",3)]==1)//342
-//	{
-//		m_defSetPointEdit.EnableWindow(TRUE);
-//	}
-//
-//	//213	142	1	Low byte	W/R	Temperature sensor filter, FIL, weighted average of stored value to new raw value
-////	strTemp.Format(_T("%d"),multi_register_value[213]);
-//	strTemp.Format(_T("%d"),newtstat6[_G("MODBUS_FILTER",3)]);	//142
-//	m_inputFilterEdit.SetWindowText(strTemp);
-//
-//
-//	//201	241	1	Low byte	W/R	"MODBUS_CYCLING_DELAY – delay time (in minutes) for switching out of heating or cooling
-//	//strTemp.Format(_T("%d"),multi_register_value[201]);
-//	strTemp.Format(_T("%d"),newtstat6[_G("MODBUS_CYCLING_DELAY",3)]);	//241
-//	m_cycledlayEdit.SetWindowText(strTemp);
-//
-//	//301	114	2	Full	W/R	Period timer ON time.
-//	//strTemp.Format(_T("%d"),multi_register_value[301]);
-//	strTemp.Format(_T("%d"),newtstat6[_G("MODBUS_TIMER_ON",3)]);	//114
-//	m_timerOnEdit.SetWindowText(strTemp);
-//
-//	//302	115	2	Full	W/R	Period timer OFF time.
-//	//strTemp.Format(_T("%d"),multi_register_value[302]);
-//
-//	strTemp.Format(_T("%d"),newtstat6[_G("MODBUS_TIMER_OFF",3)]);	//115
-//	m_timerOffEdit.SetWindowText(strTemp);
-//
-//	//303	116	1	Low byte	W/R(not to eeprom)	Period timer units. 0, second; 1, minute; 2, hour.
-//	m_uniteCombox.SetCurSel(newtstat6[_G("MODBUS_TIMER_UNITS",3)]);	//116
-//
-//	strTemp.Format(_T("%d"),multi_register_value[_G("MODBUS_COOL_ORIGINAL_TABLE",3)]);//tstat6,7没找到。	333
-//	m_timerLeft.SetWindowText(strTemp);
-//
-//
-//	//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
-//	//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
-//
-//	//if(multi_register_value[283]==2||multi_register_value[284]==2)
-//	if(newtstat6[_G("MODBUS_MODE_OUTPUT4",3)]==2||newtstat6[_G("MODBUS_MODE_OUTPUT5",3)]==2)	//205  206
-//	{
-//		CComboBox* pCombox=(CComboBox*)GetDlgItem(IDC_TIMERDELECTCOMBO);
-//		int	indext=3;
-//		//327	408	1	Low byte	W/R	"Assign the timer to be used for which feature. 0 = period timer, 1 = rotation timer,
-//		write_one(g_tstat_id,_G("MODBUS_EEPROM_SIZE",3),indext); //408 
-//		pCombox->SetCurSel(3);
-//
-//	}
-//	else
-//	{
-//
-//	}
-//
-//	//if(multi_register_value[283]==2)
-//	if(newtstat6[_G("MODBUS_MODE_OUTPUT4",3)]==2)	//205 
-//	{
-//		CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMERON_STATIC);
-//		ptimerout->SetWindowText(_T("Out4:"));
-//	}
-//	else
-//	{
-//		CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMERON_STATIC);
-//		ptimerout->SetWindowText(_T("Timer On:"));
-//	}
-//
-//	//if(multi_register_value[284]==2)
-//	if(newtstat6[_G("MODBUS_MODE_OUTPUT5",3)]==2)	//206 
-//	{
-//
-//		CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMEOFF_STATIC);
-//		ptimerout->SetWindowText(_T("Out5:"));
-//
-//	}
-//	else
-//	{
-//		CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMEOFF_STATIC);
-//		ptimerout->SetWindowText(_T("Timer Off:"));
-//	}
-//
-////327	408	1	Low byte	W/R	"Assign the timer to be used for which feature. 0 = period timer, 1 = rotation timer,
-//	//m_timerSelectCombox.SetCurSel(multi_register_value[327]);
-//	m_timerSelectCombox.SetCurSel(newtstat6[_G("MODBUS_EEPROM_SIZE",3)]);	//408
-//
-//
-//		//211	111	1	Low byte	W/R	Unoccupied Override Timer, Ort. 0=disabled, >0=number of minutes manual override is allowed
-//		//212	112	1	Low byte	W/R	"OVERRIDE_TIMER_DOWN_COUNT - Number of minutes remaining on the timer when 
-//	
-//
-//
-//
-//	//strTemp.Format(_T("%d"),multi_register_value[212]);
-//	strTemp.Format(_T("%d"),newtstat6[_G("MODBUS_OVERRIDE_TIMER_LEFT",3)]);	//112
-//	m_TimeEdit.SetWindowText(strTemp);
-//	strTemp.Format(_T("%d"),newtstat6[_G("MODBUS_OVERRIDE_TIMER",3)]);	//111
-//	m_OverRideEdit.SetWindowText(strTemp);
-////tstat6
-//	//111	382	1	Low byte	W/R	Sensor to be used for the PID calculations,  1= external sensor analog input 1 , 2 = internal thermistor, 3 = average the internal thermistor and analog input1
-//	if (newtstat6[_G("MODBUS_TEMP_SELECT",3)]<1)	//382
-//	{
-//		m_InputSelect1.SetCurSel(0);
-//	}else if (newtstat6[_G("MODBUS_TEMP_SELECT",3)]>3)//382
-//	{
-//		m_InputSelect1.SetCurSel(2);
-//	}else
-//	{
-//		m_InputSelect1.SetCurSel(newtstat6[_G("MODBUS_TEMP_SELECT",3)]-1);//382
-//	}
-//	
-//	if (newtstat6[_G("MODBUS_INPUT1_SELECT",3)]<0)	//383
-//	{
-//		m_inputSelect2.SetCurSel(0);
-//	}else if (newtstat6[_G("MODBUS_INPUT1_SELECT",3)]>5)	//383
-//	{
-//		m_inputSelect2.SetCurSel(5);
-//	}else
-//	{
-//		m_inputSelect2.SetCurSel(newtstat6[_G("MODBUS_INPUT1_SELECT",3)]);	//383
-//	}
-//	
-//
-//	strTemp.Format(_T("%.1f"),newtstat6[_G("MODBUS_TEMPRATURE_CHIP",3)]/10.0);	//121
-//	m_inputvalue1.SetWindowText(strTemp+strUnit);
-//
-//	//////////////////////////////////////////////////////////////////////////
-//	// PID2 m_inputValue2 m_inputSelect2 关联设置
-//	if(newtstat6[_G("MODBUS_INPUT1_SELECT",3)]==1) // input1		//383
-//	{	
-//
-//		if(newtstat6[7]== PM_PRESSURE)  // pressure
-//		{
-//			strTemp.Format(_T("%.1f W.C"),multi_register_value[MODBUS_EXTERNAL_SENSOR_0]/100.0);//180
-//		}
-//		else
-//		{
-//			
-//			if(multi_register_value[MODBUS_ANALOG_IN1]==4||multi_register_value[MODBUS_ANALOG_IN1]==1)//188
-//			{
-//				strTemp.Format(_T("%.1f"),(float)multi_register_value[MODBUS_EXTERNAL_SENSOR_0]/10);//180
-//				strTemp=strTemp+strUnit;
-//			}
-//			if (strUnit==""||strUnit=="%")
-//			{
-//				strTemp.Format(_T("%d"),multi_register_value[MODBUS_EXTERNAL_SENSOR_0]);//180
-//			}
-//			if(multi_register_value[MODBUS_EXTERNAL_SENSOR_0]==3)//180
-//			{
-//				if(multi_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//180
-//					strTemp=_T("OFF");
-//				if(multi_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//180
-//					strTemp=_T("ON");
-//			}
-//			
-//		}
-//
-//		m_inputValue2.SetWindowText(strTemp);
-//	}
-//
-//	//241	383	2	Full	W/R	Universal PID input select, 0=none, 1=analog_in1, 2=analog_in2, 3= humidity  4= co2
-//
-//
-//	//if(multi_register_value[241]==2) // input2 //m_inputvalue1
-//	if(newtstat6[_G("MODBUS_INPUT1_SELECT",3)]==2) // input2 //m_inputvalue1	383
-//	{
-//
-//		if(multi_register_value[_G("MODBUS_ANALOG_IN2")]==4||multi_register_value[_G("MODBUS_ANALOG_IN2")]==1)//tstat6找不到	//189 MODBUS_ANALOG_IN2
-//		{
-//			strTemp.Format(_T("%.1f"),(float)multi_register_value[_G("MODBUS_EXTERNAL_SENSOR_1")]/10.0);	//181
-//			strTemp=strTemp+strUnit;
-//		}
-//		if (strUnit==""||strUnit=="%")
-//		{
-//			strTemp.Format(_T("%d"),multi_register_value[_G("MODBUS_EXTERNAL_SENSOR_1")]);//181
-//		}
-//		if(multi_register_value[_G("MODBUS_ANALOG_IN2")]==3)	//189
-//		{
-//			if(multi_register_value[_G("MODBUS_EXTERNAL_SENSOR_1")]==0)//181
-//				strTemp=_T("OFF");
-//			if(multi_register_value[_G("MODBUS_EXTERNAL_SENSOR_1")]==1)//181
-//				strTemp=_T("ON");
-//		}
-//
-//	}
-//	else
-//	{
-//			//m_hotelCoolEdt.SetWindowText(_T("N/A"));//0911
-//	}
-//
-//
-//	if (newtstat6[_G("MODBUS_INPUT1_SELECT",3)]==3) // humidity	//383
-//	{
-//		strTemp.Format(_T("%.1f%%"),multi_register_value[422]/10.0);	//422 Don't know why???
-//		m_inputValue2.SetWindowText(strTemp);
-//	}
-//
-//	//
-//	//////////////////////////////////////////////////////////////////////////
-//	//184	109	1	Low byte	W/R	Info Byte, this register contains info about the state of the tstat.  
-//
-//
-//// 	if (newtstat6[7] == PM_TSTAT7) || newtstat6[7] == PM_TSTAT6)
-//// 	{
-//		//short nOccupied = multi_register_value[184];  // Day setpoint option  
-//	short nOccupied = newtstat6[_G("MODBUS_INFO_BYTE",3)];  // Day setpoint option  //109 
-//		BOOL bOccupied = nOccupied & 0x0001;
-//		if (bOccupied)  // day  - Occupied
-//		{
-//			m_application_ctrl.SetCurSel(multi_register_value[454]);//tstat6,7找不到	454
-//			// 5E 以及以后的型号
-//		}
-//		else
-//		{
-//			m_application_ctrl.SetCurSel(multi_register_value[125]); 
-//		}
-//// 	}
-//// 	else
-//// 	{
-//// 		m_application_ctrl.SetCurSel(multi_register_value[125]); 
-//// 	}
-////	UpdateCoolingandHeatingData();
-//
-//
-//
-//
-//	strTemp.Empty();
-//	m_version=get_curtstat_version();
-//
-//
-//	strTemp.Empty();
-//	strTemp.Format(_T("%.1f"),multi_register_value[_G("MODBUS_UNIVERSAL_SET")]/10.0);	 //246
-//	m_pid_setptEdt2.SetWindowText(strTemp);
-//
-//	strTemp.Format(_T("%d"),multi_register_value[_G("MODBUS_COOLING_PID")]);		//104
-//	m_pid_outputEdt1.SetWindowText(strTemp);
-//	strTemp.Format(_T("%d"),multi_register_value[_G("MODBUS_PID_UNIVERSAL")]);		//270
-//	m_pid_outputEdt2.SetWindowText(strTemp);
-//
-////tstat6
-//	//114	385	1	Low byte	R	COOLING PTERM , proportional term for PI calculation
-//
-//
-//	strTemp.Format(_T("%.1f"),(float)newtstat6[_G("MODBUS_COOLING_PTERM",3)]/10.0);	//385
-//	m_pternEdt1.SetWindowText(strTemp);
-//
-////tstat6
-//	//115	386	1	Low byte	W/R	COOLING ITEM
-//	strTemp.Format(_T("%.1f"),(float)newtstat6[_G("MODBUS_COOLING_ITERM",3)]/10.0);		//386
-//	m_coolingPitemEdt1.SetWindowText(strTemp);
-//
-//	strTemp.Format(_T("%.1f"),(float)multi_register_value[_G("MODBUS_UNIVERSAL_ITERM")]/10.0);	//245
-//	m_pidPitemEdt2.SetWindowText(strTemp);
-//
-//
-//	strTemp.Empty();
-//	strTemp.Format(_T("%.1f"),(float)multi_register_value[_G("MODBUS_UNIVERSAL_SET")]/10.0);	//246
-//	strTemp+=strUnit;
-//	m_dayOccEdt2.SetWindowText(strTemp);
-//	if (multi_register_value[MODBUS_INPUT1_SELECT]==3) // humidity	//241
-//	{
-//		strTemp.Format(_T("%.1f%%"),multi_register_value[422]/10.0);	//422	???????
-//		m_dayOccEdt2.SetWindowText(strTemp);
-//	}
-//
-//	strTemp.Empty();
-//
-////	if(newtstat6[7] == PM_TSTAT7)
-////	{
-//	//380	160	2	Full	W/R	Calibration for analog input6
-//
-//		//strTemp.Format(_T("%.1f"),multi_register_value[380]/10.0);//	set point 
-//	strTemp.Format(_T("%.1f"),newtstat6[160]/10.0);//	set point 
-////	}
-//// 	else
-//// 	{
-//// 		if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E)   // 老版本135，新版本374// 老版本不除10，
-//// 		{
-//// 			strTemp.Format(_T("%d"),(int)multi_register_value[135]);
-//// 		}
-//// 		else
-//// 		{
-//// 			strTemp.Format(_T("%.1f"),multi_register_value[374]/10.0);	// set point for TStat A,B,C,D
-//// 		}	
-//// 	}
-//
-//	m_dayOccEdt1.SetWindowText(strTemp);
-//
-//	//184	109	1	Low byte	W/R	Info Byte, this register contains info about the state of the tstat.  
-//
-//	//tstat6
-//	// unoccupied and office mode, we should recalc the setpoint here	
-//	//short nOccupied = multi_register_value[184];  // Day setpoint option  
-//	
-////	BOOL bOccupied = nOccupied & 0x0001;
-////	if (!bOccupied && multi_register_value[125] == 0)  // unoccupied and office mode
-////	{ //DON'T UNDERSTAND  WHY？？？？？？？？？？？？？;
-//		float temp =float( (multi_register_value[355]-multi_register_value[354]) / 2.0 + multi_register_value[354] );
-//		
-//	
-//
-//		//strTemp.Format(_T("%.1f"),temp);
-//		strTemp.Format(_T("%d"),(int)temp);
-//	//}
-//	m_pid_setptEdt1.SetWindowText(strTemp+strUnit);
-//
-//
-//	//131	365	1	Low byte	W/R	MAX_SETPOINT, Setpoint high, the highest setpoint a user will be able to set from the keypad.
-//	//132	366	1	Low byte	W/R	MIN_SETPOINT, Setpoint Low, the lowest setpoint a user will be able to set from the keypad. 
-//
-////	strTemp.Format(_T("%d"),multi_register_value[131]);
-//		strTemp.Format(_T("%d"),newtstat6[_G("MODBUS_MAX_SETPOINT",3)]);//365
-//	strTemp+=strUnit;
-//	m_setptHiEdit.SetWindowText(strTemp);
-//
-//	strTemp.Empty();
-//	//strTemp.Format(_T("%d"),multi_register_value[132]);
-//	strTemp.Format(_T("%d"),newtstat6[_G("MODBUS_MIN_SETPOINT",3)]);//366
-//	strTemp+=strUnit;
-//	m_setptLoEdit.SetWindowText(strTemp);
-//
-//
-////119	346	1	Low byte	W/R	(Day)Occupied cooling setpoint dead band  , offset from setpoint for cooling to begin.  Units are 0.1 deg.
-////		347	1	Low byte	W/R	(Day)Occupied heating setpoint dead band  , offset from setpoint for heating to begin.  Units are 0.1 deg.
-//
-//
-//
-////the section below modified by Fance 
-//	//strTemp.Empty();
-//	//strTemp.Format(_T("%.1f"),multi_register_value[119]/10.0);//119
-//	//strTemp+=strUnit;
-//	//m_setptCDDEdt1.SetWindowText(strTemp);
-//
-//	//strTemp.Empty();
-//	//strTemp.Format(_T("%.1f"),multi_register_value[243]/10.0);//243
-//	//strTemp+=strUnit;
-//	//m_setptCCDEdt2.SetWindowText(strTemp);
-//	//strTemp.Empty();
-//	//strTemp.Format(_T("%.1f"),multi_register_value[120]/10.0);
-//	//strTemp+=strUnit;
-//	//m_HeadDEdt1.SetWindowText(strTemp);
-//	//strTemp.Empty();
-//	//strTemp.Format(_T("%.1f"),multi_register_value[242]/10.0);
-//	//strTemp+=strUnit;
-//	//m_HeadDEdt2.SetWindowText(strTemp);
-//
-//	//Modify by Fance 2013-03-22 , the last code shows the error information.
-//
-//	strTemp.Empty();//6  7 没有 MODBUS_COOLING_DEADBAND =119  这一项;
-//	m_setptCDDEdt1.SetWindowText(strTemp);
-//
-//
-//	strTemp.Empty();
-//	strTemp.Format(_T("%.1f"),newtstat6[_G("MODBUS_UNIVERSAL_DB_LO",3)]/10.0);//243->361
-//	strTemp+=strUnit;
-//	m_setptCCDEdt2.SetWindowText(strTemp);
-//
-//	strTemp.Empty();
-//	m_HeadDEdt1.SetWindowText(strTemp);//6  7 没有 MODBUS_HEATING_DEADBAND =120  这一项
-//	
-//
-//	strTemp.Empty();
-//	strTemp.Format(_T("%.1f"),newtstat6[_G("MODBUS_UNIVERSAL_DB_HI",3)]/10.0);// 242->360
-//	strTemp+=strUnit;
-//	m_HeadDEdt2.SetWindowText(strTemp);
-//
-//
-//	//The code below is error.Modify by Fance.
-//	//CComboBox* pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_LCDSCRN1);
-//	//pCbx->SetCurSel(multi_register_value[400]);
-//	//pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_LCDSCRN2);
-//	//pCbx->SetCurSel(multi_register_value[401]);
-//	//pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_ROUNDDIS);
-//	//if(multi_register_value[318] == 0)
-//	//{
-//	//	pCbx->SetCurSel(0);
-//	//}
-//	//else if(multi_register_value[318] == 1)
-//	//{
-//	//	pCbx->SetCurSel(1);
-//	//}
-//	//else if(multi_register_value[318] == 5)
-//	//{
-//	//	pCbx->SetCurSel(2);
-//	//}
-//	//Modify by Fance  2013-03-22
-//	CComboBox* pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_LCDSCRN1);
-//	pCbx->SetCurSel(newtstat6[_G("MODBUS_LCD_SCREEN1",3)]);
-//	pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_LCDSCRN2);
-//	pCbx->SetCurSel(newtstat6[_G("MODBUS_LCD_SCREEN2",3)]);	
-//	pCbx = (CComboBox*)GetDlgItem(IDC_COMBO_ROUNDDIS);
-//	if(newtstat6[_G("MODBUS_ROUND_DISPLAY",3)] == 0)	//318->405
-//	{
-//		pCbx->SetCurSel(0);
-//	}
-//	else if(newtstat6[_G("MODBUS_ROUND_DISPLAY",3)] == 1)//318->405
-//	{
-//		pCbx->SetCurSel(1);
-//	}
-//	else if(newtstat6[_G("MODBUS_ROUND_DISPLAY",3)] == 5)//318->405
-//	{
-//		pCbx->SetCurSel(2);
-//	}
-//	
-//
-//
-//}
+
 void CParameterDlg::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
@@ -4276,36 +3393,137 @@ void CParameterDlg::OnEnKillfocusEditValuetraveltime()//0914
 	{
 		ret = 255;
 	}
-	int R =0;
-	R = write_one(g_tstat_id, MODBUS_VALVE_TRAVEL_TIME,ret, 5);//243	Only Tstats 6 has this function; 
-	if (R>0)
-	{
-		newtstat6[MODBUS_VALVE_TRAVEL_TIME] = ret;	//243
-		product_register_value[MODBUS_VALVE_TRAVEL_TIME] = ret;
-	}
-	else
-	{
-		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-	}
 
+
+	if(product_register_value[MODBUS_VALVE_TRAVEL_TIME]==ret)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_VALVE_TRAVEL_TIME,ret,
+		product_register_value[MODBUS_VALVE_TRAVEL_TIME],this->m_hWnd,IDC_EDIT_ValueTravelTime,_T("VALVE TRAVEL TIME"));
 }
 
 void CParameterDlg::OnEnKillfocusEditPid2offsetpoint()
 {
+
 	CString str;
 	//str.Format(_T("%d"),multi_register_value[275]);
 	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->GetWindowText(str);
 	int nValue= _wtoi(str);
-	int ret =0;
-	ret = write_one(g_tstat_id,275,nValue*10,5);
-	if (ret>0)
+
+	if(product_register_value[275]==nValue*10)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,275,nValue*10,
+		product_register_value[275],this->m_hWnd,IDC_EDIT_PID2OFFSETPOINT,_T("Pid2 off setpoint"));
+}
+
+//Add 20130516  by Fance
+LRESULT  CParameterDlg::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
+{
+	_MessageWriteOneInfo *Write_Struct_feedback =(_MessageWriteOneInfo *)lParam;
+	bool msg_result=WRITE_FAIL;
+	msg_result = MKBOOL(wParam);
+	vector <int>::iterator Iter;
+	if(msg_result)
 	{
-		multi_register_value[275] = nValue;
-	}else
-	{
-		AfxMessageBox(_T("Pleas try again"));
+		int indexid = -1;
+		for (int i=0;i<(int)Change_Color_ID.size();i++)
+		{
+			if(Change_Color_ID.at(i)!=Write_Struct_feedback->CTRL_ID)
+				continue;
+			else
+				indexid = i;
+		}
+		
+		if(indexid!=-1)
+		{
+			Iter = Change_Color_ID.begin()+indexid;
+			Change_Color_ID.erase(Iter);
+		}
+
+		CString temp;
+		temp.Format(_T("Change \"%s\" value from %d to %d success!"),
+			Write_Struct_feedback->Changed_Name,
+			Write_Struct_feedback->old_value,
+			Write_Struct_feedback->new_value);
+
+		SetPaneString(1,temp);
+		product_register_value[Write_Struct_feedback->address]= Write_Struct_feedback->new_value;
+		if(Write_Struct_feedback!=NULL)
+			delete Write_Struct_feedback;
+		//MessageBox(temp);
 	}
+	else
+	{
+		CString temp;
+		temp.Format(_T("Change \"%s\" value from %d to %d Fail!"),
+			Write_Struct_feedback->Changed_Name,
+			Write_Struct_feedback->old_value,
+			Write_Struct_feedback->new_value);
+		SetPaneString(1,temp);
+		Beep(10,100);
+		/*if(MessageBox(temp,_T("Information"),MB_RETRYCANCEL)== IDRETRY )
+		{
+			Post_Thread_Message(MY_WRITE_ONE,
+				Write_Struct_feedback->device_id,
+				Write_Struct_feedback->address,
+				Write_Struct_feedback->new_value,
+				Write_Struct_feedback->old_value,
+				Write_Struct_feedback->hwnd,
+				Write_Struct_feedback->CTRL_ID,
+				Write_Struct_feedback->Changed_Name);
+		}
+		else
+		{*/
+			product_register_value[Write_Struct_feedback->address]= Write_Struct_feedback->old_value;
+			//GetDlgItem(Write_Struct_feedback->CTRL_ID)->SetWindowTextW(_T(""));
 
+			int indexid = -1;
+			for (int i=0;i<(int)Change_Color_ID.size();i++)
+			{
+				if(Change_Color_ID.at(i)!=Write_Struct_feedback->CTRL_ID)
+					continue;
+				else
+					indexid = i;
+			}
+			Iter = Change_Color_ID.begin()+indexid;
+			if(indexid!=-1)
+			{
+				Iter = Change_Color_ID.begin()+indexid;
+				Change_Color_ID.erase(Iter);
+			}
 
+			if(Write_Struct_feedback!=NULL)
+			{
+				delete Write_Struct_feedback;
+				//MessageBox(_T("delete Write_Struct_feedback"));
+			}
+	//	}
+	}
+	Reflesh_ParameterDlg();
+	return 0;
+}
 
+HBRUSH CParameterDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	// TODO:  Change any attributes of the DC here
+
+	// TODO:  Return a different brush if the default is not desired
+	for (int i=0;i<(int)Change_Color_ID.size();i++)
+	{
+		if(/*nCtlColor==CTLCOLOR_EDIT &&*/pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//注意此处的（pWnd->），否则没效果
+		{
+			pDC->SetTextColor(RGB(0,0,0));
+			pDC->SetBkColor(RGB(255,0,0));//设置文本背景色
+			pDC->SetBkMode(TRANSPARENT);//设置背景透明
+			hbr = (HBRUSH)m_brush;
+
+			//((CComboBox *)GetDlgItem(pWnd->GetDlgCtrlID()))->
+		}
+		//else if()
+	}
+	
+	return hbr;
 }
