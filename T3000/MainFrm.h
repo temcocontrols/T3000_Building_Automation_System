@@ -332,7 +332,7 @@ public:
 	UINT FlagSerialNumber;
 	void Treestatus();
 	static	DWORD WINAPI Get_All_Dlg_Message(LPVOID lpVoid);
-	static	DWORD WINAPI DoMSG(LPVOID lpVoid);
+	static	DWORD WINAPI Translate_My_Message(LPVOID lpVoid);
 };
 
 
