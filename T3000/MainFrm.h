@@ -21,7 +21,7 @@
 #include "MiniPanel/DialgMiniPanel.h" //Mini Panel
 #include "AirQuality/AirQuality.h"//AirQuality
 
-#define NUMVIEWS 10
+#define NUMVIEWS 11
 
 
 

@@ -136,8 +136,10 @@ typedef struct _STATUSBARINFO
 
 
 #define MY_WRITE_ONE WM_USER+100
-#define MY_CLOSE WM_USER+101
+#define MY_READ_ONE  WM_USER+101
+#define MY_CLOSE WM_USER+110
 #define MY_RESUME_DATA  WM_USER+200
+#define MY_READ_DATA_CALLBACK WM_USER+201
 typedef struct _MessageWriteOneInfo
 {
 	unsigned char device_id;
@@ -149,5 +151,15 @@ typedef struct _MessageWriteOneInfo
 	CString Changed_Name;
 
 }MessageWriteOneInfo;
+
+
+typedef struct _MessageReadOneInfo
+{
+	unsigned char device_id;
+	unsigned short address;
+	short new_value;
+	HWND hwnd;
+}MessageReadOneInfo;
+
 //#define _DEBUG
 //*********************************link to dll***************************

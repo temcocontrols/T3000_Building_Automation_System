@@ -62,4 +62,11 @@ BOOL Post_Thread_Message(UINT MsgType,
 	HWND Dlg_hwnd,
 	UINT CTRL_ID,
 	CString Changed_Name);
+
+
+BOOL Post_Read_one_Thread_Message(
+	unsigned char device_id,
+	unsigned short address,
+	HWND Dlg_hwnd);
+
 #endif

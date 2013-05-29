@@ -799,3 +799,23 @@ BOOL Post_Thread_Message(UINT MsgType,
 		return TRUE;
 	}
 }
+
+BOOL Post_Read_one_Thread_Message(
+	unsigned char device_id,
+	unsigned short address,
+	HWND Dlg_hwnd)
+{
+	_MessageReadOneInfo *My_Read_Struct = new _MessageReadOneInfo;
+	My_Read_Struct->device_id=device_id;
+	My_Read_Struct->address=address;
+	My_Read_Struct->new_value = -1;
+	My_Read_Struct->hwnd = Dlg_hwnd;
+	if(!PostThreadMessage(nThreadID,MY_READ_ONE,(WPARAM)My_Read_Struct,NULL))//post thread msg
+	{
+		return FALSE;
+	}
+	else
+	{
+		return TRUE;
+	}
+}

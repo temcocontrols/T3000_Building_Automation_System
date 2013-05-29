@@ -198,9 +198,11 @@ ON_EN_KILLFOCUS(IDC_EDIT_ValueTravelTime, &CParameterDlg::OnEnKillfocusEditValue
 ON_EN_KILLFOCUS(IDC_EDIT_PID2OFFSETPOINT, &CParameterDlg::OnEnKillfocusEditPid2offsetpoint)
 
 ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
+ON_MESSAGE(MY_READ_DATA_CALLBACK, ReadDataCallBack)
 
 //ON_WM_KILLFOCUS()
 ON_WM_CTLCOLOR()
+ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -477,6 +479,7 @@ BOOL CParameterDlg::OnInitDialog()
 	 ((CButton *)GetDlgItem(IDC_REFRESHBUTTON))->SetIcon(hIcon);
 
 	 m_brush.CreateSolidBrush(RGB(255,0,0));
+	 SetTimer(1,2000,NULL);
 	//////////////////////////////////////////////////////////////////////////
 	// TODO:  Add extra initialization here
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -3187,7 +3190,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 				m_application_ctrl.SetCurSel(product_register_value[125]); 
 			}
 			UpdateCoolingandHeatingData();
-			if(product_type!=3)
+			if(product_type!=T3000_6_ADDRESS)
 			{
 				//UpdateCoolingandHeatingData();
 				int index = 0;
@@ -3243,21 +3246,21 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 			strTemp.Empty();
 			strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_UNIVERSAL_SET]/10.0);	//246  359
-			strTemp+=strUnit;
+			//strTemp+=strUnit;
 			m_dayOccEdt2.SetWindowText(strTemp);
 
 
 			//下面有问题;
-			if (product_register_value[MODBUS_INPUT1_SELECT]==3) // humidity		//241
-			{
-				strTemp.Format(_T("%.1f%%"),multi_register_value[422]/10.0);	//422 Don't know why???
-				m_dayOccEdt2.SetWindowText(strTemp);
-			}
+			//if (product_register_value[MODBUS_INPUT1_SELECT]==3) // humidity		//241
+			//{
+			//	strTemp.Format(_T("%.1f%%"),multi_register_value[422]/10.0);	//422 Don't know why???
+			//	m_dayOccEdt2.SetWindowText(strTemp);
+			//}
 
 			strTemp.Empty();
 			//上面可能有问题;
 
-			if(product_type!=3)
+			if(product_type!=T3000_6_ADDRESS)
 			{
 				if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E)   // ÀÏ°æ±¾135£¬ÐÂ°æ±¾374// ÀÏ°æ±¾²»³ý10£¬
 				{
@@ -3317,7 +3320,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			//119	346	1	Low byte	W/R	(Day)Occupied cooling setpoint dead band  , offset from setpoint for cooling to begin.  Units are 0.1 deg.
 			//		347	1	Low byte	W/R	(Day)Occupied heating setpoint dead band  , offset from setpoint for heating to begin.  Units are 0.1 deg.
 
-			if(product_type!=3)
+			if(product_type!=T3000_6_ADDRESS)
 			{
 				strTemp.Empty();
 				strTemp.Format(_T("%.1f"),product_register_value[MODBUS_COOLING_DEADBAND]/10.0);	//119
@@ -3417,6 +3420,22 @@ void CParameterDlg::OnEnKillfocusEditPid2offsetpoint()
 		product_register_value[275],this->m_hWnd,IDC_EDIT_PID2OFFSETPOINT,_T("Pid2 off setpoint"));
 }
 
+
+LRESULT  CParameterDlg::ReadDataCallBack(WPARAM wParam, LPARAM lParam)
+{
+	_MessageReadOneInfo *Read_Struct_feedback =(_MessageReadOneInfo *)lParam;
+	bool msg_result=WRITE_FAIL;
+	msg_result = MKBOOL(wParam);
+	if(msg_result)
+	{
+		product_register_value[Read_Struct_feedback->address]=Read_Struct_feedback->new_value;	
+	}
+	if(Read_Struct_feedback!=NULL)
+		delete Read_Struct_feedback;
+	return 1;
+}
+
+
 //Add 20130516  by Fance
 LRESULT  CParameterDlg::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 {
@@ -3462,19 +3481,6 @@ LRESULT  CParameterDlg::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 			Write_Struct_feedback->new_value);
 		SetPaneString(1,temp);
 		Beep(10,100);
-		/*if(MessageBox(temp,_T("Information"),MB_RETRYCANCEL)== IDRETRY )
-		{
-			Post_Thread_Message(MY_WRITE_ONE,
-				Write_Struct_feedback->device_id,
-				Write_Struct_feedback->address,
-				Write_Struct_feedback->new_value,
-				Write_Struct_feedback->old_value,
-				Write_Struct_feedback->hwnd,
-				Write_Struct_feedback->CTRL_ID,
-				Write_Struct_feedback->Changed_Name);
-		}
-		else
-		{*/
 			product_register_value[Write_Struct_feedback->address]= Write_Struct_feedback->old_value;
 			//GetDlgItem(Write_Struct_feedback->CTRL_ID)->SetWindowTextW(_T(""));
 
@@ -3496,9 +3502,7 @@ LRESULT  CParameterDlg::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 			if(Write_Struct_feedback!=NULL)
 			{
 				delete Write_Struct_feedback;
-				//MessageBox(_T("delete Write_Struct_feedback"));
 			}
-	//	}
 	}
 	Reflesh_ParameterDlg();
 	return 0;
@@ -3519,11 +3523,41 @@ HBRUSH CParameterDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 			pDC->SetBkColor(RGB(255,0,0));//设置文本背景色
 			pDC->SetBkMode(TRANSPARENT);//设置背景透明
 			hbr = (HBRUSH)m_brush;
-
-			//((CComboBox *)GetDlgItem(pWnd->GetDlgCtrlID()))->
 		}
-		//else if()
+
 	}
 	
 	return hbr;
+}
+
+
+void CParameterDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+	Post_Read_one_Thread_Message(g_tstat_id,MODBUS_ROTATION_TIME_LEFT,this->m_hWnd);
+	Post_Read_one_Thread_Message(g_tstat_id,MODBUS_TEMPRATURE_CHIP,this->m_hWnd);
+	Post_Read_one_Thread_Message(g_tstat_id,MODBUS_INPUT1_SELECT,this->m_hWnd);
+	Post_Read_one_Thread_Message(g_tstat_id,MODBUS_EXTERNAL_SENSOR_0,this->m_hWnd);
+	Post_Read_one_Thread_Message(g_tstat_id,MODBUS_COOLING_PID,this->m_hWnd);
+	Post_Read_one_Thread_Message(g_tstat_id,MODBUS_PID_UNIVERSAL,this->m_hWnd);
+	
+	Fresh_Single_UI();
+
+	//Reflesh_ParameterDlg();
+	CDialog::OnTimer(nIDEvent);
+}
+
+void CParameterDlg::Fresh_Single_UI()
+{
+	CString strTemp;
+	CString strUnit=GetTempUnit();//Unit string.
+	strTemp.Format(_T("%.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);	//121
+	m_inputvalue1.SetWindowText(strTemp+strUnit);
+
+	strTemp.Format(_T("%d"),product_register_value[MODBUS_COOLING_PID]);		//104 384
+	m_pid_outputEdt1.SetWindowText(strTemp);
+
+	strTemp.Format(_T("%d"),product_register_value[MODBUS_PID_UNIVERSAL]);		//270  389
+	m_pid_outputEdt2.SetWindowText(strTemp);
+
 }
