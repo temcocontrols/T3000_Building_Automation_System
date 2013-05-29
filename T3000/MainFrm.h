@@ -234,6 +234,7 @@ public:
 	void SwitchToGraphicView();
 	void SetPaneConnectionPrompt(CString strInfo);
 	void OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult);
+	void OnHTreeItemKeyDownChanged(NMHDR* pNMHDR, LRESULT* pResult);
 	void OnHTreeItemEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult);
 	LRESULT OnHTreeItemBeginlabeledit(NMHDR *pNMHDR, LRESULT *pResult);
 	void  OnHTreeItemClick(NMHDR *pNMHDR, LRESULT *pResult);
@@ -245,7 +246,8 @@ public:
 	void CheckConnectFailure(const CString& strIP);// 检查失败的原因，并给出详细的提示信息
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	BOOL ConnectSubBuilding(Building_info build_info);
-
+	//0:TCP Disconnect 1:TCP Connection 2:COM disconnect 3:Com Connection
+    int CheckCurrentNodeConnectSubBuilding();
 
 
 	//scan funtion:
@@ -331,8 +333,12 @@ public:
 
 	UINT FlagSerialNumber;
 	void Treestatus();
+	
 	static	DWORD WINAPI Get_All_Dlg_Message(LPVOID lpVoid);
 	static	DWORD WINAPI Translate_My_Message(LPVOID lpVoid);
+	
+	tree_product  m_CurrentBuildingNode;
 };
+
 
 

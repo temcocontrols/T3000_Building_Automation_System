@@ -23,6 +23,7 @@
 
 #include "../FlexSlideBar/FlexSlideWnd.h"
 #include "../FlexSlideBar/FSBContainer.h"
+#include "DisplayDlg.h"
 
 // #define _CRTDBG_MAP_ALLOC
 // #include "stdlib.h"
@@ -348,7 +349,7 @@ void CT3000View::OnInitialUpdate()
 
 	// Create flex slide bar
 	//return;
-	CreateFlexSilde();
+	CreateFlexSilde_TStat6_2SP();
 
 
 // 	CString strTemp;
@@ -376,7 +377,7 @@ void CT3000View::OnInitialUpdate()
 
 }
 
-void CT3000View::CreateFlexSilde()
+void CT3000View::CreateFlexSilde_TStat6_2SP()
 {
 	if(m_pNightTwoSP == NULL)
 	{
@@ -603,6 +604,22 @@ void CT3000View::Fresh()
 // 	strInfo.Format(_T("CT3000View::Fresh():FreshIOGridTable()"));			
 // 	SetPaneString(2, strInfo);
 //Alex-Changed
+	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5E))
+	{
+		GetDlgItem(IDC_LEDBUTTON)->ShowWindow(SW_SHOW);
+		if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
+		{
+			GetDlgItem(IDC_BUTTON_SCHEDULE)->ShowWindow(SW_SHOW);
+		}
+
+
+
+	} 
+	else
+	{
+		GetDlgItem(IDC_LEDBUTTON)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_BUTTON_SCHEDULE)->ShowWindow(SW_HIDE);
+	}
     FreshCtrl();
 	FreshIOGridTable();
 }
@@ -1328,10 +1345,12 @@ void CT3000View::Fresh_In()
 		m_Input_Grid.put_TextMatrix(8,1,g_strInName7);
 		m_Input_Grid.put_TextMatrix(9,1,g_strInName8);
 		m_Input_Grid.put_TextMatrix(10,1,g_strInHumName);
+		m_Input_Grid.put_TextMatrix(11,1,g_strInCO2);
 
 		strTemp.Empty();
 		if(m_fFirmwareVersion>33.3)
 		{
+		     BOOL m_disable_hum,m_disable_CO2;
 			float nValue;
 			for(int i=0;i<9;i++)
 			{
@@ -1409,6 +1428,64 @@ void CT3000View::Fresh_In()
 				}
 				m_Input_Grid.put_TextMatrix(1+i,2,strTemp);
 			}
+			if((product_register_value[20]&2)==2)
+			{m_disable_hum=TRUE;}
+			else
+			{
+				m_disable_hum=FALSE;
+			}
+			if((product_register_value[20]&4)==4){
+				m_disable_CO2=TRUE;}
+			else
+			{
+				m_disable_CO2=FALSE;
+			}
+			if (!m_disable_hum)
+			{
+				m_Input_Grid.put_Col(2);
+				m_Input_Grid.put_Row(10);
+				m_Input_Grid.put_CellBackColor(DISABLE_COLOR_CELL);
+			}
+			else
+			{
+				if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
+				{
+					  
+					strTemp.Format(_T("%0.1f%%"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
+					m_Input_Grid.put_TextMatrix(10,2,strTemp);
+				}
+				else
+				{
+					 
+					strTemp.Format(_T("%0.1f%%"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
+					m_Input_Grid.put_TextMatrix(10,2,strTemp);
+				}
+			}
+			if (!m_disable_CO2)
+			{
+				m_Input_Grid.put_Col(2);
+				m_Input_Grid.put_Row(11);
+				m_Input_Grid.put_CellBackColor(DISABLE_COLOR_CELL);
+			}
+			else
+			{
+				if (product_register_value[607]==0)
+				{
+					 
+					strTemp.Format(_T("%d"),product_register_value[139]);
+					m_Input_Grid.put_TextMatrix(11,2,strTemp);
+				}
+				else
+				{
+					 
+					strTemp.Format(_T("%d"),product_register_value[608]);
+					m_Input_Grid.put_TextMatrix(11,2,strTemp);
+				}
+			}
+
+
+
+		
 		}
 		else
 		{
@@ -1537,22 +1614,17 @@ void CT3000View::Fresh_In()
  
 
 
-	if(nModel==PM_TSTAT6  )  // Tstat 6 // 2012-02-07, 5E型号灭有湿度
-	{
-		//Mdb_Adress_Map = T3000_5EH_LCD_ADDRESS;
-		
+	//if(nModel==PM_TSTAT6  )  // Tstat 6 // 2012-02-07, 5E型号灭有湿度
+	//{
+	//	//Mdb_Adress_Map = T3000_5EH_LCD_ADDRESS;
+	//	WORD wHum = product_register_value[MODBUS_EXTERNAL_SENSOR2];	//   140
+	//	 
+	//	CString str;
+	//	str.Format(_T("%0.1f%%"), wHum/10.0);
 
-		m_Input_Grid.put_TextMatrix(10,1,g_strInHumName);
-		DWORD dwHum = product_register_value[MODBUS_NEW_COOLING_SETPOINT];//422
-		CString strHum;
-		strHum.Format(_T("%0.1f%%"), dwHum/10.0);
-		m_Input_Grid.put_TextMatrix(10,2,strHum);
-	}
-
-	if(nModel==19)//H
-	{
-
-	}
+	//	m_Input_Grid.put_TextMatrix(10,1,g_strInHumName);
+	//	m_Input_Grid.put_TextMatrix(10,2,str);
+	//}
 
 	if (nModel == PM_PRESSURE)
 	{
@@ -1879,6 +1951,10 @@ void CT3000View::FreshIOGridTable()
 
 			 }break;
 		case PM_TSTAT6:
+			{
+				m_outRows=8;
+				m_inRows=12;
+			}break;
 		case PM_TSTAT5E:
 			{
 				m_outRows=8;
@@ -5399,97 +5475,6 @@ void CT3000View::InitFlexSliderBars_tstat6()
 }
 
 
-//It's useless.
-void CT3000View::OnFlexSlideCallBackFortstat6()
-{
-	int nMin, nMax;
-#if 1
-// 	short nOccupied = multi_register_value[184];  // Day setpoint option  
-// 	BOOL bOccupied = nOccupied & 0x0001;
-// 	int nOfficeOrHotel = 0;
-
-	int nCoolSP = 0;
-	int nHeatSP = 0;
-	int nSP =0;
-
-	//else  // unoccupied
-
-	//以下是右边 1SP
-	{
-		//nOfficeOrHotel = multi_register_value[125];	
-		//if (nOfficeOrHotel == 0) // office
-		if (0)
-		{		
-			vector<int>  szPos(2);
-			m_pNightTwoSP->GetRange(nMin, nMax);
-			int nNum = m_pNightTwoSP->GetPos(szPos);
-			int nHeatSP = szPos[0] + nMin;
-			int nCoolSP = szPos[1] + nMin;
-			int ret=0;
-			ret =write_one(g_tstat_id, MODBUS_NIGHT_COOLING_SETPOINT, nCoolSP,5);//355才是对的
-			ret =write_one(g_tstat_id, MODBUS_NIGHT_HEATING_SETPOINT, nHeatSP,5);//354才是对的 不是353
-			//Marked by Fance ,no need to judge product this time
-			//int ret=0;
-			//if (((m_strModelName.CompareNoCase(_T("Tstat6")) == 0)&&m_fFirmwareVersion >35.5)||(m_strModelName.CompareNoCase(_T("Tstat7")) == 0))
-			//{
-			//	ret =write_one(g_tstat_id, 354, nCoolSP,5);
-			//	ret =write_one(g_tstat_id, 353, nHeatSP,5);
-
-			//}else
-			//{
-			//	write_one(g_tstat_id, 183, nCoolSP,5);
-			//	write_one(g_tstat_id, 182, nHeatSP,5);
-			//}
-
-			CString strTemp;
-
-			strTemp.Format(_T("%d"), nCoolSP);
-			m_nightInfoEdit.SetWindowText(strTemp);
-			strTemp.Format(_T("%d"), nHeatSP);
-			m_nightHeatInfoEdit.SetWindowText(strTemp);
-
-
-		}
-		else if(0) // day
-		{
-			vector<int>  szPos(3);
-			m_pNightSingleSP->GetRange(nMin, nMax);
-			int nNum = m_pNightSingleSP->GetPos(szPos);
-			int nHeatSP = szPos[0] + nMin;
-			int nSP = szPos[1] + nMin;
-			int nCoolSP = szPos[2] + nMin;
-
-			int ret=0;
-			CString strTemp;
-			strTemp.Format(_T("%d"), nSP);
-			CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
-			pSPWnd->SetWindowText(strTemp);
-
-			strTemp.Format(_T("%d"), nCoolSP);
-			m_nightInfoEdit.SetWindowText(strTemp);
-			strTemp.Format(_T("%d"),  nHeatSP);
-			m_nightHeatInfoEdit.SetWindowText(strTemp);
-
-			{
-				ret =write_one(g_tstat_id, 345, nSP,5);
-				ret =write_one(g_tstat_id, 348, nCoolSP,5);
-				ret =write_one(g_tstat_id, 349, nHeatSP,5);
-
-			}
-
-		}
-	}
-
-
-
-#endif
-}
-
-void CT3000View::TemperatureSlider()
-{
-	//GetDlgItem(IDC_TEMPRETURE_SLIDER)->EnableWindow(TRUE);//2.5.0.95
-
-}
 void CT3000View::OnNMReleasedcaptureTempretureSlider(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	// TODO: Add your control notification handler code here
@@ -5774,10 +5759,36 @@ void CT3000View::FreshCtrl()
 	if((product_register_value[MODBUS_PRODUCT_MODEL] == PM_TSTAT6)||(product_register_value[MODBUS_PRODUCT_MODEL] == PM_TSTAT7))
 	{	
 		// humidity
-		WORD wHum = product_register_value[MODBUS_EXTERNAL_SENSOR2];	//   140
-		CEdit * pEdit = (CEdit*)GetDlgItem(IDC_EDIT_HUMIDITY);
+		BOOL m_disable_hum;
+		if((product_register_value[20]&2)==2)
+		{m_disable_hum=TRUE;}
+		else
+		{
+			m_disable_hum=FALSE;
+		}
+
 		CString str;
-		str.Format(_T("%0.1f%%"), wHum/10.0);
+		if (!m_disable_hum)
+		{
+		str=_T("UNUSED") ;
+		}
+		else
+		{
+		  if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
+		{
+			str.Format(_T("%0.1f%%"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
+		}
+		else
+		{
+			str.Format(_T("%0.1f%%"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
+		}
+		}
+		
+
+		 
+		CEdit * pEdit = (CEdit*)GetDlgItem(IDC_EDIT_HUMIDITY);
+		 
+		 
 		pEdit->SetWindowText(str);
 	}	
 	else

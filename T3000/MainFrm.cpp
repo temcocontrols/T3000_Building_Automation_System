@@ -34,8 +34,9 @@
 #include "LightingController/LightingController.h"//Lightingcontroller
 #include "HumChamber.h"
 #include "CO2_View.h"
-
+#include "NewImportDBDlg.h"
 #include "Dialog_Progess.h"
+#include "RenameDlg.h"
 
 #include "excel9.h"
 
@@ -529,6 +530,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_pTreeViewCrl=&m_wndWorkSpace.m_TreeCtrl;	
 	m_pTreeViewCrl->SetExtendedStyle(TVS_EDITLABELS, TVS_EDITLABELS);
 
+	m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
+	m_pRefreshThread->SetMainWnd(this);	
+
+	// 需要执行线程中的操作时
+	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
+	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 
 	//  2011,7,4, 先判断是否第一次运行，是否要导入数据库。
 	//ImportDataBaseForFirstRun();
@@ -543,12 +550,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
 
-	m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
-	m_pRefreshThread->SetMainWnd(this);	
 
-	// 需要执行线程中的操作时
-	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
-	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 	//tstat6
 	Tstat6_func();//为TSTST6新寄存器用的。
 
@@ -882,255 +884,36 @@ int nRet =read_one(g_tstat_id,6,1);
 	//CM5
 
 	EndWaitCursor();
-////////////////////////////////////////////////////////////////////////////
-// commented by zgq; 2010-11-29;这个是为了
-/*
-	int nCounts=m_product.size();
-	tree_product product_Node;
-	int nSelectID=-1;
-	UINT nSelectSerialNumber;
-	for(int i=0;i<m_product.size();i++)
+ 
+
+}
+
+void CMainFrame::OnHTreeItemKeyDownChanged(NMHDR* pNMHDR, LRESULT* pResult)
+{	
+
+//	Flexflash = TRUE;
+//	HTREEITEM hSelItem,hNextItem;//=m_pTreeViewCrl->GetSelectedItem();
+////int nRet =read_one(g_tstat_id,6,1);
+////
+//     hSelItem= m_pTreeViewCrl->GetSelectedItem();
+// 
+//	//////////////////////////////////////////////////////////////////////////
+//	
+//	m_strCurSelNodeName = m_pTreeViewCrl->GetItemText(hSelItem);
+
+   /* CRenameDlg dlg;
+	dlg.m_nodename=m_strCurSelNodeName;
+	if (dlg.DoModal()==IDOK)
 	{
-		if(hSelItem==m_product.at(i).product_item )
-		{
-			int nID=-1;
-			int nTRet=-1;
-			//g_tstat_id=m_product.at(i).product_id;
-			product_Node=m_product.at(i);
-
-			//************************************
-			register_critical_section.Lock();
-			g_tstat_id_changed=TRUE;
-			g_tstat_id=product_Node.product_id;
-			register_critical_section.Unlock();
-			//***************************************
-			nSelectID=product_Node.product_id;
-			nSelectSerialNumber=product_Node.serial_number;
-
-
-			CString strTitle;
-			strTitle=product_Node.BuildingInfo.strMainBuildingname;
-			strTitle+=_T("->");
-			strTitle+=product_Node.BuildingInfo.strBuildingName;
-
-			m_wndWorkSpace.SetWindowText(strTitle);
-
-			//AfxMessageBox(product_Node.BuildingInfo.strMainBuildingname);
-		
-			g_strImagePathName=product_Node.strImgPathName;
-			if(product_Node.BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0)
-			{
-				//connect:
-				ConnectSubBuilding(product_Node.BuildingInfo);
-			}
-			
-			
-// 			if(m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0&&product_Node.BuildingInfo.hCommunication!=NULL)
-// 			{
-// 				CloseHandle(product_Node.BuildingInfo.hCommunication);
-// 				m_product.at(i).BuildingInfo.hCommunication=NULL;
-// 			}
-			if(m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0&&m_hCurCommunication!=NULL)
-			{
-				//CloseHandle(m_hCurCommunication);
-			}
-
-			m_strCurSubBuldingName=product_Node.BuildingInfo.strBuildingName;
-			BOOL bOnLine=FALSE;
-			UINT nSerialNumber=0;
-			if (g_CommunicationType==0)
-			{
-				m_nbaudrat=19200;
-				Change_BaudRate(19200);
-				nID=read_one(g_tstat_id,6,2);
-				if(nID<0)
-				{
-					m_nbaudrat=9600;
-					Change_BaudRate(9600);
-					nID=read_one(g_tstat_id,6,2);
-					bOnLine=FALSE;
-				}
-				if(nID>0)
-				{
-					unsigned short SerialNum[4];
-					memset(SerialNum,0,sizeof(SerialNum));
-					int nRet=0;//
-					nRet=Read_Multi(g_tstat_id,&SerialNum[0],0,4,3);
-					
-					if(nRet>=0)
-					{
-			
-						nSerialNumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
-					}
-					if(nSerialNumber>=0)
-					{
-						if(nSerialNumber==nSelectSerialNumber)
-							bOnLine=TRUE;
-					}
-			
-
-				}
-			}
-			if (g_CommunicationType==1)
-			{
-			  nID=read_one(g_tstat_id,6);
-			  if(nID<0)
-				  bOnLine=FALSE;
-			  if(nID>0)
-			  {
-				  	unsigned short SerialNum[4];
-					memset(SerialNum,0,sizeof(SerialNum));
-					int nRet=0;//
-					nRet=Read_Multi(g_tstat_id,&SerialNum[0],0,4,3);
-					UINT nSerialNumber=0;
-					if(nRet>0)
-					{
-			
-						nSerialNumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
-					}
-					if(nSerialNumber>0)
-					{
-						if(nSerialNumber==nSelectSerialNumber)
-							bOnLine=TRUE;
-					}
-			  }
-
-			}
-			if(bOnLine)
-			{
-				SetPaneConnectionPrompt(_T("Online!"));
-				m_pTreeViewCrl->turn_item_image(hSelItem ,true);
-			
-			}
-			else
-			{
-				
-				SetPaneConnectionPrompt(_T("Offline!"));
-				m_pTreeViewCrl->turn_item_image(hSelItem ,false);	
-				memset(&multi_register_value[0],0,sizeof(multi_register_value));
-				return;
-				//CString strtemp;
-				//strtemp.Format(_T("Failed to connect the Tstate Serial number=%d,Address ID=%d"),m_product.at(i).serial_number,m_product.at(i).product_id);
-				//AfxMessageBox(strtemp);
-				//return;
-			}
-			register_critical_section.Lock();
-			multi_read_tstat(g_tstat_id);
-			g_tstat_id_changed=FALSE;
-			register_critical_section.Unlock();
-			g_serialNum=nSerialNumber;//get_serialnumber();
-
-			if(g_bPrivilegeMannage)
-			{
-				if(g_buser_log_in)
-				{
-					if(g_strLoginUserName.CompareNoCase(_T("admin"))==0)
-					{
-						g_MainScreenLevel=0;
-						g_ParamLevel=0;
-						g_OutPutLevel=0;
-						g_NetWorkLevel=0;
-						g_GraphicModelevel=0;
-						g_BurnHexLevel=0;
-						g_LoadConfigLevel=0;
-						g_BuildingsetLevel=0;
-						g_AllscreensetLevel=0;
-					}
-
-					else
-				{
-					_ConnectionPtr m_pConTmp;
-					_RecordsetPtr m_pRsTemp;
-					m_pConTmp.CreateInstance("ADODB.Connection");
-					m_pRsTemp.CreateInstance("ADODB.Recordset");
-					m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-
-					CString strSerial;
-					strSerial.Format(_T("%d"),g_serialNum);
-					strSerial.Trim();
-					CString strsql;
-					strsql.Format(_T("select * from user_level where MainBuilding_Name='%s' and Building_Name='%s' and username = '%s' and serial_number = %d"),m_strCurMainBuildingName,m_strCurSubBuldingName,g_strLoginUserName,g_serialNum);
-					m_pRsTemp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);	
-
-					if(VARIANT_FALSE==m_pRsTemp->EndOfFile)
-					{//获取权限：
-						g_AllscreensetLevel=m_pRsTemp->GetCollect("allscreen_level");
-						if(g_AllscreensetLevel!=1)
-						{
-							g_MainScreenLevel=m_pRsTemp->GetCollect("mainscreen_level");//
-							g_ParamLevel=m_pRsTemp->GetCollect("parameter_level");
-							g_OutPutLevel=m_pRsTemp->GetCollect("outputtable_level");
-							g_NetWorkLevel=m_pRsTemp->GetCollect("networkcontrol_level");//
-							g_GraphicModelevel=m_pRsTemp->GetCollect("graphic_level");//
-							g_BurnHexLevel=m_pRsTemp->GetCollect("burnhex_level");
-							g_LoadConfigLevel=m_pRsTemp->GetCollect("loadconfig_level");
-							g_BuildingsetLevel=m_pRsTemp->GetCollect("building_level");
-						}
-						else
-						{
-							g_MainScreenLevel=1;
-							g_ParamLevel=1;
-							g_OutPutLevel=1;
-							g_NetWorkLevel=1;
-							g_GraphicModelevel=1;
-							g_BurnHexLevel=1;
-							g_LoadConfigLevel=1;
-							g_BuildingsetLevel=1;
-							g_AllscreensetLevel=1;
-
-						}
-
-
-
-					}
-					if(m_pRsTemp->State) 
-						m_pRsTemp->Close(); 
-					if(m_pConTmp->State)
-						m_pConTmp->Close();	
-
-
-					m_pConTmp.CreateInstance("ADODB.Connection");
-					m_pRsTemp.CreateInstance("ADODB.Recordset");
-					m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-
-					strSerial.Format(_T("%d"),g_serialNum);
-					strSerial.Trim();
-
-					strsql.Format(_T("select * from UserLevelSingleSet where MainBuilding_Name='%s' and Building_Name='%s' and username = '%s'"),m_strCurMainBuildingName,m_strCurSubBuldingName,g_strLoginUserName);
-					m_pRsTemp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);	
-					if(VARIANT_FALSE==m_pRsTemp->EndOfFile)
-					{//获取权限：
-						g_NetWorkLevel=m_pRsTemp->GetCollect("networkcontroller");//
-						g_BuildingsetLevel=m_pRsTemp->GetCollect("database_limition");
-					}
-
-					if(m_pRsTemp->State) 
-						m_pRsTemp->Close(); 
-					if(m_pConTmp->State)
-						m_pConTmp->Close();	
-
-
-				}
-
-				}
-	
-			}
-			GetIONanme();
-
-			if(multi_register_value[7]==NET_WORK_CONT_PRODUCT_MODEL)
-			{
-				SwitchToPruductType(1);
-			}
-			if(multi_register_value[7]<NET_WORK_CONT_PRODUCT_MODEL)
-			{
-				SwitchToPruductType(0);
-			}
-		}
-	}
-	*/
-//	}else
-//		AfxMessageBox(_T("Sorry, this node is offline"));//tree0412
-
+	   m_strCurSelNodeName=dlg.m_nodename;
+	}*/
+	//m_pTreeViewCrl->SetItemText(hSelItem,m_strCurSelNodeName);
+	/* m_pTreeViewCrl->SelectItem(hSelItem);
+	m_pTreeViewCrl->SetFocus();
+	hNextItem=m_pTreeViewCrl->GetNextItem(hSelItem,TVGN_CARET);
+	m_pTreeViewCrl->SelectItem(hNextItem);
+	m_pTreeViewCrl->SetFocus(); */
+  //  AfxMessageBox(m_strCurSelNodeName);
 }
 
 
@@ -3747,7 +3530,7 @@ void CMainFrame::GetIONanme()
 				else
 					str_temp=_T("Output 7");
 				g_strOutName7=str_temp;
-
+				g_strInCO2=_T("CO2 Sensor");
 			}
 			else
 			{
@@ -3760,9 +3543,8 @@ void CMainFrame::GetIONanme()
 				g_strInName6=_T("Input 6");
 				g_strInName7=_T("Input 7");
 				g_strInName8=_T("Input 8");
-				
 				g_strInHumName = _T("Humidity Sensor");
-
+				g_strInCO2=_T("CO2 Sensor");
 
 				g_strOutName1=_T("Output 1");
 				g_strOutName2=_T("Output 2");
@@ -3796,7 +3578,7 @@ void CMainFrame::OnHelp()
 }
 void CMainFrame::OnImportDatase()
 {
-	CImportDatabaseDlg Dlg;
+	CNewImportDBDlg Dlg;
 	Dlg.DoModal();
 	
 }
@@ -3828,7 +3610,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			OnToolRefreshLeftTreee();
 		}
 
-		if(pMsg->wParam == VK_F2)
+		if(pMsg->wParam == VK_F4)
 		{
 			OnToolErease();
 			return 1;
@@ -4136,7 +3918,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			int nTRet=-1;
 			//g_tstat_id=m_product.at(i).product_id;
 			product_Node=m_product.at(i);
-
+			m_CurrentBuildingNode=m_product.at(i);
 			//************************************
 			register_critical_section.Lock();
 			g_tstat_id_changed=TRUE;
@@ -4192,27 +3974,29 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 					CString strInfo;
 					strInfo.Format(_T("COM %d Connected: Yes"), nComPort);			
-					//SetPaneCommunicationPrompt(strInfo);
-					SetPaneString(1, strInfo);
+					 
+					
 					BOOL  bret = open_com(nComPort);
 					if (!bret)
-					{
-						AfxMessageBox(_T("COM port open failure!"));			
+					{	 strInfo.Format(_T("COM port %d open failure"), nComPort);	
+						AfxMessageBox(strInfo);
+								
 						if (pDlg !=NULL)
-						{
+						{	SetPaneString(1, strInfo);
 							pDlg->ShowWindow(SW_HIDE);
 							delete pDlg;
 						}
 						return;
 					}else
 					{
+					    SetPaneString(1, strInfo);
 						g_CommunicationType=0;
 					}
 				}
 			}
-			if(m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0&&m_hCurCommunication!=NULL)
+			/*if(m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0&&m_hCurCommunication!=NULL)
 			{
-			}
+			}*/
 
 			m_strCurSubBuldingName=product_Node.BuildingInfo.strBuildingName;
 			BOOL bOnLine=FALSE;
@@ -4255,7 +4039,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					// 					AfxMessageBox(str);
 					//Reset the COM or check to make sure the product is open
 					//	AfxMessageBox(_T("Detect the product model not corresponding\nSelect COM port,try again!"));//\nDatabase->Building config Database	
-					AfxMessageBox(_T("Detect the product model not corresponding\nReset the com port or check to make sure the product is open,and then try again!"));
+					CString str=m_strCurSelNodeName+_T("  is offline!\nPlease Check your cable");
+					AfxMessageBox(str);
+                    SetPaneString(1, str);
 					if (pDlg !=NULL)
 					{
 						pDlg->ShowWindow(SW_HIDE);
@@ -4288,8 +4074,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 							bOnLine=TRUE;
 					}
 				}else
-				{
-					AfxMessageBox(_T("Detect the product model not corresponding\nSelect COM port,try again!"));//\nDatabase->Building config Database			
+				{	  CString str=m_strCurSelNodeName+_T("  is offline!");
+					AfxMessageBox(str);//\nDatabase->Building config Database			
 					if (pDlg !=NULL)
 					{
 						pDlg->ShowWindow(SW_HIDE);
@@ -4298,18 +4084,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					return;
 				}
 			}
-			nFlag = read_one(g_tstat_id,7,6);		
-			if(nFlag >65530)	//The return value is -1 -2 -3 -4
-			{
 
-				AfxMessageBox(_T("Reading product model abnormal \n Try again!"));
-				if (pDlg !=NULL)
-				{
-					pDlg->ShowWindow(SW_HIDE);
-					delete pDlg;
-				}
-				return;
-			}
 			if(bOnLine)
 			{ 
 				SetPaneConnectionPrompt(_T("Online!"));
@@ -4556,9 +4331,19 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 #endif
 			// 			strInfo.Format(_T("CMainFrame::DoConnectToANode():read_one(g_tstat_id,7,3)"));			
 			// 			SetPaneString(2, strInfo);
-		//	SwitchToPruductType(10);
+ 		
+			nFlag = read_one(g_tstat_id,7,6);		
+			if(nFlag >65530)	//The return value is -1 -2 -3 -4
+			{
 
-
+				AfxMessageBox(_T("Reading product model abnormal \n Try again!"));
+				if (pDlg !=NULL)
+				{
+					pDlg->ShowWindow(SW_HIDE);
+					delete pDlg;
+				}
+				return;
+			}
 			if(nFlag==PM_NC)	
 			{	
 				SwitchToPruductType(1);
@@ -4807,10 +4592,9 @@ void CMainFrame::RefreshTreeView()
 			int nIDNode=tp.product_id;
 			nSerialNumber=tp.serial_number;
 			//int newnID=read_one(nID,6,2);
-
+			 
 			if (g_CommunicationType==0) // 通信类型 0
 			{	
-				// force baud rate to 19200
 				m_nbaudrat=19200;
 				Change_BaudRate(19200);
 
