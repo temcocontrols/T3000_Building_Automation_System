@@ -4298,18 +4298,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					return;
 				}
 			}
-			nFlag = read_one(g_tstat_id,7,6);		
-			if(nFlag >65530)	//The return value is -1 -2 -3 -4
-			{
 
-				AfxMessageBox(_T("Reading product model abnormal \n Try again!"));
-				if (pDlg !=NULL)
-				{
-					pDlg->ShowWindow(SW_HIDE);
-					delete pDlg;
-				}
-				return;
-			}
 			if(bOnLine)
 			{ 
 				SetPaneConnectionPrompt(_T("Online!"));
@@ -4557,7 +4546,18 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			// 			strInfo.Format(_T("CMainFrame::DoConnectToANode():read_one(g_tstat_id,7,3)"));			
 			// 			SetPaneString(2, strInfo);
 		//	SwitchToPruductType(10);
+			nFlag = read_one(g_tstat_id,7,6);		
+			if(nFlag >65530)	//The return value is -1 -2 -3 -4
+			{
 
+				AfxMessageBox(_T("Reading product model abnormal \n Try again!"));
+				if (pDlg !=NULL)
+				{
+					pDlg->ShowWindow(SW_HIDE);
+					delete pDlg;
+				}
+				return;
+			}
 
 			if(nFlag==PM_NC)	
 			{	
