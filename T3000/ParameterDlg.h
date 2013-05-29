@@ -89,7 +89,7 @@ public:
 
 
 	afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
-
+	afx_msg LRESULT  ReadDataCallBack(WPARAM wParam, LPARAM lParam);
 	void Refresh();
 	 void Refresh6();
 	 void Reflesh_ParameterDlg();
@@ -193,4 +193,7 @@ public:
 
 	public:
 		CBrush m_brush;
+		afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	void Fresh_Single_UI();
 };

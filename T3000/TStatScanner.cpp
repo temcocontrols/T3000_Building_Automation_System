@@ -1150,8 +1150,11 @@ UINT _ScanTstatThread2(LPVOID pParam)
 			bool bRet = Change_BaudRate(pScan->m_nBaudrate);
 			ASSERT(bRet);
 			g_strScanInfoPrompt.Format(_T("COM%d"), n);
-
-			BOOL bReadone = pScan->ReadOneCheckOnline(n);
+			//It's unnecessary to check one device. annulled by Fance. 
+			//We encountered such a situation that ,some device scan commond is not works well,if it only exsit on the modbus.
+			//it can be scan,but if other device also on modbus line , it will can't scan.
+			//So ,in order to check device works well, delete this code can help developer test our product.
+		//	BOOL bReadone = pScan->ReadOneCheckOnline(n);
 		//	if (!bReadone)//comscan oldcode
 			//{
 			//	pScan->background_binarysearch(n);				

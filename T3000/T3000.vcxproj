@@ -134,6 +134,7 @@
     <ClCompile Include="ApplyGraphicLabelsDlg.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
+    <ClCompile Include="CO2_View.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
     <ClCompile Include="HumChamber.cpp" />
     <ClCompile Include="LightingController\configure.cpp" />
@@ -264,6 +265,7 @@
     <None Include="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CO2_View.h" />
     <ClInclude Include="HumChamber.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="WeeklySchedule.h" />

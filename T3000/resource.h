@@ -162,6 +162,7 @@
 #define IDC_SLAVE_ID                    1027
 #define IDC_EDIT41                      1027
 #define IDC_INTERVAL                    1027
+#define IDC_CO2_ALARM_OFF_TIME          1027
 #define IDC_OUTPUT3_DELAY_OFF_EDIT      1028
 #define IDC_CUR_TEMP                    1028
 #define IDC_EDIT42                      1028
@@ -298,10 +299,12 @@
 #define IDC_DAY_SLIDER                  1066
 #define IDC_OUTPUT4_DELAY_ON_EDIT       1066
 #define IDC_TEMP8                       1066
+#define IDC_CO2_ALARM_SETPOINT          1066
 #define IDC_NIGHT_SLIDER                1067
 #define IDC_OUTPUT3_DELAY_ON_EDIT       1067
 #define IDC_SLIDER5                     1067
 #define IDC_HUM8                        1067
+#define IDC_CO2_CALIBRATING_OFFSET      1067
 #define IDC_EDIT3                       1068
 #define IDC_NIGHT_EDIT                  1068
 #define IDC_INFILEREDIT                 1068
@@ -332,6 +335,7 @@
 #define IDC_SLIDER9                     1074
 #define IDC_EDIT_CUR_SP                 1074
 #define IDC_TEMP10                      1074
+#define IDD_CO2_DIALOG                  1074
 #define IDC_BUTTON4                     1075
 #define IDC_SLIDER12                    1075
 #define IDC_SLIDER11                    1075
@@ -962,6 +966,20 @@
 #define IDC_NUM                         1595
 #define IDC_PROGRESS                    1596
 #define IDC_REFRESH_ALL                 1598
+#define IDC_ID_CO2_EDIT                 1599
+#define IDC_SERIALNUM_CO2_EDIT          1600
+#define IDC_FIRMWARV_CO2_EDIT           1601
+#define IDC_MODEL_CO2_EDIT              1602
+#define IDC_HARDWAREV_CO2_EDIT          1603
+#define IDC_CO2_BRAUDRATECOMBO          1604
+#define IDC_CO2_ENABLEIDBUTTON          1605
+#define IDC_CO2_TEMP_UNIT               1606
+#define IDC_CO2_ALARM_STATE             1607
+#define IDC_RADIO_ALARM_MANUAL          1608
+#define IDC_RADIO_ALARM_AUTO            1609
+#define IDC_CO2_ALARM_ON_TIME           1610
+#define IDC_CO2_PREPARE_ALARM_SETPOINT  1611
+#define IDC_MSFLEXGRID_CO2              1612
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1052,9 +1070,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        445
+#define _APS_NEXT_RESOURCE_VALUE        446
 #define _APS_NEXT_COMMAND_VALUE         32866
-#define _APS_NEXT_CONTROL_VALUE         1599
+#define _APS_NEXT_CONTROL_VALUE         1613
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

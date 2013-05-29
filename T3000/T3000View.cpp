@@ -2757,17 +2757,17 @@ if(MsgT3000ViewFresh==message)
 	{
 		if((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) )
 		{
-			product_type =3;
+			product_type =T3000_6_ADDRESS;
 		}
 		else if((product_register_value[7] == PM_TSTAT5E) || (product_register_value[7] == PM_TSTAT5H))
 		{
-			product_type = 2;
+			product_type = T3000_5EH_LCD_ADDRESS;
 		}
 		else if((product_register_value[7] == PM_TSTAT5A) ||(product_register_value[7] == PM_TSTAT5B) ||
 			(product_register_value[7] ==PM_TSTAT5C ) || (product_register_value[7] == PM_TSTAT5D) || (product_register_value[7] == PM_TSTAT5F) ||
 			(product_register_value[7] == PM_TSTAT5G))
 		{
-			product_type =1;
+			product_type =T3000_5ABCDFG_LED_ADDRESS;
 		}
 	//	AfxMessageBox(_T("freshe!"));
 //tstat6
@@ -5838,7 +5838,7 @@ void CT3000View::FreshCtrl()
 
 		FlexSP =1;
 		FlexSPN =1;
-		if(product_type==3)
+		if(product_type==T3000_6_ADDRESS)
 		InitFlexSliderBars_tstat6();
 		else
 		InitSliderBars2();
@@ -5864,7 +5864,7 @@ void CT3000View::FreshCtrl()
 
 		m_singleslidernight.SetPos(tempd1);
 		m_singlesliderday.SetPos(tempd1);
-		if(product_type==3)
+		if(product_type==T3000_6_ADDRESS)
 			InitFlexSliderBars_tstat6();
 		else
 			InitSliderBars2();

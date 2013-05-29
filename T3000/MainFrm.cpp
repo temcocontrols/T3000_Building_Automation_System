@@ -33,7 +33,7 @@
 #include "hangeIDDlg.h"
 #include "LightingController/LightingController.h"//Lightingcontroller
 #include "HumChamber.h"
-
+#include "CO2_View.h"
 
 #include "Dialog_Progess.h"
 
@@ -121,6 +121,8 @@ extern CT3000TableView* pTableView;
 #define TVINSERV_CMFIVE			{tvInsert.item.iImage=10;tvInsert.item.iSelectedImage=10;} //CM5
 #define TVINSERV_MINIPANEL		{tvInsert.item.iImage=14;tvInsert.item.iSelectedImage=14;} //MiniPanel
 #define TVINSERV_LC				{tvInsert.item.iImage=16;tvInsert.item.iSelectedImage=16;} //Lightingcontroller
+#define TVINSERV_TSTAT6			{tvInsert.item.iImage=18;tvInsert.item.iSelectedImage=18;}//tstat6
+#define TVINSERV_CO2			{tvInsert.item.iImage=20;tvInsert.item.iSelectedImage=20;}//CO2
 #endif
 
 #define ITEM_MASK				TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_TEXT
@@ -371,7 +373,7 @@ void CMainFrame::InitViews()
  	m_pViews[7]=(CView*) new CAirQuality;//AirQuality
 	m_pViews[8]=(CView*) new CLightingController;//Lightingcontroller
 	m_pViews[9]=(CView*) new CHumChamber;
-	
+	m_pViews[10]=(CView*) new CCO2_View;
 
 
 
@@ -1447,9 +1449,14 @@ try
 				else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
 					//TVINSERV_NET_WORK  //tree0412
 					TVINSERV_LC          //tree0412
-				else if ((temp_product_class_id == PM_TSTAT6)||(temp_product_class_id == PM_TSTAT7))//TSTAT7 &TSTAT6 //tree0412
+				else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
 					TVINSERV_LED //tree0412
+				else if(temp_product_class_id == PM_TSTAT6)
+					TVINSERV_TSTAT6
+				else if(temp_product_class_id == PM_CO2)
+					TVINSERV_CO2
 				else
+				
 					TVINSERV_TSTAT
 #endif
 
@@ -2349,6 +2356,13 @@ here:
 	     m_nCurView=9;
 		((CHumChamber*)m_pViews[m_nCurView])->Fresh();
 	}
+	break;
+	case  10:
+		{
+			m_nCurView = 10;
+			((CCO2_View*)m_pViews[m_nCurView])->Fresh();
+		}
+		break;
 	}
 //here
 }
@@ -4207,14 +4221,16 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{
 				m_nbaudrat=19200;
 				Change_BaudRate(19200);
-				nID=read_one(g_tstat_id,6,2);
-				//if(nID<0)		//Annul by Fance  ,if change to 9600 the communication  will be error.
-				//{
-				//	m_nbaudrat=9600;
-				//	Change_BaudRate(9600);
-				//	nID=read_one(g_tstat_id,6,2);
-				//	bOnLine=FALSE;
-				//}
+				nID=read_one(g_tstat_id,6,5);
+				if(nID<0)		
+				{
+					m_nbaudrat=9600;
+					Change_BaudRate(9600);
+					nID=read_one(g_tstat_id,6,5);
+					if(nID<0)
+						Change_BaudRate(19200);
+					bOnLine=FALSE;
+				}
 				if(nID>0)
 				{
 					unsigned short SerialNum[4];
@@ -4282,7 +4298,18 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					return;
 				}
 			}
+			nFlag = read_one(g_tstat_id,7,6);		
+			if(nFlag >65530)	//The return value is -1 -2 -3 -4
+			{
 
+				AfxMessageBox(_T("Reading product model abnormal \n Try again!"));
+				if (pDlg !=NULL)
+				{
+					pDlg->ShowWindow(SW_HIDE);
+					delete pDlg;
+				}
+				return;
+			}
 			if(bOnLine)
 			{ 
 				SetPaneConnectionPrompt(_T("Online!"));
@@ -4529,7 +4556,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 #endif
 			// 			strInfo.Format(_T("CMainFrame::DoConnectToANode():read_one(g_tstat_id,7,3)"));			
 			// 			SetPaneString(2, strInfo);
-			nFlag = read_one(g_tstat_id,7,3);		
+		//	SwitchToPruductType(10);
+
 
 			if(nFlag==PM_NC)	
 			{	
@@ -4551,6 +4579,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{
 
 				SwitchToPruductType(9);
+			}
+			else if(nFlag == PM_CO2)
+			{
+				SwitchToPruductType(10);
 			}
 			else if(nFlag<PM_NC)	
 			{	
@@ -5963,6 +5995,12 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
 				My_Write_Struct= (_MessageWriteOneInfo *)msg.wParam;
 				product_register_value[My_Write_Struct->address] = My_Write_Struct->new_value;//先变过来，免得后台更新的时候 乱变。
 				break;
+			case  MY_READ_ONE:
+				MyCriticalSection.Lock();
+				My_Receive_msg.push_back(msg);
+				MyCriticalSection.Unlock();
+				My_Write_Struct= (_MessageWriteOneInfo *)msg.wParam;
+				break;
 			case MY_CLOSE:
 				goto myend;
 				break;
@@ -5982,20 +6020,52 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 	{
 		if(My_Receive_msg.size()>0)
 		{
-			MyCriticalSection.Lock();
-			msg=My_Receive_msg.at(0);
-			_MessageWriteOneInfo *My_Write_Struct = (_MessageWriteOneInfo *)msg.wParam;
-			My_Receive_msg.erase(My_Receive_msg.begin());
-			MyCriticalSection.Unlock();
+			MSG my_temp_msg = My_Receive_msg.at(0);
+			switch(my_temp_msg.message)
+			{
+			case MY_WRITE_ONE:
+				{
+					MyCriticalSection.Lock();
+					msg=My_Receive_msg.at(0);
+					_MessageWriteOneInfo *My_Write_Struct = (_MessageWriteOneInfo *)msg.wParam;
+					My_Receive_msg.erase(My_Receive_msg.begin());
+					MyCriticalSection.Unlock();
 
-			if(write_one(My_Write_Struct->device_id, My_Write_Struct->address,My_Write_Struct->new_value,10)<0)
-			{
-				::PostMessage(My_Write_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_FAIL,(LPARAM)My_Write_Struct);
+					if(write_one(My_Write_Struct->device_id, My_Write_Struct->address,My_Write_Struct->new_value,10)<0)
+					{
+						::PostMessage(My_Write_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_FAIL,(LPARAM)My_Write_Struct);
+					}
+					else
+					{
+						::PostMessage(My_Write_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_SUCCESS,(LPARAM)My_Write_Struct);
+					}
+				}
+				break;
+			case MY_READ_ONE:
+				{
+					MyCriticalSection.Lock();
+					msg=My_Receive_msg.at(0);
+					_MessageReadOneInfo *My_Read_Struct = (_MessageReadOneInfo *)msg.wParam;
+					My_Receive_msg.erase(My_Receive_msg.begin());
+					MyCriticalSection.Unlock();
+					int ret = read_one(My_Read_Struct->device_id, My_Read_Struct->address,10);
+					if(ret<0)
+					{
+						//::PostMessage(My_Read_Struct->hwnd,MY_READ_DATA_CALLBACK,(WPARAM)WRITE_FAIL,(LPARAM)My_Read_Struct);
+						if(My_Read_Struct!=NULL)
+							delete	My_Read_Struct;
+					}
+					else
+					{
+						My_Read_Struct->new_value = ret;	//refresh the old value; post message to dlg deal the read data;
+						::PostMessage(My_Read_Struct->hwnd,MY_READ_DATA_CALLBACK,(WPARAM)WRITE_SUCCESS,(LPARAM)My_Read_Struct);
+					}
+
+
+				}
+				break;
 			}
-			else
-			{
-				::PostMessage(My_Write_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_SUCCESS,(LPARAM)My_Write_Struct);
-			}
+			
 		}
 		Sleep(10);
 	}

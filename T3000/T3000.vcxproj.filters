@@ -288,6 +288,9 @@
     <ClCompile Include="OutputSetDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CO2_View.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -709,6 +712,9 @@
       <Filter>singleslider</Filter>
     </ClInclude>
     <ClInclude Include="HumChamber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CO2_View.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
