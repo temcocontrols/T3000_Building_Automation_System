@@ -132,13 +132,14 @@ extern BOOL g_unint;
 
 //////////////////////////////////////////////////////////////////////////
 // product model ID table
-int const PM_TSTAT5A = 2;
 int const PM_TSTAT5B = 1;
+int const PM_TSTAT5A = 2;
 int const PM_TSTAT5B2 = 3;
 int const PM_TSTAT5C = 4;
 int const PM_TSTAT6 = 6;
 int const PM_TSTAT7 = 7;
 int const PM_TSTAT5D = 12;
+int const PM_AirQuality = 13;
 const int PM_TSTAT5E = 16;
 int const PM_TSTAT5F = 17;
 int const PM_TSTAT5G = 18;
@@ -155,13 +156,14 @@ int const PM_T34AO = 28;
 int const PM_T36CT = 29;
 int const PM_SOLAR = 30;
 int const PM_FWMTRANSDUCER = 31;
+int const PM_CO2 = 32;
 int const PM_MINIPANEL = 35;
 int const PM_PRESSURE = 40;
 int const PM_CM5 = 50;
-int const PM_NC = 100;
-int const PM_AirQuality = 13;
-int const PM_LightingController = 103;
 int const PM_TSTAT6_HUM_Chamber=64;
+int const PM_NC = 100;
+int const PM_LightingController = 103;
+
 
 
 extern int MODBUS_SERIALNUMBER_LOWORD                          ;
