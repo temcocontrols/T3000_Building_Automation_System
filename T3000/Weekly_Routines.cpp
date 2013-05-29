@@ -598,7 +598,7 @@ BOOL Weekly_Routines::PreTranslateMessage(MSG* pMsg)
 			return true;
 		}
 
-		if(pMsg->wParam==VK_F5)
+		if(pMsg->wParam==VK_F4)
 		{
 			load_grid();
 		}

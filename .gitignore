@@ -38,3 +38,22 @@ tst/unit_test/debug/*
 /T3000 Output/FlexSlideBar object
 /T3000 Output/modbusdll object
 /T3000 Output/T3000 object
+/T3000 Output/FlexSlideBar object
+/T3000 Output/modbusdll object
+/T3000 Output/modbusdll object
+/T3000 Output/T3000 object
+/T3000 Output/debug/T3000.pdb
+/T3000 Output/debug/FlexSlideBar.dll
+/T3000 Output/debug/FlexSlideBar.exp
+/T3000 Output/debug/FlexSlideBar.ilk
+/T3000 Output/debug/FlexSlideBar.lib
+/T3000 Output/debug/FlexSlideBar.pdb
+/T3000 Output/debug/ModbusDllforVc.dll
+/T3000 Output/debug/ModbusDllforVc.exp
+/T3000 Output/debug/ModbusDllforVc.ilk
+/T3000 Output/debug/ModbusDllforVc.lib
+/T3000 Output/debug/ModbusDllforVc.pdb
+/T3000 Output/debug/T3000.exe
+/T3000 Output/debug/T3000.ilk
+/T3000 Output/debug/T3000.map
+/T3000/ipch

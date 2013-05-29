@@ -87,6 +87,7 @@ extern CString g_strLoginUserName;
 extern int g_UserLevel;
 
 extern CString g_strSensorName;
+extern CString g_strInCO2;
 extern CString g_strInName1;
 extern CString g_strInName2;
 extern CString g_strInName3;
@@ -132,8 +133,9 @@ extern BOOL g_unint;
 
 //////////////////////////////////////////////////////////////////////////
 // product model ID table
-int const PM_TSTAT5B = 1;
+
 int const PM_TSTAT5A = 2;
+int const PM_TSTAT5B = 1;
 int const PM_TSTAT5B2 = 3;
 int const PM_TSTAT5C = 4;
 int const PM_TSTAT6 = 6;
@@ -162,8 +164,9 @@ int const PM_PRESSURE = 40;
 int const PM_CM5 = 50;
 int const PM_TSTAT6_HUM_Chamber=64;
 int const PM_NC = 100;
+//int const PM_AirQuality = 13;
 int const PM_LightingController = 103;
-
+//int const PM_TSTAT6_HUM_Chamber=64;
 
 
 extern int MODBUS_SERIALNUMBER_LOWORD                          ;
