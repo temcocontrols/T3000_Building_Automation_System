@@ -85,6 +85,73 @@ int _P(char *str,int mMdb_Adress_Map)
 
 	return -1;
 }
+//Search Address value by Name order by tstats6.It's convenience for tstats series.but other product is hard to maintain.
+//So annulled this ,use Address value to read address value.
+//bool T3000RegAddress::MatchMoudleAddress(void)
+//{
+//	_tcscpy_s(m_mdb_path_t3000,sizeof(m_mdb_path_t3000),_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source="));
+//	GetModuleFileName(NULL, m_ini_path_t3000, MAX_PATH);
+//	PathRemoveFileSpec(m_ini_path_t3000);
+//
+//	_tcscat_s(m_mdb_path_t3000,sizeof(m_ini_path_t3000),m_ini_path_t3000);
+//
+//	//_tcscat(m_mdb_path,_T("\\try.mdb"));
+//	//_tcscat(m_mdb_path_t3000,_T("\\Database\\t3000.mdb"));
+//	_tcscat_s(m_mdb_path_t3000,sizeof(m_mdb_path_t3000),_T("\\Database\\t3000.mdb"));
+//	HRESULT hr;
+//	m_pCon.CreateInstance(_T("ADODB.Connection"));
+//	hr=m_pRs.CreateInstance(_T("ADODB.Recordset"));
+//	if(FAILED(hr))
+//	{
+//		AfxMessageBox(_T("Load msado12.dll erro"));
+//		return FALSE;
+//	}
+//	m_pCon->Open(m_mdb_path_t3000,_T(""),_T(""),adModeUnknown);
+//	_variant_t temp_variant_item;
+//	_variant_t temp_variant;
+//	_variant_t temp_variant_value;
+//	CString strSql;
+//
+//	strSql.Format(_T("select * from T3000_Register_Address_By_Name order by nItem"));
+//	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+//	while(VARIANT_FALSE==m_pRs->EndOfFile)
+//	{
+//		temp_variant_item = m_pRs->GetCollect(_T("nItem"));
+//
+//			temp_variant=m_pRs->GetCollect(_T("Register_Name"));
+//			CString cs_temp=temp_variant;
+//			cs_temp = cs_temp.Trim();
+//			//_tcscpy_s(TSTAT_5ABCDFG_LED_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cs_temp);
+//			//_tcscpy_s(TSTAT_5EH_LCD_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cs_temp);
+//			//_tcscpy_s(TSTAT_6_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cs_temp);
+//
+//			char cTemp[256];
+//			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
+//
+//			strcpy_s(TSTAT_5ABCDFG_LED_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cTemp);
+//			strcpy_s(TSTAT_5EH_LCD_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cTemp);
+//			strcpy_s(TSTAT_6_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cTemp);
+//
+//
+//
+//			temp_variant_value=m_pRs->GetCollect(_T("TSTAT_6_7_Address"));
+//			TSTAT_6_ADDRESS[temp_variant_item].AddressValue = temp_variant_value;
+//			temp_variant_value=m_pRs->GetCollect(_T("TSTAT5_ABCDFG_Address"));
+//			TSTAT_5ABCDFG_LED_ADDRESS[temp_variant_item].AddressValue = temp_variant_value;
+//
+//			temp_variant_value=m_pRs->GetCollect(_T("TSTAT5_EH_Address"));
+//			TSTAT_5EH_LCD_ADDRESS[temp_variant_item].AddressValue = temp_variant_value;
+//		m_pRs->MoveNext();
+//	}
+//	if(m_pRs->State)
+//		m_pRs->Close();
+//	if(m_pCon->State)
+//		m_pCon->Close();
+//
+//	return true;
+//}
+
+
 
 bool T3000RegAddress::MatchMoudleAddress(void)
 {
@@ -93,9 +160,6 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 	PathRemoveFileSpec(m_ini_path_t3000);
 
 	_tcscat_s(m_mdb_path_t3000,sizeof(m_ini_path_t3000),m_ini_path_t3000);
-
-	//_tcscat(m_mdb_path,_T("\\try.mdb"));
-	//_tcscat(m_mdb_path_t3000,_T("\\Database\\t3000.mdb"));
 	_tcscat_s(m_mdb_path_t3000,sizeof(m_mdb_path_t3000),_T("\\Database\\t3000.mdb"));
 	HRESULT hr;
 	m_pCon.CreateInstance(_T("ADODB.Connection"));
@@ -111,35 +175,42 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 	_variant_t temp_variant_value;
 	CString strSql;
 
-	strSql.Format(_T("select * from T3000_Register_Address_By_Name order by nItem"));
+	strSql.Format(_T("select * from T3000_Register_Address_By_ID order by Register_Address"));
 	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 	while(VARIANT_FALSE==m_pRs->EndOfFile)
 	{
-		temp_variant_item = m_pRs->GetCollect(_T("nItem"));
+		char cTemp[256];
+		memset(cTemp,0,256);
+		temp_variant_item = m_pRs->GetCollect(_T("Register_Address"));
 
-			temp_variant=m_pRs->GetCollect(_T("Register_Name"));
-			CString cs_temp=temp_variant;
-			cs_temp = cs_temp.Trim();
-			//_tcscpy_s(TSTAT_5ABCDFG_LED_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cs_temp);
-			//_tcscpy_s(TSTAT_5EH_LCD_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cs_temp);
-			//_tcscpy_s(TSTAT_6_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cs_temp);
+		temp_variant=m_pRs->GetCollect(_T("TSTAT5_LED_AddressName"));
+		CString cs_temp=temp_variant;
+		cs_temp = cs_temp.Trim();
 
-			char cTemp[256];
-			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
+		strcpy_s(TSTAT_5ABCDFG_LED_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cTemp);
+		TSTAT_5ABCDFG_LED_ADDRESS[temp_variant_item].AddressValue = temp_variant_item;
 
-			strcpy_s(TSTAT_5ABCDFG_LED_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cTemp);
-			strcpy_s(TSTAT_5EH_LCD_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cTemp);
-			strcpy_s(TSTAT_6_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cTemp);
+		temp_variant=m_pRs->GetCollect(_T("TSTAT5_LCD_AddressName"));
+		cs_temp.Empty();
+		cs_temp=temp_variant;
+		cs_temp = cs_temp.Trim();
 
+		char cTemp_5e[256];
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp_5e, 256, NULL, NULL );
+		strcpy_s(TSTAT_5EH_LCD_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cTemp_5e);
+		TSTAT_5EH_LCD_ADDRESS[temp_variant_item].AddressValue = temp_variant_item;
 
+		temp_variant=m_pRs->GetCollect(_T("TSTAT6_AddressName"));
+		cs_temp.Empty();
+		cs_temp=temp_variant;
+		cs_temp = cs_temp.Trim();
 
-			temp_variant_value=m_pRs->GetCollect(_T("TSTAT_6_7_Address"));
-			TSTAT_6_ADDRESS[temp_variant_item].AddressValue = temp_variant_value;
-			temp_variant_value=m_pRs->GetCollect(_T("TSTAT5_ABCDFG_Address"));
-			TSTAT_5ABCDFG_LED_ADDRESS[temp_variant_item].AddressValue = temp_variant_value;
+		char cTemp_6_7[256];
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp_6_7, 256, NULL, NULL );
+		strcpy_s(TSTAT_6_ADDRESS[temp_variant_item].AddressName,MAX_PATH,cTemp_6_7);
+		TSTAT_6_ADDRESS[temp_variant_item].AddressValue = temp_variant_item;
 
-			temp_variant_value=m_pRs->GetCollect(_T("TSTAT5_EH_Address"));
-			TSTAT_5EH_LCD_ADDRESS[temp_variant_item].AddressValue = temp_variant_value;
 		m_pRs->MoveNext();
 	}
 	if(m_pRs->State)
@@ -149,6 +220,8 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 
 	return true;
 }
+
+
 
 
  bool T3000RegAddress::Change_Register_Table(void)

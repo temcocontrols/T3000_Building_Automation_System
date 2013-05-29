@@ -21,7 +21,7 @@
 #include "MiniPanel/DialgMiniPanel.h" //Mini Panel
 #include "AirQuality/AirQuality.h"//AirQuality
 
-#define NUMVIEWS 10
+#define NUMVIEWS 11
 
 
 
@@ -332,7 +332,7 @@ public:
 	UINT FlagSerialNumber;
 	void Treestatus();
 	static	DWORD WINAPI Get_All_Dlg_Message(LPVOID lpVoid);
-	static	DWORD WINAPI DoMSG(LPVOID lpVoid);
+	static	DWORD WINAPI Translate_My_Message(LPVOID lpVoid);
 };
 
 
