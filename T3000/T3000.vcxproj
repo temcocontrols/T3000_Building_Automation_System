@@ -136,6 +136,8 @@
     <ClCompile Include="ChangePasswordDlg.cpp" />
     <ClCompile Include="CO2_View.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
+    <ClCompile Include="DisplayDlg.cpp" />
+    <ClCompile Include="FreezeFunctionDlg.cpp" />
     <ClCompile Include="HumChamber.cpp" />
     <ClCompile Include="LightingController\configure.cpp" />
     <ClCompile Include="DBOprator.cpp" />
@@ -168,6 +170,7 @@
     <ClCompile Include="monthview1.cpp" />
     <ClCompile Include="msflexgrid1.cpp" />
     <ClCompile Include="NetworkControllView.cpp" />
+    <ClCompile Include="NewImportDBDlg.cpp" />
     <ClCompile Include="OfficeStPtDlg.cpp" />
     <ClCompile Include="OutPutDlg.cpp" />
     <ClCompile Include="OutputSetDlg.cpp" />
@@ -175,6 +178,7 @@
     <ClCompile Include="ParameterDlg.cpp" />
     <ClCompile Include="RefreshTreeThread.cpp" />
     <ClCompile Include="RelayLabel.cpp" />
+    <ClCompile Include="RenameDlg.cpp" />
     <ClCompile Include="ScanDbWaitDlg.cpp" />
     <ClCompile Include="ScanDlg.cpp" />
     <ClCompile Include="ScanSelectDlg.cpp" />
@@ -266,7 +270,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CO2_View.h" />
+    <ClInclude Include="DisplayDlg.h" />
+    <ClInclude Include="FreezeFunctionDlg.h" />
     <ClInclude Include="HumChamber.h" />
+    <ClInclude Include="NewImportDBDlg.h" />
+    <ClInclude Include="RenameDlg.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="WeeklySchedule.h" />
     <ClInclude Include="5EInputDialog.h" />

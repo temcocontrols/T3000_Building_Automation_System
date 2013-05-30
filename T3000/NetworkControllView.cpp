@@ -39,6 +39,7 @@ CNetworkControllView::CNetworkControllView()
 	, m_strTime(_T(""))
 	, m_nListenPort(6001)
 	, m_bWarningBldVersion(FALSE)
+	, m_Mac_Address(_T(""))
 {
 	
 }
@@ -70,6 +71,7 @@ void CNetworkControllView::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BAUDRATE_COMBX, m_baudRateCombox);
 	DDX_Control(pDX, IDC_IDADDRESS_EDIT, m_idEdt);
 	DDX_Control(pDX, IDC_MSFLEXGRID_SUB, m_gridSub);
+	DDX_Text(pDX, IDC_MAC_ADDRESS, m_Mac_Address);
 }
 
 BEGIN_MESSAGE_MAP(CNetworkControllView, CFormView)
@@ -157,13 +159,18 @@ void CNetworkControllView::OnInitialUpdate()
 	initTimeServerList();
 
 
-	//InitGrid();
+	InitGrid();
 
 	
 
 }
 
-
+CString CNetworkControllView::Get_MAC_Address()
+{
+	CString Mac_ADD;
+	Mac_ADD.Format(_T("%02x-%02x-%02x-%02x-%02x-%02x"),multi_register_value[100],multi_register_value[101],multi_register_value[102],multi_register_value[103],multi_register_value[104],multi_register_value[105]);
+	return Mac_ADD;
+}
 
 void CNetworkControllView::Fresh()
 {
@@ -224,9 +231,11 @@ void CNetworkControllView::Fresh()
 
 
 	
-	m_nListenPort=multi_register_value[120];
+	m_nListenPort=multi_register_value[120];  m_Mac_Address=Get_MAC_Address();
 	InitGrid();
-
+	// TODO: Add your specialized code here and/or call the base class
+	
+ 
 	UpdateData(false);
 }
 void CNetworkControllView::OnBnClickedCheck1()
@@ -234,19 +243,19 @@ void CNetworkControllView::OnBnClickedCheck1()
 	if (m_ReadOnlyCheckBtn.GetCheck()==BST_CHECKED) 
 	{
 		m_ipModelComBox.EnableWindow(TRUE);
-		//m_listenPortEdit.EnableWindow(TRUE);
-		//m_ip_addressCtrl.EnableWindow(TRUE);
-		//m_subnet_addressCtrl.EnableWindow(TRUE);
-		//m_gateway_addressCtrl.EnableWindow(TRUE);
+		m_listenPortEdit.EnableWindow(TRUE);
+		m_ip_addressCtrl.EnableWindow(TRUE);
+		m_subnet_addressCtrl.EnableWindow(TRUE);
+		m_gateway_addressCtrl.EnableWindow(TRUE);
 		GetDlgItem(IDC_APPLYBUTTON)->EnableWindow(TRUE);
 	}
 	else
 	{
 		m_ipModelComBox.EnableWindow(FALSE);
-		//m_listenPortEdit.EnableWindow(FALSE);
-		//m_ip_addressCtrl.EnableWindow(FALSE);
-		//m_subnet_addressCtrl.EnableWindow(FALSE);
-		//m_gateway_addressCtrl.EnableWindow(FALSE);
+		m_listenPortEdit.EnableWindow(FALSE);
+		m_ip_addressCtrl.EnableWindow(FALSE);
+		m_subnet_addressCtrl.EnableWindow(FALSE);
+		m_gateway_addressCtrl.EnableWindow(FALSE);
 		GetDlgItem(IDC_APPLYBUTTON)->EnableWindow(FALSE);
 	}
 }
@@ -373,11 +382,12 @@ void CNetworkControllView::OnBnClickedApplybutton()
 	}
 	write_one(g_tstat_id,120,m_nListenPort);
 	BYTE address1,address2,address3,address4;
-	m_ip_addressCtrl.	GetAddress(address1,address2,address3,address4);
+	m_ip_addressCtrl.GetAddress(address1,address2,address3,address4);
 	int n=write_one(g_tstat_id,107,address1);
-	n=write_one(g_tstat_id,108,address2);
-	n=write_one(g_tstat_id,109,address3);
-	n=write_one(g_tstat_id,110,address4);
+	    n=write_one(g_tstat_id,108,address2);
+	    n=write_one(g_tstat_id,109,address3);
+	    n=write_one(g_tstat_id,110,address4);
+		
 	m_subnet_addressCtrl.GetAddress(address1,address2,address3,address4);
 	write_one(g_tstat_id,111,address1);
 	write_one(g_tstat_id,112,address2);
@@ -1070,7 +1080,7 @@ void CNetworkControllView::InitGrid()
 	{
 		m_gridSub.put_ColAlignment(i,4);
 	}
-
+	 /*   DataStruct has changed ,so all defualt is wrong.
 	WORD data[30*500+2];
 	memset(data,0,sizeof(data));
 	int ret3 = Read_One(g_tstat_id,7001);
@@ -1165,7 +1175,7 @@ void CNetworkControllView::InitGrid()
 		case 27:strtemp1=g_strTstat7;break;
 		case 13:
 		case 14:break;
-		default:strtemp1=g_strTstat5a;break;
+		default:strtemp1=_T("UNUSED");break;
 		}
 		m_gridSub.put_TextMatrix(i,1,strtemp1);
 
@@ -1223,7 +1233,7 @@ void CNetworkControllView::InitGrid()
 		m_gridSub.put_TextMatrix(i,8,_subnetwork.at(i-1).m_nightHeating);
 		m_gridSub.put_TextMatrix(i,9,_subnetwork.at(i-1).m_nightCooling);
 	}
-
+	*/
 
 }
 

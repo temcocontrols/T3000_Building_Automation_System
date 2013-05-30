@@ -291,6 +291,18 @@
     <ClCompile Include="CO2_View.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenameDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DisplayDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FreezeFunctionDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NewImportDBDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -715,6 +727,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CO2_View.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenameDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DisplayDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FreezeFunctionDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NewImportDBDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -289,96 +289,6 @@ void COutPutDlg::put_fan_variable()
 	}
 }
 
-//Recode by Fance 2013 04 08
-//------------------------------------------------------------------------------------------
-//void COutPutDlg::put_fan_variable()
-//{
-//	strdemo = _T("1-4,");
-//	SetPaneString(2,strdemo);
-//	CString p[6]={_T("Fan Off"),_T("Fan On"),_T("Fan Low"),_T("Fan Mid"),_T("Fan High"),_T("Fan Aut")};
-////		UpdateData(true);
-//	m_fan.ResetContent();
-//
-//	//129	107	1	Low byte	W/R	"AUTO_ONLY , enables or disables manual mode. 0 = Manual Fan Modes 1-x Allowed 
-//	//(depending on R122 value, 1 = Auto Mode Only, 2 = DDC mode,the user can not change setpoint and fan speed from keypad."
-//
-//	strdemo = _T("1-4-0,");
-//	SetPaneString(2,strdemo);
-//
-//	//if (newtstat6[7] == PM_TSTAT6)
-//	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
-//	{
-//		strdemo = _T("1-4-0-1,");
-//		SetPaneString(2,strdemo);
-//		//if(read_one(g_tstat_id,107)==1)////here can't use read_multi function
-//		if(newtstat6[107] == 1)////here can't use read_multi function  如果去读，常会死在这里。
-//		{
-//			strdemo = _T("1-4-1,");
-//			SetPaneString(2,strdemo);
-//			m_fan.AddString(p[0]);
-//			m_fan.AddString(p[5]);			
-//		}
-//		else
-//		{	
-//			//122	105	1	Low byte	W/R	FAN MODE, number of fan speeds. Single speed = 1 up to three speed fan = 3
-//			strdemo = _T("1-4-2,");
-//			SetPaneString(2,strdemo);
-//			if (newtstat6[105]>0)
-//				m_fan_mode_ctrl.SetCurSel(newtstat6[105]-1);
-//			else
-//				m_fan_mode_ctrl.SetCurSel(0);
-//			switch(m_fan_mode_ctrl.GetCurSel())
-//			{
-//			case 0:m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[5]);break;
-//			case 1:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-//			case 2:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-//			default:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-//			}
-//		}
-//		//137	273	1	Low byte	W/R	FAN_SPEED, current operating fan speed   
-//// 		Relay Output Tables (bit0 = relay1, bit1 = relay2, bit2 = relay3, bit3 = relay4, bit4 = relay5)
-//
-//
-//		strdemo = _T("1-4-3,");
-//		SetPaneString(2,strdemo);
-//		if (newtstat6[273>0])
-//			m_fan.SetCurSel(newtstat6[273]);
-//		else
-//			m_fan.SetCurSel(0);
-//	}else
-//	{
-//
-//// 		strdemo = _T("read_one(g_tstat_id,129)==1开始");
-//// 		SetPaneString(2,strdemo);
-//		//if(read_one(g_tstat_id,129)==1)////here can't use read_multi function//0912
-//		if (multi_register_value[129] == 1)
-//		{
-//			m_fan.AddString(p[0]);
-//			m_fan.AddString(p[5]);			
-//		}
-//		else
-//		{				
-//			m_fan_mode_ctrl.SetCurSel(multi_register_value[122]-1);
-//			switch(m_fan_mode_ctrl.GetCurSel())
-//			{
-//			case 0:m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[5]);break;
-//			case 1:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-//			case 2:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-//			default:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-//			}
-//		}
-//// 		strdemo = _T("read_one(g_tstat_id,129)==1完成");
-//// 		SetPaneString(2,strdemo);
-//		m_fan.SetCurSel(multi_register_value[137]);
-//	}
-//
-//	strdemo = _T("1-5,");
-//	SetPaneString(2,strdemo);
-//
-//}
-//------------------------------------------------------------------------------------------
-
-
 int COutPutDlg::get_real_fan_select()
 {
 
@@ -496,11 +406,26 @@ void COutPutDlg::OnEnKillfocusPid1Heatstageedit()
 				FreshGrid_PID1tstat6();
 			}
 			//m_PID1_heat_stages=newtstat6[332];
-
-		}else
+			
+	}
+		if (product_register_value[7]==PM_TSTAT5E)
+		{
+			int ret=write_one(g_tstat_id,276,m_PID1_heat_stages);
+			if (ret>0)
+			{
+				product_register_value[276]=m_PID1_heat_stages;
+			}
+			else
+			{
+				m_PID1_heat_stages=product_register_value[276];
+			}
+			 
+			FreshGrid_PID1();
+		}
+		else
 		{
 			write_one(g_tstat_id,276,m_PID1_heat_stages);
-			m_PID1_heat_stages=multi_register_value[276];
+			product_register_value[276]=m_PID1_heat_stages;
 			FreshGrid_PID1();
 		}
 
@@ -541,7 +466,22 @@ void COutPutDlg::OnEnKillfocusPid1coolstageedit()
 			product_register_value[MODBUS_COOL_ORIGINAL_TABLE]=m_PID1_cool_stages;
 			FreshGrid_PID1tstat6();
 			}
-		}else
+		}
+		if (product_register_value[7]==PM_TSTAT5E)
+		{
+			int ret=write_one(g_tstat_id,277,m_PID1_cool_stages);
+			if (ret>0)
+			{
+			 product_register_value[277]=m_PID1_cool_stages;
+			}
+			else
+			{
+			  m_PID1_cool_stages=product_register_value[277];
+			}
+			//m_PID1_cool_stages=multi_register_value[277];
+			FreshGrid_PID1();
+		}
+		else
 		{
 			write_one(g_tstat_id,277,m_PID1_cool_stages);
 			m_PID1_cool_stages=multi_register_value[277];
@@ -3380,7 +3320,8 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 		}
 		//	FreshGrids();
 
-	}else
+	}
+	else
 	{
 		if(g_OutPutLevel==1)
 			return;
@@ -3471,21 +3412,38 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				}
 			}
 			else
-			{
+			{		int ret;
 				if(bflexgrid1_or_2==false)
 					str2=m_FlexGrid1.get_TextMatrix(row,col);
 				else
 					str2=m_FlexGrid2.get_TextMatrix(row,col);
 				if(str2.CompareNoCase(_T("PID1"))==0)
-					write_one(g_tstat_id,247+row-1,0);
+					{  ret=write_one(g_tstat_id,247+row-1,0);
+					if (ret>0)
+					{
+					 product_register_value[247+row-1]=0;
+					}		}
 				else if(str2.CompareNoCase(_T("PID2"))==0)
-					write_one(g_tstat_id,247+row-1,1);
+					{  ret=write_one(g_tstat_id,247+row-1,1);
+					  if (ret>0)
+					  {
+					  product_register_value[247+row-1]=1;
+					  }		 }
 				else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
-					write_one(g_tstat_id,247+row-1,2);
+					{ret=write_one(g_tstat_id,247+row-1,2);
+					if (ret>0)
+					{
+					product_register_value[247+row-1]=2;
+					}		}
 				else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
-					write_one(g_tstat_id,247+row-1,3);
+					{ret=write_one(g_tstat_id,247+row-1,3);
+					if (ret>0)
+					{
+					product_register_value[247+row-1]=3;
+					}
+					}
 			}
-			FreshGrids();//lsc add
+			//FreshGrids();//lsc add
 
 		}
 		else if(col==5)
@@ -3927,7 +3885,9 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				}
 			}
 		}
-		//FreshGrids();//2.5.0.98
+
+
+		FreshGrids();//2.5.0.98
 	}
 }
 
@@ -4566,9 +4526,25 @@ void COutPutDlg::OnEnKillfocusPid2Heatstageedit2()
 			write_one(g_tstat_id,330,m_PID2_heat_stages);
 			newtstat6[330] = m_PID2_heat_stages;
 			FreshGrid_PID2tstat6();
-		}else
+		}
+	  else	if (product_register_value[7]==PM_TSTAT5E)
+		{
+			int ret=write_one(g_tstat_id,268,m_PID1_heat_stages);
+			if (ret>0)
+			{
+				product_register_value[268]=m_PID1_heat_stages;
+			}
+			else
+			{
+				m_PID2_heat_stages=product_register_value[268];
+			}
+
+			FreshGrid_PID2();
+		}
+		else
 		{
 			write_one(g_tstat_id,268,m_PID2_heat_stages);
+			product_register_value[268]=m_PID2_heat_stages;
 			FreshGrid_PID2();
 		}
 
@@ -4599,9 +4575,25 @@ void COutPutDlg::OnEnKillfocusPid2coolstageedit2()
 			write_one(g_tstat_id,331,m_PID2_cool_stages);
 			newtstat6[331] =m_PID2_cool_stages;
 			FreshGrid_PID2tstat6();
-		}else
+		}
+		else	if (product_register_value[7]==PM_TSTAT5E)
+		{
+			int ret=write_one(g_tstat_id,269,m_PID2_cool_stages);
+			if (ret>0)
+			{
+				product_register_value[269]=m_PID2_cool_stages;
+			}
+			else
+			{
+				m_PID2_cool_stages=product_register_value[269];
+			}
+
+			FreshGrid_PID2();
+		}
+		else
 		{
 			write_one(g_tstat_id,269,m_PID2_cool_stages);
+			product_register_value[269]=m_PID2_cool_stages;
 			FreshGrid_PID2();
 		}
 
