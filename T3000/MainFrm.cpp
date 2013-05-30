@@ -4329,10 +4329,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 			GetIONanme();
 #endif
-			// 			strInfo.Format(_T("CMainFrame::DoConnectToANode():read_one(g_tstat_id,7,3)"));			
-			// 			SetPaneString(2, strInfo);
-<<<<<<< HEAD
-		//	SwitchToPruductType(10);
+
 			nFlag = read_one(g_tstat_id,7,6);		
 			if(nFlag >65530)	//The return value is -1 -2 -3 -4
 			{
@@ -4345,13 +4342,11 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				}
 				return;
 			}
-=======
+
  		
 			nFlag = read_one(g_tstat_id,7,6);		
 			if(nFlag >65530)	//The return value is -1 -2 -3 -4
 			{
->>>>>>> 23597497ef4492430e561edea9278a2ac1d43106
-
 				AfxMessageBox(_T("Reading product model abnormal \n Try again!"));
 				if (pDlg !=NULL)
 				{
