@@ -39,5 +39,4 @@ public:
 	BOOL m_bfromLower;
 	
 
-	afx_msg void OnBnClickedCreate();
 };

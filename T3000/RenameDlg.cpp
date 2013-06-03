@@ -1,3 +1,4 @@
+
 // RenameDlg.cpp : implementation file
 //
 
@@ -11,7 +12,7 @@
 
 IMPLEMENT_DYNAMIC(CRenameDlg, CDialog)
 
-CRenameDlg::CRenameDlg(CWnd* pParent /*=NULL*/)
+	CRenameDlg::CRenameDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CRenameDlg::IDD, pParent)
 	, m_nodename(_T(""))
 {
@@ -38,7 +39,7 @@ END_MESSAGE_MAP()
 
 BOOL CRenameDlg::OnInitDialog()
 {
-    
+
 	CDialog::OnInitDialog();
 	UpdateData(FALSE);
 	return TRUE;

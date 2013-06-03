@@ -57,3 +57,9 @@ tst/unit_test/debug/*
 /T3000 Output/debug/T3000.ilk
 /T3000 Output/debug/T3000.map
 /T3000/ipch
+/T3000/ipch/t3000-9dcbbcef/t3000-77af99c9.ipch
+/T3000/T3000.vcproj.ZDRI.LSC.user
+/T3000/T3000.vcproj.ZDRIVER.LSC.user
+/T3000/T3000.vcxproj.user
+/T3000/T3000.vcxproj
+/T3000/T3000.vcxproj.filters

@@ -38,12 +38,12 @@ BEGIN_MESSAGE_MAP(CWorkspaceBar, CDockablePane)
 	ON_WM_SIZE()
 	ON_WM_PAINT()
 	ON_WM_SETFOCUS()
-	ON_NOTIFY(TVN_SELCHANGED,ID_SHELLTREE,OnFolderSeletedChanged)
-	ON_NOTIFY(TVN_KEYDOWN,ID_SHELLTREE,OnKeyDownChanged)
+	//ON_NOTIFY(TVN_SELCHANGED,ID_SHELLTREE,OnFolderSeletedChanged)
+	//ON_NOTIFY(TVN_KEYDOWN,ID_SHELLTREE,OnKeyDownChanged)
 	ON_NOTIFY(TVN_ENDLABELEDIT, ID_SHELLTREE, OnTvnEndlabeleditTree)
 	ON_NOTIFY(TVN_BEGINLABELEDIT, ID_SHELLTREE, OnTvnBeginlabeleditTree)
 	ON_NOTIFY(NM_CLICK, ID_SHELLTREE, OnNMClickTree)
-	ON_NOTIFY(TVN_SELCHANGED,ID_SHELLTREE,OnKYDOWNClickTree)
+	//ON_NOTIFY(TVN_SELCHANGED,ID_SHELLTREE,OnKYDOWNClickTree)
 	ON_WM_NCHITTEST()
 	ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
@@ -67,66 +67,67 @@ CWorkspaceBar::~CWorkspaceBar()
 
  BOOL CWorkspaceBar::PreTranslateMessage(MSG* pMsg)
  {
-    
-	 if(pMsg->message == WM_KEYDOWN  )
-	 {
-		 if(pMsg->wParam == VK_F2)
-		 {
-		 
-			 
+    											  
+	 //if(pMsg->message == WM_KEYDOWN  )
+	 //{
+	 //    
+		// if(pMsg->wParam == VK_F2)
+		// {
+		// 
+		//	 
 
-			
-			
-			m_hSelItem=m_TreeCtrl.GetSelectedItem();
-			m_level=m_TreeCtrl.get_item_level(m_hSelItem);
-			m_name_old=m_TreeCtrl.GetItemText(m_hSelItem);
-			
-			
-			//AfxMessageBox(m_name_new);
-			  // m_TreeCtrl.EditLabel(m_hSelItem);
-			   //m_name_new=m_TreeCtrl.GetItemText(m_hSelItem);
-				   m_renamedlg.m_nodename=m_name_old;
+		//	
+		//	
+		//	m_hSelItem=m_TreeCtrl.GetSelectedItem();
+		//	m_level=m_TreeCtrl.get_item_level(m_hSelItem);
+		//	m_name_old=m_TreeCtrl.GetItemText(m_hSelItem);
+		//	
+		//	
+		//	 
+		//		  /* m_renamedlg.m_nodename=m_name_old;
 
-			   if ((m_renamedlg.DoModal()==IDOK)||(m_renamedlg.DoModal()==IDCANCEL))
-			   {  
-				   if (m_renamedlg.m_nodename.IsEmpty())
-			   {
-			   m_name_new=m_name_old;
-			   } 
-			   else
-			   {
-			   m_name_new=m_renamedlg.m_nodename;
-			   }
-				
-			   }
-			  
-			  
-			   if (m_name_new.CompareNoCase(m_name_old)!=0)
-			   {
-			     if (UpdateDataToDB())
-			     {
-				  m_TreeCtrl.SetItemText(m_hSelItem,m_name_new);
-			     } 
-			     else
-			     {
-				 MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
-				  m_TreeCtrl.SetItemText(m_hSelItem,m_name_old);
-			     }
-				 
-			   }
-			   m_TreeCtrl.SelectItem(m_hSelItem);
-			   m_TreeCtrl.SetFocus();
-			    
-			 return 1;
-		 }
-	 }
+		//	   if ((m_renamedlg.DoModal()==IDOK)||(m_renamedlg.DoModal()==IDCANCEL))
+		//	   {  
+		//		   if (m_renamedlg.m_nodename.IsEmpty())
+		//	   {
+		//	   m_name_new=m_name_old;
+		//	   } 
+		//	   else
+		//	   {
+		//	   m_name_new=m_renamedlg.m_nodename;
+		//	   }
+		//		
+		//	   }*/
+		//	  
+		//	  
+		//	   if (m_name_new.CompareNoCase(m_name_old)!=0)
+		//	   {
+		//	     if (UpdateDataToDB())
+		//	     {
+		//		  m_TreeCtrl.SetItemText(m_hSelItem,m_name_new);
+		//	     } 
+		//	     else
+		//	     {
+		//		 MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
+		//		  m_TreeCtrl.SetItemText(m_hSelItem,m_name_old);
+		//	     }
+		//		 
+		//	   }
+		//	   m_TreeCtrl.SelectItem(m_hSelItem);
+		//	   m_TreeCtrl.SetFocus();
+		//	    
+		//	 return 1;
+		// }
+	 //    
+
+	 //}	 
    return CDockablePane::PreTranslateMessage(pMsg);
  }
    	/*
-   	Date:2013/05/29
-   	Purpose:
-   	  parameters 1：根据层次
-	             2：改变的名字，有新旧比较
+	Date:2013/05/29
+	Purpose:
+	parameters 1：根据层次
+	2：改变的名字，有新旧比较
    	*/
 BOOL CWorkspaceBar::UpdateDataToDB(){
 	 _ConnectionPtr m_pCon;
@@ -403,13 +404,13 @@ void CWorkspaceBar::OnSetFocus(CWnd* pOldWnd)
 	CDockablePane::OnSetFocus(pOldWnd);
 
 }
-void CWorkspaceBar::OnKeyDownChanged(NMHDR* pNMHDR, LRESULT* pResult)
-{
-	/*NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
-	CString strFolder=_T("");
-	CMainFrame* pMainFrame= (CMainFrame*)AfxGetMainWnd(); */
-//	pMainFrame->OnHTreeItemKeyDownChanged(pNMHDR,pResult);
-}
+//void CWorkspaceBar::OnKeyDownChanged(NMHDR* pNMHDR, LRESULT* pResult)
+//{
+//	/*NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+//	CString strFolder=_T("");
+//	CMainFrame* pMainFrame= (CMainFrame*)AfxGetMainWnd(); */
+////	pMainFrame->OnHTreeItemKeyDownChanged(pNMHDR,pResult);
+//}
 void CWorkspaceBar::OnFolderSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
@@ -475,8 +476,8 @@ void CWorkspaceBar::OnNMClickTree(NMHDR *pNMHDR, LRESULT *pResult)
 
 }
 
-void CWorkspaceBar::OnKYDOWNClickTree(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	CMainFrame* pMainFrame= (CMainFrame*)AfxGetMainWnd();
-	pMainFrame->OnHTreeItemKeyDownChanged(pNMHDR,pResult);
-}
+//void CWorkspaceBar::OnKYDOWNClickTree(NMHDR *pNMHDR, LRESULT *pResult)
+//{
+//	CMainFrame* pMainFrame= (CMainFrame*)AfxGetMainWnd();
+//	pMainFrame->OnHTreeItemKeyDownChanged(pNMHDR,pResult);
+//}

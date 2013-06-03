@@ -34,6 +34,7 @@ IMPLEMENT_DYNAMIC(CInputSetDlg, CDialog)
 CInputSetDlg::CInputSetDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CInputSetDlg::IDD, pParent)
 	, m_filterValue(0)
+	//, m_filterValue(0)
 {
 	m_nCurRow=m_nCurCol=0;
 	 InputThread=NULL;
@@ -66,6 +67,8 @@ void CInputSetDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_FILTER, m_Filter);
 	DDX_Text(pDX, IDC_FILTER, m_filterValue);
 	DDV_MinMaxUInt(pDX, m_filterValue, 0, 100);
+	DDX_Control(pDX, IDC_FILTER, m_Filter);
+	DDX_Text(pDX, IDC_FILTER, m_filterValue);
 }
 
 
@@ -213,7 +216,7 @@ BOOL CInputSetDlg::OnInitDialog()
 	m_FlexGrid.put_Rows(m_inRows);
 
 	m_FlexGrid.put_Cols(TOTAL_COLS);
-	 
+	//m_FlexGrid.put_Rows(TOTAL_ROWS);
 	m_FlexGrid.put_TextMatrix(0,INDEX_FIELD,_T(""));
 	m_FlexGrid.put_ColWidth(INDEX_FIELD,400);
 
@@ -228,9 +231,19 @@ BOOL CInputSetDlg::OnInitDialog()
 
 	m_FlexGrid.put_TextMatrix(0,CAL_FIELD,_T("Calibration"));
 	m_FlexGrid.put_ColWidth(CAL_FIELD,750);	
+	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
+	{
+		m_FlexGrid.put_TextMatrix(0,FILTER,_T("Filter"));
+		m_FlexGrid.put_ColWidth(FILTER,750);
+	} 
+	else
+	{
+		m_FlexGrid.put_TextMatrix(0,FILTER,_T("Filter"));
+		m_FlexGrid.put_ColWidth(FILTER,750);
+	 m_FlexGrid.put_ColWidth(FILTER,0);
+	}
 		
-	m_FlexGrid.put_TextMatrix(0,FILTER,_T("Filter"));
-	m_FlexGrid.put_ColWidth(FILTER,750);
+	
 
 	m_FlexGrid.put_TextMatrix(0,RANG_FIELD,_T("Range"));
 	m_FlexGrid.put_ColWidth(RANG_FIELD,1200);
@@ -241,7 +254,20 @@ BOOL CInputSetDlg::OnInitDialog()
 	m_FlexGrid.put_TextMatrix(0,CUST_FIELD,_T("Custom Tables"));
 	m_FlexGrid.put_ColWidth(CUST_FIELD,1100);
 
- 
+	/*
+	m_FlexGrid.put_TextMatrix(1,0,_T("Internal"));
+	m_FlexGrid.put_TextMatrix(2,0,_T("Input 1"));
+	m_FlexGrid.put_TextMatrix(3,0,_T("Input 2"));
+	m_FlexGrid.put_TextMatrix(4,0,_T("Input 3"));
+	m_FlexGrid.put_TextMatrix(5,0,_T("Input 4"));
+	m_FlexGrid.put_TextMatrix(6,0,_T("Input 5"));
+	*/
+	/*m_FlexGrid.put_TextMatrix(1,0,g_strInName1);
+	m_FlexGrid.put_TextMatrix(2,0,g_strInName2);
+	m_FlexGrid.put_TextMatrix(3,0,g_strInName3);
+	m_FlexGrid.put_TextMatrix(4,0,g_strInName4);
+	m_FlexGrid.put_TextMatrix(5,0,g_strInName5);
+	m_FlexGrid.put_TextMatrix(6,0,g_strInName6);*/
 	
 	//get unit stringlist
 	UINT uint_temp=GetOEMCP();//get system is for chinese or english
@@ -280,7 +306,19 @@ BOOL CInputSetDlg::OnInitDialog()
 	   return TRUE;
 	}
 
-   
+//	if (m_nModel == 16 || m_nModel == PM_TSTAT6 ) // 5E与其他的不同
+	////if (m_nModel == PM_TSTAT6 ) // 5E与其他的不同
+	////{
+	////	Init5EGrid();
+	////	return TRUE;
+	////}
+
+	////if (m_nModel == PM_TSTAT5E)
+	////{
+	////	InitGrid5EnoTSTAT6();
+	////	return TRUE;
+	////}
+
 
 	for(int i=1;i<m_inRows;i++)
 	{
@@ -358,17 +396,28 @@ void CInputSetDlg::OnBnClickedCancel()
 
 void CInputSetDlg::Fresh_Grid()
 {
-	if(m_nModel == 16)
+	if(m_nModel == 16 || m_nModel == PM_TSTAT6)
 	{
 		Init_not_5ABCD_Grid();
 		return ;
 	}
-	if (m_nModel==PM_TSTAT6)
+		if (m_nModel==PM_TSTAT6)
 	{
 		InitGridtstat6();
 		return ;
 	}
-	 
+	//Merge Init5EGrid InitGrid5EnoTSTAT6 to One function  Init_not_5ABCD_Grid; Fance
+	//if (m_nModel == PM_TSTAT6 )
+	//{
+	//	Init5EGrid();
+	//	return;
+	//}
+
+	//if (m_nModel == PM_TSTAT5E)
+	//{
+	//	InitGrid5EnoTSTAT6();
+	//	return;
+	//}
 
 	CString strUnit=GetTempUnit();
 	CString strTemp;	
@@ -378,7 +427,7 @@ void CInputSetDlg::Fresh_Grid()
 //row 1:	
 	if(m_FlexGrid.get_Row()>=1)
 	{
-		strTemp.Format(_T("%.1f"),product_register_value[216]/10.0);//216
+		strTemp.Format(_T("%.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);//101
 		strTemp=strTemp+strUnit;
 		m_FlexGrid.put_TextMatrix(1,VALUE_FIELD,strTemp);
 		m_FlexGrid.put_TextMatrix(1,AM_FIELD,NO_APPLICATION);
@@ -967,7 +1016,7 @@ void CInputSetDlg::OnCbnSelchangeRangCombo()
 
 void CInputSetDlg::OnCbnKillfocusRangCombo()
 {
-	//m_RangCombox.ShowWindow(SW_HIDE);
+	m_RangCombox.ShowWindow(SW_HIDE);
 	// TODO: Add your control notification handler code here
 }
 
@@ -1414,7 +1463,36 @@ void CInputSetDlg::OnBnClickedRefreshbutton()
 	GetDlgItem(IDC_REFRESHBUTTON)->EnableWindow(FALSE);
 	GetDlgItem(IDEXIT)->EnableWindow(FALSE);
 	if(InputThread==NULL)
-	InputThread = CreateThread(NULL,NULL,StartRefresh,this,NULL,NULL);
+		InputThread = CreateThread(NULL,NULL,StartRefresh,this,NULL,NULL);
+
+	/*
+
+#if 1
+	int i;
+	register_critical_section.Lock();
+	for(i=0;i<16;i++)
+	{
+		Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);
+	}
+	register_critical_section.Unlock();
+	memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));//
+	if ((multi_register_value[7] == 6)||(multi_register_value[7] == 7))//tstat6
+	{
+			//multi_register_value[]列表交换。
+			memset(tempchange,0,sizeof(tempchange));
+			int index = 0;
+
+			for (int i = 0;i<512;i++)
+			{
+				index = reg_tstat6[i];
+				tempchange[index] = multi_register_value[i];
+			}
+			memcpy(multi_register_value,tempchange,sizeof(multi_register_value));
+	}
+
+#endif
+	Fresh_Grid();
+	*/
 }
 
 void CInputSetDlg::OnEnKillfocusInputnameedit()
@@ -2066,7 +2144,6 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 					strTemp.Format(_T("%.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);  //121
 				}
 
-
 				strTemp=strTemp+strUnit;
 				m_FlexGrid.put_TextMatrix(1,VALUE_FIELD,strTemp);
 				m_FlexGrid.put_TextMatrix(1,AM_FIELD,NO_APPLICATION);
@@ -2215,7 +2292,7 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 			{
 				if(i== 2 || i==3)
 				{
-					nValue=product_register_value[298+i-2];
+					nValue=multi_register_value[298+i-2];
 					strTemp=INPUT_FUNS[nValue];
 					m_FlexGrid.put_TextMatrix(i,FUN_FIELD,strTemp);
 				}
@@ -2226,6 +2303,15 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);				
 				}
 			}
+
+			//	}
+			// 			else
+			// 			{
+			// 				m_FlexGrid.put_Col(FUN_FIELD);
+			// 				m_FlexGrid.put_Row(i);
+			// 				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);				
+			// 			}
+			// column 6 custom tables
 			if(product_register_value[MODBUS_PRODUCT_MODEL] ==  6)
 			{
 				m_customBtn.ShowWindow(SW_HIDE);
@@ -2257,19 +2343,19 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 		{
 			int nValue;
 
-			if(product_register_value[341+i-2]==1)	//341
+			if(multi_register_value[341+i-2]==1)	//341
 			{
-				nValue=(int)(product_register_value[349+i-2]/10.0);
+				nValue=(int)(multi_register_value[349+i-2]/10.0);
 				strTemp.Format(_T("%.1f"),nValue);
 			}
 			else
 			{
-				strTemp.Format(_T("%d"),product_register_value[349+i-2]);
+				strTemp.Format(_T("%d"),multi_register_value[349+i-2]);
 			}
 			m_FlexGrid.put_TextMatrix(i,VALUE_FIELD,strTemp);
 
 			strTemp.Empty();
-			int nItem=product_register_value[341+i-2];
+			int nItem=multi_register_value[341+i-2];
 			if(nItem>=0&&nItem<=4)
 			{
 				strTemp=analog_range_0[nItem];					
@@ -2515,7 +2601,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 		m_RangCombox.BringWindowToTop();
 		m_RangCombox.ShowWindow(SW_SHOW);//显示控件
 		m_RangCombox.SetFocus(); //获取焦点
-		
+	
 		CString strTemp;
 		if(nRow == 1) // use 121
 		{	
@@ -2538,7 +2624,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 			if (nValue==0||nValue==1)//tstat6
 			strTemp = m_strUnitList[nValue];
 		}
-		else 
+		else
 		{
 			m_RangCombox.ResetContent();	
 			//359	122	1	Low byte	W/R	ANALOG INPUT1 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
@@ -2591,7 +2677,6 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 	//////////////////////////////////////////////////////////////////////////
 	if(nCol == FUN_FIELD)
 	{
-	  
 		m_inputFinCombox.ResetContent();
 		for(int i=0;i<7;i++)
 			m_inputFinCombox.AddString(INPUT_FUNS[i]);
@@ -2619,7 +2704,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 
 	//////////////////////////////////////////////////////////////////////////
 	if(nCol == CUST_FIELD)
-	{	  
+	{
 		if(nRow==2&&multi_register_value[188]==4)///没找到TSTAT6对应值
 		{
 			m_customBtn.ShowWindow(SW_SHOW);
@@ -2646,6 +2731,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 // 6	127	1	Low byte	W/R	ANALOG INPUT6 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
 // 7	128	1	Low byte	W/R	ANALOG INPUT7 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
 // 8	129	1	Low byte	W/R	ANALOG INPUT8 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
+
 //121	104	1	Low byte	W/R(Reboot after write)	DEGC_OR_F, engineering units, Deg C = 0, Deg F = 1
 
 

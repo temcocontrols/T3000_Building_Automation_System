@@ -81,7 +81,7 @@ public:
 	afx_msg void OnEnKillfocusPid2coolstageedit2();
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnEnKillfocusDescriptedit();
-//	afx_msg void OnEnSetfocusDescriptedit();
+ 	afx_msg void OnEnSetfocusDescriptedit();
 
 
 	void FreshGrid_PID1tstat6();
@@ -92,5 +92,5 @@ public:
 	long pid2lrow;//2.5.0.94
 	long pid1lrow;//2.5.0.96
 
-	afx_msg void OnBnClickedRefresh();
+	afx_msg void OnBnClickedUpdate();
 	};
