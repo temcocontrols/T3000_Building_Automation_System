@@ -34,9 +34,8 @@
 #include "LightingController/LightingController.h"//Lightingcontroller
 #include "HumChamber.h"
 #include "CO2_View.h"
-#include "NewImportDBDlg.h"
+
 #include "Dialog_Progess.h"
-#include "RenameDlg.h"
 
 #include "excel9.h"
 
@@ -530,12 +529,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_pTreeViewCrl=&m_wndWorkSpace.m_TreeCtrl;	
 	m_pTreeViewCrl->SetExtendedStyle(TVS_EDITLABELS, TVS_EDITLABELS);
 
-	m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
-	m_pRefreshThread->SetMainWnd(this);	
-
-	// 需要执行线程中的操作时
-	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
-	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 
 	//  2011,7,4, 先判断是否第一次运行，是否要导入数据库。
 	//ImportDataBaseForFirstRun();
@@ -550,7 +543,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
 
+	m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
+	m_pRefreshThread->SetMainWnd(this);	
 
+	// 需要执行线程中的操作时
+	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
+	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 	//tstat6
 	Tstat6_func();//为TSTST6新寄存器用的。
 
@@ -807,7 +805,82 @@ void CMainFrame::OnUpdateCheckIOPane(CCmdUI* pCmdUI)
 {
 
 }
+void CMainFrame::EnterConnectToANode()
+{
+	Flexflash = TRUE;
+	HTREEITEM hSelItem;//=m_pTreeViewCrl->GetSelectedItem();
+	int nRet =read_one(g_tstat_id,6,1);
 
+	/*CPoint pt;
+	GetCursorPos(&pt);
+	m_pTreeViewCrl->ScreenToClient(&pt);*/
+	hSelItem = m_pTreeViewCrl->GetSelectedItem();
+
+	//////////////////////////////////////////////////////////////////////////
+	m_strCurSelNodeName = m_pTreeViewCrl->GetItemText(hSelItem);
+	//m_pTreeViewCrl->Expand(hSelItem,TVE_EXPAND);
+
+
+	//	BOOL ret  =  m_pTreeViewCrl->Retofline(hSelItem);//tree0412
+	//	if (ret)//tree0412
+	//	{
+
+	BeginWaitCursor();
+	//CM5
+#if 1
+	for(UINT i=0;i<m_product.size();i++)
+	{
+		if(hSelItem==m_product.at(i).product_item )
+		{			
+			if(m_product.at(i).product_class_id == PM_CM5)
+			{
+				g_tstat_id=m_product.at(i).product_id;
+				//SetPaneString(2,_T("Connect To CM5"));
+				m_isCM5=TRUE;
+				DoConnectToANode(hSelItem); 
+				//SwitchToPruductType(4);			
+			}else if (m_product.at(i).product_class_id == PM_MINIPANEL)
+			{
+				g_tstat_id = m_product.at(i).product_id;
+				SwitchToPruductType(6);
+			}else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
+			{
+				g_tstat_id = m_product.at(i).product_id;
+				SwitchToPruductType(5);
+			}
+			else if (m_product.at(i).product_class_id ==PM_AirQuality) //AirQuality
+			{
+				g_tstat_id = m_product.at(i).product_id;
+				SwitchToPruductType(7);
+			}else if (m_product.at(i).product_class_id == PM_LightingController)//LightingController
+			{
+				g_tstat_id = m_product.at(i).product_id;
+				if(m_product.at(i).BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(m_product.at(i).BuildingInfo.strBuildingName)!=0)
+				{
+					//connect:
+					BOOL bRet = ConnectSubBuilding(m_product.at(i).BuildingInfo);
+					if (!bRet)
+					{
+						if(m_product.at(i).BuildingInfo.strProtocol.CompareNoCase(_T("Modbus TCP")) == 0) // net work protocol
+						{
+							CheckConnectFailure(m_product.at(i).BuildingInfo.strIp);
+						}
+					}
+				}
+				SwitchToPruductType(8);
+			}
+			else 
+			{
+				DoConnectToANode(hSelItem); 
+			}
+
+		}
+	}
+#endif
+	//CM5
+
+	EndWaitCursor();
+}
 void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {	
 
@@ -884,38 +957,35 @@ int nRet =read_one(g_tstat_id,6,1);
 	//CM5
 
 	EndWaitCursor();
- 
-
 }
 
-void CMainFrame::OnHTreeItemKeyDownChanged(NMHDR* pNMHDR, LRESULT* pResult)
-{	
-
-//	Flexflash = TRUE;
-//	HTREEITEM hSelItem,hNextItem;//=m_pTreeViewCrl->GetSelectedItem();
-////int nRet =read_one(g_tstat_id,6,1);
-////
-//     hSelItem= m_pTreeViewCrl->GetSelectedItem();
-// 
-//	//////////////////////////////////////////////////////////////////////////
-//	
-//	m_strCurSelNodeName = m_pTreeViewCrl->GetItemText(hSelItem);
-
-   /* CRenameDlg dlg;
-	dlg.m_nodename=m_strCurSelNodeName;
-	if (dlg.DoModal()==IDOK)
-	{
-	   m_strCurSelNodeName=dlg.m_nodename;
-	}*/
-	//m_pTreeViewCrl->SetItemText(hSelItem,m_strCurSelNodeName);
-	/* m_pTreeViewCrl->SelectItem(hSelItem);
-	m_pTreeViewCrl->SetFocus();
-	hNextItem=m_pTreeViewCrl->GetNextItem(hSelItem,TVGN_CARET);
-	m_pTreeViewCrl->SelectItem(hNextItem);
-	m_pTreeViewCrl->SetFocus(); */
-  //  AfxMessageBox(m_strCurSelNodeName);
-}
-
+//void CMainFrame::OnHTreeItemKeyDownChanged(NMHDR* pNMHDR, LRESULT* pResult)
+//{	
+//
+////	Flexflash = TRUE;
+////	HTREEITEM hSelItem,hNextItem;//=m_pTreeViewCrl->GetSelectedItem();
+//////int nRet =read_one(g_tstat_id,6,1);
+//////
+////     hSelItem= m_pTreeViewCrl->GetSelectedItem();
+//// 
+////	//////////////////////////////////////////////////////////////////////////
+////	
+////	m_strCurSelNodeName = m_pTreeViewCrl->GetItemText(hSelItem);
+//
+//   /* CRenameDlg dlg;
+//	dlg.m_nodename=m_strCurSelNodeName;
+//	if (dlg.DoModal()==IDOK)
+//	{
+//	   m_strCurSelNodeName=dlg.m_nodename;
+//	}*/
+//	//m_pTreeViewCrl->SetItemText(hSelItem,m_strCurSelNodeName);
+//	/* m_pTreeViewCrl->SelectItem(hSelItem);
+//	m_pTreeViewCrl->SetFocus();
+//	hNextItem=m_pTreeViewCrl->GetNextItem(hSelItem,TVGN_CARET);
+//	m_pTreeViewCrl->SelectItem(hNextItem);
+//	m_pTreeViewCrl->SetFocus(); */
+//  //  AfxMessageBox(m_strCurSelNodeName);
+//}
 
 
 
@@ -3530,6 +3600,8 @@ void CMainFrame::GetIONanme()
 				else
 					str_temp=_T("Output 7");
 				g_strOutName7=str_temp;
+
+				g_strInHumName = _T("Humidity Sensor");
 				g_strInCO2=_T("CO2 Sensor");
 			}
 			else
@@ -3543,8 +3615,9 @@ void CMainFrame::GetIONanme()
 				g_strInName6=_T("Input 6");
 				g_strInName7=_T("Input 7");
 				g_strInName8=_T("Input 8");
+				
 				g_strInHumName = _T("Humidity Sensor");
-				g_strInCO2=_T("CO2 Sensor");
+				 g_strInCO2=_T("CO2 Sensor");
 
 				g_strOutName1=_T("Output 1");
 				g_strOutName2=_T("Output 2");
@@ -3578,7 +3651,7 @@ void CMainFrame::OnHelp()
 }
 void CMainFrame::OnImportDatase()
 {
-	CNewImportDBDlg Dlg;
+	CImportDatabaseDlg Dlg;
 	Dlg.DoModal();
 	
 }
@@ -3610,11 +3683,16 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			OnToolRefreshLeftTreee();
 		}
 
-		if(pMsg->wParam == VK_F4)
+		if(pMsg->wParam == VK_F2)
 		{
 			OnToolErease();
 			return 1;
-		}
+		} 
+			if(pMsg->wParam == VK_RETURN)
+			{
+				EnterConnectToANode();
+				return 1;
+			}
 	}
 	return CFrameWndEx::PreTranslateMessage(pMsg);
 }
@@ -3651,7 +3729,6 @@ BOOL CMainFrame::GetIPbyHostName(CString strHostName,CString& strIP)
 //pHostent   =   gethostbyname("www.google.com\0");   
  // sockaddr_in   sa;   
  // memcpy(&sa.sin_addr.s_addr,pHostent->h_addr_list[0],pHostent->h_length);   
-
     pHostent   =   gethostbyname(CW2A(strHostName));   
     if(pHostent==NULL)   
        return   false;  
@@ -3918,7 +3995,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			int nTRet=-1;
 			//g_tstat_id=m_product.at(i).product_id;
 			product_Node=m_product.at(i);
-			m_CurrentBuildingNode=m_product.at(i);
+
 			//************************************
 			register_critical_section.Lock();
 			g_tstat_id_changed=TRUE;
@@ -3974,29 +4051,27 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 					CString strInfo;
 					strInfo.Format(_T("COM %d Connected: Yes"), nComPort);			
-					 
-					
+					//SetPaneCommunicationPrompt(strInfo);
+					SetPaneString(1, strInfo);
 					BOOL  bret = open_com(nComPort);
 					if (!bret)
-					{	 strInfo.Format(_T("COM port %d open failure"), nComPort);	
-						AfxMessageBox(strInfo);
-								
+					{
+						AfxMessageBox(_T("COM port open failure!"));			
 						if (pDlg !=NULL)
-						{	SetPaneString(1, strInfo);
+						{
 							pDlg->ShowWindow(SW_HIDE);
 							delete pDlg;
 						}
 						return;
 					}else
 					{
-					    SetPaneString(1, strInfo);
 						g_CommunicationType=0;
 					}
 				}
 			}
-			/*if(m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0&&m_hCurCommunication!=NULL)
+			if(m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0&&m_hCurCommunication!=NULL)
 			{
-			}*/
+			}
 
 			m_strCurSubBuldingName=product_Node.BuildingInfo.strBuildingName;
 			BOOL bOnLine=FALSE;
@@ -4039,9 +4114,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					// 					AfxMessageBox(str);
 					//Reset the COM or check to make sure the product is open
 					//	AfxMessageBox(_T("Detect the product model not corresponding\nSelect COM port,try again!"));//\nDatabase->Building config Database	
-					CString str=m_strCurSelNodeName+_T("  is offline!\nPlease Check your cable");
-					AfxMessageBox(str);
-                    SetPaneString(1, str);
+					AfxMessageBox(_T("Detect the product model not corresponding\nReset the com port or check to make sure the product is open,and then try again!"));
 					if (pDlg !=NULL)
 					{
 						pDlg->ShowWindow(SW_HIDE);
@@ -4074,8 +4147,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 							bOnLine=TRUE;
 					}
 				}else
-				{	  CString str=m_strCurSelNodeName+_T("  is offline!");
-					AfxMessageBox(str);//\nDatabase->Building config Database			
+				{
+					AfxMessageBox(_T("Detect the product model not corresponding\nSelect COM port,try again!"));//\nDatabase->Building config Database			
 					if (pDlg !=NULL)
 					{
 						pDlg->ShowWindow(SW_HIDE);
@@ -4329,7 +4402,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 			GetIONanme();
 #endif
-
+			// 			strInfo.Format(_T("CMainFrame::DoConnectToANode():read_one(g_tstat_id,7,3)"));			
+			// 			SetPaneString(2, strInfo);
+		//	SwitchToPruductType(10);
 			nFlag = read_one(g_tstat_id,7,6);		
 			if(nFlag >65530)	//The return value is -1 -2 -3 -4
 			{
@@ -4343,18 +4418,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				return;
 			}
 
- 		
-			nFlag = read_one(g_tstat_id,7,6);		
-			if(nFlag >65530)	//The return value is -1 -2 -3 -4
-			{
-				AfxMessageBox(_T("Reading product model abnormal \n Try again!"));
-				if (pDlg !=NULL)
-				{
-					pDlg->ShowWindow(SW_HIDE);
-					delete pDlg;
-				}
-				return;
-			}
 			if(nFlag==PM_NC)	
 			{	
 				SwitchToPruductType(1);
@@ -4603,9 +4666,10 @@ void CMainFrame::RefreshTreeView()
 			int nIDNode=tp.product_id;
 			nSerialNumber=tp.serial_number;
 			//int newnID=read_one(nID,6,2);
-			 
+
 			if (g_CommunicationType==0) // 通信类型 0
 			{	
+				// force baud rate to 19200
 				m_nbaudrat=19200;
 				Change_BaudRate(19200);
 

@@ -95,9 +95,9 @@ CString g_strInName5;
 CString g_strInName6;
 CString g_strInName7;
 CString g_strInName8;
-
+ CString g_strInCO2;
 CString g_strInHumName;		// for tstat6 humidity input
-CString g_strInCO2;
+
 CString g_strOutName1;
 CString g_strOutName2;
 CString g_strOutName3;
@@ -121,7 +121,7 @@ int parameterSet = 0;//用于初始化SLIDER。
 
 //int g_nIpPort=6001;
 //CString	g_strIpAdress;
-int MDAY=1,MNIGHT=1;
+int MDAY=0,MNIGHT=0;
 int tstat6flex[12]={
 	30,
 	20,

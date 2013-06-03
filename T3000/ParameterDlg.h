@@ -86,7 +86,7 @@ public:
 	afx_msg void OnEnKillfocusSetvalue1();
 	afx_msg void OnCbnSelchangeOccupiedmodecombo();
 	virtual BOOL OnInitDialog();
-	 afx_msg void OnBnClickedCancel();
+
 
 	afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT  ReadDataCallBack(WPARAM wParam, LPARAM lParam);
@@ -161,7 +161,7 @@ public:
 	CDialog_Progess* pProgess;
 
 
-   BOOL m_disable_hum,m_disable_CO2;
+
 
 	afx_msg void OnCbnKillfocusCombo1();
 	afx_msg void OnCbnKillfocusCombo4();
@@ -185,7 +185,7 @@ public:
 	afx_msg void OnEnKillfocusEdit32();
 	afx_msg void OnEnKillfocusEdit35();
 	afx_msg void OnEnKillfocusEdit38();
-
+	afx_msg void OnBnClickedCancel();
 	afx_msg void OnEnKillfocusEditValuetraveltime();
 	afx_msg void OnEnKillfocusEditPid2offsetpoint();
 //	afx_msg void OnKillFocus(CWnd* pNewWnd);

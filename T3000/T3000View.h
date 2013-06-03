@@ -71,7 +71,7 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual void OnInitialUpdate(); // called first time after construct
-	void CreateFlexSilde_TStat6_2SP();
+	void CreateFlexSilde();
 // Implementation
 public:
 	virtual ~CT3000View();
@@ -97,7 +97,7 @@ public:
 	void OnConnect();
 	void OnDisconnect();
 	void OnAddBuildingConfig();
-	//void OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult);
+	
 	void Fresh();
 	void FreshCtrl();
 	void InitSliderBars();
@@ -238,8 +238,8 @@ public:
 	void HandleSliderSetPos(BOOL bRight);
 	BOOL				m_bSliderSetPosWarning;
 	void InitFlexSliderBars_tstat6();//tsat6
-	
-	
+	void OnFlexSlideCallBackFortstat6();
+	void TemperatureSlider();
 	afx_msg void OnNMReleasedcaptureTempretureSlider(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnEnKillfocusDayEdit();
 	int m_daysetpoint;//0907

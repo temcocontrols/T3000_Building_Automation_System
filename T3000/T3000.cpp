@@ -12,8 +12,7 @@
 #include "T3000TableView.h"
 
 #include "LoginDlg.h"
- #include "ImportDatabaseDlg.h"
- #include "NewImportDBDlg.h"
+
 #include "iniFile.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -187,41 +186,22 @@ BOOL CT3000App::InitInstance()
 	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
 	g_strDatabasefilepath=exeFullPath;//
 	g_strExePth=g_strDatabasefilepath;//
-			CStdioFile *plFile=new CStdioFile;
-	
-			CString DBfilepath_default=g_strExePth+_T("Database\\T3000.mdb");
-			if (plFile->Open(DBfilepath_default,CFile::modeReadWrite | CFile::shareDenyNone))
-			{
-				g_strDatabasefilepath=DBfilepath_default;
-			} 
-			else
-			{
-				CString filepath=g_strExePth+_T("start.ini");
-				if(plFile->Open(filepath,CFile::modeReadWrite | CFile::shareDenyNone))
-				{
-					plFile->ReadString(g_strDatabasefilepath);
-				}
-				else
-				{
 	CreateDirectory(g_strExePth+_T("Database"),NULL);//creat database folder;//
 	g_strOrigDatabaseFilePath=g_strExePth+_T("t3000.mdb");//
 	g_strDatabasefilepath+=_T("Database\\t3000.mdb");//
-				}
-			}
-			HANDLE hFind;//
-			WIN32_FIND_DATA wfd;//
-			hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
-			if (hFind==INVALID_HANDLE_VALUE)//
-			{
-				//CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
-				//如果没有没有找到从这里
-				AfxMessageBox(_T("Can't Find T3000.mdb in default file path\n Choose your T3000.mdb or Create a default one"));
-				CNewImportDBDlg Dlg;
-				Dlg.DoModal();
-				AfxMessageBox(_T("Restart T3000,Please!"));
-				return FALSE;
 
-			}//
+
+	HANDLE hFind;//
+	WIN32_FIND_DATA wfd;//
+	hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
+	if (hFind==INVALID_HANDLE_VALUE)//
+	{
+		CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
+	}//
+	else//
+	{
+	
+	}
 	FindClose(hFind);//
 
 	g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;//
@@ -369,8 +349,8 @@ BOOL CT3000App::InitInstance()
 	}
 	catch (...)
 	{
-	     CString stradodll;
-		 stradodll=g_strExePth+_T("\\REG_msado15.bat");
+	//	AfxMessageBox(_T("Double click 'REG_msado15.dll',Please!\nAt C:\\Program Files\\Temcocontrols\\T3000"));
+
 // 		CString strFilter = _T("hex File;bin File|*.hex;*.bin|all File|*.*||");
 // 		CFileDialog dlg(true,_T("hex"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
 // 		dlg.DoModal();
@@ -399,9 +379,9 @@ BOOL CT3000App::InitInstance()
 
 
 
-	//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat"), _T(""), _T(""), SW_SHOW);
+		::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat"), _T(""), _T(""), SW_SHOW);
 		//vcredist_x86.zip
-			::ShellExecute(NULL, _T("open"),stradodll /*_T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat")*/, _T(""), _T(""), SW_SHOW);
+		
 	//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
 		//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
 		AfxMessageBox(_T("Open'T3000'Again,Please!"));
