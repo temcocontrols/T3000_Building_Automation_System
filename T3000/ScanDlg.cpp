@@ -6,12 +6,7 @@
 #include "ScanDlg.h"
 #include "GridButton.h"
 #include "TStatScanner.h"
-// #include "TStatBase.h"
-// #include "TStat_Net.h"
-// #include "TStat_Dev.h"
 
-//#define WM_SCANFINISH WM_USER + 1100
-// CScanDlg dialog
 
 
 

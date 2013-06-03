@@ -346,45 +346,21 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 			
 			//temp.software_version=tstat_version2;
 			pTemp->SetSoftwareVersion(tstat_version2);
-			//if(Read_One2(a, 185, bForTStat)==0)	
-			////if(pTemp->ReadOneReg(185)==0)
-			//{
-			//	//temp.baudrate=9600;
-			//	pTemp->SetBaudRate(9600);//scan
+			if(Read_One2(a, 185, bForTStat)==0)	
+			//if(pTemp->ReadOneReg(185)==0)
+			{
+				//temp.baudrate=9600;
+				pTemp->SetBaudRate(9600);//scan
 
-			//}
-			//else
-			//{
-			//		//temp.baudrate=19200;
-			//	pTemp->SetBaudRate(19200);//scan
-			//}
-			////temp.nEPsize=Read_One2(temp.id,326, bForTStat);
-			//pTemp->SetEPSize(pTemp->ReadOneReg(326));
-				if ((SerialNum[7]==PM_TSTAT6)||(SerialNum[7]==PM_TSTAT7))
-				{
-					if(Read_One2(a,110, true)==0)
-						pTemp->SetBaudRate(9600);
-					else
-					{
-						pTemp->SetBaudRate(19200);
-					}
-					int nEPsize=Read_One2(a,408, true);
-					pTemp->SetEPSize(nEPsize);
-					 
+			}
+			else
+			{
+					//temp.baudrate=19200;
+				pTemp->SetBaudRate(19200);//scan
+			}
+			//temp.nEPsize=Read_One2(temp.id,326, bForTStat);
+			pTemp->SetEPSize(pTemp->ReadOneReg(326));
 
-				} 
-				else
-				{
-					if(Read_One2(a,185, true)==0)
-						pTemp->SetBaudRate(9600);
-					else
-					{
-						pTemp->SetBaudRate(19200);
-					}
-					int nEPsize=Read_One2(a,326, true);
-					pTemp->SetEPSize(nEPsize);
-					
-				}
 			//if(pTemp->GetComPort()>=0)
 			pTemp->SetComPort(nComPort);
 			// product type
@@ -515,32 +491,20 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 													
 													//temp.software_version=tstat_version2;
 													pTemp->SetSoftwareVersion(tstat_version2);
-												//	if(Read_One2(j,185, bForTStat)==0)
-				if ((SerialNum[7]==PM_TSTAT6)||(SerialNum[7]==PM_TSTAT7))
-				{
-					if(Read_One2(j,110, true)==0)
-						pTemp->SetBaudRate(9600);
-					else
-					{
-						pTemp->SetBaudRate(19200);
-					}
-					int nEPsize=Read_One2(j,408, true);
-					pTemp->SetEPSize(nEPsize);
-					// pTemp->SetEPSize(pTemp->ReadOneReg(408));
+													if(Read_One2(j,185, bForTStat)==0)
+													//if(pTemp->ReadOneReg(185)==0)
+													{
+														//temp.baudrate=9600;
+														pTemp->SetBaudRate(9600);
+													}
+													else
+													{
+														pTemp->SetBaudRate(19200);
+													}
 
-				} 
-				else
-				{
-					if(Read_One2(j,185, true)==0)
-						pTemp->SetBaudRate(9600);
-					else
-					{
-						pTemp->SetBaudRate(19200);
-					}
-					int nEPsize=Read_One2(j,326, true);
-					pTemp->SetEPSize(nEPsize);
-					//pTemp->SetEPSize(pTemp->ReadOneReg(326));
-				}
+													int nEPsize=Read_One2(j,326, bForTStat);
+													pTemp->SetEPSize(nEPsize);
+											
 													pTemp->SetComPort(nComPort);
 
 													pTemp->SetBuildingName(m_strBuildingName);
@@ -1211,59 +1175,6 @@ UINT _ScanTstatThread2(LPVOID pParam)
 		}
 
 	}
-	 //9600		   把所有串口扫一遍
-	 /*
-	for (i = 0; i < pScan->m_szComs.size(); i++)
-	{
-		//if (WaitForSingleObject(pScan->m_eScanComEnd->m_hObject, 0) == WAIT_OBJECT_0 )
-		if(pScan->m_bStopScan)
-		{ // 有信号，就结束scan
-			//g_ScnnedNum=254;
-			//return;
-			break;
-		}
-		CString strComPort = pScan->m_szComs[i];
-		TRACE(_T("Scanning @ ") + strComPort + _T("\n"));
-
-		// 		CHAR* lpsz;
-		// 		USES_CONVERSION;
-		// 		lpsz = W2A(strComPort.GetString());
-		//TCHAR tc = strComPort.GetAt(strComPort.GetLength()-1);
-		CString tc = strComPort.Mid(3);
-
-		int n = _wtoi(tc);
-		// 		char c[2];
-		// 		_itoa_s(n, c, 10);
-		// 		c[0] = '7';
-
-		if(pScan->OpenCom(n)) //Open one current comport.
-		{
-			pScan->SetComPort(n); //设置当前的COM NUM
-			bool bRet = Change_BaudRate(  pScan->m_nBaudrate); 
-			ASSERT(bRet);
-			g_strScanInfoPrompt.Format(_T("COM%d"), n);
-
-			BOOL bReadone = pScan->ReadOneCheckOnline(n);
-
-			pScan->background_binarysearch(n);	//lsc comscan new cold
-			close_com();
-			Sleep(500);
-			TRACE(_T("Success open the COM%d\n"), n); 
-		}
-		else
-		{
-			// 不能打开串口X，提示信息
-			TRACE(_T("Cannot open the COM%d\n"), n);
-			CString str;
-			str.Format(_T("Cannot open the COM%d\n"), n);
-			SetPaneString(2, str);
-			int n =0 ;
-		}
-
-	}
-
-	
-			 */
 	g_ScnnedNum=254;
 	//
 	//pScan->AddComDeviceToGrid();
@@ -2770,29 +2681,12 @@ void CTStatScanner::ScanOldNC(BYTE devLo, BYTE devHi)
 				}//tstat_version
 			
 				pNet->SetSoftwareVersion(tstat_version2);
-				if ((SerialNum[7]==PM_TSTAT6)||(SerialNum[7]==PM_TSTAT7))
-				{
-					if(Read_One2(a,110, true)==0)
-						pNet->SetBaudRate(9600);
-					else
-					{
-						pNet->SetBaudRate(19200);
-					}
-					/*int nEPsize=Read_One2(a,408, true);
-					pNet->SetEPSize(nEPsize);*/
-				} 
+				if(Read_One2(a,185, true)==0)
+					pNet->SetBaudRate(9600);
 				else
 				{
-					if(Read_One2(a,185, true)==0)
-						pNet->SetBaudRate(9600);
-					else
-					{
-						pNet->SetBaudRate(19200);
-					}
-					/*int nEPsize=Read_One2(a,326, true);
-					pNet->SetEPSize(nEPsize);*/
+					pNet->SetBaudRate(19200);
 				}
-			
 				//int nEPsize=Read_One2(a,326, true);
 				//pNet->SetEPSize(nEPsize);
 				if(serialnumber>=0)

@@ -11,7 +11,7 @@ public:
 	CRenameDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CRenameDlg();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = IDD_RENAME_DLG };
 	virtual BOOL OnInitDialog();
 protected:

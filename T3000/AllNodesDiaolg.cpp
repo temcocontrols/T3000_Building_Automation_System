@@ -138,7 +138,7 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
 	m_FlexGrid.put_TextMatrix(0,AN_SCREENID,_T("Screen ID"));
 	m_FlexGrid.put_ColWidth(AN_SCREENID,2000);
 
-	m_FlexGrid.put_TextMatrix(0,AN_BAUDRATE,_T("IPAddress"));
+	m_FlexGrid.put_TextMatrix(0,AN_BAUDRATE,_T("Baud Rate"));
 	m_FlexGrid.put_ColWidth(AN_BAUDRATE,1300);
 
 	m_FlexGrid.put_TextMatrix(0,AN_GRAPHICID,_T("Graphic Name"));

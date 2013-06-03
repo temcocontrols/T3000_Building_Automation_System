@@ -97,19 +97,17 @@ typedef struct _binary_search_result
 	
 }binary_search_result;
 
-
 class CTStatScanner;
 class CScanDbWaitDlg;
 class CMainFrame : public CFrameWndEx
-{
-	
+{	
 protected: // create from serialization only
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
 	void OnToolErease();
 	void OnToolFresh();
 	void OnToolRefreshLeftTreee();
-
+	void EnterConnectToANode();
 public:
 
     CView * m_pViews[NUMVIEWS];
@@ -133,7 +131,7 @@ public:
 	CString				g_strIpAdress;
 	vector<Building_info>	m_subNetLst;
 	vector<CString>			m_buildingLst;
-//	vector <HTREEITEM> m_rootLst;//for every building name
+     //vector <HTREEITEM> m_rootLst;//for every building name
 	//HTREEITEM treem[20];
 	vector <tree_floor>		m_floorLst;//for every building name
 	vector <tree_room>		m_roomLst;//for every room name	
@@ -234,7 +232,7 @@ public:
 	void SwitchToGraphicView();
 	void SetPaneConnectionPrompt(CString strInfo);
 	void OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult);
-	void OnHTreeItemKeyDownChanged(NMHDR* pNMHDR, LRESULT* pResult);
+	//void OnHTreeItemKeyDownChanged(NMHDR* pNMHDR, LRESULT* pResult);
 	void OnHTreeItemEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult);
 	LRESULT OnHTreeItemBeginlabeledit(NMHDR *pNMHDR, LRESULT *pResult);
 	void  OnHTreeItemClick(NMHDR *pNMHDR, LRESULT *pResult);
@@ -246,8 +244,7 @@ public:
 	void CheckConnectFailure(const CString& strIP);// 检查失败的原因，并给出详细的提示信息
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	BOOL ConnectSubBuilding(Building_info build_info);
-	//0:TCP Disconnect 1:TCP Connection 2:COM disconnect 3:Com Connection
-    int CheckCurrentNodeConnectSubBuilding();
+
 
 
 	//scan funtion:
@@ -333,12 +330,8 @@ public:
 
 	UINT FlagSerialNumber;
 	void Treestatus();
-	
 	static	DWORD WINAPI Get_All_Dlg_Message(LPVOID lpVoid);
 	static	DWORD WINAPI Translate_My_Message(LPVOID lpVoid);
-	
-	tree_product  m_CurrentBuildingNode;
 };
-
 
 
