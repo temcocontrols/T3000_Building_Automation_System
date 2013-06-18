@@ -158,11 +158,20 @@ int modbus_read_multi_value(
 	g_bEnableRefreshTreeView = false;
 
 	int error=0;
+	CSingleLock singleLock(&register_critical_section);
+	singleLock.Lock() ;
 	for(int i=0;i<retry_times;i++)
 	{
 
 		// call the modbus DLL method
+		;
+
+		// call the modbus DLL method
 		error=read_multi(device_var,put_data_into_here,start_address,length);
+
+		// free the modbus communications for other threads
+	
+		
 
 		// increment the number of transmissions we have done
 		g_llTxCount++;
@@ -175,7 +184,7 @@ int modbus_read_multi_value(
 			break;
 		}
 	}
-
+	  	singleLock.Unlock();
 	// check for running in the main GUI thread
 	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
 

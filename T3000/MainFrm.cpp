@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "T3000.h"
-
+#include "Scanwaydlg.h"
 #include "MainFrm.h"
 #include "T3000Doc.h"
 #include "T3000TableView.h"
@@ -38,10 +38,12 @@
 #include "Dialog_Progess.h"
 
 #include "excel9.h"
+#include "ScanSelectDlg.h"
 
 //////////////////////////////
 #include "isp/CDialogISPTOOL.h"
 
+#include "IONameConfig.h"
 #pragma region Fance Test
 //For Test
 
@@ -179,6 +181,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 
 	//ON_COMMAND(ID_DATABASE_TEMCOPRODUCTS, &CMainFrame::OnDatabaseTemcoproducts)
 	//ON_COMMAND(ID_FILE_ISPTOOL, &CMainFrame::OnFileIsptool)
+	ON_COMMAND(ID_DATABASE_IONAMECONFIG, &CMainFrame::OnDatabaseIonameconfig)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -348,7 +351,10 @@ CMainFrame::~CMainFrame()
 		delete m_pScanner;
 		m_pScanner = NULL;
 	}
-
+	if (is_connect())
+	{
+		close_com(); // added by zgq:12-16-2011
+	}
 // 	if (m_pFreshMultiRegisters)
 // 	{
 // 		//delete m_pFreshMultiRegisters;
@@ -827,6 +833,8 @@ void CMainFrame::EnterConnectToANode()
 
 	BeginWaitCursor();
 	//CM5
+	g_bChamber=FALSE;
+	m_isCM5=FALSE;
 #if 1
 	for(UINT i=0;i<m_product.size();i++)
 	{
@@ -839,11 +847,13 @@ void CMainFrame::EnterConnectToANode()
 				m_isCM5=TRUE;
 				DoConnectToANode(hSelItem); 
 				//SwitchToPruductType(4);			
-			}else if (m_product.at(i).product_class_id == PM_MINIPANEL)
+			}
+			else if (m_product.at(i).product_class_id == PM_MINIPANEL)
 			{
 				g_tstat_id = m_product.at(i).product_id;
 				SwitchToPruductType(6);
-			}else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
+			}
+			else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
 			{
 				g_tstat_id = m_product.at(i).product_id;
 				SwitchToPruductType(5);
@@ -869,9 +879,16 @@ void CMainFrame::EnterConnectToANode()
 				}
 				SwitchToPruductType(8);
 			}
+			else if (m_product.at(i).product_class_id==PM_TSTAT6_HUM_Chamber)
+			{	g_bChamber=TRUE;
+				g_tstat_id = m_product.at(i).product_id;
+
+			    SwitchToPruductType(9);
+			}
 			else 
 			{
-				DoConnectToANode(hSelItem); 
+			            g_tstat_id = m_product.at(i).product_id;
+						DoConnectToANode(hSelItem); 
 			}
 
 		}
@@ -904,6 +921,7 @@ int nRet =read_one(g_tstat_id,6,1);
 
 	BeginWaitCursor();
 	//CM5
+	g_bChamber=FALSE;
 #if 1
 	for(UINT i=0;i<m_product.size();i++)
 	{
@@ -946,8 +964,16 @@ int nRet =read_one(g_tstat_id,6,1);
 				}
 				SwitchToPruductType(8);
 			}
+			else if (m_product.at(i).product_class_id==PM_TSTAT6_HUM_Chamber)
+			{	
+			
+			g_bChamber=TRUE;
+			g_tstat_id = m_product.at(i).product_id;
+
+			SwitchToPruductType(9);
+			}
 			else 
-			{
+			{   g_tstat_id = m_product.at(i).product_id;
 				DoConnectToANode(hSelItem); 
 			}
 				
@@ -1942,29 +1968,6 @@ void CMainFrame::OnScanDevice()
 	m_bScanALL=FALSE;
 	g_bPauseMultiRead=TRUE;
 
-	//////////////////////////////////////////////////////////////////////////
-	//// oldscan
-// 	CScanSelectDlg dlg;
-// 	if(dlg.DoModal()==IDOK)
-// 	{
-// 		this->m_strsubNetSelectedScan=dlg.m_strScanSubNetName;
-// 	}
-// 	else
-// 		return;
-// 	if(m_strsubNetSelectedScan.IsEmpty())
-// 		return;
-
-	/*
-	if(m_hCurCommunication!=NULL)	
-	{
-		CloseHandle(m_hCurCommunication);
-		m_hCurCommunication=NULL;
-
-	}
-	close_com();
-	*/
-
-
 	Scan_Product();
 	
 }
@@ -2255,7 +2258,19 @@ void CMainFrame::Scan_Product()
 		return;
 	}
 	*/
+	CString strTime;
+	strTime=Get_NowTime();
+	//开始时间
+	
+	CString strlog=_T("--------------------------------Scan Begin--------------------------------\n");
 
+	
+	WriteLogFile(strlog);
+	NET_WriteLogFile(strlog);
+	strlog=_T("Scan begin Time: ");
+	strlog+=strTime+_T("\n");;
+	WriteLogFile(strlog); 
+	NET_WriteLogFile(strlog);
 	if(m_pRs->State)
 	m_pRs->Close(); 
 	if(m_pCon->State)
@@ -2305,26 +2320,54 @@ void CMainFrame::Scan_Product()
 
 
 	//scan 自动com,tcp扫描，如果单一扫描则不会出现多扫（一个产品有两个标识出现）
-	if (strProtocol == strMB485)
-	{
+	//if (strProtocol == strMB485)
+	//{
+	//	CString strlog=_T("default will scan via 'modbus 485',\n do you also need 'modbus TCP'?\n");
+	//		  
+	////	WriteLogFile(strlog);
+	//	int ret = AfxMessageBox(_T("default will scan via 'modbus 485',\n do you also need 'modbus TCP'?"),MB_YESNOCANCEL ,3);
+	//	if ( ret == IDYES)
+	//	{	
+	CScanwaydlg dlg;
 
-		int ret = AfxMessageBox(_T("default will scan via 'modbus 485',\n do you also need 'modbus TCP'?"),MB_YESNOCANCEL ,3);
-		if ( ret == IDYES)
+	int ret =dlg.DoModal(); //AfxMessageBox(_T("YES: 'Quick Scan(Binary Search)' ,\n NO:'Deep Scan(One By One)'?"),MB_YESNOCANCEL ,3);
+	 	if ( ret == IDOK)
+	 	{
+			CScanSelectDlg dlg;
+			dlg.DoModal();
+			m_pScanner->ScanComOneByOneDevice();
+			m_pScanner->WaitScan();
+			m_pScanner->m_scantype=4;
+
+			
+		}
+		else if(ret==IDCANCEL)
 		{
 			m_pScanner->ScanAll();
 			m_pScanner->m_scantype = 3;
+		
+			
+
 		}
-		else if(ret == IDNO)
+		else
 		{
-		m_pScanner->ScanComDevice();
+			return;
+		}
+
+	/*	}
+		else if(ret == IDNO)
+		{	
+		WriteLogFile(_T("You choose the Modbus 485 to scan \n Only Scan Com Port in your computer..."));
+		
+		    m_pScanner->ScanComDevice();
 			m_pScanner->WaitScan();
 			m_pScanner->m_scantype = 1;
 		}else
 		{
 			return;
 		}
-	}
-	else
+	}*/
+	/*else
 	{
 
 		int ret1 = AfxMessageBox(_T("default will scan via 'modbus TCP',\n do you also need 'modbus 485'?"),MB_YESNOCANCEL,3); 
@@ -2343,7 +2386,7 @@ void CMainFrame::Scan_Product()
 			return;
 		}
 
-	}
+	}*/
 
 	m_pWaitScanDlg->DoModal();	
 
@@ -4045,7 +4088,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 				}else
 				{
-
+						//close_com();//关闭所有端口
 					int nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
 
 
@@ -4061,6 +4104,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						{
 							pDlg->ShowWindow(SW_HIDE);
 							delete pDlg;
+							pDlg=NULL;
 						}
 						return;
 					}else
@@ -4069,17 +4113,15 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					}
 				}
 			}
-			if(m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0&&m_hCurCommunication!=NULL)
-			{
-			}
+			 
 
 			m_strCurSubBuldingName=product_Node.BuildingInfo.strBuildingName;
 			BOOL bOnLine=FALSE;
 			UINT nSerialNumber=0;
 			if (g_CommunicationType==0)
 			{
-				m_nbaudrat=19200;
-				Change_BaudRate(19200);
+				m_nbaudrat=_wtoi(product_Node.BuildingInfo.strBaudRate);
+				Change_BaudRate(m_nbaudrat);
 				nID=read_one(g_tstat_id,6,5);
 				if(nID<0)		
 				{
@@ -4107,20 +4149,23 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						if(nSerialNumber==nSelectSerialNumber)
 							bOnLine=TRUE;
 					}
-				}else
+				}
+				else
 				{
 					// 					CString str;
 					// 					str.Format(_T("communication failure,error code:%d\nor select other com port to try"),nID);
 					// 					AfxMessageBox(str);
 					//Reset the COM or check to make sure the product is open
 					//	AfxMessageBox(_T("Detect the product model not corresponding\nSelect COM port,try again!"));//\nDatabase->Building config Database	
-					AfxMessageBox(_T("Detect the product model not corresponding\nReset the com port or check to make sure the product is open,and then try again!"));
+					AfxMessageBox(_T("Can't read your selected ID or you have changed the serial no of the device\n"));
 					if (pDlg !=NULL)
 					{
 						pDlg->ShowWindow(SW_HIDE);
 						delete pDlg;
+						pDlg=NULL;
 					}
-					return;
+					bOnLine=FALSE;
+					//return;
 				}
 			}
 			if (g_CommunicationType==1)
@@ -4146,15 +4191,17 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						if(nSerialNumber==nSelectSerialNumber)
 							bOnLine=TRUE;
 					}
-				}else
+				}
+				else
 				{
-					AfxMessageBox(_T("Detect the product model not corresponding\nSelect COM port,try again!"));//\nDatabase->Building config Database			
+					AfxMessageBox(_T("Can't read your selected ID or you have changed the serial no of the device"));//\nDatabase->Building config Database			
 					if (pDlg !=NULL)
 					{
 						pDlg->ShowWindow(SW_HIDE);
 						delete pDlg;
+						pDlg=NULL;
 					}
-					return;
+					//return;
 				}
 			}
 
@@ -4174,6 +4221,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				{
 					pDlg->ShowWindow(SW_HIDE);
 					delete pDlg;
+					pDlg=NULL;
 				}
 
 				return;
@@ -4248,7 +4296,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					//register_critical_section.Lock();
 					//int nStart = GetTickCount();
 					int itemp = 0;
-					itemp = Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64,3);
+					itemp = Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64,5);
 					if(itemp == -2)
 					{
 						continue;
@@ -4402,9 +4450,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 			GetIONanme();
 #endif
-			// 			strInfo.Format(_T("CMainFrame::DoConnectToANode():read_one(g_tstat_id,7,3)"));			
-			// 			SetPaneString(2, strInfo);
-		//	SwitchToPruductType(10);
 			nFlag = read_one(g_tstat_id,7,6);		
 			if(nFlag >65530)	//The return value is -1 -2 -3 -4
 			{
@@ -4414,10 +4459,11 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				{
 					pDlg->ShowWindow(SW_HIDE);
 					delete pDlg;
+					pDlg=NULL;
 				}
 				return;
 			}
-
+			 g_HumChamberThread=FALSE;
 			if(nFlag==PM_NC)	
 			{	
 				SwitchToPruductType(1);
@@ -4436,7 +4482,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			}
 			else if (nFlag==PM_TSTAT6_HUM_Chamber)
 			{
-
+				 g_HumChamberThread=TRUE;
 				SwitchToPruductType(9);
 			}
 			else if(nFlag == PM_CO2)
@@ -4670,12 +4716,14 @@ void CMainFrame::RefreshTreeView()
 			if (g_CommunicationType==0) // 通信类型 0
 			{	
 				// force baud rate to 19200
+			 
 				m_nbaudrat=19200;
 				Change_BaudRate(19200);
 
 				// read register offset 6
-				int error = modbus_read_one_value( nID,nIDNode,6,2);
-
+				
+				//int error = modbus_read_one_value( nID,nIDNode,6,5);
+							nID=read_one(nIDNode,6,5);
 				/* 
 				If an error was returned from the read,
 				we previously attempted to try again with a reduced baud rate.
@@ -4685,21 +4733,32 @@ void CMainFrame::RefreshTreeView()
 
 				Now we simply set the online flag to FALSE and give up.
 				*/
-
-				if( error ) {
+					if (nID<0)
+					{
+					m_nbaudrat=9600;
+					Change_BaudRate(9600);
+					nID=read_one(g_tstat_id,6,5);
+					if (nID<0)
+					{
+					Change_BaudRate(19200);
 					bOnLine=FALSE;
+					//continue;
+					}
+					} 
+					 
+				if( nID <0) {
+					bOnLine=FALSE;
+					
+				} 
 
-				} else {
-
+				else {
 					// successful read of register offset 6
-
 					unsigned short SerialNum[4];
 					memset(SerialNum,0,sizeof(SerialNum));
 					int nRet=0;//
-
 					// read first 4 registers 
-					nRet=modbus_read_multi_value(&SerialNum[0],nID,0,4,2); 
-
+				//	nRet=modbus_read_multi_value(&SerialNum[0],nID,0,4,5); 
+				 nRet=Read_Multi(nID,&SerialNum[0],0,4,5);
 					int nSerialNumberRead;
 
 					if(nRet>=0)  // 计算串口号
@@ -4793,7 +4852,7 @@ void CMainFrame::DoFreshAll()
 
 UINT _FreshTreeView(LPVOID pParam )
 {
-	Sleep(10000);
+	Sleep(30000);
 	CMainFrame* pMain = (CMainFrame*)pParam;
 	while(1)
 	{
@@ -5929,4 +5988,12 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 		Sleep(10);
 	}
 	return 0;
+}
+
+
+void CMainFrame::OnDatabaseIonameconfig()
+{
+	// TODO: Add your command handler code here
+	CIONameConfig ionameconfig;
+	ionameconfig.DoModal();
 }

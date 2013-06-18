@@ -102,7 +102,7 @@ public:
 	vector<CString> m_szComm;
 
 
-
+	BOOL m_Changed;
 	//////////////////////////////////////////////////////////////////////////
 	//	Added by zgq; 2010-11-29;
 	//  把按钮Exit和Save功能合并

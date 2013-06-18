@@ -19,14 +19,15 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-	DECLARE_MESSAGE_MAP()
+	
+	
 public:
 	
 	afx_msg void OnBnClickedOk();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedCancel();
 	void Fresh_Grid();
+	void Fresh_GridForTstat6();
 	DECLARE_EVENTSINK_MAP()
 	void ClickMsflexgrid1();
 public:
@@ -40,6 +41,7 @@ public:
 	CComboBox m_outAMCmbox;
 	CComboBox m_outRangCmbox;
 	CComboBox m_outFunCmbox;
+	  DECLARE_MESSAGE_MAP()
 	afx_msg void OnCbnKillfocusOvaluecombo();
 	afx_msg void OnCbnKillfocusOamcombo();
 	afx_msg void OnCbnSelchangeOvaluecombo();
@@ -67,4 +69,6 @@ public:
 	bool b_is_fresh; //When it is freshing ,can not be exit at this time.
 	static DWORD WINAPI StartRefresh(LPVOID lpVoid);
 	afx_msg void OnClose();
+	CEdit m_onoffset;
+	CEdit m_offonset;
 };

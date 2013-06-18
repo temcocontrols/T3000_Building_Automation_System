@@ -96,7 +96,13 @@ INPUT void closefile();//scan
 INPUT void writefile( CString strip,CString strport);//scan
 INPUT void Createfile();//scan
 
+INPUT void WriteLogFile(CString strlog);
+INPUT void CloseLogFile();
+INPUT CString Get_NowTime();
 
+
+INPUT void NET_WriteLogFile(CString strlog);
+INPUT void NET_CloseLogFile();
 //INPUT SOCKET GetSocketHandle();
 
 //#include "modbus.h"

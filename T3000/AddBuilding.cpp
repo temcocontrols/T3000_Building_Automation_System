@@ -53,6 +53,7 @@ CAddBuilding::CAddBuilding(CWnd* pParent /*=NULL*/)
 	m_nCurCol=-1;
 	pNCScanThread=NULL;
 	m_bRunningThread=FALSE;
+	m_Changed=FALSE;
 }
 
 CAddBuilding::~CAddBuilding()
@@ -837,7 +838,11 @@ void CAddBuilding::Update_Recorder()
 void CAddBuilding::OnBnClickedExit()
 {
 	// TODO: Add your control notification handler code here
-
+	   if (m_Changed)
+	   {
+		   CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		   ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
+	   }
 	CDialog::OnOK();
 }
 void CAddBuilding::OnBnClickedOk()
@@ -1008,8 +1013,7 @@ void CAddBuilding::PostNcDestroy()
 
 	::DeleteCriticalSection(&g_Lock);
 	Sleep(150);
-	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-	::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
+	
 
 	CDialog::PostNcDestroy();
 }
@@ -1922,4 +1926,7 @@ void CAddBuilding::OnBnClickedAddbuiding()
 		AfxMessageBox(e->ErrorMessage());
 	}
 	Update_Recorder();
+	m_Changed=TRUE;
+
+
 }
