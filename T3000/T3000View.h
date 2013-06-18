@@ -248,6 +248,8 @@ public:
 	//CSliderCtrl m_singlesliderday;
 	CMacSliderCtrl m_singlesliderday;
 	CMacSliderCtrl m_singleslidernight;
+	afx_msg void OnCbnSelchangeCombo7();
+	afx_msg void OnCbnSelchangeCombo4();
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

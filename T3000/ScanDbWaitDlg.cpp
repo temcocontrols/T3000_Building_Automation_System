@@ -82,8 +82,8 @@ void CScanDbWaitDlg::OnTimer(UINT_PTR nIDEvent)
 {
 		static int nCount = 0;
 	// TODO: Add your message handler code here and/or call default
-	//if(g_ScanSecurity)
-	if(0)
+		//if(g_ScanSecurity)
+		if(0)
 	{
 		SetWindowText(_T("Scaning..."));
 		if(g_ScnnedNum<=g_nEndID)

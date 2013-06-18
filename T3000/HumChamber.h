@@ -152,6 +152,8 @@ private:
 	int Minute;
 	
 	HANDLE hFirstThread;
+	CString m_recordhumchamber;
+	  CStdioFile*					m_chamberFile;
 	//CWinThread* hFirstThread;
 	//HANDLE hSecondThread;
 	public:

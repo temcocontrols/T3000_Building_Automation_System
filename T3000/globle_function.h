@@ -69,4 +69,7 @@ BOOL Post_Read_one_Thread_Message(
 	unsigned short address,
 	HWND Dlg_hwnd);
 
+
+
+
 #endif

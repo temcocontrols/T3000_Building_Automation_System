@@ -38,6 +38,8 @@ keymap_t	m_Keymap;
 cmdmap_t	m_Commandmap;
 public:
 BOOL UpdateDataToDB();
+bool CanInsertItem(HTREEITEM hItem);
+bool CanDeleteItem(HTREEITEM hItem);
 	virtual bool	CanEditLabel(HTREEITEM hItem);
 	afx_msg void OnBeginlabeledit(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult);

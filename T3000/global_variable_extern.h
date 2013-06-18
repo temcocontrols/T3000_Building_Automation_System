@@ -5,9 +5,9 @@ extern DWORD nThreadID;
 
 extern const bool WRITE_SUCCESS;
 extern const bool WRITE_FAIL ;
-
+extern	   bool g_HumChamberThread;
 extern bool g_register_occuppied ; //Add by Alex
-
+extern			  BOOL g_bChamber;
 //Fance_4
 extern unsigned short product_register_value[1024];
 extern int product_type ;
@@ -71,11 +71,12 @@ extern CString g_strTstat7;
 extern CString g_strOR485;
 extern CString g_strPressure;
 extern CString g_strLightingCtrl;
-
+ extern CString g_strHumChamber;
 
 extern int g_CommunicationType;
 extern int m_nbaudrat;
 extern CString showing_text;
+
 extern  CCriticalSection  critical_section;
 extern  CCriticalSection  register_critical_section;
 extern CEvent g_eventPauseMultiRead;
@@ -846,4 +847,5 @@ extern int MODBUS_WINDOW_HEATING_SETPOINT                      ;
 extern int MODBUS_WINDOW_COOLING_SETPOINT                      ;
 extern int MODBUS_RELAY_PWM_ENABLE                             ;
 extern int MODBUS_RELAY_PWM_TOTAL_DUTY                         ;
-extern int MODBUS_RELAY_PWM_HIGH_DUTY                          ;
+extern int MODBUS_RELAY_PWM_HIGH_DUTY                          ;   
+

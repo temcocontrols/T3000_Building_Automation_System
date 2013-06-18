@@ -16,7 +16,7 @@ unsigned short product_register_value[1024]={-1};
 int product_type = 0;
 int old_product_type = 0;
 
-
+bool g_HumChamberThread=FALSE;
 bool g_register_occuppied = false; //Add by Alex
 
 unsigned short cm5_register_value[512]; //CM5
@@ -28,7 +28,7 @@ int g_tstat_id=255;
 int g_serialNum=0;
 BOOL g_tstat_id_changed=FALSE;
 BOOL g_bPauseMultiRead=FALSE;
-
+BOOL g_bChamber=FALSE;
 
 CString g_strImagePathName=_T("");
 int now_tstat_id =0;//for batch load /flash.
@@ -62,12 +62,13 @@ CString g_strPressure;
 CString g_strOR485;
 CString g_strcm5;  //CM5
 CString g_strLightingCtrl;
-
+CString g_strHumChamber;
 int g_CommunicationType;
 int m_nbaudrat=19200;
 CString showing_text;
  CCriticalSection  critical_section;
  CCriticalSection  register_critical_section;
+
 CEvent g_eventPauseMultiRead;
 
 BOOL g_buser_log_in=FALSE;
@@ -121,7 +122,7 @@ int parameterSet = 0;//用于初始化SLIDER。
 
 //int g_nIpPort=6001;
 //CString	g_strIpAdress;
-int MDAY=0,MNIGHT=0;
+int MDAY=1,MNIGHT=1;
 int tstat6flex[12]={
 	30,
 	20,
@@ -1745,3 +1746,6 @@ int MODBUS_WINDOW_COOLING_SETPOINT                           =-1  ;//           
 int MODBUS_RELAY_PWM_ENABLE                                  =-1  ;//              -1                  542
 int MODBUS_RELAY_PWM_TOTAL_DUTY                              =-1  ;//              -1                  543
 int MODBUS_RELAY_PWM_HIGH_DUTY                               =-1  ;//              -1                  544
+
+
+

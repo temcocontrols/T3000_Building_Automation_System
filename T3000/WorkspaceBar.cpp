@@ -46,6 +46,8 @@ BEGIN_MESSAGE_MAP(CWorkspaceBar, CDockablePane)
 	//ON_NOTIFY(TVN_SELCHANGED,ID_SHELLTREE,OnKYDOWNClickTree)
 	ON_WM_NCHITTEST()
 	ON_WM_LBUTTONDOWN()
+//	ON_WM_RBUTTONDOWN()
+//ON_WM_CONTEXTMENU()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -439,7 +441,7 @@ return 0;   // 使得 dockable pane 无法拖动了。
 void CWorkspaceBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-
+	 
 	CDockablePane::OnLButtonDown(nFlags, point);
 }
 
@@ -480,4 +482,18 @@ void CWorkspaceBar::OnNMClickTree(NMHDR *pNMHDR, LRESULT *pResult)
 //{
 //	CMainFrame* pMainFrame= (CMainFrame*)AfxGetMainWnd();
 //	pMainFrame->OnHTreeItemKeyDownChanged(pNMHDR,pResult);
+//}
+
+
+//void CWorkspaceBar::OnRButtonDown(UINT nFlags, CPoint point)
+//{
+//	// TODO: Add your message handler code here and/or call default
+//	 AfxMessageBox(_T("RButtonDown"));
+//	CDockablePane::OnRButtonDown(nFlags, point);
+//}
+
+
+//void CWorkspaceBar::OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/)
+//{
+//	AfxMessageBox(_T("Menu"));
 //}
