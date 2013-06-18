@@ -373,33 +373,7 @@ bool string2digital(CString str,unsigned char & val ,bool & type )   // type fal
 		}
 	}
 	switch(SN)
-	{/*
-		case 0 :
-			val = 0 ;
-		break;
-		case 1 :
-			val = 1 ;
-		break;
-		case 2 :
-			val = 0 ;
-		break;
-		case 3 :
-			val = 3 ;
-		break;
-		case 4 :
-			val = 1 ;
-		break;
-
-		case 5:
-			val = 2 ;
-		break;
-		case 6:
-			val = 4 ;///bit 7 or 8 and defferent from others
-		break;
-
-		default:
-		break;
-		*/
+	{
 		case 0 :
 			val = 0 ;
 		break;

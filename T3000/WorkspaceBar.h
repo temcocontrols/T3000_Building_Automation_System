@@ -8,7 +8,7 @@
 // Microsoft Foundation Classes product.
 #pragma once
 #include "ImageTreeCtrl.h"
-#include "RenameDlg.h"
+//#include "RenameDlg.h"
 class CWorkspaceBar : public CDockablePane
 {
 public:
@@ -29,7 +29,7 @@ protected:
 public:
 	CImageTreeCtrl m_TreeCtrl;
 	//CTreeCtrl m_wndTree;
-	CRenameDlg m_renamedlg;
+	//CRenameDlg m_renamedlg;
 	// Operations
 public:
 	BOOL  UpdateDataToDB();
@@ -58,4 +58,6 @@ protected:
 public:
 	afx_msg LRESULT OnNcHitTest(CPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+//	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+//	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
 };

@@ -13,7 +13,7 @@ public:
 	CParameterDlg(CWnd* pParent = NULL,CString str=_T(""));   // standard constructor
 	virtual ~CParameterDlg();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = IDD_PARAMETERDIALOG };
 
 protected:
@@ -91,13 +91,13 @@ public:
 	afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT  ReadDataCallBack(WPARAM wParam, LPARAM lParam);
 	void Refresh();
-	 void Refresh6();
-	 void Reflesh_ParameterDlg();
+	void Refresh6();
+	void Reflesh_ParameterDlg();
 
 	void InitPID2ComboBox();
 	void  UpdateCoolingandHeatingData();
 public:
-//	unsigned short multi_register_value[513];
+	//	unsigned short multi_register_value[513];
 	CWinThread* pParamBackFresh;
 public:
 	CEdit m_idAdressEdit;
@@ -152,7 +152,7 @@ public:
 	CEdit m_HeadDEdt1;
 	CEdit m_HeadDEdt2;
 	CComboBox m_occupiedSetPointModeCmbox;
-
+	BOOL m_disable_hum,m_disable_CO2;
 	float m_version;
 	afx_msg void OnCbnSelchangeComboLcdscrn1();
 	afx_msg void OnCbnSelchangeComboLcdscrn2();
@@ -188,12 +188,13 @@ public:
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnEnKillfocusEditValuetraveltime();
 	afx_msg void OnEnKillfocusEditPid2offsetpoint();
-//	afx_msg void OnKillFocus(CWnd* pNewWnd);
+	//	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 
-	public:
-		CBrush m_brush;
-		afx_msg void OnTimer(UINT_PTR nIDEvent);
+public:
+	CBrush m_brush;
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
 	void Fresh_Single_UI();
+	//	afx_msg void OnEnChangeEdit34();
 };

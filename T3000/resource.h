@@ -2,7 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by T3000.rc
 //
-#define IDC_UPDATE                      1601
 #define IDD_ABOUTBOX                    100
 #define IDP_OLE_INIT_FAILED             100
 #define IDD_T3000_FORM                  101
@@ -148,6 +147,9 @@
 #define IDI_ICON_EXIT                   444
 #define IDD_DIALOG10                    446
 #define IDD_RENAME_DLG                  446
+#define IDR_T3000_DATABASE              447
+#define IDD_SCANWAY                     448
+#define IDD_IONAMECONFIG                449
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -258,6 +260,8 @@
 #define IDC_ECOOLINGPTERM1              1051
 #define IDC_HUM4                        1051
 #define IDC_TIME4                       1052
+#define IDC_COMBO7                      1052
+#define IDC_COMBO14                     1052
 #define IDC_TEMP_LEFT4                  1053
 #define IDC_TEMP5                       1054
 #define IDC_HUM5                        1055
@@ -936,6 +940,7 @@
 #define IDC_STATIC_1SP2SPN              1556
 #define IDC_EDIT_CSPN                   1557
 #define IDC_EDIT_CSPD                   1557
+#define IDC_STATIC_1SP2SPN2             1557
 #define IDC_EDIT_CSPNN                  1558
 #define IDC_EDIT_CSPWN                  1559
 #define IDC_EDIT_CDBDN                  1560
@@ -971,6 +976,7 @@
 #define IDC_REFRESH_ALL                 1598
 #define IDC_ID_CO2_EDIT                 1599
 #define IDC_SERIALNUM_CO2_EDIT          1600
+#define IDC_UPDATE                      1601
 #define IDC_FIRMWARV_CO2_EDIT           1601
 #define IDC_MODEL_CO2_EDIT              1602
 #define IDC_HARDWAREV_CO2_EDIT          1603
@@ -985,6 +991,10 @@
 #define IDC_MSFLEXGRID_CO2              1612
 #define IDC_FILTER                      1613
 #define IDC_NAME_EDIT                   1614
+#define IDC_COMBO12                     1615
+#define IDC_QUICK                       1620
+#define IDC_MSFLEXGRID_IOTABLE          1621
+#define IDC_NAMEEDIT                    1622
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1068,6 +1078,7 @@
 #define ID_SETMAP_SETTINGSAVE           32863
 #define ID_SETMAPPING_SAND              32864
 #define ID_FILE_ISPTOOL                 32865
+#define ID_DATABASE_IONAMECONFIG        32866
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
 
@@ -1075,9 +1086,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        447
-#define _APS_NEXT_COMMAND_VALUE         32866
-#define _APS_NEXT_CONTROL_VALUE         1615
+#define _APS_NEXT_RESOURCE_VALUE        451
+#define _APS_NEXT_COMMAND_VALUE         32867
+#define _APS_NEXT_CONTROL_VALUE         1623
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

@@ -131,6 +131,7 @@ public:
 	CString				g_strIpAdress;
 	vector<Building_info>	m_subNetLst;
 	vector<CString>			m_buildingLst;
+	 vector<CString> m_szComs;
      //vector <HTREEITEM> m_rootLst;//for every building name
 	//HTREEITEM treem[20];
 	vector <tree_floor>		m_floorLst;//for every building name
@@ -332,6 +333,7 @@ public:
 	void Treestatus();
 	static	DWORD WINAPI Get_All_Dlg_Message(LPVOID lpVoid);
 	static	DWORD WINAPI Translate_My_Message(LPVOID lpVoid);
+	afx_msg void OnDatabaseIonameconfig();
 };
 
 

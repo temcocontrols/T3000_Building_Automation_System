@@ -165,6 +165,9 @@ CString CTStat_Dev::GetProductName()
 	case  PM_CO2:
 		strProductName = "CO2";
 		break;
+	case PM_TSTAT6_HUM_Chamber:
+		strProductName =g_strHumChamber;
+		break;
 	default:
 		strProductName="TStat";
 		break;

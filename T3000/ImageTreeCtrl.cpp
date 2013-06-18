@@ -8,6 +8,25 @@
 
 
 // CImageTreeCtrl
+enum ECmdHandler {
+	ID_RENAME = 1,
+	ID_DELETE,
+	ID_ADD_SIBLING,
+	ID_ADD_CHILD,
+	ID_ADD_ROOT,
+	ID_SORT_LEVEL,
+	ID_SORT_LEVELANDBELOW,
+
+	ID_MAX_CMD
+};
+
+enum ERightDragHandler {
+	ID_DRAG_COPY = 15,
+	ID_DRAG_MOVE,
+	ID_DRAG_CANCEL,
+
+	ID_MAX_DRH
+};
 
 IMPLEMENT_DYNAMIC(CImageTreeCtrl, CTreeCtrl)
 CImageTreeCtrl::CImageTreeCtrl()
@@ -17,6 +36,21 @@ CImageTreeCtrl::CImageTreeCtrl()
 	m_nRoomItemData = 2000;
 	m_nDeviceItemData = 3000;
 	m_Keymap[VK_F2][false][false] = &CImageTreeCtrl::DoEditLabel;
+
+	//m_Keymap[VK_INSERT][true ][false] = &CImageTreeCtrl::DoInsertChild;
+	//m_Keymap[VK_INSERT][false][true ] = &CImageTreeCtrl::DoInsertRoot;
+	//m_Keymap[VK_INSERT][false][false] = &CImageTreeCtrl::DoInsertSibling;
+	//m_Keymap[VK_DELETE][false][false] = &CImageTreeCtrl::DoDeleteItem;
+	//m_Keymap['S'      ][true ][false] = &CImageTreeCtrl::DoSortCurrentLevel;
+	//m_Keymap['S'      ][true ][true ] = &CImageTreeCtrl::DoSortCurrentLevelAndBelow;
+
+	m_Commandmap[ID_RENAME]		        = &CImageTreeCtrl::DoEditLabel;
+	//m_Commandmap[ID_ADD_CHILD]          = &CImageTreeCtrl::DoInsertChild;
+	//m_Commandmap[ID_ADD_ROOT]           = &CImageTreeCtrl::DoInsertRoot;
+	//m_Commandmap[ID_ADD_SIBLING]        = &CImageTreeCtrl::DoInsertSibling;
+	//m_Commandmap[ID_DELETE]             = &CImageTreeCtrl::DoDeleteItem;
+	//m_Commandmap[ID_SORT_LEVEL]         = &CImageTreeCtrl::DoSortCurrentLevel;
+	//m_Commandmap[ID_SORT_LEVELANDBELOW] = &CImageTreeCtrl::DoSortCurrentLevelAndBelow;
 }
 
 CImageTreeCtrl::~CImageTreeCtrl()
@@ -319,11 +353,11 @@ void CImageTreeCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 }
 bool CImageTreeCtrl::CanEditLabel(HTREEITEM hItem) {
-	TRACE1(_T("CEditTreeCtrl::CanEditLabel('%s')\n"), LPCTSTR(GetItemText(hItem)));
+	//TRACE1(_T("CEditTreeCtrl::CanEditLabel('%s')\n"), LPCTSTR(GetItemText(hItem)));
 	return true;
 }
 bool CImageTreeCtrl::CanSetLabelText(TVITEM & item) {
-	TRACE1(_T("CEditTreeCtrl::CanSetLabelText('%s')\n"), item.pszText);
+	//TRACE1(_T("CEditTreeCtrl::CanSetLabelText('%s')\n"), item.pszText);
 	m_name_new=item.pszText;
 	return true;
 }
@@ -681,23 +715,66 @@ int CImageTreeCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	return 0;
 }
-
+bool CImageTreeCtrl::CanInsertItem(HTREEITEM hItem) {
+	TRACE(_T("CEditTreeCtrl::CanInsertItem('%s')\n"), (hItem && hItem != TVI_ROOT) ? LPCTSTR(GetItemText(hItem)) : _T("<Root>"));
+	return true;
+}
 void CImageTreeCtrl::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
 {
 	// TODO: Add your message handler code here
 
 	
+	CPoint pt(point);
+	ScreenToClient(&pt);
+	UINT flags;
+	HTREEITEM hItem = HitTest(pt, &flags);
+	bool bOnItem = (flags & TVHT_ONITEM) != 0;
+
+	CMenu add;
+	VERIFY(add.CreatePopupMenu());
+	if(bOnItem) {
+		if(CanInsertItem(GetParentItem(hItem)))
+			VERIFY(add.AppendMenu(MF_STRING, ID_ADD_SIBLING, _T("New Sibling\tINS")));
+		if(CanInsertItem(hItem))
+			VERIFY(add.AppendMenu(MF_STRING, ID_ADD_CHILD, _T("New Child Item\tCtrl+INS")));
+	}
+	if(CanInsertItem(0))
+		VERIFY(add.AppendMenu(MF_STRING, ID_ADD_ROOT, _T("New Root Item\tShift+INS")));
+
+	CMenu sort;
+	VERIFY(sort.CreatePopupMenu());
+	VERIFY(sort.AppendMenu(MF_STRING, ID_SORT_LEVEL, _T("Current Level\tCtrl+S")));
+	VERIFY(sort.AppendMenu(MF_STRING, ID_SORT_LEVELANDBELOW, _T("Current Level And Below\tCtrl+Shift+S")));
+
 	CMenu menu;
-	menu.LoadMenu(IDR_BUILDINGPOPMENU);
-	CMenu *pmenu=menu.GetSubMenu(0);	
-//		ClientToScreen(&point);
-//		ScreenToClient(&point);
-	pmenu->TrackPopupMenu(TPM_LEFTBUTTON | TPM_LEFTALIGN ,point.x,point.y,this);
+	VERIFY(menu.CreatePopupMenu());
+	if(bOnItem) {
+		if(CanEditLabel(hItem))
+			VERIFY(menu.AppendMenu(MF_STRING, ID_RENAME, _T("Rename\tF2")));
+		if(CanDeleteItem(hItem))
+			VERIFY(menu.AppendMenu(MF_STRING, ID_DELETE, _T("Delete\tDEL")));
+	}
+	if(add.GetMenuItemCount() > 0)
+		VERIFY(menu.AppendMenu(MF_POPUP, UINT(add.GetSafeHmenu()), _T("Add")));
+	if(bOnItem) {
+		if(menu.GetMenuItemCount() > 0)
+			VERIFY(menu.AppendMenu(MF_SEPARATOR));
+		VERIFY(menu.AppendMenu(MF_POPUP, UINT(sort.GetSafeHmenu()), _T("Sort")));
+	}
+
+	
+
+	// maybe the menu is empty...
+	if(menu.GetMenuItemCount() > 0)
+		menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
 	
 
 }
 
-
+bool CImageTreeCtrl::CanDeleteItem(HTREEITEM hItem) {
+	TRACE(_T("CEditTreeCtrl::CanDeleteItem('%s')\n"), LPCTSTR(GetItemText(hItem)));
+	return true;
+}
 HTREEITEM CImageTreeCtrl::InsertSubnetItem(LPTVINSERTSTRUCT lpInsertStruct)
 {
 	HTREEITEM hti = InsertItem(lpInsertStruct);

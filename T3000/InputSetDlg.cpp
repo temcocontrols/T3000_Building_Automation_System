@@ -1083,65 +1083,6 @@ void CInputSetDlg::OnCbnKillfocusAmcombo()
 	m_AmCombox.ShowWindow(SW_HIDE);
 }
 
-//void CInputSetDlg::OnCbnSelchangeAmcombo()
-//{
-//	if (m_nModel == 16 || m_nModel == PM_TSTAT6 )
-//	{
-//		OnCbnSelchangeAmcomboFor5E();
-//		return;
-//	}
-//	
-//	
-//	int n=0;
-//	n=multi_register_value[309];
-//	int i;
-//	int nchange;
-//	if(m_nCurRow==2&&m_nCurCol==AM_FIELD)//input 1
-//	{
-//		if(m_AmCombox.GetCurSel()==1)
-//		{
-//			i=1;
-//			nchange=n|i;	
-//		}
-//		else
-//		{
-//			i=0xfe;
-//			nchange=n & 0xfe;
-//		}
-//	}
-//	if(m_nCurRow==3&&m_nCurCol==AM_FIELD)//input 2
-//	{
-//		if(m_AmCombox.GetCurSel()==1)
-//		{
-//			i=2;
-//			nchange=n|i;	
-//		}
-//		else
-//		{
-//			i=0xfd;
-//			nchange=n & i;
-//		}
-//	}
-//	if(m_nCurRow==4&&m_nCurCol==AM_FIELD)//input 3
-//	{
-//
-//		if(m_AmCombox.GetCurSel()==1)
-//		{
-//			i=4;
-//			nchange=n|i;	
-//		}
-//		else
-//		{
-//			i=0xfb;
-//			nchange=n & i;
-//		}
-//
-//	}
-//	if(nchange<0)
-//		return;
-//	write_one(g_tstat_id,309,nchange);
-//	Fresh_Grid();
-//}
 void CInputSetDlg::add_analog_rang(int i)
 {
 
@@ -1192,105 +1133,6 @@ void CInputSetDlg::OnCbnSelchangeInputfuncombo()
 	Fresh_Grid();
 
 }
-
-//void CInputSetDlg::OnCbnSelchangeInputfuncombo()
-//{
-////	298	167	1	Low byte	W/R	Analog input1 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-////	299	168	1	Low byte	W/R	Analog input2 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-////	300	169	1	Low byte	W/R	(future)Analog input3 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-////	301	170	1	Low byte	W/R	(future)Analog input4 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-////	302	171	1	Low byte	W/R	(future)Analog input5 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-////	303	172	1	Low byte	W/R	(future)Analog input6 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-////	304	173	1	Low byte	W/R	(future)Analog input7 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-////	305	174	1	Low byte	W/R	(future)Analog input8 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-//
-//
-//
-//	if (newtstat6[7] ==6)
-//	{
-//		if(m_nCurRow==2&&m_nCurCol==FUN_FIELD)
-//		{
-//			int nchange=0;
-//			nchange=m_inputFinCombox.GetCurSel();
-//			write_one(g_tstat_id,167,nchange);
-//			newtstat6[167] = nchange;
-//		}
-//		if(m_nCurRow==3&&m_nCurCol==FUN_FIELD)
-//		{
-//			int nchange=0;
-//			nchange=m_inputFinCombox.GetCurSel();
-//			write_one(g_tstat_id,168,nchange);
-//			newtstat6[168] = nchange;
-//		}
-//		if(m_nCurRow==4&&m_nCurCol==FUN_FIELD)
-//		{
-//			int nchange=0;
-//			nchange=m_inputFinCombox.GetCurSel();
-//			write_one(g_tstat_id,169,nchange);
-//			newtstat6[169] = nchange;
-//		}
-//
-//		if(m_nCurRow==5&&m_nCurCol==FUN_FIELD)
-//		{
-//			int nchange=0;
-//			nchange=m_inputFinCombox.GetCurSel();
-//			write_one(g_tstat_id,170,nchange);
-//			newtstat6[170] = nchange;
-//		}
-//		if(m_nCurRow==6&&m_nCurCol==FUN_FIELD)
-//		{
-//			int nchange=0;
-//			nchange=m_inputFinCombox.GetCurSel();
-//			write_one(g_tstat_id,171,nchange);
-//			newtstat6[171] = nchange;
-//		}
-//		if(m_nCurRow==7&&m_nCurCol==FUN_FIELD)
-//		{
-//			int nchange=0;
-//			nchange=m_inputFinCombox.GetCurSel();
-//			write_one(g_tstat_id,172,nchange);
-//			newtstat6[172] = nchange;
-//		}
-//
-//		if(m_nCurRow==8&&m_nCurCol==FUN_FIELD)
-//		{
-//			int nchange=0;
-//			nchange=m_inputFinCombox.GetCurSel();
-//			write_one(g_tstat_id,173,nchange);
-//			newtstat6[173] = nchange;
-//		}
-//		if(m_nCurRow==9&&m_nCurCol==FUN_FIELD)
-//		{
-//			int nchange=0;
-//			nchange=m_inputFinCombox.GetCurSel();
-//			write_one(g_tstat_id,174,nchange);
-//			newtstat6[174] = nchange;
-//		}
-//	}else
-//	{
-//		if(m_nCurRow==2&&m_nCurCol==FUN_FIELD)
-//		{
-//			int nchange=0;
-//			nchange=m_inputFinCombox.GetCurSel();
-//			write_one(g_tstat_id,298,nchange);
-//		}
-//		if(m_nCurRow==3&&m_nCurCol==FUN_FIELD)
-//		{
-//			int nchange=0;
-//			nchange=m_inputFinCombox.GetCurSel();
-//			write_one(g_tstat_id,299,nchange);
-//		}
-//		if(m_nCurRow==4&&m_nCurCol==FUN_FIELD)
-//		{
-//			int nchange=0;
-//			nchange=m_inputFinCombox.GetCurSel();
-//			write_one(g_tstat_id,300,nchange);
-//		}
-//	}
-//
-//	Fresh_Grid();
-//
-//}
 
 void CInputSetDlg::OnCbnKillfocusInputfuncombo()
 {
@@ -1731,7 +1573,7 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
  
 void CInputSetDlg::InitGridtstat6()
    {
-	   if((product_register_value[20]&2)==2)
+	  /* if((product_register_value[20]&2)==2)
 	   {m_disable_hum=TRUE;}
 	   else
 	   {
@@ -1742,7 +1584,7 @@ void CInputSetDlg::InitGridtstat6()
 	   else
 	   {
 		   m_disable_CO2=FALSE;
-	   }
+	   }*/
 
 	   m_FlexGrid.put_TextMatrix(1,NAME_FIELD,g_strSensorName);
 	   m_FlexGrid.put_TextMatrix(2,NAME_FIELD,g_strInName1);
@@ -2004,14 +1846,8 @@ void CInputSetDlg::InitGridtstat6()
 					 CString temp;
 			   for (int i=1;i<=8;i++)
 			   {
-				   if (!m_disable_hum)
-				   {
-					   m_FlexGrid.put_Col(i);
-					   m_FlexGrid.put_Row(10);
-					   m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
-				   }
-				   else
-				   {
+				  
+				  
 
 					   if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
 					   {
@@ -2028,15 +1864,7 @@ void CInputSetDlg::InitGridtstat6()
 					   
 
 					   m_FlexGrid.put_TextMatrix(10,VALUE_FIELD,temp);
-				   }
-				   if (!m_disable_CO2)
-				   {
-					   m_FlexGrid.put_Col(i);
-					   m_FlexGrid.put_Row(11);
-					   m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
-				   }
-				   else
-				   {
+				 
 					   if (product_register_value[607]==0)
 					   {
 						   m_FlexGrid.put_TextMatrix(11,AM_FIELD,strAuto);
@@ -2049,7 +1877,7 @@ void CInputSetDlg::InitGridtstat6()
 						   temp.Format(_T("%d"),product_register_value[608]);
 						   m_FlexGrid.put_TextMatrix(11,VALUE_FIELD,temp);
 					   }
-				   }
+				 
 			   }
 			  
 
@@ -2381,7 +2209,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 // 	{
 // 		return;
 // 	}
-	if (((nRow == 1)||((nRow==10)&&!m_disable_hum)||((nRow==11)&&!m_disable_CO2)) && (nCol == VALUE_FIELD  || nCol == FUN_FIELD || nCol == AM_FIELD || nCol == CAL_FIELD))
+	if (nRow == 1 && (nCol == VALUE_FIELD  || nCol == FUN_FIELD || nCol == AM_FIELD || nCol == CAL_FIELD))
 	{
 		return;
 	}
@@ -2409,7 +2237,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 	{
 		//309	141	2	Full	W/R	Input auto/ manual enable.
 		int nValue;// = multi_register_value[309];
-		if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 		{
 			nValue = multi_register_value[141];
 		}else
@@ -2470,8 +2298,8 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 
 		//309	141	2	Full	W/R	Input auto/ manual enable.
 		BYTE nValue;// =BYTE(multi_register_value[309]);
-		//if (newtstat6[7] == 6)
-		if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+	
+		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 		{
 			nValue=BYTE(multi_register_value[141]);
 		}else
@@ -2527,10 +2355,10 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 			//359	122	1	Low byte	W/R	ANALOG INPUT1 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
 
 			int nRange;// = multi_register_value[359+nRow-2];
-			//if (newtstat6[7] == 6)
-			if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+			
+			if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 			{
-				nRange= newtstat6[122+nRow-2];
+				nRange= product_register_value[122+nRow-2];
 			}else
 			{
 				nRange = multi_register_value[359+nRow-2];
@@ -2548,10 +2376,10 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 			{
 				////309	141	2	Full	W/R	Input auto/ manual enable.
 				BYTE nValue;// =BYTE(multi_register_value[309]);
-				//if (newtstat6[7] == 6)
-				if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+			
+				if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 				{
-					nValue =BYTE(newtstat6[141]);
+					nValue =BYTE(product_register_value[141]);
 
 				}else
 				{
@@ -2577,7 +2405,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 	if(nCol==FILTER)
 	{
 
-		if ((nRow== 1)||((nRow==10)&&(!m_disable_hum))||((nRow==11)&&(!m_disable_CO2)))
+		if ((nRow== 1)||((nRow==10))||((nRow==11)))
 			return;
 
 		CString strValue = m_FlexGrid.get_TextMatrix(nRow,nCol);
@@ -2613,10 +2441,10 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 			//121	104	1	Low byte	W/R(Reboot after write)	DEGC_OR_F, engineering units, Deg C = 0, Deg F = 1
 
 			int nValue;// = multi_register_value[121];//tatat6 :104
-			//if (newtstat6[7] == 6)
-			if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+			
+			if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 			{
-				nValue = newtstat6[104];
+				nValue = product_register_value[104];
 			}else
 			{
 				nValue = multi_register_value[121];
@@ -2630,10 +2458,10 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 			//359	122	1	Low byte	W/R	ANALOG INPUT1 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
 			//121	104	1	Low byte	W/R(Reboot after write)	DEGC_OR_F, engineering units, Deg C = 0, Deg F = 1
 			int nValue;// = multi_register_value[359+nRow-2];
-			if (newtstat6[7] ==6)
+			if (product_register_value[7] ==6)
 			{
-				nValue = newtstat6[122+nRow-2];
-				if(newtstat6[104]==0)
+				nValue = product_register_value[122+nRow-2];
+				if(product_register_value[104]==0)
 				{
 					for(int i=0;i<ANALOG_RANG_NUMBER;i++)
 					{
@@ -2641,7 +2469,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 					}	
 					strTemp = analog_range_0[nValue];
 				}
-				if(newtstat6[104]==1)
+				if(product_register_value[104]==1)
 				{
 					for(int i=0;i<ANALOG_RANG_NUMBER;i++)
 					{
@@ -2689,10 +2517,10 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 		//298	167	1	Low byte	W/R	Analog input1 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
 
 		int nValue;//=multi_register_value[298+nRow-2];
-		//if (newtstat6[7] == 6)
-		if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+
+		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 		{
-			nValue=newtstat6[167+nRow-2];
+			nValue=product_register_value[167+nRow-2];
 		}else
 		{
 			nValue=multi_register_value[298+nRow-2];
@@ -2752,30 +2580,7 @@ void CInputSetDlg::OnCbnSelchangeRangComboFor5E()
 
 
 
-	//5e 的寄存器 还和 6的不一样，也与5abcd的不一样，这里好像错了。;
-	//Annul by Fance  2013 04 01
-	//-----------------------------------------------------------------------------
-	//if(m_nCurRow >= 2 && m_nCurCol==RANG_FIELD)
-	//{
-	//	int nindext=m_RangCombox.GetCurSel();
-	//	//if ((multi_register_value[7] == 6)||(multi_register_value[7] == 7))//tstat6
-	//	if (product_register_value[MODBUS_PRODUCT_MODEL] == 7)//tstat6
-	//	{
-	//		write_one(g_tstat_id,359+m_nCurRow-2,nindext);	//359
-	//		multi_register_value[359+m_nCurRow-2] = nindext;
-	//	}//else if (newtstat6[7] == PM_TSTAT6)
-	//	else if (newtstat6[7] == PM_TSTAT6)
-	//	{
-	//		write_one(g_tstat_id,122+m_nCurRow-2,nindext);
-	//		multi_register_value[359+m_nCurRow-2] = nindext;
-	//		newtstat6[122+m_nCurRow-2] = nindext;
 
-	//	}else
-	//		write_one(g_tstat_id,359+m_nCurRow-2,nindext);
-	//}
-	//--------------------------------------------------------------------------------
-
-	//Recode by Fance,need to check!!
 	if(m_nCurRow >= 2 && m_nCurCol==RANG_FIELD)
 	{
 		int nindext=m_RangCombox.GetCurSel();
@@ -2821,46 +2626,6 @@ void CInputSetDlg::OnBnClickedUpbuttonFor5E()
 	Fresh_Grid();
 }
 
-//Annul by Fance ,recode it.2013/04/01
-//void CInputSetDlg::OnBnClickedUpbuttonFor5E()
-//{
-//	//if (newtstat6[7] == 6)
-//	if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
-//	{
-//		//101	121	2	Full	W/R
-//
-//		if(m_nCurRow==1&&m_nCurCol==CAL_FIELD)
-//		{
-//			int nValue=newtstat6[121]+1;
-//			write_one(g_tstat_id,121,nValue);
-//			newtstat6[121] = nValue;
-//		}
-//		else//(m_nCurRow==2&& m_nCurCol==CAL_FIELD)
-//		{
-//			//367	131	2	Full	W/R	Analog input1 value
-//
-//			int nAddr =131+m_nCurRow-2;
-//			write_one(g_tstat_id, nAddr, newtstat6[nAddr]+1);
-//			newtstat6[nAddr] = newtstat6[nAddr]+1;
-//		}
-//	}else
-//	{
-//		if(m_nCurRow==1&&m_nCurCol==CAL_FIELD)
-//		{
-//			int nValue=multi_register_value[101]+1;
-//			write_one(g_tstat_id,101,nValue);
-//		}
-//		else//(m_nCurRow==2&& m_nCurCol==CAL_FIELD)
-//		{
-//			int nAddr =367+m_nCurRow-2;
-//			write_one(g_tstat_id, nAddr, multi_register_value[nAddr]+1);
-//		}
-//	}
-//
-//
-//	Fresh_Grid();
-//}
-
 
 void CInputSetDlg::OnBnClickedDownbuttonFor5E()
 {
@@ -2878,46 +2643,7 @@ void CInputSetDlg::OnBnClickedDownbuttonFor5E()
 		}
 	Fresh_Grid();
 }
-//recode by Fance 20130401
-//void CInputSetDlg::OnBnClickedDownbuttonFor5E()
-//{
-//	//if (newtstat6[7] == 6)
-//	if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
-//	{
-//		if(m_nCurRow==1&&m_nCurCol==CAL_FIELD)
-//		{
-//			int nValue=multi_register_value[121]-1;
-//			write_one(g_tstat_id,121,nValue);
-//			newtstat6[121] = nValue;
-//		}
-//		else//(m_nCurRow==2&& m_nCurCol==CAL_FIELD)
-//		{
-//			int nAddr =131+m_nCurRow-2;
-//			write_one(g_tstat_id, nAddr, newtstat6[nAddr]-1);
-//			newtstat6[131] = newtstat6[nAddr]-1;
-//		}
-//	}else
-//	{
-//		if(m_nCurRow==1&&m_nCurCol==CAL_FIELD)
-//		{
-//			int nValue=multi_register_value[101]-1;
-//			write_one(g_tstat_id,101,nValue);
-//		}
-//		else//(m_nCurRow==2&& m_nCurCol==CAL_FIELD)
-//		{
-//			int nAddr =367+m_nCurRow-2;
-//			write_one(g_tstat_id, nAddr, multi_register_value[nAddr]-1);
-//		}
-//	}
-//
-//
-//	Fresh_Grid();
-//}
 
-
-//Recode by Fance ,TSTATS5E and 6 can merge into one , but tstat ABCD is hard to merge into this function. there are too many different with
-// 5E and 6
-//void CInputSetDlg::OnCbnSelchangeAmcomboFor5E()
 void CInputSetDlg::OnCbnSelchangeAmcombo()
 {
 	
