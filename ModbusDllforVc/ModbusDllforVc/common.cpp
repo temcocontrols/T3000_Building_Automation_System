@@ -33,14 +33,10 @@ const CString g_strLogFile = _T("C:\\T3000Scan_log.txt");
 CStdioFile* g_fileScanLog = NULL;
 #endif
 
-
-
-
 OUTPUT void SetCommunicationType(int nType)
 {
 	g_Commu_type=nType;
 }
-
 
 /*
 OUTPUT bool open_com(TS_UC m_com)
@@ -205,7 +201,6 @@ OUTPUT void close_com()
 	}
 	
 }
-
 
 OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 {
@@ -626,6 +621,7 @@ OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
 	//the warning not all control paths return a value will be disappeared.
 	return the_return_value;
 }
+
 OUTPUT bool Change_BaudRate(TS_US new_baudrate)
 {
 
@@ -786,6 +782,7 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
 // 表现为对串口操作正常，但是没有通信数据。
 // 2，串口打开失败或工作不正常（USB串口拔出，占用等等）。
 // 表现为无法操作串口。
+
 OUTPUT bool is_connect()
 {
 	if (g_Commu_type==0)
@@ -805,12 +802,14 @@ OUTPUT bool is_connect()
 	return false; //add by Fance
 }
 //device_var:priduct ID,address:a regster;
-OUTPUT int Read_One(TS_UC device_var,TS_US address)
+OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
 {
 
 //	CSingleLock singlock(&scan_mutex);
 //	singlock.Lock();
 	int nTemp=-1;
+
+	//MessageBoxW(NULL, L"MB", L"MB", MB_OK);
 	if(g_Commu_type==0)//serial
 	{
 		//address        the register
@@ -1092,7 +1091,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
 //	singlock.Unlock();
 }
 
-OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
+OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
 {
 	if (g_Commu_type==0)
 	{
@@ -1455,7 +1454,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
 	///////////////////////////////////////////////////////////
 }
 
-OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length)
+OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length)
 {
 	if(g_Commu_type==0)
 	{
@@ -1663,7 +1662,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 	return -1;
 }
 
-OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
+OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 {	
 	if(g_Commu_type==0)//
 	{
@@ -2083,9 +2082,6 @@ OUTPUT int NetController_CheckTstatOnline(TS_UC devLo,TS_UC devHi)
 	return -1;
 }
 
-
-
-
 OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 {
 	if(g_Commu_type==0)
@@ -2348,7 +2344,6 @@ OUTPUT int NetController_CheckTstatOnline2(TS_UC devLo,TS_UC devHi)
 	}
 	return -1;
 }
-
 ///also return the serial communication handle;
 OUTPUT HANDLE GetCommunicationHandle()
 {
@@ -2366,10 +2361,12 @@ OUTPUT HANDLE GetCommunicationHandle()
 
 	return NULL;
 }
+
 OUTPUT BOOL bTCPDisconnected()
 {
 	return TRUE;
 }
+
 OUTPUT void SetComnicationHandle(int nType,HANDLE hCommunication)
 {
 	close_com();
@@ -2383,7 +2380,6 @@ OUTPUT void SetComnicationHandle(int nType,HANDLE hCommunication)
 	}
 
 }
-
 
 OUTPUT bool open_com(int m_com)
 {	
@@ -2481,8 +2477,6 @@ OUTPUT bool open_com(int m_com)
 
 	return true;
 }
-
-
 
 OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
 {
@@ -2770,7 +2764,6 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
 	return -1;
 //	singlock.Unlock();
 }
-
 
 OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
 {
@@ -3135,7 +3128,6 @@ OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US val, bool bComm_Type)
 	///////////////////////////////////////////////////////////
 }
 
-
 OUTPUT int NetController_CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 {
 	if(bComm_Type==0)
@@ -3253,9 +3245,6 @@ OUTPUT int NetController_CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_
 
 	return -1;
 }
-
-
-
 
 OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 {
@@ -3723,7 +3712,6 @@ OUTPUT int read_multi2(TS_UC device_var,TS_US *put_data_into_here,TS_US start_ad
 	}
 	return -1;
 }
-
 
 OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 {
@@ -4292,7 +4280,6 @@ OUTPUT void closefile()
 		m_pFile->Close();
 		delete m_pFile;
 }
-
 
 OUTPUT void writefile( CString strip,CString strport )
 {

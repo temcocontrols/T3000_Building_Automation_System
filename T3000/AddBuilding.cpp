@@ -629,6 +629,7 @@ void CAddBuilding::ReloadAddBuildingDB()
 void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 {
 #if 1
+		MessageBox(L"Hi");
 		CString strText;
 		m_AddBuiding_SetEditCtrl.GetWindowText(strText);
 		m_strMainBuildingName = m_AddBuiding_FlexGrid.get_TextMatrix(m_nCurRow, AB_MAINNAME);
@@ -1923,3 +1924,5 @@ void CAddBuilding::OnBnClickedAddbuiding()
 	}
 	Update_Recorder();
 }
+
+

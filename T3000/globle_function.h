@@ -12,13 +12,19 @@ int modbus_read_one_value(
 				unsigned short address, 
 				int retry_times );
 
+int modbus_read_multi_value( 
+		unsigned short *put_data_into_here,
+		unsigned char device_var,
+		unsigned short start_address,
+		int length,
+		int retry_times );
+
 int read_one(unsigned char device_var,unsigned short address,int retry_times=3);
 int write_one(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times=3);
 int write_one_org(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
-int Read_Multi_org(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times=3);
 
 int turn_hex_str_to_ten_num(char *str);
 bool turn_hex_file_line_to_unsigned_char(char *str);
@@ -44,7 +50,19 @@ CString get_product_name_by_product_model(int product_model);
 CString GetTempUnit(int nRange=-1,int nPIDNO = 0);
 CString get_product_class_name_by_model_ID(int nModelID);
 
-
+extern int Read_One(unsigned char device_var,unsigned short address);
+extern int Write_One(unsigned char device_var, unsigned short address, unsigned short val);
+extern int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+extern int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 
 BOOL GetSerialComPortNumber1(vector<CString>& szComm);
+
+BOOL Post_Thread_Message(UINT MsgType,
+	unsigned char device_id,
+	unsigned short address,
+	short new_value,
+	short old_value,
+	HWND Dlg_hwnd,
+	UINT CTRL_ID,
+	CString Changed_Name);
 #endif

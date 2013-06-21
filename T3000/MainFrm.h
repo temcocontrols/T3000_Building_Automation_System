@@ -21,6 +21,9 @@
 #include "MiniPanel/DialgMiniPanel.h" //Mini Panel
 #include "AirQuality/AirQuality.h"//AirQuality
 
+#include "MBP.h"
+#include "MbPoll.h"
+
 #define NUMVIEWS 10
 
 
@@ -103,6 +106,11 @@ class CScanDbWaitDlg;
 class CMainFrame : public CFrameWndEx
 {
 	
+private:
+	CMbp* m_pDlg;
+	BOOL m_bDialogOpen;
+	LONG OnDlgClose(UINT wParam, LONG lParam);
+
 protected: // create from serialization only
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
@@ -215,6 +223,7 @@ protected:
 
 public:
 	
+	void OnMBP();
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();
 	void OnLoadConfigFile();
@@ -331,6 +340,14 @@ public:
 
 	UINT FlagSerialNumber;
 	void Treestatus();
+	static	DWORD WINAPI Get_All_Dlg_Message(LPVOID lpVoid);
+	static	DWORD WINAPI Translate_My_Message(LPVOID lpVoid);
+
+	afx_msg void OnDatabaseMbpoll();
+	CMbPoll* mbPoll;
+	bool mbPollDlgOpen;
+protected:
+	afx_msg LRESULT OnMbpollClosed(WPARAM wParam, LPARAM lParam);
 };
 
 

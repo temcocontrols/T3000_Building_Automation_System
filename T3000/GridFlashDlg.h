@@ -54,6 +54,7 @@ public:
 	CWinThread* pThread_flash;
 
 private:
+
 	CString m_strHexFile;
 	int row_row;
 	int row_col;

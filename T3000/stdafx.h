@@ -65,10 +65,10 @@ using namespace Gdiplus;
 #pragma comment(lib,"ModbusDllforVc")
 #pragma comment(lib,"FlexSlideBar")
 
-INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
-INPUT int Read_One(unsigned char device_var,unsigned short address);
-INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
-INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+INPUT int Write_One_tap(unsigned char device_var,unsigned short address,unsigned short value);
+INPUT int Read_One_tap(unsigned char device_var,unsigned short address);
+INPUT int write_multi_tap(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
+INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
 //INPUT bool open_com(unsigned char m_com);
 INPUT bool open_com(int m_com);
 INPUT void close_com();
@@ -134,5 +134,20 @@ typedef struct _STATUSBARINFO
 
 #define MKBOOL(_VALUE) ((_VALUE) != 0)		//Add by Fance .Use this macro to solve the warning warning C4800: 'BOOL' : forcing value to bool 'true' or 'false'
 
+
+#define MY_WRITE_ONE WM_USER+100
+#define MY_CLOSE WM_USER+101
+#define MY_RESUME_DATA  WM_USER+200
+typedef struct _MessageWriteOneInfo
+{
+	unsigned char device_id;
+	unsigned short address;
+	short new_value;
+	short old_value;
+	HWND hwnd;
+	UINT CTRL_ID;
+	CString Changed_Name;
+
+}MessageWriteOneInfo;
 //#define _DEBUG
 //*********************************link to dll***************************

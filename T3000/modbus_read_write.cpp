@@ -10,6 +10,9 @@
   @param[in]   retry_times	the number of times to retry on read failure before giving up
 
   @return  0 if there were no errors
+
+  This DOES lock the register_critical_section
+
   */
 int modbus_read_one_value( 
 				int& value, 
@@ -101,7 +104,7 @@ int modbus_read_one_value(
 
 		// construct status message string
 		CString str;
-		str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d]"), 
+		str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d] 4"), 
 			device_var, g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
 
 		//Display it
@@ -119,4 +122,132 @@ int modbus_read_one_value(
 
 	return error_ret;
 
+}
+
+
+/**
+
+  Read multiple values from a modbus device
+
+  @param[out]  put_data_into_here	the values read
+  @param[in]   device_var			the modbus device address
+  @param[in]   start_address		the offset of thefirt value to be read in the device
+  @param[in]   length				number of values to be read
+  @param[in]   retry_times			the number of times to retry on read failure before giving up
+
+  @return  negative if there were errors, otherwise length of data read
+
+  This does NOT lock the register_critical_section
+
+  */
+int modbus_read_multi_value( 
+		unsigned short *put_data_into_here,
+		unsigned char device_var,
+		unsigned short start_address,
+		int length,
+		int retry_times )
+{
+	BOOL EnableRefreshTreeView_original_value = g_bEnableRefreshTreeView;
+
+	/** This will prevent a refresh of the tree view while we are doing the read
+	 It seems to be a sort of home made mutex.
+	 There are all sorts of probems with this, including the fact that the tree refresh
+	 is abandoned, not just delayed.
+	 But it is used in over 40 places in the rest of the code, so leave it alone
+	 */
+	g_bEnableRefreshTreeView = false;
+
+	int error=0;
+	for(int i=0;i<retry_times;i++)
+	{
+
+		// call the modbus DLL method
+		error=read_multi(device_var,put_data_into_here,start_address,length);
+
+		// increment the number of transmissions we have done
+		g_llTxCount++;
+
+		// accept any return other than -2
+		if( error !=-2 )
+		{
+			// increment the number or replies we have received
+			g_llRxCount++;
+			break;
+		}
+	}
+
+	// check for running in the main GUI thread
+	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
+
+		// construct status message string
+		CString str;
+		str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d] 5"), 
+			device_var, g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+
+		//Display it
+		((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
+
+	}
+
+	/**  Restore original value of tree refresh flag
+
+	Note that we do an OR here, so if the flag has been set true somewhere else
+	then we will not set it false if it was false when we started.
+
+	*/
+	g_bEnableRefreshTreeView |= EnableRefreshTreeView_original_value;
+
+
+	return error;
+}
+
+
+
+
+int write_one_org(unsigned char device_var,unsigned short address,short value,int retry_times)
+{//retry 
+// 	CString str;
+// 	str.Format(_T("ID :%d Writing %d"),device_var,address);
+// 	SetPaneString(0,str);
+	short temp_value=value;
+	if(address==101 && temp_value<0)
+	{//for the temperature is below zero;;;;;;;;-23.3
+		temp_value=65535+temp_value;
+	}
+	int j=0;
+	for(int i=0;i<retry_times;i++)
+	{
+		//register_critical_section.Lock();
+		j=Write_One(device_var,address,temp_value);
+		multi_register_value[address]=value;//mark***********************
+		//register_critical_section.Unlock();
+
+		if(j!=-2 && j!=-3)
+		{
+			CString str;
+			if (j == -1) // no connetiong
+			{
+				str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d] 6"), device_var, ++g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+			}
+			else
+			{
+				str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d] 7"), device_var, ++g_llTxCount, ++g_llRxCount, g_llTxCount-g_llRxCount);
+			}
+			SetPaneString(0,str);
+			return j;//return right success
+		}
+	}
+	CString str;
+	str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d] 8"), device_var, ++g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+	SetPaneString(0,str);
+	return j;
+}
+int write_one(unsigned char device_var,unsigned short address,short value,int retry_times)
+{//retry 
+
+	BOOL bTemp = g_bEnableRefreshTreeView;
+	g_bEnableRefreshTreeView = FALSE;
+	int j = write_one_org(device_var,address,value,retry_times);
+	g_bEnableRefreshTreeView |= bTemp;
+	return j;
 }
