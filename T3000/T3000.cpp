@@ -190,17 +190,30 @@ BOOL CT3000App::InitInstance()
 	g_strOrigDatabaseFilePath=g_strExePth+_T("t3000.mdb");//
 	g_strDatabasefilepath+=_T("Database\\t3000.mdb");//
 
-
+	   CString FilePath;
 	HANDLE hFind;//
 	WIN32_FIND_DATA wfd;//
 	hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
 	if (hFind==INVALID_HANDLE_VALUE)//
 	{
-		CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
+		//CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
+		  //没有找到就创建一个默认的数据库
+		FilePath=g_strExePth+_T("Database\\T3000.mdb");
+		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DATABASE), _T("DB"));   
+		HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+
+
+		LPVOID lpExe = LockResource(hGlobal);   
+		CFile file;
+		if(file.Open(FilePath, CFile::modeCreate | CFile::modeWrite))    
+			file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+		file.Close();    
+		::UnlockResource(hGlobal);   
+		::FreeResource(hGlobal);
 	}//
 	else//
 	{
-	
+	  
 	}
 	FindClose(hFind);//
 
@@ -251,6 +264,12 @@ BOOL CT3000App::InitInstance()
 		AfxMessageBox(_T("Database operation to stop!"));
 
 	}
+	CString registerfilename;
+	registerfilename=g_strExePth+_T("REG_msado15.dll.bat");
+	::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
+	/*registerfilename=g_strExePth+_T("REG_MSFLXGRD.bat");
+	::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);*/
+
 	// Register the application's document templates.  Document templates
 	//  serve as the connection between documents, frame windows and views
 	CSingleDocTemplate* pDocTemplate;
@@ -338,6 +357,7 @@ BOOL CT3000App::InitInstance()
 	}
 
 #endif
+	
 
   	((CMainFrame*)m_pMainWnd)->InitViews();//
 
@@ -379,7 +399,7 @@ BOOL CT3000App::InitInstance()
 
 
 
-		::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat"), _T(""), _T(""), SW_SHOW);
+		//::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat"), _T(""), _T(""), SW_SHOW);
 		//vcredist_x86.zip
 		
 	//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
@@ -478,7 +498,7 @@ void CT3000App::InitModeName()
 		g_strTstat7=_T("Tstat7");
 		g_strPressure=_T("Pressure");
 		g_strOR485=_T("OR485");
-
+		g_strHumChamber=_T("HumChamber");
 	}
 	else
 	{

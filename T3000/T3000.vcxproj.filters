@@ -10,29 +10,29 @@
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
     <Filter Include="T3">
-      <UniqueIdentifier>{491ab79e-3026-45a4-85e4-ec41cec87837}</UniqueIdentifier>
+      <UniqueIdentifier>{04864613-5791-4496-a45f-a558636f058f}</UniqueIdentifier>
     </Filter>
     <Filter Include="MiniPanel">
-      <UniqueIdentifier>{0df3ed59-d767-4c3d-b29b-b00458ae49ff}</UniqueIdentifier>
+      <UniqueIdentifier>{921ad1c6-5ab3-4d8f-9226-9819ea946b0e}</UniqueIdentifier>
     </Filter>
     <Filter Include="CADO">
-      <UniqueIdentifier>{48b58ac0-1edd-4abb-a57c-c4b2e22ec2f7}</UniqueIdentifier>
+      <UniqueIdentifier>{b1d039be-af63-4fdd-a8cf-e8638bd8a25e}</UniqueIdentifier>
     </Filter>
     <Filter Include="CM5">
-      <UniqueIdentifier>{9235cbf0-8a36-4a35-abc3-a96571334992}</UniqueIdentifier>
+      <UniqueIdentifier>{47872dd0-6006-4513-92b4-d6258d979013}</UniqueIdentifier>
     </Filter>
     <Filter Include="AirQuality">
-      <UniqueIdentifier>{2535fb5b-69b2-435a-9d07-57f479d0b136}</UniqueIdentifier>
+      <UniqueIdentifier>{3757b5c7-f245-412e-bc02-5b9fe8cbf1a8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
     <Filter Include="ISP">
-      <UniqueIdentifier>{81280580-ae71-4047-8cd6-69ab8bdcbf9e}</UniqueIdentifier>
+      <UniqueIdentifier>{dafcb4ff-63f4-4e10-8bf9-24df487af357}</UniqueIdentifier>
     </Filter>
     <Filter Include="singleslider">
-      <UniqueIdentifier>{66f2d924-ec41-4e18-8c58-35e5484ea4a0}</UniqueIdentifier>
+      <UniqueIdentifier>{38d4558f-60de-4677-87c1-5a273a6fc23a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +108,9 @@
     <ClCompile Include="hangeIDDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HumChamber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ImageTreeCtrl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -165,6 +168,9 @@
     <ClCompile Include="OutPutDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="OutputSetDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="OutsidDailog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -199,6 +205,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="T3000Doc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T3000RegAddress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="T3000TableView.cpp">
@@ -279,13 +288,13 @@
     <ClCompile Include="singleslider\MacSliderCtrl.cpp">
       <Filter>singleslider</Filter>
     </ClCompile>
-    <ClCompile Include="HumChamber.cpp">
+    <ClCompile Include="CO2_View.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="T3000RegAddress.cpp">
+    <ClCompile Include="Scanwaydlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OutputSetDlg.cpp">
+    <ClCompile Include="IONameConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MBP.cpp">
@@ -436,6 +445,7 @@
     <None Include="res\Exit.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\t3000.mdb" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -489,16 +499,10 @@
     <ClInclude Include="DialogInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EnumSerial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EreaseDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="excel9.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="extern_function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fileRW.h">
@@ -529,6 +533,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hangeIDDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HumChamber.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ImageTreeCtrl.h">
@@ -642,6 +649,9 @@
     <ClInclude Include="T3000Doc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="T3000RegAddress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="T3000TableView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -720,7 +730,13 @@
     <ClInclude Include="singleslider\MacSliderCtrl.h">
       <Filter>singleslider</Filter>
     </ClInclude>
-    <ClInclude Include="HumChamber.h">
+    <ClInclude Include="CO2_View.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scanwaydlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IONameConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MBP.h">

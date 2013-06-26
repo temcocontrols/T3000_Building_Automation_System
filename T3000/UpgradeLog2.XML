@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="T3000">
+</Property><Property Name="Solution File" Value="F:\My_Work\T3000\T3000\T3000.sln">
+</Property><Property Name="Date" Value="2013年6月13日">
+</Property><Property Name="Time" Value="15:49:01">
+</Property><Property Name="Log Number" Value="2">
+</Property></Properties><Event ErrorLevel="0" Project="T3000" Source="T3000.vcproj" Description="Converting project file 'F:\My_Work\T3000\T3000\T3000.vcproj'.">
+</Event><Event ErrorLevel="1" Project="T3000" Source="T3000.vcproj" Description="VCWebServiceProxyGeneratorTool is no longer supported. The tool has been removed from your project settings.">
+</Event><Event ErrorLevel="1" Project="T3000" Source="T3000.vcproj" Description="VCConvertEngine could not convert attribute UseFAT32Workaround = false under Tool VCManifestTool.">
+</Event><Event ErrorLevel="1" Project="T3000" Source="T3000.vcproj" Description="MSB8012: $(TargetPath) ('F:\My_Work\T3000\T3000\..\T3000 Output\debug\T3000.exe') does not match the Linker's OutputFile property value '..\T3000 Output\debug\T3000.exe' ('F:\My_Work\T3000\T3000 Output\debug\T3000.exe') in project configuration 'Debug|Win32'. This may cause your project to build incorrectly. To correct this, please make sure that $(TargetPath) property value matches the value specified in %(Link.OutputFile).">
+</Event><Event ErrorLevel="1" Project="T3000" Source="T3000.vcproj" Description="MSB8012: $(TargetPath) ('F:\My_Work\T3000\T3000\..\T3000 Output\release\T3000.exe') does not match the Linker's OutputFile property value '..\T3000 Output\release\T3000.exe' ('F:\My_Work\T3000\T3000 Output\release\T3000.exe') in project configuration 'Release|Win32'. This may cause your project to build incorrectly. To correct this, please make sure that $(TargetPath) property value matches the value specified in %(Link.OutputFile).">
+</Event><Event ErrorLevel="0" Project="T3000" Source="T3000.vcproj" Description="Done converting to new project file 'F:\My_Work\T3000\T3000\T3000.vcxproj'.">
+</Event><Event ErrorLevel="3" Project="T3000" Source="T3000.vcproj" Description="Converted">
+</Event></UpgradeLog>

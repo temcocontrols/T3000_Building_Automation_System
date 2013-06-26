@@ -5,9 +5,13 @@ extern DWORD nThreadID;
 
 extern const bool WRITE_SUCCESS;
 extern const bool WRITE_FAIL ;
+<<<<<<< HEAD
 
+=======
+extern	   bool g_HumChamberThread;
+>>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 extern bool g_register_occuppied ; //Add by Alex
-
+extern			  BOOL g_bChamber;
 //Fance_4
 extern unsigned short product_register_value[1024];
 extern int product_type ;
@@ -71,11 +75,12 @@ extern CString g_strTstat7;
 extern CString g_strOR485;
 extern CString g_strPressure;
 extern CString g_strLightingCtrl;
-
+ extern CString g_strHumChamber;
 
 extern int g_CommunicationType;
 extern int m_nbaudrat;
 extern CString showing_text;
+
 extern  CCriticalSection  critical_section;
 extern  CCriticalSection  register_critical_section;
 extern CEvent g_eventPauseMultiRead;
@@ -97,7 +102,7 @@ extern CString g_strInName7;
 extern CString g_strInName8;
 
 extern CString g_strInHumName;		// for tstat6 humidity input
-
+extern CString			   g_strInCO2;
 
 extern CString g_strOutName1;
 extern CString g_strOutName2;
@@ -132,13 +137,14 @@ extern BOOL g_unint;
 
 //////////////////////////////////////////////////////////////////////////
 // product model ID table
-int const PM_TSTAT5A = 2;
 int const PM_TSTAT5B = 1;
+int const PM_TSTAT5A = 2;
 int const PM_TSTAT5B2 = 3;
 int const PM_TSTAT5C = 4;
 int const PM_TSTAT6 = 6;
 int const PM_TSTAT7 = 7;
 int const PM_TSTAT5D = 12;
+int const PM_AirQuality = 13;
 const int PM_TSTAT5E = 16;
 int const PM_TSTAT5F = 17;
 int const PM_TSTAT5G = 18;
@@ -155,13 +161,14 @@ int const PM_T34AO = 28;
 int const PM_T36CT = 29;
 int const PM_SOLAR = 30;
 int const PM_FWMTRANSDUCER = 31;
+int const PM_CO2 = 32;
 int const PM_MINIPANEL = 35;
 int const PM_PRESSURE = 40;
 int const PM_CM5 = 50;
-int const PM_NC = 100;
-int const PM_AirQuality = 13;
-int const PM_LightingController = 103;
 int const PM_TSTAT6_HUM_Chamber=64;
+int const PM_NC = 100;
+int const PM_LightingController = 103;
+
 
 
 extern int MODBUS_SERIALNUMBER_LOWORD                          ;
@@ -844,4 +851,5 @@ extern int MODBUS_WINDOW_HEATING_SETPOINT                      ;
 extern int MODBUS_WINDOW_COOLING_SETPOINT                      ;
 extern int MODBUS_RELAY_PWM_ENABLE                             ;
 extern int MODBUS_RELAY_PWM_TOTAL_DUTY                         ;
-extern int MODBUS_RELAY_PWM_HIGH_DUTY                          ;
+extern int MODBUS_RELAY_PWM_HIGH_DUTY                          ;   
+

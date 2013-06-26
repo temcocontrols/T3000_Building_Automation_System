@@ -96,7 +96,13 @@ INPUT void closefile();//scan
 INPUT void writefile( CString strip,CString strport);//scan
 INPUT void Createfile();//scan
 
+INPUT void WriteLogFile(CString strlog);
+INPUT void CloseLogFile();
+INPUT CString Get_NowTime();
 
+
+INPUT void NET_WriteLogFile(CString strlog);
+INPUT void NET_CloseLogFile();
 //INPUT SOCKET GetSocketHandle();
 
 //#include "modbus.h"
@@ -136,8 +142,15 @@ typedef struct _STATUSBARINFO
 
 
 #define MY_WRITE_ONE WM_USER+100
+<<<<<<< HEAD
 #define MY_CLOSE WM_USER+101
 #define MY_RESUME_DATA  WM_USER+200
+=======
+#define MY_READ_ONE  WM_USER+101
+#define MY_CLOSE WM_USER+110
+#define MY_RESUME_DATA  WM_USER+200
+#define MY_READ_DATA_CALLBACK WM_USER+201
+>>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 typedef struct _MessageWriteOneInfo
 {
 	unsigned char device_id;
@@ -149,5 +162,18 @@ typedef struct _MessageWriteOneInfo
 	CString Changed_Name;
 
 }MessageWriteOneInfo;
+<<<<<<< HEAD
+=======
+
+
+typedef struct _MessageReadOneInfo
+{
+	unsigned char device_id;
+	unsigned short address;
+	short new_value;
+	HWND hwnd;
+}MessageReadOneInfo;
+
+>>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 //#define _DEBUG
 //*********************************link to dll***************************

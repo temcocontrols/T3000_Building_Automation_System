@@ -97,7 +97,7 @@ public:
 	void OnConnect();
 	void OnDisconnect();
 	void OnAddBuildingConfig();
-	//void OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult);
+	
 	void Fresh();
 	void FreshCtrl();
 	void InitSliderBars();
@@ -248,6 +248,8 @@ public:
 	//CSliderCtrl m_singlesliderday;
 	CMacSliderCtrl m_singlesliderday;
 	CMacSliderCtrl m_singleslidernight;
+	afx_msg void OnCbnSelchangeCombo7();
+	afx_msg void OnCbnSelchangeCombo4();
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

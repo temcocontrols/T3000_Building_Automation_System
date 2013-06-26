@@ -1,4 +1,4 @@
-   /*  define.h */
+/*  define.h */
 #ifndef COMMON_H
 #define COMMON_H
 
@@ -47,15 +47,24 @@ OUTPUT int read_multi2(TS_UC device_var,TS_US *put_data_into_here,TS_US start_ad
 
 CStdioFile*					m_pFile;
 CString						m_strFileINI;
+CString m_strScanNetfilename;
 
+//CStdioFile* g_fileScanLog;
+CCriticalSection  logfile_section;
+CCriticalSection  NET_logfile_section;
 OUTPUT void closefile();
 OUTPUT void writefile(CString strip,CString strport);
 OUTPUT void Createfile();
 
+OUTPUT void WriteLogFile(CString strlog);
+OUTPUT void CloseLogFile();
 
-#ifndef _DEBUG
+OUTPUT void NET_WriteLogFile(CString strlog);
+OUTPUT void NET_CloseLogFile();
+
+OUTPUT CString Get_NowTime();
 void SaveBufferToLogFile(TS_UC* pBuffer, int nSize);
-#endif
+
 
 
 

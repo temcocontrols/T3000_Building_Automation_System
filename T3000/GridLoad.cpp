@@ -399,6 +399,8 @@ BOOL CGridLoad::OnInitDialog()
 			case 19:strTemp=g_strTstat5h;break;
 			case 6:strTemp=g_strTstat6;break;
 			case 7:strTemp=g_strTstat7;break;
+			case PM_TSTAT6_HUM_Chamber:strTemp=g_strHumChamber;break;
+
 			default:strTemp=g_strTstat5a;break;
 		}
 		m_FlexGrid.put_TextMatrix(i+1,COL_DEVICETYPE ,strTemp);//product model ===== software version
@@ -1006,6 +1008,7 @@ void CGridLoad::LoadDeviceToGrid()
 		case 19:strTemp=g_strTstat5h;break;
 		case 6:strTemp=g_strTstat6;break;
 		case 7:strTemp=g_strTstat7;break;
+		case PM_TSTAT6_HUM_Chamber:strTemp=g_strHumChamber;break;
 		default:strTemp=g_strTstat5a;break;
 		}
 		m_FlexGrid.put_TextMatrix(i+1,COL_DEVICETYPE ,strTemp);//product model ===== software version

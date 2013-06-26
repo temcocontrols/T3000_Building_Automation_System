@@ -130,6 +130,7 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
 /**
 
   Read multiple values from a modbus device
+<<<<<<< HEAD
 
   @param[out]  put_data_into_here	the values read
   @param[in]   device_var			the modbus device address
@@ -147,6 +148,25 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
 
   This does NOT lock the critical section.
 
+=======
+
+  @param[out]  put_data_into_here	the values read
+  @param[in]   device_var			the modbus device address
+  @param[in]   start_address		the offset of thefirt value to be read in the device
+  @param[in]   length				number of values to be read
+  @param[in]   retry_times			the number of times to retry on read failure before giving up
+
+  @return  0 if there were no errors
+
+  This does NOT lock the register_critical_section
+
+  This is a wrapper for modbus_read_multi_value
+  It is provided for compatibility with existing code.
+  New code should use modbus_read_multi_value() directly.
+
+  This does NOT lock the critical section.
+
+>>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
   */
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times)
 {
@@ -799,3 +819,29 @@ BOOL Post_Thread_Message(UINT MsgType,
 		return TRUE;
 	}
 }
+<<<<<<< HEAD
+=======
+
+BOOL Post_Read_one_Thread_Message(
+	unsigned char device_id,
+	unsigned short address,
+	HWND Dlg_hwnd)
+{
+	_MessageReadOneInfo *My_Read_Struct = new _MessageReadOneInfo;
+	My_Read_Struct->device_id=device_id;
+	My_Read_Struct->address=address;
+	My_Read_Struct->new_value = -1;
+	My_Read_Struct->hwnd = Dlg_hwnd;
+	if(!PostThreadMessage(nThreadID,MY_READ_ONE,(WPARAM)My_Read_Struct,NULL))//post thread msg
+	{
+		return FALSE;
+	}
+	else
+	{
+		return TRUE;
+	}
+}
+
+
+ 
+>>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1

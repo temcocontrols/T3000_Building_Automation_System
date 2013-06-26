@@ -5,7 +5,8 @@
 #include "T3000.h"
 #include "HumChamber.h"
 #include  "ADO\ADO.h"
-
+#include "MainFrm.h"
+#include <locale.h>
 DWORD WINAPI _UpdateThread(LPVOID pParam);
 //DWORD WINAPI _Update_TMEPHUM_Thread(LPVOID pParam);
 //UINT _UpdateSensorTableThread(LPVOID pParam);
@@ -52,14 +53,18 @@ CHumChamber::CHumChamber()
 	, m_time1(0)
 	{
 		hFirstThread=NULL;
-  
+  		m_chamberFile = new CStdioFile;//txt
     }
 
 CHumChamber::~CHumChamber()
 {
 if(hFirstThread != NULL)
 	TerminateThread(hFirstThread, 0);
-
+	if (m_chamberFile!=NULL)
+	{
+	  delete m_chamberFile;
+	  m_chamberFile=NULL;
+	}
 }
 
 void CHumChamber::DoDataExchange(CDataExchange* pDX)
@@ -151,6 +156,8 @@ LRESULT CHumChamber::my_message(WPARAM wParam,LPARAM lParam)
 
 void CHumChamber::OnInitialUpdate()
 {
+
+
  CFormView::OnInitialUpdate();
  m_Start=FALSE;
 
@@ -188,7 +195,16 @@ void CHumChamber::Fresh()
 //初始化表格
 //初始化寄存器的值
 //底下直接应用这些寄存器号码
+	CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+	pMain->m_pFreshMultiRegisters->SuspendThread();
+//	pMain->m_pFreshTree->SuspendThread();
+	pMain->m_pRefreshThread->SuspendThread();
+	 if (!is_connect())
+	 {
+		pMain->OnConnect();
+	 }
 	register_critical_section.Lock();
+	Read_Multi(g_tstat_id,&multi_register_value[0],0,20);  //0-20
 	g_register_occuppied=TRUE;
 for(int  i=0;i<3;i++)
 	{
@@ -269,11 +285,15 @@ for(int  i=0;i<3;i++)
 		m_Start=FALSE;
 		m_StartBtn.ShowWindow(TRUE);
 		m_StopBtn.ShowWindow(FALSE);
-		m_ContinueBtn.ShowWindow(FALSE);
+		m_ContinueBtn.ShowWindow(TRUE);
 	}
 	  if (!hFirstThread)
 	  {
 		  hFirstThread = CreateThread(NULL,NULL,_UpdateThread,this,NULL,0);
+	  }
+	  else
+	  {
+	   //l  hFirstThread
 	  }
 }
 
@@ -308,21 +328,61 @@ void CHumChamber::Update_AllData()
 
 }
 void CHumChamber::Fresh_Hum_Temp()
-{	float temp;
-    CString str_master_id;
-	int times=0;
-	BOOL ADD=TRUE;
+{	
+//setlocale(LC_CTYPE,("chs"));
+if (is_connect())
+{	 
+float temp;
+CString str_master_id;
+int times=0;
+BOOL ADD=TRUE;
+CTime time;
+CString strwrite;
+CString str_hum;
+m_recordhumchamber = g_strExePth + _T("HumChamber.TXT");
+if (!m_chamberFile->Open(m_recordhumchamber.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate ))//打不开就创建一个
+{       m_chamberFile->Open(m_recordhumchamber.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate ) ;
+
+
+
+		m_chamberFile->WriteString(_T("Time           Temp         Hum"));	
+}
+
+	m_chamberFile->SeekToEnd();
 	while(TRUE)
 	{
-		Sleep(1000);
+		 if ((!is_connect())||(!g_bChamber))
+		 {	 
+		 if (!is_connect())
+		 {
+			 g_strScanInfo =_T("Disconnect...");
+			 PostMessage(WM_MY_MESSAGE,1,0);
+		 } 
+		 break;
+		 } 
+		 
+		Sleep(1500);
 		register_critical_section.Lock();
+		Read_Multi(g_tstat_id,&multi_register_value[0],0,20);  //0-20
 		g_register_occuppied=TRUE;
-		for(int  i=0;i<3;i++)
+		if (m_Start)
 		{
+			for(int  i=0;i<3;i++)
+			{
 
-			Read_Multi(g_tstat_id,&multi_register_value[584+i*50],584+i*50,50);
+				Read_Multi(g_tstat_id,&multi_register_value[584+i*50],584+i*50,50);
 
+			}
+		} 
+		else
+		{
+			 
+
+				Read_Multi(g_tstat_id,&multi_register_value[619],619,30);
+
+			 
 		}
+		
 		register_critical_section.Unlock();
 		g_register_occuppied=FALSE;
 		if (ADD)
@@ -349,42 +409,94 @@ void CHumChamber::Fresh_Hum_Temp()
 				ADD=FALSE;
 			}
 		}
-		  switch(times)
-		  {
-		  case 0:g_strScanInfo = _T("Communicating ");break;
-		  case 1:g_strScanInfo = _T("Communicating . ");break;
-		  case 2:g_strScanInfo = _T("Communicating . .");break;
-		  case 3:g_strScanInfo = _T("Communicating . . .");break;
-		  case 4:g_strScanInfo = _T("Communicating . . . .");break;
-		  case 5:g_strScanInfo = _T("Communicating . . . . .");break;  
-		  case 6:g_strScanInfo = _T("Communicating . . . . . .");break;
-		  case 7:g_strScanInfo = _T("Communicating . . . . . . . .");break; 
-		  case 8:g_strScanInfo = _T("Communicating . . . . . . . . .");break; 
-		  case 9:g_strScanInfo = _T("Communicating . . . . . . . . . .");break; 
-		 case 10:g_strScanInfo = _T("Communicating . . . . . . . . . . .");break; 
-		  }
-		  PostMessage(WM_MY_MESSAGE,1,0);
-		 
-		
-		  temp=(float)(multi_register_value[CurrentTemp.Start_ID]/10.0);
-		 
-			str_master_id.Format(_T("%0.2f°C"),temp);
-			GetDlgItem(IDC_CUR_TEMP)->SetWindowText(str_master_id);
-		 
+
+		switch(times)
+		{
+		case 0:g_strScanInfo = _T("Communicating ");break;
+		case 1:g_strScanInfo = _T("Communicating . ");break;
+		case 2:g_strScanInfo = _T("Communicating . .");break;
+		case 3:g_strScanInfo = _T("Communicating . . .");break;
+		case 4:g_strScanInfo = _T("Communicating . . . .");break;
+		case 5:g_strScanInfo = _T("Communicating . . . . .");break;  
+		case 6:g_strScanInfo = _T("Communicating . . . . . .");break;
+		case 7:g_strScanInfo = _T("Communicating . . . . . . . .");break; 
+		case 8:g_strScanInfo = _T("Communicating . . . . . . . . .");break; 
+		case 9:g_strScanInfo = _T("Communicating . . . . . . . . . .");break; 
+		case 10:g_strScanInfo = _T("Communicating . . . . . . . . . . .");break; 
+		}
+
+
+		PostMessage(WM_MY_MESSAGE,1,0);
+
+
+		SYSTEMTIME st;
+		CString strDate,strTime;
+		GetLocalTime(&st);
+		strDate.Format(_T("%4d-%2d-%2d"),st.wYear,st.wMonth,st.wDay);
+		strTime.Format(_T("%2d:%2d:%2d"), st.wHour,st.wMinute,st.wSecond);
+
+
+
+
+
+		temp=(float)(multi_register_value[CurrentTemp.Start_ID]/10.0);
+		strwrite=_T("");
+		strwrite+=strDate;
+		strwrite+=_T("   ");
+		strwrite+=strTime;
+		strwrite+=_T("   ");
+		str_master_id.Format(_T("%0.2f"),temp);
+		strwrite+=str_master_id;
+		str_master_id.Format(_T("%0.2f ℃"),temp);
+		GetDlgItem(IDC_CUR_TEMP)->SetWindowText(str_master_id);
 
 		temp=(float)(multi_register_value[CurrentHum.Start_ID]/10.0);
-		 
-			str_master_id.Format(_T("%0.2f%%"),temp);
-			GetDlgItem(IDC_CUR_HUM)->SetWindowText(str_master_id);  
-		 
-			if (m_Start)
-			{
+		strwrite+=_T("   ");
+		str_hum.Format(_T("%0.2f"),temp);
+		strwrite+=str_hum;
+		str_hum.Format(_T("%0.2f%%"),temp);
+		GetDlgItem(IDC_CUR_HUM)->SetWindowText(str_hum);  
+		if (multi_register_value[TestState.Start_ID]==4)//Running....started
+		{
+			m_Start=TRUE;
+			m_StartBtn.ShowWindow(FALSE);
+			m_StopBtn.ShowWindow(TRUE);
+			m_ContinueBtn.ShowWindow(FALSE);
+		}
+		if (multi_register_value[TestState.Start_ID]==0)//Stop 状态
+		{
+			m_Start=FALSE;
+			m_StartBtn.ShowWindow(TRUE);
+			m_StopBtn.ShowWindow(FALSE);
+			m_ContinueBtn.ShowWindow(TRUE);
+		}
 
+	 
+		
 
-				Show_AllData();
-			}
+		m_chamberFile->WriteString(strwrite);
+		   m_chamberFile->Flush();
+		m_chamberFile->WriteString(_T("\n"));
+		m_chamberFile->Flush();
+
+		if (m_Start)
+		{
+
+			Show_AllData();
+		}
 	}
+	close_com();
+	m_chamberFile->Close();
+	return;
+}
+else
+{
+  g_strScanInfo=_T("Please Click Connection");
+  
+  PostMessage(WM_MY_MESSAGE,1,0);
+}
 
+return;	 
 
 }
 void CHumChamber::Show_AllData(){
@@ -533,10 +645,11 @@ void CHumChamber::OnBnClickedRefresh()
 
 DWORD WINAPI _UpdateThread(LPVOID pParam)
 	{
-	CHumChamber* pDlg = (CHumChamber*)(pParam);
-	pDlg->Fresh_Hum_Temp();
-
-	//pDlg->Update_AllData();
+	 	 if (g_bChamber)
+	 	 { 
+		 CHumChamber* pDlg = (CHumChamber*)(pParam);
+		 pDlg->Fresh_Hum_Temp();
+	 	 }
 	return 1;
 	}
 //DWORD WINAPI _Update_TMEPHUM_Thread(LPVOID pParam)
@@ -1684,8 +1797,7 @@ Update_SensorTable();
 
 void CHumChamber::OnBnClickedStart()
 	{
-	if (!m_Start)
-		{
+ 
 		int ret=write_one(g_tstat_id,TestState.Start_ID,2);
 		if (ret>0)
 		{
@@ -1695,7 +1807,7 @@ void CHumChamber::OnBnClickedStart()
 			m_ContinueBtn.ShowWindow(FALSE);
 		}
 		
-		} 
+		 
 	 
 
 	}
@@ -1707,26 +1819,24 @@ void CHumChamber::OnBnClickedStart()
 void CHumChamber::OnBnClickedStop()
 	{
 	// TODO: Add your control notification handler code here
-	if (m_Start)
-	{
+ 
 	    int ret=write_one(g_tstat_id,TestState.Start_ID,0);
 		if (ret>0)
 		{
 		m_Start=FALSE;
-		m_StartBtn.ShowWindow(FALSE);
+		m_StartBtn.ShowWindow(TRUE);
 		m_StopBtn.ShowWindow(FALSE);
 		m_ContinueBtn.ShowWindow(TRUE);
 		}
 
-	}
+	 
  
 	}
 
 
 void CHumChamber::OnBnClickedContinue()
 	{
-	if (!m_Start)
-	{
+	
 	  int ret= write_one(g_tstat_id,TestState.Start_ID,1);
 	  if (ret>0)
 		  {
@@ -1734,12 +1844,7 @@ void CHumChamber::OnBnClickedContinue()
 		  m_StartBtn.ShowWindow(FALSE);
 		  m_StopBtn.ShowWindow(TRUE);
 		  m_ContinueBtn.ShowWindow(FALSE);
-		  }
-	}
-	 
-	 
-
-	 m_Start=TRUE;
+			}
 	}
 //void CHumChamber::KeyUpMsflexgridInput3(short* KeyCode, short Shift)
 //	{

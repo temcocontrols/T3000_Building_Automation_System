@@ -145,11 +145,19 @@
 #define IDI_ICON_REFRESH                443
 #define IDI_ICON2                       444
 #define IDI_ICON_EXIT                   444
+<<<<<<< HEAD
 #define IDD_MBP                         445
 #define IDR_MENU_MBP                    447
 #define IDD_DIALOG10                    449
 #define IDD_MBPOLL                      449
 #define IDD_MBPOLL_OPTIONS_DIALOG       451
+=======
+#define IDD_DIALOG10                    446
+#define IDD_RENAME_DLG                  446
+#define IDR_T3000_DATABASE              447
+#define IDD_SCANWAY                     448
+#define IDD_IONAMECONFIG                449
+>>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -167,6 +175,7 @@
 #define IDC_SLAVE_ID                    1027
 #define IDC_EDIT41                      1027
 #define IDC_INTERVAL                    1027
+#define IDC_CO2_ALARM_OFF_TIME          1027
 #define IDC_OUTPUT3_DELAY_OFF_EDIT      1028
 #define IDC_CUR_TEMP                    1028
 #define IDC_EDIT42                      1028
@@ -262,6 +271,8 @@
 #define IDC_ECOOLINGPTERM1              1051
 #define IDC_HUM4                        1051
 #define IDC_TIME4                       1052
+#define IDC_COMBO7                      1052
+#define IDC_COMBO14                     1052
 #define IDC_TEMP_LEFT4                  1053
 #define IDC_TEMP5                       1054
 #define IDC_HUM5                        1055
@@ -306,10 +317,12 @@
 #define IDC_DAY_SLIDER                  1066
 #define IDC_OUTPUT4_DELAY_ON_EDIT       1066
 #define IDC_TEMP8                       1066
+#define IDC_CO2_ALARM_SETPOINT          1066
 #define IDC_NIGHT_SLIDER                1067
 #define IDC_OUTPUT3_DELAY_ON_EDIT       1067
 #define IDC_SLIDER5                     1067
 #define IDC_HUM8                        1067
+#define IDC_CO2_CALIBRATING_OFFSET      1067
 #define IDC_EDIT3                       1068
 #define IDC_NIGHT_EDIT                  1068
 #define IDC_INFILEREDIT                 1068
@@ -340,6 +353,7 @@
 #define IDC_SLIDER9                     1074
 #define IDC_EDIT_CUR_SP                 1074
 #define IDC_TEMP10                      1074
+#define IDD_CO2_DIALOG                  1074
 #define IDC_BUTTON4                     1075
 #define IDC_SLIDER12                    1075
 #define IDC_SLIDER11                    1075
@@ -939,6 +953,7 @@
 #define IDC_STATIC_1SP2SPN              1556
 #define IDC_EDIT_CSPN                   1557
 #define IDC_EDIT_CSPD                   1557
+#define IDC_STATIC_1SP2SPN2             1557
 #define IDC_EDIT_CSPNN                  1558
 #define IDC_EDIT_CSPWN                  1559
 #define IDC_EDIT_CDBDN                  1560
@@ -972,6 +987,7 @@
 #define IDC_NUM                         1595
 #define IDC_PROGRESS                    1596
 #define IDC_REFRESH_ALL                 1598
+<<<<<<< HEAD
 #define IDC_MBP1                        1601
 #define IDC_MBP_EDITBOX                 1602
 #define IDC_MBPOLL_GRID1                1603
@@ -1018,6 +1034,29 @@
 #define IDC_BUTTON_START_STOP4          1636
 #define IDC_BUTTON_START_STOP5          1637
 #define IDC_CHECK_TAP_DATA              1638
+=======
+#define IDC_ID_CO2_EDIT                 1599
+#define IDC_SERIALNUM_CO2_EDIT          1600
+#define IDC_UPDATE                      1601
+#define IDC_FIRMWARV_CO2_EDIT           1601
+#define IDC_MODEL_CO2_EDIT              1602
+#define IDC_HARDWAREV_CO2_EDIT          1603
+#define IDC_CO2_BRAUDRATECOMBO          1604
+#define IDC_CO2_ENABLEIDBUTTON          1605
+#define IDC_CO2_TEMP_UNIT               1606
+#define IDC_CO2_ALARM_STATE             1607
+#define IDC_RADIO_ALARM_MANUAL          1608
+#define IDC_RADIO_ALARM_AUTO            1609
+#define IDC_CO2_ALARM_ON_TIME           1610
+#define IDC_CO2_PREPARE_ALARM_SETPOINT  1611
+#define IDC_MSFLEXGRID_CO2              1612
+#define IDC_FILTER                      1613
+#define IDC_NAME_EDIT                   1614
+#define IDC_COMBO12                     1615
+#define IDC_QUICK                       1620
+#define IDC_MSFLEXGRID_IOTABLE          1621
+#define IDC_NAMEEDIT                    1622
+>>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1101,6 +1140,7 @@
 #define ID_SETMAP_SETTINGSAVE           32863
 #define ID_SETMAPPING_SAND              32864
 #define ID_FILE_ISPTOOL                 32865
+<<<<<<< HEAD
 #define ID_DATABASE_MBP                 32866
 #define ID_DISPLAY_SIGNED               32867
 #define ID_DISPLAY_UNSIGNED             32868
@@ -1124,6 +1164,9 @@
 #define ID_SETUP                        32886
 #define ID_SETUP_OPTIONS                32887
 #define ID_FILE_EXIT                    32888
+=======
+#define ID_DATABASE_IONAMECONFIG        32866
+>>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
 
@@ -1131,9 +1174,15 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
+<<<<<<< HEAD
 #define _APS_NEXT_RESOURCE_VALUE        452
 #define _APS_NEXT_COMMAND_VALUE         32889
 #define _APS_NEXT_CONTROL_VALUE         1639
+=======
+#define _APS_NEXT_RESOURCE_VALUE        451
+#define _APS_NEXT_COMMAND_VALUE         32867
+#define _APS_NEXT_CONTROL_VALUE         1623
+>>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

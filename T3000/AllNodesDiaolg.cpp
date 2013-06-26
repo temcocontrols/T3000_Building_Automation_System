@@ -331,8 +331,11 @@ void CAllNodesDiaolg::OnBnClickedExitbutton()
 {
 	CAllNodesDiaolg::OnCancel();
 	
-	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
+	if (m_bChanged)
+	{
+		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
+	}
 }
 
 void CAllNodesDiaolg::OnBnClickedCancel()

@@ -28,10 +28,10 @@ int g_Commu_type=0;//0:serial modus//
 
 //CMutex scan_mutex;
 
-#ifndef _DEBUG
-const CString g_strLogFile = _T("C:\\T3000Scan_log.txt");
+
+
 CStdioFile* g_fileScanLog = NULL;
-#endif
+CStdioFile* g_fileScanNetLog=NULL;
 
 OUTPUT void SetCommunicationType(int nType)
 {
@@ -3248,6 +3248,7 @@ OUTPUT int NetController_CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_
 
 OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 {
+     CString strlog;
 	if(bComm_Type==0)
 	{
 		//the second time
@@ -3260,7 +3261,8 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
 		//清空串口缓冲区
 		//the return value is the register address
-
+			strlog.Format(_T("Scan From ID=%d To ID=%d"),devLo,devHi);
+			WriteLogFile(strlog);
 		if(devLo<1 || devHi>254)
 			return -5;
 		//the input inspect
@@ -3339,23 +3341,56 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 			else
 				m_had_send_data_number=0;
 		}
-		//CloseHandle(m_osRead.hEvent);
-		/*
-		CStdioFile default_file;
-		CString saved_path="C:\\modbus_scan_data.txt";
-		CString a_line;
-		if(default_file.Open(_T(saved_path.GetString()),CFile::modeCreate | CFile::modeWrite | CFile::modeNoTruncate)!=0)
-		{
-		default_file.SeekToEnd();
-		a_line.Format("T:%x %x %x %x %x %x",pval[0],pval[1],pval[2],pval[3],pval[4],pval[5]);
-		default_file.WriteString(a_line+"\n");
-		a_line.Format("R:%x %x %x %x %x %x %x %x %x %x %x %x %x",gval[0],gval[1],gval[2],gval[3],gval[4],gval[5],gval[6],gval[7],gval[8],gval[9],gval[10],gval[11],gval[12]);
-		default_file.WriteString(a_line+"\n");
-		default_file.Flush();
-		default_file.Close();
-		}
-		*/
-		//	TRACE("%d R:%x %x %x %x %x %x %x %x %x %x %x %x %x\n",ddd,gval[0],gval[1],gval[2],gval[3],gval[4],gval[5],gval[6],gval[7],gval[8],gval[9],gval[10],gval[11],gval[12]);
+
+		
+				CString strCom;
+				strCom.Format(_T("Com=%d : "), open_com_port_number_in_dll);
+			
+				WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
+				    CString filelog;
+				filelog=_T("Send a scan command to any devices: ");
+				//SaveBufferToLogFile(pval, 6);
+				 
+				   
+				for (int i = 0; i < 6; i++)
+				{
+					int nValue = pval[i];
+					CString strValue;
+					strValue.Format(_T("%0x, "), nValue);
+					//g_fileScanLog->WriteString(strValue);
+					filelog+=strValue;
+				}
+				WriteLogFile(filelog);
+				filelog.Empty();
+				filelog=_T("Recv Data : ");
+				for (int i = 0; i < 13; i++)
+				{
+					int nValue = gval[i];
+					CString strValue;
+					strValue.Format(_T("%0x, "), nValue);
+					//g_fileScanLog->WriteString(strValue);
+					filelog+=strValue;
+				}
+				WriteLogFile(filelog);
+				int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
+				if(index==-1)
+				{
+				 WriteLogFile(_T(">>More than one device answer......"));
+				}
+				else
+				{
+				  WriteLogFile(_T(">>No one device answer......"));
+				}
+				//SaveBufferToLogFile(gval, 13);
+
+				
+		
+
+
+
+	
+
+
 		if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
 		{//old scan protocal
 			old_or_new_scan_protocal_in_dll=2;
@@ -3407,6 +3442,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 		default_file.Flush();
 		default_file.Close();
 		}*/
+		 
 		return gval[2];
 	}
 
@@ -3422,6 +3458,8 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
 		//清空串口缓冲区
 		//the return value is the register address
+		strlog.Format(_T("Scan From ID=%d To ID=%d"),devLo,devHi);
+		NET_WriteLogFile(strlog);
 		if(devLo<1 || devHi>254)
 			return -5;
 		//the input inspect
@@ -3464,6 +3502,44 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 			//异常:
 			memcpy(gval,(void*)&rvdata[6],sizeof(rvdata)-6);
 		}
+
+
+		NET_WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
+		CString filelog;
+		filelog=_T("Send a scan command to any devices: ");
+
+		for (int i = 0; i < 10; i++)
+		{
+			int nValue = pval[i];
+			CString strValue;
+			strValue.Format(_T("%0X, "), nValue);
+			//g_fileScanLog->WriteString(strValue);
+			filelog+=strValue;
+		}
+		NET_WriteLogFile(filelog);
+		filelog.Empty();
+		NET_WriteLogFile(_T("Recv Data : "));
+		for (int i = 0; i < 19; i++)
+		{
+			int nValue = rvdata[i];
+			CString strValue;
+			strValue.Format(_T("%0X, "), nValue);
+			//g_fileScanLog->WriteString(strValue);
+			filelog+=strValue;
+		}
+		
+		NET_WriteLogFile(filelog);
+		 
+		int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
+		if(index==-1)
+		{
+			NET_WriteLogFile(_T(">>More than one device answer......"));
+		}
+		else
+		{
+			NET_WriteLogFile(_T(">>No one device answer......"));
+		}
+
 		if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
 		{//old scan protocal
 			old_or_new_scan_protocal_in_dll=2;
@@ -3714,7 +3790,9 @@ OUTPUT int read_multi2(TS_UC device_var,TS_US *put_data_into_here,TS_US start_ad
 }
 
 OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
-{
+{	CString strlog;	
+    
+    
 	if(bComm_Type==0)
 	{
 		//the second time
@@ -3727,6 +3805,9 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
 		//清空串口缓冲区
 		//the return value is the register address
+		strlog.Format(_T("Com Scan:  From ID=%d To ID=%d"),devLo,devHi);
+		WriteLogFile(strlog);
+
 		if(devLo<1 || devHi>254)
 			return -5;
 		//the input inspect
@@ -3803,49 +3884,46 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 			else
 				m_had_send_data_number=0;
 		}
-		//CloseHandle(m_osRead.hEvent);
-		/*
-		CStdioFile default_file;
-		CString saved_path="C:\\modbus_scan_data.txt";
-		CString a_line;
-		if(default_file.Open(_T(saved_path.GetString()),CFile::modeCreate | CFile::modeWrite | CFile::modeNoTruncate)!=0)
+		 
+		  
+
+		WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
+		CString filelog;
+		filelog=_T("Send a scan command to any devices: ");
+		
+		 
+
+		for (int i = 0; i < 6; i++)
 		{
-		default_file.SeekToEnd();
-		a_line.Format("T:%x %x %x %x %x %x",pval[0],pval[1],pval[2],pval[3],pval[4],pval[5]);
-		default_file.WriteString(a_line+"\n");
-		a_line.Format("R:%x %x %x %x %x %x %x %x %x %x %x %x %x",gval[0],gval[1],gval[2],gval[3],gval[4],gval[5],gval[6],gval[7],gval[8],gval[9],gval[10],gval[11],gval[12]);
-		default_file.WriteString(a_line+"\n");
-		default_file.Flush();
-		default_file.Close();
+			int nValue = pval[i];
+			CString strValue;
+			strValue.Format(_T("%0X, "), nValue);
+			//g_fileScanLog->WriteString(strValue);
+			filelog+=strValue;
 		}
-		*/
-		//	TRACE("%d R:%x %x %x %x %x %x %x %x %x %x %x %x %x\n",ddd,gval[0],gval[1],gval[2],gval[3],gval[4],gval[5],gval[6],gval[7],gval[8],gval[9],gval[10],gval[11],gval[12]);
-
-
-#ifndef _DEBUG
-
-		if (g_fileScanLog == NULL)
+		 
+		WriteLogFile(filelog);
+		filelog.Empty();
+		filelog=_T("Recv Data : ");
+		for (int i = 0; i < 13; i++)
 		{
-			g_fileScanLog = new CStdioFile;
-			g_fileScanLog->Open(g_strLogFile, CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone );
-			
-		}
-
-		if(g_fileScanLog != NULL)
-		{
-			CString strCom;
-			strCom.Format(_T("Com=%d : "), open_com_port_number_in_dll);
-			g_fileScanLog->WriteString(strCom);
-			g_fileScanLog->WriteString(_T("Send Data : "));
-				SaveBufferToLogFile(pval, 6);
-			
-			g_fileScanLog->WriteString(_T("Recv Data : "));
-				SaveBufferToLogFile(gval, 13);
-			
+			int nValue = gval[i];
+			CString strValue;
+			strValue.Format(_T("%0X, "), nValue);
+			//g_fileScanLog->WriteString(strValue);
+			filelog+=strValue;
 		}
 		
-
-#endif
+		WriteLogFile(filelog);
+		int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
+		if(index==-1)
+		{
+			WriteLogFile(_T(">>More than one device answer......"));
+		}
+		else
+		{
+			WriteLogFile(_T(">>No one device answer......"));
+		}
 
 
 
@@ -3929,7 +4007,8 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
 		//清空串口缓冲区
 		//the return value is the register address
-
+		strlog.Format(_T("NET Scan:  From ID=%d To ID=%d"),devLo,devHi);
+		NET_WriteLogFile(strlog);
 		if(devLo<1 || devHi>254)
 			return -5;
 		//the input inspect
@@ -3981,105 +4060,104 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		}
 
 //		static int num = 0;
+		NET_WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
+		CString filelog;
+		filelog=_T("Send a scan command to any devices: ");
+	 
 
-
-
-
-//		if (m_pFile)
+		for (int i = 0; i < 10; i++)
 		{
-			//m_pFile->Close();
-			//delete m_pFile;
-
-			//if(m_pFile->Open(m_strFileINI.GetString(),CFile::modeReadWrite))
-			{
-#if 0
-				CString strsend,strreceive;
-				strsend = _T("send");
-				strreceive = _T("receive");
-				m_pFile->WriteString(strsend+_T("\n"));
-
-				CString str;
-				int idate;
-				//str.Format(_T("%"),pval);
-				//m_pFile->WriteString(str+_T("\n"));
-				for (int i =0;i<sizeof(pval);i++)
-				{
-					idate =(int)pval[i];
-					str.Format(_T("%x"),idate);
-
-					m_pFile->WriteString(str+_T(" "));	
-
-				}
-
-				m_pFile->WriteString(_T("\n"));	
-				m_pFile->WriteString(strreceive+_T("\n"));//↑
-				for (int i =0;i<sizeof(rvData);i++)
-				{
-
-					idate =(int)rvData[i];
-					str.Format(_T("%x"),idate);
-
-					m_pFile->WriteString(str+_T(" "));	
-
-				}
-				//m_pFile->WriteString(_T(" "));
-				// 			str.Format(_T("%s"),rvData);
-				// 			m_pFile->WriteString(str+_T("\n"));
-
-
-				m_pFile->WriteString(_T("\n"));
-#endif
-				//m_pFile->Close();
-			}
-
-
-
-		}//else
-		{
-
-		{
-			CString strsend,strreceive;
-			strsend = _T("send");
-			strreceive = _T("receive");
-			m_pFile->WriteString(strsend+_T("\n"));
-#if 1
-			CString str;
-			int idate;
-			//str.Format(_T("%"),pval);
-			//m_pFile->WriteString(str+_T("\n"));
-
-		
-			for (int i =6;i<sizeof(pval);i++)
-			{
-				idate =(int)pval[i];
-				str.Format(_T("%.2x"),idate);
-
-				m_pFile->WriteString(str+_T(" "));	
-
-			}
-
-			m_pFile->WriteString(_T("\n"));	
-			m_pFile->WriteString(strreceive+_T("\n"));//↑
-			for (int i =6;i<nRecv;i++)
-			{
-
-				idate =(int)rvData[i];
-				str.Format(_T("%.2x"),idate);
-
-				m_pFile->WriteString(str+_T(" "));	
-
-			}
-			//m_pFile->WriteString(_T(" "));
-			// 			str.Format(_T("%s"),rvData);
-			// 			m_pFile->WriteString(str+_T("\n"));
-
-
-			m_pFile->WriteString(_T("\n"));
-#endif
-			//m_pFile->Close();
-		
+			int nValue = pval[i];
+			CString strValue;
+			strValue.Format(_T("%0X, "), nValue);
+			//g_fileScanLog->WriteString(strValue);
+			filelog+=strValue;
 		}
-}
+		 
+		NET_WriteLogFile(filelog);
+		filelog.Empty();
+		 
+		filelog=_T("Recv Data : ");
+		for (int i = 0; i <13; i++)
+		{
+			int nValue = gval[i];
+			CString strValue;
+			strValue.Format(_T("%0X, "), nValue);
+			//g_fileScanLog->WriteString(strValue);
+			filelog+=strValue;
+		}
+		//NET_WriteLogFile(_T("Recv Data:"));
+		NET_WriteLogFile(filelog);
+		int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
+		if(index==-1)
+		{
+			WriteLogFile(_T(">>More than one device answer......"));
+		}
+		else
+		{
+			WriteLogFile(_T(">>No one device answer......"));
+		}
+
+//		if (g_fileScanLog == NULL)
+//		{
+//			g_fileScanLog = new CStdioFile;
+//		}
+//
+//	if (g_fileScanLog != NULL)
+//		{
+//			TCHAR exeFullPath[MAX_PATH+1]; //
+//			GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
+//			(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
+//
+//			CString g_strExePth=exeFullPath;
+//			m_strFileINI = g_strExePth + _T("ScanLog.TXT");
+//			if(g_fileScanLog->Open(m_strFileINI.GetString(),CFile::modeReadWrite))
+//			{
+//#if 1
+//                g_fileScanLog->SeekToEnd();
+//				CString strsend,strreceive;
+//				strsend = _T("Send Data:");
+//				strreceive = _T("Receive Data:");
+//				g_fileScanLog->WriteString(strsend+_T("\n"));
+//
+//				CString str;
+//				int idate;
+//				//str.Format(_T("%"),pval);
+//				//m_pFile->WriteString(str+_T("\n"));
+//				for (int i =0;i<sizeof(pval);i++)
+//				{
+//					idate =(int)pval[i];
+//					str.Format(_T("%0x"),idate);
+//
+//					g_fileScanLog->WriteString(str+_T(" "));	
+//
+//				}
+//
+//				g_fileScanLog->WriteString(_T("\n"));	
+//				g_fileScanLog->WriteString(strreceive+_T("\n"));//↑
+//				for (int i =0;i<sizeof(rvData);i++)
+//				{
+//					idate =(int)rvData[i];
+//					str.Format(_T("%0x"),idate);
+//					g_fileScanLog->WriteString(str+_T(" "));	
+//				}
+//
+//
+//
+//				g_fileScanLog->WriteString(_T("\n"));
+//#endif
+//				
+//				
+//				g_fileScanLog->Close();
+//			}
+//		    else
+//			{
+//			 //-----
+//			}
+//
+//
+//		}
+        
 
 	
 
@@ -4175,6 +4253,7 @@ OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		}
 		int the_return_value;
 		int the_return_value2=0;
+		//CheckTstatOnline2_a 可以记录收发的数据
 		the_return_value=CheckTstatOnline2_a(devLo,devHi, bComm_Type);
 		//down is inspect result first scan
 		if(the_return_value==-4)
@@ -4301,23 +4380,130 @@ OUTPUT void Createfile()
 	m_pFile->Open(m_strFileINI.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
 }
 
-#ifndef _DEBUG
-void SaveBufferToLogFile(TS_UC* pBuffer, int nSize)
-{
-	ASSERT(g_fileScanLog);
-	for (int i = 0; i < nSize; i++)
+
+
+
+
+
+OUTPUT void WriteLogFile(CString strlog){
+	logfile_section.Lock();
+	if (g_fileScanLog == NULL)
 	{
-		int nValue = pBuffer[i];
-		CString strValue;
-		strValue.Format(_T("%d, "), nValue);
-		g_fileScanLog->WriteString(strValue);
+		g_fileScanLog = new CStdioFile;
+	
+		TCHAR exeFullPath[MAX_PATH+1]; //
+		GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
+		(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
+		CString g_strExePth=exeFullPath;
+		m_strFileINI = g_strExePth + _T("COM_Log.TXT");
+		g_fileScanLog->Open(m_strFileINI.GetString(), CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone );
+		g_fileScanLog->Close();
 	}
 
-	g_fileScanLog->WriteString(_T("\n"));	
+	if(g_fileScanLog != NULL)
+	{	
+		TCHAR exeFullPath[MAX_PATH+1]; //
+		GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
+		(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
+		CString g_strExePth=exeFullPath;
+		m_strFileINI = g_strExePth + _T("COM_Log.TXT");
+		if (g_fileScanLog->Open(m_strFileINI.GetString(),CFile::modeReadWrite | CFile::shareDenyNone ))
+		{
+			g_fileScanLog->SeekToEnd();
+			g_fileScanLog->WriteString(strlog);
+			g_fileScanLog->WriteString(_T("\n"));
+			g_fileScanLog->Flush();
+			g_fileScanLog->Close();
+		}
+		else
+		{
+			g_fileScanLog->Close();
+			g_fileScanLog->Open(m_strFileINI.GetString(), CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone );
+			g_fileScanLog->SeekToEnd();
+			g_fileScanLog->WriteString(strlog);
+			g_fileScanLog->WriteString(_T("\n"));
+			g_fileScanLog->Flush();
+			g_fileScanLog->Close();
+		}
 
+
+	}
+
+	logfile_section.Unlock();
+}
+OUTPUT void CloseLogFile()
+{
+	//g_fileScanLog->Close();
+	delete g_fileScanLog;
+	g_fileScanLog=NULL;
+
+}
+OUTPUT CString Get_NowTime()
+{
+	SYSTEMTIME st;
+	CString strDate,strTime;
+	GetLocalTime(&st);
+	strDate.Format(_T("%4d-%2d-%2d"),st.wYear,st.wMonth,st.wDay);
+	strTime.Format(_T("%2d:%2d:%2d"), st.wHour,st.wMinute,st.wSecond);
+	strDate+=_T(" ");
+	strDate+=strTime;
+
+
+	return strDate;
 }
 
 
 
+OUTPUT void NET_WriteLogFile(CString strlog){
+	NET_logfile_section.Lock();
+	if (g_fileScanNetLog == NULL)
+	{
+		g_fileScanNetLog = new CStdioFile;
 
-#endif
+		TCHAR exeFullPath[MAX_PATH+1]; //
+		GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
+		(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
+		CString g_strExePth=exeFullPath;
+		m_strScanNetfilename = g_strExePth + _T("NET_Log.TXT");
+		g_fileScanNetLog->Open(m_strScanNetfilename.GetString(), CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone );
+		g_fileScanNetLog->Close();
+	}
+
+	if(g_fileScanNetLog != NULL)
+	{	
+		TCHAR exeFullPath[MAX_PATH+1]; //
+		GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
+		(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
+		CString g_strExePth=exeFullPath;
+		m_strScanNetfilename = g_strExePth + _T("NET_Log.TXT");
+		if (g_fileScanNetLog->Open(m_strScanNetfilename.GetString(),CFile::modeReadWrite | CFile::shareDenyNone ))
+		{
+			g_fileScanNetLog->SeekToEnd();
+			g_fileScanNetLog->WriteString(strlog);
+			g_fileScanNetLog->WriteString(_T("\n"));
+			g_fileScanNetLog->Flush();
+			g_fileScanNetLog->Close();
+		}
+		else
+		{
+			g_fileScanNetLog->Close();
+			g_fileScanNetLog->Open(m_strScanNetfilename.GetString(), CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone );
+			g_fileScanNetLog->SeekToEnd();
+			g_fileScanNetLog->WriteString(strlog);
+			g_fileScanNetLog->WriteString(_T("\n"));
+			g_fileScanNetLog->Flush();
+			g_fileScanNetLog->Close();
+		}
+
+
+	}
+
+	NET_logfile_section.Unlock();
+}
+OUTPUT void NET_CloseLogFile()
+{
+	//g_fileScanLog->Close();
+	delete g_fileScanNetLog;
+	g_fileScanNetLog=NULL;
+
+}

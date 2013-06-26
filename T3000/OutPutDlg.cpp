@@ -78,8 +78,8 @@ BEGIN_MESSAGE_MAP(COutPutDlg, CDialog)
 	ON_EN_KILLFOCUS(IDC_PID2COOLSTAGEEDIT2, &COutPutDlg::OnEnKillfocusPid2coolstageedit2)
 	ON_BN_CLICKED(IDCANCEL, &COutPutDlg::OnBnClickedCancel)
 	ON_EN_KILLFOCUS(IDC_DESCRIPTEDIT, &COutPutDlg::OnEnKillfocusDescriptedit)
-//	ON_EN_SETFOCUS(IDC_DESCRIPTEDIT, &COutPutDlg::OnEnSetfocusDescriptedit)
-	ON_BN_CLICKED(IDC_REFRESH, &COutPutDlg::OnBnClickedRefresh)
+	ON_EN_SETFOCUS(IDC_DESCRIPTEDIT, &COutPutDlg::OnEnSetfocusDescriptedit)
+	ON_BN_CLICKED(IDC_UPDATE, &COutPutDlg::OnBnClickedUpdate)
 END_MESSAGE_MAP()
 
 BOOL COutPutDlg::OnInitDialog()
@@ -106,60 +106,44 @@ BOOL COutPutDlg::OnInitDialog()
 //	OnCbnSelchangeFanmode();
 	//129	107	1	Low byte	W/R	"AUTO_ONLY , enables or disables manual mode. 0 = Manual Fan Modes 1-x Allowed 
 	//(depending on R122 value, 1 = Auto Mode Only, 2 = DDC mode,the user can not change setpoint and fan speed from keypad."
-	if(product_register_value[MODBUS_AUTO_ONLY]==0)
+
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	{	
+		if(product_register_value[107]==0)
+		{
+			m_bFanAutoOnly=FALSE;
+			//m_fanAutoCheck.GetCheck()==BST_CHECKED;
+			m_fanAutoCheck.SetCheck(BST_UNCHECKED);
+		}	
+		if(product_register_value[107]==1)
+		{
+			m_bFanAutoOnly=TRUE;
+			m_fanAutoCheck.SetCheck(BST_CHECKED);
+		}
+		//122	105	1	Low byte	W/R	FAN MODE, number of fan speeds. Single speed = 1 up to three speed fan = 3
+		if(product_register_value[105]>0&&product_register_value[105]<=3)
+			m_fan_mode_ctrl.SetCurSel(product_register_value[105]-1);
+
+		strdemo = _T("1-3,");
+		SetPaneString(2,strdemo);
+	}else
 	{
-		m_bFanAutoOnly=FALSE;
-		m_fanAutoCheck.SetCheck(BST_UNCHECKED);
-	}
-	else if(product_register_value[MODBUS_AUTO_ONLY]==1)
-	{
-		m_bFanAutoOnly=TRUE;
-		m_fanAutoCheck.SetCheck(BST_CHECKED);
+		if(multi_register_value[129]==0)
+		{
+			m_bFanAutoOnly=FALSE;
+			//m_fanAutoCheck.GetCheck()==BST_CHECKED;
+			m_fanAutoCheck.SetCheck(BST_UNCHECKED);
+		}	
+		if(multi_register_value[129]==1)
+		{
+			m_bFanAutoOnly=TRUE;
+			m_fanAutoCheck.SetCheck(BST_CHECKED);
+		}
+		if(multi_register_value[122]>0&&multi_register_value[122]<=3)
+			m_fan_mode_ctrl.SetCurSel(multi_register_value[122]-1);
+
 	}
 
-	if(product_register_value[MODBUS_FAN_MODE]>0 && product_register_value[MODBUS_FAN_MODE]<=3)	//122  105
-	{
-		m_fan_mode_ctrl.SetCurSel(product_register_value[MODBUS_FAN_MODE]-1);
-	}
-	//---------------------------------------------------------------
-	//Annul by Fance 2013 0407 
-	//if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
-	//{	
-	//	if(newtstat6[107]==0)
-	//	{
-	//		m_bFanAutoOnly=FALSE;
-	//		//m_fanAutoCheck.GetCheck()==BST_CHECKED;
-	//		m_fanAutoCheck.SetCheck(BST_UNCHECKED);
-	//	}	
-	//	if(newtstat6[107]==1)
-	//	{
-	//		m_bFanAutoOnly=TRUE;
-	//		m_fanAutoCheck.SetCheck(BST_CHECKED);
-	//	}
-	//	//122	105	1	Low byte	W/R	FAN MODE, number of fan speeds. Single speed = 1 up to three speed fan = 3
-	//	if(newtstat6[105]>0&&newtstat6[105]<=3)
-	//		m_fan_mode_ctrl.SetCurSel(newtstat6[105]-1);
-
-	//	strdemo = _T("1-3,");
-	//	SetPaneString(2,strdemo);
-	//}else
-	//{
-	//	if(multi_register_value[129]==0)
-	//	{
-	//		m_bFanAutoOnly=FALSE;
-	//		//m_fanAutoCheck.GetCheck()==BST_CHECKED;
-	//		m_fanAutoCheck.SetCheck(BST_UNCHECKED);
-	//	}	
-	//	if(multi_register_value[129]==1)
-	//	{
-	//		m_bFanAutoOnly=TRUE;
-	//		m_fanAutoCheck.SetCheck(BST_CHECKED);
-	//	}
-	//	if(multi_register_value[122]>0&&multi_register_value[122]<=3)
-	//		m_fan_mode_ctrl.SetCurSel(multi_register_value[122]-1);
-
-	//}
-	//---------------------------------------------------------------
 
 	put_fan_variable();
 	strdemo = _T("2,");
@@ -192,32 +176,31 @@ BOOL COutPutDlg::OnInitDialog()
 	int output5_value=0;//multi_register_value[284];
 
 	//modify by Fance
-	output4_value = product_register_value[MODBUS_MODE_OUTPUT4];// 283 205
-	output5_value = product_register_value[MODBUS_MODE_OUTPUT5];//284 206
+	
 	//---------------------------------------------------
 	//Annul by Fance 2013 04 07
-	//if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
-	//{
-	//	output4_value = newtstat6[205];
-	//	output5_value = newtstat6[206];
-	//}else
-	//{
-	//	output4_value =multi_register_value[283];
-	//	output5_value =multi_register_value[284];
-	//}
-	//---------------------------------------------------
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	{
+		output4_value = product_register_value[MODBUS_OUTPUT4_FUNCTION/*MODBUS_MODE_OUTPUT4*/];// 283 205
+		output5_value = product_register_value[MODBUS_OUTPUT5_FUNCTION/*MODBUS_MODE_OUTPUT5*/];//284 206
+	}else
+	{
+		output4_value =multi_register_value[283];
+		output5_value =multi_register_value[284];
+	}
 	if(output4_value==1||output5_value==1)
 	{
 		m_bFloat=TRUE;
 	}
-	if (output4_value==2)
+	//PWM 根据 336 337 判断，
+	/*if (output4_value==2)
 	{
 		m_bOut4PWM=TRUE;
 	}
 	if(output5_value==2)
 	{
 		m_bOut5PWM=TRUE;
-	}
+	}*/
 
 	//288	247	1	Low byte	W/R	Interlock for  output3
 	//104	384	2	Full	R	PID1, current PI calculation for PID number 1  (PID2 is in register 240)
@@ -226,11 +209,12 @@ BOOL COutPutDlg::OnInitDialog()
 	//i_268_pid2 = product_register_value[MODBUS_INTERLOCK_OUTPUT3];//     247
 	//---------------------------------------------------
 	//Annul by Fance 2013 04 07
-	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
 	{
-		i_104_pid1=multi_register_value[384];
-		i_268_pid2=multi_register_value[247];
-	}else
+		i_104_pid1=product_register_value[384];
+		i_268_pid2=product_register_value[247];
+	}
+	else
 	{
 		i_104_pid1=multi_register_value[104];
 		i_268_pid2=multi_register_value[268];
@@ -258,125 +242,77 @@ void COutPutDlg::put_fan_variable()
 	m_fan.ResetContent(); //Comments by Fance . Removes all items from the list box and edit control of a combo box.
 	//129	107	1	Low byte	W/R	"AUTO_ONLY , enables or disables manual mode. 0 = Manual Fan Modes 1-x Allowed 
 	//(depending on R122 value, 1 = Auto Mode Only, 2 = DDC mode,the user can not change setpoint and fan speed from keypad."
-
-	if(product_register_value[MODBUS_AUTO_ONLY]== 1)	//129   107
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
 	{
-		m_fan.AddString(p[0]);
-		m_fan.AddString(p[5]);
-	}
-	else
-	{
-		if(product_register_value[MODBUS_FAN_MODE]>0)	//122   105
+		strdemo = _T("1-4-0-1,");
+		SetPaneString(2,strdemo);
+		//if(read_one(g_tstat_id,107)==1)////here can't use read_multi function
+		if(product_register_value[107] == 1)////here can't use read_multi function  如果去读，常会死在这里。
 		{
-			m_fan_mode_ctrl.SetCurSel(product_register_value[MODBUS_FAN_MODE]-1);
+			strdemo = _T("1-4-1,");
+			SetPaneString(2,strdemo);
+			m_fan.AddString(p[0]);
+			m_fan.AddString(p[5]);			
 		}
 		else
-		{
-			m_fan_mode_ctrl.SetCurSel(0);
+		{	
+			//122	105	1	Low byte	W/R	FAN MODE, number of fan speeds. Single speed = 1 up to three speed fan = 3
+			strdemo = _T("1-4-2,");
+			SetPaneString(2,strdemo);
+			if (product_register_value[105]>0)
+				m_fan_mode_ctrl.SetCurSel(product_register_value[105]-1);
+			else
+				m_fan_mode_ctrl.SetCurSel(0);
+			switch(m_fan_mode_ctrl.GetCurSel())
+			{
+			case 0:m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[5]);break;
+			case 1:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
+			case 2:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
+			default:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
+			}
 		}
-		switch(m_fan_mode_ctrl.GetCurSel())
-		{
-		case 0:m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[5]);break;
-		case 1:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-		case 2:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-		default:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-		}
+//137	273	1	Low byte	W/R	FAN_SPEED, current operating fan speed   
+// Relay Output Tables (bit0 = relay1, bit1 = relay2, bit2 = relay3, bit3 = relay4, bit4 = relay5)
 
-		if (product_register_value[MODBUS_FAN_SPEED>0])	//137  273
-			m_fan.SetCurSel(product_register_value[MODBUS_FAN_SPEED]);	//137  273
+
+		strdemo = _T("1-4-3,");
+		SetPaneString(2,strdemo);
+		if (product_register_value[273>0])
+			m_fan.SetCurSel(product_register_value[273]);
 		else
 			m_fan.SetCurSel(0);
+	}else
+	{
+
+// 		strdemo = _T("read_one(g_tstat_id,129)==1开始");
+// 		SetPaneString(2,strdemo);
+		//if(read_one(g_tstat_id,129)==1)////here can't use read_multi function//0912
+		if (multi_register_value[129] == 1)
+		{
+			m_fan.AddString(p[0]);
+			m_fan.AddString(p[5]);			
+		}
+		else
+		{				
+			m_fan_mode_ctrl.SetCurSel(multi_register_value[122]-1);
+			switch(m_fan_mode_ctrl.GetCurSel())
+			{
+			case 0:m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[5]);break;
+			case 1:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
+			case 2:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
+		   default:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
+			}
+		}
+// 		strdemo = _T("read_one(g_tstat_id,129)==1完成");
+// 		SetPaneString(2,strdemo);
+		m_fan.SetCurSel(multi_register_value[137]);
 	}
+
+	strdemo = _T("1-5,");
+	SetPaneString(2,strdemo);
+
 }
 
-//Recode by Fance 2013 04 08
-//------------------------------------------------------------------------------------------
-//void COutPutDlg::put_fan_variable()
-//{
-//	strdemo = _T("1-4,");
-//	SetPaneString(2,strdemo);
-//	CString p[6]={_T("Fan Off"),_T("Fan On"),_T("Fan Low"),_T("Fan Mid"),_T("Fan High"),_T("Fan Aut")};
-////		UpdateData(true);
-//	m_fan.ResetContent();
-//
-//	//129	107	1	Low byte	W/R	"AUTO_ONLY , enables or disables manual mode. 0 = Manual Fan Modes 1-x Allowed 
-//	//(depending on R122 value, 1 = Auto Mode Only, 2 = DDC mode,the user can not change setpoint and fan speed from keypad."
-//
-//	strdemo = _T("1-4-0,");
-//	SetPaneString(2,strdemo);
-//
-//	//if (newtstat6[7] == PM_TSTAT6)
-//	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
-//	{
-//		strdemo = _T("1-4-0-1,");
-//		SetPaneString(2,strdemo);
-//		//if(read_one(g_tstat_id,107)==1)////here can't use read_multi function
-//		if(newtstat6[107] == 1)////here can't use read_multi function  如果去读，常会死在这里。
-//		{
-//			strdemo = _T("1-4-1,");
-//			SetPaneString(2,strdemo);
-//			m_fan.AddString(p[0]);
-//			m_fan.AddString(p[5]);			
-//		}
-//		else
-//		{	
-//			//122	105	1	Low byte	W/R	FAN MODE, number of fan speeds. Single speed = 1 up to three speed fan = 3
-//			strdemo = _T("1-4-2,");
-//			SetPaneString(2,strdemo);
-//			if (newtstat6[105]>0)
-//				m_fan_mode_ctrl.SetCurSel(newtstat6[105]-1);
-//			else
-//				m_fan_mode_ctrl.SetCurSel(0);
-//			switch(m_fan_mode_ctrl.GetCurSel())
-//			{
-//			case 0:m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[5]);break;
-//			case 1:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-//			case 2:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-//			default:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-//			}
-//		}
-//		//137	273	1	Low byte	W/R	FAN_SPEED, current operating fan speed   
-//// 		Relay Output Tables (bit0 = relay1, bit1 = relay2, bit2 = relay3, bit3 = relay4, bit4 = relay5)
-//
-//
-//		strdemo = _T("1-4-3,");
-//		SetPaneString(2,strdemo);
-//		if (newtstat6[273>0])
-//			m_fan.SetCurSel(newtstat6[273]);
-//		else
-//			m_fan.SetCurSel(0);
-//	}else
-//	{
-//
-//// 		strdemo = _T("read_one(g_tstat_id,129)==1开始");
-//// 		SetPaneString(2,strdemo);
-//		//if(read_one(g_tstat_id,129)==1)////here can't use read_multi function//0912
-//		if (multi_register_value[129] == 1)
-//		{
-//			m_fan.AddString(p[0]);
-//			m_fan.AddString(p[5]);			
-//		}
-//		else
-//		{				
-//			m_fan_mode_ctrl.SetCurSel(multi_register_value[122]-1);
-//			switch(m_fan_mode_ctrl.GetCurSel())
-//			{
-//			case 0:m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[5]);break;
-//			case 1:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-//			case 2:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-//			default:m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);break;
-//			}
-//		}
-//// 		strdemo = _T("read_one(g_tstat_id,129)==1完成");
-//// 		SetPaneString(2,strdemo);
-//		m_fan.SetCurSel(multi_register_value[137]);
-//	}
-//
-//	strdemo = _T("1-5,");
-//	SetPaneString(2,strdemo);
-//
-//}
-//------------------------------------------------------------------------------------------
 
 
 int COutPutDlg::get_real_fan_select()
@@ -412,25 +348,20 @@ void COutPutDlg::OnCbnSelchangeFanmode()
 	//	Fan4 is for the Auto state.  These states are controlled by the user."
 	//	The mode of operation (coasting, cooling, heating) is determined by the PID parameter.
 
+ 
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	{
+		write_one(g_tstat_id, 105,m_fan_mode_ctrl.GetCurSel()+1);
+		write_one(g_tstat_id, 273,m_fan.GetCurSel());
+		product_register_value[105] = m_fan_mode_ctrl.GetCurSel()+1;
+		product_register_value[273] = m_fan.GetCurSel();
+	 
+	}else
+	{
+		write_one(g_tstat_id, 122,m_fan_mode_ctrl.GetCurSel()+1);
+		write_one(g_tstat_id, 137,m_fan.GetCurSel());
+	}
 
-	write_one(g_tstat_id, MODBUS_FAN_MODE,m_fan_mode_ctrl.GetCurSel()+1);	//122  105
-	write_one(g_tstat_id, MODBUS_FAN_SPEED,m_fan.GetCurSel());//137 273
-	product_register_value[MODBUS_FAN_MODE] = m_fan_mode_ctrl.GetCurSel()+1;
-	product_register_value[MODBUS_FAN_SPEED] = m_fan.GetCurSel();
-	//---------------------------------------------------------------
-	//Recode by Fance 2013 04 08 
-	//if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
-	//{
-	//	write_one(g_tstat_id, 105,m_fan_mode_ctrl.GetCurSel()+1);
-	//	write_one(g_tstat_id, 273,m_fan.GetCurSel());
-	//	newtstat6[105] = m_fan_mode_ctrl.GetCurSel()+1;
-	//	newtstat6[273] = m_fan.GetCurSel();
-	//}else
-	//{
-	//	write_one(g_tstat_id, 122,m_fan_mode_ctrl.GetCurSel()+1);
-	//	write_one(g_tstat_id, 137,m_fan.GetCurSel());
-	//}
-	//---------------------------------------------------------------
 	put_fan_variable();
 	FreshGrids();
 }
@@ -447,19 +378,21 @@ void COutPutDlg::OnCbnSelchangeCbfan()
 // 		"Fan0 table is for the off state. Fan1, Fan2, and Fan3 are for the manual states. 
 //		Fan4 is for the Auto state.  These states are controlled by the user."
 // 		The mode of operation (coasting, cooling, heating) is determined by the PID parameter.
-
-	write_one(g_tstat_id, MODBUS_FAN_SPEED,m_fan.GetCurSel());//137  273
-	product_register_value[MODBUS_FAN_SPEED] = m_fan.GetCurSel();
-	//---------------------------------------------------------------
-	//Recode by Fance 2013 04 08 
-	//if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
-	//{
-	//	write_one(g_tstat_id, 273,m_fan.GetCurSel());
-	//	newtstat6[273]= m_fan.GetCurSel();
-	//}
-	//else
-	//	write_one(g_tstat_id, 137,m_fan.GetCurSel());
-	//---------------------------------------------------------------
+	//if (newtstat6[7] == PM_TSTAT6)
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	{
+		int ret=write_one(g_tstat_id, 273,m_fan.GetCurSel());
+		if (ret>0)
+		{
+			 
+			product_register_value[MODBUS_FAN_SPEED]=m_fan.GetCurSel();
+		}
+		
+	}
+	else
+		write_one(g_tstat_id, 137,m_fan.GetCurSel());
+	//put_fan_variable();
+ 
 	FreshGrids();
 }
 
@@ -473,7 +406,7 @@ void COutPutDlg::OnEnKillfocusPid1Heatstageedit()
 
 		AfxMessageBox(_T("Too many stages for PID1!"));
 		m_PID1_heat_stages = 3;
-		newtstat6[332] = 3;
+		product_register_value[332] = 3;
 		GetDlgItem(IDC_PID1_HEATSTAGEEDIT)->SetWindowText(_T("3"));
 		//UpdateData(FALSE);
 		return;
@@ -483,20 +416,22 @@ void COutPutDlg::OnEnKillfocusPid1Heatstageedit()
 		//276	332	1	Low byte	W/R	Number of Heating Stages in Original Table - (Maximum # of total heating and cooling states is 6)
 
 		//if (newtstat6[7] == PM_TSTAT6)
-		if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
+		if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
 		{
-			if(write_one(g_tstat_id,332,m_PID1_heat_stages)<0)
+			int ret=write_one(g_tstat_id,332,m_PID1_heat_stages);
+			//m_PID1_heat_stages=newtstat6[332];
+			if (ret>0)
 			{
-				MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-			}
+				product_register_value[332] = m_PID1_heat_stages;
+				product_register_value[332]=m_PID1_heat_stages;
+				FreshGrid_PID1tstat6();
+			} 
 			else
 			{
-				newtstat6[332] = m_PID1_heat_stages;
-				product_register_value[MODBUS_HEAT_ORIGINAL_TABLE] = m_PID1_heat_stages;
-				FreshGrid_PID1tstat6();
+			   
+			   AfxMessageBox(_T("Try again"));
 			}
-			//m_PID1_heat_stages=newtstat6[332];
-
+			
 		}else
 		{
 			write_one(g_tstat_id,276,m_PID1_heat_stages);
@@ -504,8 +439,9 @@ void COutPutDlg::OnEnKillfocusPid1Heatstageedit()
 			FreshGrid_PID1();
 		}
 
-		
+
 	}
+	 
 }
 
 void COutPutDlg::OnEnKillfocusPid1coolstageedit()
@@ -517,7 +453,7 @@ void COutPutDlg::OnEnKillfocusPid1coolstageedit()
 	{
 		AfxMessageBox(_T("Too many stages for PID1!"));
 		m_PID1_cool_stages = 3;
-		newtstat6[333] = 3;
+		product_register_value[333] = 3;
 		GetDlgItem(IDC_PID1COOLSTAGEEDIT)->SetWindowText(_T("3"));
 		//UpdateData(FALSE);
 		return;
@@ -528,37 +464,39 @@ void COutPutDlg::OnEnKillfocusPid1coolstageedit()
 		//277	333	1	Low byte	W/R	Number of Cooling Stages in Original Table - (Maximum # of total heating and cooling states is 6)
 
 
-		if (newtstat6[7] ==PM_TSTAT6)
+		if (product_register_value[7] ==PM_TSTAT6)
 		{
-			if(write_one(g_tstat_id,333,m_PID1_cool_stages)<0)
+			int ret=write_one(g_tstat_id,333,m_PID1_cool_stages);
+			//m_PID1_cool_stages=newtstat6[333];
+			if (ret>0)
 			{
-				MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-			}
+				 
+				product_register_value[333]=m_PID1_cool_stages;
+				FreshGrid_PID1tstat6();
+			} 
 			else
 			{
-			//m_PID1_cool_stages=newtstat6[333];
-			newtstat6[333] = m_PID1_cool_stages;
-			product_register_value[MODBUS_COOL_ORIGINAL_TABLE]=m_PID1_cool_stages;
-			FreshGrid_PID1tstat6();
+			AfxMessageBox(_T("Try again"));
 			}
+		
 		}else
 		{
 			write_one(g_tstat_id,277,m_PID1_cool_stages);
 			m_PID1_cool_stages=multi_register_value[277];
 			FreshGrid_PID1();
 		}
-		
+
 
 	}
 }
 void COutPutDlg::FreshGrids()
 {
 	//if (newtstat6[7] == PM_TSTAT6)
-	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
 	{
 		FreshGrid_PID1tstat6();
 		FreshGrid_PID2tstat6();
-
+		//FreshGrid_PID1tstat6();
 	}else
 	{
 		FreshGrid_PID1();
@@ -569,65 +507,48 @@ void COutPutDlg::FreshGrids()
 void COutPutDlg::FreshGrid_PID1()
 {
 
+if(multi_register_value[129]==0)
+	m_bFanAutoOnly=FALSE;
+if(multi_register_value[129]==1)
+	m_bFanAutoOnly=TRUE;
+ 
 
-	if(product_register_value[MODBUS_AUTO_ONLY]==0)	//129
-		m_bFanAutoOnly=FALSE;
-	else if(product_register_value[MODBUS_AUTO_ONLY]==1)	//129
-		m_bFanAutoOnly=TRUE;
+	if(multi_register_value[122]>0)
+		m_fan_mode_ctrl.SetCurSel(multi_register_value[122]-1);
+	
+	if(multi_register_value[137]>=0)
+		m_fan.SetCurSel(multi_register_value[137]);
 
-	if(product_register_value[MODBUS_FAN_MODE]>0)	//122
-		m_fan_mode_ctrl.SetCurSel(product_register_value[MODBUS_FAN_MODE]-1);//122
-
-	if(product_register_value[MODBUS_FAN_SPEED]>=0)//137
-		m_fan.SetCurSel(product_register_value[MODBUS_FAN_SPEED]);//137
-
-
-	int output4_value=product_register_value[MODBUS_MODE_OUTPUT4];//283//2 rows plug in one row
-	int output5_value=product_register_value[MODBUS_MODE_OUTPUT5];//284
-
-	if(product_register_value[MODBUS_PRODUCT_MODEL]!=18)
-	{
+	int output4_value=multi_register_value[283];//2 rows plug in one row
+	int output5_value=multi_register_value[284];
+	 
 		if(output4_value==1||output5_value==1)
 		{
 			m_bFloat=TRUE;
 		}
-	}
+	 
 
+	int output4_PWMvalue=multi_register_value[336];//2 rows plug in one row
+	int output5_PWMvalue=multi_register_value[337];
 
-	int output4_PWMvalue=product_register_value[MODBUS_OUTPUT4_FUNCTION];//336 //2 rows plug in one row
-	int output5_PWMvalue=product_register_value[MODBUS_OUTPUT5_FUNCTION];//337
-	if (product_register_value[MODBUS_PRODUCT_MODEL] == 18)
-	{
-		if (output4_value==2)
+	if (output4_PWMvalue==3)
 		{
-			m_bOut4PWM=TRUE;
+		m_bOut4PWM=TRUE;
 		}
-		if(output5_value==2)
+	if(output5_PWMvalue==3)
 		{
-			m_bOut5PWM=TRUE;
+		m_bOut5PWM=TRUE;
 		}
 
-	}
-	else
-	{
-		if (output4_PWMvalue==3)
-		{
-			m_bOut4PWM=TRUE;
-		}
-		if(output5_PWMvalue==3)
-		{
-			m_bOut5PWM=TRUE;
-		}
-	}
 
 
 	CString strTemp;
-	m_PID1_heat_stages=product_register_value[MODBUS_HEAT_ORIGINAL_TABLE];//276 register ,heat stages
-	m_PID1_cool_stages=product_register_value[MODBUS_COOL_ORIGINAL_TABLE];//277 register ,cool stages
+	m_PID1_heat_stages=multi_register_value[276];//276 register ,heat stages
+	m_PID1_cool_stages=multi_register_value[277];//277 register ,cool stages
 	if(m_PID1_heat_stages==0&&m_PID1_cool_stages==0)
 	{
-		write_one(g_tstat_id,MODBUS_HEAT_ORIGINAL_TABLE,3);//276
-		write_one(g_tstat_id,MODBUS_COOL_ORIGINAL_TABLE,3);//277
+	//	write_one(g_tstat_id,276,3);
+	//	write_one(g_tstat_id,277,3);
 		m_PID1_heat_stages=3;
 		m_PID1_cool_stages=3;
 		if(m_PID1_heat_stages>6)
@@ -657,7 +578,7 @@ void COutPutDlg::FreshGrid_PID1()
 	m_FlexGrid1.put_TextMatrix(0,m_PID1_heat_stages+6,_T("Coast"));
 	for(i=0;i<m_PID1_cool_stages;i++)
 		m_FlexGrid1.put_TextMatrix(0,m_PID1_heat_stages+7+i,cool_hand[i]);
-
+		//Row1-7 "output1-7"
 	m_FlexGrid1.put_TextMatrix(1,1,g_strOutName1);
 	m_FlexGrid1.put_TextMatrix(2,1,g_strOutName2);
 	m_FlexGrid1.put_TextMatrix(3,1,g_strOutName3);
@@ -665,8 +586,8 @@ void COutPutDlg::FreshGrid_PID1()
 	m_FlexGrid1.put_TextMatrix(5,1,g_strOutName5);
 	m_FlexGrid1.put_TextMatrix(6,1,g_strOutName6);
 	m_FlexGrid1.put_TextMatrix(7,1,g_strOutName7);
-
-
+	
+	//Row 1-7
 	m_FlexGrid1.put_TextMatrix(1,0,_T("1"));
 	m_FlexGrid1.put_TextMatrix(2,0,_T("2"));
 	m_FlexGrid1.put_TextMatrix(3,0,_T("3"));
@@ -676,7 +597,7 @@ void COutPutDlg::FreshGrid_PID1()
 	m_FlexGrid1.put_TextMatrix(7,0,_T("7"));
 	m_FlexGrid1.put_ColAlignment(0,4);
 	m_FlexGrid1.put_ColAlignment(1,4);
-
+		
 
 	int moduleValue;
 
@@ -684,7 +605,7 @@ void COutPutDlg::FreshGrid_PID1()
 	float version=get_curtstat_version();
 	if(version>=25)
 	{
-		moduleValue=product_register_value[MODBUS_PRODUCT_MODEL];//product_model register
+		moduleValue=multi_register_value[7];//product_model register
 
 		switch(moduleValue)
 		{
@@ -701,7 +622,7 @@ void COutPutDlg::FreshGrid_PID1()
 		case 17:m_nmoduleType=2;break;//tstat 5f
 		}
 	}
-	else//版本小于25的时候 不明白下面是什么原因，不改动。;
+	else
 	{
 		moduleValue=multi_register_value[130];//output_scale1
 		if(moduleValue==0 || moduleValue==4)//add by jwq
@@ -717,15 +638,15 @@ void COutPutDlg::FreshGrid_PID1()
 		totalrows = 3;
 	else 
 		totalrows = 5;
-
+		
 	if(m_nmoduleType == 3)//2.5.0.99
-		totalrows = 7;
+		totalrows = 7;//只要是Tstat都是7个输出
 
 	int pid_select2[7]={0};
-	if (m_nmoduleType==1)	//5B的特殊情况，不去改动，免得出问题. Fance Du;
+	if (m_nmoduleType==1)
 	{
 		for(i=0;i<3;i++)
-			pid_select2[i]=multi_register_value[247+i];//247   /////////////////////////////get pid select ;col one 1
+		pid_select2[i]=multi_register_value[247+i];/////////////////////////////get pid select ;col one 1
 		pid_select2[3]=multi_register_value[252];
 		pid_select2[4]=multi_register_value[253];
 		//
@@ -733,15 +654,15 @@ void COutPutDlg::FreshGrid_PID1()
 	else
 	{
 		for(i=0;i<7;i++)
-			pid_select2[i]=product_register_value[MODBUS_PID_OUTPUT1+i];//247/////////////////////////////get pid select ;col one 1
+			pid_select2[i]=multi_register_value[247+i];/////////////////////////////get pid select ;col one 1
 	}
 	m_pids = pid_select2[0];//lsc add 默认为pid1
 	//new feature:
 	short nRotation;
-	short nFunction=product_register_value[MODBUS_OUTPUT1_FUNCTION];//328
+	short nFunction=multi_register_value[328];
 	for (int k=0; k<4; k++)
 	{
-		nRotation=product_register_value[MODBUS_ROTATION_OUT2+k];//329
+		nRotation=multi_register_value[329+k];
 		strTemp.Format(_T("%d"),nRotation);
 		m_FlexGrid1.put_TextMatrix(k+2,3,strTemp);
 		if ((nFunction& (1<<k))>0)
@@ -772,22 +693,24 @@ void COutPutDlg::FreshGrid_PID1()
 			{
 				continue;
 			}
-			if (product_register_value[MODBUS_PRODUCT_MODEL] == 18)	//5G的特殊情况 
+			if (multi_register_value[7] == 18)//5G
 			{
-				if(product_register_value[MODBUS_MODE_OUTPUT4] == 1&&row==4)//283
+				if(multi_register_value[283] == 1&&row==4)
 					continue;
-				if(product_register_value[MODBUS_MODE_OUTPUT5] == 1&&row==5)	//284
+				if(multi_register_value[284] == 1&&row==5)
 					continue;
-			}else
+			}
+			else
 			{
-				if(m_bFloat&&row==4)
-					continue;
-				if(m_bFloat&&row==5)
-					continue;
+			if(m_bFloat&&row==4)
+				continue;
+			if(m_bFloat&&row==5)
+				continue;
 			}
 
 			int nOutReg;
-			nOutReg=MODBUS_INTERLOCK_OUTPUT1+row-1;//286
+			nOutReg=286+row-1;
+			//int nValue=read_one(tstat_id,nOutReg);
 			int nValue=multi_register_value[nOutReg];
 			if(nValue==7)
 				continue;
@@ -795,21 +718,23 @@ void COutPutDlg::FreshGrid_PID1()
 			int nFan=get_real_fan_select();
 			//marked 20090511
 			if(pid_select2[row-1]==2 || pid_select2[row-1]==3)//min(pid1,pid2) or max(pid1,pid2)
-				tstatval = product_register_value[MODBUS_FAN0_OPER_TABLE_COAST+4 * 7 + pos];//138 /////////////////////fan auto
+				tstatval = multi_register_value[138+4 * 7 + pos];/////////////////////fan auto
 			else
-				tstatval = product_register_value[MODBUS_FAN0_OPER_TABLE_COAST+nFan * 7 + pos];//138
+				tstatval = multi_register_value[138+nFan * 7 + pos];
 			CString str;
-			{
+			{    //被选中Pid2，Pid1变灰
 				if(digital2string((tstatval >> (row-1)) & 0x01,str,FAN))
 					if(pid_select2[row-1]==1)
-						FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1//变灰不显示
+						FLEX_GRID1_PUT_COLOR_STR(row,col,str)
+						//col +1//变灰不显示
 					else
-					FLEX_GRID1_PUT_STR(row,col,str)//col +1
+						FLEX_GRID1_PUT_STR(row,col,str)
+						//col +1
 			}
 
 		}
 	}
-	//以前只显示了前三排的数据
+//以前只显示了前三排的数据
 #if 1 //test
 	if(m_nmoduleType == 1 || m_nmoduleType == 3)
 	{
@@ -825,40 +750,45 @@ void COutPutDlg::FreshGrid_PID1()
 				pos = col - (m_PID1_heat_stages+1);
 			//
 			//tstatval = multi_register_value[173+ pos];
-
+			
 			//////////////////////////////////////////////
 
-			//这是原代码。
-			// 			if(m_fan.GetCurSel()==0&&(m_nmoduleType==1||m_nmoduleType==3))//a,d,g 3就是tstat5g
-			// 				tstatval = multi_register_value[351+ pos];
-			// 			else 
-			// 				tstatval = multi_register_value[173+ pos];	
+//这是原代码。
+// 			if(m_fan.GetCurSel()==0&&(m_nmoduleType==1||m_nmoduleType==3))//a,d,g 3就是tstat5g
+// 				tstatval = multi_register_value[351+ pos];
+// 			else 
+// 				tstatval = multi_register_value[173+ pos];	
+// 		    	351	1	Analog output OFF table, coasting mode
+// 				352	1	Analog output OFF table, cooling1 mode
+// 				353	1	Analog output OFF table, cooling2 mode
+// 				354	1	Analog output OFF table, cooling3 mode
+// 				355	1	Analog output OFF table, heating1 mode
+// 				356	1	Analog output OFF table, heating2 mode
+// 				357	1	Analog output OFF table, heating3 mode
 
 
-
-			// 		    	351	1	Analog output OFF table, coasting mode
-			// 				352	1	Analog output OFF table, cooling1 mode
-			// 				353	1	Analog output OFF table, cooling2 mode
-			// 				354	1	Analog output OFF table, cooling3 mode
-			// 				355	1	Analog output OFF table, heating1 mode
-			// 				356	1	Analog output OFF table, heating2 mode
-			// 				357	1	Analog output OFF table, heating3 mode
-
-
-			if (product_register_value[7] == 18)//2.5.0.98
-			{
-				tstatval = product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+ pos];//173	//2.5.0.99
-				///////////////////////////////////////////
-			}else
-			{
-				if(m_fan.GetCurSel()==0&&m_nmoduleType==1)//a,d,g 3就是tstat5g//2.5.0.99
-				{
-					tstatval = product_register_value[MODBUS_VALVE_OFF_TABLE_COAST+ pos];	//351
-				}
-				else
-					tstatval = product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+ pos];	//173
-			}
-
+			//if (multi_register_value[7] == 18)//2.5.0.98
+			//{
+			//	if(m_fan.GetCurSel()==0/*&&(m_nmoduleType==1||m_nmoduleType==3)*/)//a,d,g 3就是tstat5g
+			//	{
+			//		 
+			//		tstatval = multi_register_value[351+ pos];//2.5.0.99
+			//	}
+			// 
+			//	else
+			//		tstatval = multi_register_value[173+ pos];	//2.5.0.99
+			//}else
+			//{
+		//if(m_fan.GetCurSel()==0&&(m_nmoduleType==1||m_nmoduleType==3))//a,d,g 3就是tstat5g
+			if(m_fan.GetCurSel()==0/*&&m_nmoduleType==1*/)//a,d,g 3就是tstat5g//2.5.0.99
+			/*{*/
+					tstatval = multi_register_value[351+ pos];
+			/*
+			}*/
+ 			else
+				   tstatval = multi_register_value[173+ pos];	
+			/*}*/
+	
 
 
 			for(row=totalrows-1;row<=totalrows;row++)//row value
@@ -875,129 +805,149 @@ void COutPutDlg::FreshGrid_PID1()
 					continue;
 				if(m_bFloat&&row==5)
 					continue;
-				// 	186	1	Ou1 - Output1 Scale - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
-				// 	187	1	Ou2 - Output2 Scale - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
+// 	186	1	Ou1 - Output1 Scale - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
+// 	187	1	Ou2 - Output2 Scale - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
 
+				/*if(multi_register_value[186] == 0&&row==6)
+					continue;
+				if(multi_register_value[187] == 0&&row==7)
+					continue;*/
 				int nOutReg;	
 
-				nOutReg=MODBUS_INTERLOCK_OUTPUT1+row-1;	//286
-				nValue=multi_register_value[nOutReg];
 
-				if(nValue==7)
-					continue;
+					nOutReg=286+row-1;
+					nValue=multi_register_value[nOutReg];
 
+					if(nValue==7)
+						continue;
 				CString str;
-
-
-				if(row==(totalrows-1))//倒数第二行
-				{
-					if (multi_register_value[186]!=0)
+				//if(/*tstatval>63*/TRUE)//
+				//{
+			
+					if(row==(totalrows-1))//倒数第二行
 					{
-						if (tstatval & 64)
+					if (multi_register_value[186]!=0)
 						{
-							if(digital2string(4,str,VALVE))//for 7 or 8 bit
-								if(pid_select2[row-1]==1)
-									FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
-								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
-						} 
-						else
-						{
-							if(digital2string(tstatval & 0x03,str,VALVE))//*** value
+						  if (tstatval & 64)
+						  {
+						  if(digital2string(4,str,VALVE))//for 7 or 8 bit
+							  if(pid_select2[row-1]==1)
+								  FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+							  else
+							  FLEX_GRID1_PUT_STR(row,col,str)//col +1
+						  } 
+						  else
+						  {
+						    if(digital2string(tstatval & 0x03,str,VALVE))//*** value
 							{
 								if(pid_select2[row-1]==1)
-									FLEX_GRID1_PUT_COLOR_STR(row,col, str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col, str)//col +1
 								else
 								FLEX_GRID1_PUT_STR(row,col, str)//col +1
 							}
+						  }
 						}
-					}
 					else
 					{
-						int sel=tstatval & 0x03;
-
-						if (sel!=0)
-						{
+					   int sel=tstatval & 0x03;
+							 
+							if (sel!=0)
+							{
 							if(digital2string(1,str,FAN))//*** value
 							{
 								if(pid_select2[row-1]==1)
-									FLEX_GRID1_PUT_COLOR_STR(row,col, str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col, str)//col +1
 								else
 								FLEX_GRID1_PUT_STR(row,col,str)//col +1
 							}
-						} 
-						else
-						{
+							} 
+							else
+							{
 							if(digital2string(0,str,FAN))//*** value
 							{
 								if(pid_select2[row-1]==1)
-									FLEX_GRID1_PUT_COLOR_STR(row,col, str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col, str)//col +1
 								else
 								FLEX_GRID1_PUT_STR(row,col,str)//col +1
 							}
-						}
-
+					       }
+				 
 					}
-				}
-				if(row==totalrows)//倒数第一个
-				{
-					if (multi_register_value[187]!=0)
+					}
+					if(row==totalrows)//倒数第一个
 					{
-						if(tstatval & 128)
+					if (multi_register_value[187]!=0)
 						{
-							if(digital2string(4,str,VALVE))//for 7 or 8 bit
+						if(tstatval & 128)
 							{
+							if(digital2string(4,str,VALVE))//for 7 or 8 bit
+								{
 								if(pid_select2[row-1]==1)
 									FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
 								else
 								FLEX_GRID1_PUT_STR(row,col,str)//col +1
-							}
+								}
 
-						}else
-						{
+							}else
+							{
 							if(digital2string((tstatval >> 2) & 0x03,str,VALVE))//*** value
 							{
 								if(pid_select2[row-1]==1)
-									FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
 								else
 								FLEX_GRID1_PUT_STR(row,col,str)//col +1
 							}
+							}
 						}
-					}
 
 					else
-					{
-						int sel=(tstatval >> 2) & 0x03;
-						if (sel!=0)
 						{
+						int sel=(tstatval >> 2) & 0x03;
+							if (sel!=0)
+							{
 							if(digital2string(1/*(tstatval >> 2) & 0x03*/,str,FAN))//*** value
 							{
 								if(pid_select2[row-1]==1)
-									FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
 								else
 								FLEX_GRID1_PUT_STR(row,col,str)//col +1
 							}
-						} 
-						else
-						{
+							} 
+							else
+							{
 							if(digital2string(0/*(tstatval >> 2) & 0x03*/,str,FAN))//*** value
 							{
 								if(pid_select2[row-1]==1)
-									FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
 								else
 								FLEX_GRID1_PUT_STR(row,col,str)//col +1
 							}
+							}
 						}
-					}
-
+					 
 				}
+				 
+				//}
+				//else
+				//{
+				///*
+				//	if(digital2string((tstatval >> ((row-totalrows+1)*2)) & 0x03,str,VALVE))//*** value
+				//		if(pid_select2[row-1]==1)
+				//		FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+				//		else
+				//		FLEX_GRID1_PUT_STR(row,col,str)//col +1
+				//		*/
+				//}
+
 			}
 		}
 	}
 
-	if (product_register_value[MODBUS_PRODUCT_MODEL] == 18) // 2.5.0.98
+// 	output4_value =multi_register_value[283]; // 1 表示floating
+// 	output5_value =multi_register_value[284];
+	if (multi_register_value[7] == 18) // 2.5.0.98
 	{
-		if(product_register_value[MODBUS_MODE_OUTPUT4] == 1)	//283
+		if(multi_register_value[283] == 1)
 		{
 			for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
 			{
@@ -1007,14 +957,13 @@ void COutPutDlg::FreshGrid_PID1()
 				else
 					pos = col - (m_PID1_heat_stages+1);	
 
-
 				if(m_fan.GetCurSel()==0)
-					nValue = product_register_value[MODBUS_VALVE_OFF_TABLE_COAST+ pos];	//351
+					nValue = multi_register_value[351+ pos];
 				else
-					nValue = product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+ pos];	//173
+					nValue = multi_register_value[173+ pos];
 				int indext=-1;
 
-				nValue=(nValue&0x30)>>4;
+				nValue=(nValue& 0x03)>>4;
 				switch(nValue)
 				{
 				case 0:
@@ -1039,16 +988,24 @@ void COutPutDlg::FreshGrid_PID1()
 				if(pid_select2[4-1]==1)
 				{
 					FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp)//col +1
+			
+
 				}
 				else
 				{
 					FLEX_GRID1_PUT_STR(4,col,strTemp)//col +1
-
+	
 				}
+
+
+				//FLEX_GRID1_PUT_STR(4,col,strTemp)//col +1
+
+				//	FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
+
 
 			}
 		}
-		if(product_register_value[MODBUS_MODE_OUTPUT5] == 1)	//284
+		if(multi_register_value[284] == 1)
 		{
 			for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
 			{
@@ -1060,14 +1017,14 @@ void COutPutDlg::FreshGrid_PID1()
 
 
 				if(m_fan.GetCurSel()==0)
-					nValue = product_register_value[MODBUS_VALVE_OFF_TABLE_COAST+ pos];	//351
+					nValue = multi_register_value[351+ pos];
 				else
-					nValue = product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+ pos];	//173
+					nValue = multi_register_value[173+ pos];
 				int indext=-1;
 
-				nValue=(nValue&0x30)>>4;
+				nValue=(nValue)>>4;
 				switch(nValue)
-				{
+					{
 				case 0:
 					strTemp="Close";
 					break;
@@ -1086,20 +1043,25 @@ void COutPutDlg::FreshGrid_PID1()
 				default:
 					strTemp="";
 					break;
-				}
+					}
 				if(pid_select2[5-1]==1)
 				{
-					FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp)
+						FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp)
 
 				}
 				else
 				{
-					FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
+						FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
 				}
+
+
+ 
+
 
 			}
 		}
-	}else
+	}
+	else
 	{
 		if(m_bFloat)
 		{
@@ -1113,12 +1075,12 @@ void COutPutDlg::FreshGrid_PID1()
 
 
 				if(m_fan.GetCurSel()==0)
-					nValue = product_register_value[MODBUS_VALVE_OFF_TABLE_COAST+ pos];	//351
+					nValue = multi_register_value[351+ pos];
 				else
-					nValue = product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+ pos];	//173
+					nValue = multi_register_value[173+ pos];
 				int indext=-1;
 
-				nValue=(nValue&0x30)>>4;
+				nValue=(nValue& 0x03)>>4;
 				switch(nValue)
 				{
 				case 0:
@@ -1143,183 +1105,188 @@ void COutPutDlg::FreshGrid_PID1()
 				if(pid_select2[4-1]==1)
 				{
 					FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp)//col +1
-						FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp)
+					FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp)
 
 				}
 				else
 				{
 					FLEX_GRID1_PUT_STR(4,col,strTemp)//col +1
-						FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
+					FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
 				}
+
+
+				//FLEX_GRID1_PUT_STR(4,col,strTemp)//col +1
+
+				//	FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
+
 
 			}
 		}
 
 	}
-
-
 	if(m_bOut4PWM) // 2表示PWM
 	{
 
-		for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
-		{
-			int nValue=0;
-			if(col < (m_PID1_heat_stages+1))
-				pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
-			else
-				pos = col - (m_PID1_heat_stages+1);			
-			tstatval = product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+ pos];	//173
-			int indext=-1;
-			nValue=product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+pos];	//341
-			nValue=nValue>>4;
-			switch(nValue)
+			for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
 			{
-			case 0:
-				strTemp=_T("Close");
-				break;
-			case 1:
-				strTemp=_T("Open");
-				break;
-			case 2:
-				strTemp="0-100";
-				break;
-			case 3:
-				strTemp=_T("50-100");
-				break;
-			case 4:
-				strTemp=_T("0-50");
-				break;
-			default:
-				strTemp=_T("");
-			}
+				int nValue=0;
+				if(col < (m_PID1_heat_stages+1))
+					pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
+				else
+					pos = col - (m_PID1_heat_stages+1);			
+				tstatval = multi_register_value[173+ pos];
+				int indext=-1;
+				//nValue=read_one(tstat_id,341+pos);
+				nValue=multi_register_value[341+pos];
+				nValue=nValue>>4;
+				switch(nValue)
+				{
+				case 0:
+					strTemp=_T("Close");
+					break;
+				case 1:
+					strTemp=_T("Open");
+					break;
+				case 2:
+					strTemp="0-100";
+					break;
+				case 3:
+					strTemp=_T("50-100");
+					break;
+				case 4:
+					strTemp=_T("0-50");
+					break;
+				default:
+					strTemp=_T("");
+				}
 			if(pid_select2[4-1]==1)//2.5.0.98  1表示pid2
 				FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp)
-			else
-			FLEX_GRID1_PUT_STR(4,col,strTemp)//col +1
-		}
+				else
+				FLEX_GRID1_PUT_STR(4,col,strTemp)//col +1
+			}
 	}	
 	if(m_bOut5PWM)
-	{
-		for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
 		{
-			int nValue=0;
-			if(col < (m_PID1_heat_stages+1))
-				pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
-			else
-				pos = col - (m_PID1_heat_stages+1);			
-			tstatval = product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+ pos];	//173
-			int indext=-1;
-
-			nValue=product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+pos];	//341
-			nValue=nValue&0x0f;
-			switch(nValue)
+			for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
 			{
-			case 0:
-				strTemp=_T("Close");
-				break;
-			case 1:
-				strTemp=_T("Open");
-				break;
-			case 2:
-				strTemp=_T("0-100");
-				break;
-			case 3:
-				strTemp=_T("50-100");
-				break;
-			case 4:
-				strTemp=_T("0-50");
-				break;
-			default:
-				strTemp=_T("");
-			}
+				int nValue=0;
+				if(col < (m_PID1_heat_stages+1))
+					pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
+				else
+					pos = col - (m_PID1_heat_stages+1);			
+				tstatval = multi_register_value[173+ pos];
+				int indext=-1;
 
-			if(pid_select2[5-1]==1)//2.5.0.98
+				//nValue=read_one(tstat_id,341+pos);	
+				nValue=multi_register_value[341+pos];
+				nValue=nValue&0x0f;
+				switch(nValue)
+				{
+				case 0:
+					strTemp=_T("Close");
+					break;
+				case 1:
+					strTemp=_T("Open");
+					break;
+				case 2:
+					strTemp=_T("0-100");
+					break;
+				case 3:
+					strTemp=_T("50-100");
+					break;
+				case 4:
+					strTemp=_T("0-50");
+					break;
+				default:
+					strTemp=_T("");
+				}
+
+				if(pid_select2[5-1]==1)//2.5.0.98
 				FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp)	
-			else
-			FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
+				else
+				FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
 
-			//FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1//2.5.0.98
-			//totalrows
+				//FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1//2.5.0.98
+					//totalrows
+			}
 		}
-	}
 
-
-	//Free Cool:
 
 	for( row = 1;row<=totalrows;row++)//****************************
-	{
-		int nOutReg;
-		nOutReg=MODBUS_INTERLOCK_OUTPUT1+row-1;	//286
-		int nValue=multi_register_value[nOutReg];
-		if(nValue!=7)
-			continue;
-		for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
+		//for( row = totalrows-1;row<=totalrows;row++)//****************************
 		{
-			int nValue=0;
-			if(col < (m_PID1_heat_stages+1))
-				pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
-			else
-				pos = col - (m_PID1_heat_stages+1);			
-			int indext=-1;
-
-			int nReg=MODBUS_OUTPUT_FREE_COOL_COAST+pos;//362
-			nValue=multi_register_value[nReg]; 
-
-			if(m_fan.GetCurSel()==0)
+			int nOutReg;
+			nOutReg=286+row-1;
+//			int nValue=read_one(tstat_id,nOutReg);
+			int nValue=multi_register_value[nOutReg];
+			if(nValue!=7)
+					continue;
+			for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
 			{
-				nValue=(nValue&0xF0)>>4;
-				switch(nValue)
-				{
-				case 0:
-					strTemp=_T("0%");
-					break;
-				case 1:
-					strTemp=_T("100%");
-					break;
-				case 2:
-					strTemp=_T("Min->100%");
-					break;
-				case 3:
-					strTemp=_T("Min|100%");
-					break;
-				case 4:
-					strTemp=_T("Min");
-					break;
-				default:
-					strTemp=_T("0%");
-				}
-				//	FLEX_GRID1_PUT_STR(row,col,strTemp)//col +1
-				FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
-				FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
-			}
-			else
-			{
-				nValue=(nValue&0x0F);
-				switch(nValue)
-				{
-				case 0:
-					strTemp=_T("0%");
-					break;
-				case 1:
-					strTemp=_T("100%");
-					break;
-				case 2:
-					strTemp=_T("Min->100%");
-					break;
-				case 3:
-					strTemp=_T("Min|100%");
-					break;
-				case 4:
-					strTemp=_T("Min");
-					break;
-				default:
-					strTemp=_T("0%");
-				}
-				//	FLEX_GRID1_PUT_STR(row,col,strTemp)//col +1
-				FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
-				FLEX_GRID1_PUT_STR(totalrows,col,strTemp);//col +1
+				int nValue=0;
+				if(col < (m_PID1_heat_stages+1))
+					pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
+				else
+					pos = col - (m_PID1_heat_stages+1);			
+				int indext=-1;
 
-			}
+				int nReg=362+pos;
+				nValue=multi_register_value[nReg]; 
+
+				if(m_fan.GetCurSel()==0)
+				{
+					nValue=(nValue&0xF0)>>4;
+					switch(nValue)
+					{
+					case 0:
+						strTemp=_T("0%");
+						break;
+					case 1:
+						strTemp=_T("100%");
+						break;
+					case 2:
+						strTemp=_T("Min->100%");
+						break;
+					case 3:
+						strTemp=_T("Min|100%");
+						break;
+					case 4:
+						strTemp=_T("Min");
+						break;
+					default:
+						strTemp=_T("0%");
+					}
+			 
+					FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
+				}
+				else
+				{
+					nValue=(nValue&0x0F);
+					switch(nValue)
+					{
+					case 0:
+						strTemp=_T("0%");
+						break;
+					case 1:
+						strTemp=_T("100%");
+						break;
+					case 2:
+						strTemp=_T("Min->100%");
+						break;
+					case 3:
+						strTemp=_T("Min|100%");
+						break;
+					case 4:
+						strTemp=_T("Min");
+						break;
+					default:
+						strTemp=_T("0%");
+					}
+				//	FLEX_GRID1_PUT_STR(row,col,strTemp)//col +1
+					FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
+					FLEX_GRID1_PUT_STR(totalrows,col,strTemp);//col +1
+
+				}
 		}		
 	}
 #endif
@@ -1334,8 +1301,8 @@ void COutPutDlg::FreshGrid_PID2()
 	m_PID2_cool_stages=multi_register_value[269];//277 register ,cool stages
 	if(m_PID2_heat_stages==0&&m_PID2_cool_stages==0)
 	{
-		write_one(g_tstat_id,268,3);
-		write_one(g_tstat_id,269,3);
+		//write_one(g_tstat_id,268,3);
+		//write_one(g_tstat_id,269,3);
 		m_PID2_heat_stages=3;
 		m_PID2_cool_stages=3;
 		if(m_PID2_heat_stages>6)
@@ -1424,7 +1391,7 @@ void COutPutDlg::FreshGrid_PID2()
 			pos = col - (m_PID2_heat_stages+1);
 
 		if(m_fan.GetCurSel()==0&&(m_nmoduleType==1||m_nmoduleType==3))//min(pid1,pid2) or max(pid1,pid2)
-			tstatval = multi_register_value[385+pos];/////////////////////fan auto
+			tstatval = multi_register_value[526+pos];/////////////////////fan auto
 		else
 			tstatval = multi_register_value[254+ pos];
 		for( row = 1;row<=totalrows;row++)//****************************
@@ -1458,7 +1425,7 @@ void COutPutDlg::FreshGrid_PID2()
 				// 				if (pid_select2[0] == 1)//只有第一行选择pid2，下面都是以PID2来计算  //PID1 = 0 PID2 =1
 				// 					tstatval = multi_register_value[385+ pos];
 				// 				else
-				tstatval = multi_register_value[392+ pos];
+				tstatval = multi_register_value[533+ pos];
 			}
 			// 			else if (pid_select2[0] == 1)
 			// 				tstatval = multi_register_value[254+ pos];	
@@ -1874,52 +1841,54 @@ void COutPutDlg::OnBnClickedFanautocheck()
 	//(depending on R122 value, 1 = Auto Mode Only, 2 = DDC mode,the user can not change setpoint and fan speed from keypad."
 
 
-	m_bFanAutoOnly =(BOOL)m_fanAutoCheck.GetCheck();
-	write_one(g_tstat_id,MODBUS_AUTO_ONLY,m_bFanAutoOnly);//129  107
-	product_register_value[MODBUS_AUTO_ONLY]=m_bFanAutoOnly;
+//	m_bFanAutoOnly =(BOOL)m_fanAutoCheck.GetCheck();
+//	write_one(g_tstat_id,MODBUS_AUTO_ONLY,m_bFanAutoOnly);//129  107
+//	product_register_value[MODBUS_AUTO_ONLY]=m_bFanAutoOnly;
 	//----------------------------------------------------------
 	//Recode by Fance ,2013 04 08.
-	//if(m_fanAutoCheck.GetCheck()==BST_CHECKED)
-	//{
-	//	m_bFanAutoOnly=TRUE;
-	//	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
-	//	{
-	//		write_one(g_tstat_id,107,1);
-	//		newtstat6[107]=1;
-	//	}else
-	//		write_one(g_tstat_id,129,1);
-	//}
-	//else
-	//{
-	//	m_bFanAutoOnly=FALSE;
-	//	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
-	//	{
-	//		write_one(g_tstat_id,107,0);
-	//		newtstat6[107]=0;
-	//	}else
-	//		write_one(g_tstat_id,129,0);
+	if(m_fanAutoCheck.GetCheck()==BST_CHECKED)
+	{
+		m_bFanAutoOnly=TRUE;
+		//m_fan_mode_ctrl.EnableWindow(FALSE);
+		//if (newtstat6[7] == PM_TSTAT6)
+		if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+		{
+			write_one(g_tstat_id,107,1);
+			product_register_value[107]=1;
+		}else
+			write_one(g_tstat_id,129,1);
+	}
+	else
+	{
+		m_bFanAutoOnly=FALSE;
+	//	m_fan_mode_ctrl.EnableWindow(TRUE);
+		//write_one(g_tstat_id,129,0);
 
-	//}
-	//----------------------------------------------------------
+		//if (newtstat6[7] == PM_TSTAT6)
+		if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+		{
+			write_one(g_tstat_id,107,0);
+			product_register_value[107]=0;
+		}else
+			write_one(g_tstat_id,129,0);
 
+	}
 
+	//write_one(g_tstat_id,129,m_bFanAutoOnly);
 
-
-	//----------------------------------------------------------
-	//Recode by Fance ,2013 04 08.It's unnecessary to redo this part,the upper code has do it. 
-	//if (newtstat6[7] ==PM_TSTAT6)
-	//{
-	//	if(multi_register_value[107]==0)
-	//		m_bFanAutoOnly=FALSE;
-	//	if(multi_register_value[107]==1)
-	//		m_bFanAutoOnly=TRUE;
-	//}else
-	//{
-	//	if(multi_register_value[129]==0)
-	//		m_bFanAutoOnly=FALSE;
-	//	if(multi_register_value[129]==1)
-	//		m_bFanAutoOnly=TRUE;
-	//}
+	if (product_register_value[7] ==PM_TSTAT6)
+	{
+		if(product_register_value[107]==0)
+			m_bFanAutoOnly=FALSE;
+		if(product_register_value[107]==1)
+			m_bFanAutoOnly=TRUE;
+	}else
+	{
+		if(multi_register_value[129]==0)
+			m_bFanAutoOnly=FALSE;
+		if(multi_register_value[129]==1)
+			m_bFanAutoOnly=TRUE;
+	}
 	//----------------------------------------------------------
 
 	put_fan_variable();
@@ -1947,7 +1916,6 @@ void COutPutDlg::OnBnClickedFanautocheck()
 BEGIN_EVENTSINK_MAP(COutPutDlg, CDialog)
 	ON_EVENT(COutPutDlg, IDC_MSFLEXGRID1, DISPID_CLICK, COutPutDlg::ClickMsflexgrid1, VTS_NONE)
 	ON_EVENT(COutPutDlg, IDC_MSFLEXGRID2, DISPID_CLICK, COutPutDlg::ClickMsflexgrid2, VTS_NONE)
-
 END_EVENTSINK_MAP()
 
 void COutPutDlg::ClickMsflexgrid1()
@@ -2033,13 +2001,13 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("On"));
 			m_ItemValueCombx.AddString(_T("DI1"));
-			if (newtstat6[7]== 6)
+			if (product_register_value[7]== PM_TSTAT6)
 			{
-				if(multi_register_value[188]==3)//on/off mode  //找不到对应的tstat6
+				if(product_register_value[188]==3)//on/off mode  //找不到对应的tstat6
 					m_ItemValueCombx.AddString(_T("AI1"));
 				else
 					m_ItemValueCombx.AddString(_T("//AI1"));
-				if(multi_register_value[189]==3)//on/off mode
+				if(product_register_value[189]==3)//on/off mode
 					m_ItemValueCombx.AddString(_T("AI2"));
 				else
 					m_ItemValueCombx.AddString(_T("//AI2"));
@@ -2084,10 +2052,10 @@ void COutPutDlg::ClickMsflexgrid1()
 		int nOutReg,nValue;
 
 		//if (newtstat6[7] == 6)
-		if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 		{
 			nOutReg=245+m_nCurRow-1;
-			nValue=newtstat6[nOutReg];
+			nValue=product_register_value[nOutReg];
 
 
 		}else
@@ -2117,26 +2085,10 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.SetFocus(); //获取焦点
 		}
 	//	else if((lRow<4)||(lRow==4 && !m_bOut4PWM)||(lRow==5 && !m_bOut5PWM))
-			else if((lRow<4)||(lRow==4 && !m_bOut4PWM)||(lRow==5 && !m_bOut5PWM)/*||(lRow>5)*/)//20121008
+			else if((lRow<4) ||(lRow==4 && !m_bOut4PWM)||(lRow==5 && !m_bOut5PWM))//20121008
 		{		
-		    if (m_bFloat)
-		    {
-				m_ItemValueCombx.ResetContent();
-			/*m_ItemValueCombx.AddString(_T("Off"));
-			m_ItemValueCombx.AddString(_T("On"));*/
-	 		m_ItemValueCombx.AddString(_T("Close"));
-			m_ItemValueCombx.AddString(_T("Open"));
-			m_ItemValueCombx.AddString(_T("0-100"));
-			m_ItemValueCombx.AddString(_T("50-100"));
-			m_ItemValueCombx.AddString(_T("0-50")); 
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
-		    } 
-		    else
-		    {m_ItemValueCombx.ResetContent();
+		 //Row 1-3
+			m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On"));
 	/*		m_ItemValueCombx.AddString(_T("Close"));
@@ -2149,16 +2101,17 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.BringWindowToTop();
 			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
 			m_ItemValueCombx.SetFocus(); //获取焦点
-		    }
-			
 		}
-		else if (lRow>5)
-		{
-		   if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+		else if((lRow>5))//20121008
+		{		
+		    
+
+
+			 if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 			 {
 			 if (lRow==6)
 				 {
-				 if (newtstat6[207]==0)
+				 if (product_register_value[207]==0)
 					 {
 				m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
@@ -2193,7 +2146,7 @@ void COutPutDlg::ClickMsflexgrid1()
 			    } 
 			    else if (lRow==7)//lRow==7
 			    {
-				  if (newtstat6[208]==0)
+				  if (product_register_value[208]==0)
 				  {
 				  m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
@@ -2353,7 +2306,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 // 		345	379				reserved,unoccupied cooling
 // 		346	380				reserved,humidity setpoint
 
-	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
 	{
 #if 1//0911
 		if(g_OutPutLevel==1)
@@ -2763,7 +2716,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 {
 	int ret=0;
-	if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 	{
 		if(g_OutPutLevel==1)
 			return;
@@ -2797,27 +2750,27 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 					{
 						if(write_one(g_tstat_id,274+row-1,0)<0)
 						{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-						newtstat6[274+row-1] =0;
+						product_register_value[274+row-1] =0;
 					}
 
 					else if(str2.CompareNoCase(_T("PID2"))==0)
 					{
 						if(write_one(g_tstat_id,274+row-1,1)<0)
 						{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-						newtstat6[274+row-1] =1;
+						product_register_value[274+row-1] =1;
 
 					}
 					else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
 					{
 						if(write_one(g_tstat_id,274+row-1,2)<0)
 						{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-						newtstat6[274+row-1] =2;
+						product_register_value[274+row-1] =2;
 					}
 					else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
 					{
 						if(write_one(g_tstat_id,274+row-1,3)<0)
 						{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-						newtstat6[274+row-1] =3;
+						product_register_value[274+row-1] =3;
 					}
 				}
 				else
@@ -2833,13 +2786,13 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						{
 							if(write_one(g_tstat_id,279,0)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							newtstat6[279] = 0;
+							product_register_value[279] = 0;
 						}
 						if (row==5)
 						{
 							if(write_one(g_tstat_id,280,0)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							newtstat6[280] = 0;
+							product_register_value[280] = 0;
 						}
 
 					}
@@ -2852,13 +2805,13 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						{
 							if(write_one(g_tstat_id,279,1)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							newtstat6[279] = 1;
+							product_register_value[279] = 1;
 						}
 						if (row==5)
 						{
 							if(write_one(g_tstat_id,280,1)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							newtstat6[280] =1;
+							product_register_value[280] =1;
 						}
 
 					}
@@ -2869,13 +2822,13 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						{
 							if(write_one(g_tstat_id,279,2)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							newtstat6[279] = 2;
+							product_register_value[279] = 2;
 						}
 						if (row==5)
 						{
 							if(write_one(g_tstat_id,280,2)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							newtstat6[280] = 2;
+							product_register_value[280] = 2;
 						}
 
 					}
@@ -2885,13 +2838,13 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						{
 							if(write_one(g_tstat_id,279,3)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							newtstat6[279] = 3;
+							product_register_value[279] = 3;
 						}
 						if (row==5)
 						{
 							if(write_one(g_tstat_id,280,3)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							newtstat6[280] = 3;
+							product_register_value[280] = 3;
 						}
 					}
 					//write_one(tstat_id,247+row-1,3);
@@ -2908,7 +2861,7 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				{
 					if(write_one(g_tstat_id,274+row-1,0)<0)
 					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-					newtstat6[274+row-1] = 0;
+					product_register_value[274+row-1] = 0;
 					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 0;
 
 				}
@@ -2916,7 +2869,7 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				{
 					if(write_one(g_tstat_id,274+row-1,1)<0)
 					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-					newtstat6[274+row-1] = 1;
+					product_register_value[274+row-1] = 1;
 					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 1;
 
 				}
@@ -2926,14 +2879,14 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
 
 					int aaa=read_one(g_tstat_id,274+row-1,3);
-					newtstat6[274+row-1] = 2;
+					product_register_value[274+row-1] = 2;
 					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 2;
 				}
 				else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
 				{
 					if(write_one(g_tstat_id,274+row-1,3)<0)
 					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-					newtstat6[274+row-1] = 3;
+					product_register_value[274+row-1] = 3;
 					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 3;
 				}
 			}
@@ -2960,49 +2913,49 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 			{
 				if(write_one(g_tstat_id,245+row-1,0)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				newtstat6[245+row-1] = 0;
+				product_register_value[245+row-1] = 0;
 			}
 			else if(str2.CompareNoCase(_T("DI1"))==0)
 			{
 				if(write_one(g_tstat_id,245+row-1,1)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				newtstat6[245+row-1] = 1;
+				product_register_value[245+row-1] = 1;
 			}
 			else if((str2.CompareNoCase(_T("AI1"))==0)||str2.CompareNoCase(_T("//AI1"))==0)
 			{
 				if(write_one(g_tstat_id,245+row-1,2)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				newtstat6[245+row-1] = 2;
+				product_register_value[245+row-1] = 2;
 			}
 			else if((str2.CompareNoCase(_T("AI2"))==0)||str2.CompareNoCase(_T("//AI2"))==0)
 			{
 				if(write_one(g_tstat_id,245+row-1,3)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				newtstat6[245+row-1] = 3;
+				product_register_value[245+row-1] = 3;
 			}
 			else if(str2.CompareNoCase(_T("Timer OR"))==0)
 			{
 				if(write_one(g_tstat_id,245+row-1,4)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				newtstat6[245+row-1] = 4;
+				product_register_value[245+row-1] = 4;
 			}
 			else if(str2.CompareNoCase(_T("Timer And"))==0)
 			{
 				if(write_one(g_tstat_id,245+row-1,5)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				newtstat6[245+row-1] = 5;
+				product_register_value[245+row-1] = 5;
 			}
 			else if(str2.CompareNoCase(_T("InterLock Timer"))==0)
 			{
 				if(write_one(g_tstat_id,245+row-1,6)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				newtstat6[245+row-1] = 6;
+				product_register_value[245+row-1] = 6;
 			}
 			else if(str2.CompareNoCase(_T("FreeCool"))==0)
 			{
 				if(write_one(g_tstat_id,245+row-1,7)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				newtstat6[245+row-1] = 7;
+				product_register_value[245+row-1] = 7;
 			}
 
 		}
@@ -3082,11 +3035,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				int n=get_real_fan_select() ;
 				//138	288	1	Low byte	W/R	FAN0_OPERATION_TABLE_COAST
 				//if (newtstat6[7] ==6)
-				if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+				if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 				{
 					if(write_one(g_tstat_id,288+get_real_fan_select() * 7 + pos,tstatval)<0)
 					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-					newtstat6[288+get_real_fan_select() * 7+pos] = tstatval;
+					product_register_value[288+get_real_fan_select() * 7+pos] = tstatval;
 				}
 				else
 				{
@@ -3112,11 +3065,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						if(m_fan.GetCurSel()==0)
 						{
 							//if (newtstat6[7] == 6)
-							if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 							{
 								if(write_one(g_tstat_id,334+pos,tstatval)<0)
 								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-								newtstat6[334+pos] = tstatval;
+								product_register_value[334+pos] = tstatval;
 							}
 							else
 							{
@@ -3127,11 +3080,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						else
 						{
 							//if (newtstat6[7] == 6)
-							if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 							{
 								if(write_one(g_tstat_id,323+pos,tstatval)<0)
 								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-								newtstat6[323+pos] = tstatval;
+								product_register_value[323+pos] = tstatval;
 							}
 							else
 							{
@@ -3153,11 +3106,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 
 						{
 							//if (newtstat6[7] == 6)
-							if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 							{
 								if(write_one(g_tstat_id,334+pos,tstatval)<0)
 								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-								newtstat6[334+pos] = tstatval;
+								product_register_value[334+pos] = tstatval;
 							}
 							else
 							{
@@ -3168,11 +3121,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						else
 						{
 							//if (newtstat6[7] == 6)
-							if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 							{
 								if(write_one(g_tstat_id,323+pos,tstatval)<0)
 								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-								newtstat6[323+pos]= tstatval;
+								product_register_value[323+pos]= tstatval;
 							}
 							else
 							{
@@ -3186,9 +3139,9 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				if(m_fan.GetCurSel()==0)
 				{
 					//if (newtstat6[7] == 6)
-					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+					if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 					{
-						tstatval=(unsigned char)newtstat6[334+pos];
+						tstatval=(unsigned char)product_register_value[334+pos];
 					}
 					else
 					{
@@ -3198,9 +3151,9 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				else
 				{
 					//if (newtstat6[7] == 6)
-					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+					if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 					{
-						tstatval=(unsigned char)newtstat6[323+pos];
+						tstatval=(unsigned char)product_register_value[323+pos];
 					}
 					else
 					{
@@ -3259,11 +3212,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						// 					write_one(g_tstat_id,173+pos,tstatval);
 					{
 						//if (newtstat6[7] == 6)
-						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+						if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 						{
 							if(write_one(g_tstat_id,334+pos,tstatval)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							newtstat6[334+pos] = tstatval;
+							product_register_value[334+pos] = tstatval;
 						}
 						else
 						{
@@ -3274,11 +3227,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 					else
 					{
 						//if (newtstat6[7] == 6)
-						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+						if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 						{
 							if(write_one(g_tstat_id,323+pos,tstatval)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							newtstat6[323+pos] = tstatval;
+							product_register_value[323+pos] = tstatval;
 						}
 						else
 						{
@@ -3317,11 +3270,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				}
 				//254	281	1	Low byte	W/R	PID2 Output table- Coasting
 
-				if (newtstat6[7] ==6)
+				if (product_register_value[7] ==6)
 				{
 					if(write_one(g_tstat_id,281 + pos,tstatval)<0)
 					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-					newtstat6[281 + pos] = tstatval;
+					product_register_value[281 + pos] = tstatval;
 				}
 				else
 				{
@@ -3380,7 +3333,8 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 		}
 		//	FreshGrids();
 
-	}else
+	}
+	else
 	{
 		if(g_OutPutLevel==1)
 			return;
@@ -3529,11 +3483,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 
 			int output3_value;//=multi_register_value[283];//2 rows plug in one row//out 4
 			int output4_value;//=multi_register_value[284];//out 5;
-			//if (newtstat6[7] == 6)
-			if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+
+			if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 			{
-				output3_value=newtstat6[205];//2 rows plug in one row//out 4
-				output4_value=newtstat6[206];//out 5;
+				output3_value=product_register_value[205];//2 rows plug in one row//out 4
+				output4_value=product_register_value[206];//out 5;
 			}else
 			{
 				output3_value=multi_register_value[283];//2 rows plug in one row//out 4
@@ -3581,10 +3535,10 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				}
 				int n=get_real_fan_select() ;
 				//138	288	1	Low byte	W/R	FAN0_OPERATION_TABLE_COAST
-				if ((newtstat6[7] ==7)||(newtstat6[7] ==6))
+				if ((product_register_value[7] ==7)||(product_register_value[7] ==6))
 				{
 					write_one(g_tstat_id,288+get_real_fan_select() * 7 + pos,tstatval);		
-					newtstat6[288+get_real_fan_select() * 7] = tstatval;
+					product_register_value[288+get_real_fan_select() * 7] = tstatval;
 				}
 				else
 				{
@@ -3629,10 +3583,10 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						else
 						{
 							//if (newtstat6[7] == 6)
-							if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 							{
 								write_one(g_tstat_id,323+pos,tstatval);
-								newtstat6[323+pos] = tstatval;
+								product_register_value[323+pos] = tstatval;
 							}
 							else
 							{
@@ -3656,10 +3610,10 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 
 						{
 							//if (newtstat6[7] == 6)
-							if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 							{
 								write_one(g_tstat_id,334+pos,tstatval);
-								newtstat6[334+pos] = tstatval;
+								product_register_value[334+pos] = tstatval;
 							}
 							else
 							{
@@ -3669,10 +3623,10 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						else
 						{
 							//if (newtstat6[7] == 6)
-							if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 							{
 								write_one(g_tstat_id,323+pos,tstatval);
-								newtstat6[323+pos]= tstatval;
+								product_register_value[323+pos]= tstatval;
 							}
 							else
 							{
@@ -3685,9 +3639,9 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				if(m_fan.GetCurSel()==0)
 				{
 					//if (newtstat6[7] == 6)
-					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+					if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 					{
-						tstatval=(unsigned char)newtstat6[334+pos];
+						tstatval=(unsigned char)product_register_value[334+pos];
 					}
 					else
 					{
@@ -3697,9 +3651,9 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				else
 				{
 					//if (newtstat6[7] == 6)
-					if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+					if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 					{
-						tstatval=(unsigned char)newtstat6[323+pos];
+						tstatval=(unsigned char)product_register_value[323+pos];
 					}
 					else
 					{
@@ -3759,10 +3713,10 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						// 					write_one(g_tstat_id,173+pos,tstatval);
 					{
 						//if (newtstat6[7] == 6)
-						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+						if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 						{
 							write_one(g_tstat_id,334+pos,tstatval);
-							newtstat6[334+pos] = tstatval;
+							product_register_value[334+pos] = tstatval;
 						}
 						else
 						{
@@ -3775,10 +3729,10 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 					else
 					{
 						//if (newtstat6[7] == 6)
-						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+						if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 						{
 							write_one(g_tstat_id,323+pos,tstatval);
-							newtstat6[323+pos] = tstatval;
+							product_register_value[323+pos] = tstatval;
 						}
 						else
 						{
@@ -3790,6 +3744,8 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 
 				}
 			}
+
+			
 			else//grid 2:
 			{
 				int ret1= 0;
@@ -3819,16 +3775,12 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				}
 				//254	281	1	Low byte	W/R	PID2 Output table- Coasting
 
-				if ((newtstat6[7] ==6)||(newtstat6[7] ==7))
+				
+				if (m_nmoduleType==3)
 				{
-					write_one(g_tstat_id,281 + pos,tstatval);
-					newtstat6[281 + pos] = tstatval;
-				}
-				else if (multi_register_value[7] == 18 )//2.5.0.94
-				{	
 					if(m_fan.GetCurSel()==0)
 					{
-						ret1 = write_one(g_tstat_id,385 + pos,tstatval);
+						ret1 = write_one(g_tstat_id,526 + pos,tstatval);
 						// 					if (ret1<=0)
 						// 						AfxMessageBox(_T("setting failure!"));
 					}else
@@ -3849,7 +3801,7 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						totalrows = 4 ;////////////////
 					else
 						totalrows = 6 ;////////////////
-					if((col-5) < (m_PID2_heat_stages+1))
+				if((col-5) < (m_PID2_heat_stages+1))
 						pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
 					else
 						pos = (col-5) - (m_PID2_heat_stages+1);
@@ -3884,14 +3836,7 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						}
 
 					}
-					//
-					//write_one(g_tstat_id,261+pos,tstatval);//没找到对应的值。
-					// 				int ret392 = 0;
-					// 				ret392 = write_one(g_tstat_id,392+pos,tstatval);//2.5.0.93
-					// 				if (ret392>0)
-					// 				{
-					// 					multi_register_value[392+pos] = tstatval;
-					// 				}
+				 
 
 
 					if(m_fan.GetCurSel()==0)
@@ -3899,10 +3844,10 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						//write_one(g_tstat_id,351+pos,tstatval);
 
 						int ret392 = 0;
-						ret392 = write_one(g_tstat_id,392+pos,tstatval);//2.5.0.93
+						ret392 = write_one(g_tstat_id,533+pos,tstatval);//2.5.0.93
 						if (ret392>0)
 						{
-							multi_register_value[392+pos] = tstatval;
+							product_register_value[533+pos] = tstatval;
 						}else
 						{
 							//AfxMessageBox(_T("setting failure!"));
@@ -3916,7 +3861,7 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						ret392 = write_one(g_tstat_id,261+pos,tstatval);//2.5.0.93
 						if (ret392>0)
 						{
-							multi_register_value[261+pos] = tstatval;
+							product_register_value[261+pos] = tstatval;
 						}else
 						{
 							//AfxMessageBox(_T("setting failure!"));
@@ -3927,7 +3872,7 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				}
 			}
 		}
-		//FreshGrids();//2.5.0.98
+		FreshGrids();//2.5.0.98
 	}
 }
 
@@ -4070,10 +4015,10 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 	int	nValue;
 
 	//if (newtstat6[7] ==6)
-	if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 	{
 		nOutReg = 245 + lRow-1;
-		nValue=newtstat6[nOutReg];
+		nValue=product_register_value[nOutReg];
 
 	}
 	else
@@ -4099,20 +4044,20 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 		//362	125	1	Low byte	W/R	ANALOG INPUT4 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
 
 		//if (newtstat6[7] == 6)
-		if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 		{
 			if(m_fan.GetCurSel()==0)
 			{
 				int ndata;
 				nValue=nValue<<4;
 				int nReg=362+nPos;
-				ndata=newtstat6[125+nPos];
+				ndata=product_register_value[125+nPos];
 				if(ndata>=0)
 				{
 					ndata=ndata&0x0F;//清掉4-7位
 					nValue=nValue|ndata;
 					write_one(g_tstat_id,125+nPos,nValue);
-					newtstat6[125] = nValue;
+					product_register_value[125] = nValue;
 
 					m_ItemValueCombx.GetWindowText(strNewText);
 					//int nItemwww=m_ItemValueCombx.GetCurSel();
@@ -4129,7 +4074,7 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 				{
 					nValue=nValue|ndata;
 					write_one(g_tstat_id,125+nPos,nValue);
-					newtstat6[125] = nValue;
+					product_register_value[125] = nValue;
 				}
 			}
 		}else
@@ -4295,10 +4240,10 @@ void COutPutDlg::ClickMsflexgrid2()
 	int nOutReg,nValue;
 
 	//if (newtstat6[7] == 6)
-	if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 		{
 		nOutReg=245+m_nCurRow-1;
-		nValue=newtstat6[nOutReg];
+		nValue=product_register_value[nOutReg];
 
 
 		}else
@@ -4358,11 +4303,11 @@ void COutPutDlg::ClickMsflexgrid2()
 		}
 		else if (lRow>5)
 		{
-		   if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+		   if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 			 {
 			 if (lRow==6)
 				 {
-				 if (newtstat6[207]==0)
+				 if (product_register_value[207]==0)
 					 {
 				m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
@@ -4397,7 +4342,7 @@ void COutPutDlg::ClickMsflexgrid2()
 			    } 
 			    else if (lRow==7)//lRow==7
 			    {
-				  if (newtstat6[208]==0)
+				  if (product_register_value[208]==0)
 				  {
 				  m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
@@ -4553,7 +4498,7 @@ void COutPutDlg::OnEnKillfocusPid2Heatstageedit2()
 	{
 
 		AfxMessageBox(_T("Too many stages for PID2!"));
-		m_PID2_heat_stages = newtstat6[330];
+		m_PID2_heat_stages = product_register_value[330];
 		GetDlgItem(IDC_PID2_HEATSTAGEEDIT2)->SetWindowText(_T("1"));
 	}
 	else
@@ -4561,15 +4506,29 @@ void COutPutDlg::OnEnKillfocusPid2Heatstageedit2()
 		//268	330	1	Low byte	W/R	Number of Heating Stages (Max heat+cool = 6)
 
 		//if (newtstat6[7] == PM_TSTAT6)
-		if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
+		if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
 		{
 			write_one(g_tstat_id,330,m_PID2_heat_stages);
-			newtstat6[330] = m_PID2_heat_stages;
+			product_register_value[330] = m_PID2_heat_stages;
 			FreshGrid_PID2tstat6();
 		}else
 		{
-			write_one(g_tstat_id,268,m_PID2_heat_stages);
-			FreshGrid_PID2();
+			int ret=write_one(g_tstat_id,268,m_PID2_heat_stages);
+			/*if (product_register_value[268]==m_PID2_heat_stages)
+			return;
+			Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,268,m_PID2_heat_stages,
+				product_register_value[268],this->m_hWnd,IDC_PID2_HEATSTAGEEDIT2,_T("Heating Stages"));*/
+				if (ret>0)
+				{ 
+				  product_register_value[268]=m_PID2_heat_stages;
+				  multi_register_value[268]=m_PID2_heat_stages;	
+				  FreshGrid_PID2();
+				}
+				else
+				{
+				AfxMessageBox(_T("Try again"));
+				}
+			
 		}
 
 	}
@@ -4586,7 +4545,7 @@ void COutPutDlg::OnEnKillfocusPid2coolstageedit2()
 	if(m_PID2_heat_stages+m_PID2_cool_stages>6)
 	{
 		AfxMessageBox(_T("Too many stages for PID2!"));
-		m_PID2_cool_stages = newtstat6[331];
+		m_PID2_cool_stages = product_register_value[331];
 		GetDlgItem(IDC_PID2_HEATSTAGEEDIT2)->SetWindowText(_T("1"));
 	}
 	else
@@ -4594,15 +4553,28 @@ void COutPutDlg::OnEnKillfocusPid2coolstageedit2()
 		//269	331	1	Low byte	W/R	Number of Cooling Stages (Max heat + Cool = 6) 
 
 		//if (newtstat6[7] == PM_TSTAT6)
-		if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
+		if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
 		{
 			write_one(g_tstat_id,331,m_PID2_cool_stages);
-			newtstat6[331] =m_PID2_cool_stages;
+			product_register_value[331] =m_PID2_cool_stages;
 			FreshGrid_PID2tstat6();
 		}else
 		{
-			write_one(g_tstat_id,269,m_PID2_cool_stages);
-			FreshGrid_PID2();
+			int ret=write_one(g_tstat_id,269,m_PID2_cool_stages);
+
+		
+				if (ret>0)
+				{
+				multi_register_value[269]=m_PID2_cool_stages;
+				product_register_value[269]=m_PID2_cool_stages;
+				 FreshGrid_PID2();
+				}
+				else
+				{
+				 AfxMessageBox(_T("Try again"));
+				}
+				  
+
 		}
 
 	}
@@ -4822,10 +4794,10 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 	
 }
 
-//void COutPutDlg::OnEnSetfocusDescriptedit()
-//{
-//	
-//}
+void COutPutDlg::OnEnSetfocusDescriptedit()
+{
+
+}
 
 void COutPutDlg::FreshGrid_PID1tstat6()
 {
@@ -4911,8 +4883,8 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 	m_PID1_cool_stages=product_register_value[MODBUS_COOL_ORIGINAL_TABLE];//333 register ,cool stages
 	if(m_PID1_heat_stages==0&&m_PID1_cool_stages==0)
 	{
-		write_one(g_tstat_id,MODBUS_HEAT_ORIGINAL_TABLE,3);//332
-		write_one(g_tstat_id,MODBUS_COOL_ORIGINAL_TABLE,3);//333
+		//write_one(g_tstat_id,MODBUS_HEAT_ORIGINAL_TABLE,3);//332
+		//write_one(g_tstat_id,MODBUS_COOL_ORIGINAL_TABLE,3);//333
 		m_PID1_heat_stages=3;
 		m_PID1_cool_stages=3;
 		if(m_PID1_heat_stages>6)
@@ -5019,7 +4991,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 		for(i=0;i<3;i++)
 			//247	274	1	Low byte	W/R	Output 1 PID Interlock                    0 = PID1, can assign each output to either PID1 or 2, the max or the min of the two PIDS
 
-			pid_select2[i]=newtstat6[274+i];/////////////////////////////get pid select ;col one 1
+			pid_select2[i]=product_register_value[274+i];/////////////////////////////get pid select ;col one 1
 
 		//252	279	1	Low byte	W/R	Output 6 PID Interlock
 		//253	280	1	Low byte	W/R	Output 7 PID Interlock
@@ -5084,7 +5056,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 			nOutReg=245+row-1;//286
 			//nOutReg=286+row-1;//286   marked by Fance
 			//int nValue=read_one(tstat_id,nOutReg);
-			int nValue=newtstat6[nOutReg];
+			int nValue=product_register_value[nOutReg];
 			if(nValue==7)
 				continue;
 
@@ -5094,9 +5066,9 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 		//	138	288	1	Low byte	W/R	FAN0_OPERATION_TABLE_COAST
 
 			if(pid_select2[row-1]==2 || pid_select2[row-1]==3)//min(pid1,pid2) or max(pid1,pid2)
-				tstatval = newtstat6[288+4 * 7 + pos];/////////////////////fan auto
+				tstatval = product_register_value[288+4 * 7 + pos];/////////////////////fan auto
 			else
-				tstatval = newtstat6[288+nFan * 7 + pos];
+				tstatval = product_register_value[288+nFan * 7 + pos];
 			CString str;
 			{
 				if(digital2string((tstatval >> (row-1)) & 0x01,str,FAN))
@@ -5130,11 +5102,11 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 
 
 			if(m_fan.GetCurSel()==0&&(m_nmoduleType==1||m_nmoduleType==3))//a,d,g
-				tstatval = newtstat6[334+ pos];
+				tstatval = product_register_value[334+ pos];
 			else
 				//173	323	1	Low byte	W/R	VALVE_OPER_TABLE_COAST, Analog output state for each of the 7 modes of operation
 
-				tstatval = newtstat6[323+ pos];	
+				tstatval = product_register_value[323+ pos];	
 			///////////////////////////////////////////
 
 
@@ -5232,9 +5204,9 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 
 
 			if(m_fan.GetCurSel()==0)
-				nValue = newtstat6[334+ pos];
+				nValue = product_register_value[334+ pos];
 			else
-				nValue = newtstat6[323+ pos];
+				nValue = product_register_value[323+ pos];
 			int indext=-1;
 
 			nValue=(nValue&0x30)>>4;
@@ -5383,7 +5355,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 				pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
 			else
 				pos = col - (m_PID1_heat_stages+1);			
-			tstatval = newtstat6[323+ pos];
+			tstatval = product_register_value[323+ pos];
 			int indext=-1;
 			//nValue=read_one(tstat_id,341+pos);
 			//nValue=multi_register_value[341+pos];//这项没找到对应项   //Annul by Fance
@@ -5423,7 +5395,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 				pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
 			else
 				pos = col - (m_PID1_heat_stages+1);			
-			tstatval = newtstat6[323+ pos];
+			tstatval = product_register_value[323+ pos];
 			int indext=-1;
 
 			//nValue=multi_register_value[341+pos];//这项没找到对应项		 //Annul by Fance
@@ -5465,7 +5437,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 		nOutReg=245+row-1;//Modify by fance; 这里应该是 MODBUS_INTERLOCK_OUTPUT1 对应 245  而  286 是TSTAT 5的值
 		//nOutReg=286+row-1;
 		//			int nValue=read_one(tstat_id,nOutReg);
-		int nValue=newtstat6[nOutReg];
+		int nValue=product_register_value[nOutReg];
 		if(nValue!=7)
 			continue;
 		for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
@@ -5478,7 +5450,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 			int indext=-1;
 
 			int nReg=362+pos;
-			nValue=newtstat6[nReg]; 
+			nValue=product_register_value[nReg]; 
 
 			if(m_fan.GetCurSel()==0)
 			{
@@ -5554,12 +5526,12 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 	SetPaneString(2,strdemo);
 
 	CString strTemp;
-	m_PID2_heat_stages=newtstat6[330];//276 register ,heat stages
-	m_PID2_cool_stages=newtstat6[331];//277 register ,cool stages
+	m_PID2_heat_stages=product_register_value[330];//276 register ,heat stages
+	m_PID2_cool_stages=product_register_value[331];//277 register ,cool stages
 	if(m_PID2_heat_stages==0&&m_PID2_cool_stages==0)
 	{
-		write_one(g_tstat_id,330,3);
-		write_one(g_tstat_id,331,3);
+		//write_one(g_tstat_id,330,3);
+		//write_one(g_tstat_id,331,3);
 // 		newtstat6[330] = 3;
 // 		newtstat6[331] =3;
 		m_PID2_heat_stages=3;
@@ -5649,19 +5621,19 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 		//247	274	1	Low byte	W/R	Output 1 PID Interlock                    0 = PID1, can assign each output to either PID1 or 2, the max or the min of the two PIDS
 
 		for(i=0;i<3;i++)
-			pid_select2[i]=newtstat6[274+i];/////////////////////////////get pid select ;col one 1
+			pid_select2[i]=product_register_value[274+i];/////////////////////////////get pid select ;col one 1
 
 		//252	279	1	Low byte	W/R	Output 6 PID Interlock
 		//253	280	1	Low byte	W/R	Output 7 PID Interlock
 
-		pid_select2[3]=newtstat6[279];
-		pid_select2[4]=newtstat6[280];
+		pid_select2[3]=product_register_value[279];
+		pid_select2[4]=product_register_value[280];
 		//
 	}
 	else
 	{
 		for(i=0;i<7;i++)
-			pid_select2[i]=newtstat6[274+i];/////////////////////////////get pid select ;col one 1
+			pid_select2[i]=product_register_value[274+i];/////////////////////////////get pid select ;col one 1
 	}
 
 //cong
@@ -5675,7 +5647,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 		else
 			pos = col - (m_PID2_heat_stages+1);
 		//254	281	1	Low byte	W/R	PID2 Output table- Coasting
-		tstatval = newtstat6[281 + pos];
+		tstatval = product_register_value[281 + pos];
 		for( row = 1;row<=totalrows;row++)//****************************
 		{
 			CString str;
@@ -5768,7 +5740,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 
 
 
-	int  nFunction=newtstat6[266];
+	int  nFunction=product_register_value[266];
 	int nRotation;
 	for (int k=0; k<4; k++)
 	{
@@ -5796,7 +5768,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 	unsigned short interlock[7]={0};
 	for(int i=0;i<7;i++)
 	{
-		interlock[i]=newtstat6[245+i];
+		interlock[i]=product_register_value[245+i];
 	}
 	//	Read_Multi(tstat_id,interlock,286,7);
 
@@ -5887,10 +5859,11 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 }
 
 
-void COutPutDlg::OnBnClickedRefresh()
-	{
+void COutPutDlg::OnBnClickedUpdate()
+{
+
 	FreshGrids();
-	}
+}
 
 //int write_one_show_message(unsigned char device_var,unsigned short address,short value,int retry_times)
 //{//retry 

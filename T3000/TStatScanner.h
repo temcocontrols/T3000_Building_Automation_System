@@ -15,6 +15,7 @@
 #include "TStat_Net.h"
 #include "MainFrm.h"
 
+
 #define WM_ADDTREENODE WM_USER + 2000
 
 struct _ComDeviceInfo
@@ -89,7 +90,7 @@ public:
  	BOOL ScanNetworkDevice(); 
  	// 搜索串口设备
  	BOOL ScanComDevice();
-
+	BOOL ScanComOneByOneDevice();
 	void SetComPort(int nCom);
 public:
 	// 释放资源
@@ -100,6 +101,8 @@ public:
 	void		background_binarysearch(int nComPort);
 	// bForTstat = TRUE : scan tstat, = FALSE : scan NC
 	void		binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254);
+
+	void        OneByOneSearchforComDevice(int nComPort, bool bForTStat=FALSE, BYTE devLo=1, BYTE devHi=254);
 	// 校验
 	BOOL		binary_search_crc(int a);
 	// 搜索NC的函数
@@ -192,6 +195,7 @@ public:
 
 	vector<CString>				m_szComs;
 	CEvent*							m_eScanComEnd;
+	CEvent*							m_eScanComOneByOneEnd;
 	CEvent*							m_eScanNCEnd;
 	CEvent*							m_eScanOldNCEnd;
 
@@ -207,6 +211,7 @@ protected:
 
 	CWinThread*					m_pScanNCThread;
 	CWinThread*					m_pScanTstatThread;
+	CWinThread*					m_pScanTstatOneByOneThread;
 	CWinThread*					m_pWaitScanThread;
 
 
