@@ -21,14 +21,10 @@
 #include "MiniPanel/DialgMiniPanel.h" //Mini Panel
 #include "AirQuality/AirQuality.h"//AirQuality
 
-<<<<<<< HEAD
 #include "MBP.h"
 #include "MbPoll.h"
 
-#define NUMVIEWS 10
-=======
 #define NUMVIEWS 11
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 
 
 
@@ -107,17 +103,11 @@ typedef struct _binary_search_result
 class CTStatScanner;
 class CScanDbWaitDlg;
 class CMainFrame : public CFrameWndEx
-<<<<<<< HEAD
-{
-	
+{	
 private:
 	CMbp* m_pDlg;
 	BOOL m_bDialogOpen;
 	LONG OnDlgClose(UINT wParam, LONG lParam);
-
-=======
-{	
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 protected: // create from serialization only
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
@@ -351,16 +341,12 @@ public:
 	void Treestatus();
 	static	DWORD WINAPI Get_All_Dlg_Message(LPVOID lpVoid);
 	static	DWORD WINAPI Translate_My_Message(LPVOID lpVoid);
-<<<<<<< HEAD
-
+	afx_msg void OnDatabaseIonameconfig();
 	afx_msg void OnDatabaseMbpoll();
 	CMbPoll* mbPoll;
 	bool mbPollDlgOpen;
 protected:
 	afx_msg LRESULT OnMbpollClosed(WPARAM wParam, LPARAM lParam);
-=======
-	afx_msg void OnDatabaseIonameconfig();
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 };
 
 

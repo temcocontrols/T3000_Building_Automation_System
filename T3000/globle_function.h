@@ -55,6 +55,7 @@ extern int Write_One(unsigned char device_var, unsigned short address, unsigned 
 extern int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
 extern int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 
+
 BOOL GetSerialComPortNumber1(vector<CString>& szComm);
 
 BOOL Post_Thread_Message(UINT MsgType,
@@ -65,8 +66,6 @@ BOOL Post_Thread_Message(UINT MsgType,
 	HWND Dlg_hwnd,
 	UINT CTRL_ID,
 	CString Changed_Name);
-<<<<<<< HEAD
-=======
 
 
 BOOL Post_Read_one_Thread_Message(
@@ -77,5 +76,4 @@ BOOL Post_Read_one_Thread_Message(
 
 
 
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 #endif

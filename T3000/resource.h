@@ -145,19 +145,14 @@
 #define IDI_ICON_REFRESH                443
 #define IDI_ICON2                       444
 #define IDI_ICON_EXIT                   444
-<<<<<<< HEAD
 #define IDD_MBP                         445
-#define IDR_MENU_MBP                    447
-#define IDD_DIALOG10                    449
-#define IDD_MBPOLL                      449
-#define IDD_MBPOLL_OPTIONS_DIALOG       451
-=======
 #define IDD_DIALOG10                    446
 #define IDD_RENAME_DLG                  446
 #define IDR_T3000_DATABASE              447
+#define IDR_MENU_MBP                    447
 #define IDD_SCANWAY                     448
 #define IDD_IONAMECONFIG                449
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
+#define IDD_MBPOLL                      451
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -359,6 +354,7 @@
 #define IDC_SLIDER11                    1075
 #define IDC_UNOCCUPIED_MARK             1075
 #define IDC_HUM10                       1075
+#define IDD_MBPOLL_OPTIONS_DIALOG       1075
 #define IDC_SLIDER13                    1076
 #define IDC_SLIDER7                     1076
 #define IDC_EDIT_DAYCOOL                1076
@@ -987,35 +983,52 @@
 #define IDC_NUM                         1595
 #define IDC_PROGRESS                    1596
 #define IDC_REFRESH_ALL                 1598
-<<<<<<< HEAD
+#define IDC_ID_CO2_EDIT                 1599
+#define IDC_SERIALNUM_CO2_EDIT          1600
+#define IDC_UPDATE                      1601
+#define IDC_FIRMWARV_CO2_EDIT           1601
 #define IDC_MBP1                        1601
+#define IDC_MODEL_CO2_EDIT              1602
 #define IDC_MBP_EDITBOX                 1602
+#define IDC_HARDWAREV_CO2_EDIT          1603
 #define IDC_MBPOLL_GRID1                1603
-#define IDC_STATIC_NO_OF_GRIDS          1604
+#define IDC_CO2_BRAUDRATECOMBO          1604
 #define IDC_MBPOLL_GRID2                1604
-#define IDC_COMBO_NO_OF_GRIDS           1605
+#define IDC_CO2_ENABLEIDBUTTON          1605
 #define IDC_MBPOLL_GRID3                1605
-#define IDC_EDIT_TEST                   1606
+#define IDC_CO2_TEMP_UNIT               1606
 #define IDC_MBPOLL_GRID4                1606
+#define IDC_CO2_ALARM_STATE             1607
 #define IDC_STATIC_LABEL1               1607
+#define IDC_RADIO_ALARM_MANUAL          1608
 #define IDC_EDIT_FOR_GRID               1608
+#define IDC_RADIO_ALARM_AUTO            1609
 #define IDC_MBPOLL_GRID5                1609
+#define IDC_CO2_ALARM_ON_TIME           1610
 #define IDC_COMBO_NoOFGRIDS             1610
+#define IDC_CO2_PREPARE_ALARM_SETPOINT  1611
 #define IDC_BUTTON_CONFIG1              1611
+#define IDC_MSFLEXGRID_CO2              1612
 #define IDC_BUTTON_CONFIG2              1612
 #define IDC_STATIC_SLAVE_ID             1612
+#define IDC_FILTER                      1613
 #define IDC_BUTTON_CONFIG3              1613
 #define IDC_STATIC_FUNCTION             1613
+#define IDC_NAME_EDIT                   1614
 #define IDC_BUTTON_CONFIG4              1614
 #define IDC_STATIC_ADDRESS              1614
+#define IDC_COMBO12                     1615
 #define IDC_BUTTON_CONFIG5              1615
 #define IDC_STATIC_QUANTITY             1615
 #define IDC_STATIC_SCAN_RATE            1616
 #define IDC_EDIT_SLAVE_ID               1617
 #define IDC_COMBO_FUNCTION              1618
 #define IDC_CHECK_READ_WRITE_DISABLED   1619
+#define IDC_QUICK                       1620
 #define IDC_CHECK_DISABLE_ON_ERROR      1620
+#define IDC_MSFLEXGRID_IOTABLE          1621
 #define IDC_STATIC_ROWS                 1621
+#define IDC_NAMEEDIT                    1622
 #define IDC_RADIO_10                    1622
 #define IDC_RADIO_20                    1623
 #define IDC_STATIC_DISPLAY              1624
@@ -1024,7 +1037,6 @@
 #define IDC_CHECK_ADDRESS_IN_CELL       1627
 #define IDC_STATIC_CONFIG1              1628
 #define IDC_STATIC_CONFIG2              1629
-#define IDC_CHECK_TAP_DATA_OLD          1629
 #define IDC_STATIC_CONFIG3              1630
 #define IDC_STATIC_CONFIG4              1631
 #define IDC_STATIC_CONFIG5              1632
@@ -1034,29 +1046,6 @@
 #define IDC_BUTTON_START_STOP4          1636
 #define IDC_BUTTON_START_STOP5          1637
 #define IDC_CHECK_TAP_DATA              1638
-=======
-#define IDC_ID_CO2_EDIT                 1599
-#define IDC_SERIALNUM_CO2_EDIT          1600
-#define IDC_UPDATE                      1601
-#define IDC_FIRMWARV_CO2_EDIT           1601
-#define IDC_MODEL_CO2_EDIT              1602
-#define IDC_HARDWAREV_CO2_EDIT          1603
-#define IDC_CO2_BRAUDRATECOMBO          1604
-#define IDC_CO2_ENABLEIDBUTTON          1605
-#define IDC_CO2_TEMP_UNIT               1606
-#define IDC_CO2_ALARM_STATE             1607
-#define IDC_RADIO_ALARM_MANUAL          1608
-#define IDC_RADIO_ALARM_AUTO            1609
-#define IDC_CO2_ALARM_ON_TIME           1610
-#define IDC_CO2_PREPARE_ALARM_SETPOINT  1611
-#define IDC_MSFLEXGRID_CO2              1612
-#define IDC_FILTER                      1613
-#define IDC_NAME_EDIT                   1614
-#define IDC_COMBO12                     1615
-#define IDC_QUICK                       1620
-#define IDC_MSFLEXGRID_IOTABLE          1621
-#define IDC_NAMEEDIT                    1622
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1140,33 +1129,11 @@
 #define ID_SETMAP_SETTINGSAVE           32863
 #define ID_SETMAPPING_SAND              32864
 #define ID_FILE_ISPTOOL                 32865
-<<<<<<< HEAD
-#define ID_DATABASE_MBP                 32866
-#define ID_DISPLAY_SIGNED               32867
-#define ID_DISPLAY_UNSIGNED             32868
-#define ID_DISPLAY_HEX                  32869
-#define ID_DISPLAY_BINARY               32870
-#define ID_DISPLAY_LONGABCD             32871
-#define ID_DISPLAY_LONGCDAB             32872
-#define ID_DISPLAY_LONGBADC             32873
-#define ID_DISPLAY_LONGDCBA             32874
-#define ID_DISPLAY_FLOATABCD            32875
-#define ID_DISPLAY_FLOATCDAB            32876
-#define ID_DISPLAY_FLOATBADC            32877
-#define ID_DISPLAY_FLOATDCBA            32878
-#define ID_DISPLAY_DOUBLEABCD           32879
-#define ID_DISPLAY_DOUBLEGHEFCDAB       32880
-#define ID_DISPLAY_DOUBLEBADCFEHG       32881
-#define ID_DISPLAY_DOUBLEHGFEDCBA       32882
+#define ID_DATABASE_IONAMECONFIG        32866
+#define ID_DATABASE_MBPOLL              32867
 #define ID_FILE_OPEN32883               32883
 #define ID_FILE_SAVE32884               32884
-#define ID_DATABASE_MBPOLL              32885
-#define ID_SETUP                        32886
-#define ID_SETUP_OPTIONS                32887
 #define ID_FILE_EXIT                    32888
-=======
-#define ID_DATABASE_IONAMECONFIG        32866
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
 
@@ -1174,15 +1141,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-<<<<<<< HEAD
 #define _APS_NEXT_RESOURCE_VALUE        452
-#define _APS_NEXT_COMMAND_VALUE         32889
-#define _APS_NEXT_CONTROL_VALUE         1639
-=======
-#define _APS_NEXT_RESOURCE_VALUE        451
-#define _APS_NEXT_COMMAND_VALUE         32867
+#define _APS_NEXT_COMMAND_VALUE         32868
 #define _APS_NEXT_CONTROL_VALUE         1623
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

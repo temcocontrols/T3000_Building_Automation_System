@@ -5,11 +5,7 @@ extern DWORD nThreadID;
 
 extern const bool WRITE_SUCCESS;
 extern const bool WRITE_FAIL ;
-<<<<<<< HEAD
-
-=======
 extern	   bool g_HumChamberThread;
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 extern bool g_register_occuppied ; //Add by Alex
 extern			  BOOL g_bChamber;
 //Fance_4

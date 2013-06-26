@@ -630,7 +630,6 @@ void CAddBuilding::ReloadAddBuildingDB()
 void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 {
 #if 1
-		MessageBox(L"Hi");
 		CString strText;
 		m_AddBuiding_SetEditCtrl.GetWindowText(strText);
 		m_strMainBuildingName = m_AddBuiding_FlexGrid.get_TextMatrix(m_nCurRow, AB_MAINNAME);
@@ -1927,13 +1926,7 @@ void CAddBuilding::OnBnClickedAddbuiding()
 		AfxMessageBox(e->ErrorMessage());
 	}
 	Update_Recorder();
-<<<<<<< HEAD
-}
-
-
-=======
 	m_Changed=TRUE;
 
 
 }
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1

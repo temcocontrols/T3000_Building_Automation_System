@@ -265,19 +265,15 @@
     <None Include="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-    <ClInclude Include="HumChamber.h" />
+    <ClInclude Include="CO2_View.h" />
+    <ClInclude Include="IONameConfig.h" />
     <ClInclude Include="MBP.h" />
     <ClInclude Include="MbpDefines.h" />
     <ClInclude Include="MbpExterns.h" />
     <ClInclude Include="MbpGlobals.h" />
     <ClInclude Include="MbPoll.h" />
     <ClInclude Include="MbPollOptions.h" />
-=======
-    <ClInclude Include="CO2_View.h" />
-    <ClInclude Include="IONameConfig.h" />
     <ClInclude Include="Scanwaydlg.h" />
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="WeeklySchedule.h" />
     <ClInclude Include="5EInputDialog.h" />

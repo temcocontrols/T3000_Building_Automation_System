@@ -89,11 +89,7 @@ public:
 
 
 	afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
-<<<<<<< HEAD
-
-=======
 	afx_msg LRESULT  ReadDataCallBack(WPARAM wParam, LPARAM lParam);
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 	void Refresh();
 	void Refresh6();
 	void Reflesh_ParameterDlg();
@@ -192,13 +188,6 @@ public:
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnEnKillfocusEditValuetraveltime();
 	afx_msg void OnEnKillfocusEditPid2offsetpoint();
-<<<<<<< HEAD
-//	afx_msg void OnKillFocus(CWnd* pNewWnd);
-	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-
-	public:
-		CBrush m_brush;
-=======
 	//	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 
@@ -208,5 +197,4 @@ public:
 
 	void Fresh_Single_UI();
 	//	afx_msg void OnEnChangeEdit34();
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 };

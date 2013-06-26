@@ -116,21 +116,20 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
 		{
 			//SetPaneString(2,_T("Multi-Write successful!"));
 			CString str;
-			str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d] 1"), device_var, ++g_llTxCount, ++g_llRxCount,g_llTxCount-g_llRxCount);
+			str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, ++g_llRxCount,g_llTxCount-g_llRxCount);
 			SetPaneString(0,str);
 			return j;
 		}
 	}
 	//SetPaneString(2,_T("Multi-write failure!"));
 	CString str;
-	str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d] 2"), device_var, ++g_llTxCount, g_llRxCount,g_llTxCount-g_llRxCount);
+	str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount,g_llTxCount-g_llRxCount);
 	SetPaneString(0,str);
 	return j;
 }
 /**
 
   Read multiple values from a modbus device
-<<<<<<< HEAD
 
   @param[out]  put_data_into_here	the values read
   @param[in]   device_var			the modbus device address
@@ -148,25 +147,6 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
 
   This does NOT lock the critical section.
 
-=======
-
-  @param[out]  put_data_into_here	the values read
-  @param[in]   device_var			the modbus device address
-  @param[in]   start_address		the offset of thefirt value to be read in the device
-  @param[in]   length				number of values to be read
-  @param[in]   retry_times			the number of times to retry on read failure before giving up
-
-  @return  0 if there were no errors
-
-  This does NOT lock the register_critical_section
-
-  This is a wrapper for modbus_read_multi_value
-  It is provided for compatibility with existing code.
-  New code should use modbus_read_multi_value() directly.
-
-  This does NOT lock the critical section.
-
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
   */
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times)
 {
@@ -819,8 +799,6 @@ BOOL Post_Thread_Message(UINT MsgType,
 		return TRUE;
 	}
 }
-<<<<<<< HEAD
-=======
 
 BOOL Post_Read_one_Thread_Message(
 	unsigned char device_id,
@@ -844,4 +822,3 @@ BOOL Post_Read_one_Thread_Message(
 
 
  
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1

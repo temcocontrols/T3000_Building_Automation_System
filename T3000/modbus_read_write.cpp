@@ -104,7 +104,7 @@ int modbus_read_one_value(
 
 		// construct status message string
 		CString str;
-		str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d] 4"), 
+		str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d]"), 
 			device_var, g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
 
 		//Display it
@@ -158,19 +158,12 @@ int modbus_read_multi_value(
 	g_bEnableRefreshTreeView = false;
 
 	int error=0;
-<<<<<<< HEAD
-=======
 	CSingleLock singleLock(&register_critical_section);
 	singleLock.Lock() ;
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 	for(int i=0;i<retry_times;i++)
 	{
 
 		// call the modbus DLL method
-<<<<<<< HEAD
-		error=read_multi(device_var,put_data_into_here,start_address,length);
-
-=======
 		;
 
 		// call the modbus DLL method
@@ -180,7 +173,6 @@ int modbus_read_multi_value(
 	
 		
 
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 		// increment the number of transmissions we have done
 		g_llTxCount++;
 
@@ -192,21 +184,13 @@ int modbus_read_multi_value(
 			break;
 		}
 	}
-<<<<<<< HEAD
-
-=======
 	  	singleLock.Unlock();
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 	// check for running in the main GUI thread
 	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
 
 		// construct status message string
 		CString str;
-<<<<<<< HEAD
-		str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d] 5"), 
-=======
 		str.Format(_T("Addr:%d [Tx=%d Rx=%d Err=%d]"), 
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 			device_var, g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
 
 		//Display it
@@ -252,30 +236,18 @@ int write_one_org(unsigned char device_var,unsigned short address,short value,in
 			CString str;
 			if (j == -1) // no connetiong
 			{
-<<<<<<< HEAD
-				str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d] 6"), device_var, ++g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
-			}
-			else
-			{
-				str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d] 7"), device_var, ++g_llTxCount, ++g_llRxCount, g_llTxCount-g_llRxCount);
-=======
 				str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
 			}
 			else
 			{
 				str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, ++g_llRxCount, g_llTxCount-g_llRxCount);
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 			}
 			SetPaneString(0,str);
 			return j;//return right success
 		}
 	}
 	CString str;
-<<<<<<< HEAD
-	str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d] 8"), device_var, ++g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
-=======
 	str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
->>>>>>> 2e9ddba20a1940f319dd2ab81ecc63f9fd73e5d1
 	SetPaneString(0,str);
 	return j;
 }
