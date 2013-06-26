@@ -297,6 +297,18 @@
     <ClCompile Include="IONameConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MbPollOptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MBP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MbpGlobalFuncs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MbPoll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -725,6 +737,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IONameConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MbPollOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MBP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MbpDefines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MbpExterns.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MbpGlobals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MbPoll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

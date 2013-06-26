@@ -33,6 +33,7 @@
 #include "hangeIDDlg.h"
 #include "LightingController/LightingController.h"//Lightingcontroller
 #include "HumChamber.h"
+#include "MbpGlobals.h"
 #include "CO2_View.h"
 
 #include "Dialog_Progess.h"
@@ -181,6 +182,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 
 	//ON_COMMAND(ID_DATABASE_TEMCOPRODUCTS, &CMainFrame::OnDatabaseTemcoproducts)
 	//ON_COMMAND(ID_FILE_ISPTOOL, &CMainFrame::OnFileIsptool)
+	ON_MESSAGE(WM_DLG_CLOSE, OnDlgClose)
+	ON_COMMAND(ID_DATABASE_MBPOLL, &CMainFrame::OnDatabaseMbpoll)
+	ON_MESSAGE(WM_MBPOLL_CLOSED, &CMainFrame::OnMbpollClosed)
 	ON_COMMAND(ID_DATABASE_IONAMECONFIG, &CMainFrame::OnDatabaseIonameconfig)
 END_MESSAGE_MAP()
 
@@ -341,6 +345,9 @@ CMainFrame::CMainFrame()
 	FistWdb = TRUE;
 	m_isCM5=FALSE;
 	FlagSerialNumber = 0;
+
+	m_bDialogOpen = FALSE;
+	mbPollDlgOpen = FALSE;
 }
 
 
@@ -3242,6 +3249,21 @@ _ConnectionPtr t_pCon;//for ado connection
 			t_pCon->Close();
 }
 
+void CMainFrame::OnMBP()
+{
+    if (m_bDialogOpen == TRUE) return;
+    //m_pDlg->m_nColor = m_nClientColor;   // sets dialog's variables
+    //m_pDlg->m_sTitle = m_sMainWindowTitle;
+	m_bDialogOpen = TRUE;
+    m_pDlg->Create();
+}
+
+LONG CMainFrame::OnDlgClose(UINT wParam, LONG lParam)
+{
+    m_bDialogOpen = FALSE;
+    return 1;
+}
+
 void CMainFrame::OnLabel()
 {
 }
@@ -5997,3 +6019,30 @@ void CMainFrame::OnDatabaseIonameconfig()
 	CIONameConfig ionameconfig;
 	ionameconfig.DoModal();
 }
+
+
+void CMainFrame::OnDatabaseMbpoll()
+{
+	// TODO: Add your command handler code here
+	if (mbPollDlgOpen == TRUE) 
+		return;
+
+	mbPollDlgOpen = TRUE;
+
+	mbPoll = new CMbPoll(this);
+
+	//mbPoll->Create(IDD_MBPOLL, GetDesktopWindow());
+	mbPoll->Create(IDD_MBPOLL, this);
+	mbPoll->ShowWindow(SW_SHOW);
+}
+
+
+
+LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
+{
+	//mbPollDlgOpen = FALSE;
+    mbPoll = NULL; 
+	mbPollDlgOpen = FALSE;
+    return 0;
+}
+
