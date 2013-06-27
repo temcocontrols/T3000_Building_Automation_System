@@ -805,7 +805,7 @@ OUTPUT bool is_connect()
 	return false; //add by Fance
 }
 //device_var:priduct ID,address:a regster;
-OUTPUT int Read_One(TS_UC device_var,TS_US address)
+OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
 {
 
 //	CSingleLock singlock(&scan_mutex);
@@ -1092,7 +1092,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
 //	singlock.Unlock();
 }
 
-OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
+OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
 {
 	if (g_Commu_type==0)
 	{
@@ -1455,7 +1455,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
 	///////////////////////////////////////////////////////////
 }
 
-OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length)
+OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length)
 {
 	if(g_Commu_type==0)
 	{
@@ -1663,7 +1663,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 	return -1;
 }
 
-OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
+OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 {	
 	if(g_Commu_type==0)//
 	{

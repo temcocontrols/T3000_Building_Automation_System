@@ -159,6 +159,10 @@
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="ManageAccountDlg.cpp" />
     <ClCompile Include="MannageBuidingDlg.cpp" />
+    <ClCompile Include="MBP.cpp" />
+    <ClCompile Include="MbpGlobalFuncs.cpp" />
+    <ClCompile Include="MbPoll.cpp" />
+    <ClCompile Include="MbPollOptions.cpp" />
     <ClCompile Include="monthview1.cpp" />
     <ClCompile Include="msflexgrid1.cpp" />
     <ClCompile Include="NetworkControllView.cpp" />
@@ -263,6 +267,12 @@
   <ItemGroup>
     <ClInclude Include="CO2_View.h" />
     <ClInclude Include="IONameConfig.h" />
+    <ClInclude Include="MBP.h" />
+    <ClInclude Include="MbpDefines.h" />
+    <ClInclude Include="MbpExterns.h" />
+    <ClInclude Include="MbpGlobals.h" />
+    <ClInclude Include="MbPoll.h" />
+    <ClInclude Include="MbPollOptions.h" />
     <ClInclude Include="Scanwaydlg.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="WeeklySchedule.h" />
