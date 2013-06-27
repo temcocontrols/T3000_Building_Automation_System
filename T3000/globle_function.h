@@ -50,6 +50,10 @@ CString get_product_name_by_product_model(int product_model);
 CString GetTempUnit(int nRange=-1,int nPIDNO = 0);
 CString get_product_class_name_by_model_ID(int nModelID);
 
+extern int Read_One(unsigned char device_var,unsigned short address);
+extern int Write_One(unsigned char device_var, unsigned short address, unsigned short val);
+extern int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+extern int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 
 
 BOOL GetSerialComPortNumber1(vector<CString>& szComm);
