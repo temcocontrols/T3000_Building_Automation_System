@@ -6,6 +6,7 @@
 #include "MbPoll.h"
 #include "afxdialogex.h"
 #include "MbpExterns.h"
+#include "globle_function.h"
 
 
 // CMbPoll dialog
@@ -243,7 +244,7 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 			{
 				for (int i = 0; i < pollQuantity[0]; i++)
 				{
-					tempStr1.Format(_T("%x"), (pollAddress[0] + i)); 
+					tempStr1.Format(_T("%d"), (pollAddress[0] + i)); 
 					ctrlGrid1.put_TextMatrix(i + 1, 1, tempStr1);
 					tempStr1.Format(_T("%d"), *((short int*)grid1Data + i)); 
 					ctrlGrid1.put_TextMatrix(i + 1, 2, tempStr1);
@@ -254,7 +255,7 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 			{
 				for (int i = 0; i < pollQuantity[1]; i++)
 				{
-					tempStr1.Format(_T("%x"), (pollAddress[1] + i)); 
+					tempStr1.Format(_T("%d"), (pollAddress[1] + i)); 
 					ctrlGrid2.put_TextMatrix(i + 1, 1, tempStr1);
 					tempStr1.Format(_T("%d"), *((short int*)grid2Data + i)); 
 					ctrlGrid2.put_TextMatrix(i + 1, 2, tempStr1);
@@ -265,7 +266,7 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 			{
 				for (int i = 0; i < pollQuantity[2]; i++)
 				{
-					tempStr1.Format(_T("%x"), (pollAddress[2] + i)); 
+					tempStr1.Format(_T("%d"), (pollAddress[2] + i)); 
 					ctrlGrid3.put_TextMatrix(i + 1, 1, tempStr1);
 					tempStr1.Format(_T("%d"), *((short int*)grid3Data + i)); 
 					ctrlGrid3.put_TextMatrix(i + 1, 2, tempStr1);
@@ -276,7 +277,7 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 			{
 				for (int i = 0; i < pollQuantity[3]; i++)
 				{
-					tempStr1.Format(_T("%x"), (pollAddress[3] + i)); 
+					tempStr1.Format(_T("%d"), (pollAddress[3] + i)); 
 					ctrlGrid4.put_TextMatrix(i + 1, 1, tempStr1);
 					tempStr1.Format(_T("%d"), *((short int*)grid4Data + i)); 
 					ctrlGrid4.put_TextMatrix(i + 1, 2, tempStr1);
@@ -287,7 +288,7 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 			{
 				for (int i = 0; i < pollQuantity[4]; i++)
 				{
-					tempStr1.Format(_T("%x"), (pollAddress[4] + i)); 
+					tempStr1.Format(_T("%d"), (pollAddress[4] + i)); 
 					ctrlGrid5.put_TextMatrix(i + 1, 1, tempStr1);
 					tempStr1.Format(_T("%d"), *((short int*)grid5Data + i)); 
 					ctrlGrid5.put_TextMatrix(i + 1, 2, tempStr1);
@@ -296,6 +297,75 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 
 			break;
 		}
+
+	case 3:
+		{
+			tapDataMode = 1;
+			if (pollShown[0] == 1)
+			{
+				//Read_One(unsigned char device_var,unsigned short address);
+				if (pollFunction[0] == 0)
+				{
+					
+				}
+				if (pollFunction[0] == 1)
+				{
+					
+				}
+				if (pollFunction[0] == 2)
+				{
+					unsigned short tempVar[1000] = {0};
+					unsigned short *tempPtr = tempVar;
+					read_multi(pollSlaveId[0], tempPtr, pollAddress[0], pollQuantity[0]);
+					//MessageBoxW(L"las");
+				}
+				if (pollFunction[0] == 3)
+				{
+					
+				}
+				if (pollFunction[0] == 4)
+				{
+					
+				}
+				if (pollFunction[0] == 5)
+				{
+					
+				}
+			}
+		}
+
+	case 4:
+		{
+			if (pollShown[1] == 1)
+			{
+				//Read_One(unsigned char device_var,unsigned short address);
+			}
+		}
+
+	case 5:
+		{
+			if (pollShown[2] == 1)
+			{
+				//Read_One(unsigned char device_var,unsigned short address);
+			}
+		}
+
+	case 6:
+		{
+			if (pollShown[3] == 1)
+			{
+				//Read_One(unsigned char device_var,unsigned short address);
+			}
+		}
+
+	case 7:
+		{
+			if (pollShown[4] == 1)
+			{
+				//Read_One(unsigned char device_var,unsigned short address);
+			}
+		}
+
 	default:
 		break;
 	}
@@ -805,10 +875,20 @@ void CMbPoll::OnClickedCheckTapData()
 	if (checkTapData.GetCheck() == TRUE)
 	{
 		tapDataMode = 1;
+		KillTimer(3);
+		KillTimer(4);
+		KillTimer(5);
+		KillTimer(6);
+		KillTimer(7);
 	}
 	else
 	{
 		tapDataMode = 0;
+		SetTimer(3, pollScanRate[0], NULL);
+		SetTimer(4, pollScanRate[1], NULL);
+		SetTimer(5, pollScanRate[2], NULL);
+		SetTimer(6, pollScanRate[3], NULL);
+		SetTimer(7, pollScanRate[4], NULL);
 	}
 }
 
