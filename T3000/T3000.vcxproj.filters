@@ -309,6 +309,30 @@
     <ClCompile Include="MbPoll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CM5\MyOwnListCtrl.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogCM5_BacNet.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetInput.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\ListCtrlCellEx.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\ListCtrlEx.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetProgram.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetOutput.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetVariable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -446,6 +470,24 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\t3000.mdb" />
+    <None Include="res\Input.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Programing.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Output.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\variable.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\week.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\annual.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -755,6 +797,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MbPoll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bacnet_Include.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogCM5_BacNet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyOwnListCtrlInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetVariable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

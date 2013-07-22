@@ -10,7 +10,7 @@
 #include "T3000Doc.h"
 #include "T3000View.h"
 #include "T3000TableView.h"
-
+#include "DialogCM5_BacNet.h"
 #include "LoginDlg.h"
 
 #include "iniFile.h"
@@ -278,7 +278,7 @@ BOOL CT3000App::InitInstance()
 		RUNTIME_CLASS(CT3000Doc),
 		RUNTIME_CLASS(CMainFrame),       // main SDI frame window
 		RUNTIME_CLASS(CT3000View));
-
+		// RUNTIME_CLASS(CDialogCM5_BacNet));Fance  
 
 
 

@@ -64,6 +64,9 @@ using namespace Gdiplus;
 #pragma comment(lib, "WS2_32")
 #pragma comment(lib,"ModbusDllforVc")
 #pragma comment(lib,"FlexSlideBar")
+#pragma comment(lib,"BACnet_Stack_Library.lib" )//指定与静态库一起连接
+
+
 
 INPUT int Write_One_tap(unsigned char device_var,unsigned short address,unsigned short value);
 INPUT int Read_One_tap(unsigned char device_var,unsigned short address);
@@ -104,6 +107,15 @@ INPUT CString Get_NowTime();
 INPUT void NET_WriteLogFile(CString strlog);
 INPUT void NET_CloseLogFile();
 //INPUT SOCKET GetSocketHandle();
+#include <stdint.h>
+//INPUT bool Device_Set_Object_Instance_Number(
+//	uint32_t object_id);
+//
+//INPUT   void address_init(void);
+//INPUT	int Get_transfer_length();
+//INPUT	void Set_transfer_length(int data);
+//INPUT   bool tsm_invoke_id_free(uint8_t invokeID);
+
 
 //#include "modbus.h"
 #include <vector>  // STL vector header. There is no ".h"
@@ -112,7 +124,10 @@ using namespace std;  // Ensure that the namespace is set to std
 
 #define CUSTOM_TABLE_FLOAT_VERSION 50.1
 #define SETPOINT_SPECIAL_VERSION	50
+#define  WM_REFRESH_BAC_INPUT_LIST WM_USER + 201
+#define  WM_REFRESH_BAC_PROGRAM_LIST WM_USER + 203
 
+#define  WM_REDROW_BAC_IN_LIST WM_USER + 202
 
 
 //#pragma warning(disable:4244)
@@ -143,6 +158,7 @@ typedef struct _STATUSBARINFO
 
 #define MY_WRITE_ONE WM_USER+100
 #define MY_READ_ONE  WM_USER+101
+#define MY_INVOKE_ID WM_USER + 102
 #define MY_CLOSE WM_USER+110
 #define MY_RESUME_DATA  WM_USER+200
 #define MY_READ_DATA_CALLBACK WM_USER+201
@@ -167,5 +183,12 @@ typedef struct _MessageReadOneInfo
 	HWND hwnd;
 }MessageReadOneInfo;
 
+typedef struct _MessageInvokeIDInfo
+{
+	int Invoke_ID;
+	HWND hwnd;
+}MessageInvokeODInfo;
+
+//#include "Bacnet_Include.h"
 //#define _DEBUG
 //*********************************link to dll***************************
