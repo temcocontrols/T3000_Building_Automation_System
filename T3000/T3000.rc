@@ -1386,7 +1386,7 @@ IDI_ICON_EXIT           ICON                    "res\\Exit.ico"
 // DB
 //
 
-IDR_T3000_DATABASE      DB                      "F:\\Temco\\20120625\\T3000_Building_Automation_System-master\\T3000\\res\\t3000.mdb"
+IDR_T3000_DATABASE      DB                      "res\\t3000.mdb"
 
 /////////////////////////////////////////////////////////////////////////////
 //
