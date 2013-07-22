@@ -35,6 +35,7 @@
 #include "HumChamber.h"
 #include "MbpGlobals.h"
 #include "CO2_View.h"
+#include "DialogCM5_BacNet.h"
 
 #include "Dialog_Progess.h"
 
@@ -47,8 +48,13 @@
 #include "IONameConfig.h"
 #pragma region Fance Test
 //For Test
-
-
+//#include "whois.h"
+//#pragma comment(lib,  "BACnet Stack Library.lib" )//指定与静态库一起连接
+//INPUT  int whois_encode_apdu(
+//	unsigned char * apdu,
+//	int low_limit,
+//	int high_limit);
+//#include "Bacnet_Include.h"
 
 HANDLE hStartEvent; // thread start event
 
@@ -201,8 +207,16 @@ static UINT indicators[] =
 
 unsigned short tempchange[512];
 
+//INPUT   int whois_encode_apdu(
+//	uint8_t * apdu,
+//	int32_t low_limit,
+//	int32_t high_limit);
+//extern __declspec(dllimport) int My_Max();
 UINT _ReadMultiRegisters(LPVOID pParam)
 {
+	//uint8_t ABC[1000];
+	//whois_encode_apdu(ABC,-1,-1);
+
 	CMainFrame* pFrame=(CMainFrame*)(pParam);
 	BOOL bFirst=TRUE;
 	Read_Mutex=CreateMutex(NULL,TRUE,_T("Read_Multi_Reg"));	//Add by Fance .
@@ -213,7 +227,6 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 
 		if(::WaitForSingleObject(g_killMultiReadEvent,0)==WAIT_OBJECT_0)
 			break;		
-
 		g_bEnableRefreshTreeView = TRUE;
 		if(!bFirst)
 			Sleep(30*1000);
@@ -388,6 +401,8 @@ void CMainFrame::InitViews()
 	m_pViews[9]=(CView*) new CHumChamber;
 	m_pViews[10]=(CView*) new CCO2_View;
 
+	m_pViews[11]=(CView*) new CDialogCM5_BacNet; //CM5
+
 
 
 
@@ -560,8 +575,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_pRefreshThread->SetMainWnd(this);	
 
 	// 需要执行线程中的操作时
+#if 1
 	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
 	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
+#endif
 	//tstat6
 	Tstat6_func();//为TSTST6新寄存器用的。
 
@@ -2226,6 +2243,12 @@ here:
 			((CCO2_View*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
+	case  11:
+		{
+			m_nCurView = 11;
+			((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Fresh();
+		}
+		break;
 	}
 //here
 }
@@ -3420,6 +3443,22 @@ void CMainFrame::OnDestroy()
 	CFrameWndEx::OnDestroy();
 
 	g_killMultiReadEvent.SetEvent();
+
+
+	if (is_connect())
+	{
+		close_com(); // added by zgq:12-16-2011
+	}
+
+
+//#if 1
+//	if (pDialogInfo!=NULL)
+//	{
+//		delete pDialogInfo;
+//		pDialogInfo = NULL;
+//	}
+//	return;
+//#endif
 
 	Sleep(500);//wait for the end of the thread.
 	if (WaitForSingleObject(m_pFreshMultiRegisters->m_hThread, 1000) != WAIT_OBJECT_0)
@@ -5941,6 +5980,11 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
 				MyCriticalSection.Unlock();
 				My_Write_Struct= (_MessageWriteOneInfo *)msg.wParam;
 				break;
+			case MY_INVOKE_ID:
+				MyCriticalSection.Lock();
+				My_Receive_msg.push_back(msg);
+				MyCriticalSection.Unlock();
+				break;
 			case MY_CLOSE:
 				goto myend;
 				break;
@@ -5955,6 +5999,7 @@ myend:
 
 DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 {
+	CMainFrame *pParent = (CMainFrame *)lpVoid;
 	MSG msg;
 	while(1)
 	{
@@ -6003,6 +6048,28 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 
 
 				}
+				break;
+			case MY_INVOKE_ID:
+				MyCriticalSection.Lock();
+				msg=My_Receive_msg.at(0);
+				MessageInvokeODInfo *My_Invoke_Struct = (_MessageInvokeIDInfo *)msg.wParam;
+				My_Receive_msg.erase(My_Receive_msg.begin());
+				MyCriticalSection.Unlock();
+				for (int i=0;i<2000;i++)
+				{
+					if(tsm_invoke_id_free(My_Invoke_Struct->Invoke_ID))
+					{
+						::PostMessage(My_Invoke_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_SUCCESS,(LPARAM)My_Invoke_Struct);
+						goto loop1;
+					}
+					else
+					{
+						Sleep(1);
+						continue;
+					}
+				}
+					::PostMessage(My_Invoke_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_FAIL,(LPARAM)My_Invoke_Struct);
+loop1:
 				break;
 			}
 			

@@ -6,9 +6,6 @@
 
 
 
-#include "T3000RegAddress.h"
-
-
 #define DELAY_TIME	 10	//MS
 #define Modbus_Serial	0
 #define	Modbus_TCP	1
@@ -756,7 +753,23 @@ BOOL GetSerialComPortNumber1(vector<CString>& szComm)
 //unsigned short address
 //short new_value
 //short old_value
-
+BOOL Post_Invoke_ID_Monitor_Thread(UINT MsgType,
+	int Invoke_ID,
+	HWND hwnd
+	)
+{
+	_MessageInvokeIDInfo *pMy_Invoke_id = new _MessageInvokeIDInfo;
+	pMy_Invoke_id->Invoke_ID = Invoke_ID;
+	pMy_Invoke_id->hwnd = hwnd;
+	if(!PostThreadMessage(nThreadID,MY_INVOKE_ID,(WPARAM)pMy_Invoke_id,NULL))//post thread msg
+	{
+		return FALSE;
+	}
+	else
+	{
+		return TRUE;
+	}
+}
 
 BOOL Post_Thread_Message(UINT MsgType,
 	unsigned char device_id,
@@ -778,7 +791,7 @@ BOOL Post_Thread_Message(UINT MsgType,
 
 	//search the id ,if not in the vector, push back into the vector.
 	bool find_id=false;
-	for (int i=0;i<Change_Color_ID.size();i++)
+	for (int i=0;i<(int)Change_Color_ID.size();i++)
 	{
 		if(Change_Color_ID.at(i)!=CTRL_ID)
 			continue;
@@ -818,6 +831,325 @@ BOOL Post_Read_one_Thread_Message(
 	{
 		return TRUE;
 	}
+}
+
+int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize )
+{
+	// TODO: Add your control notification handler code here
+
+	uint8_t apdu[480] = { 0 };
+	uint8_t test_value[480] = { 0 };
+	int private_data_len = 0;	
+	BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
+	BACNET_APPLICATION_DATA_VALUE test_data_value = { 0 };
+	BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
+	BACNET_PRIVATE_TRANSFER_DATA test_data = { 0 };
+	bool status = false;
+
+	private_data.vendorID = BACNET_VENDOR_ID;
+	private_data.serviceNumber = 1;
+
+	unsigned max_apdu = 0;
+
+	Str_user_data_header private_data_chunk;
+	private_data_chunk.total_length = 6+ (end_instance - start_instance + 1)*entitysize;
+	private_data_chunk.command = command;
+	private_data_chunk.point_start_instance = start_instance;
+	private_data_chunk.point_end_instance = end_instance;
+	private_data_chunk.entitysize=entitysize;
+
+	char SendBuffer[500];
+	memcpy_s(SendBuffer,6,&private_data_chunk,6);
+
+	switch(command)
+	{
+	case WRITEINPUT_T3000:
+		for (int i=0;i<(int)m_Input_data.size();i++)
+		{
+			memcpy_s(SendBuffer + i*sizeof(Str_in_point) +6,sizeof(Str_in_point),&m_Input_data.at(i),sizeof(Str_in_point));
+		}
+		break;
+	case WRITEPROGRAM_T3000:
+		for (int i=0;i<(int)m_Program_data.size();i++)
+		{
+			memcpy_s(SendBuffer + i*sizeof(Str_program_point) +6,sizeof(Str_program_point),&m_Program_data.at(i),sizeof(Str_program_point));
+		}
+		break;
+	}
+
+
+	Set_transfer_length(private_data_chunk.total_length);
+	//transfer_len=6;
+
+	status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&SendBuffer, &data_value);
+	//ct_test(pTest, status == true);
+	private_data_len =	bacapp_encode_application_data(&test_value[0], &data_value);
+	private_data.serviceParameters = &test_value[0];
+	private_data.serviceParametersLen = private_data_len;
+
+	BACNET_ADDRESS dest = { 0 };
+	status = address_get_by_device(deviceid, &max_apdu, &dest);
+	if (status) 
+	{
+		return Send_ConfirmedPrivateTransfer(&dest,&private_data);
+	}
+	return -2;
+}
+
+
+
+int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize)
+{
+	// TODO: Add your control notification handler code here
+
+	uint8_t apdu[480] = { 0 };
+	uint8_t test_value[480] = { 0 };
+	int apdu_len = 0;
+	int private_data_len = 0;	
+	unsigned max_apdu = 0;
+	BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
+//	BACNET_APPLICATION_DATA_VALUE test_data_value = { 0 };
+	BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
+//	BACNET_PRIVATE_TRANSFER_DATA test_data = { 0 };
+	bool status = false;
+
+	private_data.vendorID = BACNET_VENDOR_ID;
+	private_data.serviceNumber = 1;
+
+
+
+	Str_user_data_header private_data_chunk;
+	private_data_chunk.total_length=6;
+	private_data_chunk.command = command;
+	private_data_chunk.point_start_instance=start_instance;
+	private_data_chunk.point_end_instance=end_instance;
+	private_data_chunk.entitysize=entitysize;
+	// char private_data_chunk[33] = { "3031323334353637383940" };
+	Set_transfer_length(6);
+	//transfer_len=6;
+
+	status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&private_data_chunk, &data_value);
+	//ct_test(pTest, status == true);
+	private_data_len =	bacapp_encode_application_data(&test_value[0], &data_value);
+	private_data.serviceParameters = &test_value[0];
+	private_data.serviceParametersLen = private_data_len;
+
+	BACNET_ADDRESS dest = { 0 };
+	status = address_get_by_device(deviceid, &max_apdu, &dest);
+	if (status) 
+	{
+		return Send_ConfirmedPrivateTransfer(&dest,&private_data);
+		//return g_invoke_id;
+	}
+	else
+		return -1;
+
+}
+
+
+int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
+{
+	int i;
+	int block_length;
+	char *my_temp_point;
+	int temp_struct_value;
+
+
+	int iLen;   /* Index to current location in data */
+	uint32_t uiErrorCode;
+	char cBlockNumber;
+	uint32_t ulTemp;
+	int tag_len;
+	uint8_t tag_number;
+	uint32_t len_value_type;
+	BACNET_OCTET_STRING Temp_CS;
+	iLen = 0;
+	int command_type;
+
+	/* Error code is returned for read and write operations */
+
+	tag_len =  decode_tag_number_and_value(&data->serviceParameters[iLen],   &tag_number, &len_value_type);
+	iLen += tag_len;
+	if (tag_number != BACNET_APPLICATION_TAG_OCTET_STRING) 
+	{
+		/* if (tag_number != BACNET_APPLICATION_TAG_UNSIGNED_INT) {*/
+#if PRINT_ENABLED
+		printf("CPTA: Bad Encoding!\n");
+#endif
+		return 0;
+	}
+	//iLen +=
+	//    decode_unsigned(&data->serviceParameters[iLen], len_value_type,
+	//    &uiErrorCode);
+	decode_octet_string(&data->serviceParameters[iLen], len_value_type,&Temp_CS);
+	command_type = Temp_CS.value[2];
+
+
+#if 0
+	////////////////////////////////
+	 len_value_type = 80;
+	char *test_point;
+	test_point = (char *)Temp_CS.value +6;
+	strcpy_s(test_point,8,"ABCDEFG");
+	test_point = test_point + 21;
+	strcpy_s(test_point,5,"ABCD");
+	test_point = test_point + 9;
+	*test_point ++= 10;
+	*test_point ++= 0;
+	*test_point ++= 1;//OFF ON
+	*test_point ++= 1;//AutoMan
+	*test_point ++= 0;//comprg
+	*test_point ++= 0;//errcode
+	*test_point ++= 0;//unused
+
+	strcpy_s(test_point,8,"EEEEEEE");
+	test_point = test_point + 21;
+	strcpy_s(test_point,5,"1111");
+	test_point = test_point + 9;
+	*test_point ++= 10;
+	*test_point ++= 0;
+	*test_point ++= 0;//OFF ON
+	*test_point ++= 0;//AutoMan
+	*test_point ++= 1;//comprg
+	*test_point ++= 1;//errcode
+	*test_point ++= 1;//unused
+
+#endif
+
+
+	///////////////////////////////
+	switch(command_type)
+	{
+	case READOUTPUT_T3000:
+		break;
+
+	case READINPUT_T3000:
+		{
+			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_in_point))!=0)
+				return -1;	//得到的结构长度错误;
+
+			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_in_point);
+			//m_Input_data_length = block_length;
+			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+			m_Input_data.clear();
+			for (i=0;i<block_length;i++)
+			{
+				Str_in_point temp_in;
+				memcpy_s( temp_in.description,STR_IN_DESCRIPTION_LENGTH,my_temp_point,STR_IN_DESCRIPTION_LENGTH);
+				my_temp_point=my_temp_point + STR_IN_DESCRIPTION_LENGTH;
+				memcpy_s(temp_in.label,STR_IN_LABEL ,my_temp_point,STR_IN_LABEL );
+				my_temp_point=my_temp_point + STR_IN_LABEL ;
+
+				temp_struct_value = my_temp_point[3]<<24 | my_temp_point[2]<<16 | my_temp_point[1]<<8 | my_temp_point[0];
+				temp_in.value = temp_struct_value;
+				//memcpy_s(Private_data[i].value,4,temp_struct_value,4);
+				my_temp_point=my_temp_point+4;
+				temp_in.filter = *(my_temp_point++);
+				temp_in.decom	= *(my_temp_point++);
+				temp_in.sen_on	= *(my_temp_point++);;
+				temp_in.sen_off = *(my_temp_point++);
+				temp_in.control = *(my_temp_point++);
+				temp_in.auto_manual = *(my_temp_point++);
+				temp_in.digital_analog = *(my_temp_point++);
+				temp_in.calibration_sign = *(my_temp_point++);
+				temp_in.calibration_increment = *(my_temp_point++);
+				temp_in.unused = *(my_temp_point++);
+				temp_in.calibration = *(my_temp_point++);
+				temp_in.range = *(my_temp_point++);
+
+				m_Input_data.push_back(temp_in);
+			}
+			return READINPUT_T3000;
+		}
+		break;
+	case READVARIABLE_T3000   :
+	case READCONTROLLER_T3000  :
+	case READWEEKLYROUTINE_T3000  :
+	case READANNUALROUTINE_T3000  :
+		break;
+	case READPROGRAM_T3000:
+		{
+			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_program_point))!=0)
+				return -1;	//得到的结构长度错误;
+			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_program_point);
+			//m_Input_data_length = block_length;
+			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+			m_Program_data.clear();
+
+			for (i=0;i<block_length;i++)
+			{
+				Str_program_point temp_in;
+				memcpy_s( temp_in.description,STR_PROGRAM_DESCRIPTION_LENGTH,my_temp_point,STR_PROGRAM_DESCRIPTION_LENGTH);
+				my_temp_point=my_temp_point + STR_PROGRAM_DESCRIPTION_LENGTH;
+				memcpy_s(temp_in.label,STR_PROGRAM_LABEL_LENGTH ,my_temp_point,STR_PROGRAM_LABEL_LENGTH );
+				my_temp_point=my_temp_point + STR_PROGRAM_LABEL_LENGTH ;
+
+				temp_in.bytes	= my_temp_point[1]<<8 | my_temp_point[0];
+				my_temp_point = my_temp_point + 2;
+				temp_in.on_off = *(my_temp_point++);
+				temp_in.auto_manual = *(my_temp_point++);
+				temp_in.com_prg = *(my_temp_point++);
+				temp_in.errcode = *(my_temp_point++);
+				temp_in.unused = *(my_temp_point++);
+				m_Program_data.push_back(temp_in);
+			}
+			return READPROGRAM_T3000;
+		}
+		break;
+	}
+	return 1;
+}
+
+
+void local_handler_conf_private_trans_ack(
+    uint8_t * service_request,
+    uint16_t service_len,
+    BACNET_ADDRESS * src,
+    BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data)
+{
+    BACNET_PRIVATE_TRANSFER_DATA data;
+    int len;
+
+/*
+ * Note:
+ * We currently don't look at the source address and service data
+ * but we probably should to verify that the ack is oneit is what
+ * we were expecting. But this is just to silence some compiler
+ * warnings from Borland.
+ */
+    src = src;
+    service_data = service_data;
+
+    len = 0;
+#if PRINT_ENABLED
+    printf("Received Confirmed Private Transfer Ack!\n");
+#endif
+
+    len = ptransfer_decode_service_request(service_request, service_len, &data);        /* Same decode for ack as for service request! */
+    if (len < 0) {
+#if PRINT_ENABLED
+        printf("cpta: Bad Encoding!\n");
+#endif
+    }
+	int receive_data_type;
+
+	receive_data_type = CM5ProcessPTA(&data);
+	switch(receive_data_type)
+	{
+	case READINPUT_T3000:
+		::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+		break;
+	case READPROGRAM_T3000:
+		::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+		break;
+	}
+ //   if(CM5ProcessPTA(&data)==1)  /* See what to do with the response */
+	//{
+	//	::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST/*WM_REFRESH_LIST*/,NULL,NULL);
+	//}
+	//	//Sleep(1);
+
+    return;
 }
 
 
