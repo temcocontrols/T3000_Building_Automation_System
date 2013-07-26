@@ -2,7 +2,6 @@
 
 *.pdb
 *.user
-*.suo
 *.ncb
 
 # folders containing intermediate files created during build
