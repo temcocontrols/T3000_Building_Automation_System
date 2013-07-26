@@ -299,7 +299,7 @@
       <CompileAs>CompileAsC</CompileAs>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(SolutionPath)\..\..\..\..\Include;$(SolutionPath)\..\..\..\..\demo\object;$(SolutionPath)\..\..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;MainCpp\;include\;object\;handler\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>

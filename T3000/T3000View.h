@@ -250,6 +250,8 @@ public:
 	CMacSliderCtrl m_singleslidernight;
 	afx_msg void OnCbnSelchangeCombo7();
 	afx_msg void OnCbnSelchangeCombo4();
+	afx_msg void OnCbnSelchangeStaticunint();
+	CComboBox m_gUnit;
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

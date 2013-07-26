@@ -701,28 +701,36 @@ extern int MODBUS_BUTTON_LEFT1                                 ;
 extern int MODBUS_BUTTON_LEFT2                                 ;
 extern int MODBUS_BUTTON_LEFT3                                 ;
 extern int MODBUS_BUTTON_LEFT4                                 ;
-extern int MODBUS_HUM_INPUT_MANUAL_ENABLE                      ;
-extern int MODBUS_HUM_INPUT_MANUAL_VALUE                       ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN                   ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL1                   ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL2                   ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL3                   ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT1                   ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT2                   ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT3                   ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_BEGIN                    ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL1                    ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL2                    ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL3                    ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT1                    ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT2                    ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT3                    ;
-extern int MODBUS_TEST1                                        ;
-extern int MODBUS_TEST2                                        ;
-extern int MODBUS_TEST3                                        ;
-extern int MODBUS_TEST4                                        ;
-extern int MODBUS_TEST5                                        ;
-extern int MODBUS_TEST6                                        ;
+
+
+extern int MODBUS_HUM_HEATER_CONTROL_ENABLE;
+extern int MODBUS_HUM_INPUT_MANUAL_ENABLE;
+extern int MODBUS_HUM_INPUT_MANUAL_VALUE;                             
+extern int MODBUS_CO2_INPUT_MANUAL_ENABLE;                            
+extern int MODBUS_CO2_INPUT_VALUE    ;                                
+extern int MODBUS_CO2_CALIBRATION_DATA   ;                           
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN       ;                  
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL1   ;                      
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL2  ;                       
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL3   ;                      
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT1  ;                       
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT2  ;                       
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT3 ;                       
+extern int MODBUS_UNIVERSAL_OFF_VALVE_BEGIN ;                        
+extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL1;                          
+extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL2 ;                         
+extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL3   ;                       
+extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT1   ;                       
+extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT2   ;                       
+extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT3   ;                      
+
+extern int MODBUS_VALUE_SENSOR        ;                             
+extern int MODBUS_PIR_SELECT_ENABLE      ;                           
+extern int MODBUS_PIR_REAL_VALUE    ;                                 
+extern int MODBUS_PIR_OCCUPIED      ;                                 
+                            
+
+
 extern int MODBUS_HEATING_PID                                  ;
 extern int MODBUS_CALIBRATION                                  ;
 extern int MODBUS_CALIBRATION_ANALOG_IN1                       ;
