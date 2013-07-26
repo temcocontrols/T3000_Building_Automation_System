@@ -95,4 +95,5 @@ public:
 	long pid1lrow;//2.5.0.96
 
 	afx_msg void OnBnClickedUpdate();
-	};
+	afx_msg void OnBnClickedRefresh();
+};
