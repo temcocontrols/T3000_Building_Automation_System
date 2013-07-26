@@ -58,3 +58,7 @@ tst/unit_test/debug/*
 /T3000 Output/debug/T3000.map
 /T3000/ipch
 /T3000/ipch/t3000-9dcbbcef/t3000-77af99c9.ipch
+/T3000 Output/release/Database/t3000.mdb
+/T3000 Output
+/BacNetDllforVc/Debug
+/BacNetDllforVc/Release
