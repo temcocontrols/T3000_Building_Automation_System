@@ -106,6 +106,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		CFile config_file;//the hex file
 		CStdioFile log_file;
 		bool log_file_opened=false;
+		int nowmoder=0;
 		if(pDlg->m_bStopLoadingfile)
 		{
 			break;
@@ -188,9 +189,19 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 			CString strFileName=config_file.GetFileTitle();
 			open_file=true;
 			pDlg->m_infoListBox.InsertString(0,_T(""));
-
+			nowmoder=read_one(now_tstat_id,7,7);
 			if(log_file_opened==true)
+				{
+				if (nowmoder==6||nowmoder==7)
+				{
+				LoadFile2Tstat67(temppp,(LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(),&log_file);
+				} 
+				else
+				{
 				LoadFile2Tstat(temppp,(LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(),&log_file);
+				}
+				
+				}
 			if(find_load_file_error(temppp))
 			{
 				CString for_showing_text;

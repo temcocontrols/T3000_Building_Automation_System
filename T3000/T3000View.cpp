@@ -84,6 +84,7 @@ BEGIN_MESSAGE_MAP(CT3000View, CFormView)
 	ON_EN_KILLFOCUS(IDC_EDIT_CUR_SP, &CT3000View::OnEnKillfocusEditCurSp)
 	ON_CBN_SELCHANGE(IDC_COMBO7, &CT3000View::OnCbnSelchangeCombo7)
 	ON_CBN_SELCHANGE(IDC_COMBO4, &CT3000View::OnCbnSelchangeCombo4)
+	ON_CBN_SELCHANGE(IDC_STATICUNINT, &CT3000View::OnCbnSelchangeStaticunint)
 END_MESSAGE_MAP()
 
 // CT3000View construction/destruction
@@ -243,7 +244,8 @@ void CT3000View::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
 
-	
+	m_gUnit.AddString(_T("°„C"));
+	m_gUnit.AddString(_T("°„F"));
 /*
 	CFile myfile(_T("D:\\big.HEX"),CFile::modeRead);//test.txt
 	//if(m_hex_file.Open(_T("D:\\big.HEX"),CFile::modeRead))
@@ -2966,15 +2968,15 @@ void CT3000View::OnBnClickedBtnSynctime()
 
 void CT3000View::OnBnClickedButtonSchedule()
 {
-// 	if(multi_register_value[7] < PM_TSTAT6)
-// 	{
+	if(multi_register_value[7] != PM_TSTAT6)
+	{
 		AfxMessageBox(_T("This model of TStat don't support schedule!"));
 		return;
-//	}
-// 	g_bPauseMultiRead = TRUE;
-// 	CTStatScheduleDlg dlg;
-// 	dlg.DoModal();
-// 	g_bPauseMultiRead = FALSE;
+	}
+	g_bPauseMultiRead = TRUE;
+	CTStatScheduleDlg dlg;
+	dlg.DoModal();
+	g_bPauseMultiRead = FALSE;
 	
 }
 
@@ -5736,4 +5738,28 @@ void CT3000View::OnCbnSelchangeCombo4()
 	FlexSPN = 1;
 
 	FreshCtrl();*/
+}
+
+
+void CT3000View::OnCbnSelchangeStaticunint()
+{     int sel=m_gUnit.GetCurSel();
+    if (sel!=product_register_value[MODBUS_DEGC_OR_F])
+    {
+	   write_one(g_tstat_id,MODBUS_DEGC_OR_F,sel);
+	   product_register_value[MODBUS_DEGC_OR_F]=sel;
+
+	   if(product_register_value[MODBUS_DEGC_OR_F] == 1)	//t5= 121;t6=104
+	   {
+		   g_unint = FALSE;
+		   GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("°„F"));
+	   }else 
+	   {
+		   g_unint = TRUE;
+		   GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("°„C"));
+	   }
+	   Fresh_In();
+    } 
+     
+    
+	
 }
