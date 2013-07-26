@@ -24,7 +24,7 @@
 #include "MBP.h"
 #include "MbPoll.h"
 
-#define NUMVIEWS 11
+#define NUMVIEWS 12
 
 
 
@@ -348,5 +348,20 @@ public:
 protected:
 	afx_msg LRESULT OnMbpollClosed(WPARAM wParam, LPARAM lParam);
 };
+
+const int DLG_T3000_VIEW = 0;
+const int DLG_NETWORKCONTROL_VIEW = 1;
+const int DLG_GRAPGIC_VIEW = 2;
+const int DLG_TRENDLOG_VIEW =3;
+const int DLG_DIALOGCM5_VIEW = 4;
+const int DLG_DIALOGT3_VIEW = 5;
+const int DLG_DIALOGMINIPANEL_VIEW = 6;
+const int DLG_AIRQUALITY_VIEW = 7;
+const int DLG_LIGHTINGCONTROLLER_VIEW = 8;
+const int DLG_HUMCHAMBER = 9;
+const int DLG_CO2_VIEW = 10;
+const int DLG_CM5_BACNET_VIEW = 11;
+
+
 
 

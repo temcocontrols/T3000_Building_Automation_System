@@ -1,4 +1,8 @@
 #pragma once
+#include "Bacnet_Include.h"
+#include "CM5\ud_str.h"
+
+extern int g_invoke_id;
 extern vector <int> Change_Color_ID;
 extern HANDLE hThread;
 extern DWORD nThreadID;
@@ -118,6 +122,8 @@ extern int g_llRxCount;
 extern BOOL g_unint;
 
 
+
+
 //////////////////////////////////////////////////////////////////////////
 // extern int const PM_TSTAT5A;
 // extern int const PM_TSTAT5B;
@@ -157,7 +163,8 @@ int const PM_T34AO = 28;
 int const PM_T36CT = 29;
 int const PM_SOLAR = 30;
 int const PM_FWMTRANSDUCER = 31;
-int const PM_CO2 = 32;
+int const PM_CO2_NET = 32;
+int const PM_CO2_RS485 = 33;
 int const PM_MINIPANEL = 35;
 int const PM_PRESSURE = 40;
 int const PM_CM5 = 50;
@@ -849,3 +856,11 @@ extern int MODBUS_RELAY_PWM_ENABLE                             ;
 extern int MODBUS_RELAY_PWM_TOTAL_DUTY                         ;
 extern int MODBUS_RELAY_PWM_HIGH_DUTY                          ;   
 
+#pragma region For_bacnet
+extern HWND      g_hwnd_now;
+extern HWND      m_input_dlg_hwnd;
+extern HWND      m_pragram_dlg_hwnd;
+extern vector <Str_out_point> m_Output_data;
+extern vector <Str_in_point>  m_Input_data;
+extern vector <Str_program_point>  m_Program_data;
+#pragma endregion For_bacnet

@@ -136,6 +136,7 @@
 #define IDR_MENU_MAP                    430
 #define IDD_DIALOG_LightCSeting         433
 #define IDD_DIALOG_Configure            434
+#define IDD_DIALOG_INPUT                434
 #define IDD_DIALOG10_Progress           436
 #define IDD_DIALOG10_ISPTOOL            437
 #define IDB_BITMAP_SCHEDULE             438
@@ -153,6 +154,13 @@
 #define IDD_SCANWAY                     448
 #define IDD_IONAMECONFIG                449
 #define IDD_MBPOLL                      451
+#define IDD_DIALOG_BACNET_INPUT         452
+#define IDI_ICON_INPUT                  454
+#define IDI_ICON_PROGRAMING             455
+#define IDI_ICON_OUTPUT                 456
+#define IDI_ICON_VARIABLE               457
+#define IDI_ICON_WEEKLY                 458
+#define IDI_ICON_ANNUAL                 459
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -276,6 +284,7 @@
 #define IDC_FARCALLBTN                  1056
 #define IDC_BUTTON_ResetToFactory       1056
 #define IDC_TIME5                       1056
+#define IDC_BUTTON_CM5_ANNUAL           1056
 #define IDC_BUTTON7                     1057
 #define IDC_IOSET_BUTTON                1057
 #define IDC_FARCALLIP_BTN               1057
@@ -360,12 +369,16 @@
 #define IDC_EDIT_DAYCOOL                1076
 #define IDC_TIME10                      1076
 #define IDC_BUTTON9                     1076
+#define IDD_DIALOG_CM5_BACNET           1076
 #define IDC_EDIT5                       1077
 #define IDC_TEMP_LEFT10                 1077
+#define IDD_DIALOG_BACNET_PROGRAM       1077
 #define IDC_EDIT6                       1078
 #define IDC_RH2                         1078
+#define IDD_DIALOG_BACNET_OUTPUT        1078
 #define IDC_EDIT7                       1079
 #define IDC_FREQ3                       1079
+#define IDD_DIALOG_BACNET_VARIABLE      1079
 #define IDC_IPADDRESS1                  1080
 #define IDC_EDIT31                      1080
 #define IDC_RH3                         1080
@@ -1031,21 +1044,57 @@
 #define IDC_NAMEEDIT                    1622
 #define IDC_RADIO_10                    1622
 #define IDC_RADIO_20                    1623
+#define IDC_BUTTON_TEST                 1623
 #define IDC_STATIC_DISPLAY              1624
+#define IDC_STATIC_CM_DEVICE_ID         1624
 #define IDC_COMBO_DISPLAY               1625
+#define IDC_STATIC_CM5_MAC              1625
 #define IDC_CHECK_HIDE_ALIAS_COLUMN     1626
+#define IDC_STATIC_CM5_VENDOR_ID        1626
 #define IDC_CHECK_ADDRESS_IN_CELL       1627
+#define IDC_BUTTON_CM5_ADVANCE          1627
 #define IDC_STATIC_CONFIG1              1628
 #define IDC_STATIC_CONFIG2              1629
+#define IDC_BUTTON_VARIABLE_READ        1629
 #define IDC_STATIC_CONFIG3              1630
 #define IDC_STATIC_CONFIG4              1631
+#define IDC_BUTTON_CM5_PROGRAMING       1631
 #define IDC_STATIC_CONFIG5              1632
+#define IDC_LIST_PROGRAM                1632
 #define IDC_BUTTON_START_STOP1          1633
+#define IDC_BUTTON_PROGRAM_READ         1633
 #define IDC_BUTTON_START_STOP2          1634
+#define IDC_BUTTON_PROGRAM_APPLY        1634
 #define IDC_BUTTON_START_STOP3          1635
+#define IDC_BUTTON_CM5_OUTPUT           1635
 #define IDC_BUTTON_START_STOP4          1636
+#define IDC_BUTTON_CM5_VARIABLE         1636
 #define IDC_BUTTON_START_STOP5          1637
+#define IDC_BUTTON_CM5_WEEKLY           1637
 #define IDC_CHECK_TAP_DATA              1638
+#define IDC_LIST_OUTPUT                 1638
+#define IDC_BUTTON_OUTPUT_READ          1639
+#define IDC_BUTTON_OUTPUT_APPLY         1640
+#define IDC_BUTTON_INPUT_READ           1641
+#define IDC_BUTTON_INPUT_APPLY          1642
+#define IDC_BUTTON_VARIABLE_APPLY       1643
+#define IDC_LIST_VARIABLE               1644
+#define IDC_COMBO_CO2_SENSOR_SEL        1645
+#define IDC_EDIT_INTERNAL_TEMP          1646
+#define IDC_EDIT_EXTERNAL_TEMP          1647
+#define IDC_STATIC_CO2_UNIT1            1648
+#define IDC_STATIC_CO2_UNIT2            1649
+#define IDC_LIST_CO2_EXTERNAL_SENSOR    1650
+#define IDC_EDIT_CO2_HUMIDITY           1651
+#define IDC_CO2_DATETIMEPICKER1         1652
+#define IDC_CO2_DATETIMEPICKER_TIME     1653
+#define IDC_BUTTON_CO2_SYNC_TIME        1654
+#define IDC_RADIO_PASSWORD_ENABLE       1656
+#define IDC_RADIO_PASSWORD_DISABLE      1657
+#define IDC_EDIT_CO2_PASSWOR            1658
+#define IDC_EDIT_CO2_BLOCK_TIME         1659
+#define IDC_EDIT_CO2_BACKLIGHT_TIME     1660
+#define IDC_BTN_CO2_REFRESH             1661
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1141,9 +1190,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        452
+#define _APS_NEXT_RESOURCE_VALUE        460
 #define _APS_NEXT_COMMAND_VALUE         32868
-#define _APS_NEXT_CONTROL_VALUE         1623
+#define _APS_NEXT_CONTROL_VALUE         1662
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

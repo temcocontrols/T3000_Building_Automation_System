@@ -1,7 +1,11 @@
 #ifndef _GLOBLE_FUNCTION_H
 #define _GLOBLE_FUNCTION_H
 
-
+#pragma region For_Bacnet
+#include "CM5/ud_str.h"
+#include "Bacnet_Include.h"
+#include "T3000RegAddress.h"
+#pragma endregion For_Bacnet
 
 
 #include "global_variable_extern.h"
@@ -73,7 +77,18 @@ BOOL Post_Read_one_Thread_Message(
 	unsigned short address,
 	HWND Dlg_hwnd);
 
+BOOL Post_Invoke_ID_Monitor_Thread(UINT MsgType,
+	int Invoke_ID,
+	HWND hwnd
+	);
 
+int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize);
+int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize );
 
-
+int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
+void local_handler_conf_private_trans_ack(
+	uint8_t * service_request,
+	uint16_t service_len,
+	BACNET_ADDRESS * src,
+	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
 #endif

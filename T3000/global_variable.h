@@ -1,8 +1,13 @@
 
 #pragma once
 #include "afxmt.h"
+#include "Bacnet_Include.h"
+#include "CM5\ud_str.h"
+int g_invoke_id;
 
 vector <int> Change_Color_ID;
+
+
 const bool WRITE_SUCCESS = true;
 const bool WRITE_FAIL    = false;
 
@@ -1748,4 +1753,12 @@ int MODBUS_RELAY_PWM_TOTAL_DUTY                              =-1  ;//           
 int MODBUS_RELAY_PWM_HIGH_DUTY                               =-1  ;//              -1                  544
 
 
+#pragma region For_bacnet
+HWND      g_hwnd_now;
+HWND      m_input_dlg_hwnd;
+HWND      m_pragram_dlg_hwnd;
+vector <Str_out_point> m_Output_data;
+vector <Str_in_point>  m_Input_data;
+vector <Str_program_point>  m_Program_data;
+#pragma endregion For_bacnet
 
