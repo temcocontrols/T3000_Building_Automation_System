@@ -272,10 +272,14 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 
 		//Fance_1
 		memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
-		if(pFrame->m_pViews[0]->m_hWnd!=NULL)
+		if(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd!=NULL)
 		{
+			::PostMessage(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
+		}
 
-			::PostMessage(pFrame->m_pViews[0]->m_hWnd,MsgT3000ViewFresh,0,0);
+		if(pFrame->m_pViews[DLG_CO2_VIEW]->m_hWnd!=NULL)
+		{
+			::PostMessage(pFrame->m_pViews[DLG_CO2_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
 		}
 		
 	}
@@ -389,19 +393,18 @@ void CMainFrame::InitViews()
     CView* pActiveView = GetActiveView();
 	if(pActiveView==NULL)
 		return;
-	m_pViews[0] = pActiveView;
-	m_pViews[1]=(CView*) new CNetworkControllView();
-	m_pViews[2]=(CView*) new CGraphicView();
-	m_pViews[3]=(CView*) new CTrendLogView();
- 	m_pViews[4]=(CView*) new CDialogCM5(); //CM5
- 	m_pViews[5]=(CView*) new CDialogT3();  //T3
-	m_pViews[6]=(CView*) new CDialgMiniPanel();//Mini Panel 
- 	m_pViews[7]=(CView*) new CAirQuality;//AirQuality
-	m_pViews[8]=(CView*) new CLightingController;//Lightingcontroller
-	m_pViews[9]=(CView*) new CHumChamber;
-	m_pViews[10]=(CView*) new CCO2_View;
-
-	m_pViews[11]=(CView*) new CDialogCM5_BacNet; //CM5
+	m_pViews[DLG_T3000_VIEW] = pActiveView;
+	m_pViews[DLG_NETWORKCONTROL_VIEW]=(CView*) new CNetworkControllView();
+	m_pViews[DLG_GRAPGIC_VIEW]=(CView*) new CGraphicView();
+	m_pViews[DLG_TRENDLOG_VIEW]=(CView*) new CTrendLogView();
+ 	m_pViews[DLG_DIALOGCM5_VIEW]=(CView*) new CDialogCM5(); //CM5
+ 	m_pViews[DLG_DIALOGT3_VIEW]=(CView*) new CDialogT3();  //T3
+	m_pViews[DLG_DIALOGMINIPANEL_VIEW]=(CView*) new CDialgMiniPanel();//Mini Panel 
+ 	m_pViews[DLG_AIRQUALITY_VIEW]=(CView*) new CAirQuality;//AirQuality
+	m_pViews[DLG_LIGHTINGCONTROLLER_VIEW]=(CView*) new CLightingController;//Lightingcontroller
+	m_pViews[DLG_HUMCHAMBER]=(CView*) new CHumChamber;
+	m_pViews[DLG_CO2_VIEW]=(CView*) new CCO2_View;
+	m_pViews[DLG_CM5_BACNET_VIEW]=(CView*) new CDialogCM5_BacNet; //CM5
 
 
 
@@ -875,17 +878,17 @@ void CMainFrame::EnterConnectToANode()
 			else if (m_product.at(i).product_class_id == PM_MINIPANEL)
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(6);
+				SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
 			}
 			else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(5);
+				SwitchToPruductType(DLG_DIALOGT3_VIEW);
 			}
 			else if (m_product.at(i).product_class_id ==PM_AirQuality) //AirQuality
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(7);
+				SwitchToPruductType(DLG_AIRQUALITY_VIEW);
 			}else if (m_product.at(i).product_class_id == PM_LightingController)//LightingController
 			{
 				g_tstat_id = m_product.at(i).product_id;
@@ -901,13 +904,13 @@ void CMainFrame::EnterConnectToANode()
 						}
 					}
 				}
-				SwitchToPruductType(8);
+				SwitchToPruductType(DLG_LIGHTINGCONTROLLER_VIEW);
 			}
 			else if (m_product.at(i).product_class_id==PM_TSTAT6_HUM_Chamber)
 			{	g_bChamber=TRUE;
 				g_tstat_id = m_product.at(i).product_id;
 
-			    SwitchToPruductType(9);
+			    SwitchToPruductType(DLG_HUMCHAMBER);
 			}
 			else 
 			{
@@ -961,16 +964,16 @@ int nRet =read_one(g_tstat_id,6,1);
 			}else if (m_product.at(i).product_class_id == PM_MINIPANEL)
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(6);
+				SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
 			}else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(5);
+				SwitchToPruductType(DLG_DIALOGT3_VIEW);
 			}
 			else if (m_product.at(i).product_class_id ==PM_AirQuality) //AirQuality
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(7);
+				SwitchToPruductType(DLG_AIRQUALITY_VIEW);
 			}else if (m_product.at(i).product_class_id == PM_LightingController)//LightingController
 			{
 				g_tstat_id = m_product.at(i).product_id;
@@ -986,7 +989,7 @@ int nRet =read_one(g_tstat_id,6,1);
 						}
 					}
 				}
-				SwitchToPruductType(8);
+				SwitchToPruductType(DLG_LIGHTINGCONTROLLER_VIEW);
 			}
 			else if (m_product.at(i).product_class_id==PM_TSTAT6_HUM_Chamber)
 			{	
@@ -994,7 +997,7 @@ int nRet =read_one(g_tstat_id,6,1);
 			g_bChamber=TRUE;
 			g_tstat_id = m_product.at(i).product_id;
 
-			SwitchToPruductType(9);
+			SwitchToPruductType(DLG_HUMCHAMBER);
 			}
 			else 
 			{   g_tstat_id = m_product.at(i).product_id;
@@ -1356,7 +1359,7 @@ try
 					TVINSERV_LED //tree0412
 				else if(temp_product_class_id == PM_TSTAT6)
 					TVINSERV_TSTAT6
-				else if(temp_product_class_id == PM_CO2)
+				else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485))
 					TVINSERV_CO2
 				else
 				
@@ -2134,118 +2137,80 @@ void CMainFrame::SwitchToPruductType(int nIndex)
 	RecalcLayout();
 	pNewView->Invalidate();
 here:
+	g_bPauseMultiRead = FALSE;//恢复主线程的刷新
 	switch(nIndex)
 	{
-	case 0:
+	case DLG_T3000_VIEW:
 		{
-//20120427
-#if 0
-		
-			if (nFlag == 6)
-			{
-				//multi_register_value[]列表交换。
-				//读取TXT
-				memset(tempchange,0,sizeof(tempchange));
-				memset(temptstat6,0,sizeof(temptstat6));
-				memcpy(temptstat6,multi_register_value,sizeof(multi_register_value));
-				int index = 0;
-
-				for (int i = 0;i<512;i++)
-				{
-					index = reg_tstat6[i];
-					tempchange[index] = temptstat6[i];
-				}
-
-				memcpy(multi_register_value,tempchange,sizeof(multi_register_value));
-
-			}
-#endif
-//20120427
-
-//			theApp.cm5_timer = false;	//CM5
-			m_nCurView=0;
-
-// 			strInfo.Format(_T("CMainFrame::SwitchToPruductType(int nIndex):FreshIOGridTable()"));			
-// 			SetPaneString(2, strInfo);
+			m_nCurView=DLG_T3000_VIEW;
 			((CT3000View*)m_pViews[m_nCurView])->FreshIOGridTable();
-// 			strInfo.Format(_T("CMainFrame::SwitchToPruductType(int nIndex):Fresh"));			
-// 			SetPaneString(2, strInfo);
 			((CT3000View*)m_pViews[m_nCurView])->Fresh();
-// 			strInfo.Format(_T("CMainFrame::SwitchToPruductType(int nIndex):Fresh:END"));			
-// 			SetPaneString(2, strInfo);
 		}
 		break;
-	case 1:
+	case DLG_NETWORKCONTROL_VIEW:
 		{
-//			theApp.cm5_timer = false;	//NetControllView
-			m_nCurView=1;    
+			m_nCurView=DLG_NETWORKCONTROL_VIEW;    
 			((CNetworkControllView*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
-	case 2:
+	case DLG_GRAPGIC_VIEW:
 		{
-			m_nCurView=2;
+			m_nCurView=DLG_GRAPGIC_VIEW;
 			int nSerialNum=get_serialnumber();
-
 			((CGraphicView*)m_pViews[m_nCurView])->InitGraphic(nSerialNum,g_tstat_id);
-
 		}
 		break;
-	case 3:
+	case DLG_TRENDLOG_VIEW:
 		{
-			m_nCurView=3;
+			m_nCurView=DLG_TRENDLOG_VIEW;
 		}
 		break;
-	case 4:		//CM5
+	case DLG_DIALOGCM5_VIEW:		//CM5
 		{	
-//			theApp.cm5_timer = true;
-			m_nCurView=4; 
+			m_nCurView=DLG_DIALOGCM5_VIEW; 
 			((CDialogCM5*)m_pViews[m_nCurView])->Fresh();
 		}	
 		break;
-	case 5:	   //T3
+	case DLG_DIALOGT3_VIEW:	   //T3
 		{
-//			theApp.cm5_timer = false;
-			m_nCurView =5;
+			m_nCurView =DLG_DIALOGT3_VIEW;
 			((CDialogT3*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
 
-	case 6://Mini Panel
+	case DLG_DIALOGMINIPANEL_VIEW://Mini Panel
 		{
-//			theApp.cm5_timer = false;
-			m_nCurView = 6;
+			m_nCurView = DLG_DIALOGMINIPANEL_VIEW;
 		((CDialgMiniPanel*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
-	case 7://AirQuality
+	case DLG_AIRQUALITY_VIEW://AirQuality
 		{
-			m_nCurView = 7;
+			m_nCurView = DLG_AIRQUALITY_VIEW;
 			((CAirQuality*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
-	case 8:
+	case DLG_LIGHTINGCONTROLLER_VIEW:
 		{
-			m_nCurView = 8;
+			m_nCurView = DLG_LIGHTINGCONTROLLER_VIEW;
 			((CLightingController*)m_pViews[m_nCurView])->Fresh();
-
 		}
 		break;
-	case 9:
+	case DLG_HUMCHAMBER:
 	{
-	     m_nCurView=9;
+	     m_nCurView=DLG_HUMCHAMBER;
 		((CHumChamber*)m_pViews[m_nCurView])->Fresh();
 	}
 	break;
-	case  10:
+	case  DLG_CO2_VIEW:
 		{
-			m_nCurView = 10;
+			m_nCurView = DLG_CO2_VIEW;
 			((CCO2_View*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
-	case  11:
+	case  DLG_CM5_BACNET_VIEW:
 		{
-			m_nCurView = 11;
+			m_nCurView = DLG_CM5_BACNET_VIEW;
 			((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
@@ -2263,7 +2228,7 @@ void CMainFrame::SwitchToGraphicView()
 	//	((CT3000View*)m_pViews[0])->m_pSetPtDayDlg->ShowWindow(SW_HIDE);
 		
 
-	SwitchToPruductType(2);
+	SwitchToPruductType(DLG_GRAPGIC_VIEW);
 }
 void CMainFrame::OnAllNodeDatabase()
 {
@@ -4527,28 +4492,28 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			 g_HumChamberThread=FALSE;
 			if(nFlag==PM_NC)	
 			{	
-				SwitchToPruductType(1);
+				SwitchToPruductType(DLG_NETWORKCONTROL_VIEW);
 			}else if (nFlag == PM_CM5)//CM5
 			{
-				SwitchToPruductType(4);
+				SwitchToPruductType(DLG_DIALOGCM5_VIEW);
 			}else if (nFlag == PM_T38AIOD ||nFlag == PM_T3IOA  ||nFlag ==PM_T332AI || nFlag == PM_T34AO)//T3
 			{
 				memset(newtstat6,0,sizeof(newtstat6));
-				SwitchToPruductType(5);
+				SwitchToPruductType(DLG_DIALOGT3_VIEW);
 
 			}
 			else if (nFlag == PM_MINIPANEL)
 			{
-				SwitchToPruductType(6);
+				SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
 			}
 			else if (nFlag==PM_TSTAT6_HUM_Chamber)
 			{
 				 g_HumChamberThread=TRUE;
-				SwitchToPruductType(9);
+				SwitchToPruductType(DLG_HUMCHAMBER);
 			}
-			else if(nFlag == PM_CO2)
+			else if((nFlag == PM_CO2_NET)||(nFlag == PM_CO2_RS485))
 			{
-				SwitchToPruductType(10);
+				SwitchToPruductType(DLG_CO2_VIEW);
 			}
 			else if(nFlag<PM_NC)	
 			{	
@@ -4663,14 +4628,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				}
 
 
-				SwitchToPruductType(0);
-
-				//20120426
-
-
-				//memset(&multi_register_value[10],0,sizeof(multi_register_value)-10);
-				//	memset(multi_register_value,0,sizeof(multi_register_value));
-
+				SwitchToPruductType(DLG_T3000_VIEW);
 
 
 			}		

@@ -1079,6 +1079,22 @@
 #define IDC_BUTTON_INPUT_APPLY          1642
 #define IDC_BUTTON_VARIABLE_APPLY       1643
 #define IDC_LIST_VARIABLE               1644
+#define IDC_COMBO_CO2_SENSOR_SEL        1645
+#define IDC_EDIT_INTERNAL_TEMP          1646
+#define IDC_EDIT_EXTERNAL_TEMP          1647
+#define IDC_STATIC_CO2_UNIT1            1648
+#define IDC_STATIC_CO2_UNIT2            1649
+#define IDC_LIST_CO2_EXTERNAL_SENSOR    1650
+#define IDC_EDIT_CO2_HUMIDITY           1651
+#define IDC_CO2_DATETIMEPICKER1         1652
+#define IDC_CO2_DATETIMEPICKER_TIME     1653
+#define IDC_BUTTON_CO2_SYNC_TIME        1654
+#define IDC_RADIO_PASSWORD_ENABLE       1656
+#define IDC_RADIO_PASSWORD_DISABLE      1657
+#define IDC_EDIT_CO2_PASSWOR            1658
+#define IDC_EDIT_CO2_BLOCK_TIME         1659
+#define IDC_EDIT_CO2_BACKLIGHT_TIME     1660
+#define IDC_BTN_CO2_REFRESH             1661
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1176,7 +1192,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        460
 #define _APS_NEXT_COMMAND_VALUE         32868
-#define _APS_NEXT_CONTROL_VALUE         1645
+#define _APS_NEXT_CONTROL_VALUE         1662
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

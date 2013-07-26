@@ -2662,9 +2662,7 @@ void CT3000View::OnDestroy()
 void CT3000View::OnBnClickedTrendlogview()
 {
 
-	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(3);
-//	SwitchToPruductType(3);
-
+	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(DLG_TRENDLOG_VIEW);
 	// TODO: Add your control notification handler code here
 }
 
@@ -2852,8 +2850,8 @@ if(MsgT3000ViewFresh==message)
 //tstat6
 
 
-
-		Fresh();
+		if(this->IsWindowVisible())	//add by Fance ,if window not visible, it's unnecessary to fresh it;
+			Fresh();
 	}
 
 	return CFormView::WindowProc(message, wParam, lParam);
