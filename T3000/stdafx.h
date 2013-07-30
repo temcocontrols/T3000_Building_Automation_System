@@ -16,6 +16,12 @@
 #define _BIND_TO_CURRENT_VCLIBS_VERSION 1
 
 
+#define CUSTOM_TABLE_FLOAT_VERSION 50.1
+#define SETPOINT_SPECIAL_VERSION	50
+#define  WM_REFRESH_BAC_INPUT_LIST WM_USER + 201
+#define  WM_REFRESH_BAC_PROGRAM_LIST WM_USER + 203
+
+#define  WM_REDROW_BAC_IN_LIST WM_USER + 202
 #include "targetver.h"
 
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
@@ -56,22 +62,19 @@ using namespace Gdiplus;
 
 #pragma  comment(lib,"HtmlHelp.lib")
 #pragma  comment(lib,"Iphlpapi.lib")
-
+#pragma  comment(lib,"ISP.lib")
+#pragma  comment(lib,"RegisterMonitor.lib")
 #import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 //**********************************link to dll*********************
 #define INPUT extern "C" __declspec(dllimport)
-
 #pragma comment(lib, "WS2_32")
 #pragma comment(lib,"ModbusDllforVc")
 #pragma comment(lib,"FlexSlideBar")
-#pragma comment(lib,"BACnet_Stack_Library.lib" )//指定与静态库一起连接
-
-
-
-INPUT int Write_One_tap(unsigned char device_var,unsigned short address,unsigned short value);
-INPUT int Read_One_tap(unsigned char device_var,unsigned short address);
-INPUT int write_multi_tap(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
-INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+#pragma comment(lib,"ISP")
+#pragma comment(lib,"BACnet_Stack_Library" )
+INPUT void  show_ISPDlg();
+INPUT void  show_RegisterMonitorDlg(); 
+INPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length);
 //INPUT bool open_com(unsigned char m_com);
 INPUT bool open_com(int m_com);
 INPUT void close_com();
@@ -106,6 +109,12 @@ INPUT CString Get_NowTime();
 
 INPUT void NET_WriteLogFile(CString strlog);
 INPUT void NET_CloseLogFile();
+
+INPUT int Write_One_tap(unsigned char device_var,unsigned short address,unsigned short value);
+INPUT int Read_One_tap(unsigned char device_var,unsigned short address);
+INPUT int write_multi_tap(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
+INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+
 //INPUT SOCKET GetSocketHandle();
 #include <stdint.h>
 //INPUT bool Device_Set_Object_Instance_Number(

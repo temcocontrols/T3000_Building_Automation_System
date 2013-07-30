@@ -230,6 +230,7 @@ void CT3000View::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_CUR_SP, m_nightpot);//0907
 	DDX_Control(pDX, IDC_SLIDER_DAY, m_singlesliderday);
 	DDX_Control(pDX, IDC_SLIDER_NIGHT, m_singleslidernight);
+	DDX_Control(pDX, IDC_STATICUNINT, m_gUnit);
 }
 
 
@@ -610,7 +611,7 @@ void CT3000View::Fresh()
 // 	strInfo.Format(_T("CT3000View::Fresh():FreshIOGridTable()"));			
 // 	SetPaneString(2, strInfo);
 //Alex-Changed
-CString strTemp;
+    CString strTemp;
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_COOLING_PID]);		//104 384
 	strTemp+=_T("%");
 	GetDlgItem(IDC_OUTPUT1)->SetWindowText(strTemp);
@@ -2664,7 +2665,9 @@ void CT3000View::OnDestroy()
 void CT3000View::OnBnClickedTrendlogview()
 {
 
-	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(DLG_TRENDLOG_VIEW);
+	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(3);
+//	SwitchToPruductType(3);
+
 	// TODO: Add your control notification handler code here
 }
 
@@ -2852,8 +2855,8 @@ if(MsgT3000ViewFresh==message)
 //tstat6
 
 
-		if(this->IsWindowVisible())	//add by Fance ,if window not visible, it's unnecessary to fresh it;
-			Fresh();
+
+		Fresh();
 	}
 
 	return CFormView::WindowProc(message, wParam, lParam);
@@ -2940,7 +2943,10 @@ LRESULT CT3000View::OnFreshView(WPARAM wParam, LPARAM lParam)
 //synchronization the time ,it's not use,this button is not visible.
 void CT3000View::OnBnClickedBtnSynctime()
 {
-	CTime time = CTime::GetCurrentTime();
+CString m_张振中=_T("zhangzhenzhong");
+//AfxMessageBox(m_张振中);
+#if 1
+   CTime time = CTime::GetCurrentTime();
 	BYTE szTime[8] ={0};
 	
 	BeginWaitCursor();
@@ -2963,6 +2969,8 @@ void CT3000View::OnBnClickedBtnSynctime()
 
 	GetDlgItem(IDC_BTN_SYNCTIME)->EnableWindow(TRUE);
 	EndWaitCursor();
+#endif
+	
 	//int nRet = Write_Multi(g_tstat_id, szTime, 450, 8, 3);  // 这个写入有问题，所以变成单个字节写多次
 }
 

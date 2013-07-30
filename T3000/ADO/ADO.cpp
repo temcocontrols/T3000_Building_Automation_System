@@ -5,7 +5,6 @@
 CADO::CADO(void)
 {
 	g_strDatabasefilepath = _T("");
-
 	g_strOrigDatabaseFilePath=_T("");
 	g_strDatabasefilepath=_T("");
 	g_strExePth=_T("");
@@ -46,7 +45,7 @@ void CADO::OnInitADOConn()
 		}
 		FindClose(hFind);
 
-	
+
 		g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;
 		g_strImgeFolder=g_strExePth+_T("Database\\image\\");
 		CreateDirectory(g_strImgeFolder,NULL);

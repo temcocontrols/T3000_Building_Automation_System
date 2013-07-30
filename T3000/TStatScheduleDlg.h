@@ -54,4 +54,6 @@ public:
 	afx_msg void OnBnClickedButtonExit();
 	afx_msg void OnBnClickedRadio24h();
 	afx_msg void OnBnClickedRadio12h();
+	CComboBox m_scheduleonoff;
+	afx_msg void OnCbnSelchangeComboOnoff();
 };

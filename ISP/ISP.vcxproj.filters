@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="ISP.def">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="res\ISP.rc2">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\ISP.ico">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ISP.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BinFileParser.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="common.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ComWriter.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigFileHandler.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="crc.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="extern_variable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashBase.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FlashSN.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="globle_function.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Hex386Writer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HexFileParser.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ISPDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="JPGLoader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyPing.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="NCFinder.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="NetWriter.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Splash.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TCPFlasher.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TFTPServer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MySocket.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ISP.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BinFileParser.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ComWriter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigFileHandler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="crc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="define.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashBase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FlashSN.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Global_Struct.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="globle_function.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Hex386Writer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HexFileParser.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ISPDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="JPGLoader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyPing.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NCFinder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NetWriter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Splash.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TCPFlasher.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TFTP Struct.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TFTPServer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MySocket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ISP.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

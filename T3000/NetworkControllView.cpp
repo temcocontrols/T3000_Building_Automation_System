@@ -225,7 +225,7 @@ void CNetworkControllView::Fresh()
 
 	
 	m_nListenPort=multi_register_value[120];
-	InitGrid();
+	//InitGrid();
 
 	UpdateData(false);
 }
@@ -372,47 +372,54 @@ void CNetworkControllView::OnBnClickedApplybutton()
 		return;
 	}
 	write_one(g_tstat_id,120,m_nListenPort);
-	BYTE address1,address2,address3,address4;
-	m_ip_addressCtrl.	GetAddress(address1,address2,address3,address4);
-	int n=write_one(g_tstat_id,107,address1);
-	n=write_one(g_tstat_id,108,address2);
-	n=write_one(g_tstat_id,109,address3);
-	n=write_one(g_tstat_id,110,address4);
-	m_subnet_addressCtrl.GetAddress(address1,address2,address3,address4);
-	write_one(g_tstat_id,111,address1);
+	BYTE address[12];
+	m_ip_addressCtrl.GetAddress(address[0],address[1],address[2],address[3]);
+	//int n=write_one(g_tstat_id,107,address1);
+	//n=write_one(g_tstat_id,108,address2);
+	//n=write_one(g_tstat_id,109,address3);
+	//n=write_one(g_tstat_id,110,address4);
+	m_subnet_addressCtrl.GetAddress(address[4],address[5],address[6],address[7]);
+	/*write_one(g_tstat_id,111,address1);
 	write_one(g_tstat_id,112,address2);
 	write_one(g_tstat_id,113,address3);
-	write_one(g_tstat_id,114,address4);
-	m_gateway_addressCtrl.GetAddress(address1,address2,address3,address4);
-	write_one(g_tstat_id,115,address1);
+	write_one(g_tstat_id,114,address4);*/
+	m_gateway_addressCtrl.GetAddress(address[8],address[9],address[10],address[11]);
+	/*write_one(g_tstat_id,115,address1);
 	write_one(g_tstat_id,116,address2);
 	write_one(g_tstat_id,117,address3);
-	write_one(g_tstat_id,118,address4);
-	write_one(g_tstat_id,131,1);
-	Sleep(1000);//Sleep(10000); // ???
-	write_one(g_tstat_id,133,1);
-	Sleep(5000);	//Sleep(5000); // wait for nc restart
+	write_one(g_tstat_id,118,address4);*/
+	unsigned short data[12];
+	for (int i=0;i<12;i++)
+	{
+	   data[i]=(unsigned short)address[i];
+	}
+
+	int ret=write_multi_Short(g_tstat_id,data,107,12);
+	//write_one(g_tstat_id,131,1);
+	//Sleep(1000);//Sleep(10000); // ???
+	//write_one(g_tstat_id,133,1);
+	//Sleep(5000);	//Sleep(5000); // wait for nc restart
 
 	CMainFrame* pPraent=(CMainFrame*)GetParent();
 	//pPraent->ReFresh();
 
-	/*
-	unsigned short variable[13]={0};
-	int nRet=Read_Multi(g_tstat_id,variable,106,13,3);/////////////////////////read
-	m_ipModelComBox.SetCurSel(variable[0]);
-	m_ip_addressCtrl.SetAddress(variable[1],variable[2],variable[3],variable[4]);
-	m_subnet_addressCtrl.SetAddress(variable[5],variable[6],variable[7],variable[8]);
-	m_gateway_addressCtrl.SetAddress(variable[9],variable[10],variable[11],variable[12]);
+	 
+	//unsigned short variable[13]={0};
+	//int nRet=Read_Multi(g_tstat_id,variable,106,13,3);/////////////////////////read
+	//m_ipModelComBox.SetCurSel(variable[0]);
+	//m_ip_addressCtrl.SetAddress(variable[1],variable[2],variable[3],variable[4]);
+	//m_subnet_addressCtrl.SetAddress(variable[5],variable[6],variable[7],variable[8]);
+	//m_gateway_addressCtrl.SetAddress(variable[9],variable[10],variable[11],variable[12]);
 
-*/
+ 
 	
 	CString strBuilding,strSubBuilding;
 	strBuilding=pPraent->m_strCurMainBuildingName;
 	strSubBuilding=pPraent->m_strCurSubBuldingName;
 	CString strIP,strPort;
 	strPort.Format(_T("%d"),multi_register_value[120]);
-	m_ip_addressCtrl.GetAddress(address1,address2,address3,address4);
-	strIP.Format(_T("%d.%d.%d.%d"),address1,address2,address3,address4);
+	m_ip_addressCtrl.GetAddress(address[0],address[1],address[2],address[3]);
+	strIP.Format(_T("%d.%d.%d.%d"),address[0],address[1],address[2],address[3]);
 	if(g_CommunicationType==1)//TCP
 	{
 		int nPort;
@@ -475,7 +482,7 @@ void CNetworkControllView::OnBnClickedApplybutton()
 		*/
 	}
 	//write_one(g_tstat_id,131,1);
-	Fresh();
+	//Fresh();
 	EndWaitCursor();
 
 }

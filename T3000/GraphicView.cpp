@@ -602,7 +602,7 @@ void CGraphicView::OnInitialUpdate()
 
 void CGraphicView::OnBnClickedGobackbutton()
 {
-	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(DLG_T3000_VIEW);
+	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(0);
 }
 void CGraphicView::saveLabelInfo(int nItem)
 {

@@ -149,10 +149,10 @@ BOOL COutPutDlg::OnInitDialog()
 	put_fan_variable();
 	strdemo = _T("2,");
 	SetPaneString(2,strdemo);
-	/*
+	
 	if(g_ifanStatus<m_fan.GetCount())
 		m_fan.SetCurSel(g_ifanStatus);
-		*/
+		
 	if(!g_strFan.IsEmpty())
 	{
 		CString strLbText;
@@ -247,15 +247,21 @@ void COutPutDlg::put_fan_variable()
 	{
 		strdemo = _T("1-4-0-1,");
 		SetPaneString(2,strdemo);
-		//if(read_one(g_tstat_id,107)==1)////here can't use read_multi function
-		if(product_register_value[107] == 1)////here can't use read_multi function  如果去读，常会死在这里。
+		//if(read_one(g_tstat_id,107)==1)////here can't use  function
+		if(product_register_value[107] == 1)////here can't use  function  如果去读，常会死在这里。
 		{
 			strdemo = _T("1-4-1,");
 			SetPaneString(2,strdemo);
 			m_fan.AddString(p[0]);
 			m_fan.AddString(p[5]);	
+			m_fan_mode_ctrl.EnableWindow(FALSE);
 			
-			m_fan_mode_ctrl.EnableWindow(FALSE);		
+			strdemo = _T("1-4-3,");
+			SetPaneString(2,strdemo);
+			if (product_register_value[273]==0)
+				m_fan.SetCurSel(0);
+			else
+				m_fan.SetCurSel(1);		
 		}
 		else
 		{	
@@ -275,23 +281,26 @@ void COutPutDlg::put_fan_variable()
 			}
 
 			m_fan_mode_ctrl.EnableWindow(TRUE);
+
+			strdemo = _T("1-4-3,");
+			SetPaneString(2,strdemo);
+			if (product_register_value[273]>0)
+				m_fan.SetCurSel(product_register_value[273]);
+			else
+				m_fan.SetCurSel(0);
 		}
 //137	273	1	Low byte	W/R	FAN_SPEED, current operating fan speed   
 // Relay Output Tables (bit0 = relay1, bit1 = relay2, bit2 = relay3, bit3 = relay4, bit4 = relay5)
 
 
-		strdemo = _T("1-4-3,");
-		SetPaneString(2,strdemo);
-		if (product_register_value[273]>0)
-			m_fan.SetCurSel(product_register_value[273]);
-		else
-			m_fan.SetCurSel(0);
-	}else
+		
+	}
+	else
 	{
 
 // 		strdemo = _T("read_one(g_tstat_id,129)==1开始");
 // 		SetPaneString(2,strdemo);
-		//if(read_one(g_tstat_id,129)==1)////here can't use read_multi function//0912
+		//if(read_one(g_tstat_id,129)==1)////here can't use  function//0912
 		if (multi_register_value[129] == 1)
 		{
 			m_fan.AddString(p[0]);
@@ -385,13 +394,38 @@ void COutPutDlg::OnCbnSelchangeCbfan()
 // 		The mode of operation (coasting, cooling, heating) is determined by the PID parameter.
 	//if (newtstat6[7] == PM_TSTAT6)
 	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	{ 
+	 if (product_register_value[MODBUS_AUTO_ONLY]==1)
+	{
+	   int sel=m_fan.GetCurSel();
+	   if (sel==0)//OFF
+	   {
+		   int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,sel);
+		   if (ret>0)
+		   {
+
+			   product_register_value[MODBUS_FAN_SPEED]=0;
+		   }
+	   } 
+	   else//Auto
+	   {
+		   int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,4);
+		   if (ret>0)
+		   {
+			   product_register_value[MODBUS_FAN_SPEED]=4;
+		   }
+	   }
+	} 
+	else
 	{
 		int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,m_fan.GetCurSel());
 		if (ret>0)
 		{
-			 
+
 			product_register_value[MODBUS_FAN_SPEED]=m_fan.GetCurSel();
 		}
+	}
+		
 		
 	}
 	else
@@ -3250,10 +3284,8 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 			else//grid 2:
 			{
 
-					if (((product_register_value[MODBUS_FAN_SPEED]==1)&&(product_register_value[MODBUS_AUTO_ONLY]==1))||
-						(product_register_value[MODBUS_FAN_SPEED]==4)//Auto 
-						)
-						{
+					if(product_register_value[MODBUS_FAN_SPEED]==4)//Auto 
+					{
 						if((col-5) < (m_PID2_heat_stages+1))
 						pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
 					else
@@ -4911,9 +4943,19 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 
 
 	if(product_register_value[MODBUS_AUTO_ONLY]==0)	//107
-		m_bFanAutoOnly=FALSE;
-	else if(product_register_value[MODBUS_AUTO_ONLY]==1)	//107
-		m_bFanAutoOnly=TRUE;
+		{m_bFanAutoOnly=FALSE;
+	if(product_register_value[MODBUS_FAN_SPEED]>=0)	//273
+		m_fan.SetCurSel(product_register_value[MODBUS_FAN_SPEED]);	//273
+	else
+		m_fan.SetCurSel(0);
+		}
+	else//107
+		{m_bFanAutoOnly=TRUE;
+	if(product_register_value[MODBUS_FAN_SPEED]==0)	//273
+		m_fan.SetCurSel(0);	//273
+	else
+		m_fan.SetCurSel(1);
+		}
 
 
 	//122	105	1	Low byte	W/R	FAN MODE, number of fan speeds. Single speed = 1 up to three speed fan = 3
@@ -4932,10 +4974,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 //		Fan4 is for the Auto state.  These states are controlled by the user."
 // 		The mode of operation (coasting, cooling, heating) is determined by the PID parameter.
 
-	if(product_register_value[MODBUS_FAN_SPEED]>=0)	//273
-		m_fan.SetCurSel(product_register_value[MODBUS_FAN_SPEED]);	//273
-	else
-		m_fan.SetCurSel(0);
+
 
 
 	//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
@@ -5486,9 +5525,8 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 #if 1
 	////////////////////////down code is for m_flexgrid2
 	//for(int col = 1 ;col <= (m_PID2_heat_stages+m_PID2_heat_stages+1);col++)
-	if (((product_register_value[MODBUS_FAN_SPEED]==1)&&(product_register_value[MODBUS_AUTO_ONLY]==1))||
-	    (product_register_value[MODBUS_FAN_SPEED]==4)
-	 )//Auto
+	if (product_register_value[MODBUS_FAN_SPEED]==4)
+	 //Auto
 	{
 	for(int col = 1 ;col <= (m_PID2_heat_stages+m_PID2_cool_stages+1);col++)
 	{
