@@ -11,7 +11,7 @@ public:
 	CBuildTable1(bool table1_table2,CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CBuildTable1();
 
-// 对话框数据
+	// 对话框数据
 	enum { IDD = IDD_BUILD_TABLE1 };
 
 protected:

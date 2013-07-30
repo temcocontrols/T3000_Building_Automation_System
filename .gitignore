@@ -1,63 +1,10 @@
-# cache files created and maintained by Visual Studio
 
-*.pdb
-*.user
-*.ncb
-
-# folders containing intermediate files created during build
-
-T3000 Output/T3000 object/*
-T3000 Output/modbusdll object/*
-T3000 Output/FlexSlideBar object/*
-T3000 Output/debug/*
-tst/unit_test/debug/*
-
-# created by build
-
-*.dll
-*.exp
-*.lib
-*.exe
-*.ilk
-
-/T3000 Output/debug/ModbusDllforVc.dll
-/T3000 Output/debug/ModbusDllforVc.exp
-/T3000 Output/debug/ModbusDllforVc.ilk
-/T3000 Output/debug/ModbusDllforVc.lib
-/T3000 Output/debug/ModbusDllforVc.pdb
-/T3000 Output/debug/T3000.exe
-/T3000 Output/debug/T3000.ilk
-/T3000 Output/debug/T3000.map
-/T3000 Output/debug/T3000.pdb
-/T3000 Output/debug/FlexSlideBar.dll
-/T3000 Output/debug/FlexSlideBar.exp
-/T3000 Output/debug/FlexSlideBar.ilk
-/T3000 Output/debug/FlexSlideBar.lib
-/T3000 Output/debug/FlexSlideBar.pdb
-/T3000 Output/FlexSlideBar object
-/T3000 Output/modbusdll object
-/T3000 Output/T3000 object
-/T3000 Output/FlexSlideBar object
-/T3000 Output/modbusdll object
-/T3000 Output/modbusdll object
-/T3000 Output/T3000 object
-/T3000 Output/debug/T3000.pdb
-/T3000 Output/debug/FlexSlideBar.dll
-/T3000 Output/debug/FlexSlideBar.exp
-/T3000 Output/debug/FlexSlideBar.ilk
-/T3000 Output/debug/FlexSlideBar.lib
-/T3000 Output/debug/FlexSlideBar.pdb
-/T3000 Output/debug/ModbusDllforVc.dll
-/T3000 Output/debug/ModbusDllforVc.exp
-/T3000 Output/debug/ModbusDllforVc.ilk
-/T3000 Output/debug/ModbusDllforVc.lib
-/T3000 Output/debug/ModbusDllforVc.pdb
-/T3000 Output/debug/T3000.exe
-/T3000 Output/debug/T3000.ilk
-/T3000 Output/debug/T3000.map
-/T3000/ipch
-/T3000/ipch/t3000-9dcbbcef/t3000-77af99c9.ipch
-/T3000 Output/release/Database/t3000.mdb
 /T3000 Output
-/BacNetDllforVc/Debug
-/BacNetDllforVc/Release
+/T3000/UpgradeLog.XML
+/T3000/UpgradeLog2.XML
+/T3000/ipch
+/ISP/Debug
+/ISP/ipch
+/RegisterMonitor/ipch
+/RegisterMonitor/ipch
+/RegisterMonitor/ipch

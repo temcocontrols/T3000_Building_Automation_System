@@ -7,6 +7,7 @@
 #include "T3000.h"
 #include "globle_function.h"
 
+
 #define	SLIDER_RANGE 65535
 #define MAX_VALUE atoi(m_max)
 #define OVER_MAX_OR_BELOW_MIN AfxMessageBox(_T("Please verify the value is between the minimum and maximum readings!"))
