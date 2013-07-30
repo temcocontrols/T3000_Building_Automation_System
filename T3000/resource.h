@@ -490,12 +490,14 @@
 #define IDC_COMBO_INPUTOUTPUT           1129
 #define IDC_CHECK55                     1129
 #define IDC_COMBO_panel                 1129
+#define IDC_STATICUNINT                 1129
 #define IDC_POWERMODELCOMBO             1130
 #define IDC_CHECK56                     1130
 #define IDC_COMBO_TIMESERVERLIST2       1130
 #define IDC_BRAUDRATECOMBO              1131
 #define IDC_CHECK57                     1131
 #define IDC_COMBO_ENABLE_INOUTPUT       1131
+#define IDC_COMBO_TYPE_INOUTPUT         1131
 #define IDC_DISPLAYCOMBO                1132
 #define IDC_CHECK66                     1132
 #define IDC_KEYPADLOCKCOMBO             1133
@@ -934,7 +936,7 @@
 #define IDC_PROGRESS1                   1527
 #define IDC_STATICn                     1528
 #define IDC_STATICd                     1529
-#define IDC_STATICUNINT                 1530
+#define IDC_STATICUNINT_T               1530
 #define IDC_COMBOLOCK                   1531
 #define IDC_BUTTON_SELECT               1532
 #define IDC_EDIT_FILEPATHE              1533
@@ -1080,6 +1082,7 @@
 #define IDC_BUTTON_VARIABLE_APPLY       1643
 #define IDC_LIST_VARIABLE               1644
 #define IDC_COMBO_CO2_SENSOR_SEL        1645
+#define IDC_COMBO_ONOFF                 1624
 #define IDC_EDIT_INTERNAL_TEMP          1646
 #define IDC_EDIT_EXTERNAL_TEMP          1647
 #define IDC_STATIC_CO2_UNIT1            1648
@@ -1179,10 +1182,12 @@
 #define ID_SETMAPPING_SAND              32864
 #define ID_FILE_ISPTOOL                 32865
 #define ID_DATABASE_IONAMECONFIG        32866
-#define ID_DATABASE_MBPOLL              32867
+#define ID_TOOL_ISPTOOLFORONE           32867
+#define ID_DATABASE_MBPOLL              33867
 #define ID_FILE_OPEN32883               32883
 #define ID_FILE_SAVE32884               32884
 #define ID_FILE_EXIT                    32888
+#define ID_TOOL_REGISTERMONITER         32868
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
 
@@ -1190,9 +1195,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        460
-#define _APS_NEXT_COMMAND_VALUE         32868
-#define _APS_NEXT_CONTROL_VALUE         1662
+#define _APS_NEXT_RESOURCE_VALUE        451
+#define _APS_NEXT_COMMAND_VALUE         32869
+#define _APS_NEXT_CONTROL_VALUE         1625
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

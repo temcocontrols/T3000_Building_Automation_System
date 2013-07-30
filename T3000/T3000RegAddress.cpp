@@ -917,6 +917,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
     MODBUS_WINDOW_COOLING_SETPOINT                        =  _P("MODBUS_WINDOW_COOLING_SETPOINT");          
     MODBUS_RELAY_PWM_ENABLE                               =  _P("MODBUS_RELAY_PWM_ENABLE");                 
     MODBUS_RELAY_PWM_TOTAL_DUTY                           =  _P("MODBUS_RELAY_PWM_TOTAL_DUTY");             
-    MODBUS_RELAY_PWM_HIGH_DUTY                            =  _P("MODBUS_RELAY_PWM_HIGH_DUTY");       
+    MODBUS_RELAY_PWM_HIGH_DUTY                            =  _P("MODBUS_RELAY_PWM_HIGH_DUTY");
+	       
 	return 0;
 	}

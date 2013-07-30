@@ -22,8 +22,8 @@
 #define TSTAT25_VAR_NUM 43
 #define TSTAT24_VAR_NUM 30
 #define NET_WORK_CONTROLLER_NUM 24
-#define TSTAT26_VAR_NUM 112
-#define TSTAT26_VAR_NUM_TSTAT67 110
+#define TSTAT26_VAR_NUM 113
+#define TSTAT26_VAR_NUM_TSTAT67 111
 #define NET_WORK_DEFFERENT_TSTAT_FILE "NET WORK\n"
 using namespace std;
 
@@ -49,7 +49,7 @@ int tstat26_register_var[TSTAT26_VAR_NUM]={	118,121,185,128,111,	112,114,115,119
 	336,337,338,339,		327,283,284,
 	341,342,343,344,345,346,347,
 	298,299,300};
-int tstat67_register_var[TSTAT26_VAR_NUM]={	
+int tstat67_register_var[TSTAT26_VAR_NUM_TSTAT67]={	
                                             MODBUS_SEQUENCE,
                                             MODBUS_DEGC_OR_F,
 											MODBUS_BAUDRATE,
@@ -160,6 +160,7 @@ int tstat67_register_var[TSTAT26_VAR_NUM]={
 											MODBUS_OUTPUT5_FUNCTION,
 											MODBUS_OUTPUT6_FUNCTION,
 											MODBUS_OUTPUT7_FUNCTION,
+											MODBUS_SCHEDULE_ON_OFF
 											};
 
 int net_work_controller[NET_WORK_CONTROLLER_NUM]={	106,107,108,109,110,	111,112,113,114,115,
@@ -599,7 +600,8 @@ _TCHAR * TSTATVAR_CONST_67[] = {                  //attention:该数组中的值，不要
 	_T("Output Fun 4"),
 	_T("Output Fun 5"),
 	_T("Output Fun 6"),
-	_T("Output Fun 7")
+	_T("Output Fun 7"),
+	_T("Schedule ON/OFF")
 						};
 _TCHAR *STRINGCONST[] ={_T("Off"),_T("On"),_T("Close"),_T("Open"),_T("0-100"),_T("50-100"),_T("0-50")};
 

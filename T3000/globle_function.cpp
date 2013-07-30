@@ -6,6 +6,9 @@
 
 
 
+#include "T3000RegAddress.h"
+
+
 #define DELAY_TIME	 10	//MS
 #define Modbus_Serial	0
 #define	Modbus_TCP	1
@@ -93,7 +96,14 @@ int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short 
 	g_bEnableRefreshTreeView |= bTemp;
 	return j;
 }
-
+int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times)
+{
+	BOOL bTemp = g_bEnableRefreshTreeView;
+	g_bEnableRefreshTreeView = FALSE;
+	int j = Write_Multi_org_short(device_var, to_write, start_address, length, retry_times);
+	g_bEnableRefreshTreeView |= bTemp;
+	return j;
+}
 int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
 {
 // 	CString str;
@@ -104,6 +114,38 @@ int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned sh
 	{
 		register_critical_section.Lock();
 		j=write_multi(device_var,to_write,start_address,length);
+		register_critical_section.Unlock();
+		if (g_CommunicationType==Modbus_Serial)
+		{
+			Sleep(DELAY_TIME);//do this for better quickly
+		}
+		if(j!=-2)
+		{
+			//SetPaneString(2,_T("Multi-Write successful!"));
+			CString str;
+			str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, ++g_llRxCount,g_llTxCount-g_llRxCount);
+			SetPaneString(0,str);
+			return j;
+		}
+	}
+	//SetPaneString(2,_T("Multi-write failure!"));
+	CString str;
+	str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), device_var, ++g_llTxCount, g_llRxCount,g_llTxCount-g_llRxCount);
+	SetPaneString(0,str);
+	return j;
+}
+
+
+int Write_Multi_org_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times)
+{
+	// 	CString str;
+	// 	str.Format(_T("ID :%d Multi writing start :%d Amount: %d"),device_var,start_address,length);
+	// 	SetPaneString(2,str);
+	int j=0;
+	for(int i=0;i<retry_times;i++)
+	{
+		register_critical_section.Lock();
+		j=write_multi_Short(device_var,to_write,start_address,length);
 		register_critical_section.Unlock();
 		if (g_CommunicationType==Modbus_Serial)
 		{
@@ -791,7 +833,7 @@ BOOL Post_Thread_Message(UINT MsgType,
 
 	//search the id ,if not in the vector, push back into the vector.
 	bool find_id=false;
-	for (int i=0;i<(int)Change_Color_ID.size();i++)
+	for (int i=0;i<Change_Color_ID.size();i++)
 	{
 		if(Change_Color_ID.at(i)!=CTRL_ID)
 			continue;

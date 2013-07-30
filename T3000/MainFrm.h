@@ -343,6 +343,9 @@ public:
 	static	DWORD WINAPI Translate_My_Message(LPVOID lpVoid);
 	afx_msg void OnDatabaseIonameconfig();
 	afx_msg void OnDatabaseMbpoll();
+
+	afx_msg void OnToolIsptoolforone();
+	afx_msg void OnToolRegistermoniter();
 	CMbPoll* mbPoll;
 	bool mbPollDlgOpen;
 protected:
@@ -361,7 +364,4 @@ const int DLG_LIGHTINGCONTROLLER_VIEW = 8;
 const int DLG_HUMCHAMBER = 9;
 const int DLG_CO2_VIEW = 10;
 const int DLG_CM5_BACNET_VIEW = 11;
-
-
-
 

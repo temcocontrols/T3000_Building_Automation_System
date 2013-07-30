@@ -101,6 +101,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\BacNetDllforVc\;..\BacNetDllforVc\MainCpp\;..\BacNetDllforVc\include\;..\BacNetDllforVc\object\;..\BacNetDllforVc\handler\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -126,6 +127,7 @@
     <ClCompile Include="Annual_Routines.cpp" />
     <ClCompile Include="AnnualRout_InsertDia.cpp" />
     <ClCompile Include="ApplyGraphicLabelsDlg.cpp" />
+    <ClCompile Include="BacnetInfo.cpp" />
     <ClCompile Include="BacnetInput.cpp" />
     <ClCompile Include="BacnetOutput.cpp" />
     <ClCompile Include="BacnetProgram.cpp" />
@@ -226,7 +228,6 @@
     <None Include="OutputTableDlg.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="res\annual.ico" />
     <None Include="res\ApplyDisable.bmp" />
     <None Include="res\ApplyDown.bmp" />
     <None Include="res\ApplyFouct.bmp" />
@@ -246,7 +247,6 @@
     <None Include="res\coldtool.bmp" />
     <None Include="res\Exit.ico" />
     <None Include="res\hottool.bmp" />
-    <None Include="res\Input.ico" />
     <None Include="res\MDisable.bmp" />
     <None Include="res\MDown.bmp" />
     <None Include="res\menu_img.bmp" />
@@ -255,8 +255,6 @@
     <None Include="res\MFouct.bmp" />
     <None Include="res\MUp.bmp" />
     <None Include="C:\Documents and Settings\lee\桌面\NWT3000.ico" />
-    <None Include="res\Output.ico" />
-    <None Include="res\Programing.ico" />
     <None Include="res\Refresh.ico" />
     <None Include="res\Schedule0607.bmp" />
     <None Include="res\serialnum.ico" />
@@ -273,8 +271,6 @@
     <None Include="res\Toolbar_V25049.bmp" />
     <None Include="res\ToolbarOwn.bmp" />
     <None Include="res\treenode.bmp" />
-    <None Include="res\variable.ico" />
-    <None Include="res\week.ico" />
     <None Include="UserImages.bmp" />
     <None Include="ReadMe.txt" />
     <None Include="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt" />
@@ -286,6 +282,12 @@
     <ClInclude Include="BacnetProgram.h" />
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="Bacnet_Include.h" />
+    <ClInclude Include="CM5\ListCtrlCellEx.h" />
+    <ClInclude Include="CM5\ListCtrlEx.h" />
+    <ClInclude Include="CM5\MyOwnListCtrl.h" />
+    <ClInclude Include="CM5\PerfTimer.h" />
+    <ClInclude Include="CM5\ud_str.h" />
+    <ClInclude Include="CM5\user_data.h" />
     <ClInclude Include="CO2_View.h" />
     <ClInclude Include="DialogCM5_BacNet.h" />
     <ClInclude Include="IONameConfig.h" />
@@ -295,7 +297,6 @@
     <ClInclude Include="MbpGlobals.h" />
     <ClInclude Include="MbPoll.h" />
     <ClInclude Include="MbPollOptions.h" />
-    <ClInclude Include="MyOwnListCtrlInput.h" />
     <ClInclude Include="Scanwaydlg.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="WeeklySchedule.h" />

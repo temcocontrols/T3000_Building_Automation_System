@@ -85,7 +85,7 @@ void CDialogCM5_BacNet::OnInitialUpdate()
 	// TODO: Add your specialized code here and/or call the base class
 }
 
-INPUT int test_function_return_value();
+//INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
 
@@ -102,7 +102,7 @@ void CDialogCM5_BacNet::Fresh()
 	{
 		has_run_once =true;
 		close_com();
-		int test111=test_function_return_value();
+	//	int test111=test_function_return_value();
 		Device_Set_Object_Instance_Number(4194300);
 		address_init();
 		Init_Service_Handlers();
