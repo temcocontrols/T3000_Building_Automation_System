@@ -393,8 +393,7 @@ void COutPutDlg::OnCbnSelchangeCbfan()
 //		Fan4 is for the Auto state.  These states are controlled by the user."
 // 		The mode of operation (coasting, cooling, heating) is determined by the PID parameter.
 	//if (newtstat6[7] == PM_TSTAT6)
-	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
-	{ 
+	  
 	 if (product_register_value[MODBUS_AUTO_ONLY]==1)
 	{
 	   int sel=m_fan.GetCurSel();
@@ -427,9 +426,7 @@ void COutPutDlg::OnCbnSelchangeCbfan()
 	}
 		
 		
-	}
-	else
-		write_one(g_tstat_id, 137,m_fan.GetCurSel());
+	 
 	//put_fan_variable();
  
 	FreshGrids();
@@ -3074,17 +3071,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				int n=get_real_fan_select() ;
 				//138	288	1	Low byte	W/R	FAN0_OPERATION_TABLE_COAST
 				//if (newtstat6[7] ==6)
-				if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-				{
-					if(write_one(g_tstat_id,288+get_real_fan_select() * 7 + pos,tstatval)<0)
+				 
+					if(write_one(g_tstat_id,MODBUS_FAN0_OPER_TABLE_COAST+get_real_fan_select() * 7 + pos,tstatval)<0)
 					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-					product_register_value[288+get_real_fan_select() * 7+pos] = tstatval;
-				}
-				else
-				{
-					if(write_one(g_tstat_id,138+get_real_fan_select() * 7 + pos,tstatval)<0)
-					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				}
+					product_register_value[MODBUS_FAN0_OPER_TABLE_COAST+get_real_fan_select() * 7+pos] = tstatval;
+			 
 
 				if(m_bFloat)
 				{
@@ -3104,32 +3095,20 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						if(m_fan.GetCurSel()==0)
 						{
 							//if (newtstat6[7] == 6)
-							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-							{
-								if(write_one(g_tstat_id,334+pos,tstatval)<0)
+							 
+								if(write_one(g_tstat_id,MODBUS_VALVE_OFF_TABLE_COAST+pos,tstatval)<0)
 								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-								product_register_value[334+pos] = tstatval;
-							}
-							else
-							{
-								if(write_one(g_tstat_id,351+pos,tstatval)<0)
-								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							}
+								product_register_value[MODBUS_VALVE_OFF_TABLE_COAST+pos] = tstatval;
+						 
 						}
 						else
 						{
-							//if (newtstat6[7] == 6)
-							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-							{
-								if(write_one(g_tstat_id,323+pos,tstatval)<0)
+							 
+						 
+								if(write_one(g_tstat_id,MODBUS_VALVE_OPERATION_TABLE_BEGIN+pos,tstatval)<0)
 								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-								product_register_value[323+pos] = tstatval;
-							}
-							else
-							{
-								if(write_one(g_tstat_id,173+pos,tstatval)<0)
-								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							}
+								product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+pos] = tstatval;
+					 
 						}
 					}
 					if(row==5&&output4_value==1)
@@ -3175,39 +3154,11 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 					}
 				}
 
-				if(m_fan.GetCurSel()==0)
-				{
-					//if (newtstat6[7] == 6)
-					if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-					{
-						tstatval=(unsigned char)product_register_value[334+pos];
-					}
-					else
-					{
-						tstatval=(unsigned char)multi_register_value[351+pos];
-					}
-				}
-				else
-				{
-					//if (newtstat6[7] == 6)
-					if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-					{
-						tstatval=(unsigned char)product_register_value[323+pos];
-					}
-					else
-					{
-						tstatval=(unsigned char)multi_register_value[173+pos];
-					}
-				}
-				// 				tstatval=multi_register_value[351+pos];
-				// 			else
-				// 				tstatval=multi_register_value[173+pos];
+		
+			 
 
-				if(m_nmoduleType == 1 || m_nmoduleType == 3)
-				{
-					if(m_nmoduleType == 1)
-						totalrows = 4 ;////////////////
-					else
+				
+					
 						totalrows = 6 ;////////////////
 					if((col-5) < (m_PID1_heat_stages+1))
 						pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - (col-5) ;
@@ -3246,40 +3197,25 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						/*}*/
 					}
 					if(m_fan.GetCurSel()==0)
-						// 					write_one(g_tstat_id,351+pos,tstatval);
-						// 				else
-						// 					write_one(g_tstat_id,173+pos,tstatval);
 					{
 						//if (newtstat6[7] == 6)
-						if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-						{
-							if(write_one(g_tstat_id,334+pos,tstatval)<0)
+						 
+							if(write_one(g_tstat_id,MODBUS_VALVE_OFF_TABLE_COAST+pos,tstatval)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							product_register_value[334+pos] = tstatval;
-						}
-						else
-						{
-							if(write_one(g_tstat_id,351+pos,tstatval)<0)
-							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-						}
+							product_register_value[MODBUS_VALVE_OFF_TABLE_COAST+pos] = tstatval;
+						 
 					}
 					else
 					{
 						//if (newtstat6[7] == 6)
-						if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-						{
-							if(write_one(g_tstat_id,323+pos,tstatval)<0)
+						 
+							if(write_one(g_tstat_id,MODBUS_VALVE_OPERATION_TABLE_BEGIN+pos,tstatval)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							product_register_value[323+pos] = tstatval;
-						}
-						else
-						{
-							if(write_one(g_tstat_id,173+pos,tstatval)<0)
-							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-						}
+							product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+pos] = tstatval;
+						 
 					}
 
-				}
+				
 			}
 			else//grid 2:
 			{
@@ -3368,7 +3304,7 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 							
 					 
 						}
-						else
+					else
 						{
 
 							if((col-5) < (m_PID2_heat_stages+1))
@@ -3405,8 +3341,8 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						}
 						else
 						{
-
-							totalrows = 6 ;////////////////
+						  if (product_register_value[MODBUS_FAN_SPEED]==0)
+						  {totalrows = 6 ;////////////////
 							if((col-5) < (m_PID2_heat_stages+1))
 								pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
 							else
@@ -3447,6 +3383,8 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 							if(write_one(g_tstat_id,MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN+pos,tstatval)<0)//没找到对应的值。
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
 							product_register_value[MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN+pos]=tstatval;
+						  }
+							
 						}
 
 			
@@ -3692,16 +3630,7 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 
 						if(m_fan.GetCurSel()==0)
 						{
-							//if (newtstat6[7] == 6)
-							// 						if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
-							// 						{
-							// 							write_one(g_tstat_id,334+pos,tstatval);
-							// 							newtstat6[334+pos] = tstatval;
-							// 						}
-							// 						else
-							// 						{
-							//write_one(g_tstat_id,351+pos,tstatval);
-							//						}
+							 
 							if (m_pids == 1)
 							{
 								write_one(g_tstat_id,385+pos,tstatval);//lsc add ,目前只有当第一个选择为PID2，下面的才写到这个寄存器中
@@ -3769,26 +3698,16 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				if(m_fan.GetCurSel()==0)
 				{
 					//if (newtstat6[7] == 6)
-					if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-					{
-						tstatval=(unsigned char)product_register_value[334+pos];
-					}
-					else
-					{
-						tstatval=(unsigned char)multi_register_value[351+pos];
-					}
+					 
+						tstatval=(unsigned char)product_register_value[MODBUS_VALVE_OFF_TABLE_COAST+pos];
+					 
 				}
 				else
 				{
 					//if (newtstat6[7] == 6)
-					if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-					{
-						tstatval=(unsigned char)product_register_value[323+pos];
-					}
-					else
-					{
-						tstatval=(unsigned char)multi_register_value[173+pos];
-					}
+					 
+						tstatval=(unsigned char)product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+pos];
+					 
 				}
 				// 				tstatval=multi_register_value[351+pos];
 				// 			else
@@ -4145,17 +4064,11 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 	int	nValue;
 
 	//if (newtstat6[7] ==6)
-	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-	{
-		nOutReg = 245 + lRow-1;
+	 
+		nOutReg = MODBUS_INTERLOCK_OUTPUT1 + lRow-1;
 		nValue=product_register_value[nOutReg];
 
-	}
-	else
-	{
-		nOutReg=286+lRow-1;
-		nValue=multi_register_value[nOutReg];
-	}
+ 
 	
 	//int	nValue=multi_register_value[nOutReg];
 	if(nValue==7&&lCol>=6&&!m_bflexgrid1_or_2)
@@ -6008,5 +5921,5 @@ void COutPutDlg::OnBnClickedUpdate()
 
 void COutPutDlg::OnBnClickedRefresh()
 {
-	// TODO: Add your control notification handler code here
+//OnBnClickedUpdate();	// TODO: Add your control notification handler code here
 }

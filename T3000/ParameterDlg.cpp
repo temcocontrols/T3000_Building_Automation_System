@@ -113,6 +113,7 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT32, m_setpointN);
 	DDX_Text(pDX, IDC_EDIT35, m_heatdbN);
 	DDX_Text(pDX, IDC_EDIT38, m_heatspN);
+	DDX_Control(pDX, IDC_STATICUNINT2, m_gUnit);
 }
 
 BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
@@ -204,6 +205,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 	ON_WM_CTLCOLOR()
 	ON_WM_TIMER()
 	//ON_EN_CHANGE(IDC_EDIT34, &CParameterDlg::OnEnChangeEdit34)
+	ON_CBN_SELCHANGE(IDC_STATICUNINT2, &CParameterDlg::OnCbnSelchangeStaticunint2)
 END_MESSAGE_MAP()
 
 
@@ -254,6 +256,10 @@ BOOL CParameterDlg::OnInitDialog()
 
 
 	CDialog::OnInitDialog();
+	m_gUnit.AddString(_T("°C"));
+	m_gUnit.AddString(_T("°F"));
+
+
 	GetDlgItem(IDC_TEMPALARMEDIT)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_STATICALARM)->ShowWindow(SW_HIDE);
 	m_setPointCtrlEdit.ShowWindow(SW_HIDE);
@@ -2104,7 +2110,20 @@ void CParameterDlg::OnEnKillfocusEdit38()
 //Add by Fance ,use this function to replace the  Reflash() and Reflash6();
 void CParameterDlg::Reflesh_ParameterDlg()
 {
+	 
+		 
 
+		if(product_register_value[MODBUS_DEGC_OR_F] == 1)	//t5= 121;t6=104
+		{
+			g_unint = FALSE;
+			GetDlgItem(IDC_STATICUNINT2)->SetWindowText(_T("°F"));
+		}else 
+		{
+			g_unint = TRUE;
+			GetDlgItem(IDC_STATICUNINT2)->SetWindowText(_T("°C"));
+		}
+		 
+	 
 	if (product_register_value[MODBUS_TIMER_SELECT]==3)
 	{
 		GetDlgItem(IDC_EDIT12)->EnableWindow(FALSE);
@@ -3247,3 +3266,25 @@ void CParameterDlg::Fresh_Single_UI()
 //
 //	// TODO:  Add your control notification handler code here
 //}
+
+
+void CParameterDlg::OnCbnSelchangeStaticunint2()
+{
+	int sel=m_gUnit.GetCurSel();
+	if (sel!=product_register_value[MODBUS_DEGC_OR_F])
+	{
+		write_one(g_tstat_id,MODBUS_DEGC_OR_F,sel);
+		product_register_value[MODBUS_DEGC_OR_F]=sel;
+
+		if(product_register_value[MODBUS_DEGC_OR_F] == 1)	//t5= 121;t6=104
+		{
+			g_unint = FALSE;
+			GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("°F"));
+		}else 
+		{
+			g_unint = TRUE;
+			GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("°C"));
+		}
+		 
+	} 
+}

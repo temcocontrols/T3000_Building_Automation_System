@@ -919,7 +919,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 
 	Flexflash = TRUE;
 	HTREEITEM hSelItem;//=m_pTreeViewCrl->GetSelectedItem();
-int nRet =read_one(g_tstat_id,6,1);
+    int nRet =read_one(g_tstat_id,6,1);
 
 	CPoint pt;
 	GetCursorPos(&pt);
@@ -3989,6 +3989,7 @@ void CMainFrame::OnToolRefreshLeftTreee()
 //
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
+   
 	g_Isbusy=TRUE;
 	//20120420
 	CDialog_Progess* pDlg = new CDialog_Progess(this,1,7);

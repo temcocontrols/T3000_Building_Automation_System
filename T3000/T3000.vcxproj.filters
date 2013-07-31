@@ -473,6 +473,24 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\t3000.mdb" />
+    <None Include="res\Input.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Programing.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Output.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\variable.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\week.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\annual.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
