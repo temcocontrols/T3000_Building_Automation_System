@@ -2777,26 +2777,48 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
 		pMain->m_pRefreshThread->SuspendThread();//
 	int ret=0;
 
-	ret = write_one(g_tstat_id,MODBUS_FAN_SPEED,m_FanComBox.GetCurSel()); //t5=137  t6=273
+//	ret = write_one(g_tstat_id,MODBUS_FAN_SPEED,m_FanComBox.GetCurSel()); //t5=137  t6=273
 	
-	//Marked by Fance no need to judge
-	//if (((m_strModelName.CompareNoCase(_T("Tstat6")) == 0)&&m_fFirmwareVersion >35.5)||(m_strModelName.CompareNoCase(_T("Tstat7")) == 0))
-	//	ret = write_one(g_tstat_id,273,m_FanComBox.GetCurSel());
-	//else
-	//	ret = write_one(g_tstat_id,137,m_FanComBox.GetCurSel());
-
-
-// 	if(m_strModelName.CompareNoCase(_T("Tstat7")) == 0)
-// 		ret = write_one(g_tstat_id,273,m_FanComBox.GetCurSel());
-// 	else
-// 		ret = write_one(g_tstat_id,137,m_FanComBox.GetCurSel());
-
-	if (!(ret>0))
+	if (product_register_value[MODBUS_AUTO_ONLY]==1)
 	{
-		CString str;
-		str.Format(_T("setting invalid,error:%d"),ret);
-		AfxMessageBox(_T("setting invalid!"));
+		int sel=m_FanComBox.GetCurSel();
+		if (sel==0)//OFF
+		{
+			int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,sel);
+			if (ret>0)
+			{
+
+				product_register_value[MODBUS_FAN_SPEED]=0;
+			}
+			m_FanComBox.SetCurSel(0);
+		} 
+		else//Auto
+		{
+			int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,4);
+			if (ret>0)
+			{
+				product_register_value[MODBUS_FAN_SPEED]=4;
+			}
+			m_FanComBox.SetCurSel(1);
+		}
+	} 
+	else
+	{
+		int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,m_FanComBox.GetCurSel());
+		if (ret>0)
+		{
+
+			product_register_value[MODBUS_FAN_SPEED]=m_FanComBox.GetCurSel();
+		    m_FanComBox.SetCurSel(product_register_value[MODBUS_FAN_SPEED]);
+		}
 	}
+	
+	//if (!(ret>0))
+	//{
+	//	CString str;
+	//	str.Format(_T("setting invalid,error:%d"),ret);
+	//	AfxMessageBox(_T("setting invalid!"));
+	//}
 
 	//»Ö¸´T3000Ö÷Ïß³Ì
 	pMain->m_pFreshMultiRegisters->ResumeThread();

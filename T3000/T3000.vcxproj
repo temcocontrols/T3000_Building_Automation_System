@@ -228,6 +228,7 @@
     <None Include="OutputTableDlg.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="res\annual.ico" />
     <None Include="res\ApplyDisable.bmp" />
     <None Include="res\ApplyDown.bmp" />
     <None Include="res\ApplyFouct.bmp" />
@@ -247,6 +248,7 @@
     <None Include="res\coldtool.bmp" />
     <None Include="res\Exit.ico" />
     <None Include="res\hottool.bmp" />
+    <None Include="res\Input.ico" />
     <None Include="res\MDisable.bmp" />
     <None Include="res\MDown.bmp" />
     <None Include="res\menu_img.bmp" />
@@ -255,6 +257,8 @@
     <None Include="res\MFouct.bmp" />
     <None Include="res\MUp.bmp" />
     <None Include="C:\Documents and Settings\lee\桌面\NWT3000.ico" />
+    <None Include="res\Output.ico" />
+    <None Include="res\Programing.ico" />
     <None Include="res\Refresh.ico" />
     <None Include="res\Schedule0607.bmp" />
     <None Include="res\serialnum.ico" />
@@ -271,6 +275,8 @@
     <None Include="res\Toolbar_V25049.bmp" />
     <None Include="res\ToolbarOwn.bmp" />
     <None Include="res\treenode.bmp" />
+    <None Include="res\variable.ico" />
+    <None Include="res\week.ico" />
     <None Include="UserImages.bmp" />
     <None Include="ReadMe.txt" />
     <None Include="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt" />

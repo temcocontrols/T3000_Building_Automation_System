@@ -171,6 +171,31 @@ CString CTStat_Dev::GetProductName()
 	case PM_TSTAT6_HUM_Chamber:
 		strProductName =g_strHumChamber;
 		break;
+
+	case PM_T38AIOD :
+	     strProductName="T3-8I13O";
+		 break;
+	case PM_T3IOA :
+		strProductName="T3-8IOA";
+			break;
+	case PM_T332AI :
+		strProductName="T3-32AI";
+			break;
+	case PM_T3AI16O :
+		strProductName="T3-8AI160";
+			break;
+	case PM_T38I13O :
+		strProductName="T3-8I13O";
+			break;
+	case PM_T3PERFORMANCE :
+		strProductName="T3-Performance";
+			break;
+	case PM_T34AO :
+		strProductName="T3-4AO";
+			break;
+	case PM_T36CT :
+		strProductName="T3-6CT";
+			break;
 	default:
 		strProductName="TStat";
 		break;
