@@ -197,4 +197,6 @@ public:
 
 	void Fresh_Single_UI();
 	//	afx_msg void OnEnChangeEdit34();
+	afx_msg void OnCbnSelchangeStaticunint2();
+	CComboBox m_gUnit;
 };

@@ -121,22 +121,6 @@ extern int g_llTxCount;
 extern int g_llRxCount;
 extern BOOL g_unint;
 
-
-//////////////////////////////////////////////////////////////////////////
-// extern int const PM_TSTAT5A;
-// extern int const PM_TSTAT5B;
-// extern int const PM_TSTAT5B2;
-// extern int const PM_TSTAT5C;
-// extern int const PM_TSTAT5D;
-// extern const int PM_TSTAT5E;
-// extern int const PM_TSTAT5F;
-// extern int const PM_TSTAT5G;
-// extern int const PM_TSTAT5H;
-// extern int const PM_TSTAT6;
-// extern int const PM_TSTAT7;
-
-//////////////////////////////////////////////////////////////////////////
-// product model ID table
 int const PM_TSTAT5B = 1;
 int const PM_TSTAT5A = 2;
 int const PM_TSTAT5B2 = 3;
@@ -153,6 +137,7 @@ int const PM_T38AIOD= 20;
 int const PM_T3IOA = 21;
 int const PM_T332AI = 22;
 int const PM_T3AI16O = 23;
+
 int const PM_ZIGBEE = 24;
 int const PM_FLEXDRIVER = 25;
 int const PM_T38I13O = 26;

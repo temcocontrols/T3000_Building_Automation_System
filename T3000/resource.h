@@ -507,6 +507,7 @@
 #define IDC_CHECK68                     1134
 #define IDC_CHECK69                     1135
 #define IDC_IDADDRESSEDIT2              1135
+#define IDC_STATICUNINT2                1135
 #define IDC_AUTOONLYCOMBO               1136
 #define IDC_CHECK70                     1136
 #define IDC_REFRESHBUTTON               1137
@@ -1049,6 +1050,7 @@
 #define IDC_BUTTON_TEST                 1623
 #define IDC_STATIC_DISPLAY              1624
 #define IDC_STATIC_CM_DEVICE_ID         1624
+#define IDC_COMBO_ONOFF                 1624
 #define IDC_COMBO_DISPLAY               1625
 #define IDC_STATIC_CM5_MAC              1625
 #define IDC_CHECK_HIDE_ALIAS_COLUMN     1626
@@ -1082,7 +1084,6 @@
 #define IDC_BUTTON_VARIABLE_APPLY       1643
 #define IDC_LIST_VARIABLE               1644
 #define IDC_COMBO_CO2_SENSOR_SEL        1645
-#define IDC_COMBO_ONOFF                 1624
 #define IDC_EDIT_INTERNAL_TEMP          1646
 #define IDC_EDIT_EXTERNAL_TEMP          1647
 #define IDC_STATIC_CO2_UNIT1            1648
@@ -1183,11 +1184,11 @@
 #define ID_FILE_ISPTOOL                 32865
 #define ID_DATABASE_IONAMECONFIG        32866
 #define ID_TOOL_ISPTOOLFORONE           32867
-#define ID_DATABASE_MBPOLL              33867
+#define ID_TOOL_REGISTERMONITER         32868
 #define ID_FILE_OPEN32883               32883
 #define ID_FILE_SAVE32884               32884
 #define ID_FILE_EXIT                    32888
-#define ID_TOOL_REGISTERMONITER         32868
+#define ID_DATABASE_MBPOLL              33867
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
 
