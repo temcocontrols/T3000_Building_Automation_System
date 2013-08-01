@@ -122,6 +122,7 @@ public:
 	static DWORD WINAPI StartRefresh(LPVOID lpVoid);
 	afx_msg void OnEnKillfocusCo2AlarmOnTime();
 	afx_msg void OnEnKillfocusCo2AlarmOffTime();
+	afx_msg void OnBnClickedBtnCo2ClearCal();
 };
 
 typedef enum
