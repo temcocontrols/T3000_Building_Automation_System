@@ -297,7 +297,31 @@
     <ClCompile Include="IONameConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MbPollOptions.cpp">
+    <ClCompile Include="CM5\ListCtrlCellEx.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\ListCtrlEx.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\MyOwnListCtrl.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetOutput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetProgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetVariable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogCM5_BacNet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MBP.cpp">
@@ -309,28 +333,7 @@
     <ClCompile Include="MbPoll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CM5\MyOwnListCtrl.cpp">
-      <Filter>CM5</Filter>
-    </ClCompile>
-    <ClCompile Include="DialogCM5_BacNet.cpp">
-      <Filter>CM5</Filter>
-    </ClCompile>
-    <ClCompile Include="BacnetInput.cpp">
-      <Filter>CM5</Filter>
-    </ClCompile>
-    <ClCompile Include="CM5\ListCtrlCellEx.cpp">
-      <Filter>CM5</Filter>
-    </ClCompile>
-    <ClCompile Include="CM5\ListCtrlEx.cpp">
-      <Filter>CM5</Filter>
-    </ClCompile>
-    <ClCompile Include="BacnetProgram.cpp">
-      <Filter>CM5</Filter>
-    </ClCompile>
-    <ClCompile Include="BacnetOutput.cpp">
-      <Filter>CM5</Filter>
-    </ClCompile>
-    <ClCompile Include="BacnetVariable.cpp">
+    <ClCompile Include="MbPollOptions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -781,7 +784,43 @@
     <ClInclude Include="IONameConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MbPollOptions.h">
+    <ClInclude Include="CM5\user_data.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\ListCtrlCellEx.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\ListCtrlEx.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\MyOwnListCtrl.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\PerfTimer.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\ud_str.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogCM5_BacNet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bacnet_Include.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetVariable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MBP.h">
@@ -799,28 +838,7 @@
     <ClInclude Include="MbPoll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Bacnet_Include.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DialogCM5_BacNet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BacnetInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BacnetInput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyOwnListCtrlInput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BacnetProgram.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BacnetOutput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BacnetVariable.h">
+    <ClInclude Include="MbPollOptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

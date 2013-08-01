@@ -57,7 +57,7 @@ public:
 	afx_msg void OnBnClickedUpbutton();
 	afx_msg void OnBnClickedDownbutton();
 	afx_msg void OnCbnKillfocusAmcombo();
-	afx_msg void OnCbnSelchangeAmcombo();
+ 	afx_msg void OnCbnSelchangeAmcombo();
 	afx_msg void OnCbnSelchangeInputfuncombo();
 	afx_msg void OnCbnKillfocusInputfuncombo();
 	afx_msg void OnBnClickedCustombutton();

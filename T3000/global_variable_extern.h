@@ -1,7 +1,7 @@
 #pragma once
+
 #include "Bacnet_Include.h"
 #include "CM5\ud_str.h"
-
 extern int g_invoke_id;
 extern vector <int> Change_Color_ID;
 extern HANDLE hThread;
@@ -39,7 +39,7 @@ extern	int g_tstat_id;
 extern int g_serialNum;
 extern	BOOL g_tstat_id_changed;
 extern  BOOL g_bPauseMultiRead;     // for background read register
-
+extern  BOOL g_Isbusy;
 extern  int now_tstat_id;//for batch load/flash read/write
 extern  CString g_strImagePathName;
 extern	CString	g_strDatabasefilepath;
@@ -121,24 +121,6 @@ extern int g_llTxCount;
 extern int g_llRxCount;
 extern BOOL g_unint;
 
-
-
-
-//////////////////////////////////////////////////////////////////////////
-// extern int const PM_TSTAT5A;
-// extern int const PM_TSTAT5B;
-// extern int const PM_TSTAT5B2;
-// extern int const PM_TSTAT5C;
-// extern int const PM_TSTAT5D;
-// extern const int PM_TSTAT5E;
-// extern int const PM_TSTAT5F;
-// extern int const PM_TSTAT5G;
-// extern int const PM_TSTAT5H;
-// extern int const PM_TSTAT6;
-// extern int const PM_TSTAT7;
-
-//////////////////////////////////////////////////////////////////////////
-// product model ID table
 int const PM_TSTAT5B = 1;
 int const PM_TSTAT5A = 2;
 int const PM_TSTAT5B2 = 3;
@@ -155,6 +137,7 @@ int const PM_T38AIOD= 20;
 int const PM_T3IOA = 21;
 int const PM_T332AI = 22;
 int const PM_T3AI16O = 23;
+
 int const PM_ZIGBEE = 24;
 int const PM_FLEXDRIVER = 25;
 int const PM_T38I13O = 26;
@@ -269,28 +252,28 @@ extern int MODBUS_ANALOG5_FUNCTION                             ;
 extern int MODBUS_ANALOG6_FUNCTION                             ;
 extern int MODBUS_ANALOG7_FUNCTION                             ;
 extern int MODBUS_ANALOG8_FUNCTION                             ;
-//extern int MODBUS_TABLE1_ZERO                                  ;
-//extern int MODBUS_TABLE1_HALFONE                               ;
-//extern int MODBUS_TABLE1_ONE                                   ;
-//extern int MODBUS_TABLE1_HALFTWO                               ;
-//extern int MODBUS_TABLE1_TWO                                   ;
-//extern int MODBUS_TABLE1_HALFTHREE                             ;
-//extern int MODBUS_TABLE1_THREE                                 ;
-//extern int MODBUS_TABLE1_HALFFOUR                              ;
-//extern int MODBUS_TABLE1_FOUR                                  ;
-//extern int MODBUS_TABLE1_HALFFIVE                              ;
-//extern int MODBUS_TABLE1_FIVE                                  ;
-//extern int MODBUS_TABLE2_ZERO                                  ;
-//extern int MODBUS_TABLE2_HALFONE                               ;
-//extern int MODBUS_TABLE2_ONE                                   ;
-//extern int MODBUS_TABLE2_HALFTWO                               ;
-//extern int MODBUS_TABLE2_TWO                                   ;
-//extern int MODBUS_TABLE2_HALFTHREE                             ;
-//extern int MODBUS_TABLE2_THREE                                 ;
-//extern int MODBUS_TABLE2_HALFFOUR                              ;
-//extern int MODBUS_TABLE2_FOUR                                  ;
-//extern int MODBUS_TABLE2_HALFFIVE                              ;
-//extern int MODBUS_TABLE2_FIVE                                  ;
+//extern int MODBUS_TABLE1_ZERO_M                                  ;
+//extern int MODBUS_TABLE1_HALFONE_M                               ;
+//extern int MODBUS_TABLE1_ONE_M                                   ;
+//extern int MODBUS_TABLE1_HALFTWO_M                               ;
+//extern int MODBUS_TABLE1_TWO_M                                   ;
+//extern int MODBUS_TABLE1_HALFTHREE_M                             ;
+//extern int MODBUS_TABLE1_THREE_M                                 ;
+//extern int MODBUS_TABLE1_HALFFOUR_M                              ;
+//extern int MODBUS_TABLE1_FOUR_M                                  ;
+//extern int MODBUS_TABLE1_HALFFIVE_M                              ;
+//extern int MODBUS_TABLE1_FIVE_M                                  ;
+//extern int MODBUS_TABLE2_ZERO_M                                  ;
+//extern int MODBUS_TABLE2_HALFONE_M                               ;
+//extern int MODBUS_TABLE2_ONE_M                                   ;
+//extern int MODBUS_TABLE2_HALFTWO_M                               ;
+//extern int MODBUS_TABLE2_TWO_M                                   ;
+//extern int MODBUS_TABLE2_HALFTHREE_M                             ;
+//extern int MODBUS_TABLE2_THREE_M                                 ;
+//extern int MODBUS_TABLE2_HALFFOUR_M                              ;
+//extern int MODBUS_TABLE2_FOUR_M                                  ;
+//extern int MODBUS_TABLE2_HALFFIVE_M                              ;
+//extern int MODBUS_TABLE2_FIVE_M                                  ;
 extern int MODUBS_HUMIDITY_RH                                  ;
 extern int MODBUS_HUMIDITY_FREQUENCY                           ;
 extern int MODBUS_HUM_PIC_UPDATE                               ;

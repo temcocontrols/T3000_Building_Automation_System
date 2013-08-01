@@ -343,7 +343,7 @@ void CDialogCM5::OnBnClickedButtonSyncwithpc()
 	minute = _ttoi(tempminute);
 
 	int yearh,yearl;
-	yearl = year&0x00FF;
+	yearl = year%100;
 	int tempy = year&0xFF00;
 	tempy = tempy>>16;
 	yearh = tempy;

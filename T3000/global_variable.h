@@ -3,14 +3,10 @@
 #include "afxmt.h"
 #include "Bacnet_Include.h"
 #include "CM5\ud_str.h"
-int g_invoke_id;
-
 vector <int> Change_Color_ID;
-
-
 const bool WRITE_SUCCESS = true;
 const bool WRITE_FAIL    = false;
-
+int g_invoke_id;
 HANDLE hThread;
 DWORD nThreadID;
 //#include "stdafx.h"
@@ -78,7 +74,7 @@ CEvent g_eventPauseMultiRead;
 
 BOOL g_buser_log_in=FALSE;
 BOOL g_bPrivilegeMannage=FALSE;
-
+BOOL g_Isbusy=FALSE;
 CString g_strLoginUserName;
 int g_MainScreenLevel=0;
 int g_ParamLevel=0;
@@ -1165,28 +1161,28 @@ int MODBUS_ANALOG5_FUNCTION                                  =171 ;//           
 int MODBUS_ANALOG6_FUNCTION                                  =172 ;//              -1                  -1 
 int MODBUS_ANALOG7_FUNCTION                                  =173 ;//              -1                  -1 
 int MODBUS_ANALOG8_FUNCTION                                  =174 ;//              -1                  -1 
-//int MODBUS_TABLE1_ZERO                                       =175 ;//              219                 219
-//int MODBUS_TABLE1_HALFONE                                    =176 ;//              220                 220
-//int MODBUS_TABLE1_ONE                                        =177 ;//              221                 221
-//int MODBUS_TABLE1_HALFTWO                                    =178 ;//              222                 222
-//int MODBUS_TABLE1_TWO                                        =179 ;//              223                 223
-//int MODBUS_TABLE1_HALFTHREE                                  =180 ;//              224                 224
-//int MODBUS_TABLE1_THREE                                      =181 ;//              225                 225
-//int MODBUS_TABLE1_HALFFOUR                                   =182 ;//              226                 226
-//int MODBUS_TABLE1_FOUR                                       =183 ;//              227                 227
-//int MODBUS_TABLE1_HALFFIVE                                   =184 ;//              228                 228
-//int MODBUS_TABLE1_FIVE                                       =185 ;//              229                 229
-//int MODBUS_TABLE2_ZERO                                       =186 ;//              230                 230
-//int MODBUS_TABLE2_HALFONE                                    =187 ;//              231                 231
-//int MODBUS_TABLE2_ONE                                        =188 ;//              232                 232
-//int MODBUS_TABLE2_HALFTWO                                    =189 ;//              233                 233
-//int MODBUS_TABLE2_TWO                                        =190 ;//              234                 234
-//int MODBUS_TABLE2_HALFTHREE                                  =191 ;//              235                 235
-//int MODBUS_TABLE2_THREE                                      =192 ;//              236                 236
-//int MODBUS_TABLE2_HALFFOUR                                   =193 ;//              237                 237
-//int MODBUS_TABLE2_FOUR                                       =194 ;//              238                 238
-//int MODBUS_TABLE2_HALFFIVE                                   =195 ;//              239                 239
-//int MODBUS_TABLE2_FIVE                                       =196 ;//              240                 240
+//int MODBUS_TABLE1_ZERO_M                                       =175 ;//              219                 219
+//int MODBUS_TABLE1_HALFONE_M                                    =176 ;//              220                 220
+//int MODBUS_TABLE1_ONE_M                                        =177 ;//              221                 221
+//int MODBUS_TABLE1_HALFTWO_M                                    =178 ;//              222                 222
+//int MODBUS_TABLE1_TWO_M                                        =179 ;//              223                 223
+//int MODBUS_TABLE1_HALFTHREE_M                                  =180 ;//              224                 224
+//int MODBUS_TABLE1_THREE_M                                      =181 ;//              225                 225
+//int MODBUS_TABLE1_HALFFOUR_M                                   =182 ;//              226                 226
+//int MODBUS_TABLE1_FOUR_M                                       =183 ;//              227                 227
+//int MODBUS_TABLE1_HALFFIVE_M                                   =184 ;//              228                 228
+//int MODBUS_TABLE1_FIVE_M                                       =185 ;//              229                 229
+//int MODBUS_TABLE2_ZERO_M                                       =186 ;//              230                 230
+//int MODBUS_TABLE2_HALFONE_M                                    =187 ;//              231                 231
+//int MODBUS_TABLE2_ONE_M                                        =188 ;//              232                 232
+//int MODBUS_TABLE2_HALFTWO_M                                    =189 ;//              233                 233
+//int MODBUS_TABLE2_TWO_M                                        =190 ;//              234                 234
+//int MODBUS_TABLE2_HALFTHREE_M                                  =191 ;//              235                 235
+//int MODBUS_TABLE2_THREE_M                                      =192 ;//              236                 236
+//int MODBUS_TABLE2_HALFFOUR_M                                   =193 ;//              237                 237
+//int MODBUS_TABLE2_FOUR_M                                       =194 ;//              238                 238
+//int MODBUS_TABLE2_HALFFIVE_M                                   =195 ;//              239                 239
+//int MODBUS_TABLE2_FIVE_M                                       =196 ;//              240                 240
 int MODUBS_HUMIDITY_RH                                       =197 ;//              -1                  -1 
 int MODBUS_HUMIDITY_FREQUENCY                                =198 ;//              -1                  -1 
 int MODBUS_HUM_PIC_UPDATE                                    =199 ;//              -1                  -1 
@@ -1629,6 +1625,8 @@ int MODBUS_UNIVERSAL_VALVE_COOL3                         =635;
 int MODBUS_UNIVERSAL_VALVE_HEAT1                            =636;
 int MODBUS_UNIVERSAL_VALVE_HEAT2                            =637;
 int MODBUS_UNIVERSAL_VALVE_HEAT3                            =638;
+
+
 int MODBUS_HEATING_PID                                       =-1  ;//              105                 105
 int MODBUS_CALIBRATION                                       =-1  ;//              109                 109
 int MODBUS_CALIBRATION_ANALOG_IN1                            =-1  ;//              110                 110
@@ -1763,6 +1761,8 @@ int MODBUS_RELAY_PWM_TOTAL_DUTY                              =-1  ;//           
 int MODBUS_RELAY_PWM_HIGH_DUTY                               =-1  ;//              -1                  544
 
 
+
+
 #pragma region For_bacnet
 HWND      g_hwnd_now;
 HWND      m_input_dlg_hwnd;
@@ -1771,4 +1771,3 @@ vector <Str_out_point> m_Output_data;
 vector <Str_in_point>  m_Input_data;
 vector <Str_program_point>  m_Program_data;
 #pragma endregion For_bacnet
-

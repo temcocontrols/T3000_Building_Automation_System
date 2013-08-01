@@ -31,7 +31,7 @@ public:
 	afx_msg void OnCbnSelchangeKeypadlockcombo();
 	afx_msg void OnCbnSelchangeDisplaycombo();
 	afx_msg void OnCbnSelchangeAutoonlycombo();
-	afx_msg void OnEnKillfocusIdaddressedit();
+ 	afx_msg void OnEnKillfocusIdaddressedit();
 	afx_msg void OnDestroy();
 
 	afx_msg void OnCbnSelchangekeypadcombo();
@@ -197,4 +197,6 @@ public:
 
 	void Fresh_Single_UI();
 	//	afx_msg void OnEnChangeEdit34();
+	afx_msg void OnCbnSelchangeStaticunint2();
+	CComboBox m_gUnit;
 };

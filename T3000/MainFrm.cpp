@@ -33,10 +33,8 @@
 #include "hangeIDDlg.h"
 #include "LightingController/LightingController.h"//Lightingcontroller
 #include "HumChamber.h"
-#include "MbpGlobals.h"
 #include "CO2_View.h"
-#include "DialogCM5_BacNet.h"
-
+#include "MbpGlobals.h"
 #include "Dialog_Progess.h"
 
 #include "excel9.h"
@@ -46,15 +44,12 @@
 #include "isp/CDialogISPTOOL.h"
 
 #include "IONameConfig.h"
+
+#include "DialogCM5_BacNet.h"
 #pragma region Fance Test
 //For Test
-//#include "whois.h"
-//#pragma comment(lib,  "BACnet Stack Library.lib" )//指定与静态库一起连接
-//INPUT  int whois_encode_apdu(
-//	unsigned char * apdu,
-//	int low_limit,
-//	int high_limit);
-//#include "Bacnet_Include.h"
+
+
 
 HANDLE hStartEvent; // thread start event
 
@@ -192,6 +187,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_DATABASE_MBPOLL, &CMainFrame::OnDatabaseMbpoll)
 	ON_MESSAGE(WM_MBPOLL_CLOSED, &CMainFrame::OnMbpollClosed)
 	ON_COMMAND(ID_DATABASE_IONAMECONFIG, &CMainFrame::OnDatabaseIonameconfig)
+	ON_COMMAND(ID_TOOL_ISPTOOLFORONE, &CMainFrame::OnToolIsptoolforone)
+	ON_COMMAND(ID_TOOL_REGISTERMONITER, &CMainFrame::OnToolRegistermoniter)
+//	ON_COMMAND(ID_APP_EXIT, &CMainFrame::OnAppExit)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -207,16 +205,8 @@ static UINT indicators[] =
 
 unsigned short tempchange[512];
 
-//INPUT   int whois_encode_apdu(
-//	uint8_t * apdu,
-//	int32_t low_limit,
-//	int32_t high_limit);
-//extern __declspec(dllimport) int My_Max();
 UINT _ReadMultiRegisters(LPVOID pParam)
 {
-	//uint8_t ABC[1000];
-	//whois_encode_apdu(ABC,-1,-1);
-
 	CMainFrame* pFrame=(CMainFrame*)(pParam);
 	BOOL bFirst=TRUE;
 	Read_Mutex=CreateMutex(NULL,TRUE,_T("Read_Multi_Reg"));	//Add by Fance .
@@ -227,6 +217,7 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 
 		if(::WaitForSingleObject(g_killMultiReadEvent,0)==WAIT_OBJECT_0)
 			break;		
+
 		g_bEnableRefreshTreeView = TRUE;
 		if(!bFirst)
 			Sleep(30*1000);
@@ -578,10 +569,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_pRefreshThread->SetMainWnd(this);	
 
 	// 需要执行线程中的操作时
-#if 1
 	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
 	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
-#endif
 	//tstat6
 	Tstat6_func();//为TSTST6新寄存器用的。
 
@@ -930,7 +919,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 
 	Flexflash = TRUE;
 	HTREEITEM hSelItem;//=m_pTreeViewCrl->GetSelectedItem();
-int nRet =read_one(g_tstat_id,6,1);
+    int nRet =read_one(g_tstat_id,6,1);
 
 	CPoint pt;
 	GetCursorPos(&pt);
@@ -1078,8 +1067,6 @@ void  CMainFrame::OnHTreeItemClick(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	OnHTreeItemSeletedChanged(pNMHDR, pResult);
 }
-
-
 
 BOOL CMainFrame::ValidAddress(CString sAddress)
 {
@@ -2386,6 +2373,7 @@ void CMainFrame::Scan_Product()
 	m_pWaitScanDlg->DoModal();	
 
 	m_bScanALL = TRUE;
+	close_com();
 	//m_bScanFinished = FALSE;
 	delete m_pWaitScanDlg;
 	m_pWaitScanDlg = NULL;
@@ -2877,8 +2865,8 @@ CString CMainFrame::GetDeviceClassName(int nClassID)
 	case 18:strClassName=g_strTstat5g;break;
 	case 16:strClassName=g_strTstat5e;break;
 	case 19:strClassName=g_strTstat5h;break;
-	case 27:strClassName=g_strTstat7;break;
-	case 26:strClassName=g_strTstat6;break;
+	case 7:strClassName=g_strTstat7;break;
+	case 6:strClassName=g_strTstat6;break;
 	case 13:
 	case 14:break;
 	default:strClassName=g_strTstat5a;break;
@@ -3281,7 +3269,7 @@ void CMainFrame::SaveConfigFile()
 	CString strTips = _T("T3000 is ready to save config file, start now?");
 
 	SetPaneString(1, strTips);
-	AfxMessageBox(strTips);
+	//AfxMessageBox(strTips);
 
 	if(multi_register_value[7]==100)//NC
 	{
@@ -3322,27 +3310,27 @@ void CMainFrame::SaveConfigFile()
 		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
 
 		SetPaneString(1, strTips);
-		AfxMessageBox(strTips);
+		//AfxMessageBox(strTips);
 	}
 	else//save tstat config file:
-	{
-		nret=write_one(g_tstat_id,321,4);
-		nret=write_one(g_tstat_id,322,0);
-		nret=write_one(g_tstat_id,323,0);
-		nret=write_one(g_tstat_id,325,0);
-		int nSpecialValue=read_one(g_tstat_id,326);
+	{//?????
+		nret=write_one(g_tstat_id,MODBUS_FAN_GRIDPOINT,4);
+		nret=write_one(g_tstat_id,MODBUS_MODE_GRIDPOINT,0);
+		nret=write_one(g_tstat_id,MODBUS_HOLD_GRIDPOINT,0);
+		nret=write_one(g_tstat_id,MODBUS_CONFIGURATION,0);
+		//int nSpecialValue=read_one(g_tstat_id,326);
 
-		if(nSpecialValue==1)
-		{
-		//	write_one(g_tstat_id,324,0);
-		}
+		//if(nSpecialValue==1)
+		//{
+		////	write_one(g_tstat_id,324,0);
+		//}
 		Save2File_ForTwoFiles((LPTSTR)(LPCTSTR)strFilename);
 
 	
 		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
 		
 		SetPaneString(1, strTips);
-		AfxMessageBox(strTips);
+		//AfxMessageBox(strTips);
 // 		CMFCStatusBar * pStatusBar=NULL;
 // 		if(AfxGetMainWnd()->GetActiveWindow()==NULL)//if this function is called by a thread ,return 
 // 			return;
@@ -3371,6 +3359,7 @@ LRESULT CMainFrame::OnFreshStatusBar(WPARAM wParam, LPARAM lParam)
 void CMainFrame::OnDestroy()
 {
 #if 1
+
 	CDialogInfo *pDialogInfo = NULL;
 
 	try
@@ -3408,22 +3397,6 @@ void CMainFrame::OnDestroy()
 	CFrameWndEx::OnDestroy();
 
 	g_killMultiReadEvent.SetEvent();
-
-
-	if (is_connect())
-	{
-		close_com(); // added by zgq:12-16-2011
-	}
-
-
-//#if 1
-//	if (pDialogInfo!=NULL)
-//	{
-//		delete pDialogInfo;
-//		pDialogInfo = NULL;
-//	}
-//	return;
-//#endif
 
 	Sleep(500);//wait for the end of the thread.
 	if (WaitForSingleObject(m_pFreshMultiRegisters->m_hThread, 1000) != WAIT_OBJECT_0)
@@ -3465,10 +3438,10 @@ void CMainFrame::OnDestroy()
 		//m_pRefreshThread->Delete();
 	}
 
-	if (is_connect())
-	{
+	/*if (is_connect())
+	{*/
 		close_com(); // added by zgq:12-16-2011
-	}
+	/*}*/
 
 	
 
@@ -4016,6 +3989,8 @@ void CMainFrame::OnToolRefreshLeftTreee()
 //
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
+   
+	g_Isbusy=TRUE;
 	//20120420
 	CDialog_Progess* pDlg = new CDialog_Progess(this,1,7);
 	//创建对话框窗口
@@ -4249,7 +4224,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					delete pDlg;
 					pDlg=NULL;
 				}
-
+				g_Isbusy=FALSE;
 				return;
 			}
 			/*
@@ -4859,7 +4834,10 @@ void CMainFrame::ContinueRefreshThread()
 
 
 void CMainFrame::DoFreshAll()
-{		
+{	if (g_Isbusy)
+{
+	return;
+}	
 	RefreshTreeView();
 	if (m_nCurView == 0)
 	{
@@ -4871,11 +4849,13 @@ void CMainFrame::DoFreshAll()
 
 UINT _FreshTreeView(LPVOID pParam )
 {
+	
 	Sleep(30000);
 	CMainFrame* pMain = (CMainFrame*)pParam;
 	while(1)
 	{
-		Sleep(30000);
+		
+		Sleep(5000);
 		WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
 
 		pMain->DoFreshAll();
@@ -6071,3 +6051,21 @@ LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+
+//void CMainFrame::OnAppExit()
+//{
+//     OnDisconnect();
+//	 OnDestroy();
+//	// TODO: Add your command handler code here
+//}
+void CMainFrame::OnToolIsptoolforone()
+{
+	close_com();
+	show_ISPDlg();
+}
+
+
+void CMainFrame::OnToolRegistermoniter()
+{    close_com();
+show_RegisterMonitorDlg();
+}

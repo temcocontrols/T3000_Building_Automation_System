@@ -14,15 +14,15 @@ public:
 	COutputSetDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~COutputSetDlg();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = IDD_OUTPUTSETDLG };
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	
-	
+
+
 public:
-	
+
 	afx_msg void OnBnClickedOk();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedCancel();
@@ -41,7 +41,7 @@ public:
 	CComboBox m_outAMCmbox;
 	CComboBox m_outRangCmbox;
 	CComboBox m_outFunCmbox;
-	  DECLARE_MESSAGE_MAP()
+	DECLARE_MESSAGE_MAP()
 	afx_msg void OnCbnKillfocusOvaluecombo();
 	afx_msg void OnCbnKillfocusOamcombo();
 	afx_msg void OnCbnSelchangeOvaluecombo();

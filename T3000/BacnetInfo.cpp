@@ -1,15 +1,15 @@
-//// BacnetInfo.cpp : implementation file
-////
+//BacnetInfo.cpp : implementation file*/
+
+
+#include "stdafx.h"
+#include "T3000.h"
+#include "BacnetInfo.h"
+#include "afxdialogex.h"
+
+
+// CBacnetInfo dialog
 //
-//#include "stdafx.h"
-//#include "T3000.h"
-//#include "BacnetInfo.h"
-//#include "afxdialogex.h"
-//
-//
-//// CBacnetInfo dialog
-//
-//IMPLEMENT_DYNAMIC(CBacnetInfo, CDialogEx)
+//	 IMPLEMENT_DYNAMIC(CBacnetInfo, CDialogEx)
 //
 //CBacnetInfo::CBacnetInfo(CWnd* pParent /*=NULL*/)
 //	: CDialogEx(CBacnetInfo::IDD, pParent)
@@ -31,4 +31,4 @@
 //END_MESSAGE_MAP()
 //
 //
-//// CBacnetInfo message handlers
+// CBacnetInfo message handlers

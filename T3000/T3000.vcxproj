@@ -101,6 +101,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\BacNetDllforVc\;..\BacNetDllforVc\MainCpp\;..\BacNetDllforVc\include\;..\BacNetDllforVc\object\;..\BacNetDllforVc\handler\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -126,6 +127,7 @@
     <ClCompile Include="Annual_Routines.cpp" />
     <ClCompile Include="AnnualRout_InsertDia.cpp" />
     <ClCompile Include="ApplyGraphicLabelsDlg.cpp" />
+    <ClCompile Include="BacnetInfo.cpp" />
     <ClCompile Include="BacnetInput.cpp" />
     <ClCompile Include="BacnetOutput.cpp" />
     <ClCompile Include="BacnetProgram.cpp" />
@@ -286,6 +288,12 @@
     <ClInclude Include="BacnetProgram.h" />
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="Bacnet_Include.h" />
+    <ClInclude Include="CM5\ListCtrlCellEx.h" />
+    <ClInclude Include="CM5\ListCtrlEx.h" />
+    <ClInclude Include="CM5\MyOwnListCtrl.h" />
+    <ClInclude Include="CM5\PerfTimer.h" />
+    <ClInclude Include="CM5\ud_str.h" />
+    <ClInclude Include="CM5\user_data.h" />
     <ClInclude Include="CO2_View.h" />
     <ClInclude Include="DialogCM5_BacNet.h" />
     <ClInclude Include="IONameConfig.h" />
@@ -295,7 +303,6 @@
     <ClInclude Include="MbpGlobals.h" />
     <ClInclude Include="MbPoll.h" />
     <ClInclude Include="MbPollOptions.h" />
-    <ClInclude Include="MyOwnListCtrlInput.h" />
     <ClInclude Include="Scanwaydlg.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="WeeklySchedule.h" />
