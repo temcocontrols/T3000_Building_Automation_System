@@ -93,6 +93,7 @@ BEGIN_MESSAGE_MAP(CCO2_View, CFormView)
 	ON_MESSAGE(WM_REFRESH_CO2_DLG, &CCO2_View::DealMessage)
 	ON_EN_KILLFOCUS(IDC_CO2_ALARM_ON_TIME, &CCO2_View::OnEnKillfocusCo2AlarmOnTime)
 	ON_EN_KILLFOCUS(IDC_CO2_ALARM_OFF_TIME, &CCO2_View::OnEnKillfocusCo2AlarmOffTime)
+	ON_BN_CLICKED(IDC_BTN_CO2_CLEAR_CAL, &CCO2_View::OnBnClickedBtnCo2ClearCal)
 END_MESSAGE_MAP()
 
 
@@ -127,6 +128,8 @@ void CCO2_View::Fresh()
 		m_co2_braudRateCombox.SetCurSel(product_register_value[CO2_485_MODBUS_BAUDRATE]);
 	else
 		m_co2_braudRateCombox.SetCurSel(0);
+
+	m_co2_braudRateCombox.EnableWindow(0);
 
 	m_co2_firmwareversion=get_curtstat_version();
 	m_co2_serialNumber=get_serialnumber();
@@ -231,8 +234,10 @@ void CCO2_View::C02_SHOW_TEMP()
 	float f_external_temp = 0;
 	CString temp_internal_value,temp_external_value;
 	m_sensor_sel.ResetContent();
-	m_sensor_sel.AddString(_T("Internal"));
-	m_sensor_sel.AddString(_T("External"));
+	m_sensor_sel.InsertString(0,_T("Internal"));
+	m_sensor_sel.InsertString(1,_T("External"));
+
+		
 	CString strTemp1,strTemp2;
 	strTemp1.Format(_T("%cC"),176);
 	strTemp2.Format(_T("%cF"),176);
@@ -331,8 +336,19 @@ void CCO2_View::Fresh_External_List()
 
 		temp_cs_pre_alarm_sp.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXT_PRE_ALARM_SETPOINT_START + i - 1]);
 		temp_cs_alarm_sp.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXT_ALARM_SETPOINT_START + i - 1]);
-		temp_cs_cal_offset.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXT_CO2_OFFSET_START + i - 1]);
-		temp_cs_ppm.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + i - 1]);
+		temp_cs_cal_offset.Format(_T("%d"),(short)product_register_value[CO2_485_MODBUS_EXT_CO2_OFFSET_START + i - 1]);
+
+		if(product_register_value[CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + i - 1] == 65535)
+		{
+			temp_cs_ppm.Format(_T("No Sensor"));
+			m_co2_external_sensor_list.SetCellEnabled(i-1,CO2_EXTERNAL_PPM,0);
+		}
+		else
+		{
+			temp_cs_ppm.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + i - 1]);
+			m_co2_external_sensor_list.SetCellEnabled(i-1,CO2_EXTERNAL_PPM,1);
+		}
+			
 		m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_DEVICE_ID,temp_cs_id);
 		m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_SERIAL_NUM,temp_cs_serial);
 		m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_PPM,temp_cs_ppm);
@@ -754,6 +770,13 @@ bool CheckString( CString str )
 	int nCount = str.GetLength(); // 获得字符个数
 	for ( int i = 0; i < nCount; i ++ )
 	{
+		if(i==0)
+		{
+			if(str.GetAt(i) == '-')
+				continue;
+		}
+		
+
 		if ( 0 == isdigit( str.GetAt(i) ) ) // 不是数字就置标志位
 		{
 			return FALSE;
@@ -1060,4 +1083,26 @@ void CCO2_View::OnEnKillfocusCo2AlarmOffTime()
 		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_PRE_ALARM_SETTING_OFF_TIME,m_alarm_off_time,
 			product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_OFF_TIME],this->m_hWnd,IDC_EDIT_CO2_BACKLIGHT_TIME,_T("User Defined Alarm Off Time"));
 	}
+}
+
+
+void CCO2_View::OnBnClickedBtnCo2ClearCal()
+{
+	// TODO: Add your control notification handler code here
+	int item_count = m_co2_external_sensor_list.GetItemCount();
+	for (int i=0;i<item_count;i++)
+	{
+		if(write_one(g_tstat_id,CO2_485_MODBUS_EXT_CO2_OFFSET_START + i,0,3)<0)
+		{
+			MessageBox(_T("Write register failure,Please try again!"));
+			Fresh_External_List();
+			return;
+		}
+		else
+		{
+			product_register_value[CO2_485_MODBUS_EXT_CO2_OFFSET_START + i] = 0;
+		}
+	}
+	OnBnClickedBtnCo2Refresh();
+	SetPaneString(1,_T("Clear External Calibration Offset Success!! "));
 }
