@@ -74,7 +74,7 @@ CEvent g_eventPauseMultiRead;
 
 BOOL g_buser_log_in=FALSE;
 BOOL g_bPrivilegeMannage=FALSE;
-BOOL g_Isbusy=FALSE;
+
 CString g_strLoginUserName;
 int g_MainScreenLevel=0;
 int g_ParamLevel=0;
