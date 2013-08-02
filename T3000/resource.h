@@ -1053,6 +1053,7 @@
 #define IDC_COMBO_ONOFF                 1624
 #define IDC_COMBO_DISPLAY               1625
 #define IDC_STATIC_CM5_MAC              1625
+#define IDC_BTN_CO2_CLEAR_CAL           1625
 #define IDC_CHECK_HIDE_ALIAS_COLUMN     1626
 #define IDC_STATIC_CM5_VENDOR_ID        1626
 #define IDC_CHECK_ADDRESS_IN_CELL       1627
@@ -1198,7 +1199,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        451
 #define _APS_NEXT_COMMAND_VALUE         32869
-#define _APS_NEXT_CONTROL_VALUE         1625
+#define _APS_NEXT_CONTROL_VALUE         1626
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

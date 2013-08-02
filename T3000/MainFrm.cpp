@@ -3990,7 +3990,6 @@ void CMainFrame::OnToolRefreshLeftTreee()
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
    
-	g_Isbusy=TRUE;
 	//20120420
 	CDialog_Progess* pDlg = new CDialog_Progess(this,1,7);
 	//创建对话框窗口
@@ -4224,7 +4223,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					delete pDlg;
 					pDlg=NULL;
 				}
-				g_Isbusy=FALSE;
 				return;
 			}
 			/*
@@ -4834,10 +4832,7 @@ void CMainFrame::ContinueRefreshThread()
 
 
 void CMainFrame::DoFreshAll()
-{	if (g_Isbusy)
-{
-	return;
-}	
+{	
 	RefreshTreeView();
 	if (m_nCurView == 0)
 	{

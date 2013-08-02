@@ -39,7 +39,6 @@ extern	int g_tstat_id;
 extern int g_serialNum;
 extern	BOOL g_tstat_id_changed;
 extern  BOOL g_bPauseMultiRead;     // for background read register
-extern  BOOL g_Isbusy;
 extern  int now_tstat_id;//for batch load/flash read/write
 extern  CString g_strImagePathName;
 extern	CString	g_strDatabasefilepath;
