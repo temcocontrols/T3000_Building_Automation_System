@@ -242,6 +242,7 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			continue;
 		}
 //		int i;
+		int ret_count = 0;
 		for(int i=0;i<10;i++) //Modify by Fance , tstat 6 has more register than 512;
 		//for(i=0;i<8;i++)
 		{
@@ -255,13 +256,18 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			}
 			register_critical_section.Lock();
 			//
-			Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);
+			if(Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64)<0)
+				ret_count++;
 			register_critical_section.Unlock();
 		}
 
 		ReleaseMutex(Read_Mutex);//Add by Fance .
 
 		//Fance_1
+		if(ret_count!=0)	//不等于0 说明这次读的中间出现了错误，如果继续运行，会出现界面上的很多值是错的。Add by Fance;
+		{
+			continue;
+		}
 		memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
 		if(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd!=NULL)
 		{
@@ -4850,7 +4856,7 @@ UINT _FreshTreeView(LPVOID pParam )
 	while(1)
 	{
 		
-		Sleep(5000);
+		Sleep(30000);
 		WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
 
 		pMain->DoFreshAll();

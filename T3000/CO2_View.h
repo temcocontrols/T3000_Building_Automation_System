@@ -123,6 +123,20 @@ public:
 	afx_msg void OnEnKillfocusCo2AlarmOnTime();
 	afx_msg void OnEnKillfocusCo2AlarmOffTime();
 	afx_msg void OnBnClickedBtnCo2ClearCal();
+	CString m_internal_ppm;
+	afx_msg void OnEnKillfocusEditCo2InternalPpm();
+	CString m_float_temp_min;
+	CString m_float_temp_max;
+	CString m_float_hum_min;
+	CString m_float_hum_max;
+	int m_int_co2_min;
+	int m_int_co2_max;
+	afx_msg void OnEnKillfocusEditCo2TempMin();
+	afx_msg void OnEnKillfocusEditCo2TempMax();
+	afx_msg void OnEnKillfocusEditCo2HumMin();
+	afx_msg void OnEnKillfocusEditCo2HumMax();
+	afx_msg void OnEnKillfocusEditCo2PpmMin();
+	afx_msg void OnEnKillfocusEditCo2PpmMax();
 };
 
 typedef enum
