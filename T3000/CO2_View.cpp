@@ -24,6 +24,13 @@ CCO2_View::CCO2_View()
 	, m_cs_password(_T(""))
 	, m_co2_block_time(0)
 	, m_co2_backlight_time(0)
+	, m_internal_ppm(_T(""))
+	, m_float_temp_min(_T(""))
+	, m_float_temp_max(_T(""))
+	, m_float_hum_min(_T(""))
+	, m_float_hum_max(_T(""))
+	, m_int_co2_min(0)
+	, m_int_co2_max(0)
 {
 
 	m_co2_firmwareversion = 0.0f;
@@ -64,6 +71,13 @@ void CCO2_View::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_CO2_PASSWOR, m_cs_password);
 	DDX_Text(pDX, IDC_EDIT_CO2_BLOCK_TIME, m_co2_block_time);
 	DDX_Text(pDX, IDC_EDIT_CO2_BACKLIGHT_TIME, m_co2_backlight_time);
+	DDX_Text(pDX, IDC_EDIT_CO2_INTERNAL_PPM, m_internal_ppm);
+	DDX_Text(pDX, IDC_EDIT_CO2_TEMP_MIN, m_float_temp_min);
+	DDX_Text(pDX, IDC_EDIT_CO2_TEMP_MAX, m_float_temp_max);
+	DDX_Text(pDX, IDC_EDIT_CO2_HUM_MIN, m_float_hum_min);
+	DDX_Text(pDX, IDC_EDIT_CO2_HUM_MAX, m_float_hum_max);
+	DDX_Text(pDX, IDC_EDIT_CO2_PPM_MIN, m_int_co2_min);
+	DDX_Text(pDX, IDC_EDIT_CO2_PPM_MAX, m_int_co2_max);
 }
 
 BEGIN_MESSAGE_MAP(CCO2_View, CFormView)
@@ -94,6 +108,13 @@ BEGIN_MESSAGE_MAP(CCO2_View, CFormView)
 	ON_EN_KILLFOCUS(IDC_CO2_ALARM_ON_TIME, &CCO2_View::OnEnKillfocusCo2AlarmOnTime)
 	ON_EN_KILLFOCUS(IDC_CO2_ALARM_OFF_TIME, &CCO2_View::OnEnKillfocusCo2AlarmOffTime)
 	ON_BN_CLICKED(IDC_BTN_CO2_CLEAR_CAL, &CCO2_View::OnBnClickedBtnCo2ClearCal)
+	ON_EN_KILLFOCUS(IDC_EDIT_CO2_INTERNAL_PPM, &CCO2_View::OnEnKillfocusEditCo2InternalPpm)
+	ON_EN_KILLFOCUS(IDC_EDIT_CO2_TEMP_MIN, &CCO2_View::OnEnKillfocusEditCo2TempMin)
+	ON_EN_KILLFOCUS(IDC_EDIT_CO2_TEMP_MAX, &CCO2_View::OnEnKillfocusEditCo2TempMax)
+	ON_EN_KILLFOCUS(IDC_EDIT_CO2_HUM_MIN, &CCO2_View::OnEnKillfocusEditCo2HumMin)
+	ON_EN_KILLFOCUS(IDC_EDIT_CO2_HUM_MAX, &CCO2_View::OnEnKillfocusEditCo2HumMax)
+	ON_EN_KILLFOCUS(IDC_EDIT_CO2_PPM_MIN, &CCO2_View::OnEnKillfocusEditCo2PpmMin)
+	ON_EN_KILLFOCUS(IDC_EDIT_CO2_PPM_MAX, &CCO2_View::OnEnKillfocusEditCo2PpmMax)
 END_MESSAGE_MAP()
 
 
@@ -142,7 +163,17 @@ void CCO2_View::Fresh()
 
 	C02_SHOW_TEMP();
 
-	m_humidity_value = (float)(product_register_value[CO2_485_MODBUS_HUMIDITY_RH]/10);
+	m_float_temp_min.Format(_T("%.1f"),((float)product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MIN_TEM])/10);
+	m_float_temp_max.Format(_T("%.1f"),((float)product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MAX_TEM])/10);
+
+	m_float_hum_min.Format(_T("%.1f"),((float)product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MIN_HUM])/10);
+	m_float_hum_max.Format(_T("%.1f"),((float)product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MAX_HUM])/10);
+
+
+	m_int_co2_min = product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MIN_CO2];
+	m_int_co2_max = product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MAX_CO2];
+
+	m_humidity_value = ((float)product_register_value[CO2_485_MODBUS_HUMIDITY_RH]/10);
 	if(m_humidity_value>100)
 	{
 		(CEdit *)GetDlgItem(IDC_EDIT_CO2_HUMIDITY)->EnableWindow(FALSE);
@@ -286,7 +317,7 @@ void CCO2_View::Initial_List()
 	m_co2_external_sensor_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	m_co2_external_sensor_list.SetExtendedStyle(m_co2_external_sensor_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 
-	m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_NUM, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+	m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_NUM, _T("Item"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_DEVICE_ID, _T("Device ID"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_SERIAL_NUM, _T("Serial Number"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_PPM, _T("External PPM"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -387,6 +418,17 @@ void CCO2_View::CO2_Alarm_Set()
 	m_alarm_on_time = product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_ON_TIME];
 	m_alarm_off_time = product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_OFF_TIME];
 
+	
+		if(product_register_value[CO2_485_MODBUS_INTERNAL_CO2_PPM] == 65535)
+		{
+			m_internal_ppm.Format(_T("No Sensor"));
+			GetDlgItem(IDC_EDIT_CO2_INTERNAL_PPM)->EnableWindow(0);
+		}
+		else
+		{
+			m_internal_ppm.Format(_T("%d"),product_register_value[CO2_485_MODBUS_INTERNAL_CO2_PPM]);
+			GetDlgItem(IDC_EDIT_CO2_INTERNAL_PPM)->EnableWindow(1);
+		}
 	m_edit_pre_alarm_setpoint = product_register_value[CO2_485_MODBUS_INT_PRE_ALARM_SETPOINT];
 	m_edit_alarm_setpoint = product_register_value[CO2_485_MODBUS_INT_ALARM_SETPOINT];
 	m_edit_calibrating_offset = product_register_value[CO2_485_MODBUS_INT_CO2_OFFSET];
@@ -528,7 +570,7 @@ LRESULT  CCO2_View::ResumeCO2MessageCallBack(WPARAM wParam, LPARAM lParam)
 			Iter = Change_Color_ID.begin()+indexid;
 			Change_Color_ID.erase(Iter);
 		}
-
+		product_register_value[Write_Struct_feedback->address]= Write_Struct_feedback->old_value;
 		if(Write_Struct_feedback!=NULL)
 		{
 			delete Write_Struct_feedback;
@@ -579,7 +621,10 @@ void CCO2_View::OnEnKillfocusEditInternalTemp()
 	// TODO: Add your control notification handler code here
 	UpdateData();
 	int ivalue=0;
-	ivalue = m_f_internal_temp *10;
+	CString temp_cs;
+	GetDlgItemText(IDC_EDIT_INTERNAL_TEMP,temp_cs);
+	ivalue = (int)(_wtof(temp_cs)*10);
+	//ivalue = (int) (m_f_internal_temp *10);
 	if(m_co2_temp_unit.GetCurSel())
 	{
 		if(ivalue == product_register_value[CO2_485_MODBUS_TEMPERATURE_F_INTERNAL])
@@ -624,7 +669,11 @@ void CCO2_View::OnEnKillfocusEditExternalTemp()
 	// TODO: Add your control notification handler code here
 	UpdateData();
 	int ivalue=0;
-	ivalue = m_f_external_temp *10;
+	CString temp_cs;
+	GetDlgItemText(IDC_EDIT_EXTERNAL_TEMP,temp_cs);
+	//ivalue = (int)(_wtof(temp_cs)*10);
+
+	ivalue =(int) (m_f_external_temp *10);
 	if(m_co2_temp_unit.GetCurSel())
 	{
 		if(ivalue == product_register_value[CO2_485_MODBUS_TEMPERATURE_F_EXTERNAL])
@@ -733,22 +782,22 @@ LRESULT CCO2_View::Save_List_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == CO2_EXTERNAL_PPM)
 	{
 		temp_write_reg = CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + Changed_Item;
-		temp_cs_change_info.Format(_T("External PPM"));
+		temp_cs_change_info.Format(_T("Item:%d External PPM"),Changed_Item+1);
 	}
 	else if(Changed_SubItem == CO2_EXTERNAL_PRE_ALARM_SP)
 	{
 		temp_write_reg = CO2_485_MODBUS_EXT_PRE_ALARM_SETPOINT_START + Changed_Item;
-		temp_cs_change_info.Format(_T("External Prepare Alarm Setpoint"));
+		temp_cs_change_info.Format(_T("Item:%d External Prepare Alarm Setpoint"),Changed_Item+1);
 	}
 	else if(Changed_SubItem == CO2_EXTERNAL_ALARM_SP)
 	{
 		temp_write_reg = CO2_485_MODBUS_EXT_ALARM_SETPOINT_START + Changed_Item;
-		temp_cs_change_info.Format(_T("Alarm Setpoint"));	
+		temp_cs_change_info.Format(_T("Item:%d Alarm Setpoint"),Changed_Item+1);	
 	}
 	else if(Changed_SubItem == CO2_EXTERNAL_CAL_OFFSET)
 	{
 		temp_write_reg = CO2_485_MODBUS_EXT_CO2_OFFSET_START + Changed_Item;
-		temp_cs_change_info.Format(_T("Calibrating Offset"));	
+		temp_cs_change_info.Format(_T("Item:%d Calibrating Offset"),Changed_Item+1);	
 	}
 	else
 	{
@@ -782,6 +831,8 @@ bool CheckString( CString str )
 			return FALSE;
 			//break;// ÍË³ö
 		}
+
+
 	}
 
 	return TRUE;
@@ -1068,7 +1119,7 @@ void CCO2_View::OnEnKillfocusCo2AlarmOnTime()
 	if(m_alarm_on_time != product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_ON_TIME])
 	{
 		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_PRE_ALARM_SETTING_ON_TIME,m_alarm_on_time,
-			product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_ON_TIME],this->m_hWnd,IDC_EDIT_CO2_BACKLIGHT_TIME,_T("User Defined Alarm On Time"));
+			product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_ON_TIME],this->m_hWnd,IDC_CO2_ALARM_ON_TIME,_T("User Defined Alarm On Time"));
 	}
 	
 }
@@ -1081,7 +1132,7 @@ void CCO2_View::OnEnKillfocusCo2AlarmOffTime()
 	if(m_alarm_off_time != product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_OFF_TIME])
 	{
 		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_PRE_ALARM_SETTING_OFF_TIME,m_alarm_off_time,
-			product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_OFF_TIME],this->m_hWnd,IDC_EDIT_CO2_BACKLIGHT_TIME,_T("User Defined Alarm Off Time"));
+			product_register_value[CO2_485_MODBUS_PRE_ALARM_SETTING_OFF_TIME],this->m_hWnd,IDC_CO2_ALARM_OFF_TIME,_T("User Defined Alarm Off Time"));
 	}
 }
 
@@ -1105,4 +1156,137 @@ void CCO2_View::OnBnClickedBtnCo2ClearCal()
 	}
 	OnBnClickedBtnCo2Refresh();
 	SetPaneString(1,_T("Clear External Calibration Offset Success!! "));
+}
+
+
+void CCO2_View::OnEnKillfocusEditCo2InternalPpm()
+{
+	// TODO: Add your control notification handler code here
+	UpdateData();
+	int ppm_value = _wtoi(m_internal_ppm);
+	if(ppm_value != product_register_value[CO2_485_MODBUS_INTERNAL_CO2_PPM])
+	{
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_INTERNAL_CO2_PPM,ppm_value,
+			product_register_value[CO2_485_MODBUS_INTERNAL_CO2_PPM],this->m_hWnd,IDC_EDIT_CO2_INTERNAL_PPM,_T("Internal CO2 PPM"));
+	}
+}
+
+
+void CCO2_View::OnEnKillfocusEditCo2TempMin()
+{
+	// TODO: Add your control notification handler code here
+	UpdateData();
+	int temp_value = (int)(_wtof(m_float_temp_min)*10);
+	if(temp_value > (_wtof(m_float_temp_max)*10))
+	{
+		MessageBox(_T("Min value can't greater than Max value"));
+		return;
+	}
+
+	if(temp_value != product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MIN_TEM])
+	{
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_OUTPUT_RANGE_MIN_TEM,temp_value,
+			product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MIN_TEM],this->m_hWnd,IDC_EDIT_CO2_TEMP_MIN,_T("Temperature Range Min"));
+	}
+}
+
+
+void CCO2_View::OnEnKillfocusEditCo2TempMax()
+{
+	// TODO: Add your control notification handler code here
+	UpdateData();
+	int temp_value = (int)(_wtof(m_float_temp_max)*10);
+	if(temp_value < (_wtof(m_float_temp_min)*10))
+	{
+		MessageBox(_T("Max value can't smaller than Min value"));
+		return;
+	}
+
+	if(temp_value != product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MAX_TEM])
+	{
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_OUTPUT_RANGE_MAX_TEM,temp_value,
+			product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MAX_TEM],this->m_hWnd,IDC_EDIT_CO2_TEMP_MAX,_T("Temperature Range Max"));
+	}
+}
+
+
+void CCO2_View::OnEnKillfocusEditCo2HumMin()
+{
+	// TODO: Add your control notification handler code here
+	UpdateData();
+	int temp_value = (int)(_wtof(m_float_hum_min)*10);
+	if(temp_value > (_wtof(m_float_hum_max)*10))
+	{
+		MessageBox(_T("Min value can't greater than Max value"));
+		return;
+	}
+	if(temp_value >= 1000)
+	{
+		MessageBox(_T("Min value can't greater than 100%"));
+		return;
+	}
+	if(temp_value != product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MIN_HUM])
+	{
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_OUTPUT_RANGE_MIN_HUM,temp_value,
+			product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MIN_HUM],this->m_hWnd,IDC_EDIT_CO2_HUM_MIN,_T("Humidity Range Min"));
+	}
+}
+
+
+void CCO2_View::OnEnKillfocusEditCo2HumMax()
+{
+	// TODO: Add your control notification handler code here
+	UpdateData();
+	int temp_value = (int)(_wtof(m_float_hum_max)*10);
+	if(temp_value < (_wtof(m_float_hum_min)*10))
+	{
+		MessageBox(_T("Max value can't smaller than Min value"));
+		return;
+	}
+	if(temp_value >= 1000)
+	{
+		MessageBox(_T("Max value can't greater than 100%"));
+		return;
+	}
+	if(temp_value != product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MAX_HUM])
+	{
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_OUTPUT_RANGE_MAX_HUM,temp_value,
+			product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MAX_HUM],this->m_hWnd,IDC_EDIT_CO2_HUM_MAX,_T("Humidity Range Max"));
+	}
+}
+
+
+void CCO2_View::OnEnKillfocusEditCo2PpmMin()
+{
+	// TODO: Add your control notification handler code here
+	UpdateData();
+	unsigned short temp_value = m_int_co2_min;
+	if(temp_value > m_int_co2_max)
+	{
+		MessageBox(_T("Min value can't greater than Max value"));
+		return;
+	}
+	if(temp_value != product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MIN_CO2])
+	{
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_OUTPUT_RANGE_MIN_CO2,temp_value,
+			product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MIN_CO2],this->m_hWnd,IDC_EDIT_CO2_PPM_MIN,_T("CO2 PPM Range Min"));
+	}
+}
+
+
+void CCO2_View::OnEnKillfocusEditCo2PpmMax()
+{
+	// TODO: Add your control notification handler code here
+	UpdateData();
+	unsigned short temp_value = m_int_co2_max;
+	if(temp_value < (m_int_co2_min))
+	{
+		MessageBox(_T("Max value can't smaller than Min value"));
+		return;
+	}
+	if(temp_value != product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MAX_CO2])
+	{
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_OUTPUT_RANGE_MAX_CO2,temp_value,
+			product_register_value[CO2_485_MODBUS_OUTPUT_RANGE_MAX_CO2],this->m_hWnd,IDC_EDIT_CO2_PPM_MAX,_T("CO2 PPM Range Max"));
+	}
 }

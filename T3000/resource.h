@@ -183,10 +183,12 @@
 #define IDC_CUR_TEMP                    1028
 #define IDC_EDIT42                      1028
 #define IDC_DTS1                        1028
+#define IDC_EDIT_CO2_HUM_MIN            1028
 #define IDC_BUTTON3                     1029
 #define IDC_DELAYTABBTN                 1029
 #define IDC_OUTPUT5_DELAY_OFF_EDIT      1029
 #define IDC_CUR_HUM                     1029
+#define IDC_EDIT_CO2_PPM_MIN            1029
 #define IDC_RADIO1                      1030
 #define IDC_OUTPUT4_DELAY_OFF_EDIT      1030
 #define IDC_HUM1                        1030
@@ -1056,12 +1058,17 @@
 #define IDC_BTN_CO2_CLEAR_CAL           1625
 #define IDC_CHECK_HIDE_ALIAS_COLUMN     1626
 #define IDC_STATIC_CM5_VENDOR_ID        1626
+#define IDC_EDIT_CO2_TEMP_MIN           1626
 #define IDC_CHECK_ADDRESS_IN_CELL       1627
 #define IDC_BUTTON_CM5_ADVANCE          1627
+#define IDC_EDIT_CO2_TEMP_MAX           1627
 #define IDC_STATIC_CONFIG1              1628
+#define IDC_EDIT_CO2_HUM_MAX            1628
 #define IDC_STATIC_CONFIG2              1629
 #define IDC_BUTTON_VARIABLE_READ        1629
+#define IDC_EDIT_CO2_PPM_MAX            1629
 #define IDC_STATIC_CONFIG3              1630
+#define IDC_EDIT_CO2_INTERNAL_PPM       1630
 #define IDC_STATIC_CONFIG4              1631
 #define IDC_BUTTON_CM5_PROGRAMING       1631
 #define IDC_STATIC_CONFIG5              1632
@@ -1199,7 +1206,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        451
 #define _APS_NEXT_COMMAND_VALUE         32869
-#define _APS_NEXT_CONTROL_VALUE         1626
+#define _APS_NEXT_CONTROL_VALUE         1631
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
