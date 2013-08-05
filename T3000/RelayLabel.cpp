@@ -115,16 +115,16 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 		if(nStatus==1)
 		{
 			strTemp.Empty();
-			if(multi_register_value[188]==4||multi_register_value[188]==1)
+			if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)
 			{
 				strTemp.Format(_T("%.1f"),(float)multi_register_value[180]/10);
 				strTemp=strTemp+strUnit;
 			}
-			if (multi_register_value[188]==0||multi_register_value[188]==2)
+			if (product_register_value[MODBUS_ANALOG_IN1]==0||product_register_value[MODBUS_ANALOG_IN1]==2)
 			{
 				strTemp.Format(_T("%d"),multi_register_value[180]);
 			}
-			if(multi_register_value[188]==3)
+			if(product_register_value[MODBUS_ANALOG_IN1]==3)
 			{
 				if(multi_register_value[180]==1)
 					strTemp=_T("On");

@@ -1,10 +1,23 @@
-
-Ver2.6.0.11,date released:2013-7-15
+Ver2.6.0.14,date released:2013-8-1
 *************************************************************************************
-<1>fix the Schedule of Tstat6/7
-<2>Add "RegisterMonitor" [Tool->RegisterMonitor] to T3000
-<3>fix the config file 
-<4>Update CM5
+<1>fix Output PID2 OFF VALVE TABLE
+<2>Add T3 To T3000
+<3>Add the function of flashing Serial no 
+<4>Input Name config
+*************************************************************************************
+
+Ver2.6.0.13,date released:2013-7-26
+*************************************************************************************
+<1>fix Output PID2 Auto /OFF  FAN/VALVE
+<2>Add BACnet to T3000
+<3>Add MBPoll to T3000
+<4>Fix Fan Speed in output table
+*************************************************************************************
+
+Ver2.6.0.12,date released:2013-7-26
+*************************************************************************************
+<1>fix Output PID2 Auto /OFF  FAN/VALVE
+<2>Add Schedule ON/OFF
 *************************************************************************************
 
 

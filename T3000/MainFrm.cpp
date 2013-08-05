@@ -3688,8 +3688,9 @@ void CMainFrame::GetIONanme()
 }
 void CMainFrame::OnHelp()
 {
-	CString strHelp=g_strExePth+_T("T3000help.chm");
-	::HtmlHelp(NULL, strHelp, HH_DISPLAY_TOPIC, 0);
+	CString strHelp=g_strExePth+_T("The Instruction of T3000 .txt");
+	//::HtmlHelp(NULL, strHelp, HH_DISPLAY_TOPIC, 0);
+	ShellExecute(NULL, _T("open"), strHelp, NULL, NULL, SW_SHOWNORMAL);
 }
 void CMainFrame::OnImportDatase()
 {
@@ -3715,6 +3716,11 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 
 	if(pMsg->message == WM_KEYDOWN  )
 	{
+		if(((GetAsyncKeyState( VK_LCONTROL ) & 0x8000))&&(pMsg->wParam ==VK_F2))
+		{
+			OnToolIsptoolforone();
+			return 1;
+		}
 		if(pMsg->wParam == VK_F8)
 		{
 			ReFresh();
@@ -3735,6 +3741,8 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				EnterConnectToANode();
 				return 1;
 			}
+			
+
 	}
 	return CFrameWndEx::PreTranslateMessage(pMsg);
 }
@@ -4850,7 +4858,7 @@ UINT _FreshTreeView(LPVOID pParam )
 	while(1)
 	{
 		
-		Sleep(5000);
+		Sleep(15000);
 		WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
 
 		pMain->DoFreshAll();
@@ -6055,7 +6063,7 @@ LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
 //}
 void CMainFrame::OnToolIsptoolforone()
 {
-	close_com();
+    OnDisconnect();
 	show_ISPDlg();
 }
 

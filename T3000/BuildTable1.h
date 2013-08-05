@@ -8,7 +8,7 @@ class CBuildTable1 : public CDialog
 	DECLARE_DYNAMIC(CBuildTable1)
 
 public:
-	CBuildTable1(bool table1_table2,CWnd* pParent = NULL);   // 标准构造函数
+	CBuildTable1(int Input_NO,CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CBuildTable1();
 
 	// 对话框数据
@@ -125,7 +125,7 @@ private:
 	int m_slider11_i;
 	CString m_max;
 	CString m_min;
-	bool m_table1_table2;//false is table1,true is table2;
+	int m_InputNo;//false is table1,true is table2;
 	CString m_units_s;
 
 	CSliderCtrl m_slider1_ctrl;

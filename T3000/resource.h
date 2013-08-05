@@ -155,6 +155,8 @@
 #define IDD_IONAMECONFIG                449
 #define IDD_MBPOLL                      451
 #define IDD_DIALOG_BACNET_INPUT         452
+#define IDD_DIALOG11                    453
+#define IDD_DISPLAY_CONFIG              453
 #define IDI_ICON_INPUT                  454
 #define IDI_ICON_PROGRAMING             455
 #define IDI_ICON_OUTPUT                 456
@@ -1193,13 +1195,54 @@
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
 
+
+
+#define IDC_DISPLAY_CONFIG              1586
+#define IDC_INPUT_1                     1588
+#define IDC_LINE_2                      1589
+#define IDC_LINE_1                      1590
+#define IDC_INPUT_2                     1591
+#define IDC_INPUT_3                     1592
+#define IDC_INPUT_4                     1593
+#define IDC_INPUT_5                     1594
+#define IDC_INPUT_6                     1595
+#define IDC_INPUT_7                     1596
+#define IDC_INPUT_8                     1597
+#define IDC_INPUT_9                     1598
+#define IDC_SEQ_COM                     1599
+#define IDC_UPDATE                      1601
+#define IDC_SAVE                        1602
+#define IDC_SAVE2                       1603
+#define IDC_LINE1                       1604
+#define IDC_SAVE_LINE2                  1605
+#define IDC_LINE2                       1606
+#define IDC_SAVE_INPUT1                 1607
+#define IDC_INPUT1                      1608
+#define IDC_SAVE_INPUT2                 1609
+#define IDC_INPUT2                      1610
+#define IDC_SAVE_INPUT3                 1611
+#define IDC_INPUT3                      1612
+#define IDC_SAVE_INPUT4                 1613
+#define IDC_INPUT4                      1614
+#define IDC_SAVE_INPUT5                 1615
+#define IDC_INPUT5                      1616
+#define IDC_SAVE_INPUT6                 1617
+#define IDC_INPUT6                      1618
+#define IDC_SAVE_INPUT8                 1619
+#define IDC_INPUT8                      1620
+#define IDC_SAVE_INPUT7                 1621
+#define IDC_INPUT7                      1622
+#define IDC_PROCESS                     1623
+#define IDC_FRESH_TABLE                 1624
+#define IDOK_1                          1625
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        451
+#define _APS_NEXT_RESOURCE_VALUE        454
 #define _APS_NEXT_COMMAND_VALUE         32869
-#define _APS_NEXT_CONTROL_VALUE         1626
+#define _APS_NEXT_CONTROL_VALUE         1625
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
