@@ -715,7 +715,7 @@ void CInputSetDlg::ClickMsflexgrid1()
 		}
 		if(lRow==2 && (wAM & 0x01))
 		{
-			if(multi_register_value[188]==3)//On OFF
+			if(product_register_value[MODBUS_ANALOG_IN1]==3)//On OFF
 			{
 				m_valueCombx.ResetContent();
 				m_valueCombx.InsertString(0,_T("Off"));
@@ -852,7 +852,7 @@ void CInputSetDlg::ClickMsflexgrid1()
 
 		if(lRow==2)
 		{
-			if(multi_register_value[188]==3||multi_register_value[188]==5)
+			if(product_register_value[MODBUS_ANALOG_IN1]==3||product_register_value[MODBUS_ANALOG_IN1]==5)
 			{
 					
 				m_downButton.ShowWindow(SW_HIDE);
@@ -917,7 +917,7 @@ void CInputSetDlg::ClickMsflexgrid1()
 		m_inputFinCombox.SetFocus(); //获取焦点
 		
 	}
-	if(lRow==2&&CUST_FIELD==lCol&&multi_register_value[188]==4)
+	if(lRow==2&&CUST_FIELD==lCol&&product_register_value[MODBUS_ANALOG_IN1]==4)
 	{
 		m_customBtn.ShowWindow(SW_SHOW);
 		m_customBtn.MoveWindow(rc); //移动到选中格的位置，覆盖
@@ -966,10 +966,10 @@ void CInputSetDlg::OnCbnSelchangeRangCombo()
 	if(m_nCurRow==2&&m_nCurCol==RANG_FIELD)
 	{
 		int nindext=m_RangCombox.GetCurSel();
-		int ret=write_one(g_tstat_id,188,nindext);
+		int ret=write_one(g_tstat_id,MODBUS_ANALOG_IN1,nindext);
 		 if (ret>0)
 		 {  
-		 if(multi_register_value[188]==4)
+		 if(product_register_value[MODBUS_ANALOG_IN1]==4)
 		 {
 			 m_FlexGrid.put_TextMatrix(2,CUST_FIELD,_T("Custom..."));
 		 }
@@ -1143,12 +1143,12 @@ void CInputSetDlg::OnBnClickedCustombutton()
 {
 	if(m_nCurRow==2&&m_nCurCol==CUST_FIELD)
 	{
-		CBuildTable1 Dlg(false);
+		CBuildTable1 Dlg(2);
 		Dlg.DoModal();
 	}
 	if(m_nCurRow==3&&m_nCurCol==CUST_FIELD)
 	{
-		CBuildTable1 Dlg(true);
+		CBuildTable1 Dlg(3);
 		Dlg.DoModal();
 	}
 }
@@ -2549,14 +2549,14 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 	//////////////////////////////////////////////////////////////////////////
 	if(nCol == CUST_FIELD)
 	{
-		if(nRow==2&&product_register_value[188]==4)///没找到TSTAT6对应值
+		if(nRow==2&&product_register_value[MODBUS_ANALOG1_RANGE]==4)///没找到TSTAT6对应值
 		{
 			m_customBtn.ShowWindow(SW_SHOW);
 			m_customBtn.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 			m_customBtn.BringWindowToTop();
 			m_customBtn.SetFocus(); //获取焦点
 		}
-		if(nRow==3&&product_register_value[189]==4)
+		if(nRow==3&&product_register_value[MODBUS_ANALOG2_RANGE]==4)
 		{
 			m_customBtn.ShowWindow(SW_SHOW);
 			m_customBtn.MoveWindow(rcCell); //移动到选中格的位置，覆盖
@@ -2608,12 +2608,12 @@ void CInputSetDlg::OnCbnSelchangeRangComboFor5E()
 			return;
 		}
 		product_register_value[MODBUS_ANALOG1_RANGE+m_nCurRow-2] = nindext;
-
-		int retread = read_one(g_tstat_id,MODBUS_ANALOG_INPUT1+m_nCurRow-2);
+		//Sleep(2000);
+		/*int retread = read_one(g_tstat_id,MODBUS_ANALOG_INPUT1+m_nCurRow-2,5);
 		if(retread<0)
-			MessageBox(_T("Read Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+		MessageBox(_T("Read Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 		else
-			product_register_value[MODBUS_ANALOG_INPUT1+m_nCurRow-2] =retread;
+		product_register_value[MODBUS_ANALOG_INPUT1+m_nCurRow-2] =retread;*/
 	}
 
 
@@ -2979,7 +2979,7 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 	//////////////////////////////////////////////////////////////////////////
 	if(nCol == CUST_FIELD)
 	{
-		if(nRow==2&&multi_register_value[188]==4)
+		if(nRow==2&&product_register_value[MODBUS_ANALOG_IN1]==4)
 		{
 			m_customBtn.ShowWindow(SW_SHOW);
 			m_customBtn.MoveWindow(rcCell); //移动到选中格的位置，覆盖

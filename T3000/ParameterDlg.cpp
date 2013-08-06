@@ -1152,7 +1152,7 @@ void CParameterDlg::OnEnKillfocusInputvalue2()
 	}
 	else
 	{
-		if(multi_register_value[188]==4||multi_register_value[188]==1)
+		if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)
 			write_one(g_tstat_id, 180,nValue*10);
 		else
 			write_one(g_tstat_id, 180,nValue);
@@ -2540,7 +2540,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			} 
 			else
 			{
-				if(product_register_value[188]==4||product_register_value[188]==1)
+				if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)
 				{
 					strTemp.Format(_T("%.1f"),(float)product_register_value[180]/10);
 					strTemp=strTemp+strUnit;

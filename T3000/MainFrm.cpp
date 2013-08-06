@@ -242,7 +242,6 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			continue;
 		}
 //		int i;
-		int ret_count = 0;
 		for(int i=0;i<10;i++) //Modify by Fance , tstat 6 has more register than 512;
 		//for(i=0;i<8;i++)
 		{
@@ -256,18 +255,13 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			}
 			register_critical_section.Lock();
 			//
-			if(Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64)<0)
-				ret_count++;
+			Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);
 			register_critical_section.Unlock();
 		}
 
 		ReleaseMutex(Read_Mutex);//Add by Fance .
 
 		//Fance_1
-		if(ret_count!=0)	//不等于0 说明这次读的中间出现了错误，如果继续运行，会出现界面上的很多值是错的。Add by Fance;
-		{
-			continue;
-		}
 		memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
 		if(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd!=NULL)
 		{
@@ -3694,8 +3688,9 @@ void CMainFrame::GetIONanme()
 }
 void CMainFrame::OnHelp()
 {
-	CString strHelp=g_strExePth+_T("T3000help.chm");
-	::HtmlHelp(NULL, strHelp, HH_DISPLAY_TOPIC, 0);
+	CString strHelp=g_strExePth+_T("The Instruction of T3000 .txt");
+	//::HtmlHelp(NULL, strHelp, HH_DISPLAY_TOPIC, 0);
+	ShellExecute(NULL, _T("open"), strHelp, NULL, NULL, SW_SHOWNORMAL);
 }
 void CMainFrame::OnImportDatase()
 {
@@ -3721,6 +3716,11 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 
 	if(pMsg->message == WM_KEYDOWN  )
 	{
+		if(((GetAsyncKeyState( VK_LCONTROL ) & 0x8000))&&(pMsg->wParam ==VK_F2))
+		{
+			OnToolIsptoolforone();
+			return 1;
+		}
 		if(pMsg->wParam == VK_F8)
 		{
 			ReFresh();
@@ -3741,6 +3741,8 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				EnterConnectToANode();
 				return 1;
 			}
+			
+
 	}
 	return CFrameWndEx::PreTranslateMessage(pMsg);
 }
@@ -4856,7 +4858,7 @@ UINT _FreshTreeView(LPVOID pParam )
 	while(1)
 	{
 		
-		Sleep(30000);
+		Sleep(15000);
 		WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
 
 		pMain->DoFreshAll();
@@ -6061,7 +6063,7 @@ LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
 //}
 void CMainFrame::OnToolIsptoolforone()
 {
-	close_com();
+    OnDisconnect();
 	show_ISPDlg();
 }
 
