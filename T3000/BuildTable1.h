@@ -58,7 +58,7 @@ public:
 	afx_msg void OnEnSetfocusEdit18();
 	afx_msg void OnEnSetfocusEdit19();
 	afx_msg void OnEnSetfocusEdit20();
-	afx_msg void OnEnSetfocusEdit12();
+	//afx_msg void OnEnSetfocusEdit12();
 	afx_msg void OnEnChangeEdit1();
 	afx_msg void OnEnChangeEdit8();
 	afx_msg void OnEnChangeEdit9();
