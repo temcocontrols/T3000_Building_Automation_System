@@ -140,6 +140,7 @@
     <ClCompile Include="CO2_View.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
     <ClCompile Include="DialogCM5_BacNet.cpp" />
+    <ClCompile Include="DisplayConfig.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
     <ClCompile Include="LightingController\configure.cpp" />
     <ClCompile Include="DBOprator.cpp" />
@@ -296,6 +297,7 @@
     <ClInclude Include="CM5\user_data.h" />
     <ClInclude Include="CO2_View.h" />
     <ClInclude Include="DialogCM5_BacNet.h" />
+    <ClInclude Include="DisplayConfig.h" />
     <ClInclude Include="IONameConfig.h" />
     <ClInclude Include="MBP.h" />
     <ClInclude Include="MbpDefines.h" />

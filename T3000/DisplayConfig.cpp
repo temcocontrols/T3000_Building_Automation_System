@@ -23,19 +23,19 @@ CDisplayConfig::~CDisplayConfig()
 }
 BOOL CDisplayConfig::OnInitDialog()
 {
-CDialog::OnInitDialog();
+	CDialog::OnInitDialog();
 
- m_display_number=0;
-m_FlexGrid1.put_Rows(1);
-m_FlexGrid1.put_Cols(2);
-m_FlexGrid1.put_TextMatrix(0,0,_T("Seq_NO"));
-m_FlexGrid1.put_TextMatrix(0,1,_T("Display_Choice"));
-m_FlexGrid1.put_ColWidth(0,800);
-m_FlexGrid1.put_ColWidth(1,2200);
-UpdateData(FALSE);
-OnBnClickedOk();
-Fresh_Grid();
-return TRUE;
+	m_display_number=1;
+	m_FlexGrid1.put_Rows(1);
+	m_FlexGrid1.put_Cols(2);
+	m_FlexGrid1.put_TextMatrix(0,0,_T("Seq_NO"));
+	m_FlexGrid1.put_TextMatrix(0,1,_T("Display_Choice"));
+	m_FlexGrid1.put_ColWidth(0,800);
+	m_FlexGrid1.put_ColWidth(1,2200);
+	UpdateData(FALSE);
+	OnBnClickedOk();
+	Fresh_Grid();
+	return TRUE;
 }
 void CDisplayConfig::DoDataExchange(CDataExchange* pDX)
 {
@@ -73,20 +73,12 @@ CString CDisplayConfig::GetTextReg(unsigned short reg){
 	unsigned short temp_buffer[4];
 	unsigned short temp_buffer_Char[THE_CHAR_LENGTH];
 	unsigned char p[THE_CHAR_LENGTH+1]={'\0'};
-	if (multi_register_value[7]==PM_TSTAT6||multi_register_value[7]==PM_TSTAT7)
-	{
-	temp_buffer[0]=/*multi_register_value*/newtstat6[reg];
-	temp_buffer[1]=/*multi_register_value*/newtstat6[reg+1];
-	temp_buffer[2]=/*multi_register_value*/newtstat6[reg+2];
-	temp_buffer[3]=/*multi_register_value*/newtstat6[reg+3];
-	} 
-	else
-	{
-	temp_buffer[0]=multi_register_value[reg];
-	temp_buffer[1]=multi_register_value[reg+1];
-	temp_buffer[2]=multi_register_value[reg+2];
-	temp_buffer[3]=multi_register_value[reg+3];
-	}
+	 
+		temp_buffer[0]=product_register_value[reg];
+		temp_buffer[1]=product_register_value[reg+1];
+		temp_buffer[2]=product_register_value[reg+2];
+		temp_buffer[3]=product_register_value[reg+3];
+	 
 
    unsigned short Hi_Char,Low_Char;
 
@@ -99,31 +91,29 @@ CString CDisplayConfig::GetTextReg(unsigned short reg){
 		Low_Char=Low_Char&0x00ff;
 		temp_buffer_Char[2*i]=Hi_Char;
 		temp_buffer_Char[2*i+1]=Low_Char;
-
 		} 
 
 	for (int i=0;i<THE_CHAR_LENGTH;i++)
 		{
 		p[i] =(unsigned char)temp_buffer_Char[i];
-
 		}
-
-	str_temp.Format(_T("%c%c%c%c%c%c%c%c"),p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);
-
-
-		 
+	str_temp.Format(_T("%c%c%c%c%c%c%c%c"),p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);	
+ 
+	 
 	return str_temp;
 	}
+
+
 CString CDisplayConfig::GetTextFromReg(unsigned short reg){
 	CString str_temp;
 	unsigned short temp_buffer[4];
 	unsigned short temp_buffer_Char[THE_CHAR_LENGTH];
 	unsigned char p[THE_CHAR_LENGTH+1]={'\0'};
 	if (Read_Multi(g_tstat_id,temp_buffer,reg,4))
-		{  unsigned short Hi_Char,Low_Char;
+	{  unsigned short Hi_Char,Low_Char;
 
 	for (int i=0;i<4;i++)
-		{
+	{
 		Hi_Char=temp_buffer[i];
 		Hi_Char=Hi_Char&0xff00;
 		Hi_Char=Hi_Char>>8;
@@ -131,25 +121,24 @@ CString CDisplayConfig::GetTextFromReg(unsigned short reg){
 		Low_Char=Low_Char&0x00ff;
 		temp_buffer_Char[2*i]=Hi_Char;
 		temp_buffer_Char[2*i+1]=Low_Char;
-
-		} 
+	} 
 
 	for (int i=0;i<THE_CHAR_LENGTH;i++)
-		{
+	{
 		p[i] =(unsigned char)temp_buffer_Char[i];
 
-		}
+	}
 
 	str_temp.Format(_T("%c%c%c%c%c%c%c%c"),p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);
 
 
-		} 
+	} 
 	else
-		{
+	{
 		AfxMessageBox(_T("Reading Error"));
-		}
-	return str_temp;
 	}
+	return str_temp;
+}
 
 BEGIN_EVENTSINK_MAP(CDisplayConfig, CDialog)
 	ON_EVENT(CDisplayConfig, IDC_INPUT_MSFLEXGRID, DISPID_DBLCLICK, CDisplayConfig::DblClickInputMsflexgrid, VTS_NONE)
@@ -221,58 +210,30 @@ CString CDisplayConfig::GetSel(int ID)
   return selection;
 }
 void CDisplayConfig::Fresh_Grid(){
-   if (multi_register_value[7]==PM_TSTAT6||multi_register_value[7]==PM_TSTAT7)
-   {
-   m_display_number=newtstat6[Get_RegID(multi_register_value[7],_T("Display Number"))];
-   int display_number=1;
-   if (m_display_number>=0)
-	   {
-	   display_number=m_display_number+1;
-	   m_FlexGrid1.put_Rows(display_number);
-	   m_FlexGrid1.put_Cols(2);
-	   m_FlexGrid1.put_TextMatrix(0,0,_T("Seq_NO"));
-	   m_FlexGrid1.put_TextMatrix(0,1,_T("Display_Choice"));
-	   m_FlexGrid1.put_ColWidth(0,800);
-	   m_FlexGrid1.put_ColWidth(1,2200);
-	   for (int i=1;i<=m_display_number;i++)
-		   {
-		   CString str_No;
-		   str_No.Format(_T("%d"),i);
-		   m_FlexGrid1.put_TextMatrix(i,0,str_No);
-		   m_FlexGrid1.put_TextMatrix(i,1,GetSel(newtstat6[Get_RegID(multi_register_value[7],_T("GridFirstID"))+i-1]));
-		   }
-	   } 
-   else
-	   {
-	   AfxMessageBox(_T("Reading Error.Try again."));
-	   }
-   } 
-   else
-   {
-   m_display_number=multi_register_value[Get_RegID(multi_register_value[7],_T("Display Number"))];
-   int display_number=1;
-   if (m_display_number>=0)
-	   {
-	   display_number=m_display_number+1;
-	   m_FlexGrid1.put_Rows(display_number);
-	   m_FlexGrid1.put_Cols(2);
-	   m_FlexGrid1.put_TextMatrix(0,0,_T("Seq_NO"));
-	   m_FlexGrid1.put_TextMatrix(0,1,_T("Display_Choice"));
-	   m_FlexGrid1.put_ColWidth(0,800);
-	   m_FlexGrid1.put_ColWidth(1,2200);
-	   for (int i=1;i<=m_display_number;i++)
-		   {
-		   CString str_No;
-		   str_No.Format(_T("%d"),i);
-		   m_FlexGrid1.put_TextMatrix(i,0,str_No);
-		   m_FlexGrid1.put_TextMatrix(i,1,GetSel(multi_register_value[Get_RegID(multi_register_value[7],_T("GridFirstID"))+i-1]));
-		   }
-	   } 
-   else
-	   {
-	   AfxMessageBox(_T("Reading Error.Try again."));
-	   }
-   }
+	 
+		m_display_number=product_register_value[MODBUS_LCD_ROTATE_ENABLE];//newtstat6[Get_RegID(multi_register_value[7],_T("Display Number"))];
+		int display_number=1;
+		if (m_display_number>=0)
+		{
+			display_number=m_display_number+1;
+			m_FlexGrid1.put_Rows(display_number);
+			m_FlexGrid1.put_Cols(2);
+			m_FlexGrid1.put_TextMatrix(0,0,_T("Seq_NO"));
+			m_FlexGrid1.put_TextMatrix(0,1,_T("Display_Choice"));
+			m_FlexGrid1.put_ColWidth(0,800);
+			m_FlexGrid1.put_ColWidth(1,2200);
+			for (int i=1;i<=m_display_number;i++)
+			{
+				CString str_No;
+				str_No.Format(_T("%d"),i);
+				m_FlexGrid1.put_TextMatrix(i,0,str_No);
+				m_FlexGrid1.put_TextMatrix(i,1,GetSel(product_register_value[MODBUS_DISP_ITEM_TEMPERATURE+i-1]));
+			}
+		} 
+		else
+		{
+			AfxMessageBox(_T("Reading Error.Try again."));
+		}
 	
 	 
 	
@@ -358,126 +319,7 @@ if(g_OutPutLevel==1)
 		m_ItemValueCombx.SetFocus(); //»ñÈ¡½¹µã
 		}
 }
-int CDisplayConfig::Get_RegID(int Model_ID,CString Name)
-{
-   int RegID=-1;
-   if (Model_ID==16)
-   {
-          if (Name.CompareNoCase(_T("Line1"))==0)
-     {
-	   RegID=425;
-     } 
-     else if (Name.CompareNoCase(_T("Line2"))==0)
-     {
-	   RegID=429;
-     } 
-	 else if (Name.CompareNoCase(_T("Input1"))==0)
-	{
-		 RegID=437;
-	}
-	 else if (Name.CompareNoCase(_T("Input2"))==0)
-		 {
-		 RegID=441;
-		 }
-	 else if (Name.CompareNoCase(_T("Input3"))==0)
-		 {
-		 RegID=445;
-		 }
-	 else if (Name.CompareNoCase(_T("Input4"))==0)
-		 {
-		 RegID=449;
-		 }
-	 else if (Name.CompareNoCase(_T("Input5"))==0)
-		 {
-		 RegID=453;
-		 }
-	 else if (Name.CompareNoCase(_T("Input6"))==0)
-		 {
-		 RegID=457;
-		 }
-	 else if (Name.CompareNoCase(_T("Input7"))==0)
-		 {
-		 RegID=461;
-		 }
-	 else if (Name.CompareNoCase(_T("Input8"))==0)
-		 {
-		 RegID=465;
-		 }
-	 else if (Name.CompareNoCase(_T("Display Number"))==0)
-		 {
-		 RegID=497;
-		 }
-	 else if (Name.CompareNoCase(_T("GridFirstID"))==0)
-		 {
-		 RegID=498;
-		 }
-     else
-     {
-	   RegID==-1;
-     }
-   } 
-   else if (Model_ID==PM_TSTAT6||Model_ID==PM_TSTAT7)
-   {
-
-   if (Name.CompareNoCase(_T("Line1"))==0)
-	   {
-	   RegID=435;
-	   } 
-   else if (Name.CompareNoCase(_T("Line2"))==0)
-	   {
-	   RegID=439;
-	   } 
-   else if (Name.CompareNoCase(_T("Input1"))==0)
-	   {
-	   RegID=447;
-	   }
-   else if (Name.CompareNoCase(_T("Input2"))==0)
-	   {
-	   RegID=451;
-	   }
-   else if (Name.CompareNoCase(_T("Input3"))==0)
-	   {
-	   RegID=455;
-	   }
-   else if (Name.CompareNoCase(_T("Input4"))==0)
-	   {
-	   RegID=459;
-	   }
-   else if (Name.CompareNoCase(_T("Input5"))==0)
-	   {
-	   RegID=463;
-	   }
-   else if (Name.CompareNoCase(_T("Input6"))==0)
-	   {
-	   RegID=467;
-	   }
-   else if (Name.CompareNoCase(_T("Input7"))==0)
-	   {
-	   RegID=471;
-	   }
-   else if (Name.CompareNoCase(_T("Input8"))==0)
-	   {
-	   RegID=475;
-	   }
-   else if (Name.CompareNoCase(_T("Display Number"))==0)
-	   {
-	   RegID=564;
-	   }
-   else if (Name.CompareNoCase(_T("GridFirstID"))==0)
-	   {
-	   RegID=566;
-	   }
-   else
-	   {
-	   RegID==-1;
-	   }
-   } 
-   else
-   {
-   RegID==-1;
-   }
-  return RegID; 
-}
+ 
 void CDisplayConfig::OnEnKillfocusInput9()
 {
    UpdateData(TRUE);
@@ -485,29 +327,24 @@ void CDisplayConfig::OnEnKillfocusInput9()
    /*int jugde=m_display_number+1*/
    if (m_display_number>14||m_display_number<0)
    {
-     AfxMessageBox(_T("Input Error"));
+	   AfxMessageBox(_T("Input Error"));
    } 
    else
    {
-	 int ret=write_one(g_tstat_id,Get_RegID(multi_register_value[7],_T("Display Number")),m_display_number);
-     if (ret>0)
-     {
-	 if (multi_register_value[7]==PM_TSTAT6||multi_register_value[7]==PM_TSTAT7)
-	 {
-	 newtstat6[Get_RegID(multi_register_value[7],_T("Display Number"))]=m_display_number;
-	 } 
-	 else
-	 {
-	   multi_register_value[Get_RegID(multi_register_value[7],_T("Display Number"))]=m_display_number;
-	 }
-	 
-	 Fresh_Grid();
-     } 
-     else
-     {
-	   AfxMessageBox(_T("Try again."));
-     }
-     
+	   int ret=write_one(g_tstat_id,MODBUS_LCD_ROTATE_ENABLE,m_display_number);
+	   if (ret>0)
+	   {
+		   
+		 product_register_value[MODBUS_LCD_ROTATE_ENABLE]=m_display_number;
+		   
+
+		   Fresh_Grid();
+	   } 
+	   else
+	   {
+		   AfxMessageBox(_T("Try again."));
+	   }
+
    }
   
 }
@@ -515,32 +352,12 @@ void CDisplayConfig::OnEnKillfocusInput9()
 void CDisplayConfig::OnCbnSelchangeSeqCom()
 {
    
-  int ret=write_one(g_tstat_id,Get_RegID(multi_register_value[7],_T("GridFirstID"))+m_nCurRow-1,m_ItemValueCombx.GetCurSel());
-  multi_register_value[Get_RegID(multi_register_value[7],_T("GridFirstID"))+m_nCurRow-1]=m_ItemValueCombx.GetCurSel();
-  newtstat6[Get_RegID(multi_register_value[7],_T("GridFirstID"))+m_nCurRow-1]=m_ItemValueCombx.GetCurSel();
+  int ret=write_one(g_tstat_id,MODBUS_DISP_ITEM_TEMPERATURE+m_nCurRow-1,m_ItemValueCombx.GetCurSel());
+  product_register_value[MODBUS_DISP_ITEM_TEMPERATURE+m_nCurRow-1]=m_ItemValueCombx.GetCurSel();
+ 
   Fresh_Grid();
 }
-BOOL CDisplayConfig::UpdateTextToReg(CString input_str,UINT reg,int lenght){
-	//input_str.TrimRight();
-		unsigned char p[16];
-		for(int i=1;i<=THE_CHAR_LENGTH;i++)
-			{
-			if(i<input_str.GetLength()+1)
-				p[i-1]=input_str.GetAt(i-1);
-			else
-				p[i-1]=' ';
-			}
-		if(WriteCharsToReg(p,reg,lenght))
-			{
-			 return TRUE;
-			}
-		else
-			{
-			//AfxMessageBox(_T("Error"));
-			return FALSE;
-			}
-		
-}
+ 
 BOOL CDisplayConfig::WriteCharsToReg(unsigned char *to_write,unsigned short start_address,int length){
        
 
@@ -574,105 +391,102 @@ CDialog::OnCancel();
 }
 void CDisplayConfig::OnBnClickedOk()
 	{ 
-	  CString temp;
-	 int reg=Get_RegID(multi_register_value[7],_T("Display Number"));
-	 int m_display_number=read_one(g_tstat_id,reg);
-	 if (multi_register_value[7]==PM_TSTAT6||multi_register_value[7]==PM_TSTAT7)
-		 {
-		
-		  newtstat6[reg]=m_display_number;
-		 } 
-	 else
-		 {
-		  
-		  multi_register_value[reg]=m_display_number;
-		 }
-	
-	if (m_display_number==0)
-	{
-	m_progress.ShowWindow(TRUE);
-	m_progress.SetRange(0,100);
-	m_progress.SetPos(0);
-	GetDlgItem(IDC_LINE_1)->SetWindowText(GetTextFromReg(Get_RegID(multi_register_value[7],_T("Line1"))));
-	m_progress.SetPos(10);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_LINE_2)->SetWindowText(GetTextFromReg(Get_RegID(multi_register_value[7],_T("Line2")))); 
-	m_progress.SetPos(20);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_1)->SetWindowText(GetTextFromReg(Get_RegID(multi_register_value[7],_T("Input1"))));
-	m_progress.SetPos(30);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_2)->SetWindowText(GetTextFromReg(Get_RegID(multi_register_value[7],_T("Input2"))));
-	m_progress.SetPos(40);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_3)->SetWindowText(GetTextFromReg(Get_RegID(multi_register_value[7],_T("Input3"))));
-	m_progress.SetPos(50);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_4)->SetWindowText(GetTextFromReg(Get_RegID(multi_register_value[7],_T("Input4"))));
-	m_progress.SetPos(60);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_5)->SetWindowText(GetTextFromReg(Get_RegID(multi_register_value[7],_T("Input5"))));
-	m_progress.SetPos(70);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_6)->SetWindowText(GetTextFromReg(Get_RegID(multi_register_value[7],_T("Input6"))));
-	m_progress.SetPos(80);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_7)->SetWindowText(GetTextFromReg(Get_RegID(multi_register_value[7],_T("Input7"))));
-	m_progress.SetPos(90);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_8)->SetWindowText(GetTextFromReg(Get_RegID(multi_register_value[7],_T("Input8"))));
-	CString temp;
-	/*int display=read_one(g_tstat_id,Get_RegID(multi_register_value[7],_T("Display Number")));*/
-	temp.Format(_T("%d"),m_display_number);
-	//multi_register_value[Get_RegID(multi_register_value[7],_T("Display Number"))]=display;
-	GetDlgItem(IDC_INPUT_9)->SetWindowText(temp);
-	Fresh_Grid();
-	m_progress.SetPos(100);
-	//UpdateData(FALSE);
-	m_progress.ShowWindow(FALSE);
-	} 
-	else
-	{
-	m_progress.ShowWindow(TRUE);
-	m_progress.SetRange(0,100);
-	m_progress.SetPos(0);
-	GetDlgItem(IDC_LINE_1)->SetWindowText(GetTextReg(Get_RegID(multi_register_value[7],_T("Line1"))));
-	m_progress.SetPos(10);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_LINE_2)->SetWindowText(GetTextReg(Get_RegID(multi_register_value[7],_T("Line2")))); 
-	m_progress.SetPos(20);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_1)->SetWindowText(GetTextReg(Get_RegID(multi_register_value[7],_T("Input1"))));
-	m_progress.SetPos(30);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_2)->SetWindowText(GetTextReg(Get_RegID(multi_register_value[7],_T("Input2"))));
-	m_progress.SetPos(40);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_3)->SetWindowText(GetTextReg(Get_RegID(multi_register_value[7],_T("Input3"))));
-	m_progress.SetPos(50);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_4)->SetWindowText(GetTextReg(Get_RegID(multi_register_value[7],_T("Input4"))));
-	m_progress.SetPos(60);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_5)->SetWindowText(GetTextReg(Get_RegID(multi_register_value[7],_T("Input5"))));
-	m_progress.SetPos(70);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_6)->SetWindowText(GetTextReg(Get_RegID(multi_register_value[7],_T("Input6"))));
-	m_progress.SetPos(80);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_7)->SetWindowText(GetTextReg(Get_RegID(multi_register_value[7],_T("Input7"))));
-	m_progress.SetPos(90);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_8)->SetWindowText(GetTextReg(Get_RegID(multi_register_value[7],_T("Input8"))));
-	CString temp;
-	temp.Format(_T("%d"),multi_register_value[Get_RegID(multi_register_value[7],_T("Display Number"))]);
-	GetDlgItem(IDC_INPUT_9)->SetWindowText(temp);
-	Fresh_Grid();
-	m_progress.SetPos(100);
-	//UpdateData(FALSE);
-	m_progress.ShowWindow(FALSE);
+	 // CString temp;
+	 CString input1,input2,input3,input4,input5,input6,input7,input8;
+
+	 int reg=MODBUS_LCD_ROTATE_ENABLE; 
+	 int m_display_number=product_register_value[reg];
+
 	 
-	} 
+	GetDlgItem(IDC_LINE_1)->SetWindowText(GetTextReg(MODBUS_LINE1_CHAR1));
+	 
+	//UpdateData(FALSE);
+	
+	GetDlgItem(IDC_LINE_2)->SetWindowText(GetTextReg(MODBUS_LINE2_CHAR1)); 
+ 
+	//UpdateData(FALSE);
+	input1=GetTextReg(MODBUS_AI1_CHAR1);
+	GetDlgItem(IDC_INPUT_1)->SetWindowText(input1);
+	 
+	//UpdateData(FALSE);
+	input2=GetTextReg(MODBUS_AI2_CHAR1);
+	GetDlgItem(IDC_INPUT_2)->SetWindowText(input2);
+	 
+	//UpdateData(FALSE);
+	input3=GetTextReg(MODBUS_AI3_CHAR1);
+	GetDlgItem(IDC_INPUT_3)->SetWindowText(input3);
+	 
+	//UpdateData(FALSE);
+	input4=GetTextReg(MODBUS_AI4_CHAR1);
+	GetDlgItem(IDC_INPUT_4)->SetWindowText(input4);
+	 
+	//UpdateData(FALSE);
+	input5=GetTextReg(MODBUS_AI5_CHAR1);
+	GetDlgItem(IDC_INPUT_5)->SetWindowText(input5);
+	 
+	//UpdateData(FALSE);
+	input6=GetTextReg(MODBUS_AI6_CHAR1);
+	GetDlgItem(IDC_INPUT_6)->SetWindowText(input6);
+	 input7=GetTextReg(MODBUS_AI7_CHAR1);
+	//UpdateData(FALSE);
+	GetDlgItem(IDC_INPUT_7)->SetWindowText(input7);
+	 input8=GetTextReg(MODBUS_AI8_CHAR1);
+	//UpdateData(FALSE);
+	GetDlgItem(IDC_INPUT_8)->SetWindowText(input8);
+	CString temp;
+	temp.Format(_T("%d"),product_register_value[MODBUS_LCD_ROTATE_ENABLE]);
+	GetDlgItem(IDC_INPUT_9)->SetWindowText(temp);
+	Fresh_Grid();
+	temp.Format(_T("%d"),get_serialnumber());
+
+	_ConnectionPtr m_pCon;
+	_RecordsetPtr m_pRs;
+	::CoInitialize(NULL);
+	m_pCon.CreateInstance("ADODB.Connection");
+	m_pRs.CreateInstance(_T("ADODB.Recordset"));
+	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	try
+	{
+		CString strSql;BOOL is_exist=FALSE;	  CString str_temp;
+		 
+	 
+			CString SerialNo,Input1,Input2,Input3,Input4,Input5,Input6,Input7,Input8;
+			SerialNo=temp;
+			 
+			Input1=input1;
+			Input2=input2;
+			Input3=input3;
+			Input4=input4;
+			Input5=input5;
+			Input6=input6;
+			Input7=input7;
+			Input8=input8;
+
+			strSql.Format(_T("update IONAME set INPUT1='%s',INPUT2='%s',INPUT3='%s',INPUT4='%s',INPUT5='%s',INPUT6='%s',INPUT7='%s',INPUT8='%s' where SERIAL_ID='%s'"),Input1,Input2,Input3,Input4,Input5,Input6,Input7,Input8,SerialNo);
+			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+			 
+			g_strInName1=Input1;
+			g_strInName2=Input2;
+			g_strInName3=Input3;
+			g_strInName4=Input4;
+			g_strInName5=Input5;
+			g_strInName6=Input6;
+			g_strInName7=Input7;
+			g_strInName8=Input8;
+
+		 
+	}
+	catch(_com_error e)
+	{
+		/* AfxMessageBox(e.Description());*/
+		//MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
+
+
+		m_pCon->Close();
+		return ;
+	}
+	m_pCon->Close(); 
+  
     }
 	//Write Line1,Line2
 void CDisplayConfig::OnBnClickedSave2()
@@ -707,13 +521,13 @@ void CDisplayConfig::OnBnClickedSave2()
 	 } 
    else
 	   {
-        if (Write_Multi(g_tstat_id,p,Get_RegID(multi_register_value[7],_T("Line1")),16))
+        if (Write_Multi(g_tstat_id,p,MODBUS_LINE1_CHAR1,16))
         {
 		   GetDlgItem(IDC_LINE1)->SetWindowText(_T("OK"));
         } 
         else
         {
-		 GetDlgItem(IDC_LINE1)->SetWindowText(_T("Error"));
+		   GetDlgItem(IDC_LINE1)->SetWindowText(_T("Error"));
         }
         
        }
@@ -752,7 +566,7 @@ if (input.GetLength()>16)
 	} 
 else
 	{
-	if (Write_Multi(g_tstat_id,p,Get_RegID(multi_register_value[7],_T("Line1")),16))
+	if (Write_Multi(g_tstat_id,p,MODBUS_LINE1_CHAR1,16))
 		{
 		GetDlgItem(IDC_LINE2)->SetWindowText(_T("OK"));
 		} 
@@ -763,7 +577,6 @@ else
 
 	}
 }
-
 
 void CDisplayConfig::OnBnClickedSave()
 {
@@ -791,6 +604,8 @@ m_progress.SetPos(0);
  OnBnClickedSaveInput8();
  m_progress.SetPos(100);
  m_progress.ShowWindow(FALSE);
+
+
 }
 
 
@@ -802,19 +617,19 @@ input.TrimRight();
 unsigned char p[8];//input+input1
 //input
 for(int i=0;i<THE_CHAR_LENGTH;i++)
-	{
+{
 	if(i<input.GetLength())
 		p[i]=input.GetAt(i);
 	else
 		p[i]=' ';
-	}
+}
 if (input.GetLength()>8)
 	{
 	GetDlgItem(IDC_INPUT1)->SetWindowText(_T(">8 chars"));
 	} 
 else
 	{
-	if (Write_Multi(g_tstat_id,p,Get_RegID(multi_register_value[7],_T("Input1")),8))
+	if (Write_Multi(g_tstat_id,p,MODBUS_AI1_CHAR1,8))
 		{
 		GetDlgItem(IDC_INPUT1)->SetWindowText(_T("OK"));
 		} 
@@ -848,7 +663,7 @@ void CDisplayConfig::OnBnClickedSaveInput2()
 		} 
 	else
 		{
-		if (Write_Multi(g_tstat_id,p,Get_RegID(multi_register_value[7],_T("Input2")),8))
+		if (Write_Multi(g_tstat_id,p,MODBUS_AI2_CHAR1,8))
 			{
 			GetDlgItem(IDC_INPUT2)->SetWindowText(_T("OK"));
 			} 
@@ -881,7 +696,7 @@ void CDisplayConfig::OnBnClickedSaveInput3()
 		} 
 	else
 		{
-		if (Write_Multi(g_tstat_id,p,Get_RegID(multi_register_value[7],_T("Input3")),8))
+		if (Write_Multi(g_tstat_id,p,MODBUS_AI3_CHAR1,8))
 			{
 			GetDlgItem(IDC_INPUT3)->SetWindowText(_T("OK"));
 			} 
@@ -914,7 +729,7 @@ void CDisplayConfig::OnBnClickedSaveInput4()
 		} 
 	else
 		{
-		if (Write_Multi(g_tstat_id,p,Get_RegID(multi_register_value[7],_T("Input4")),8))
+		if (Write_Multi(g_tstat_id,p,MODBUS_AI4_CHAR1,8))
 			{
 			GetDlgItem(IDC_INPUT4)->SetWindowText(_T("OK"));
 			} 
@@ -947,7 +762,7 @@ void CDisplayConfig::OnBnClickedSaveInput5()
 		} 
 	else
 		{
-		if (Write_Multi(g_tstat_id,p,Get_RegID(multi_register_value[7],_T("Input5")),8))
+		if (Write_Multi(g_tstat_id,p,MODBUS_AI5_CHAR1,8))
 			{
 			GetDlgItem(IDC_INPUT5)->SetWindowText(_T("OK"));
 			} 
@@ -980,7 +795,7 @@ void CDisplayConfig::OnBnClickedSaveInput6()
 		} 
 	else
 		{
-		if (Write_Multi(g_tstat_id,p,Get_RegID(multi_register_value[7],_T("Input6")),8))
+		if (Write_Multi(g_tstat_id,p,MODBUS_AI6_CHAR1,8))
 			{
 			GetDlgItem(IDC_INPUT6)->SetWindowText(_T("OK"));
 			} 
@@ -1013,7 +828,7 @@ void CDisplayConfig::OnBnClickedSaveInput7()
 		} 
 	else
 		{
-		if (Write_Multi(g_tstat_id,p,Get_RegID(multi_register_value[7],_T("Input7")),8))
+		if (Write_Multi(g_tstat_id,p,MODBUS_AI7_CHAR1,8))
 			{
 			GetDlgItem(IDC_INPUT7)->SetWindowText(_T("OK"));
 			} 
@@ -1046,7 +861,7 @@ void CDisplayConfig::OnBnClickedSaveInput8()
 		} 
 	else
 		{
-		if (Write_Multi(g_tstat_id,p,Get_RegID(multi_register_value[7],_T("Input8")),8))
+		if (Write_Multi(g_tstat_id,p,MODBUS_AI8_CHAR1,8))
 			{
 			GetDlgItem(IDC_INPUT8)->SetWindowText(_T("OK"));
 			} 
@@ -1056,12 +871,32 @@ void CDisplayConfig::OnBnClickedSaveInput8()
 			}
 
 		}
+
 	}
 
 
 void CDisplayConfig::OnBnClickedFreshTable()
 	{
 	// TODO: Add your control notification handler code here
+	    m_progress.ShowWindow(TRUE);
+		m_progress.SetRange(0,10);
+		register_critical_section.Lock();
+		for(int i=0;i<10;i++) //Modify by Fance , tstat 6 has more register than 512;
+		{
+			if(g_tstat_id_changed)
+			{
+				continue;
+			}
+			if(g_bPauseMultiRead)
+			{
+				continue;
+			}
+			Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);	
+			m_progress.SetPos(i);
+		}
+		register_critical_section.Unlock();
+		m_progress.ShowWindow(FALSE);
+		memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
 	Fresh_Grid();
 	}
 

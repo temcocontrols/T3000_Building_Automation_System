@@ -322,7 +322,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
     MODBUS_ANALOG6_FUNCTION                               =  _P("MODBUS_ANALOG6_FUNCTION");                 
     MODBUS_ANALOG7_FUNCTION                               =  _P("MODBUS_ANALOG7_FUNCTION");                 
     MODBUS_ANALOG8_FUNCTION                               =  _P("MODBUS_ANALOG8_FUNCTION");                 
-/*    MODBUS_TABLE1_ZERO                                    =  _P("MODBUS_TABLE1_ZERO");                      
+    MODBUS_TABLE1_ZERO                                    =  _P("MODBUS_TABLE1_ZERO");                      
     MODBUS_TABLE1_HALFONE                                 =  _P("MODBUS_TABLE1_HALFONE");                   
     MODBUS_TABLE1_ONE                                     =  _P("MODBUS_TABLE1_ONE");                       
     MODBUS_TABLE1_HALFTWO                                 =  _P("MODBUS_TABLE1_HALFTWO");                   
@@ -343,7 +343,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
     MODBUS_TABLE2_HALFFOUR                                =  _P("MODBUS_TABLE2_HALFFOUR");                  
     MODBUS_TABLE2_FOUR                                    =  _P("MODBUS_TABLE2_FOUR");                      
     MODBUS_TABLE2_HALFFIVE                                =  _P("MODBUS_TABLE2_HALFFIVE");                  
-    MODBUS_TABLE2_FIVE                                    =  _P("MODBUS_TABLE2_FIVE");  */                    
+    MODBUS_TABLE2_FIVE                                    =  _P("MODBUS_TABLE2_FIVE");                     
     MODUBS_HUMIDITY_RH                                    =  _P("MODUBS_HUMIDITY_RH");                      
     MODBUS_HUMIDITY_FREQUENCY                             =  _P("MODBUS_HUMIDITY_FREQUENCY");               
     MODBUS_HUM_PIC_UPDATE                                 =  _P("MODBUS_HUM_PIC_UPDATE");                   

@@ -66,6 +66,7 @@
 
 // CBuildTable1 ¶Ô»°¿ò
     // Address 219
+	/*
 #define MODBUS_TABLE1_ZERO  219
 #define	MODBUS_TABLE1_ZERO_HI  220              // 1     254    the range from reg 20 to reg 41.A changable look up table for "custom" sensor 
 #define	MODBUS_TABLE1_HALFONE  221   
@@ -110,7 +111,7 @@
 #define	MODBUS_TABLE2_HALFFIVE     332
 #define	MODBUS_TABLE2_HALFFIVE_HI  333
 #define	MODBUS_TABLE2_FIVE         334
-#define	MODBUS_TABLE2_FIVE_HI      335
+#define	MODBUS_TABLE2_FIVE_HI      335*/
 //
 //
 //

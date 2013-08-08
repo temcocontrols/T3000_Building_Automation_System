@@ -1301,134 +1301,134 @@ void lookup_table_write(wofstream & out)
 	_Twrite_to_file_a_line(out,str);
 	_Twrite_to_file_a_line(out,_T("//   LOOKUP TABLE END"));
 	}
-	if(version>=CUSTOM_TABLE_FLOAT_VERSION)
-	{
-		{
-		short slider1_low=product_register_value[MODBUS_TABLE1_ZERO];
-		short slider1_high=product_register_value[MODBUS_TABLE1_ZERO_HI];
-		int m_slider1_i=slider1_high*65536+slider1_low;
-		short slider2_low=product_register_value[MODBUS_TABLE1_HALFONE];
-		short slider2_high=product_register_value[MODBUS_TABLE1_HALFONE_HI];
-		int m_slider2_i=(slider2_high*65536+slider2_low);
-		short slider3_low=product_register_value[MODBUS_TABLE1_ONE];
-		short slider3_high=product_register_value[MODBUS_TABLE1_ONE_HI];
-		int m_slider3_i=(slider3_high*65536+slider3_low);	
-		short slider4_low=product_register_value[MODBUS_TABLE1_HALFTWO];
-		short slider4_high=product_register_value[MODBUS_TABLE1_HALFTWO_HI];
-		int m_slider4_i=(slider4_high*65536+slider4_low);
-		short slider5_low=product_register_value[MODBUS_TABLE1_TWO];
-		short slider5_high=product_register_value[MODBUS_TABLE1_TWO_HI];
-		int m_slider5_i=(slider5_high*65536+slider5_low);
-		short slider6_low=product_register_value[MODBUS_TABLE1_HALFTHREE];
-		short slider6_high=product_register_value[MODBUS_TABLE1_HALFTHREE_HI];
-		int m_slider6_i=(slider6_high*65536+slider6_low);
-		short slider7_low=product_register_value[MODBUS_TABLE1_THREE];
-		short slider7_high=product_register_value[MODBUS_TABLE1_THREE_HI];
-		int m_slider7_i=(slider7_high*65536+slider7_low);
-		short slider8_low=product_register_value[MODBUS_TABLE1_HALFFOUR];
-		short slider8_high=product_register_value[MODBUS_TABLE1_HALFFOUR_HI];
-		int m_slider8_i=(slider8_high*65536+slider8_low);
-		short slider9_low=product_register_value[MODBUS_TABLE1_FOUR];
-		short slider9_high=product_register_value[MODBUS_TABLE1_FOUR_HI];
-		int m_slider9_i=(slider9_high*65536+slider9_low);
-		short slider10_low=product_register_value[MODBUS_TABLE1_HALFFIVE];
-		short slider10_high=product_register_value[MODBUS_TABLE1_HALFFIVE_HI];
-		int m_slider10_i=(slider10_high*65536+slider10_low);
-		short slider11_low=multi_register_value[MODBUS_TABLE1_FIVE];
-		short slider11_high=multi_register_value[MODBUS_TABLE1_FIVE_HI];
-		int m_slider11_i=(slider11_high*65536+slider11_low);
-	_Twrite_to_file_a_line(out,_T("//   LOOKUP TABLE"));
-	_Twrite_to_file_a_line(out,_T("//			0.0V	0.5V	1.0V	1.5V	2.0V	2.5V	3.0V	3.5V	4.0V	4.5V	5.0V"));
-		CString str;
-		str.Format(_T("Lookup Table 1:	\t%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d"),
-		m_slider1_i,m_slider2_i,m_slider3_i,m_slider4_i,m_slider5_i,m_slider6_i,
-		m_slider7_i,m_slider8_i,m_slider9_i,m_slider10_i,m_slider11_i);
-		_Twrite_to_file_a_line(out,str);
-		}
-		{
-		short slider1_low=product_register_value[MODBUS_TABLE2_ZERO];
-		short slider1_high=product_register_value[MODBUS_TABLE2_ZERO_HI];
-		int m_slider1_i=slider1_high*65536+slider1_low;
-
-		short slider2_low=product_register_value[MODBUS_TABLE2_HALFONE];
-		short slider2_high=product_register_value[MODBUS_TABLE2_HALFONE_HI];
-		int m_slider2_i=(slider2_high*65536+slider2_low);
-
-		short slider3_low=product_register_value[MODBUS_TABLE2_ONE];
-		short slider3_high=product_register_value[MODBUS_TABLE2_ONE_HI];
-		int m_slider3_i=(slider3_high*65536+slider3_low);
-
-		short slider4_low=product_register_value[MODBUS_TABLE2_HALFTWO];
-		short slider4_high=product_register_value[MODBUS_TABLE2_HALFTWO_HI];
-		int m_slider4_i=(slider4_high*65536+slider4_low);
-
-		short slider5_low=product_register_value[MODBUS_TABLE2_TWO];
-		short slider5_high=product_register_value[MODBUS_TABLE2_TWO_HI];
-		int m_slider5_i=(slider5_high*65536+slider5_low);
-
-		short slider6_low=product_register_value[MODBUS_TABLE2_HALFTHREE];
-		short slider6_high=product_register_value[MODBUS_TABLE2_HALFTHREE_HI];
-		int m_slider6_i=(slider6_high*65536+slider6_low);
-
-		short slider7_low=product_register_value[MODBUS_TABLE2_THREE];
-		short slider7_high=product_register_value[MODBUS_TABLE2_THREE_HI];
-		int m_slider7_i=(slider7_high*65536+slider7_low);
-
-		short slider8_low=product_register_value[MODBUS_TABLE2_HALFFOUR];
-		short slider8_high=product_register_value[MODBUS_TABLE2_HALFFOUR_HI];
-		int m_slider8_i=(slider8_high*65536+slider8_low);
-
-		short slider9_low=product_register_value[MODBUS_TABLE2_FOUR];
-		short slider9_high=product_register_value[MODBUS_TABLE2_FOUR_HI];
-		int m_slider9_i=(slider9_high*65536+slider9_low);
-
-		short slider10_low=product_register_value[MODBUS_TABLE2_HALFFIVE];
-		short slider10_high=product_register_value[MODBUS_TABLE2_HALFFIVE_HI];
-		int m_slider10_i=(slider10_high*65536+slider10_low);
-
-		short slider11_low=product_register_value[MODBUS_TABLE2_FIVE];
-		short slider11_high=product_register_value[MODBUS_TABLE2_FIVE_HI];
-		int m_slider11_i=(slider11_high*65536+slider11_low);
-		CString str;
-		str.Format(_T("Lookup Table 2:	\t%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d"),
-		m_slider1_i,m_slider2_i,m_slider3_i,m_slider4_i,m_slider5_i,m_slider6_i,
-		m_slider7_i,m_slider8_i,m_slider9_i,m_slider10_i,m_slider11_i);
-		_Twrite_to_file_a_line(out,str);
-		_Twrite_to_file_a_line(out,_T("//   LOOKUP TABLE END"));
-		}
-//
-	/*
-	int Array[23];
-	CString str,str1;
-	for(int i = 0 ;i <22;i++)
-		Array[i] = read_one(tstat_id,219+i);
-	write_to_file_a_line(out,"//   LOOKUP TABLE");
-	write_to_file_a_line(out,"//			0.0V	0.5V	1.0V	1.5V	2.0V	2.5V	3.0V	3.5V	4.0V	4.5V	5.0V");
-	str.Format("Lookup Table 1:	\t%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d",
-		Array[0],Array[1],Array[2],Array[3],Array[4],Array[5],
-		Array[6],Array[7],Array[8],Array[9],Array[10]);
-	write_to_file_a_line(out,LPCSTR(str));
-	str.Format("Lookup Table 2:	\t%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d",
-		Array[11],Array[12],Array[13],Array[14],Array[15],Array[16],
-		Array[17],Array[18],Array[19],Array[20],Array[21]);
-	write_to_file_a_line(out,LPCSTR(str));
-	write_to_file_a_line(out,"//   LOOKUP TABLE END");
-	*/
-	}
+// 	if(version>=CUSTOM_TABLE_FLOAT_VERSION)
+// 	{
+// 		{
+// 		short slider1_low=product_register_value[MODBUS_TABLE1_ZERO];
+// 		short slider1_high=product_register_value[MODBUS_TABLE1_ZERO_HI];
+// 		int m_slider1_i=slider1_high*65536+slider1_low;
+// 		short slider2_low=product_register_value[MODBUS_TABLE1_HALFONE];
+// 		short slider2_high=product_register_value[MODBUS_TABLE1_HALFONE_HI];
+// 		int m_slider2_i=(slider2_high*65536+slider2_low);
+// 		short slider3_low=product_register_value[MODBUS_TABLE1_ONE];
+// 		short slider3_high=product_register_value[MODBUS_TABLE1_ONE_HI];
+// 		int m_slider3_i=(slider3_high*65536+slider3_low);	
+// 		short slider4_low=product_register_value[MODBUS_TABLE1_HALFTWO];
+// 		short slider4_high=product_register_value[MODBUS_TABLE1_HALFTWO_HI];
+// 		int m_slider4_i=(slider4_high*65536+slider4_low);
+// 		short slider5_low=product_register_value[MODBUS_TABLE1_TWO];
+// 		short slider5_high=product_register_value[MODBUS_TABLE1_TWO_HI];
+// 		int m_slider5_i=(slider5_high*65536+slider5_low);
+// 		short slider6_low=product_register_value[MODBUS_TABLE1_HALFTHREE];
+// 		short slider6_high=product_register_value[MODBUS_TABLE1_HALFTHREE_HI];
+// 		int m_slider6_i=(slider6_high*65536+slider6_low);
+// 		short slider7_low=product_register_value[MODBUS_TABLE1_THREE];
+// 		short slider7_high=product_register_value[MODBUS_TABLE1_THREE_HI];
+// 		int m_slider7_i=(slider7_high*65536+slider7_low);
+// 		short slider8_low=product_register_value[MODBUS_TABLE1_HALFFOUR];
+// 		short slider8_high=product_register_value[MODBUS_TABLE1_HALFFOUR_HI];
+// 		int m_slider8_i=(slider8_high*65536+slider8_low);
+// 		short slider9_low=product_register_value[MODBUS_TABLE1_FOUR];
+// 		short slider9_high=product_register_value[MODBUS_TABLE1_FOUR_HI];
+// 		int m_slider9_i=(slider9_high*65536+slider9_low);
+// 		short slider10_low=product_register_value[MODBUS_TABLE1_HALFFIVE];
+// 		short slider10_high=product_register_value[MODBUS_TABLE1_HALFFIVE_HI];
+// 		int m_slider10_i=(slider10_high*65536+slider10_low);
+// 		short slider11_low=multi_register_value[MODBUS_TABLE1_FIVE];
+// 		short slider11_high=multi_register_value[MODBUS_TABLE1_FIVE_HI];
+// 		int m_slider11_i=(slider11_high*65536+slider11_low);
+// 	_Twrite_to_file_a_line(out,_T("//   LOOKUP TABLE"));
+// 	_Twrite_to_file_a_line(out,_T("//			0.0V	0.5V	1.0V	1.5V	2.0V	2.5V	3.0V	3.5V	4.0V	4.5V	5.0V"));
+// 		CString str;
+// 		str.Format(_T("Lookup Table 1:	\t%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d"),
+// 		m_slider1_i,m_slider2_i,m_slider3_i,m_slider4_i,m_slider5_i,m_slider6_i,
+// 		m_slider7_i,m_slider8_i,m_slider9_i,m_slider10_i,m_slider11_i);
+// 		_Twrite_to_file_a_line(out,str);
+// 		}
+// 		{
+// 		short slider1_low=product_register_value[MODBUS_TABLE2_ZERO];
+// 		short slider1_high=product_register_value[MODBUS_TABLE2_ZERO_HI];
+// 		int m_slider1_i=slider1_high*65536+slider1_low;
+// 
+// 		short slider2_low=product_register_value[MODBUS_TABLE2_HALFONE];
+// 		short slider2_high=product_register_value[MODBUS_TABLE2_HALFONE_HI];
+// 		int m_slider2_i=(slider2_high*65536+slider2_low);
+// 
+// 		short slider3_low=product_register_value[MODBUS_TABLE2_ONE];
+// 		short slider3_high=product_register_value[MODBUS_TABLE2_ONE_HI];
+// 		int m_slider3_i=(slider3_high*65536+slider3_low);
+// 
+// 		short slider4_low=product_register_value[MODBUS_TABLE2_HALFTWO];
+// 		short slider4_high=product_register_value[MODBUS_TABLE2_HALFTWO_HI];
+// 		int m_slider4_i=(slider4_high*65536+slider4_low);
+// 
+// 		short slider5_low=product_register_value[MODBUS_TABLE2_TWO];
+// 		short slider5_high=product_register_value[MODBUS_TABLE2_TWO_HI];
+// 		int m_slider5_i=(slider5_high*65536+slider5_low);
+// 
+// 		short slider6_low=product_register_value[MODBUS_TABLE2_HALFTHREE];
+// 		short slider6_high=product_register_value[MODBUS_TABLE2_HALFTHREE_HI];
+// 		int m_slider6_i=(slider6_high*65536+slider6_low);
+// 
+// 		short slider7_low=product_register_value[MODBUS_TABLE2_THREE];
+// 		short slider7_high=product_register_value[MODBUS_TABLE2_THREE_HI];
+// 		int m_slider7_i=(slider7_high*65536+slider7_low);
+// 
+// 		short slider8_low=product_register_value[MODBUS_TABLE2_HALFFOUR];
+// 		short slider8_high=product_register_value[MODBUS_TABLE2_HALFFOUR_HI];
+// 		int m_slider8_i=(slider8_high*65536+slider8_low);
+// 
+// 		short slider9_low=product_register_value[MODBUS_TABLE2_FOUR];
+// 		short slider9_high=product_register_value[MODBUS_TABLE2_FOUR_HI];
+// 		int m_slider9_i=(slider9_high*65536+slider9_low);
+// 
+// 		short slider10_low=product_register_value[MODBUS_TABLE2_HALFFIVE];
+// 		short slider10_high=product_register_value[MODBUS_TABLE2_HALFFIVE_HI];
+// 		int m_slider10_i=(slider10_high*65536+slider10_low);
+// 
+// 		short slider11_low=product_register_value[MODBUS_TABLE2_FIVE];
+// 		short slider11_high=product_register_value[MODBUS_TABLE2_FIVE_HI];
+// 		int m_slider11_i=(slider11_high*65536+slider11_low);
+// 		CString str;
+// 		str.Format(_T("Lookup Table 2:	\t%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d"),
+// 		m_slider1_i,m_slider2_i,m_slider3_i,m_slider4_i,m_slider5_i,m_slider6_i,
+// 		m_slider7_i,m_slider8_i,m_slider9_i,m_slider10_i,m_slider11_i);
+// 		_Twrite_to_file_a_line(out,str);
+// 		_Twrite_to_file_a_line(out,_T("//   LOOKUP TABLE END"));
+// 		}
+// //
+// 	/*
+// 	int Array[23];
+// 	CString str,str1;
+// 	for(int i = 0 ;i <22;i++)
+// 		Array[i] = read_one(tstat_id,219+i);
+// 	write_to_file_a_line(out,"//   LOOKUP TABLE");
+// 	write_to_file_a_line(out,"//			0.0V	0.5V	1.0V	1.5V	2.0V	2.5V	3.0V	3.5V	4.0V	4.5V	5.0V");
+// 	str.Format("Lookup Table 1:	\t%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d",
+// 		Array[0],Array[1],Array[2],Array[3],Array[4],Array[5],
+// 		Array[6],Array[7],Array[8],Array[9],Array[10]);
+// 	write_to_file_a_line(out,LPCSTR(str));
+// 	str.Format("Lookup Table 2:	\t%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d",
+// 		Array[11],Array[12],Array[13],Array[14],Array[15],Array[16],
+// 		Array[17],Array[18],Array[19],Array[20],Array[21]);
+// 	write_to_file_a_line(out,LPCSTR(str));
+// 	write_to_file_a_line(out,"//   LOOKUP TABLE END");
+// 	*/
+// 	}
 		 
 		 
 	 
 }
 void lookup_table_write_Tstat67(wofstream & out)
 {
-	/*float version=get_tstat_version(g_tstat_id);
+	float version=get_tstat_version(g_tstat_id);
 	if(version<CUSTOM_TABLE_FLOAT_VERSION)
-	{*/
-	/*
+	{
+	
 	int Array[23];
 	CString str,str1;
 	for(int i = 0 ;i <22;i++)
-		Array[i] = product_register_value[175+i];
+		Array[i] = product_register_value[MODBUS_TABLE1_ZERO+i];
 	_Twrite_to_file_a_line(out,_T("//   LOOKUP TABLE"));
 	_Twrite_to_file_a_line(out,_T("//			0.0V	0.5V	1.0V	1.5V	2.0V	2.5V	3.0V	3.5V	4.0V	4.5V	5.0V"));
 	str.Format(_T("Lookup Table 1:	\t%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d%-8d"),
@@ -1439,9 +1439,9 @@ void lookup_table_write_Tstat67(wofstream & out)
 		Array[11],Array[12],Array[13],Array[14],Array[15],Array[16],
 		Array[17],Array[18],Array[19],Array[20],Array[21]);
 	_Twrite_to_file_a_line(out,str);
-	_Twrite_to_file_a_line(out,_T("//   LOOKUP TABLE END"));*/
-	/*}*/
-	 
+	_Twrite_to_file_a_line(out,_T("//   LOOKUP TABLE END"));
+
+	 }
 		 
 	/*	short slider1_low=product_register_value[MODBUS_TABLE1_ZERO_M];
 		short slider1_high=product_register_value[MODBUS_TABLE1_HALFONE_M];

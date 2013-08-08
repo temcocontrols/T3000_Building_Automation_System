@@ -336,6 +336,9 @@
     <ClCompile Include="MbPollOptions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DisplayConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -839,6 +842,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MbPollOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DisplayConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
