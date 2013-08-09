@@ -1,6 +1,8 @@
 #pragma once
 #include "../msflexgrid1.h"
 #include "../resource.h"
+#include "afxcmn.h"
+#include "afxwin.h"
 
 #define FLEXGRID_CELL_COLOR						13421772
 #define FLEXGRID_CELL_GRAY_COLOR				13421772
@@ -55,7 +57,10 @@ public:
 	CMsflexgrid m_msflexgrid_input;
 	CMsflexgrid m_msflexgrid_output;
 	virtual void OnInitialUpdate();
-
+	DECLARE_EVENTSINK_MAP()
+	void ClickInputMsflexgrid();
+	void ClickOutputMsflexgrid();
+ 
 public:
 	void Fresh();
 	void ShowDialogData();
@@ -72,6 +77,8 @@ public:
 	int comnum;//¶ÁÈ¡´®¿ÚºÅ
 	BOOL MiniUpdateData();
 	void Updatedatabase();
+	CProgressCtrl m_progress;
+	CEdit m_inNameEdt;
 };
 
 
