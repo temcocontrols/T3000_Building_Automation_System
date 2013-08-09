@@ -339,6 +339,30 @@
     <ClCompile Include="DisplayConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="T3RTDView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T3Performance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T38I13O.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T38AI8AO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T38AI16O.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T36CT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T332AI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T328IN.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -845,6 +869,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DisplayConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3RTDView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3Performance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T38I13O.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T38AI8AO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T38AI16O.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T36CT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T332AI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T328IN.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
