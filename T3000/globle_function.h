@@ -1,7 +1,11 @@
 #ifndef _GLOBLE_FUNCTION_H
 #define _GLOBLE_FUNCTION_H
 
-
+#pragma region For_Bacnet
+#include "CM5/ud_str.h"
+#include "Bacnet_Include.h"
+#include "T3000RegAddress.h"
+#pragma endregion For_Bacnet
 
 
 #include "global_variable_extern.h"
@@ -22,10 +26,11 @@ int modbus_read_multi_value(
 int read_one(unsigned char device_var,unsigned short address,int retry_times=3);
 int write_one(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
+int Write_Multi_short(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times=3);
 int write_one_org(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
-
+int Write_Multi_org_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times=3);
 int turn_hex_str_to_ten_num(char *str);
 bool turn_hex_file_line_to_unsigned_char(char *str);
 int turn_hex_char_to_int(char c);
@@ -50,10 +55,10 @@ CString get_product_name_by_product_model(int product_model);
 CString GetTempUnit(int nRange=-1,int nPIDNO = 0);
 CString get_product_class_name_by_model_ID(int nModelID);
 
-extern int Read_One(unsigned char device_var,unsigned short address);
-extern int Write_One(unsigned char device_var, unsigned short address, unsigned short val);
-extern int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
-extern int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
+extern int Read_One_t(unsigned char device_var,unsigned short address, int slot);
+extern int Write_One_t(unsigned char device_var, unsigned short address, unsigned short val, int slot);
+extern int read_multi_t(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length, int slot);
+extern int write_multi_t(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length, int slot);
 
 
 BOOL GetSerialComPortNumber1(vector<CString>& szComm);
@@ -73,7 +78,18 @@ BOOL Post_Read_one_Thread_Message(
 	unsigned short address,
 	HWND Dlg_hwnd);
 
+BOOL Post_Invoke_ID_Monitor_Thread(UINT MsgType,
+	int Invoke_ID,
+	HWND hwnd
+	);
 
+int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize);
+int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize );
 
-
+int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
+void local_handler_conf_private_trans_ack(
+	uint8_t * service_request,
+	uint16_t service_len,
+	BACNET_ADDRESS * src,
+	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
 #endif

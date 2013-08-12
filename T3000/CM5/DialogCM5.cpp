@@ -5,8 +5,30 @@
 #include "../T3000.h"
 #include "DialogCM5.h"
 #include <cmath>
+#define  WM_ENABLE_REFRESHBUTTON WM_USER+200
 
+const int REFRESH_GRID=1;
+const int ENABLE_REFRESH_BUTTON=2;
 
+UINT _ReadMulti_CM5Registers(LPVOID pParam){
+	CDialogCM5 *pParent = (CDialogCM5 *)pParam;
+	int i;
+	register_critical_section.Lock();
+	pParent->b_is_fresh = true;
+	for(i=0;i<80;i++)
+	{	
+		Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100);	
+	}
+	register_critical_section.Unlock();
+	pParent->ShowDialogData();
+	//memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
+	pParent->PostMessage(WM_ENABLE_REFRESHBUTTON,ENABLE_REFRESH_BUTTON,0);
+	 
+	//pParent->Fresh_Grid();
+	pParent->CM5_OutputThread=NULL;
+	pParent->b_is_fresh = false;
+	return 0;
+}
 //#ifndef _CM5DB
 #define  THE_CHAR_LENGTH 8
 int timer = 3;
@@ -44,7 +66,8 @@ CDialogCM5::CDialogCM5()
 	, m_Interval(0)
 	, m_dts1(0)
 {
-
+b_is_fresh=FALSE;
+CM5_OutputThread=NULL;
 }
 
 CDialogCM5::~CDialogCM5()
@@ -84,7 +107,7 @@ void CDialogCM5::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT8, m_nListenPort);
 	DDX_Control(pDX, IDC_MAC_ADDRESS, m_Mac_Address);
 	DDX_Control(pDX, IDC_CHECK_DEMO, m_checkdemo);
-	DDX_Control(pDX, IDC_COMBO_ENABLE_INOUTPUT, m_combox_enable);
+	DDX_Control(pDX, IDC_COMBO_TYPE_INOUTPUT, m_combox_enable);
 	DDX_Text(pDX, IDC_NUM, m_Display_Num);
 	DDV_MinMaxInt(pDX, m_Display_Num, 0, 10);
 	DDX_Text(pDX, IDC_INTERVAL, m_Interval);
@@ -108,6 +131,7 @@ BEGIN_MESSAGE_MAP(CDialogCM5, CFormView)
 	ON_BN_CLICKED(IDC_BUTTON1, &CDialogCM5::OnBnClickedButtonSyncwithpc)
 	ON_BN_CLICKED(IDC_SAVE_CONFIG, &CDialogCM5::OnBnClickedButtonSaveConfig)
 	ON_BN_CLICKED(IDC_BUTTON2, &CDialogCM5::OnBnClickedButtonweeklyschedule)
+	ON_BN_CLICKED(IDC_REFRESH_ALL, &CDialogCM5::OnBnClickedButtonRefreshAll)
 	ON_BN_CLICKED(IDC_BUTTON3, &CDialogCM5::OnBnClickedButtonannualschedule)
 	ON_BN_CLICKED(IDC_BUTTON4, &CDialogCM5::OnBnClickedButtonidschedule)
 	ON_BN_CLICKED(IDC_BUTTON5, &CDialogCM5::OnBnClickedButtoninputtype)
@@ -132,6 +156,9 @@ BEGIN_MESSAGE_MAP(CDialogCM5, CFormView)
 	ON_WM_TIMER()
 
 	ON_CBN_SELCHANGE(IDC_COMBO_INPUTOUTPUT, &CDialogCM5::OnCbnSelchangeCombx)
+	ON_CBN_SELCHANGE(IDC_COMBO_TYPE_INOUTPUT, &CDialogCM5::OnCbnSelchangeType)
+
+	ON_MESSAGE(WM_ENABLE_REFRESHBUTTON, &CDialogCM5::DealWithMessage)
 END_MESSAGE_MAP()
 
 
@@ -160,7 +187,20 @@ void CDialogCM5::OnClose()
 	//CDialog::OnClose();
 
 }
+LRESULT  CDialogCM5::DealWithMessage(WPARAM wParam,LPARAM lParam)
+{
+	int command = wParam;
+	switch(command)
+	{
+	case ENABLE_REFRESH_BUTTON:
+		GetDlgItem(IDC_REFRESH_ALL)->EnableWindow(TRUE);
+		break;
+	default:
+		break;
+	}
 
+	return 0;
+}
 void CDialogCM5::Fresh()
 {
 
@@ -170,6 +210,7 @@ Date:2013/04/10
 Purpose:
 重写 if 0 掉
 */
+SetTimer(DATATIME_TIMER,1000,NULL);
 
  
 	if(!g_bPauseMultiRead)
@@ -210,7 +251,60 @@ else
    m_DIGrid.put_TextMatrix(lRow,lCol,strTemp);
 EndWaitCursor();
 }
+void CDialogCM5::OnCbnSelchangeType(){
+	BeginWaitCursor();
+	CString strTemp;
+	int lRow = m_subtstatgrid.get_RowSel();	
+	int lCol = m_subtstatgrid.get_ColSel();
+	//if ((strText.GetLength()<=0)||strText.CompareNoCase(m_tempGridString)==0)
+	//{
+	//	return;
+	//}
+	int sel=m_combox_enable.GetCurSel();
+	m_combox_enable.ShowWindow(FALSE);
+	int ret=write_one(g_tstat_id,173+lRow,sel);
+	if (ret>0)
+	{
+		if (sel==0)
+		{
+		   strTemp=_T("UNUSED");
+		}
+		else if (sel==1)
+		{
+		   strTemp=_T("Normal");
+		}
+		else
+		{
 
+		strTemp=_T("Switch");
+		}
+		multi_register_value_tcp[173+lRow]=sel;
+		//m_DIGrid.put_TextMatrix(i,4,strTemp);
+	} 
+	else
+	{
+		 
+		//m_DIGrid.put_TextMatrix(i,4,strTemp);
+		if (multi_register_value_tcp[173+lRow]==0)
+		{
+			strTemp=_T("UNUSED");
+		}
+		else if (multi_register_value_tcp[173+lRow]==1)
+		{
+			strTemp=_T("Normal");
+		}
+		else
+		{
+
+			strTemp=_T("Switch");
+		}
+	}
+	m_subtstatgrid.put_TextMatrix(lRow,lCol,strTemp);
+
+
+	ShowDialogData();
+	EndWaitCursor();
+}
 void CDialogCM5::OnBnClickedButtonSyncwithpc()
 {
 	// 		200	1	second
@@ -249,19 +343,19 @@ void CDialogCM5::OnBnClickedButtonSyncwithpc()
 	minute = _ttoi(tempminute);
 
 	int yearh,yearl;
-	yearl = year&0x00FF;
+	yearl = year%100;
 	int tempy = year&0xFF00;
 	tempy = tempy>>16;
 	yearh = tempy;
 
-	write_one(g_tstat_id,207,yearh);
-	write_one(g_tstat_id,206,yearl);
-	write_one(g_tstat_id,205,month);
-	write_one(g_tstat_id,203,day);
+	//write_one(g_tstat_id,201,20);
+	write_one(g_tstat_id,201,yearl);
+	write_one(g_tstat_id,202,month);
+	write_one(g_tstat_id,204,day);
 
-	write_one(g_tstat_id,202,time);
-	write_one(g_tstat_id,201,minute);
-
+	write_one(g_tstat_id,205,time);
+	write_one(g_tstat_id,206,minute);
+	 
 	SetTimer(DATATIME_TIMER,1000,NULL);
 }
 
@@ -280,7 +374,12 @@ void CDialogCM5::OnBnClickedButtonweeklyschedule()
 
 
 }
+void CDialogCM5::OnBnClickedButtonRefreshAll(){
+	GetDlgItem(IDC_REFRESH_ALL)->EnableWindow(FALSE);
 
+	if(CM5_OutputThread==NULL)
+		CM5_OutputThread =AfxBeginThread(_ReadMulti_CM5Registers,this);
+}
 void CDialogCM5::OnBnClickedButtonannualschedule()
 {
 	KillTimer(DATATIME_TIMER);
@@ -320,7 +419,7 @@ void CDialogCM5::OnBnClickedButtonCheckDemo()
    }
    else
    {
-    write_one(g_tstat_id,31,0);
+     write_one(g_tstat_id,31,0);
    }
 }
 int  CDialogCM5::Get_RegID(int lRow)
@@ -1108,11 +1207,21 @@ void CDialogCM5::OnTimer(UINT_PTR nIDEvent)
 
 	if (DATATIME_TIMER == nIDEvent)
 	{
-		CTime now;
-		now = CTime::GetCurrentTime();
-		m_static_datetime = now.Format(_T("%A,%B %d,%Y  %H:%M:%S"));		//?"Saturday, April 12, 2012"		
+		//CTime now;
+		//now = CTime::GetCurrentTime();
+		//m_static_datetime = now.Format(_T("%A,%B %d,%Y  %H:%M:%S"));		//?"Saturday, April 12, 2012"		
+		CTime time = CTime::GetCurrentTime();
 
-		UpdateData(FALSE);
+		CString strtime = time.Format(_T("%I:%M:%S %p"));
+		//CString strtime = time.Format(_T("%m/%d/%Y %H:%M:%S %a"));
+		CEdit* pEdit = (CEdit*)GetDlgItem(IDC_EDIT_TIME);
+		pEdit->SetWindowText(strtime);
+
+		CString strDate = time.Format(_T("%A, %b %d, %Y"));
+		pEdit = (CEdit*)GetDlgItem(IDC_EDIT_DATE);
+		pEdit->SetWindowText(strDate);
+		 /* read_one(g_tstat_id,104);*/
+		//UpdateData(FALSE);
  
 //			if (nCount1% timer == 0)
 //			{
@@ -1383,481 +1492,83 @@ void CDialogCM5::OnInitialUpdate()
 
 BOOL CDialogCM5::PreTranslateMessage(MSG* pMsg)
 {
-/*
  
-	if(pMsg->wParam == VK_RETURN )			 
-	{ 
-		
-
-		//	GetDlgItem(IDC_SERIALSTATIC)->SetFocus();
-		num++;	  //Enter按下弹起都会进入此。
-		if (num == 2)
-		{
-			num =0;
-			return true;
-		}
-		if (m_switch == 1)
-		{
-			KillTimer(DATATIME_TIMER);
-			int lRow = m_msflexgrid_input.get_RowSel();//获取点击的行号
-			int lCol = m_msflexgrid_input.get_ColSel(); //获取点击的列号
-			if (lCol == 3)
-			{
-				m_combobox2_input.ShowWindow(SW_SHOW);
-
-
-				long lRow = m_msflexgrid_input.get_RowSel();//获取点击的行号	
-				long lCol = m_msflexgrid_input.get_ColSel(); //获取点击的列号		
-				CRect rect;	
-				m_msflexgrid_input.GetWindowRect(rect); //获取表格控件的窗口矩形
-				ScreenToClient(rect); //转换为客户区矩形
-				// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-				//需要将其转化为像素，1440缇= 1英寸
-				CDC* pDC =GetDC();
-				//计算象素点和缇的转换比例
-				int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
-				int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-				//计算选中格的左上角的坐标(象素为单位)
-				long y = m_msflexgrid_input.get_RowPos(lRow)/nTwipsPerDotY;
-				long x = m_msflexgrid_input.get_ColPos(lCol)/nTwipsPerDotX;
-				//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
-				long width = m_msflexgrid_input.get_ColWidth(lCol)/nTwipsPerDotX+1;
-				long height = m_msflexgrid_input.get_RowHeight(lRow)/nTwipsPerDotY+1;
-				//形成选中个所在的矩形区域
-				CRect rc(x,y,x+width,y+height);
-				//转换成相对对话框的坐标	
-				rc.OffsetRect(rect.left+1,rect.top+1);	
-				//获取选中格的文本信息	
-				//获取选中格的文本信息	
-				CString strValue = m_msflexgrid_input.get_TextMatrix(lRow,lCol);
-				m_combobox2_input.ResetContent();
-
-				m_combobox2_input.AddString(_T("Manual"));
-				m_combobox2_input.AddString(_T("Auto"));
-
-				m_combobox2_input.MoveWindow(&rc,1); //移动到选中格的位置
-				m_combobox2_input.BringWindowToTop();	
-				m_combobox2_input.SelectString(-1,strValue);
-				m_combobox2_input.ShowWindow(SW_SHOW);//显示控件
-
-
-
-				CString strTemp;
-				int nindext = m_combobox2_input.GetCurSel();//GetEditSel();	 GetCurSel
-				if (nindext<0||nindext>3)
-				{	   
-					nindext = 1;			
-				}	
-				m_combobox2_input.GetLBText(nindext,strTemp);
-
-				CString m_strmanual = _T("Manual");
-				int addr;
-				int ret = strTemp.Collate(m_strmanual);
-				if (ret == 0)
-				{
-					m_combo2_cstring = _T("Auto");
-					TRACE(_T("Auto%d"),num);
-
-				}else
-				{
-					m_combo2_cstring = _T("Manual");  
-					TRACE(_T("Manual%d"),num);
-
-
-				}	
-
-				UpdateData(FALSE);
-				if (lCol == 3)
-				{ 
-					m_msflexgrid_input.put_TextMatrix(lRow,lCol,m_combo2_cstring);
-
-				}
-			}else if (lCol == 2&lRow>10)
-			{
-				CString value_lCol = m_msflexgrid_input.get_TextMatrix(lRow,lCol+1);
-				CString m_strmanual = _T("Manual");
-				int ret = value_lCol.Collate(m_strmanual);
-				if (ret == 0)
-				{
-
-					m_combobox2_input.ShowWindow(SW_SHOW);
-
-
-					long lRow = m_msflexgrid_input.get_RowSel();//获取点击的行号	
-					long lCol = m_msflexgrid_input.get_ColSel(); //获取点击的列号		
-					CRect rect;	
-					m_msflexgrid_input.GetWindowRect(rect); //获取表格控件的窗口矩形
-					ScreenToClient(rect); //转换为客户区矩形
-					// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-					//需要将其转化为像素，1440缇= 1英寸
-					CDC* pDC =GetDC();
-					//计算象素点和缇的转换比例
-					int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
-					int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-					//计算选中格的左上角的坐标(象素为单位)
-					long y = m_msflexgrid_input.get_RowPos(lRow)/nTwipsPerDotY;
-					long x = m_msflexgrid_input.get_ColPos(lCol)/nTwipsPerDotX;
-					//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
-					long width = m_msflexgrid_input.get_ColWidth(lCol)/nTwipsPerDotX+1;
-					long height = m_msflexgrid_input.get_RowHeight(lRow)/nTwipsPerDotY+1;
-					//形成选中个所在的矩形区域
-					CRect rc(x,y,x+width,y+height);
-					//转换成相对对话框的坐标	
-					rc.OffsetRect(rect.left+1,rect.top+1);	
-					//获取选中格的文本信息	
-					//获取选中格的文本信息	
-					CString strValue = m_msflexgrid_input.get_TextMatrix(lRow,lCol);
-					m_combobox2_input.ResetContent();
-
-					m_combobox2_input.AddString(_T("On"));
-					m_combobox2_input.AddString(_T("Off"));
-
-					m_combobox2_input.MoveWindow(&rc,1); //移动到选中格的位置
-					m_combobox2_input.BringWindowToTop();	
-					m_combobox2_input.SelectString(-1,strValue);
-					m_combobox2_input.ShowWindow(SW_SHOW);//显示控件
-
-					CString strTemp;
-					int nindext = m_combobox2_input.GetCurSel();//GetEditSel();	 GetCurSel
-					if (nindext<0||nindext>3)
-					{	   
-						nindext = 1;			
-					}	
-					m_combobox2_input.GetLBText(nindext,strTemp);
-
-					CString m_strmanual = _T("On");
-					int addr;
-					int ret = strTemp.Collate(m_strmanual);
-					if (ret == 0)
-					{
-						m_combo2_cstring = _T("Off");
-					
-						TRACE(_T("Auto%d"),num);
-
-					}else
-					{
-						m_combo2_cstring = _T("On");  
-				
-						TRACE(_T("Manual%d"),num);
-
-
-					}	
-
-					UpdateData(FALSE);
-					if (lCol == 2)
-					{ 
-						m_msflexgrid_input.put_TextMatrix(lRow,lCol,m_combo2_cstring);
-					}
-				}
-
-			}else if(lCol == 1)			
-			{
-				//使用edition控件形式显示
-
-				long lRow,lCol;
-				lRow = m_msflexgrid_input.get_RowSel();
-				lCol = m_msflexgrid_input.get_ColSel(); 
-
-				CRect rect;
-				m_msflexgrid_input.GetWindowRect(rect); //
-				ScreenToClient(rect); //
-				CDC* pDC =GetDC();
-
-				int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
-				int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-
-				long y = m_msflexgrid_input.get_RowPos(lRow)/nTwipsPerDotY;
-				long x = m_msflexgrid_input.get_ColPos(lCol)/nTwipsPerDotX;
-
-				long width = m_msflexgrid_input.get_ColWidth(lCol)/nTwipsPerDotX+1;
-				long height = m_msflexgrid_input.get_RowHeight(lRow)/nTwipsPerDotY+1;
-
-				CRect rcCell(x,y,x+width,y+height);
-
-				rcCell.OffsetRect(rect.left+1,rect.top+1);
-				ReleaseDC(pDC);
-				CString strValue = m_msflexgrid_input.get_TextMatrix(lRow,lCol);
-
-				if(1==lCol)		
-				{		
-					m_edit_input.MoveWindow(&rcCell,1);
-					m_edit_input.ShowWindow(SW_SHOW);	
-					m_edit_input.SetWindowText(strValue);	
-					m_edit_input.SetFocus();
-					int nLenth=strValue.GetLength();	
-					m_edit_input.SetSel(nLenth,nLenth); 
-
-				}	
-
-			}
-			SetTimer(DATATIME_TIMER,1000,NULL);
-
-
-		}else if (m_switch == 2)
-		{
-			KillTimer(DATATIME_TIMER);
-
-			int lRow = m_msflexgridoutput.get_RowSel();//获取点击的行号
-			int lCol = m_msflexgridoutput.get_ColSel(); //获取点击的列号
-			if (lCol == 3)
-			{
-				m_msflexgridoutput.ShowWindow(SW_SHOW);
-
-				long lRow = m_msflexgridoutput.get_RowSel();//获取点击的行号	
-				long lCol = m_msflexgridoutput.get_ColSel(); //获取点击的列号		
-				CRect rect;	
-				m_msflexgridoutput.GetWindowRect(rect); //获取表格控件的窗口矩形
-				ScreenToClient(rect); //转换为客户区矩形
-				// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-				//需要将其转化为像素，1440缇= 1英寸
-				CDC* pDC =GetDC();
-				//计算象素点和缇的转换比例
-				int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
-				int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-				//计算选中格的左上角的坐标(象素为单位)
-				long y = m_msflexgridoutput.get_RowPos(lRow)/nTwipsPerDotY;
-				long x = m_msflexgridoutput.get_ColPos(lCol)/nTwipsPerDotX;
-				//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
-				long width = m_msflexgridoutput.get_ColWidth(lCol)/nTwipsPerDotX+1;
-				long height = m_msflexgridoutput.get_RowHeight(lRow)/nTwipsPerDotY+1;
-				//形成选中个所在的矩形区域
-				CRect rc(x,y,x+width,y+height);
-				//转换成相对对话框的坐标	
-				rc.OffsetRect(rect.left+1,rect.top+1);	
-				//获取选中格的文本信息	
-				//获取选中格的文本信息	
-				CString strValue = m_msflexgridoutput.get_TextMatrix(lRow,lCol);
-				m_combobox2_input.ResetContent();
-
-				m_combobox2_input.AddString(_T("Manual"));
-				m_combobox2_input.AddString(_T("Auto"));
-
-				m_combobox2_input.MoveWindow(&rc,1); //移动到选中格的位置
-				m_combobox2_input.BringWindowToTop();	
-				m_combobox2_input.SelectString(-1,strValue);
-				m_combobox2_input.ShowWindow(SW_SHOW);//显示控件
-
-				CString strTemp;
-				int nindext = m_combobox2_input.GetCurSel();//GetEditSel();	 GetCurSel
-				if (nindext<0||nindext>3)
-				{	   
-					nindext = 1;			
-				}	
-				m_combobox2_input.GetLBText(nindext,strTemp);
-
-				CString m_strmanual = _T("Manual");
-				int addr;
-				int ret = strTemp.Collate(m_strmanual);
-				if (ret == 0)
-				{
-					m_combo2_cstring = _T("Auto");
-		
-					TRACE(_T("Auto%d"),num);
-
-				}else
-				{
-					m_combo2_cstring = _T("Manual");  
-			
-					TRACE(_T("Manual%d"),num);
-
-
-				}	
-
-				UpdateData(FALSE);
-				if (lCol == 3)
-				{ 
-					m_msflexgridoutput.put_TextMatrix(lRow,lCol,m_combo2_cstring);
-
-					CString m_strmanual = _T("Auto");
-					int ret = m_combo2_cstring.Collate(m_strmanual);
-					if (ret == 0)
-					{
-						m_msflexgridoutput.put_TextMatrix(lRow,lCol+1,_T("On/Off"));
-					}
-
-				}
-			}else if (lCol == 2)
-			{
-
-				CString value_lCol = m_msflexgridoutput.get_TextMatrix(lRow,lCol+1);
-				CString m_strmanual = _T("Manual");
-				int ret = value_lCol.Collate(m_strmanual);
-				if (ret == 0)
-				{
-
-					m_msflexgridoutput.ShowWindow(SW_SHOW);
-
-
-					long lRow = m_msflexgridoutput.get_RowSel();//获取点击的行号	
-					long lCol = m_msflexgridoutput.get_ColSel(); //获取点击的列号		
-					CRect rect;	
-					m_msflexgridoutput.GetWindowRect(rect); //获取表格控件的窗口矩形
-					ScreenToClient(rect); //转换为客户区矩形
-					// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-					//需要将其转化为像素，1440缇= 1英寸
-					CDC* pDC =GetDC();
-					//计算象素点和缇的转换比例
-					int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
-					int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-					//计算选中格的左上角的坐标(象素为单位)
-					long y = m_msflexgridoutput.get_RowPos(lRow)/nTwipsPerDotY;
-					long x = m_msflexgridoutput.get_ColPos(lCol)/nTwipsPerDotX;
-					//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
-					long width = m_msflexgridoutput.get_ColWidth(lCol)/nTwipsPerDotX+1;
-					long height = m_msflexgridoutput.get_RowHeight(lRow)/nTwipsPerDotY+1;
-					//形成选中个所在的矩形区域
-					CRect rc(x,y,x+width,y+height);
-					//转换成相对对话框的坐标	
-					rc.OffsetRect(rect.left+1,rect.top+1);	
-					//获取选中格的文本信息	
-					//获取选中格的文本信息	
-					CString strValue = m_msflexgridoutput.get_TextMatrix(lRow,lCol);
-					m_combobox2_input.ResetContent();
-
-					m_combobox2_input.AddString(_T("On"));
-					m_combobox2_input.AddString(_T("Off"));
-
-					m_combobox2_input.MoveWindow(&rc,1); //移动到选中格的位置
-					m_combobox2_input.BringWindowToTop();	
-					m_combobox2_input.SelectString(-1,strValue);
-					m_combobox2_input.ShowWindow(SW_SHOW);//显示控件
-
-
-					CString strTemp;
-					int nindext = m_combobox2_input.GetCurSel();//GetEditSel();	 GetCurSel
-					if (nindext<0||nindext>3)
-					{	   
-						nindext = 1;			
-					}	
-					m_combobox2_input.GetLBText(nindext,strTemp);
-
-					CString m_strmanual = _T("On");
-					int addr;
-					int ret = strTemp.Collate(m_strmanual);
-					if (ret == 0)
-					{
-						m_combo2_cstring = _T("Off");
-						TRACE(_T("Auto%d"),num);
-
-					}else
-					{
-						m_combo2_cstring = _T("On");  
-						TRACE(_T("Manual%d"),num);
-
-
-					}	
-
-					UpdateData(FALSE);
-					if (lCol == 2)
-					{ 
-						m_msflexgridoutput.put_TextMatrix(lRow,lCol,m_combo2_cstring);
-
-					}
-				}
-
-			}else if (lCol == 1)
-			{
-				//使用edition控件形式显示
-
-				long lRow,lCol;
-				lRow = m_msflexgridoutput.get_RowSel();
-				lCol = m_msflexgridoutput.get_ColSel(); 
-
-				CRect rect;
-				m_msflexgridoutput.GetWindowRect(rect); 
-				ScreenToClient(rect); 
-				CDC* pDC =GetDC();
-
-				int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
-				int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-
-				long y = m_msflexgridoutput.get_RowPos(lRow)/nTwipsPerDotY;
-				long x = m_msflexgridoutput.get_ColPos(lCol)/nTwipsPerDotX;
-
-				long width = m_msflexgridoutput.get_ColWidth(lCol)/nTwipsPerDotX+1;
-				long height = m_msflexgridoutput.get_RowHeight(lRow)/nTwipsPerDotY+1;
-
-				CRect rcCell(x,y,x+width,y+height);
-
-				rcCell.OffsetRect(rect.left+1,rect.top+1);
-				ReleaseDC(pDC);
-				CString strValue = m_msflexgridoutput.get_TextMatrix(lRow,lCol);
-
-
-				if(1==lCol)		
-				{		
-					m_edit_output.MoveWindow(&rcCell,1);
-					m_edit_output.ShowWindow(SW_SHOW);	
-					m_edit_output.SetWindowText(strValue);	
-					m_edit_output.SetFocus();	
-					int nLenth=strValue.GetLength();	
-					m_edit_output.SetSel(nLenth,nLenth); 	
-
-				}		
-
-			}
-			SetTimer(DATATIME_TIMER,1000,NULL);
-
-		}else
-		{
-
-			return true; 
-		}
-
-	}
-
-
-	if(pMsg->wParam == VK_LEFT||pMsg->wParam == VK_RIGHT||pMsg->wParam == VK_UP||pMsg->wParam == VK_DOWN)			 
-	{ 
-
-
-		m_combobox2_input.ShowWindow(SW_HIDE);
-		if (m_switch == 1)			  
-		{
-			KillTimer(DATATIME_TIMER);
-			int lCol = m_msflexgrid_input.get_ColSel(); //获取点击的列号
-			if (lCol ==1)
-			{
-				m_edit_input.EnableWindow(FALSE);
-				m_msflexgrid_input.SetFocus();
-				
-				
-				m_edit_input.EnableWindow();
-
-			}else
-			{
-				m_msflexgrid_input.SetFocus();
-			}
-
-			m_msflexgrid_input.SetFocus();
-			SetTimer(DATATIME_TIMER,1000,NULL);
-
-		} 
-		else if (m_switch == 2)
-		{
-			KillTimer(DATATIME_TIMER);
-			int lCol = m_msflexgridoutput.get_ColSel(); //获取点击的列号
-			if (lCol ==1)
-			{
-				m_edit_output.EnableWindow(FALSE);
-				m_msflexgridoutput.SetFocus();
-				m_edit_output.EnableWindow();
-
-			}else
-			{
-				m_msflexgridoutput.SetFocus();
-			}
-
-		}
-		SetTimer(DATATIME_TIMER,1000,NULL);
-
-	} 
-
-	*/ 
 	
 	return CFormView::PreTranslateMessage(pMsg);
 }
+void CDialogCM5::UpdateGrid(){
+	CString index;
 
+	//============================================================================================列表框设置（界面中间部份列表框）
+	m_Output_GridCM5_.put_Rows(9); //行
+	m_Output_GridCM5_.put_Cols(16);
+	//set row high
+	m_Output_GridCM5_.put_WordWrap(TRUE);
+	m_Output_GridCM5_.put_RowHeight(0,500);
+	//title middle show
+	for (int n=0;n<=9;n++)
+	{
+		m_Output_GridCM5_.put_ColAlignment(n,4);
+	}
+	//设置列宽
+	m_Output_GridCM5_.put_ColWidth(0,400);
+	m_Output_GridCM5_.put_ColWidth(1,800);
+	m_Output_GridCM5_.put_ColWidth(2,1200);
+	m_Output_GridCM5_.put_ColWidth(3 ,800);
+	m_Output_GridCM5_.put_ColWidth(4 ,1000);
+	m_Output_GridCM5_.put_ColWidth(5 ,1000);
+	m_Output_GridCM5_.put_ColWidth(6 ,1000);
+	m_Output_GridCM5_.put_ColWidth(7 ,1000);
+	m_Output_GridCM5_.put_ColWidth(8 ,1000);
+	m_Output_GridCM5_.put_ColWidth(9 ,1200);
+	m_Output_GridCM5_.put_ColWidth(10,1200);
+	m_Output_GridCM5_.put_ColWidth(11,1200);
+	m_Output_GridCM5_.put_ColWidth(12,1200);
+	m_Output_GridCM5_.put_ColWidth(13,1200);
+	m_Output_GridCM5_.put_ColWidth(14,1200);
+
+	m_Output_GridCM5_.put_TextMatrix(0,0,_T("No"));
+	m_Output_GridCM5_.put_TextMatrix(0,1,_T("Device\nName"));
+	m_Output_GridCM5_.put_TextMatrix(0,2,_T("Modbus ID\nAddress"));
+	m_Output_GridCM5_.put_TextMatrix(0,3,_T("SN"));
+	m_Output_GridCM5_.put_TextMatrix(0,4 ,_T("Cooling\nSetpoint"));
+	m_Output_GridCM5_.put_TextMatrix(0,5 ,_T("Heating\nSetpoint"));
+	m_Output_GridCM5_.put_TextMatrix(0,6 ,_T("Setpoint"));
+	m_Output_GridCM5_.put_TextMatrix(0,7 ,_T("Room\nTemperture"));
+	m_Output_GridCM5_.put_TextMatrix(0,8 ,_T("Mode"));
+	m_Output_GridCM5_.put_TextMatrix(0,9 ,_T("Night Heating\nSetpoint"));
+	m_Output_GridCM5_.put_TextMatrix(0,10 ,_T("Night Cooling\nSetpoint"));
+	m_Output_GridCM5_.put_TextMatrix(0,11,_T("Occupied"));
+	m_Output_GridCM5_.put_TextMatrix(0,12,_T("Output Status"));
+	m_Output_GridCM5_.put_TextMatrix(0,13,_T("Night Heating\n DB"));
+	m_Output_GridCM5_.put_TextMatrix(0,14,_T("Night Cooling\n DB"));
+	m_Output_GridCM5_.put_TextMatrix(0,15,_T("Override Value"));
+	//彩色显示
+	for(int i=1;i<9;i++)
+	{
+
+		//		for(int k=0;k<=12;k++)
+		index.Format(_T("%d"),i);
+		m_Output_GridCM5_.put_TextMatrix(i,0,index);
+		for(int k=0;k<=9;k++)
+		{
+
+
+			if (i%2==1)
+			{
+				m_Output_GridCM5_.put_Row(i);
+				m_Output_GridCM5_.put_Col(k);
+				m_Output_GridCM5_.put_CellBackColor(RGB(255,255,255));
+			}
+			else
+			{
+				m_Output_GridCM5_.put_Row(i);
+				m_Output_GridCM5_.put_Col(k);
+				m_Output_GridCM5_.put_CellBackColor(COLOR_CELL);
+			}
+		}
+	} 
+}
 void CDialogCM5::ShowDialogData()
 {
 
@@ -1888,8 +1599,8 @@ void CDialogCM5::ShowDialogData()
 		Purpose:
 
 		*/
-		m_strDateCM5.Format(_T("%d%d-%d-%d"),20,multi_register_value_tcp[201],multi_register_value_tcp[203],multi_register_value_tcp[204]);//临时演示
-		m_strTime.Format(_T("%02d:%02d:%02d"),multi_register_value_tcp[205],multi_register_value_tcp[206],multi_register_value_tcp[207]);
+		//m_strDateCM5.Format(_T("%02d%02d-%02d-%02d"),20,multi_register_value_tcp[201],multi_register_value_tcp[202],multi_register_value_tcp[204]);//临时演示
+		//m_strTime.Format(_T("%02d:%02d:%02d"),multi_register_value_tcp[205],multi_register_value_tcp[206],multi_register_value_tcp[207]);
 		m_IDaddressCM5=multi_register_value_tcp[6];	
 
 		UINT nSelectSerialNumber =multi_register_value_tcp[0]+multi_register_value_tcp[1]*256+multi_register_value_tcp[2]*256*256+multi_register_value_tcp[3]*256*256*256;// cm5_register_value[0]+cm5_register_value[1]*256+cm5_register_value[2]*256*256+cm5_register_value[3]*256*256*256;
@@ -1989,15 +1700,15 @@ void CDialogCM5::ShowDialogData()
 
 	    m_subetwork.m_Occupied=(multi_register_value_tcp[5670]&(unsigned short)pow((double)2,i));//1,2,4,8,16,32,64,128
 		m_subetwork.m_coolingSet.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i]/10);
-		m_subetwork.m_heatingSet.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+8]/10);
-		m_subetwork.m_setpoint.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+16]/10); 
+		m_subetwork.m_heatingSet.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+8]);
+		m_subetwork.m_setpoint.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+16]); 
 		m_subetwork.m_roomTemper.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+24]/10); 
 		m_subetwork.m_mode = multi_register_value_tcp[5671+i+32];     
 		m_subetwork.m_outputState.Format(_T("%.1f"),(float)multi_register_value_tcp[5671+i+40]/10); 
-		m_subetwork.m_nightHeatingDB.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+48]/10);
-		m_subetwork.m_nightCoolingDB.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+56]/10); 
-		m_subetwork.m_nightHeating.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+64]/10);
-		m_subetwork.m_nightCooling.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+72]/10); 
+		m_subetwork.m_nightHeatingDB.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+48]);
+		m_subetwork.m_nightCoolingDB.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+56]); 
+		m_subetwork.m_nightHeating.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+64]);
+		m_subetwork.m_nightCooling.Format(_T("%.1f°C"),(float)multi_register_value_tcp[5671+i+72]); 
 		m_subetwork.m_tstatProduct = multi_register_value_tcp[5671+i+80]; 
 		m_subetwork.m_overridevalue.Format(_T("%d"),multi_register_value_tcp[5671+i+88]);
 		m_subetwork.m_SerialNumber.Format(_T("%d"),multi_register_value_tcp[5671+i+96]+multi_register_value_tcp[5671+i+96+1]*256+multi_register_value_tcp[5671+i+96+2]*256*256+multi_register_value_tcp[5671+i+96+3]*256*256*256);
@@ -2011,10 +1722,19 @@ void CDialogCM5::ShowDialogData()
 	coasting_temp = 0;
 	heating_temp = 0;
 	cooling_temp = 0;
+	m_Output_GridCM5_.Clear();
+	 
 
-
+	UpdateGrid();
+	int type;
 	for (int i=1;i<9;i++)
 	{
+
+	    type=multi_register_value_tcp[173+i];
+		if (type!=1)
+		{
+		 continue;
+		}
 		int ret = _subnetwork.at(i-1).m_modbusaddr.Compare(_T("0"));
 		if(ret == 0)
 			continue;
@@ -2041,7 +1761,6 @@ void CDialogCM5::ShowDialogData()
 		default:strtemp1=_T("Tstat");break;
 		}
 		m_Output_GridCM5_.put_TextMatrix(i,1,strtemp1);//Device Name
-
 		m_Output_GridCM5_.put_TextMatrix(i,2,_subnetwork.at(i-1).m_modbusaddr);//Address
 		m_Output_GridCM5_.put_TextMatrix(i,3,_subnetwork.at(i-1).m_SerialNumber);//SN
 		m_Output_GridCM5_.put_TextMatrix(i,4,_subnetwork.at(i-1).m_coolingSet);
@@ -2117,6 +1836,7 @@ void CDialogCM5::ShowDialogData()
 		Purpose:
 		Initial Grid Table
 		*/
+		
 	CString strTemp;
 	BOOL bit;
 	m_type=0;
@@ -2161,7 +1881,8 @@ void CDialogCM5::ShowDialogData()
 
 	}
 	m_type=1;
-	int type;
+//	int type;
+
 	for(int i=1;i<9;i++)		//排数量 Sub Tstat
 	{
 		//index.Format(_T("%d"),i);_T("12345671234567")
@@ -2170,7 +1891,7 @@ void CDialogCM5::ShowDialogData()
 		type=multi_register_value_tcp[173+i];
 		if (type==0)
 		{
-		   strTemp=_T("None");
+		   strTemp=_T("UNUSED");
 		} 
 		else if (type==1)
 		{
@@ -2178,7 +1899,7 @@ void CDialogCM5::ShowDialogData()
 		} 
 		else
 		{
-		  strTemp=_T("Simple");
+		  strTemp=_T("Switch");
 		}
 		 m_subtstatgrid.put_TextMatrix(i,2,strTemp);//Address
 
@@ -2203,6 +1924,7 @@ void CDialogCM5::ShowDialogData()
 	m_type=2;
 	UINT reg183=multi_register_value_tcp[183];
 	UINT reg190=multi_register_value_tcp[190];
+	
 	for(int i=1;i<9;i++)		//排数量,input_DI
 	{
 		m_msflexgrid_input.put_TextMatrix(i,1,GetTextReg(Get_RegID(i),FALSE));
@@ -2233,6 +1955,7 @@ void CDialogCM5::ShowDialogData()
 	m_type=3;
 	UINT reg189=multi_register_value_tcp[189];
 	UINT reg192=multi_register_value_tcp[192];
+	
 	for(int i=1;i<11;i++)		//排数量,input AI
 	{
 	/*
@@ -2741,7 +2464,7 @@ void CDialogCM5::ClickOutputMsflexgrid()
 	/*
 	Date:2013/04/24
 	Purpose:
-	  单击sub Tstat
+	单击sub Tstat
 	*/
 void CDialogCM5::ClickSubTstatgrid()
 {
@@ -2756,8 +2479,7 @@ void CDialogCM5::ClickSubTstatgrid()
 	lRow = m_subtstatgrid.get_RowSel();
 	lCol = m_subtstatgrid.get_ColSel(); 
 
-	if(lCol == 1)
-	{
+	
 		CRect rect;
 		m_subtstatgrid.GetWindowRect(rect); 
 		ScreenToClient(rect); 
@@ -2790,8 +2512,19 @@ void CDialogCM5::ClickSubTstatgrid()
 			m_edit_output.SetSel(nLenth,nLenth); 	
 
 		}		
+	
+	if (lCol==2)
+	{
+	m_combox_enable.MoveWindow(&rcCell,1);
+	m_combox_enable.ResetContent();
+	m_combox_enable.AddString(_T("UNUSED"));
+	m_combox_enable.AddString(_T("Normal"));
+	m_combox_enable.AddString(_T("Switch"));
+	m_combox_enable.ShowWindow(TRUE);
+	m_combox_enable.SetWindowText(strValue);
+	m_combox_enable.SetFocus();
+	m_combox_enable.SetCapture();
 	}
-
 
 	SetTimer(DATATIME_TIMER,1000,NULL);
 }

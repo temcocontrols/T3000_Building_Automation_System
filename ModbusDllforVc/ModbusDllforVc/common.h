@@ -3,7 +3,7 @@
 #define COMMON_H
 
 #include "define.h"
-
+OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length);
 OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US value);
 OUTPUT int Read_One(TS_UC device_var,TS_US address);
 OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length);

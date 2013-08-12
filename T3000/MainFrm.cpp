@@ -33,9 +33,8 @@
 #include "hangeIDDlg.h"
 #include "LightingController/LightingController.h"//Lightingcontroller
 #include "HumChamber.h"
-#include "MbpGlobals.h"
 #include "CO2_View.h"
-
+#include "MbpGlobals.h"
 #include "Dialog_Progess.h"
 
 #include "excel9.h"
@@ -45,6 +44,8 @@
 #include "isp/CDialogISPTOOL.h"
 
 #include "IONameConfig.h"
+
+#include "DialogCM5_BacNet.h"
 #pragma region Fance Test
 //For Test
 
@@ -186,6 +187,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_DATABASE_MBPOLL, &CMainFrame::OnDatabaseMbpoll)
 	ON_MESSAGE(WM_MBPOLL_CLOSED, &CMainFrame::OnMbpollClosed)
 	ON_COMMAND(ID_DATABASE_IONAMECONFIG, &CMainFrame::OnDatabaseIonameconfig)
+	ON_COMMAND(ID_TOOL_ISPTOOLFORONE, &CMainFrame::OnToolIsptoolforone)
+	ON_COMMAND(ID_TOOL_REGISTERMONITER, &CMainFrame::OnToolRegistermoniter)
+//	ON_COMMAND(ID_APP_EXIT, &CMainFrame::OnAppExit)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -259,10 +263,14 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 
 		//Fance_1
 		memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
-		if(pFrame->m_pViews[0]->m_hWnd!=NULL)
+		if(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd!=NULL)
 		{
+			::PostMessage(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
+		}
 
-			::PostMessage(pFrame->m_pViews[0]->m_hWnd,MsgT3000ViewFresh,0,0);
+		if(pFrame->m_pViews[DLG_CO2_VIEW]->m_hWnd!=NULL)
+		{
+			::PostMessage(pFrame->m_pViews[DLG_CO2_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
 		}
 		
 	}
@@ -376,17 +384,18 @@ void CMainFrame::InitViews()
     CView* pActiveView = GetActiveView();
 	if(pActiveView==NULL)
 		return;
-	m_pViews[0] = pActiveView;
-	m_pViews[1]=(CView*) new CNetworkControllView();
-	m_pViews[2]=(CView*) new CGraphicView();
-	m_pViews[3]=(CView*) new CTrendLogView();
- 	m_pViews[4]=(CView*) new CDialogCM5(); //CM5
- 	m_pViews[5]=(CView*) new CDialogT3();  //T3
-	m_pViews[6]=(CView*) new CDialgMiniPanel();//Mini Panel 
- 	m_pViews[7]=(CView*) new CAirQuality;//AirQuality
-	m_pViews[8]=(CView*) new CLightingController;//Lightingcontroller
-	m_pViews[9]=(CView*) new CHumChamber;
-	m_pViews[10]=(CView*) new CCO2_View;
+	m_pViews[DLG_T3000_VIEW] = pActiveView;
+	m_pViews[DLG_NETWORKCONTROL_VIEW]=(CView*) new CNetworkControllView();
+	m_pViews[DLG_GRAPGIC_VIEW]=(CView*) new CGraphicView();
+	m_pViews[DLG_TRENDLOG_VIEW]=(CView*) new CTrendLogView();
+ 	m_pViews[DLG_DIALOGCM5_VIEW]=(CView*) new CDialogCM5(); //CM5
+ 	m_pViews[DLG_DIALOGT3_VIEW]=(CView*) new CDialogT3();  //T3
+	m_pViews[DLG_DIALOGMINIPANEL_VIEW]=(CView*) new CDialgMiniPanel();//Mini Panel 
+ 	m_pViews[DLG_AIRQUALITY_VIEW]=(CView*) new CAirQuality;//AirQuality
+	m_pViews[DLG_LIGHTINGCONTROLLER_VIEW]=(CView*) new CLightingController;//Lightingcontroller
+	m_pViews[DLG_HUMCHAMBER]=(CView*) new CHumChamber;
+	m_pViews[DLG_CO2_VIEW]=(CView*) new CCO2_View;
+	m_pViews[DLG_CM5_BACNET_VIEW]=(CView*) new CDialogCM5_BacNet; //CM5
 
 
 
@@ -858,17 +867,17 @@ void CMainFrame::EnterConnectToANode()
 			else if (m_product.at(i).product_class_id == PM_MINIPANEL)
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(6);
+				SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
 			}
 			else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(5);
+				SwitchToPruductType(DLG_DIALOGT3_VIEW);
 			}
 			else if (m_product.at(i).product_class_id ==PM_AirQuality) //AirQuality
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(7);
+				SwitchToPruductType(DLG_AIRQUALITY_VIEW);
 			}else if (m_product.at(i).product_class_id == PM_LightingController)//LightingController
 			{
 				g_tstat_id = m_product.at(i).product_id;
@@ -884,13 +893,13 @@ void CMainFrame::EnterConnectToANode()
 						}
 					}
 				}
-				SwitchToPruductType(8);
+				SwitchToPruductType(DLG_LIGHTINGCONTROLLER_VIEW);
 			}
 			else if (m_product.at(i).product_class_id==PM_TSTAT6_HUM_Chamber)
 			{	g_bChamber=TRUE;
 				g_tstat_id = m_product.at(i).product_id;
 
-			    SwitchToPruductType(9);
+			    SwitchToPruductType(DLG_HUMCHAMBER);
 			}
 			else 
 			{
@@ -910,7 +919,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 
 	Flexflash = TRUE;
 	HTREEITEM hSelItem;//=m_pTreeViewCrl->GetSelectedItem();
-int nRet =read_one(g_tstat_id,6,1);
+    int nRet =read_one(g_tstat_id,6,1);
 
 	CPoint pt;
 	GetCursorPos(&pt);
@@ -944,16 +953,16 @@ int nRet =read_one(g_tstat_id,6,1);
 			}else if (m_product.at(i).product_class_id == PM_MINIPANEL)
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(6);
+				SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
 			}else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(5);
+				SwitchToPruductType(DLG_DIALOGT3_VIEW);
 			}
 			else if (m_product.at(i).product_class_id ==PM_AirQuality) //AirQuality
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(7);
+				SwitchToPruductType(DLG_AIRQUALITY_VIEW);
 			}else if (m_product.at(i).product_class_id == PM_LightingController)//LightingController
 			{
 				g_tstat_id = m_product.at(i).product_id;
@@ -969,7 +978,7 @@ int nRet =read_one(g_tstat_id,6,1);
 						}
 					}
 				}
-				SwitchToPruductType(8);
+				SwitchToPruductType(DLG_LIGHTINGCONTROLLER_VIEW);
 			}
 			else if (m_product.at(i).product_class_id==PM_TSTAT6_HUM_Chamber)
 			{	
@@ -977,7 +986,7 @@ int nRet =read_one(g_tstat_id,6,1);
 			g_bChamber=TRUE;
 			g_tstat_id = m_product.at(i).product_id;
 
-			SwitchToPruductType(9);
+			SwitchToPruductType(DLG_HUMCHAMBER);
 			}
 			else 
 			{   g_tstat_id = m_product.at(i).product_id;
@@ -1058,8 +1067,6 @@ void  CMainFrame::OnHTreeItemClick(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	OnHTreeItemSeletedChanged(pNMHDR, pResult);
 }
-
-
 
 BOOL CMainFrame::ValidAddress(CString sAddress)
 {
@@ -1339,7 +1346,7 @@ try
 					TVINSERV_LED //tree0412
 				else if(temp_product_class_id == PM_TSTAT6)
 					TVINSERV_TSTAT6
-				else if(temp_product_class_id == PM_CO2)
+				else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485))
 					TVINSERV_CO2
 				else
 				
@@ -2117,113 +2124,81 @@ void CMainFrame::SwitchToPruductType(int nIndex)
 	RecalcLayout();
 	pNewView->Invalidate();
 here:
+	g_bPauseMultiRead = FALSE;//恢复主线程的刷新
 	switch(nIndex)
 	{
-	case 0:
+	case DLG_T3000_VIEW:
 		{
-//20120427
-#if 0
-		
-			if (nFlag == 6)
-			{
-				//multi_register_value[]列表交换。
-				//读取TXT
-				memset(tempchange,0,sizeof(tempchange));
-				memset(temptstat6,0,sizeof(temptstat6));
-				memcpy(temptstat6,multi_register_value,sizeof(multi_register_value));
-				int index = 0;
-
-				for (int i = 0;i<512;i++)
-				{
-					index = reg_tstat6[i];
-					tempchange[index] = temptstat6[i];
-				}
-
-				memcpy(multi_register_value,tempchange,sizeof(multi_register_value));
-
-			}
-#endif
-//20120427
-
-//			theApp.cm5_timer = false;	//CM5
-			m_nCurView=0;
-
-// 			strInfo.Format(_T("CMainFrame::SwitchToPruductType(int nIndex):FreshIOGridTable()"));			
-// 			SetPaneString(2, strInfo);
+			m_nCurView=DLG_T3000_VIEW;
 			((CT3000View*)m_pViews[m_nCurView])->FreshIOGridTable();
-// 			strInfo.Format(_T("CMainFrame::SwitchToPruductType(int nIndex):Fresh"));			
-// 			SetPaneString(2, strInfo);
 			((CT3000View*)m_pViews[m_nCurView])->Fresh();
-// 			strInfo.Format(_T("CMainFrame::SwitchToPruductType(int nIndex):Fresh:END"));			
-// 			SetPaneString(2, strInfo);
 		}
 		break;
-	case 1:
+	case DLG_NETWORKCONTROL_VIEW:
 		{
-//			theApp.cm5_timer = false;	//NetControllView
-			m_nCurView=1;    
+			m_nCurView=DLG_NETWORKCONTROL_VIEW;    
 			((CNetworkControllView*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
-	case 2:
+	case DLG_GRAPGIC_VIEW:
 		{
-			m_nCurView=2;
+			m_nCurView=DLG_GRAPGIC_VIEW;
 			int nSerialNum=get_serialnumber();
-
 			((CGraphicView*)m_pViews[m_nCurView])->InitGraphic(nSerialNum,g_tstat_id);
-
 		}
 		break;
-	case 3:
+	case DLG_TRENDLOG_VIEW:
 		{
-			m_nCurView=3;
+			m_nCurView=DLG_TRENDLOG_VIEW;
 		}
 		break;
-	case 4:		//CM5
+	case DLG_DIALOGCM5_VIEW:		//CM5
 		{	
-//			theApp.cm5_timer = true;
-			m_nCurView=4; 
+			m_nCurView=DLG_DIALOGCM5_VIEW; 
 			((CDialogCM5*)m_pViews[m_nCurView])->Fresh();
 		}	
 		break;
-	case 5:	   //T3
+	case DLG_DIALOGT3_VIEW:	   //T3
 		{
-//			theApp.cm5_timer = false;
-			m_nCurView =5;
+			m_nCurView =DLG_DIALOGT3_VIEW;
 			((CDialogT3*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
 
-	case 6://Mini Panel
+	case DLG_DIALOGMINIPANEL_VIEW://Mini Panel
 		{
-//			theApp.cm5_timer = false;
-			m_nCurView = 6;
+			m_nCurView = DLG_DIALOGMINIPANEL_VIEW;
 		((CDialgMiniPanel*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
-	case 7://AirQuality
+	case DLG_AIRQUALITY_VIEW://AirQuality
 		{
-			m_nCurView = 7;
+			m_nCurView = DLG_AIRQUALITY_VIEW;
 			((CAirQuality*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
-	case 8:
+	case DLG_LIGHTINGCONTROLLER_VIEW:
 		{
-			m_nCurView = 8;
+			m_nCurView = DLG_LIGHTINGCONTROLLER_VIEW;
 			((CLightingController*)m_pViews[m_nCurView])->Fresh();
-
 		}
 		break;
-	case 9:
+	case DLG_HUMCHAMBER:
 	{
-	     m_nCurView=9;
+	     m_nCurView=DLG_HUMCHAMBER;
 		((CHumChamber*)m_pViews[m_nCurView])->Fresh();
 	}
 	break;
-	case  10:
+	case  DLG_CO2_VIEW:
 		{
-			m_nCurView = 10;
+			m_nCurView = DLG_CO2_VIEW;
 			((CCO2_View*)m_pViews[m_nCurView])->Fresh();
+		}
+		break;
+	case  DLG_CM5_BACNET_VIEW:
+		{
+			m_nCurView = DLG_CM5_BACNET_VIEW;
+			((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
 	}
@@ -2240,7 +2215,7 @@ void CMainFrame::SwitchToGraphicView()
 	//	((CT3000View*)m_pViews[0])->m_pSetPtDayDlg->ShowWindow(SW_HIDE);
 		
 
-	SwitchToPruductType(2);
+	SwitchToPruductType(DLG_GRAPGIC_VIEW);
 }
 void CMainFrame::OnAllNodeDatabase()
 {
@@ -2398,6 +2373,7 @@ void CMainFrame::Scan_Product()
 	m_pWaitScanDlg->DoModal();	
 
 	m_bScanALL = TRUE;
+	close_com();
 	//m_bScanFinished = FALSE;
 	delete m_pWaitScanDlg;
 	m_pWaitScanDlg = NULL;
@@ -2889,8 +2865,8 @@ CString CMainFrame::GetDeviceClassName(int nClassID)
 	case 18:strClassName=g_strTstat5g;break;
 	case 16:strClassName=g_strTstat5e;break;
 	case 19:strClassName=g_strTstat5h;break;
-	case 27:strClassName=g_strTstat7;break;
-	case 26:strClassName=g_strTstat6;break;
+	case 7:strClassName=g_strTstat7;break;
+	case 6:strClassName=g_strTstat6;break;
 	case 13:
 	case 14:break;
 	default:strClassName=g_strTstat5a;break;
@@ -3293,7 +3269,7 @@ void CMainFrame::SaveConfigFile()
 	CString strTips = _T("T3000 is ready to save config file, start now?");
 
 	SetPaneString(1, strTips);
-	AfxMessageBox(strTips);
+	//AfxMessageBox(strTips);
 
 	if(multi_register_value[7]==100)//NC
 	{
@@ -3334,27 +3310,27 @@ void CMainFrame::SaveConfigFile()
 		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
 
 		SetPaneString(1, strTips);
-		AfxMessageBox(strTips);
+		//AfxMessageBox(strTips);
 	}
 	else//save tstat config file:
-	{
-		nret=write_one(g_tstat_id,321,4);
-		nret=write_one(g_tstat_id,322,0);
-		nret=write_one(g_tstat_id,323,0);
-		nret=write_one(g_tstat_id,325,0);
-		int nSpecialValue=read_one(g_tstat_id,326);
+	{//?????
+		nret=write_one(g_tstat_id,MODBUS_FAN_GRIDPOINT,4);
+		nret=write_one(g_tstat_id,MODBUS_MODE_GRIDPOINT,0);
+		nret=write_one(g_tstat_id,MODBUS_HOLD_GRIDPOINT,0);
+		nret=write_one(g_tstat_id,MODBUS_CONFIGURATION,0);
+		//int nSpecialValue=read_one(g_tstat_id,326);
 
-		if(nSpecialValue==1)
-		{
-		//	write_one(g_tstat_id,324,0);
-		}
+		//if(nSpecialValue==1)
+		//{
+		////	write_one(g_tstat_id,324,0);
+		//}
 		Save2File_ForTwoFiles((LPTSTR)(LPCTSTR)strFilename);
 
 	
 		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
 		
 		SetPaneString(1, strTips);
-		AfxMessageBox(strTips);
+		//AfxMessageBox(strTips);
 // 		CMFCStatusBar * pStatusBar=NULL;
 // 		if(AfxGetMainWnd()->GetActiveWindow()==NULL)//if this function is called by a thread ,return 
 // 			return;
@@ -3383,6 +3359,7 @@ LRESULT CMainFrame::OnFreshStatusBar(WPARAM wParam, LPARAM lParam)
 void CMainFrame::OnDestroy()
 {
 #if 1
+
 	CDialogInfo *pDialogInfo = NULL;
 
 	try
@@ -3461,10 +3438,10 @@ void CMainFrame::OnDestroy()
 		//m_pRefreshThread->Delete();
 	}
 
-	if (is_connect())
-	{
+	/*if (is_connect())
+	{*/
 		close_com(); // added by zgq:12-16-2011
-	}
+	/*}*/
 
 	
 
@@ -3711,8 +3688,9 @@ void CMainFrame::GetIONanme()
 }
 void CMainFrame::OnHelp()
 {
-	CString strHelp=g_strExePth+_T("T3000help.chm");
-	::HtmlHelp(NULL, strHelp, HH_DISPLAY_TOPIC, 0);
+	CString strHelp=g_strExePth+_T("The Instruction of T3000 .txt");
+	//::HtmlHelp(NULL, strHelp, HH_DISPLAY_TOPIC, 0);
+	ShellExecute(NULL, _T("open"), strHelp, NULL, NULL, SW_SHOWNORMAL);
 }
 void CMainFrame::OnImportDatase()
 {
@@ -3738,6 +3716,11 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 
 	if(pMsg->message == WM_KEYDOWN  )
 	{
+		if(((GetAsyncKeyState( VK_LCONTROL ) & 0x8000))&&(pMsg->wParam ==VK_F2))
+		{
+			OnToolIsptoolforone();
+			return 1;
+		}
 		if(pMsg->wParam == VK_F8)
 		{
 			ReFresh();
@@ -3758,6 +3741,8 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				EnterConnectToANode();
 				return 1;
 			}
+			
+
 	}
 	return CFrameWndEx::PreTranslateMessage(pMsg);
 }
@@ -4012,6 +3997,7 @@ void CMainFrame::OnToolRefreshLeftTreee()
 //
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
+   
 	//20120420
 	CDialog_Progess* pDlg = new CDialog_Progess(this,1,7);
 	//创建对话框窗口
@@ -4245,7 +4231,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					delete pDlg;
 					pDlg=NULL;
 				}
-
 				return;
 			}
 			/*
@@ -4488,28 +4473,28 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			 g_HumChamberThread=FALSE;
 			if(nFlag==PM_NC)	
 			{	
-				SwitchToPruductType(1);
+				SwitchToPruductType(DLG_NETWORKCONTROL_VIEW);
 			}else if (nFlag == PM_CM5)//CM5
 			{
-				SwitchToPruductType(4);
+				SwitchToPruductType(DLG_DIALOGCM5_VIEW);
 			}else if (nFlag == PM_T38AIOD ||nFlag == PM_T3IOA  ||nFlag ==PM_T332AI || nFlag == PM_T34AO)//T3
 			{
 				memset(newtstat6,0,sizeof(newtstat6));
-				SwitchToPruductType(5);
+				SwitchToPruductType(DLG_DIALOGT3_VIEW);
 
 			}
 			else if (nFlag == PM_MINIPANEL)
 			{
-				SwitchToPruductType(6);
+				SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
 			}
 			else if (nFlag==PM_TSTAT6_HUM_Chamber)
 			{
 				 g_HumChamberThread=TRUE;
-				SwitchToPruductType(9);
+				SwitchToPruductType(DLG_HUMCHAMBER);
 			}
-			else if(nFlag == PM_CO2)
+			else if((nFlag == PM_CO2_NET)||(nFlag == PM_CO2_RS485))
 			{
-				SwitchToPruductType(10);
+				SwitchToPruductType(DLG_CO2_VIEW);
 			}
 			else if(nFlag<PM_NC)	
 			{	
@@ -4624,14 +4609,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				}
 
 
-				SwitchToPruductType(0);
-
-				//20120426
-
-
-				//memset(&multi_register_value[10],0,sizeof(multi_register_value)-10);
-				//	memset(multi_register_value,0,sizeof(multi_register_value));
-
+				SwitchToPruductType(DLG_T3000_VIEW);
 
 
 			}		
@@ -4862,7 +4840,7 @@ void CMainFrame::ContinueRefreshThread()
 
 
 void CMainFrame::DoFreshAll()
-{		
+{	
 	RefreshTreeView();
 	if (m_nCurView == 0)
 	{
@@ -4874,11 +4852,13 @@ void CMainFrame::DoFreshAll()
 
 UINT _FreshTreeView(LPVOID pParam )
 {
+	
 	Sleep(30000);
 	CMainFrame* pMain = (CMainFrame*)pParam;
 	while(1)
 	{
-		Sleep(30000);
+		
+		Sleep(15000);
 		WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
 
 		pMain->DoFreshAll();
@@ -5941,6 +5921,11 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
 				MyCriticalSection.Unlock();
 				My_Write_Struct= (_MessageWriteOneInfo *)msg.wParam;
 				break;
+			case MY_INVOKE_ID:
+				MyCriticalSection.Lock();
+				My_Receive_msg.push_back(msg);
+				MyCriticalSection.Unlock();
+				break;
 			case MY_CLOSE:
 				goto myend;
 				break;
@@ -5955,6 +5940,7 @@ myend:
 
 DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 {
+	CMainFrame *pParent = (CMainFrame *)lpVoid;
 	MSG msg;
 	while(1)
 	{
@@ -6004,6 +5990,28 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 
 				}
 				break;
+			case MY_INVOKE_ID:
+				MyCriticalSection.Lock();
+				msg=My_Receive_msg.at(0);
+				MessageInvokeODInfo *My_Invoke_Struct = (_MessageInvokeIDInfo *)msg.wParam;
+				My_Receive_msg.erase(My_Receive_msg.begin());
+				MyCriticalSection.Unlock();
+				for (int i=0;i<2000;i++)
+				{
+					if(tsm_invoke_id_free(My_Invoke_Struct->Invoke_ID))
+					{
+						::PostMessage(My_Invoke_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_SUCCESS,(LPARAM)My_Invoke_Struct);
+						goto loop1;
+					}
+					else
+					{
+						Sleep(1);
+						continue;
+					}
+				}
+					::PostMessage(My_Invoke_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_FAIL,(LPARAM)My_Invoke_Struct);
+loop1:
+				break;
 			}
 			
 		}
@@ -6046,3 +6054,21 @@ LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+
+//void CMainFrame::OnAppExit()
+//{
+//     OnDisconnect();
+//	 OnDestroy();
+//	// TODO: Add your command handler code here
+//}
+void CMainFrame::OnToolIsptoolforone()
+{
+    OnDisconnect();
+	show_ISPDlg();
+}
+
+
+void CMainFrame::OnToolRegistermoniter()
+{    close_com();
+show_RegisterMonitorDlg();
+}

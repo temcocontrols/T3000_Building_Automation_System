@@ -113,6 +113,7 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT32, m_setpointN);
 	DDX_Text(pDX, IDC_EDIT35, m_heatdbN);
 	DDX_Text(pDX, IDC_EDIT38, m_heatspN);
+	DDX_Control(pDX, IDC_STATICUNINT2, m_gUnit);
 }
 
 BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
@@ -127,7 +128,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 
 	ON_CBN_SELCHANGE(IDC_KEYPADSELECT, &CParameterDlg::OnCbnSelchangekeypadcombo)
 
-	ON_EN_KILLFOCUS(IDC_IDADDRESSEDIT, &CParameterDlg::OnEnKillfocusIdaddressedit)
+ 	ON_EN_KILLFOCUS(IDC_IDADDRESSEDIT, &CParameterDlg::OnEnKillfocusIdaddressedit)
 	ON_WM_DESTROY()
 	//ON_CBN_KILLFOCUS(IDC_KEYPADSELECT, &CParameterDlg::OnCbnKillfocusKeypadselect)
 	ON_EN_KILLFOCUS(IDC_VALUPOSEDIT, &CParameterDlg::OnEnKillfocusValuposedit)
@@ -204,6 +205,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 	ON_WM_CTLCOLOR()
 	ON_WM_TIMER()
 	//ON_EN_CHANGE(IDC_EDIT34, &CParameterDlg::OnEnChangeEdit34)
+	ON_CBN_SELCHANGE(IDC_STATICUNINT2, &CParameterDlg::OnCbnSelchangeStaticunint2)
 END_MESSAGE_MAP()
 
 
@@ -254,6 +256,10 @@ BOOL CParameterDlg::OnInitDialog()
 
 
 	CDialog::OnInitDialog();
+	m_gUnit.AddString(_T("°C"));
+	m_gUnit.AddString(_T("°F"));
+
+
 	GetDlgItem(IDC_TEMPALARMEDIT)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_STATICALARM)->ShowWindow(SW_HIDE);
 	m_setPointCtrlEdit.ShowWindow(SW_HIDE);
@@ -409,8 +415,6 @@ void CParameterDlg::OnBnClickedEnableidbutton()
 	}
 }
 
-
-
 void CParameterDlg::OnCbnSelchangeAutoonlycombo()
 {
 	int nindext=m_autoOnlyCombox.GetCurSel();
@@ -425,7 +429,6 @@ void CParameterDlg::OnCbnSelchangeAutoonlycombo()
 
 	// TODO: Add your control notification handler code here
 }
-
 
 void CParameterDlg::OnEnKillfocusIdaddressedit()
 {
@@ -544,7 +547,6 @@ void CParameterDlg::OnDestroy()
 	// TODO: Add your message handler code here
 }
 
-
 void CParameterDlg::OnCbnSelchangekeypadcombo()
 {
 	int nItem=m_keySelectCombox.GetCurSel();
@@ -647,14 +649,12 @@ void CParameterDlg::OnCbnSelchangekeypadcombo()
 //This Edit is invisible for all product, May be it can be delete.
 void CParameterDlg::OnEnKillfocusValuposedit()
 {
-
 	if(g_ParamLevel==1)
 		return;
 	CString strTemp;
 	m_value_percentEdit.GetWindowText(strTemp);
 	if(strTemp.IsEmpty())
 		return;
-
 	//MODBUS_VALVE_PERCENT
 	if(product_register_value[MODBUS_VALVE_PERCENT]==_wtoi(strTemp))	//Add this to judge weather this value need to change.
 		return;
@@ -1023,14 +1023,14 @@ void CParameterDlg::OnCbnSelchangeTimerdelectcombo()
 
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TIMER_SELECT,m_timerSelectCombox.GetCurSel(),
 		product_register_value[MODBUS_TIMER_SELECT],this->m_hWnd,IDC_TIMERDELECTCOMBO,_T("TIMER_SELECT"));
-	if (product_register_value[MODBUS_TIMER_SELECT]==3)
+	/*if (product_register_value[MODBUS_TIMER_SELECT]==3)
 	{
 	GetDlgItem(IDC_EDIT12)->EnableWindow(FALSE);
 	}
 	else
 	{
 	  GetDlgItem(IDC_EDIT12)->EnableWindow(TRUE);
-	}
+	}*/
 }
 
 //modify for support t6 t7.
@@ -1152,7 +1152,7 @@ void CParameterDlg::OnEnKillfocusInputvalue2()
 	}
 	else
 	{
-		if(multi_register_value[188]==4||multi_register_value[188]==1)
+		if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)
 			write_one(g_tstat_id, 180,nValue*10);
 		else
 			write_one(g_tstat_id, 180,nValue);
@@ -1806,7 +1806,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 	else if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E)  // 只有5E使用135
 	{
 		//short nVal = short(fValue);
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,135,short(fValue*10),
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,135,short(fValue),
 			product_register_value[380],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));
 		//write_one(g_tstat_id, 135, nVal);
 	}
@@ -2110,7 +2110,20 @@ void CParameterDlg::OnEnKillfocusEdit38()
 //Add by Fance ,use this function to replace the  Reflash() and Reflash6();
 void CParameterDlg::Reflesh_ParameterDlg()
 {
+	 
+		 
 
+		if(product_register_value[MODBUS_DEGC_OR_F] == 1)	//t5= 121;t6=104
+		{
+			g_unint = FALSE;
+			GetDlgItem(IDC_STATICUNINT2)->SetWindowText(_T("°F"));
+		}else 
+		{
+			g_unint = TRUE;
+			GetDlgItem(IDC_STATICUNINT2)->SetWindowText(_T("°C"));
+		}
+		 
+	 
 	if (product_register_value[MODBUS_TIMER_SELECT]==3)
 	{
 		GetDlgItem(IDC_EDIT12)->EnableWindow(FALSE);
@@ -2133,12 +2146,12 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 
-	if (product_register_value[MODBUS_PRODUCT_MODEL] == 18)//tstat5g	//7
-	{
-		CString str;
-		str.Format(_T("%.1f"),product_register_value[MODBUS_UNIVERSAL_NIGHTSET]/10.0);			//275 
-		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->SetWindowText(str+strUnit);
-	}
+	//if (product_register_value[MODBUS_PRODUCT_MODEL] == 18)//tstat5g	//7
+	//{
+	//CString str;
+		strTemp.Format(_T("%.1f"),product_register_value[MODBUS_UNIVERSAL_NIGHTSET]/10.0);			//275 
+		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->SetWindowText(strTemp+strUnit);
+	/*}*/
 
 
 	int nItem;
@@ -2527,7 +2540,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			} 
 			else
 			{
-				if(product_register_value[188]==4||product_register_value[188]==1)
+				if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)
 				{
 					strTemp.Format(_T("%.1f"),(float)product_register_value[180]/10);
 					strTemp=strTemp+strUnit;
@@ -2789,7 +2802,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		m_dayOccEdt1.SetWindowText(strTemp);
 		if (multi_register_value[7] == PM_TSTAT5E)//0911
 		{
-			strTemp.Format(_T("%.1f"),multi_register_value[135]/10.0);//0911	//135
+			//strTemp.Format(_T("%.1f"),product_register_value[135]);//0911	//135
+			strTemp.Format(_T("%d"),(int)product_register_value[MODBUS_COOLING_SETPOINT]);
 			m_pid_setptEdt1.SetWindowText(strTemp+strUnit);
 		}
 		else
@@ -3088,10 +3102,10 @@ void CParameterDlg::OnEnKillfocusEditPid2offsetpoint()
 	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->GetWindowText(str);
 	int nValue= _wtoi(str);
 
-	if(product_register_value[275]==nValue*10)	//Add this to judge weather this value need to change.
+	if(product_register_value[MODBUS_UNIVERSAL_NIGHTSET]==nValue*10)	//Add this to judge weather this value need to change.
 		return;
 
-	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,275,nValue*10,
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_UNIVERSAL_NIGHTSET,nValue*10,
 		product_register_value[275],this->m_hWnd,IDC_EDIT_PID2OFFSETPOINT,_T("Pid2 off setpoint"));
 }
 
@@ -3252,3 +3266,25 @@ void CParameterDlg::Fresh_Single_UI()
 //
 //	// TODO:  Add your control notification handler code here
 //}
+
+
+void CParameterDlg::OnCbnSelchangeStaticunint2()
+{
+	int sel=m_gUnit.GetCurSel();
+	if (sel!=product_register_value[MODBUS_DEGC_OR_F])
+	{
+		write_one(g_tstat_id,MODBUS_DEGC_OR_F,sel);
+		product_register_value[MODBUS_DEGC_OR_F]=sel;
+
+		if(product_register_value[MODBUS_DEGC_OR_F] == 1)	//t5= 121;t6=104
+		{
+			g_unint = FALSE;
+			GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("°F"));
+		}else 
+		{
+			g_unint = TRUE;
+			GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("°C"));
+		}
+		 
+	} 
+}

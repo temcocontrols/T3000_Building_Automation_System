@@ -23,7 +23,7 @@
 
 #include "../FlexSlideBar/FlexSlideWnd.h"
 #include "../FlexSlideBar/FSBContainer.h"
-
+#include "DisplayConfig.h"
 // #define _CRTDBG_MAP_ALLOC
 // #include "stdlib.h"
 // #include "crtdbg.h"
@@ -84,6 +84,7 @@ BEGIN_MESSAGE_MAP(CT3000View, CFormView)
 	ON_EN_KILLFOCUS(IDC_EDIT_CUR_SP, &CT3000View::OnEnKillfocusEditCurSp)
 	ON_CBN_SELCHANGE(IDC_COMBO7, &CT3000View::OnCbnSelchangeCombo7)
 	ON_CBN_SELCHANGE(IDC_COMBO4, &CT3000View::OnCbnSelchangeCombo4)
+	ON_CBN_SELCHANGE(IDC_STATICUNINT, &CT3000View::OnCbnSelchangeStaticunint)
 END_MESSAGE_MAP()
 
 // CT3000View construction/destruction
@@ -229,6 +230,7 @@ void CT3000View::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_CUR_SP, m_nightpot);//0907
 	DDX_Control(pDX, IDC_SLIDER_DAY, m_singlesliderday);
 	DDX_Control(pDX, IDC_SLIDER_NIGHT, m_singleslidernight);
+	DDX_Control(pDX, IDC_STATICUNINT, m_gUnit);
 }
 
 
@@ -243,7 +245,8 @@ void CT3000View::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
 
-	
+	m_gUnit.AddString(_T("°C"));
+	m_gUnit.AddString(_T("°F"));
 /*
 	CFile myfile(_T("D:\\big.HEX"),CFile::modeRead);//test.txt
 	//if(m_hex_file.Open(_T("D:\\big.HEX"),CFile::modeRead))
@@ -608,7 +611,7 @@ void CT3000View::Fresh()
 // 	strInfo.Format(_T("CT3000View::Fresh():FreshIOGridTable()"));			
 // 	SetPaneString(2, strInfo);
 //Alex-Changed
-CString strTemp;
+    CString strTemp;
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_COOLING_PID]);		//104 384
 	strTemp+=_T("%");
 	GetDlgItem(IDC_OUTPUT1)->SetWindowText(strTemp);
@@ -2662,9 +2665,18 @@ void CT3000View::OnDestroy()
 void CT3000View::OnBnClickedTrendlogview()
 {
 
-	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(3);
+	//((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(3);
 //	SwitchToPruductType(3);
-
+	if ((multi_register_value[7]==PM_TSTAT5E)||(multi_register_value[7]==PM_TSTAT6)||(multi_register_value[7]==PM_TSTAT7))
+	{
+		CDisplayConfig display_cfg;
+		display_cfg.DoModal();
+	} 
+	else
+	{
+		AfxMessageBox(_T("This model of TStat don't support Display Config!"));
+		return;
+	}
 	// TODO: Add your control notification handler code here
 }
 
@@ -2774,26 +2786,48 @@ void CT3000View::OnCbnSelchangeFanspeedcombo()
 		pMain->m_pRefreshThread->SuspendThread();//
 	int ret=0;
 
-	ret = write_one(g_tstat_id,MODBUS_FAN_SPEED,m_FanComBox.GetCurSel()); //t5=137  t6=273
+//	ret = write_one(g_tstat_id,MODBUS_FAN_SPEED,m_FanComBox.GetCurSel()); //t5=137  t6=273
 	
-	//Marked by Fance no need to judge
-	//if (((m_strModelName.CompareNoCase(_T("Tstat6")) == 0)&&m_fFirmwareVersion >35.5)||(m_strModelName.CompareNoCase(_T("Tstat7")) == 0))
-	//	ret = write_one(g_tstat_id,273,m_FanComBox.GetCurSel());
-	//else
-	//	ret = write_one(g_tstat_id,137,m_FanComBox.GetCurSel());
-
-
-// 	if(m_strModelName.CompareNoCase(_T("Tstat7")) == 0)
-// 		ret = write_one(g_tstat_id,273,m_FanComBox.GetCurSel());
-// 	else
-// 		ret = write_one(g_tstat_id,137,m_FanComBox.GetCurSel());
-
-	if (!(ret>0))
+	if (product_register_value[MODBUS_AUTO_ONLY]==1)
 	{
-		CString str;
-		str.Format(_T("setting invalid,error:%d"),ret);
-		AfxMessageBox(_T("setting invalid!"));
+		int sel=m_FanComBox.GetCurSel();
+		if (sel==0)//OFF
+		{
+			int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,sel);
+			if (ret>0)
+			{
+
+				product_register_value[MODBUS_FAN_SPEED]=0;
+			}
+			m_FanComBox.SetCurSel(0);
+		} 
+		else//Auto
+		{
+			int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,4);
+			if (ret>0)
+			{
+				product_register_value[MODBUS_FAN_SPEED]=4;
+			}
+			m_FanComBox.SetCurSel(1);
+		}
+	} 
+	else
+	{
+		int ret=write_one(g_tstat_id, MODBUS_FAN_SPEED,m_FanComBox.GetCurSel());
+		if (ret>0)
+		{
+
+			product_register_value[MODBUS_FAN_SPEED]=m_FanComBox.GetCurSel();
+		    m_FanComBox.SetCurSel(product_register_value[MODBUS_FAN_SPEED]);
+		}
 	}
+	
+	//if (!(ret>0))
+	//{
+	//	CString str;
+	//	str.Format(_T("setting invalid,error:%d"),ret);
+	//	AfxMessageBox(_T("setting invalid!"));
+	//}
 
 	//恢复T3000主线程
 	pMain->m_pFreshMultiRegisters->ResumeThread();
@@ -2940,7 +2974,10 @@ LRESULT CT3000View::OnFreshView(WPARAM wParam, LPARAM lParam)
 //synchronization the time ,it's not use,this button is not visible.
 void CT3000View::OnBnClickedBtnSynctime()
 {
-	CTime time = CTime::GetCurrentTime();
+CString m_张振中=_T("zhangzhenzhong");
+//AfxMessageBox(m_张振中);
+#if 1
+   CTime time = CTime::GetCurrentTime();
 	BYTE szTime[8] ={0};
 	
 	BeginWaitCursor();
@@ -2963,20 +3000,22 @@ void CT3000View::OnBnClickedBtnSynctime()
 
 	GetDlgItem(IDC_BTN_SYNCTIME)->EnableWindow(TRUE);
 	EndWaitCursor();
+#endif
+	
 	//int nRet = Write_Multi(g_tstat_id, szTime, 450, 8, 3);  // 这个写入有问题，所以变成单个字节写多次
 }
 
 void CT3000View::OnBnClickedButtonSchedule()
 {
-// 	if(multi_register_value[7] < PM_TSTAT6)
-// 	{
+	if(multi_register_value[7] != PM_TSTAT6)
+	{
 		AfxMessageBox(_T("This model of TStat don't support schedule!"));
 		return;
-//	}
-// 	g_bPauseMultiRead = TRUE;
-// 	CTStatScheduleDlg dlg;
-// 	dlg.DoModal();
-// 	g_bPauseMultiRead = FALSE;
+	}
+	g_bPauseMultiRead = TRUE;
+	CTStatScheduleDlg dlg;
+	dlg.DoModal();
+	g_bPauseMultiRead = FALSE;
 	
 }
 
@@ -5738,4 +5777,28 @@ void CT3000View::OnCbnSelchangeCombo4()
 	FlexSPN = 1;
 
 	FreshCtrl();*/
+}
+
+
+void CT3000View::OnCbnSelchangeStaticunint()
+{     int sel=m_gUnit.GetCurSel();
+    if (sel!=product_register_value[MODBUS_DEGC_OR_F])
+    {
+	   write_one(g_tstat_id,MODBUS_DEGC_OR_F,sel);
+	   product_register_value[MODBUS_DEGC_OR_F]=sel;
+
+	   if(product_register_value[MODBUS_DEGC_OR_F] == 1)	//t5= 121;t6=104
+	   {
+		   g_unint = FALSE;
+		   GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("°F"));
+	   }else 
+	   {
+		   g_unint = TRUE;
+		   GetDlgItem(IDC_STATICUNINT)->SetWindowText(_T("°C"));
+	   }
+	   Fresh_In();
+    } 
+     
+    
+	
 }

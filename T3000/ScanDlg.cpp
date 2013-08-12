@@ -772,7 +772,7 @@ void CScanDlg::CombineDBandScanRet()
 }
 
 
-
+//≥Ã–Ú‘O”ã
 void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 {
 	ASSERT(pDev);

@@ -1,11 +1,12 @@
 
 #pragma once
 #include "afxmt.h"
-
+#include "Bacnet_Include.h"
+#include "CM5\ud_str.h"
 vector <int> Change_Color_ID;
 const bool WRITE_SUCCESS = true;
 const bool WRITE_FAIL    = false;
-
+int g_invoke_id;
 HANDLE hThread;
 DWORD nThreadID;
 //#include "stdafx.h"
@@ -1160,28 +1161,28 @@ int MODBUS_ANALOG5_FUNCTION                                  =171 ;//           
 int MODBUS_ANALOG6_FUNCTION                                  =172 ;//              -1                  -1 
 int MODBUS_ANALOG7_FUNCTION                                  =173 ;//              -1                  -1 
 int MODBUS_ANALOG8_FUNCTION                                  =174 ;//              -1                  -1 
-//int MODBUS_TABLE1_ZERO                                       =175 ;//              219                 219
-//int MODBUS_TABLE1_HALFONE                                    =176 ;//              220                 220
-//int MODBUS_TABLE1_ONE                                        =177 ;//              221                 221
-//int MODBUS_TABLE1_HALFTWO                                    =178 ;//              222                 222
-//int MODBUS_TABLE1_TWO                                        =179 ;//              223                 223
-//int MODBUS_TABLE1_HALFTHREE                                  =180 ;//              224                 224
-//int MODBUS_TABLE1_THREE                                      =181 ;//              225                 225
-//int MODBUS_TABLE1_HALFFOUR                                   =182 ;//              226                 226
-//int MODBUS_TABLE1_FOUR                                       =183 ;//              227                 227
-//int MODBUS_TABLE1_HALFFIVE                                   =184 ;//              228                 228
-//int MODBUS_TABLE1_FIVE                                       =185 ;//              229                 229
-//int MODBUS_TABLE2_ZERO                                       =186 ;//              230                 230
-//int MODBUS_TABLE2_HALFONE                                    =187 ;//              231                 231
-//int MODBUS_TABLE2_ONE                                        =188 ;//              232                 232
-//int MODBUS_TABLE2_HALFTWO                                    =189 ;//              233                 233
-//int MODBUS_TABLE2_TWO                                        =190 ;//              234                 234
-//int MODBUS_TABLE2_HALFTHREE                                  =191 ;//              235                 235
-//int MODBUS_TABLE2_THREE                                      =192 ;//              236                 236
-//int MODBUS_TABLE2_HALFFOUR                                   =193 ;//              237                 237
-//int MODBUS_TABLE2_FOUR                                       =194 ;//              238                 238
-//int MODBUS_TABLE2_HALFFIVE                                   =195 ;//              239                 239
-//int MODBUS_TABLE2_FIVE                                       =196 ;//              240                 240
+int MODBUS_TABLE1_ZERO                                       =175 ;//              219                 219
+int MODBUS_TABLE1_HALFONE                                    =176 ;//              220                 220
+int MODBUS_TABLE1_ONE                                        =177 ;//              221                 221
+int MODBUS_TABLE1_HALFTWO                                    =178 ;//              222                 222
+int MODBUS_TABLE1_TWO                                        =179 ;//              223                 223
+int MODBUS_TABLE1_HALFTHREE                                  =180 ;//              224                 224
+int MODBUS_TABLE1_THREE                                      =181 ;//              225                 225
+int MODBUS_TABLE1_HALFFOUR                                   =182 ;//              226                 226
+int MODBUS_TABLE1_FOUR                                       =183 ;//              227                 227
+int MODBUS_TABLE1_HALFFIVE                                   =184 ;//              228                 228
+int MODBUS_TABLE1_FIVE                                       =185 ;//              229                 229
+int MODBUS_TABLE2_ZERO                                       =186 ;//              230                 230
+int MODBUS_TABLE2_HALFONE                                    =187 ;//              231                 231
+int MODBUS_TABLE2_ONE                                        =188 ;//              232                 232
+int MODBUS_TABLE2_HALFTWO                                    =189 ;//              233                 233
+int MODBUS_TABLE2_TWO                                        =190 ;//              234                 234
+int MODBUS_TABLE2_HALFTHREE                                  =191 ;//              235                 235
+int MODBUS_TABLE2_THREE                                      =192 ;//              236                 236
+int MODBUS_TABLE2_HALFFOUR                                   =193 ;//              237                 237
+int MODBUS_TABLE2_FOUR                                       =194 ;//              238                 238
+int MODBUS_TABLE2_HALFFIVE                                   =195 ;//              239                 239
+int MODBUS_TABLE2_FIVE                                       =196 ;//              240                 240
 int MODUBS_HUMIDITY_RH                                       =197 ;//              -1                  -1 
 int MODBUS_HUMIDITY_FREQUENCY                                =198 ;//              -1                  -1 
 int MODBUS_HUM_PIC_UPDATE                                    =199 ;//              -1                  -1 
@@ -1592,28 +1593,40 @@ int MODBUS_BUTTON_LEFT1                                      =603 ;//           
 int MODBUS_BUTTON_LEFT2                                      =604 ;//              -1                  -1 
 int MODBUS_BUTTON_LEFT3                                      =605 ;//              -1                  -1 
 int MODBUS_BUTTON_LEFT4                                      =606 ;//              -1                  -1 
-int MODBUS_HUM_INPUT_MANUAL_ENABLE                           =607 ;//              -1                  -1 
-int MODBUS_HUM_INPUT_MANUAL_VALUE                            =608 ;//              -1                  -1 
-int MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN                        =609 ;//              393                 526
-int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL1                        =610 ;//              394                 527
-int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL2                        =611 ;//              395                 528
-int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL3                        =612 ;//              396                 529
-int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT1                        =613 ;//              397                 530
-int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT2                        =614 ;//              398                 531
-int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT3                        =615 ;//              399                 532
-int MODBUS_UNIVERSAL_OFF_VALVE_BEGIN                         =616 ;//              400                 533
-int MODBUS_UNIVERSAL_OFF_VALVE_COOL1                         =617 ;//              401                 534
-int MODBUS_UNIVERSAL_OFF_VALVE_COOL2                         =618 ;//              402                 535
-int MODBUS_UNIVERSAL_OFF_VALVE_COOL3                         =619 ;//              403                 536
-int MODBUS_UNIVERSAL_OFF_VALVE_HEAT1                         =620 ;//              404                 537
-int MODBUS_UNIVERSAL_OFF_VALVE_HEAT2                         =621 ;//              405                 538
-int MODBUS_UNIVERSAL_OFF_VALVE_HEAT3                         =622 ;//              406                 539
-int MODBUS_TEST1                                             =623 ;//              412                 545
-int MODBUS_TEST2                                             =624 ;//              413                 546
-int MODBUS_TEST3                                             =625 ;//              414                 547
-int MODBUS_TEST4                                             =626 ;//              415                 -1 
-int MODBUS_TEST5                                             =627 ;//              -1                  -1 
-int MODBUS_TEST6                                             =628 ;//              -1                  -1 
+int MODBUS_HUM_HEATER_CONTROL_ENABLE                         =607 ;
+int MODBUS_HUM_INPUT_MANUAL_ENABLE                           =608 ;//              -1                  -1 
+int MODBUS_HUM_INPUT_MANUAL_VALUE                            =609 ;//              -1                  -1 
+int MODBUS_CO2_INPUT_MANUAL_ENABLE                           =610;
+int MODBUS_CO2_INPUT_VALUE                                   =611;
+int MODBUS_CO2_CALIBRATION_DATA                              =612;
+int MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN                        =613 ;//              393                 526
+int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL1                        =614 ;//              394                 527
+int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL2                        =615 ;//              395                 528
+int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL3                        =616 ;//              396                 529
+int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT1                        =617 ;//              397                 530
+int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT2                        =618 ;//              398                 531
+int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT3                        =619 ;//              399                 532
+int MODBUS_UNIVERSAL_OFF_VALVE_BEGIN                         =620 ;//              400                 533
+int MODBUS_UNIVERSAL_OFF_VALVE_COOL1                         =621 ;//              401                 534
+int MODBUS_UNIVERSAL_OFF_VALVE_COOL2                         =622 ;//              402                 535
+int MODBUS_UNIVERSAL_OFF_VALVE_COOL3                         =623 ;//              403                 536
+int MODBUS_UNIVERSAL_OFF_VALVE_HEAT1                         =624 ;//              404                 537
+int MODBUS_UNIVERSAL_OFF_VALVE_HEAT2                         =625 ;//              405                 538
+int MODBUS_UNIVERSAL_OFF_VALVE_HEAT3                         =626 ;//              406                 539
+
+int MODBUS_VALUE_SENSOR                                      =628;
+int MODBUS_PIR_SELECT_ENABLE                                 =629;
+int MODBUS_PIR_REAL_VALUE                                    =630;
+int MODBUS_PIR_OCCUPIED                                      =631;
+int MODBUS_UNIVERSAL_VALVE_BEGIN                          =632;
+int MODBUS_UNIVERSAL_VALVE_COOL1                         =633;
+int MODBUS_UNIVERSAL_VALVE_COOL2                         =634;
+int MODBUS_UNIVERSAL_VALVE_COOL3                         =635;
+int MODBUS_UNIVERSAL_VALVE_HEAT1                            =636;
+int MODBUS_UNIVERSAL_VALVE_HEAT2                            =637;
+int MODBUS_UNIVERSAL_VALVE_HEAT3                            =638;
+
+
 int MODBUS_HEATING_PID                                       =-1  ;//              105                 105
 int MODBUS_CALIBRATION                                       =-1  ;//              109                 109
 int MODBUS_CALIBRATION_ANALOG_IN1                            =-1  ;//              110                 110
@@ -1639,13 +1652,13 @@ int MODBUS_LED6_CONTROL                                      =-1  ;//           
 int MODBUS_LED7_CONTROL                                      =-1  ;//              210                 210
 int MODBUS_INTERNAL_TEMP_IC                                  =-1  ;//              215                 215
 int MODBUS_CALIBRATION_ANALOG_IN2                            =-1  ;//              218                 218
-int MODBUS_UNIVERSAL_VALVE_BEGIN                             =-1  ;//              261                 261
-int MODBUS_UNIVERSAL_VALVE_COOL1                             =-1  ;//              262                 262
-int MODBUS_UNIVERSAL_VALVE_COOL2                             =-1  ;//              263                 263
-int MODBUS_UNIVERSAL_VALVE_COOL3                             =-1  ;//              264                 264
-int MODBUS_UNIVERSAL_VALVE_HEAT1                             =-1  ;//              265                 265
-int MODBUS_UNIVERSAL_VALVE_HEAT2                             =-1  ;//              266                 266
-int MODBUS_UNIVERSAL_VALVE_HEAT3                             =-1  ;//              267                 267
+//int MODBUS_UNIVERSAL_VALVE_BEGIN                             =-1  ;//              261                 261
+//int MODBUS_UNIVERSAL_VALVE_COOL1                             =-1  ;//              262                 262
+//int MODBUS_UNIVERSAL_VALVE_COOL2                             =-1  ;//              263                 263
+//int MODBUS_UNIVERSAL_VALVE_COOL3                             =-1  ;//              264                 264
+//// MODBUS_UNIVERSAL_VALVE_HEAT1                             =-1  ;//              265                 265
+//int MODBUS_UNIVERSAL_VALVE_HEAT2                             =-1  ;//              266                 266
+//int MODBUS_UNIVERSAL_VALVE_HEAT3                             =-1  ;//              267                 267
 int MODBUS_DIGITAL1_FUNCTION                                 =-1  ;//              300                 300
 int MODBUS_DIGITAL_INPUT                                     =-1  ;//              311                 311
 int MODBUS_DEBUGTIMER                                        =-1  ;//              316                 316
@@ -1749,3 +1762,12 @@ int MODBUS_RELAY_PWM_HIGH_DUTY                               =-1  ;//           
 
 
 
+
+#pragma region For_bacnet
+HWND      g_hwnd_now;
+HWND      m_input_dlg_hwnd;
+HWND      m_pragram_dlg_hwnd;
+vector <Str_out_point> m_Output_data;
+vector <Str_in_point>  m_Input_data;
+vector <Str_program_point>  m_Program_data;
+#pragma endregion For_bacnet

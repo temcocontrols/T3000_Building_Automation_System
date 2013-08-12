@@ -1053,6 +1053,7 @@ void CAddBuilding::OnCbnSelendokAddbuidingSelectcombo()
 
 	}
 	m_AddBuiding_SetComBox.ShowWindow(SW_HIDE);
+	m_Changed=TRUE;
 //	AfxMessageBox(m_strBuilding_Name2);
 
 }

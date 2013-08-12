@@ -58,6 +58,7 @@
 #define LOAD_FAILURE_SEVEN							_T("Section7:VARIABLE ")
 #define STEP_FAILURE								_T(" Error\r\n")
 #define STEP_FINISH									_T(" Success\r\n")
+ 
 
 
 
@@ -65,7 +66,8 @@
 
 // CBuildTable1 ¶Ô»°¿ò
     // Address 219
-#define    MODBUS_TABLE1_ZERO  219
+	/*
+#define MODBUS_TABLE1_ZERO  219
 #define	MODBUS_TABLE1_ZERO_HI  220              // 1     254    the range from reg 20 to reg 41.A changable look up table for "custom" sensor 
 #define	MODBUS_TABLE1_HALFONE  221   
 #define	MODBUS_TABLE1_HALFONE_HI 222               //              the range of input voltage is 0----5v and the range is divided 10 equal partions,at 0.5v interval
@@ -109,10 +111,10 @@
 #define	MODBUS_TABLE2_HALFFIVE     332
 #define	MODBUS_TABLE2_HALFFIVE_HI  333
 #define	MODBUS_TABLE2_FIVE         334
-#define	MODBUS_TABLE2_FIVE_HI      335
-
-
-
+#define	MODBUS_TABLE2_FIVE_HI      335*/
+//
+//
+//
 #define MODBUS_TSTAT6_HUM_AM  608  //605
 #define MODBUS_TSTAT6_HUM_MVALUE 609   //606
 #define MODBUS_TSTAT6_HUM_AVALUE 140

@@ -555,20 +555,6 @@ void CT3000App::OnVersionInfo()
 
 BOOL CT3000App::haveRegister()
 {
-// 	CString strPath;
-// 	CFile tempFile;
-// 
-// 	strPath=GetModulePath();
-// 	strPath=strPath.Left(strPath.ReverseFind(_T('\\'))+1);
-// 	strPath+=_T("77984329");
-// 
-// 	if(!tempFile.Open(strPath,CFile::modeRead))
-// 		return FALSE;
-// 
-// 	tempFile.Close();
-// 	return TRUE;
-
-
 	if (m_maxClients == 0)
 		return FALSE;
 	else 

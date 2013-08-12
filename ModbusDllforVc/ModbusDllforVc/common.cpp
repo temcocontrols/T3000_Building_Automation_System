@@ -805,7 +805,165 @@ OUTPUT bool is_connect()
 	return false; //add by Fance
 }
 //device_var:priduct ID,address:a regster;
-OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
+
+OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length)
+{	
+	if(g_Commu_type==0)//
+	{
+		//the return value ,-2 is wrong
+		//the return value == -1 ,no connecting
+		HCURSOR hc;//load mouse cursor
+		TS_UC data_to_write[600]={0};
+		data_to_write[0]=device_var;
+		data_to_write[1]=0x10;
+		data_to_write[2]=start_address >> 8 & 0xff;
+		data_to_write[3]=start_address & 0xff;
+		data_to_write[4]=0;
+		data_to_write[5]=length*0xff;
+		data_to_write[6]=length*2;//128 is better ,if you send more than 128, the ron software will meet some trouble,because it is too long one times,can not finish on time;on time
+		for(int i=0;i<length;i++)
+			{
+				data_to_write[7+i*2] =to_write[i]  >> 8 & 0xff;
+				data_to_write[7+i*2+1]=to_write[i] & 0xff;
+			
+			}
+ 
+
+		TS_US crc=CRC16(data_to_write,length+7);
+		data_to_write[length*2+7]=crc>>8 & 0xff;
+		data_to_write[length*2+8]=crc & 0xff;
+
+		hc = LoadCursor(NULL,IDC_WAIT);
+		hc = SetCursor(hc);
+		//length is the data length,if you want to write 128 bite,the length == 128
+		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		if(m_hSerial==NULL)
+		{
+			return -1;
+		}
+		////////////////////////////////////////////////clear com error
+		COMSTAT ComStat;
+		DWORD dwErrorFlags;
+
+		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
+		PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
+		////////////////////////////////////////////////////////////overlapped declare
+		memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
+		if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false,_T("MulWrite")))==NULL)
+			return -2; 
+		m_osMulWrite.Offset = 0;
+		m_osMulWrite.OffsetHigh = 0 ;
+		///////////////////////////////////////////////////////send the to read message
+		int fState=WriteFile(m_hSerial,// 句柄
+			data_to_write,// 数据缓冲区地址
+			length*2+9,// 数据大小
+			&m_had_send_data_number,// 返回发送出去的字节数
+			&m_osMulWrite);
+		if(!fState)// 不支持重叠	
+		{
+			if(GetLastError()==ERROR_IO_PENDING)
+			{
+				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
+				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+			}
+			else
+				m_had_send_data_number=0;
+		}
+		///////////////////////////up is write
+		/////////////**************down is read
+		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
+		memset(&m_osRead, 0, sizeof(OVERLAPPED));
+		if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+			return -2; 
+		m_osRead.Offset = 0;
+		m_osRead.OffsetHigh = 0 ;
+		Sleep(LATENCY_TIME_COM);
+		////////////////////////////////////////////////clear com error
+		fState=ReadFile(m_hSerial,// 句柄
+			gval,// 数据缓冲区地址
+			8,// 数据大小
+			&m_had_send_data_number,// 返回发送出去的字节数
+			&m_osRead);
+		if(!fState)// 不支持重叠	
+		{
+			if(GetLastError()==ERROR_IO_PENDING)
+			{
+				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
+				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+			}
+			else
+				m_had_send_data_number=0;
+		}	
+		///////////////////////////////////////////////////////////
+		for(int i=0;i<6;i++)
+			if(gval[i]!=*(data_to_write+i))
+				return -2;
+		crc=CRC16(gval,6);
+		if(gval[6]!=((crc>>8)&0xff))
+			return -2;
+		if(gval[7]!=(crc & 0xff))
+			return -2;
+		return 1;
+	}
+	if(g_Commu_type==1)//tcp.
+	{
+		//the return value ,-2 is wrong
+		//the return value == -1 ,no connecting
+		HCURSOR hc;//load mouse cursor
+		TS_UC data_to_write[600]={'\0'};
+		TS_UC data_back_write[600]={'\0'};
+		
+		data_to_write[0]=1;
+		data_to_write[1]=2;
+		data_to_write[2]=3;
+		data_to_write[3]=4;
+		data_to_write[4]=5;
+		data_to_write[5]=6;
+
+		data_to_write[6]=device_var;
+		data_to_write[7]=0x10;
+		data_to_write[8]=start_address >> 8 & 0xff;
+		data_to_write[9]=start_address & 0xff;
+		data_to_write[10]=0;
+		data_to_write[11]=length&0xff;
+		data_to_write[12]=length*2;//128 is better ,if you send more than 128, the ron software will meet some trouble,because it is too long one times,can not finish on time;on time
+		for(int i=0;i<length;i++)
+			 {
+				 data_to_write[13+i*2] =to_write[i]  >> 8 & 0xff;
+				 data_to_write[13+i*2+1]=to_write[i] & 0xff;
+			 }
+		
+			
+	//	1 2 3 4 5 6 2 10 0 c8 0 8 8 5 5 5 5 5 5 5 5
+	//	TS_US crc=CRC16(data_to_write,i+7);
+	//	data_to_write[i+7]=crc>>8 & 0xff;
+	//	data_to_write[i+8]=crc & 0xff;
+		hc = LoadCursor(NULL,IDC_WAIT);
+		hc = SetCursor(hc);
+//length is the data length,if you want to write 128 bite,the length == 128
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		if(m_hSocket==INVALID_SOCKET)
+		{
+			return -1;
+		}
+	
+		int n=::send(m_hSocket,(char *)data_to_write,13+2*length,0);
+		int nRecv = ::recv(m_hSocket, (char *)data_back_write,13, 0);
+		if(nRecv<0)
+		{
+			return -2;
+		}
+	//	memcpy((void*)&to_send_data[0],(void*)&to_Reive_data[6],sizeof(to_Reive_data));
+		for(int i=0;i<6;i++)
+			if(data_back_write[i+6]!=*(data_to_write+i+6))
+				return -2;
+		return 1;
+
+	}
+	return -1;
+}
+     
+OUTPUT int Read_One(TS_UC device_var,TS_US address)
 {
 
 //	CSingleLock singlock(&scan_mutex);
@@ -1092,7 +1250,7 @@ OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
 //	singlock.Unlock();
 }
 
-OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
+OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
 {
 	if (g_Commu_type==0)
 	{
@@ -1455,7 +1613,7 @@ OUTPUT int Write_One_tap(TS_UC device_var,TS_US address,TS_US val)
 	///////////////////////////////////////////////////////////
 }
 
-OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length)
+OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length)
 {
 	if(g_Commu_type==0)
 	{
@@ -1663,7 +1821,7 @@ OUTPUT int read_multi_tap(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 	return -1;
 }
 
-OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
+OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 {	
 	if(g_Commu_type==0)//
 	{
@@ -1814,155 +1972,6 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
 	}
 	return -1;
 }
-
-/*
-OUTPUT int Read_One2(TS_UC device_var,TS_US address)
-{
-	if(g_Commu_type==0)//serial
-	{
-		TS_UC to_send_data[300]={'\0'};
-		//address        the register
-		//the return value ,-2 is wrong
-		//the return value == -1 ,no connecting
-		//return value == -3 ,no response
-		//清空串口缓冲区
-		//TS_UC  gval[8]={'\0'};//the data that get
-		//      TS_UC  pval[9];
-		for(int i=0;i<11;i++)
-			gval[i]=0;/////////////////////////////////////////clear buffer
-		TS_US crc;		
-		DWORD m_had_send_data_number;//已经发送的数据的字节数
-		pval[0] = device_var;
-		pval[1] = 3;
-		pval[2] =0;//address>>8 & 0xFF ;//起始地址从而开始.
-		pval[3] =0;//address & 0xFF;
-
-		pval[4] = 0;//(val>>8) & 0xff;//number hi
-		pval[5] = 0x78;//val & 0xff;//number lo    //120Byte
-		crc = CRC16(pval,6);
-		pval[6] = (crc >>8) & 0xff;
-		pval[7] = crc & 0xff;
-		if(m_hSerial==NULL)
-		{
-			return -1;
-		}
-		////////////////////////////////////////////////////////////overlapped declare
-		////////////////////////////////////////////////clear com error
-		COMSTAT ComStat;
-		DWORD dwErrorFlags;
-
-		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
-		PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
-		///////////////////////////////////////////////////////send the to read message
-		memset(&m_osWrite, 0, sizeof(OVERLAPPED));
-		if((m_osWrite.hEvent = CreateEvent(NULL,true,false,_T("Write")))==NULL)
-			return -2; 
-		m_osWrite.Offset = 0;
-		m_osWrite.OffsetHigh = 0 ;
-
-		int fState=WriteFile(m_hSerial,// 句柄
-			pval,// 数据缓冲区地址
-			8,// 数据大小
-			&m_had_send_data_number,// 返回发送出去的字节数
-			&m_osWrite);
-		if(!fState)// 不支持重叠	
-		{
-			if(GetLastError()==ERROR_IO_PENDING)
-			{
-				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
-				//			if(GetLastError()==ERROR_IO_PENDING)
-				//				AfxMessageBox("wrong1");
-			}
-			else
-				m_had_send_data_number=0;
-		}
-		//////////////////////////////////////////the message had send ,now to read
-		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
-		memset(&m_osRead, 0, sizeof(OVERLAPPED));
-		if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
-			return -2; 
-		m_osRead.Offset = 0;
-		m_osRead.OffsetHigh = 0 ;
-		////////////////////////////////////////////////clear com error
-		Sleep(LATENCY_TIME_COM);
-		if(address==10)
-		{
-			serinumber_in_dll[0]=serinumber_in_dll[1]=serinumber_in_dll[2]=serinumber_in_dll[3]=0;//this line is for new protocal			
-			fState=ReadFile(m_hSerial,// 句柄
-				to_send_data,// 数据缓冲区地址
-				145,// 数据大小70*2+3+2
-				&m_had_send_data_number,// 返回发送出去的字节数
-				&m_osRead);
-		}
-		else
-		{
-			fState=ReadFile(m_hSerial,// 句柄
-				to_send_data,// 数据缓冲区地址
-				245,// 数据大小120*2+3+2
-				&m_had_send_data_number,// 返回发送出去的字节数
-				&m_osRead);
-		}
-		if(!fState)// 不支持重叠	
-		{
-			if(GetLastError()==ERROR_IO_PENDING)
-			{
-				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
-				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
-			}
-			else
-				m_had_send_data_number=0;
-		}
-
-		if(address!=10)
-		{//old protocal
-			if(to_send_data[0]==0 && to_send_data[1]==0 && to_send_data[2]==0 && to_send_data[3]==0 && to_send_data[4]==0 && to_send_data[5]==0 && to_send_data[6]==0 )
-				return -3;
-			if(to_send_data[0]!=pval[0] || to_send_data[1]!=pval[1] ||to_send_data[2]!=240 )//120*2 bytes data?
-				return -2;
-			//crc=CRC16(gval,5);
-			crc=CRC16(to_send_data,243);//3+120*2
-			if(to_send_data[243]!=((crc>>8)&0xff))
-				return -2;
-			if(to_send_data[244]!=(crc & 0xff))
-				return -2;	
-		}
-
-	
-// 		else
-// 		{
-// 			if(gval[7]!=0 || gval[8]!=0 || gval[9]!=0 || gval[10]!=0)
-// 			{//new protocal
-// 				if(gval[0]!=pval[0] || gval[1]!=pval[1])//6
-// 					return -2;
-// 				crc=CRC16(gval,9);
-// 				if(gval[9]!=((crc>>8)&0xff))
-// 					return -2;
-// 				if(gval[10]!=(crc & 0xff))
-// 					return -2;		
-// 				serinumber_in_dll[0]=gval[5];
-// 				serinumber_in_dll[1]=gval[6];
-// 				serinumber_in_dll[2]=gval[7];
-// 				serinumber_in_dll[3]=gval[8];//stay serialnumber	
-// 				//			TRACE("R:%x %x %x %x\n",serinumber_in_dll[0],serinumber_in_dll[1],serinumber_in_dll[2],serinumber_in_dll[3]);
-// 			}
-// 			else
-// 			{//old protocal
-// 				if(gval[0]!=pval[0] || gval[1]!=pval[1] || gval[2]!=2 )//2
-// 					return -2;
-// 				crc=CRC16(gval,5);
-// 				if(gval[5]!=((crc>>8)&0xff))
-// 					return -2;
-// 				if(gval[6]!=(crc & 0xff))
-// 					return -2;	
-// 			}
-// 		}
-		
-		return (to_send_data[15]*256+to_send_data[16]);
-	}
-	//return 1;
-}
-*/
 
 
 OUTPUT int NetController_CheckTstatOnline(TS_UC devLo,TS_UC devHi)

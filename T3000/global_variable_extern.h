@@ -1,4 +1,8 @@
 #pragma once
+
+#include "Bacnet_Include.h"
+#include "CM5\ud_str.h"
+extern int g_invoke_id;
 extern vector <int> Change_Color_ID;
 extern HANDLE hThread;
 extern DWORD nThreadID;
@@ -35,7 +39,6 @@ extern	int g_tstat_id;
 extern int g_serialNum;
 extern	BOOL g_tstat_id_changed;
 extern  BOOL g_bPauseMultiRead;     // for background read register
-
 extern  int now_tstat_id;//for batch load/flash read/write
 extern  CString g_strImagePathName;
 extern	CString	g_strDatabasefilepath;
@@ -117,22 +120,6 @@ extern int g_llTxCount;
 extern int g_llRxCount;
 extern BOOL g_unint;
 
-
-//////////////////////////////////////////////////////////////////////////
-// extern int const PM_TSTAT5A;
-// extern int const PM_TSTAT5B;
-// extern int const PM_TSTAT5B2;
-// extern int const PM_TSTAT5C;
-// extern int const PM_TSTAT5D;
-// extern const int PM_TSTAT5E;
-// extern int const PM_TSTAT5F;
-// extern int const PM_TSTAT5G;
-// extern int const PM_TSTAT5H;
-// extern int const PM_TSTAT6;
-// extern int const PM_TSTAT7;
-
-//////////////////////////////////////////////////////////////////////////
-// product model ID table
 int const PM_TSTAT5B = 1;
 int const PM_TSTAT5A = 2;
 int const PM_TSTAT5B2 = 3;
@@ -149,6 +136,7 @@ int const PM_T38AIOD= 20;
 int const PM_T3IOA = 21;
 int const PM_T332AI = 22;
 int const PM_T3AI16O = 23;
+
 int const PM_ZIGBEE = 24;
 int const PM_FLEXDRIVER = 25;
 int const PM_T38I13O = 26;
@@ -157,7 +145,8 @@ int const PM_T34AO = 28;
 int const PM_T36CT = 29;
 int const PM_SOLAR = 30;
 int const PM_FWMTRANSDUCER = 31;
-int const PM_CO2 = 32;
+int const PM_CO2_NET = 32;
+int const PM_CO2_RS485 = 33;
 int const PM_MINIPANEL = 35;
 int const PM_PRESSURE = 40;
 int const PM_CM5 = 50;
@@ -262,28 +251,28 @@ extern int MODBUS_ANALOG5_FUNCTION                             ;
 extern int MODBUS_ANALOG6_FUNCTION                             ;
 extern int MODBUS_ANALOG7_FUNCTION                             ;
 extern int MODBUS_ANALOG8_FUNCTION                             ;
-//extern int MODBUS_TABLE1_ZERO                                  ;
-//extern int MODBUS_TABLE1_HALFONE                               ;
-//extern int MODBUS_TABLE1_ONE                                   ;
-//extern int MODBUS_TABLE1_HALFTWO                               ;
-//extern int MODBUS_TABLE1_TWO                                   ;
-//extern int MODBUS_TABLE1_HALFTHREE                             ;
-//extern int MODBUS_TABLE1_THREE                                 ;
-//extern int MODBUS_TABLE1_HALFFOUR                              ;
-//extern int MODBUS_TABLE1_FOUR                                  ;
-//extern int MODBUS_TABLE1_HALFFIVE                              ;
-//extern int MODBUS_TABLE1_FIVE                                  ;
-//extern int MODBUS_TABLE2_ZERO                                  ;
-//extern int MODBUS_TABLE2_HALFONE                               ;
-//extern int MODBUS_TABLE2_ONE                                   ;
-//extern int MODBUS_TABLE2_HALFTWO                               ;
-//extern int MODBUS_TABLE2_TWO                                   ;
-//extern int MODBUS_TABLE2_HALFTHREE                             ;
-//extern int MODBUS_TABLE2_THREE                                 ;
-//extern int MODBUS_TABLE2_HALFFOUR                              ;
-//extern int MODBUS_TABLE2_FOUR                                  ;
-//extern int MODBUS_TABLE2_HALFFIVE                              ;
-//extern int MODBUS_TABLE2_FIVE                                  ;
+extern int MODBUS_TABLE1_ZERO                                  ;
+extern int MODBUS_TABLE1_HALFONE                               ;
+extern int MODBUS_TABLE1_ONE                                   ;
+extern int MODBUS_TABLE1_HALFTWO                               ;
+extern int MODBUS_TABLE1_TWO                                   ;
+extern int MODBUS_TABLE1_HALFTHREE                             ;
+extern int MODBUS_TABLE1_THREE                                 ;
+extern int MODBUS_TABLE1_HALFFOUR                              ;
+extern int MODBUS_TABLE1_FOUR                                  ;
+extern int MODBUS_TABLE1_HALFFIVE                              ;
+extern int MODBUS_TABLE1_FIVE                                  ;
+extern int MODBUS_TABLE2_ZERO                                  ;
+extern int MODBUS_TABLE2_HALFONE                               ;
+extern int MODBUS_TABLE2_ONE                                   ;
+extern int MODBUS_TABLE2_HALFTWO                               ;
+extern int MODBUS_TABLE2_TWO                                   ;
+extern int MODBUS_TABLE2_HALFTHREE                             ;
+extern int MODBUS_TABLE2_THREE                                 ;
+extern int MODBUS_TABLE2_HALFFOUR                              ;
+extern int MODBUS_TABLE2_FOUR                                  ;
+extern int MODBUS_TABLE2_HALFFIVE                              ;
+extern int MODBUS_TABLE2_FIVE                                  ;
 extern int MODUBS_HUMIDITY_RH                                  ;
 extern int MODBUS_HUMIDITY_FREQUENCY                           ;
 extern int MODBUS_HUM_PIC_UPDATE                               ;
@@ -694,28 +683,36 @@ extern int MODBUS_BUTTON_LEFT1                                 ;
 extern int MODBUS_BUTTON_LEFT2                                 ;
 extern int MODBUS_BUTTON_LEFT3                                 ;
 extern int MODBUS_BUTTON_LEFT4                                 ;
-extern int MODBUS_HUM_INPUT_MANUAL_ENABLE                      ;
-extern int MODBUS_HUM_INPUT_MANUAL_VALUE                       ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN                   ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL1                   ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL2                   ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL3                   ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT1                   ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT2                   ;
-extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT3                   ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_BEGIN                    ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL1                    ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL2                    ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL3                    ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT1                    ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT2                    ;
-extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT3                    ;
-extern int MODBUS_TEST1                                        ;
-extern int MODBUS_TEST2                                        ;
-extern int MODBUS_TEST3                                        ;
-extern int MODBUS_TEST4                                        ;
-extern int MODBUS_TEST5                                        ;
-extern int MODBUS_TEST6                                        ;
+
+
+extern int MODBUS_HUM_HEATER_CONTROL_ENABLE;
+extern int MODBUS_HUM_INPUT_MANUAL_ENABLE;
+extern int MODBUS_HUM_INPUT_MANUAL_VALUE;                             
+extern int MODBUS_CO2_INPUT_MANUAL_ENABLE;                            
+extern int MODBUS_CO2_INPUT_VALUE    ;                                
+extern int MODBUS_CO2_CALIBRATION_DATA   ;                           
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN       ;                  
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL1   ;                      
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL2  ;                       
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_COOL3   ;                      
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT1  ;                       
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT2  ;                       
+extern int MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT3 ;                       
+extern int MODBUS_UNIVERSAL_OFF_VALVE_BEGIN ;                        
+extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL1;                          
+extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL2 ;                         
+extern int MODBUS_UNIVERSAL_OFF_VALVE_COOL3   ;                       
+extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT1   ;                       
+extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT2   ;                       
+extern int MODBUS_UNIVERSAL_OFF_VALVE_HEAT3   ;                      
+
+extern int MODBUS_VALUE_SENSOR        ;                             
+extern int MODBUS_PIR_SELECT_ENABLE      ;                           
+extern int MODBUS_PIR_REAL_VALUE    ;                                 
+extern int MODBUS_PIR_OCCUPIED      ;                                 
+                            
+
+
 extern int MODBUS_HEATING_PID                                  ;
 extern int MODBUS_CALIBRATION                                  ;
 extern int MODBUS_CALIBRATION_ANALOG_IN1                       ;
@@ -849,3 +846,11 @@ extern int MODBUS_RELAY_PWM_ENABLE                             ;
 extern int MODBUS_RELAY_PWM_TOTAL_DUTY                         ;
 extern int MODBUS_RELAY_PWM_HIGH_DUTY                          ;   
 
+#pragma region For_bacnet
+extern HWND      g_hwnd_now;
+extern HWND      m_input_dlg_hwnd;
+extern HWND      m_pragram_dlg_hwnd;
+extern vector <Str_out_point> m_Output_data;
+extern vector <Str_in_point>  m_Input_data;
+extern vector <Str_program_point>  m_Program_data;
+#pragma endregion For_bacnet

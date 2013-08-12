@@ -21,7 +21,7 @@ CString Interlock[6]={_T("ON"),_T("DI1"),_T("AI1") ,_T("AI2"),_T("TIMER OR"),_T(
 CString ONTPUT_FUNS[3]={_T("Normal"),_T("Normal"),_T("Normal") };//2.5.0.98
 CString OUTPUT_ANRANGE[5]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)")};
 //CString OUTPUT_RANGE45[2]={_T("On/Off"),_T("Float(0-100%)")/*,_T("PWM(0-100%)")*/};
-CString OUTPUT_RANGE45[3]={_T("On/Off"),_T("Float(0-100%)"),_T("PWM(0-100%)")};//2.5.0.98
+CString OUTPUT_RANGE45[4]={_T("On/Off"),_T("Float(Cooling)"),_T("Float(Heating)"),_T("PWM(0-100%)")};//2.5.0.98
 
 const int REFRESH_GRID=1;
 const int ENABLE_REFRESH_BUTTON=2;
@@ -129,9 +129,9 @@ BOOL COutputSetDlg::OnInitDialog()
 	m_FlexGrid.put_TextMatrix(0,6,_T("Interlock"));//tstat5
 	m_FlexGrid.put_ColWidth(6,1200);//tstat5
 
-	m_FlexGrid.put_TextMatrix(0,7,_T("ON->OFF Delay"));//tstat5
+	m_FlexGrid.put_TextMatrix(0,7,_T("OFF->ON Delay"));//tstat5
 	m_FlexGrid.put_ColWidth(7,1500);//tstat5
-	m_FlexGrid.put_TextMatrix(0,8,_T("OFF->ON Delay"));//tstat5
+	m_FlexGrid.put_TextMatrix(0,8,_T("ON->OFF Delay"));//tstat5
 	m_FlexGrid.put_ColWidth(8,1500);//tstat5
 
 	m_FlexGrid.put_TextMatrix(1,NAME_OUTFIELD,g_strOutName1);
@@ -211,7 +211,14 @@ void COutputSetDlg::Fresh_Grid()
 	CString strTemp;
 	//row1:
 	int nVAlue;
-
+	//这段代码的作用是当选择的是Floating或者PWM模式的时候，
+	//要根据在outputtable中 用户选择的是PID1，还是PID2 PID1 从384 读值 PID2 就是从389读值
+	#if 1
+	int pid_select2[7]={0};
+	for(int i=0;i<7;i++)
+		pid_select2[i]=product_register_value[MODBUS_PID_OUTPUT1+i];
+#endif
+	
 
 	//108  209 Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.  Fan.
 	nVAlue = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS]; //t5=108   t6=209;
@@ -224,7 +231,7 @@ void COutputSetDlg::Fresh_Grid()
 
 	int nAMVAlue=0;//=multi_register_value[310];
 	nAMVAlue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];
-
+	//Row 1-3 初始化 Value，A/M，Range
 	for(int i=1;i<=3;i++)
 	{
 		if(nVAlue&(1<<(i-1)))
@@ -256,11 +263,22 @@ void COutputSetDlg::Fresh_Grid()
 			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
 		} 
 		m_FlexGrid.put_TextMatrix(i,AM_OUTFIELD,strTemp);
-		strTemp=_T("On/Off");
+		//strTemp=_T("On/Off");
+		nRange=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
+		 
+		 
+		if(nRange>=0&&nRange<4)
+		{
+			strTemp=OUTPUT_RANGE45[nRange];
+		}
+
+
 		m_FlexGrid.put_TextMatrix(i,RANG_OUTFIELD,strTemp);
 		
 	}
 	//Fan  Comments 这里有问题 ， strTemp 判断了那么久 在后面直接赋值 NO_APPLICATION ，是为什么?;
+	//Row1-3 其他几列
+	#if 1 
 	if(m_version>32.2)
 	{
 		//	328	266	1	Low byte	W/R	"Output1 Function setting:
@@ -330,9 +348,11 @@ void COutputSetDlg::Fresh_Grid()
 		m_FlexGrid.put_TextMatrix(3,FUN_OUTFIELD,strTemp);
 
 	}
+#endif
+
 
 //----------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------
+
 	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16 
 		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)//||m_nModeType==17||m_nModeType==18)
 	{
@@ -361,8 +381,7 @@ void COutputSetDlg::Fresh_Grid()
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
 
-		if(nRange>=0&&nRange<=2)		//Modify by Fance_0412
-		//if(nRange>=0&&nRange<2)
+		if(nRange>=0&&nRange<=3)		//Modify by Fance_0412
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
@@ -444,7 +463,7 @@ void COutputSetDlg::Fresh_Grid()
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];
 
-		if(nRange>=0&&nRange<=2)
+		if(nRange>=0&&nRange<=3)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
@@ -559,7 +578,7 @@ void COutputSetDlg::Fresh_Grid()
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT4]; //283  205
 
-		if(nRange>=0&&nRange<=2)
+		if(nRange>=0&&nRange<=3)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
@@ -696,13 +715,11 @@ void COutputSetDlg::Fresh_Grid()
 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];  //284  206
-		if(nRange>=0&&nRange<=2)
+		if(nRange>=0&&nRange<=3)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
-
 		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
-
 		strTemp.Empty();
 		if (m_version<32.2)
 		{
@@ -836,7 +853,7 @@ void COutputSetDlg::Fresh_Grid()
 			}
 			m_FlexGrid.put_TextMatrix(4,AM_OUTFIELD,strTemp);
 
-			if(nRange>=0&&nRange<5)
+			if(nRange>=0&&nRange<4)
 			{
 				strTemp=OUTPUT_ANRANGE[nRange];
 			}
@@ -1105,6 +1122,71 @@ void COutputSetDlg::Fresh_Grid()
 		m_FlexGrid.put_TextMatrix(row+1,8,strdelay);
 	}
 	}
+	else
+	{
+		CString strdelay;
+		for (int row=0;row<5;row++)
+		{
+			stradd=MODBUS_OUTPUT1_DELAY_OFF_TO_ON+row;	 //213
+			int itemp=product_register_value[stradd];
+			strdelay.Format(_T("%d"),itemp);
+			m_FlexGrid.put_TextMatrix(row+1,7,strdelay);
+		}
+		for (int row=0;row<5;row++)
+		{
+			stradd=MODBUS_OUTPUT1_DELAY_ON_TO_OFF+row;	 //227
+			int itemp=product_register_value[stradd];
+			strdelay.Format(_T("%d"),itemp);
+			m_FlexGrid.put_TextMatrix(row+1,8,strdelay);
+		}
+	}
+	if ((product_register_value[7] == 6)||(product_register_value[7] == 7)){
+	nAMVAlue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];
+
+	for (int row=1;row<=5;row++)
+	{
+
+		 
+		
+
+	   if (product_register_value[MODBUS_MODE_OUTPUT1+row-1]==3)
+	   {
+	       strTemp=_T("Auto");
+		   m_FlexGrid.put_Col(AM_OUTFIELD);
+		   m_FlexGrid.put_Row(row);
+		   m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+		   m_FlexGrid.put_Col(VALUE_OUTFIELD);
+		   m_FlexGrid.put_Row(row);
+		   m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+	   }
+	   else
+	   {
+		   m_FlexGrid.put_Col(AM_OUTFIELD);
+		   m_FlexGrid.put_Row(row);
+		   m_FlexGrid.put_CellBackColor(RGB(255,255,255));
+
+		   if((int)(nAMVAlue & (1<<(row-1))) == (1<<(row-1)))
+		   {
+			   strTemp=_T("Manual");
+			   m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			   m_FlexGrid.put_Row(row);
+			   m_FlexGrid.put_CellBackColor(RGB(255,255,255));
+		   }
+		   else
+		   {
+		    strTemp=_T("Auto");
+			   m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			   m_FlexGrid.put_Row(row);
+			   m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+		   }
+	   }
+	   m_FlexGrid.put_TextMatrix(row,AM_OUTFIELD,strTemp);
+	}
+
+	}
+
+
+
 }
 
 
@@ -1265,7 +1347,7 @@ void COutputSetDlg::Fresh_GridForTstat6()
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
 
-		if(nRange>=0&&nRange<=2)		//Modify by Fance_0412
+		if(nRange>=0&&nRange<=3)		//Modify by Fance_0412
 			//if(nRange>=0&&nRange<2)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
@@ -1348,7 +1430,7 @@ void COutputSetDlg::Fresh_GridForTstat6()
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];
 
-		if(nRange>=0&&nRange<=2)
+		if(nRange>=0&&nRange<=3)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
@@ -3307,346 +3389,232 @@ BEGIN_EVENTSINK_MAP(COutputSetDlg, CDialog)
 END_EVENTSINK_MAP()
 
 void COutputSetDlg::ClickMsflexgrid1()
-{
+{ 
+
+ #if 1//Tstat67
 	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
 	{
-		m_FlexGrid.SetFocus();
-		long lRow,lCol;
-		lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
-		lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
-		if(lRow>m_FlexGrid.get_Rows()) //如果点击区超过最大行号，则点击是无效的
-			return;
-		if(lRow == 0) //如果点击标题行，也无效
-			return;
-		CRect rect;
-		m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-		ScreenToClient(rect); //转换为客户区矩形	
-		// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-		//需要将其转化为像素，1440缇= 1英寸
-		CDC* pDC =GetDC();
-		//计算象素点和缇的转换比例
-		int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
-		int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-		//计算选中格的左上角的坐标(象素为单位)
-		long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
-		long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
-		//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
-		long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
-		long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-		//形成选中个所在的矩形区域
-		CRect rc(x,y,x+width,y+height);
-		//转换成相对对话框的坐标
-		rc.OffsetRect(rect.left+1,rect.top+1);
-		//获取选中格的文本信息
-		CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
-		m_nCurRow=lRow;
-		m_nCurCol=lCol;
+	m_FlexGrid.SetFocus();
+	long lRow,lCol;
+	lRow = m_FlexGrid.get_RowSel();//获取点击的行号	
+	lCol = m_FlexGrid.get_ColSel(); //获取点击的列号
+	if(lRow>m_FlexGrid.get_Rows()) //如果点击区超过最大行号，则点击是无效的
+		return;
+	if(lRow == 0) //如果点击标题行，也无效
+		return;
+	CRect rect;
+	m_FlexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); 
+	//转换为客户区矩形	
+	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
+	//需要将其转化为像素，1440缇= 1英寸
+	CDC* pDC =GetDC();
+	//计算象素点和缇的转换比例
+	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
+	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//计算选中格的左上角的坐标(象素为单位)
+	long y = m_FlexGrid.get_RowPos(lRow)/nTwipsPerDotY;
+	long x = m_FlexGrid.get_ColPos(lCol)/nTwipsPerDotX;
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	long width = m_FlexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
+	long height = m_FlexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	//形成选中个所在的矩形区域
+	CRect rc(x,y,x+width,y+height);
+	//转换成相对对话框的坐标
+	rc.OffsetRect(rect.left+1,rect.top+1);
+	//获取选中格的文本信息
+	CString strValue = m_FlexGrid.get_TextMatrix(lRow,lCol);
+	m_nCurRow=lRow;
+	m_nCurCol=lCol;
 
-		if(VALUE_OUTFIELD==lCol)
+	if(VALUE_OUTFIELD==lCol)
+	{
+		if(lRow==1||lRow==2||lRow==3||lRow==4||lRow==5||lRow==6||lRow==7)
 		{
-			if(lRow==1||lRow==2||lRow==3||lRow==4||lRow==5||lRow==6||lRow==7)
-			{
-				if(DISABLE_COLOR_CELL==m_FlexGrid.get_CellBackColor())
-					return;
+			if(DISABLE_COLOR_CELL==m_FlexGrid.get_CellBackColor())
+				return;
 
-				m_OutValueCmbox.ResetContent();
-				m_OutValueCmbox.AddString(_T("Off"));
-				m_OutValueCmbox.AddString(_T("On"));
-				m_OutValueCmbox.ShowWindow(SW_SHOW);//显示控件
+			m_OutValueCmbox.ResetContent();
+			m_OutValueCmbox.AddString(_T("Off"));
+			m_OutValueCmbox.AddString(_T("On"));
+			m_OutValueCmbox.ShowWindow(SW_SHOW);//显示控件
 
-				m_OutValueCmbox.MoveWindow(rc);			//移动到选中格的位置，覆盖
-				m_OutValueCmbox.BringWindowToTop();
-				m_OutValueCmbox.SelectString(-1,strValue);
-				m_OutValueCmbox.SetFocus();					//获取焦点
+			m_OutValueCmbox.MoveWindow(rc);			//移动到选中格的位置，覆盖
+			m_OutValueCmbox.BringWindowToTop();
+			m_OutValueCmbox.SelectString(-1,strValue);
+			m_OutValueCmbox.SetFocus();					//获取焦点
 
-				//310	254	1	Low byte	W/R	"Output auto/manual enable. Bit 0 to 4 correspond to output1 to output5, bit 5 correspond to 
-				//output6, bit 6 correspond to output7. 0, auto mode; 1, manual mode."
+			//310	254	1	Low byte	W/R	"Output auto/manual enable. Bit 0 to 4 correspond to output1 to output5, bit 5 correspond to 
+			//output6, bit 6 correspond to output7. 0, auto mode; 1, manual mode."
 
-				/////////////////////////////////////////////////////////////////////////////////
-				// below added by zgq;
-// 				if(m_nModeType==16 && lRow==4)
-// 				{
-// 					int nTempValue = newtstat6[254];
-// 					if(!(nTempValue & 0x08))	 // A/M，如选择Auto，不动，否则看Range
-// 						m_OutValueCmbox.ShowWindow(SW_HIDE);	
-// 					else
-// 					{
-// 						//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
-// 
-// 						int nTempValue = newtstat6[205];
-// 						if ( nTempValue != 0 )
-// 						{
-// 							m_OutValueCmbox.ShowWindow(SW_HIDE);
-// 							m_OutValueEdt.ShowWindow(SW_SHOW);	
-// 							m_OutValueEdt.SetWindowText(strValue);
-// 							m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
-// 							m_OutValueEdt.BringWindowToTop();
-// 							m_OutValueEdt.SetFocus(); //获取焦点
-// 						}					
-// 					}
-// 				}
+			/////////////////////////////////////////////////////////////////////////////////
+			// below added by zgq;
+			// 				if(m_nModeType==16 && lRow==4)
+			// 				{
+			// 					int nTempValue = newtstat6[254];
+			// 					if(!(nTempValue & 0x08))	 // A/M，如选择Auto，不动，否则看Range
+			// 						m_OutValueCmbox.ShowWindow(SW_HIDE);	
+			// 					else
+			// 					{
+			// 						//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
+			// 
+			// 						int nTempValue = newtstat6[205];
+			// 						if ( nTempValue != 0 )
+			// 						{
+			// 							m_OutValueCmbox.ShowWindow(SW_HIDE);
+			// 							m_OutValueEdt.ShowWindow(SW_SHOW);	
+			// 							m_OutValueEdt.SetWindowText(strValue);
+			// 							m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
+			// 							m_OutValueEdt.BringWindowToTop();
+			// 							m_OutValueEdt.SetFocus(); //获取焦点
+			// 						}					
+			// 					}
+			// 				}
 
-				//if((m_nModeType==PM_TSTAT5D||m_nModeType==PM_TSTAT5E ||m_nModeType==PM_TSTAT6 ||m_nModeType==PM_TSTAT7  ) && lRow>5)
-				if(lRow >=4)
-				{
+			//if((m_nModeType==PM_TSTAT5D||m_nModeType==PM_TSTAT5E ||m_nModeType==PM_TSTAT6 ||m_nModeType==PM_TSTAT7  ) && lRow>5)
+			if(lRow<=5)
+			{  //  MODBUS_DIGITAL_OUTPUT_STATUS
 				//	int nTempValue = newtstat6[254];		//Marked by Fance 2013 04 11
-					int nTempValue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];  //T5=310  //T6=254
-					DWORD dwFlag = 0x01;
-					bool bRowAuto =MKBOOL(nTempValue & (dwFlag << (lRow-1)));
+				int nTempValue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];  //T5=310  //T6=254
+				DWORD dwFlag = 0x01;
+				bool bRowAuto =MKBOOL(nTempValue & (dwFlag << (lRow-1)));
 
-					if(!bRowAuto)	 // A/M，如选择Auto，不动，否则看Range
-						m_OutValueCmbox.ShowWindow(SW_HIDE);	
-					else
-					{
+				if(!bRowAuto)	 // A/M，如选择Auto，不动，否则看Range
+					m_OutValueCmbox.ShowWindow(SW_HIDE);	
+				else
+				{
 					//	283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
 					//	284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 
-						int nTempValue = newtstat6[205+lRow-4];//180找不到对应的tstat6
-						if ( nTempValue != 0 )
-						{
-							m_OutValueCmbox.ShowWindow(SW_HIDE);
-							m_OutValueEdt.ShowWindow(SW_SHOW);	
-							m_OutValueEdt.SetWindowText(strValue);
-							m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
-							m_OutValueEdt.BringWindowToTop();
-							m_OutValueEdt.SetFocus(); //获取焦点
-						}					
-					}
+					int nTempValue = newtstat6[205+lRow-4];//180找不到对应的tstat6
+					if ( nTempValue != 0 )
+					{
+						m_OutValueCmbox.ShowWindow(SW_HIDE);
+						m_OutValueEdt.ShowWindow(SW_SHOW);	
+						m_OutValueEdt.SetWindowText(strValue);
+						m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
+						m_OutValueEdt.BringWindowToTop();
+						m_OutValueEdt.SetFocus(); //获取焦点
+					}					
 				}
-				// on top added by zgq;2010-12-07; output4，5，使用新的规则，详细见资料“OutPut各栏对应关系规则.xls”
-				//////////////////////////////////////////////////////////////////////////
-
-				//186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
-				//	187	208	1	Low byte	W/R	Analog Output2 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
-
-// 				if(m_nModeType==2&&lRow==4)
-// 				{
-// 					if(newtstat6[207]==0)//ON/oFF
-// 						m_OutValueEdt.ShowWindow(SW_HIDE);	
-// 					else
-// 					{
-// 						m_OutValueCmbox.ShowWindow(SW_HIDE);
-// 						m_OutValueEdt.ShowWindow(SW_SHOW);	
-// 
-// 						m_OutValueEdt.SetWindowText(strValue);
-// 						m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
-// 						m_OutValueEdt.BringWindowToTop();
-// 						m_OutValueEdt.SetFocus(); //获取焦点
-// 					}
-// 				}
-
-// 				if(m_nModeType==2&&lRow==5)
-// 				{
-// 					if(newtstat6[208]==0)//ON/oFF
-// 						m_OutValueEdt.ShowWindow(SW_HIDE);	
-// 					else
-// 					{
-// 						m_OutValueCmbox.ShowWindow(SW_HIDE);
-// 						m_OutValueEdt.ShowWindow(SW_SHOW);	
-// 						m_OutValueEdt.SetWindowText(strValue);
-// 						m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
-// 						m_OutValueEdt.BringWindowToTop();
-// 						m_OutValueEdt.SetFocus(); //获取焦点
-// 					}
-// 
-// 				}
-
-				//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
-
-// 				if((m_nModeType==17||m_nModeType==18)&&lRow==4)
-// 				{
-// 					if(newtstat6[205]==0)//ON/oFF
-// 						m_OutValueEdt.ShowWindow(SW_HIDE);	
-// 					else
-// 					{
-// 						m_OutValueCmbox.ShowWindow(SW_HIDE);
-// 						m_OutValueEdt.ShowWindow(SW_SHOW);	
-// 						m_OutValueEdt.SetWindowText(strValue);
-// 						m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
-// 						m_OutValueEdt.BringWindowToTop();
-// 						m_OutValueEdt.SetFocus(); //获取焦点
-// 					}
-// 
-// 				}
-				//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
-
-// 				if((m_nModeType==17||m_nModeType==18)&&lRow==5)
-// 				{
-// 					if(newtstat6[206]==0)//ON/oFF
-// 						m_OutValueEdt.ShowWindow(SW_HIDE);	
-// 					else
-// 					{
-// 						m_OutValueCmbox.ShowWindow(SW_HIDE);
-// 						m_OutValueEdt.ShowWindow(SW_SHOW);	
-// 						m_OutValueEdt.SetWindowText(strValue);
-// 						m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
-// 						m_OutValueEdt.BringWindowToTop();
-// 						m_OutValueEdt.SetFocus(); //获取焦点
-// 					}
-// 
-// 				}
-
-				//186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
-				//	187	208	1	Low byte	W/R	Analog Output2 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
-// 				if((m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_PRESSURE)&&lRow==6)
-// 				{
-// 					if(newtstat6[207]==0)//ON/oFF
-// 						m_OutValueEdt.ShowWindow(SW_HIDE);	
-// 					else
-// 					{
-// 						m_OutValueCmbox.ShowWindow(SW_HIDE);
-// 						m_OutValueEdt.ShowWindow(SW_SHOW);
-// 						m_OutValueEdt.SetWindowText(strValue);
-// 						m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
-// 						m_OutValueEdt.BringWindowToTop();
-// 						m_OutValueEdt.SetFocus(); //获取焦点
-// 					}
-// 				}
-
-// 				if((m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_PRESSURE)&&lRow==7)
-// 				{
-// 					if(newtstat6[208]==0)//ON/oFF
-// 						m_OutValueEdt.ShowWindow(SW_HIDE);	
-// 					else
-// 					{
-// 						m_outAMCmbox.ShowWindow(SW_HIDE);
-// 						m_OutValueEdt.ShowWindow(SW_SHOW);	
-// 						m_OutValueEdt.SetWindowText(strValue);
-// 						m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
-// 						m_OutValueEdt.BringWindowToTop();
-// 						m_OutValueEdt.SetFocus(); //获取焦点
-// 					}
-// 				}
 			}
+		
 		}
+	}
 
-		if(lCol==AM_OUTFIELD)
+	if(lCol==AM_OUTFIELD)
+	{   
+		 
+			
+
+
+		if(lRow==1||lRow==2||lRow==3||lRow==4||lRow==5||lRow==6||lRow==7)
 		{
-			if(lRow==1||lRow==2||lRow==3||lRow==4||lRow==5||lRow==6||lRow==7)
-			{
-				m_outAMCmbox.ResetContent();
-				m_outAMCmbox.AddString(_T("Auto"));
-				m_outAMCmbox.AddString(_T("Manual"));
-				m_outAMCmbox.ShowWindow(SW_SHOW);
+			if(DISABLE_COLOR_CELL==m_FlexGrid.get_CellBackColor())
+				return;
+
+			m_outAMCmbox.ResetContent();
+			m_outAMCmbox.AddString(_T("Auto"));
+			m_outAMCmbox.AddString(_T("Manual"));
+			m_outAMCmbox.ShowWindow(SW_SHOW);
 
 
 
-				//显示控件
-				m_outAMCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
-				m_outAMCmbox.BringWindowToTop();
-				m_outAMCmbox.SelectString(-1,strValue);
-				m_outAMCmbox.SetFocus(); //获取焦点
-			}
-
-		}
-		if(lCol==RANG_OUTFIELD)
-		{
-			if((lRow==4||lRow==5)&&m_nModeType==2)//model a
-			{	
-				m_outRangCmbox.ResetContent();
-
-				for(int i=0;i<5;i++)
-				{
-					m_outRangCmbox.AddString(OUTPUT_ANRANGE[i]);
-				}
-
-
-				m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
-				m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
-				m_outRangCmbox.BringWindowToTop();
-				m_outRangCmbox.SelectString(-1,strValue);
-				m_outRangCmbox.SetFocus(); //获取焦点
-
-
-			}
-			if((lRow==4||lRow==5)&&m_nModeType!=2)//model a
-			{
-				m_outRangCmbox.ResetContent();
-
-
-			//	for(int i=0;i<2;i++)
-				for(int i=0;i<3;i++)//2.5.0.98
-				{
-					m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
-				}
-
-				m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
-				m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
-				m_outRangCmbox.BringWindowToTop();
-				m_outRangCmbox.SelectString(-1,strValue);
-				m_outRangCmbox.SetFocus(); //获取焦点
-
-			}
-			if((lRow==6||lRow==7)
-				&&(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_TSTAT6
-				||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE))//model DEG TStat6,TStat7
-			{
-
-				m_outRangCmbox.ResetContent();
-				for(int i=0;i<5;i++)
-				{
-					m_outRangCmbox.AddString(OUTPUT_ANRANGE[i]);
-				}
-
-				m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
-				m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
-				m_outRangCmbox.BringWindowToTop();
-				m_outRangCmbox.SelectString(-1,strValue);
-				m_outRangCmbox.SetFocus(); //获取焦点
-			}
-
-		}
-		if(lCol==FUN_OUTFIELD)
-		{
-			if(lRow>=1&&lRow<=5)
-			{
-				m_outFunCmbox.ResetContent();
-				//for(int i=0;i<4;i++)
-				for(int i=0;i<3;i++)//2.5.0.98
-				{
-					m_outFunCmbox.AddString(ONTPUT_FUNS[i]);
-					//AfxMessageBox(ONTPUT_FUNS[i]);
-				}
-				m_outFunCmbox.ShowWindow(SW_SHOW);//显示控件
-				m_outFunCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
-				m_outFunCmbox.BringWindowToTop();
-				m_outFunCmbox.SelectString(-1,strValue);
-				m_outFunCmbox.SetFocus(); //获取焦点
-			}
-
-		}
-		if((lCol==NAME_OUTFIELD)||(lCol==7)||(lCol==8))
-		{
-			m_outputNameEDIT.MoveWindow(&rc,1);
-			m_outputNameEDIT.ShowWindow(SW_SHOW);
-			m_outputNameEDIT.SetWindowText(strValue);
-			m_outputNameEDIT.SetFocus();
-			int nLenth=strValue.GetLength();
-			m_outputNameEDIT.SetSel(nLenth,nLenth); //全选//
-		}
-
-
-		if(lCol==6)
-		{
-
-			m_Interlockcombo.ResetContent();
-			for(int i=0;i<6;i++)
-			{
-				m_Interlockcombo.AddString(Interlock[i]);
-				//AfxMessageBox(ONTPUT_FUNS[i]);
-			}
-			m_Interlockcombo.ShowWindow(SW_SHOW);//显示控件
-			m_Interlockcombo.MoveWindow(rc); //移动到选中格的位置，覆盖
-			m_Interlockcombo.BringWindowToTop();
-			m_Interlockcombo.SelectString(-1,strValue);
-			m_Interlockcombo.SetFocus(); //获取焦点
-
+			//显示控件
+			m_outAMCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_outAMCmbox.BringWindowToTop();
+			m_outAMCmbox.SelectString(-1,strValue);
+			m_outAMCmbox.SetFocus(); //获取焦点
 		}
 
 	}
-	
-	
-	
+	if(lCol==RANG_OUTFIELD)
+	{
+		
+		if(lRow<=5)
+		{
+			m_outRangCmbox.ResetContent();
+
+
+			//	for(int i=0;i<2;i++)
+			for(int i=0;i<4;i++)//2.5.0.98
+			{
+				m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
+			}
+
+			m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
+			m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_outRangCmbox.BringWindowToTop();
+			m_outRangCmbox.SelectString(-1,strValue);
+			m_outRangCmbox.SetFocus(); //获取焦点
+
+		}
+		if((lRow==6||lRow==7))//model DEG TStat6,TStat7
+		{
+
+			m_outRangCmbox.ResetContent();
+			for(int i=0;i<5;i++)
+			{
+				m_outRangCmbox.AddString(OUTPUT_ANRANGE[i]);
+			}
+
+			m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
+			m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_outRangCmbox.BringWindowToTop();
+			m_outRangCmbox.SelectString(-1,strValue);
+			m_outRangCmbox.SetFocus(); //获取焦点
+		}
+
+	}
+	if(lCol==FUN_OUTFIELD)
+	{
+		if(lRow>=1&&lRow<=5)
+		{
+			m_outFunCmbox.ResetContent();
+			//for(int i=0;i<4;i++)
+			for(int i=0;i<3;i++)//2.5.0.98
+			{
+				m_outFunCmbox.AddString(ONTPUT_FUNS[i]);
+				//AfxMessageBox(ONTPUT_FUNS[i]);
+			}
+			m_outFunCmbox.ShowWindow(SW_SHOW);//显示控件
+			m_outFunCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_outFunCmbox.BringWindowToTop();
+			m_outFunCmbox.SelectString(-1,strValue);
+			m_outFunCmbox.SetFocus(); //获取焦点
+		}
+
+	}
+	if((lCol==NAME_OUTFIELD)||(lCol==7)||(lCol==8))
+	{
+		m_outputNameEDIT.MoveWindow(&rc,1);
+		m_outputNameEDIT.ShowWindow(SW_SHOW);
+		m_outputNameEDIT.SetWindowText(strValue);
+		m_outputNameEDIT.SetFocus();
+		int nLenth=strValue.GetLength();
+		m_outputNameEDIT.SetSel(nLenth,nLenth); //全选//
+	}
+
+
+	if(lCol==6)
+	{
+
+		m_Interlockcombo.ResetContent();
+		for(int i=0;i<6;i++)
+		{
+			m_Interlockcombo.AddString(Interlock[i]);
+			//AfxMessageBox(ONTPUT_FUNS[i]);
+		}
+		m_Interlockcombo.ShowWindow(SW_SHOW);//显示控件
+		m_Interlockcombo.MoveWindow(rc); //移动到选中格的位置，覆盖
+		m_Interlockcombo.BringWindowToTop();
+		m_Interlockcombo.SelectString(-1,strValue);
+		m_Interlockcombo.SetFocus(); //获取焦点
+
+	}
+
+	}
+#endif
 	else
 	{
 		m_FlexGrid.SetFocus();
@@ -3961,7 +3929,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 
 
 			//for(int i=0;i<2;i++)
-			for(int i=0;i<3;i++)//2.5.0.98
+			for(int i=0;i<4;i++)//2.5.0.98
 			{
 				m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
 			}
@@ -4014,7 +3982,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 #endif
 		
 	}
-	if(lCol==NAME_OUTFIELD)
+	if((lCol==NAME_OUTFIELD)||(lCol==7)||(lCol==8))
 	{
 		m_outputNameEDIT.MoveWindow(&rc,1);
 		m_outputNameEDIT.ShowWindow(SW_SHOW);

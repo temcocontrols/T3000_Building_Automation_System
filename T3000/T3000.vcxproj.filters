@@ -297,7 +297,31 @@
     <ClCompile Include="IONameConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MbPollOptions.cpp">
+    <ClCompile Include="CM5\ListCtrlCellEx.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\ListCtrlEx.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\MyOwnListCtrl.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetOutput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetProgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetVariable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogCM5_BacNet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MBP.cpp">
@@ -307,6 +331,36 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MbPoll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MbPollOptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DisplayConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T3RTDView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T3Performance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T38I13O.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T38AI8AO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T38AI16O.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T36CT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T332AI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T328IN.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -446,6 +500,24 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\t3000.mdb" />
+    <None Include="res\Input.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Programing.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Output.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\variable.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\week.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\annual.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -739,7 +811,43 @@
     <ClInclude Include="IONameConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MbPollOptions.h">
+    <ClInclude Include="CM5\user_data.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\ListCtrlCellEx.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\ListCtrlEx.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\MyOwnListCtrl.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\PerfTimer.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\ud_str.h">
+      <Filter>CM5</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogCM5_BacNet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bacnet_Include.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetVariable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MBP.h">
@@ -755,6 +863,36 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MbPoll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MbPollOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DisplayConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3RTDView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3Performance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T38I13O.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T38AI8AO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T38AI16O.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T36CT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T332AI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T328IN.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

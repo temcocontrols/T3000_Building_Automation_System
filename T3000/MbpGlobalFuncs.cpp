@@ -5,62 +5,133 @@
 int reflectAppStatus = 0;
 short int testVar = 0;
 
-void testFunc()
+int Read_One_t(unsigned char device_var,unsigned short address, int slot)
 {
-	static int a = 0;
-	a++;
-	srand(time(NULL));
-
-	if (putDataInGrid1 == 1)
+	int retVal = -100;
+	int executeMBFunc = 0;
+	static int readCount = 0;
+	
+	if (MbPollOpen == 1)
 	{
-		for (int i = 0; i < 4; i++)
-		{
-			*((short int*)grid1Data + i) = (short int)rand();
-		}
-		*((short int*)grid1Data + 4) = (short int)testVar;
+		executeMBFunc = 1;
 	}
-}
-
-int Read_One(unsigned char device_var,unsigned short address)
-{
-	int retVal;
-	retVal = Read_One_tap(device_var, address);
-	if (tapDataMode == 1)
+	else
 	{
+		executeMBFunc = 0;
+	}
+
+	if (executeMBFunc == 1)
+	{
+		retVal = Read_One(device_var, address);
 		LoadReadOneData(retVal, device_var, address);
+		mbpollTotalCount[slot]++;
+		if (retVal < 0)
+		{
+			mbpollErrCount[slot]++;
+		}
+		/*CString temp;
+		readCount++;
+		temp.Format(_T("addr = %d count = %d"), address, readCount); 
+		MessageBox(NULL, temp, L"Read_One", MB_OK);*/
 	}
 	return retVal;
 }
 
-int Write_One(unsigned char device_var, unsigned short address, unsigned short val)
+int Write_One_t(unsigned char device_var, unsigned short address, unsigned short val, int slot)
 {
-	int retVal;
-	retVal = Write_One_tap(device_var, address, val);
-	if ((!(retVal < 0)) && (tapDataMode == 1))
+	int retVal = -100;
+	int executeMBFunc = 0;
+	static int writeCount = 0;
+
+	if (MbPollOpen == 1)
 	{
-		LoadWriteOneData(val, device_var, address);
+		executeMBFunc = 1;
+	}
+	else
+	{
+		executeMBFunc = 0;
+	}
+
+	if (executeMBFunc == 1)
+	{
+		//LoadWriteOneData(val, device_var, address);
+		retVal = Write_One(device_var, address, val);
+		mbpollTotalCount[slot]++;
+		if (retVal < 0)
+		{
+			mbpollErrCount[slot]++;
+		}
+		/*CString temp;
+		writeCount++;
+		temp.Format(_T("addr = %d count = %d ret = %d"), address, writeCount, retVal); 
+		MessageBox(NULL, temp, L"Write_One", MB_OK);*/
 	}
 	return retVal;
 }
 
-int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length)
+int read_multi_t(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int slot)
 {
-	int retVal;
-	retVal =  read_multi_tap(device_var, put_data_into_here, start_address, length);
-	if ((!(retVal < 0)) && (tapDataMode == 1))
+	int retVal = -100;
+	int executeMBFunc = 0;
+	static int readCount = 0;
+
+	if (MbPollOpen == 1)
 	{
-		LoadReadMultiData(device_var, put_data_into_here, start_address, length);
+		executeMBFunc = 1;
+	}
+	else
+	{
+		executeMBFunc = 0;
+	}
+
+	if (executeMBFunc == 1)
+	{
+		retVal =  read_multi(device_var, put_data_into_here, start_address, length);
+		if (!(retVal < 0))
+		{
+			LoadReadMultiData(device_var, put_data_into_here, start_address, length);
+		}
+		mbpollTotalCount[slot]++;
+		if (retVal < 0)
+		{
+			mbpollErrCount[slot]++;
+		}
+		/*CString temp;
+		readCount++;
+		temp.Format(_T("addr = %d count = %d ret = %d"), start_address, readCount, retVal); 
+		MessageBox(NULL, temp, L"read_multi", MB_OK);*/
 	}
 	return retVal;
 }
 
-int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length)
+int write_multi_t(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length, int slot)
 {
-	int retVal;
-	retVal = write_multi_tap(device_var, to_write, start_address, length);
-	if ((!(retVal < 0)) && (tapDataMode == 1))
+	int retVal = -100;
+	int executeMBFunc = 0;
+	static int writeCount = 0;
+	
+	if (MbPollOpen == 1)
 	{
-		LoadWriteMultiData(device_var, to_write, start_address, length);
+		executeMBFunc = 1;
+	}
+	else
+	{
+		executeMBFunc = 0;
+	}
+
+	if (executeMBFunc == 1)
+	{
+		//LoadWriteMultiData(device_var, to_write, start_address, length);
+		retVal = write_multi(device_var, to_write, start_address, length);
+		mbpollTotalCount[slot]++;
+		if (retVal < 0)
+		{
+			mbpollErrCount[slot]++;
+		}
+		/*CString temp;
+		writeCount++;
+		temp.Format(_T("addr = %d count = %d ret = %d"), start_address, writeCount, retVal); 
+		MessageBox(NULL, temp, L"write_multi", MB_OK);*/
 	}
 	return retVal;
 }
@@ -92,7 +163,7 @@ void LoadReadOneData(int val, unsigned char device_var,unsigned short address)
 				}
 			}
 		}
-		gridData == NULL;
+		gridData = NULL;
 	}
 }
 
@@ -122,9 +193,8 @@ void LoadWriteOneData(int val, unsigned char device_var,unsigned short address)
 				}
 			}
 		}
-		gridData == NULL;
+		gridData = NULL;
 	}
-	
 }
 
 void LoadReadMultiData(unsigned char device_var,unsigned short *put_data_into_here, unsigned short start_address,int length)
@@ -160,20 +230,15 @@ void LoadReadMultiData(unsigned char device_var,unsigned short *put_data_into_he
 								k++;
 							}
 						}
-						
-						/*if (pollAddress[i] == address)
-						{
-							*((short int*)gridData) = (short int)val;
-						}*/
 					}
 				}
 			}
 		}
-		gridData == NULL;
+		gridData = NULL;
 	}
 }
 
-void LoadWriteMultiData(unsigned char device_var,unsigned char *to_write, unsigned short start_address,int length)
+void LoadWriteMultiData(unsigned char device_var, unsigned char *to_write, unsigned short start_address,int length)
 {
 	short* gridData = NULL;
 	int outsideRange = 1;
@@ -210,7 +275,7 @@ void LoadWriteMultiData(unsigned char device_var,unsigned char *to_write, unsign
 				}
 			}
 		}
-		gridData == NULL;
+		gridData = NULL;
 	}
 }
 

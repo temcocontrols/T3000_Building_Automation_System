@@ -10,6 +10,7 @@
 
 #include "../MainFrm.h"
 #include "afxcmn.h"
+#include "../msflexgrid1.h"
 
 
 
@@ -92,11 +93,13 @@ public:
 	CString m_combo2_cstring;
 
 	CString m_tempGridString;
-
+	HANDLE CM5_OutputThread;
+	BOOL b_is_fresh;
 public://events
 	afx_msg void OnBnClickedButtonSyncwithpc();
 	afx_msg void OnBnClickedButtonSaveConfig();
 	afx_msg void OnBnClickedButtonweeklyschedule();
+	afx_msg void OnBnClickedButtonRefreshAll();
 	afx_msg void OnBnClickedButtonannualschedule();
 	afx_msg void OnBnClickedButtonidschedule();
 	afx_msg void OnBnClickedButtonCheckDemo();
@@ -116,6 +119,7 @@ public://events
 	afx_msg void OnEnKillfocusEditDTS8();
 	afx_msg void OnEnKillfocusEditDTS9();
 	afx_msg void OnEnKillfocusEditDTS10();
+	afx_msg LRESULT DealWithMessage(WPARAM wParam,LPARAM lParam);
 public://messages override
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	virtual void OnInitialUpdate();
@@ -152,6 +156,8 @@ private:
 	void ClickInputMsflexgrid2();
 	void DblClickInputMsflexgrid2()	;
 	void OnCbnSelchangeCombx();
+	void OnCbnSelchangeType();
+	void UpdateGrid();
 public:
 	CString m_bootloaderversion;
 	CComboBox m_Baudrate;

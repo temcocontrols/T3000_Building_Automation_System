@@ -322,7 +322,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
     MODBUS_ANALOG6_FUNCTION                               =  _P("MODBUS_ANALOG6_FUNCTION");                 
     MODBUS_ANALOG7_FUNCTION                               =  _P("MODBUS_ANALOG7_FUNCTION");                 
     MODBUS_ANALOG8_FUNCTION                               =  _P("MODBUS_ANALOG8_FUNCTION");                 
-/*    MODBUS_TABLE1_ZERO                                    =  _P("MODBUS_TABLE1_ZERO");                      
+    MODBUS_TABLE1_ZERO                                    =  _P("MODBUS_TABLE1_ZERO");                      
     MODBUS_TABLE1_HALFONE                                 =  _P("MODBUS_TABLE1_HALFONE");                   
     MODBUS_TABLE1_ONE                                     =  _P("MODBUS_TABLE1_ONE");                       
     MODBUS_TABLE1_HALFTWO                                 =  _P("MODBUS_TABLE1_HALFTWO");                   
@@ -343,7 +343,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
     MODBUS_TABLE2_HALFFOUR                                =  _P("MODBUS_TABLE2_HALFFOUR");                  
     MODBUS_TABLE2_FOUR                                    =  _P("MODBUS_TABLE2_FOUR");                      
     MODBUS_TABLE2_HALFFIVE                                =  _P("MODBUS_TABLE2_HALFFIVE");                  
-    MODBUS_TABLE2_FIVE                                    =  _P("MODBUS_TABLE2_FIVE");  */                    
+    MODBUS_TABLE2_FIVE                                    =  _P("MODBUS_TABLE2_FIVE");                     
     MODUBS_HUMIDITY_RH                                    =  _P("MODUBS_HUMIDITY_RH");                      
     MODBUS_HUMIDITY_FREQUENCY                             =  _P("MODBUS_HUMIDITY_FREQUENCY");               
     MODBUS_HUM_PIC_UPDATE                                 =  _P("MODBUS_HUM_PIC_UPDATE");                   
@@ -754,29 +754,39 @@ bool T3000RegAddress::MatchMoudleAddress(void)
     MODBUS_BUTTON_LEFT2                                   =  _P("MODBUS_BUTTON_LEFT2");                     
     MODBUS_BUTTON_LEFT3                                   =  _P("MODBUS_BUTTON_LEFT3");                     
     MODBUS_BUTTON_LEFT4                                   =  _P("MODBUS_BUTTON_LEFT4");                     
-    MODBUS_HUM_INPUT_MANUAL_ENABLE                        =  _P("MODBUS_HUM_INPUT_MANUAL_ENABLE");          
-    MODBUS_HUM_INPUT_MANUAL_VALUE                         =  _P("MODBUS_HUM_INPUT_MANUAL_VALUE");           
-    MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN                     =  _P("MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN");       
-    MODBUS_UNIVERSAL_OFF_OUTPUT_COOL1                     =  _P("MODBUS_UNIVERSAL_OFF_OUTPUT_COOL1");       
-    MODBUS_UNIVERSAL_OFF_OUTPUT_COOL2                     =  _P("MODBUS_UNIVERSAL_OFF_OUTPUT_COOL2");       
-    MODBUS_UNIVERSAL_OFF_OUTPUT_COOL3                     =  _P("MODBUS_UNIVERSAL_OFF_OUTPUT_COOL3");       
-    MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT1                     =  _P("MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT1");       
-    MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT2                     =  _P("MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT2");       
-    MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT3                     =  _P("MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT3");       
-    MODBUS_UNIVERSAL_OFF_VALVE_BEGIN                      =  _P("MODBUS_UNIVERSAL_OFF_VALVE_BEGIN");        
-    MODBUS_UNIVERSAL_OFF_VALVE_COOL1                      =  _P("MODBUS_UNIVERSAL_OFF_VALVE_COOL1");        
-    MODBUS_UNIVERSAL_OFF_VALVE_COOL2                      =  _P("MODBUS_UNIVERSAL_OFF_VALVE_COOL2");        
-    MODBUS_UNIVERSAL_OFF_VALVE_COOL3                      =  _P("MODBUS_UNIVERSAL_OFF_VALVE_COOL3");        
-    MODBUS_UNIVERSAL_OFF_VALVE_HEAT1                      =  _P("MODBUS_UNIVERSAL_OFF_VALVE_HEAT1");        
-    MODBUS_UNIVERSAL_OFF_VALVE_HEAT2                      =  _P("MODBUS_UNIVERSAL_OFF_VALVE_HEAT2");        
-    MODBUS_UNIVERSAL_OFF_VALVE_HEAT3                      =  _P("MODBUS_UNIVERSAL_OFF_VALVE_HEAT3");        
-    MODBUS_TEST1                                          =  _P("MODBUS_TEST1");                            
-    MODBUS_TEST2                                          =  _P("MODBUS_TEST2");                            
-    MODBUS_TEST3                                          =  _P("MODBUS_TEST3");                            
-    MODBUS_TEST4                                          =  _P("MODBUS_TEST4");                            
-    MODBUS_TEST5                                          =  _P("MODBUS_TEST5");                            
-    MODBUS_TEST6                                          =  _P("MODBUS_TEST6");                            
-    MODBUS_HEATING_PID                                    =  _P("MODBUS_HEATING_PID");                      
+    
+
+	MODBUS_HUM_HEATER_CONTROL_ENABLE=_P("MODBUS_HUM_HEATER_CONTROL_ENABLE");
+	MODBUS_HUM_INPUT_MANUAL_ENABLE=_P("MODBUS_HUM_INPUT_MANUAL_ENABLE");
+	MODBUS_HUM_INPUT_MANUAL_VALUE=_P("MODBUS_HUM_INPUT_MANUAL_VALUE");                             
+	MODBUS_CO2_INPUT_MANUAL_ENABLE=_P("MODBUS_CO2_INPUT_MANUAL_ENABLE");                            
+	MODBUS_CO2_INPUT_VALUE=_P("MODBUS_CO2_INPUT_VALUE");                                    
+	MODBUS_CO2_CALIBRATION_DATA=_P("MODBUS_CO2_CALIBRATION_DATA");                              
+	MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN=_P("MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN");                         
+	MODBUS_UNIVERSAL_OFF_OUTPUT_COOL1=_P("MODBUS_UNIVERSAL_OFF_OUTPUT_COOL1");                         
+	MODBUS_UNIVERSAL_OFF_OUTPUT_COOL2=_P("MODBUS_UNIVERSAL_OFF_OUTPUT_COOL2");                         
+	MODBUS_UNIVERSAL_OFF_OUTPUT_COOL3=_P("MODBUS_UNIVERSAL_OFF_OUTPUT_COOL3");                         
+	MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT1=_P("MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT1");                         
+	MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT2=_P("MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT2");                         
+	MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT3=_P("MODBUS_UNIVERSAL_OFF_OUTPUT_HEAT3");                        
+	MODBUS_UNIVERSAL_OFF_VALVE_BEGIN=_P("MODBUS_UNIVERSAL_OFF_VALVE_BEGIN");                         
+	MODBUS_UNIVERSAL_OFF_VALVE_COOL1=_P("MODBUS_UNIVERSAL_OFF_VALVE_COOL1");                          
+	MODBUS_UNIVERSAL_OFF_VALVE_COOL2=_P("MODBUS_UNIVERSAL_OFF_VALVE_COOL2");                          
+	MODBUS_UNIVERSAL_OFF_VALVE_COOL3=_P("MODBUS_UNIVERSAL_OFF_VALVE_COOL3");                          
+	MODBUS_UNIVERSAL_OFF_VALVE_HEAT1=_P("MODBUS_UNIVERSAL_OFF_VALVE_HEAT1");                          
+	MODBUS_UNIVERSAL_OFF_VALVE_HEAT2=_P("MODBUS_UNIVERSAL_OFF_VALVE_HEAT2");                          
+	MODBUS_UNIVERSAL_OFF_VALVE_HEAT3=_P("MODBUS_UNIVERSAL_OFF_VALVE_HEAT3");                         
+
+	MODBUS_VALUE_SENSOR=_P("MODBUS_VALUE_SENSOR");                                     
+	MODBUS_PIR_SELECT_ENABLE =_P("MODBUS_PIR_SELECT_ENABLE");                                 
+	MODBUS_PIR_REAL_VALUE=_P("MODBUS_PIR_REAL_VALUE");                                     
+	MODBUS_PIR_OCCUPIED=_P("MODBUS_PIR_OCCUPIED");                                       
+                         
+
+
+
+
+	MODBUS_HEATING_PID                                    =  _P("MODBUS_HEATING_PID");                      
     MODBUS_CALIBRATION                                    =  _P("MODBUS_CALIBRATION");                      
     MODBUS_CALIBRATION_ANALOG_IN1                         =  _P("MODBUS_CALIBRATION_ANALOG_IN1");           
     MODBUS_DELAY                                          =  _P("MODBUS_DELAY");                            
@@ -907,6 +917,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
     MODBUS_WINDOW_COOLING_SETPOINT                        =  _P("MODBUS_WINDOW_COOLING_SETPOINT");          
     MODBUS_RELAY_PWM_ENABLE                               =  _P("MODBUS_RELAY_PWM_ENABLE");                 
     MODBUS_RELAY_PWM_TOTAL_DUTY                           =  _P("MODBUS_RELAY_PWM_TOTAL_DUTY");             
-    MODBUS_RELAY_PWM_HIGH_DUTY                            =  _P("MODBUS_RELAY_PWM_HIGH_DUTY");       
+    MODBUS_RELAY_PWM_HIGH_DUTY                            =  _P("MODBUS_RELAY_PWM_HIGH_DUTY");
+	       
 	return 0;
 	}
