@@ -110,10 +110,10 @@ INPUT CString Get_NowTime();
 INPUT void NET_WriteLogFile(CString strlog);
 INPUT void NET_CloseLogFile();
 
-INPUT int Write_One_tap(unsigned char device_var,unsigned short address,unsigned short value);
-INPUT int Read_One_tap(unsigned char device_var,unsigned short address);
-INPUT int write_multi_tap(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
-INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
+INPUT int Read_One(unsigned char device_var,unsigned short address);
+INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
+INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
 
 //INPUT SOCKET GetSocketHandle();
 #include <stdint.h>
