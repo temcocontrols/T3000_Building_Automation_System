@@ -87,6 +87,7 @@ private:
 	Register_info CurrentTestSensorHum;
 	Register_info CurrentCalibrationTimeLeft;
 	Register_info CurrentCalibrationID;
+	Register_info First_Sensor_Temp_Hum_RegID;
 public:
 //	afx_msg void OnEnUpdateMasterId();
 	afx_msg void OnEnKillfocusMasterId();

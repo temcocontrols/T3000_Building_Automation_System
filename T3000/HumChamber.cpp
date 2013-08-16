@@ -33,7 +33,7 @@ BOOL Register::Write_Single_Value(int Value)
  }
 }
 // CHumChamber
-#define  SENSOR_NUM 24
+#define  SENSOR_NUM 104
 IMPLEMENT_DYNCREATE(CHumChamber, CFormView)
 
 CHumChamber::CHumChamber()
@@ -156,11 +156,8 @@ LRESULT CHumChamber::my_message(WPARAM wParam,LPARAM lParam)
 
 void CHumChamber::OnInitialUpdate()
 {
-
-
  CFormView::OnInitialUpdate();
  m_Start=FALSE;
-
 //hSecondThread=CreateThread(NULL,NULL,_UpdateThread,this,NULL,0);
 }
 // CHumChamber diagnostics
@@ -189,6 +186,7 @@ GetRegInfoFromDB(CurrentTestSensorTemp,_T("CurrentTestSensorTemp_RegID"));
 GetRegInfoFromDB(CurrentTestSensorHum,_T("CurrentTestSensorHum_RegID"));
 GetRegInfoFromDB(CurrentCalibrationTimeLeft,_T("CurrentCalibrationTimeLeft_RegID"));
 GetRegInfoFromDB(CurrentCalibrationID,_T("CurrentCalibrationPointID_RegID"));
+GetRegInfoFromDB(First_Sensor_Temp_Hum_RegID,_T("First_Sensor_Temp_Hum_RegID"));
 }
 void CHumChamber::Fresh()
 {
