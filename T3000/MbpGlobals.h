@@ -21,7 +21,7 @@ int pollSlaveId[MAX_GRIDS] = {1, 1, 1, 1, 1};
 int pollFunction[MAX_GRIDS] = {0};
 int pollAddress[MAX_GRIDS] = {0};
 int pollQuantity[MAX_GRIDS] = {10, 10, 10, 10, 10};
-int pollScanRate[MAX_GRIDS] = {1000, 1000, 1000, 1000, 1000};
+unsigned int pollScanRate[MAX_GRIDS] = {1000, 1000, 1000, 1000, 1000};
 int pollRows[MAX_GRIDS] = {0};
 int pollDisplay[MAX_GRIDS] = {0};
 int pollHideAliasColumn[MAX_GRIDS] = {0};
@@ -36,13 +36,24 @@ short int *grid3Data = NULL;
 short int *grid4Data = NULL;
 short int *grid5Data = NULL;
 
-int putDataInGrid1;
-int putDataInGrid2;
-int putDataInGrid3;
-int putDataInGrid4;
-int putDataInGrid5;
+int dataFlowStarted[5] = {0};
 
-int tapDataMode;
+int putDataInGrid[5] = {0};
+
+char putDataNow[5] = {0};
+
+unsigned int commCount[5] = {0};
+
+//int tapDataMode = 1;		// no tapping required
+int tapDataMode = 0;
+
+int MbPollOpen = 0;
+
+unsigned int mbpollTotalCount[5] = {0};
+unsigned int mbpollErrCount[5] = {0};
+
+//CString* regNames[5] = {0};
+CString regNames;
 
 #endif
 

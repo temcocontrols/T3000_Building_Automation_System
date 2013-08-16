@@ -21,7 +21,7 @@ extern int pollSlaveId[MAX_GRIDS];
 extern int pollFunction[MAX_GRIDS];
 extern int pollAddress[MAX_GRIDS];
 extern int pollQuantity[MAX_GRIDS];
-extern int pollScanRate[MAX_GRIDS];
+extern unsigned int pollScanRate[MAX_GRIDS];
 extern int pollRows[MAX_GRIDS];
 extern int pollDisplay[MAX_GRIDS];
 extern int pollHideAliasColumn[MAX_GRIDS];
@@ -36,15 +36,24 @@ extern short int *grid3Data;
 extern short int *grid4Data;
 extern short int *grid5Data;
 
-extern int putDataInGrid1;
-extern int putDataInGrid2;
-extern int putDataInGrid3;
-extern int putDataInGrid4;
-extern int putDataInGrid5;
+extern int dataFlowStarted[5];
+
+extern int putDataInGrid[5];
+
+extern char putDataNow[5];
+
+extern unsigned int commCount[5];
 
 extern int tapDataMode;
 
-extern void testFunc();
+extern int MbPollOpen;
+
+extern unsigned int mbpollTotalCount[5];
+extern unsigned int mbpollErrCount[5];
+
+//extern CString* regNames[5];
+extern CString regNames;
+
 extern void LoadReadOneData(int val, unsigned char device_var,unsigned short address);
 extern void LoadWriteOneData(int val, unsigned char device_var,unsigned short address);
 extern void LoadReadMultiData(unsigned char device_var,unsigned short *put_data_into_here, unsigned short start_address,int length);

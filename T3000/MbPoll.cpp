@@ -1,4 +1,4 @@
-// MbPoll.cpp : implementation file
+﻿// MbPoll.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -17,20 +17,18 @@ CMbPoll::CMbPoll(CWnd* pParent /*=NULL*/)
 	: CDialog(CMbPoll::IDD, pParent)
 {
 	mParent = pParent;
-	/*if (mParent == NULL)
-	{
-	MessageBox(L"mParent is NULL");
-	}
-	else
-	{
-	MessageBox(L"mParent is not NULL");
-	}*/
+	//checkTapData.SetCheck(1);
 	strGrid1 = _T("");
 	valNoOfGrids = 0;
 }
 
 CMbPoll::~CMbPoll()
 {
+	if (grid1Data != NULL){delete(grid1Data); grid1Data = NULL;}
+	if (grid2Data != NULL){delete(grid2Data); grid2Data = NULL;}
+	if (grid3Data != NULL){delete(grid3Data); grid3Data = NULL;}
+	if (grid4Data != NULL){delete(grid4Data); grid4Data = NULL;}
+	if (grid5Data != NULL){delete(grid5Data); grid5Data = NULL;}
 }
 
 void CMbPoll::DoDataExchange(CDataExchange* pDX)
@@ -62,6 +60,97 @@ void CMbPoll::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BUTTON_START_STOP4, btnStartStop4);
 	DDX_Control(pDX, IDC_BUTTON_START_STOP5, btnStartStop5);
 	DDX_Control(pDX, IDC_CHECK_TAP_DATA, checkTapData);
+	DDX_Control(pDX, IDC_STATIC_RUNNING1, staticRunning1);
+	DDX_Control(pDX, IDC_STATIC_RUNNING2, staticRunning2);
+	DDX_Control(pDX, IDC_STATIC_RUNNING3, staticRunning3);
+	DDX_Control(pDX, IDC_STATIC_RUNNING4, staticRunning4);
+	DDX_Control(pDX, IDC_STATIC_RUNNING5, staticRunning5);
+}
+
+void CMbPoll::startStopBtnState()
+{
+	(dataFlowStarted[0] == 1) ? (btnStartStop1.SetWindowText(L"Stop")) : (btnStartStop1.SetWindowText(L"Start"));
+	(dataFlowStarted[1] == 1) ? (btnStartStop2.SetWindowText(L"Stop")) : (btnStartStop2.SetWindowText(L"Start"));
+	(dataFlowStarted[2] == 1) ? (btnStartStop3.SetWindowText(L"Stop")) : (btnStartStop3.SetWindowText(L"Start"));
+	(dataFlowStarted[3] == 1) ? (btnStartStop4.SetWindowText(L"Stop")) : (btnStartStop4.SetWindowText(L"Start"));
+	(dataFlowStarted[4] == 1) ? (btnStartStop5.SetWindowText(L"Stop")) : (btnStartStop5.SetWindowText(L"Start"));
+	(dataFlowStarted[0] == 1) ? (staticRunning1.SetWindowText(L"√")) : (staticRunning1.SetWindowText(L"X"));
+	(dataFlowStarted[1] == 1) ? (staticRunning2.SetWindowText(L"√")) : (staticRunning2.SetWindowText(L"X"));
+	(dataFlowStarted[2] == 1) ? (staticRunning3.SetWindowText(L"√")) : (staticRunning3.SetWindowText(L"X"));
+	(dataFlowStarted[3] == 1) ? (staticRunning4.SetWindowText(L"√")) : (staticRunning4.SetWindowText(L"X"));
+	(dataFlowStarted[4] == 1) ? (staticRunning5.SetWindowText(L"√")) : (staticRunning5.SetWindowText(L"X"));
+	(tapDataMode == 1) ? checkTapData.SetCheck(1) : checkTapData.SetCheck(0);
+}
+
+void CMbPoll::restoreConfigs()
+{
+	if (pollConfigured[0] == 1)
+	{
+		updateStaticConfig(0);
+		updateDataSharingVariables(0);
+	}
+	if (pollConfigured[1] == 1)
+	{
+		updateStaticConfig(1);
+		updateDataSharingVariables(1);
+	}
+	if (pollConfigured[2] == 1)
+	{
+		updateStaticConfig(2);
+		updateDataSharingVariables(2);
+	}
+	if (pollConfigured[3] == 1)
+	{
+		updateStaticConfig(3);
+		updateDataSharingVariables(3);
+	}
+	if (pollConfigured[4] == 1)
+	{
+		updateStaticConfig(4);
+		updateDataSharingVariables(4);
+	}
+}
+
+BOOL CMbPoll::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+
+	MbPollOpen = 1;
+	ctrlEditGrid1.ShowWindow(SW_HIDE);
+	comboNoOfGrids.SetCurSel(noOfGridTables);
+	//displayGrids(noOfGridTables);
+	displayGrids(5);
+	startStopBtnState();
+	restoreConfigs();
+
+	ctrlGrid1.put_TextMatrix(0, 0, L"Alias");
+	ctrlGrid1.put_TextMatrix(0, 1, L"Addr");
+	ctrlGrid1.put_TextMatrix(0, 2, L"Value");
+
+	ctrlGrid2.put_TextMatrix(0, 0, L"Alias");
+	ctrlGrid2.put_TextMatrix(0, 1, L"Addr");
+	ctrlGrid2.put_TextMatrix(0, 2, L"Value");
+
+	ctrlGrid3.put_TextMatrix(0, 0, L"Alias");
+	ctrlGrid3.put_TextMatrix(0, 1, L"Addr");
+	ctrlGrid3.put_TextMatrix(0, 2, L"Value");
+
+	ctrlGrid4.put_TextMatrix(0, 0, L"Alias");
+	ctrlGrid4.put_TextMatrix(0, 1, L"Addr");
+	ctrlGrid4.put_TextMatrix(0, 2, L"Value");
+
+	ctrlGrid5.put_TextMatrix(0, 0, L"Alias");
+	ctrlGrid5.put_TextMatrix(0, 1, L"Addr");
+	ctrlGrid5.put_TextMatrix(0, 2, L"Value");
+
+	restoreRegNames();
+
+	SetTimer(1, 2000, NULL);
+	SetTimer(2, 500, NULL);
+	SetTimer(3, 500, NULL);
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
 BEGIN_MESSAGE_MAP(CMbPoll, CDialog)
@@ -83,6 +172,8 @@ BEGIN_MESSAGE_MAP(CMbPoll, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_START_STOP4, &CMbPoll::OnClickedButtonStartStop4)
 	ON_BN_CLICKED(IDC_BUTTON_START_STOP5, &CMbPoll::OnClickedButtonStartStop5)
 	ON_BN_CLICKED(IDC_CHECK_TAP_DATA, &CMbPoll::OnClickedCheckTapData)
+	ON_COMMAND(ID_FILE_SAVE32884, &CMbPoll::OnFileSave)
+	ON_COMMAND(ID_FILE_OPEN, &CMbPoll::OnFileOpen)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CMbPoll, CDialog)
@@ -114,6 +205,7 @@ END_EVENTSINK_MAP()
 
 
 // CMbPoll message handlers
+
 
 void CMbPoll::ClickGrid(CMsflexgrid &grid)
 {
@@ -183,6 +275,1015 @@ BOOL CMbPoll::Create(UINT nIDTemplate, CWnd* pParentWnd)
 	return CDialog::Create(nIDTemplate, pParentWnd);
 }
 
+void CMbPoll::OnBnClickedClose()
+{
+	// TODO: Add your control notification handler code here
+	KillTimer(1);
+	KillTimer(2);
+	KillTimer(3);
+	
+	CDialog::OnCancel();
+	OnMbPollDestroyWindow();	
+}
+
+void CMbPoll::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+	static unsigned int count = 0;
+	static unsigned int a, b, c, d, e = 0;
+	CString tempStr;
+	static int qtyToShow[5] = {0};
+
+	tempStr.Format(_T("%d %d %d %d %d %d"),count, a, b, c, d ,e);
+	ctrlLabel1.SetWindowTextW(tempStr);
+
+	switch(nIDEvent)
+	{
+	case 1:	// 2s
+		{
+			break;
+		}
+	case 2: // 500 ms
+#if 1
+		{
+			CString tempStr1;
+			staticRunning1.SetWindowText(L"X");
+			staticRunning1.SetWindowText(L"X");
+			staticRunning1.SetWindowText(L"X");
+			staticRunning1.SetWindowText(L"X");
+			staticRunning1.SetWindowText(L"X");
+
+			/*	update grid if, 
+				config has been done (grid1Data != NULL), 
+				Start button has been clicked (dataFlowStarted[0] == 1), 
+				its not a write function where grid update is not required (pollFunction[0] <= 3)	*/
+			if ((grid1Data != NULL) && (dataFlowStarted[0] == 1))
+			{
+				staticRunning1.SetWindowText(L"√");
+				if (putDataNow[0] == 1)
+				{
+					qtyToShow[0] = ((pollRows[0] == 0) || (pollQuantity[0] < pollRows[0])) ? pollQuantity[0] : pollRows[0];
+					putDataNow[0] = 0;
+				}
+				for (int i = 0; i < qtyToShow[0]; i++)
+				{
+					tempStr1.Format(_T("%d"), (pollAddress[0] + i)); 
+					ctrlGrid1.put_TextMatrix(i + 1, 1, tempStr1);
+					updateStaticConfig(0, 1);
+					if (!((tapDataMode == 0) && (pollFunction[0] >= 4)))
+					{
+						//tempStr1.Format(_T("%d"), *((short int*)grid1Data + i)); 
+						convertFunction(pollDisplay[0], (unsigned short)(*((short int*)grid1Data + i)), &tempStr1);
+						ctrlGrid1.put_TextMatrix(i + 1, 2, tempStr1);
+					}
+				}
+			}
+
+			if ((grid2Data != NULL)  && (dataFlowStarted[1] == 1))
+			{
+				staticRunning2.SetWindowText(L"√");
+				if (putDataNow[1] == 1)
+				{
+					qtyToShow[1] = ((pollRows[1] == 0) || (pollQuantity[1] < pollRows[1])) ? pollQuantity[1] : pollRows[1];
+					putDataNow[1] = 0;
+				}
+				for (int i = 0; i < qtyToShow[1]; i++)
+				{
+					tempStr1.Format(_T("%d"), (pollAddress[1] + i)); 
+					ctrlGrid2.put_TextMatrix(i + 1, 1, tempStr1);
+					updateStaticConfig(1, 1);
+					if (!((tapDataMode == 0) && (pollFunction[1] >= 4)))
+					{
+						tempStr1.Format(_T("%d"), *((short int*)grid2Data + i)); 
+						ctrlGrid2.put_TextMatrix(i + 1, 2, tempStr1);
+					}
+				}
+			}
+
+			if ((grid3Data != NULL) && (dataFlowStarted[2] == 1))
+			{
+				staticRunning3.SetWindowText(L"√");
+				if (putDataNow[2] == 1)
+				{
+					qtyToShow[2] = ((pollRows[2] == 0) || (pollQuantity[2] < pollRows[2])) ? pollQuantity[2] : pollRows[2];
+					putDataNow[2] = 0;
+				}
+				for (int i = 0; i < qtyToShow[2]; i++)
+				{
+					tempStr1.Format(_T("%d"), (pollAddress[2] + i)); 
+					ctrlGrid3.put_TextMatrix(i + 1, 1, tempStr1);
+					updateStaticConfig(2, 1);
+					if (!((tapDataMode == 0) && (pollFunction[2] >= 4)))
+					{
+						tempStr1.Format(_T("%d"), *((short int*)grid3Data + i)); 
+						ctrlGrid3.put_TextMatrix(i + 1, 2, tempStr1);
+					}
+				}
+			}
+
+			if ((grid4Data != NULL) && (dataFlowStarted[3] == 1))
+			{
+				staticRunning4.SetWindowText(L"√");
+				if (putDataNow[3] == 1)
+				{
+					qtyToShow[3] = ((pollRows[3] == 0) || (pollQuantity[3] < pollRows[3])) ? pollQuantity[3] : pollRows[3];
+					putDataNow[3] = 0;
+				}
+				for (int i = 0; i < qtyToShow[3]; i++)
+				{
+					tempStr1.Format(_T("%d"), (pollAddress[3] + i)); 
+					ctrlGrid4.put_TextMatrix(i + 1, 1, tempStr1);
+					updateStaticConfig(3, 1);
+					if (!((tapDataMode == 0) && (pollFunction[3] >= 4)))
+					{
+						tempStr1.Format(_T("%d"), *((short int*)grid4Data + i)); 
+						ctrlGrid4.put_TextMatrix(i + 1, 2, tempStr1);
+					}
+				}
+			}
+
+			if ((grid5Data != NULL) && (dataFlowStarted[4] == 1))
+			{
+				staticRunning5.SetWindowText(L"√");
+				if (putDataNow[4] == 1)
+				{
+					qtyToShow[4] = ((pollRows[4] == 0) || (pollQuantity[4] < pollRows[4])) ? pollQuantity[4] : pollRows[4];
+					putDataNow[4] = 0;
+				}
+				for (int i = 0; i < qtyToShow[4]; i++)
+				{
+					tempStr1.Format(_T("%d"), (pollAddress[4] + i)); 
+					ctrlGrid5.put_TextMatrix(i + 1, 1, tempStr1);
+					updateStaticConfig(4, 1);
+					if (!((tapDataMode == 0) && (pollFunction[4] >= 4)))
+					{
+						tempStr1.Format(_T("%d"), *((short int*)grid5Data + i)); 
+						ctrlGrid5.put_TextMatrix(i + 1, 2, tempStr1);
+					}
+				}
+			}
+			break;
+		}
+#endif
+	case 3:
+		{
+			count++;
+			if ((count % (pollScanRate[0]/500)) == 0)	{callMbFunc(0);a++;}
+			if ((count % (pollScanRate[1]/500)) == 0)	{callMbFunc(1);b++;}
+			if ((count % (pollScanRate[2]/500)) == 0)	{callMbFunc(2);c++;}
+			if ((count % (pollScanRate[3]/500)) == 0)	{callMbFunc(3);d++;}
+			if ((count % (pollScanRate[4]/500)) == 0)	{callMbFunc(4);e++;}
+			//MessageBox(tempStr);
+			break;
+		}
+	default:
+		break;
+	}
+
+	CDialog::OnTimer(nIDEvent);
+}
+
+void CMbPoll::callMbFunc(int slotNo)
+{
+	CString tempStr1;
+	CMsflexgrid* grid;
+
+	if (slotNo == 0) grid = &ctrlGrid1;
+	if (slotNo == 1) grid = &ctrlGrid2;
+	if (slotNo == 2) grid = &ctrlGrid3;
+	if (slotNo == 3) grid = &ctrlGrid4;
+	if (slotNo == 4) grid = &ctrlGrid5;
+
+	if ((dataFlowStarted[slotNo] == 1) && (tapDataMode == 0))
+	{
+		//Read_One11(unsigned char device_var,unsigned short address);
+		if (pollFunction[slotNo] == 0){}		// 01 Read Coils (0x)
+		if (pollFunction[slotNo] == 1){}		// 02 Read Discrete Inputs (1x)
+		if (pollFunction[slotNo] == 2)		// * 03 Read Holding Registers (4x) (Read_One11, read_multi11)
+		{
+			if (pollQuantity[slotNo] == 1)
+			{
+				unsigned short tempVar;
+				tempVar = Read_One_t(pollSlaveId[slotNo], pollAddress[slotNo], slotNo);
+			}
+			else
+			{
+				unsigned short tempVar[1000] = {0};
+				unsigned short *tempPtr = tempVar;
+				read_multi_t(pollSlaveId[slotNo], tempPtr, pollAddress[slotNo], pollQuantity[slotNo], slotNo);
+			}
+		}
+		if (pollFunction[slotNo] == 3){}		// 04 Read Input Registers (3x)
+		if (pollFunction[slotNo] == 4){}		// 05 Write Single Coil
+		if (pollFunction[slotNo] == 5)			// * 06 Write Single Register (Write_One11)
+		{
+			if (pollQuantity[slotNo] == 1)
+			{
+				unsigned short tempVar;
+				tempStr1 = grid->get_TextMatrix(1, 2);
+				tempVar = _wtoi(tempStr1);
+				Write_One_t(pollSlaveId[slotNo], pollAddress[slotNo], tempVar, slotNo);
+			}
+		}
+		if (pollFunction[slotNo] == 6){}		// 15 Write Multiple Coils
+		if (pollFunction[slotNo] == 7)			// * 16 Write Multiple Registers (write_multi11)
+		{
+			unsigned short tempVar[1000] = {0};
+			unsigned short *tempPtr = tempVar;
+			if (pollQuantity[slotNo] != 0)
+			{
+				for (int i = 0; i < pollQuantity[slotNo]; i++)
+				{
+					tempStr1 = grid->get_TextMatrix(i + 1, 2);
+					tempVar[i] = _wtoi(tempStr1);
+				}
+			}
+			write_multi_t(pollSlaveId[slotNo], (unsigned char*)(&tempVar[0]), pollAddress[slotNo], pollQuantity[slotNo] * 2, slotNo);
+		}
+	}
+	if ((dataFlowStarted[slotNo] == 1) && (tapDataMode == 1))
+	{
+		//Read_One11(unsigned char device_var,unsigned short address);
+		if (pollFunction[slotNo] == 0){}		// 01 Read Coils (0x)
+		if (pollFunction[slotNo] == 1){}		// 02 Read Discrete Inputs (1x)
+		if (pollFunction[slotNo] == 2){}		// * 03 Read Holding Registers (4x) (Read_One11, read_multi11)
+		if (pollFunction[slotNo] == 3){}		// 04 Read Input Registers (3x)
+		if (pollFunction[slotNo] == 4){}		// 05 Write Single Coil
+		if (pollFunction[slotNo] == 5){ /* no code required */ }		// * 06 Write Single Register (Write_One11)
+		if (pollFunction[slotNo] == 6){}		// 15 Write Multiple Coils
+		if (pollFunction[slotNo] == 7){ /* no code required */ }		// * 16 Write Multiple Registers (write_multi11)
+	}
+}
+
+void CMbPoll::OnKillfocusEditForGrid()
+{
+	// TODO: Add your control notification handler code here
+
+	CString strText;
+	ctrlEditGrid1.GetWindowText(strText);
+
+	if (curGridForEdit == 1)
+		ctrlGrid1.put_TextMatrix(currentRow, currentCol, strText);
+	if (curGridForEdit == 2)
+		ctrlGrid2.put_TextMatrix(currentRow, currentCol, strText);
+	if (curGridForEdit == 3)
+		ctrlGrid3.put_TextMatrix(currentRow, currentCol, strText);
+	if (curGridForEdit == 4)
+		ctrlGrid4.put_TextMatrix(currentRow, currentCol, strText);
+	if (curGridForEdit == 5)
+		ctrlGrid5.put_TextMatrix(currentRow, currentCol, strText);
+}
+
+void CMbPoll::saveRegNames()
+{
+#if 0
+	int mallocQty[5] = {0};
+	CMsflexgrid* grid;
+
+	for (int i = 0; i < 5; i++)
+	{
+		if (i == 0) grid = &ctrlGrid1;
+		if (i == 1) grid = &ctrlGrid2;
+		if (i == 2) grid = &ctrlGrid3;
+		if (i == 3) grid = &ctrlGrid4;
+		if (i == 4) grid = &ctrlGrid5;
+
+		regNames[i] = NULL;
+
+		if (pollRows[i] == 0) 
+		{
+			mallocQty[i] = pollQuantity[i];
+		}
+		else 
+		{
+			mallocQty[i] = pollRows[i];
+		}
+
+		regNames[i] = (CString*)malloc(mallocQty[i] * sizeof(CString));
+
+		for (int j = 0; j < mallocQty[i]; j++)
+		{
+			*(regNames[i] + j) = grid->get_TextMatrix(j + 1, 0);
+		}
+
+	}
+#endif
+
+	int mallocQty[5] = {0};
+	CMsflexgrid* grid;
+
+	regNames = L"";
+
+	for (int i = 0; i < 5; i++)
+	{
+		if (i == 0) grid = &ctrlGrid1;
+		if (i == 1) grid = &ctrlGrid2;
+		if (i == 2) grid = &ctrlGrid3;
+		if (i == 3) grid = &ctrlGrid4;
+		if (i == 4) grid = &ctrlGrid5;
+
+		if (pollRows[i] == 0) 
+		{
+			mallocQty[i] = pollQuantity[i];
+		}
+		else 
+		{
+			mallocQty[i] = pollRows[i];
+		}
+
+		for (int j = 0; j < mallocQty[i]; j++)
+		{
+			regNames = regNames + grid->get_TextMatrix(j + 1, 0) + L";";
+		}
+	}
+}
+
+void CMbPoll::restoreRegNames()
+{
+#if 0
+	int mallocQty[5] = {0};
+	CMsflexgrid* grid;
+
+	for (int i = 0; i < 5; i++)
+	{
+		if (regNames[i] == NULL)
+		{
+			continue;
+		}
+		
+		if (i == 0) grid = &ctrlGrid1;
+		if (i == 1) grid = &ctrlGrid2;
+		if (i == 2) grid = &ctrlGrid3;
+		if (i == 3) grid = &ctrlGrid4;
+		if (i == 4) grid = &ctrlGrid5;
+
+		if (pollRows[i] == 0) 
+		{
+			mallocQty[i] = pollQuantity[i];
+		}
+		else 
+		{
+			mallocQty[i] = pollRows[i];
+		}
+
+		for (int j = 0; j < mallocQty[i]; j++)
+		{
+			grid->put_TextMatrix(j + 1, 0, *(regNames[i] + j));
+		}
+		regNames[i] = NULL;
+	}
+#endif
+
+	int position;
+	CString temp1, temp2;
+	CMsflexgrid* grid;
+	int gridNo = 0;
+	int mallocQty[5] = {0};
+	int rowNo = 0;
+
+	//MessageBox(regNames);
+	position = regNames.Find(L";");
+	
+	for (int i = 0; i < 5; i++)
+	{
+		if (pollRows[i] == 0) 
+		{
+			mallocQty[i] = pollQuantity[i];
+		}
+		else 
+		{
+			mallocQty[i] = pollRows[i];
+		}
+	}
+
+	while (1)
+	{
+		position = regNames.Find(L";");
+		if (position == -1) break;
+		temp1 = regNames.Left(position);
+		//MessageBox(temp1);
+
+		if (position != 0)
+		{
+			regNames = regNames.Right(regNames.GetLength() - position - 1);
+		}
+		else
+		{
+			regNames = regNames.Right(regNames.GetLength() - 1);
+		}
+		//MessageBox(regNames);
+
+		if (gridNo == 0) grid = &ctrlGrid1;
+		if (gridNo == 1) grid = &ctrlGrid2;
+		if (gridNo == 2) grid = &ctrlGrid3;
+		if (gridNo == 3) grid = &ctrlGrid4;
+		if (gridNo == 4) grid = &ctrlGrid5;
+
+		temp2.Format(_T("gridNo = %d rowNo = %d"), gridNo, rowNo);
+		//MessageBox(temp2);
+
+		grid->put_TextMatrix(rowNo + 1, 0, temp1);
+		rowNo++;
+		if (rowNo == mallocQty[gridNo])
+		{
+			gridNo++;
+			rowNo = 0;
+		}
+
+		temp2.Format(_T("gridNo = %d rowNo = %d"), gridNo, rowNo);
+		if (gridNo == 5) break;
+
+	}
+}
+
+void CMbPoll::OnOK()
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	//CDialog::OnOK();
+}
+
+void CMbPoll::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+	saveRegNames();
+	CDialog::OnCancel();
+	OnMbPollDestroyWindow();
+}
+
+void CMbPoll::OnSelchangeComboNoofgrids()
+{
+	// TODO: Add your control notification handler code here
+	displayGrids(comboNoOfGrids.GetCurSel());
+}
+
+void CMbPoll::displayGrids(int number)
+{
+	switch(number)
+	{
+#if 0
+	case 0:
+		{
+		btnConfig1.ShowWindow(SW_HIDE);
+		btnConfig2.ShowWindow(SW_HIDE);
+		btnConfig3.ShowWindow(SW_HIDE);
+		btnConfig4.ShowWindow(SW_HIDE);
+		btnConfig5.ShowWindow(SW_HIDE);
+		ctrlGrid1.ShowWindow(SW_HIDE);
+		ctrlGrid2.ShowWindow(SW_HIDE);
+		ctrlGrid3.ShowWindow(SW_HIDE);
+		ctrlGrid4.ShowWindow(SW_HIDE);
+		ctrlGrid5.ShowWindow(SW_HIDE);
+		staticConfig1.ShowWindow(SW_HIDE);
+		staticConfig2.ShowWindow(SW_HIDE);
+		staticConfig3.ShowWindow(SW_HIDE);
+		staticConfig4.ShowWindow(SW_HIDE);
+		staticConfig5.ShowWindow(SW_HIDE);
+		ctrlEditGrid1.ShowWindow(SW_HIDE);
+		btnStartStop1.ShowWindow(SW_HIDE);
+		btnStartStop2.ShowWindow(SW_HIDE);
+		btnStartStop3.ShowWindow(SW_HIDE);
+		btnStartStop4.ShowWindow(SW_HIDE);
+		btnStartStop5.ShowWindow(SW_HIDE);
+		pollShown[0] = 0;
+		pollShown[1] = 0;
+		pollShown[2] = 0;
+		pollShown[3] = 0;
+		pollShown[4] = 0;
+		putDataNow[0] = 0;
+		putDataInGrid[0] = 0;
+		pollConfigured[0] = 0;
+		putDataNow[1] = 0;
+		putDataInGrid[1] = 0;
+		pollConfigured[1] = 0;
+		putDataNow[2] = 0;
+		putDataInGrid[2] = 0;
+		pollConfigured[2] = 0;
+		putDataNow[3] = 0;
+		putDataInGrid[3] = 0;
+		pollConfigured[3] = 0;
+		putDataNow[4] = 0;
+		putDataInGrid[4] = 0;
+		pollConfigured[4] = 0;
+		break;
+		}
+	case 1:
+		{
+		btnConfig1.ShowWindow(SW_SHOW);
+		btnConfig2.ShowWindow(SW_HIDE);
+		btnConfig3.ShowWindow(SW_HIDE);
+		btnConfig4.ShowWindow(SW_HIDE);
+		btnConfig5.ShowWindow(SW_HIDE);
+		ctrlGrid1.ShowWindow(SW_SHOW);
+		ctrlGrid2.ShowWindow(SW_HIDE);
+		ctrlGrid3.ShowWindow(SW_HIDE);
+		ctrlGrid4.ShowWindow(SW_HIDE);
+		ctrlGrid5.ShowWindow(SW_HIDE);
+		staticConfig1.ShowWindow(SW_SHOW);
+		staticConfig2.ShowWindow(SW_HIDE);
+		staticConfig3.ShowWindow(SW_HIDE);
+		staticConfig4.ShowWindow(SW_HIDE);
+		staticConfig5.ShowWindow(SW_HIDE);
+		btnStartStop1.ShowWindow(SW_SHOW);
+		btnStartStop2.ShowWindow(SW_HIDE);
+		btnStartStop3.ShowWindow(SW_HIDE);
+		btnStartStop4.ShowWindow(SW_HIDE);
+		btnStartStop5.ShowWindow(SW_HIDE);
+		pollShown[0] = 1;
+		pollShown[1] = 0;
+		pollShown[2] = 0;
+		pollShown[3] = 0;
+		pollShown[4] = 0;
+		putDataNow[0] = 1;
+		putDataInGrid[0] = 1;
+		pollConfigured[0] = 1;
+		putDataNow[1] = 0;
+		putDataInGrid[1] = 0;
+		pollConfigured[1] = 0;
+		putDataNow[2] = 0;
+		putDataInGrid[2] = 0;
+		pollConfigured[2] = 0;
+		putDataNow[3] = 0;
+		putDataInGrid[3] = 0;
+		pollConfigured[3] = 0;
+		putDataNow[4] = 0;
+		putDataInGrid[4] = 0;
+		pollConfigured[4] = 0;
+		break;
+		}
+	case 2:
+		{
+		btnConfig1.ShowWindow(SW_SHOW);
+		btnConfig2.ShowWindow(SW_SHOW);
+		btnConfig3.ShowWindow(SW_HIDE);
+		btnConfig4.ShowWindow(SW_HIDE);
+		btnConfig5.ShowWindow(SW_HIDE);
+		ctrlGrid1.ShowWindow(SW_SHOW);
+		ctrlGrid2.ShowWindow(SW_SHOW);
+		ctrlGrid3.ShowWindow(SW_HIDE);
+		ctrlGrid4.ShowWindow(SW_HIDE);
+		ctrlGrid5.ShowWindow(SW_HIDE);
+		staticConfig1.ShowWindow(SW_SHOW);
+		staticConfig2.ShowWindow(SW_SHOW);
+		staticConfig3.ShowWindow(SW_HIDE);
+		staticConfig4.ShowWindow(SW_HIDE);
+		staticConfig5.ShowWindow(SW_HIDE);
+		btnStartStop1.ShowWindow(SW_SHOW);
+		btnStartStop2.ShowWindow(SW_SHOW);
+		btnStartStop3.ShowWindow(SW_HIDE);
+		btnStartStop4.ShowWindow(SW_HIDE);
+		btnStartStop5.ShowWindow(SW_HIDE);
+		pollShown[0] = 1;
+		pollShown[1] = 1;
+		pollShown[2] = 0;
+		pollShown[3] = 0;
+		pollShown[4] = 0;
+		putDataNow[0] = 1;
+		putDataInGrid[0] = 1;
+		pollConfigured[0] = 1;
+		putDataNow[1] = 1;
+		putDataInGrid[1] = 1;
+		pollConfigured[1] = 1;
+		putDataNow[2] = 0;
+		putDataInGrid[2] = 0;
+		pollConfigured[2] = 0;
+		putDataNow[3] = 0;
+		putDataInGrid[3] = 0;
+		pollConfigured[3] = 0;
+		putDataNow[4] = 0;
+		putDataInGrid[4] = 0;
+		pollConfigured[4] = 0;
+		break;
+		}
+	case 3:
+		{
+		btnConfig1.ShowWindow(SW_SHOW);
+		btnConfig2.ShowWindow(SW_SHOW);
+		btnConfig3.ShowWindow(SW_SHOW);
+		btnConfig4.ShowWindow(SW_HIDE);
+		btnConfig5.ShowWindow(SW_HIDE);
+		ctrlGrid1.ShowWindow(SW_SHOW);
+		ctrlGrid2.ShowWindow(SW_SHOW);
+		ctrlGrid3.ShowWindow(SW_SHOW);
+		ctrlGrid4.ShowWindow(SW_HIDE);
+		ctrlGrid5.ShowWindow(SW_HIDE);
+		staticConfig1.ShowWindow(SW_SHOW);
+		staticConfig2.ShowWindow(SW_SHOW);
+		staticConfig3.ShowWindow(SW_SHOW);
+		staticConfig4.ShowWindow(SW_HIDE);
+		staticConfig5.ShowWindow(SW_HIDE);
+		btnStartStop1.ShowWindow(SW_SHOW);
+		btnStartStop2.ShowWindow(SW_SHOW);
+		btnStartStop3.ShowWindow(SW_SHOW);
+		btnStartStop4.ShowWindow(SW_HIDE);
+		btnStartStop5.ShowWindow(SW_HIDE);
+		pollShown[0] = 1;
+		pollShown[1] = 1;
+		pollShown[2] = 1;
+		pollShown[3] = 0;
+		pollShown[4] = 0;
+		putDataNow[0] = 1;
+		putDataInGrid[0] = 1;
+		pollConfigured[0] = 1;
+		putDataNow[1] = 1;
+		putDataInGrid[1] = 1;
+		pollConfigured[1] = 1;
+		putDataNow[2] = 1;
+		putDataInGrid[2] = 1;
+		pollConfigured[2] = 1;
+		putDataNow[3] = 0;
+		putDataInGrid[3] = 0;
+		pollConfigured[3] = 0;
+		putDataNow[4] = 0;
+		putDataInGrid[4] = 0;
+		pollConfigured[4] = 0;
+		break;
+		}
+	case 4:
+		{
+		btnConfig1.ShowWindow(SW_SHOW);
+		btnConfig2.ShowWindow(SW_SHOW);
+		btnConfig3.ShowWindow(SW_SHOW);
+		btnConfig4.ShowWindow(SW_SHOW);
+		btnConfig5.ShowWindow(SW_HIDE);
+		ctrlGrid1.ShowWindow(SW_SHOW);
+		ctrlGrid2.ShowWindow(SW_SHOW);
+		ctrlGrid3.ShowWindow(SW_SHOW);
+		ctrlGrid4.ShowWindow(SW_SHOW);
+		ctrlGrid5.ShowWindow(SW_HIDE);
+		staticConfig1.ShowWindow(SW_SHOW);
+		staticConfig2.ShowWindow(SW_SHOW);
+		staticConfig3.ShowWindow(SW_SHOW);
+		staticConfig4.ShowWindow(SW_SHOW);
+		staticConfig5.ShowWindow(SW_HIDE);
+		btnStartStop1.ShowWindow(SW_SHOW);
+		btnStartStop2.ShowWindow(SW_SHOW);
+		btnStartStop3.ShowWindow(SW_SHOW);
+		btnStartStop4.ShowWindow(SW_SHOW);
+		btnStartStop5.ShowWindow(SW_HIDE);
+		pollShown[0] = 1;
+		pollShown[1] = 1;
+		pollShown[2] = 1;
+		pollShown[3] = 1;
+		pollShown[4] = 0;
+		putDataNow[0] = 1;
+		putDataInGrid[0] = 1;
+		pollConfigured[0] = 1;
+		putDataNow[1] = 1;
+		putDataInGrid[1] = 1;
+		pollConfigured[1] = 1;
+		putDataNow[2] = 1;
+		putDataInGrid[2] = 1;
+		pollConfigured[2] = 1;
+		putDataNow[3] = 1;
+		putDataInGrid[3] = 1;
+		pollConfigured[3] = 1;
+		putDataNow[4] = 0;
+		putDataInGrid[4] = 0;
+		pollConfigured[4] = 0;
+		break;
+		}
+#endif
+	case 5:
+		{
+		btnConfig1.ShowWindow(SW_SHOW);
+		btnConfig2.ShowWindow(SW_SHOW);
+		btnConfig3.ShowWindow(SW_SHOW);
+		btnConfig4.ShowWindow(SW_SHOW);
+		btnConfig5.ShowWindow(SW_SHOW);
+		ctrlGrid1.ShowWindow(SW_SHOW);
+		ctrlGrid2.ShowWindow(SW_SHOW);
+		ctrlGrid3.ShowWindow(SW_SHOW);
+		ctrlGrid4.ShowWindow(SW_SHOW);
+		ctrlGrid5.ShowWindow(SW_SHOW);
+		staticConfig1.ShowWindow(SW_SHOW);
+		staticConfig2.ShowWindow(SW_SHOW);
+		staticConfig3.ShowWindow(SW_SHOW);
+		staticConfig4.ShowWindow(SW_SHOW);
+		staticConfig5.ShowWindow(SW_SHOW);
+		btnStartStop1.ShowWindow(SW_SHOW);
+		btnStartStop2.ShowWindow(SW_SHOW);
+		btnStartStop3.ShowWindow(SW_SHOW);
+		btnStartStop4.ShowWindow(SW_SHOW);
+		btnStartStop5.ShowWindow(SW_SHOW);
+		pollShown[0] = 1;
+		pollShown[1] = 1;
+		pollShown[2] = 1;
+		pollShown[3] = 1;
+		pollShown[4] = 1;
+		putDataNow[0] = 1;
+		putDataInGrid[0] = 1;
+		putDataNow[1] = 1;
+		putDataInGrid[1] = 1;
+		putDataNow[2] = 1;
+		putDataInGrid[2] = 1;
+		putDataNow[3] = 1;
+		putDataInGrid[3] = 1;
+		putDataNow[4] = 1;
+		putDataInGrid[4] = 1;
+		break;
+		}
+	default:
+		{
+		btnConfig1.ShowWindow(SW_SHOW);
+		btnConfig2.ShowWindow(SW_HIDE);
+		btnConfig3.ShowWindow(SW_HIDE);
+		btnConfig4.ShowWindow(SW_HIDE);
+		btnConfig5.ShowWindow(SW_HIDE);
+		ctrlGrid1.ShowWindow(SW_SHOW);
+		ctrlGrid2.ShowWindow(SW_HIDE);
+		ctrlGrid3.ShowWindow(SW_HIDE);
+		ctrlGrid4.ShowWindow(SW_HIDE);
+		ctrlGrid5.ShowWindow(SW_HIDE);
+		staticConfig1.ShowWindow(SW_SHOW);
+		staticConfig2.ShowWindow(SW_HIDE);
+		staticConfig3.ShowWindow(SW_HIDE);
+		staticConfig4.ShowWindow(SW_HIDE);
+		staticConfig5.ShowWindow(SW_HIDE);
+		btnStartStop1.ShowWindow(SW_SHOW);
+		btnStartStop2.ShowWindow(SW_HIDE);
+		btnStartStop3.ShowWindow(SW_HIDE);
+		btnStartStop4.ShowWindow(SW_HIDE);
+		btnStartStop5.ShowWindow(SW_HIDE);
+		pollShown[0] = 1;
+		pollShown[1] = 0;
+		pollShown[2] = 0;
+		pollShown[3] = 0;
+		pollShown[4] = 0;
+		putDataNow[0] = 1;
+		putDataInGrid[0] = 1;
+		pollConfigured[0] = 1;
+		putDataNow[1] = 0;
+		putDataInGrid[1] = 0;
+		pollConfigured[1] = 0;
+		putDataNow[2] = 0;
+		putDataInGrid[2] = 0;
+		pollConfigured[2] = 0;
+		putDataNow[3] = 0;
+		putDataInGrid[3] = 0;
+		pollConfigured[3] = 0;
+		putDataNow[4] = 0;
+		putDataInGrid[4] = 0;
+		break;
+		}
+	}
+}
+
+void CMbPoll::OnFileExit()
+{
+	// TODO: Add your command handler code here
+	saveRegNames();
+	OnMbPollDestroyWindow();
+}
+
+void CMbPoll::OnMbPollDestroyWindow()
+{
+	//noOfGridTables = comboNoOfGrids.GetCurSel();
+	MbPollOpen = 0;
+	DestroyWindow();
+}
+
+void CMbPoll::OnClickedButtonConfig1()
+{
+	// TODO: Add your control notification handler code here
+	curConf = 0;
+	int ret = mbPollOptions.DoModal();
+	if (ret == IDOK)
+	{
+		pollConfigured[0] = 1;
+		mbpollTotalCount[0] = 0;
+		mbpollErrCount[0] = 0;
+		updateStaticConfig(0);
+		updateDataSharingVariables(0);
+	}
+}
+
+void CMbPoll::OnClickedButtonConfig2()
+{
+	// TODO: Add your control notification handler code here
+	curConf = 1;
+	int ret = mbPollOptions.DoModal();
+	if (ret == IDOK)
+	{
+		pollConfigured[1] = 1;
+		mbpollTotalCount[1] = 0;
+		mbpollErrCount[1] = 0;
+		updateStaticConfig(1);
+		updateDataSharingVariables(1);
+	}
+}
+
+void CMbPoll::OnClickedButtonConfig3()
+{
+	// TODO: Add your control notification handler code here
+	curConf = 2;
+	int ret = mbPollOptions.DoModal();
+	if (ret == IDOK)
+	{
+		pollConfigured[2] = 1;
+		mbpollTotalCount[2] = 0;
+		mbpollErrCount[2] = 0;
+		updateStaticConfig(2);
+		updateDataSharingVariables(2);
+	}
+}
+
+void CMbPoll::OnClickedButtonConfig4()
+{
+	// TODO: Add your control notification handler code here
+	curConf = 3;
+	int ret = mbPollOptions.DoModal();
+	if (ret == IDOK)
+	{
+		pollConfigured[3] = 1;
+		mbpollTotalCount[3] = 0;
+		mbpollErrCount[3] = 0;
+		updateStaticConfig(3);
+		updateDataSharingVariables(3);
+	}
+}
+
+void CMbPoll::OnClickedButtonConfig5()
+{
+	// TODO: Add your control notification handler code here
+	curConf = 4;
+	int ret = mbPollOptions.DoModal();
+	if (ret == IDOK)
+	{
+		pollConfigured[4] = 1;
+		mbpollTotalCount[4] = 0;
+		mbpollErrCount[4] = 0;
+		updateStaticConfig(4);
+		updateDataSharingVariables(4);
+	}
+}
+
+void CMbPoll::OnClickedButtonStartStop1()
+{
+	// TODO: Add your control notification handler code here
+	OnClickedButtonStartStop(ctrlGrid1, 0, btnStartStop1);
+}
+
+void CMbPoll::OnClickedButtonStartStop2()
+{
+	// TODO: Add your control notification handler code here
+	OnClickedButtonStartStop(ctrlGrid2, 1, btnStartStop2);
+}
+
+void CMbPoll::OnClickedButtonStartStop3()
+{
+	// TODO: Add your control notification handler code here
+	OnClickedButtonStartStop(ctrlGrid3, 2, btnStartStop3);
+}
+
+void CMbPoll::OnClickedButtonStartStop4()
+{
+	// TODO: Add your control notification handler code here
+	OnClickedButtonStartStop(ctrlGrid4, 3, btnStartStop4);
+}
+
+void CMbPoll::OnClickedButtonStartStop5()
+{
+	// TODO: Add your control notification handler code here
+	OnClickedButtonStartStop(ctrlGrid5, 4, btnStartStop5);
+}
+
+void CMbPoll::OnClickedButtonStartStop(CMsflexgrid &grid, int gridNum, CButton &btn)
+{
+	// TODO: Add your control notification handler code here
+	if (dataFlowStarted[gridNum] == 0)
+	{
+		dataFlowStarted[gridNum] = 1;
+		btn.SetWindowText(L"Stop");
+	}
+	else
+	{
+		dataFlowStarted[gridNum] = 0;
+		btn.SetWindowText(L"Start");
+	}
+}
+
+void CMbPoll::OnClickedCheckTapData()
+{
+	// TODO: Add your control notification handler code here
+	if (checkTapData.GetCheck() == TRUE)
+	{
+		//tapDataMode = 1;		// no tapping required
+		tapDataMode = 0;
+	}
+	else
+	{
+		tapDataMode = 0;
+	}
+}
+
+void CMbPoll::updateStaticConfig(int configNo, int noRowsUpdate)
+{
+	CString tempStrSlaveId;
+	CString tempStrFunction;
+	CString tempStrAddress;
+	CString tempStrQuantity;
+	CString tempStrTotalCount;
+	CString tempStrErrCount;
+	CString tempStr;
+	int tempVar;
+	CMsflexgrid *grid;
+	CStatic *staticConfig;
+
+	if (pollConfigured[configNo] != 1) return;
+	
+	tempStrSlaveId.Format(_T("%d"), pollSlaveId[configNo]);
+
+	switch(pollFunction[configNo])
+	{
+		case 0: tempVar = 1; break;
+		case 1: tempVar = 2; break;
+		case 2: tempVar = 3; break;
+		case 3: tempVar = 4; break;
+		case 4: tempVar = 5; break;
+		case 5: tempVar = 6; break;
+		case 6: tempVar = 15; break;
+		case 7: tempVar = 16; break;
+		default: tempVar = 0; break;
+	}
+
+	tempStrFunction.Format(_T("%02d"), tempVar);
+	tempStrAddress.Format(_T("%d"), pollAddress[configNo]);
+	tempStrQuantity.Format(_T("%d"), pollQuantity[configNo]);
+	tempStrTotalCount.Format(_T("%d"), mbpollTotalCount[configNo]);
+	tempStrErrCount.Format(_T("%d"), mbpollErrCount[configNo]);
+
+	tempStr = L"S = " + tempStrSlaveId + L", F = " + tempStrFunction + L", A = " + tempStrAddress + L", Q = " + tempStrQuantity + L", Tx = " + tempStrTotalCount + L", Err = " + tempStrErrCount;
+
+	switch(configNo)
+	{
+	case 0:
+		grid = &ctrlGrid1;
+		staticConfig = &staticConfig1;
+		break;
+	case 1:
+		grid = &ctrlGrid2;
+		staticConfig = &staticConfig2;
+		break;
+	case 2:
+		grid = &ctrlGrid3;
+		staticConfig = &staticConfig3;
+		break;
+	case 3:
+		grid = &ctrlGrid4;
+		staticConfig = &staticConfig4;
+		break;
+	case 4:
+		grid = &ctrlGrid5;
+		staticConfig = &staticConfig5;
+		break;
+	default:
+		break;
+	}
+
+	staticConfig->SetWindowText(tempStr);
+
+	if (noRowsUpdate != 1)
+	{
+		if (pollRows[configNo] == 0) grid->put_Rows(pollQuantity[configNo] + 1);
+		if (pollRows[configNo] == 10) grid->put_Rows(11);
+		if (pollRows[configNo] == 20) grid->put_Rows(21);
+		if (pollRows[configNo] == 50) grid->put_Rows(51);
+		if (pollRows[configNo] == 100) grid->put_Rows(101);
+	}
+}
+
+void CMbPoll::updateDataSharingVariables(int configNo)
+{
+	switch(configNo)
+	{
+	case 0:
+		if (grid1Data != NULL){delete(grid1Data); grid1Data = NULL;}
+		grid1Data = (short int*) malloc (sizeof(short int) * pollQuantity[configNo]);
+		break;
+	case 1:
+		if (grid2Data != NULL){delete(grid2Data); grid2Data = NULL;}
+		grid2Data = (short int*) malloc (sizeof(short int) * pollQuantity[configNo]);
+		break;
+	case 2:
+		if (grid3Data != NULL){delete(grid3Data); grid3Data = NULL;}
+		grid3Data = (short int*) malloc (sizeof(short int) * pollQuantity[configNo]);
+		break;
+	case 3:
+		if (grid4Data != NULL){delete(grid4Data); grid4Data = NULL;}
+		grid4Data = (short int*) malloc (sizeof(short int) * pollQuantity[configNo]);
+		break;
+	case 4:
+		if (grid5Data != NULL){delete(grid5Data); grid5Data = NULL;}
+		grid5Data = (short int*) malloc (sizeof(short int) * pollQuantity[configNo]);
+		break;
+	default:
+		break;
+	}
+	putDataNow[configNo] = 1;
+	putDataInGrid[configNo] = 1;
+}
+
 void CMbPoll::OnNcDestroy()
 {
 	CDialog::OnNcDestroy();
@@ -206,689 +1307,210 @@ void CMbPoll::PostNcDestroy()
 	delete this;
 }
 
-void CMbPoll::OnBnClickedClose()
-{
-	// TODO: Add your control notification handler code here
-	KillTimer(1);
-	KillTimer(2);
-	CDialog::OnCancel();
-	OnMbPollDestroyWindow();	
-}
+/*
+Conversion function:
+convType: 
+0 = Signed
+1 = Unsigned
+2 = Hex
+3 = Binary
+*/
 
-void CMbPoll::OnTimer(UINT_PTR nIDEvent)
+void CMbPoll::convertFunction(int convType, unsigned short val, CString *str)
 {
-	// TODO: Add your message handler code here and/or call default
-	static int a = 0;
 	CString tempStr;
-	tempStr.Format(_T("%d"),a);
-	ctrlLabel1.SetWindowTextW(tempStr);
-	a++;
+	short int tempVal1;
+	unsigned short int tempVal2;
+	unsigned short int tempVal3;
+	unsigned short int tempVal4;
+	char* binaryStr;
+	char buf[16] = "";
 
-	switch(nIDEvent)
+	switch (convType)
 	{
-	case 1:	// 2s
-		{
-			//testFunc();
-			break;
-		}
-	case 2: // 500 ms
-		{
-			if ((pollShown[0] == 1) && (grid1Data == NULL)) break;
-			if ((pollShown[1] == 1) && (grid1Data == NULL)) break;
-			if ((pollShown[2] == 1) && (grid1Data == NULL)) break;
-			if ((pollShown[3] == 1) && (grid1Data == NULL)) break;
-			if ((pollShown[4] == 1) && (grid1Data == NULL)) break;
-
-			CString tempStr1;
-			if (grid1Data != NULL) 
-			{
-				for (int i = 0; i < pollQuantity[0]; i++)
-				{
-					tempStr1.Format(_T("%d"), (pollAddress[0] + i)); 
-					ctrlGrid1.put_TextMatrix(i + 1, 1, tempStr1);
-					tempStr1.Format(_T("%d"), *((short int*)grid1Data + i)); 
-					ctrlGrid1.put_TextMatrix(i + 1, 2, tempStr1);
-				}
-			}
-
-			if (grid2Data != NULL) 
-			{
-				for (int i = 0; i < pollQuantity[1]; i++)
-				{
-					tempStr1.Format(_T("%d"), (pollAddress[1] + i)); 
-					ctrlGrid2.put_TextMatrix(i + 1, 1, tempStr1);
-					tempStr1.Format(_T("%d"), *((short int*)grid2Data + i)); 
-					ctrlGrid2.put_TextMatrix(i + 1, 2, tempStr1);
-				}
-			}
-
-			if (grid3Data != NULL) 
-			{
-				for (int i = 0; i < pollQuantity[2]; i++)
-				{
-					tempStr1.Format(_T("%d"), (pollAddress[2] + i)); 
-					ctrlGrid3.put_TextMatrix(i + 1, 1, tempStr1);
-					tempStr1.Format(_T("%d"), *((short int*)grid3Data + i)); 
-					ctrlGrid3.put_TextMatrix(i + 1, 2, tempStr1);
-				}
-			}
-
-			if (grid4Data != NULL) 
-			{
-				for (int i = 0; i < pollQuantity[3]; i++)
-				{
-					tempStr1.Format(_T("%d"), (pollAddress[3] + i)); 
-					ctrlGrid4.put_TextMatrix(i + 1, 1, tempStr1);
-					tempStr1.Format(_T("%d"), *((short int*)grid4Data + i)); 
-					ctrlGrid4.put_TextMatrix(i + 1, 2, tempStr1);
-				}
-			}
-
-			if (grid5Data != NULL) 
-			{
-				for (int i = 0; i < pollQuantity[4]; i++)
-				{
-					tempStr1.Format(_T("%d"), (pollAddress[4] + i)); 
-					ctrlGrid5.put_TextMatrix(i + 1, 1, tempStr1);
-					tempStr1.Format(_T("%d"), *((short int*)grid5Data + i)); 
-					ctrlGrid5.put_TextMatrix(i + 1, 2, tempStr1);
-				}
-			}
-
-			break;
-		}
-
-	case 3:
-		{
-			tapDataMode = 1;
-			if (pollShown[0] == 1)
-			{
-				//Read_One(unsigned char device_var,unsigned short address);
-				if (pollFunction[0] == 0)
-				{
-					
-				}
-				if (pollFunction[0] == 1)
-				{
-					
-				}
-				if (pollFunction[0] == 2)
-				{
-					unsigned short tempVar[1000] = {0};
-					unsigned short *tempPtr = tempVar;
-					read_multi(pollSlaveId[0], tempPtr, pollAddress[0], pollQuantity[0]);
-					//MessageBoxW(L"las");
-				}
-				if (pollFunction[0] == 3)
-				{
-					
-				}
-				if (pollFunction[0] == 4)
-				{
-					
-				}
-				if (pollFunction[0] == 5)
-				{
-					
-				}
-			}
-		}
-
-	case 4:
-		{
-			if (pollShown[1] == 1)
-			{
-				//Read_One(unsigned char device_var,unsigned short address);
-			}
-		}
-
-	case 5:
-		{
-			if (pollShown[2] == 1)
-			{
-				//Read_One(unsigned char device_var,unsigned short address);
-			}
-		}
-
-	case 6:
-		{
-			if (pollShown[3] == 1)
-			{
-				//Read_One(unsigned char device_var,unsigned short address);
-			}
-		}
-
-	case 7:
-		{
-			if (pollShown[4] == 1)
-			{
-				//Read_One(unsigned char device_var,unsigned short address);
-			}
-		}
-
-	default:
+	case 0:		/* Signed */
+		tempVal1 = (short int)val;
+		str->Format(_T("%d"), tempVal1);
+		break;
+	case 1:		/* Unsigned */
+		tempVal2 = (unsigned short int)val;
+		str->Format(_T("%d"), tempVal2);
+		break;
+	case 2:		/* Hex */
+		tempVal3 = (unsigned short int)val;
+		str->Format(_T("%X"), tempVal3);
+		break;
+#if 0
+	case 3:		/* Binary */
+		tempVal4 = (unsigned short int)val;
+		str->Format(_T("%X"), tempVal4);
+		tempStr.Format(_T("%X"), tempVal4);
+		binaryStr = tempStr.GetBuffer(tempStr.GetLength());
+		MessageBox((LPCTSTR)binaryStr);
+		break;
+#endif
+	default: 
+		tempVal2 = (unsigned short int)val;
+		str->Format(_T("%d"), tempVal2);
 		break;
 	}
-
-	CDialog::OnTimer(nIDEvent);
-
 }
 
-void CMbPoll::OnKillfocusEditForGrid()
+/*
+const char * const quads[16][4] = {"0000","0001","0010","0011",
+							"0100","0101","0110","0111",
+							"1000","1001","1010","1011",
+							"1100","1101","1110","1111"};
+
+const char * hex_to_bin_quad(unsigned char c)
 {
-	// TODO: Add your control notification handler code here
-
-	CString strText;
-	ctrlEditGrid1.GetWindowText(strText);
-
-	if (curGridForEdit == 1)
-		ctrlGrid1.put_TextMatrix(currentRow, currentCol, strText);
-	if (curGridForEdit == 2)
-		ctrlGrid2.put_TextMatrix(currentRow, currentCol, strText);
-	if (curGridForEdit == 3)
-		ctrlGrid3.put_TextMatrix(currentRow, currentCol, strText);
-	if (curGridForEdit == 4)
-		ctrlGrid4.put_TextMatrix(currentRow, currentCol, strText);
-	if (curGridForEdit == 5)
-		ctrlGrid5.put_TextMatrix(currentRow, currentCol, strText);
+  if (c >= '0' && c <= '9') return quads[     c - '0'];
+  if (c >= 'A' && c <= 'F') return quads[10 + c - 'A'];
+  if (c >= 'a' && c <= 'f') return quads[10 + c - 'a'];
+  return -1;
 }
+*/
 
-void CMbPoll::OnOK()
+void WriteCString (CFile& file, CString& str)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	int iChars = 1 + str.GetLength ();
 
-	//CDialog::OnOK();
+	file.Write (&iChars, sizeof (iChars));
+	file.Write ((LPVOID)(LPCTSTR) str, iChars * sizeof (TCHAR));
 }
 
-void CMbPoll::OnCancel()
+void ReadCString (CString& str, CFile& file)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	int iChars;
 
-	CDialog::OnCancel();
-	OnMbPollDestroyWindow();
+	file.Read (&iChars, sizeof (iChars));
+	file.Read ((LPVOID) str.GetBuffer (iChars), iChars * sizeof (TCHAR));
+	str.ReleaseBuffer ();
 }
 
-BOOL CMbPoll::OnInitDialog()
-{
-	CDialog::OnInitDialog();
-
-	// TODO:  Add extra initialization here
-	ctrlEditGrid1.ShowWindow(SW_HIDE);
-	comboNoOfGrids.SetCurSel(noOfGridTables);
-	displayGrids(noOfGridTables);
-	tapDataMode = 0;
-
-	ctrlGrid1.put_TextMatrix(0, 0, L"Alias");
-	ctrlGrid1.put_TextMatrix(0, 1, L"Addr");
-	ctrlGrid1.put_TextMatrix(0, 2, L"Value");
-
-	ctrlGrid2.put_TextMatrix(0, 0, L"Alias");
-	ctrlGrid2.put_TextMatrix(0, 1, L"Addr");
-	ctrlGrid2.put_TextMatrix(0, 2, L"Value");
-
-	ctrlGrid3.put_TextMatrix(0, 0, L"Alias");
-	ctrlGrid3.put_TextMatrix(0, 1, L"Addr");
-	ctrlGrid3.put_TextMatrix(0, 2, L"Value");
-
-	ctrlGrid4.put_TextMatrix(0, 0, L"Alias");
-	ctrlGrid4.put_TextMatrix(0, 1, L"Addr");
-	ctrlGrid4.put_TextMatrix(0, 2, L"Value");
-
-	ctrlGrid5.put_TextMatrix(0, 0, L"Alias");
-	ctrlGrid5.put_TextMatrix(0, 1, L"Addr");
-	ctrlGrid5.put_TextMatrix(0, 2, L"Value");
-
-	SetTimer(1, 2000, NULL);
-	SetTimer(2, 500, NULL);
-
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
-}
-
-void CMbPoll::OnSelchangeComboNoofgrids()
-{
-	// TODO: Add your control notification handler code here
-	displayGrids(comboNoOfGrids.GetCurSel());
-}
-
-void CMbPoll::displayGrids(int number)
-{
-
-	switch(number)
-	{
-	case 0:
-		btnConfig1.ShowWindow(SW_HIDE);
-		btnConfig2.ShowWindow(SW_HIDE);
-		btnConfig3.ShowWindow(SW_HIDE);
-		btnConfig4.ShowWindow(SW_HIDE);
-		btnConfig5.ShowWindow(SW_HIDE);
-		ctrlGrid1.ShowWindow(SW_HIDE);
-		ctrlGrid2.ShowWindow(SW_HIDE);
-		ctrlGrid3.ShowWindow(SW_HIDE);
-		ctrlGrid4.ShowWindow(SW_HIDE);
-		ctrlGrid5.ShowWindow(SW_HIDE);
-		staticConfig1.ShowWindow(SW_HIDE);
-		staticConfig2.ShowWindow(SW_HIDE);
-		staticConfig3.ShowWindow(SW_HIDE);
-		staticConfig4.ShowWindow(SW_HIDE);
-		staticConfig5.ShowWindow(SW_HIDE);
-		ctrlEditGrid1.ShowWindow(SW_HIDE);
-		/*btnStartStop1.ShowWindow(SW_HIDE);
-		btnStartStop2.ShowWindow(SW_HIDE);
-		btnStartStop3.ShowWindow(SW_HIDE);
-		btnStartStop4.ShowWindow(SW_HIDE);
-		btnStartStop5.ShowWindow(SW_HIDE);*/
-		pollShown[0] = 0;
-		pollShown[1] = 0;
-		pollShown[2] = 0;
-		pollShown[3] = 0;
-		pollShown[4] = 0;
-		break;
-	case 1:
-		btnConfig1.ShowWindow(SW_SHOW);
-		btnConfig2.ShowWindow(SW_HIDE);
-		btnConfig3.ShowWindow(SW_HIDE);
-		btnConfig4.ShowWindow(SW_HIDE);
-		btnConfig5.ShowWindow(SW_HIDE);
-		ctrlGrid1.ShowWindow(SW_SHOW);
-		ctrlGrid2.ShowWindow(SW_HIDE);
-		ctrlGrid3.ShowWindow(SW_HIDE);
-		ctrlGrid4.ShowWindow(SW_HIDE);
-		ctrlGrid5.ShowWindow(SW_HIDE);
-		staticConfig1.ShowWindow(SW_SHOW);
-		staticConfig2.ShowWindow(SW_HIDE);
-		staticConfig3.ShowWindow(SW_HIDE);
-		staticConfig4.ShowWindow(SW_HIDE);
-		staticConfig5.ShowWindow(SW_HIDE);
-		/*btnStartStop1.ShowWindow(SW_SHOW);
-		btnStartStop2.ShowWindow(SW_HIDE);
-		btnStartStop3.ShowWindow(SW_HIDE);
-		btnStartStop4.ShowWindow(SW_HIDE);
-		btnStartStop5.ShowWindow(SW_HIDE);*/
-		pollShown[0] = 1;
-		pollShown[1] = 0;
-		pollShown[2] = 0;
-		pollShown[3] = 0;
-		pollShown[4] = 0;
-		break;
-	case 2:
-		btnConfig1.ShowWindow(SW_SHOW);
-		btnConfig2.ShowWindow(SW_SHOW);
-		btnConfig3.ShowWindow(SW_HIDE);
-		btnConfig4.ShowWindow(SW_HIDE);
-		btnConfig5.ShowWindow(SW_HIDE);
-		ctrlGrid1.ShowWindow(SW_SHOW);
-		ctrlGrid2.ShowWindow(SW_SHOW);
-		ctrlGrid3.ShowWindow(SW_HIDE);
-		ctrlGrid4.ShowWindow(SW_HIDE);
-		ctrlGrid5.ShowWindow(SW_HIDE);
-		staticConfig1.ShowWindow(SW_SHOW);
-		staticConfig2.ShowWindow(SW_SHOW);
-		staticConfig3.ShowWindow(SW_HIDE);
-		staticConfig4.ShowWindow(SW_HIDE);
-		staticConfig5.ShowWindow(SW_HIDE);
-		/*btnStartStop1.ShowWindow(SW_SHOW);
-		btnStartStop2.ShowWindow(SW_SHOW);
-		btnStartStop3.ShowWindow(SW_HIDE);
-		btnStartStop4.ShowWindow(SW_HIDE);
-		btnStartStop5.ShowWindow(SW_HIDE);*/
-		pollShown[0] = 1;
-		pollShown[1] = 1;
-		pollShown[2] = 0;
-		pollShown[3] = 0;
-		pollShown[4] = 0;
-		break;
-	case 3:
-		btnConfig1.ShowWindow(SW_SHOW);
-		btnConfig2.ShowWindow(SW_SHOW);
-		btnConfig3.ShowWindow(SW_SHOW);
-		btnConfig4.ShowWindow(SW_HIDE);
-		btnConfig5.ShowWindow(SW_HIDE);
-		ctrlGrid1.ShowWindow(SW_SHOW);
-		ctrlGrid2.ShowWindow(SW_SHOW);
-		ctrlGrid3.ShowWindow(SW_SHOW);
-		ctrlGrid4.ShowWindow(SW_HIDE);
-		ctrlGrid5.ShowWindow(SW_HIDE);
-		staticConfig1.ShowWindow(SW_SHOW);
-		staticConfig2.ShowWindow(SW_SHOW);
-		staticConfig3.ShowWindow(SW_SHOW);
-		staticConfig4.ShowWindow(SW_HIDE);
-		staticConfig5.ShowWindow(SW_HIDE);
-		/*btnStartStop1.ShowWindow(SW_SHOW);
-		btnStartStop2.ShowWindow(SW_SHOW);
-		btnStartStop3.ShowWindow(SW_SHOW);
-		btnStartStop4.ShowWindow(SW_HIDE);
-		btnStartStop5.ShowWindow(SW_HIDE);*/
-		pollShown[0] = 1;
-		pollShown[1] = 1;
-		pollShown[2] = 1;
-		pollShown[3] = 0;
-		pollShown[4] = 0;
-		break;
-	case 4:
-		btnConfig1.ShowWindow(SW_SHOW);
-		btnConfig2.ShowWindow(SW_SHOW);
-		btnConfig3.ShowWindow(SW_SHOW);
-		btnConfig4.ShowWindow(SW_SHOW);
-		btnConfig5.ShowWindow(SW_HIDE);
-		ctrlGrid1.ShowWindow(SW_SHOW);
-		ctrlGrid2.ShowWindow(SW_SHOW);
-		ctrlGrid3.ShowWindow(SW_SHOW);
-		ctrlGrid4.ShowWindow(SW_SHOW);
-		ctrlGrid5.ShowWindow(SW_HIDE);
-		staticConfig1.ShowWindow(SW_SHOW);
-		staticConfig2.ShowWindow(SW_SHOW);
-		staticConfig3.ShowWindow(SW_SHOW);
-		staticConfig4.ShowWindow(SW_SHOW);
-		staticConfig5.ShowWindow(SW_HIDE);
-		/*btnStartStop1.ShowWindow(SW_SHOW);
-		btnStartStop2.ShowWindow(SW_SHOW);
-		btnStartStop3.ShowWindow(SW_SHOW);
-		btnStartStop4.ShowWindow(SW_SHOW);
-		btnStartStop5.ShowWindow(SW_HIDE);*/
-		pollShown[0] = 1;
-		pollShown[1] = 1;
-		pollShown[2] = 1;
-		pollShown[3] = 1;
-		pollShown[4] = 0;
-		break;
-	case 5:
-		btnConfig1.ShowWindow(SW_SHOW);
-		btnConfig2.ShowWindow(SW_SHOW);
-		btnConfig3.ShowWindow(SW_SHOW);
-		btnConfig4.ShowWindow(SW_SHOW);
-		btnConfig5.ShowWindow(SW_SHOW);
-		ctrlGrid1.ShowWindow(SW_SHOW);
-		ctrlGrid2.ShowWindow(SW_SHOW);
-		ctrlGrid3.ShowWindow(SW_SHOW);
-		ctrlGrid4.ShowWindow(SW_SHOW);
-		ctrlGrid5.ShowWindow(SW_SHOW);
-		staticConfig1.ShowWindow(SW_SHOW);
-		staticConfig2.ShowWindow(SW_SHOW);
-		staticConfig3.ShowWindow(SW_SHOW);
-		staticConfig4.ShowWindow(SW_SHOW);
-		staticConfig5.ShowWindow(SW_SHOW);
-		/*btnStartStop1.ShowWindow(SW_SHOW);
-		btnStartStop2.ShowWindow(SW_SHOW);
-		btnStartStop3.ShowWindow(SW_SHOW);
-		btnStartStop4.ShowWindow(SW_SHOW);
-		btnStartStop5.ShowWindow(SW_SHOW);*/
-		pollShown[0] = 1;
-		pollShown[1] = 1;
-		pollShown[2] = 1;
-		pollShown[3] = 1;
-		pollShown[4] = 1;
-		break;
-	default:
-		btnConfig1.ShowWindow(SW_SHOW);
-		btnConfig2.ShowWindow(SW_HIDE);
-		btnConfig3.ShowWindow(SW_HIDE);
-		btnConfig4.ShowWindow(SW_HIDE);
-		btnConfig5.ShowWindow(SW_HIDE);
-		ctrlGrid1.ShowWindow(SW_SHOW);
-		ctrlGrid2.ShowWindow(SW_HIDE);
-		ctrlGrid3.ShowWindow(SW_HIDE);
-		ctrlGrid4.ShowWindow(SW_HIDE);
-		ctrlGrid5.ShowWindow(SW_HIDE);
-		staticConfig1.ShowWindow(SW_SHOW);
-		staticConfig2.ShowWindow(SW_HIDE);
-		staticConfig3.ShowWindow(SW_HIDE);
-		staticConfig4.ShowWindow(SW_HIDE);
-		staticConfig5.ShowWindow(SW_HIDE);
-		/*btnStartStop1.ShowWindow(SW_SHOW);
-		btnStartStop2.ShowWindow(SW_HIDE);
-		btnStartStop3.ShowWindow(SW_HIDE);
-		btnStartStop4.ShowWindow(SW_HIDE);
-		btnStartStop5.ShowWindow(SW_HIDE);*/
-		pollShown[0] = 1;
-		pollShown[1] = 0;
-		pollShown[2] = 0;
-		pollShown[3] = 0;
-		pollShown[4] = 0;
-		break;
-	}
-	if ((pollShown[0] == 1) && (pollConfigured[0] == 1))
-	{;}
-}
-
-void CMbPoll::OnFileExit()
+void CMbPoll::OnFileSave()
 {
 	// TODO: Add your command handler code here
-	OnMbPollDestroyWindow();
-}
+	CFile f;
+	CString strFilter = _T("Text file (*.txt)|*.txt|All files (*.*)|*.*||");
+	CString temp;
+	int qtyToShow[5];
+	CMsflexgrid* grid;
 
-void CMbPoll::OnMbPollDestroyWindow()
-{
-	noOfGridTables = comboNoOfGrids.GetCurSel();
-	DestroyWindow();
-}
+	//CFileDialog dlg(true,_T("Save current Config"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
+	CFileDialog dlg(false, _T("Save current Config"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER, strFilter);
 
-void CMbPoll::OnClickedButtonConfig1()
-{
-	// TODO: Add your control notification handler code here
-	curConf = 0;
-	int ret = mbPollOptions.DoModal();
-	if (ret == IDOK)
+	if (dlg.DoModal() == IDOK)
 	{
-		updateStaticConfig(0);
-		updateDataSharingVariables(0);
+		CString strConfigFilePathName = dlg.GetPathName();
+		CString strConfigFileName = dlg.GetFileName();
+
+		f.Open(strConfigFileName, CFile::modeCreate | CFile::modeWrite);
+
+		//CString str1;
+		//str1 = L"Text1;Text2;Text3;";
+		//WriteCString(f, str1);
+		//f.Close();
+
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == 0) grid = &ctrlGrid1;
+			if (i == 1) grid = &ctrlGrid2;
+			if (i == 2) grid = &ctrlGrid3;
+			if (i == 3) grid = &ctrlGrid4;
+			if (i == 4) grid = &ctrlGrid5;
+
+			temp.Format(_T("%d"), i);				// grid number
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), dataFlowStarted[i]);	// dataflow started
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollConfigured[i]);	// poll configured
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollSlaveId[i]);	// slave ID
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollFunction[i]);	// function
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollAddress[i]);	// address
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollQuantity[i]); // quantity
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollScanRate[i]); // scan rate
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollRows[i]);		// rows
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollDisplay[i]);	// display
+			WriteCString(f, temp);
+
+			qtyToShow[i] = ((pollRows[i] == 0) || (pollQuantity[i] < pollRows[i])) ? pollQuantity[i] : pollRows[i];
+			for (int j = 0; j < qtyToShow[i]; j++)
+			{
+				temp = grid->get_TextMatrix(j+1, 0);
+				WriteCString(f, temp);
+			}
+		}
+		f.Close();
 	}
 }
 
-void CMbPoll::OnClickedButtonConfig2()
+void CMbPoll::OnFileOpen()
 {
-	// TODO: Add your control notification handler code here
-	curConf = 1;
-	int ret = mbPollOptions.DoModal();
-	if (ret == IDOK)
+	// TODO: Add your command handler code here
+
+	int qtyToShow[5];
+	CMsflexgrid* grid;
+	CString strFilter = _T("Text file (*.txt)|*.txt|All files (*.*)|*.*||");
+	CFile f;
+	CString temp;
+
+	CFileDialog dlg(true, _T("Open current Config"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER, strFilter);
+	if (dlg.DoModal() == IDOK)
 	{
-		updateStaticConfig(1);
-		updateDataSharingVariables(1);
-	}
-}
+		CString strConfigFilePathName1 = dlg.GetPathName();
+		CString strConfigFileName1 = dlg.GetFileName();
+		f.Open(strConfigFileName1, CFile::modeRead);
 
-void CMbPoll::OnClickedButtonConfig3()
-{
-	// TODO: Add your control notification handler code here
-	curConf = 2;
-	int ret = mbPollOptions.DoModal();
-	if (ret == IDOK)
-	{
-		updateStaticConfig(2);
-		updateDataSharingVariables(2);
-	}
-}
+		for (int i = 0; i < 5; i++)
+		{
+			if (i == 0) grid = &ctrlGrid1;
+			if (i == 1) grid = &ctrlGrid2;
+			if (i == 2) grid = &ctrlGrid3;
+			if (i == 3) grid = &ctrlGrid4;
+			if (i == 4) grid = &ctrlGrid5;
 
-void CMbPoll::OnClickedButtonConfig4()
-{
-	// TODO: Add your control notification handler code here
-	curConf = 3;
-	int ret = mbPollOptions.DoModal();
-	if (ret == IDOK)
-	{
-		updateStaticConfig(3);
-		updateDataSharingVariables(3);
-	}
-}
-
-void CMbPoll::OnClickedButtonConfig5()
-{
-	// TODO: Add your control notification handler code here
-	curConf = 4;
-	int ret = mbPollOptions.DoModal();
-	if (ret == IDOK)
-	{
-		updateStaticConfig(4);
-		updateDataSharingVariables(4);
-	}
-}
-
-void CMbPoll::updateStaticConfig(int configNo)
-{
-	CString tempStrSlaveId;
-	CString tempStrFunction;
-	CString tempStrAddress;
-	CString tempStrQuantity;
-	CString tempStr;
-	int tempVar;
-	
-	tempStrSlaveId.Format(_T("%d"), pollSlaveId[configNo]);
-
-	switch(pollFunction[configNo])
-	{
-		case 0: tempVar = 1; break;
-		case 1: tempVar = 2; break;
-		case 2: tempVar = 3; break;
-		case 3: tempVar = 4; break;
-		case 4: tempVar = 5; break;
-		case 5: tempVar = 6; break;
-		case 6: tempVar = 15; break;
-		case 7: tempVar = 16; break;
-		default: tempVar = 0; break;
-	}
-	tempStrFunction.Format(_T("%02d"), tempVar);
-	tempStrAddress.Format(_T("%d"), pollAddress[configNo]);
-	tempStrQuantity.Format(_T("%d"), pollQuantity[configNo]);
-
-	tempStr = L"S = " + tempStrSlaveId + L", F = " + tempStrFunction + L"\nA = " + tempStrAddress + L", Q = " + tempStrQuantity;
-
-	switch(configNo)
-	{
-	case 0:
-		staticConfig1.SetWindowText(tempStr);
-		if (pollRows[configNo] == 0) ctrlGrid1.put_Rows(pollQuantity[configNo] + 1);
-		if (pollRows[configNo] == 10) ctrlGrid1.put_Rows(11);
-		if (pollRows[configNo] == 20) ctrlGrid1.put_Rows(21);
-		if (pollRows[configNo] == 50) ctrlGrid1.put_Rows(51);
-		if (pollRows[configNo] == 100) ctrlGrid1.put_Rows(101);
-		break;
-	case 1:
-		staticConfig2.SetWindowText(tempStr);
-		if (pollRows[configNo] == 0) ctrlGrid2.put_Rows(pollQuantity[configNo] + 1);
-		if (pollRows[configNo] == 10) ctrlGrid2.put_Rows(11);
-		if (pollRows[configNo] == 20) ctrlGrid2.put_Rows(21);
-		if (pollRows[configNo] == 50) ctrlGrid2.put_Rows(51);
-		if (pollRows[configNo] == 100) ctrlGrid2.put_Rows(101);
-		break;
-	case 2:
-		staticConfig3.SetWindowText(tempStr);
-		if (pollRows[configNo] == 0) ctrlGrid3.put_Rows(pollQuantity[configNo] + 1);
-		if (pollRows[configNo] == 10) ctrlGrid3.put_Rows(11);
-		if (pollRows[configNo] == 20) ctrlGrid3.put_Rows(21);
-		if (pollRows[configNo] == 50) ctrlGrid3.put_Rows(51);
-		if (pollRows[configNo] == 100) ctrlGrid3.put_Rows(101);
-		break;
-	case 3:
-		staticConfig4.SetWindowText(tempStr);
-		if (pollRows[configNo] == 0) ctrlGrid4.put_Rows(pollQuantity[configNo] + 1);
-		if (pollRows[configNo] == 10) ctrlGrid4.put_Rows(11);
-		if (pollRows[configNo] == 20) ctrlGrid4.put_Rows(21);
-		if (pollRows[configNo] == 50) ctrlGrid4.put_Rows(51);
-		if (pollRows[configNo] == 100) ctrlGrid4.put_Rows(101);
-		break;
-	case 4:
-		staticConfig5.SetWindowText(tempStr);
-		if (pollRows[configNo] == 0) ctrlGrid5.put_Rows(pollQuantity[configNo] + 1);
-		if (pollRows[configNo] == 10) ctrlGrid5.put_Rows(11);
-		if (pollRows[configNo] == 20) ctrlGrid5.put_Rows(21);
-		if (pollRows[configNo] == 50) ctrlGrid5.put_Rows(51);
-		if (pollRows[configNo] == 100) ctrlGrid5.put_Rows(101);
-		break;
-	default:
-		break;
-	}
-}
-
-void CMbPoll::updateDataSharingVariables(int configNo)
-{
-	switch(configNo)
-	{
-	case 0:
-		if (grid1Data != NULL){delete(grid1Data); grid1Data = NULL;}
-		grid1Data = (short int*) malloc (sizeof(short int) * pollQuantity[configNo]);
-		putDataInGrid1 = 1;
-		break;
-	case 1:
-		if (grid2Data != NULL){delete(grid2Data); grid2Data = NULL;}
-		grid2Data = (short int*) malloc (sizeof(short int) * pollQuantity[configNo]);
-		putDataInGrid2 = 1;
-		break;
-	case 2:
-		if (grid3Data != NULL){delete(grid3Data); grid3Data = NULL;}
-		grid3Data = (short int*) malloc (sizeof(short int) * pollQuantity[configNo]);
-		putDataInGrid3 = 1;
-		break;
-	case 3:
-		if (grid4Data != NULL){delete(grid4Data); grid4Data = NULL;}
-		grid4Data = (short int*) malloc (sizeof(short int) * pollQuantity[configNo]);
-		putDataInGrid4 = 1;
-		break;
-	case 4:
-		if (grid5Data != NULL){delete(grid5Data); grid5Data = NULL;}
-		grid5Data = (short int*) malloc (sizeof(short int) * pollQuantity[configNo]);
-		putDataInGrid5 = 1;
-		break;
-	default:
-		break;
-	}
-	pollConfigured[configNo] = 1;
-}
-
-void CMbPoll::OnClickedButtonStartStop1()
-{
-	// TODO: Add your control notification handler code here
-	OnClickedButtonStartStop(ctrlGrid1);
-}
-
-void CMbPoll::OnClickedButtonStartStop2()
-{
-	// TODO: Add your control notification handler code here
-	OnClickedButtonStartStop(ctrlGrid2);
-}
-
-void CMbPoll::OnClickedButtonStartStop3()
-{
-	// TODO: Add your control notification handler code here
-	OnClickedButtonStartStop(ctrlGrid3);
-}
-
-void CMbPoll::OnClickedButtonStartStop4()
-{
-	// TODO: Add your control notification handler code here
-	OnClickedButtonStartStop(ctrlGrid4);
-}
-
-void CMbPoll::OnClickedButtonStartStop5()
-{
-	// TODO: Add your control notification handler code here
-	OnClickedButtonStartStop(ctrlGrid5);
-}
-
-void CMbPoll::OnClickedButtonStartStop(CMsflexgrid &grid)
-{
-	// TODO: Add your control notification handler code here
-}
-
-void CMbPoll::OnClickedCheckTapData()
-{
-	// TODO: Add your control notification handler code here
-	if (checkTapData.GetCheck() == TRUE)
-	{
-		tapDataMode = 1;
-		KillTimer(3);
-		KillTimer(4);
-		KillTimer(5);
-		KillTimer(6);
-		KillTimer(7);
-	}
-	else
-	{
-		tapDataMode = 0;
-		SetTimer(3, pollScanRate[0], NULL);
-		SetTimer(4, pollScanRate[1], NULL);
-		SetTimer(5, pollScanRate[2], NULL);
-		SetTimer(6, pollScanRate[3], NULL);
-		SetTimer(7, pollScanRate[4], NULL);
+			ReadCString(temp, f);		// grid number
+			ReadCString(temp, f);		// dataflow started
+			dataFlowStarted[i] = _wtoi(temp);
+			ReadCString(temp, f);		// poll configured
+			pollConfigured[i] = _wtoi(temp);
+			ReadCString(temp, f);		// slave ID
+			pollSlaveId[i] = _wtoi(temp);
+			ReadCString(temp, f);		// function
+			pollFunction[i] = _wtoi(temp);
+			ReadCString(temp, f);		// address
+			pollAddress[i] = _wtoi(temp);
+			ReadCString(temp, f);		// quantity
+			pollQuantity[i] = _wtoi(temp);
+			ReadCString(temp, f);		// scan rate
+			pollScanRate[i] = _wtoi(temp);
+			ReadCString(temp, f);		// rows
+			pollRows[i] = _wtoi(temp);
+			ReadCString(temp, f);		// display
+			pollDisplay[i] = _wtoi(temp);
+			qtyToShow[i] = ((pollRows[i] == 0) || (pollQuantity[i] < pollRows[i])) ? pollQuantity[i] : pollRows[i];
+			if (pollRows[i] == 0) grid->put_Rows(pollQuantity[i] + 1);
+			if (pollRows[i] == 10) grid->put_Rows(11);
+			if (pollRows[i] == 20) grid->put_Rows(21);
+			if (pollRows[i] == 50) grid->put_Rows(51);
+			if (pollRows[i] == 100) grid->put_Rows(101);
+			for (int j = 0; j < qtyToShow[i]; j++)
+			{
+				ReadCString(temp, f);
+				grid->put_TextMatrix(j + 1, 0, temp);		// put_TextMatrix(row, col, text);
+			}
+		}
+		startStopBtnState();
+		restoreConfigs();
+		f.Close();
 	}
 }
 
