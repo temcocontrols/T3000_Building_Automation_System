@@ -7,14 +7,17 @@
 #include <ctype.h>
 #include <math.h>
 
-
-
 #include "T3000DEF.H"
 #include "ROUTER.H"
+
+#pragma warning(disable:4309)
+#pragma warning(disable:4305)
+#pragma warning(disable:4244)
 
 char *index_stack;
 char stack[150];
 
+extern char editbuf[25000];//For Bacnet Program use
 
 #define  TRUE 1
 #define  FALSE 0
@@ -41,7 +44,7 @@ int look_up_func( char *s );
 int isarray(char *tok);
 int varoffsetlast(int cur);
 int checkonlyarray(char *tok);
-int mmain ( /*GEdit *ppedit*/);
+int Encode_Program ( /*GEdit *ppedit*/);
 void put_line_num( int line_value );
 
 extern int mode_text;
@@ -63,7 +66,7 @@ Info_Table my_info_panel[18];
 
 #pragma region Panel
 
-class Point{
+class MyPoint{
 public:
 	byte number		;
 	byte point_type;
@@ -759,7 +762,7 @@ struct func_table {
  "DOY",DOY,
  "MOY",MOY,
  "INPUT",INKEYD,
- "INT",INT,
+ "INT",_INT,
  "INTERVAL",INTERVAL,
  "LN",LN,
  "LN-1",LN_1 ,
@@ -771,7 +774,7 @@ struct func_table {
  "POWER_LOSS",POWER_LOSS,
  "SCANS",SCANS,
  "SQR",SQR,
- "STATUS",Status,
+ "STATUS",_Status,
  "RUNTIME",RUNTIME,
  "TBL",Tbl,
  "TIME",TIME,
@@ -885,7 +888,7 @@ struct commands {
  "do" , DO,
  "while" , WHILE ,
  "char" , CHAR ,
- "int" , INT ,
+ "int" , _INT ,
  "return" , RETURN ,
  "REM" ,REM,
  "end" , END ,
@@ -924,40 +927,55 @@ int local_request(int panel, int network);
 int findroutingentry(int port, int network, int &j, int t=1);
 int localnetwork(int net);
 void  init_info_table( void );
+void Init_table_bank();
 #pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
 #pragma warning(disable:4996)
 
 
 
-
+#ifdef Fance_Enable
 int _tmain(int argc, _TCHAR* argv[])
 {
 	init_info_table();
+	Init_table_bank();
+
+
+	//For Test
+	_tcscpy_s(ptr_panel.vars[3].label,"VARIAB");
+	//ptr_panel.vars[3].label = "VARIAB";
+
+
 	renumvar = 1;
-	mmain();
+	Encode_Program();
 	desassembler_program();
 	return 0;
 }
+#endif
+
 char *pmes;
 char mycode[1024];
 //char editbuf[1024] = {"10 REM IF DAYTIMER > 06:00:00 THEN START COOLMODE\r\n20 REM IF+ AHU10CC THEN START OCCUPIED\r\n21 IF- AHU10CC THEN START OCCUPIED\r\n30 IF TIME-ON( OCCUPIED ) > 00:00:15 THEN STOP OCCUPIED"};
 
-//char editbuf[1024] = {"10 REM Test123456789\r\n20 IF VAR1 > 1 THEN VAR8 = 3"};//Pass
+//char editbuf[1024] = {"10 REM Test123456789\r\n20 IF VARIAB > 1 THEN VARIAB = 3"};//Pass
 //char editbuf[1024] = {"10 REM 123\r\n20 ENABLE OUT1\r\n30 DISABLE IN2"};//Pass
 
 //char editbuf[1024] = {"10 REM TEST\r\n20 IF VAR1 > 1 THEN VAR2 = 2 ELSE VAR3 = 3\r\n30 VAR4 = VAR5 - 2\r\n40 VAR6 = VAR7 + 2"};
 //char editbuf[1024] = {"10 REM TEST\r\n20 IF 1-VAR1 > 1 THEN 1-VAR2 = 2 ELSE 1-VAR3 = 3\r\n30 1-VAR4 = 1-VAR5 - 2\r\n40 1-VAR6 = 1-VAR7 + 2"};
 
-char editbuf[1024] = {"10 REM Test123456789\r\n20 ENABLE OUT8"};
+//char editbuf[1024] = {"10 REM Test123456789\r\n20 ENABLE OUT8"};//Pass
+//extern char editbuf[25000];
+//char editbuf[1024] = {"10 REM TestEnable\r\n20 ENABLE 0-OUT1\r\n30 DISABLE 0-OUT2"};
+
 char mesbuf[1024];
 char mycomment[1024] = {"AAAAAAAAAAAA"};
 int my_lengthcode = 0;
-int mmain ( /*GEdit *ppedit*/)
+int Encode_Program ( /*GEdit *ppedit*/)
 {
-	int n,i,j,k,m;
-	char fname[65],*p;
+	int /*n,*/i,j,k/*,m*/;
+
+//	char fname[65];//,*p;
 	unsigned int Byte;
-	int lx,ly,rx,ry;
+//	int lx,ly,rx,ry;
 	eoi=NL;
 	eol=0;
 //	t=0;
@@ -1782,6 +1800,7 @@ int prescan1 (void)
 //	if(token_type!=NL)
 		get_token();
 	}
+	return 0;
 }
 
 void get_nl()
@@ -2006,7 +2025,7 @@ int get_token(void)
 				else
 				{
 					*temp = '\0' ;
-					for(i=0;i<strlen(token);i++)
+					for(i=0;i<(int)strlen(token);i++)
 						if((token[i]<'0' || token[i]>'9') && (token[i]!='.' && token[i]!='E' && token[i]!='e'))
 							break;
 					if (i==strlen(token))
@@ -2160,7 +2179,7 @@ char logops[7] = { AND , OR , XOR, 0 } ;
 /* Process logical operators */
 void parse_exp0( float *value )
 {
-	float partial_value ;
+//	float partial_value ;
 	register char op ;
 
 	parse_exp1(value) ;
@@ -2177,7 +2196,7 @@ void parse_exp0( float *value )
 /* Process relational operators */
 void parse_exp1( float *value )
 {
-	float partial_value ;
+//	float partial_value ;
 	register char op ;
 
 	parse_exp2(value) ;
@@ -2241,7 +2260,7 @@ void eval_exp(float *value)
 
 int define_var(char *tok, int t,int l,int c, int lstr)
 {
- char *label,test;
+ char *label/*,test*/;
   byte point_type,var_type;
  int i,k,num_net,num_point,num_panel;
  var_type = num_point = point_type = 0;
@@ -2445,9 +2464,9 @@ for ( ; *t ; t++ )
 /* Display an error message pg 26 */
 void sntx_err(int err, int err_true )
 {
-	char *p , *temp ;
+//	char *p , *temp ;
 	int linecount = 0 ;
-	register int i ;
+//	register int i ;
 	static char *e[] = 
 	{
 	 "syntax error" ,
@@ -2507,7 +2526,7 @@ void sntx_err(int err, int err_true )
 /* Process addition or subtraction */
 void parse_exp2( float *value )
 {
-	float partial_value ;
+//	float partial_value ;
 	register char op ;
 
 	parse_exp3(value) ;
@@ -2524,7 +2543,7 @@ void parse_exp2( float *value )
 /* Process multiplication or division  */
 void parse_exp3( float *value )
 {
-	float partial_value ;
+//	float partial_value ;
 	register char op ;
 
 	parse_exp4(value) ;
@@ -2560,7 +2579,7 @@ void parse_exp4( float *value )
 /* Process power */
 void parse_exp4( float *value )
 {
-	float partial_value ;
+//	float partial_value ;
 	register char op ;
 
 	parse_exp5(value) ;
@@ -2599,7 +2618,7 @@ char address_item;
 void parse_atom( float  *value )
 {
 	float res;
-	int i,t ;
+	int i/*,t*/ ;
 	int ftok;
 	char pt[14];
 	switch( token_type) 
@@ -2708,11 +2727,11 @@ void parse_atom( float  *value )
 			 switch (ftok) 
 			 {
 				 case ABS:
-				 case INT:
+				 case _INT:
 				 case LN:
 				 case LN_1:
 				 case SQR:
-				 case Status:
+				 case _Status:
 				 case RUNTIME:
 				 case SENSOR_ON:
 				 case SENSOR_OFF:
@@ -3058,7 +3077,7 @@ void parse_atom( float  *value )
 
 char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent)
 {
-	int i,j,k,l;
+	int /*i,j*/k,l;
 	char pc[11],*p,*q,buf[21],*tok;
 	tok = token;
 	if(netpresent) *netpresent = 0;
@@ -3137,12 +3156,12 @@ char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *
 			}
 			else 
 			{
-				for(l=0;l<strlen(p);l++)//À¨ºÅ Fance ¼Ó
+				for(l=0;l<(int)strlen(p);l++)//À¨ºÅ Fance ¼Ó
 				{
 					if (p[l]<'0' || p[l]>'9')
 						break;
 				}
-				if (l<strlen(p))
+				if (l<(int)strlen(p))
 					return(islabel(token,num_point,var_type,point_type,num_panel));
 				else
 				{
@@ -3222,6 +3241,98 @@ char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *
 Str_out_point My_outputs[10];
 Str_variable_point  My_vars[10];
 
+
+char *islabel(char *token,int *num_point,byte *var_type,byte *point_type, int *num_panel)
+{
+	char *p;
+	int i,j;
+
+	if(!local_panel)
+	{
+		#ifdef Fance_enable
+		p=0;
+		if(Des)
+		{
+			p=Des->islabel(token,num_point,var_type,point_type,num_panel);
+		}
+		if( p )
+			return(p);
+		#endif
+	}
+
+	for(i=OUT;i<=AY;i++)
+		//		for(j=0;j<ptr_panel->info[i].max_points;j++)
+		for(j=0;j<ptr_panel.table_bank[i];j++)
+		{
+			p = 0;
+			if(i!=CON)
+			{
+				switch (i) {
+				case OUT:
+					p = ptr_panel.outputs[j].label;
+					break;
+				case IN:
+					p = ptr_panel.inputs[j].label;
+					break;
+				case VAR:
+					p = ptr_panel.vars[j].label;
+					break;
+				case CON:
+					//									p = ptr_panel->controllers[j].label;
+					break;
+				case WR:
+					p = ptr_panel.weekly_routines[j].label;
+					break;
+				case AR:
+					p = ptr_panel.annual_routines[j].label;
+					break;
+				case PRG:
+					p = ptr_panel.programs[j].label;
+					break;
+				case GRP:
+					p = ptr_panel.control_groups[j].label;
+					break;
+				case AMON:
+					p = ptr_panel.analog_mon[j].label;
+					break;
+				case AY:
+					p = ptr_panel.arrays[j].label;
+					break;
+				default:
+					break;
+				}
+				if(p)
+					if(!strcmp(rtrim(p),rtrim(token)))  // de verificat duplicate
+					{
+						*var_type = LABEL_VAR;
+						itoa(Station_NUM,token,10);
+						//Fance strcat(token,lin);
+						strcat(token,"-");
+						strcat(token,ptr_panel.info[i].name);
+						itoa(j+1,&token[strlen(token)],10);
+						*num_point = j+1;
+						*point_type = i;
+						//						 *num_panel = ptr_panel->GlPanel;
+						*num_panel = Station_NUM;
+						return p;
+					}
+			}
+		}
+		p=0;
+		if(local_panel)
+		{
+			#ifdef Fance_enable
+			if(Des)
+			{
+				p=Des->islabel(token,num_point,var_type,point_type,num_panel);
+			}
+			#endif
+
+		}
+		return(p);
+}
+
+#if 0
 char *islabel(char *token,int *num_point,byte *var_type,byte *point_type, int *num_panel)
 {
 	char *p;
@@ -3311,7 +3422,7 @@ char *islabel(char *token,int *num_point,byte *var_type,byte *point_type, int *n
 		}
 		return(p);
 }
-
+#endif
 int local_request(int panel, int network)
 {
 	if( panel==Station_NUM && localnetwork(network) )
@@ -3491,7 +3602,7 @@ return 0 ; /* unkown command */
 
 int isarray(char *tok)
 {
-	float value;
+//	float value;
 	int i;
 	i=checklocalvar(tok);
 	if( !i ) return 0;
@@ -3595,7 +3706,7 @@ void prescan2(void)
 	float value,fvar1,fvar2,fvar3;
 	int i,command ;
 	char *p;
-	char temp[31],temp1[11];
+	char temp[31];//,temp1[11];
 	char block = 0 ;
 	char var1[12],var2[12],var3[12];
 	int nrlin[10];
@@ -3760,7 +3871,7 @@ void prescan2(void)
 										else
 										{
 										 if (!strcmp(strupr(token),"DATE"))
-													buf_v[i].v=DATE;
+													buf_v[i].v=_DATE;
 										 else if (!strcmp(strupr(token),"PTIME"))
 														buf_v[i].v=PTIME;
 												 else	if (!strcmp(strupr(token),"USER_A"))
@@ -4169,10 +4280,10 @@ void write_cod(int type,int n_var, int v1, char *var1, float fvar1,
 																	 int v2, char *var2, float fvar2,
 																	 int v3, char *var3, float fvar3)
 {
-char *p;
+//char *p;
 int *buf1;
 struct buf_str *buf,*buf2;
-int int_var1,n,i,j;
+int /*int_var1,*/n,i,j;
 long lval;
 switch (type) 
 {
@@ -4283,8 +4394,8 @@ case ASSIGNARRAY_2:
 //				 strcpy(&cod_line[ind_cod_line],buf[i].var);
 //				 ind_cod_line +=  strlen(buf[i].var)+1;
 				 break;
-		 case DATE:
-				 cod_line[ind_cod_line++]=DATE;
+		 case _DATE:
+				 cod_line[ind_cod_line++]=_DATE;
 				 break;
 		 case PTIME:
 				 cod_line[ind_cod_line++]=PTIME;
@@ -4893,7 +5004,7 @@ void put_line_num( int line_value )
 
 int find_var_def(char *var_name)
 {
- int i,j,num_net,num_panel,num_point,k;
+ int i,/*j,*/num_net,num_panel,num_point,k;
  byte point_type,var_type;
  var_type = 0;
  k = 0;
@@ -4991,8 +5102,8 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 							cod_line[Byte++]=LOCAL_POINT_PRG;
 							point.number     = vars_table[cur_index].num_point-1;
 							point.point_type = vars_table[cur_index].point_type+1;
-							memcpy(&cod_line[Byte],&point,sizeof(Point));
-							Byte += sizeof(Point);
+							memcpy(&cod_line[Byte],&point,sizeof(MyPoint));
+							Byte += sizeof(MyPoint);
 						}
 						else
 						{
@@ -5007,8 +5118,8 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 						cod_line[Byte++]=LOCAL_POINT_PRG;
 						point.number     = vars_table[cur_index].num_point-1;
 						point.point_type = vars_table[cur_index].point_type+1;
-						memcpy(&cod_line[Byte],&point,sizeof(Point));
-						Byte += sizeof(Point);
+						memcpy(&cod_line[Byte],&point,sizeof(MyPoint));
+						Byte += sizeof(MyPoint);
 					 }
 					 else
 					 {
@@ -5057,11 +5168,11 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				 case ABS:
 				 case INKEYD:
 				 case OUTPUTD:
-				 case INT:
+				 case _INT:
 				 case LN:
 				 case LN_1:
 				 case SQR:
-				 case Status:
+				 case _Status:
          case RUNTIME:
 				 case CONPROP:
 				 case CONRATE:
@@ -5174,9 +5285,9 @@ char * pcode;
 char *local;
 char *desassembler_program()
 {
-unsigned char cod,xtemp[15];
- int point,type_var,ind,i;
- int id,len,nitem,lvar;
+unsigned char cod;//,xtemp[15];
+ int /*point,*//*type_var,*//*ind,*/i;
+ int len,nitem;//lvar;
  long lval;
 
  code = mycode;
@@ -5218,7 +5329,7 @@ unsigned char cod,xtemp[15];
 		 if (*code!=0x01)
 		 {
 			printf("ERROR!!!!Desassambler!!!!!!!!!!!!!\n");
-//			exit(1);
+			return NULL;
 		 }
 		memcpy(&lline,++code,2);
 //		adjustint(&lline, ptrprg->type);
@@ -5320,7 +5431,7 @@ unsigned char cod,xtemp[15];
 									for(int j=0;j<nitem;j++)
 									 {
 										switch (*code++) {
-											case DATE:
+											case _DATE:
 																strcpy(buf,"DATE;");
 																buf += 5;
 																break;
@@ -5684,7 +5795,7 @@ void ftoa(float f, int length, int ndec, char *buf)
 
 int desvar(void)
 {
- char *b,q[17], *p, *r;
+ char *b,q[17], *p/*, *r*/;
  Point_T3000 point;
  byte point_type,var_type;
  int num_point,num_panel,num_net,k;
@@ -5697,7 +5808,7 @@ int desvar(void)
  {
 	long n;
   n = *((int *)(code+1));
-  int t=0,j,k,l,c,m,lc,cc;
+  int t=0,j,k,l,c,m;//lc,cc;
 
   l = c = 0;
   for(j=0;j<ind_local_table; )
@@ -5760,10 +5871,10 @@ int desvar(void)
 	 if (((unsigned char)*code) == 0x9c/*(byte)*//*LOCAL_POINT_PRG*/)
 	{
 //#ifdef Fance_recode
-//				*((Point *)&point) = *((Point *)++code);
+//				*((MyPoint *)&point) = *((MyPoint *)++code);
 //				point.panel = panel-1;
 //				pointtotext(q, &point);
-//				code += sizeof(Point);
+//				code += sizeof(MyPoint);
 //				k=0;
 //				strcpy(buf,ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, network, panel, &k));
 //				if( (point.point_type-1) == AY )
@@ -5777,10 +5888,10 @@ int desvar(void)
 //				}
 //#endif
 
-				*((Point *)&point) = *((Point *)++code);
+				*((MyPoint *)&point) = *((MyPoint *)++code);
 				point.panel = 0;
 				pointtotext(q, &point);
-				code += sizeof(Point);
+				code += sizeof(MyPoint);
 				k=0;
 				//strcpy(buf,ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, network, panel, &k));
 				strcpy(buf,ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, my_network, my_panel, &k));
@@ -5863,9 +5974,12 @@ int pointtotext(char *buf,Point_T3000 *point)
 		buf[0]=0;
 		return 1;
 	}
+	strcpy(buf,"");
+#ifdef Fance_Enable
 	strcpy(buf,itoa(panel+1,x,10));
 	if(panel+1<10 || num+1 < 100)
 		strcat(buf,"-");
+#endif
 		//strcat(buf,lin);
 
 
@@ -5948,7 +6062,7 @@ int	desexpr(void)
 {
  char *op1,*op2,*op;
  char oper[10],last_oper,par,opar;
- int point,i;
+ int /*point,*/i;
  char n;
  char stack_par[30];
  char ind_par;
@@ -6055,12 +6169,12 @@ int	desexpr(void)
 				 case ABS:
 				 case SENSOR_ON:
 				 case SENSOR_OFF:
-				 case INT:
+				 case _INT:
 				 case INTERVAL:
 				 case LN:
 				 case LN_1:
 				 case SQR:
-				 case Status:
+				 case _Status:
 				 case RUNTIME:
 							 par=0;
 								strcpy(op1,look_func(*(code-1)));
@@ -6290,6 +6404,7 @@ int	desexpr(void)
  delete op;
 // clear_semaphore_dos();fance
 // return pop();
+ return 0;
 }
 
 char *ltrim(char *text)
@@ -6302,6 +6417,31 @@ char *ltrim(char *text)
 	strcpy(text,text+i);
 	return text;
 }
+
+void Init_table_bank()
+{
+//	strcpy(ptr_panel.outputs[1].label,"OOO");
+
+
+	ptr_panel.table_bank[OUT] = 20; // set to 0 at the end
+	ptr_panel.table_bank[IN] = 20; //     - || -
+
+
+	ptr_panel.table_bank[VAR]       = MAX_VARS;
+	ptr_panel.table_bank[CON]       = MAX_CONS;
+	ptr_panel.table_bank[WR]        = MAX_WR;
+	ptr_panel.table_bank[AR]        = MAX_AR;
+	ptr_panel.table_bank[PRG]       = MAX_PRGS;
+	ptr_panel.table_bank[TBL]       = MAX_TABS;
+	ptr_panel.table_bank[DMON]      = MAX_DIGM;
+	ptr_panel.table_bank[AMON]      = MAX_ANALM;
+	ptr_panel.table_bank[GRP]       = MAX_GRPS;
+	ptr_panel.table_bank[AY]        = MAX_ARRAYS;
+	ptr_panel.table_bank[ALARMM]    = MAX_ALARMS;
+	ptr_panel.table_bank[UNIT]      = MAX_UNITS;
+	ptr_panel.table_bank[USER_NAME] = MAX_PASSW;
+}
+
 
 void init_info_table( void )
 {
