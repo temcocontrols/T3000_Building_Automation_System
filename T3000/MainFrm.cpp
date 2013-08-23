@@ -4000,7 +4000,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
    
 	//20120420
-	CDialog_Progess* pDlg = new CDialog_Progess(this,1,7);
+	CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
 	//创建对话框窗口
 	pDlg->Create(IDD_DIALOG10_Progress, this);
 
@@ -4188,7 +4188,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					memset(SerialNum,0,sizeof(SerialNum));
 					int nRet=0;//
 
-					nRet=Read_Multi(g_tstat_id,&SerialNum[0],0,4,3);
+					nRet=Read_Multi(g_tstat_id,&SerialNum[0],0,4,6);
 					UINT nSerialNumber=0;
 					if(nRet>0)
 					{
@@ -4242,59 +4242,117 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			multi_register_value_tcp
 			适用于网络口，大数据量
 			*/ 
-			if (m_isCM5&&(product_Node.BuildingInfo.strProtocol.CompareNoCase(_T("Modbus TCP"))==0))
+			if(product_Node.BuildingInfo.strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
 			{
-				register_critical_section.Lock();
-				int i;
-				int it = 0;
-				float progress;
-				for(i=0;i<80;i++)
-				{
-					//register_critical_section.Lock();
-					//int nStart = GetTickCount();
-					int itemp = 0;
-					itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100,3);
-					if(itemp == -2)
+			    if (m_isCM5)
+			    {
+					register_critical_section.Lock();
+					int i;
+					int it = 0;
+					float progress;
+					for(i=0;i<80;i++)
 					{
-						continue;
-					}
-					else						
-					{
-						if (pDlg!=NULL)
+						//register_critical_section.Lock();
+						//int nStart = GetTickCount();
+						int itemp = 0;
+						itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100,3);
+						if(itemp == -2)
 						{
-							progress=float(it+1);
-							pDlg->ShowProgress(int(progress/10),(int)progress);
-						} 
-					}							
-					it++;
-					Sleep(100);
-				}
-				//Add by Fance use this product_register_value to unite the register.
-				//Fance_2
-				//memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value_tcp,1024);
+							continue;
+						}
+						else						
+						{
+							if (pDlg!=NULL)
+							{
+								progress=float((it+1)*(100/80));
+								pDlg->ShowProgress(int(progress/10),(int)progress);
+							} 
+						}							
+						it++;
+						Sleep(100);
+					}
+					//Add by Fance use this product_register_value to unite the register.
+					//Fance_2
+					//memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value_tcp,1024);
 
-				if (it<80)
-				{	
-					AfxMessageBox(_T("Reading abnormal \n Try again!"));
-					pDlg->ShowWindow(SW_HIDE);
-					if(pDlg!=NULL)
-					delete pDlg;
-					pDlg=NULL;
+					if (it<80)
+					{	
+						AfxMessageBox(_T("Reading abnormal \n Try again!"));
+						pDlg->ShowWindow(SW_HIDE);
+						if(pDlg!=NULL)
+							delete pDlg;
+						pDlg=NULL;
 
-				}
-				else
+					}
+					else
+					{
+						pDlg->ShowProgress(100,100);
+						pDlg->ShowWindow(SW_HIDE);
+						if(pDlg!=NULL)
+							delete pDlg;
+						pDlg=NULL;
+					}
+					g_tstat_id_changed=FALSE;
+					register_critical_section.Unlock();
+			    }
+				else  //For Zigbee
 				{
-					pDlg->ShowProgress(100,100);
-					pDlg->ShowWindow(SW_HIDE);
-					if(pDlg!=NULL)
-					delete pDlg;
-					pDlg=NULL;
+		 
+					register_critical_section.Lock();
+					int i;
+					int it = 0;
+					float progress;
+					for(i=0;i<20;i++)	//暂定为0 ，因为TSTAT6 目前为600多
+					{
+						//register_critical_section.Lock();
+						//int nStart = GetTickCount();
+						int itemp = 0;
+						itemp = Read_Multi(g_tstat_id,&multi_register_value[i*30],i*30,30,5);
+						if(itemp == -2)
+						{
+							continue;
+						}
+						else						
+						{
+							if (pDlg!=NULL)
+							{
+								progress=float((it+1)*(100/20));
+								pDlg->ShowProgress(int(progress),int(progress));
+							} 						
+						it++;
+						Sleep(1500);
+						}							
+
+					}
+				
+					memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
+
+					if (it<20)
+					{	
+						AfxMessageBox(_T("Reading abnormal \n Try again!"));
+						pDlg->ShowWindow(SW_HIDE);
+						if(pDlg!=NULL)
+							delete pDlg;
+						pDlg=NULL;
+
+					}
+					else
+					{
+						pDlg->ShowProgress(100,100);
+						pDlg->ShowWindow(SW_HIDE);
+						if(pDlg!=NULL)
+							delete pDlg;
+						pDlg=NULL;
+					}
+					g_tstat_id_changed=FALSE;
+					register_critical_section.Unlock();
+
 				}
-				g_tstat_id_changed=FALSE;
-				register_critical_section.Unlock();
-			} 
+
+			} //COMPort
 			else
 			{
+
 				register_critical_section.Lock();
 				int i;
 				int it = 0;
@@ -4313,7 +4371,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 						if (pDlg!=NULL)
 						{
-							progress=float((it+1)*(100/16));
+							progress=float((it+1));
 							pDlg->ShowProgress(int(progress/10),int(progress));
 						} 
 					}							
