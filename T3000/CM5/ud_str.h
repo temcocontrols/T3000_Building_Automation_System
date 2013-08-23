@@ -7,7 +7,7 @@
 #define MAX_OUTS	5
 #define MAX_INS     5
 
-#define PRIVATE_HEAD_LENGTH 6
+#define PRIVATE_HEAD_LENGTH 7
 
 typedef enum
 {
@@ -135,6 +135,9 @@ typedef enum {
 #define  STR_OUT_DESCRIPTION_LENGTH  21
 #define  STR_OUT_LABEL  9
 
+#define STR_VARIABLE_DESCRIPTION_LENGTH  21
+#define	 STR_VARIABLE_LABEL  9
+
 #define STR_PROGRAM_DESCRIPTION_LENGTH 21
 #define  STR_PROGRAM_LABEL_LENGTH 9
 
@@ -227,7 +230,7 @@ typedef struct
 	 uint8_t		command;
 	 uint8_t		point_start_instance;
 	 uint8_t		point_end_instance;
-	 uint8_t		entitysize;
+	 uint16_t		entitysize;
 
 }Str_user_data_header;
 

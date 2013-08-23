@@ -564,13 +564,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//InitTreeNodeConn();   //LSC
 
 	SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
-
+#ifndef Fance_Enable
 	m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
 	m_pRefreshThread->SetMainWnd(this);	
 
 	// 需要执行线程中的操作时
 	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
 	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
+#endif
 	//tstat6
 	Tstat6_func();//为TSTST6新寄存器用的。
 

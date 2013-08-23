@@ -16,14 +16,18 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
+	HICON	hIcon;
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedButtonOutputRead();
 	afx_msg LRESULT Fresh_Output_List(WPARAM wParam,LPARAM lParam);
+	afx_msg LRESULT OutputResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT Fresh_Output_Item(WPARAM wParam,LPARAM lParam);
 	ListCtrlEx::CListCtrlEx m_output_list;
 	void Initial_List();
+
+	afx_msg void OnBnClickedButtonOutputApply();
 };
 
 const int OUTPUT_NUM = 0;

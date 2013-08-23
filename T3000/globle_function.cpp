@@ -15,6 +15,11 @@
 
 #include "modbus_read_write.cpp"
 
+#pragma region For_Bacnet_program_Use
+
+extern char mycode[1024];
+extern int my_lengthcode;// the length of the edit of code
+#pragma endregion
 /**
 
 A wrapper for modbus_read_one_value which returns BOTH read value and error flag
@@ -894,27 +899,43 @@ int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8
 	unsigned max_apdu = 0;
 
 	Str_user_data_header private_data_chunk;
-	private_data_chunk.total_length = 6+ (end_instance - start_instance + 1)*entitysize;
+	private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + (end_instance - start_instance + 1)*entitysize;
 	private_data_chunk.command = command;
 	private_data_chunk.point_start_instance = start_instance;
 	private_data_chunk.point_end_instance = end_instance;
 	private_data_chunk.entitysize=entitysize;
 
 	char SendBuffer[500];
-	memcpy_s(SendBuffer,6,&private_data_chunk,6);
+	memcpy_s(SendBuffer,PRIVATE_HEAD_LENGTH ,&private_data_chunk,PRIVATE_HEAD_LENGTH );
 
 	switch(command)
 	{
 	case WRITEINPUT_T3000:
 		for (int i=0;i<(int)m_Input_data.size();i++)
 		{
-			memcpy_s(SendBuffer + i*sizeof(Str_in_point) +6,sizeof(Str_in_point),&m_Input_data.at(i),sizeof(Str_in_point));
+			memcpy_s(SendBuffer + i*sizeof(Str_in_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_in_point),&m_Input_data.at(i),sizeof(Str_in_point));
 		}
 		break;
 	case WRITEPROGRAM_T3000:
 		for (int i=0;i<(int)m_Program_data.size();i++)
 		{
-			memcpy_s(SendBuffer + i*sizeof(Str_program_point) +6,sizeof(Str_program_point),&m_Program_data.at(i),sizeof(Str_program_point));
+			memcpy_s(SendBuffer + i*sizeof(Str_program_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_program_point),&m_Program_data.at(i),sizeof(Str_program_point));
+		}
+
+		break;
+	case WRITEPROGRAMCODE_T3000:
+		memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,entitysize,mycode,my_lengthcode);
+		break;
+	case WRITEVARIABLE_T3000:
+		for (int i=0;i<(int)m_Variable_data.size();i++)
+		{
+			memcpy_s(SendBuffer + i*sizeof(Str_variable_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_variable_point),&m_Variable_data.at(i),sizeof(Str_variable_point));
+		}
+		break;
+	default:
+		{
+			AfxMessageBox(_T("Command not match!Please Check it!"));
+			return -1;
 		}
 		break;
 	}
@@ -940,6 +961,17 @@ int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8
 
 
 
+/************************************************************************/
+/*
+Author: Fance
+Get Bacnet Private Data
+<param name="deviceid">Bacnet Device ID
+<param name="command">Bacnet command
+<param name="start_instance">start point
+<param name="end_instance">end point
+<param name="entitysize">Block size of read
+*/
+/************************************************************************/
 int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize)
 {
 	// TODO: Add your control notification handler code here
@@ -961,13 +993,13 @@ int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t
 
 
 	Str_user_data_header private_data_chunk;
-	private_data_chunk.total_length=6;
+	private_data_chunk.total_length=PRIVATE_HEAD_LENGTH;
 	private_data_chunk.command = command;
 	private_data_chunk.point_start_instance=start_instance;
 	private_data_chunk.point_end_instance=end_instance;
 	private_data_chunk.entitysize=entitysize;
 	// char private_data_chunk[33] = { "3031323334353637383940" };
-	Set_transfer_length(6);
+	Set_transfer_length(PRIVATE_HEAD_LENGTH);
 	//transfer_len=6;
 
 	status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&private_data_chunk, &data_value);
@@ -984,7 +1016,7 @@ int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t
 		//return g_invoke_id;
 	}
 	else
-		return -1;
+		return -2;
 
 }
 
@@ -1063,6 +1095,42 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 	switch(command_type)
 	{
 	case READOUTPUT_T3000:
+		{
+			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_out_point))!=0)
+				return -1;	//得到的结构长度错误;
+
+			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_out_point);
+			//m_Input_data_length = block_length;
+			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+			m_Output_data.clear();
+			for (i=0;i<block_length;i++)
+			{
+				Str_out_point temp_out;
+				memcpy_s( temp_out.description,STR_OUT_DESCRIPTION_LENGTH,my_temp_point,STR_OUT_DESCRIPTION_LENGTH);
+				my_temp_point=my_temp_point + STR_OUT_DESCRIPTION_LENGTH;
+				memcpy_s(temp_out.label,STR_OUT_LABEL ,my_temp_point,STR_OUT_LABEL );
+				my_temp_point=my_temp_point + STR_OUT_LABEL ;
+
+				temp_struct_value = my_temp_point[3]<<24 | my_temp_point[2]<<16 | my_temp_point[1]<<8 | my_temp_point[0];
+				temp_out.value = temp_struct_value;
+				//memcpy_s(Private_data[i].value,4,temp_struct_value,4);
+				my_temp_point=my_temp_point+4;
+
+				temp_out.auto_manual = *(my_temp_point++);
+				temp_out.digital_analog = *(my_temp_point++);
+				temp_out.access_level = *(my_temp_point++);
+				temp_out.control = *(my_temp_point++);
+				temp_out.digital_control = *(my_temp_point++);
+				temp_out.decom	= *(my_temp_point++);
+				temp_out.range = *(my_temp_point++);
+				temp_out.m_del_low = *(my_temp_point++);
+				temp_out.s_del_high = *(my_temp_point++);
+				temp_out.delay_timer = *(my_temp_point++);
+
+				m_Output_data.push_back(temp_out);
+			}
+			return READOUTPUT_T3000;
+		}
 		break;
 
 	case READINPUT_T3000:
@@ -1105,12 +1173,46 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 		}
 		break;
 	case READVARIABLE_T3000   :
+		{
+			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_variable_point))!=0)
+				return -1;	//得到的结构长度错误;
+
+			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_variable_point);
+			//m_Input_data_length = block_length;
+			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+			m_Variable_data.clear();
+			for (i=0;i<block_length;i++)
+			{
+				Str_variable_point temp_variable;
+				memcpy_s( temp_variable.description,STR_VARIABLE_DESCRIPTION_LENGTH,my_temp_point,STR_VARIABLE_DESCRIPTION_LENGTH);
+				my_temp_point=my_temp_point + STR_VARIABLE_DESCRIPTION_LENGTH;
+				memcpy_s(temp_variable.label,STR_VARIABLE_LABEL ,my_temp_point,STR_VARIABLE_LABEL );
+				my_temp_point=my_temp_point + STR_VARIABLE_LABEL ;
+
+				temp_struct_value = my_temp_point[3]<<24 | my_temp_point[2]<<16 | my_temp_point[1]<<8 | my_temp_point[0];
+				temp_variable.value = temp_struct_value;
+				//memcpy_s(Private_data[i].value,4,temp_struct_value,4);
+				my_temp_point=my_temp_point+4;
+				
+				
+				temp_variable.auto_manual = *(my_temp_point++);
+				temp_variable.digital_analog = *(my_temp_point++);
+				temp_variable.control = *(my_temp_point++);
+				temp_variable.unused = *(my_temp_point++);
+				temp_variable.range = *(my_temp_point++);
+
+				m_Variable_data.push_back(temp_variable);
+			}
+			return READVARIABLE_T3000;
+		}
+		break;
 	case READCONTROLLER_T3000  :
 	case READWEEKLYROUTINE_T3000  :
 	case READANNUALROUTINE_T3000  :
 		break;
 	case READPROGRAM_T3000:
 		{
+
 			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_program_point))!=0)
 				return -1;	//得到的结构长度错误;
 			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_program_point);
@@ -1136,6 +1238,15 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 				m_Program_data.push_back(temp_in);
 			}
 			return READPROGRAM_T3000;
+		}
+		break;
+	case READPROGRAMCODE_T3000://Fance 将program code 存至Buf 等待发送消息后使用解码函数
+		{
+		block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
+		my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+		memset(mycode,0,1024);
+		memcpy_s(mycode,block_length,my_temp_point,block_length);
+		return READPROGRAMCODE_T3000;
 		}
 		break;
 	}
@@ -1184,12 +1295,16 @@ void local_handler_conf_private_trans_ack(
 	case READPROGRAM_T3000:
 		::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 		break;
+	case READPROGRAMCODE_T3000:
+		::PostMessage(m_program_edit_hwnd,WM_REFRESH_BAC_PROGRAM_RICHEDIT,NULL,NULL);
+		break;
+	case READVARIABLE_T3000:
+		::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+		break;
+	case READOUTPUT_T3000:
+		::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+		break;
 	}
- //   if(CM5ProcessPTA(&data)==1)  /* See what to do with the response */
-	//{
-	//	::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST/*WM_REFRESH_LIST*/,NULL,NULL);
-	//}
-	//	//Sleep(1);
 
     return;
 }
