@@ -10,8 +10,10 @@
 #include "CM5/ud_str.h"
 #include "Bacnet_Include.h"
 #include "globle_function.h"
+#include "BacnetProgramEdit.h"
 
 
+int program_list_line = 0;
 // CBacnetProgram dialog
 
 IMPLEMENT_DYNAMIC(CBacnetProgram, CDialogEx)
@@ -38,6 +40,11 @@ BEGIN_MESSAGE_MAP(CBacnetProgram, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_READ, &CBacnetProgram::OnBnClickedButtonProgramRead)
 	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_APPLY, &CBacnetProgram::OnBnClickedButtonProgramApply)
 	ON_MESSAGE(MY_RESUME_DATA, ProgramResumeMessageCallBack)
+	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_EDIT, &CBacnetProgram::OnBnClickedButtonProgramEdit)
+//	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_PROGRAM, &CBacnetProgram::OnLvnItemchangedListProgram)
+//ON_NOTIFY(HDN_ITEMCLICK, 0, &CBacnetProgram::OnHdnItemclickListProgram)
+//ON_NOTIFY(LVN_ITEMACTIVATE, IDC_LIST_PROGRAM, &CBacnetProgram::OnLvnItemActivateListProgram)
+ON_NOTIFY(NM_CLICK, IDC_LIST_PROGRAM, &CBacnetProgram::OnNMClickListProgram)
 END_MESSAGE_MAP()
 
 
@@ -49,8 +56,15 @@ BOOL CBacnetProgram::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	Initial_List();
 	g_invoke_id = GetPrivateData(1234,READPROGRAM_T3000,0,5,sizeof(Str_program_point));
-	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+	if(g_invoke_id>=0)
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 	// TODO:  Add extra initialization here
+
+	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_REFRESH);
+	((CButton *)GetDlgItem(IDC_BUTTON_PROGRAM_READ))->SetIcon(hIcon);	
+	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_OK);
+	((CButton *)GetDlgItem(IDC_BUTTON_PROGRAM_APPLY))->SetIcon(hIcon);
+
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -59,9 +73,9 @@ BOOL CBacnetProgram::OnInitDialog()
 void CBacnetProgram::Initial_List()
 {
 	m_program_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
-	m_program_list.SetExtendedStyle(m_program_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
-
-	m_program_list.InsertColumn(0, _T("Num"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+	//m_program_list.SetExtendedStyle(m_program_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
+	m_program_list.SetExtendedStyle(m_program_list.GetExtendedStyle() |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
+	m_program_list.InsertColumn(0, _T("Num"), 80, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_program_list.InsertColumn(1, _T("Full Lable"), 150, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_program_list.InsertColumn(2, _T("Status"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_program_list.InsertColumn(3, _T("Auto/Manual"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -77,7 +91,8 @@ void CBacnetProgram::OnBnClickedButtonProgramRead()
 {
 	// TODO: Add your control notification handler code here
 	g_invoke_id = GetPrivateData(1234,READPROGRAM_T3000,0,5,sizeof(Str_program_point));
-	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+	if(g_invoke_id>=0)
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 }
 
 LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
@@ -93,6 +108,8 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		CString temp_units;
 		temp_item.Format(_T("%d"),i+1);
 		m_program_list.InsertItem(i,temp_item);
+		m_program_list.SetCellEnabled(i,0,0);
+		m_program_list.SetCellChecked(0,0,1);// default will set the first one checked
 		if(ListCtrlEx::ComboBox == m_program_list.GetColumnType(PROGRAM_AUTO_MANUAL))
 		{
 			ListCtrlEx::CStrList strlist;
@@ -126,7 +143,7 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 			m_program_list.SetItemText(i,PROGRAM_STATUS,ProgramStatus[1]);
 
 		temp_value.Format(_T("%d"),m_Program_data.at(i).bytes);
-		m_program_list.SetItemText(i,PROGRAM_SIZE,temp_value);
+		m_program_list.SetItemText(i,PROGRAM_SIZE_LIST,temp_value);
 
 		if(m_Program_data.at(i).com_prg==0)
 			m_program_list.SetItemText(i,PROGRAM_RUN_STATUS,_T("Normal"));
@@ -189,7 +206,8 @@ void CBacnetProgram::OnBnClickedButtonProgramApply()
 	}
 
 		g_invoke_id =WritePrivateData(1234,WRITEPROGRAM_T3000,0,(int)m_Program_data.size()-1,sizeof(Str_program_point));
-	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+		if(g_invoke_id>=0)
+			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 }
 
 LRESULT  CBacnetProgram::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
@@ -210,4 +228,86 @@ LRESULT  CBacnetProgram::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lPar
 	if(pInvoke)
 		delete pInvoke;
 	return 0;
+}
+
+
+void CBacnetProgram::OnBnClickedButtonProgramEdit()
+{
+	// TODO: Add your control notification handler code here
+	for (int i=0;i<m_program_list.GetItemCount();++i)
+	{
+		if(m_program_list.GetCellChecked(i,0))
+		{
+			program_list_line = i;
+			break;
+		}
+	}
+
+	this->ShowWindow(0);
+	CBacnetProgramEdit dlg;
+	dlg.DoModal();
+	this->ShowWindow(1);
+}
+
+
+//void CBacnetProgram::OnLvnItemchangedListProgram(NMHDR *pNMHDR, LRESULT *pResult)
+//{
+//	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+//	m_program_list.SetCellChecked(pNMLV->iItem,0,1);
+//
+//	for (int i=0;i<m_program_list.GetItemCount();++i)
+//	{
+//		if(i == pNMLV->iItem)
+//			continue;
+//		m_program_list.SetCellChecked(i,0,FALSE);
+//	}
+//
+//	//if(m_program_list.GetCellChecked(pNMLV->iItem,0))  
+//	//	UnCheckOtherItem(m_program_list, pNMLV->iItem);
+//
+//	
+//	// TODO: Add your control notification handler code here
+//	*pResult = 0;
+//}
+
+//void CBacnetProgram::UnCheckOtherItem(ListCtrlEx::CListCtrlEx& listCtrl, int index)
+//{
+//	for (int i=0;i<listCtrl.GetItemCount();++i)
+//	{
+//		if(i == index)
+//			continue;
+//		listCtrl.SetCellChecked(i,0,FALSE);
+//	}
+//}
+
+
+
+
+void CBacnetProgram::OnNMClickListProgram(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+	m_program_list.ScreenToClient(&point);
+	LVHITTESTINFO lvinfo;
+	lvinfo.pt=point;
+	lvinfo.flags=LVHT_ABOVE;
+	int nItem=m_program_list.SubItemHitTest(&lvinfo);
+	if(nItem!=-1)
+	{
+		m_program_list.SetCellChecked(nItem,0,1);
+		for (int i=0;i<m_program_list.GetItemCount();++i)
+		{
+			if(i == nItem)
+				continue;
+			m_program_list.SetCellChecked(i,0,FALSE);
+		}
+	}
+
+
+	// TODO: Add your control notification handler code here
+
+
+	*pResult = 0;
 }

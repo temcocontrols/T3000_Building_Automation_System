@@ -20,6 +20,7 @@
 #define IDS_STRNOPRIVILEGE2             113
 #define IDS_STRNOPRIVILEGE3             114
 #define IDS_STRNOPRIVILEGE_BUILDING     115
+#define IDS_INIT_RICHEDIT_ERROR         116
 #define IDR_POPUP_EDIT                  119
 #define ID_STATUSBAR_PANE1              120
 #define ID_STATUSBAR_PANE2              121
@@ -172,6 +173,9 @@
 #define IDD_T328IN                      460
 #define IDD_DIALOG12                    461
 #define IDD_T3RTD                       461
+#define IDD_DIALOG_BACNET_PROGRAM_EDIT  462
+#define IDR_MENU_PROGRAM_EDIT           463
+#define IDI_ICON_OK                     464
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -1113,13 +1117,18 @@
 #define IDC_BUTTON_CM5_ADVANCE          1627
 #define IDC_STATIC_RUNNING5             1627
 #define IDC_CHECK_ADDRESS_IN_CELL       1627
+#define IDC_BUTTON_PROGRAM_EDIT         1627
 #define IDC_STATIC_CONFIG1              1628
 #define IDC_STATIC_SCAN_RATE2           1628
+#define IDC_RICHEDIT2_PROGRAM           1628
 #define IDC_BUTTON_VARIABLE_READ        1629
 #define IDC_STATIC_CONFIG2              1629
+#define IDC_BUTTON_PROGRAM_SEND         1629
 #define IDC_STATIC_CONFIG3              1630
+#define IDC_RADIO_HUMIDITY_HEAT_ENABLE  1630
 #define IDC_BUTTON_CM5_PROGRAMING       1631
 #define IDC_STATIC_CONFIG4              1631
+#define IDC_RADIO_HUMIDITY_HEAT_DISABLE 1631
 #define IDC_LIST_PROGRAM                1632
 #define IDC_STATIC_CONFIG5              1632
 #define IDC_BUTTON_PROGRAM_READ         1633
@@ -1242,6 +1251,10 @@
 #define ID_DATABASE_IONAMECONFIG        32866
 #define ID_TOOL_ISPTOOLFORONE           32867
 #define ID_TOOL_REGISTERMONITER         32868
+#define ID_SEND                         32869
+#define ID_CLEAR                        32870
+#define ID_LOADFILE                     32871
+#define ID_SAVEFILE                     32872
 #define ID_FILE_OPEN32883               32883
 #define ID_FILE_SAVE32884               32884
 #define ID_FILE_EXIT                    32888
@@ -1253,9 +1266,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        462
-#define _APS_NEXT_COMMAND_VALUE         32869
-#define _APS_NEXT_CONTROL_VALUE         1627
+#define _APS_NEXT_RESOURCE_VALUE        465
+#define _APS_NEXT_COMMAND_VALUE         32873
+#define _APS_NEXT_CONTROL_VALUE         1632
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

@@ -123,6 +123,8 @@ public:
 	afx_msg void OnEnKillfocusCo2AlarmOnTime();
 	afx_msg void OnEnKillfocusCo2AlarmOffTime();
 	afx_msg void OnBnClickedBtnCo2ClearCal();
+	afx_msg void OnBnClickedRadioHumidityHeatEnable();
+	afx_msg void OnBnClickedRadioHumidityHeatDisable();
 };
 
 typedef enum

@@ -1,5 +1,5 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
-//
+// DialogCM5 Bacnet programming by Fance 2013 05 01
 
 #include "stdafx.h"
 #include "T3000.h"
@@ -8,6 +8,7 @@
 #include "BacnetInput.h"
 #include "BacnetOutput.h"
 #include "BacnetProgram.h"
+#include "BacnetVariable.h"
 #include "globle_function.h"
 
 #include "datalink.h"
@@ -48,6 +49,7 @@ BEGIN_MESSAGE_MAP(CDialogCM5_BacNet, CFormView)
 //	ON_BN_CLICKED(IDC_BUTTON1, &CDialogCM5_BacNet::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON_CM5_PROGRAMING, &CDialogCM5_BacNet::OnBnClickedButtonCm5Programing)
 	ON_BN_CLICKED(IDC_BUTTON_CM5_OUTPUT, &CDialogCM5_BacNet::OnBnClickedButtonCm5Output)
+	ON_BN_CLICKED(IDC_BUTTON_CM5_VARIABLE, &CDialogCM5_BacNet::OnBnClickedButtonCm5Variable)
 END_MESSAGE_MAP()
 
 
@@ -81,7 +83,9 @@ void CDialogCM5_BacNet::OnBnClickedButtonTest()
 void CDialogCM5_BacNet::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
-	//Fresh();
+	#ifdef Fance_Enable
+	Fresh();//Fance
+	#endif
 	// TODO: Add your specialized code here and/or call the base class
 }
 
@@ -111,7 +115,7 @@ void CDialogCM5_BacNet::Fresh()
 		dlmstp_set_max_info_frames(DEFAULT_MAX_INFO_FRAMES);
 		dlmstp_set_max_master(DEFAULT_MAX_MASTER);
 		memset(my_port,0,50);
-		sprintf(my_port,"COM1");
+		sprintf(my_port,"COM5");
 		dlmstp_init(my_port);
 
 
@@ -646,4 +650,12 @@ void CDialogCM5_BacNet::OnBnClickedButtonCm5Output()
 	// TODO: Add your control notification handler code here
 	CBacnetOutput DLG;
 	DLG.DoModal();
+}
+
+
+void CDialogCM5_BacNet::OnBnClickedButtonCm5Variable()
+{
+	// TODO: Add your control notification handler code here
+	CBacnetVariable dlg;
+	dlg.DoModal();
 }
