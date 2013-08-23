@@ -1,5 +1,5 @@
 ﻿// BacnetInput.cpp : implementation file
-//
+// BacnetInput File Add by Fance 2013 0620
 
 #include "stdafx.h"
 #include "T3000.h"
@@ -35,7 +35,7 @@ void CBacnetInput::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CBacnetInput, CDialogEx)
 	ON_MESSAGE(WM_REFRESH_BAC_INPUT_LIST,Fresh_Input_List)
-	ON_MESSAGE(WM_REDROW_BAC_IN_LIST,Fresh_Input_Item)	
+	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Input_Item)	
 	ON_BN_CLICKED(IDOK, &CBacnetInput::OnBnClickedOk)
 //	ON_BN_CLICKED(IDC_BUTTON_CHECK_INVOKE_ID, &CBacnetInput::OnBnClickedButtonCheckInvokeId)
 	ON_MESSAGE(MY_RESUME_DATA, InputResumeMessageCallBack)
@@ -126,7 +126,14 @@ BOOL CBacnetInput::OnInitDialog()
 	// TODO:  Add extra initialization here
 	Initial_List();
 	g_invoke_id = GetPrivateData(1234,READINPUT_T3000,0,4,sizeof(Str_in_point));
-	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+	if(g_invoke_id>=0)
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+
+	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_REFRESH);
+	((CButton *)GetDlgItem(IDC_BUTTON_INPUT_READ))->SetIcon(hIcon);	
+	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_OK);
+	((CButton *)GetDlgItem(IDC_BUTTON_INPUT_APPLY))->SetIcon(hIcon);
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -134,8 +141,8 @@ BOOL CBacnetInput::OnInitDialog()
 void CBacnetInput::Initial_List()
 {
 	m_input_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
-	m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
-
+	//m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
+	m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_input_list.InsertColumn(INPUT_NUM, _T("NUM"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_input_list.InsertColumn(INPUT_FULL_LABLE, _T("Full Lable"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -161,8 +168,19 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	int Changed_SubItem = (int)lParam;
 
 
-
-	if(Changed_SubItem==INPUT_RANGE)
+	if(Changed_SubItem == INPUT_AUTO_MANUAL)
+	{
+		CString temp_cs = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
+		if(temp_cs.CompareNoCase(_T("Auto"))==0)
+		{
+			m_input_list.SetCellEnabled(Changed_Item,INPUT_VALUE,0);
+		}
+		else
+		{
+			m_input_list.SetCellEnabled(Changed_Item,INPUT_VALUE,1);
+		}
+	}
+	else if(Changed_SubItem==INPUT_RANGE)
 	{
 		CString temp_cs = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
 		if(temp_cs.CompareNoCase(_T("Not Used"))==0)
@@ -285,9 +303,15 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		temp_des.ReleaseBuffer();
 		m_input_list.SetItemText(i,INPUT_FULL_LABLE,temp_des);
 		if(m_Input_data.at(i).auto_manual==0)
+		{
 			m_input_list.SetItemText(i,INPUT_AUTO_MANUAL,_T("Auto"));
+			m_input_list.SetCellEnabled(i,INPUT_VALUE,0);
+		}
 		else
+		{
 			m_input_list.SetItemText(i,INPUT_AUTO_MANUAL,_T("Manual"));
+			m_input_list.SetCellEnabled(i,INPUT_VALUE,1);
+		}
 
 		switch(m_Input_data.at(i).range)
 		{
@@ -466,7 +490,8 @@ void CBacnetInput::OnBnClickedButtonApply()
 	}
 
 	g_invoke_id =WritePrivateData(1234,WRITEINPUT_T3000,0,(int)m_Input_data.size()-1,sizeof(Str_in_point));
-	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+	if(g_invoke_id>=0)
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 }
 
 
@@ -474,7 +499,8 @@ void CBacnetInput::OnBnClickedButtonRead()
 {
 	// TODO: Add your control notification handler code here
 	g_invoke_id = GetPrivateData(1234,READINPUT_T3000,0,4,sizeof(Str_in_point));
-	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+	if(g_invoke_id>=0)
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 }
 
 //

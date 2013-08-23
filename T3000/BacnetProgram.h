@@ -16,7 +16,7 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
+	HICON hIcon;
 	DECLARE_MESSAGE_MAP()
 
 public:
@@ -28,13 +28,19 @@ public:
 	afx_msg LRESULT Fresh_Program_List(WPARAM wParam,LPARAM lParam);
 	afx_msg void OnBnClickedButtonProgramApply();
 	afx_msg LRESULT  ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnBnClickedButtonProgramEdit();
+//	afx_msg void OnLvnItemchangedListProgram(NMHDR *pNMHDR, LRESULT *pResult);
+	void UnCheckOtherItem(ListCtrlEx::CListCtrlEx& listCtrl, int index);
+//	afx_msg void OnHdnItemclickListProgram(NMHDR *pNMHDR, LRESULT *pResult);
+//	afx_msg void OnLvnItemActivateListProgram(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMClickListProgram(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 	const int PROGRAM_NUM = 0;
 	const int PROGRAM_FULL_LABLE = 1;
 	const int PROGRAM_STATUS = 2;
 	const int PROGRAM_AUTO_MANUAL = 3;
-	const int PROGRAM_SIZE = 4;
+	const int PROGRAM_SIZE_LIST = 4;
 	const int PROGRAM_RUN_STATUS = 5;
 	const int PROGRAM_LABEL = 6 ;
 

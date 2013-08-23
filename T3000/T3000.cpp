@@ -10,6 +10,7 @@
 #include "T3000Doc.h"
 #include "T3000View.h"
 #include "T3000TableView.h"
+#include "DialogCM5_BacNet.h"
 
 #include "LoginDlg.h"
 
@@ -161,7 +162,11 @@ BOOL CT3000App::InitInstance()
 	HRESULT hr;//
 
 
-
+	if(!AfxInitRichEdit())
+	{
+		AfxMessageBox(IDS_INIT_RICHEDIT_ERROR);//
+		return FALSE;//
+	}
 
  
 	if (!AfxSocketInit())//
@@ -272,12 +277,21 @@ BOOL CT3000App::InitInstance()
 
 	// Register the application's document templates.  Document templates
 	//  serve as the connection between documents, frame windows and views
+
+#ifndef Fance_Enable
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
 		IDR_MAINFRAME,
 		RUNTIME_CLASS(CT3000Doc),
 		RUNTIME_CLASS(CMainFrame),       // main SDI frame window
 		RUNTIME_CLASS(CT3000View));
+#endif
+	//CSingleDocTemplate* pDocTemplate;
+	//pDocTemplate = new CSingleDocTemplate(
+	//	IDR_MAINFRAME,
+	//	RUNTIME_CLASS(CT3000Doc),
+	//	RUNTIME_CLASS(CMainFrame),       // main SDI frame window
+	//	RUNTIME_CLASS(CDialogCM5_BacNet));
 
 
 
