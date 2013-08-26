@@ -45,7 +45,9 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual void OnInitialUpdate();
 public:
+    BOOL m_ReadOnly;
 	void Fresh();
+	void FreshGrid();
     void Fresh_Hum_Temp();
 	void InitialRegisterNo();
 	void ShowDialogData();
@@ -90,7 +92,7 @@ private:
 	Register_info First_Sensor_Temp_Hum_RegID;
 public:
 //	afx_msg void OnEnUpdateMasterId();
-	afx_msg void OnEnKillfocusMasterId();
+//	afx_msg void OnEnKillfocusMasterId();
 private:
 	UINT m_masterid;
 	UINT m_slaveid;
@@ -154,7 +156,7 @@ private:
 	
 	HANDLE hFirstThread;
 	CString m_recordhumchamber;
-	  CStdioFile*					m_chamberFile;
+	
 	//CWinThread* hFirstThread;
 	//HANDLE hSecondThread;
 	public:
@@ -225,7 +227,8 @@ private:
 		// //process
 		CProgressCtrl m_progress;
 //		void KeyDownMsflexgridInput3(short* KeyCode, short Shift);
-		void RowColChangeMsflexgridInput3();
+//		void RowColChangeMsflexgridInput3();
+		void ShowChangingData();
 };
 
 

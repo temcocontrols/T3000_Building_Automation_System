@@ -240,7 +240,7 @@ BOOL CInputSetDlg::OnInitDialog()
 	{
 		m_FlexGrid.put_TextMatrix(0,FILTER,_T("Filter"));
 		m_FlexGrid.put_ColWidth(FILTER,750);
-	 m_FlexGrid.put_ColWidth(FILTER,0);
+	    m_FlexGrid.put_ColWidth(FILTER,0);
 	}
 		
 	
@@ -1034,16 +1034,28 @@ void CInputSetDlg::OnBnClickedUpbutton()
 	//comments by Fance.
 	if(m_nCurRow==1&&m_nCurCol==CAL_FIELD)
 	{
-		int nValue=multi_register_value[101]+1;
-		write_one(g_tstat_id,109,nValue);
+		int nValue=product_register_value[101]+1;
+		int ret=write_one(g_tstat_id,101,nValue);
+		if (ret>0)
+		{
+		 product_register_value[101]=nValue;
+		}
 	}
 	if(m_nCurRow==2&& m_nCurCol==CAL_FIELD)
 	{
-		write_one(g_tstat_id,180,multi_register_value[180]+1);
+		int ret=write_one(g_tstat_id,180,product_register_value[180]+1);
+		if (ret>0)
+		{
+		product_register_value[180]=product_register_value[180]+1;
+		}
 	}
 	if(m_nCurRow==3&& m_nCurCol==CAL_FIELD)
 	{
-		write_one(g_tstat_id,181,multi_register_value[181]+1);
+		int ret=write_one(g_tstat_id,181,product_register_value[181]+1);
+		if (ret>0)
+		{
+		   product_register_value[181]=product_register_value[181]+1;
+		}
 	}
 	Fresh_Grid();
 }
@@ -1064,16 +1076,19 @@ void CInputSetDlg::OnBnClickedDownbutton()
 	//comments by Fance.
 	if(m_nCurRow==1&&m_nCurCol==CAL_FIELD)
 	{
-		int nValue=multi_register_value[101]-1;
-		write_one(g_tstat_id,101,nValue);
+		int nValue=product_register_value[101]-1;
+		int ret=write_one(g_tstat_id,101,nValue);
+		if (ret>0)
+		{
+		}
 	}
 	if(m_nCurRow==2&& m_nCurCol==CAL_FIELD)
 	{
-		write_one(g_tstat_id,180,multi_register_value[180]-1);
+		write_one(g_tstat_id,180,product_register_value[180]-1);
 	}
 	if(m_nCurRow==3&& m_nCurCol==CAL_FIELD)
 	{
-		write_one(g_tstat_id,181,multi_register_value[181]-1);
+		write_one(g_tstat_id,181,product_register_value[181]-1);
 	}
 	Fresh_Grid();
 }
@@ -2225,7 +2240,7 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 // 	{
 // 		return;
 // 	}
-	if (nRow == 1 && (nCol == VALUE_FIELD  || nCol == FUN_FIELD || nCol == AM_FIELD || nCol == CAL_FIELD))
+	if (nRow == 1 && (nCol == VALUE_FIELD  || nCol == FUN_FIELD || nCol == AM_FIELD ))
 	{
 		return;
 	}

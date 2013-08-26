@@ -53,18 +53,15 @@ CHumChamber::CHumChamber()
 	, m_time1(0)
 	{
 		hFirstThread=NULL;
-  		m_chamberFile = new CStdioFile;//txt
+ 
+		m_ReadOnly=TRUE;
     }
 
 CHumChamber::~CHumChamber()
 {
 if(hFirstThread != NULL)
 	TerminateThread(hFirstThread, 0);
-	if (m_chamberFile!=NULL)
-	{
-	  delete m_chamberFile;
-	  m_chamberFile=NULL;
-	}
+
 }
 
 void CHumChamber::DoDataExchange(CDataExchange* pDX)
@@ -96,7 +93,7 @@ BEGIN_MESSAGE_MAP(CHumChamber, CFormView)
 	ON_BN_CLICKED(IDC_REFRESH, &CHumChamber::OnBnClickedRefresh)
  
  
-ON_EN_KILLFOCUS(IDC_MASTER_ID, &CHumChamber::OnEnKillfocusMasterId)
+//ON_EN_KILLFOCUS(IDC_MASTER_ID, &CHumChamber::OnEnKillfocusMasterId)
 ON_EN_KILLFOCUS(IDC_SLAVE_ID, &CHumChamber::OnEnKillfocusSlaveId)
 ON_EN_KILLFOCUS(IDC_TEMP1, &CHumChamber::OnEnKillfocusTemp1)
 ON_EN_KILLFOCUS(IDC_TEMP2, &CHumChamber::OnEnKillfocusTemp2)
@@ -183,7 +180,7 @@ GetRegInfoFromDB(First_Sensor_RH,_T("First_Sensor_RH_RegID"));
 GetRegInfoFromDB(First_Sensor_State,_T("First_Sensor_State_RegID"));
 GetRegInfoFromDB(CurrentTestSensor,_T("CurrentTestSensor_RegID"));
 GetRegInfoFromDB(CurrentTestSensorTemp,_T("CurrentTestSensorTemp_RegID"));
-GetRegInfoFromDB(CurrentTestSensorHum,_T("CurrentTestSensorHum_RegID"));
+GetRegInfoFromDB(CurrentTestSensorHum,_T("CurrentTestSensorHum_RegID"));                                        
 GetRegInfoFromDB(CurrentCalibrationTimeLeft,_T("CurrentCalibrationTimeLeft_RegID"));
 GetRegInfoFromDB(CurrentCalibrationID,_T("CurrentCalibrationPointID_RegID"));
 GetRegInfoFromDB(First_Sensor_Temp_Hum_RegID,_T("First_Sensor_Temp_Hum_RegID"));
@@ -201,77 +198,81 @@ void CHumChamber::Fresh()
 	 {
 		pMain->OnConnect();
 	 }
+	 InitialRegisterNo();
+
 	register_critical_section.Lock();
 	Read_Multi(g_tstat_id,&multi_register_value[0],0,20);  //0-20
 	g_register_occuppied=TRUE;
-for(int  i=0;i<3;i++)
+for(int  i=0;i<8;i++)
 	{
-	Read_Multi(g_tstat_id,&multi_register_value[584+i*50],584+i*50,50);
+	Read_Multi(g_tstat_id,&multi_register_value[581+i*50],581+i*50,50);
 	}
 
    register_critical_section.Unlock();
    g_register_occuppied=FALSE;
-   InitialRegisterNo();
    
-   m_msflexgrid.put_Cols(4);
-   m_msflexgrid.put_Rows(SENSOR_NUM+1);
-   m_msflexgrid.put_TextMatrix(0,0,_T("Sensor"));
-   m_msflexgrid.put_TextMatrix(0,1,_T("State"));
-   m_msflexgrid.put_TextMatrix(0,2,_T("TEMP"));
-   m_msflexgrid.put_TextMatrix(0,3,_T("Hum"));
+   FreshGrid();
    
-   CString temp,temp1;
-   for (int i=1;i<=SENSOR_NUM;i++)
-   {
-     temp.Format(_T("%d"),i);
-     m_msflexgrid.put_TextMatrix(i,0,temp);
-	 switch (multi_register_value[First_Sensor_State.Start_ID+i-1])
-	 {
-	 case 0:
-	     {
-		 temp1=_T("Not Tested");
-		 break;
-		 }
-	 case 1:
-		 {
-		 temp1=_T("Tested");
-		 break;
-		 }
-	 case 2:
-		 {
-		 temp1=_T("Bad Hum");
-		 break;
-		 }
-	 case 3:
-		 {
-		 temp1=_T("Bad Temp");
-		 break;
-		 }
-	 case 4:
-		 {
-		 temp1=_T("Bad Communications");
-		 break;
-		 }
-	 default:
-	     {
-		 temp1=_T("Not Tested");
-		 break;
-		 }
-	 }
-	 m_msflexgrid.put_TextMatrix(i,1,temp1);
-   
-	 temp.Format(_T("%d"),(signed short)multi_register_value[CurrentTestSensorTemp.Start_ID+2*(i-1)]);
-	 m_msflexgrid.put_TextMatrix(i,2,temp);
-	 temp.Format(_T("%d"),(signed short)multi_register_value[CurrentTestSensorHum.Start_ID+2*(i-1)]);
-	 m_msflexgrid.put_TextMatrix(i,3,temp);
-   } 
+  // m_msflexgrid.put_Cols(4);
+  // m_msflexgrid.put_Rows(SENSOR_NUM+1);
+  // m_msflexgrid.put_TextMatrix(0,0,_T("Sensor"));
+  // m_msflexgrid.put_TextMatrix(0,1,_T("State"));
+  // m_msflexgrid.put_TextMatrix(0,2,_T("TEMP(°C)"));
+  // m_msflexgrid.put_TextMatrix(0,3,_T("Hum(%)"));
+  // 
+  // CString temp,temp1;
+  // for (int i=1;i<=SENSOR_NUM;i++)
+  // {
+  //   temp.Format(_T("%d"),i);
+  //   m_msflexgrid.put_TextMatrix(i,0,temp);
+	 //switch (multi_register_value[First_Sensor_State.Start_ID+i-1])
+	 //{
+	 //case 0:
+	 //    {
+		// temp1=_T("Not Tested");
+		// break;
+		// }
+	 //case 1:
+		// {
+		// temp1=_T("Tested");
+		// break;
+		// }
+	 //case 2:
+		// {
+		// temp1=_T("Bad Hum");
+		// break;
+		// }
+	 //case 3:
+		// {
+		// temp1=_T("Bad Temp");
+		// break;
+		// }
+	 //case 4:
+		// {
+		// temp1=_T("Bad Communications");
+		// break;
+		// }
+	 //default:
+	 //    {
+		// temp1=_T("Not Tested");
+		// break;
+		// }
+	 //}
+	 //m_msflexgrid.put_TextMatrix(i,1,temp1);
+  // 
+	 //temp.Format(_T("%0.1f"),(short)(multi_register_value[First_Sensor_Temp_Hum_RegID.Start_ID+2*(i-1)]/10));
+	 //m_msflexgrid.put_TextMatrix(i,2,temp);
+	 //temp.Format(_T("%0.1f"),(short)(multi_register_value[First_Sensor_Temp_Hum_RegID.Start_ID+1+2*(i-1)]/10));
+	 //m_msflexgrid.put_TextMatrix(i,3,temp);
+  // } 
  
   
-
+ 
     
     ShowDialogData();
+ 
 	Update_SensorTable();
-    if (multi_register_value[TestState.Start_ID]==4)//Running....started
+    if (multi_register_value[TestState.Start_ID]==4||multi_register_value[TestState.Start_ID]==5)//Running....started
     {
 		m_Start=TRUE;
 		m_StartBtn.ShowWindow(FALSE);
@@ -285,14 +286,14 @@ for(int  i=0;i<3;i++)
 		m_StopBtn.ShowWindow(FALSE);
 		m_ContinueBtn.ShowWindow(TRUE);
 	}
+	  if(hFirstThread != NULL)
+		  TerminateThread(hFirstThread, 0);
+		  hFirstThread=NULL;
 	  if (!hFirstThread)
 	  {
 		  hFirstThread = CreateThread(NULL,NULL,_UpdateThread,this,NULL,0);
 	  }
-	  else
-	  {
-	   //l  hFirstThread
-	  }
+	  
 }
 
 #ifdef _DEBUG
@@ -326,63 +327,36 @@ void CHumChamber::Update_AllData()
 
 }
 void CHumChamber::Fresh_Hum_Temp()
-{	
-//setlocale(LC_CTYPE,("chs"));
+{
 if (is_connect())
 {	 
-float temp;
+
 CString str_master_id;
 int times=0;
+int Time=0;
 BOOL ADD=TRUE;
 CTime time;
 CString strwrite;
 CString str_hum;
-m_recordhumchamber = g_strExePth + _T("HumChamber.TXT");
-if (!m_chamberFile->Open(m_recordhumchamber.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate ))//打不开就创建一个
-{       m_chamberFile->Open(m_recordhumchamber.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate ) ;
+short read_temp;
 
-
-
-		m_chamberFile->WriteString(_T("Time           Temp         Hum"));	
-}
-
-	m_chamberFile->SeekToEnd();
 	while(TRUE)
 	{
 		 if ((!is_connect())||(!g_bChamber))
 		 {	 
 		 if (!is_connect())
 		 {
-			 g_strScanInfo =_T("Disconnect...");
+			 g_strScanInfo =_T("Disconnect");
 			 PostMessage(WM_MY_MESSAGE,1,0);
 		 } 
-		 break;
+		// break;
 		 } 
 		 
-		Sleep(1500);
-		register_critical_section.Lock();
-		Read_Multi(g_tstat_id,&multi_register_value[0],0,20);  //0-20
-		g_register_occuppied=TRUE;
-		if (m_Start)
-		{
-			for(int  i=0;i<3;i++)
-			{
-
-				Read_Multi(g_tstat_id,&multi_register_value[584+i*50],584+i*50,50);
-
-			}
-		} 
-		else
-		{
-			 
-
-				Read_Multi(g_tstat_id,&multi_register_value[619],619,30);
-
-			 
-		}
 		
-		register_critical_section.Unlock();
-		g_register_occuppied=FALSE;
+	 
+	 
+		Sleep(1000);
+	
 		if (ADD)
 		{
 			times++;
@@ -422,39 +396,14 @@ if (!m_chamberFile->Open(m_recordhumchamber.GetString(),CFile::modeReadWrite | C
 		case 9:g_strScanInfo = _T("Communicating . . . . . . . . . .");break; 
 		case 10:g_strScanInfo = _T("Communicating . . . . . . . . . . .");break; 
 		}
-
-
 		PostMessage(WM_MY_MESSAGE,1,0);
-
-
-		SYSTEMTIME st;
-		CString strDate,strTime;
-		GetLocalTime(&st);
-		strDate.Format(_T("%4d-%2d-%2d"),st.wYear,st.wMonth,st.wDay);
-		strTime.Format(_T("%2d:%2d:%2d"), st.wHour,st.wMinute,st.wSecond);
-
-
-
-
-
-		temp=(float)(multi_register_value[CurrentTemp.Start_ID]/10.0);
-		strwrite=_T("");
-		strwrite+=strDate;
-		strwrite+=_T("   ");
-		strwrite+=strTime;
-		strwrite+=_T("   ");
-		str_master_id.Format(_T("%0.2f"),temp);
-		strwrite+=str_master_id;
-		str_master_id.Format(_T("%0.2f ℃"),temp);
-		GetDlgItem(IDC_CUR_TEMP)->SetWindowText(str_master_id);
-
-		temp=(float)(multi_register_value[CurrentHum.Start_ID]/10.0);
-		strwrite+=_T("   ");
-		str_hum.Format(_T("%0.2f"),temp);
-		strwrite+=str_hum;
-		str_hum.Format(_T("%0.2f%%"),temp);
-		GetDlgItem(IDC_CUR_HUM)->SetWindowText(str_hum);  
-		if (multi_register_value[TestState.Start_ID]==4)//Running....started
+		read_temp=read_one(g_tstat_id,TestState.Start_ID);
+		if (read_temp>0)
+		{
+		multi_register_value[TestState.Start_ID]=read_temp;
+		}
+		
+		if (multi_register_value[TestState.Start_ID]==4||multi_register_value[TestState.Start_ID]==5)//Running....started
 		{
 			m_Start=TRUE;
 			m_StartBtn.ShowWindow(FALSE);
@@ -469,22 +418,51 @@ if (!m_chamberFile->Open(m_recordhumchamber.GetString(),CFile::modeReadWrite | C
 			m_ContinueBtn.ShowWindow(TRUE);
 		}
 
-	 
-		
-
-		m_chamberFile->WriteString(strwrite);
-		   m_chamberFile->Flush();
-		m_chamberFile->WriteString(_T("\n"));
-		m_chamberFile->Flush();
-
-		if (m_Start)
-		{
-
-			Show_AllData();
-		}
+	
+	read_temp=read_one(g_tstat_id,CurrentTemp.Start_ID);
+	if (read_temp>0)
+	{multi_register_value[CurrentTemp.Start_ID]=read_temp;
 	}
-	close_com();
-	m_chamberFile->Close();
+		
+		str_master_id.Format(_T("%0.1f°C"),multi_register_value[CurrentTemp.Start_ID]/10.0);
+		GetDlgItem(IDC_CUR_TEMP)->SetWindowText(str_master_id);
+		read_temp=read_one(g_tstat_id,CurrentHum.Start_ID);
+		if (read_temp>0)
+		{
+		multi_register_value[CurrentHum.Start_ID]=read_temp;
+		}
+		
+		str_master_id.Format(_T("%0.1f%%"), multi_register_value[CurrentHum.Start_ID]/10.0);
+		GetDlgItem(IDC_CUR_HUM)->SetWindowText(str_master_id);
+
+		read_temp=read_one(g_tstat_id,NumBadSensors.Start_ID);
+		if (read_temp>0)
+		{
+          multi_register_value[NumBadSensors.Start_ID]=read_temp;
+		}
+
+		
+		str_master_id.Format(_T("%d"),multi_register_value[NumBadSensors.Start_ID]);
+		GetDlgItem(IDC_NUM_ERROR_SENSOR)->SetWindowText(str_master_id);
+ 		if (m_Start)
+ 		{   
+		    Time++;
+		    if (Time==10)
+		    {
+			  Time=0;
+			   for(int  i=0;i<6;i++)
+			   {
+				   Read_Multi(g_tstat_id,&multi_register_value[660+i*50],660+i*50,50);
+			   }
+			   FreshGrid();
+
+		    }
+		    ShowChangingData();
+		}
+	 
+	}
+	//close_com();
+	
 	return;
 }
 else
@@ -497,44 +475,44 @@ else
 return;	 
 
 }
-void CHumChamber::Show_AllData(){
+void CHumChamber::FreshGrid(){
 	m_msflexgrid.put_Cols(4);
-	m_msflexgrid.put_Rows(SENSOR_NUM+1);
+	m_msflexgrid.put_Rows(multi_register_value[NumSensors.Start_ID]+1);
 	m_msflexgrid.put_TextMatrix(0,0,_T("Sensor"));
 	m_msflexgrid.put_TextMatrix(0,1,_T("State"));
-	m_msflexgrid.put_TextMatrix(0,2,_T("TEMP"));
-	m_msflexgrid.put_TextMatrix(0,3,_T("Hum"));
+	m_msflexgrid.put_TextMatrix(0,2,_T("TEMP(°C)"));
+	m_msflexgrid.put_TextMatrix(0,3,_T("Hum(%)"));
 	CString temp,temp1;
-	for (int i=1;i<=SENSOR_NUM;i++)
-		{
+	for (int i=1;i<=multi_register_value[NumSensors.Start_ID];i++)
+	{
 		temp.Format(_T("%d"),i);
 		m_msflexgrid.put_TextMatrix(i,0,temp);
 		switch (multi_register_value[First_Sensor_State.Start_ID+i-1])
-			{
+		{
 		case 0:
 			{
-			temp1=_T("Not Tested");
-			break;
+				temp1=_T("Not Tested");
+				break;
 			}
 		case 1:
 			{
-			temp1=_T("Tested");
-			break;
+				temp1=_T("Tested");
+				break;
 			}
 		case 2:
 			{
-			temp1=_T("Bad Hum");
-			break;
+				temp1=_T("Bad Hum");
+				break;
 			}
 		case 3:
 			{
-			temp1=_T("Bad Temp");
-			break;
+				temp1=_T("Bad Temp");
+				break;
 			}
 		case 4:
 			{
-			temp1=_T("Bad Communications");
-			break;
+				temp1=_T("Bad Communications");
+				break;
 			}
 		case 5:
 			{
@@ -542,31 +520,28 @@ void CHumChamber::Show_AllData(){
 			}
 		default:
 			{
-			temp1=_T("Not Tested");
-			break;
+				temp1=_T("Not Tested");
+				break;
 			}
-			}
+		}
 		m_msflexgrid.put_TextMatrix(i,1,temp1);
 
-		temp.Format(_T("%d"),(signed short)multi_register_value[CurrentTestSensorTemp.Start_ID+2*(i-1)]);
+		temp.Format(_T("%0.1f"),(unsigned short)(multi_register_value[First_Sensor_Temp_Hum_RegID.Start_ID+2*(i-1)]/10));
 		m_msflexgrid.put_TextMatrix(i,2,temp);
-		temp.Format(_T("%d"),(signed short)multi_register_value[CurrentTestSensorHum.Start_ID+2*(i-1)]);
+		temp.Format(_T("%0.1f"),(unsigned short)(multi_register_value[First_Sensor_Temp_Hum_RegID.Start_ID+1+2*(i-1)]/10));
 		m_msflexgrid.put_TextMatrix(i,3,temp);
-		} 
-	// multi_register_value[626]=1;//test use
-	//把温度和湿度显示在当时测试的表格中...
-	/*temp.Format(_T("%d"),multi_register_value[CurrentTestSensorTemp.Start_ID]);
-	m_msflexgrid.put_TextMatrix(multi_register_value[CurrentTestSensor.Start_ID],2,temp);
+	} 
+}
+void CHumChamber::Show_AllData(){
 
-	temp.Format(_T("%d"),multi_register_value[CurrentTestSensorHum.Start_ID]);
-	m_msflexgrid.put_TextMatrix(multi_register_value[CurrentTestSensor.Start_ID],3,temp);*/
+	 FreshGrid();
 
 	ShowDialogData();
 	//Update_SensorTable();
 }
 void CHumChamber::Update_SensorTable()
 {
- 
+    
 	CString str_master_id;
 	str_master_id.Format(_T("%d"),(signed short)multi_register_value[First_Sensor_Fr.Start_ID]);
 	GetDlgItem(IDC_FREQ1)->SetWindowText(str_master_id);
@@ -618,27 +593,15 @@ void CHumChamber::Update_SensorTable()
 // CHumChamber message handlers
 void CHumChamber::OnBnClickedRefresh()
 {
-//int i;
-//m_progress.ShowWindow(TRUE);
-//m_progress.SetRange(0,100);
-//m_progress.SetPos(0);
-//for(i=0;i<3;i++)
-//	{
-//	register_critical_section.Lock();
-//	Read_Multi(g_tstat_id,&multi_register_value[584+i*50],584+i*50,50);
-//	
-//	register_critical_section.Unlock();
-//
-//	m_progress.SetPos(30*(i+1));
-//	}
-//Show_AllData();
-//m_progress.SetPos(100);
-//m_progress.ShowWindow(FALSE);
-	 //Fresh();
-	
-	//SetPaneString(2,_T("Pane"));
-  // hFirstThread=AfxBeginThread(_UpdateThread,this);
-  //hFirstThread->m_bAutoDelete=FALSE;
+   if (is_connect())
+   { 
+   for(int  i=0;i<6;i++)
+   {
+	   Read_Multi(g_tstat_id,&multi_register_value[660+i*50],660+i*50,50);
+   }
+   FreshGrid();
+   }
+  
 }
 
 DWORD WINAPI _UpdateThread(LPVOID pParam)
@@ -650,19 +613,7 @@ DWORD WINAPI _UpdateThread(LPVOID pParam)
 	 	 }
 	return 1;
 	}
-//DWORD WINAPI _Update_TMEPHUM_Thread(LPVOID pParam)
-//{
-//	CHumChamber* pDlg = (CHumChamber*)(pParam);
-//
-//	//pDlg->Fresh_Hum_Temp();
-//
-//	return 1;
-//}
  
-//void CHumChamber::OnTimer(UINT_PTR nIDEvent)
-//	{
-//	CFormView::OnTimer(nIDEvent);
-//	}
 BOOL CHumChamber::GetRegInfoFromDB(Register_info &reg_data,CString Area_Name)
 {
 CADO m_cado;  
@@ -696,23 +647,24 @@ else
 void CHumChamber::ShowDialogData()
 {
  ////这里是所有单个的 TextArea 
- 
+
+
 	CString str_master_id;
 	str_master_id.Format(_T("%d"), multi_register_value[MasterID.Start_ID]);
 	GetDlgItem(IDC_MASTER_ID)->SetWindowText(str_master_id);
 	str_master_id.Format(_T("%d"),multi_register_value[SlaveID.Start_ID]); 
 	GetDlgItem(IDC_SLAVE_ID)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f°C"),(signed short)multi_register_value[CurrentTemp.Start_ID]/10.0);
+	str_master_id.Format(_T("%0.1f°C"),( short)multi_register_value[CurrentTemp.Start_ID]/10.0);
 	GetDlgItem(IDC_CUR_TEMP)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f°C"),(signed short)multi_register_value[TempTolerence.Start_ID]/10.0);
+	str_master_id.Format(_T("%0.1f°C"),( short)multi_register_value[TempTolerence.Start_ID]/10.0);
 	GetDlgItem(IDC_TEMP_TOL)->SetWindowText(str_master_id);
     str_master_id.Format(_T("%d"),multi_register_value[NumSensors.Start_ID]);
 	GetDlgItem(IDC_NUM_SENSOR)->SetWindowText(str_master_id);
     str_master_id.Format(_T("%d"),multi_register_value[StartPoint.Start_ID]);
 	GetDlgItem(IDC_START_POINT)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f%%"), (signed short)multi_register_value[CurrentHum.Start_ID]/10.0);
+	str_master_id.Format(_T("%0.1f%%"), ( short)multi_register_value[CurrentHum.Start_ID]/10.0);
 	GetDlgItem(IDC_CUR_HUM)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f%%"),(signed short)multi_register_value[HumTolenrence.Start_ID]/10.0);
+	str_master_id.Format(_T("%0.1f%%"),( short)multi_register_value[HumTolenrence.Start_ID]/10.0);
 	GetDlgItem(IDC_HUM_TOL)->SetWindowText(str_master_id);
 	str_master_id.Format(_T("%d"),multi_register_value[NumBadSensors.Start_ID]);
 	GetDlgItem(IDC_NUM_ERROR_SENSOR)->SetWindowText(str_master_id);
@@ -724,78 +676,83 @@ void CHumChamber::ShowDialogData()
 	GetDlgItem(IDC_SENSOR_TEMP)->SetWindowText(str_master_id);
 	str_master_id.Format(_T("%d"),(multi_register_value[CurrentTestSensor.Start_ID])); 
 	GetDlgItem(IDC_SENSOR_ID)->SetWindowText(str_master_id);
-//这个是有规律的 寄存器 Set Calibration Points
  
-	  
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Temp.Start_ID]/10.0);
-	GetDlgItem(IDC_TEMP1)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Temp.Start_ID+3]/10.0);
-	GetDlgItem(IDC_TEMP2)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Temp.Start_ID+6]/10.0);
-	GetDlgItem(IDC_TEMP3)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Temp.Start_ID+9]/10.0);
-	GetDlgItem(IDC_TEMP4)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Temp.Start_ID+12]/10.0);
-	GetDlgItem(IDC_TEMP5)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Temp.Start_ID+15]/10.0);
-	GetDlgItem(IDC_TEMP6)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Temp.Start_ID+18]/10.0);
-	GetDlgItem(IDC_TEMP7)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Temp.Start_ID+21]/10.0);
-	GetDlgItem(IDC_TEMP8)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Temp.Start_ID+24]/10.0);
-	GetDlgItem(IDC_TEMP9)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Temp.Start_ID+27]/10.0);
-	GetDlgItem(IDC_TEMP10)->SetWindowText(str_master_id);
+ 
+	 
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID]/10.0);
+		  GetDlgItem(IDC_TEMP1)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+3]/10.0);
+		  GetDlgItem(IDC_TEMP2)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+6]/10.0);
+		  GetDlgItem(IDC_TEMP3)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+9]/10.0);
+		  GetDlgItem(IDC_TEMP4)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+12]/10.0);
+		  GetDlgItem(IDC_TEMP5)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+15]/10.0);
+		  GetDlgItem(IDC_TEMP6)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+18]/10.0);
+		  GetDlgItem(IDC_TEMP7)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+21]/10.0);
+		  GetDlgItem(IDC_TEMP8)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+24]/10.0);
+		  GetDlgItem(IDC_TEMP9)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+27]/10.0);
+		  GetDlgItem(IDC_TEMP10)->SetWindowText(str_master_id);
+
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID]/10.0);
+		  GetDlgItem(IDC_HUM1)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+3]/10.0);
+		  GetDlgItem(IDC_HUM2)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+6]/10.0);
+		  GetDlgItem(IDC_HUM3)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+9]/10.0);
+		  GetDlgItem(IDC_HUM4)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+12]/10.0);
+		  GetDlgItem(IDC_HUM5)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+15]/10.0);
+		  GetDlgItem(IDC_HUM6)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+18]/10.0);
+		  GetDlgItem(IDC_HUM7)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+21]/10.0);
+		  GetDlgItem(IDC_HUM8)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+24]/10.0);
+		  GetDlgItem(IDC_HUM9)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+27]/10.0);
+		  GetDlgItem(IDC_HUM10)->SetWindowText(str_master_id);
+
+	
+	
      
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Hum.Start_ID]/10.0);
-	GetDlgItem(IDC_HUM1)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Hum.Start_ID+3]/10.0);
-	GetDlgItem(IDC_HUM2)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Hum.Start_ID+6]/10.0);
-	GetDlgItem(IDC_HUM3)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Hum.Start_ID+9]/10.0);
-	GetDlgItem(IDC_HUM4)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Hum.Start_ID+12]/10.0);
-	GetDlgItem(IDC_HUM5)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Hum.Start_ID+15]/10.0);
-	GetDlgItem(IDC_HUM6)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Hum.Start_ID+18]/10.0);
-	GetDlgItem(IDC_HUM7)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Hum.Start_ID+21]/10.0);
-	GetDlgItem(IDC_HUM8)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Hum.Start_ID+24]/10.0);
-	GetDlgItem(IDC_HUM9)->SetWindowText(str_master_id);
-	str_master_id.Format(_T("%0.1f"),(signed short)multi_register_value[First_Calibration_Points_Hum.Start_ID+27]/10.0);
-	GetDlgItem(IDC_HUM10)->SetWindowText(str_master_id);
+
  
 
-	str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID]);
-	GetDlgItem(IDC_TIME1)->SetWindowText(str_master_id);
-	Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID];
-	Hour=Time_left/60;
-	Minute=Time_left%60;
-	Second=0;
-	str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
-	GetDlgItem(IDC_TEMP_LEFT1)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID]);
+		  GetDlgItem(IDC_TIME1)->SetWindowText(str_master_id);
+		  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID];
+		  Hour=Time_left/60;
+		  Minute=Time_left%60;
+		  Second=0;
+		  str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+		  GetDlgItem(IDC_TEMP_LEFT1)->SetWindowText(str_master_id);
 
-	str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+3]);
-	GetDlgItem(IDC_TIME2)->SetWindowText(str_master_id);
-	  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+3];
-	  Hour=Time_left/60;
-	  Minute=Time_left%60;
-	  Second=0;
-	str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
-	GetDlgItem(IDC_TEMP_LEFT2)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+3]);
+		  GetDlgItem(IDC_TIME2)->SetWindowText(str_master_id);
+		  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+3];
+		  Hour=Time_left/60;
+		  Minute=Time_left%60;
+		  Second=0;
+		  str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+		  GetDlgItem(IDC_TEMP_LEFT2)->SetWindowText(str_master_id);
 
-	str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+6]);
-	GetDlgItem(IDC_TIME3)->SetWindowText(str_master_id);
-	  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+6];
-	  Hour=Time_left/60;
-	  Minute=Time_left%60;
-	  Second=0;
-	str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
-	GetDlgItem(IDC_TEMP_LEFT3)->SetWindowText(str_master_id);
+		  str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+6]);
+		  GetDlgItem(IDC_TIME3)->SetWindowText(str_master_id);
+		  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+6];
+		  Hour=Time_left/60;
+		  Minute=Time_left%60;
+		  Second=0;
+		  str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+		  GetDlgItem(IDC_TEMP_LEFT3)->SetWindowText(str_master_id);
 
 	str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+9]);
 	GetDlgItem(IDC_TIME4)->SetWindowText(str_master_id);
@@ -912,7 +869,87 @@ void CHumChamber::ShowDialogData()
   /*m_progress.SetPos(75);*/
 }
  
+void CHumChamber::ShowChangingData(){
 
+int timeleft,Hour,Minute,Second,read_temp;
+	CString str_master_id;
+	
+
+read_temp=read_one(g_tstat_id,CurrentCalibrationID.Start_ID);
+if (read_temp>0)
+{
+ multi_register_value[CurrentCalibrationID.Start_ID] =read_temp;
+}
+int point=multi_register_value[CurrentCalibrationID.Start_ID];
+
+Sleep(1000);
+read_temp=read_one(g_tstat_id,CurrentCalibrationTimeLeft.Start_ID);
+if (read_temp>0)
+{
+	multi_register_value[CurrentCalibrationTimeLeft.Start_ID]=read_temp;
+}
+ 
+timeleft=multi_register_value[CurrentCalibrationTimeLeft.Start_ID];
+
+Hour=timeleft/3600;
+Minute=(timeleft-Hour*3600)/60;
+Second=(timeleft-Hour*3600)%60;
+str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+
+switch(point)
+{
+case 1:
+	{
+	  GetDlgItem(IDC_TEMP_LEFT1)->SetWindowText(str_master_id);
+		break;
+	}
+case 2:
+	{
+	GetDlgItem(IDC_TEMP_LEFT2)->SetWindowText(str_master_id);
+		break;
+	}
+case 3:
+	{
+	GetDlgItem(IDC_TEMP_LEFT3)->SetWindowText(str_master_id);
+		break;
+	}
+case 4:
+	{
+	GetDlgItem(IDC_TEMP_LEFT4)->SetWindowText(str_master_id);
+		break;
+	}
+case 5:
+	{
+	GetDlgItem(IDC_TEMP_LEFT5)->SetWindowText(str_master_id);
+		break;
+	}
+case 6:
+	{
+	GetDlgItem(IDC_TEMP_LEFT6)->SetWindowText(str_master_id);
+		break;
+	}
+case 7:
+	{
+	GetDlgItem(IDC_TEMP_LEFT7)->SetWindowText(str_master_id);
+		break;
+	}
+case 8:
+	{
+	GetDlgItem(IDC_TEMP_LEFT8)->SetWindowText(str_master_id);
+		break;
+	}
+case 9:
+	{
+	GetDlgItem(IDC_TEMP_LEFT9)->SetWindowText(str_master_id);
+		break;
+	}
+case 10:
+	{
+	GetDlgItem(IDC_TEMP_LEFT10)->SetWindowText(str_master_id);
+		break;
+	}
+}
+}
 
  
 BOOL CHumChamber::WriteValueToRegID(UINT RegID,UINT &Value)
@@ -920,54 +957,24 @@ BOOL CHumChamber::WriteValueToRegID(UINT RegID,UINT &Value)
 	int IntTemp=multi_register_value[RegID];
 	if (IntTemp!=Value)
 		{
-		write_one(g_tstat_id,RegID,Value);
-		if (read_one(g_tstat_id,RegID)!=Value)
+		int ret=write_one(g_tstat_id,RegID,Value);
+		 
+			if (ret>0)
 			{
-			//AfxMessageBox(_T("Try again"));
-			Value=IntTemp;
+				multi_register_value[RegID]=Value;
+				return TRUE;
+			}
+			else
+			{
 			return FALSE;
-			} 
-		else
-			{
-			multi_register_value[RegID]=Value;
-			return TRUE;
 			}
 		}
 		return TRUE;
 	}
 
-void CHumChamber::OnEnKillfocusMasterId()
-{
- 
-  /* UpdateData(TRUE);  IDC_MASTER_ID
-  if (!WriteValueToRegID(MasterID.Start_ID,m_masterid))
-  {
-     AfxMessageBox(_T("Try again"));
-  } 
-  UpdateData(FALSE);*/
 
-	float temp_float;
-	CString str_text;
-	GetDlgItem(IDC_MASTER_ID)->GetWindowText(str_text);
- 
-	temp_float=(float)_wtof(str_text);
-	m_masterid=(UINT)temp_float;
-	WriteValueToRegID(MasterID.Start_ID,m_masterid);
-	str_text.Format(_T("%d"),(multi_register_value[MasterID.Start_ID])); 
-	GetDlgItem(IDC_MASTER_ID)->SetWindowText(str_text);
-}
-
-
-//
 void CHumChamber::OnEnKillfocusSlaveId()
 {
-//UpdateData(TRUE);
-//if (!WriteValueToRegID(SlaveID.Start_ID,m_slaveid))
-//	{
-//	AfxMessageBox(_T("Try again"));
-//	} 
-//UpdateData(FALSE);
-
 	float temp_float;
 	CString str_text;
 	GetDlgItem(IDC_SLAVE_ID)->GetWindowText(str_text);
@@ -989,19 +996,14 @@ void CHumChamber::OnEnKillfocusTemp1()
 	temp_float=(float)_wtof(str_text);
 	m_temp1=(UINT)temp_float*10;
 	WriteValueToRegID(First_Calibration_Points_Temp.Start_ID,m_temp1);
-	str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Temp.Start_ID]/10.0)); 
+	str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID]/10.0)); 
 	GetDlgItem(IDC_TEMP1)->SetWindowText(str_text);
 }
 
 
 void CHumChamber::OnEnKillfocusTemp2()
 	{
-	/*UpdateData(TRUE);
-	if (!WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+3,m_temp2))
-		{
-		AfxMessageBox(_T("Try again"));
-		} 
-	UpdateData(FALSE);*/
+	
 		float temp_float;
 		CString str_text;
 		GetDlgItem(IDC_TEMP2)->GetWindowText(str_text);
@@ -1009,7 +1011,7 @@ void CHumChamber::OnEnKillfocusTemp2()
 		temp_float=(float)_wtof(str_text);
 		m_temp2=(UINT)temp_float*10;
 		WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+3,m_temp2);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Temp.Start_ID+3]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+3]/10.0)); 
 		GetDlgItem(IDC_TEMP2)->SetWindowText(str_text);
 	}
 void CHumChamber::OnEnKillfocusTemp3()
@@ -1021,7 +1023,7 @@ void CHumChamber::OnEnKillfocusTemp3()
 	temp_float=(float)_wtof(str_text);
 	m_temp3=(UINT)temp_float*10;
     WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+6,m_temp3);
-	str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Temp.Start_ID+6]/10.0)); 
+	str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+6]/10.0)); 
 	GetDlgItem(IDC_TEMP3)->SetWindowText(str_text);
 	}
 void CHumChamber::OnEnKillfocusTemp4()
@@ -1036,7 +1038,7 @@ void CHumChamber::OnEnKillfocusTemp4()
 	m_temp4=(UINT)temp_float*10;
    WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+9,m_temp4);
  
-	str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Temp.Start_ID+9]/10.0)); 
+	str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+9]/10.0)); 
 	 
 	GetDlgItem(IDC_TEMP4)->SetWindowText(str_text);
 	}
@@ -1056,8 +1058,8 @@ void CHumChamber::OnEnKillfocusTemp5()
 	//	str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
 		temp_float=(float)_wtof(str_text);
 		m_temp5=(UINT)(temp_float*10);
-		WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+12,m_temp3);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Temp.Start_ID+12]/10.0)); 
+		WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+12,m_temp5);
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+12]/10.0)); 
 		GetDlgItem(IDC_TEMP5)->SetWindowText(str_text);
 	 
 	}
@@ -1078,7 +1080,7 @@ void CHumChamber::OnEnKillfocusTemp6()
 		temp_float=(float)_wtof(str_text);
 		m_temp6=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+15,m_temp6);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Temp.Start_ID+15]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+15]/10.0)); 
 		GetDlgItem(IDC_TEMP6)->SetWindowText(str_text);
 	}
 
@@ -1099,7 +1101,7 @@ void CHumChamber::OnEnKillfocusTemp7()
 		temp_float=(float)_wtof(str_text);
 		m_temp7=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+18,m_temp7);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Temp.Start_ID+18]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+18]/10.0)); 
 		GetDlgItem(IDC_TEMP7)->SetWindowText(str_text);
 	 
 	}
@@ -1119,7 +1121,7 @@ void CHumChamber::OnEnKillfocusTemp8()
 		temp_float=(float)_wtof(str_text);
 		m_temp8=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+21,m_temp8);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Temp.Start_ID+21]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+21]/10.0)); 
 		GetDlgItem(IDC_TEMP8)->SetWindowText(str_text);
 	}
 void CHumChamber::OnEnKillfocusTemp9()
@@ -1137,7 +1139,7 @@ void CHumChamber::OnEnKillfocusTemp9()
 		temp_float=(float)_wtof(str_text);
 		m_temp9=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+24,m_temp9);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Temp.Start_ID+24]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+24]/10.0)); 
 		GetDlgItem(IDC_TEMP9)->SetWindowText(str_text);
 	}
 void CHumChamber::OnEnKillfocusTemp10()
@@ -1157,7 +1159,7 @@ void CHumChamber::OnEnKillfocusTemp10()
 		temp_float=(float)_wtof(str_text);
 		m_temp10=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+27,m_temp10);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Temp.Start_ID+27]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+27]/10.0)); 
 		GetDlgItem(IDC_TEMP10)->SetWindowText(str_text);
  
 }
@@ -1178,7 +1180,7 @@ void CHumChamber::OnEnKillfocusHum1()
 		temp_float=(float)_wtof(str_text);
 		m_hum1=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Hum.Start_ID,m_hum1);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Hum.Start_ID]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID]/10.0)); 
 		GetDlgItem(IDC_HUM1)->SetWindowText(str_text);
 
 	}
@@ -1198,7 +1200,7 @@ void CHumChamber::OnEnKillfocusHum2()
 		temp_float=(float)_wtof(str_text);
 		m_hum2=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+3,m_hum2);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Hum.Start_ID+3]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+3]/10.0)); 
 		GetDlgItem(IDC_HUM2)->SetWindowText(str_text);
 
 	}
@@ -1219,7 +1221,7 @@ void CHumChamber::OnEnKillfocusHum3()
 		temp_float=(float)_wtof(str_text);
 		m_hum3=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+6,m_hum3);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Hum.Start_ID+6]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+6]/10.0)); 
 		GetDlgItem(IDC_HUM3)->SetWindowText(str_text);
 	}
 void CHumChamber::OnEnKillfocusHum4()
@@ -1238,7 +1240,7 @@ void CHumChamber::OnEnKillfocusHum4()
 		temp_float=(float)_wtof(str_text);
 		m_hum4=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+9,m_hum4);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Hum.Start_ID+9]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+9]/10.0)); 
 		GetDlgItem(IDC_HUM4)->SetWindowText(str_text);
 	}
 void CHumChamber::OnEnKillfocusHum5()
@@ -1258,7 +1260,7 @@ void CHumChamber::OnEnKillfocusHum5()
 		temp_float=(float)_wtof(str_text);
 		m_hum5=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+12,m_hum5);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Hum.Start_ID+12]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+12]/10.0)); 
 		GetDlgItem(IDC_HUM5)->SetWindowText(str_text);
 	}
 void CHumChamber::OnEnKillfocusHum6()
@@ -1278,7 +1280,7 @@ void CHumChamber::OnEnKillfocusHum6()
 		temp_float=(float)_wtof(str_text);
 		m_hum6=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+15,m_hum6);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Hum.Start_ID+15]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+15]/10.0)); 
 		GetDlgItem(IDC_HUM6)->SetWindowText(str_text);
 	}
 void CHumChamber::OnEnKillfocusHum7()
@@ -1298,7 +1300,7 @@ void CHumChamber::OnEnKillfocusHum7()
 		temp_float=(float)_wtof(str_text);
 		m_hum7=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+18,m_hum7);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Hum.Start_ID+18]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+18]/10.0)); 
 		GetDlgItem(IDC_HUM7)->SetWindowText(str_text);
 	}
 void CHumChamber::OnEnKillfocusHum8()
@@ -1318,7 +1320,7 @@ void CHumChamber::OnEnKillfocusHum8()
 		temp_float=(float)_wtof(str_text);
 		m_hum8=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+21,m_hum8);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Hum.Start_ID+21]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+21]/10.0)); 
 		GetDlgItem(IDC_HUM8)->SetWindowText(str_text);
 	}
 void CHumChamber::OnEnKillfocusHum9()
@@ -1338,7 +1340,7 @@ void CHumChamber::OnEnKillfocusHum9()
 		temp_float=(float)_wtof(str_text);
 		m_hum9=(UINT)(temp_float*10);
 		WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+24,m_hum9);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Hum.Start_ID+24]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+24]/10.0)); 
 		GetDlgItem(IDC_HUM9)->SetWindowText(str_text);
 	}
 void CHumChamber::OnEnKillfocusHum10()
@@ -1358,7 +1360,7 @@ void CHumChamber::OnEnKillfocusHum10()
 		temp_float=(float)_wtof(str_text);
 		m_hum10=(UINT)temp_float*10;
 		WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+27,m_hum10);
-		str_text.Format(_T("%0.1f"),(signed short)(multi_register_value[First_Calibration_Points_Hum.Start_ID+27]/10.0)); 
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+27]/10.0)); 
 		GetDlgItem(IDC_HUM10)->SetWindowText(str_text);
 	}
 
@@ -1605,23 +1607,13 @@ void CHumChamber::OnEnKillfocusTime10()
 
 void CHumChamber::OnEnKillfocusSensorTemp()
 	{
-	/*UpdateData(TRUE);IDC_SENSOR_TEMP
-	if (!WriteValueToRegID(SensorTemp.Start_ID,m_sensorTemp))
-		{
-		AfxMessageBox(_T("Try again"));
-		} 
-	UpdateData(FALSE);*/
+
 	}
 
 
 void CHumChamber::OnEnKillfocusSensorId()
 	{
-	/*UpdateData(TRUE);IDC_SENSOR_ID
-	if (!WriteValueToRegID(CurrentTestSensor.Start_ID,m_sensorid))
-		{
-		AfxMessageBox(_T("Try again"));
-		} 
-	UpdateData(FALSE);*/	
+	
 		float temp_float;
 		CString str_text;
 		GetDlgItem(IDC_SENSOR_ID)->GetWindowText(str_text);
@@ -1638,12 +1630,7 @@ void CHumChamber::OnEnKillfocusSensorId()
 
 void CHumChamber::OnEnKillfocusHumTol()
 	{
-	/*UpdateData(TRUE);
-	if (!WriteValueToRegID(HumTolenrence.Start_ID,m_humtolerance))
-		{
-		AfxMessageBox(_T("Try again"));
-		} 
-	UpdateData(FALSE);*/
+
 		float temp_float;
 		CString str_text;
 		GetDlgItem(IDC_HUM_TOL)->GetWindowText(str_text);
@@ -1651,7 +1638,7 @@ void CHumChamber::OnEnKillfocusHumTol()
 		temp_float=(float)_wtof(str_text);
 		m_humtolerance=(UINT)(temp_float*10);
 		WriteValueToRegID(HumTolenrence.Start_ID,m_humtolerance);
-		str_text.Format(_T("%0.1f%%"),(signed short)(multi_register_value[HumTolenrence.Start_ID]/10.0)); 
+		str_text.Format(_T("%0.1f%%"),(multi_register_value[HumTolenrence.Start_ID]/10.0)); 
 		GetDlgItem(IDC_HUM_TOL)->SetWindowText(str_text);
 
 	}
@@ -1662,18 +1649,14 @@ void CHumChamber::OnEnKillfocusTempTol()
     CString str_text;
 	GetDlgItem(IDC_TEMP_TOL)->GetWindowText(str_text);
    // AfxMessageBox(str_text);
-	str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+	//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
 	//AfxMessageBox(str_text);
 	temp_float=(float)_wtof(str_text);
 	m_temptolerance=(UINT)(temp_float*10);
-if (!WriteValueToRegID(TempTolerence.Start_ID,m_temptolerance))
-	{
-	    str_text+=_T("°C");
-	}
-else
-    {
-	  str_text.Format(_T("%0.1f°C"));
-	} 
+ WriteValueToRegID(TempTolerence.Start_ID,m_temptolerance);
+ 
+	  str_text.Format(_T("%0.1f°C"),( short)multi_register_value[TempTolerence.Start_ID]/10.0);
+	 
 	GetDlgItem(IDC_TEMP_TOL)->SetWindowText(str_text);
 }
 
@@ -1723,12 +1706,6 @@ void CHumChamber::OnEnKillfocusNumErrorSensor()
 
 void CHumChamber::OnEnKillfocusNumSensor()
 	{
-	//UpdateData(TRUE);
-	//if (!WriteValueToRegID(NumSensors.Start_ID,m_numsensors))
-	//	{
-	//	AfxMessageBox(_T("Try again"));
-	//	} 
-	//UpdateData(FALSE);
 		float temp_float;
 		CString str_text;
 		GetDlgItem(IDC_NUM_SENSOR)->GetWindowText(str_text);
@@ -1739,17 +1716,19 @@ void CHumChamber::OnEnKillfocusNumSensor()
 		str_text.Format(_T("%d"),(multi_register_value[NumSensors.Start_ID])); 
 		GetDlgItem(IDC_NUM_SENSOR)->SetWindowText(str_text);
 
+		FreshGrid();
 	}
 BEGIN_EVENTSINK_MAP(CHumChamber, CFormView)
 	ON_EVENT(CHumChamber, IDC_MSFLEXGRID_INPUT3, DISPID_DBLCLICK, CHumChamber::DblClickMsflexgridInput3, VTS_NONE)
 //    ON_EVENT(CHumChamber, IDC_MSFLEXGRID_INPUT3, DISPID_KEYUP, CHumChamber::KeyUpMsflexgridInput3, VTS_PI2 VTS_I2)
 //ON_EVENT(CHumChamber, IDC_MSFLEXGRID_INPUT3, DISPID_KEYDOWN, CHumChamber::KeyDownMsflexgridInput3, VTS_PI2 VTS_I2)
-ON_EVENT(CHumChamber, IDC_MSFLEXGRID_INPUT3, 70, CHumChamber::RowColChangeMsflexgridInput3, VTS_NONE)
+//ON_EVENT(CHumChamber, IDC_MSFLEXGRID_INPUT3, 70, CHumChamber::RowColChangeMsflexgridInput3, VTS_NONE)
 END_EVENTSINK_MAP()
 
 
 void CHumChamber::DblClickMsflexgridInput3()
 {
+
 long lRow,lCol;
 lRow = m_msflexgrid.get_RowSel();//获取点击的行号	
 lCol = m_msflexgrid.get_ColSel(); //获取点击的列号
@@ -1786,6 +1765,9 @@ CString str_text;
 WriteValueToRegID(CurrentTestSensor.Start_ID,temp);
 str_text.Format(_T("%d"),(multi_register_value[CurrentTestSensor.Start_ID])); 
 GetDlgItem(IDC_SENSOR_ID)->SetWindowText(str_text);
+
+Sleep(2000);
+Read_Multi(g_tstat_id,&multi_register_value[633],633,20);
 Update_SensorTable();
 }
 
@@ -1803,6 +1785,7 @@ void CHumChamber::OnBnClickedStart()
 			m_StartBtn.ShowWindow(FALSE);
 			m_StopBtn.ShowWindow(TRUE);
 			m_ContinueBtn.ShowWindow(FALSE);
+			 
 		}
 		
 		 
@@ -1862,43 +1845,43 @@ void CHumChamber::OnBnClickedContinue()
 //}
 
 
-void CHumChamber::RowColChangeMsflexgridInput3()
-{
-	long lRow,lCol;
-	lRow = m_msflexgrid.get_RowSel();//获取点击的行号	
-	lCol = m_msflexgrid.get_ColSel(); //获取点击的列号
-	if(lRow==0)
-		return;
-	CRect rect;
-	m_msflexgrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-	ScreenToClient(rect); //转换为客户区矩形	
-	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-	//需要将其转化为像素，1440缇= 1英寸
-	CDC* pDC =GetDC();
-	//计算象素点和缇的转换比例
-	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
-	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-	//计算选中格的左上角的坐标(象素为单位)
-	long y = m_msflexgrid.get_RowPos(lRow)/nTwipsPerDotY;
-	long x = m_msflexgrid.get_ColPos(lCol)/nTwipsPerDotX;
-	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
-	long width = m_msflexgrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
-	long height = m_msflexgrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-	//形成选中个所在的矩形区域
-	CRect rc(x,y,x+width,y+height);
-	//转换成相对对话框的坐标
-	rc.OffsetRect(rect.left+1,rect.top+1);
-	//获取选中格的文本信息	
-	CString strValue = m_msflexgrid.get_TextMatrix(lRow,lCol);
-	m_nCurRow=lRow;
-	m_nCurCol=lCol;
-
-
-	//write_one(g_tstat_id,CurrentTestSensor.Start_ID,m_nCurRow);
-	UINT temp=m_nCurRow;
-	CString str_text;
-	WriteValueToRegID(CurrentTestSensor.Start_ID,temp);
-	str_text.Format(_T("%d"),(multi_register_value[CurrentTestSensor.Start_ID])); 
-	GetDlgItem(IDC_SENSOR_ID)->SetWindowText(str_text);
-	Update_SensorTable(); 
-}
+//void CHumChamber::RowColChangeMsflexgridInput3()
+//{
+//	long lRow,lCol;
+//	lRow = m_msflexgrid.get_RowSel();//获取点击的行号	
+//	lCol = m_msflexgrid.get_ColSel(); //获取点击的列号
+//	if(lRow==0)
+//		return;
+//	CRect rect;
+//	m_msflexgrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+//	ScreenToClient(rect); //转换为客户区矩形	
+//	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
+//	//需要将其转化为像素，1440缇= 1英寸
+//	CDC* pDC =GetDC();
+//	//计算象素点和缇的转换比例
+//	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
+//	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+//	//计算选中格的左上角的坐标(象素为单位)
+//	long y = m_msflexgrid.get_RowPos(lRow)/nTwipsPerDotY;
+//	long x = m_msflexgrid.get_ColPos(lCol)/nTwipsPerDotX;
+//	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+//	long width = m_msflexgrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
+//	long height = m_msflexgrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+//	//形成选中个所在的矩形区域
+//	CRect rc(x,y,x+width,y+height);
+//	//转换成相对对话框的坐标
+//	rc.OffsetRect(rect.left+1,rect.top+1);
+//	//获取选中格的文本信息	
+//	CString strValue = m_msflexgrid.get_TextMatrix(lRow,lCol);
+//	m_nCurRow=lRow;
+//	m_nCurCol=lCol;
+//
+//
+//	//write_one(g_tstat_id,CurrentTestSensor.Start_ID,m_nCurRow);
+//	UINT temp=m_nCurRow;
+//	CString str_text;
+//	WriteValueToRegID(CurrentTestSensor.Start_ID,temp);
+//	str_text.Format(_T("%d"),(multi_register_value[CurrentTestSensor.Start_ID])); 
+//	GetDlgItem(IDC_SENSOR_ID)->SetWindowText(str_text);
+//	Update_SensorTable(); 
+//}

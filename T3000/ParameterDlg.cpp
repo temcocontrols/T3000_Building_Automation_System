@@ -1307,11 +1307,24 @@ void CParameterDlg::OnEnKillfocusSetvalue2()
 	int nValue=_wtoi(strText);
 
 
-	if(product_register_value[MODBUS_UNIVERSAL_SET]==nValue)	//Add this to judge weather this value need to change.
+	if(product_register_value[MODBUS_UNIVERSAL_SET]==(nValue*10))	//Add this to judge weather this value need to change.
 		return;
 
-	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_UNIVERSAL_SET,nValue*10,
-		product_register_value[MODBUS_UNIVERSAL_SET],this->m_hWnd,IDC_SETVALUE2,_T("UNIVERSAL SET"));
+	//Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_UNIVERSAL_SET,nValue*10,
+	//	product_register_value[MODBUS_UNIVERSAL_SET],this->m_hWnd,IDC_SETVALUE2,_T("UNIVERSAL SET"));
+
+	int ret=write_one(g_tstat_id,MODBUS_UNIVERSAL_SET,nValue*10);
+	if (ret>0)
+	{
+	product_register_value[MODBUS_UNIVERSAL_SET]=(nValue*10);
+	strText.Format(_T("%0.1f"),product_register_value[MODBUS_UNIVERSAL_SET]/10);
+	m_pid_setptEdt2.SetWindowText(strText);
+	} 
+	else
+	{
+	AfxMessageBox(_T("Fail!"));
+	}
+
 
 }
 
@@ -1786,6 +1799,7 @@ BOOL CParameterDlg::PreTranslateMessage(MSG* pMsg)
 
 void CParameterDlg::OnEnKillfocusSetvalue1()
 {
+//修改这个因为 用消息 一直在消息队列中，故而改成这种方式
 	if(g_ParamLevel==1)
 		return;
 	CString strText;
@@ -1799,23 +1813,66 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 	g_bPauseMultiRead = TRUE;	
 	if ((multi_register_value[7]==PM_TSTAT6)||(multi_register_value[7] == PM_TSTAT7))
 	{
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,345,short(fValue*10),
-			product_register_value[345],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));
+		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,345,short(fValue*10),
+			product_register_value[345],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));*/
+			if (product_register_value[345]!=short(fValue*10))
+			{			
+			int ret=write_one(g_tstat_id,345,short(fValue*10));
+			if (ret>0)
+			{
+				product_register_value[345]=short(fValue*10);
+			}
+			else
+			{
+				AfxMessageBox(_T("Fail!"));
+			}
+			strText.Format(_T("%0.1f"),(product_register_value[345]/10));
+			}
+
+		
+
 
 	}
 	else if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E)  // 只有5E使用135
 	{
 		//short nVal = short(fValue);
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,135,short(fValue),
-			product_register_value[380],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));
-		//write_one(g_tstat_id, 135, nVal);
+		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,135,short(fValue),
+			product_register_value[380],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));*/
+			if (product_register_value[135]!=short(fValue))
+			{		
+			int ret=write_one(g_tstat_id, 135, short(fValue));
+			if (ret>0)
+			{
+				product_register_value[135]=short(fValue);
+			} 
+			else
+			{
+				AfxMessageBox(_T("Fail!"));
+			}
+			strText.Format(_T("%0.1f"),(product_register_value[135]));
+			}
+	
 	}
 	else
 	{
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,374,short(fValue*10),
-			product_register_value[380],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));
-		//write_one(g_tstat_id, 374,short(fValue*10));
+	/*	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,374,short(fValue*10),
+			product_register_value[380],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));*/
+			if (product_register_value[374]!=short(fValue*10))
+			{		
+			int ret=write_one(g_tstat_id, 374,short(fValue*10));
+			if (ret>0)
+			{
+				product_register_value[374]=short(fValue*10);
+			}
+			else
+			{
+				AfxMessageBox(_T("Fail!"));
+			}
+			strText.Format(_T("%0.1f"),(product_register_value[374]));
+			}
+	
 	}
+	m_pid_setptEdt1.SetWindowText(strText);
 	g_bPauseMultiRead = FALSE;
 }
 
