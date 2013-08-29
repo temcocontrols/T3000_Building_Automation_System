@@ -226,7 +226,7 @@ void LoadReadMultiData(unsigned char device_var,unsigned short *put_data_into_he
 							}
 							if (outsideRange == 0)
 							{
-								*((short int*)gridData + k) = *((short int*)put_data_into_here + j);
+								*((short int*)gridData + k) = *((short int*)put_data_into_here + k);
 								k++;
 							}
 						}
@@ -267,7 +267,7 @@ void LoadWriteMultiData(unsigned char device_var, unsigned char *to_write, unsig
 							}
 							if (outsideRange == 0)
 							{
-								*((short int*)gridData + k) = *((short int*)to_write + j);
+								*((short int*)gridData + k) = *((short int*)to_write + k);
 								k++;
 							}
 						}

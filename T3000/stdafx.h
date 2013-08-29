@@ -21,7 +21,7 @@
 #define  WM_REFRESH_BAC_INPUT_LIST WM_USER + 201
 #define  WM_REFRESH_BAC_PROGRAM_LIST WM_USER + 203
 
-#define  WM_REDROW_BAC_IN_LIST WM_USER + 202
+#define  WM_LIST_ITEM_CHANGED WM_USER + 202
 #include "targetver.h"
 
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
@@ -131,12 +131,16 @@ INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here
 #include <afxdhtml.h>
 using namespace std;  // Ensure that the namespace is set to std
 
-#define CUSTOM_TABLE_FLOAT_VERSION 50.1
-#define SETPOINT_SPECIAL_VERSION	50
-#define  WM_REFRESH_BAC_INPUT_LIST WM_USER + 201
-#define  WM_REFRESH_BAC_PROGRAM_LIST WM_USER + 203
+#define		CUSTOM_TABLE_FLOAT_VERSION					50.1
+#define		SETPOINT_SPECIAL_VERSION					50
+#define		WM_REFRESH_BAC_INPUT_LIST					WM_USER + 201
 
-#define  WM_REDROW_BAC_IN_LIST WM_USER + 202
+#define		WM_REFRESH_BAC_PROGRAM_LIST					WM_USER + 203
+#define		WM_REFRESH_BAC_PROGRAM_RICHEDIT				WM_USER + 204
+#define		WM_REFRESH_BAC_VARIABLE_LIST				WM_USER + 205
+#define		WM_REFRESH_BAC_OUTPUT_LIST					WM_USER + 206
+
+
 
 
 //#pragma warning(disable:4244)

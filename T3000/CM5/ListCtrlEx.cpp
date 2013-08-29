@@ -1145,7 +1145,7 @@ void ListCtrlEx::CListCtrlEx::OnLvnEndlabeledit(NMHDR *pNMHDR, LRESULT *pResult)
 	GetParent()->SendMessage(WM_VALIDATE, GetDlgCtrlID(), (LPARAM)pDispInfo); 
 	Changed_item = pDispInfo->item.iItem;
 	Changed_subitem = pDispInfo->item.iSubItem;
-	::PostMessage(g_hwnd_now,WM_REDROW_BAC_IN_LIST,Changed_item,Changed_subitem);
+	::PostMessage(g_hwnd_now,WM_LIST_ITEM_CHANGED,Changed_item,Changed_subitem);
 	*pResult = 0;
 }
 

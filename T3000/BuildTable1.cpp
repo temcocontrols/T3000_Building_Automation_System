@@ -161,8 +161,8 @@ void CBuildTable1::to_fresh()
 // 		}
 // 		else
 // 		{
-			m_nMax=multi_register_value[MODBUS_TABLE1_FIVE]/10;
-			m_nMin=multi_register_value[MODBUS_TABLE1_ZERO]/10;
+			m_nMax=product_register_value[MODBUS_TABLE1_FIVE]/10;
+			m_nMin=product_register_value[MODBUS_TABLE1_ZERO]/10;
 		/*}*/
 	}
 	else if (m_InputNo==3)
@@ -181,8 +181,8 @@ void CBuildTable1::to_fresh()
 // 		}
 // 		else
 // 		{
-			m_nMax=multi_register_value[MODBUS_TABLE2_FIVE]/10;
-			m_nMin=multi_register_value[MODBUS_TABLE2_ZERO]/10;
+			m_nMax=product_register_value[MODBUS_TABLE2_FIVE]/10;
+			m_nMin=product_register_value[MODBUS_TABLE2_ZERO]/10;
 		/*}*/
 
 
@@ -294,21 +294,21 @@ void CBuildTable1::to_fresh()
 // 		}
 // 		else//<CUSTOM_TABLE_FLOAT_VERSION
 // 		{
-			m_slider1_i=multi_register_value[MODBUS_TABLE1_ZERO]/10;
-			m_slider2_i=multi_register_value[MODBUS_TABLE1_HALFONE]/10;
-			m_slider3_i=multi_register_value[MODBUS_TABLE1_ONE]/10;
-			m_slider4_i=multi_register_value[MODBUS_TABLE1_HALFTWO]/10;
-			m_slider5_i=multi_register_value[MODBUS_TABLE1_TWO]/10;
-			m_slider6_i=multi_register_value[MODBUS_TABLE1_HALFTHREE]/10;
-			m_slider7_i=multi_register_value[MODBUS_TABLE1_THREE]/10;
-			m_slider8_i=multi_register_value[MODBUS_TABLE1_HALFFOUR]/10;
-			m_slider9_i=multi_register_value[MODBUS_TABLE1_FOUR]/10;
-			m_slider10_i=multi_register_value[MODBUS_TABLE1_HALFFIVE]/10;
-			m_slider11_i=multi_register_value[MODBUS_TABLE1_FIVE]/10;
+		m_slider1_i=product_register_value[MODBUS_TABLE1_ZERO]/10;
+		m_slider2_i=product_register_value[MODBUS_TABLE1_HALFONE]/10;
+			m_slider3_i=product_register_value[MODBUS_TABLE1_ONE]/10;
+			m_slider4_i=product_register_value[MODBUS_TABLE1_HALFTWO]/10;
+			m_slider5_i=product_register_value[MODBUS_TABLE1_TWO]/10;
+			m_slider6_i=product_register_value[MODBUS_TABLE1_HALFTHREE]/10;
+			m_slider7_i=product_register_value[MODBUS_TABLE1_THREE]/10;
+			m_slider8_i=product_register_value[MODBUS_TABLE1_HALFFOUR]/10;
+			m_slider9_i=product_register_value[MODBUS_TABLE1_FOUR]/10;
+			m_slider10_i=product_register_value[MODBUS_TABLE1_HALFFIVE]/10;
+			m_slider11_i=product_register_value[MODBUS_TABLE1_FIVE]/10;
 		//}
 	//	UpdateData(FALSE);
-		int m_271=multi_register_value[MODBUS_UNITS1_HIGH];
-		int m_272=multi_register_value[MODBUS_UNITS1_LOW];
+		int m_271=product_register_value[MODBUS_UNITS1_HIGH];
+		int m_272=product_register_value[MODBUS_UNITS1_LOW];
 		if(m_271>>8=='0')
 		{
 			if((m_271 & 0xFF) =='0')
@@ -395,23 +395,23 @@ void CBuildTable1::to_fresh()
 // 		}
 // 		else//<CUSTOM_TABLE_FLOAT_VERSION
 // 		{
-			m_slider1_i=multi_register_value[MODBUS_TABLE2_ZERO]/10;
-			m_slider2_i=multi_register_value[MODBUS_TABLE2_HALFONE]/10;
-			m_slider3_i=multi_register_value[MODBUS_TABLE2_ONE]/10;
-			m_slider4_i=multi_register_value[MODBUS_TABLE2_HALFTWO]/10;
-			m_slider5_i=multi_register_value[MODBUS_TABLE2_TWO]/10;
-			m_slider6_i=multi_register_value[MODBUS_TABLE2_HALFTHREE]/10;
-			m_slider7_i=multi_register_value[MODBUS_TABLE2_THREE]/10;
-			m_slider8_i=multi_register_value[MODBUS_TABLE2_HALFFOUR]/10;
-			m_slider9_i=multi_register_value[MODBUS_TABLE2_FOUR]/10;
-			m_slider10_i=multi_register_value[MODBUS_TABLE2_HALFFIVE]/10;
-			m_slider11_i=multi_register_value[MODBUS_TABLE2_FIVE]/10;
+			m_slider1_i=product_register_value[MODBUS_TABLE2_ZERO]/10;
+			m_slider2_i=product_register_value[MODBUS_TABLE2_HALFONE]/10;
+			m_slider3_i=product_register_value[MODBUS_TABLE2_ONE]/10;
+			m_slider4_i=product_register_value[MODBUS_TABLE2_HALFTWO]/10;
+			m_slider5_i=product_register_value[MODBUS_TABLE2_TWO]/10;
+			m_slider6_i=product_register_value[MODBUS_TABLE2_HALFTHREE]/10;
+			m_slider7_i=product_register_value[MODBUS_TABLE2_THREE]/10;
+			m_slider8_i=product_register_value[MODBUS_TABLE2_HALFFOUR]/10;
+			m_slider9_i=product_register_value[MODBUS_TABLE2_FOUR]/10;
+			m_slider10_i=product_register_value[MODBUS_TABLE2_HALFFIVE]/10;
+			m_slider11_i=product_register_value[MODBUS_TABLE2_FIVE]/10;
 
 		//}
 
 
-		int m_273=multi_register_value[MODBUS_UNITS2_HIGH];
-		int m_274=multi_register_value[MODBUS_UNITS2_LOW];
+		int m_273=product_register_value[MODBUS_UNITS2_HIGH];
+		int m_274=product_register_value[MODBUS_UNITS2_LOW];
 		if(m_273>>8=='0')
 		{
 			if((m_273 & 0xFF)=='0')
@@ -2079,8 +2079,8 @@ void CBuildTable1::refresh()
 	if(m_InputNo==2)
 	{//table1 is click
 
-		int m_271=multi_register_value[MODBUS_UNITS1_HIGH];
-		int m_272=multi_register_value[MODBUS_UNITS1_LOW];
+		int m_271=product_register_value[MODBUS_UNITS1_HIGH];
+		int m_272=product_register_value[MODBUS_UNITS1_LOW];
 		if(m_271>>8=='0')
 		{
 			if((m_271 & 0xFF) =='0')
@@ -2099,8 +2099,8 @@ void CBuildTable1::refresh()
 	else if(m_InputNo==3)
 	{
 		//table2 is click
-		int m_273=multi_register_value[MODBUS_UNITS2_HIGH];
-		int m_274=multi_register_value[MODBUS_UNITS2_LOW];
+		int m_273=product_register_value[MODBUS_UNITS2_HIGH];
+		int m_274=product_register_value[MODBUS_UNITS2_LOW];
 		if(m_273>>8=='0')
 		{
 			if((m_273 & 0xFF)=='0')

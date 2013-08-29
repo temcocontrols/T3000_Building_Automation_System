@@ -13,10 +13,9 @@
 IMPLEMENT_DYNAMIC(CDisplayConfig, CDialog)
 CDisplayConfig::CDisplayConfig(CWnd* pParent /*=NULL*/)
 	: CDialog(CDisplayConfig::IDD, pParent)
-	 
-	{
-	/*m_display_number=15;*/
-	}
+{
+/*m_display_number=15;*/
+}
 
 CDisplayConfig::~CDisplayConfig()
 {
@@ -68,7 +67,8 @@ END_MESSAGE_MAP()
 
 
  
-CString CDisplayConfig::GetTextReg(unsigned short reg){
+CString CDisplayConfig::GetTextReg(unsigned short reg)
+{
 	CString str_temp;
 	unsigned short temp_buffer[4];
 	unsigned short temp_buffer_Char[THE_CHAR_LENGTH];
@@ -160,51 +160,53 @@ CString CDisplayConfig::GetSel(int ID)
 //m_ItemValueCombx.AddString(_T("CLOCK DATE"));
 //m_ItemValueCombx.AddString(_T("CLOCK TIME"));
   switch(ID)
-  {
-    case 0:
+  { case 0:
+      selection=_T("None");
+	  break;
+    case 1:
 	 selection=_T("temperature");
 	 break;
-	case 1:
+	case 2:
 		selection=_T("setpoint");
 		break;
-	case 2:
+	case 3:
 		selection=_T("AI1");
 		break;
-	case 3:
+	case 4:
 		selection=_T("AI2");
 		break;
-	case 4:
+	case 5:
 		selection=_T("AI3");
 		break;
-	case 5:
+	case 6:
 		selection=_T("AI4");
 		break;
-	case 6:
+	case 7:
 		selection=_T("AI5");
 		break;
-	case 7:
+	case 8:
 		selection=_T("AI6");
 		break;
-	case 8:
+	case 9:
 		selection=_T("AI7");
 		break;
-	case 9:
+	case 10:
 		selection=_T("AI8");
 		break;
-	case 10:
+	case 11:
 		selection=_T("MODE");
 		break;
-	case 11:
+	case 12:
 		selection=_T("USER INFO");
 		break;
-	case 12:
+	case 13:
 		selection=_T("CLOCK DATE");
 		break;
-	case 13:
+	case 14:
 		selection=_T("CLOCK TIME");
 		break;
 	default:
-		selection=_T("temperature");
+		selection=_T("None");
 		break;
   }
   return selection;
@@ -298,6 +300,7 @@ if(g_OutPutLevel==1)
 		14:CLOCK TIME (TBD:OUTPUT)
 		*/
 		m_ItemValueCombx.ResetContent();
+		m_ItemValueCombx.AddString(_T("None"));
 		m_ItemValueCombx.AddString(_T("temperature"));
 		m_ItemValueCombx.AddString(_T("setpoint"));
 		m_ItemValueCombx.AddString(_T("AI1"));
