@@ -45,6 +45,7 @@ public:
 //	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedButtonCm5Programing();
 	afx_msg void OnBnClickedButtonCm5Output();
+	afx_msg void OnBnClickedButtonCm5Variable();
 };
 static void Init_Service_Handlers(void);
 

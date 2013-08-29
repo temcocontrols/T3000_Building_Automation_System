@@ -92,6 +92,7 @@ public:
 	CButton btnConfig4;
 	CButton btnConfig5;
 	void updateStaticConfig(int configNo, int noRowsUpdate = 0);
+	void updateBtnLabel(int configNo);
 	CStatic staticConfig1;
 	CStatic staticConfig2;
 	CStatic staticConfig3;
@@ -119,9 +120,10 @@ public:
 	CStatic staticRunning4;
 	CStatic staticRunning5;
 	void callMbFunc(int slotNo);
-	void convertFunction(int convType, unsigned short val, CString *str);
+	CString convertFunction(int convType, unsigned short val);
 	afx_msg void OnFileSave();
 	afx_msg void OnFileOpen();
 	void saveRegNames();
 	void restoreRegNames();
+	CStatic staticConnectionStatus;
 };

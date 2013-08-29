@@ -1,5 +1,6 @@
 // CO2_View.cpp : implementation file
-//
+// CO2 coded by Fance 2013 07 20
+// Already finished CO2 with RS485.
 
 #include "stdafx.h"
 #include "T3000.h"
@@ -80,7 +81,7 @@ BEGIN_MESSAGE_MAP(CCO2_View, CFormView)
 	ON_BN_CLICKED(IDC_RADIO_ALARM_MANUAL, &CCO2_View::OnBnClickedRadioAlarmManual)
 	ON_BN_CLICKED(IDC_RADIO_ALARM_AUTO, &CCO2_View::OnBnClickedRadioAlarmAuto)
 	ON_CBN_SELCHANGE(IDC_CO2_ALARM_STATE, &CCO2_View::OnCbnSelchangeCo2AlarmState)
-	ON_MESSAGE(WM_REDROW_BAC_IN_LIST,Save_List_Item)	
+	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Save_List_Item)	
 	ON_NOTIFY(NM_KILLFOCUS, IDC_CO2_DATETIMEPICKER1, &CCO2_View::OnNMKillfocusCo2Datetimepicker1)
 	ON_NOTIFY(NM_KILLFOCUS, IDC_CO2_DATETIMEPICKER_TIME, &CCO2_View::OnNMKillfocusCo2DatetimepickerTime)
 	ON_BN_CLICKED(IDC_BUTTON_CO2_SYNC_TIME, &CCO2_View::OnBnClickedButtonCo2SyncTime)
@@ -94,6 +95,8 @@ BEGIN_MESSAGE_MAP(CCO2_View, CFormView)
 	ON_EN_KILLFOCUS(IDC_CO2_ALARM_ON_TIME, &CCO2_View::OnEnKillfocusCo2AlarmOnTime)
 	ON_EN_KILLFOCUS(IDC_CO2_ALARM_OFF_TIME, &CCO2_View::OnEnKillfocusCo2AlarmOffTime)
 	ON_BN_CLICKED(IDC_BTN_CO2_CLEAR_CAL, &CCO2_View::OnBnClickedBtnCo2ClearCal)
+	ON_BN_CLICKED(IDC_RADIO_HUMIDITY_HEAT_ENABLE, &CCO2_View::OnBnClickedRadioHumidityHeatEnable)
+	ON_BN_CLICKED(IDC_RADIO_HUMIDITY_HEAT_DISABLE, &CCO2_View::OnBnClickedRadioHumidityHeatDisable)
 END_MESSAGE_MAP()
 
 
@@ -170,6 +173,20 @@ void CCO2_View::Fresh()
 		((CButton *)GetDlgItem(IDC_RADIO_PASSWORD_DISABLE))->SetCheck(1);
 		(GetDlgItem(IDC_EDIT_CO2_PASSWOR)->EnableWindow(FALSE));
 	}
+
+
+	if(product_register_value[CO2_485_MODBUS_HUM_SENSOR_HEATING] == 1)
+	{
+		((CButton *)GetDlgItem(IDC_RADIO_HUMIDITY_HEAT_ENABLE))->SetCheck(1);
+		((CButton *)GetDlgItem(IDC_RADIO_HUMIDITY_HEAT_DISABLE))->SetCheck(0);
+	}
+	else
+	{
+		((CButton *)GetDlgItem(IDC_RADIO_HUMIDITY_HEAT_ENABLE))->SetCheck(0);
+		((CButton *)GetDlgItem(IDC_RADIO_HUMIDITY_HEAT_DISABLE))->SetCheck(1);
+	}
+
+
 
 	int cyear,cmonth,cday,chour,cmin,csec;
 	cyear = product_register_value[CO2_485_MODBUS_RTC_YEAR];
@@ -1105,4 +1122,26 @@ void CCO2_View::OnBnClickedBtnCo2ClearCal()
 	}
 	OnBnClickedBtnCo2Refresh();
 	SetPaneString(1,_T("Clear External Calibration Offset Success!! "));
+}
+
+
+void CCO2_View::OnBnClickedRadioHumidityHeatEnable()
+{
+	// TODO: Add your control notification handler code here
+	if(product_register_value[CO2_485_MODBUS_HUM_SENSOR_HEATING] != TRUE)
+	{
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_HUM_SENSOR_HEATING,1,
+			product_register_value[CO2_485_MODBUS_HUM_SENSOR_HEATING],this->m_hWnd,IDC_RADIO_HUMIDITY_HEAT_ENABLE,_T("Humidity Sensor Heating"));
+	}
+}
+
+
+void CCO2_View::OnBnClickedRadioHumidityHeatDisable()
+{
+	// TODO: Add your control notification handler code here
+	if(product_register_value[CO2_485_MODBUS_PASSWORD_ENABLE] != FALSE)
+	{
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_485_MODBUS_HUM_SENSOR_HEATING,0,
+			product_register_value[CO2_485_MODBUS_HUM_SENSOR_HEATING],this->m_hWnd,IDC_RADIO_HUMIDITY_HEAT_DISABLE,_T("Humidity Sensor Heating"));
+	}
 }

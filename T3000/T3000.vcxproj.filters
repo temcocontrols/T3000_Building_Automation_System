@@ -34,6 +34,9 @@
     <Filter Include="singleslider">
       <UniqueIdentifier>{38d4558f-60de-4677-87c1-5a273a6fc23a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CM5\CM5_H">
+      <UniqueIdentifier>{f1c0a87b-351f-4535-a9ab-10e2bb3a8940}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="5EInputDialog.cpp">
@@ -309,21 +312,6 @@
     <ClCompile Include="BacnetInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BacnetInput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BacnetOutput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BacnetProgram.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BacnetVariable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DialogCM5_BacNet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MBP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -362,6 +350,27 @@
     </ClCompile>
     <ClCompile Include="T328IN.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\BacNetProgram_transplant.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetProgramEdit.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetInput.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetOutput.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetProgram.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetVariable.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogCM5_BacNet.cpp">
+      <Filter>CM5</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -516,6 +525,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\annual.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\OK.ico">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
@@ -784,15 +796,6 @@
     <ClInclude Include="ADO\ADO.h">
       <Filter>CADO</Filter>
     </ClInclude>
-    <ClInclude Include="CM5\DialogCM5.h">
-      <Filter>CM5</Filter>
-    </ClInclude>
-    <ClInclude Include="CM5\SliderBoth.h">
-      <Filter>CM5</Filter>
-    </ClInclude>
-    <ClInclude Include="CM5\SliderBothBtn.h">
-      <Filter>CM5</Filter>
-    </ClInclude>
     <ClInclude Include="AirQuality\AirQuality.h">
       <Filter>AirQuality</Filter>
     </ClInclude>
@@ -810,24 +813,6 @@
     </ClInclude>
     <ClInclude Include="IONameConfig.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CM5\user_data.h">
-      <Filter>CM5</Filter>
-    </ClInclude>
-    <ClInclude Include="CM5\ListCtrlCellEx.h">
-      <Filter>CM5</Filter>
-    </ClInclude>
-    <ClInclude Include="CM5\ListCtrlEx.h">
-      <Filter>CM5</Filter>
-    </ClInclude>
-    <ClInclude Include="CM5\MyOwnListCtrl.h">
-      <Filter>CM5</Filter>
-    </ClInclude>
-    <ClInclude Include="CM5\PerfTimer.h">
-      <Filter>CM5</Filter>
-    </ClInclude>
-    <ClInclude Include="CM5\ud_str.h">
-      <Filter>CM5</Filter>
     </ClInclude>
     <ClInclude Include="DialogCM5_BacNet.h">
       <Filter>Header Files</Filter>
@@ -894,6 +879,45 @@
     </ClInclude>
     <ClInclude Include="T328IN.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetProgramEdit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\DialogCM5.h">
+      <Filter>CM5\CM5_H</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\ListCtrlCellEx.h">
+      <Filter>CM5\CM5_H</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\ListCtrlEx.h">
+      <Filter>CM5\CM5_H</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\PARSER.H">
+      <Filter>CM5\CM5_H</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\ROUTER.H">
+      <Filter>CM5\CM5_H</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\PerfTimer.h">
+      <Filter>CM5\CM5_H</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\MyOwnListCtrl.h">
+      <Filter>CM5\CM5_H</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\SliderBoth.h">
+      <Filter>CM5\CM5_H</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\SliderBothBtn.h">
+      <Filter>CM5\CM5_H</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\T3000DEF.H">
+      <Filter>CM5\CM5_H</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\ud_str.h">
+      <Filter>CM5\CM5_H</Filter>
+    </ClInclude>
+    <ClInclude Include="CM5\user_data.h">
+      <Filter>CM5\CM5_H</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

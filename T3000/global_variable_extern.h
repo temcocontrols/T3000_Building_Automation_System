@@ -2,6 +2,9 @@
 
 #include "Bacnet_Include.h"
 #include "CM5\ud_str.h"
+
+
+
 extern int g_invoke_id;
 extern vector <int> Change_Color_ID;
 extern HANDLE hThread;
@@ -849,8 +852,13 @@ extern int MODBUS_RELAY_PWM_HIGH_DUTY                          ;
 #pragma region For_bacnet
 extern HWND      g_hwnd_now;
 extern HWND      m_input_dlg_hwnd;
+extern HWND      m_output_dlg_hwnd;
 extern HWND      m_pragram_dlg_hwnd;
+extern HWND      m_program_edit_hwnd;
+extern HWND      m_variable_dlg_hwnd;
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
+extern vector <Str_variable_point>  m_Variable_data;
+
 #pragma endregion For_bacnet

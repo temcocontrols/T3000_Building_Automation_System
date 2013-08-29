@@ -564,13 +564,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//InitTreeNodeConn();   //LSC
 
 	SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
-
+#ifndef Fance_Enable
 	m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
 	m_pRefreshThread->SetMainWnd(this);	
 
 	// 需要执行线程中的操作时
 	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
 	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
+#endif
 	//tstat6
 	Tstat6_func();//为TSTST6新寄存器用的。
 
@@ -1575,12 +1576,14 @@ void CMainFrame::OnConnect()
 					CString strInfo;
 					strInfo.Format((_T("Open IP:%s successful.")),build_info.strIp);//prompt info;
 					SetPaneString(1,strInfo);
+					connectionSuccessful = 1;
 				}
 				else
 				{
 					CString strInfo;
 					strInfo.Format((_T("Open IP:%s failed.")),build_info.strIp);//prompt info;
 					SetPaneString(1,strInfo);
+					connectionSuccessful = 0;
 				}
 
 			}
@@ -1603,13 +1606,15 @@ void CMainFrame::OnConnect()
 					//strInfo=_T("Open ")+build_info.strComPort+_T(" Failure!");
 					//strInfo.Format(_T("COM: %d Connected: No"), nComPort);		
 					strInfo.Format(_T("COM %d : Not available "), nComPort);
+					connectionSuccessful = 0;
 					//SetPaneCommunicationPrompt(strInfo);
 					SetPaneString(1, strInfo);
 				}
 				else
 				{
 					//strInfo=_T("Open ")+build_info.strComPort+_T(" Sucessful!");
-					strInfo.Format(_T("COM %d Connected: Yes"), nComPort);			
+					strInfo.Format(_T("COM %d Connected: Yes"), nComPort);	
+					connectionSuccessful = 1;
 					//SetPaneCommunicationPrompt(strInfo);
 					SetPaneString(1, strInfo);
 					Change_BaudRate(default_com1_port_baudrate);
@@ -1783,6 +1788,7 @@ void CMainFrame::OnDisconnect()
 	close_com();
 	
 	CString strInfo = _T("No Connnection");
+	connectionSuccessful = 0;
 	SetPaneString(1,strInfo);
 	strInfo = _T("Offline!");
 	SetPaneString(2,strInfo);
@@ -3999,7 +4005,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
    
 	//20120420
-	CDialog_Progess* pDlg = new CDialog_Progess(this,1,7);
+	CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
 	//创建对话框窗口
 	pDlg->Create(IDD_DIALOG10_Progress, this);
 
@@ -4187,7 +4193,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					memset(SerialNum,0,sizeof(SerialNum));
 					int nRet=0;//
 
-					nRet=Read_Multi(g_tstat_id,&SerialNum[0],0,4,3);
+					nRet=Read_Multi(g_tstat_id,&SerialNum[0],0,4,6);
 					UINT nSerialNumber=0;
 					if(nRet>0)
 					{
@@ -4241,59 +4247,117 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			multi_register_value_tcp
 			适用于网络口，大数据量
 			*/ 
-			if (m_isCM5&&(product_Node.BuildingInfo.strProtocol.CompareNoCase(_T("Modbus TCP"))==0))
+			if(product_Node.BuildingInfo.strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
 			{
-				register_critical_section.Lock();
-				int i;
-				int it = 0;
-				float progress;
-				for(i=0;i<80;i++)
-				{
-					//register_critical_section.Lock();
-					//int nStart = GetTickCount();
-					int itemp = 0;
-					itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100,3);
-					if(itemp == -2)
+			    if (m_isCM5)
+			    {
+					register_critical_section.Lock();
+					int i;
+					int it = 0;
+					float progress;
+					for(i=0;i<80;i++)
 					{
-						continue;
-					}
-					else						
-					{
-						if (pDlg!=NULL)
+						//register_critical_section.Lock();
+						//int nStart = GetTickCount();
+						int itemp = 0;
+						itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100,3);
+						if(itemp == -2)
 						{
-							progress=float(it+1);
-							pDlg->ShowProgress(int(progress/10),(int)progress);
-						} 
-					}							
-					it++;
-					Sleep(100);
-				}
-				//Add by Fance use this product_register_value to unite the register.
-				//Fance_2
-				//memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value_tcp,1024);
+							continue;
+						}
+						else						
+						{
+							if (pDlg!=NULL)
+							{
+								progress=float((it+1)*(100/80));
+								pDlg->ShowProgress(int(progress/10),(int)progress);
+							} 
+						}							
+						it++;
+						Sleep(100);
+					}
+					//Add by Fance use this product_register_value to unite the register.
+					//Fance_2
+					//memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value_tcp,1024);
 
-				if (it<80)
-				{	
-					AfxMessageBox(_T("Reading abnormal \n Try again!"));
-					pDlg->ShowWindow(SW_HIDE);
-					if(pDlg!=NULL)
-					delete pDlg;
-					pDlg=NULL;
+					if (it<80)
+					{	
+						AfxMessageBox(_T("Reading abnormal \n Try again!"));
+						pDlg->ShowWindow(SW_HIDE);
+						if(pDlg!=NULL)
+							delete pDlg;
+						pDlg=NULL;
 
-				}
-				else
+					}
+					else
+					{
+						pDlg->ShowProgress(100,100);
+						pDlg->ShowWindow(SW_HIDE);
+						if(pDlg!=NULL)
+							delete pDlg;
+						pDlg=NULL;
+					}
+					g_tstat_id_changed=FALSE;
+					register_critical_section.Unlock();
+			    }
+				else  //For Zigbee
 				{
-					pDlg->ShowProgress(100,100);
-					pDlg->ShowWindow(SW_HIDE);
-					if(pDlg!=NULL)
-					delete pDlg;
-					pDlg=NULL;
+		 
+					register_critical_section.Lock();
+					int i;
+					int it = 0;
+					float progress;
+					for(i=0;i<20;i++)	//暂定为0 ，因为TSTAT6 目前为600多
+					{
+						//register_critical_section.Lock();
+						//int nStart = GetTickCount();
+						int itemp = 0;
+						itemp = Read_Multi(g_tstat_id,&multi_register_value[i*30],i*30,30,5);
+						if(itemp == -2)
+						{
+							continue;
+						}
+						else						
+						{
+							if (pDlg!=NULL)
+							{
+								progress=float((it+1)*(100/20));
+								pDlg->ShowProgress(int(progress),int(progress));
+							} 						
+						it++;
+						Sleep(1500);
+						}							
+
+					}
+				
+					memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
+
+					if (it<20)
+					{	
+						AfxMessageBox(_T("Reading abnormal \n Try again!"));
+						pDlg->ShowWindow(SW_HIDE);
+						if(pDlg!=NULL)
+							delete pDlg;
+						pDlg=NULL;
+
+					}
+					else
+					{
+						pDlg->ShowProgress(100,100);
+						pDlg->ShowWindow(SW_HIDE);
+						if(pDlg!=NULL)
+							delete pDlg;
+						pDlg=NULL;
+					}
+					g_tstat_id_changed=FALSE;
+					register_critical_section.Unlock();
+
 				}
-				g_tstat_id_changed=FALSE;
-				register_critical_section.Unlock();
-			} 
+
+			} //COMPort
 			else
 			{
+
 				register_critical_section.Lock();
 				int i;
 				int it = 0;
@@ -4312,7 +4376,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 						if (pDlg!=NULL)
 						{
-							progress=float((it+1)*(100/16));
+							progress=float((it+1));
 							pDlg->ShowProgress(int(progress/10),int(progress));
 						} 
 					}							

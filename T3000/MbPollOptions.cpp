@@ -35,15 +35,14 @@ void CMbPollOptions::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_SCAN_RATE, staticScanRate);
 	DDX_Control(pDX, IDC_STATIC_SLAVE_ID, staticSlaveId);
 	DDX_Control(pDX, IDC_CHECK_ADDRESS_IN_CELL, checkAddressInCell);
-	DDX_Control(pDX, IDC_CHECK_DISABLE_ON_ERROR, checkDisableOnError);
 	DDX_Control(pDX, IDC_CHECK_HIDE_ALIAS_COLUMN, checkHideAliasColumn);
-	DDX_Control(pDX, IDC_CHECK_READ_WRITE_DISABLED, checkReadWriteDisabled);
 	DDX_Control(pDX, IDC_COMBO_DISPLAY, comboDisplay);
 	DDX_Control(pDX, IDC_RADIO_10, radio10);
 	DDX_Control(pDX, IDC_RADIO_100, radio100);
 	DDX_Control(pDX, IDC_RADIO_20, radio20);
 	DDX_Control(pDX, IDC_RADIO_50, radio50);
 	DDX_Control(pDX, IDC_RADIO_FIT_TO_QTY, radioFitToQty);
+	DDX_Control(pDX, IDC_CHECK_FUNCTION1, checkSingleFunction);
 }
 
 BEGIN_MESSAGE_MAP(CMbPollOptions, CDialog)
@@ -74,6 +73,7 @@ BOOL CMbPollOptions::OnInitDialog()
 	optionsQuantity = pollQuantity[curConf];
 	optionsScanRate = pollScanRate[curConf];
 	optionsRows = pollRows[curConf];
+	optionsSingleFunction = pollSingleFunction[curConf];
 	optionsDisplay = pollDisplay[curConf];
 	optionsHideAliasColumn = pollHideAliasColumn[curConf];
 	optionsAddressInCell = pollAddressInCell[curConf];
@@ -87,6 +87,17 @@ BOOL CMbPollOptions::OnInitDialog()
 	editQuantity.SetWindowText(tempStr);
 	tempStr.Format(_T("%d"), optionsScanRate);
 	editScanRate.SetWindowText(tempStr);
+	tempStr.Format(_T("%d"), optionsSingleFunction);
+	
+	if (optionsSingleFunction == 1)
+	{
+		checkSingleFunction.SetCheck(TRUE);
+	}
+	else
+	{
+		checkSingleFunction.SetCheck(FALSE);
+	}
+
 	radio10.SetCheck(optionsRows == 10);
 	radio20.SetCheck(optionsRows == 20);
 	radio50.SetCheck(optionsRows == 50);
@@ -150,6 +161,11 @@ void CMbPollOptions::OnOK()
 		pollScanRate[curConf] += modulus;
 	}
 
+	if (checkSingleFunction.GetCheck() == TRUE) 
+		pollSingleFunction[curConf] = 1;
+	else
+		pollSingleFunction[curConf] = 0;
+
 	if (radio10.GetCheck() == TRUE) pollRows[curConf] = 10;
 	if (radio20.GetCheck() == TRUE) pollRows[curConf] = 20;
 	if (radio50.GetCheck() == TRUE) pollRows[curConf] = 50;
@@ -176,6 +192,7 @@ void CMbPollOptions::OnCancel()
 	optionsQuantity = pollQuantity[curConf];
 	optionsScanRate = pollScanRate[curConf];
 	optionsRows = pollRows[curConf];
+	optionsSingleFunction = pollSingleFunction[curConf];
 	optionsDisplay = pollDisplay[curConf];
 	optionsHideAliasColumn = pollHideAliasColumn[curConf];
 	optionsAddressInCell = pollAddressInCell[curConf];*/
