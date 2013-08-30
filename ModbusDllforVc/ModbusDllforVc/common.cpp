@@ -1685,7 +1685,6 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 		m_osRead.Offset = 0;
 		m_osRead.OffsetHigh = 0 ;
 		////////////////////////////////////////////////clear com error
-
 		fState=ReadFile(m_hSerial,// 句柄
 			to_send_data,// 数据缓冲区地址
 			length*2+5,// 数据大小
@@ -1800,6 +1799,10 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 
 		Sleep(LATENCY_TIME_NET);
 		int nn=sizeof(to_Reive_data);
+
+		unsigned long bytes_available;
+		ioctlsocket(m_hSocket,FIONREAD,&bytes_available);
+		if (bytes_available == 0) return -1;
 		int nRecv = ::recv(m_hSocket, (char*)to_Reive_data, length*2+12, 0);
 
 		memcpy((void*)&to_send_data[0],(void*)&to_Reive_data[6],sizeof(to_Reive_data));

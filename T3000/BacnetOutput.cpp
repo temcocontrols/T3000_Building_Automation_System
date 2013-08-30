@@ -10,7 +10,9 @@
 #include "CM5/ud_str.h"
 #include "Bacnet_Include.h"
 #include "globle_function.h"
-// CBacnetOutput dialog
+#include "gloab_define.h"
+#include "BacnetRange.h"
+extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 
 IMPLEMENT_DYNAMIC(CBacnetOutput, CDialogEx)
 
@@ -133,6 +135,15 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			m_output_list.SetCellStringList(i, OUTPUT_AUTO_MANUAL, strlist);
 		}
 
+		if(ListCtrlEx::ComboBox == m_output_list.GetColumnType(OUTPUT_RANGE))
+		{
+			ListCtrlEx::CStrList strlist;
+			for (int i=0;i<(int)sizeof(Units_Type)/sizeof(Units_Type[0]);i++)
+			{
+				strlist.push_back(Units_Type[i]);
+			}
+			m_output_list.SetCellStringList(i, OUTPUT_RANGE, strlist);		
+		}
 		//if(ListCtrlEx::ComboBox == m_output_list.GetColumnType(OUTPUT_RANGE))
 		//{
 		//	ListCtrlEx::CStrList strlist;
@@ -260,7 +271,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		m_output_list.SetItemText(i,OUTPUT_LABLE,temp_des2);
 
 	}
-
+	copy_data_to_ptrpanel(TYPE_OUTPUT);
 	//MessageBox("1");
 	return 0;
 }
@@ -337,6 +348,72 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		{
 			m_output_list.SetCellEnabled(Changed_Item,OUTPUT_VALUE,1);
 		}
+	}
+	if(Changed_SubItem == OUTPUT_RANGE)
+	{
+		CString temp_cs = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
+		BacnetRange dlg;
+		if(temp_cs.CompareNoCase(Units_Type[0])==0)
+		{
+			bac_ranges_type = OUTPUT_RANGE_ANALOG_TYPE;
+			dlg.DoModal();
+			m_output_list.SetItemText(Changed_Item,OUTPUT_UNITE,Output_Analog_Units_Show[bac_range_number_choose]);		
+			m_output_list.SetItemText(Changed_Item,OUTPUT_0_PERSENT,_T("0"));
+			m_output_list.SetCellEnabled(Changed_Item,OUTPUT_0_PERSENT,1);
+			m_output_list.SetItemText(Changed_Item,OUTPUT_100_PERSENT,_T("10"));
+			m_output_list.SetCellEnabled(Changed_Item,OUTPUT_100_PERSENT,1);
+
+			m_output_list.SetItemText(Changed_Item,OUTPUT_VALUE,_T("0"));
+		}
+		else if(temp_cs.CompareNoCase(Units_Type[1])==0)
+		{
+			m_output_list.SetCellEnabled(Changed_Item,OUTPUT_VALUE,0);
+			bac_ranges_type = OUTPUT_RANGE_DIGITAL_TYPE;
+			dlg.DoModal();
+			m_output_list.SetItemText(Changed_Item,OUTPUT_0_PERSENT,_T(""));
+			m_output_list.SetCellEnabled(Changed_Item,OUTPUT_0_PERSENT,0);
+			m_output_list.SetItemText(Changed_Item,OUTPUT_100_PERSENT,_T(""));
+			m_output_list.SetCellEnabled(Changed_Item,OUTPUT_100_PERSENT,0);
+			if(bac_range_number_choose>=12)
+			{
+				CString temp1;
+				CStringArray temparray;
+				temp1 = Digital_Units_Array[bac_range_number_choose - 11];//11 is the sizeof the array
+				SplitCStringA(temparray,temp1,_T("/"));
+				if((temparray.GetSize()==2)&&(!temparray.GetAt(1).IsEmpty()))
+				{
+					m_output_list.SetItemText(Changed_Item,OUTPUT_VALUE,temparray.GetAt(1));
+				}
+				m_output_list.SetItemText(Changed_Item,OUTPUT_RANGE,temp1);
+			}
+			else if(bac_range_number_choose>=1)
+			{
+				CString temp1;
+				CStringArray temparray;
+				temp1 = Digital_Units_Array[bac_range_number_choose];
+				SplitCStringA(temparray,temp1,_T("/"));
+				if((temparray.GetSize()==2)&&(!temparray.GetAt(0).IsEmpty()))
+				{
+					m_output_list.SetItemText(Changed_Item,OUTPUT_VALUE,temparray.GetAt(0));
+				}
+				m_output_list.SetItemText(Changed_Item,OUTPUT_RANGE,temp1);
+			}
+			else
+			{
+				m_output_list.SetItemText(Changed_Item,OUTPUT_UNITE,Output_Analog_Units_Show[0]);
+			}
+
+		}
+		else if(temp_cs.CompareNoCase(Units_Type[2])==0)
+		{
+			bac_ranges_type = OUTPUT_RANGE_CUSTOM_DIG_TYPE;
+			dlg.DoModal();
+		}
+
+		
+		
+
+		
 	}
 
 	return 0;

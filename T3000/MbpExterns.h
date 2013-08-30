@@ -11,6 +11,7 @@ extern int optionsAddress;
 extern int optionsQuantity;
 extern int optionsScanRate;
 extern int optionsRows;
+extern int optionsSingleFunction;
 extern int optionsDisplay;
 extern int optionsHideAliasColumn;
 extern int optionsAddressInCell;
@@ -23,6 +24,7 @@ extern int pollAddress[MAX_GRIDS];
 extern int pollQuantity[MAX_GRIDS];
 extern unsigned int pollScanRate[MAX_GRIDS];
 extern int pollRows[MAX_GRIDS];
+extern int pollSingleFunction[MAX_GRIDS];
 extern int pollDisplay[MAX_GRIDS];
 extern int pollHideAliasColumn[MAX_GRIDS];
 extern int pollAddressInCell[MAX_GRIDS];
@@ -53,6 +55,10 @@ extern unsigned int mbpollErrCount[5];
 
 //extern CString* regNames[5];
 extern CString regNames;
+
+extern int connectionSuccessful;
+
+extern int executeOnce[5];
 
 extern void LoadReadOneData(int val, unsigned char device_var,unsigned short address);
 extern void LoadWriteOneData(int val, unsigned char device_var,unsigned short address);

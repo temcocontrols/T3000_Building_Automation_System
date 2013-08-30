@@ -132,10 +132,13 @@
     <ClCompile Include="BacnetOutput.cpp" />
     <ClCompile Include="BacnetProgram.cpp" />
     <ClCompile Include="BacnetProgramEdit.cpp" />
+    <ClCompile Include="BacnetRange.cpp" />
     <ClCompile Include="BacnetVariable.cpp" />
+    <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
     <ClCompile Include="CM5\BacNetProgram_transplant.cpp" />
+    <ClCompile Include="CM5\CStatic\staticex.cpp" />
     <ClCompile Include="CM5\ListCtrlCellEx.cpp" />
     <ClCompile Include="CM5\ListCtrlEx.cpp" />
     <ClCompile Include="CM5\MyOwnListCtrl.cpp" />
@@ -299,7 +302,9 @@
     <ClInclude Include="BacnetOutput.h" />
     <ClInclude Include="BacnetProgram.h" />
     <ClInclude Include="BacnetProgramEdit.h" />
+    <ClInclude Include="BacnetRange.h" />
     <ClInclude Include="BacnetVariable.h" />
+    <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
     <ClInclude Include="CM5\ListCtrlCellEx.h" />
     <ClInclude Include="CM5\ListCtrlEx.h" />
@@ -313,6 +318,7 @@
     <ClInclude Include="CO2_View.h" />
     <ClInclude Include="DialogCM5_BacNet.h" />
     <ClInclude Include="DisplayConfig.h" />
+    <ClInclude Include="gloab_define.h" />
     <ClInclude Include="IONameConfig.h" />
     <ClInclude Include="MBP.h" />
     <ClInclude Include="MbpDefines.h" />

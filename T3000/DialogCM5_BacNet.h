@@ -40,14 +40,25 @@ public:
 	void Initial_List();
 //	CMyOwnListCtrl m_device_list_info;
 	afx_msg LRESULT Fresh_UI(WPARAM wParam,LPARAM lParam);
-	
+	afx_msg LRESULT  AllMessageCallBack(WPARAM wParam, LPARAM lParam);
+	LRESULT Delete_Wait_Dlg(WPARAM wParam,LPARAM lParam);
 	afx_msg void OnBnClickedButtonCm5Advance();
 //	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedButtonCm5Programing();
 	afx_msg void OnBnClickedButtonCm5Output();
 	afx_msg void OnBnClickedButtonCm5Variable();
+	afx_msg void OnBnClickedButtonBacReadTotal();
+	static	DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid);
+
+	
 };
 static void Init_Service_Handlers(void);
+
+
+
+
+
+
 
 
 

@@ -49,5 +49,6 @@ public:
 	virtual void OnCancel();
 	CButton checkTapData;
 	afx_msg void OnCbnSelchangeComboFunction();
+	CButton checkSingleFunction;
 };
 

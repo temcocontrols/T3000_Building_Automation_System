@@ -9,8 +9,9 @@
 #include "CM5/ud_str.h"
 #include "Bacnet_Include.h"
 #include "globle_function.h"
-// CBacnetVariable dialog
-
+#include "gloab_define.h"
+#include "BacnetRange.h"
+extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 IMPLEMENT_DYNAMIC(CBacnetVariable, CDialogEx)
 
 CBacnetVariable::CBacnetVariable(CWnd* pParent /*=NULL*/)
@@ -53,7 +54,10 @@ BOOL CBacnetVariable::OnInitDialog()
 	if(g_invoke_id>=0)
 		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 
-
+	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_REFRESH);
+	((CButton *)GetDlgItem(IDC_BUTTON_VARIABLE_READ))->SetIcon(hIcon);	
+	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_OK);
+	((CButton *)GetDlgItem(IDC_BUTTON_VARIABLE_APPLY))->SetIcon(hIcon);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -123,6 +127,17 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 			m_variable_list.SetCellStringList(i, VARIABLE_AUTO_MANUAL, strlist);
 		}
 
+		if(ListCtrlEx::ComboBox == m_variable_list.GetColumnType(VARIABLE_UNITE))
+		{
+			ListCtrlEx::CStrList strlist;
+			for (int i=0;i<(int)sizeof(Units_Type)/sizeof(Units_Type[0]);i++)
+			{
+				strlist.push_back(Units_Type[i]);
+			}
+			m_variable_list.SetCellStringList(i, VARIABLE_UNITE, strlist);		
+		}
+
+
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).description, (int)strlen((char *)m_Variable_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
@@ -158,13 +173,47 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		m_variable_list.SetItemText(i,VARIABLE_LABLE,temp_des2);
 
 	}
-
+	copy_data_to_ptrpanel(TYPE_VARIABLE);
 	//MessageBox("1");
 	return 0;
 }
 LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 {
+	int Changed_Item = (int)wParam;
+	int Changed_SubItem = (int)lParam;
 
+
+	if(Changed_SubItem == VARIABLE_AUTO_MANUAL)
+	{
+		CString temp_cs = m_variable_list.GetItemText(Changed_Item,Changed_SubItem);
+		if(temp_cs.CompareNoCase(_T("Auto"))==0)
+		{
+			m_variable_list.SetCellEnabled(Changed_Item,VARIABLE_VALUE,0);
+		}
+		else
+		{
+			m_variable_list.SetCellEnabled(Changed_Item,VARIABLE_VALUE,1);
+		}
+	}
+	if(Changed_SubItem == VARIABLE_UNITE)
+	{
+		CString temp_cs = m_variable_list.GetItemText(Changed_Item,Changed_SubItem);
+		if(temp_cs.CompareNoCase(Units_Type[0])==0)
+		{
+			bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
+		}
+		else if(temp_cs.CompareNoCase(Units_Type[1])==0)
+		{
+			bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
+		}
+		else if(temp_cs.CompareNoCase(Units_Type[2])==0)
+		{
+			bac_ranges_type = VARIABLE_RANGE_CUSTOM_DIG_TYPE;
+		}
+
+		BacnetRange dlg;
+		dlg.DoModal();
+	}
 	return 0;
 }
 
@@ -184,10 +233,12 @@ void CBacnetVariable::OnBnClickedButtonVariableApply()
 		if(cs_temp.CompareNoCase(_T("Auto"))==0)
 		{
 			m_Variable_data.at(i).auto_manual=0;
+			m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,0);
 		}
 		else
 		{
 			m_Variable_data.at(i).auto_manual=1;
+			m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,1);
 		}
 
 
