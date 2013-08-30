@@ -998,6 +998,8 @@
 #define IDC_STATICDAY                   1569
 #define IDC_STATICNIGHT                 1570
 #define IDC_MASTER_ID                   1571
+#define IDC_SLIDER_DAY2                 1571
+#define IDC_SLIDER_DAY_CurrentTemp      1571
 #define IDC_TEMP1                       1572
 #define IDC_TEMP2                       1573
 #define IDC_FREQ1                       1574
@@ -1277,6 +1279,7 @@
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
 
+ #define       IDC_RANGECOMBO           57926
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
