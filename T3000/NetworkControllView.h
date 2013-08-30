@@ -113,10 +113,14 @@ public:
 
 
 	}subnetwork;
+	typedef struct SubnetTstat
+	{
+	  CString ID;
+	  CString SN;
+	}SubnetDevice;
 
-
-	vector<subnetwork>_subnetwork;
-	subnetwork m_subetwork;
+	vector<SubnetDevice>_subnetwork;
+	SubnetDevice m_subetwork;
 	afx_msg void OnBnClickedButton1();
 };
 

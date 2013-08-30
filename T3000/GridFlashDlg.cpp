@@ -361,26 +361,107 @@
 
 				switch(m_grid_flash.at(i).device)
 				{
-					case 2:stemp=g_strTstat5a;break;//Tstat5A
-					case 1:stemp=g_strTstat5b;break;//Tstat5A
-					case 3:stemp=g_strTstat5b;break;//Tstat5A
-					case 4:stemp=g_strTstat5c;break;//Tstat5A
-					case 12:stemp=g_strTstat5d;break;//Tstat5A
-					case 17:stemp=g_strTstat5f;break;
-					case 18:stemp=g_strTstat5g;break;
-					case 16:stemp=g_strTstat5e;break;
-					case 19:stemp=g_strTstat5h;break;
-					case 26:stemp=g_strTstat6;break;
-					case 27:stemp=g_strTstat7;break;
-					case PM_NC:stemp=g_strnetWork;break;
-					case LED_PRODUCT_MODEL:stemp=_T("Led");break;//Others
-					case PM_SOLAR:			stemp=_T("Solar");break;
-					case PM_ZIGBEE:			stemp=_T("ZigBee");break;
-					case T3_32I_PRODUCT_MODEL:stemp=_T("T3-32I");break;
-					case T3_8I_16O_PRODUCT_MODEL:stemp=_T("T3-8I-16O");break;
-					case PM_T3IOA:stemp=_T("T3-8IOA");break;
-					case PM_T38AIOD:stemp=_T("T3-8IOD");break;
-					default:stemp=_T("Others");break;
+					//case 2:stemp=g_strTstat5a;break;//Tstat5A
+					//case 1:stemp=g_strTstat5b;break;//Tstat5A
+					//case 3:stemp=g_strTstat5b;break;//Tstat5A
+					//case 4:stemp=g_strTstat5c;break;//Tstat5A
+					//case 12:stemp=g_strTstat5d;break;//Tstat5A
+					//case 17:stemp=g_strTstat5f;break;
+					//case 18:stemp=g_strTstat5g;break;
+					//case 16:stemp=g_strTstat5e;break;
+					//case 19:stemp=g_strTstat5h;break;
+					//case 6:stemp=g_strTstat6;break;
+					//case 7:stemp=g_strTstat7;break;
+					//case PM_NC:stemp=g_strnetWork;break;
+					//case LED_PRODUCT_MODEL:stemp=_T("Led");break;//Others
+					//case PM_SOLAR:			stemp=_T("Solar");break;
+					//case PM_ZIGBEE:			stemp=_T("ZigBee");break;
+					//case T3_32I_PRODUCT_MODEL:stemp=_T("T3-32I");break;
+					//case T3_8I_16O_PRODUCT_MODEL:stemp=_T("T3-8I-16O");break;
+					//case PM_T3IOA:stemp=_T("T3-8IOA");break;
+					//case PM_T38AIOD:stemp=_T("T3-8IOD");break;
+					//default:stemp=_T("Others");break;
+				case PM_TSTAT5A:
+					stemp="TStat5A";
+					break;
+				case PM_TSTAT5B:
+					stemp="TStat5B";
+					break;
+				case PM_TSTAT5B2:
+					stemp="TStat5B2";
+					break;
+				case PM_TSTAT5C:
+					stemp="TStat5C";
+					break;
+				case PM_TSTAT5D:
+					stemp="TStat5D";
+					break;
+				case PM_TSTAT5E:
+					stemp="TStat5E";
+					break;
+				case PM_TSTAT5F:
+					stemp="TStat5F";
+					break;
+				case PM_TSTAT5G:
+					stemp="TStat5G";
+					break;
+				case PM_TSTAT5H:
+					stemp="TStat5H";
+					break;
+				case PM_TSTAT6:
+					stemp="TStat6";
+					break;
+				case PM_TSTAT7:
+					stemp="TStat7";
+					break;
+				case PM_NC:
+					stemp="NC";
+					break;
+				case PM_CM5:
+					stemp ="CM5";
+					break;
+				case PM_LightingController:
+					stemp = "LC";
+					break;
+				case  PM_CO2_NET:
+					stemp = "CO2 Net";
+					break;
+				case  PM_CO2_RS485:
+					stemp = "CO2";
+					break;
+				case PM_TSTAT6_HUM_Chamber:
+					stemp =g_strHumChamber;
+					break;
+
+				case PM_T38AIOD :
+					stemp="T3-8I13O";
+					break;
+				case PM_T3IOA :
+					stemp="T3-8IOA";
+					break;
+				case PM_T332AI :
+					stemp="T3-32AI";
+					break;
+				case PM_T3AI16O :
+					stemp="T3-8AI160";
+					break;
+				case PM_T38I13O :
+					stemp="T3-8I13O";
+					break;
+				case PM_T3PERFORMANCE :
+					stemp="T3-Performance";
+					break;
+				case PM_T34AO :
+					stemp="T3-4AO";
+					break;
+				case PM_T36CT :
+					stemp="T3-6CT";
+					break;
+				default:
+					stemp="TStat";
+					break;
+
+
 				}
 				m_FlexGrid.put_TextMatrix(i+1,5,stemp);//product model ===== software version
 				if(m_grid_flash.at(i).software_version==p_mode)
