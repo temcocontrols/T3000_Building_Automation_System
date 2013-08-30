@@ -9,10 +9,15 @@
 #include "Bacnet_Include.h"
 #include "globle_function.h"
 #include <math.h>
+
+#include "gloab_define.h"
+extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
+
 //extern  Str_in_point m_Input_data[100];
 //extern int m_Input_data_length;
 //extern HWND m_input_dlg_hwnd;
 // CBacnetInput dialog
+
 
 IMPLEMENT_DYNAMIC(CBacnetInput, CDialogEx)
 
@@ -21,6 +26,7 @@ CBacnetInput::CBacnetInput(CWnd* pParent /*=NULL*/)
 {
 
 }
+
 
 CBacnetInput::~CBacnetInput()
 {
@@ -393,9 +399,9 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des2.ReleaseBuffer();
 		m_input_list.SetItemText(i,INPUT_LABLE,temp_des2);
-
+		//ptr_panel
 	}
-
+	copy_data_to_ptrpanel(TYPE_INPUT);
 	//MessageBox("1");
 	return 0;
 }

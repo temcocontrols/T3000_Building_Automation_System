@@ -6060,7 +6060,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 				MessageInvokeODInfo *My_Invoke_Struct = (_MessageInvokeIDInfo *)msg.wParam;
 				My_Receive_msg.erase(My_Receive_msg.begin());
 				MyCriticalSection.Unlock();
-				for (int i=0;i<2000;i++)
+				for (int i=0;i<3000;i++)
 				{
 					if(tsm_invoke_id_free(My_Invoke_Struct->Invoke_ID))
 					{

@@ -1,5 +1,6 @@
 #pragma once
-
+#include "afxwin.h"
+#include "CM5\CStatic\staticex.h"
 const int KEY_F2 = 1002;
 const int KEY_F3 = 1003;
 const int KEY_F5 = 1005;
@@ -35,4 +36,11 @@ public:
 	afx_msg void OnSavefile();
 	virtual void OnCancel();
 	afx_msg void OnEnSetfocusRichedit2Program();
+	void Initial_static();
+	CListBox m_information_window;
+	CStaticEx m_pool_size;
+	CStaticEx m_program_size;
+	CStaticEx m_free_memory;
 };
+
+
