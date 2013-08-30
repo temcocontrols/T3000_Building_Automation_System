@@ -139,8 +139,8 @@ void CDialogCM5_BacNet::OnBnClickedButtonTest()
 void CDialogCM5_BacNet::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
-	#ifndef Fance_Enable
-	Fresh();//Fance
+	#ifdef Fance_Enable
+	//Fresh();//Fance
 	#endif
 	// TODO: Add your specialized code here and/or call the base class
 }
