@@ -1576,12 +1576,14 @@ void CMainFrame::OnConnect()
 					CString strInfo;
 					strInfo.Format((_T("Open IP:%s successful.")),build_info.strIp);//prompt info;
 					SetPaneString(1,strInfo);
+					connectionSuccessful = 1;
 				}
 				else
 				{
 					CString strInfo;
 					strInfo.Format((_T("Open IP:%s failed.")),build_info.strIp);//prompt info;
 					SetPaneString(1,strInfo);
+					connectionSuccessful = 0;
 				}
 
 			}
@@ -1604,13 +1606,15 @@ void CMainFrame::OnConnect()
 					//strInfo=_T("Open ")+build_info.strComPort+_T(" Failure!");
 					//strInfo.Format(_T("COM: %d Connected: No"), nComPort);		
 					strInfo.Format(_T("COM %d : Not available "), nComPort);
+					connectionSuccessful = 0;
 					//SetPaneCommunicationPrompt(strInfo);
 					SetPaneString(1, strInfo);
 				}
 				else
 				{
 					//strInfo=_T("Open ")+build_info.strComPort+_T(" Sucessful!");
-					strInfo.Format(_T("COM %d Connected: Yes"), nComPort);			
+					strInfo.Format(_T("COM %d Connected: Yes"), nComPort);	
+					connectionSuccessful = 1;
 					//SetPaneCommunicationPrompt(strInfo);
 					SetPaneString(1, strInfo);
 					Change_BaudRate(default_com1_port_baudrate);
@@ -1784,6 +1788,7 @@ void CMainFrame::OnDisconnect()
 	close_com();
 	
 	CString strInfo = _T("No Connnection");
+	connectionSuccessful = 0;
 	SetPaneString(1,strInfo);
 	strInfo = _T("Offline!");
 	SetPaneString(2,strInfo);

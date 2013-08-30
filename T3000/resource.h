@@ -1131,6 +1131,7 @@
 #define IDC_RADIO_HUMIDITY_HEAT_DISABLE 1631
 #define IDC_LIST_PROGRAM                1632
 #define IDC_STATIC_CONFIG5              1632
+#define IDC_CHECK_FUNCTION1             1632
 #define IDC_BUTTON_PROGRAM_READ         1633
 #define IDC_BUTTON_START_STOP1          1633
 #define IDC_BUTTON_PROGRAM_APPLY        1634
@@ -1144,6 +1145,7 @@
 #define IDC_LIST_OUTPUT                 1638
 #define IDC_CHECK_TAP_DATA              1638
 #define IDC_BUTTON_OUTPUT_READ          1639
+#define IDC_STATIC_CONFIG6              1639
 #define IDC_BUTTON_OUTPUT_APPLY         1640
 #define IDC_BUTTON_INPUT_READ           1641
 #define IDC_BUTTON_INPUT_APPLY          1642
@@ -1268,7 +1270,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        465
 #define _APS_NEXT_COMMAND_VALUE         32873
-#define _APS_NEXT_CONTROL_VALUE         1632
+#define _APS_NEXT_CONTROL_VALUE         1633
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
