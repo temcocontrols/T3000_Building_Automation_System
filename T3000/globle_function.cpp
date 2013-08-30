@@ -7,7 +7,7 @@
 
 
 #include "T3000RegAddress.h"
-
+#include "gloab_define.h"
 
 #define DELAY_TIME	 10	//MS
 #define Modbus_Serial	0
@@ -1137,7 +1137,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 		{
 			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_in_point))!=0)
 				return -1;	//得到的结构长度错误;
-
+			int test =  sizeof(Str_in_point);
 			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_in_point);
 			//m_Input_data_length = block_length;
 			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
@@ -1253,7 +1253,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 	return 1;
 }
 
-
+extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 void local_handler_conf_private_trans_ack(
     uint8_t * service_request,
     uint16_t service_len,
@@ -1291,22 +1291,64 @@ void local_handler_conf_private_trans_ack(
 	{
 	case READINPUT_T3000:
 		::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+		copy_data_to_ptrpanel(TYPE_INPUT);
 		break;
 	case READPROGRAM_T3000:
 		::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+		copy_data_to_ptrpanel(TYPE_PROGRAM);
 		break;
 	case READPROGRAMCODE_T3000:
 		::PostMessage(m_program_edit_hwnd,WM_REFRESH_BAC_PROGRAM_RICHEDIT,NULL,NULL);
 		break;
 	case READVARIABLE_T3000:
 		::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+		copy_data_to_ptrpanel(TYPE_VARIABLE);
 		break;
 	case READOUTPUT_T3000:
 		::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+		copy_data_to_ptrpanel(TYPE_OUTPUT);
 		break;
 	}
 
     return;
+}
+
+//This function coded by Fance,used to split the cstring to each part.
+void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
+{
+	CString sTempSource, sTempSplitted;
+
+	sTempSource = sSource;
+
+	int nPos = sTempSource.Find(sToken);
+
+	//--if there are no token in the string, then add itself and return.
+	if(nPos == -1)
+		saArray.Add(sTempSource);
+	else
+	{
+		while(sTempSource.GetLength() > 0)
+		{
+			nPos = sTempSource.Find(sToken);
+			if(nPos == -1)
+			{
+				saArray.Add(sTempSource.Trim());
+				break;
+			}
+			else if(nPos == 0)
+			{
+				sTempSource = sTempSource.Mid(sToken.GetLength(), sTempSource.GetLength());
+				continue;
+			}
+			else
+			{
+				sTempSplitted = sTempSource.Mid(0, nPos);
+				saArray.Add(sTempSplitted.Trim());
+				sTempSource = sTempSource.Mid(nPos + sToken.GetLength(), sTempSource.GetLength());
+			}
+		}
+	}
+
 }
 
 

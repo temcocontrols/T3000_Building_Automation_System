@@ -12,6 +12,8 @@
 #include "globle_function.h"
 #include "BacnetProgramEdit.h"
 
+#include "gloab_define.h"
+extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 
 int program_list_line = 0;
 // CBacnetProgram dialog
@@ -100,7 +102,9 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 	// Str_in_point Get_Str_in_Point(int index);
 
 	m_program_list.DeleteAllItems();
-	
+	bac_program_pool_size = 26624;
+	bac_program_size = 0;
+	bac_free_memory = 26624;
 	for (int i=0;i<(int)m_Program_data.size();i++)
 	{
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
@@ -145,6 +149,8 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		temp_value.Format(_T("%d"),m_Program_data.at(i).bytes);
 		m_program_list.SetItemText(i,PROGRAM_SIZE_LIST,temp_value);
 
+		bac_program_size = bac_program_size + m_Program_data.at(i).bytes;
+
 		if(m_Program_data.at(i).com_prg==0)
 			m_program_list.SetItemText(i,PROGRAM_RUN_STATUS,_T("Normal"));
 		else
@@ -158,9 +164,8 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		m_program_list.SetItemText(i,PROGRAM_LABEL,temp_des2);
 
 	}
-
-
-	//MessageBox("1");
+	bac_free_memory = bac_program_pool_size - bac_program_size;
+	copy_data_to_ptrpanel(TYPE_PROGRAM);
 	return 0;
 }
 
@@ -217,7 +222,7 @@ LRESULT  CBacnetProgram::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lPar
 	msg_result = MKBOOL(wParam);
 	if(msg_result)
 	{
-		SetPaneString(0,_T("Bacnet operation success!"));
+		//SetPaneString(0,_T("Bacnet operation success!"));
 		//MessageBox(_T("Bacnet operation success!"));
 	}
 	else
@@ -247,39 +252,9 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 	CBacnetProgramEdit dlg;
 	dlg.DoModal();
 	this->ShowWindow(1);
+
+	OnBnClickedButtonProgramRead();
 }
-
-
-//void CBacnetProgram::OnLvnItemchangedListProgram(NMHDR *pNMHDR, LRESULT *pResult)
-//{
-//	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-//	m_program_list.SetCellChecked(pNMLV->iItem,0,1);
-//
-//	for (int i=0;i<m_program_list.GetItemCount();++i)
-//	{
-//		if(i == pNMLV->iItem)
-//			continue;
-//		m_program_list.SetCellChecked(i,0,FALSE);
-//	}
-//
-//	//if(m_program_list.GetCellChecked(pNMLV->iItem,0))  
-//	//	UnCheckOtherItem(m_program_list, pNMLV->iItem);
-//
-//	
-//	// TODO: Add your control notification handler code here
-//	*pResult = 0;
-//}
-
-//void CBacnetProgram::UnCheckOtherItem(ListCtrlEx::CListCtrlEx& listCtrl, int index)
-//{
-//	for (int i=0;i<listCtrl.GetItemCount();++i)
-//	{
-//		if(i == index)
-//			continue;
-//		listCtrl.SetCellChecked(i,0,FALSE);
-//	}
-//}
-
 
 
 

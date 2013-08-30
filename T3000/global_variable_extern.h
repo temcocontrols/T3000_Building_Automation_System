@@ -850,6 +850,13 @@ extern int MODBUS_RELAY_PWM_TOTAL_DUTY                         ;
 extern int MODBUS_RELAY_PWM_HIGH_DUTY                          ;   
 
 #pragma region For_bacnet
+extern int bac_ranges_type;
+extern int bac_range_number_choose;
+
+extern int bac_program_pool_size;
+extern int bac_program_size;
+extern int bac_free_memory;
+
 extern HWND      g_hwnd_now;
 extern HWND      m_input_dlg_hwnd;
 extern HWND      m_output_dlg_hwnd;

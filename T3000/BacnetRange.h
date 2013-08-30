@@ -1,0 +1,38 @@
+#pragma once
+
+#include "CM5\CStatic\staticex.h"
+#include "afxwin.h"
+// BacnetRange dialog
+
+class BacnetRange : public CDialogEx
+{
+	DECLARE_DYNAMIC(BacnetRange)
+
+public:
+	BacnetRange(CWnd* pParent = NULL);   // standard constructor
+	virtual ~BacnetRange();
+
+// Dialog Data
+	enum { IDD = IDD_DIALOG_BACNET_RANGES };
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+	DECLARE_MESSAGE_MAP()
+public:
+	CStaticEx m_static_range_title;
+	CStaticEx m_static_range_detail;
+	virtual BOOL OnInitDialog();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual void OnOK();
+	virtual void OnCancel();
+	void Initial_static();
+	CStaticEx m_static_range_units_select;
+};
+
+const CString Range_Type[] =
+{
+	_T("Analog Ranges"),
+	_T("Digital Ranges"),
+	_T("Custom Digital Ranges")
+};
