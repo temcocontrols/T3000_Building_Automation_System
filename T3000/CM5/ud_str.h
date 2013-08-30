@@ -362,6 +362,4 @@ typedef struct
 } Str_program_point;	  /* 21+9+2+2 = 34 bytes*/
 #pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
 
-
-
 #endif

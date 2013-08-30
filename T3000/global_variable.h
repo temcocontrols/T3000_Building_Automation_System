@@ -1767,6 +1767,13 @@ int MODBUS_RELAY_PWM_HIGH_DUTY                               =-1  ;//           
 
 
 #pragma region For_bacnet
+int bac_ranges_type;
+int bac_range_number_choose;
+
+int bac_program_pool_size;
+int bac_program_size;
+int bac_free_memory;
+
 HWND      g_hwnd_now;
 HWND      m_input_dlg_hwnd;
 HWND      m_output_dlg_hwnd;

@@ -92,4 +92,7 @@ void local_handler_conf_private_trans_ack(
 	uint16_t service_len,
 	BACNET_ADDRESS * src,
 	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
+
+void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
+
 #endif

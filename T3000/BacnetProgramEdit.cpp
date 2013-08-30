@@ -1,5 +1,5 @@
 // BacnetProgramEdit.cpp : implementation file
-//
+// This File coded by Fance used to encode and decode programming.20130820
 
 #include "stdafx.h"
 #include "T3000.h"
@@ -10,6 +10,8 @@
 #include "Bacnet_Include.h"
 #include "globle_function.h"
 
+extern int error;
+extern char *pmes;
 extern int program_list_line;
 
 // CBacnetProgramEdit dialog
@@ -20,7 +22,7 @@ extern int program_list_line;
 
 extern void  init_info_table( void );
 extern void Init_table_bank();
-
+extern char mesbuf[1024];
 extern int renumvar;
 
 extern char *desassembler_program();
@@ -40,6 +42,10 @@ CBacnetProgramEdit::~CBacnetProgramEdit()
 void CBacnetProgramEdit::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST_INFORMATION_WINDOW, m_information_window);
+	DDX_Control(pDX, IDC_STATIC_POOL_SIZE, m_pool_size);
+	DDX_Control(pDX, IDC_STATIC_SIZE, m_program_size);
+	DDX_Control(pDX, IDC_STATIC_FREE_MEMORY, m_free_memory);
 }
 
 
@@ -89,6 +95,26 @@ LRESULT CBacnetProgramEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
+void CBacnetProgramEdit::Initial_static()
+{
+	CString temp_cs_size,temp_cs_free;
+	m_pool_size.SetWindowTextW(_T("26624"));
+	m_pool_size.textColor(RGB(255,0,0));
+	//m_static.bkColor(RGB(0,255,255));
+	m_pool_size.setFont(15,10,NULL,_T("Arial"));
+
+	temp_cs_size.Format(_T("%d"),bac_program_size);
+	m_program_size.SetWindowTextW(temp_cs_size);
+	m_program_size.textColor(RGB(255,0,0));
+	//m_static.bkColor(RGB(0,255,255));
+	m_program_size.setFont(15,10,NULL,_T("Arial"));
+
+	temp_cs_free.Format(_T("%d"),bac_free_memory);
+	m_free_memory.SetWindowTextW(temp_cs_free);
+	m_free_memory.textColor(RGB(255,0,0));
+	//m_static.bkColor(RGB(0,255,255));
+	m_free_memory.setFont(15,10,NULL,_T("Arial"));
+}
 
 BOOL CBacnetProgramEdit::OnInitDialog()
 {
@@ -133,6 +159,8 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	RegisterHotKey(GetSafeHwnd(),KEY_F3,NULL,VK_F3);
 	RegisterHotKey(GetSafeHwnd(),KEY_F5,NULL,VK_F5);
 	RegisterHotKey(GetSafeHwnd(),KEY_F6,NULL,VK_F6);
+
+	Initial_static();
 
 	init_info_table();
 	Init_table_bank();
@@ -201,7 +229,7 @@ void CBacnetProgramEdit::OnSend()
 {
 	// TODO: Add your command handler code here
 	renumvar = 1;
-
+	error = -1; //Default no error;
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
 
@@ -212,14 +240,39 @@ void CBacnetProgramEdit::OnSend()
 	memset( ( void* )editbuf, 0, sizeof( char ) * ( iTextLen + 1 ) );
 	::WideCharToMultiByte( CP_ACP,0,tempcs,-1,editbuf,iTextLen,NULL,NULL );
 	Encode_Program();
+	if(error == -1)
+	{
+		g_invoke_id =WritePrivateData(1234,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line,my_lengthcode);
+		if(g_invoke_id>=0)
+			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+	}
+	else
+	{
+		CString cstring_error;
+
+		int len = strlen(mesbuf);
+		int  unicodeLen = ::MultiByteToWideChar( CP_ACP,0, mesbuf,-1,NULL,0 ); 
+		::MultiByteToWideChar( CP_ACP,  0,mesbuf,-1,cstring_error.GetBuffer(MAX_PATH),unicodeLen );  
+		cstring_error.ReleaseBuffer();
 
 
-	g_invoke_id =WritePrivateData(1234,WRITEPROGRAMCODE_T3000,0,0,my_lengthcode);
-	if(g_invoke_id>=0)
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+//		MessageBox(cstring_error);
+		CStringArray  Error_info;  
+		SplitCStringA(Error_info,cstring_error,_T("\r\n"));//Splite the CString with "\r\n" and then add to the list.(Fance)
+		Sleep(1);
+		m_information_window.ResetContent();
+		for (int i=0;i<(int)Error_info.GetSize();i++)
+		{
+			m_information_window.InsertString(i,Error_info.GetAt(i));
+		}
 
+		MessageBox(_T("Errors,program NOT Sent!"));
+	}
 
 }
+
+
+
 
 
 void CBacnetProgramEdit::OnClose()
