@@ -1824,6 +1824,232 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 	return -1;
 }
 
+OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length,TS_US *put_senddate_into_here,TS_US *put_revdata_into_here)
+{
+	if(g_Commu_type==0)
+	{
+		//device_var is the Tstat ID
+		//the return value == -1 ,no connecting
+
+		TS_UC to_send_data[300]={'\0'};
+		HCURSOR hc;//load mouse cursor
+		hc = LoadCursor(NULL,IDC_WAIT);
+		hc = SetCursor(hc);
+		//to_send_data is the array that you want to put data into
+		//length is the number of register,that you want to read
+		//start_address is the start register
+		TS_UC data_to_send[8]={'\0'};//the array to used in writefile()
+		data_to_send[0]=device_var;//slave address
+		data_to_send[1]=3;//function multiple
+		data_to_send[2]=start_address>>8 & 0xff;//starting address hi
+		data_to_send[3]=start_address & 0xff;//starting address lo
+		data_to_send[4]=length >> 8 & 0xff;//quantity of registers hi
+		data_to_send[5]=length & 0xff;//quantity of registers lo
+		TS_US crc=CRC16(data_to_send,6);
+		data_to_send[6]=(crc>>8) & 0xff;
+		data_to_send[7]=crc & 0xff;
+
+		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		if(m_hSerial==NULL)
+		{		
+			return -1;
+		}
+		////////////////////////////////////////////////clear com error
+		COMSTAT ComStat;
+		DWORD dwErrorFlags;
+
+		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
+		PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
+		////////////////////////////////////////////////////////////overlapped declare
+		memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
+		if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false,_T("MulWrite")))==NULL)
+			return -2; 
+		m_osMulWrite.Offset = 0;
+		m_osMulWrite.OffsetHigh = 0 ;
+		///////////////////////////////////////////////////////send the to read message
+
+
+
+		int fState=WriteFile(m_hSerial,// 句柄
+			data_to_send,// 数据缓冲区地址
+			8,// 数据大小
+			&m_had_send_data_number,// 返回发送出去的字节数
+			&m_osMulWrite);
+		if(!fState)// 不支持重叠	
+		{
+			if(GetLastError()==ERROR_IO_PENDING)
+			{
+				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
+				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+			}
+			else
+				m_had_send_data_number=0;
+		}
+		///////////////////////////up is write
+		/////////////**************down is read
+
+		Sleep(LATENCY_TIME_COM);
+		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
+		memset(&m_osRead, 0, sizeof(OVERLAPPED));
+		if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+			return -2; 
+		m_osRead.Offset = 0;
+		m_osRead.OffsetHigh = 0 ;
+		////////////////////////////////////////////////clear com error
+
+		fState=ReadFile(m_hSerial,// 句柄
+			to_send_data,// 数据缓冲区地址
+			length*2+5,// 数据大小
+			&m_had_send_data_number,// 返回发送出去的字节数
+			&m_osRead);
+		if(!fState)// 不支持重叠	
+		{
+			if(GetLastError()==ERROR_IO_PENDING)
+			{
+				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
+				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+			}
+			else
+				m_had_send_data_number=0;
+		}	
+		///////////////////////////////////////////////////////////
+		if(to_send_data[0]!=device_var || to_send_data[1]!=3 || to_send_data[2]!=length*2)
+			return -2;
+		crc=CRC16(to_send_data,length*2+3);
+		if(to_send_data[length*2+3]!=((crc>>8) & 0xff))
+			return -2;
+		if(to_send_data[length*2+4]!=(crc & 0xff))
+			return -2;
+		for(int i=0;i<length;i++)
+			put_data_into_here[i]=to_send_data[3+2*i]*256+to_send_data[4+2*i];
+
+		for (int i=0;i<8;i++)//put send data into buffer
+		{
+		put_senddate_into_here[i]=data_to_send[i];
+		}
+		for (int i=0;i<2*length+5;i++)
+		{
+		put_revdata_into_here[i]=to_send_data[i];
+		}
+		return length;
+	}
+	if(g_Commu_type==1)//tcp.
+	{
+		/*
+		//device_var is the Tstat ID
+		//the return value == -1 ,no connecting
+		TS_UC to_send_data[700]={'\0'};
+		HCURSOR hc;//load mouse cursor
+		hc = LoadCursor(NULL,IDC_WAIT);
+		hc = SetCursor(hc);
+		//to_send_data is the array that you want to put data into
+		//length is the number of register,that you want to read
+		//start_address is the start register
+		TS_UC data_to_send[8]={'\0'};//the array to used in writefile()
+		data_to_send[0]=device_var;//slave address
+		data_to_send[1]=3;//function multiple
+		data_to_send[2]=start_address>>8 & 0xff;//starting address hi
+		data_to_send[3]=start_address & 0xff;//starting address lo
+		data_to_send[4]=length >> 8 & 0xff;//quantity of registers hi
+		data_to_send[5]=length & 0xff;//quantity of registers lo
+		TS_US crc=CRC16(data_to_send,6);
+		data_to_send[6]=(crc>>8) & 0xff;
+		data_to_send[7]=crc & 0xff;
+
+		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		if(m_hSocket==INVALID_SOCKET)
+		{		
+			return -1;
+		}
+		::send(m_hSocket,(char*)data_to_send,sizeof(data_to_send),MSG_OOB);
+
+		int nn=sizeof(to_send_data);
+		int nRecv = ::recv(m_hSocket, (char*)to_send_data, length*2+5, 0);
+
+		///////////////////////////////////////////////////////////
+		if(to_send_data[0]!=device_var || to_send_data[1]!=3 || to_send_data[2]!=length*2)
+			return -2;
+		crc=CRC16(to_send_data,length*2+3);
+		if(to_send_data[length*2+3]!=((crc>>8) & 0xff))
+			return -2;
+		if(to_send_data[length*2+4]!=(crc & 0xff))
+			return -2;
+		for(int i=0;i<length;i++)
+			put_data_into_here[i]=to_send_data[3+2*i]*256+to_send_data[4+2*i];
+		return length;
+		*/
+		//device_var is the Tstat ID
+		//the return value == -1 ,no connecting
+
+		TS_UC to_send_data[700]={'\0'};
+		TS_UC to_Reive_data[700]={'\0'};
+		HCURSOR hc;//load mouse cursor
+		hc = LoadCursor(NULL,IDC_WAIT);
+		hc = SetCursor(hc);
+		//to_send_data is the array that you want to put data into
+		//length is the number of register,that you want to read
+		//start_address is the start register
+		TS_UC data_to_send[12]={'\0'};//the array to used in writefile()
+		data_to_send[0]=1;
+		data_to_send[1]=2;
+		data_to_send[2]=3;
+		data_to_send[3]=4;
+		data_to_send[4]=5;
+		data_to_send[5]=6;
+
+
+
+		data_to_send[6]=device_var;//slave address
+		data_to_send[7]=3;//function multiple
+		data_to_send[8]=start_address>>8 & 0xff;//starting address hi
+		data_to_send[9]=start_address & 0xff;//starting address lo
+		data_to_send[10]=length >> 8 & 0xff;//quantity of registers hi
+		data_to_send[11]=length & 0xff;//quantity of registers lo
+
+		//TS_US crc=CRC16(data_to_send,6);
+		//data_to_send[6]=(crc>>8) & 0xff;
+		//data_to_send[7]=crc & 0xff;/
+
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		if(m_hSocket==INVALID_SOCKET)
+		{
+			return -1;
+		}
+
+		::send(m_hSocket,(char*)data_to_send,sizeof(data_to_send),0);
+
+		Sleep(LATENCY_TIME_NET);
+		int nn=sizeof(to_Reive_data);
+		int nRecv = ::recv(m_hSocket, (char*)to_Reive_data, length*2+12, 0);
+
+		memcpy((void*)&to_send_data[0],(void*)&to_Reive_data[6],sizeof(to_Reive_data));
+		///////////////////////////////////////////////////////////
+		if(to_send_data[0]!=device_var || to_send_data[1]!=3 || to_send_data[2]!=length*2)
+			return -2;
+		/*
+		crc=CRC16(to_send_data,length*2+3);
+		if(to_send_data[length*2+3]!=((crc>>8) & 0xff))
+			return -2;
+
+		if(to_send_data[length*2+4]!=(crc & 0xff))
+			return -2;
+			*/
+		for(int i=0;i<length;i++)
+			put_data_into_here[i]=to_send_data[3+2*i]*256+to_send_data[4+2*i];
+		for (int i=6;i<12;i++)
+		{
+		  put_senddate_into_here[i]=data_to_send[i];
+		}
+		for (int i=0;i<2*length+3;i++)
+		{
+		  put_revdata_into_here[i]=to_send_data[i];
+		}
+		return length;
+	}
+	return -1;
+}
+
+
 OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
 {	
 	if(g_Commu_type==0)//
