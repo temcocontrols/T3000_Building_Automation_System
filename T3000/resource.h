@@ -1272,20 +1272,23 @@
 #define ID_CLEAR                        32870
 #define ID_LOADFILE                     32871
 #define ID_SAVEFILE                     32872
+#define ID_VIEW_DATATRAFFIC             32873
+#define ID_VIEW_COMMUNICATETRAFFIC      32880
 #define ID_FILE_OPEN32883               32883
 #define ID_FILE_SAVE32884               32884
 #define ID_FILE_EXIT                    32888
 #define ID_DATABASE_MBPOLL              33867
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
+#define IDC_RANGECOMBO                  57926
+#define IDD_TEST_MULTI_READ             57927
 
- #define       IDC_RANGECOMBO           57926
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        465
-#define _APS_NEXT_COMMAND_VALUE         32873
+#define _APS_NEXT_COMMAND_VALUE         32874
 #define _APS_NEXT_CONTROL_VALUE         1633
 #define _APS_NEXT_SYMED_VALUE           320
 #endif

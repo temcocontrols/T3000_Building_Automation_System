@@ -880,6 +880,22 @@ BEGIN
     LTEXT           "Static",IDC_STATIC_WAIT_DETAIL,97,16,268,15
 END
 
+IDD_TEST_MULTI_READ DIALOGEX 0, 0, 632, 398
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Test Multi Read Traffic"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Start",IDOK,218,8,50,14
+    PUSHBUTTON      "Exit",IDCANCEL,575,377,50,14
+    LISTBOX         IDC_LIST2,7,23,618,349,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT1,23,8,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT2,172,8,40,14,ES_AUTOHSCROLL
+    LTEXT           "ID:",IDC_STATIC,12,11,11,8
+    LTEXT           "Length:",IDC_STATIC,145,11,26,8
+    EDITTEXT        IDC_EDIT3,101,8,40,14,ES_AUTOHSCROLL
+    LTEXT           "Start Add:",IDC_STATIC,65,11,34,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1182,6 +1198,14 @@ BEGIN
         RIGHTMARGIN, 365
         TOPMARGIN, 7
         BOTTOMMARGIN, 57
+    END
+
+    IDD_TEST_MULTI_READ, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 625
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 391
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -2107,7 +2131,7 @@ CAPTION "About T3000"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,18,20,20,20
-    LTEXT           "T3000 Version 2.6.0.16",IDC_STATIC,54,27,107,8,SS_NOPREFIX
+    LTEXT           "T3000 Version 2013.17",IDC_STATIC,54,27,107,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2005-2013 Temcocontrols.Ltd.",IDC_STATIC,36,43,149,8,NOT WS_VISIBLE
     PUSHBUTTON      "http://www.temcocontrols.com",IDC_BUTTON1,35,53,147,14,NOT WS_VISIBLE
     DEFPUSHBUTTON   "OK",IDOK,148,11,48,14,WS_GROUP
@@ -5012,6 +5036,7 @@ BEGIN
             MENUITEM "Building Pane",               ID_BUILDINGBAR
         END
         MENUITEM "Status Bar",                  ID_VIEW_STATUS_BAR
+        MENUITEM "Data Traffic",                ID_VIEW_COMMUNICATETRAFFIC
         POPUP "&Application Look"
         BEGIN
             MENUITEM "Office 200&3",                ID_VIEW_APPLOOK_OFF_2003

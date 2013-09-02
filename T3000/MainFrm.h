@@ -343,7 +343,7 @@ public:
 	static	DWORD WINAPI Translate_My_Message(LPVOID lpVoid);
 	afx_msg void OnDatabaseIonameconfig();
 	afx_msg void OnDatabaseMbpoll();
-
+	afx_msg void OnViewCommunicatetraffic();
 	afx_msg void OnToolIsptoolforone();
 	afx_msg void OnToolRegistermoniter();
 	CMbPoll* mbPoll;
