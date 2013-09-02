@@ -46,6 +46,9 @@
 #include "IONameConfig.h"
 
 #include "DialogCM5_BacNet.h"
+
+#include "T38I13O.h"
+#include "T332AI.h"
 #pragma region Fance Test
 //For Test
 
@@ -268,10 +271,10 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			::PostMessage(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
 		}
 
-		if(pFrame->m_pViews[DLG_CO2_VIEW]->m_hWnd!=NULL)
-		{
-			::PostMessage(pFrame->m_pViews[DLG_CO2_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
-		}
+		//if(pFrame->m_pViews[DLG_CO2_VIEW]->m_hWnd!=NULL)
+		//{
+		//	::PostMessage(pFrame->m_pViews[DLG_CO2_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
+		//}
 		
 	}
 
@@ -396,7 +399,8 @@ void CMainFrame::InitViews()
 	m_pViews[DLG_HUMCHAMBER]=(CView*) new CHumChamber;
 	m_pViews[DLG_CO2_VIEW]=(CView*) new CCO2_View;
 	m_pViews[DLG_CM5_BACNET_VIEW]=(CView*) new CDialogCM5_BacNet; //CM5
-
+	m_pViews[DLG_DIALOGT38I13O_VIEW]=(CView*) new T38I13O;
+	m_pViews[DLG_DIALOGT332AI_VIEW]=(CView*)new T332AI;
 
 
 
@@ -917,10 +921,11 @@ void CMainFrame::EnterConnectToANode()
 }
 void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {	
-
+     
+	
 	Flexflash = TRUE;
 	HTREEITEM hSelItem;//=m_pTreeViewCrl->GetSelectedItem();
-    int nRet =read_one(g_tstat_id,6,1);
+ //   int nRet =read_one(g_tstat_id,6,1);
 
 	CPoint pt;
 	GetCursorPos(&pt);
@@ -964,7 +969,8 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 			{
 				g_tstat_id = m_product.at(i).product_id;
 				SwitchToPruductType(DLG_AIRQUALITY_VIEW);
-			}else if (m_product.at(i).product_class_id == PM_LightingController)//LightingController
+			}
+			else if (m_product.at(i).product_class_id == PM_LightingController)//LightingController
 			{
 				g_tstat_id = m_product.at(i).product_id;
 				if(m_product.at(i).BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(m_product.at(i).BuildingInfo.strBuildingName)!=0)
@@ -989,8 +995,15 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 
 			SwitchToPruductType(DLG_HUMCHAMBER);
 			}
+			else if (m_product.at(i).product_class_id==PM_T38I13O)
+			{
+			g_tstat_id=m_product.at(i).product_id;
+			DoConnectToANode(hSelItem); 
+			//SwitchToPruductType(DLG_DIALOGT38I13O_VIEW);
+			}
 			else 
-			{   g_tstat_id = m_product.at(i).product_id;
+			{   
+			    g_tstat_id = m_product.at(i).product_id;
 				DoConnectToANode(hSelItem); 
 			}
 				
@@ -2207,6 +2220,16 @@ here:
 			((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
+	case DLG_DIALOGT38I13O_VIEW:
+	{
+	    m_nCurView=DLG_DIALOGT38I13O_VIEW;
+		((T38I13O*)m_pViews[m_nCurView])->Fresh();
+	}
+	case DLG_DIALOGT332AI_VIEW:
+	{
+	   m_nCurView=DLG_DIALOGT332AI_VIEW;
+	   ((T332AI*)m_pViews[m_nCurView])->Fresh();
+	}
 	}
 //here
 }
@@ -2379,7 +2402,7 @@ void CMainFrame::Scan_Product()
 	m_pWaitScanDlg->DoModal();	
 
 	m_bScanALL = TRUE;
-	close_com();
+//	close_com();
 	//m_bScanFinished = FALSE;
 	delete m_pWaitScanDlg;
 	m_pWaitScanDlg = NULL;
@@ -3444,10 +3467,10 @@ void CMainFrame::OnDestroy()
 		//m_pRefreshThread->Delete();
 	}
 
-	/*if (is_connect())
-	{*/
+	if (is_connect())
+	{
 		close_com(); // added by zgq:12-16-2011
-	/*}*/
+	}
 
 	
 
@@ -4102,7 +4125,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 				}else
 				{
-						//close_com();//关闭所有端口
+						close_com();//关闭所有端口
 					int nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
 
 
@@ -4179,7 +4202,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						pDlg=NULL;
 					}
 					bOnLine=FALSE;
-					//return;
+					return;
 				}
 			}
 			if (g_CommunicationType==1)
@@ -4302,55 +4325,112 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			    }
 				else  //For Zigbee
 				{
-		 
-					register_critical_section.Lock();
-					int i;
-					int it = 0;
-					float progress;
-					for(i=0;i<20;i++)	//暂定为0 ，因为TSTAT6 目前为600多
+		            int NC=read_one(g_tstat_id,7);
+					if (NC==100)
 					{
-						//register_critical_section.Lock();
-						//int nStart = GetTickCount();
-						int itemp = 0;
-						itemp = Read_Multi(g_tstat_id,&multi_register_value[i*30],i*30,30,5);
-						if(itemp == -2)
+
+						register_critical_section.Lock();
+						int i;
+						int it = 0;
+						float progress;
+						for(i=0;i<12;i++)
 						{
-							continue;
-						}
-						else						
-						{
-							if (pDlg!=NULL)
+							//register_critical_section.Lock();
+							//int nStart = GetTickCount();
+							int itemp = 0;
+							itemp = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100,3);
+							if(itemp == -2)
 							{
-								progress=float((it+1)*(100/20));
-								pDlg->ShowProgress(int(progress),int(progress));
-							} 						
-						it++;
-						Sleep(1500);
-						}							
+								continue;
+							}
+							else						
+							{
+								if (pDlg!=NULL)
+								{
+									progress=float((it+1)*(100/12));
+									pDlg->ShowProgress(int(progress),(int)progress);
+								} 
+							}							
+							it++;
+							Sleep(100);
+						}
+						//Add by Fance use this product_register_value to unite the register.
+						//Fance_2
+						//memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value_tcp,1024);
 
-					}
-				
-					memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
+						if (it<12)
+						{	
+							AfxMessageBox(_T("Reading abnormal \n Try again!"));
+							pDlg->ShowWindow(SW_HIDE);
+							if(pDlg!=NULL)
+								delete pDlg;
+							pDlg=NULL;
 
-					if (it<20)
-					{	
-						AfxMessageBox(_T("Reading abnormal \n Try again!"));
-						pDlg->ShowWindow(SW_HIDE);
-						if(pDlg!=NULL)
-							delete pDlg;
-						pDlg=NULL;
+						}
+						else
+						{
+							pDlg->ShowProgress(100,100);
+							pDlg->ShowWindow(SW_HIDE);
+							if(pDlg!=NULL)
+								delete pDlg;
+							pDlg=NULL;
+						}
+						g_tstat_id_changed=FALSE;
+						register_critical_section.Unlock();
 
 					}
 					else
 					{
-						pDlg->ShowProgress(100,100);
-						pDlg->ShowWindow(SW_HIDE);
-						if(pDlg!=NULL)
-							delete pDlg;
-						pDlg=NULL;
+						register_critical_section.Lock();
+						int i;
+						int it = 0;
+						float progress;
+						for(i=0;i<20;i++)	//暂定为0 ，因为TSTAT6 目前为600多
+						{
+							//register_critical_section.Lock();
+							//int nStart = GetTickCount();
+							int itemp = 0;
+							itemp = Read_Multi(g_tstat_id,&multi_register_value[i*30],i*30,30,5);
+							if(itemp == -2)
+							{
+								continue;
+							}
+							else						
+							{
+								if (pDlg!=NULL)
+								{
+									progress=float((it+1)*(100/20));
+									pDlg->ShowProgress(int(progress),int(progress));
+								} 						
+								it++;
+								Sleep(1500);
+							}							
+
+						}
+
+						memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
+
+						if (it<20)
+						{	
+							AfxMessageBox(_T("Reading abnormal \n Try again!"));
+							pDlg->ShowWindow(SW_HIDE);
+							if(pDlg!=NULL)
+								delete pDlg;
+							pDlg=NULL;
+
+						}
+						else
+						{
+							pDlg->ShowProgress(100,100);
+							pDlg->ShowWindow(SW_HIDE);
+							if(pDlg!=NULL)
+								delete pDlg;
+							pDlg=NULL;
+						}
+						g_tstat_id_changed=FALSE;
+						register_critical_section.Unlock();
 					}
-					g_tstat_id_changed=FALSE;
-					register_critical_section.Unlock();
+
 
 				}
 
@@ -4376,8 +4456,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 						if (pDlg!=NULL)
 						{
-							progress=float((it+1));
-							pDlg->ShowProgress(int(progress/10),int(progress));
+							progress=float((it+1)*(100/10));
+							pDlg->ShowProgress(int(progress),int(progress));
 						} 
 					}							
 					it++;
@@ -4538,10 +4618,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			if(nFlag==PM_NC)	
 			{	
 				SwitchToPruductType(DLG_NETWORKCONTROL_VIEW);
-			}else if (nFlag == PM_CM5)//CM5
+			}
+			else if (nFlag == PM_CM5)//CM5
 			{
 				SwitchToPruductType(DLG_DIALOGCM5_VIEW);
-			}else if (nFlag == PM_T38AIOD ||nFlag == PM_T3IOA  ||nFlag ==PM_T332AI || nFlag == PM_T34AO)//T3
+			}
+			else if (nFlag == PM_T34AO)//T3
 			{
 				memset(newtstat6,0,sizeof(newtstat6));
 				SwitchToPruductType(DLG_DIALOGT3_VIEW);
@@ -4559,6 +4641,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			else if((nFlag == PM_CO2_NET)||(nFlag == PM_CO2_RS485))
 			{
 				SwitchToPruductType(DLG_CO2_VIEW);
+			}
+			else if (nFlag==PM_T38I13O)
+			{
+			SwitchToPruductType(DLG_DIALOGT38I13O_VIEW);
+			}
+			else if (nFlag==PM_T332AI)
+			{
+			  SwitchToPruductType(DLG_DIALOGT332AI_VIEW);
 			}
 			else if(nFlag<PM_NC)	
 			{	

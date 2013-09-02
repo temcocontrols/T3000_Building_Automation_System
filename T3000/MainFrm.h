@@ -24,7 +24,7 @@
 #include "MBP.h"
 #include "MbPoll.h"
 
-#define NUMVIEWS 12
+#define NUMVIEWS 14
 
 
 
@@ -364,4 +364,6 @@ const int DLG_LIGHTINGCONTROLLER_VIEW = 8;
 const int DLG_HUMCHAMBER = 9;
 const int DLG_CO2_VIEW = 10;
 const int DLG_CM5_BACNET_VIEW = 11;
+const int DLG_DIALOGT38I13O_VIEW=12;
+const int DLG_DIALOGT332AI_VIEW=13;
 

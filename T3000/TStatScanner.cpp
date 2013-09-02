@@ -2934,7 +2934,7 @@ void CTStatScanner::ScanAll()
 	
 	ScanNetworkDevice();
 	
-	 AfxBeginThread(_WaitScanThread, this);
+	AfxBeginThread(_WaitScanThread, this);
 
  
 	
