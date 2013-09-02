@@ -214,6 +214,7 @@
     <ClCompile Include="T3Performance.cpp" />
     <ClCompile Include="T3RTDView.cpp" />
     <ClCompile Include="TDelayForm.cpp" />
+    <ClCompile Include="TestMultiReadTraffic.cpp" />
     <ClCompile Include="Timer_Calibrate.cpp" />
     <ClCompile Include="ToolCalibrateDlg.cpp" />
     <ClCompile Include="TrendLogView.cpp" />
@@ -335,6 +336,7 @@
     <ClInclude Include="T38I13O.h" />
     <ClInclude Include="T3Performance.h" />
     <ClInclude Include="T3RTDView.h" />
+    <ClInclude Include="TestMultiReadTraffic.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="WeeklySchedule.h" />
     <ClInclude Include="5EInputDialog.h" />
