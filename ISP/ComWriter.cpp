@@ -73,10 +73,10 @@ int CComWriter::BeginWirteByCom()
 	
 	if (m_nHexFileType == 0)
 	{
-		/*if (!WriteCommandtoReset())
+		if (!WriteCommandtoReset())
 		{
 		return 0;
-		} */
+		} 
 		 
 
 		HCURSOR hc;//load mouse cursor

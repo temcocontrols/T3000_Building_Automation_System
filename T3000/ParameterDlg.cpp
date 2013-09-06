@@ -20,6 +20,7 @@
 
 
 #include "T3000RegAddress.h"
+#include "CustomSTable.h"
 extern int Mdb_Adress_Map;
 // CParameterDlg dialog
 
@@ -206,6 +207,8 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 	ON_WM_TIMER()
 	//ON_EN_CHANGE(IDC_EDIT34, &CParameterDlg::OnEnChangeEdit34)
 	ON_CBN_SELCHANGE(IDC_STATICUNINT2, &CParameterDlg::OnCbnSelchangeStaticunint2)
+	ON_BN_CLICKED(IDC_CS_1, &CParameterDlg::OnBnClickedCs1)
+	ON_BN_CLICKED(IDC_CS_2, &CParameterDlg::OnBnClickedCs2)
 END_MESSAGE_MAP()
 
 
@@ -370,7 +373,13 @@ void CParameterDlg::InitPID2ComboBox()
 		m_inputSelect2.AddString(_T("None"));
 		m_inputSelect2.AddString(g_strInName1);
 		m_inputSelect2.AddString(g_strInName2);
-		if (product_register_value[7]==PM_TSTAT6)
+		m_inputSelect2.AddString(g_strInName3);
+		m_inputSelect2.AddString(g_strInName4);
+		m_inputSelect2.AddString(g_strInName5);
+		m_inputSelect2.AddString(g_strInName6);
+		m_inputSelect2.AddString(g_strInName7);
+		m_inputSelect2.AddString(g_strInName8);
+		if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
 		{	
 
 			m_inputSelect2.AddString(_T("Humidity"));
@@ -2162,7 +2171,52 @@ void CParameterDlg::OnEnKillfocusEdit38()
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,m_heatspN*10,
 		product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],this->m_hWnd,IDC_EDIT38,_T("NIGHT HEATING SETPOINT"));
 }
+CString CParameterDlg::GetInputValue(int InputNo){//这个是行号，如果是Input的话，要在这个基础上加1
+//所以InputNO=InputNo+1;
+InputNo+=1;
+float fValue;short nValue;
+CString strTemp;
+	CString strValueUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2], 1); //5e=359   122
+	{
+		if(product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2]==1)	//359  122
+		{				
+			fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+InputNo-2]/10.0);	//367   131
+			strTemp.Format(_T("%.1f"),fValue);	
 
+			strTemp +=strValueUnit;
+		}
+		else if(product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2]==3 || product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2]==5) // On/Off or Off/On ==1 On ==0 Off   359  122
+		{						
+			int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+InputNo-2]); //367  131
+			if (nValue == 0)
+			{
+				strTemp = _T("Off");
+			}
+			else
+			{
+				strTemp = _T("On");
+			}					
+		}
+		else if (product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2]==4 )  // custom sensor	359 122
+		{					
+			fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+InputNo-2]/10.0);	//367  131
+			strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
+			strTemp +=strValueUnit;
+		}
+		else if(product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2]==2)	//359 122
+		{
+			nValue=product_register_value[MODBUS_ANALOG_INPUT1+InputNo-2];		//367  131
+			strTemp.Format(_T("%0.1f%%"),  (float)nValue);
+		}
+		else
+		{
+			//strTemp.Format(_T("%d"),multi_register_value[367+i-2]);//lsc
+			strTemp.Format(_T("UNUSED"));
+
+		}						
+		return strTemp;
+	}
+}
 
 //Add by Fance ,use this function to replace the  Reflash() and Reflash6();
 void CParameterDlg::Reflesh_ParameterDlg()
@@ -2430,10 +2484,11 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	if (product_register_value[MODBUS_INPUT1_SELECT]<0)	//383
 	{
 		m_inputSelect2.SetCurSel(0);
-	}else if (product_register_value[MODBUS_INPUT1_SELECT]>5)	//383
-	{
-		m_inputSelect2.SetCurSel(5);
-	}else
+	//}else if (product_register_value[MODBUS_INPUT1_SELECT]>5)	//383
+	//{
+	//	m_inputSelect2.SetCurSel(5);
+	}
+	else
 	{
 		m_inputSelect2.SetCurSel(product_register_value[MODBUS_INPUT1_SELECT]);	//383
 	}
@@ -2450,51 +2505,177 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		m_inputvalue1.SetWindowText(strTemp+strUnit);
 		// float fValue;
 		int nValue=0;
-		CString strValueUnit=GetTempUnit(product_register_value[359], 1);
+	//	CString strValueUnit=GetTempUnit(product_register_value[359], 1);
 		if(product_register_value[383]==1) // input1
 		{	
 			//188-122
-			if(product_register_value[122]==4||product_register_value[122]==1)
-			{			   //180-131
-				strTemp.Format(_T("%.1f"),(float)product_register_value[131]/10);
-				strTemp=strTemp+strUnit;
-			}
-			if (strUnit==""||strUnit=="%")
-			{
-				strTemp.Format(_T("%d"),product_register_value[131]);
-			}
-			if(product_register_value[122]==3)
-			{
-				if(multi_register_value[131]==0)
-					strTemp=_T("OFF");
-				if(multi_register_value[131]==1)
-					strTemp=_T("ON");
-			}
-
+			//if(product_register_value[122]==4||product_register_value[122]==1)
+			//{			   //180-131
+			//	strTemp.Format(_T("%.1f"),(float)product_register_value[131]/10);
+			//	strTemp=strTemp+strUnit;
+			//}
+			//if (strUnit==""||strUnit=="%")
+			//{
+			//	strTemp.Format(_T("%d"),product_register_value[131]);
+			//}
+			//if(product_register_value[122]==3)
+			//{
+			//	if(multi_register_value[131]==0)
+			//		strTemp=_T("OFF");
+			//	if(multi_register_value[131]==1)
+			//		strTemp=_T("ON");
+			//}
+			strTemp=GetInputValue(1);
 			m_inputValue2.SetWindowText(strTemp);
 		}
 		else if(product_register_value[383]==2) // input2 //m_inputvalue1
 		{
-			if(product_register_value[123]==4||product_register_value[123]==1)
-			{			   //180-131
-				strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
-				strTemp=strTemp+strUnit;
-			}
-			if (strUnit==""||strUnit=="%")
-			{
-				strTemp.Format(_T("%d"),product_register_value[132]);
-			}
-			if(product_register_value[123]==3)
-			{
-				if(multi_register_value[132]==0)
-					strTemp=_T("OFF");
-				if(multi_register_value[132]==1)
-					strTemp=_T("ON");
-			} 
-
+			//if(product_register_value[123]==4||product_register_value[123]==1)
+			//{			   //180-131
+			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
+			//	strTemp=strTemp+strUnit;
+			//}
+			//if (strUnit==""||strUnit=="%")
+			//{
+			//	strTemp.Format(_T("%d"),product_register_value[132]);
+			//}
+			//if(product_register_value[123]==3)
+			//{
+			//	if(multi_register_value[132]==0)
+			//		strTemp=_T("OFF");
+			//	if(multi_register_value[132]==1)
+			//		strTemp=_T("ON");
+			//} 
+			strTemp=GetInputValue(2);
 			m_inputValue2.SetWindowText(strTemp);
 		}
-		else if (product_register_value[383]==3)//Humidity
+		else if(product_register_value[383]==3) // input2 //m_inputvalue1
+		{
+			//if(product_register_value[123]==4||product_register_value[123]==1)
+			//{			   //180-131
+			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
+			//	strTemp=strTemp+strUnit;
+			//}
+			//if (strUnit==""||strUnit=="%")
+			//{
+			//	strTemp.Format(_T("%d"),product_register_value[132]);
+			//}
+			//if(product_register_value[123]==3)
+			//{
+			//	if(multi_register_value[132]==0)
+			//		strTemp=_T("OFF");
+			//	if(multi_register_value[132]==1)
+			//		strTemp=_T("ON");
+			//} 
+			strTemp=GetInputValue(3);
+			m_inputValue2.SetWindowText(strTemp);
+		}
+		else if(product_register_value[383]==4) // input2 //m_inputvalue1
+		{
+			//if(product_register_value[123]==4||product_register_value[123]==1)
+			//{			   //180-131
+			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
+			//	strTemp=strTemp+strUnit;
+			//}
+			//if (strUnit==""||strUnit=="%")
+			//{
+			//	strTemp.Format(_T("%d"),product_register_value[132]);
+			//}
+			//if(product_register_value[123]==3)
+			//{
+			//	if(multi_register_value[132]==0)
+			//		strTemp=_T("OFF");
+			//	if(multi_register_value[132]==1)
+			//		strTemp=_T("ON");
+			//} 
+			strTemp=GetInputValue(4);
+			m_inputValue2.SetWindowText(strTemp);
+		}
+		else if(product_register_value[383]==5) // input2 //m_inputvalue1
+		{
+			//if(product_register_value[123]==4||product_register_value[123]==1)
+			//{			   //180-131
+			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
+			//	strTemp=strTemp+strUnit;
+			//}
+			//if (strUnit==""||strUnit=="%")
+			//{
+			//	strTemp.Format(_T("%d"),product_register_value[132]);
+			//}
+			//if(product_register_value[123]==3)
+			//{
+			//	if(multi_register_value[132]==0)
+			//		strTemp=_T("OFF");
+			//	if(multi_register_value[132]==1)
+			//		strTemp=_T("ON");
+			//} 
+			strTemp=GetInputValue(5);
+			m_inputValue2.SetWindowText(strTemp);
+		}
+		else if(product_register_value[383]==6) // input2 //m_inputvalue1
+		{
+			//if(product_register_value[123]==4||product_register_value[123]==1)
+			//{			   //180-131
+			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
+			//	strTemp=strTemp+strUnit;
+			//}
+			//if (strUnit==""||strUnit=="%")
+			//{
+			//	strTemp.Format(_T("%d"),product_register_value[132]);
+			//}
+			//if(product_register_value[123]==3)
+			//{
+			//	if(multi_register_value[132]==0)
+			//		strTemp=_T("OFF");
+			//	if(multi_register_value[132]==1)
+			//		strTemp=_T("ON");
+			//} 
+			strTemp=GetInputValue(6);
+			m_inputValue2.SetWindowText(strTemp);
+		}
+		else if(product_register_value[383]==7) // input2 //m_inputvalue1
+		{
+			//if(product_register_value[123]==4||product_register_value[123]==1)
+			//{			   //180-131
+			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
+			//	strTemp=strTemp+strUnit;
+			//}
+			//if (strUnit==""||strUnit=="%")
+			//{
+			//	strTemp.Format(_T("%d"),product_register_value[132]);
+			//}
+			//if(product_register_value[123]==3)
+			//{
+			//	if(multi_register_value[132]==0)
+			//		strTemp=_T("OFF");
+			//	if(multi_register_value[132]==1)
+			//		strTemp=_T("ON");
+			//} 
+			strTemp=GetInputValue(7);
+			m_inputValue2.SetWindowText(strTemp);
+		}
+		else if(product_register_value[383]==8) // input2 //m_inputvalue1
+		{
+			//if(product_register_value[123]==4||product_register_value[123]==1)
+			//{			   //180-131
+			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
+			//	strTemp=strTemp+strUnit;
+			//}
+			//if (strUnit==""||strUnit=="%")
+			//{
+			//	strTemp.Format(_T("%d"),product_register_value[132]);
+			//}
+			//if(product_register_value[123]==3)
+			//{
+			//	if(multi_register_value[132]==0)
+			//		strTemp=_T("OFF");
+			//	if(multi_register_value[132]==1)
+			//		strTemp=_T("ON");
+			//} 
+			strTemp=GetInputValue(8);
+			m_inputValue2.SetWindowText(strTemp);
+		}
+		else if (product_register_value[383]==9)//Humidity
 		{		CString temp;
 
 		if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
@@ -2515,7 +2696,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 		}
-		else if (product_register_value[383]==4)//Co2
+		else if (product_register_value[383]==10)//Co2
 		{		   CString temp;
 
 		if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
@@ -2542,6 +2723,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		}
 #endif
 	} 
+	
 	else
 	{
 #if 1
@@ -3344,4 +3526,18 @@ void CParameterDlg::OnCbnSelchangeStaticunint2()
 		}
 		 
 	} 
+}
+
+
+void CParameterDlg::OnBnClickedCs1()
+{
+	CCustomSTable Dlg(2);
+	Dlg.DoModal();
+}
+
+
+void CParameterDlg::OnBnClickedCs2()
+{
+	CCustomSTable Dlg(3);
+	Dlg.DoModal();
 }

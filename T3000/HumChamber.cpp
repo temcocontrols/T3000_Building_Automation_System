@@ -203,7 +203,7 @@ void CHumChamber::Fresh()
 	register_critical_section.Lock();
 	Read_Multi(g_tstat_id,&multi_register_value[0],0,20);  //0-20
 	g_register_occuppied=TRUE;
-for(int  i=0;i<8;i++)
+for(int  i=0;i<9;i++)
 	{
 	Read_Multi(g_tstat_id,&multi_register_value[581+i*50],581+i*50,50);
 	}
@@ -526,9 +526,9 @@ void CHumChamber::FreshGrid(){
 		}
 		m_msflexgrid.put_TextMatrix(i,1,temp1);
 
-		temp.Format(_T("%0.1f"),(unsigned short)(multi_register_value[First_Sensor_Temp_Hum_RegID.Start_ID+2*(i-1)]/10));
+		temp.Format(_T("%0.1f"),(multi_register_value[First_Sensor_Temp_Hum_RegID.Start_ID+2*(i-1)]/10.0));
 		m_msflexgrid.put_TextMatrix(i,2,temp);
-		temp.Format(_T("%0.1f"),(unsigned short)(multi_register_value[First_Sensor_Temp_Hum_RegID.Start_ID+1+2*(i-1)]/10));
+		temp.Format(_T("%0.1f"),(multi_register_value[First_Sensor_Temp_Hum_RegID.Start_ID+1+2*(i-1)]/10.0));
 		m_msflexgrid.put_TextMatrix(i,3,temp);
 	} 
 }
@@ -595,11 +595,15 @@ void CHumChamber::OnBnClickedRefresh()
 {
    if (is_connect())
    { 
-   for(int  i=0;i<6;i++)
+   for(int  i=0;i<7;i++)
    {
 	   Read_Multi(g_tstat_id,&multi_register_value[660+i*50],660+i*50,50);
    }
    FreshGrid();
+   }
+   else
+   {
+    AfxMessageBox(_T("Disconnect"));
    }
   
 }
