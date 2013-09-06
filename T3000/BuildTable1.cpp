@@ -13,6 +13,32 @@
 #define OVER_MAX_OR_BELOW_MIN AfxMessageBox(_T("Please verify the value is between the minimum and maximum readings!"))
 
 IMPLEMENT_DYNAMIC(CBuildTable1, CDialog)
+
+
+	short Get_Min(short *short_Array,int length){
+		short min=short_Array[0];
+		for (int i=1;i<length;i++)
+		{
+			if (min>short_Array[i])
+			{
+				min=short_Array[i];
+			}
+		}
+		return min;
+}
+short Get_Max(short *short_Array,int length){
+	short max=short_Array[0];
+	for (int i=1;i<length;i++)
+	{
+		if (max<short_Array[i])
+		{
+			max=short_Array[i];
+		}
+	}
+	return max;
+}
+
+
 CBuildTable1::CBuildTable1(int Input_NO,CWnd* pParent /*=NULL*/)
 	: CDialog(CBuildTable1::IDD, pParent)	
 	, m_slider1_i(0)
@@ -79,7 +105,7 @@ BEGIN_MESSAGE_MAP(CBuildTable1, CDialog)
 
 	ON_WM_TIMER()
 	ON_WM_DESTROY()
-	ON_EN_SETFOCUS(IDC_EDIT1, OnEnSetfocusEdit1)
+//	ON_EN_SETFOCUS(IDC_EDIT1, OnEnSetfocusEdit1)
 	ON_EN_SETFOCUS(IDC_EDIT8, OnEnSetfocusEdit8)
 	ON_EN_SETFOCUS(IDC_EDIT9, OnEnSetfocusEdit9)
 	ON_EN_SETFOCUS(IDC_EDIT13, OnEnSetfocusEdit13)
@@ -115,7 +141,7 @@ BEGIN_MESSAGE_MAP(CBuildTable1, CDialog)
 	ON_EN_KILLFOCUS(IDC_EDIT19, OnEnKillfocusEdit19)
 	ON_EN_KILLFOCUS(IDC_EDIT20, OnEnKillfocusEdit20)
 	ON_EN_KILLFOCUS(IDC_EDIT12, OnEnKillfocusEdit12)
-	ON_EN_KILLFOCUS(IDC_EDIT10, OnEnKillfocusEdit10)
+//	ON_EN_KILLFOCUS(IDC_EDIT10, OnEnKillfocusEdit10)
 	ON_EN_CHANGE(IDC_EDIT10, OnEnChangeEdit10)
 	ON_EN_SETFOCUS(IDC_EDIT10, OnEnSetfocusEdit10)
 	ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
@@ -141,6 +167,7 @@ BOOL CBuildTable1::OnInitDialog()
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
 }
+
 void CBuildTable1::to_fresh()
 {
 	//float m_version=get_tstat_version(g_tstat_id);
@@ -161,8 +188,18 @@ void CBuildTable1::to_fresh()
 // 		}
 // 		else
 // 		{
-			m_nMax=product_register_value[MODBUS_TABLE1_FIVE]/10;
-			m_nMin=product_register_value[MODBUS_TABLE1_ZERO]/10;
+
+		short temp[11];
+		for (int i=0;i<11;i++)
+		{
+			temp[i]=(short)product_register_value[MODBUS_TABLE1_ZERO+i];
+		}
+
+		m_nMax=Get_Max(&temp[0],11)/10;
+		m_nMin=Get_Min(&temp[0],11)/10;
+
+		/*	m_nMax=product_register_value[MODBUS_TABLE1_FIVE]/10;
+			m_nMin=product_register_value[MODBUS_TABLE1_ZERO]/10;*/
 		/*}*/
 	}
 	else if (m_InputNo==3)
@@ -185,6 +222,15 @@ void CBuildTable1::to_fresh()
 			m_nMin=product_register_value[MODBUS_TABLE2_ZERO]/10;
 		/*}*/
 
+			short temp[11];
+			for (int i=0;i<11;i++)
+			{
+				temp[i]=(short)product_register_value[MODBUS_TABLE2_ZERO+i];
+			}
+
+			m_nMax=Get_Max(&temp[0],11)/10;
+			m_nMin=Get_Min(&temp[0],11)/10;
+
 
 	}
 	int nTemp;
@@ -201,7 +247,7 @@ void CBuildTable1::to_fresh()
 // 	}
 // 	else
 // 	{
-		refresh_rule((float)m_nMin,(float)m_nMax);
+		//refresh_rule((float)m_nMin,(float)m_nMax);
 //	}
 	
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
@@ -294,17 +340,17 @@ void CBuildTable1::to_fresh()
 // 		}
 // 		else//<CUSTOM_TABLE_FLOAT_VERSION
 // 		{
-		m_slider1_i=product_register_value[MODBUS_TABLE1_ZERO]/10;
-		m_slider2_i=product_register_value[MODBUS_TABLE1_HALFONE]/10;
-			m_slider3_i=product_register_value[MODBUS_TABLE1_ONE]/10;
-			m_slider4_i=product_register_value[MODBUS_TABLE1_HALFTWO]/10;
-			m_slider5_i=product_register_value[MODBUS_TABLE1_TWO]/10;
-			m_slider6_i=product_register_value[MODBUS_TABLE1_HALFTHREE]/10;
-			m_slider7_i=product_register_value[MODBUS_TABLE1_THREE]/10;
-			m_slider8_i=product_register_value[MODBUS_TABLE1_HALFFOUR]/10;
-			m_slider9_i=product_register_value[MODBUS_TABLE1_FOUR]/10;
-			m_slider10_i=product_register_value[MODBUS_TABLE1_HALFFIVE]/10;
-			m_slider11_i=product_register_value[MODBUS_TABLE1_FIVE]/10;
+		    m_slider1_i=(short)product_register_value[MODBUS_TABLE1_ZERO]/10;
+		    m_slider2_i=(short)product_register_value[MODBUS_TABLE1_HALFONE]/10;
+			m_slider3_i=(short)product_register_value[MODBUS_TABLE1_ONE]/10;
+			m_slider4_i=(short)product_register_value[MODBUS_TABLE1_HALFTWO]/10;
+			m_slider5_i=(short)product_register_value[MODBUS_TABLE1_TWO]/10;
+			m_slider6_i=(short)product_register_value[MODBUS_TABLE1_HALFTHREE]/10;
+			m_slider7_i=(short)product_register_value[MODBUS_TABLE1_THREE]/10;
+			m_slider8_i=(short)product_register_value[MODBUS_TABLE1_HALFFOUR]/10;
+			m_slider9_i=(short)product_register_value[MODBUS_TABLE1_FOUR]/10;
+		   m_slider10_i=(short)product_register_value[MODBUS_TABLE1_HALFFIVE]/10;
+		   m_slider11_i=(short)product_register_value[MODBUS_TABLE1_FIVE]/10;
 		//}
 	//	UpdateData(FALSE);
 		int m_271=product_register_value[MODBUS_UNITS1_HIGH];
@@ -395,17 +441,17 @@ void CBuildTable1::to_fresh()
 // 		}
 // 		else//<CUSTOM_TABLE_FLOAT_VERSION
 // 		{
-			m_slider1_i=product_register_value[MODBUS_TABLE2_ZERO]/10;
-			m_slider2_i=product_register_value[MODBUS_TABLE2_HALFONE]/10;
-			m_slider3_i=product_register_value[MODBUS_TABLE2_ONE]/10;
-			m_slider4_i=product_register_value[MODBUS_TABLE2_HALFTWO]/10;
-			m_slider5_i=product_register_value[MODBUS_TABLE2_TWO]/10;
-			m_slider6_i=product_register_value[MODBUS_TABLE2_HALFTHREE]/10;
-			m_slider7_i=product_register_value[MODBUS_TABLE2_THREE]/10;
-			m_slider8_i=product_register_value[MODBUS_TABLE2_HALFFOUR]/10;
-			m_slider9_i=product_register_value[MODBUS_TABLE2_FOUR]/10;
-			m_slider10_i=product_register_value[MODBUS_TABLE2_HALFFIVE]/10;
-			m_slider11_i=product_register_value[MODBUS_TABLE2_FIVE]/10;
+			m_slider1_i=(short)product_register_value[MODBUS_TABLE2_ZERO]/10;
+			m_slider2_i=(short)product_register_value[MODBUS_TABLE2_HALFONE]/10;
+			m_slider3_i=(short)product_register_value[MODBUS_TABLE2_ONE]/10;
+			m_slider4_i=(short)product_register_value[MODBUS_TABLE2_HALFTWO]/10;
+			m_slider5_i=(short)product_register_value[MODBUS_TABLE2_TWO]/10;
+			m_slider6_i=(short)product_register_value[MODBUS_TABLE2_HALFTHREE]/10;
+			m_slider7_i=(short)product_register_value[MODBUS_TABLE2_THREE]/10;
+			m_slider8_i=(short)product_register_value[MODBUS_TABLE2_HALFFOUR]/10;
+			m_slider9_i=(short)product_register_value[MODBUS_TABLE2_FOUR]/10;
+			m_slider10_i=(short)product_register_value[MODBUS_TABLE2_HALFFIVE]/10;
+			m_slider11_i=(short)product_register_value[MODBUS_TABLE2_FIVE]/10;
 
 		//}
 
@@ -1266,11 +1312,11 @@ void CBuildTable1::OnDestroy()
 	// TODO: 在此处添加消息处理程序代码
 }
 
-void CBuildTable1::OnEnSetfocusEdit1()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	//KillTimer(1);//killtimer
-}
+//void CBuildTable1::OnEnSetfocusEdit1()
+//{
+//	// TODO: 在此添加控件通知处理程序代码
+//	//KillTimer(1);//killtimer
+//}
 
 void CBuildTable1::OnEnSetfocusEdit8()
 {
@@ -1469,38 +1515,12 @@ void CBuildTable1::OnEnChangeEdit12()
 void CBuildTable1::OnEnKillfocusEdit1()
 {
 
-
-// 	if(m_version>=CUSTOM_TABLE_FLOAT_VERSION)
-// 	{
-// 		float ftemp;
-// 		CString strtxt;
-// 		GetDlgItem(IDC_EDIT1)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		strtxt.Format(_T("%.1f"),ftemp);
-// 		GetDlgItem(IDC_EDIT1)->SetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider1_i=(int)(ftemp*10);
-// 	}
-// 	else
-// 	{
-		int ftemp;
+ 
+		 
 		CString strtxt;
 		GetDlgItem(IDC_EDIT1)->GetWindowText(strtxt);
-		ftemp=_wtoi(strtxt);
-		if (ftemp<0)
-		{
-			AfxMessageBox(_T("your input can not be negative"));
-			to_fresh();
-			return;
-		}
-		strtxt.Format(_T("%d"),ftemp);
-		GetDlgItem(IDC_EDIT1)->SetWindowText(strtxt);
-		ftemp=_wtoi(strtxt);
-		m_slider1_i=ftemp;
-	//}
-	
-
-	refresh();
+		m_slider1_i=_wtoi(strtxt);
+ 
 }
 
 void CBuildTable1::OnEnKillfocusEdit8()
@@ -1524,16 +1544,7 @@ void CBuildTable1::OnEnKillfocusEdit8()
 	CString strtxt;
 	GetDlgItem(IDC_EDIT8)->GetWindowText(strtxt);
 	ftemp=_wtoi(strtxt);
-	if (ftemp<0)
-	{
-		AfxMessageBox(_T("your input can not be negative"));
-		to_fresh();
-		return;
-	}
-
-	strtxt.Format(_T("%d"),ftemp);
-	GetDlgItem(IDC_EDIT8)->SetWindowText(strtxt);
-	ftemp=_wtoi(strtxt);
+	 
 	m_slider2_i=ftemp;
 //}
 	
@@ -1565,12 +1576,12 @@ void CBuildTable1::OnEnKillfocusEdit9()
 		GetDlgItem(IDC_EDIT9)->GetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
 
-		if (ftemp<0)
+	/*	if (ftemp<0)
 		{
 			AfxMessageBox(_T("your input can not be negative"));
 			to_fresh();
 			return;
-		}
+		}*/
 		strtxt.Format(_T("%d"),ftemp);
 		GetDlgItem(IDC_EDIT9)->SetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
@@ -1606,12 +1617,12 @@ void CBuildTable1::OnEnKillfocusEdit13()
 		CString strtxt;
 		GetDlgItem(IDC_EDIT13)->GetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
-		if (ftemp<0)
+		/*if (ftemp<0)
 		{
 			AfxMessageBox(_T("your input can not be negative"));
 			to_fresh();
 			return;
-		}
+		}*/
 
 		strtxt.Format(_T("%d"),ftemp);
 		GetDlgItem(IDC_EDIT13)->SetWindowText(strtxt);
@@ -1644,12 +1655,12 @@ void CBuildTable1::OnEnKillfocusEdit14()
 		CString strtxt;
 		GetDlgItem(IDC_EDIT14)->GetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
-		if (ftemp<0)
+	/*	if (ftemp<0)
 		{
 			AfxMessageBox(_T("your input can not be negative"));
 			to_fresh();
 			return;
-		}
+		}*/
 		strtxt.Format(_T("%d"),ftemp);
 		GetDlgItem(IDC_EDIT14)->SetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
@@ -1683,12 +1694,12 @@ void CBuildTable1::OnEnKillfocusEdit15()
 		GetDlgItem(IDC_EDIT15)->GetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
 
-		if (ftemp<0)
+		/*if (ftemp<0)
 		{
 			AfxMessageBox(_T("your input can not be negative"));
 			to_fresh();
 			return;
-		}
+		}*/
 		strtxt.Format(_T("%d"),ftemp);
 		GetDlgItem(IDC_EDIT15)->SetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
@@ -1722,12 +1733,12 @@ void CBuildTable1::OnEnKillfocusEdit16()
 		GetDlgItem(IDC_EDIT16)->GetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
 
-		if (ftemp<0)
+		/*if (ftemp<0)
 		{
 			AfxMessageBox(_T("your input can not be negative"));
 			to_fresh();
 			return;
-		}
+		}*/
 		strtxt.Format(_T("%d"),ftemp);
 		GetDlgItem(IDC_EDIT16)->SetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
@@ -1761,12 +1772,12 @@ void CBuildTable1::OnEnKillfocusEdit17()
 		GetDlgItem(IDC_EDIT17)->GetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
 
-		if (ftemp<0)
-		{
-			AfxMessageBox(_T("your input can not be negative"));
-			to_fresh();
-			return;
-		}
+		//if (ftemp<0)
+		//{
+		//	AfxMessageBox(_T("your input can not be negative"));
+		//	to_fresh();
+		//	return;
+		//}
 		strtxt.Format(_T("%d"),ftemp);
 		GetDlgItem(IDC_EDIT17)->SetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
@@ -1800,12 +1811,12 @@ void CBuildTable1::OnEnKillfocusEdit18()
 		GetDlgItem(IDC_EDIT18)->GetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
 
-		if (ftemp<0)
+		/*if (ftemp<0)
 		{
 			AfxMessageBox(_T("your input can not be negative"));
 			to_fresh();
 			return;
-		}
+		}*/
 		strtxt.Format(_T("%d"),ftemp);
 		GetDlgItem(IDC_EDIT18)->SetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
@@ -1840,12 +1851,12 @@ void CBuildTable1::OnEnKillfocusEdit19()
 		GetDlgItem(IDC_EDIT19)->GetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
 
-		if (ftemp<0)
+	/*	if (ftemp<0)
 		{
 			AfxMessageBox(_T("your input can not be negative"));
 			to_fresh();
 			return;
-		}
+		}*/
 		strtxt.Format(_T("%d"),ftemp);
 		GetDlgItem(IDC_EDIT19)->SetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
@@ -1880,12 +1891,12 @@ void CBuildTable1::OnEnKillfocusEdit20()
 		GetDlgItem(IDC_EDIT20)->GetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
 
-		if (ftemp<0)
+		/*if (ftemp<0)
 		{
 			AfxMessageBox(_T("your input can not be negative"));
 			to_fresh();
 			return;
-		}
+		}*/
 		strtxt.Format(_T("%d"),ftemp);
 		GetDlgItem(IDC_EDIT20)->SetWindowText(strtxt);
 		ftemp=_wtoi(strtxt);
@@ -1945,10 +1956,7 @@ BOOL CBuildTable1::PreTranslateMessage(MSG* pMsg)
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
-void CBuildTable1::OnEnKillfocusEdit10()
-{
  
-}
 
 void CBuildTable1::OnEnChangeEdit10()
 {
@@ -2038,10 +2046,11 @@ void CBuildTable1::refresh()
 // 	}
 // 	else
 // 	{
+    
 		m_max.Format(_T("%d"),m_nMax);
 		m_min.Format(_T("%d"),m_nMin);
-		refresh_rule((float)m_nMin,(float)m_nMax);
-	//}
+		//refresh_rule((float)m_nMin,(float)m_nMax);
+//}
 
 
 
@@ -2391,56 +2400,7 @@ void CBuildTable1::OnBnClickedSaveok()
 
 BOOL CBuildTable1::CheckDataisRight()
 {
-// 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION) 
-// 	{
-// 		CString strtxt;
-// 		GetDlgItem(IDC_EDIT1)->GetWindowText(strtxt);
-// 		float ftemp=(float)_wtof(strtxt);
-// 		m_slider1_i=(int)(ftemp*10);
-// 
-// 		GetDlgItem(IDC_EDIT8)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider2_i=(int)(ftemp*10);
-// 
-// 		GetDlgItem(IDC_EDIT9)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider3_i=(int)(ftemp*10);
-// 
-// 		GetDlgItem(IDC_EDIT13)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider4_i=(int)(ftemp*10);
-// 
-// 		GetDlgItem(IDC_EDIT14)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider5_i=(int)(ftemp*10);
-// 
-// 		GetDlgItem(IDC_EDIT15)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider6_i=(int)(ftemp*10);
-// 
-// 		GetDlgItem(IDC_EDIT16)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider7_i=(int)(ftemp*10);
-// 
-// 		GetDlgItem(IDC_EDIT17)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider8_i=(int)(ftemp*10);
-// 
-// 		GetDlgItem(IDC_EDIT18)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider9_i=(int)(ftemp*10);
-// 
-// 		GetDlgItem(IDC_EDIT19)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider10_i=(int)(ftemp*10);
-// 
-// 		GetDlgItem(IDC_EDIT20)->GetWindowText(strtxt);
-// 		ftemp=(float)_wtof(strtxt);
-// 		m_slider11_i=(int)(ftemp*10);
-// 
-// 	}
-// 	else
-// 	{
+ 
 		CString strtxt;
 		GetDlgItem(IDC_EDIT1)->GetWindowText(strtxt);
 		int ftemp=_wtoi(strtxt);
@@ -2491,15 +2451,16 @@ BOOL CBuildTable1::CheckDataisRight()
 
 	//}
 	
-
+/*
 	if((m_slider1_i<=m_slider2_i&&m_slider2_i<=m_slider3_i&&m_slider3_i<=m_slider4_i&&m_slider4_i<=m_slider5_i&&
 		m_slider5_i<=m_slider6_i&&m_slider6_i<=m_slider7_i&&m_slider7_i
 		<=m_slider8_i&&m_slider8_i<=m_slider9_i&&m_slider9_i<=m_slider10_i&&m_slider10_i<=m_slider11_i)||
 		(m_slider1_i>=m_slider2_i&&m_slider2_i>=m_slider3_i&&m_slider3_i>=m_slider4_i&&m_slider4_i>=m_slider5_i&&
 		m_slider5_i>=m_slider6_i&&m_slider6_i>=m_slider7_i
 		&&m_slider7_i>=m_slider8_i&&m_slider8_i>=m_slider9_i&&m_slider9_i>=m_slider10_i&&m_slider10_i>=m_slider11_i))
+		*/
 		return TRUE;
-	return FALSE;
+	//return FALSE;
 }
 
 void CBuildTable1::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
