@@ -787,7 +787,7 @@ extern struct remote_local_list  remote_local_list[100];
 
 
 //extern int  station_num;
-int local_panel=0;
+/*extern*/ int local_panel=0;
 extern unsigned char tbl_bank[100];
 
 /* This array is used by eval_exp1() */
@@ -1138,6 +1138,8 @@ int Encode_Program ( /*GEdit *ppedit*/)
 //	memset(time_table, 0, 200);
 //	memset(local_table,0,sizeof(local_table));
 	ind_local_table = ind_time_table = 0;
+
+	memset(mycode,0,sizeof(mycode));
 	code = mycode;
 	memset(mesbuf,0,1024);
 	pmes = mesbuf;
@@ -4440,6 +4442,11 @@ case ASSIGNARRAY_2:
 				cod_line[ind_cod_line++]=ASSIGN;
 */
 			 ind_cod_line=pcodvar(0,v1,var1,fvar1,NULL,ind_cod_line);
+			 if(ind_cod_line == -2)
+			 {
+				 error = 1;
+				 return;
+			 }
 			 if(v2)
 			 {
 				for(i=0;i<v2;i++)
@@ -5222,7 +5229,8 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 						 }
 						 if (j == ind_local_table)
 						 {
-							exit(1);
+							 return -2;
+							//exit(1);//Fance
 						 }
 					 }
 

@@ -28,6 +28,7 @@ public:
 	void Initial_List();
 
 	afx_msg void OnBnClickedButtonOutputApply();
+	afx_msg void OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 const int OUTPUT_NUM = 0;

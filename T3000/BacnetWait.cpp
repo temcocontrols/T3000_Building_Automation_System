@@ -90,7 +90,7 @@ BOOL BacnetWait::PreTranslateMessage(MSG* pMsg)
 void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 {
 	static int static_count=0;
-	static_count = (++static_count)%5;
+	static_count = (++static_count)%(5+BAC_READ_INPUT_GROUP_NUMBER*2-1);
 	CString tempcs,tempcs2;
 	tempcs.Format(_T("Reading descriptors "));
 	for (int i=0;i<=static_count;i++)
@@ -100,68 +100,228 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 	tempcs = tempcs + tempcs2;
 	int success_count =0;
 	int pos=0;
-	if(Bacnet_Refresh_Info.Output_result == BAC_RESULTS_OK)
+	for (int i=0;i<=BAC_READ_INPUT_GROUP_NUMBER ;i++ )
 	{
-		success_count ++;
-		pos = pos +25;
+		if(bac_read_which_list ==BAC_READ_ALL_LIST)
+		{
+			if(Bacnet_Refresh_Info.Input_result[i] == BAC_RESULTS_OK)
+			{
+				success_count ++;
+				pos = pos +7;
+			}
+
+			if(Bacnet_Refresh_Info.Output_result[i] == BAC_RESULTS_OK)
+			{
+				success_count ++;
+				pos = pos +7;
+			}
+
+			if(Bacnet_Refresh_Info.Variable_result[i] == BAC_RESULTS_OK)
+			{
+				success_count ++;
+				pos = pos +7;
+			}
+
+			if(Bacnet_Refresh_Info.Program_result[i] == BAC_RESULTS_OK)
+			{
+				success_count ++;
+				pos = pos +7;
+			}
+		}
+		else if(bac_read_which_list == BAC_READ_INPUT_LIST)
+		{
+			if(Bacnet_Refresh_Info.Input_result[i] == BAC_RESULTS_OK)
+			{
+				success_count ++;
+				pos = pos +25;
+			}
+		}
+		else if(bac_read_which_list == BAC_READ_OUTPUT_LIST)
+		{
+			if(Bacnet_Refresh_Info.Output_result[i] == BAC_RESULTS_OK)
+			{
+				success_count ++;
+				pos = pos +25;
+			}
+		}
+		else if(bac_read_which_list == BAC_READ_VARIABLE_LIST)
+		{
+			if(Bacnet_Refresh_Info.Variable_result[i] == BAC_RESULTS_OK)
+			{
+				success_count ++;
+				pos = pos +25;
+			}
+		}
+		else if(bac_read_which_list == BAC_READ_PROGRAM_LIST)
+		{
+			if(Bacnet_Refresh_Info.Program_result[i] == BAC_RESULTS_OK)
+			{
+				success_count ++;
+				pos = pos +25;
+			}
+		}
 	}
-	if(Bacnet_Refresh_Info.Input_result == BAC_RESULTS_OK)
-	{
-		success_count ++;
-		pos = pos +25;
-	}
-	if(Bacnet_Refresh_Info.Variable_result == BAC_RESULTS_OK)
-	{
-		success_count ++;
-		pos = pos +25;
-	}
-	if(Bacnet_Refresh_Info.Program_result == BAC_RESULTS_OK)
-	{
-		success_count ++;
-		pos = pos +25;
-	}
+
+
 	m_wait_progress.SetPos(pos);
+
 
 	switch(nIDEvent)
 	{
 	case 1:
-		if((Bacnet_Refresh_Info.Input_result == BAC_RESULTS_UNKONW) ||
-			(Bacnet_Refresh_Info.Output_result == BAC_RESULTS_UNKONW) ||
-			(Bacnet_Refresh_Info.Program_result == BAC_RESULTS_UNKONW) ||
-			(Bacnet_Refresh_Info.Variable_result == BAC_RESULTS_UNKONW) )
+		for (int i=0;i<BAC_READ_INPUT_GROUP_NUMBER;i++)
 		{
-			m_wait_detail.SetWindowTextW(tempcs);
+			if(bac_read_which_list ==BAC_READ_ALL_LIST)
+			{
+				if((Bacnet_Refresh_Info.Input_result[i] == BAC_RESULTS_UNKONW) ||
+					(Bacnet_Refresh_Info.Output_result[i] == BAC_RESULTS_UNKONW)||
+					(Bacnet_Refresh_Info.Variable_result[i] == BAC_RESULTS_UNKONW)||
+					(Bacnet_Refresh_Info.Program_result[i] == BAC_RESULTS_UNKONW))
+				{
+					m_wait_detail.SetWindowTextW(tempcs);
+					goto endthis;
+				}
+				if(Bacnet_Refresh_Info.Input_result[i] == BAC_RESULTS_FAIL)
+				{
+					m_wait_detail.SetWindowTextW(_T("Read Input Table Time Out!"));
+					KillTimer(1);
+					SetTimer(2,2000,NULL);
+					goto endthis;
+				}
+				if(Bacnet_Refresh_Info.Output_result[i] == BAC_RESULTS_FAIL)
+				{
+					m_wait_detail.SetWindowTextW(_T("Read Output Table Time Out!"));
+					KillTimer(1);
+					SetTimer(2,2000,NULL);
+					goto endthis;
+				}
+				if(Bacnet_Refresh_Info.Program_result[i] == BAC_RESULTS_FAIL)
+				{
+					m_wait_detail.SetWindowTextW(_T("Read Program Table Time Out!"));
+					KillTimer(1);
+					SetTimer(2,2000,NULL);
+					goto endthis;
+				}
+				if(Bacnet_Refresh_Info.Variable_result[i] == BAC_RESULTS_FAIL)
+				{
+					m_wait_detail.SetWindowTextW(_T("Read Variable Table Time Out!"));
+					KillTimer(1);
+					SetTimer(2,2000,NULL);
+					goto endthis;
+				}
+			}
+			else if(bac_read_which_list == BAC_READ_INPUT_LIST)
+			{
+				if(Bacnet_Refresh_Info.Input_result[i] == BAC_RESULTS_UNKONW)
+				{
+					m_wait_detail.SetWindowTextW(tempcs);
+					goto endthis;
+				}
+				else if(Bacnet_Refresh_Info.Input_result[i] == BAC_RESULTS_FAIL)
+				{
+					m_wait_detail.SetWindowTextW(_T("Read Input Table Time Out!"));
+					KillTimer(1);
+					SetTimer(2,2000,NULL);
+					goto endthis;
+				}
+			}
+			else if(bac_read_which_list == BAC_READ_OUTPUT_LIST)
+			{
+				if(Bacnet_Refresh_Info.Output_result[i] == BAC_RESULTS_UNKONW)
+				{
+					m_wait_detail.SetWindowTextW(tempcs);
+					goto endthis;
+				}
+				else if(Bacnet_Refresh_Info.Output_result[i] == BAC_RESULTS_FAIL)
+				{
+					m_wait_detail.SetWindowTextW(_T("Read Outputs Table Time Out!"));
+					KillTimer(1);
+					SetTimer(2,2000,NULL);
+					goto endthis;
+				}
+			}
+			else if(bac_read_which_list == BAC_READ_VARIABLE_LIST)
+			{
+				if(Bacnet_Refresh_Info.Variable_result[i] == BAC_RESULTS_UNKONW)
+				{
+					m_wait_detail.SetWindowTextW(tempcs);
+					goto endthis;
+				}
+				else if(Bacnet_Refresh_Info.Variable_result[i] == BAC_RESULTS_FAIL)
+				{
+					m_wait_detail.SetWindowTextW(_T("Read Variable Table Time Out!"));
+					KillTimer(1);
+					SetTimer(2,2000,NULL);
+					goto endthis;
+				}
+			}
+			else if(bac_read_which_list == BAC_READ_PROGRAM_LIST)
+			{
+				if(Bacnet_Refresh_Info.Program_result[i] == BAC_RESULTS_UNKONW)
+				{
+					m_wait_detail.SetWindowTextW(tempcs);
+					goto endthis;
+				}
+				else if(Bacnet_Refresh_Info.Program_result[i] == BAC_RESULTS_FAIL)
+				{
+					m_wait_detail.SetWindowTextW(_T("Read Program Table Time Out!"));
+					KillTimer(1);
+					SetTimer(2,2000,NULL);
+					goto endthis;
+				}
+			}
 		}
-		else if(Bacnet_Refresh_Info.Input_result == BAC_RESULTS_FAIL)
-		{
-			m_wait_detail.SetWindowTextW(_T("Read Input Table Time Out!"));
-			KillTimer(1);
-			SetTimer(2,2000,NULL);
-		}
-		else if(Bacnet_Refresh_Info.Output_result == BAC_RESULTS_FAIL)
-		{
-			m_wait_detail.SetWindowTextW(_T("Read Output Table Time Out!"));
-			KillTimer(1);
-			SetTimer(2,2000,NULL);
-		}
-		else if(Bacnet_Refresh_Info.Program_result == BAC_RESULTS_FAIL)
-		{
-			m_wait_detail.SetWindowTextW(_T("Read Program Table Time Out!"));
-			KillTimer(1);
-			SetTimer(2,2000,NULL);
-		}
-		else if(Bacnet_Refresh_Info.Variable_result == BAC_RESULTS_FAIL)
-		{
-			m_wait_detail.SetWindowTextW(_T("Read Variable Table Time Out!"));
-			KillTimer(1);
-			SetTimer(2,2000,NULL);
-		}
-		else
-		{
+		bac_input_read_results = true;
+		bac_output_read_results = true;
+		bac_variable_read_results = true;
+		bac_program_read_results = true;
 			m_wait_detail.SetWindowTextW(_T("Reading descriptors success!"));
 			KillTimer(1);
+			if(bac_read_which_list ==BAC_READ_ALL_LIST)
 			SetTimer(2,2000,NULL);
-		}
+			else
+			SetTimer(2,100,NULL);
+
+		//if(/*(Bacnet_Refresh_Info.Input_result == BAC_RESULTS_UNKONW) ||*/
+		//	/*(Bacnet_Refresh_Info.Output_result == BAC_RESULTS_UNKONW) ||*/
+		//	(Bacnet_Refresh_Info.Program_result == BAC_RESULTS_UNKONW) ||
+		//	(Bacnet_Refresh_Info.Variable_result == BAC_RESULTS_UNKONW) )
+		//{
+		//	m_wait_detail.SetWindowTextW(tempcs);
+		//}
+		////else if(Bacnet_Refresh_Info.Input_result == BAC_RESULTS_FAIL)
+		////{
+		////	m_wait_detail.SetWindowTextW(_T("Read Input Table Time Out!"));
+		////	KillTimer(1);
+		////	SetTimer(2,2000,NULL);
+		////}
+		////else if(Bacnet_Refresh_Info.Output_result == BAC_RESULTS_FAIL)
+		////{
+		////	m_wait_detail.SetWindowTextW(_T("Read Output Table Time Out!"));
+		////	KillTimer(1);
+		////	SetTimer(2,2000,NULL);
+		////}
+		////else /*if(Bacnet_Refresh_Info.Program_result == BAC_RESULTS_FAIL)
+		//{
+		//	m_wait_detail.SetWindowTextW(_T("Read Program Table Time Out!"));
+		//	KillTimer(1);
+		//	SetTimer(2,2000,NULL);
+		//}
+		//else if(Bacnet_Refresh_Info.Variable_result == BAC_RESULTS_FAIL)
+		//{
+		//	m_wait_detail.SetWindowTextW(_T("Read Variable Table Time Out!"));
+		//	KillTimer(1);
+		//	SetTimer(2,2000,NULL);
+		//}*/
+		//else
+		//{
+		//	m_wait_detail.SetWindowTextW(_T("Reading descriptors success!"));
+		//	KillTimer(1);
+		//	SetTimer(2,2000,NULL);
+		//}
+
+
+endthis:
 		break;
 	case 2:
 		{

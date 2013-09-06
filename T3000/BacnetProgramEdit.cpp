@@ -9,7 +9,7 @@
 #include "CM5/ud_str.h"
 #include "Bacnet_Include.h"
 #include "globle_function.h"
-
+#include "gloab_define.h"
 extern int error;
 extern char *pmes;
 extern int program_list_line;
@@ -60,6 +60,7 @@ BEGIN_MESSAGE_MAP(CBacnetProgramEdit, CDialogEx)
 	ON_COMMAND(ID_LOADFILE, &CBacnetProgramEdit::OnLoadfile)
 	ON_COMMAND(ID_SAVEFILE, &CBacnetProgramEdit::OnSavefile)
 	ON_EN_SETFOCUS(IDC_RICHEDIT2_PROGRAM, &CBacnetProgramEdit::OnEnSetfocusRichedit2Program)
+	ON_COMMAND(ID_REFRESH, &CBacnetProgramEdit::OnRefresh)
 END_MESSAGE_MAP()
 
 
@@ -80,7 +81,7 @@ LRESULT CBacnetProgramEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 		OnClear();
 		Run_once_mutex = false;
 	}
-	else if(wParam == KEY_F5)
+	else if(wParam == KEY_F7)
 	{
 		Run_once_mutex = true;
 		OnLoadfile();
@@ -90,6 +91,12 @@ LRESULT CBacnetProgramEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 	{
 		Run_once_mutex = true;
 		OnSavefile();
+		Run_once_mutex = false;
+	}
+	else if(wParam == KEY_F8)
+	{
+		Run_once_mutex = true;
+		OnRefresh();
 		Run_once_mutex = false;
 	}
 	return 0;
@@ -157,9 +164,9 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 
 	RegisterHotKey(GetSafeHwnd(),KEY_F2,NULL,VK_F2);//F2¼ü
 	RegisterHotKey(GetSafeHwnd(),KEY_F3,NULL,VK_F3);
-	RegisterHotKey(GetSafeHwnd(),KEY_F5,NULL,VK_F5);
+	RegisterHotKey(GetSafeHwnd(),KEY_F7,NULL,VK_F7);
 	RegisterHotKey(GetSafeHwnd(),KEY_F6,NULL,VK_F6);
-
+	RegisterHotKey(GetSafeHwnd(),KEY_F8,NULL,VK_F8);
 	Initial_static();
 
 	init_info_table();
@@ -211,13 +218,17 @@ LRESULT  CBacnetProgramEdit::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM 
 	msg_result = MKBOOL(wParam);
 	if(msg_result)
 	{
-		SetPaneString(0,_T("Bacnet operation success!"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Bacnet operation success!"));
+		#ifdef SHOW_MESSAGEBOX
 		MessageBox(_T("Bacnet operation success!"));
+		#endif
 	}
 	else
 	{
-		SetPaneString(0,_T("Bacnet operation fail!"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Bacnet operation fail!"));
+		#ifdef SHOW_ERROR_MESSAGE
 		MessageBox(_T("Bacnet operation fail!"));
+		#endif
 	}
 	if(pInvoke)
 		delete pInvoke;
@@ -242,7 +253,7 @@ void CBacnetProgramEdit::OnSend()
 	Encode_Program();
 	if(error == -1)
 	{
-		g_invoke_id =WritePrivateData(1234,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line,my_lengthcode);
+		g_invoke_id =WritePrivateData(1234,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line/*,my_lengthcode*/);
 		if(g_invoke_id>=0)
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 	}
@@ -280,8 +291,9 @@ void CBacnetProgramEdit::OnClose()
 	// TODO: Add your message handler code here and/or call default
 	UnregisterHotKey(GetSafeHwnd(),KEY_F2);//×¢ÏúF2¼ü
 	UnregisterHotKey(GetSafeHwnd(),KEY_F3);
-	UnregisterHotKey(GetSafeHwnd(),KEY_F5);
+	UnregisterHotKey(GetSafeHwnd(),KEY_F7);
 	UnregisterHotKey(GetSafeHwnd(),KEY_F6);
+	UnregisterHotKey(GetSafeHwnd(),KEY_F8);
 	CDialogEx::OnClose();
 }
 
@@ -390,4 +402,14 @@ void CBacnetProgramEdit::OnEnSetfocusRichedit2Program()
 	GetDlgItemText(IDC_RICHEDIT2_PROGRAM,temp);
 	int length = temp.GetLength();
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(length,length);
+}
+
+
+void CBacnetProgramEdit::OnRefresh()
+{
+	// TODO: Add your command handler code here
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(_T(""));
+	g_invoke_id = GetPrivateData(1234,READPROGRAMCODE_T3000,program_list_line,program_list_line,100);
+	if(g_invoke_id>=0)
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 }

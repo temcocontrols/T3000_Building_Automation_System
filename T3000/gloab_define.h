@@ -1,4 +1,7 @@
 #pragma once
+
+//#define SHOW_MESSAGEBOX
+#define SHOW_ERROR_MESSAGE
 const int TYPE_INPUT = 1;
 const int TYPE_OUTPUT = 2;
 const int TYPE_PROGRAM = 3;
@@ -20,16 +23,45 @@ const int BAC_RESULTS_UNKONW = 2;
 const int BAC_RESULTS_OK = 1;
 const int BAC_RESULTS_FAIL = 0;
 
+const int BAC_UNITS_DIGITAL = 0;
+const int BAC_UNITS_ANALOG  = 1;
+
+const int BAC_AUTO = 0;
+const int BAC_MANUAL = 1;
+
+const int BAC_DECOM_YES = 0;
+const int BAC_DECOM_NO  = 1;
+
+const int BAC_READ_INPUT_GROUP_NUMBER = 4;
+
+const int BAC_READ_ALL_LIST = 255;
+const int BAC_READ_INPUT_LIST = 1;
+const int BAC_READ_OUTPUT_LIST = 2;
+const int BAC_READ_VARIABLE_LIST = 3;
+const int BAC_READ_PROGRAM_LIST = 4;
+
+const int BAC_SHOW_MISSION_RESULTS = 3;
+
 struct _Refresh_Info 
 {
-	int Input_InvokeID;
-	int Output_InvokeID;
-	int Variable_InvokeID;
-	int Program_InvokeID;
-	int Input_result;	//2 UNKONW  1 OK   0 FAIL
-	int Output_result;
-	int Variable_result;
-	int Program_result;
+	int Input_InvokeID[BAC_READ_INPUT_GROUP_NUMBER+1];
+	int Output_InvokeID[BAC_READ_INPUT_GROUP_NUMBER+1];
+	int Variable_InvokeID[BAC_READ_INPUT_GROUP_NUMBER+1];
+	int Program_InvokeID[BAC_READ_INPUT_GROUP_NUMBER+1];
+	int Input_result[BAC_READ_INPUT_GROUP_NUMBER+1];	//2 UNKONW  1 OK   0 FAIL
+	int Output_result[BAC_READ_INPUT_GROUP_NUMBER+1];
+	int Variable_result[BAC_READ_INPUT_GROUP_NUMBER+1];
+	int Program_result[BAC_READ_INPUT_GROUP_NUMBER+1];
+};
+
+typedef struct _MessageWriteListInfo
+{
+	uint32_t deviceid;
+	int8_t command;
+	int8_t start_instance;
+	int8_t end_instance;
+	int8_t entitysize;
+	HWND hWnd;
 };
 
 
@@ -68,6 +100,28 @@ const CString Output_Analog_Units_Show[] =
 	_T("%"),
 	_T("%Cls"),
 	_T("ma"),	
+};
+
+const CString OutPut_List_Analog_Range[] =
+{
+	_T("Unused"),
+	_T("0.0 -> 10"),
+	_T("0.0 -> 100"),
+	_T("0.0 -> 20"),
+	_T("0.0 -> 100"),
+	_T("0.0 -> 100"),
+	_T("0.0 -> 20")
+};
+
+const CString OutPut_List_Analog_Units[] =
+{
+	_T("Unused"),
+	_T("Volts"),
+	_T("%Open"),
+	_T("psi"),
+	_T("%"),
+	_T("%Cls"),
+	_T("ma")
 };
 
 const CString Output_Analog_Units_Array[] = 

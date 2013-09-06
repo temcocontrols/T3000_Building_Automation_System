@@ -52,17 +52,27 @@ END_MESSAGE_MAP()
 LRESULT  CBacnetInput::InputResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 {
 	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
+	CString temp_cs;
+	temp_cs.Format(_T("%d"),pInvoke->Invoke_ID);
 	bool msg_result=WRITE_FAIL;
 	msg_result = MKBOOL(wParam);
 	if(msg_result)
 	{
-		SetPaneString(0,_T("Bacnet operation success!"));
-		//MessageBox(_T("Bacnet operation success!"));
+		CString temp_ok;
+		temp_ok = _T("Bacnet operation success!   Request ID:") +  temp_cs;
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_ok);
+		#ifdef SHOW_MESSAGEBOX
+		MessageBox(temp_ok);
+		#endif
 	}
 	else
 	{
-		SetPaneString(0,_T("Bacnet operation fail!"));
-		MessageBox(_T("Bacnet operation fail!"));
+		CString temp_fail;
+		temp_fail = _T("Bacnet operation fail!   Request ID:") +  temp_cs;
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_fail);
+		#ifdef SHOW_ERROR_MESSAGE
+		MessageBox(temp_fail);
+		#endif
 	}
 	if(pInvoke)
 		delete pInvoke;
@@ -131,9 +141,10 @@ BOOL CBacnetInput::OnInitDialog()
 
 	// TODO:  Add extra initialization here
 	Initial_List();
-	g_invoke_id = GetPrivateData(1234,READINPUT_T3000,0,4,sizeof(Str_in_point));
-	if(g_invoke_id>=0)
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+	//g_invoke_id = GetPrivateData(1234,READINPUT_T3000,0,4,sizeof(Str_in_point));
+	//if(g_invoke_id>=0)
+	//	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 
 	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_REFRESH);
 	((CButton *)GetDlgItem(IDC_BUTTON_INPUT_READ))->SetIcon(hIcon);	
@@ -150,7 +161,7 @@ void CBacnetInput::Initial_List()
 	//m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_input_list.InsertColumn(INPUT_NUM, _T("NUM"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-	m_input_list.InsertColumn(INPUT_FULL_LABLE, _T("Full Lable"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_FULL_LABLE, _T("Full Label"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_UNITE, _T("Units"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -158,7 +169,7 @@ void CBacnetInput::Initial_List()
 	m_input_list.InsertColumn(INPUT_CAL, _T("Calibration"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_FITLER, _T("Filter"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_DECOM, _T("Status"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_input_list.InsertColumn(INPUT_LABLE, _T("Lable"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_LABLE, _T("Label"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_input_dlg_hwnd;
 }
@@ -173,6 +184,24 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
 
+	if(Changed_SubItem == INPUT_LABLE)
+	{
+		CString cs_temp = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
+		char cTemp1[255];
+		memset(cTemp1,0,255);
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+		memcpy_s(m_Input_data.at(Changed_Item).label,STR_IN_LABEL,cTemp1,STR_IN_LABEL);
+	}
+
+	if(Changed_SubItem == INPUT_FULL_LABLE)
+	{
+		CString cs_temp = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
+		char cTemp1[255];
+		memset(cTemp1,0,255);
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+		memcpy_s(m_Input_data.at(Changed_Item).description,STR_IN_DESCRIPTION_LENGTH,cTemp1,STR_IN_DESCRIPTION_LENGTH);
+	}
+
 
 	if(Changed_SubItem == INPUT_AUTO_MANUAL)
 	{
@@ -180,10 +209,12 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 		if(temp_cs.CompareNoCase(_T("Auto"))==0)
 		{
 			m_input_list.SetCellEnabled(Changed_Item,INPUT_VALUE,0);
+			m_Input_data.at(Changed_Item).auto_manual = BAC_AUTO ;
 		}
 		else
 		{
 			m_input_list.SetCellEnabled(Changed_Item,INPUT_VALUE,1);
+			m_Input_data.at(Changed_Item).auto_manual = BAC_MANUAL ;
 		}
 	}
 	else if(Changed_SubItem==INPUT_RANGE)
@@ -246,7 +277,37 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 			m_input_list.SetItemText(Changed_Item,INPUT_UNITE,_T("ON/OFF"));
 		}
 	}
-	m_input_list.Invalidate();
+
+	if(Changed_SubItem==INPUT_CAL)
+	{
+		CString cs_temp=m_input_list.GetItemText(Changed_Item,INPUT_CAL);
+		int cal_value = _wtoi(cs_temp);
+		m_Input_data.at(Changed_Item).calibration = cal_value;
+	}
+	else if(Changed_SubItem==INPUT_FITLER)
+	{
+		CString cs_temp=m_input_list.GetItemText(Changed_Item,INPUT_FITLER);
+		int  temp2 = _wtoi(cs_temp);
+		m_Input_data.at(Changed_Item).filter = log((double)temp2)/log((double)2);
+	}
+	else if(Changed_SubItem==INPUT_DECOM)
+	{
+		CString cs_temp = m_input_list.GetItemText(Changed_Item,INPUT_DECOM);
+		int dec_index=-1;
+		for (int m=0;m<(int)sizeof(Decom_Array)/sizeof(Decom_Array[0]);m++)
+		{
+			if(cs_temp.CompareNoCase(Decom_Array[m])==0)
+			{
+				dec_index = m;
+				break;
+			}
+		}
+		m_Input_data.at(Changed_Item).decom = dec_index;
+	}
+
+
+	Post_Write_Message(1234,WRITEINPUT_T3000,Changed_Item,Changed_Item,sizeof(Str_in_point),this->m_hWnd);
+	//m_input_list.Invalidate();
 	return 0;
 }
 
@@ -494,19 +555,20 @@ void CBacnetInput::OnBnClickedButtonApply()
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 		memcpy_s(m_Input_data.at(i).label,STR_IN_LABEL,cTemp1,STR_IN_LABEL);
 	}
-
-	g_invoke_id =WritePrivateData(1234,WRITEINPUT_T3000,0,(int)m_Input_data.size()-1,sizeof(Str_in_point));
-	if(g_invoke_id>=0)
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+	Post_Write_Message(1234,WRITEINPUT_T3000,0,19,sizeof(Str_in_point),this->m_hWnd);
+	//g_invoke_id =WritePrivateData(1234,WRITEINPUT_T3000,0,(int)m_Input_data.size()-1,sizeof(Str_in_point));
+	//if(g_invoke_id>=0)
+	//	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 }
 
 
 void CBacnetInput::OnBnClickedButtonRead()
 {
 	// TODO: Add your control notification handler code here
-	g_invoke_id = GetPrivateData(1234,READINPUT_T3000,0,4,sizeof(Str_in_point));
-	if(g_invoke_id>=0)
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+	//g_invoke_id = GetPrivateData(1234,READINPUT_T3000,0,4,sizeof(Str_in_point));
+	//if(g_invoke_id>=0)
+	//	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 }
 
 //

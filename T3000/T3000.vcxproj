@@ -144,6 +144,7 @@
     <ClCompile Include="CM5\MyOwnListCtrl.cpp" />
     <ClCompile Include="CO2_View.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
+    <ClCompile Include="CustomSTable.cpp" />
     <ClCompile Include="DialogCM5_BacNet.cpp" />
     <ClCompile Include="DisplayConfig.cpp" />
     <ClCompile Include="IONameConfig.cpp" />

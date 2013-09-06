@@ -26,6 +26,7 @@ CListCtrlEx::CListCtrlEx()
 	m_dwEditStyle = ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_LEFT | ES_NOHIDESEL;
 	m_dwComboStyle = WS_BORDER | WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_AUTOVSCROLL | 
 		CBS_DROPDOWNLIST | CBS_DISABLENOSCROLL;
+	m_need_edit = true;
 }
 
 CListCtrlEx::~CListCtrlEx()
@@ -386,6 +387,15 @@ BOOL CListCtrlEx::GetCellRect(int iRow, int iCol, CRect &rect, int nArea)
 	rect.right = rCol1.left;
 
 	return TRUE;
+}
+
+void      CListCtrlEx::Set_Edit(bool b_edit)
+{
+	m_need_edit = b_edit;
+}
+BOOL		CListCtrlEx::Get_Edit()
+{
+	return m_need_edit;
 }
 
 BOOL	CListCtrlEx::GetCheckRect(int iRow, int iCol, CRect &rect)
@@ -995,7 +1005,8 @@ void ListCtrlEx::CListCtrlEx::OnLButtonDown(UINT nFlags, CPoint point)
 	bShouldAction=(ix.first>=0 && ix.second>=0 && ix.first<GetItemCount() && ix.second<GetColumnCount());
 	
 	CListCtrl::OnLButtonDown(nFlags, point);
-
+	if(m_need_edit == false)
+		return;
 	// If the SHIFT or CTRL key is down call the base class
 	// Check the high bit of GetKeyState to determine whether SHIFT or CTRL key is down
 	if ((GetKeyState(VK_SHIFT) & 0x80) || (GetKeyState(VK_CONTROL) & 0x80))
@@ -1038,6 +1049,7 @@ void ListCtrlEx::CListCtrlEx::OnLButtonDown(UINT nFlags, CPoint point)
 		//InvalidateRect(&rcItem); // normal or default should be update immediately for the focus state
 		//UpdateWindow();	
 	}
+
 	// notify parent with user messages
 	if ((pWnd = GetParent())!=NULL )
 	{

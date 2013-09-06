@@ -278,7 +278,7 @@ BOOL CT3000App::InitInstance()
 	// Register the application's document templates.  Document templates
 	//  serve as the connection between documents, frame windows and views
 
-#ifndef Fance_Enable
+#ifndef Fance_Enable_Test
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
 		IDR_MAINFRAME,
@@ -286,12 +286,15 @@ BOOL CT3000App::InitInstance()
 		RUNTIME_CLASS(CMainFrame),       // main SDI frame window
 		RUNTIME_CLASS(CT3000View));
 #endif
-	//CSingleDocTemplate* pDocTemplate;
-	//pDocTemplate = new CSingleDocTemplate(
-	//	IDR_MAINFRAME,
-	//	RUNTIME_CLASS(CT3000Doc),
-	//	RUNTIME_CLASS(CMainFrame),       // main SDI frame window
-	//	RUNTIME_CLASS(CDialogCM5_BacNet));
+
+#ifdef Fance_Enable_Test
+	CSingleDocTemplate* pDocTemplate;
+	pDocTemplate = new CSingleDocTemplate(
+		IDR_MAINFRAME,
+		RUNTIME_CLASS(CT3000Doc),
+		RUNTIME_CLASS(CMainFrame),       // main SDI frame window
+		RUNTIME_CLASS(CDialogCM5_BacNet));
+#endif
 
 
 

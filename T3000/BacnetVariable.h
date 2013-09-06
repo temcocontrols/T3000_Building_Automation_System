@@ -1,5 +1,6 @@
 #pragma once
 #include "CM5/ListCtrlEx.h"
+#include "afxwin.h"
 
 // CBacnetVariable dialog
 
@@ -28,6 +29,7 @@ public:
 	ListCtrlEx::CListCtrlEx m_variable_list;
 
 	afx_msg void OnBnClickedButtonVariableApply();
+	afx_msg void OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 
