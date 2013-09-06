@@ -49,6 +49,7 @@
 #include "TestMultiReadTraffic.h"
 #include "T38I13O.h"
 #include "T332AI.h"
+#include "gloab_define.h"
 #pragma region Fance Test
 //For Test
 
@@ -202,6 +203,7 @@ static UINT indicators[] =
 	ID_RW_INFO,
 	ID_BUILDING_INFO,
 	ID_PROTOCOL_INFO,
+	IDS_SHOW_RESULTS,
 	ID_INDICATOR_CAPS,
 	ID_INDICATOR_NUM,
 	ID_INDICATOR_SCRL,
@@ -539,11 +541,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	
 	m_wndStatusBar.SetPaneInfo(0,ID_RW_INFO,SBPS_NOBORDERS,   300);
    // int index = m_wndStatusBar.CommandToIndex(ID_BUILDING_INFO);	
-	m_wndStatusBar.SetPaneInfo(1,ID_BUILDING_INFO,SBPS_NOBORDERS, 600);//SBPS_POPOUT | SBPS_NOBORDERS,300);	
+	m_wndStatusBar.SetPaneInfo(1,ID_BUILDING_INFO,SBPS_NOBORDERS, 300);//SBPS_POPOUT | SBPS_NOBORDERS,300);	
 //	index = m_wndStatusBar.CommandToIndex(ID_RW_INFO);
 //	m_wndStatusBar.SetPaneInfo(index,ID_PROTOCOL_INFO,SBPS_NOBORDERS,250);//SBPS_POPOUT | SBPS_NOBORDERS,300);
 //	index = m_wndStatusBar.CommandToIndex(ID_PROTOCOL_INFO);
-	m_wndStatusBar.SetPaneInfo(2,ID_PROTOCOL_INFO,SBPS_STRETCH | SBPS_NOBORDERS , 300);
+	m_wndStatusBar.SetPaneInfo(2,ID_PROTOCOL_INFO,SBPS_STRETCH | SBPS_NOBORDERS , 100);
+	m_wndStatusBar.SetPaneInfo(3,IDS_SHOW_RESULTS,SBPS_NORMAL , 400);
 
 	m_wndStatusBar.SetPaneText(1, _T("No Connection"), TRUE);
 	m_wndStatusBar.SetPaneTextColor(0, RGB(224,0,0));
@@ -569,7 +572,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//InitTreeNodeConn();   //LSC
 
 	SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
-#ifndef Fance_Enable
+#ifndef Fance_Enable_Test
 	m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
 	m_pRefreshThread->SetMainWnd(this);	
 
@@ -3426,6 +3429,15 @@ void CMainFrame::OnDestroy()
 
 	CFrameWndEx::OnDestroy();
 
+
+#ifdef Fance_Enable_Test		//For Test Use
+	if (is_connect())
+	{
+		close_com(); 
+	}
+	return;
+#endif
+
 	g_killMultiReadEvent.SetEvent();
 
 	Sleep(500);//wait for the end of the thread.
@@ -3457,13 +3469,12 @@ void CMainFrame::OnDestroy()
 		if (WaitForSingleObject(hp, 1000) != WAIT_OBJECT_0)
 
 		if (WaitForSingleObject(m_pRefreshThread->m_hThread, 100) == WAIT_OBJECT_0)
+
 		{
 		}
 		else
 		{
 			TerminateThread(m_pRefreshThread->m_hThread, 0);
-		
-	//m_pRefreshThread=NULL;
 			 
 		}
 		//CloseHandle(hp);
@@ -6089,6 +6100,11 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
 				My_Receive_msg.push_back(msg);
 				MyCriticalSection.Unlock();
 				break;
+			case  MY_BAC_WRITE_LIST:
+				MyCriticalSection.Lock();
+				My_Receive_msg.push_back(msg);
+				MyCriticalSection.Unlock();
+				break;
 			case MY_CLOSE:
 				goto myend;
 				break;
@@ -6105,6 +6121,9 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 {
 	CMainFrame *pParent = (CMainFrame *)lpVoid;
 	MSG msg;
+	int resend_count=0;
+	int temp_end_value=0;
+	_MessageInvokeIDInfo *My_Invoke_Struct=NULL;
 	while(1)
 	{
 		if(My_Receive_msg.size()>0)
@@ -6156,7 +6175,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 			case MY_INVOKE_ID:
 				MyCriticalSection.Lock();
 				msg=My_Receive_msg.at(0);
-				MessageInvokeODInfo *My_Invoke_Struct = (_MessageInvokeIDInfo *)msg.wParam;
+				My_Invoke_Struct = (_MessageInvokeIDInfo *)msg.wParam;
 				My_Receive_msg.erase(My_Receive_msg.begin());
 				MyCriticalSection.Unlock();
 				for (int i=0;i<3000;i++)
@@ -6174,6 +6193,114 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 				}
 					::PostMessage(My_Invoke_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_FAIL,(LPARAM)My_Invoke_Struct);
 loop1:
+				break;
+			case MY_BAC_WRITE_LIST:
+				{
+					MyCriticalSection.Lock();
+					msg=My_Receive_msg.at(0);
+					_MessageWriteListInfo *My_WriteList_Struct = (_MessageWriteListInfo *)msg.wParam;
+					My_Receive_msg.erase(My_Receive_msg.begin());
+					MyCriticalSection.Unlock();
+					//temp_end_value = My_WriteList_Struct->end_instance;
+					do 
+					{
+						if(My_WriteList_Struct->end_instance<=(My_WriteList_Struct->start_instance+4))
+						{
+							temp_end_value  =  My_WriteList_Struct->end_instance;
+							//continue;//如果大于这个范围，就continue;
+						}
+						else
+							temp_end_value = My_WriteList_Struct->start_instance + 4;
+
+						resend_count = 0;
+						do 
+						{
+							resend_count ++;
+							if(resend_count>10)
+								break;
+							g_invoke_id =WritePrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,My_WriteList_Struct->start_instance,temp_end_value);
+							if(g_invoke_id>=0)
+								Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
+							Sleep(200);
+						} while (g_invoke_id<0);
+
+
+#if 0
+						switch(My_WriteList_Struct->command)
+						{
+						case WRITEVARIABLE_T3000:
+							{
+								resend_count = 0;
+								do 
+								{
+									resend_count ++;
+									if(resend_count>10)
+										break;
+									g_invoke_id =WritePrivateData(My_WriteList_Struct->deviceid,WRITEVARIABLE_T3000,My_WriteList_Struct->start_instance,temp_end_value,sizeof(Str_variable_point));
+									if(g_invoke_id>=0)
+										Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
+									Sleep(200);
+								} while (g_invoke_id<0);
+							}
+							break;
+						case WRITEOUTPUT_T3000:
+							{
+								resend_count = 0;
+								do 
+								{
+									resend_count ++;
+									if(resend_count>10)
+										break;
+									g_invoke_id =WritePrivateData(My_WriteList_Struct->deviceid,WRITEOUTPUT_T3000,My_WriteList_Struct->start_instance,temp_end_value,sizeof(Str_out_point));
+									if(g_invoke_id>=0)
+										Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
+									Sleep(200);
+								} while (g_invoke_id<0);
+							}
+							break;
+						case  WRITEINPUT_T3000:
+							{
+								resend_count = 0;
+								do 
+								{
+									resend_count ++;
+									if(resend_count>10)
+										break;
+									g_invoke_id =WritePrivateData(My_WriteList_Struct->deviceid,WRITEINPUT_T3000,My_WriteList_Struct->start_instance,temp_end_value,sizeof(Str_in_point));
+									if(g_invoke_id>=0)
+										Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
+									Sleep(200);
+								} while (g_invoke_id<0);
+							}
+							break;
+						case WRITEPROGRAM_T3000:
+							{
+								resend_count = 0;
+								do 
+								{
+									resend_count ++;
+									if(resend_count>10)
+										break;
+									g_invoke_id =WritePrivateData(My_WriteList_Struct->deviceid,WRITEPROGRAM_T3000,My_WriteList_Struct->start_instance,temp_end_value,sizeof(Str_program_point));
+									if(g_invoke_id>=0)
+										Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
+									Sleep(200);
+								} while (g_invoke_id<0);
+							}
+							break;
+						default:
+							break;
+						}
+#endif
+						//g_invoke_id =WritePrivateData(1234,WRITEVARIABLE_T3000,0,(int)m_Variable_data.size()-1,sizeof(Str_variable_point));
+						//if(g_invoke_id>=0)
+						//	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+						My_WriteList_Struct->start_instance = temp_end_value + 1;
+					} while (temp_end_value<My_WriteList_Struct->end_instance);
+						
+
+					
+				}
 				break;
 			}
 			

@@ -1,3 +1,10 @@
+2013-09-06
+Update by Fance
+1.Change the range selected dialog,allowed the user to change the units by mouse click.(If user click one of the units , the edit box will auto changed the number.)
+2.Support multi block read and write.
+3.Support single write , if user changed one of the item ,it will sent this change to device immediately,not sent whole list.
+4.In IDE interface, Add refresh function.
+************************************************************************************
 2013-08-30
 Update by Fance
 For Bacnet:

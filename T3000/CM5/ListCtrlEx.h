@@ -140,6 +140,9 @@ namespace ListCtrlEx
 
 // operations
 	public:
+		void                Set_Edit(bool b_edit);
+		BOOL				Get_Edit();
+
 		static BOOL		DrawGradientRect(CDC *pDC, CRect &rect, COLORREF crTopLeft, COLORREF crBottomRight);
 		BOOL				GetCheckRect(int iRow, int iCol, CRect &rect);
 		BOOL				GetCellRect(CellIndex ix, CRect &rect);
@@ -220,7 +223,7 @@ namespace ListCtrlEx
 		DWORD			m_dwComboStyle;
 		int					m_nImageListType;
 		DWORD			m_dwListCtrlExStyle; // 
-
+		bool			m_need_edit;
 	protected:
 		struct _ColumnSort_t
 		{

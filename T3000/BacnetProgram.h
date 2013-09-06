@@ -34,6 +34,9 @@ public:
 //	afx_msg void OnHdnItemclickListProgram(NMHDR *pNMHDR, LRESULT *pResult);
 //	afx_msg void OnLvnItemActivateListProgram(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMClickListProgram(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg LRESULT Fresh_Program_Item(WPARAM wParam,LPARAM lParam);
+	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
+	afx_msg void OnClose();
 };
 
 	const int PROGRAM_NUM = 0;
@@ -56,5 +59,7 @@ public:
 		_T("ON"),
 		_T("OFF")
 	};
+
+	const int KEY_INSERT = 1020;
 
 

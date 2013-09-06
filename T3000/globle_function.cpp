@@ -794,6 +794,25 @@ BOOL GetSerialComPortNumber1(vector<CString>& szComm)
 	return FALSE;   
 }
 
+BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize,HWND hWnd)
+{
+	_MessageWriteListInfo *pmy_write_info = new _MessageWriteListInfo;
+	pmy_write_info->deviceid = deviceid;
+	pmy_write_info->command = command;
+	pmy_write_info->start_instance = start_instance;
+	pmy_write_info->end_instance = end_instance;
+	pmy_write_info->entitysize = entitysize;
+	pmy_write_info->hWnd = hWnd;
+	if(!PostThreadMessage(nThreadID,MY_BAC_WRITE_LIST,(WPARAM)pmy_write_info,NULL))//post thread msg
+	{
+		return FALSE;
+	}
+	else
+	{
+		return TRUE;
+	}
+}
+
 //Add 20130516  by Fance
 //UINT MsgType
 //unsigned char device_id
@@ -879,11 +898,11 @@ BOOL Post_Read_one_Thread_Message(
 		return TRUE;
 	}
 }
-
-int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize )
+extern int my_lengthcode;
+int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance )
 {
 	// TODO: Add your control notification handler code here
-
+	int8_t entitysize=0;
 	uint8_t apdu[480] = { 0 };
 	uint8_t test_value[480] = { 0 };
 	int private_data_len = 0;	
@@ -897,7 +916,26 @@ int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8
 	private_data.serviceNumber = 1;
 
 	unsigned max_apdu = 0;
-
+	switch(command)
+	{
+	case WRITEINPUT_T3000:
+		entitysize = sizeof(Str_in_point);
+		break;
+	case WRITEPROGRAM_T3000:
+		entitysize = sizeof(Str_variable_point);
+		break;
+	case WRITEPROGRAMCODE_T3000:
+		entitysize = my_lengthcode;
+		break;
+	case WRITEVARIABLE_T3000:
+		entitysize = sizeof(Str_variable_point);
+		break;
+	case  WRITEOUTPUT_T3000:
+		entitysize = sizeof(Str_out_point);
+		break;
+	default:
+		break;
+	}
 	Str_user_data_header private_data_chunk;
 	private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + (end_instance - start_instance + 1)*entitysize;
 	private_data_chunk.command = command;
@@ -905,21 +943,21 @@ int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8
 	private_data_chunk.point_end_instance = end_instance;
 	private_data_chunk.entitysize=entitysize;
 
-	char SendBuffer[500];
+	char SendBuffer[1000];
 	memcpy_s(SendBuffer,PRIVATE_HEAD_LENGTH ,&private_data_chunk,PRIVATE_HEAD_LENGTH );
 
 	switch(command)
 	{
 	case WRITEINPUT_T3000:
-		for (int i=0;i<(int)m_Input_data.size();i++)
+		for (int i=0;i<(end_instance-start_instance + 1);i++)
 		{
-			memcpy_s(SendBuffer + i*sizeof(Str_in_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_in_point),&m_Input_data.at(i),sizeof(Str_in_point));
+			memcpy_s(SendBuffer + i*sizeof(Str_in_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_in_point),&m_Input_data.at(i + start_instance),sizeof(Str_in_point));
 		}
 		break;
 	case WRITEPROGRAM_T3000:
-		for (int i=0;i<(int)m_Program_data.size();i++)
+		for (int i=0;i<(end_instance-start_instance + 1);i++)
 		{
-			memcpy_s(SendBuffer + i*sizeof(Str_program_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_program_point),&m_Program_data.at(i),sizeof(Str_program_point));
+			memcpy_s(SendBuffer + i*sizeof(Str_program_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_program_point),&m_Program_data.at(i + start_instance),sizeof(Str_program_point));
 		}
 
 		break;
@@ -927,9 +965,15 @@ int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8
 		memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,entitysize,mycode,my_lengthcode);
 		break;
 	case WRITEVARIABLE_T3000:
-		for (int i=0;i<(int)m_Variable_data.size();i++)
+		for (int i=0;i<(end_instance-start_instance + 1);i++)
 		{
-			memcpy_s(SendBuffer + i*sizeof(Str_variable_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_variable_point),&m_Variable_data.at(i),sizeof(Str_variable_point));
+			memcpy_s(SendBuffer + i*sizeof(Str_variable_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_variable_point),&m_Variable_data.at(i + start_instance),sizeof(Str_variable_point));
+		}
+		break;
+	case  WRITEOUTPUT_T3000:
+		for (int i=0;i<(end_instance-start_instance + 1);i++)
+		{
+			memcpy_s(SendBuffer + i*sizeof(Str_out_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_out_point),&m_Output_data.at(i + start_instance),sizeof(Str_out_point));
 		}
 		break;
 	default:
@@ -1090,7 +1134,8 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 
 #endif
 
-
+	int start_instance=0;
+	int end_instance = 0;
 	///////////////////////////////
 	switch(command_type)
 	{
@@ -1101,33 +1146,42 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 
 			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_out_point);
 			//m_Input_data_length = block_length;
-			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
-			m_Output_data.clear();
-			for (i=0;i<block_length;i++)
+			my_temp_point = (char *)Temp_CS.value + 3;
+			start_instance = *my_temp_point;
+			my_temp_point++;
+			end_instance = *my_temp_point;
+			my_temp_point++;
+			my_temp_point = my_temp_point + 2;
+
+			//my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+			//m_Output_data.clear();
+			for (i=start_instance;i<=end_instance;i++)
 			{
-				Str_out_point temp_out;
-				memcpy_s( temp_out.description,STR_OUT_DESCRIPTION_LENGTH,my_temp_point,STR_OUT_DESCRIPTION_LENGTH);
+				//Str_out_point temp_out;
+				memcpy_s( m_Output_data.at(i).description,STR_OUT_DESCRIPTION_LENGTH,my_temp_point,STR_OUT_DESCRIPTION_LENGTH);
 				my_temp_point=my_temp_point + STR_OUT_DESCRIPTION_LENGTH;
-				memcpy_s(temp_out.label,STR_OUT_LABEL ,my_temp_point,STR_OUT_LABEL );
+				memcpy_s(m_Output_data.at(i).label,STR_OUT_LABEL ,my_temp_point,STR_OUT_LABEL );
 				my_temp_point=my_temp_point + STR_OUT_LABEL ;
 
-				temp_struct_value = my_temp_point[3]<<24 | my_temp_point[2]<<16 | my_temp_point[1]<<8 | my_temp_point[0];
-				temp_out.value = temp_struct_value;
+				temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				m_Output_data.at(i).value = temp_struct_value;
 				//memcpy_s(Private_data[i].value,4,temp_struct_value,4);
 				my_temp_point=my_temp_point+4;
 
-				temp_out.auto_manual = *(my_temp_point++);
-				temp_out.digital_analog = *(my_temp_point++);
-				temp_out.access_level = *(my_temp_point++);
-				temp_out.control = *(my_temp_point++);
-				temp_out.digital_control = *(my_temp_point++);
-				temp_out.decom	= *(my_temp_point++);
-				temp_out.range = *(my_temp_point++);
-				temp_out.m_del_low = *(my_temp_point++);
-				temp_out.s_del_high = *(my_temp_point++);
-				temp_out.delay_timer = *(my_temp_point++);
+				m_Output_data.at(i).auto_manual = *(my_temp_point++);
+				m_Output_data.at(i).digital_analog = *(my_temp_point++);
+				m_Output_data.at(i).access_level = *(my_temp_point++);
+				m_Output_data.at(i).control = *(my_temp_point++);
+				m_Output_data.at(i).digital_control = *(my_temp_point++);
+				m_Output_data.at(i).decom	= *(my_temp_point++);
+				m_Output_data.at(i).range = *(my_temp_point++);
+				m_Output_data.at(i).m_del_low = *(my_temp_point++);
+				m_Output_data.at(i).s_del_high = *(my_temp_point++);
+				//temp_out.delay_timer = *(my_temp_point++);  Output 这个Delay time先不管 清0
+				m_Output_data.at(i).delay_timer = 0;
+				my_temp_point = my_temp_point + 2;
 
-				m_Output_data.push_back(temp_out);
+				//m_Output_data.push_back(temp_out);
 			}
 			return READOUTPUT_T3000;
 		}
@@ -1140,34 +1194,39 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			int test =  sizeof(Str_in_point);
 			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_in_point);
 			//m_Input_data_length = block_length;
-			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
-			m_Input_data.clear();
-			for (i=0;i<block_length;i++)
+			my_temp_point = (char *)Temp_CS.value + 3;
+			start_instance = *my_temp_point;
+			my_temp_point++;
+			end_instance = *my_temp_point;
+			my_temp_point++;
+			my_temp_point = my_temp_point + 2;
+			//my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+			//m_Input_data.clear();
+			for (i=start_instance;i<=end_instance;i++)
 			{
-				Str_in_point temp_in;
-				memcpy_s( temp_in.description,STR_IN_DESCRIPTION_LENGTH,my_temp_point,STR_IN_DESCRIPTION_LENGTH);
+			//	Str_in_point temp_in;
+				memcpy_s( m_Input_data.at(i).description,STR_IN_DESCRIPTION_LENGTH,my_temp_point,STR_IN_DESCRIPTION_LENGTH);
 				my_temp_point=my_temp_point + STR_IN_DESCRIPTION_LENGTH;
-				memcpy_s(temp_in.label,STR_IN_LABEL ,my_temp_point,STR_IN_LABEL );
+				memcpy_s(m_Input_data.at(i).label,STR_IN_LABEL ,my_temp_point,STR_IN_LABEL );
 				my_temp_point=my_temp_point + STR_IN_LABEL ;
 
-				temp_struct_value = my_temp_point[3]<<24 | my_temp_point[2]<<16 | my_temp_point[1]<<8 | my_temp_point[0];
-				temp_in.value = temp_struct_value;
+				temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				m_Input_data.at(i).value = temp_struct_value;
 				//memcpy_s(Private_data[i].value,4,temp_struct_value,4);
 				my_temp_point=my_temp_point+4;
-				temp_in.filter = *(my_temp_point++);
-				temp_in.decom	= *(my_temp_point++);
-				temp_in.sen_on	= *(my_temp_point++);;
-				temp_in.sen_off = *(my_temp_point++);
-				temp_in.control = *(my_temp_point++);
-				temp_in.auto_manual = *(my_temp_point++);
-				temp_in.digital_analog = *(my_temp_point++);
-				temp_in.calibration_sign = *(my_temp_point++);
-				temp_in.calibration_increment = *(my_temp_point++);
-				temp_in.unused = *(my_temp_point++);
-				temp_in.calibration = *(my_temp_point++);
-				temp_in.range = *(my_temp_point++);
-
-				m_Input_data.push_back(temp_in);
+				m_Input_data.at(i).filter = *(my_temp_point++);
+				m_Input_data.at(i).decom	= *(my_temp_point++);
+				m_Input_data.at(i).sen_on	= *(my_temp_point++);;
+				m_Input_data.at(i).sen_off = *(my_temp_point++);
+				m_Input_data.at(i).control = *(my_temp_point++);
+				m_Input_data.at(i).auto_manual = *(my_temp_point++);
+				m_Input_data.at(i).digital_analog = *(my_temp_point++);
+				m_Input_data.at(i).calibration_sign = *(my_temp_point++);
+				m_Input_data.at(i).calibration_increment = *(my_temp_point++);
+				m_Input_data.at(i).unused = *(my_temp_point++);
+				m_Input_data.at(i).calibration = *(my_temp_point++);
+				m_Input_data.at(i).range = *(my_temp_point++);
+				//m_Input_data.push_back(temp_in);
 			}
 			return READINPUT_T3000;
 		}
@@ -1178,30 +1237,37 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 				return -1;	//得到的结构长度错误;
 
 			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_variable_point);
+			my_temp_point = (char *)Temp_CS.value + 3;
+			start_instance = *my_temp_point;
+			my_temp_point++;
+			end_instance = *my_temp_point;
+			my_temp_point++;
+			my_temp_point = my_temp_point + 2;
+
 			//m_Input_data_length = block_length;
-			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
-			m_Variable_data.clear();
-			for (i=0;i<block_length;i++)
+			//my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+			//m_Variable_data.clear();
+			for (i=start_instance;i<end_instance + 1;i++)
 			{
-				Str_variable_point temp_variable;
-				memcpy_s( temp_variable.description,STR_VARIABLE_DESCRIPTION_LENGTH,my_temp_point,STR_VARIABLE_DESCRIPTION_LENGTH);
+				//Str_variable_point temp_variable;
+				memcpy_s( m_Variable_data.at(i).description,STR_VARIABLE_DESCRIPTION_LENGTH,my_temp_point,STR_VARIABLE_DESCRIPTION_LENGTH);
 				my_temp_point=my_temp_point + STR_VARIABLE_DESCRIPTION_LENGTH;
-				memcpy_s(temp_variable.label,STR_VARIABLE_LABEL ,my_temp_point,STR_VARIABLE_LABEL );
+				memcpy_s(m_Variable_data.at(i).label,STR_VARIABLE_LABEL ,my_temp_point,STR_VARIABLE_LABEL );
 				my_temp_point=my_temp_point + STR_VARIABLE_LABEL ;
 
-				temp_struct_value = my_temp_point[3]<<24 | my_temp_point[2]<<16 | my_temp_point[1]<<8 | my_temp_point[0];
-				temp_variable.value = temp_struct_value;
+				temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				m_Variable_data.at(i).value = temp_struct_value;
 				//memcpy_s(Private_data[i].value,4,temp_struct_value,4);
 				my_temp_point=my_temp_point+4;
 				
 				
-				temp_variable.auto_manual = *(my_temp_point++);
-				temp_variable.digital_analog = *(my_temp_point++);
-				temp_variable.control = *(my_temp_point++);
-				temp_variable.unused = *(my_temp_point++);
-				temp_variable.range = *(my_temp_point++);
+				m_Variable_data.at(i).auto_manual = *(my_temp_point++);
+				m_Variable_data.at(i).digital_analog = *(my_temp_point++);
+				m_Variable_data.at(i).control = *(my_temp_point++);
+				m_Variable_data.at(i).unused = *(my_temp_point++);
+				m_Variable_data.at(i).range = *(my_temp_point++);
 
-				m_Variable_data.push_back(temp_variable);
+				//m_Variable_data.push_back(temp_variable);
 			}
 			return READVARIABLE_T3000;
 		}
@@ -1217,25 +1283,30 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 				return -1;	//得到的结构长度错误;
 			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_program_point);
 			//m_Input_data_length = block_length;
-			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
-			m_Program_data.clear();
+			//my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+			//m_Program_data.clear();
+			my_temp_point = (char *)Temp_CS.value + 3;
+			start_instance = *my_temp_point;
+			my_temp_point++;
+			end_instance = *my_temp_point;
+			my_temp_point++;
+			my_temp_point = my_temp_point + 2;
 
-			for (i=0;i<block_length;i++)
+			for (i=start_instance;i<end_instance;i++)
 			{
-				Str_program_point temp_in;
-				memcpy_s( temp_in.description,STR_PROGRAM_DESCRIPTION_LENGTH,my_temp_point,STR_PROGRAM_DESCRIPTION_LENGTH);
+				//Str_program_point temp_in;
+				memcpy_s( m_Program_data.at(i).description,STR_PROGRAM_DESCRIPTION_LENGTH,my_temp_point,STR_PROGRAM_DESCRIPTION_LENGTH);
 				my_temp_point=my_temp_point + STR_PROGRAM_DESCRIPTION_LENGTH;
-				memcpy_s(temp_in.label,STR_PROGRAM_LABEL_LENGTH ,my_temp_point,STR_PROGRAM_LABEL_LENGTH );
+				memcpy_s( m_Program_data.at(i).label,STR_PROGRAM_LABEL_LENGTH ,my_temp_point,STR_PROGRAM_LABEL_LENGTH );
 				my_temp_point=my_temp_point + STR_PROGRAM_LABEL_LENGTH ;
-
-				temp_in.bytes	= my_temp_point[1]<<8 | my_temp_point[0];
-				my_temp_point = my_temp_point + 2;
-				temp_in.on_off = *(my_temp_point++);
-				temp_in.auto_manual = *(my_temp_point++);
-				temp_in.com_prg = *(my_temp_point++);
-				temp_in.errcode = *(my_temp_point++);
-				temp_in.unused = *(my_temp_point++);
-				m_Program_data.push_back(temp_in);
+				 m_Program_data.at(i).bytes	= ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
+				 my_temp_point = my_temp_point + 2;
+				 m_Program_data.at(i).on_off = *(my_temp_point++);
+				 m_Program_data.at(i).auto_manual = *(my_temp_point++);
+				 m_Program_data.at(i).com_prg = *(my_temp_point++);
+				 m_Program_data.at(i).errcode = *(my_temp_point++);
+				 m_Program_data.at(i).unused = *(my_temp_point++);
+				//m_Program_data.push_back(temp_in);
 			}
 			return READPROGRAM_T3000;
 		}
