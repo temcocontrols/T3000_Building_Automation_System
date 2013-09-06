@@ -178,6 +178,7 @@
 #define IDI_ICON_OK                     464
 #define IDD_DIALOG_BACNET_RANGES        465
 #define IDD_DIALOG_BACNET_WAIT          466
+#define IDD_CSTABLE                     467
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -1140,12 +1141,15 @@
 #define IDC_BUTTON_PROGRAM_READ         1633
 #define IDC_BUTTON_START_STOP1          1633
 #define IDC_STATIC_POOL_SIZE            1633
+#define IDC_CS_1                        1633
 #define IDC_BUTTON_PROGRAM_APPLY        1634
 #define IDC_BUTTON_START_STOP2          1634
 #define IDC_STATIC_SIZE                 1634
+#define IDC_CS_2                        1634
 #define IDC_BUTTON_CM5_OUTPUT           1635
 #define IDC_BUTTON_START_STOP3          1635
 #define IDC_STATIC_FREE_MEMORY          1635
+#define IDC_ROWNO                       1635
 #define IDC_BUTTON_CM5_VARIABLE         1636
 #define IDC_BUTTON_START_STOP4          1636
 #define IDC_STATIC_RANGES               1636
@@ -1287,9 +1291,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        465
+#define _APS_NEXT_RESOURCE_VALUE        468
 #define _APS_NEXT_COMMAND_VALUE         32874
-#define _APS_NEXT_CONTROL_VALUE         1633
+#define _APS_NEXT_CONTROL_VALUE         1636
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
