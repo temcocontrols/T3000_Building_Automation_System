@@ -856,6 +856,11 @@ extern int bac_range_number_choose;
 extern int bac_program_pool_size;
 extern int bac_program_size;
 extern int bac_free_memory;
+extern int bac_read_which_list;
+extern bool bac_input_read_results;
+extern bool bac_output_read_results;
+extern bool bac_variable_read_results;
+extern bool bac_program_read_results;
 
 extern HWND      g_hwnd_now;
 extern HWND      m_input_dlg_hwnd;
