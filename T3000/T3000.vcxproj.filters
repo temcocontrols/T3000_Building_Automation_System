@@ -381,6 +381,9 @@
     <ClCompile Include="BacnetWait.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
+    <ClCompile Include="TestMultiReadTraffic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -935,6 +938,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetWait.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestMultiReadTraffic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

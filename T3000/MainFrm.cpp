@@ -46,13 +46,13 @@
 #include "IONameConfig.h"
 
 #include "DialogCM5_BacNet.h"
-
+#include "TestMultiReadTraffic.h"
 #include "T38I13O.h"
 #include "T332AI.h"
 #pragma region Fance Test
 //For Test
 
-
+CTestMultiReadTraffic *g_testmultiReadtraffic_dlg=NULL;
 
 HANDLE hStartEvent; // thread start event
 
@@ -193,6 +193,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_TOOL_ISPTOOLFORONE, &CMainFrame::OnToolIsptoolforone)
 	ON_COMMAND(ID_TOOL_REGISTERMONITER, &CMainFrame::OnToolRegistermoniter)
 //	ON_COMMAND(ID_APP_EXIT, &CMainFrame::OnAppExit)
+	ON_COMMAND(ID_VIEW_COMMUNICATETRAFFIC, &CMainFrame::OnViewCommunicatetraffic)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -3440,6 +3441,7 @@ void CMainFrame::OnDestroy()
 		{		
 			BOOL bRet = TerminateThread(m_pFreshMultiRegisters->m_hThread,0);
 			delete m_pFreshMultiRegisters;
+			m_pFreshMultiRegisters=NULL;
 		}
 
 	}
@@ -3455,12 +3457,13 @@ void CMainFrame::OnDestroy()
 		if (WaitForSingleObject(hp, 1000) != WAIT_OBJECT_0)
 
 		if (WaitForSingleObject(m_pRefreshThread->m_hThread, 100) == WAIT_OBJECT_0)
-
 		{
 		}
 		else
 		{
 			TerminateThread(m_pRefreshThread->m_hThread, 0);
+		
+	//m_pRefreshThread=NULL;
 			 
 		}
 		//CloseHandle(hp);
@@ -3478,6 +3481,12 @@ void CMainFrame::OnDestroy()
 	{
 		delete pDialogInfo;
 		pDialogInfo = NULL;
+	}
+
+	if (g_testmultiReadtraffic_dlg!=NULL)
+	{
+	  delete g_testmultiReadtraffic_dlg;
+	  g_testmultiReadtraffic_dlg=NULL;
 	}
 #endif
 
@@ -6225,4 +6234,18 @@ void CMainFrame::OnToolIsptoolforone()
 void CMainFrame::OnToolRegistermoniter()
 {    close_com();
 show_RegisterMonitorDlg();
+}
+
+void CMainFrame::OnViewCommunicatetraffic()
+{
+
+	 if(g_testmultiReadtraffic_dlg==NULL){
+	 g_testmultiReadtraffic_dlg=new CTestMultiReadTraffic;
+	 g_testmultiReadtraffic_dlg->Create(IDD_TEST_MULTI_READ,this);
+	 g_testmultiReadtraffic_dlg->ShowWindow(SW_SHOW);
+	 }
+	 else
+	 {
+	  g_testmultiReadtraffic_dlg->ShowWindow(SW_SHOW);
+	 }
 }

@@ -787,7 +787,7 @@ extern struct remote_local_list  remote_local_list[100];
 
 
 //extern int  station_num;
-extern int local_panel;
+int local_panel=0;
 extern unsigned char tbl_bank[100];
 
 /* This array is used by eval_exp1() */

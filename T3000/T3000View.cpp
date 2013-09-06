@@ -5557,9 +5557,9 @@ void CT3000View::FreshCtrl()
 			GetDlgItem(IDC_UNOCCUPIED_MARK)->ShowWindow(SW_HIDE);
 			//	GetDlgItem(IDC_STATIC_DAYSPMODE)->ShowWindow(SW_HIDE);//0903
 			//	GetDlgItem(IDC_STATIC_SPMODE)->ShowWindow(SW_HIDE);//0903
-			GetDlgItem(IDC_TEMPRETURE_SLIDER)->ShowWindow(SW_HIDE);
+			//GetDlgItem(IDC_TEMPRETURE_SLIDER)->ShowWindow(SW_HIDE);
 
-			GetDlgItem(IDC_TEMPINFO_EDIT)->ShowWindow(SW_HIDE);
+			//GetDlgItem(IDC_TEMPINFO_EDIT)->ShowWindow(SW_HIDE);
 			GetDlgItem(IDC_STATIC1t)->ShowWindow(SW_HIDE);
 
 			GetDlgItem(IDC_STATIC2SP)->ShowWindow(SW_SHOW);

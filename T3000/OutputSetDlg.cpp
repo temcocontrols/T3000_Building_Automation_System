@@ -833,7 +833,7 @@ void COutputSetDlg::Fresh_Grid()
 			}
 			strTemp.Format(_T("%.1f%%"),nvalue);
 		}
-		if(m_nModeType==2)
+		if(m_nModeType==6)
 		{
 
 			m_FlexGrid.put_TextMatrix(4,VALUE_OUTFIELD,strTemp);
@@ -1578,6 +1578,7 @@ void COutputSetDlg::Fresh_GridForTstat6()
 			}
 			m_FlexGrid.put_TextMatrix(4,AM_OUTFIELD,strTemp);
 
+			nRange = product_register_value[MODBUS_MODE_OUTPUT4];
 			if(nRange>=0&&nRange<5)
 			{
 				strTemp=OUTPUT_ANRANGE[nRange];
@@ -1669,7 +1670,7 @@ void COutputSetDlg::Fresh_GridForTstat6()
 				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
 			}
 			m_FlexGrid.put_TextMatrix(5,AM_OUTFIELD,strTemp);
-
+			nRange = product_register_value[MODBUS_MODE_OUTPUT5];
 			if(nRange>=0&&nRange<5)
 			{
 				strTemp=OUTPUT_ANRANGE[nRange];
@@ -5156,16 +5157,50 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 
 
 	//prior judge whether it is Type 2
-	if(m_nModeType==2)//A
+	if(m_nModeType==16)//5E
 	{
 		if(m_nCurRow>0&&m_nCurRow<=3)
 		{	
-			write_one(g_tstat_id,MODBUS_MODE_OUTPUT1+(m_nCurRow-1) ,nIndext );	//280
+			int ret=write_one(g_tstat_id,MODBUS_MODE_OUTPUT1+(m_nCurRow-1) ,nIndext );	//280
+		    if (ret>0)
+		    {
+			  product_register_value[MODBUS_MODE_OUTPUT1+(m_nCurRow-1)]=nIndext;
+		    }
 		}
 		if(m_nCurRow==4)
-			write_one(g_tstat_id,MODBUS_OUTPUT1_SCALE ,nIndext );//186
+			int ret=write_one(g_tstat_id,MODBUS_MODE_OUTPUT4 ,nIndext );//186
+			if (ret>0)
+			{
+			product_register_value[MODBUS_MODE_OUTPUT4]=nIndext;
+			}
 		if(m_nCurRow==5)
-			write_one(g_tstat_id,MODBUS_OUTPUT2_SCALE ,nIndext );//187
+			int ret=write_one(g_tstat_id,MODBUS_MODE_OUTPUT5 ,nIndext );//187
+			if (ret>0)
+			{
+			 product_register_value[MODBUS_MODE_OUTPUT5]=nIndext;
+			}
+
+
+
+			if(m_nCurRow==6)
+			{
+				ret =0;
+				ret = write_one(g_tstat_id,MODBUS_OUTPUT1_SCALE ,nIndext ); //186   207
+				if (ret<=0)
+					AfxMessageBox(_T("Setting failure!"));
+				else
+					product_register_value[MODBUS_OUTPUT1_SCALE] = nIndext;
+			}
+
+			if(m_nCurRow==7)
+			{
+				ret =0;
+				ret = write_one(g_tstat_id,MODBUS_OUTPUT2_SCALE ,nIndext ); //187   208
+				if (ret<=0)
+					AfxMessageBox(_T("Setting failure!"));
+				else
+					product_register_value[MODBUS_OUTPUT2_SCALE] = nIndext;
+			}
 		Fresh_Grid();
 		EndWaitCursor();
 		return;

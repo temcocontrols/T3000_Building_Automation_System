@@ -47,7 +47,7 @@ public:
 	afx_msg void OnNMReleasedcaptureSlider11(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTimer(UINT nIDEvent);
 	afx_msg void OnDestroy();
-	afx_msg void OnEnSetfocusEdit1();
+//	afx_msg void OnEnSetfocusEdit1();
 	afx_msg void OnEnSetfocusEdit8();
 	afx_msg void OnEnSetfocusEdit9();
 	afx_msg void OnEnSetfocusEdit13();
@@ -84,7 +84,7 @@ public:
 	afx_msg void OnEnKillfocusEdit20();
 	afx_msg void OnEnKillfocusEdit12();
 
-	afx_msg void OnEnKillfocusEdit10();
+//	afx_msg void OnEnKillfocusEdit10();
 	afx_msg void OnEnChangeEdit10();
 	afx_msg void OnEnSetfocusEdit10();
 	afx_msg void OnBnClickedCancel();
