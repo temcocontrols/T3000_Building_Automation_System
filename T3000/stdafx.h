@@ -165,7 +165,7 @@ typedef struct _STATUSBARINFO
 #include "fileRW.h"
 
 #include "T3000RegAddress.h"
-
+//#define Fance_Enable_Test
 
 #define MKBOOL(_VALUE) ((_VALUE) != 0)		//Add by Fance .Use this macro to solve the warning warning C4800: 'BOOL' : forcing value to bool 'true' or 'false'
 
@@ -173,6 +173,7 @@ typedef struct _STATUSBARINFO
 #define MY_WRITE_ONE WM_USER+100
 #define MY_READ_ONE  WM_USER+101
 #define MY_INVOKE_ID WM_USER + 102
+#define MY_BAC_WRITE_LIST WM_USER + 103
 #define MY_CLOSE WM_USER+110
 #define MY_RESUME_DATA  WM_USER+200
 #define MY_READ_DATA_CALLBACK WM_USER+201

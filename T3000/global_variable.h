@@ -1773,6 +1773,12 @@ int bac_range_number_choose;
 int bac_program_pool_size;
 int bac_program_size;
 int bac_free_memory;
+int bac_read_which_list;
+bool bac_input_read_results;
+bool bac_output_read_results;
+bool bac_variable_read_results;
+bool bac_program_read_results;
+
 
 HWND      g_hwnd_now;
 HWND      m_input_dlg_hwnd;

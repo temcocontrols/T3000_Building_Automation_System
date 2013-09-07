@@ -42,15 +42,15 @@ public:
 	afx_msg LRESULT Fresh_UI(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT  AllMessageCallBack(WPARAM wParam, LPARAM lParam);
 	LRESULT Delete_Wait_Dlg(WPARAM wParam,LPARAM lParam);
-	afx_msg void OnBnClickedButtonCm5Advance();
+	afx_msg void OnBnClickedButtonCm5Input();
 //	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedButtonCm5Programing();
 	afx_msg void OnBnClickedButtonCm5Output();
 	afx_msg void OnBnClickedButtonCm5Variable();
 	afx_msg void OnBnClickedButtonBacReadTotal();
 	static	DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid);
-
-	
+	void Initial_All_Point();
+	void Show_Wait_Dialog_And_SendMessage(int read_list_type);
 };
 static void Init_Service_Handlers(void);
 
