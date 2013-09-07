@@ -192,7 +192,16 @@ void COutputSetDlg::OnBnClickedCancel()
 void COutputSetDlg::Fresh_Grid()
 {
 	m_nModeType = product_register_value[7];
-
+	/*if (m_nModeType==16)
+	{
+		Fresh_Grid_Tstat5E();
+		return;
+	}
+	if (m_nModeType==6||m_nModeType==7)
+	{
+		Fresh_GridForTstat6();
+		return;
+	}*/
 	switch (m_nModeType)
 	{
 	case 2:
@@ -213,6 +222,7 @@ void COutputSetDlg::Fresh_Grid()
 	int nVAlue;
 	//这段代码的作用是当选择的是Floating或者PWM模式的时候，
 	//要根据在outputtable中 用户选择的是PID1，还是PID2 PID1 从384 读值 PID2 就是从389读值
+	/////前三行
 	#if 1
 	int pid_select2[7]={0};
 	for(int i=0;i<7;i++)
@@ -232,6 +242,7 @@ void COutputSetDlg::Fresh_Grid()
 	int nAMVAlue=0;//=multi_register_value[310];
 	nAMVAlue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];
 	//Row 1-3 初始化 Value，A/M，Range
+
 	for(int i=1;i<=3;i++)
 	{
 		if(nVAlue&(1<<(i-1)))
@@ -767,7 +778,7 @@ void COutputSetDlg::Fresh_Grid()
 	}
 	//row45/67 ANALOG
 	if (m_nModeType==2||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PRESSURE
-		||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7)//5ADEG
+		||m_nModeType==18||m_nModeType==6||m_nModeType==7)//5ADEG
 	{
 		//186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
 		//102	210	2	Full	W/R(write only when manual output6 enable)	Output6 ,Analog output1, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.
@@ -836,7 +847,8 @@ void COutputSetDlg::Fresh_Grid()
 		if(m_nModeType==6)
 		{
 
-			m_FlexGrid.put_TextMatrix(4,VALUE_OUTFIELD,strTemp);
+			m_FlexGrid.put_TextMatrix(6,VALUE_OUTFIELD,strTemp);
+			
 			if((int)(nAMVAlue & 8))
 			{
 				strTemp=_T("Manual");
@@ -851,13 +863,13 @@ void COutputSetDlg::Fresh_Grid()
 				m_FlexGrid.put_Row(4);
 				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
 			}
-			m_FlexGrid.put_TextMatrix(4,AM_OUTFIELD,strTemp);
+			m_FlexGrid.put_TextMatrix(6,AM_OUTFIELD,strTemp);
 
 			if(nRange>=0&&nRange<4)
 			{
 				strTemp=OUTPUT_ANRANGE[nRange];
 			}
-			m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
+			m_FlexGrid.put_TextMatrix(6,RANG_OUTFIELD,strTemp);
 
 			//row5
 
@@ -924,7 +936,7 @@ void COutputSetDlg::Fresh_Grid()
 				}
 				strTemp.Format(_T("%.1f%%"),nvalue);
 			}
-			m_FlexGrid.put_TextMatrix(5,VALUE_OUTFIELD,strTemp);
+			m_FlexGrid.put_TextMatrix(7,VALUE_OUTFIELD,strTemp);
 
 
 
@@ -943,13 +955,13 @@ void COutputSetDlg::Fresh_Grid()
 				m_FlexGrid.put_Row(5);
 				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
 			}
-			m_FlexGrid.put_TextMatrix(5,AM_OUTFIELD,strTemp);
+			m_FlexGrid.put_TextMatrix(7,AM_OUTFIELD,strTemp);
 
 			if(nRange>=0&&nRange<5)
 			{
 				strTemp=OUTPUT_ANRANGE[nRange];
 			}
-			m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
+			m_FlexGrid.put_TextMatrix(7,RANG_OUTFIELD,strTemp);
 		}//end ==2
 		else//out6/7
 		{
@@ -1091,7 +1103,8 @@ void COutputSetDlg::Fresh_Grid()
 				m_FlexGrid.put_TextMatrix(i+1,6,Interlock[itemp]);
 
 		}
-	}else
+	}
+	else
 	{
 		stradd =MODBUS_INTERLOCK_OUTPUT1;// 286;
 		for (int i = 0;i<7;i++)
@@ -1105,6 +1118,12 @@ void COutputSetDlg::Fresh_Grid()
 
 
 	}
+	
+	
+	
+	
+	//Delay
+	
 	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 	{  CString strdelay;
 	for (int row=0;row<7;row++)
@@ -1141,6 +1160,9 @@ void COutputSetDlg::Fresh_Grid()
 		}
 	}
 	if ((product_register_value[7] == 6)||(product_register_value[7] == 7)){
+	
+	
+	
 	nAMVAlue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];
 
 	for (int row=1;row<=5;row++)
@@ -1182,6 +1204,1018 @@ void COutputSetDlg::Fresh_Grid()
 	   }
 	   m_FlexGrid.put_TextMatrix(row,AM_OUTFIELD,strTemp);
 	}
+
+	}
+
+
+
+}
+void COutputSetDlg::Fresh_Grid_Tstat5E()
+{
+	m_nModeType = product_register_value[7];
+
+	switch (m_nModeType)
+	{
+	case 2:
+	case 1:	m_outRows=6;break;
+	case 4:	m_outRows=6;break;
+	case PM_PRESSURE: break;
+	case PM_TSTAT5D:m_outRows=8;break;
+	case PM_TSTAT6:
+	case PM_TSTAT7:
+	case 16:m_outRows=8;break;
+	case 17:m_outRows=6;break;
+	case 18:m_outRows=8;break;
+	case 19:m_outRows=8;break;
+	default:break;
+	}
+	CString strTemp;
+	//row1:
+	int nVAlue;
+	//这段代码的作用是当选择的是Floating或者PWM模式的时候，
+	//要根据在outputtable中 用户选择的是PID1，还是PID2 PID1 从384 读值 PID2 就是从389读值
+	/////前三行
+#if 1
+	int pid_select2[7]={0};
+	for(int i=0;i<7;i++)
+		pid_select2[i]=product_register_value[MODBUS_PID_OUTPUT1+i];
+#endif
+
+
+	//108  209 Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.  Fan.
+	nVAlue = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS]; //t5=108   t6=209;
+	int nRange=0;
+
+
+
+	//310	254	1	Low byte	W/R	"Output auto/manual enable. Bit 0 to 4 correspond to output1 to output5, bit 5 correspond to 
+	//	output6, bit 6 correspond to output7. 0, auto mode; 1, manual mode."
+
+	int nAMVAlue=0;//=multi_register_value[310];
+	nAMVAlue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];
+	//Row 1-3 初始化 Value，A/M，Range
+
+	for(int i=1;i<=3;i++)
+	{
+		if(nVAlue&(1<<(i-1)))
+		{
+			strTemp=_T("On");
+		}
+		else
+		{
+			strTemp=_T("Off");
+		}
+		m_FlexGrid.put_TextMatrix(i,VALUE_OUTFIELD,strTemp);
+
+
+		//int temp=1<<(i-1);
+		//int a = nAMVAlue;
+		//int b = nAMVAlue & (1<<(i-1));
+		if((int)(nAMVAlue & (1<<(i-1))) == (1<<(i-1)))
+		{
+			strTemp=_T("Manual");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(i);
+			m_FlexGrid.put_CellBackColor(RGB(255,255,255));
+		}
+		else
+		{
+			strTemp=_T("Auto");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(i);
+			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+		} 
+		m_FlexGrid.put_TextMatrix(i,AM_OUTFIELD,strTemp);
+		//strTemp=_T("On/Off");
+		nRange=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
+
+
+		if(nRange>=0&&nRange<4)
+		{
+			strTemp=OUTPUT_RANGE45[nRange];
+		}
+
+
+		m_FlexGrid.put_TextMatrix(i,RANG_OUTFIELD,strTemp);
+
+	}
+	//Fan  Comments 这里有问题 ， strTemp 判断了那么久 在后面直接赋值 NO_APPLICATION ，是为什么?;
+	//Row1-3 其他几列
+#if 1 
+	if(m_version>32.2)
+	{
+		//	328	266	1	Low byte	W/R	"Output1 Function setting:
+		//	0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
+		int nFun=0;//=multi_register_value[328];//tstat6找不到对应的
+		nFun = product_register_value[MODBUS_OUTPUT1_FUNCTION]; //328   266
+		if(nFun>=0&&nFun<4)
+		{
+			strTemp=ONTPUT_FUNS[nFun];
+		}
+	}
+	else
+	{
+		strTemp=NO_APPLICATION;
+	}
+	strTemp=ONTPUT_FUNS[0];//2.5.0.98
+	m_FlexGrid.put_TextMatrix(1,FUN_OUTFIELD,strTemp);
+
+	if (m_version<32.2)
+	{
+
+		short nFun=0;//multi_register_value[328];
+		//328	266	1	int8	1	Low byte	W/R	"Output1 Function setting:
+		//	0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
+		nFun = product_register_value[MODBUS_OUTPUT1_FUNCTION];
+		int nMask;
+		nMask=nFun&0x1;
+		if (nMask>0)
+		{
+			strTemp=ONTPUT_FUNS[1];
+		}
+		else
+		{
+			strTemp=ONTPUT_FUNS[0];
+		}
+		strTemp=ONTPUT_FUNS[0];//2.5.0.98
+		m_FlexGrid.put_TextMatrix(2,FUN_OUTFIELD,strTemp);
+
+
+		nFun = product_register_value[MODBUS_OUTPUT1_FUNCTION]; //328  266
+		nMask=nFun&0x2;
+		if (nMask>0)
+		{
+			strTemp=ONTPUT_FUNS[1];
+		}
+		else
+		{
+			strTemp=ONTPUT_FUNS[0];
+		}
+		strTemp=ONTPUT_FUNS[0];//2.5.0.98
+		m_FlexGrid.put_TextMatrix(3,FUN_OUTFIELD,strTemp);
+
+	}
+	else
+	{
+		int indext=-1;
+		//334	267	1	Low byte	W/R	Output2 function setting (see above)
+		indext = product_register_value[MODBUS_OUTPUT2_FUNCTION];
+		strTemp=ONTPUT_FUNS[0];//2.5.0.98
+		m_FlexGrid.put_TextMatrix(2,FUN_OUTFIELD,strTemp);
+
+		//335	268	1	Low byte	W/R	Output3 function setting (see above)
+		indext = product_register_value[MODBUS_OUTPUT3_FUNCTION];
+		if(indext>=0&&indext<=3)
+			strTemp=ONTPUT_FUNS[indext];
+		strTemp=ONTPUT_FUNS[0];//2.5.0.98
+		m_FlexGrid.put_TextMatrix(3,FUN_OUTFIELD,strTemp);
+
+	}
+#endif
+
+
+	//----------------------------------------------------------------------------------
+
+	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16 
+		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)//||m_nModeType==17||m_nModeType==18)
+	{
+		// just for row4 ///////////////////////////////////////////////////////////////
+		if((int)(nAMVAlue & 8))
+		{
+			strTemp=_T("Manual");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(4);
+			//m_FlexGrid.put_CellBackColor(RGB(255,255,255));//COLOR_CELL RGB
+			m_FlexGrid.put_CellBackColor(COLOR_CELL);
+		}
+		else
+		{
+			strTemp=_T("Auto");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(4);
+			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+		}
+		m_FlexGrid.put_TextMatrix(4,AM_OUTFIELD,strTemp);
+		strTemp.Empty();
+
+		//////////////////////////////////////////////////////////////////////////
+		//nRange=multi_register_value[283];
+		//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
+
+		nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
+
+		if(nRange>=0&&nRange<=3)		//Modify by Fance_0412
+		{
+			strTemp=OUTPUT_RANGE45[nRange];
+		}
+		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
+
+		if(nRange == 0 || !(nAMVAlue & 8)) // AM栏选择了Auto或者Range 栏选择了On/Off，value都显示ON/Off
+		{  // output is on/off
+			if(nVAlue&8)
+			{
+				strTemp=_T("On");
+			}
+			else
+			{
+				strTemp=_T("Off");
+			}
+		}
+		else // output is value
+		{
+			//comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
+			int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
+			strTemp.Format(_T("%d%%"), nValueTemp);
+		}
+		m_FlexGrid.put_TextMatrix(4,VALUE_OUTFIELD,strTemp);
+
+		//////////////////////////////////////////////////////////////////////////
+
+		if (m_version<32.2)
+		{
+			short nFun=0;//multi_register_value[328];
+			nFun = product_register_value[MODBUS_OUTPUT1_FUNCTION]; //328  266
+			int nMask;
+			nMask=nFun&0x4;
+			if (nMask>0)
+			{
+				strTemp=ONTPUT_FUNS[1];//Fance_?_  为什么 所有的值都是 Normal;
+			}
+			else
+			{
+				strTemp=ONTPUT_FUNS[0];
+			}
+			strTemp=ONTPUT_FUNS[0];//2.5.0.98
+			m_FlexGrid.put_TextMatrix(4,FUN_OUTFIELD,strTemp);
+		}
+		else
+		{
+			/////336	407	1	Low byte	R	Show the size of E2 chip. 0 = 24c02, 1 = 24c08/24c16. xxxx
+			//336	269	1	Low byte	W/R	Output4 function setting (see above)vvvv
+
+			int indext=-1;
+			//indext=multi_register_value[336];
+			//if (newtstat6[7] ==PM_TSTAT6)
+			indext = product_register_value[MODBUS_OUTPUT4_FUNCTION];
+			if(indext>=0&&indext<=3)
+				strTemp=ONTPUT_FUNS[indext];
+			strTemp=ONTPUT_FUNS[0];//2.5.0.98
+			m_FlexGrid.put_TextMatrix(4,FUN_OUTFIELD,strTemp);
+		}
+
+		///////////////////////////////////////////////////////////////////////////
+		// just for row5
+		if((int)(nAMVAlue & 16))
+		{
+			strTemp=_T("Manual");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(5);
+			m_FlexGrid.put_CellBackColor(RGB(255,255,255));
+		}
+		else
+		{
+			strTemp=_T("Auto");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(5);
+			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+		}
+		m_FlexGrid.put_TextMatrix(5,AM_OUTFIELD,strTemp);
+		strTemp.Empty();
+
+		//nRange=multi_register_value[284];
+		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
+		nRange = product_register_value[MODBUS_MODE_OUTPUT5];
+
+		if(nRange>=0&&nRange<=3)
+		{
+			strTemp=OUTPUT_RANGE45[nRange];
+		}
+		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
+
+		//////////////////////////////////////////////////////////////////////////
+		if(nRange == 0 || !(nAMVAlue & 16))
+		{			
+			if(nVAlue&16)
+			{
+				strTemp=_T("On");
+			}
+			else
+			{
+				strTemp=_T("Off");
+			}
+		}
+		else
+		{
+			int nValueTemp=product_register_value[MODBUS_PWM_OUT5];	//tstat6没有找到	349 ,599
+			strTemp.Format(_T("%d%%"), nValueTemp);
+		}
+		m_FlexGrid.put_TextMatrix(5,VALUE_OUTFIELD,strTemp);
+		//////////////////////////////////////////////////////////////////////////
+		if (m_version<32.2)
+		{
+			//328	266	1	Low byte	W/R	"Output1 Function setting:
+			//	0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
+			short nFun;//=multi_register_value[328];
+			nFun= product_register_value[MODBUS_OUTPUT1_FUNCTION];
+			int nMask;
+			nMask=nFun&0x8;
+			if (nMask>0)
+			{
+				strTemp=ONTPUT_FUNS[1];
+			}
+			else
+			{
+				strTemp=ONTPUT_FUNS[0];
+			}
+			strTemp=ONTPUT_FUNS[0];//2.5.0.98
+			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
+		}
+		else
+		{
+			////337	270	1	Low byte	W/R	Output5 function setting (see above)
+			int indext=-1;
+			indext = product_register_value[MODBUS_OUTPUT5_FUNCTION];
+
+			if(indext>=0&&indext<=3)
+				strTemp=ONTPUT_FUNS[indext];
+			strTemp=ONTPUT_FUNS[0];//2.5.0.98
+			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//row4,5,for 5F,5G:
+	if(m_nModeType==17||m_nModeType==18)
+	{
+		//out4:
+		int nRang=0;//multi_register_value[283];
+		nRang= product_register_value[MODBUS_OUTPUT1_FUNCTION];//328  266
+		int nValue1;//=multi_register_value[108];
+		//---------------------Modify by Fan--------------------------------------------
+		nValue1 = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS];//108   209
+		if(nRang==0)
+		{
+			if(nValue1 &( 1<<4))
+				strTemp=_T("ON");
+			else
+				strTemp=_T("OFF");
+		}
+		else
+		{
+			strTemp.Format(_T("%d%%"),product_register_value[MODBUS_PWM_OUT4]);//348  598
+		}
+		m_FlexGrid.put_TextMatrix(4,VALUE_OUTFIELD,strTemp);
+		//2.5.0.94
+		if(m_nModeType == 18)
+		{
+			if(product_register_value[MODBUS_MODE_OUTPUT4])  //283   205
+			{
+				if(nValue1 &( 1<<3))
+					strTemp=_T("ON");
+				else
+					strTemp=_T("OFF");
+			}
+			else
+			{
+				strTemp.Format(_T("%d%%"),product_register_value[MODBUS_PWM_OUT4]);//348  598
+			}
+		}
+		//AM
+		if((int)(nAMVAlue & 8))
+		{
+			strTemp=_T("Manual");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(4);
+			m_FlexGrid.put_CellBackColor(RGB(255,255,255));
+		}
+		else
+		{
+			strTemp=_T("Auto");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(4);
+			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+		}
+		m_FlexGrid.put_TextMatrix(4,AM_OUTFIELD,strTemp);
+		strTemp.Empty();
+		//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
+
+		nRange = product_register_value[MODBUS_MODE_OUTPUT4]; //283  205
+
+		if(nRange>=0&&nRange<=3)
+		{
+			strTemp=OUTPUT_RANGE45[nRange];
+		}
+		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
+
+		strTemp.Empty();
+		if (m_version<32.2)
+		{
+			//328	266	1	Low byte	W/R	"Output1 Function setting:
+			//	0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
+
+			short nFun=0;//multi_register_value[328];
+			nFun = product_register_value[MODBUS_OUTPUT1_FUNCTION];
+			int nMask;
+			nMask=nFun&0x4;
+			if (nMask>0)
+			{
+				strTemp=ONTPUT_FUNS[1];
+			}
+			else
+			{
+				strTemp=ONTPUT_FUNS[0];
+			}
+			m_FlexGrid.put_TextMatrix(4,FUN_OUTFIELD,strTemp);
+		}
+		else
+		{
+			int indext=-1;
+			//336	269	1	Low byte	W/R	Output4 function setting (see above)
+			if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+			{
+				indext=product_register_value[269];
+			}else
+			{
+				//indext=multi_register_value[336];//2.5.0.96
+				indext=product_register_value[283];//2.5.0.98		//Fance_?_   //269 对应 336 这里为什么 要变为 283;
+
+			}
+			if(indext>=0&&indext<=3)
+				strTemp=ONTPUT_FUNS[indext];
+			if (indext >=2)//2.5.0.98
+			{
+				strTemp=ONTPUT_FUNS[0];
+			}
+
+			m_FlexGrid.put_TextMatrix(4,FUN_OUTFIELD,strTemp);
+		}
+
+		//out5:
+		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
+
+		////337	270	1	Low byte	W/R	Output5 function setting (see above)
+		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+		{
+			nRang=product_register_value[206];
+		}else
+		{
+			nRang=product_register_value[337];			//Fance_?_ 不明白 为什么 tstat5 要用337=MODBUS_OUTPUT5_FUNCTION 而tstat 要用206=MODBUS_MODE_OUTPUT5;
+		}
+		//108	209	1	Low byte	W/R	Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.
+
+		nValue1 = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS];//108   209
+		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+		{
+			if(nRang==0)
+			{
+				if(nValue1 &( 1<<3))
+					//if(nValue1 &( 1<<4))//2.5.0.94
+					strTemp=_T("ON");
+				else
+					strTemp=_T("OFF");
+			}
+			else
+			{	
+				strTemp.Format(_T("%d%%"),product_register_value[MODBUS_PWM_OUT5]);//找不到 现在找到了 349  599;
+			}
+			m_FlexGrid.put_TextMatrix(5,VALUE_OUTFIELD,strTemp);
+
+		}else if (product_register_value[7]==18)
+		{
+			//2.5.0.94
+			if(product_register_value[MODBUS_MODE_OUTPUT5]==0)// 284   206
+			{
+				if(nValue1 &( 1<<4))//2.5.0.94
+					strTemp=_T("ON");
+				else
+					strTemp=_T("OFF");
+			}
+			else
+			{
+				strTemp.Format(_T("%d%%"),product_register_value[MODBUS_PWM_OUT5]);//349  599 //Fance_?
+			}
+			m_FlexGrid.put_TextMatrix(5,VALUE_OUTFIELD,strTemp);
+			//2.5.0.94
+		}else
+		{
+			nRang = product_register_value[MODBUS_MODE_OUTPUT5];// 284   206
+			//	nRang=multi_register_value[284];
+			if(nRang==0)
+			{
+				if(nValue1 &( 1<<3))
+					//if(nValue1 &( 1<<4))//2.5.0.94
+					strTemp=_T("ON");
+				else
+					strTemp=_T("OFF");
+			}
+			else
+			{
+				strTemp.Format(_T("%d%%"),product_register_value[MODBUS_PWM_OUT5]);//找不到  349 599
+			}
+			m_FlexGrid.put_TextMatrix(5,VALUE_OUTFIELD,strTemp);
+
+		}
+		//AM
+		if((int)(nAMVAlue & 16))
+		{
+			strTemp=_T("Manual");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(5);
+			m_FlexGrid.put_CellBackColor(RGB(255,255,255));
+		}
+		else
+		{
+			strTemp=_T("Auto");
+			m_FlexGrid.put_Col(VALUE_OUTFIELD);
+			m_FlexGrid.put_Row(5);
+			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+		}
+		m_FlexGrid.put_TextMatrix(5,AM_OUTFIELD,strTemp);
+		strTemp.Empty();
+
+		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
+
+
+
+		nRange = product_register_value[MODBUS_MODE_OUTPUT5];  //284  206
+		if(nRange>=0&&nRange<=3)
+		{
+			strTemp=OUTPUT_RANGE45[nRange];
+		}
+		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
+		strTemp.Empty();
+		if (m_version<32.2)
+		{
+			//328	266	1	Low byte	W/R	"Output1 Function setting:
+			//	0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
+
+			short nFun;//=multi_register_value[328];
+			nFun = product_register_value[MODBUS_OUTPUT1_FUNCTION]; // 328  266;
+
+			int nMask;
+			nMask=nFun&0x8;
+			if (nMask>0)
+			{
+				strTemp=ONTPUT_FUNS[1];
+			}
+			else
+			{
+				strTemp=ONTPUT_FUNS[0];
+			}
+			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
+		}
+		else
+		{
+			//337	270	1	Low byte	W/R	Output5 function setting (see above)
+
+			int indext=-1;
+			if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+			{
+				indext=product_register_value[270];
+			}else
+			{
+				//indext=multi_register_value[337];//2.5.0.96
+				indext=product_register_value[284];//2.5.0.98			//Fance_?_  为什么要不对应;
+
+			}
+
+			if(indext>=0&&indext<=3)
+				strTemp=ONTPUT_FUNS[indext];
+			if (indext >=2)//2.5.0.98
+			{
+				strTemp=ONTPUT_FUNS[0];
+			}
+			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
+		}
+	}
+	//row45/67 ANALOG
+	if (m_nModeType==2||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PRESSURE
+		||m_nModeType==18||m_nModeType==6||m_nModeType==7)//5ADEG
+	{
+		//186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
+		//102	210	2	Full	W/R(write only when manual output6 enable)	Output6 ,Analog output1, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.
+
+		short nRange;//=multi_register_value[186];
+		int nValue;//e=multi_register_value[102];
+		//if (newtstat6[7] == 6)
+		nRange = product_register_value[MODBUS_OUTPUT1_SCALE]; //186  207
+		nValue = product_register_value[MODBUS_COOLING_VALVE]; //102  210
+
+		if(nRange==0)
+		{				
+			if(nValue==0)	
+				strTemp=_T("Off");
+			if(nValue==1000)
+				strTemp=_T("On");
+		}
+		else
+		{
+			float nvalue=0.0;
+			//if (newtstat6[7] == 6)
+			if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+			{
+				//AfxMessageBox(_T("It's impossible to enter this place!"));
+				if(nRange==1)//0-10v
+				{
+					nvalue= product_register_value[MODBUS_COOLING_VALVE]/10.0f;//  T6=210
+				}
+				if(nRange==2)//0-5v
+				{
+					nvalue=product_register_value[MODBUS_COOLING_VALVE]/5.0f;
+				}
+				if(nRange==3)//2-10v
+				{
+					nvalue=product_register_value[MODBUS_COOLING_VALVE]/8.0f;
+				}
+				if(nRange==3)//10-0v
+				{
+					nvalue=(10-product_register_value[MODBUS_COOLING_VALVE]/100.0f)/10.0f *100;
+				}
+			}
+			else
+			{
+
+
+				if(nRange==1)//0-10v
+				{
+					//nvalue=multi_register_value[102]/100 /10.0 * 100%;
+					nvalue=product_register_value[MODBUS_COOLING_VALVE]/10.0f;//102   210
+				}
+				if(nRange==2)//0-5v
+				{
+					nvalue=product_register_value[MODBUS_COOLING_VALVE]/5.0f;
+				}
+				if(nRange==3)//2-10v
+				{
+					nvalue=product_register_value[MODBUS_COOLING_VALVE]/8.0f;
+				}
+				if(nRange==3)//10-0v
+				{
+					nvalue=(10-product_register_value[MODBUS_COOLING_VALVE]/100.0f)/10.0f *100;
+				}
+			}
+			strTemp.Format(_T("%.1f%%"),nvalue);
+		}
+		if(m_nModeType==6)
+		{
+
+			m_FlexGrid.put_TextMatrix(6,VALUE_OUTFIELD,strTemp);
+
+			if((int)(nAMVAlue & 8))
+			{
+				strTemp=_T("Manual");
+				m_FlexGrid.put_Col(VALUE_OUTFIELD);
+				m_FlexGrid.put_Row(4);
+				m_FlexGrid.put_CellBackColor(COLOR_CELL);
+			}
+			else
+			{
+				strTemp=_T("Auto");
+				m_FlexGrid.put_Col(VALUE_OUTFIELD);
+				m_FlexGrid.put_Row(4);
+				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+			}
+			m_FlexGrid.put_TextMatrix(6,AM_OUTFIELD,strTemp);
+
+			if(nRange>=0&&nRange<4)
+			{
+				strTemp=OUTPUT_ANRANGE[nRange];
+			}
+			m_FlexGrid.put_TextMatrix(6,RANG_OUTFIELD,strTemp);
+
+			//row5
+
+
+			//103	211	2	Full	W/R(write only when manual output7 enable)	Output7 Analog output2, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.    
+			//187	208	1	Low byte	W/R	Analog Output2 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
+
+			nRange= product_register_value[MODBUS_OUTPUT2_SCALE];//187  208
+			nValue= product_register_value[MODBUS_HEATING_VALVE];//103  211
+
+			if(nRange==0)
+			{
+
+				if(nValue==0)
+					strTemp=_T("Off");
+				if(nValue==1)
+					strTemp=_T("On");
+			}
+			else
+			{
+				//strTemp.Format(_T("%.1f"),nValue/100.0);
+
+				float nvalue=0.0;
+				//if (newtstat6[7] == 6)
+				if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+				{
+					//AfxMessageBox(_T("It's impossible to enter this place!222"));
+					if(nRange==1)//0-10v
+					{
+						//nvalue=multi_register_value[102]/100 /10.0 * 100%;
+						nvalue=product_register_value[MODBUS_HEATING_VALVE]/10.0f;//103 211
+					}
+					if(nRange==2)//0-5v
+					{
+						nvalue=product_register_value[MODBUS_HEATING_VALVE]/5.0f;
+					}
+					if(nRange==3)//2-10v
+					{
+						nvalue=product_register_value[MODBUS_HEATING_VALVE]/8.0f;
+					}
+					if(nRange==4)//10-0v
+					{
+						nvalue=(10-product_register_value[MODBUS_HEATING_VALVE]/100.0f)/10.0f *100;
+					}
+				}else
+				{
+					if(nRange==1)//0-10v
+					{
+						//nvalue=multi_register_value[102]/100 /10.0 * 100%;
+						nvalue= product_register_value[MODBUS_HEATING_VALVE]/10.0f;//103   211
+					}
+					if(nRange==2)//0-5v
+					{
+						nvalue= product_register_value[MODBUS_HEATING_VALVE]/5.0f;
+					}
+					if(nRange==3)//2-10v
+					{
+						nvalue= product_register_value[MODBUS_HEATING_VALVE]/8.0f;
+					}
+					if(nRange==4)//10-0v
+					{
+						nvalue=(10- product_register_value[MODBUS_HEATING_VALVE]/100.0f)/10.0f *100;
+					}
+				}
+				strTemp.Format(_T("%.1f%%"),nvalue);
+			}
+			m_FlexGrid.put_TextMatrix(7,VALUE_OUTFIELD,strTemp);
+
+
+
+
+			if((int)(nAMVAlue & 16))
+			{
+				strTemp=_T("Manual");
+				m_FlexGrid.put_Col(VALUE_OUTFIELD);
+				m_FlexGrid.put_Row(5);
+				m_FlexGrid.put_CellBackColor(RGB(255,255,255));
+			}
+			else
+			{
+				strTemp=_T("Auto");
+				m_FlexGrid.put_Col(VALUE_OUTFIELD);
+				m_FlexGrid.put_Row(5);
+				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+			}
+			m_FlexGrid.put_TextMatrix(7,AM_OUTFIELD,strTemp);
+
+			if(nRange>=0&&nRange<5)
+			{
+				strTemp=OUTPUT_ANRANGE[nRange];
+			}
+			m_FlexGrid.put_TextMatrix(7,RANG_OUTFIELD,strTemp);
+		}//end ==2
+		else//out6/7
+		{
+
+			m_FlexGrid.put_TextMatrix(6,VALUE_OUTFIELD,strTemp);
+
+			if((int)(nAMVAlue & 32))
+			{
+				strTemp=_T("Manual");
+				m_FlexGrid.put_Col(VALUE_OUTFIELD);
+				m_FlexGrid.put_Row(6);
+				m_FlexGrid.put_CellBackColor(COLOR_CELL);
+			}
+			else
+			{
+				strTemp=_T("Auto");
+				m_FlexGrid.put_Col(VALUE_OUTFIELD);
+				m_FlexGrid.put_Row(6);
+				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+			}
+			m_FlexGrid.put_TextMatrix(6,AM_OUTFIELD,strTemp);
+			strTemp.Empty();
+
+			if(nRange>=0&&nRange<5)
+			{
+				strTemp=OUTPUT_ANRANGE[nRange];
+			}
+
+			m_FlexGrid.put_TextMatrix(6,RANG_OUTFIELD,strTemp);
+
+
+			//103	211	2	Full	W/R(write only when manual output7 enable)	Output7 Analog output2, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.    
+			//187	208	1	Low byte	W/R	Analog Output2 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
+			//if (newtstat6[7] == 6)
+
+
+
+			nRange= product_register_value[MODBUS_OUTPUT2_SCALE];//187  208
+			nValue= product_register_value[MODBUS_HEATING_VALVE];//103  211
+
+
+			strTemp.Empty();
+			if(nRange==0)
+			{
+
+				if(nValue==0)
+					strTemp=_T("Off");
+				if(nValue==1000)
+					strTemp=_T("On");
+			}
+			else
+			{
+				//strTemp.Format(_T("%.1f"),nValue/100.0);
+				float nvalue=0.0;
+				//if (newtstat6[7] == 6)
+				if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+				{
+					if(nRange==1)//0-10v
+					{
+						//nvalue=multi_register_value[102]/100 /10.0 * 100%;
+						nvalue=product_register_value[MODBUS_HEATING_VALVE]/10.0f;//103 211
+					}
+					if(nRange==2)//0-5v
+					{
+						nvalue=product_register_value[MODBUS_HEATING_VALVE]/5.0f;
+					}
+					if(nRange==3)//2-10v
+					{
+						nvalue=product_register_value[MODBUS_HEATING_VALVE]/8.0f;
+					}
+					if(nRange==4)//10-0v
+					{
+						nvalue=(10-product_register_value[MODBUS_HEATING_VALVE]/100.0f)/10.0f *100;
+					}
+				}else
+				{
+					if(nRange==1)//0-10v
+					{
+						//nvalue=multi_register_value[102]/100 /10.0 * 100%;
+						nvalue=product_register_value[MODBUS_HEATING_VALVE]/10.0f;
+					}
+					if(nRange==2)//0-5v
+					{
+						nvalue=product_register_value[MODBUS_HEATING_VALVE]/5.0f;
+					}
+					if(nRange==3)//2-10v
+					{
+						nvalue=product_register_value[MODBUS_HEATING_VALVE]/8.0f;
+					}
+					if(nRange==4)//10-0v
+					{
+						nvalue=(10-product_register_value[MODBUS_HEATING_VALVE]/100.0f)/10.0f *100;
+					}
+				}
+				strTemp.Format(_T("%.1f%%"),nvalue);
+			}
+			m_FlexGrid.put_TextMatrix(7,VALUE_OUTFIELD,strTemp);
+
+			if((int)(nAMVAlue & 64))
+			{
+				strTemp=_T("Manual");
+				m_FlexGrid.put_Col(VALUE_OUTFIELD);
+				m_FlexGrid.put_Row(7);
+				m_FlexGrid.put_CellBackColor(RGB(255,255,255));
+			}
+			else
+			{
+				strTemp=_T("Auto");
+				m_FlexGrid.put_Col(VALUE_OUTFIELD);
+				m_FlexGrid.put_Row(7);
+				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+			}
+			m_FlexGrid.put_TextMatrix(7,AM_OUTFIELD,strTemp);
+			strTemp.Empty();
+			if(nRange>=0&&nRange<5)
+			{
+				strTemp=OUTPUT_ANRANGE[nRange];
+			}
+			m_FlexGrid.put_TextMatrix(7,RANG_OUTFIELD,strTemp);
+
+
+		}
+		strTemp.Empty();
+
+	}
+	//286	245	1	Low byte	W/R	Interlock for  output1
+
+	CString strlock;
+	int stradd;// = 286;
+	//if (newtstat6[7] == 6)
+	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+	{
+		stradd =MODBUS_INTERLOCK_OUTPUT1; //245;
+		for (int i = 0;i<7;i++)
+		{
+
+			int itemp = product_register_value[stradd+i];
+			if(itemp>=0&&itemp<6)
+				m_FlexGrid.put_TextMatrix(i+1,6,Interlock[itemp]);
+
+		}
+	}
+	else
+	{
+		stradd =MODBUS_INTERLOCK_OUTPUT1;// 286;
+		for (int i = 0;i<7;i++)
+		{
+
+			int itemp = product_register_value[stradd+i];
+			if(itemp>=0&&itemp<6)
+				m_FlexGrid.put_TextMatrix(i+1,6,Interlock[itemp]);
+
+		}
+
+
+	}
+
+
+
+
+	//Delay
+
+	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+	{  CString strdelay;
+	for (int row=0;row<7;row++)
+	{
+		stradd=MODBUS_OUTPUT1_DELAY_OFF_TO_ON+row;	 //213
+		int itemp=product_register_value[stradd];
+		strdelay.Format(_T("%d"),itemp);
+		m_FlexGrid.put_TextMatrix(row+1,7,strdelay);
+	}
+	for (int row=0;row<7;row++)
+	{
+		stradd=MODBUS_OUTPUT1_DELAY_ON_TO_OFF+row;	 //227
+		int itemp=product_register_value[stradd];
+		strdelay.Format(_T("%d"),itemp);
+		m_FlexGrid.put_TextMatrix(row+1,8,strdelay);
+	}
+	}
+	else
+	{
+		CString strdelay;
+		for (int row=0;row<5;row++)
+		{
+			stradd=MODBUS_OUTPUT1_DELAY_OFF_TO_ON+row;	 //213
+			int itemp=product_register_value[stradd];
+			strdelay.Format(_T("%d"),itemp);
+			m_FlexGrid.put_TextMatrix(row+1,7,strdelay);
+		}
+		for (int row=0;row<5;row++)
+		{
+			stradd=MODBUS_OUTPUT1_DELAY_ON_TO_OFF+row;	 //227
+			int itemp=product_register_value[stradd];
+			strdelay.Format(_T("%d"),itemp);
+			m_FlexGrid.put_TextMatrix(row+1,8,strdelay);
+		}
+	}
+	if ((product_register_value[7] == 6)||(product_register_value[7] == 7)){
+
+
+
+		nAMVAlue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];
+
+		for (int row=1;row<=5;row++)
+		{
+
+
+
+
+			if (product_register_value[MODBUS_MODE_OUTPUT1+row-1]==3)
+			{
+				strTemp=_T("Auto");
+				m_FlexGrid.put_Col(AM_OUTFIELD);
+				m_FlexGrid.put_Row(row);
+				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+				m_FlexGrid.put_Col(VALUE_OUTFIELD);
+				m_FlexGrid.put_Row(row);
+				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+			}
+			else
+			{
+				m_FlexGrid.put_Col(AM_OUTFIELD);
+				m_FlexGrid.put_Row(row);
+				m_FlexGrid.put_CellBackColor(RGB(255,255,255));
+
+				if((int)(nAMVAlue & (1<<(row-1))) == (1<<(row-1)))
+				{
+					strTemp=_T("Manual");
+					m_FlexGrid.put_Col(VALUE_OUTFIELD);
+					m_FlexGrid.put_Row(row);
+					m_FlexGrid.put_CellBackColor(RGB(255,255,255));
+				}
+				else
+				{
+					strTemp=_T("Auto");
+					m_FlexGrid.put_Col(VALUE_OUTFIELD);
+					m_FlexGrid.put_Row(row);
+					m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+				}
+			}
+			m_FlexGrid.put_TextMatrix(row,AM_OUTFIELD,strTemp);
+		}
 
 	}
 
@@ -3903,65 +4937,110 @@ void COutputSetDlg::ClickMsflexgrid1()
 		}
 		
 	}
-	if(lCol==RANG_OUTFIELD)
+	if (product_register_value[7]==16)
 	{
-		if((lRow==4||lRow==5)&&m_nModeType==2)//model a
-		{	
-			m_outRangCmbox.ResetContent();
-	
-			//for(int i=0;i<5;i++)
-			for(int i=0;i<3;i++)//2.5.0.98
-			{
-				m_outRangCmbox.AddString(OUTPUT_ANRANGE[i]);
-			}
-
-
-			m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
-			m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
-			m_outRangCmbox.BringWindowToTop();
-			m_outRangCmbox.SelectString(-1,strValue);
-			m_outRangCmbox.SetFocus(); //获取焦点
-			
-			
-		}
-		if((lRow==4||lRow==5)&&m_nModeType!=2)//model a
-		{
-			m_outRangCmbox.ResetContent();
-
-
-			//for(int i=0;i<2;i++)
-			for(int i=0;i<4;i++)//2.5.0.98
-			{
-				m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
-			}
-
-			m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
-			m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
-			m_outRangCmbox.BringWindowToTop();
-			m_outRangCmbox.SelectString(-1,strValue);
-			m_outRangCmbox.SetFocus(); //获取焦点
-	
-		}
-		if((lRow==6||lRow==7)
-			&&(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_TSTAT6
-			||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE))//model DEG TStat6,TStat7
+		if(lCol==RANG_OUTFIELD)
 		{
 
-			m_outRangCmbox.ResetContent();
-			//for(int i=0;i<5;i++)
-			for(int i=0;i<3;i++)//2.5.0.98
+			if(lRow<=5)
 			{
-				m_outRangCmbox.AddString(OUTPUT_ANRANGE[i]);
+				m_outRangCmbox.ResetContent();
+
+
+				//	for(int i=0;i<2;i++)
+				for(int i=0;i<4;i++)//2.5.0.98
+				{
+					m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
+				}
+
+				m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
+				m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_outRangCmbox.BringWindowToTop();
+				m_outRangCmbox.SelectString(-1,strValue);
+				m_outRangCmbox.SetFocus(); //获取焦点
+
+			}
+			if((lRow==6||lRow==7))//model DEG TStat6,TStat7
+			{
+
+				m_outRangCmbox.ResetContent();
+				for(int i=0;i<5;i++)
+				{
+					m_outRangCmbox.AddString(OUTPUT_ANRANGE[i]);
+				}
+
+				m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
+				m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_outRangCmbox.BringWindowToTop();
+				m_outRangCmbox.SelectString(-1,strValue);
+				m_outRangCmbox.SetFocus(); //获取焦点
 			}
 
-			m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
-			m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
-			m_outRangCmbox.BringWindowToTop();
-			m_outRangCmbox.SelectString(-1,strValue);
-			m_outRangCmbox.SetFocus(); //获取焦点
 		}
+	} 
+	else
+	{
+		if(lCol==RANG_OUTFIELD)
+		{
+			if((lRow==4||lRow==5)&&m_nModeType==2)//model a
+			{	
+				m_outRangCmbox.ResetContent();
 
+				//for(int i=0;i<5;i++)
+				for(int i=0;i<3;i++)//2.5.0.98
+				{
+					m_outRangCmbox.AddString(OUTPUT_ANRANGE[i]);
+				}
+
+
+				m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
+				m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_outRangCmbox.BringWindowToTop();
+				m_outRangCmbox.SelectString(-1,strValue);
+				m_outRangCmbox.SetFocus(); //获取焦点
+
+
+			}
+			if((lRow==4||lRow==5)&&m_nModeType!=2)//model a
+			{
+				m_outRangCmbox.ResetContent();
+
+
+				//for(int i=0;i<2;i++)
+				for(int i=0;i<4;i++)//2.5.0.98
+				{
+					m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
+				}
+
+				m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
+				m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_outRangCmbox.BringWindowToTop();
+				m_outRangCmbox.SelectString(-1,strValue);
+				m_outRangCmbox.SetFocus(); //获取焦点
+
+			}
+			if((lRow==6||lRow==7)
+				&&(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_TSTAT6
+				||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE))//model DEG TStat6,TStat7
+			{
+
+				m_outRangCmbox.ResetContent();
+				//for(int i=0;i<5;i++)
+				for(int i=0;i<3;i++)//2.5.0.98
+				{
+					m_outRangCmbox.AddString(OUTPUT_ANRANGE[i]);
+				}
+
+				m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
+				m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_outRangCmbox.BringWindowToTop();
+				m_outRangCmbox.SelectString(-1,strValue);
+				m_outRangCmbox.SetFocus(); //获取焦点
+			}
+
+		}
 	}
+
 	if(lCol==FUN_OUTFIELD)
 	{
 #if 0//2.5.0.98
@@ -5157,57 +6236,57 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 
 
 	//prior judge whether it is Type 2
-	if(m_nModeType==16)//5E
-	{
-		if(m_nCurRow>0&&m_nCurRow<=3)
-		{	
-			int ret=write_one(g_tstat_id,MODBUS_MODE_OUTPUT1+(m_nCurRow-1) ,nIndext );	//280
-		    if (ret>0)
-		    {
-			  product_register_value[MODBUS_MODE_OUTPUT1+(m_nCurRow-1)]=nIndext;
-		    }
-		}
-		if(m_nCurRow==4)
-			int ret=write_one(g_tstat_id,MODBUS_MODE_OUTPUT4 ,nIndext );//186
-			if (ret>0)
-			{
-			product_register_value[MODBUS_MODE_OUTPUT4]=nIndext;
-			}
-		if(m_nCurRow==5)
-			int ret=write_one(g_tstat_id,MODBUS_MODE_OUTPUT5 ,nIndext );//187
-			if (ret>0)
-			{
-			 product_register_value[MODBUS_MODE_OUTPUT5]=nIndext;
-			}
+	//if(m_nModeType==16)//5E
+	//{
+	//	if(m_nCurRow>0&&m_nCurRow<=3)
+	//	{	
+	//		int ret=write_one(g_tstat_id,MODBUS_MODE_OUTPUT1+(m_nCurRow-1) ,nIndext );	//280
+	//	    if (ret>0)
+	//	    {
+	//		  product_register_value[MODBUS_MODE_OUTPUT1+(m_nCurRow-1)]=nIndext;
+	//	    }
+	//	}
+	//	if(m_nCurRow==4)
+	//		int ret=write_one(g_tstat_id,MODBUS_MODE_OUTPUT4 ,nIndext );//186
+	//		if (ret>0)
+	//		{
+	//		product_register_value[MODBUS_MODE_OUTPUT4]=nIndext;
+	//		}
+	//	if(m_nCurRow==5)
+	//		int ret=write_one(g_tstat_id,MODBUS_MODE_OUTPUT5 ,nIndext );//187
+	//		if (ret>0)
+	//		{
+	//		 product_register_value[MODBUS_MODE_OUTPUT5]=nIndext;
+	//		}
 
 
 
-			if(m_nCurRow==6)
-			{
-				ret =0;
-				ret = write_one(g_tstat_id,MODBUS_OUTPUT1_SCALE ,nIndext ); //186   207
-				if (ret<=0)
-					AfxMessageBox(_T("Setting failure!"));
-				else
-					product_register_value[MODBUS_OUTPUT1_SCALE] = nIndext;
-			}
+	//		if(m_nCurRow==6)
+	//		{
+	//			ret =0;
+	//			ret = write_one(g_tstat_id,MODBUS_OUTPUT1_SCALE ,nIndext ); //186   207
+	//			if (ret<=0)
+	//				AfxMessageBox(_T("Setting failure!"));
+	//			else
+	//				product_register_value[MODBUS_OUTPUT1_SCALE] = nIndext;
+	//		}
 
-			if(m_nCurRow==7)
-			{
-				ret =0;
-				ret = write_one(g_tstat_id,MODBUS_OUTPUT2_SCALE ,nIndext ); //187   208
-				if (ret<=0)
-					AfxMessageBox(_T("Setting failure!"));
-				else
-					product_register_value[MODBUS_OUTPUT2_SCALE] = nIndext;
-			}
-		Fresh_Grid();
-		EndWaitCursor();
-		return;
-	}
+	//		if(m_nCurRow==7)
+	//		{
+	//			ret =0;
+	//			ret = write_one(g_tstat_id,MODBUS_OUTPUT2_SCALE ,nIndext ); //187   208
+	//			if (ret<=0)
+	//				AfxMessageBox(_T("Setting failure!"));
+	//			else
+	//				product_register_value[MODBUS_OUTPUT2_SCALE] = nIndext;
+	//		}
+	//	Fresh_Grid();
+	//	EndWaitCursor();
+	//	return;
+	//}
 
 
-
+	
 	if(m_nCurRow>0&&m_nCurRow<=5)
 	{
 		ret = write_one(g_tstat_id,MODBUS_MODE_OUTPUT1+(m_nCurRow-1) ,nIndext );	//280  202

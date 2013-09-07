@@ -934,16 +934,19 @@
     <ClInclude Include="CM5\user_data.h">
       <Filter>CM5\CM5_H</Filter>
     </ClInclude>
-    <ClInclude Include="gloab_define.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BacnetRange.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetWait.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gloab_define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="TestMultiReadTraffic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomSTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
