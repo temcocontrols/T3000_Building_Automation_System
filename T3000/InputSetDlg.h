@@ -73,6 +73,8 @@ public:
 	HANDLE InputThread;
 	HICON hIcon;
 	HICON hIcon_Exit;
+
+	 
 public:
 	//int m1_inRows;
 	CEdit m_inputNameEdt;
