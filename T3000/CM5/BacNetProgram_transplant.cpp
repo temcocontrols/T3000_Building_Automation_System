@@ -7,12 +7,19 @@
 #include <ctype.h>
 #include <math.h>
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #include "T3000DEF.H"
 #include "ROUTER.H"
+
+#include "..\gloab_define.h"
 
 #pragma warning(disable:4309)
 #pragma warning(disable:4305)
 #pragma warning(disable:4244)
+
+
 
 char *index_stack;
 char stack[150];
@@ -62,8 +69,18 @@ typedef struct {
 
 Info_Table my_info_panel[18];
 
+#define  STR_IN_DESCRIPTION_LENGTH  21
+#define	 STR_IN_LABEL  9
+#define  STR_OUT_DESCRIPTION_LENGTH  21
+#define  STR_OUT_LABEL  9
 
+#define STR_VARIABLE_DESCRIPTION_LENGTH  21
+#define	 STR_VARIABLE_LABEL  9
 
+#define STR_PROGRAM_DESCRIPTION_LENGTH 21
+#define  STR_PROGRAM_LABEL_LENGTH 9
+
+#if 1
 #pragma region Panel
 
 class MyPoint{
@@ -117,7 +134,48 @@ void Point_Net::putpoint( byte num, byte p_type, byte p, int  net)
 }
 
 
+typedef  struct
+{
 
+	char description[STR_IN_DESCRIPTION_LENGTH]; 	      /* (21 bytes; string)*/
+	char label[STR_IN_LABEL];		      	/* (9 bytes; string)*/
+
+	//int8_t value[4]
+	int value;		     						/* (4 bytes; int32_t)*/
+	//int8_t value[4];
+	int8_t  filter;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
+	int8_t decom;/* (1 bit; 0=ok, 1=point decommissioned)*/
+	int8_t sen_on;/* (1 bit)*/
+	int8_t sen_off;  /* (1 bit)*/
+	int8_t control; /*  (1 bit; 0=OFF, 1=ON)*/
+	int8_t auto_manual; /* (1 bit; 0=auto, 1=manual)*/
+	int8_t digital_analog ; /* (1 bit; 1=analog, 0=digital)*/
+	int8_t calibration_sign; /* (1 bit; sign 0=positiv 1=negative )*/
+	int8_t calibration_increment; /* (1 bit;  0=0.1, 1=1.0)*/
+	int8_t unused; /* (5 bits - spare )*/
+#if 0
+	unsigned  filter:3;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
+	unsigned decom	:1;  /* (1 bit; 0=ok, 1=point decommissioned)*/
+	unsigned sen_on :1;  /* (1 bit)*/
+	unsigned sen_off:1;  /* (1 bit)*/
+	unsigned control:1; /*  (1 bit; 0=OFF, 1=ON)*/
+	unsigned auto_manual:1; /* (1 bit; 0=auto, 1=manual)*/
+	unsigned digital_analog :1; /* (1 bit; 1=analog, 0=digital)*/
+	unsigned calibration_sign :1; /* (1 bit; sign 0=positiv 1=negative )*/
+	unsigned calibration_increment:1; /* (1 bit;  0=0.1, 1=1.0)*/
+	unsigned unused:5; /* (5 bits - spare )*/
+#endif
+	//	uint8_t flag1;
+	//	uint8_t flag2;
+
+	uint8_t calibration;  /* (8 bits; -25.6 to 25.6 / -256 to 256 )*/
+
+	uint8_t range;	      			/* (1 uint8_t ; input_range_equate)*/
+
+} Str_in_point; /* 21+1+4+1+1+9 = 38 */
+
+
+#if 0
 typedef struct
 {
 	char description[21]; 	      /* (21 bytes; string)*/
@@ -142,7 +200,7 @@ typedef struct
 	byte        range;	      			/* (1 Byte ; input_range_equate)*/
 
 } Str_in_point; /* 21+1+4+1+1+9+1 = 38 */
-
+#endif
 typedef struct
 {
 	//fance Point_T3000 input;	      /* (2 bytes; point)*/
@@ -259,6 +317,19 @@ typedef struct
 
 typedef struct
 {
+	char description[STR_PROGRAM_DESCRIPTION_LENGTH]; 	      	  /* (21 bytes; string)*/
+	char label[STR_PROGRAM_LABEL_LENGTH];			  /* (9 bytes; string)*/  
+	uint16_t bytes;		/* (2 bytes; size in bytes of program)*/ 
+	uint8_t on_off;	//	      : 1; /* (1 bit; 0=off; 1=on)*/
+	uint8_t auto_manual;//	  : 1; /* (1 bit; 0=auto; 1=manual)*/
+	uint8_t com_prg;	//	    : 1; /* (6 bits; 0=normal use, 1=com program)*/
+	uint8_t errcode;	//      : 5; /* (6 bits; 0=normal end, 1=too int32_t in program)*/
+	uint8_t unused;   //      : 8;
+
+} Str_program_point;	  /* 21+9+2+2 = 34 bytes*/
+#if 0
+typedef struct
+{
 	char description[21]; 	        // (21 bytes; string)*/
 	char label[9];			           // (9 bytes; string)*/
 
@@ -270,7 +341,7 @@ typedef struct
 	byte         unused;                // because of mini's
 
 }	Str_program_point;	  /* 21+9+2+1+1 = 34 bytes*/
-
+#endif
 typedef struct
 {
 	char description[21];				/* (21 bytes; string)	*/
@@ -438,7 +509,7 @@ typedef struct{
 							            	// 1 - change,  slaver report change
 */
 } Str_netstat_point; // 2+ 1+1+1+1+ 1+1+ 1=9
-
+#if 0
 typedef struct
 {
 	char description[21]; 	       /* (21 bytes; string)*/
@@ -459,7 +530,59 @@ typedef struct
 	unsigned int delay_timer;      /* (2 bytes;  seconds,minutes)*/
 
 } Str_out_point;  /* 21+4+2+2+9 = 40 */
+#endif
 
+typedef struct
+{
+	char description[STR_OUT_DESCRIPTION_LENGTH]; 	       /* (21 bytes; string)*/
+	char label[STR_OUT_LABEL];		       /* (9 bytes; string)*/
+
+	int32_t value;		       /* (4 bytes; int32_t) */
+
+	int8_t auto_manual;  /* (1 bit; 0=auto, 1=manual)*/
+	int8_t digital_analog;  /* (1 bit; 0=digital, 1=analog)*/
+	int8_t access_level;  /* (3 bits; 0-5)*/
+	int8_t control ;  /* (1 bit; 0=off, 1=on)*/
+	int8_t digital_control;  /* (1 bit)*/
+	int8_t decom;  /* (1 bit; 0=ok, 1=point decommissioned)*/
+	int8_t range;	/* (1 Byte ; output_range_equate)*/
+#if 0
+	unsigned auto_manual : 1;  /* (1 bit; 0=auto, 1=manual)*/
+	unsigned digital_analog	: 1;  /* (1 bit; 0=digital, 1=analog)*/
+	unsigned access_level	  : 3;  /* (3 bits; 0-5)*/
+	unsigned control       : 1;  /* (1 bit; 0=off, 1=on)*/
+	unsigned digital_control: 1;  /* (1 bit)*/
+	unsigned decom	     	: 1;  /* (1 bit; 0=ok, 1=point decommissioned)*/
+	unsigned range        : 8;	/* (1 Byte ; output_range_equate)*/
+
+#endif
+	//	uint8_t flag1;
+	//	uint8_t range  ;	/* (1 uint8_t ; output_range_equate)*/
+
+	uint8_t m_del_low;  /* (1 uint8_t ; if analog then low)*/
+	uint8_t s_del_high; /* (1 uint8_t ; if analog then high)*/
+	uint16_t delay_timer;      /* (2 bytes;  seconds,minutes)*/
+
+} Str_out_point;  /* 21+9+4+2+2+2 = 40 */
+
+
+typedef struct
+{
+	char description[21];	      /*  (21 bytes; string)*/
+	char label[9];		      /*  (9 bytes; string)*/
+
+	int32_t value;		      /*  (4 bytes; float)*/
+
+	uint8_t auto_manual;  /*  (1 bit; 0=auto, 1=manual)*/
+	uint8_t digital_analog;  /*  (1 bit; 1=analog, 0=digital)*/
+	uint8_t control	;
+	uint8_t unused	;
+	uint8_t range ; /*  (1 uint8_t ; variable_range_equate)*/
+
+
+}	Str_variable_point; /* 21+9+4+1+1 = 36*/
+
+#if 0
 typedef struct
 {
 	char description[21];	      /*  (21 bytes; string)*/
@@ -474,7 +597,7 @@ typedef struct
 	unsigned range          : 8; /*  (1 Byte ; variable_range_equate)*/
 
 }	Str_variable_point; /* 21+9+4+2 = 36*/
-
+#endif
 class Aio
 {
 public:
@@ -600,9 +723,15 @@ public:
 
 
 #pragma endregion Panel
-
+#endif
 
  Panel ptr_panel;
+ extern vector <Str_in_point>  m_Input_data;
+  extern vector <Str_out_point>  m_Output_data;
+  extern vector <Str_program_point>  m_Program_data;
+  extern vector <Str_variable_point>  m_Variable_data;
+
+
 //extern Panel *ptr_panel;
 //extern void creategauge(GWindow **gauge, char *buf);
 //extern void deletegauge(GWindow **gauge);
@@ -658,7 +787,7 @@ extern struct remote_local_list  remote_local_list[100];
 
 
 //extern int  station_num;
-extern int local_panel;
+/*extern*/ int local_panel=0;
 extern unsigned char tbl_bank[100];
 
 /* This array is used by eval_exp1() */
@@ -932,7 +1061,6 @@ void Init_table_bank();
 #pragma warning(disable:4996)
 
 
-
 #ifdef Fance_Enable
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -980,7 +1108,7 @@ int Encode_Program ( /*GEdit *ppedit*/)
 	eol=0;
 //	t=0;
 //	n_local=n_global=0;
-	ncod=error=n_var=n_var1=for_count=then_else=ind_cod_line=next_then_else=0;
+	ncod/*=error*/=n_var=n_var1=for_count=then_else=ind_cod_line=next_then_else=0;//Fance marked error
 	next_else_else=ret_value=index_vars_table=lline=index_buf=index_op=type_eval=0;
 	index_wait=index_go_to=index_dalarm=ind_renum=0;
 //	index_position_table=ind_renum=0;
@@ -1010,7 +1138,10 @@ int Encode_Program ( /*GEdit *ppedit*/)
 //	memset(time_table, 0, 200);
 //	memset(local_table,0,sizeof(local_table));
 	ind_local_table = ind_time_table = 0;
+
+	memset(mycode,0,sizeof(mycode));
 	code = mycode;
+	memset(mesbuf,0,1024);
 	pmes = mesbuf;
 	p_buf = editbuf;
 	*pmes = 0;
@@ -1066,7 +1197,9 @@ int Encode_Program ( /*GEdit *ppedit*/)
 									sizeof(go_to_str)*MAX_GOTO);
 
 	prog = p_buf;
-	prescan1() ; // find the location of all functions and global
+int ret =	prescan1() ; // find the location of all functions and global
+if(error!=-1)
+	return error;
 //Fance	//deletegauge(&gaugep);
 
 #if 0
@@ -1115,6 +1248,8 @@ int Encode_Program ( /*GEdit *ppedit*/)
 	index_go_to = 0;
 //	creategauge(&gaugep,"Generating code");
 	prescan2() ; // find the location of all functions and global
+	if(error!=-1)
+		return error;
 //	deletegauge(&gaugep);
 //	cod_putint(pedit->code, ncod, pedit->ptrprg->type);
 //fance	memcpy(pedit->code,&ncod,2);
@@ -4307,6 +4442,11 @@ case ASSIGNARRAY_2:
 				cod_line[ind_cod_line++]=ASSIGN;
 */
 			 ind_cod_line=pcodvar(0,v1,var1,fvar1,NULL,ind_cod_line);
+			 if(ind_cod_line == -2)
+			 {
+				 error = 1;
+				 return;
+			 }
 			 if(v2)
 			 {
 				for(i=0;i<v2;i++)
@@ -5089,7 +5229,8 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 						 }
 						 if (j == ind_local_table)
 						 {
-							exit(1);
+							 return -2;
+							//exit(1);//Fance
 						 }
 					 }
 
@@ -5914,7 +6055,12 @@ else
 				code += sizeof(Point_Net);
 				k=0;
 			//	strcpy(buf,ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, network, panel, &k));//Fance
-				strcpy(buf,ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, my_network, my_panel, &k));
+				char *temp_p = ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, my_network, my_panel, &k);
+				if(temp_p == NULL)	//没有获取到，就算失败
+				{
+					return 0;
+				}
+				strcpy(buf,temp_p);
 				if( (((Point_Net *)b)->point_type-1) == AY )
 				{
 					b = buf;
@@ -6494,6 +6640,11 @@ void init_info_table( void )
 				ptr_panel.info[i].max_points = MAX_PRGS;
 				break;
 			case TBL:
+				ptr_panel.info[i].address = (char *)ptr_panel.analog_mon;
+				ptr_panel.info[i].str_size = sizeof( Str_monitor_point );
+				ptr_panel.info[i].name = "TBL";
+				ptr_panel.info[i].max_points = MAX_TABS;
+
 				#ifdef Fance_enable
 				info[i].address = (char *)custom_tab;
 				info[i].str_size = sizeof( Str_tbl_point );
@@ -6502,8 +6653,10 @@ void init_info_table( void )
 				#endif
 				break;
 			case DMON:
-				ptr_panel.info[i].address = NULL;
-				ptr_panel.info[i].name = "";
+				ptr_panel.info[i].address = (char *)ptr_panel.analog_mon;
+				ptr_panel.info[i].str_size = sizeof( Str_monitor_point );
+				ptr_panel.info[i].name = "DMON";
+				ptr_panel.info[i].max_points = MAX_TABS;
 				break;
 			case AMON:
 				ptr_panel.info[i].address = (char *)ptr_panel.analog_mon;
@@ -6571,6 +6724,46 @@ void init_info_table( void )
 				break;
 		}
 	}
+}
+
+void copy_data_to_ptrpanel(int Data_type)
+{
+	switch(Data_type)
+	{
+	case TYPE_INPUT:
+		{
+			for (int i=0;i<(int)m_Input_data.size();i++)
+			{
+				memcpy(&ptr_panel.inputs[i], &m_Input_data.at(i),sizeof(Str_in_point));
+			}
+		}
+		break;
+	case TYPE_OUTPUT:
+		{
+			for (int i=0;i<(int)m_Output_data.size();i++)
+			{
+				memcpy(&ptr_panel.outputs[i], &m_Output_data.at(i),sizeof(Str_out_point));
+			}
+		}
+		break;
+	case  TYPE_PROGRAM:
+		{
+			for (int i=0;i<(int)m_Program_data.size();i++)
+			{
+				memcpy(&ptr_panel.programs[i], &m_Program_data.at(i),sizeof(Str_program_point));
+			}
+		}
+		break;
+	case TYPE_VARIABLE:
+		{
+			for (int i=0;i<(int)m_Variable_data.size();i++)
+			{
+				memcpy(&ptr_panel.vars[i], &m_Variable_data.at(i),sizeof(Str_variable_point));
+			}
+		}
+
+	}
+
 }
 
 

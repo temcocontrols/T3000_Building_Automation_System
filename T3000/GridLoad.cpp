@@ -6,7 +6,8 @@
 #include "GridLoad.h"
 #include "MainFrm.h"
 #include "globle_function.h"
-
+#include "T3000RegAddress.h"
+T3000RegAddress M_RegAddress;
 namespace NC_Define
 {	
 	const CString strSERIALNO= _T("Serial#");
@@ -99,7 +100,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 	int failure_number=0;
 	int disabled_number=0;
 	
-
+ 
 	for(UINT iitemp=0;iitemp<pDlg->m_grid_load.size();iitemp++)
 	{
 		CString log_file_path;
@@ -113,12 +114,16 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		}
 		if(!pDlg->m_grid_load.at(iitemp).flash_or_no)
 			continue;
-		
+
 		if(!pDlg->CheckLoadFileForTStat(pDlg->m_grid_load.at(iitemp)))
 		{
 			continue;
 		}
-
+		CString status=pDlg->m_FlexGrid.get_TextMatrix(iitemp+1,COL_STATUS);
+		if (status.Find(_T("OK"))>=0)
+		{
+		   continue;
+		}
 		int nID=-1;
 		int nTempID =pDlg->m_grid_load.at(iitemp).ID;//get temp tstat id
 		if (g_CommunicationType==0)
@@ -137,7 +142,42 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		{
 			nID=read_one(nTempID,6);
 		}
+		if (nID<0)//没有读到 ID，就省略掉
+		{
+		   continue;
+		}
 		now_tstat_id=nID;
+		int nFlag=0;
+		nFlag = read_one(now_tstat_id,7,6);
+
+		if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7) )
+		{
+			product_type =T3000_6_ADDRESS;
+		}
+		else if((nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H))
+		{
+			product_type = T3000_5EH_LCD_ADDRESS;
+		}
+		else if((nFlag == PM_TSTAT5A) ||(nFlag == PM_TSTAT5B) ||
+			(nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F) ||
+			(nFlag == PM_TSTAT5G))
+		{
+			product_type =T3000_5ABCDFG_LED_ADDRESS;
+		}
+
+		 
+		//Code and comments by Fance
+		//Use old_product_type to save the last value.
+		//if this value is change ,it will reload the register value.
+		//example:
+		//For tstats 5A : product_register_value[MODBUS_BAUDRATE]  ->  MODBUS_BAUDRATE = 185
+		//For tstats 6	  product_register_value[MODBUS_BAUDRATE]  ->  MODBUS_BAUDRATE = 110
+		if(old_product_type!=product_type)
+		{
+			old_product_type = product_type;
+			M_RegAddress.Change_Register_Table();
+		}
+
 		if(now_tstat_id>0)
 		{
 			pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_CONNECTION,_T("On line"));
@@ -221,7 +261,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 				pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_STATUS,_T("OK"));
 
 				
-				SYSTEMTIME stUTC, stLocal;
+			/*	SYSTEMTIME stUTC, stLocal;
 				CString strDatatime;
 				FileTimeToSystemTime(&(fData.ftLastWriteTime), &stUTC);
 				BOOL bRet= SystemTimeToTzSpecificLocalTime(NULL, &stUTC, &stLocal);
@@ -231,7 +271,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 					SystemTimeToTzSpecificLocalTime(NULL, &stUTC, &stLocal);
 				}
 				strDatatime.Format(_T("%02d. %02d %d, %02d:%02d"), stLocal.wDay,stLocal.wMonth,stLocal.wYear,stLocal.wHour,stLocal.wMinute);
-				pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_LOADEVENT,strDatatime);
+				pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_LOADEVENT,strDatatime);*/
 			}
 		//	else
 				//failure_number++;
@@ -242,6 +282,11 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		}		
 		//p_list_box->ResetContent();
 	}
+
+
+
+
+
 	pDlg->m_bTstatLoadFinished=TRUE;
 
 	pDlg->m_eTstatLoadFinish.SetEvent(); // signal
@@ -342,6 +387,7 @@ BOOL CGridLoad::OnInitDialog()
 	m_FlexGrid.put_ColWidth(COL_LOADEVENT,1700);
 	//add sub net to combolist
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+ 
 //	m_srScanSubNetNameCobox.AddString(_T("All subNets..."));
 	CString strTemp;
 	for(UINT i=0;i<pFrame->m_subNetLst.size();i++)
@@ -767,15 +813,15 @@ void CGridLoad::OnBnClickedConfigbutton()
 				m_grid_load.at(iitemp).flash_or_no =false;//Tstat5A		
 		}
 	
-		DWORD dwExidCode;
-		GetExitCodeThread(m_pLoadBackCheckThread->m_hThread,&dwExidCode);
-		if(dwExidCode==STILL_ACTIVE)
-		{
-			TerminateThread(m_pLoadBackCheckThread->m_hThread,dwExidCode);
-			m_pLoadBackCheckThread=NULL;
+	DWORD dwExidCode;
+	GetExitCodeThread(m_pLoadBackCheckThread->m_hThread,&dwExidCode);
+	if(dwExidCode==STILL_ACTIVE)
+	{
+	TerminateThread(m_pLoadBackCheckThread->m_hThread,dwExidCode);
+	m_pLoadBackCheckThread=NULL;
 
-			Sleep(300);
-		}
+	Sleep(300);
+	}
 
 	//	SetPaneString("Loading...");
 		//m_ploadThread=AfxBeginThread(run_back_ground_load_thread,this);////////////////////////create thread,read information	
@@ -1270,9 +1316,10 @@ BOOL CGridLoad::CheckLoadFileForTStat(GRID_LOAD& glItem)
 		{
 			bRet = TRUE;
 		}
-	}
-
 	file.Close();
+	}
+	
+	
 
 	return bRet;			
 }

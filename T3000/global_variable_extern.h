@@ -135,14 +135,14 @@ const int PM_TSTAT5E = 16;
 int const PM_TSTAT5F = 17;
 int const PM_TSTAT5G = 18;
 int const PM_TSTAT5H = 19;
-int const PM_T38AIOD= 20;
+int const PM_T38AIOD= 26;
 int const PM_T3IOA = 21;
 int const PM_T332AI = 22;
 int const PM_T3AI16O = 23;
 
 int const PM_ZIGBEE = 24;
 int const PM_FLEXDRIVER = 25;
-int const PM_T38I13O = 26;
+int const PM_T38I13O = 20;
 int const PM_T3PERFORMANCE = 27;
 int const PM_T34AO = 28;
 int const PM_T36CT = 29;
@@ -850,6 +850,18 @@ extern int MODBUS_RELAY_PWM_TOTAL_DUTY                         ;
 extern int MODBUS_RELAY_PWM_HIGH_DUTY                          ;   
 
 #pragma region For_bacnet
+extern int bac_ranges_type;
+extern int bac_range_number_choose;
+
+extern int bac_program_pool_size;
+extern int bac_program_size;
+extern int bac_free_memory;
+extern int bac_read_which_list;
+extern bool bac_input_read_results;
+extern bool bac_output_read_results;
+extern bool bac_variable_read_results;
+extern bool bac_program_read_results;
+
 extern HWND      g_hwnd_now;
 extern HWND      m_input_dlg_hwnd;
 extern HWND      m_output_dlg_hwnd;

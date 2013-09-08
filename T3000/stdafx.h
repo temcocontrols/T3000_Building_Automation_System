@@ -114,6 +114,7 @@ INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned sho
 INPUT int Read_One(unsigned char device_var,unsigned short address);
 INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+INPUT int read_multi_log(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,unsigned short *put_senddate_into_here,unsigned short *put_revdata_into_here);
 
 //INPUT SOCKET GetSocketHandle();
 #include <stdint.h>
@@ -164,7 +165,7 @@ typedef struct _STATUSBARINFO
 #include "fileRW.h"
 
 #include "T3000RegAddress.h"
-
+//#define Fance_Enable_Test
 
 #define MKBOOL(_VALUE) ((_VALUE) != 0)		//Add by Fance .Use this macro to solve the warning warning C4800: 'BOOL' : forcing value to bool 'true' or 'false'
 
@@ -172,6 +173,7 @@ typedef struct _STATUSBARINFO
 #define MY_WRITE_ONE WM_USER+100
 #define MY_READ_ONE  WM_USER+101
 #define MY_INVOKE_ID WM_USER + 102
+#define MY_BAC_WRITE_LIST WM_USER + 103
 #define MY_CLOSE WM_USER+110
 #define MY_RESUME_DATA  WM_USER+200
 #define MY_READ_DATA_CALLBACK WM_USER+201

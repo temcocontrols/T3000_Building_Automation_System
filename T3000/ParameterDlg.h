@@ -199,4 +199,8 @@ public:
 	//	afx_msg void OnEnChangeEdit34();
 	afx_msg void OnCbnSelchangeStaticunint2();
 	CComboBox m_gUnit;
+	afx_msg void OnBnClickedCs1();
+	afx_msg void OnBnClickedCs2();
+
+	CString GetInputValue(int InputNo);
 };

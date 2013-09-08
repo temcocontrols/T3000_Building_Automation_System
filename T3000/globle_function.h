@@ -82,9 +82,10 @@ BOOL Post_Invoke_ID_Monitor_Thread(UINT MsgType,
 	int Invoke_ID,
 	HWND hwnd
 	);
+BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize,HWND hWnd);
 
 int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize);
-int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize );
+int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance/*,int8_t entitysize*/ );
 
 int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
 void local_handler_conf_private_trans_ack(
@@ -92,4 +93,7 @@ void local_handler_conf_private_trans_ack(
 	uint16_t service_len,
 	BACNET_ADDRESS * src,
 	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
+
+void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
+
 #endif

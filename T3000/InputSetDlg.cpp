@@ -39,6 +39,8 @@ CInputSetDlg::CInputSetDlg(CWnd* pParent /*=NULL*/)
 	m_nCurRow=m_nCurCol=0;
 	 InputThread=NULL;
 	 b_is_fresh = false;
+
+	 
 }
 
 CInputSetDlg::~CInputSetDlg()
@@ -1615,7 +1617,6 @@ void CInputSetDlg::InitGridtstat6()
 	   m_FlexGrid.put_TextMatrix(8,NAME_FIELD,g_strInName7);
 	   m_FlexGrid.put_TextMatrix(9,NAME_FIELD,g_strInName8); 
 	   m_FlexGrid.put_TextMatrix(10,NAME_FIELD,g_strInHumName);
-	   
 	   m_FlexGrid.put_TextMatrix(11,NAME_FIELD,g_strInCO2);
 	    
 	   
@@ -1729,13 +1730,13 @@ void CInputSetDlg::InitGridtstat6()
 				   else if(product_register_value[MODBUS_ANALOG1_RANGE+i-2]==3 || product_register_value[MODBUS_ANALOG1_RANGE+i-2]==5) // On/Off or Off/On ==1 On ==0 Off   359  122
 				   {						
 					   int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
-					   if (nValue == 1)
+					   if (nValue == 0)
 					   {
-						   strTemp = _T("On");
+						   strTemp = _T("Off");
 					   }
 					   else
 					   {
-						   strTemp = _T("Off");
+						   strTemp = _T("On");
 					   }					
 				   }
 				   else if (product_register_value[MODBUS_ANALOG1_RANGE+i-2]==4 )  // custom sensor	359 122
@@ -2271,7 +2272,8 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
 		{
 			nValue = multi_register_value[141];
-		}else
+		}
+		else
 		{
 			nValue = multi_register_value[309];
 
@@ -2562,23 +2564,23 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	if(nCol == CUST_FIELD)
-	{
-		if(nRow==2&&product_register_value[MODBUS_ANALOG1_RANGE]==4)///没找到TSTAT6对应值
-		{
-			m_customBtn.ShowWindow(SW_SHOW);
-			m_customBtn.MoveWindow(rcCell); //移动到选中格的位置，覆盖
-			m_customBtn.BringWindowToTop();
-			m_customBtn.SetFocus(); //获取焦点
-		}
-		if(nRow==3&&product_register_value[MODBUS_ANALOG2_RANGE]==4)
-		{
-			m_customBtn.ShowWindow(SW_SHOW);
-			m_customBtn.MoveWindow(rcCell); //移动到选中格的位置，覆盖
-			m_customBtn.BringWindowToTop();
-			m_customBtn.SetFocus(); //获取焦点
-		}
-	}
+	//if(nCol == CUST_FIELD)
+	//{
+	//	if(nRow==2&&product_register_value[MODBUS_ANALOG1_RANGE]==4)///没找到TSTAT6对应值
+	//	{
+	//		m_customBtn.ShowWindow(SW_SHOW);
+	//		m_customBtn.MoveWindow(rcCell); //移动到选中格的位置，覆盖
+	//		m_customBtn.BringWindowToTop();
+	//		m_customBtn.SetFocus(); //获取焦点
+	//	}
+	//	if(nRow==3&&product_register_value[MODBUS_ANALOG2_RANGE]==4)
+	//	{
+	//		m_customBtn.ShowWindow(SW_SHOW);
+	//		m_customBtn.MoveWindow(rcCell); //移动到选中格的位置，覆盖
+	//		m_customBtn.BringWindowToTop();
+	//		m_customBtn.SetFocus(); //获取焦点
+	//	}
+	//}
 }
 
 
@@ -2600,7 +2602,6 @@ void CInputSetDlg::OnCbnSelchangeRangComboFor5E()
 	{
 		int nindext=m_RangCombox.GetCurSel();
 		//if ((multi_register_value[7] == 6)||(multi_register_value[7] == 7))//tstat6
-
 		int ret=write_one(g_tstat_id,MODBUS_DEGC_OR_F,nindext);//121  104 
 		if(ret<0)
 		{
@@ -2614,6 +2615,47 @@ void CInputSetDlg::OnCbnSelchangeRangComboFor5E()
 
 	if(m_nCurRow >= 2 && m_nCurCol==RANG_FIELD)
 	{
+
+		vector<int> vet_Row;
+		for (int i=0;i<8;i++)
+		{
+			if (product_register_value[MODBUS_ANALOG1_RANGE+i]==4)
+			{   
+				vet_Row.push_back(i);
+			}
+		}
+		if (vet_Row.size()>=2)
+		{
+			int nindext=m_RangCombox.GetCurSel();
+			if (nindext!=4)
+			{
+				int ret=write_one(g_tstat_id,MODBUS_ANALOG1_RANGE+m_nCurRow-2,nindext);	//5e=359  6=122
+				if(ret<0)
+				{
+					AfxMessageBox(_T("Write Fail!Please try again!"));
+					return;
+				}
+				product_register_value[MODBUS_ANALOG1_RANGE+m_nCurRow-2] = nindext;
+				Fresh_Grid();
+			}
+			//if ((multi_register_value[7] == 6)||(multi_register_value[7] == 7))//tstat6
+			else
+			{
+				AfxMessageBox(_T("More than 2 rows for custom sensor"));
+				
+			}
+
+			return;
+
+
+		}
+		 
+
+
+
+
+
+
 		int nindext=m_RangCombox.GetCurSel();
 		//if ((multi_register_value[7] == 6)||(multi_register_value[7] == 7))//tstat6
 		int ret=write_one(g_tstat_id,MODBUS_ANALOG1_RANGE+m_nCurRow-2,nindext);	//5e=359  6=122
@@ -2623,6 +2665,9 @@ void CInputSetDlg::OnCbnSelchangeRangComboFor5E()
 			return;
 		}
 		product_register_value[MODBUS_ANALOG1_RANGE+m_nCurRow-2] = nindext;
+
+
+
 		//Sleep(2000);
 		/*int retread = read_one(g_tstat_id,MODBUS_ANALOG_INPUT1+m_nCurRow-2,5);
 		if(retread<0)

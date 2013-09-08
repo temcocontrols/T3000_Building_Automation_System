@@ -151,10 +151,10 @@ public:
 	CString m_strFreeCool;
 	CString m_strFreeCoolFN;
 
-	CSliderCtrl m_TemperaureSlider;
-	CSliderCtrl m_daySlider;
-	CSliderCtrl m_nightSlider;
-	CSliderCtrl m_nightHeatSlider;
+	CMacSliderCtrl m_TemperaureSlider;
+	CMacSliderCtrl m_daySlider;
+	CMacSliderCtrl m_nightSlider;
+	CMacSliderCtrl m_nightHeatSlider;
 
 	int m_outRows;
 	int m_inRows;
@@ -252,6 +252,8 @@ public:
 	afx_msg void OnCbnSelchangeCombo4();
 	afx_msg void OnCbnSelchangeStaticunint();
 	CComboBox m_gUnit;
+	CMacSliderCtrl m_currentTemp;
+	afx_msg void OnNMReleasedcaptureSliderDay(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

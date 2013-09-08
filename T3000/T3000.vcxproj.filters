@@ -372,6 +372,21 @@
     <ClCompile Include="DialogCM5_BacNet.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
+    <ClCompile Include="CM5\CStatic\staticex.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetRange.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetWait.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="TestMultiReadTraffic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomSTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -918,6 +933,18 @@
     </ClInclude>
     <ClInclude Include="CM5\user_data.h">
       <Filter>CM5\CM5_H</Filter>
+    </ClInclude>
+    <ClInclude Include="gloab_define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetRange.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetWait.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestMultiReadTraffic.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,3 +1,37 @@
+2013-09-06
+Update by Fance
+1.Change the range selected dialog,allowed the user to change the units by mouse click.(If user click one of the units , the edit box will auto changed the number.)
+2.Support multi block read and write.
+3.Support single write , if user changed one of the item ,it will sent this change to device immediately,not sent whole list.
+4.In IDE interface, Add refresh function.
+************************************************************************************
+2013-08-30
+Update by Fance
+For Bacnet:
+1.Add programming context,when user use bacnet to program code,if codes contains error,it will prompt the user which line occurs error.
+2.Add static text to show how many free memory the program has,and how many it has used.
+3.Add range choose dialog.
+4.Add "load descriptors" function like old T3000 do.(Read all date program needed,like "Programs" "Inputs" "Outputs" and so on)
+5.Add wait show dialog,to show the "load descriptors" progress step! 
+*************************************************************************************
+2013-08-23
+Update by Fance
+1.Add about 5000 lines for bacnet programming part.(Only finished encode part,such as ("if else","REM","ENABLE DISABLE").Decode part not finished yet,because it's more complex than encode)
+2.This part of code is just for test,if it's stable enough,it will add to T3000.
+
+CM5 Part:
+1.Add CM5 bacnet  programming parts encode and decode into T3000.
+2.Delete the test project which used for test the function "encode and decode " in github.
+3.Make the input output variable list more perfect.Such as : 
+   1>If in manual mode user can't change the value of the item.
+   2>If user change the range ,the units will change it automatically.
+   3>Add icon of the refresh button and the apply button.
+4.Add the hotkey in programming interface.(F2 Send,F3 Clear,F5 Load File,F6 Save File)
+5.Add the function that user can save the programming code into a file,and also allowed user load this file ,display on the screem
+CO2 Part:
+1.Add the function and UI allowed user to enable or disable "Heating the humidity sensor"
+
+
 Ver2.6.0.14,date released:2013-8-1
 *************************************************************************************
 <1>fix Output PID2 OFF VALVE TABLE

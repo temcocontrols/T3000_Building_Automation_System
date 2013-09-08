@@ -11,15 +11,20 @@
 #include "BacnetVariable.h"
 #include "globle_function.h"
 
+#include "gloab_define.h"
 #include "datalink.h"
+#include "BacnetWait.h"
 #include "Bacnet_Include.h"
 #include "CM5\ud_str.h"
 //bool CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
 CString temp_device_id,temp_mac,temp_vendor_id;
+HANDLE hwait_thread;
+BacnetWait *WaitDlg=NULL;
 // CDialogCM5_BacNet
 HWND BacNet_hwd;
-#define WM_FRESH_CM_LIST WM_USER + 200
-
+_Refresh_Info Bacnet_Refresh_Info;
+#define WM_FRESH_CM_LIST WM_USER + 975
+//#define WM_SEND_OVER     WM_USER + 1287
 // int m_Input_data_length;
 
 
@@ -45,11 +50,14 @@ void CDialogCM5_BacNet::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CDialogCM5_BacNet, CFormView)
 	ON_BN_CLICKED(IDC_BUTTON_TEST, &CDialogCM5_BacNet::OnBnClickedButtonTest)
 	ON_MESSAGE(WM_FRESH_CM_LIST,Fresh_UI)
-	ON_BN_CLICKED(IDC_BUTTON_CM5_ADVANCE, &CDialogCM5_BacNet::OnBnClickedButtonCm5Advance)
+	ON_BN_CLICKED(IDC_BUTTON_CM5_ADVANCE, &CDialogCM5_BacNet::OnBnClickedButtonCm5Input)
 //	ON_BN_CLICKED(IDC_BUTTON1, &CDialogCM5_BacNet::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON_CM5_PROGRAMING, &CDialogCM5_BacNet::OnBnClickedButtonCm5Programing)
 	ON_BN_CLICKED(IDC_BUTTON_CM5_OUTPUT, &CDialogCM5_BacNet::OnBnClickedButtonCm5Output)
 	ON_BN_CLICKED(IDC_BUTTON_CM5_VARIABLE, &CDialogCM5_BacNet::OnBnClickedButtonCm5Variable)
+	ON_BN_CLICKED(IDC_BUTTON_BAC_READ_TOTAL, &CDialogCM5_BacNet::OnBnClickedButtonBacReadTotal)
+	ON_MESSAGE(MY_RESUME_DATA, AllMessageCallBack)
+	ON_MESSAGE(WM_DELETE_WAIT_DLG,Delete_Wait_Dlg)	
 END_MESSAGE_MAP()
 
 
@@ -69,9 +77,111 @@ void CDialogCM5_BacNet::Dump(CDumpContext& dc) const
 #endif
 #endif //_DEBUG
 
+//The window which created by the button ,will delete when the wait dialog send this message,to this window.
+//It means ,it has done .we don't needed.
+LRESULT CDialogCM5_BacNet::Delete_Wait_Dlg(WPARAM wParam,LPARAM lParam)
+{
+	if(WaitDlg!=NULL)
+	{
+		Sleep(1000);
+		delete WaitDlg;
+		WaitDlg = NULL;
+		((CButton *)GetDlgItem(IDC_BUTTON_BAC_READ_TOTAL))->EnableWindow(TRUE);
 
+		if(bac_read_which_list == BAC_READ_INPUT_LIST)
+		{
+			if(bac_input_read_results)
+			{
+			 CBacnetInput DLG;
+			 DLG.DoModal();
+			}
+			else
+				MessageBox(_T("Inputs list read time out!"));	
+			return 0;
+		}
+
+		if(bac_read_which_list == BAC_READ_OUTPUT_LIST)
+		{
+			if(bac_output_read_results)
+			{
+				CBacnetOutput DLG;
+				DLG.DoModal();
+			}
+			else
+				MessageBox(_T("Outputs list read time out!"));
+			return 0;
+		}
+
+		if(bac_read_which_list == BAC_READ_VARIABLE_LIST)
+		{
+			if(bac_variable_read_results)
+			{
+				CBacnetVariable DLG;
+				DLG.DoModal();
+			}
+			else
+				MessageBox(_T("Variable list read time out!"));
+			return 0;
+		}
+
+		if(bac_read_which_list == BAC_READ_PROGRAM_LIST)
+		{
+			if(bac_program_read_results)
+			{
+				CBacnetProgram DLG;
+				DLG.DoModal();
+			}
+			else
+				MessageBox(_T("Program list read time out!"));
+			return 0;
+		}
+
+	}
+	return 0;
+}
 // CDialogCM5_BacNet message handlers
+LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
+{
+	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
+	bool msg_result=WRITE_FAIL;
+	msg_result = MKBOOL(wParam);
+	if(msg_result)
+	{
+		for (int i=0;i<BAC_READ_INPUT_GROUP_NUMBER;i++)
+		{
+			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Input_InvokeID[i])
+				Bacnet_Refresh_Info.Input_result[i] = true;
+			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Output_InvokeID[i])
+				Bacnet_Refresh_Info.Output_result[i] = true;
+			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Variable_InvokeID[i])
+				Bacnet_Refresh_Info.Variable_result[i] = true;
+			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Program_InvokeID[i])
+				Bacnet_Refresh_Info.Program_result[i] = true;
+		}
 
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Bacnet operation success!"));
+		//MessageBox(_T("Bacnet operation success!"));
+	}
+	else
+	{
+		for (int i=0;i<BAC_READ_INPUT_GROUP_NUMBER;i++)
+		{
+			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Input_InvokeID[i])
+				Bacnet_Refresh_Info.Input_result[i] = false;
+			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Output_InvokeID[i])
+				Bacnet_Refresh_Info.Output_result[i] = false;
+			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Variable_InvokeID[i])
+				Bacnet_Refresh_Info.Variable_result[i] = false;
+			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Program_InvokeID[i])
+				Bacnet_Refresh_Info.Program_result[i] = false;
+		}
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Bacnet operation fail!"));
+		//MessageBox(_T("Bacnet operation fail!"));
+	}
+	if(pInvoke)
+		delete pInvoke;
+	return 0;
+}
 
 void CDialogCM5_BacNet::OnBnClickedButtonTest()
 {
@@ -83,12 +193,46 @@ void CDialogCM5_BacNet::OnBnClickedButtonTest()
 void CDialogCM5_BacNet::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
-	#ifdef Fance_Enable
+	#ifdef Fance_Enable_Test
 	Fresh();//Fance
+	Initial_All_Point();
 	#endif
 	// TODO: Add your specialized code here and/or call the base class
 }
+void CDialogCM5_BacNet::Initial_All_Point()
+{
+	m_Input_data.clear();
+	m_Variable_data.clear();
+	m_Output_data.clear();
+	m_Program_data.clear();
+	for(int i=0;i<5*BAC_READ_INPUT_GROUP_NUMBER;i++)
+	{
+			Str_in_point temp_in;
+			//temp_in.auto_manual = 0;
+			//temp_in.calibration = 0;
+			//temp_in.calibration_increment = 0;
+			//temp_in.calibration_sign = 0;
+			//temp_in.control = 0;
+			//temp_in.decom = 0;
+			////temp_in.description = "";
+			//temp_in.digital_analog = 0;
+			//temp_in.filter = 0;
+			////temp_in.label = 0;
+			//temp_in.range =0;
+			//temp_in.sen_off = 0;
+			//temp_in.sen_on = 0;
+			//temp_in.unused = 0;
+			//temp_in.value = 0;
+			m_Input_data.push_back(temp_in);
 
+			Str_out_point temp_out;
+			m_Output_data.push_back(temp_out);
+			Str_variable_point temp_variable;
+			m_Variable_data.push_back(temp_variable);
+			Str_program_point temp_program;
+			m_Program_data.push_back(temp_program);
+		}
+}
 //INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
@@ -105,6 +249,10 @@ void CDialogCM5_BacNet::Fresh()
 	if(!has_run_once)
 	{
 		has_run_once =true;
+		bac_program_pool_size = 26624;
+		bac_program_size = 0;
+		bac_free_memory = 26624;
+		hwait_thread = NULL;
 		close_com();
 	//	int test111=test_function_return_value();
 		Device_Set_Object_Instance_Number(4194300);
@@ -508,11 +656,14 @@ static void LocalIAmHandler(
     return;
 }
 
+
+
 LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 {
 	((CStatic *)GetDlgItem(IDC_STATIC_CM_DEVICE_ID))->SetWindowTextW(temp_device_id);
 	((CStatic *)GetDlgItem(IDC_STATIC_CM5_MAC))->SetWindowTextW(temp_mac);
 	((CStatic *)GetDlgItem(IDC_STATIC_CM5_VENDOR_ID))->SetWindowTextW(temp_vendor_id);
+	
 	return 0;
 }
 
@@ -615,13 +766,15 @@ static void Init_Service_Handlers(
 //}
 
 
-void CDialogCM5_BacNet::OnBnClickedButtonCm5Advance()
+void CDialogCM5_BacNet::OnBnClickedButtonCm5Input()
 {
 	// TODO: Add your control notification handler code here
 	//g_invoke_id = GetPrivateData();
 	//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
-	CBacnetInput DLG;
-	DLG.DoModal();
+	Show_Wait_Dialog_And_SendMessage(BAC_READ_INPUT_LIST);
+	//bac_read_which_list = BAC_READ_INPUT_LIST;
+	//CBacnetInput DLG;
+	//DLG.DoModal();
 }
 
 
@@ -640,22 +793,153 @@ void CDialogCM5_BacNet::OnBnClickedButtonCm5Advance()
 void CDialogCM5_BacNet::OnBnClickedButtonCm5Programing()
 {
 	// TODO: Add your control notification handler code here
-	CBacnetProgram DLG;
-	DLG.DoModal();
+	Show_Wait_Dialog_And_SendMessage(BAC_READ_PROGRAM_LIST);
+	//CBacnetProgram DLG;
+	//DLG.DoModal();
 }
 
 
 void CDialogCM5_BacNet::OnBnClickedButtonCm5Output()
 {
 	// TODO: Add your control notification handler code here
-	CBacnetOutput DLG;
-	DLG.DoModal();
+	Show_Wait_Dialog_And_SendMessage(BAC_READ_OUTPUT_LIST);
+
+	//CBacnetOutput DLG;
+	//DLG.DoModal();
 }
 
 
 void CDialogCM5_BacNet::OnBnClickedButtonCm5Variable()
 {
 	// TODO: Add your control notification handler code here
-	CBacnetVariable dlg;
-	dlg.DoModal();
+	Show_Wait_Dialog_And_SendMessage(BAC_READ_VARIABLE_LIST);
+	//CBacnetVariable dlg;
+	//dlg.DoModal();
+}
+
+
+void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
+{
+	bac_read_which_list = read_list_type;
+	if(WaitDlg==NULL)
+	{
+		WaitDlg = new BacnetWait;
+		WaitDlg->Create(IDD_DIALOG_BACNET_WAIT,this);
+		WaitDlg->ShowWindow(SW_SHOW);
+
+		RECT RECT_SET1;
+		GetWindowRect(&RECT_SET1);
+		//	GetClientRect(&RECT_SET1);
+		WaitDlg->MoveWindow(RECT_SET1.left+100,RECT_SET1.bottom-200,RECT_SET1.left+270/*RECT_SET1.right/2+20*/,100);
+	}
+
+	//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);
+	if(hwait_thread==NULL)
+	{
+		hwait_thread =CreateThread(NULL,NULL,Send_read_Command_Thread,this,NULL, NULL);
+		((CButton *)GetDlgItem(IDC_BUTTON_BAC_READ_TOTAL))->EnableWindow(FALSE);
+	}
+}
+
+//First,Get all information we needed.
+void CDialogCM5_BacNet::OnBnClickedButtonBacReadTotal()
+{
+	//bac_read_which_list = BAC_READ_ALL_LIST;
+
+	Show_Wait_Dialog_And_SendMessage(BAC_READ_ALL_LIST);
+	
+}
+
+static int resend_count=0;
+DWORD WINAPI  CDialogCM5_BacNet::Send_read_Command_Thread(LPVOID lpVoid)
+{
+	CDialogCM5_BacNet *pParent = (CDialogCM5_BacNet *)lpVoid;
+	
+	
+
+	for (int i=0;i<BAC_READ_INPUT_GROUP_NUMBER;i++)
+	{
+		if((bac_read_which_list == BAC_READ_INPUT_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST))
+			Bacnet_Refresh_Info.Input_result[i] = BAC_RESULTS_UNKONW;
+		if((bac_read_which_list == BAC_READ_OUTPUT_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST))
+			Bacnet_Refresh_Info.Output_result[i] = BAC_RESULTS_UNKONW;
+		if((bac_read_which_list == BAC_READ_PROGRAM_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST))
+			Bacnet_Refresh_Info.Program_result[i] = BAC_RESULTS_UNKONW;
+		if((bac_read_which_list == BAC_READ_VARIABLE_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST))
+			Bacnet_Refresh_Info.Variable_result[i] = BAC_RESULTS_UNKONW;
+	}
+	// TODO: Add your control notification handler code here
+
+	for (int i=0;i<BAC_READ_INPUT_GROUP_NUMBER;i++)
+	{
+		if((bac_read_which_list == BAC_READ_INPUT_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST))
+		{
+			resend_count = 0;
+			do 
+			{
+				resend_count ++;
+				if(resend_count>10)
+					goto myend;
+				g_invoke_id = GetPrivateData(1234,READINPUT_T3000,(BAC_READ_INPUT_GROUP_NUMBER+1)*i,4+(BAC_READ_INPUT_GROUP_NUMBER + 1)*i,sizeof(Str_in_point));
+				Sleep(500);
+			} while (g_invoke_id<0);
+
+			Bacnet_Refresh_Info.Input_InvokeID[i] = g_invoke_id;
+			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);	
+		}
+		if((bac_read_which_list == BAC_READ_OUTPUT_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST))
+		{
+			resend_count = 0;
+			do 
+			{
+				resend_count ++;
+				if(resend_count>10)
+					goto myend;
+				g_invoke_id = GetPrivateData(1234,READOUTPUT_T3000,(BAC_READ_INPUT_GROUP_NUMBER+1)*i,4+(BAC_READ_INPUT_GROUP_NUMBER + 1)*i,sizeof(Str_out_point));
+				Sleep(500);
+			} while (g_invoke_id<0);
+			Bacnet_Refresh_Info.Output_InvokeID[i] = g_invoke_id;
+			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
+		}
+		if((bac_read_which_list == BAC_READ_VARIABLE_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST))
+		{
+			resend_count = 0;
+			do 
+			{
+				resend_count ++;
+				if(resend_count>10)
+					goto myend;
+				g_invoke_id = GetPrivateData(1234,READVARIABLE_T3000,(BAC_READ_INPUT_GROUP_NUMBER+1)*i,4+(BAC_READ_INPUT_GROUP_NUMBER + 1)*i,sizeof(Str_variable_point));
+				Sleep(500);
+			} while (g_invoke_id<0);
+
+			Bacnet_Refresh_Info.Variable_InvokeID[i] = g_invoke_id;
+			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
+		}
+		if((bac_read_which_list == BAC_READ_PROGRAM_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST))
+		{
+			resend_count = 0;
+			do 
+			{
+				resend_count ++;
+				if(resend_count>10)
+					goto myend;
+				g_invoke_id = GetPrivateData(1234,READPROGRAM_T3000,(BAC_READ_INPUT_GROUP_NUMBER+1)*i,4+(BAC_READ_INPUT_GROUP_NUMBER + 1)*i,sizeof(Str_program_point));
+				Sleep(500);
+			} while (g_invoke_id<0);
+
+			Bacnet_Refresh_Info.Program_InvokeID[i] = g_invoke_id;
+			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
+		}
+	}
+
+	
+
+		hwait_thread = NULL;
+	return 0;
+		//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);
+myend:	hwait_thread = NULL;
+		((CButton *)(pParent->GetDlgItem(IDC_BUTTON_BAC_READ_TOTAL)))->EnableWindow(TRUE);
+		::PostMessage(BacNet_hwd,WM_DELETE_WAIT_DLG,0,0);
+	return 0;
 }
