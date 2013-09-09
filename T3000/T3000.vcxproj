@@ -318,6 +318,7 @@
     <ClInclude Include="CM5\ud_str.h" />
     <ClInclude Include="CM5\user_data.h" />
     <ClInclude Include="CO2_View.h" />
+    <ClInclude Include="CustomSTable.h" />
     <ClInclude Include="DialogCM5_BacNet.h" />
     <ClInclude Include="DisplayConfig.h" />
     <ClInclude Include="gloab_define.h" />
