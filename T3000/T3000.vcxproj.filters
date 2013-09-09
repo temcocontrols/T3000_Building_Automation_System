@@ -387,6 +387,9 @@
     <ClCompile Include="CustomSTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TrafficWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -947,6 +950,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CustomSTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrafficWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -39,26 +39,27 @@ extern short int *grid4Data;
 extern short int *grid5Data;
 
 extern int dataFlowStarted[5];
-
 extern int putDataInGrid[5];
-
 extern char putDataNow[5];
-
 extern unsigned int commCount[5];
-
 extern int tapDataMode;
-
 extern int MbPollOpen;
-
 extern unsigned int mbpollTotalCount[5];
 extern unsigned int mbpollErrCount[5];
-
 //extern CString* regNames[5];
 extern CString regNames;
-
 extern int connectionSuccessful;
-
 extern int executeOnce[5];
+extern int trafficSlotNo;
+extern bool boolTrafficWindowOpen;
+extern char sendData[1024];
+extern char recvData[1024];
+extern int sendDataLen;
+extern int recvDataLen;
+extern int insertDataString;
+extern unsigned int trafficStringIndex;
+extern int autoScroll;
+extern unsigned int packetCount;
 
 extern void LoadReadOneData(int val, unsigned char device_var,unsigned short address);
 extern void LoadWriteOneData(int val, unsigned char device_var,unsigned short address);

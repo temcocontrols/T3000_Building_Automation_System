@@ -6340,6 +6340,7 @@ LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
 {
 	//mbPollDlgOpen = FALSE;
     mbPoll = NULL; 
+	delete mbPoll;
 	mbPollDlgOpen = FALSE;
     return 0;
 }
