@@ -225,7 +225,7 @@ void CNetworkControllView::Fresh()
 
 	
 	m_nListenPort=multi_register_value[120];
-	//InitGrid();
+	InitGrid();
 
 	UpdateData(false);
 }
