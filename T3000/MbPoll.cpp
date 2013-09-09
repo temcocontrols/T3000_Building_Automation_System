@@ -7,8 +7,9 @@
 #include "afxdialogex.h"
 #include "MbpExterns.h"
 #include "globle_function.h"
+#include "TrafficWindow.h"
 
-
+TrafficWindow *trafficWindow = NULL;
 // CMbPoll dialog
 
 IMPLEMENT_DYNAMIC(CMbPoll, CDialog)
@@ -66,6 +67,11 @@ void CMbPoll::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_RUNNING4, staticRunning4);
 	DDX_Control(pDX, IDC_STATIC_RUNNING5, staticRunning5);
 	DDX_Control(pDX, IDC_STATIC_CONFIG6, staticConnectionStatus);
+	DDX_Control(pDX, IDC_BUTTON_TRAFFIC1, btnShowTraffic1);
+	DDX_Control(pDX, IDC_BUTTON_TRAFFIC2, btnShowTraffic2);
+	DDX_Control(pDX, IDC_BUTTON_TRAFFIC3, btnShowTraffic3);
+	DDX_Control(pDX, IDC_BUTTON_TRAFFIC4, btnShowTraffic4);
+	DDX_Control(pDX, IDC_BUTTON_TRAFFIC5, btnShowTraffic5);
 }
 
 void CMbPoll::startStopBtnState()
@@ -78,7 +84,7 @@ void CMbPoll::startStopBtnState()
 	else
 	{
 		(dataFlowStarted[0] == 1) ? (btnStartStop1.SetWindowText(L"Stop")) : (btnStartStop1.SetWindowText(L"Start"));
-		(dataFlowStarted[0] == 1) ? (staticRunning1.SetWindowText(L"√")) : (staticRunning1.SetWindowText(L"X"));	
+		(dataFlowStarted[0] == 1) ? (staticRunning1.SetWindowText(L"`")) : (staticRunning1.SetWindowText(L"X"));	
 	}
 
 	if (pollSingleFunction[1] == 1)
@@ -230,6 +236,12 @@ BEGIN_MESSAGE_MAP(CMbPoll, CDialog)
 	ON_BN_CLICKED(IDC_CHECK_TAP_DATA, &CMbPoll::OnClickedCheckTapData)
 	ON_COMMAND(ID_FILE_SAVE32884, &CMbPoll::OnFileSave)
 	ON_COMMAND(ID_FILE_OPEN, &CMbPoll::OnFileOpen)
+	ON_BN_CLICKED(IDC_BUTTON_TRAFFIC1, &CMbPoll::OnClickedButtonTraffic1)
+	ON_BN_CLICKED(IDC_BUTTON_TRAFFIC2, &CMbPoll::OnClickedButtonTraffic2)
+	ON_BN_CLICKED(IDC_BUTTON_TRAFFIC3, &CMbPoll::OnClickedButtonTraffic3)
+	ON_BN_CLICKED(IDC_BUTTON_TRAFFIC4, &CMbPoll::OnClickedButtonTraffic4)
+	ON_BN_CLICKED(IDC_BUTTON_TRAFFIC5, &CMbPoll::OnClickedButtonTraffic5)
+	ON_MESSAGE(WM_TRAFFIC_CLOSED, &CMbPoll::OnTrafficClosed)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CMbPoll, CDialog)
@@ -338,6 +350,7 @@ void CMbPoll::OnBnClickedClose()
 	KillTimer(2);
 	KillTimer(3);
 	
+	saveRegNames();
 	CDialog::OnCancel();
 	OnMbPollDestroyWindow();	
 }
@@ -505,24 +518,45 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 			count++;
 			if (dataFlowStarted[0] == 1)
 			{
-				if ((count % (pollScanRate[0]/500)) == 0)	{callMbFunc(0);a++;}
+				if ((count % (pollScanRate[0]/500)) == 0)	
+				{
+					callMbFunc(0);
+					a++;
+				}
 			}
 			if (dataFlowStarted[1] == 1)
 			{
-				if ((count % (pollScanRate[1]/500)) == 0)	{callMbFunc(1);b++;}
+				if ((count % (pollScanRate[1]/500)) == 0)	
+				{
+					callMbFunc(1);
+					b++;
+				}
 			}
 			if (dataFlowStarted[2] == 1)
 			{
-				if ((count % (pollScanRate[2]/500)) == 0)	{callMbFunc(2);c++;}
+				if ((count % (pollScanRate[2]/500)) == 0)	
+				{
+					callMbFunc(2);
+					c++;
+				}
 			}
 			if (dataFlowStarted[3] == 1)
 			{
-				if ((count % (pollScanRate[3]/500)) == 0)	{callMbFunc(3);d++;}
+				if ((count % (pollScanRate[3]/500)) == 0)	
+				{
+					callMbFunc(3);
+					d++;
+				}
 			}
 			if (dataFlowStarted[4] == 1)
 			{
-				if ((count % (pollScanRate[4]/500)) == 0)	{callMbFunc(4);e++;}
+				if ((count % (pollScanRate[4]/500)) == 0)	
+				{
+					callMbFunc(4);
+					e++;
+				}
 			}
+
 			if (executeOnce[0] == 1)
 			{
 				callMbFunc(0);
@@ -587,7 +621,7 @@ void CMbPoll::callMbFunc(int slotNo)
 				unsigned short tempVar[1000] = {0};
 				unsigned short *tempPtr = tempVar;
 				read_multi_t(pollSlaveId[slotNo], tempPtr, pollAddress[slotNo], pollQuantity[slotNo], slotNo);
-			}
+			}	
 		}
 		if (pollFunction[slotNo] == 3){}		// 04 Read Input Registers (3x)
 		if (pollFunction[slotNo] == 4){}		// 05 Write Single Coil
@@ -1272,6 +1306,17 @@ void CMbPoll::OnClickedButtonStartStop5()
 void CMbPoll::OnClickedButtonStartStop(CMsflexgrid &grid, int gridNum, CButton &btn)
 {
 	// TODO: Add your control notification handler code here
+	if (connectionSuccessful != 1) 
+	{
+		MessageBox(L"Please establish Modbus connection first.", L"NO CONNECTION");
+		return;
+	}
+	if (pollConfigured[gridNum] != 1) 
+	{
+		MessageBox(L"Please do config first.", L"NOT CONFIGURED");
+		return;
+	}
+
 	if (pollSingleFunction[gridNum] == 0)
 	{
 		if (dataFlowStarted[gridNum] == 0)
@@ -1469,15 +1514,6 @@ void CMbPoll::OnNcDestroy()
 void CMbPoll::PostNcDestroy() 
 {	
     CDialog::PostNcDestroy();
-
-	/*if (GetParent() == NULL)
-	{
-		MessageBox(L"GetParent returns NULL");
-	}
-	else
-	{
-		MessageBox(L"GetParent ok");
-	}*/
 	mParent->PostMessage(WM_MBPOLL_CLOSED,0,0);
 	delete this;
 }
@@ -1576,7 +1612,7 @@ void CMbPoll::OnFileSave()
 {
 	// TODO: Add your command handler code here
 	CFile f;
-	CString strFilter = _T("Text file (*.txt)|*.txt|All files (*.*)|*.*||");
+	CString strFilter = _T("Text file (*.txt)|*.txt|Rich Text file (*.rtf)|*.rtf|All files (*.*)|*.*||");
 	CString temp;
 	int qtyToShow[5];
 	CMsflexgrid* grid;
@@ -1587,9 +1623,10 @@ void CMbPoll::OnFileSave()
 	if (dlg.DoModal() == IDOK)
 	{
 		CString strConfigFilePathName = dlg.GetPathName();
+		//MessageBox(strConfigFilePathName);
 		CString strConfigFileName = dlg.GetFileName();
-
-		f.Open(strConfigFileName, CFile::modeCreate | CFile::modeWrite);
+		//MessageBox(strConfigFileName);
+		BOOL a = f.Open(strConfigFileName, CFile::modeCreate | CFile::modeWrite);
 
 		//CString str1;
 		//str1 = L"Text1;Text2;Text3;";
@@ -1644,7 +1681,7 @@ void CMbPoll::OnFileOpen()
 
 	int qtyToShow[5];
 	CMsflexgrid* grid;
-	CString strFilter = _T("Text file (*.txt)|*.txt|All files (*.*)|*.*||");
+	CString strFilter = _T("Text file (*.txt)|*.txt|Rich Text file (*.rtf)|*.rtf|All files (*.*)|*.*||");
 	CFile f;
 	CString temp;
 
@@ -1702,4 +1739,78 @@ void CMbPoll::OnFileOpen()
 	}
 }
 
+void CMbPoll::OnClickedButtonTraffic1()
+{
+	// TODO: Add your control notification handler code here
+	showTrafficWindow(0);
+}
+
+void CMbPoll::OnClickedButtonTraffic2()
+{
+	// TODO: Add your control notification handler code here
+	showTrafficWindow(1);
+}
+
+void CMbPoll::OnClickedButtonTraffic3()
+{
+	// TODO: Add your control notification handler code here
+	showTrafficWindow(2);
+}
+
+void CMbPoll::OnClickedButtonTraffic4()
+{
+	// TODO: Add your control notification handler code here
+	showTrafficWindow(3);
+}
+
+void CMbPoll::OnClickedButtonTraffic5()
+{
+	// TODO: Add your control notification handler code here
+	showTrafficWindow(4);
+}
+
+void CMbPoll::showTrafficWindow(int slotNo)
+{
+	if (connectionSuccessful != 1) 
+	{
+		MessageBox(L"Please establish Modbus connection first.", L"NO CONNECTION");
+		return;
+	}
+	if (pollConfigured[slotNo] != 1) 
+	{
+		MessageBox(L"Please do config first.", L"NOT CONFIGURED");
+		return;
+	}
+
+	if (boolTrafficWindowOpen == FALSE)
+	{
+		if (trafficWindow != NULL) 
+		{
+			trafficWindow = NULL;
+		}
+		boolTrafficWindowOpen = TRUE;
+		trafficStringIndex = 0;
+		packetCount = 0;
+		trafficSlotNo = slotNo;
+		trafficWindow = new TrafficWindow;
+		trafficWindow->Create(IDD_TRAFFIC_WINDOW,this);
+		trafficWindow->ShowWindow(SW_SHOW);
+	}
+	else
+	{
+		boolTrafficWindowOpen = TRUE;
+		trafficStringIndex = 0;
+		packetCount = 0;
+		trafficSlotNo = slotNo;
+		trafficWindow->ShowWindow(SW_SHOW);
+	}
+}
+
+afx_msg LRESULT CMbPoll::OnTrafficClosed(WPARAM wParam, LPARAM lParam)
+{
+    trafficWindow = NULL; 
+	delete trafficWindow;
+	boolTrafficWindowOpen = FALSE;
+    return 0;
+}
 

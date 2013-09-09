@@ -44,7 +44,11 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type);
 OUTPUT int Write_One2(TS_UC device_var,TS_US address,TS_US value, bool bComm_Type);
 //OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length);
 OUTPUT int read_multi2(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length, bool bComm_Type);
-OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length,TS_US *put_senddate_into_here,TS_US *put_revdata_into_here);
+
+OUTPUT int Read_One_log(TS_UC device_var,TS_US address,char *put_senddate_into_here,char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,char *put_senddate_into_here,char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length,char *put_senddate_into_here,char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length,char *put_senddate_into_here,char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 
 CStdioFile*					m_pFile;
 CString						m_strFileINI;

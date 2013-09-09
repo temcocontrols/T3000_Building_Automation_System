@@ -22,7 +22,16 @@ int Read_One_t(unsigned char device_var,unsigned short address, int slot)
 
 	if (executeMBFunc == 1)
 	{
-		retVal = Read_One(device_var, address);
+		if ((trafficSlotNo == slot) && (trafficSlotNo != -1))
+		{
+			retVal = Read_One_log(device_var, address, &sendData[0], &recvData[0], &sendDataLen, &recvDataLen);
+			insertDataString = 1;
+		}
+		else
+		{
+			retVal = Read_One(device_var, address);
+		}
+
 		LoadReadOneData(retVal, device_var, address);
 		mbpollTotalCount[slot]++;
 		if (retVal < 0)
@@ -55,7 +64,16 @@ int Write_One_t(unsigned char device_var, unsigned short address, unsigned short
 	if (executeMBFunc == 1)
 	{
 		//LoadWriteOneData(val, device_var, address);
-		retVal = Write_One(device_var, address, val);
+		if ((trafficSlotNo == slot) && (trafficSlotNo != -1))
+		{
+			retVal = Write_One_log(device_var, address, val, &sendData[0], &recvData[0], &sendDataLen, &recvDataLen);
+			insertDataString = 1;
+		}
+		else
+		{
+			retVal = Write_One(device_var, address, val);
+		}
+
 		mbpollTotalCount[slot]++;
 		if (retVal < 0)
 		{
@@ -86,7 +104,16 @@ int read_multi_t(unsigned char device_var,unsigned short *put_data_into_here,uns
 
 	if (executeMBFunc == 1)
 	{
-		retVal =  read_multi(device_var, put_data_into_here, start_address, length);
+		if ((trafficSlotNo == slot) && (trafficSlotNo != -1))
+		{
+			retVal =  read_multi_log(device_var, put_data_into_here, start_address, length, &sendData[0], &recvData[0], &sendDataLen, &recvDataLen);
+			insertDataString = 1;
+		}
+		else
+		{
+			retVal =  read_multi(device_var, put_data_into_here, start_address, length);
+		}
+
 		if (!(retVal < 0))
 		{
 			LoadReadMultiData(device_var, put_data_into_here, start_address, length);
@@ -122,7 +149,16 @@ int write_multi_t(unsigned char device_var,unsigned char *to_write,unsigned shor
 	if (executeMBFunc == 1)
 	{
 		//LoadWriteMultiData(device_var, to_write, start_address, length);
-		retVal = write_multi(device_var, to_write, start_address, length);
+		if ((trafficSlotNo == slot) && (trafficSlotNo != -1))
+		{
+			retVal = write_multi_log(device_var, to_write, start_address, length, &sendData[0], &recvData[0], &sendDataLen, &recvDataLen);
+			insertDataString = 1;
+		}
+		else
+		{
+			retVal = write_multi(device_var, to_write, start_address, length);
+		}
+
 		mbpollTotalCount[slot]++;
 		if (retVal < 0)
 		{
