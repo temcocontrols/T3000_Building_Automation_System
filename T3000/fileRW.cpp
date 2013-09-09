@@ -3300,7 +3300,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 					}
 				}
 			}
-		}
+}
 			if(p_log_file!=NULL)
 				p_log_file->WriteString(_T("\r\n"));	
 			int value_setting[7]={0};

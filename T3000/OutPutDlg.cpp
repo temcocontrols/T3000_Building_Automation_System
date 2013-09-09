@@ -519,7 +519,13 @@ void COutPutDlg::FreshGrids()
 		FreshGrid_PID1tstat6();
 		FreshGrid_PID2tstat6();
 		//FreshGrid_PID1tstat6();
-	}else
+	}
+	else if (product_register_value[7]==PM_TSTAT5E)
+	{
+		FreshGrid_PID1tstat6();
+		FreshGrid_PID2tstat6();
+	}
+	else
 	{
 		FreshGrid_PID1();
 		FreshGrid_PID2();
@@ -2107,7 +2113,7 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.SetFocus(); //获取焦点
 		}
 	//	else if((lRow<4)||(lRow==4 && !m_bOut4PWM)||(lRow==5 && !m_bOut5PWM))
-			else if((lRow<4) ||(lRow==4 && !m_bOut4PWM)||(lRow==5 && !m_bOut5PWM))//20121008
+		else if((lRow<4) ||(lRow==4 && !m_bOut4PWM)||(lRow==5 && !m_bOut5PWM))//20121008
 		{		
 		 //Row 1-3
 			m_ItemValueCombx.ResetContent();
@@ -2277,37 +2283,70 @@ void COutPutDlg::ClickMsflexgrid1()
 		
 		 
 	}
-
+	//后来修改了，不在限制在四和第五行了。现在都支持PWM模式了
 	if(lCol>5)
 	{   
-		if(lRow==4 && (m_bOut4PWM/*||m_bFloat*/))
+	    if (product_register_value[MODBUS_MODE_OUTPUT1+lRow-1]!=0)
+	    {
+				m_ItemValueCombx.ResetContent();
+				m_ItemValueCombx.AddString(_T("Close"));
+				m_ItemValueCombx.AddString(_T("Open"));
+				m_ItemValueCombx.AddString(_T("0-100"));
+				m_ItemValueCombx.AddString(_T("50-100"));
+				m_ItemValueCombx.AddString(_T("0-50"));
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.BringWindowToTop();
+				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
+				m_ItemValueCombx.SetFocus(); //获取焦点
+	    }
+		else
 		{
 			m_ItemValueCombx.ResetContent();
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Off"));
+			m_ItemValueCombx.AddString(_T("On"));
+	/*		m_ItemValueCombx.AddString(_T("Close"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
-			m_ItemValueCombx.AddString(_T("0-50"));
+			m_ItemValueCombx.AddString(_T("0-50"));*/
 			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
 			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 			m_ItemValueCombx.BringWindowToTop();
 			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
 			m_ItemValueCombx.SetFocus(); //获取焦点
 		}
-		if(lRow==5 && (m_bOut5PWM/*||m_bFloat*/))
-		{
-			m_ItemValueCombx.ResetContent();
-			m_ItemValueCombx.AddString(_T("Close"));
-			m_ItemValueCombx.AddString(_T("Open"));
-			m_ItemValueCombx.AddString(_T("0-100"));
-			m_ItemValueCombx.AddString(_T("50-100"));
-			m_ItemValueCombx.AddString(_T("0-50"));
-			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-			m_ItemValueCombx.BringWindowToTop();
-			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-			m_ItemValueCombx.SetFocus(); //获取焦点
-		}
+	    
+		//if(lRow==4 && (m_bOut4PWM/*||m_bFloat*/))
+		//{
+		//	m_ItemValueCombx.ResetContent();
+		//	m_ItemValueCombx.AddString(_T("Close"));
+		//	m_ItemValueCombx.AddString(_T("Open"));
+		//	m_ItemValueCombx.AddString(_T("0-100"));
+		//	m_ItemValueCombx.AddString(_T("50-100"));
+		//	m_ItemValueCombx.AddString(_T("0-50"));
+		//	m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+		//	m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+		//	m_ItemValueCombx.BringWindowToTop();
+		//	m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
+		//	m_ItemValueCombx.SetFocus(); //获取焦点
+		//}
+		//if(lRow==5 && (m_bOut5PWM/*||m_bFloat*/))
+		//{
+		//	m_ItemValueCombx.ResetContent();
+		//	m_ItemValueCombx.AddString(_T("Close"));
+		//	m_ItemValueCombx.AddString(_T("Open"));
+		//	m_ItemValueCombx.AddString(_T("0-100"));
+		//	m_ItemValueCombx.AddString(_T("50-100"));
+		//	m_ItemValueCombx.AddString(_T("0-50"));
+		//	m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+		//	m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+		//	m_ItemValueCombx.BringWindowToTop();
+		//	m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
+		//	m_ItemValueCombx.SetFocus(); //获取焦点
+		//}
+
+
 
 	}
 
@@ -2752,127 +2791,7 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 		if(col==4)
 		{//pid
 			CString str2;
-			if (m_nmoduleType==1)
-			{
-
-				// 			    	247	274	1	Low byte	W/R	Output 1 PID Interlock                    0 = PID1, can assign each output to either PID1 or 2, the max or the min of the two PIDS
-				// 					248	275	1	Low byte	W/R	Output 2 PID Interlock                    1 = PID2
-				// 					249	276	1	Low byte	W/R	Output 3 PID Interlock                    2 = Maximum of PID1 and PID2
-				// 					250	277	1	Low byte	W/R	Output 4 PID Interlock                    3 = Minimum of PID1 and PID2
-				// 					251	278	1	Low byte	W/R	Output 5 PID Interlock
-				// 					252	279	1	Low byte	W/R	Output 6 PID Interlock
-				// 					253	280	1	Low byte	W/R	Output 7 PID Interlock
-				if (row<4)
-				{
-					if(bflexgrid1_or_2==false)
-						str2=m_FlexGrid1.get_TextMatrix(row,col);
-					else
-						str2=m_FlexGrid2.get_TextMatrix(row,col);
-					if(str2.CompareNoCase(_T("PID1"))==0)
-					{
-						if(write_one(g_tstat_id,274+row-1,0)<0)
-						{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-						product_register_value[274+row-1] =0;
-					}
-
-					else if(str2.CompareNoCase(_T("PID2"))==0)
-					{
-						if(write_one(g_tstat_id,274+row-1,1)<0)
-						{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-						product_register_value[274+row-1] =1;
-
-					}
-					else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
-					{
-						if(write_one(g_tstat_id,274+row-1,2)<0)
-						{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-						product_register_value[274+row-1] =2;
-					}
-					else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
-					{
-						if(write_one(g_tstat_id,274+row-1,3)<0)
-						{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-						product_register_value[274+row-1] =3;
-					}
-				}
-				else
-				{
-
-					if(bflexgrid1_or_2==false)
-						str2=m_FlexGrid1.get_TextMatrix(row,col);
-					else
-						str2=m_FlexGrid2.get_TextMatrix(row,col);
-					if(str2.CompareNoCase(_T("PID1"))==0)
-					{
-						if (row==4) 
-						{
-							if(write_one(g_tstat_id,279,0)<0)
-							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							product_register_value[279] = 0;
-						}
-						if (row==5)
-						{
-							if(write_one(g_tstat_id,280,0)<0)
-							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							product_register_value[280] = 0;
-						}
-
-					}
-					// 					252	279	1	Low byte	W/R	Output 6 PID Interlock
-					// 					253	280	1	Low byte	W/R	Output 7 PID Interlock
-					if(str2.CompareNoCase(_T("PID2"))==0)
-						//write_one(tstat_id,247+row-1,1);
-					{
-						if (row==4) 
-						{
-							if(write_one(g_tstat_id,279,1)<0)
-							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							product_register_value[279] = 1;
-						}
-						if (row==5)
-						{
-							if(write_one(g_tstat_id,280,1)<0)
-							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							product_register_value[280] =1;
-						}
-
-					}
-					if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
-						//write_one(tstat_id,247+row-1,2);
-					{
-						if (row==4) 
-						{
-							if(write_one(g_tstat_id,279,2)<0)
-							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							product_register_value[279] = 2;
-						}
-						if (row==5)
-						{
-							if(write_one(g_tstat_id,280,2)<0)
-							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							product_register_value[280] = 2;
-						}
-
-					}
-					if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
-					{
-						if (row==4) 
-						{
-							if(write_one(g_tstat_id,279,3)<0)
-							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							product_register_value[279] = 3;
-						}
-						if (row==5)
-						{
-							if(write_one(g_tstat_id,280,3)<0)
-							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							product_register_value[280] = 3;
-						}
-					}
-					//write_one(tstat_id,247+row-1,3);
-				}
-			}
-			else
+		
 			{
 
 				if(bflexgrid1_or_2==false)
@@ -2881,45 +2800,38 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 					str2=m_FlexGrid2.get_TextMatrix(row,col);
 				if(str2.CompareNoCase(_T("PID1"))==0)
 				{
-					if(write_one(g_tstat_id,274+row-1,0)<0)
+					if(write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,0)<0)
 					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-					product_register_value[274+row-1] = 0;
+					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 0;
 					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 0;
 
 				}
 				else if(str2.CompareNoCase(_T("PID2"))==0)
 				{
-					if(write_one(g_tstat_id,274+row-1,1)<0)
+					if(write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,1)<0)
 					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-					product_register_value[274+row-1] = 1;
+					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 1;
 					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 1;
 
 				}
 				else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
 				{
-					if(write_one(g_tstat_id,274+row-1,2)<0)
+					if(write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,2)<0)
 					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
 
-					int aaa=read_one(g_tstat_id,274+row-1,3);
-					product_register_value[274+row-1] = 2;
+					int aaa=read_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,3);
+					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 2;
 					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 2;
 				}
 				else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
 				{
-					if(write_one(g_tstat_id,274+row-1,3)<0)
+					if(write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,3)<0)
 					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-					product_register_value[274+row-1] = 3;
+					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 3;
 					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 3;
 				}
 			}
-			// 			    	247	274	1	Low byte	W/R	Output 1 PID Interlock                    0 = PID1, can assign each output to either PID1 or 2, the max or the min of the two PIDS
-			// 				286	245	1	Low byte	W/R	Interlock for  output1
-			// 				287	246	1	Low byte	W/R	Interlock for  output2
-			// 				288	247	1	Low byte	W/R	Interlock for  output3
-			// 				289	248	1	Low byte	W/R	Interlock for  output4
-			// 				290	249	1	Low byte	W/R	Interlock for  output5
-			// 				291	250	1	Low byte	W/R	Interlock for  output6
-			// 				292	251	1	Low byte	W/R	Interlock for  output7
+		 
 
 
 			FreshGrids(); //lsc add
@@ -2933,51 +2845,51 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				str2=m_FlexGrid2.get_TextMatrix(row,col);
 			if((str2.CompareNoCase(_T("On"))==0)||str2==_T("      -"))
 			{
-				if(write_one(g_tstat_id,245+row-1,0)<0)
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,0)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				product_register_value[245+row-1] = 0;
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 0;
 			}
 			else if(str2.CompareNoCase(_T("DI1"))==0)
 			{
-				if(write_one(g_tstat_id,245+row-1,1)<0)
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,1)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				product_register_value[245+row-1] = 1;
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 1;
 			}
 			else if((str2.CompareNoCase(_T("AI1"))==0)||str2.CompareNoCase(_T("//AI1"))==0)
 			{
-				if(write_one(g_tstat_id,245+row-1,2)<0)
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,2)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				product_register_value[245+row-1] = 2;
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 2;
 			}
 			else if((str2.CompareNoCase(_T("AI2"))==0)||str2.CompareNoCase(_T("//AI2"))==0)
 			{
-				if(write_one(g_tstat_id,245+row-1,3)<0)
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,3)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				product_register_value[245+row-1] = 3;
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 3;
 			}
 			else if(str2.CompareNoCase(_T("Timer OR"))==0)
 			{
-				if(write_one(g_tstat_id,245+row-1,4)<0)
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,4)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				product_register_value[245+row-1] = 4;
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 4;
 			}
 			else if(str2.CompareNoCase(_T("Timer And"))==0)
 			{
-				if(write_one(g_tstat_id,245+row-1,5)<0)
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,5)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				product_register_value[245+row-1] = 5;
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 5;
 			}
 			else if(str2.CompareNoCase(_T("InterLock Timer"))==0)
 			{
-				if(write_one(g_tstat_id,245+row-1,6)<0)
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,6)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				product_register_value[245+row-1] = 6;
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 6;
 			}
 			else if(str2.CompareNoCase(_T("FreeCool"))==0)
 			{
-				if(write_one(g_tstat_id,245+row-1,7)<0)
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,7)<0)
 				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-				product_register_value[245+row-1] = 7;
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 7;
 			}
 
 		}
@@ -3110,32 +3022,19 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 
 						{
 							//if (newtstat6[7] == 6)
-							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-							{
-								if(write_one(g_tstat_id,334+pos,tstatval)<0)
+							 
+								if(write_one(g_tstat_id,MODBUS_VALVE_OFF_TABLE_COAST+pos,tstatval)<0)
 								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-								product_register_value[334+pos] = tstatval;
-							}
-							else
-							{
-								if(write_one(g_tstat_id,351+pos,tstatval)<0)
-								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							}
+								product_register_value[MODBUS_VALVE_OFF_TABLE_COAST+pos] = tstatval;
+						 
 						}
 						else
 						{
-							//if (newtstat6[7] == 6)
-							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-							{
-								if(write_one(g_tstat_id,323+pos,tstatval)<0)
+							 
+								if(write_one(g_tstat_id,MODBUS_VALVE_OPERATION_TABLE_BEGIN+pos,tstatval)<0)
 								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
 								product_register_value[323+pos]= tstatval;
-							}
-							else
-							{
-								if(write_one(g_tstat_id,173+pos,tstatval)<0)
-								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							}
+							 
 						}
 					}
 				}
@@ -3388,113 +3287,67 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 		//	FreshGrids();
 
 	}
-	else
+	else if (product_register_value[7]==16)
 	{
-		if(g_OutPutLevel==1)
+			if(g_OutPutLevel==1)
 			return;
 		unsigned char tstatval=0,pos,cellval=0;
 		int row_temp,totalrows;
 		bool ty;
-		if(m_nmoduleType == 1)//5a
-			totalrows = 3;
-		else
-			totalrows = 5 ;
+		totalrows=5;
 		if(col==4)
 		{//pid
 			CString str2;
-			if (m_nmoduleType==1)
 			{
-				if (row<4)
-				{
-					if(bflexgrid1_or_2==false)
-						str2=m_FlexGrid1.get_TextMatrix(row,col);
-					else
-						str2=m_FlexGrid2.get_TextMatrix(row,col);
-					if(str2.CompareNoCase(_T("PID1"))==0)
-						write_one(g_tstat_id,247+row-1,0);
-					else if(str2.CompareNoCase(_T("PID2"))==0)
-						write_one(g_tstat_id,247+row-1,1);
-					else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
-						write_one(g_tstat_id,247+row-1,2);
-					else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
-						write_one(g_tstat_id,247+row-1,3);
-				}
-				else
-				{
-					if(bflexgrid1_or_2==false)
-						str2=m_FlexGrid1.get_TextMatrix(row,col);
-					else
-						str2=m_FlexGrid2.get_TextMatrix(row,col);
-					if(str2.CompareNoCase(_T("PID1"))==0)
-					{
-						if (row==4) 
-						{
-							write_one(g_tstat_id,252,0);
-						}
-						if (row==5)
-						{
-							write_one(g_tstat_id,253,0);
-						}
 
-					}
-
-					if(str2.CompareNoCase(_T("PID2"))==0)
-						//write_one(tstat_id,247+row-1,1);
-					{
-						if (row==4) 
-						{
-							write_one(g_tstat_id,252,1);
-						}
-						if (row==5)
-						{
-							write_one(g_tstat_id,253,1);
-						}
-
-					}
-					if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
-						//write_one(tstat_id,247+row-1,2);
-					{
-						if (row==4) 
-						{
-							write_one(g_tstat_id,252,2);
-						}
-						if (row==5)
-						{
-							write_one(g_tstat_id,253,2);
-						}
-
-					}
-					if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
-					{
-						if (row==4) 
-						{
-							write_one(g_tstat_id,252,3);
-						}
-						if (row==5)
-						{
-							write_one(g_tstat_id,253,3);
-						}
-					}
-					//write_one(tstat_id,247+row-1,3);
-				}
-			}
-			else
-			{
 				if(bflexgrid1_or_2==false)
 					str2=m_FlexGrid1.get_TextMatrix(row,col);
 				else
 					str2=m_FlexGrid2.get_TextMatrix(row,col);
 				if(str2.CompareNoCase(_T("PID1"))==0)
-					write_one(g_tstat_id,247+row-1,0);
-				else if(str2.CompareNoCase(_T("PID2"))==0)
-					write_one(g_tstat_id,247+row-1,1);
-				else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
-					write_one(g_tstat_id,247+row-1,2);
-				else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
-					write_one(g_tstat_id,247+row-1,3);
-			}
-			FreshGrids();//lsc add
+				{
+					if(write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,0)<0)
+					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+					 
+					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 0;
 
+				}
+				else if(str2.CompareNoCase(_T("PID2"))==0)
+				{
+					if(write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,1)<0)
+					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+					 
+					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 1;
+
+				}
+				else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
+				{
+					if(write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,2)<0)
+					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+
+					/*int aaa=read_one(g_tstat_id,274+row-1,3);
+					product_register_value[274+row-1] = 2;*/
+					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 2;
+				}
+				else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
+				{
+					if(write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,3)<0)
+					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+					 
+					product_register_value[MODBUS_PID_OUTPUT1+row-1] = 3;
+				}
+			}
+			// 			    	247	274	1	Low byte	W/R	Output 1 PID Interlock                    0 = PID1, can assign each output to either PID1 or 2, the max or the min of the two PIDS
+			// 				286	245	1	Low byte	W/R	Interlock for  output1
+			// 				287	246	1	Low byte	W/R	Interlock for  output2
+			// 				288	247	1	Low byte	W/R	Interlock for  output3
+			// 				289	248	1	Low byte	W/R	Interlock for  output4
+			// 				290	249	1	Low byte	W/R	Interlock for  output5
+			// 				291	250	1	Low byte	W/R	Interlock for  output6
+			// 				292	251	1	Low byte	W/R	Interlock for  output7
+
+
+			FreshGrids(); //lsc add
 		}
 		else if(col==5)
 		{
@@ -3504,21 +3357,53 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 			else
 				str2=m_FlexGrid2.get_TextMatrix(row,col);
 			if((str2.CompareNoCase(_T("On"))==0)||str2==_T("      -"))
-				write_one(g_tstat_id,286+row-1,0);
+			{
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,0)<0)
+				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 0;
+			}
 			else if(str2.CompareNoCase(_T("DI1"))==0)
-				write_one(g_tstat_id,286+row-1,1);
+			{
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,1)<0)
+				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 1;
+			}
 			else if((str2.CompareNoCase(_T("AI1"))==0)||str2.CompareNoCase(_T("//AI1"))==0)
-				write_one(g_tstat_id,286+row-1,2);
+			{
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,2)<0)
+				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 2;
+			}
 			else if((str2.CompareNoCase(_T("AI2"))==0)||str2.CompareNoCase(_T("//AI2"))==0)
-				write_one(g_tstat_id,286+row-1,3);
+			{
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,3)<0)
+				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 3;
+			}
 			else if(str2.CompareNoCase(_T("Timer OR"))==0)
-				write_one(g_tstat_id,286+row-1,4);
+			{
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,4)<0)
+				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 4;
+			}
 			else if(str2.CompareNoCase(_T("Timer And"))==0)
-				write_one(g_tstat_id,286+row-1,5);
+			{
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,5)<0)
+				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 5;
+			}
 			else if(str2.CompareNoCase(_T("InterLock Timer"))==0)
-				write_one(g_tstat_id,286+row-1,6);
+			{
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,6)<0)
+				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 6;
+			}
 			else if(str2.CompareNoCase(_T("FreeCool"))==0)
-				write_one(g_tstat_id,286+row-1,7);
+			{
+				if(write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,7)<0)
+				{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1] = 7;
+			}
 
 		}
 		CString strItem;
@@ -3538,15 +3423,22 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 			int output3_value;//=multi_register_value[283];//2 rows plug in one row//out 4
 			int output4_value;//=multi_register_value[284];//out 5;
 
-			if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-			{
-				output3_value=product_register_value[205];//2 rows plug in one row//out 4
-				output4_value=product_register_value[206];//out 5;
-			}else
-			{
-				output3_value=multi_register_value[283];//2 rows plug in one row//out 4
-				output4_value=multi_register_value[284];//out 5;
-			}
+
+			//这里可能是变量定义的问题，让人难以理解 为什么 会错位;Fance
+			output3_value = product_register_value[MODBUS_MODE_OUTPUT4]; // 283  205
+			output4_value = product_register_value[MODBUS_MODE_OUTPUT5]; //284 206
+			//------------------------------------------------------------------------
+			//Annul by Fance 2013 04 10		//??有问题  205 对应的是output4 为什么要叫 output3_value
+			//if ((newtstat6[7] == 6)||(newtstat6[7] == 7))
+			//{
+			//	output3_value=newtstat6[205];//2 rows plug in one row//out 4
+			//	output4_value=newtstat6[206];//out 5;
+			//}else
+			//{
+			//	output3_value=multi_register_value[283];//2 rows plug in one row//out 4
+			//	output4_value=multi_register_value[284];//out 5;
+			//}
+			//------------------------------------------------------------------------
 			BOOL bFloat=FALSE;
 			BOOL bONOFF=TRUE;
 
@@ -3589,15 +3481,12 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 				}
 				int n=get_real_fan_select() ;
 				//138	288	1	Low byte	W/R	FAN0_OPERATION_TABLE_COAST
-				if ((product_register_value[7] ==7)||(product_register_value[7] ==6))
-				{
-					write_one(g_tstat_id,288+get_real_fan_select() * 7 + pos,tstatval);		
-					product_register_value[288+get_real_fan_select() * 7] = tstatval;
-				}
-				else
-				{
-					write_one(g_tstat_id,138+get_real_fan_select() * 7 + pos,tstatval);
-				}
+				//if (newtstat6[7] ==6)
+				 
+					if(write_one(g_tstat_id,MODBUS_FAN0_OPER_TABLE_COAST+get_real_fan_select() * 7 + pos,tstatval)<0)
+					{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+					product_register_value[MODBUS_FAN0_OPER_TABLE_COAST+get_real_fan_select() * 7+pos] = tstatval;
+			 
 
 				if(m_bFloat)
 				{
@@ -3616,27 +3505,21 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 
 						if(m_fan.GetCurSel()==0)
 						{
+							//if (newtstat6[7] == 6)
 							 
-							if (m_pids == 1)
-							{
-								write_one(g_tstat_id,385+pos,tstatval);//lsc add ,目前只有当第一个选择为PID2，下面的才写到这个寄存器中
-							}else
-							{
-								write_one(g_tstat_id,351+pos,tstatval);
-							}
+								if(write_one(g_tstat_id,MODBUS_VALVE_OFF_TABLE_COAST+pos,tstatval)<0)
+								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+								product_register_value[MODBUS_VALVE_OFF_TABLE_COAST+pos] = tstatval;
+						 
 						}
 						else
 						{
-							//if (newtstat6[7] == 6)
-							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-							{
-								write_one(g_tstat_id,323+pos,tstatval);
-								product_register_value[323+pos] = tstatval;
-							}
-							else
-							{
-								write_one(g_tstat_id,173+pos,tstatval);
-							}
+							 
+						 
+								if(write_one(g_tstat_id,MODBUS_VALVE_OPERATION_TABLE_BEGIN+pos,tstatval)<0)
+								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+								product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+pos] = tstatval;
+					 
 						}
 					}
 					if(row==5&&output4_value==1)
@@ -3649,37 +3532,487 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 							tstatval|=nValue;
 						}
 						if(m_fan.GetCurSel()==0)
-							// 						write_one(g_tstat_id,351+pos,tstatval);
-							// 					else
-							// 						write_one(g_tstat_id,173+pos,tstatval);
 
 						{
 							//if (newtstat6[7] == 6)
-							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-							{
-								write_one(g_tstat_id,334+pos,tstatval);
-								product_register_value[334+pos] = tstatval;
-							}
-							else
-							{
-								write_one(g_tstat_id,351+pos,tstatval);
-							}
+							 
+								if(write_one(g_tstat_id,MODBUS_VALVE_OFF_TABLE_COAST+pos,tstatval)<0)
+								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+								product_register_value[MODBUS_VALVE_OFF_TABLE_COAST+pos] = tstatval;
+							 
 						}
 						else
 						{
-							//if (newtstat6[7] == 6)
-							if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-							{
-								write_one(g_tstat_id,323+pos,tstatval);
-								product_register_value[323+pos]= tstatval;
-							}
-							else
-							{
-								write_one(g_tstat_id,173+pos,tstatval);
-							}
+							 
+								if(write_one(g_tstat_id,MODBUS_VALVE_OPERATION_TABLE_BEGIN+pos,tstatval)<0)
+								{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+								product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+pos]= tstatval;
+							 
 						}
 					}
 				}
+
+		
+			 
+
+				
+					
+						totalrows = 6 ;////////////////
+					if((col-5) < (m_PID1_heat_stages+1))
+						pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - (col-5) ;
+					else
+						pos = (col-5) - (m_PID1_heat_stages+1);
+					m_FlexGrid1.put_Col(col);
+					tstatval &= 0x3F ;//clear 7 bit and 8 bit  for 0-50
+
+					for( row_temp=totalrows;row_temp<=totalrows+1;row_temp++)
+					{
+						CString strItemText=m_FlexGrid1.get_TextMatrix(row_temp,col);
+						//	m_FlexGrid1.put_Row(row_temp);
+						string2digital(strItemText,cellval,ty);	
+						/*if()
+						{*/						
+						if(cellval==4)
+						{//for 0-50
+							if(row_temp==totalrows)
+								tstatval |=64;//第6位
+							else if(row_temp==(totalrows+1))//0-50
+								tstatval |=128;//第7位
+						}
+						else
+						{
+							if(row_temp == totalrows)
+							{
+								tstatval &= 0xFC ;//1111 1100
+							}
+							if(row_temp == totalrows+1)
+							{
+								tstatval &= 0xF3 ;//1111 0011
+								cellval <<= 2 ; 
+							}
+							tstatval |= cellval  ;
+						}						
+						/*}*/
+					}
+					if(m_fan.GetCurSel()==0)
+					{
+						//if (newtstat6[7] == 6)
+						 
+							if(write_one(g_tstat_id,MODBUS_VALVE_OFF_TABLE_COAST+pos,tstatval)<0)
+							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+							product_register_value[MODBUS_VALVE_OFF_TABLE_COAST+pos] = tstatval;
+						 
+					}
+					else
+					{
+						//if (newtstat6[7] == 6)
+						 
+							if(write_one(g_tstat_id,MODBUS_VALVE_OPERATION_TABLE_BEGIN+pos,tstatval)<0)
+							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+							product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+pos] = tstatval;
+						 
+					}
+
+				
+			}
+			else//grid 2:
+			{
+
+					if(product_register_value[MODBUS_FAN_SPEED]==4)//Auto 
+					{
+						if((col-5) < (m_PID2_heat_stages+1))
+						pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+					else
+						pos = (col-5) - (m_PID2_heat_stages+1);
+					m_FlexGrid2.put_Col(col);////////////////////////////////////////////////////////
+					 if (m_nCurRow<=5)
+					 {
+					 for( row_temp = 1;row_temp<=totalrows;row_temp++)//***********************row_temp==totalrows+1
+					{
+						m_FlexGrid2.put_Row(row_temp);////////////////////////////////////////////////////
+						if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+						{
+							if(row_temp == 1)
+								tstatval &= 0xFE;
+							if(row_temp == 2)
+								tstatval &= 0xFD;
+							if(row_temp == 3)
+								tstatval &= 0xFB ;
+							if(row_temp == 4)
+								tstatval &= 0xF7;
+							if(row_temp == 5)
+								tstatval &= 0xEF;
+							tstatval |= cellval << (row_temp -1) ;
+						}
+
+					}
+					if(write_one(g_tstat_id,MODBUS_UNIVERSAL_OUTPUT_BEGIN + pos,tstatval)<0)
+						{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+						product_register_value[MODBUS_UNIVERSAL_OUTPUT_BEGIN + pos] = tstatval;
+					 }
+					 else
+					 {
+						 totalrows = 6 ;////////////////
+						 if((col-5) < (m_PID2_heat_stages+1))
+							 pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+						 else
+							 pos = (col-5) - (m_PID2_heat_stages+1);
+						 m_FlexGrid2.put_Col(col);
+						 //tstatval &= 0x3F ;//clear 7 bit and 8 bit  for 0-50
+						 tstatval=0;
+						 for( row_temp=totalrows;row_temp<=totalrows+1;row_temp++)
+						 {
+							 m_FlexGrid2.put_Row(row_temp);	
+							 if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+							 {
+								 if(cellval==4 )
+								 {//for 0-50
+									 if(row_temp==totalrows)
+										 tstatval |=64;
+									 else if(row_temp==(totalrows+1))
+										 tstatval |=128;
+								 }
+								 else
+								 {
+									 if(row_temp == totalrows)
+									 {
+										 tstatval &= 0xFC ;
+									 }
+									 if(row_temp == totalrows+1)
+									 {
+										 tstatval &= 0xF3 ;
+										 cellval <<= 2 ; 
+									 }
+									 tstatval |= cellval  ;
+								 }
+							 }
+
+						 }
+						 //
+
+						 if(write_one(g_tstat_id,MODBUS_UNIVERSAL_VALVE_BEGIN+pos,tstatval)<0)//没找到对应的值。
+						 {MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+						 product_register_value[MODBUS_UNIVERSAL_VALVE_BEGIN+pos]=tstatval;
+					 
+					 }
+			
+
+					 
+						 
+							
+					 
+						}
+					else
+						{
+
+							if((col-5) < (m_PID2_heat_stages+1))
+							pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+						else
+							pos = (col-5) - (m_PID2_heat_stages+1);
+						m_FlexGrid2.put_Col(col);////////////////////////////////////////////////////////
+
+
+						if (m_nCurRow<=5)
+						{
+						for( row_temp = 1;row_temp<=totalrows;row_temp++)//***********************row_temp==totalrows+1
+						{
+							m_FlexGrid2.put_Row(row_temp);////////////////////////////////////////////////////
+							if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+							{
+								if(row_temp == 1)
+									tstatval &= 0xFE;
+								if(row_temp == 2)
+									tstatval &= 0xFD;
+								if(row_temp == 3)
+									tstatval &= 0xFB ;
+								if(row_temp == 4)
+									tstatval &= 0xF7;
+								if(row_temp == 5)
+									tstatval &= 0xEF;
+								tstatval |= cellval << (row_temp -1) ;
+							}
+
+						}
+						if(write_one(g_tstat_id,MODBUS_UNIVERSAL_OUTPUT_BEGIN + pos,tstatval)<0)
+							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+							product_register_value[MODBUS_UNIVERSAL_OUTPUT_BEGIN + pos] = tstatval;
+						}
+						else
+						{
+						  if (product_register_value[MODBUS_FAN_SPEED]==0)
+						  {totalrows = 6 ;////////////////
+							if((col-5) < (m_PID2_heat_stages+1))
+								pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+							else
+								pos = (col-5) - (m_PID2_heat_stages+1);
+							m_FlexGrid2.put_Col(col);
+							//tstatval &= 0x3F ;//clear 7 bit and 8 bit  for 0-50
+							tstatval=0;
+							for( row_temp=totalrows;row_temp<=totalrows+1;row_temp++)
+							{
+								m_FlexGrid2.put_Row(row_temp);	
+								if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+								{
+									if(cellval==4 )
+									{//for 0-50
+										if(row_temp==totalrows)
+											tstatval |=64;
+										else if(row_temp==(totalrows+1))
+											tstatval |=128;
+									}
+									else
+									{
+										if(row_temp == totalrows)
+										{
+											tstatval &= 0xFC ;
+										}
+										if(row_temp == totalrows+1)
+										{
+											tstatval &= 0xF3 ;
+											cellval <<= 2 ; 
+										}
+										tstatval |= cellval  ;
+									}
+								}
+
+							}
+							//
+
+							if(write_one(g_tstat_id,MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+pos,tstatval)<0)//没找到对应的值。
+							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+							product_register_value[MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+pos]=tstatval;
+						  }
+							
+						}
+
+			
+
+						 
+							 
+
+						 
+						}
+			   
+
+				
+			}
+		}
+	}
+	else
+	{
+		if(g_OutPutLevel==1)
+			return;
+		unsigned char tstatval=0,pos,cellval=0;
+		int row_temp,totalrows;
+		bool ty;
+		if(m_nmoduleType == 1)//5a
+			totalrows = 3;
+		else
+			totalrows = 5 ;
+		if(col==4)
+		{//pid
+			CString str2;
+			 
+			{
+				if(bflexgrid1_or_2==false)
+					str2=m_FlexGrid1.get_TextMatrix(row,col);
+				else
+					str2=m_FlexGrid2.get_TextMatrix(row,col);
+				if(str2.CompareNoCase(_T("PID1"))==0)
+					write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,0);
+				else if(str2.CompareNoCase(_T("PID2"))==0)
+					write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,1);
+				else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
+					write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,2);
+				else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
+					write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,3);
+			}
+			FreshGrids();//lsc add
+
+		}
+		else if(col==5)
+		{
+			CString str2;
+			if(bflexgrid1_or_2==false)
+				str2=m_FlexGrid1.get_TextMatrix(row,col);
+			else
+				str2=m_FlexGrid2.get_TextMatrix(row,col);
+			if((str2.CompareNoCase(_T("On"))==0)||str2==_T("      -"))
+				{write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,0);
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1]=0;}
+			else if(str2.CompareNoCase(_T("DI1"))==0)
+				{write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,1);
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1]=1;}
+			else if((str2.CompareNoCase(_T("AI1"))==0)||str2.CompareNoCase(_T("//AI1"))==0)
+
+				{write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,2);
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1]=2;}
+			else if((str2.CompareNoCase(_T("AI2"))==0)||str2.CompareNoCase(_T("//AI2"))==0)
+				{write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,3);
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1]=3;}
+			else if(str2.CompareNoCase(_T("Timer OR"))==0)
+				{write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,4);
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1]=4;}
+			else if(str2.CompareNoCase(_T("Timer And"))==0)
+				{write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,5);
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1]=5;}
+			else if(str2.CompareNoCase(_T("InterLock Timer"))==0)
+				{write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,6);
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1]=6;}
+			else if(str2.CompareNoCase(_T("FreeCool"))==0)
+				{write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,7);
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1]=7;}
+
+		}
+		CString strItem;
+
+		if(col>5)
+		{
+
+			//	283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
+			//	284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
+
+
+
+			// 		int output3_value=multi_register_value[283];//2 rows plug in one row//out 4
+			// 		int output4_value=multi_register_value[284];//out 5;
+
+
+			int output3_value;//=multi_register_value[283];//2 rows plug in one row//out 4
+			int output4_value;//=multi_register_value[284];//out 5;
+
+			 
+				output3_value=product_register_value[MODBUS_MODE_OUTPUT4];//2 rows plug in one row//out 4
+				output4_value=product_register_value[MODBUS_MODE_OUTPUT4];//out 5;
+			 
+			BOOL bFloat=FALSE;
+			BOOL bONOFF=TRUE;
+
+			if(bflexgrid1_or_2==false)
+			{//grid one 1
+
+				if((col-5) < (m_PID1_heat_stages+1))
+					pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - (col-5) ;
+				else
+					pos = (col-5) - (m_PID1_heat_stages+1);
+				m_FlexGrid1.put_Col(col);
+
+				for( row_temp = 1;row_temp<=totalrows;row_temp++)//***********************row_temp==totalrows+1
+				{
+					m_FlexGrid1.put_Row(row_temp);	
+					strItem=m_FlexGrid1.get_TextMatrix(row_temp,col);
+					if(string2digital(strItem,cellval,ty))
+					{
+						if(row_temp == 1)
+							tstatval &= 0xFE;
+						if(row_temp == 2)
+							tstatval &= 0xFD;
+						if(row_temp == 3)
+							tstatval &= 0xFB ;
+						if(!m_bFloat)//not floater out 4 and out5
+						{
+							if(row_temp == 4&&!m_bOut4PWM)
+								tstatval &= 0xF7;
+							if(row_temp == 5&&!m_bOut5PWM)
+								tstatval &= 0xEF;
+						}
+						else
+						{
+							if(row_temp==4)
+								break;
+						}
+
+						tstatval |= cellval << (row_temp -1) ;
+					}
+				}
+				int n=get_real_fan_select() ;
+				//138	288	1	Low byte	W/R	FAN0_OPERATION_TABLE_COAST
+				 
+					write_one(g_tstat_id,MODBUS_FAN0_OPER_TABLE_COAST+get_real_fan_select() * 7 + pos,tstatval);		
+					product_register_value[MODBUS_FAN0_OPER_TABLE_COAST+get_real_fan_select() * 7] = tstatval;
+				 
+
+				//if(m_bFloat)
+				//{
+				//	int nValue=0;
+				//	if(row==4&&output3_value==1)
+				//	{
+				//		strItem=m_FlexGrid1.get_TextMatrix(row,col);
+				//		if(string2digital(strItem,cellval,ty) )
+				//		{
+				//			tstatval=tstatval&0xCF;
+				//			nValue= cellval << 4 ;
+				//			tstatval|=nValue;
+				//		}
+				//		//351	334	1	Low byte	W/R	analog output in OFF table, coating mode,bit1 means AO1 : 1 = on, 0 = off    bit3 means AO2 : 1 = on, 0 = off
+				//		//173	323	1	Low byte	W/R	VALVE_OPER_TABLE_COAST, Analog output state for each of the 7 modes of operation
+
+				//		if(m_fan.GetCurSel()==0)
+				//		{
+				//			 
+				//			if (m_pids == 1)
+				//			{
+				//				write_one(g_tstat_id,385+pos,tstatval);//lsc add ,目前只有当第一个选择为PID2，下面的才写到这个寄存器中
+				//			}else
+				//			{
+				//				write_one(g_tstat_id,351+pos,tstatval);
+				//			}
+				//		}
+				//		else
+				//		{
+				//			//if (newtstat6[7] == 6)
+				//			if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+				//			{
+				//				write_one(g_tstat_id,323+pos,tstatval);
+				//				product_register_value[323+pos] = tstatval;
+				//			}
+				//			else
+				//			{
+				//				write_one(g_tstat_id,173+pos,tstatval);
+				//			}
+				//		}
+				//	}
+				//	if(row==5&&output4_value==1)
+				//	{
+				//		strItem=m_FlexGrid1.get_TextMatrix(row,col);
+				//		if(string2digital(strItem,cellval,ty) )
+				//		{
+				//			tstatval=tstatval&0xCF;
+				//			nValue= cellval << 4 ;
+				//			tstatval|=nValue;
+				//		}
+				//		if(m_fan.GetCurSel()==0)
+				//			// 						write_one(g_tstat_id,351+pos,tstatval);
+				//			// 					else
+				//			// 						write_one(g_tstat_id,173+pos,tstatval);
+
+				//		{
+				//			//if (newtstat6[7] == 6)
+				//			if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+				//			{
+				//				write_one(g_tstat_id,334+pos,tstatval);
+				//				product_register_value[334+pos] = tstatval;
+				//			}
+				//			else
+				//			{
+				//				write_one(g_tstat_id,351+pos,tstatval);
+				//			}
+				//		}
+				//		else
+				//		{
+				//			//if (newtstat6[7] == 6)
+				//			if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+				//			{
+				//				write_one(g_tstat_id,323+pos,tstatval);
+				//				product_register_value[323+pos]= tstatval;
+				//			}
+				//			else
+				//			{
+				//				write_one(g_tstat_id,173+pos,tstatval);
+				//			}
+				//		}
+				//	}
+				//}
 
 				if(m_fan.GetCurSel()==0)
 				{
@@ -4874,21 +5207,29 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 	//int output4_PWMvalue=multi_register_value[MODBUS_OUTPUT4_FUNCTION];//269 //2 rows plug in one row
 	//int output5_PWMvalue=multi_register_value[MODBUS_OUTPUT5_FUNCTION];//270
 
-	int output4_PWMvalue=product_register_value[MODBUS_OUTPUT4_FUNCTION];//269 //2 rows plug in one row
-	int output5_PWMvalue=product_register_value[MODBUS_OUTPUT5_FUNCTION];//270
+	//int output4_PWMvalue=product_register_value[MODBUS_OUTPUT4_FUNCTION];//269 //2 rows plug in one row
+	//int output5_PWMvalue=product_register_value[MODBUS_OUTPUT5_FUNCTION];//270
 
-	if (output4_PWMvalue==3)
-	{
-		m_bOut4PWM=TRUE;
-	}
-	if(output5_PWMvalue==3)
-	{
-		m_bOut5PWM=TRUE;
-	}
+	//if (output4_PWMvalue==3)
+	//{
+	//	m_bOut4PWM=TRUE;
+	//}
+	//if(output5_PWMvalue==3)
+	//{
+	//	m_bOut5PWM=TRUE;
+	//}
 
 	//276	332	1	Low byte	W/R	Number of Heating Stages in Original Table - (Maximum # of total heating and cooling states is 6)
 	//277	333	1	Low byte	W/R	Number of Cooling Stages in Original Table - (Maximum # of total heating and cooling states is 6)
 
+	if(product_register_value[MODBUS_MODE_OUTPUT4]==3)
+	{
+		m_bOut4PWM=TRUE;
+	}
+	if(product_register_value[MODBUS_MODE_OUTPUT5]==3)
+	{
+		m_bOut5PWM=TRUE;
+	}
 
 #if 1
 	CString strTemp;//332 333 这两个寄存器 决定 有几个 阶段。;comments by Fance
@@ -4920,6 +5261,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 
 	m_FlexGrid1.put_TextMatrix(0,1,_T("Description"));
 	m_FlexGrid1.put_TextMatrix(0,2,_T("Function"));
+	m_FlexGrid1.put_ColWidth(2,0);
 	m_FlexGrid1.put_TextMatrix(0,3,_T("Rotation"));
 	m_FlexGrid1.put_ColWidth(3,0);
 	m_FlexGrid1.put_TextMatrix(0,4,_T("Control"));
@@ -4979,7 +5321,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 			pos = col - (m_PID1_heat_stages+1);
 		for( row = 1;row<=totalrows-2;row++)//****************************
 		{
-			if (row==4&&m_bOut4PWM)
+		/*	if (row==4&&m_bOut4PWM)
 			{
 				continue;
 			}
@@ -4990,7 +5332,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 			if(m_bFloat&&row==4)
 				continue;
 			if(m_bFloat&&row==5)
-				continue;
+				continue;*/
 			int nOutReg;
 
 			//Modify  by  Fance  ,this  must be 245= MODBUS_INTERLOCK_OUTPUT1  286 is tstat5 value
@@ -5022,9 +5364,8 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 		}
 	}
  
-		 
-			totalrows = 7 ;		
-		for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
+	totalrows = 7 ;		
+	for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
 		{
 			if(col < (m_PID1_heat_stages+1))
 				pos = (m_PID1_heat_stages+m_PID1_cool_stages+1) - col ;
@@ -5047,7 +5388,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 				tstatval = product_register_value[MODBUS_VALVE_OPERATION_TABLE_BEGIN+ pos];	
 			///////////////////////////////////////////
 
-
+			//最后两行
 			for(row=totalrows-1;row<=totalrows;row++)//row value
 			{
 				if (row==4&&m_bOut4PWM)
@@ -5125,7 +5466,15 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 				}
 			}
 		}
-
+    
+    if (product_register_value[MODBUS_MODE_OUTPUT4]==3)
+    {
+	m_bOut4PWM=TRUE;
+    }
+	if (product_register_value[MODBUS_MODE_OUTPUT5]==3)
+	{
+	m_bOut5PWM=TRUE;
+	}
 	if(m_bOut4PWM)
 	{
 
@@ -5209,7 +5558,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 			}
 
 			if(pid_select2[4]==1)
-				FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp)//col +1
+			FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp)//col +1
 			else
 			FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
 				//totalrows
@@ -5263,7 +5612,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 				default:
 					strTemp=_T("0%");
 				}
-				//	FLEX_GRID1_PUT_STR(row,col,strTemp)//col +1
+				//FLEX_GRID1_PUT_STR(row,col,strTemp)//col +1
 				//FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
 				FLEX_GRID1_PUT_STR(row,col,strTemp);//col +1
 			}
@@ -5341,6 +5690,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 	//*****************************************
 	m_FlexGrid2.put_TextMatrix(0,1,_T("Description"));
 	m_FlexGrid2.put_TextMatrix(0,2,_T("Function"));
+	m_FlexGrid2.put_ColWidth(2,0);
 	m_FlexGrid2.put_TextMatrix(0,3,_T("Rotation"));
 	m_FlexGrid2.put_ColWidth(3,0);
 	m_FlexGrid2.put_TextMatrix(0,4,_T("Control"));
@@ -5759,7 +6109,14 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 	#endif
 
 
-
+	if(product_register_value[MODBUS_MODE_OUTPUT4]==3)
+	{
+		m_bOut4PWM=TRUE;
+	}
+	if(product_register_value[MODBUS_MODE_OUTPUT5]==3)
+	{
+		m_bOut5PWM=TRUE;
+	}
 
 	if(m_bOut4PWM)
 	{
@@ -5799,7 +6156,14 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 			default:
 				strTemp=_T("");
 			}
+
+			if(pid_select2[3]==0)
+				FLEX_GRID2_PUT_COLOR_STR(4,col,strTemp)//col +1
+			else
 			FLEX_GRID2_PUT_STR(4,col,strTemp)//col +1
+
+
+			//FLEX_GRID2_PUT_STR(4,col,strTemp)//col +1
 		}
 	}	
 	if(m_bOut5PWM)
@@ -5838,7 +6202,9 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 			default:
 				strTemp=_T("");
 			}
-
+			if(pid_select2[4]==0)
+				FLEX_GRID2_PUT_COLOR_STR(5,col,strTemp)//col +1
+			else
 			FLEX_GRID2_PUT_STR(5,col,strTemp)//col +1
 				//totalrows
 		}

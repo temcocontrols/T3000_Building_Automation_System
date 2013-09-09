@@ -1962,9 +1962,8 @@ IDR_MENU_PROGRAM_EDIT MENU
 BEGIN
     MENUITEM "Send (F2)",                   ID_SEND
     MENUITEM "Clear (F3)",                  ID_CLEAR
-    MENUITEM "Load File (F7)",              ID_LOADFILE
+    MENUITEM "Load File (F5)",              ID_LOADFILE
     MENUITEM "Save File (F6)",              ID_SAVEFILE
-    MENUITEM "Refresh (F8)",                ID_REFRESH
 END
 
 
@@ -2228,7 +2227,7 @@ CAPTION "About T3000"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,18,20,20,20
-    LTEXT           "T3000 Version 2013.17",IDC_STATIC,54,27,107,8,SS_NOPREFIX
+    LTEXT           "T3000 Version 2013.18",IDC_STATIC,54,27,107,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2005-2013 Temcocontrols.Ltd.",IDC_STATIC,36,43,149,8,NOT WS_VISIBLE
     PUSHBUTTON      "http://www.temcocontrols.com",IDC_BUTTON1,35,53,147,14,NOT WS_VISIBLE
     DEFPUSHBUTTON   "OK",IDOK,148,11,48,14,WS_GROUP
