@@ -39,27 +39,28 @@ short int *grid4Data = NULL;
 short int *grid5Data = NULL;
 
 int dataFlowStarted[5] = {0};
-
 int putDataInGrid[5] = {0};
-
 char putDataNow[5] = {0};
-
 unsigned int commCount[5] = {0};
-
 //int tapDataMode = 1;		// no tapping required
 int tapDataMode = 0;
-
 int MbPollOpen = 0;
-
 unsigned int mbpollTotalCount[5] = {0};
 unsigned int mbpollErrCount[5] = {0};
-
 //CString* regNames[5] = {0};
 CString regNames;
-
 int connectionSuccessful = 0;
-
 int executeOnce[5] = {0};
+int trafficSlotNo = -1;
+bool boolTrafficWindowOpen = FALSE;
+char sendData[1024] = {0};
+char recvData[1024] = {0};
+int sendDataLen = 0;
+int recvDataLen = 0;
+int insertDataString = 0;
+unsigned int trafficStringIndex = 0;
+int autoScroll = 0;
+unsigned int packetCount = 0;
 
 #endif
 
