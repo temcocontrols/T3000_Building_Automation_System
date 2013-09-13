@@ -7,18 +7,73 @@
 #include "globle_function.h"
 #include "AfxMessageDialog.h"
 // COutPutDlg dialog
-#define FLEXGRID_CELL_COLOR RGB(128,128,128)
-#define FLEX_GRID1_PUT_COLOR_STR(row,col,str)	{m_FlexGrid1.put_TextMatrix(row,col+5,_T(""));m_FlexGrid1.put_Row(row);m_FlexGrid1.put_Col(col+5);m_FlexGrid1.put_CellBackColor(FLEXGRID_CELL_COLOR);}
-//#define FLEX_GRID1_PUT_COLOR_STR(row,col,str)	{m_FlexGrid1.put_TextMatrix(row,col+5,str);m_FlexGrid1.put_Row(row);m_FlexGrid1.put_Col(col+5);m_FlexGrid1.put_CellBackColor(FLEXGRID_CELL_COLOR);}
-//#define FLEX_GRID2_PUT_COLOR_STR(row,col,str)	{m_FlexGrid2.put_TextMatrix(row,col+5,str);m_FlexGrid2.put_Row(row);m_FlexGrid2.put_Col(col+5);m_FlexGrid2.put_CellBackColor(FLEXGRID_CELL_COLOR);}
-#define FLEX_GRID2_PUT_COLOR_STR(row,col,str)	{m_FlexGrid2.put_TextMatrix(row,col+5,_T(""));m_FlexGrid2.put_Row(row);m_FlexGrid2.put_Col(col+5);m_FlexGrid2.put_CellBackColor(FLEXGRID_CELL_COLOR);}
-#define FLEX_GRID1_PUT_STR(row,col,str)			{m_FlexGrid1.put_TextMatrix(row,col+5,str);m_FlexGrid1.put_Row(row);m_FlexGrid1.put_Col(col+5);m_FlexGrid1.put_CellForeColor(RGB(0,0,0));m_FlexGrid1.put_CellBackColor(RGB(255,255,255));}//str must be declare
-#define FLEX_GRID2_PUT_STR(row,col,str)			{m_FlexGrid2.put_TextMatrix(row,col+5,str);m_FlexGrid2.put_Row(row);m_FlexGrid2.put_Col(col+5);m_FlexGrid2.put_CellForeColor(RGB(0,0,0));m_FlexGrid2.put_CellBackColor(RGB(255,255,255));}//str must be declare
 
 IMPLEMENT_DYNAMIC(COutPutDlg, CDialog)
 CString heat_hand[6]={_T("Heat1"),_T("Heat2"),_T("Heat3"),_T("Heat4"),_T("Heat5"),_T("Heat6")};
 CString cool_hand[6]={_T("Cool1"),_T("Cool2"),_T("Cool3"),_T("Cool4"),_T("Cool5"),_T("Cool6")};
 
+void COutPutDlg::FLEX_GRID1_PUT_COLOR_STR(int row,int col,CString str) 
+{
+m_FlexGrid1.put_TextMatrix(row,col+5,_T(""));
+m_FlexGrid1.put_Row(row);
+m_FlexGrid1.put_Col(col+5);
+m_FlexGrid1.put_CellBackColor(FLEXGRID_CELL_COLOR);
+}
+void COutPutDlg::FLEX_GRID2_PUT_COLOR_STR(int row,int col,CString str){
+m_FlexGrid2.put_TextMatrix(row,col+5,_T(""));
+m_FlexGrid2.put_Row(row);
+m_FlexGrid2.put_Col(col+5);
+m_FlexGrid2.put_CellBackColor(FLEXGRID_CELL_COLOR);
+}
+void COutPutDlg::FLEX_GRID1_PUT_STR(int row,int col,CString str)			
+{
+	m_FlexGrid1.put_TextMatrix(row,col+5,str);
+	m_FlexGrid1.put_Row(row);
+	m_FlexGrid1.put_Col(col+5);
+	m_FlexGrid1.put_CellForeColor(RGB(0,0,0));
+	if((str.CompareNoCase(_T("Off"))==0)||(str.CompareNoCase(_T("Close"))==0))
+	{
+		m_FlexGrid1.put_CellBackColor(GREEN_COLOR);
+	}
+	else if ((str.CompareNoCase(_T("ON"))==0)||(str.CompareNoCase(_T("Open"))==0))
+	{
+		m_FlexGrid1.put_CellBackColor(YELLOW_COLOR);
+	}
+	else if ((str.CompareNoCase(_T("0-50"))==0)||(str.CompareNoCase(_T("50-100"))==0))
+	{
+		m_FlexGrid1.put_CellBackColor(ORANGE_COLOR);
+	}
+	else
+	{
+		m_FlexGrid1.put_CellBackColor(RGB(255,255,255));
+	}
+
+}//str must be declare
+
+
+void COutPutDlg::FLEX_GRID2_PUT_STR(int row,int col,CString str)
+{
+m_FlexGrid2.put_TextMatrix(row,col+5,str);
+m_FlexGrid2.put_Row(row);
+m_FlexGrid2.put_Col(col+5);
+m_FlexGrid2.put_CellForeColor(RGB(0,0,0));
+if((str.CompareNoCase(_T("Off"))==0)||(str.CompareNoCase(_T("Close"))==0))
+{
+	m_FlexGrid2.put_CellBackColor(GREEN_COLOR);
+}
+else if ((str.CompareNoCase(_T("ON"))==0)||(str.CompareNoCase(_T("Open"))==0))
+{
+	m_FlexGrid2.put_CellBackColor(YELLOW_COLOR);
+}
+else if ((str.CompareNoCase(_T("0-50"))==0)||(str.CompareNoCase(_T("50-100"))==0))
+{
+	m_FlexGrid2.put_CellBackColor(ORANGE_COLOR);
+}
+else
+{
+	m_FlexGrid2.put_CellBackColor(RGB(255,255,255));
+}
+}//str must be declare
 
 int write_one_show_message(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 bool last_output_write_register_result=false;
@@ -520,7 +575,7 @@ void COutPutDlg::FreshGrids()
 		FreshGrid_PID2tstat6();
 		//FreshGrid_PID1tstat6();
 	}
-	else if (product_register_value[7]==PM_TSTAT5E)
+	else if (product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_TSTAT5G)
 	{
 		FreshGrid_PID1tstat6();
 		FreshGrid_PID2tstat6();
@@ -753,10 +808,10 @@ if(multi_register_value[129]==1)
 			{    //被选中Pid2，Pid1变灰
 				if(digital2string((tstatval >> (row-1)) & 0x01,str,FAN))
 					if(pid_select2[row-1]==1)
-						FLEX_GRID1_PUT_COLOR_STR(row,col,str)
+						FLEX_GRID1_PUT_COLOR_STR(row,col,str);
 						//col +1//变灰不显示
 					else
-						FLEX_GRID1_PUT_STR(row,col,str)
+						FLEX_GRID1_PUT_STR(row,col,str);
 						//col +1
 			}
 
@@ -860,18 +915,18 @@ if(multi_register_value[129]==1)
 						  {
 						  if(digital2string(4,str,VALVE))//for 7 or 8 bit
 							  if(pid_select2[row-1]==1)
-								  FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+								  FLEX_GRID1_PUT_COLOR_STR(row,col,str);//col +1
 							  else
-							  FLEX_GRID1_PUT_STR(row,col,str)//col +1
+							  FLEX_GRID1_PUT_STR(row,col,str);//col +1
 						  } 
 						  else
 						  {
 						    if(digital2string(tstatval & 0x03,str,VALVE))//*** value
 							{
 								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col, str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col, str);//col +1
 								else
-								FLEX_GRID1_PUT_STR(row,col, str)//col +1
+								FLEX_GRID1_PUT_STR(row,col, str);//col +1
 							}
 						  }
 						}
@@ -884,9 +939,9 @@ if(multi_register_value[129]==1)
 							if(digital2string(1,str,FAN))//*** value
 							{
 								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col, str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col, str);//col +1
 								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_STR(row,col,str);//col +1
 							}
 							} 
 							else
@@ -894,9 +949,9 @@ if(multi_register_value[129]==1)
 							if(digital2string(0,str,FAN))//*** value
 							{
 								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col, str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col, str);//col +1
 								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_STR(row,col,str);//col +1
 							}
 					       }
 				 
@@ -911,9 +966,9 @@ if(multi_register_value[129]==1)
 							if(digital2string(4,str,VALVE))//for 7 or 8 bit
 								{
 								if(pid_select2[row-1]==1)
-									FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+									FLEX_GRID1_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_STR(row,col,str);//col +1
 								}
 
 							}else
@@ -921,9 +976,9 @@ if(multi_register_value[129]==1)
 							if(digital2string((tstatval >> 2) & 0x03,str,VALVE))//*** value
 							{
 								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_STR(row,col,str);//col +1
 							}
 							}
 						}
@@ -936,9 +991,9 @@ if(multi_register_value[129]==1)
 							if(digital2string(1/*(tstatval >> 2) & 0x03*/,str,FAN))//*** value
 							{
 								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_STR(row,col,str);//col +1
 							}
 							} 
 							else
@@ -946,9 +1001,9 @@ if(multi_register_value[129]==1)
 							if(digital2string(0/*(tstatval >> 2) & 0x03*/,str,FAN))//*** value
 							{
 								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_STR(row,col,str);//col +1
 							}
 							}
 						}
@@ -1015,13 +1070,13 @@ if(multi_register_value[129]==1)
 				}
 				if(pid_select2[4-1]==1)
 				{
-					FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp)//col +1
+					FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp);//col +1
 			
 
 				}
 				else
 				{
-					FLEX_GRID1_PUT_STR(4,col,strTemp)//col +1
+					FLEX_GRID1_PUT_STR(4,col,strTemp);//col +1
 	
 				}
 
@@ -1074,12 +1129,12 @@ if(multi_register_value[129]==1)
 					}
 				if(pid_select2[5-1]==1)
 				{
-						FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp)
+						FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp);
 
 				}
 				else
 				{
-						FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
+						FLEX_GRID1_PUT_STR(5,col,strTemp);//col +1
 				}
 
 
@@ -1132,14 +1187,14 @@ if(multi_register_value[129]==1)
 				}
 				if(pid_select2[4-1]==1)
 				{
-					FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp)//col +1
-					FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp)
+					FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp);//col +1
+					FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp);
 
 				}
 				else
 				{
-					FLEX_GRID1_PUT_STR(4,col,strTemp)//col +1
-					FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
+					FLEX_GRID1_PUT_STR(4,col,strTemp);//col +1
+					FLEX_GRID1_PUT_STR(5,col,strTemp);//col +1
 				}
 
 
@@ -1188,9 +1243,9 @@ if(multi_register_value[129]==1)
 					strTemp=_T("");
 				}
 			if(pid_select2[4-1]==1)//2.5.0.98  1表示pid2
-				FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp)
+				FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp);
 				else
-				FLEX_GRID1_PUT_STR(4,col,strTemp)//col +1
+				FLEX_GRID1_PUT_STR(4,col,strTemp);//col +1
 			}
 	}	
 	if(m_bOut5PWM)
@@ -1230,9 +1285,9 @@ if(multi_register_value[129]==1)
 				}
 
 				if(pid_select2[5-1]==1)//2.5.0.98
-				FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp)	
+				FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp);	
 				else
-				FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
+				FLEX_GRID1_PUT_STR(5,col,strTemp);//col +1
 
 				//FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1//2.5.0.98
 					//totalrows
@@ -1320,7 +1375,11 @@ if(multi_register_value[129]==1)
 #endif
 
 }
+void COutPutDlg::Color_Grid1()
+{
 
+
+}
 
 void COutPutDlg::FreshGrid_PID2()
 {
@@ -1428,9 +1487,9 @@ void COutPutDlg::FreshGrid_PID2()
 			{
 				if(digital2string((tstatval >> (row-1)) & 0x01,str,FAN))
 						if(pid_select2[row-1]==0)
-							FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+							FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 						else
-							FLEX_GRID2_PUT_STR(row,col,str)//col +1
+							FLEX_GRID2_PUT_STR(row,col,str);//col +1
 			}
 		}
 	}//end if
@@ -1502,18 +1561,18 @@ if(row==(totalrows-1))
 							{
 								if(digital2string(4,str,VALVE))//for 7 or 8 bit
 								if(pid_select2[row-1]==0)
-									FLEX_GRID2_PUT_COLOR_STR(totalrows-1,col,str)//col +1
+									FLEX_GRID2_PUT_COLOR_STR(totalrows-1,col,str);//col +1
 								else
-									FLEX_GRID2_PUT_STR(totalrows-1,col,str)//col +1
+									FLEX_GRID2_PUT_STR(totalrows-1,col,str);//col +1
 							}
 							else
 							{
 								
 							  if(digital2string(tstatval& 0x03,str,VALVE))//*** value
 								if(pid_select2[row-1]==0)
-									FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+									FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 								else
-									FLEX_GRID2_PUT_STR(row,col,str)//col +1
+									FLEX_GRID2_PUT_STR(row,col,str);//col +1
 							}
 						}
 						if(row==totalrows)
@@ -1522,17 +1581,17 @@ if(row==(totalrows-1))
 							{
 								if(digital2string(4,str,VALVE))//for 7 or 8 bit
 									if(pid_select2[row-1]==0)
-										FLEX_GRID2_PUT_COLOR_STR(totalrows,col,str)//col +1
+										FLEX_GRID2_PUT_COLOR_STR(totalrows,col,str);//col +1
 									else
-										FLEX_GRID2_PUT_STR(totalrows,col,str)//col +1
+										FLEX_GRID2_PUT_STR(totalrows,col,str);//col +1
 							}
 							else
 							{
 								if(digital2string((tstatval >> 2) & 0x03,str,VALVE))//*** value
 									if(pid_select2[row-1]==0)
-										FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+										FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 									else
-										FLEX_GRID2_PUT_STR(row,col,str)//col +1
+										FLEX_GRID2_PUT_STR(row,col,str);//col +1
 							}
 
 						}
@@ -1648,9 +1707,9 @@ if(row==(totalrows-1))
 						BOOL b=digital2string((tstatval >> ((row-totalrows+1)*2)) & 0x03,str,VALVE);
 						if( b)//*** value
 								if(pid_select2[row-1]==0)
-									FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+									FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 								else
-									FLEX_GRID2_PUT_STR(row,col,str)//col +1
+									FLEX_GRID2_PUT_STR(row,col,str);//col +1
 					}
 				}
 			}
@@ -1806,9 +1865,9 @@ if(row==(totalrows-1))
 					strTemp=_T("");
 				}
 				if(pid_select2[4-1]==1)//2.5.0.98  1表示pid2
-				FLEX_GRID2_PUT_STR(4,col,strTemp)//col +1	
+				FLEX_GRID2_PUT_STR(4,col,strTemp);//col +1	
 				else
-				FLEX_GRID2_PUT_COLOR_STR(4,col,strTemp)
+				FLEX_GRID2_PUT_COLOR_STR(4,col,strTemp);
 			}
 		}	
 		if(m_bOut5PWM)
@@ -1848,9 +1907,9 @@ if(row==(totalrows-1))
 				}
 
 				if(pid_select2[5-1]==1)//2.5.0.98
-					FLEX_GRID2_PUT_STR(5,col,strTemp)//col +1		
+					FLEX_GRID2_PUT_STR(5,col,strTemp);//col +1		
 				else
-					FLEX_GRID2_PUT_COLOR_STR(5,col,strTemp)
+					FLEX_GRID2_PUT_COLOR_STR(5,col,strTemp);
 
 				//FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1//2.5.0.98
 				//totalrows
@@ -5356,9 +5415,9 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 			{
 				if(digital2string((tstatval >> (row-1)) & 0x01,str,FAN))
 					if(pid_select2[row-1]==1)
-					FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+					FLEX_GRID1_PUT_COLOR_STR(row,col,str);//col +1
 					else
-					FLEX_GRID1_PUT_STR(row,col,str)//col +1
+					FLEX_GRID1_PUT_STR(row,col,str);//col +1
 			}
 
 		}
@@ -5417,18 +5476,18 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 						{
 							if(digital2string(4,str,VALVE))//for 7 or 8 bit
 								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_STR(row,col,str);//col +1
 						}
 						else
 						{ 
 							if(digital2string(tstatval & 0x03,str,VALVE))//*** value
 							{
 								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_STR(row,col,str);//col +1
 							}
 						}
 					}
@@ -5439,9 +5498,9 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 							if(digital2string(4,str,VALVE))//for 7 or 8 bit
 							{
 								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_STR(row,col,str);//col +1
 							}
 
 						}else
@@ -5449,9 +5508,9 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 							if(digital2string((tstatval >> 2) & 0x03,str,VALVE))//*** value
 							{
 								if(pid_select2[row-1]==1)
-									FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+									FLEX_GRID1_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
+								FLEX_GRID1_PUT_STR(row,col,str);//col +1
 							}
 						}
 					}
@@ -5460,9 +5519,9 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 				{
 					if(digital2string((tstatval >> ((row-totalrows+1)*2)) & 0x03,str,VALVE))//*** value
 						if(pid_select2[row-1]==1)
-						FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
+						FLEX_GRID1_PUT_COLOR_STR(row,col,str);//col +1
 						else
-						FLEX_GRID1_PUT_STR(row,col,str)//col +1
+						FLEX_GRID1_PUT_STR(row,col,str);//col +1
 				}
 			}
 		}
@@ -5514,9 +5573,9 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 				strTemp=_T("");
 			}
 			if(pid_select2[3]==1)
-			FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp)//col +1
+			FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp);//col +1
 			else
-			FLEX_GRID1_PUT_STR(4,col,strTemp)//col +1
+			FLEX_GRID1_PUT_STR(4,col,strTemp);//col +1
 			
 		}
 	}	
@@ -5558,9 +5617,9 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 			}
 
 			if(pid_select2[4]==1)
-			FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp)//col +1
+			FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp);//col +1
 			else
-			FLEX_GRID1_PUT_STR(5,col,strTemp)//col +1
+			FLEX_GRID1_PUT_STR(5,col,strTemp);//col +1
 				//totalrows
 		}
 	}
@@ -5761,9 +5820,9 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 			{
 				if(digital2string((tstatval >> (row-1)) & 0x01,str,FAN))
 					if(pid_select2[row-1]==0)
-					FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+					FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 					else
-					FLEX_GRID2_PUT_STR(row,col,str)//col +1
+					FLEX_GRID2_PUT_STR(row,col,str);//col +1
 			}
 		}
 	}
@@ -5813,18 +5872,18 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 						{
 							if(digital2string(4,str,VALVE))//for 7 or 8 bit
 								if(pid_select2[row-1]==0)
-								FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID2_PUT_STR(row,col,str)//col +1
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
 						}
 						else
 						{ 
 							if(digital2string(tstatval & 0x03,str,VALVE))//*** value
 							{
 								if(pid_select2[row-1]==0)
-								FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID2_PUT_STR(row,col,str)//col +1
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
 							}
 						}
 					}
@@ -5835,9 +5894,9 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 							if(digital2string(4,str,VALVE))//for 7 or 8 bit
 							{
 								if(pid_select2[row-1]==0)
-								FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID2_PUT_STR(row,col,str)//col +1
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
 							}
 
 						}else
@@ -5845,9 +5904,9 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 							if(digital2string((tstatval >> 2) & 0x03,str,VALVE))//*** value
 							{
 								if(pid_select2[row-1]==0)
-									FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+									FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID2_PUT_STR(row,col,str)//col +1
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
 							}
 						}
 					}
@@ -5856,9 +5915,9 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 				{
 					if(digital2string((tstatval >> ((row-totalrows+1)*2)) & 0x03,str,VALVE))//*** value
 						if(pid_select2[row-1]==0)
-						FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+						FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 						else
-						FLEX_GRID2_PUT_STR(row,col,str)//col +1
+						FLEX_GRID2_PUT_STR(row,col,str);//col +1
 				}
 			}
 		}
@@ -5880,9 +5939,9 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 			{
 				if(digital2string((tstatval >> (row-1)) & 0x01,str,FAN))
 					if(pid_select2[row-1]==0)
-					FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+					FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 					else
-					FLEX_GRID2_PUT_STR(row,col,str)//col +1
+					FLEX_GRID2_PUT_STR(row,col,str);//col +1
 			}
 		}
 	}
@@ -5932,18 +5991,18 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 						{
 							if(digital2string(4,str,VALVE))//for 7 or 8 bit
 								if(pid_select2[row-1]==0)
-									FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+									FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID2_PUT_STR(row,col,str)//col +1
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
 						}
 						else
 						{ 
 							if(digital2string(tstatval & 0x03,str,VALVE))//*** value
 							{
 								if(pid_select2[row-1]==0)
-								FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+								FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID2_PUT_STR(row,col,str)//col +1
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
 							}
 						}
 					}
@@ -5954,9 +6013,9 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 							if(digital2string(4,str,VALVE))//for 7 or 8 bit
 							{
 								if(pid_select2[row-1]==0)
-									FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+									FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID2_PUT_STR(row,col,str)//col +1
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
 							}
 
 						}else
@@ -5964,9 +6023,9 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 							if(digital2string((tstatval >> 2) & 0x03,str,VALVE))//*** value
 							{
 								if(pid_select2[row-1]==0)
-									FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+									FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 								else
-								FLEX_GRID2_PUT_STR(row,col,str)//col +1
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
 							}
 						}
 					}
@@ -5975,9 +6034,9 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 				{
 					if(digital2string((tstatval >> ((row-totalrows+1)*2)) & 0x03,str,VALVE))//*** value
 						if(pid_select2[row-1]==0)
-						FLEX_GRID2_PUT_COLOR_STR(row,col,str)//col +1
+						FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
 						else
-						FLEX_GRID2_PUT_STR(row,col,str)//col +1
+						FLEX_GRID2_PUT_STR(row,col,str);//col +1
 				}
 			}
 		}
@@ -6158,9 +6217,9 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 			}
 
 			if(pid_select2[3]==0)
-				FLEX_GRID2_PUT_COLOR_STR(4,col,strTemp)//col +1
+				FLEX_GRID2_PUT_COLOR_STR(4,col,strTemp);//col +1
 			else
-			FLEX_GRID2_PUT_STR(4,col,strTemp)//col +1
+			FLEX_GRID2_PUT_STR(4,col,strTemp);//col +1
 
 
 			//FLEX_GRID2_PUT_STR(4,col,strTemp)//col +1
@@ -6203,9 +6262,9 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 				strTemp=_T("");
 			}
 			if(pid_select2[4]==0)
-				FLEX_GRID2_PUT_COLOR_STR(5,col,strTemp)//col +1
+				FLEX_GRID2_PUT_COLOR_STR(5,col,strTemp);//col +1
 			else
-			FLEX_GRID2_PUT_STR(5,col,strTemp)//col +1
+			FLEX_GRID2_PUT_STR(5,col,strTemp);//col +1
 				//totalrows
 		}
 	}

@@ -1202,20 +1202,23 @@
 #define IDC_BUTTON_START_STOP4          1636
 #define IDC_STATIC_RANGES               1636
 #define IDC_RADIO49                     1636
+#define IDC_MAX                         1636
 #define IDC_BUTTON_CM5_WEEKLY           1637
 #define IDC_BUTTON_START_STOP5          1637
 #define IDC_STATIC_RANGE_TITLE          1637
 #define IDC_RADIO50                     1637
+#define IDC_MIN                         1637
 #define IDC_LIST_OUTPUT                 1638
 #define IDC_CHECK_TAP_DATA              1638
 #define IDC_EDIT_RANGE_SELECT           1638
+#define IDC_MIN2                        1638
 #define IDC_BUTTON_OUTPUT_READ          1639
 #define IDC_STATIC_CONFIG6              1639
 #define IDC_STATIC_RANGE_ENTER_UNITS    1639
+#define IDC_MAX2                        1639
 #define IDC_BUTTON_OUTPUT_APPLY         1640
 #define IDC_BUTTON_BAC_READ_TOTAL       1640
 #define IDC_RADIO51                     1640
-#define IDC_BUTTON_TRAFFIC1             1640
 #define IDC_BUTTON_INPUT_READ           1641
 #define IDC_STATIC_WAIT_DETAIL          1641
 #define IDC_RADIO52                     1641
@@ -1353,13 +1356,15 @@
 #define IDC_RANGECOMBO                  57926
 #define IDD_TEST_MULTI_READ             57927
 
+#define IDC_BUTTON_TRAFFIC1 57928
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        469
+#define _APS_NEXT_RESOURCE_VALUE        468
 #define _APS_NEXT_COMMAND_VALUE         32874
-#define _APS_NEXT_CONTROL_VALUE         1645
+#define _APS_NEXT_CONTROL_VALUE         1638
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

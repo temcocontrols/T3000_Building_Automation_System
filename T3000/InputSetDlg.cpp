@@ -695,7 +695,7 @@ void CInputSetDlg::ClickMsflexgrid1()
 		OnClickTstat6Grid(m_nCurRow, m_nCurCol, rc);
 		return;
 	}
-	if (m_nModel == PM_TSTAT5E)
+	if (multi_register_value[7] == PM_TSTAT5G || m_nModel == PM_TSTAT5E)
 	{
 		ClickMsflexgrid5E(m_nCurRow, m_nCurCol, rc);
 		return;
@@ -949,7 +949,7 @@ void CInputSetDlg::ClickMsflexgrid1()
 void CInputSetDlg::OnCbnSelchangeRangCombo()
 {
 //	if( m_nModel == 16 || m_nModel == PM_TSTAT6 )
-	if( m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5E)  //tstat6
+	if( multi_register_value[7] == PM_TSTAT5G || m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5E)  //tstat6
 	{
 		OnCbnSelchangeRangComboFor5E();
 	

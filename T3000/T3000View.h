@@ -100,7 +100,7 @@ public:
 	
 	void Fresh();
 	void FreshCtrl();
-	void InitSliderBars();
+	
 	// 这个函数是为了与之前的版本兼容
 	// 使用新的Slider，但是寄存器逻辑使用原来的
 	void InitSliderBars2();
@@ -254,6 +254,7 @@ public:
 	CComboBox m_gUnit;
 	CMacSliderCtrl m_currentTemp;
 	afx_msg void OnNMReleasedcaptureSliderDay(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMReleasedcaptureSliderNight(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp
