@@ -4723,7 +4723,8 @@ void COutputSetDlg::ClickMsflexgrid1()
 				}
 			}
 
-			if((m_nModeType==PM_TSTAT5D||m_nModeType==PM_TSTAT5E ||m_nModeType==PM_TSTAT6 ||m_nModeType==PM_TSTAT7  ) && lRow>5)
+			if((m_nModeType==PM_TSTAT5D||m_nModeType==PM_TSTAT5E ||
+				(product_register_value[7] == PM_TSTAT5G)||m_nModeType==PM_TSTAT6 ||m_nModeType==PM_TSTAT7  ) && lRow>5)
 			{
 				int nTempValue = multi_register_value[310];
 				DWORD dwFlag = 0x01;

@@ -1423,4 +1423,27 @@ void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
 }
 
 
- 
+void FLEX_GRID_PUT_STR(CMsflexgrid m_FlexGrid1,int row,int col,CString str)
+{
+	m_FlexGrid1.put_TextMatrix(row,col,str);
+	m_FlexGrid1.put_Row(row);
+	m_FlexGrid1.put_Col(col);
+	m_FlexGrid1.put_CellForeColor(RGB(0,0,0));
+	if((str.CompareNoCase(_T("Off"))==0)||(str.CompareNoCase(_T("Close"))==0))
+	{
+		m_FlexGrid1.put_CellBackColor(GREEN_COLOR);
+	}
+	else if ((str.CompareNoCase(_T("ON"))==0)||(str.CompareNoCase(_T("Open"))==0))
+	{
+		m_FlexGrid1.put_CellBackColor(YELLOW_COLOR);
+	}
+	else if ((str.CompareNoCase(_T("0-50"))==0)||(str.CompareNoCase(_T("50-100"))==0))
+	{
+		m_FlexGrid1.put_CellBackColor(ORANGE_COLOR);
+	}
+
+	else
+	{
+		m_FlexGrid1.put_CellBackColor(RGB(255,255,255));
+	}
+}

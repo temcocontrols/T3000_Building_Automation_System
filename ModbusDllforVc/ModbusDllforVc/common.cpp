@@ -2538,7 +2538,10 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 	return -1;
 }
 
-OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length,char *put_senddate_into_here,char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
+OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,
+                         TS_US start_address,int length,
+						 char *put_senddate_into_here,char *put_revdata_into_here, 
+						 int* sendDataLength, int* recvDataLength)
 {
 	if(g_Commu_type==0)
 	{
