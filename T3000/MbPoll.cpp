@@ -21,6 +21,10 @@ CMbPoll::CMbPoll(CWnd* pParent /*=NULL*/)
 	//checkTapData.SetCheck(1);
 	strGrid1 = _T("");
 	valNoOfGrids = 0;
+	m_nCurHeight = 0;
+	m_nScrollPos = 0;
+	m_nCurWidth = 0;
+	m_nHScrollPos = 0;
 }
 
 CMbPoll::~CMbPoll()
@@ -180,7 +184,7 @@ BOOL CMbPoll::OnInitDialog()
 	ctrlGrid1.put_TextMatrix(0, 2, L"Value");
 	ctrlGrid1.put_ColWidth(1, 500);
 	ctrlGrid1.put_ColWidth(2, 1400);
-
+	
 	ctrlGrid2.put_TextMatrix(0, 0, L"Alias");
 	ctrlGrid2.put_TextMatrix(0, 1, L"Addr");
 	ctrlGrid2.put_TextMatrix(0, 2, L"Value");
@@ -210,6 +214,10 @@ BOOL CMbPoll::OnInitDialog()
 	SetTimer(1, 2000, NULL);
 	SetTimer(2, 500, NULL);
 	SetTimer(3, 500, NULL);
+
+	GetWindowRect(m_rect);
+	m_nScrollPos = 0;
+	m_nHScrollPos = 0;
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -242,6 +250,9 @@ BEGIN_MESSAGE_MAP(CMbPoll, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_TRAFFIC4, &CMbPoll::OnClickedButtonTraffic4)
 	ON_BN_CLICKED(IDC_BUTTON_TRAFFIC5, &CMbPoll::OnClickedButtonTraffic5)
 	ON_MESSAGE(WM_TRAFFIC_CLOSED, &CMbPoll::OnTrafficClosed)
+	ON_WM_SIZE()
+	ON_WM_HSCROLL()
+	ON_WM_VSCROLL()
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CMbPoll, CDialog)
@@ -518,7 +529,7 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 			count++;
 			if (dataFlowStarted[0] == 1)
 			{
-				if ((count % (pollScanRate[0]/500)) == 0)	
+				if ((count % (pollScanRate[0]/50)) == 0)	
 				{
 					callMbFunc(0);
 					a++;
@@ -526,7 +537,7 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 			}
 			if (dataFlowStarted[1] == 1)
 			{
-				if ((count % (pollScanRate[1]/500)) == 0)	
+				if ((count % (pollScanRate[1]/50)) == 0)	
 				{
 					callMbFunc(1);
 					b++;
@@ -534,7 +545,7 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 			}
 			if (dataFlowStarted[2] == 1)
 			{
-				if ((count % (pollScanRate[2]/500)) == 0)	
+				if ((count % (pollScanRate[2]/50)) == 0)	
 				{
 					callMbFunc(2);
 					c++;
@@ -542,7 +553,7 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 			}
 			if (dataFlowStarted[3] == 1)
 			{
-				if ((count % (pollScanRate[3]/500)) == 0)	
+				if ((count % (pollScanRate[3]/50)) == 0)	
 				{
 					callMbFunc(3);
 					d++;
@@ -550,7 +561,7 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 			}
 			if (dataFlowStarted[4] == 1)
 			{
-				if ((count % (pollScanRate[4]/500)) == 0)	
+				if ((count % (pollScanRate[4]/50)) == 0)	
 				{
 					callMbFunc(4);
 					e++;
@@ -1100,22 +1111,22 @@ void CMbPoll::displayGrids(int number)
 		btnConfig2.ShowWindow(SW_SHOW);
 		btnConfig3.ShowWindow(SW_SHOW);
 		btnConfig4.ShowWindow(SW_SHOW);
-		btnConfig5.ShowWindow(SW_SHOW);
+		//btnConfig5.ShowWindow(SW_SHOW);
 		ctrlGrid1.ShowWindow(SW_SHOW);
 		ctrlGrid2.ShowWindow(SW_SHOW);
 		ctrlGrid3.ShowWindow(SW_SHOW);
 		ctrlGrid4.ShowWindow(SW_SHOW);
-		ctrlGrid5.ShowWindow(SW_SHOW);
+		//ctrlGrid5.ShowWindow(SW_SHOW);
 		staticConfig1.ShowWindow(SW_SHOW);
 		staticConfig2.ShowWindow(SW_SHOW);
 		staticConfig3.ShowWindow(SW_SHOW);
 		staticConfig4.ShowWindow(SW_SHOW);
-		staticConfig5.ShowWindow(SW_SHOW);
+		//staticConfig5.ShowWindow(SW_SHOW);
 		btnStartStop1.ShowWindow(SW_SHOW);
 		btnStartStop2.ShowWindow(SW_SHOW);
 		btnStartStop3.ShowWindow(SW_SHOW);
 		btnStartStop4.ShowWindow(SW_SHOW);
-		btnStartStop5.ShowWindow(SW_SHOW);
+		//btnStartStop5.ShowWindow(SW_SHOW);
 		pollShown[0] = 1;
 		pollShown[1] = 1;
 		pollShown[2] = 1;
@@ -1276,40 +1287,40 @@ void CMbPoll::OnClickedButtonConfig5()
 void CMbPoll::OnClickedButtonStartStop1()
 {
 	// TODO: Add your control notification handler code here
-	OnClickedButtonStartStop(ctrlGrid1, 0, btnStartStop1);
+	OnClickedButtonStartStop(ctrlGrid1, 0, btnStartStop1, btnConfig1);
 }
 
 void CMbPoll::OnClickedButtonStartStop2()
 {
 	// TODO: Add your control notification handler code here
-	OnClickedButtonStartStop(ctrlGrid2, 1, btnStartStop2);
+	OnClickedButtonStartStop(ctrlGrid2, 1, btnStartStop2, btnConfig2);
 }
 
 void CMbPoll::OnClickedButtonStartStop3()
 {
 	// TODO: Add your control notification handler code here
-	OnClickedButtonStartStop(ctrlGrid3, 2, btnStartStop3);
+	OnClickedButtonStartStop(ctrlGrid3, 2, btnStartStop3, btnConfig3);
 }
 
 void CMbPoll::OnClickedButtonStartStop4()
 {
 	// TODO: Add your control notification handler code here
-	OnClickedButtonStartStop(ctrlGrid4, 3, btnStartStop4);
+	OnClickedButtonStartStop(ctrlGrid4, 3, btnStartStop4, btnConfig4);
 }
 
 void CMbPoll::OnClickedButtonStartStop5()
 {
 	// TODO: Add your control notification handler code here
-	OnClickedButtonStartStop(ctrlGrid5, 4, btnStartStop5);
+	OnClickedButtonStartStop(ctrlGrid5, 4, btnStartStop5, btnConfig5);
 }
 
-void CMbPoll::OnClickedButtonStartStop(CMsflexgrid &grid, int gridNum, CButton &btn)
+void CMbPoll::OnClickedButtonStartStop(CMsflexgrid &grid, int gridNum, CButton &btn, CButton &configbtn)
 {
 	// TODO: Add your control notification handler code here
 	if (connectionSuccessful != 1) 
 	{
 		MessageBox(L"Please establish Modbus connection first.", L"NO CONNECTION");
-		return;
+		//return;
 	}
 	if (pollConfigured[gridNum] != 1) 
 	{
@@ -1323,11 +1334,13 @@ void CMbPoll::OnClickedButtonStartStop(CMsflexgrid &grid, int gridNum, CButton &
 		{
 			dataFlowStarted[gridNum] = 1;
 			btn.SetWindowText(L"Stop");
+			configbtn.EnableWindow(FALSE);
 		}
 		else
 		{
 			dataFlowStarted[gridNum] = 0;
 			btn.SetWindowText(L"Start");
+			configbtn.EnableWindow(TRUE);
 		}
 	}
 	if (pollSingleFunction[gridNum] == 1)
@@ -1814,3 +1827,144 @@ afx_msg LRESULT CMbPoll::OnTrafficClosed(WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+
+
+void CMbPoll::OnSize(UINT nType, int cx, int cy)
+{
+	CDialog::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	CDialog::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here.
+	m_nCurHeight = cy;
+	m_nCurWidth = cx;
+
+	int nScrollMax;
+	
+	if (cy < m_rect.Height())
+	{
+	     nScrollMax = m_rect.Height() - cy;
+	}
+	else
+	     nScrollMax = 0;
+
+	SCROLLINFO si;
+	si.cbSize = sizeof(SCROLLINFO);
+	si.fMask = SIF_ALL; // SIF_ALL = SIF_PAGE | SIF_RANGE | SIF_POS;
+	si.nMin = 0;
+	si.nMax = nScrollMax;
+	si.nPage = si.nMax/10;
+	si.nPos = 0;
+    SetScrollInfo(SB_VERT, &si, TRUE); 
+
+	if (cx < m_rect.Width())
+	{
+	     nScrollMax = m_rect.Width() - cx;
+	}
+	else
+	     nScrollMax = 0;
+
+	//SCROLLINFO si;
+	si.cbSize = sizeof(SCROLLINFO);
+	si.fMask = SIF_ALL; // SIF_ALL = SIF_PAGE | SIF_RANGE | SIF_POS;
+	si.nMin = 0;
+	si.nMax = nScrollMax;
+	si.nPage = si.nMax/10;
+	si.nPos = 0;
+    SetScrollInfo(SB_HORZ, &si, TRUE); 
+
+}
+
+
+void CMbPoll::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	// TODO: Add your message handler code here and/or call default
+	int nDelta;
+	int nMaxPos = m_rect.Width() - m_nCurWidth;
+
+	switch (nSBCode)
+	{
+	case SB_LINEDOWN:
+		if (m_nHScrollPos >= nMaxPos)
+			return;
+		nDelta = min(nMaxPos/100,nMaxPos-m_nHScrollPos);
+		break;
+
+	case SB_LINEUP:
+		if (m_nHScrollPos <= 0)
+			return;
+		nDelta = -min(nMaxPos/100,m_nHScrollPos);
+		break;
+
+         case SB_PAGEDOWN:
+		if (m_nHScrollPos >= nMaxPos)
+			return;
+		nDelta = min(nMaxPos/10,nMaxPos-m_nHScrollPos);
+		break;
+
+	case SB_THUMBPOSITION:
+		nDelta = (int)nPos - m_nHScrollPos;
+		break;
+
+	case SB_PAGEUP:
+		if (m_nHScrollPos <= 0)
+			return;
+		nDelta = -min(nMaxPos/10,m_nHScrollPos);
+		break;
+	
+         default:
+		return;
+	}
+	m_nHScrollPos += nDelta;
+	SetScrollPos(SB_HORZ,m_nHScrollPos,TRUE);
+	ScrollWindow(-nDelta,0);
+
+	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
+}
+
+
+void CMbPoll::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	// TODO: Add your message handler code here and/or call default
+	int nDelta;
+	int nMaxPos = m_rect.Height() - m_nCurHeight;
+
+	switch (nSBCode)
+	{
+	case SB_LINEDOWN:
+		if (m_nScrollPos >= nMaxPos)
+			return;
+		nDelta = min(nMaxPos/100,nMaxPos-m_nScrollPos);
+		break;
+
+	case SB_LINEUP:
+		if (m_nScrollPos <= 0)
+			return;
+		nDelta = -min(nMaxPos/100,m_nScrollPos);
+		break;
+
+         case SB_PAGEDOWN:
+		if (m_nScrollPos >= nMaxPos)
+			return;
+		nDelta = min(nMaxPos/10,nMaxPos-m_nScrollPos);
+		break;
+
+	case SB_THUMBPOSITION:
+		nDelta = (int)nPos - m_nScrollPos;
+		break;
+
+	case SB_PAGEUP:
+		if (m_nScrollPos <= 0)
+			return;
+		nDelta = -min(nMaxPos/10,m_nScrollPos);
+		break;
+	
+         default:
+		return;
+	}
+	m_nScrollPos += nDelta;
+	SetScrollPos(SB_VERT,m_nScrollPos,TRUE);
+	ScrollWindow(0,-nDelta);
+	CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
+}

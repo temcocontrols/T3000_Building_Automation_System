@@ -115,10 +115,10 @@ INPUT int Read_One(unsigned char device_var,unsigned short address);
 INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
 
-INPUT int Read_One_log(unsigned char device_var,unsigned short address,char *put_senddate_into_here,char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
-INPUT int Write_One_log(unsigned char device_var,unsigned short address,unsigned short val,char *put_senddate_into_here,char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
-INPUT int read_multi_log(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,char *put_senddate_into_here,char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
-INPUT int write_multi_log(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,char *put_senddate_into_here,char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+INPUT int Read_One_log(unsigned char device_var,unsigned short address,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+INPUT int Write_One_log(unsigned char device_var,unsigned short address,unsigned short val,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+INPUT int read_multi_log(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+INPUT int write_multi_log(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 
 //INPUT SOCKET GetSocketHandle();
 #include <stdint.h>
