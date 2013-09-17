@@ -149,26 +149,28 @@ void TrafficWindow::OnTimer(UINT_PTR nIDEvent)
 		{
 			TxStr = L"";
 			temp = L"";
-			temp.Format(_T("%04d-Tx (%02d): "), packetCount, sendDataLen);
+			//temp.Format(_T("%04d-Tx (%02d): "), packetCount, sendDataLen);
+			temp.Format(_T("%04d-Tx: "), packetCount);
 			packetCount++;
 			TxStr = TxStr + temp;
 			for (int i = 0; i < sendDataLen; i++)
 			{
 				temp = L"";
-				temp.Format(_T("%02X "), sendData[i]);
+				temp.Format(_T("%02X "), (unsigned char)sendData[i]);
 				TxStr = TxStr + temp;
 			}
 			listTrafficWindow.InsertString(trafficStringIndex++, TxStr);
 
 			RxStr = L"";
 			temp = L"";
-			temp.Format(_T("%04d-Rx (%02d): "), packetCount, recvDataLen);
+			//temp.Format(_T("%04d-Rx (%02d): "), packetCount, recvDataLen);
+			temp.Format(_T("%04d-Rx: "), packetCount);
 			packetCount++;
 			RxStr = RxStr + temp;
 			for (int i = 0; i < recvDataLen; i++)
 			{
 				temp = L"";
-				temp.Format(_T("%02X "), recvData[i]);
+				temp.Format(_T("%02X "), (unsigned char)recvData[i]);
 				RxStr = RxStr + temp;
 			}
 			listTrafficWindow.InsertString(trafficStringIndex++, RxStr);
