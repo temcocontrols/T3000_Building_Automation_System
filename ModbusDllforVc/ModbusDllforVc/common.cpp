@@ -1251,7 +1251,7 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
 //	singlock.Unlock();
 }
 
-OUTPUT int Read_One_log(TS_UC device_var,TS_US address,char *put_senddate_into_here,char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
+OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
 {
 
 //	CSingleLock singlock(&scan_mutex);
@@ -1927,7 +1927,7 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
 	///////////////////////////////////////////////////////////
 }
 
-OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,char *put_senddate_into_here,char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
+OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
 {
 	if (g_Commu_type==0)
 	{
@@ -2538,10 +2538,7 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 	return -1;
 }
 
-OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,
-                         TS_US start_address,int length,
-						 char *put_senddate_into_here,char *put_revdata_into_here, 
-						 int* sendDataLength, int* recvDataLength)
+OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
 {
 	if(g_Commu_type==0)
 	{
@@ -2941,7 +2938,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int 
 	return -1;
 }
 
-OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length,char *put_senddate_into_here,char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
+OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
 {	
 	if(g_Commu_type==0)//
 	{
