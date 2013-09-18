@@ -110,7 +110,7 @@ public:
 	afx_msg void OnClickedButtonStartStop3();
 	afx_msg void OnClickedButtonStartStop4();
 	afx_msg void OnClickedButtonStartStop5();
-	void OnClickedButtonStartStop(CMsflexgrid &grid, int gridNum, CButton &btn);
+	void OnClickedButtonStartStop(CMsflexgrid &grid, int gridNum, CButton &btn, CButton &configbtn);
 	afx_msg void OnClickedCheckTapData();
 	CButton checkTapData;
 	void startStopBtnState();
@@ -140,4 +140,14 @@ public:
 	void showTrafficWindow(int slotNo);
 protected:
 	afx_msg LRESULT OnTrafficClosed(WPARAM wParam, LPARAM lParam);
+public:
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+protected:
+	int m_nCurHeight;
+	int m_nScrollPos;
+	CRect m_rect;
+	int m_nCurWidth;
+	int m_nHScrollPos;
 };
