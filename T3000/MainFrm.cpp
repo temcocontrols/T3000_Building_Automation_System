@@ -4294,17 +4294,19 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{
 			    if (m_isCM5)
 			    {
-					register_critical_section.Lock();
+					
 					int i;
 					int it = 0;
 					float progress;
+					register_critical_section.Lock();
 					for(i=0;i<80;i++)
 					{
 						//register_critical_section.Lock();
 						//int nStart = GetTickCount();
 						int itemp = 0;
-						itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100,3);
-						if(itemp == -2)
+						itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100,5);
+						Sleep(100);
+						if(itemp < 0)
 						{
 							continue;
 						}
@@ -4313,12 +4315,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 							if (pDlg!=NULL)
 							{
 								progress=float((it+1)*(100/80));
-								pDlg->ShowProgress(int(progress/10),(int)progress);
+								pDlg->ShowProgress(int(progress),(int)progress);
 							} 
+							it++;
 						}							
-						it++;
-						Sleep(100);
+						
+						
 					}
+					register_critical_section.Unlock();
 					//Add by Fance use this product_register_value to unite the register.
 					//Fance_2
 					//memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value_tcp,1024);
@@ -4341,7 +4345,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						pDlg=NULL;
 					}
 					g_tstat_id_changed=FALSE;
-					register_critical_section.Unlock();
+					
 			    }
 				else  //For Zigbee
 				{
@@ -4682,13 +4686,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				{
 					product_type =T3000_6_ADDRESS;
 				}
-				else if((nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H))
+				else if(  (nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H) ||
+					(nFlag == PM_TSTAT5G))
 				{
 					product_type = T3000_5EH_LCD_ADDRESS;
 				}
 				else if((nFlag == PM_TSTAT5A) ||(nFlag == PM_TSTAT5B) ||
-					(nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F) ||
-					(nFlag == PM_TSTAT5G))
+					(nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F))
 				{
 					product_type =T3000_5ABCDFG_LED_ADDRESS;
 				}
@@ -6340,6 +6344,7 @@ LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
 {
 	//mbPollDlgOpen = FALSE;
     mbPoll = NULL; 
+	delete mbPoll;
 	mbPollDlgOpen = FALSE;
     return 0;
 }

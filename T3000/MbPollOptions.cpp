@@ -143,16 +143,17 @@ void CMbPollOptions::OnOK()
 	}
 	editScanRate.GetWindowText(tempStr);
 	pollScanRate[curConf] = _wtoi(tempStr);
-	//if (!((pollScanRate[curConf] >= 500) && ((pollScanRate[curConf] % 500) == 0)))
-	if (!(pollScanRate[curConf] >= 500))
+
+	//if (!(pollScanRate[curConf] >= 500))
+	if (!((pollScanRate[curConf] >= 50) && (pollScanRate[curConf] <= 10000)))
 	{
 		outOfRangeData = 4;
-		MessageBox(L"Scan Rate shall be: >= 500 ms");
+		MessageBox(L"Scan Rate shall be: >= 50 ms and <= 10000 ms");
 	}
 	/* In order to have lesser load on processor rounding off timings to multiple of 500 ms */
 	int modulus;
-	modulus = pollScanRate[curConf] % 500;
-	if (modulus < 250)
+	modulus = pollScanRate[curConf] % 50;
+	if (modulus < 25)
 	{
 		pollScanRate[curConf] += (-1 * modulus);
 	}

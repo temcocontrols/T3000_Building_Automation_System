@@ -5,10 +5,20 @@
 #include "CM5/ud_str.h"
 #include "Bacnet_Include.h"
 #include "T3000RegAddress.h"
+#include "msflexgrid1.h"
+
 #pragma endregion For_Bacnet
 
 
 #include "global_variable_extern.h"
+#define FLEXGRID_CELL_COLOR RGB(128,128,128) 
+#define GREEN_COLOR RGB(0,255,0)
+#define YELLOW_COLOR RGB(255,255,0)
+#define ORANGE_COLOR RGB(255,165,0)
+
+#include "global_variable_extern.h"
+
+void FLEX_GRID_PUT_STR(CMsflexgrid m_FlexGri,int row,int col,CString str);
 
 int modbus_read_one_value( 
 				int& value, 

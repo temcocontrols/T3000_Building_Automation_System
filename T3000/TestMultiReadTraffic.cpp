@@ -53,7 +53,7 @@ void CTestMultiReadTraffic::OnBnClickedOk()
 	unsigned short rev_back_rawData[300],send_data[8];
 	unsigned short rev_back_Data[300];
 	register_critical_section.Lock();
-	read_multi_log(m_ID,&rev_back_Data[0],m_startid,m_length,&send_data[0],&rev_back_rawData[0]);
+	//read_multi_log(m_ID,&rev_back_Data[0],m_startid,m_length,&send_data[0],&rev_back_rawData[0]);
 	register_critical_section.Unlock();
 	if (g_CommunicationType==0)
 	{

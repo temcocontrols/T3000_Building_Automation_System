@@ -1194,8 +1194,10 @@ void CParameterDlg::OnCbnSelchangeEapplication()
 
 		}
 		nRet = write_one(g_tstat_id,reg_tststold[125],m_application_ctrl.GetCurSel()); //tstat6 350 
+
 	}
-	else if((multi_register_value[7]==PM_TSTAT5E) && (m_fFirmwareVersion >= 35.4))//0912
+	else if(((multi_register_value[7]==PM_TSTAT5E)||
+		(product_register_value[7] == PM_TSTAT5G)) && (m_fFirmwareVersion >= 35.4))//0912
 	{
 		write_one(g_tstat_id,423 ,m_application_ctrl.GetCurSel()); // 
 		write_one(g_tstat_id,125 ,m_application_ctrl.GetCurSel()); // 
@@ -1207,7 +1209,7 @@ void CParameterDlg::OnCbnSelchangeEapplication()
 
 
 	if(nRet>0)
-		multi_register_value[125] = m_application_ctrl.GetCurSel();
+		product_register_value[125] = m_application_ctrl.GetCurSel();
 
 	g_bPauseMultiRead = FALSE;
 }
@@ -1518,7 +1520,8 @@ void CParameterDlg::OnEnKillfocusSpset1()
 			}
 			product_register_value[MODBUS_DAY_SETPOINT] = short(nOrig*10);
 		}
-		else if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E)
+		else if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E||
+			(product_register_value[7] == PM_TSTAT5G))
 		{
 			int nRet = write_one(g_tstat_id, 135, short(nOrig));	//Fance comments: because the version which below 34.9 is too low ,135 register I Don't know it's real meaning. 
 		}
@@ -1739,7 +1742,7 @@ void CParameterDlg::OnEnKillfocusEnigntheating()
 		return;
 	CString strText;
 	m_nightheating.GetWindowText(strText);
-	int nValue= _wtoi(strText)*10;
+	int nValue= _wtoi(strText);
 
 
 
@@ -1748,16 +1751,48 @@ void CParameterDlg::OnEnKillfocusEnigntheating()
 		if(product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]==nValue)	//Add this to judge weather this value need to change.
 			return;
 
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,nValue,
-			product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],this->m_hWnd,IDC_ENIGNTHEATING,_T("NIGHT HEATING SETPOINT"));
+		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,nValue,
+			product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],this->m_hWnd,IDC_ENIGNTHEATING,
+			_T("NIGHT HEATING SETPOINT"));*/
+		int ret=write_one(g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,nValue);
+		if (ret>0)
+		{
+			product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]=nValue;
+		} 
+		else
+		{
+			AfxMessageBox(_T("Fail"));
+		}
+		
+		CString strText;
+		strText.Format(_T("0.1f%"),(float)(product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]));
+		m_nightheating.GetWindowText(strText);
+
 	}
 	else
 	{
 		if(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]==nValue)	//Add this to judge weather this value need to change.
 			return;
 
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,nValue,
-			product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],this->m_hWnd,IDC_ENIGNTHEATING,_T("NIGHT HEATING DEADBAND"));
+		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,nValue,
+			product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],this->m_hWnd,IDC_ENIGNTHEATING,
+			_T("NIGHT HEATING DEADBAND"));*/
+		int ret=write_one(g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,nValue*10);
+		if (ret>0)
+		{
+		product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=nValue;
+		} 
+		else
+		{
+		  AfxMessageBox(_T("Fail"));
+		}
+
+
+		CString strText;
+		strText.Format(_T("0.1f%"),(float)(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10));
+		m_nightheating.GetWindowText(strText);
+
+
 	}
 
 }
@@ -1770,7 +1805,7 @@ void CParameterDlg::OnEnKillfocusEnigntcooling1()
 	CString strText;
 	m_nightcooling.GetWindowText(strText);
 	int nValue= _wtoi(strText);
-
+	
 	if(m_application_ctrl.GetCurSel()==0)
 	{
 		if(product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]==nValue)	//Add this to judge weather this value need to change.
@@ -1781,10 +1816,10 @@ void CParameterDlg::OnEnKillfocusEnigntcooling1()
 	}
 	else
 	{
-		if(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]==nValue)	//Add this to judge weather this value need to change.
+		if((int)(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10)==nValue)	//Add this to judge weather this value need to change.
 			return;
 
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,nValue,
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,nValue*10,
 			product_register_value[MODBUS_NIGHT_COOLING_DEADBAND],this->m_hWnd,IDC_ENIGNTCOOLING1,_T("NIGHT COOLING DEADBAND"));
 	}
 }
@@ -1842,7 +1877,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 
 
 	}
-	else if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E)  // 只有5E使用135
+	else if(multi_register_value[7] == PM_TSTAT5G || multi_register_value[7] == PM_TSTAT5E)  // 只有5E使用135
 	{
 		//short nVal = short(fValue);
 		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,135,short(fValue),
@@ -1858,7 +1893,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 			{
 				AfxMessageBox(_T("Fail!"));
 			}
-			strText.Format(_T("%0.1f"),(product_register_value[135]));
+			strText.Format(_T("%0.1f"),(float)(product_register_value[135]));
 			}
 	
 	}
@@ -1877,7 +1912,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 			{
 				AfxMessageBox(_T("Fail!"));
 			}
-			strText.Format(_T("%0.1f"),(product_register_value[374]));
+			strText.Format(_T("%0.1f"),((float)product_register_value[374]/10));
 			}
 	
 	}
@@ -2930,7 +2965,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	float m_fFirmwareVersion=get_curtstat_version();//0912
-	if (multi_register_value[7] == PM_TSTAT5E)//0912
+	if (multi_register_value[7] == PM_TSTAT5E||
+		(product_register_value[7] == PM_TSTAT5G))//0912
 	{
 		short nOccupied = multi_register_value[184];  // Day setpoint option  
 		BOOL bOccupied = nOccupied & 0x0001;
@@ -3029,7 +3065,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 	if(product_type!=T3000_6_ADDRESS)
 	{
-		if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E)   // ÀÏ°æ±¾135£¬ÐÂ°æ±¾374// ÀÏ°æ±¾²»³ý10£¬
+		if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E||
+			(product_register_value[7] == PM_TSTAT5G))   // ÀÏ°æ±¾135£¬ÐÂ°æ±¾374// ÀÏ°æ±¾²»³ý10£¬
 		{
 			strTemp.Format(_T("%d"),(int)product_register_value[MODBUS_COOLING_SETPOINT]);//135
 		}
@@ -3039,7 +3076,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		}	
 
 		m_dayOccEdt1.SetWindowText(strTemp);
-		if (multi_register_value[7] == PM_TSTAT5E)//0911
+		if (multi_register_value[7] == PM_TSTAT5E||
+			(product_register_value[7] == PM_TSTAT5G))//0911
 		{
 			//strTemp.Format(_T("%.1f"),product_register_value[135]);//0911	//135
 			strTemp.Format(_T("%d"),(int)product_register_value[MODBUS_COOLING_SETPOINT]);

@@ -5,6 +5,7 @@
 #include "MbpExterns.h"
 
 #define WM_MBPOLL_CLOSED (WM_USER + 555)
+#define WM_TRAFFIC_CLOSED	(WM_USER + 556)
 // CMbPoll dialog
 
 class CMbPoll : public CDialog
@@ -109,7 +110,7 @@ public:
 	afx_msg void OnClickedButtonStartStop3();
 	afx_msg void OnClickedButtonStartStop4();
 	afx_msg void OnClickedButtonStartStop5();
-	void OnClickedButtonStartStop(CMsflexgrid &grid, int gridNum, CButton &btn);
+	void OnClickedButtonStartStop(CMsflexgrid &grid, int gridNum, CButton &btn, CButton &configbtn);
 	afx_msg void OnClickedCheckTapData();
 	CButton checkTapData;
 	void startStopBtnState();
@@ -126,4 +127,27 @@ public:
 	void saveRegNames();
 	void restoreRegNames();
 	CStatic staticConnectionStatus;
+	afx_msg void OnClickedButtonTraffic1();
+	afx_msg void OnClickedButtonTraffic2();
+	afx_msg void OnClickedButtonTraffic3();
+	afx_msg void OnClickedButtonTraffic4();
+	afx_msg void OnClickedButtonTraffic5();
+	CButton btnShowTraffic1;
+	CButton btnShowTraffic2;
+	CButton btnShowTraffic3;
+	CButton btnShowTraffic4;
+	CButton btnShowTraffic5;
+	void showTrafficWindow(int slotNo);
+protected:
+	afx_msg LRESULT OnTrafficClosed(WPARAM wParam, LPARAM lParam);
+public:
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+protected:
+	int m_nCurHeight;
+	int m_nScrollPos;
+	CRect m_rect;
+	int m_nCurWidth;
+	int m_nHScrollPos;
 };
