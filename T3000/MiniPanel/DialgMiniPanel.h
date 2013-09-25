@@ -3,7 +3,16 @@
 #include "../MainFrm.h"
 #include "afxwin.h"
 #include "../global_struct.h"
+#include "../msflexgrid1.h"
+#include "../globle_function.h"
+#include "../Weekly_Routines.h"
+#include "../Annual_Routines.h"
+#include "../Config_Routines.h"
+#include "../global_variable_extern.h"
 
+ 
+#include "afxcmn.h"
+#include "../msflexgrid1.h"
 #define FLEXGRID_CELL_COLOR						13421772
 #define FLEXGRID_CELL_GRAY_COLOR				13421772
 #define MiniPanelTimer							11
@@ -65,7 +74,11 @@ public:
 	
 	int comnum;
 
-
+	afx_msg void OnBnClickedButtonweeklyschedule();
+	 
+	afx_msg void OnBnClickedButtonannualschedule();
+	afx_msg void OnBnClickedButtonidschedule();
+	afx_msg void OnBnClickedButtonClear();
 	CString m_datetime;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	void Updatedatabase();

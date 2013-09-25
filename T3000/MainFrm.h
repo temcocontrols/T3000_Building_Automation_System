@@ -315,6 +315,7 @@ public:
 
 	CString						m_strCurSelNodeName;  // 记录当前点击树节点的name
 	BOOL m_isCM5;
+	BOOL m_isMiniPanel;
 	//HTREEITEM				m_htiCurSel;  // 记录当前点击树节点
 	CString						m_strFileVersion;
 

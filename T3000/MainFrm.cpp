@@ -860,6 +860,7 @@ void CMainFrame::EnterConnectToANode()
 	//CM5
 	g_bChamber=FALSE;
 	m_isCM5=FALSE;
+	m_isMiniPanel=FALSE;
 #if 1
 	for(UINT i=0;i<m_product.size();i++)
 	{
@@ -876,7 +877,10 @@ void CMainFrame::EnterConnectToANode()
 			else if (m_product.at(i).product_class_id == PM_MINIPANEL)
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
+				m_isMiniPanel=TRUE;
+				DoConnectToANode(hSelItem);
+				
+				//SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
 			}
 			else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
 			{
@@ -948,6 +952,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	BeginWaitCursor();
 	//CM5
 	g_bChamber=FALSE;
+	m_isMiniPanel=FALSE;
 #if 1
 	for(UINT i=0;i<m_product.size();i++)
 	{
@@ -963,7 +968,8 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 			}else if (m_product.at(i).product_class_id == PM_MINIPANEL)
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
+				m_isMiniPanel=TRUE;
+				DoConnectToANode(hSelItem); 
 			}else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
 			{
 				g_tstat_id = m_product.at(i).product_id;
@@ -2055,12 +2061,11 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		}
 		else
 		{
-			//strTemp.Format(_T("Scanning now,please wait,found %d node(s)"),m_binary_search_product_background_thread.size());// oldscan
-			
-// 			CString strTemp;
-// 			strTemp.Format(_T("ID %d to %d"),g_nStartID,g_nEndID);
-// 			CString strTemp2;
-// 			strTemp2.Format(_T("Scanning %s, %s. Please wait."), g_strScanInfoPrompt, strTemp);
+//				strTemp.Format(_T("Scanning now,please wait,found %d node(s)"),m_binary_search_product_background_thread.size());// oldscan
+// 				CString strTemp;
+// 				strTemp.Format(_T("ID %d to %d"),g_nStartID,g_nEndID);
+// 				CString strTemp2;
+// 				strTemp2.Format(_T("Scanning %s, %s. Please wait."), g_strScanInfoPrompt, strTemp);
 			CString strTemp;
 			if (g_nStartID == -1) // 用这个来区分是scan TStat 还是scan NC
 			{
@@ -3448,7 +3453,9 @@ void CMainFrame::OnDestroy()
 
 	{
 		if (WaitForSingleObject(m_pFreshMultiRegisters->m_hThread, 3000) == WAIT_OBJECT_0)
-		{}
+		{
+
+		}
 		else
 		{		
 			BOOL bRet = TerminateThread(m_pFreshMultiRegisters->m_hThread,0);
@@ -3766,6 +3773,31 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 	if(pMsg->message == WM_KEYDOWN  )
 	{
 		if(((GetAsyncKeyState( VK_LCONTROL ) & 0x8000))&&(pMsg->wParam ==VK_F2))
+		{
+			//OnToolIsptoolforone();
+			
+			int ret = AfxMessageBox(_T("This will reset the device to the factory defaults\n are you sure'?"),MB_YESNO ,3);
+			 if ( ret == IDYES)
+			 	{
+				if (is_connect())
+			 	{
+				 write_one(g_tstat_id,16,143);
+			 	}
+				else
+				{
+				 AfxMessageBox(_T("Please Connect to the Device!"));
+				}
+				}
+				else
+				{
+				return TRUE;
+				}
+				  
+				    
+			
+			return 1;
+		}
+		if(((GetAsyncKeyState( VK_LCONTROL ) & 0x8000))&&(pMsg->wParam =='R'))
 		{
 			OnToolIsptoolforone();
 			return 1;
@@ -4347,6 +4379,59 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					g_tstat_id_changed=FALSE;
 					
 			    }
+				else if (m_isMiniPanel)
+				{
+					int i;
+					int it = 0;
+					float progress;
+					register_critical_section.Lock();
+					for(i=0;i<80;i++)
+					{
+						//register_critical_section.Lock();
+						//int nStart = GetTickCount();
+						int itemp = 0;
+						itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100,5);
+						Sleep(100);
+						if(itemp < 0)
+						{
+							continue;
+						}
+						else						
+						{
+							if (pDlg!=NULL)
+							{
+								progress=float((it+1)*(100/80));
+								pDlg->ShowProgress(int(progress),(int)progress);
+							} 
+							it++;
+						}							
+
+
+					}
+					register_critical_section.Unlock();
+					//Add by Fance use this product_register_value to unite the register.
+					//Fance_2
+					//memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value_tcp,1024);
+
+					if (it<80)
+					{	
+						AfxMessageBox(_T("Reading abnormal \n Try again!"));
+						pDlg->ShowWindow(SW_HIDE);
+						if(pDlg!=NULL)
+							delete pDlg;
+						pDlg=NULL;
+
+					}
+					else
+					{
+						pDlg->ShowProgress(100,100);
+						pDlg->ShowWindow(SW_HIDE);
+						if(pDlg!=NULL)
+							delete pDlg;
+						pDlg=NULL;
+					}
+					g_tstat_id_changed=FALSE;
+				}
 				else  //For Zigbee
 				{
 		            int NC=read_one(g_tstat_id,7);
@@ -4686,13 +4771,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				{
 					product_type =T3000_6_ADDRESS;
 				}
-				else if(  (nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H) ||
-					(nFlag == PM_TSTAT5G))
+				else if(  (nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H)
+					)
 				{
 					product_type = T3000_5EH_LCD_ADDRESS;
 				}
 				else if((nFlag == PM_TSTAT5A) ||(nFlag == PM_TSTAT5B) ||
-					(nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F))
+					(nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F)||nFlag==PM_TSTAT5G)
 				{
 					product_type =T3000_5ABCDFG_LED_ADDRESS;
 				}

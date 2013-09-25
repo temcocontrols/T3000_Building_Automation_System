@@ -1010,6 +1010,11 @@ void CHumChamber::OnEnKillfocusTemp1()
 	}
 	str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID]/10.0)); 
 	GetDlgItem(IDC_TEMP1)->SetWindowText(str_text);
+
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,First_Calibration_Points_Temp.Start_ID,m_temp1,
+		product_register_value[MODBUS_UNIVERSAL_SET],this->m_hWnd,IDC_SETVALUE2,_T("UNIVERSAL SET"));
+
 }
 
 
@@ -1879,6 +1884,7 @@ BEGIN_EVENTSINK_MAP(CHumChamber, CFormView)
 //    ON_EVENT(CHumChamber, IDC_MSFLEXGRID_INPUT3, DISPID_KEYUP, CHumChamber::KeyUpMsflexgridInput3, VTS_PI2 VTS_I2)
 //ON_EVENT(CHumChamber, IDC_MSFLEXGRID_INPUT3, DISPID_KEYDOWN, CHumChamber::KeyDownMsflexgridInput3, VTS_PI2 VTS_I2)
 //ON_EVENT(CHumChamber, IDC_MSFLEXGRID_INPUT3, 70, CHumChamber::RowColChangeMsflexgridInput3, VTS_NONE)
+ON_EVENT(CHumChamber, IDC_MSFLEXGRID_INPUT3, DISPID_CLICK, CHumChamber::ClickMsflexgridInput3, VTS_NONE)
 END_EVENTSINK_MAP()
 
 
@@ -1913,8 +1919,21 @@ rc.OffsetRect(rect.left+1,rect.top+1);
 CString strValue = m_msflexgrid.get_TextMatrix(lRow,lCol);
 m_nCurRow=lRow;
 m_nCurCol=lCol;
+///////////////先刷新当前主表信息
+if (is_connect())
+{ 
+	for(int  i=0;i<7;i++)
+	{
+		Read_Multi(g_tstat_id,&multi_register_value[660+i*50],660+i*50,50);
+	}
+	FreshGrid();
+}
+else
+{
+	AfxMessageBox(_T("Disconnect"));
+}
 
- 
+/////////////////////////
 //write_one(g_tstat_id,CurrentTestSensor.Start_ID,m_nCurRow);
 UINT temp=m_nCurRow;
 CString str_text;
@@ -2046,3 +2065,20 @@ void CHumChamber::OnBnClickedContinue()
 //	GetDlgItem(IDC_SENSOR_ID)->SetWindowText(str_text);
 //	Update_SensorTable(); 
 //}
+
+
+void CHumChamber::ClickMsflexgridInput3()
+{
+	/*if (is_connect())
+	{ 
+		for(int  i=0;i<7;i++)
+		{
+			Read_Multi(g_tstat_id,&multi_register_value[660+i*50],660+i*50,50);
+		}
+		FreshGrid();
+	}
+	else
+	{
+		AfxMessageBox(_T("Disconnect"));
+	}*/ 
+}
