@@ -600,7 +600,7 @@ void CInputSetDlg::Fresh_Grid()
 		if (product_register_value[MODBUS_DIGITAL_IN1]==0)//190 
 		{
 			CString strTemp2;
-			if (multi_register_value[311]==0)
+			if (product_register_value[311]==0)
 			{
 				strTemp=_T("Off");
 			}else
@@ -695,7 +695,7 @@ void CInputSetDlg::ClickMsflexgrid1()
 		OnClickTstat6Grid(m_nCurRow, m_nCurCol, rc);
 		return;
 	}
-	if (multi_register_value[7] == PM_TSTAT5G || m_nModel == PM_TSTAT5E)
+	if (m_nModel == PM_TSTAT5E)
 	{
 		ClickMsflexgrid5E(m_nCurRow, m_nCurCol, rc);
 		return;
@@ -949,7 +949,7 @@ void CInputSetDlg::ClickMsflexgrid1()
 void CInputSetDlg::OnCbnSelchangeRangCombo()
 {
 //	if( m_nModel == 16 || m_nModel == PM_TSTAT6 )
-	if( multi_register_value[7] == PM_TSTAT5G || m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5E)  //tstat6
+	if(m_nModel == PM_TSTAT6 || m_nModel == PM_TSTAT7|| m_nModel == PM_TSTAT5E)  //tstat6
 	{
 		OnCbnSelchangeRangComboFor5E();
 	
@@ -961,8 +961,15 @@ void CInputSetDlg::OnCbnSelchangeRangCombo()
 	if(m_nCurRow==1&&m_nCurCol==RANG_FIELD)
 	{
 		int nindext=m_RangCombox.GetCurSel();
-		write_one(g_tstat_id,121,nindext);
-		//need refreshing:
+		int ret=write_one(g_tstat_id,121,nindext);
+		 if (ret>0)
+		 {
+		  product_register_value[121]=nindext;
+		 }
+		 else
+		 {
+		  AfxMessageBox(_T("Fail"));
+		 }
 	}
 
 	if(m_nCurRow==2&&m_nCurCol==RANG_FIELD)
@@ -1011,7 +1018,16 @@ void CInputSetDlg::OnCbnSelchangeRangCombo()
 	if(m_nCurRow==4&&m_nCurCol==RANG_FIELD)
 	{
 		int nindext=m_RangCombox.GetCurSel();
-		write_one(g_tstat_id,190,nindext);
+		int ret=write_one(g_tstat_id,190,nindext);
+		if (ret>0)
+		{
+		product_register_value[190]=nindext;
+		}
+		else
+		{
+		 AfxMessageBox(_T("Try again"));
+		}
+
 	}
 	Fresh_Grid();
 }
@@ -1399,32 +1415,61 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 	if(strText.CompareNoCase(strInName)==0)
 		return;
 	
+	if ((multi_register_value[7]==PM_TSTAT5E)||(multi_register_value[7]==PM_TSTAT6)||(multi_register_value[7]==PM_TSTAT7))
+	{
+		strText.TrimRight();
+		unsigned char p[8];//input+input1
+
+		for(int i=0;i<8;i++)
+		{
+			if(i<strText.GetLength())
+				p[i]=strText.GetAt(i);
+			else
+				p[i]=' ';
+		}
+		if (strText.GetLength()>8)
+		{
+			AfxMessageBox(_T(">8 chars"));
+		} 
+		else
+		{
+			if (Write_Multi(g_tstat_id,p,MODBUS_AI1_CHAR1+4*(lRow-2),8)>0)
+			{
+
+			} 
+			else
+			{
+				AfxMessageBox(_T("Error"));
+				return;
+			}
+
+		}
+	}
+
 	try
 	{
 
-	//if(g_serialNum>0&&multi_register_value[6]>0)
-	if(multi_register_value[6]>0)
-	{
-		_ConnectionPtr m_ConTmp;
-		_RecordsetPtr m_RsTmp;
-		m_ConTmp.CreateInstance("ADODB.Connection");
-		m_RsTmp.CreateInstance("ADODB.Recordset");
-		m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+		//if(g_serialNum>0&&multi_register_value[6]>0)
+		if(multi_register_value[6]>0)
+		{
+			_ConnectionPtr m_ConTmp;
+			_RecordsetPtr m_RsTmp;
+			m_ConTmp.CreateInstance("ADODB.Connection");
+			m_RsTmp.CreateInstance("ADODB.Recordset");
+			m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
 
-		CString strSerial;
-		strSerial.Format(_T("%d"),g_serialNum);
+			CString strSerial;
+			strSerial.Format(_T("%d"),g_serialNum);
 
-		CString strsql;
-		strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
-		m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-		if(VARIANT_FALSE==m_RsTmp->EndOfFile)//update
-		{			
-			CString strField;
-			switch (lRow)
-			{
-// 				case 1:
-// 					strField=_T("SENSORNAME");
-// 					break;
+			CString strsql;
+			strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
+			m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
+			if(VARIANT_FALSE==m_RsTmp->EndOfFile)//update
+			{			
+				CString strField;
+				switch (lRow)
+				{
+
 				case 2:
 					strField=_T("INPUT1");
 					break;
@@ -1449,27 +1494,27 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 				case 9:
 					strField=_T("INPUT8");
 					break;
-			}
+				}
 
-			try
-			{
+				try
+				{
 
-			CString str_temp;
-			str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
-			//AfxMessageBox(str_temp );
-			m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
-			m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
-			}
-			catch(_com_error *e)
-			{
-				AfxMessageBox(e->ErrorMessage());
-			}
+					CString str_temp;
+					str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
+					//AfxMessageBox(str_temp );
+					m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+					m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
+				}
+				catch(_com_error *e)
+				{
+					AfxMessageBox(e->ErrorMessage());
+				}
 
-		}
-		else//inerst
-		{
-			switch (lRow)
+			}
+			else//inerst
 			{
+				switch (lRow)
+				{
 				case 2:
 					g_strInName1=strText;
 					break;
@@ -1494,46 +1539,46 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 				case 9:
 					g_strInName8=strText;
 					break;
+				}
+
+				CString g_strInName9;
+				//g_strInName9 = _T("input9");Humidity Sensor
+				g_strInName9 = _T("Humidity Sensor");
+				CString	str_temp;
+				str_temp.Format(_T("insert into IONAME values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"),
+					strSerial,
+					g_strInName1,
+					g_strInName2,
+					g_strInName3,
+					g_strInName4,
+					g_strInName5,
+					g_strInName6,
+					g_strInName7,
+					g_strOutName1,
+					g_strOutName2,
+					g_strOutName3,
+					g_strOutName4,
+					g_strOutName5,
+					g_strOutName6,
+					g_strOutName7,
+					g_strInName8,
+					g_strInHumName,
+					g_strSensorName
+					);
+				try
+				{
+
+					m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+					m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
+				}
+				catch(_com_error *e)
+				{
+					AfxMessageBox(e->ErrorMessage());
+				}
 			}
 
-			CString g_strInName9;
-			//g_strInName9 = _T("input9");Humidity Sensor
-			g_strInName9 = _T("Humidity Sensor");
-			CString	str_temp;
-			str_temp.Format(_T("insert into IONAME values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"),
-				strSerial,
-				g_strInName1,
-				g_strInName2,
-				g_strInName3,
-				g_strInName4,
-				g_strInName5,
-				g_strInName6,
-				g_strInName7,
-				g_strOutName1,
-				g_strOutName2,
-				g_strOutName3,
-				g_strOutName4,
-				g_strOutName5,
-				g_strOutName6,
-				g_strOutName7,
-				g_strInName8,
-				g_strInHumName,
-				g_strSensorName
-				);
-			try
+			switch (lRow)
 			{
-
-			m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
-			m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
-			}
-			catch(_com_error *e)
-			{
-				AfxMessageBox(e->ErrorMessage());
-			}
-		}
-	
-		switch (lRow)
-		{
 			case 2:
 				g_strInName1=strText;
 				break;
@@ -1558,20 +1603,19 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 			case 9:
 				g_strInName8=strText;
 				break;
-		}
-		if(m_RsTmp->State) 
-			m_RsTmp->Close(); 
-		if(m_ConTmp->State)
-			m_ConTmp->Close();	
-	}	
+			}
+			if(m_RsTmp->State) 
+				m_RsTmp->Close(); 
+			if(m_ConTmp->State)
+				m_ConTmp->Close();	
+		}	
 
-		}
- 		catch (...)
- 		{
- 
- 
- 		}
+	}
+	catch (...)
+	{
 
+
+	}
 	
 }
 

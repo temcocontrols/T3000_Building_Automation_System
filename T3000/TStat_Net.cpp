@@ -167,6 +167,9 @@ CString CTStat_Net::GetProductName()
     case PM_CM5:
 	    strProductName="CM5_Ethernet";
 		break;
+	case PM_MINIPANEL:
+	    strProductName="MiniPanel";
+		break;
 	default:
 		strProductName="WIFI";
 

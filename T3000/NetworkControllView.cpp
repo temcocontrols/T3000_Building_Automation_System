@@ -39,6 +39,7 @@ CNetworkControllView::CNetworkControllView()
 	, m_strTime(_T(""))
 	, m_nListenPort(6001)
 	, m_bWarningBldVersion(FALSE)
+	, m_Mac_Address(_T(""))
 {
 	
 }
@@ -70,6 +71,7 @@ void CNetworkControllView::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BAUDRATE_COMBX, m_baudRateCombox);
 	DDX_Control(pDX, IDC_IDADDRESS_EDIT, m_idEdt);
 	DDX_Control(pDX, IDC_MSFLEXGRID_SUB, m_gridSub);
+	DDX_Text(pDX, IDC_MAC_ADDRESS, m_Mac_Address);
 }
 
 BEGIN_MESSAGE_MAP(CNetworkControllView, CFormView)
@@ -200,7 +202,7 @@ void CNetworkControllView::Fresh()
 	m_ip_addressCtrl.SetAddress((BYTE)multi_register_value[107],(BYTE)multi_register_value[108],(BYTE)multi_register_value[109],(BYTE)multi_register_value[110]);
 	m_subnet_addressCtrl.SetAddress((BYTE)multi_register_value[111],(BYTE)multi_register_value[112],(BYTE)multi_register_value[113],(BYTE)multi_register_value[114]);
 	m_gateway_addressCtrl.SetAddress((BYTE)multi_register_value[115],(BYTE)multi_register_value[116],(BYTE)multi_register_value[117],(BYTE)multi_register_value[118]);
-	OnBnClickedCheck1();
+	//OnBnClickedCheck1();
 		
 	if(multi_register_value[12]==0)
 	{
@@ -226,8 +228,14 @@ void CNetworkControllView::Fresh()
 	
 	m_nListenPort=multi_register_value[120];
 	InitGrid();
-
+	 m_Mac_Address=Get_MAC_Address();
 	UpdateData(false);
+}
+CString CNetworkControllView::Get_MAC_Address()
+{
+	CString Mac_ADD;
+	Mac_ADD.Format(_T("%02X-%02X-%02X-%02X-%02X-%02X"),multi_register_value[100],multi_register_value[101],multi_register_value[102],multi_register_value[103],multi_register_value[104],multi_register_value[105]);
+	return Mac_ADD;
 }
 void CNetworkControllView::OnBnClickedCheck1()
 {

@@ -61,7 +61,7 @@ public:
 	//CEdit		m_wnd2;
 public:
 
-
+void Read_SliderData();
 
 public:
 	
@@ -104,7 +104,7 @@ public:
 	// 这个函数是为了与之前的版本兼容
 	// 使用新的Slider，但是寄存器逻辑使用原来的
 	void InitSliderBars2();
-	
+	void UpdateSliderBars2();
 	void InitFlexSliderBars();
 	void Fresh_In();
 	void Fresh_Out();

@@ -518,7 +518,6 @@
     <None Include="UserImages.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="ReadMe.txt" />
     <None Include="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt" />
     <None Include="res\Refresh.ico">
       <Filter>Resource Files</Filter>
