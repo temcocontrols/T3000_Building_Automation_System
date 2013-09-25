@@ -229,6 +229,7 @@ private:
 //		void KeyDownMsflexgridInput3(short* KeyCode, short Shift);
 //		void RowColChangeMsflexgridInput3();
 		void ShowChangingData();
+		void ClickMsflexgridInput3();
 };
 
 

@@ -65,7 +65,7 @@ else if ((str.CompareNoCase(_T("ON"))==0)||(str.CompareNoCase(_T("Open"))==0))
 {
 	m_FlexGrid2.put_CellBackColor(YELLOW_COLOR);
 }
-else if ((str.CompareNoCase(_T("0-50"))==0)||(str.CompareNoCase(_T("50-100"))==0))
+else if ((str.CompareNoCase(_T("0-100"))==0)||(str.CompareNoCase(_T("50-100"))==0)||(str.CompareNoCase(_T("0-50"))==0))
 {
 	m_FlexGrid2.put_CellBackColor(ORANGE_COLOR);
 }
@@ -578,7 +578,16 @@ void COutPutDlg::FreshGrids()
 	else if (product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_TSTAT5G)
 	{
 		FreshGrid_PID1tstat6();
-		FreshGrid_PID2tstat6();
+		float version=get_curtstat_version();
+		if (product_register_value[7]==PM_TSTAT5E)
+		{
+         FreshGrid_PID2tstat6();
+		} 
+		else
+		{
+		FreshGrid_PID2tstat5GLessthan368();
+		}
+		
 	}
 	else
 	{
@@ -2125,13 +2134,7 @@ void COutPutDlg::ClickMsflexgrid1()
 	 if(lCol>5)
 	{
 		
-// 			286	245	1	Low byte	W/R	Interlock for  output1
-// 			287	246	1	Low byte	W/R	Interlock for  output2
-// 			288	247	1	Low byte	W/R	Interlock for  output3
-// 			289	248	1	Low byte	W/R	Interlock for  output4
-// 			290	249	1	Low byte	W/R	Interlock for  output5
-// 			291	250	1	Low byte	W/R	Interlock for  output6
-// 			292	251	1	Low byte	W/R	Interlock for  output7
+ 
 
 
 
@@ -2157,7 +2160,9 @@ void COutPutDlg::ClickMsflexgrid1()
 #if 1
 		//if(nValue==7&&(!m_bOut4PWM)&&(!m_bOut5PWM))
 		//if((nValue==7&&lRow<4)||(lRow==4 && !m_bOut4PWM&&nValue==7)||(lRow==5 && !m_bOut5PWM&&nValue==7))
-		if((nValue==7&&lRow<4)||(lRow==4 && !m_bOut4PWM&&nValue==7)||(lRow==5 && !m_bOut5PWM&&nValue==7)||(nValue==7&&lRow>5))//20121008
+		if((nValue==7&&lRow<4)||(lRow==4 && !m_bOut4PWM&&nValue==7)||
+		   (lRow==5 && !m_bOut5PWM&&nValue==7)||
+		   (nValue==7&&lRow>5))//20121008
 		{
 			m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("0%"));
@@ -2178,7 +2183,7 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On"));
-	/*		m_ItemValueCombx.AddString(_T("Close"));
+			/*		m_ItemValueCombx.AddString(_T("Close"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -2198,7 +2203,7 @@ void COutPutDlg::ClickMsflexgrid1()
 			 {
 			 if (lRow==6)
 				 {
-				 if (product_register_value[207]==0)
+				 if (product_register_value[MODBUS_OUTPUT1_SCALE]==0)
 					 {
 				m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
@@ -2233,7 +2238,7 @@ void COutPutDlg::ClickMsflexgrid1()
 			    } 
 			    else if (lRow==7)//lRow==7
 			    {
-				  if (product_register_value[208]==0)
+				  if (product_register_value[MODBUS_OUTPUT2_SCALE]==0)
 				  {
 				  m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
@@ -2265,87 +2270,82 @@ void COutPutDlg::ClickMsflexgrid1()
 			 else
 			 {
 			   
-			 if (lRow==6)
+			  	 if (lRow==6)
 				 {
-				 if (multi_register_value[186]!=0)
+				 if (product_register_value[MODBUS_OUTPUT1_SCALE]==0)
 					 {
-					 m_ItemValueCombx.ResetContent();
-					 m_ItemValueCombx.AddString(_T("Close"));
-					 m_ItemValueCombx.AddString(_T("Open"));
-					 m_ItemValueCombx.AddString(_T("0-100"));
-					 m_ItemValueCombx.AddString(_T("50-100"));
-					 m_ItemValueCombx.AddString(_T("0-50"));
-					 m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-					 m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-					 m_ItemValueCombx.BringWindowToTop();
-					 m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-					 m_ItemValueCombx.SetFocus(); //获取焦点
-					 } 
-				 else
-					 {
-					 m_ItemValueCombx.ResetContent();
-					 m_ItemValueCombx.AddString(_T("Off"));
-					 m_ItemValueCombx.AddString(_T("On"));
-					 //m_ItemValueCombx.AddString(_T("0-100"));
-					 //m_ItemValueCombx.AddString(_T("50-100"));
-					 //m_ItemValueCombx.AddString(_T("0-50"));
-					 m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-					 m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-					 m_ItemValueCombx.BringWindowToTop();
-					 m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-					 m_ItemValueCombx.SetFocus(); //获取焦点
-					 }
-				 }
-			else if (lRow==7)
-			{
-			if (multi_register_value[187]!=0)
-				{
 				m_ItemValueCombx.ResetContent();
-				m_ItemValueCombx.AddString(_T("Close"));
-				m_ItemValueCombx.AddString(_T("Open"));
-				m_ItemValueCombx.AddString(_T("0-100"));
-				m_ItemValueCombx.AddString(_T("50-100"));
-				m_ItemValueCombx.AddString(_T("0-50"));
-				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-				m_ItemValueCombx.BringWindowToTop();
-				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-				m_ItemValueCombx.SetFocus(); //获取焦点
+			m_ItemValueCombx.AddString(_T("Off"));
+			m_ItemValueCombx.AddString(_T("On")); 
+			/*m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Open"));
+			m_ItemValueCombx.AddString(_T("0-100"));
+			m_ItemValueCombx.AddString(_T("50-100"));
+			m_ItemValueCombx.AddString(_T("0-50"));*/
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.BringWindowToTop();
+			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
+			m_ItemValueCombx.SetFocus(); //获取焦点
 				} 
-			else
+				else
 				{
-				m_ItemValueCombx.ResetContent();
-				m_ItemValueCombx.AddString(_T("Off"));
-				m_ItemValueCombx.AddString(_T("On"));
-				//m_ItemValueCombx.AddString(_T("0-100"));
-				//m_ItemValueCombx.AddString(_T("50-100"));
-				//m_ItemValueCombx.AddString(_T("0-50"));
-				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-				m_ItemValueCombx.BringWindowToTop();
-				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-				m_ItemValueCombx.SetFocus(); //获取焦点
+				  m_ItemValueCombx.ResetContent();
+			/*m_ItemValueCombx.AddString(_T("Off"));
+			m_ItemValueCombx.AddString(_T("On"));*/
+			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Open"));
+			m_ItemValueCombx.AddString(_T("0-100"));
+			m_ItemValueCombx.AddString(_T("50-100"));
+			m_ItemValueCombx.AddString(_T("0-50"));
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.BringWindowToTop();
+			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
+			m_ItemValueCombx.SetFocus(); //获取焦点
 				}
-			} 
-			else
-			{
-			}
+			    } 
+			    else if (lRow==7)//lRow==7
+			    {
+				  if (product_register_value[MODBUS_OUTPUT2_SCALE]==0)
+				  {
+				  m_ItemValueCombx.ResetContent();
+			m_ItemValueCombx.AddString(_T("Off"));
+			m_ItemValueCombx.AddString(_T("On")); 
 			 
-			
-			   
-			  
-			  
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.BringWindowToTop();
+			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
+			m_ItemValueCombx.SetFocus(); //获取焦点
+				  } 
+				  else
+				  {
+				    m_ItemValueCombx.ResetContent();
+			 
+			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Open"));
+			m_ItemValueCombx.AddString(_T("0-100"));
+			m_ItemValueCombx.AddString(_T("50-100"));
+			m_ItemValueCombx.AddString(_T("0-50"));
+			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+			m_ItemValueCombx.BringWindowToTop();
+			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
+			m_ItemValueCombx.SetFocus(); //获取焦点
+				  }
+			    }
 			 }
 		}
 		 
 #endif
-		
-		 
 	}
 	//后来修改了，不在限制在四和第五行了。现在都支持PWM模式了
 	if(lCol>5)
 	{   
-	    if (product_register_value[MODBUS_MODE_OUTPUT1+lRow-1]!=0)
+	    if (lRow<=5)
+	    {
+		if(product_register_value[MODBUS_MODE_OUTPUT1+lRow-1]==3)
 	    {
 				m_ItemValueCombx.ResetContent();
 				m_ItemValueCombx.AddString(_T("Close"));
@@ -2364,46 +2364,17 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On"));
-	/*		m_ItemValueCombx.AddString(_T("Close"));
-			m_ItemValueCombx.AddString(_T("Open"));
-			m_ItemValueCombx.AddString(_T("0-100"));
-			m_ItemValueCombx.AddString(_T("50-100"));
-			m_ItemValueCombx.AddString(_T("0-50"));*/
+	
 			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
 			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 			m_ItemValueCombx.BringWindowToTop();
 			m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
 			m_ItemValueCombx.SetFocus(); //获取焦点
 		}
+	    }
+
 	    
-		//if(lRow==4 && (m_bOut4PWM/*||m_bFloat*/))
-		//{
-		//	m_ItemValueCombx.ResetContent();
-		//	m_ItemValueCombx.AddString(_T("Close"));
-		//	m_ItemValueCombx.AddString(_T("Open"));
-		//	m_ItemValueCombx.AddString(_T("0-100"));
-		//	m_ItemValueCombx.AddString(_T("50-100"));
-		//	m_ItemValueCombx.AddString(_T("0-50"));
-		//	m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-		//	m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-		//	m_ItemValueCombx.BringWindowToTop();
-		//	m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-		//	m_ItemValueCombx.SetFocus(); //获取焦点
-		//}
-		//if(lRow==5 && (m_bOut5PWM/*||m_bFloat*/))
-		//{
-		//	m_ItemValueCombx.ResetContent();
-		//	m_ItemValueCombx.AddString(_T("Close"));
-		//	m_ItemValueCombx.AddString(_T("Open"));
-		//	m_ItemValueCombx.AddString(_T("0-100"));
-		//	m_ItemValueCombx.AddString(_T("50-100"));
-		//	m_ItemValueCombx.AddString(_T("0-50"));
-		//	m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
-		//	m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
-		//	m_ItemValueCombx.BringWindowToTop();
-		//	m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
-		//	m_ItemValueCombx.SetFocus(); //获取焦点
-		//}
+	
 
 
 
@@ -2414,11 +2385,6 @@ void COutPutDlg::ClickMsflexgrid1()
 
 void COutPutDlg::OnCbnKillfocusValueitemcombo()
 {
-
-
-
-
-
 // 	341	375				reserved, wall setpoint
 // 		342	376				reserved,ceiling setpoint
 // 		343	377				reserved,average setpoint
@@ -3346,7 +3312,7 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 		//	FreshGrids();
 
 	}
-	else if (product_register_value[7]==16)
+	else if(product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_TSTAT5G)
 	{
 			if(g_OutPutLevel==1)
 			return;
@@ -3676,8 +3642,12 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 			}
 			else//grid 2:
 			{
-
-					if(product_register_value[MODBUS_FAN_SPEED]==4)//Auto 
+			      float version=get_curtstat_version();
+			      if (product_register_value[7]==PM_TSTAT5G&&version<36.8)
+			      {
+				  #if 1
+//Auto
+				 if(product_register_value[MODBUS_FAN_SPEED]==4)//Auto 
 					{
 						if((col-5) < (m_PID2_heat_stages+1))
 						pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
@@ -3754,13 +3724,189 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 						 product_register_value[MODBUS_UNIVERSAL_VALVE_BEGIN+pos]=tstatval;
 					 
 					 }
+						}
+					
+					//OFF
+					else
+						{
+
+							if((col-5) < (m_PID2_heat_stages+1))
+							pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+						else
+							pos = (col-5) - (m_PID2_heat_stages+1);
+						m_FlexGrid2.put_Col(col);////////////////////////////////////////////////////////
+
+
+						if (m_nCurRow<=5)
+						{
+						for( row_temp = 1;row_temp<=totalrows;row_temp++)//***********************row_temp==totalrows+1
+						{
+							m_FlexGrid2.put_Row(row_temp);////////////////////////////////////////////////////
+							if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+							{
+								if(row_temp == 1)
+									tstatval &= 0xFE;
+								if(row_temp == 2)
+									tstatval &= 0xFD;
+								if(row_temp == 3)
+									tstatval &= 0xFB ;
+								if(row_temp == 4)
+									tstatval &= 0xF7;
+								if(row_temp == 5)
+									tstatval &= 0xEF;
+								tstatval |= cellval << (row_temp -1) ;
+							}
+
+						}
+						if(write_one(g_tstat_id,385+ pos,tstatval)<0)
+							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+							product_register_value[385+ pos] = tstatval;
+						}
+						else
+						{
+						  if (product_register_value[MODBUS_FAN_SPEED]==0)
+						  {totalrows = 6 ;////////////////
+							if((col-5) < (m_PID2_heat_stages+1))
+								pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+							else
+								pos = (col-5) - (m_PID2_heat_stages+1);
+							m_FlexGrid2.put_Col(col);
+							//tstatval &= 0x3F ;//clear 7 bit and 8 bit  for 0-50
+							tstatval=0;
+							for( row_temp=totalrows;row_temp<=totalrows+1;row_temp++)
+							{
+								m_FlexGrid2.put_Row(row_temp);	
+								if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+								{
+									if(cellval==4 )
+									{//for 0-50
+										if(row_temp==totalrows)
+											tstatval |=64;
+										else if(row_temp==(totalrows+1))
+											tstatval |=128;
+									}
+									else
+									{
+										if(row_temp == totalrows)
+										{
+											tstatval &= 0xFC ;
+										}
+										if(row_temp == totalrows+1)
+										{
+											tstatval &= 0xF3 ;
+											cellval <<= 2 ; 
+										}
+										tstatval |= cellval  ;
+									}
+								}
+
+							}
+							//
+
+							if(write_one(g_tstat_id,392+pos,tstatval)<0)//没找到对应的值。
+							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+							return;
+							}
+							product_register_value[392+pos]=tstatval;
+						    }
+							
+						}
+
 			
 
-					 
 						 
-							
-					 
+							 
+
+						 
 						}
+                  #endif
+
+
+			      } 
+			      else
+			      {
+				  
+				  
+				    if(product_register_value[MODBUS_FAN_SPEED]==4)//Auto 
+					{
+						if((col-5) < (m_PID2_heat_stages+1))
+						pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+					else
+						pos = (col-5) - (m_PID2_heat_stages+1);
+					m_FlexGrid2.put_Col(col);////////////////////////////////////////////////////////
+					 if (m_nCurRow<=5)
+					 {
+					 for( row_temp = 1;row_temp<=totalrows;row_temp++)//***********************row_temp==totalrows+1
+					{
+						m_FlexGrid2.put_Row(row_temp);////////////////////////////////////////////////////
+						if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+						{
+							if(row_temp == 1)
+								tstatval &= 0xFE;
+							if(row_temp == 2)
+								tstatval &= 0xFD;
+							if(row_temp == 3)
+								tstatval &= 0xFB ;
+							if(row_temp == 4)
+								tstatval &= 0xF7;
+							if(row_temp == 5)
+								tstatval &= 0xEF;
+							tstatval |= cellval << (row_temp -1) ;
+						}
+
+					}
+					if(write_one(g_tstat_id,MODBUS_UNIVERSAL_OUTPUT_BEGIN + pos,tstatval)<0)
+						{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+						product_register_value[MODBUS_UNIVERSAL_OUTPUT_BEGIN + pos] = tstatval;
+					 }
+					 else
+					 {
+						 totalrows = 6 ;////////////////
+						 if((col-5) < (m_PID2_heat_stages+1))
+							 pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - (col-5) ;
+						 else
+							 pos = (col-5) - (m_PID2_heat_stages+1);
+						 m_FlexGrid2.put_Col(col);
+						 //tstatval &= 0x3F ;//clear 7 bit and 8 bit  for 0-50
+						 tstatval=0;
+						 for( row_temp=totalrows;row_temp<=totalrows+1;row_temp++)
+						 {
+							 m_FlexGrid2.put_Row(row_temp);	
+							 if(string2digital(m_FlexGrid2.get_Text(),cellval,ty))
+							 {
+								 if(cellval==4 )
+								 {//for 0-50
+									 if(row_temp==totalrows)
+										 tstatval |=64;
+									 else if(row_temp==(totalrows+1))
+										 tstatval |=128;
+								 }
+								 else
+								 {
+									 if(row_temp == totalrows)
+									 {
+										 tstatval &= 0xFC ;
+									 }
+									 if(row_temp == totalrows+1)
+									 {
+										 tstatval &= 0xF3 ;
+										 cellval <<= 2 ; 
+									 }
+									 tstatval |= cellval  ;
+								 }
+							 }
+
+						 }
+						 //
+
+						 if(write_one(g_tstat_id,MODBUS_UNIVERSAL_VALVE_BEGIN+pos,tstatval)<0)//没找到对应的值。
+						 {MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
+						 product_register_value[MODBUS_UNIVERSAL_VALVE_BEGIN+pos]=tstatval;
+					 
+					 }
+						}
+					
+					//OFF
 					else
 						{
 
@@ -3851,11 +3997,14 @@ void COutPutDlg::OnWrite(bool bflexgrid1_or_2,int col,int row)
 
 						 
 						}
+			      }
+					
 			   
 
 				
 			}
 		}
+	FreshGrids();
 	}
 	else
 	{
@@ -4498,7 +4647,8 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 					product_register_value[125] = nValue;
 				}
 			}
-		}else
+		}
+		else
 		{
 		if(m_fan.GetCurSel()==0)
 		{
@@ -4855,9 +5005,7 @@ void COutPutDlg::ClickMsflexgrid2()
 				m_ItemValueCombx.SetFocus(); //获取焦点
 				}
 			} 
-			else
-			{
-			}
+			
 			 
 			
 			   
@@ -4922,15 +5070,22 @@ void COutPutDlg::OnEnKillfocusPid2Heatstageedit2()
 	}
 	else
 	{
-		//268	330	1	Low byte	W/R	Number of Heating Stages (Max heat+cool = 6)
-
-		//if (newtstat6[7] == PM_TSTAT6)
+		 
 		 
 			int ret=write_one(g_tstat_id,MODBUS_HEAT_UNIVERSAL_TABLE,m_PID2_heat_stages);
 			if (ret>0)
 			{
 			product_register_value[MODBUS_HEAT_UNIVERSAL_TABLE] = m_PID2_heat_stages;
-			FreshGrid_PID2tstat6();
+			float version=get_curtstat_version();
+			if (version>=36.8||product_register_value[7]==PM_TSTAT5E)
+			{
+				FreshGrid_PID2tstat6();
+			} 
+			else
+			{
+				FreshGrid_PID2tstat5GLessthan368();
+			}
+			
 			}
 			else
 			{
@@ -4966,7 +5121,15 @@ void COutPutDlg::OnEnKillfocusPid2coolstageedit2()
 			if (ret>0)
 			{
 				product_register_value[MODBUS_COOL_UNIVERSAL_TABLE] =m_PID2_cool_stages;
-				FreshGrid_PID2tstat6();
+				float version=get_curtstat_version();
+				if (version>=36.8||product_register_value[7]==PM_TSTAT5E)
+				{
+					FreshGrid_PID2tstat6();
+				} 
+				else
+				{
+					FreshGrid_PID2tstat5GLessthan368();
+				}
 			}
 			else
 			{
@@ -5802,7 +5965,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 
 #if 1
 	////////////////////////down code is for m_flexgrid2
-	//for(int col = 1 ;col <= (m_PID2_heat_stages+m_PID2_heat_stages+1);col++)
+ 
 	if (product_register_value[MODBUS_FAN_SPEED]==4)
 	 //Auto
 	{
@@ -5924,8 +6087,8 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 	} 
 	else//OFF
 	{
-
-		for(int col = 1 ;col <= (m_PID2_heat_stages+m_PID2_cool_stages+1);col++)
+ 
+	for(int col = 1 ;col <= (m_PID2_heat_stages+m_PID2_cool_stages+1);col++)
 	{
 		if(col < (m_PID2_heat_stages+1))
 			pos = (m_PID2_cool_stages+m_PID2_heat_stages+1) - col ;
@@ -5945,12 +6108,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 			}
 		}
 	}
-	
-	
-	
-	
-	
-	
+
 	for(int col = 1 ;col <=(m_PID2_heat_stages+m_PID2_cool_stages+1);col++)
 		{
 			if(col < (m_PID2_heat_stages+1))
@@ -6270,7 +6428,558 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 	}
 }
 
+void COutPutDlg::FreshGrid_PID2tstat5GLessthan368()
+{
+//	268	330	1	Low byte	W/R	Number of Heating Stages (Max heat+cool = 6)
+//	269	331	1	Low byte	W/R	Number of Cooling Stages (Max heat + Cool = 6) 
 
+    int nValue;
+	strdemo = _T("2,");
+	SetPaneString(2,strdemo);
+
+	CString strTemp;
+	m_PID2_heat_stages=product_register_value[MODBUS_HEAT_UNIVERSAL_TABLE];//276 register ,heat stages
+	m_PID2_cool_stages=product_register_value[MODBUS_COOL_UNIVERSAL_TABLE];//277 register ,cool stages
+	if(m_PID2_heat_stages==0&&m_PID2_cool_stages==0)
+	{
+		//write_one(g_tstat_id,330,3);
+		//write_one(g_tstat_id,331,3);
+// 		newtstat6[330] = 3;
+// 		newtstat6[331] =3;
+		m_PID2_heat_stages=3;
+		m_PID2_cool_stages=3;
+		if(m_PID2_heat_stages>6)
+			m_PID2_heat_stages=6;
+		if(m_PID2_cool_stages>6)
+			m_PID2_cool_stages=6;
+	}
+ 
+
+	strTemp.Format(_T("%d"),m_PID2_heat_stages);
+	m_PID2_heatEdit.SetWindowText(strTemp);
+	strTemp.Format(_T("%d"),m_PID2_cool_stages);
+	m_PID2_coolEdit.SetWindowText(strTemp);
+
+	m_FlexGrid2.put_Rows(8);
+	m_FlexGrid2.put_Cols(m_PID2_heat_stages+m_PID2_cool_stages+7);//3 because 1/pid;2/out1;3/coast 4/interlock
+	//*****************************************
+	m_FlexGrid2.put_TextMatrix(0,1,_T("Description"));
+	m_FlexGrid2.put_TextMatrix(0,2,_T("Function"));
+	m_FlexGrid2.put_ColWidth(2,0);
+	m_FlexGrid2.put_TextMatrix(0,3,_T("Rotation"));
+	m_FlexGrid2.put_ColWidth(3,0);
+	m_FlexGrid2.put_TextMatrix(0,4,_T("Control"));
+	m_FlexGrid2.put_TextMatrix(0,5,_T("Interlock"));
+	int i=0;
+	for(i=0;i<m_PID2_heat_stages;i++)
+		m_FlexGrid2.put_TextMatrix(0,6+i,heat_hand[m_PID2_heat_stages-i-1]);
+	m_FlexGrid2.put_TextMatrix(0,m_PID2_heat_stages+6,_T("Coast"));
+	for(i=0;i<m_PID2_cool_stages;i++)
+		m_FlexGrid2.put_TextMatrix(0,m_PID2_heat_stages+7+i,cool_hand[i]);
+
+
+//	m_FlexGrid1.put_Rows(8);
+//	m_FlexGrid1.put_Cols(m_PID2_heat_stages+m_PID2_cool_stages+7);//interlock control first_blank coast
+
+
+	m_FlexGrid2.put_TextMatrix(1,1,g_strOutName1);
+	m_FlexGrid2.put_TextMatrix(2,1,g_strOutName2);
+	m_FlexGrid2.put_TextMatrix(3,1,g_strOutName3);
+	m_FlexGrid2.put_TextMatrix(4,1,g_strOutName4);
+	m_FlexGrid2.put_TextMatrix(5,1,g_strOutName5);
+	m_FlexGrid2.put_TextMatrix(6,1,g_strOutName6);
+	m_FlexGrid2.put_TextMatrix(7,1,g_strOutName7);
+
+	m_FlexGrid2.put_TextMatrix(1,0,_T("1"));
+	m_FlexGrid2.put_TextMatrix(2,0,_T("2"));
+	m_FlexGrid2.put_TextMatrix(3,0,_T("3"));
+	m_FlexGrid2.put_TextMatrix(4,0,_T("4"));
+	m_FlexGrid2.put_TextMatrix(5,0,_T("5"));
+	m_FlexGrid2.put_TextMatrix(6,0,_T("6"));
+	m_FlexGrid2.put_TextMatrix(7,0,_T("7"));
+
+	m_FlexGrid2.put_ColAlignment(0,4);
+	m_FlexGrid2.put_ColAlignment(1,4);
+	//*****************************888、
+
+
+	int totalrows,row;
+	unsigned short tstatval,pos;
+
+
+		totalrows = 7;
+
+	int pid_select2[7]={0};
+
+		for(i=0;i<7;i++)
+			pid_select2[i]=product_register_value[MODBUS_PID_OUTPUT1+i];/////////////////////////////get pid select ;col one 1
+
+
+
+#if 1
+	////////////////////////down code is for m_flexgrid2
+ 
+	if (product_register_value[MODBUS_FAN_SPEED]==4)
+	 //Auto
+	{
+	for(int col = 1 ;col <= (m_PID2_heat_stages+m_PID2_cool_stages+1);col++)
+	{
+		if(col < (m_PID2_heat_stages+1))
+			pos = (m_PID2_cool_stages+m_PID2_heat_stages+1) - col ;
+		else
+			pos = col - (m_PID2_heat_stages+1);
+		//254	281	1	Low byte	W/R	PID2 Output table- Coasting
+		tstatval = product_register_value[MODBUS_UNIVERSAL_OUTPUT_BEGIN + pos];
+		for( row = 1;row<=totalrows;row++)//****************************
+		{
+			CString str;
+			{
+				if(digital2string((tstatval >> (row-1)) & 0x01,str,FAN))
+					if(pid_select2[row-1]==0)
+					FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
+					else
+					FLEX_GRID2_PUT_STR(row,col,str);//col +1
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	
+	for(int col = 1 ;col <=(m_PID2_heat_stages+m_PID2_cool_stages+1);col++)
+		{
+			if(col < (m_PID2_heat_stages+1))
+				pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - col ;
+			else
+				pos = col - (m_PID2_heat_stages+1);
+
+				tstatval = product_register_value[MODBUS_UNIVERSAL_VALVE_BEGIN+ pos];
+		 
+			///////////////////////////////////////////
+
+
+			for(row=totalrows-1;row<=totalrows;row++)//row value
+			{
+				if (row==4&&m_bOut4PWM)
+				{
+					continue;
+				}
+				if (row==5&&m_bOut5PWM)
+				{
+					continue;
+				}
+			
+				int nOutReg;
+				nOutReg=MODBUS_INTERLOCK_OUTPUT1+row-1;
+				nValue=product_register_value[nOutReg];
+				if(nValue==7)
+					continue;
+
+
+				CString str;
+				if(tstatval>63)//
+				{
+					//
+					if(row==(totalrows-1))
+					{
+						if(tstatval & 64)
+						{
+							if(digital2string(4,str,VALVE))//for 7 or 8 bit
+								if(pid_select2[row-1]==0)
+								FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
+								else
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
+						}
+						else
+						{ 
+							if(digital2string(tstatval & 0x03,str,VALVE))//*** value
+							{
+								if(pid_select2[row-1]==0)
+								FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
+								else
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
+							}
+						}
+					}
+					if(row==totalrows)
+					{
+						if(tstatval & 128)
+						{
+							if(digital2string(4,str,VALVE))//for 7 or 8 bit
+							{
+								if(pid_select2[row-1]==0)
+								FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
+								else
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
+							}
+
+						}else
+						{
+							if(digital2string((tstatval >> 2) & 0x03,str,VALVE))//*** value
+							{
+								if(pid_select2[row-1]==0)
+									FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
+								else
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
+							}
+						}
+					}
+				}
+				else
+				{
+					if(digital2string((tstatval >> ((row-totalrows+1)*2)) & 0x03,str,VALVE))//*** value
+						if(pid_select2[row-1]==0)
+						FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
+						else
+						FLEX_GRID2_PUT_STR(row,col,str);//col +1
+				}
+			}
+		}
+	} 
+	else//OFF
+	{
+ //FAN
+	for(int col = 1 ;col <= (m_PID2_heat_stages+m_PID2_cool_stages+1);col++)
+	{
+		if(col < (m_PID2_heat_stages+1))
+			pos = (m_PID2_cool_stages+m_PID2_heat_stages+1) - col ;
+		else
+			pos = col - (m_PID2_heat_stages+1);
+		//254	281	1	Low byte	W/R	PID2 Output table- Coasting
+		tstatval = product_register_value[385 + pos];
+		for( row = 1;row<=totalrows;row++)//****************************
+		{
+			CString str;
+			{
+				if(digital2string((tstatval >> (row-1)) & 0x01,str,FAN))
+					if(pid_select2[row-1]==0)
+					FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
+					else
+					FLEX_GRID2_PUT_STR(row,col,str);//col +1
+			}
+		}
+	}
+//VALVE
+	for(int col = 1 ;col <=(m_PID2_heat_stages+m_PID2_cool_stages+1);col++)
+		{
+			if(col < (m_PID2_heat_stages+1))
+				pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - col ;
+			else
+				pos = col - (m_PID2_heat_stages+1);
+
+				tstatval = product_register_value[392+ pos];
+		 
+			///////////////////////////////////////////
+
+
+			for(row=totalrows-1;row<=totalrows;row++)//row value
+			{
+				if (row==4&&m_bOut4PWM)
+				{
+					continue;
+				}
+				if (row==5&&m_bOut5PWM)
+				{
+					continue;
+				}
+			
+				int nOutReg;
+				nOutReg=MODBUS_INTERLOCK_OUTPUT1+row-1;
+				nValue=product_register_value[nOutReg];
+				if(nValue==7)
+					continue;
+
+
+				CString str;
+				if(tstatval>63)//
+				{
+					//
+					if(row==(totalrows-1))
+					{
+						if(tstatval & 64)
+						{
+							if(digital2string(4,str,VALVE))//for 7 or 8 bit
+								if(pid_select2[row-1]==0)
+									FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
+								else
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
+						}
+						else
+						{ 
+							if(digital2string(tstatval & 0x03,str,VALVE))//*** value
+							{
+								if(pid_select2[row-1]==0)
+								FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
+								else
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
+							}
+						}
+					}
+					if(row==totalrows)
+					{
+						if(tstatval & 128)
+						{
+							if(digital2string(4,str,VALVE))//for 7 or 8 bit
+							{
+								if(pid_select2[row-1]==0)
+								FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
+								else
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
+							}
+
+						}else
+						{
+							if(digital2string((tstatval >> 2) & 0x03,str,VALVE))//*** value
+							{
+								if(pid_select2[row-1]==0)
+									FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
+								else
+								FLEX_GRID2_PUT_STR(row,col,str);//col +1
+							}
+						}
+					}
+				}
+				else
+				{
+					if(digital2string((tstatval >> ((row-totalrows+1)*2)) & 0x03,str,VALVE))//*** value
+						if(pid_select2[row-1]==0)
+						FLEX_GRID2_PUT_COLOR_STR(row,col,str);//col +1
+						else
+						FLEX_GRID2_PUT_STR(row,col,str);//col +1
+				}
+			}
+		}
+
+	}
+	
+ 
+#endif
+#if 1
+	 
+
+	//328	266	1	Low byte	W/R	"Output1 Function setting:
+	//0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
+
+
+
+	int  nFunction=product_register_value[MODBUS_OUTPUT1_FUNCTION];
+
+
+	unsigned short interlock[7]={0};
+	for(int i=0;i<7;i++)
+	{
+		interlock[i]=product_register_value[MODBUS_INTERLOCK_OUTPUT1+i];
+	}
+	//	Read_Multi(tstat_id,interlock,286,7);
+
+	CString str;
+	TCHAR *interlock_str[]={_T("On"),_T("DI1"),_T("AI1"),_T("AI2"),_T("Timer Or"),_T("Timer And"),_T("Interlock Timer"),_T("FreeCool")};
+
+
+	for(i=0;i<totalrows;i++)
+	{		
+
+		switch(interlock[i])
+		{
+			//case 0:m_FlexGrid.put_TextMatrix(i+1,5,interlock_str[0]);m_FlexGrid2.put_TextMatrix(i+1,5,interlock_str[0]);break;
+		case 0:
+		m_FlexGrid1.put_TextMatrix(i+1,5,_T("      -"));
+		m_FlexGrid2.put_TextMatrix(i+1,5,_T("      -"));
+		break;
+		case 1:
+		m_FlexGrid1.put_TextMatrix(i+1,5,interlock_str[1]);
+		m_FlexGrid2.put_TextMatrix(i+1,5,interlock_str[1]);
+		break;
+		case 2:
+		m_FlexGrid1.put_TextMatrix(i+1,5,interlock_str[2]);
+		m_FlexGrid2.put_TextMatrix(i+1,5,interlock_str[2]);
+		break;
+		case 3:
+		m_FlexGrid1.put_TextMatrix(i+1,5,interlock_str[3]);
+		m_FlexGrid2.put_TextMatrix(i+1,5,interlock_str[3]);
+		break;
+		case 4:
+		m_FlexGrid1.put_TextMatrix(i+1,5,interlock_str[4]);
+		m_FlexGrid2.put_TextMatrix(i+1,5,interlock_str[4]);
+		break;
+		case 5:
+		m_FlexGrid1.put_TextMatrix(i+1,5,interlock_str[5]);
+		m_FlexGrid2.put_TextMatrix(i+1,5,interlock_str[5]);
+		break;
+		case 6:m_FlexGrid1.put_TextMatrix(i+1,5,interlock_str[6]);
+		m_FlexGrid2.put_TextMatrix(i+1,5,interlock_str[6]);
+		break;
+		case 7:
+		m_FlexGrid1.put_TextMatrix(i+1,5,interlock_str[7]);
+		m_FlexGrid2.put_TextMatrix(i+1,5,interlock_str[7]);
+		break;
+
+		default:m_FlexGrid1.put_TextMatrix(i+1,5,interlock_str[0]);m_FlexGrid2.put_TextMatrix(i+1,5,interlock_str[0]);break;
+		}
+		switch(pid_select2[i])
+		{
+		case 0:str = _T("PID1");break;
+		case 1:str = _T("PID2");break;
+		case 2:str = _T("MAX(PID1,PID2)");break;
+		case 3:str = _T("MIN(PID1,PID2)");break;
+		default:str = _T("PID2");break;
+		}
+ 		m_FlexGrid1.put_TextMatrix(i+1,4,str);
+ 		m_FlexGrid2.put_TextMatrix(i+1,4,str);		
+
+	/*	m_FlexGrid1.put_TextMatrix(i+1,4,_T("PID1"));//Marked by Fance ,don't know why???
+		m_FlexGrid2.put_TextMatrix(i+1,4, _T("PID2"));*/
+	}
+
+
+#if 1
+	for( row = 1;row<=totalrows;row++)//row value
+	{  
+		if(pid_select2[row-1]==2)
+		{		
+			if(i_104_pid1>i_268_pid2)
+			{
+				for(int col = 6 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1)+5;col++)
+				{
+					m_FlexGrid1.put_Row(row);
+					m_FlexGrid1.put_Col(col);
+					m_FlexGrid1.put_CellForeColor(FLEXGRID_CELL_COLOR);
+				}
+				for(int col =6 ;col <=(m_PID2_cool_stages+m_PID2_heat_stages+1)+5;col++)
+				{
+					m_FlexGrid2.put_Row(row);
+					m_FlexGrid2.put_Col(col);
+					m_FlexGrid2.put_CellBackColor(FLEXGRID_CELL_COLOR);
+				}
+			}
+			else//i_104_pid1<=i_268_pid2
+			{
+				for(int col = 6 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1)+5;col++)
+				{
+					m_FlexGrid1.put_Row(row);
+					m_FlexGrid1.put_Col(col);
+					m_FlexGrid1.put_CellBackColor(FLEXGRID_CELL_COLOR);
+
+				}
+				for(int col = 6 ;col <=(m_PID2_cool_stages+m_PID2_heat_stages+1)+5;col++)
+				{
+
+					m_FlexGrid2.put_Row(row);
+					m_FlexGrid2.put_Col(col);
+					m_FlexGrid2.put_CellForeColor(FLEXGRID_CELL_COLOR);
+				}
+
+			}
+		}
+	}
+#endif
+
+	#endif
+
+
+	if(product_register_value[MODBUS_MODE_OUTPUT4]==3)
+	{
+		m_bOut4PWM=TRUE;
+	}
+	if(product_register_value[MODBUS_MODE_OUTPUT5]==3)
+	{
+		m_bOut5PWM=TRUE;
+	}
+
+	if(m_bOut4PWM)
+	{
+
+		for(int col = 1 ;col <=(m_PID2_heat_stages+m_PID2_cool_stages+1);col++)
+		{
+			int nValue=0;
+			if(col < (m_PID2_heat_stages+1))
+				pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - col ;
+			else
+				pos = col - (m_PID2_heat_stages+1);			
+			//tstatval = product_register_value[323+ pos];
+			int indext=-1;
+			//nValue=read_one(tstat_id,341+pos);
+			//nValue=multi_register_value[341+pos];//这项没找到对应项   //Annul by Fance
+
+			nValue=product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+pos];//modify by Fance  341  591
+
+			nValue=nValue>>4;
+			switch(nValue)
+			{
+			case 0:
+				strTemp=_T("Close");
+				break;
+			case 1:
+				strTemp=_T("Open");
+				break;
+			case 2:
+				strTemp="0-100";
+				break;
+			case 3:
+				strTemp=_T("50-100");
+				break;
+			case 4:
+				strTemp=_T("0-50");
+				break;
+			default:
+				strTemp=_T("");
+			}
+
+			if(pid_select2[3]==0)
+			FLEX_GRID2_PUT_COLOR_STR(4,col,strTemp);//col +1
+			else
+			FLEX_GRID2_PUT_STR(4,col,strTemp);//col +1
+
+
+			//FLEX_GRID2_PUT_STR(4,col,strTemp)//col +1
+		}
+	}	
+	if(m_bOut5PWM)
+	{
+		for(int col = 1 ;col <=(m_PID2_heat_stages+m_PID2_cool_stages+1);col++)
+		{
+			int nValue=0;
+			if(col < (m_PID2_heat_stages+1))
+				pos = (m_PID2_heat_stages+m_PID2_cool_stages+1) - col ;
+			else
+				pos = col - (m_PID2_heat_stages+1);			
+			 
+			int indext=-1;
+
+			//nValue=multi_register_value[341+pos];//这项没找到对应项		 //Annul by Fance
+			nValue=product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+pos];//modify by Fance  341  591
+
+			nValue=nValue&0x0f;
+			switch(nValue)
+			{
+			case 0:
+				strTemp=_T("Close");
+				break;
+			case 1:
+				strTemp=_T("Open");
+				break;
+			case 2:
+				strTemp=_T("0-100");
+				break;
+			case 3:
+				strTemp=_T("50-100");
+				break;
+			case 4:
+				strTemp=_T("0-50");
+				break;
+			default:
+				strTemp=_T("");
+			}
+			if(pid_select2[4]==0)
+				FLEX_GRID2_PUT_COLOR_STR(5,col,strTemp);//col +1
+			else
+			FLEX_GRID2_PUT_STR(5,col,strTemp);//col +1
+				//totalrows
+		}
+	}
+}
 void COutPutDlg::OnBnClickedUpdate()
 {
 

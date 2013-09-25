@@ -93,7 +93,7 @@ public:
 	void Refresh();
 	void Refresh6();
 	void Reflesh_ParameterDlg();
-
+	void Read_SliderData();
 	void InitPID2ComboBox();
 	void  UpdateCoolingandHeatingData();
 public:

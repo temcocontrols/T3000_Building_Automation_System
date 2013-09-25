@@ -134,64 +134,74 @@ BOOL CComWriter::WriteCommandtoReset()
 	}
 	
 	int nRet = Write_One(m_szMdbIDs[0],16,127);   // 进入ISP模式
-			   Sleep(2000);
-			   int Chipsize=read_one(m_szMdbIDs[0],11,5);
-			  
-		
-		   if (Chipsize<37)	//64K
-		   {
-		      if (m_nHexFileType==0)
-		      {
-				  strTips = _T("|hex file   match with the chip!");
-				  OutPutsStatusInfo(strTips);
-		      } 
-		      else
-		      {
-				  int ii=0;
-				  while(ii<=5){
-					  int ret=Write_One(m_szMdbIDs[0],16,1);
-					  if (ret>0)
-					  {
-						  break;
-					  }
-				  }
-				  strTips = _T("|hex file can't match with the chip!");
-				  OutPutsStatusInfo(strTips);	
-				  AfxMessageBox(_T("hex file can't match with the chip"));
-				  return FALSE;
-		      }
-		   } 
-		   else	//128K
-		   {
-		      if (m_nHexFileType==0)
-		      {
-				  int ii=0;
-				  while(ii<=5){
-					  int ret=Write_One(m_szMdbIDs[0],33,1);
-					  if (ret>0)
-					  {
-						  break;
-					  }
-				  }
+	  Sleep(2000);
+	 int ModelID= read_one(m_szMdbIDs[0],7,5);
+	 if (ModelID>0)
+	 {
+		 if (ModelID==6||ModelID==7)//Tstat6,7检测芯片大小，其余用串口烧写的都不检测
+		 {
+			 int Chipsize=read_one(m_szMdbIDs[0],11,5);
 
-				  while(ii<=5){
-					  int ret=Write_One(m_szMdbIDs[0],16,1);
-					  if (ret>0)
-					  {
-						  break;
-					  }
-				  }
-				  strTips = _T("|hex file can't match with the chip!");
-				  OutPutsStatusInfo(strTips);	
-				  AfxMessageBox(_T("hex file can't match with the chip"));
-				  return FALSE;
-		      } 
-		      else
-		      {
-				  strTips = _T("|hex file   match with the chip!");
-				  OutPutsStatusInfo(strTips);
-		      }
-		   }
+
+			 if (Chipsize<37)	//64K
+			 {
+				 if (m_nHexFileType==0)
+				 {
+					 strTips = _T("|hex file   matches with the chip!");
+					 OutPutsStatusInfo(strTips);
+				 } 
+				 else
+				 {
+					 int ii=0;
+					 while(ii<=5){
+						 int ret=Write_One(m_szMdbIDs[0],16,1);
+						 if (ret>0)
+						 {
+							 break;
+						 }
+					 }
+					 strTips = _T("|hex file doesn't match with the chip!");
+					 OutPutsStatusInfo(strTips);	
+					 AfxMessageBox(_T("hex file doesn't match with the chip"));
+					 return FALSE;
+				 }
+			 } 
+			 else	//128K
+			 {
+				 if (m_nHexFileType==0)
+				 {
+					 int ii=0;
+					 while(ii<=5){
+						 int ret=Write_One(m_szMdbIDs[0],33,1);
+						 if (ret>0)
+						 {
+							 break;
+						 }
+					 }
+
+					 while(ii<=5){
+						 int ret=Write_One(m_szMdbIDs[0],16,1);
+						 if (ret>0)
+						 {
+							 break;
+						 }
+					 }
+					 strTips = _T("|hex file doesn't match with the chip!");
+					 OutPutsStatusInfo(strTips);	
+					 AfxMessageBox(_T("hex file doesn't match with the chip"));
+					 return FALSE;
+				 } 
+				 else
+				 {
+					 strTips = _T("|hex file   matches with the chip!");
+					 OutPutsStatusInfo(strTips);
+				 }
+			 }
+		 }
+	 }
+	
+			 
+			  
 
 	close_com();
 	//Sleep(1000);
@@ -263,7 +273,7 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 		pWriter->OutPutsStatusInfo(strID);
 		////显示flash之前的时间
 		pWriter->OutPutsStatusInfo(_T("|--------->>Begin"));
-		pWriter->OutPutsStatusInfo(_T("|-->>Begin Time:")+GetSysTime());
+		pWriter->OutPutsStatusInfo(_T("|-->>Start Time:")+GetSysTime());
 		//// 显示flash之前的设备状态信息
 
 		((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
@@ -811,7 +821,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 			pWriter->OutPutsStatusInfo(strID);
 			////显示flash之前的时间
 			pWriter->OutPutsStatusInfo(_T("|--------->>Begin"));
-			pWriter->OutPutsStatusInfo(_T("|-->>Begin Time:")+GetSysTime());
+			pWriter->OutPutsStatusInfo(_T("|-->>Start Time:")+GetSysTime());
 			//// 显示flash之前的设备状态信息
 
 			((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
