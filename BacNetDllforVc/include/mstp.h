@@ -222,6 +222,8 @@ extern "C" {
         volatile struct mstp_port_struct_t *mstp_port,
         unsigned timeout);      /* milliseconds to wait for a packet */
 
+__declspec(dllexport)	bool Get_MSTP_Connect_Status();
+	void Set_MSTP_Connect_Status(bool bstatus);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

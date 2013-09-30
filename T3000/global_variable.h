@@ -3,7 +3,7 @@
 #include "afxmt.h"
 #include "Bacnet_Include.h"
 #include "CM5\ud_str.h"
-
+#include "gloab_define.h"
 
 
 vector <int> Change_Color_ID;
@@ -1767,6 +1767,7 @@ int MODBUS_RELAY_PWM_HIGH_DUTY                               =-1  ;//           
 
 
 #pragma region For_bacnet
+HWND BacNet_hwd;
 int bac_ranges_type;
 int bac_range_number_choose;
 
@@ -1778,7 +1779,18 @@ bool bac_input_read_results;
 bool bac_output_read_results;
 bool bac_variable_read_results;
 bool bac_program_read_results;
+bool bac_weekly_read_results;
+bool bac_annual_read_results;
+bool bac_time_command_read_results;
+bool bac_controller_read_results;
 
+int bac_gloab_panel;
+int bac_gloab_device_id;
+
+int program_list_line ;
+int weekly_list_line ;
+int annual_list_line ;
+Time_block_mini Device_time;
 
 HWND      g_hwnd_now;
 HWND      m_input_dlg_hwnd;
@@ -1786,8 +1798,20 @@ HWND      m_output_dlg_hwnd;
 HWND      m_pragram_dlg_hwnd;
 HWND      m_program_edit_hwnd;
 HWND      m_variable_dlg_hwnd;
+HWND      m_weekly_dlg_hwnd;
+HWND      m_annual_dlg_hwnd;
+HWND      m_schedule_time_dlg_hwnd;
+HWND      m_schedule_day_dlg_hwnd;
+HWND      m_controller_dlg_hwnd;
 vector <Str_out_point> m_Output_data;
 vector <Str_in_point>  m_Input_data;
 vector <Str_program_point>  m_Program_data;
 vector <Str_variable_point>  m_Variable_data;
+vector <Str_weekly_routine_point> m_Weekly_data;
+vector <Str_annual_routine_point> m_Annual_data;
+vector <Str_schedual_time_point> m_Schedual_Time_data;
+vector <Str_controller_point> m_controller_data;
+
+byte	g_DayState[8][48];
+
 #pragma endregion For_bacnet

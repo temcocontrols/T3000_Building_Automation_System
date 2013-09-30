@@ -103,6 +103,8 @@ BOOL CT3000App::InitInstance()
 
 	Judgestore();
 	ReadREG();
+
+
 #if 0
 	// ¼ì²â×¢²áÐÅÏ¢
 	if(haveRegister())
@@ -269,6 +271,7 @@ BOOL CT3000App::InitInstance()
 		AfxMessageBox(_T("Database operation to stop!"));
 
 	}
+
 	CString registerfilename;
 	registerfilename=g_strExePth+_T("REG_msado15.dll.bat");
 	::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
@@ -322,6 +325,7 @@ BOOL CT3000App::InitInstance()
 	
 	GdiplusStartupInput gdiplusStartupInput;//
 	GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);//
+
 #if 1
 ////////////////////////////////////////////////////////
 	_ConnectionPtr m_pCon;
@@ -374,6 +378,7 @@ BOOL CT3000App::InitInstance()
 	}
 
 #endif
+
 	
 
   	((CMainFrame*)m_pMainWnd)->InitViews();//

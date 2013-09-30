@@ -1,3 +1,15 @@
+2013-09-30
+Update by Fance
+1.Solve Communication with bacnet protocal, if the block size larger then 255 ,it will crash.
+2.Delete the button which in bacnet user interface. Instead with menu.
+3.Bacnet communicat add resend function,program will auto resend the command.
+4.Add status UI to show the devices statues.
+5.Add Bacnet controller list.(some function is still in coding)
+6.Modify the Output list and Input list , the value will auto changed by the units which selected by the user.
+7.Add auto refresh function in "Input table" "Output table" "Variable table",it will auto read the data in background thread every 30s.
+8.Add the time controller,user can set the device time,also can SYNC with the local PC.
+
+************************************************************************************
 2013-09-06
 Update by Fance
 1.Change the range selected dialog,allowed the user to change the units by mouse click.(If user click one of the units , the edit box will auto changed the number.)

@@ -2,6 +2,10 @@
 
 #include "CM5\MyOwnListCtrl.h"
 #include "afxcmn.h"
+#include "afxdtctl.h"
+#include "afxwin.h"
+
+#include "CM5/CStatic/staticex.h"
 
 // CDialogCM5_BacNet form view
 
@@ -42,15 +46,30 @@ public:
 	afx_msg LRESULT Fresh_UI(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT  AllMessageCallBack(WPARAM wParam, LPARAM lParam);
 	LRESULT Delete_Wait_Dlg(WPARAM wParam,LPARAM lParam);
-	afx_msg void OnBnClickedButtonCm5Input();
+
 //	afx_msg void OnBnClickedButton1();
-	afx_msg void OnBnClickedButtonCm5Programing();
-	afx_msg void OnBnClickedButtonCm5Output();
-	afx_msg void OnBnClickedButtonCm5Variable();
-	afx_msg void OnBnClickedButtonBacReadTotal();
+
+
+
+
 	static	DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid);
 	void Initial_All_Point();
 	void Show_Wait_Dialog_And_SendMessage(int read_list_type);
+	void WriteFlash();
+
+
+	afx_msg void OnBnClickedButtonBacTest();
+	CDateTimeCtrl m_cm5_time_picker;
+	CDateTimeCtrl m_cm5_date_picker;
+	afx_msg void OnBnClickedBacEnableEditTime();
+	afx_msg void OnNMKillfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMKillfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult);
+	void Get_Time_Edit_By_Control();
+	afx_msg void OnNMSetfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMSetfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedBtnBacWriteTime();
+	CStaticEx m_bac_static_status;
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 static void Init_Service_Handlers(void);
 
