@@ -89,6 +89,7 @@ public:
 
 	void FreshGrid_PID1tstat6();
 	void FreshGrid_PID2tstat6();
+	void FreshGrid_PID2tstat5GLessthan368();
 	CString strdemo;
 	CComboBox m_fan2;
 	int m_pids;

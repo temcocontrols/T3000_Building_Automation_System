@@ -1200,17 +1200,17 @@ void CParameterDlg::OnCbnSelchangeEapplication()
 		(product_register_value[7] == PM_TSTAT5G)) && (m_fFirmwareVersion >= 35.4))//0912
 	{
 		write_one(g_tstat_id,423 ,m_application_ctrl.GetCurSel()); // 
-		write_one(g_tstat_id,125 ,m_application_ctrl.GetCurSel()); // 
+		nRet=write_one(g_tstat_id,125 ,m_application_ctrl.GetCurSel()); // 
 	}
 	else
 	{
-		write_one(g_tstat_id,125 ,m_application_ctrl.GetCurSel()); // 
+		nRet=write_one(g_tstat_id,125 ,m_application_ctrl.GetCurSel()); // 
 	}
 
 
 	if(nRet>0)
-		product_register_value[125] = m_application_ctrl.GetCurSel();
-
+		product_register_value[125] =m_application_ctrl.GetCurSel();
+		Reflesh_ParameterDlg();
 	g_bPauseMultiRead = FALSE;
 }
 
@@ -1287,24 +1287,24 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
 		{
 			if (g_unint)
 			{		
-				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10);//123
+				strText.Format(_T("%0.1f°C"),(float)(product_register_value[123]/10.0));
 				m_nightheating.SetWindowText(strText);
 
-				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10);//124
+				strText.Format(_T("%0.1f°C"),(float)(product_register_value[124]/10.0));
 				m_nightcooling.SetWindowText(strText);
 			}else
 			{
-				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);//182
+				strText.Format(_T("%0.1f°F"),(float)product_register_value[123]/10.0);
 				m_nightheating.SetWindowText(strText);
 
-				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
+				strText.Format(_T("%0.1f°F"),(float)product_register_value[124]/10.0);
 				m_nightcooling.SetWindowText(strText);
 
 			}
 
 		}
 	}
-
+ 
 }
 
 void CParameterDlg::OnEnKillfocusSetvalue2()
@@ -1520,8 +1520,7 @@ void CParameterDlg::OnEnKillfocusSpset1()
 			}
 			product_register_value[MODBUS_DAY_SETPOINT] = short(nOrig*10);
 		}
-		else if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E||
-			(product_register_value[7] == PM_TSTAT5G))
+		else if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E)
 		{
 			int nRet = write_one(g_tstat_id, 135, short(nOrig));	//Fance comments: because the version which below 34.9 is too low ,135 register I Don't know it's real meaning. 
 		}
@@ -1600,23 +1599,23 @@ void CParameterDlg::OnEnKillfocusEcooldeadband1()
 	CString strTemp;
 	CString strText;
 	m_setptCDDEdt1.GetWindowText(strText);
-	float nValue= (float)_wtof(strText);
+	int nValue= (int)(_wtof(strText)*10);
 
 	g_bPauseMultiRead = TRUE;
 	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
 	{
-		if(nValue == product_register_value[MODBUS_DAY_COOLING_DEADBAND]/10)	//346
+		if(nValue == product_register_value[MODBUS_DAY_COOLING_DEADBAND])	//346
 			return;
 
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_COOLING_DEADBAND,int(nValue *10),
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_COOLING_DEADBAND,nValue,
 			product_register_value[MODBUS_DAY_COOLING_DEADBAND],this->m_hWnd,IDC_ECOOLDEADBAND1,_T("DAY COOLING DEADBAND"));
 	}
 	else
 	{
-		if(nValue == product_register_value[MODBUS_COOLING_DEADBAND]/10)	//119
+		if(nValue == product_register_value[MODBUS_COOLING_DEADBAND])	//119
 			return;
 
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_COOLING_DEADBAND,int(nValue *10),
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_COOLING_DEADBAND,nValue,
 			product_register_value[MODBUS_COOLING_DEADBAND],this->m_hWnd,IDC_ECOOLDEADBAND1,_T("COOLING DEADBAND"));
 	}
 
@@ -1652,23 +1651,24 @@ void CParameterDlg::OnEnKillfocusEcoolingiterm1()
 	CString strTemp;
 	CString strText;
 	m_HeadDEdt1.GetWindowText(strText);
-	float nValue= (float)_wtof(strText);
-
+	
+	int nValue= (int)(_wtof(strText.GetBuffer())*10.0);
+	 
 	g_bPauseMultiRead = TRUE;
 	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
 	{
-		if(nValue == product_register_value[MODBUS_DAY_HEATING_DEADBAND]/10)	//347
+		if(nValue == product_register_value[MODBUS_DAY_HEATING_DEADBAND])	//347
 			return;
 
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_HEATING_DEADBAND,(short)nValue*10,
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_HEATING_DEADBAND,nValue,
 			product_register_value[MODBUS_DAY_HEATING_DEADBAND],this->m_hWnd,IDC_ECOOLINGITERM1,_T("DAY HEATING DEADBAND"));
 	}
 	else
 	{
-		if(nValue == product_register_value[MODBUS_HEATING_DEADBAND]/10)	//120
+		if(nValue == product_register_value[MODBUS_HEATING_DEADBAND])	//120
 			return;
 
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_HEATING_DEADBAND,(short)nValue*10,
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_HEATING_DEADBAND,nValue,
 			product_register_value[MODBUS_HEATING_DEADBAND],this->m_hWnd,IDC_ECOOLINGITERM1,_T("HEATING DEADBAND"));
 
 	}
@@ -1742,22 +1742,22 @@ void CParameterDlg::OnEnKillfocusEnigntheating()
 		return;
 	CString strText;
 	m_nightheating.GetWindowText(strText);
-	int nValue= _wtoi(strText);
+	 
 
-
+	int nValue= (int)(_wtof(strText)*10);
 
 	if(m_application_ctrl.GetCurSel()==0)
 	{
-		if(product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]==nValue)	//Add this to judge weather this value need to change.
+		if(product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]==(int)(nValue))	//Add this to judge weather this value need to change.
 			return;
 
 		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,nValue,
 			product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],this->m_hWnd,IDC_ENIGNTHEATING,
 			_T("NIGHT HEATING SETPOINT"));*/
-		int ret=write_one(g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,nValue);
+		int ret=write_one(g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,(int)(nValue/10));
 		if (ret>0)
 		{
-			product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]=nValue;
+			product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]=(int)(nValue/10);
 		} 
 		else
 		{
@@ -1765,19 +1765,21 @@ void CParameterDlg::OnEnKillfocusEnigntheating()
 		}
 		
 		CString strText;
-		strText.Format(_T("0.1f%"),(float)(product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]));
+		strText.Format(_T("0.1f%"),(float)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
 		m_nightheating.GetWindowText(strText);
 
 	}
 	else
 	{
-		if(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]==nValue)	//Add this to judge weather this value need to change.
+		if(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]==nValue)	
+		//Add this to judge weather this value need to change.
 			return;
 
 		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,nValue,
 			product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],this->m_hWnd,IDC_ENIGNTHEATING,
 			_T("NIGHT HEATING DEADBAND"));*/
-		int ret=write_one(g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,nValue*10);
+
+		int ret=write_one(g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,nValue);
 		if (ret>0)
 		{
 		product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=nValue;
@@ -1804,23 +1806,31 @@ void CParameterDlg::OnEnKillfocusEnigntcooling1()
 		return;
 	CString strText;
 	m_nightcooling.GetWindowText(strText);
-	int nValue= _wtoi(strText);
+	int nValue= (int)(_wtof(strText)*10);
 	
 	if(m_application_ctrl.GetCurSel()==0)
 	{
-		if(product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]==nValue)	//Add this to judge weather this value need to change.
+		if(product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]==(int)(nValue/10))	//Add this to judge weather this value need to change.
 			return;
 
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_SETPOINT,nValue,
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_SETPOINT,(int)(nValue/10),
 			product_register_value[MODBUS_NIGHT_COOLING_SETPOINT],this->m_hWnd,IDC_ENIGNTCOOLING1,_T("NIGHT COOLING SETPOINT"));
 	}
 	else
 	{
-		if((int)(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10)==nValue)	//Add this to judge weather this value need to change.
+		if((int)(product_register_value[MODBUS_NIGHT_COOLING_DEADBAND])==nValue)	//Add this to judge weather this value need to change.
 			return;
 
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,nValue*10,
-			product_register_value[MODBUS_NIGHT_COOLING_DEADBAND],this->m_hWnd,IDC_ENIGNTCOOLING1,_T("NIGHT COOLING DEADBAND"));
+		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,nValue,
+		product_register_value[MODBUS_NIGHT_COOLING_DEADBAND],
+		this->m_hWnd,IDC_ENIGNTCOOLING1,_T("NIGHT COOLING DEADBAND"));*/
+		int ret=write_one(g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,nValue);
+		if (ret>0)
+		{
+		  product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]=nValue;
+		}
+		 strText.Format(_T("%0.1f"),(float)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10.0);
+		 m_nightcooling.SetWindowText(strText);
 	}
 }
 
@@ -2113,6 +2123,8 @@ void CParameterDlg::OnEnKillfocusEditCdbdn()
 		return;
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_COOLING_DEADBAND,m_cooldb*10,
 		product_register_value[MODBUS_DAY_COOLING_DEADBAND],this->m_hWnd,IDC_EDIT_CDBDN,_T("DAY COOLING DEADBAND"));
+
+		Read_SliderData();
 }
 
 void CParameterDlg::OnEnKillfocusEdit31()
@@ -2122,6 +2134,7 @@ void CParameterDlg::OnEnKillfocusEdit31()
 		return;
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_SETPOINT,m_setpoint*10,
 		product_register_value[MODBUS_DAY_SETPOINT],this->m_hWnd,IDC_EDIT31,_T("DAY SETPOINT"));
+		Read_SliderData();
 }
 
 void CParameterDlg::OnEnKillfocusEdit34()
@@ -2131,6 +2144,8 @@ void CParameterDlg::OnEnKillfocusEdit34()
 		MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 	else
 		product_register_value[MODBUS_DAY_HEATING_DEADBAND] = m_heatdb*10;
+
+		Read_SliderData();
 }
 
 void CParameterDlg::OnEnKillfocusEdit37()
@@ -2140,6 +2155,8 @@ void CParameterDlg::OnEnKillfocusEdit37()
 		return;
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_DAY_HEATING_SETPOINT,m_heatsp*10,
 		product_register_value[MODBUS_DAY_HEATING_SETPOINT],this->m_hWnd,IDC_EDIT37,_T("DAY HEATING SETPOINT"));
+
+		Read_SliderData();
 }
 
 void CParameterDlg::OnEnKillfocusEditCspnn()
@@ -2149,6 +2166,8 @@ void CParameterDlg::OnEnKillfocusEditCspnn()
 		return;
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_SETPOINT,m_coolspN*10,
 		product_register_value[MODBUS_NIGHT_COOLING_SETPOINT],this->m_hWnd,IDC_EDIT_CSPNN,_T("NIGHT COOLING SETPOINT"));
+
+Read_SliderData();
 }
 
 //Recode by Fance
@@ -2160,6 +2179,7 @@ void CParameterDlg::OnEnKillfocusEditCdbnn()
 		return;
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND,m_cooldbN*10,
 		product_register_value[MODBUS_NIGHT_COOLING_DEADBAND],this->m_hWnd,IDC_EDIT_CDBNN,_T("NIGHT COOLING DEADBAND"));
+Read_SliderData();
 }
 
 
@@ -2186,6 +2206,8 @@ void CParameterDlg::OnEnKillfocusEdit32()
 
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_SETPOINT,m_setpointN*10,
 		product_register_value[MODBUS_NIGHT_SETPOINT],this->m_hWnd,IDC_EDIT32,_T("NIGHT SETPOINT"));
+
+Read_SliderData();
 }
 
 void CParameterDlg::OnEnKillfocusEdit35()
@@ -2196,6 +2218,8 @@ void CParameterDlg::OnEnKillfocusEdit35()
 
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND,m_heatdbN*10,
 		product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],this->m_hWnd,IDC_EDIT35,_T("NIGHT HEATING DEADBAND"));
+
+Read_SliderData();
 }
 
 void CParameterDlg::OnEnKillfocusEdit38()
@@ -2205,6 +2229,8 @@ void CParameterDlg::OnEnKillfocusEdit38()
 		return;
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,m_heatspN*10,
 		product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],this->m_hWnd,IDC_EDIT38,_T("NIGHT HEATING SETPOINT"));
+
+Read_SliderData();
 }
 CString CParameterDlg::GetInputValue(int InputNo){//这个是行号，如果是Input的话，要在这个基础上加1
 //所以InputNO=InputNo+1;
@@ -2263,7 +2289,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		{
 			g_unint = FALSE;
 			GetDlgItem(IDC_STATICUNINT2)->SetWindowText(_T("°F"));
-		}else 
+		}
+		else 
 		{
 			g_unint = TRUE;
 			GetDlgItem(IDC_STATICUNINT2)->SetWindowText(_T("°C"));
@@ -2514,7 +2541,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		m_InputSelect1.SetCurSel(product_register_value[MODBUS_TEMP_SELECT]-1);//382
 	}
 
-
+	 
 
 	if (product_register_value[MODBUS_INPUT1_SELECT]<0)	//383
 	{
@@ -2883,7 +2910,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			m_inputValue2.SetWindowText(_T("UNUSED"));
 		}
 
-		if (product_register_value[7]==18)
+		if (product_register_value[7]==PM_TSTAT5G)
 		{
 			if(product_register_value[241]==1)
 			{
@@ -2965,31 +2992,31 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	float m_fFirmwareVersion=get_curtstat_version();//0912
-	if (multi_register_value[7] == PM_TSTAT5E||
-		(product_register_value[7] == PM_TSTAT5G))//0912
+	if (multi_register_value[7] == PM_TSTAT5E)//0912
 	{
-		short nOccupied = multi_register_value[184];  // Day setpoint option  
+		short nOccupied = product_register_value[184];  // Day setpoint option  
 		BOOL bOccupied = nOccupied & 0x0001;
 		if (bOccupied)  // day  - Occupied
 		{
 			if(m_fFirmwareVersion >= 35.4)
 			{
-				m_application_ctrl.SetCurSel(multi_register_value[423]);
+				m_application_ctrl.SetCurSel(product_register_value[423]);
 			}else
 			{
-				m_application_ctrl.SetCurSel(multi_register_value[454]);
+				m_application_ctrl.SetCurSel(product_register_value[454]);
 				// 5E 以及以后的型号
 			}
 
 		}
 		else
 		{
-			m_application_ctrl.SetCurSel(multi_register_value[125]); 
+			m_application_ctrl.SetCurSel(product_register_value[125]); 
+			 
 		}
 	}
 	else
 	{
-		m_application_ctrl.SetCurSel(multi_register_value[125]); 
+		m_application_ctrl.SetCurSel(product_register_value[125]); 
 	}
 
 
@@ -3112,7 +3139,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	//131	365	1	Low byte	W/R	MAX_SETPOINT, Setpoint high, the highest setpoint a user will be able to set from the keypad.
-	//132	366	1	Low byte	W/R	MIN_SETPOINT, Setpoint Low, the lowest setpoint a user will be able to set from the keypad. 
+	//132	366	1	Low bddddddddddddddddyte	W/R	MIN_SETPOINT, Setpoint Low, the lowest setpoint a user will be able to set from the keypad. 
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_MAX_SETPOINT]);//131 365
 	strTemp+=strUnit;
 	m_setptHiEdit.SetWindowText(strTemp);
@@ -3287,59 +3314,30 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	// 		349	2	Full	W/R	(Day)Occupied  heating setpoint (day heating setpoint)
 
 
-	// 
-
-	//if (parameterSet == 0)
-	//{
-	m_coolsp= product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10;//348
-
-	m_cooldb=product_register_value[MODBUS_DAY_COOLING_DEADBAND]/10;//346
-	m_setpoint =product_register_value[MODBUS_DAY_SETPOINT]/10;//345
-	m_heatdb =product_register_value[MODBUS_DAY_HEATING_DEADBAND]/10;//347
-	m_heatsp =product_register_value[MODBUS_DAY_HEATING_SETPOINT]/10;//349
-
-	// 		350	1	Low byte	W/R	(Night)Unoccupied  setpoin.
-	// 		351	1	Low byte		spare
-	// 		352	1	Low byte	W/R	(Night)Unoccupied heating setpoint dead band , heating deadband for the night (OFF) mode. Units of 1 deg.
-	// 		353	1	Low byte	W/R	(Night)Unoccupied cooling setpoint dead band , cooling deadband for the night (OFF) mode. Units of 1 deg.
-	// 		354	2	Full	W/R	(Night)Unoccupied heating setpoint
-	// 		355	2	Full	W/R	(Night)Unoccupied cooling setpoint
-	m_coolspN=product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10;//355
-	m_cooldbN=product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10;//353
-	m_setpointN=product_register_value[MODBUS_NIGHT_SETPOINT]/10;//350
-	m_heatdbN=product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//352
-	m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;//354
-	//  UpdateData(FALSE);
-	if (tstat6flex[0] == 0)
+	 
+	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
 	{
-		memcpy(tstat6flex,m_slidertsta6,sizeof(m_slidertsta6));
+		m_coolsp= product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10;//348
+
+		m_cooldb=product_register_value[MODBUS_DAY_COOLING_DEADBAND]/10;//346
+		m_setpoint =product_register_value[MODBUS_DAY_SETPOINT]/10;//345
+		m_heatdb =product_register_value[MODBUS_DAY_HEATING_DEADBAND]/10;//347
+		m_heatsp =product_register_value[MODBUS_DAY_HEATING_SETPOINT]/10;//349
+
+		// 		350	1	Low byte	W/R	(Night)Unoccupied  setpoin.
+		// 		351	1	Low byte		spare
+		// 		352	1	Low byte	W/R	(Night)Unoccupied heating setpoint dead band , heating deadband for the night (OFF) mode. Units of 1 deg.
+		// 		353	1	Low byte	W/R	(Night)Unoccupied cooling setpoint dead band , cooling deadband for the night (OFF) mode. Units of 1 deg.
+		// 		354	2	Full	W/R	(Night)Unoccupied heating setpoint
+		// 		355	2	Full	W/R	(Night)Unoccupied cooling setpoint
+		m_coolspN=product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10;//355
+		m_cooldbN=product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10;//353
+		m_setpointN=product_register_value[MODBUS_NIGHT_SETPOINT]/10;//350
+		m_heatdbN=product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//352
+		m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
 	}
 
-	// parameterSet = 1;
-
-	//}else		//Annul by Fance  
-	//{
-	//	m_coolsp= tstat6flex[3];// DcoolSP	3
-	//	m_cooldb=tstat6flex[1];//DcoolDB	1
-	//	m_setpoint = tstat6flex[0];// DaySP		0
-	//	m_heatdb = tstat6flex[2];//DheatDB	2
-	//	m_heatsp = tstat6flex[4];//DheatSP	4
-
-	//	// 		350	1	Low byte	W/R	(Night)Unoccupied  setpoin.
-	//	// 		351	1	Low byte		spare
-	//	// 		352	1	Low byte	W/R	(Night)Unoccupied heating setpoint dead band , heating deadband for the night (OFF) mode. Units of 1 deg.
-	//	// 		353	1	Low byte	W/R	(Night)Unoccupied cooling setpoint dead band , cooling deadband for the night (OFF) mode. Units of 1 deg.
-	//	// 		354	2	Full	W/R	(Night)Unoccupied heating setpoint
-	//	// 		355	2	Full	W/R	(Night)Unoccupied cooling setpoint
-	//	m_coolspN=tstat6flex[9];// NcoolSP	9
-	//	m_cooldbN=tstat6flex[7];//NcoolDB	7
-	//	m_setpointN=tstat6flex[5];//NightSP	5 
-	//	m_heatdbN=tstat6flex[6];// NheatDB	6 
-	//	m_heatspN=tstat6flex[8];//NheatSP	8
-
-	//}
-
-
+	
 }
 
 void CParameterDlg::OnBnClickedCancel()
@@ -3377,12 +3375,12 @@ void CParameterDlg::OnEnKillfocusEditPid2offsetpoint()
 	CString str;
 	//str.Format(_T("%d"),multi_register_value[275]);
 	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->GetWindowText(str);
-	int nValue= _wtoi(str);
+	float nValue= _wtof(str);
 
-	if(product_register_value[MODBUS_UNIVERSAL_NIGHTSET]==nValue*10)	//Add this to judge weather this value need to change.
+	if(product_register_value[MODBUS_UNIVERSAL_NIGHTSET]==(int)nValue*10)	//Add this to judge weather this value need to change.
 		return;
 
-	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_UNIVERSAL_NIGHTSET,nValue*10,
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_UNIVERSAL_NIGHTSET,(int)nValue*10,
 		product_register_value[275],this->m_hWnd,IDC_EDIT_PID2OFFSETPOINT,_T("Pid2 off setpoint"));
 }
 
@@ -3578,4 +3576,76 @@ void CParameterDlg::OnBnClickedCs2()
 {
 	CCustomSTable Dlg(3);
 	Dlg.DoModal();
+}
+
+void CParameterDlg::Read_SliderData()
+{   
+
+    int ret=read_one(g_tstat_id,MODBUS_DAY_COOLING_SETPOINT);
+	if (ret>0)
+	{
+	product_register_value[MODBUS_DAY_COOLING_SETPOINT]=ret;
+	}
+
+	 ret=read_one(g_tstat_id,MODBUS_DAY_COOLING_DEADBAND);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_DAY_COOLING_DEADBAND]=ret;
+	}
+
+	 ret=read_one(g_tstat_id,MODBUS_DAY_SETPOINT);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_DAY_SETPOINT]=ret;
+	}
+
+	 ret=read_one(g_tstat_id,MODBUS_DAY_HEATING_DEADBAND);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_DAY_HEATING_DEADBAND]=ret;
+	}
+	 ret=read_one(g_tstat_id,MODBUS_DAY_HEATING_SETPOINT);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_DAY_HEATING_SETPOINT]=ret;
+	}
+	 ret=read_one(g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]=ret;
+	}
+	 ret=read_one(g_tstat_id,MODBUS_NIGHT_SETPOINT);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_NIGHT_SETPOINT]=ret;
+	}
+
+
+	 ret=read_one(g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=ret;
+	}
+
+
+	 ret=read_one(g_tstat_id,MODBUS_DAY_HEATING_SETPOINT);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_DAY_HEATING_SETPOINT]=ret;
+	}
+
+
+
+	m_coolsp= product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10;//348
+
+	m_cooldb=product_register_value[MODBUS_DAY_COOLING_DEADBAND]/10;//346
+	m_setpoint =product_register_value[MODBUS_DAY_SETPOINT]/10;//345
+	m_heatdb =product_register_value[MODBUS_DAY_HEATING_DEADBAND]/10;//347
+	m_heatsp =product_register_value[MODBUS_DAY_HEATING_SETPOINT]/10;//349
+
+	m_coolspN=product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10;//355
+	m_cooldbN=product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10;//353
+	m_setpointN=product_register_value[MODBUS_NIGHT_SETPOINT]/10;//350
+	m_heatdbN=product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//352
+	m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
 }
