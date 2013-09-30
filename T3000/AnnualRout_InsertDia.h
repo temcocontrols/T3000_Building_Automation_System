@@ -18,6 +18,7 @@ class AnnualRout_InsertDia : public CDialog
 	DECLARE_DYNAMIC(AnnualRout_InsertDia)
 
 public:
+	AnnualRout_InsertDia(CWnd* pParent = NULL);   // standard constructor
 	AnnualRout_InsertDia(unsigned char row,CString strtype = _T(""),CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~AnnualRout_InsertDia();
 
@@ -69,4 +70,13 @@ public:
 	CComboBox m_yearComBox;
 	afx_msg void OnCbnSelchangeCombo1();
 	CString m_strtype;
+
+
+	afx_msg void OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg LRESULT  DayResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
+	LRESULT Fresh_Schedule_Day_Cal(WPARAM wParam,LPARAM lParam);
+	//LPMONTHDAYSTATE pDayState;
+	MONTHDAYSTATE	pBacDayState[12];// = new MONTHDAYSTATE[nCount];
+
+
 };

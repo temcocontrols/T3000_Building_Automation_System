@@ -181,6 +181,10 @@
 #define IDD_DIALOG_BACNET_WAIT          466
 #define IDD_CSTABLE                     467
 #define IDD_TRAFFIC_WINDOW              468
+#define IDD_DIALOG_BACNET_WEEKLY_ROUTINES 468
+#define IDD_DIALOG_BACNET_ANNUAL_ROUTINES 469
+#define IDD_DIALOG_BACNET_SCHEDULE_TIME 470
+#define IDD_DIALOG_BACNET_CONTROLLER    472
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -1240,20 +1244,53 @@
 #define IDC_COMBO_CO2_SENSOR_SEL        1645
 #define IDC_STATIC_ANALOG_UNITS2        1645
 #define IDC_EDIT_INTERNAL_TEMP          1646
+#define IDC_RADIO54                     1646
 #define IDC_EDIT_EXTERNAL_TEMP          1647
+#define IDC_RADIO55                     1647
 #define IDC_STATIC_CO2_UNIT1            1648
+#define IDC_RADIO56                     1648
 #define IDC_STATIC_CO2_UNIT2            1649
+#define IDC_RADIO57                     1649
 #define IDC_LIST_CO2_EXTERNAL_SENSOR    1650
+#define IDC_RADIO58                     1650
 #define IDC_EDIT_CO2_HUMIDITY           1651
+#define IDC_RADIO59                     1651
 #define IDC_CO2_DATETIMEPICKER1         1652
+#define IDC_RADIO60                     1652
 #define IDC_CO2_DATETIMEPICKER_TIME     1653
+#define IDC_RADIO61                     1653
 #define IDC_BUTTON_CO2_SYNC_TIME        1654
+#define IDC_RADIO62                     1654
+#define IDC_RADIO63                     1655
 #define IDC_RADIO_PASSWORD_ENABLE       1656
+#define IDC_RADIO64                     1656
 #define IDC_RADIO_PASSWORD_DISABLE      1657
+#define IDC_RADIO65                     1657
 #define IDC_EDIT_CO2_PASSWOR            1658
+#define IDC_RADIO66                     1658
 #define IDC_EDIT_CO2_BLOCK_TIME         1659
+#define IDC_RADIO67                     1659
 #define IDC_EDIT_CO2_BACKLIGHT_TIME     1660
+#define IDC_RADIO68                     1660
 #define IDC_BTN_CO2_REFRESH             1661
+#define IDC_RADIO69                     1661
+#define IDC_RADIO70                     1662
+#define IDC_RADIO71                     1663
+#define IDC_RADIO72                     1664
+#define IDC_STATIC_INPUT_ANALOG_UNITS   1665
+#define IDC_STATIC_PERSENT              1667
+#define IDC_LIST_BAC_WEEKLY             1668
+#define IDC_LIST_BAC_ANNULE_LIST        1669
+#define IDC_LIST_SCHEDULE_TIME          1670
+#define IDC_DATETIMEPICKER1_SCHEDUAL    1671
+#define IDC_DATE_PICKER                 1672
+#define IDC_TIME_PICKER                 1673
+#define IDC_BUTTON_BAC_TEST             1674
+#define IDC_BAC_ENABLE_EDIT_TIME        1675
+#define IDC_BAC_SYNC_LOCAL_PC           1676
+#define IDC_BTN_BAC_WRITE_TIME          1680
+#define IDC_STATIC_BAC_STATUS           1681
+#define IDC_LIST_BACNET_CONTROLLER      1682
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1346,9 +1383,19 @@
 #define ID_SAVEFILE                     32872
 #define ID_REFRESH                      32873
 #define ID_VIEW_DATATRAFFIC             32873
+#define ID_CONTROL_SCREENS              32874
+#define ID_CONTROL_PROGRAMS             32875
+#define ID_CONTROL_INPUTS               32876
+#define ID_CONTROL_OUTPUTS              32877
+#define ID_CONTROL_VARIABLES            32878
+#define ID_CONTROL_CONTROLLERS          32879
 #define ID_VIEW_COMMUNICATETRAFFIC      32880
+#define ID_CONTROL_ANNUALROUTINES       32881
+#define ID_MISCELLANEOUS_LOADDESCRIPTORS 32882
 #define ID_FILE_OPEN32883               32883
+#define ID_MISCELLANEOUS_UPDATEMINI     32883
 #define ID_FILE_SAVE32884               32884
+#define ID_CONTROL_WEEKLY               32884
 #define ID_FILE_EXIT                    32888
 #define ID_DATABASE_MBPOLL              33867
 #define ID_TOOL_SCAN                    57920
@@ -1362,9 +1409,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        468
-#define _APS_NEXT_COMMAND_VALUE         32874
-#define _APS_NEXT_CONTROL_VALUE         1638
+#define _APS_NEXT_RESOURCE_VALUE        473
+#define _APS_NEXT_COMMAND_VALUE         32885
+#define _APS_NEXT_CONTROL_VALUE         1683
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

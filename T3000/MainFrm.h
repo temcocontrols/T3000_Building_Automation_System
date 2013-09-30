@@ -351,6 +351,16 @@ public:
 	bool mbPollDlgOpen;
 protected:
 	afx_msg LRESULT OnMbpollClosed(WPARAM wParam, LPARAM lParam);
+public:
+	afx_msg void OnControlInputs();
+	afx_msg void OnControlPrograms();
+	afx_msg void OnControlOutputs();
+	afx_msg void OnControlVariables();
+	afx_msg void OnControlWeekly();
+	afx_msg void OnControlAnnualroutines();
+	afx_msg void OnMiscellaneousLoaddescriptors();
+	afx_msg void OnMiscellaneousUpdatemini();
+	afx_msg void OnControlControllers();
 };
 
 const int DLG_T3000_VIEW = 0;

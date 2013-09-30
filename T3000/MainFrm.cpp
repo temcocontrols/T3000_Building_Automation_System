@@ -195,6 +195,15 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_TOOL_REGISTERMONITER, &CMainFrame::OnToolRegistermoniter)
 //	ON_COMMAND(ID_APP_EXIT, &CMainFrame::OnAppExit)
 	ON_COMMAND(ID_VIEW_COMMUNICATETRAFFIC, &CMainFrame::OnViewCommunicatetraffic)
+	ON_COMMAND(ID_CONTROL_INPUTS, &CMainFrame::OnControlInputs)
+	ON_COMMAND(ID_CONTROL_PROGRAMS, &CMainFrame::OnControlPrograms)
+	ON_COMMAND(ID_CONTROL_OUTPUTS, &CMainFrame::OnControlOutputs)
+	ON_COMMAND(ID_CONTROL_VARIABLES, &CMainFrame::OnControlVariables)
+	ON_COMMAND(ID_CONTROL_WEEKLY, &CMainFrame::OnControlWeekly)
+	ON_COMMAND(ID_CONTROL_ANNUALROUTINES, &CMainFrame::OnControlAnnualroutines)
+	ON_COMMAND(ID_MISCELLANEOUS_LOADDESCRIPTORS, &CMainFrame::OnMiscellaneousLoaddescriptors)
+	ON_COMMAND(ID_MISCELLANEOUS_UPDATEMINI, &CMainFrame::OnMiscellaneousUpdatemini)
+	ON_COMMAND(ID_CONTROL_CONTROLLERS, &CMainFrame::OnControlControllers)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -546,7 +555,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 //	m_wndStatusBar.SetPaneInfo(index,ID_PROTOCOL_INFO,SBPS_NOBORDERS,250);//SBPS_POPOUT | SBPS_NOBORDERS,300);
 //	index = m_wndStatusBar.CommandToIndex(ID_PROTOCOL_INFO);
 	m_wndStatusBar.SetPaneInfo(2,ID_PROTOCOL_INFO,SBPS_STRETCH | SBPS_NOBORDERS , 100);
-	m_wndStatusBar.SetPaneInfo(3,IDS_SHOW_RESULTS,SBPS_NORMAL , 400);
+	m_wndStatusBar.SetPaneInfo(3,IDS_SHOW_RESULTS,SBPS_NORMAL , 500);
 
 	m_wndStatusBar.SetPaneText(1, _T("No Connection"), TRUE);
 	m_wndStatusBar.SetPaneTextColor(0, RGB(224,0,0));
@@ -6158,7 +6167,8 @@ void CMainFrame::Treestatus()
 
 }
 
-
+//Code by Fance
+//Used for receive all message from all dlg
 DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
 {
 	_MessageWriteOneInfo *My_Write_Struct=NULL;
@@ -6194,6 +6204,12 @@ DWORD WINAPI   CMainFrame::Get_All_Dlg_Message(LPVOID lpVoid)
 				My_Receive_msg.push_back(msg);
 				MyCriticalSection.Unlock();
 				break;
+			case MY_BAC_REFRESH_LIST:
+				MyCriticalSection.Lock();
+				My_Receive_msg.push_back(msg);
+				MyCriticalSection.Unlock();
+				break;
+
 			case MY_CLOSE:
 				goto myend;
 				break;
@@ -6205,7 +6221,8 @@ myend:
 	return 0;
 }
 
-
+//Code by Fance
+//Use background thread deal all data
 DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 {
 	CMainFrame *pParent = (CMainFrame *)lpVoid;
@@ -6267,7 +6284,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 				My_Invoke_Struct = (_MessageInvokeIDInfo *)msg.wParam;
 				My_Receive_msg.erase(My_Receive_msg.begin());
 				MyCriticalSection.Unlock();
-				for (int i=0;i<3000;i++)
+				for (int i=0;i<3000;i++)//3秒钟判断任务是否超时.
 				{
 					if(tsm_invoke_id_free(My_Invoke_Struct->Invoke_ID))
 					{
@@ -6309,86 +6326,49 @@ loop1:
 								break;
 							g_invoke_id =WritePrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,My_WriteList_Struct->start_instance,temp_end_value);
 							if(g_invoke_id>=0)
-								Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
+							{
+								CString temp_cs_show;
+								temp_cs_show.Format(_T("Task ID = %d. %s "),g_invoke_id,My_WriteList_Struct->Write_Info);
+								Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd,temp_cs_show);
+							}
+								//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
 							Sleep(200);
 						} while (g_invoke_id<0);
 
-
-#if 0
-						switch(My_WriteList_Struct->command)
-						{
-						case WRITEVARIABLE_T3000:
-							{
-								resend_count = 0;
-								do 
-								{
-									resend_count ++;
-									if(resend_count>10)
-										break;
-									g_invoke_id =WritePrivateData(My_WriteList_Struct->deviceid,WRITEVARIABLE_T3000,My_WriteList_Struct->start_instance,temp_end_value,sizeof(Str_variable_point));
-									if(g_invoke_id>=0)
-										Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
-									Sleep(200);
-								} while (g_invoke_id<0);
-							}
-							break;
-						case WRITEOUTPUT_T3000:
-							{
-								resend_count = 0;
-								do 
-								{
-									resend_count ++;
-									if(resend_count>10)
-										break;
-									g_invoke_id =WritePrivateData(My_WriteList_Struct->deviceid,WRITEOUTPUT_T3000,My_WriteList_Struct->start_instance,temp_end_value,sizeof(Str_out_point));
-									if(g_invoke_id>=0)
-										Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
-									Sleep(200);
-								} while (g_invoke_id<0);
-							}
-							break;
-						case  WRITEINPUT_T3000:
-							{
-								resend_count = 0;
-								do 
-								{
-									resend_count ++;
-									if(resend_count>10)
-										break;
-									g_invoke_id =WritePrivateData(My_WriteList_Struct->deviceid,WRITEINPUT_T3000,My_WriteList_Struct->start_instance,temp_end_value,sizeof(Str_in_point));
-									if(g_invoke_id>=0)
-										Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
-									Sleep(200);
-								} while (g_invoke_id<0);
-							}
-							break;
-						case WRITEPROGRAM_T3000:
-							{
-								resend_count = 0;
-								do 
-								{
-									resend_count ++;
-									if(resend_count>10)
-										break;
-									g_invoke_id =WritePrivateData(My_WriteList_Struct->deviceid,WRITEPROGRAM_T3000,My_WriteList_Struct->start_instance,temp_end_value,sizeof(Str_program_point));
-									if(g_invoke_id>=0)
-										Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
-									Sleep(200);
-								} while (g_invoke_id<0);
-							}
-							break;
-						default:
-							break;
-						}
-#endif
-						//g_invoke_id =WritePrivateData(1234,WRITEVARIABLE_T3000,0,(int)m_Variable_data.size()-1,sizeof(Str_variable_point));
-						//if(g_invoke_id>=0)
-						//	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 						My_WriteList_Struct->start_instance = temp_end_value + 1;
 					} while (temp_end_value<My_WriteList_Struct->end_instance);
-						
+					
+					if(My_WriteList_Struct)		//删除 new 的东西;
+						delete My_WriteList_Struct;
 
 					
+				}
+				break;
+			case MY_BAC_REFRESH_LIST:
+				{
+					MyCriticalSection.Lock();
+					msg=My_Receive_msg.at(0);
+					_MessageRefreshListInfo *My_WriteList_Struct = (_MessageRefreshListInfo *)msg.wParam;
+					My_Receive_msg.erase(My_Receive_msg.begin());
+					MyCriticalSection.Unlock();
+					//switch(My_WriteList_Struct->command)
+					//{
+					//case READVARIABLE_T3000:
+						for (int i=0;i<My_WriteList_Struct->block_size;i++)
+						{
+								resend_count = 0;
+								do 
+								{
+									resend_count ++;
+									if(resend_count>10)
+										break;
+									
+									g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,My_WriteList_Struct->entitysize);
+									Sleep(200);
+								} while (g_invoke_id<0);
+
+						}
+
 				}
 				break;
 			}
@@ -6465,4 +6445,115 @@ void CMainFrame::OnViewCommunicatetraffic()
 	 {
 	  g_testmultiReadtraffic_dlg->ShowWindow(SW_SHOW);
 	 }
+}
+
+void CMainFrame::OnControlInputs()
+{
+	// TODO: Add your command handler code here
+	#ifdef Fance_Enable_Test
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_INPUT);
+	#endif
+
+#ifndef Fance_Enable_Test
+	MessageBox(_T("This function is still in development"));
+#endif
+}
+
+
+void CMainFrame::OnControlPrograms()
+{
+	// TODO: Add your command handler code here
+	#ifdef Fance_Enable_Test
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAM);
+	#endif
+#ifndef Fance_Enable_Test
+	MessageBox(_T("This function is still in development"));
+#endif
+}
+
+
+void CMainFrame::OnControlOutputs()
+{
+	// TODO: Add your command handler code here
+	#ifdef Fance_Enable_Test
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_OUTPUT);
+	#endif
+#ifndef Fance_Enable_Test
+	MessageBox(_T("This function is still in development"));
+#endif
+}
+
+
+void CMainFrame::OnControlVariables()
+{
+	// TODO: Add your command handler code here
+	#ifdef Fance_Enable_Test
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_VARIABLE);
+	#endif
+#ifndef Fance_Enable_Test
+	MessageBox(_T("This function is still in development"));
+#endif
+}
+
+
+void CMainFrame::OnControlWeekly()
+{
+	// TODO: Add your command handler code here
+	#ifdef Fance_Enable_Test
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLY);
+	#endif
+#ifndef Fance_Enable_Test
+	MessageBox(_T("This function is still in development"));
+#endif
+}
+
+
+void CMainFrame::OnControlAnnualroutines()
+{
+	// TODO: Add your command handler code here
+	#ifdef Fance_Enable_Test
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ANNUAL);
+#endif
+#ifndef Fance_Enable_Test
+	MessageBox(_T("This function is still in development"));
+#endif
+}
+
+
+void CMainFrame::OnMiscellaneousLoaddescriptors()
+{
+	// TODO: Add your command handler code here
+	#ifdef Fance_Enable_Test
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
+#endif
+#ifndef Fance_Enable_Test
+	MessageBox(_T("This function is still in development"));
+#endif
+}
+
+
+void CMainFrame::OnMiscellaneousUpdatemini()
+{
+	// TODO: Add your command handler code here
+		#ifdef Fance_Enable_Test
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,WRITEPRGFLASH_COMMAND);
+#endif
+#ifndef Fance_Enable_Test
+	MessageBox(_T("This function is still in development"));
+#endif
+}
+
+//#include "BacnetController.h"
+void CMainFrame::OnControlControllers()
+{
+	// TODO: Add your command handler code here
+	//BacnetController dlg;
+	//dlg.DoModal();
+	#ifdef Fance_Enable_Test
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_CONTROLLER);
+#endif
+#ifndef Fance_Enable_Test
+	MessageBox(_T("This function is still in development"));
+#endif
+	
 }

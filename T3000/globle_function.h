@@ -90,11 +90,13 @@ BOOL Post_Read_one_Thread_Message(
 
 BOOL Post_Invoke_ID_Monitor_Thread(UINT MsgType,
 	int Invoke_ID,
-	HWND hwnd
+	HWND hwnd,
+	CString Show_Detail = _T("")
 	);
-BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize,HWND hWnd);
+BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,int block_size);
+BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,HWND hWnd,CString Task_Info = _T(""));
 
-int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize);
+int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int16_t entitysize);
 int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance/*,int8_t entitysize*/ );
 
 int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);

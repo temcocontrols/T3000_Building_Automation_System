@@ -793,14 +793,32 @@ BOOL GetSerialComPortNumber1(vector<CString>& szComm)
 
 	return FALSE;   
 }
-
-BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize,HWND hWnd)
+BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,int block_size)
+{
+	_MessageRefreshListInfo *pmy_refresh_info = new _MessageRefreshListInfo;
+	pmy_refresh_info->deviceid = deviceid;
+	pmy_refresh_info->command = command;
+	pmy_refresh_info->start_instance = start_instance;
+	pmy_refresh_info->end_instance = end_instance;
+	pmy_refresh_info->entitysize = entitysize;
+	pmy_refresh_info->block_size = block_size;
+	if(!PostThreadMessage(nThreadID,MY_BAC_REFRESH_LIST,(WPARAM)pmy_refresh_info,NULL))//post thread msg
+	{
+		return FALSE;
+	}
+	else
+	{
+		return TRUE;
+	}
+}
+BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,HWND hWnd ,CString Task_Info)
 {
 	_MessageWriteListInfo *pmy_write_info = new _MessageWriteListInfo;
 	pmy_write_info->deviceid = deviceid;
 	pmy_write_info->command = command;
 	pmy_write_info->start_instance = start_instance;
 	pmy_write_info->end_instance = end_instance;
+	pmy_write_info->Write_Info = Task_Info;
 	pmy_write_info->entitysize = entitysize;
 	pmy_write_info->hWnd = hWnd;
 	if(!PostThreadMessage(nThreadID,MY_BAC_WRITE_LIST,(WPARAM)pmy_write_info,NULL))//post thread msg
@@ -821,12 +839,14 @@ BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,i
 //short old_value
 BOOL Post_Invoke_ID_Monitor_Thread(UINT MsgType,
 	int Invoke_ID,
-	HWND hwnd
+	HWND hwnd,
+	CString Show_Detail 
 	)
 {
 	_MessageInvokeIDInfo *pMy_Invoke_id = new _MessageInvokeIDInfo;
 	pMy_Invoke_id->Invoke_ID = Invoke_ID;
 	pMy_Invoke_id->hwnd = hwnd;
+	pMy_Invoke_id->task_info = Show_Detail;
 	if(!PostThreadMessage(nThreadID,MY_INVOKE_ID,(WPARAM)pMy_Invoke_id,NULL))//post thread msg
 	{
 		return FALSE;
@@ -899,10 +919,15 @@ BOOL Post_Read_one_Thread_Message(
 	}
 }
 extern int my_lengthcode;
+/***************************************************
+**
+** Write Bacnet private data to device
+** Add by Fance
+****************************************************/
 int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance )
 {
 	// TODO: Add your control notification handler code here
-	int8_t entitysize=0;
+	unsigned short entitysize=0;
 	uint8_t apdu[480] = { 0 };
 	uint8_t test_value[480] = { 0 };
 	int private_data_len = 0;	
@@ -933,7 +958,25 @@ int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8
 	case  WRITEOUTPUT_T3000:
 		entitysize = sizeof(Str_out_point);
 		break;
+	case WRITEWEEKLYROUTINE_T3000:
+		entitysize = sizeof(Str_weekly_routine_point);
+		break;
+	case WRITEANNUALROUTINE_T3000:
+		entitysize = sizeof(Str_annual_routine_point);
+		break;
+	case WRITETIMESCHEDULE_T3000:
+		entitysize =9*16;// sizeof(Str_schedual_time_point);
+		break;
+	case WRITEANNUALSCHEDULE_T3000:
+		entitysize = 48;
+		break;
+	case RESTARTMINI_COMMAND:
+		entitysize = sizeof(Time_block_mini);
+		break;
 	default:
+		{
+			AfxMessageBox(_T("Entitysize length error!"));
+		}
 		break;
 	}
 	Str_user_data_header private_data_chunk;
@@ -944,6 +987,8 @@ int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8
 	private_data_chunk.entitysize=entitysize;
 
 	char SendBuffer[1000];
+	memset(SendBuffer,0,1000);
+	char * temp_buffer = SendBuffer;
 	memcpy_s(SendBuffer,PRIVATE_HEAD_LENGTH ,&private_data_chunk,PRIVATE_HEAD_LENGTH );
 
 	switch(command)
@@ -975,6 +1020,58 @@ int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8
 		{
 			memcpy_s(SendBuffer + i*sizeof(Str_out_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_out_point),&m_Output_data.at(i + start_instance),sizeof(Str_out_point));
 		}
+		break;
+	case WRITEWEEKLYROUTINE_T3000:
+		for (int i=0;i<(end_instance-start_instance + 1);i++)
+		{
+			memcpy_s(SendBuffer + i*sizeof(Str_weekly_routine_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_weekly_routine_point),&m_Weekly_data.at(i + start_instance),sizeof(Str_weekly_routine_point));
+		}
+		break;
+	case WRITETIMESCHEDULE_T3000:
+		temp_buffer = temp_buffer + PRIVATE_HEAD_LENGTH;
+		for (int j=0;j<9;j++)
+		{
+			for (int i=0;i<8;i++)
+			{
+				*(temp_buffer++) = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_minutes;// = *(my_temp_point ++);
+				*(temp_buffer++) = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_hours;// = *(my_temp_point ++);
+			}
+		}
+		
+		break;
+	case  WRITEANNUALROUTINE_T3000:
+		for (int i=0;i<(end_instance-start_instance + 1);i++)
+		{
+			memcpy_s(SendBuffer + i*sizeof(Str_annual_routine_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_annual_routine_point),&m_Annual_data.at(i + start_instance),sizeof(Str_annual_routine_point));
+		}
+		break;
+	case WRITEANNUALSCHEDULE_T3000:
+		memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,48,&g_DayState[annual_list_line],48);
+
+		//memcpy_s(g_DayState[annual_list_line],block_length,my_temp_point,block_length);
+		break;
+	case RESTARTMINI_COMMAND:
+		{
+			SendBuffer[7] = Device_time.ti_sec;
+			SendBuffer[8] = Device_time.ti_min;
+			SendBuffer[9] = Device_time.ti_hour;
+			SendBuffer[10] = Device_time.dayofmonth;
+			SendBuffer[11] = Device_time.month;
+			SendBuffer[12] = Device_time.year;
+			SendBuffer[13] = Device_time.dayofweek;
+			SendBuffer[14] =	Device_time.dayofyear && 0x00ff;
+			SendBuffer[15] =	(Device_time.dayofyear && 0xff00)>>8;
+			SendBuffer[16] = Device_time.isdst;
+
+			//temp_struct_value = ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+			//Device_time.dayofyear = temp_struct_value;
+			//my_temp_point = my_temp_point + 2;
+
+			//Device_time.isdst = *(my_temp_point ++);
+
+		}
+
+		//Device_time
 		break;
 	default:
 		{
@@ -1016,7 +1113,7 @@ Get Bacnet Private Data
 <param name="entitysize">Block size of read
 */
 /************************************************************************/
-int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int8_t entitysize)
+int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int16_t entitysize)
 {
 	// TODO: Add your control notification handler code here
 
@@ -1064,6 +1161,11 @@ int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t
 
 }
 
+/***************************************************
+**
+** Receive Bacnet private data from device , and handle the data.
+** Add by Fance
+****************************************************/
 
 int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 {
@@ -1103,36 +1205,6 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 	command_type = Temp_CS.value[2];
 
 
-#if 0
-	////////////////////////////////
-	 len_value_type = 80;
-	char *test_point;
-	test_point = (char *)Temp_CS.value +6;
-	strcpy_s(test_point,8,"ABCDEFG");
-	test_point = test_point + 21;
-	strcpy_s(test_point,5,"ABCD");
-	test_point = test_point + 9;
-	*test_point ++= 10;
-	*test_point ++= 0;
-	*test_point ++= 1;//OFF ON
-	*test_point ++= 1;//AutoMan
-	*test_point ++= 0;//comprg
-	*test_point ++= 0;//errcode
-	*test_point ++= 0;//unused
-
-	strcpy_s(test_point,8,"EEEEEEE");
-	test_point = test_point + 21;
-	strcpy_s(test_point,5,"1111");
-	test_point = test_point + 9;
-	*test_point ++= 10;
-	*test_point ++= 0;
-	*test_point ++= 0;//OFF ON
-	*test_point ++= 0;//AutoMan
-	*test_point ++= 1;//comprg
-	*test_point ++= 1;//errcode
-	*test_point ++= 1;//unused
-
-#endif
 
 	int start_instance=0;
 	int end_instance = 0;
@@ -1247,7 +1319,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			//m_Input_data_length = block_length;
 			//my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
 			//m_Variable_data.clear();
-			for (i=start_instance;i<end_instance + 1;i++)
+			for (i=start_instance;i<=end_instance;i++)
 			{
 				//Str_variable_point temp_variable;
 				memcpy_s( m_Variable_data.at(i).description,STR_VARIABLE_DESCRIPTION_LENGTH,my_temp_point,STR_VARIABLE_DESCRIPTION_LENGTH);
@@ -1272,9 +1344,62 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			return READVARIABLE_T3000;
 		}
 		break;
-	case READCONTROLLER_T3000  :
 	case READWEEKLYROUTINE_T3000  :
+		if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_weekly_routine_point))!=0)
+			return -1;	//得到的结构长度错误;
+		block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_weekly_routine_point);
+
+		my_temp_point = (char *)Temp_CS.value + 3;
+		start_instance = *my_temp_point;
+		my_temp_point++;
+		end_instance = *my_temp_point;
+		my_temp_point++;
+		my_temp_point = my_temp_point + 2;
+
+		for (i=start_instance;i<=end_instance;i++)
+		{
+			//Str_program_point temp_in;
+			memcpy_s( m_Weekly_data.at(i).description,STR_WEEKLY_DESCRIPTION_LENGTH,my_temp_point,STR_WEEKLY_DESCRIPTION_LENGTH);
+			my_temp_point=my_temp_point + STR_WEEKLY_DESCRIPTION_LENGTH;
+			memcpy_s( m_Weekly_data.at(i).label,STR_WEEKLY_LABEL_LENGTH ,my_temp_point,STR_WEEKLY_LABEL_LENGTH );
+			my_temp_point=my_temp_point + STR_WEEKLY_LABEL_LENGTH ;
+
+
+			m_Weekly_data.at(i).value = (unsigned char)(*(my_temp_point++));
+			m_Weekly_data.at(i).auto_manual = (unsigned char)(*(my_temp_point++));
+			m_Weekly_data.at(i).override_1_value =  (unsigned char)(*(my_temp_point++));
+			m_Weekly_data.at(i).override_2_value =  (unsigned char)(*(my_temp_point++));
+			m_Weekly_data.at(i).off =  (unsigned char)(*(my_temp_point++));
+			m_Weekly_data.at(i).unused = (unsigned char)(*(my_temp_point++));
+		}
+		return READWEEKLYROUTINE_T3000;
+		break;
 	case READANNUALROUTINE_T3000  :
+		if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_annual_routine_point))!=0)
+			return -1;	//得到的结构长度错误;
+		block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_annual_routine_point);
+
+		my_temp_point = (char *)Temp_CS.value + 3;
+		start_instance = *my_temp_point;
+		my_temp_point++;
+		end_instance = *my_temp_point;
+		my_temp_point++;
+		my_temp_point = my_temp_point + 2;
+
+		for (i=start_instance;i<=end_instance;i++)
+		{
+			//Str_program_point temp_in;
+			memcpy_s( m_Annual_data.at(i).description,STR_ANNUAL_DESCRIPTION_LENGTH,my_temp_point,STR_ANNUAL_DESCRIPTION_LENGTH);
+			my_temp_point=my_temp_point + STR_ANNUAL_DESCRIPTION_LENGTH;
+			memcpy_s( m_Annual_data.at(i).label,STR_ANNUAL_LABEL_LENGTH ,my_temp_point,STR_ANNUAL_LABEL_LENGTH );
+			my_temp_point=my_temp_point + STR_ANNUAL_LABEL_LENGTH ;
+
+
+			m_Annual_data.at(i).value = (unsigned char)(*(my_temp_point++));
+			m_Annual_data.at(i).auto_manual = (unsigned char)(*(my_temp_point++));
+			my_temp_point++;
+		}
+		return READANNUALROUTINE_T3000;
 		break;
 	case READPROGRAM_T3000:
 		{
@@ -1292,7 +1417,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
 
-			for (i=start_instance;i<end_instance;i++)
+			for (i=start_instance;i<=end_instance;i++)
 			{
 				//Str_program_point temp_in;
 				memcpy_s( m_Program_data.at(i).description,STR_PROGRAM_DESCRIPTION_LENGTH,my_temp_point,STR_PROGRAM_DESCRIPTION_LENGTH);
@@ -1320,9 +1445,146 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 		return READPROGRAMCODE_T3000;
 		}
 		break;
+	case  READTIMESCHEDULE_T3000:
+		block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
+		my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+		if(block_length!=(16*9))
+			return -1;
+		//copy the schedule day time to my own buffer.
+		for (int j=0;j<9;j++)
+		{
+			for (int i=0;i<8;i++)
+			{
+				m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_minutes = *(my_temp_point ++);
+				m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_hours = *(my_temp_point ++);
+			}
+		}
+	
+		return READTIMESCHEDULE_T3000;
+		break;
+	case READANNUALSCHEDULE_T3000:
+		block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
+		my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+		if(block_length!=48)
+			return -1;
+		memset(&g_DayState[annual_list_line],0,48);
+		memcpy_s(&g_DayState[annual_list_line],block_length,my_temp_point,block_length);
+		
+
+		return READANNUALSCHEDULE_T3000;
+		break;
+	case  TIME_COMMAND:
+		block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
+		my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+		if(block_length!=sizeof(Time_block_mini))
+			return -1;
+		Device_time.ti_sec = *(my_temp_point ++);
+		Device_time.ti_min = *(my_temp_point ++);
+		Device_time.ti_hour = *(my_temp_point ++);
+		Device_time.dayofmonth = *(my_temp_point ++);
+		Device_time.month = *(my_temp_point ++);
+		Device_time.year = *(my_temp_point ++);
+		Device_time.dayofweek = *(my_temp_point ++);
+
+		//temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+		//Device_time.dayofyear = temp_struct_value;
+		//my_temp_point = my_temp_point + 4;
+
+		temp_struct_value = ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+		Device_time.dayofyear = temp_struct_value;
+		my_temp_point = my_temp_point + 2;
+
+		Device_time.isdst = *(my_temp_point ++);
+
+		if(Device_time.ti_sec>=60)
+			Device_time.ti_sec=0;
+		if(Device_time.ti_min>=60)
+			Device_time.ti_min=0;
+		if(Device_time.ti_hour>=24)
+			Device_time.ti_hour=0;
+		if((Device_time.dayofmonth>=32)||(Device_time.dayofmonth==0))
+			Device_time.dayofmonth=1;
+		if((Device_time.month>12) || (Device_time.month == 0))
+			Device_time.month = 1;
+		if((Device_time.year>50))
+			Device_time.year = 13;
+		if((Device_time.dayofweek >7) || (Device_time.dayofweek == 0))
+			Device_time.dayofweek = 1;
+		if((Device_time.dayofyear >366) || (Device_time.dayofyear == 0))
+			Device_time.dayofyear = 1;
+		//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,NULL,NULL);
+		//byte  ti_min;         // 0-59
+		//byte  ti_hour;           // 0-23
+		//byte  dayofmonth;   // 1-31
+		//byte  month;          // 0-11
+		//byte  year;           // year - 1900
+		//byte  dayofweek;        // 0-6 ; 0=Sunday
+		//int   dayofyear;    // 0-365 gmtime
+		//signed char isdst;
+
+
+		return TIME_COMMAND;
+		break;
+	case READCONTROLLER_T3000:
+		if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_controller_point))!=0)
+			return -1;	//得到的结构长度错误;
+		block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_controller_point);
+
+		my_temp_point = (char *)Temp_CS.value + 3;
+		start_instance = *my_temp_point;
+		my_temp_point++;
+		end_instance = *my_temp_point;
+		my_temp_point++;
+		my_temp_point = my_temp_point + 2;
+
+		for (i=start_instance;i<=end_instance;i++)
+		{
+			m_controller_data.at(i).input.number = *(my_temp_point++);
+			m_controller_data.at(i).input.point_type = *(my_temp_point++);
+			m_controller_data.at(i).input.panel = *(my_temp_point++);
+
+			//这里先加卡关条件，目前暂时不支持 其他panel的Input
+			//if(m_controller_data.at(i).input.number>=BAC_INPUT_ITEM_COUNT)
+			//	m_controller_data.at(i).input.number = 0;
+			if(m_controller_data.at(i).input.panel != bac_gloab_panel )
+				m_controller_data.at(i).input.panel = bac_gloab_panel;
+
+			temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+			m_controller_data.at(i).input_value = temp_struct_value;
+
+			my_temp_point=my_temp_point+4;
+			temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+			m_controller_data.at(i).value = temp_struct_value;
+			my_temp_point=my_temp_point+4;
+
+			m_controller_data.at(i).setpoint.number = *(my_temp_point++);
+			m_controller_data.at(i).setpoint.point_type = *(my_temp_point++);
+			m_controller_data.at(i).setpoint.panel = *(my_temp_point++);
+
+			temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+			m_controller_data.at(i).setpoint_value = temp_struct_value;
+			my_temp_point=my_temp_point+4;
+
+			m_controller_data.at(i).units = *(my_temp_point++);
+			m_controller_data.at(i).auto_manual = *(my_temp_point++);
+			m_controller_data.at(i).action = *(my_temp_point++);
+			m_controller_data.at(i).repeats_per_min = *(my_temp_point++);
+			m_controller_data.at(i).unused = *(my_temp_point++);
+			m_controller_data.at(i).prop_high = *(my_temp_point++);
+			m_controller_data.at(i).proportional = *(my_temp_point++);
+			m_controller_data.at(i).reset = *(my_temp_point++);
+			m_controller_data.at(i).bias = *(my_temp_point++);
+			m_controller_data.at(i).rate = *(my_temp_point++);
+		}
+
+
+
+		return READCONTROLLER_T3000;
+		break;
 	}
 	return 1;
 }
+
 
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 void local_handler_conf_private_trans_ack(
@@ -1361,23 +1623,43 @@ void local_handler_conf_private_trans_ack(
 	switch(receive_data_type)
 	{
 	case READINPUT_T3000:
-		::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+	//	::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 		copy_data_to_ptrpanel(TYPE_INPUT);
 		break;
 	case READPROGRAM_T3000:
-		::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
-		copy_data_to_ptrpanel(TYPE_PROGRAM);
+	//	::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+		copy_data_to_ptrpanel(TYPE_ALL);
 		break;
 	case READPROGRAMCODE_T3000:
 		::PostMessage(m_program_edit_hwnd,WM_REFRESH_BAC_PROGRAM_RICHEDIT,NULL,NULL);
 		break;
 	case READVARIABLE_T3000:
-		::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+	//	::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 		copy_data_to_ptrpanel(TYPE_VARIABLE);
 		break;
 	case READOUTPUT_T3000:
-		::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+	//	::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 		copy_data_to_ptrpanel(TYPE_OUTPUT);
+		break;
+	case READWEEKLYROUTINE_T3000:
+		copy_data_to_ptrpanel(TYPE_WEEKLY);
+		break;
+	case READANNUALROUTINE_T3000:
+		copy_data_to_ptrpanel(TYPE_ANNUAL);
+		break;
+	case READTIMESCHEDULE_T3000:
+		::PostMessage(m_schedule_time_dlg_hwnd,WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
+		break;
+	case TIME_COMMAND:
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,TIME_COMMAND,NULL);
+		break;
+	case READANNUALSCHEDULE_T3000:
+		::PostMessage(m_schedule_day_dlg_hwnd,WM_REFRESH_BAC_DAY_CAL,NULL,NULL);
+		break;
+	case READCONTROLLER_T3000:
+		//::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+		break;
+	default:
 		break;
 	}
 

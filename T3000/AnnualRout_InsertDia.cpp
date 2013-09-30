@@ -29,6 +29,12 @@ AnnualRout_InsertDia::AnnualRout_InsertDia(unsigned char row,CString strtype,CWn
 	m_strtype = strtype;
 }
 
+AnnualRout_InsertDia::AnnualRout_InsertDia(CWnd* pParent /*=NULL*/)
+	: CDialog(AnnualRout_InsertDia::IDD, pParent)
+{
+
+}
+
 
 AnnualRout_InsertDia::~AnnualRout_InsertDia()
 {
@@ -55,6 +61,11 @@ BEGIN_MESSAGE_MAP(AnnualRout_InsertDia, CDialog)
 	ON_COMMAND(ID_ANNUALROUT_CLEAR, OnAnnualroutClear)
 	ON_BN_CLICKED(IDOK, &AnnualRout_InsertDia::OnBnClickedOk)
 	ON_CBN_SELCHANGE(IDC_COMBO1, &AnnualRout_InsertDia::OnCbnSelchangeCombo1)
+
+	ON_NOTIFY(MCN_SELECT, IDC_MONTHCALENDAR1, &AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar)
+	ON_MESSAGE(WM_REFRESH_BAC_DAY_CAL,&AnnualRout_InsertDia::Fresh_Schedule_Day_Cal)	
+	ON_MESSAGE(MY_RESUME_DATA, &AnnualRout_InsertDia::DayResumeMessageCallBack)
+
 END_MESSAGE_MAP()
 
 // AnnualRout_InsertDia 消息处理程序
@@ -249,88 +260,139 @@ void AnnualRout_InsertDia::load()
 BOOL AnnualRout_InsertDia::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	
-	SYSTEMTIME systime;
-	::GetSystemTime(&systime);
-	CTime time(systime);
-	if(time.GetYear()%4==0)
-		is_leap=true;//leap year
-	else 
-		is_leap=false;//no leap year
-	for(int i=0;i<20;i++)
-	{
-		CString strTempYear;
-		strTempYear.Format(_T("%d"),systime.wYear+i);
-		m_yearComBox.AddString(strTempYear);
-		m_yearComBox.SetCurSel(0);
+	//if(DEVICE_FORMAT_TYPE == cm5)	//后来的人如果看到这个代码请不要奇怪，老毛要求这样的.用IF ELSE 来区分不同的
+	if(1)
+	{								//器件。产品本来不同 界面就会有差异 都还要用一个界面。木有办法，只能 加在一起了。;
+		GetDlgItem(IDC_LIST1)->ShowWindow(0);
+		GetDlgItem(IDC_YEARSTATIC)->ShowWindow(0);
+		GetDlgItem(IDC_COMBO1)->ShowWindow(0);
+		GetDlgItem(IDC_COMBO1)->ShowWindow(0);
+		GetDlgItem(IDC_STATIC)->ShowWindow(0);
+		GetDlgItem(IDOK)->ShowWindow(0);
+		
+		MoveWindow(100,100,680,700);
+		GetDlgItem(IDC_MONTHCALENDAR1)->MoveWindow(10,10,680,700);
+
+		m_schedule_day_dlg_hwnd = this->m_hWnd;
+		g_hwnd_now = m_schedule_day_dlg_hwnd;
+
+		SYSTEMTIME StartTime1;
+		StartTime1.wYear = 2013;
+		StartTime1.wMonth = 1;
+		StartTime1.wDay = 1;
+		SYSTEMTIME EndTime1;
+		EndTime1.wYear = 2013;
+		EndTime1.wMonth = 12;
+		EndTime1.wDay = 31;
+		m_month_ctrl.SetRange(&StartTime1,&EndTime1);
+
+
+		SYSTEMTIME timeFrom;
+		SYSTEMTIME timeUntil;
+		int nCount = m_month_ctrl.GetMonthRange(&timeFrom, &timeUntil, GMR_DAYSTATE);
+
+		int retry_count =0;
+		do 
+		{
+			retry_count ++;
+			g_invoke_id = GetPrivateData(bac_gloab_device_id,READANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48);
+			Sleep(200);
+		} while ((retry_count<10)&&(g_invoke_id<0));
+
+		if(g_invoke_id>=0)
+		{
+			CString temp_cs_show;
+			temp_cs_show.Format(_T("Task ID = %d. Read annual routine schedule Item %d "),g_invoke_id,annual_list_line);
+
+			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
+		}
+
 	}
-	OSVERSIONINFO Version; 
-	ZeroMemory(&Version,sizeof(OSVERSIONINFO)); 
-	Version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO); 
-	GetVersionEx(&Version); 
-	if(Version.dwMajorVersion<=5)
-		m_bXpOS=TRUE;
-	else
-		m_bXpOS=FALSE;
-	if(m_bXpOS)	
-	{
-		m_yearComBox.ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_YEARSTATIC)->ShowWindow(SW_HIDE);
-	}
 	else
 	{
-		m_yearComBox.ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_YEARSTATIC)->ShowWindow(SW_SHOW);
-		SYSTEMTIME sysFromtime;
-		SYSTEMTIME sysEndtime;
-		sysFromtime=systime;
-		sysEndtime=systime;
-		sysFromtime.wMonth=1;
-		sysEndtime.wMonth=12;
+		SYSTEMTIME systime;
+		::GetSystemTime(&systime);
+		CTime time(systime);
+		if(time.GetYear()%4==0)
+			is_leap=true;//leap year
+		else 
+			is_leap=false;//no leap year
+		for(int i=0;i<20;i++)
+		{
+			CString strTempYear;
+			strTempYear.Format(_T("%d"),systime.wYear+i);
+			m_yearComBox.AddString(strTempYear);
+			m_yearComBox.SetCurSel(0);
+		}
+		OSVERSIONINFO Version; 
+		ZeroMemory(&Version,sizeof(OSVERSIONINFO)); 
+		Version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO); 
+		GetVersionEx(&Version); 
+		if(Version.dwMajorVersion<=5)
+			m_bXpOS=TRUE;
+		else
+			m_bXpOS=FALSE;
+		if(m_bXpOS)	
+		{
+			m_yearComBox.ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_YEARSTATIC)->ShowWindow(SW_HIDE);
+		}
+		else
+		{
+			m_yearComBox.ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_YEARSTATIC)->ShowWindow(SW_SHOW);
+			SYSTEMTIME sysFromtime;
+			SYSTEMTIME sysEndtime;
+			sysFromtime=systime;
+			sysEndtime=systime;
+			sysFromtime.wMonth=1;
+			sysEndtime.wMonth=12;
 			sysFromtime.wDay=1;
-		sysEndtime.wDay=31;
-		m_month_ctrl.SetRange(&sysFromtime,&sysEndtime);
+			sysEndtime.wDay=31;
+			m_month_ctrl.SetRange(&sysFromtime,&sysEndtime);
+		}
+
+		//m_month_ctrl.SetMonthView();
+
+
+
+
+
+
+
+
+
+		// TODO:  在此添加额外的初始化	
+		CString str;
+		//	description2 temp_description;
+		//	Annual_Routines temp;
+		for(unsigned char i=1;i<=16;i++)
+		{//////////////////////////////////////////////////get information from network
+			//		temp_description=temp.read_addr(i-1);
+			//		str.Format("%s",temp_description.full_label);
+			str.Format(_T("%d"),i);
+			m_list_ctrl.AddString(str);	
+		}
+		m_list_ctrl.SetCurSel(m_addr-1);
+		//*********************for set_day_state function
+
+
+		/*
+		m_monthViewCtrl.put_Enabled(TRUE);
+		m_monthViewCtrl.put_MultiSelect(TRUE);
+		m_monthViewCtrl.ShowWindow(SW_HIDE);
+
+		*/
+		//	m_month_ctrl.SetColor(MCSC_TEXT,RGB(240,0,0));
+		//m_month_ctrl.
+
+		month_nCount = m_month_ctrl.GetMonthRange(&timeFrom, &timeUntil, GMR_DAYSTATE);
+		pDayState=new MONTHDAYSTATE[month_nCount];
+		memset(pDayState, 0, sizeof(MONTHDAYSTATE) * month_nCount);
+		//*********************for set_day_state function
+		load();	
 	}
 
-	//m_month_ctrl.SetMonthView();
-
-
-	
-
-	
-
-
-
-
-	// TODO:  在此添加额外的初始化	
-	CString str;
-//	description2 temp_description;
-//	Annual_Routines temp;
-	for(unsigned char i=1;i<=16;i++)
-	{//////////////////////////////////////////////////get information from network
-	//		temp_description=temp.read_addr(i-1);
-//		str.Format("%s",temp_description.full_label);
-		str.Format(_T("%d"),i);
-		m_list_ctrl.AddString(str);	
-	}
-	m_list_ctrl.SetCurSel(m_addr-1);
-	//*********************for set_day_state function
-
-	
-	/*
-	m_monthViewCtrl.put_Enabled(TRUE);
-	m_monthViewCtrl.put_MultiSelect(TRUE);
-	m_monthViewCtrl.ShowWindow(SW_HIDE);
-	
-	*/
-//	m_month_ctrl.SetColor(MCSC_TEXT,RGB(240,0,0));
-	//m_month_ctrl.
-
-	month_nCount = m_month_ctrl.GetMonthRange(&timeFrom, &timeUntil, GMR_DAYSTATE);
-	pDayState=new MONTHDAYSTATE[month_nCount];
-	memset(pDayState, 0, sizeof(MONTHDAYSTATE) * month_nCount);
-	//*********************for set_day_state function
-	load();	
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
 }
@@ -453,8 +515,16 @@ void AnnualRout_InsertDia::OnBnClickedButton2()
 
 void AnnualRout_InsertDia::OnDestroy()
 {
+	if(1)
+	{
+		//MessageBox(_T("Need to Add code here"));
+			CDialog::OnDestroy();	
+	}
+	else
+	{
 	CDialog::OnDestroy();	
 	delete [] pDayState;//for day state         function
+	}
 }
 
 void AnnualRout_InsertDia::OnBnClickedButton3()
@@ -591,3 +661,99 @@ void AnnualRout_InsertDia::OnCbnSelchangeCombo1()
 
 	
 }
+
+
+
+
+
+
+
+
+
+#pragma region BAC_NET_CM5
+
+LRESULT AnnualRout_InsertDia::Fresh_Schedule_Day_Cal(WPARAM wParam,LPARAM lParam)
+{
+	//
+
+	for (int i=0;i<12;i++)
+	{
+		//pDayState[i] = (DWORD)g_DayState[annual_list_line]
+		//memset((void *)pDayState[i],0,sizeof(pDayState)/sizeof(pDayState[0]));
+		memcpy_s(&pBacDayState[i],4,&g_DayState[annual_list_line][i*4],4);
+
+		//	pDayState[i]  = g_DayState[annual_list_line];
+	}
+	m_month_ctrl.SetDayState(12, pBacDayState);
+
+
+	return 0;
+}
+
+
+
+LRESULT  AnnualRout_InsertDia::DayResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
+{
+	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
+	CString temp_cs;
+	temp_cs.Format(_T("%d"),pInvoke->Invoke_ID);
+	bool msg_result=WRITE_FAIL;
+	msg_result = MKBOOL(wParam);
+	if(msg_result)
+	{
+		CString temp_ok;
+		temp_ok = _T("Bacnet operation success!   Request ID:") +  temp_cs;
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_ok);
+#ifdef SHOW_MESSAGEBOX
+		MessageBox(temp_ok);
+#endif
+	}
+	else
+	{
+		CString temp_fail;
+		temp_fail = _T("Bacnet operation fail!   Request ID:") +  temp_cs;
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_fail);
+#ifdef SHOW_ERROR_MESSAGE
+		MessageBox(temp_fail);
+#endif
+	}
+	if(pInvoke)
+		delete pInvoke;
+	return 0;
+}
+
+
+
+void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMSELCHANGE pSelChange = reinterpret_cast<LPNMSELCHANGE>(pNMHDR);
+	// TODO: Add your control notification handler code here
+
+	int Clicked_month = pSelChange->stSelStart.wMonth ;
+	int Clicked_day =pSelChange->stSelStart.wDay;
+
+	if(((pBacDayState[Clicked_month-1] >>Clicked_day-1 ) & 0x00000001) == 1)
+		pBacDayState[Clicked_month-1] &= ~(1 << Clicked_day-1);   // 4th day
+	else
+		pBacDayState[Clicked_month-1] |= 1 << Clicked_day-1;   // 4th day
+
+	m_month_ctrl.SetDayState(12, pBacDayState);
+
+
+	for (int i=0;i<12;i++)
+	{
+		memcpy_s(&g_DayState[annual_list_line][i*4],4,&pBacDayState[i],4);
+	}
+	CString temp_task_info;
+	temp_task_info.Format(_T("Write annual schedual List Item%d ."),annual_list_line + 1);
+	Post_Write_Message(bac_gloab_device_id,WRITEANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48,this->m_hWnd,temp_task_info);
+
+	*pResult = 0;
+}
+
+
+
+
+
+#pragma endregion BAC_NET_CM5
+

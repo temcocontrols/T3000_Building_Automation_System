@@ -12,7 +12,7 @@
 #include "gloab_define.h"
 extern int error;
 extern char *pmes;
-extern int program_list_line;
+//extern int program_list_line;
 
 // CBacnetProgramEdit dialog
  char editbuf[25000];
@@ -52,8 +52,7 @@ void CBacnetProgramEdit::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CBacnetProgramEdit, CDialogEx)
 	ON_MESSAGE(WM_HOTKEY,&CBacnetProgramEdit::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(WM_REFRESH_BAC_PROGRAM_RICHEDIT,Fresh_Program_RichEdit)
-	ON_MESSAGE(MY_RESUME_DATA, ProgramResumeMessageCallBack)
-//	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_SEND, &CBacnetProgramEdit::OnBnClickedButtonProgramSend)
+	//ON_MESSAGE(MY_RESUME_DATA, ProgramResumeMessageCallBack)
 	ON_COMMAND(ID_SEND, &CBacnetProgramEdit::OnSend)
 	ON_WM_CLOSE()
 	ON_COMMAND(ID_CLEAR, &CBacnetProgramEdit::OnClear)
@@ -122,13 +121,13 @@ void CBacnetProgramEdit::Initial_static()
 	//m_static.bkColor(RGB(0,255,255));
 	m_free_memory.setFont(15,10,NULL,_T("Arial"));
 }
-
+extern char my_panel;
 BOOL CBacnetProgramEdit::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
 	// TODO:  Add extra initialization here
-
+	my_panel = bac_gloab_panel; //Set the panel number
 	GetDlgItem(IDC_RICHEDIT2_PROGRAM)->SetFocus();
 
 	CHARFORMAT cf;
@@ -157,10 +156,21 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 
 	//((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->PasteSpecial(CF_TEXT);
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->PostMessage(WM_VSCROLL, SB_BOTTOM,0);
-
-	g_invoke_id = GetPrivateData(1234,READPROGRAMCODE_T3000,program_list_line,program_list_line,100);
-	if(g_invoke_id>=0)
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+	//int retry_count =0;
+	//do 
+	//{
+	//	retry_count ++;
+	//	g_invoke_id = GetPrivateData(bac_gloab_device_id,READPROGRAMCODE_T3000,program_list_line,program_list_line,100);
+	//	Sleep(200);
+	//} while ((retry_count<10)&&(g_invoke_id<0));
+	
+	//if(g_invoke_id>=0)
+	//{
+	//	CString temp_cs_show;
+	//	temp_cs_show.Format(_T("Task ID = %d. Read program code from item %d "),g_invoke_id,program_list_line);
+	//	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
+	//}
+		//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 
 	RegisterHotKey(GetSafeHwnd(),KEY_F2,NULL,VK_F2);//F2键
 	RegisterHotKey(GetSafeHwnd(),KEY_F3,NULL,VK_F3);
@@ -173,6 +183,9 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	Init_table_bank();
 	m_program_edit_hwnd = this->m_hWnd;
 	g_hwnd_now = m_program_edit_hwnd;
+
+	
+
 	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -181,7 +194,12 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	char * temp_point;
 	temp_point = desassembler_program();
 	if(temp_point == NULL)
+	{
+		MessageBox(_T("ERROR!!!!Decode Error!!!!!!!!!!!!!"));
+		
 		return 1;
+	}
+		
 	CString temp;
 
 
@@ -206,34 +224,42 @@ void CBacnetProgramEdit::OnOK()
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->ReplaceSel(_T("\n"));
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetFocus();
 
-
 	/*CDialogEx::OnOK();*/
 }
 
-
-LRESULT  CBacnetProgramEdit::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
-{
-	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
-	bool msg_result=WRITE_FAIL;
-	msg_result = MKBOOL(wParam);
-	if(msg_result)
-	{
-		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Bacnet operation success!"));
-		#ifdef SHOW_MESSAGEBOX
-		MessageBox(_T("Bacnet operation success!"));
-		#endif
-	}
-	else
-	{
-		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Bacnet operation fail!"));
-		#ifdef SHOW_ERROR_MESSAGE
-		MessageBox(_T("Bacnet operation fail!"));
-		#endif
-	}
-	if(pInvoke)
-		delete pInvoke;
-	return 0;
-}
+//
+//LRESULT  CBacnetProgramEdit::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
+//{
+//	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
+//	CString temp_cs = pInvoke->task_info;
+//	bool msg_result=WRITE_FAIL;
+//	msg_result = MKBOOL(wParam);
+//	CString Show_Results;
+//	if(msg_result)
+//	{
+//		//CString temp_ok;
+//		//temp_ok = _T("Bacnet operation success!   Request ID:") +  temp_cs;
+//
+//		Show_Results = temp_cs + _T("Success!");
+//		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+//
+//		//SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_ok);
+//#ifdef SHOW_MESSAGEBOX
+//		MessageBox(Show_Results);
+//#endif
+//	}
+//	else
+//	{
+//		Show_Results = temp_cs + _T("Fail!");
+//		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+//#ifdef SHOW_ERROR_MESSAGE
+//		MessageBox(Show_Results);
+//#endif
+//	}
+//	if(pInvoke)
+//		delete pInvoke;
+//	return 0;
+//}
 
 
 void CBacnetProgramEdit::OnSend()
@@ -253,9 +279,14 @@ void CBacnetProgramEdit::OnSend()
 	Encode_Program();
 	if(error == -1)
 	{
-		g_invoke_id =WritePrivateData(1234,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line/*,my_lengthcode*/);
+		g_invoke_id =WritePrivateData(bac_gloab_device_id,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line/*,my_lengthcode*/);
 		if(g_invoke_id>=0)
-			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+		{
+			CString temp_cs_show;
+			temp_cs_show.Format(_T("Task ID = %d. Write program code to item %d "),g_invoke_id,program_list_line);
+			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
+		}
+
 	}
 	else
 	{
@@ -331,7 +362,6 @@ void CBacnetProgramEdit::OnLoadfile()
 		file.Read(pBuf,dwFileLen);
 		file.Close();
 
-
 		CString ReadBuffer;
 
 		int  len = 0;
@@ -351,12 +381,6 @@ void CBacnetProgramEdit::OnLoadfile()
 void CBacnetProgramEdit::OnSavefile()
 {
 	// TODO: Add your command handler code here
-
-
-	
-
-
-
 	CFileDialog dlg(false,_T("*.txt"),_T(" "),OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,_T("txt files (*.txt)|*.txt|All Files (*.*)|*.*||"),NULL,0);
 	if(IDOK==dlg.DoModal())
 	{
@@ -409,7 +433,11 @@ void CBacnetProgramEdit::OnRefresh()
 {
 	// TODO: Add your command handler code here
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(_T(""));
-	g_invoke_id = GetPrivateData(1234,READPROGRAMCODE_T3000,program_list_line,program_list_line,100);
+	g_invoke_id = GetPrivateData(bac_gloab_device_id,READPROGRAMCODE_T3000,program_list_line,program_list_line,200);
 	if(g_invoke_id>=0)
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+	{
+		CString temp_cs_show;
+		temp_cs_show.Format(_T("Task ID = %d. Read program code from item %d "),g_invoke_id,program_list_line);
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
+	}
 }
