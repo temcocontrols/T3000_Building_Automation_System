@@ -3,6 +3,7 @@
 #include "afxwin.h"
 #include "afxcmn.h"
 
+
 // BacnetWait dialog
 
 class BacnetWait : public CDialogEx
@@ -30,4 +31,5 @@ public:
 	CProgressCtrl m_wait_progress;
 	static DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid);
 	
+	CStaticEx m_wait_persent;
 };

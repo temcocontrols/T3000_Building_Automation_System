@@ -1396,3 +1396,7 @@ void ListCtrlEx::CListCtrlEx::OnDestroy()
 	}
 
 }
+
+
+
+

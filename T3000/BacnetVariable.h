@@ -22,7 +22,7 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedButtonVariableRead();
-	afx_msg LRESULT  VariableResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
+	//afx_msg LRESULT  VariableResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Fresh_Variable_List(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Fresh_Variable_Item(WPARAM wParam,LPARAM lParam);
 	void Initial_List();
@@ -30,6 +30,7 @@ public:
 
 	afx_msg void OnBnClickedButtonVariableApply();
 	afx_msg void OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 

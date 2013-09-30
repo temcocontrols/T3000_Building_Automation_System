@@ -27,7 +27,7 @@ public:
 	afx_msg void OnBnClickedButtonProgramRead();
 	afx_msg LRESULT Fresh_Program_List(WPARAM wParam,LPARAM lParam);
 	afx_msg void OnBnClickedButtonProgramApply();
-	afx_msg LRESULT  ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
+//	afx_msg LRESULT  ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedButtonProgramEdit();
 //	afx_msg void OnLvnItemchangedListProgram(NMHDR *pNMHDR, LRESULT *pResult);
 	void UnCheckOtherItem(ListCtrlEx::CListCtrlEx& listCtrl, int index);
@@ -37,6 +37,7 @@ public:
 	afx_msg LRESULT Fresh_Program_Item(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
 	afx_msg void OnClose();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 	const int PROGRAM_NUM = 0;

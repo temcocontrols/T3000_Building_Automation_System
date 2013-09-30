@@ -2,7 +2,7 @@
 
 #include "Bacnet_Include.h"
 #include "CM5\ud_str.h"
-
+#include "gloab_define.h"
 
 
 extern int g_invoke_id;
@@ -850,6 +850,7 @@ extern int MODBUS_RELAY_PWM_TOTAL_DUTY                         ;
 extern int MODBUS_RELAY_PWM_HIGH_DUTY                          ;   
 
 #pragma region For_bacnet
+extern HWND BacNet_hwd;//Used for send a message to father delete the dlg;
 extern int bac_ranges_type;
 extern int bac_range_number_choose;
 
@@ -861,6 +862,18 @@ extern bool bac_input_read_results;
 extern bool bac_output_read_results;
 extern bool bac_variable_read_results;
 extern bool bac_program_read_results;
+extern bool bac_weekly_read_results;
+extern bool bac_annual_read_results;
+extern bool bac_time_command_read_results;
+extern bool bac_controller_read_results;
+
+extern int bac_gloab_panel;
+extern int bac_gloab_device_id;
+
+extern int program_list_line ;
+extern int weekly_list_line ;
+extern int annual_list_line ;
+extern Time_block_mini Device_time;
 
 extern HWND      g_hwnd_now;
 extern HWND      m_input_dlg_hwnd;
@@ -868,9 +881,18 @@ extern HWND      m_output_dlg_hwnd;
 extern HWND      m_pragram_dlg_hwnd;
 extern HWND      m_program_edit_hwnd;
 extern HWND      m_variable_dlg_hwnd;
+extern HWND      m_weekly_dlg_hwnd;
+extern HWND      m_annual_dlg_hwnd;
+extern HWND      m_schedule_time_dlg_hwnd;
+extern HWND      m_schedule_day_dlg_hwnd;
+extern HWND      m_controller_dlg_hwnd;
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
 extern vector <Str_variable_point>  m_Variable_data;
-
+extern vector <Str_weekly_routine_point> m_Weekly_data;
+extern vector <Str_annual_routine_point> m_Annual_data;
+extern vector <Str_schedual_time_point> m_Schedual_Time_data;
+extern vector <Str_controller_point> m_controller_data;
+extern byte	g_DayState[8][48];
 #pragma endregion For_bacnet

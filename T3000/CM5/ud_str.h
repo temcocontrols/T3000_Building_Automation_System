@@ -141,6 +141,12 @@ typedef enum {
 #define STR_PROGRAM_DESCRIPTION_LENGTH 21
 #define  STR_PROGRAM_LABEL_LENGTH 9
 
+#define STR_WEEKLY_DESCRIPTION_LENGTH 21
+#define  STR_WEEKLY_LABEL_LENGTH 9
+
+#define STR_ANNUAL_DESCRIPTION_LENGTH 21
+#define  STR_ANNUAL_LABEL_LENGTH 9
+
 #pragma pack(push) //±£´æ¶ÔÆë×´Ì¬ 
 #pragma pack(1)
 typedef struct
@@ -307,6 +313,21 @@ typedef struct {
 	int32_t 	oi;
 }	Con_aux;
 
+//class Point_T3000 {
+//public:
+//	byte number		;
+//	byte point_type;
+//	byte panel	 ;
+//};
+
+typedef struct {
+public:
+	byte number		;
+	byte point_type;
+	byte panel	 ;
+}Point_T3000;
+
+
 typedef struct
 {
 	int8_t description[21];		     /* (21 bytes; string)*/
@@ -324,6 +345,32 @@ typedef struct
 
 } Str_weekly_routine_point; /* 21+9+2+3+3 = 38*/
 
+typedef struct  
+{
+	byte time_minutes;
+	byte time_hours;
+	//byte time_on_minutes1;		// (1 byte ; 0-59)
+	//byte time_on_hours1;		// (1 byte ; 0-23)
+	//byte time_off_minutes1;	// (1 byte ; 0-59)
+	//byte time_off_hours1;		// (1 byte ; 0-23)
+	//byte time_on_minutes2;		// (1 byte ; 0-59)
+	//byte time_on_hours2;		// (1 byte ; 0-23)
+	//byte time_off_minutes2;	// (1 byte ; 0-59)
+	//byte time_off_hours2;		// (1 byte ; 0-23)
+	//byte time_on_minutes3;		// (1 byte ; 0-59)
+	//byte time_on_hours3;		// (1 byte ; 0-23)
+	//byte time_off_minutes3;	// (1 byte ; 0-59)
+	//byte time_off_hours3;		// (1 byte ; 0-23)
+	//byte time_on_minutes4;		// (1 byte ; 0-59)
+	//byte time_on_hours4;		// (1 byte ; 0-23)
+	//byte time_off_minutes4;	// (1 byte ; 0-59)
+	//byte time_off_hours4;		// (1 byte ; 0-23)
+}Day_Time;
+
+typedef struct 		// (size = 16 byte s)
+{
+	Day_Time Schedual_Day_Time[8][9];
+} Str_schedual_time_point;
 
 typedef struct
 {
@@ -347,6 +394,18 @@ typedef struct
 
 }	Str_annual_routine_point;   /* 21+9+2=32 bytes*/
 
+typedef struct
+{
+	byte  ti_sec;         // 0-59
+	byte  ti_min;         // 0-59
+	byte  ti_hour;           // 0-23
+	byte  dayofmonth;   // 1-31
+	byte  month;          // 0-11
+	byte  year;           // year - 1900
+	byte  dayofweek;        // 0-6 ; 0=Sunday
+	WORD   dayofyear;    // 0-365 gmtime
+	signed char isdst;
+} Time_block_mini;
 
 typedef struct
 {
@@ -360,6 +419,33 @@ typedef struct
 	uint8_t unused;   //      : 8;
 
 } Str_program_point;	  /* 21+9+2+2 = 34 bytes*/
+
+
+typedef struct
+{
+	Point_T3000 input;	        /* (3 bytes; point)*/
+	int32_t input_value; 	        /* (4 bytes; int32_t)*/
+	int32_t value;		              /* (4 bytes; int32_t)*/
+	Point_T3000 setpoint;	      /* (3 bytes; point)*/
+	int32_t setpoint_value;	      /* (4 bytes; float)*/
+	uint8_t units;    /* (1 uint8_t ; Analog_units_equate)*/
+
+	uint8_t auto_manual; /* (1 bit; 0=auto, 1=manual)*/
+	uint8_t action; /* (1 bit; 0=direct, 1=reverse)*/
+	uint8_t repeats_per_min; /* (1 bit; 0=repeats/hour,1=repeats/min)*/
+	uint8_t unused; /* (1 bit)*/
+	uint8_t prop_high; /* (4 bits; high 4 bits of proportional bad)*/
+
+	uint8_t proportional;
+
+	uint8_t reset;	      /* (1 uint8_t ; 0-255)*/
+	uint8_t bias;	      /* (1 uint8_t ; 0-100)*/
+	uint8_t rate;	      /* (1 uint8_t ; 0-2.00)*/
+
+}	Str_controller_point; /* 3+4+4+3+4+1+1+4 = 24*/
+
+
+
 #pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
 
 
