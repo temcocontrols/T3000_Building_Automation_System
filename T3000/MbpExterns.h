@@ -60,6 +60,15 @@ extern int insertDataString;
 extern unsigned int trafficStringIndex;
 extern int autoScroll;
 extern unsigned int packetCount;
+extern DWORD hThreadID;
+extern DWORD hDispThreadID;
+extern DWORD hMbCommThreadID;
+extern HANDLE ghSemaphore;
+extern HANDLE displayThreadSemaphore;
+extern HANDLE mbCommThreadSemaphore;
+extern unsigned int temporaryCount;
+extern HANDLE hDispThread;
+extern HANDLE hMbCommThread;
 
 extern void LoadReadOneData(int val, unsigned char device_var,unsigned short address);
 extern void LoadWriteOneData(int val, unsigned char device_var,unsigned short address);

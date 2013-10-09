@@ -76,6 +76,7 @@ void CMbPoll::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BUTTON_TRAFFIC3, btnShowTraffic3);
 	DDX_Control(pDX, IDC_BUTTON_TRAFFIC4, btnShowTraffic4);
 	DDX_Control(pDX, IDC_BUTTON_TRAFFIC5, btnShowTraffic5);
+	DDX_Control(pDX, IDC_MBPOLL_LIST, mbPollList);
 }
 
 void CMbPoll::startStopBtnState()
@@ -213,11 +214,27 @@ BOOL CMbPoll::OnInitDialog()
 
 	SetTimer(1, 2000, NULL);
 	SetTimer(2, 500, NULL);
-	SetTimer(3, 500, NULL);
+	SetTimer(3, 50, NULL);
+
+#if 0
+	connectionSuccessful = 1;	/* to be deleted */
+#endif
+
+	InitListCtrl();
+	mbPollList.GetWindowRect(mbPollListRect);
 
 	GetWindowRect(m_rect);
 	m_nScrollPos = 0;
 	m_nHScrollPos = 0;
+
+	//ghSemaphore = CreateSemaphore(NULL, 0, 10, NULL);
+	//hThread = CreateThread(NULL, NULL, testThread, this, 0/*CREATE_SUSPENDED*/, &hThreadID);
+	displayThreadSemaphore = CreateSemaphore(NULL, 0, 10, NULL);
+	hDispThread = CreateThread(NULL, NULL, displayThreadStarter, this, 0/*CREATE_SUSPENDED*/, &hDispThreadID);
+	mbCommThreadSemaphore = CreateSemaphore(NULL, 0, 10, NULL);
+	hMbCommThread = CreateThread(NULL, NULL, mbCommThreadStarter, this, 0/*CREATE_SUSPENDED*/, &hMbCommThreadID);
+	//hDeal_thread =CreateThread(NULL,NULL,Translate_My_Message,this,NULL, &n_Main_ThreadID_Do);
+	//PostMessage(MY_FRESH_LISTCTRL,(WPARAM)DO_SUCCESS,NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -347,6 +364,63 @@ void CMbPoll::SelChangeGrid5(){/*MessageBox(L"SelChange");*/}
 void CMbPoll::DblClickGrid5(){/*MessageBox(L"DblClick");*/}
 #endif
 
+void CMbPoll::InitListCtrl()
+{
+	long style;
+	style=GetWindowLong(mbPollList.m_hWnd,GWL_STYLE);
+	style&=~LVS_TYPEMASK;
+	style|=LVS_REPORT;	
+//	style|=LVS_EX_CHECKBOXES;
+
+	mbPollList.SetExtendedStyle(style);
+	SetWindowLong(mbPollList.m_hWnd,GWL_STYLE,style);
+	DWORD dwstyle=mbPollList.GetExtendedStyle();
+	dwstyle|=LVS_EX_FULLROWSELECT; 
+	dwstyle|=LVS_EX_GRIDLINES;     
+	mbPollList.SetExtendedStyle(dwstyle);
+	mbPollList.InsertColumn(0,_T(""),LVCFMT_LEFT,120);  
+	mbPollList.InsertColumn(1,_T(""),LVCFMT_LEFT,120);
+	mbPollList.InsertColumn(2,_T(""),LVCFMT_LEFT,120);
+	mbPollList.InsertColumn(3,_T(""),LVCFMT_LEFT,120);
+	mbPollList.InsertColumn(4,_T(""),LVCFMT_LEFT,120);
+	mbPollList.InsertColumn(5,_T(" "),LVCFMT_LEFT,120);
+	mbPollList.InsertColumn(6,_T(" "),LVCFMT_LEFT,120);
+	//SurpportAutoInstall
+	//m_list_control.InsertColumn(5,_T("444"),LVCFMT_CENTER,100);
+	mbPollList.SetTextColor(RGB(0,0,255));
+
+	//m_list_control.SortItems(0, FALSE); // sort the 1st column, ascending
+	mbPollList.SetSortable(FALSE);
+
+	mbPollList.SetGridLines(0);
+
+
+#if 0
+	g_Tx_Struct.Tx_value=0;
+
+	g_Err_Struct.Err_value = 0;
+	g_ID_Struct.ID_value = 0;
+	g_SR_Struct.SR_value = 1000;
+
+	g_Tx_Struct.CS_TX=_T("");
+	Fresh_TX_ERR_ID(0,0,0,1000,1);
+#endif
+
+	//mbPollList.SetHeaderText(0,g_Tx_Struct.CS_TX);
+	//mbPollList.SetHeaderText(1,g_Err_Struct.Err_TX);
+	//mbPollList.SetHeaderText(2,g_ID_Struct.ID_TX);
+	mbPollList.SetHeaderText(3,_T("F = 03"));
+	//mbPollList.SetHeaderText(4,g_SR_Struct.SR_TX);
+
+	CString tempcs;
+	for (int i=0;i<22;i++)
+	{
+		tempcs.Format(_T(""),i);
+		mbPollList.InsertItem(i,tempcs);
+	}
+	mbPollList.SetItemText(2, 2, _T("Jay"));
+}
+
 BOOL CMbPoll::Create(UINT nIDTemplate, CWnd* pParentWnd)
 {
 	// TODO: Add your specialized code here and/or call the base class
@@ -375,18 +449,23 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 	CString convertedStr;
 	static int qtyToShow[5] = {0};
 
-	tempStr.Format(_T("%d %d %d %d %d %d"),count, a, b, c, d ,e);
+	//tempStr.Format(_T("%d %d %d %d %d %d"),count, a, b, c, d ,e);
+	tempStr.Format(_T("%d"),temporaryCount);
+
 	ctrlLabel1.SetWindowTextW(tempStr);
 
 	switch(nIDEvent)
 	{
 	case 1:	// 2s
 		{
+			//ReleaseSemaphore(ghSemaphore, 1, NULL);
 			break;
 		}
 	case 2: // 500 ms
 #if 1
 		{
+			ReleaseSemaphore(displayThreadSemaphore, 1, NULL);
+#if 0
 			if (connectionSuccessful == 1)
 			{
 				staticConnectionStatus.ShowWindow(FALSE);
@@ -521,11 +600,14 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 					}
 				}
 			}
+#endif
 			break;
 		}
 #endif
 	case 3:
 		{
+			ReleaseSemaphore(mbCommThreadSemaphore, 1, NULL);
+#if 0
 			count++;
 			if (dataFlowStarted[0] == 1)
 			{
@@ -593,7 +675,7 @@ void CMbPoll::OnTimer(UINT_PTR nIDEvent)
 				callMbFunc(4);
 				executeOnce[4] = 2;
 			}
-
+#endif
 			//MessageBox(tempStr);
 			break;
 		}
@@ -1320,7 +1402,7 @@ void CMbPoll::OnClickedButtonStartStop(CMsflexgrid &grid, int gridNum, CButton &
 	if (connectionSuccessful != 1) 
 	{
 		MessageBox(L"Please establish Modbus connection first.", L"NO CONNECTION");
-		//return;
+		return;
 	}
 	if (pollConfigured[gridNum] != 1) 
 	{
@@ -1827,8 +1909,6 @@ afx_msg LRESULT CMbPoll::OnTrafficClosed(WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-
-
 void CMbPoll::OnSize(UINT nType, int cx, int cy)
 {
 	CDialog::OnSize(nType, cx, cy);
@@ -1876,7 +1956,6 @@ void CMbPoll::OnSize(UINT nType, int cx, int cy)
 
 }
 
-
 void CMbPoll::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: Add your message handler code here and/or call default
@@ -1923,7 +2002,6 @@ void CMbPoll::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
-
 void CMbPoll::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: Add your message handler code here and/or call default
@@ -1968,3 +2046,297 @@ void CMbPoll::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	ScrollWindow(0,-nDelta);
 	CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
 }
+
+#if 0
+DWORD WINAPI CMbPoll::testThread(LPVOID lpVoid)
+{
+	DWORD dwWaitResult; 
+
+	while(1)
+	{
+		dwWaitResult = WaitForSingleObject(ghSemaphore, INFINITE/*0L*/);
+
+		if (connectionSuccessful == 1)
+		{
+			staticConnectionStatus.ShowWindow(FALSE);
+		}
+		else
+		{
+			staticConnectionStatus.ShowWindow(TRUE);
+		}
+
+		MessageBoxW(L"hi");
+		switch (dwWaitResult)
+        {
+			case WAIT_OBJECT_0:
+				Read_One_t(pollSlaveId[0], pollAddress[0], 0);
+				temporaryCount++;
+				break;
+			case WAIT_TIMEOUT: 
+				temporaryCount++;
+				break;
+			default:
+				break;
+		}
+	}
+}
+#endif
+
+DWORD WINAPI CMbPoll::displayThreadStarter(LPVOID lpVoid)
+{
+	return ((CMbPoll*)lpVoid)->displayThread();
+}
+
+DWORD WINAPI CMbPoll::displayThread()
+{
+	DWORD dwWaitResult; 
+	CString convertedStr;
+	CString tempStr1;
+	static int qtyToShow[5] = {0};
+
+	while(1)
+	{
+		dwWaitResult = WaitForSingleObject(displayThreadSemaphore, INFINITE/*0L*/);
+		switch (dwWaitResult)
+        {
+			case WAIT_OBJECT_0:
+
+				if (connectionSuccessful == 1)
+				{
+					staticConnectionStatus.ShowWindow(FALSE);
+				}
+				else
+				{
+					staticConnectionStatus.ShowWindow(TRUE);
+				}
+
+				if (pollSingleFunction[0] != 1)	staticRunning1.SetWindowText(L"X");
+				if (pollSingleFunction[1] != 1)	staticRunning2.SetWindowText(L"X");
+				if (pollSingleFunction[2] != 1)	staticRunning3.SetWindowText(L"X");
+				if (pollSingleFunction[3] != 1)	staticRunning4.SetWindowText(L"X");
+				if (pollSingleFunction[4] != 1)	staticRunning5.SetWindowText(L"X");
+
+				/*	update grid if, 
+					config has been done (grid1Data != NULL), 
+					Start button has been clicked (dataFlowStarted[0] == 1), 
+					its not a write function where grid update is not required (pollFunction[0] <= 3)	*/
+				if (((grid1Data != NULL) && (dataFlowStarted[0] == 1)) || (executeOnce[0] == 2))
+				{
+					if (pollSingleFunction[0] != 1)	staticRunning1.SetWindowText(L"√");
+					if (executeOnce[0] == 2) executeOnce[0] = 0;
+					if (putDataNow[0] == 1)
+					{
+						qtyToShow[0] = ((pollRows[0] == 0) || (pollQuantity[0] < pollRows[0])) ? pollQuantity[0] : pollRows[0];
+						putDataNow[0] = 0;
+					}
+					for (int i = 0; i < qtyToShow[0]; i++)
+					{
+						tempStr1.Format(_T("%d"), (pollAddress[0] + i)); 
+						ctrlGrid1.put_TextMatrix(i + 1, 1, tempStr1);
+						updateStaticConfig(0, 1);
+						if ((!((tapDataMode == 0) && (pollFunction[0] >= 4))) && (connectionSuccessful == 1))
+						{
+							//tempStr1.Format(_T("%d"), *((short int*)grid1Data + i)); 
+							convertedStr = convertFunction(pollDisplay[0], (unsigned short)(*((short int*)grid1Data + i)));
+							ctrlGrid1.put_TextMatrix(i + 1, 2, convertedStr);
+						}
+					}
+				}
+
+				if (((grid2Data != NULL)  && (dataFlowStarted[1] == 1)) || (executeOnce[1] == 2))
+				{
+					if (pollSingleFunction[1] != 1)	staticRunning2.SetWindowText(L"√");
+					if (executeOnce[1] == 2) executeOnce[1] = 0;
+					if (putDataNow[1] == 1)
+					{
+						qtyToShow[1] = ((pollRows[1] == 0) || (pollQuantity[1] < pollRows[1])) ? pollQuantity[1] : pollRows[1];
+						putDataNow[1] = 0;
+					}
+					for (int i = 0; i < qtyToShow[1]; i++)
+					{
+						tempStr1.Format(_T("%d"), (pollAddress[1] + i)); 
+						ctrlGrid2.put_TextMatrix(i + 1, 1, tempStr1);
+						updateStaticConfig(1, 1);
+						if ((!((tapDataMode == 0) && (pollFunction[1] >= 4))) && (connectionSuccessful == 1))
+						{
+							//tempStr1.Format(_T("%d"), *((short int*)grid2Data + i)); 
+							convertedStr = convertFunction(pollDisplay[1], (unsigned short)(*((short int*)grid2Data + i)));
+							ctrlGrid2.put_TextMatrix(i + 1, 2, convertedStr);
+						}
+					}
+				}
+
+				if (((grid3Data != NULL) && (dataFlowStarted[2] == 1)) || (executeOnce[2] == 2))
+				{
+					if (pollSingleFunction[2] != 1)	staticRunning3.SetWindowText(L"√");
+					if (executeOnce[2] == 2) executeOnce[2] = 0;
+					if (putDataNow[2] == 1)
+					{
+						qtyToShow[2] = ((pollRows[2] == 0) || (pollQuantity[2] < pollRows[2])) ? pollQuantity[2] : pollRows[2];
+						putDataNow[2] = 0;
+					}
+					for (int i = 0; i < qtyToShow[2]; i++)
+					{
+						tempStr1.Format(_T("%d"), (pollAddress[2] + i)); 
+						ctrlGrid3.put_TextMatrix(i + 1, 1, tempStr1);
+						updateStaticConfig(2, 1);
+						if ((!((tapDataMode == 0) && (pollFunction[2] >= 4))) && (connectionSuccessful == 1))
+						{
+							//tempStr1.Format(_T("%d"), *((short int*)grid3Data + i)); 
+							convertedStr = convertFunction(pollDisplay[2], (unsigned short)(*((short int*)grid3Data + i)));
+							ctrlGrid3.put_TextMatrix(i + 1, 2, convertedStr);
+						}
+					}
+				}
+
+				if (((grid4Data != NULL) && (dataFlowStarted[3] == 1)) || (executeOnce[3] == 2))
+				{
+					if (pollSingleFunction[3] != 1)	staticRunning4.SetWindowText(L"√");
+					if (executeOnce[3] == 2) executeOnce[3] = 0;
+					if (putDataNow[3] == 1)
+					{
+						qtyToShow[3] = ((pollRows[3] == 0) || (pollQuantity[3] < pollRows[3])) ? pollQuantity[3] : pollRows[3];
+						putDataNow[3] = 0;
+					}
+					for (int i = 0; i < qtyToShow[3]; i++)
+					{
+						tempStr1.Format(_T("%d"), (pollAddress[3] + i)); 
+						ctrlGrid4.put_TextMatrix(i + 1, 1, tempStr1);
+						updateStaticConfig(3, 1);
+						if ((!((tapDataMode == 0) && (pollFunction[3] >= 4))) && (connectionSuccessful == 1))
+						{
+							//tempStr1.Format(_T("%d"), *((short int*)grid4Data + i)); 
+							convertedStr = convertFunction(pollDisplay[3], (unsigned short)(*((short int*)grid4Data + i)));
+							ctrlGrid4.put_TextMatrix(i + 1, 2, convertedStr);
+						}
+					}
+				}
+
+				if (((grid5Data != NULL) && (dataFlowStarted[4] == 1)) || (executeOnce[4] == 2))
+				{
+					if (pollSingleFunction[4] != 1)	staticRunning5.SetWindowText(L"√");
+					if (executeOnce[4] == 2) executeOnce[4] = 0;
+					if (putDataNow[4] == 1)
+					{
+						qtyToShow[4] = ((pollRows[4] == 0) || (pollQuantity[4] < pollRows[4])) ? pollQuantity[4] : pollRows[4];
+						putDataNow[4] = 0;
+					}
+					for (int i = 0; i < qtyToShow[4]; i++)
+					{
+						tempStr1.Format(_T("%d"), (pollAddress[4] + i)); 
+						ctrlGrid5.put_TextMatrix(i + 1, 1, tempStr1);
+						updateStaticConfig(4, 1);
+						if ((!((tapDataMode == 0) && (pollFunction[4] >= 4))) && (connectionSuccessful == 1))
+						{
+							//tempStr1.Format(_T("%d"), *((short int*)grid5Data + i)); 
+							convertedStr = convertFunction(pollDisplay[4], (unsigned short)(*((short int*)grid5Data + i)));
+							ctrlGrid5.put_TextMatrix(i + 1, 2, convertedStr);
+						}
+					}
+				}
+
+				temporaryCount++;
+				break;
+			case WAIT_TIMEOUT: 
+				//temporaryCount++;
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+DWORD WINAPI CMbPoll::mbCommThreadStarter(LPVOID lpVoid)
+{
+	return ((CMbPoll*)lpVoid)->mbCommThread();
+}
+
+DWORD WINAPI CMbPoll::mbCommThread()
+{
+	static unsigned int count = 0;
+	static unsigned int a, b, c, d, e = 0;
+	DWORD dwWaitResult; 
+
+	while(1)
+	{
+		dwWaitResult = WaitForSingleObject(mbCommThreadSemaphore, INFINITE/*0L*/);
+		switch (dwWaitResult)
+        {
+			case WAIT_OBJECT_0:
+				count++;
+				if (dataFlowStarted[0] == 1)
+				{
+					if ((count % (pollScanRate[0]/50)) == 0)	
+					{
+						callMbFunc(0);
+						a++;
+					}
+				}
+				if (dataFlowStarted[1] == 1)
+				{
+					if ((count % (pollScanRate[1]/50)) == 0)	
+					{
+						callMbFunc(1);
+						b++;
+					}
+				}
+				if (dataFlowStarted[2] == 1)
+				{
+					if ((count % (pollScanRate[2]/50)) == 0)	
+					{
+						callMbFunc(2);
+						c++;
+					}
+				}
+				if (dataFlowStarted[3] == 1)
+				{
+					if ((count % (pollScanRate[3]/50)) == 0)	
+					{
+						callMbFunc(3);
+						d++;
+					}
+				}
+				if (dataFlowStarted[4] == 1)
+				{
+					if ((count % (pollScanRate[4]/50)) == 0)	
+					{
+						callMbFunc(4);
+						e++;
+					}
+				}
+
+				if (executeOnce[0] == 1)
+				{
+					callMbFunc(0);
+					executeOnce[0] = 2;
+				}
+				if (executeOnce[1] == 1)
+				{
+					callMbFunc(1);
+					executeOnce[1] = 2;
+				}
+				if (executeOnce[2] == 1)
+				{
+					callMbFunc(2);
+					executeOnce[2] = 2;
+				}
+				if (executeOnce[3] == 1)
+				{
+					callMbFunc(3);
+					executeOnce[3] = 2;
+				}
+				if (executeOnce[4] == 1)
+				{
+					callMbFunc(4);
+					executeOnce[4] = 2;
+				}
+				break;
+			case WAIT_TIMEOUT: 
+				//temporaryCount++;
+				break;
+			default:
+				break;
+		}
+	}
+}
+

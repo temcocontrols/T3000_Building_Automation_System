@@ -1291,6 +1291,7 @@
 #define IDC_BTN_BAC_WRITE_TIME          1680
 #define IDC_STATIC_BAC_STATUS           1681
 #define IDC_LIST_BACNET_CONTROLLER      1682
+#define IDC_MBPOLL_LIST                 1683
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1402,8 +1403,7 @@
 #define IDC_DATETIMEPICKER_DATE         57925
 #define IDC_RANGECOMBO                  57926
 #define IDD_TEST_MULTI_READ             57927
-
-#define IDC_BUTTON_TRAFFIC1 57928
+#define IDC_BUTTON_TRAFFIC1             57928
 
 // Next default values for new objects
 // 
@@ -1411,7 +1411,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        473
 #define _APS_NEXT_COMMAND_VALUE         32885
-#define _APS_NEXT_CONTROL_VALUE         1683
+#define _APS_NEXT_CONTROL_VALUE         1684
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
