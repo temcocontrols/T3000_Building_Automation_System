@@ -28,10 +28,12 @@ public:
 	ListCtrlEx::CListCtrlEx m_input_list;
 	afx_msg void OnBnClickedOk();
 //	afx_msg void OnBnClickedButtonCheckInvokeId();
-	afx_msg LRESULT  InputResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
+//	afx_msg LRESULT  InputResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedButtonApply();
 	afx_msg void OnBnClickedButtonRead();
 
+	afx_msg void OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 //int GetPrivateData();
 //int WritePrivateData();

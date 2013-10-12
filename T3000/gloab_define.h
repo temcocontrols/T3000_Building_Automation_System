@@ -1,11 +1,23 @@
 #pragma once
 
 //#define SHOW_MESSAGEBOX
+#define WM_FRESH_CM_LIST WM_USER + 975
+#define WM_DELETE_WAIT_DLG WM_USER + 2001
 #define SHOW_ERROR_MESSAGE
+
+#define WM_COMMAND_WHO_IS  1
+#define MENU_CLICK			2
+
+
+
+const int TYPE_ALL = 255;
 const int TYPE_INPUT = 1;
 const int TYPE_OUTPUT = 2;
 const int TYPE_PROGRAM = 3;
 const int TYPE_VARIABLE = 4;
+const int TYPE_WEEKLY =5;
+const int TYPE_ANNUAL = 6;
+const int TYPE_CONTROLLER = 8;
 
 const int VARIABLE_RANGE_ANALOG_TYPE = 1;
 const int VARIABLE_RANGE_DIGITAL_TYPE = 2;
@@ -32,39 +44,110 @@ const int BAC_MANUAL = 1;
 const int BAC_DECOM_YES = 0;
 const int BAC_DECOM_NO  = 1;
 
-const int BAC_READ_INPUT_GROUP_NUMBER = 4;
+const int BAC_READ_GROUP_NUMBER = 4;
+
+const int BAC_INPUT_ITEM_COUNT = 20;
+const int BAC_OUTPUT_ITEM_COUNT = 20;
+const int BAC_PROGRAM_ITEM_COUNT = 16;
+const int BAC_VARIABLE_ITEM_COUNT = 64;
+const int BAC_WEEKLY_ROUTINES_COUNT = 16;
+const int BAC_ANNUAL_ROUTINES_COUNT = 8;
+const int BAC_SCHEDULE_TIME_COUNT = 8;
+const int BAC_TIME_COMMAND_COUNT = 1;
+const int BAC_CONTROLLER_COUNT = 48;
+
+const int BAC_INPUT_GROUP = BAC_INPUT_ITEM_COUNT / BAC_READ_GROUP_NUMBER;
+const int BAC_OUTPUT_GROUP = BAC_OUTPUT_ITEM_COUNT / BAC_READ_GROUP_NUMBER;
+const int BAC_PROGRAM_GROUP = BAC_PROGRAM_ITEM_COUNT / BAC_READ_GROUP_NUMBER;
+const int BAC_VARIABLE_GROUP = BAC_VARIABLE_ITEM_COUNT / BAC_READ_GROUP_NUMBER;
+const int BAC_WEEKLY_GROUP = BAC_WEEKLY_ROUTINES_COUNT / BAC_READ_GROUP_NUMBER;
+const int BAC_ANNUAL_GROUP = BAC_ANNUAL_ROUTINES_COUNT / BAC_READ_GROUP_NUMBER;
+const int BAC_TIME_COMMAND_GROUP = 1;
+const int BAC_CONTROLLER_GROUP = BAC_CONTROLLER_COUNT / BAC_READ_GROUP_NUMBER;
+
 
 const int BAC_READ_ALL_LIST = 255;
 const int BAC_READ_INPUT_LIST = 1;
 const int BAC_READ_OUTPUT_LIST = 2;
-const int BAC_READ_VARIABLE_LIST = 3;
-const int BAC_READ_PROGRAM_LIST = 4;
+const int BAC_READ_PROGRAM_LIST = 3;
+const int BAC_READ_VARIABLE_LIST = 4;
+const int BAC_READ_WEEKLY_LIST = 5;
+const int BAC_READ_ANNUAL_LIST = 6;
+const int BAC_READ_TIME_COMMAND = 7;
+const int BAC_READ_CONTROLLER_LIST = 8;
+
 
 const int BAC_SHOW_MISSION_RESULTS = 3;
 
-struct _Refresh_Info 
+const int BAC_LIST_REFRESH_TIME = 30000;
+
+
+const int SCHEDULE_TIME_NUM = 0;
+const int SCHEDULE_TIME_MONDAY = 1;
+const int SCHEDULE_TIME_TUESDAY = 2;
+const int SCHEDULE_TIME_WEDNESDAY = 3;
+const int SCHEDULE_TIME_THURSDAY = 4;
+const int SCHEDULE_TIME_FRIDAY = 5;
+const int SCHEDULE_TIME_SATURDAY = 6;
+const int SCHEDULE_TIME_SUNDAY = 7;
+const int SCHEDULE_TIME_HOLIDAY1 = 8;
+const int SCHEDULE_TIME_HOLIDAY2 = 9;
+
+struct _Resend_Read_Info
 {
-	int Input_InvokeID[BAC_READ_INPUT_GROUP_NUMBER+1];
-	int Output_InvokeID[BAC_READ_INPUT_GROUP_NUMBER+1];
-	int Variable_InvokeID[BAC_READ_INPUT_GROUP_NUMBER+1];
-	int Program_InvokeID[BAC_READ_INPUT_GROUP_NUMBER+1];
-	int Input_result[BAC_READ_INPUT_GROUP_NUMBER+1];	//2 UNKONW  1 OK   0 FAIL
-	int Output_result[BAC_READ_INPUT_GROUP_NUMBER+1];
-	int Variable_result[BAC_READ_INPUT_GROUP_NUMBER+1];
-	int Program_result[BAC_READ_INPUT_GROUP_NUMBER+1];
+	int device_id;
+	int command;
+	int start_instance;
+	int end_instance;
+	int resend_count;
+	int task_result;
+	int invoke_id;
+	bool has_resend_yes_or_no;
 };
 
-typedef struct _MessageWriteListInfo
+struct _Refresh_Info 
+{
+	_Resend_Read_Info Read_Variable_Info[BAC_VARIABLE_GROUP];
+	_Resend_Read_Info Read_Input_Info[BAC_INPUT_GROUP];
+	_Resend_Read_Info Read_Output_Info[BAC_OUTPUT_GROUP];
+	_Resend_Read_Info Read_Program_Info[BAC_PROGRAM_GROUP];
+	_Resend_Read_Info Read_Weekly_Info[BAC_WEEKLY_GROUP];
+	_Resend_Read_Info Read_Annual_Info[BAC_ANNUAL_GROUP];
+	_Resend_Read_Info Read_Time_Command[BAC_TIME_COMMAND_GROUP];
+	_Resend_Read_Info Read_Controller_Info[BAC_CONTROLLER_GROUP];
+};
+
+
+
+
+/*typedef*/ struct _MessageWriteListInfo
 {
 	uint32_t deviceid;
 	int8_t command;
 	int8_t start_instance;
 	int8_t end_instance;
-	int8_t entitysize;
+	unsigned short entitysize;
+	CString Write_Info;
 	HWND hWnd;
 };
 
+/*typedef*/ struct _MessageRefreshListInfo
+{
+	uint32_t deviceid;
+	int8_t command;
+	int8_t start_instance;
+	int8_t end_instance;
+	unsigned short entitysize;
+	int8_t block_size;
+	HWND hWnd;
+};
 
+const int UNITS_TYPE_ANALOG = 0;
+const int UNITS_TYPE_DIGITAL = 1;
+const int UNITS_TYPE_CUSTOM = 2;
+
+const int INPUT_ANOLAG_UNITE_COUNT = 19;
+const int VARIABLE_ANALOG_UNITE_COUNT = 34;
 
 const CString Units_Type[]=
 {
@@ -90,6 +173,11 @@ const CString Digital_Units_Array[] =
 	_T("Unoccupy/Occupy"),
 	_T("Low/High")
 };
+
+//const CString Input_Analog_Units_Show[] =
+//{
+//	_T("")
+//};
 
 const CString Output_Analog_Units_Show[] = 
 {
@@ -122,6 +210,52 @@ const CString OutPut_List_Analog_Units[] =
 	_T("%"),
 	_T("%Cls"),
 	_T("ma")
+};
+
+const CString Input_List_Analog_Units[] =
+{
+	_T("Unused"),
+	 _T("Deg.C"),
+	 _T("Deg.F"),
+	 _T("Deg.C"),
+	 _T("Deg.F"),
+	 _T("Deg.C"),
+	 _T("Deg.F"),
+	 _T("Deg.C"),
+	 _T("Deg.F"),
+	 _T("Deg.C"),
+	 _T("Deg.F"),
+	 _T("Volts"),
+	 _T("Amps"),
+	 _T("ma"),
+	 _T("psi"),
+	 _T("counts"),
+	 _T("FPM"),
+	 _T("%(0-5V)"),
+	 _T("%(4-20ma)"),
+};
+
+const CString Input_Analog_Units_Array[] =
+{
+	_T("Unused"),
+	 _T("Y3K -40 to 150"),
+	 _T("Y3K -40 to 300"),
+	 _T("10K -40 to 120"),
+	 _T("10K -40 to 250"),
+	 _T("G3K -40 to 120"),
+	 _T("G3K -40 to 250"),
+	 _T("KM10K -40 to 120"),
+	 _T("KM10K -40 to 250"),
+	 _T("A10K -50 to 110"),
+	 _T("A10K -60 to 200"),
+	 _T("0.0 to 5.0"),
+	 _T("0.0 to 100"),
+	 _T("0.0 to 20"),
+	 _T("0.0 to 20"),
+	 _T("0.0 to 2^22"),
+	 _T("0.0 to 3000"),
+	 _T("0 to 100"),
+	 _T("0 to 100"),
 };
 
 const CString Output_Analog_Units_Array[] = 
@@ -173,4 +307,3 @@ const CString Variable_Analog_Units_Array[] =
 	_T("CMH"),
 };
 
-#define WM_DELETE_WAIT_DLG WM_USER + 2001

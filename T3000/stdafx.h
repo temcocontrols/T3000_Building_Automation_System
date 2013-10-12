@@ -144,7 +144,11 @@ using namespace std;  // Ensure that the namespace is set to std
 #define		WM_REFRESH_BAC_PROGRAM_RICHEDIT				WM_USER + 204
 #define		WM_REFRESH_BAC_VARIABLE_LIST				WM_USER + 205
 #define		WM_REFRESH_BAC_OUTPUT_LIST					WM_USER + 206
-
+#define		WM_REFRESH_BAC_WEEKLY_LIST					WM_USER + 207
+#define		WM_REFRESH_BAC_ANNUAL_LIST					WM_USER + 208
+#define		WM_REFRESH_BAC_SCHEDULE_LIST				WM_USER + 209
+#define		WM_REFRESH_BAC_DAY_CAL						WM_USER + 210
+#define		WM_REFRESH_BAC_CONTROLLER_LIST				WM_USER + 211
 
 
 
@@ -169,15 +173,16 @@ typedef struct _STATUSBARINFO
 #include "fileRW.h"
 
 #include "T3000RegAddress.h"
-
+//#define Fance_Enable_Test
 
 #define MKBOOL(_VALUE) ((_VALUE) != 0)		//Add by Fance .Use this macro to solve the warning warning C4800: 'BOOL' : forcing value to bool 'true' or 'false'
 
 
-#define MY_WRITE_ONE WM_USER+100
-#define MY_READ_ONE  WM_USER+101
-#define MY_INVOKE_ID WM_USER + 102
-#define MY_BAC_WRITE_LIST WM_USER + 103
+#define MY_WRITE_ONE				WM_USER	+ 100
+#define MY_READ_ONE					WM_USER	+ 101
+#define MY_INVOKE_ID				WM_USER + 102
+#define MY_BAC_WRITE_LIST			WM_USER + 103
+#define MY_BAC_REFRESH_LIST			WM_USER + 104
 #define MY_CLOSE WM_USER+110
 #define MY_RESUME_DATA  WM_USER+200
 #define MY_READ_DATA_CALLBACK WM_USER+201
@@ -206,6 +211,7 @@ typedef struct _MessageInvokeIDInfo
 {
 	int Invoke_ID;
 	HWND hwnd;
+	CString task_info;
 }MessageInvokeODInfo;
 
 //#include "Bacnet_Include.h"

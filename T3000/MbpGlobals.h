@@ -61,6 +61,15 @@ int insertDataString = 0;
 unsigned int trafficStringIndex = 0;
 int autoScroll = 0;
 unsigned int packetCount = 0;
+DWORD hThreadID;
+DWORD hDispThreadID;
+DWORD hMbCommThreadID;
+HANDLE ghSemaphore;
+HANDLE displayThreadSemaphore;
+HANDLE mbCommThreadSemaphore;
+unsigned int temporaryCount;
+HANDLE hDispThread;
+HANDLE hMbCommThread;
 
 #endif
 

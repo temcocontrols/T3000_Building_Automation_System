@@ -47,7 +47,7 @@
 #include "bacstr.h"
 extern uint8_t IOBufferPT[300]; /* Somewhere to build the encoded result block for Private Transfers */
 
-#include "..\..\T3000\CM5\ud_str.h"
+#include "..\..\BacNetDllforVc\include\ud_str.h"
 //#include "..\gloab_variable_extern.h"
 Str_in_point Private_data[100];
 int Private_data_length;

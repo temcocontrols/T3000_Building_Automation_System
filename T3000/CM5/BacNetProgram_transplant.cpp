@@ -263,7 +263,36 @@ typedef struct
 
 }	Str_monitor_work_data;
 
+typedef struct
+{
+	char description[21]; 	    /* (21 bytes; string)*/
+	char label[9];		      		/* (9 bytes; string)*/
 
+	uint8_t value		;  /* (1 bit; 0=off, 1=on)*/
+	uint8_t auto_manual;/* (1 bit; 0=auto, 1=manual)*/
+	//	unsigned unused				: 14; 	/* ( 12 bits)*/
+	uint8_t unused;
+
+}	Str_annual_routine_point;   /* 21+9+2=32 bytes*/
+
+typedef struct
+{
+	char description[21];		     /* (21 bytes; string)*/
+	char label[9];		      	     /*	(9 bytes; string)*/
+
+	uint8_t value ;  /* (1 bit; 0=off, 1=on)*/
+	uint8_t auto_manual;  /* (1 bit; 0=auto, 1=manual)*/
+	uint8_t override_1_value;  /* (1 bit; 0=off, 1=on)*/
+	uint8_t override_2_value;  /* (1 bit; 0=off, 1=on)*/
+	uint8_t off  ;
+	uint8_t unused	; /* (11 bits)*/
+
+	//	Point_T3000 override_1;	     /* (3 bytes; point)*/
+	//	Point_T3000 override_2;	     /* (3 bytes; point)*/
+
+} Str_weekly_routine_point; /* 21+9+2+3+3 = 38*/
+
+#if 0
 typedef struct
 {
 	char description[21];		     /* (21 bytes; string)*/
@@ -280,7 +309,7 @@ typedef struct
 	//fance Point_T3000 override_2;	     /* (2 bytes; point)*/
 
 }	Str_weekly_routine_point; /* 21+2+2+2+10 = 38*/
-
+#endif
 typedef struct 		// (size = 16 byte s)
 {
 	union {
@@ -305,7 +334,7 @@ typedef struct 		// (size = 16 byte s)
 		char time2[16];
 	};
 } Wr_one_day;
-
+#if 0
 typedef struct
 {
 	char description[21]; 	    /* (21 bytes; string)*/
@@ -314,7 +343,7 @@ typedef struct
 	unsigned auto_manual	      : 1;  /* (1 bit; 0=auto, 1=manual)*/
 	unsigned unused				: 14; 	/* ( 12 bits)*/
 }	Str_annual_routine_point;   /* 21+9+2=32 bytes*/
-
+#endif
 typedef struct
 {
 	char description[STR_PROGRAM_DESCRIPTION_LENGTH]; 	      	  /* (21 bytes; string)*/
@@ -730,7 +759,8 @@ public:
   extern vector <Str_out_point>  m_Output_data;
   extern vector <Str_program_point>  m_Program_data;
   extern vector <Str_variable_point>  m_Variable_data;
-
+   extern vector <Str_weekly_routine_point>  m_Weekly_data;
+    extern vector <Str_annual_routine_point>  m_Annual_data;
 
 //extern Panel *ptr_panel;
 //extern void creategauge(GWindow **gauge, char *buf);
@@ -5215,6 +5245,15 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 							}
 							t = j+1;
 							j += 1 + k;
+
+							if(j>(4000+300+sizeof(struct variable_table)*MAX_Var+
+								sizeof(struct line_table_str)*MAX_LINE+sizeof(struct buf_str)*MAX_VAR_LINE+
+								sizeof(go_to_str)*MAX_GOTO))
+							{
+								error = 2;
+								return 0;
+							}
+
 							if( !strcmp(&local_table[j], vars_table[cur_index].name) )
 							{
 								if( vars_table[cur_index].c)
@@ -5469,7 +5508,7 @@ unsigned char cod;//,xtemp[15];
 	 {
 		 if (*code!=0x01)
 		 {
-			printf("ERROR!!!!Desassambler!!!!!!!!!!!!!\n");
+			//printf("ERROR!!!!Desassambler!!!!!!!!!!!!!\n");
 			return NULL;
 		 }
 		memcpy(&lline,++code,2);
@@ -6164,7 +6203,7 @@ int pointtotext(char *buf,Point_Net *point)
 	strcat(buf,itoa(panel+1,x,10));
 	if(panel+1<10 || num+1 < 100)
 		//strcat(buf,lin);
-		strcat(buf,"1");
+		strcat(buf,"-");
 		strcat(token,ptr_panel.info[point_type-1].name);
 	//strcat(buf,ptr_panel->info[point_type-1].name);Fance
 	strcat(buf,itoa(num+1,x,10));
@@ -6728,6 +6767,34 @@ void init_info_table( void )
 
 void copy_data_to_ptrpanel(int Data_type)
 {
+	if(Data_type ==  TYPE_ALL)
+	{
+		for (int i=0;i<(int)m_Input_data.size();i++)
+		{
+			memcpy(&ptr_panel.inputs[i], &m_Input_data.at(i),sizeof(Str_in_point));
+		}
+		for (int i=0;i<(int)m_Output_data.size();i++)
+		{
+			memcpy(&ptr_panel.outputs[i], &m_Output_data.at(i),sizeof(Str_out_point));
+		}
+		for (int i=0;i<(int)m_Program_data.size();i++)
+		{
+			memcpy(&ptr_panel.programs[i], &m_Program_data.at(i),sizeof(Str_program_point));
+		}
+		for (int i=0;i<(int)m_Variable_data.size();i++)
+		{
+			memcpy(&ptr_panel.vars[i], &m_Variable_data.at(i),sizeof(Str_variable_point));
+		}
+		for (int i=0;i<(int)m_Weekly_data.size();i++)
+		{
+			memcpy(&ptr_panel.weekly_routines[i], &m_Weekly_data.at(i),sizeof(Str_weekly_routine_point));
+		}
+		for (int i=0;i<(int)m_Annual_data.size();i++)
+		{
+			memcpy(&ptr_panel.annual_routines[i], &m_Annual_data.at(i),sizeof(Str_annual_routine_point));
+		}
+		return;
+	}
 	switch(Data_type)
 	{
 	case TYPE_INPUT:
@@ -6761,7 +6828,19 @@ void copy_data_to_ptrpanel(int Data_type)
 				memcpy(&ptr_panel.vars[i], &m_Variable_data.at(i),sizeof(Str_variable_point));
 			}
 		}
-
+		break;
+	case TYPE_WEEKLY:
+		for (int i=0;i<(int)m_Weekly_data.size();i++)
+		{
+			memcpy(&ptr_panel.weekly_routines[i], &m_Weekly_data.at(i),sizeof(Str_weekly_routine_point));
+		}
+		break;
+	case TYPE_ANNUAL:
+		for (int i=0;i<(int)m_Annual_data.size();i++)
+		{
+			memcpy(&ptr_panel.annual_routines[i], &m_Annual_data.at(i),sizeof(Str_annual_routine_point));
+		}
+		break;
 	}
 
 }

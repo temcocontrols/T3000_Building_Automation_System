@@ -60,6 +60,8 @@
 #endif
 #include "debug.h"
 
+bool MSTP_Device_connect = false;
+
 #if PRINT_ENABLED
 #undef PRINT_ENABLED_RECEIVE
 #undef PRINT_ENABLED_RECEIVE_DATA
@@ -569,7 +571,8 @@ bool MSTP_Master_Node_FSM(
     /* transition immediately to the next state */
     bool transition_now = false;
     MSTP_MASTER_STATE master_state = mstp_port->master_state;
-
+	
+	
     /* some calculations that several states need */
     next_poll_station =
         (mstp_port->Poll_Station + 1) % (mstp_port->Nmax_master + 1);
@@ -859,7 +862,7 @@ bool MSTP_Master_Node_FSM(
                 }
             } else {
                 /* SendMaintenancePFM */
-
+				Set_MSTP_Connect_Status(0);//Fance
 
                 mstp_port->Poll_Station = next_poll_station;
                 MSTP_Create_And_Send_Frame(mstp_port,
@@ -879,6 +882,7 @@ bool MSTP_Master_Node_FSM(
                     /* Enter the IDLE state to process the frame. */
                     mstp_port->master_state = MSTP_MASTER_STATE_IDLE;
                     transition_now = true;
+					Set_MSTP_Connect_Status(1);//Fance
                 }
             } else {
                 if (mstp_port->RetryCount < Nretry_token) {
@@ -908,6 +912,8 @@ bool MSTP_Master_Node_FSM(
                     /* find a new successor to TS */
                     mstp_port->master_state =
                         MSTP_MASTER_STATE_POLL_FOR_MASTER;
+
+					Set_MSTP_Connect_Status(0);//Fance
                 }
             }
             break;
@@ -1003,6 +1009,7 @@ bool MSTP_Master_Node_FSM(
 			//else if ((mstp_port->SilenceTimer((void *) mstp_port) > Tusage_timeout) ||(mstp_port->ReceivedInvalidFrame == true)) 
 			else if ((mstp_port->SilenceTimer((void *) mstp_port) > 20) ||(mstp_port->ReceivedInvalidFrame == true)) 
 			{
+				//Set_MSTP_Connect_Status(false);//Fance
                 if (mstp_port->SoleMaster == true) 
 				{
                     /* SoleMaster */
@@ -1012,9 +1019,12 @@ bool MSTP_Master_Node_FSM(
                     /* mstp_port->TokenCount++; removed in 2004 */
                     mstp_port->master_state = MSTP_MASTER_STATE_USE_TOKEN;
                     transition_now = true;
+					//Set_MSTP_Connect_Status(true);//Fance
+
                 } 
 				else 
 				{
+					
                     if (mstp_port->Next_Station != mstp_port->This_Station) 
 					{
                         /* DoneWithPFM */
@@ -1177,6 +1187,15 @@ void MSTP_Slave_Node_FSM(
     }
 }
 
+
+bool Get_MSTP_Connect_Status()
+{
+	return MSTP_Device_connect;
+}
+void Set_MSTP_Connect_Status(bool bstatus)
+{
+	MSTP_Device_connect =  bstatus ;
+}
 /* note: This_Station assumed to be set with the MAC address */
 /* note: Nmax_info_frames assumed to be set (default=1) */
 /* note: Nmax_master assumed to be set (default=127) */
