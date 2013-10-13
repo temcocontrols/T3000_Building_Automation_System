@@ -70,6 +70,9 @@ HANDLE mbCommThreadSemaphore;
 unsigned int temporaryCount;
 HANDLE hDispThread;
 HANDLE hMbCommThread;
+int showedRadioButton = 0;
+int runPoll[5] = {0};
+
 
 #endif
 

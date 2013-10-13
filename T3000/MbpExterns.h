@@ -69,6 +69,8 @@ extern HANDLE mbCommThreadSemaphore;
 extern unsigned int temporaryCount;
 extern HANDLE hDispThread;
 extern HANDLE hMbCommThread;
+extern int showedRadioButton;
+extern int runPoll[5];
 
 extern void LoadReadOneData(int val, unsigned char device_var,unsigned short address);
 extern void LoadWriteOneData(int val, unsigned char device_var,unsigned short address);
