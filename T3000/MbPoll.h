@@ -4,7 +4,7 @@
 #include "MbPollOptions.h"
 #include "MbpExterns.h"
 //#include "E:\Home\Personal\Extra Curricular\Proj5\MBP\MBP\20131002\T3000_Building_Automation_System-master\T3000\CM5\myownlistctrl.h"
-#include "F:\Temco\20131002\T3000_Building_Automation_System-master\T3000\CM5\myownlistctrl.h"
+#include "CM5\myownlistctrl.h"
 
 #define WM_MBPOLL_CLOSED (WM_USER + 555)
 #define WM_TRAFFIC_CLOSED	(WM_USER + 556)
@@ -156,9 +156,28 @@ public:
 	CMyOwnListCtrl mbPollList;
 	CRect mbPollListRect;
 	void InitListCtrl();
-	static DWORD WINAPI testThread(LPVOID lpVoid);
 	static DWORD WINAPI displayThreadStarter(LPVOID lpVoid);
 	DWORD WINAPI displayThread();
 	static DWORD WINAPI mbCommThreadStarter(LPVOID lpVoid);
 	DWORD WINAPI mbCommThread();
+	int radioButtonShow;
+	void showRadioButton();
+	void restoreRadioButtonState();
+	void saveRadioButtonState();
+	afx_msg void OnClickedMbpollCheck1();
+	afx_msg void OnClickedMbpollCheck2();
+	afx_msg void OnClickedMbpollCheck3();
+	afx_msg void OnClickedMbpollCheck4();
+	CButton mbpollCheck1;
+	CButton mbpollCheck2;
+	CButton mbpollCheck3;
+	CButton mbpollCheck4;
+	void OnClickedMbpollCheck(int gridNo);
+	void saveRegisterNames(int gridNo);
+	void restoreRegisterNames(int gridNo);
+	CString registerNames1;
+	CString registerNames2;
+	CString registerNames3;
+	CString registerNames4;
 };
+
