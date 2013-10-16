@@ -8,6 +8,7 @@
 
 #define WM_MBPOLL_CLOSED (WM_USER + 555)
 #define WM_TRAFFIC_CLOSED	(WM_USER + 556)
+
 // CMbPoll dialog
 
 class CMbPoll : public CDialog
@@ -175,9 +176,8 @@ public:
 	void OnClickedMbpollCheck(int gridNo);
 	void saveRegisterNames(int gridNo);
 	void restoreRegisterNames(int gridNo);
-	CString registerNames1;
-	CString registerNames2;
-	CString registerNames3;
-	CString registerNames4;
+protected:
+	afx_msg LRESULT OnMyMbpollRegDialogMsg(WPARAM wParam, LPARAM lParam);
+//	afx_msg LRESULT OnMyMbpollDlgMsg(WPARAM wParam, LPARAM lParam);
 };
 
