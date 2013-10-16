@@ -194,6 +194,7 @@
     <ClCompile Include="OutsidDailog.cpp" />
     <ClCompile Include="ParameterDlg.cpp" />
     <ClCompile Include="RefreshTreeThread.cpp" />
+    <ClCompile Include="RegDetails.cpp" />
     <ClCompile Include="RelayLabel.cpp" />
     <ClCompile Include="ScanDbWaitDlg.cpp" />
     <ClCompile Include="ScanDlg.cpp" />
@@ -334,6 +335,7 @@
     <ClInclude Include="MbpGlobals.h" />
     <ClInclude Include="MbPoll.h" />
     <ClInclude Include="MbPollOptions.h" />
+    <ClInclude Include="RegDetails.h" />
     <ClInclude Include="Scanwaydlg.h" />
     <ClInclude Include="T328IN.h" />
     <ClInclude Include="T332AI.h" />
