@@ -39,6 +39,7 @@
 
 #include "stdafx.h"
 #include "MyOwnListCtrl.h"
+#include "..\global_variable_extern.h"
 #include <afxtempl.h>
 #include "..\resource.h"
 #ifdef _DEBUG
@@ -981,13 +982,14 @@ BOOL CMyOwnListCtrl::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags)
 extern HWND      m_input_dlg_hwnd;
 void CMyOwnListCtrl::_MouseClkMonitor(UINT nMsg, UINT nFlags, CPoint point, BOOL bTriggerEdit)
 {
+	CString tempStr;
 	LVHITTESTINFO hti;
 	hti.pt = point;
 	const int IDX = SubItemHitTest(&hti);
 	const BOOL BEFORE = CListCtrl::GetCheck(IDX) > 0;	
 	const BOOL WAS_EDIT = _IsEditVisible();
 
-	if(hti.iSubItem==2)
+	/*if(hti.iSubItem==2)
 	{
 		CRect rect;
 		//GetItemRect()
@@ -1000,7 +1002,7 @@ void CMyOwnListCtrl::_MouseClkMonitor(UINT nMsg, UINT nFlags, CPoint point, BOOL
 		//m_valueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 
 		return;
-	}
+	}*/
 	EndEdit(TRUE);
 	const BOOL WASACTIVE = bTriggerEdit ? ExamItemStates(IDX, RC_ITEM_FOCUSED | RC_ITEM_SELECTED) : FALSE;
 
@@ -1011,7 +1013,12 @@ void CMyOwnListCtrl::_MouseClkMonitor(UINT nMsg, UINT nFlags, CPoint point, BOOL
 		break;
 
 	case WM_LBUTTONDBLCLK:
-		CListCtrl::OnLButtonDblClk(nFlags, point);
+		//CListCtrl::OnLButtonDblClk(nFlags, point);
+		//if ((hti.iSubItem % 3) == 1) break;
+		tempStr = GetItemText(hti.iItem, hti.iSubItem);
+		//MessageBox(tempStr);
+		//::PostMessage(hMbpollWnd,MY_MBPOLL_REG_DIALOG_MSG,NULL,NULL);
+		::PostMessage(hMbpollWnd,MY_MBPOLL_REG_DIALOG_MSG,hti.iItem,hti.iSubItem);
 		break;
 
 	case WM_MBUTTONDOWN:

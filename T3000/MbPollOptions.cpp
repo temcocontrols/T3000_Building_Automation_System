@@ -136,10 +136,10 @@ void CMbPollOptions::OnOK()
 	}
 	editQuantity.GetWindowText(tempStr);
 	pollQuantity[curConf] = _wtoi(tempStr);
-	if (!(pollQuantity[curConf] >= 0))
+	if (!((pollQuantity[curConf] >= 0) && (pollQuantity[curConf] <= 127)))
 	{
 		outOfRangeData = 3;
-		MessageBox(L"Quantity shall be: >= 0");
+		MessageBox(L"Quantity shall be: >= 0 and <= 127");
 	}
 	editScanRate.GetWindowText(tempStr);
 	pollScanRate[curConf] = _wtoi(tempStr);
