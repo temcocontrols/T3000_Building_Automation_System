@@ -402,6 +402,9 @@
     <ClCompile Include="BacnetScheduleTime.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
+    <ClCompile Include="RegDetails.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -965,6 +968,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TrafficWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegDetails.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
