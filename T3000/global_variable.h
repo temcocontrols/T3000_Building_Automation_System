@@ -12,6 +12,7 @@ const bool WRITE_FAIL    = false;
 int g_invoke_id;
 HANDLE hThread;
 DWORD nThreadID;
+HWND hMbpollWnd;
 //#include "stdafx.h"
 unsigned short multi_register_value[1024]={-1};
 unsigned short multi_register_value_tcp[10000]={-1};

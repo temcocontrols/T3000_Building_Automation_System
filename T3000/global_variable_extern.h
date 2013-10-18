@@ -4,11 +4,13 @@
 #include "CM5\ud_str.h"
 #include "gloab_define.h"
 
+#define MY_MBPOLL_REG_DIALOG_MSG (WM_USER + 557)
 
 extern int g_invoke_id;
 extern vector <int> Change_Color_ID;
 extern HANDLE hThread;
 extern DWORD nThreadID;
+extern HWND hMbpollWnd;
 
 extern const bool WRITE_SUCCESS;
 extern const bool WRITE_FAIL ;

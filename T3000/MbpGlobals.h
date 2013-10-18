@@ -38,6 +38,18 @@ short int *grid3Data = NULL;
 short int *grid4Data = NULL;
 short int *grid5Data = NULL;
 
+unsigned short prevData1[200] = {0};
+unsigned short prevData2[200] = {0};
+unsigned short prevData3[200] = {0};
+unsigned short prevData4[200] = {0};
+unsigned short prevData5[200] = {0};
+
+int firstTime1 = 1;
+int firstTime2 = 1;
+int firstTime3 = 1;
+int firstTime4 = 1;
+int firstTime5 = 1;
+
 int dataFlowStarted[5] = {0};
 int putDataInGrid[5] = {0};
 char putDataNow[5] = {0};
@@ -70,6 +82,16 @@ HANDLE mbCommThreadSemaphore;
 unsigned int temporaryCount;
 HANDLE hDispThread;
 HANDLE hMbCommThread;
+int showedRadioButton = 0;
+int runPoll[5] = {1,0,0,0,0};
+CString aliasString;
+CString regValueString;
+CString regAddrString;
+int editableValueField;
+CString registerNames1 = L"";
+CString registerNames2 = L"";
+CString registerNames3 = L"";
+CString registerNames4 = L"";
 
 #endif
 

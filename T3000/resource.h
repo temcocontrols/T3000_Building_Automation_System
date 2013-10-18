@@ -185,6 +185,7 @@
 #define IDD_DIALOG_BACNET_ANNUAL_ROUTINES 469
 #define IDD_DIALOG_BACNET_SCHEDULE_TIME 470
 #define IDD_DIALOG_BACNET_CONTROLLER    472
+#define IDD_MBPOLL_REG_DIALOG           473
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -203,6 +204,7 @@
 #define IDC_EDIT41                      1027
 #define IDC_INTERVAL                    1027
 #define IDC_CO2_ALARM_OFF_TIME          1027
+#define IDC_EDIT_VALUE                  1027
 #define IDC_OUTPUT3_DELAY_OFF_EDIT      1028
 #define IDC_CUR_TEMP                    1028
 #define IDC_EDIT42                      1028
@@ -1292,6 +1294,12 @@
 #define IDC_STATIC_BAC_STATUS           1681
 #define IDC_LIST_BACNET_CONTROLLER      1682
 #define IDC_MBPOLL_LIST                 1683
+#define IDC_MBPOLL_CHECK1               1685
+#define IDC_STATIC_ADDR                 1686
+#define IDC_EDIT_ALIAS                  1687
+#define IDC_MBPOLL_CHECK2               1688
+#define IDC_MBPOLL_CHECK3               1689
+#define IDC_MBPOLL_CHECK4               1690
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1409,9 +1417,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        473
+#define _APS_NEXT_RESOURCE_VALUE        474
 #define _APS_NEXT_COMMAND_VALUE         32885
-#define _APS_NEXT_CONTROL_VALUE         1684
+#define _APS_NEXT_CONTROL_VALUE         1688
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

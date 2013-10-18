@@ -38,6 +38,18 @@ extern short int *grid3Data;
 extern short int *grid4Data;
 extern short int *grid5Data;
 
+extern unsigned short prevData1[200];
+extern unsigned short prevData2[200];
+extern unsigned short prevData3[200];
+extern unsigned short prevData4[200];
+extern unsigned short prevData5[200];
+
+extern int firstTime1;
+extern int firstTime2;
+extern int firstTime3;
+extern int firstTime4;
+extern int firstTime5;
+
 extern int dataFlowStarted[5];
 extern int putDataInGrid[5];
 extern char putDataNow[5];
@@ -69,6 +81,16 @@ extern HANDLE mbCommThreadSemaphore;
 extern unsigned int temporaryCount;
 extern HANDLE hDispThread;
 extern HANDLE hMbCommThread;
+extern int showedRadioButton;
+extern int runPoll[5];
+extern CString aliasString;
+extern CString regValueString;
+extern CString regAddrString;
+extern int editableValueField;
+extern CString registerNames1;
+extern CString registerNames2;
+extern CString registerNames3;
+extern CString registerNames4;
 
 extern void LoadReadOneData(int val, unsigned char device_var,unsigned short address);
 extern void LoadWriteOneData(int val, unsigned char device_var,unsigned short address);
