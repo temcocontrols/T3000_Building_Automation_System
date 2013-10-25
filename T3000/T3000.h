@@ -9,7 +9,7 @@
 
 #include "resource.h"       // main symbols
 #include "define.h"
-
+#include <vector>
 #include "global_variable_extern.h"
 
 
@@ -27,6 +27,56 @@ extern int g_AllscreensetLevel;
 // See T3000.cpp for the implementation of this class
 //
 
+struct ALL_NODE {
+	CString MainBuilding_Name;
+	CString Building_Name;
+	CString Serial_ID;
+	CString Floor_name;
+	CString Room_name;
+	CString Product_name;
+	CString Product_class_ID;
+	CString Product_ID;
+	CString Screen_Name;
+	CString Bautrate;
+	CString Background_imgID;
+	CString Hardware_Ver;
+	CString Software_Ver;
+	CString Com_Port;
+	CString EPsize;
+	CString Protocol;
+};
+
+struct Building{
+CString Main_BuildingName;
+CString Building_Name;
+CString Protocal;
+CString Com_Port;
+CString Ip_Address;
+CString Ip_Port;
+CString Brandrate;
+BOOL Default_SubBuilding;
+};
+
+struct IONAME{
+CString SERIAL_ID;
+CString INPUT1;
+CString INPUT2;
+CString INPUT3;
+CString INPUT4;
+CString INPUT5;
+CString INPUT6;
+CString INPUT7;
+CString INPUT8;
+CString INPUT9;
+CString OUTPUT1;
+CString OUTPUT2;
+CString OUTPUT3;
+CString OUTPUT4;
+CString OUTPUT5;
+CString OUTPUT6;
+CString OUTPUT7;
+CString SENSORNAME;
+};
 class COwnMemDC : public CDC {
 	private:
 		CBitmap m_bitmap; // Offscreen bitmap
@@ -93,6 +143,7 @@ class COwnMemDC : public CDC {
 };
 class CT3000App : public CWinAppEx
 {
+
 public:
 	CT3000App();
 
@@ -128,6 +179,12 @@ public:
 	void ReadREG();
 	DWORD m_maxClients;
 	DWORD password;
+	void JudgeDB();
+	void ImportData();
+ 
+	vector<ALL_NODE> m_AllNodes;
+	 vector<Building> m_Building;
+	 vector<IONAME>   m_ioname;
 	
 };
 

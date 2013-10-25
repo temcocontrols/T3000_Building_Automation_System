@@ -173,7 +173,7 @@ typedef struct _STATUSBARINFO
 #include "fileRW.h"
 
 #include "T3000RegAddress.h"
-//#define Fance_Enable_Test
+
 
 #define MKBOOL(_VALUE) ((_VALUE) != 0)		//Add by Fance .Use this macro to solve the warning warning C4800: 'BOOL' : forcing value to bool 'true' or 'false'
 

@@ -1491,13 +1491,12 @@ void CT3000View::Fresh_In()
 						strTemp= nValue ==1 ? _T("On") : _T("Off");
 					}else if(product_register_value[MODBUS_ANALOG1_RANGE+i-1]== 4) // Off/On//359
 					{
-// 						nValue=multi_register_value[367+i-1];
-// 						strTemp= nValue ==1 ? _T("On") : _T("Off");
-
-
-						nValue=float(product_register_value[MODBUS_ANALOG1_RANGE+i-1]/10.0);//359
+						nValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-1]/10.0);//359
 						strTemp.Format(_T("%.1f"), (float)nValue/10.0);	
 						strTemp +=strValueUnit;
+
+					     
+
 					}else
 					{
 						//strTemp.Format(_T("%d"),multi_register_value[367+i-1]);//tatat6

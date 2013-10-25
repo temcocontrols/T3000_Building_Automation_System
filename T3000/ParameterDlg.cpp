@@ -21,6 +21,7 @@
 
 #include "T3000RegAddress.h"
 #include "CustomSTable.h"
+#include "AirflowSettingDlg.h"
 extern int Mdb_Adress_Map;
 // CParameterDlg dialog
 
@@ -115,6 +116,8 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT35, m_heatdbN);
 	DDX_Text(pDX, IDC_EDIT38, m_heatspN);
 	DDX_Control(pDX, IDC_STATICUNINT2, m_gUnit);
+	DDX_Control(pDX, IDC_INPUTSELECT3_PID3, m_inputSelect3);
+	DDX_Control(pDX, IDC_INPUTVALUE3_PID3, m_inputValue3);
 }
 
 BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
@@ -209,7 +212,18 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_STATICUNINT2, &CParameterDlg::OnCbnSelchangeStaticunint2)
 	ON_BN_CLICKED(IDC_CS_1, &CParameterDlg::OnBnClickedCs1)
 	ON_BN_CLICKED(IDC_CS_2, &CParameterDlg::OnBnClickedCs2)
-END_MESSAGE_MAP()
+	ON_BN_CLICKED(IDC_AIRFLOW_SETTING, &CParameterDlg::OnBnClickedAirflowSetting)
+	ON_CBN_SELCHANGE(IDC_INPUTSELECT3_PID3, &CParameterDlg::OnCbnSelchangeInputselect3Pid3)
+	ON_EN_KILLFOCUS(IDC_SETVALUE3_PID3, &CParameterDlg::OnEnKillfocusSetvalue3Pid3)
+	ON_EN_KILLFOCUS(IDC_OUTPUT3_PID3, &CParameterDlg::OnEnKillfocusOutput3Pid3)
+	ON_EN_KILLFOCUS(IDC_ECOOLINGPTERM3_PID3, &CParameterDlg::OnEnKillfocusEcoolingpterm3Pid3)
+	ON_EN_KILLFOCUS(IDC_EDIT52_PID3, &CParameterDlg::OnEnKillfocusEdit52Pid3)
+	ON_EN_KILLFOCUS(IDC_SPSET4_PID3, &CParameterDlg::OnEnKillfocusSpset4Pid3)
+	ON_EN_KILLFOCUS(IDC_ESETPOINTHI2_PID3, &CParameterDlg::OnEnKillfocusEsetpointhi2Pid3)
+	ON_EN_KILLFOCUS(IDC_ESETPOINTLO2_PID3, &CParameterDlg::OnEnKillfocusEsetpointlo2Pid3)
+	ON_EN_KILLFOCUS(IDC_ECOOLDEADBAND3_PID3, &CParameterDlg::OnEnKillfocusEcooldeadband3Pid3)
+	ON_EN_KILLFOCUS(IDC_ECOOLINGITERM3_PID3, &CParameterDlg::OnEnKillfocusEcoolingiterm3Pid3)
+	END_MESSAGE_MAP()
 
 
 UINT BackparaFreshProc(LPVOID pParam)
@@ -335,6 +349,19 @@ BOOL CParameterDlg::OnInitDialog()
 	((CButton *)GetDlgItem(IDC_REFRESHBUTTON))->SetIcon(hIcon);
 
 	m_brush.CreateSolidBrush(RGB(255,0,0));
+	m_inputSelect3.ResetContent();
+	m_inputSelect3.AddString(_T("None"));
+	m_inputSelect3.AddString(g_strInName1);
+	m_inputSelect3.AddString(g_strInName2);
+	m_inputSelect3.AddString(g_strInName3);
+	m_inputSelect3.AddString(g_strInName4);
+	m_inputSelect3.AddString(g_strInName5);
+	m_inputSelect3.AddString(g_strInName6);
+	m_inputSelect3.AddString(g_strInName7);
+	m_inputSelect3.AddString(g_strInName8);
+
+	ShowPID3();
+
 	SetTimer(1,2000,NULL);
 	//////////////////////////////////////////////////////////////////////////
 	// TODO:  Add extra initialization here
@@ -1136,6 +1163,9 @@ void CParameterDlg::OnCbnSelchangeInputselect2()
 		return;
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_INPUT1_SELECT,nSel,
 		product_register_value[MODBUS_INPUT1_SELECT],this->m_hWnd,IDC_INPUTSELECT2,_T("INPUT1_SELECT"));
+
+
+		Reflesh_ParameterDlg();
 }
 
 
@@ -1196,8 +1226,7 @@ void CParameterDlg::OnCbnSelchangeEapplication()
 		nRet = write_one(g_tstat_id,reg_tststold[125],m_application_ctrl.GetCurSel()); //tstat6 350 
 
 	}
-	else if(((multi_register_value[7]==PM_TSTAT5E)||
-		(product_register_value[7] == PM_TSTAT5G)) && (m_fFirmwareVersion >= 35.4))//0912
+	else if(((multi_register_value[7]==PM_TSTAT5E)) && (m_fFirmwareVersion >= 35.4))//0912
 	{
 		write_one(g_tstat_id,423 ,m_application_ctrl.GetCurSel()); // 
 		nRet=write_one(g_tstat_id,125 ,m_application_ctrl.GetCurSel()); // 
@@ -1329,6 +1358,8 @@ void CParameterDlg::OnEnKillfocusSetvalue2()
 	{
 	product_register_value[MODBUS_UNIVERSAL_SET]=(nValue*10);
 	strText.Format(_T("%0.1f"),product_register_value[MODBUS_UNIVERSAL_SET]/10);
+	CString strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);
+	strText+=strUnit;
 	m_pid_setptEdt2.SetWindowText(strText);
 	} 
 	else
@@ -1970,8 +2001,6 @@ void CParameterDlg::OnCbnSelchangeOccupiedmodecombo()
 //	//	Refresh();
 //	Reflesh_ParameterDlg();
 //}
-
-
 //Modify by Fance 这里原来的代码400只支持 5E 不支持T6 所以 改为如下
 void CParameterDlg::OnCbnSelchangeComboLcdscrn1()
 {
@@ -2085,26 +2114,6 @@ void CParameterDlg::OnCbnKillfocusCombo4()
 	FlexSPN = 1;
 
 }
-
-
-
-
-
-
-
-
-// 		350	1	Low byte	W/R	(Night)Unoccupied  setpoin.
-// 		351	1	Low byte		spare
-// 		352	1	Low byte	W/R	(Night)Unoccupied heating setpoint dead band , heating deadband for the night (OFF) mode. Units of 1 deg.
-// 		353	1	Low byte	W/R	(Night)Unoccupied cooling setpoint dead band , cooling deadband for the night (OFF) mode. Units of 1 deg.
-// 		354	2	Full	W/R	(Night)Unoccupied heating setpoint
-// 		355	2	Full	W/R	(Night)Unoccupied cooling setpoint
-
-
-
-
-
-
 
 
 void CParameterDlg::OnEnKillfocusEditCspd()
@@ -2237,7 +2246,7 @@ CString CParameterDlg::GetInputValue(int InputNo){//这个是行号，如果是I
 InputNo+=1;
 float fValue;short nValue;
 CString strTemp;
-	CString strValueUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2], 1); //5e=359   122
+	CString strValueUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2], InputNo-1); //5e=359   122
 	{
 		if(product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2]==1)	//359  122
 		{				
@@ -2392,12 +2401,6 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_DEFAULT_SETPOINT]);	//338 341
 	m_defSetPointEdit.SetWindowText(strTemp);
 
-
-
-
-
-
-
 	//339	342	1	Low byte	W/R	Occupied Setpoint Control Register: 0 = normal, setpoint is managed by the serial port and keypad, the stat will remember the last occupied setpoint and use that during the next occupied period. 1 = Default mode, the last occupied setpoint if forgotten and the occupied setpoint gets reset to the default. 2 = trigger an event, when a master controller writes 2 to this register, the default setpoint will be copied to the occupied setpoint after which the Tstat will set the value back to 1 to show the event has been serviced. 
 
 	if(product_register_value[MODBUS_SETPOINT_CONTROL]>=0&&product_register_value[MODBUS_SETPOINT_CONTROL]<3)	//339 342
@@ -2415,18 +2418,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		m_defSetPointEdit.EnableWindow(TRUE);
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
+	 
 
 	//213	142	1	Low byte	W/R	Temperature sensor filter, FIL, weighted average of stored value to new raw value
 	//	strTemp.Format(_T("%d"),multi_register_value[213]);
@@ -2533,10 +2525,12 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	if (product_register_value[MODBUS_TEMP_SELECT]<1)	//382
 	{
 		m_InputSelect1.SetCurSel(0);
-	}else if (product_register_value[MODBUS_TEMP_SELECT]>3)//382
+	}
+	else if (product_register_value[MODBUS_TEMP_SELECT]>3)//382
 	{
 		m_InputSelect1.SetCurSel(2);
-	}else
+	}
+	else
 	{
 		m_InputSelect1.SetCurSel(product_register_value[MODBUS_TEMP_SELECT]-1);//382
 	}
@@ -2546,9 +2540,6 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	if (product_register_value[MODBUS_INPUT1_SELECT]<0)	//383
 	{
 		m_inputSelect2.SetCurSel(0);
-	//}else if (product_register_value[MODBUS_INPUT1_SELECT]>5)	//383
-	//{
-	//	m_inputSelect2.SetCurSel(5);
 	}
 	else
 	{
@@ -2570,170 +2561,49 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	//	CString strValueUnit=GetTempUnit(product_register_value[359], 1);
 		if(product_register_value[383]==1) // input1
 		{	
-			//188-122
-			//if(product_register_value[122]==4||product_register_value[122]==1)
-			//{			   //180-131
-			//	strTemp.Format(_T("%.1f"),(float)product_register_value[131]/10);
-			//	strTemp=strTemp+strUnit;
-			//}
-			//if (strUnit==""||strUnit=="%")
-			//{
-			//	strTemp.Format(_T("%d"),product_register_value[131]);
-			//}
-			//if(product_register_value[122]==3)
-			//{
-			//	if(multi_register_value[131]==0)
-			//		strTemp=_T("OFF");
-			//	if(multi_register_value[131]==1)
-			//		strTemp=_T("ON");
-			//}
+			
 			strTemp=GetInputValue(1);
 			m_inputValue2.SetWindowText(strTemp);
 		}
 		else if(product_register_value[383]==2) // input2 //m_inputvalue1
 		{
-			//if(product_register_value[123]==4||product_register_value[123]==1)
-			//{			   //180-131
-			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
-			//	strTemp=strTemp+strUnit;
-			//}
-			//if (strUnit==""||strUnit=="%")
-			//{
-			//	strTemp.Format(_T("%d"),product_register_value[132]);
-			//}
-			//if(product_register_value[123]==3)
-			//{
-			//	if(multi_register_value[132]==0)
-			//		strTemp=_T("OFF");
-			//	if(multi_register_value[132]==1)
-			//		strTemp=_T("ON");
-			//} 
+			
 			strTemp=GetInputValue(2);
 			m_inputValue2.SetWindowText(strTemp);
 		}
 		else if(product_register_value[383]==3) // input2 //m_inputvalue1
 		{
-			//if(product_register_value[123]==4||product_register_value[123]==1)
-			//{			   //180-131
-			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
-			//	strTemp=strTemp+strUnit;
-			//}
-			//if (strUnit==""||strUnit=="%")
-			//{
-			//	strTemp.Format(_T("%d"),product_register_value[132]);
-			//}
-			//if(product_register_value[123]==3)
-			//{
-			//	if(multi_register_value[132]==0)
-			//		strTemp=_T("OFF");
-			//	if(multi_register_value[132]==1)
-			//		strTemp=_T("ON");
-			//} 
+			
 			strTemp=GetInputValue(3);
 			m_inputValue2.SetWindowText(strTemp);
 		}
 		else if(product_register_value[383]==4) // input2 //m_inputvalue1
 		{
-			//if(product_register_value[123]==4||product_register_value[123]==1)
-			//{			   //180-131
-			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
-			//	strTemp=strTemp+strUnit;
-			//}
-			//if (strUnit==""||strUnit=="%")
-			//{
-			//	strTemp.Format(_T("%d"),product_register_value[132]);
-			//}
-			//if(product_register_value[123]==3)
-			//{
-			//	if(multi_register_value[132]==0)
-			//		strTemp=_T("OFF");
-			//	if(multi_register_value[132]==1)
-			//		strTemp=_T("ON");
-			//} 
+			
 			strTemp=GetInputValue(4);
 			m_inputValue2.SetWindowText(strTemp);
 		}
 		else if(product_register_value[383]==5) // input2 //m_inputvalue1
 		{
-			//if(product_register_value[123]==4||product_register_value[123]==1)
-			//{			   //180-131
-			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
-			//	strTemp=strTemp+strUnit;
-			//}
-			//if (strUnit==""||strUnit=="%")
-			//{
-			//	strTemp.Format(_T("%d"),product_register_value[132]);
-			//}
-			//if(product_register_value[123]==3)
-			//{
-			//	if(multi_register_value[132]==0)
-			//		strTemp=_T("OFF");
-			//	if(multi_register_value[132]==1)
-			//		strTemp=_T("ON");
-			//} 
+		
 			strTemp=GetInputValue(5);
 			m_inputValue2.SetWindowText(strTemp);
 		}
 		else if(product_register_value[383]==6) // input2 //m_inputvalue1
 		{
-			//if(product_register_value[123]==4||product_register_value[123]==1)
-			//{			   //180-131
-			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
-			//	strTemp=strTemp+strUnit;
-			//}
-			//if (strUnit==""||strUnit=="%")
-			//{
-			//	strTemp.Format(_T("%d"),product_register_value[132]);
-			//}
-			//if(product_register_value[123]==3)
-			//{
-			//	if(multi_register_value[132]==0)
-			//		strTemp=_T("OFF");
-			//	if(multi_register_value[132]==1)
-			//		strTemp=_T("ON");
-			//} 
+		
 			strTemp=GetInputValue(6);
 			m_inputValue2.SetWindowText(strTemp);
 		}
 		else if(product_register_value[383]==7) // input2 //m_inputvalue1
 		{
-			//if(product_register_value[123]==4||product_register_value[123]==1)
-			//{			   //180-131
-			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
-			//	strTemp=strTemp+strUnit;
-			//}
-			//if (strUnit==""||strUnit=="%")
-			//{
-			//	strTemp.Format(_T("%d"),product_register_value[132]);
-			//}
-			//if(product_register_value[123]==3)
-			//{
-			//	if(multi_register_value[132]==0)
-			//		strTemp=_T("OFF");
-			//	if(multi_register_value[132]==1)
-			//		strTemp=_T("ON");
-			//} 
+		
 			strTemp=GetInputValue(7);
 			m_inputValue2.SetWindowText(strTemp);
 		}
 		else if(product_register_value[383]==8) // input2 //m_inputvalue1
 		{
-			//if(product_register_value[123]==4||product_register_value[123]==1)
-			//{			   //180-131
-			//	strTemp.Format(_T("%.1f"),(float)product_register_value[132]/10);
-			//	strTemp=strTemp+strUnit;
-			//}
-			//if (strUnit==""||strUnit=="%")
-			//{
-			//	strTemp.Format(_T("%d"),product_register_value[132]);
-			//}
-			//if(product_register_value[123]==3)
-			//{
-			//	if(multi_register_value[132]==0)
-			//		strTemp=_T("OFF");
-			//	if(multi_register_value[132]==1)
-			//		strTemp=_T("ON");
-			//} 
+			
 			strTemp=GetInputValue(8);
 			m_inputValue2.SetWindowText(strTemp);
 		}
@@ -2748,9 +2618,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		}
 		else
 		{
-
 			temp.Format(_T("%0.1f%%"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
-
 		}
 
 
@@ -2759,8 +2627,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 		}
 		else if (product_register_value[383]==10)//Co2
-		{		   CString temp;
-
+		{ CString temp;
+		strUnit=_T("ppm");
 		if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
 		{
 
@@ -2775,7 +2643,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			temp=temp+strUnit;
 		}
 
-		m_inputValue2.SetWindowText(strTemp);
+		m_inputValue2.SetWindowText(temp);
 
 
 		}
@@ -2785,7 +2653,6 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		}
 #endif
 	} 
-	
 	else
 	{
 #if 1
@@ -2980,9 +2847,6 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 		}
 
-
-
-
 #endif
 	}
 
@@ -3103,10 +2967,10 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		}	
 
 		m_dayOccEdt1.SetWindowText(strTemp);
-		if (multi_register_value[7] == PM_TSTAT5E||
+		if (product_register_value[7] == PM_TSTAT5E||
 			(product_register_value[7] == PM_TSTAT5G))//0911
 		{
-			//strTemp.Format(_T("%.1f"),product_register_value[135]);//0911	//135
+			strUnit=GetTempUnit();
 			strTemp.Format(_T("%d"),(int)product_register_value[MODBUS_COOLING_SETPOINT]);
 			m_pid_setptEdt1.SetWindowText(strTemp+strUnit);
 		}
@@ -3139,7 +3003,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	//131	365	1	Low byte	W/R	MAX_SETPOINT, Setpoint high, the highest setpoint a user will be able to set from the keypad.
-	//132	366	1	Low bddddddddddddddddyte	W/R	MIN_SETPOINT, Setpoint Low, the lowest setpoint a user will be able to set from the keypad. 
+	//132	366	1	Low byte	W/R	MIN_SETPOINT, Setpoint Low, the lowest setpoint a user will be able to set from the keypad. 
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_MAX_SETPOINT]);//131 365
 	strTemp+=strUnit;
 	m_setptHiEdit.SetWindowText(strTemp);
@@ -3337,7 +3201,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
 	}
 
-	
+ShowPID3();
 }
 
 void CParameterDlg::OnBnClickedCancel()
@@ -3486,7 +3350,7 @@ HBRUSH CParameterDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	// TODO:  Return a different brush if the default is not desired
 	for (int i=0;i<(int)Change_Color_ID.size();i++)
 	{
-		if(/*nCtlColor==CTLCOLOR_EDIT &&*/pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//注意此处的（pWnd->），否则没效果
+		if(pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//注意此处的（pWnd->），否则没效果
 		{
 			pDC->SetTextColor(RGB(0,0,0));
 			pDC->SetBkColor(RGB(255,0,0));//设置文本背景色
@@ -3648,4 +3512,406 @@ void CParameterDlg::Read_SliderData()
 	m_setpointN=product_register_value[MODBUS_NIGHT_SETPOINT]/10;//350
 	m_heatdbN=product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//352
 	m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
+}
+
+
+
+
+
+
+void CParameterDlg::OnBnClickedAirflowSetting()
+{
+ CAirflowSettingDlg dlg;
+ dlg.DoModal();
+}
+
+
+void CParameterDlg::OnCbnSelchangeInputselect3Pid3()
+{
+	if(g_ParamLevel==1)
+		return;
+	int nSel = m_inputSelect3.GetCurSel();	
+	if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==nSel)	//Add this to judge weather this value need to change.
+		return;
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_SUPPLY_TEMP_SELECT,nSel,
+		product_register_value[MODBUS_SUPPLY_TEMP_SELECT],this->m_hWnd,IDC_INPUTSELECT3_PID3,_T("INPUT3_SELECT"));
+
+
+	Reflesh_ParameterDlg();
+}
+//获取一个第八位数据，s:system:进制，n;num:这个数是几位的，第N位是1还是0
+//n>=N
+BOOL CParameterDlg::Get_Data_Bit(UINT Data,int n,int N)
+{
+	//Data=Data&0FFx;//去掉高八位数据
+	//下面是算幂 2的N
+	//最大的num位数的数是？ 2~num-1
+	// AfxMessageBox(_T("OK"));
+	UINT num=1;
+	for (int i=1;i<=n;i++)
+	{
+		num=num*2;
+	}
+	num=num-1;//最大的num位数
+	Data=Data&num;//取得这个n位数是什么 ？
+	num=1;
+	for (int i=1;i<N;i++)
+	{
+		num=num*2;
+	}
+	if (num==(Data&num))//说明是1 
+	{
+		return TRUE;
+	} 
+	else
+	{
+		return FALSE;
+	}
+}
+void CParameterDlg::ShowPID3(){
+	if (product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_TSTAT5G)
+	{
+
+		GetDlgItem(IDC_STATIC_PID3_LOOP3)->ShowWindow(TRUE);
+		GetDlgItem(IDC_SPSET4_PID3)->ShowWindow(TRUE);
+		GetDlgItem(IDC_ESETPOINTHI2_PID3)->ShowWindow(TRUE);
+		GetDlgItem(IDC_ESETPOINTLO2_PID3)->ShowWindow(TRUE);
+		GetDlgItem(IDC_ECOOLDEADBAND3_PID3)->ShowWindow(TRUE);
+		GetDlgItem(IDC_ECOOLINGITERM3_PID3)->ShowWindow(TRUE);
+
+		GetDlgItem(IDC_STATIC_LOOP3)->ShowWindow(TRUE);
+		GetDlgItem(IDC_INPUTSELECT3_PID3)->ShowWindow(TRUE);
+		GetDlgItem(IDC_INPUTVALUE3_PID3)->ShowWindow(TRUE);
+		GetDlgItem(IDC_SETVALUE3_PID3)->ShowWindow(TRUE);
+		GetDlgItem(IDC_OUTPUT3_PID3)->ShowWindow(TRUE);
+		GetDlgItem(IDC_ECOOLINGPTERM3_PID3)->ShowWindow(TRUE);
+		GetDlgItem(IDC_EDIT52_PID3)->ShowWindow(TRUE);
+
+		GetDlgItem(IDC_AIRFLOW_SETTING)->ShowWindow(TRUE);
+
+
+		 
+		CString strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);
+
+		CString temp,strTemp;
+		temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
+		temp+=strUnit;
+		GetDlgItem(IDC_SPSET4_PID3)->SetWindowText(temp);
+		temp.Format(_T("%d"),product_register_value[MODBUS_MAX_SUPPLY_SETPOINT]);
+		temp+=strUnit;
+		GetDlgItem(IDC_ESETPOINTHI2_PID3)->SetWindowText(temp);
+		temp.Format(_T("%d"),product_register_value[MODBUS_MIN_SUPPLY_SETPOINT]);
+		temp+=strUnit;
+		GetDlgItem(IDC_ESETPOINTLO2_PID3)->SetWindowText(temp);
+		temp.Format(_T("%d"),product_register_value[MODBUS_PID3_COOLING_DB]);
+		temp+=strUnit;
+		GetDlgItem(IDC_ECOOLDEADBAND3_PID3)->SetWindowText(temp);
+		temp.Format(_T("%d"),product_register_value[MODBUS_PID3_HEATING_DB]);
+		temp+=strUnit;
+		GetDlgItem(IDC_ECOOLINGITERM3_PID3)->SetWindowText(temp);
+
+		if (product_register_value[MODBUS_SUPPLY_TEMP_SELECT]<0) 
+		{
+			m_inputSelect3.SetCurSel(0);
+		}
+		else
+		{
+			m_inputSelect3.SetCurSel(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]);	 
+		}
+		if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==0) // input1
+		{	
+
+			strTemp=_T("UNUSED");
+			m_inputValue3.SetWindowText(strTemp);
+		}
+
+		if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==1) // input1
+		{	
+
+			strTemp=GetInputValue(1);
+			m_inputValue3.SetWindowText(strTemp);
+		}
+		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==2) // input2 //m_inputvalue1
+		{
+
+			strTemp=GetInputValue(2);
+			m_inputValue3.SetWindowText(strTemp);
+		}
+		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==3) // input2 //m_inputvalue1
+		{
+
+			strTemp=GetInputValue(3);
+			m_inputValue3.SetWindowText(strTemp);
+		}
+		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==4) // input2 //m_inputvalue1
+		{
+
+			strTemp=GetInputValue(4);
+			m_inputValue3.SetWindowText(strTemp);
+		}
+		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==5) // input2 //m_inputvalue1
+		{
+
+			strTemp=GetInputValue(5);
+			m_inputValue3.SetWindowText(strTemp);
+		}
+		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==6) // input2 //m_inputvalue1
+		{
+
+			strTemp=GetInputValue(6);
+			m_inputValue3.SetWindowText(strTemp);
+		}
+		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==7) // input2 //m_inputvalue1
+		{
+
+			strTemp=GetInputValue(7);
+			m_inputValue3.SetWindowText(strTemp);
+		}
+		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==8) // input2 //m_inputvalue1
+		{
+
+			strTemp=GetInputValue(8);
+			m_inputValue3.SetWindowText(strTemp);
+		}
+		
+	    
+		temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
+		temp+=strUnit;
+		GetDlgItem(IDC_SETVALUE3_PID3)->SetWindowText(temp);
+		temp.Format(_T("%d%%"),product_register_value[MODBUS_PID3_OUTPUT]);
+		//temp+=strUnit;
+		GetDlgItem(IDC_OUTPUT3_PID3)->SetWindowText(temp);
+		temp.Format(_T("%d"),product_register_value[MODBUS_PID3_PTERM]);
+		GetDlgItem(IDC_ECOOLINGPTERM3_PID3)->SetWindowText(temp);
+		temp.Format(_T("%d"),product_register_value[MODBUS_PID3_ITERM]);
+		GetDlgItem(IDC_EDIT52_PID3)->SetWindowText(temp);
+
+	}
+	else
+	{
+		GetDlgItem(IDC_STATIC_PID3_LOOP3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_SPSET4_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_ESETPOINTHI2_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_ESETPOINTLO2_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_ECOOLDEADBAND3_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_ECOOLINGITERM3_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_LOOP3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_INPUTSELECT3_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_INPUTVALUE3_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_SETVALUE3_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_OUTPUT3_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_ECOOLINGPTERM3_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_EDIT52_PID3)->ShowWindow(FALSE);
+
+		GetDlgItem(IDC_AIRFLOW_SETTING)->ShowWindow(FALSE);
+
+	}
+}
+
+void CParameterDlg::OnEnKillfocusSetvalue3Pid3()
+{
+	CString temp;
+	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
+	GetDlgItem(IDC_SETVALUE3_PID3)->GetWindowText(temp);
+	int Val=_wtoi(temp);
+	if (Val==product_register_value[MODBUS_SUPPLY_SETPOINT])
+	{
+		return;
+	}
+	int ret=write_one(g_tstat_id,MODBUS_SUPPLY_SETPOINT,Val);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_SUPPLY_SETPOINT]=Val;
+		ShowPID3();
+	} 
+	else
+	{
+		AfxMessageBox(_T("Fail"));
+	}
+}
+
+
+void CParameterDlg::OnEnKillfocusOutput3Pid3()
+{
+	CString temp;
+	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
+	GetDlgItem(IDC_OUTPUT3_PID3)->GetWindowText(temp);
+	int Val=_wtoi(temp);
+	if (Val==product_register_value[MODBUS_PID3_OUTPUT])
+	{
+		return;
+	}
+	int ret=write_one(g_tstat_id,MODBUS_PID3_OUTPUT,Val);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_PID3_OUTPUT]=Val;
+		ShowPID3();
+	} 
+	else
+	{
+		AfxMessageBox(_T("Fail"));
+	}
+}
+
+
+void CParameterDlg::OnEnKillfocusEcoolingpterm3Pid3()
+{
+	CString temp;
+	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
+	GetDlgItem(IDC_ECOOLINGPTERM3_PID3)->GetWindowText(temp);
+	int Val=_wtoi(temp);
+	if (Val==product_register_value[MODBUS_PID3_PTERM])
+	{
+		return;
+	}
+	int ret=write_one(g_tstat_id,MODBUS_PID3_PTERM,Val);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_PID3_PTERM]=Val;
+		ShowPID3();
+	} 
+	else
+	{
+		AfxMessageBox(_T("Fail"));
+	}
+}
+
+
+void CParameterDlg::OnEnKillfocusEdit52Pid3()
+{
+	CString temp;
+	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
+	GetDlgItem(IDC_EDIT52_PID3)->GetWindowText(temp);
+	int Val=_wtoi(temp);
+	if (Val==product_register_value[MODBUS_PID3_ITERM])
+	{
+		return;
+	}
+	int ret=write_one(g_tstat_id,MODBUS_PID3_ITERM,Val);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_PID3_ITERM]=Val;
+		ShowPID3();
+	} 
+	else
+	{
+		AfxMessageBox(_T("Fail"));
+	}
+}
+
+//SetPoint 
+void CParameterDlg::OnEnKillfocusSpset4Pid3()
+{
+	CString temp;
+	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
+	GetDlgItem(IDC_SPSET4_PID3)->GetWindowText(temp);
+	int Val=_wtoi(temp);
+	if (Val==product_register_value[MODBUS_SUPPLY_SETPOINT])
+	{
+	return;
+	}
+	int ret=write_one(g_tstat_id,MODBUS_SUPPLY_SETPOINT,Val);
+	if (ret>0)
+	{
+	product_register_value[MODBUS_SUPPLY_SETPOINT]=Val;
+	ShowPID3();
+	} 
+	else
+	{
+	AfxMessageBox(_T("Fail"));
+	}
+
+
+}
+
+
+void CParameterDlg::OnEnKillfocusEsetpointhi2Pid3()
+{
+	CString temp;
+	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
+	GetDlgItem(IDC_ESETPOINTHI2_PID3)->GetWindowText(temp);
+	int Val=_wtoi(temp);
+	if (Val==product_register_value[MODBUS_MAX_SUPPLY_SETPOINT])
+	{
+		return;
+	}
+	int ret=write_one(g_tstat_id,MODBUS_MAX_SUPPLY_SETPOINT,Val);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_MAX_SUPPLY_SETPOINT]=Val;
+		ShowPID3();
+	} 
+	else
+	{
+		AfxMessageBox(_T("Fail"));
+	}
+}
+
+
+void CParameterDlg::OnEnKillfocusEsetpointlo2Pid3()
+{
+	CString temp;
+	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
+	GetDlgItem(IDC_ESETPOINTLO2_PID3)->GetWindowText(temp);
+	int Val=_wtoi(temp);
+	if (Val==product_register_value[MODBUS_MIN_SUPPLY_SETPOINT])
+	{
+		return;
+	}
+	int ret=write_one(g_tstat_id,MODBUS_MIN_SUPPLY_SETPOINT,Val);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_MIN_SUPPLY_SETPOINT]=Val;
+		ShowPID3();
+	} 
+	else
+	{
+		AfxMessageBox(_T("Fail"));
+	}
+}
+
+
+void CParameterDlg::OnEnKillfocusEcooldeadband3Pid3()
+{
+	CString temp;
+	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
+	GetDlgItem(IDC_ECOOLDEADBAND3_PID3)->GetWindowText(temp);
+	int Val=_wtoi(temp);
+	if (Val==product_register_value[MODBUS_PID3_COOLING_DB])
+	{
+		return;
+	}
+	int ret=write_one(g_tstat_id,MODBUS_PID3_COOLING_DB,Val);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_PID3_COOLING_DB]=Val;
+		ShowPID3();
+	} 
+	else
+	{
+		AfxMessageBox(_T("Fail"));
+	}
+}
+
+
+void CParameterDlg::OnEnKillfocusEcoolingiterm3Pid3()
+{
+	CString temp;
+	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
+	GetDlgItem(IDC_ECOOLINGITERM3_PID3)->GetWindowText(temp);
+	int Val=_wtoi(temp);
+	if (Val==product_register_value[MODBUS_PID3_HEATING_DB])
+	{
+		return;
+	}
+	int ret=write_one(g_tstat_id,MODBUS_PID3_HEATING_DB,Val);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_PID3_HEATING_DB]=Val;
+		ShowPID3();
+	} 
+	else
+	{
+		AfxMessageBox(_T("Fail"));
+	}
 }

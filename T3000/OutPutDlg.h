@@ -28,9 +28,10 @@ public:
 	void Color_Grid1();
 	void FreshGrid_PID1();
 	void FreshGrid_PID2();
+	void FreshGrid_PID3();
 	void put_fan_variable();
 	int get_real_fan_select();
-	void OnWrite(bool bflexgrid1_or_2,int col,int row);
+	void OnWrite(int bflexgrid1_or_2,int col,int row);
 	DECLARE_EVENTSINK_MAP()
 	void ClickMsflexgrid1();
 	void ClickMsflexgrid2();
@@ -53,10 +54,11 @@ public:
 	CComboBox m_fan_mode_ctrl;
 	CMsflexgrid m_FlexGrid1;
 	CMsflexgrid m_FlexGrid2;
+	CMsflexgrid m_FlexGrid3;
 	CButton m_fanAutoCheck;
 	BOOL m_bFanAutoOnly;
 
-	BOOL m_bflexgrid1_or_2;//true:grid 2;false:grid 1;
+	int m_bflexgrid1_or_2;//true:grid 2;false:grid 1;
 	BOOL m_bOut4PWM;
 	BOOL m_bOut5PWM;
 	BOOL m_bFloat;
@@ -76,6 +78,10 @@ public:
 	CEdit m_PID2_coolEdit;
 	int m_PID2_heat_stages;
 	int m_PID2_cool_stages;
+
+	int m_PID3_heat_stages;
+	int m_PID3_cool_stages;
+
 	CString strOldText;
 	int i_104_pid1,i_268_pid2;
 
@@ -100,6 +106,11 @@ public:
 	afx_msg void OnBnClickedRefresh();
 	void FLEX_GRID1_PUT_COLOR_STR(int ,int ,CString);
 	void FLEX_GRID2_PUT_COLOR_STR(int ,int ,CString);
+	void FLEX_GRID3_PUT_COLOR_STR(int ,int ,CString);
 	void FLEX_GRID1_PUT_STR(int ,int ,CString);
 	void FLEX_GRID2_PUT_STR(int ,int ,CString);
+	void FLEX_GRID3_PUT_STR(int ,int ,CString);
+	CEdit m_PID3_heatEdit;
+	CEdit m_PID3_coolEdit;
+	void ClickMsflexgrid3();
 };
