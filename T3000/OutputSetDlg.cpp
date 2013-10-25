@@ -20,7 +20,7 @@ CString Interlock[6]={_T("ON"),_T("DI1"),_T("AI1") ,_T("AI2"),_T("TIMER OR"),_T(
 //CString ONTPUT_FUNS[4]={_T("Normal"),_T("Rotation Timer"),_T("Lighting Control") ,_T("PWM Control")};
 CString ONTPUT_FUNS[3]={_T("Normal"),_T("Normal"),_T("Normal") };//2.5.0.98
 CString OUTPUT_ANRANGE[5]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)")};
-//CString OUTPUT_RANGE45[2]={_T("On/Off"),_T("Float(0-100%)")/*,_T("PWM(0-100%)")*/};
+CString OUTPUT_RANGE5[3]={_T("On/Off"),_T("Float(0-100%)"),_T("PWM(0-100%)")};
 CString OUTPUT_RANGE45[4]={_T("On/Off"),_T("Float(Cooling)"),_T("Float(Heating)"),_T("PWM(0-100%)")};//2.5.0.98
 
 const int REFRESH_GRID=1;
@@ -277,11 +277,21 @@ void COutputSetDlg::Fresh_Grid()
 		//strTemp=_T("On/Off");
 		nRange=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
 		 
-		 
-		if(nRange>=0&&nRange<4)
-		{
-			strTemp=OUTPUT_RANGE45[nRange];
-		}
+		 if (product_register_value[7]==6||product_register_value[7]==6)
+		 {
+			 if(nRange>=0&&nRange<4)
+			 {
+				 strTemp=OUTPUT_RANGE45[nRange];
+			 }
+		 } 
+		 else
+		 {
+			 if(nRange>=0&&nRange<3)
+			 {
+				 strTemp=OUTPUT_RANGE5[nRange];
+			 }
+		 }
+		
 
 
 		m_FlexGrid.put_TextMatrix(i,RANG_OUTFIELD,strTemp);
@@ -391,11 +401,20 @@ void COutputSetDlg::Fresh_Grid()
 		//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
-
-		if(nRange>=0&&nRange<=3)		//Modify by Fance_0412
+		if (product_register_value[7]==6||product_register_value[7]==7)
+		{if(nRange>=0&&nRange<=3)		//Modify by Fance_0412
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
+		} 
+		else
+		{
+			if(nRange>=0&&nRange<=2)		//Modify by Fance_0412
+			{
+				strTemp=OUTPUT_RANGE5[nRange];
+			}
+		}
+		
 		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 
 		if(nRange == 0 || !(nAMVAlue & 8)) // AM栏选择了Auto或者Range 栏选择了On/Off，value都显示ON/Off
@@ -473,11 +492,21 @@ void COutputSetDlg::Fresh_Grid()
 		//nRange=multi_register_value[284];
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];
-
-		if(nRange>=0&&nRange<=3)
+		if (product_register_value[7]==7||product_register_value[6]==6)
 		{
-			strTemp=OUTPUT_RANGE45[nRange];
+			if(nRange>=0&&nRange<=3)
+			{
+				strTemp=OUTPUT_RANGE45[nRange];
+			}
 		}
+		else
+		{
+			if(nRange>=0&&nRange<=2)
+			{
+				strTemp=OUTPUT_RANGE5[nRange];
+			}
+		}
+		
 		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
 
 		//////////////////////////////////////////////////////////////////////////
@@ -588,11 +617,20 @@ void COutputSetDlg::Fresh_Grid()
 		//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT4]; //283  205
-
-		if(nRange>=0&&nRange<=3)
+		if (product_register_value[7]==7||product_register_value[7]==6)
+		{if(nRange>=0&&nRange<=3)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
 		}
+		} 
+		else
+		{
+			if(nRange>=0&&nRange<=2)
+			{
+				strTemp=OUTPUT_RANGE5[nRange];
+			}
+		}
+		
 		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 
 		strTemp.Empty();
@@ -726,10 +764,21 @@ void COutputSetDlg::Fresh_Grid()
 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];  //284  206
-		if(nRange>=0&&nRange<=3)
+		if (product_register_value[7]==7||product_register_value[7]==6)
 		{
-			strTemp=OUTPUT_RANGE45[nRange];
+			if(nRange>=0&&nRange<=3)
+			{
+				strTemp=OUTPUT_RANGE45[nRange];
+			}
+		} 
+		else
+		{
+			if(nRange>=0&&nRange<=2)
+			{
+				strTemp=OUTPUT_RANGE5[nRange];
+			}
 		}
+		
 		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
 		strTemp.Empty();
 		if (m_version<32.2)
@@ -1290,12 +1339,22 @@ void COutputSetDlg::Fresh_Grid_Tstat5E()
 		nRange=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
 
 
-		if(nRange>=0&&nRange<4)
+		 
+
+		if (product_register_value[7]==7||product_register_value[7]==6)
 		{
-			strTemp=OUTPUT_RANGE45[nRange];
+			if(nRange>=0&&nRange<=3)
+			{
+				strTemp=OUTPUT_RANGE45[nRange];
+			}
+		} 
+		else
+		{
+			if(nRange>=0&&nRange<=2)
+			{
+				strTemp=OUTPUT_RANGE5[nRange];
+			}
 		}
-
-
 		m_FlexGrid.put_TextMatrix(i,RANG_OUTFIELD,strTemp);
 
 	}
@@ -1404,9 +1463,20 @@ void COutputSetDlg::Fresh_Grid_Tstat5E()
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
 
-		if(nRange>=0&&nRange<=3)		//Modify by Fance_0412
+		 
+		if (product_register_value[7]==7||product_register_value[7]==6)
 		{
-			strTemp=OUTPUT_RANGE45[nRange];
+			if(nRange>=0&&nRange<=3)
+			{
+				strTemp=OUTPUT_RANGE45[nRange];
+			}
+		} 
+		else
+		{
+			if(nRange>=0&&nRange<=2)
+			{
+				strTemp=OUTPUT_RANGE5[nRange];
+			}
 		}
 		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 
@@ -1486,9 +1556,19 @@ void COutputSetDlg::Fresh_Grid_Tstat5E()
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];
 
-		if(nRange>=0&&nRange<=3)
+		if (product_register_value[7]==7||product_register_value[7]==6)
 		{
-			strTemp=OUTPUT_RANGE45[nRange];
+			if(nRange>=0&&nRange<=3)
+			{
+				strTemp=OUTPUT_RANGE45[nRange];
+			}
+		} 
+		else
+		{
+			if(nRange>=0&&nRange<=2)
+			{
+				strTemp=OUTPUT_RANGE5[nRange];
+			}
 		}
 		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
 
@@ -1601,9 +1681,19 @@ void COutputSetDlg::Fresh_Grid_Tstat5E()
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT4]; //283  205
 
-		if(nRange>=0&&nRange<=3)
+		if (product_register_value[7]==7||product_register_value[7]==6)
 		{
-			strTemp=OUTPUT_RANGE45[nRange];
+			if(nRange>=0&&nRange<=3)
+			{
+				strTemp=OUTPUT_RANGE45[nRange];
+			}
+		} 
+		else
+		{
+			if(nRange>=0&&nRange<=2)
+			{
+				strTemp=OUTPUT_RANGE5[nRange];
+			}
 		}
 		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 
@@ -1738,9 +1828,19 @@ void COutputSetDlg::Fresh_Grid_Tstat5E()
 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];  //284  206
-		if(nRange>=0&&nRange<=3)
+		if (product_register_value[7]==7||product_register_value[7]==6)
 		{
-			strTemp=OUTPUT_RANGE45[nRange];
+			if(nRange>=0&&nRange<=3)
+			{
+				strTemp=OUTPUT_RANGE45[nRange];
+			}
+		} 
+		else
+		{
+			if(nRange>=0&&nRange<=2)
+			{
+				strTemp=OUTPUT_RANGE5[nRange];
+			}
 		}
 		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
 		strTemp.Empty();
@@ -2381,10 +2481,19 @@ void COutputSetDlg::Fresh_GridForTstat6()
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
 
-		if(nRange>=0&&nRange<=3)		//Modify by Fance_0412
-			//if(nRange>=0&&nRange<2)
+		if (product_register_value[7]==7||product_register_value[7]==6)
 		{
-			strTemp=OUTPUT_RANGE45[nRange];
+			if(nRange>=0&&nRange<=3)
+			{
+				strTemp=OUTPUT_RANGE45[nRange];
+			}
+		} 
+		else
+		{
+			if(nRange>=0&&nRange<=2)
+			{
+				strTemp=OUTPUT_RANGE5[nRange];
+			}
 		}
 		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 
@@ -2464,9 +2573,19 @@ void COutputSetDlg::Fresh_GridForTstat6()
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];
 
-		if(nRange>=0&&nRange<=3)
+		if (product_register_value[7]==7||product_register_value[7]==6)
 		{
-			strTemp=OUTPUT_RANGE45[nRange];
+			if(nRange>=0&&nRange<=3)
+			{
+				strTemp=OUTPUT_RANGE45[nRange];
+			}
+		} 
+		else
+		{
+			if(nRange>=0&&nRange<=2)
+			{
+				strTemp=OUTPUT_RANGE5[nRange];
+			}
 		}
 		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
 
@@ -4572,11 +4691,22 @@ void COutputSetDlg::ClickMsflexgrid1()
 
 
 			//	for(int i=0;i<2;i++)
-			for(int i=0;i<4;i++)//2.5.0.98
-			{
-				m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
-			}
+			 
 
+			if (product_register_value[7]==7||product_register_value[7]==6)
+			{
+				for(int i=0;i<4;i++)//2.5.0.98
+				{
+					m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
+				}
+			} 
+			else
+			{
+				for(int i=0;i<3;i++)//2.5.0.98
+				{
+					m_outRangCmbox.AddString(OUTPUT_RANGE5[i]);
+				}
+			}
 			m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
 			m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
 			m_outRangCmbox.BringWindowToTop();
@@ -4949,11 +5079,24 @@ void COutputSetDlg::ClickMsflexgrid1()
 
 
 				//	for(int i=0;i<2;i++)
-				for(int i=0;i<4;i++)//2.5.0.98
+				//for(int i=0;i<4;i++)//2.5.0.98
+				//{
+				//	m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
+				//}
+				if (product_register_value[7]==7||product_register_value[7]==6)
 				{
-					m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
+					for(int i=0;i<4;i++)//2.5.0.98
+					{
+						m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
+					}
+				} 
+				else
+				{
+					for(int i=0;i<3;i++)//2.5.0.98
+					{
+						m_outRangCmbox.AddString(OUTPUT_RANGE5[i]);
+					}
 				}
-
 				m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
 				m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
 				m_outRangCmbox.BringWindowToTop();
@@ -5008,11 +5151,24 @@ void COutputSetDlg::ClickMsflexgrid1()
 
 
 				//for(int i=0;i<2;i++)
-				for(int i=0;i<4;i++)//2.5.0.98
+				//for(int i=0;i<4;i++)//2.5.0.98
+				//{
+				//	m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
+				//}
+				if (product_register_value[7]==7||product_register_value[7]==6)
 				{
-					m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
+					for(int i=0;i<4;i++)//2.5.0.98
+					{
+						m_outRangCmbox.AddString(OUTPUT_RANGE45[i]);
+					}
+				} 
+				else
+				{
+					for(int i=0;i<3;i++)//2.5.0.98
+					{
+						m_outRangCmbox.AddString(OUTPUT_RANGE5[i]);
+					}
 				}
-
 				m_outRangCmbox.ShowWindow(SW_SHOW);//显示控件
 				m_outRangCmbox.MoveWindow(rc); //移动到选中格的位置，覆盖
 				m_outRangCmbox.BringWindowToTop();

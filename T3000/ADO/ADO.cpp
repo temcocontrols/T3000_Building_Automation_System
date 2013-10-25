@@ -14,7 +14,10 @@ CADO::CADO(void)
 CADO::~CADO(void)
 {
 }
-
+void CADO::DeleteDB(){
+CString filePath=g_strExePth+_T("Database\\T3000.mdb");
+DeleteFile(filePath);
+}
 void CADO::OnInitADOConn()
 {
 	::CoInitialize(NULL);

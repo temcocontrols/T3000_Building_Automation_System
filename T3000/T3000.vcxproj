@@ -123,6 +123,7 @@
     <ClCompile Include="5EInputDialog.cpp" />
     <ClCompile Include="AddBuilding.cpp" />
     <ClCompile Include="AfxMessageDialog.cpp" />
+    <ClCompile Include="AirflowSettingDlg.cpp" />
     <ClCompile Include="AllNodesDiaolg.cpp" />
     <ClCompile Include="Annual_Routines.cpp" />
     <ClCompile Include="AnnualRout_InsertDia.cpp" />
@@ -140,6 +141,7 @@
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
+    <ClCompile Include="CalibrationHumDlg.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
     <ClCompile Include="CM5\BacNetProgram_transplant.cpp" />
     <ClCompile Include="CM5\CStatic\staticex.cpp" />
@@ -255,6 +257,7 @@
     <None Include="res\ApplyDown.bmp" />
     <None Include="res\ApplyFouct.bmp" />
     <None Include="res\ApplyUp.bmp" />
+    <None Include="res\Back.bmp" />
     <None Include="res\bitmap1.bmp" />
     <None Include="res\bitmap2.bmp" />
     <None Include="res\bitmap4.bmp" />
@@ -305,6 +308,7 @@
     <None Include="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AirflowSettingDlg.h" />
     <ClInclude Include="BacnetInfo.h" />
     <ClInclude Include="BacnetInput.h" />
     <ClInclude Include="BacnetOutput.h" />
@@ -314,6 +318,7 @@
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
+    <ClInclude Include="CalibrationHumDlg.h" />
     <ClInclude Include="CM5\ListCtrlCellEx.h" />
     <ClInclude Include="CM5\ListCtrlEx.h" />
     <ClInclude Include="CM5\MyOwnListCtrl.h" />

@@ -15,6 +15,8 @@
 #include "LoginDlg.h"
 
 #include "iniFile.h"
+
+ const int g_versionNO=201301;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -87,6 +89,159 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 	}
 	
 }
+ void CT3000App::ImportData(){
+  CADO ado;
+  ado.OnInitADOConn();
+  CString sql=_T("select * from ALL_NODE");
+  ado.m_pRecordset=ado.OpenRecordset(sql);
+  ALL_NODE temp;
+  while(!ado.m_pRecordset->EndOfFile){
+	   temp.MainBuilding_Name=ado.m_pRecordset->GetCollect(_T("MainBuilding_Name"));
+	   temp.Building_Name=ado.m_pRecordset->GetCollect(_T("Building_Name"));
+	   temp.Serial_ID=ado.m_pRecordset->GetCollect(_T("Serial_ID"));
+	   temp.Floor_name=ado.m_pRecordset->GetCollect(_T("Floor_name"));
+	   temp.Room_name=ado.m_pRecordset->GetCollect(_T("Room_name"));
+	   temp.Product_name=ado.m_pRecordset->GetCollect(_T("Product_name"));
+	   temp.Product_class_ID=ado.m_pRecordset->GetCollect(_T("Product_class_ID"));
+	   temp.Product_ID=ado.m_pRecordset->GetCollect(_T("Product_ID"));
+	   temp.Screen_Name=ado.m_pRecordset->GetCollect(_T("Screen_Name"));
+	   temp.Bautrate=ado.m_pRecordset->GetCollect(_T("Bautrate"));
+	   temp.Background_imgID=ado.m_pRecordset->GetCollect(_T("Background_imgID"));
+	   temp.Hardware_Ver=ado.m_pRecordset->GetCollect(_T("Hardware_Ver"));
+	   temp.Software_Ver=ado.m_pRecordset->GetCollect(_T("Software_Ver"));
+	   temp.Com_Port=ado.m_pRecordset->GetCollect(_T("Com_Port"));
+	   temp.EPsize=ado.m_pRecordset->GetCollect(_T("EPsize"));
+	   temp.Protocol=ado.m_pRecordset->GetCollect(_T("Protocol"));
+      
+	   ado.m_pRecordset->MoveNext();
+
+	   m_AllNodes.push_back(temp);
+  }
+  ado.CloseRecordset();
+  ado.CloseConn();
+ }
+
+
+
+void CT3000App::JudgeDB(){
+ CADO ado;
+ int versionno=0;
+ ado.OnInitADOConn();
+ if (ado.IsHaveTable(ado,_T("Version")))//有Version表
+ {
+   CString sql=_T("Select * from Version");
+   ado.m_pRecordset=ado.OpenRecordset(sql);
+   if (!ado.m_pRecordset->EndOfFile)
+   {
+     versionno=ado.m_pRecordset->GetCollect(_T("VersionNO"));
+   }
+   ado.CloseRecordset();
+   ado.CloseConn();
+   
+ } 
+ if (g_versionNO>versionno)//版本过低
+ {
+     SetPaneString(0,_T("The version of DB is lower,Updating....."));
+	 _ConnectionPtr srcConTmp;
+	 _RecordsetPtr srcRsTemp;
+	 srcConTmp.CreateInstance("ADODB.Connection");
+	 srcRsTemp.CreateInstance("ADODB.Recordset");
+	 srcConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	 srcRsTemp->Open(_T("select * from ALL_NODE"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
+
+	 ALL_NODE temp;
+	 while(!srcRsTemp->EndOfFile){
+		 temp.MainBuilding_Name=srcRsTemp->GetCollect(_T("MainBuilding_Name"));
+		 temp.Building_Name=srcRsTemp->GetCollect(_T("Building_Name"));
+		 temp.Serial_ID=srcRsTemp->GetCollect(_T("Serial_ID"));
+		 temp.Floor_name=srcRsTemp->GetCollect(_T("Floor_name"));
+		 temp.Room_name=srcRsTemp->GetCollect(_T("Room_name"));
+		 temp.Product_name=srcRsTemp->GetCollect(_T("Product_name"));
+		 temp.Product_class_ID=srcRsTemp->GetCollect(_T("Product_class_ID"));
+		 temp.Product_ID=srcRsTemp->GetCollect(_T("Product_ID"));
+		 temp.Screen_Name=srcRsTemp->GetCollect(_T("Screen_Name"));
+		 temp.Bautrate=srcRsTemp->GetCollect(_T("Bautrate"));
+		 temp.Background_imgID=srcRsTemp->GetCollect(_T("Background_imgID"));
+		 temp.Hardware_Ver=srcRsTemp->GetCollect(_T("Hardware_Ver"));
+		 temp.Software_Ver=srcRsTemp->GetCollect(_T("Software_Ver"));
+//		 temp.Com_Port=srcRsTemp->GetCollect(_T("Com_Port"));
+		 temp.EPsize=srcRsTemp->GetCollect(_T("EPsize"));
+		 // temp.Protocol=srcRsTemp->GetCollect(_T("Protocol"));
+
+		 srcRsTemp->MoveNext();
+
+		 m_AllNodes.push_back(temp);
+	 }
+	 srcRsTemp->Close();
+	 srcConTmp->Close();
+
+	 Sleep(2000);
+	 CString filePath=g_strExePth+_T("Database\\T3000.mdb");
+	 DeleteFile(filePath);
+
+
+
+	 HANDLE hFind;//
+	 WIN32_FIND_DATA wfd;//
+	 hFind = FindFirstFile(filePath, &wfd);//
+	 if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
+	 {
+		 //CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
+		 //没有找到就创建一个默认的数据库
+		 filePath=g_strExePth+_T("Database\\T3000.mdb");
+		 HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DATABASE), _T("DB"));   
+		 HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+
+
+		 LPVOID lpExe = LockResource(hGlobal);   
+		 CFile file;
+		 if(file.Open(filePath, CFile::modeCreate | CFile::modeWrite))    
+			 file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+		 file.Close();    
+		 ::UnlockResource(hGlobal);   
+		 ::FreeResource(hGlobal);
+	 }//
+	 CString strsql;
+	 srcConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+
+	 try
+	 {
+
+		 for (int i=0;i<m_AllNodes.size();i++)
+		 {
+			 strsql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,EPsize) values('"
+				 +m_AllNodes[i].MainBuilding_Name+"','"
+				 +m_AllNodes[i].Building_Name+"','"
+				 +m_AllNodes[i].Serial_ID+"','"
+				 +m_AllNodes[i].Floor_name+"','"
+				 +m_AllNodes[i].Room_name+"','"
+				 +m_AllNodes[i].Product_name+"','"
+				 +m_AllNodes[i].Product_class_ID+"','"
+				 +m_AllNodes[i].Product_ID+"','"
+				 +m_AllNodes[i].Screen_Name+"','"
+				 +m_AllNodes[i].Bautrate+"','"
+				 +m_AllNodes[i].Background_imgID+"','"
+				 +m_AllNodes[i].Hardware_Ver+"','"
+				 +m_AllNodes[i].Software_Ver+"','"
+				 +m_AllNodes[i].EPsize+"')"));
+
+
+			 srcConTmp->Execute(strsql.GetString(),NULL,adCmdText);	
+		 }
+	 }
+	 catch(_com_error *e)
+	 {
+		 AfxMessageBox(e->ErrorMessage());
+	 }
+
+	 srcConTmp->Close();
+
+ }
+
+
+
+}
+ 
 BOOL CT3000App::InitInstance()
 {
 	try
@@ -101,64 +256,8 @@ BOOL CT3000App::InitInstance()
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
-	Judgestore();
-	ReadREG();
+	
 
-
-#if 0
-	// 检测注册信息
-	if(haveRegister())
-	{
-// 		int days = GetSoftInstallDays();
-// 		// 		 		if(days<=30&&days>=20)
-// 		// 		 		{
-// 		// 		 			CString msg;
-// 		// 		 			msg.Format(_T("please update new version on the website"));
-// 		// 		 			AfxMessageBox(msg);
-// 		// 		 		}
-// 		// 		 		else if(days>30)
-// 		// 		 		{
-// 		// 		 			AfxMessageBox(_T("please update new version on the website"));
-// 		// 		 			return FALSE;
-// 		// 		 		}
-// 		if(days>160)
-// 		{
-// 			AfxMessageBox(_T("please update new version on the website!"));
-// 			return FALSE;
-// 
-// 		}
-
-
-		int days = GetSoftInstallDays();
-		if (((m_maxClients-days)<=5)&&(days<=m_maxClients))
-		{
-			CString msg;
-// 			if (days != m_maxClients)
-// 			{
-// 				msg.Format(_T("Contact Software Developer in %d days,Please."),m_maxClients-days);
-// 				AfxMessageBox(msg);
-// 			}else
-// 			{
-// 				msg.Format(_T("Contact Software Developer in today,Please."));
-// 				AfxMessageBox(msg);
-// 			}
-		}else if (days>m_maxClients)
-		{
-			CRegKey key;
-			LPCTSTR data_Set =_T("Software\\Microsoft\\Windows NT\\CurrentVersion\\");//_T("Software\\Microsoft\\"); //
-			key.Create(HKEY_LOCAL_MACHINE,data_Set);
-			WriteNumber(key,_T("maxClients"),0);
-			AfxMessageBox(_T("Error code: 101 \nSystem closed!"));
-			return FALSE;
-		}
-
-
-	}else
-	{
-		AfxMessageBox(_T("Error code: 102 \nSystem closed!"));
-		return FALSE;
-	}
-#endif
 
 	CWinAppEx::InitInstance();
 	HRESULT hr;//
@@ -197,11 +296,11 @@ BOOL CT3000App::InitInstance()
 	g_strOrigDatabaseFilePath=g_strExePth+_T("t3000.mdb");//
 	g_strDatabasefilepath+=_T("Database\\t3000.mdb");//
 
-	   CString FilePath;
+	CString FilePath;
 	HANDLE hFind;//
 	WIN32_FIND_DATA wfd;//
 	hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
-	if (hFind==INVALID_HANDLE_VALUE)//
+	if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
 	{
 		//CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
 		  //没有找到就创建一个默认的数据库
@@ -218,16 +317,14 @@ BOOL CT3000App::InitInstance()
 		::UnlockResource(hGlobal);   
 		::FreeResource(hGlobal);
 	}//
-	else//
-	{
-	  
-	}
+	
+	 
 	FindClose(hFind);//
-
 	g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;//
 	g_strImgeFolder=g_strExePth+_T("Database\\image\\");//
 	CreateDirectory(g_strImgeFolder,NULL);//
-	
+
+	JudgeDB();
 	//CString strocx=g_strExePth+_T("MSFLXGRD.OCX");
 
 
@@ -273,10 +370,10 @@ BOOL CT3000App::InitInstance()
 	}
 
 	CString registerfilename;
-	registerfilename=g_strExePth+_T("REG_msado15.dll.bat");
+	 registerfilename=g_strExePth+_T("REG_msado15.bat");
+	 ::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
+	registerfilename=g_strExePth+_T("REG_MSFLXGRD.bat");
 	::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
-	/*registerfilename=g_strExePth+_T("REG_MSFLXGRD.bat");
-	::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);*/
 
 	// Register the application's document templates.  Document templates
 	//  serve as the connection between documents, frame windows and views
@@ -319,9 +416,10 @@ BOOL CT3000App::InitInstance()
 
 	// Dispatch commands specified on the command line.  Will return FALSE if
 	// app was launched with /RegServer, /Register, /Unregserver or /Unregister.
+
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
-
+ 
 	
 	GdiplusStartupInput gdiplusStartupInput;//
 	GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);//

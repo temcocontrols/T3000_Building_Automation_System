@@ -399,6 +399,12 @@
     <ClCompile Include="BacnetController.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
+        <ClCompile Include="CalibrationHumDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+        <ClCompile Include="AirflowSettingDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="BacnetScheduleTime.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
@@ -562,7 +568,10 @@
     <None Include="res\OK.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="ReadMe.txt" />
+  
+    <None Include="res\Back.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -971,6 +980,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RegDetails.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+        <ClInclude Include="CalibrationHumDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AirflowSettingDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

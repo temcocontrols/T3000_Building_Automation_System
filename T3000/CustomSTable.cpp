@@ -58,47 +58,7 @@ BOOL CCustomSTable::OnInitDialog()
 // CCustomSTable message handlers
 void CCustomSTable::to_fresh()
 {
-	//if(m_InputNo==2)
-	//{//table1 is click
-
-	//	int m_271=product_register_value[MODBUS_UNITS1_HIGH];
-	//	int m_272=product_register_value[MODBUS_UNITS1_LOW];
-	//	if(m_271>>8=='0')
-	//	{
-	//		if((m_271 & 0xFF) =='0')
-	//		{
-	//			if(m_272>>8=='0')
-	//				m_units_s.Format(_T("%c"),m_272 & 0xFF);
-	//			else
-	//				m_units_s.Format(_T("%c%c"),m_272>>8,m_272 & 0xFF);
-	//		}
-	//		else
-	//			m_units_s.Format(_T("%c%c%c"),m_271 & 0xFF,m_272>>8,m_272 & 0xFF);
-	//	}
-	//	else
-	//		m_units_s.Format(_T("%c%c%c%c"),m_271>>8,m_271 & 0xFF,m_272>>8,m_272 & 0xFF);
-	//}
-	//else if(m_InputNo==3)
-	//{
-	//	//table2 is click
-	//	int m_273=product_register_value[MODBUS_UNITS2_HIGH];
-	//	int m_274=product_register_value[MODBUS_UNITS2_LOW];
-	//	if(m_273>>8=='0')
-	//	{
-	//		if((m_273 & 0xFF)=='0')
-	//		{
-	//			if(m_274>>8=='0')
-	//				m_units_s.Format(_T("%c"),m_274 & 0xFF);
-	//			else
-	//				m_units_s.Format(_T("%c%c"),m_274>>8,m_274 & 0xFF);
-	//		}
-	//		else
-	//			m_units_s.Format(_T("%c%c%c"),m_273 & 0xFF,m_274>>8,m_274 & 0xFF);
-	//	}		
-	//	else
-	//		m_units_s.Format(_T("%c%c%c%c"),m_273>>8,m_273 & 0xFF,m_274>>8,m_274 & 0xFF);
-	//}
-	//GetDlgItem(IDC_EDIT12)->SetWindowText(m_units_s); 
+	
 	 
 	vector<int> vet_Row;
 	for (int i=0;i<8;i++)
@@ -434,7 +394,8 @@ void CCustomSTable::OnEnKillfocusEdit12()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	 
-		UpdateData();		
+	/*	UpdateData();*/		
+	GetDlgItem(IDC_EDIT12)->GetWindowText(m_units_s);
 		unsigned short first,second;
 		switch(m_units_s.GetLength())
 		{
@@ -448,16 +409,31 @@ void CCustomSTable::OnEnKillfocusEdit12()
 		second=m_units_s.GetAt(2)*256+m_units_s.GetAt(3);
 		if(m_InputNo==2)
 		{
-			write_one(g_tstat_id, MODBUS_UNITS1_HIGH,first);
-			write_one(g_tstat_id, MODBUS_UNITS1_LOW,second);
+			int ret=write_one(g_tstat_id, MODBUS_UNITS1_HIGH,first);
+			if (ret>0)
+			{
+			  product_register_value[MODBUS_UNITS1_HIGH]=first;
+			}
+			ret=write_one(g_tstat_id, MODBUS_UNITS1_LOW,second);
+			if (ret>0)
+			{
+			 product_register_value[MODBUS_UNITS1_LOW]=second;
+			}
 		}
 		else if(m_InputNo==3)
 		{
-			write_one(g_tstat_id, MODBUS_UNITS2_HIGH,first);
-			write_one(g_tstat_id, MODBUS_UNITS2_LOW,second);
+			int ret=write_one(g_tstat_id, MODBUS_UNITS2_HIGH,first);
+			if (ret>0)
+			{
+				product_register_value[MODBUS_UNITS2_HIGH]=first;
+			}
+			ret=write_one(g_tstat_id, MODBUS_UNITS2_LOW,second);
+			if (ret>0)
+			{
+				product_register_value[MODBUS_UNITS2_LOW]=second;
+			}
 		}
-//		IsModfied = false;
-		//to_fresh();
+ 
 		to_fresh();
 	 
 //	SetTimer(1,ONTIMER_TIME,NULL);//设定每五秒更新一次开始
