@@ -1261,7 +1261,7 @@ void CT3000View::Fresh_In()
 		
 	}
 	
-	if(nModel == PM_TSTAT6 )// Tstat 6
+	if(nModel == PM_TSTAT6 ||nModel == PM_TSTAT7)// Tstat 6
 	{
 
 		//Mdb_Adress_Map = T3000_6_ADDRESS; //让其在 T3000_6_ADDRESS 中 进行地址 Maping;
@@ -1641,23 +1641,23 @@ void CT3000View::Fresh_Out()
 				//strTemp.Format(_T("%.1f"),multi_register_value[102]/100.0);
 				float nvalue=0.0;
 
-				if(nRange==1)//0-10v
-				{
+				//if(nRange==1)//0-10v
+				//{
 					//nvalue=multi_register_value[102]/100 /10.0 * 100%;
 					nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/10.0);
-				}
-				if(nRange==2)//0-5v
-				{
-					nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/5.0);
-				}
-				if(nRange==3)//2-10v
-				{
-					nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/8.0);
-				}
-				if(nRange==4)//10-0v
-				{
-					nvalue=float((10-product_register_value[MODBUS_COOLING_VALVE]/100.0)/10.0 *100);
-				}
+				//}
+				//if(nRange==2)//0-5v
+				//{
+				//	nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/5.0);
+				//}
+				//if(nRange==3)//2-10v
+				//{
+				//	nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/8.0);
+				//}
+				//if(nRange==4)//10-0v
+				//{
+				//	nvalue=float((10-product_register_value[MODBUS_COOLING_VALVE]/100.0)/10.0 *100);
+				//}
 				strTemp.Format(_T("%.1f%%"),nvalue);
 			}
 			m_Output_Grid.put_TextMatrix(6,2,strTemp);
@@ -1684,23 +1684,23 @@ void CT3000View::Fresh_Out()
 				//strTemp.Format(_T("%.1f"),multi_register_value[103]/100.0);
 				float nvalue=0.0;
 
-				if(nRange==1)//0-10v
-				{
+				//if(nRange==1)//0-10v
+				//{
 					//nvalue=multi_register_value[102]/100 /10.0 * 100%;
 					nvalue=(float)(product_register_value[MODBUS_HEATING_VALVE]/10.0);//T5 =102
-				}
-				if(nRange==2)//0-5v
-				{
-					nvalue=(float)(product_register_value[MODBUS_HEATING_VALVE]/5.0);
-				}
-				if(nRange==3)//2-10v
-				{
-					nvalue=(float)(product_register_value[MODBUS_HEATING_VALVE]/8.0);
-				}
-				if(nRange==4)//10-0v
-				{
-					nvalue=(float)((10-product_register_value[MODBUS_HEATING_VALVE]/100)/10.0*100);
-				}
+				//}
+				//if(nRange==2)//0-5v
+				//{
+				//	nvalue=(float)(product_register_value[MODBUS_HEATING_VALVE]/5.0);
+				//}
+				//if(nRange==3)//2-10v
+				//{
+				//	nvalue=(float)(product_register_value[MODBUS_HEATING_VALVE]/8.0);
+				//}
+				//if(nRange==4)//10-0v
+				//{
+				//	nvalue=(float)((10-product_register_value[MODBUS_HEATING_VALVE]/100)/10.0*100);
+				//}
 				strTemp.Format(_T("%.1f%%"),nvalue);
 
 			}
@@ -1709,7 +1709,7 @@ void CT3000View::Fresh_Out()
 			m_Output_Grid.put_TextMatrix(7,1,g_strOutName7);
 			strTemp.Empty();
 		}
-		if(nModel==2)//A 4,5
+		if(nModel==2||nModel==1||nModel==3)//A 4,5
 		{
 			 nRange=product_register_value[MODBUS_OUTPUT1_SCALE];
 			if(nRange==0)
@@ -1730,23 +1730,23 @@ void CT3000View::Fresh_Out()
 			{
 				//strTemp.Format(_T("%.1f"),multi_register_value[102]/100.0);
 					float nvalue=0.0;
-				if(nRange==1)//0-10v
-				{
+				//if(nRange==1)//0-10v
+				//{
 					//nvalue=multi_register_value[102]/100 /10.0 * 100%;
 					nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/10.0);
-				}
-				if(nRange==2)//0-5v
-				{
-					nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/5.0);
-				}
-				if(nRange==3)//2-10v
-				{
-					nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/8.0);
-				}
-				if(nRange==4)//10-0v
-				{
-					nvalue=(float)((10-product_register_value[MODBUS_COOLING_VALVE]/100.0)/10.0 *100);
-				}
+				//}
+				//if(nRange==2)//0-5v
+				//{
+				//	nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/5.0);
+				//}
+				//if(nRange==3)//2-10v
+				//{
+				//	nvalue=(float)(product_register_value[MODBUS_COOLING_VALVE]/8.0);
+				//}
+				//if(nRange==4)//10-0v
+				//{
+				//	nvalue=(float)((10-product_register_value[MODBUS_COOLING_VALVE]/100.0)/10.0 *100);
+				//}
 				strTemp.Format(_T("%.1f%%"),nvalue);
 			
 			}
@@ -1769,23 +1769,23 @@ void CT3000View::Fresh_Out()
 			{
 				//strTemp.Format(_T("%.1f"),multi_register_value[103]/100.0);
 					float nvalue=0.0;
-				if(nRange==1)//0-10v
-				{
+				//if(nRange==1)//0-10v
+				//{
 					//nvalue=multi_register_value[102]/100 /10.0 * 100%;
 					nvalue=(float)(product_register_value[MODBUS_HEATING_VALVE]/10.0);
-				}
-				if(nRange==2)//0-5v
-				{
-					nvalue=(float)(product_register_value[MODBUS_HEATING_VALVE]/5.0);
-				}
-				if(nRange==3)//2-10v
-				{
-					nvalue=(float)(product_register_value[MODBUS_HEATING_VALVE]/8.0);
-				}
-				if(nRange==4)//10-0v
-				{
-					nvalue=(float)((10-product_register_value[MODBUS_HEATING_VALVE]/100.0)/10.0 *100);
-				}
+				//}
+				//if(nRange==2)//0-5v
+				//{
+				//	nvalue=(float)(product_register_value[MODBUS_HEATING_VALVE]/5.0);
+				//}
+				//if(nRange==3)//2-10v
+				//{
+				//	nvalue=(float)(product_register_value[MODBUS_HEATING_VALVE]/8.0);
+				//}
+				//if(nRange==4)//10-0v
+				//{
+				//	nvalue=(float)((10-product_register_value[MODBUS_HEATING_VALVE]/100.0)/10.0 *100);
+				//}
 				strTemp.Format(_T("%.1f%%"),nvalue);
 			}
 			m_Output_Grid.put_TextMatrix(5,2,strTemp);

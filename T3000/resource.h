@@ -1437,8 +1437,9 @@
 #define ID_LOADFILE                     32871
 #define ID_SAVEFILE                     32872
 #define ID_REFRESH                      32873
-#define ID_VIEW_DATATRAFFIC             32873
-#define ID_FUNCTION_HUMCALIBRATION      32873
+#define ID_VIEW_DATATRAFFIC             32885
+ #define ID_FUNCTION_HUMCALIBRATION     32886
+ #define ID_FUNCTION_HUMCALIBRATION_C   32887
 #define ID_CONTROL_SCREENS              32874
 #define ID_CONTROL_PROGRAMS             32875
 #define ID_CONTROL_INPUTS               32876
@@ -1465,7 +1466,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        474
-#define _APS_NEXT_COMMAND_VALUE         32885
+#define _APS_NEXT_COMMAND_VALUE         34000
 #define _APS_NEXT_CONTROL_VALUE         1688
 #define _APS_NEXT_SYMED_VALUE           320
 #endif

@@ -4,6 +4,7 @@
 // but are changed infrequently
 
 #pragma once
+#define _SECURE_SCL 0
 
 #ifndef _SECURE_ATL
 #define _SECURE_ATL 1

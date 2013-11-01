@@ -98,7 +98,10 @@ void CADO::CloseRecordset()
 
 void CADO::CloseConn()
 {
-	m_pConnection->Close();
+	if (m_pConnection->State)
+	{m_pConnection->Close();
+	}
+	m_pConnection=NULL;
 	::CoUninitialize();
 
 

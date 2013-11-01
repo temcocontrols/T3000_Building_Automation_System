@@ -584,8 +584,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
 #ifndef Fance_Enable_Test
-	//m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
-	//m_pRefreshThread->SetMainWnd(this);	
+	 m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
+	 m_pRefreshThread->SetMainWnd(this);	
 
 	// 需要执行线程中的操作时
 	 m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
@@ -3335,7 +3335,8 @@ void CMainFrame::SaveConfigFile()
 
 		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
 		SetPaneString(1, strTips);
-	}else if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
+	}
+	else if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
 	{
 // 		nret=write_one(g_tstat_id,321,4);
 // 		nret=write_one(g_tstat_id,322,0);

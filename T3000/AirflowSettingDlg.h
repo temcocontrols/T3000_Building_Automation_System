@@ -30,4 +30,5 @@ public:
 	void Fresh();
 	CString m_strUnit;
 	CEdit m_Editor_maxsupply;
+	BOOL is_have_AVASensor;
 };

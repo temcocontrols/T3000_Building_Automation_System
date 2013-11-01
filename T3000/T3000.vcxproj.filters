@@ -72,9 +72,6 @@
     <ClCompile Include="LightingController\configure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DBOprator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Dialog_Progess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -399,10 +396,10 @@
     <ClCompile Include="BacnetController.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
-        <ClCompile Include="CalibrationHumDlg.cpp">
+    <ClCompile Include="CalibrationHumDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-        <ClCompile Include="AirflowSettingDlg.cpp">
+    <ClCompile Include="AirflowSettingDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BacnetScheduleTime.cpp">
@@ -568,7 +565,6 @@
     <None Include="res\OK.ico">
       <Filter>Resource Files</Filter>
     </None>
-  
     <None Include="res\Back.bmp">
       <Filter>Resource Files</Filter>
     </None>
@@ -611,9 +607,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LightingController\configure.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DBOprator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="define.h">
@@ -982,7 +975,7 @@
     <ClInclude Include="RegDetails.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-        <ClInclude Include="CalibrationHumDlg.h">
+    <ClInclude Include="CalibrationHumDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AirflowSettingDlg.h">

@@ -69,7 +69,7 @@ BOOL CAirflowSettingDlg::Get_Data_Bit(UINT Data,int n,int N)
 }
 BOOL CAirflowSettingDlg::OnInitDialog()
 {
-
+	  is_have_AVASensor=product_register_value[MODBUS_VAV_CONTROL]&2;
 	Fresh();
 CDialogEx::OnInitDialog();
 	return TRUE;
@@ -85,28 +85,48 @@ void CAirflowSettingDlg::Fresh(){
 
 		m_strUnit=_T("¡ãC");
 	}
+	CString strUnit;CString temp,strTemp;
+	
+	if (!is_have_AVASensor)
+	{
+		strUnit=_T("%");
+		temp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_AIRFLOW_SETPOINT]/10.0);
+		temp+=strUnit;
+		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT2)->SetWindowText(temp);
+		temp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_MAX_AIRFLOW_HEATING]/10.0);
+		temp+=strUnit;
+		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT4)->SetWindowText(temp);
+		temp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_MAX_AIRFLOW_COOLING]/10.0);
+		temp+=strUnit;
+		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT3)->SetWindowText(temp);
+		temp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_MIN_AIRFLOW]/10.0);
+		temp+=strUnit;
+		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT5)->SetWindowText(temp);
+	}
+	else
+	{
 
-	 
-	 CString strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);
-
-	CString temp,strTemp;
-	temp.Format(_T("%d"),product_register_value[MODBUS_AIRFLOW_SETPOINT]);
-	temp+=strUnit;
-	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT2)->SetWindowText(temp);
-	temp.Format(_T("%d"),product_register_value[MODBUS_MAX_AIRFLOW_HEATING]);
-	temp+=strUnit;
-	 GetDlgItem(IDC_EDIT_PID2OFFSETPOINT4)->SetWindowText(temp);
-	temp.Format(_T("%d"),product_register_value[MODBUS_MAX_AIRFLOW_COOLING]);
-	temp+=strUnit;
-	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT3)->SetWindowText(temp);
-	temp.Format(_T("%d"),product_register_value[MODBUS_MIN_AIRFLOW]);
-	temp+=strUnit;
-	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT5)->SetWindowText(temp);
-	temp.Format(_T("%d"),product_register_value[MODBUS_MAX_SUPPLY_SETPOINT]);
+	   strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);
+	   temp.Format(_T("%d"),product_register_value[MODBUS_AIRFLOW_SETPOINT]);
+	   temp+=strUnit;
+	   GetDlgItem(IDC_EDIT_PID2OFFSETPOINT2)->SetWindowText(temp);
+	   temp.Format(_T("%d"),product_register_value[MODBUS_MAX_AIRFLOW_HEATING]);
+	   temp+=strUnit;
+	   GetDlgItem(IDC_EDIT_PID2OFFSETPOINT4)->SetWindowText(temp);
+	   temp.Format(_T("%d"),product_register_value[MODBUS_MAX_AIRFLOW_COOLING]);
+	   temp+=strUnit;
+	   GetDlgItem(IDC_EDIT_PID2OFFSETPOINT3)->SetWindowText(temp);
+	   temp.Format(_T("%d"),product_register_value[MODBUS_MIN_AIRFLOW]);
+	   temp+=strUnit;
+	   GetDlgItem(IDC_EDIT_PID2OFFSETPOINT5)->SetWindowText(temp);
+	}
+	
+	
+	temp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_MAX_SUPPLY_SETPOINT]/10.0);
 	temp+=m_strUnit;
 	GetDlgItem(IDC_MAX_SUPPLY)->SetWindowText(temp);
 
-	temp.Format(_T("%d"),product_register_value[MODBUS_MIN_SUPPLY_SETPOINT]);
+	temp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_MIN_SUPPLY_SETPOINT]/10.0);
 	temp+=m_strUnit;
 	GetDlgItem(IDC_MIN_SUPPLY)->SetWindowText(temp);
 
@@ -139,22 +159,44 @@ void CAirflowSettingDlg::OnEnKillfocusEditPid2offsetpoint4()
 {
 	CString temp;
 	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT4)->GetWindowText(temp);
-	int Val=_wtoi(temp);
-	if (Val==product_register_value[MODBUS_MAX_AIRFLOW_HEATING])
+	
+	if (!is_have_AVASensor)
 	{
-		return;
-	}
-	int ret=write_one(g_tstat_id,MODBUS_MAX_AIRFLOW_HEATING,Val);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_MAX_AIRFLOW_HEATING]=Val;
-		temp.Format(_T("%d"),product_register_value[MODBUS_MAX_AIRFLOW_HEATING]);
-		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT4)->SetWindowText(temp);
+		int Val=(int)(_wtof(temp)*10);
+		if (Val==product_register_value[MODBUS_MAX_AIRFLOW_HEATING])
+		{
+			return;
+		}
+		int ret=write_one(g_tstat_id,MODBUS_MAX_AIRFLOW_HEATING,Val);
+		if (ret>0)
+		{
+			product_register_value[MODBUS_MAX_AIRFLOW_HEATING]=Val;
+
+		} 
+		else
+		{
+			AfxMessageBox(_T("Write Fail"));
+		}
+		
 	} 
 	else
-	{
-		AfxMessageBox(_T("Write Fail"));
+	{int Val=_wtoi(temp);
+		if (Val==product_register_value[MODBUS_MAX_AIRFLOW_HEATING])
+		{
+			return;
+		}
+		int ret=write_one(g_tstat_id,MODBUS_MAX_AIRFLOW_HEATING,Val);
+		if (ret>0)
+		{
+			product_register_value[MODBUS_MAX_AIRFLOW_HEATING]=Val;
+
+		} 
+		else
+		{
+			AfxMessageBox(_T("Write Fail"));
+		}
 	}
+	
 	Fresh();
 }
 
@@ -163,22 +205,43 @@ void CAirflowSettingDlg::OnEnKillfocusEditPid2offsetpoint3()
 {
 	CString temp;
 	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT3)->GetWindowText(temp);
-	int Val=_wtoi(temp);
-	if (Val==product_register_value[MODBUS_MAX_AIRFLOW_COOLING])
+	if (!is_have_AVASensor)
 	{
-		return;
+		int Val=(int)(_wtof(temp)*10);
+		if (Val==product_register_value[MODBUS_MAX_AIRFLOW_COOLING])
+		{
+			return;
+		}
+		int ret=write_one(g_tstat_id,MODBUS_MAX_AIRFLOW_COOLING,Val);
+		if (ret>0)
+		{
+			product_register_value[MODBUS_MAX_AIRFLOW_COOLING]=Val;
+			 
+		} 
+		else
+		{
+			AfxMessageBox(_T("Write Fail"));
+		}
 	}
-	int ret=write_one(g_tstat_id,MODBUS_MAX_AIRFLOW_COOLING,Val);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_MAX_AIRFLOW_COOLING]=Val;
-		temp.Format(_T("%d"),product_register_value[MODBUS_MAX_AIRFLOW_COOLING]);
-		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT3)->SetWindowText(temp);
-	} 
 	else
 	{
-		AfxMessageBox(_T("Write Fail"));
+		int Val=_wtoi(temp);
+		if (Val==product_register_value[MODBUS_MAX_AIRFLOW_COOLING])
+		{
+			return;
+		}
+		int ret=write_one(g_tstat_id,MODBUS_MAX_AIRFLOW_COOLING,Val);
+		if (ret>0)
+		{
+			product_register_value[MODBUS_MAX_AIRFLOW_COOLING]=Val;
+			 
+		} 
+		else
+		{
+			AfxMessageBox(_T("Write Fail"));
+		}
 	}
+	
 	Fresh();
 }
 
@@ -187,22 +250,44 @@ void CAirflowSettingDlg::OnEnKillfocusEditPid2offsetpoint5()
 {
 	CString temp;
 	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT5)->GetWindowText(temp);
-	int Val=_wtoi(temp);
-	if (Val==product_register_value[MODBUS_MIN_AIRFLOW])
+
+	if (!is_have_AVASensor)
 	{
-		return;
+		int Val=(int)(_wtof(temp)*10);
+		if (Val==product_register_value[MODBUS_MIN_AIRFLOW])
+		{
+			return;
+		}
+		int ret=write_one(g_tstat_id,MODBUS_MIN_AIRFLOW,Val);
+		if (ret>0)
+		{
+			product_register_value[MODBUS_MIN_AIRFLOW]=Val;
+
+		} 
+		else
+		{
+			AfxMessageBox(_T("Write Fail"));
+		}	
 	}
-	int ret=write_one(g_tstat_id,MODBUS_MIN_AIRFLOW,Val);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_MIN_AIRFLOW]=Val;
-		temp.Format(_T("%d"),product_register_value[MODBUS_MIN_AIRFLOW]);
-		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT5)->SetWindowText(temp);
-	} 
 	else
 	{
-		AfxMessageBox(_T("Write Fail"));
-	}	
+		int Val=_wtoi(temp);
+		if (Val==product_register_value[MODBUS_MIN_AIRFLOW])
+		{
+			return;
+		}
+		int ret=write_one(g_tstat_id,MODBUS_MIN_AIRFLOW,Val);
+		if (ret>0)
+		{
+			product_register_value[MODBUS_MIN_AIRFLOW]=Val;
+			 
+		} 
+		else
+		{
+			AfxMessageBox(_T("Write Fail"));
+		}	
+	}
+	
 	Fresh(); 
 }
 
@@ -218,7 +303,7 @@ void CAirflowSettingDlg::OnEnKillfocusMaxSupply()
 {
 	CString temp;
 	GetDlgItem(IDC_MAX_SUPPLY)->GetWindowText(temp);
-	int Val=_wtoi(temp);
+	int Val=(int)(_wtof(temp)*10);
 	if (Val==product_register_value[MODBUS_MAX_SUPPLY_SETPOINT])
 	{
 		return;
@@ -242,7 +327,7 @@ void CAirflowSettingDlg::OnEnKillfocusMinSupply()
 {
 	CString temp;
 	GetDlgItem(IDC_MIN_SUPPLY)->GetWindowText(temp);
-	int Val=_wtoi(temp);
+	int Val=(int)(_wtof(temp)*10);
 	if (Val==product_register_value[MODBUS_MIN_SUPPLY_SETPOINT])
 	{
 		return;

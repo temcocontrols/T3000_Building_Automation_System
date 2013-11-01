@@ -16,7 +16,7 @@
 
 #include "iniFile.h"
 
- const int g_versionNO=201301;
+ const int g_versionNO=201306;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -131,14 +131,18 @@ void CT3000App::JudgeDB(){
  {
    CString sql=_T("Select * from Version");
    ado.m_pRecordset=ado.OpenRecordset(sql);
-   if (!ado.m_pRecordset->EndOfFile)
+   ado.m_pRecordset->MoveFirst();
+   while (!ado.m_pRecordset->EndOfFile)
    {
      versionno=ado.m_pRecordset->GetCollect(_T("VersionNO"));
+	 ado.m_pRecordset->MoveNext();
    }
    ado.CloseRecordset();
-   ado.CloseConn();
+  
    
  } 
+  ado.CloseConn();
+
  if (g_versionNO>versionno)//°æ±¾¹ýµÍ
  {
      SetPaneString(0,_T("The version of DB is lower,Updating....."));
@@ -172,10 +176,15 @@ void CT3000App::JudgeDB(){
 
 		 m_AllNodes.push_back(temp);
 	 }
-	 srcRsTemp->Close();
-	 srcConTmp->Close();
 
-	 Sleep(2000);
+	 srcRsTemp->Close();
+	 if (srcConTmp->State)
+	 {srcConTmp->Close();
+	 }
+	 
+	 
+
+	 
 	 CString filePath=g_strExePth+_T("Database\\T3000.mdb");
 	 DeleteFile(filePath);
 
@@ -234,7 +243,10 @@ void CT3000App::JudgeDB(){
 		 AfxMessageBox(e->ErrorMessage());
 	 }
 
-	 srcConTmp->Close();
+	 if (srcConTmp->State)
+	 {srcConTmp->Close();
+	 }
+	 srcConTmp=NULL;
 
  }
 
@@ -293,8 +305,8 @@ BOOL CT3000App::InitInstance()
 	g_strDatabasefilepath=exeFullPath;//
 	g_strExePth=g_strDatabasefilepath;//
 	CreateDirectory(g_strExePth+_T("Database"),NULL);//creat database folder;//
-	g_strOrigDatabaseFilePath=g_strExePth+_T("t3000.mdb");//
-	g_strDatabasefilepath+=_T("Database\\t3000.mdb");//
+	g_strOrigDatabaseFilePath=g_strExePth+_T("T3000.mdb");//
+	g_strDatabasefilepath+=_T("Database\\T3000.mdb");//
 
 	CString FilePath;
 	HANDLE hFind;//
@@ -324,11 +336,11 @@ BOOL CT3000App::InitInstance()
 	g_strImgeFolder=g_strExePth+_T("Database\\image\\");//
 	CreateDirectory(g_strImgeFolder,NULL);//
 
-	JudgeDB();
+ 	JudgeDB();
 	//CString strocx=g_strExePth+_T("MSFLXGRD.OCX");
 
 
-	InitModeName();//
+ 	InitModeName();//
 
 
 
@@ -371,9 +383,9 @@ BOOL CT3000App::InitInstance()
 
 	CString registerfilename;
 	 registerfilename=g_strExePth+_T("REG_msado15.bat");
-	 ::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
+	// ::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
 	registerfilename=g_strExePth+_T("REG_MSFLXGRD.bat");
-	::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
+	//::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
 
 	// Register the application's document templates.  Document templates
 	//  serve as the connection between documents, frame windows and views
