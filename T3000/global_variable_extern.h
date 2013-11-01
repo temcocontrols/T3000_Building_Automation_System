@@ -881,7 +881,27 @@ extern	int	MODBUS_PID3_OUTPUT_COOL3	;
 extern	int	MODBUS_PID3_OUTPUT_HEAT1	;
 extern	int	MODBUS_PID3_OUTPUT_HEAT2	;
 extern	int	MODBUS_PID3_OUTPUT_HEAT3	;
-
+//extern	int	MODBUS_OUTPUT6_FUNCTION		;
+//extern	int	MODBUS_OUTPUT7_FUNCTION		;
+//extern	int	MODBUS_ANALOG3_FUNCTION		;
+//extern	int	MODBUS_ANALOG4_FUNCTION		;
+//extern	int	MODBUS_ANALOG5_FUNCTION		;
+//extern	int	MODBUS_ANALOG6_FUNCTION		;
+//extern	int	MODBUS_ANALOG7_FUNCTION		;
+extern	int	MODBUS_PID3_VALVE_OFF_TABLE_BEGIN  ;
+extern	int	MODBUS_PID3_VALVE_OFF_TABLE_COOL1  ;
+extern	int	MODBUS_PID3_VALVE_OFF_TABLE_COOL2  ;
+extern	int	MODBUS_PID3_VALVE_OFF_TABLE_COOL3  ;
+extern	int	MODBUS_PID3_VALVE_OFF_TABLE_HEAT1  ;
+extern	int	MODBUS_PID3_VALVE_OFF_TABLE_HEAT2  ;
+extern	int	MODBUS_PID3_VALVE_OFF_TABLE_HEAT3  ;
+extern	int	MODBUS_PID3_OFF_OUTPUT_BEGIN	   ;
+extern	int	MODBUS_PID3_OFF_OUTPUT_COOL1	   ;
+extern	int	MODBUS_PID3_OFF_OUTPUT_COOL2	   ;
+extern	int	MODBUS_PID3_OFF_OUTPUT_COOL3	   ;
+extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT1	   ;
+extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT2	   ;
+extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT3	   ;
 #pragma region For_bacnet
 extern HWND BacNet_hwd;//Used for send a message to father delete the dlg;
 extern int bac_ranges_type;

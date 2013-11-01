@@ -167,6 +167,8 @@ BEGIN_MESSAGE_MAP(COutPutDlg, CDialog)
 	ON_EN_SETFOCUS(IDC_DESCRIPTEDIT, &COutPutDlg::OnEnSetfocusDescriptedit)
 	ON_BN_CLICKED(IDC_UPDATE, &COutPutDlg::OnBnClickedUpdate)
 	ON_BN_CLICKED(IDC_REFRESH, &COutPutDlg::OnBnClickedRefresh)
+	ON_EN_KILLFOCUS(IDC_PID3_HEATSTAGEEDIT, &COutPutDlg::OnEnKillfocusPid3Heatstageedit)
+	ON_EN_KILLFOCUS(IDC_PID3COOLSTAGEEDIT, &COutPutDlg::OnEnKillfocusPid3coolstageedit)
 END_MESSAGE_MAP()
 
 BOOL COutPutDlg::OnInitDialog()
@@ -1913,10 +1915,10 @@ void COutPutDlg::FreshGrid_PID3()
 		
 		m_PID3_heat_stages=3;
 		m_PID3_cool_stages=3;
-		if(m_PID3_heat_stages>6)
-			m_PID3_heat_stages=6;
-		if(m_PID3_cool_stages>6)
-			m_PID3_cool_stages=6;
+		if(m_PID3_heat_stages>3)
+			m_PID3_heat_stages=3;
+		if(m_PID3_cool_stages>3)
+			m_PID3_cool_stages=3;
 	}
 	strTemp.Format(_T("%d"),m_PID3_heat_stages);
 	m_PID3_heatEdit.SetWindowText(strTemp);
@@ -1963,19 +1965,9 @@ void COutPutDlg::FreshGrid_PID3()
 	int totalrows,row;
 	unsigned short tstatval,pos;
 
-	//if(m_nmoduleType == 3)//5d
-	//	m_FlexGrid3.put_Rows(8);
-	//else
-	//	m_FlexGrid3.put_Rows(6);
-	//if(m_nmoduleType == 1 )//5a
-	//	totalrows = 3;
-	//else 
-	//	totalrows = 5;
-	//if (m_nmoduleType == 3) //2.5.0.99
-	//{
+	 
 		totalrows = 7;
-	//}
-	//m_FlexGrid3.put_Rows(totalrows);
+	 
 	int pid_select2[7]={0};
 	if (m_nmoduleType==1)
 	{
@@ -1992,15 +1984,17 @@ void COutPutDlg::FreshGrid_PID3()
 			pid_select2[i]=product_register_value[247+i];/////////////////////////////get pid select ;col one 1
 	}
 	////////////////////////down code is for m_flexgrid2
-	for(int col = 1 ;col <= (m_PID3_heat_stages+m_PID3_heat_stages+1);col++)
+	for(int col = 1 ;col <= (m_PID3_cool_stages+m_PID3_heat_stages+1);col++)
 	{
 		if(col < (m_PID3_heat_stages+1))
 			pos = (m_PID3_cool_stages+m_PID3_heat_stages+1) - col ;
 		else
 			pos = col - (m_PID3_heat_stages+1);
 
-		if(m_fan.GetCurSel()==4)//min(pid1,pid2) or max(pid1,pid2)
+		if(m_fan.GetCurSel()==4)//Auto
 			tstatval = product_register_value[MODBUS_PID3_OUTPUT_BEGIN+pos];/////////////////////fan auto
+		else if(m_fan.GetCurSel()==0)//Off
+			tstatval = product_register_value[MODBUS_PID3_OFF_OUTPUT_BEGIN+pos];
 	 
 		for( row = 1;row<=totalrows;row++)//****************************
 		{
@@ -2031,6 +2025,10 @@ void COutPutDlg::FreshGrid_PID3()
 			if(m_fan.GetCurSel()==4)//a,d,g 3就是tstat5g
 			{
 				tstatval = product_register_value[MODBUS_PID3_VALVE_OPERATION_TABLE_BEGIN+ pos];
+			}
+			else if (m_fan.GetCurSel()==0)//OFF
+			{
+				tstatval = product_register_value[MODBUS_PID3_VALVE_OFF_TABLE_BEGIN+ pos];
 			}
 		
 
@@ -2104,110 +2102,7 @@ if(row==(totalrows-1))
 
 						}
                     #endif
-					#if 0
-					if(row==(totalrows-1))//倒数第二行
-					{
-					if (product_register_value[186]!=0)
-						{
-						  if (tstatval & 64)
-						  {
-						  if(digital2string(4,str,VALVE))//for 7 or 8 bit
-							  if(pid_select2[row-1]==1)
-								  FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
-							  else
-							  FLEX_GRID1_PUT_STR(row,col,str)//col +1
-						  } 
-						  else
-						  {
-						    if(digital2string(tstatval & 0x03,str,VALVE))//*** value
-							{
-								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col, str)//col +1
-								else
-								FLEX_GRID1_PUT_STR(row,col, str)//col +1
-							}
-						  }
-					 }
-					else
-					{
-					   int sel=tstatval & 0x03;
-							 
-							if (sel!=0)
-							{
-							if(digital2string(1,str,FAN))//*** value
-							{
-								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col, str)//col +1
-								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
-							}
-							} 
-							else
-							{
-							if(digital2string(0,str,FAN))//*** value
-							{
-								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col, str)//col +1
-								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
-							}
-					       }
-				 
-					}
-					}
-					if(row==totalrows)//倒数第一个
-					{
-					if (product_register_value[187]!=0)
-						{
-						if(tstatval & 128)
-							{
-							if(digital2string(4,str,VALVE))//for 7 or 8 bit
-								{
-								if(pid_select2[row-1]==1)
-									FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
-								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
-								}
-
-							}else
-							{
-							if(digital2string((tstatval >> 2) & 0x03,str,VALVE))//*** value
-							{
-								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
-								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
-							}
-							}
-						}
-
-					else
-						{
-						int sel=(tstatval >> 2) & 0x03;
-							if (sel!=0)
-							{
-							if(digital2string(1/*(tstatval >> 2) & 0x03*/,str,FAN))//*** value
-							{
-								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
-								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
-							}
-							} 
-							else
-							{
-							if(digital2string(0/*(tstatval >> 2) & 0x03*/,str,FAN))//*** value
-							{
-								if(pid_select2[row-1]==1)
-								FLEX_GRID1_PUT_COLOR_STR(row,col,str)//col +1
-								else
-								FLEX_GRID1_PUT_STR(row,col,str)//col +1
-							}
-							}
-						}
-					 
-				}
-#endif
+ 
 						
 					}
 					else
@@ -8143,4 +8038,73 @@ void COutPutDlg::ClickMsflexgrid3()
 			}
 
 		}
+}
+
+
+void COutPutDlg::OnEnKillfocusPid3Heatstageedit()
+{
+	if(g_OutPutLevel==1)
+		return;
+	CString strText;
+	GetDlgItem(IDC_PID3_HEATSTAGEEDIT)->GetWindowText(strText);
+	m_PID3_heat_stages=_wtoi(strText);
+	if(m_PID2_heat_stages+m_PID2_cool_stages>6)
+	{
+		AfxMessageBox(_T("Too many stages for PID3!"));
+		m_PID3_heat_stages = product_register_value[MODBUS_PID3_HEAT_STAGE];
+		GetDlgItem(IDC_PID3_HEATSTAGEEDIT)->SetWindowText(_T("1"));
+	}
+	else
+	{
+ 
+
+		int ret=write_one(g_tstat_id,MODBUS_PID3_HEAT_STAGE,m_PID3_heat_stages);
+		if (ret>0)
+		{
+			product_register_value[MODBUS_PID3_HEAT_STAGE] =m_PID3_heat_stages; 
+		}
+		else
+		{
+			m_PID3_heat_stages=product_register_value[MODBUS_PID3_HEAT_STAGE];
+		}
+
+
+		FreshGrid_PID3();
+
+	}
+
+}
+
+
+void COutPutDlg::OnEnKillfocusPid3coolstageedit()
+{
+	if(g_OutPutLevel==1)
+		return;
+	CString strText;
+	GetDlgItem(IDC_PID3COOLSTAGEEDIT)->GetWindowText(strText);
+	m_PID3_cool_stages=_wtoi(strText);
+	if(m_PID3_heat_stages+m_PID3_cool_stages>6)
+	{
+		AfxMessageBox(_T("Too many stages for PID3!"));
+		m_PID3_cool_stages = product_register_value[MODBUS_PID3_COOL_STAGE];
+		GetDlgItem(IDC_PID3COOLSTAGEEDIT)->SetWindowText(_T("1"));
+	}
+	else
+	{
+
+
+		int ret=write_one(g_tstat_id,MODBUS_PID3_COOL_STAGE,m_PID3_cool_stages);
+		if (ret>0)
+		{
+			product_register_value[MODBUS_PID3_COOL_STAGE] =m_PID3_cool_stages; 
+		}
+		else
+		{
+			m_PID3_cool_stages=product_register_value[MODBUS_PID3_COOL_STAGE];
+		}
+
+
+		FreshGrid_PID3();
+
+	}
 }

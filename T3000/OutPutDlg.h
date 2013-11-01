@@ -113,4 +113,6 @@ public:
 	CEdit m_PID3_heatEdit;
 	CEdit m_PID3_coolEdit;
 	void ClickMsflexgrid3();
+	afx_msg void OnEnKillfocusPid3Heatstageedit();
+	afx_msg void OnEnKillfocusPid3coolstageedit();
 };

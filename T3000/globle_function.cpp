@@ -330,14 +330,14 @@ float get_tstat_version(unsigned short tstat_id)
 	//tstat is online ,return >0
 	//tstat is not online ,return -2
 	
-	float tstat_version2=(float)read_one((unsigned char)tstat_id,4);//tstat version			
+	float tstat_version2=(float)product_register_value[4];//tstat version			
 	if(tstat_version2==-2 || tstat_version2==-3)
 		return tstat_version2;
 	if(tstat_version2 >=240 && tstat_version2 <250)
 		tstat_version2 /=10;
 	else 
 	{
-		tstat_version2 = (float)(read_one((unsigned char)tstat_id,5,1)*256+read_one((unsigned char)tstat_id,4,1));	
+		tstat_version2 = (float)(product_register_value[5]*256+product_register_value[4]);	
 		tstat_version2 /=10;
 	}//tstat_version
 	return tstat_version2;

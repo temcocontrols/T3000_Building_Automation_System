@@ -901,7 +901,7 @@ void CInputSetDlg::ClickMsflexgrid1()
 		if(lRow==2||lRow==3)
 		{
 			m_inputFinCombox.ResetContent();
-			for(int i=0;i<7;i++)
+			for(int i=0;i<8;i++)
 				m_inputFinCombox.AddString(INPUT_FUNS[i]);
 		}
 		if(lRow==4)
@@ -1427,7 +1427,7 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 	if(strText.CompareNoCase(strInName)==0)
 		return;
 	
-	if ((multi_register_value[7]==PM_TSTAT5E)||(multi_register_value[7]==PM_TSTAT6)||(multi_register_value[7]==PM_TSTAT7))
+	if ((multi_register_value[7]==PM_TSTAT5G)||(multi_register_value[7]==PM_TSTAT5E)||(multi_register_value[7]==PM_TSTAT6)||(multi_register_value[7]==PM_TSTAT7))
 	{
 		strText.TrimRight();
 		unsigned char p[8];//input+input1

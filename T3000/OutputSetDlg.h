@@ -27,10 +27,10 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedCancel();
 	void Fresh_Grid();
-	void Fresh_GridForTstat6();
+	//void Fresh_GridForTstat6();
 	DECLARE_EVENTSINK_MAP()
 	void ClickMsflexgrid1();
-	void Fresh_Grid_Tstat5E();
+	//void Fresh_Grid_Tstat5E();
 public:
 	int m_nCurRow;
 	int m_nCurCol;

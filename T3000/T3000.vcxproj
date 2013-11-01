@@ -155,7 +155,6 @@
     <ClCompile Include="DisplayConfig.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
     <ClCompile Include="LightingController\configure.cpp" />
-    <ClCompile Include="DBOprator.cpp" />
     <ClCompile Include="Dialog_Progess.cpp" />
     <ClCompile Include="DialogInfo.cpp" />
     <ClCompile Include="EreaseDlg.cpp" />
@@ -304,7 +303,6 @@
     <None Include="res\variable.ico" />
     <None Include="res\week.ico" />
     <None Include="UserImages.bmp" />
-    <None Include="ReadMe.txt" />
     <None Include="..\ModbusDllforVc\ModbusDllforVc\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -365,7 +363,6 @@
     <ClInclude Include="ChangePasswordDlg.h" />
     <ClInclude Include="Config_Routines.h" />
     <ClInclude Include="LightingController\configure.h" />
-    <ClInclude Include="DBOprator.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="Dialog_Progess.h" />
     <ClInclude Include="DialogInfo.h" />
