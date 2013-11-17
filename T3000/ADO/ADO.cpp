@@ -14,7 +14,10 @@ CADO::CADO(void)
 CADO::~CADO(void)
 {
 }
-
+void CADO::DeleteDB(){
+CString filePath=g_strExePth+_T("Database\\T3000.mdb");
+DeleteFile(filePath);
+}
 void CADO::OnInitADOConn()
 {
 	::CoInitialize(NULL);
@@ -95,7 +98,10 @@ void CADO::CloseRecordset()
 
 void CADO::CloseConn()
 {
-	m_pConnection->Close();
+	if (m_pConnection->State)
+	{m_pConnection->Close();
+	}
+	m_pConnection=NULL;
 	::CoUninitialize();
 
 

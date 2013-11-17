@@ -203,4 +203,19 @@ public:
 	afx_msg void OnBnClickedCs2();
 
 	CString GetInputValue(int InputNo);
+	BOOL Get_Data_Bit(UINT Data,int n,int N);
+	void ShowPID3();
+	afx_msg void OnBnClickedAirflowSetting();
+	afx_msg void OnCbnSelchangeInputselect3Pid3();
+	CComboBox m_inputSelect3;
+	CEdit m_inputValue3;
+	afx_msg void OnEnKillfocusSetvalue3Pid3();
+	afx_msg void OnEnKillfocusOutput3Pid3();
+	afx_msg void OnEnKillfocusEcoolingpterm3Pid3();
+	afx_msg void OnEnKillfocusEdit52Pid3();
+	afx_msg void OnEnKillfocusSpset4Pid3();
+	afx_msg void OnEnKillfocusEsetpointhi2Pid3();
+	afx_msg void OnEnKillfocusEsetpointlo2Pid3();
+	afx_msg void OnEnKillfocusEcooldeadband3Pid3();
+	afx_msg void OnEnKillfocusEcoolingiterm3Pid3();
 };

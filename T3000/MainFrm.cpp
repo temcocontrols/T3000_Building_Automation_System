@@ -50,6 +50,7 @@
 #include "T38I13O.h"
 #include "T332AI.h"
 #include "gloab_define.h"
+#include "CalibrationHumDlg.h"
 #pragma region Fance Test
 //For Test
 
@@ -148,7 +149,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnApplicationLook)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnUpdateApplicationLook)
 	
-	ON_REGISTERED_MESSAGE(AFX_WM_RESETTOOLBAR, OnToolbarReset) // 工具栏的按钮添加文字的方法
+	//ON_REGISTERED_MESSAGE(AFX_WM_RESETTOOLBAR, //OnToolbarReset) // 工具栏的按钮添加文字的方法
 	ON_COMMAND(ID_BUILDINGBAR,OnCheckBuildingBar)
 	ON_UPDATE_COMMAND_UI(ID_BUILDINGBAR, OnUpdateCheckBuildingBar)
 	ON_COMMAND(ID_INPUTOUTPUTPANE,OnCheckIOPane)
@@ -195,6 +196,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_TOOL_REGISTERMONITER, &CMainFrame::OnToolRegistermoniter)
 //	ON_COMMAND(ID_APP_EXIT, &CMainFrame::OnAppExit)
 	ON_COMMAND(ID_VIEW_COMMUNICATETRAFFIC, &CMainFrame::OnViewCommunicatetraffic)
+	ON_COMMAND(ID_FUNCTION_HUMCALIBRATION, &CMainFrame::OnFunctionHumcalibration)
 	ON_COMMAND(ID_CONTROL_INPUTS, &CMainFrame::OnControlInputs)
 	ON_COMMAND(ID_CONTROL_PROGRAMS, &CMainFrame::OnControlPrograms)
 	ON_COMMAND(ID_CONTROL_OUTPUTS, &CMainFrame::OnControlOutputs)
@@ -224,7 +226,8 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 {
 	CMainFrame* pFrame=(CMainFrame*)(pParam);
 	BOOL bFirst=TRUE;
-	Read_Mutex=CreateMutex(NULL,TRUE,_T("Read_Multi_Reg"));	//Add by Fance .
+	Read_Mutex=CreateMutex(NULL,TRUE,_T("Read_Multi_Reg"));	//Add by Fance 
+	Sleep(30*1000);
 	//forbid  _ReadMultiRegisters  and _FreshTreeView access com port at the same time.
 	ReleaseMutex(Read_Mutex);//Add by Fance .
 	while(1)
@@ -508,12 +511,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	ASSERT(bNameValid);
 	m_wndToolBar.SetWindowText(strToolBarName);
 
-	/*
+	
 	CString strCustomize;
 	bNameValid = strCustomize.LoadString(IDS_TOOLBAR_CUSTOMIZE);
 	ASSERT(bNameValid);
-	m_wndToolBar.EnableCustomizeButton(TRUE, ID_VIEW_CUSTOMIZE, strCustomize);
-*/
+
 	// Allow user-defined toolbars operations:
 	InitUserToolbars(NULL, uiFirstUserToolBarId, uiLastUserToolBarId);
 
@@ -582,12 +584,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
 #ifndef Fance_Enable_Test
-	m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
-	m_pRefreshThread->SetMainWnd(this);	
+	 m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
+	 m_pRefreshThread->SetMainWnd(this);	
 
 	// 需要执行线程中的操作时
-	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
-	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
+	 m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
+	 m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 #endif
 	//tstat6
 	Tstat6_func();//为TSTST6新寄存器用的。
@@ -779,55 +781,55 @@ BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParent
 	return TRUE;
 }
 
-afx_msg LRESULT CMainFrame::OnToolbarReset(WPARAM wp, LPARAM)
-{
-
-	UINT uiToolBarId = (UINT) wp;	
-
-	if (IDR_TOOLBAR_VER25049)
-	{	
-		//int n;
-		m_wndToolBar.EnableTextLabels(true);
-		//CMFCToolBarMenuButton btnEditor(ID_FILE_SAVE_CONFIG, NULL,GetCmdMgr ()->GetCmdImage (ID_FILE_SAVE_CONFIG), _T("Save"),FALSE);
-		//CMFCToolBarMenuButton btnEditor(0, NULL,NULL, _T(""),FALSE);
-		//n=GetCmdMgr ()->GetCmdImage (ID_CONFIGFILE_SAVE_AS);
-		//m_wndToolBar.ReplaceButton (ID_FILE_OPEN, btnEditor);
-		//m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_CONFIGFILE_SAVE_AS),_T("Save"));
-
-		//CMFCToolBarMenuButton btnLoadConfig(ID_LOAD_CONFIG, NULL,GetCmdMgr ()->GetCmdImage (ID_LOAD_CONFIG), _T("Load"),FALSE);
-		//CMFCToolBarMenuButton btnLoadConfig(ID_LOAD_CONFIG, NULL,GetCmdMgr ()->GetCmdImage (ID_LOAD_CONFIG), _T(""),FALSE);
-		//n=GetCmdMgr ()->GetCmdImage (ID_LOAD_CONFIG);
-		//m_wndToolBar.ReplaceButton (ID_LOAD_CONFIG, btnLoadConfig);
-		//m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_LOAD_CONFIG),_T("Load"));
-
-		//CMFCToolBarMenuButton btnBurn(ID_FILE_BATCHBURNHEX, NULL,GetCmdMgr ()->GetCmdImage (ID_FILE_BATCHBURNHEX), _T("Burn"),FALSE);
-		//CMFCToolBarMenuButton btnBurn(ID_FILE_BATCHBURNHEX, NULL,GetCmdMgr ()->GetCmdImage (ID_FILE_BATCHBURNHEX), _T(""),FALSE);
-		//m_wndToolBar.ReplaceButton (ID_FILE_BATCHBURNHEX, btnBurn);
-		//n=m_wndToolBar.CommandToIndex (ID_FILE_BATCHBURNHEX);
-		//m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_FILE_BATCHBURNHEX),_T("Burn"));
-		
-		CMFCToolBarMenuButton btnConnect(ID_CONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_CONNECT2), _T("Connect"),FALSE);
-		//CMFCToolBarMenuButton btnConnect(ID_CONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_CONNECT2), _T(""),FALSE);
-		m_wndToolBar.ReplaceButton (ID_CONNECT2, btnConnect);
-		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_CONNECT2),_T("Connect"));
-
-		CMFCToolBarMenuButton btndiDisConnect(ID_DISCONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_DISCONNECT2), _T("DisConn"),FALSE);
-		//CMFCToolBarMenuButton btndiDisConnect(ID_DISCONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_DISCONNECT2), _T(""),FALSE);
-		m_wndToolBar.ReplaceButton (ID_DISCONNECT2, btndiDisConnect);
-		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_DISCONNECT2),_T("DisConn"));
-
-		CMFCToolBarMenuButton btnScan(ID_SCAN, NULL,GetCmdMgr ()->GetCmdImage(ID_SCAN), _T("Scan"),FALSE);
-		//CMFCToolBarMenuButton btnScan(ID_SCAN, NULL,GetCmdMgr ()->GetCmdImage(ID_SCAN), _T(""),FALSE);
-		m_wndToolBar.ReplaceButton (ID_SCAN, btnScan);
-		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_SCAN),_T("Scan"));
-
-		CMFCToolBarMenuButton btnConfig(ID_BUILDINGCONFIGDB, NULL, GetCmdMgr ()->GetCmdImage(ID_BUILDINGCONFIGDB), _T("Config"),FALSE);
-		//CMFCToolBarMenuButton btnConnect(ID_CONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_CONNECT2), _T(""),FALSE);
-		m_wndToolBar.ReplaceButton (ID_BUILDINGCONFIGDB, btnConfig);
-		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_BUILDINGCONFIGDB),_T("Config"));
-	}
-	return 0;
-}
+//afx_msg LRESULT CMainFrame::OnToolbarReset(WPARAM wp, LPARAM)
+//{
+//
+//	UINT uiToolBarId = (UINT) wp;	
+//	/*
+//	if (IDR_TOOLBAR_VER25049)
+//	{	
+//		//int n;
+//		m_wndToolBar.EnableTextLabels(true);
+//		//CMFCToolBarMenuButton btnEditor(ID_FILE_SAVE_CONFIG, NULL,GetCmdMgr ()->GetCmdImage (ID_FILE_SAVE_CONFIG), _T("Save"),FALSE);
+//		//CMFCToolBarMenuButton btnEditor(0, NULL,NULL, _T(""),FALSE);
+//		//n=GetCmdMgr ()->GetCmdImage (ID_CONFIGFILE_SAVE_AS);
+//		//m_wndToolBar.ReplaceButton (ID_FILE_OPEN, btnEditor);
+//		//m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_CONFIGFILE_SAVE_AS),_T("Save"));
+//
+//		//CMFCToolBarMenuButton btnLoadConfig(ID_LOAD_CONFIG, NULL,GetCmdMgr ()->GetCmdImage (ID_LOAD_CONFIG), _T("Load"),FALSE);
+//		//CMFCToolBarMenuButton btnLoadConfig(ID_LOAD_CONFIG, NULL,GetCmdMgr ()->GetCmdImage (ID_LOAD_CONFIG), _T(""),FALSE);
+//		//n=GetCmdMgr ()->GetCmdImage (ID_LOAD_CONFIG);
+//		//m_wndToolBar.ReplaceButton (ID_LOAD_CONFIG, btnLoadConfig);
+//		//m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_LOAD_CONFIG),_T("Load"));
+//
+//		//CMFCToolBarMenuButton btnBurn(ID_FILE_BATCHBURNHEX, NULL,GetCmdMgr ()->GetCmdImage (ID_FILE_BATCHBURNHEX), _T("Burn"),FALSE);
+//		//CMFCToolBarMenuButton btnBurn(ID_FILE_BATCHBURNHEX, NULL,GetCmdMgr ()->GetCmdImage (ID_FILE_BATCHBURNHEX), _T(""),FALSE);
+//		//m_wndToolBar.ReplaceButton (ID_FILE_BATCHBURNHEX, btnBurn);
+//		//n=m_wndToolBar.CommandToIndex (ID_FILE_BATCHBURNHEX);
+//		//m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_FILE_BATCHBURNHEX),_T("Burn"));
+//		
+//		CMFCToolBarMenuButton btnConnect(ID_CONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_CONNECT2), _T("Connect"),FALSE);
+//		//CMFCToolBarMenuButton btnConnect(ID_CONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_CONNECT2), _T(""),FALSE);
+//		m_wndToolBar.ReplaceButton (ID_CONNECT2, btnConnect);
+//		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_CONNECT2),_T("Connect"));
+//
+//		CMFCToolBarMenuButton btndiDisConnect(ID_DISCONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_DISCONNECT2), _T("DisConn"),FALSE);
+//		//CMFCToolBarMenuButton btndiDisConnect(ID_DISCONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_DISCONNECT2), _T(""),FALSE);
+//		m_wndToolBar.ReplaceButton (ID_DISCONNECT2, btndiDisConnect);
+//		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_DISCONNECT2),_T("DisConn"));
+//
+//		CMFCToolBarMenuButton btnScan(ID_SCAN, NULL,GetCmdMgr ()->GetCmdImage(ID_SCAN), _T("Scan"),FALSE);
+//		//CMFCToolBarMenuButton btnScan(ID_SCAN, NULL,GetCmdMgr ()->GetCmdImage(ID_SCAN), _T(""),FALSE);
+//		m_wndToolBar.ReplaceButton (ID_SCAN, btnScan);
+//		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_SCAN),_T("Scan"));
+//
+//		CMFCToolBarMenuButton btnConfig(ID_BUILDINGCONFIGDB, NULL, GetCmdMgr ()->GetCmdImage(ID_BUILDINGCONFIGDB), _T("Config"),FALSE);
+//		//CMFCToolBarMenuButton btnConnect(ID_CONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_CONNECT2), _T(""),FALSE);
+//		m_wndToolBar.ReplaceButton (ID_BUILDINGCONFIGDB, btnConfig);
+//		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_BUILDINGCONFIGDB),_T("Config"));
+//	}
+//	*/return 1;
+//}
 
 void CMainFrame::OnCheckBuildingBar()
 {
@@ -962,6 +964,10 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	//CM5
 	g_bChamber=FALSE;
 	m_isMiniPanel=FALSE;
+
+	//m_pFreshMultiRegisters->SuspendThread();
+	//m_pFreshTree->SuspendThread();
+	g_bPauseMultiRead=TRUE;
 #if 1
 	for(UINT i=0;i<m_product.size();i++)
 	{
@@ -1029,8 +1035,10 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 		}
 	}
 #endif
+g_bPauseMultiRead=FALSE;
 	//CM5
-
+	//m_pFreshMultiRegisters->ResumeThread();
+	//m_pFreshTree->ResumeThread();
 	EndWaitCursor();
 }
 
@@ -3327,7 +3335,8 @@ void CMainFrame::SaveConfigFile()
 
 		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
 		SetPaneString(1, strTips);
-	}else if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
+	}
+	else if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
 	{
 // 		nret=write_one(g_tstat_id,321,4);
 // 		nret=write_one(g_tstat_id,322,0);
@@ -4172,7 +4181,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						delete pDlg;//20120220
 						pDlg = NULL;
 					}
+					else
+					{
+						m_CurSubBuldingInfo=product_Node.BuildingInfo;
+					}
 				}
+				
 			}else
 			{
 
@@ -4255,7 +4269,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					// 					AfxMessageBox(str);
 					//Reset the COM or check to make sure the product is open
 					//	AfxMessageBox(_T("Detect the product model not corresponding\nSelect COM port,try again!"));//\nDatabase->Building config Database	
-					AfxMessageBox(_T("Can't read your selected ID or you have changed the serial no of the device\n"));
+					//AfxMessageBox(_T("Can't read your selected ID or you have changed the serial no of the device\n"));
 					if (pDlg !=NULL)
 					{
 						pDlg->ShowWindow(SW_HIDE);
@@ -4263,7 +4277,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						pDlg=NULL;
 					}
 					bOnLine=FALSE;
-					return;
+					//return;
 				}
 			}
 			if (g_CommunicationType==1)
@@ -4399,8 +4413,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						//register_critical_section.Lock();
 						//int nStart = GetTickCount();
 						int itemp = 0;
-						itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100,5);
-						Sleep(100);
+						 itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100,5);
+					//	Sleep(100);
+					itemp>0;
 						if(itemp < 0)
 						{
 							continue;
@@ -6446,7 +6461,11 @@ void CMainFrame::OnViewCommunicatetraffic()
 	  g_testmultiReadtraffic_dlg->ShowWindow(SW_SHOW);
 	 }
 }
-
+void CMainFrame::OnFunctionHumcalibration()
+{
+	 CCalibrationHumDlg dlg;
+	 dlg.DoModal();
+}
 void CMainFrame::OnControlInputs()
 {
 	// TODO: Add your command handler code here

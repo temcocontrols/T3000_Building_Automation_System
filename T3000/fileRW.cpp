@@ -19,10 +19,10 @@
 
 
 
-#define TSTAT25_VAR_NUM 43
-#define TSTAT24_VAR_NUM 30
+#define TSTAT25_VAR_NUM 90
+#define TSTAT24_VAR_NUM 32
 #define NET_WORK_CONTROLLER_NUM 24
-#define TSTAT26_VAR_NUM 113
+#define TSTAT26_VAR_NUM 115
 #define TSTAT26_VAR_NUM_TSTAT67 111
 #define NET_WORK_DEFFERENT_TSTAT_FILE "NET WORK\n"
 using namespace std;
@@ -34,7 +34,11 @@ int tstat25_register_var[TSTAT25_VAR_NUM]={	118,121,185,128,111,	112,114,115,119
 											122,123,124,125,126,	127,129,186,187,131,
 											132,133,135,136,137,	182,183,202,203,201,
 											188,189,190,204,205,	206,207,208,209,210,
-											211,213,214};
+											211,213,214,570,571,	572,573,574,577,578,	
+											579,580,581,582,583,	584,585,586,587,588,
+											589,590,592,593,594,	595,596,597,598,599,	
+											600,601,602,603,604,	605,606,607,608,609,	
+											610,611,612,613,614,    615,616,617,618,619};
 int tstat26_register_var[TSTAT26_VAR_NUM]={	118,121,185,128,111,	112,114,115,119,120,
 	122,123,124,125,126,	127,129,186,187,131,
 	132,133,135,136,137,	182,183,202,203,201,
@@ -48,7 +52,8 @@ int tstat26_register_var[TSTAT26_VAR_NUM]={	118,121,185,128,111,	112,114,115,119
 	327,333,319,320,321,    322,323,325,334,335,
 	336,337,338,339,		327,283,284,
 	341,342,343,344,345,346,347,
-	298,299,300};
+	298,299,300,
+	412,413};
 int tstat67_register_var[TSTAT26_VAR_NUM_TSTAT67]={	
                                             MODBUS_SEQUENCE,
                                             MODBUS_DEGC_OR_F,
@@ -289,58 +294,105 @@ _TCHAR * TSTATVAR_CONST_24[] = {                  //attention:该数组中的值，不要
 						};
 
 _TCHAR * TSTATVAR_CONST_25[] = {                  //attention:该数组中的值，不要有完全包含的出现
-						_T("SEQUENCE"),		
-						_T("DEGC_OR_F"),                   
-						_T("baudrate"),                    
-						_T("KEYPAD_SELECT"),  //128             
-						_T("TEMP_SELECT"),                 
+	_T("SEQUENCE"),		
+	_T("DEGC_OR_F"),                   
+	_T("baudrate"),                    
+	_T("KEYPAD_SELECT"),  //128             
+	_T("TEMP_SELECT"),                 
 
-						_T("DAC_OFFSET") ,     
-						_T("COOLING_P_TERM"),		          
-						_T("COOLING_I_TERM"),
-						_T("DAY_COOLING_DEADBAND"),        
-						_T("DAY_HEATING_DEADBAND"),        
+	_T("DAC_OFFSET") ,     
+	_T("COOLING_P_TERM"),		          
+	_T("COOLING_I_TERM"),
+	_T("DAY_COOLING_DEADBAND"),        
+	_T("DAY_HEATING_DEADBAND"),        
 
-						_T("NUMBER_OF_FAN_SPEEDS"),                    
-						_T("NIGHT_HEATING_DEADBAND"),      
-						_T("NIGHT_COOLING_DEADBAND"),      
-						_T("APPLICATION"),                 
-						_T("POWERUP_SETPOINT"),            
+	_T("NUMBER_OF_FAN_SPEEDS"),                    
+	_T("NIGHT_HEATING_DEADBAND"),      
+	_T("NIGHT_COOLING_DEADBAND"),      
+	_T("APPLICATION"),                 
+	_T("POWERUP_SETPOINT"),            
 
-						_T("POWERUP_ON_OFF"),              
-						_T("AUTO_ONLY"),                   
-						_T("OUTPUT1_SCALE"),               
-						_T("OUTPUT2_SCALE"),               
-						_T("SETPOINT_HI"),                 
+	_T("POWERUP_ON_OFF"),              
+	_T("AUTO_ONLY"),                   
+	_T("OUTPUT1_SCALE"),               
+	_T("OUTPUT2_SCALE"),               
+	_T("SETPOINT_HI"),                 
 
-						_T("SETPOINT_LO"),                 
-						_T("MENU_LOCK"),                   
-						_T("DAY_COOLING_SETPOINT"),        
-						_T("DAY_HEATING_SETPOINT"),        
-						_T("CURRENT_FAN_SPEED"),                   
+	_T("SETPOINT_LO"),                 
+	_T("MENU_LOCK"),                   
+	_T("DAY_COOLING_SETPOINT"),        
+	_T("DAY_HEATING_SETPOINT"),        
+	_T("CURRENT_FAN_SPEED"),                   
 
-						_T("NIGHT_HEATING_SETPOINT"),      
-						_T("NIGHT_COOLING_SETPOINT"),      
-						_T("Changeover_Delay"),            
-						_T("Display"),                     
-						_T("Cycling_Delay"),               
+	_T("NIGHT_HEATING_SETPOINT"),      
+	_T("NIGHT_COOLING_SETPOINT"),      
+	_T("Changeover_Delay"),            
+	_T("Display"),                     
+	_T("Cycling_Delay"),               
 
-						_T("ANALOG_IN1_RANGE"),            
-						_T("ANALOG_IN2_RANGE"),            
-						_T("DIGITAL_IN1"),                 
-						_T("LED1_CONTROL"),                
-						_T("LED2_CONTROL"),               
+	_T("ANALOG_IN1_RANGE"),            
+	_T("ANALOG_IN2_RANGE"),            
+	_T("DIGITAL_IN1"),                 
+	_T("LED1_CONTROL"),                
+	_T("LED2_CONTROL"),               
 
-						_T("LED3_CONTROL"),                
-						_T("LED4_CONTROL"),                
-						_T("LED5_CONTROL"),                
-						_T("LED6_CONTROL"),                
-						_T("LED7_CONTROL"),
+	_T("LED3_CONTROL"),                
+	_T("LED4_CONTROL"),                
+	_T("LED5_CONTROL"),                
+	_T("LED6_CONTROL"),                
+	_T("LED7_CONTROL"),
 
-						_T("OVERIDE_TIMER"),//211
-						_T("FILTER"),//213
-						_T("HEAT_COOL_CONFIG")//214
-						};
+	_T("OVERIDE_TIMER"),//211
+	_T("FILTER"),//213
+	_T("HEAT_COOL_CONFIG"),//214
+	_T("VAV_Max_Supply_Setpoint"),
+	_T("VAV_Min_Supply_Setpoint"),
+	_T("VAV_Max_Airflow_Cooling"),
+	_T("VAV_Max_Airflow_Heating"),
+	_T("VAV_Min_Airflow"),
+	_T("VAV_PID3_Input_Select"),
+	_T("VAV_PID3_VALVE_OPERATION_TABLE_BEGIN"),
+	_T("VAV_PID3_VALVE_OPER_TABLE_COOL1"),
+	_T("VAV_PID3_VALVE_OPER_TABLE_COOL2"),
+	_T("VAV_PID3_VALVE_OPER_TABLE_COOL3"),
+	_T("VAV_PID3_VALVE_OPER_TABLE_HEAT1"),
+	_T("VAV_PID3_VALVE_OPER_TABLE_HEAT2"),
+	_T("VAV_PID3_VALVE_OPER_TABLE_HEAT3"),
+	_T("VAV_PID3_Cooling_Deadband"),
+	_T("VAV_PID3_Heating_Deadband"),
+	_T("VAV_PID3_Pterm"),
+	_T("VAV_PID3_Iterm"),
+	_T("VAV_PID3_Heat_Stage"),
+	_T("VAV_PID3_Cool_Stage"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_BEGIN"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_COOL1"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_COOL2"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_COOL3"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_HEAT1"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_HEAT2"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_HEAT3"),
+	_T("VAV_Output6_Function"),
+	_T("VAV_Output7_Function"),
+	_T("VAV_Analog_Input3_Function"),
+	_T("VAV_Analog_Input4_Function"),
+	_T("VAV_Analog_Input5_Function"),
+	_T("VAV_Analog_Input6_Function"),
+	_T("VAV_Analog_Input7_Function"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_BEGIN"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_COOL1"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_COOL2"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_COOL3"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_HEAT1"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_HEAT2"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_HEAT3"),
+	_T("VAV_PID3_OFF_OUTPUT_BEGIN"),
+	_T("VAV_PID3_OFF_OUTPUT_COOL1"),
+	_T("VAV_PID3_OFF_OUTPUT_COOL2"),
+	_T("VAV_PID3_OFF_OUTPUT_COOL3"),
+	_T("VAV_PID3_OFF_OUTPUT_HEAT1"),
+	_T("VAV_PID3_OFF_OUTPUT_HEAT2"),
+	_T("VAV_PID3_OFF_OUTPUT_HEAT3"),
+};	
 _TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要有完全包含的出现
 	_T("SEQUENCE"),		
 	_T("DEGC_OR_F"),                   
@@ -473,6 +525,8 @@ _TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要
 	_T("Input Fun1"),
 	_T("Input Fun2"),
 	_T("Input Fun3"),
+	_T("Output Function 6"),
+	_T("Output Function 7")
 };
 _TCHAR * TSTATVAR_CONST_67[] = {                  //attention:该数组中的值，不要有完全包含的出现
 	_T("SEQUENCE"),		
@@ -1494,7 +1548,9 @@ void var_write(wofstream & out)
 	//used by save2file functiojn
 	CString str1;
 	float version=get_tstat_version(g_tstat_id);
-		if(version<25)
+	if (product_register_value[7]==PM_TSTAT5G)
+	{
+		if(version<35)
 		{//24
 			for(int i=0;i<TSTAT24_VAR_NUM;i++)
 			{			
@@ -1504,7 +1560,7 @@ void var_write(wofstream & out)
 					_Twrite_to_file_a_line(out,_T(" "));//a space line
 			}
 		}
-		else if(version<26)
+		else 
 		{//25
 			for(int i=0;i<TSTAT25_VAR_NUM;i++)
 			{
@@ -1514,31 +1570,45 @@ void var_write(wofstream & out)
 					_Twrite_to_file_a_line(out,_T(" "));//a space line
 			}
 		}
-		else //if(version<=29)
+	} 
+	else
+	{
+		//if(product_register_value[7]==1||product_register_value[7]==2||product_register_value[7]==3)
+		//{ 
+		//	for(int i=0;i<TSTAT24_VAR_NUM;i++)
+		//	{			
+		//		str1.Format(_T("%d,\t%d,\t%s"),tstat24_register_var[i], product_register_value[tstat24_register_var[i]],TSTATVAR_CONST_24[i]);
+		//		_Twrite_to_file_a_line(out,str1);
+		//		if((i%5)==4)
+		//			_Twrite_to_file_a_line(out,_T(" "));//a space line
+		//	}
+		//}
+		  if(version<26)
+		{//25
+			for(int i=0;i<TSTAT25_VAR_NUM;i++)
+			{
+				str1.Format(_T("%d,\t%d,\t%s"),tstat25_register_var[i],product_register_value[tstat25_register_var[i]]  ,TSTATVAR_CONST_25[i]);
+				_Twrite_to_file_a_line(out,str1);
+				if((i%5)==4)
+					_Twrite_to_file_a_line(out,_T(" "));//a space line
+			}
+		}
+		else
 		{
 			for(int i=0;i<TSTAT26_VAR_NUM;i++)
 			{
-				/*
-				if(version>=28.0&&i==23)//register 135:
-				{
-				str1.Format("%d,\t%d,\t%s",tstat26_register_var[i],read_one(tstat_id,							tstat26_register_var[i]/10),TSTATVAR_CONST_26[i]);
-				write_to_file_a_line(out,str1);
-				}
-				else
-				{
-					str1.Format("%d,\t%d,\t%s",tstat26_register_var[i],read_one(tstat_id,							tstat26_register_var[i]),TSTATVAR_CONST_26[i]);
-				write_to_file_a_line(out,str1);
-				if((i%5)==4)
-					write_to_file_a_line(out," ");//a space line
-				}
-				*/
+				 
 			    str1.Format(_T("%d,\t%d,\t%s"),tstat26_register_var[i],product_register_value[tstat26_register_var[i]],TSTATVAR_CONST_26[i]);
 				_Twrite_to_file_a_line(out,str1);
 				if((i%5)==4)
 				_Twrite_to_file_a_line(out,_T(" "));//a space line
 			}
-			//135:
+			 
 		}
+	}
+		
+
+
 }
 void var_write_Tstat67(wofstream & out)
 {
@@ -3884,6 +3954,7 @@ void weekly_write(CStdioFile &default_file,int schedule_id)
 
 
 
+
 void weekly_routines_insert_write(CStdioFile &default_file,int schedule_id,int weekly_row_number)
 {
 	CString a_line;	
@@ -4780,3 +4851,6 @@ void Write_newrigister()
 
 }
 
+void WriteInputName(){
+	 
+}

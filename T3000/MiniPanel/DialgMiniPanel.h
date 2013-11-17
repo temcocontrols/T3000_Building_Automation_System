@@ -10,7 +10,7 @@
 #include "../Config_Routines.h"
 #include "../global_variable_extern.h"
 
- 
+
 #include "afxcmn.h"
 #include "../msflexgrid1.h"
 #define FLEXGRID_CELL_COLOR						13421772
@@ -18,7 +18,24 @@
 #define MiniPanelTimer							11
 
 // CDialgMiniPanel form view
-
+typedef struct Subnetwork_Mini						
+{						
+	CString	m_coolingSet;				
+	CString	m_heatingSet;				
+	CString	m_setpoint; 				
+	CString	m_roomTemper;				
+	int	    m_mode;				
+	CString	m_outputState;				
+	CString	m_nightHeating;				
+	CString	m_nightCooling;				
+	int	m_tstatProduct;				
+	CString m_modbusaddr;
+	int  m_Occupied;
+	CString  m_overridevalue;
+	CString m_SerialNumber; 
+	CString	m_nightHeatingDB;				
+	CString	m_nightCoolingDB;						
+}Subnetwork_Mini;
 
 typedef struct MINIPANEL 
 {
@@ -70,8 +87,14 @@ public:
 	vector<m_minipanel>vecminipanel;
 	m_minipanel MINImini;
 	BOOL  MiniUpdateData();//更新数据并写入数据库
+	void UpdateGrid();
+	void UpdateData_Input();
+	void UpdateData_DO();
+	void UpdateData_AO();
+	vector<Subnetwork_Mini>_subnetwork;
+	Subnetwork_Mini m_subetwork;
+	BOOL  Get_Data_Bit(UINT Data, int n,int N);//获取一个第八位数据，s:system:进制，n;num:这个数是几位的，第N位是1还是0
 
-	
 	int comnum;
 
 	afx_msg void OnBnClickedButtonweeklyschedule();
@@ -79,6 +102,8 @@ public:
 	afx_msg void OnBnClickedButtonannualschedule();
 	afx_msg void OnBnClickedButtonidschedule();
 	afx_msg void OnBnClickedButtonClear();
+	afx_msg void OnBnClickedButtonRefreshAll();
+	afx_msg void OnBnClickedButtonSyncwithpc();
 	CString m_datetime;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	void Updatedatabase();
@@ -92,16 +117,30 @@ public:
 	afx_msg void OnEnKillfocusEditOutputao();
 	void ClickMsflexgridOutputDo();
 	void ClickMsflexgridOutputAo();
+	void OnCbnSelchangeRange();
 	void writedbinputname(int& num,CString& str );
 public:
 	void Initial_RegisterList();
 	int  Get_RegID(CString Name);
 	vector<T3Register> m_vecT3Register;
+
+
+public:
+	CComboBox m_ipModelComBox;
+	 
+	CString m_nListenPort;
+	CEdit m_Mac_Address;
+	CIPAddressCtrl m_ip_addressCtrl;
+	CIPAddressCtrl m_subnet_addressCtrl;
+	CIPAddressCtrl m_gateway_addressCtrl;
+	CMsflexgrid m_Output_GridCM5_;
+	int input_rows;
+	int output_AO;
+	int output_DO;
+	void DrawGrid();
 private:
 	int	SN_LOW	;
-
 	int	SN_HI	;
-
 	int	FIRMWARE_VER_NUMBER_0	;
 	int	FIRMWARE_VER_NUMBER_1	;
 	int	MODBUS_ID	;
@@ -111,7 +150,6 @@ private:
 	int	CALIBRATION	;
 	int	PLUG_N_PLAY	;
 	int	VER_ISP	;
-
 	int	UPDATE_STATUS	;
 	int	PROTOCAL_TYPE	;
 	int	DIGITAL_OUTPUT1	;
@@ -271,6 +309,13 @@ private:
 	int	TSTAT_ADD_BOTH_CHANNEL_UART2	;
 
 
+public:
+	CComboBox m_combox_range;
+
+	int m_curCol;
+	int m_curRow;
+	int m_Table;
+	CProgressCtrl m_prgoressctrl;
 };
 
 

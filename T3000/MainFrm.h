@@ -149,6 +149,7 @@ public:
 	_RecordsetPtr				m_pRs;//for ado 
 	
 	CString m_strCurSubBuldingName;
+	Building_info m_CurSubBuldingInfo;
 	CString m_strCurMainBuildingName;
 	int m_nCurSubBuildingIndex;
 	//
@@ -193,7 +194,7 @@ protected:  // control bar embedded members
 	CMFCMenuBar				m_wndMenuBar;
 	CMFCToolBar				m_wndToolBar;
 
-	CMFCToolBarImages		m_UserImages;
+	//CMFCToolBarImages		m_UserImages;
 public: 
 	CWorkspaceBar			m_wndWorkSpace;
 	CMFCStatusBar			m_wndStatusBar;
@@ -206,7 +207,7 @@ protected:
 	afx_msg LRESULT OnToolbarCreateNew(WPARAM wp, LPARAM lp);
 	afx_msg void OnApplicationLook(UINT id);
 	afx_msg void OnUpdateApplicationLook(CCmdUI* pCmdUI);
-	afx_msg LRESULT OnToolbarReset(WPARAM,LPARAM);
+	//afx_msg LRESULT OnToolbarReset(WPARAM,LPARAM);
 	afx_msg void OnUpdateCheckBuildingBar(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateCheckIOPane(CCmdUI* pCmdUI);
 	afx_msg void OnScanDevice();
@@ -352,6 +353,7 @@ public:
 protected:
 	afx_msg LRESULT OnMbpollClosed(WPARAM wParam, LPARAM lParam);
 public:
+	afx_msg void OnFunctionHumcalibration();
 	afx_msg void OnControlInputs();
 	afx_msg void OnControlPrograms();
 	afx_msg void OnControlOutputs();

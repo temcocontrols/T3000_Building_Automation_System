@@ -4,6 +4,7 @@
 // but are changed infrequently
 
 #pragma once
+#define _SECURE_SCL 0
 
 #ifndef _SECURE_ATL
 #define _SECURE_ATL 1
@@ -173,7 +174,7 @@ typedef struct _STATUSBARINFO
 #include "fileRW.h"
 
 #include "T3000RegAddress.h"
-//#define Fance_Enable_Test
+
 
 #define MKBOOL(_VALUE) ((_VALUE) != 0)		//Add by Fance .Use this macro to solve the warning warning C4800: 'BOOL' : forcing value to bool 'true' or 'false'
 
