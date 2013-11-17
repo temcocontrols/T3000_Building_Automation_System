@@ -188,8 +188,6 @@
 #define IDD_MBPOLL_REG_DIALOG           473
 #define IDD_CALIBRATION_HUM             474
 #define IDD_DIALOGAIRFLOW_SETTING       475
-
-
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -1064,13 +1062,9 @@
 #define IDC_EDIT_ValueTravelTime        1564
 #define IDC_EDIT_PID2OFFSETPOINT        1565
 #define IDC_CBFAN2                      1566
-#define IDC_EDIT_PID2OFFSETPOINT2       2002
 #define IDC_SLIDER_DAY                  1567
-#define IDC_EDIT_PID2OFFSETPOINT3       2004
 #define IDC_SLIDER_NIGHT                1568
-#define IDC_EDIT_PID2OFFSETPOINT4       2003
 #define IDC_STATICDAY                   1569
-#define IDC_EDIT_PID2OFFSETPOINT5       2005
 #define IDC_STATICNIGHT                 1570
 #define IDC_MASTER_ID                   1571
 #define IDC_SLIDER_DAY2                 1571
@@ -1283,8 +1277,8 @@
 #define IDC_STATIC_MAXCOOLING           1647
 #define IDC_STATIC_CO2_UNIT1            1648
 #define IDC_RADIO56                     1648
-#define IDC_STATIC_CO2_UNIT2            1649
 #define IDC_STATIC_MAXHEATING           1648
+#define IDC_STATIC_CO2_UNIT2            1649
 #define IDC_STATIC_MINAIRFLOW           1649
 #define IDC_RADIO57                     1649
 #define IDC_LIST_CO2_EXTERNAL_SENSOR    1650
@@ -1295,23 +1289,20 @@
 #define IDC_STATIC_PID3                 1651
 #define IDC_CO2_DATETIMEPICKER1         1652
 #define IDC_RADIO60                     1652
-#define IDC_CO2_DATETIMEPICKER_TIME     1653
 #define IDC_STATIC_HS                   1652
+#define IDC_CO2_DATETIMEPICKER_TIME     1653
 #define IDC_RADIO61                     1653
-#define IDC_BUTTON_CO2_SYNC_TIME        1654
 #define IDC_STATIC_CS                   1653
+#define IDC_BUTTON_CO2_SYNC_TIME        1654
 #define IDC_RADIO62                     1654
 #define IDC_STATIC_SEPERATOR            1654
 #define IDC_RADIO63                     1655
 #define IDC_AIR_FLOW_BACK               1655
 #define IDC_RADIO_PASSWORD_ENABLE       1656
 #define IDC_RADIO64                     1656
-#define IDC_MIN_SUPPLY                  2007
-#define IDC_MAX_SUPPLY                  2006
 #define IDC_RADIO_PASSWORD_DISABLE      1657
 #define IDC_RADIO65                     1657
 #define IDC_EDIT_CO2_PASSWOR            1658
- 
 #define IDC_RADIO66                     1658
 #define IDC_EDIT_CO2_BLOCK_TIME         1659
 #define IDC_RADIO67                     1659
@@ -1343,9 +1334,13 @@
 #define IDC_MBPOLL_CHECK2               1688
 #define IDC_MBPOLL_CHECK3               1689
 #define IDC_MBPOLL_CHECK4               1690
-
-
-
+#define IDC_STATIC_DISPLAYTYPE          1691
+#define IDC_EDIT_PID2OFFSETPOINT2       2002
+#define IDC_EDIT_PID2OFFSETPOINT4       2003
+#define IDC_EDIT_PID2OFFSETPOINT3       2004
+#define IDC_EDIT_PID2OFFSETPOINT5       2005
+#define IDC_MAX_SUPPLY                  2006
+#define IDC_MIN_SUPPLY                  2007
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
@@ -1374,7 +1369,6 @@
 #define ID_ALLNODESDATABASE             32802
 #define ID_IOSELECTMENU_INPUT           32803
 #define ID_IOSELECTMENU_OUTPUT          32804
-#define ID_CONFIGFILE_SAVE_AS           35000
 #define ID_FILE_BATCHBURNHEX            32806
 #define ID_HELP_HELP                    32807
 #define ID_DELEMENUBTN_DELETECURRENTLABEL 32808
@@ -1437,9 +1431,6 @@
 #define ID_LOADFILE                     32871
 #define ID_SAVEFILE                     32872
 #define ID_REFRESH                      32873
-#define ID_VIEW_DATATRAFFIC             32885
- #define ID_FUNCTION_HUMCALIBRATION     32886
- #define ID_FUNCTION_HUMCALIBRATION_C   32887
 #define ID_CONTROL_SCREENS              32874
 #define ID_CONTROL_PROGRAMS             32875
 #define ID_CONTROL_INPUTS               32876
@@ -1453,8 +1444,16 @@
 #define ID_MISCELLANEOUS_UPDATEMINI     32883
 #define ID_FILE_SAVE32884               32884
 #define ID_CONTROL_WEEKLY               32884
+#define ID_VIEW_DATATRAFFIC             32885
+#define ID_FUNCTION_HUMCALIBRATION      32886
+#define ID_FUNCTION_HUMCALIBRATION_C    32887
 #define ID_FILE_EXIT                    32888
 #define ID_DATABASE_MBPOLL              33867
+#define ID_DISPLAYTYPE_SIGNED           34000
+#define ID_DISPLAYTYPE_UNSIGNED         34001
+#define ID_DISPLAYTYPE_HEX              34002
+#define ID_DISPLAYTYPE_BINARY           34003
+#define ID_CONFIGFILE_SAVE_AS           35000
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
 #define IDC_RANGECOMBO                  57926
@@ -1466,8 +1465,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        474
-#define _APS_NEXT_COMMAND_VALUE         34000
-#define _APS_NEXT_CONTROL_VALUE         1688
+#define _APS_NEXT_COMMAND_VALUE         34004
+#define _APS_NEXT_CONTROL_VALUE         1692
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

@@ -176,6 +176,12 @@ void CMbPollOptions::OnOK()
 	pollHideAliasColumn[curConf] = checkHideAliasColumn.GetCheck();
 	pollAddressInCell[curConf] = checkAddressInCell.GetCheck();
 
+	firstTime1 = 1;
+	firstTime2 = 1;
+	firstTime3 = 1;
+	firstTime4 = 1;
+	firstTime5 = 1;
+
 	if (outOfRangeData == 0)
 	{
 		CDialog::OnOK();
