@@ -176,8 +176,21 @@ public:
 	void OnClickedMbpollCheck(int gridNo);
 	void saveRegisterNames(int gridNo);
 	void restoreRegisterNames(int gridNo);
+	void checkUncheckMenus(int menuCheckedVar);
+	void OnFileSaveWhileClose();
+	void OnFileOpenWhileOpen();
 protected:
 	afx_msg LRESULT OnMyMbpollRegDialogMsg(WPARAM wParam, LPARAM lParam);
 //	afx_msg LRESULT OnMyMbpollDlgMsg(WPARAM wParam, LPARAM lParam);
+public:
+	afx_msg void OnDisplaytypeSigned();
+	afx_msg void OnDisplaytypeUnsigned();
+	afx_msg void OnDisplaytypeHex();
+	afx_msg void OnDisplaytypeBinary();
+	afx_msg void OnUpdateDisplaytypeSigned(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateDisplaytypeUnsigned(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateDisplaytypeHex(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateDisplaytypeBinary(CCmdUI *pCmdUI);
+	CStatic staticDisplayType;
 };
 
