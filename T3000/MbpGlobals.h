@@ -93,5 +93,9 @@ CString registerNames2 = L"";
 CString registerNames3 = L"";
 CString registerNames4 = L"";
 
+CMenu* mbpMenu;
+int menuChecked = 0;
+int mbPollFirstTime = 1;
+
 #endif
 

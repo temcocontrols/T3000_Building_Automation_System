@@ -86,6 +86,7 @@ void CMbPoll::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MBPOLL_CHECK2, mbpollCheck2);
 	DDX_Control(pDX, IDC_MBPOLL_CHECK3, mbpollCheck3);
 	DDX_Control(pDX, IDC_MBPOLL_CHECK4, mbpollCheck4);
+	DDX_Control(pDX, IDC_STATIC_DISPLAYTYPE, staticDisplayType);
 }
 
 void CMbPoll::startStopBtnState()
@@ -202,6 +203,12 @@ BOOL CMbPoll::OnInitDialog()
 	startStopBtnState();
 	restoreConfigs();
 
+	if (mbPollFirstTime == 1)
+	{
+		OnFileOpenWhileOpen();
+		mbPollFirstTime = 0;
+	}
+
 	ctrlGrid1.put_TextMatrix(0, 0, L"Alias");
 	ctrlGrid1.put_TextMatrix(0, 1, L"Addr");
 	ctrlGrid1.put_TextMatrix(0, 2, L"Value");
@@ -237,6 +244,13 @@ BOOL CMbPoll::OnInitDialog()
 	SetTimer(1, 2000, NULL);
 	SetTimer(2, 500, NULL);
 	SetTimer(3, 50, NULL);
+
+	mbpMenu = GetMenu();
+	firstTime1 = 1;
+	firstTime2 = 1;
+	firstTime3 = 1;
+	firstTime4 = 1;
+	firstTime5 = 1;
 
 #if 0
 	connectionSuccessful = 1;	/* to be deleted */
@@ -297,6 +311,14 @@ BEGIN_MESSAGE_MAP(CMbPoll, CDialog)
 	ON_BN_CLICKED(IDC_MBPOLL_CHECK3, &CMbPoll::OnClickedMbpollCheck3)
 	ON_BN_CLICKED(IDC_MBPOLL_CHECK4, &CMbPoll::OnClickedMbpollCheck4)
 	ON_MESSAGE(MY_MBPOLL_REG_DIALOG_MSG, &CMbPoll::OnMyMbpollRegDialogMsg)
+	ON_COMMAND(ID_DISPLAYTYPE_SIGNED, &CMbPoll::OnDisplaytypeSigned)
+	ON_COMMAND(ID_DISPLAYTYPE_UNSIGNED, &CMbPoll::OnDisplaytypeUnsigned)
+	ON_COMMAND(ID_DISPLAYTYPE_HEX, &CMbPoll::OnDisplaytypeHex)
+	ON_COMMAND(ID_DISPLAYTYPE_BINARY, &CMbPoll::OnDisplaytypeBinary)
+	ON_UPDATE_COMMAND_UI(ID_DISPLAYTYPE_SIGNED, &CMbPoll::OnUpdateDisplaytypeSigned)
+	ON_UPDATE_COMMAND_UI(ID_DISPLAYTYPE_UNSIGNED, &CMbPoll::OnUpdateDisplaytypeUnsigned)
+	ON_UPDATE_COMMAND_UI(ID_DISPLAYTYPE_HEX, &CMbPoll::OnUpdateDisplaytypeHex)
+	ON_UPDATE_COMMAND_UI(ID_DISPLAYTYPE_BINARY, &CMbPoll::OnUpdateDisplaytypeBinary)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CMbPoll, CDialog)
@@ -468,7 +490,6 @@ BOOL CMbPoll::Create(UINT nIDTemplate, CWnd* pParentWnd)
 	
 	return CDialog::Create(nIDTemplate, pParentWnd);
 }
-
 
 void CMbPoll::OnBnClickedClose()
 {
@@ -1134,6 +1155,7 @@ void CMbPoll::OnFileExit()
 void CMbPoll::OnMbPollDestroyWindow()
 {
 	//noOfGridTables = comboNoOfGrids.GetCurSel();
+	OnFileSaveWhileClose();
 	MbPollOpen = 0;
 	TerminateThread(hDispThread, 0);
 	TerminateThread(hMbCommThread, 0);
@@ -1145,6 +1167,12 @@ void CMbPoll::OnClickedButtonConfig1()
 {
 	// TODO: Add your control notification handler code here
 	curConf = 0;
+	int alterDataFlow = 0;
+	if (dataFlowStarted[0] == 1)
+	{
+		dataFlowStarted[0] = 0;
+		alterDataFlow = 1;
+	}
 	int ret = mbPollOptions.DoModal();
 	if (ret == IDOK)
 	{
@@ -1155,12 +1183,22 @@ void CMbPoll::OnClickedButtonConfig1()
 		updateBtnLabel(0);
 		updateDataSharingVariables(0);
 	}
+	if (alterDataFlow == 1)
+	{
+		dataFlowStarted[0] = 1;
+	}
 }
 
 void CMbPoll::OnClickedButtonConfig2()
 {
 	// TODO: Add your control notification handler code here
 	curConf = 1;
+	int alterDataFlow = 0;
+	if (dataFlowStarted[1] == 1)
+	{
+		dataFlowStarted[1] = 0;
+		alterDataFlow = 1;
+	}
 	int ret = mbPollOptions.DoModal();
 	if (ret == IDOK)
 	{
@@ -1171,12 +1209,22 @@ void CMbPoll::OnClickedButtonConfig2()
 		updateBtnLabel(1);
 		updateDataSharingVariables(1);
 	}
+	if (alterDataFlow == 1)
+	{
+		dataFlowStarted[1] = 1;
+	}
 }
 
 void CMbPoll::OnClickedButtonConfig3()
 {
 	// TODO: Add your control notification handler code here
 	curConf = 2;
+	int alterDataFlow = 0;
+	if (dataFlowStarted[2] == 1)
+	{
+		dataFlowStarted[2] = 0;
+		alterDataFlow = 1;
+	}
 	int ret = mbPollOptions.DoModal();
 	if (ret == IDOK)
 	{
@@ -1187,12 +1235,22 @@ void CMbPoll::OnClickedButtonConfig3()
 		updateBtnLabel(2);
 		updateDataSharingVariables(2);
 	}
+	if (alterDataFlow == 1)
+	{
+		dataFlowStarted[2] = 1;
+	}
 }
 
 void CMbPoll::OnClickedButtonConfig4()
 {
 	// TODO: Add your control notification handler code here
 	curConf = 3;
+	int alterDataFlow = 0;
+	if (dataFlowStarted[3] == 1)
+	{
+		dataFlowStarted[3] = 0;
+		alterDataFlow = 1;
+	}
 	int ret = mbPollOptions.DoModal();
 	if (ret == IDOK)
 	{
@@ -1203,12 +1261,22 @@ void CMbPoll::OnClickedButtonConfig4()
 		updateBtnLabel(3);
 		updateDataSharingVariables(3);
 	}
+	if (alterDataFlow == 1)
+	{
+		dataFlowStarted[3] = 1;
+	}
 }
 
 void CMbPoll::OnClickedButtonConfig5()
 {
 	// TODO: Add your control notification handler code here
 	curConf = 4;
+	int alterDataFlow = 0;
+	if (dataFlowStarted[4] == 1)
+	{
+		dataFlowStarted[4] = 0;
+		alterDataFlow = 1;
+	}
 	int ret = mbPollOptions.DoModal();
 	if (ret == IDOK)
 	{
@@ -1218,6 +1286,10 @@ void CMbPoll::OnClickedButtonConfig5()
 		updateStaticConfig(4);
 		updateBtnLabel(4);
 		updateDataSharingVariables(4);
+	}
+	if (alterDataFlow == 1)
+	{
+		dataFlowStarted[4] = 1;
 	}
 }
 
@@ -1271,7 +1343,8 @@ void CMbPoll::OnClickedButtonStartStop(CMsflexgrid &grid, int gridNum, CButton &
 		{
 			dataFlowStarted[gridNum] = 1;
 			btn.SetWindowText(L"Stop");
-			configbtn.EnableWindow(FALSE);
+			//configbtn.EnableWindow(FALSE);
+			configbtn.EnableWindow(TRUE);
 		}
 		else
 		{
@@ -1301,7 +1374,7 @@ void CMbPoll::OnClickedCheckTapData()
 	}
 }
 
-void CMbPoll:: updateBtnLabel(int configNo)
+void CMbPoll::updateBtnLabel(int configNo)
 {
 	CButton *btnStartStop;
 	CStatic *staticRunning;
@@ -1499,7 +1572,7 @@ CString CMbPoll::convertFunction(int convType, unsigned short val)
 		break;
 	case 2:		/* Hex */
 		tempVal3 = (unsigned short int)val;
-		strToReturn.Format(_T("%X"), tempVal3);
+		strToReturn.Format(_T("%04X"), tempVal3);
 		break;
 	case 3:		/* Binary */
 		tempVal4 = (unsigned short int)val;
@@ -1576,7 +1649,8 @@ void CMbPoll::OnFileSave()
 		//MessageBox(strConfigFilePathName);
 		CString strConfigFileName = dlg.GetFileName();
 		//MessageBox(strConfigFileName);
-		BOOL a = f.Open(strConfigFileName, CFile::modeCreate | CFile::modeWrite);
+		//BOOL a = f.Open(strConfigFileName, CFile::modeCreate | CFile::modeWrite);
+		BOOL a = f.Open(strConfigFilePathName, CFile::modeCreate | CFile::modeWrite);
 
 		//CString str1;
 		//str1 = L"Text1;Text2;Text3;";
@@ -1647,8 +1721,11 @@ void CMbPoll::OnFileOpen()
 	if (dlg.DoModal() == IDOK)
 	{
 		CString strConfigFilePathName1 = dlg.GetPathName();
+		//MessageBox(strConfigFilePathName1);
 		CString strConfigFileName1 = dlg.GetFileName();
-		f.Open(strConfigFileName1, CFile::modeRead);
+		//MessageBox(strConfigFileName1);
+		//f.Open(strConfigFileName1, CFile::modeRead);
+		f.Open(strConfigFilePathName1, CFile::modeRead);
 
 #if SHOW_ALL
 		for (int i = 0; i < 5; i++)
@@ -1971,26 +2048,52 @@ DWORD WINAPI CMbPoll::displayThread()
 							qtyToShow[0] = ((pollRows[0] == 0) || (pollQuantity[0] < pollRows[0])) ? pollQuantity[0] : pollRows[0];
 							putDataNow[0] = 0;
 						}
+						//CString temppp;
+						//temppp.Format(_T("qty = %d"), qtyToShow[0]);
+						//MessageBox(temppp);
+						if (firstTime1 == 1)
+						{
+							for (int i = 0; i < ROWS_OF_MBPOLLLIST; i++)
+							{
+								mbPollList.SetItemText(i, 1, L"");
+								mbPollList.SetItemText(i, 2, L"");
+								mbPollList.SetItemText(i, 4, L"");
+								mbPollList.SetItemText(i, 5, L"");
+								mbPollList.SetItemText(i, 7, L"");
+								mbPollList.SetItemText(i, 8, L"");
+								mbPollList.SetItemText(i, 10, L"");
+								mbPollList.SetItemText(i, 11, L"");
+								mbPollList.SetItemText(i, 13, L"");
+								mbPollList.SetItemText(i, 14, L"");
+							}
+						}
+
 						for (int i = 0; i < qtyToShow[0]; i++)
 						{
-							tempStr1.Format(_T("%d"), (pollAddress[0] + i)); 
-							//ctrlGrid1.put_TextMatrix(i + 1, 1, tempStr1);	// uncomment if old grid is to be used
-						
 							rowNo = i % ROWS_OF_MBPOLLLIST;
 							tempVar = i / ROWS_OF_MBPOLLLIST;
 							colNo = 3 * tempVar + 1;
-							mbPollList.SetItemText(rowNo, colNo, tempStr1);
+
+							if (firstTime1 == 1)
+							{
+								tempStr1.Format(_T("%d"), (pollAddress[0] + i)); 
+								//ctrlGrid1.put_TextMatrix(i + 1, 1, tempStr1);	// uncomment if old grid is to be used
+						
+								mbPollList.SetItemText(rowNo, colNo, tempStr1);
+							}
 
 							updateStaticConfig(0, 1);
 							if ((!((tapDataMode == 0) && (pollFunction[0] >= 4))) && (connectionSuccessful == 1))
 							{
-
 								if (firstTime1 == 0) 
 								{
-									if (prevData1[i] != (unsigned short)(*((short int*)grid1Data + i)))
+									//MessageBox(L"not ft, not disp");
+									//if (prevData1[i] != (unsigned short)(*((short int*)grid1Data + i)))
+									if (1)
 									{
+										//MessageBox(L"not ft, displayed");
 										//tempStr1.Format(_T("%d"), *((short int*)grid1Data + i)); 
-										convertedStr = convertFunction(pollDisplay[0], (unsigned short)(*((short int*)grid1Data + i)));
+										convertedStr = convertFunction(menuChecked/*pollDisplay[0]*/, (unsigned short)(*((short int*)grid1Data + i)));
 										//ctrlGrid1.put_TextMatrix(i + 1, 2, convertedStr);	// uncomment if old grid is to be used
 										colNo = 3 * tempVar + 2;
 										mbPollList.SetItemText(rowNo, colNo, convertedStr);
@@ -1999,14 +2102,15 @@ DWORD WINAPI CMbPoll::displayThread()
 								}
 								if (firstTime1 == 1)
 								{
-									convertedStr = convertFunction(pollDisplay[0], (unsigned short)(*((short int*)grid1Data + i)));
+									//MessageBox(L"firstTime");
+									convertedStr = convertFunction(menuChecked/*pollDisplay[0]*/, (unsigned short)(*((short int*)grid1Data + i)));
 									colNo = 3 * tempVar + 2;
 									mbPollList.SetItemText(rowNo, colNo, convertedStr);
 									prevData1[i] = (unsigned short)(*((short int*)grid1Data + i));
-									firstTime1 = 0;
 								}
 							}
 						}
+						firstTime1 = 0;
 					}
 				}
 
@@ -2051,10 +2155,10 @@ DWORD WINAPI CMbPoll::displayThread()
 									colNo = 3 * tempVar + 2;
 									mbPollList.SetItemText(rowNo, colNo, convertedStr);
 									prevData2[i] = (unsigned short)(*((short int*)grid2Data + i));
-									firstTime2 = 0;
 								}
 							}
 						}
+						firstTime2 = 0;
 					}
 				}
 
@@ -2098,10 +2202,10 @@ DWORD WINAPI CMbPoll::displayThread()
 									colNo = 3 * tempVar + 2;
 									mbPollList.SetItemText(rowNo, colNo, convertedStr);
 									prevData3[i] = (unsigned short)(*((short int*)grid3Data + i));
-									firstTime3 = 0;
 								}
 							}
 						}
+						firstTime3 = 0;
 					}
 				}
 
@@ -2145,10 +2249,10 @@ DWORD WINAPI CMbPoll::displayThread()
 										colNo = 3 * tempVar + 2;
 										mbPollList.SetItemText(rowNo, colNo, convertedStr);
 										prevData4[i] = (unsigned short)(*((short int*)grid4Data + i));
-										firstTime4 = 0;
 								}
 							}
 						}
+						firstTime4 = 0;
 					}
 				}
 
@@ -2193,10 +2297,10 @@ DWORD WINAPI CMbPoll::displayThread()
 									colNo = 3 * tempVar + 2;
 									mbPollList.SetItemText(rowNo, colNo, convertedStr);
 									prevData5[i] = (unsigned short)(*((short int*)grid5Data + i));
-									firstTime5 = 0;
 								}
 							}
 						}
+						firstTime5 = 0;
 					}
 				}
 
@@ -2618,4 +2722,260 @@ afx_msg LRESULT CMbPoll::OnMyMbpollRegDialogMsg(WPARAM wParam, LPARAM lParam)
 
 	return 0;
 }
+
+void CMbPoll::OnDisplaytypeSigned()
+{
+	// TODO: Add your command handler code here
+	//MessageBox(L"Signed");
+	//CheckMenuItem(ID_DISPLAYTYPE_SIGNED, MF_CHECKED);
+	/*MENUITEMINFO miinfo;
+	miinfo.cbSize = sizeof(MENUITEMINFO);
+	miinfo.fMask = MIIM_CHECKMARKS;
+	miinfo.hbmpChecked = NULL;
+	miinfo.hbmpUnchecked = NULL;
+	SetMenuItemInfo(IDR_MENU_MBP, ID_DISPLAYTYPE_SIGNED, FALSE, miinfo);*/
+	menuChecked = 0;
+	staticDisplayType.SetWindowTextW(L"SIGNED");
+	//checkUncheckMenus(menuChecked);
+}
+
+void CMbPoll::OnDisplaytypeUnsigned()
+{
+	// TODO: Add your command handler code here
+	//MessageBox(L"Unsigned");
+	menuChecked = 1;
+	staticDisplayType.SetWindowTextW(L"UNSIGNED");
+	//checkUncheckMenus(menuChecked);
+}
+
+void CMbPoll::OnDisplaytypeHex()
+{
+	// TODO: Add your command handler code here
+	//MessageBox(L"Hex");
+	menuChecked = 2;
+	staticDisplayType.SetWindowTextW(L"HEX");
+	//checkUncheckMenus(menuChecked);
+}
+
+void CMbPoll::OnDisplaytypeBinary()
+{
+	// TODO: Add your command handler code here
+	//MessageBox(L"Binary");
+	menuChecked = 3;
+	staticDisplayType.SetWindowTextW(L"BINARY");
+	//checkUncheckMenus(menuChecked);
+}
+
+void CMbPoll::checkUncheckMenus(int menuCheckedVar)
+{
+	switch(menuCheckedVar)
+	{
+	case 0:
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_SIGNED, MF_CHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_UNSIGNED, MF_UNCHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_HEX, MF_UNCHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_BINARY, MF_UNCHECKED | MF_BYCOMMAND);
+		break;
+	case 1:
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_SIGNED, MF_UNCHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_UNSIGNED, MF_CHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_HEX, MF_UNCHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_BINARY, MF_UNCHECKED | MF_BYCOMMAND);
+		break;
+	case 2:
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_SIGNED, MF_UNCHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_UNSIGNED, MF_UNCHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_HEX, MF_CHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_BINARY, MF_UNCHECKED | MF_BYCOMMAND);
+		break;
+	case 3:
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_SIGNED, MF_UNCHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_UNSIGNED, MF_UNCHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_HEX, MF_UNCHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_BINARY, MF_CHECKED | MF_BYCOMMAND);
+		break;
+	default:
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_SIGNED, MF_CHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_UNSIGNED, MF_UNCHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_HEX, MF_UNCHECKED | MF_BYCOMMAND);
+		mbpMenu->CheckMenuItem(ID_DISPLAYTYPE_BINARY, MF_UNCHECKED | MF_BYCOMMAND);
+		break;
+	}
+}
+
+void CMbPoll::OnUpdateDisplaytypeSigned(CCmdUI *pCmdUI)
+{
+	// TODO: Add your command update UI handler code here
+}
+
+void CMbPoll::OnUpdateDisplaytypeUnsigned(CCmdUI *pCmdUI)
+{
+	// TODO: Add your command update UI handler code here
+}
+
+void CMbPoll::OnUpdateDisplaytypeHex(CCmdUI *pCmdUI)
+{
+	// TODO: Add your command update UI handler code here
+}
+
+void CMbPoll::OnUpdateDisplaytypeBinary(CCmdUI *pCmdUI)
+{
+	// TODO: Add your command update UI handler code here
+}
+
+#if 1
+void CMbPoll::OnFileSaveWhileClose()
+{
+	// TODO: Add your command handler code here
+	CFile f;
+	//CString strFilter = _T("Text file (*.txt)|*.txt|Rich Text file (*.rtf)|*.rtf|All files (*.*)|*.*||");
+	CString temp;
+	int qtyToShow[5];
+	CMsflexgrid* grid;
+
+	//CFileDialog dlg(true,_T("Save current Config"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
+	//CFileDialog dlg(false, _T("Save current Config"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER, strFilter);
+
+	//if (dlg.DoModal() == IDOK)
+	if (1)
+	{
+		//CString strConfigFilePathName = dlg.GetPathName();
+		//MessageBox(strConfigFilePathName);
+		//CString strConfigFileName = dlg.GetFileName();
+		//MessageBox(strConfigFileName);
+		BOOL a = f.Open(L"LightingController\\savedConfig.txt", CFile::modeCreate | CFile::modeWrite);
+
+		//CString str1;
+		//str1 = L"Text1;Text2;Text3;";
+		//WriteCString(f, str1);
+		//f.Close();
+
+#if SHOW_ALL
+		for (int i = 0; i < 5; i++)
+#endif
+#if !SHOW_ALL
+		for (int i = 0; i < 1; i++)
+#endif
+		{
+			if (i == 0) grid = &ctrlGrid1;
+			if (i == 1) grid = &ctrlGrid2;
+			if (i == 2) grid = &ctrlGrid3;
+			if (i == 3) grid = &ctrlGrid4;
+			if (i == 4) grid = &ctrlGrid5;
+
+			temp.Format(_T("%d"), i);				// grid number
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), dataFlowStarted[i]);	// dataflow started
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollConfigured[i]);	// poll configured
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollSlaveId[i]);	// slave ID
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollFunction[i]);	// function
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollAddress[i]);	// address
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollQuantity[i]); // quantity
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollScanRate[i]); // scan rate
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollSingleFunction[i]); // single function
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollRows[i]);		// rows
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollDisplay[i]);	// display
+			WriteCString(f, temp);
+
+			qtyToShow[i] = ((pollRows[i] == 0) || (pollQuantity[i] < pollRows[i])) ? pollQuantity[i] : pollRows[i];
+			for (int j = 0; j < qtyToShow[i]; j++)
+			{
+				//temp = grid->get_TextMatrix(j+1, 0);
+				int rowNo = j % ROWS_OF_MBPOLLLIST;
+				int colNo = (j / ROWS_OF_MBPOLLLIST) * 3;
+				temp = mbPollList.GetItemText(rowNo, colNo);
+				WriteCString(f, temp);
+			}
+		}
+		f.Close();
+	}
+}
+#endif
+
+void CMbPoll::OnFileOpenWhileOpen()
+{
+	// TODO: Add your command handler code here
+
+	int qtyToShow[5];
+	CMsflexgrid* grid;
+	CString strFilter = _T("Text file (*.txt)|*.txt|Rich Text file (*.rtf)|*.rtf|All files (*.*)|*.*||");
+	CFile f;
+	CString temp;
+
+	//CFileDialog dlg(true, _T("Open current Config"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER, strFilter);
+	//if (dlg.DoModal() == IDOK)
+	if (1)
+	{
+		//CString strConfigFilePathName1 = dlg.GetPathName();
+		//MessageBox(strConfigFilePathName1);
+		//CString strConfigFileName1 = dlg.GetFileName();
+		//MessageBox(strConfigFileName1);
+		//f.Open(strConfigFileName1, CFile::modeRead);
+		f.Open(L"LightingController\\savedConfig.txt", CFile::modeRead);
+
+#if SHOW_ALL
+		for (int i = 0; i < 5; i++)
+#endif
+#if !SHOW_ALL
+		for (int i = 0; i < 1; i++)
+#endif
+		{
+			if (i == 0) grid = &ctrlGrid1;
+			if (i == 1) grid = &ctrlGrid2;
+			if (i == 2) grid = &ctrlGrid3;
+			if (i == 3) grid = &ctrlGrid4;
+			if (i == 4) grid = &ctrlGrid5;
+
+			ReadCString(temp, f);		// grid number
+			ReadCString(temp, f);		// dataflow started
+			dataFlowStarted[i] = _wtoi(temp);
+			ReadCString(temp, f);		// poll configured
+			pollConfigured[i] = _wtoi(temp);
+			ReadCString(temp, f);		// slave ID
+			pollSlaveId[i] = _wtoi(temp);
+			ReadCString(temp, f);		// function
+			pollFunction[i] = _wtoi(temp);
+			ReadCString(temp, f);		// address
+			pollAddress[i] = _wtoi(temp);
+			ReadCString(temp, f);		// quantity
+			pollQuantity[i] = _wtoi(temp);
+			ReadCString(temp, f);		// scan rate
+			pollScanRate[i] = _wtoi(temp);
+			ReadCString(temp, f);		// single function
+			pollSingleFunction[i] = _wtoi(temp);
+			ReadCString(temp, f);		// rows
+			pollRows[i] = _wtoi(temp);
+			ReadCString(temp, f);		// display
+			pollDisplay[i] = _wtoi(temp);
+			qtyToShow[i] = ((pollRows[i] == 0) || (pollQuantity[i] < pollRows[i])) ? pollQuantity[i] : pollRows[i];
+			if (pollRows[i] == 0) grid->put_Rows(pollQuantity[i] + 1);
+			if (pollRows[i] == 10) grid->put_Rows(11);
+			if (pollRows[i] == 20) grid->put_Rows(21);
+			if (pollRows[i] == 50) grid->put_Rows(51);
+			if (pollRows[i] == 100) grid->put_Rows(101);
+			for (int j = 0; j < qtyToShow[i]; j++)
+			{
+				ReadCString(temp, f);
+				//grid->put_TextMatrix(j + 1, 0, temp);		// put_TextMatrix(row, col, text);
+				int rowNo = j % ROWS_OF_MBPOLLLIST;
+				int colNo = (j / ROWS_OF_MBPOLLLIST) * 3;
+				mbPollList.SetItemText(rowNo, colNo, temp);
+			}
+			saveRegisterNames(i);
+		}
+		startStopBtnState();
+		restoreConfigs();
+		f.Close();
+	}
+}
+
 

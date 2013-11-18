@@ -92,6 +92,10 @@ extern CString registerNames2;
 extern CString registerNames3;
 extern CString registerNames4;
 
+extern CMenu* mbpMenu;
+extern int menuChecked;
+extern int mbPollFirstTime;
+
 extern void LoadReadOneData(int val, unsigned char device_var,unsigned short address);
 extern void LoadWriteOneData(int val, unsigned char device_var,unsigned short address);
 extern void LoadReadMultiData(unsigned char device_var,unsigned short *put_data_into_here, unsigned short start_address,int length);
