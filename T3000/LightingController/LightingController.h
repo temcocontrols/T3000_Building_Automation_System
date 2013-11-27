@@ -57,6 +57,7 @@ protected:
 public:
 	virtual void OnInitialUpdate();
 	void Fresh();
+	void Fresh_System();
 	unsigned int m_inaddress;
 	int m_inSerialNum;
 	float m_flFirmware;
@@ -65,6 +66,7 @@ public:
 	int m_inBaudrate;
 	void ShowLighContDlg();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	CString m_datetime;
 	unsigned short LightCregister[512];
 	BOOL prodtopcData();//采集数据
@@ -231,6 +233,9 @@ public:
 	 CComboBox m_ipModelComBox;
 	 afx_msg void OnBnClickedButtonConfigure();
 	 afx_msg void OnBnClickedButtonConfigureswitch();
+	 CComboBox m_timeserver;
+	 CEdit m_macaddress;
+	BOOL m_light[32];
 };
 
 

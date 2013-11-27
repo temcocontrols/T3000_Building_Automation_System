@@ -1501,7 +1501,11 @@ void CMbPoll::updateDataSharingVariables(int configNo)
 	switch(configNo)
 	{
 	case 0:
-		if (grid1Data != NULL){delete(grid1Data); grid1Data = NULL;}
+		if (grid1Data != NULL)
+		{
+		delete(grid1Data); 
+		grid1Data = NULL;
+		}
 		grid1Data = (short int*) malloc (sizeof(short int) * pollQuantity[configNo]);
 		break;
 	case 1:
@@ -1839,6 +1843,7 @@ void CMbPoll::showTrafficWindow(int slotNo)
 		trafficWindow = new TrafficWindow;
 		trafficWindow->Create(IDD_TRAFFIC_WINDOW,this);
 		trafficWindow->ShowWindow(SW_SHOW);
+		
 	}
 	else
 	{
@@ -2843,7 +2848,11 @@ void CMbPoll::OnFileSaveWhileClose()
 		//MessageBox(strConfigFilePathName);
 		//CString strConfigFileName = dlg.GetFileName();
 		//MessageBox(strConfigFileName);
-		BOOL a = f.Open(L"LightingController\\savedConfig.txt", CFile::modeCreate | CFile::modeWrite);
+		CString strConfigFilePathName1 = g_strExePth+_T("savedConfig.txt");
+
+
+		//f.Open(strConfigFilePathName1.GetString(), CFile::modeRead);
+		BOOL a = f.Open(strConfigFilePathName1.GetString(), CFile::modeCreate | CFile::modeWrite);
 
 		//CString str1;
 		//str1 = L"Text1;Text2;Text3;";
@@ -2915,12 +2924,10 @@ void CMbPoll::OnFileOpenWhileOpen()
 	//if (dlg.DoModal() == IDOK)
 	if (1)
 	{
-		//CString strConfigFilePathName1 = dlg.GetPathName();
-		//MessageBox(strConfigFilePathName1);
-		//CString strConfigFileName1 = dlg.GetFileName();
-		//MessageBox(strConfigFileName1);
-		//f.Open(strConfigFileName1, CFile::modeRead);
-		f.Open(L"LightingController\\savedConfig.txt", CFile::modeRead);
+		 CString strConfigFilePathName1 = g_strExePth+_T("savedConfig.txt");
+		 
+		
+		f.Open(strConfigFilePathName1.GetString(), CFile::modeRead);
 
 #if SHOW_ALL
 		for (int i = 0; i < 5; i++)

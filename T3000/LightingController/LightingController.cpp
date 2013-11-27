@@ -86,6 +86,9 @@ void CLightingController::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_ListeningPort, m_listenPortEdit);
 
 	DDX_Control(pDX, IDC_COMBO_IPModel, m_ipModelComBox);
+	DDX_Control(pDX, IDC_COMBO_TIMESERVERLIST2, m_timeserver);
+	DDX_Control(pDX, IDC_MAC_ADDRESS, m_macaddress);
+	 
 }
 
 BEGIN_MESSAGE_MAP(CLightingController, CFormView)
@@ -93,7 +96,7 @@ BEGIN_MESSAGE_MAP(CLightingController, CFormView)
 	ON_LBN_DBLCLK(IDC_LIST_INPUT, &CLightingController::OnLbnDblclkListInput)
 	ON_LBN_SELCHANGE(IDC_LIST_INPUT, &CLightingController::OnLbnSelchangeListInput)
 	ON_WM_CONTEXTMENU()
-
+	ON_WM_CTLCOLOR()
 	ON_CBN_SELCHANGE(IDC_COMBO1, &CLightingController::OnCbnSelchangeCombo1)
 	ON_EN_KILLFOCUS(IDC_EDIT_MODIFYNAME, &CLightingController::OnEnKillfocusEditModifyname)
 	ON_COMMAND(ID_SETMAPPING_ADDOUTPUTBAROD, &CLightingController::OnSetmappingAddoutputbarod)
@@ -142,7 +145,9 @@ void CLightingController::Dump(CDumpContext& dc) const
 void CLightingController::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
-
+	for(int i=0;i<32;i++){
+	m_light[i]=FALSE;
+	}
 	CString strtmp;
 	for(int i = 1;i<=200;i++)
 	{
@@ -465,6 +470,7 @@ void CLightingController::Fresh()
 
 	//m_inaddress = 255;//界面上Address的值,在这里除显示没任何意义
 	UpdateData(FALSE);
+
 	if(ifLCdb)//T3000启动仅执行一次
 	{
 		CString temptable = _T("LightingController");
@@ -550,13 +556,14 @@ void CLightingController::Fresh()
 	//AfxGetMainWnd()->SendMessage(WM_SETICON,TRUE,(LPARAM)hIcon);//消息，就是并不会立即执行
 
 	//AfxGetMainWnd()->SetWindowText(_T("LC"));//改变窗口标题
-	m_ipModelComBox.SetCurSel(0);
-	OnBnClickedCheckEnableEdit();
-	m_ip_addressCtrl.SetAddress((BYTE)192,(BYTE)168,(BYTE)0,(BYTE)3);
-	m_subnet_addressCtrl.SetAddress((BYTE)255,(BYTE)255,(BYTE)255,(BYTE)0);
-	m_gateway_addressCtrl.SetAddress((BYTE)192,(BYTE)168,(BYTE)0,(BYTE)4);
-
 	
+
+
+	 if (!is_connect())
+	{
+	SetPaneString(1,_T("NO CONNECTION"));
+	}
+	Fresh_System();
 #if 0//原NC
 	GetDlgItem(IDC_SERIALSTATIC)->SetFocus();
 	m_IDaddress=multi_register_value[6];
@@ -618,10 +625,45 @@ void CLightingController::Fresh()
 
 	UpdateData(false);
 #endif
-
+    
 	SetTimer(LIGHTINGCONTROLLERTIMER,1000,NULL);
 
 }
+
+void CLightingController::Fresh_System(){
+unsigned short sys_data[100];
+CString strtemp;
+Read_Multi(g_tstat_id,&sys_data[0],0,20);
+strtemp.Format(_T("%d"),sys_data[6]);
+GetDlgItem(IDC_EDIT1)->SetWindowTextW(strtemp);//Address ID
+strtemp.Format(_T("%d"),sys_data[0]+sys_data[1]*256+sys_data[2]*256*256+sys_data[3]*256*256*256);
+GetDlgItem(IDC_EDIT3)->SetWindowTextW(strtemp);//Serial NO
+strtemp.Format(_T("%d"),sys_data[8]);
+GetDlgItem(IDC_EDIT4)->SetWindowTextW(strtemp);//Hardware
+ 
+ 
+float firmware=((float) sys_data[4])/100.0+(float)sys_data[5];
+strtemp.Format(_T("%0.2f"),firmware);
+GetDlgItem(IDC_EDIT2)->SetWindowTextW(strtemp);
+
+m_timeserver.SetCurSel(0);
+m_timeserver.EnableWindow(FALSE);
+
+
+Read_Multi(g_tstat_id,&sys_data[0],100,21);
+strtemp.Format(_T("%02X-%02X-%02X-%02X-%02X-%02X"),sys_data[0],sys_data[1],sys_data[102],sys_data[3],sys_data[4],sys_data[5]);
+m_macaddress.SetWindowText(strtemp);
+m_ipModelComBox.SetCurSel(sys_data[6]);
+m_ip_addressCtrl.SetAddress((BYTE)sys_data[7],(BYTE)sys_data[8],(BYTE)sys_data[9],(BYTE)sys_data[10]);
+m_subnet_addressCtrl.SetAddress((BYTE)sys_data[11],(BYTE)sys_data[12],(BYTE)sys_data[13],(BYTE)sys_data[14]);
+m_gateway_addressCtrl.SetAddress((BYTE)sys_data[15],(BYTE)sys_data[16],(BYTE)sys_data[17],(BYTE)sys_data[18]);
+strtemp.Format(_T("%d"),sys_data[20]);
+m_listenPortEdit.SetWindowText(strtemp);
+OnBnClickedCheckEnableEdit();
+
+
+}
+
 
 void CLightingController::ShowLighContDlg()
 {
@@ -718,6 +760,16 @@ void CLightingController::OnTimer(UINT_PTR nIDEvent)
 // 		m_date.GetCurrentTime();
 // 		m_time.GetCurrentTime();
 			//UpdateData(FALSE);
+       int  Status1=read_one(g_tstat_id,14600);
+	   int  Status2=read_one(g_tstat_id,14601);
+	   for (int i=0;i<16;i++)
+	   {
+	      m_light[i]=(Status1>>i) &0x01;
+	   }
+	   for (int i=16;i<32;i++)
+	   {
+		   m_light[i]=(Status2>>(i-16)) &0x01;
+	   }
 	}
 
 
@@ -1102,9 +1154,6 @@ BOOL CLightingController::UpdateDBALL()
 	SetTimer(LIGHTINGCONTROLLERTIMER,1000,NULL);
 	return TRUE;
 }
-
-
-
 
 void CLightingController::OnLbnDblclkListInput()
 {
@@ -2062,76 +2111,7 @@ void CLightingController::OnSetmappingAddoutputbarod()
 
 void CLightingController::OnSetmappingPrevious()//delete
 {
-
-// 	//flexcontrol参数设置
-// 	m_msflexgrid1to96.put_WordWrap(TRUE);//允许换行 和下面\n对应一起使用才有效果	
-// 	m_msflexgrid1to96.put_MergeCells(1); //表按任意方式进行组合单元格内容	
-// 
-// 	m_msflexgrid1to96.put_MergeCol(0,TRUE);//其中第一人参数0，表示的是第几列.不是表示需要合并的行数
-// 	m_msflexgrid1to96.put_MergeCol(1,TRUE);
-// 
-// 
-// 
-// 	//获取panel,outputboard,output组合框所选择的当前值；
-// 	CString strpanel,stroutputboard,stroutput,stroutputname;
-// 	GetDlgItem(IDC_COMBO_panel)->GetWindowText(strpanel);
-// 	GetDlgItem(IDC_COMBO_outputboard)->GetWindowText(stroutputboard);
-// 	GetDlgItem(IDC_COMBO_output)->GetWindowText(stroutput);
-// 
-// 
-// 	//将选择的数据显示在flexgrid控件上
-// 
-// 	int itmp_ = m_ListBox.GetCurSel();//获取编号
-// 	//判断是组还是输入
-// 	CString strtmp_,strtmp1_;
-// 	GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp_);
-// 	if (strtmp_.CompareNoCase(_T("Input-Output-Map")) == 0)//确认是input还是group
-// 		strtmp1_.Format(_T("input%d"),itmp_+1);
-// 	else
-// 		strtmp1_.Format(_T("group%d"),itmp_+1);
-// 
-// 	m_vecaddoutputs.clear();
-// 	map<CString,vecaddoutputs>::iterator iter_;//查找组中的元素
-// 	iter_ = m_mapaddoutputs.find(strtmp1_);
-// 	if (iter_ != m_mapaddoutputs.end())
-// 		m_vecaddoutputs = iter_->second;
-// 
-// 
-// 
-// 
-// 	int i  = m_vecaddoutputs.size()+1;
-// 	m_msflexgrid1to96.put_TextMatrix(i,0,strpanel);
-// 	int ctoitmp = _ttoi(stroutputboard);
-// 	if (ctoitmp<10)
-// 		stroutputboard.Format(_T("00%d"),ctoitmp);
-// 	else if (ctoitmp<100)
-// 		stroutputboard.Format(_T("0%d"),ctoitmp);
-// 
-// 	stroutputboard = strpanel+ _T("--out\n") + stroutputboard;
-// 	m_msflexgrid1to96.put_TextMatrix(i,1,stroutputboard);
-// 	m_msflexgrid1to96.put_TextMatrix(i,2,stroutput);
-// 	stroutputname =  _T("output")+stroutput;
-// 	m_msflexgrid1to96.put_TextMatrix(i,3,stroutputname);
-// 
-// 
-// 
-// 	//将选择的数据保存在内存中vector:: m_vecaddoutputs
-// 	m_structaddoutputs.stroutputno = stroutput;
-// 	m_structaddoutputs.stroutputboard = stroutputboard;
-// 	m_structaddoutputs.strpanel = strpanel;
-// 	m_structaddoutputs.stroutputname = stroutputname;
-// 	m_vecaddoutputs.push_back(m_structaddoutputs);
-
-
-
-
-
 	int itmp = m_ListBox.GetCurSel();
-	// 	//m_ListBox.SelectString(itmp,strtmp);
-	// 	strtmp.Format(_T(""))
-	//	GetDlgItem(IDC_LIST_INPUT)->GetWindowText(strtmp);
-
-
 	//判断是组还是输入
 	CString strtmp,strtmp1;
 	GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp);
@@ -2140,14 +2120,12 @@ void CLightingController::OnSetmappingPrevious()//delete
 	else
 		strtmp1.Format(_T("group%d"),itmp+1);
 
-	//m_mapaddoutputs.clear();
 	map<CString,vecaddoutputs>::iterator iter;
 	iter = m_mapaddoutputs.find(strtmp1);
 	if (iter != m_mapaddoutputs.end())
 	{
 		m_mapaddoutputs.erase(iter);
 		m_vecaddoutputs.clear();
-
 
 		m_msflexgrid1to96.Clear();
 		m_msflexgrid1to96.put_TextMatrix(0,0,_T("Panels"));
@@ -2163,17 +2141,8 @@ void CLightingController::OnSetmappingPrevious()//delete
 
 void CLightingController::OnSetmappingNext() //现改成 Set As default 给硬件发送 1,给91寄存器
 {
-
-
-
-
 	if (g_CommunicationType == 0)
 		open_com(comnum);
-
-
-
-
-
  	int ret =0;
 	ret = write_one(g_tstat_id,91,1);
 	//ret = write_one(100,200,4);
@@ -2181,35 +2150,6 @@ void CLightingController::OnSetmappingNext() //现改成 Set As default 给硬件发送 
 		AfxMessageBox(_T("Setting successful"));
 	else
 		AfxMessageBox(_T("Setting fail"));
-
-	//PostMessage(WM_WRITE_MESSAGE,91,1);
-	//SendMessage(WM_WRITE_MESSAGE,91,1);
-// 	ret = write_one(g_tstat_id,91,1);
-// 	if(ret>0)
-// 		AfxMessageBox(_T("Setting successful"));
-// 	else
-// 		AfxMessageBox(_T("Setting fail"));
-
-
-
-
-// 	CString strfixgridcol;//=_T(" 123");
-// 	m_mapoutputparam;
-// 	if(m_outputsum >3) 
-// 	{
-	//strfixgridcol = m_msflexgridTitle.get_TextMatrix(0,0);
-// 	CString str = _T(" 123");
-//		char ch =  str.GetAt(3);
- 	//	char chr = strfixgridcol.GetAt(13);//左边第一个空格不计算,第一个从0开始算起
-// 
-// 			" Output Board 1 Address:   210")
-		//获得指定位置字符：char a = str1.GetAt(3);
-//		int Address;
-// 		// Address = (int)chr;//如果chr = '1'那么Address = 49;
-// 	//	sscanf(&chr,"%d",&Address);
-// 	}
-//显示下一页
-
 }
 
 
@@ -2224,9 +2164,9 @@ void CLightingController::OnSetmappingRead()//read from lightingcontroller  to p
 
 
 
-#if 0 //测试LightingController批量读。
-	open_com(comnum);
-	memset(SerialNum,0,sizeof(SerialNum));
+#if 1 //测试LightingController批量读。
+	//open_com(comnum);
+	//memset(SerialNum,0,sizeof(SerialNum));
 	
 	int num = 0;//确定硬件件中input-output-map中有已设置了多少组（总共24组）
 
@@ -3613,3 +3553,510 @@ void CLightingController::OnBnClickedButtonConfigureswitch()
 	Cconfigure dlg;
 	dlg.DoModal();
 }
+
+
+
+HBRUSH CLightingController::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CFormView::OnCtlColor(pDC, pWnd, nCtlColor);
+
+
+	switch(pWnd->GetDlgCtrlID())
+	{
+	case IDC_STATUS1:
+	{
+		if (m_light[0])
+		{
+			pDC->SetTextColor(RGB(0,255,255));
+			pDC->SetBkColor(RGB(0,255,255));
+			pDC->SetBkMode(TRANSPARENT);
+
+
+			HBRUSH B = CreateSolidBrush(RGB(0,255,255));
+			return (HBRUSH)B;
+		} 
+		else
+		{
+			pDC->SetTextColor(RGB(130,130,130));
+			pDC->SetBkColor(RGB(130,130,130));
+			pDC->SetBkMode(TRANSPARENT);
+
+
+			HBRUSH B = CreateSolidBrush(RGB(130,130,130));
+			return (HBRUSH)B;
+		}
+
+		
+	}
+	case IDC_STATUS2:
+		{
+			if (m_light[1])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));
+					return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));
+					return (HBRUSH)B;
+			}
+
+		
+		}
+	case IDC_STATUS3:
+		{
+			if (m_light[2])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));
+				return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));
+				return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS4:
+		{
+			if (m_light[3])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS5:
+		{
+			if (m_light[4])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS6:
+		{
+			if (m_light[5])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS7:
+		{
+			if (m_light[6])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS8:
+		{
+			if (m_light[7])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS9:
+		{
+			if (m_light[8])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS10:
+		{
+			if (m_light[9])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS11:
+		{
+			if (m_light[10])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS12:
+		{
+			if (m_light[11])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS13:
+		{
+			if (m_light[12])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS14:
+		{
+			if (m_light[13])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS15:
+		{
+			if (m_light[14])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS16:
+		{
+			if (m_light[15])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS17:
+		{
+			if (m_light[16])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS18:
+		{
+			if (m_light[17])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS19:
+		{
+			if (m_light[18])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS20:
+		{
+			if (m_light[19])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+
+	//case IDC_NIGHT_EDIT:
+	//	{
+	//		pDC->SetTextColor(RGB(255,255,255));
+	//		pDC->SetBkColor(RGB(0,0,255));
+	//		pDC->SetBkMode(TRANSPARENT);
+	//		HBRUSH B = CreateSolidBrush(RGB(0,0,255));
+	//		return (HBRUSH)B;
+	//	}
+	//case IDC_EDIT_DAYHEAT:
+	//	{
+	//		pDC->SetTextColor(RGB(255,255,255));
+	//		//pDC->SetBkColor(RGB(255,255,255));
+	//		pDC->SetBkMode(TRANSPARENT);
+	//		HBRUSH B = CreateSolidBrush(RGB(255,0,0));
+	//		return (HBRUSH)B;
+	//	}
+	//case IDC_NIGHTHEAT_EDIT:
+	//	{
+	//		pDC->SetTextColor(RGB(255,255,255));
+	//		//pDC->SetBkColor(RGB(255,255,255));
+	//		pDC->SetBkMode(TRANSPARENT);
+	//		HBRUSH B = CreateSolidBrush(RGB(255,0,0));
+	//		return (HBRUSH)B;
+	//	}
+	default:
+		return CFormView::OnCtlColor(pDC,pWnd, nCtlColor);
+	}
+
+}
+

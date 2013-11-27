@@ -164,11 +164,11 @@ int modbus_read_multi_value(
 	{
 
 		// call the modbus DLL method
-		;
+		
 
 		// call the modbus DLL method
 		error=read_multi(device_var,put_data_into_here,start_address,length);
-
+		       
 		// free the modbus communications for other threads
 	
 		

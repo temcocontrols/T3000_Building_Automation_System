@@ -24,13 +24,16 @@ typedef enum
  	INITIALIZE ,
  	BLOCK_COUNT       			
  };					 
-
+ #define GROUP_LABLE_SIZE 10
 #define WR_DESCRIPTION_SIZE			31
 #define AR_DESCRIPTION_SIZE			29
 #define ID_SIZE					3
 #define AR_TIME_SIZE				46
 #define WR_TIME_SIZE				72
-
+#define INPUT_DESCRIPTION_LENGTH 10
+#define ONE_SWITCH_LENGTH 60
+#define ONE_GROUP_LENGTH 60
+#define OUTPUT_DESCRIPTION_LENGTH 10
 #define WR_BLOCK_SIZE				1024
 #define AR_BLOCK_SIZE				1024
 #define ID_BLOCK_SIZE				1536
@@ -91,6 +94,28 @@ enum {
 
 } ;
 
+#define INPUT_FILTER_TIME 200
+#define SWITCH_TYPE 201
+#define OVER_TIME 252
+#define INPUT_OUTPUT_MAPPING 300
+#define GROUP_OUTPUT_MAPPING 1740
+#define INPUT_AM 4148
+#define INPUT_MB 4172
+#define GROUP_AM 4196
+#define GROUP_MB 4236
+#define WEEKLY_ROUTINE_DESCRIPTION 4276
+#define ANNUAL_ROUTINE_DESCRIPTION 4896
+#define GROUP_SCHEDULE 5360
+#define ANNUAL_ROUTINE_TIME 5480
+#define WEEKLY_ROUTINE_ON_TIME 6216
+#define WEEKLY_ROUTINE_OFF_TIME 7656
+#define INPUT_DESCRIPTION 9096
+#define OUTPUT_DESCRIPTION 9336
+#define GROUP_DESCRIPTION_REG 14136
+#define DELAY_TIME_SWITCH 14536
+#define ENABLE_DISABLE_MC 14602
+#define RELAY_PULSE 15083
+#define DELAY_RELAY_PULSE 15084
 typedef struct WEEKLY_ROUTINES_DESCRIPTION{
 		char  full_label[20];
 		char  label[8];
@@ -108,6 +133,12 @@ typedef struct CONFIG_ROUTINES_DESCRIPTION{
  		unsigned char  schedul2;	 
 		unsigned char  flag;
       }description3;//id routines
+typedef struct GROUP_DESCRIPTION{
+    char  full_label[10];
+	unsigned char  schedul1;
+	unsigned char  schedul2;	 
+	unsigned char  flag;
+}description3_group;
 //***************************************************************************
 
 

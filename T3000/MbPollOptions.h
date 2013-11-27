@@ -50,5 +50,6 @@ public:
 	CButton checkTapData;
 	afx_msg void OnCbnSelchangeComboFunction();
 	CButton checkSingleFunction;
+//	afx_msg void OnBnClickedOk();
 };
 

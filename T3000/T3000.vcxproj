@@ -153,13 +153,13 @@
     <ClCompile Include="CustomSTable.cpp" />
     <ClCompile Include="DialogCM5_BacNet.cpp" />
     <ClCompile Include="DisplayConfig.cpp" />
+    <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
     <ClCompile Include="LightingController\configure.cpp" />
     <ClCompile Include="Dialog_Progess.cpp" />
     <ClCompile Include="DialogInfo.cpp" />
     <ClCompile Include="EreaseDlg.cpp" />
     <ClCompile Include="excel9.cpp" />
-    <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="FreeCoolDlg.cpp" />
     <ClCompile Include="globle_function.cpp" />
     <ClCompile Include="GraphicView.cpp" />
@@ -218,6 +218,7 @@
     <ClCompile Include="T38AI16O.cpp" />
     <ClCompile Include="T38AI8AO.cpp" />
     <ClCompile Include="T38I13O.cpp" />
+    <ClCompile Include="T38IOAView.cpp" />
     <ClCompile Include="T3Performance.cpp" />
     <ClCompile Include="T3RTDView.cpp" />
     <ClCompile Include="TDelayForm.cpp" />
@@ -246,6 +247,7 @@
     <ClCompile Include="AirQuality\AirQuality.cpp" />
     <ClCompile Include="ISP\CDialogISPTOOL.cpp" />
     <ClCompile Include="singleslider\MacSliderCtrl.cpp" />
+    <ClCompile Include="WriteSingleRegDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -330,6 +332,7 @@
     <ClInclude Include="CustomSTable.h" />
     <ClInclude Include="DialogCM5_BacNet.h" />
     <ClInclude Include="DisplayConfig.h" />
+    <ClInclude Include="fileRW.h" />
     <ClInclude Include="gloab_define.h" />
     <ClInclude Include="IONameConfig.h" />
     <ClInclude Include="MBP.h" />
@@ -346,6 +349,7 @@
     <ClInclude Include="T38AI16O.h" />
     <ClInclude Include="T38AI8AO.h" />
     <ClInclude Include="T38I13O.h" />
+    <ClInclude Include="T38IOAView.h" />
     <ClInclude Include="T3Performance.h" />
     <ClInclude Include="T3RTDView.h" />
     <ClInclude Include="TestMultiReadTraffic.h" />
@@ -368,7 +372,6 @@
     <ClInclude Include="DialogInfo.h" />
     <ClInclude Include="EreaseDlg.h" />
     <ClInclude Include="excel9.h" />
-    <ClInclude Include="fileRW.h" />
     <ClInclude Include="FreeCoolDlg.h" />
     <ClInclude Include="global_variable.h" />
     <ClInclude Include="global_variable_extern.h" />
@@ -443,6 +446,7 @@
     <ClInclude Include="AirQuality\AirQuality.h" />
     <ClInclude Include="ISP\CDialogISPTOOL.h" />
     <ClInclude Include="singleslider\MacSliderCtrl.h" />
+    <ClInclude Include="WriteSingleRegDlg.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc" />

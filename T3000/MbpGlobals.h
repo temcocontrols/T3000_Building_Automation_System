@@ -18,10 +18,10 @@ int optionsAddressInCell = 0;
 
 int curConf = 0;
 
-int pollSlaveId[MAX_GRIDS] = {1, 1, 1, 1, 1};
+int pollSlaveId[MAX_GRIDS] = {255, 1, 1, 1, 1};
 int pollFunction[MAX_GRIDS] = {0};
 int pollAddress[MAX_GRIDS] = {0};
-int pollQuantity[MAX_GRIDS] = {10, 10, 10, 10, 10};
+int pollQuantity[MAX_GRIDS] = {100, 10, 10, 10, 10};
 unsigned int pollScanRate[MAX_GRIDS] = {1000, 1000, 1000, 1000, 1000};
 int pollRows[MAX_GRIDS] = {0};
 int pollSingleFunction[MAX_GRIDS] = {0};

@@ -16,7 +16,7 @@
 
 #include "iniFile.h"
 
- const int g_versionNO=201306;
+ const int g_versionNO=201309;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif

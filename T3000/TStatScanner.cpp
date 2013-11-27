@@ -1620,6 +1620,10 @@ void CTStatScanner::SendScanEndMsg()
 
 		CloseLogFile();
 		NET_CloseLogFile();
+		SetCommunicationType(1);
+		close_com();
+		SetCommunicationType(0);
+		close_com();
 }
 
 

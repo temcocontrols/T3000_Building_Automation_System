@@ -77,6 +77,13 @@ INPUT void  show_ISPDlg();
 INPUT void  show_RegisterMonitorDlg(); 
 INPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length);
 //INPUT bool open_com(unsigned char m_com);
+
+
+INPUT int Write_One_tap(unsigned char device_var,unsigned short address,unsigned short value);
+INPUT int Read_One_tap(unsigned char device_var,unsigned short address);
+INPUT int write_multi_tap(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
+INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+
 INPUT bool open_com(int m_com);
 INPUT void close_com();
 INPUT bool is_connect();

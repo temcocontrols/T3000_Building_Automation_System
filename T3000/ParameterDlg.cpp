@@ -1785,10 +1785,10 @@ void CParameterDlg::OnEnKillfocusEnigntheating()
 		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,nValue,
 			product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],this->m_hWnd,IDC_ENIGNTHEATING,
 			_T("NIGHT HEATING SETPOINT"));*/
-		int ret=write_one(g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,(int)(nValue/10));
+		int ret=write_one(g_tstat_id,MODBUS_NIGHT_HEATING_SETPOINT,nValue);
 		if (ret>0)
 		{
-			product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]=(int)(nValue/10);
+			product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]=nValue;
 		} 
 		else
 		{
@@ -1796,8 +1796,8 @@ void CParameterDlg::OnEnKillfocusEnigntheating()
 		}
 		
 		CString strText;
-		strText.Format(_T("0.1f%"),(float)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
-		m_nightheating.GetWindowText(strText);
+		strText.Format(_T("0.1f%"),(float)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10.0);
+		m_nightheating.SetWindowText(strText);
 
 	}
 	else
@@ -1822,8 +1822,8 @@ void CParameterDlg::OnEnKillfocusEnigntheating()
 
 
 		CString strText;
-		strText.Format(_T("0.1f%"),(float)(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10));
-		m_nightheating.GetWindowText(strText);
+		strText.Format(_T("0.1f%"),(float)(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0));
+		m_nightheating.SetWindowText(strText);
 
 
 	}
@@ -2306,14 +2306,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		}
 		 
 	 
-	if (product_register_value[MODBUS_TIMER_SELECT]==3)
-	{
-		GetDlgItem(IDC_EDIT12)->EnableWindow(FALSE);
-	}
-	else
-	{
-		GetDlgItem(IDC_EDIT12)->EnableWindow(TRUE);
-	}
+ 
 
 	CString strTemp;
 	strTemp.Format(_T("%d"),g_tstat_id);
@@ -2328,12 +2321,9 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 
-	//if (product_register_value[MODBUS_PRODUCT_MODEL] == 18)//tstat5g	//7
-	//{
-	//CString str;
-		strTemp.Format(_T("%.1f"),product_register_value[MODBUS_UNIVERSAL_NIGHTSET]/10.0);			//275 
-		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->SetWindowText(strTemp+strUnit);
-	/*}*/
+ 
+		
+	 
 
 
 	int nItem;
@@ -2558,10 +2548,11 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		m_inputvalue1.SetWindowText(strTemp+strUnit);
 		// float fValue;
 		int nValue=0;
-	//	CString strValueUnit=GetTempUnit(product_register_value[359], 1);
+	   CString strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+product_register_value[383]-1], product_register_value[383]);
+		
 		if(product_register_value[383]==1) // input1
 		{	
-			
+			 
 			strTemp=GetInputValue(1);
 			m_inputValue2.SetWindowText(strTemp);
 		}
@@ -2609,20 +2600,20 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		}
 		else if (product_register_value[383]==9)//Humidity
 		{		CString temp;
-
+		strUnit=_T("%");
 		if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
 		{
 
-			temp.Format(_T("%0.1f%%"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
+			temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
 
 		}
 		else
 		{
-			temp.Format(_T("%0.1f%%"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
+			temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
 		}
 
 
-		m_inputValue2.SetWindowText(temp); 
+		m_inputValue2.SetWindowText(temp+strUnit); 
 
 
 		}
@@ -2651,6 +2642,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		{
 			m_inputValue2.SetWindowText(_T("UNUSED"));
 		}
+		strTemp.Format(_T("%.1f"),product_register_value[MODBUS_UNIVERSAL_NIGHTSET]/10.0);			//275 
+		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->SetWindowText(strTemp+strUnit);
 #endif
 	} 
 	else
@@ -2846,7 +2839,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			m_inputValue2.SetWindowText(strTemp);
 
 		}
-
+		strTemp.Format(_T("%.1f"),product_register_value[MODBUS_UNIVERSAL_NIGHTSET]/10.0);			//275 
+		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->SetWindowText(strTemp+strValueUnit);
 #endif
 	}
 
@@ -3200,7 +3194,41 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		m_heatdbN=product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//352
 		m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
 	}
+	CenterWindow(this);
+	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	{
+		WINDOWPLACEMENT wp;
 
+		GetWindowPlacement(&wp);
+
+		wp.rcNormalPosition.bottom += 120;
+
+		SetWindowPlacement(&wp);
+
+		GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_NORMAL);
+
+
+	 
+	} 
+	else
+	{
+
+		WINDOWPLACEMENT wp;
+		GetWindowPlacement(&wp);
+
+		CRect rc;
+		CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
+		pWnd->GetWindowRect(&rc);
+		//ScreenToClient(&rc);
+
+		wp.rcNormalPosition.bottom = rc.bottom - 10;
+		SetWindowPlacement(&wp);
+
+		GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_HIDE); 
+
+
+	 
+	}
 ShowPID3();
 }
 

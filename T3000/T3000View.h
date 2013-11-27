@@ -202,6 +202,7 @@ public:
 	//	afx_msg void OnBnClickedOutputbtn();
 	afx_msg void OnBnClicked5ebutton();
 	DECLARE_EVENTSINK_MAP()
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	void ClickInputMsflexgrid();
 	void ClickOutputMsflexgrid();
 	afx_msg void OnEnKillfocusInputnameedit();

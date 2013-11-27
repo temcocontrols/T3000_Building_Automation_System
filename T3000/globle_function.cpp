@@ -1705,4 +1705,91 @@ void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken)
 }
 
 
- 
+CString GetProductName(int ModelID)
+{
+	CString strProductName;
+	switch(ModelID)
+	{
+	case PM_TSTAT5A:
+		strProductName="TStat5A";
+		break;
+	case PM_TSTAT5B:
+		strProductName="TStat5B";
+		break;
+	case PM_TSTAT5B2:
+		strProductName="TStat5B2";
+		break;
+	case PM_TSTAT5C:
+		strProductName="TStat5C";
+		break;
+	case PM_TSTAT5D:
+		strProductName="TStat5D";
+		break;
+	case PM_TSTAT5E:
+		strProductName="TStat5E";
+		break;
+	case PM_TSTAT5F:
+		strProductName="TStat5F";
+		break;
+	case PM_TSTAT5G:
+		strProductName="TStat5G";
+		break;
+	case PM_TSTAT5H:
+		strProductName="TStat5H";
+		break;
+	case PM_TSTAT6:
+		strProductName="TStat6";
+		break;
+	case PM_TSTAT7:
+		strProductName="TStat7";
+		break;
+	case PM_NC:
+		strProductName="NC";
+		break;
+	case PM_CM5:
+		strProductName ="CM5";
+		break;
+		//20120424
+	case PM_LightingController:
+		strProductName = "LC";
+		break;
+	case  PM_CO2_NET:
+		strProductName = "CO2 Net";
+		break;
+	case  PM_CO2_RS485:
+		strProductName = "CO2";
+		break;
+	case PM_TSTAT6_HUM_Chamber:
+		strProductName =g_strHumChamber;
+		break;
+
+	case PM_T38AIOD :
+		strProductName="T3-8I13O";
+		break;
+	case PM_T3IOA :
+		strProductName="T3-8IOA";
+		break;
+	case PM_T332AI :
+		strProductName="T3-32AI";
+		break;
+	case PM_T3AI16O :
+		strProductName="T3-8AI160";
+		break;
+	case PM_T38I13O :
+		strProductName="T3-8I13O";
+		break;
+	case PM_T3PERFORMANCE :
+		strProductName="T3-Performance";
+		break;
+	case PM_T34AO :
+		strProductName="T3-4AO";
+		break;
+	case PM_T36CT :
+		strProductName="T3-6CT";
+		break;
+	default:
+		strProductName="TStat";
+		break;
+	}
+	return strProductName;
+}

@@ -51,6 +51,8 @@
 #include "T332AI.h"
 #include "gloab_define.h"
 #include "CalibrationHumDlg.h"
+#include "T38AI8AO.h"
+ 
 #pragma region Fance Test
 //For Test
 
@@ -249,7 +251,10 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			continue;
 		if(g_tstat_id<0&&g_tstat_id>255)
 			continue;
-		
+		if (!is_connect())
+		{
+			  continue;
+		}
 		WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
 		//int nRet =read_one(g_tstat_id,6,1);这是原有代码，这样发现，真正调用此函数，成功返回率很低
 		int nRet =read_one(g_tstat_id,6,2);
@@ -374,6 +379,8 @@ CMainFrame::CMainFrame()
 
 	m_bDialogOpen = FALSE;
 	mbPollDlgOpen = FALSE;
+
+	mbPoll=NULL;
 }
 
 
@@ -416,7 +423,7 @@ void CMainFrame::InitViews()
 	m_pViews[DLG_CM5_BACNET_VIEW]=(CView*) new CDialogCM5_BacNet; //CM5
 	m_pViews[DLG_DIALOGT38I13O_VIEW]=(CView*) new T38I13O;
 	m_pViews[DLG_DIALOGT332AI_VIEW]=(CView*)new T332AI;
-
+	m_pViews[DLG_DIALOGT38AI8AO]=(CView*)new T38AI8AO;
 
 
 	CDocument* pCurrentDoc = GetActiveDocument();
@@ -781,55 +788,6 @@ BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParent
 	return TRUE;
 }
 
-//afx_msg LRESULT CMainFrame::OnToolbarReset(WPARAM wp, LPARAM)
-//{
-//
-//	UINT uiToolBarId = (UINT) wp;	
-//	/*
-//	if (IDR_TOOLBAR_VER25049)
-//	{	
-//		//int n;
-//		m_wndToolBar.EnableTextLabels(true);
-//		//CMFCToolBarMenuButton btnEditor(ID_FILE_SAVE_CONFIG, NULL,GetCmdMgr ()->GetCmdImage (ID_FILE_SAVE_CONFIG), _T("Save"),FALSE);
-//		//CMFCToolBarMenuButton btnEditor(0, NULL,NULL, _T(""),FALSE);
-//		//n=GetCmdMgr ()->GetCmdImage (ID_CONFIGFILE_SAVE_AS);
-//		//m_wndToolBar.ReplaceButton (ID_FILE_OPEN, btnEditor);
-//		//m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_CONFIGFILE_SAVE_AS),_T("Save"));
-//
-//		//CMFCToolBarMenuButton btnLoadConfig(ID_LOAD_CONFIG, NULL,GetCmdMgr ()->GetCmdImage (ID_LOAD_CONFIG), _T("Load"),FALSE);
-//		//CMFCToolBarMenuButton btnLoadConfig(ID_LOAD_CONFIG, NULL,GetCmdMgr ()->GetCmdImage (ID_LOAD_CONFIG), _T(""),FALSE);
-//		//n=GetCmdMgr ()->GetCmdImage (ID_LOAD_CONFIG);
-//		//m_wndToolBar.ReplaceButton (ID_LOAD_CONFIG, btnLoadConfig);
-//		//m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_LOAD_CONFIG),_T("Load"));
-//
-//		//CMFCToolBarMenuButton btnBurn(ID_FILE_BATCHBURNHEX, NULL,GetCmdMgr ()->GetCmdImage (ID_FILE_BATCHBURNHEX), _T("Burn"),FALSE);
-//		//CMFCToolBarMenuButton btnBurn(ID_FILE_BATCHBURNHEX, NULL,GetCmdMgr ()->GetCmdImage (ID_FILE_BATCHBURNHEX), _T(""),FALSE);
-//		//m_wndToolBar.ReplaceButton (ID_FILE_BATCHBURNHEX, btnBurn);
-//		//n=m_wndToolBar.CommandToIndex (ID_FILE_BATCHBURNHEX);
-//		//m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_FILE_BATCHBURNHEX),_T("Burn"));
-//		
-//		CMFCToolBarMenuButton btnConnect(ID_CONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_CONNECT2), _T("Connect"),FALSE);
-//		//CMFCToolBarMenuButton btnConnect(ID_CONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_CONNECT2), _T(""),FALSE);
-//		m_wndToolBar.ReplaceButton (ID_CONNECT2, btnConnect);
-//		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_CONNECT2),_T("Connect"));
-//
-//		CMFCToolBarMenuButton btndiDisConnect(ID_DISCONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_DISCONNECT2), _T("DisConn"),FALSE);
-//		//CMFCToolBarMenuButton btndiDisConnect(ID_DISCONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_DISCONNECT2), _T(""),FALSE);
-//		m_wndToolBar.ReplaceButton (ID_DISCONNECT2, btndiDisConnect);
-//		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_DISCONNECT2),_T("DisConn"));
-//
-//		CMFCToolBarMenuButton btnScan(ID_SCAN, NULL,GetCmdMgr ()->GetCmdImage(ID_SCAN), _T("Scan"),FALSE);
-//		//CMFCToolBarMenuButton btnScan(ID_SCAN, NULL,GetCmdMgr ()->GetCmdImage(ID_SCAN), _T(""),FALSE);
-//		m_wndToolBar.ReplaceButton (ID_SCAN, btnScan);
-//		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_SCAN),_T("Scan"));
-//
-//		CMFCToolBarMenuButton btnConfig(ID_BUILDINGCONFIGDB, NULL, GetCmdMgr ()->GetCmdImage(ID_BUILDINGCONFIGDB), _T("Config"),FALSE);
-//		//CMFCToolBarMenuButton btnConnect(ID_CONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_CONNECT2), _T(""),FALSE);
-//		m_wndToolBar.ReplaceButton (ID_BUILDINGCONFIGDB, btnConfig);
-//		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_BUILDINGCONFIGDB),_T("Config"));
-//	}
-//	*/return 1;
-//}
 
 void CMainFrame::OnCheckBuildingBar()
 {
@@ -985,7 +943,13 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 				g_tstat_id = m_product.at(i).product_id;
 				m_isMiniPanel=TRUE;
 				DoConnectToANode(hSelItem); 
-			}else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
+			}
+			else if (m_product.at(i).product_class_id == PM_T3IOA)
+			{
+				g_tstat_id = m_product.at(i).product_id;
+				DoConnectToANode(hSelItem);
+			}
+			else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
 			{
 				g_tstat_id = m_product.at(i).product_id;
 				SwitchToPruductType(DLG_DIALOGT3_VIEW);
@@ -1603,6 +1567,9 @@ void CMainFrame::OnConnect()
 			{
 				//AfxMessageBox(_T("Invalidate IP Address!!"));
 				//goto here;
+				CString strInfo;
+				strInfo.Format(_T("Invalidate IP Address,You can click config button to reset it."));
+				SetPaneString(1, strInfo);
 			}
 			else
 			{
@@ -2251,11 +2218,17 @@ here:
 	    m_nCurView=DLG_DIALOGT38I13O_VIEW;
 		((T38I13O*)m_pViews[m_nCurView])->Fresh();
 	}
+		break;
 	case DLG_DIALOGT332AI_VIEW:
 	{
 	   m_nCurView=DLG_DIALOGT332AI_VIEW;
 	   ((T332AI*)m_pViews[m_nCurView])->Fresh();
-	}
+	}	break;
+	case DLG_DIALOGT38AI8AO :
+		{
+			m_nCurView=DLG_DIALOGT38AI8AO;
+			((T38AI8AO*)m_pViews[m_nCurView])->Fresh();
+		}	break;
 	}
 //here
 }
@@ -3308,8 +3281,9 @@ void CMainFrame::SaveConfigFile()
 {
 	int nret=0;
 	g_bEnableRefreshTreeView = FALSE;
-
-	if(read_one(g_tstat_id,6)<=0)
+	int IDFlag=read_one(g_tstat_id,7);
+	product_register_value[7]=IDFlag;
+	if(IDFlag<=0)
 		return;
 	float version=get_curtstat_version();
 	CString strFilter;
@@ -3326,12 +3300,37 @@ void CMainFrame::SaveConfigFile()
 	SetPaneString(1, strTips);
 	//AfxMessageBox(strTips);
 
-	if(multi_register_value[7]==100)//NC
+	if(product_register_value[7]==100||product_register_value[7]==PM_LightingController)//NC
+	{
+		strTips.Format(_T("Config file \" %s \" is saving, please waiting..."), strFilename);
+		SetPaneString(1, strTips);
+		if (product_register_value[7]==100)
+		{
+		save_schedule_2_file((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
+		}
+		else
+		{
+		save_schedule_2_file_LC((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
+		}
+		
+
+		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
+		SetPaneString(1, strTips);
+	}
+	else if (product_register_value[7]==PM_T38AIOD||
+	product_register_value[7]==PM_T3IOA||
+	product_register_value[7]==PM_T332AI||
+	product_register_value[7]==PM_T3AI16O||
+	product_register_value[7]==PM_T38I13O||
+	product_register_value[7]==PM_T3PERFORMANCE||
+	product_register_value[7]==PM_T34AO||
+	product_register_value[7]==PM_T36CT 
+	        )
 	{
 		strTips.Format(_T("Config file \" %s \" is saving, please waiting..."), strFilename);
 		SetPaneString(1, strTips);
 
-		save_schedule_2_file((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
+		save_T3Modules_file((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
 
 		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
 		SetPaneString(1, strTips);
@@ -3449,6 +3448,12 @@ void CMainFrame::OnDestroy()
 	g_bEnableRefreshTreeView = FALSE;
 	HTREEITEM htiSel = m_pTreeViewCrl->GetSelectedItem();
 	SaveTreeNodeRecordToReg(htiSel);
+
+	if (mbPoll!=NULL)
+	{
+	  delete mbPoll;
+	  mbPoll=NULL;
+	}
 
 	CFrameWndEx::OnDestroy();
 
@@ -3848,6 +3853,10 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 void CMainFrame::ReFresh()
 {
 //	int i;
+	if (!is_connect())
+	{
+		 return;
+	}
 	register_critical_section.Lock();
 	for(int i=0;i<10;i++) //Modify by Fance , tstat 6 has more register than 512;
 	{
@@ -4200,7 +4209,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 				}else
 				{
-						close_com();//关闭所有端口
+						//close_com();//关闭所有端口
 					int nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
 
 
@@ -4345,11 +4354,18 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			multi_register_value_tcp
 			适用于网络口，大数据量
 			*/ 
+			 
 			if(product_Node.BuildingInfo.strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
 			{
 			    if (m_isCM5)
 			    {
-					
+					CStdioFile default_file;
+					CString recordpath;
+					recordpath=g_strExePth+_T("Record.txt");
+					if(default_file.Open(recordpath,CFile::modeCreate | CFile::modeWrite)==0)
+					{
+					return;
+					}
 					int i;
 					int it = 0;
 					float progress;
@@ -4358,15 +4374,21 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 						//register_critical_section.Lock();
 						//int nStart = GetTickCount();
+						CString temp;
 						int itemp = 0;
-						itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100,5);
-						Sleep(100);
+						itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100);
+						
 						if(itemp < 0)
 						{
+						   temp.Format(_T("%d*100=Error\n"),i);
+						   default_file.WriteString(temp);
 							continue;
 						}
 						else						
 						{
+							temp.Format(_T("%d*100=OK\n"),i);
+							default_file.WriteString(temp);
+
 							if (pDlg!=NULL)
 							{
 								progress=float((it+1)*(100/80));
@@ -4378,10 +4400,16 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						
 					}
 					register_critical_section.Unlock();
+
+				
+
+
+
 					//Add by Fance use this product_register_value to unite the register.
 					//Fance_2
 					//memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value_tcp,1024);
-
+					default_file.Flush();
+					default_file.Close();
 					if (it<80)
 					{	
 						AfxMessageBox(_T("Reading abnormal \n Try again!"));
@@ -4568,6 +4596,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				}
 
 			} //COMPort
+			
+		 
+			
+			
+ 
+			
 			else
 			{
 
@@ -4762,6 +4796,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				SwitchToPruductType(DLG_DIALOGT3_VIEW);
 
 			}
+			else if (nFlag == PM_T3IOA){
+				
+			SwitchToPruductType(DLG_DIALOGT38AI8AO);
+			}
 			else if (nFlag == PM_MINIPANEL)
 			{
 				SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
@@ -4783,6 +4821,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{
 			  SwitchToPruductType(DLG_DIALOGT332AI_VIEW);
 			}
+			else if (nFlag==PM_T3IOA)
+			{
+			  SwitchToPruductType(DLG_DIALOGT38AI8AO);
+			}
 			else if(nFlag<PM_NC)	
 			{	
 
@@ -4795,13 +4837,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				{
 					product_type =T3000_6_ADDRESS;
 				}
-				else if(  (nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H)
-					)
+				else if(  (nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H)||(nFlag==PM_TSTAT5G))
 				{
 					product_type = T3000_5EH_LCD_ADDRESS;
 				}
 				else if((nFlag == PM_TSTAT5A) ||(nFlag == PM_TSTAT5B) ||
-					(nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F)||nFlag==PM_TSTAT5G)
+					(nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F))
 				{
 					product_type =T3000_5ABCDFG_LED_ADDRESS;
 				}
@@ -5144,7 +5185,10 @@ UINT _FreshTreeView(LPVOID pParam )
 	CMainFrame* pMain = (CMainFrame*)pParam;
 	while(1)
 	{
-		
+		if (!is_connect())
+		{
+			continue;
+		}
 		Sleep(15000);
 		WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
 
@@ -6407,7 +6451,10 @@ void CMainFrame::OnDatabaseMbpoll()
 {
 	// TODO: Add your command handler code here
 	if (mbPollDlgOpen == TRUE) 
+		{
+		mbPoll->ShowWindow(SW_SHOW);
 		return;
+		}
 
 	mbPollDlgOpen = TRUE;
 

@@ -107,5 +107,5 @@ void local_handler_conf_private_trans_ack(
 	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
 
 void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
-
+CString GetProductName(int ModelID); 
 #endif

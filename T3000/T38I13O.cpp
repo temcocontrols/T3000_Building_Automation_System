@@ -29,11 +29,15 @@ void T38I13O::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MSFLEXGRID_OUTPUT, m_msflexgrid_output);
 	DDX_Control(pDX, IDC_RANGECOMBO, m_comboxRange);
 	DDX_Control(pDX, IDC_EDIT_NAME, m_inNameEdt);
+	DDX_Control(pDX, IDC_BRANDRATE, m_brandratebombox);
+	DDX_Control(pDX, IDC_DELAY, m_delaycombox);
 }
 
 BEGIN_MESSAGE_MAP(T38I13O, CFormView)
 	ON_CBN_SELCHANGE(IDC_RANGECOMBO, &T38I13O::OnCbnSelchangeRangecombo)
 	ON_EN_KILLFOCUS(IDC_EDIT_NAME, &T38I13O::OnEnKillfocusEditName)
+	ON_CBN_SELCHANGE(IDC_BRANDRATE, &T38I13O::OnCbnSelchangeBrandrate)
+	ON_CBN_SELCHANGE(IDC_DELAY, &T38I13O::OnCbnSelchangeDelay)
 END_MESSAGE_MAP()
 
 
@@ -512,6 +516,8 @@ strTemp.Format(_T("%d"),product_register_value[HARDWARE_VER_NUMBER]);
 GetDlgItem(IDC_EDIT_T3HARDWARE)->SetWindowText(strTemp);
 strTemp.Format(_T("%d"),product_register_value[PIC_VER_NUMBER]);
 GetDlgItem(IDC_EDIT_T3PICVERSION)->SetWindowText(strTemp);
+m_brandratebombox.SetCurSel(product_register_value[BAUDRATE]);
+m_delaycombox.SetCurSel(product_register_value[RESPONSE_DELAY]);
 // Input
 CString strresult;
 int regValue;
@@ -693,10 +699,7 @@ void T38I13O::OnCbnSelchangeRangecombo()
 		CString strTemp;
 		int lRow = m_msflexgrid_input.get_RowSel();	
 		int lCol = m_msflexgrid_input.get_ColSel();
-		//if ((strText.GetLength()<=0)||strText.CompareNoCase(m_tempGridString)==0)
-		//{
-		//	return;
-		//}
+		 
 		int sel=m_comboxRange.GetCurSel();
 		m_comboxRange.ShowWindow(FALSE);
 		if (product_register_value[RANGE_INPUT1+lRow-1]==sel)
@@ -808,4 +811,16 @@ void T38I13O::OnEnKillfocusEditName()
 	{
 
 	}
+}
+
+
+void T38I13O::OnCbnSelchangeBrandrate()
+{
+	// TODO: Add your control notification handler code here
+}
+
+
+void T38I13O::OnCbnSelchangeDelay()
+{
+	// TODO: Add your control notification handler code here
 }

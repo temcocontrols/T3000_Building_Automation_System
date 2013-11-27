@@ -74,7 +74,9 @@ public:
 	HICON hIcon;
 	HICON hIcon_Exit;
 
-	 
+	int m_cvalue;
+	int m_crange;
+	long m_sn;
 public:
 	//int m1_inRows;
 	CEdit m_inputNameEdt;
@@ -104,4 +106,5 @@ public:
 	afx_msg void OnClose();
 	CEdit m_Filter;
 	UINT m_filterValue;
+	afx_msg void OnCbnSelchangeValuecombo();
 };

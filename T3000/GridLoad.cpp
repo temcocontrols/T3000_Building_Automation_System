@@ -115,10 +115,10 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		if(!pDlg->m_grid_load.at(iitemp).flash_or_no)
 			continue;
 
-		if(!pDlg->CheckLoadFileForTStat(pDlg->m_grid_load.at(iitemp)))
+		/*if(!pDlg->CheckLoadFileForTStat(pDlg->m_grid_load.at(iitemp)))
 		{
 			continue;
-		}
+		}*/
 		CString status=pDlg->m_FlexGrid.get_TextMatrix(iitemp+1,COL_STATUS);
 		if (status.Find(_T("OK"))>=0)
 		{
@@ -154,16 +154,26 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		{
 			product_type =T3000_6_ADDRESS;
 		}
-		else if((nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H))
+		else if((nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H)||(nFlag == PM_TSTAT5G))
 		{
 			product_type = T3000_5EH_LCD_ADDRESS;
 		}
 		else if((nFlag == PM_TSTAT5A) ||(nFlag == PM_TSTAT5B) ||
-			(nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F) ||
-			(nFlag == PM_TSTAT5G))
+			(nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F) )
 		{
 			product_type =T3000_5ABCDFG_LED_ADDRESS;
 		}
+		else if (nFlag==PM_T38AIOD||
+			nFlag==PM_T3IOA||
+			nFlag==PM_T332AI||
+			nFlag==PM_T3AI16O||
+			nFlag==PM_T38I13O||
+			nFlag==PM_T3PERFORMANCE||
+			nFlag==PM_T34AO||
+			nFlag==PM_T36CT 
+			){
+			product_type =T3000_T3_MODULES;
+			}
 
 		 
 		//Code and comments by Fance
@@ -183,13 +193,14 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 			pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_CONNECTION,_T("On line"));
 
 		}
-		else{
+		else
+		{
 			pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_CONNECTION,_T("Off line"));
 			pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_ENABLE,_T("False"));//flash select
 			failure_number++;	
 			pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_STATUS,_T("Error"));
 			continue;
-			}
+		}
 
 		load_file_every_step temppp;
 		temppp.eight_step=temppp.fifth_step=temppp.first_step=temppp.keep_down=temppp.second_step=temppp.seven_step=temppp.sixth_step=temppp.third_step=temppp.thurth_step=FALSE;
@@ -224,7 +235,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 
 		if(config_file.Open(pDlg->m_grid_load.at(iitemp).hex_file_path.GetString() ,CFile::modeRead | CFile::shareDenyNone))
 		{
-	//		write_one(now_tstat_id,324,0);	
+	        
 			CString strPath=config_file.GetFilePath();
 			CString strFileName=config_file.GetFileTitle();
 			open_file=true;
@@ -235,7 +246,22 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 				if (nowmoder==6||nowmoder==7)
 				{
 				LoadFile2Tstat67(temppp,(LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(),&log_file);
-				} 
+				}
+				else if (product_type==T3000_T3_MODULES)
+				{
+				 //LoadT3Modules(temppp,(LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(),&log_file);
+				LoadFile2Tstat_T3(temppp,(LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(),&log_file);
+				}
+				else if (nowmoder==PM_LightingController)
+				{
+				 config_file.Close();
+
+				 load_file_2_schedule_LC((LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(), now_tstat_id, log_file);
+				}
+				else if (nowmoder==PM_NC)
+				{
+				 load_file_2_schedule_NC((LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(), now_tstat_id, log_file);
+				}
 				else
 				{
 				LoadFile2Tstat(temppp,(LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(),&log_file);
@@ -261,21 +287,15 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 				pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_STATUS,_T("OK"));
 
 				
-			/*	SYSTEMTIME stUTC, stLocal;
-				CString strDatatime;
-				FileTimeToSystemTime(&(fData.ftLastWriteTime), &stUTC);
-				BOOL bRet= SystemTimeToTzSpecificLocalTime(NULL, &stUTC, &stLocal);
-				if (!bRet)
-				{
-					GetSystemTime(&stUTC);
-					SystemTimeToTzSpecificLocalTime(NULL, &stUTC, &stLocal);
-				}
-				strDatatime.Format(_T("%02d. %02d %d, %02d:%02d"), stLocal.wDay,stLocal.wMonth,stLocal.wYear,stLocal.wHour,stLocal.wMinute);
-				pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_LOADEVENT,strDatatime);*/
+		
 			}
-		//	else
-				//failure_number++;
-				config_file.Close();//close file
+			/*if (nowmoder!=PM_LightingController)
+			{
+				config_file.Close();
+			}
+*/
+		 
+				
 				if(log_file.m_hFile!=NULL)
 					log_file.Close();
 				
@@ -444,21 +464,86 @@ BOOL CGridLoad::OnInitDialog()
 
 		switch(m_grid_load.at(i).device)
 		{
-			case 2:strTemp=g_strTstat5a;break;
-			case 1:strTemp=g_strTstat5b;break;
-			case 3:strTemp=g_strTstat5b;break;
-			case 4:strTemp=g_strTstat5c;break;
-			case 12:strTemp=g_strTstat5d;break;
-			case PM_NC:strTemp=g_strnetWork;break;
-			case 17: strTemp=g_strTstat5f;break;
-			case 18:strTemp=g_strTstat5g;break;
-			case 16:strTemp=g_strTstat5e;break;
-			case 19:strTemp=g_strTstat5h;break;
-			case 6:strTemp=g_strTstat6;break;
-			case 7:strTemp=g_strTstat7;break;
-			case PM_TSTAT6_HUM_Chamber:strTemp=g_strHumChamber;break;
+		case PM_TSTAT5A:
+			strTemp="TStat5A";
+			break;
+		case PM_TSTAT5B:
+			strTemp="TStat5B";
+			break;
+		case PM_TSTAT5B2:
+			strTemp="TStat5B2";
+			break;
+		case PM_TSTAT5C:
+			strTemp="TStat5C";
+			break;
+		case PM_TSTAT5D:
+			strTemp="TStat5D";
+			break;
+		case PM_TSTAT5E:
+			strTemp="TStat5E";
+			break;
+		case PM_TSTAT5F:
+			strTemp="TStat5F";
+			break;
+		case PM_TSTAT5G:
+			strTemp="TStat5G";
+			break;
+		case PM_TSTAT5H:
+			strTemp="TStat5H";
+			break;
+		case PM_TSTAT6:
+			strTemp="TStat6";
+			break;
+		case PM_TSTAT7:
+			strTemp="TStat7";
+			break;
+		case PM_NC:
+			strTemp="NC";
+			break;
+		case PM_CM5:
+			strTemp ="CM5";
+			break;
+			//20120424
+		case PM_LightingController:
+			strTemp = "LC";
+			break;
+		case  PM_CO2_NET:
+			strTemp = "CO2 Net";
+			break;
+		case  PM_CO2_RS485:
+			strTemp = "CO2";
+			break;
+		case PM_TSTAT6_HUM_Chamber:
+			strTemp =g_strHumChamber;
+			break;
 
-			default:strTemp=g_strTstat5a;break;
+		case PM_T38AIOD :
+			strTemp="T3-8I13O";
+			break;
+		case PM_T3IOA :
+			strTemp="T3-8IOA";
+			break;
+		case PM_T332AI :
+			strTemp="T3-32AI";
+			break;
+		case PM_T3AI16O :
+			strTemp="T3-8AI160";
+			break;
+		case PM_T38I13O :
+			strTemp="T3-8I13O";
+			break;
+		case PM_T3PERFORMANCE :
+			strTemp="T3-Performance";
+			break;
+		case PM_T34AO :
+			strTemp="T3-4AO";
+			break;
+		case PM_T36CT :
+			strTemp="T3-6CT";
+			break;
+		default:
+			strTemp="TStat";
+			break;
 		}
 		m_FlexGrid.put_TextMatrix(i+1,COL_DEVICETYPE ,strTemp);//product model ===== software version
 		if(m_grid_load.at(i).flash_or_no==false)
@@ -804,6 +889,10 @@ void CGridLoad::OnBnClickedConfigbutton()
 				m_grid_load.at(iitemp).device =6;//Tstat6
 			else if(str_temp==g_strTstat5h)
 				m_grid_load.at(iitemp).device =7;//Tstat7
+			else if (str_temp==_T("LC"))
+			{
+			m_grid_load.at(iitemp).device =PM_LightingController;
+			}
 			m_grid_load.at(iitemp).hex_file_path=m_FlexGrid.get_TextMatrix(iitemp+1,COL_FILENAME);//hex file path
 			m_grid_load.at(iitemp).hex_file_path.Trim();
 			str_temp=m_FlexGrid.get_TextMatrix(iitemp+1,COL_ENABLE);//flash select 
@@ -819,12 +908,11 @@ void CGridLoad::OnBnClickedConfigbutton()
 	{
 	TerminateThread(m_pLoadBackCheckThread->m_hThread,dwExidCode);
 	m_pLoadBackCheckThread=NULL;
-
 	Sleep(300);
 	}
 
-	//	SetPaneString("Loading...");
-		//m_ploadThread=AfxBeginThread(run_back_ground_load_thread,this);////////////////////////create thread,read information	
+//	SetPaneString("Loading...");
+//m_ploadThread=AfxBeginThread(run_back_ground_load_thread,this);////////////////////////create thread,read information	
 // 		if (m_bProductType)
 // 		{
 // 			m_ploadThread=AfxBeginThread(run_back_ground_load_thread,this);////////////////////////create thread,read information	
@@ -836,7 +924,7 @@ void CGridLoad::OnBnClickedConfigbutton()
 		{
 			m_eTstatLoadFinish.ResetEvent(); //no signal
 			m_ploadThread=AfxBeginThread(run_back_ground_load_thread,this);////////////////////////create thread,read information	
-			m_ploadThread=AfxBeginThread(_NC_LoadThread,this);////////////////////////create thread,read information	
+		//	m_ploadThread=AfxBeginThread(_NC_LoadThread,this);////////////////////////create thread,read information	
 		}
 	//	showing_text="";
 		SetTimer(1,10,NULL);/////////////10 ms is better 
@@ -887,15 +975,7 @@ void CGridLoad::OnTimer(UINT_PTR nIDEvent)
 
 	CDialog::OnTimer(nIDEvent);
 }
-/*
-void CGridLoad::_change_showing_text_variable(CString str)
-{
-	critical_section.Lock();
-	showing_text=str;
-	critical_section.Unlock();
-	
-}
-\*/
+ 
 
 
 
@@ -1053,20 +1133,86 @@ void CGridLoad::LoadDeviceToGrid()
 		m_FlexGrid.put_TextMatrix(i+1,COL_SWVERSION, strTemp);//hardware revision
 		switch(m_grid_load.at(i).device)
 		{
-		case 2:strTemp=g_strTstat5a;break;
-		case 1:strTemp=g_strTstat5b;break;
-		case 3:strTemp=g_strTstat5b;break;
-		case 4:strTemp=g_strTstat5c;break;
-		case 12:strTemp=g_strTstat5d;break;
-		case PM_NC:strTemp=g_strnetWork;break;
-		case 17: strTemp=g_strTstat5f;break;
-		case 18:strTemp=g_strTstat5g;break;
-		case 16:strTemp=g_strTstat5e;break;
-		case 19:strTemp=g_strTstat5h;break;
-		case 6:strTemp=g_strTstat6;break;
-		case 7:strTemp=g_strTstat7;break;
-		case PM_TSTAT6_HUM_Chamber:strTemp=g_strHumChamber;break;
-		default:strTemp=g_strTstat5a;break;
+		case PM_TSTAT5A:
+			strTemp="TStat5A";
+			break;
+		case PM_TSTAT5B:
+			strTemp="TStat5B";
+			break;
+		case PM_TSTAT5B2:
+			strTemp="TStat5B2";
+			break;
+		case PM_TSTAT5C:
+			strTemp="TStat5C";
+			break;
+		case PM_TSTAT5D:
+			strTemp="TStat5D";
+			break;
+		case PM_TSTAT5E:
+			strTemp="TStat5E";
+			break;
+		case PM_TSTAT5F:
+			strTemp="TStat5F";
+			break;
+		case PM_TSTAT5G:
+			strTemp="TStat5G";
+			break;
+		case PM_TSTAT5H:
+			strTemp="TStat5H";
+			break;
+		case PM_TSTAT6:
+			strTemp="TStat6";
+			break;
+		case PM_TSTAT7:
+			strTemp="TStat7";
+			break;
+		case PM_NC:
+			strTemp="NC";
+			break;
+		case PM_CM5:
+			strTemp ="CM5";
+			break;
+			//20120424
+		case PM_LightingController:
+			strTemp = "LC";
+			break;
+		case  PM_CO2_NET:
+			strTemp = "CO2 Net";
+			break;
+		case  PM_CO2_RS485:
+			strTemp = "CO2";
+			break;
+		case PM_TSTAT6_HUM_Chamber:
+			strTemp =g_strHumChamber;
+			break;
+
+		case PM_T38AIOD :
+			strTemp="T3-8I13O";
+			break;
+		case PM_T3IOA :
+			strTemp="T3-8IOA";
+			break;
+		case PM_T332AI :
+			strTemp="T3-32AI";
+			break;
+		case PM_T3AI16O :
+			strTemp="T3-8AI160";
+			break;
+		case PM_T38I13O :
+			strTemp="T3-8I13O";
+			break;
+		case PM_T3PERFORMANCE :
+			strTemp="T3-Performance";
+			break;
+		case PM_T34AO :
+			strTemp="T3-4AO";
+			break;
+		case PM_T36CT :
+			strTemp="T3-6CT";
+			break;
+		default:
+			strTemp="TStat";
+			break;
 		}
 		m_FlexGrid.put_TextMatrix(i+1,COL_DEVICETYPE ,strTemp);//product model ===== software version
 		if(m_grid_load.at(i).flash_or_no==false)
@@ -1237,7 +1383,7 @@ UINT _NC_LoadThread(LPVOID pParam)
 // 			open_file=true;
 			pDlg->m_infoListBox.InsertString(0,_T(""));
 
-			load_file_2_schedule((LPTSTR)(LPCTSTR)strConfigFile, now_tstat_id, log_file);
+			load_file_2_schedule_NC((LPTSTR)(LPCTSTR)strConfigFile, now_tstat_id, log_file);
 
 		}
 

@@ -7,6 +7,7 @@
 #include  "ADO\ADO.h"
 #include "MainFrm.h"
 #include <locale.h>
+#include "WriteSingleRegDlg.h"
 DWORD WINAPI _UpdateThread(LPVOID pParam);
 //DWORD WINAPI _Update_TMEPHUM_Thread(LPVOID pParam);
 //UINT _UpdateSensorTableThread(LPVOID pParam);
@@ -55,13 +56,15 @@ CHumChamber::CHumChamber()
 		hFirstThread=NULL;
  
 		m_ReadOnly=TRUE;
+		
+	
     }
 
 CHumChamber::~CHumChamber()
 {
 if(hFirstThread != NULL)
 	TerminateThread(hFirstThread, 0);
-
+	
 }
 
 void CHumChamber::DoDataExchange(CDataExchange* pDX)
@@ -139,6 +142,50 @@ ON_BN_CLICKED(IDC_START, &CHumChamber::OnBnClickedStart)
 ON_BN_CLICKED(IDC_STOP, &CHumChamber::OnBnClickedStop)
 ON_BN_CLICKED(IDC_CONTINUE, &CHumChamber::OnBnClickedContinue)
 ON_MESSAGE(WM_MY_MESSAGE,&CHumChamber::my_message)
+ON_EN_SETFOCUS(IDC_NUM_SENSOR, &CHumChamber::OnEnSetfocusNumSensor)
+ 
+
+ON_EN_SETFOCUS(IDC_SLAVE_ID, &CHumChamber::OnEnSetfocusSlaveId)
+ON_EN_SETFOCUS(IDC_START_POINT, &CHumChamber::OnEnSetfocusStartPoint)
+ON_EN_SETFOCUS(IDC_TEMP_TOL, &CHumChamber::OnEnSetfocusTempTol)
+ON_EN_SETFOCUS(IDC_HUM_TOL, &CHumChamber::OnEnSetfocusHumTol)
+
+
+ON_EN_SETFOCUS(IDC_TEMP1, &CHumChamber::OnEnSetfocusTemp1)
+ON_EN_SETFOCUS(IDC_TEMP3, &CHumChamber::OnEnSetfocusTemp3)
+ON_EN_SETFOCUS(IDC_TEMP4, &CHumChamber::OnEnSetfocusTemp4)
+ON_EN_SETFOCUS(IDC_TEMP5, &CHumChamber::OnEnSetfocusTemp5)
+ON_EN_SETFOCUS(IDC_TEMP6, &CHumChamber::OnEnSetfocusTemp6)
+ON_EN_SETFOCUS(IDC_TEMP7, &CHumChamber::OnEnSetfocusTemp7)
+ON_EN_SETFOCUS(IDC_TEMP8, &CHumChamber::OnEnSetfocusTemp8)
+ON_EN_SETFOCUS(IDC_TEMP9, &CHumChamber::OnEnSetfocusTemp9)
+ON_EN_SETFOCUS(IDC_TEMP10,&CHumChamber::OnEnSetfocusTemp10)
+
+ON_EN_SETFOCUS(IDC_HUM1, &CHumChamber::OnEnSetfocusHum1)
+ON_EN_SETFOCUS(IDC_HUM2, &CHumChamber::OnEnSetfocusHum2)
+ON_EN_SETFOCUS(IDC_HUM3, &CHumChamber::OnEnSetfocusHum3)
+ON_EN_SETFOCUS(IDC_HUM4, &CHumChamber::OnEnSetfocusHum4)
+ON_EN_SETFOCUS(IDC_HUM5, &CHumChamber::OnEnSetfocusHum5)
+ON_EN_SETFOCUS(IDC_HUM6, &CHumChamber::OnEnSetfocusHum6)
+ON_EN_SETFOCUS(IDC_HUM7, &CHumChamber::OnEnSetfocusHum7)
+ON_EN_SETFOCUS(IDC_HUM8, &CHumChamber::OnEnSetfocusHum8)
+ON_EN_SETFOCUS(IDC_HUM9, &CHumChamber::OnEnSetfocusHum9)
+ON_EN_SETFOCUS(IDC_HUM10,&CHumChamber::OnEnSetfocusHum10)
+
+ON_EN_SETFOCUS(IDC_TEMP2, &CHumChamber::OnEnSetfocusTemp2)
+
+
+ON_EN_SETFOCUS(IDC_TIME1, &CHumChamber::OnEnSetfocusTime1)
+ON_EN_SETFOCUS(IDC_TIME2, &CHumChamber::OnEnSetfocusTime2)
+ON_EN_SETFOCUS(IDC_TIME3, &CHumChamber::OnEnSetfocusTime3)
+ON_EN_SETFOCUS(IDC_TIME4, &CHumChamber::OnEnSetfocusTime4)
+ON_EN_SETFOCUS(IDC_TIME5, &CHumChamber::OnEnSetfocusTime5)
+ON_EN_SETFOCUS(IDC_TIME6, &CHumChamber::OnEnSetfocusTime6)
+ON_EN_SETFOCUS(IDC_TIME7, &CHumChamber::OnEnSetfocusTime7)
+ON_EN_SETFOCUS(IDC_TIME8, &CHumChamber::OnEnSetfocusTime8)
+ON_EN_SETFOCUS(IDC_TIME9, &CHumChamber::OnEnSetfocusTime9)
+ON_EN_SETFOCUS(IDC_TIME10, &CHumChamber::OnEnSetfocusTime10)
+
 END_MESSAGE_MAP()
 
 
@@ -157,6 +204,7 @@ void CHumChamber::OnInitialUpdate()
  m_Start=FALSE;
 //hSecondThread=CreateThread(NULL,NULL,_UpdateThread,this,NULL,0);
 }
+
 // CHumChamber diagnostics
 //初始化23个寄存器号，从数据库中读出来
 void CHumChamber::InitialRegisterNo()
@@ -396,7 +444,7 @@ short read_temp;
 		case 9:g_strScanInfo = _T("Communicating . . . . . . . . . .");break; 
 		case 10:g_strScanInfo = _T("Communicating . . . . . . . . . . .");break; 
 		}
-		PostMessage(WM_MY_MESSAGE,1,0);
+	//	PostMessage(WM_MY_MESSAGE,1,0);
 		read_temp=read_one(g_tstat_id,TestState.Start_ID);
 		if (read_temp>0)
 		{
@@ -985,11 +1033,14 @@ void CHumChamber::OnEnKillfocusSlaveId()
 
 	temp_float=(float)_wtof(str_text);
 	m_slaveid=(UINT)temp_float;
-	BOOL ret=WriteValueToRegID(SlaveID.Start_ID,m_slaveid);
+	/*Set(SlaveID.Start_ID,m_slaveid);
 	if (!ret)
 	{
 	 AfxMessageBox(_T("Write Fail"));
-	}
+	}*/
+	//CWriteSingleRegDlg //m_writesingleregdlg;
+	////m_writesingleregdlg.Set(SlaveID.Start_ID,m_slaveid);
+	////m_writesingleregdlg.DoModal();;
 	str_text.Format(_T("%d"),(multi_register_value[SlaveID.Start_ID])); 
 	GetDlgItem(IDC_SLAVE_ID)->SetWindowText(str_text);
 }
@@ -997,23 +1048,36 @@ void CHumChamber::OnEnKillfocusSlaveId()
 
 void CHumChamber::OnEnKillfocusTemp1()
 {
-	float temp_float;
-	CString str_text;
-	GetDlgItem(IDC_TEMP1)->GetWindowText(str_text);
-	//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
-	temp_float=(float)_wtof(str_text);
-	m_temp1=(UINT)temp_float*10;
-	BOOL ret=WriteValueToRegID(First_Calibration_Points_Temp.Start_ID,m_temp1);
+	
+	/*Set(First_Calibration_Points_Temp.Start_ID,m_temp1);
 	if (!ret)
 	{
 		AfxMessageBox(_T("Write Fail"));
+	}*/
+	BOOL flag=TRUE;
+	if (flag)
+	{
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TEMP1)->GetWindowText(str_text);
+		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+		temp_float=(float)_wtof(str_text);
+		m_temp1=(UINT)temp_float*10;
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Temp.Start_ID,m_temp1);
+		////m_writesingleregdlg.DoModal();
+		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID]/10.0)); 
+		GetDlgItem(IDC_TEMP1)->SetWindowText(str_text);
+		flag=FALSE;
 	}
-	str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID]/10.0)); 
-	GetDlgItem(IDC_TEMP1)->SetWindowText(str_text);
 
 
-	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,First_Calibration_Points_Temp.Start_ID,m_temp1,
-		product_register_value[MODBUS_UNIVERSAL_SET],this->m_hWnd,IDC_SETVALUE2,_T("UNIVERSAL SET"));
+
+	
+
+
+	//Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,First_Calibration_Points_Temp.Start_ID,m_temp1,
+	//	product_register_value[MODBUS_UNIVERSAL_SET],this->m_hWnd,IDC_SETVALUE2,_T("UNIVERSAL SET"));
 
 }
 
@@ -1027,11 +1091,15 @@ void CHumChamber::OnEnKillfocusTemp2()
 		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
 		temp_float=(float)_wtof(str_text);
 		m_temp2=(UINT)temp_float*10;
-		BOOL ret=WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+3,m_temp2);
+		/*Set(First_Calibration_Points_Temp.Start_ID+3,m_temp2);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Temp.Start_ID+3,m_temp2);
+		////m_writesingleregdlg.DoModal();;
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+3]/10.0)); 
 		GetDlgItem(IDC_TEMP2)->SetWindowText(str_text);
 	}
@@ -1043,11 +1111,15 @@ void CHumChamber::OnEnKillfocusTemp3()
 	//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
 	temp_float=(float)_wtof(str_text);
 	m_temp3=(UINT)temp_float*10;
-    BOOL ret=WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+6,m_temp3);
+   /* Set(First_Calibration_Points_Temp.Start_ID+6,m_temp3);
 	if (!ret)
 	{
 		AfxMessageBox(_T("Write Fail"));
-	}
+	}*/
+	//CWriteSingleRegDlg //m_writesingleregdlg;
+	//m_writesingleregdlg.Set(First_Calibration_Points_Temp.Start_ID+6,m_temp3);
+	////m_writesingleregdlg.DoModal();;
+
 	str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+6]/10.0)); 
 	GetDlgItem(IDC_TEMP3)->SetWindowText(str_text);
 	}
@@ -1061,11 +1133,15 @@ void CHumChamber::OnEnKillfocusTemp4()
 	 
 	temp_float=(float)_wtof(str_text);
 	m_temp4=(UINT)temp_float*10;
-   BOOL ret=WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+9,m_temp4);
+ /*  Set(First_Calibration_Points_Temp.Start_ID+9,m_temp4);
    if (!ret)
    {
 	   AfxMessageBox(_T("Write Fail"));
-   }
+   }*/
+   //CWriteSingleRegDlg //m_writesingleregdlg;
+	//m_writesingleregdlg.Set(First_Calibration_Points_Temp.Start_ID+9,m_temp4);
+	////m_writesingleregdlg.DoModal();;
+
 	str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+9]/10.0)); 
 	 
 	GetDlgItem(IDC_TEMP4)->SetWindowText(str_text);
@@ -1086,11 +1162,15 @@ void CHumChamber::OnEnKillfocusTemp5()
 	//	str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
 		temp_float=(float)_wtof(str_text);
 		m_temp5=(UINT)(temp_float*10);
-		BOOL ret=WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+12,m_temp5);
+		/*Set(First_Calibration_Points_Temp.Start_ID+12,m_temp5);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Temp.Start_ID+12,m_temp5);
+		////m_writesingleregdlg.DoModal();;
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+12]/10.0)); 
 		GetDlgItem(IDC_TEMP5)->SetWindowText(str_text);
 	 
@@ -1111,11 +1191,15 @@ void CHumChamber::OnEnKillfocusTemp6()
 		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
 		temp_float=(float)_wtof(str_text);
 		m_temp6=(UINT)(temp_float*10);
-		BOOL ret=WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+15,m_temp6);
+		/*Set(First_Calibration_Points_Temp.Start_ID+15,m_temp6);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Temp.Start_ID+15,m_temp6);
+		////m_writesingleregdlg.DoModal();;
+
 
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+15]/10.0)); 
 		GetDlgItem(IDC_TEMP6)->SetWindowText(str_text);
@@ -1137,11 +1221,16 @@ void CHumChamber::OnEnKillfocusTemp7()
 		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
 		temp_float=(float)_wtof(str_text);
 		m_temp7=(UINT)(temp_float*10);
-		BOOL ret=WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+18,m_temp7);
+		/*Set(First_Calibration_Points_Temp.Start_ID+18,m_temp7);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Temp.Start_ID+18,m_temp7);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+18]/10.0)); 
 		GetDlgItem(IDC_TEMP7)->SetWindowText(str_text);
 	 
@@ -1161,11 +1250,16 @@ void CHumChamber::OnEnKillfocusTemp8()
 		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
 		temp_float=(float)_wtof(str_text);
 		m_temp8=(UINT)(temp_float*10);
-		BOOL ret=WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+21,m_temp8);
+		/*Set(First_Calibration_Points_Temp.Start_ID+21,m_temp8);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Temp.Start_ID+21,m_temp8);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+21]/10.0)); 
 		GetDlgItem(IDC_TEMP8)->SetWindowText(str_text);
 	}
@@ -1183,11 +1277,16 @@ void CHumChamber::OnEnKillfocusTemp9()
 		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
 		temp_float=(float)_wtof(str_text);
 		m_temp9=(UINT)(temp_float*10);
-		BOOL ret=WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+24,m_temp9);
+		/*Set(First_Calibration_Points_Temp.Start_ID+24,m_temp9);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Temp.Start_ID+24,m_temp9);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+24]/10.0)); 
 		GetDlgItem(IDC_TEMP9)->SetWindowText(str_text);
 	}
@@ -1207,11 +1306,16 @@ void CHumChamber::OnEnKillfocusTemp10()
 		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
 		temp_float=(float)_wtof(str_text);
 		m_temp10=(UINT)(temp_float*10);
-		BOOL  ret=WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+27,m_temp10);
+		/*Set(First_Calibration_Points_Temp.Start_ID+27,m_temp10);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Temp.Start_ID+27,m_temp10);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Temp.Start_ID+27]/10.0)); 
 		GetDlgItem(IDC_TEMP10)->SetWindowText(str_text);
  
@@ -1232,11 +1336,15 @@ void CHumChamber::OnEnKillfocusHum1()
 		//str_text.Delete(str_text.GetLength()-1,1);//delete % 
 		temp_float=(float)_wtof(str_text);
 		m_hum1=(UINT)(temp_float*10);
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Hum.Start_ID,m_hum1);
+		/*Set(First_Calibration_Points_Hum.Start_ID,m_hum1);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Hum.Start_ID,m_hum1);
+		////m_writesingleregdlg.DoModal();;
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID]/10.0)); 
 		GetDlgItem(IDC_HUM1)->SetWindowText(str_text);
 
@@ -1256,11 +1364,16 @@ void CHumChamber::OnEnKillfocusHum2()
 	//	str_text.Delete(str_text.GetLength()-1,1);//delete % 
 		temp_float=(float)_wtof(str_text);
 		m_hum2=(UINT)(temp_float*10);
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+3,m_hum2);
+		/*Set(First_Calibration_Points_Hum.Start_ID+3,m_hum2);
 		if (!ret)
 		{
-			AfxMessageBox(_T("Write Fail"));
-		}
+		AfxMessageBox(_T("Write Fail"));
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Hum.Start_ID+3,m_hum2);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+3]/10.0)); 
 		GetDlgItem(IDC_HUM2)->SetWindowText(str_text);
 
@@ -1281,11 +1394,16 @@ void CHumChamber::OnEnKillfocusHum3()
 	//	str_text.Delete(str_text.GetLength()-1,1);//delete % 
 		temp_float=(float)_wtof(str_text);
 		m_hum3=(UINT)(temp_float*10);
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+6,m_hum3);
+		/*Set(First_Calibration_Points_Hum.Start_ID+6,m_hum3);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Hum.Start_ID+6,m_hum3);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+6]/10.0)); 
 		GetDlgItem(IDC_HUM3)->SetWindowText(str_text);
 	}
@@ -1304,11 +1422,16 @@ void CHumChamber::OnEnKillfocusHum4()
 	//	str_text.Delete(str_text.GetLength()-1,1);//delete % 
 		temp_float=(float)_wtof(str_text);
 		m_hum4=(UINT)(temp_float*10);
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+9,m_hum4);
+		/*Set(First_Calibration_Points_Hum.Start_ID+9,m_hum4);
 		if (!ret)
 		{
-			AfxMessageBox(_T("Write Fail"));
-		}
+		AfxMessageBox(_T("Write Fail"));
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Hum.Start_ID+9,m_hum4);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+9]/10.0)); 
 		GetDlgItem(IDC_HUM4)->SetWindowText(str_text);
 	}
@@ -1328,11 +1451,16 @@ void CHumChamber::OnEnKillfocusHum5()
 		//str_text.Delete(str_text.GetLength()-1,1);//delete % 
 		temp_float=(float)_wtof(str_text);
 		m_hum5=(UINT)(temp_float*10);
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+12,m_hum5);
+		/*Set(First_Calibration_Points_Hum.Start_ID+12,m_hum5);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Hum.Start_ID+12,m_hum5);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+12]/10.0)); 
 		GetDlgItem(IDC_HUM5)->SetWindowText(str_text);
 	}
@@ -1352,11 +1480,16 @@ void CHumChamber::OnEnKillfocusHum6()
 	//	str_text.Delete(str_text.GetLength()-1,1);//delete % 
 		temp_float=(float)_wtof(str_text);
 		m_hum6=(UINT)(temp_float*10);
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+15,m_hum6);
+		/*Set(First_Calibration_Points_Hum.Start_ID+15,m_hum6);
 		if (!ret)
 		{
-			AfxMessageBox(_T("Write Fail"));
-		}
+		AfxMessageBox(_T("Write Fail"));
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Hum.Start_ID+15,m_hum6);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+15]/10.0)); 
 		GetDlgItem(IDC_HUM6)->SetWindowText(str_text);
 	}
@@ -1376,12 +1509,17 @@ void CHumChamber::OnEnKillfocusHum7()
 	//	str_text.Delete(str_text.GetLength()-1,1);//delete % 
 		temp_float=(float)_wtof(str_text);
 		m_hum7=(UINT)(temp_float*10);
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+18,m_hum7);
-		
+		/*Set(First_Calibration_Points_Hum.Start_ID+18,m_hum7);
+
 		if (!ret)
 		{
-			AfxMessageBox(_T("Write Fail"));
-		}
+		AfxMessageBox(_T("Write Fail"));
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Hum.Start_ID+18,m_hum7);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+18]/10.0)); 
 		GetDlgItem(IDC_HUM7)->SetWindowText(str_text);
 	}
@@ -1401,11 +1539,16 @@ void CHumChamber::OnEnKillfocusHum8()
 	//	str_text.Delete(str_text.GetLength()-1,1);//delete % 
 		temp_float=(float)_wtof(str_text);
 		m_hum8=(UINT)(temp_float*10);
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+21,m_hum8);
+		/*Set(First_Calibration_Points_Hum.Start_ID+21,m_hum8);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Hum.Start_ID+21,m_hum8);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+21]/10.0)); 
 		GetDlgItem(IDC_HUM8)->SetWindowText(str_text);
 	}
@@ -1425,11 +1568,16 @@ void CHumChamber::OnEnKillfocusHum9()
 		//str_text.Delete(str_text.GetLength()-1,1);//delete % 
 		temp_float=(float)_wtof(str_text);
 		m_hum9=(UINT)(temp_float*10);
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+24,m_hum9);
+		/*Set(First_Calibration_Points_Hum.Start_ID+24,m_hum9);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Hum.Start_ID+24,m_hum9);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+24]/10.0)); 
 		GetDlgItem(IDC_HUM9)->SetWindowText(str_text);
 	}
@@ -1449,11 +1597,16 @@ void CHumChamber::OnEnKillfocusHum10()
 		//str_text.Delete(str_text.GetLength()-1,1);//delete % 
 		temp_float=(float)_wtof(str_text);
 		m_hum10=(UINT)temp_float*10;
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+27,m_hum10);
+		/*Set(First_Calibration_Points_Hum.Start_ID+27,m_hum10);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Hum.Start_ID+27,m_hum10);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%0.1f"),(multi_register_value[First_Calibration_Points_Hum.Start_ID+27]/10.0)); 
 		GetDlgItem(IDC_HUM10)->SetWindowText(str_text);
 	}
@@ -1478,11 +1631,16 @@ void CHumChamber::OnEnKillfocusTime1()
 		GetDlgItem(IDC_TIME1)->GetWindowText(str_text);
 		temp_float=(float)_wtof(str_text);
 		m_time1=(UINT)(temp_float);
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Time.Start_ID,m_time1);
+		/*Set(First_Calibration_Points_Time.Start_ID,m_time1);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Time.Start_ID,m_time1);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%d"),(multi_register_value[First_Calibration_Points_Time.Start_ID])); 
 		GetDlgItem(IDC_TIME1)->SetWindowText(str_text);
 //show the left time
@@ -1508,11 +1666,16 @@ void CHumChamber::OnEnKillfocusTime2()
 		GetDlgItem(IDC_TIME2)->GetWindowText(str_text);
 		temp_float=(float)_wtof(str_text);
 		m_time2=(UINT)temp_float;
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Time.Start_ID+3,m_time2);
+		/*Set(First_Calibration_Points_Time.Start_ID+3,m_time2);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Time.Start_ID+3,m_time2);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%d"),(multi_register_value[First_Calibration_Points_Time.Start_ID+3])); 
 		GetDlgItem(IDC_TIME2)->SetWindowText(str_text);
 
@@ -1533,11 +1696,16 @@ void CHumChamber::OnEnKillfocusTime3()
 		GetDlgItem(IDC_TIME3)->GetWindowText(str_text);
 		temp_float=(float)_wtof(str_text);
 		m_time3=(UINT)temp_float;
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Time.Start_ID+6,m_time3);
+		/*Set(First_Calibration_Points_Time.Start_ID+6,m_time3);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Time.Start_ID+6,m_time3);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%d"),(multi_register_value[First_Calibration_Points_Time.Start_ID+6])); 
 		GetDlgItem(IDC_TIME3)->SetWindowText(str_text);
 
@@ -1557,12 +1725,17 @@ void CHumChamber::OnEnKillfocusTime4()
 		GetDlgItem(IDC_TIME4)->GetWindowText(str_text);
 		temp_float=(float)_wtof(str_text);
 		m_time4=(UINT)temp_float;
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Time.Start_ID+9,m_time4);
+		/*Set(First_Calibration_Points_Time.Start_ID+9,m_time4);
 		
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Time.Start_ID+9,m_time4);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%d"),(multi_register_value[First_Calibration_Points_Time.Start_ID+9])); 
 		GetDlgItem(IDC_TIME4)->SetWindowText(str_text);
 
@@ -1583,12 +1756,17 @@ void CHumChamber::OnEnKillfocusTime5()
 		GetDlgItem(IDC_TIME5)->GetWindowText(str_text);
 		temp_float=(float)_wtof(str_text);
 		m_time5=(UINT)temp_float;
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Time.Start_ID+12,m_time5);
-		
+		/*Set(First_Calibration_Points_Time.Start_ID+12,m_time5);
+
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}str_text.Format(_T("%d"),(multi_register_value[First_Calibration_Points_Time.Start_ID+12])); 
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Time.Start_ID+12,m_time5);
+		////m_writesingleregdlg.DoModal();;
+		
+		str_text.Format(_T("%d"),(multi_register_value[First_Calibration_Points_Time.Start_ID+12])); 
 		GetDlgItem(IDC_TIME5)->SetWindowText(str_text);
 
 	CString str_master_id;
@@ -1608,12 +1786,17 @@ void CHumChamber::OnEnKillfocusTime6()
 		GetDlgItem(IDC_TIME6)->GetWindowText(str_text);
 		temp_float=(float)_wtof(str_text);
 		m_time6=(UINT)temp_float;
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Time.Start_ID+15,m_time6);
+		/*Set(First_Calibration_Points_Time.Start_ID+15,m_time6);
 		
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}str_text.Format(_T("%d"),(multi_register_value[First_Calibration_Points_Time.Start_ID+15])); 
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Time.Start_ID+15,m_time6);
+		////m_writesingleregdlg.DoModal();;
+
+		str_text.Format(_T("%d"),(multi_register_value[First_Calibration_Points_Time.Start_ID+15])); 
 		GetDlgItem(IDC_TIME6)->SetWindowText(str_text);
 
 	CString str_master_id;
@@ -1633,12 +1816,17 @@ void CHumChamber::OnEnKillfocusTime7()
 		GetDlgItem(IDC_TIME7)->GetWindowText(str_text);
 		temp_float=(float)_wtof(str_text);
 		m_time7=(UINT)temp_float;
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Time.Start_ID+18,m_time7);
+		/*Set(First_Calibration_Points_Time.Start_ID+18,m_time7);
 		
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Time.Start_ID+18,m_time7);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%d"),(multi_register_value[First_Calibration_Points_Time.Start_ID+18])); 
 		GetDlgItem(IDC_TIME7)->SetWindowText(str_text);
 
@@ -1659,12 +1847,17 @@ void CHumChamber::OnEnKillfocusTime8()
 		GetDlgItem(IDC_TIME8)->GetWindowText(str_text);
 		temp_float=(float)_wtof(str_text);
 		m_time8=(UINT)temp_float;
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Time.Start_ID+21,m_time8);
+		/*Set(First_Calibration_Points_Time.Start_ID+21,m_time8);
 		
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Time.Start_ID+21,m_time8);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%d"),(multi_register_value[First_Calibration_Points_Time.Start_ID+21])); 
 		GetDlgItem(IDC_TIME8)->SetWindowText(str_text);
 
@@ -1690,11 +1883,16 @@ void CHumChamber::OnEnKillfocusTime9()
 		GetDlgItem(IDC_TIME9)->GetWindowText(str_text);
 		temp_float=(float)_wtof(str_text);
 		m_time9=(UINT)temp_float;
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Time.Start_ID+24,m_time9);
+		/*Set(First_Calibration_Points_Time.Start_ID+24,m_time9);
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Time.Start_ID+24,m_time9);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%d"),(multi_register_value[First_Calibration_Points_Time.Start_ID+24])); 
 		GetDlgItem(IDC_TIME9)->SetWindowText(str_text);
 
@@ -1723,12 +1921,17 @@ void CHumChamber::OnEnKillfocusTime10()
 		GetDlgItem(IDC_TIME10)->GetWindowText(str_text);
 		temp_float=(float)_wtof(str_text);
 		m_time10=(UINT)temp_float;
-		BOOL ret =WriteValueToRegID(First_Calibration_Points_Time.Start_ID+27,m_time10);
+		/*Set(First_Calibration_Points_Time.Start_ID+27,m_time10);
 		
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(First_Calibration_Points_Time.Start_ID+27,m_time10);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%d"),(multi_register_value[First_Calibration_Points_Time.Start_ID+27])); 
 		GetDlgItem(IDC_TIME10)->SetWindowText(str_text);
 
@@ -1758,12 +1961,17 @@ void CHumChamber::OnEnKillfocusSensorId()
 		 
 		temp_float=(float)_wtof(str_text);
 		m_sensorid=(UINT)temp_float;
-		BOOL ret =WriteValueToRegID(CurrentTestSensor.Start_ID,m_sensorid);
+		/*Set(CurrentTestSensor.Start_ID,m_sensorid);
 		
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(CurrentTestSensor.Start_ID,m_sensorid);
+		////m_writesingleregdlg.DoModal();;
+
+
 		str_text.Format(_T("%d"),(multi_register_value[CurrentTestSensor.Start_ID])); 
 		GetDlgItem(IDC_SENSOR_ID)->SetWindowText(str_text);
 	
@@ -1780,12 +1988,16 @@ void CHumChamber::OnEnKillfocusHumTol()
 		//str_text.Delete(str_text.GetLength()-1,1);//delete % 
 		temp_float=(float)_wtof(str_text);
 		m_humtolerance=(UINT)(temp_float*10);
-		BOOL ret =WriteValueToRegID(HumTolenrence.Start_ID,m_humtolerance);
+		/*Set(HumTolenrence.Start_ID,m_humtolerance);
 		
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		//m_writesingleregdlg.Set(HumTolenrence.Start_ID,m_humtolerance);
+		////m_writesingleregdlg.DoModal();;
+
 		str_text.Format(_T("%0.1f%%"),(multi_register_value[HumTolenrence.Start_ID]/10.0)); 
 		GetDlgItem(IDC_HUM_TOL)->SetWindowText(str_text);
 
@@ -1801,12 +2013,17 @@ void CHumChamber::OnEnKillfocusTempTol()
 	//AfxMessageBox(str_text);
 	temp_float=(float)_wtof(str_text);
 	m_temptolerance=(UINT)(temp_float*10);
- BOOL ret =WriteValueToRegID(TempTolerence.Start_ID,m_temptolerance);
- if (!ret)
- {
-	 AfxMessageBox(_T("Write Fail"));
- }
-	  str_text.Format(_T("%0.1f°C"),( short)multi_register_value[TempTolerence.Start_ID]/10.0);
+ //Set(TempTolerence.Start_ID,m_temptolerance);
+ //if (!ret)
+ //{
+	// AfxMessageBox(_T("Write Fail"));
+ //}
+ //CWriteSingleRegDlg //m_writesingleregdlg;
+	//m_writesingleregdlg.Set(TempTolerence.Start_ID,m_temptolerance);
+	 
+	////m_writesingleregdlg.DoModal();;
+
+	str_text.Format(_T("%0.1f°C"),(float)multi_register_value[TempTolerence.Start_ID]/10.0);
 	 
 	GetDlgItem(IDC_TEMP_TOL)->SetWindowText(str_text);
 }
@@ -1838,12 +2055,17 @@ void CHumChamber::OnEnKillfocusStartPoint()
 		//str_text.Delete(str_text.GetLength()-1,1);//delete % 
 		temp_float=(float)_wtof(str_text);
 		m_startpoint=(UINT)temp_float;
-		BOOL ret =WriteValueToRegID(StartPoint.Start_ID,m_startpoint);
+		/*Set(StartPoint.Start_ID,m_startpoint);
 		
 		if (!ret)
 		{
 			AfxMessageBox(_T("Write Fail"));
-		}
+		}*/
+		//CWriteSingleRegDlg //m_writesingleregdlg;
+		 
+		//m_writesingleregdlg.Set(StartPoint.Start_ID,m_startpoint);
+		////m_writesingleregdlg.DoModal();
+
 		str_text.Format(_T("%d"),(multi_register_value[StartPoint.Start_ID])); 
 		GetDlgItem(IDC_START_POINT)->SetWindowText(str_text);
 	}
@@ -1860,25 +2082,6 @@ void CHumChamber::OnEnKillfocusNumErrorSensor()
 	}
 
 
-void CHumChamber::OnEnKillfocusNumSensor()
-	{
-		float temp_float;
-		CString str_text;
-		GetDlgItem(IDC_NUM_SENSOR)->GetWindowText(str_text);
-		//str_text.Delete(str_text.GetLength()-1,1);//delete % 
-		temp_float=(float)_wtof(str_text);
-		m_numsensors=(UINT)temp_float;
-		BOOL ret=WriteValueToRegID(NumSensors.Start_ID,m_numsensors);
-		
-		if (!ret)
-		{
-			AfxMessageBox(_T("Write Fail"));
-		}
-		str_text.Format(_T("%d"),(multi_register_value[NumSensors.Start_ID])); 
-		GetDlgItem(IDC_NUM_SENSOR)->SetWindowText(str_text);
-
-		FreshGrid();
-	}
 BEGIN_EVENTSINK_MAP(CHumChamber, CFormView)
 	ON_EVENT(CHumChamber, IDC_MSFLEXGRID_INPUT3, DISPID_DBLCLICK, CHumChamber::DblClickMsflexgridInput3, VTS_NONE)
 //    ON_EVENT(CHumChamber, IDC_MSFLEXGRID_INPUT3, DISPID_KEYUP, CHumChamber::KeyUpMsflexgridInput3, VTS_PI2 VTS_I2)
@@ -1935,20 +2138,7 @@ else
 
 /////////////////////////
 //write_one(g_tstat_id,CurrentTestSensor.Start_ID,m_nCurRow);
-UINT temp=m_nCurRow;
-CString str_text;
-BOOL ret=WriteValueToRegID(CurrentTestSensor.Start_ID,temp);
 
-if (!ret)
-{
-	AfxMessageBox(_T("Write Fail"));
-}
-str_text.Format(_T("%d"),(multi_register_value[CurrentTestSensor.Start_ID])); 
-GetDlgItem(IDC_SENSOR_ID)->SetWindowText(str_text);
-
-Sleep(2000);
-Read_Multi(g_tstat_id,&multi_register_value[633],633,20);
-Update_SensorTable();
 }
 
 
@@ -2007,78 +2197,667 @@ void CHumChamber::OnBnClickedContinue()
 		  m_ContinueBtn.ShowWindow(FALSE);
 		}
 	}
-//void CHumChamber::KeyUpMsflexgridInput3(short* KeyCode, short Shift)
-//	{
-//	// TODO: Add your message handler code here
-//	 
-//	}
-
-
-//void CHumChamber::KeyDownMsflexgridInput3(short* KeyCode, short Shift)
-//{
-//	 if (KeyCode==)
-//	 {
-//	 } 
-//	 else
-//	 {
-//	 }
-//}
-
-
-//void CHumChamber::RowColChangeMsflexgridInput3()
-//{
-//	long lRow,lCol;
-//	lRow = m_msflexgrid.get_RowSel();//获取点击的行号	
-//	lCol = m_msflexgrid.get_ColSel(); //获取点击的列号
-//	if(lRow==0)
-//		return;
-//	CRect rect;
-//	m_msflexgrid.GetWindowRect(rect); //获取表格控件的窗口矩形
-//	ScreenToClient(rect); //转换为客户区矩形	
-//	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
-//	//需要将其转化为像素，1440缇= 1英寸
-//	CDC* pDC =GetDC();
-//	//计算象素点和缇的转换比例
-//	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
-//	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
-//	//计算选中格的左上角的坐标(象素为单位)
-//	long y = m_msflexgrid.get_RowPos(lRow)/nTwipsPerDotY;
-//	long x = m_msflexgrid.get_ColPos(lCol)/nTwipsPerDotX;
-//	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
-//	long width = m_msflexgrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
-//	long height = m_msflexgrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
-//	//形成选中个所在的矩形区域
-//	CRect rc(x,y,x+width,y+height);
-//	//转换成相对对话框的坐标
-//	rc.OffsetRect(rect.left+1,rect.top+1);
-//	//获取选中格的文本信息	
-//	CString strValue = m_msflexgrid.get_TextMatrix(lRow,lCol);
-//	m_nCurRow=lRow;
-//	m_nCurCol=lCol;
-//
-//
-//	//write_one(g_tstat_id,CurrentTestSensor.Start_ID,m_nCurRow);
-//	UINT temp=m_nCurRow;
-//	CString str_text;
-//	WriteValueToRegID(CurrentTestSensor.Start_ID,temp);
-//	str_text.Format(_T("%d"),(multi_register_value[CurrentTestSensor.Start_ID])); 
-//	GetDlgItem(IDC_SENSOR_ID)->SetWindowText(str_text);
-//	Update_SensorTable(); 
-//}
-
-
+ 
 void CHumChamber::ClickMsflexgridInput3()
 {
-	/*if (is_connect())
-	{ 
-		for(int  i=0;i<7;i++)
-		{
-			Read_Multi(g_tstat_id,&multi_register_value[660+i*50],660+i*50,50);
-		}
-		FreshGrid();
-	}
-	else
+	long lRow,lCol;
+	lRow = m_msflexgrid.get_RowSel();//获取点击的行号	
+	lCol = m_msflexgrid.get_ColSel(); //获取点击的列号
+	if(lRow==0)
+		return;
+	CRect rect;
+	m_msflexgrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形	
+	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
+	//需要将其转化为像素，1440缇= 1英寸
+	CDC* pDC =GetDC();
+	//计算象素点和缇的转换比例
+	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
+	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//计算选中格的左上角的坐标(象素为单位)
+	long y = m_msflexgrid.get_RowPos(lRow)/nTwipsPerDotY;
+	long x = m_msflexgrid.get_ColPos(lCol)/nTwipsPerDotX;
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	long width = m_msflexgrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
+	long height = m_msflexgrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	//形成选中个所在的矩形区域
+	CRect rc(x,y,x+width,y+height);
+	//转换成相对对话框的坐标
+	rc.OffsetRect(rect.left+1,rect.top+1);
+	//获取选中格的文本信息	
+	CString strValue = m_msflexgrid.get_TextMatrix(lRow,lCol);
+	m_nCurRow=lRow;
+	m_nCurCol=lCol;
+	if (m_nCurCol==3)
 	{
-		AfxMessageBox(_T("Disconnect"));
-	}*/ 
+	  Set(628,_wtof(strValue)*10);
+	}
+	if (m_nCurCol==2)
+	{
+	   Set(627,_wtof(strValue)*10);
+	}
+	if (m_nCurCol==0)
+	{
+		UINT temp=m_nCurRow;
+		CString str_text;
+		int ret=WriteValueToRegID(CurrentTestSensor.Start_ID,temp);
+
+		if (!ret)
+		{
+			AfxMessageBox(_T("Write Fail"));
+		}
+		str_text.Format(_T("%d"),(multi_register_value[CurrentTestSensor.Start_ID])); 
+		GetDlgItem(IDC_SENSOR_ID)->SetWindowText(str_text);
+
+		Sleep(2000);
+		Read_Multi(g_tstat_id,&multi_register_value[633],633,20);
+		Update_SensorTable();
+	}
 }
+void CHumChamber::OnEnSetfocusNumSensor()
+{
+	 //  AfxMessageBox(_T("OK"));
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_NUM_SENSOR)->GetWindowText(str_text);
+	//str_text.Delete(str_text.GetLength()-1,1);//delete % 
+	temp_float=(float)_wtof(str_text);
+	m_numsensors=(UINT)temp_float;
+	////CWriteSingleRegDlg //m_writesingleregdlg;
+	////m_writesingleregdlg.Set(NumSensors.Start_ID,m_numsensors); 
+	//////m_writesingleregdlg.DoModal();
+	m_ID=NumSensors.Start_ID;
+	m_Value=m_numsensors;
+}
+	//////////////////////////////////////////////////////////
+void CHumChamber::OnEnKillfocusNumSensor()
+	{
+	 
+
+
+		//float temp_float;
+		//CString str_text;
+		//GetDlgItem(IDC_NUM_SENSOR)->GetWindowText(str_text);
+		////str_text.Delete(str_text.GetLength()-1,1);//delete % 
+		//temp_float=(float)_wtof(str_text);
+		//m_numsensors=(UINT)temp_float;
+		//////CWriteSingleRegDlg //m_writesingleregdlg;
+		//////m_writesingleregdlg.Set(NumSensors.Start_ID,m_numsensors); 
+		////////m_writesingleregdlg.DoModal();
+		//m_ID=NumSensors.Start_ID;
+		//m_Value=m_numsensors;
+	/*	str_text.Format(_T("%d"),(multi_register_value[NumSensors.Start_ID])); 
+		GetDlgItem(IDC_NUM_SENSOR)->SetWindowText(str_text);*/
+
+	 	//FreshGrid(); 
+	}
+ BOOL CHumChamber::PreTranslateMessage(MSG* pMsg)
+ {
+    											  
+	 if(pMsg->message == WM_KEYDOWN  )
+	 {
+	     
+		 if(pMsg->wParam == VK_F5)
+		 {
+			 CWriteSingleRegDlg m_writesingleregdlg;
+			 m_writesingleregdlg.Set(m_ID,m_Value); 
+			 m_writesingleregdlg.DoModal();
+			
+			ShowDialogData();
+			 FreshGrid();
+			 return 1;
+		 }
+	     
+
+	 }	 
+   return CFormView::PreTranslateMessage(pMsg);
+ }
+
+void CHumChamber::Set(int id,int value){
+m_ID=id;
+m_Value=value;
+}
+void CHumChamber::OnEnSetfocusSlaveId()
+{
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_SLAVE_ID)->GetWindowText(str_text);
+
+	temp_float=(float)_wtof(str_text);
+	m_slaveid=(UINT)temp_float;
+	BOOL ret=WriteValueToRegID(SlaveID.Start_ID,m_slaveid);
+
+}
+void CHumChamber::OnEnSetfocusStartPoint()
+{
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_START_POINT)->GetWindowText(str_text);
+	//str_text.Delete(str_text.GetLength()-1,1);//delete % 
+	temp_float=(float)_wtof(str_text);
+	m_startpoint=(UINT)temp_float;
+	Set(StartPoint.Start_ID,m_startpoint);
+
+}
+void CHumChamber::OnEnSetfocusTempTol()
+{
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_TEMP_TOL)->GetWindowText(str_text);
+	// AfxMessageBox(str_text);
+	//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+	//AfxMessageBox(str_text);
+	temp_float=(float)_wtof(str_text);
+	m_temptolerance=(UINT)(temp_float*10);
+	Set(TempTolerence.Start_ID,m_temptolerance);
+
+}
+void CHumChamber::OnEnSetfocusHumTol()
+{
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_HUM_TOL)->GetWindowText(str_text);
+	//str_text.Delete(str_text.GetLength()-1,1);//delete % 
+	temp_float=(float)_wtof(str_text);
+	m_humtolerance=(UINT)(temp_float*10);
+	Set(HumTolenrence.Start_ID,m_humtolerance);
+
+}
+
+void CHumChamber::OnEnSetfocusTemp1()
+{
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_TEMP1)->GetWindowText(str_text);
+	//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+	temp_float=(float)_wtof(str_text);
+	m_temp1=(UINT)temp_float*10;
+	Set(First_Calibration_Points_Temp.Start_ID,m_temp1);
+
+}
+void CHumChamber::OnEnSetfocusTemp2()
+{
+
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_TEMP2)->GetWindowText(str_text);
+	//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+	temp_float=(float)_wtof(str_text);
+	m_temp2=(UINT)temp_float*10;
+	Set(First_Calibration_Points_Temp.Start_ID+3,m_temp2);
+
+}
+void CHumChamber::OnEnSetfocusTemp3()
+{
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_TEMP3)->GetWindowText(str_text);
+	//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+	temp_float=(float)_wtof(str_text);
+	m_temp3=(UINT)temp_float*10;
+	Set(First_Calibration_Points_Temp.Start_ID+6,m_temp3);
+
+}
+void CHumChamber::OnEnSetfocusTemp4()
+{
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_TEMP4)->GetWindowText(str_text);
+
+	//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+
+	temp_float=(float)_wtof(str_text);
+	m_temp4=(UINT)temp_float*10;
+	Set(First_Calibration_Points_Temp.Start_ID+9,m_temp4);
+
+}
+void CHumChamber::OnEnSetfocusTemp5()
+{
+	// TODO: Add your control notification handler code here
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+12,m_temp5))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_TEMP5)->GetWindowText(str_text);
+	//	str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+	temp_float=(float)_wtof(str_text);
+	m_temp5=(UINT)(temp_float*10);
+	Set(First_Calibration_Points_Temp.Start_ID+12,m_temp5);
+
+
+}
+void CHumChamber::OnEnSetfocusTemp6()
+{
+	// TODO: Add your control notification handler code here
+	/*UpdateData(TRUE);
+	if (!WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+15,m_temp6))
+	{
+	AfxMessageBox(_T("Try again"));
+	} 
+	UpdateData(FALSE);*/
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_TEMP6)->GetWindowText(str_text);
+	//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+	temp_float=(float)_wtof(str_text);
+	m_temp6=(UINT)(temp_float*10);
+	Set(First_Calibration_Points_Temp.Start_ID+15,m_temp6);
+
+}
+void CHumChamber::OnEnSetfocusTemp7()
+{
+	// TODO: Add your control notification handler code here
+	/*UpdateData(TRUE);
+	if (!WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+18,m_temp7))
+	{
+	AfxMessageBox(_T("Try again"));
+	} 
+	UpdateData(FALSE);*/
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_TEMP7)->GetWindowText(str_text);
+	//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+	temp_float=(float)_wtof(str_text);
+	m_temp7=(UINT)(temp_float*10);
+	Set(First_Calibration_Points_Temp.Start_ID+18,m_temp7);
+
+
+}
+void CHumChamber::OnEnSetfocusTemp8()
+{
+	/*UpdateData(TRUE);
+	if (!WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+21,m_temp8))
+	{
+	AfxMessageBox(_T("Try again"));
+	} 
+	UpdateData(FALSE);*/
+
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_TEMP8)->GetWindowText(str_text);
+	//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+	temp_float=(float)_wtof(str_text);
+	m_temp8=(UINT)(temp_float*10);
+	Set(First_Calibration_Points_Temp.Start_ID+21,m_temp8);
+	
+}
+void CHumChamber::OnEnSetfocusTemp9()
+	{
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+24,m_temp9))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TEMP9)->GetWindowText(str_text);
+		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+		temp_float=(float)_wtof(str_text);
+		m_temp9=(UINT)(temp_float*10);
+		Set(First_Calibration_Points_Temp.Start_ID+24,m_temp9);
+
+	}
+void CHumChamber::OnEnSetfocusTemp10()
+	{
+	// TODO: Add your control notification handler code here
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Temp.Start_ID+27,m_temp10))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+	 
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TEMP10)->GetWindowText(str_text);
+		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+		temp_float=(float)_wtof(str_text);
+		m_temp10=(UINT)(temp_float*10);
+		Set(First_Calibration_Points_Temp.Start_ID+27,m_temp10);
+	
+ 
+}
+
+void CHumChamber::OnEnSetfocusHum1()
+	{
+	// TODO: Add your control notification handler code here
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Hum.Start_ID,m_hum1))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_HUM1)->GetWindowText(str_text);
+		//str_text.Delete(str_text.GetLength()-1,1);//delete % 
+		temp_float=(float)_wtof(str_text);
+		m_hum1=(UINT)(temp_float*10);
+		Set(First_Calibration_Points_Hum.Start_ID,m_hum1);
+
+
+	}
+void CHumChamber::OnEnSetfocusHum2()
+	{
+	// TODO: Add your control notification handler code here
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+3,m_hum2))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_HUM2)->GetWindowText(str_text);
+	//	str_text.Delete(str_text.GetLength()-1,1);//delete % 
+		temp_float=(float)_wtof(str_text);
+		m_hum2=(UINT)(temp_float*10);
+		Set(First_Calibration_Points_Hum.Start_ID+3,m_hum2);
+	
+
+	}
+void CHumChamber::OnEnSetfocusHum3()
+	{
+	// TODO: Add your control notification handler code here
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+6,m_hum3))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_HUM3)->GetWindowText(str_text);
+	//	str_text.Delete(str_text.GetLength()-1,1);//delete % 
+		temp_float=(float)_wtof(str_text);
+		m_hum3=(UINT)(temp_float*10);
+		Set(First_Calibration_Points_Hum.Start_ID+6,m_hum3);
+
+	}
+void CHumChamber::OnEnSetfocusHum4()
+	{
+	// TODO: Add your control notification handler code here
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+9,m_hum4))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_HUM4)->GetWindowText(str_text);
+	//	str_text.Delete(str_text.GetLength()-1,1);//delete % 
+		temp_float=(float)_wtof(str_text);
+		m_hum4=(UINT)(temp_float*10);
+		Set(First_Calibration_Points_Hum.Start_ID+9,m_hum4);
+	
+	}
+void CHumChamber::OnEnSetfocusHum5()
+	{
+	// TODO: Add your control notification handler code here
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+12,m_hum5))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_HUM5)->GetWindowText(str_text);
+		//str_text.Delete(str_text.GetLength()-1,1);//delete % 
+		temp_float=(float)_wtof(str_text);
+		m_hum5=(UINT)(temp_float*10);
+		Set(First_Calibration_Points_Hum.Start_ID+12,m_hum5);
+		
+	}
+void CHumChamber::OnEnSetfocusHum6()
+	{
+	// TODO: Add your control notification handler code here
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+15,m_hum6))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_HUM6)->GetWindowText(str_text);
+	//	str_text.Delete(str_text.GetLength()-1,1);//delete % 
+		temp_float=(float)_wtof(str_text);
+		m_hum6=(UINT)(temp_float*10);
+		Set(First_Calibration_Points_Hum.Start_ID+15,m_hum6);
+
+	}
+void CHumChamber::OnEnSetfocusHum7()
+	{
+	// TODO: Add your control notification handler code here
+	/*UpdateData(TRUE);
+	if (!WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+18,m_hum7))
+		{
+		AfxMessageBox(_T("Try again"));
+		} 
+	UpdateData(FALSE);*/
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_HUM7)->GetWindowText(str_text);
+	//	str_text.Delete(str_text.GetLength()-1,1);//delete % 
+		temp_float=(float)_wtof(str_text);
+		m_hum7=(UINT)(temp_float*10);
+		Set(First_Calibration_Points_Hum.Start_ID+18,m_hum7);
+	
+	}
+void CHumChamber::OnEnSetfocusHum8()
+	{
+	// TODO: Add your control notification handler code here
+	/*UpdateData(TRUE);
+	if (!WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+21,m_hum8))
+		{
+		AfxMessageBox(_T("Try again"));
+		} 
+	UpdateData(FALSE);*/
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_HUM8)->GetWindowText(str_text);
+	//	str_text.Delete(str_text.GetLength()-1,1);//delete % 
+		temp_float=(float)_wtof(str_text);
+		m_hum8=(UINT)(temp_float*10);
+		Set(First_Calibration_Points_Hum.Start_ID+21,m_hum8);
+
+	}
+void CHumChamber::OnEnSetfocusHum9()
+	{
+	// TODO: Add your control notification handler code here
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+24,m_hum9))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_HUM9)->GetWindowText(str_text);
+		//str_text.Delete(str_text.GetLength()-1,1);//delete % 
+		temp_float=(float)_wtof(str_text);
+		m_hum9=(UINT)(temp_float*10);
+		Set(First_Calibration_Points_Hum.Start_ID+24,m_hum9);
+
+	}
+void CHumChamber::OnEnSetfocusHum10()
+	{
+	// TODO: Add your control notification handler code here
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Hum.Start_ID+27,m_hum10))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_HUM10)->GetWindowText(str_text);
+		//str_text.Delete(str_text.GetLength()-1,1);//delete % 
+		temp_float=(float)_wtof(str_text);
+		m_hum10=(UINT)temp_float*10;
+		Set(First_Calibration_Points_Hum.Start_ID+27,m_hum10);
+
+	}
+
+
+ 
+void CHumChamber::OnEnSetfocusTime1()
+	{
+	// TODO: Add your control notification handler code here
+	
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Time.Start_ID,m_time1))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+
+	//
+	//UpdateData(FALSE);
+    //Set the time of calibration.
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TIME1)->GetWindowText(str_text);
+		temp_float=(float)_wtof(str_text);
+		m_time1=(UINT)(temp_float);
+		Set(First_Calibration_Points_Time.Start_ID,m_time1);
+
+	}
+void CHumChamber::OnEnSetfocusTime2()
+	{
+	//// TODO: Add your control notification handler code here
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Time.Start_ID+3,m_time2))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TIME2)->GetWindowText(str_text);
+		temp_float=(float)_wtof(str_text);
+		m_time2=(UINT)temp_float;
+		Set(First_Calibration_Points_Time.Start_ID+3,m_time2);
+
+	}
+void CHumChamber::OnEnSetfocusTime3()
+	{
+ 
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TIME3)->GetWindowText(str_text);
+		temp_float=(float)_wtof(str_text);
+		m_time3=(UINT)temp_float;
+		Set(First_Calibration_Points_Time.Start_ID+6,m_time3);
+
+	}
+void CHumChamber::OnEnSetfocusTime4()
+	{
+ 
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TIME4)->GetWindowText(str_text);
+		temp_float=(float)_wtof(str_text);
+		m_time4=(UINT)temp_float;
+		Set(First_Calibration_Points_Time.Start_ID+9,m_time4);
+		
+	
+	}
+void CHumChamber::OnEnSetfocusTime5()
+	{
+ 
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TIME5)->GetWindowText(str_text);
+		temp_float=(float)_wtof(str_text);
+		m_time5=(UINT)temp_float;
+		Set(First_Calibration_Points_Time.Start_ID+12,m_time5);
+		
+	
+	}
+void CHumChamber::OnEnSetfocusTime6()
+	{
+ 
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TIME6)->GetWindowText(str_text);
+		temp_float=(float)_wtof(str_text);
+		m_time6=(UINT)temp_float;
+		Set(First_Calibration_Points_Time.Start_ID+15,m_time6);
+		
+		
+	}
+void CHumChamber::OnEnSetfocusTime7()
+	{
+ 
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TIME7)->GetWindowText(str_text);
+		temp_float=(float)_wtof(str_text);
+		m_time7=(UINT)temp_float;
+		Set(First_Calibration_Points_Time.Start_ID+18,m_time7);
+		
+
+	}
+void CHumChamber::OnEnSetfocusTime8()
+	{
+ 
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TIME8)->GetWindowText(str_text);
+		temp_float=(float)_wtof(str_text);
+		m_time8=(UINT)temp_float;
+		Set(First_Calibration_Points_Time.Start_ID+21,m_time8);
+
+		
+	}
+void CHumChamber::OnEnSetfocusTime9()
+	{
+	// TODO: Add your control notification handler code here
+	//UpdateData(TRUE);
+	//if (!WriteValueToRegID(First_Calibration_Points_Time.Start_ID+24,m_time9))
+	//	{
+	//	AfxMessageBox(_T("Try again"));
+	//	} 
+	//UpdateData(FALSE);
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TIME9)->GetWindowText(str_text);
+		temp_float=(float)_wtof(str_text);
+		m_time9=(UINT)temp_float;
+		Set(First_Calibration_Points_Time.Start_ID+24,m_time9);
+		
+
+	}
+void CHumChamber::OnEnSetfocusTime10()
+	{
+	 
+   
+
+		float temp_float;
+		CString str_text;
+		GetDlgItem(IDC_TIME10)->GetWindowText(str_text);
+		temp_float=(float)_wtof(str_text);
+		m_time10=(UINT)temp_float;
+		Set(First_Calibration_Points_Time.Start_ID+27,m_time10);
+		
+	}

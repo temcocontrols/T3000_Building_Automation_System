@@ -45,7 +45,7 @@ void COutPutDlg::FLEX_GRID1_PUT_STR(int row,int col,CString str)
 	{
 		m_FlexGrid1.put_CellBackColor(YELLOW_COLOR);
 	}
-	else if ((str.CompareNoCase(_T("0-50"))==0)||(str.CompareNoCase(_T("50-100"))==0))
+	else if ((str.CompareNoCase(_T("0-50"))==0)||(str.CompareNoCase(_T("50-100"))==0)||(str.CompareNoCase(_T("0-100"))==0))
 	{
 		m_FlexGrid1.put_CellBackColor(ORANGE_COLOR);
 	}
@@ -440,6 +440,11 @@ void COutPutDlg::OnCbnSelchangeFanmode()
 	{
 		write_one(g_tstat_id, 105,m_fan_mode_ctrl.GetCurSel()+1);
 		write_one(g_tstat_id, 273,m_fan.GetCurSel());
+
+	
+
+
+
 		product_register_value[105] = m_fan_mode_ctrl.GetCurSel()+1;
 		product_register_value[273] = m_fan.GetCurSel();
 	 
@@ -447,6 +452,9 @@ void COutPutDlg::OnCbnSelchangeFanmode()
 	{
 		write_one(g_tstat_id, 122,m_fan_mode_ctrl.GetCurSel()+1);
 		write_one(g_tstat_id, 137,m_fan.GetCurSel());
+
+		product_register_value[122] = m_fan_mode_ctrl.GetCurSel()+1;
+		product_register_value[137] = m_fan.GetCurSel();
 	}
 
 	put_fan_variable();
@@ -938,14 +946,14 @@ if(product_register_value[129]==1)
 			//}else
 			//{
 		//if(m_fan.GetCurSel()==0&&(m_nmoduleType==1||m_nmoduleType==3))//a,d,g 3就是tstat5g
-			if(m_fan.GetCurSel()==0/*&&m_nmoduleType==1*/)//a,d,g 3就是tstat5g//2.5.0.99
-			/*{*/
+			if(m_fan.GetCurSel()==0)//a,d,g 3就是tstat5g//2.5.0.99
+			{
 					tstatval = product_register_value[351+ pos];
-			/*
-			}*/
- 			else
+			
+			}
+ 			else{
 				   tstatval = product_register_value[173+ pos];	
-			/*}*/
+			}
 	
 
 
@@ -2398,12 +2406,14 @@ void COutPutDlg::OnBnClickedFanautocheck()
 		m_bFanAutoOnly=TRUE;
 		//m_fan_mode_ctrl.EnableWindow(FALSE);
 		//if (newtstat6[7] == PM_TSTAT6)
-		if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
-		{
+		/*if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+		{*/
 			write_one(g_tstat_id,MODBUS_AUTO_ONLY,1);
 			product_register_value[MODBUS_AUTO_ONLY]=1;
-		}else
-			write_one(g_tstat_id,MODBUS_AUTO_ONLY,1);
+		/*}else
+			{write_one(g_tstat_id,MODBUS_AUTO_ONLY,1);
+			product_register_value[MODBUS_AUTO_ONLY]=1;}*/
+
 	}
 	else
 	{
@@ -2412,12 +2422,12 @@ void COutPutDlg::OnBnClickedFanautocheck()
 		//write_one(g_tstat_id,129,0);
 
 		//if (newtstat6[7] == PM_TSTAT6)
-		if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
-		{
+		/*if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+		{*/
 			write_one(g_tstat_id,MODBUS_AUTO_ONLY,0);
 			product_register_value[MODBUS_AUTO_ONLY]=0;
-		}else
-			write_one(g_tstat_id,MODBUS_AUTO_ONLY,0);
+		/*}else
+			write_one(g_tstat_id,MODBUS_AUTO_ONLY,0);*/
 
 	}
 
@@ -4716,13 +4726,53 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 				else
 					str2=m_FlexGrid2.get_TextMatrix(row,col);
 				if(str2.CompareNoCase(_T("PID1"))==0)
-					write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,0);
+			       {  ret=write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,0);
+					if (ret>0)
+					{
+					product_register_value[MODBUS_PID_OUTPUT1+row-1]=0;
+					AfxMessageBox(_T("Ok"));
+					} 
+					else
+					{
+					AfxMessageBox(_T("Fail"));
+					}
+					}
 				else if(str2.CompareNoCase(_T("PID2"))==0)
-					write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,1);
+				{	ret=write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,1);
+				if (ret>0)
+				{
+					product_register_value[MODBUS_PID_OUTPUT1+row-1]=0;
+					AfxMessageBox(_T("Ok"));
+				} 
+				else
+				{
+					AfxMessageBox(_T("Fail"));
+				}
+				}
 				else if(str2.CompareNoCase(_T("MAX(PID1,PID2)"))==0)
-					write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,2);
+					{ret=write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,2);
+				if (ret>0)
+				{
+					product_register_value[MODBUS_PID_OUTPUT1+row-1]=0;
+					AfxMessageBox(_T("Ok"));
+				} 
+				else
+				{
+					AfxMessageBox(_T("Fail"));
+				}
+				}
 				else if(str2.CompareNoCase(_T("MIN(PID1,PID2)"))==0)
-					write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,3);
+					{ret=write_one(g_tstat_id,MODBUS_PID_OUTPUT1+row-1,3);
+				if (ret>0)
+				{
+					product_register_value[MODBUS_PID_OUTPUT1+row-1]=0;
+					AfxMessageBox(_T("Ok"));
+				} 
+				else
+				{
+					AfxMessageBox(_T("Fail"));
+				}
+				}
 			}
 			FreshGrids();//lsc add
 
@@ -4736,7 +4786,8 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 				str2=m_FlexGrid2.get_TextMatrix(row,col);
 			if((str2.CompareNoCase(_T("On"))==0)||str2==_T("      -"))
 				{write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,0);
-				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1]=0;}
+				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1]=0;
+				}
 			else if(str2.CompareNoCase(_T("DI1"))==0)
 				{write_one(g_tstat_id,MODBUS_INTERLOCK_OUTPUT1+row-1,1);
 				product_register_value[MODBUS_INTERLOCK_OUTPUT1+row-1]=1;}
@@ -4825,10 +4876,18 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 				int n=get_real_fan_select() ;
 				//138	288	1	Low byte	W/R	FAN0_OPERATION_TABLE_COAST
 				 
-					write_one(g_tstat_id,MODBUS_FAN0_OPER_TABLE_COAST+get_real_fan_select() * 7 + pos,tstatval);		
-					product_register_value[MODBUS_FAN0_OPER_TABLE_COAST+get_real_fan_select() * 7] = tstatval;
-				 
-
+					int ret=write_one(g_tstat_id,MODBUS_FAN0_OPER_TABLE_COAST+get_real_fan_select() * 7 + pos,tstatval);		
+				//roduct_register_value[MODBUS_FAN0_OPER_TABLE_COAST+get_real_fan_select() * 7 + pos] = tstatval;
+				    
+					if (ret>0)
+					{
+						product_register_value[MODBUS_FAN0_OPER_TABLE_COAST+get_real_fan_select() * 7 + pos]=tstatval;
+						AfxMessageBox(_T("Ok"));
+					} 
+					else
+					{
+						AfxMessageBox(_T("Fail"));
+					}
 				
 
 				if(m_fan.GetCurSel()==0)
@@ -4893,9 +4952,6 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 					}
 					int ret = 0;
 					if(m_fan.GetCurSel()==0)
-						// 					write_one(g_tstat_id,351+pos,tstatval);
-						// 				else
-						// 					write_one(g_tstat_id,173+pos,tstatval);
 					{
 						//if (newtstat6[7] == 6)
 						if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
@@ -4906,9 +4962,12 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 						else
 						{
 							ret = write_one(g_tstat_id,351+pos,tstatval);
-							// 						if (ret<=0)
-							// 							AfxMessageBox(_T("setting failure!"));
-
+							 if (ret<=0)
+							 AfxMessageBox(_T("setting failure!"));
+							else
+							{
+							product_register_value[351+pos]=tstatval;
+							}
 						}
 					}
 					else
@@ -4922,8 +4981,10 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 						else
 						{
 							ret = write_one(g_tstat_id,173+pos,tstatval);
-							// 						if (ret<=0)
-							// 							AfxMessageBox(_T("setting failure!"));
+							  						if (ret<=0)
+							 							AfxMessageBox(_T("setting failure!"));
+														else
+														product_register_value[173+pos]=tstatval;
 						}
 					}
 
@@ -4966,18 +5027,27 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 					if(m_fan.GetCurSel()==0)
 					{
 						ret1 = write_one(g_tstat_id,526 + pos,tstatval);
-						// 					if (ret1<=0)
-						// 						AfxMessageBox(_T("setting failure!"));
+						 					if (ret1<=0)
+						 						AfxMessageBox(_T("setting failure!"));
+												else
+												product_register_value[526 + pos]=tstatval;
+
 					}else
 					{
 						ret1 = write_one(g_tstat_id,254 + pos,tstatval);
-						// 					if (ret1<=0)
-						// 						AfxMessageBox(_T("setting failure!"));
+						 					if (ret1<=0)
+						  						AfxMessageBox(_T("setting failure!"));
+												else
+												product_register_value[254+pos]=tstatval;
 					}
 				}
 				else
 				{
-					write_one(g_tstat_id,254 + pos,tstatval);
+					ret1 = write_one(g_tstat_id,254 + pos,tstatval);
+					if (ret1<=0)
+						AfxMessageBox(_T("setting failure!"));
+					else
+						product_register_value[254+pos]=tstatval;
 				}
 
 				if(m_nmoduleType == 1 || m_nmoduleType == 3)
@@ -5035,7 +5105,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 							product_register_value[533+pos] = tstatval;
 						}else
 						{
-							//AfxMessageBox(_T("setting failure!"));
+							 AfxMessageBox(_T("setting failure!"));
 						}
 
 					}
@@ -5049,7 +5119,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 							product_register_value[261+pos] = tstatval;
 						}else
 						{
-							//AfxMessageBox(_T("setting failure!"));
+							 AfxMessageBox(_T("setting failure!"));
 						}
 
 					}
@@ -5173,7 +5243,12 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 			nreg=nreg&0x0f;
 			nValue=nValue<<4;
 			nValue=nreg|nValue;
-			write_one(g_tstat_id,341+nPos,nValue);
+			//write_one(g_tstat_id,341+nPos,nValue);
+			int ret1 = write_one(g_tstat_id,341+nPos,nValue);
+			if (ret1<=0)
+				AfxMessageBox(_T("setting failure!"));
+			else
+				product_register_value[341+nPos]=nValue;
 			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
 			m_FlexGrid1.SetFocus();
 			//FreshGrids();//lsc0928
@@ -5199,7 +5274,13 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 			nreg=nreg&0xf0;
 			nValue=nreg|nValue;
 
-			write_one(g_tstat_id,341+nPos,nValue);
+		
+
+			int ret1 = write_one(g_tstat_id,341+nPos,nValue);
+			if (ret1<=0)
+				AfxMessageBox(_T("setting failure!"));
+			else
+				product_register_value[341+nPos]=nValue;
 			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
 			m_FlexGrid1.SetFocus();
 			//FreshGrids();//lsc0928
@@ -5254,7 +5335,13 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 				{
 					ndata=ndata&0x0F;//清掉4-7位
 					nValue=nValue|ndata;
-					write_one(g_tstat_id,125+nPos,nValue);
+					 
+					int ret1 = write_one(g_tstat_id,125+nPos,nValue);
+					if (ret1<=0)
+						AfxMessageBox(_T("setting failure!"));
+					else
+						product_register_value[125+nPos]=nValue;
+
 					product_register_value[125] = nValue;
 
 					m_ItemValueCombx.GetWindowText(strNewText);
@@ -5271,8 +5358,13 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 				if(ndata>=0)
 				{
 					nValue=nValue|ndata;
-					write_one(g_tstat_id,125+nPos,nValue);
-					product_register_value[125] = nValue;
+					 
+					int ret1 = write_one(g_tstat_id,125+nPos,nValue);
+					if (ret1<=0)
+						AfxMessageBox(_T("setting failure!"));
+					else
+						product_register_value[125+nPos]=nValue;
+				 
 				}
 			}
 		}
@@ -5288,7 +5380,14 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 			{
 				ndata=ndata&0x0F;//清掉4-7位
 				nValue=nValue|ndata;
-				write_one(g_tstat_id,362+nPos,nValue);
+				 
+
+
+int 				ret1 = write_one(g_tstat_id,362+nPos,nValue);
+				if (ret1<=0)
+					AfxMessageBox(_T("setting failure!"));
+				else
+					product_register_value[362+nPos]=nValue;
 
 				m_ItemValueCombx.GetWindowText(strNewText);
 				//int nItemwww=m_ItemValueCombx.GetCurSel();
@@ -5304,7 +5403,12 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 			if(ndata>=0)
 			{
 				nValue=nValue|ndata;
-				write_one(g_tstat_id,362+nPos,nValue);
+			//	write_one(g_tstat_id,362+nPos,nValue);
+				int ret1 = write_one(g_tstat_id,362+nPos,nValue);
+				if (ret1<=0)
+					AfxMessageBox(_T("setting failure!"));
+				else
+					product_register_value[362+nPos]=nValue;
 			}
 		}
 		}

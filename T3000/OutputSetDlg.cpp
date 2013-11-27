@@ -408,7 +408,8 @@ void COutputSetDlg::Fresh_Grid()
 		{
 			nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
 			if (product_register_value[7]==6||product_register_value[7]==7)
-			{if(nRange>=0&&nRange<=3)		//Modify by Fance_0412
+			{
+				if(nRange>=0&&nRange<=3)		//Modify by Fance_0412
 			{
 				strTemp=OUTPUT_RANGE45[nRange];
 			}
@@ -500,7 +501,7 @@ void COutputSetDlg::Fresh_Grid()
 		//nRange=product_register_value[284];
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];
-		if (product_register_value[7]==7||product_register_value[6]==6)
+		if (product_register_value[7]==7||product_register_value[7]==6)
 		{
 			if(nRange>=0&&nRange<=3)
 			{

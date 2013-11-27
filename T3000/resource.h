@@ -188,6 +188,8 @@
 #define IDD_MBPOLL_REG_DIALOG           473
 #define IDD_CALIBRATION_HUM             474
 #define IDD_DIALOGAIRFLOW_SETTING       475
+#define IDD_DIALOG_8IOA_VIEW            476
+#define IDD_WRITEREGDLG                 477
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -507,6 +509,7 @@
 #define IDC_MSFLEXGRID1                 1095
 #define IDC_MSFLEXGRID_INPUT3           1095
 #define IDC_CLEAR                       1096
+#define IDC_MSFLEXGRID4                 1096
 #define IDC_COPY_TO                     1097
 #define IDC_CHECK2                      1098
 #define IDC_CHECK3                      1099
@@ -564,6 +567,7 @@
 #define IDC_COMBO_panel                 1129
 #define IDC_STATICUNINT                 1129
 #define IDC_COMBO_RANGE                 1129
+#define IDC_DELAY                       1129
 #define IDC_POWERMODELCOMBO             1130
 #define IDC_CHECK56                     1130
 #define IDC_COMBO_TIMESERVERLIST2       1130
@@ -1042,11 +1046,15 @@
 #define IDC_STATIC_WINDOWN              1550
 #define IDC_MSFLEXGRID_Configure        1551
 #define IDC_STATIC_COOLSPN              1551
+#define IDC_BUTTON_Configure2           1551
 #define IDC_BUTTON_SEND                 1552
 #define IDC_STATIC_COOLDBN              1552
+#define IDC_BUTTON_Configure3           1552
 #define IDC_COMBO_SELECT                1553
 #define IDC_STATIC_SPN                  1553
+#define IDC_BUTTON_Configure4           1553
 #define IDC_STATIC_HEATDBN              1554
+#define IDC_BUTTON_Configure5           1554
 #define IDC_STATIC_HEATSPN              1555
 #define IDC_STATIC_1SP2SPN              1556
 #define IDC_EDIT_CSPN                   1557
@@ -1332,9 +1340,41 @@
 #define IDC_STATIC_ADDR                 1686
 #define IDC_EDIT_ALIAS                  1687
 #define IDC_MBPOLL_CHECK2               1688
+#define IDC_BRANDRATE                   1688
 #define IDC_MBPOLL_CHECK3               1689
 #define IDC_MBPOLL_CHECK4               1690
 #define IDC_STATIC_DISPLAYTYPE          1691
+#define IDC_88ADDRESS                   1695
+#define IDC_88FIRMWARE                  1696
+#define IDC_SLAVE                       1696
+#define IDC_STATUS1                     1696
+#define IDC_88SERIAL                    1697
+#define IDC_LALUE                       1697
+#define IDC_STATUS2                     1697
+#define IDC_88HARDWARE                  1698
+#define IDC_SYNC_WEB                    1698
+#define IDC_STATUS3                     1698
+#define IDC_88MODEL                     1699
+#define IDC_STATUS4                     1699
+#define IDC_88PIC                       1700
+#define IDC_NETADDRESS1                 1700
+#define IDC_BACKGROUND                  1700
+#define IDC_STATUS5                     1701
+#define IDC_STATUS6                     1702
+#define IDC_STATUS7                     1703
+#define IDC_STATUS8                     1704
+#define IDC_STATUS9                     1705
+#define IDC_STATUS10                    1706
+#define IDC_STATUS11                    1707
+#define IDC_STATUS12                    1708
+#define IDC_STATUS13                    1709
+#define IDC_STATUS14                    1710
+#define IDC_STATUS15                    1711
+#define IDC_STATUS16                    1712
+#define IDC_STATUS17                    1713
+#define IDC_STATUS18                    1714
+#define IDC_STATUS19                    1715
+#define IDC_STATUS20                    1716
 #define IDC_EDIT_PID2OFFSETPOINT2       2002
 #define IDC_EDIT_PID2OFFSETPOINT4       2003
 #define IDC_EDIT_PID2OFFSETPOINT3       2004
@@ -1466,7 +1506,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        474
 #define _APS_NEXT_COMMAND_VALUE         34004
-#define _APS_NEXT_CONTROL_VALUE         1692
+#define _APS_NEXT_CONTROL_VALUE         1701
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

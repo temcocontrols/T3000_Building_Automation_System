@@ -184,6 +184,10 @@ public:
 	afx_msg void OnCbnSelchangeRangecombo();
 	void ClickMsflexgridOutput();
 	afx_msg void OnEnKillfocusEditName();
+	CComboBox m_brandratebombox;
+	CComboBox m_delaycombox;
+	afx_msg void OnCbnSelchangeBrandrate();
+	afx_msg void OnCbnSelchangeDelay();
 };
 
 
