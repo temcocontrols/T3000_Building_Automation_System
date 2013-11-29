@@ -1358,8 +1358,8 @@
 #define IDC_STATUS4                     1699
 #define IDC_88PIC                       1700
 #define IDC_NETADDRESS1                 1700
-#define IDC_BACKGROUND                  1700
 #define IDC_STATUS5                     1701
+#define IDC_SYSLINK1                    1701
 #define IDC_STATUS6                     1702
 #define IDC_STATUS7                     1703
 #define IDC_STATUS8                     1704
@@ -1506,7 +1506,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        474
 #define _APS_NEXT_COMMAND_VALUE         34004
-#define _APS_NEXT_CONTROL_VALUE         1701
+#define _APS_NEXT_CONTROL_VALUE         1702
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

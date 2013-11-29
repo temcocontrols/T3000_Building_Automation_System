@@ -107,5 +107,9 @@ void local_handler_conf_private_trans_ack(
 	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
 
 void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
-CString GetProductName(int ModelID); 
+CString GetProductName(int ModelID);
+
+CString Get_Table_Name(int SerialNo,CString Type ,int Row);
+void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName); 
+int Get_Unit_Process(CString Unit);
 #endif

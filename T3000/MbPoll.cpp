@@ -1503,8 +1503,8 @@ void CMbPoll::updateDataSharingVariables(int configNo)
 	case 0:
 		if (grid1Data != NULL)
 		{
-		delete(grid1Data); 
-		grid1Data = NULL;
+		/*delete(grid1Data); 
+		grid1Data = NULL;*/
 		}
 		grid1Data = (short int*) malloc (sizeof(short int) * pollQuantity[configNo]);
 		break;

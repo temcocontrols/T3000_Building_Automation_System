@@ -2330,291 +2330,296 @@ void CT3000View::Fresh_In()
 	//	m_Input_Grid.put_TextMatrix(2,0,g_strInName3);
 	//	strTemp.Empty();
 	}
-	//in3 and in4 
-	int m_crange=0;
-	CADO ado;
-	ado.OnInitADOConn();
-	if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
-	{
-		CString sql;
-		sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),2,get_serialnumber());
-		ado.m_pRecordset=ado.OpenRecordset(sql);
-
-		if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
-		{    
-			ado.m_pRecordset->MoveFirst();
-			while (!ado.m_pRecordset->EndOfFile)
-			{
-				m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-				ado.m_pRecordset->MoveNext();
-			}
-
-			strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN2], 1);//188
-			if(product_register_value[MODBUS_ANALOG_IN2]==4||product_register_value[MODBUS_ANALOG_IN2]==1)//188
-			{	
-				strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_1]/10);//180
-				strTemp=strTemp+strUnit;
-			}
-			if (product_register_value[MODBUS_ANALOG_IN2]==0||product_register_value[MODBUS_ANALOG_IN2]==2)//188
-			{
-				//strUnit=GetTempUnit(180);
-				strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_1]);//180
-			}
-			if(product_register_value[MODBUS_ANALOG_IN2]==3 || product_register_value[MODBUS_ANALOG_IN2]==5)//188
-			{
-
-
-				if (m_crange==6||m_crange==7)
-				{
-					if (m_crange==6)
-					{
-						
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
-							strTemp=_T("Occupied");
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
-							strTemp=_T("Unoccupied");
-						
-						
-					} 
-					else
-					{
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
-							strTemp=_T("Unoccupied");
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
-							strTemp=_T("Occupied");
-					}
-				} 
-				else
-				{
-					if (product_register_value[MODBUS_ANALOG_IN2]==3)
-					{
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
-							strTemp=_T("Off");
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
-							strTemp=_T("On");
-					} 
-					else
-					{
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
-							strTemp=_T("On");
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
-							strTemp=_T("Off");
-					}
-				}
-
-
-			//}
-
-
-		} 
-		}
-		else
-		{
-			strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN2], 1);//188
-			if(product_register_value[MODBUS_ANALOG_IN2]==4||product_register_value[MODBUS_ANALOG_IN2]==1)//188
-			{	
-				strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_1]/10);//180
-				strTemp=strTemp+strUnit;
-			}
-			if (product_register_value[MODBUS_ANALOG_IN2]==0||product_register_value[MODBUS_ANALOG_IN2]==2)//188
-			{
-				//strUnit=GetTempUnit(180);
-				strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_1]);//180
-			}
-			if(product_register_value[MODBUS_ANALOG_IN2]==3 || product_register_value[MODBUS_ANALOG_IN2]==5)//188
-			{
-
-
-
-
-				if (product_register_value[MODBUS_ANALOG_IN2]==3)
-				{
-					if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
-						strTemp=_T("Off");
-					if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
-						strTemp=_T("On");
-				} 
-				else
-				{
-					if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
-						strTemp=_T("On");
-					if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
-						strTemp=_T("Off");
-				}
-
-
-
-			}
-		}
-
-		ado.CloseRecordset();
-	}
-	if (nModel==18)//2.5.0.98
-	{
-		if (product_register_value[MODBUS_ANALOG_IN2] == 0)//188
-		{
-			strTemp = _T("UNUSED");
-		}
-	}
-	 m_Input_Grid.put_TextMatrix(3,1,g_strInName2);
-	 m_Input_Grid.put_TextMatrix(3,2,strTemp);
-
-
-	 
-
-	
-	strTemp.Empty();
-	//strTemp.Format(_T("Input %d"),3);
  
-	strTemp.Empty();
-	m_Input_Grid.put_TextMatrix(4,1,g_strInName3);
 
-
-	 m_crange=0;
-	 ado;
-	ado.OnInitADOConn();
-	if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
-	{
-		CString sql;
-		sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),3,get_serialnumber());
-		ado.m_pRecordset=ado.OpenRecordset(sql);
-
-		if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
-		{    
-			ado.m_pRecordset->MoveFirst();
-			while (!ado.m_pRecordset->EndOfFile)
-			{
-				m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-				ado.m_pRecordset->MoveNext();
-			}
-
-			if((product_register_value[546]==0)&&(m_crange==0))//190
-			{
-
-				if(product_register_value[311]==0)
-				{
-					strTemp=_T("Off");
-				}
-				else
-				{
-					strTemp=_T("On");
-				}
-
-
-
-			}
-			else  if((product_register_value[546]==0)&&(m_crange==2))//190
-			{
-				CString strTemp2;
-				if (product_register_value[311]==0)
-				{
-					strTemp=_T("Occupied");
-				}
-				else
-				{
-					strTemp=_T("UnOccupied");
-				}
-
-
-			}
-			if ((product_register_value[546]==1)&&(m_crange==1))//190
-			{
-
-				if (product_register_value[311]==1)
-				{
-					strTemp=_T("Off");
-
-				}else
-				{
-					strTemp=_T("On");
-				}
-
-
-			}
-			else if ((product_register_value[546]==1)&&(m_crange==3))//190
-			{
-				CString strTemp2;
-				if (product_register_value[311]==1)
-				{
-					strTemp=_T("UnOccupied");
-
-				}
-				else
-				{
-					strTemp=_T("Occupied");
-				}
-
-			}
-
-
-		} 
-		else
+	if(nModel==4||nModel==PM_TSTAT5D||nModel==17||nModel==18)
 		{
-			if (product_register_value[546]==0)//190
+			int m_crange=0;
+			CADO ado;
+			ado.OnInitADOConn();
+			if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
 			{
-				CString strTemp2;
-				if (product_register_value[311]==0)
-				{
-					strTemp=_T("On");
+				CString sql;
+				sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),2,get_serialnumber());
+				ado.m_pRecordset=ado.OpenRecordset(sql);
+
+				if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+				{    
+					ado.m_pRecordset->MoveFirst();
+					while (!ado.m_pRecordset->EndOfFile)
+					{
+						m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
+						ado.m_pRecordset->MoveNext();
+					}
+
+					strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN2], 1);//188
+					if(product_register_value[MODBUS_ANALOG_IN2]==4||product_register_value[MODBUS_ANALOG_IN2]==1)//188
+					{	
+						strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_1]/10);//180
+						strTemp=strTemp+strUnit;
+					}
+					if (product_register_value[MODBUS_ANALOG_IN2]==0||product_register_value[MODBUS_ANALOG_IN2]==2)//188
+					{
+						//strUnit=GetTempUnit(180);
+						strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_1]);//180
+					}
+					if(product_register_value[MODBUS_ANALOG_IN2]==3 || product_register_value[MODBUS_ANALOG_IN2]==5)//188
+					{
+
+
+						if (m_crange==6||m_crange==7)
+						{
+							if (m_crange==6)
+							{
+
+								if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
+									strTemp=_T("Occupied");
+								if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
+									strTemp=_T("Unoccupied");
+
+
+							} 
+							else
+							{
+								if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
+									strTemp=_T("Unoccupied");
+								if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
+									strTemp=_T("Occupied");
+							}
+						} 
+						else
+						{
+							if (product_register_value[MODBUS_ANALOG_IN2]==3)
+							{
+								if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
+									strTemp=_T("Off");
+								if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
+									strTemp=_T("On");
+							} 
+							else
+							{
+								if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
+									strTemp=_T("On");
+								if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
+									strTemp=_T("Off");
+							}
+						}
+
+
+						//}
+
+
+					} 
 				}
 				else
 				{
-					strTemp=_T("Off");
+					strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN2], 1);//188
+					if(product_register_value[MODBUS_ANALOG_IN2]==4||product_register_value[MODBUS_ANALOG_IN2]==1)//188
+					{	
+						strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_1]/10);//180
+						strTemp=strTemp+strUnit;
+					}
+					if (product_register_value[MODBUS_ANALOG_IN2]==0||product_register_value[MODBUS_ANALOG_IN2]==2)//188
+					{
+						//strUnit=GetTempUnit(180);
+						strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_1]);//180
+					}
+					if(product_register_value[MODBUS_ANALOG_IN2]==3 || product_register_value[MODBUS_ANALOG_IN2]==5)//188
+					{
+
+
+
+
+						if (product_register_value[MODBUS_ANALOG_IN2]==3)
+						{
+							if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
+								strTemp=_T("Off");
+							if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
+								strTemp=_T("On");
+						} 
+						else
+						{
+							if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
+								strTemp=_T("On");
+							if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
+								strTemp=_T("Off");
+						}
+
+
+
+					}
 				}
 
-
+				ado.CloseRecordset();
 			}
-			if (product_register_value[546]==1)//190
+			if (nModel==18)//2.5.0.98
 			{
-				CString strTemp2;
-				if (product_register_value[311]==1)
+				if (product_register_value[MODBUS_ANALOG_IN2] == 0)//188
 				{
-					strTemp=_T("Off");
+					strTemp = _T("UNUSED");
+				}
+			}
+			m_Input_Grid.put_TextMatrix(3,1,g_strInName2);
+			m_Input_Grid.put_TextMatrix(3,2,strTemp);
 
-				}else
+
+
+
+
+			strTemp.Empty();
+			//strTemp.Format(_T("Input %d"),3);
+
+			strTemp.Empty();
+			m_Input_Grid.put_TextMatrix(4,1,g_strInName3);
+
+
+			m_crange=0;
+			ado;
+			ado.OnInitADOConn();
+			if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+			{
+				CString sql;
+				sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),3,get_serialnumber());
+				ado.m_pRecordset=ado.OpenRecordset(sql);
+
+				if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+				{    
+					ado.m_pRecordset->MoveFirst();
+					while (!ado.m_pRecordset->EndOfFile)
+					{
+						m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
+						ado.m_pRecordset->MoveNext();
+					}
+
+					if((product_register_value[546]==0)&&(m_crange==0))//190
+					{
+
+						if(product_register_value[311]==0)
+						{
+							strTemp=_T("Off");
+						}
+						else
+						{
+							strTemp=_T("On");
+						}
+
+
+
+					}
+					else  if((product_register_value[546]==0)&&(m_crange==2))//190
+					{
+						CString strTemp2;
+						if (product_register_value[311]==0)
+						{
+							strTemp=_T("Occupied");
+						}
+						else
+						{
+							strTemp=_T("UnOccupied");
+						}
+
+
+					}
+					if ((product_register_value[546]==1)&&(m_crange==1))//190
+					{
+
+						if (product_register_value[311]==1)
+						{
+							strTemp=_T("Off");
+
+						}else
+						{
+							strTemp=_T("On");
+						}
+
+
+					}
+					else if ((product_register_value[546]==1)&&(m_crange==3))//190
+					{
+						CString strTemp2;
+						if (product_register_value[311]==1)
+						{
+							strTemp=_T("UnOccupied");
+
+						}
+						else
+						{
+							strTemp=_T("Occupied");
+						}
+
+					}
+
+
+				} 
+				else
 				{
-					strTemp=_T("On");
+					if (product_register_value[546]==0)//190
+					{
+						CString strTemp2;
+						if (product_register_value[311]==0)
+						{
+							strTemp=_T("On");
+						}
+						else
+						{
+							strTemp=_T("Off");
+						}
+
+
+					}
+					if (product_register_value[546]==1)//190
+					{
+						CString strTemp2;
+						if (product_register_value[311]==1)
+						{
+							strTemp=_T("Off");
+
+						}else
+						{
+							strTemp=_T("On");
+						}
+
+					}
+
+
+				}
+
+				ado.CloseRecordset();
+			}
+			else
+			{
+				if (product_register_value[546]==0)//190
+				{
+					CString strTemp2;
+					if (product_register_value[311]==0)
+					{
+						strTemp=_T("On");
+					}else
+					{
+						strTemp=_T("Off");
+					}
+
+				}
+				if (product_register_value[546]==1)//190
+				{
+					CString strTemp2;
+					if (product_register_value[311]==1)
+					{
+						strTemp=_T("Off");
+
+					}else
+					{
+						strTemp=_T("On");
+					}
+
 				}
 
 			}
+			ado.CloseConn();
 
+			m_Input_Grid.put_TextMatrix(4,2,strTemp);
 
 		}
-
-		ado.CloseRecordset();
-	}
-	else
-	{
-		if (product_register_value[546]==0)//190
-		{
-			CString strTemp2;
-			if (product_register_value[311]==0)
-			{
-				strTemp=_T("On");
-			}else
-			{
-				strTemp=_T("Off");
-			}
-
-		}
-		if (product_register_value[546]==1)//190
-		{
-			CString strTemp2;
-			if (product_register_value[311]==1)
-			{
-				strTemp=_T("Off");
-
-			}else
-			{
-				strTemp=_T("On");
-			}
-
-		}
-
-	}
-	ado.CloseConn();
-
-	m_Input_Grid.put_TextMatrix(4,2,strTemp);
 
 	strTemp.Empty();
 
@@ -3208,7 +3213,7 @@ void CT3000View::FreshIOGridTable()
 		return;
 	if(::GetFocus()==m_inNameEdt.m_hWnd)
 		return;
-
+     BOOL Is_tstat=TRUE;
 	m_Output_Grid.Clear();
 	m_Input_Grid.Clear();
 	int nModel=product_register_value[MODBUS_PRODUCT_MODEL];
@@ -3272,7 +3277,12 @@ void CT3000View::FreshIOGridTable()
 			}
 			break;
 
-		default:break;
+		default:
+		{
+		    Is_tstat=FALSE;
+		 
+		}
+		break;
 	}
 // 	m_Input_Grid.put_Rows(m_inRows);
 // 	m_Output_Grid.put_Rows(m_outRows);
@@ -3343,9 +3353,12 @@ void CT3000View::FreshIOGridTable()
 
 
 
+	if (Is_tstat)
+	{
+		Fresh_Out();
+		Fresh_In();
+	}
 
-	Fresh_Out();
-	Fresh_In();
 
 
 

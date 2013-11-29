@@ -7,9 +7,12 @@
 #include "ado/ADO.h"
 #include "globle_function.h"
 #include "MainFrm.h"
+#include "WriteSingleRegDlg.h"
+
 
 // T38I13O
 
+CString Range_Unit[]={_T("RAW DATA"),_T("10K C"),_T("10K F"),_T("0-100%"),_T("ON/OFF"),_T("OFF/ON"),_T("Pulse Input"),_T("Lighting Control"),_T("TYPE3 10K C"),_T("TYPE3 10K F"),_T("NO USE"),_T("0-5V"),_T("0-10V"),_T("0-20I")};
 IMPLEMENT_DYNCREATE(T38I13O, CFormView)
 
 T38I13O::T38I13O()
@@ -61,7 +64,7 @@ void T38I13O::OnInitialUpdate()
 CFormView::OnInitialUpdate();
 #if 1	
 //设置排/行数量
-m_msflexgrid_input.put_Cols(5);
+m_msflexgrid_input.put_Cols(7);
 m_msflexgrid_input.put_Rows(9);//包括标题栏
 //显示横标题
 m_msflexgrid_input.put_TextMatrix(0,0,_T("Input Name"));
@@ -69,18 +72,21 @@ m_msflexgrid_input.put_TextMatrix(0,1,_T("Register Value"));
 m_msflexgrid_input.put_TextMatrix(0,2,_T("Date Stamp"));
 m_msflexgrid_input.put_TextMatrix(0,3,_T("Range"));
 m_msflexgrid_input.put_TextMatrix(0,4,_T("Filter"));
-
+m_msflexgrid_input.put_TextMatrix(0,5,_T("Lighting Time"));
+m_msflexgrid_input.put_TextMatrix(0,6,_T("Time Left"));
 
 
 
 //设置列宽	
 m_msflexgrid_input.put_ColWidth(0,1000);
-m_msflexgrid_input.put_ColWidth(1,1500);
-m_msflexgrid_input.put_ColWidth(2,1500);
-m_msflexgrid_input.put_ColWidth(3,1500);
-m_msflexgrid_input.put_ColWidth(4,1000);
+m_msflexgrid_input.put_ColWidth(1,1200);
+m_msflexgrid_input.put_ColWidth(2,1300);
+m_msflexgrid_input.put_ColWidth(3,1000);
+m_msflexgrid_input.put_ColWidth(4,800);
+m_msflexgrid_input.put_ColWidth(5,1300);
+m_msflexgrid_input.put_ColWidth(6,1000);
 //居中显示
-for (int col=0;col<5;col++)
+for (int col=0;col<7;col++)
 { 
 	m_msflexgrid_input.put_ColAlignment(col,4);
 }
@@ -89,7 +95,7 @@ for (int col=0;col<5;col++)
 for(int i=1;i<9;i++)		//排数量
 {
 
-	for(int k=0;k<5;k++)	//列数量
+	for(int k=0;k<7;k++)	//列数量
 	{
 		if (i%2==1)
 		{
@@ -119,7 +125,7 @@ for(int i=1;i<9;i++)
 
 //设置行/列数量
 m_msflexgrid_output.put_Rows(14);
-m_msflexgrid_output.put_Cols(3);
+m_msflexgrid_output.put_Cols(4);
 //设置列宽	
 
 
@@ -127,13 +133,13 @@ m_msflexgrid_output.put_Cols(3);
 m_msflexgrid_output.put_TextMatrix(0,0,_T("Output Name"));
 m_msflexgrid_output.put_TextMatrix(0,1,_T("Output Value"));
 m_msflexgrid_output.put_TextMatrix(0,2,_T("Light Switch"));
-//m_msflexgrid_output.put_TextMatrix(0,3,_T("Auto/Manual"));
+m_msflexgrid_output.put_TextMatrix(0,3,_T("A/M"));
 
 m_msflexgrid_output.put_ColWidth(0,1000);
-m_msflexgrid_output.put_ColWidth(1,1500);
+m_msflexgrid_output.put_ColWidth(1,1000);
 m_msflexgrid_output.put_ColWidth(2,1500);
-//m_msflexgrid_output.put_ColWidth(3,1500);//居中显示
-for (int col=0;col<3;col++)
+m_msflexgrid_output.put_ColWidth(3,700);//居中显示
+for (int col=0;col<4;col++)
 { 
 	m_msflexgrid_output.put_ColAlignment(col,4);
 }
@@ -142,7 +148,7 @@ for (int col=0;col<3;col++)
 for(int i=1;i<14;i++)		//排数量
 {
 
-	for(int k=0;k<3;k++)	//列数量
+	for(int k=0;k<4;k++)	//列数量
 	{
 		if (i%2==1)
 		{
@@ -501,6 +507,7 @@ int  T38I13O::Get_RegID(CString Name)
 
 void T38I13O::InitialDialog(){
 Initial_RegisterList();
+InitialTableName();
 CString strTemp;
 strTemp.Format(_T("%d"),product_register_value[MODBUS_ID]);
 GetDlgItem(IDC_EDIT_T3ADDRESS)->SetWindowText(strTemp);
@@ -523,16 +530,16 @@ CString strresult;
 int regValue;
 for(int i = 1;i<=8;i++)
 {  
-	regValue=product_register_value[INPUT1_PULSE_COUNT_HIGHT+2*(i-1)]*65535+product_register_value[INPUT1_PULSE_COUNT_LOW+2*(i-1)];
-	strresult.Format(_T("%d"),regValue);
-	m_msflexgrid_input.put_TextMatrix(i,1,strresult);
+	
 
 	strresult.Format(_T("%4d/%4d/%4d  %2d:%2d"),product_register_value[DATE_STAMP_INPUT1_YEAR+3*(i-1)],product_register_value[DATE_STAMP_INPUT1_MONTH+3*(i-1)],product_register_value[DATE_STAMP_INPUT1_DAY+3*(i-1)],product_register_value[DATE_STAMP_INPUT1_HOUR+3*(i-1)],product_register_value[DATE_STAMP_INPUT1_MINUTE+3*(i-1)]);
 	m_msflexgrid_input.put_TextMatrix(i,2,strresult);
+
 	strresult.Format(_T("%d"),product_register_value[RANGE_INPUT1+i-1]);
 	if (0==product_register_value[RANGE_INPUT1+i-1])
 	{
 		strresult=_T("RAW DATA");
+
 	} 
 	else if (1==product_register_value[RANGE_INPUT1+i-1])
 	{
@@ -588,8 +595,107 @@ for(int i = 1;i<=8;i++)
 	}
 
 	m_msflexgrid_input.put_TextMatrix(i,3,strresult);
+
+
+	regValue=(short)product_register_value[INPUT1_PULSE_COUNT_LOW+2*(i-1)];
+	
+	if (0==product_register_value[RANGE_INPUT1+i-1])
+	{
+		strresult.Format(_T("%d"),regValue);
+
+	} 
+	else if (1==product_register_value[RANGE_INPUT1+i-1])
+	{
+		strresult.Format(_T("%.1f C"),(float)regValue/10.0);
+	}
+	else if (2==product_register_value[RANGE_INPUT1+i-1])
+	{
+		strresult=_T("10K F");
+		strresult.Format(_T("%.1f F"),(float)regValue/10.0);
+	}
+	else if (3==product_register_value[RANGE_INPUT1+i-1])
+	{
+		 
+		strresult.Format(_T("%.1f"),(float)regValue);
+		strresult+=_T("%");
+	}
+	else if (4==product_register_value[RANGE_INPUT1+i-1])
+	{
+		//strresult.Format(_T("%.1f F"),(float)regValue/10.0);
+		if (regValue==0)
+		{
+		strresult=_T("OFF");
+		} 
+		else
+		{
+		strresult=_T("ON");
+		}
+	}
+	else if (5==product_register_value[RANGE_INPUT1+i-1])
+	{
+		if (regValue==0)
+		{
+			strresult=_T("ON");
+		} 
+		else
+		{
+			strresult=_T("OFF");
+		}
+	}
+	else if (6==product_register_value[RANGE_INPUT1+i-1])
+	{
+		 strresult.Format(_T("%d"),regValue);
+	}
+	else if (7==product_register_value[RANGE_INPUT1+i-1])
+	{
+		strresult.Format(_T("%d"),regValue);
+	}
+	else if (8==product_register_value[RANGE_INPUT1+i-1])
+	{
+		//strresult=_T("TYPE3 10K C");
+		strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
+	}
+	else if (9==product_register_value[RANGE_INPUT1+i-1])
+	{
+		/*strresult=_T("TYPE3 10K F");*/
+		strresult.Format(_T("%0.1f F"),(float)regValue/10.0);
+	}
+	else if (10==product_register_value[RANGE_INPUT1+i-1])
+	{
+		strresult=_T("0");
+		//strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
+	}
+	else if (11==product_register_value[RANGE_INPUT1+i-1])
+	{
+		//strresult=_T("0-5V");
+		strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
+	}
+	else if (12==product_register_value[RANGE_INPUT1+i-1])
+	{
+		//strresult=_T("0-10V");
+		strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
+	}
+	else if (13==product_register_value[RANGE_INPUT1+i-1])
+	{
+		//strresult=_T("0-20I");
+		strresult.Format(_T("%0.1f mA"),(float)regValue/1000.0);
+	}
+	
+	
+	
+	
+	m_msflexgrid_input.put_TextMatrix(i,1,strresult);
+
+
+
 	strresult.Format(_T("%d"),product_register_value[FILTER_INPUT1+i-1]);
 	m_msflexgrid_input.put_TextMatrix(i,4,strresult);
+
+	strresult.Format(_T("%d min"),product_register_value[LIGHTING_ZONE_TIME_INPUT1+i-1]);
+	m_msflexgrid_input.put_TextMatrix(i,5,strresult);
+
+	strresult.Format(_T("%d min"),product_register_value[ZONE_TIME_LEFT_INPUT1+i-1]);
+	m_msflexgrid_input.put_TextMatrix(i,6,strresult);
 }
 
 CString CstresultDO;
@@ -597,13 +703,57 @@ for(int i = 1;i<=13;i++)
 {  
 
 	CstresultDO.Format(_T("%d"),product_register_value[OUTPUT1+i-1]);
+	if (product_register_value[OUTPUT1+i-1]==0)
+	{
+	CstresultDO=_T("Off");
+	}
+	else
+	{
+	CstresultDO=_T("On");
+	}
 	m_msflexgrid_output.put_TextMatrix(i,1,CstresultDO);
-	//m_msflexgrid_output.put_TextMatrix(i,2,vect3model.at(100-1+i).CStName);
-	CstresultDO.Format(_T("%d"),product_register_value[LIGHT_SWITCH_OUTPUT1+i-1]);
+    
+	if (product_register_value[LIGHT_SWITCH_OUTPUT1+i-1]>0)
+	{
+	CstresultDO=Get_Table_Name(m_sn,_T("Input"),product_register_value[LIGHT_SWITCH_OUTPUT1+i-1]);
+	}
+	else
+	{
+	CstresultDO=_T("UNUSED");
+	}
 	m_msflexgrid_output.put_TextMatrix(i,2,CstresultDO);
- 
-
+    if ((product_register_value[AUTO_MANUAL_OUTPUTS]>>(m_currow-1))&0x01==1)
+    {
+	CstresultDO=_T("Manual");
+    } 
+    else
+    {
+	CstresultDO=_T("Auto");
+    }
+	m_msflexgrid_output.put_TextMatrix(i,3,CstresultDO);
 }
+}
+void T38I13O::InitialTableName(){
+	m_sn=product_register_value[SN_LOW]+product_register_value[SN_LOW+1]*256+product_register_value[SN_HI]*256*256+product_register_value[SN_HI+1]*256*256*256;
+	
+	CString str_input;
+	for(int i=1;i<9;i++)
+	{
+
+		 str_input=Get_Table_Name(m_sn,_T("Input"),i);
+
+		 m_msflexgrid_input.put_TextMatrix(i,0,str_input);	 
+	}
+
+	CString str_output;
+	for(int i=1;i<14;i++)
+	{
+
+		str_output=Get_Table_Name(m_sn,_T("Output"),i);
+		m_msflexgrid_output.put_TextMatrix(i,0,str_output);	
+
+
+	}
 }
 void T38I13O::Fresh()
 {
@@ -645,10 +795,14 @@ void T38I13O::ClickMsflexgridInput()
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
 	CString strValue = m_msflexgrid_input.get_TextMatrix(lRow,lCol);
+	m_oldname=strValue;
 	m_curcol=lCol;
 	m_currow=lRow;
 
-
+	if (lCol==6)//Time left --ReadOnly.
+	{
+	return;
+	}
 	if(3!=lCol && lRow != 0)
 	{
 
@@ -691,31 +845,60 @@ void T38I13O::ClickMsflexgridInput()
 		m_comboxRange.SetFocus(); //获取焦点
 		m_comboxRange.SetWindowText(strValue);
 }
-
+    
 }
 void T38I13O::OnCbnSelchangeRangecombo()
 	{
-		BeginWaitCursor();
-		CString strTemp;
-		int lRow = m_msflexgrid_input.get_RowSel();	
-		int lCol = m_msflexgrid_input.get_ColSel();
-		 
-		int sel=m_comboxRange.GetCurSel();
-		m_comboxRange.ShowWindow(FALSE);
-		if (product_register_value[RANGE_INPUT1+lRow-1]==sel)
-		{
-			return;
-		}
-		int ret=write_one(g_tstat_id,RANGE_INPUT1+lRow-1,sel);
-		if (ret>0)
-		{
-			product_register_value[RANGE_INPUT1+lRow-1]=sel;
-		}
-		InitialDialog();
-		EndWaitCursor();
+	   if (m_isinput)
+	   {
+		   BeginWaitCursor();
+		   CString strTemp;
+		   int lRow = m_msflexgrid_input.get_RowSel();	
+		   int lCol = m_msflexgrid_input.get_ColSel();
+
+		   int sel=m_comboxRange.GetCurSel();
+		   m_comboxRange.ShowWindow(FALSE);
+		   if (product_register_value[RANGE_INPUT1+lRow-1]==sel)
+		   {
+			   return;
+		   }
+		   int ret=write_one(g_tstat_id,RANGE_INPUT1+lRow-1,sel);
+		   if (ret>0)
+		   {
+			   product_register_value[RANGE_INPUT1+lRow-1]=sel;
+		   }
+		   Sleep(500);
+		   Read_Multi(g_tstat_id,&product_register_value[INPUT1_PULSE_COUNT_HIGHT],INPUT1_PULSE_COUNT_HIGHT,16);
+		   InitialDialog();
+		   EndWaitCursor();
+	   }
+	   else
+	   {
+		   int sel=m_comboxRange.GetCurSel();
+		   m_comboxRange.ShowWindow(FALSE);
+		   
+			   if (product_register_value[OUTPUT1+m_currow-1]==sel)
+			   {
+				   return;
+			   }
+			   int ret=write_one(g_tstat_id,OUTPUT1+m_currow-1,sel);
+			   if (ret>0)
+			   {
+				   product_register_value[OUTPUT1+m_currow-1]=sel;
+			   }
+			   if (product_register_value[OUTPUT1+m_currow-1]==0)
+			   {
+				   m_msflexgrid_output.put_TextMatrix(m_currow,m_curcol,_T("Off"));
+			   }
+			   else
+			   {
+			      m_msflexgrid_output.put_TextMatrix(m_currow,m_curcol,_T("On"));
+			   }
+			   
+
+	   }
+	
 	}
-
-
 void T38I13O::ClickMsflexgridOutput()
 	{
 	    m_isinput=FALSE;
@@ -743,10 +926,11 @@ void T38I13O::ClickMsflexgridOutput()
 		rcCell.OffsetRect(rect.left+1,rect.top+1);
 		ReleaseDC(pDC);
 		CString strValue = m_msflexgrid_output.get_TextMatrix(lRow,lCol);
+		m_oldname=strValue;
 		m_curcol=lCol;
 		m_currow=lRow;
-
-		if(lRow != 0)
+		CString str_input;
+		if(lRow != 0&&lCol==0)
 		{
 			//return; // 2012.2.7老毛说不允许修改
 			m_inNameEdt.MoveWindow(&rcCell,1);
@@ -758,35 +942,85 @@ void T38I13O::ClickMsflexgridOutput()
 			m_inNameEdt.SetSel(nLenth,nLenth); //全选//
 
 		}
+		if (lCol==1&&lRow!=0)
+		{
+			m_comboxRange.MoveWindow(&rcCell,1);
+			m_comboxRange.ResetContent();
+			m_comboxRange.AddString(_T("Off"));
+			m_comboxRange.AddString(_T("On"));
+			m_comboxRange.ShowWindow(SW_SHOW);
+			m_comboxRange.BringWindowToTop();
+			m_comboxRange.SetFocus(); //获取焦点
+			m_comboxRange.SetWindowText(strValue);
+		}
+		if (lCol==2&&lRow!=0)
+		{
+			m_comboxRange.MoveWindow(&rcCell,1);
+			m_comboxRange.ResetContent();
+			//m_comboxRange.AddString(_T("Off"));
+			m_comboxRange.AddString(_T("UNUSED"));
+
+		 
+			for(int i=1;i<9;i++)
+			{
+
+				str_input=Get_Table_Name(m_sn,_T("Input"),i);
+				m_comboxRange.AddString(str_input);
+			}
+			m_comboxRange.ShowWindow(SW_SHOW);
+			m_comboxRange.BringWindowToTop();
+			m_comboxRange.SetFocus(); //获取焦点
+			m_comboxRange.SetWindowText(strValue);
+		}
 	}
-
-
 void T38I13O::OnEnKillfocusEditName()
 {
-    CString strTemp;
-	GetDlgItem(IDC_EDIT_NAME)->GetWindowText(strTemp);
+     CString strTemp;
+	 GetDlgItem(IDC_EDIT_NAME)->GetWindowText(strTemp);
 	 int Value=_wtoi(strTemp);
+
+	 if (strTemp.Compare(m_oldname)==0)
+	 {
+		 return;
+	 }
 	if (m_isinput)
 	{
+	  if (m_curcol==0)
+	  {
+	   
+		Insert_Update_Table_Name(m_sn,_T("Input"),m_currow,strTemp);
+		//InitialTableName();
+		m_msflexgrid_input.put_TextMatrix(m_currow,m_curcol,strTemp);
+	  }
 	  if (m_curcol==1)//Value
 	  {
-	    int RegValue=product_register_value[INPUT1_PULSE_COUNT_HIGHT+2*(m_currow-1)]*65535+product_register_value[INPUT1_PULSE_COUNT_LOW+2*(m_currow-1)];
 
-	     int high;
-		 int low;
-	    if(RegValue==Value)
+
+		  /*int RegValue=product_register_value[INPUT1_PULSE_COUNT_HIGHT+2*(m_currow-1)]*65535+product_register_value[INPUT1_PULSE_COUNT_LOW+2*(m_currow-1)];
+
+		  int high;
+		  int low;
+		  if(RegValue==Value)
+		  {
+		  return;
+		  } 
+		  else*/
 	    {
-		return;
-	    } 
-	    else
-	    {
-		high=Value/65535;
+
+			int regvalue=product_register_value[RANGE_INPUT1+m_currow-1];
+			if (regvalue>13)
+			{
+				regvalue=0;
+			}
+			Value=Value*Get_Unit_Process(Range_Unit[regvalue]);
+			
+			int low;
+		
 		low=Value%65535;
-	    int ret1=write_one(g_tstat_id,INPUT1_PULSE_COUNT_HIGHT+2*(m_currow-1),high);
+	   // int ret1=write_one(g_tstat_id,INPUT1_PULSE_COUNT_HIGHT+2*(m_currow-1),high);
 		int ret2=write_one(g_tstat_id,INPUT1_PULSE_COUNT_LOW+2*(m_currow-1),low);
-		if (ret1>0&&ret2>0)
+		if (ret2>0)
 		{
-		product_register_value[INPUT1_PULSE_COUNT_HIGHT+2*(m_currow-1)]=high;
 		product_register_value[INPUT1_PULSE_COUNT_LOW+2*(m_currow-1)]=low;
 		InitialDialog();
 		} 
@@ -806,11 +1040,53 @@ void T38I13O::OnEnKillfocusEditName()
 		  }
 		}
 	  }
+	  if (m_curcol==5)
+	  {
+		  int regvalue=product_register_value[LIGHTING_ZONE_TIME_INPUT1+m_currow-1];
+		  if (Value!=regvalue)
+		  {
+			  int ret1=write_one(g_tstat_id,LIGHTING_ZONE_TIME_INPUT1+m_currow-1,Value);
+			  if (ret1>0)
+			  {
+				  product_register_value[LIGHTING_ZONE_TIME_INPUT1+m_currow-1]=Value;
+				  InitialDialog();
+			  }
+			  else
+			  {
+			  AfxMessageBox(_T("Try again"));
+			  }
+		  }
+	  }
+	
 	}
 	else
 	{
+		if (m_curcol==0)
+		{
+			if (strTemp.Compare(m_oldname)==0)
+			{
+				return;
+			}
+			Insert_Update_Table_Name(m_sn,_T("Output"),m_currow,strTemp);
+			m_msflexgrid_output.put_TextMatrix(m_currow,m_curcol,strTemp);
+		}
+
+
+		//CstresultDO.Format(_T("%d"),product_register_value[OUTPUT1+i-1]);
+		//m_msflexgrid_output.put_TextMatrix(i,1,CstresultDO);
+		////m_msflexgrid_output.put_TextMatrix(i,2,vect3model.at(100-1+i).CStName);
+		//CstresultDO.Format(_T("%d"),product_register_value[LIGHT_SWITCH_OUTPUT1+i-1]);
+		//m_msflexgrid_output.put_TextMatrix(i,2,CstresultDO);
+	 
+		if (m_curcol==2)
+		{
+		}
 
 	}
+
+	
+
+
 }
 
 
@@ -822,5 +1098,17 @@ void T38I13O::OnCbnSelchangeBrandrate()
 
 void T38I13O::OnCbnSelchangeDelay()
 {
-	// TODO: Add your control notification handler code here
+	 int item=m_delaycombox.GetCurSel();
+	 int ret=write_one(g_tstat_id,RESPONSE_DELAY,item);
+	 if (ret>0)
+	 {
+	 product_register_value[RESPONSE_DELAY]=item;
+	 } 
+	 else
+	 {
+	 AfxMessageBox(_T("Write Error"));
+	 }
+
+	 m_delaycombox.SetCurSel(product_register_value[RESPONSE_DELAY]);
+
 }

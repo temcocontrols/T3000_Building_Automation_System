@@ -5603,7 +5603,7 @@ void Input_Output_read_LC(CStdioFile &default_file,int schedule_id, CStdioFile& 
 					break;
 				lable_buffer[k]=(char)group_discription.GetAt(k);
 			}
-			 Write_Multi(schedule_id,lable_buffer,INPUT_DESCRIPTION+j*GROUP_LABLE_SIZE,GROUP_LABLE_SIZE);
+			Write_Multi(schedule_id,lable_buffer,INPUT_DESCRIPTION+j*GROUP_LABLE_SIZE,GROUP_LABLE_SIZE);
 
 			for (i=0;i<OUTPUTCARD_NUM_PER_INPUTCARD;i++)
 			{

@@ -108,7 +108,7 @@ public:
 	DECLARE_EVENTSINK_MAP()
 	void ClickMsflexgrid1();
 
-
+	void ClickMsflexgrid4();
 	 long row,col;
 	 void DblClickMsflexgrid1();
 	 CEdit m_editName;
@@ -165,8 +165,11 @@ public:
 	BYTE senddata[100];
 	
 
-
-
+	int m_nCurRow;
+	int m_nCurCol;
+	int m_GridNo;
+	CString m_oldname;
+	CString m_newname;
 	afx_msg void OnSetmappingAddoutputbarod();
 	afx_msg void OnSetmappingPrevious();
 	afx_msg void OnSetmappingNext();
@@ -177,7 +180,7 @@ public:
 	afx_msg void OnBnClickedButtonLightingcontorlAnnuals();
 	afx_msg void OnBnClickedButtonLightingcontorlGroups();
 	afx_msg void OnBnClickedButtonLightingcontorlSyncwithPC();
-
+	afx_msg void OnCbnSelchangeValuecombo();
 
 	WORD lightingController_time[8];
 	
@@ -220,6 +223,7 @@ public:
 
 	 afx_msg void OnBnClickedButtonApply();
 	 BOOL CheckSettingChanged();
+	 void Fresh_Inputs();
 	 CIPAddressCtrl			m_ip_addressCtrl;
 	 CIPAddressCtrl			m_subnet_addressCtrl;
 	 CIPAddressCtrl			m_gateway_addressCtrl;
@@ -236,6 +240,8 @@ public:
 	 CComboBox m_timeserver;
 	 CEdit m_macaddress;
 	BOOL m_light[32];
+	CMsflexgrid m_inputs_grid;
+	CComboBox m_combox_controler;
 };
 
 

@@ -430,21 +430,7 @@ short read_temp;
 			}
 		}
 
-		switch(times)
-		{
-		case 0:g_strScanInfo = _T("Communicating ");break;
-		case 1:g_strScanInfo = _T("Communicating . ");break;
-		case 2:g_strScanInfo = _T("Communicating . .");break;
-		case 3:g_strScanInfo = _T("Communicating . . .");break;
-		case 4:g_strScanInfo = _T("Communicating . . . .");break;
-		case 5:g_strScanInfo = _T("Communicating . . . . .");break;  
-		case 6:g_strScanInfo = _T("Communicating . . . . . .");break;
-		case 7:g_strScanInfo = _T("Communicating . . . . . . . .");break; 
-		case 8:g_strScanInfo = _T("Communicating . . . . . . . . .");break; 
-		case 9:g_strScanInfo = _T("Communicating . . . . . . . . . .");break; 
-		case 10:g_strScanInfo = _T("Communicating . . . . . . . . . . .");break; 
-		}
-	//	PostMessage(WM_MY_MESSAGE,1,0);
+
 		read_temp=read_one(g_tstat_id,TestState.Start_ID);
 		if (read_temp>0)
 		{

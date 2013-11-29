@@ -3,7 +3,7 @@
 #include "globle_function.h"
 #include "Windows.h"
 #include "T3000.h"
-
+#include "ado/ADO.h"
 
 
 #include "T3000RegAddress.h"
@@ -1793,3 +1793,124 @@ CString GetProductName(int ModelID)
 	}
 	return strProductName;
 }
+
+
+CString Get_Table_Name(int SerialNo,CString Type ,int Row){
+	CADO ado;
+	CString Table_Name;
+	ado.OnInitADOConn();
+	if (ado.IsHaveTable(ado,_T("IONAME_CONFIG")))//有Version表
+	{
+		CString sql;
+		sql.Format(_T("Select * from IONAME_CONFIG where Type='%s' and  Row=%d and SerialNo=%d"),Type.GetBuffer(),Row,SerialNo);
+		ado.m_pRecordset=ado.OpenRecordset(sql);
+		if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+		{
+			ado.m_pRecordset->MoveFirst();
+			while (!ado.m_pRecordset->EndOfFile)
+			{
+				Table_Name=ado.m_pRecordset->GetCollect(_T("InOutName"));
+				ado.m_pRecordset->MoveNext();
+			}
+		}
+		else
+		{
+		  Table_Name.Format(_T("%s%d"),Type.GetBuffer(),Row);
+		}
+	}
+	else
+	{
+	    Table_Name.Format(_T("%s%d"),Type.GetBuffer(),Row);
+	}
+	ado.CloseRecordset();
+	ado.CloseConn();
+	return Table_Name;
+}
+void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName){
+	CADO ado;
+	ado.OnInitADOConn();
+	CString sql;
+	sql.Format(_T("Select * from IONAME_CONFIG where Type='%s' and  Row=%d and SerialNo=%d"),Type.GetBuffer(),Row,SerialNo);
+	ado.m_pRecordset=ado.OpenRecordset(sql);
+
+	if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+	{
+
+		sql.Format(_T("update IONAME_CONFIG set InOutName = '%s' where Type='%s' and  Row=%d and SerialNo=%d "),TableName.GetBuffer(),Type.GetBuffer(),Row,SerialNo);
+		ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+	}
+	else
+	{
+			ado.CloseRecordset();
+		sql.Format(_T("Insert into IONAME_CONFIG(InOutName,Type,Row,SerialNo) values('%s','%s','%d','%d')"),TableName.GetBuffer(),Type.GetBuffer(),Row,SerialNo);
+		ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+	}
+
+	ado.CloseConn();
+}
+
+int Get_Unit_Process(CString Unit){
+int ret_Value=1;
+if (Unit.CompareNoCase(_T("RAW DATA"))==0)
+{
+ret_Value=1;
+}
+else if (Unit.CompareNoCase(_T("10K C"))==0)
+{ret_Value=10;
+}
+else if (Unit.CompareNoCase(_T("10K F"))==0)
+{
+ret_Value=10;
+}
+else if (Unit.CompareNoCase(_T("0-100%"))==0)
+{
+ret_Value=1;
+}
+else if (Unit.CompareNoCase(_T("ON/OFF"))==0)
+{
+ret_Value=1;
+}
+
+else if (Unit.CompareNoCase(_T("OFF/ON"))==0)
+{
+ret_Value=1;
+}
+else if (Unit.CompareNoCase(_T("Pulse Input"))==0)
+{
+ret_Value=1;
+}
+else if (Unit.CompareNoCase(_T("Lighting Control"))==0)
+{
+ret_Value=1;
+}
+else if (Unit.CompareNoCase(_T("TYPE3 10K C"))==0)
+{
+ret_Value=10;
+}
+else if (Unit.CompareNoCase(_T("TYPE3 10K F"))==0)
+{
+ret_Value=10;
+}
+else if (Unit.CompareNoCase(_T("NO USE"))==0)
+{
+ret_Value=1;
+}
+else if (Unit.CompareNoCase(_T("0-5V"))==0)
+{
+ret_Value=1000;
+}
+else if (Unit.CompareNoCase(_T("0-10V"))==0)
+{
+ret_Value=1000;
+}
+else if (Unit.CompareNoCase(_T("0-20I"))==0)
+{
+ret_Value=1000;
+}
+
+
+
+return ret_Value;
+}
+
+

@@ -28,14 +28,17 @@ protected:
 	virtual void OnInitialUpdate();
 	DECLARE_MESSAGE_MAP()
 public:
-void Fresh();
+    void Fresh();
     void InitialDialog();
 	void Initial_RegisterList();
+	void InitialTableName();
 	int  Get_RegID(CString Name);
 	vector<T3Register> m_vecT3Register;
 	bool m_isinput;
 	int m_curcol;
 	int m_currow;
+	int m_sn;
+	CString m_oldname;
 private:
 	    int	SN_LOW											 ;
 		int	SN_HI											 ;
