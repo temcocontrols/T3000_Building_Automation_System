@@ -2,6 +2,7 @@
 
 #include "msflexgrid1.h"
 #include "MbPollOptions.h"
+#include "MbPollFunctions.h"
 #include "MbpExterns.h"
 //#include "E:\Home\Personal\Extra Curricular\Proj5\MBP\MBP\20131002\T3000_Building_Automation_System-master\T3000\CM5\myownlistctrl.h"
 #include "CM5\myownlistctrl.h"
@@ -35,6 +36,7 @@ public:
 	afx_msg void OnBnClickedClose();
 //	afx_msg void OnSetupOptions();
 	CMbPollOptions mbPollOptions;
+	CMbPollFunctions mbPollFunctions;
 	CStatic ctrlLabel1;
 	UINT_PTR timer1;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
@@ -192,5 +194,6 @@ public:
 	afx_msg void OnUpdateDisplaytypeHex(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateDisplaytypeBinary(CCmdUI *pCmdUI);
 	CStatic staticDisplayType;
+	afx_msg void OnFunctionsWriteregisters();
 };
 

@@ -190,6 +190,7 @@
 #define IDD_DIALOGAIRFLOW_SETTING       475
 #define IDD_DIALOG_8IOA_VIEW            476
 #define IDD_WRITEREGDLG                 477
+#define IDD_DIALOG_MBPOLL_FUNCS         478
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -209,10 +210,12 @@
 #define IDC_INTERVAL                    1027
 #define IDC_CO2_ALARM_OFF_TIME          1027
 #define IDC_EDIT_VALUE                  1027
+#define IDC_EDIT_ADDRESS1               1027
 #define IDC_OUTPUT3_DELAY_OFF_EDIT      1028
 #define IDC_CUR_TEMP                    1028
 #define IDC_EDIT42                      1028
 #define IDC_DTS1                        1028
+#define IDC_EDIT_SIZE1                  1028
 #define IDC_BUTTON3                     1029
 #define IDC_DELAYTABBTN                 1029
 #define IDC_OUTPUT5_DELAY_OFF_EDIT      1029
@@ -1361,10 +1364,15 @@
 #define IDC_STATUS5                     1701
 #define IDC_SYSLINK1                    1701
 #define IDC_STATUS6                     1702
+#define IDC_EDIT_SLAVE1                 1702
 #define IDC_STATUS7                     1703
+#define IDC_LIST_REG1                   1703
 #define IDC_STATUS8                     1704
+#define IDC_BUTTON_SEND1                1704
 #define IDC_STATUS9                     1705
+#define IDC_BUTTON_CANCEL1              1705
 #define IDC_STATUS10                    1706
+#define IDC_BUTTON_EDIT1                1706
 #define IDC_STATUS11                    1707
 #define IDC_STATUS12                    1708
 #define IDC_STATUS13                    1709
@@ -1493,6 +1501,7 @@
 #define ID_DISPLAYTYPE_UNSIGNED         34001
 #define ID_DISPLAYTYPE_HEX              34002
 #define ID_DISPLAYTYPE_BINARY           34003
+#define ID_FUNCTIONS_WRITEREGISTERS     34004
 #define ID_CONFIGFILE_SAVE_AS           35000
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
@@ -1504,9 +1513,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        474
-#define _APS_NEXT_COMMAND_VALUE         34004
-#define _APS_NEXT_CONTROL_VALUE         1702
+#define _APS_NEXT_RESOURCE_VALUE        479
+#define _APS_NEXT_COMMAND_VALUE         34005
+#define _APS_NEXT_CONTROL_VALUE         1707
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

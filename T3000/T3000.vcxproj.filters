@@ -414,6 +414,9 @@
     <ClCompile Include="fileRW.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MbPollFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -991,6 +994,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fileRW.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MbPollFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

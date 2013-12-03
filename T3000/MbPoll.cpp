@@ -252,7 +252,7 @@ BOOL CMbPoll::OnInitDialog()
 	firstTime4 = 1;
 	firstTime5 = 1;
 
-#if 0
+#if 1
 	connectionSuccessful = 1;	/* to be deleted */
 #endif
 
@@ -319,6 +319,7 @@ BEGIN_MESSAGE_MAP(CMbPoll, CDialog)
 	ON_UPDATE_COMMAND_UI(ID_DISPLAYTYPE_UNSIGNED, &CMbPoll::OnUpdateDisplaytypeUnsigned)
 	ON_UPDATE_COMMAND_UI(ID_DISPLAYTYPE_HEX, &CMbPoll::OnUpdateDisplaytypeHex)
 	ON_UPDATE_COMMAND_UI(ID_DISPLAYTYPE_BINARY, &CMbPoll::OnUpdateDisplaytypeBinary)
+	ON_COMMAND(ID_FUNCTIONS_WRITEREGISTERS, &CMbPoll::OnFunctionsWriteregisters)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CMbPoll, CDialog)
@@ -425,7 +426,7 @@ void CMbPoll::InitListCtrl()
 	SetWindowLong(mbPollList.m_hWnd,GWL_STYLE,style);
 	DWORD dwstyle=mbPollList.GetExtendedStyle();
 	dwstyle|=LVS_EX_FULLROWSELECT; 
-	dwstyle|=LVS_EX_GRIDLINES;     
+	dwstyle|=LVS_EX_GRIDLINES;
 	mbPollList.SetExtendedStyle(dwstyle);
 	mbPollList.InsertColumn(0,_T(""),LVCFMT_LEFT,120);  
 	mbPollList.InsertColumn(1,_T(""),LVCFMT_LEFT,50);
@@ -2828,6 +2829,8 @@ void CMbPoll::OnUpdateDisplaytypeBinary(CCmdUI *pCmdUI)
 	// TODO: Add your command update UI handler code here
 }
 
+#if 0
+
 #if 1
 void CMbPoll::OnFileSaveWhileClose()
 {
@@ -2984,5 +2987,176 @@ void CMbPoll::OnFileOpenWhileOpen()
 		f.Close();
 	}
 }
+
+#endif
+
+#if 1
+void CMbPoll::OnFileSaveWhileClose()
+{
+	// TODO: Add your command handler code here
+	CFile f;
+	//CString strFilter = _T("Text file (*.txt)|*.txt|Rich Text file (*.rtf)|*.rtf|All files (*.*)|*.*||");
+	CString temp;
+	int qtyToShow[5];
+	CMsflexgrid* grid;
+
+	//CFileDialog dlg(true,_T("Save current Config"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
+	//CFileDialog dlg(false, _T("Save current Config"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER, strFilter);
+
+	//if (dlg.DoModal() == IDOK)
+	if (1)
+	{
+		//CString strConfigFilePathName = dlg.GetPathName();
+		//MessageBox(strConfigFilePathName);
+		//CString strConfigFileName = dlg.GetFileName();
+		//MessageBox(strConfigFileName);
+		BOOL a = f.Open(L"LightingController\\savedConfig.txt", CFile::modeCreate | CFile::modeWrite);
+
+		//CString str1;
+		//str1 = L"Text1;Text2;Text3;";
+		//WriteCString(f, str1);
+		//f.Close();
+
+#if SHOW_ALL
+		for (int i = 0; i < 5; i++)
+#endif
+#if !SHOW_ALL
+		for (int i = 0; i < 1; i++)
+#endif
+		{
+			if (i == 0) grid = &ctrlGrid1;
+			if (i == 1) grid = &ctrlGrid2;
+			if (i == 2) grid = &ctrlGrid3;
+			if (i == 3) grid = &ctrlGrid4;
+			if (i == 4) grid = &ctrlGrid5;
+
+			temp.Format(_T("%d"), i);				// grid number
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), dataFlowStarted[i]);	// dataflow started
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollConfigured[i]);	// poll configured
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollSlaveId[i]);	// slave ID
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollFunction[i]);	// function
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollAddress[i]);	// address
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollQuantity[i]); // quantity
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollScanRate[i]); // scan rate
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollSingleFunction[i]); // single function
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollRows[i]);		// rows
+			WriteCString(f, temp);
+			temp.Format(_T("%d"), pollDisplay[i]);	// display
+			WriteCString(f, temp);
+
+			qtyToShow[i] = ((pollRows[i] == 0) || (pollQuantity[i] < pollRows[i])) ? pollQuantity[i] : pollRows[i];
+			for (int j = 0; j < qtyToShow[i]; j++)
+			{
+				//temp = grid->get_TextMatrix(j+1, 0);
+				int rowNo = j % ROWS_OF_MBPOLLLIST;
+				int colNo = (j / ROWS_OF_MBPOLLLIST) * 3;
+				temp = mbPollList.GetItemText(rowNo, colNo);
+				WriteCString(f, temp);
+			}
+		}
+		f.Close();
+	}
+}
+#endif
+
+void CMbPoll::OnFileOpenWhileOpen()
+{
+	// TODO: Add your command handler code here
+
+	int qtyToShow[5];
+	CMsflexgrid* grid;
+	CString strFilter = _T("Text file (*.txt)|*.txt|Rich Text file (*.rtf)|*.rtf|All files (*.*)|*.*||");
+	CFile f;
+	CString temp;
+
+	//CFileDialog dlg(true, _T("Open current Config"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER, strFilter);
+	//if (dlg.DoModal() == IDOK)
+	if (1)
+	{
+		//CString strConfigFilePathName1 = dlg.GetPathName();
+		//MessageBox(strConfigFilePathName1);
+		//CString strConfigFileName1 = dlg.GetFileName();
+		//MessageBox(strConfigFileName1);
+		//f.Open(strConfigFileName1, CFile::modeRead);
+		f.Open(L"LightingController\\savedConfig.txt", CFile::modeRead);
+
+#if SHOW_ALL
+		for (int i = 0; i < 5; i++)
+#endif
+#if !SHOW_ALL
+		for (int i = 0; i < 1; i++)
+#endif
+		{
+			if (i == 0) grid = &ctrlGrid1;
+			if (i == 1) grid = &ctrlGrid2;
+			if (i == 2) grid = &ctrlGrid3;
+			if (i == 3) grid = &ctrlGrid4;
+			if (i == 4) grid = &ctrlGrid5;
+
+			ReadCString(temp, f);		// grid number
+			ReadCString(temp, f);		// dataflow started
+			dataFlowStarted[i] = _wtoi(temp);
+			ReadCString(temp, f);		// poll configured
+			pollConfigured[i] = _wtoi(temp);
+			ReadCString(temp, f);		// slave ID
+			pollSlaveId[i] = _wtoi(temp);
+			ReadCString(temp, f);		// function
+			pollFunction[i] = _wtoi(temp);
+			ReadCString(temp, f);		// address
+			pollAddress[i] = _wtoi(temp);
+			ReadCString(temp, f);		// quantity
+			pollQuantity[i] = _wtoi(temp);
+			ReadCString(temp, f);		// scan rate
+			pollScanRate[i] = _wtoi(temp);
+			ReadCString(temp, f);		// single function
+			pollSingleFunction[i] = _wtoi(temp);
+			ReadCString(temp, f);		// rows
+			pollRows[i] = _wtoi(temp);
+			ReadCString(temp, f);		// display
+			pollDisplay[i] = _wtoi(temp);
+			qtyToShow[i] = ((pollRows[i] == 0) || (pollQuantity[i] < pollRows[i])) ? pollQuantity[i] : pollRows[i];
+			if (pollRows[i] == 0) grid->put_Rows(pollQuantity[i] + 1);
+			if (pollRows[i] == 10) grid->put_Rows(11);
+			if (pollRows[i] == 20) grid->put_Rows(21);
+			if (pollRows[i] == 50) grid->put_Rows(51);
+			if (pollRows[i] == 100) grid->put_Rows(101);
+			for (int j = 0; j < qtyToShow[i]; j++)
+			{
+				ReadCString(temp, f);
+				//grid->put_TextMatrix(j + 1, 0, temp);		// put_TextMatrix(row, col, text);
+				int rowNo = j % ROWS_OF_MBPOLLLIST;
+				int colNo = (j / ROWS_OF_MBPOLLLIST) * 3;
+				mbPollList.SetItemText(rowNo, colNo, temp);
+			}
+			saveRegisterNames(i);
+		}
+		startStopBtnState();
+		restoreConfigs();
+		f.Close();
+	}
+}
+
+
+
+void CMbPoll::OnFunctionsWriteregisters()
+{
+
+	int ret = mbPollFunctions.DoModal();
+	if (ret == IDOK)
+	{
+		
+	}
+}
+
+
 
 
