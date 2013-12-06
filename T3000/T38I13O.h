@@ -13,7 +13,7 @@ class T38I13O : public CFormView
 public:
 	T38I13O();           // protected constructor used by dynamic creation
 	virtual ~T38I13O();
-
+	HANDLE m_threadT38I13o;
 public:
 	enum { IDD = IDD_T38I13O };
 #ifdef _DEBUG
@@ -39,7 +39,7 @@ public:
 	int m_currow;
 	int m_sn;
 	CString m_oldname;
-private:
+public:
 	    int	SN_LOW											 ;
 		int	SN_HI											 ;
 		int	EPROM_VER_NUMBER								 ;
@@ -191,6 +191,8 @@ public:
 	CComboBox m_delaycombox;
 	afx_msg void OnCbnSelchangeBrandrate();
 	afx_msg void OnCbnSelchangeDelay();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnDestroy();
 };
 
 

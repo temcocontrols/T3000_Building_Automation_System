@@ -91,7 +91,7 @@ void WeeklyRout_InsertDia::load_grid()
 	unsigned short p[72]={0};
 	memset(p,0,sizeof(p));
 	if (m_strtype.CompareNoCase(_T("LightingController")) == 0)
-		Read_Multi(254,p,6488 + WR_TIME_SIZE*(m_addr-1),0x48);//由上到下，由左到右，from up to lower ,from left to right
+		Read_Multi(g_tstat_id,p,WEEKLY_ROUTINE_ON_TIME + WR_TIME_SIZE*(m_addr-1),0x48);//由上到下，由左到右，from up to lower ,from left to right
 	else
 		Read_Multi(g_tstat_id,p,MODBUS_WR_ONTIME_FIRST + WR_TIME_SIZE*(m_addr-1),0x48);//由上到下，由左到右，from up to lower ,from left to right
 	CString str;
@@ -118,7 +118,7 @@ void WeeklyRout_InsertDia::load_grid()
 		}
 		
 	if (m_strtype.CompareNoCase(_T("LightingController")) == 0)
-		Read_Multi(254,p,7928 + WR_TIME_SIZE*(m_addr-1),0x48);//由上到下，由左到右，from up to lower ,from left to right
+		Read_Multi(g_tstat_id,p,WEEKLY_ROUTINE_OFF_TIME + WR_TIME_SIZE*(m_addr-1),0x48);//由上到下，由左到右，from up to lower ,from left to right
 	else
 		Read_Multi(g_tstat_id,p,MODBUS_WR_OFFTIME_FIRST + WR_TIME_SIZE*(m_addr-1),0x48);//由上到下，由左到右，from up to lower ,from left to right
 	for(i=1;i<GRID_COL_NUMBER;i++)
@@ -171,7 +171,7 @@ void WeeklyRout_InsertDia::write_grid()
 		}
 
 		if (m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-			Write_Multi(254,p,6488 + WR_TIME_SIZE*(m_addr-1),0x48);
+			Write_Multi(g_tstat_id,p,WEEKLY_ROUTINE_ON_TIME + WR_TIME_SIZE*(m_addr-1),0x48);
 		else
 			Write_Multi(g_tstat_id,p,MODBUS_WR_ONTIME_FIRST + WR_TIME_SIZE*(m_addr-1),0x48);
 	k=0;//////////////////////////////////clear
@@ -196,7 +196,7 @@ void WeeklyRout_InsertDia::write_grid()
 //		p[i]=0;
 	Sleep(10);
 	if (m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		Write_Multi(254,p,7928 + WR_TIME_SIZE*(m_addr-1),0x48);
+		Write_Multi(g_tstat_id,p,WEEKLY_ROUTINE_OFF_TIME + WR_TIME_SIZE*(m_addr-1),0x48);
 	else
 		Write_Multi(g_tstat_id,p,MODBUS_WR_OFFTIME_FIRST + WR_TIME_SIZE*(m_addr-1),0x48);
 	

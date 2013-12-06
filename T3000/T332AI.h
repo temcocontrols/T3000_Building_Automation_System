@@ -15,7 +15,8 @@ class T332AI : public CFormView
 public:
 	T332AI();           // protected constructor used by dynamic creation
 	virtual ~T332AI();
-
+	int m_sn;
+	CString m_oldname;
 public:
 	enum { IDD = IDD_T332AI };
 #ifdef _DEBUG
@@ -82,10 +83,82 @@ private:
 	int	INPUT30	;
 	int	INPUT31	;
 	int	INPUT32	;
+	int	Range1	;
+	int	Range2	;
+	int	Range3	;
+	int	Range4	;
+	int	Range5	;
+	int	Range6	;
+	int	Range7	;
+	int	Range8	;
+	int	Range9	;
+	int	Range10	;
+	int	Range11	;
+	int	Range12	;
+	int	Range13	;
+	int	Range14	;
+	int	Range15	;
+	int	Range16	;
+	int	Range17	;
+	int	Range18	;
+	int	Range19	;
+	int	Range20	;
+	int	Range21	;
+	int	Range22	;
+	int	Range23	;
+	int	Range24	;
+	int	Range25	;
+	int	Range26	;
+	int	Range27	;
+	int	Range28	;
+	int	Range29	;
+	int	Range30	;
+	int	Range31	;
+	int	Range32	;
+
+	int	Filter1	;
+	int	Filter2	;
+	int	Filter3	;
+	int	Filter4	;
+	int	Filter5	;
+	int	Filter6	;
+	int	Filter7	;
+	int	Filter8	;
+	int	Filter9	;
+	int	Filter10	;
+	int	Filter11	;
+	int	Filter12	;
+	int	Filter13	;
+	int	Filter14	;
+	int	Filter15	;
+	int	Filter16	;
+	int	Filter17	;
+	int	Filter18	;
+	int	Filter19	;
+	int	Filter20	;
+	int	Filter21	;
+	int	Filter22	;
+	int	Filter23	;
+	int	Filter24	;
+	int	Filter25	;
+	int	Filter26	;
+	int	Filter27	;
+	int	Filter28	;
+	int	Filter29	;
+	int	Filter30	;
+	int	Filter31	;
+	int	Filter32	;
+
 
 public:
 	CMsflexgrid m_msflexgrid_input;
 	CEdit m_inNameEdt;
+	DECLARE_EVENTSINK_MAP()
+	void ClickMsflexgridInput();
+	afx_msg void OnEnKillfocusEditName();
+	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
+	CComboBox m_comboxRange;
+	afx_msg void OnCbnSelchangeRangecombo();
 };
 
 

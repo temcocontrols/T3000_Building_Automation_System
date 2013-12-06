@@ -1359,7 +1359,6 @@
 #define IDC_88PIC                       1700
 #define IDC_NETADDRESS1                 1700
 #define IDC_STATUS5                     1701
-#define IDC_SYSLINK1                    1701
 #define IDC_STATUS6                     1702
 #define IDC_STATUS7                     1703
 #define IDC_STATUS8                     1704
@@ -1375,6 +1374,8 @@
 #define IDC_STATUS18                    1714
 #define IDC_STATUS19                    1715
 #define IDC_STATUS20                    1716
+#define IDC_SAVEDELAYTIME               1717
+#define IDC_SAVEALL                     1718
 #define IDC_EDIT_PID2OFFSETPOINT2       2002
 #define IDC_EDIT_PID2OFFSETPOINT4       2003
 #define IDC_EDIT_PID2OFFSETPOINT3       2004
@@ -1506,7 +1507,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        474
 #define _APS_NEXT_COMMAND_VALUE         34004
-#define _APS_NEXT_CONTROL_VALUE         1702
+#define _APS_NEXT_CONTROL_VALUE         1719
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

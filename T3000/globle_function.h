@@ -18,6 +18,7 @@
 
 #include "global_variable_extern.h"
 
+
 void FLEX_GRID_PUT_STR(CMsflexgrid m_FlexGri,int row,int col,CString str);
 
 int modbus_read_one_value( 
@@ -36,7 +37,7 @@ int modbus_read_multi_value(
 int read_one(unsigned char device_var,unsigned short address,int retry_times=3);
 int write_one(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
-int Write_Multi_short(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
+int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times=3);
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times=3);
 int write_one_org(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
@@ -112,4 +113,5 @@ CString GetProductName(int ModelID);
 CString Get_Table_Name(int SerialNo,CString Type ,int Row);
 void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName); 
 int Get_Unit_Process(CString Unit);
+BOOL Get_Bit_FromRegister(unsigned short RegisterValue,unsigned short Position);
 #endif

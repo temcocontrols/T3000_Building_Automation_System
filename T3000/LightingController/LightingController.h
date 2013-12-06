@@ -29,6 +29,12 @@ typedef struct OUTPUTNAMESTATUS
 	CString Status;
 }ONS;
 
+typedef struct Output_Mapping_Struct{
+	int Address;
+	int Card_ID;
+	int OuputNo;
+	int OutputNameAddress;
+} Mapping_Struct;
 
 // CLightingController form view
 
@@ -64,9 +70,21 @@ public:
 	int m_inHardware;
 	CString m_CStrModel;
 	int m_inBaudrate;
+	int m_sn;
+	int m_input_output;
+	void Fresh_ListBox();
 	void ShowLighContDlg();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnDestroy();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+
+	//////////////////////////////////////////////
+	vector<Mapping_Struct> m_input_output_mapping;
+	vector<Mapping_Struct> m_group_output_mapping;
+	////////////////////////////////////////////////
+
+	CString Read_OutputName(int Address);
+	void Read_Input_Group_Mapping();
 	CString m_datetime;
 	unsigned short LightCregister[512];
 	BOOL prodtopcData();//采集数据
@@ -113,6 +131,7 @@ public:
 	 void DblClickMsflexgrid1();
 	 CEdit m_editName;
 	 afx_msg void OnEnKillfocusEditModifyname();
+	 afx_msg void OnEnKillfocusEditTimeSaveDelay();
 	 //存放输出名称Status
 	 vector<ONS>m_vecONS;
 	 ONS m_structONS;
@@ -180,6 +199,7 @@ public:
 	afx_msg void OnBnClickedButtonLightingcontorlAnnuals();
 	afx_msg void OnBnClickedButtonLightingcontorlGroups();
 	afx_msg void OnBnClickedButtonLightingcontorlSyncwithPC();
+	afx_msg void OnBnClickedButtonSaveAll();
 	afx_msg void OnCbnSelchangeValuecombo();
 
 	WORD lightingController_time[8];
@@ -236,12 +256,14 @@ public:
 	 CButton					m_ReadOnlyCheckBtn;
 	 CComboBox m_ipModelComBox;
 	 afx_msg void OnBnClickedButtonConfigure();
-	 afx_msg void OnBnClickedButtonConfigureswitch();
+	 
 	 CComboBox m_timeserver;
 	 CEdit m_macaddress;
 	BOOL m_light[32];
 	CMsflexgrid m_inputs_grid;
 	CComboBox m_combox_controler;
+	CWinThread * LC_Thread;
+	CEdit m_savedelaytime;
 };
 
 

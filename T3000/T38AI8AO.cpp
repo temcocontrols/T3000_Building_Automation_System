@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "T38AI8AO.h"
 #include "ado/ADO.h"
- 
+ #include "Dialog_Progess.h"
 #include "globle_function.h"
 #include "MainFrm.h"
 // T38AI8AO
@@ -406,9 +406,43 @@ void T38AI8AO::InitialDialog(){
 }
 
 void T38AI8AO::Fresh(){
-InitialRegister();	
-InitialDialog();
-AfxBeginThread(_BackFreshing,this);
+
+	float progress;
+	if (is_connect())
+	{  
+		CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
+		pDlg->Create(IDD_DIALOG10_Progress, this);
+		pDlg->ShowProgress(0,0);
+		pDlg->ShowWindow(SW_SHOW);
+		RECT RECT_SET1;
+		GetClientRect(&RECT_SET1);
+		pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20);
+
+		for (int i=0;i<3;i++)
+		{
+			if (pDlg!=NULL)
+			{
+				progress=float((i+1)*(100/3));
+				pDlg->ShowProgress(int(progress),(int)progress);
+			} 
+			Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
+		}
+		pDlg->ShowWindow(SW_HIDE);
+		if(pDlg!=NULL)
+		{delete pDlg;
+		pDlg=NULL;}
+
+		InitialRegister();	
+		InitialDialog();
+		AfxBeginThread(_BackFreshing,this);
+	}
+	else
+	{
+		SetPaneString(1,_T("Disconnection"));
+		AfxMessageBox(_T("Please Connect your device"));
+	}
+
+
 }
 
 

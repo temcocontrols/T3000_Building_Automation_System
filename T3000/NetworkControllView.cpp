@@ -460,7 +460,7 @@ return;
 	   data[i]=(unsigned short)address[i];
 	}
 
-	int ret=write_multi_Short(g_tstat_id,data,107,12);
+	int ret=Write_Multi_short(g_tstat_id,data,107,12);
 	//write_one(g_tstat_id,131,1);
 	//Sleep(1000);//Sleep(10000); // ???
 	//write_one(g_tstat_id,133,1);

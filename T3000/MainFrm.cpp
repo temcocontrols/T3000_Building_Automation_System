@@ -255,8 +255,8 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 		{
 			  continue;
 		}
-		WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
-		//int nRet =read_one(g_tstat_id,6,1);这是原有代码，这样发现，真正调用此函数，成功返回率很低
+		WaitForSingleObject(Read_Mutex,INFINITE); 
+		 
 		int nRet =read_one(g_tstat_id,6,2);
 
 		if(nRet<0)	
@@ -264,9 +264,9 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			ReleaseMutex(Read_Mutex);//Add by Fance .
 			continue;
 		}
-//		int i;
+ 
 		for(int i=0;i<10;i++) //Modify by Fance , tstat 6 has more register than 512;
-		//for(i=0;i<8;i++)
+		 
 		{
 			if(g_tstat_id_changed)
 			{
@@ -805,97 +805,7 @@ void CMainFrame::OnUpdateCheckIOPane(CCmdUI* pCmdUI)
 {
 
 }
-void CMainFrame::EnterConnectToANode()
-{
-	Flexflash = TRUE;
-	HTREEITEM hSelItem;//=m_pTreeViewCrl->GetSelectedItem();
-	int nRet =read_one(g_tstat_id,6,1);
-
-	/*CPoint pt;
-	GetCursorPos(&pt);
-	m_pTreeViewCrl->ScreenToClient(&pt);*/
-	hSelItem = m_pTreeViewCrl->GetSelectedItem();
-
-	//////////////////////////////////////////////////////////////////////////
-	m_strCurSelNodeName = m_pTreeViewCrl->GetItemText(hSelItem);
-	//m_pTreeViewCrl->Expand(hSelItem,TVE_EXPAND);
-
-
-	//	BOOL ret  =  m_pTreeViewCrl->Retofline(hSelItem);//tree0412
-	//	if (ret)//tree0412
-	//	{
-
-	BeginWaitCursor();
-	//CM5
-	g_bChamber=FALSE;
-	m_isCM5=FALSE;
-	m_isMiniPanel=FALSE;
-#if 1
-	for(UINT i=0;i<m_product.size();i++)
-	{
-		if(hSelItem==m_product.at(i).product_item )
-		{			
-			if(m_product.at(i).product_class_id == PM_CM5)
-			{
-				g_tstat_id=m_product.at(i).product_id;
-				//SetPaneString(2,_T("Connect To CM5"));
-				m_isCM5=TRUE;
-				DoConnectToANode(hSelItem); 
-				//SwitchToPruductType(4);			
-			}
-			else if (m_product.at(i).product_class_id == PM_MINIPANEL)
-			{
-				g_tstat_id = m_product.at(i).product_id;
-				m_isMiniPanel=TRUE;
-				DoConnectToANode(hSelItem);
-				
-				//SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
-			}
-			else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
-			{
-				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(DLG_DIALOGT3_VIEW);
-			}
-			else if (m_product.at(i).product_class_id ==PM_AirQuality) //AirQuality
-			{
-				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(DLG_AIRQUALITY_VIEW);
-			}else if (m_product.at(i).product_class_id == PM_LightingController)//LightingController
-			{
-				g_tstat_id = m_product.at(i).product_id;
-				if(m_product.at(i).BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(m_product.at(i).BuildingInfo.strBuildingName)!=0)
-				{
-					//connect:
-					BOOL bRet = ConnectSubBuilding(m_product.at(i).BuildingInfo);
-					if (!bRet)
-					{
-						if(m_product.at(i).BuildingInfo.strProtocol.CompareNoCase(_T("Modbus TCP")) == 0) // net work protocol
-						{
-							CheckConnectFailure(m_product.at(i).BuildingInfo.strIp);
-						}
-					}
-				}
-				SwitchToPruductType(DLG_LIGHTINGCONTROLLER_VIEW);
-			}
-			else if (m_product.at(i).product_class_id==PM_TSTAT6_HUM_Chamber)
-			{	g_bChamber=TRUE;
-				g_tstat_id = m_product.at(i).product_id;
-
-			    SwitchToPruductType(DLG_HUMCHAMBER);
-			}
-			else 
-			{
-			            g_tstat_id = m_product.at(i).product_id;
-						DoConnectToANode(hSelItem); 
-			}
-
-		}
-	}
-#endif
-	//CM5
-
-	EndWaitCursor();
-}
+ 
 void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {	
      
@@ -947,12 +857,22 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 			else if (m_product.at(i).product_class_id == PM_T3IOA)
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				DoConnectToANode(hSelItem);
+				SwitchToPruductType(DLG_DIALOGT38AI8AO);
 			}
-			else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
+			else if (m_product.at(i).product_class_id == PM_T38I13O)
+			{
+				g_tstat_id = m_product.at(i).product_id;
+				SwitchToPruductType(DLG_DIALOGT38I13O_VIEW);
+			}
+			else if (m_product.at(i).product_class_id == PM_T34AO) //T3
 			{
 				g_tstat_id = m_product.at(i).product_id;
 				SwitchToPruductType(DLG_DIALOGT3_VIEW);
+			}
+			else if (m_product.at(i).product_class_id==PM_T332AI)
+			{
+			    g_tstat_id = m_product.at(i).product_id;
+				SwitchToPruductType(DLG_DIALOGT332AI_VIEW);
 			}
 			else if (m_product.at(i).product_class_id ==PM_AirQuality) //AirQuality
 			{
@@ -3499,7 +3419,6 @@ void CMainFrame::OnDestroy()
 		if (WaitForSingleObject(hp, 1000) != WAIT_OBJECT_0)
 
 		if (WaitForSingleObject(m_pRefreshThread->m_hThread, 100) == WAIT_OBJECT_0)
-
 		{
 		}
 		else
@@ -3510,7 +3429,7 @@ void CMainFrame::OnDestroy()
 		//CloseHandle(hp);
 		//m_pRefreshThread->Delete();
 	}
-
+	
 	if (is_connect())
 	{
 		close_com(); // added by zgq:12-16-2011
@@ -3526,8 +3445,8 @@ void CMainFrame::OnDestroy()
 
 	if (g_testmultiReadtraffic_dlg!=NULL)
 	{
-	  delete g_testmultiReadtraffic_dlg;
-	  g_testmultiReadtraffic_dlg=NULL;
+		delete g_testmultiReadtraffic_dlg;
+		g_testmultiReadtraffic_dlg=NULL;
 	}
 #endif
 
@@ -3840,11 +3759,11 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			OnToolErease();
 			return 1;
 		} 
-			if(pMsg->wParam == VK_RETURN)
-			{
-				EnterConnectToANode();
-				return 1;
-			}
+		/*if(pMsg->wParam == VK_RETURN)
+		{
+		EnterConnectToANode();
+		return 1;
+		}*/
 			
 
 	}

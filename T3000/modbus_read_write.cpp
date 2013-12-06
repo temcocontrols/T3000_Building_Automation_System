@@ -2,16 +2,16 @@
 
 /**
 
-  Read one value from a modbus device
+Read one value from a modbus device
 
-  @param[out]  value		the value read, cast to an integer
-  @param[in]   device_var	the modbus device address
-  @param[in]   address		the offset of the value to be read in the device
-  @param[in]   retry_times	the number of times to retry on read failure before giving up
+@param[out]  value		the value read, cast to an integer
+@param[in]   device_var	the modbus device address
+@param[in]   address		the offset of the value to be read in the device
+@param[in]   retry_times	the number of times to retry on read failure before giving up
 
-  @return  0 if there were no errors
+@return  0 if there were no errors
 
-  This DOES lock the register_critical_section
+This DOES lock the register_critical_section
 
   */
 int modbus_read_one_value( 
