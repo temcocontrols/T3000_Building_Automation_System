@@ -224,7 +224,7 @@ void AnnualRout_InsertDia::load()
 {
 	set_day_state(TO_CLEAR_MONTH_CTRL);//clear month ctrl	
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		Read_Multi(254,the_days,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);//get from network
+		Read_Multi(g_tstat_id,the_days,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);//get from network
 	else
 		Read_Multi(g_tstat_id,the_days,MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);//get from network
 	int i=0,j=0;
@@ -242,7 +242,7 @@ void AnnualRout_InsertDia::load()
 			temp_uc[i]=0;
 		}
 		if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-			Write_Multi(254,temp_uc,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
+			Write_Multi(g_tstat_id,temp_uc,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 		else
 			Write_Multi(g_tstat_id,temp_uc,MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 	}
@@ -592,7 +592,7 @@ void AnnualRout_InsertDia::OnAnnualroutAdd()
 	for(int i=0;i<ONE_YEAR_BETYS;i++)
 		ttt[i]=(unsigned char)the_days[i];
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		Write_Multi(254,ttt,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
+		Write_Multi(g_tstat_id,ttt,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 	else
 		Write_Multi(g_tstat_id,ttt,MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 	NET_WORK_SLEEP_BETWEEN_WRITE_READ
@@ -609,7 +609,7 @@ void AnnualRout_InsertDia::OnAnnualroutClear()
 		for(int i=0;i<ONE_YEAR_BETYS;i++)
 			ttt[i]=0;
 		if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-			Write_Multi(254,ttt,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
+			Write_Multi(g_tstat_id,ttt,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 		else
 			Write_Multi(g_tstat_id,ttt,MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 		NET_WORK_SLEEP_BETWEEN_WRITE_READ

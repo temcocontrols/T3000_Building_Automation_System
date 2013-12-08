@@ -222,6 +222,7 @@ typedef struct _MessageInvokeIDInfo
 	CString task_info;
 }MessageInvokeODInfo;
 
+
 //#include "Bacnet_Include.h"
 //#define _DEBUG
 //*********************************link to dll***************************

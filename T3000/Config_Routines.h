@@ -22,6 +22,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 public:
 	//add function by manual
+	int m_sn;
 	int row_row,row_col;//for first row is clicked,setfocus is last row and first line,killfocus is first line and first row
     void load_grid();
 	void on_select();

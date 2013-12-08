@@ -8,21 +8,39 @@
 #include "globle_function.h"
 #include "MainFrm.h"
 #include "WriteSingleRegDlg.h"
+#include "Dialog_Progess.h"
+CString Range_Unit[]={_T("RAW DATA"),_T("TYPE2 10K C"),_T("TYPE2 10K F"),_T("0-100%"),_T("ON/OFF"),_T("OFF/ON"),_T("Pulse Input"),_T("Lighting Control"),_T("TYPE3 10K C"),_T("TYPE3 10K F"),_T("NO USE"),_T("0-5V"),_T("0-10V"),_T("0-20ma")};
 
 
-// T38I13O
+UINT _ReadMulti_T38I13ORegisters(LPVOID pParam){
+T38I13O *pParent = (T38I13O *)pParam;
+while (TRUE)
+{
+if (!is_connect())
+{
+Sleep(5000);
+continue;
+} 
+else
+{
+Sleep(2000);
+Read_Multi(g_tstat_id,&product_register_value[pParent->ZONE_TIME_LEFT_INPUT1],pParent->ZONE_TIME_LEFT_INPUT1,8);
+}
+}
 
-CString Range_Unit[]={_T("RAW DATA"),_T("10K C"),_T("10K F"),_T("0-100%"),_T("ON/OFF"),_T("OFF/ON"),_T("Pulse Input"),_T("Lighting Control"),_T("TYPE3 10K C"),_T("TYPE3 10K F"),_T("NO USE"),_T("0-5V"),_T("0-10V"),_T("0-20I")};
+
+}
 IMPLEMENT_DYNCREATE(T38I13O, CFormView)
 
 T38I13O::T38I13O()
 	: CFormView(T38I13O::IDD)
 {
-
+m_threadT38I13o=NULL;
 }
 
 T38I13O::~T38I13O()
 {
+
 }
 
 void T38I13O::DoDataExchange(CDataExchange* pDX)
@@ -41,6 +59,8 @@ BEGIN_MESSAGE_MAP(T38I13O, CFormView)
 	ON_EN_KILLFOCUS(IDC_EDIT_NAME, &T38I13O::OnEnKillfocusEditName)
 	ON_CBN_SELCHANGE(IDC_BRANDRATE, &T38I13O::OnCbnSelchangeBrandrate)
 	ON_CBN_SELCHANGE(IDC_DELAY, &T38I13O::OnCbnSelchangeDelay)
+	ON_WM_TIMER()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -678,7 +698,7 @@ for(int i = 1;i<=8;i++)
 	else if (13==product_register_value[RANGE_INPUT1+i-1])
 	{
 		//strresult=_T("0-20I");
-		strresult.Format(_T("%0.1f mA"),(float)regValue/1000.0);
+		strresult.Format(_T("%0.1f ma"),(float)regValue/1000.0);
 	}
 	
 	
@@ -722,7 +742,7 @@ for(int i = 1;i<=13;i++)
 	CstresultDO=_T("UNUSED");
 	}
 	m_msflexgrid_output.put_TextMatrix(i,2,CstresultDO);
-    if ((product_register_value[AUTO_MANUAL_OUTPUTS]>>(m_currow-1))&0x01==1)
+    if (((product_register_value[AUTO_MANUAL_OUTPUTS]>>(i-1))&0x01)==1)
     {
 	CstresultDO=_T("Manual");
     } 
@@ -757,7 +777,41 @@ void T38I13O::InitialTableName(){
 }
 void T38I13O::Fresh()
 {
-InitialDialog();
+	float progress;
+	if (is_connect())
+	{  
+		CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
+		pDlg->Create(IDD_DIALOG10_Progress, this);
+		pDlg->ShowProgress(0,0);
+		pDlg->ShowWindow(SW_SHOW);
+		RECT RECT_SET1;
+		GetClientRect(&RECT_SET1);
+		pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20);
+
+		for (int i=0;i<3;i++)
+		{
+			if (pDlg!=NULL)
+			{
+				progress=float((i+1)*(100/3));
+				pDlg->ShowProgress(int(progress),(int)progress);
+			} 
+			Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
+		}
+		pDlg->ShowWindow(SW_HIDE);
+		if(pDlg!=NULL)
+		{delete pDlg;
+		pDlg=NULL;}
+
+		InitialDialog();
+		SetTimer(1,2000,NULL);
+		AfxBeginThread(_ReadMulti_T38I13ORegisters,this);
+	}
+	else
+	{
+		SetPaneString(1,_T("Disconnection"));
+		AfxMessageBox(_T("Please Connect your device"));
+	}
+
 }
 BEGIN_EVENTSINK_MAP(T38I13O, CFormView)
 	ON_EVENT(T38I13O, IDC_MSFLEXGRID_INPUT, DISPID_CLICK, T38I13O::ClickMsflexgridInput, VTS_NONE)
@@ -834,7 +888,7 @@ void T38I13O::ClickMsflexgridInput()
 		m_comboxRange.AddString(_T("NO USE"));
 		m_comboxRange.AddString(_T("0-5V"));
 		m_comboxRange.AddString(_T("0-10V"));
-		m_comboxRange.AddString(_T("0-20I"));
+		m_comboxRange.AddString(_T("0-20ma"));
 
 		m_comboxRange.ShowWindow(SW_SHOW);
 
@@ -874,28 +928,94 @@ void T38I13O::OnCbnSelchangeRangecombo()
 	   }
 	   else
 	   {
-		   int sel=m_comboxRange.GetCurSel();
-		   m_comboxRange.ShowWindow(FALSE);
-		   
-			   if (product_register_value[OUTPUT1+m_currow-1]==sel)
-			   {
-				   return;
-			   }
-			   int ret=write_one(g_tstat_id,OUTPUT1+m_currow-1,sel);
-			   if (ret>0)
-			   {
-				   product_register_value[OUTPUT1+m_currow-1]=sel;
-			   }
-			   if (product_register_value[OUTPUT1+m_currow-1]==0)
-			   {
-				   m_msflexgrid_output.put_TextMatrix(m_currow,m_curcol,_T("Off"));
-			   }
-			   else
-			   {
-			      m_msflexgrid_output.put_TextMatrix(m_currow,m_curcol,_T("On"));
-			   }
-			   
+	         if (m_curcol==1)
+	         {
+				 int sel=m_comboxRange.GetCurSel();
+				 m_comboxRange.ShowWindow(FALSE);
 
+				 if (product_register_value[OUTPUT1+m_currow-1]==sel)
+				 {
+					 return;
+				 }
+				 int ret=write_one(g_tstat_id,OUTPUT1+m_currow-1,sel);
+				 if (ret>0)
+				 {
+					 product_register_value[OUTPUT1+m_currow-1]=sel;
+				 }
+				 if (product_register_value[OUTPUT1+m_currow-1]==0)
+				 {
+					 m_msflexgrid_output.put_TextMatrix(m_currow,m_curcol,_T("Off"));
+				 }
+				 else
+				 {
+					 m_msflexgrid_output.put_TextMatrix(m_currow,m_curcol,_T("On"));
+				 }
+	         }
+		     
+		    else if (m_curcol==2)
+			  {
+				  int sel=m_comboxRange.GetCurSel();
+				  m_comboxRange.ShowWindow(FALSE);
+				  if (product_register_value[LIGHT_SWITCH_OUTPUT1+m_currow-1]==sel)
+				  {
+					  return;
+				  }
+				  int ret=write_one(g_tstat_id,LIGHT_SWITCH_OUTPUT1+m_currow-1,sel);
+				  if (ret>0)
+				  {
+					  product_register_value[LIGHT_SWITCH_OUTPUT1+m_currow-1]=sel;
+				  }
+				 
+				  CString CstresultDO;
+				   if (product_register_value[LIGHT_SWITCH_OUTPUT1+m_currow-1]>0)
+				   {
+					   CstresultDO=Get_Table_Name(m_sn,_T("Input"),product_register_value[LIGHT_SWITCH_OUTPUT1+m_currow-1]);
+				   }
+				   else
+				   {
+					   CstresultDO=_T("UNUSED");
+				   }
+				   m_msflexgrid_output.put_TextMatrix(m_currow,m_curcol,CstresultDO);
+			  }
+		    else if (m_curcol==3)
+		    {
+			   CString strtemp;
+		     	int sel=m_comboxRange.GetCurSel();
+				m_comboxRange.ShowWindow(FALSE); 
+				if (sel==0)
+				{
+				   strtemp=_T("Auto");
+				}
+				else
+				{
+				  strtemp=_T("Manual");
+				}
+				m_msflexgrid_output.put_TextMatrix(m_currow,m_curcol,strtemp);
+
+				int Value=0;
+				int temp;
+				for (int i=1;i<=13;i++)
+				{
+					CString strValue = m_msflexgrid_output.get_TextMatrix(i,m_curcol);
+					if (strValue.CompareNoCase(_T("Auto"))==0)
+					{
+						temp=0;
+					}
+					else
+					{
+						temp=1;
+					}
+
+					temp=temp<<(i-1);
+					Value+=temp;
+				}
+				int ret=write_one(g_tstat_id,AUTO_MANUAL_OUTPUTS,Value);
+				if (ret>0)
+				{
+				product_register_value[AUTO_MANUAL_OUTPUTS]=Value;
+				}
+				//InitialDialog();
+		    }
 	   }
 	
 	}
@@ -971,6 +1091,18 @@ void T38I13O::ClickMsflexgridOutput()
 			m_comboxRange.BringWindowToTop();
 			m_comboxRange.SetFocus(); //获取焦点
 			m_comboxRange.SetWindowText(strValue);
+		}
+		if (lCol==3&&lRow!=0)
+		{
+			m_comboxRange.MoveWindow(&rcCell,1);
+			m_comboxRange.ResetContent();
+			m_comboxRange.AddString(_T("Auto"));
+			m_comboxRange.AddString(_T("Manual"));
+			m_comboxRange.ShowWindow(SW_SHOW);
+			m_comboxRange.BringWindowToTop();
+			m_comboxRange.SetFocus(); //获取焦点
+			m_comboxRange.SetWindowText(strValue);
+			
 		}
 	}
 void T38I13O::OnEnKillfocusEditName()
@@ -1080,6 +1212,7 @@ void T38I13O::OnEnKillfocusEditName()
 	 
 		if (m_curcol==2)
 		{
+
 		}
 
 	}
@@ -1111,4 +1244,44 @@ void T38I13O::OnCbnSelchangeDelay()
 
 	 m_delaycombox.SetCurSel(product_register_value[RESPONSE_DELAY]);
 
+}
+
+
+void T38I13O::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+	CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+	CView* pNewView = pMain->m_pViews[8];
+	CView* pActiveView = pMain->GetActiveView();
+
+	if(1 == nIDEvent)// )&& (counter%60 == 0)
+	{
+
+		//Read_Multi(g_tstat_id,&product_register_value[ZONE_TIME_LEFT_INPUT1],ZONE_TIME_LEFT_INPUT1,8);
+
+		CString strresult;
+		int regValue;
+		for(int i = 1;i<=8;i++)
+		{  
+			strresult.Format(_T("%d min"),product_register_value[ZONE_TIME_LEFT_INPUT1+i-1]);
+			m_msflexgrid_input.put_TextMatrix(i,6,strresult);
+		}
+
+	
+	}
+
+	CFormView::OnTimer(nIDEvent);
+}
+
+
+void T38I13O::OnDestroy()
+{
+
+   if (m_threadT38I13o!=NULL)
+   {
+   TerminateThread(m_threadT38I13o, 0);
+   }
+	CFormView::OnDestroy();
+
+	 
 }

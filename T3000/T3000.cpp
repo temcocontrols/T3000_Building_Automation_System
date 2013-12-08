@@ -15,8 +15,8 @@
 #include "LoginDlg.h"
 
 #include "iniFile.h"
-
- const int g_versionNO=201310;
+#include "afxinet.h"
+ const int g_versionNO=201311;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -338,11 +338,61 @@ BOOL CT3000App::InitInstance()
 
  	JudgeDB();
 	//CString strocx=g_strExePth+_T("MSFLXGRD.OCX");
-
+	
+	/*CStdioFile file;
+	CString versionno;
+	file.
+	file.SetFilePath(_T("http://www.temcocontrols.com/ftp/software/T3000_Version.txt"));
+	file.ReadString(versionno);
+	file.Close();*/
+	//CFile file;
+//	file.Open(_T("http://www.temcocontrols.com/ftp/software/T3000_Version.txt"),modeRead);
 
  	InitModeName();//
 
+	#if 0
+	CInternetSession session;
+	CInternetFile *file=NULL;
+	try
+	{
+		INTERNET_PROXY_INFO  proxyinfo;
+		proxyinfo.dwAccessType=INTERNET_OPEN_TYPE_PROXY;
+		proxyinfo.lpszProxy=_T("192.168.0.4:8080 ");
+		proxyinfo.lpszProxyBypass=NULL; 
+		if (!session.SetOption(INTERNET_OPTION_PROXY,(LPVOID)&proxyinfo,sizeof(INTERNET_PROXY_INFO)))
+		{
+			AfxMessageBox(_T("UserName"));
+		} 
+		CString username=_T("alex");
+		if(!session.SetOption(INTERNET_OPTION_PROXY_USERNAME,username.GetBuffer(),username.GetLength()+ 1)){
 
+			AfxMessageBox(_T("UserName"));
+		}
+		CString password=_T("travel");
+		if(!session.SetOption(INTERNET_OPTION_PROXY_PASSWORD,password.GetBuffer(),password.GetLength()+ 1)){
+
+			AfxMessageBox(_T("Password"));
+		}
+		file=(CInternetFile*)session.OpenURL(_T("www.temcocontrols.com/ftp/software/T3000_Version.txt"));
+
+	}
+	catch (CInternetException* e)
+	{
+		file=NULL;
+		e->Delete();
+
+	}
+	CString version;
+
+	if (file)
+	{
+		while(file->ReadString(version)!=NULL){
+
+		}
+		AfxMessageBox(version);
+	}
+   #endif
+	 
 
 #endif
 
@@ -380,7 +430,8 @@ BOOL CT3000App::InitInstance()
 		AfxMessageBox(_T("Database operation to stop!"));
 
 	}
-
+	 
+	
 	CString registerfilename;
 	 registerfilename=g_strExePth+_T("REG_msado15.bat");
 	// ::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
@@ -496,7 +547,7 @@ BOOL CT3000App::InitInstance()
    	m_pMainWnd->SetWindowText(_T("T3000 Building Automation System"));//
   	m_pMainWnd->ShowWindow(SW_SHOW);
   	m_pMainWnd->UpdateWindow();
-
+     
 
 	}
 	catch (...)

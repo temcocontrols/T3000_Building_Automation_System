@@ -19,7 +19,7 @@
 #define	AB_COMPORT	6
 #define	AB_BAUDRAT	7
 
-
+#define SHOW_TX_RX 	g_llTxCount++;g_llRxCount++;if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {CString str;str.Format(_T("Addr:255 [Tx=%d Rx=%d Err=%d]"), g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());}
 //#define MAX_FIELDS	10
 //CRITICAL_SECTION g_Lock;
 #define UPD_BROADCAST_QRY_MSG 100
@@ -466,13 +466,35 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 
 	if (a == -3 || a > 0)
 	{
-// 		int nnn = -2;
-// 		while (nnn == -2)
-// 		{
-// 			nnn = Read_One2(253, 7);
-// 		}
-		
+        g_llTxCount++;
+		g_llRxCount++;
+		if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
+
+			// construct status message string
+			CString str;
+			str.Format(_T("Addr:255 [Tx=%d Rx=%d Err=%d]"), 
+				  g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+
+			//Display it
+			((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
+
+		}
+
 		a=CheckTstatOnline_a(devLo,devHi, bForTStat);
+		g_llTxCount++;
+		g_llRxCount++;
+		if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
+
+			// construct status message string
+			CString str;
+			str.Format(_T("Addr:255 [Tx=%d Rx=%d Err=%d]"), 
+				g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+
+			//Display it
+			((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
+
+		}
+
 	}
 
 	//TRACE("L:%d   H:%d  a:%d\n",devLo,devHi,a);
@@ -493,7 +515,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 		memset(SerialNum,0,sizeof(SerialNum));
 		int nRet=0;
 		nRet=read_multi2(a,&SerialNum[0],0,9,bForTStat);
-
+		SHOW_TX_RX
 		if(nRet>0)
 		{
 			CTStat_Dev* pTemp = new CTStat_Dev;			
@@ -541,7 +563,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 			pTemp->SetSoftwareVersion(tstat_version2);
 			if(Read_One2(a, 185, bForTStat)==0)	
 			//if(pTemp->ReadOneReg(185)==0)
-			{
+			{SHOW_TX_RX
 				//temp.baudrate=9600;
 				pTemp->SetBaudRate(9600);//scan
 
@@ -626,6 +648,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 			//	else
 				{	
 					Sleep(100);
+					SHOW_TX_RX
 					CString str_temp;
 					for(int j=254;j>=1;j--)
 						if(j!=devLo)
@@ -644,7 +667,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 								{
 									//if(Write_One(devLo,10,j)>0)//sometimes write failure ,so inspect,important
 									if(Write_One2(devLo,10,j, bForTStat)>0)//sometimes write failure ,so inspect,important
-									{	
+									{	SHOW_TX_RX
 										m_szRepeatedID[j] = devLo;
 										if(j<devLo)
 										{
@@ -665,7 +688,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 												pTemp->SetDevID(j);
 												nRet=read_multi2(j,&SerialNum[0],0,9,bForTStat);
 												if(nRet>0)
-												{		
+												{		SHOW_TX_RX
 													//temp.serialnumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
 													//temp.product_class_id=SerialNum[7];
 													//temp.hardware_version=SerialNum[8];
@@ -700,6 +723,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 													}
 
 													int nEPsize=Read_One2(j,326, bForTStat);
+													SHOW_TX_RX
 													pTemp->SetEPSize(nEPsize);
 											
 													pTemp->SetComPort(nComPort);
@@ -940,6 +964,11 @@ int CTStatScanner::_ScanNCFunc()
 										m_szNCScanRet.push_back(pInfo);
 									}
 								}
+
+
+
+								SHOW_TX_RX
+
 							}
 							else								
 							{
@@ -1221,6 +1250,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 
 					//}
 				}	
+			SHOW_TX_RX
 			}
 		}	
 		else

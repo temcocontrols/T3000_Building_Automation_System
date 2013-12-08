@@ -1855,10 +1855,10 @@ if (Unit.CompareNoCase(_T("RAW DATA"))==0)
 {
 ret_Value=1;
 }
-else if (Unit.CompareNoCase(_T("10K C"))==0)
+else if (Unit.CompareNoCase(_T("TYPE2 10K C"))==0)
 {ret_Value=10;
 }
-else if (Unit.CompareNoCase(_T("10K F"))==0)
+else if (Unit.CompareNoCase(_T("TYPE2 10K F"))==0)
 {
 ret_Value=10;
 }
@@ -1903,7 +1903,7 @@ else if (Unit.CompareNoCase(_T("0-10V"))==0)
 {
 ret_Value=1000;
 }
-else if (Unit.CompareNoCase(_T("0-20I"))==0)
+else if (Unit.CompareNoCase(_T("0-20ma"))==0)
 {
 ret_Value=1000;
 }
@@ -1914,3 +1914,11 @@ return ret_Value;
 }
 
 
+BOOL Get_Bit_FromRegister(unsigned short RegisterValue,unsigned short Position){
+ 
+int postionvalue=1;
+  postionvalue=postionvalue<<(Position-1);
+  postionvalue= RegisterValue&postionvalue;
+  BOOL ret=postionvalue>>(Position-1);
+  return ret;
+}
