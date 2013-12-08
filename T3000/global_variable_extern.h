@@ -5,12 +5,15 @@
 #include "gloab_define.h"
 
 #define MY_MBPOLL_REG_DIALOG_MSG (WM_USER + 557)
+#define MY_MBPOLL_WRITE_REG_MSG (WM_USER + 558)
 
 extern int g_invoke_id;
 extern vector <int> Change_Color_ID;
 extern HANDLE hThread;
 extern DWORD nThreadID;
 extern HWND hMbpollWnd;
+extern HWND hMbpollWritePopWnd;
+extern int regDetailsOpenedFrom;	// 0 = MbPoll.cpp; 1 = mbpollFunctions.cpp
 
 extern const bool WRITE_SUCCESS;
 extern const bool WRITE_FAIL ;
@@ -137,20 +140,17 @@ const int PM_TSTAT5E = 16;
 int const PM_TSTAT5F = 17;
 int const PM_TSTAT5G = 18;
 int const PM_TSTAT5H = 19;
-
 int const PM_T38AIOD= 26;
 int const PM_T3IOA = 21;
 int const PM_T332AI = 22;
 int const PM_T3AI16O = 23;
-int const PM_T38I13O = 20;
-int const PM_T34AO = 28;
-int const PM_T36CT = 29;
 
 int const PM_ZIGBEE = 24;
 int const PM_FLEXDRIVER = 25;
-
+int const PM_T38I13O = 20;
 int const PM_T3PERFORMANCE = 27;
-
+int const PM_T34AO = 28;
+int const PM_T36CT = 29;
 int const PM_SOLAR = 30;
 int const PM_FWMTRANSDUCER = 31;
 int const PM_CO2_NET = 32;

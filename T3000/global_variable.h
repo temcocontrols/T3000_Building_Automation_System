@@ -13,6 +13,9 @@ int g_invoke_id;
 HANDLE hThread;
 DWORD nThreadID;
 HWND hMbpollWnd;
+HWND hMbpollWritePopWnd;
+int regDetailsOpenedFrom = 0;	// 0 = MbPoll.cpp; 1 = mbpollFunctions.cpp
+
 //#include "stdafx.h"
 unsigned short multi_register_value[1024]={-1};
 unsigned short multi_register_value_tcp[10000]={-1};

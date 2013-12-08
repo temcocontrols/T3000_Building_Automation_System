@@ -95,6 +95,10 @@ extern CString registerNames4;
 extern CMenu* mbpMenu;
 extern int menuChecked;
 extern int mbPollFirstTime;
+extern int writeRegPopupAddressValue;
+extern int writeRegPopupSizeValue;
+extern int writeRegPopupSlaveIdValue;
+extern CString writePopupRegStr;
 
 extern void LoadReadOneData(int val, unsigned char device_var,unsigned short address);
 extern void LoadWriteOneData(int val, unsigned char device_var,unsigned short address);

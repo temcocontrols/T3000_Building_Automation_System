@@ -1018,7 +1018,14 @@ void CMyOwnListCtrl::_MouseClkMonitor(UINT nMsg, UINT nFlags, CPoint point, BOOL
 		tempStr = GetItemText(hti.iItem, hti.iSubItem);
 		//MessageBox(tempStr);
 		//::PostMessage(hMbpollWnd,MY_MBPOLL_REG_DIALOG_MSG,NULL,NULL);
-		::PostMessage(hMbpollWnd,MY_MBPOLL_REG_DIALOG_MSG,hti.iItem,hti.iSubItem);
+		if (regDetailsOpenedFrom == 0)
+		{
+			::PostMessage(hMbpollWnd,MY_MBPOLL_REG_DIALOG_MSG,hti.iItem,hti.iSubItem);
+		}
+		if (regDetailsOpenedFrom == 1)
+		{
+			::PostMessage(hMbpollWritePopWnd,MY_MBPOLL_WRITE_REG_MSG,hti.iItem,hti.iSubItem);
+		}
 		break;
 
 	case WM_MBUTTONDOWN:

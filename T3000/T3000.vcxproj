@@ -185,6 +185,7 @@
     <ClCompile Include="MBP.cpp" />
     <ClCompile Include="MbpGlobalFuncs.cpp" />
     <ClCompile Include="MbPoll.cpp" />
+    <ClCompile Include="MbPollFunctions.cpp" />
     <ClCompile Include="MbPollOptions.cpp" />
     <ClCompile Include="monthview1.cpp" />
     <ClCompile Include="msflexgrid1.cpp" />
@@ -340,6 +341,7 @@
     <ClInclude Include="MbpExterns.h" />
     <ClInclude Include="MbpGlobals.h" />
     <ClInclude Include="MbPoll.h" />
+    <ClInclude Include="MbPollFunctions.h" />
     <ClInclude Include="MbPollOptions.h" />
     <ClInclude Include="RegDetails.h" />
     <ClInclude Include="Scanwaydlg.h" />
