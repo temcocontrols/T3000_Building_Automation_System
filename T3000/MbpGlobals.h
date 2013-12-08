@@ -96,6 +96,10 @@ CString registerNames4 = L"";
 CMenu* mbpMenu;
 int menuChecked = 0;
 int mbPollFirstTime = 1;
+int writeRegPopupAddressValue = 0;
+int writeRegPopupSizeValue = 10;
+int writeRegPopupSlaveIdValue = 255;
+CString writePopupRegStr = L"";
 
 #endif
 

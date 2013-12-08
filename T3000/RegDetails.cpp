@@ -28,17 +28,15 @@ void CRegDetails::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_ALIAS, editAlias);
 	DDX_Control(pDX, IDC_EDIT_VALUE, editValue);
 	DDX_Control(pDX, IDC_STATIC_ADDR, staticAddress);
+	DDX_Control(pDX, IDC_STATIC_ALIAS, staticAlias2);
 }
-
 
 BEGIN_MESSAGE_MAP(CRegDetails, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CRegDetails::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CRegDetails::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
-
 // CRegDetails message handlers
-
 
 BOOL CRegDetails::OnInitDialog()
 {
@@ -55,6 +53,14 @@ BOOL CRegDetails::OnInitDialog()
 	else
 	{
 		editValue.EnableWindow(FALSE);
+	}
+
+	staticAlias2.ShowWindow(TRUE);
+	editAlias.ShowWindow(TRUE);
+	if (regDetailsOpenedFrom == 1)
+	{
+		staticAlias2.ShowWindow(FALSE);
+		editAlias.ShowWindow(FALSE);
 	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -77,3 +83,5 @@ void CRegDetails::OnBnClickedCancel()
 	// TODO: Add your control notification handler code here
 	CDialogEx::OnCancel();
 }
+
+

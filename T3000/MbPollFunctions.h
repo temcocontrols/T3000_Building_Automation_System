@@ -30,7 +30,7 @@ public:
 	CEdit editAddress1;
 	CEdit editSize1;
 	CEdit editSlave1;
-	CListCtrl listReg1;
+	CMyOwnListCtrl listReg1;
 	afx_msg void OnClickedButtonCancel1();
 	afx_msg void OnClickedButtonEdit1();
 	afx_msg void OnClickedButtonSend1();
@@ -39,6 +39,13 @@ public:
 	virtual void OnCancel();
 	void InitListControl1();
 //	CMyOwnListCtrl mbPollFuncList;
-	CMyOwnListCtrl mbpollFuncList1;
+//	CMyOwnListCtrl mbpollFuncList1;
 	CRect mbPollFuncListRect;
+protected:
+	afx_msg LRESULT OnMyMbpollWriteRegMsg(WPARAM wParam, LPARAM lParam);
+public:
+//	afx_msg void OnEnUpdateEditSize1();
+	afx_msg void OnEnKillfocusEditSize1();
+	afx_msg void OnEnKillfocusEditAddress1();
+	afx_msg void OnHdnItemclickListReg1(NMHDR *pNMHDR, LRESULT *pResult);
 };
