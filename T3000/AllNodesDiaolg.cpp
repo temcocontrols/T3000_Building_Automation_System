@@ -282,8 +282,10 @@ void CAllNodesDiaolg::OnBnClickedDelbutton()
 	{
 		AfxMessageBox(_T("No item Selected!"));
 	}
+	CString strhw_version;
+	strhw_version = m_FlexGrid.get_TextMatrix(m_nCurRow,AN_HDVERSION);
 	CString strSql;
-	strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"),strText);
+	strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s' and Hardware_Ver = '%s'"),strText,strhw_version);
 	CString strTemp;
 	strTemp.Format(_T("Are you sure to delete thise item"));
 	if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)

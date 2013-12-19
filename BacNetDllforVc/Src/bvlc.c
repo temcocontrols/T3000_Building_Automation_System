@@ -45,6 +45,21 @@
 #endif
 #include "debug.h"
 
+
+
+//Fance_IP
+#pragma region Fance_IP
+#define WIN32_LEAN_AND_MEAN
+
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#include <stdio.h>
+
+// Link with ws2_32.lib
+#pragma comment(lib, "Ws2_32.lib")
+#pragma endregion
+
+
 /** @file bvlc.c  Handle the BACnet Virtual Link Control (BVLC),
  * which includes: BACnet Broadcast Management Device,
  * Broadcast Distribution Table, and
@@ -663,21 +678,21 @@ int bvlc_send_mpdu(
     uint8_t * mtu,
     uint16_t mtu_len)
 {
-	return 0;
-    ////struct sockaddr_in bvlc_dest = { 0 };
 
-    /////* assumes that the driver has already been initialized */
-    ////if (bip_socket() < 0) {
-    ////    return 0;
-    ////}
-    /////* load destination IP address */
-    ////bvlc_dest.sin_family = AF_INET;
-    ////bvlc_dest.sin_addr.s_addr = dest->sin_addr.s_addr;
-    ////bvlc_dest.sin_port = dest->sin_port;
-    ////memset(&(bvlc_dest.sin_zero), '\0', 8);
-    /////* Send the packet */
-    ////return sendto(bip_socket(), (char *) mtu, mtu_len, 0,
-    ////    (struct sockaddr *) &bvlc_dest, sizeof(struct sockaddr));
+    struct sockaddr_in bvlc_dest = { 0 };
+
+    /* assumes that the driver has already been initialized */
+    if (bip_socket() < 0) {
+        return 0;
+    }
+    /* load destination IP address */
+    bvlc_dest.sin_family = AF_INET;
+    bvlc_dest.sin_addr.s_addr = dest->sin_addr.s_addr;
+    bvlc_dest.sin_port = dest->sin_port;
+    memset(&(bvlc_dest.sin_zero), '\0', 8);
+    /* Send the packet */
+    return sendto(bip_socket(), (char *) mtu, mtu_len, 0,
+        (struct sockaddr *) &bvlc_dest, sizeof(struct sockaddr));
 }
 
 #if defined(BBMD_ENABLED) && BBMD_ENABLED
@@ -715,8 +730,8 @@ static void bvlc_bdt_forward_npdu(
                 continue;
             }
             bvlc_send_mpdu(&bip_dest, mtu, mtu_len);
-            debug_printf("BVLC: BDT Sent Forwarded-NPDU to %s:%04X\n",
-                inet_ntoa(bip_dest.sin_addr), ntohs(bip_dest.sin_port));
+            //debug_printf("BVLC: BDT Sent Forwarded-NPDU to %s:%04X\n",
+            //    inet_ntoa(bip_dest.sin_addr), ntohs(bip_dest.sin_port)); Fance_IP
         }
     }
 
@@ -770,8 +785,8 @@ static void bvlc_fdt_forward_npdu(
                 continue;
             }
             bvlc_send_mpdu(&bip_dest, mtu, mtu_len);
-            debug_printf("BVLC: FDT Sent Forwarded-NPDU to %s:%04X\n",
-                inet_ntoa(bip_dest.sin_addr), ntohs(bip_dest.sin_port));
+            //debug_printf("BVLC: FDT Sent Forwarded-NPDU to %s:%04X\n",Fance_IP
+            //    inet_ntoa(bip_dest.sin_addr), ntohs(bip_dest.sin_port));
         }
     }
 
@@ -1002,8 +1017,8 @@ uint16_t bvlc_receive(
             dest.sin_addr.s_addr = original_sin.sin_addr.s_addr;
             dest.sin_port = original_sin.sin_port;
             bvlc_fdt_forward_npdu(&dest, &npdu[4 + 6], npdu_len);
-            debug_printf("BVLC: Received Forwarded-NPDU from %s:%04X.\n",
-                inet_ntoa(dest.sin_addr), ntohs(dest.sin_port));
+            //debug_printf("BVLC: Received Forwarded-NPDU from %s:%04X.\n",
+            //    inet_ntoa(dest.sin_addr), ntohs(dest.sin_port));Fance_IP
             bvlc_internet_to_bacnet_address(src, &dest);
             if (npdu_len < max_npdu) {
                 /* shift the buffer to return a valid PDU */
@@ -1080,9 +1095,9 @@ uint16_t bvlc_receive(
             npdu_len = 0;
             break;
         case BVLC_DISTRIBUTE_BROADCAST_TO_NETWORK:
-            debug_printf
-                ("BVLC: Received Distribute-Broadcast-to-Network from %s:%04X.\n",
-                inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));
+            //debug_printf
+            //    ("BVLC: Received Distribute-Broadcast-to-Network from %s:%04X.\n",
+            //    inet_ntoa(sin.sin_addr), ntohs(sin.sin_port));Fance_IP
             /* Upon receipt of a BVLL Distribute-Broadcast-To-Network message
                from a foreign device, the receiving BBMD shall transmit a
                BVLL Forwarded-NPDU message on its local IP subnet using the

@@ -24,8 +24,12 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	ListCtrlEx::CListCtrlEx m_controller_list;
 	void Initial_List();
+	afx_msg LRESULT ControllerMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Fresh_Controller_List(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Fresh_Controller_Item(WPARAM wParam,LPARAM lParam);
+	afx_msg void OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnClose();
 };
 
 const int CONTROLLER_NUM = 0;
@@ -42,4 +46,6 @@ const int CONTROLLER_PROPORTIONAL = 10;
 const int CONTROLLER_RESET = 11;
 const int CONTROLLER_RATE = 12;
 const int CONTROLLER_BIAS = 13;
+
+const int CONTROLLER_COL_NUMBER = 14;
 

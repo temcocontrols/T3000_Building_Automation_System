@@ -581,11 +581,23 @@ void dlmstp_get_broadcast_address(
 
     return;
 }
+ unsigned long hThread1 = 0;
+  unsigned long hThread2 = 0;
+
+ unsigned long  Get_Thread1()
+  {
+return hThread1;
+  }
+
+unsigned long  Get_Thread2()
+ {
+return hThread2;
+ }
 
 bool dlmstp_init(
     char *ifname)
 {
-    unsigned long hThread = 0;
+  //  unsigned long hThread = 0;
     uint32_t arg_value = 0;
 	Sleep(1);
     /* initialize packet queue */
@@ -647,12 +659,12 @@ bool dlmstp_init(
     fprintf(stderr, "MS/TP Max_Info_Frames: %u\n",
         (unsigned) MSTP_Port.Nmax_info_frames);
 #endif
-    hThread = _beginthread(dlmstp_receive_fsm_task, 4096, &arg_value);
-    if (hThread == 0) {
+    hThread1 = _beginthread(dlmstp_receive_fsm_task, 4096, &arg_value);
+    if (hThread1 == 0) {
         fprintf(stderr, "Failed to start recive FSM task\n");
     }
-    hThread = _beginthread(dlmstp_master_fsm_task, 4096, &arg_value);
-    if (hThread == 0) {
+    hThread2 = _beginthread(dlmstp_master_fsm_task, 4096, &arg_value);
+    if (hThread2 == 0) {
         fprintf(stderr, "Failed to start Master Node FSM task\n");
     }
 

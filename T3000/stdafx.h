@@ -157,6 +157,9 @@ using namespace std;  // Ensure that the namespace is set to std
 #define		WM_REFRESH_BAC_SCHEDULE_LIST				WM_USER + 209
 #define		WM_REFRESH_BAC_DAY_CAL						WM_USER + 210
 #define		WM_REFRESH_BAC_CONTROLLER_LIST				WM_USER + 211
+#define		WM_REFRESH_BAC_SCREEN_LIST					WM_USER + 212
+#define		WM_REFRESH_BAC_MONITOR_LIST					WM_USER + 213
+#define		WM_REFRESH_BAC_MONITOR_INPUT_LIST			WM_USER + 214
 
 
 
@@ -191,9 +194,11 @@ typedef struct _STATUSBARINFO
 #define MY_INVOKE_ID				WM_USER + 102
 #define MY_BAC_WRITE_LIST			WM_USER + 103
 #define MY_BAC_REFRESH_LIST			WM_USER + 104
+#define MY_BAC_REFRESH_ONE			WM_USER + 105
 #define MY_CLOSE WM_USER+110
 #define MY_RESUME_DATA  WM_USER+200
 #define MY_READ_DATA_CALLBACK WM_USER+201
+#define MY_RX_TX_COUNT WM_USER + 202
 typedef struct _MessageWriteOneInfo
 {
 	unsigned char device_id;
@@ -220,6 +225,8 @@ typedef struct _MessageInvokeIDInfo
 	int Invoke_ID;
 	HWND hwnd;
 	CString task_info;
+	int mRow;
+	int mCol;
 }MessageInvokeODInfo;
 
 

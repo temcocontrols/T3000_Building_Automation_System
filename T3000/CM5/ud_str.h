@@ -9,6 +9,8 @@
 
 #define PRIVATE_HEAD_LENGTH 7
 
+#define PRIVATE_MONITOR_HEAD_LENGTH 18
+
 typedef enum
 {
 	ENUM_OUT=0,ENUM_IN, ENUM_VAR, ENUM_CON, ENUM_WRT, ENUM_AR, ENUM_PRG, ENUM_TBL, ENUM_TZ, 
@@ -103,6 +105,7 @@ typedef enum {
 
 
 		 TABLEPOINTS_COMMAND       = 75,
+		  GETSERIALNUMBERINFO       = 99,
 		 PANEL_INFO1_COMMAND       = 110,
 		 PANEL_INFO2_COMMAND       = 111,
 		 MINICOMMINFO_COMMAND      = 112,
@@ -116,7 +119,7 @@ typedef enum {
 		 RESTARTMINI_COMMAND       = 121,
 		 WRITEPRGFLASH_COMMAND     = 122,
 		 OPENSCREEN_COMMAND        = 123
-
+		
 } CommandRequest;	  
 
 
@@ -146,6 +149,12 @@ typedef enum {
 
 #define STR_ANNUAL_DESCRIPTION_LENGTH 21
 #define  STR_ANNUAL_LABEL_LENGTH 9
+
+#define  STR_SCREEN_DESCRIPTION_LENGTH 21
+#define  STR_SCREEN_LABLE_LENGTH 9
+#define  STR_SCREEN_PIC_FILE_LENGTH 11
+
+#define STR_MONITOR_LABEL_LENGTH 9
 
 #pragma pack(push) //±£´æ¶ÔÆë×´Ì¬ 
 #pragma pack(1)
@@ -340,8 +349,8 @@ typedef struct
 	uint8_t off  ;
 	uint8_t unused	; /* (11 bits)*/
 
-	//	Point_T3000 override_1;	     /* (3 bytes; point)*/
-	//	Point_T3000 override_2;	     /* (3 bytes; point)*/
+	Point_T3000 override_1;	     /* (3 bytes; point)*/
+	Point_T3000 override_2;	     /* (3 bytes; point)*/
 
 } Str_weekly_routine_point; /* 21+9+2+3+3 = 38*/
 
@@ -445,6 +454,187 @@ typedef struct
 }	Str_controller_point; /* 3+4+4+3+4+1+1+4 = 24*/
 
 
+typedef struct
+{
+	int8_t description[21];				/* (21 bytes; string)	*/
+	int8_t label[9];							/* (9 bytes; string)	*/
+	int8_t picture_file[11];			/* (11 bytes; string)	*/
+
+	uint8_t update;                /* refresh time */
+	uint8_t  mode     ;// :1;     /* text / graphic */
+	uint8_t  xcur_grp	;//:15;
+
+	uint16_t  ycur_grp;
+
+} Control_group_point;				/* (size = 46 bytes)	*/
+
+#ifndef MAX_POINTS_IN_MONITOR
+#define MAX_POINTS_IN_MONITOR 14
+#endif
+
+#ifndef MAX_ANALOG_SAMPLES_PER_BLOCK
+#define MAX_ANALOG_SAMPLES_PER_BLOCK  140
+#endif
+
+#ifndef MAX_DIGITAL_SAMPLES_PER_BLOCK
+#define MAX_DIGITAL_SAMPLES_PER_BLOCK 112
+#endif
+/* Point_Net_T3000;*/
+typedef struct
+{
+	byte number		;
+	byte point_type;
+	byte panel		;
+	unsigned short  network;
+}Point_Net ;
+
+
+typedef struct
+{
+	int8_t label[9];		      	  					/* 9 bytes; string */
+
+	Point_Net 	inputs[MAX_POINTS_IN_MONITOR];	/* 70 bytes; array of Point_Net */
+	uint8_t				range[MAX_POINTS_IN_MONITOR]; /* 14 bytes */
+
+	uint8_t second_interval_time; 				/* 1 byte ; 0-59 */
+	uint8_t minute_interval_time; 				/* 1 byte ; 0-59 */
+	uint8_t hour_interval_time;   				/* 1 byte ; 0-255 */
+
+	uint8_t max_time_length;      /* the length of the monitor in time units */
+
+//	Views views[MAX_VIEWS];			/* 16 x MAX_VIEWS bytes */
+
+	uint8_t num_inputs  ;// :4; 	/* total number of points */
+	uint8_t an_inputs ;//   :4; 	/* number of analog points */
+	uint8_t unit 		;//		:2; 	/* 2 bits - minutes=0, hours=1, days=2	*/
+//	uint8_t ind_views	;//	:2; 	/* number of views */
+	uint8_t wrap_flag	;//	:1;		/* (1 bit ; 0=no wrap, 1=data wrapped)*/
+	uint8_t status		;//		:1;		/* monitor status 0=OFF / 1=ON */
+	uint8_t reset_flag	;//	:1; 	/* 1 bit; 0=no reset, 1=reset	*/
+	uint8_t double_flag;//	:1; 	/* 1 bit; 0= 4 bytes data, 1= 1(2) bytes data */
+
+}	Str_monitor_point; 		/* 9+70+14+3+1+48+2 = 133 bytes */
+
+typedef struct              /* 5 bytes */
+{
+	uint8_t pointno_and_value;    // bit0-bit6 point_no     value bit7
+	// U8_T unused ;
+	// U8_T value;
+
+	int32_t          time;
+
+} Digital_sample;        /* 5 bytes */
+
+
+typedef struct              /* 645 bytes */
+{
+	Point_Net     inputs[MAX_POINTS_IN_MONITOR]; /* 70 bytes; array of Point_Net */
+
+	uint8_t monitor;//	       :4; /* monitors' number */
+	uint8_t no_points  ;//     :4; /* number of points in block */
+
+	uint8_t second_interval_time; /* 1 U8_T ; 0-59 */
+	uint8_t minute_interval_time; /* 1 U8_T ; 0-59 */
+	uint8_t hour_interval_time;   /* 1 U8_T ; 0-255 */
+
+	uint8_t priority	 ;//     :2; /* 0-block empty, 1-low, 2-medium, 3-high */
+	uint8_t first_block  ;//   :1; /* 1 - this block is the first in the chain */
+	uint8_t last_block  ;//    :1; /* 1 - this block is the last in the chain */
+	uint8_t analog_digital;//  :1; /* 0 - analog, 1 - digital */
+	uint8_t block_state ;//    :1; /* 0 = unused, 1 = used */
+	uint8_t fast_sampling;//   :1; /* 0 = normal sampling 1 = fast sampling */
+	uint8_t wrap_around ;//    :1; /* 1 - wrapped  */
+
+	int32_t          start_time;
+
+	uint16_t          index;      /* pointer to the new free location in block */
+														/* equal with the number of samples in block */
+	uint8_t          next_block; /* pointer to the next block in chain
+	                              255 = last block in chain */
+	uint8_t          block_no;      /* position of block in chain */
+  	uint8_t      last_digital_state ;//: 14;
+  	uint8_t      not_used       ;//    :  2;
+
+  	union {
+	int32_t           analog[MAX_ANALOG_SAMPLES_PER_BLOCK];   /* 140*4=560 bytes */
+  	Digital_sample digital[MAX_DIGITAL_SAMPLES_PER_BLOCK]; /* 112*5=560 bytes */
+  	uint8_t           raw_byte[560];
+  	uint16_t           raw_int[280];
+  	} dat;
+
+}	Monitor_Block;         /* 645 bytes */
+
+
+
+typedef struct              /* 85 bytes */
+{
+	Point_Net     inputs[MAX_POINTS_IN_MONITOR]; /* 70 bytes; array of Point_Net */
+
+	uint8_t monitor;//	       :4; /* monitors' number */
+	uint8_t no_points ;//      :4; /* number of points in block */
+/*	unsigned tenths_of_seconds    : 4; /* 4 bits ; 0-15 */
+/*	unsigned second_interval_time : 6; /* 6 bits ; 0-59 */
+/*	unsigned minute_interval_time : 6; /* 6 bits ; 0-59 */
+
+	uint8_t second_interval_time; /* 1 U8_T ; 0-59 */
+	uint8_t minute_interval_time; /* 1 U8_T ; 0-59 */
+	uint8_t hour_interval_time;   /* 1 U8_T ; 0-255 */
+
+	uint8_t priority	  ;//     :2; /* 0-block empty, 1-low, 2-medium, 3-high */
+	uint8_t first_block  ;//   :1; /* 1 - this block is the first in the chain */
+	uint8_t last_block    ;//  :1; /* 1 - this block is the last in the chain */
+	uint8_t analog_digital;//  :1; /* 0 - analog, 1 - digital */
+	uint8_t block_state ;//    :1; /* 0 = unused, 1 = used */
+	uint8_t fast_sampling;//   :1; /* 0 = normal sampling 1 = fast sampling */
+	uint8_t wrap_around  ;//   :1; /* 1 - wrapped  */
+
+	int32_t          start_time;
+
+	uint16_t          index;      /* pointer to the new free location in block */
+														/* equal with the number of samples in block */
+	uint8_t          next_block; /* pointer to the next block in chain
+	                              255 = last block in chain */
+	uint8_t          block_no;      /* position of block in chain */
+
+
+  uint8_t      last_digital_state ;//: 14;
+  uint8_t      not_used       ;//    :  2;
+/*  unsigned      index_fast         :  2;*/
+
+
+} Monitor_Block_Header;  /* 85 bytes */
+
+
+typedef struct {
+
+	long nsize;
+	long oldest_time;
+	long most_recent_time;
+
+} MonitorUpdateData;
+
+
+typedef struct
+{
+	uint16_t  		total_length;        /*	total length to be received or sent	*/
+	uint8_t		command;
+	uint8_t index;
+	uint8_t type;
+	MonitorUpdateData conm_args;
+	uint8_t special;
+}Str_Monitor_data_header;
+
+typedef struct 
+{
+	uint16_t instance;
+	uint8_t mac_address[6];
+	uint8_t serial_num[4];
+	uint8_t modbus_addr;
+	uint8_t product_type;
+	uint8_t panel_number;
+	uint8_t noused[6];
+
+}Str_Serial_info;
 
 #pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
 

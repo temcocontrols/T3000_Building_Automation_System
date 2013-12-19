@@ -177,7 +177,7 @@ protected:
 	//{{AFX_MSG(CStaticEx)
 	//}}AFX_MSG
 
-    afx_msg void OnClicked();
+  //  afx_msg void OnClicked();
 	afx_msg HBRUSH CtlColor(CDC* pDC, UINT nCtlColor);
     afx_msg BOOL OnSetCursor( CWnd* pWnd, UINT nHitTest, UINT message );
     

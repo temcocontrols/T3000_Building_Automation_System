@@ -15,7 +15,7 @@
 #include "BacnetRange.h"
 #include "BacnetScheduleTime.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
-
+Str_weekly_routine_point m_temp_weekly_data[BAC_WEEKLY_ROUTINES_COUNT];
 // BacnetWeeklyRoutine dialog
 
 IMPLEMENT_DYNAMIC(BacnetWeeklyRoutine, CDialogEx)
@@ -38,21 +38,72 @@ void BacnetWeeklyRoutine::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(BacnetWeeklyRoutine, CDialogEx)
+	ON_MESSAGE(MY_RESUME_DATA, WeeklyMessageCallBack)
 	ON_MESSAGE(WM_HOTKEY,&BacnetWeeklyRoutine::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(WM_REFRESH_BAC_WEEKLY_LIST,Fresh_Weekly_List)
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Weekly_Routine_Item)
+
+	ON_BN_CLICKED(IDC_BUTTON_WEEKLY_EDIT, &BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit)
 	//ON_MESSAGE(MY_RESUME_DATA, WeeklyResumeMessageCallBack)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_BAC_WEEKLY, &BacnetWeeklyRoutine::OnNMClickListBacWeekly)
 	ON_WM_CLOSE()
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
 // BacnetWeeklyRoutine message handlers
 
+LRESULT  BacnetWeeklyRoutine::WeeklyMessageCallBack(WPARAM wParam, LPARAM lParam)
+{
+	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
+	bool msg_result=WRITE_FAIL;
+	msg_result = MKBOOL(wParam);
+	CString Show_Results;
+	CString temp_cs = pInvoke->task_info;
+	if(msg_result)
+	{
+		Show_Results = temp_cs + _T("Success!");
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+		//MessageBox(_T("Bacnet operation success!"));
+	}
+	else
+	{
+		memcpy_s(&m_Weekly_data.at(pInvoke->mRow),sizeof(Str_weekly_routine_point),&m_temp_weekly_data[pInvoke->mRow],sizeof(Str_weekly_routine_point));//还原没有改对的值
+		PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
+		Show_Results = temp_cs + _T("Fail!");
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+		//AfxMessageBox(Show_Results);
+		//MessageBox(_T("Bacnet operation fail!"));
+	}
+	//m_weeklyr_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR);
+
+	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
+		m_weeklyr_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
+	else
+		m_weeklyr_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+	m_weeklyr_list.RedrawItems(pInvoke->mRow,pInvoke->mRow);
+
+
+	if(pInvoke)
+		delete pInvoke;
+	return 0;
+}
+
 
 BOOL BacnetWeeklyRoutine::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
+	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
+	{
+		CRect list_rect,win_rect;
+		m_weeklyr_list.GetWindowRect(list_rect);
+		ScreenToClient(&list_rect);
+		::GetWindowRect(m_weekly_dlg_hwnd,win_rect);
+		m_weeklyr_list.Set_My_WindowRect(win_rect);
+		m_weeklyr_list.Set_My_ListRect(list_rect);
+		m_weeklyr_list.Get_clicked_mouse_position();
+		return TRUE;
+	}
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -61,9 +112,11 @@ LRESULT BacnetWeeklyRoutine::OnHotKey(WPARAM wParam,LPARAM lParam)
 {
 	if (wParam==KEY_INSERT)
 	{
-		CBacnetScheduleTime DLG;
-		DLG.DoModal();
+		OnBnClickedButtonWeeklyScheduleEdit();
+		//CBacnetScheduleTime DLG;
+		//DLG.DoModal();
 	}
+	//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAMCODE);
 	return 0;
 }
 
@@ -75,6 +128,7 @@ BOOL BacnetWeeklyRoutine::OnInitDialog()
 	Initial_List();
 	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);
 	PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
+	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -95,6 +149,15 @@ void BacnetWeeklyRoutine::Initial_List()
 	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_LABEL, _T("Label"), 90, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_weekly_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_weekly_dlg_hwnd;
+
+
+	CRect list_rect,win_rect;
+	m_weeklyr_list.GetWindowRect(list_rect);
+	ScreenToClient(&list_rect);
+	::GetWindowRect(m_weekly_dlg_hwnd,win_rect);
+	m_weeklyr_list.Set_My_WindowRect(win_rect);
+	m_weeklyr_list.Set_My_ListRect(list_rect);
+
 
 	m_weeklyr_list.DeleteAllItems();
 	for (int i=0;i<(int)m_Weekly_data.size();i++)
@@ -147,6 +210,14 @@ void BacnetWeeklyRoutine::Initial_List()
 			m_weeklyr_list.SetCellStringList(i, WEEKLY_ROUTINE_HOLIDAY2, strlist);
 		}
 
+		for (int x=0;x<WEEKLY_COL_NUMBER;x++)
+		{
+			if((i%2)==0)
+				m_weeklyr_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
+			else
+				m_weeklyr_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
+		}
+
 	}
 	m_weeklyr_list.SetCellChecked(0,0,1);
 
@@ -154,15 +225,23 @@ void BacnetWeeklyRoutine::Initial_List()
 
 LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lParam)
 {
+	int cmp_ret ;//compare if match it will 0;
 	int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
 
 	CString temp_task_info;
 	CString New_CString =  m_weeklyr_list.GetItemText(Changed_Item,Changed_SubItem);
+	memcpy_s(&m_temp_weekly_data[Changed_Item],sizeof(Str_weekly_routine_point),&m_Weekly_data.at(Changed_Item),sizeof(Str_weekly_routine_point));
 
 	if(Changed_SubItem == WEEKLY_ROUTINE_LABEL)
 	{
 		CString cs_temp = m_weeklyr_list.GetItemText(Changed_Item,Changed_SubItem);
+		if(cs_temp.GetLength()>= STR_WEEKLY_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Length can not higher than 8"),_T("Warning"));
+			PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
+			return 0;
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -172,6 +251,13 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 	if(Changed_SubItem == WEEKLY_ROUTINE_FULL_LABLE)
 	{
 		CString cs_temp = m_weeklyr_list.GetItemText(Changed_Item,Changed_SubItem);
+		if(cs_temp.GetLength()>= STR_WEEKLY_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Length can not higher than 20"),_T("Warning"));
+			PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
+			return 0;
+		}
+
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -204,24 +290,49 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 			m_weeklyr_list.SetCellEnabled(Changed_Item,WEEKLY_ROUTINE_OUTPUT,1);
 		}
 	}
-
+	cmp_ret = memcmp(&m_temp_weekly_data[Changed_Item],&m_Weekly_data.at(Changed_Item),sizeof(Str_weekly_routine_point));
+	if(cmp_ret!=0)
+	{
+			m_weeklyr_list.SetItemBkColor(Changed_Item,Changed_SubItem,LIST_ITEM_CHANGED_BKCOLOR);
 	temp_task_info.Format(_T("Write Weekly Routine List Item%d .Changed to \"%s\" "),Changed_Item + 1,New_CString);
-	Post_Write_Message(bac_gloab_device_id,WRITEWEEKLYROUTINE_T3000,Changed_Item,Changed_Item,sizeof(Str_weekly_routine_point),BacNet_hwd ,temp_task_info);
-
+	Post_Write_Message(g_bac_instance,WRITEWEEKLYROUTINE_T3000,Changed_Item,Changed_Item,sizeof(Str_weekly_routine_point),m_weekly_dlg_hwnd ,temp_task_info,Changed_Item,Changed_SubItem);
+	}
 	return 0;
 }
 
 LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 {
-	// Str_in_point Get_Str_in_Point(int index);
 
-	//m_weeklyr_list.DeleteAllItems();
+	int Fresh_Item;
+	int isFreshOne = (int)lParam;
+	if(isFreshOne == REFRESH_ON_ITEM)
+	{
+		Fresh_Item = (int)wParam;
+	}
+	else
+	{
+		if(m_weeklyr_list.IsDataNewer((char *)&m_Weekly_data.at(0),sizeof(Str_weekly_routine_point) * BAC_WEEKLY_ROUTINES_COUNT))
+		{
+			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			m_weeklyr_list.SetListData((char *)&m_Weekly_data.at(0),sizeof(Str_weekly_routine_point) * BAC_WEEKLY_ROUTINES_COUNT);
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+
 	for (int i=0;i<(int)m_Weekly_data.size();i++)
 	{
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
 		CString temp_des;
 		CString temp_units;
 
+		if(isFreshOne)
+		{
+			i = Fresh_Item;
+		}
 
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Weekly_data.at(i).description, (int)strlen((char *)m_Weekly_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
@@ -245,7 +356,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 		//uint8_t override_2_value;  /* (1 bit; 0=off, 1=on)*/
 		//uint8_t off  ;
 		//uint8_t unused	; /* (11 bits)*/
-		if(m_Weekly_data.at(i).auto_manual==0)
+		if(m_Weekly_data.at(i).value==0)
 			m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_OUTPUT,_T("OFF"));
 		else
 			m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_OUTPUT,_T("ON"));
@@ -265,7 +376,10 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des2.ReleaseBuffer();
 		m_weeklyr_list.SetItemText(i,WEEKLY_ROUTINE_LABEL,temp_des2);
-
+		if(isFreshOne)
+		{
+			break;
+		}
 	}
 	copy_data_to_ptrpanel(TYPE_WEEKLY);
 	//MessageBox("1");
@@ -307,5 +421,34 @@ void BacnetWeeklyRoutine::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
+	KillTimer(1);
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,TYPE_SCREENS,0);
 	CDialogEx::OnClose();
+}
+
+
+
+void BacnetWeeklyRoutine::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+	PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
+	Post_Refresh_Message(g_bac_instance,READWEEKLYROUTINE_T3000,0,BAC_WEEKLY_ROUTINES_COUNT - 1,sizeof(Str_weekly_routine_point), BAC_WEEKLY_GROUP);
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit()
+{
+	// TODO: Add your control notification handler code here
+	for (int i=0;i<m_weeklyr_list.GetItemCount();++i)
+	{
+		if(m_weeklyr_list.GetCellChecked(i,0))
+		{
+			weekly_list_line = i;
+			break;
+		}
+	}
+
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLYCODE);
+
 }

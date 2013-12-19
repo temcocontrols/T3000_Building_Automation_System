@@ -295,7 +295,7 @@ void CT3000View::OnInitialUpdate()
  	GetDlgItem(IDC_SLIDER_NIGHT)->ShowWindow(SW_HIDE);
 
 	CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
-	pMain->OnConnect();
+//	pMain->OnConnect();	//如果IP不存在的话，开机就会挂掉10几秒，这样不合理;Fance
 
 }
 

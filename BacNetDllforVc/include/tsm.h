@@ -90,8 +90,10 @@ extern "C" {
         void);
     void tsm_timer_milliseconds(
         uint16_t milliseconds);
+
+  __declspec(dllexport)   void	tsm_free_all_invoke_id();
 /* free the invoke ID when the reply comes back */
-    void tsm_free_invoke_id(
+  __declspec(dllexport)   void tsm_free_invoke_id(
         uint8_t invokeID);
 /* use these in tandem */
     uint8_t tsm_next_free_invokeID(

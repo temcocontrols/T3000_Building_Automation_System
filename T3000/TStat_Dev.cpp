@@ -62,6 +62,16 @@ int CTStat_Dev::GetComPort()const
 	return m_nComPort;
 }
 
+int CTStat_Dev::GetProtocol() const
+{
+	return m_nprotocol;
+}
+void CTStat_Dev::SetProtocol(int nProtocol)
+{
+	m_nprotocol = nProtocol;
+}
+
+
 void CTStat_Dev::SetComPort(int nComPort)
 {
 	m_nComPort = nComPort;
@@ -196,6 +206,9 @@ CString CTStat_Dev::GetProductName()
 	case PM_T36CT :
 		strProductName="T3-6CT";
 			break;
+	case PM_MINIPANEL:
+		strProductName="MiniPanel";
+		break;
 	default:
 		strProductName="TStat";
 		break;

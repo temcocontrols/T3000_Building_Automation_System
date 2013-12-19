@@ -31,6 +31,7 @@ public:
 	afx_msg void OnNMClickListScheduleTime(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnClose();
 	//afx_msg LRESULT  SchedualTimeResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 private:
 	int m_row;

@@ -12,6 +12,7 @@ class BacnetWait : public CDialogEx
 
 public:
 	BacnetWait(CWnd* pParent = NULL);   // standard constructor
+	BacnetWait(int wait_type = 0);
 	virtual ~BacnetWait();
 
 // Dialog Data
@@ -27,9 +28,11 @@ public:
 	virtual void OnCancel();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	void Set_Read_Write(bool read_0_write_1);
 	CStaticEx m_wait_detail;
 	CProgressCtrl m_wait_progress;
 	static DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid);
 	
 	CStaticEx m_wait_persent;
+	int m_wait_type;//0 µã»÷£»  1 Ð´config  £»2  ¶Áconfig;
 };

@@ -41,6 +41,7 @@ void BacnetRange::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(BacnetRange, CDialogEx)
 	ON_WM_TIMER()
 	ON_EN_KILLFOCUS(IDC_EDIT_RANGE_SELECT, &BacnetRange::OnEnKillfocusEditRangeSelect)
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
@@ -186,6 +187,7 @@ BOOL BacnetRange::PreTranslateMessage(MSG* pMsg)
 void BacnetRange::OnOK()
 {
 	// TODO: Add your specialized code here and/or call the base class
+	range_cancel = false;
 	CString temp;
 	GetDlgItemText(IDC_EDIT_RANGE_SELECT,temp);
 	if(!temp.IsEmpty())
@@ -202,6 +204,7 @@ void BacnetRange::OnOK()
 void BacnetRange::OnCancel()
 {
 	// TODO: Add your specialized code here and/or call the base class
+	range_cancel = true;
 	bac_range_number_choose = 0;
 	CDialogEx::OnCancel();
 }
@@ -321,4 +324,12 @@ void BacnetRange::OnEnKillfocusEditRangeSelect()
 	// TODO: Add your control notification handler code here
 	KillTimer(2);
 	SetTimer(1,400,NULL);
+}
+
+
+void BacnetRange::OnClose()
+{
+	// TODO: Add your message handler code here and/or call default
+	range_cancel = true;
+	CDialogEx::OnClose();
 }

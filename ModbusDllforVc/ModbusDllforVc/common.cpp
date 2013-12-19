@@ -4958,6 +4958,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		//the return value == -3,Maybe that have more than 2 Tstat is connecting
 		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
 		//the return value == -5 ,the input have some trouble
+		//the return value == -6 , the bus has bannet protocol,scan stop;
 		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
 		//清空串口缓冲区
 		//the return value is the register address
@@ -5068,6 +5069,18 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 			strValue.Format(_T("%0X, "), nValue);
 			//g_fileScanLog->WriteString(strValue);
 			filelog+=strValue;
+			if((nValue == 0x55) &&((i+1)<13))	//为了防止误判，检测2个周期的 55 ff  。。。。55 ff;
+			{
+				if((gval[i+1] == 0xff) && (i+8)<13)
+				{
+					if((gval[i+8] == 0x55) && (i+9)<13)
+					{
+						if(gval[i+9] == 0xff)
+							return -6;//总线上有bacnet协议，结束扫描;
+					}
+						
+				}
+			}
 		}
 		
 		WriteLogFile(filelog);
@@ -5397,6 +5410,7 @@ OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		//the return value == -3,Maybe that have more than 2 Tstat is connecting
 		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
 		//the return value == -5 ,the input have some trouble
+		//the return value == -6 , the bus has bannet protocol,scan stop;
 		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
 		//清空串口缓冲区
 		//the return value is the register address
@@ -5411,6 +5425,8 @@ OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		int the_return_value2=0;
 		//CheckTstatOnline2_a 可以记录收发的数据
 		the_return_value=CheckTstatOnline2_a(devLo,devHi, bComm_Type);
+		if(the_return_value == -6)
+			return -6;
 		//down is inspect result first scan
 		if(the_return_value==-4)
 		{

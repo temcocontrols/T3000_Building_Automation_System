@@ -47,28 +47,28 @@ extern "C" {
     /* note: define init, set_interface, and cleanup in your port */
     /* on Linux, ifname is eth0, ath0, arc0, and others.
        on Windows, ifname is the dotted ip address of the interface */
-    bool bip_init(
+__declspec(dllexport)    bool bip_init(
         char *ifname);
-    void bip_set_interface(
+ __declspec(dllexport)   void bip_set_interface(
         char *ifname);
-    void bip_cleanup(
+ __declspec(dllexport)   void bip_cleanup(
         void);
 
     /* common BACnet/IP functions */
-    void bip_set_socket(
+ __declspec(dllexport)   void bip_set_socket(
         int sock_fd);
-    int bip_socket(
+__declspec(dllexport)    int bip_socket(
         void);
-    bool bip_valid(
+__declspec(dllexport)    bool bip_valid(
         void);
-    void bip_get_broadcast_address(
+__declspec(dllexport)    void bip_get_broadcast_address(
         BACNET_ADDRESS * dest); /* destination address */
-    void bip_get_my_address(
+ __declspec(dllexport)   void bip_get_my_address(
         BACNET_ADDRESS * my_address);
 
     /* function to send a packet out the BACnet/IP socket */
     /* returns zero on success, non-zero on failure */
-    int bip_send_pdu(
+  __declspec(dllexport)    int bip_send_pdu(
         BACNET_ADDRESS * dest,  /* destination address */
         BACNET_NPDU_DATA * npdu_data,   /* network information */
         uint8_t * pdu,  /* any data to be sent - may be null */
@@ -76,31 +76,31 @@ extern "C" {
 
     /* receives a BACnet/IP packet */
     /* returns the number of octets in the PDU, or zero on failure */
-    uint16_t bip_receive(
+   __declspec(dllexport)   uint16_t bip_receive(
         BACNET_ADDRESS * src,   /* source address */
         uint8_t * pdu,  /* PDU data */
         uint16_t max_pdu,       /* amount of space available in the PDU  */
         unsigned timeout);      /* milliseconds to wait for a packet */
 
     /* use network byte order for setting */
-    void bip_set_port(
+   __declspec(dllexport)   void bip_set_port(
         uint16_t port);
     /* returns network byte order */
-    uint16_t bip_get_port(
+   __declspec(dllexport)   uint16_t bip_get_port(
         void);
 
     /* use network byte order for setting */
-    void bip_set_addr(
+   __declspec(dllexport)   void bip_set_addr(
         uint32_t net_address);
     /* returns network byte order */
-    uint32_t bip_get_addr(
+   __declspec(dllexport)   uint32_t bip_get_addr(
         void);
 
     /* use network byte order for setting */
-    void bip_set_broadcast_addr(
+   __declspec(dllexport)   void bip_set_broadcast_addr(
         uint32_t net_address);
     /* returns network byte order */
-    uint32_t bip_get_broadcast_addr(
+  __declspec(dllexport)    uint32_t bip_get_broadcast_addr(
         void);
 
     /* gets an IP address by name, where name can be a
@@ -108,7 +108,7 @@ extern "C" {
        a name that is a domain name
        returns 0 if not found, or
        an IP address in network byte order */
-    long bip_getaddrbyname(
+  __declspec(dllexport)    long bip_getaddrbyname(
         const char *host_name);
 
 
