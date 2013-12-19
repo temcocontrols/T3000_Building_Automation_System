@@ -9,7 +9,7 @@
 #include "globle_function.h"
 #include "gloab_define.h"
 // CBacnetScheduleTime dialog
-
+HWND m_WeeklyParent_Hwnd;
 IMPLEMENT_DYNAMIC(CBacnetScheduleTime, CDialogEx)
 
 CBacnetScheduleTime::CBacnetScheduleTime(CWnd* pParent /*=NULL*/)
@@ -36,57 +36,27 @@ BEGIN_MESSAGE_MAP(CBacnetScheduleTime, CDialogEx)
 		ON_NOTIFY(NM_CLICK, IDC_LIST_SCHEDULE_TIME, &CBacnetScheduleTime::OnNMClickListScheduleTime)
 		ON_NOTIFY(NM_KILLFOCUS, IDC_DATETIMEPICKER1_SCHEDUAL, &CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual)
 		ON_WM_TIMER()
+		ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
 // CBacnetScheduleTime message handlers
-
-//LRESULT  CBacnetScheduleTime::SchedualTimeResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
-//{
-//	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
-//	CString temp_cs = pInvoke->task_info;
-//	bool msg_result=WRITE_FAIL;
-//	msg_result = MKBOOL(wParam);
-//	CString Show_Results;
-//	if(msg_result)
-//	{
-//		//CString temp_ok;
-//		//temp_ok = _T("Bacnet operation success!   Request ID:") +  temp_cs;
-//
-//		Show_Results = temp_cs + _T("Success!");
-//		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-//
-//		//SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_ok);
-//		#ifdef SHOW_MESSAGEBOX
-//		MessageBox(Show_Results);
-//		#endif
-//	}
-//	else
-//	{
-//		Show_Results = temp_cs + _T("Fail!");
-//		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-//		#ifdef SHOW_ERROR_MESSAGE
-//		MessageBox(Show_Results);
-//		#endif
-//	}
-//	if(pInvoke)
-//		delete pInvoke;
-//	return 0;
-//}
 
 BOOL CBacnetScheduleTime::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	Initial_List();
 	// TODO:  Add extra initialization here
-	g_invoke_id = GetPrivateData(bac_gloab_device_id,READTIMESCHEDULE_T3000,weekly_list_line,weekly_list_line,16*9);
+#if 0
+	g_invoke_id = GetPrivateData(g_bac_instance,READTIMESCHEDULE_T3000,weekly_list_line,weekly_list_line,WEEKLY_SCHEDULE_SIZE);
 	if(g_invoke_id>=0)
 	{
 		CString temp_cs_show;
 		temp_cs_show.Format(_T("Task ID = %d. Read weekly schedule time from item %d "),g_invoke_id,weekly_list_line);
 		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 	}
-
+#endif
+	PostMessage(WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -100,23 +70,31 @@ BOOL CBacnetScheduleTime::PreTranslateMessage(MSG* pMsg)
 	{
 		if (pMsg->wParam == VK_RETURN)
 		{
-			GetDlgItem(IDCANCEL)->SetFocus();
+			if(GetFocus()->GetDlgCtrlID() == IDC_LIST_SCHEDULE_TIME)
+			{
+				CRect list_rect,win_rect;
+				m_schedule_time_list.GetWindowRect(list_rect);
+				ScreenToClient(&list_rect);
+				::GetWindowRect(m_schedule_time_dlg_hwnd,win_rect);
+				m_schedule_time_list.Set_My_WindowRect(win_rect);
+				m_schedule_time_list.Set_My_ListRect(list_rect);
+				m_schedule_time_list.Get_clicked_mouse_position();
+			}
+			else if(GetFocus()->GetDlgCtrlID() == IDC_DATETIMEPICKER1_SCHEDUAL)
+			{
+				GetDlgItem(IDC_LIST_SCHEDULE_TIME)->SetFocus();
+			}
+
+
+
+			
 			return TRUE;
 		}
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-//const int SCHEDULE_TIME_NUM = 0;
-//const int SCHEDULE_TIME_MONDAY = 1;
-//const int SCHEDULE_TIME_TUESDAY = 2;
-//const int SCHEDULE_TIME_WEDNESDAY = 3;
-//const int SCHEDULE_TIME_THURSDAY = 4;
-//const int SCHEDULE_TIME_FRIDAY = 5;
-//const int SCHEDULE_TIME_SATURDAY = 6;
-//const int SCHEDULE_TIME_SUNDAY = 7;
-//const int SCHEDULE_TIME_HOLIDAY1 = 8;
-//const int SCHEDULE_TIME_HOLIDAY2 = 9;
+
 void CBacnetScheduleTime::Initial_List()
 {
 	m_schedule_time_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
@@ -131,8 +109,20 @@ void CBacnetScheduleTime::Initial_List()
 	m_schedule_time_list.InsertColumn(SCHEDULE_TIME_SUNDAY, _T("Sunday"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_schedule_time_list.InsertColumn(SCHEDULE_TIME_HOLIDAY1, _T("Holiday1"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_schedule_time_list.InsertColumn(SCHEDULE_TIME_HOLIDAY2, _T("Holiday2"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+
+
+	m_WeeklyParent_Hwnd = g_hwnd_now;
+
 	m_schedule_time_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_schedule_time_dlg_hwnd;
+
+	CRect list_rect,win_rect;
+	m_schedule_time_list.GetWindowRect(list_rect);
+	ScreenToClient(&list_rect);
+	::GetWindowRect(m_schedule_time_dlg_hwnd,win_rect);
+	m_schedule_time_list.Set_My_WindowRect(win_rect);
+	m_schedule_time_list.Set_My_ListRect(list_rect);
+
 
 	m_schedule_time_list.DeleteAllItems();
 	for (int i=0;i<BAC_SCHEDULE_TIME_COUNT;i++)
@@ -152,12 +142,23 @@ void CBacnetScheduleTime::Initial_List()
 	m_schedual_time_picker.SetTime(&TimeTemp);
 }
 
+void CBacnetScheduleTime::OnClose()
+{
+	// TODO: Add your message handler code here and/or call default
+
+	g_hwnd_now = m_WeeklyParent_Hwnd;
+	if(m_weekly_dlg_hwnd!=NULL)
+		::PostMessage(m_weekly_dlg_hwnd,WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
+	CDialogEx::OnClose();
+}
+
 
 LRESULT CBacnetScheduleTime::Fresh_Schedual_List(WPARAM wParam,LPARAM lParam)
 {
 	CString temp_show;
 	for (int j=0;j<9;j++)
 	{
+		//过滤不合理的时间，不合理的显示空;
 		for (int i=0;i<8;i++)
 		{
 			if((m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][j].time_minutes >59) ||
@@ -187,7 +188,7 @@ LRESULT CBacnetScheduleTime::Fresh_Schedual_Item(WPARAM wParam,LPARAM lParam)
 
 
 
-	//Post_Write_Message(bac_gloab_device_id,WRITEOUTPUT_T3000,Changed_Item,Changed_Item,sizeof(Str_out_point),this->m_hWnd);
+	//Post_Write_Message(g_bac_instance,WRITEOUTPUT_T3000,Changed_Item,Changed_Item,sizeof(Str_out_point),this->m_hWnd);
 	return 0;
 }
 
@@ -241,10 +242,9 @@ void CBacnetScheduleTime::OnNMClickListScheduleTime(NMHDR *pNMHDR, LRESULT *pRes
 
 	m_schedule_time_list.SetItemText(lRow,lCol,_T(""));
 	m_schedual_time_picker.ShowWindow(SW_SHOW);
-	CRect list_rect,win_rect,client_rect;
+	CRect list_rect,win_rect;
 	m_schedule_time_list.GetWindowRect(list_rect);
 	GetWindowRect(win_rect);
-	GetClientRect(client_rect);
 	CRect myrect;
 	m_schedule_time_list.GetSubItemRect(lRow,lCol,LVIR_BOUNDS,myrect);
 	myrect.left = myrect.left + list_rect.left - win_rect.left;
@@ -289,7 +289,7 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
 	m_schedual_time_picker.ShowWindow(SW_HIDE);
 	CString temp_task_info;
 	temp_task_info.Format(_T("Write Schedule Time Item%d .Changed Time to \"%s\" "),weekly_list_line + 1,temp_cs);
-	Post_Write_Message(bac_gloab_device_id,WRITETIMESCHEDULE_T3000,weekly_list_line,weekly_list_line,16*9,BacNet_hwd,temp_task_info);
+	Post_Write_Message(g_bac_instance,WRITETIMESCHEDULE_T3000,weekly_list_line,weekly_list_line,16*9,BacNet_hwd,temp_task_info);
 
 	*pResult = 0;
 }

@@ -47,7 +47,8 @@ typedef struct dlmstp_packet {
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
+__declspec(dllexport) 	 unsigned long  Get_Thread1();
+__declspec(dllexport) unsigned long Get_Thread2();
 __declspec(dllexport)    bool dlmstp_init(
         char *ifname);
     void dlmstp_reset(

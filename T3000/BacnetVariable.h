@@ -1,6 +1,7 @@
 #pragma once
 #include "CM5/ListCtrlEx.h"
 #include "afxwin.h"
+#include "afxdtctl.h"
 
 // CBacnetVariable dialog
 
@@ -22,7 +23,7 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedButtonVariableRead();
-	//afx_msg LRESULT  VariableResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT VariableMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Fresh_Variable_List(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Fresh_Variable_Item(WPARAM wParam,LPARAM lParam);
 	void Initial_List();
@@ -31,6 +32,12 @@ public:
 	afx_msg void OnBnClickedButtonVariableApply();
 	afx_msg void OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	CDateTimeCtrl m_variable_time_picker;
+	afx_msg void OnNMKillfocusDatetimepicker2Variable(NMHDR *pNMHDR, LRESULT *pResult);
+
+	int m_row;
+	int m_col;
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 
@@ -40,3 +47,5 @@ const int VARIABLE_AUTO_MANUAL = 2;
 const int VARIABLE_VALUE = 3;
 const int VARIABLE_UNITE = 4;
 const int VARIABLE_LABLE = 5;
+
+const int VARIABLE_COL_NUMBER = 6;

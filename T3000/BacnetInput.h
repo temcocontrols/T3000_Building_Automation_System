@@ -24,6 +24,7 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg LRESULT Fresh_Input_List(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Fresh_Input_Item(WPARAM wParam,LPARAM lParam);
+	afx_msg LRESULT InputMessageCallBack(WPARAM wParam, LPARAM lParam);
 	void Initial_List();
 	ListCtrlEx::CListCtrlEx m_input_list;
 	afx_msg void OnBnClickedOk();
@@ -34,6 +35,8 @@ public:
 
 	afx_msg void OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnClose();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 //int GetPrivateData();
 //int WritePrivateData();
@@ -48,6 +51,9 @@ const int INPUT_CAL = 6;
 const int INPUT_FITLER = 7;
 const int INPUT_DECOM = 8;
 const int INPUT_LABLE = 9;
+
+const int INPUT_COL_NUMBER = 10;
+
 const CString Input_Range_Array[7] = 
 {
 	_T("Not Used"),

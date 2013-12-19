@@ -24,6 +24,10 @@ public:
 	virtual BOOL Create(LPCTSTR lpszText, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID = 0xffff);
 	afx_msg void OnPaint();
 	void SetLabelInfo(int TstatID,int input_or_output,int nStatus,COLORREF textClr,COLORREF bkClr);
+	void SetLabelInfo_General(int ndeviceid,int type,int nStatus,COLORREF textClr,COLORREF bkClr);
+	void DispalyInputValue_General(int nStatus,COLORREF textClr,COLORREF bkClr);
+	void DispalyOutputValue_General(int nStatus,COLORREF textClr,COLORREF bkClr);
+	void DispalyVariableValue_General(int nStatus,COLORREF textClr,COLORREF bkClr);
 	void DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr);
 	void DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr);
 	void DispalyRigesterValue(int nStatus,COLORREF textClr,COLORREF bkClr);

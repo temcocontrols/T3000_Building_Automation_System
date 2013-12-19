@@ -45,19 +45,19 @@ extern "C" {
 #define bvlc_maintenance_timer(x)
 #endif
 
-    uint16_t bvlc_receive(
+  __declspec(dllexport)    uint16_t bvlc_receive(
         BACNET_ADDRESS * src,   /* returns the source address */
         uint8_t * npdu, /* returns the NPDU */
         uint16_t max_npdu,      /* amount of space available in the NPDU  */
         unsigned timeout);      /* number of milliseconds to wait for a packet */
 
-    int bvlc_send_pdu(
+  __declspec(dllexport)     int bvlc_send_pdu(
         BACNET_ADDRESS * dest,  /* destination address */
         BACNET_NPDU_DATA * npdu_data,   /* network information */
         uint8_t * pdu,  /* any data to be sent - may be null */
         unsigned pdu_len);
 
-    int bvlc_send_mpdu(
+  __declspec(dllexport)     int bvlc_send_mpdu(
         struct sockaddr_in *dest,
         uint8_t * mtu,
         uint16_t mtu_len);
@@ -81,20 +81,20 @@ extern "C" {
         uint8_t * npdu,
         unsigned npdu_length);
 #endif
-    int bvlc_encode_read_bdt(
+  __declspec(dllexport)     int bvlc_encode_read_bdt(
         uint8_t * pdu);
-    int bvlc_bbmd_read_bdt(
+  __declspec(dllexport)     int bvlc_bbmd_read_bdt(
         uint32_t bbmd_address,
         uint16_t bbmd_port);
 
     /* registers with a bbmd as a foreign device */
-    int bvlc_register_with_bbmd(
+  __declspec(dllexport)     int bvlc_register_with_bbmd(
         uint32_t bbmd_address,  /* in network byte order */
         uint16_t bbmd_port,     /* in network byte order */
         uint16_t time_to_live_seconds);
 
     /* Note any BVLC_RESULT code, or NAK the BVLL message in the unsupported cases. */
-    int bvlc_for_non_bbmd(
+  __declspec(dllexport)     int bvlc_for_non_bbmd(
         struct sockaddr_in *sout,
         uint8_t * npdu,
         uint16_t received_bytes);
@@ -102,14 +102,14 @@ extern "C" {
     /* Returns the last BVLL Result we received, either as the result of a BBMD
      * request we sent, or (if not a BBMD or Client), from trying to register
      * as a foreign device. */
-    BACNET_BVLC_RESULT bvlc_get_last_result(
+  __declspec(dllexport)     BACNET_BVLC_RESULT bvlc_get_last_result(
         void);
 
     /* Returns the current BVLL Function Code we are processing.
      * We have to store this higher layer code for when the lower layers
      * need to know what it is, especially to differentiate between
      * BVLC_ORIGINAL_UNICAST_NPDU and BVLC_ORIGINAL_BROADCAST_NPDU.  */
-    BACNET_BVLC_FUNCTION bvlc_get_function_code(
+   __declspec(dllexport)    BACNET_BVLC_FUNCTION bvlc_get_function_code(
         void);
 
 #ifdef __cplusplus

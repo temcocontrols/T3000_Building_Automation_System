@@ -25,10 +25,12 @@ public:
 	virtual BOOL OnInitDialog();
 	void Initial_List();
 	afx_msg void OnClose();
+	afx_msg LRESULT AnnualMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
 	afx_msg void OnNMClickListBacAnnuleList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg LRESULT Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Fresh_Annual_Routine_List(WPARAM wParam,LPARAM lParam);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	//afx_msg LRESULT AnnualResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 };
 
@@ -37,4 +39,7 @@ const int ANNUAL_ROUTINE_FULL_LABEL = 1 ;
 const int ANNUAL_ROUTINE_AUTO_MANUAL = 2 ;
 const int ANNUAL_ROUTINE_VALUE = 3 ;
 const int ANNUAL_ROUTINE_LABLE = 4 ;
+
+const int ANNUAL_COL_NUMBER = 5 ;
+
 

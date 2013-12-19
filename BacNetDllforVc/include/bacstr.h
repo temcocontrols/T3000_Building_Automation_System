@@ -195,7 +195,7 @@ extern "C" {
 
 __declspec(dllexport)	int Get_transfer_length();
 __declspec(dllexport)	void Set_transfer_length(int data);
-	
+
 
 
 #ifdef __cplusplus

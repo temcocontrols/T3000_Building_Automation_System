@@ -19,6 +19,7 @@ extern char *pmes;
  extern char my_display[1024];
  extern int Encode_Program();
  extern int my_lengthcode;
+ extern char mycode[1024];
 
 extern void  init_info_table( void );
 extern void Init_table_bank();
@@ -26,6 +27,8 @@ extern char mesbuf[1024];
 extern int renumvar;
 
 extern char *desassembler_program();
+
+HWND mParent_Hwnd;
 
 IMPLEMENT_DYNAMIC(CBacnetProgramEdit, CDialogEx)
 
@@ -52,7 +55,7 @@ void CBacnetProgramEdit::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CBacnetProgramEdit, CDialogEx)
 	ON_MESSAGE(WM_HOTKEY,&CBacnetProgramEdit::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(WM_REFRESH_BAC_PROGRAM_RICHEDIT,Fresh_Program_RichEdit)
-	//ON_MESSAGE(MY_RESUME_DATA, ProgramResumeMessageCallBack)
+	ON_MESSAGE(MY_RESUME_DATA, ProgramResumeMessageCallBack)
 	ON_COMMAND(ID_SEND, &CBacnetProgramEdit::OnSend)
 	ON_WM_CLOSE()
 	ON_COMMAND(ID_CLEAR, &CBacnetProgramEdit::OnClear)
@@ -160,7 +163,7 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	//do 
 	//{
 	//	retry_count ++;
-	//	g_invoke_id = GetPrivateData(bac_gloab_device_id,READPROGRAMCODE_T3000,program_list_line,program_list_line,100);
+	//	g_invoke_id = GetPrivateData(g_bac_instance,READPROGRAMCODE_T3000,program_list_line,program_list_line,100);
 	//	Sleep(200);
 	//} while ((retry_count<10)&&(g_invoke_id<0));
 	
@@ -181,18 +184,23 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 
 	init_info_table();
 	Init_table_bank();
+
+	mParent_Hwnd = g_hwnd_now;
+
 	m_program_edit_hwnd = this->m_hWnd;
 	g_hwnd_now = m_program_edit_hwnd;
 
 	
-
+	PostMessage(WM_REFRESH_BAC_PROGRAM_RICHEDIT,NULL,NULL);
 	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 {
+	//return 0;
+	//	CString temp2;
 	char * temp_point;
-	temp_point = desassembler_program();
+ 	temp_point = desassembler_program();
 	if(temp_point == NULL)
 	{
 		MessageBox(_T("ERROR!!!!Decode Error!!!!!!!!!!!!!"));
@@ -206,11 +214,16 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	int  len = 0;
 	len =  strlen(my_display); //str.length();
 	int  unicodeLen = ::MultiByteToWideChar( CP_ACP,0, my_display,-1,NULL,0 );  
-	::MultiByteToWideChar( CP_ACP,  0,my_display,-1,temp.GetBuffer(MAX_PATH),unicodeLen ); 
+	::MultiByteToWideChar( CP_ACP,  0,my_display,-1,temp.GetBuffer(unicodeLen),unicodeLen ); 
 	temp.ReleaseBuffer();
-	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(-1,-1);
-	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->ReplaceSel(temp);
-	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(-1,-1);
+	CString temp1 = temp;
+	
+
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(temp1);
+
+	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(-1,-1);
+	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->ReplaceSel(temp1);
+	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(-1,-1);
 	return 0;
 }
 
@@ -227,39 +240,40 @@ void CBacnetProgramEdit::OnOK()
 	/*CDialogEx::OnOK();*/
 }
 
-//
-//LRESULT  CBacnetProgramEdit::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
-//{
-//	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
-//	CString temp_cs = pInvoke->task_info;
-//	bool msg_result=WRITE_FAIL;
-//	msg_result = MKBOOL(wParam);
-//	CString Show_Results;
-//	if(msg_result)
-//	{
-//		//CString temp_ok;
-//		//temp_ok = _T("Bacnet operation success!   Request ID:") +  temp_cs;
-//
-//		Show_Results = temp_cs + _T("Success!");
-//		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-//
-//		//SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_ok);
+
+LRESULT  CBacnetProgramEdit::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
+{
+	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
+	CString temp_cs = pInvoke->task_info;
+	bool msg_result=WRITE_FAIL;
+	msg_result = MKBOOL(wParam);
+	CString Show_Results;
+	if(msg_result)
+	{
+		//CString temp_ok;
+		//temp_ok = _T("Bacnet operation success!   Request ID:") +  temp_cs;
+		m_Program_data.at(program_list_line).bytes =	program_code_length[program_list_line] - PRIVATE_HEAD_LENGTH;
+
+		Show_Results = temp_cs + _T("Success!");
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+
+		//SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_ok);
 //#ifdef SHOW_MESSAGEBOX
-//		MessageBox(Show_Results);
+		MessageBox(Show_Results);
 //#endif
-//	}
-//	else
-//	{
-//		Show_Results = temp_cs + _T("Fail!");
-//		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+	}
+	else
+	{
+		Show_Results = temp_cs + _T("Fail!");
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 //#ifdef SHOW_ERROR_MESSAGE
-//		MessageBox(Show_Results);
+		MessageBox(Show_Results);
 //#endif
-//	}
-//	if(pInvoke)
-//		delete pInvoke;
-//	return 0;
-//}
+	}
+	if(pInvoke)
+		delete pInvoke;
+	return 0;
+}
 
 
 void CBacnetProgramEdit::OnSend()
@@ -279,12 +293,25 @@ void CBacnetProgramEdit::OnSend()
 	Encode_Program();
 	if(error == -1)
 	{
-		g_invoke_id =WritePrivateData(bac_gloab_device_id,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line/*,my_lengthcode*/);
+		TRACE(_T("Encode_Program length is %d ,copy length is %d\r\n"),program_code_length[program_list_line],my_lengthcode + 10);
+		if(my_lengthcode+10 <400)
+		memcpy_s(program_code[program_list_line],my_lengthcode+10,mycode,my_lengthcode + 10);
+		else
+		{
+			CString temp_mycs;//如果npdu的长度过长，大于 400了，目前是通过换一个page来存;
+			temp_mycs.Format(_T("Encode Program Code Length is %d,Please Try to code in another page."),my_lengthcode+10);
+			MessageBox(temp_mycs);
+			memset(program_code[program_list_line],0,400);
+			return;
+		}
+			
+
+		g_invoke_id =WritePrivateData(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line/*,my_lengthcode*/);
 		if(g_invoke_id>=0)
 		{
 			CString temp_cs_show;
 			temp_cs_show.Format(_T("Task ID = %d. Write program code to item %d "),g_invoke_id,program_list_line);
-			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
+			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd/*BacNet_hwd*/,temp_cs_show);
 		}
 
 	}
@@ -325,6 +352,10 @@ void CBacnetProgramEdit::OnClose()
 	UnregisterHotKey(GetSafeHwnd(),KEY_F7);
 	UnregisterHotKey(GetSafeHwnd(),KEY_F6);
 	UnregisterHotKey(GetSafeHwnd(),KEY_F8);
+
+	g_hwnd_now = mParent_Hwnd;
+	if(m_pragram_dlg_hwnd!=NULL)
+		::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 	CDialogEx::OnClose();
 }
 
@@ -367,7 +398,7 @@ void CBacnetProgramEdit::OnLoadfile()
 		int  len = 0;
 		len = strlen(pBuf);
 		int  unicodeLen = ::MultiByteToWideChar( CP_ACP,0, pBuf,-1,NULL,0 );  
-		::MultiByteToWideChar( CP_ACP,  0,pBuf,-1,ReadBuffer.GetBuffer(MAX_PATH),unicodeLen );  
+		::MultiByteToWideChar( CP_ACP,  0,pBuf,-1,ReadBuffer.GetBuffer(unicodeLen),unicodeLen );  
 		ReadBuffer.ReleaseBuffer();
 		
 		delete[] pBuf;
@@ -433,7 +464,12 @@ void CBacnetProgramEdit::OnRefresh()
 {
 	// TODO: Add your command handler code here
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(_T(""));
-	g_invoke_id = GetPrivateData(bac_gloab_device_id,READPROGRAMCODE_T3000,program_list_line,program_list_line,200);
+	if(m_Program_data.at(program_list_line).bytes <450)
+		g_invoke_id = GetPrivateData(g_bac_instance,READPROGRAMCODE_T3000,program_list_line,program_list_line,m_Program_data.at(program_list_line).bytes + 10);
+	else
+	{
+		g_invoke_id = GetPrivateData(g_bac_instance,READPROGRAMCODE_T3000,program_list_line,program_list_line, 10);
+	}
 	if(g_invoke_id>=0)
 	{
 		CString temp_cs_show;

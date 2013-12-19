@@ -4,6 +4,7 @@
 // CScanDbWaitDlg dialog
 #define WM_NETSCANINFO  WM_USER + 1200
 #define WM_COMSCANINFO  WM_USER + 1201
+#define WM_BACNETCOMSCANINFO WM_USER + 1202
 
 
 class CTStatScanner;
@@ -30,6 +31,7 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg LRESULT OnNetScanInfo(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnComScanInfo(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnBacnetComScanInfo(WPARAM wParam, LPARAM lParam);
 
 
 	void SetPromtText(CString strInfo);

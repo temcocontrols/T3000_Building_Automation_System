@@ -142,6 +142,15 @@ const char *RS485_Interface(
 {
     return RS485_Port_Name;
 }
+HANDLE Get_RS485_Handle()
+{
+	return RS485_Handle;
+}
+
+void  Set_RS485_Handle(HANDLE temp_handle)
+{
+	 RS485_Handle = temp_handle;
+}
 
 void RS485_Print_Error(
     void)
@@ -485,7 +494,11 @@ void RS485_Check_UART_Data(
         /* check for data */
         if (!ReadFile(RS485_Handle, lpBuf, sizeof(lpBuf), &dwRead, NULL)) {
             if (GetLastError() != ERROR_IO_PENDING) {
+				int tempa = GetLastError();
                 mstp_port->ReceiveError = TRUE;
+			//	PurgeComm(RS485_Handle, PURGE_TXABORT| PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//每次读都清空一次，多次调用后会触发错误,重叠模式
+				RS485_Cleanup();
+				 RS485_Initialize();
             }
         } else {
             if (dwRead) {

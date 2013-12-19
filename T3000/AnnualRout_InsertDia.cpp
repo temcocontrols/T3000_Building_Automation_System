@@ -295,7 +295,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 		do 
 		{
 			retry_count ++;
-			g_invoke_id = GetPrivateData(bac_gloab_device_id,READANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48);
+			g_invoke_id = GetPrivateData(g_bac_instance,READANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48);
 			Sleep(200);
 		} while ((retry_count<10)&&(g_invoke_id<0));
 
@@ -746,7 +746,7 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 	}
 	CString temp_task_info;
 	temp_task_info.Format(_T("Write annual schedual List Item%d ."),annual_list_line + 1);
-	Post_Write_Message(bac_gloab_device_id,WRITEANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48,this->m_hWnd,temp_task_info);
+	Post_Write_Message(g_bac_instance,WRITEANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48,this->m_hWnd,temp_task_info);
 
 	*pResult = 0;
 }

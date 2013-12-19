@@ -9,7 +9,7 @@
 #include "Bacnet_Include.h"
 #include "globle_function.h"
 #include <math.h>
-
+Str_in_point m_temp_Input_data[BAC_INPUT_ITEM_COUNT];
 #include "gloab_define.h"
 #include "BacnetRange.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
@@ -39,19 +39,56 @@ void CBacnetInput::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CBacnetInput, CDialogEx)
+	ON_MESSAGE(MY_RESUME_DATA, InputMessageCallBack)
 	ON_MESSAGE(WM_REFRESH_BAC_INPUT_LIST,Fresh_Input_List)
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Input_Item)	
 	ON_BN_CLICKED(IDOK, &CBacnetInput::OnBnClickedOk)
-//	ON_MESSAGE(MY_RESUME_DATA, InputResumeMessageCallBack)
 	ON_BN_CLICKED(IDC_BUTTON_INPUT_APPLY, &CBacnetInput::OnBnClickedButtonApply)
 	ON_BN_CLICKED(IDC_BUTTON_INPUT_READ, &CBacnetInput::OnBnClickedButtonRead)
 	ON_NOTIFY(NM_CLICK, IDC_LIST1, &CBacnetInput::OnNMClickList1)
 	ON_WM_TIMER()
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
 
 // CBacnetInput message handlers
+LRESULT  CBacnetInput::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
+{
+	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
+	bool msg_result=WRITE_FAIL;
+	msg_result = MKBOOL(wParam);
+	CString Show_Results;
+	CString temp_cs = pInvoke->task_info;
+	if(msg_result)
+	{
+		Show_Results = temp_cs + _T("Success!");
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+
+		//Post_Refresh_Message(g_bac_instance,READINPUT_T3000,pInvoke->mRow,pInvoke->mRow,sizeof(Str_in_point), BAC_INPUT_GROUP);
+		//MessageBox(_T("Bacnet operation success!"));
+	}
+	else
+	{
+		memcpy_s(&m_Input_data.at(pInvoke->mRow),sizeof(Str_in_point),&m_temp_Input_data[pInvoke->mRow],sizeof(Str_in_point));//还原没有改对的值
+		PostMessage(WM_REFRESH_BAC_INPUT_LIST,pInvoke->mRow,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+		Show_Results = temp_cs + _T("Fail!");
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+
+		//AfxMessageBox(Show_Results);
+		//MessageBox(_T("Bacnet operation fail!"));
+	}
+	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
+		m_input_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
+	else
+		m_input_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+	m_input_list.RedrawItems(pInvoke->mRow,pInvoke->mRow);
+
+
+	if(pInvoke)
+		delete pInvoke;
+	return 0;
+}
 
 
 BOOL CBacnetInput::OnInitDialog()
@@ -88,6 +125,14 @@ void CBacnetInput::Initial_List()
 	m_input_list.InsertColumn(INPUT_LABLE, _T("Label"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_input_dlg_hwnd;
+
+	CRect list_rect,win_rect;
+	m_input_list.GetWindowRect(list_rect);
+	ScreenToClient(&list_rect);
+	::GetWindowRect(m_input_dlg_hwnd,win_rect);
+	m_input_list.Set_My_WindowRect(win_rect);
+	m_input_list.Set_My_ListRect(list_rect);
+
 
 	m_input_list.DeleteAllItems();
 	for (int i=0;i<(int)m_Input_data.size();i++)
@@ -148,18 +193,32 @@ void CBacnetInput::Initial_List()
 			}
 			m_input_list.SetCellStringList(i, INPUT_DECOM, strlist);
 		}
+
+		for (int x=0;x<INPUT_COL_NUMBER;x++)
+		{
+			if((i%2)==0)
+				m_input_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
+			else
+				m_input_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
+		}
+
+		
+
 	}
 }
 
 void CBacnetInput::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
-	//CDialogEx::OnOK();
+//	CDialogEx::OnOK();
 }
 LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 {
+	int cmp_ret ;//compare if match it will 0;
 	int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
+
+	memcpy_s(&m_temp_Input_data[Changed_Item],sizeof(Str_in_point),&m_Input_data.at(Changed_Item),sizeof(Str_in_point));
 
 	CString temp_task_info;
 	CString New_CString =  m_input_list.GetItemText(Changed_Item,Changed_SubItem);
@@ -167,6 +226,12 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == INPUT_LABLE)
 	{
 		CString cs_temp = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
+		if(cs_temp.GetLength()>= STR_IN_LABEL)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Length can not higher than 8"),_T("Warning"));
+			PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+			return 0;
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -176,6 +241,13 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == INPUT_FULL_LABLE)
 	{
 		CString cs_temp = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
+		if(cs_temp.GetLength()>= STR_IN_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Length can not higher than 20"),_T("Warning"));
+			PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+			return 0;
+		}
+
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -201,7 +273,9 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == INPUT_VALUE)
 	{
 		CString temp_cs = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
-		int temp_int = _wtoi(temp_cs);
+
+		int temp_int = (int)(_wtof(temp_cs) * 1000);
+		//int temp_int = _wtoi(temp_cs);
 		m_Input_data.at(Changed_Item).value = temp_int;
 	}
 
@@ -213,6 +287,11 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 		{
 			bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;
 			dlg.DoModal();
+			if(range_cancel)
+			{
+				PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+				return 0;
+			}
 			m_Input_data.at(Changed_Item).digital_analog =  BAC_UNITS_ANALOG;
 			m_Input_data.at(Changed_Item).range =  bac_range_number_choose;
 			m_input_list.SetItemText(Changed_Item,INPUT_RANGE,Input_Analog_Units_Array[bac_range_number_choose]);		
@@ -227,14 +306,24 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 			//m_input_list.SetItemText(Changed_Item,OUTPUT_100_PERSENT,_T("10"));
 			//m_input_list.SetCellEnabled(Changed_Item,OUTPUT_100_PERSENT,1);
 
-			cstemp_value.Format(_T("%d"),m_Input_data.at(Changed_Item).value);
+			CString cstemp_value;
+			float temp_float_value;
+			temp_float_value = ((float)m_Input_data.at(Changed_Item).value) / 1000;
+			cstemp_value.Format(_T("%.2f"),temp_float_value);
 			m_input_list.SetItemText(Changed_Item,INPUT_VALUE,cstemp_value);	
+
+			//cstemp_value.Format(_T("%d"),m_Input_data.at(Changed_Item).value);
+			//m_input_list.SetItemText(Changed_Item,INPUT_VALUE,cstemp_value);	
 		}
 		else if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_DIGITAL])==0)
 		{
 			bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
 			dlg.DoModal();
-
+			if(range_cancel)
+			{
+				PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+				return 0;
+			}
 			m_Input_data.at(Changed_Item).digital_analog =  BAC_UNITS_DIGITAL;
 			m_Input_data.at(Changed_Item).range =  bac_range_number_choose;
 			//m_input_list.SetItemText(Changed_Item,INPUT_RANGE,INPUT_Digital_Units_Show[bac_range_number_choose]);		
@@ -272,6 +361,11 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 			bac_ranges_type = OUTPUT_RANGE_CUSTOM_DIG_TYPE;
 			//dlg.DoModal();
 		}	
+		else
+		{
+			PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+			//m_input_list.SetItemText(Changed_Item,INPUT_RANGE,temp_cs);
+		}
 	}
 
 
@@ -363,9 +457,13 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 		m_Input_data.at(Changed_Item).decom = dec_index;
 	}
 
-	temp_task_info.Format(_T("Write Input List Item%d .Changed to \"%s\" "),Changed_Item + 1,New_CString);
-	Post_Write_Message(bac_gloab_device_id,WRITEINPUT_T3000,Changed_Item,Changed_Item,sizeof(Str_in_point),BacNet_hwd ,temp_task_info);
-
+	cmp_ret = memcmp(&m_temp_Input_data[Changed_Item],&m_Input_data.at(Changed_Item),sizeof(Str_in_point));
+	if(cmp_ret!=0)
+	{
+		m_input_list.SetItemBkColor(Changed_Item,Changed_SubItem,LIST_ITEM_CHANGED_BKCOLOR);
+		temp_task_info.Format(_T("Write Input List Item%d .Changed to \"%s\" "),Changed_Item + 1,New_CString);
+		Post_Write_Message(g_bac_instance,WRITEINPUT_T3000,Changed_Item,Changed_Item,sizeof(Str_in_point),m_input_dlg_hwnd ,temp_task_info,Changed_Item,Changed_SubItem);
+	}
 	//m_input_list.Invalidate();
 	return 0;
 }
@@ -373,6 +471,31 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 {
 	// Str_in_point Get_Str_in_Point(int index);
+	int Fresh_Item;
+	int isFreshOne = (int)lParam;
+	if(isFreshOne == REFRESH_ON_ITEM)
+	{
+		Fresh_Item = (int)wParam;
+	}
+	else
+	{
+		if(m_input_list.IsDataNewer((char *)&m_Input_data.at(0),sizeof(Str_in_point) * BAC_INPUT_ITEM_COUNT))
+		{
+			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			m_input_list.SetListData((char *)&m_Input_data.at(0),sizeof(Str_in_point) * BAC_INPUT_ITEM_COUNT);
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	if(0)
+	{
+		int temp_select_raw = 0;
+		int temp_select_col = 0;
+		m_input_list.Get_Selected_Item(temp_select_raw,temp_select_col);
+		m_input_list.SetItemBkColor(temp_select_raw,temp_select_col,LIST_ITEM_SELECTED,0);
+	}
 
 	//m_input_list.DeleteAllItems();
 	for (int i=0;i<(int)m_Input_data.size();i++)
@@ -381,10 +504,15 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		CString temp_des;
 		CString temp_units;
 
+		if(isFreshOne)
+		{
+			i = Fresh_Item;
+		}
 
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).description, (int)strlen((char *)m_Input_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
+
 		m_input_list.SetItemText(i,INPUT_FULL_LABLE,temp_des);
 		if(m_Input_data.at(i).auto_manual==0)
 		{
@@ -407,9 +535,15 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			m_input_list.SetItemText(i,INPUT_UNITE,Input_List_Analog_Units[m_Input_data.at(i).range]);
 
 
-			CString temp_value;
-			temp_value.Format(_T("%d"),m_Input_data.at(i).value);
-			m_input_list.SetItemText(i,INPUT_VALUE,temp_value);
+			CString cstemp_value;
+			float temp_float_value;
+			temp_float_value = ((float)m_Input_data.at(i).value) / 1000;
+			cstemp_value.Format(_T("%.2f"),temp_float_value);
+			m_input_list.SetItemText(i,INPUT_VALUE,cstemp_value);
+
+			//CString temp_value;
+			//temp_value.Format(_T("%d"),m_Input_data.at(i).value);
+			//m_input_list.SetItemText(i,INPUT_VALUE,temp_value);
 
 			temp_cal.Format(_T("%d"),(m_Input_data.at(i).calibration));
 			m_input_list.SetItemText(i,INPUT_CAL,temp_cal);
@@ -418,100 +552,35 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		{
 
 			m_input_list.SetItemText(i,INPUT_CAL,_T(""));
-			m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[m_Input_data.at(i).range]);
+			if(m_Input_data.at(i).range>=12)
+				m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[m_Input_data.at(i).range -11]);
+			else
+				m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[m_Input_data.at(i).range]);
 			m_input_list.SetItemText(i,INPUT_UNITE,_T(""));
 
-			if((m_Input_data.at(i).range>=12)&&(m_Input_data.at(i).range<=22))
+			if(m_Input_data.at(i).range>22)
 			{
-				CString temp1;
-				CStringArray temparray;
-				temp1 = Digital_Units_Array[m_Input_data.at(i).range - 11];//11 is the sizeof the array
-				SplitCStringA(temparray,temp1,_T("/"));
-				if((temparray.GetSize()==2)&&(!temparray.GetAt(1).IsEmpty()))
-				{
-					m_input_list.SetItemText(i,INPUT_VALUE,temparray.GetAt(1));
-				}
-				m_input_list.SetItemText(i,INPUT_RANGE,temp1);
-			}
-			else if((m_Input_data.at(i).range>=1)&&(m_Input_data.at(i).range<=11))
-			{
-				CString temp1;
-				CStringArray temparray;
-				temp1 = Digital_Units_Array[m_Input_data.at(i).range];
-				SplitCStringA(temparray,temp1,_T("/"));
-				if((temparray.GetSize()==2)&&(!temparray.GetAt(0).IsEmpty()))
-				{
-					m_input_list.SetItemText(i,INPUT_VALUE,temparray.GetAt(0));
-				}
-				m_input_list.SetItemText(i,INPUT_RANGE,temp1);
+				m_input_list.SetItemText(i,INPUT_UNITE,Digital_Units_Array[0]);
 			}
 			else
 			{
-				m_input_list.SetItemText(i,INPUT_UNITE,Input_List_Analog_Units[0]);
+				CString temp1;
+				CStringArray temparray;
+				if(m_Input_data.at(i).range>=12)
+					temp1 = Digital_Units_Array[m_Input_data.at(i).range - 11];//11 is the sizeof the array
+				else
+					temp1 = Digital_Units_Array[m_Input_data.at(i).range];
+				SplitCStringA(temparray,temp1,_T("/"));
+				if((temparray.GetSize()==2))
+				{
+					if(m_Input_data.at(i).control == 0)
+						m_input_list.SetItemText(i,INPUT_VALUE,temparray.GetAt(0));
+					else
+						m_input_list.SetItemText(i,INPUT_VALUE,temparray.GetAt(1));
+				}
 			}
+
 		}
-
-
-		//switch(m_Input_data.at(i).range)
-		//{
-		//case 0:
-		//	temp_units = _T("Not Used");
-		//	break;
-		//case 1:
-		//	temp_units = _T("℃");
-		//	if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_UNITE))
-		//	{
-		//		ListCtrlEx::CStrList strlist;
-		//		strlist.push_back(_T("℃"));
-		//		strlist.push_back(_T("℉"));
-		//		m_input_list.SetCellStringList(i, INPUT_UNITE, strlist);
-		//	}
-		//	break;
-		//case 2:
-		//	if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_UNITE))
-		//	{
-		//		ListCtrlEx::CStrList strlist;
-		//		strlist.push_back(Input_Unit[ma]);
-		//		m_input_list.SetCellStringList(i, INPUT_UNITE, strlist);
-		//	}
-		//	temp_units = _T("mA");
-		//	break;
-		//case 3:
-		//case 4:
-		//	if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_UNITE))
-		//	{
-		//		ListCtrlEx::CStrList strlist;
-		//		strlist.push_back(Input_Unit[Volts]);
-		//		m_input_list.SetCellStringList(i, INPUT_UNITE, strlist);
-		//	}
-		//	temp_units = _T("Volt");
-		//	break;
-		//case 5:
-		//case 6:
-		//	if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_UNITE))
-		//	{
-		//		ListCtrlEx::CStrList strlist;
-		//		strlist.push_back(_T("ON/OFF"));
-		//		m_input_list.SetCellStringList(i, INPUT_UNITE, strlist);
-		//	}
-		//	temp_units = _T("ON/OFF");
-		//	break;
-		//default:
-		//	break;
-		//}
-		//m_input_list.SetItemText(i,INPUT_UNITE,temp_units);
-
-		//temp_value.Format(_T("%d"),m_Input_data.at(i).value);
-		//m_input_list.SetItemText(i,INPUT_VALUE,temp_value);
-
-		//CString temp_show_rang;
-		//if((m_Input_data.at(i).range>=7)||(m_Input_data.at(i).range<0))
-		//	temp_show_rang = _T("");
-		//else
-		//	temp_show_rang = Input_Range_Array[m_Input_data.at(i).range];
-
-		//m_input_list.SetItemText(i,INPUT_RANGE,temp_show_rang);
-
 
 
 		temp_filter.Format(_T("%d"),(int)pow((double)2,(int)m_Input_data.at(i).filter));
@@ -530,7 +599,12 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).label, (int)strlen((char *)m_Input_data.at(i).label)+1, 
 			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des2.ReleaseBuffer();
+
 		m_input_list.SetItemText(i,INPUT_LABLE,temp_des2);
+		if(isFreshOne)
+		{
+			break;
+		}
 		//ptr_panel
 	}
 	copy_data_to_ptrpanel(TYPE_INPUT);
@@ -614,14 +688,19 @@ void CBacnetInput::OnBnClickedButtonApply()
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 		memcpy_s(m_Input_data.at(i).label,STR_IN_LABEL,cTemp1,STR_IN_LABEL);
 	}
-	Post_Write_Message(bac_gloab_device_id,WRITEINPUT_T3000,0,19,sizeof(Str_in_point),BacNet_hwd);
+	Post_Write_Message(g_bac_instance,WRITEINPUT_T3000,0,19,sizeof(Str_in_point),BacNet_hwd);
 
 }
 
 
 void CBacnetInput::OnBnClickedButtonRead()
 {
+	//CPoint temp;
+	//temp.x = 130;
+	//temp.y = 201;
+ //	::PostMessage((HWND)GetDlgItem(IDC_LIST1),WM_LBUTTONDOWN,1,0);
 	// TODO: Add your control notification handler code here
+	Post_Refresh_Message(g_bac_instance,READINPUT_T3000,0,BAC_INPUT_ITEM_COUNT - 1,sizeof(Str_in_point), BAC_INPUT_GROUP);
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 }
 
@@ -663,7 +742,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	if(m_Input_data.at(lRow).auto_manual == BAC_AUTO)	//If it is auto mode, disable to change the value.
 		return;
 
-
+	memcpy_s(&m_temp_Input_data[lRow],sizeof(Str_in_point),&m_Input_data.at(lRow),sizeof(Str_in_point));
 
 	CString New_CString;
 	CString temp_task_info;
@@ -701,8 +780,14 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	m_input_list.Set_Edit(false);
 
-	temp_task_info.Format(_T("Write Input List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
-	Post_Write_Message(bac_gloab_device_id,WRITEINPUT_T3000,lRow,lRow,sizeof(Str_in_point),BacNet_hwd,temp_task_info);
+	int cmp_ret = memcmp(&m_temp_Input_data[lRow],&m_Input_data.at(lRow),sizeof(Str_in_point));
+	if(cmp_ret!=0)
+	{
+		m_input_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
+		temp_task_info.Format(_T("Write Input List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
+		Post_Write_Message(g_bac_instance,WRITEINPUT_T3000,lRow,lRow,sizeof(Str_in_point),m_input_dlg_hwnd,temp_task_info,lRow,lCol);
+	}
+
 
 
 	*pResult = 0;
@@ -713,6 +798,33 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-	Post_Refresh_Message(bac_gloab_device_id,READINPUT_T3000,0,19,sizeof(Str_in_point),5);
+	Post_Refresh_Message(g_bac_instance,READINPUT_T3000,0,BAC_INPUT_ITEM_COUNT - 1,sizeof(Str_in_point), BAC_INPUT_GROUP);
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void CBacnetInput::OnClose()
+{
+	// TODO: Add your message handler code here and/or call default
+	m_input_dlg_hwnd = NULL;
+	CDialogEx::OnClose();
+}
+
+
+BOOL CBacnetInput::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
+	{
+		CRect list_rect,win_rect;
+		m_input_list.GetWindowRect(list_rect);
+		ScreenToClient(&list_rect);
+		::GetWindowRect(m_input_dlg_hwnd,win_rect);
+		m_input_list.Set_My_WindowRect(win_rect);
+		m_input_list.Set_My_ListRect(list_rect);
+
+		m_input_list.Get_clicked_mouse_position();
+		return TRUE;
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
 }

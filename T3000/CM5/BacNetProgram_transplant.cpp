@@ -19,7 +19,8 @@
 #pragma warning(disable:4305)
 #pragma warning(disable:4244)
 
-
+extern int program_code_length[BAC_PROGRAM_ITEM_COUNT];
+extern int program_list_line ;
 
 char *index_stack;
 char stack[150];
@@ -92,6 +93,7 @@ public:
 
 
 /* Point_T3000;*/
+#if 0
 class Point_T3000 {
 public:
 	byte number		;
@@ -107,7 +109,15 @@ public:
 	void operator=(const Point_T3000 &copy);
 };
 
+#endif
+typedef struct {
+public:
+	byte number		;
+	byte point_type;
+	byte panel	 ;
+}Point_T3000;
 
+#if 0
 /* Point_Net_T3000;*/
 class Point_Net {
 public:
@@ -132,7 +142,7 @@ void Point_Net::putpoint( byte num, byte p_type, byte p, int  net)
 	panel = p;
 	network = net;
 }
-
+#endif
 
 typedef  struct
 {
@@ -200,7 +210,7 @@ typedef struct
 	byte        range;	      			/* (1 Byte ; input_range_equate)*/
 
 } Str_in_point; /* 21+1+4+1+1+9+1 = 38 */
-#endif
+
 typedef struct
 {
 	//fance Point_T3000 input;	      /* (2 bytes; point)*/
@@ -221,7 +231,31 @@ typedef struct
 	byte bias;	      /* (1 Byte ; 0-100)*/
 	byte rate;	      /* (1 Byte ; 0-2.00)*/
 }	Str_controller_point; /* 2+4+4+2+4+1+1+4 = 24*/
+#endif
 
+typedef struct
+{
+	Point_T3000 input;	        /* (3 bytes; point)*/
+	int32_t input_value; 	        /* (4 bytes; int32_t)*/
+	int32_t value;		              /* (4 bytes; int32_t)*/
+	Point_T3000 setpoint;	      /* (3 bytes; point)*/
+	int32_t setpoint_value;	      /* (4 bytes; float)*/
+	uint8_t units;    /* (1 uint8_t ; Analog_units_equate)*/
+
+	uint8_t auto_manual; /* (1 bit; 0=auto, 1=manual)*/
+	uint8_t action; /* (1 bit; 0=direct, 1=reverse)*/
+	uint8_t repeats_per_min; /* (1 bit; 0=repeats/hour,1=repeats/min)*/
+	uint8_t unused; /* (1 bit)*/
+	uint8_t prop_high; /* (4 bits; high 4 bits of proportional bad)*/
+
+	uint8_t proportional;
+
+	uint8_t reset;	      /* (1 uint8_t ; 0-255)*/
+	uint8_t bias;	      /* (1 uint8_t ; 0-100)*/
+	uint8_t rate;	      /* (1 uint8_t ; 0-2.00)*/
+
+}	Str_controller_point; /* 3+4+4+3+4+1+1+4 = 24*/
+#if 0
 typedef struct
 {
 	char label[9];		      	  					/* 9 bytes; string */
@@ -247,6 +281,42 @@ typedef struct
 	unsigned double_flag	   :1; 	/* 1 bit; 0= 4 bytes data, 1= 2 bytes data */
 
 }	Str_monitor_point; 		/* 9+28+14+3+1+48+2 = 147 bytes */
+#endif
+
+typedef struct
+{
+	byte number		;
+	byte point_type;
+	byte panel		;
+	unsigned short  network;
+}Point_Net ;
+
+
+typedef struct
+{
+	char label[9];		      	  					/* 9 bytes; string */
+
+	Point_Net 	inputs[MAX_POINTS_IN_MONITOR];	/* 70 bytes; array of Point_Net */
+	uint8_t				range[MAX_POINTS_IN_MONITOR]; /* 14 bytes */
+
+	uint8_t second_interval_time; 				/* 1 byte ; 0-59 */
+	uint8_t minute_interval_time; 				/* 1 byte ; 0-59 */
+	uint8_t hour_interval_time;   				/* 1 byte ; 0-255 */
+
+	uint8_t max_time_length;      /* the length of the monitor in time units */
+
+	//	Views views[MAX_VIEWS];			/* 16 x MAX_VIEWS bytes */
+
+	uint8_t num_inputs  ;// :4; 	/* total number of points */
+	uint8_t an_inputs ;//   :4; 	/* number of analog points */
+	uint8_t unit 		;//		:2; 	/* 2 bits - minutes=0, hours=1, days=2	*/
+	//	uint8_t ind_views	;//	:2; 	/* number of views */
+	uint8_t wrap_flag	;//	:1;		/* (1 bit ; 0=no wrap, 1=data wrapped)*/
+	uint8_t status		;//		:1;		/* monitor status 0=OFF / 1=ON */
+	uint8_t reset_flag	;//	:1; 	/* 1 bit; 0=no reset, 1=reset	*/
+	uint8_t double_flag;//	:1; 	/* 1 bit; 0= 4 bytes data, 1= 1(2) bytes data */
+
+}	Str_monitor_point; 		/* 9+70+14+3+1+48+2 = 133 bytes */
 
 typedef struct
 {
@@ -370,7 +440,7 @@ typedef struct
 	byte         unused;                // because of mini's
 
 }	Str_program_point;	  /* 21+9+2+1+1 = 34 bytes*/
-#endif
+
 typedef struct
 {
 	char description[21];				/* (21 bytes; string)	*/
@@ -382,6 +452,21 @@ typedef struct
 	unsigned state       :1;        // 1 group displayed on screen 
 	unsigned xcur_grp    :14;
 	int    	             ycur_grp;
+} Control_group_point;				/* (size = 46 bytes)	*/
+#endif
+
+typedef struct
+{
+	char description[21];				/* (21 bytes; string)	*/
+	char label[9];							/* (9 bytes; string)	*/
+	char picture_file[11];			/* (11 bytes; string)	*/
+
+	uint8_t update;                /* refresh time */
+	uint8_t  mode     ;// :1;     /* text / graphic */
+	uint8_t  xcur_grp	;//:15;
+
+	uint16_t  ycur_grp;
+
 } Control_group_point;				/* (size = 46 bytes)	*/
 
 typedef struct
@@ -761,6 +846,8 @@ public:
   extern vector <Str_variable_point>  m_Variable_data;
    extern vector <Str_weekly_routine_point>  m_Weekly_data;
     extern vector <Str_annual_routine_point>  m_Annual_data;
+	extern vector <Control_group_point> m_screen_data;
+	extern vector <Str_controller_point> m_controller_data;
 
 //extern Panel *ptr_panel;
 //extern void creategauge(GWindow **gauge, char *buf);
@@ -1368,7 +1455,12 @@ if(error!=-1)
 		 memcpy(code,&ind_time_table,2);
 		 memcpy(code+2,time_table,ind_time_table);
 		}
+
+
+
 		my_lengthcode = code - mycode;
+		program_code_length[program_list_line] = my_lengthcode;
+
 	//fance pedit->length_code=code-pedit->code;
 
 	for(i=0;i<index_vars_table;i++)
@@ -2431,6 +2523,7 @@ int define_var(char *tok, int t,int l,int c, int lstr)
  var_type = num_point = point_type = 0;
  k=0;
  /*label=ispoint(tok,&num_point,&var_type,&point_type,&num_panel,&num_net,pedit->network,pedit->panel,&k);*/
+ my_panel = Station_NUM;
  label=ispoint(tok,&num_point,&var_type,&point_type,&num_panel,&num_net,my_network,my_panel,&k);
  if(!label)
  {             // local var
@@ -3443,7 +3536,7 @@ char *islabel(char *token,int *num_point,byte *var_type,byte *point_type, int *n
 					p = ptr_panel.vars[j].label;
 					break;
 				case CON:
-					//									p = ptr_panel->controllers[j].label;
+					//p = ptr_panel.controllers[j].;
 					break;
 				case WR:
 					p = ptr_panel.weekly_routines[j].label;
@@ -5277,7 +5370,8 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				else
 					if ((vars_table[cur_index].type == POINT_VAR) || (vars_table[cur_index].type == LABEL_VAR))
 					{
-						if( vars_table[cur_index].panel == my_panel )
+
+						if( vars_table[cur_index].panel == Station_NUM )
 						{
 							cod_line[Byte++]=LOCAL_POINT_PRG;
 							point.number     = vars_table[cur_index].num_point-1;
@@ -5288,7 +5382,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 						else
 						{
 							cod_line[Byte++]=REMOTE_POINT_PRG;
-							point.putpoint( vars_table[cur_index].num_point-1, vars_table[cur_index].point_type+1, vars_table[cur_index].panel-1, vars_table[cur_index].network);
+						//Fance	point.putpoint( vars_table[cur_index].num_point-1, vars_table[cur_index].point_type+1, vars_table[cur_index].panel-1, vars_table[cur_index].network);
 							memcpy(&cod_line[Byte],&point,sizeof(Point_Net));
 							Byte += sizeof(Point_Net);
 						}
@@ -5473,10 +5567,15 @@ unsigned char cod;//,xtemp[15];
  code = mycode;
 //Edit by Fance
  buf = my_display;
+ memset(my_display,0,1024);
  index_stack = stack;
  int n;
  buf[0]=0;
  int bytes;
+
+  int code_length = ((unsigned char)code[1])*256 + (unsigned char)code[0];
+ if(code_length == 0)
+	 return my_display;
  pcode=code+2;
  memcpy(&bytes,code,2);
 // adjustint(&bytes, ptrprg->type);
@@ -6069,12 +6168,13 @@ int desvar(void)
 //#endif
 
 				*((MyPoint *)&point) = *((MyPoint *)++code);
-				point.panel = 0;
+				//point.panel = 0;
+				point.panel = Station_NUM;
 				pointtotext(q, &point);
 				code += sizeof(MyPoint);
 				k=0;
 				//strcpy(buf,ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, network, panel, &k));
-				strcpy(buf,ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, my_network, my_panel, &k));
+				strcpy(buf,ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, my_network, point.panel, &k));
 				if( (point.point_type-1) == AY )
 				{
 					b = buf;
@@ -6185,6 +6285,11 @@ int pointtotext(char *buf,Point_Net *point)
 	num=point->number;
 	panel=point->panel;
 	point_type=point->point_type;
+	if(point_type > 0x12)
+	{
+		error = -6;
+		return -6;
+	}
 	net = point->network;
 	if (point_type==0)
 	{
@@ -6588,8 +6693,9 @@ int	desexpr(void)
  delete op2;
  delete op;
 // clear_semaphore_dos();fance
-// return pop();
+// pop();//Fance
  return 0;
+// return 0;
 }
 
 char *ltrim(char *text)
@@ -6793,6 +6899,14 @@ void copy_data_to_ptrpanel(int Data_type)
 		{
 			memcpy(&ptr_panel.annual_routines[i], &m_Annual_data.at(i),sizeof(Str_annual_routine_point));
 		}
+		for (int i=0;i<(int)m_screen_data.size();i++)
+		{
+			memcpy(&ptr_panel.control_groups[i],&m_screen_data.at(i),sizeof(Control_group_point));
+		}
+		for (int i=0;i<(int)m_controller_data.size();i++)
+		{
+			memcpy(&ptr_panel.controllers[i],&m_controller_data.at(i),sizeof(Str_controller_point));
+		}
 		return;
 	}
 	switch(Data_type)
@@ -6839,6 +6953,18 @@ void copy_data_to_ptrpanel(int Data_type)
 		for (int i=0;i<(int)m_Annual_data.size();i++)
 		{
 			memcpy(&ptr_panel.annual_routines[i], &m_Annual_data.at(i),sizeof(Str_annual_routine_point));
+		}
+		break;
+	case TYPE_SCREENS:
+		for (int i=0;i<(int)m_screen_data.size();i++)
+		{
+			memcpy(&ptr_panel.control_groups[i],&m_screen_data.at(i),sizeof(Control_group_point));
+		}
+		break;
+	case TYPE_CONTROLLER:
+		for (int i=0;i<(int)m_controller_data.size();i++)
+		{
+			memcpy(&ptr_panel.controllers[i],&m_controller_data.at(i),sizeof(Str_controller_point));
 		}
 		break;
 	}

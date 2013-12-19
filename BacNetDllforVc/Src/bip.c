@@ -109,6 +109,16 @@ uint32_t bip_get_broadcast_addr(
 void bip_set_port(
     uint16_t port)
 {       /* in network byte order */
+#if 0
+	unsigned short new_port ;
+	unsigned char temp_var_high;
+	unsigned char temp_var_low;
+	temp_var_high = (port & 0xff00)>>8;
+	temp_var_low = port & 0x00ff;
+	
+	new_port = temp_var_low*256 + temp_var_high;
+	 BIP_Port = new_port;
+#endif
     BIP_Port = port;
 }
 
@@ -116,6 +126,17 @@ void bip_set_port(
 uint16_t bip_get_port(
     void)
 {
+#if 0
+	unsigned short new_port ;
+	unsigned char temp_var_high;
+	unsigned char temp_var_low;
+	temp_var_high = (BIP_Port & 0xff00)>>8;
+	temp_var_low = BIP_Port & 0x00ff;
+	
+	new_port = temp_var_low*256 + temp_var_high;
+
+	return new_port;
+#endif
     return BIP_Port;
 }
 
@@ -150,51 +171,52 @@ int bip_send_pdu(
     uint8_t * pdu,      /* any data to be sent - may be null */
     unsigned pdu_len)
 {       /* number of bytes of data */
-    ////struct sockaddr_in bip_dest;
-    ////uint8_t mtu[MAX_MPDU] = { 0 };
-    ////int mtu_len = 0;
-    ////int bytes_sent = 0;
-    /////* addr and port in host format */
-    ////struct in_addr address;
-    ////uint16_t port = 0;
+    struct sockaddr_in bip_dest;
+    uint8_t mtu[MAX_MPDU] = { 0 };
+    int mtu_len = 0;
+    int bytes_sent = 0;
+   /* addr and port in host format */
+    struct in_addr address;
+    uint16_t port = 0;
 
-    ////(void) npdu_data;
-    /////* assumes that the driver has already been initialized */
-    ////if (BIP_Socket < 0) {
-    ////    return BIP_Socket;
-    ////}
+    (void) npdu_data;
+    /* assumes that the driver has already been initialized */
+    if (BIP_Socket < 0) {
+        return BIP_Socket;
+    }
 
-    ////mtu[0] = BVLL_TYPE_BACNET_IP;
-    ////bip_dest.sin_family = AF_INET;
-    ////if ((dest->net == BACNET_BROADCAST_NETWORK) || ((dest->net > 0) &&
-    ////        (dest->len == 0)) || (dest->mac_len == 0)) {
-    ////    /* broadcast */
-    ////    address.s_addr = BIP_Broadcast_Address.s_addr;
-    ////    port = BIP_Port;
-    ////    mtu[1] = BVLC_ORIGINAL_BROADCAST_NPDU;
-    ////} else if (dest->mac_len == 6) {
-    ////    bip_decode_bip_address(dest, &address, &port);
-    ////    mtu[1] = BVLC_ORIGINAL_UNICAST_NPDU;
-    ////} else {
-    ////    /* invalid address */
-    ////    return -1;
-    ////}
-    ////bip_dest.sin_addr.s_addr = address.s_addr;
-    ////bip_dest.sin_port = port;
-    ////memset(&(bip_dest.sin_zero), '\0', 8);
-    ////mtu_len = 2;
-    ////mtu_len +=
-    ////    encode_unsigned16(&mtu[mtu_len],
-    ////    (uint16_t) (pdu_len + 4 /*inclusive */ ));
-    ////memcpy(&mtu[mtu_len], pdu, pdu_len);
-    ////mtu_len += pdu_len;
+    mtu[0] = BVLL_TYPE_BACNET_IP;
+    bip_dest.sin_family = AF_INET;
+    if ((dest->net == BACNET_BROADCAST_NETWORK) || ((dest->net > 0) &&
+            (dest->len == 0)) || (dest->mac_len == 0)) {
+        /* broadcast */
+        address.s_addr = BIP_Broadcast_Address.s_addr;
+        port = BIP_Port;
+        mtu[1] = BVLC_ORIGINAL_BROADCAST_NPDU;
+    } else if (dest->mac_len == 6) {
+        bip_decode_bip_address(dest, &address, &port);
+        mtu[1] = BVLC_ORIGINAL_UNICAST_NPDU;
+    } else {
+        /* invalid address */
+        return -1;
+    }
+    bip_dest.sin_addr.s_addr = address.s_addr;
+    bip_dest.sin_port = port;
+    memset(&(bip_dest.sin_zero), '\0', 8);
+    mtu_len = 2;
+    mtu_len +=
+        encode_unsigned16(&mtu[mtu_len],
+        (uint16_t) (pdu_len + 4 /*inclusive */ ));
+    memcpy(&mtu[mtu_len], pdu, pdu_len);
+    mtu_len += pdu_len;
 
-    /////* Send the packet */
-    ////bytes_sent =
-    ////    sendto(BIP_Socket, (char *) mtu, mtu_len, 0,
-    ////    (struct sockaddr *) &bip_dest, sizeof(struct sockaddr));
+    /* Send the packet */
+    bytes_sent =
+        sendto(BIP_Socket, (char *) mtu, mtu_len, 0,
+        (struct sockaddr *) &bip_dest, sizeof(struct sockaddr));
 
-    return 0;//bytes_sent;
+	return bytes_sent;
+   // return 0;//bytes_sent;
 }
 
 /** Implementation of the receive() function for BACnet/IP; receives one
@@ -214,141 +236,141 @@ uint16_t bip_receive(
     uint16_t max_pdu,   /* amount of space available in the PDU  */
     unsigned timeout)
 {
-////    int received_bytes = 0;
-////    uint16_t pdu_len = 0;       /* return value */
-////    fd_set read_fds;
-////    int max = 0;
-////    struct timeval select_timeout;
-////    struct sockaddr_in sin = { 0 };
-////    socklen_t sin_len = sizeof(sin);
-////    uint16_t i = 0;
-////    int function = 0;
-////
-////    /* Make sure the socket is open */
-////    if (BIP_Socket < 0)
-////        return 0;
-////
-////    /* we could just use a non-blocking socket, but that consumes all
-////       the CPU time.  We can use a timeout; it is only supported as
-////       a select. */
-////    if (timeout >= 1000) {
-////        select_timeout.tv_sec = timeout / 1000;
-////        select_timeout.tv_usec =
-////            1000 * (timeout - select_timeout.tv_sec * 1000);
-////    } else {
-////        select_timeout.tv_sec = 0;
-////        select_timeout.tv_usec = 1000 * timeout;
-////    }
-////    FD_ZERO(&read_fds);
-////    FD_SET(BIP_Socket, &read_fds);
-////    max = BIP_Socket;
-////    /* see if there is a packet for us */
-////    if (select(max + 1, &read_fds, NULL, NULL, &select_timeout) > 0)
-////        received_bytes =
-////            recvfrom(BIP_Socket, (char *) &pdu[0], max_pdu, 0,
-////            (struct sockaddr *) &sin, &sin_len);
-////    else
-////        return 0;
-////
-////    /* See if there is a problem */
-////    if (received_bytes < 0) {
-////        return 0;
-////    }
-////
-////    /* no problem, just no bytes */
-////    if (received_bytes == 0)
-////        return 0;
-////
-////    /* the signature of a BACnet/IP packet */
-////    if (pdu[0] != BVLL_TYPE_BACNET_IP)
-////        return 0;
-////
-////    if (bvlc_for_non_bbmd(&sin, pdu, received_bytes) > 0) {
-////        /* Handled, usually with a NACK. */
-////#if PRINT_ENABLED
-////        fprintf(stderr, "BIP: BVLC discarded!\n");
-////#endif
-////        return 0;
-////    }
-////
-////    function = bvlc_get_function_code();        /* aka, pdu[1] */
-////    if ((function == BVLC_ORIGINAL_UNICAST_NPDU) ||
-////        (function == BVLC_ORIGINAL_BROADCAST_NPDU)) {
-////        /* ignore messages from me */
-////        if ((sin.sin_addr.s_addr == BIP_Address.s_addr) &&
-////            (sin.sin_port == BIP_Port)) {
-////            pdu_len = 0;
-////#if 0
-////            fprintf(stderr, "BIP: src is me. Discarded!\n");
-////#endif
-////        } else {
-////            /* data in src->mac[] is in network format */
-////            src->mac_len = 6;
-////            memcpy(&src->mac[0], &sin.sin_addr.s_addr, 4);
-////            memcpy(&src->mac[4], &sin.sin_port, 2);
-////            /* FIXME: check destination address */
-////            /* see if it is broadcast or for us */
-////            /* decode the length of the PDU - length is inclusive of BVLC */
-////            (void) decode_unsigned16(&pdu[2], &pdu_len);
-////            /* subtract off the BVLC header */
-////            pdu_len -= 4;
-////            if (pdu_len < max_pdu) {
-////#if 0
-////                fprintf(stderr, "BIP: NPDU[%hu]:", pdu_len);
-////#endif
-////                /* shift the buffer to return a valid PDU */
-////                for (i = 0; i < pdu_len; i++) {
-////                    pdu[i] = pdu[4 + i];
-////#if 0
-////                    fprintf(stderr, "%02X ", pdu[i]);
-////#endif
-////                }
-////#if 0
-////                fprintf(stderr, "\n");
-////#endif
-////            }
-////            /* ignore packets that are too large */
-////            /* clients should check my max-apdu first */
-////            else {
-////                pdu_len = 0;
-////#if PRINT_ENABLED
-////                fprintf(stderr, "BIP: PDU too large. Discarded!.\n");
-////#endif
-////            }
-////        }
-////    } else if (function == BVLC_FORWARDED_NPDU) {
-////        memcpy(&sin.sin_addr.s_addr, &pdu[4], 4);
-////        memcpy(&sin.sin_port, &pdu[8], 2);
-////        if ((sin.sin_addr.s_addr == BIP_Address.s_addr) &&
-////            (sin.sin_port == BIP_Port)) {
-////            /* ignore messages from me */
-////            pdu_len = 0;
-////        } else {
-////            /* data in src->mac[] is in network format */
-////            src->mac_len = 6;
-////            memcpy(&src->mac[0], &sin.sin_addr.s_addr, 4);
-////            memcpy(&src->mac[4], &sin.sin_port, 2);
-////            /* FIXME: check destination address */
-////            /* see if it is broadcast or for us */
-////            /* decode the length of the PDU - length is inclusive of BVLC */
-////            (void) decode_unsigned16(&pdu[2], &pdu_len);
-////            /* subtract off the BVLC header */
-////            pdu_len -= 10;
-////            if (pdu_len < max_pdu) {
-////                /* shift the buffer to return a valid PDU */
-////                for (i = 0; i < pdu_len; i++) {
-////                    pdu[i] = pdu[4 + 6 + i];
-////                }
-////            } else {
-////                /* ignore packets that are too large */
-////                /* clients should check my max-apdu first */
-////                pdu_len = 0;
-////            }
-////        }
-////    }
-////
-////    return pdu_len;
- return 0;
+    int received_bytes = 0;
+    uint16_t pdu_len = 0;       /* return value */
+    fd_set read_fds;
+    int max = 0;
+    struct timeval select_timeout;
+    struct sockaddr_in sin = { 0 };
+    socklen_t sin_len = sizeof(sin);
+    uint16_t i = 0;
+    int function = 0;
+
+    /* Make sure the socket is open */
+    if (BIP_Socket < 0)
+        return 0;
+
+    /* we could just use a non-blocking socket, but that consumes all
+       the CPU time.  We can use a timeout; it is only supported as
+       a select. */
+    if (timeout >= 1000) {
+        select_timeout.tv_sec = timeout / 1000;
+        select_timeout.tv_usec =
+            1000 * (timeout - select_timeout.tv_sec * 1000);
+    } else {
+        select_timeout.tv_sec = 0;
+        select_timeout.tv_usec = 1000 * timeout;
+    }
+    FD_ZERO(&read_fds);
+    FD_SET(BIP_Socket, &read_fds);
+    max = BIP_Socket;
+    /* see if there is a packet for us */
+    if (select(max + 1, &read_fds, NULL, NULL, &select_timeout) > 0)
+        received_bytes =
+            recvfrom(BIP_Socket, (char *) &pdu[0], max_pdu, 0,
+            (struct sockaddr *) &sin, &sin_len);
+    else
+        return 0;
+
+    /* See if there is a problem */
+    if (received_bytes < 0) {
+        return 0;
+    }
+
+    /* no problem, just no bytes */
+    if (received_bytes == 0)
+        return 0;
+
+    /* the signature of a BACnet/IP packet */
+    if (pdu[0] != BVLL_TYPE_BACNET_IP)
+        return 0;
+
+    if (bvlc_for_non_bbmd(&sin, pdu, received_bytes) > 0) {
+        /* Handled, usually with a NACK. */
+#if PRINT_ENABLED
+        fprintf(stderr, "BIP: BVLC discarded!\n");
+#endif
+        return 0;
+    }
+
+    function = bvlc_get_function_code();        /* aka, pdu[1] */
+    if ((function == BVLC_ORIGINAL_UNICAST_NPDU) ||
+        (function == BVLC_ORIGINAL_BROADCAST_NPDU)) {
+        /* ignore messages from me */
+        if ((sin.sin_addr.s_addr == BIP_Address.s_addr) &&
+            (sin.sin_port == BIP_Port)) {
+            pdu_len = 0;
+#if 0
+            fprintf(stderr, "BIP: src is me. Discarded!\n");
+#endif
+        } else {
+            /* data in src->mac[] is in network format */
+            src->mac_len = 6;
+            memcpy(&src->mac[0], &sin.sin_addr.s_addr, 4);
+            memcpy(&src->mac[4], &sin.sin_port, 2);
+            /* FIXME: check destination address */
+            /* see if it is broadcast or for us */
+            /* decode the length of the PDU - length is inclusive of BVLC */
+            (void) decode_unsigned16(&pdu[2], &pdu_len);
+            /* subtract off the BVLC header */
+            pdu_len -= 4;
+            if (pdu_len < max_pdu) {
+#if 0
+                fprintf(stderr, "BIP: NPDU[%hu]:", pdu_len);
+#endif
+                /* shift the buffer to return a valid PDU */
+                for (i = 0; i < pdu_len; i++) {
+                    pdu[i] = pdu[4 + i];
+#if 0
+                    fprintf(stderr, "%02X ", pdu[i]);
+#endif
+                }
+#if 0
+                fprintf(stderr, "\n");
+#endif
+            }
+            /* ignore packets that are too large */
+            /* clients should check my max-apdu first */
+            else {
+                pdu_len = 0;
+#if PRINT_ENABLED
+                fprintf(stderr, "BIP: PDU too large. Discarded!.\n");
+#endif
+            }
+        }
+    } else if (function == BVLC_FORWARDED_NPDU) {
+        memcpy(&sin.sin_addr.s_addr, &pdu[4], 4);
+        memcpy(&sin.sin_port, &pdu[8], 2);
+        if ((sin.sin_addr.s_addr == BIP_Address.s_addr) &&
+            (sin.sin_port == BIP_Port)) {
+            /* ignore messages from me */
+            pdu_len = 0;
+        } else {
+            /* data in src->mac[] is in network format */
+            src->mac_len = 6;
+            memcpy(&src->mac[0], &sin.sin_addr.s_addr, 4);
+            memcpy(&src->mac[4], &sin.sin_port, 2);
+            /* FIXME: check destination address */
+            /* see if it is broadcast or for us */
+            /* decode the length of the PDU - length is inclusive of BVLC */
+            (void) decode_unsigned16(&pdu[2], &pdu_len);
+            /* subtract off the BVLC header */
+            pdu_len -= 10;
+            if (pdu_len < max_pdu) {
+                /* shift the buffer to return a valid PDU */
+                for (i = 0; i < pdu_len; i++) {
+                    pdu[i] = pdu[4 + 6 + i];
+                }
+            } else {
+                /* ignore packets that are too large */
+                /* clients should check my max-apdu first */
+                pdu_len = 0;
+            }
+        }
+    }
+
+    return pdu_len;
+ //return 0;
 }
 
 void bip_get_my_address(

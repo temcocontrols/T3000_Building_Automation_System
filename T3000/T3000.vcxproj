@@ -130,13 +130,16 @@
     <ClCompile Include="ApplyGraphicLabelsDlg.cpp" />
     <ClCompile Include="BacnetAnnualRoutine.cpp" />
     <ClCompile Include="BacnetController.cpp" />
+    <ClCompile Include="BacnetGraphic.cpp" />
     <ClCompile Include="BacnetInfo.cpp" />
     <ClCompile Include="BacnetInput.cpp" />
+    <ClCompile Include="BacnetMonitor.cpp" />
     <ClCompile Include="BacnetOutput.cpp" />
     <ClCompile Include="BacnetProgram.cpp" />
     <ClCompile Include="BacnetProgramEdit.cpp" />
     <ClCompile Include="BacnetRange.cpp" />
     <ClCompile Include="BacnetScheduleTime.cpp" />
+    <ClCompile Include="BacnetScreen.cpp" />
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
@@ -148,6 +151,7 @@
     <ClCompile Include="CM5\ListCtrlCellEx.cpp" />
     <ClCompile Include="CM5\ListCtrlEx.cpp" />
     <ClCompile Include="CM5\MyOwnListCtrl.cpp" />
+    <ClCompile Include="CM5\PointItem.cpp" />
     <ClCompile Include="CO2_View.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
     <ClCompile Include="CustomSTable.cpp" />

@@ -694,6 +694,7 @@ void Set_transfer_length(int data)
 }
 
 
+
 bool octetstring_init_ascii_hex(
     BACNET_OCTET_STRING * octet_string,
     const char *ascii_hex)

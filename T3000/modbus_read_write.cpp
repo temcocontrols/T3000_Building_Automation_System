@@ -124,6 +124,30 @@ int modbus_read_one_value(
 
 }
 
+int Set_Communication_Count(bool b_transmission,int bac_instanceid)
+{
+	if(b_transmission)
+	{
+		g_llTxCount++;g_llRxCount++;
+	}
+	else
+	{
+		g_llTxCount++;
+	}
+	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) 
+	{
+
+		// construct status message string
+		CString str;
+		str.Format(_T("Instance ID:%d [Tx=%d Rx=%d Err=%d]"), 
+			bac_instanceid, g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+
+		//Display it
+		((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
+
+	}
+	return 0;
+}
 
 /**
 

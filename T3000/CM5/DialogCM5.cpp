@@ -2515,15 +2515,15 @@ void CDialogCM5::ClickSubTstatgrid()
 	
 	if (lCol==2)
 	{
-	m_combox_enable.MoveWindow(&rcCell,1);
-	m_combox_enable.ResetContent();
-	m_combox_enable.AddString(_T("UNUSED"));
-	m_combox_enable.AddString(_T("Normal"));
-	m_combox_enable.AddString(_T("Switch"));
-	m_combox_enable.ShowWindow(TRUE);
-	m_combox_enable.SetWindowText(strValue);
-	m_combox_enable.SetFocus();
-	m_combox_enable.SetCapture();
+		m_combox_enable.MoveWindow(&rcCell,1);
+		m_combox_enable.ResetContent();
+		m_combox_enable.AddString(_T("UNUSED"));
+		m_combox_enable.AddString(_T("Normal"));
+		m_combox_enable.AddString(_T("Switch"));
+		m_combox_enable.ShowWindow(TRUE);
+		m_combox_enable.SetWindowText(strValue);
+		m_combox_enable.SetFocus();
+		m_combox_enable.SetCapture();
 	}
 
 	SetTimer(DATATIME_TIMER,1000,NULL);

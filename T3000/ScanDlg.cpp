@@ -177,6 +177,11 @@ void CScanDlg::AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList)
 		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_COMPORT,strPort); 
 		////
 		CString strProtocol;		
+		if(pNetInfo->m_pNet->GetProtocol() == 3)
+		{
+			strProtocol.Format(_T("BacnetIP"));
+		}
+		else
 		strProtocol.Format(_T("TCP/IP"));
 		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_PROTOCOL,strProtocol); 
 		////
@@ -1008,6 +1013,9 @@ void CScanDlg::AddComDeviceToGrid(vector<_ComDeviceInfo*>& szList)
 		m_flexGrid.put_TextMatrix(i+nSize,SCAN_TABLE_COMPORT,strPort); 
 		//// protocol
 		CString strProtocol;		
+		if(pDevInfo->m_pDev->GetProtocol() == 2)
+		strProtocol.Format(_T("Bacnet MSTP"));
+			else
 		strProtocol.Format(_T("Modbus 485"));
 		m_flexGrid.put_TextMatrix(i+nSize,SCAN_TABLE_PROTOCOL,strProtocol); 
 		//// 

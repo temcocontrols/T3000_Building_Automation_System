@@ -191,6 +191,10 @@
 #define IDD_DIALOG_8IOA_VIEW            476
 #define IDD_WRITEREGDLG                 477
 #define IDD_DIALOG_MBPOLL_FUNCS         478
+#define IDD_DIALOG_BACNET_SCREENS       479
+#define IDD_DIALOG_BACNET_MONITOR       480
+#define IDD_DIALOG_BACNET_GRAPHIC       481
+
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -761,6 +765,8 @@
 #define IDC_INFOSTATIC4                 1215
 #define IDC_INFO_COM                    1215
 #define IDC_PID1COOLSTAGEEDIT           1216
+#define IDC_INFO_COM2                   1216
+#define IDC_INFO_MSTP                   1216
 #define IDC_VALUEITEMCOMBO              1217
 #define IDC_DESCRIPTEDIT                1218
 #define IDC_PID2_HEATSTAGEEDIT2         1219
@@ -1338,6 +1344,29 @@
 #define IDC_BTN_BAC_WRITE_TIME          1680
 #define IDC_STATIC_BAC_STATUS           1681
 #define IDC_LIST_BACNET_CONTROLLER      1682
+#define IDC_LIST_SCREEN                 1683
+#define IDC_DATETIMEPICKER2_VARIABLE    1684
+#define IDC_LIST_MONITOR                1686
+#define IDC_LIST_MONITOR_INPUT          1687
+#define IDC_DATETIMEPICKER_MONITOR      1688
+#define IDC_BTN_MONITOR_REFRESH         1689
+#define IDC_BTN_MONITOR_GRAPHIC         1690
+#define IDC_BUTTON_MONITOR_TEST         1691
+#define IDC_STATIC_GRAPHIC_1            1692
+#define IDC_STATIC_GRAPHIC_2            1693
+#define IDC_STATIC_GRAPHIC_3            1694
+#define IDC_BUTTON_WEEKLY_EDIT          1694
+#define IDC_STATIC_GRAPHIC_4            1695
+#define IDC_STATIC_GRAPHIC_5            1696
+#define IDC_STATIC_GRAPHIC_6            1697
+#define IDC_STATIC_GRAPHIC_7            1698
+#define IDC_STATIC_GRAPHIC_8            1699
+#define IDC_STATIC_GRAPHIC_9            1700
+#define IDC_STATIC_GRAPHIC_A            1701
+#define IDC_STATIC_GRAPHIC_B            1704
+#define IDC_STATIC_GRAPHIC_C            1705
+#define IDC_STATIC_GRAPHIC_D            1707
+#define IDC_STATIC_GRAPHIC_E            1708
 #define IDC_MBPOLL_LIST                 1683
 #define IDC_MBPOLL_CHECK1               1685
 #define IDC_STATIC_ADDR                 1686
@@ -1419,6 +1448,7 @@
 #define ID_ALLNODESDATABASE             32802
 #define ID_IOSELECTMENU_INPUT           32803
 #define ID_IOSELECTMENU_OUTPUT          32804
+#define ID_CONFIGFILE_SAVE_AS           32805
 #define ID_FILE_BATCHBURNHEX            32806
 #define ID_HELP_HELP                    32807
 #define ID_DELEMENUBTN_DELETECURRENTLABEL 32808
@@ -1494,6 +1524,7 @@
 #define ID_MISCELLANEOUS_UPDATEMINI     32883
 #define ID_FILE_SAVE32884               32884
 #define ID_CONTROL_WEEKLY               32884
+#define ID_CONTROL_MONITORS             32985
 #define ID_VIEW_DATATRAFFIC             32885
 #define ID_FUNCTION_HUMCALIBRATION      32886
 #define ID_FUNCTION_HUMCALIBRATION_C    32887
@@ -1504,7 +1535,7 @@
 #define ID_DISPLAYTYPE_HEX              34002
 #define ID_DISPLAYTYPE_BINARY           34003
 #define ID_FUNCTIONS_WRITEREGISTERS     34004
-#define ID_CONFIGFILE_SAVE_AS           35000
+//#define ID_CONFIGFILE_SAVE_AS           35000
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
 #define IDC_RANGECOMBO                  57926

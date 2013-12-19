@@ -1,4 +1,4 @@
-
+//Add color , item subitem by Fance Du.
 #include "stdafx.h"
 #include "ListCtrlEx.h"
 
@@ -15,6 +15,38 @@ using namespace ListCtrlEx;
 
 #define SHOW_PROGRESS_PERCENT 0x00000001
 #define SUPPORT_SORT	0x00000002
+
+
+//////////////////////////////////////////////////////////////////////////
+// CItemData class is used for store extra information
+//////////////////////////////////////////////////////////////////////////
+class CMyItemData
+{
+public:
+	CMyItemData() { dwData = 0; }
+	void InsertColumn(int nColumn);
+	void DeleteColumn(int nColumn);
+	DWORD dwData; // The actual 32-bit user data stores here
+	CArray<COLORREF, COLORREF> aTextColors; // Sub item text colors
+	CArray<COLORREF, COLORREF> aBkColors; // Sub item backgroud colors
+};
+
+void CMyItemData::InsertColumn(int nColumn)
+{
+	aTextColors.InsertAt(nColumn, ::GetSysColor(COLOR_WINDOWTEXT));
+	aBkColors.InsertAt(nColumn, ::GetSysColor(COLOR_WINDOW));
+}
+
+void CMyItemData::DeleteColumn(int nColumn)
+{
+	aTextColors.RemoveAt(nColumn);
+	aBkColors.RemoveAt(nColumn);
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
 //////////////////////////////////////////////////////////////////////////
 // CListCtrlEx
 IMPLEMENT_DYNAMIC(CListCtrlEx, CListCtrl)
@@ -27,6 +59,9 @@ CListCtrlEx::CListCtrlEx()
 	m_dwComboStyle = WS_BORDER | WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_AUTOVSCROLL | 
 		CBS_DROPDOWNLIST | CBS_DISABLENOSCROLL;
 	m_need_edit = true;
+	memset(m_data,255,30000);
+	m_select_raw = 0;
+	m_select_col = 1;
 }
 
 CListCtrlEx::~CListCtrlEx()
@@ -40,6 +75,7 @@ BEGIN_MESSAGE_MAP(CListCtrlEx, CListCtrl)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONDBLCLK()
 	ON_WM_RBUTTONDOWN()
+	ON_WM_KEYDOWN()
 	ON_NOTIFY_REFLECT(LVN_BEGINLABELEDIT, &CListCtrlEx::OnLvnBeginlabeledit)
 	ON_NOTIFY_REFLECT(LVN_ENDLABELEDIT, &CListCtrlEx::OnLvnEndlabeledit)
 	ON_NOTIFY_REFLECT(LVN_COLUMNCLICK, &CListCtrlEx::OnLvnColumnclick)
@@ -54,14 +90,113 @@ CImageList* CListCtrlEx::SetImageList( CImageList* pImageList, int nImageListTyp
 	return CListCtrl::SetImageList(pImageList, nImageListType);
 }
 
+void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// TODO: Add your message handler code here and/or call default
+	//Get_clicked_mouse_position(select_raw,select_col);
+	int old_select_raw = m_select_raw;//记录下原来的行和列;
+	int old_select_col = m_select_col;
+	
+	if(nChar == VK_LEFT)
+	{
+		if(m_select_col >1)//left第一列无效;
+		{
+			m_select_col = m_select_col - 1;
+			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
+			
+			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
+			else
+				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+
+			RedrawItems(m_select_raw,m_select_raw);
+			return ;
+		}
+
+	}
+	else if(nChar == VK_UP)
+	{
+		if(m_select_raw>0)
+		{
+			m_select_raw = m_select_raw - 1;
+			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
+			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
+			else
+				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+
+			RedrawItems(m_select_raw,m_select_raw);
+			RedrawItems(old_select_raw,old_select_raw);
+			return ;
+		}
+	}
+	else if(nChar == VK_RIGHT)
+	{
+		if(m_select_col < GetColumnCount() -1)
+		{
+			m_select_col = m_select_col + 1;
+			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
+			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
+			else
+				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+
+			RedrawItems(m_select_raw,m_select_raw);
+			return ;
+		}
+	}
+	else if(nChar == VK_DOWN)
+	{
+		if(m_select_raw < GetItemCount() - 1)
+		{
+			m_select_raw = m_select_raw + 1;
+			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
+			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
+			else
+				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+			RedrawItems(m_select_raw,m_select_raw);
+			RedrawItems(old_select_raw,old_select_raw);
+			return ;
+		}
+
+	}
+	CListCtrl::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
 int CListCtrlEx::InsertColumn(int nCol, CString strColHead, int nWidth, ColumnType eColType, int nFormat, 
 										SortType eSortBy, int nSubItem )
 {
 	//
 	m_mapCol2ColType[nCol]=eColType;
 	m_mapCol2Sort[nCol].m_eSortType=eSortBy;
-	return CListCtrl::InsertColumn(nCol, strColHead, nFormat, nWidth, nSubItem);
+
+
+	//EndEdit(TRUE);
+	const int IDX = CListCtrl::InsertColumn(nCol, strColHead, nFormat, nWidth, nSubItem);
+	if (IDX >= 0)
+		_UpdateColumn(IDX, TRUE);
+	return IDX;
+
+
+
+	//return CListCtrl::InsertColumn(nCol, strColHead, nFormat, nWidth, nSubItem);
 }
+
+void CListCtrlEx::_UpdateColumn(int nColumn, BOOL bInsert)
+{
+	const int ITEMS = GetItemCount();
+	for (int i = 0; i < ITEMS; i++)
+	{
+		CMyItemData* p = (CMyItemData*)(CListCtrl::GetItemData(i));
+		ASSERT(p != NULL);
+		if (bInsert)
+			p->InsertColumn(nColumn);
+		else
+			p->DeleteColumn(nColumn);
+	}
+}
+
 
 BOOL CListCtrlEx::DeleteColumn( int nCol  )
 {
@@ -107,7 +242,37 @@ CListCtrlEx::CellIndex CListCtrlEx::Point2Cell(const CPoint &point)
 	if ((HitTest(&lvHitTestInfo) >= 0 || SubItemHitTest(&lvHitTestInfo) >=0 )&& lvHitTestInfo.iItem >= 0)
 	{
 		int nRow = lvHitTestInfo.iItem;
+		int nCol =  lvHitTestInfo.iSubItem;
 		int nColCnt=GetColumnCount();
+
+		int old_select_col = m_select_col;	//把旧的的存起来;
+		int old_select_raw = m_select_raw;
+		m_select_raw = nRow;				//新的赋值给当前select
+		m_select_col = nCol;
+
+		if((old_select_raw != m_select_raw) || (old_select_col != m_select_col ))	//判断是否为选中的同一个;
+		{
+			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
+			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
+			else
+				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+			if(m_select_raw != old_select_raw)	//如果是换行了，就两行都要刷新;
+			{
+				RedrawItems(m_select_raw,m_select_raw);
+				RedrawItems(old_select_raw,old_select_raw);
+			}
+			else//没有换行就只刷新当前行
+			{
+				RedrawItems(m_select_raw,m_select_raw);
+			}
+
+		}
+
+	
+
+
+
 		for (int nCol=0; nCol<nColCnt; ++nCol)
 		{
 			if (GetCellRect(nRow, nCol, rcItem))
@@ -389,14 +554,247 @@ BOOL CListCtrlEx::GetCellRect(int iRow, int iCol, CRect &rect, int nArea)
 	return TRUE;
 }
 
-void      CListCtrlEx::Set_Edit(bool b_edit)
+void   CListCtrlEx::Set_Edit(bool b_edit)
 {
 	m_need_edit = b_edit;
 }
-BOOL		CListCtrlEx::Get_Edit()
+BOOL	CListCtrlEx::Get_Edit()
 {
 	return m_need_edit;
 }
+
+void  CListCtrlEx::SetWhetherShowBkCol(bool nshow)
+{
+	m_show_bk_color = nshow;
+}
+
+void	CListCtrlEx::Set_My_WindowRect(CRect nRect)
+{
+	m_windowrect.left = nRect.left;
+	m_windowrect.top = nRect.top;
+	m_windowrect.right = nRect.right;
+	m_windowrect.bottom = nRect.bottom;
+}
+
+void	CListCtrlEx::Set_My_ListRect(CRect nRect)
+{
+	m_list_rect.left = nRect.left;
+	m_list_rect.top = nRect.top;
+	m_list_rect.right = nRect.right;
+	m_list_rect.bottom = nRect.bottom;
+}
+
+//POINT	CListCtrlEx::Get_clicked_mouse_position(int nRAW,int nCol)
+POINT	CListCtrlEx::Get_clicked_mouse_position()
+{
+	CRect temp_rect;
+	GetSubItemRect(m_select_raw,m_select_col,LVIR_BOUNDS,temp_rect);
+	ClientToScreen(&temp_rect);
+	//temp_rect.left = temp_rect.left + m_list_rect.left - m_windowrect.left + 3;
+	//temp_rect.top = temp_rect.top + 11;
+	POINT temp_point;
+	if(0)
+	{
+		temp_rect.left = temp_rect.left + m_list_rect.left + m_windowrect.left + 6;
+		temp_rect.top = temp_rect.top +  m_list_rect.top + m_windowrect.top + 5;
+	}	
+		temp_point.x = temp_rect.left;
+		temp_point.y = temp_rect.top;
+	
+
+	TRACE(_T("x=%d , y =%d\r\n"),temp_point.x,temp_point.y);
+	POINT lpPoint;
+	GetCursorPos(&lpPoint);
+	//lpPoint.x = 550;
+	//lpPoint.y = 300;
+	POINT combo_point = temp_point;
+	ScreenToClient(&combo_point);
+	LVHITTESTINFO lvHitTestInfo;
+	lvHitTestInfo.pt = combo_point;
+	if ((HitTest(&lvHitTestInfo) >= 0 || SubItemHitTest(&lvHitTestInfo) >=0 )&& lvHitTestInfo.iItem >= 0)
+	{
+		int nRow = lvHitTestInfo.iItem;
+		int nCol =  lvHitTestInfo.iSubItem;
+		if(GetColumnType(nCol)==ListCtrlEx::ComboBox)//判断如果是 Combobox的话就下拉出全部的 选项;
+		{
+			SetCursorPos(temp_point.x, temp_point.y);
+			mouse_event(MOUSEEVENTF_LEFTDOWN,0,0,0,0);
+			mouse_event(MOUSEEVENTF_LEFTUP,0,0,0,0);
+			Sleep(5);
+		}
+
+	}
+	SetCursorPos(temp_point.x, temp_point.y);
+	mouse_event(MOUSEEVENTF_LEFTDOWN,0,0,0,0);
+	mouse_event(MOUSEEVENTF_LEFTUP,0,0,0,0);
+	SetCursorPos(lpPoint.x, lpPoint.y);
+
+	return temp_point;
+}
+
+void CListCtrlEx::Set_Selected_Item(int nRAW,int nCol)
+{
+	m_select_raw = nRAW;
+	m_select_col = nCol;
+}
+
+void CListCtrlEx::Get_Selected_Item(int &my_select_raw,int &my_select_col)
+{
+	my_select_raw = m_select_raw;
+	my_select_col = m_select_col;
+}
+
+
+void CListCtrlEx::SetListData(char *mydata,int data_length)
+{
+	memset(m_data,0,data_length);
+	memcpy_s(m_data,data_length,mydata,data_length);
+}
+
+BOOL CListCtrlEx::IsDataNewer(char *datapoint,int data_length)
+{
+	int ret = memcmp(m_data,datapoint,data_length);
+	if(ret!=0)
+		return true;
+	else
+		return false;
+}
+
+
+int CListCtrlEx::InsertItem(int nIndex, LPCTSTR lpText)
+{	
+	//EndEdit(TRUE);
+	//_UnsetSortedColumn();
+	const int IDX = CListCtrl::InsertItem(nIndex, lpText);
+	if (IDX >= 0)
+		_AllocItemMemory(IDX);
+	return IDX;
+}
+
+void CListCtrlEx::_AllocItemMemory(int nItem)
+{
+	ASSERT(_IsValidIndex(nItem));
+	const int COLS = GetColumnCount();
+	ASSERT(COLS > 0);
+	CMyItemData* pData = new CMyItemData;	
+	pData->dwData = CListCtrl::GetItemData(nItem);
+	pData->aTextColors.SetSize(COLS);
+	pData->aBkColors.SetSize(COLS);
+	for (int i = 0; i < COLS; i++)
+	{
+		pData->aTextColors[i] = ::GetSysColor(COLOR_WINDOWTEXT);
+		pData->aBkColors[i] = ::GetSysColor(COLOR_WINDOW);
+	}
+	CListCtrl::SetItemData(nItem, (DWORD)pData);
+}
+
+BOOL CListCtrlEx::_IsValidIndex(int nIndex) const
+{
+	return nIndex >= 0 && nIndex < CListCtrl::GetItemCount();
+}
+
+void CListCtrlEx::SetItemBkColor(int nItem, int nSubItem, COLORREF color, BOOL bRedraw)
+{
+	if (color == COLOR_INVALID)
+		color = ::GetSysColor(COLOR_WINDOW);
+	const int ROWS = GetItemCount();
+	const int COLS = GetColumnCount();
+	BOOL bRowValid = nItem >= 0 && nItem < ROWS;
+	BOOL bColValid = nSubItem >= 0 && nSubItem < COLS;
+
+	if (bRowValid && bColValid)
+	{
+		// apply to individual grid
+		CMyItemData* p = (CMyItemData*)(CListCtrl::GetItemData(nItem));
+		ASSERT(p != NULL);
+		p->aBkColors[nSubItem] = color;
+	}
+	else if (bRowValid && !bColValid)
+	{
+		// apply to whole row for the existing item
+		CMyItemData* p = (CMyItemData*)(CListCtrl::GetItemData(nItem));
+		ASSERT(p != NULL);
+		for (int i = 0; i < COLS; i++)
+			p->aBkColors[i] = color;
+	}
+	else if (!bRowValid && bColValid)
+	{
+		// apply to whole column for all existing items
+		for (int i = 0; i < ROWS; i++)
+		{
+			CMyItemData* p = (CMyItemData*)(CListCtrl::GetItemData(i));
+			ASSERT(p != NULL);
+			p->aBkColors[nSubItem] = color;
+		}
+	}
+	else
+	{
+		// apply to whole table for all existing items
+		for (int i = 0; i < ROWS; i++)
+		{
+			CMyItemData* p = (CMyItemData*)(CListCtrl::GetItemData(i));
+			ASSERT(p != NULL);
+			for (int j = 0; j < COLS; j++)
+				p->aBkColors[j] = color;
+		}
+	}
+
+	if (bRedraw)
+		RedrawWindow();
+}
+
+
+void CListCtrlEx::SetItemTextColor(int nItem, int nSubItem, COLORREF color, BOOL bRedraw)
+{
+	if (color == COLOR_INVALID)
+		color = ::GetSysColor(COLOR_WINDOWTEXT);
+	const int ROWS = GetItemCount();
+	const int COLS = GetColumnCount();
+	BOOL bRowValid = nItem >= 0 && nItem < ROWS;
+	BOOL bColValid = nSubItem >= 0 && nSubItem < COLS;
+
+	if (bRowValid && bColValid)
+	{
+		// apply to individual grid
+		CMyItemData* p = (CMyItemData*)(CListCtrl::GetItemData(nItem));
+		ASSERT(p != NULL);
+		p->aTextColors[nSubItem] = color;
+	}
+	else if (bRowValid && !bColValid)
+	{
+		// apply to whole row for the existing item
+		CMyItemData* p = (CMyItemData*)(CListCtrl::GetItemData(nItem));
+		ASSERT(p != NULL);
+		for (int i = 0; i < COLS; i++)
+			p->aTextColors[i] = color;
+	}
+	else if (!bRowValid && bColValid)
+	{
+		// apply to whole column for all existing items
+		for (int i = 0; i < ROWS; i++)
+		{
+			CMyItemData* p = (CMyItemData*)(CListCtrl::GetItemData(i));
+			ASSERT(p != NULL);
+			p->aTextColors[nSubItem] = color;
+		}
+	}
+	else
+	{
+		// apply to whole table for all existing items
+		for (int i = 0; i < ROWS; i++)
+		{
+			CMyItemData* p = (CMyItemData*)(CListCtrl::GetItemData(i));
+			ASSERT(p != NULL);
+			for (int j = 0; j < COLS; j++)
+				p->aTextColors[j] = color;
+		}
+	}
+
+	if (bRedraw)
+		RedrawWindow();
+}
+
+
 
 BOOL	CListCtrlEx::GetCheckRect(int iRow, int iCol, CRect &rect)
 {
@@ -461,6 +859,7 @@ int CListCtrlEx::GetColumnFmt(int nCol)
 }
 //////////////////////////////////////////////////////////////////////////
 // customer draw
+//Add color , item subitem by Fance Du.
 void CListCtrlEx::OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	//FuncTime(_T("OnNMCustomdraw"));
@@ -478,6 +877,13 @@ void CListCtrlEx::OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult)
 		break;
 	case CDDS_ITEMPREPAINT|CDDS_SUBITEM:			// recd when CDRF_NOTIFYSUBITEMDRAW is returned in
 		{	
+
+			CMyItemData* p = (CMyItemData*)(CListCtrl::GetItemData(lplvcd->nmcd.dwItemSpec));
+			ASSERT(p != NULL);
+			ASSERT(lplvcd->iSubItem >= 0 && lplvcd->iSubItem < p->aTextColors.GetSize());
+			lplvcd->clrText = p->aTextColors[lplvcd->iSubItem];
+			lplvcd->clrTextBk = p->aBkColors[lplvcd->iSubItem];
+
 			// response to CDDS_ITEMPREPAINT.
 			*pResult = CDRF_DODEFAULT;			
 			CString strText = GetItemText(iRow, iCol);
@@ -488,8 +894,15 @@ void CListCtrlEx::OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult)
 				// get the device context.
 				CDC *pDC= CDC::FromHandle(lplvcd->nmcd.hdc);
 				// draw the cell.
-				DrawCell(pDC, strText, rcCell, bSelected, iRow, iCol, pResult ); // *pResult will be changed here
+				DrawCell(pDC, strText, rcCell, bSelected, iRow, iCol, pResult ,lplvcd->clrText,lplvcd->clrTextBk); // *pResult will be changed here
 			}	
+
+
+
+
+
+
+
 
 			break;
 		}
@@ -499,20 +912,24 @@ void CListCtrlEx::OnNMCustomdraw(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	return;
 }
-
+//COLORREF crText=bSelected?GetSysColor(COLOR_HIGHLIGHTTEXT):GetSysColor(COLOR_WINDOWTEXT);
+//COLORREF crTextBkgrnd=bSelected?GetSysColor(COLOR_HIGHLIGHT):GetSysColor(COLOR_WINDOW);
 void CListCtrlEx::DrawCell(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, 
-										int nRow, int nCol, LRESULT *pResult)
+										int nRow, int nCol, LRESULT *pResult,COLORREF n_crtext,COLORREF n_crtextbkgrnd)
 {
+	if(m_show_bk_color)
+	SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
+	
 	switch(GetColumnType(nCol))
 	{
 	default:
 	case Normal:
 		*pResult |= CDRF_SKIPDEFAULT;
-		DrawNormal(pDC, strText, rcCell, bSelected, FindCellData(nRow, nCol), GetColumnFmt(nCol));
+		DrawNormal(pDC, strText, rcCell, bSelected, FindCellData(nRow, nCol), GetColumnFmt(nCol),n_crtext,n_crtextbkgrnd);
 		return;
 	case CheckBox:
 		*pResult |= CDRF_SKIPDEFAULT;
-		DrawCheckBox(pDC, strText, rcCell, bSelected, FindCellData(nRow, nCol));
+		DrawCheckBox(pDC, strText, rcCell, bSelected, FindCellData(nRow, nCol),n_crtext,n_crtextbkgrnd);
 		return;
 	case RadioBox:
 		*pResult |= CDRF_SKIPDEFAULT;
@@ -520,11 +937,11 @@ void CListCtrlEx::DrawCell(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSel
 		return;
 	case ComboBox:
 		*pResult |= CDRF_DODEFAULT;//Fance
-		DrawComboBox(pDC, strText, rcCell, bSelected, FindCellData(nRow, nCol));
+		DrawComboBox(pDC, strText, rcCell, bSelected, FindCellData(nRow, nCol),n_crtext,n_crtextbkgrnd);
 		return;
 	case EditBox:
 		*pResult|=CDRF_SKIPDEFAULT;
-		DrawEditBox(pDC, strText, rcCell, bSelected, FindCellData(nRow, nCol), GetColumnFmt(nCol));
+		DrawEditBox(pDC, strText, rcCell, bSelected, FindCellData(nRow, nCol), GetColumnFmt(nCol),n_crtext,n_crtextbkgrnd);
 		return;
 	case Progress:
 		*pResult|=CDRF_SKIPDEFAULT;
@@ -534,11 +951,13 @@ void CListCtrlEx::DrawCell(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSel
 }
 
 // draw normal text
-void CListCtrlEx::DrawNormal(CDC *pDC, CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData, int uLvcFmt)
+void CListCtrlEx::DrawNormal(CDC *pDC, CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData, int uLvcFmt,COLORREF n_crtext,COLORREF n_crtextbkgrnd)
 {
 	UNREFERENCED_PARAMETER(cellData);
-	COLORREF crText=bSelected?GetSysColor(COLOR_HIGHLIGHTTEXT):GetSysColor(COLOR_WINDOWTEXT);
-	COLORREF crTextBkgrnd=bSelected?GetSysColor(COLOR_HIGHLIGHT):GetSysColor(COLOR_WINDOW);
+	COLORREF crText = n_crtext;
+	COLORREF crTextBkgrnd = n_crtextbkgrnd;
+	//COLORREF crText=bSelected?GetSysColor(COLOR_HIGHLIGHTTEXT):GetSysColor(COLOR_WINDOWTEXT);
+	//COLORREF crTextBkgrnd=bSelected?GetSysColor(COLOR_HIGHLIGHT):GetSysColor(COLOR_WINDOW);
 	// fill background
 	CRect rcText(rcCell), rcIcon(rcCell);
 	pDC->FillSolidRect(&rcCell, crTextBkgrnd);
@@ -574,10 +993,13 @@ void CListCtrlEx::DrawNormal(CDC *pDC, CString &strText, CRect &rcCell, BOOL bSe
 }
 
 // draw a check box cell
-void CListCtrlEx::DrawCheckBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData)
+void CListCtrlEx::DrawCheckBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData,COLORREF n_crtext,COLORREF n_crtextbkgrnd)
 {
-	COLORREF crText=bSelected?GetSysColor(COLOR_HIGHLIGHTTEXT):GetSysColor(COLOR_WINDOWTEXT);
-	COLORREF crTextBkgrnd=bSelected?GetSysColor(COLOR_HIGHLIGHT):GetSysColor(COLOR_WINDOW);
+	//COLORREF crText=bSelected?GetSysColor(COLOR_HIGHLIGHTTEXT):GetSysColor(COLOR_WINDOWTEXT);
+	//COLORREF crTextBkgrnd=bSelected?GetSysColor(COLOR_HIGHLIGHT):GetSysColor(COLOR_WINDOW);
+
+	COLORREF crText = n_crtext;
+	COLORREF crTextBkgrnd = n_crtextbkgrnd;
 	COLORREF crCheckFrame=cellData.GetEnable()?RGB(51,102,153):RGB(192,192,192);
 	COLORREF crCheckMark=cellData.GetEnable()?RGB(51,255,153):RGB(192,192,192);
 	//------------calculate the check box & Text rect ---------------------/
@@ -717,10 +1139,12 @@ void CListCtrlEx::DrawRadioBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL 
 	
 }
 // draw a combo box cell
-void CListCtrlEx::DrawComboBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData)
+void CListCtrlEx::DrawComboBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData,COLORREF n_crtext,COLORREF n_crtextbkgrnd)
 {
-	COLORREF crText=bSelected?GetSysColor(COLOR_HIGHLIGHTTEXT):GetSysColor(COLOR_WINDOWTEXT);
-	COLORREF crTextBkgrnd=bSelected?GetSysColor(COLOR_HIGHLIGHT):GetSysColor(COLOR_WINDOW);
+	COLORREF crText = n_crtext;
+	COLORREF crTextBkgrnd = n_crtextbkgrnd;
+	//COLORREF crText=bSelected?GetSysColor(COLOR_HIGHLIGHTTEXT):GetSysColor(COLOR_WINDOWTEXT);
+	//COLORREF crTextBkgrnd=bSelected?GetSysColor(COLOR_HIGHLIGHT):GetSysColor(COLOR_WINDOW);
 	COLORREF crComboTL=cellData.GetEnable()?RGB(255,255,255):RGB(192,192,192); //RGB(212,225,252):RGB(192,192,192);
 	COLORREF crComboBR=cellData.GetEnable()? RGB(177,203,250):RGB(192,192,192);
 	COLORREF crComboMark=cellData.GetEnable()?RGB(77,97,133):RGB(0,0,0);
@@ -791,10 +1215,12 @@ void CListCtrlEx::DrawComboBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL 
 
 
 // draw a edit box cell
-void CListCtrlEx::DrawEditBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData, int uLvcFmt)
+void CListCtrlEx::DrawEditBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData, int uLvcFmt,COLORREF n_crtext,COLORREF n_crtextbkgrnd)
 {
-	COLORREF crText=bSelected?GetSysColor(COLOR_HIGHLIGHTTEXT):GetSysColor(COLOR_WINDOWTEXT);
-	COLORREF crTextBkgrnd=bSelected?GetSysColor(COLOR_HIGHLIGHT):GetSysColor(COLOR_WINDOW);
+	//COLORREF crText=bSelected?GetSysColor(COLOR_HIGHLIGHTTEXT):GetSysColor(COLOR_WINDOWTEXT);
+	//COLORREF crTextBkgrnd=bSelected?GetSysColor(COLOR_HIGHLIGHT):GetSysColor(COLOR_WINDOW);
+	COLORREF crText= n_crtext;
+	COLORREF crTextBkgrnd=n_crtextbkgrnd;
 	COLORREF crTextUnabled=bSelected?GetSysColor(COLOR_HIGHLIGHTTEXT):RGB(192,192,192);
 
 	CRect rcText(rcCell), rcIcon(rcCell);

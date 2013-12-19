@@ -48,10 +48,10 @@ extern "C" {
         char *ifname);
     const char *RS485_Interface(
         void);
-
+		__declspec(dllexport) HANDLE Get_RS485_Handle();
+		__declspec(dllexport) void  Set_RS485_Handle(HANDLE temp_handle);
     void RS485_Initialize(
         void);
-
     void RS485_Send_Frame(
         volatile struct mstp_port_struct_t *mstp_port,  /* port specific data */
         uint8_t * buffer,       /* frame to send (up to 501 bytes of data) */

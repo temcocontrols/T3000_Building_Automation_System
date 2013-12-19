@@ -24,7 +24,7 @@
 *********************************************************************/
 #ifndef CONFIG_H
 #define CONFIG_H
-#define  BACDL_MSTP	//Fance
+#define  BACDL_BIP	//Fance
 /* Note: these defines can be defined in your makefile or project
    or here or not defined and defaults will be used */
 
@@ -40,8 +40,10 @@
     USE_INADDR - uses INADDR_BROADCAST for broadcast and binds using INADDR_ANY
     USE_CLASSADDR = uses IN_CLASSx_HOST where x=A,B,C or D for broadcast
 */
+#if 0 //Fance
 #if !defined(BBMD_ENABLED)
 #define BBMD_ENABLED 1
+#endif
 #endif
 #endif
 

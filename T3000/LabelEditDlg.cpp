@@ -108,6 +108,7 @@ BOOL CLabelEditDlg::OnInitDialog()
 	if(m_input_or_output>=0&&m_input_or_output<=2)
 		m_IOCombox.SetCurSel(m_input_or_output);
 	OnCbnSelchangeIocombox();
+	m_statusComBox.SetCurSel(m_nstatus);
 	m_textClorBtn.EnableAutomaticButton(_T("Automatic"),m_clrTxt);
 	m_textClorBtn.EnableOtherButton(_T("Other"));
 	m_textClorBtn.SetColor((COLORREF)-1);
@@ -131,6 +132,7 @@ BOOL CLabelEditDlg::OnInitDialog()
 
 	}
 	*/
+	UpdateData(0);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -236,44 +238,90 @@ void CLabelEditDlg::SaveToDb()
 
 void CLabelEditDlg::OnCbnSelchangeIocombox()
 {
-	m_statusComBox.ResetContent();
+//	m_statusComBox.ResetContent();
 	m_input_or_output=m_IOCombox.GetCurSel();
-	if(m_input_or_output==0)
+	if(bac_cm5_graphic == false)	//如果不是CM5 
 	{
-		GetDlgItem(IDC_REG_STATIC)->SetWindowText(_T("Input"));
-		for(int i=0;i<INPUT_NUMBER;i++)
+		if(m_input_or_output==0)
 		{
-			m_statusComBox.AddString(m_input[i]);
+			GetDlgItem(IDC_REG_STATIC)->SetWindowText(_T("Input"));
+			for(int i=0;i<INPUT_NUMBER;i++)
+			{
+				m_statusComBox.AddString(m_input[i]);
+			}
+			if(m_nstatus>=0&&m_nstatus<=7)
+				m_statusComBox.SetCurSel(m_nstatus);
+			m_regEdit.ShowWindow(SW_HIDE);
+			m_statusComBox.ShowWindow(SW_SHOW);
 		}
-		if(m_nstatus>=0&&m_nstatus<=7)
-			m_statusComBox.SetCurSel(m_nstatus);
-		m_regEdit.ShowWindow(SW_HIDE);
-		m_statusComBox.ShowWindow(SW_SHOW);
-	}
-	if(m_input_or_output==1)
-	{
-		
-		for(int i=0;i<OUTPUT_NUMBER;i++)
+		if(m_input_or_output==1)
 		{
-			m_statusComBox.AddString(m_output[i]);
+
+			for(int i=0;i<OUTPUT_NUMBER;i++)
+			{
+				m_statusComBox.AddString(m_output[i]);
+			}
+			//	m_status_ctrl.SetCurSel(0);
+			GetDlgItem(IDC_REG_STATIC)->SetWindowText(_T("Output"));
+			if(m_nstatus>=0&&m_nstatus<=7)
+				m_statusComBox.SetCurSel(m_nstatus);
+
+			m_regEdit.ShowWindow(SW_HIDE);
+			m_statusComBox.ShowWindow(SW_SHOW);
 		}
-	//	m_status_ctrl.SetCurSel(0);
-		GetDlgItem(IDC_REG_STATIC)->SetWindowText(_T("Output"));
-		if(m_nstatus>=0&&m_nstatus<=7)
-			m_statusComBox.SetCurSel(m_nstatus);
-			
-		m_regEdit.ShowWindow(SW_HIDE);
-		m_statusComBox.ShowWindow(SW_SHOW);
+		if(m_input_or_output==2)
+		{
+			CString strTemp;
+			strTemp.Format(_T("%d"),m_nstatus);
+
+			m_regEdit.SetWindowText(strTemp);
+			m_regEdit.ShowWindow(SW_SHOW);
+			m_statusComBox.ShowWindow(SW_HIDE);
+		}
 	}
-	if(m_input_or_output==2)
+	else//是Bacnet 协议;
 	{
-		CString strTemp;
-		strTemp.Format(_T("%d"),m_nstatus);
-		
-		m_regEdit.SetWindowText(strTemp);
-		m_regEdit.ShowWindow(SW_SHOW);
-		m_statusComBox.ShowWindow(SW_HIDE);
+		if(m_input_or_output==0)
+		{
+			m_statusComBox.ResetContent();
+			for (int i=1;i<=BAC_INPUT_ITEM_COUNT;i++)
+			{
+				CString temp1;
+				temp1.Format(_T("Input%d"),i);
+				m_statusComBox.AddString(temp1);
+			}
+			m_regEdit.ShowWindow(SW_HIDE);
+			m_statusComBox.ShowWindow(SW_SHOW);
+		}
+		else if(m_input_or_output == 1)
+		{
+			m_statusComBox.ResetContent();
+			for (int i=1;i<=BAC_OUTPUT_ITEM_COUNT;i++)
+			{
+				CString temp1;
+				temp1.Format(_T("Output%d"),i);
+				m_statusComBox.AddString(temp1);
+			}
+			m_regEdit.ShowWindow(SW_HIDE);
+			m_statusComBox.ShowWindow(SW_SHOW);
+		}
+		else if(m_input_or_output == 2)
+		{
+			m_statusComBox.ResetContent();
+			for (int i=1;i<=BAC_VARIABLE_ITEM_COUNT;i++)
+			{
+				CString temp1;
+				temp1.Format(_T("Variable%d"),i);
+				m_statusComBox.AddString(temp1);
+			}
+			m_regEdit.ShowWindow(SW_HIDE);
+			m_statusComBox.ShowWindow(SW_SHOW);
+		}
+
+
 	}
+	m_statusComBox.Invalidate(1);
+//	UpdateData(false);
 
 }
 

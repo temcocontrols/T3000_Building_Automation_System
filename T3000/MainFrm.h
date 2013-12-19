@@ -81,7 +81,7 @@ typedef struct _tree_product//////////////////////
 	float hardware_version;
 	int nEPsize;
 	CString strImgPathName;
-
+	int protocol;
 	
 }tree_product;///////////////////////////////////////////////////////////////////////////////
 
@@ -217,10 +217,17 @@ protected:
 	afx_msg LRESULT OnFreshStatusBar(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnUserMannageMentUpdate(CCmdUI *pCmdUI);
 	afx_msg LRESULT OnAddTreeNode(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT  AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam);
+	afx_msg LRESULT  ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 public:
-	
+	void	SaveBacnetConfigFile();
+	void	LoadBacnetConfigFile();
+	void  Show_Wait_Dialog_And_SendConfigMessage();
+	static DWORD WINAPI  Send_Set_Config_Command_Thread(LPVOID lpVoid);
 	void OnMBP();
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();
@@ -347,6 +354,7 @@ public:
 	afx_msg void OnViewCommunicatetraffic();
 	afx_msg void OnToolIsptoolforone();
 	afx_msg void OnToolRegistermoniter();
+	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
 	CMbPoll* mbPoll;
 	bool mbPollDlgOpen;
 protected:
@@ -362,6 +370,8 @@ public:
 	afx_msg void OnMiscellaneousLoaddescriptors();
 	afx_msg void OnMiscellaneousUpdatemini();
 	afx_msg void OnControlControllers();
+	afx_msg void OnControlScreens();
+	afx_msg void OnControlMonitors();
 };
 
 const int DLG_T3000_VIEW = 0;
@@ -381,4 +391,4 @@ const int DLG_DIALOGT3_VIEW = 5;
 const int DLG_DIALOGT38I13O_VIEW=12;
 const int DLG_DIALOGT332AI_VIEW=13;
 const int DLG_DIALOGT38AI8AO=14;
-
+extern int g_gloab_bac_comport;

@@ -14,7 +14,7 @@
 
 #include "gloab_define.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
-
+Str_program_point m_temp_program_data[BAC_PROGRAM_ITEM_COUNT];
 
 // CBacnetProgram dialog
 
@@ -38,12 +38,12 @@ void CBacnetProgram::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CBacnetProgram, CDialogEx)
+	ON_MESSAGE(MY_RESUME_DATA, ProgramMessageCallBack)
 	ON_MESSAGE(WM_HOTKEY,&CBacnetProgram::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Program_Item)
 	ON_MESSAGE(WM_REFRESH_BAC_PROGRAM_LIST,Fresh_Program_List)
 	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_READ, &CBacnetProgram::OnBnClickedButtonProgramRead)
 	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_APPLY, &CBacnetProgram::OnBnClickedButtonProgramApply)
-	//ON_MESSAGE(MY_RESUME_DATA, ProgramResumeMessageCallBack)
 	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_EDIT, &CBacnetProgram::OnBnClickedButtonProgramEdit)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_PROGRAM, &CBacnetProgram::OnNMClickListProgram)
 	ON_WM_CLOSE()
@@ -52,6 +52,41 @@ END_MESSAGE_MAP()
 
 
 // CBacnetProgram message handlers
+
+LRESULT  CBacnetProgram::ProgramMessageCallBack(WPARAM wParam, LPARAM lParam)
+{
+	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
+	bool msg_result=WRITE_FAIL;
+	msg_result = MKBOOL(wParam);
+	CString Show_Results;
+	CString temp_cs = pInvoke->task_info;
+	if(msg_result)
+	{
+		Show_Results = temp_cs + _T("Success!");
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+		//MessageBox(_T("Bacnet operation success!"));
+	}
+	else
+	{
+		memcpy_s(&m_Program_data.at(pInvoke->mRow),sizeof(Str_program_point),&m_temp_program_data[pInvoke->mRow],sizeof(Str_program_point));//还原没有改对的值
+		PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,pInvoke->mRow,REFRESH_ON_ITEM);
+		Show_Results = temp_cs + _T("Fail!");
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+		//AfxMessageBox(Show_Results);
+		//MessageBox(_T("Bacnet operation fail!"));
+	}
+	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
+		m_program_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
+	else
+		m_program_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+	m_program_list.RedrawItems(pInvoke->mRow,pInvoke->mRow);
+
+
+	if(pInvoke)
+		delete pInvoke;
+	return 0;
+}
+
 
 // CBacnetProgramEdit message handlers
 LRESULT CBacnetProgram::OnHotKey(WPARAM wParam,LPARAM lParam)
@@ -98,6 +133,13 @@ void CBacnetProgram::Initial_List()
 	m_pragram_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_pragram_dlg_hwnd;
 
+	CRect list_rect,win_rect;
+	m_program_list.GetWindowRect(list_rect);
+	ScreenToClient(&list_rect);
+	::GetWindowRect(m_pragram_dlg_hwnd,win_rect);
+	m_program_list.Set_My_WindowRect(win_rect);
+	m_program_list.Set_My_ListRect(list_rect);
+
 	m_program_list.DeleteAllItems();
 	for (int i=0;i<(int)m_Program_data.size();i++)
 	{
@@ -123,6 +165,15 @@ void CBacnetProgram::Initial_List()
 			strlist.push_back(ProgramStatus[1]);
 			m_program_list.SetCellStringList(i, PROGRAM_STATUS, strlist);
 		}
+
+		for (int x=0;x<PROGRAM_COL_NUMBER;x++)
+		{
+			if((i%2)==0)
+				m_program_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
+			else
+				m_program_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
+		}
+
 	}
 
 	m_program_list.SetCellChecked(0,0,1);
@@ -132,21 +183,33 @@ void CBacnetProgram::Initial_List()
 void CBacnetProgram::OnBnClickedButtonProgramRead()
 {
 	// TODO: Add your control notification handler code here
-
+	Post_Refresh_Message(g_bac_instance,READPROGRAM_T3000,0,BAC_PROGRAM_ITEM_COUNT - 1,sizeof(Str_program_point),BAC_PROGRAM_GROUP);
 	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 }
 
 LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 {
+	int cmp_ret ;//compare if match it will 0;
 	int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
+
+	memcpy_s(&m_temp_program_data[Changed_Item],sizeof(Str_program_point),&m_Program_data.at(Changed_Item),sizeof(Str_program_point));
+
 
 	CString temp_task_info;
 	CString New_CString =  m_program_list.GetItemText(Changed_Item,Changed_SubItem);
 
+
 	if(Changed_SubItem == PROGRAM_LABEL)
 	{
 		CString cs_temp = m_program_list.GetItemText(Changed_Item,Changed_SubItem);
+		if(cs_temp.GetLength()>= STR_PROGRAM_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Length can not higher than 8"),_T("Warning"));
+			PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+			return 0;
+		}
+
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -156,6 +219,12 @@ LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == PROGRAM_FULL_LABLE)
 	{
 		CString cs_temp = m_program_list.GetItemText(Changed_Item,Changed_SubItem);
+		if(cs_temp.GetLength()>= STR_PROGRAM_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Length can not higher than 20"),_T("Warning"));
+			PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+			return 0;
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -186,10 +255,13 @@ LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 			m_Program_data.at(Changed_Item).auto_manual=1;
 		}
 	}
-
-	temp_task_info.Format(_T("Write Program List Item%d .Changed to \"%s\" "),Changed_Item + 1,New_CString);
-	Post_Write_Message(bac_gloab_device_id,WRITEPROGRAM_T3000,Changed_Item,Changed_Item,sizeof(Str_program_point),BacNet_hwd ,temp_task_info);
-
+	cmp_ret = memcmp(&m_temp_program_data[Changed_Item],&m_Program_data.at(Changed_Item),sizeof(Str_program_point));
+	if(cmp_ret!=0)
+	{
+		m_program_list.SetItemBkColor(Changed_Item,Changed_SubItem,LIST_ITEM_CHANGED_BKCOLOR);
+		temp_task_info.Format(_T("Write Program List Item%d .Changed to \"%s\" "),Changed_Item + 1,New_CString);
+		Post_Write_Message(g_bac_instance,WRITEPROGRAM_T3000,Changed_Item,Changed_Item,sizeof(Str_program_point),m_pragram_dlg_hwnd ,temp_task_info,Changed_Item,Changed_SubItem);
+	}
 
 	return 0;
 }
@@ -197,6 +269,26 @@ LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 {
 	// Str_in_point Get_Str_in_Point(int index);
+	int Fresh_Item;
+	int isFreshOne = (int)lParam;
+	if(isFreshOne == REFRESH_ON_ITEM)
+	{
+		Fresh_Item = (int)wParam;
+	}
+	else
+	{
+		if(m_program_list.IsDataNewer((char *)&m_Program_data.at(0),sizeof(Str_program_point) * BAC_PROGRAM_ITEM_COUNT))
+		{
+			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
+			m_program_list.SetListData((char *)&m_Program_data.at(0),sizeof(Str_program_point) * BAC_PROGRAM_ITEM_COUNT);
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+
 
 	bac_program_pool_size = 26624;
 	bac_program_size = 0;
@@ -207,9 +299,16 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		CString temp_des;
 		CString temp_units;
 		
+		if(isFreshOne)
+		{
+			i = Fresh_Item;
+		}
+
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).description, (int)strlen((char *)m_Program_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
+
+
 		m_program_list.SetItemText(i,PROGRAM_FULL_LABLE,temp_des);
 
 
@@ -238,7 +337,13 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).label, (int)strlen((char *)m_Program_data.at(i).label)+1, 
 			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des2.ReleaseBuffer();
+
 		m_program_list.SetItemText(i,PROGRAM_LABEL,temp_des2);
+
+		if(isFreshOne)
+		{
+			break;
+		}
 
 	}
 	bac_free_memory = bac_program_pool_size - bac_program_size;
@@ -286,7 +391,7 @@ void CBacnetProgram::OnBnClickedButtonProgramApply()
 
 
 	}
-	Post_Write_Message(bac_gloab_device_id,WRITEPROGRAM_T3000,0,15,sizeof(Str_program_point),BacNet_hwd);
+	Post_Write_Message(g_bac_instance,WRITEPROGRAM_T3000,0,15,sizeof(Str_program_point),BacNet_hwd);
 
 }
 
@@ -335,13 +440,22 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 			break;
 		}
 	}
+
+#if 0
 	int	resend_count = 0;
 	do 
 	{
 		resend_count ++;
-		if(resend_count>20)
+		if(resend_count>RESEND_COUNT)
 			return;
-		g_invoke_id = GetPrivateData(bac_gloab_device_id,READPROGRAMCODE_T3000,program_list_line,program_list_line,200);
+		if(m_Program_data.at(program_list_line).bytes <450)
+			g_invoke_id = GetPrivateData(g_bac_instance,READPROGRAMCODE_T3000,program_list_line,program_list_line,m_Program_data.at(program_list_line).bytes + 10);
+			//g_invoke_id = GetPrivateData(g_bac_instance,READPROGRAMCODE_T3000,program_list_line,program_list_line,200);
+		else
+		{
+			g_invoke_id = GetPrivateData(g_bac_instance,READPROGRAMCODE_T3000,program_list_line,program_list_line, 10);
+			TRACE("m_Program_data.at(program_list_line).bytes = %d\r\n",m_Program_data.at(program_list_line).bytes);
+		}
 		Sleep(200);
 	} while (g_invoke_id<0);
 
@@ -353,17 +467,18 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 		temp_cs.Format(_T("Task ID = %d. Read program code from item %d "),g_invoke_id,program_list_line);
 		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs);
 	}
-
+	KillTimer(1);
 	this->ShowWindow(0);
 	CBacnetProgramEdit dlg;
 	dlg.DoModal();
 	this->ShowWindow(1);
+	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
+#endif
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAMCODE);
 
-
-
-
+	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 		//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
-
+	
 	//OnBnClickedButtonProgramRead();
 }
 
@@ -403,6 +518,7 @@ void CBacnetProgram::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,TYPE_SCREENS,0);
 	CDialogEx::OnClose();
 }
 
@@ -411,6 +527,26 @@ void CBacnetProgram::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
 	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
-	Post_Refresh_Message(bac_gloab_device_id,READPROGRAM_T3000,0,15,sizeof(Str_program_point),4);
+	Post_Refresh_Message(g_bac_instance,READPROGRAM_T3000,0,BAC_PROGRAM_ITEM_COUNT - 1,sizeof(Str_program_point),BAC_PROGRAM_GROUP);
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+BOOL CBacnetProgram::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
+	{
+		CRect list_rect,win_rect;
+		m_program_list.GetWindowRect(list_rect);
+		ScreenToClient(&list_rect);
+		::GetWindowRect(m_pragram_dlg_hwnd,win_rect);
+		m_program_list.Set_My_WindowRect(win_rect);
+		m_program_list.Set_My_ListRect(list_rect);
+
+		m_program_list.Get_clicked_mouse_position();
+		return TRUE;
+	}
+
+	return CDialogEx::PreTranslateMessage(pMsg);
 }
