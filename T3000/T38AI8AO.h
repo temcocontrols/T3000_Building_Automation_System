@@ -1,17 +1,22 @@
 #pragma once
 
 #include "global_struct.h"
-
-// T38AI8AO form view
+#include "msflexgrid1.h"
+#include "msflexgrid1.h"
+#include "resource.h"
+#include "afxcmn.h"
+#include "afxwin.h"
+#include <vector>
+ 
 
 class T38AI8AO : public CFormView
 {
 	DECLARE_DYNCREATE(T38AI8AO)
 
-protected:
+public:
 	T38AI8AO();           // protected constructor used by dynamic creation
 	virtual ~T38AI8AO();
-
+	
 public:
 	enum { IDD = IDD_T38AI8AO };
 #ifdef _DEBUG
@@ -23,14 +28,25 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
+	virtual void OnInitialUpdate();
 	DECLARE_MESSAGE_MAP()
 
 public:
 void InitialRegister();
 int  Get_RegID(CString Name);
-vector<T3Register> m_vecT3Register;
+//vector<T3Register> m_Reglist;
+bool m_isinput;
+int m_curcol;
+int m_currow;
+void Fresh();
+void InitialDialog();
+public:
+	CMsflexgrid m_msflexgrid_input;
+	CMsflexgrid m_msflexgrid_output;
+	CString m_address;
+
 private:
+	vector<T3Register> m_vecT3Register;
 	int	SN_LOW	;
 	int	SN_HI	;
 	int	EPROM_VER_NUMBER	;
@@ -77,7 +93,18 @@ private:
 	int	FILTER_INPUT6	;
 	int	FILTER_INPUT7	;
 	int	FILTER_INPUT8	;
-
+public:
+	CComboBox m_brandratebombox;
+	CComboBox m_delaycombox;
+	afx_msg void OnCbnSelchangeBrandrate();
+	afx_msg void OnCbnSelchangeDelay();
+	DECLARE_EVENTSINK_MAP()
+	void ClickMsflexgridInput();
+	void ClickMsflexgridOutput();
+	CComboBox m_comboxRange;
+	CEdit m_inNameEdt;
+	afx_msg void OnEnKillfocusEditName();
+	afx_msg void OnCbnSelchangeRangecombo();
 };
 
 

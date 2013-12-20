@@ -315,4 +315,13 @@ void LoadWriteMultiData(unsigned char device_var, unsigned char *to_write, unsig
 	}
 }
 
-
+int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length)
+{
+	int retVal;
+	retVal =  read_multi_tap(device_var, put_data_into_here, start_address, length);
+	if ((!(retVal < 0)) && (tapDataMode == 1))
+	{
+		LoadReadMultiData(device_var, put_data_into_here, start_address, length);
+	}
+	return retVal;
+}

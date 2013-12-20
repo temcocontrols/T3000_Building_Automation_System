@@ -13,6 +13,9 @@ int g_invoke_id;
 HANDLE hThread;
 DWORD nThreadID;
 HWND hMbpollWnd;
+HWND hMbpollWritePopWnd;
+int regDetailsOpenedFrom = 0;	// 0 = MbPoll.cpp; 1 = mbpollFunctions.cpp
+
 //#include "stdafx.h"
 unsigned short multi_register_value[1024]={-1};
 unsigned short multi_register_value_tcp[10000]={-1};
@@ -1817,6 +1820,9 @@ int	MODBUS_PID3_OFF_OUTPUT_HEAT3		=	-1	;
 
 
 #pragma region For_bacnet
+int g_bac_instance;
+unsigned short g_mac;
+HWND MainFram_hwd;
 HWND BacNet_hwd;
 int bac_ranges_type;
 int bac_range_number_choose;
@@ -1833,13 +1839,21 @@ bool bac_weekly_read_results;
 bool bac_annual_read_results;
 bool bac_time_command_read_results;
 bool bac_controller_read_results;
+bool bac_screen_read_results;
+bool bac_monitor_read_results;
+bool bac_programcode_read_results;
+bool bac_weeklycode_read_results;
 
+
+bool bac_cm5_graphic;
 int bac_gloab_panel;
-int bac_gloab_device_id;
+//int g_bac_instance;
 
 int program_list_line ;
 int weekly_list_line ;
 int annual_list_line ;
+int screen_list_line ;
+int monitor_list_line;
 Time_block_mini Device_time;
 
 HWND      g_hwnd_now;
@@ -1853,6 +1867,8 @@ HWND      m_annual_dlg_hwnd;
 HWND      m_schedule_time_dlg_hwnd;
 HWND      m_schedule_day_dlg_hwnd;
 HWND      m_controller_dlg_hwnd;
+HWND      m_screen_dlg_hwnd;
+HWND	  m_monitor_dlg_hwnd;
 vector <Str_out_point> m_Output_data;
 vector <Str_in_point>  m_Input_data;
 vector <Str_program_point>  m_Program_data;
@@ -1861,7 +1877,43 @@ vector <Str_weekly_routine_point> m_Weekly_data;
 vector <Str_annual_routine_point> m_Annual_data;
 vector <Str_schedual_time_point> m_Schedual_Time_data;
 vector <Str_controller_point> m_controller_data;
+vector <Control_group_point> m_screen_data;
+vector <Str_monitor_point> m_monitor_data;
+vector <_Com_Scan_Read_Info> m_bac_scan_resend_data;
+vector <_Bac_Scan_Com_Info> m_bac_scan_com_data;
+vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
+
+Monitor_Block m_monitor_block;
+int Monitor_Input__Data[14][1000];	
+Monitor_Input_Info my_input_info[14];
+
+int Max_Scale_value;	//保存整个屏幕的最大刻度值;
+int Min_Scale_value;
+
+int MAX_SCALE_5;
+int MIN_SCALE_5;
+int Total_SCALE;
+
+vector <_Graphic_Value_Info> m_graphic_refresh_data;
 
 byte	g_DayState[8][48];
 
+unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][500];//暂定400;
+int program_code_length[BAC_PROGRAM_ITEM_COUNT];
+
+unsigned long timesec1970; 
+unsigned long timestart;   
+
+CString bac_cs_mac;
+CString bac_cs_device_id;
+CString bac_cs_vendor_id;
+
+HANDLE CM5_hThread;
+HANDLE CM5_UI_Thread;
+DWORD nThreadID_x;
+DWORD cm5_nThreadID;
+
+bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，否则就为1;
+int g_protocol;
+bool bac_net_initial_once;
 #pragma endregion For_bacnet

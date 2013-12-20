@@ -24,12 +24,11 @@
 #include "MBP.h"
 #include "MbPoll.h"
 
-#define NUMVIEWS 14
+#define NUMVIEWS 15
 
 
 
 
-	
 
 typedef struct _tree_floor///////////////////////////////////////////////////////////////////////////////
 {//for vector
@@ -82,7 +81,7 @@ typedef struct _tree_product//////////////////////
 	float hardware_version;
 	int nEPsize;
 	CString strImgPathName;
-
+	int protocol;
 	
 }tree_product;///////////////////////////////////////////////////////////////////////////////
 
@@ -114,7 +113,7 @@ protected: // create from serialization only
 	void OnToolErease();
 	void OnToolFresh();
 	void OnToolRefreshLeftTreee();
-	void EnterConnectToANode();
+	 
 public:
 
     CView * m_pViews[NUMVIEWS];
@@ -218,10 +217,17 @@ protected:
 	afx_msg LRESULT OnFreshStatusBar(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnUserMannageMentUpdate(CCmdUI *pCmdUI);
 	afx_msg LRESULT OnAddTreeNode(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT  AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam);
+	afx_msg LRESULT  ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 public:
-	
+	void	SaveBacnetConfigFile();
+	void	LoadBacnetConfigFile();
+	void  Show_Wait_Dialog_And_SendConfigMessage();
+	static DWORD WINAPI  Send_Set_Config_Command_Thread(LPVOID lpVoid);
 	void OnMBP();
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();
@@ -348,6 +354,7 @@ public:
 	afx_msg void OnViewCommunicatetraffic();
 	afx_msg void OnToolIsptoolforone();
 	afx_msg void OnToolRegistermoniter();
+	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
 	CMbPoll* mbPoll;
 	bool mbPollDlgOpen;
 protected:
@@ -363,6 +370,8 @@ public:
 	afx_msg void OnMiscellaneousLoaddescriptors();
 	afx_msg void OnMiscellaneousUpdatemini();
 	afx_msg void OnControlControllers();
+	afx_msg void OnControlScreens();
+	afx_msg void OnControlMonitors();
 };
 
 const int DLG_T3000_VIEW = 0;
@@ -370,13 +379,16 @@ const int DLG_NETWORKCONTROL_VIEW = 1;
 const int DLG_GRAPGIC_VIEW = 2;
 const int DLG_TRENDLOG_VIEW =3;
 const int DLG_DIALOGCM5_VIEW = 4;
-const int DLG_DIALOGT3_VIEW = 5;
+
 const int DLG_DIALOGMINIPANEL_VIEW = 6;
 const int DLG_AIRQUALITY_VIEW = 7;
 const int DLG_LIGHTINGCONTROLLER_VIEW = 8;
 const int DLG_HUMCHAMBER = 9;
 const int DLG_CO2_VIEW = 10;
 const int DLG_CM5_BACNET_VIEW = 11;
+//T3-Serials
+const int DLG_DIALOGT3_VIEW = 5;
 const int DLG_DIALOGT38I13O_VIEW=12;
 const int DLG_DIALOGT332AI_VIEW=13;
-
+const int DLG_DIALOGT38AI8AO=14;
+extern int g_gloab_bac_comport;

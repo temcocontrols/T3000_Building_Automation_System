@@ -8,8 +8,8 @@
 #include "schedule.h"
 #include "global_variable_extern.h"
 #include "globle_function.h"
-
-
+#include "ado/ADO.h"
+#include "Global_Struct.h"
 #include "define.h"
 //#include "Weekly_Routines.h"
 
@@ -22,9 +22,12 @@
 #define TSTAT25_VAR_NUM 90
 #define TSTAT24_VAR_NUM 32
 #define NET_WORK_CONTROLLER_NUM 24
-#define TSTAT26_VAR_NUM 115
+#define TSTAT26_VAR_NUM 163
 #define TSTAT26_VAR_NUM_TSTAT67 111
 #define NET_WORK_DEFFERENT_TSTAT_FILE "NET WORK\n"
+#define INPUTCARD_NUM 24
+#define GROUP_NUM 40
+#define OUTPUTCARD_NUM_PER_INPUTCARD 20
 using namespace std;
 
 int tstat24_register_var[TSTAT24_VAR_NUM]={	118,121,128,109,110,	111,112,113,114,115,
@@ -53,7 +56,12 @@ int tstat26_register_var[TSTAT26_VAR_NUM]={	118,121,185,128,111,	112,114,115,119
 	336,337,338,339,		327,283,284,
 	341,342,343,344,345,346,347,
 	298,299,300,
-	412,413};
+	MODBUS_OUTPUT6_FUNCTION,MODBUS_OUTPUT7_FUNCTION,
+	570,571,	572,573,574,577,578,	
+	579,580,581,582,583,	584,585,586,587,588,
+	589,590,592,593,594,	595,596,597,598,599,	
+	600,601,602,603,604,	605,606,607,608,609,	
+	610,611,612,613,614,    615,616,617,618,619};
 int tstat67_register_var[TSTAT26_VAR_NUM_TSTAT67]={	
                                             MODBUS_SEQUENCE,
                                             MODBUS_DEGC_OR_F,
@@ -201,6 +209,12 @@ _TCHAR * NET_WORK_CONTROLLER[] = {                  //attention:该数组中的值，不
 						_T("Inter Character Timeout:"),		//10
 						_T("Factory Default:")		//11
 						};
+_TCHAR * LC_VARIABLE_LIST[] = {                  //attention:该数组中的值，不要有完全包含的出现
+	_T("Input Filter Time:"),		//0
+	_T("Relay Pulse Duration:"),		//1
+	_T("Delay Between Relay Pulses:")	//2	
+};
+
 _TCHAR * temp_heating[]={
 	_T("Heating1"),
 	_T("Heating2"),
@@ -399,22 +413,17 @@ _TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要
 	_T("baudrate"),                    
 	_T("KEYPAD_SELECT"),  //128             
 	_T("TEMP_SELECT"),                 
-
 	_T("DAC_OFFSET"),     
 	_T("COOLING_P_TERM"),		          
 	_T("COOLING_I_TERM"),
 	_T("DAY_COOLING_DEADBAND"),        
 	_T("DAY_HEATING_DEADBAND"),        
-
 	_T("NUMBER_OF_FAN_SPEEDS"),                    
 	_T("NIGHT_HEATING_DEADBAND"),      
 	_T("NIGHT_COOLING_DEADBAND"),      
 	_T("APPLICATION"),                 
 	_T("POWERUP_SETPOINT"),            
-
-	_T("POWERUP_ON_OFF"),              
-	//	_T("OUTPUT1_SCALE"),               
-	//	_T("OUTPUT1_SCALE"),               
+	_T("POWERUP_ON_OFF"),                           
 	_T("AUTO_ONLY"),                   
 	_T("OUTPUT1_SCALE"),               
 	_T("OUTPUT2_SCALE"),               
@@ -472,8 +481,10 @@ _TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要
 	_T("PID2 Units hi"),
 	_T("PID2 Units lo"),
 	_T("Universal Night Setpoint"),
-	_T("Heating Stages in Original Table"),
-	_T("Cooling Stages in Original Table"),
+	_T("Heating Stages  For PID1"),
+	_T("Cooling Stages  For PID1"),
+	_T("Heating Stages  For PID2"),
+	_T("Cooling Stages  For PID2"),
 
 	_T("Interlock Output1"),
 	_T("Interlock Output2"),
@@ -526,7 +537,55 @@ _TCHAR * TSTATVAR_CONST_26[] = {                  //attention:该数组中的值，不要
 	_T("Input Fun2"),
 	_T("Input Fun3"),
 	_T("Output Function 6"),
-	_T("Output Function 7")
+	_T("Output Function 7"),
+	_T("VAV_Max_Supply_Setpoint"),
+	_T("VAV_Min_Supply_Setpoint"),
+	_T("VAV_Max_Airflow_Cooling"),
+	_T("VAV_Max_Airflow_Heating"),
+	_T("VAV_Min_Airflow"),
+	_T("VAV_PID3_Input_Select"),
+	_T("VAV_PID3_VALVE_OPERATION_TABLE_BEGIN"),
+	_T("VAV_PID3_VALVE_OPER_TABLE_COOL1"),
+	_T("VAV_PID3_VALVE_OPER_TABLE_COOL2"),
+	_T("VAV_PID3_VALVE_OPER_TABLE_COOL3"),
+	_T("VAV_PID3_VALVE_OPER_TABLE_HEAT1"),
+	_T("VAV_PID3_VALVE_OPER_TABLE_HEAT2"),
+	_T("VAV_PID3_VALVE_OPER_TABLE_HEAT3"),
+	_T("VAV_PID3_Cooling_Deadband"),
+	_T("VAV_PID3_Heating_Deadband"),
+	_T("VAV_PID3_Pterm"),
+	_T("VAV_PID3_Iterm"),
+	_T("VAV_PID3_Heat_Stage"),
+	_T("VAV_PID3_Cool_Stage"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_BEGIN"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_COOL1"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_COOL2"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_COOL3"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_HEAT1"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_HEAT2"),
+	_T("VAV_PID3_DIGITAL_OUTPUT_HEAT3"),
+	_T("VAV_Output6_Function"),
+	_T("VAV_Output7_Function"),
+	_T("VAV_Analog_Input3_Function"),
+	_T("VAV_Analog_Input4_Function"),
+	_T("VAV_Analog_Input5_Function"),
+	_T("VAV_Analog_Input6_Function"),
+	_T("VAV_Analog_Input7_Function"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_BEGIN"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_COOL1"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_COOL2"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_COOL3"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_HEAT1"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_HEAT2"),
+	_T("VAV_PID3_VALVE_OFF_TABLE_HEAT3"),
+	_T("VAV_PID3_OFF_OUTPUT_BEGIN"),
+	_T("VAV_PID3_OFF_OUTPUT_COOL1"),
+	_T("VAV_PID3_OFF_OUTPUT_COOL2"),
+	_T("VAV_PID3_OFF_OUTPUT_COOL3"),
+	_T("VAV_PID3_OFF_OUTPUT_HEAT1"),
+	_T("VAV_PID3_OFF_OUTPUT_HEAT2"),
+	_T("VAV_PID3_OFF_OUTPUT_HEAT3"),
+
 };
 _TCHAR * TSTATVAR_CONST_67[] = {                  //attention:该数组中的值，不要有完全包含的出现
 	_T("SEQUENCE"),		
@@ -1562,9 +1621,30 @@ void var_write(wofstream & out)
 		}
 		else 
 		{//25
-			for(int i=0;i<TSTAT25_VAR_NUM;i++)
+			int tstat26_register_var[TSTAT26_VAR_NUM]={	118,121,185,128,111,	112,114,115,119,120,
+				122,123,124,125,126,	127,129,186,187,131,
+				132,133,135,136,137,	182,183,202,203,201,
+				188,189,190,204,205,	206,207,208,209,210,
+				211,213,214,
+				241,242,243,244,245,	246,247,248,249,250,
+				251,252,253,
+				268,269,270,271,272,	273,274,275,MODBUS_HEAT_ORIGINAL_TABLE,MODBUS_COOL_ORIGINAL_TABLE,
+				MODBUS_HEAT_UNIVERSAL_TABLE,MODBUS_COOL_UNIVERSAL_TABLE,
+				286,287,288,289,290,	291,292,285,293,
+				301,302,303,309,310,    328,329,330,331,332,
+				327,333,319,320,321,    322,323,325,334,335,
+				336,337,338,339,		327,283,284,
+				341,342,343,344,345,346,347,
+				298,299,300,
+				MODBUS_OUTPUT6_FUNCTION,MODBUS_OUTPUT7_FUNCTION,
+				570,571,	572,573,574,577,578,	
+				579,580,581,582,583,	584,585,586,587,588,
+				589,590,592,593,594,	595,596,597,598,599,	
+				600,601,602,603,604,	605,606,607,608,609,	
+				610,611,612,613,614,    615,616,617,618,619};
+			for(int i=0;i<TSTAT26_VAR_NUM;i++)
 			{
-				str1.Format(_T("%d,\t%d,\t%s"),tstat25_register_var[i],product_register_value[tstat25_register_var[i]]  ,TSTATVAR_CONST_25[i]);
+				str1.Format(_T("%d,\t%d,\t%s"),tstat26_register_var[i],product_register_value[tstat26_register_var[i]]  ,TSTATVAR_CONST_26[i]);
 				_Twrite_to_file_a_line(out,str1);
 				if((i%5)==4)
 					_Twrite_to_file_a_line(out,_T(" "));//a space line
@@ -1573,18 +1653,9 @@ void var_write(wofstream & out)
 	} 
 	else
 	{
-		//if(product_register_value[7]==1||product_register_value[7]==2||product_register_value[7]==3)
-		//{ 
-		//	for(int i=0;i<TSTAT24_VAR_NUM;i++)
-		//	{			
-		//		str1.Format(_T("%d,\t%d,\t%s"),tstat24_register_var[i], product_register_value[tstat24_register_var[i]],TSTATVAR_CONST_24[i]);
-		//		_Twrite_to_file_a_line(out,str1);
-		//		if((i%5)==4)
-		//			_Twrite_to_file_a_line(out,_T(" "));//a space line
-		//	}
-		//}
-		  if(version<26)
-		{//25
+		 
+		if(version<26)
+		{
 			for(int i=0;i<TSTAT25_VAR_NUM;i++)
 			{
 				str1.Format(_T("%d,\t%d,\t%s"),tstat25_register_var[i],product_register_value[tstat25_register_var[i]]  ,TSTATVAR_CONST_25[i]);
@@ -1866,6 +1937,7 @@ void Save2File_ForTwoFiles(TCHAR* fn)
 	SetPaneString(1, strTips);
 	//////////////////////////////////////////////////////////////////////////
 	var_write(out);	
+   save_write_input_output(out);
 	//_Twrite_to_file_a_line(out,_T("OK!"));//space
 	return;
 
@@ -1965,6 +2037,7 @@ void Save2File_ForTwoFiles(TCHAR* fn)
 	WriteAddress(out);
 	_Twrite_to_file_a_line(out,_T(" "));//space
 	var_write(out);	
+	save_write_input_output(out);
 	out.close();
 
 	if (nValue>=0)
@@ -1976,6 +2049,7 @@ void Save2File_ForTwoFiles(TCHAR* fn)
 #endif
 
 }
+
 void change_showing_text_variable(CString str)
 {
 #if 0
@@ -2666,16 +2740,79 @@ void get_var_write_var(wifstream & inf,float tstat_version,CStdioFile *p_log_fil
 	while(!inf.eof())
 	{
 		inf.getline(buf,1024);
-
-		if(find_sub_chars(buf,_T("END CONFIG")))
-			break;
+		if (wcsstr(buf,_T("//Input Output Config"))!=NULL)
+		 break;
 
 
 		get_write_var_line(buf,tstat_version,p_log_file,p_log_file_one_time);//get a line ,one register value,
 	}
 }
 
+void get_write_var_line_T3(TCHAR *buf,float tstat_version,CStdioFile *p_log_file)
+{
+	CString for_showing_text;
+	if(_wtoi(buf)==0)
+		return ;
+	TCHAR *temp=buf;
+	temp=wcsstr(temp,_T(","));
+	temp++;	
+	int register_id=_wtoi(buf);
+	int register_value=_wtoi(temp);
+	int j=-1;
+	if (register_id<100)
+	{
+	return;
+	}
 	
+	j=write_one(now_tstat_id,register_id,register_value);	
+	if(p_log_file!=NULL)
+	{
+		for_showing_text.Format(_T("register ID:%d,VALUE:%d write "),register_id,register_value);
+		if(j>0)
+			for_showing_text=for_showing_text+_T("OK\r\n");
+		else
+		{
+			
+			for_showing_text=for_showing_text+_T("Error******************\r\n");
+		}
+		change_showing_text_variable(for_showing_text);
+		p_log_file->WriteString(for_showing_text);
+	}
+}
+
+
+void get_var_write_var_T3(wifstream & inf,float tstat_version,CStdioFile *p_log_file)
+{
+	TCHAR buf[1024];	
+	while(!inf.eof())
+	{
+		inf.getline(buf,1024);
+
+		if(find_sub_chars(buf,_T("END CONFIG")))
+			break;
+
+
+		get_write_var_line_T3(buf,tstat_version,p_log_file);//get a line ,one register value,
+	}
+}
+
+
+void write_input_output_var(wifstream & inf,float tstat_version,CStdioFile *p_log_file,load_file_every_step *p_log_file_one_time)
+{
+	TCHAR buf[1024];	
+	int inputno=0;
+	while(!inf.eof())
+	{
+		inf.getline(buf,1024);
+		 if (wcsstr(buf,_T("//END"))!=NULL)
+			break; 
+        
+
+		get_write_var_line_input_output(buf,tstat_version,inputno,p_log_file,p_log_file_one_time);//get a line ,one register value,
+	  inputno++;
+	}
+}
+
 int fan_number;
 
 void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,load_file_every_step *p_log_file_one_time)
@@ -2691,7 +2828,8 @@ void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,lo
 	int j;
 	int register_122=0;
 	if(register_id==MODBUS_DEGC_OR_F && register_value>1)
-		j=-4;//wrong value
+		j=-4;
+		//wrong value
 	/*
 	else if(register_id==128 && register_value>5)
 		j=-4;//wrong value
@@ -2742,6 +2880,312 @@ void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,lo
 	//	p_log_file->Write(for_showing_text.GetString(),for_showing_text.GetLength());
 		p_log_file->WriteString(for_showing_text);
 	}
+
+}
+
+void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,CStdioFile *p_log_file,load_file_every_step *p_log_file_one_time)
+{
+//used by get_value_setting function only
+	CString for_showing_text,strText, strInName;;
+	//if(_wtoi(buf)==0)
+	//	return ;
+	TCHAR *temp=buf;
+	temp=wcsstr(temp,_T(":"));
+	temp++;	
+ 
+	
+	
+	strText.Format(_T("%s"),temp);
+    int lRow=inputno+2;
+   
+	switch (lRow)
+	{
+	case 1:
+		strInName=g_strSensorName;
+		break;
+	case 2:
+		strInName=g_strInName1;
+		break;
+	case 3:
+		strInName=g_strInName2;
+		break;
+	case 4:
+		strInName=g_strInName3;
+		break;
+	case 5:
+		strInName=g_strInName4;
+		break;
+	case 6:
+		strInName=g_strInName5;
+		break;
+	case 7:
+		strInName=g_strInName6;
+		break;
+	case 8:
+		strInName=g_strInName7;
+		break;
+	case 9:
+		strInName=g_strInName8;
+		break;
+	}
+	if(strText.CompareNoCase(strInName)==0)
+		return;
+		int Model_ID=read_one(now_tstat_id,7,5);
+	if ((Model_ID==PM_TSTAT5G)||(Model_ID==PM_TSTAT5E)||(Model_ID==PM_TSTAT6)||(Model_ID==PM_TSTAT7))
+	{
+		strText.TrimRight();
+		unsigned char p[8];//input+input1
+
+		for(int i=0;i<8;i++)
+		{
+			if(i<strText.GetLength())
+				p[i]=strText.GetAt(i);
+			else
+				p[i]=' ';
+		}
+		if (strText.GetLength()>8)
+		{
+			AfxMessageBox(_T(">8 chars"));
+		} 
+		else
+		{
+			if (Write_Multi(g_tstat_id,p,MODBUS_AI1_CHAR1+4*(lRow-2),8)>0)
+			{
+
+			} 
+			else
+			{
+				AfxMessageBox(_T("Error"));
+				return;
+			}
+
+		}
+	}
+	try
+	{
+
+		 int ID=read_one(now_tstat_id,6);
+		if(ID>0)
+		{  unsigned short num[4];  
+		   Read_Multi(now_tstat_id,&num[0],0,4);
+		   g_serialNum=num[0]+num[1]*256+num[2]*256*256+num[3]*256*256;
+		   _ConnectionPtr m_ConTmp;
+		   _RecordsetPtr m_RsTmp;
+			m_ConTmp.CreateInstance("ADODB.Connection");
+			m_RsTmp.CreateInstance("ADODB.Recordset");
+			m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+
+			CString strSerial;
+			strSerial.Format(_T("%d"),g_serialNum);
+
+			CString strsql;
+			strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
+			m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
+			if(VARIANT_FALSE==m_RsTmp->EndOfFile)//update
+			{			
+				CString strField;
+				switch (lRow)
+				{
+
+				case 2:
+					strField=_T("INPUT1");
+					break;
+				case 3:
+					strField=_T("INPUT2");
+					break;
+				case 4:
+					strField=_T("INPUT3");
+					break;
+				case 5:
+					strField=_T("INPUT4");
+					break;
+				case 6:
+					strField=_T("INPUT5");
+					break;
+				case 7:
+					strField=_T("INPUT6");
+					break;
+				case 8:
+					strField=_T("INPUT7");
+					break;
+				case 9:
+					strField=_T("INPUT8");
+					break;
+				}
+
+				try
+				{
+
+					CString str_temp;
+					str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
+					//AfxMessageBox(str_temp );
+					m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+					//m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
+				}
+				catch(_com_error *e)
+				{
+					AfxMessageBox(e->ErrorMessage());
+				}
+
+			}
+			else//inerst
+			{
+				switch (lRow)
+				{
+				case 2:
+					g_strInName1=strText;
+					break;
+				case 3:
+					g_strInName2=strText;
+					break;
+				case 4:
+					g_strInName3=strText;
+					break;
+				case 5:
+					g_strInName4=strText;
+					break;
+				case 6:
+					g_strInName5=strText;
+					break;
+				case 7:
+					g_strInName6=strText;
+					break;
+				case 8:
+					g_strInName7=strText;
+					break;
+				case 9:
+					g_strInName8=strText;
+					break;
+				}
+
+				CString g_strInName9;
+				//g_strInName9 = _T("input9");Humidity Sensor
+				g_strInName9 = _T("Humidity Sensor");
+				CString	str_temp;
+				str_temp.Format(_T("insert into IONAME values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"),
+					strSerial,
+					g_strInName1,
+					g_strInName2,
+					g_strInName3,
+					g_strInName4,
+					g_strInName5,
+					g_strInName6,
+					g_strInName7,
+					g_strOutName1,
+					g_strOutName2,
+					g_strOutName3,
+					g_strOutName4,
+					g_strOutName5,
+					g_strOutName6,
+					g_strOutName7,
+					g_strInName8,
+					g_strInHumName,
+					g_strSensorName
+					);
+				try
+				{
+
+					m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+				//	m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
+				}
+				catch(_com_error *e)
+				{
+					AfxMessageBox(e->ErrorMessage());
+				}
+			}
+
+			switch (lRow)
+			{
+			case 2:
+				g_strInName1=strText;
+				break;
+			case 3:
+				g_strInName2=strText;
+				break;
+			case 4:
+				g_strInName3=strText;
+				break;
+			case 5:
+				g_strInName4=strText;
+				break;
+			case 6:
+				g_strInName5=strText;
+				break;
+			case 7:
+				g_strInName6=strText;
+				break;
+			case 8:
+				g_strInName7=strText;
+				break;
+			case 9:
+				g_strInName8=strText;
+				break;
+			}
+			if(m_RsTmp->State) 
+				m_RsTmp->Close(); 
+			if(m_ConTmp->State)
+				m_ConTmp->Close();	
+		}	
+
+	}
+	catch (...)
+	{
+
+
+	}
+
+    //wrong value
+	/*
+	else if(register_id==128 && register_value>5)
+		j=-4;//wrong value
+		//comment on 09-02-03
+		*/
+
+	//else if(register_id==MODBUS_FAN_MODE )
+	//{
+	//	int real_fan_number=get_real_number_fan_speeds(fan_number);
+	//	if(register_value!=real_fan_number && real_fan_number!=-1)
+	//	{
+	//		register_122=-100;
+	//		register_value=real_fan_number;/////////////^-^ 
+	//	}
+	//	j=write_one(now_tstat_id,register_id,register_value);	
+	//}
+	//else
+	//	j=write_one(now_tstat_id,register_id,register_value);	
+	//if(register_id==185)
+	//{
+	//	Sleep(14000);	
+	//	//if(register_value==1)Change_BaudRate(19200);
+	//	//if(register_value==0)Change_BaudRate(9600);
+	//}
+
+	//if(j==-2 && tstat_version<25 && tstat_version >0)  ////////////////////////if the version is 24.4 ,write_one some register will restart,for example 118,121
+	//{
+	//	Sleep(14000);	
+	//	j=write_one(now_tstat_id,register_id,register_value);	
+	//}
+	//if(p_log_file!=NULL)
+	//{
+	//	for_showing_text.Format(_T("register ID:%d,VALUE:%d write "),register_id,register_value);
+	//	if(register_122==-100)
+	//	{
+	//		CString t_str=for_showing_text;
+	//		for_showing_text.Format(_T("NUMBER_OF_FAN_SPEEDS IS INCORRECT,try correct value :%d "),register_value);
+	//		for_showing_text=t_str+for_showing_text;
+	//	}
+	//	if(j>0)
+	//		for_showing_text=for_showing_text+_T("OK\r\n");
+	//	else
+	//	{
+	//		p_log_file_one_time->seven_step=false;
+	//		for_showing_text=for_showing_text+_T("Error******************\r\n");
+	//	}
+	//	change_showing_text_variable(for_showing_text);
+	////	p_log_file->Write(for_showing_text.GetString(),for_showing_text.GetLength());
+	//	p_log_file->WriteString(for_showing_text);
+	//}
+
 }
 
 void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
@@ -2912,7 +3356,8 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 	strTips = _T("Config file saved 99%...");
 	SetPaneString(1, strTips);
 	//////////////////////////////////////////////////////////////////////////
-	var_write_Tstat67(out);	
+	var_write_Tstat67(out);
+	save_write_input_output(out);	
 	//_Twrite_to_file_a_line(out,_T("OK!"));//space
 	return;
 
@@ -2925,7 +3370,35 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 #endif
 }
  
+void LoadFile2Tstat_T3(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFile*p_log_file)
+{
+   //int nSpecialValue=read_one(now_tstat_id,326);
+	//write_one(g_tstat_id,324,0);
+	//every step is false
 
+	CString for_showing_text;
+	float tstat_version;
+	tstat_version=get_tstat_version(now_tstat_id);///////////////////get version
+	wifstream inf;//file
+	inf.open(fn,ios_base::in);
+
+	for_showing_text=_T("Begin.....");
+	TCHAR buf[1024];
+
+	while(!inf.eof())
+	{
+		inf.getline(buf,1024);
+		if(wcscmp(buf,_T("Reg No,Reg Value,Reg Name"))==0)
+		{
+			get_var_write_var_T3(inf,tstat_version,p_log_file);//////a line //////////// a line
+
+			if(p_log_file!=NULL)
+				p_log_file->WriteString(_T("\r\n"));
+		}
+	}	
+	inf.close();
+	Sleep(5000);
+}
 void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFile*p_log_file)
 {
    //int nSpecialValue=read_one(now_tstat_id,326);
@@ -2948,26 +3421,26 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 	for(int i=0;i<fan_number;i++)
 	{
 		for(int t_i=0;t_i<7;t_i++)
-			{
-				int real_fan_address=get_real_fan_address(fan_number-2,i,t_i);
-				if(fan_value[i]>=0)
+		{
+			int real_fan_address=get_real_fan_address(fan_number-2,i,t_i);
+			if(fan_value[i*7+t_i]>=0)
+			{   
+				int i_i=write_one(now_tstat_id,real_fan_address,fan_value[i*7+t_i]);
+				if(p_log_file!=NULL)
 				{
-					int i_i=write_one(now_tstat_id,real_fan_address,fan_value[i*7+t_i]);
-					if(p_log_file!=NULL)
+					if(i_i>0)
+						for_showing_text.Format(_T("register ID: %d value:%d write OK\r\n"),real_fan_address,fan_value[i*7+t_i]);
+					else
 					{
-						if(i_i>0)
-							for_showing_text.Format(_T("register ID: %d value:%d write OK\r\n"),real_fan_address,fan_value[i*7+t_i]);
-						else
-						{
-							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),real_fan_address,fan_value[i*7+t_i]);
-							load_file_one_time.first_step=false;
-						}
-						change_showing_text_variable(for_showing_text);
-							p_log_file->WriteString(for_showing_text);
+						for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),real_fan_address,fan_value[i*7+t_i]);
+						load_file_one_time.first_step=false;
 					}
+					change_showing_text_variable(for_showing_text);
+					p_log_file->WriteString(for_showing_text);
 				}
 			}
 		}
+	}
 			if(p_log_file!=NULL)
 				p_log_file->WriteString(_T("\r\n"));	
 			int value_setting[7]={0};
@@ -2976,7 +3449,7 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 			get_value_setting(inf,value_setting);//value setting
 			Show_load_file_error_message(load_file_one_time,2,p_log_file);
 			load_file_one_time.second_step=true;
-			for(int i=0;i<7;i++)
+	for(int i=0;i<7;i++)
 			{
 				if(value_setting[i]>=0)
 				{
@@ -3097,156 +3570,7 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 				}
 				if(p_log_file!=NULL)
 				p_log_file->WriteString(_T("\r\n"));
-		//	}
-			//else if(tstat_version>=CUSTOM_TABLE_FLOAT_VERSION)
-			//{
-			//	int lookup_table_setting[23]={0};
-			//	get_lookup_table_setting(inf,lookup_table_setting);
-			//	Show_load_file_error_message(load_file_one_time,4,p_log_file);
-			//	load_file_one_time.thurth_step=true;
-
-			//	int ntemp=(int)lookup_table_setting[0];
-
-			//	//table1
-			//	{
-			//	short high=ntemp/65536;
-			//	short low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE1_ZERO,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE1_ZERO_HI,high);
-			//	//2
-			//	ntemp=lookup_table_setting[1];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE1_HALFONE,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE1_HALFONE_HI,high);
-			//	//3
-			//	ntemp=lookup_table_setting[2];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE1_ONE,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE1_ONE_HI,high);
-			//	//4
-			//	ntemp=(int)lookup_table_setting[3];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE1_HALFTWO,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE1_HALFTWO_HI,high);
-			//	//5
-			//	ntemp=lookup_table_setting[4];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE1_TWO,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE1_TWO_HI,high);
-			//	//6
-			//	ntemp=lookup_table_setting[5];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE1_HALFTHREE,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE1_HALFTHREE_HI,high);
-			//	//7
-			//	ntemp=lookup_table_setting[6];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE1_THREE,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE1_THREE_HI,high);
-			//	//8
-
-			//	ntemp=lookup_table_setting[7];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE1_HALFFOUR,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE1_HALFFOUR_HI,high);
-			//	//9
-			//	ntemp=lookup_table_setting[8];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE1_FOUR,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE1_FOUR_HI,high);
-			//	//10
-			//	ntemp=lookup_table_setting[9];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE1_HALFFIVE,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE1_HALFFIVE_HI,high);
-			//	//11
-			//	ntemp=lookup_table_setting[10];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE1_FIVE,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE1_FIVE_HI,high);
-			//	}
-
-			//	//table 2
-			//	{
-			//	int ntemp=(int)lookup_table_setting[11];
-			//	short high=ntemp/65536;
-			//	short low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE2_ZERO,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE2_ZERO_HI,high);
-			//	//2
-			//	ntemp=lookup_table_setting[12];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;		
-			//	write_one(now_tstat_id, MODBUS_TABLE2_HALFONE,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE2_HALFONE_HI,high);
-			//	//3
-			//	ntemp=lookup_table_setting[13];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE2_ONE,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE2_ONE_HI,high);
-			//	//4
-			//	ntemp=(int)lookup_table_setting[14];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE2_HALFTWO,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE2_HALFTWO_HI,high);
-			//	//5
-			//	ntemp=lookup_table_setting[15];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE2_TWO,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE2_TWO_HI,high);
-			//	//6
-			//	ntemp=lookup_table_setting[16];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE2_HALFTHREE,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE2_HALFTHREE_HI,high);
-			//	//7
-			//	ntemp=lookup_table_setting[17];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE2_THREE,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE2_THREE_HI,high);
-			//	//8
-
-			//	ntemp=lookup_table_setting[18];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE2_HALFFOUR,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE2_HALFFOUR_HI,high);
-			//	//9
-			//	ntemp=lookup_table_setting[19];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE2_FOUR,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE2_FOUR_HI,high);
-			//	//10
-			//	ntemp=lookup_table_setting[20];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE2_HALFFIVE,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE2_HALFFIVE_HI,high);
-			//	//11
-			//	ntemp=lookup_table_setting[21];
-			//	high=ntemp/65536;
-			//	low=ntemp%65536;
-			//	write_one(now_tstat_id, MODBUS_TABLE2_FIVE,low);
-			//	write_one(now_tstat_id, MODBUS_TABLE2_FIVE_HI,high);
-			//	
-			//	}
-			//}
+	 
 
 		}
 		
@@ -3317,12 +3641,14 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 			write_one(now_tstat_id,MODBUS_INFO_BYTE,5);//184 register,to no restart,when you write the 185,118,121,128 register
 			load_file_one_time.seven_step=true;
 			get_var_write_var(inf,tstat_version,p_log_file,&load_file_one_time);//////a line //////////// a line
-		//	write_one(now_tstat_id,MODBUS_UPDATE_STATUS,143);//////
-			//reset 
-			//write_one(now_tstat_id,184,0);//184 register,to no restart,when you write the 185,118,121,128 register
+		    
+		    write_input_output_var(inf,tstat_version,p_log_file,&load_file_one_time);
+
+
 			if(p_log_file!=NULL)
 			p_log_file->WriteString(_T("\r\n"));
 		}
+	  /*  else */
 	}	
 	inf.close();
 	Sleep(5000);
@@ -3787,8 +4113,38 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 
 }
 
+void LoadT3Modules(load_file_every_step &load_file_one_time,CHAR* fn,CStdioFile*p_log_file)
+{
+   //int nSpecialValue=read_one(now_tstat_id,326);
+	//write_one(g_tstat_id,324,0);
+	//every step is false
 
- 
+	CString for_showing_text;
+	float tstat_version;
+	tstat_version=get_tstat_version(now_tstat_id);///////////////////get version
+	wifstream inf;//file
+	inf.open(fn,ios_base::in);
+	 
+    for_showing_text=_T("Begin.....");
+	TCHAR buf[1024];
+	
+	while(!inf.eof())
+	{
+		inf.getline(buf,1024);
+	 if(wcscmp(buf,_T("Reg No		Reg Value		Reg Name"))==0)
+		{
+			get_var_write_var_T3(inf,tstat_version,p_log_file);//////a line //////////// a line
+	
+			if(p_log_file!=NULL)
+			p_log_file->WriteString(_T("\r\n"));
+		}
+	}	
+	inf.close();
+	Sleep(5000);
+////LoadFile2Tstat_twofile(load_file_one_time,fn,p_log_file);
+
+}
+
 
 void save_schedule_2_file(TCHAR* fn,int schedule_id)
 {
@@ -3817,6 +4173,503 @@ void save_schedule_2_file(TCHAR* fn,int schedule_id)
 		AfxMessageBox(_T("Open file failure!"));
 	
 }
+
+void weekly_write_LC(CStdioFile &default_file,int schedule_id)
+{
+	CString a_line;	
+	int i=0;
+	a_line=_T("WEEKLY ROUTINES\n");
+	default_file.WriteString(a_line.GetString());
+
+	a_line=_T("Num\tFULL_LABEL\t\tA/M\tOutput\tHoliday1 State1\tHoliday2 State2\tLabel\n");
+	default_file.WriteString(a_line.GetString());
+	unsigned short temp_buffer[WR_DESCRIPTION_SIZE]={0};
+	memset(&temp_buffer[0],0,sizeof(temp_buffer));
+	
+
+	description temp_description;	
+	//TCHAR* p=new TCHAR;
+	//p=(TCHAR *)&temp_description;///////////////*****pointer   attention
+	unsigned char* p = reinterpret_cast<unsigned char*>(&temp_description);
+
+	for(i=0;i<MAX_WR;i++)
+	{
+		a_line=_T("");//clear
+		Read_Multi(schedule_id,temp_buffer,4276+i*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
+		if(temp_buffer[0]==255)
+		{
+			for(int itt=0;itt<WR_DESCRIPTION_SIZE;itt++)
+				temp_buffer[itt]=0;
+		}			
+
+		//memset(&temp_description,0,sizeof(description));
+		memset(p,0,sizeof(description));
+
+		for(int j=0;j<WR_DESCRIPTION_SIZE;j++)
+		{
+			p[j] =(unsigned char) temp_buffer[j];
+			//(*(p++))=temp_buffer[j];
+		}
+
+		CString a_m,output,state1,state2;
+		if(temp_description.flag & 128)
+			a_m=_T("MAN");
+		else
+			a_m=_T("AUTO");
+		if(temp_description.flag & 64)
+			output=_T("ON");
+		else
+			output=_T("OFF");
+		if(temp_description.flag & 32)
+			state1=_T("ON");
+		else
+			state1=_T("OFF");
+		if(temp_description.flag & 16)
+			state2=_T("ON");
+		else
+			state2=_T("OFF");			
+		if(strlen(temp_description.full_label)<8)
+			a_line.Format(_T("\t%s\t\t\t"),(CString)temp_description.full_label);
+		else if(strlen(temp_description.full_label)<16)
+			a_line.Format(_T("\t%s\t\t"),(CString)temp_description.full_label);
+		else if(strlen(temp_description.full_label)<20)
+			a_line.Format(_T("\t%s\t"),(CString)temp_description.full_label);
+		CString temp;
+		a_line=a_line+a_m+_T("\t");
+		a_line=a_line+output+_T("\t");
+		temp.Format(_T("%d"),temp_description.holiday1);
+		a_line=a_line+temp+_T("\t");
+		a_line=a_line+state1+_T("\t");
+		temp.Format(_T("%d"),temp_description.holiday2);
+		a_line=a_line+temp+_T("\t");
+		a_line=a_line+state2+_T("\t");
+		temp.Format(_T("%s\n"),(CString)temp_description.label);
+		a_line=a_line+temp;
+		temp.Format(_T("%d:"),i+1);
+		a_line=temp+a_line;
+		default_file.WriteString(a_line.GetString());////////////////write
+		 weekly_routines_insert_write_LC(default_file,schedule_id,i);
+	}
+}
+void weekly_routines_insert_write_LC(CStdioFile &default_file,int schedule_id,int weekly_row_number)
+{
+	CString a_line;	
+	int i=0;
+	//	a_line="WEEKLY ROUTINES INSERT\n";
+	//	default_file.WriteString(a_line.GetString());
+	a_line=_T("\tMon\tTue\tWed\tThu\tFri\tSat\tSun\tHoliday1Holiday2\n");
+	default_file.WriteString(a_line.GetString());
+	unsigned short on[72]={0};
+	unsigned short off[72]={0};
+	//	for(i=0;i<MAX_WR;i++)
+	//	{
+	Read_Multi(schedule_id,on,6216 + WR_TIME_SIZE*weekly_row_number,0x48);
+	//由上到下，由左到右，from up to lower ,from left to right
+	Read_Multi(schedule_id,off,7656 + WR_TIME_SIZE*weekly_row_number,0x48);
+	//由上到下，由左到右，from up to lower ,from left to right
+	for(int i=0;i<0x48;i++)
+	{
+		if(on[i]==255)
+			on[i]=0;
+		if(off[i]==255)
+			off[i]=0;
+	}
+	for(int w=0;w<4;w++)
+	{
+		int itemp=w*2;
+		a_line.Format(_T("ON:\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\n"),on[itemp+0*8],on[itemp+0*8+1],on[itemp+1*8],on[itemp+1*8+1],on[itemp+2*8],on[itemp+2*8+1],on[itemp+3*8],on[itemp+3*8+1],on[itemp+4*8],on[itemp+4*8+1],on[itemp+5*8],on[itemp+5*8+1],on[itemp+6*8],on[itemp+6*8+1],on[itemp+7*8],on[itemp+7*8+1],on[itemp+8*8],on[itemp+8*8+1]);
+		default_file.WriteString(a_line.GetString());
+		a_line.Format(_T("OFF:\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\n"),off[itemp+0*8],off[itemp+0*8+1],off[itemp+1*8],off[itemp+1*8+1],off[itemp+2*8],off[itemp+2*8+1],off[itemp+3*8],off[itemp+3*8+1],off[itemp+4*8],off[itemp+4*8+1],off[itemp+5*8],off[itemp+5*8+1],off[itemp+6*8],off[itemp+6*8+1],off[itemp+7*8],off[itemp+7*8+1],off[itemp+8*8],off[itemp+8*8+1]);
+		default_file.WriteString(a_line.GetString());
+	}
+	default_file.WriteString(_T("\n"));
+	//	}
+}
+void InputName_OutName_Description_LC(CStdioFile &default_file,int schedule_id){
+	CString a_line,temp;	
+	int i=0;
+
+	a_line=_T("Input and Output Description\n");
+	default_file.WriteString(a_line.GetString());
+	a_line=_T("\t\t");
+	for (i=0;i<OUTPUTCARD_NUM_PER_INPUTCARD;i++)
+	{
+		temp=_T("");//clear
+		temp.Format(_T("Out%02d\t"),i+1);
+		a_line+=temp;
+	}
+	a_line+=_T("\n");
+	default_file.WriteString(a_line.GetString());
+ 
+	
+	for (i=0;i<INPUTCARD_NUM;i++)
+	{   
+	    
+		 
+
+			OutCardName_Insert_Description_LC(default_file,schedule_id,i);
+
+    }
+
+}
+void OutCardName_Insert_Description_LC(CStdioFile &default_file,int schedule_id,int Input_CardNo){
+	CString a_line,temp;	
+	int i=0;
+	unsigned short temp_buffer[INPUT_DESCRIPTION_LENGTH]={0};
+	unsigned char temp_charbuffer[INPUT_DESCRIPTION_LENGTH];
+	unsigned short temp_buffer_out[INPUT_DESCRIPTION_LENGTH]={0};
+	unsigned char temp_charbuffer_out[INPUT_DESCRIPTION_LENGTH];
+	a_line=_T("");//clear
+	a_line.Format(_T("Input%02d:"),Input_CardNo+1);
+	Read_Multi(schedule_id,temp_buffer,INPUT_DESCRIPTION+Input_CardNo*INPUT_DESCRIPTION_LENGTH,INPUT_DESCRIPTION_LENGTH);
+	if(temp_buffer[0]==255)
+	{
+		for(int itt=0;itt<INPUT_DESCRIPTION_LENGTH;itt++)
+			temp_buffer[itt]=0;
+	}
+	for(int itt=0;itt<INPUT_DESCRIPTION_LENGTH;itt++)
+	{
+	   temp_charbuffer[itt] =(unsigned char) temp_buffer[itt];
+	}
+	temp=(CString)temp_charbuffer;
+	a_line+=temp;
+	a_line+=_T("\t");
+	for (i=0;i<OUTPUTCARD_NUM_PER_INPUTCARD;i++)
+	{
+		/*temp=_T("");
+		a_line+=temp;*/
+		//a_line.Format(_T("Out%2d:"),i+1);
+		Read_Multi(schedule_id,temp_buffer_out,OUTPUT_DESCRIPTION+(Input_CardNo*OUTPUTCARD_NUM_PER_INPUTCARD+i)*INPUT_DESCRIPTION_LENGTH,INPUT_DESCRIPTION_LENGTH);
+		if(temp_buffer_out[0]==255)
+		{
+			for(int itt=0;itt<INPUT_DESCRIPTION_LENGTH;itt++)
+				temp_buffer_out[itt]=0;
+		}
+		for(int itt=0;itt<INPUT_DESCRIPTION_LENGTH;itt++)
+		{temp_charbuffer_out[itt] =(unsigned char) temp_buffer_out[itt];}
+		
+		temp=(CString)temp_charbuffer_out;
+		temp+=_T("\t");
+		a_line+=temp;
+	}
+	 
+		a_line+=_T("\n");
+		default_file.WriteString(a_line.GetString());
+ 
+}
+//多写到Buffer
+void Switch_Config_LC(CStdioFile &default_file,int schedule_id){
+	CString a_line,temp,temp1;	
+	int i=0;
+	 int tempint=0;
+	a_line=_T("\nSwitch Config\n");
+	default_file.WriteString(a_line.GetString());
+	a_line=_T("\t\t//Auto/Manaul:A/M\tOT:OverrideTime\tMB:ManualBlock\tDT:DelayTime\n");
+	default_file.WriteString(a_line.GetString());
+	a_line=_T("\t\tType\t\tOT\tA/M\tMB\tDT\n");
+	default_file.WriteString(a_line.GetString());
+	unsigned short temp_Type[INPUTCARD_NUM],temp_OT[INPUTCARD_NUM],temp_AM[INPUTCARD_NUM],temp_MB[INPUTCARD_NUM],temp_DT[INPUTCARD_NUM];
+	Read_Multi(schedule_id,&temp_Type[0],SWITCH_TYPE,INPUTCARD_NUM);
+	Read_Multi(schedule_id,&temp_OT[0],OVER_TIME,INPUTCARD_NUM);
+	Read_Multi(schedule_id,&temp_AM[0],INPUT_AM,INPUTCARD_NUM);
+	Read_Multi(schedule_id,&temp_MB[0],INPUT_MB,INPUTCARD_NUM);
+	Read_Multi(schedule_id,&temp_DT[0],DELAY_TIME_SWITCH,INPUTCARD_NUM);
+	for (i=0;i<INPUTCARD_NUM;i++)
+	{   a_line=_T("");
+		temp.Format(_T("Switch%02d:"),i+1);
+		temp+=_T("\t");
+		a_line+=temp;
+	 
+		//temp.Format(_T("%d\t"),temp_Type[i]);
+		//a_line+=temp;
+		//Type
+		if (temp_Type[i]&1)
+		{
+			temp=_T("Low");
+		}
+		else if(temp_Type[i]&2)
+		{
+			temp=_T("High");
+		}
+		else if(temp_Type[i]&4)
+		{
+			temp=_T("Edge");
+		}
+		
+		if (temp_Type[i]&16)
+		{
+			temp+=_T(":OnOnly\t");
+		}
+		else if (temp_Type[i]&32)
+		{
+			temp+=_T(":On/Off\t");
+		}
+
+		a_line+=temp;
+
+		/////
+
+		temp.Format(_T("%d\t"),temp_OT[i]);
+		a_line+=temp;
+		tempint=temp_AM[i];
+		if (tempint==0)
+		{
+		temp=_T("AUTO\t");
+		} 
+		else if(tempint==1)
+		{
+		temp=_T("MAN\t");
+		}
+	 
+		a_line+=temp;
+		tempint=temp_MB[i];
+		if (tempint==0)
+		{
+			temp=_T("OFF\t");
+		} 
+		else if(tempint==1)
+		{
+			temp=_T("ON\t");
+	    }
+		a_line+=temp;
+		 
+		temp.Format(_T("%d\n"),temp_DT[i]);
+		a_line+=temp;
+		default_file.WriteString(a_line.GetString());
+
+		
+	}
+
+}
+//多写到buffer
+void Enable_Disable_Manual_Control_LC(CStdioFile &default_file,int schedule_id){
+	CString a_line,temp;	
+	int i=0;
+
+	a_line=_T("Enable/Disable Manual Control\n");
+	default_file.WriteString(a_line.GetString());
+	a_line=_T("\t\t");
+	for (int j=0;j<OUTPUTCARD_NUM_PER_INPUTCARD;j++)
+	{
+
+		temp=_T("");//clear
+		temp.Format(_T("Out%02d\t\t"),j+1);
+		a_line+=temp;
+	}
+	a_line+=_T("\n");
+	default_file.WriteString(a_line.GetString());
+	int tempint=0;
+	unsigned short DataBuffer[480];
+	for (i=0;i<6;i++)
+	{
+	  Read_Multi(schedule_id,&DataBuffer[i*80],ENABLE_DISABLE_MC+80*i,80);
+	}
+	for (i=0;i<INPUTCARD_NUM;i++)
+	{   
+		a_line=_T("");//clear
+		a_line.Format(_T("Switch%02d:\t"),i+1);
+		  
+		 for (int j=0;j<OUTPUTCARD_NUM_PER_INPUTCARD;j++)
+		 {  
+			 
+			 tempint=DataBuffer[OUTPUTCARD_NUM_PER_INPUTCARD*i+j];
+			 if (tempint&128)
+			 {
+			 temp=_T("Enable");
+			 } 
+			 else
+			 {
+			 temp=_T("Disable");
+			 }
+			 if (tempint&1)
+			 {
+			 temp+=_T(":On\t");
+			 } 
+			 else
+			 {
+			 temp+=_T(":Off\t");
+			 }
+			// temp.Format(_T("%02d\t"),tempint);
+			 a_line+=temp;
+		 }
+		 a_line+=_T("\n");
+		 default_file.WriteString(a_line.GetString());
+
+	}
+}
+//多写到buffer
+void Group_Config_LC(CStdioFile &default_file,int schedule_id){
+	CString a_line,temp;	
+	int i=0;
+	int tempint=0;
+	a_line=_T("Group Config\n");
+	default_file.WriteString(a_line.GetString());
+	a_line=_T("\t\t//Auto/Manaul:A/M\tMB:ManualBlock\n");
+	default_file.WriteString(a_line.GetString());
+	a_line=_T("\t\tA/M\tMB\n");
+	default_file.WriteString(a_line.GetString());
+	unsigned short temp_AM[GROUP_NUM],temp_MB[GROUP_NUM];
+	Read_Multi(schedule_id,&temp_AM[0],GROUP_AM,GROUP_NUM);
+	Read_Multi(schedule_id,&temp_MB[0],GROUP_MB,GROUP_NUM);
+	for (i=0;i<GROUP_NUM;i++)
+	{   
+	a_line=_T("");
+	temp.Format(_T("Group%02d:"),i+1);/////???为什么要两个\t才能对齐呢？？
+	temp+=_T("\t");
+	a_line+=temp;
+
+	 
+	tempint=temp_AM[i];
+	if (tempint==0)
+	{
+		temp=_T("AUTO\t");
+	} 
+	else if(tempint==1)
+	{
+		temp=_T("MAN\t");
+	}
+	/*temp.Format(_T("%d\t"),tempint);*/
+	a_line+=temp;
+	tempint=temp_MB[i];
+	if (tempint==0)
+	{
+		temp=_T("OFF\n");
+	} 
+	else if(tempint==1)
+	{
+		temp=_T("ON\n");
+	}
+	a_line+=temp;
+	default_file.WriteString(a_line.GetString());
+	}
+
+}
+//多写到buffer
+void Input_Output_Mapping_LC(CStdioFile &default_file,int schedule_id){
+	CString a_line,temp;	
+	int i=0;
+
+	a_line=_T("Input Output Mappings Config\n");
+	default_file.WriteString(a_line.GetString());
+	a_line=_T("\t\t");
+	for (int j=0;j<OUTPUTCARD_NUM_PER_INPUTCARD;j++)
+	{
+
+		temp=_T("");//clear
+		temp.Format(_T("Out%02d:ID%02d\t"),j+1,j+1);
+		a_line+=temp;
+	}
+	a_line+=_T("\n");
+	default_file.WriteString(a_line.GetString());
+	int tempint=0;
+	unsigned short DataBuffer[ONE_SWITCH_LENGTH];
+	for (i=0;i<INPUTCARD_NUM;i++)
+	{   
+		a_line=_T("");//clear
+		a_line.Format(_T("Switch%02d:\t"),i+1);
+		Read_Multi(schedule_id,&DataBuffer[0],INPUT_OUTPUT_MAPPING+i*ONE_SWITCH_LENGTH,ONE_SWITCH_LENGTH);
+		int id,outputvalue;
+		for (int j=0;j<OUTPUTCARD_NUM_PER_INPUTCARD;j++)
+		{    id=DataBuffer[3*j];
+		     outputvalue=DataBuffer[1+3*j]+DataBuffer[2+3*j]*256;
+			 temp.Format(_T("%d:%d\t\t"),tempint,id);
+			a_line+=temp;
+		}
+		a_line+=_T("\n");
+		default_file.WriteString(a_line.GetString());
+	}
+
+}
+//多写到buffer
+void Group_Output_Mapping_LC(CStdioFile &default_file,int schedule_id){
+	CString a_line,temp;	
+	int i=0;
+
+	a_line=_T("Group Output Mappings Config\n");
+	default_file.WriteString(a_line.GetString());
+	a_line=_T("\t\t");
+	for (int j=0;j<OUTPUTCARD_NUM_PER_INPUTCARD;j++)
+	{
+
+		temp=_T("");//clear
+		temp.Format(_T("Out%02d:ID%02d\t"),j+1,j+1);
+		a_line+=temp;
+	}
+	a_line+=_T("\n");
+	default_file.WriteString(a_line.GetString());
+	int tempint=0;
+	unsigned short DataBuffer[ONE_SWITCH_LENGTH];
+	for (i=0;i<GROUP_NUM;i++)
+	{   
+		a_line=_T("");//clear
+		a_line.Format(_T("Group%02d:\t"),i+1);
+		Read_Multi(schedule_id,&DataBuffer[0],GROUP_OUTPUT_MAPPING+i*ONE_GROUP_LENGTH,ONE_GROUP_LENGTH);
+		int id,outputvalue;
+		for (int j=0;j<OUTPUTCARD_NUM_PER_INPUTCARD;j++)
+		{ 
+		id=DataBuffer[3*j];
+		outputvalue=DataBuffer[1+3*j]+DataBuffer[2+3*j]*256;
+		temp.Format(_T("%d:%d\t\t"),outputvalue,id);
+		a_line+=temp;
+		}
+		a_line+=_T("\n");
+		default_file.WriteString(a_line.GetString());
+	}
+
+}
+
+void save_T3Modules_file(TCHAR* fn,int schedule_id){
+CStdioFile default_file;
+CString line;
+if(default_file.Open(fn,CFile::modeCreate | CFile::modeWrite)!=0){
+	default_file.WriteString(_T("T3 Modules config file\n"));
+	default_file.WriteString(_T("Model :"));
+	CString productname=GetProductName(product_register_value[7]);
+	default_file.WriteString(productname);
+	default_file.WriteString(_T("\n"));
+
+	T3Register temp;
+	vector<T3Register>VectorT3Register;
+	VectorT3Register.clear();
+	CADO m_ado;
+	m_ado.OnInitADOConn();
+#if 1
+	CString SQL = _T("select * from T3_RegisterList");
+	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
+	_variant_t vartemp;
+	while(!m_ado.m_pRecordset->EndOfFile)
+	{
+		temp.regID=m_ado.m_pRecordset->GetCollect(_T("RegID"));
+		vartemp =m_ado.m_pRecordset->GetCollect(productname.GetString());
+		if (vartemp.vt==VT_NULL)
+			temp.regName=_T("");
+		else
+			temp.regName =vartemp;
+		m_ado.m_pRecordset->MoveNext();
+		if (temp.regName.CompareNoCase(_T("RESERVED"))==0)
+		continue;
+		VectorT3Register.push_back(temp);
+	}
+	m_ado.CloseRecordset();
+	m_ado.CloseConn();
+#endif 
+    default_file.WriteString(_T("Reg No,Reg Value,Reg Name\n"));
+	vector<T3Register>::iterator iter;
+	for (iter=VectorT3Register.begin();iter!=VectorT3Register.end();iter++)
+	{
+		  
+		 line.Format(_T("%d,	%d,	%s\n"),iter->regID,product_register_value[iter->regID],iter->regName.GetString());
+	     default_file.WriteString(line);
+	}
+	default_file.Flush();
+	default_file.Close();
+}
+else
+{
+AfxMessageBox(_T("Open file failure!"));
+}
+}
+
 void variable_write(CStdioFile &default_file,int schedule_id)
 {
 	CString a_line;	
@@ -3868,9 +4721,20 @@ void variable_write(CStdioFile &default_file,int schedule_id)
 
 }
 
+void variable_write_LC(CStdioFile &default_file,int schedule_id)
+{
+	CString a_line;	
+	a_line=_T("VARIABLE LIST\n");
+	default_file.WriteString(a_line.GetString());
+	a_line.Format(_T("Input Filter Time:%d\n"),read_one(g_tstat_id,INPUT_FILTER_TIME));
+	default_file.WriteString(a_line.GetString());
+    
+	a_line.Format(_T("Relay Pulse Duration:%d\n"),read_one(g_tstat_id,RELAY_PULSE));
+	default_file.WriteString(a_line.GetString());
 
-
-
+	a_line.Format(_T("Delay Between Relay Pulses:%d\n"),read_one(g_tstat_id,DELAY_RELAY_PULSE));
+	default_file.WriteString(a_line.GetString());
+}
 void weekly_write(CStdioFile &default_file,int schedule_id)
 {
 	CString a_line;	
@@ -3948,48 +4812,40 @@ void weekly_write(CStdioFile &default_file,int schedule_id)
 		weekly_routines_insert_write(default_file,schedule_id,i);
 	}
 }
-
-
-
-
-
-
-
 void weekly_routines_insert_write(CStdioFile &default_file,int schedule_id,int weekly_row_number)
 {
 	CString a_line;	
 	int i=0;
-//	a_line="WEEKLY ROUTINES INSERT\n";
-//	default_file.WriteString(a_line.GetString());
+	//	a_line="WEEKLY ROUTINES INSERT\n";
+	//	default_file.WriteString(a_line.GetString());
 	a_line=_T("\tMon\tTue\tWed\tThu\tFri\tSat\tSun\tHoliday1Holiday2\n");
 	default_file.WriteString(a_line.GetString());
 	unsigned short on[72]={0};
 	unsigned short off[72]={0};
-//	for(i=0;i<MAX_WR;i++)
-//	{
-		Read_Multi(schedule_id,on,MODBUS_WR_ONTIME_FIRST + WR_TIME_SIZE*weekly_row_number,0x48);
-		//由上到下，由左到右，from up to lower ,from left to right
-		Read_Multi(schedule_id,off,MODBUS_WR_OFFTIME_FIRST + WR_TIME_SIZE*weekly_row_number,0x48);
-		//由上到下，由左到右，from up to lower ,from left to right
-		for(int i=0;i<0x48;i++)
-		{
-			if(on[i]==255)
-				on[i]=0;
-			if(off[i]==255)
-				off[i]=0;
-		}
-		for(int w=0;w<4;w++)
-		{
-			int itemp=w*2;
-			a_line.Format(_T("ON:\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\n"),on[itemp+0*8],on[itemp+0*8+1],on[itemp+1*8],on[itemp+1*8+1],on[itemp+2*8],on[itemp+2*8+1],on[itemp+3*8],on[itemp+3*8+1],on[itemp+4*8],on[itemp+4*8+1],on[itemp+5*8],on[itemp+5*8+1],on[itemp+6*8],on[itemp+6*8+1],on[itemp+7*8],on[itemp+7*8+1],on[itemp+8*8],on[itemp+8*8+1]);
-			default_file.WriteString(a_line.GetString());
-			a_line.Format(_T("OFF:\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\n"),off[itemp+0*8],off[itemp+0*8+1],off[itemp+1*8],off[itemp+1*8+1],off[itemp+2*8],off[itemp+2*8+1],off[itemp+3*8],off[itemp+3*8+1],off[itemp+4*8],off[itemp+4*8+1],off[itemp+5*8],off[itemp+5*8+1],off[itemp+6*8],off[itemp+6*8+1],off[itemp+7*8],off[itemp+7*8+1],off[itemp+8*8],off[itemp+8*8+1]);
-			default_file.WriteString(a_line.GetString());
-		}
-		default_file.WriteString(_T("\n"));
-//	}
+	//	for(i=0;i<MAX_WR;i++)
+	//	{
+	Read_Multi(schedule_id,on,MODBUS_WR_ONTIME_FIRST + WR_TIME_SIZE*weekly_row_number,0x48);
+	//由上到下，由左到右，from up to lower ,from left to right
+	Read_Multi(schedule_id,off,MODBUS_WR_OFFTIME_FIRST + WR_TIME_SIZE*weekly_row_number,0x48);
+	//由上到下，由左到右，from up to lower ,from left to right
+	for(int i=0;i<0x48;i++)
+	{
+		if(on[i]==255)
+			on[i]=0;
+		if(off[i]==255)
+			off[i]=0;
+	}
+	for(int w=0;w<4;w++)
+	{
+		int itemp=w*2;
+		a_line.Format(_T("ON:\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\n"),on[itemp+0*8],on[itemp+0*8+1],on[itemp+1*8],on[itemp+1*8+1],on[itemp+2*8],on[itemp+2*8+1],on[itemp+3*8],on[itemp+3*8+1],on[itemp+4*8],on[itemp+4*8+1],on[itemp+5*8],on[itemp+5*8+1],on[itemp+6*8],on[itemp+6*8+1],on[itemp+7*8],on[itemp+7*8+1],on[itemp+8*8],on[itemp+8*8+1]);
+		default_file.WriteString(a_line.GetString());
+		a_line.Format(_T("OFF:\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\t%d:%d\n"),off[itemp+0*8],off[itemp+0*8+1],off[itemp+1*8],off[itemp+1*8+1],off[itemp+2*8],off[itemp+2*8+1],off[itemp+3*8],off[itemp+3*8+1],off[itemp+4*8],off[itemp+4*8+1],off[itemp+5*8],off[itemp+5*8+1],off[itemp+6*8],off[itemp+6*8+1],off[itemp+7*8],off[itemp+7*8+1],off[itemp+8*8],off[itemp+8*8+1]);
+		default_file.WriteString(a_line.GetString());
+	}
+	default_file.WriteString(_T("\n"));
+	//	}
 }
-
 
 void annual_write(CStdioFile &default_file,int schedule_id)
 {
@@ -4067,6 +4923,83 @@ void annual_routines_insert_write(CStdioFile &default_file,int schedule_id,int w
 	a_line+=_T('\n');
 	default_file.WriteString(a_line.GetString());////////////////write
 }
+void annual_write_LC(CStdioFile &default_file,int schedule_id)
+{
+	CString a_line;	
+	int i=0;
+	a_line=_T("ANNUAL ROUTINES\n");
+	default_file.WriteString(a_line.GetString());
+
+	a_line=_T("Num\tFULL_LABEL\t\tA/M\tValue\tLabel\n");
+	default_file.WriteString(a_line.GetString());
+	unsigned short temp_buffer[AR_DESCRIPTION_SIZE]={0};
+	memset(&temp_buffer[0],0,sizeof(temp_buffer));
+	for(i=0;i<MAX_AR;i++)
+	{
+		a_line="";//clear
+		Read_Multi(schedule_id,temp_buffer,4896+i*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
+		if(temp_buffer[0]==255)
+		{
+			for(int itt=0;itt<AR_DESCRIPTION_SIZE;itt++)
+				temp_buffer[itt]=0;
+		}
+		description2 temp_description;
+		memset(&temp_description,0,sizeof(description2));
+		char *p;
+		p=(char *)&temp_description;///////////////*****pointer   attention
+		for(int j=0;j<AR_DESCRIPTION_SIZE;j++)
+			(*(p++))=(char)temp_buffer[j];
+		CString a_m,value;
+		if(temp_description.flag & 128)
+			a_m=_T("MAN");
+		else
+			a_m=_T("AUTO");
+		if(temp_description.flag & 64)
+			value=_T("ON");
+		else
+			value=_T("OFF");
+		if(strlen(temp_description.full_label)<8)
+			a_line.Format(_T("%s\t\t\t"),(CString)(temp_description.full_label));
+		else if(strlen(temp_description.full_label)<16)
+			a_line.Format(_T("\t%s\t\t"),(CString)(temp_description.full_label));
+		else if(strlen(temp_description.full_label)<20)
+			a_line.Format(_T("\t%s\t"),(CString)(temp_description.full_label));
+		a_line=a_line+a_m+_T("\t");
+		a_line=a_line+value+_T("\t");	
+		CString temp;
+		temp.Format(_T("%s\n"),(CString)(temp_description.label));
+		a_line=a_line+temp;
+		temp.Format(_T("%d:\t"),i+1);
+		a_line=temp+a_line;
+		default_file.WriteString(a_line.GetString());////////////////write
+		annual_routines_insert_write_LC(default_file,schedule_id,i);
+	}
+}
+void annual_routines_insert_write_LC(CStdioFile &default_file,int schedule_id,int weekly_row_number)
+{
+	unsigned short the_days[AR_TIME_SIZE];
+	CString a_line=_T("\t"),temp=_T("");	
+    Read_Multi(schedule_id,the_days,5480 + AR_TIME_SIZE*weekly_row_number,AR_TIME_SIZE);//get from network
+	for(int i=0;i<AR_TIME_SIZE;i++)
+	{
+		int j;
+		for(j=0;j<AR_TIME_SIZE;j++)
+		{
+			if(the_days[j]!=255)
+				break;
+		}
+		if(j==AR_TIME_SIZE)
+		{
+			for(j=0;j<AR_TIME_SIZE;j++)
+				the_days[j]=0;
+		}
+		temp.Format(_T("%02d,"),the_days[i]);
+		a_line+=temp;
+	}
+	a_line+=_T('\n');
+	default_file.WriteString(a_line.GetString());////////////////write
+}
+
 void configure_write(CStdioFile &default_file,int schedule_id)
 {
 	CString a_line;	
@@ -4121,7 +5054,1299 @@ void configure_write(CStdioFile &default_file,int schedule_id)
 		default_file.WriteString(a_line.GetString());
 	}
 }
+void Group_write(CStdioFile &default_file,int schedule_id)
+{
+	CString a_line;	
+	int i=0;
+	a_line=_T("GROUP SCHEDULE\n");
+	default_file.WriteString(a_line.GetString());
 
+	a_line=_T("Num\tLable\tA/M\tValue\tSchedule1\tstate1\tSchedule2\tstate2\n");
+	default_file.WriteString(a_line.GetString());
+	unsigned short temp_buffer[ID_SIZE]={0};
+	unsigned short temp_lable[GROUP_LABLE_SIZE]={0};
+	for(i=0;i<40;i++)
+	{
+		a_line=_T("");//clear
+		Read_Multi(schedule_id,temp_lable,14136+i*GROUP_LABLE_SIZE,GROUP_LABLE_SIZE);
+		Read_Multi(schedule_id,temp_buffer,5360+i*ID_SIZE,ID_SIZE);
+		if(temp_lable[0]==255)
+		{
+			for(int itt=0;itt<GROUP_LABLE_SIZE;itt++)
+				temp_lable[itt]=0;
+
+		}
+		if(temp_buffer[0]==255)
+		{
+			for(int itt=0;itt<ID_SIZE;itt++)
+				temp_buffer[itt]=0;
+			 
+		}			
+		description3_group temp_description;
+		char *p;
+		p=(char *)&temp_description;///////////////*****pointer   attention
+		
+		for(int j=0;j<GROUP_LABLE_SIZE;j++)
+				(*(p++))=(char)temp_lable[j];
+		for(int j=GROUP_LABLE_SIZE;j<GROUP_LABLE_SIZE+ID_SIZE;j++)
+			(*(p++))=(char)temp_buffer[j];
+
+		CString lable,state1,state2,a_m,value;
+		lable=(CString)temp_description.full_label+_T("\t");
+		if(temp_description.flag & 128)
+			a_m=_T("MAN\t");
+		else
+			a_m=_T("AUTO\t");
+		if(temp_description.flag & 64)
+			value=_T("ON\t");
+		else
+			value=_T("OFF\t");
+		if(temp_description.flag & 32)
+			state1=_T("ON\t");
+		else
+			state1=_T("OFF\t");
+		if(temp_description.flag & 16)
+			state2=_T("ON\n");
+		else
+			state2=_T("OFF\n");
+		a_line.Format(_T("%d:\t"),i+1);
+		a_line+=lable;
+		a_line+=a_m;
+		a_line+=value;
+		CString temp;		
+		temp.Format(_T("%d\t\t"),temp_description.schedul1);
+		a_line+=temp;
+		a_line+=state1;
+		temp.Format(_T("%d\t\t"),temp_description.schedul2);
+		a_line+=temp;
+		a_line+=state2;
+		default_file.WriteString(a_line.GetString());
+	}
+}
+CString get_left_first_array(CString &a_line)
+{
+	bool found_first_char=false;
+	CString return_str=_T("");
+	for(int i=0;i<a_line.GetLength();i++)
+	{
+		if(a_line.GetAt(i) == 9/* '\t'*/ || a_line.GetAt(i) == 0x20/* ' '*/ || a_line.GetAt(i)==',' || a_line.GetAt(i)==':')
+		{
+			if(found_first_char==true)
+				break;
+			else
+				continue;
+		}
+		return_str+=a_line.GetAt(i);
+		found_first_char=true;		
+	}
+	a_line=a_line.Right(a_line.GetLength()-a_line.Find(return_str.GetString())-return_str.GetLength());
+	return return_str;
+}
+void weekly_read(CStdioFile & default_file,int schedule_id, CStdioFile& logfile)
+{
+	CString strShowing;
+	CString a_line;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+
+		if(a_line.Find(_T("WEEKLY ROUTINES"))!=-1)
+			continue;
+		if(a_line.Find(_T("A/M"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("ANNUAL ROUTINES"))!=-1)//annual routines start
+			break;
+		if(a_line.Find(_T(":"))!=-1)			
+		{
+			CString strNum = a_line.Left(a_line.Find(_T(":")));
+			int j=_wtoi(strNum)-1;
+			unsigned char flag=0;
+			get_left_first_array(a_line);//clear left number
+			unsigned char temp_buffer[WR_DESCRIPTION_SIZE]={0};
+			CString full_label=get_left_first_array(a_line);
+			CString a_m;
+			if(full_label=="MAN" || full_label=="AUTO")
+			{
+				a_m=full_label;
+				full_label=_T("");
+			}
+			else
+				a_m=get_left_first_array(a_line);
+
+			CString output=get_left_first_array(a_line);
+			CString holiday1=get_left_first_array(a_line);
+			CString state1=get_left_first_array(a_line);
+			CString holiday2=get_left_first_array(a_line);
+			CString state2=get_left_first_array(a_line);
+			CString label=get_left_first_array(a_line);
+			int i=0;
+			for(i=0;i<full_label.GetLength() && i<20;i++)
+				temp_buffer[i]=(char)full_label.GetAt(i);
+			for(i=20;i<20+label.GetLength() && i<28;i++)
+				temp_buffer[i]=(char)label.GetAt(i-20);
+			temp_buffer[28]=(char)_wtoi(holiday1);
+			temp_buffer[29]=(char)_wtoi(holiday2);
+			if(state1==_T("ON"))
+				flag+=32;
+			if(state2==_T("ON"))
+				flag+=16;
+			if(output==_T("ON"))
+				flag+=64;
+			if(a_m==_T("MAN"))
+				flag+=128;
+			temp_buffer[30]=flag;
+			Write_Multi(schedule_id,temp_buffer,MODBUS_WR_DESCRIP_FIRST+j*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
+			weekly_routines_insert_read(default_file,schedule_id,j);
+		}
+	}while(1);	
+}
+void weekly_routines_insert_read(CStdioFile &default_file,int schedule_id,int weekly_row_number)
+{
+	CString a_line;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+		if(a_line.Find(_T("Mon"))!=-1)
+		{
+			CString on;
+			CString off;
+			unsigned char on_time[72];
+			unsigned char off_time[72];
+			for(int w=0;w<4;w++)
+			{
+				if(default_file.ReadString(on)==false)
+					return;
+				if(default_file.ReadString(off)==false)
+					return;
+				get_left_first_array(on);
+				get_left_first_array(off);
+				int itemp=w*2;
+				for(int i=0;i<9;i++)
+				{
+					on_time[itemp+i*8]=(char)_wtoi(get_left_first_array(on));
+					on_time[itemp+i*8+1]=(char)_wtoi(get_left_first_array(on));
+					off_time[itemp+i*8]=(char)_wtoi(get_left_first_array(off));
+					off_time[itemp+i*8+1]=(char)_wtoi(get_left_first_array(off));
+				}			
+			}
+			Write_Multi(schedule_id,on_time,MODBUS_WR_ONTIME_FIRST + WR_TIME_SIZE*weekly_row_number,WR_TIME_SIZE);
+			Write_Multi(schedule_id,off_time,MODBUS_WR_OFFTIME_FIRST + WR_TIME_SIZE*weekly_row_number,WR_TIME_SIZE);
+			break;
+		}
+		else
+			return;
+	}while(1);	
+}
+void weekly_read_LC(CStdioFile & default_file,int schedule_id, CStdioFile& logfile)
+{
+	CString strShowing;
+	CString a_line;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+
+		if(a_line.Find(_T("WEEKLY ROUTINES"))!=-1)
+			continue;
+		if(a_line.Find(_T("A/M"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("ANNUAL ROUTINES"))!=-1)//annual routines start
+			break;
+		if(a_line.Find(_T(":"))!=-1)			
+		{
+			CString strNum = a_line.Left(a_line.Find(_T(":")));
+			int j=_wtoi(strNum)-1;
+			unsigned char flag=0;
+			get_left_first_array(a_line);//clear left number
+			unsigned char temp_buffer[WR_DESCRIPTION_SIZE]={0};
+			CString full_label=get_left_first_array(a_line);
+			CString a_m;
+			if(full_label=="MAN" || full_label=="AUTO")
+			{
+				a_m=full_label;
+				full_label=_T("");
+			}
+			else
+				a_m=get_left_first_array(a_line);
+
+			CString output=get_left_first_array(a_line);
+			CString holiday1=get_left_first_array(a_line);
+			CString state1=get_left_first_array(a_line);
+			CString holiday2=get_left_first_array(a_line);
+			CString state2=get_left_first_array(a_line);
+			CString label=get_left_first_array(a_line);
+			int i=0;
+			for(i=0;i<full_label.GetLength() && i<20;i++)
+				temp_buffer[i]=(char)full_label.GetAt(i);
+			for(i=20;i<20+label.GetLength() && i<28;i++)
+				temp_buffer[i]=(char)label.GetAt(i-20);
+			temp_buffer[28]=(char)_wtoi(holiday1);
+			temp_buffer[29]=(char)_wtoi(holiday2);
+			if(state1==_T("ON"))
+				flag+=32;
+			if(state2==_T("ON"))
+				flag+=16;
+			if(output==_T("ON"))
+				flag+=64;
+			if(a_m==_T("MAN"))
+				flag+=128;
+			temp_buffer[30]=flag;
+			Write_Multi(schedule_id,temp_buffer,WEEKLY_ROUTINE_DESCRIPTION+j*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
+			weekly_routines_insert_read_LC(default_file,schedule_id,j);
+		}
+	}while(1);	
+}
+void weekly_routines_insert_read_LC(CStdioFile &default_file,int schedule_id,int weekly_row_number)
+{
+	CString a_line;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+		if(a_line.Find(_T("Mon"))!=-1)
+		{
+			CString on;
+			CString off;
+			unsigned char on_time[72];
+			unsigned char off_time[72];
+			for(int w=0;w<4;w++)
+			{
+				if(default_file.ReadString(on)==false)
+					return;
+				if(default_file.ReadString(off)==false)
+					return;
+				get_left_first_array(on);
+				get_left_first_array(off);
+				int itemp=w*2;
+				for(int i=0;i<9;i++)
+				{
+					on_time[itemp+i*8]=(char)_wtoi(get_left_first_array(on));
+					on_time[itemp+i*8+1]=(char)_wtoi(get_left_first_array(on));
+					off_time[itemp+i*8]=(char)_wtoi(get_left_first_array(off));
+					off_time[itemp+i*8+1]=(char)_wtoi(get_left_first_array(off));
+				}			
+			}
+			Write_Multi(schedule_id,on_time,WEEKLY_ROUTINE_ON_TIME + WR_TIME_SIZE*weekly_row_number,WR_TIME_SIZE);
+			Write_Multi(schedule_id,off_time,WEEKLY_ROUTINE_OFF_TIME  + WR_TIME_SIZE*weekly_row_number,WR_TIME_SIZE);
+			break;
+		}
+		else
+			return;
+	}while(1);	
+}
+void annual_read(CStdioFile &default_file,int schedule_id, CStdioFile& logfile)
+{
+	CString a_line, strShowing;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+
+		if(a_line.Find(_T("A/M"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("ID ROUTINES"))!=-1)//annual routines start
+			break;
+		if(a_line.Find(_T(":"))!=-1)			
+		{
+			int j=((char)_wtoi(a_line))-1;
+			unsigned char flag=0;
+			get_left_first_array(a_line);//clear left number
+			unsigned char temp_buffer[AR_DESCRIPTION_SIZE]={0};
+			CString full_label=get_left_first_array(a_line);
+			CString a_m;
+			if(full_label==_T("MAN") || full_label==_T("AUTO"))
+			{
+				a_m=full_label;
+				full_label=_T("");
+			}
+			else
+                a_m=get_left_first_array(a_line);
+			CString value=get_left_first_array(a_line);
+			CString label=get_left_first_array(a_line);
+			int i=0;
+			for(i=0;i<full_label.GetLength() && i<20;i++)
+				temp_buffer[i]=(char)(full_label.GetAt(i));
+			for(i=20;i<20+label.GetLength() && i<28;i++)
+				temp_buffer[i]=(char)(label.GetAt(i-20));
+			if(value==_T("ON"))
+				flag+=64;
+			if(a_m==_T("MAN"))
+				flag+=128;
+			temp_buffer[28]=flag;
+			Write_Multi(schedule_id,temp_buffer,MODBUS_AR_DESCRIP_FIRST+j*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
+			annual_routines_insert_read(default_file,schedule_id,j);
+		}
+	}while(1);	
+}
+void annual_routines_insert_read(CStdioFile &default_file,int schedule_id,int weekly_row_number)
+{
+	CString a_line;
+	if(default_file.ReadString(a_line)==false)
+		return;
+	unsigned char the_days[AR_TIME_SIZE];
+	for(int i=0;i<AR_TIME_SIZE;i++)
+		the_days[i]=(char)_wtoi(get_left_first_array(a_line));
+	Write_Multi(schedule_id,the_days,MODBUS_AR_TIME_FIRST + AR_TIME_SIZE*weekly_row_number,AR_TIME_SIZE);
+}
+void annual_read_LC(CStdioFile &default_file,int schedule_id, CStdioFile& logfile)
+{
+	CString a_line, strShowing;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+
+		if(a_line.Find(_T("ANNUAL ROUTINES"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("A/M"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("GROUP SCHEDULE"))!=-1)//annual routines start
+			break;
+		if(a_line.Find(_T(":"))!=-1)			
+		{
+			int j=((char)_wtoi(a_line))-1;
+			unsigned char flag=0;
+			get_left_first_array(a_line);//clear left number
+			unsigned char temp_buffer[AR_DESCRIPTION_SIZE]={0};
+			CString full_label=get_left_first_array(a_line);
+			CString a_m;
+			if(full_label==_T("MAN") || full_label==_T("AUTO"))
+			{
+				a_m=full_label;
+				full_label=_T("");
+			}
+			else
+				a_m=get_left_first_array(a_line);
+			CString value=get_left_first_array(a_line);
+			CString label=get_left_first_array(a_line);
+			int i=0;
+			for(i=0;i<full_label.GetLength() && i<20;i++)
+				temp_buffer[i]=(char)(full_label.GetAt(i));
+			for(i=20;i<20+label.GetLength() && i<28;i++)
+				temp_buffer[i]=(char)(label.GetAt(i-20));
+			if(value==_T("ON"))
+				flag+=64;
+			if(a_m==_T("MAN"))
+				flag+=128;
+			temp_buffer[28]=flag;
+			Write_Multi(schedule_id,temp_buffer,ANNUAL_ROUTINE_DESCRIPTION+j*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
+			annual_routines_insert_read_LC(default_file,schedule_id,j);
+		}
+	}while(1);	
+}
+void annual_routines_insert_read_LC(CStdioFile &default_file,int schedule_id,int weekly_row_number)
+{
+	CString a_line;
+	if(default_file.ReadString(a_line)==false)
+		return;
+	unsigned char the_days[AR_TIME_SIZE];
+	for(int i=0;i<AR_TIME_SIZE;i++)
+		the_days[i]=(char)_wtoi(get_left_first_array(a_line));
+	Write_Multi(schedule_id,the_days,ANNUAL_ROUTINE_TIME + AR_TIME_SIZE*weekly_row_number,AR_TIME_SIZE);
+}
+void configure_read(CStdioFile &default_file,int schedule_id, CStdioFile& logfile)
+{
+	CString a_line, strShowing;
+	int i = 0;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+
+		if(a_line.Find(_T("Schedule1"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("VARIABLE LIST"))!=-1)//annual routines start
+			break;
+		if(a_line.Find(_T(":"))!=-1)			
+		{
+			int j=(_wtoi(a_line))-1;
+			unsigned char flag=0;
+			get_left_first_array(a_line);//clear left number
+			unsigned char temp_buffer[ID_SIZE]={0};
+			CString a_m=get_left_first_array(a_line);
+			CString value=get_left_first_array(a_line);
+			temp_buffer[0]=(char)_wtoi(get_left_first_array(a_line));
+			CString state1=get_left_first_array(a_line);
+			temp_buffer[1]=(char)_wtoi(get_left_first_array(a_line));
+			CString state2=get_left_first_array(a_line);			
+			if(a_m==_T("MAN"))
+				flag+=128;
+			if(value==_T("ON"))
+				flag+=64;
+			if(state1==_T("ON"))
+				flag+=32;
+			if(state2==_T("ON"))
+				flag+=16;
+			temp_buffer[2]=flag;
+			Write_Multi(schedule_id,temp_buffer,MODBUS_ID_FIRST+j*ID_SIZE,ID_SIZE);
+			i++;
+			if (i == 253)
+			{
+				int n = 0;
+			}
+		}
+	}while(1);		
+}
+void Group_read_LC(CStdioFile &default_file,int schedule_id, CStdioFile& logfile){
+	CString a_line, strShowing;
+	 
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+		unsigned char lable_buffer[GROUP_LABLE_SIZE]={0};
+		if(a_line.Find(_T("GROUP SCHEDULE"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("A/M"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("Input and Output Description"))!=-1)//annual routines start
+			break;
+		if(a_line.Find(_T(":"))!=-1)			
+		{
+			int j=(_wtoi(a_line))-1;
+			unsigned char flag=0;
+			get_left_first_array(a_line);//clear left number
+			CString group_discription=get_left_first_array(a_line);
+			//transfer string to char array
+			for (int k=0;k<group_discription.GetLength();k++)
+			{
+			  if (k>=10)
+			  break;
+			  lable_buffer[k]=(char)group_discription.GetAt(k);
+			}
+			//write into group description
+			Write_Multi(schedule_id,lable_buffer,GROUP_DESCRIPTION_REG+j*GROUP_LABLE_SIZE,GROUP_LABLE_SIZE);
+
+			unsigned char temp_buffer[ID_SIZE]={0};
+			CString a_m=get_left_first_array(a_line);
+			CString value=get_left_first_array(a_line);
+			temp_buffer[0]=(char)_wtoi(get_left_first_array(a_line));
+			CString state1=get_left_first_array(a_line);
+			temp_buffer[1]=(char)_wtoi(get_left_first_array(a_line));
+			CString state2=get_left_first_array(a_line);			
+			if(a_m==_T("MAN"))
+				flag+=128;
+			if(value==_T("ON"))
+				flag+=64;
+			if(state1==_T("ON"))
+				flag+=32;
+			if(state2==_T("ON"))
+				flag+=16;
+			temp_buffer[2]=flag;
+
+			Write_Multi(schedule_id,temp_buffer,GROUP_DESCRIPTION_REG+j*ID_SIZE,ID_SIZE);
+			 
+			 
+		}
+	}while(1);		
+}
+void Input_Output_read_LC(CStdioFile &default_file,int schedule_id, CStdioFile& logfile){
+	CString a_line, strShowing;
+	int i = 0;
+	int j=-1;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+		unsigned char lable_buffer[GROUP_LABLE_SIZE]={0};
+		if(a_line.Find(_T("Input and Output Description"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("//"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("Switch Config"))!=-1)//annual routines start
+			break;
+		if(a_line.Find(_T(":"))!=-1)			
+		{
+			++j;
+			 
+			get_left_first_array(a_line);//clear left number
+			CString group_discription=get_left_first_array(a_line);
+			//transfer string to char array
+			for (int k=0;k<group_discription.GetLength();k++)
+			{
+				if (k>=10)
+					break;
+				lable_buffer[k]=(char)group_discription.GetAt(k);
+			}
+			Write_Multi(schedule_id,lable_buffer,INPUT_DESCRIPTION+j*GROUP_LABLE_SIZE,GROUP_LABLE_SIZE);
+
+			for (i=0;i<OUTPUTCARD_NUM_PER_INPUTCARD;i++)
+			{
+			 CString out_dis=get_left_first_array(a_line);
+			 unsigned char out_lable_buffer[GROUP_LABLE_SIZE]={0};
+			 for (int k=0;k<out_dis.GetLength();k++)
+			 {
+				 if (k>=10)
+					 break;
+				 out_lable_buffer[k]=(char)out_dis.GetAt(k);
+			 }
+			 
+			  Write_Multi(schedule_id,out_lable_buffer,OUTPUT_DESCRIPTION+(j*OUTPUTCARD_NUM_PER_INPUTCARD+i)*INPUT_DESCRIPTION_LENGTH,INPUT_DESCRIPTION_LENGTH);
+			}
+		}
+	}while(1);
+
+}
+void Switch_Config_read_LC(CStdioFile &default_file,int schedule_id, CStdioFile& logfile){
+	CString a_line, strShowing,strTemp;
+	int i = 0;
+	int j=-1;
+	int temp;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+		unsigned char lable_buffer[GROUP_LABLE_SIZE]={0};
+		if(a_line.Find(_T("Switch Config"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("//"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("Group Config"))!=-1)//annual routines start
+			break;
+		if(a_line.Find(_T(":"))!=-1)			
+		{
+			++j;
+			unsigned char flag=0;
+			get_left_first_array(a_line);//clear left number
+			strTemp=get_left_first_array(a_line);
+			temp=0;
+			if (strTemp.Find(_T("High"))!=-1)
+			{
+			temp+=1;
+			}
+			else if (strTemp.Find(_T("Low"))!=-1)
+			{
+			temp+=2;
+			}
+			else if (strTemp.Find(_T("Edge"))!=-1)
+			{
+			temp+=4;
+			}
+		
+		   strTemp=get_left_first_array(a_line);
+
+			if (strTemp.Find(_T("OnOnly"))!=-1)
+			{
+				temp+=16;
+			}
+			else if (strTemp.Find(_T("On/Off"))!=-1)
+			{
+				temp+=32;
+			}
+			
+			write_one(schedule_id,SWITCH_TYPE+j,temp);
+			 
+			strTemp=get_left_first_array(a_line);
+			temp=_wtoi(strTemp);//Override
+			write_one(schedule_id,OVER_TIME+j,temp);
+
+			strTemp=get_left_first_array(a_line);
+			
+			if (strTemp.Find(_T("AUTO"))!=-1)
+			{
+			temp=0;
+			} 
+			else
+			{
+			temp=1;
+			}
+		//	temp=_wtoi(strTemp);//Override
+			write_one(schedule_id,INPUT_AM+j,temp);
+
+			strTemp=get_left_first_array(a_line);
+			if (strTemp.Find(_T("OFF"))!=-1)
+			{
+				temp=0;
+			} 
+			else
+			{
+				temp=1;
+			}
+			write_one(schedule_id,INPUT_MB+j,temp);
+
+			strTemp=get_left_first_array(a_line);
+			temp=_wtoi(strTemp);//DelayTime
+			write_one(schedule_id,DELAY_TIME_SWITCH+j,temp);
+			
+		}
+	}while(1);		
+}
+void Group_Config_read_LC(CStdioFile &default_file,int schedule_id, CStdioFile& logfile){
+	CString a_line, strShowing,strTemp;
+	int i = 0;
+	int j=-1;
+	int temp;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+		unsigned char lable_buffer[GROUP_LABLE_SIZE]={0};
+		if(a_line.Find(_T("Group Config"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("//"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("Enable/Disable Manual Control"))!=-1)//annual routines start
+			break;
+		if(a_line.Find(_T(":"))!=-1)			
+		{
+			++j;
+			unsigned char flag=0;
+			get_left_first_array(a_line);//clear left number
+
+			strTemp=get_left_first_array(a_line);
+			if (strTemp.Find(_T("AUTO"))!=-1)
+			{
+				temp=0;
+			} 
+			else
+			{
+				temp=1;
+			}
+			//	temp=_wtoi(strTemp);//Override
+			write_one(schedule_id,GROUP_AM+j,temp);
+
+			strTemp=get_left_first_array(a_line);
+			if (strTemp.Find(_T("OFF"))!=-1)
+			{
+				temp=0;
+			} 
+			else
+			{
+				temp=1;
+			}
+			write_one(schedule_id,GROUP_MB+j,temp);
+		}
+	}while(1);		
+}
+void Enable_Disable_MC_read_LC(CStdioFile &default_file,int schedule_id, CStdioFile& logfile){
+	CString a_line, strShowing;
+	int i = 0;
+	int j=-1;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+	 
+		if(a_line.Find(_T("Enable/Disable Manual Control"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("//"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("Input Output Mappings Config"))!=-1)//annual routines start
+			break;
+		if(a_line.Find(_T(":"))!=-1)			
+		{
+		   
+			++j;
+
+			get_left_first_array(a_line);//clear left number
+			for (i=0;i<OUTPUTCARD_NUM_PER_INPUTCARD;i++)
+			{   unsigned short temp_value=0;
+				CString ENDIS=get_left_first_array(a_line);
+				CString OnOff=get_left_first_array(a_line);
+				if(ENDIS.Find(_T("Disable"))!=-1){
+				temp_value+=0;
+				}
+				else{
+				temp_value+=128;
+				}
+
+				if (OnOff.Find(_T("Off"))!=-1)
+				{
+				temp_value+=0;
+				} 
+				else
+				{
+				temp_value+=1;
+				}
+				write_one(schedule_id,ENABLE_DISABLE_MC+j*OUTPUTCARD_NUM_PER_INPUTCARD+i,temp_value);
+		   }
+		}
+	}while(1);
+
+}
+
+void Input_Output_Mapping_read_LC(CStdioFile &default_file,int schedule_id, CStdioFile& logfile){
+	CString a_line, strShowing;
+	int i = 0;
+	int j=-1;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+
+		if(a_line.Find(_T("Input Output Mappings Config"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("Out01:ID01"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("Group Output Mappings Config"))!=-1)//annual routines start
+			break;
+		if(a_line.Find(_T(":"))!=-1)			
+		{
+
+			++j;
+
+			get_left_first_array(a_line);//clear left number
+			for (i=0;i<OUTPUTCARD_NUM_PER_INPUTCARD;i++)
+			{
+			int output_value=0;
+			int address=0;   
+			unsigned short high,low=0;
+			CString outputvalue=get_left_first_array(a_line);
+			             get_left_first_array(a_line);//ID不要了
+			 output_value=_wtoi(outputvalue);
+			 high=output_value/256;
+			 low=output_value%256;
+
+			 address=INPUT_OUTPUT_MAPPING+j*ONE_GROUP_LENGTH+3*i;
+			 write_one(schedule_id,address+1,low);
+			 write_one(schedule_id,address+2,high);
+			}
+		}
+	}while(1);
+
+}
+
+void Group_Output_Mappings_read_LC(CStdioFile &default_file,int schedule_id, CStdioFile& logfile){
+	CString a_line, strShowing;
+	int i = 0;
+	int j=-1;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+
+		if(a_line.Find(_T("Group Output Mappings Config"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("Out01:ID01"))!=-1)//annual routines start
+			continue;
+		if(a_line.Find(_T("VARIABLE LIST"))!=-1)//annual routines start
+			break;
+		if(a_line.Find(_T(":"))!=-1)			
+		{
+
+			++j;
+
+			get_left_first_array(a_line);//clear left number
+			for (i=0;i<OUTPUTCARD_NUM_PER_INPUTCARD;i++)
+			{
+				int output_value=0;
+				int address=0;   
+				unsigned short high,low=0;
+				CString outputvalue=get_left_first_array(a_line);
+				get_left_first_array(a_line);//ID不要了
+				output_value=_wtoi(outputvalue);
+				high=output_value/256;
+				low=output_value%256;
+
+				address=GROUP_OUTPUT_MAPPING+j*ONE_GROUP_LENGTH+3*i;
+				write_one(schedule_id,address+1,low);
+				write_one(schedule_id,address+2,high);
+			}
+		}
+	}while(1);
+
+}
+
+void variable_read(CStdioFile &default_file,int schedule_id, CStdioFile& logfile)
+{
+	CString a_line, strShowing;
+	int j;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+
+
+		if((j=a_line.Find(_T(":")))!=-1)			
+		{
+			if(a_line.Find(NET_WORK_CONTROLLER[0])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,106,j);				
+			}
+			else if(a_line.Find(NET_WORK_CONTROLLER[1])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,107,j);				
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,108,j);				
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,109,j);				
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,110,j);				
+			}
+			else if(a_line.Find(NET_WORK_CONTROLLER[2])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,111,j);				
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,112,j);				
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,113,j);				
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,114,j);				
+			}
+			else if(a_line.Find(NET_WORK_CONTROLLER[3])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,115,j);				
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,116,j);				
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,117,j);				
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,118,j);				
+			}
+			else if(a_line.Find(NET_WORK_CONTROLLER[4])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,119,j);				
+			}
+			else if(a_line.Find(NET_WORK_CONTROLLER[5])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,120,j);				
+			}
+			else if(a_line.Find(NET_WORK_CONTROLLER[6])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,127,j);				
+
+			}
+			else if(a_line.Find(NET_WORK_CONTROLLER[7])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,121,j);				
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,122,j);				
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,123,j);				
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,124,j);				
+			}
+			else if(a_line.Find(NET_WORK_CONTROLLER[8])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,125,j);				
+			}
+			else if(a_line.Find(NET_WORK_CONTROLLER[9])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,126,j);				
+			}
+			else if(a_line.Find(NET_WORK_CONTROLLER[10])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,129,j);				
+			}
+			else if(a_line.Find(NET_WORK_CONTROLLER[11])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,130,j);				
+			}
+		}
+	}while(1);	
+}
+
+void variable_read_LC(CStdioFile &default_file,int schedule_id, CStdioFile& logfile)
+{
+	CString a_line, strShowing;
+	int j;
+	do{
+		if(default_file.ReadString(a_line)==false)
+			return;
+
+		//###############################
+		strShowing = a_line+_T("\n");
+		change_showing_text_variable(strShowing);
+		logfile.WriteString(strShowing);			
+		//###############################
+
+
+		if((j=a_line.Find(_T(":")))!=-1)			
+		{
+			if(a_line.Find(LC_VARIABLE_LIST[0])!=-1)
+			{
+				a_line=a_line.Right(a_line.GetLength()-j);
+				j=_wtoi(get_left_first_array(a_line));
+				write_one(schedule_id,INPUT_FILTER_TIME,j);	
+			}
+		}
+		else if(a_line.Find(LC_VARIABLE_LIST[1])!=-1)
+		{
+			a_line=a_line.Right(a_line.GetLength()-j);
+			j=_wtoi(get_left_first_array(a_line));
+			write_one(schedule_id,RELAY_PULSE,j);
+		}
+		else if(a_line.Find(LC_VARIABLE_LIST[2])!=-1)
+		{
+			a_line=a_line.Right(a_line.GetLength()-j);
+			j=_wtoi(get_left_first_array(a_line));
+			write_one(schedule_id,DELAY_RELAY_PULSE,j);
+		}
+	}while(1);	
+}
+
+void load_file_2_schedule_NC(TCHAR* fn,int schedule_id, CStdioFile& file)
+{
+	CStdioFile default_file;
+	
+	
+	if(default_file.Open((CString (fn)),CFile::modeRead)!=0)
+	{
+		CString a_line;
+		default_file.ReadString(a_line);
+		if(a_line.Find(_T("Network Controller"))==-1)
+		{
+			AfxMessageBox(_T("Wrong File!"));
+			return ;
+		}
+		write_one(schedule_id,16,0xAA);
+		Sleep(5);//here sleep for quick load file
+		showing_text = _T("Start read weekly routine...");
+		weekly_read(default_file,schedule_id, file);
+		showing_text = _T("Start read weekly routine...");
+ 		annual_read(default_file,schedule_id, file);
+ 		showing_text = _T("Start read weekly routine...");
+		configure_read(default_file,schedule_id, file);
+		showing_text = _T("Start read weekly routine...");
+		variable_read(default_file,schedule_id, file);
+		/////////////////////////////////////////////last work
+		default_file.Close();
+	}
+	else
+		AfxMessageBox(_T("Open file failure!"));	
+}
+void load_file_2_schedule_LC(TCHAR* fn,int schedule_id, CStdioFile& file)
+{
+    CStdioFile default_file;
+   
+	CString filepath_2(fn);
+	 
+    
+	if(default_file.Open(filepath_2,CFile::modeRead)!=0)
+	{
+		CString a_line;
+		default_file.ReadString(a_line);
+		
+		if(a_line.Find(_T("LC"))==-1)
+		{
+			AfxMessageBox(_T("Wrong File!"));
+			return ;
+		}
+		//write_one(schedule_id,16,0xAA);
+		//Sleep(5);//here sleep for quick load file
+		showing_text = _T("Start read weekly routine...");
+		default_file.ReadString(a_line);
+		default_file.ReadString(a_line);
+
+       weekly_read_LC(default_file,schedule_id, file);
+	   showing_text = _T("Start read annual routine...");
+	  annual_read_LC(default_file,schedule_id, file);
+		 showing_text = _T("Start read  Group_read_LC  ...");
+	    Group_read_LC(default_file,schedule_id, file);
+	 	showing_text = _T("Start read Input Output Description...");
+	   
+		/////////////////////////////////////////////last work
+		 Input_Output_read_LC(default_file,schedule_id, file);
+		 showing_text = _T("Start read Switch config...");
+		 Switch_Config_read_LC(default_file,schedule_id, file);
+		  showing_text = _T("Start read Group Config...");
+		   Group_Config_read_LC(default_file,schedule_id, file);
+		    showing_text = _T("Start read Enable Disable Manual Control...");
+		  Enable_Disable_MC_read_LC(default_file,schedule_id, file);
+		   showing_text = _T("Start read Input Output Mapping config...");
+		 Input_Output_Mapping_read_LC(default_file,schedule_id, file);
+		  showing_text = _T("Start read Croup Output Mapping  config...");
+		 Group_Output_Mappings_read_LC(default_file,schedule_id, file);
+		  showing_text = _T("Start read Some Variables config...");
+		variable_read_LC(default_file,schedule_id, file);
+		default_file.Close();
+	}
+	else
+		AfxMessageBox(_T("Open file failure!"));
+}
+void save_schedule_2_file_LC(TCHAR* fn,int schedule_id)
+{
+	CStdioFile default_file;
+	if(default_file.Open(fn,CFile::modeCreate | CFile::modeWrite)!=0)
+	{
+		//default_file.WriteString(_T("NET WORK\n"));
+		default_file.WriteString(_T("LC Config File\n"));
+		default_file.WriteString(_T("Model : LightingController \n"));
+		int nVersionLo = Read_One(g_tstat_id, 4);
+		int	nVersionHi = Read_One(g_tstat_id, 5);
+		float firmwareVersion =float(nVersionHi) + float(nVersionLo/100.0);
+		CString strFirmware;
+		strFirmware.Format(_T("%0.2f"), firmwareVersion);
+		CString strTips;
+		default_file.WriteString(_T("version : ")+strFirmware+_T("\n"));
+
+		strTips=_T("Weekly Routines Saving......");
+		SetPaneString(1, strTips);
+		weekly_write_LC(default_file,schedule_id);
+
+		strTips=_T("Annual Routines Saving......");
+		SetPaneString(1, strTips);
+		annual_write_LC(default_file,schedule_id);
+
+		strTips=_T("Group Schedule Saving......");
+		SetPaneString(1, strTips);
+		Group_write(default_file,schedule_id);
+
+		strTips=_T("Input Output Name Description Saving......");
+		SetPaneString(1, strTips);
+		InputName_OutName_Description_LC(default_file,schedule_id);
+
+		strTips=_T("Switch Config Saving......");
+		SetPaneString(1, strTips);
+		Switch_Config_LC(default_file,schedule_id);
+
+		strTips=_T("Group Config Saving......");
+		SetPaneString(1, strTips);
+		Group_Config_LC(default_file,schedule_id);
+
+		strTips=_T("Enable Disable Manual Control Saving......");
+		SetPaneString(1, strTips);
+		Enable_Disable_Manual_Control_LC(default_file,schedule_id);
+
+		strTips=_T("Input-Output-Mapping Saving......");
+		SetPaneString(1, strTips);
+		Input_Output_Mapping_LC(default_file,schedule_id);
+
+		strTips=_T("Group-Output-Mapping Saving......");
+		SetPaneString(1, strTips);
+		Group_Output_Mapping_LC(default_file,schedule_id);
+
+		strTips=_T("Some important Variable Saving......");
+		SetPaneString(1, strTips);
+		variable_write_LC(default_file,schedule_id); 
+
+		/////////////////////////////////////////////last work
+		default_file.Flush();
+		default_file.Close();
+	}
+	else
+		AfxMessageBox(_T("Open file failure!"));
+
+}
+void save_write_input_output(wofstream & out){
+_Twrite_to_file_a_line(out,_T("//Input Output Config"));//space
+	CString str1;
+	int m_outRows,m_inRows;
+	
+	//判断Input output 行数
+	#if 1
+	int nModel=product_register_value[MODBUS_PRODUCT_MODEL];
+	switch (nModel)
+	{
+	case 3:
+	case 2:
+	case 1:
+		{
+			m_outRows=6;
+			m_inRows=3;
+		}
+
+		break;
+	case 4:
+		{
+			m_outRows=6;
+			m_inRows=5;
+
+		}
+		break;	
+	case PM_TSTAT7:
+	case PM_TSTAT5D:  // 5D 同 TStat7
+		{
+			m_outRows=8;
+			m_inRows=5;
+
+		}break;
+	case PM_TSTAT6:
+		{
+			m_outRows=8;
+			m_inRows=12;
+		}break;
+	case PM_TSTAT5E:
+		{
+			m_outRows=8;
+			m_inRows=11;
+		}break;
+	case 17:
+		{
+			m_outRows=6;
+			m_inRows=5;
+		}
+		break;
+	case 18:
+		{
+			m_outRows=8;
+			m_inRows=4;
+		}
+		break;
+	case 19:
+		{
+			m_outRows=8;
+			m_inRows=9;
+		}
+		break;
+	case PM_PRESSURE:
+		{
+			m_outRows=8;
+			m_inRows=2;
+		}
+		break;
+
+	default:break;
+	}
+    #endif
+	int row=1;
+	int rows=m_inRows-1;
+	while (row<=rows)
+	{
+		switch (row)
+		{
+		case 1:
+		{
+		str1=_T("Input1_Name: ");
+		str1+=g_strInName1;
+
+		  _Twrite_to_file_a_line(out,str1);
+		}break;
+		case 2:
+			{
+				str1=_T("Input2_Name: ");
+				str1+=g_strInName2;
+
+				_Twrite_to_file_a_line(out,str1);
+			}break;
+		case 3:
+			{
+				str1=_T("Input3_Name: ");
+				str1+=g_strInName3;
+
+				_Twrite_to_file_a_line(out,str1);
+			}break;
+		case 4:
+			{
+				str1=_T("Input4_Name: ");
+				str1+=g_strInName4;
+
+				_Twrite_to_file_a_line(out,str1);
+			}break;
+		case 5:
+			{
+				str1=_T("Input5_Name: ");
+				str1+=g_strInName5;
+
+				_Twrite_to_file_a_line(out,str1);
+			}break;
+		case 6:
+			{
+				str1=_T("Input6_Name: ");
+				str1+=g_strInName6;
+
+				_Twrite_to_file_a_line(out,str1);
+			}break;
+		case 7:
+			{
+				str1=_T("Input7_Name: ");
+				str1+=g_strInName7;
+
+				_Twrite_to_file_a_line(out,str1);
+			}break;
+
+		case 8:
+			{
+				str1=_T("Input8_Name: ");
+				str1+=g_strInName8;
+				_Twrite_to_file_a_line(out,str1);
+			}break;
+		 
+		 
+	}
+	   
+	   row++;
+   }
+ }
 
 #if 0
 CString Show_load_file_result_message(load_file_every_step temppp,bool show_message_dialog)
@@ -4463,394 +6688,3 @@ void save_schedule_2_file(const char* fn,int schedule_id)
 }
 
 #endif
-CString get_left_first_array(CString &a_line)
-{
-	bool found_first_char=false;
-	CString return_str=_T("");
-	for(int i=0;i<a_line.GetLength();i++)
-	{
-		if(a_line.GetAt(i) == 9/* '\t'*/ || a_line.GetAt(i) == 0x20/* ' '*/ || a_line.GetAt(i)==',' || a_line.GetAt(i)==':')
-		{
-			if(found_first_char==true)
-				break;
-			else
-				continue;
-		}
-		return_str+=a_line.GetAt(i);
-		found_first_char=true;		
-	}
-	a_line=a_line.Right(a_line.GetLength()-a_line.Find(return_str.GetString())-return_str.GetLength());
-	return return_str;
-}
-
-
-
-
-void weekly_read(CStdioFile & default_file,int schedule_id, CStdioFile& logfile)
-{
-	CString strShowing;
-	CString a_line;
-	do{
-		if(default_file.ReadString(a_line)==false)
-			return;
-
-		//###############################
-		strShowing = a_line+_T("\n");
-		change_showing_text_variable(strShowing);
-		logfile.WriteString(strShowing);			
-		//###############################
-
-		if(a_line.Find(_T("WEEKLY ROUTINES"))!=-1)
-			continue;
-		if(a_line.Find(_T("A/M"))!=-1)//annual routines start
-			continue;
-		if(a_line.Find(_T("ANNUAL ROUTINES"))!=-1)//annual routines start
-			break;
-		if(a_line.Find(_T(":"))!=-1)			
-		{
-			CString strNum = a_line.Left(a_line.Find(_T(":")));
-			int j=_wtoi(strNum)-1;
-			unsigned char flag=0;
-			get_left_first_array(a_line);//clear left number
-			unsigned char temp_buffer[WR_DESCRIPTION_SIZE]={0};
-			CString full_label=get_left_first_array(a_line);
-			CString a_m;
-			if(full_label=="MAN" || full_label=="AUTO")
-			{
-				a_m=full_label;
-				full_label=_T("");
-			}
-			else
-                a_m=get_left_first_array(a_line);
-
-			CString output=get_left_first_array(a_line);
-			CString holiday1=get_left_first_array(a_line);
-			CString state1=get_left_first_array(a_line);
-			CString holiday2=get_left_first_array(a_line);
-			CString state2=get_left_first_array(a_line);
-			CString label=get_left_first_array(a_line);
-			int i=0;
-			for(i=0;i<full_label.GetLength() && i<20;i++)
-				temp_buffer[i]=(char)full_label.GetAt(i);
-			for(i=20;i<20+label.GetLength() && i<28;i++)
-				temp_buffer[i]=(char)label.GetAt(i-20);
-			temp_buffer[28]=(char)_wtoi(holiday1);
-			temp_buffer[29]=(char)_wtoi(holiday2);
-			if(state1==_T("ON"))
-				flag+=32;
-			if(state2==_T("ON"))
-				flag+=16;
-			if(output==_T("ON"))
-				flag+=64;
-			if(a_m==_T("MAN"))
-				flag+=128;
-			temp_buffer[30]=flag;
-			Write_Multi(schedule_id,temp_buffer,MODBUS_WR_DESCRIP_FIRST+j*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
-			weekly_routines_insert_read(default_file,schedule_id,j);
-		}
-	}while(1);	
-}
-
-void weekly_routines_insert_read(CStdioFile &default_file,int schedule_id,int weekly_row_number)
-{
-	CString a_line;
-	do{
-		if(default_file.ReadString(a_line)==false)
-			return;
-		if(a_line.Find(_T("Mon"))!=-1)
-		{
-			CString on;
-			CString off;
-			unsigned char on_time[72];
-			unsigned char off_time[72];
-			for(int w=0;w<4;w++)
-			{
-				if(default_file.ReadString(on)==false)
-					return;
-				if(default_file.ReadString(off)==false)
-					return;
-				get_left_first_array(on);
-				get_left_first_array(off);
-				int itemp=w*2;
-				for(int i=0;i<9;i++)
-				{
-					on_time[itemp+i*8]=(char)_wtoi(get_left_first_array(on));
-					on_time[itemp+i*8+1]=(char)_wtoi(get_left_first_array(on));
-					off_time[itemp+i*8]=(char)_wtoi(get_left_first_array(off));
-					off_time[itemp+i*8+1]=(char)_wtoi(get_left_first_array(off));
-				}			
-			}
-			Write_Multi(schedule_id,on_time,MODBUS_WR_ONTIME_FIRST + WR_TIME_SIZE*weekly_row_number,WR_TIME_SIZE);
-			Write_Multi(schedule_id,off_time,MODBUS_WR_OFFTIME_FIRST + WR_TIME_SIZE*weekly_row_number,WR_TIME_SIZE);
-			break;
-		}
-		else
-			return;
-	}while(1);	
-}
-
-
-void annual_read(CStdioFile &default_file,int schedule_id, CStdioFile& logfile)
-{
-	CString a_line, strShowing;
-	do{
-		if(default_file.ReadString(a_line)==false)
-			return;
-
-		//###############################
-		strShowing = a_line+_T("\n");
-		change_showing_text_variable(strShowing);
-		logfile.WriteString(strShowing);			
-		//###############################
-
-		if(a_line.Find(_T("A/M"))!=-1)//annual routines start
-			continue;
-		if(a_line.Find(_T("ID ROUTINES"))!=-1)//annual routines start
-			break;
-		if(a_line.Find(_T(":"))!=-1)			
-		{
-			int j=((char)_wtoi(a_line))-1;
-			unsigned char flag=0;
-			get_left_first_array(a_line);//clear left number
-			unsigned char temp_buffer[AR_DESCRIPTION_SIZE]={0};
-			CString full_label=get_left_first_array(a_line);
-			CString a_m;
-			if(full_label==_T("MAN") || full_label==_T("AUTO"))
-			{
-				a_m=full_label;
-				full_label=_T("");
-			}
-			else
-                a_m=get_left_first_array(a_line);
-			CString value=get_left_first_array(a_line);
-			CString label=get_left_first_array(a_line);
-			int i=0;
-			for(i=0;i<full_label.GetLength() && i<20;i++)
-				temp_buffer[i]=(char)(full_label.GetAt(i));
-			for(i=20;i<20+label.GetLength() && i<28;i++)
-				temp_buffer[i]=(char)(label.GetAt(i-20));
-			if(value==_T("ON"))
-				flag+=64;
-			if(a_m==_T("MAN"))
-				flag+=128;
-			temp_buffer[28]=flag;
-			Write_Multi(schedule_id,temp_buffer,MODBUS_AR_DESCRIP_FIRST+j*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
-			annual_routines_insert_read(default_file,schedule_id,j);
-		}
-	}while(1);	
-}
-void annual_routines_insert_read(CStdioFile &default_file,int schedule_id,int weekly_row_number)
-{
-	CString a_line;
-	if(default_file.ReadString(a_line)==false)
-		return;
-	unsigned char the_days[AR_TIME_SIZE];
-	for(int i=0;i<AR_TIME_SIZE;i++)
-		the_days[i]=(char)_wtoi(get_left_first_array(a_line));
-	Write_Multi(schedule_id,the_days,MODBUS_AR_TIME_FIRST + AR_TIME_SIZE*weekly_row_number,AR_TIME_SIZE);
-}
-void configure_read(CStdioFile &default_file,int schedule_id, CStdioFile& logfile)
-{
-	CString a_line, strShowing;
-	int i = 0;
-	do{
-		if(default_file.ReadString(a_line)==false)
-			return;
-
-		//###############################
-		strShowing = a_line+_T("\n");
-		change_showing_text_variable(strShowing);
-		logfile.WriteString(strShowing);			
-		//###############################
-
-		if(a_line.Find(_T("Schedule1"))!=-1)//annual routines start
-			continue;
-		if(a_line.Find(_T("VARIABLE LIST"))!=-1)//annual routines start
-			break;
-		if(a_line.Find(_T(":"))!=-1)			
-		{
-			int j=(_wtoi(a_line))-1;
-			unsigned char flag=0;
-			get_left_first_array(a_line);//clear left number
-			unsigned char temp_buffer[ID_SIZE]={0};
-			CString a_m=get_left_first_array(a_line);
-			CString value=get_left_first_array(a_line);
-			temp_buffer[0]=(char)_wtoi(get_left_first_array(a_line));
-			CString state1=get_left_first_array(a_line);
-			temp_buffer[1]=(char)_wtoi(get_left_first_array(a_line));
-			CString state2=get_left_first_array(a_line);			
-			if(a_m==_T("MAN"))
-				flag+=128;
-			if(value==_T("ON"))
-				flag+=64;
-			if(state1==_T("ON"))
-				flag+=32;
-			if(state2==_T("ON"))
-				flag+=16;
-			temp_buffer[2]=flag;
-			Write_Multi(schedule_id,temp_buffer,MODBUS_ID_FIRST+j*ID_SIZE,ID_SIZE);
-			i++;
-			if (i == 253)
-			{
-				int n = 0;
-			}
-		}
-	}while(1);		
-}
-void variable_read(CStdioFile &default_file,int schedule_id, CStdioFile& logfile)
-{
-	CString a_line, strShowing;
-	int j;
-	do{
-		if(default_file.ReadString(a_line)==false)
-			return;
-
-		//###############################
-		strShowing = a_line+_T("\n");
-		change_showing_text_variable(strShowing);
-		logfile.WriteString(strShowing);			
-		//###############################
-
-
-		if((j=a_line.Find(_T(":")))!=-1)			
-		{
-			if(a_line.Find(NET_WORK_CONTROLLER[0])!=-1)
-			{
-				a_line=a_line.Right(a_line.GetLength()-j);
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,106,j);				
-			}
-			else if(a_line.Find(NET_WORK_CONTROLLER[1])!=-1)
-			{
-				a_line=a_line.Right(a_line.GetLength()-j);
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,107,j);				
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,108,j);				
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,109,j);				
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,110,j);				
-			}
-			else if(a_line.Find(NET_WORK_CONTROLLER[2])!=-1)
-			{
-				a_line=a_line.Right(a_line.GetLength()-j);
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,111,j);				
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,112,j);				
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,113,j);				
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,114,j);				
-			}
-			else if(a_line.Find(NET_WORK_CONTROLLER[3])!=-1)
-			{
-				a_line=a_line.Right(a_line.GetLength()-j);
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,115,j);				
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,116,j);				
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,117,j);				
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,118,j);				
-			}
-			else if(a_line.Find(NET_WORK_CONTROLLER[4])!=-1)
-			{
-				a_line=a_line.Right(a_line.GetLength()-j);
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,119,j);				
-			}
-			else if(a_line.Find(NET_WORK_CONTROLLER[5])!=-1)
-			{
-				a_line=a_line.Right(a_line.GetLength()-j);
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,120,j);				
-			}
-			else if(a_line.Find(NET_WORK_CONTROLLER[6])!=-1)
-			{
-				a_line=a_line.Right(a_line.GetLength()-j);
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,127,j);				
-
-			}
-			else if(a_line.Find(NET_WORK_CONTROLLER[7])!=-1)
-			{
-				a_line=a_line.Right(a_line.GetLength()-j);
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,121,j);				
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,122,j);				
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,123,j);				
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,124,j);				
-			}
-			else if(a_line.Find(NET_WORK_CONTROLLER[8])!=-1)
-			{
-				a_line=a_line.Right(a_line.GetLength()-j);
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,125,j);				
-			}
-			else if(a_line.Find(NET_WORK_CONTROLLER[9])!=-1)
-			{
-				a_line=a_line.Right(a_line.GetLength()-j);
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,126,j);				
-			}
-			else if(a_line.Find(NET_WORK_CONTROLLER[10])!=-1)
-			{
-				a_line=a_line.Right(a_line.GetLength()-j);
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,129,j);				
-			}
-			else if(a_line.Find(NET_WORK_CONTROLLER[11])!=-1)
-			{
-				a_line=a_line.Right(a_line.GetLength()-j);
-				j=_wtoi(get_left_first_array(a_line));
-				write_one(schedule_id,130,j);				
-			}
-		}
-	}while(1);	
-}
-
-
-void load_file_2_schedule(TCHAR* fn,int schedule_id, CStdioFile& file)
-{
-	CStdioFile default_file;
-	if(default_file.Open((CString (fn)),CFile::modeRead)!=0)
-	{
-		CString a_line;
-		default_file.ReadString(a_line);
-		if(a_line.Find(_T("Network Controller"))==-1)
-		{
-			AfxMessageBox(_T("Wrong File!"));
-			return ;
-		}
-		write_one(schedule_id,16,0xAA);
-		Sleep(5);//here sleep for quick load file
-		showing_text = _T("Start read weekly routine...");
-		weekly_read(default_file,schedule_id, file);
-		showing_text = _T("Start read weekly routine...");
- 		annual_read(default_file,schedule_id, file);
- 		showing_text = _T("Start read weekly routine...");
-		configure_read(default_file,schedule_id, file);
-		showing_text = _T("Start read weekly routine...");
-		variable_read(default_file,schedule_id, file);
-		/////////////////////////////////////////////last work
-		default_file.Close();
-	}
-	else
-		AfxMessageBox(_T("Open file failure!"));	
-}
-
-
-void Write_newrigister()
-{
-
-}
-
-void WriteInputName(){
-	 
-}

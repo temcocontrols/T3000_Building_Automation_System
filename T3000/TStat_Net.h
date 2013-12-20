@@ -35,6 +35,10 @@ public:
 	virtual int GetIPPort()const; 
 	virtual void SetIPPort(int nPort);
 
+	int GetProtocol() const;
+	void SetProtocol(int nProtocol);
+
+
 	// 波特率
 	virtual int GetBaudRate()const; 
 	virtual void SetBaudRate(int nBaudRate);
@@ -53,7 +57,7 @@ public:
 	BOOL CTStat_Net::operator==(const CTStat_Net& dev);
 
 protected:
-
+	int				m_nprotocol;				//协议
 	int				m_nBaudRate;				// 波特率
 	int				m_nComPort;				// 串口	
 	DWORD		m_dwIPAddr;				// IP Address

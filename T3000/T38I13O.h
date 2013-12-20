@@ -13,7 +13,7 @@ class T38I13O : public CFormView
 public:
 	T38I13O();           // protected constructor used by dynamic creation
 	virtual ~T38I13O();
-
+	HANDLE m_threadT38I13o;
 public:
 	enum { IDD = IDD_T38I13O };
 #ifdef _DEBUG
@@ -28,15 +28,18 @@ protected:
 	virtual void OnInitialUpdate();
 	DECLARE_MESSAGE_MAP()
 public:
-void Fresh();
+    void Fresh();
     void InitialDialog();
 	void Initial_RegisterList();
+	void InitialTableName();
 	int  Get_RegID(CString Name);
 	vector<T3Register> m_vecT3Register;
 	bool m_isinput;
 	int m_curcol;
 	int m_currow;
-private:
+	int m_sn;
+	CString m_oldname;
+public:
 	    int	SN_LOW											 ;
 		int	SN_HI											 ;
 		int	EPROM_VER_NUMBER								 ;
@@ -184,6 +187,12 @@ public:
 	afx_msg void OnCbnSelchangeRangecombo();
 	void ClickMsflexgridOutput();
 	afx_msg void OnEnKillfocusEditName();
+	CComboBox m_brandratebombox;
+	CComboBox m_delaycombox;
+	afx_msg void OnCbnSelchangeBrandrate();
+	afx_msg void OnCbnSelchangeDelay();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnDestroy();
 };
 
 

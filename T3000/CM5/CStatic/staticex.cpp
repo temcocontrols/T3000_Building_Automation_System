@@ -80,7 +80,7 @@ BEGIN_MESSAGE_MAP(CStaticEx, CStatic)
 	//}}AFX_MSG_MAP
     ON_WM_SETCURSOR()
     ON_WM_CTLCOLOR_REFLECT()
-    ON_CONTROL_REFLECT( STN_CLICKED, OnClicked )
+  //  ON_CONTROL_REFLECT( STN_CLICKED, OnClicked )
 END_MESSAGE_MAP()
 
 CStaticEx::CStaticEx() 
@@ -286,7 +286,7 @@ HBRUSH CStaticEx::CtlColor(CDC* pDC, UINT nCtlColor)
 
     return (HBRUSH)m_brBkGround;
 }
-
+#if 0
 void CStaticEx::OnClicked()
 {
     if ( m_showThisCwnd )
@@ -323,7 +323,7 @@ void CStaticEx::OnClicked()
         ::SendMessage( m_sendMsgToThisCwnd->m_hWnd, m_wm_message, m_msg_flags, 0 );
     }
 }
-
+#endif
 BOOL CStaticEx::OnSetCursor( CWnd* pWnd, UINT nHitTest, UINT message )
 {
     HCURSOR hCursor;

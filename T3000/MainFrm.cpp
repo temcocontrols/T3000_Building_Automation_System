@@ -51,11 +51,16 @@
 #include "T332AI.h"
 #include "gloab_define.h"
 #include "CalibrationHumDlg.h"
+#include "T38AI8AO.h"
+ #include "rs485.h" // For call Get_RS485_Handle() function
+#include "BacnetWait.h"
 #pragma region Fance Test
 //For Test
 
 CTestMultiReadTraffic *g_testmultiReadtraffic_dlg=NULL;
-
+BacnetWait *WaitWriteDlg=NULL;
+HANDLE hwait_write_thread = NULL;
+_Refresh_Write_Info Write_Config_Info;
 HANDLE hStartEvent; // thread start event
 
 vector <MSG> My_Receive_msg;
@@ -65,6 +70,19 @@ HANDLE hDeal_thread;
 DWORD nThreadID_Do;
 
 CCriticalSection MyCriticalSection;
+CString SaveConfigFilePath;
+int m_MainHotKeyID[10] = 
+{
+	3001,
+	3002,
+	3003,
+	3004,
+	3005,
+	3006,
+	3007,
+	3008,
+	3009
+};
 
 //End for Test
 #pragma endregion 
@@ -143,6 +161,11 @@ const UINT uiFirstUserToolBarId = AFX_IDW_CONTROLBAR_FIRST + 40;
 const UINT uiLastUserToolBarId = uiFirstUserToolBarId + iMaxUserToolbars - 1;
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
+	ON_MESSAGE(MY_BAC_CONFIG_READ_RESULTS, ReadConfigFromDeviceMessageCallBack)
+	ON_MESSAGE(MY_RESUME_DATA, AllWriteMessageCallBack)
+	ON_MESSAGE(MY_RX_TX_COUNT, Refresh_RX_TX_Count)
+	ON_MESSAGE(WM_DELETE_NEW_MESSAGE_DLG,Delete_Write_New_Dlg)	
+	ON_MESSAGE(WM_HOTKEY,&CMainFrame::OnHotKey)
 	ON_WM_CREATE()
 	ON_COMMAND(ID_VIEW_CUSTOMIZE, &CMainFrame::OnViewCustomize)
 	ON_REGISTERED_MESSAGE(AFX_WM_CREATETOOLBAR, &CMainFrame::OnToolbarCreateNew)
@@ -206,6 +229,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_MISCELLANEOUS_LOADDESCRIPTORS, &CMainFrame::OnMiscellaneousLoaddescriptors)
 	ON_COMMAND(ID_MISCELLANEOUS_UPDATEMINI, &CMainFrame::OnMiscellaneousUpdatemini)
 	ON_COMMAND(ID_CONTROL_CONTROLLERS, &CMainFrame::OnControlControllers)
+	ON_COMMAND(ID_CONTROL_SCREENS, &CMainFrame::OnControlScreens)
+	ON_COMMAND(ID_CONTROL_MONITORS, &CMainFrame::OnControlMonitors)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -249,9 +274,12 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			continue;
 		if(g_tstat_id<0&&g_tstat_id>255)
 			continue;
-		
-		WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
-		//int nRet =read_one(g_tstat_id,6,1);这是原有代码，这样发现，真正调用此函数，成功返回率很低
+		if (!is_connect())
+		{
+			  continue;
+		}
+		WaitForSingleObject(Read_Mutex,INFINITE); 
+		 
 		int nRet =read_one(g_tstat_id,6,2);
 
 		if(nRet<0)	
@@ -259,9 +287,9 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			ReleaseMutex(Read_Mutex);//Add by Fance .
 			continue;
 		}
-//		int i;
+ 
 		for(int i=0;i<10;i++) //Modify by Fance , tstat 6 has more register than 512;
-		//for(i=0;i<8;i++)
+		 
 		{
 			if(g_tstat_id_changed)
 			{
@@ -374,6 +402,8 @@ CMainFrame::CMainFrame()
 
 	m_bDialogOpen = FALSE;
 	mbPollDlgOpen = FALSE;
+
+	mbPoll=NULL;
 }
 
 
@@ -416,7 +446,7 @@ void CMainFrame::InitViews()
 	m_pViews[DLG_CM5_BACNET_VIEW]=(CView*) new CDialogCM5_BacNet; //CM5
 	m_pViews[DLG_DIALOGT38I13O_VIEW]=(CView*) new T38I13O;
 	m_pViews[DLG_DIALOGT332AI_VIEW]=(CView*)new T332AI;
-
+	m_pViews[DLG_DIALOGT38AI8AO]=(CView*)new T38AI8AO;
 
 
 	CDocument* pCurrentDoc = GetActiveDocument();
@@ -584,12 +614,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
 #ifndef Fance_Enable_Test
-	 m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
-	 m_pRefreshThread->SetMainWnd(this);	
+	m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
+	m_pRefreshThread->SetMainWnd(this);	
 
 	// 需要执行线程中的操作时
-	 m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
-	 m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
+	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
+	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 #endif
 	//tstat6
 	Tstat6_func();//为TSTST6新寄存器用的。
@@ -635,7 +665,50 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	hDeal_thread =CreateThread(NULL,NULL,Translate_My_Message,this,NULL, &nThreadID_Do);
 
 
+	//Register热键   
+	#ifdef _DEBUG //debug版本   
+	int nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'S'); //热键 ctrl + S   
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + S failure"));  
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'P'); //热键 ctrl + d   
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + P failure"));  
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[2],MOD_ALT,'I'); //热键 ctrl + d   
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + I failure"));  
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[3],MOD_ALT,'O'); //热键 ctrl + d   
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + O failure"));  
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[4],MOD_ALT,'V'); //热键 ctrl + d   
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + V failure"));  
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[5],MOD_ALT,'C'); //热键 ctrl + d   
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + C failure"));  
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[6],MOD_ALT,'W'); //热键 ctrl + d   
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + W failure"));  
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[7],MOD_ALT,'A'); //热键 ctrl + d   
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + A failure"));  
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[8],MOD_ALT,'G'); //热键 ctrl + d   
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + G failure")); 
+	#else //release版本   
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'S'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'P'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[2],MOD_ALT,'I'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[3],MOD_ALT,'O'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[4],MOD_ALT,'V'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[5],MOD_ALT,'C'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[6],MOD_ALT,'W'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[7],MOD_ALT,'A'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[8],MOD_ALT,'G');
+	#endif  
+
+
 	MyRegAddress.MatchMoudleAddress();
+	bac_net_initial_once = false;
 	return 0;
 }
 
@@ -781,55 +854,6 @@ BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParent
 	return TRUE;
 }
 
-//afx_msg LRESULT CMainFrame::OnToolbarReset(WPARAM wp, LPARAM)
-//{
-//
-//	UINT uiToolBarId = (UINT) wp;	
-//	/*
-//	if (IDR_TOOLBAR_VER25049)
-//	{	
-//		//int n;
-//		m_wndToolBar.EnableTextLabels(true);
-//		//CMFCToolBarMenuButton btnEditor(ID_FILE_SAVE_CONFIG, NULL,GetCmdMgr ()->GetCmdImage (ID_FILE_SAVE_CONFIG), _T("Save"),FALSE);
-//		//CMFCToolBarMenuButton btnEditor(0, NULL,NULL, _T(""),FALSE);
-//		//n=GetCmdMgr ()->GetCmdImage (ID_CONFIGFILE_SAVE_AS);
-//		//m_wndToolBar.ReplaceButton (ID_FILE_OPEN, btnEditor);
-//		//m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_CONFIGFILE_SAVE_AS),_T("Save"));
-//
-//		//CMFCToolBarMenuButton btnLoadConfig(ID_LOAD_CONFIG, NULL,GetCmdMgr ()->GetCmdImage (ID_LOAD_CONFIG), _T("Load"),FALSE);
-//		//CMFCToolBarMenuButton btnLoadConfig(ID_LOAD_CONFIG, NULL,GetCmdMgr ()->GetCmdImage (ID_LOAD_CONFIG), _T(""),FALSE);
-//		//n=GetCmdMgr ()->GetCmdImage (ID_LOAD_CONFIG);
-//		//m_wndToolBar.ReplaceButton (ID_LOAD_CONFIG, btnLoadConfig);
-//		//m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_LOAD_CONFIG),_T("Load"));
-//
-//		//CMFCToolBarMenuButton btnBurn(ID_FILE_BATCHBURNHEX, NULL,GetCmdMgr ()->GetCmdImage (ID_FILE_BATCHBURNHEX), _T("Burn"),FALSE);
-//		//CMFCToolBarMenuButton btnBurn(ID_FILE_BATCHBURNHEX, NULL,GetCmdMgr ()->GetCmdImage (ID_FILE_BATCHBURNHEX), _T(""),FALSE);
-//		//m_wndToolBar.ReplaceButton (ID_FILE_BATCHBURNHEX, btnBurn);
-//		//n=m_wndToolBar.CommandToIndex (ID_FILE_BATCHBURNHEX);
-//		//m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_FILE_BATCHBURNHEX),_T("Burn"));
-//		
-//		CMFCToolBarMenuButton btnConnect(ID_CONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_CONNECT2), _T("Connect"),FALSE);
-//		//CMFCToolBarMenuButton btnConnect(ID_CONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_CONNECT2), _T(""),FALSE);
-//		m_wndToolBar.ReplaceButton (ID_CONNECT2, btnConnect);
-//		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_CONNECT2),_T("Connect"));
-//
-//		CMFCToolBarMenuButton btndiDisConnect(ID_DISCONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_DISCONNECT2), _T("DisConn"),FALSE);
-//		//CMFCToolBarMenuButton btndiDisConnect(ID_DISCONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_DISCONNECT2), _T(""),FALSE);
-//		m_wndToolBar.ReplaceButton (ID_DISCONNECT2, btndiDisConnect);
-//		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_DISCONNECT2),_T("DisConn"));
-//
-//		CMFCToolBarMenuButton btnScan(ID_SCAN, NULL,GetCmdMgr ()->GetCmdImage(ID_SCAN), _T("Scan"),FALSE);
-//		//CMFCToolBarMenuButton btnScan(ID_SCAN, NULL,GetCmdMgr ()->GetCmdImage(ID_SCAN), _T(""),FALSE);
-//		m_wndToolBar.ReplaceButton (ID_SCAN, btnScan);
-//		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_SCAN),_T("Scan"));
-//
-//		CMFCToolBarMenuButton btnConfig(ID_BUILDINGCONFIGDB, NULL, GetCmdMgr ()->GetCmdImage(ID_BUILDINGCONFIGDB), _T("Config"),FALSE);
-//		//CMFCToolBarMenuButton btnConnect(ID_CONNECT2, NULL, GetCmdMgr ()->GetCmdImage(ID_CONNECT2), _T(""),FALSE);
-//		m_wndToolBar.ReplaceButton (ID_BUILDINGCONFIGDB, btnConfig);
-//		m_wndToolBar.SetToolBarBtnText (m_wndToolBar.CommandToIndex (ID_BUILDINGCONFIGDB),_T("Config"));
-//	}
-//	*/return 1;
-//}
 
 void CMainFrame::OnCheckBuildingBar()
 {
@@ -847,97 +871,7 @@ void CMainFrame::OnUpdateCheckIOPane(CCmdUI* pCmdUI)
 {
 
 }
-void CMainFrame::EnterConnectToANode()
-{
-	Flexflash = TRUE;
-	HTREEITEM hSelItem;//=m_pTreeViewCrl->GetSelectedItem();
-	int nRet =read_one(g_tstat_id,6,1);
-
-	/*CPoint pt;
-	GetCursorPos(&pt);
-	m_pTreeViewCrl->ScreenToClient(&pt);*/
-	hSelItem = m_pTreeViewCrl->GetSelectedItem();
-
-	//////////////////////////////////////////////////////////////////////////
-	m_strCurSelNodeName = m_pTreeViewCrl->GetItemText(hSelItem);
-	//m_pTreeViewCrl->Expand(hSelItem,TVE_EXPAND);
-
-
-	//	BOOL ret  =  m_pTreeViewCrl->Retofline(hSelItem);//tree0412
-	//	if (ret)//tree0412
-	//	{
-
-	BeginWaitCursor();
-	//CM5
-	g_bChamber=FALSE;
-	m_isCM5=FALSE;
-	m_isMiniPanel=FALSE;
-#if 1
-	for(UINT i=0;i<m_product.size();i++)
-	{
-		if(hSelItem==m_product.at(i).product_item )
-		{			
-			if(m_product.at(i).product_class_id == PM_CM5)
-			{
-				g_tstat_id=m_product.at(i).product_id;
-				//SetPaneString(2,_T("Connect To CM5"));
-				m_isCM5=TRUE;
-				DoConnectToANode(hSelItem); 
-				//SwitchToPruductType(4);			
-			}
-			else if (m_product.at(i).product_class_id == PM_MINIPANEL)
-			{
-				g_tstat_id = m_product.at(i).product_id;
-				m_isMiniPanel=TRUE;
-				DoConnectToANode(hSelItem);
-				
-				//SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
-			}
-			else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
-			{
-				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(DLG_DIALOGT3_VIEW);
-			}
-			else if (m_product.at(i).product_class_id ==PM_AirQuality) //AirQuality
-			{
-				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(DLG_AIRQUALITY_VIEW);
-			}else if (m_product.at(i).product_class_id == PM_LightingController)//LightingController
-			{
-				g_tstat_id = m_product.at(i).product_id;
-				if(m_product.at(i).BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(m_product.at(i).BuildingInfo.strBuildingName)!=0)
-				{
-					//connect:
-					BOOL bRet = ConnectSubBuilding(m_product.at(i).BuildingInfo);
-					if (!bRet)
-					{
-						if(m_product.at(i).BuildingInfo.strProtocol.CompareNoCase(_T("Modbus TCP")) == 0) // net work protocol
-						{
-							CheckConnectFailure(m_product.at(i).BuildingInfo.strIp);
-						}
-					}
-				}
-				SwitchToPruductType(DLG_LIGHTINGCONTROLLER_VIEW);
-			}
-			else if (m_product.at(i).product_class_id==PM_TSTAT6_HUM_Chamber)
-			{	g_bChamber=TRUE;
-				g_tstat_id = m_product.at(i).product_id;
-
-			    SwitchToPruductType(DLG_HUMCHAMBER);
-			}
-			else 
-			{
-			            g_tstat_id = m_product.at(i).product_id;
-						DoConnectToANode(hSelItem); 
-			}
-
-		}
-	}
-#endif
-	//CM5
-
-	EndWaitCursor();
-}
+ 
 void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {	
      
@@ -985,10 +919,26 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 				g_tstat_id = m_product.at(i).product_id;
 				m_isMiniPanel=TRUE;
 				DoConnectToANode(hSelItem); 
-			}else if (m_product.at(i).product_class_id == T3_4AO_PRODUCT_MODEL) //T3
+			}
+			else if (m_product.at(i).product_class_id == PM_T3IOA)
+			{
+				g_tstat_id = m_product.at(i).product_id;
+				SwitchToPruductType(DLG_DIALOGT38AI8AO);
+			}
+			else if (m_product.at(i).product_class_id == PM_T38I13O)
+			{
+				g_tstat_id = m_product.at(i).product_id;
+				SwitchToPruductType(DLG_DIALOGT38I13O_VIEW);
+			}
+			else if (m_product.at(i).product_class_id == PM_T34AO) //T3
 			{
 				g_tstat_id = m_product.at(i).product_id;
 				SwitchToPruductType(DLG_DIALOGT3_VIEW);
+			}
+			else if (m_product.at(i).product_class_id==PM_T332AI)
+			{
+			    g_tstat_id = m_product.at(i).product_id;
+				SwitchToPruductType(DLG_DIALOGT332AI_VIEW);
 			}
 			else if (m_product.at(i).product_class_id ==PM_AirQuality) //AirQuality
 			{
@@ -1453,13 +1403,29 @@ try
 				m_product_temp.nEPsize=(int)_wtol(strTemp);
 
 				//m_product_temp.baudrate=m_pRs->GetCollect("Bautrate");
+				temp_variant=m_pRs->GetCollect("Protocol");//
+				if(temp_variant.vt!=VT_NULL)
+					strTemp=temp_variant;
+				else
+					strTemp=_T("");
+				m_product_temp.protocol = (int)_wtoi(strTemp);
 			
 				temp_variant=m_pRs->GetCollect("Bautrate");//
 				if(temp_variant.vt!=VT_NULL)
 					strTemp=temp_variant;
 				else
 					strTemp=_T("");
-				m_product_temp.baudrate=_wtoi(strTemp);
+				if(m_product_temp.protocol == 3)
+				{
+					char cTemp1[255];
+					memset(cTemp1,0,255);
+					WideCharToMultiByte( CP_ACP, 0, strTemp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+					DWORD dwIP = inet_addr(cTemp1); 
+
+					m_product_temp.baudrate=dwIP;//_wtoi(strTemp);
+				}
+				else
+					m_product_temp.baudrate=_wtoi(strTemp);
 				if (m_product_temp.product_class_id == PM_NC)
 				{m_product_temp.baudrate = 19200;
 				}
@@ -1543,6 +1509,12 @@ void CMainFrame::OnFileOpen()
 }
 void CMainFrame::OnLoadConfigFile()
 {
+	if(g_protocol == 2)
+	{
+		MainFram_hwd = this->m_hWnd;
+		LoadBacnetConfigFile();
+		return;
+	}
 	//AfxMessageBox(_T("Load configuration file."));
 	if(g_LoadConfigLevel==1)
 	{
@@ -1603,6 +1575,9 @@ void CMainFrame::OnConnect()
 			{
 				//AfxMessageBox(_T("Invalidate IP Address!!"));
 				//goto here;
+				CString strInfo;
+				strInfo.Format(_T("Invalidate IP Address,You can click config button to reset it."));
+				SetPaneString(1, strInfo);
 			}
 			else
 			{
@@ -1660,161 +1635,6 @@ void CMainFrame::OnConnect()
 					Change_BaudRate(default_com1_port_baudrate);
 				}	
 			}
-			/*
-			if (build_info.strComPort.CompareNoCase(_T("COM1"))==0)
-			{
-				open_com(1);//open*************************************
-				CString strInfo;
-				if(!is_connect())
-				{
-					strInfo=_T("Open COM1 Failure!");
-					SetPaneCommunicationPrompt(strInfo);
-				}
-				else
-				{
-					strInfo=_T("Connect COM1 successful.");
-					SetPaneCommunicationPrompt(strInfo);
-					Change_BaudRate(default_com1_port_baudrate);
-				}	
-			}
-			if (build_info.strComPort.CompareNoCase(_T("COM2"))==0)
-			{
-				open_com(2);//open ******************************************
-				if(!is_connect())
-				{
-					strInfo=_T("Open COM2 Failure!");
-					SetPaneCommunicationPrompt(strInfo);
-					AfxMessageBox(strInfo);
-				//	com_port_num=10;
-				}
-				else
-				{
-					strInfo=_T("Connect COM2 successful.");
-					SetPaneCommunicationPrompt(strInfo);
-					Change_BaudRate(default_com1_port_baudrate);
-				}	
-			}
-			if (build_info.strComPort.CompareNoCase(_T("COM3"))==0)
-			{
-				open_com(3);//open ******************************************
-				if(!is_connect())
-				{
-					strInfo=_T("Open COM3 Failure!");
-					SetPaneCommunicationPrompt(strInfo);
-					AfxMessageBox(strInfo);
-				//	com_port_num=10;
-				}
-				else
-				{
-					strInfo=_T("Connect COM3 successful.");
-					SetPaneCommunicationPrompt(strInfo);
-					Change_BaudRate(default_com1_port_baudrate);
-				}	
-			}
-			if (build_info.strComPort.CompareNoCase(_T("COM4"))==0)
-			{
-				open_com(4);//open ******************************************
-				if(!is_connect())
-				{
-					strInfo=_T("Open COM4 Failure!");
-					SetPaneCommunicationPrompt(strInfo);
-					AfxMessageBox(strInfo);
-				//	com_port_num=10;
-				}
-				else
-				{
-					strInfo=_T("Connect COM4 successful.");
-					SetPaneCommunicationPrompt(strInfo);
-					Change_BaudRate(default_com1_port_baudrate);
-				}	
-			}
-			if (build_info.strComPort.CompareNoCase(_T("COM5"))==0)
-			{
-				open_com(5);//open ******************************************
-				if(!is_connect())
-				{
-					strInfo=_T("Open COM5 Failure!");
-					SetPaneCommunicationPrompt(strInfo);
-					AfxMessageBox(strInfo);
-				}
-				else
-				{
-					strInfo=_T("Connect COM5 successful.");
-					SetPaneCommunicationPrompt(strInfo);
-					Change_BaudRate(default_com1_port_baudrate);
-					AfxMessageBox(strInfo);
-				}	
-			}
-			if (build_info.strComPort.CompareNoCase(_T("COM6"))==0)
-			{
-				open_com(6);//open ******************************************
-				if(!is_connect())
-				{
-					strInfo=_T("Open COM6 Failure!");
-					SetPaneCommunicationPrompt(strInfo);
-					AfxMessageBox(strInfo);
-				}
-				else
-				{
-					strInfo=_T("Connect COM6 successful.");
-					SetPaneCommunicationPrompt(strInfo);
-					Change_BaudRate(default_com1_port_baudrate);
-				}	
-			}
-			if (build_info.strComPort.CompareNoCase(_T("COM7"))==0)
-			{
-				open_com(7);//open ******************************************
-				if(!is_connect())
-				{
-					strInfo=_T("Open COM7 Failure!");
-					SetPaneCommunicationPrompt(strInfo);
-					AfxMessageBox(strInfo);
-				//	com_port_num=10;
-				}
-				else
-				{
-					strInfo=_T("Connect COM7 successful.");
-					SetPaneCommunicationPrompt(strInfo);
-					Change_BaudRate(default_com1_port_baudrate);
-				}	
-			}
-			if (build_info.strComPort.CompareNoCase(_T("COM8"))==0)
-			{
-				open_com(8);//open ******************************************
-				if(!is_connect())
-				{
-					strInfo=_T("Open COM8 Failure!");
-					SetPaneCommunicationPrompt(strInfo);
-					AfxMessageBox(strInfo);
-				//	com_port_num=10;
-				}
-				else
-				{
-					strInfo=_T("Connect COM8 successful.");
-					SetPaneCommunicationPrompt(strInfo);
-					Change_BaudRate(default_com1_port_baudrate);
-				}	
-			}
-			if (build_info.strComPort.CompareNoCase(_T("COM9"))==0)
-			{
-				open_com(9);//open ******************************************
-				if(!is_connect())
-				{
-					strInfo=_T("Open COM9 Failure!");
-					SetPaneCommunicationPrompt(strInfo);
-					AfxMessageBox(strInfo);
-				}
-				else
-				{
-					strInfo=_T("Connect COM9 successful.");
-					SetPaneCommunicationPrompt(strInfo);
-					Change_BaudRate(default_com1_port_baudrate);
-				}	
-			}
-
-			*/
-
-
 		}//endof rs485 checking
 	}
 
@@ -2188,8 +2008,19 @@ here:
 	case DLG_GRAPGIC_VIEW:
 		{
 			m_nCurView=DLG_GRAPGIC_VIEW;
+			if(bac_cm5_graphic == false)
+			{
+			
 			int nSerialNum=get_serialnumber();
 			((CGraphicView*)m_pViews[m_nCurView])->InitGraphic(nSerialNum,g_tstat_id);
+			}
+			else
+			{
+//#ifdef Fance_Enable_Test
+				int nSerialNum =2222;
+//#endif
+			((CGraphicView*)m_pViews[m_nCurView])->InitGraphic(nSerialNum,g_bac_instance);
+			}
 		}
 		break;
 	case DLG_TRENDLOG_VIEW:
@@ -2251,11 +2082,17 @@ here:
 	    m_nCurView=DLG_DIALOGT38I13O_VIEW;
 		((T38I13O*)m_pViews[m_nCurView])->Fresh();
 	}
+		break;
 	case DLG_DIALOGT332AI_VIEW:
 	{
 	   m_nCurView=DLG_DIALOGT332AI_VIEW;
 	   ((T332AI*)m_pViews[m_nCurView])->Fresh();
-	}
+	}	break;
+	case DLG_DIALOGT38AI8AO :
+		{
+			m_nCurView=DLG_DIALOGT38AI8AO;
+			((T38AI8AO*)m_pViews[m_nCurView])->Fresh();
+		}	break;
 	}
 //here
 }
@@ -2315,7 +2152,20 @@ void CMainFrame::Scan_Product()
 	ClearBuilding();
 
 	
+	HANDLE temphandle;//如果用户点击Scan，而 bacnet的线程还在继续工作，需要先结束这两个线程;
+	if(bac_net_initial_once)
+	{
+		temphandle = Get_RS485_Handle();
+		if(temphandle !=NULL)
+		{
+			TerminateThread((HANDLE)Get_Thread1(),0);
+			TerminateThread((HANDLE)Get_Thread2(),0);
 
+			CloseHandle(temphandle);
+			Set_RS485_Handle(NULL);
+			bac_net_initial_once = false;
+		}
+	}
 	//g_pauseMultiReadEvent.SetEvent();
 	//Sleep(500);
 
@@ -3304,12 +3154,1521 @@ void CMainFrame::OnLabe2()
 void CMainFrame::OnLabe3()
 {
 }
+
+void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
+{
+	for (int i=0;i<BAC_INPUT_GROUP;i++)
+	{
+
+		Write_Config_Info.Write_Input_Info[i].command = 0;
+		Write_Config_Info.Write_Input_Info[i].device_id = 0;
+		Write_Config_Info.Write_Input_Info[i].start_instance =0;
+		Write_Config_Info.Write_Input_Info[i].end_instance =0;
+		Write_Config_Info.Write_Input_Info[i].has_resend_yes_or_no = 0;
+		Write_Config_Info.Write_Input_Info[i].resend_count = 0;
+		Write_Config_Info.Write_Input_Info[i].task_result = BAC_RESULTS_UNKONW;
+		Write_Config_Info.Write_Input_Info[i].invoke_id = -1;
+		//bac_input_read_results = 0;
+		Write_Config_Info.Write_Input_Info[i].timeout_count = 0;
+	}
+
+	for (int i=0;i<BAC_OUTPUT_GROUP;i++)
+	{
+
+		Write_Config_Info.Write_Output_Info[i].command = 0;
+		Write_Config_Info.Write_Output_Info[i].device_id = 0;
+		Write_Config_Info.Write_Output_Info[i].start_instance =0;
+		Write_Config_Info.Write_Output_Info[i].end_instance =0;
+		Write_Config_Info.Write_Output_Info[i].has_resend_yes_or_no = 0;
+		Write_Config_Info.Write_Output_Info[i].resend_count = 0;
+		Write_Config_Info.Write_Output_Info[i].task_result = BAC_RESULTS_UNKONW;
+		Write_Config_Info.Write_Output_Info[i].invoke_id = -1;
+		//bac_input_read_results = 0;
+		Write_Config_Info.Write_Output_Info[i].timeout_count = 0;
+	}
+
+	for (int i=0;i<BAC_VARIABLE_GROUP;i++)
+	{
+
+		Write_Config_Info.Write_Variable_Info[i].command = 0;
+		Write_Config_Info.Write_Variable_Info[i].device_id = 0;
+		Write_Config_Info.Write_Variable_Info[i].start_instance =0;
+		Write_Config_Info.Write_Variable_Info[i].end_instance =0;
+		Write_Config_Info.Write_Variable_Info[i].has_resend_yes_or_no = 0;
+		Write_Config_Info.Write_Variable_Info[i].resend_count = 0;
+		Write_Config_Info.Write_Variable_Info[i].task_result = BAC_RESULTS_UNKONW;
+		Write_Config_Info.Write_Variable_Info[i].invoke_id = -1;
+		//bac_input_read_results = 0;
+		Write_Config_Info.Write_Variable_Info[i].timeout_count = 0;
+	}
+
+	for (int i=0;i<BAC_PROGRAM_GROUP;i++)
+	{
+
+		Write_Config_Info.Write_Program_Info[i].command = 0;
+		Write_Config_Info.Write_Program_Info[i].device_id = 0;
+		Write_Config_Info.Write_Program_Info[i].start_instance =0;
+		Write_Config_Info.Write_Program_Info[i].end_instance =0;
+		Write_Config_Info.Write_Program_Info[i].has_resend_yes_or_no = 0;
+		Write_Config_Info.Write_Program_Info[i].resend_count = 0;
+		Write_Config_Info.Write_Program_Info[i].task_result = BAC_RESULTS_UNKONW;
+		Write_Config_Info.Write_Program_Info[i].invoke_id = -1;
+		//bac_input_read_results = 0;
+		Write_Config_Info.Write_Program_Info[i].timeout_count = 0;
+	}
+
+	for (int i=0;i<BAC_PROGRAMCODE_GROUP;i++)
+	{
+
+		Write_Config_Info.Write_Programcode_Info[i].command = 0;
+		Write_Config_Info.Write_Programcode_Info[i].device_id = 0;
+		Write_Config_Info.Write_Programcode_Info[i].start_instance =0;
+		Write_Config_Info.Write_Programcode_Info[i].end_instance =0;
+		Write_Config_Info.Write_Programcode_Info[i].has_resend_yes_or_no = 0;
+		Write_Config_Info.Write_Programcode_Info[i].resend_count = 0;
+		Write_Config_Info.Write_Programcode_Info[i].task_result = BAC_RESULTS_UNKONW;
+		Write_Config_Info.Write_Programcode_Info[i].invoke_id = -1;
+		//bac_input_read_results = 0;
+		Write_Config_Info.Write_Programcode_Info[i].timeout_count = 0;
+	}
+
+	for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
+	{
+
+		Write_Config_Info.Write_Controller_Info[i].command = 0;
+		Write_Config_Info.Write_Controller_Info[i].device_id = 0;
+		Write_Config_Info.Write_Controller_Info[i].start_instance =0;
+		Write_Config_Info.Write_Controller_Info[i].end_instance =0;
+		Write_Config_Info.Write_Controller_Info[i].has_resend_yes_or_no = 0;
+		Write_Config_Info.Write_Controller_Info[i].resend_count = 0;
+		Write_Config_Info.Write_Controller_Info[i].task_result = BAC_RESULTS_UNKONW;
+		Write_Config_Info.Write_Controller_Info[i].invoke_id = -1;
+		//bac_input_read_results = 0;
+		Write_Config_Info.Write_Controller_Info[i].timeout_count = 0;
+	}
+
+	for (int i=0;i<BAC_SCREEN_GROUP;i++)
+	{
+
+		Write_Config_Info.Write_Screen_Info[i].command = 0;
+		Write_Config_Info.Write_Screen_Info[i].device_id = 0;
+		Write_Config_Info.Write_Screen_Info[i].start_instance =0;
+		Write_Config_Info.Write_Screen_Info[i].end_instance =0;
+		Write_Config_Info.Write_Screen_Info[i].has_resend_yes_or_no = 0;
+		Write_Config_Info.Write_Screen_Info[i].resend_count = 0;
+		Write_Config_Info.Write_Screen_Info[i].task_result = BAC_RESULTS_UNKONW;
+		Write_Config_Info.Write_Screen_Info[i].invoke_id = -1;
+		//bac_input_read_results = 0;
+		Write_Config_Info.Write_Screen_Info[i].timeout_count = 0;
+	}
+
+	for (int i=0;i<BAC_WEEKLY_GROUP;i++)
+	{
+
+		Write_Config_Info.Write_Weekly_Info[i].command = 0;
+		Write_Config_Info.Write_Weekly_Info[i].device_id = 0;
+		Write_Config_Info.Write_Weekly_Info[i].start_instance =0;
+		Write_Config_Info.Write_Weekly_Info[i].end_instance =0;
+		Write_Config_Info.Write_Weekly_Info[i].has_resend_yes_or_no = 0;
+		Write_Config_Info.Write_Weekly_Info[i].resend_count = 0;
+		Write_Config_Info.Write_Weekly_Info[i].task_result = BAC_RESULTS_UNKONW;
+		Write_Config_Info.Write_Weekly_Info[i].invoke_id = -1;
+		//bac_input_read_results = 0;
+		Write_Config_Info.Write_Weekly_Info[i].timeout_count = 0;
+	}
+
+	for (int i=0;i<BAC_ANNUAL_GROUP;i++)
+	{
+
+		Write_Config_Info.Write_Annual_Info[i].command = 0;
+		Write_Config_Info.Write_Annual_Info[i].device_id = 0;
+		Write_Config_Info.Write_Annual_Info[i].start_instance =0;
+		Write_Config_Info.Write_Annual_Info[i].end_instance =0;
+		Write_Config_Info.Write_Annual_Info[i].has_resend_yes_or_no = 0;
+		Write_Config_Info.Write_Annual_Info[i].resend_count = 0;
+		Write_Config_Info.Write_Annual_Info[i].task_result = BAC_RESULTS_UNKONW;
+		Write_Config_Info.Write_Annual_Info[i].invoke_id = -1;
+		//bac_input_read_results = 0;
+		Write_Config_Info.Write_Annual_Info[i].timeout_count = 0;
+	}
+
+	for (int i=0;i<BAC_MONITOR_GROUP;i++)
+	{
+
+		Write_Config_Info.Write_Monitor_Info[i].command = 0;
+		Write_Config_Info.Write_Monitor_Info[i].device_id = 0;
+		Write_Config_Info.Write_Monitor_Info[i].start_instance =0;
+		Write_Config_Info.Write_Monitor_Info[i].end_instance =0;
+		Write_Config_Info.Write_Monitor_Info[i].has_resend_yes_or_no = 0;
+		Write_Config_Info.Write_Monitor_Info[i].resend_count = 0;
+		Write_Config_Info.Write_Monitor_Info[i].task_result = BAC_RESULTS_UNKONW;
+		Write_Config_Info.Write_Monitor_Info[i].invoke_id = -1;
+		//bac_input_read_results = 0;
+		Write_Config_Info.Write_Monitor_Info[i].timeout_count = 0;
+	}
+
+
+	WaitWriteDlg = NULL;
+	if(WaitWriteDlg==NULL)
+	{
+		
+
+
+		WaitWriteDlg = new BacnetWait(1);
+		WaitWriteDlg->Create(IDD_DIALOG_BACNET_WAIT,this);
+		WaitWriteDlg->ShowWindow(SW_SHOW);
+
+		RECT RECT_SET1;
+		if(BacNet_hwd)
+		::GetWindowRect(BacNet_hwd,&RECT_SET1);
+		else
+		GetWindowRect(&RECT_SET1);
+		//	GetClientRect(&RECT_SET1);
+		//WaitDlg->MoveWindow(RECT_SET1.left+100,RECT_SET1.bottom-200,560/*RECT_SET1.left+270*//*RECT_SET1.right/2+20*/,100);
+		WaitWriteDlg->MoveWindow(RECT_SET1.left+100,RECT_SET1.top+400,560/*RECT_SET1.left+270*//*RECT_SET1.right/2+20*/,100);
+	}
+
+	//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);
+	if(hwait_write_thread==NULL)
+	{
+		hwait_write_thread =CreateThread(NULL,NULL,Send_Set_Config_Command_Thread,this,NULL, NULL);
+	}
+}
+
+LRESULT CMainFrame::Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam)
+{
+	int message_type = wParam;
+	switch(message_type)
+	{
+	case 0:
+		if(WaitWriteDlg!=NULL)
+		{
+			Sleep(1000);
+			delete WaitWriteDlg;
+			WaitWriteDlg = NULL;
+
+		}
+		break;
+	}
+
+	return 0;
+}
+
+
+
+DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
+{
+	//Write_Config_Info
+	CMainFrame *pParent = (CMainFrame *)lpVoid;
+	
+
+
+
+	int resend_count;
+	for (int i=0;i<BAC_INPUT_GROUP;i++)
+	{
+			resend_count = 0;
+			do 
+			{
+				resend_count ++;
+				if(resend_count>RESEND_COUNT)
+					goto mywriteend;
+				g_invoke_id =WritePrivateData(g_bac_instance,WRITEINPUT_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i);
+				//g_invoke_id = GetPrivateData(g_bac_instance,READINPUT_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,sizeof(Str_in_point));
+				Sleep(SEND_COMMAND_DELAY_TIME);
+			} while (g_invoke_id<0);
+
+			Write_Config_Info.Write_Input_Info[i].command = WRITEINPUT_T3000;
+			Write_Config_Info.Write_Input_Info[i].device_id = g_bac_instance;
+			Write_Config_Info.Write_Input_Info[i].start_instance = (BAC_READ_GROUP_NUMBER)*i;
+			Write_Config_Info.Write_Input_Info[i].end_instance =3+(BAC_READ_GROUP_NUMBER)*i;
+			Write_Config_Info.Write_Input_Info[i].invoke_id = g_invoke_id;
+
+
+			CString temp_cs;
+			temp_cs.Format(_T("Task ID = %d. Write Input List Item From %d to %d "),g_invoke_id,
+				Write_Config_Info.Write_Input_Info[i].start_instance,
+				Write_Config_Info.Write_Input_Info[i].end_instance);
+			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
+
+	}
+
+
+	for (int i=0;i<BAC_OUTPUT_GROUP;i++)
+	{
+		resend_count = 0;
+		do 
+		{
+			resend_count ++;
+			if(resend_count>RESEND_COUNT)
+				goto mywriteend;
+			g_invoke_id =WritePrivateData(g_bac_instance,WRITEOUTPUT_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i);
+			//g_invoke_id = GetPrivateData(g_bac_instance,READINPUT_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,sizeof(Str_in_point));
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (g_invoke_id<0);
+
+		Write_Config_Info.Write_Output_Info[i].command = WRITEOUTPUT_T3000;
+		Write_Config_Info.Write_Output_Info[i].device_id = g_bac_instance;
+		Write_Config_Info.Write_Output_Info[i].start_instance = (BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Output_Info[i].end_instance =3+(BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Output_Info[i].invoke_id = g_invoke_id;
+
+
+		CString temp_cs;
+		temp_cs.Format(_T("Task ID = %d. Write Output List Item From %d to %d "),g_invoke_id,
+			Write_Config_Info.Write_Output_Info[i].start_instance,
+			Write_Config_Info.Write_Output_Info[i].end_instance);
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
+
+	}
+
+	for (int i=0;i<BAC_VARIABLE_GROUP;i++)
+	{
+		resend_count = 0;
+		do 
+		{
+			resend_count ++;
+			if(resend_count>RESEND_COUNT)
+				goto mywriteend;
+			g_invoke_id =WritePrivateData(g_bac_instance,WRITEVARIABLE_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i);
+			//g_invoke_id = GetPrivateData(g_bac_instance,READINPUT_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,sizeof(Str_in_point));
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (g_invoke_id<0);
+
+		Write_Config_Info.Write_Variable_Info[i].command = WRITEVARIABLE_T3000;
+		Write_Config_Info.Write_Variable_Info[i].device_id = g_bac_instance;
+		Write_Config_Info.Write_Variable_Info[i].start_instance = (BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Variable_Info[i].end_instance =3+(BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Variable_Info[i].invoke_id = g_invoke_id;
+
+
+		CString temp_cs;
+		temp_cs.Format(_T("Task ID = %d. Write Variable List Item From %d to %d "),g_invoke_id,
+			Write_Config_Info.Write_Variable_Info[i].start_instance,
+			Write_Config_Info.Write_Variable_Info[i].end_instance);
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
+
+	}
+
+	for (int i=0;i<BAC_PROGRAM_GROUP;i++)
+	{
+		resend_count = 0;
+		do 
+		{
+			resend_count ++;
+			if(resend_count>RESEND_COUNT)
+				goto mywriteend;
+			g_invoke_id =WritePrivateData(g_bac_instance,WRITEPROGRAM_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i);
+			//g_invoke_id = GetPrivateData(g_bac_instance,READINPUT_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,sizeof(Str_in_point));
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (g_invoke_id<0);
+
+		Write_Config_Info.Write_Program_Info[i].command = WRITEPROGRAM_T3000;
+		Write_Config_Info.Write_Program_Info[i].device_id = g_bac_instance;
+		Write_Config_Info.Write_Program_Info[i].start_instance = (BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Program_Info[i].end_instance =3+(BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Program_Info[i].invoke_id = g_invoke_id;
+
+
+		CString temp_cs;
+		temp_cs.Format(_T("Task ID = %d. Write Program List Item From %d to %d "),g_invoke_id,
+			Write_Config_Info.Write_Program_Info[i].start_instance,
+			Write_Config_Info.Write_Program_Info[i].end_instance);
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
+
+	}
+
+
+
+	for (int i=0;i<BAC_PROGRAMCODE_GROUP;i++)
+	{
+		resend_count = 0;
+		do 
+		{
+			resend_count ++;
+			if(resend_count>RESEND_COUNT)
+				goto mywriteend;
+			g_invoke_id =WritePrivateData(g_bac_instance,WRITEPROGRAMCODE_T3000,i,i);
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (g_invoke_id<0);
+
+		Write_Config_Info.Write_Programcode_Info[i].command = WRITEPROGRAMCODE_T3000;
+		Write_Config_Info.Write_Programcode_Info[i].device_id = g_bac_instance;
+		Write_Config_Info.Write_Programcode_Info[i].start_instance = i;
+		Write_Config_Info.Write_Programcode_Info[i].end_instance =i;
+		Write_Config_Info.Write_Programcode_Info[i].invoke_id = g_invoke_id;
+
+
+		CString temp_cs;
+		temp_cs.Format(_T("Task ID = %d. Write Program code List Item From %d to %d "),g_invoke_id,
+			Write_Config_Info.Write_Programcode_Info[i].start_instance,
+			Write_Config_Info.Write_Programcode_Info[i].end_instance);
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
+
+	}
+
+
+
+	for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
+	{
+		resend_count = 0;
+		do 
+		{
+			resend_count ++;
+			if(resend_count>RESEND_COUNT)
+				goto mywriteend;
+			g_invoke_id =WritePrivateData(g_bac_instance,WRITECONTROLLER_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i);
+			//g_invoke_id = GetPrivateData(g_bac_instance,READINPUT_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,sizeof(Str_in_point));
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (g_invoke_id<0);
+
+		Write_Config_Info.Write_Controller_Info[i].command = WRITECONTROLLER_T3000;
+		Write_Config_Info.Write_Controller_Info[i].device_id = g_bac_instance;
+		Write_Config_Info.Write_Controller_Info[i].start_instance = (BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Controller_Info[i].end_instance =3+(BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Controller_Info[i].invoke_id = g_invoke_id;
+
+
+		CString temp_cs;
+		temp_cs.Format(_T("Task ID = %d. Write Controller List Item From %d to %d "),g_invoke_id,
+			Write_Config_Info.Write_Controller_Info[i].start_instance,
+			Write_Config_Info.Write_Controller_Info[i].end_instance);
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
+
+	}
+
+	for (int i=0;i<BAC_SCREEN_GROUP;i++)
+	{
+		resend_count = 0;
+		do 
+		{
+			resend_count ++;
+			if(resend_count>RESEND_COUNT)
+				goto mywriteend;
+			g_invoke_id =WritePrivateData(g_bac_instance,WRITESCREEN_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i);
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (g_invoke_id<0);
+
+		Write_Config_Info.Write_Screen_Info[i].command = WRITESCREEN_T3000;
+		Write_Config_Info.Write_Screen_Info[i].device_id = g_bac_instance;
+		Write_Config_Info.Write_Screen_Info[i].start_instance = (BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Screen_Info[i].end_instance =3+(BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Screen_Info[i].invoke_id = g_invoke_id;
+
+
+		CString temp_cs;
+		temp_cs.Format(_T("Task ID = %d. Write Screen List Item From %d to %d "),g_invoke_id,
+			Write_Config_Info.Write_Screen_Info[i].start_instance,
+			Write_Config_Info.Write_Screen_Info[i].end_instance);
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
+
+	}
+
+	for (int i=0;i<BAC_ANNUAL_GROUP;i++)
+	{
+		resend_count = 0;
+		do 
+		{
+			resend_count ++;
+			if(resend_count>RESEND_COUNT)
+				goto mywriteend;
+			g_invoke_id =WritePrivateData(g_bac_instance,WRITEANNUALROUTINE_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i);
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (g_invoke_id<0);
+
+		Write_Config_Info.Write_Annual_Info[i].command = WRITEANNUALROUTINE_T3000;
+		Write_Config_Info.Write_Annual_Info[i].device_id = g_bac_instance;
+		Write_Config_Info.Write_Annual_Info[i].start_instance = (BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Annual_Info[i].end_instance =3+(BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Annual_Info[i].invoke_id = g_invoke_id;
+
+
+		CString temp_cs;
+		temp_cs.Format(_T("Task ID = %d. Write Annual List Item From %d to %d "),g_invoke_id,
+			Write_Config_Info.Write_Annual_Info[i].start_instance,
+			Write_Config_Info.Write_Annual_Info[i].end_instance);
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
+
+	}
+
+	for (int i=0;i<BAC_WEEKLY_GROUP;i++)
+	{
+		resend_count = 0;
+		do 
+		{
+			resend_count ++;
+			if(resend_count>RESEND_COUNT)
+				goto mywriteend;
+			g_invoke_id =WritePrivateData(g_bac_instance,WRITEWEEKLYROUTINE_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i);
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (g_invoke_id<0);
+
+		Write_Config_Info.Write_Weekly_Info[i].command = WRITEWEEKLYROUTINE_T3000;
+		Write_Config_Info.Write_Weekly_Info[i].device_id = g_bac_instance;
+		Write_Config_Info.Write_Weekly_Info[i].start_instance = (BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Weekly_Info[i].end_instance =3+(BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Weekly_Info[i].invoke_id = g_invoke_id;
+
+
+		CString temp_cs;
+		temp_cs.Format(_T("Task ID = %d. Write Weekly List Item From %d to %d "),g_invoke_id,
+			Write_Config_Info.Write_Weekly_Info[i].start_instance,
+			Write_Config_Info.Write_Weekly_Info[i].end_instance);
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
+
+	}
+
+
+	for (int i=0;i<BAC_MONITOR_GROUP;i++)
+	{
+		resend_count = 0;
+		do 
+		{
+			resend_count ++;
+			if(resend_count>RESEND_COUNT)
+				goto mywriteend;
+			g_invoke_id =WritePrivateData(g_bac_instance,WRITEMONITOR_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i);
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (g_invoke_id<0);
+
+		Write_Config_Info.Write_Monitor_Info[i].command = WRITEWEEKLYROUTINE_T3000;
+		Write_Config_Info.Write_Monitor_Info[i].device_id = g_bac_instance;
+		Write_Config_Info.Write_Monitor_Info[i].start_instance = (BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Monitor_Info[i].end_instance =3+(BAC_READ_GROUP_NUMBER)*i;
+		Write_Config_Info.Write_Monitor_Info[i].invoke_id = g_invoke_id;
+
+
+		CString temp_cs;
+		temp_cs.Format(_T("Task ID = %d. Write Monitor List Item From %d to %d "),g_invoke_id,
+			Write_Config_Info.Write_Monitor_Info[i].start_instance,
+			Write_Config_Info.Write_Monitor_Info[i].end_instance);
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
+
+	}
+
+
+
+	hwait_write_thread = NULL;
+	return 0;
+mywriteend:
+
+	AfxMessageBox(_T("Send Command Timeout!Please try it again!"));
+	::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,0,0);
+	hwait_write_thread = NULL;
+	return 0;
+}
+
+LRESULT  CMainFrame::ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM lParam)
+{
+	bool msg_result=WRITE_FAIL;
+	msg_result = MKBOOL(wParam);
+	if(msg_result)
+	{
+		SaveBacnetConfigFile();
+	}
+	return 0;
+}
+LRESULT CMainFrame::Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam)
+{
+	int ret = (int)wParam;
+	if(ret == 1)
+	Set_Communication_Count(1,g_bac_instance);//成功，计数+1
+	else
+	Set_Communication_Count(0,g_bac_instance);
+
+	return 0;
+}
+
+LRESULT  CMainFrame::AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam)
+{
+	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
+	bool msg_result=WRITE_FAIL;
+	msg_result = MKBOOL(wParam);
+	CString Show_Results;
+	CString temp_cs = pInvoke->task_info;
+	if(msg_result)
+	{
+	
+		for (int i=0;i<BAC_INPUT_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Input_Info[i].invoke_id)
+				Write_Config_Info.Write_Input_Info[i].task_result = true;
+		}
+
+		for (int i=0;i<BAC_OUTPUT_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Output_Info[i].invoke_id)
+				Write_Config_Info.Write_Output_Info[i].task_result = true;
+		}
+
+		for (int i=0;i<BAC_VARIABLE_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Variable_Info[i].invoke_id)
+				Write_Config_Info.Write_Variable_Info[i].task_result = true;
+		}
+		for (int i=0;i<BAC_PROGRAM_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Program_Info[i].invoke_id)
+				Write_Config_Info.Write_Program_Info[i].task_result = true;
+		}
+
+		for (int i=0;i<BAC_PROGRAMCODE_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Programcode_Info[i].invoke_id)
+				Write_Config_Info.Write_Programcode_Info[i].task_result = true;
+		}
+
+
+		for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Controller_Info[i].invoke_id)
+				Write_Config_Info.Write_Controller_Info[i].task_result = true;
+		}
+
+		for (int i=0;i<BAC_SCREEN_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Screen_Info[i].invoke_id)
+				Write_Config_Info.Write_Screen_Info[i].task_result = true;
+		}
+
+		for (int i=0;i<BAC_WEEKLY_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Weekly_Info[i].invoke_id)
+				Write_Config_Info.Write_Weekly_Info[i].task_result = true;
+		}
+
+		for (int i=0;i<BAC_ANNUAL_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Annual_Info[i].invoke_id)
+				Write_Config_Info.Write_Annual_Info[i].task_result = true;
+		}
+
+		for (int i=0;i<BAC_MONITOR_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Monitor_Info[i].invoke_id)
+				Write_Config_Info.Write_Monitor_Info[i].task_result = true;
+		}
+
+		Show_Results = temp_cs + _T("Success!");
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+		TRACE(Show_Results + _T("\r\n"));
+		//MessageBox(_T("Bacnet operation success!"));
+	}
+	else
+	{
+
+		for (int i=0;i<BAC_INPUT_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Input_Info[i].invoke_id)
+				Write_Config_Info.Write_Input_Info[i].task_result = false;
+		}
+
+		for (int i=0;i<BAC_OUTPUT_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Output_Info[i].invoke_id)
+				Write_Config_Info.Write_Output_Info[i].task_result = false;
+		}
+
+		for (int i=0;i<BAC_VARIABLE_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Variable_Info[i].invoke_id)
+				Write_Config_Info.Write_Variable_Info[i].task_result = false;
+		}
+		for (int i=0;i<BAC_PROGRAM_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Program_Info[i].invoke_id)
+				Write_Config_Info.Write_Program_Info[i].task_result = false;
+		}
+
+		for (int i=0;i<BAC_PROGRAMCODE_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Programcode_Info[i].invoke_id)
+				Write_Config_Info.Write_Programcode_Info[i].task_result = false;
+		}
+
+		for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Controller_Info[i].invoke_id)
+				Write_Config_Info.Write_Controller_Info[i].task_result = false;
+		}
+
+		for (int i=0;i<BAC_SCREEN_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Screen_Info[i].invoke_id)
+				Write_Config_Info.Write_Screen_Info[i].task_result = false;
+		}
+
+		for (int i=0;i<BAC_WEEKLY_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Weekly_Info[i].invoke_id)
+				Write_Config_Info.Write_Weekly_Info[i].task_result = false;
+		}
+
+		for (int i=0;i<BAC_ANNUAL_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Annual_Info[i].invoke_id)
+				Write_Config_Info.Write_Annual_Info[i].task_result = false;
+		}
+
+		for (int i=0;i<BAC_MONITOR_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Monitor_Info[i].invoke_id)
+				Write_Config_Info.Write_Monitor_Info[i].task_result = false;
+		}
+
+		Show_Results = temp_cs + _T("Fail!");
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+		TRACE(Show_Results + _T("\r\n"));
+		//AfxMessageBox(Show_Results);
+		//MessageBox(_T("Bacnet operation fail!"));
+	}
+
+	if(pInvoke)
+		delete pInvoke;
+	return 0;
+}
+
+void CMainFrame::LoadBacnetConfigFile()
+{
+	if((g_mac!=0) &&(g_bac_instance!=0))
+	{
+		CFileDialog dlg(true,_T("*.ini"),_T(" "),OFN_HIDEREADONLY ,_T("Ini files (*.ini)|*.ini|All Files (*.*)|*.*||"),NULL,0);
+		if(IDOK==dlg.DoModal())
+		{
+			CString FilePath;
+			FilePath=dlg.GetPathName();
+			for (int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
+			{
+				CString temp_input,temp_des,temp_csc;
+				temp_input.Format(_T("Input%d"),i);
+
+				CString cs_temp;
+				char cTemp1[255];
+				GetPrivateProfileStringW(temp_input,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Input_data.at(i).description,STR_IN_DESCRIPTION_LENGTH,cTemp1,STR_IN_DESCRIPTION_LENGTH);
+
+				cs_temp.Empty();
+				GetPrivateProfileStringW(temp_input,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Input_data.at(i).label,STR_IN_LABEL,cTemp1,STR_IN_LABEL);
+
+				m_Input_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_input,_T("Auto_Manual"),0,FilePath);
+				m_Input_data.at(i).value = GetPrivateProfileInt(temp_input,_T("Value"),0,FilePath);
+
+				m_Input_data.at(i).filter = (unsigned char)GetPrivateProfileInt(temp_input,_T("Filter"),0,FilePath);
+				m_Input_data.at(i).decom = (unsigned char)GetPrivateProfileInt(temp_input,_T("Decom"),0,FilePath);
+				m_Input_data.at(i).sen_on = (unsigned char)GetPrivateProfileInt(temp_input,_T("Sen_On"),0,FilePath);
+
+				m_Input_data.at(i).sen_off = (unsigned char)GetPrivateProfileInt(temp_input,_T("Sen_Off"),0,FilePath);
+				m_Input_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_input,_T("Control"),0,FilePath);
+				m_Input_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_input,_T("Digital_Analog"),0,FilePath);
+
+				m_Input_data.at(i).calibration_sign = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration_Sign"),0,FilePath);
+				m_Input_data.at(i).calibration_increment = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration_Increment"),0,FilePath);
+				m_Input_data.at(i).unused = (unsigned char)GetPrivateProfileInt(temp_input,_T("Unused"),0,FilePath);
+
+				m_Input_data.at(i).calibration = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration"),0,FilePath);
+				m_Input_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_input,_T("Range"),0,FilePath);
+
+			}
+
+			for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Output%d"),i);
+				CString cs_temp;
+				char cTemp1[255];
+				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Output_data.at(i).description,STR_OUT_DESCRIPTION_LENGTH,cTemp1,STR_OUT_DESCRIPTION_LENGTH);
+
+				cs_temp.Empty();
+				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Output_data.at(i).label,STR_OUT_LABEL,cTemp1,STR_OUT_LABEL);
+
+				m_Output_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+				m_Output_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
+
+				m_Output_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Analog"),0,FilePath);
+				m_Output_data.at(i).access_level = (unsigned char)GetPrivateProfileInt(temp_section,_T("Access_Level"),0,FilePath);
+				m_Output_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Control"),0,FilePath);
+				m_Output_data.at(i).digital_control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Control"),0,FilePath);
+				m_Output_data.at(i).decom = (unsigned char)GetPrivateProfileInt(temp_section,_T("Decom"),0,FilePath);
+				m_Output_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_section,_T("Range"),0,FilePath);
+				m_Output_data.at(i).m_del_low = (unsigned char)GetPrivateProfileInt(temp_section,_T("M_Del_Low"),0,FilePath);
+				m_Output_data.at(i).s_del_high = (unsigned char)GetPrivateProfileInt(temp_section,_T("S_Del_High"),0,FilePath);
+				m_Output_data.at(i).delay_timer = (unsigned char)GetPrivateProfileInt(temp_section,_T("Delay_Timer"),0,FilePath);
+			}
+
+			for (int i=0;i<BAC_VARIABLE_ITEM_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Variable%d"),i);
+				CString cs_temp;
+				char cTemp1[255];
+				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Variable_data.at(i).description,STR_VARIABLE_DESCRIPTION_LENGTH,cTemp1,STR_VARIABLE_DESCRIPTION_LENGTH);
+
+				cs_temp.Empty();
+				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Variable_data.at(i).label,STR_VARIABLE_LABEL,cTemp1,STR_VARIABLE_LABEL);
+
+
+
+				m_Variable_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
+				m_Variable_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+				m_Variable_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Analog"),0,FilePath);
+				m_Variable_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Control"),0,FilePath);
+				m_Variable_data.at(i).unused = (unsigned char)GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
+				m_Variable_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_section,_T("Range"),0,FilePath);
+
+			}
+
+			for (int i=0;i<BAC_PROGRAM_ITEM_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Program%d"),i);
+				CString cs_temp;
+				char cTemp1[255];
+				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Program_data.at(i).description,STR_PROGRAM_DESCRIPTION_LENGTH,cTemp1,STR_PROGRAM_DESCRIPTION_LENGTH);
+
+				cs_temp.Empty();
+				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Program_data.at(i).label,STR_PROGRAM_LABEL_LENGTH,cTemp1,STR_PROGRAM_LABEL_LENGTH);
+
+				m_Program_data.at(i).bytes = (unsigned short)GetPrivateProfileInt(temp_section,_T("Bytes"),0,FilePath);
+				m_Program_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+				m_Program_data.at(i).on_off = (unsigned char)GetPrivateProfileInt(temp_section,_T("On_Off"),0,FilePath);
+				m_Program_data.at(i).com_prg = (unsigned char)GetPrivateProfileInt(temp_section,_T("Com_Prg"),0,FilePath);
+				m_Program_data.at(i).errcode = (unsigned char)GetPrivateProfileInt(temp_section,_T("Errcode"),0,FilePath);
+				m_Program_data.at(i).unused = (unsigned char)GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
+			}
+
+			for (int i=0;i<BAC_CONTROLLER_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Controller%d"),i);
+
+				m_controller_data.at(i).input.number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Number"),0,FilePath);
+				m_controller_data.at(i).input.panel = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Panel"),0,FilePath);
+				m_controller_data.at(i).input.point_type = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Point_Type"),0,FilePath);
+				m_controller_data.at(i).input_value = GetPrivateProfileInt(temp_section,_T("Input_Value"),0,FilePath);
+				m_controller_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
+				m_controller_data.at(i).setpoint.number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Number"),0,FilePath);
+				m_controller_data.at(i).setpoint.panel = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Panel"),0,FilePath);
+				m_controller_data.at(i).setpoint.point_type = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Point_Type"),0,FilePath);
+				m_controller_data.at(i).setpoint_value = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Value"),0,FilePath);
+				m_controller_data.at(i).units = (unsigned char)GetPrivateProfileInt(temp_section,_T("Units"),0,FilePath);
+				m_controller_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+				m_controller_data.at(i).action = (unsigned char)GetPrivateProfileInt(temp_section,_T("Action"),0,FilePath);
+				m_controller_data.at(i).repeats_per_min = (unsigned char)GetPrivateProfileInt(temp_section,_T("Repeats_Per_Min"),0,FilePath);
+				m_controller_data.at(i).unused = (unsigned char)GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
+				m_controller_data.at(i).prop_high = (unsigned char)GetPrivateProfileInt(temp_section,_T("Prop_High"),0,FilePath);
+				m_controller_data.at(i).proportional = (unsigned char)GetPrivateProfileInt(temp_section,_T("Proportional"),0,FilePath);
+				m_controller_data.at(i).reset = (unsigned char)GetPrivateProfileInt(temp_section,_T("Reset"),0,FilePath);
+				m_controller_data.at(i).bias = (unsigned char)GetPrivateProfileInt(temp_section,_T("Bias"),0,FilePath);
+				m_controller_data.at(i).rate = (unsigned char)GetPrivateProfileInt(temp_section,_T("Rate"),0,FilePath);
+			}
+
+			for (int i=0;i<BAC_PROGRAMCODE_ITEM_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				CString temp_code;
+				unsigned char * temp_point = NULL;
+				temp_point = program_code[i];
+				temp_section.Format(_T("Program_Code%d"),i);
+				program_code_length[i] = (unsigned int)GetPrivateProfileInt(temp_section,_T("Program_Length"),0,FilePath);
+
+				if(program_code_length[i] >400)
+				{
+					program_code_length[i]=0;
+					memset(program_code[i],0,400);
+					continue;
+				}
+				int save_part = program_code_length[i] /100  + 1;
+				for (int m=0;m<save_part;m++)
+				{
+					CString part_section;
+					part_section.Format(_T("Program_Code%d"),m);
+					CString temp_program_code1;
+					GetPrivateProfileStringW(temp_section,part_section,_T(""),temp_program_code1.GetBuffer(MAX_PATH),400,FilePath);
+					temp_program_code1.ReleaseBuffer();
+					CString temp_program_code = temp_program_code1;
+					int temp_length= temp_program_code.GetLength();
+
+
+					if(program_code_length[i] > (m+1)*100)
+					{
+						if(temp_length!=100*2)
+						{
+							MessageBox(_T("Load config file failed!"));
+							return;
+						}
+						for (int x=m*100;x<(m+1)*100;x++)
+						{
+							CString temp_value;
+							temp_value = temp_program_code.Left(2);
+							temp_program_code = temp_program_code.Right(temp_program_code.GetLength()-2);
+							program_code[i][x] = Str_to_Byte(temp_value);
+						}
+					}
+					else
+					{
+						if(temp_length != (program_code_length[i]%100)*2)
+						{
+							MessageBox(_T("Load config file failed!"));
+							return;
+						}
+						for (int x=m*100;x<program_code_length[i];x++)
+						{
+							CString temp_value;
+							temp_value = temp_program_code.Left(2);
+							temp_program_code = temp_program_code.Right(temp_program_code.GetLength()-2);
+							program_code[i][x] = Str_to_Byte(temp_value);
+						}
+					}
+
+
+
+				}
+
+
+
+
+				
+
+
+			
+				/*WritePrivateProfileStringW(temp_section,_T("Program_Code"),temp_code,FilePath);*/
+
+			}
+
+
+			for (int i=0;i<BAC_SCREEN_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Screen%d"),i);
+
+				CString cs_temp;
+				char cTemp1[255];
+				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_screen_data.at(i).description,STR_SCREEN_DESCRIPTION_LENGTH,cTemp1,STR_SCREEN_DESCRIPTION_LENGTH);
+
+				cs_temp.Empty();
+				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_screen_data.at(i).label,STR_SCREEN_LABLE_LENGTH,cTemp1,STR_SCREEN_LABLE_LENGTH);
+				cs_temp.Empty();
+				GetPrivateProfileStringW(temp_section,_T("Picture_file"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_screen_data.at(i).label,STR_SCREEN_PIC_FILE_LENGTH,cTemp1,STR_SCREEN_PIC_FILE_LENGTH);
+
+				m_screen_data.at(i).update = GetPrivateProfileInt(temp_section,_T("Update"),0,FilePath);
+				m_screen_data.at(i).mode = GetPrivateProfileInt(temp_section,_T("Mode"),0,FilePath);
+				m_screen_data.at(i).xcur_grp = GetPrivateProfileInt(temp_section,_T("Xcur_grp"),0,FilePath);
+				m_screen_data.at(i).ycur_grp = GetPrivateProfileInt(temp_section,_T("Ycur_grp"),0,FilePath);
+			}
+
+			for (int i=0;i<BAC_WEEKLY_ROUTINES_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Weekly_Routines%d"),i);
+
+				CString cs_temp;
+				char cTemp1[255];
+				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Weekly_data.at(i).description,STR_WEEKLY_DESCRIPTION_LENGTH,cTemp1,STR_WEEKLY_DESCRIPTION_LENGTH);
+
+				cs_temp.Empty();
+				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Weekly_data.at(i).label,STR_WEEKLY_LABEL_LENGTH,cTemp1,STR_WEEKLY_LABEL_LENGTH);
+
+				m_Weekly_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
+				m_Weekly_data.at(i).auto_manual = GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+				m_Weekly_data.at(i).override_1_value = GetPrivateProfileInt(temp_section,_T("Override_1_Value"),0,FilePath);
+				m_Weekly_data.at(i).override_2_value = GetPrivateProfileInt(temp_section,_T("Override_2_Value"),0,FilePath);
+				m_Weekly_data.at(i).off = GetPrivateProfileInt(temp_section,_T("Off"),0,FilePath);
+				m_Weekly_data.at(i).unused = GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
+
+				m_Weekly_data.at(i).override_1.number = GetPrivateProfileInt(temp_section,_T("Override_1_Number"),0,FilePath);
+				m_Weekly_data.at(i).override_1.panel = GetPrivateProfileInt(temp_section,_T("Override_1_Panel"),0,FilePath);
+				m_Weekly_data.at(i).override_1.point_type = GetPrivateProfileInt(temp_section,_T("Override_1_Point_Type"),0,FilePath);
+				m_Weekly_data.at(i).override_2.number = GetPrivateProfileInt(temp_section,_T("Override_2_number"),0,FilePath);
+				m_Weekly_data.at(i).override_2.panel = GetPrivateProfileInt(temp_section,_T("Override_2_Panel"),0,FilePath);
+				m_Weekly_data.at(i).override_2.point_type = GetPrivateProfileInt(temp_section,_T("Override_2_Point_Type"),0,FilePath);
+			}
+
+			for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Annual_Routines%d"),i);
+
+				CString cs_temp;
+				char cTemp1[255];
+				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Annual_data.at(i).description,STR_ANNUAL_DESCRIPTION_LENGTH,cTemp1,STR_ANNUAL_DESCRIPTION_LENGTH);
+
+				cs_temp.Empty();
+				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Annual_data.at(i).label,STR_ANNUAL_LABEL_LENGTH,cTemp1,STR_ANNUAL_LABEL_LENGTH);
+
+				m_Annual_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
+				m_Annual_data.at(i).auto_manual = GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+				m_Annual_data.at(i).unused = GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
+
+			}
+
+			for (int i=0;i<BAC_MONITOR_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Monitor%d"),i);
+
+				CString cs_temp;
+				char cTemp1[255];
+				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_monitor_data.at(i).label,STR_MONITOR_LABEL_LENGTH,cTemp1,STR_MONITOR_LABEL_LENGTH);
+
+
+				CString temp_input_code1;
+				GetPrivateProfileStringW(temp_section,_T("Inputs"),_T(""),temp_input_code1.GetBuffer(MAX_PATH),255,FilePath);
+				temp_input_code1.ReleaseBuffer();
+
+				CString temp_input = temp_input_code1;
+				if(temp_input.GetLength()!= (sizeof(Point_Net)*MAX_POINTS_IN_MONITOR) )
+					continue;	//如果这一个的长度不正确 就继续下一个;忽略这个;
+				unsigned char temp_in_array[sizeof(Point_Net)*MAX_POINTS_IN_MONITOR];
+				for (int x=0;x<(sizeof(Point_Net)*MAX_POINTS_IN_MONITOR);x++)
+				{
+					CString temp_value;
+					temp_value = temp_input.Left(2);
+					temp_input = temp_input.Right(temp_input.GetLength()-2);
+					temp_in_array[x] = Str_to_Byte(temp_value);
+				}
+				memcpy_s(&m_monitor_data.at(i).inputs[0],sizeof(Point_Net)*MAX_POINTS_IN_MONITOR,temp_in_array,sizeof(Point_Net)*MAX_POINTS_IN_MONITOR);//copy 70 
+
+				CString temp_range_code1;
+				GetPrivateProfileStringW(temp_section,_T("Range"),_T(""),temp_range_code1.GetBuffer(MAX_PATH),255,FilePath);
+				temp_range_code1.ReleaseBuffer();
+
+				CString temp_range = temp_range_code1;
+				
+				if(temp_range.GetLength() != MAX_POINTS_IN_MONITOR)
+					continue;
+				unsigned char rang_array[MAX_POINTS_IN_MONITOR];
+				for (int r=0;r<MAX_POINTS_IN_MONITOR;r++)
+				{
+					CString temp_value;
+					temp_value = temp_range.Left(2);
+					temp_range = temp_range.Right(temp_range.GetLength()-2);
+					rang_array[r] = Str_to_Byte(temp_value);
+				}
+				memcpy_s(&m_monitor_data.at(i).range[0],MAX_POINTS_IN_MONITOR,rang_array,MAX_POINTS_IN_MONITOR);//copy MAX_POINTS_IN_MONITOR 14 
+
+				m_monitor_data.at(i).second_interval_time = GetPrivateProfileInt(temp_section,_T("Second_Interval_Time"),0,FilePath);
+				m_monitor_data.at(i).minute_interval_time = GetPrivateProfileInt(temp_section,_T("Minute_Interval_Time"),0,FilePath);
+				m_monitor_data.at(i).hour_interval_time = GetPrivateProfileInt(temp_section,_T("Hour_Interval_Time"),0,FilePath);
+				m_monitor_data.at(i).max_time_length = GetPrivateProfileInt(temp_section,_T("Max_Time_Length"),0,FilePath);
+				m_monitor_data.at(i).num_inputs = GetPrivateProfileInt(temp_section,_T("Num_Inputs"),0,FilePath);
+				m_monitor_data.at(i).an_inputs = GetPrivateProfileInt(temp_section,_T("An_Inputs"),0,FilePath);
+				m_monitor_data.at(i).unit = GetPrivateProfileInt(temp_section,_T("Unit"),0,FilePath);
+				m_monitor_data.at(i).wrap_flag = GetPrivateProfileInt(temp_section,_T("Wrap_flag"),0,FilePath);
+				m_monitor_data.at(i).status = GetPrivateProfileInt(temp_section,_T("Status"),0,FilePath);
+				m_monitor_data.at(i).reset_flag = GetPrivateProfileInt(temp_section,_T("Reset_Flag"),0,FilePath);
+				m_monitor_data.at(i).double_flag = GetPrivateProfileInt(temp_section,_T("Double_flag"),0,FilePath);
+
+			}
+
+
+
+			Show_Wait_Dialog_And_SendConfigMessage();
+		}
+	}
+
+	
+}
+
+void CMainFrame::SaveBacnetConfigFile()
+{
+	if((g_mac!=0) &&(g_bac_instance!=0))
+	{
+			CString FilePath;
+			FilePath=SaveConfigFilePath;
+			for (int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
+			{
+				CString temp_input,temp_des,temp_csc;
+				temp_input.Format(_T("Input%d"),i);
+
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).description, (int)strlen((char *)m_Input_data.at(i).description)+1, 
+					temp_des.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_des.ReleaseBuffer();
+				CString temp_label;
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).label, (int)strlen((char *)m_Input_data.at(i).label)+1, 
+					temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_label.ReleaseBuffer();
+
+				WritePrivateProfileStringW(temp_input,_T("Description"),temp_des,FilePath);
+				WritePrivateProfileStringW(temp_input,_T("Label"),temp_label,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).auto_manual);
+				WritePrivateProfileStringW(temp_input,_T("Auto_Manual"),temp_csc,FilePath);
+				temp_csc.Format(_T("%d"),m_Input_data.at(i).value);
+				WritePrivateProfileStringW(temp_input,_T("Value"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).filter);
+				WritePrivateProfileStringW(temp_input,_T("Filter"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).decom);
+				WritePrivateProfileStringW(temp_input,_T("Decom"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).sen_on);
+				WritePrivateProfileStringW(temp_input,_T("Sen_On"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).sen_off);
+				WritePrivateProfileStringW(temp_input,_T("Sen_Off"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).control);
+				WritePrivateProfileStringW(temp_input,_T("Control"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).digital_analog);
+				WritePrivateProfileStringW(temp_input,_T("Digital_Analog"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).calibration_sign);
+				WritePrivateProfileStringW(temp_input,_T("Calibration_Sign"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).calibration_increment);
+				WritePrivateProfileStringW(temp_input,_T("Calibration_Increment"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).unused);
+				WritePrivateProfileStringW(temp_input,_T("Unused"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).calibration);
+				WritePrivateProfileStringW(temp_input,_T("Calibration"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Input_data.at(i).range);
+				WritePrivateProfileStringW(temp_input,_T("Range"),temp_csc,FilePath);
+			}
+
+			for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Output%d"),i);
+
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).description, (int)strlen((char *)m_Output_data.at(i).description)+1, 
+					temp_des.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_des.ReleaseBuffer();
+				CString temp_label;
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).label, (int)strlen((char *)m_Output_data.at(i).label)+1, 
+					temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_label.ReleaseBuffer();
+
+				WritePrivateProfileStringW(temp_section,_T("Description"),temp_des,FilePath);
+				WritePrivateProfileStringW(temp_section,_T("Label"),temp_label,FilePath);
+				temp_csc.Format(_T("%d"),m_Output_data.at(i).value);
+				WritePrivateProfileStringW(temp_section,_T("Value"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).auto_manual);
+				WritePrivateProfileStringW(temp_section,_T("Auto_Manual"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).digital_analog);
+				WritePrivateProfileStringW(temp_section,_T("Digital_Analog"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).access_level);
+				WritePrivateProfileStringW(temp_section,_T("Access_Level"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).control);
+				WritePrivateProfileStringW(temp_section,_T("Control"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).digital_control);
+				WritePrivateProfileStringW(temp_section,_T("Digital_Control"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).decom);
+				WritePrivateProfileStringW(temp_section,_T("Decom"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).range);
+				WritePrivateProfileStringW(temp_section,_T("Range"),temp_csc,FilePath);
+
+				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).m_del_low);
+				WritePrivateProfileStringW(temp_section,_T("M_Del_Low"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).s_del_high);
+				WritePrivateProfileStringW(temp_section,_T("S_Del_High"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).delay_timer);
+				WritePrivateProfileStringW(temp_section,_T("Delay_Timer"),temp_csc,FilePath);
+			}
+
+			for (int i=0;i<BAC_VARIABLE_ITEM_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Variable%d"),i);
+
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).description, (int)strlen((char *)m_Variable_data.at(i).description)+1, 
+					temp_des.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_des.ReleaseBuffer();
+				CString temp_label;
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).label, (int)strlen((char *)m_Variable_data.at(i).label)+1, 
+					temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_label.ReleaseBuffer();
+
+				WritePrivateProfileStringW(temp_section,_T("Description"),temp_des,FilePath);
+				WritePrivateProfileStringW(temp_section,_T("Label"),temp_label,FilePath);
+
+				temp_csc.Format(_T("%d"),m_Variable_data.at(i).value);
+				WritePrivateProfileStringW(temp_section,_T("Value"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Variable_data.at(i).auto_manual);
+				WritePrivateProfileStringW(temp_section,_T("Auto_Manual"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Variable_data.at(i).digital_analog);
+				WritePrivateProfileStringW(temp_section,_T("Digital_Analog"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Variable_data.at(i).control);
+				WritePrivateProfileStringW(temp_section,_T("Control"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Variable_data.at(i).unused);
+				WritePrivateProfileStringW(temp_section,_T("Unused"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Variable_data.at(i).range);
+				WritePrivateProfileStringW(temp_section,_T("Range"),temp_csc,FilePath);
+			}
+
+			for (int i=0;i<BAC_PROGRAM_ITEM_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Program%d"),i);
+
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).description, (int)strlen((char *)m_Program_data.at(i).description)+1, 
+					temp_des.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_des.ReleaseBuffer();
+				CString temp_label;
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).label, (int)strlen((char *)m_Program_data.at(i).label)+1, 
+					temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_label.ReleaseBuffer();
+
+				WritePrivateProfileStringW(temp_section,_T("Description"),temp_des,FilePath);
+				WritePrivateProfileStringW(temp_section,_T("Label"),temp_label,FilePath);
+
+				temp_csc.Format(_T("%u"),(unsigned short)m_Program_data.at(i).bytes);
+				WritePrivateProfileStringW(temp_section,_T("Bytes"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Program_data.at(i).auto_manual);
+				WritePrivateProfileStringW(temp_section,_T("Auto_Manual"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Program_data.at(i).on_off);
+				WritePrivateProfileStringW(temp_section,_T("On_Off"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Program_data.at(i).com_prg);
+				WritePrivateProfileStringW(temp_section,_T("Com_Prg"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Program_data.at(i).errcode);
+				WritePrivateProfileStringW(temp_section,_T("Errcode"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Program_data.at(i).unused);
+				WritePrivateProfileStringW(temp_section,_T("Unused"),temp_csc,FilePath);
+
+			}
+
+			for (int i=0;i<BAC_CONTROLLER_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Controller%d"),i);
+
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).input.number);
+				WritePrivateProfileStringW(temp_section,_T("Input_Number"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).input.panel);
+				WritePrivateProfileStringW(temp_section,_T("Input_Panel"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).input.point_type);
+				WritePrivateProfileStringW(temp_section,_T("Input_Point_Type"),temp_csc,FilePath);
+				temp_csc.Format(_T("%d"),m_controller_data.at(i).input_value);
+				WritePrivateProfileStringW(temp_section,_T("Input_Value"),temp_csc,FilePath);
+				temp_csc.Format(_T("%d"),m_controller_data.at(i).value);
+				WritePrivateProfileStringW(temp_section,_T("Value"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).setpoint.number);
+				WritePrivateProfileStringW(temp_section,_T("Setpoint_Number"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).setpoint.panel);
+				WritePrivateProfileStringW(temp_section,_T("Setpoint_Panel"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).setpoint.point_type);
+				WritePrivateProfileStringW(temp_section,_T("Setpoint_Point_Type"),temp_csc,FilePath);
+
+				temp_csc.Format(_T("%d"),m_controller_data.at(i).setpoint_value);
+				WritePrivateProfileStringW(temp_section,_T("Setpoint_Value"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).units);
+				WritePrivateProfileStringW(temp_section,_T("Units"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).auto_manual);
+				WritePrivateProfileStringW(temp_section,_T("Auto_Manual"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).action);
+				WritePrivateProfileStringW(temp_section,_T("Action"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).repeats_per_min);
+				WritePrivateProfileStringW(temp_section,_T("Repeats_Per_Min"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).unused);
+				WritePrivateProfileStringW(temp_section,_T("Unused"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).prop_high);
+				WritePrivateProfileStringW(temp_section,_T("Prop_High"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).proportional);
+				WritePrivateProfileStringW(temp_section,_T("Proportional"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).reset);
+				WritePrivateProfileStringW(temp_section,_T("Reset"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).bias);
+				WritePrivateProfileStringW(temp_section,_T("Bias"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_controller_data.at(i).rate);
+				WritePrivateProfileStringW(temp_section,_T("Rate"),temp_csc,FilePath);
+
+			}
+
+			for (int i=0;i<BAC_SCREEN_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Screen%d"),i);
+
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).description, (int)strlen((char *)m_screen_data.at(i).description)+1, 
+					temp_des.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_des.ReleaseBuffer();
+				CString temp_label;
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).label, (int)strlen((char *)m_screen_data.at(i).label)+1, 
+					temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_label.ReleaseBuffer();
+
+				CString temp_pic_file;
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).picture_file, (int)strlen((char *)m_screen_data.at(i).picture_file)+1, 
+					temp_pic_file.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_pic_file.ReleaseBuffer();
+
+				WritePrivateProfileStringW(temp_section,_T("Description"),temp_des,FilePath);
+				WritePrivateProfileStringW(temp_section,_T("Label"),temp_label,FilePath);
+				WritePrivateProfileStringW(temp_section,_T("Picture_file"),temp_pic_file,FilePath);
+
+				temp_csc.Format(_T("%u"),(unsigned short)m_screen_data.at(i).update);
+				WritePrivateProfileStringW(temp_section,_T("Update"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_screen_data.at(i).mode);
+				WritePrivateProfileStringW(temp_section,_T("Mode"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_screen_data.at(i).xcur_grp);
+				WritePrivateProfileStringW(temp_section,_T("Xcur_grp"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned short)m_screen_data.at(i).ycur_grp);
+				WritePrivateProfileStringW(temp_section,_T("Ycur_grp"),temp_csc,FilePath);
+			}
+
+
+			for (int i=0;i<BAC_WEEKLY_ROUTINES_COUNT;i++)
+			{
+				CString temp_input,temp_des,temp_csc;
+				temp_input.Format(_T("Weekly_Routines%d"),i);
+
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_Weekly_data.at(i).description, (int)strlen((char *)m_Weekly_data.at(i).description)+1, 
+					temp_des.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_des.ReleaseBuffer();
+				CString temp_label;
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_Weekly_data.at(i).label, (int)strlen((char *)m_Weekly_data.at(i).label)+1, 
+					temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_label.ReleaseBuffer();
+
+				WritePrivateProfileStringW(temp_input,_T("Description"),temp_des,FilePath);
+				WritePrivateProfileStringW(temp_input,_T("Label"),temp_label,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).value);
+				WritePrivateProfileStringW(temp_input,_T("Value"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).auto_manual);
+				WritePrivateProfileStringW(temp_input,_T("Auto_Manual"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_1_value);
+				WritePrivateProfileStringW(temp_input,_T("Override_1_Value"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_2_value);
+				WritePrivateProfileStringW(temp_input,_T("Override_2_Value"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).off);
+				WritePrivateProfileStringW(temp_input,_T("Off"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).unused);
+				WritePrivateProfileStringW(temp_input,_T("Unused"),temp_csc,FilePath);
+
+
+				temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_1.number);
+				WritePrivateProfileStringW(temp_input,_T("Override_1_Number"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_1.panel);
+				WritePrivateProfileStringW(temp_input,_T("Override_1_Panel"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_1.point_type);
+				WritePrivateProfileStringW(temp_input,_T("Override_1_Point_Type"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_2.number);
+				WritePrivateProfileStringW(temp_input,_T("Override_2_number"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_2.panel);
+				WritePrivateProfileStringW(temp_input,_T("Override_2_Panel"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Weekly_data.at(i).override_2.point_type);
+				WritePrivateProfileStringW(temp_input,_T("Override_2_Point_Type"),temp_csc,FilePath);
+
+			}
+
+			for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
+			{
+				CString temp_input,temp_des,temp_csc;
+				temp_input.Format(_T("Annual_Routines%d"),i);
+
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_Annual_data.at(i).description, (int)strlen((char *)m_Annual_data.at(i).description)+1, 
+					temp_des.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_des.ReleaseBuffer();
+				CString temp_label;
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_Annual_data.at(i).label, (int)strlen((char *)m_Annual_data.at(i).label)+1, 
+					temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_label.ReleaseBuffer();
+
+				WritePrivateProfileStringW(temp_input,_T("Description"),temp_des,FilePath);
+				WritePrivateProfileStringW(temp_input,_T("Label"),temp_label,FilePath);
+
+				temp_csc.Format(_T("%u"),(unsigned char)m_Annual_data.at(i).value);
+				WritePrivateProfileStringW(temp_input,_T("Value"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Annual_data.at(i).auto_manual);
+				WritePrivateProfileStringW(temp_input,_T("Auto_Manual"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Annual_data.at(i).unused);
+				WritePrivateProfileStringW(temp_input,_T("Unused"),temp_csc,FilePath);
+			}
+
+			for (int i=0;i<BAC_MONITOR_COUNT;i++)
+			{
+				CString temp_monitor,temp_des,temp_csc;
+				temp_monitor.Format(_T("Monitor%d"),i);
+
+				CString temp_label;
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_monitor_data.at(i).label, (int)strlen((char *)m_monitor_data.at(i).label)+1, 
+					temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_label.ReleaseBuffer();
+				WritePrivateProfileStringW(temp_monitor,_T("Label"),temp_label,FilePath);
+				unsigned char * temp_point = NULL;
+				CString temp_inputs;
+				for (int j=0;j<MAX_POINTS_IN_MONITOR;j++)
+				{
+					temp_point = &m_monitor_data.at(i).inputs[j].number;
+					for (int k=0;k<(int)sizeof(Point_Net);k++)
+					{
+						temp_csc.Format(_T("%02x"),*(temp_point + k));
+						temp_csc.MakeUpper();
+						temp_inputs = temp_inputs + temp_csc;
+					}
+				}
+				WritePrivateProfileStringW(temp_monitor,_T("Inputs"),temp_inputs,FilePath);
+				temp_point = NULL;
+				CString temp_range;
+
+				for (int x=0;x<MAX_POINTS_IN_MONITOR;x++)
+				{
+					temp_point = &m_monitor_data.at(i).range[x];
+					temp_csc.Format(_T("%02x"),*(temp_point));
+					temp_csc.MakeUpper();
+					temp_range = temp_range + temp_csc;
+				}
+				WritePrivateProfileStringW(temp_monitor,_T("Range"),temp_range,FilePath);
+
+				temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).second_interval_time);
+				WritePrivateProfileStringW(temp_monitor,_T("Second_Interval_Time"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).minute_interval_time);
+				WritePrivateProfileStringW(temp_monitor,_T("Minute_Interval_Time"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).hour_interval_time);
+				WritePrivateProfileStringW(temp_monitor,_T("Hour_Interval_Time"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).max_time_length);
+				WritePrivateProfileStringW(temp_monitor,_T("Max_Time_Length"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).num_inputs);
+				WritePrivateProfileStringW(temp_monitor,_T("Num_Inputs"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).an_inputs);
+				WritePrivateProfileStringW(temp_monitor,_T("An_Inputs"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).unit);
+				WritePrivateProfileStringW(temp_monitor,_T("Unit"),temp_csc,FilePath);
+
+				temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).wrap_flag);
+				WritePrivateProfileStringW(temp_monitor,_T("Wrap_flag"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).status);
+				WritePrivateProfileStringW(temp_monitor,_T("Status"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).reset_flag);
+				WritePrivateProfileStringW(temp_monitor,_T("Reset_Flag"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_monitor_data.at(i).double_flag);
+				WritePrivateProfileStringW(temp_monitor,_T("Double_flag"),temp_csc,FilePath);
+				
+			}
+
+			for (int i=0;i<BAC_PROGRAMCODE_ITEM_COUNT;i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				CString temp_code;
+				unsigned char * temp_point = NULL;
+				temp_point = program_code[i];
+				temp_section.Format(_T("Program_Code%d"),i);
+
+				temp_csc.Format(_T("%d"),program_code_length[i]);
+				WritePrivateProfileStringW(temp_section,_T("Program_Length"),temp_csc,FilePath);
+
+				//将要保存的代码划分为N快存储，每块 100 ，ini文本一个段最多只有保存260;
+				int save_part = program_code_length[i] /100  + 1;
+				for (int m=0;m<save_part;m++)
+				{
+					temp_code.Empty();
+					if(program_code_length[i] > (m+1)*100)
+					{
+						for (int j=m*100;j<m*100+100;j++)
+						{
+							temp_csc.Format(_T("%02x"),*(temp_point + j));
+							temp_csc.MakeUpper();
+							temp_code = temp_code + temp_csc;
+						}
+					}
+					else
+					{
+						for (int j=m*100;j<program_code_length[i];j++)
+						{
+							temp_csc.Format(_T("%02x"),*(temp_point + j));
+							temp_csc.MakeUpper();
+							temp_code = temp_code + temp_csc;
+						}
+					}
+
+					CString part_section;
+					part_section.Format(_T("Program_Code%d"),m);
+					WritePrivateProfileStringW(temp_section,part_section,temp_code,FilePath);
+				}
+
+				
+			}
+
+		
+	}
+}
+
 void CMainFrame::SaveConfigFile()
 {
+	if(g_protocol == 2)
+	{
+		MainFram_hwd = this->m_hWnd;
+
+		CFileDialog dlg(false,_T("*.ini"),_T(" "),OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,_T("Ini files (*.ini)|*.ini|All Files (*.*)|*.*||"),NULL,0);
+		if(IDOK==dlg.DoModal())
+		{
+
+			SaveConfigFilePath=dlg.GetPathName();
+			//协议时bacnet ，用户点击 File save时 先调用线程读取所有需要存的资料；在发送消息回来 调用SaveBacnetConfigFile;
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SVAE_CONFIG);
+		}
+		else
+		{
+			SaveConfigFilePath.Empty();
+		}
+		
+		
+
+
+
+	//	SaveBacnetConfigFile();
+		return;
+	}
 	int nret=0;
 	g_bEnableRefreshTreeView = FALSE;
-
-	if(read_one(g_tstat_id,6)<=0)
+	int IDFlag=read_one(g_tstat_id,7);
+	product_register_value[7]=IDFlag;
+	if(IDFlag<=0)
 		return;
 	float version=get_curtstat_version();
 	CString strFilter;
@@ -3326,12 +4685,37 @@ void CMainFrame::SaveConfigFile()
 	SetPaneString(1, strTips);
 	//AfxMessageBox(strTips);
 
-	if(multi_register_value[7]==100)//NC
+	if(product_register_value[7]==100||product_register_value[7]==PM_LightingController)//NC
+	{
+		strTips.Format(_T("Config file \" %s \" is saving, please waiting..."), strFilename);
+		SetPaneString(1, strTips);
+		if (product_register_value[7]==100)
+		{
+		save_schedule_2_file((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
+		}
+		else
+		{
+		save_schedule_2_file_LC((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
+		}
+		
+
+		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
+		SetPaneString(1, strTips);
+	}
+	else if (product_register_value[7]==PM_T38AIOD||
+	product_register_value[7]==PM_T3IOA||
+	product_register_value[7]==PM_T332AI||
+	product_register_value[7]==PM_T3AI16O||
+	product_register_value[7]==PM_T38I13O||
+	product_register_value[7]==PM_T3PERFORMANCE||
+	product_register_value[7]==PM_T34AO||
+	product_register_value[7]==PM_T36CT 
+	        )
 	{
 		strTips.Format(_T("Config file \" %s \" is saving, please waiting..."), strFilename);
 		SetPaneString(1, strTips);
 
-		save_schedule_2_file((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
+		save_T3Modules_file((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
 
 		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
 		SetPaneString(1, strTips);
@@ -3450,8 +4834,17 @@ void CMainFrame::OnDestroy()
 	HTREEITEM htiSel = m_pTreeViewCrl->GetSelectedItem();
 	SaveTreeNodeRecordToReg(htiSel);
 
-	CFrameWndEx::OnDestroy();
+	if (mbPoll!=NULL)
+	{
+	  delete mbPoll;
+	  mbPoll=NULL;
+	}
 
+	CFrameWndEx::OnDestroy();
+	for (int i=0;i<9;i++)
+	{
+		UnregisterHotKey(GetSafeHwnd(), m_MainHotKeyID[i]);   
+	}
 
 #ifdef Fance_Enable_Test		//For Test Use
 	if (is_connect())
@@ -3483,6 +4876,10 @@ void CMainFrame::OnDestroy()
 
 	}
 
+		TerminateThread(CM5_hThread,0);
+		TerminateThread(CM5_UI_Thread,0);
+		TerminateThread(hDeal_thread,0);
+		TerminateThread(hThread,0);
 	// 结束线程
 	
 	if (m_pRefreshThread) 
@@ -3494,7 +4891,6 @@ void CMainFrame::OnDestroy()
 		if (WaitForSingleObject(hp, 1000) != WAIT_OBJECT_0)
 
 		if (WaitForSingleObject(m_pRefreshThread->m_hThread, 100) == WAIT_OBJECT_0)
-
 		{
 		}
 		else
@@ -3505,7 +4901,7 @@ void CMainFrame::OnDestroy()
 		//CloseHandle(hp);
 		//m_pRefreshThread->Delete();
 	}
-
+	
 	if (is_connect())
 	{
 		close_com(); // added by zgq:12-16-2011
@@ -3521,8 +4917,8 @@ void CMainFrame::OnDestroy()
 
 	if (g_testmultiReadtraffic_dlg!=NULL)
 	{
-	  delete g_testmultiReadtraffic_dlg;
-	  g_testmultiReadtraffic_dlg=NULL;
+		delete g_testmultiReadtraffic_dlg;
+		g_testmultiReadtraffic_dlg=NULL;
 	}
 #endif
 
@@ -3835,11 +5231,11 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			OnToolErease();
 			return 1;
 		} 
-			if(pMsg->wParam == VK_RETURN)
-			{
-				EnterConnectToANode();
-				return 1;
-			}
+		/*if(pMsg->wParam == VK_RETURN)
+		{
+		EnterConnectToANode();
+		return 1;
+		}*/
 			
 
 	}
@@ -3848,6 +5244,10 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 void CMainFrame::ReFresh()
 {
 //	int i;
+	if (!is_connect())
+	{
+		 return;
+	}
 	register_critical_section.Lock();
 	for(int i=0;i<10;i++) //Modify by Fance , tstat 6 has more register than 512;
 	{
@@ -4096,7 +5496,7 @@ void CMainFrame::OnToolRefreshLeftTreee()
 //
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
-   
+   MainFram_hwd = this->m_hWnd;
 	//20120420
 	CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
 	//创建对话框窗口
@@ -4145,6 +5545,88 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			int nTRet=-1;
 			//g_tstat_id=m_product.at(i).product_id;
 			product_Node=m_product.at(i);
+			if((product_Node.product_class_id == 50) || (product_Node.product_class_id == 35))	//如果是CM5或者MINIPANEL 才有 bacnet协议;
+			{
+				
+				if( m_product.at(i).protocol == 3)
+				//if(product_Node.BuildingInfo.strProtocol.CompareNoCase(_T("BacnetIP")) == 0 )
+				{
+					CString temp_csa;
+					temp_csa =  product_Node.BuildingInfo.strComPort;
+					temp_csa = temp_csa.Right(temp_csa.GetLength() - 3);
+					g_bac_instance = m_product.at(i).hardware_version;
+					g_mac = m_product.at(i).software_version;
+					g_gloab_bac_comport =_wtoi(temp_csa);
+					
+#if 0
+					CString Program_Path,Program_ConfigFile_Path;
+					int g_com=0;
+					GetModuleFileName(NULL,Program_Path.GetBuffer(MAX_PATH),MAX_PATH);  //获取当前运行的绝对地址;
+					PathRemoveFileSpec(Program_Path.GetBuffer(MAX_PATH) );            //返回绝对地址的上层目录?;
+					Program_Path.ReleaseBuffer();
+					Program_ConfigFile_Path = Program_Path + _T("\\BacnetDB.ini");
+
+					CString section;
+					section.Format(_T("Device_%d"),g_bac_instance);
+					CString temp_src_code1;
+					GetPrivateProfileStringW(section,_T("SRC"),_T(""),temp_src_code1.GetBuffer(MAX_PATH),400,Program_ConfigFile_Path);
+					temp_src_code1.ReleaseBuffer();
+
+					unsigned int temp_max_apdu = GetPrivateProfileInt(section,_T("MAX_APDU"),1000,Program_ConfigFile_Path);
+					
+
+					CString temp_src_code = temp_src_code1;
+					int temp_length= temp_src_code.GetLength();
+					unsigned char device_src[20];
+					if(temp_length!=36)
+					{
+						pDlg->ShowWindow(SW_HIDE);
+						if(pDlg)
+							delete pDlg;
+						pDlg = NULL;
+						return;
+					}
+					for (int x=0;x<18;x++)
+					{
+						CString temp_value;
+						temp_value = temp_src_code.Left(2);
+						temp_src_code = temp_src_code.Right(temp_src_code.GetLength()-2);
+						device_src[x] = Str_to_Byte(temp_value);
+					}
+					BACNET_ADDRESS  src;
+					memcpy_s(&src,18,device_src,18);
+					address_add(g_bac_instance, temp_max_apdu, &src);//这句话很重要，将收到的 iam 信息 加入address list;
+
+
+#endif
+
+
+
+					/*bac_net_initial_once = false;*/
+					SwitchToPruductType(DLG_CM5_BACNET_VIEW);
+					g_protocol = 2;
+					pDlg->ShowWindow(SW_HIDE);
+					if(pDlg)
+						delete pDlg;//20120220
+					pDlg = NULL;
+					return;
+				}
+			}
+
+			HANDLE temphandle;
+			if(bac_net_initial_once)
+			{
+				temphandle = Get_RS485_Handle();
+				if(temphandle !=NULL)
+				{
+					TerminateThread((HANDLE)Get_Thread1(),0);
+					TerminateThread((HANDLE)Get_Thread2(),0);
+
+					CloseHandle(temphandle);
+					Set_RS485_Handle(NULL);
+					bac_net_initial_once = false;
+				}
+			}
 
 			//************************************
 			register_critical_section.Lock();
@@ -4200,7 +5682,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 				}else
 				{
-						close_com();//关闭所有端口
+						//close_com();//关闭所有端口
 					int nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
 
 
@@ -4285,6 +5767,31 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				nID=read_one(g_tstat_id,6);
 				if(nID<0)
 					bOnLine=FALSE;
+				int ndevice = read_one(nID,7);
+				if(ndevice == 50)	//if it is cm5 .
+				{
+					int protocol_type = read_one(nID,32);
+					if(protocol_type == 2)	//如果是MSTP
+					{
+						//这里要初始化Bacnet的很多东西;
+
+						bac_net_initial_once =false; //设置为没有初始化，等进去后初始化串口 等等~
+						g_protocol = 2;	//设置全局协议变更为mstp;
+						//SwitchToPruductType(DLG_CM5_BACNET_VIEW);
+						if (pDlg !=NULL)
+						{
+							pDlg->ShowWindow(SW_HIDE);
+							delete pDlg;
+							pDlg=NULL;
+						}
+						SwitchToPruductType(DLG_CM5_BACNET_VIEW);
+						return;
+					}
+					else if((protocol_type == 1) || (protocol_type == 0))//如果不是MSTP 就切换到以前的 界面;
+					{
+
+					}
+				}
 				if(nID>0)
 				{
 					unsigned short SerialNum[4];
@@ -4345,11 +5852,18 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			multi_register_value_tcp
 			适用于网络口，大数据量
 			*/ 
+			 
 			if(product_Node.BuildingInfo.strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
 			{
 			    if (m_isCM5)
 			    {
-					
+					CStdioFile default_file;
+					CString recordpath;
+					recordpath=g_strExePth+_T("Record.txt");
+					if(default_file.Open(recordpath,CFile::modeCreate | CFile::modeWrite)==0)
+					{
+					return;
+					}
 					int i;
 					int it = 0;
 					float progress;
@@ -4358,15 +5872,21 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 						//register_critical_section.Lock();
 						//int nStart = GetTickCount();
+						CString temp;
 						int itemp = 0;
-						itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100,5);
-						Sleep(100);
+						itemp = Read_Multi(g_tstat_id,&multi_register_value_tcp[i*100],i*100,100);
+						
 						if(itemp < 0)
 						{
+						   temp.Format(_T("%d*100=Error\n"),i);
+						   default_file.WriteString(temp);
 							continue;
 						}
 						else						
 						{
+							temp.Format(_T("%d*100=OK\n"),i);
+							default_file.WriteString(temp);
+
 							if (pDlg!=NULL)
 							{
 								progress=float((it+1)*(100/80));
@@ -4378,10 +5898,16 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						
 					}
 					register_critical_section.Unlock();
+
+				
+
+
+
 					//Add by Fance use this product_register_value to unite the register.
 					//Fance_2
 					//memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value_tcp,1024);
-
+					default_file.Flush();
+					default_file.Close();
 					if (it<80)
 					{	
 						AfxMessageBox(_T("Reading abnormal \n Try again!"));
@@ -4568,6 +6094,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				}
 
 			} //COMPort
+			
+		 
+			
+			
+ 
+			
 			else
 			{
 
@@ -4762,6 +6294,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				SwitchToPruductType(DLG_DIALOGT3_VIEW);
 
 			}
+			else if (nFlag == PM_T3IOA){
+				
+			SwitchToPruductType(DLG_DIALOGT38AI8AO);
+			}
 			else if (nFlag == PM_MINIPANEL)
 			{
 				SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);
@@ -4783,6 +6319,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{
 			  SwitchToPruductType(DLG_DIALOGT332AI_VIEW);
 			}
+			else if (nFlag==PM_T3IOA)
+			{
+			  SwitchToPruductType(DLG_DIALOGT38AI8AO);
+			}
 			else if(nFlag<PM_NC)	
 			{	
 
@@ -4795,13 +6335,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				{
 					product_type =T3000_6_ADDRESS;
 				}
-				else if(  (nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H)
-					)
+				else if(  (nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H)||(nFlag==PM_TSTAT5G))
 				{
 					product_type = T3000_5EH_LCD_ADDRESS;
 				}
 				else if((nFlag == PM_TSTAT5A) ||(nFlag == PM_TSTAT5B) ||
-					(nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F)||nFlag==PM_TSTAT5G)
+					(nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F))
 				{
 					product_type =T3000_5ABCDFG_LED_ADDRESS;
 				}
@@ -4981,13 +6520,13 @@ void CMainFrame::RefreshTreeView()
 
 
 #ifdef _DEBUG
-		CString str;
-		str.Format(_T("Fresh Tree at %d. \n"), i);
-		TRACE(str);
-		if(i == 8)
-		{		
-			int n = 0;
-		}
+//		CString str;
+//		str.Format(_T("Fresh Tree at %d. \n"), i);
+//		TRACE(str);
+		//if(i == 8)
+		//{		
+		//	int n = 0;
+		//}
 #endif
 		BOOL bOnLine=FALSE;
 		UINT nSerialNumber=0;
@@ -4999,98 +6538,121 @@ void CMainFrame::RefreshTreeView()
 			int nIDNode=tp.product_id;
 			nSerialNumber=tp.serial_number;
 			//int newnID=read_one(nID,6,2);
-
-			if (g_CommunicationType==0) // 通信类型 0
-			{	
-				// force baud rate to 19200
-			 
-				m_nbaudrat=19200;
-				Change_BaudRate(19200);
-
-				// read register offset 6
-				
-				//int error = modbus_read_one_value( nID,nIDNode,6,5);
-							nID=read_one(nIDNode,6,5);
-				/* 
-				If an error was returned from the read,
-				we previously attempted to try again with a reduced baud rate.
-				However, a bug in the code meant this never was done correctly
-				and problems were reported when the baud rate was changed.
-				See discussion in ticket #14
-
-				Now we simply set the online flag to FALSE and give up.
-				*/
-					if (nID<0)
-					{
-					m_nbaudrat=9600;
-					Change_BaudRate(9600);
-					nID=read_one(g_tstat_id,6,5);
-					if (nID<0)
-					{
-					Change_BaudRate(19200);
-					bOnLine=FALSE;
-					//continue;
-					}
-					} 
-					 
-				if( nID <0) {
-					bOnLine=FALSE;
-					
-				} 
-
-				else {
-					// successful read of register offset 6
-					unsigned short SerialNum[4];
-					memset(SerialNum,0,sizeof(SerialNum));
-					int nRet=0;//
-					// read first 4 registers 
-				//	nRet=modbus_read_multi_value(&SerialNum[0],nID,0,4,5); 
-				 nRet=Read_Multi(nID,&SerialNum[0],0,4,5);
-					int nSerialNumberRead;
-
-					if(nRet>=0)  // 计算串口号
-					{
-						nSerialNumberRead=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256; 
-					}
-
-					if(nSerialNumber>=0)  
-					{
-						if(nSerialNumberRead==nSerialNumber) // 取到串口号，并相等，说明online
-							bOnLine=TRUE;
-					}
-				}
-			}
-
-			if (g_CommunicationType==1)  // 通信类型1，重复上面的过程
+			if(m_product.at(i).protocol == 3)
 			{
-
-				int error = modbus_read_one_value( nID, nIDNode, 6 ,2);
-				if( error )
-					bOnLine=FALSE;
-
-				if( ! error )
+				int find_exsit = false;
+				for (int x=0;x<(int)m_bac_scan_com_data.size();x++)
 				{
-					unsigned short SerialNum[4];
-					memset(SerialNum,0,sizeof(SerialNum));
-					int nRet=0;
-
-					// read first 4 registers
-					nRet=modbus_read_multi_value(&SerialNum[0],nIDNode,0,4,2);
-
-					int nSerialNumberRead;
-
-					if(nRet>=0)
+					if(m_bac_scan_com_data.at(x).device_id == m_product.at(i).hardware_version)	//之前使用hardware 代替 device id的
 					{
-
-						nSerialNumberRead=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
+						find_exsit = true;
+						break;
 					}
-					if(nSerialNumber>=0)
+				}
+				if(find_exsit)
+				{
+					bOnLine=TRUE;
+					TRACE(_T("Device %d is Online\r\n"),(int)m_product.at(i).hardware_version);
+				}
+
+
+			//	m_product.at(i).hardware_version ==
+			}
+			else
+			{
+				if (g_CommunicationType==0) // 通信类型 0
+				{	
+					// force baud rate to 19200
+
+					m_nbaudrat=19200;
+					Change_BaudRate(19200);
+
+					// read register offset 6
+
+					//int error = modbus_read_one_value( nID,nIDNode,6,5);
+					nID=read_one(nIDNode,6,5);
+					/* 
+					If an error was returned from the read,
+					we previously attempted to try again with a reduced baud rate.
+					However, a bug in the code meant this never was done correctly
+					and problems were reported when the baud rate was changed.
+					See discussion in ticket #14
+
+					Now we simply set the online flag to FALSE and give up.
+					*/
+					if (nID<0)
 					{
-						if(nSerialNumberRead==nSerialNumber)
-							bOnLine=TRUE;
+						m_nbaudrat=9600;
+						Change_BaudRate(9600);
+						nID=read_one(g_tstat_id,6,5);
+						if (nID<0)
+						{
+							Change_BaudRate(19200);
+							bOnLine=FALSE;
+							//continue;
+						}
+					} 
+
+					if( nID <0) {
+						bOnLine=FALSE;
+
+					} 
+
+					else {
+						// successful read of register offset 6
+						unsigned short SerialNum[4];
+						memset(SerialNum,0,sizeof(SerialNum));
+						int nRet=0;//
+						// read first 4 registers 
+						//	nRet=modbus_read_multi_value(&SerialNum[0],nID,0,4,5); 
+						nRet=Read_Multi(nID,&SerialNum[0],0,4,5);
+						int nSerialNumberRead;
+
+						if(nRet>=0)  // 计算串口号
+						{
+							nSerialNumberRead=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256; 
+						}
+
+						if(nSerialNumber>=0)  
+						{
+							if(nSerialNumberRead==nSerialNumber) // 取到串口号，并相等，说明online
+								bOnLine=TRUE;
+						}
+					}
+				}
+
+				if (g_CommunicationType==1)  // 通信类型1，重复上面的过程
+				{
+
+					int error = modbus_read_one_value( nID, nIDNode, 6 ,2);
+					if( error )
+						bOnLine=FALSE;
+
+					if( ! error )
+					{
+						unsigned short SerialNum[4];
+						memset(SerialNum,0,sizeof(SerialNum));
+						int nRet=0;
+
+						// read first 4 registers
+						nRet=modbus_read_multi_value(&SerialNum[0],nIDNode,0,4,2);
+
+						int nSerialNumberRead;
+
+						if(nRet>=0)
+						{
+
+							nSerialNumberRead=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
+						}
+						if(nSerialNumber>=0)
+						{
+							if(nSerialNumberRead==nSerialNumber)
+								bOnLine=TRUE;
+						}
 					}
 				}
 			}
+
 
 			if(bOnLine>0)  // 如果online，更新显示图片
 			{
@@ -5144,7 +6706,7 @@ UINT _FreshTreeView(LPVOID pParam )
 	CMainFrame* pMain = (CMainFrame*)pParam;
 	while(1)
 	{
-		
+
 		Sleep(15000);
 		WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
 
@@ -5263,6 +6825,52 @@ void CMainFrame::UpdateFloorNode(HTREEITEM& htiEdit)
 	
 }
 
+LRESULT CMainFrame::OnHotKey(WPARAM wParam,LPARAM lParam)
+{
+	UINT fuModifiers = (UINT) LOWORD(lParam);  // key-modifier flags    
+	UINT uVirtKey = (UINT) HIWORD(lParam);     // virtual-key code    
+
+	//判断响应了什么热键   
+	if( MOD_ALT == fuModifiers && 'S' == uVirtKey )  //Screen
+	{  
+		OnControlScreens();
+		//AfxMessageBox(_T("你按下了组合键 alt + m"));    
+	}  
+	else if(MOD_ALT == fuModifiers && 'P' == uVirtKey)//Program
+	{
+		OnControlPrograms();
+	}
+	else if(MOD_ALT == fuModifiers && 'I' == uVirtKey)//Input
+	{
+		OnControlInputs();
+	}
+	else if(MOD_ALT == fuModifiers && 'O' == uVirtKey)//Output
+	{
+		OnControlOutputs();
+	}
+	else if(MOD_ALT == fuModifiers && 'V' == uVirtKey)//Variable
+	{
+		OnControlVariables();
+	}
+	else if(MOD_ALT == fuModifiers && 'C' == uVirtKey)//Controllers
+	{
+		OnControlControllers();
+	}
+	else if(MOD_ALT == fuModifiers && 'W' == uVirtKey)//Weekly routines
+	{
+		OnControlWeekly();
+	}
+	else if(MOD_ALT == fuModifiers && 'A' == uVirtKey)//Annual Routines
+	{
+		OnControlAnnualroutines();
+	}
+	else if(MOD_ALT == fuModifiers && 'G' == uVirtKey)//Annual Routines
+	{
+		OnControlMonitors();
+	}
+
+	return 0;
+}
 
 void CMainFrame::UpdateRoomNode(HTREEITEM& htiEdit)
 {
@@ -6299,20 +7907,25 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 				My_Invoke_Struct = (_MessageInvokeIDInfo *)msg.wParam;
 				My_Receive_msg.erase(My_Receive_msg.begin());
 				MyCriticalSection.Unlock();
-				for (int i=0;i<3000;i++)//3秒钟判断任务是否超时.
+				for (int i=0;i<40;i++)//3秒钟判断任务是否超时.
 				{
 					if(tsm_invoke_id_free(My_Invoke_Struct->Invoke_ID))
 					{
+						::PostMessage(MainFram_hwd,MY_RX_TX_COUNT,1,0);
 						::PostMessage(My_Invoke_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_SUCCESS,(LPARAM)My_Invoke_Struct);
 						goto loop1;
 					}
 					else
 					{
-						Sleep(1);
+
+						//Sleep(30);
+						Sleep(5);
 						continue;
 					}
 				}
+					::PostMessage(MainFram_hwd,MY_RX_TX_COUNT,0,0);
 					::PostMessage(My_Invoke_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_FAIL,(LPARAM)My_Invoke_Struct);
+		//			tsm_free_invoke_id (My_Invoke_Struct->Invoke_ID);
 loop1:
 				break;
 			case MY_BAC_WRITE_LIST:
@@ -6344,10 +7957,10 @@ loop1:
 							{
 								CString temp_cs_show;
 								temp_cs_show.Format(_T("Task ID = %d. %s "),g_invoke_id,My_WriteList_Struct->Write_Info);
-								Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd,temp_cs_show);
+								Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd,temp_cs_show,My_WriteList_Struct->ItemInfo.nRow,My_WriteList_Struct->ItemInfo.nCol);
 							}
 								//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
-							Sleep(200);
+							Sleep(SEND_COMMAND_DELAY_TIME);
 						} while (g_invoke_id<0);
 
 						My_WriteList_Struct->start_instance = temp_end_value + 1;
@@ -6379,10 +7992,30 @@ loop1:
 										break;
 									
 									g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,My_WriteList_Struct->entitysize);
-									Sleep(200);
+									Sleep(SEND_COMMAND_DELAY_TIME);
 								} while (g_invoke_id<0);
 
 						}
+
+				}
+				break;
+			case MY_BAC_REFRESH_ONE:
+				{
+					MyCriticalSection.Lock();
+					msg=My_Receive_msg.at(0);
+					_MessageRefreshListInfo *My_Readone_Struct = (_MessageRefreshListInfo *)msg.wParam;
+					My_Receive_msg.erase(My_Receive_msg.begin());
+					MyCriticalSection.Unlock();
+					resend_count = 0;
+					do 
+					{
+						resend_count ++;
+						if(resend_count>10)
+							break;
+
+						g_invoke_id = GetPrivateData(My_Readone_Struct->deviceid,My_Readone_Struct->command,My_Readone_Struct->start_instance,My_Readone_Struct->end_instance,My_Readone_Struct->entitysize);
+						Sleep(SEND_COMMAND_DELAY_TIME);
+					} while (g_invoke_id<0);
 
 				}
 				break;
@@ -6407,7 +8040,10 @@ void CMainFrame::OnDatabaseMbpoll()
 {
 	// TODO: Add your command handler code here
 	if (mbPollDlgOpen == TRUE) 
+		{
+		mbPoll->ShowWindow(SW_SHOW);
 		return;
+		}
 
 	mbPollDlgOpen = TRUE;
 
@@ -6469,97 +8105,164 @@ void CMainFrame::OnFunctionHumcalibration()
 void CMainFrame::OnControlInputs()
 {
 	// TODO: Add your command handler code here
-	#ifdef Fance_Enable_Test
-	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_INPUT);
-	#endif
+	//#ifdef Fance_Enable_Test
+	//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_INPUT);
+	//#endif
 
-#ifndef Fance_Enable_Test
-	MessageBox(_T("This function is still in development"));
-#endif
+	//#ifndef Fance_Enable_Test
+	//MessageBox(_T("This function is still in development"));
+	//#endif
+
+	if(g_protocol == 2)
+	{
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_INPUT);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
 }
 
 
 void CMainFrame::OnControlPrograms()
 {
 	// TODO: Add your command handler code here
-	#ifdef Fance_Enable_Test
-	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAM);
-	#endif
-#ifndef Fance_Enable_Test
-	MessageBox(_T("This function is still in development"));
-#endif
+	//#ifdef Fance_Enable_Test
+	//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAM);
+	//#endif
+	//#ifndef Fance_Enable_Test
+	//MessageBox(_T("This function is still in development"));
+	//#endif
+
+	if(g_protocol == 2)
+	{
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAM);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
 }
 
 
 void CMainFrame::OnControlOutputs()
 {
 	// TODO: Add your command handler code here
-	#ifdef Fance_Enable_Test
-	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_OUTPUT);
-	#endif
-#ifndef Fance_Enable_Test
-	MessageBox(_T("This function is still in development"));
-#endif
+	//#ifdef Fance_Enable_Test
+	//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_OUTPUT);
+	//#endif
+	//#ifndef Fance_Enable_Test
+	//MessageBox(_T("This function is still in development"));
+	//#endif
+
+	if(g_protocol == 2)
+	{
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_OUTPUT);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
 }
 
 
 void CMainFrame::OnControlVariables()
 {
 	// TODO: Add your command handler code here
-	#ifdef Fance_Enable_Test
-	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_VARIABLE);
-	#endif
-#ifndef Fance_Enable_Test
-	MessageBox(_T("This function is still in development"));
-#endif
+	//#ifdef Fance_Enable_Test
+	//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_VARIABLE);
+	//#endif
+	//#ifndef Fance_Enable_Test
+	//MessageBox(_T("This function is still in development"));
+	//#endif
+	if(g_protocol == 2)
+	{
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_VARIABLE);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
 }
 
 
 void CMainFrame::OnControlWeekly()
 {
 	// TODO: Add your command handler code here
-	#ifdef Fance_Enable_Test
-	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLY);
-	#endif
-#ifndef Fance_Enable_Test
-	MessageBox(_T("This function is still in development"));
-#endif
+	//#ifdef Fance_Enable_Test
+	//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLY);
+	//#endif
+	//#ifndef Fance_Enable_Test
+	//MessageBox(_T("This function is still in development"));
+	//#endif
+	if(g_protocol == 2)
+	{
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLY);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
 }
 
 
 void CMainFrame::OnControlAnnualroutines()
 {
 	// TODO: Add your command handler code here
-	#ifdef Fance_Enable_Test
-	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ANNUAL);
-#endif
-#ifndef Fance_Enable_Test
-	MessageBox(_T("This function is still in development"));
-#endif
+	//#ifdef Fance_Enable_Test
+	//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ANNUAL);
+	//#endif
+	//#ifndef Fance_Enable_Test
+	//MessageBox(_T("This function is still in development"));
+	//#endif
+	if(g_protocol == 2)
+	{
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ANNUAL);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
 }
 
 
 void CMainFrame::OnMiscellaneousLoaddescriptors()
 {
 	// TODO: Add your command handler code here
-	#ifdef Fance_Enable_Test
-	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
-#endif
-#ifndef Fance_Enable_Test
-	MessageBox(_T("This function is still in development"));
-#endif
+	//#ifdef Fance_Enable_Test
+	//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
+	//#endif
+	//#ifndef Fance_Enable_Test
+	//MessageBox(_T("This function is still in development"));
+	//#endif
+	if(g_protocol == 2)
+	{
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
 }
 
 
 void CMainFrame::OnMiscellaneousUpdatemini()
 {
 	// TODO: Add your command handler code here
-		#ifdef Fance_Enable_Test
-	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,WRITEPRGFLASH_COMMAND);
-#endif
-#ifndef Fance_Enable_Test
-	MessageBox(_T("This function is still in development"));
-#endif
+	//#ifdef Fance_Enable_Test
+	//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,WRITEPRGFLASH_COMMAND);
+	//#endif
+	//#ifndef Fance_Enable_Test
+	//MessageBox(_T("This function is still in development"));
+	//#endif
+	if(g_protocol == 2)
+	{
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,WRITEPRGFLASH_COMMAND);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
 }
 
 //#include "BacnetController.h"
@@ -6568,11 +8271,58 @@ void CMainFrame::OnControlControllers()
 	// TODO: Add your command handler code here
 	//BacnetController dlg;
 	//dlg.DoModal();
-	#ifdef Fance_Enable_Test
-	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_CONTROLLER);
+	//#ifdef Fance_Enable_Test
+	//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_CONTROLLER);
+	//#endif
+	//#ifndef Fance_Enable_Test
+	//MessageBox(_T("This function is still in development"));
+	//#endif
+	if(g_protocol == 2)
+	{
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_CONTROLLER);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
+}
+
+void CMainFrame::OnControlScreens()
+{
+	
+	// TODO: Add your command handler code here
+	if(g_protocol == 2)
+	{
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SCREENS);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
+}
+
+#include "BacnetMonitor.h"
+void CMainFrame::OnControlMonitors()
+{
+	// TODO: Add your command handler code here
+#if 0
+#ifdef Fance_Enable_Test
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_MONITOR);
 #endif
 #ifndef Fance_Enable_Test
 	MessageBox(_T("This function is still in development"));
 #endif
-	
+#endif
+
+	if(g_protocol == 2)
+	{
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_MONITOR);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
+
+	//CBacnetMonitor Dlg;
+	//Dlg.DoModal();
 }

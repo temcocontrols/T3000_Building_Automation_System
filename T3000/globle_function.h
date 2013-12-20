@@ -19,7 +19,7 @@
 #include "global_variable_extern.h"
 
 void FLEX_GRID_PUT_STR(CMsflexgrid m_FlexGri,int row,int col,CString str);
-
+int Set_Communication_Count(bool b_transmission,int bac_instanceid);
 int modbus_read_one_value( 
 				int& value, 
 				unsigned char device_var,
@@ -36,7 +36,7 @@ int modbus_read_multi_value(
 int read_one(unsigned char device_var,unsigned short address,int retry_times=3);
 int write_one(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
-int Write_Multi_short(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
+int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times=3);
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times=3);
 int write_one_org(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
@@ -91,12 +91,15 @@ BOOL Post_Read_one_Thread_Message(
 BOOL Post_Invoke_ID_Monitor_Thread(UINT MsgType,
 	int Invoke_ID,
 	HWND hwnd,
-	CString Show_Detail = _T("")
+	CString Show_Detail = _T(""),
+	int nRow = 0,
+	int nCol = 0
 	);
+BOOL Post_Refresh_One_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize);
 BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,int block_size);
-BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,HWND hWnd,CString Task_Info = _T(""));
-
+BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,HWND hWnd,CString Task_Info = _T(""),int nRow = 0,int nCol = 0);
 int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int16_t entitysize);
+int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t index,int8_t ntype,int8_t nspecial,MonitorUpdateData* up_data);
 int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance/*,int8_t entitysize*/ );
 
 int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
@@ -106,6 +109,25 @@ void local_handler_conf_private_trans_ack(
 	BACNET_ADDRESS * src,
 	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
 
-void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
+void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_ADDRESS * src);
 
+void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
+char * intervaltotext(char *textbuf, long seconds , unsigned minutes , unsigned hours, char *c =":");
+char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsigned hours,char *c =":");
+ DWORD WINAPI   MSTP_Receive(LPVOID lpVoid);
+ void Localhandler_read_property_ack(
+	 uint8_t * service_request,
+	 uint16_t service_len,
+	 BACNET_ADDRESS * src,
+	 BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
+ void Initial_bac_com(int comport = 1);
+  bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket);
+  unsigned char Str_to_Byte(CString need_conver);
+  void Init_Service_Handlers(void);
+CString GetProductName(int ModelID);
+
+CString Get_Table_Name(int SerialNo,CString Type ,int Row);
+void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName); 
+int Get_Unit_Process(CString Unit);
+BOOL Get_Bit_FromRegister(unsigned short RegisterValue,unsigned short Position);
 #endif

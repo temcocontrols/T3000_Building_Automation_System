@@ -31,6 +31,9 @@ public:
 	int GetEPSize()const;
 	void SetEPSize(int nEPSize);
 	
+	int GetProtocol() const;
+	void SetProtocol(int nProtocol);
+
 	CString GetProductName();
 // 	int GetAddrID()const;
 // 	void SetAddrID(int nID);
@@ -41,7 +44,7 @@ public:
 
 
 protected:
-	
+	int				m_nprotocol;				//协议
 	int				m_nBaudRate;				// 波特率
 	int				m_nComPort;				// 串口	
 	int				m_nEPSize;					// ??

@@ -26,6 +26,7 @@ public:
 	void Initial_List();
 	afx_msg void OnBnClickedButtonProgramRead();
 	afx_msg LRESULT Fresh_Program_List(WPARAM wParam,LPARAM lParam);
+	LRESULT ProgramMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedButtonProgramApply();
 //	afx_msg LRESULT  ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedButtonProgramEdit();
@@ -38,6 +39,7 @@ public:
 	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
 	afx_msg void OnClose();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 	const int PROGRAM_NUM = 0;
@@ -47,6 +49,9 @@ public:
 	const int PROGRAM_SIZE_LIST = 4;
 	const int PROGRAM_RUN_STATUS = 5;
 	const int PROGRAM_LABEL = 6 ;
+
+	const int PROGRAM_COL_NUMBER = 7;
+	
 
 
 	const CString Auto_Manual[2]=

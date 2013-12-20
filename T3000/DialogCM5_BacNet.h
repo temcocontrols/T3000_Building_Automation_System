@@ -38,14 +38,17 @@ public:
 
 	bool CM5_Thread;
 	bool m_MSTP_THREAD;
-	HANDLE CM5_hThread;
+	//HANDLE CM5_hThread;
+	//HANDLE CM5_UI_Thread;
 	DWORD nThreadID;
-	static DWORD WINAPI   MSTP_Receive(LPVOID lpVoid);
+	DWORD cm5_nThreadID;
+	//static DWORD WINAPI   MSTP_Receive(LPVOID lpVoid);
+	//static DWORD WINAPI   CM5_UI(LPVOID lpVoid);
 	void Initial_List();
 //	CMyOwnListCtrl m_device_list_info;
 	afx_msg LRESULT Fresh_UI(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT  AllMessageCallBack(WPARAM wParam, LPARAM lParam);
-	LRESULT Delete_Wait_Dlg(WPARAM wParam,LPARAM lParam);
+	LRESULT Delete_New_Dlg(WPARAM wParam,LPARAM lParam);
 
 //	afx_msg void OnBnClickedButton1();
 
@@ -68,7 +71,7 @@ public:
 	afx_msg void OnNMSetfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMSetfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedBtnBacWriteTime();
-	CStaticEx m_bac_static_status;
+
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 static void Init_Service_Handlers(void);

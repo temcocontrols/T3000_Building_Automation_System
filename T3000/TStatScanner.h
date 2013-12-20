@@ -91,6 +91,7 @@ public:
  	// 搜索串口设备
  	BOOL ScanComDevice();
 	BOOL ScanComOneByOneDevice();
+	BOOL ScanBacnetComDevice();//扫描 bacnet com port 设备;
 	void SetComPort(int nCom);
 public:
 	// 释放资源
@@ -174,6 +175,7 @@ public:
 
 	void ShowNetScanInfo(const CString& strInfo);
 	void ShowComScanInfo(const CString& strInfo);
+	void ShowBacnetComScanInfo(const CString& strInfo);
 
 	void  ReadNCTable(_NetDeviceInfo* pNCInfo);
 	
@@ -192,12 +194,14 @@ public:
 	vector<_ComDeviceInfo*>		m_szTstatScandRet;
 	vector<_NetDeviceInfo*>		m_szNCScanRet;
 	vector<_NetDeviceInfo*>		m_szNCScanRet2; // NC find by com port
-
+	vector<CString>				m_bacnetComs;
 	vector<CString>				m_szComs;
 	CEvent*							m_eScanComEnd;
 	CEvent*							m_eScanComOneByOneEnd;
 	CEvent*							m_eScanNCEnd;
 	CEvent*							m_eScanOldNCEnd;
+	CEvent*						m_eScanBacnetComEnd;
+
 
 	BOOL								m_bStopScan;					// 强制结束SCAN，由用户选择exit时，停止两个搜索线程
 	BOOL								m_bNetScanFinish;			// 网络scan完成
@@ -205,14 +209,22 @@ public:
 	int									m_nComPort;
 	CWnd*							m_pParent;	
 
-protected:
-	BOOL								m_bComScanRunning;		// 是否是Com scan, TRUE = scan com, FALSE = scan net
-	int									m_ScannedNum;
-
+	CWinThread*					m_pScanBacnetComThread;
 	CWinThread*					m_pScanNCThread;
 	CWinThread*					m_pScanTstatThread;
 	CWinThread*					m_pScanTstatOneByOneThread;
 	CWinThread*					m_pWaitScanThread;
+	bool						m_com_scan_end;
+
+	CString						m_strBuildingName;
+	CString						m_strSubNet;
+	CString						m_strFloorName;
+	CString						m_strRoomName;
+protected:
+	BOOL								m_bComScanRunning;		// 是否是Com scan, TRUE = scan com, FALSE = scan net
+	int									m_ScannedNum;
+
+
 
 
 
@@ -232,10 +244,7 @@ protected:
 	
 
 
-	CString						m_strBuildingName;
-	CString						m_strSubNet;
-	CString						m_strFloorName;
-	CString						m_strRoomName;
+
 	//BOOL							m_bAllScanFinish;	
 	_ConnectionPtr					t_pCon;
 	

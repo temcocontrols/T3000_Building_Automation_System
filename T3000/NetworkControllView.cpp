@@ -355,7 +355,65 @@ void CNetworkControllView::OnBnClickedButton10()
 }
 
 void CNetworkControllView::OnBnClickedApplybutton()
+{   if (g_CommunicationType==0)
 {
+	if(!CheckSettingChanged()) // if setting changed,return TRUE
+	{
+		return; // unchanged, don't write register
+	}
+
+	if(g_NetWorkLevel==1)
+		return;
+	BeginWaitCursor();
+	//m_nListenPort	
+	CString strText;
+	m_listenPortEdit.GetWindowText(strText);
+	if(!strText.IsEmpty())
+		m_nListenPort=_wtoi(strText);
+	if(m_nListenPort>=12767)
+	{
+		AfxMessageBox(_T("The listen port number is too big, please change it."));
+		return;
+	}
+	if(m_nListenPort<=0)
+	{
+		AfxMessageBox(_T("The listen port number must be greater than 0!"));
+		return;
+	}
+	write_one(g_tstat_id,120,m_nListenPort);
+	BYTE address1,address2,address3,address4;
+	m_ip_addressCtrl.	GetAddress(address1,address2,address3,address4);
+	int n=write_one(g_tstat_id,107,address1);
+	n=write_one(g_tstat_id,108,address2);
+	n=write_one(g_tstat_id,109,address3);
+	n=write_one(g_tstat_id,110,address4);
+	m_subnet_addressCtrl.GetAddress(address1,address2,address3,address4);
+	write_one(g_tstat_id,111,address1);
+	write_one(g_tstat_id,112,address2);
+	write_one(g_tstat_id,113,address3);
+	write_one(g_tstat_id,114,address4);
+	m_gateway_addressCtrl.GetAddress(address1,address2,address3,address4);
+	write_one(g_tstat_id,115,address1);
+	write_one(g_tstat_id,116,address2);
+	write_one(g_tstat_id,117,address3);
+	write_one(g_tstat_id,118,address4);
+	write_one(g_tstat_id,131,1);
+	Sleep(1000);//Sleep(10000); // ???
+	write_one(g_tstat_id,133,1);
+	Sleep(5000);	//Sleep(5000); // wait for nc restart
+
+	CMainFrame* pPraent=(CMainFrame*)GetParent();
+
+	CString strBuilding,strSubBuilding;
+	strBuilding=pPraent->m_strCurMainBuildingName;
+	strSubBuilding=pPraent->m_strCurSubBuldingName;
+	CString strIP,strPort;
+	strPort.Format(_T("%d"),multi_register_value[120]);
+	m_ip_addressCtrl.GetAddress(address1,address2,address3,address4);
+	strIP.Format(_T("%d.%d.%d.%d"),address1,address2,address3,address4);
+
+return;
+}
 	if(!CheckSettingChanged()) // if setting changed,return TRUE
 	{
 		return; // unchanged, don't write register
@@ -402,7 +460,7 @@ void CNetworkControllView::OnBnClickedApplybutton()
 	   data[i]=(unsigned short)address[i];
 	}
 
-	int ret=write_multi_Short(g_tstat_id,data,107,12);
+	int ret=Write_Multi_short(g_tstat_id,data,107,12);
 	//write_one(g_tstat_id,131,1);
 	//Sleep(1000);//Sleep(10000); // ???
 	//write_one(g_tstat_id,133,1);

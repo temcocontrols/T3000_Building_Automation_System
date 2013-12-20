@@ -2,16 +2,16 @@
 
 /**
 
-  Read one value from a modbus device
+Read one value from a modbus device
 
-  @param[out]  value		the value read, cast to an integer
-  @param[in]   device_var	the modbus device address
-  @param[in]   address		the offset of the value to be read in the device
-  @param[in]   retry_times	the number of times to retry on read failure before giving up
+@param[out]  value		the value read, cast to an integer
+@param[in]   device_var	the modbus device address
+@param[in]   address		the offset of the value to be read in the device
+@param[in]   retry_times	the number of times to retry on read failure before giving up
 
-  @return  0 if there were no errors
+@return  0 if there were no errors
 
-  This DOES lock the register_critical_section
+This DOES lock the register_critical_section
 
   */
 int modbus_read_one_value( 
@@ -124,6 +124,30 @@ int modbus_read_one_value(
 
 }
 
+int Set_Communication_Count(bool b_transmission,int bac_instanceid)
+{
+	if(b_transmission)
+	{
+		g_llTxCount++;g_llRxCount++;
+	}
+	else
+	{
+		g_llTxCount++;
+	}
+	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) 
+	{
+
+		// construct status message string
+		CString str;
+		str.Format(_T("Instance ID:%d [Tx=%d Rx=%d Err=%d]"), 
+			bac_instanceid, g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+
+		//Display it
+		((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
+
+	}
+	return 0;
+}
 
 /**
 
@@ -164,11 +188,11 @@ int modbus_read_multi_value(
 	{
 
 		// call the modbus DLL method
-		;
+		
 
 		// call the modbus DLL method
 		error=read_multi(device_var,put_data_into_here,start_address,length);
-
+		       
 		// free the modbus communications for other threads
 	
 		

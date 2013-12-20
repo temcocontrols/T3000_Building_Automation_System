@@ -84,9 +84,6 @@
     <ClCompile Include="excel9.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fileRW.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FreeCoolDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -408,6 +405,30 @@
     <ClCompile Include="RegDetails.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="T38IOAView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WriteSingleRegDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fileRW.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MbPollFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetGraphic.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetMonitor.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetScreen.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\PointItem.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -622,9 +643,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="excel9.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fileRW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FreeCoolDlg.h">
@@ -979,6 +997,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AirflowSettingDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T38IOAView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WriteSingleRegDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fileRW.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MbPollFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

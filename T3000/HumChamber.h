@@ -5,6 +5,7 @@
 #include "globle_function.h"
 #include "afxwin.h"
 #include "afxcmn.h"
+#include "WriteSingleRegDlg.h"
 
 #define  WM_MY_MESSAGE  WM_USER + 101
 
@@ -44,6 +45,7 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual void OnInitialUpdate();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 public:
     BOOL m_ReadOnly;
 	void Fresh();
@@ -54,18 +56,17 @@ public:
 	BOOL GetRegInfoFromDB(Register_info &reg_data,CString Area_Name);
 	void Update_AllData();
 	void Update_SensorTable();
-	 
 	void Show_AllData();
 	BOOL WriteValueToRegID(UINT RegID,UINT &Value); 
-	/*void CreatDBTable();
-	BOOL GetDatabase();*/
-
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnBnClickedRefresh();
 //	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CMsflexgrid m_msflexgrid;
 	CString g_strScanInfo;
-//	afx_msg void OnEnChangeHumTol();
+	void Set(int id,int value);
+ 
+    int m_ID;
+	int m_Value;
 private:
 	Register_info MasterID;
 	Register_info SlaveID;
@@ -230,6 +231,46 @@ private:
 //		void RowColChangeMsflexgridInput3();
 		void ShowChangingData();
 		void ClickMsflexgridInput3();
+		afx_msg void OnEnSetfocusNumSensor();
+	 
+		
+		afx_msg void OnEnSetfocusSlaveId();
+		afx_msg void OnEnSetfocusStartPoint();
+		afx_msg void OnEnSetfocusTempTol();
+		afx_msg void OnEnSetfocusHumTol();
+
+		afx_msg void OnEnSetfocusTemp1();
+		afx_msg void OnEnSetfocusTemp2();
+		afx_msg void OnEnSetfocusTemp3();
+		afx_msg void OnEnSetfocusTemp4();
+		afx_msg void OnEnSetfocusTemp5();
+		afx_msg void OnEnSetfocusTemp6();
+		afx_msg void OnEnSetfocusTemp7();
+		afx_msg void OnEnSetfocusTemp8();
+		afx_msg void OnEnSetfocusTemp9();
+		afx_msg void OnEnSetfocusTemp10();
+
+		afx_msg void OnEnSetfocusHum1();
+		afx_msg void OnEnSetfocusHum2();
+		afx_msg void OnEnSetfocusHum3();
+		afx_msg void OnEnSetfocusHum4();
+		afx_msg void OnEnSetfocusHum5();
+		afx_msg void OnEnSetfocusHum6();
+		afx_msg void OnEnSetfocusHum7();
+		afx_msg void OnEnSetfocusHum8();
+		afx_msg void OnEnSetfocusHum9();
+		afx_msg void OnEnSetfocusHum10();
+
+		afx_msg void OnEnSetfocusTime1();
+		afx_msg void OnEnSetfocusTime2();
+		afx_msg void OnEnSetfocusTime3();
+		afx_msg void OnEnSetfocusTime4();
+		afx_msg void OnEnSetfocusTime5();
+		afx_msg void OnEnSetfocusTime6();
+		afx_msg void OnEnSetfocusTime7();
+		afx_msg void OnEnSetfocusTime8();
+		afx_msg void OnEnSetfocusTime9();
+		afx_msg void OnEnSetfocusTime10();
 };
 
 

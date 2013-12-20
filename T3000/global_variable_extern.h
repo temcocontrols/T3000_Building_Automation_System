@@ -5,12 +5,15 @@
 #include "gloab_define.h"
 
 #define MY_MBPOLL_REG_DIALOG_MSG (WM_USER + 557)
+#define MY_MBPOLL_WRITE_REG_MSG (WM_USER + 558)
 
 extern int g_invoke_id;
 extern vector <int> Change_Color_ID;
 extern HANDLE hThread;
 extern DWORD nThreadID;
 extern HWND hMbpollWnd;
+extern HWND hMbpollWritePopWnd;
+extern int regDetailsOpenedFrom;	// 0 = MbPoll.cpp; 1 = mbpollFunctions.cpp
 
 extern const bool WRITE_SUCCESS;
 extern const bool WRITE_FAIL ;
@@ -903,6 +906,9 @@ extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT1	   ;
 extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT2	   ;
 extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT3	   ;
 #pragma region For_bacnet
+extern int g_bac_instance;
+extern unsigned short g_mac;
+extern HWND MainFram_hwd;
 extern HWND BacNet_hwd;//Used for send a message to father delete the dlg;
 extern int bac_ranges_type;
 extern int bac_range_number_choose;
@@ -919,13 +925,20 @@ extern bool bac_weekly_read_results;
 extern bool bac_annual_read_results;
 extern bool bac_time_command_read_results;
 extern bool bac_controller_read_results;
+extern bool bac_screen_read_results;
+extern bool bac_monitor_read_results;
+extern bool bac_programcode_read_results;
+extern bool bac_weeklycode_read_results;
+extern bool bac_cm5_graphic;
 
 extern int bac_gloab_panel;
-extern int bac_gloab_device_id;
+
 
 extern int program_list_line ;
 extern int weekly_list_line ;
 extern int annual_list_line ;
+extern int screen_list_line ;
+extern int monitor_list_line;
 extern Time_block_mini Device_time;
 
 extern HWND      g_hwnd_now;
@@ -939,6 +952,8 @@ extern HWND      m_annual_dlg_hwnd;
 extern HWND      m_schedule_time_dlg_hwnd;
 extern HWND      m_schedule_day_dlg_hwnd;
 extern HWND      m_controller_dlg_hwnd;
+extern HWND      m_screen_dlg_hwnd;
+extern HWND	  m_monitor_dlg_hwnd;
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
@@ -947,5 +962,33 @@ extern vector <Str_weekly_routine_point> m_Weekly_data;
 extern vector <Str_annual_routine_point> m_Annual_data;
 extern vector <Str_schedual_time_point> m_Schedual_Time_data;
 extern vector <Str_controller_point> m_controller_data;
+extern vector <Control_group_point> m_screen_data;
+extern vector <Str_monitor_point> m_monitor_data;
+extern vector <_Bac_Scan_Com_Info> m_bac_scan_com_data;
+extern vector <_Com_Scan_Read_Info> m_bac_scan_resend_data;
+extern vector <_Graphic_Value_Info> m_graphic_refresh_data;
+extern vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
+extern Monitor_Block m_monitor_block;
+extern int Monitor_Input__Data[14][1000];
+extern Monitor_Input_Info my_input_info[14];
+extern unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][500];//暂定400;
+extern int program_code_length[BAC_PROGRAM_ITEM_COUNT];
+extern int Max_Scale_value;
+extern int Min_Scale_value;
+extern int MAX_SCALE_5;
+extern int MIN_SCALE_5;
+extern int Total_SCALE;
+extern CString bac_cs_mac;
+extern CString bac_cs_device_id;
+extern CString bac_cs_vendor_id;
+extern HANDLE CM5_hThread;
+extern HANDLE CM5_UI_Thread;
+extern DWORD nThreadID_x;
+extern DWORD cm5_nThreadID;
+extern int g_protocol;
+extern bool bac_net_initial_once;
 extern byte	g_DayState[8][48];
+extern unsigned long timesec1970; 
+extern unsigned long timestart;   
+extern bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，否则就为1;
 #pragma endregion For_bacnet

@@ -29,6 +29,12 @@ typedef struct OUTPUTNAMESTATUS
 	CString Status;
 }ONS;
 
+typedef struct Output_Mapping_Struct{
+	int Address;
+	int Card_ID;
+	int OuputNo;
+	int OutputNameAddress;
+} Mapping_Struct;
 
 // CLightingController form view
 
@@ -57,14 +63,28 @@ protected:
 public:
 	virtual void OnInitialUpdate();
 	void Fresh();
+	void Fresh_System();
 	unsigned int m_inaddress;
 	int m_inSerialNum;
 	float m_flFirmware;
 	int m_inHardware;
 	CString m_CStrModel;
 	int m_inBaudrate;
+	int m_sn;
+	int m_input_output;
+	void Fresh_ListBox();
 	void ShowLighContDlg();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnDestroy();
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+
+	//////////////////////////////////////////////
+	vector<Mapping_Struct> m_input_output_mapping;
+	vector<Mapping_Struct> m_group_output_mapping;
+	////////////////////////////////////////////////
+
+	CString Read_OutputName(int Address);
+	void Read_Input_Group_Mapping();
 	CString m_datetime;
 	unsigned short LightCregister[512];
 	BOOL prodtopcData();//采集数据
@@ -106,11 +126,12 @@ public:
 	DECLARE_EVENTSINK_MAP()
 	void ClickMsflexgrid1();
 
-
+	void ClickMsflexgrid4();
 	 long row,col;
 	 void DblClickMsflexgrid1();
 	 CEdit m_editName;
 	 afx_msg void OnEnKillfocusEditModifyname();
+	 afx_msg void OnEnKillfocusEditTimeSaveDelay();
 	 //存放输出名称Status
 	 vector<ONS>m_vecONS;
 	 ONS m_structONS;
@@ -163,8 +184,11 @@ public:
 	BYTE senddata[100];
 	
 
-
-
+	int m_nCurRow;
+	int m_nCurCol;
+	int m_GridNo;
+	CString m_oldname;
+	CString m_newname;
 	afx_msg void OnSetmappingAddoutputbarod();
 	afx_msg void OnSetmappingPrevious();
 	afx_msg void OnSetmappingNext();
@@ -175,7 +199,8 @@ public:
 	afx_msg void OnBnClickedButtonLightingcontorlAnnuals();
 	afx_msg void OnBnClickedButtonLightingcontorlGroups();
 	afx_msg void OnBnClickedButtonLightingcontorlSyncwithPC();
-
+	afx_msg void OnBnClickedButtonSaveAll();
+	afx_msg void OnCbnSelchangeValuecombo();
 
 	WORD lightingController_time[8];
 	
@@ -218,6 +243,7 @@ public:
 
 	 afx_msg void OnBnClickedButtonApply();
 	 BOOL CheckSettingChanged();
+	 void Fresh_Inputs();
 	 CIPAddressCtrl			m_ip_addressCtrl;
 	 CIPAddressCtrl			m_subnet_addressCtrl;
 	 CIPAddressCtrl			m_gateway_addressCtrl;
@@ -230,7 +256,14 @@ public:
 	 CButton					m_ReadOnlyCheckBtn;
 	 CComboBox m_ipModelComBox;
 	 afx_msg void OnBnClickedButtonConfigure();
-	 afx_msg void OnBnClickedButtonConfigureswitch();
+	 
+	 CComboBox m_timeserver;
+	 CEdit m_macaddress;
+	BOOL m_light[32];
+	CMsflexgrid m_inputs_grid;
+	CComboBox m_combox_controler;
+	CWinThread * LC_Thread;
+	CEdit m_savedelaytime;
 };
 
 

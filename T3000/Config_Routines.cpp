@@ -61,8 +61,12 @@ void CConfig_Routines::read_addr(description3 *temp_description,int number,unsig
 	description3 * temp2=temp_description;
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
 	{
-		unsigned short temp_buffer[SIZEOF_DESCRIPTION*20];
-		Read_Multi(254,temp_buffer,5692 + ID_SIZE * (addr2-1),SIZEOF_DESCRIPTION*number);
+		unsigned short temp_buffer[SIZEOF_DESCRIPTION*40];//分两次读
+		for (int i=0;i<2;i++)
+		{
+		 Read_Multi(g_tstat_id,&temp_buffer[SIZEOF_DESCRIPTION*20*i],GROUP_SCHEDULE,SIZEOF_DESCRIPTION*20);
+		}
+		
 		int i=0;
 		char *p;
 		description3 temp;
@@ -183,7 +187,7 @@ void CConfig_Routines::clear_addr(unsigned char addr2)
 		*(p++)=0xFF;
 	p=(unsigned char *) &temp_descri;
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		Write_Multi(254,p,5692+(addr2-1)*SIZEOF_DESCRIPTION,SIZEOF_DESCRIPTION);
+		Write_Multi(g_tstat_id,p,GROUP_SCHEDULE+(addr2-1)*SIZEOF_DESCRIPTION,SIZEOF_DESCRIPTION);
 	else
 		Write_Multi(g_tstat_id,p,MODBUS_ID_FIRST+(addr2-1)*SIZEOF_DESCRIPTION,SIZEOF_DESCRIPTION);
 }
@@ -221,7 +225,7 @@ void CConfig_Routines::write_addr(unsigned char addr2)
 	unsigned char *p;
 	p=(unsigned char *) &temp_descri;
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		Write_Multi(254,p,5692 + ID_SIZE * (addr2-1),SIZEOF_DESCRIPTION);
+		Write_Multi(g_tstat_id,p,GROUP_SCHEDULE + ID_SIZE * (addr2-1),SIZEOF_DESCRIPTION);
 	else
 		Write_Multi(g_tstat_id,p,MODBUS_ID_FIRST + ID_SIZE * (addr2-1),SIZEOF_DESCRIPTION);
 	NET_WORK_SLEEP_BETWEEN_WRITE_READ
@@ -232,46 +236,66 @@ void CConfig_Routines::write_addr(unsigned char addr2)
 
 void CConfig_Routines::load_grid()
 {
-	m_FlexGrid.put_TextMatrix(0,0,_T("Num"));
-	m_FlexGrid.put_TextMatrix(0,1,_T("A/M"));
-	m_FlexGrid.put_TextMatrix(0,2,_T("Value"));
-	m_FlexGrid.put_TextMatrix(0,3,_T("Schedul1"));
-	m_FlexGrid.put_TextMatrix(0,4,_T("state1"));
-	m_FlexGrid.put_TextMatrix(0,5,_T("Schedul2"));
-	m_FlexGrid.put_TextMatrix(0,6,_T("state2"));
+	
 
 	CString str;
 	int intemp;
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
 	{
-		intemp = 20;
-		//m_FlexGrid.put_Rows(21);
+		m_FlexGrid.put_Cols(8);
+		m_FlexGrid.put_Rows(41);
+		m_FlexGrid.put_TextMatrix(0,0,_T("Num"));
+		 
+		m_FlexGrid.put_TextMatrix(0,1,_T("A/M"));
+		m_FlexGrid.put_TextMatrix(0,2,_T("Value"));
+		m_FlexGrid.put_TextMatrix(0,3,_T("Schedul1"));
+		m_FlexGrid.put_TextMatrix(0,4,_T("state1"));
+		m_FlexGrid.put_TextMatrix(0,5,_T("Schedul2"));
+		m_FlexGrid.put_TextMatrix(0,6,_T("state2"));
+		m_FlexGrid.put_TextMatrix(0,7,_T("Group Name"));
+	    intemp = 40;
+
 	}
 	else
 	{
+		m_FlexGrid.put_TextMatrix(0,0,_T("Num"));
+		m_FlexGrid.put_TextMatrix(0,1,_T("A/M"));
+		m_FlexGrid.put_TextMatrix(0,2,_T("Value"));
+		m_FlexGrid.put_TextMatrix(0,3,_T("Schedul1"));
+		m_FlexGrid.put_TextMatrix(0,4,_T("state1"));
+		m_FlexGrid.put_TextMatrix(0,5,_T("Schedul2"));
+		m_FlexGrid.put_TextMatrix(0,6,_T("state2"));
 		intemp = 254;
-		//m_FlexGrid.put_Rows(255);
+	
 	}
-
+	
 	//for(int i=1;i<=GRID_ROW_NUMBER;i++)
 	for(int i=1;i<=intemp;i++)
 	{
-		str.Format(_T("%d"),i);
-        m_FlexGrid.put_TextMatrix(i,0,str);
-		m_FlexGrid.put_Row(i);
-// 		m_FlexGrid.put_Col(4);
-// 		m_FlexGrid.put_CellBackColor(FLEXGRID_CELL_GRAY_COLOR);
-// 		m_FlexGrid.put_Col(6);
-// 		m_FlexGrid.put_CellBackColor(FLEXGRID_CELL_GRAY_COLOR);
+	   if (m_strtype.CompareNoCase(_T("Lightingcontroller"))!=0)
+	   {
+		   str.Format(_T("%d"),i);
+		   m_FlexGrid.put_TextMatrix(i,0,str);
+		   m_FlexGrid.put_Row(i);
+	   } 
+	   else
+	   {
+		   str.Format(_T("%d"),i);
+		   m_FlexGrid.put_TextMatrix(i,0,str);
+		   str=Get_Table_Name(m_sn,_T("Group"),i);
+		   m_FlexGrid.put_TextMatrix(i,7,str);
+		   m_FlexGrid.put_Row(i);
+	   }
+		
 
 	}
-	m_FlexGrid.put_ColWidth(0,400);
-	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) != 0)
+	m_FlexGrid.put_ColWidth(7,1000);
+	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) != 0)//IS NC
 	{
 		description3 temp_description[36];
 
 		for(unsigned short i=1;i<=7;i++)
-		{//////////////////////////////////////////////////get information from network
+		{    //////////////////////////////////////////////////get information from network
 			read_addr(temp_description,36,(i-1)*36+1);
 			for(int j=0;j<36;j++)
 				put_row_col(temp_description[j],(i-1)*36+j+1);
@@ -284,20 +308,12 @@ void CConfig_Routines::load_grid()
 	else
 	{
 		//description3 temp_description[36];
-		description3 temp_description[20];
-
-	//	for(unsigned short i=1;i<=7;i++)
-		//{//////////////////////////////////////////////////get information from network
-			//read_addr(temp_description,36,(i-1)*36+1);
-			read_addr(temp_description,20,1);
-			//for(int j=0;j<36;j++)
-			for(int j=0;j<20;j++)
+		   description3 temp_description[40];
+		  read_addr(temp_description,40,1);
+	
+			for(int j=0;j<40;j++)
 				put_row_col(temp_description[j],j+1);
-	//	}
-// 		read_addr(temp_description,2,253);//这是7*36= 252
-// 		put_row_col(temp_description[0],253);//252+1 = 253
-// 		put_row_col(temp_description[1],254);//253+1 = 254
-		m_FlexGrid.put_Row(g_tstat_id);//?
+
 	}
 
 
@@ -382,6 +398,14 @@ void CConfig_Routines::on_select()
 		m_combo_col_row.SelectString(-1,strValue); //内容全选。方便直接修改		
 		m_combo_col_row.SetFocus(); //获取焦点
 	}
+	else if (row_col==7&&row_row!=0)
+	{
+		m_Change.ShowWindow(SW_SHOW); //显示控件
+		m_Change.SetWindowText(strValue); //显示文本
+		m_Change.SetFocus(); //获取焦点
+		m_Change.SetSel(0,-1); //全选
+		m_Change.MoveWindow(rc); //移动到选中格的位置，覆盖
+	}
 	else
 	{
 		m_Change.ShowWindow(SW_SHOW); //显示控件
@@ -396,8 +420,14 @@ void CConfig_Routines::on_select()
 BOOL CConfig_Routines::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	unsigned short Data[4];
+	if (!is_connect())
+	{
+	AfxMessageBox(_T("Disconnection,Please connect!"));
+	}
+	Read_Multi(g_tstat_id,Data,0,4);
+	m_sn=Data[0]+Data[1]*256+Data[2]*256*256+Data[3]*256*256*256;
 
-	// TODO:  在此添加额外的初始化
 	load_grid();
 //	SetPaneString(_T("Finish"));
 	NET_WORK_SET_TIMER
@@ -416,7 +446,7 @@ void CConfig_Routines::ClickMsflexgrid1()
 
 void CConfig_Routines::OnEnSetfocusEdit1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	 
 	NET_WORK_KILL_TIMER
 	UpdateData(true);
 	m_before_focus_string=m_sChange;
@@ -440,12 +470,26 @@ void CConfig_Routines::OnEnKillfocusEdit1()
 		}
 		else 
 			m_sChange.MakeUpper();
+
+		m_FlexGrid.put_TextMatrix(row_row,row_col,m_sChange);//设置文本信息
+		m_Change.ShowWindow(SW_HIDE); //隐藏文本控件
+		UpdateData(false);
+		if(m_before_focus_string!=m_sChange)
+			write_addr(row_row);
 	}
-	m_FlexGrid.put_TextMatrix(row_row,row_col,m_sChange);//设置文本信息
-	m_Change.ShowWindow(SW_HIDE); //隐藏文本控件
-	UpdateData(false);
-	if(m_before_focus_string!=m_sChange)
-		write_addr(row_row);
+	else if (row_col==7)
+	{
+		unsigned char lable_buffer[GROUP_LABLE_SIZE]={0};
+		for (int k=0;k<m_sChange.GetLength();k++)
+		{
+			if (k>=10)
+				break;
+			lable_buffer[k]=(char)m_sChange.GetAt(k);
+		}
+		Write_Multi(g_tstat_id,lable_buffer,GROUP_DESCRIPTION_REG+(row_row-1)*GROUP_LABLE_SIZE,GROUP_LABLE_SIZE);
+		Insert_Update_Table_Name(m_sn,_T("Group"),row_row,m_sChange);
+		m_FlexGrid.put_TextMatrix(row_row,row_col,m_sChange);  
+	}
 	NET_WORK_SET_TIMER
 }
 

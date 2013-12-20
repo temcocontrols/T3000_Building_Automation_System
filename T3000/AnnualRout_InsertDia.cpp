@@ -224,7 +224,7 @@ void AnnualRout_InsertDia::load()
 {
 	set_day_state(TO_CLEAR_MONTH_CTRL);//clear month ctrl	
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		Read_Multi(254,the_days,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);//get from network
+		Read_Multi(g_tstat_id,the_days,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);//get from network
 	else
 		Read_Multi(g_tstat_id,the_days,MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);//get from network
 	int i=0,j=0;
@@ -242,7 +242,7 @@ void AnnualRout_InsertDia::load()
 			temp_uc[i]=0;
 		}
 		if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-			Write_Multi(254,temp_uc,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
+			Write_Multi(g_tstat_id,temp_uc,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 		else
 			Write_Multi(g_tstat_id,temp_uc,MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 	}
@@ -295,7 +295,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 		do 
 		{
 			retry_count ++;
-			g_invoke_id = GetPrivateData(bac_gloab_device_id,READANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48);
+			g_invoke_id = GetPrivateData(g_bac_instance,READANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48);
 			Sleep(200);
 		} while ((retry_count<10)&&(g_invoke_id<0));
 
@@ -592,7 +592,7 @@ void AnnualRout_InsertDia::OnAnnualroutAdd()
 	for(int i=0;i<ONE_YEAR_BETYS;i++)
 		ttt[i]=(unsigned char)the_days[i];
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		Write_Multi(254,ttt,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
+		Write_Multi(g_tstat_id,ttt,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 	else
 		Write_Multi(g_tstat_id,ttt,MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 	NET_WORK_SLEEP_BETWEEN_WRITE_READ
@@ -609,7 +609,7 @@ void AnnualRout_InsertDia::OnAnnualroutClear()
 		for(int i=0;i<ONE_YEAR_BETYS;i++)
 			ttt[i]=0;
 		if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-			Write_Multi(254,ttt,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
+			Write_Multi(g_tstat_id,ttt,5752 + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 		else
 			Write_Multi(g_tstat_id,ttt,MODBUS_AR_TIME_FIRST + ONE_YEAR_BETYS*(m_addr-1),ONE_YEAR_BETYS);
 		NET_WORK_SLEEP_BETWEEN_WRITE_READ
@@ -746,7 +746,7 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 	}
 	CString temp_task_info;
 	temp_task_info.Format(_T("Write annual schedual List Item%d ."),annual_list_line + 1);
-	Post_Write_Message(bac_gloab_device_id,WRITEANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48,this->m_hWnd,temp_task_info);
+	Post_Write_Message(g_bac_instance,WRITEANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48,this->m_hWnd,temp_task_info);
 
 	*pResult = 0;
 }

@@ -27,7 +27,7 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
-//	LRESULT  ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
+	LRESULT  ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 	LRESULT  Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam);
 //	afx_msg void OnBnClickedButtonProgramSend();
 	afx_msg void OnSend();

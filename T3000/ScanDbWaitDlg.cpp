@@ -39,6 +39,8 @@ BEGIN_MESSAGE_MAP(CScanDbWaitDlg, CDialog)
 	ON_WM_TIMER()
 	ON_MESSAGE(WM_NETSCANINFO, OnNetScanInfo)
 	ON_MESSAGE(WM_COMSCANINFO, OnComScanInfo)
+	ON_MESSAGE(WM_BACNETCOMSCANINFO, OnBacnetComScanInfo)
+	
 END_MESSAGE_MAP()
 
 
@@ -236,6 +238,19 @@ LRESULT CScanDbWaitDlg::OnNetScanInfo(WPARAM wParam, LPARAM lParam)
 	return 1;
 }
 
+
+LRESULT CScanDbWaitDlg::OnBacnetComScanInfo(WPARAM wParam, LPARAM lParam)
+{
+	CString* pStr = (CString*)(wParam);
+	m_strComScanInfo = _T("Com Port Scan : ") + *pStr;
+
+	//UpdateData(FALSE);
+
+	CWnd* pWnd = GetDlgItem(IDC_INFO_MSTP);
+	pWnd->SetWindowText(m_strComScanInfo);
+	delete pStr;
+	return 1;
+}
 LRESULT CScanDbWaitDlg::OnComScanInfo(WPARAM wParam, LPARAM lParam)
 {
 	CString* pStr = (CString*)(wParam);

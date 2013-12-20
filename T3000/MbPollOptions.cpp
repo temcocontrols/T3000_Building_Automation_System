@@ -47,6 +47,8 @@ void CMbPollOptions::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CMbPollOptions, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO_FUNCTION, &CMbPollOptions::OnCbnSelchangeComboFunction)
+//	ON_BN_CLICKED(IDOK, &CMbPollOptions::OnBnClickedOk)
+//ON_BN_CLICKED(IDOK, &CMbPollOptions::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
@@ -253,3 +255,17 @@ void CMbPollOptions::OnCbnSelchangeComboFunction()
 	}
 }
 
+
+
+//void CMbPollOptions::OnBnClickedOk()
+//{
+//	// TODO: Add your control notification handler code here
+//	CDialog::OnOK();
+//}
+
+
+//void CMbPollOptions::OnBnClickedOk()
+//{
+//	// TODO: Add your control notification handler code here
+//	CDialog::OnOK();
+//}

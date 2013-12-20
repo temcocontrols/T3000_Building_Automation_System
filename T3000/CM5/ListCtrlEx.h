@@ -1,3 +1,4 @@
+//Add color , item subitem by Fance Du.
 #ifndef __LISTCTRLEX__
 #define __LISTCTRLEX__
 
@@ -5,6 +6,7 @@
 #include <vector>
 #include <list>
 #include "ListCtrlCellEx.h"
+#define COLOR_INVALID	0xffffffff
 //////////////////////////////////////////////////////////////////////////
 #define USING_CUSTOM_DRAW // define this to control the cell control theme (whether or not to draw them hand on ))
 //////////////////////////////////////////////////////////////////////////
@@ -138,11 +140,23 @@ namespace ListCtrlEx
 		BOOL				DeleteAllItems( );
 		BOOL				DeleteItem( int nItem );
 
+
+			int InsertItem(int nIndex, LPCTSTR lpText);
+
 // operations
 	public:
 		void                Set_Edit(bool b_edit);
 		BOOL				Get_Edit();
+		void				SetListData(char *mydata,int data_length);
+		BOOL				IsDataNewer(char *datapoint,int data_length);
+		void				Set_Selected_Item(int nRAW,int nCol);
+		void				Get_Selected_Item(int &my_select_raw,int &my_select_col);
+		void				SetWhetherShowBkCol(bool nshow=true);
 
+		void				Set_My_WindowRect(CRect nRect);
+		void				Set_My_ListRect(CRect nRect);
+		//POINT				Get_clicked_mouse_position(int nRAW,int nCol);
+		POINT				Get_clicked_mouse_position();
 		static BOOL		DrawGradientRect(CDC *pDC, CRect &rect, COLORREF crTopLeft, COLORREF crBottomRight);
 		BOOL				GetCheckRect(int iRow, int iCol, CRect &rect);
 		BOOL				GetCellRect(CellIndex ix, CRect &rect);
@@ -182,7 +196,8 @@ namespace ListCtrlEx
 		void				SetCellProgressValue(int nRow, int nCol, UINT uValue);
 		//
 		CellIndex			Point2Cell(const CPoint &point);
-
+		void SetItemTextColor(int nItem = -1, int nSubItem = -1, COLORREF color = COLOR_INVALID, BOOL bRedraw = TRUE);
+		void SetItemBkColor(int nItem = -1, int nSubItem = -1, COLORREF color = COLOR_INVALID, BOOL bRedraw = TRUE);
 	protected:
 		virtual void		PreSubclassWindow();
 		DECLARE_MESSAGE_MAP()
@@ -195,18 +210,33 @@ namespace ListCtrlEx
 		afx_msg void	OnLvnEndlabeledit(NMHDR *pNMHDR, LRESULT *pResult);
 		afx_msg void	OnLvnColumnclick(NMHDR *pNMHDR, LRESULT *pResult);
 		afx_msg void	OnDestroy();
+		afx_msg void	OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	
+		void _AllocItemMemory(int nItem);
+		BOOL _IsValidIndex(int nIndex) const;
+		void _UpdateColumn(int nColumn, BOOL bInsert);
 // implementation
 	private:
-		inline void		DrawCell(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, 
-											int nRow, int nCol, LRESULT *pResult);
-		void				DrawNormal(CDC *pDC, CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData, int uLvcFmt=LVCFMT_CENTER);
-		void				DrawCheckBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData);	
-		void				DrawRadioBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData);
-		void				DrawComboBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData);
-		void				DrawEditBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData, int uLvcFmt=LVCFMT_CENTER);
-		void				DrawProgress(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData);
+		//inline void		DrawCell(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, 
+		//									int nRow, int nCol, LRESULT *pResult);
 
+		//COLORREF crText=bSelected?GetSysColor(COLOR_HIGHLIGHTTEXT):GetSysColor(COLOR_WINDOWTEXT);
+		//COLORREF crTextBkgrnd=bSelected?GetSysColor(COLOR_HIGHLIGHT):GetSysColor(COLOR_WINDOW);
+		void CListCtrlEx::DrawCell(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, 
+			int nRow, int nCol, LRESULT *pResult,COLORREF n_crtext,COLORREF n_crtextbkgrnd);
+
+
+
+		//void				DrawNormal(CDC *pDC, CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData, int uLvcFmt=LVCFMT_CENTER);
+		//void				DrawEditBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData, int uLvcFmt=LVCFMT_CENTER);
+		//void				DrawComboBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData);
+		//void				DrawCheckBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData);	
+		void				DrawNormal(CDC *pDC, CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData, int uLvcFmt,COLORREF n_crtext,COLORREF n_crtextbkgrnd);		
+		void				DrawCheckBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData,COLORREF n_crtext,COLORREF n_crtextbkgrnd);	
+		void				DrawComboBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData,COLORREF n_crtext,COLORREF n_crtextbkgrnd);
+		void				DrawEditBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData, int uLvcFmt,COLORREF n_crtext,COLORREF n_crtextbkgrnd);
+		void				DrawProgress(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData);
+		void				DrawRadioBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData);
 		int				    GetColumnFmt(int nCol);
 		inline void		ShowCellInPlace(CellIndex ix, CellType eCellType);
 		void				ShowInPlaceCombo(CellIndex ix);
@@ -224,6 +254,12 @@ namespace ListCtrlEx
 		int					m_nImageListType;
 		DWORD			m_dwListCtrlExStyle; // 
 		bool			m_need_edit;
+		char			m_data[30000];
+		CRect            m_windowrect;
+		CRect			m_list_rect;
+		int				m_select_raw;
+		int				m_select_col;
+		bool			m_show_bk_color;//记录是否显示选中背景颜色;
 	protected:
 		struct _ColumnSort_t
 		{

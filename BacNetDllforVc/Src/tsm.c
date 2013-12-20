@@ -282,6 +282,16 @@ void tsm_timer_milliseconds(
     }
 }
 
+//Add by Fance
+void tsm_free_all_invoke_id()
+{
+	int i;
+	for (i=0;i<MAX_TSM_TRANSACTIONS;i++)
+	{
+		TSM_List[i].state = TSM_STATE_IDLE;
+		TSM_List[i].InvokeID = 0;
+	}
+}
 /* frees the invokeID and sets its state to IDLE */
 void tsm_free_invoke_id(
     uint8_t invokeID)
