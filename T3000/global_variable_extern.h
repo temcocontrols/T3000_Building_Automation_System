@@ -14,7 +14,7 @@ extern DWORD nThreadID;
 extern HWND hMbpollWnd;
 extern HWND hMbpollWritePopWnd;
 extern int regDetailsOpenedFrom;	// 0 = MbPoll.cpp; 1 = mbpollFunctions.cpp
-
+extern int g_language;
 extern const bool WRITE_SUCCESS;
 extern const bool WRITE_FAIL ;
 extern	   bool g_HumChamberThread;
@@ -144,13 +144,12 @@ int const PM_T38AIOD= 26;
 int const PM_T3IOA = 21;
 int const PM_T332AI = 22;
 int const PM_T3AI16O = 23;
-
-int const PM_ZIGBEE = 24;
-int const PM_FLEXDRIVER = 25;
 int const PM_T38I13O = 20;
-int const PM_T3PERFORMANCE = 27;
 int const PM_T34AO = 28;
 int const PM_T36CT = 29;
+int const PM_ZIGBEE = 24;
+int const PM_FLEXDRIVER = 25;
+int const PM_T3PERFORMANCE = 27;
 int const PM_SOLAR = 30;
 int const PM_FWMTRANSDUCER = 31;
 int const PM_CO2_NET = 32;

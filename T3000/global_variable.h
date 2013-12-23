@@ -37,7 +37,7 @@ int g_serialNum=0;
 BOOL g_tstat_id_changed=FALSE;
 BOOL g_bPauseMultiRead=FALSE;
 BOOL g_bChamber=FALSE;
-
+int g_language=0;
 CString g_strImagePathName=_T("");
 int now_tstat_id =0;//for batch load /flash.
 

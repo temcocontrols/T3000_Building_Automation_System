@@ -414,6 +414,9 @@
     <ClCompile Include="fileRW.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+     <ClCompile Include="LanguageLocale.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="MbPollFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

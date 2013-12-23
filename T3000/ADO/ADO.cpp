@@ -1,7 +1,10 @@
 #include "StdAfx.h"
 #include "../ado/ADO.h"
-#define FOR_DATABASE_CONNECT					_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=")
+//#define FOR_DATABASE_CONNECT					_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=")
+//#define FOR_DATABASE_CONNECT					_T("Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider;Data Source=")
 
+//Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider
+#define FOR_DATABASE_CONNECT					_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=")
 CADO::CADO(void)
 {
 	g_strDatabasefilepath = _T("");
@@ -58,8 +61,7 @@ void CADO::OnInitADOConn()
 
 
 		m_pConnection.CreateInstance("ADODB.Connection");
-		_bstr_t strConnect = "DRIVER={Microsoft Access Driver (*.mdb)};\
-							 uid=;pwd=;DBQ=t3000.mdb;";
+	 
 		m_pConnection->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
 	}
 	catch(_com_error e)
