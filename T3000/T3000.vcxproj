@@ -159,6 +159,7 @@
     <ClCompile Include="DisplayConfig.cpp" />
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
+    <ClCompile Include="LanguageLocale.cpp" />
     <ClCompile Include="LightingController\configure.cpp" />
     <ClCompile Include="Dialog_Progess.cpp" />
     <ClCompile Include="DialogInfo.cpp" />
@@ -340,6 +341,7 @@
     <ClInclude Include="fileRW.h" />
     <ClInclude Include="gloab_define.h" />
     <ClInclude Include="IONameConfig.h" />
+    <ClInclude Include="LanguageLocale.h" />
     <ClInclude Include="MBP.h" />
     <ClInclude Include="MbpDefines.h" />
     <ClInclude Include="MbpExterns.h" />

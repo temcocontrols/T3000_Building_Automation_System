@@ -11,7 +11,7 @@
 #include "define.h"
 #include <vector>
 #include "global_variable_extern.h"
-
+#include "LanguageLocale.h"
 
 extern int g_MainScreenLevel;
 extern int g_ParamLevel;
@@ -150,7 +150,7 @@ public:
 // Overrides
 public:
 	virtual BOOL InitInstance();
-
+	CLanguageLocale m_locale;
 // Implementation
 	UINT  m_nAppLook;
 	BOOL  m_bHiColorIcons;
@@ -177,6 +177,8 @@ public:
 	BOOL ReadNameber(CRegKey& key,CStringW valueName,DWORD& value);
 	void Judgestore();
 	void ReadREG();
+	int  GetLanguage();
+	void SetLanguage(DWORD Last);
 	DWORD m_maxClients;
 	DWORD password;
 	void JudgeDB();

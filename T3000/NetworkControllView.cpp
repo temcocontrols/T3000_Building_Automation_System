@@ -1114,7 +1114,10 @@ void CNetworkControllView::InitGrid()
 */
 //设置排/行数量
 	int rows=read_one(g_tstat_id,5670);
-
+	if (rows>=254)
+	{
+		rows=254;
+	}
 	m_gridSub.put_Cols(3);//这句一定要有，如果下面再增加显示一外，而这里不变还是5，则会出错
 	m_gridSub.put_Rows(rows+1);//包括标题栏
 

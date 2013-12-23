@@ -63,6 +63,7 @@ protected:
 public:
 	virtual void OnInitialUpdate();
 	void Fresh();
+	void Fresh_OutputGrid(BOOL Input_Group);
 	void Fresh_System();
 	unsigned int m_inaddress;
 	int m_inSerialNum;
@@ -84,7 +85,7 @@ public:
 	////////////////////////////////////////////////
 
 	CString Read_OutputName(int Address);
-	void Read_Input_Group_Mapping();
+	void Read_Input_Group_Mapping(BOOL Input_Group);
 	CString m_datetime;
 	unsigned short LightCregister[512];
 	BOOL prodtopcData();//采集数据
@@ -230,7 +231,7 @@ public:
 	vecaddoutputs m_vecaddoutputs;
 
 	map<CString,vecaddoutputs> m_mapaddoutputs;
-	WORD SerialNum[100];
+	unsigned short SerialNum[60];
 
 	BOOL GetSerialComm(vector<CString>& szComm);//读了串口
 	vector<CString> m_szComm;
