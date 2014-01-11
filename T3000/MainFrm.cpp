@@ -55,6 +55,7 @@
  #include "rs485.h" // For call Get_RS485_Handle() function
 #include "BacnetWait.h"
 #include "LanguageLocale.h"
+ #include "RegisterViewerDlg.h"
 #pragma region Fance Test
 //For Test
 
@@ -236,6 +237,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_LANGUAGE_ENGLISH, &CMainFrame::OnLanguageEnglish)
 	ON_COMMAND(ID_LANGUAGE_34010, &CMainFrame::OnLanguage34010)
 	ON_COMMAND(ID_LANGUAGE_34006, &CMainFrame::OnLanguage34006)
+	ON_COMMAND(ID_TOOL_REGISTERVIEWER, &CMainFrame::OnToolRegisterviewer)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -307,6 +309,7 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			register_critical_section.Lock();
 			//
 			Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);
+			Sleep(500);
 			register_critical_section.Unlock();
 		}
 
@@ -583,11 +586,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DockPane (&m_wndWorkSpace);
 	
 
-	int last=theApp.GetLanguage();
-
-	theApp.m_locale.SetLanguage(last);
-	g_language=last;
-	gSetMenuStrings(m_hWnd);
+// 	int last=theApp.GetLanguage();
+// 	theApp.m_locale.SetLanguage(last);
+// 	g_language=last;
+// 	gSetMenuStrings(m_hWnd);
  
 	// enable Visual Studio 2005 style docking window behavior
 	CDockingManager::SetDockingMode(DT_SMART);
@@ -8373,4 +8375,10 @@ void CMainFrame::OnControlMonitors()
 
 	//CBacnetMonitor Dlg;
 	//Dlg.DoModal();
+}
+void CMainFrame::OnToolRegisterviewer()
+{
+	// TODO: Add your command handler code here
+	CRegisterViewerDlg dlg;
+	dlg.DoModal();
 }

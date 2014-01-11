@@ -376,6 +376,7 @@ public:
 	afx_msg void OnLanguageEnglish();
 	afx_msg void OnLanguage34010();
 	afx_msg void OnLanguage34006();
+	afx_msg void OnToolRegisterviewer();
 };
 
 const int DLG_T3000_VIEW = 0;

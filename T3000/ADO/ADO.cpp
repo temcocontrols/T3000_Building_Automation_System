@@ -1,10 +1,10 @@
 #include "StdAfx.h"
 #include "../ado/ADO.h"
 //#define FOR_DATABASE_CONNECT					_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=")
-//#define FOR_DATABASE_CONNECT					_T("Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider;Data Source=")
+#define FOR_DATABASE_CONNECT					_T("Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider;Data Source=")
 
 //Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider
-#define FOR_DATABASE_CONNECT					_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=")
+//#define FOR_DATABASE_CONNECT					_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=")
 CADO::CADO(void)
 {
 	g_strDatabasefilepath = _T("");

@@ -137,6 +137,8 @@ CT3000View::CT3000View()
 
 	m_rcTabCtrl.CopyRect(CRect(620,500,850,800));//runningtime
 	m_bSliderSetPosWarning = TRUE; // permit warning
+	m_Input_Grid.Set_ParentWind(this);
+	m_Output_Grid.Set_ParentWind(this);
 }
 
 CT3000View::~CT3000View()
@@ -293,10 +295,13 @@ void CT3000View::OnInitialUpdate()
  	GetDlgItem(IDC_SLIDER_DAY)->ShowWindow(SW_HIDE);
  
  	GetDlgItem(IDC_SLIDER_NIGHT)->ShowWindow(SW_HIDE);
-
+	CString lightsensor;
+	lightsensor.Format(_T("%d"),product_register_value[MODBUS_VALUE_SENSOR]);
+	GetDlgItem(IDC_LIGHTING_SENSOR)->SetWindowText(lightsensor);
 	CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
-//	pMain->OnConnect();	//如果IP不存在的话，开机就会挂掉10几秒，这样不合理;Fance
-
+	pMain->OnConnect();
+  //gGetFormViewStrings(this->m_hWnd,IDD_T3000_FORM);
+     //gSetFormViewStrings(this->m_hWnd,IDD_T3000_FORM);
 }
 
 void CT3000View::CreateFlexSilde()
