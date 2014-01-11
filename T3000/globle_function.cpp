@@ -423,7 +423,7 @@ bool get_serialnumber(long & serial,int the_id_of_product)
 
 UINT get_serialnumber()
 {
-	return multi_register_value[MODBUS_SERIALNUMBER_LOWORD]+multi_register_value[MODBUS_SERIALNUMBER_LOWORD+1]*256+multi_register_value[MODBUS_SERIALNUMBER_HIWORD]*256*256+multi_register_value[MODBUS_SERIALNUMBER_HIWORD+1]*256*256*256;
+	return product_register_value[MODBUS_SERIALNUMBER_LOWORD]+product_register_value[MODBUS_SERIALNUMBER_LOWORD+1]*256+product_register_value[MODBUS_SERIALNUMBER_HIWORD]*256*256+product_register_value[MODBUS_SERIALNUMBER_HIWORD+1]*256*256*256;
 }
 
 
@@ -439,7 +439,7 @@ bool multi_read_tstat(int id)
 	{
 		//register_critical_section.Lock();
 		//int nStart = GetTickCount();
-		if(-2==Read_Multi(id,&multi_register_value[i*64],i*64,64,1))
+		if(-2==Read_Multi(id,&product_register_value[i*64],i*64,64,1))
 			return_value=false;
 
 		//TRACE(_T("Read_Multi once = %d \n"), GetTickCount()-nStart);

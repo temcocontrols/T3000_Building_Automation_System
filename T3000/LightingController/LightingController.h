@@ -5,7 +5,6 @@
 #include "../msflexgrid1.h"
 #include "../LightingController/LightingSet.h"
 #include <map>
-
 #include "../LightingController/configure.h"
 // #include <vector>
 // #include <algorithm>
@@ -21,7 +20,6 @@ typedef struct   LIGHTINTGCONTROLLER
 	int iaddress;
 	CString CStvalue;
 }lightingcontroller;
-
 
 typedef struct OUTPUTNAMESTATUS
 {
@@ -78,7 +76,7 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnDestroy();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-
+	CString get_OutputName(int card,int output);
 	//////////////////////////////////////////////
 	vector<Mapping_Struct> m_input_output_mapping;
 	vector<Mapping_Struct> m_group_output_mapping;
@@ -201,6 +199,7 @@ public:
 	afx_msg void OnBnClickedButtonLightingcontorlGroups();
 	afx_msg void OnBnClickedButtonLightingcontorlSyncwithPC();
 	afx_msg void OnBnClickedButtonSaveAll();
+	afx_msg void OnBnClickedButtonConfigureOutputName();
 	afx_msg void OnCbnSelchangeValuecombo();
 
 	WORD lightingController_time[8];

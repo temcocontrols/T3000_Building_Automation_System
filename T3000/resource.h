@@ -180,7 +180,7 @@
 #define IDD_DIALOG_BACNET_RANGES        465
 #define IDD_DIALOG_BACNET_WAIT          466
 #define IDD_CSTABLE                     467
-#define IDD_TRAFFIC_WINDOW              468
+#define IDD_TRAFFIC_WINDOW              500
 #define IDD_DIALOG_BACNET_WEEKLY_ROUTINES 468
 #define IDD_DIALOG_BACNET_ANNUAL_ROUTINES 469
 #define IDD_DIALOG_BACNET_SCHEDULE_TIME 470
@@ -191,10 +191,20 @@
 #define IDD_DIALOG_8IOA_VIEW            476
 #define IDD_WRITEREGDLG                 477
 #define IDD_DIALOG_MBPOLL_FUNCS         478
+#define IDD_LC_OUTPUTS_NAMECONFIG       478
+#define IDD_DIALOG13                    501
+#define IDD_REGISTER_VIEWER             502
+#define IDR_ACCELERATOR1                483
+#define IDR_DB1                         484
+//#define IDR_T3000_DATABASE              484
 #define IDD_DIALOG_BACNET_SCREENS       479
-#define IDD_DIALOG_BACNET_MONITOR       480
+#define IDD_DIALOG_BACNET_MONITOR       503
 #define IDD_DIALOG_BACNET_GRAPHIC       481
-
+#define IDR_ASSIGNMENT_MENU             485
+#define IDD_GRID_LAB                    486
+#define IDR_REGISTERVIEWER              487
+#define IDD_DIALOG_WRITE_REGISTERVIEWER 488
+#define IDD_TRAFFIC_WINDOW              500
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -220,6 +230,7 @@
 #define IDC_EDIT42                      1028
 #define IDC_DTS1                        1028
 #define IDC_EDIT_SIZE1                  1028
+#define IDC_REG_NO                      1028
 #define IDC_BUTTON3                     1029
 #define IDC_DELAYTABBTN                 1029
 #define IDC_OUTPUT5_DELAY_OFF_EDIT      1029
@@ -239,6 +250,7 @@
 #define IDC_DTS4                        1032
 #define IDC_RADIO_50                    1032
 #define IDC_RADIO3                      1032
+#define IDC_TEST_TEMP2                  1032
 #define IDC_LEDTABLEBTN                 1033
 #define IDC_EDIT46                      1033
 #define IDC_DTS5                        1033
@@ -517,8 +529,12 @@
 #define IDC_MSFLEXGRID_INPUT3           1095
 #define IDC_CLEAR                       1096
 #define IDC_MSFLEXGRID4                 1096
+#define IDC_TEST_HUM1                   1096
 #define IDC_COPY_TO                     1097
+#define IDC_TEST_HUM2                   1097
 #define IDC_CHECK2                      1098
+#define IDC_HUM13                       1098
+#define IDC_TEST_HUM3                   1098
 #define IDC_CHECK3                      1099
 #define IDC_CHECK4                      1100
 #define IDC_CHECK5                      1101
@@ -527,7 +543,9 @@
 #define IDC_CHECK8                      1104
 #define IDC_MSFLEXGRID_WEEKEND          1104
 #define IDC_CHECK18                     1105
+#define IDC_CHECK_8                     1105
 #define IDC_CHECK19                     1106
+#define IDC_CHECK_9                     1106
 #define IDC_CHECK9                      1107
 #define IDC_CHECK20                     1108
 #define IDC_MONTHCALENDAR1              1109
@@ -1093,6 +1111,8 @@
 #define IDC_SENSOR_TEMP                 1576
 #define IDC_NUM_ERROR_SENSOR            1577
 #define IDC_SENSOR_ID                   1578
+#define IDC_TEST_TEMP1                  1579
+#define IDC_TEST_TEMP3                  1580
 #define IDC_START                       1584
 #define IDC_STOP                        1585
 #define IDC_CONTINUE                    1586
@@ -1481,6 +1501,34 @@
 #define IDC_STATIC_OVERRRIDETIMER       1784
 #define IDC_STATIC_LSensor              1785
 #define IDC_LIGHTING_SENSOR             1786
+#define IDC_EDIT_ID                     1787
+#define IDC_CONFIGLC_OUTPUTNAME         1788
+#define IDC_SPIN1                       1789
+#define IDC_LEFT                        1790
+#define IDC_RIGHT                       1791
+#define IDC_PRODUCTNAME                 1792
+#define IDC_BEGIN                       1793
+#define IDC_END                         1794
+#define IDC_PRODUCTNAME_T               1795
+#define IDC_PAGES                       1796
+#define IDC_COLNAME                     1797
+#define IDC_LAB                         1798
+#define IDC_CHECK_1                     1799
+#define IDC_CHECK_2                     1800
+#define IDC_CHECK_3                     1801
+#define IDC_CHECK_4                     1802
+#define IDC_CHECK_5                     1803
+#define IDC_CHECK_6                     1804
+#define IDC_CHECK_7                     1805
+#define IDC_CHECK_10                    1806
+#define IDC_STATIC_TESTSTATUS           1807
+#define IDC_STATIC_WARNING              1808
+#define IDC_CELLEDIT                    1810
+#define IDC_EDIT_PRODUCTNAME            1811
+#define IDC_STATIC_PRODUCTNAME          1812
+#define IDC_SAVETODB                    1813
+#define IDC_EDIT_DESCRIPTON             1819
+#define IDC_REG_NAME                    1822
 #define IDC_EDIT_PID2OFFSETPOINT2       2002
 #define IDC_EDIT_PID2OFFSETPOINT4       2003
 #define IDC_EDIT_PID2OFFSETPOINT3       2004
@@ -1515,7 +1563,7 @@
 #define ID_ALLNODESDATABASE             32802
 #define ID_IOSELECTMENU_INPUT           32803
 #define ID_IOSELECTMENU_OUTPUT          32804
-#define ID_CONFIGFILE_SAVE_AS           32805
+//#define ID_CONFIGFILE_SAVE_AS           32805
 #define ID_FILE_BATCHBURNHEX            32806
 #define ID_HELP_HELP                    32807
 #define ID_DELEMENUBTN_DELETECURRENTLABEL 32808
@@ -1612,6 +1660,12 @@
 #define ID_LANGUAGE_34011               34011
 #define  IDC_STATIC_ALIAS               34013
 #define ID_FUNCTIONS_WRITEREGISTERS     34012
+#define ID_TOOL_REGISTERVIEWER          34012
+#define ID__CLEAR                       34014
+#define ID_CLEAR_CELL                   34015
+#define ID_MAIN_NEW                     34016
+#define ID_MAIN_SAVE                    34017
+#define ID_CONFIGFILE_SAVE_AS           35000
 //#define ID_CONFIGFILE_SAVE_AS           35000
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
@@ -1623,9 +1677,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        474
-#define _APS_NEXT_COMMAND_VALUE         34005
-#define _APS_NEXT_CONTROL_VALUE         1720
+#define _APS_NEXT_RESOURCE_VALUE        489
+#define _APS_NEXT_COMMAND_VALUE         34018
+#define _APS_NEXT_CONTROL_VALUE         1823
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

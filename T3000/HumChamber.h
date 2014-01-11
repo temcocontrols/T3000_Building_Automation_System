@@ -79,6 +79,7 @@ private:
 	Register_info NumBadSensors;
 	Register_info TestState;
 	Register_info SensorTemp;
+	 
 	Register_info First_Calibration_Points_Temp;
 	Register_info First_Calibration_Points_Hum;
 	Register_info First_Calibration_Points_Time;
@@ -91,6 +92,10 @@ private:
 	Register_info CurrentCalibrationTimeLeft;
 	Register_info CurrentCalibrationID;
 	Register_info First_Sensor_Temp_Hum_RegID;
+
+	Register_info TEST_STEP_STATUS_RegID;
+	Register_info TEST_CHOICE_RegID;
+	Register_info First_Test_Temp_Hum_RegID;
 public:
 //	afx_msg void OnEnUpdateMasterId();
 //	afx_msg void OnEnKillfocusMasterId();
@@ -161,7 +166,7 @@ private:
 	//CWinThread* hFirstThread;
 	//HANDLE hSecondThread;
 	public:
-		afx_msg void OnEnKillfocusSlaveId();
+//		afx_msg void OnEnKillfocusSlaveId();
 		afx_msg void OnEnKillfocusTemp1();
 		afx_msg void OnEnKillfocusTemp2();
 		afx_msg void OnEnKillfocusTemp3();
@@ -194,7 +199,7 @@ private:
 		afx_msg void OnEnKillfocusTime9();
 		afx_msg void OnEnKillfocusTime10();
 		afx_msg void OnEnKillfocusSensorTemp();
-		afx_msg void OnEnKillfocusSensorId();
+//		afx_msg void OnEnKillfocusSensorId();
 		afx_msg void OnEnKillfocusHumTol();
 		afx_msg void OnEnKillfocusTempTol();
 		afx_msg void OnEnKillfocusTestState();
@@ -271,6 +276,51 @@ private:
 		afx_msg void OnEnSetfocusTime8();
 		afx_msg void OnEnSetfocusTime9();
 		afx_msg void OnEnSetfocusTime10();
+		afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+		CStatic m_Static_TestStatus;
+		afx_msg void OnBnClickedCheck1();
+		afx_msg void OnBnClickedCheck2();
+		afx_msg void OnBnClickedCheck3();
+		afx_msg void OnBnClickedCheck4();
+		afx_msg void OnBnClickedCheck5();
+		afx_msg void OnBnClickedCheck6();
+		afx_msg void OnBnClickedCheck7();
+		afx_msg void OnBnClickedCheck8();
+		afx_msg void OnBnClickedCheck9();
+		afx_msg void OnBnClickedCheck10();
+		CButton m_checkBtn1;
+		CButton m_checkBtn2;
+		CButton m_checkBtn3;
+		CButton m_checkBtn4;
+		CButton m_checkBtn5;
+		CButton m_checkBtn6;
+		CButton m_checkBtn7;
+		CButton m_checkBtn8;
+		CButton m_checkBtn9;
+		CButton m_checkBtn10;
+		CEdit m_test_temp1;
+		CEdit m_test_hum1;
+		CEdit m_test_temp2;
+		CEdit m_test_hum2;
+		CEdit m_test_temp3;
+		CEdit m_test_hum3;
+		int m_test_status;
+//		afx_msg void OnEnKillfocusTestTemp1();
+//		afx_msg void OnEnKillfocusTestTemp2();
+//		afx_msg void OnEnKillfocusTestTemp3();
+//		afx_msg void OnEnKillfocusTestHum1();
+//		afx_msg void OnEnKillfocusTestHum2();
+//		afx_msg void OnEnKillfocusTestHum3();
+		afx_msg void OnEnSetfocusTestTemp1();
+		afx_msg void OnEnSetfocusTestTemp2();
+		afx_msg void OnEnSetfocusTestTemp3();
+		afx_msg void OnEnSetfocusTestHum1();
+		afx_msg void OnEnSetfocusTestHum2();
+		afx_msg void OnEnSetfocusTestHum3();
+		BOOL is_Show_Write_singleDLG;
+		afx_msg void OnEnSetfocusSensorId();
+		void Fresh_Checks();
+		unsigned short Get_Checks();
 };
 
 

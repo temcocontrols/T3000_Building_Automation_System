@@ -16,7 +16,7 @@
 
 #include "iniFile.h"
 #include "afxinet.h"
- const int g_versionNO=201311;
+ const int g_versionNO=201401;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif

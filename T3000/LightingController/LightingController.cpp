@@ -7,7 +7,7 @@
 #include "..\T3000.h"
 #include "..\LightingController\LightingController.h"
 #include "..\MainFrm.h"
-
+#include "..\LCOutNameConfig.h"
 static BOOL ifLCdb = TRUE;
 static BOOL ifUpdatedb = TRUE;
 
@@ -144,6 +144,8 @@ BEGIN_MESSAGE_MAP(CLightingController, CFormView)
 	ON_BN_CLICKED(IDC_BUTTON_Syncwithpc, &CLightingController::OnBnClickedButtonLightingcontorlSyncwithPC)
 	ON_BN_CLICKED(IDC_SAVEALL, &CLightingController::OnBnClickedButtonSaveAll)
 
+
+	ON_BN_CLICKED(IDC_CONFIGLC_OUTPUTNAME, &CLightingController::OnBnClickedButtonConfigureOutputName)
 	ON_BN_CLICKED(IDC_BUTTON_ADD, &CLightingController::OnBnClickedButtonAdd)
 	ON_MESSAGE(WM_WRITE_MESSAGE,OnWriteMessage)
 	ON_BN_CLICKED(IDC_BUTTON_APPLY, &CLightingController::OnBnClickedButtonApply)
@@ -319,10 +321,8 @@ void CLightingController::Fresh()
 	}
 	Fresh_System();
 	Fresh_Inputs();
-
-	//Read_Input_Group_Mapping();
-
- //   LC_Thread=AfxBeginThread(_Read_LightingStatus,this);
+	OnLbnSelchangeListInput();
+ 
 	SetTimer(LIGHTINGCONTROLLERTIMER,1000,NULL);
 
 }
@@ -481,8 +481,6 @@ strtemp.Format(_T("%d"),read_one(g_tstat_id,92));
 m_savedelaytime.SetWindowText(strtemp);
 
 }
-
-
 void CLightingController::ShowLighContDlg()
 {
 	m_CStrModel = _T("Lighting Controller");
@@ -995,6 +993,7 @@ void CLightingController::OnLbnSelchangeListInput()
 	m_vecaddoutputs.clear();
 	map<CString,vecaddoutputs>::iterator iter;//查找组中的元素
 	iter = m_mapaddoutputs.find(strtmp_PanelName);
+	int card,output;
 	if (iter != m_mapaddoutputs.end())
 	{
 		m_vecaddoutputs = iter->second;
@@ -1005,7 +1004,8 @@ void CLightingController::OnLbnSelchangeListInput()
 			m_msflexgrid1to96.put_TextMatrix(i,0,m_vecaddoutputs.at(i-1).strpanel);
 			m_msflexgrid1to96.put_TextMatrix(i,1,m_vecaddoutputs.at(i-1).stroutputboard);
 			m_msflexgrid1to96.put_TextMatrix(i,2,m_vecaddoutputs.at(i-1).stroutputno);
-			m_vecaddoutputs.at(i-1).stroutputname =  _T("output")+m_vecaddoutputs.at(i-1).stroutputno;
+			 
+			 
 			m_msflexgrid1to96.put_TextMatrix(i,3,m_vecaddoutputs.at(i-1).stroutputname);
 		}
 	}
@@ -1060,8 +1060,11 @@ void CLightingController::OnLbnSelchangeListInput()
 						if (flag != 0)
 						{
 							stroutput.Format(_T("%d"),i);
-							stroutputname.Format(_T("Output%d"),i);
-							
+							stroutputname=get_OutputName(j+1,i);
+							if (stroutputname.IsEmpty())
+							{
+							 stroutputname.Format(_T("Output%d"),i);
+							}
 							m_structaddoutputs.stroutputno = stroutput;
 							m_structaddoutputs.stroutputboard = stroutputboard;
 							m_structaddoutputs.strpanel = strpanel;
@@ -1081,7 +1084,12 @@ void CLightingController::OnLbnSelchangeListInput()
 						if (flag != 0)
 						{
 							stroutput.Format(_T("%d"),i);
-							stroutputname.Format(_T("Output%d"),i);
+							//stroutputname.Format(_T("Output%d"),i);
+							stroutputname=get_OutputName(j+1,i);
+							if (stroutputname.IsEmpty())
+							{
+								stroutputname.Format(_T("Output%d"),i);
+							}
 							m_structaddoutputs.stroutputno = stroutput;
 							m_structaddoutputs.stroutputboard = stroutputboard;
 							m_structaddoutputs.strpanel = strpanel;
@@ -1120,7 +1128,7 @@ void CLightingController::OnLbnSelchangeListInput()
 				
 				m_msflexgrid1to96.put_TextMatrix(i,1,m_vecaddoutputs.at(i-1).stroutputboard);
 				m_msflexgrid1to96.put_TextMatrix(i,2,m_vecaddoutputs.at(i-1).stroutputno);
-				m_vecaddoutputs.at(i-1).stroutputname =  _T("output")+m_vecaddoutputs.at(i-1).stroutputno;
+				//m_vecaddoutputs.at(i-1).stroutputname =get_OutputName() // _T("output")+m_vecaddoutputs.at(i-1).stroutputno;
 				m_msflexgrid1to96.put_TextMatrix(i,3,m_vecaddoutputs.at(i-1).stroutputname);
 
 			}
@@ -1497,7 +1505,7 @@ void CLightingController::ClickMsflexgrid1()
 		m_msflexgrid1to96.put_Col(tempcol);
 		m_msflexgrid1to96.put_CellBackColor(RGB(100,100,150));
 	}
-	#if 1
+	#if 0
 	long lCol=m_msflexgrid1to96.get_ColSel();         //获取点击的行号
 	long lRow=m_msflexgrid1to96.get_RowSel();      //获取点击的列号
 	if(lRow>m_msflexgrid1to96.get_Rows() || lRow==0)              //判断点击是否有效
@@ -1538,6 +1546,7 @@ void CLightingController::ClickMsflexgrid1()
                               //获取焦点
 #endif
 #if 0
+/*
 	if(tempcol == 2)
 	{
 
@@ -1572,6 +1581,7 @@ void CLightingController::ClickMsflexgrid1()
 		}	
 
 	}
+	*/
 	if(tempcol == 3)
 	{
 	   
@@ -3598,3 +3608,40 @@ void CLightingController::OnDestroy(){
 CFormView::OnDestroy();
 }
 
+void CLightingController::OnBnClickedButtonConfigureOutputName(){
+CLCOutNameConfig dlg(m_sn);
+dlg.DoModal();
+}
+
+CString CLightingController::get_OutputName(int card,int output){
+	CString sql ,outputname;
+// CADO ado;
+// 	ado.OnInitADOConn();
+//  
+// 	sql.Format(_T("Select * from LCNameConfigure where SN=%d and  Card=%d and Output=%d"),m_sn,card,output);
+// 	ado.m_pRecordset=ado.OpenRecordset(sql);
+// 	 
+//  
+// 	if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+// 	{
+// 	  outputname=ado.m_pRecordset->GetCollect(_T("OutputName"));
+// 	}
+// 	else
+// 	{
+	 
+		unsigned short temp_buffer_out[INPUT_DESCRIPTION_LENGTH]={0};
+		unsigned char temp_charbuffer_out[INPUT_DESCRIPTION_LENGTH];
+		 
+		 
+			Read_Multi(g_tstat_id,temp_buffer_out,OUTPUT_DESCRIPTION+((card-1)*24+(output-1))*INPUT_DESCRIPTION_LENGTH,INPUT_DESCRIPTION_LENGTH);
+			if(temp_buffer_out[0]==255)
+			{
+				for(int itt=0;itt<INPUT_DESCRIPTION_LENGTH;itt++)
+					temp_buffer_out[itt]=0;
+			}
+			for(int itt=0;itt<INPUT_DESCRIPTION_LENGTH;itt++)
+			{temp_charbuffer_out[itt] =(unsigned char) temp_buffer_out[itt];}
+			outputname=(CString)temp_charbuffer_out;
+/*	}*/
+	return outputname;
+}

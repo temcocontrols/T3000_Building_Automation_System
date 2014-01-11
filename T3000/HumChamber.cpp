@@ -8,9 +8,9 @@
 #include "MainFrm.h"
 #include <locale.h>
 #include "WriteSingleRegDlg.h"
+#include "Dialog_Progess.h"
 DWORD WINAPI _UpdateThread(LPVOID pParam);
-//DWORD WINAPI _Update_TMEPHUM_Thread(LPVOID pParam);
-//UINT _UpdateSensorTableThread(LPVOID pParam);
+
 void Register::Set_Reg(Register_info reginfo)
 {
    reg_data=reginfo;
@@ -56,7 +56,7 @@ CHumChamber::CHumChamber()
 		hFirstThread=NULL;
  
 		m_ReadOnly=TRUE;
-		
+		is_Show_Write_singleDLG=FALSE;
 	
     }
 
@@ -69,35 +69,52 @@ if(hFirstThread != NULL)
 
 void CHumChamber::DoDataExchange(CDataExchange* pDX)
 {
-CFormView::DoDataExchange(pDX);
-DDX_Control(pDX, IDC_MSFLEXGRID_INPUT3, m_msflexgrid);
-DDX_Text(pDX, IDC_MASTER_ID, m_masterid);
-DDV_MinMaxUInt(pDX, m_masterid, 0, 255);
-DDX_Text(pDX, IDC_SLAVE_ID, m_slaveid);
-DDX_Text(pDX, IDC_TEMP_TOL, m_temptolerance);
-DDX_Text(pDX, IDC_HUM_TOL, m_humtolerance);
-DDX_Text(pDX, IDC_START_POINT, m_startpoint);
-DDX_Text(pDX, IDC_NUM_SENSOR, m_numsensors);
-DDX_Text(pDX, IDC_NUM_ERROR_SENSOR, m_numbadsensors);
-DDX_Text(pDX, IDC_TEST_STATE, m_teststate);
-DDX_Text(pDX, IDC_SENSOR_TEMP, m_sensorTemp);
-DDX_Text(pDX, IDC_SENSOR_ID, m_sensorid);
+	CFormView::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_MSFLEXGRID_INPUT3, m_msflexgrid);
+	DDX_Text(pDX, IDC_MASTER_ID, m_masterid);
+	DDV_MinMaxUInt(pDX, m_masterid, 0, 255);
+	DDX_Text(pDX, IDC_SLAVE_ID, m_slaveid);
+	DDX_Text(pDX, IDC_TEMP_TOL, m_temptolerance);
+	DDX_Text(pDX, IDC_HUM_TOL, m_humtolerance);
+	DDX_Text(pDX, IDC_START_POINT, m_startpoint);
+	DDX_Text(pDX, IDC_NUM_SENSOR, m_numsensors);
+	DDX_Text(pDX, IDC_NUM_ERROR_SENSOR, m_numbadsensors);
+	DDX_Text(pDX, IDC_TEST_STATE, m_teststate);
+	DDX_Text(pDX, IDC_SENSOR_TEMP, m_sensorTemp);
+	DDX_Text(pDX, IDC_SENSOR_ID, m_sensorid);
 
-DDX_Control(pDX, IDC_START, m_StartBtn);
-DDX_Control(pDX, IDC_STOP, m_StopBtn);
-DDX_Control(pDX, IDC_CONTINUE, m_ContinueBtn);
-DDX_Control(pDX, IDC_RUNNING, m_Running);
-DDX_Control(pDX, IDC_RAMPING, m_Ramping);
-DDX_Control(pDX, IDC_TOLERANCE, m_tolerance);
-DDX_Control(pDX, IDC_PROGRESS1, m_progress);
-	}
+	DDX_Control(pDX, IDC_START, m_StartBtn);
+	DDX_Control(pDX, IDC_STOP, m_StopBtn);
+	DDX_Control(pDX, IDC_CONTINUE, m_ContinueBtn);
+	//DDX_Control(pDX, IDC_RUNNING, m_Running);
+	//DDX_Control(pDX, IDC_RAMPING, m_Ramping);
+	//DDX_Control(pDX, IDC_TOLERANCE, m_tolerance);
+	DDX_Control(pDX, IDC_PROGRESS1, m_progress);
+	DDX_Control(pDX, IDC_STATIC_TESTSTATUS, m_Static_TestStatus);
+	DDX_Control(pDX, IDC_CHECK_1, m_checkBtn1);
+	DDX_Control(pDX, IDC_CHECK_2, m_checkBtn2);
+	DDX_Control(pDX, IDC_CHECK_3, m_checkBtn3);
+	DDX_Control(pDX, IDC_CHECK_4, m_checkBtn4);
+	DDX_Control(pDX, IDC_CHECK_5, m_checkBtn5);
+	DDX_Control(pDX, IDC_CHECK_6, m_checkBtn6);
+	DDX_Control(pDX, IDC_CHECK_7, m_checkBtn7);
+	DDX_Control(pDX, IDC_CHECK_8, m_checkBtn8);
+	DDX_Control(pDX, IDC_CHECK_9, m_checkBtn9);
+	DDX_Control(pDX, IDC_CHECK_10, m_checkBtn10);
+	DDX_Control(pDX, IDC_TEST_TEMP1, m_test_temp1);
+	DDX_Control(pDX, IDC_TEST_HUM1, m_test_hum1);
+	DDX_Control(pDX, IDC_TEST_TEMP2, m_test_temp2);
+	DDX_Control(pDX, IDC_TEST_HUM2, m_test_hum2);
+	DDX_Control(pDX, IDC_TEST_TEMP3, m_test_temp3);
+	DDX_Control(pDX, IDC_TEST_HUM3, m_test_hum3);
+}
 
 BEGIN_MESSAGE_MAP(CHumChamber, CFormView)
 	ON_BN_CLICKED(IDC_REFRESH, &CHumChamber::OnBnClickedRefresh)
  
  
 //ON_EN_KILLFOCUS(IDC_MASTER_ID, &CHumChamber::OnEnKillfocusMasterId)
-ON_EN_KILLFOCUS(IDC_SLAVE_ID, &CHumChamber::OnEnKillfocusSlaveId)
+//ON_EN_KILLFOCUS(IDC_SLAVE_ID, &CHumChamber::OnEnKillfocusSlaveId)
 ON_EN_KILLFOCUS(IDC_TEMP1, &CHumChamber::OnEnKillfocusTemp1)
 ON_EN_KILLFOCUS(IDC_TEMP2, &CHumChamber::OnEnKillfocusTemp2)
 ON_EN_KILLFOCUS(IDC_TEMP3, &CHumChamber::OnEnKillfocusTemp3)
@@ -131,7 +148,7 @@ ON_EN_KILLFOCUS(IDC_TIME8, &CHumChamber::OnEnKillfocusTime8)
 ON_EN_KILLFOCUS(IDC_TIME9, &CHumChamber::OnEnKillfocusTime9)
 ON_EN_KILLFOCUS(IDC_TIME10, &CHumChamber::OnEnKillfocusTime10)
 ON_EN_KILLFOCUS(IDC_SENSOR_TEMP, &CHumChamber::OnEnKillfocusSensorTemp)
-ON_EN_KILLFOCUS(IDC_SENSOR_ID, &CHumChamber::OnEnKillfocusSensorId)
+//ON_EN_KILLFOCUS(IDC_SENSOR_ID, &CHumChamber::OnEnKillfocusSensorId)
 ON_EN_KILLFOCUS(IDC_HUM_TOL, &CHumChamber::OnEnKillfocusHumTol)
 ON_EN_KILLFOCUS(IDC_TEMP_TOL, &CHumChamber::OnEnKillfocusTempTol)
 ON_EN_KILLFOCUS(IDC_TEST_STATE, &CHumChamber::OnEnKillfocusTestState)
@@ -186,6 +203,30 @@ ON_EN_SETFOCUS(IDC_TIME8, &CHumChamber::OnEnSetfocusTime8)
 ON_EN_SETFOCUS(IDC_TIME9, &CHumChamber::OnEnSetfocusTime9)
 ON_EN_SETFOCUS(IDC_TIME10, &CHumChamber::OnEnSetfocusTime10)
 
+ON_WM_CTLCOLOR()
+ON_BN_CLICKED(IDC_CHECK_1, &CHumChamber::OnBnClickedCheck1)
+ON_BN_CLICKED(IDC_CHECK_2, &CHumChamber::OnBnClickedCheck2)
+ON_BN_CLICKED(IDC_CHECK_3, &CHumChamber::OnBnClickedCheck3)
+ON_BN_CLICKED(IDC_CHECK_4, &CHumChamber::OnBnClickedCheck4)
+ON_BN_CLICKED(IDC_CHECK_5, &CHumChamber::OnBnClickedCheck5)
+ON_BN_CLICKED(IDC_CHECK_6, &CHumChamber::OnBnClickedCheck6)
+ON_BN_CLICKED(IDC_CHECK_7, &CHumChamber::OnBnClickedCheck7)
+ON_BN_CLICKED(IDC_CHECK_8, &CHumChamber::OnBnClickedCheck8)
+ON_BN_CLICKED(IDC_CHECK_9, &CHumChamber::OnBnClickedCheck9)
+ON_BN_CLICKED(IDC_CHECK_10, &CHumChamber::OnBnClickedCheck10)
+//ON_EN_KILLFOCUS(IDC_TEST_TEMP1, &CHumChamber::OnEnKillfocusTestTemp1)
+//ON_EN_KILLFOCUS(IDC_TEST_TEMP2, &CHumChamber::OnEnKillfocusTestTemp2)
+//ON_EN_KILLFOCUS(IDC_TEST_TEMP3, &CHumChamber::OnEnKillfocusTestTemp3)
+//ON_EN_KILLFOCUS(IDC_TEST_HUM1, &CHumChamber::OnEnKillfocusTestHum1)
+//ON_EN_KILLFOCUS(IDC_TEST_HUM2, &CHumChamber::OnEnKillfocusTestHum2)
+//ON_EN_KILLFOCUS(IDC_TEST_HUM3, &CHumChamber::OnEnKillfocusTestHum3)
+ON_EN_SETFOCUS(IDC_TEST_TEMP1, &CHumChamber::OnEnSetfocusTestTemp1)
+ON_EN_SETFOCUS(IDC_TEST_TEMP2, &CHumChamber::OnEnSetfocusTestTemp2)
+ON_EN_SETFOCUS(IDC_TEST_TEMP3, &CHumChamber::OnEnSetfocusTestTemp3)
+ON_EN_SETFOCUS(IDC_TEST_HUM1, &CHumChamber::OnEnSetfocusTestHum1)
+ON_EN_SETFOCUS(IDC_TEST_HUM2, &CHumChamber::OnEnSetfocusTestHum2)
+ON_EN_SETFOCUS(IDC_TEST_HUM3, &CHumChamber::OnEnSetfocusTestHum3)
+ON_EN_SETFOCUS(IDC_SENSOR_ID, &CHumChamber::OnEnSetfocusSensorId)
 END_MESSAGE_MAP()
 
 
@@ -232,9 +273,14 @@ GetRegInfoFromDB(CurrentTestSensorHum,_T("CurrentTestSensorHum_RegID"));
 GetRegInfoFromDB(CurrentCalibrationTimeLeft,_T("CurrentCalibrationTimeLeft_RegID"));
 GetRegInfoFromDB(CurrentCalibrationID,_T("CurrentCalibrationPointID_RegID"));
 GetRegInfoFromDB(First_Sensor_Temp_Hum_RegID,_T("First_Sensor_Temp_Hum_RegID"));
+
+GetRegInfoFromDB(TEST_STEP_STATUS_RegID,_T("TEST_STEP_STATUS_RegID"));
+GetRegInfoFromDB(TEST_CHOICE_RegID,_T("TEST_CHOICE_RegID"));
+GetRegInfoFromDB(First_Test_Temp_Hum_RegID,_T("First_Test_Temp_Hum_RegID"));
+ 
 }
 void CHumChamber::Fresh()
-{
+{	float progress;
 //初始化表格
 //初始化寄存器的值
 //底下直接应用这些寄存器号码
@@ -246,80 +292,74 @@ void CHumChamber::Fresh()
 	 {
 		pMain->OnConnect();
 	 }
+	 CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
+	 pDlg->Create(IDD_DIALOG10_Progress, this);
+	 pDlg->ShowProgress(0,0);
+	 pDlg->ShowWindow(SW_SHOW);
+	 RECT RECT_SET1;
+	 GetClientRect(&RECT_SET1);
+	 pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20);
+
 	 InitialRegisterNo();
 
 	register_critical_section.Lock();
 	Read_Multi(g_tstat_id,&multi_register_value[0],0,20);  //0-20
 	g_register_occuppied=TRUE;
-for(int  i=0;i<9;i++)
+    for(int  i=0;i<6;i++)
 	{
-	Read_Multi(g_tstat_id,&multi_register_value[581+i*50],581+i*50,50);
+		if (pDlg!=NULL)
+		{
+			progress=float((i+1)*(100/6));
+			pDlg->ShowProgress(int(progress),(int)progress);
+		}
+	Sleep(3000);
+	Read_Multi(g_tstat_id,&multi_register_value[581+i*100],581+i*100,100);
 	}
-
    register_critical_section.Unlock();
    g_register_occuppied=FALSE;
-   
+   pDlg->ShowWindow(SW_HIDE);
+   if(pDlg!=NULL)
+   {
+   delete pDlg;
+   pDlg=NULL;
+   }
    FreshGrid();
-   
-  // m_msflexgrid.put_Cols(4);
-  // m_msflexgrid.put_Rows(SENSOR_NUM+1);
-  // m_msflexgrid.put_TextMatrix(0,0,_T("Sensor"));
-  // m_msflexgrid.put_TextMatrix(0,1,_T("State"));
-  // m_msflexgrid.put_TextMatrix(0,2,_T("TEMP(°C)"));
-  // m_msflexgrid.put_TextMatrix(0,3,_T("Hum(%)"));
-  // 
-  // CString temp,temp1;
-  // for (int i=1;i<=SENSOR_NUM;i++)
-  // {
-  //   temp.Format(_T("%d"),i);
-  //   m_msflexgrid.put_TextMatrix(i,0,temp);
-	 //switch (multi_register_value[First_Sensor_State.Start_ID+i-1])
-	 //{
-	 //case 0:
-	 //    {
-		// temp1=_T("Not Tested");
-		// break;
-		// }
-	 //case 1:
-		// {
-		// temp1=_T("Tested");
-		// break;
-		// }
-	 //case 2:
-		// {
-		// temp1=_T("Bad Hum");
-		// break;
-		// }
-	 //case 3:
-		// {
-		// temp1=_T("Bad Temp");
-		// break;
-		// }
-	 //case 4:
-		// {
-		// temp1=_T("Bad Communications");
-		// break;
-		// }
-	 //default:
-	 //    {
-		// temp1=_T("Not Tested");
-		// break;
-		// }
-	 //}
-	 //m_msflexgrid.put_TextMatrix(i,1,temp1);
-  // 
-	 //temp.Format(_T("%0.1f"),(short)(multi_register_value[First_Sensor_Temp_Hum_RegID.Start_ID+2*(i-1)]/10));
-	 //m_msflexgrid.put_TextMatrix(i,2,temp);
-	 //temp.Format(_T("%0.1f"),(short)(multi_register_value[First_Sensor_Temp_Hum_RegID.Start_ID+1+2*(i-1)]/10));
-	 //m_msflexgrid.put_TextMatrix(i,3,temp);
-  // } 
  
-  
- 
-    
     ShowDialogData();
- 
+ Fresh_Checks();
 	Update_SensorTable();
+	int C_sensor=multi_register_value[CurrentCalibrationID.Start_ID];
+	CString tempstr;
+	if (multi_register_value[TEST_STEP_STATUS_RegID.Start_ID]>=1&&multi_register_value[TEST_STEP_STATUS_RegID.Start_ID]<=10)
+	{
+	m_test_status=1;//   
+	tempstr.Format(_T("Calibrating Senor:%d T/H Setpoint %0.1f℃/%0.1f"),C_sensor,
+	               (float)multi_register_value[First_Calibration_Points_Temp.Start_ID+3*(C_sensor-1)]/10.0,
+				   (float)multi_register_value[First_Calibration_Points_Hum.Start_ID+3*(C_sensor-1)]/10.0);
+				   tempstr+=_T("%");
+	} 
+	else if (multi_register_value[TEST_STEP_STATUS_RegID.Start_ID]>=11&&multi_register_value[TEST_STEP_STATUS_RegID.Start_ID]<=13)
+	{
+	m_test_status=2;
+    tempstr.Format(_T("Calibrating Senor:%d T/H Setpoint %0.1f℃/%0.1f"),C_sensor,
+	(float)multi_register_value[First_Test_Temp_Hum_RegID.Start_ID+3*(C_sensor-1)]/10.0,
+	(float)multi_register_value[First_Test_Temp_Hum_RegID.Start_ID+1+3*(C_sensor-1)]/10.0);
+	 tempstr+=_T("%");
+	}
+	else
+	{
+	m_test_status=0;
+	tempstr=_T("                      Ready");
+	}
+
+     if (multi_register_value[TEST_STEP_STATUS_RegID.Start_ID]==255)
+   {
+	   m_test_status=3;
+	   tempstr=_T("                      Finished");
+   }
+	m_Static_TestStatus.SetWindowText(tempstr);
+	
+
     if (multi_register_value[TestState.Start_ID]==4||multi_register_value[TestState.Start_ID]==5)//Running....started
     {
 		m_Start=TRUE;
@@ -452,7 +492,8 @@ short read_temp;
 			m_ContinueBtn.ShowWindow(TRUE);
 		}
 
-	
+	//sleep for communication.
+	Sleep(1000);
 	read_temp=read_one(g_tstat_id,CurrentTemp.Start_ID);
 	if (read_temp>0)
 	{multi_register_value[CurrentTemp.Start_ID]=read_temp;
@@ -469,6 +510,8 @@ short read_temp;
 		str_master_id.Format(_T("%0.1f%%"), multi_register_value[CurrentHum.Start_ID]/10.0);
 		GetDlgItem(IDC_CUR_HUM)->SetWindowText(str_master_id);
 
+		//sleep for communication.
+		Sleep(1000);
 		read_temp=read_one(g_tstat_id,NumBadSensors.Start_ID);
 		if (read_temp>0)
 		{
@@ -484,12 +527,16 @@ short read_temp;
 		    if (Time==10)
 		    {
 			  Time=0;
-			   for(int  i=0;i<6;i++)
+			   for(int  i=0;i<4;i++)
 			   {
-				   Read_Multi(g_tstat_id,&multi_register_value[660+i*50],660+i*50,50);
+				   Read_Multi(g_tstat_id,&multi_register_value[660+i*100],660+i*100,100);
+				   //sleep for communication.
+				   Sleep(2000);
 			   }
-			   FreshGrid();
+			   
 
+			   FreshGrid();
+			   Fresh_Checks();
 		    }
 		    ShowChangingData();
 		}
@@ -530,7 +577,7 @@ void CHumChamber::FreshGrid(){
 			}
 		case 1:
 			{
-				temp1=_T("Tested");
+				temp1=_T("OK");
 				break;
 			}
 		case 2:
@@ -551,6 +598,7 @@ void CHumChamber::FreshGrid(){
 		case 5:
 			{
 				temp1=_T("Testing");
+				break;
 			}
 		default:
 			{
@@ -565,6 +613,7 @@ void CHumChamber::FreshGrid(){
 		temp.Format(_T("%0.1f"),(multi_register_value[First_Sensor_Temp_Hum_RegID.Start_ID+1+2*(i-1)]/10.0));
 		m_msflexgrid.put_TextMatrix(i,3,temp);
 	} 
+
 }
 void CHumChamber::Show_AllData(){
 
@@ -713,10 +762,7 @@ void CHumChamber::ShowDialogData()
 	str_master_id.Format(_T("%d"),multi_register_value[SensorTemp.Start_ID]);
 	GetDlgItem(IDC_SENSOR_TEMP)->SetWindowText(str_master_id);
 	str_master_id.Format(_T("%d"),(multi_register_value[CurrentTestSensor.Start_ID])); 
-	GetDlgItem(IDC_SENSOR_ID)->SetWindowText(str_master_id);
- 
- 
-	 
+	      GetDlgItem(IDC_SENSOR_ID)->SetWindowText(str_master_id);
 		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID]/10.0);
 		  GetDlgItem(IDC_TEMP1)->SetWindowText(str_master_id);
 		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+3]/10.0);
@@ -759,102 +805,169 @@ void CHumChamber::ShowDialogData()
 		  str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+27]/10.0);
 		  GetDlgItem(IDC_HUM10)->SetWindowText(str_master_id);
 
-	
-	
-     
-
- 
-
 		  str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID]);
 		  GetDlgItem(IDC_TIME1)->SetWindowText(str_master_id);
-		  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID];
-		  Hour=Time_left/60;
-		  Minute=Time_left%60;
-		  Second=0;
-		  str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
-		  GetDlgItem(IDC_TEMP_LEFT1)->SetWindowText(str_master_id);
+		  if (multi_register_value[CurrentCalibrationID.Start_ID]>1)
+		  {
+			  str_master_id.Format(_T("0:0:0"));
+			  GetDlgItem(IDC_TEMP_LEFT1)->SetWindowText(str_master_id);
+		  } 
+		  else
+		  {
+			  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID];
+			  Hour=Time_left/60;
+			  Minute=Time_left%60;
+			  Second=0;
+			  str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			  GetDlgItem(IDC_TEMP_LEFT1)->SetWindowText(str_master_id);
+		  }
+		 
 
 		  str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+3]);
 		  GetDlgItem(IDC_TIME2)->SetWindowText(str_master_id);
-		  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+3];
-		  Hour=Time_left/60;
-		  Minute=Time_left%60;
-		  Second=0;
-		  str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
-		  GetDlgItem(IDC_TEMP_LEFT2)->SetWindowText(str_master_id);
+		  if (multi_register_value[CurrentCalibrationID.Start_ID]>2)
+		  {
+			  str_master_id.Format(_T("0:0:0"));
+			  GetDlgItem(IDC_TEMP_LEFT2)->SetWindowText(str_master_id);
+		  } 
+		  else
+		  {
+			  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+3];
+			  Hour=Time_left/60;
+			  Minute=Time_left%60;
+			  Second=0;
+			  str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			  GetDlgItem(IDC_TEMP_LEFT2)->SetWindowText(str_master_id);
+		  }
+
 
 		  str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+6]);
 		  GetDlgItem(IDC_TIME3)->SetWindowText(str_master_id);
+		  if (multi_register_value[CurrentCalibrationID.Start_ID]>3)
+		  {
+			  str_master_id.Format(_T("0:0:0"));
+			  GetDlgItem(IDC_TEMP_LEFT3)->SetWindowText(str_master_id);
+		  } 
+		  else
+		  {
 		  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+6];
 		  Hour=Time_left/60;
 		  Minute=Time_left%60;
 		  Second=0;
 		  str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
 		  GetDlgItem(IDC_TEMP_LEFT3)->SetWindowText(str_master_id);
-
+		  }
 	str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+9]);
 	GetDlgItem(IDC_TIME4)->SetWindowText(str_master_id);
+	if (multi_register_value[CurrentCalibrationID.Start_ID]>4)
+	{
+		str_master_id.Format(_T("0:0:0"));
+		GetDlgItem(IDC_TEMP_LEFT4)->SetWindowText(str_master_id);
+	} 
+	else
+	{
 	  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+9];
 	  Hour=Time_left/60;
 	  Minute=Time_left%60;
 	  Second=0;
 	str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
 	GetDlgItem(IDC_TEMP_LEFT4)->SetWindowText(str_master_id);
-
+	}
 	str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+12]);
 	GetDlgItem(IDC_TIME5)->SetWindowText(str_master_id);
+	if (multi_register_value[CurrentCalibrationID.Start_ID]>5)
+	{
+		str_master_id.Format(_T("0:0:0"));
+		GetDlgItem(IDC_TEMP_LEFT5)->SetWindowText(str_master_id);
+	} 
+	else
+	{
 	  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+12];
 	  Hour=Time_left/60;
 	  Minute=Time_left%60;
 	  Second=0;
 	str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
 	GetDlgItem(IDC_TEMP_LEFT5)->SetWindowText(str_master_id);
-
+	}
 	str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+15]);
 	GetDlgItem(IDC_TIME6)->SetWindowText(str_master_id);
+	if (multi_register_value[CurrentCalibrationID.Start_ID]>6)
+	{
+		str_master_id.Format(_T("0:0:0"));
+		GetDlgItem(IDC_TEMP_LEFT6)->SetWindowText(str_master_id);
+	} 
+	else
+	{
 	  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+15];
 	  Hour=Time_left/60;
 	  Minute=Time_left%60;
 	  Second=0;
 	str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
 	GetDlgItem(IDC_TEMP_LEFT6)->SetWindowText(str_master_id);
-
+	}
 	str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+18]);
 	GetDlgItem(IDC_TIME7)->SetWindowText(str_master_id);
+	if (multi_register_value[CurrentCalibrationID.Start_ID]>7)
+	{
+		str_master_id.Format(_T("0:0:0"));
+		GetDlgItem(IDC_TEMP_LEFT7)->SetWindowText(str_master_id);
+	} 
+	else
+	{
 	  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+18];
 	  Hour=Time_left/60;
 	  Minute=Time_left%60;
 	  Second=0;
 	str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
 	GetDlgItem(IDC_TEMP_LEFT7)->SetWindowText(str_master_id);
-
+	}
 	str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+21]);
 	GetDlgItem(IDC_TIME8)->SetWindowText(str_master_id);
+	if (multi_register_value[CurrentCalibrationID.Start_ID]>8)
+	{
+		str_master_id.Format(_T("0:0:0"));
+		GetDlgItem(IDC_TEMP_LEFT8)->SetWindowText(str_master_id);
+	} 
+	else
+	{
 	  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+21];
 	  Hour=Time_left/60;
 	  Minute=Time_left%60;
 	  Second=0;
 	str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
 	GetDlgItem(IDC_TEMP_LEFT8)->SetWindowText(str_master_id);
-
+	}
 	str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+24]);
 	GetDlgItem(IDC_TIME9)->SetWindowText(str_master_id);
+	if (multi_register_value[CurrentCalibrationID.Start_ID]>9)
+	{
+		str_master_id.Format(_T("0:0:0"));
+		GetDlgItem(IDC_TEMP_LEFT9)->SetWindowText(str_master_id);
+	} 
+	else
+	{
 	  Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+24];
 	  Hour=Time_left/60;
 	  Minute=Time_left%60;
 	  Second=0;
 	str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
-	GetDlgItem(IDC_TEMP_LEFT9)->SetWindowText(str_master_id);
+	GetDlgItem(IDC_TEMP_LEFT9)->SetWindowText(str_master_id);}
 
 	str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+27]);
 	GetDlgItem(IDC_TIME10)->SetWindowText(str_master_id);
-
+	if (multi_register_value[CurrentCalibrationID.Start_ID]>10)
+	{
+		str_master_id.Format(_T("0:0:0"));
+		GetDlgItem(IDC_TEMP_LEFT10)->SetWindowText(str_master_id);
+	} 
+	else
+	{
 	 Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+27];
 	 Hour=Time_left/60;
 	 Minute=Time_left%60;
 	 Second=0;
 	str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
-	GetDlgItem(IDC_TEMP_LEFT10)->SetWindowText(str_master_id);
+	GetDlgItem(IDC_TEMP_LEFT10)->SetWindowText(str_master_id);}
  //m_progress.SetPos(65);
 
 
@@ -903,10 +1016,546 @@ void CHumChamber::ShowDialogData()
 	GetDlgItem(IDC_RH9)->SetWindowText(str_master_id);
 	str_master_id.Format(_T("%d"),(signed short)multi_register_value[First_Sensor_RH.Start_ID+18]);
 	GetDlgItem(IDC_RH10)->SetWindowText(str_master_id);
- 
-  /*m_progress.SetPos(75);*/
+
+    str_master_id.Format(_T("%0.1f"),(float)multi_register_value[First_Test_Temp_Hum_RegID.Start_ID]/10.0);
+	m_test_temp1.SetWindowText(str_master_id);
+	str_master_id.Format(_T("%0.1f"),(float)multi_register_value[First_Test_Temp_Hum_RegID.Start_ID+1]/10.0);
+	m_test_hum1.SetWindowText(str_master_id);
+	str_master_id.Format(_T("%0.1f"),(float)multi_register_value[First_Test_Temp_Hum_RegID.Start_ID+2]/10.0);
+	m_test_temp2.SetWindowText(str_master_id);
+	str_master_id.Format(_T("%0.1f"),(float)multi_register_value[First_Test_Temp_Hum_RegID.Start_ID+3]/10.0);
+	m_test_hum2.SetWindowText(str_master_id);
+	str_master_id.Format(_T("%0.1f"),(float)multi_register_value[First_Test_Temp_Hum_RegID.Start_ID+4]/10.0);
+	m_test_temp3.SetWindowText(str_master_id);
+	str_master_id.Format(_T("%0.1f"),(float)multi_register_value[First_Test_Temp_Hum_RegID.Start_ID+5]/10.0);
+	m_test_hum3.SetWindowText(str_master_id);
+
+    
+}
+void CHumChamber::Fresh_Checks(){
+BOOL Checked;
+Checked=Get_Bit_FromRegister(multi_register_value[TEST_CHOICE_RegID.Start_ID],1);
+if (!Checked)
+{
+ m_checkBtn1.SetCheck(1);
+}
+else
+{
+ m_checkBtn1.SetCheck(0);
+}
+Checked=Get_Bit_FromRegister(multi_register_value[TEST_CHOICE_RegID.Start_ID],2);
+if (!Checked)
+{
+	m_checkBtn2.SetCheck(1);
+}
+else
+{
+	m_checkBtn2.SetCheck(0);
 }
  
+Checked=Get_Bit_FromRegister(multi_register_value[TEST_CHOICE_RegID.Start_ID],3);
+if (!Checked)
+{
+	m_checkBtn3.SetCheck(1);
+}
+else
+{
+	m_checkBtn3.SetCheck(0);
+}
+
+Checked=Get_Bit_FromRegister(multi_register_value[TEST_CHOICE_RegID.Start_ID],4);
+if (!Checked)
+{
+	m_checkBtn4.SetCheck(1);
+}
+else
+{
+	m_checkBtn4.SetCheck(0);
+}
+Checked=Get_Bit_FromRegister(multi_register_value[TEST_CHOICE_RegID.Start_ID],5);
+if (!Checked)
+{
+	m_checkBtn5.SetCheck(1);
+}
+else
+{
+	m_checkBtn5.SetCheck(0);
+}
+Checked=Get_Bit_FromRegister(multi_register_value[TEST_CHOICE_RegID.Start_ID],6);
+if (!Checked)
+{
+	m_checkBtn6.SetCheck(1);
+}
+else
+{
+	m_checkBtn6.SetCheck(0);
+}
+Checked=Get_Bit_FromRegister(multi_register_value[TEST_CHOICE_RegID.Start_ID],7);
+if (!Checked)
+{
+	m_checkBtn7.SetCheck(1);
+}
+else
+{
+	m_checkBtn7.SetCheck(0);
+}
+Checked=Get_Bit_FromRegister(multi_register_value[TEST_CHOICE_RegID.Start_ID],8);
+if (!Checked)
+{
+	m_checkBtn8.SetCheck(1);
+}
+else
+{
+	m_checkBtn8.SetCheck(0);
+}
+Checked=Get_Bit_FromRegister(multi_register_value[TEST_CHOICE_RegID.Start_ID],9);
+if (!Checked)
+{
+	m_checkBtn9.SetCheck(1);
+}
+else
+{
+	m_checkBtn9.SetCheck(0);
+}
+Checked=Get_Bit_FromRegister(multi_register_value[TEST_CHOICE_RegID.Start_ID],10);
+if (!Checked)
+{
+	m_checkBtn10.SetCheck(1);
+}
+else
+{
+	m_checkBtn10.SetCheck(0);
+}
+
+
+if (m_checkBtn1.GetCheck()!=0)
+{
+	GetDlgItem(IDC_TEMP1)->SetWindowText(_T("0"));
+	GetDlgItem(IDC_TEMP1)->EnableWindow(FALSE);
+	GetDlgItem(IDC_HUM1)->SetWindowText(_T("0"));
+	GetDlgItem(IDC_HUM1)->EnableWindow(FALSE);
+	GetDlgItem(IDC_TIME1)->SetWindowText(_T("0"));
+	GetDlgItem(IDC_TEMP_LEFT1)->SetWindowText(_T("0:0:0"));
+	GetDlgItem(IDC_TIME1)->EnableWindow(FALSE);
+}
+else
+{   
+	GetDlgItem(IDC_TEMP1)->EnableWindow(TRUE);
+	GetDlgItem(IDC_HUM1)->EnableWindow(TRUE);
+	GetDlgItem(IDC_TIME1)->EnableWindow(TRUE);
+	CString str_master_id;
+	str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID]/10.0);
+	GetDlgItem(IDC_TEMP1)->SetWindowText(str_master_id);
+
+
+	str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID]/10.0);
+	GetDlgItem(IDC_HUM1)->SetWindowText(str_master_id);
+
+	str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID]);
+	GetDlgItem(IDC_TIME1)->SetWindowText(str_master_id);
+	if (multi_register_value[CurrentCalibrationID.Start_ID]>1)
+	{
+		str_master_id.Format(_T("0:0:0"));
+		GetDlgItem(IDC_TEMP_LEFT1)->SetWindowText(str_master_id);
+	} 
+	else
+	{
+		Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID];
+		Hour=Time_left/60;
+		Minute=Time_left%60;
+		Second=0;
+		str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+		GetDlgItem(IDC_TEMP_LEFT1)->SetWindowText(str_master_id);
+	}
+}
+
+
+ 
+
+	if (m_checkBtn2.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP2)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP2)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM2)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM2)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME2)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT2)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME2)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP2)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM2)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME2)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+3]/10.0);
+		GetDlgItem(IDC_TEMP2)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+3]/10.0);
+		GetDlgItem(IDC_HUM2)->SetWindowText(str_master_id);
+
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+3]);
+		GetDlgItem(IDC_TIME2)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>2)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT2)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+3];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT2)->SetWindowText(str_master_id);
+		}
+
+	}
+
+ 
+	if (m_checkBtn3.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP3)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP3)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM3)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM3)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME3)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT3)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME3)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP3)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM3)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME3)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+6]/10.0);
+		GetDlgItem(IDC_TEMP3)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+6]/10.0);
+		GetDlgItem(IDC_HUM3)->SetWindowText(str_master_id);
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+6]);
+		GetDlgItem(IDC_TIME3)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>3)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT3)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+6];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT3)->SetWindowText(str_master_id);
+		}
+	}
+ 
+	if (m_checkBtn4.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP4)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP4)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM4)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM4)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME4)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT4)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME4)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP4)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM4)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME4)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+9]/10.0);
+		GetDlgItem(IDC_TEMP4)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+9]/10.0);
+		GetDlgItem(IDC_HUM4)->SetWindowText(str_master_id);
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+9]);
+		GetDlgItem(IDC_TIME4)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>4)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT4)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+9];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT4)->SetWindowText(str_master_id);
+		}
+	}
+ 
+	if (m_checkBtn5.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP5)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP5)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM5)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM5)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME5)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT5)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME5)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP5)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM5)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME5)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+12]/10.0);
+		GetDlgItem(IDC_TEMP5)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+12]/10.0);
+		GetDlgItem(IDC_HUM5)->SetWindowText(str_master_id); 
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+12]);
+		GetDlgItem(IDC_TIME5)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>5)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT5)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+12];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT5)->SetWindowText(str_master_id);
+		}
+	}
+ 
+	if (m_checkBtn6.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP6)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP6)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM6)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM6)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME6)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT6)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME6)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP6)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM6)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME6)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+15]/10.0);
+		GetDlgItem(IDC_TEMP6)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+15]/10.0);
+		GetDlgItem(IDC_HUM6)->SetWindowText(str_master_id); 
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+15]);
+		GetDlgItem(IDC_TIME6)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>6)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT6)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+15];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT6)->SetWindowText(str_master_id);
+		}
+	}
+ 
+	if (m_checkBtn7.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP7)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP7)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM7)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM7)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME7)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT7)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME7)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP7)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM7)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME7)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+18]/10.0);
+		GetDlgItem(IDC_TEMP7)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+18]/10.0);
+		GetDlgItem(IDC_HUM7)->SetWindowText(str_master_id); 
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+18]);
+		GetDlgItem(IDC_TIME7)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>7)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT7)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+18];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT7)->SetWindowText(str_master_id);
+		}
+	}
+ 
+ 
+	if (m_checkBtn8.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP8)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP8)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM8)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM8)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME8)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT8)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME8)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP8)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM8)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME8)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+21]/10.0);
+		GetDlgItem(IDC_TEMP8)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+21]/10.0);
+		GetDlgItem(IDC_HUM8)->SetWindowText(str_master_id);
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+21]);
+		GetDlgItem(IDC_TIME8)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>8)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT8)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+21];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT8)->SetWindowText(str_master_id);
+		}
+	}
+ 
+ 
+	if (m_checkBtn9.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP9)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP9)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM9)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM9)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME9)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT9)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME9)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP9)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM9)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME9)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+24]/10.0);
+		GetDlgItem(IDC_TEMP9)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+24]/10.0);
+		GetDlgItem(IDC_HUM9)->SetWindowText(str_master_id); 
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+24]);
+		GetDlgItem(IDC_TIME9)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>9)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT9)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+24];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT9)->SetWindowText(str_master_id);
+		}
+	}
+ 
+ 
+	 
+	if (m_checkBtn10.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP10)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP10)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM10)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM10)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME10)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT10)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME10)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP10)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM10)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME10)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+27]/10.0);
+		GetDlgItem(IDC_TEMP10)->SetWindowText(str_master_id);
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+27]/10.0);
+		GetDlgItem(IDC_HUM10)->SetWindowText(str_master_id); 
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+27]);
+		GetDlgItem(IDC_TIME10)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>10)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT10)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+27];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT10)->SetWindowText(str_master_id);
+		}
+	}
+ 
+
+}
 void CHumChamber::ShowChangingData(){
 
 int timeleft,Hour,Minute,Second,read_temp;
@@ -987,6 +1636,7 @@ case 10:
 		break;
 	}
 }
+
 }
 
  
@@ -1011,27 +1661,7 @@ BOOL CHumChamber::WriteValueToRegID(UINT RegID,UINT &Value)
 	}
 
 
-void CHumChamber::OnEnKillfocusSlaveId()
-{
-	float temp_float;
-	CString str_text;
-	GetDlgItem(IDC_SLAVE_ID)->GetWindowText(str_text);
-
-	temp_float=(float)_wtof(str_text);
-	m_slaveid=(UINT)temp_float;
-	/*Set(SlaveID.Start_ID,m_slaveid);
-	if (!ret)
-	{
-	 AfxMessageBox(_T("Write Fail"));
-	}*/
-	//CWriteSingleRegDlg //m_writesingleregdlg;
-	////m_writesingleregdlg.Set(SlaveID.Start_ID,m_slaveid);
-	////m_writesingleregdlg.DoModal();;
-	str_text.Format(_T("%d"),(multi_register_value[SlaveID.Start_ID])); 
-	GetDlgItem(IDC_SLAVE_ID)->SetWindowText(str_text);
-}
-
-
+ 
 void CHumChamber::OnEnKillfocusTemp1()
 {
 	
@@ -1937,34 +2567,6 @@ void CHumChamber::OnEnKillfocusSensorTemp()
 
 	}
 
-
-void CHumChamber::OnEnKillfocusSensorId()
-	{
-	
-		float temp_float;
-		CString str_text;
-		GetDlgItem(IDC_SENSOR_ID)->GetWindowText(str_text);
-		 
-		temp_float=(float)_wtof(str_text);
-		m_sensorid=(UINT)temp_float;
-		/*Set(CurrentTestSensor.Start_ID,m_sensorid);
-		
-		if (!ret)
-		{
-			AfxMessageBox(_T("Write Fail"));
-		}*/
-		//CWriteSingleRegDlg //m_writesingleregdlg;
-		//m_writesingleregdlg.Set(CurrentTestSensor.Start_ID,m_sensorid);
-		////m_writesingleregdlg.DoModal();;
-
-
-		str_text.Format(_T("%d"),(multi_register_value[CurrentTestSensor.Start_ID])); 
-		GetDlgItem(IDC_SENSOR_ID)->SetWindowText(str_text);
-	
-		Update_SensorTable();
-	}
-
-
 void CHumChamber::OnEnKillfocusHumTol()
 	{
 
@@ -2016,7 +2618,7 @@ void CHumChamber::OnEnKillfocusTempTol()
 
 
 void CHumChamber::OnEnKillfocusTestState()
-	{
+{
 		UpdateData(TRUE);
 		if (!WriteValueToRegID(TestState.Start_ID,m_teststate))
 		{
@@ -2254,6 +2856,7 @@ void CHumChamber::OnEnSetfocusNumSensor()
 	//////m_writesingleregdlg.DoModal();
 	m_ID=NumSensors.Start_ID;
 	m_Value=m_numsensors;
+	is_Show_Write_singleDLG=TRUE;
 }
 	//////////////////////////////////////////////////////////
 void CHumChamber::OnEnKillfocusNumSensor()
@@ -2285,12 +2888,17 @@ void CHumChamber::OnEnKillfocusNumSensor()
 	     
 		 if(pMsg->wParam == VK_F5)
 		 {
-			 CWriteSingleRegDlg m_writesingleregdlg;
-			 m_writesingleregdlg.Set(m_ID,m_Value); 
-			 m_writesingleregdlg.DoModal();
+		    if (is_Show_Write_singleDLG)
+		    {
+				CWriteSingleRegDlg m_writesingleregdlg;
+				m_writesingleregdlg.Set(m_ID,m_Value); 
+				m_writesingleregdlg.DoModal();
+
+				ShowDialogData();
+				FreshGrid();
+				is_Show_Write_singleDLG=FALSE;
+		    }
 			
-			ShowDialogData();
-			 FreshGrid();
 			 return 1;
 		 }
 	     
@@ -2311,8 +2919,10 @@ void CHumChamber::OnEnSetfocusSlaveId()
 
 	temp_float=(float)_wtof(str_text);
 	m_slaveid=(UINT)temp_float;
-	BOOL ret=WriteValueToRegID(SlaveID.Start_ID,m_slaveid);
-
+	//BOOL ret=WriteValueToRegID(SlaveID.Start_ID,m_slaveid);
+	Set(SlaveID.Start_ID,m_slaveid);
+	 
+	is_Show_Write_singleDLG=TRUE;
 }
 void CHumChamber::OnEnSetfocusStartPoint()
 {
@@ -2323,7 +2933,7 @@ void CHumChamber::OnEnSetfocusStartPoint()
 	temp_float=(float)_wtof(str_text);
 	m_startpoint=(UINT)temp_float;
 	Set(StartPoint.Start_ID,m_startpoint);
-
+	is_Show_Write_singleDLG=TRUE;
 }
 void CHumChamber::OnEnSetfocusTempTol()
 {
@@ -2336,7 +2946,7 @@ void CHumChamber::OnEnSetfocusTempTol()
 	temp_float=(float)_wtof(str_text);
 	m_temptolerance=(UINT)(temp_float*10);
 	Set(TempTolerence.Start_ID,m_temptolerance);
-
+	is_Show_Write_singleDLG=TRUE;
 }
 void CHumChamber::OnEnSetfocusHumTol()
 {
@@ -2347,7 +2957,7 @@ void CHumChamber::OnEnSetfocusHumTol()
 	temp_float=(float)_wtof(str_text);
 	m_humtolerance=(UINT)(temp_float*10);
 	Set(HumTolenrence.Start_ID,m_humtolerance);
-
+	is_Show_Write_singleDLG=TRUE;
 }
 
 void CHumChamber::OnEnSetfocusTemp1()
@@ -2359,7 +2969,7 @@ void CHumChamber::OnEnSetfocusTemp1()
 	temp_float=(float)_wtof(str_text);
 	m_temp1=(UINT)temp_float*10;
 	Set(First_Calibration_Points_Temp.Start_ID,m_temp1);
-
+	is_Show_Write_singleDLG=TRUE;
 }
 void CHumChamber::OnEnSetfocusTemp2()
 {
@@ -2371,7 +2981,7 @@ void CHumChamber::OnEnSetfocusTemp2()
 	temp_float=(float)_wtof(str_text);
 	m_temp2=(UINT)temp_float*10;
 	Set(First_Calibration_Points_Temp.Start_ID+3,m_temp2);
-
+	is_Show_Write_singleDLG=TRUE;
 }
 void CHumChamber::OnEnSetfocusTemp3()
 {
@@ -2382,7 +2992,7 @@ void CHumChamber::OnEnSetfocusTemp3()
 	temp_float=(float)_wtof(str_text);
 	m_temp3=(UINT)temp_float*10;
 	Set(First_Calibration_Points_Temp.Start_ID+6,m_temp3);
-
+	is_Show_Write_singleDLG=TRUE;
 }
 void CHumChamber::OnEnSetfocusTemp4()
 {
@@ -2395,7 +3005,7 @@ void CHumChamber::OnEnSetfocusTemp4()
 	temp_float=(float)_wtof(str_text);
 	m_temp4=(UINT)temp_float*10;
 	Set(First_Calibration_Points_Temp.Start_ID+9,m_temp4);
-
+	is_Show_Write_singleDLG=TRUE;
 }
 void CHumChamber::OnEnSetfocusTemp5()
 {
@@ -2414,7 +3024,7 @@ void CHumChamber::OnEnSetfocusTemp5()
 	temp_float=(float)_wtof(str_text);
 	m_temp5=(UINT)(temp_float*10);
 	Set(First_Calibration_Points_Temp.Start_ID+12,m_temp5);
-
+	is_Show_Write_singleDLG=TRUE;
 
 }
 void CHumChamber::OnEnSetfocusTemp6()
@@ -2433,7 +3043,7 @@ void CHumChamber::OnEnSetfocusTemp6()
 	temp_float=(float)_wtof(str_text);
 	m_temp6=(UINT)(temp_float*10);
 	Set(First_Calibration_Points_Temp.Start_ID+15,m_temp6);
-
+	is_Show_Write_singleDLG=TRUE;
 }
 void CHumChamber::OnEnSetfocusTemp7()
 {
@@ -2452,7 +3062,7 @@ void CHumChamber::OnEnSetfocusTemp7()
 	m_temp7=(UINT)(temp_float*10);
 	Set(First_Calibration_Points_Temp.Start_ID+18,m_temp7);
 
-
+	is_Show_Write_singleDLG=TRUE;
 }
 void CHumChamber::OnEnSetfocusTemp8()
 {
@@ -2470,7 +3080,7 @@ void CHumChamber::OnEnSetfocusTemp8()
 	temp_float=(float)_wtof(str_text);
 	m_temp8=(UINT)(temp_float*10);
 	Set(First_Calibration_Points_Temp.Start_ID+21,m_temp8);
-	
+	is_Show_Write_singleDLG=TRUE;
 }
 void CHumChamber::OnEnSetfocusTemp9()
 	{
@@ -2487,7 +3097,7 @@ void CHumChamber::OnEnSetfocusTemp9()
 		temp_float=(float)_wtof(str_text);
 		m_temp9=(UINT)(temp_float*10);
 		Set(First_Calibration_Points_Temp.Start_ID+24,m_temp9);
-
+		is_Show_Write_singleDLG=TRUE;
 	}
 void CHumChamber::OnEnSetfocusTemp10()
 	{
@@ -2507,7 +3117,7 @@ void CHumChamber::OnEnSetfocusTemp10()
 		m_temp10=(UINT)(temp_float*10);
 		Set(First_Calibration_Points_Temp.Start_ID+27,m_temp10);
 	
- 
+ is_Show_Write_singleDLG=TRUE;
 }
 
 void CHumChamber::OnEnSetfocusHum1()
@@ -2526,7 +3136,7 @@ void CHumChamber::OnEnSetfocusHum1()
 		temp_float=(float)_wtof(str_text);
 		m_hum1=(UINT)(temp_float*10);
 		Set(First_Calibration_Points_Hum.Start_ID,m_hum1);
-
+		is_Show_Write_singleDLG=TRUE;
 
 	}
 void CHumChamber::OnEnSetfocusHum2()
@@ -2546,7 +3156,7 @@ void CHumChamber::OnEnSetfocusHum2()
 		m_hum2=(UINT)(temp_float*10);
 		Set(First_Calibration_Points_Hum.Start_ID+3,m_hum2);
 	
-
+	is_Show_Write_singleDLG=TRUE;
 	}
 void CHumChamber::OnEnSetfocusHum3()
 	{
@@ -2565,7 +3175,7 @@ void CHumChamber::OnEnSetfocusHum3()
 		temp_float=(float)_wtof(str_text);
 		m_hum3=(UINT)(temp_float*10);
 		Set(First_Calibration_Points_Hum.Start_ID+6,m_hum3);
-
+		is_Show_Write_singleDLG=TRUE;
 	}
 void CHumChamber::OnEnSetfocusHum4()
 	{
@@ -2583,7 +3193,7 @@ void CHumChamber::OnEnSetfocusHum4()
 		temp_float=(float)_wtof(str_text);
 		m_hum4=(UINT)(temp_float*10);
 		Set(First_Calibration_Points_Hum.Start_ID+9,m_hum4);
-	
+	is_Show_Write_singleDLG=TRUE;
 	}
 void CHumChamber::OnEnSetfocusHum5()
 	{
@@ -2602,7 +3212,7 @@ void CHumChamber::OnEnSetfocusHum5()
 		temp_float=(float)_wtof(str_text);
 		m_hum5=(UINT)(temp_float*10);
 		Set(First_Calibration_Points_Hum.Start_ID+12,m_hum5);
-		
+		is_Show_Write_singleDLG=TRUE;
 	}
 void CHumChamber::OnEnSetfocusHum6()
 	{
@@ -2621,7 +3231,7 @@ void CHumChamber::OnEnSetfocusHum6()
 		temp_float=(float)_wtof(str_text);
 		m_hum6=(UINT)(temp_float*10);
 		Set(First_Calibration_Points_Hum.Start_ID+15,m_hum6);
-
+is_Show_Write_singleDLG=TRUE;
 	}
 void CHumChamber::OnEnSetfocusHum7()
 	{
@@ -2640,7 +3250,7 @@ void CHumChamber::OnEnSetfocusHum7()
 		temp_float=(float)_wtof(str_text);
 		m_hum7=(UINT)(temp_float*10);
 		Set(First_Calibration_Points_Hum.Start_ID+18,m_hum7);
-	
+	is_Show_Write_singleDLG=TRUE;
 	}
 void CHumChamber::OnEnSetfocusHum8()
 	{
@@ -2659,7 +3269,7 @@ void CHumChamber::OnEnSetfocusHum8()
 		temp_float=(float)_wtof(str_text);
 		m_hum8=(UINT)(temp_float*10);
 		Set(First_Calibration_Points_Hum.Start_ID+21,m_hum8);
-
+		is_Show_Write_singleDLG=TRUE;
 	}
 void CHumChamber::OnEnSetfocusHum9()
 	{
@@ -2678,7 +3288,7 @@ void CHumChamber::OnEnSetfocusHum9()
 		temp_float=(float)_wtof(str_text);
 		m_hum9=(UINT)(temp_float*10);
 		Set(First_Calibration_Points_Hum.Start_ID+24,m_hum9);
-
+		is_Show_Write_singleDLG=TRUE;
 	}
 void CHumChamber::OnEnSetfocusHum10()
 	{
@@ -2697,7 +3307,7 @@ void CHumChamber::OnEnSetfocusHum10()
 		temp_float=(float)_wtof(str_text);
 		m_hum10=(UINT)temp_float*10;
 		Set(First_Calibration_Points_Hum.Start_ID+27,m_hum10);
-
+		is_Show_Write_singleDLG=TRUE;
 	}
 
 
@@ -2721,7 +3331,7 @@ void CHumChamber::OnEnSetfocusTime1()
 		temp_float=(float)_wtof(str_text);
 		m_time1=(UINT)(temp_float);
 		Set(First_Calibration_Points_Time.Start_ID,m_time1);
-
+		is_Show_Write_singleDLG=TRUE;
 	}
 void CHumChamber::OnEnSetfocusTime2()
 	{
@@ -2738,7 +3348,7 @@ void CHumChamber::OnEnSetfocusTime2()
 		temp_float=(float)_wtof(str_text);
 		m_time2=(UINT)temp_float;
 		Set(First_Calibration_Points_Time.Start_ID+3,m_time2);
-
+		is_Show_Write_singleDLG=TRUE;
 	}
 void CHumChamber::OnEnSetfocusTime3()
 	{
@@ -2750,7 +3360,7 @@ void CHumChamber::OnEnSetfocusTime3()
 		temp_float=(float)_wtof(str_text);
 		m_time3=(UINT)temp_float;
 		Set(First_Calibration_Points_Time.Start_ID+6,m_time3);
-
+		is_Show_Write_singleDLG=TRUE;
 	}
 void CHumChamber::OnEnSetfocusTime4()
 	{
@@ -2761,7 +3371,7 @@ void CHumChamber::OnEnSetfocusTime4()
 		temp_float=(float)_wtof(str_text);
 		m_time4=(UINT)temp_float;
 		Set(First_Calibration_Points_Time.Start_ID+9,m_time4);
-		
+		is_Show_Write_singleDLG=TRUE;
 	
 	}
 void CHumChamber::OnEnSetfocusTime5()
@@ -2774,7 +3384,7 @@ void CHumChamber::OnEnSetfocusTime5()
 		temp_float=(float)_wtof(str_text);
 		m_time5=(UINT)temp_float;
 		Set(First_Calibration_Points_Time.Start_ID+12,m_time5);
-		
+		is_Show_Write_singleDLG=TRUE;
 	
 	}
 void CHumChamber::OnEnSetfocusTime6()
@@ -2787,7 +3397,7 @@ void CHumChamber::OnEnSetfocusTime6()
 		temp_float=(float)_wtof(str_text);
 		m_time6=(UINT)temp_float;
 		Set(First_Calibration_Points_Time.Start_ID+15,m_time6);
-		
+		is_Show_Write_singleDLG=TRUE;
 		
 	}
 void CHumChamber::OnEnSetfocusTime7()
@@ -2800,7 +3410,7 @@ void CHumChamber::OnEnSetfocusTime7()
 		temp_float=(float)_wtof(str_text);
 		m_time7=(UINT)temp_float;
 		Set(First_Calibration_Points_Time.Start_ID+18,m_time7);
-		
+		is_Show_Write_singleDLG=TRUE;
 
 	}
 void CHumChamber::OnEnSetfocusTime8()
@@ -2813,7 +3423,7 @@ void CHumChamber::OnEnSetfocusTime8()
 		temp_float=(float)_wtof(str_text);
 		m_time8=(UINT)temp_float;
 		Set(First_Calibration_Points_Time.Start_ID+21,m_time8);
-
+		is_Show_Write_singleDLG=TRUE;
 		
 	}
 void CHumChamber::OnEnSetfocusTime9()
@@ -2831,7 +3441,7 @@ void CHumChamber::OnEnSetfocusTime9()
 		temp_float=(float)_wtof(str_text);
 		m_time9=(UINT)temp_float;
 		Set(First_Calibration_Points_Time.Start_ID+24,m_time9);
-		
+		is_Show_Write_singleDLG=TRUE;
 
 	}
 void CHumChamber::OnEnSetfocusTime10()
@@ -2845,5 +3455,823 @@ void CHumChamber::OnEnSetfocusTime10()
 		temp_float=(float)_wtof(str_text);
 		m_time10=(UINT)temp_float;
 		Set(First_Calibration_Points_Time.Start_ID+27,m_time10);
-		
+		is_Show_Write_singleDLG=TRUE;
+}
+
+HBRUSH CHumChamber::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CFormView::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	// TODO:  Change any attributes of the DC here
+	switch(pWnd->GetDlgCtrlID())
+	{
+	 case IDC_STATIC_TESTSTATUS:
+		 {
+			 if (m_test_status==0)
+			 {
+				 pDC->SetTextColor(RGB(255,255,255));
+				 pDC->SetBkColor(RGB(0,0,255));
+				 pDC->SetBkMode(TRANSPARENT);
+				 HBRUSH B = CreateSolidBrush(RGB(0,0,255));
+				 return (HBRUSH)B;
+			 } 
+			 else if (m_test_status==1)
+			 {
+				 pDC->SetTextColor(RGB(255,255,255));
+				 pDC->SetBkColor(RGB(0,0,255));
+				 pDC->SetBkMode(TRANSPARENT);
+				 HBRUSH B = CreateSolidBrush(RGB(255,0,255));
+				 return (HBRUSH)B;
+			 }
+			 else if (m_test_status==2)
+			 {
+				 pDC->SetTextColor(RGB(255,255,255));
+				 pDC->SetBkColor(RGB(0,0,255));
+				 pDC->SetBkMode(TRANSPARENT);
+				 HBRUSH B = CreateSolidBrush(RGB(0,139,0));
+				 return (HBRUSH)B;
+			 }
+			 else
+			 {
+				 pDC->SetTextColor(RGB(255,255,255));
+				 pDC->SetBkColor(RGB(0,0,255));
+				 pDC->SetBkMode(TRANSPARENT);
+				 HBRUSH B = CreateSolidBrush(RGB(137,137,137));
+				 return (HBRUSH)B;
+			 }
+
+		 } 
+	 case  IDC_STATIC_WARNING:
+	 {
+		 pDC->SetTextColor(RGB(255,255,255));
+		 pDC->SetBkColor(RGB(0,0,255));
+		 pDC->SetBkMode(TRANSPARENT);
+		 HBRUSH B = CreateSolidBrush(RGB(255,0,0));
+		 return (HBRUSH)B;
+	 }
 	}
+	// TODO:  Return a different brush if the default is not desired
+ return hbr;
+}
+
+
+void CHumChamber::OnBnClickedCheck1()
+{  
+     
+   unsigned short VLV=Get_Checks();
+   int ret= write_one(g_tstat_id,TEST_CHOICE_RegID.Start_ID,VLV);
+  
+   if (ret<0)
+   {
+	   if (m_checkBtn1.GetCheck()!=0)
+	   {
+		   m_checkBtn1.SetCheck(0);
+	   }
+	   else
+	   {
+		   m_checkBtn1.SetCheck(1);
+	   }
+	    
+   AfxMessageBox(_T("Try again!"));
+   return;
+   } 
+    
+  multi_register_value[TEST_CHOICE_RegID.Start_ID]=VLV;
+   if (m_checkBtn1.GetCheck()!=0)
+   {
+	   GetDlgItem(IDC_TEMP1)->SetWindowText(_T("0"));
+	   GetDlgItem(IDC_TEMP1)->EnableWindow(FALSE);
+	   GetDlgItem(IDC_HUM1)->SetWindowText(_T("0"));
+	   GetDlgItem(IDC_HUM1)->EnableWindow(FALSE);
+	   GetDlgItem(IDC_TIME1)->SetWindowText(_T("0"));
+	   GetDlgItem(IDC_TEMP_LEFT1)->SetWindowText(_T("0:0:0"));
+	   GetDlgItem(IDC_TIME1)->EnableWindow(FALSE);
+   }
+   else
+   {   
+	   GetDlgItem(IDC_TEMP1)->EnableWindow(TRUE);
+	   GetDlgItem(IDC_HUM1)->EnableWindow(TRUE);
+	   GetDlgItem(IDC_TIME1)->EnableWindow(TRUE);
+	   CString str_master_id;
+	   str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID]/10.0);
+	   GetDlgItem(IDC_TEMP1)->SetWindowText(str_master_id);
+
+
+	   str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID]/10.0);
+	   GetDlgItem(IDC_HUM1)->SetWindowText(str_master_id);
+
+	   str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID]);
+	   GetDlgItem(IDC_TIME1)->SetWindowText(str_master_id);
+	   if (multi_register_value[CurrentCalibrationID.Start_ID]>1)
+	   {
+		   str_master_id.Format(_T("0:0:0"));
+		   GetDlgItem(IDC_TEMP_LEFT1)->SetWindowText(str_master_id);
+	   } 
+	   else
+	   {
+		   Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID];
+		   Hour=Time_left/60;
+		   Minute=Time_left%60;
+		   Second=0;
+		   str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+		   GetDlgItem(IDC_TEMP_LEFT1)->SetWindowText(str_master_id);
+	   }
+   }
+	 
+}
+void CHumChamber::OnBnClickedCheck2()
+{
+	 
+	unsigned short VLV= Get_Checks();
+	int ret= write_one(g_tstat_id,TEST_CHOICE_RegID.Start_ID,VLV);
+	if (ret<0)
+	{  
+ 	 if (m_checkBtn2.GetCheck()!=0)
+ 	{
+ 		m_checkBtn2.SetCheck(0);
+ 	}
+ 	else
+ 	{
+ 		m_checkBtn2.SetCheck(1);
+ 	}
+		 
+			 
+
+		  
+		AfxMessageBox(_T("Try again!"));
+		return;
+	} 
+
+	multi_register_value[TEST_CHOICE_RegID.Start_ID]=VLV;
+
+	if (m_checkBtn2.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP2)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP2)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM2)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM2)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME2)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT2)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME2)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP2)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM2)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME2)->EnableWindow(TRUE);
+		CString str_master_id;
+	 
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+3]/10.0);
+		GetDlgItem(IDC_TEMP2)->SetWindowText(str_master_id);
+		 
+
+	 
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+3]/10.0);
+		GetDlgItem(IDC_HUM2)->SetWindowText(str_master_id);
+
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+3]);
+		GetDlgItem(IDC_TIME2)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>2)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT2)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+3];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT2)->SetWindowText(str_master_id);
+		}
+		 
+	}
+
+}
+void CHumChamber::OnBnClickedCheck3()
+{ 
+unsigned short VLV=Get_Checks();
+int ret= write_one(g_tstat_id,TEST_CHOICE_RegID.Start_ID,VLV);
+if (ret<0)
+{ 
+ 	if (m_checkBtn3.GetCheck()!=0)
+ 	{
+ 		m_checkBtn3.SetCheck(0);
+ 	}
+ 	else
+ 	{
+ 		m_checkBtn3.SetCheck(1);
+ 	}
+ 
+	AfxMessageBox(_T("Try again!"));
+	return;
+} 
+
+multi_register_value[TEST_CHOICE_RegID.Start_ID]=VLV;
+	if (m_checkBtn3.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP3)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP3)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM3)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM3)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME3)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT3)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME3)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP3)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM3)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME3)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+6]/10.0);
+		GetDlgItem(IDC_TEMP3)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+6]/10.0);
+		GetDlgItem(IDC_HUM3)->SetWindowText(str_master_id);
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+6]);
+		GetDlgItem(IDC_TIME3)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>3)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT3)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+6];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT3)->SetWindowText(str_master_id);
+		}
+	}
+}
+void CHumChamber::OnBnClickedCheck4()
+{ 
+unsigned short VLV=Get_Checks();
+int ret= write_one(g_tstat_id,TEST_CHOICE_RegID.Start_ID,VLV);
+if (ret<0)
+{
+ if (m_checkBtn4.GetCheck()!=0)
+ {
+ 	m_checkBtn4.SetCheck(0);
+ }
+ else
+ {
+ 	m_checkBtn4.SetCheck(1);
+ }
+	 
+	AfxMessageBox(_T("Try again!"));
+	return;
+} 
+
+multi_register_value[TEST_CHOICE_RegID.Start_ID]=VLV;
+	if (m_checkBtn4.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP4)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP4)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM4)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM4)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME4)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT4)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME4)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP4)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM4)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME4)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+9]/10.0);
+		GetDlgItem(IDC_TEMP4)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+9]/10.0);
+		GetDlgItem(IDC_HUM4)->SetWindowText(str_master_id);
+		 str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+9]);
+		GetDlgItem(IDC_TIME4)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>4)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT4)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+9];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT4)->SetWindowText(str_master_id);
+		}
+	}
+}
+void CHumChamber::OnBnClickedCheck5()
+{ 
+unsigned short VLV=Get_Checks();
+int ret= write_one(g_tstat_id,TEST_CHOICE_RegID.Start_ID,VLV);
+if (ret<0){
+	if (m_checkBtn5.GetCheck()!=0)
+	{
+		m_checkBtn5.SetCheck(0);
+	}
+	else
+	{
+		m_checkBtn5.SetCheck(1);
+	}
+	 
+	AfxMessageBox(_T("Try again!"));
+	return;
+} 
+
+multi_register_value[TEST_CHOICE_RegID.Start_ID]=VLV;
+	if (m_checkBtn5.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP5)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP5)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM5)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM5)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME5)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT5)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME5)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP5)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM5)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME5)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+12]/10.0);
+		GetDlgItem(IDC_TEMP5)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+12]/10.0);
+		GetDlgItem(IDC_HUM5)->SetWindowText(str_master_id); 
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+12]);
+		GetDlgItem(IDC_TIME5)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>5)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT5)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+12];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT5)->SetWindowText(str_master_id);
+		}
+	}
+}
+void CHumChamber::OnBnClickedCheck6()
+{ 
+unsigned short VLV=Get_Checks();
+int ret= write_one(g_tstat_id,TEST_CHOICE_RegID.Start_ID,VLV);
+if (ret<0)
+{ 
+	if (m_checkBtn6.GetCheck()!=0)
+	{
+		m_checkBtn6.SetCheck(0);
+	}
+	else
+	{
+		m_checkBtn6.SetCheck(1);
+	}
+	AfxMessageBox(_T("Try again!"));
+	return;
+} 
+
+multi_register_value[TEST_CHOICE_RegID.Start_ID]=VLV;
+	if (m_checkBtn6.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP6)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP6)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM6)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM6)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME6)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT6)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME6)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP6)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM6)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME6)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+15]/10.0);
+		GetDlgItem(IDC_TEMP6)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+15]/10.0);
+		GetDlgItem(IDC_HUM6)->SetWindowText(str_master_id); 
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+15]);
+		GetDlgItem(IDC_TIME6)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>6)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT6)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+15];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT6)->SetWindowText(str_master_id);
+		}
+	}
+}
+void CHumChamber::OnBnClickedCheck7()
+{
+unsigned short VLV=Get_Checks();
+int ret= write_one(g_tstat_id,TEST_CHOICE_RegID.Start_ID,VLV);
+if (ret<0){
+	if (m_checkBtn7.GetCheck()!=0)
+	{
+		m_checkBtn7.SetCheck(0);
+	}
+	else
+	{
+		m_checkBtn7.SetCheck(1);
+	}
+Fresh_Checks();	AfxMessageBox(_T("Try again!"));
+	return;
+} 
+
+multi_register_value[TEST_CHOICE_RegID.Start_ID]=VLV;
+	if (m_checkBtn7.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP7)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP7)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM7)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM7)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME7)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT7)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME7)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP7)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM7)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME7)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+18]/10.0);
+		GetDlgItem(IDC_TEMP7)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+18]/10.0);
+		GetDlgItem(IDC_HUM7)->SetWindowText(str_master_id); 
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+18]);
+		GetDlgItem(IDC_TIME7)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>7)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT7)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+18];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT7)->SetWindowText(str_master_id);
+		}
+	}
+}
+void CHumChamber::OnBnClickedCheck8()
+{ 
+unsigned short VLV= Get_Checks();
+int ret= write_one(g_tstat_id,TEST_CHOICE_RegID.Start_ID,VLV);
+if (ret<0)
+{ 
+ if (m_checkBtn8.GetCheck()!=0)
+ {
+ 	m_checkBtn8.SetCheck(0);
+ }
+ else
+ {
+ 	m_checkBtn8.SetCheck(1);
+ }
+/*Fresh_Checks();*/AfxMessageBox(_T("Try again!"));
+return;
+} 
+
+multi_register_value[TEST_CHOICE_RegID.Start_ID]=VLV;
+if (m_checkBtn8.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP8)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP8)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM8)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM8)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME8)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT8)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME8)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP8)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM8)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME8)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+21]/10.0);
+		GetDlgItem(IDC_TEMP8)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+21]/10.0);
+		GetDlgItem(IDC_HUM8)->SetWindowText(str_master_id);
+		 str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+21]);
+		GetDlgItem(IDC_TIME8)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>8)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT8)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+21];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT8)->SetWindowText(str_master_id);
+		}
+	}
+}
+void CHumChamber::OnBnClickedCheck9()
+{
+unsigned short VLV=Get_Checks();
+int ret= write_one(g_tstat_id,TEST_CHOICE_RegID.Start_ID,VLV);
+if (ret<0){
+ if (m_checkBtn9.GetCheck()!=0)
+ {
+ 	m_checkBtn9.SetCheck(0);
+ }
+ else
+ {
+ 	m_checkBtn9.SetCheck(1);
+ }
+	 AfxMessageBox(_T("Try again!"));
+	return;
+} 
+
+multi_register_value[TEST_CHOICE_RegID.Start_ID]=VLV;
+	if (m_checkBtn9.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP9)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP9)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM9)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM9)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME9)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT9)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME9)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP9)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM9)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME9)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+24]/10.0);
+		GetDlgItem(IDC_TEMP9)->SetWindowText(str_master_id);
+
+
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+24]/10.0);
+		GetDlgItem(IDC_HUM9)->SetWindowText(str_master_id); 
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+24]);
+		GetDlgItem(IDC_TIME9)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>9)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT9)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+24];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT9)->SetWindowText(str_master_id);
+		}
+	}
+}
+void CHumChamber::OnBnClickedCheck10()
+{
+unsigned short VLV=Get_Checks();
+int ret= write_one(g_tstat_id,TEST_CHOICE_RegID.Start_ID,VLV);
+if (ret<0)
+{
+ 	if (m_checkBtn10.GetCheck()!=0)
+ 	{
+ 		m_checkBtn10.SetCheck(0);
+ 	}
+ 	else
+ 	{
+ 		m_checkBtn10.SetCheck(1);
+ 	}
+ 	AfxMessageBox(_T("Try again!"));
+	return;
+} 
+
+multi_register_value[TEST_CHOICE_RegID.Start_ID]=VLV;
+	if (m_checkBtn10.GetCheck()!=0)
+	{
+		GetDlgItem(IDC_TEMP10)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP10)->EnableWindow(FALSE);
+		GetDlgItem(IDC_HUM10)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_HUM10)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TIME10)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_TEMP_LEFT10)->SetWindowText(_T("0:0:0"));
+		GetDlgItem(IDC_TIME10)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_TEMP10)->EnableWindow(TRUE);
+		GetDlgItem(IDC_HUM10)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TIME10)->EnableWindow(TRUE);
+		CString str_master_id;
+
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Temp.Start_ID+27]/10.0);
+		GetDlgItem(IDC_TEMP10)->SetWindowText(str_master_id);
+		str_master_id.Format(_T("%0.1f"),multi_register_value[First_Calibration_Points_Hum.Start_ID+27]/10.0);
+		GetDlgItem(IDC_HUM10)->SetWindowText(str_master_id); 
+		str_master_id.Format(_T("%d"),multi_register_value[First_Calibration_Points_Time.Start_ID+27]);
+		GetDlgItem(IDC_TIME10)->SetWindowText(str_master_id);
+		if (multi_register_value[CurrentCalibrationID.Start_ID]>10)
+		{
+			str_master_id.Format(_T("0:0:0"));
+			GetDlgItem(IDC_TEMP_LEFT10)->SetWindowText(str_master_id);
+		} 
+		else
+		{
+			Time_left=multi_register_value[First_Calibration_Points_Time.Start_ID+27];
+			Hour=Time_left/60;
+			Minute=Time_left%60;
+			Second=0;
+			str_master_id.Format(_T("%d:%d:%d"),Hour,Minute,Second);
+			GetDlgItem(IDC_TEMP_LEFT10)->SetWindowText(str_master_id);
+		}
+	}
+}
+unsigned short CHumChamber::Get_Checks(){
+unsigned short Reg_Value=0;
+ 
+if (m_checkBtn10.GetCheck()==0)
+{
+	Reg_Value+=1<<9;
+}
+if (m_checkBtn9.GetCheck()==0)
+{
+	Reg_Value+=1<<8;
+}
+if (m_checkBtn8.GetCheck()==0)
+{
+	Reg_Value+=1<<7;
+}
+if (m_checkBtn7.GetCheck()==0)
+{
+	Reg_Value+=1<<6;
+}
+if (m_checkBtn6.GetCheck()==0)
+{
+	Reg_Value+=1<<5;
+}
+if (m_checkBtn5.GetCheck()==0)
+{
+	Reg_Value+=1<<4;
+}
+if (m_checkBtn4.GetCheck()==0)
+{
+	Reg_Value+=1<<3;
+}
+if (m_checkBtn3.GetCheck()==0)
+{
+	Reg_Value+=1<<2;
+}
+if (m_checkBtn2.GetCheck()==0)
+{
+	Reg_Value+=1<<1;
+}
+if (m_checkBtn1.GetCheck()==0)
+{
+	Reg_Value+=1;
+}
+return Reg_Value;
+}
+void CHumChamber::OnEnSetfocusTestTemp1()
+{
+		float temp_float;
+		int temp;
+		CString str_text;
+		m_test_temp1.GetWindowText(str_text);
+		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+		temp_float=(float)_wtof(str_text);
+		temp=(UINT)temp_float*10;
+		Set(First_Test_Temp_Hum_RegID.Start_ID,temp);
+		is_Show_Write_singleDLG=TRUE;
+}
+
+
+void CHumChamber::OnEnSetfocusTestTemp2()
+{
+	float temp_float;int temp;
+		CString str_text;
+		m_test_temp2.GetWindowText(str_text);
+		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+		temp_float=(float)_wtof(str_text);
+		temp=(UINT)temp_float*10;
+		Set(First_Test_Temp_Hum_RegID.Start_ID+2,temp);
+		is_Show_Write_singleDLG=TRUE;
+}
+
+
+void CHumChamber::OnEnSetfocusTestTemp3()
+{
+	int temp;
+		float temp_float;
+		CString str_text;
+		m_test_temp3.GetWindowText(str_text);
+		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+		temp_float=(float)_wtof(str_text);
+		temp=(UINT)temp_float*10;
+		Set(First_Test_Temp_Hum_RegID.Start_ID+4,temp);
+		is_Show_Write_singleDLG=TRUE;
+}
+
+
+void CHumChamber::OnEnSetfocusTestHum1()
+{
+	int temp;
+		float temp_float;
+		CString str_text;
+		m_test_hum1.GetWindowText(str_text);
+		 
+		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+		temp_float=(float)_wtof(str_text);
+		temp=(UINT)temp_float*10;
+		Set(First_Test_Temp_Hum_RegID.Start_ID+1,temp);
+		is_Show_Write_singleDLG=TRUE;
+}
+
+
+void CHumChamber::OnEnSetfocusTestHum2()
+{
+	int temp;
+		float temp_float;
+		CString str_text;
+		//GetDlgItem(IDC_TEST_HUM2)->GetWindowText(str_text);
+		m_test_hum2.GetWindowText(str_text);
+		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+		temp_float=(float)_wtof(str_text);
+		temp=(UINT)temp_float*10;
+		Set(First_Test_Temp_Hum_RegID.Start_ID+3,temp);
+		is_Show_Write_singleDLG=TRUE;
+}
+
+
+void CHumChamber::OnEnSetfocusTestHum3()
+{
+	    int temp;
+		float temp_float;
+		CString str_text;
+		m_test_hum3.GetWindowText(str_text);
+		//str_text.Delete(str_text.GetLength()-2,2);//去掉°C两个字符
+		temp_float=(float)_wtof(str_text);
+		temp=(UINT)temp_float*10;
+		Set(First_Test_Temp_Hum_RegID.Start_ID+5,temp);
+		is_Show_Write_singleDLG=TRUE;
+}
+
+
+void CHumChamber::OnEnSetfocusSensorId()
+{
+	float temp_float;
+	CString str_text;
+	GetDlgItem(IDC_SENSOR_ID)->GetWindowText(str_text);
+
+	temp_float=(float)_wtof(str_text);
+	m_sensorid=(UINT)temp_float;
+	Set(CurrentTestSensor.Start_ID,m_sensorid);
+	is_Show_Write_singleDLG=TRUE;
+}
