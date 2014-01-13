@@ -54,6 +54,7 @@ BEGIN_MESSAGE_MAP(CBacnetMonitor, CDialogEx)
 //	ON_NOTIFY(NM_KILLFOCUS, IDC_LIST_MONITOR_INPUT, &CBacnetMonitor::OnNMKillfocusListMonitorInput)
 	ON_NOTIFY(NM_SETFOCUS, IDC_LIST_MONITOR, &CBacnetMonitor::OnNMSetfocusListMonitor)
 	ON_NOTIFY(NM_SETFOCUS, IDC_LIST_MONITOR_INPUT, &CBacnetMonitor::OnNMSetfocusListMonitorInput)
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
@@ -688,11 +689,12 @@ void CBacnetMonitor::OnTimer(UINT_PTR nIDEvent)
 	switch(nIDEvent)
 	{
 	case 1:
-#if 0
+		if(this->IsWindowVisible())
+		{
 		PostMessage(WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
 		PostMessage(WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
 		Post_Refresh_Message(g_bac_instance,READMONITOR_T3000,0,BAC_MONITOR_COUNT - 1,sizeof(Str_monitor_point),BAC_MONITOR_GROUP);
-#endif
+		}
 		break;
 	case 2:
 		KillTimer(2);
@@ -851,4 +853,32 @@ void CBacnetMonitor::OnNMSetfocusListMonitorInput(NMHDR *pNMHDR, LRESULT *pResul
 
 
 	*pResult = 0;
+}
+
+void CBacnetMonitor::OnClose()
+{
+	// TODO: Add your message handler code here and/or call default
+	KillTimer(1);
+	m_monitor_dlg_hwnd = NULL;
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
+	CDialogEx::OnClose();
+}
+
+void CBacnetMonitor::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+//	KillTimer(1);
+//	m_monitor_dlg_hwnd = NULL;
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
+//	CDialogEx::OnCancel();
+}
+
+void CBacnetMonitor::Reg_Hotkey()
+{
+	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert¼ü
+}
+
+void CBacnetMonitor::Unreg_Hotkey()
+{
+	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 }

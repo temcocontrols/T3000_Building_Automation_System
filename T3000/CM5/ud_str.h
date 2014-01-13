@@ -118,8 +118,8 @@ typedef enum {
 		 READSTATUSWRITEFLASH_COMMAND = 120,
 		 RESTARTMINI_COMMAND       = 121,
 		 WRITEPRGFLASH_COMMAND     = 122,
-		 OPENSCREEN_COMMAND        = 123
-		
+		 OPENSCREEN_COMMAND        = 123,
+		 CONNECTED_WITH_DEVICE		= 199
 } CommandRequest;	  
 
 
@@ -232,6 +232,10 @@ typedef  struct
 
 } Str_in_point; /* 21+1+4+1+1+9 = 38 */
 
+typedef  struct
+{
+	int8_t label[4];		
+}Str_connected_point;
 
 typedef union {
 		Str_out_point             *pout;

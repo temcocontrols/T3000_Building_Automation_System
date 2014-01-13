@@ -30,6 +30,7 @@ public:
 	afx_msg void OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnClose();
+	virtual void OnCancel();
 };
 
 const int CONTROLLER_NUM = 0;

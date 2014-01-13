@@ -38,6 +38,8 @@ public:
 	int m_row;
 	int m_col;
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnClose();
+	virtual void OnCancel();
 };
 
 

@@ -45,14 +45,14 @@ extern "C" {
         unsigned index);
     const char *bactext_unconfirmed_service_name(
         unsigned index);
-    const char *bactext_application_tag_name(
+ __declspec(dllexport)  const char *bactext_application_tag_name(
         unsigned index);
-    const char *bactext_object_type_name(
+  __declspec(dllexport)   const char *bactext_object_type_name(
         unsigned index);
     bool bactext_object_type_index(
         const char *search_name,
         unsigned *found_index);
-    const char *bactext_property_name(
+   __declspec(dllexport)    const char *bactext_property_name(
         unsigned index);
     bool bactext_property_index(
         const char *search_name,

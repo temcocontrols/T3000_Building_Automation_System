@@ -335,7 +335,7 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 
 			CString temp1;
 			CStringArray temparray;
-			temp1 = Digital_Units_Array[bac_range_number_choose];//11 is the sizeof the array
+			temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
 			SplitCStringA(temparray,temp1,_T("/"));
 
 			if(m_Input_data.at(Changed_Item).control == 1)
@@ -552,13 +552,19 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		{
 
 			m_input_list.SetItemText(i,INPUT_CAL,_T(""));
+#if 0
 			if(m_Input_data.at(i).range>=12)
 				m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[m_Input_data.at(i).range -11]);
 			else
 				m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[m_Input_data.at(i).range]);
+#endif
+			if(m_Input_data.at(i).range<=22)
+				m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[m_Input_data.at(i).range]);
+			else
+				m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[0]);
 			m_input_list.SetItemText(i,INPUT_UNITE,_T(""));
 
-			if(m_Input_data.at(i).range>22)
+			if((m_Input_data.at(i).range>22) || (m_Input_data.at(i).range == 0))
 			{
 				m_input_list.SetItemText(i,INPUT_UNITE,Digital_Units_Array[0]);
 			}
@@ -566,9 +572,11 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			{
 				CString temp1;
 				CStringArray temparray;
+#if 0
 				if(m_Input_data.at(i).range>=12)
 					temp1 = Digital_Units_Array[m_Input_data.at(i).range - 11];//11 is the sizeof the array
 				else
+#endif
 					temp1 = Digital_Units_Array[m_Input_data.at(i).range];
 				SplitCStringA(temparray,temp1,_T("/"));
 				if((temparray.GetSize()==2))
@@ -749,11 +757,31 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 	CString temp1;
 	CStringArray temparray;
+	if((m_Input_data.at(lRow).range < 23) &&(m_Input_data.at(lRow).range !=0))
+		temp1 = Digital_Units_Array[m_Input_data.at(lRow).range];
+	else
+		return;
+	SplitCStringA(temparray,temp1,_T("/"));
+
+	if(m_Input_data.at(lRow).control == 0)
+	{
+		m_Input_data.at(lRow).control = 1;
+		m_input_list.SetItemText(lRow,INPUT_VALUE,temparray.GetAt(1));
+		New_CString = temparray.GetAt(1);
+	}
+	else
+	{
+		m_Input_data.at(lRow).control = 0;
+		m_input_list.SetItemText(lRow,INPUT_VALUE,temparray.GetAt(0));
+		New_CString = temparray.GetAt(0);
+	}
+#if 0
 	if(m_Input_data.at(lRow).range > 11)
 		temp1 = Digital_Units_Array[m_Input_data.at(lRow).range - 11];//11 is the sizeof the array
 	else
 		temp1 = Digital_Units_Array[m_Input_data.at(lRow).range];
 	SplitCStringA(temparray,temp1,_T("/"));
+
 	if(m_Input_data.at(lRow).range>=12)
 	{
 
@@ -778,6 +806,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 
 	}
+#endif
 	m_input_list.Set_Edit(false);
 
 	int cmp_ret = memcmp(&m_temp_Input_data[lRow],&m_Input_data.at(lRow),sizeof(Str_in_point));
@@ -797,8 +826,11 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
+	if(this->IsWindowVisible())
+	{
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 	Post_Refresh_Message(g_bac_instance,READINPUT_T3000,0,BAC_INPUT_ITEM_COUNT - 1,sizeof(Str_in_point), BAC_INPUT_GROUP);
+	}
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -807,7 +839,15 @@ void CBacnetInput::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
 	m_input_dlg_hwnd = NULL;
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	CDialogEx::OnClose();
+}
+void CBacnetInput::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+//	m_input_dlg_hwnd = NULL;
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
+//	CDialogEx::OnCancel();
 }
 
 
@@ -828,3 +868,6 @@ BOOL CBacnetInput::PreTranslateMessage(MSG* pMsg)
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
+
+
+

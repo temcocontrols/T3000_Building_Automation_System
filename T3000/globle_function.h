@@ -120,7 +120,8 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
 	 uint16_t service_len,
 	 BACNET_ADDRESS * src,
 	 BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
- void Initial_bac_com(int comport = 1);
+  void local_rp_ack_print_data(	BACNET_READ_PROPERTY_DATA * data);
+ void Initial_bac(int comport = 1);
   bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket);
   unsigned char Str_to_Byte(CString need_conver);
   void Init_Service_Handlers(void);

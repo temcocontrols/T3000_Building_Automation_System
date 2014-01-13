@@ -1210,7 +1210,7 @@ char mycode[1024];
 //char editbuf[1024] = {"10 REM Test123456789\r\n20 ENABLE OUT8"};//Pass
 //extern char editbuf[25000];
 //char editbuf[1024] = {"10 REM TestEnable\r\n20 ENABLE 0-OUT1\r\n30 DISABLE 0-OUT2"};
-
+char * intervaltotext_old(char *textbuf, long seconds , unsigned minutes , unsigned hours, char *c=":");
 char mesbuf[1024];
 char mycomment[1024] = {"AAAAAAAAAAAA"};
 int my_lengthcode = 0;
@@ -1518,6 +1518,44 @@ if(error!=-1)
 }	/* end of main */
 
 
+char * intervaltotext_old(char *textbuf, long seconds , unsigned minutes , unsigned hours, char *c)
+{
+	char buf[12], *textbuffer;
+	char *separator = c ;
+	textbuffer = buf;
+	if( seconds < 0 )
+	{
+		seconds = -seconds;
+		strcpy(textbuffer++, "-" ) ;        /* add the '-' */
+	}
+	if(*c!='-')
+	{
+		hours += seconds/3600;
+		minutes += (unsigned)(seconds%3600)/60;
+		seconds = (unsigned)(seconds%3600)%60;
+	}
+	if( hours < 10 ) {
+		strcpy(textbuffer++, "0" ) ;        /* add the leading zero 0#:##:## */
+	}
+	itoa(hours,textbuffer,10) ;
+	textbuffer += strlen(textbuffer);
+	strcpy(textbuffer++, separator ) ;        /* add the ":" separator*/
+
+	if( minutes < 10 ) {
+		strcpy(textbuffer++, "0" ) ;        /* add the leading zero ##:0#:## */
+	}
+	itoa(minutes,textbuffer,10) ;
+	textbuffer += strlen(textbuffer);
+	strcpy(textbuffer++, separator ) ;        /* add the ":" separator*/
+	if( seconds < 10 ) {
+		strcpy(textbuffer++, "0" ) ;        /* add the leading zero ##:##:0# */
+	}
+	itoa(seconds,textbuffer,10)  ;
+
+	if(textbuf) strcpy(textbuf, buf);
+	return( buf ) ;
+}
+/*******************intervaltotext ********************/
 
 
 int prescan1 (void)
@@ -3376,10 +3414,11 @@ char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *
 			return(islabel(token,num_point,var_type,point_type,num_panel));
 	}
 //	strcpy_s(my_info_panel[0].name,4,"VAR");
+#if 0
 	my_info_panel[0].name = "OUT" ;
 	my_info_panel[1].name = "IN";
 	my_info_panel[2].name = "VAR";
-	
+#endif
 	if ((p=strpbrk(q, "123456789"))!=NULL)
 	{
 		memcpy(pc,q,p-q);
@@ -5371,7 +5410,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 					if ((vars_table[cur_index].type == POINT_VAR) || (vars_table[cur_index].type == LABEL_VAR))
 					{
 
-						if( vars_table[cur_index].panel == Station_NUM )
+						if( (unsigned char)vars_table[cur_index].panel == Station_NUM )
 						{
 							cod_line[Byte++]=LOCAL_POINT_PRG;
 							point.number     = vars_table[cur_index].num_point-1;
@@ -5552,7 +5591,7 @@ char *rtrim(char *text)
 }
 
 char * buf;
-char my_display[1024];
+char my_display[10240];
 
 char my_input_code[1024];
 char * pcode;
@@ -5567,7 +5606,7 @@ unsigned char cod;//,xtemp[15];
  code = mycode;
 //Edit by Fance
  buf = my_display;
- memset(my_display,0,1024);
+ memset(my_display,0,10240);
  index_stack = stack;
  int n;
  buf[0]=0;
@@ -5990,6 +6029,7 @@ unsigned char cod;//,xtemp[15];
 											unsigned long k;
 											memcpy(&k,++code,4);
 //									      adjustlong(&k, ptrprg->type);
+											intervaltotext_old(buf, k , 0 , 0 );
 #ifdef Fance
 											intervaltotext(buf, k , 0 , 0 );
 #endif
@@ -6222,9 +6262,10 @@ else
 						if( *code == TIME_FORMAT)
 						{
 							code++;
-							#ifdef Fance
-							intervaltotext(buf, (long)f, 0, 0);
-							#endif
+							intervaltotext_old(buf, (long)f, 0, 0);
+							//#ifdef Fance
+							//intervaltotext(buf, (long)f, 0, 0);
+							//#endif
 
 						}
 						else
@@ -6474,18 +6515,18 @@ int	desexpr(void)
 								strcat(op1," )");
 								push(op1);
 								stack_par[ind_par++]=0;
-								#ifdef Fance
+							//	#ifdef Fance
 								if (*(code-1) == INTERVAL || *(code-1) == TIME_ON || *(code-1) == TIME_OFF )
 								{
 									if (*(code-1) == TIME_ON || *(code-1) == TIME_OFF )
 										//											if ( ind_line_array && line_array[ind_line_array-1][0]!=line)
 									{
-										line_array[ind_line_array][0] = (unsigned int)((long)FP_SEG(code)*16+(long)FP_OFF(code)-(long)(FP_SEG(pcode)*16+(long)FP_OFF(pcode)) + 2);
-										memcpy(&line_array[ind_line_array++][1],code-3,2);
+									//	line_array[ind_line_array][0] = (unsigned int)((long)FP_SEG(code)*16+(long)FP_OFF(code)-(long)(FP_SEG(pcode)*16+(long)FP_OFF(pcode)) + 2);
+									//	memcpy(&line_array[ind_line_array++][1],code-3,2);
 									}
 									code += 4;
 								}
-								#endif
+							//	#endif
 								break;
 				 case TIME_ON:
 				 case TIME_OFF:

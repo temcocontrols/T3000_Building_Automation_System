@@ -266,9 +266,9 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 			||(bac_ranges_type == OUTPUT_RANGE_DIGITAL_TYPE) 
 			|| (bac_ranges_type == INPUT_RANGE_DIGITAL_TYPE))	//12
 		{
-			if(sel_value>=12)
+			if(sel_value>=23)
 			{
-				MessageBox(_T("Please input a value between 0 - 11"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+				MessageBox(_T("Please input a value between 0 - 22"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 				GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(_T(""));
 				((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetSel(0,-1);
 			}

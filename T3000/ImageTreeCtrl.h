@@ -77,6 +77,27 @@ private:
 	CString m_name_old;
 	CString m_name_new;
 	HTREEITEM m_hSelItem;
+
+
+protected:
+	struct Color_Font
+	{
+		COLORREF color;
+		LOGFONT logfont;
+	};
+	CMap< void*, void*, Color_Font, Color_Font& > m_mapColorFont ;
+	HTREEITEM old_hItem;
+public:
+	void SetItemFont(HTREEITEM hItem, LOGFONT& logfont);
+	void SetItemBold(HTREEITEM hItem, BOOL bBold);
+	void SetItemColor(HTREEITEM hItem, COLORREF color);
+	BOOL GetItemFont(HTREEITEM hItem, LOGFONT * plogfont);
+	BOOL GetItemBold(HTREEITEM hItem);
+	void SetSelectItem(HTREEITEM hItem);
+	COLORREF GetItemColor(HTREEITEM hItem);
+	afx_msg void OnPaint();
+	afx_msg void OnKillFocus(CWnd* pNewWnd);
+
 };
 
 
