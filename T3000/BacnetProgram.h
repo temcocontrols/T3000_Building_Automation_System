@@ -40,6 +40,9 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual void OnCancel();
+	void Reg_Hotkey();
+	void Unreg_Hotkey();
 };
 
 	const int PROGRAM_NUM = 0;
@@ -66,6 +69,6 @@ public:
 		_T("OFF")
 	};
 
-	const int KEY_INSERT = 1020;
+//	const int KEY_INSERT = 1020;
 
 

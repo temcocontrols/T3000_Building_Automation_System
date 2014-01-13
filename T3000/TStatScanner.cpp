@@ -1752,7 +1752,7 @@ int CTStatScanner::GetAllNodeFromDataBase()
 			((CTStat_Net*)(pNode))->SetIPPort(_wtoi(strPort));
 			
 			 CString str_product_id = m_pRs->GetCollect("Product_class_ID");
-			 if((_wtoi(str_product_id) == 35) ||(_wtoi(str_product_id) ==50))
+			 if((_wtoi(str_product_id) == PM_MINIPANEL) ||(_wtoi(str_product_id) == PM_CM5))
 			 {
 				 CString strprotocol = m_pRs->GetCollect("Protocol");
 				 ((CTStat_Net*)(pNode))->SetProtocol(_wtoi(strprotocol));
@@ -2086,6 +2086,8 @@ void CTStatScanner::AddNewNetToDB()
 
 		int nSID = pInfo->m_pNet->GetSerialID();
 		int nSProtocol = pInfo->m_pNet->GetProtocol();
+		if((nSProtocol <0) || (nSProtocol >3))
+			nSProtocol = MODBUS_TCPIP;//default it will be modbus protocol;
 		for (UINT j = 0; j < m_szNetNodes.size(); j++)
 		{
 			int nNodeSID = m_szNetNodes[j]->GetSerialID();
@@ -2093,11 +2095,11 @@ void CTStatScanner::AddNewNetToDB()
 			//if the scan device is CM5 or minipanel, this products has 3 protocol, BacnetIP modbus485 modbus tcp;
 			//So when scan bacnet ip and midbus tcp ,the or replay to t3000,
 			//So I display the device in two format,judge to 2 decvice;
-			if((pInfo->m_pNet->GetProductType() == 50) || (pInfo->m_pNet->GetProductType() == 35))
+			if((pInfo->m_pNet->GetProductType() == PM_CM5) || (pInfo->m_pNet->GetProductType() == PM_MINIPANEL))
 			{
 				int nNodeSID = m_szNetNodes[j]->GetSerialID();
 				int nNodeProtocol = m_szNetNodes[j]->GetProtocol();
-				if ((nSID == nNodeSID)&&(nSProtocol = nNodeProtocol))
+				if ((nSID == nNodeSID)&&(nSProtocol == nNodeProtocol))
 				{
 					bIsNew = FALSE;
 					break;
@@ -2194,7 +2196,7 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
 	//GetNetDevSubnetName(strIP);
 	
 	CString strEPSize;
-	if(pInfo->m_pNet->GetProtocol()==3)//如果是bacnetip 需要往数据库里保存 协议 3 就是bacnetip;
+	if(pInfo->m_pNet->GetProtocol()== PROTOCOL_BACNET_IP)//如果是bacnetip 需要往数据库里保存 协议 3 就是bacnetip;
 	{
 		CString temp_pro = _T("3");
 		strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol)					  values('"+m_strBuildingName+"','"+m_strSubNet+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"','"+temp_pro+"')"));
@@ -3573,7 +3575,7 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 		if(!bip_valid())
 		{
 			bac_net_initial_once = false;
-			Initial_bac_com();
+			Initial_bac();
 			
 		}
 
@@ -3589,7 +3591,7 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 		{
 			int ready_to_read_count =	m_bac_scan_com_data.size();
 
-			CString strInfo;strInfo.Format(_T("Scan  Bacnetip.Found %d device"),ready_to_read_count);
+			CString strInfo;strInfo.Format(_T("Scan  Bacnetip.Found %d BACNET device"),ready_to_read_count);
 			pScan->ShowBacnetComScanInfo(strInfo);
 
 			if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//达到返回的个数后就break;
@@ -3718,7 +3720,7 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 		SetCommunicationType(0);//如果没有关闭串口 就先关闭;
 		close_com();
 		bac_net_initial_once = false;
-		Initial_bac_com(temp_port);
+		Initial_bac(temp_port);
 
 		TRACE(_T("Now scan with COM%d\r\n"),temp_port);
 

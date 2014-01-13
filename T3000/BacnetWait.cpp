@@ -68,11 +68,11 @@ BOOL BacnetWait::OnInitDialog()
 
 
 	// TODO:  Add extra initialization here
-	if(m_wait_type==1)
+	if(m_wait_type==1)	//1 is now write config
 	{
 		SetTimer(4,200,NULL);
 	}
-	else
+	else	//Read one of the list or read all list;
 	{
 	SetTimer(1,200,NULL);
 	SetTimer(5,120000,NULL);
@@ -128,7 +128,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 	}
 	else
 	{
-		tempcs.Format(_T("Reading descriptors "));
+		tempcs.Format(_T("   Reading data "));
 
 	}
 	for (int i=0;i<=static_count;i++)
@@ -150,7 +150,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			BAC_SCREEN_GROUP +
 			BAC_MONITOR_GROUP +
 			BAC_WEEKLY_GROUP +
-			BAC_ANNUAL_GROUP;
+			BAC_ANNUAL_GROUP +
+			BAC_WEEKLYCODE_GOUP +
+			BAC_ANNUALCODE_GROUP;
 		int write_all_step = 1000 / write_total_count;
 		int write_success_count = 0;
 		int write_pos = 0;
@@ -238,6 +240,25 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				write_pos = write_pos +write_all_step;
 			}
 		}
+
+		for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
+		{
+			if(Write_Config_Info.Write_Weeklycode_Info[i].task_result == BAC_RESULTS_OK)
+			{
+				write_success_count ++;
+				write_pos = write_pos +write_all_step;
+			}
+		}
+
+		for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
+		{
+			if(Write_Config_Info.Write_Annualcode_Info[i].task_result == BAC_RESULTS_OK)
+			{
+				write_success_count ++;
+				write_pos = write_pos +write_all_step;
+			}
+		}
+
 		write_pos = write_pos /10;
 		if(write_pos>100)
 			write_pos=100;
@@ -257,7 +278,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 									  BAC_WEEKLY_GROUP +
 									  BAC_ANNUAL_GROUP +
 									  BAC_MONITOR_GROUP +
-									  BAC_WEEKLYCODE_GOUP;//这里还有很多要加;
+									  BAC_WEEKLYCODE_GOUP +
+									  BAC_ANNUALCODE_GROUP;//这里还有很多要加;
 		int read_config_all_step = 1000 / read_config_total_count;
 		int read_config_success_count =0;
 		int read_config_pos = 0;
@@ -283,6 +305,19 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				}
 			}
 		}
+
+		for (int i=0;i<BAC_ANNUALCODE_GROUP;i++ )
+		{
+			if(bac_read_which_list ==BAC_READ_SVAE_CONFIG)
+			{
+				if(Bacnet_Refresh_Info.Read_Annualcode_Info[i].task_result == BAC_RESULTS_OK)
+				{
+					read_config_success_count ++;
+					read_config_pos = read_config_pos +read_config_all_step;
+				}
+			}
+		}
+
 		for (int i=0;i<BAC_INPUT_GROUP;i++)
 		{
 			if(bac_read_which_list ==BAC_READ_SVAE_CONFIG)
@@ -407,7 +442,10 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			BAC_VARIABLE_GROUP +
 			BAC_TIME_COMMAND_GROUP +
 			BAC_WEEKLY_GROUP +
-			BAC_ANNUAL_GROUP;
+			BAC_ANNUAL_GROUP +
+			BAC_CONTROLLER_GROUP +
+			BAC_SCREEN_GROUP +
+			BAC_MONITOR_GROUP;
 
 		int all_step = 1000 / total_count;
 		int input_step = 1000 / BAC_INPUT_GROUP;
@@ -567,7 +605,15 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 		for (int i=0;i<BAC_CONTROLLER_GROUP ;i++ )
 		{
-			 if(bac_read_which_list == BAC_READ_CONTROLLER_LIST)
+			if(bac_read_which_list ==BAC_READ_ALL_LIST)
+			{
+				if(Bacnet_Refresh_Info.Read_Controller_Info[i].task_result == BAC_RESULTS_OK)
+				{
+					success_count ++;
+					pos = pos +all_step;
+				}
+			}
+			else if(bac_read_which_list == BAC_READ_CONTROLLER_LIST)
 			{
 				if(Bacnet_Refresh_Info.Read_Controller_Info[i].task_result == BAC_RESULTS_OK)
 				{
@@ -579,7 +625,15 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 		for (int i=0;i<BAC_SCREEN_GROUP ;i++ )
 		{
-			if(bac_read_which_list == BAC_READ_SCREEN_LIST)
+			if(bac_read_which_list ==BAC_READ_ALL_LIST)
+			{
+				if(Bacnet_Refresh_Info.Read_Screen_Info[i].task_result == BAC_RESULTS_OK)
+				{
+					success_count ++;
+					pos = pos +all_step;
+				}
+			}
+			else if(bac_read_which_list == BAC_READ_SCREEN_LIST)
 			{
 				if(Bacnet_Refresh_Info.Read_Screen_Info[i].task_result == BAC_RESULTS_OK)
 				{
@@ -591,7 +645,15 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 		for (int i=0;i<BAC_MONITOR_GROUP ;i++ )
 		{
-			if(bac_read_which_list == BAC_READ_MONITOR_LIST)
+			if(bac_read_which_list ==BAC_READ_ALL_LIST)
+			{
+				if(Bacnet_Refresh_Info.Read_Monitor_Info[i].task_result == BAC_RESULTS_OK)
+				{
+					success_count ++;
+					pos = pos +all_step;
+				}
+			}
+			else if(bac_read_which_list == BAC_READ_MONITOR_LIST)
 			{
 				if(Bacnet_Refresh_Info.Read_Monitor_Info[i].task_result == BAC_RESULTS_OK)
 				{
@@ -619,7 +681,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		{
 		for (int i=0;i<BAC_MONITOR_GROUP;i++)
 		{
-			if((bac_read_which_list == BAC_READ_MONITOR_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG))
+			if((bac_read_which_list == BAC_READ_MONITOR_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_ALL_LIST))
 			{
 				if(Bacnet_Refresh_Info.Read_Monitor_Info[i].task_result == BAC_RESULTS_UNKONW)
 				{
@@ -685,7 +747,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 		for (int i=0;i<BAC_SCREEN_GROUP;i++)
 		{
-			if((bac_read_which_list == BAC_READ_SCREEN_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG))
+			if((bac_read_which_list == BAC_READ_SCREEN_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_ALL_LIST))
 			{
 				if(Bacnet_Refresh_Info.Read_Screen_Info[i].task_result == BAC_RESULTS_UNKONW)
 				{
@@ -749,7 +811,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 		for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
 		{
-			if((bac_read_which_list == BAC_READ_CONTROLLER_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG))
+			if((bac_read_which_list == BAC_READ_CONTROLLER_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_ALL_LIST))
 			{
 
 
@@ -1405,6 +1467,131 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 
+		if(bac_read_which_list == BAC_READ_ANNUALCODE_LIST)
+		{
+			if(Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].task_result == BAC_RESULTS_UNKONW)
+			{
+				if(Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].invoke_id > 0)
+				{
+					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].timeout_count ++;
+				}
+				if(Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].timeout_count > 20)
+				{
+					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].task_result = BAC_RESULTS_FAIL;
+					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].timeout_count = 0;
+				}
+				m_wait_detail.SetWindowTextW(tempcs);
+				goto endthis;
+			}
+			else if(Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].task_result == BAC_RESULTS_FAIL)
+			{
+				Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].resend_count ++ ;
+				cotinue_waite = true;
+				//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+				if((Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].resend_count>RESEND_COUNT) 
+					|| (Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].has_resend_yes_or_no > FAIL_RESEND_COUNT))
+				{
+					m_wait_detail.SetWindowTextW(_T("Read annual day Time Out!"));
+					KillTimer(1);
+					SetTimer(2,2000,NULL);
+					goto endthis;
+				}
+				g_invoke_id = GetPrivateData(
+					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].device_id,
+					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].command,
+					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].start_instance,
+					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].end_instance,
+					WEEKLY_SCHEDULE_SIZE);
+				if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+				{
+					goto endthis;
+				}
+				Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].has_resend_yes_or_no ++;
+				Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
+				Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+
+				CString temp_cs_show;
+				temp_cs_show.Format(_T("Task ID = %d. Read annual day time list from item %d to %d "),g_invoke_id,
+					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].start_instance,
+					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].end_instance);
+				Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
+
+
+				//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
+
+				TRACE(_T("Program code Resend start = %d , Resend end = %d\r\n"),
+					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].start_instance,
+					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].end_instance);
+
+
+			}
+		}
+		else if((bac_read_which_list == TYPE_SVAE_CONFIG))
+		{
+			for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
+			{
+				if(Bacnet_Refresh_Info.Read_Annualcode_Info[i].task_result == BAC_RESULTS_UNKONW)
+				{
+					if(Bacnet_Refresh_Info.Read_Annualcode_Info[i].invoke_id > 0)
+					{
+						Bacnet_Refresh_Info.Read_Annualcode_Info[i].timeout_count ++;
+					}
+					if(Bacnet_Refresh_Info.Read_Annualcode_Info[i].timeout_count > 20)
+					{
+						Bacnet_Refresh_Info.Read_Annualcode_Info[i].task_result = BAC_RESULTS_FAIL;
+						Bacnet_Refresh_Info.Read_Annualcode_Info[i].timeout_count = 0;
+						continue;
+					}
+					m_wait_detail.SetWindowTextW(tempcs);
+					cotinue_waite = true;
+					break;
+					//goto endthis;
+				}
+				else if(Bacnet_Refresh_Info.Read_Annualcode_Info[i].task_result == BAC_RESULTS_FAIL)
+				{
+					Bacnet_Refresh_Info.Read_Annualcode_Info[i].resend_count ++ ;
+					cotinue_waite = true;
+					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					if((Bacnet_Refresh_Info.Read_Annualcode_Info[i].resend_count>RESEND_COUNT) 
+						|| (Bacnet_Refresh_Info.Read_Annualcode_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
+					{
+						m_wait_detail.SetWindowTextW(_T("Read annual day Time Out!"));
+						KillTimer(1);
+						SetTimer(2,2000,NULL);
+						goto endthis;
+					}
+					g_invoke_id = GetPrivateData(
+						Bacnet_Refresh_Info.Read_Annualcode_Info[i].device_id,
+						Bacnet_Refresh_Info.Read_Annualcode_Info[i].command,
+						Bacnet_Refresh_Info.Read_Annualcode_Info[i].start_instance,
+						Bacnet_Refresh_Info.Read_Annualcode_Info[i].end_instance,
+						WEEKLY_SCHEDULE_SIZE);
+					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					{
+						Sleep(50);
+						continue;
+					}
+					Bacnet_Refresh_Info.Read_Annualcode_Info[i].has_resend_yes_or_no ++;
+					Bacnet_Refresh_Info.Read_Annualcode_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
+					Bacnet_Refresh_Info.Read_Annualcode_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+
+					CString temp_cs_show;
+					temp_cs_show.Format(_T("Task ID = %d. Read annual day time list from item %d to %d "),g_invoke_id,
+						Bacnet_Refresh_Info.Read_Annualcode_Info[i].start_instance,
+						Bacnet_Refresh_Info.Read_Annualcode_Info[i].end_instance);
+					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
+
+
+					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
+
+					TRACE(_T("Weekly schedule time Resend start = %d , Resend end = %d\r\n"),
+						Bacnet_Refresh_Info.Read_Annualcode_Info[i].start_instance,
+						Bacnet_Refresh_Info.Read_Annualcode_Info[i].end_instance);
+
+
+				}
+			}
+		}
 
 		for (int i=0;i<BAC_INPUT_GROUP;i++)
 		{
@@ -1610,6 +1797,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			goto endthis;
 m_wait_progress.SetPos(100);
 m_wait_persent.SetWindowTextW(_T("100%"));
+		bac_read_all_results = true;
 		bac_monitor_read_results = true;
 		bac_input_read_results = true;
 		bac_output_read_results = true;
@@ -1622,6 +1810,7 @@ m_wait_persent.SetWindowTextW(_T("100%"));
 		bac_monitor_read_results = true;
 		bac_programcode_read_results = true;
 		bac_weeklycode_read_results = true;
+		bac_annualcode_read_results = true;
 			m_wait_detail.SetWindowTextW(_T("Reading descriptors success!"));
 			KillTimer(1);
 			if(bac_read_which_list ==BAC_READ_ALL_LIST)
@@ -2288,6 +2477,122 @@ endthis:
 					TRACE(_T(" Write weekly routines Resend start = %d , Resend end = %d\r\n"),
 						Write_Config_Info.Write_Weekly_Info[i].start_instance,
 						Write_Config_Info.Write_Weekly_Info[i].end_instance);
+				}
+			}
+
+			for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
+			{
+				if(Write_Config_Info.Write_Weeklycode_Info[i].task_result == BAC_RESULTS_UNKONW)
+				{
+					if(Write_Config_Info.Write_Weeklycode_Info[i].invoke_id > 0)
+					{
+						Write_Config_Info.Write_Weeklycode_Info[i].timeout_count ++;
+					}
+					if(Write_Config_Info.Write_Weeklycode_Info[i].timeout_count > 20)
+					{
+						Write_Config_Info.Write_Weeklycode_Info[i].task_result = BAC_RESULTS_FAIL;
+						Write_Config_Info.Write_Weeklycode_Info[i].timeout_count = 0;
+						continue;
+					}
+					m_wait_detail.SetWindowTextW(tempcs);
+					write_cotinue_waite = true;
+					break;
+				}
+				else if(Write_Config_Info.Write_Weeklycode_Info[i].task_result == BAC_RESULTS_FAIL)
+				{
+					write_cotinue_waite = true;
+					Write_Config_Info.Write_Weeklycode_Info[i].resend_count ++ ;
+					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					if((Write_Config_Info.Write_Weeklycode_Info[i].resend_count>RESEND_COUNT) 
+						|| (Write_Config_Info.Write_Weeklycode_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
+					{
+						m_wait_detail.SetWindowTextW(_T("Write weekly shcedule time Time Out!"));
+						KillTimer(4);
+						SetTimer(2,2000,NULL);
+						goto write_endthis;
+					}
+					g_invoke_id = WritePrivateData(
+						Write_Config_Info.Write_Weeklycode_Info[i].device_id,
+						Write_Config_Info.Write_Weeklycode_Info[i].command,
+						Write_Config_Info.Write_Weeklycode_Info[i].start_instance,
+						Write_Config_Info.Write_Weeklycode_Info[i].end_instance);
+					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					{
+						Sleep(50);
+						continue;
+					}
+					Write_Config_Info.Write_Weeklycode_Info[i].has_resend_yes_or_no ++;
+					Write_Config_Info.Write_Weeklycode_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
+					Write_Config_Info.Write_Weeklycode_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+
+					CString temp_cs_show;
+					temp_cs_show.Format(_T("Task ID = %d. Write weekly schedule time from item %d to %d "),g_invoke_id,
+						Write_Config_Info.Write_Weeklycode_Info[i].start_instance,
+						Write_Config_Info.Write_Weeklycode_Info[i].end_instance);
+					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
+
+					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
+					TRACE(_T("weekly schedule time Resend start = %d , Resend end = %d\r\n"),
+						Write_Config_Info.Write_Weeklycode_Info[i].start_instance,
+						Write_Config_Info.Write_Weeklycode_Info[i].end_instance);
+				}
+			}
+
+			for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
+			{
+				if(Write_Config_Info.Write_Annualcode_Info[i].task_result == BAC_RESULTS_UNKONW)
+				{
+					if(Write_Config_Info.Write_Annualcode_Info[i].invoke_id > 0)
+					{
+						Write_Config_Info.Write_Annualcode_Info[i].timeout_count ++;
+					}
+					if(Write_Config_Info.Write_Annualcode_Info[i].timeout_count > 20)
+					{
+						Write_Config_Info.Write_Annualcode_Info[i].task_result = BAC_RESULTS_FAIL;
+						Write_Config_Info.Write_Annualcode_Info[i].timeout_count = 0;
+						continue;
+					}
+					m_wait_detail.SetWindowTextW(tempcs);
+					write_cotinue_waite = true;
+					break;
+				}
+				else if(Write_Config_Info.Write_Annualcode_Info[i].task_result == BAC_RESULTS_FAIL)
+				{
+					write_cotinue_waite = true;
+					Write_Config_Info.Write_Annualcode_Info[i].resend_count ++ ;
+					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					if((Write_Config_Info.Write_Annualcode_Info[i].resend_count>RESEND_COUNT) 
+						|| (Write_Config_Info.Write_Annualcode_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
+					{
+						m_wait_detail.SetWindowTextW(_T("Write weekly shcedule time Time Out!"));
+						KillTimer(4);
+						SetTimer(2,2000,NULL);
+						goto write_endthis;
+					}
+					g_invoke_id = WritePrivateData(
+						Write_Config_Info.Write_Annualcode_Info[i].device_id,
+						Write_Config_Info.Write_Annualcode_Info[i].command,
+						Write_Config_Info.Write_Annualcode_Info[i].start_instance,
+						Write_Config_Info.Write_Annualcode_Info[i].end_instance);
+					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					{
+						Sleep(50);
+						continue;
+					}
+					Write_Config_Info.Write_Annualcode_Info[i].has_resend_yes_or_no ++;
+					Write_Config_Info.Write_Annualcode_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
+					Write_Config_Info.Write_Annualcode_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+
+					CString temp_cs_show;
+					temp_cs_show.Format(_T("Task ID = %d. Write annual day time from item %d to %d "),g_invoke_id,
+						Write_Config_Info.Write_Annualcode_Info[i].start_instance,
+						Write_Config_Info.Write_Annualcode_Info[i].end_instance);
+					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
+
+					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
+					TRACE(_T("annual day time Resend start = %d , Resend end = %d\r\n"),
+						Write_Config_Info.Write_Annualcode_Info[i].start_instance,
+						Write_Config_Info.Write_Annualcode_Info[i].end_instance);
 				}
 			}
 

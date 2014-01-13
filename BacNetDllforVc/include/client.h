@@ -121,7 +121,7 @@ __declspec(dllexport)    void Send_WhoIs_Global(
         uint32_t object_instance,
         BACNET_PROPERTY_ID object_property,
         uint32_t array_index);
-    uint8_t Send_Read_Property_Request(
+ __declspec(dllexport)    uint8_t Send_Read_Property_Request(
         uint32_t device_id,     /* destination device */
         BACNET_OBJECT_TYPE object_type,
         uint32_t object_instance,

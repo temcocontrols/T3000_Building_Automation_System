@@ -112,10 +112,20 @@ BOOL CBacnetProgram::OnInitDialog()
 	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_OK);
 	((CButton *)GetDlgItem(IDC_BUTTON_PROGRAM_APPLY))->SetIcon(hIcon);
 
-	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//F2¼ü
+	//RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert¼ü
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
+}
+
+void CBacnetProgram::Reg_Hotkey()
+{
+	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert¼ü
+}
+
+void CBacnetProgram::Unreg_Hotkey()
+{
+	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 }
 
 void CBacnetProgram::Initial_List()
@@ -476,7 +486,7 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 #endif
 	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAMCODE);
 
-	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+	//PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 		//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
 	
 	//OnBnClickedButtonProgramRead();
@@ -498,6 +508,7 @@ void CBacnetProgram::OnNMClickListProgram(NMHDR *pNMHDR, LRESULT *pResult)
 	if(nItem!=-1)
 	{
 		m_program_list.SetCellChecked(nItem,0,1);
+		program_list_line = nItem;
 		for (int i=0;i<m_program_list.GetItemCount();++i)
 		{
 			if(i == nItem)
@@ -518,16 +529,24 @@ void CBacnetProgram::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
-	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,TYPE_SCREENS,0);
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	CDialogEx::OnClose();
 }
-
+void CBacnetProgram::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
+	//CDialogEx::OnCancel();
+}
 
 void CBacnetProgram::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
+	if(this->IsWindowVisible())
+	{
 	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 	Post_Refresh_Message(g_bac_instance,READPROGRAM_T3000,0,BAC_PROGRAM_ITEM_COUNT - 1,sizeof(Str_program_point),BAC_PROGRAM_GROUP);
+	}
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -550,3 +569,6 @@ BOOL CBacnetProgram::PreTranslateMessage(MSG* pMsg)
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
+
+
+

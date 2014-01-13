@@ -54,6 +54,7 @@
 #include "T38AI8AO.h"
  #include "rs485.h" // For call Get_RS485_Handle() function
 #include "BacnetWait.h"
+#include "BacnetScreenEdit.h"
 #include "LanguageLocale.h"
  #include "RegisterViewerDlg.h"
 #pragma region Fance Test
@@ -70,7 +71,7 @@ vector <MSG> My_Receive_msg;
 
 HANDLE hDeal_thread;
 DWORD nThreadID_Do;
-
+extern CBacnetScreenEdit * ScreenEdit_Window;
 CCriticalSection MyCriticalSection;
 CString SaveConfigFilePath;
 int m_MainHotKeyID[10] = 
@@ -238,6 +239,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_LANGUAGE_34010, &CMainFrame::OnLanguage34010)
 	ON_COMMAND(ID_LANGUAGE_34006, &CMainFrame::OnLanguage34006)
 	ON_COMMAND(ID_TOOL_REGISTERVIEWER, &CMainFrame::OnToolRegisterviewer)
+	ON_WM_SIZING()
+	ON_WM_PAINT()
+	ON_COMMAND(ID_DATABASE_BACNETTOOL, &CMainFrame::OnDatabaseBacnettool)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -633,14 +637,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//InitTreeNodeConn();   //LSC
 
 	SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
-#ifndef Fance_Enable_Test
+//#ifndef Fance_Enable_Test
 	m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
 	m_pRefreshThread->SetMainWnd(this);	
 
 	// 需要执行线程中的操作时
 	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
 	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
-#endif
+//#endif
 	//tstat6
 	Tstat6_func();//为TSTST6新寄存器用的。
 
@@ -725,7 +729,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[7],MOD_ALT,'A'); 
 	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[8],MOD_ALT,'G');
 	#endif  
-
+	for(int i=0;i<9;i++)
+	{
+			pDialog[i]=NULL;
+	}
 
 	MyRegAddress.MatchMoudleAddress();
 	bac_net_initial_once = false;
@@ -1436,7 +1443,17 @@ try
 					strSql=temp_variant;
 				else
 					strSql=_T("");
-				m_product_temp.baudrate=_wtoi(strSql);
+				if(m_product_temp.protocol == PROTOCOL_BACNET_IP)
+				{
+					char cTemp1[255];
+					memset(cTemp1,0,255);
+					WideCharToMultiByte( CP_ACP, 0, strSql.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+					DWORD dwIP = inet_addr(cTemp1); 
+
+					m_product_temp.baudrate=dwIP;//_wtoi(strTemp);
+				}
+				else
+					m_product_temp.baudrate=_wtoi(strSql);
 				if (m_product_temp.product_class_id == PM_NC)
 				{m_product_temp.baudrate = 19200;
 				}
@@ -1520,7 +1537,7 @@ void CMainFrame::OnFileOpen()
 }
 void CMainFrame::OnLoadConfigFile()
 {
-	if(g_protocol == 2)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		MainFram_hwd = this->m_hWnd;
 		LoadBacnetConfigFile();
@@ -1999,6 +2016,9 @@ void CMainFrame::SwitchToPruductType(int nIndex)
 	SetActiveView(pNewView);
 	RecalcLayout();
 	pNewView->Invalidate();
+
+	g_protocol = PROTOCOL_UNKNOW;//USE FOR identify the bacnet ip protocol
+
 here:
 	g_bPauseMultiRead = FALSE;//恢复主线程的刷新
 	switch(nIndex)
@@ -2086,6 +2106,7 @@ here:
 		{
 			m_nCurView = DLG_CM5_BACNET_VIEW;
 			((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Fresh();
+			g_protocol = PROTOCOL_BACNET_IP;
 		}
 		break;
 	case DLG_DIALOGT38I13O_VIEW:
@@ -3318,6 +3339,35 @@ void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
 		Write_Config_Info.Write_Monitor_Info[i].timeout_count = 0;
 	}
 
+	for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
+	{
+
+		Write_Config_Info.Write_Weeklycode_Info[i].command = 0;
+		Write_Config_Info.Write_Weeklycode_Info[i].device_id = 0;
+		Write_Config_Info.Write_Weeklycode_Info[i].start_instance =0;
+		Write_Config_Info.Write_Weeklycode_Info[i].end_instance =0;
+		Write_Config_Info.Write_Weeklycode_Info[i].has_resend_yes_or_no = 0;
+		Write_Config_Info.Write_Weeklycode_Info[i].resend_count = 0;
+		Write_Config_Info.Write_Weeklycode_Info[i].task_result = BAC_RESULTS_UNKONW;
+		Write_Config_Info.Write_Weeklycode_Info[i].invoke_id = -1;
+		//bac_input_read_results = 0;
+		Write_Config_Info.Write_Weeklycode_Info[i].timeout_count = 0;
+	}
+
+	for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
+	{
+
+		Write_Config_Info.Write_Annualcode_Info[i].command = 0;
+		Write_Config_Info.Write_Annualcode_Info[i].device_id = 0;
+		Write_Config_Info.Write_Annualcode_Info[i].start_instance =0;
+		Write_Config_Info.Write_Annualcode_Info[i].end_instance =0;
+		Write_Config_Info.Write_Annualcode_Info[i].has_resend_yes_or_no = 0;
+		Write_Config_Info.Write_Annualcode_Info[i].resend_count = 0;
+		Write_Config_Info.Write_Annualcode_Info[i].task_result = BAC_RESULTS_UNKONW;
+		Write_Config_Info.Write_Annualcode_Info[i].invoke_id = -1;
+		//bac_input_read_results = 0;
+		Write_Config_Info.Write_Annualcode_Info[i].timeout_count = 0;
+	}
 
 	WaitWriteDlg = NULL;
 	if(WaitWriteDlg==NULL)
@@ -3519,6 +3569,59 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 	}
 
 
+	for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
+	{
+		resend_count = 0;
+		do 
+		{
+			resend_count ++;
+			if(resend_count>RESEND_COUNT)
+				goto mywriteend;
+			g_invoke_id =WritePrivateData(g_bac_instance,WRITETIMESCHEDULE_T3000,i,i);
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (g_invoke_id<0);
+
+		Write_Config_Info.Write_Weeklycode_Info[i].command = WRITETIMESCHEDULE_T3000;
+		Write_Config_Info.Write_Weeklycode_Info[i].device_id = g_bac_instance;
+		Write_Config_Info.Write_Weeklycode_Info[i].start_instance = i;
+		Write_Config_Info.Write_Weeklycode_Info[i].end_instance =i;
+		Write_Config_Info.Write_Weeklycode_Info[i].invoke_id = g_invoke_id;
+
+
+		CString temp_cs;
+		temp_cs.Format(_T("Task ID = %d. Write weekly schedule time From %d to %d "),g_invoke_id,
+			Write_Config_Info.Write_Weeklycode_Info[i].start_instance,
+			Write_Config_Info.Write_Weeklycode_Info[i].end_instance);
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
+
+	}
+
+	for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
+	{
+		resend_count = 0;
+		do 
+		{
+			resend_count ++;
+			if(resend_count>RESEND_COUNT)
+				goto mywriteend;
+			g_invoke_id =WritePrivateData(g_bac_instance,WRITEANNUALSCHEDULE_T3000,i,i);
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (g_invoke_id<0);
+
+		Write_Config_Info.Write_Annualcode_Info[i].command = WRITEANNUALSCHEDULE_T3000;
+		Write_Config_Info.Write_Annualcode_Info[i].device_id = g_bac_instance;
+		Write_Config_Info.Write_Annualcode_Info[i].start_instance = i;
+		Write_Config_Info.Write_Annualcode_Info[i].end_instance =i;
+		Write_Config_Info.Write_Annualcode_Info[i].invoke_id = g_invoke_id;
+
+
+		CString temp_cs;
+		temp_cs.Format(_T("Task ID = %d. Write ANNUAL DAY time From %d to %d "),g_invoke_id,
+			Write_Config_Info.Write_Annualcode_Info[i].start_instance,
+			Write_Config_Info.Write_Annualcode_Info[i].end_instance);
+		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
+
+	}
 
 	for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
 	{
@@ -3747,11 +3850,21 @@ LRESULT  CMainFrame::AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam)
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Weekly_Info[i].invoke_id)
 				Write_Config_Info.Write_Weekly_Info[i].task_result = true;
 		}
+		for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Weeklycode_Info[i].invoke_id)
+				Write_Config_Info.Write_Weeklycode_Info[i].task_result = true;
+		}
 
 		for (int i=0;i<BAC_ANNUAL_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Annual_Info[i].invoke_id)
 				Write_Config_Info.Write_Annual_Info[i].task_result = true;
+		}
+		for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Annualcode_Info[i].invoke_id)
+				Write_Config_Info.Write_Annualcode_Info[i].task_result = true;
 		}
 
 		for (int i=0;i<BAC_MONITOR_GROUP;i++)
@@ -3814,11 +3927,22 @@ LRESULT  CMainFrame::AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam)
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Weekly_Info[i].invoke_id)
 				Write_Config_Info.Write_Weekly_Info[i].task_result = false;
 		}
+		for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Weeklycode_Info[i].invoke_id)
+				Write_Config_Info.Write_Weeklycode_Info[i].task_result = false;
+		}
 
 		for (int i=0;i<BAC_ANNUAL_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Annual_Info[i].invoke_id)
 				Write_Config_Info.Write_Annual_Info[i].task_result = false;
+		}
+
+		for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Annualcode_Info[i].invoke_id)
+				Write_Config_Info.Write_Annualcode_Info[i].task_result = false;
 		}
 
 		for (int i=0;i<BAC_MONITOR_GROUP;i++)
@@ -3843,11 +3967,44 @@ void CMainFrame::LoadBacnetConfigFile()
 {
 	if((g_mac!=0) &&(g_bac_instance!=0))
 	{
-		CFileDialog dlg(true,_T("*.ini"),_T(" "),OFN_HIDEREADONLY ,_T("Ini files (*.ini)|*.ini|All Files (*.*)|*.*||"),NULL,0);
+		CFileDialog dlg(true,_T("*.prg"),_T(" "),OFN_HIDEREADONLY ,_T("Prg files (*.prg)|*.prg|All Files (*.*)|*.*||"),NULL,0);
 		if(IDOK==dlg.DoModal())
 		{
 			CString FilePath;
 			FilePath=dlg.GetPathName();
+#if 1
+			CFile myfile(FilePath,CFile::modeRead);
+			char *pBuf;
+			DWORD dwFileLen;
+			dwFileLen=myfile.GetLength();
+			pBuf= new char[dwFileLen+1];
+			pBuf[dwFileLen]=0;
+			myfile.Read(pBuf,dwFileLen);     //MFC   CFile 类 很方便
+			myfile.Close();
+			//MessageBox(pBuf);
+			char * temp_buffer = pBuf;
+			for (int i=0;i<dwFileLen;i++)
+			{
+				*temp_buffer = *temp_buffer ^ 1;
+				temp_buffer ++;
+			}
+
+			CString new_file;
+			new_file = FilePath.Left(FilePath.GetLength()-3) + _T("ini");
+
+			HANDLE hFile;
+			hFile=CreateFile(new_file,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+			DWORD dWrites;
+			WriteFile(hFile,pBuf,dwFileLen,&dWrites,NULL);
+			CloseHandle(hFile);  
+			if(pBuf)
+				delete pBuf;
+
+
+			FilePath = new_file;
+#endif
+//			CString FilePath;
+	//		FilePath=dlg.GetPathName();
 			for (int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
 			{
 				CString temp_input,temp_des,temp_csc;
@@ -4002,6 +4159,62 @@ void CMainFrame::LoadBacnetConfigFile()
 				m_controller_data.at(i).reset = (unsigned char)GetPrivateProfileInt(temp_section,_T("Reset"),0,FilePath);
 				m_controller_data.at(i).bias = (unsigned char)GetPrivateProfileInt(temp_section,_T("Bias"),0,FilePath);
 				m_controller_data.at(i).rate = (unsigned char)GetPrivateProfileInt(temp_section,_T("Rate"),0,FilePath);
+			}
+
+
+			for (int i=0;i<BAC_WEEKLYCODE_ROUTINES_COUNT;i++)
+			{
+				CString tempsection,temp_code,temp_csc;
+				tempsection.Format(_T("WeeklyRoutinesData_%d"),i);
+				CString temp_weeklycode_code;
+				GetPrivateProfileStringW(tempsection,_T("Data"),_T(""),temp_weeklycode_code.GetBuffer(300),300,FilePath);
+				temp_weeklycode_code.ReleaseBuffer();
+
+				for (int j=0;j<WEEKLY_SCHEDULE_SIZE;j++)
+				{
+					CString temp_value;
+					temp_value = temp_weeklycode_code.Left(2);
+					temp_weeklycode_code = temp_weeklycode_code.Right(temp_weeklycode_code.GetLength()-2);
+					weeklt_time_schedule[i][j]= Str_to_Byte(temp_value);
+				}
+				unsigned char * temp_point = NULL;
+				temp_point = weeklt_time_schedule[i];
+				for (int x=0;x<9;x++)
+				{
+					for (int y=0;y<8;y++)
+					{
+						m_Schedual_Time_data.at(i).Schedual_Day_Time[y][x].time_minutes = *(temp_point ++);
+						m_Schedual_Time_data.at(i).Schedual_Day_Time[y][x].time_hours = *(temp_point ++);
+					}
+				}
+
+				//for (int x=0;x<9;x++)
+				//{
+				//	for (int y=0;y<8;y++)
+				//	{
+				//		m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_minutes = *(my_temp_point ++);
+				//		m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_hours = *(my_temp_point ++);
+				//	}
+				//}
+
+			}
+
+			for (int i=0;i<BAC_ANNUAL_CODE_COUNT;i++)
+			{
+				CString tempsection,temp_code,temp_csc;
+				tempsection.Format(_T("AnnualRoutinesData_%d"),i);
+				CString temp_annualcode_code;
+				GetPrivateProfileStringW(tempsection,_T("Data"),_T(""),temp_annualcode_code.GetBuffer(MAX_PATH),MAX_PATH,FilePath);
+				temp_annualcode_code.ReleaseBuffer();
+
+				for (int j=0;j<ANNUAL_CODE_SIZE;j++)
+				{
+					CString temp_value;
+					temp_value = temp_annualcode_code.Left(2);
+					temp_annualcode_code = temp_annualcode_code.Right(temp_annualcode_code.GetLength()-2);
+					g_DayState[i][j]= Str_to_Byte(temp_value);
+					//weeklt_time_schedule[i][j]= Str_to_Byte(temp_value);
+				}
 			}
 
 			for (int i=0;i<BAC_PROGRAMCODE_ITEM_COUNT;i++)
@@ -4234,7 +4447,7 @@ void CMainFrame::LoadBacnetConfigFile()
 
 			}
 
-
+				DeleteFile(new_file);
 
 			Show_Wait_Dialog_And_SendConfigMessage();
 		}
@@ -4248,7 +4461,8 @@ void CMainFrame::SaveBacnetConfigFile()
 	if((g_mac!=0) &&(g_bac_instance!=0))
 	{
 			CString FilePath;
-			FilePath=SaveConfigFilePath;
+			FilePath = SaveConfigFilePath.Left(SaveConfigFilePath.GetLength()-3);
+			FilePath = FilePath + _T(".ini");
 			for (int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
 			{
 				CString temp_input,temp_des,temp_csc;
@@ -4602,6 +4816,36 @@ void CMainFrame::SaveBacnetConfigFile()
 				
 			}
 
+			for (int i=0;i<BAC_WEEKLYCODE_ROUTINES_COUNT;i++)
+			{
+				unsigned char * temp_point = NULL;
+				temp_point = weeklt_time_schedule[i];
+				CString tempsection,temp_code,temp_csc;
+				tempsection.Format(_T("WeeklyRoutinesData_%d"),i);
+				for (int j=0;j<WEEKLY_SCHEDULE_SIZE;j++)
+				{
+					temp_csc.Format(_T("%02x"),*(temp_point + j));
+					temp_csc.MakeUpper();
+					temp_code = temp_code + temp_csc;
+				}
+				WritePrivateProfileStringW(tempsection,_T("Data"),temp_code,FilePath);
+			}
+
+			for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
+			{
+				unsigned char * temp_point = NULL;
+				temp_point = g_DayState[i];
+				CString tempsection,temp_code,temp_csc;
+				tempsection.Format(_T("AnnualRoutinesData_%d"),i);
+				for (int j=0;j<ANNUAL_CODE_SIZE;j++)
+				{
+					temp_csc.Format(_T("%02x"),*(temp_point + j));
+					temp_csc.MakeUpper();
+					temp_code = temp_code + temp_csc;
+				}
+				WritePrivateProfileStringW(tempsection,_T("Data"),temp_code,FilePath);
+			}
+
 			for (int i=0;i<BAC_PROGRAMCODE_ITEM_COUNT;i++)
 			{
 				CString temp_section,temp_des,temp_csc;
@@ -4641,21 +4885,46 @@ void CMainFrame::SaveBacnetConfigFile()
 					part_section.Format(_T("Program_Code%d"),m);
 					WritePrivateProfileStringW(temp_section,part_section,temp_code,FilePath);
 				}
-
-				
 			}
 
+			CFile myfile(FilePath,CFile::modeRead);
+			char *pBuf;
+			DWORD dwFileLen;
+			dwFileLen=myfile.GetLength();
+				pBuf= new char[dwFileLen+1];
+			pBuf[dwFileLen]=0;
+			myfile.Read(pBuf,dwFileLen);     //MFC   CFile 类 很方便
+			myfile.Close();
+			//MessageBox(pBuf);
+			char * temp_buffer = pBuf;
+			for (int i=0;i<dwFileLen;i++)
+			{
+				*temp_buffer = *temp_buffer ^ 1;
+				temp_buffer ++;
+			}
+			 
+			//CString new_file;
+			//new_file = FilePath.Left(FilePath.GetLength()-3) + _T("prg");
+
+			HANDLE hFile;
+			hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+			DWORD dWrites;
+			WriteFile(hFile,pBuf,dwFileLen,&dWrites,NULL);
+			CloseHandle(hFile);  
+			if(pBuf)
+				delete pBuf;
+			DeleteFile(FilePath);
 		
 	}
 }
 
 void CMainFrame::SaveConfigFile()
 {
-	if(g_protocol == 2)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		MainFram_hwd = this->m_hWnd;
 
-		CFileDialog dlg(false,_T("*.ini"),_T(" "),OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,_T("Ini files (*.ini)|*.ini|All Files (*.*)|*.*||"),NULL,0);
+		CFileDialog dlg(false,_T("*.prg"),_T(" "),OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,_T("prg files (*.prg)|*.prg|All Files (*.*)|*.*||"),NULL,0);
 		if(IDOK==dlg.DoModal())
 		{
 
@@ -4839,7 +5108,14 @@ void CMainFrame::OnDestroy()
 	UpdataSlider(temp);
 
 
-
+	for(int i=0;i<9;i++)
+	{
+		if(pDialog[i]!=NULL)
+		{
+			delete pDialog[i];
+			pDialog[i]=NULL;
+		}
+	}
 
 	g_bEnableRefreshTreeView = FALSE;
 	HTREEITEM htiSel = m_pTreeViewCrl->GetSelectedItem();
@@ -4851,7 +5127,7 @@ void CMainFrame::OnDestroy()
 	  mbPoll=NULL;
 	}
 
-	CFrameWndEx::OnDestroy();
+	
 	for (int i=0;i<9;i++)
 	{
 		UnregisterHotKey(GetSafeHwnd(), m_MainHotKeyID[i]);   
@@ -4886,11 +5162,16 @@ void CMainFrame::OnDestroy()
 		}
 
 	}
-
-		TerminateThread(CM5_hThread,0);
-		TerminateThread(CM5_UI_Thread,0);
-		TerminateThread(hDeal_thread,0);
-		TerminateThread(hThread,0);
+		if(CM5_hThread!=NULL)
+			TerminateThread(CM5_hThread,0);
+		if(CM5_UI_Thread!=NULL)
+			TerminateThread(CM5_UI_Thread,0);
+		if(hDeal_thread!=NULL)
+			TerminateThread(hDeal_thread,0);
+		if(hThread!=NULL)
+			TerminateThread(hThread,0);
+		if(m_pFreshTree!=NULL)
+			TerminateThread(m_pFreshTree,0);
 	// 结束线程
 	
 	if (m_pRefreshThread) 
@@ -4932,7 +5213,7 @@ void CMainFrame::OnDestroy()
 		g_testmultiReadtraffic_dlg=NULL;
 	}
 #endif
-
+	CFrameWndEx::OnDestroy();
 	// TODO: Add your message handler code here
 }
 
@@ -5507,6 +5788,20 @@ void CMainFrame::OnToolRefreshLeftTreee()
 //
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
+	//static HTREEITEM last_item = NULL;
+	//if(last_item != hTreeItem)
+	//{
+	//	if(last_item!=NULL)
+	//	{
+	//		m_pTreeViewCrl->SetItemBold(last_item,0);
+	//		m_pTreeViewCrl->SetItemColor( last_item, RGB(0,0,0));
+	//	}
+	//	last_item = hTreeItem;
+	//}
+	//m_pTreeViewCrl->SetItemBold(hTreeItem,1);
+	//m_pTreeViewCrl->SetItemColor( hTreeItem, RGB(255,0,0));
+	m_pTreeViewCrl->SetSelectItem(hTreeItem);
+
    MainFram_hwd = this->m_hWnd;
 	//20120420
 	CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
@@ -5556,10 +5851,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			int nTRet=-1;
 			//g_tstat_id=m_product.at(i).product_id;
 			product_Node=m_product.at(i);
-			if((product_Node.product_class_id == 50) || (product_Node.product_class_id == 35))	//如果是CM5或者MINIPANEL 才有 bacnet协议;
+			if((product_Node.product_class_id == PM_CM5) || (product_Node.product_class_id == PM_MINIPANEL))	//如果是CM5或者MINIPANEL 才有 bacnet协议;
 			{
 				
-				if( m_product.at(i).protocol == 3)
+				if( m_product.at(i).protocol == PROTOCOL_BACNET_IP)
 				//if(product_Node.BuildingInfo.strProtocol.CompareNoCase(_T("BacnetIP")) == 0 )
 				{
 					CString temp_csa;
@@ -5615,7 +5910,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 					/*bac_net_initial_once = false;*/
 					SwitchToPruductType(DLG_CM5_BACNET_VIEW);
-					g_protocol = 2;
+					g_protocol = PROTOCOL_BACNET_IP;
 					pDlg->ShowWindow(SW_HIDE);
 					if(pDlg)
 						delete pDlg;//20120220
@@ -6549,7 +6844,10 @@ void CMainFrame::RefreshTreeView()
 			int nIDNode=tp.product_id;
 			nSerialNumber=tp.serial_number;
 			//int newnID=read_one(nID,6,2);
-			if(m_product.at(i).protocol == 3)
+			/*
+			Get the protocol ,if it is bacnet ip,we compare the device id.
+			*/
+			if(m_product.at(i).protocol == PROTOCOL_BACNET_IP)
 			{
 				int find_exsit = false;
 				for (int x=0;x<(int)m_bac_scan_com_data.size();x++)
@@ -7918,7 +8216,7 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 				My_Invoke_Struct = (_MessageInvokeIDInfo *)msg.wParam;
 				My_Receive_msg.erase(My_Receive_msg.begin());
 				MyCriticalSection.Unlock();
-				for (int i=0;i<40;i++)//3秒钟判断任务是否超时.
+				for (int i=0;i<60;i++)//3秒钟判断任务是否超时.
 				{
 					if(tsm_invoke_id_free(My_Invoke_Struct->Invoke_ID))
 					{
@@ -7966,6 +8264,11 @@ loop1:
 							g_invoke_id =WritePrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,My_WriteList_Struct->start_instance,temp_end_value);
 							if(g_invoke_id>=0)
 							{
+								if((unsigned char)My_WriteList_Struct->command == CONNECTED_WITH_DEVICE)
+								{
+									connect_invoke_id = g_invoke_id;
+									connect_replay = true;
+								}
 								CString temp_cs_show;
 								temp_cs_show.Format(_T("Task ID = %d. %s "),g_invoke_id,My_WriteList_Struct->Write_Info);
 								Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd,temp_cs_show,My_WriteList_Struct->ItemInfo.nRow,My_WriteList_Struct->ItemInfo.nCol);
@@ -8124,7 +8427,7 @@ void CMainFrame::OnControlInputs()
 	//MessageBox(_T("This function is still in development"));
 	//#endif
 
-	if(g_protocol == 2)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_INPUT);
 	}
@@ -8145,7 +8448,7 @@ void CMainFrame::OnControlPrograms()
 	//MessageBox(_T("This function is still in development"));
 	//#endif
 
-	if(g_protocol == 2)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAM);
 	}
@@ -8166,7 +8469,7 @@ void CMainFrame::OnControlOutputs()
 	//MessageBox(_T("This function is still in development"));
 	//#endif
 
-	if(g_protocol == 2)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_OUTPUT);
 	}
@@ -8186,7 +8489,7 @@ void CMainFrame::OnControlVariables()
 	//#ifndef Fance_Enable_Test
 	//MessageBox(_T("This function is still in development"));
 	//#endif
-	if(g_protocol == 2)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_VARIABLE);
 	}
@@ -8206,7 +8509,7 @@ void CMainFrame::OnControlWeekly()
 	//#ifndef Fance_Enable_Test
 	//MessageBox(_T("This function is still in development"));
 	//#endif
-	if(g_protocol == 2)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLY);
 	}
@@ -8226,7 +8529,7 @@ void CMainFrame::OnControlAnnualroutines()
 	//#ifndef Fance_Enable_Test
 	//MessageBox(_T("This function is still in development"));
 	//#endif
-	if(g_protocol == 2)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ANNUAL);
 	}
@@ -8246,7 +8549,7 @@ void CMainFrame::OnMiscellaneousLoaddescriptors()
 	//#ifndef Fance_Enable_Test
 	//MessageBox(_T("This function is still in development"));
 	//#endif
-	if(g_protocol == 2)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
 	}
@@ -8266,7 +8569,7 @@ void CMainFrame::OnMiscellaneousUpdatemini()
 	//#ifndef Fance_Enable_Test
 	//MessageBox(_T("This function is still in development"));
 	//#endif
-	if(g_protocol == 2)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,WRITEPRGFLASH_COMMAND);
 	}
@@ -8288,7 +8591,7 @@ void CMainFrame::OnControlControllers()
 	//#ifndef Fance_Enable_Test
 	//MessageBox(_T("This function is still in development"));
 	//#endif
-	if(g_protocol == 2)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_CONTROLLER);
 	}
@@ -8301,8 +8604,13 @@ void CMainFrame::OnControlControllers()
 void CMainFrame::OnControlScreens()
 {
 	
+	//bac_cm5_graphic = true;
 	// TODO: Add your command handler code here
-	if(g_protocol == 2)
+//	CBacnetScreenEdit Dlg;
+//	Dlg.DoModal();
+//	return;
+
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SCREENS);
 	}
@@ -8364,7 +8672,7 @@ void CMainFrame::OnControlMonitors()
 #endif
 #endif
 
-	if(g_protocol == 2)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_MONITOR);
 	}
@@ -8376,9 +8684,37 @@ void CMainFrame::OnControlMonitors()
 	//CBacnetMonitor Dlg;
 	//Dlg.DoModal();
 }
+void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
+{
+	CFrameWndEx::OnSizing(fwSide, pRect);
+
+	// TODO: Add your message handler code here
+}
 void CMainFrame::OnToolRegisterviewer()
 {
 	// TODO: Add your command handler code here
 	CRegisterViewerDlg dlg;
 	dlg.DoModal();
+}
+
+
+void CMainFrame::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+	TRACE(_T("Main Paint\r\n"));
+	if(ScreenEdit_Window)
+	{
+		
+		::PostMessage(m_screenedit_dlg_hwnd,MY_REDRAW_WINDOW,NULL,NULL);
+	}
+	// TODO: Add your message handler code here
+	// Do not call CFrameWndEx::OnPaint() for painting messages
+}
+
+#include "BacnetTool.h"
+void CMainFrame::OnDatabaseBacnettool()
+{
+	CBacnetTool dlg;
+	dlg.DoModal();
+	// TODO: Add your command handler code here
 }

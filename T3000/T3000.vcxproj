@@ -140,6 +140,9 @@
     <ClCompile Include="BacnetRange.cpp" />
     <ClCompile Include="BacnetScheduleTime.cpp" />
     <ClCompile Include="BacnetScreen.cpp" />
+    <ClCompile Include="BacnetScreenEdit.cpp" />
+    <ClCompile Include="BacnetTool.cpp" />
+    <ClCompile Include="BacnetToolReadProperty.cpp" />
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />

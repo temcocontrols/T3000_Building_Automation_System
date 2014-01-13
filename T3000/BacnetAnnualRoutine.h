@@ -31,6 +31,10 @@ public:
 	afx_msg LRESULT Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Fresh_Annual_Routine_List(WPARAM wParam,LPARAM lParam);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedButtonAnnualEdit();
+	virtual void OnCancel();
+	void Reg_Hotkey();
+	void Unreg_Hotkey();
 	//afx_msg LRESULT AnnualResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 };
 

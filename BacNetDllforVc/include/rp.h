@@ -92,6 +92,7 @@ extern "C" {
         int apdu_len,   /* total length of the apdu */
         BACNET_READ_PROPERTY_DATA * rpdata);
 
+ __declspec(dllexport)  char * get_prop_name();
     /* Decode instead to RPM-style data structure. */
     int rp_ack_fully_decode_service_request(
         uint8_t * apdu,

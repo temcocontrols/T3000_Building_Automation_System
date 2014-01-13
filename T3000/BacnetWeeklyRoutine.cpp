@@ -107,7 +107,19 @@ BOOL BacnetWeeklyRoutine::PreTranslateMessage(MSG* pMsg)
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
-const int KEY_INSERT = 1020;
+
+void BacnetWeeklyRoutine::Reg_Hotkey()
+{
+	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert¼ü
+}
+
+void BacnetWeeklyRoutine::Unreg_Hotkey()
+{
+	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
+}
+
+
+//const int KEY_INSERT = 1020;
 LRESULT BacnetWeeklyRoutine::OnHotKey(WPARAM wParam,LPARAM lParam)
 {
 	if (wParam==KEY_INSERT)
@@ -126,7 +138,7 @@ BOOL BacnetWeeklyRoutine::OnInitDialog()
 
 	// TODO:  Add extra initialization here
 	Initial_List();
-	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);
+//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);
 	PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -422,8 +434,17 @@ void BacnetWeeklyRoutine::OnClose()
 	// TODO: Add your message handler code here and/or call default
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 	KillTimer(1);
-	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,TYPE_SCREENS,0);
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	CDialogEx::OnClose();
+}
+
+void BacnetWeeklyRoutine::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+	//UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
+	//KillTimer(1);
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
+//	CDialogEx::OnCancel();
 }
 
 
@@ -431,8 +452,11 @@ void BacnetWeeklyRoutine::OnClose()
 void BacnetWeeklyRoutine::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
+	if(this->IsWindowVisible())
+	{
 	PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
 	Post_Refresh_Message(g_bac_instance,READWEEKLYROUTINE_T3000,0,BAC_WEEKLY_ROUTINES_COUNT - 1,sizeof(Str_weekly_routine_point), BAC_WEEKLY_GROUP);
+	}
 	CDialogEx::OnTimer(nIDEvent);
 }
 

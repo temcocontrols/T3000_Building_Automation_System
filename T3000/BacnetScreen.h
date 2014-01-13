@@ -32,6 +32,10 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg LRESULT  ScreenCallBack(WPARAM wParam, LPARAM lParam);
+	LRESULT Screeenedit_close_handle(WPARAM wParam,LPARAM lParam);
+	virtual void OnCancel();
+	void Reg_Hotkey();
+	void Unreg_Hotkey();
 //	afx_msg void OnDestroy();
 };
 

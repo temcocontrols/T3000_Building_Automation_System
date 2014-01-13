@@ -289,7 +289,7 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
 	m_schedual_time_picker.ShowWindow(SW_HIDE);
 	CString temp_task_info;
 	temp_task_info.Format(_T("Write Schedule Time Item%d .Changed Time to \"%s\" "),weekly_list_line + 1,temp_cs);
-	Post_Write_Message(g_bac_instance,WRITETIMESCHEDULE_T3000,weekly_list_line,weekly_list_line,16*9,BacNet_hwd,temp_task_info);
+	Post_Write_Message(g_bac_instance,WRITETIMESCHEDULE_T3000,weekly_list_line,weekly_list_line,WEEKLY_SCHEDULE_SIZE,BacNet_hwd,temp_task_info);
 
 	*pResult = 0;
 }

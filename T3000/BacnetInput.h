@@ -37,6 +37,7 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnClose();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual void OnCancel();
 };
 //int GetPrivateData();
 //int WritePrivateData();

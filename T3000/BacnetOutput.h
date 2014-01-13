@@ -32,6 +32,8 @@ public:
 	afx_msg void OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnClose();
+	virtual void OnCancel();
 };
 
 const int OUTPUT_NUM = 0;
