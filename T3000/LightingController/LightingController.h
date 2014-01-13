@@ -5,7 +5,6 @@
 #include "../msflexgrid1.h"
 #include "../LightingController/LightingSet.h"
 #include <map>
-
 #include "../LightingController/configure.h"
 // #include <vector>
 // #include <algorithm>
@@ -21,7 +20,6 @@ typedef struct   LIGHTINTGCONTROLLER
 	int iaddress;
 	CString CStvalue;
 }lightingcontroller;
-
 
 typedef struct OUTPUTNAMESTATUS
 {
@@ -63,6 +61,7 @@ protected:
 public:
 	virtual void OnInitialUpdate();
 	void Fresh();
+	void Fresh_OutputGrid(BOOL Input_Group);
 	void Fresh_System();
 	unsigned int m_inaddress;
 	int m_inSerialNum;
@@ -77,14 +76,14 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnDestroy();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-
+	CString get_OutputName(int card,int output);
 	//////////////////////////////////////////////
 	vector<Mapping_Struct> m_input_output_mapping;
 	vector<Mapping_Struct> m_group_output_mapping;
 	////////////////////////////////////////////////
 
 	CString Read_OutputName(int Address);
-	void Read_Input_Group_Mapping();
+	void Read_Input_Group_Mapping(BOOL Input_Group);
 	CString m_datetime;
 	unsigned short LightCregister[512];
 	BOOL prodtopcData();//采集数据
@@ -200,6 +199,7 @@ public:
 	afx_msg void OnBnClickedButtonLightingcontorlGroups();
 	afx_msg void OnBnClickedButtonLightingcontorlSyncwithPC();
 	afx_msg void OnBnClickedButtonSaveAll();
+	afx_msg void OnBnClickedButtonConfigureOutputName();
 	afx_msg void OnCbnSelchangeValuecombo();
 
 	WORD lightingController_time[8];
@@ -230,7 +230,7 @@ public:
 	vecaddoutputs m_vecaddoutputs;
 
 	map<CString,vecaddoutputs> m_mapaddoutputs;
-	WORD SerialNum[100];
+	unsigned short SerialNum[60];
 
 	BOOL GetSerialComm(vector<CString>& szComm);//读了串口
 	vector<CString> m_szComm;

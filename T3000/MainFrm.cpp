@@ -54,6 +54,8 @@
 #include "T38AI8AO.h"
  #include "rs485.h" // For call Get_RS485_Handle() function
 #include "BacnetWait.h"
+#include "LanguageLocale.h"
+ #include "RegisterViewerDlg.h"
 #pragma region Fance Test
 //For Test
 
@@ -231,6 +233,11 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_CONTROL_CONTROLLERS, &CMainFrame::OnControlControllers)
 	ON_COMMAND(ID_CONTROL_SCREENS, &CMainFrame::OnControlScreens)
 	ON_COMMAND(ID_CONTROL_MONITORS, &CMainFrame::OnControlMonitors)
+	ON_COMMAND(ID_HELP_GETLANGUAGECONFIGFILE, &CMainFrame::OnHelpGetlanguageconfigfile)
+	ON_COMMAND(ID_LANGUAGE_ENGLISH, &CMainFrame::OnLanguageEnglish)
+	ON_COMMAND(ID_LANGUAGE_34010, &CMainFrame::OnLanguage34010)
+	ON_COMMAND(ID_LANGUAGE_34006, &CMainFrame::OnLanguage34006)
+	ON_COMMAND(ID_TOOL_REGISTERVIEWER, &CMainFrame::OnToolRegisterviewer)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -302,6 +309,7 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			register_critical_section.Lock();
 			//
 			Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);
+			Sleep(500);
 			register_critical_section.Unlock();
 		}
 
@@ -477,13 +485,20 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	BOOL bNameValid;
 	// set the visual manager and style based on persisted value
 	OnApplicationLook(theApp.m_nAppLook);
-	if (!m_wndMenuBar.Create(this))
-	{
-		TRACE0("Failed to create menubar\n");
-		return -1;      // fail to create
-	}
-	m_wndMenuBar.SetPaneStyle(m_wndMenuBar.GetPaneStyle() | CBRS_SIZE_DYNAMIC | CBRS_TOOLTIPS | CBRS_FLYBY);
+ //	if (!m_wndMenuBar.Create(this))
+	//{
+	//	TRACE0("Failed to create menubar\n");
+	//	return -1;      // fail to create
+	//}
+ //	m_wndMenuBar.SetPaneStyle(m_wndMenuBar.GetPaneStyle() | CBRS_SIZE_DYNAMIC | CBRS_TOOLTIPS | CBRS_FLYBY);
+
 	// prevent the menu bar from taking the focus on activation
+
+
+
+
+
+
 	CMFCPopupMenu::SetForceMenuFocus(FALSE);
 	//CMFCToolBar::SetSizes(CSize(48,48),CSize(48,48));
 	CMFCToolBar::SetSizes(CSize(34,34),CSize(34,34));
@@ -505,8 +520,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 // 		return -1;//fail to create
 // 	}
 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
-	 		!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_TOOLBAR_VER25049 : IDR_TOOLBAR_VER25049,uiToolbarColdID, uiMenuID, 
-	 			FALSE /* Not locked */, 0, 0, uiToolbarHotID))
+	 		!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_TOOLBAR_VER25049 : IDR_TOOLBAR_VER25049,uiToolbarColdID, uiMenuID, FALSE /* Not locked */, 0, 0, uiToolbarHotID))
 //	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE ) ||
 //	 	!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_TOOLBAR_VER25049 : IDR_TOOLBAR_VER25049,uiToolbarColdID, uiMenuID, FALSE /* Not locked */, 0, 0, uiToolbarHotID))
 	{
@@ -560,17 +574,23 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// TODO: Delete these five lines if you don't want the toolbar and menubar to be dockable
 		
 	
-	m_wndMenuBar.EnableDocking(CBRS_ALIGN_ANY);
+	//m_wndMenuBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndWorkSpace.EnableDocking(CBRS_ALIGN_LEFT);
 
 	
 	EnableDocking(CBRS_ALIGN_ANY);	
 	
-	DockPane(&m_wndMenuBar);
+	//DockPane(&m_wndMenuBar);
 	DockPane(&m_wndToolBar);
 	DockPane (&m_wndWorkSpace);
+	
 
+// 	int last=theApp.GetLanguage();
+// 	theApp.m_locale.SetLanguage(last);
+// 	g_language=last;
+// 	gSetMenuStrings(m_hWnd);
+ 
 	// enable Visual Studio 2005 style docking window behavior
 	CDockingManager::SetDockingMode(DT_SMART);
 	// enable Visual Studio 2005 style docking window auto-hide behavior
@@ -1118,24 +1138,25 @@ try
 #if 1
 	ClearBuilding();
 	m_product.clear();
-	m_pCon.CreateInstance("ADODB.Connection");
-	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-	m_pRs.CreateInstance("ADODB.Recordset");
 
-
+	m_pCon.CreateInstance(_T("ADODB.Connection"));
+	m_pRs.CreateInstance(_T("ADODB.Recordset"));
+	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	CString strSql;
+	//strSql.Format(_T("select * from Building where Main_BuildingName = '%s'"),m_strMainBuildingName);
+	//strSql.Format(_T("select * from Building order by Main_BuildingName where Default_SubBuilding=-1"));
+	strSql.Format(_T("select * from Building where Default_SubBuilding=-1"));
+	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
+	int count = m_pRs->GetRecordCount();
 	_variant_t temp_variant;
-	CString strTemp;
-
-	CString temp_str=_T("select * from Building where Default_SubBuilding=-1");
-	m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
-	if(m_pRs->GetRecordCount()<=0)
+	if(count<=0)
 	{
 		if(m_pRs->State)
 		m_pRs->Close(); 
 		if(m_pCon->State)
 		m_pCon->Close();
 	//	PostMessage(ID_NODEFAULTMAINBUILDING_MSG,0,0);
-		AfxMessageBox(_T("There is no default building, please select a building First£¡"));
+		AfxMessageBox(_T("There is no default building, please select a building Firstly!"));
 
 		return;
 	}
@@ -1144,8 +1165,8 @@ try
 	if(m_pRs->State)
 		m_pRs->Close();
 	m_subNetLst.clear();
-	temp_str.Format(_T("select * from Building where Main_BuildingName ='%s'"),m_strCurMainBuildingName);
-	m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
+	strSql.Format(_T("select * from Building where Main_BuildingName ='%s'"),m_strCurMainBuildingName);
+	m_pRs->Open(_variant_t(strSql),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
 
 
 	m_nCurSubBuildingIndex=-1;
@@ -1213,8 +1234,8 @@ try
 		}
 	//	m_pRs->Close();
 		////begin floor nodes///////////////////////////////////////////////////////////////
-		temp_str.Format(_T("select DISTINCT Floor_name from ALL_NODE where Building_Name = '"+strBuilding+"'"));
-		HRESULT hR=m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);			
+		strSql.Format(_T("select DISTINCT Floor_name from ALL_NODE where Building_Name = '"+strBuilding+"'"));
+		HRESULT hR=m_pRs->Open(_variant_t(strSql),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);			
 		
 		int nTemp2 = m_pRs->RecordCount;
 
@@ -1357,75 +1378,65 @@ try
 				//m_product_temp.serial_number = m_pRs->GetCollect("Serial_ID");
 				temp_variant=m_pRs->GetCollect("Serial_ID");//
 				if(temp_variant.vt!=VT_NULL)
-					strTemp=temp_variant;
+					strSql=temp_variant;
 				else
-					strTemp=_T("");
-				m_product_temp.serial_number=_wtol(strTemp);
+					strSql=_T("");
+				m_product_temp.serial_number=_wtol(strSql);
 
 				//m_product_temp.product_id =m_pRs->GetCollect("Product_ID");
 				temp_variant=m_pRs->GetCollect("Product_ID");//
 				if(temp_variant.vt!=VT_NULL)
-					strTemp=temp_variant;
+					strSql=temp_variant;
 				else
-					strTemp=_T("");
-				m_product_temp.product_id=_wtoi(strTemp);
+					strSql=_T("");
+				m_product_temp.product_id=_wtoi(strSql);
 
 			//	m_product_temp.product_class_id = m_pRs->GetCollect("Product_class_ID");
 				temp_variant=m_pRs->GetCollect("Product_class_ID");//
 				if(temp_variant.vt!=VT_NULL)
-					strTemp=temp_variant;
+					strSql=temp_variant;
 				else
-					strTemp=_T("");
-				m_product_temp.product_class_id=_wtoi(strTemp);
+					strSql=_T("");
+				m_product_temp.product_class_id=_wtoi(strSql);
 
 			//	m_product_temp.hardware_version= m_pRs->GetCollect("Hardware_Ver");
 				temp_variant=m_pRs->GetCollect("Hardware_Ver");//
 				if(temp_variant.vt!=VT_NULL)
-					strTemp=temp_variant;
+					strSql=temp_variant;
 				else
-					strTemp=_T("");
-				m_product_temp.hardware_version=(float)_wtof(strTemp);
+					strSql=_T("");
+				m_product_temp.hardware_version=(float)_wtof(strSql);
 				
 				//
 				temp_variant=m_pRs->GetCollect("Software_Ver");//
 				if(temp_variant.vt!=VT_NULL)
-					strTemp=temp_variant;
+					strSql=temp_variant;
 				else
-					strTemp=_T("");
-				m_product_temp.software_version=(float)_wtof(strTemp);
+					strSql=_T("");
+				m_product_temp.software_version=(float)_wtof(strSql);
 
 				// 
 				temp_variant=m_pRs->GetCollect("EPsize");//
 				if(temp_variant.vt!=VT_NULL)
-					strTemp=temp_variant;
+					strSql=temp_variant;
 				else
-					strTemp=_T("");
-				m_product_temp.nEPsize=(int)_wtol(strTemp);
+					strSql=_T("");
+				m_product_temp.nEPsize=(int)_wtol(strSql);
 
 				//m_product_temp.baudrate=m_pRs->GetCollect("Bautrate");
 				temp_variant=m_pRs->GetCollect("Protocol");//
 				if(temp_variant.vt!=VT_NULL)
-					strTemp=temp_variant;
+					strSql=temp_variant;
 				else
-					strTemp=_T("");
-				m_product_temp.protocol = (int)_wtoi(strTemp);
+					strSql=_T("");
+				m_product_temp.protocol = (int)_wtoi(strSql);
 			
 				temp_variant=m_pRs->GetCollect("Bautrate");//
 				if(temp_variant.vt!=VT_NULL)
-					strTemp=temp_variant;
+					strSql=temp_variant;
 				else
-					strTemp=_T("");
-				if(m_product_temp.protocol == 3)
-				{
-					char cTemp1[255];
-					memset(cTemp1,0,255);
-					WideCharToMultiByte( CP_ACP, 0, strTemp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-					DWORD dwIP = inet_addr(cTemp1); 
-
-					m_product_temp.baudrate=dwIP;//_wtoi(strTemp);
-				}
-				else
-					m_product_temp.baudrate=_wtoi(strTemp);
+					strSql=_T("");
+				m_product_temp.baudrate=_wtoi(strSql);
 				if (m_product_temp.product_class_id == PM_NC)
 				{m_product_temp.baudrate = 19200;
 				}
@@ -1436,13 +1447,13 @@ try
 				//m_product_temp.BuildingInfo.strBuildingName=m_pRs->GetCollect("Building_Name");
 				m_product_temp.BuildingInfo=m_subNetLst.at(m_nCurSubBuildingIndex);
 //20120423	
-				m_product_temp.BuildingInfo.strIp = strTemp;
+				m_product_temp.BuildingInfo.strIp = strSql;
 				temp_variant=m_pRs->GetCollect("Com_Port");//
 				if(temp_variant.vt!=VT_NULL)
-					strTemp=temp_variant;
+					strSql=temp_variant;
 				else
-					strTemp=_T("");
-				m_product_temp.BuildingInfo.strIpPort=strTemp;
+					strSql=_T("");
+				m_product_temp.BuildingInfo.strIpPort=strSql;
 			
 //20120423
 
@@ -8300,6 +8311,45 @@ void CMainFrame::OnControlScreens()
 		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
 	}
 }
+void CMainFrame::OnHelpGetlanguageconfigfile()
+{
+
+}
+void CMainFrame::OnLanguageEnglish()
+{CString infor;
+if (g_language==0)
+{
+	infor=gLoadString(MESSAGEBOX,_T("1"));
+	AfxMessageBox(infor);
+} 
+else
+{
+theApp.SetLanguage(0);
+infor=gLoadString(MESSAGEBOX,_T("2"));
+AfxMessageBox(infor);
+}
+
+}
+void CMainFrame::OnLanguage34010()
+{CString infor;
+	 if (g_language==1)
+	 {
+		 infor=gLoadString(MESSAGEBOX,_T("3"));
+		 AfxMessageBox(infor);
+	 } 
+	 else
+	 {
+		 theApp.SetLanguage(1);
+		 infor=gLoadString(MESSAGEBOX,_T("4"));
+		 AfxMessageBox(infor);
+	 }
+}
+
+
+void CMainFrame::OnLanguage34006()
+{
+	 
+}
 
 #include "BacnetMonitor.h"
 void CMainFrame::OnControlMonitors()
@@ -8325,4 +8375,10 @@ void CMainFrame::OnControlMonitors()
 
 	//CBacnetMonitor Dlg;
 	//Dlg.DoModal();
+}
+void CMainFrame::OnToolRegisterviewer()
+{
+	// TODO: Add your command handler code here
+	CRegisterViewerDlg dlg;
+	dlg.DoModal();
 }

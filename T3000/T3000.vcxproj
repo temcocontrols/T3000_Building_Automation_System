@@ -159,6 +159,8 @@
     <ClCompile Include="DisplayConfig.cpp" />
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
+    <ClCompile Include="LanguageLocale.cpp" />
+    <ClCompile Include="LCOutNameConfig.cpp" />
     <ClCompile Include="LightingController\configure.cpp" />
     <ClCompile Include="Dialog_Progess.cpp" />
     <ClCompile Include="DialogInfo.cpp" />
@@ -201,6 +203,8 @@
     <ClCompile Include="ParameterDlg.cpp" />
     <ClCompile Include="RefreshTreeThread.cpp" />
     <ClCompile Include="RegDetails.cpp" />
+    <ClCompile Include="RegisterViewerDlg.cpp" />
+    <ClCompile Include="RegisterWriteValueDlg.cpp" />
     <ClCompile Include="RelayLabel.cpp" />
     <ClCompile Include="ScanDbWaitDlg.cpp" />
     <ClCompile Include="ScanDlg.cpp" />
@@ -208,6 +212,7 @@
     <ClCompile Include="Scanwaydlg.cpp" />
     <ClCompile Include="SetPtDayDlg.cpp" />
     <ClCompile Include="SetptGraphicBar.cpp" />
+    <ClCompile Include="StaticDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -227,6 +232,7 @@
     <ClCompile Include="T3Performance.cpp" />
     <ClCompile Include="T3RTDView.cpp" />
     <ClCompile Include="TDelayForm.cpp" />
+    <ClCompile Include="TemcoDataGrid.cpp" />
     <ClCompile Include="TestMultiReadTraffic.cpp" />
     <ClCompile Include="Timer_Calibrate.cpp" />
     <ClCompile Include="ToolCalibrateDlg.cpp" />
@@ -296,7 +302,6 @@
     <None Include="res\serialnum.ico" />
     <None Include="C:\Documents and Settings\lee\桌面\serialnum.ico" />
     <None Include="res\T3000.ico" />
-    <None Include="res\t3000.mdb" />
     <None Include="res\T3000.rc2" />
     <None Include="res\T3000Doc.ico" />
     <None Include="res\Toolbar-48.bmp" />
@@ -340,6 +345,8 @@
     <ClInclude Include="fileRW.h" />
     <ClInclude Include="gloab_define.h" />
     <ClInclude Include="IONameConfig.h" />
+    <ClInclude Include="LanguageLocale.h" />
+    <ClInclude Include="LCOutNameConfig.h" />
     <ClInclude Include="MBP.h" />
     <ClInclude Include="MbpDefines.h" />
     <ClInclude Include="MbpExterns.h" />
@@ -348,7 +355,10 @@
     <ClInclude Include="MbPollFunctions.h" />
     <ClInclude Include="MbPollOptions.h" />
     <ClInclude Include="RegDetails.h" />
+    <ClInclude Include="RegisterViewerDlg.h" />
+    <ClInclude Include="RegisterWriteValueDlg.h" />
     <ClInclude Include="Scanwaydlg.h" />
+    <ClInclude Include="StaticDlg.h" />
     <ClInclude Include="T328IN.h" />
     <ClInclude Include="T332AI.h" />
     <ClInclude Include="T36CT.h" />
@@ -358,6 +368,8 @@
     <ClInclude Include="T38IOAView.h" />
     <ClInclude Include="T3Performance.h" />
     <ClInclude Include="T3RTDView.h" />
+    <ClInclude Include="TargetGrid.h" />
+    <ClInclude Include="TemcoDataGrid.h" />
     <ClInclude Include="TestMultiReadTraffic.h" />
     <ClInclude Include="TrafficWindow.h" />
     <ClInclude Include="TrendLogWnd.h" />

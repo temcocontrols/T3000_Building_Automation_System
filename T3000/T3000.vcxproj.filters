@@ -414,6 +414,9 @@
     <ClCompile Include="fileRW.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LanguageLocale.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="MbPollFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -428,6 +431,21 @@
     </ClCompile>
     <ClCompile Include="CM5\PointItem.cpp">
       <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="LCOutNameConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisterViewerDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TemcoDataGrid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisterWriteValueDlg.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -564,7 +582,6 @@
     <None Include="res\Exit.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\t3000.mdb" />
     <None Include="res\Input.ico">
       <Filter>Resource Files</Filter>
     </None>
@@ -1006,6 +1023,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fileRW.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LanguageLocale.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LCOutNameConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegisterViewerDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TargetGrid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TemcoDataGrid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegisterWriteValueDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MbPollFunctions.h">

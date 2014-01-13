@@ -2053,7 +2053,7 @@ DWORD WINAPI CMbPoll::displayThread()
 				{
 					if (((grid1Data != NULL) && (dataFlowStarted[0] == 1)) || (executeOnce[0] == 2))
 					{
-						if (pollSingleFunction[0] != 1)	staticRunning1.SetWindowText(L"?");
+						if (pollSingleFunction[0] != 1)	staticRunning1.SetWindowText(L"¡Ì");
 						if (executeOnce[0] == 2) executeOnce[0] = 0;
 						if (putDataNow[0] == 1)
 						{
@@ -2130,7 +2130,7 @@ DWORD WINAPI CMbPoll::displayThread()
 				{
 					if (((grid2Data != NULL)  && (dataFlowStarted[1] == 1)) || (executeOnce[1] == 2))
 					{
-						if (pollSingleFunction[1] != 1)	staticRunning2.SetWindowText(L"?");
+						if (pollSingleFunction[1] != 1)	staticRunning2.SetWindowText(L"¡Ì");
 						if (executeOnce[1] == 2) executeOnce[1] = 0;
 						if (putDataNow[1] == 1)
 						{
@@ -2178,7 +2178,7 @@ DWORD WINAPI CMbPoll::displayThread()
 				{
 					if (((grid3Data != NULL) && (dataFlowStarted[2] == 1)) || (executeOnce[2] == 2))
 					{
-						if (pollSingleFunction[2] != 1)	staticRunning3.SetWindowText(L"?");
+						if (pollSingleFunction[2] != 1)	staticRunning3.SetWindowText(L"¡Ì");
 						if (executeOnce[2] == 2) executeOnce[2] = 0;
 						if (putDataNow[2] == 1)
 						{
@@ -2225,7 +2225,7 @@ DWORD WINAPI CMbPoll::displayThread()
 				{
 					if (((grid4Data != NULL) && (dataFlowStarted[3] == 1)) || (executeOnce[3] == 2))
 					{
-						if (pollSingleFunction[3] != 1)	staticRunning4.SetWindowText(L"?");
+						if (pollSingleFunction[3] != 1)	staticRunning4.SetWindowText(L"¡Ì");
 						if (executeOnce[3] == 2) executeOnce[3] = 0;
 						if (putDataNow[3] == 1)
 						{
@@ -2272,7 +2272,7 @@ DWORD WINAPI CMbPoll::displayThread()
 				{
 					if (((grid5Data != NULL) && (dataFlowStarted[4] == 1)) || (executeOnce[4] == 2))
 					{
-						if (pollSingleFunction[4] != 1)	staticRunning5.SetWindowText(L"?");
+						if (pollSingleFunction[4] != 1)	staticRunning5.SetWindowText(L"¡Ì");
 						if (executeOnce[4] == 2) executeOnce[4] = 0;
 						if (putDataNow[4] == 1)
 						{
@@ -2939,8 +2939,8 @@ void CMbPoll::OnFileOpenWhileOpen()
 		 CString strConfigFilePathName1 = g_strExePth+_T("savedConfig.txt");
 		 
 		
-		f.Open(strConfigFilePathName1.GetString(), CFile::modeRead);
-
+		if (f.Open(strConfigFilePathName1.GetString(), CFile::modeRead))
+		{
 #if SHOW_ALL
 		for (int i = 0; i < 5; i++)
 #endif

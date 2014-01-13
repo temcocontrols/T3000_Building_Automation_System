@@ -16,7 +16,7 @@
 
 #include "iniFile.h"
 #include "afxinet.h"
- const int g_versionNO=201311;
+ const int g_versionNO=201401;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -404,7 +404,7 @@ BOOL CT3000App::InitInstance()
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization
 	SetRegistryKey(_T("Temco T3000 Application"));//
-//	LoadStdProfileSettings(12);  // Load standard INI file options (including MRU)//
+    LoadStdProfileSettings();  // Load standard INI file options (including MRU)//
 	InitContextMenuManager();
 	InitKeyboardManager();
 
@@ -437,6 +437,9 @@ BOOL CT3000App::InitInstance()
 	// ::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
 	registerfilename=g_strExePth+_T("REG_MSFLXGRD.bat");
 	//::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
+	CString languagepath=g_strExePth+_T("\\Language");
+	m_locale.AddCatalogLookupPath(languagepath);
+	m_locale.SetLanguage(CLanguageLocale::LANGUAGE_ENGLISH);
 
 	// Register the application's document templates.  Document templates
 	//  serve as the connection between documents, frame windows and views
@@ -855,7 +858,22 @@ void CT3000App::ReadREG()
 	}
 }
 
+int CT3000App::GetLanguage(){
+	CRegKey key;
+	LPCTSTR data_Set = _T("Software\\Microsoft\\Windows NT\\CurrentVersion");//_T("Software\\Microsoft\\");//
+	key.Open(HKEY_LOCAL_MACHINE,data_Set);
+	DWORD language;
+	ReadNameber(key,_T("T3000"),language);
+	return language;
 
+}
+
+void CT3000App::SetLanguage(DWORD Last){
+	CRegKey key;
+	LPCTSTR data_Set = _T("Software\\Microsoft\\Windows NT\\CurrentVersion");//_T("Software\\Microsoft\\");//
+	key.Open(HKEY_LOCAL_MACHINE,data_Set);
+	WriteNumber(key,_T("T3000"),Last);
+}
 
 void CAboutDlg::OnBnClickedOk()
 	{

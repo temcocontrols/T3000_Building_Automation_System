@@ -265,6 +265,8 @@ BOOL CParameterDlg::OnInitDialog()
 	//20120420
 
 	//2.5.0.98
+//	gGetDialogStrings(this->m_hWnd,IDD_PARAMETERDIALOG);
+    
 	CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 	
 	RECT RECT_SET1;
@@ -277,8 +279,8 @@ BOOL CParameterDlg::OnInitDialog()
 	m_gUnit.AddString(_T("°F"));
 
 
-	GetDlgItem(IDC_TEMPALARMEDIT)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_STATICALARM)->ShowWindow(SW_HIDE);
+	/*GetDlgItem(IDC_TEMPALARMEDIT)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATICALARM)->ShowWindow(SW_HIDE);*/
 	m_setPointCtrlEdit.ShowWindow(SW_HIDE);
 
 	if(g_ParamLevel==1)
