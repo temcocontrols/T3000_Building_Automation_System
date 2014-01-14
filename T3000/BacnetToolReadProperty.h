@@ -27,4 +27,6 @@ public:
 	CComboBox m_combo_service_choice;
 	CComboBox m_combo_object_identifier;
 	CComboBox m_combo_property_identifier;
+	afx_msg void OnBnClickedBtnBacCancel();
+	CEdit m_instance_edit;
 };

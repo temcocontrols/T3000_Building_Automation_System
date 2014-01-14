@@ -6,7 +6,10 @@
 #include "BacnetTool.h"
 #include "afxdialogex.h"
 #include "globle_function.h"
-
+bool read_property_cancel = true;
+int object_instance = 0;
+int object_identifier =0;
+int property_identifier = 0;
 int Read_Properties(uint32_t deviceid, BACNET_OBJECT_TYPE object_type,int property_id);
 #define  WM_FRESH_BAC_TOOL_LISTVIEW WM_USER + 4002
 const int EDIT_ONE = 1;
@@ -513,5 +516,10 @@ void CBacnetTool::OnBnClickedButtonBacToolTest2()
 	// TODO: Add your control notification handler code here
 	CBacnetToolReadProperty Dlg;
 	Dlg.DoModal();
+	if(!read_property_cancel)
+	{
+		Read_Properties(object_instance,(BACNET_OBJECT_TYPE)object_identifier,property_identifier/*PROP_OBJECT_LIST*/);
+	}
+		
 	//Read_Properties(1001,OBJECT_DEVICE,PROP_OBJECT_NAME/*PROP_OBJECT_LIST*/);
 }
