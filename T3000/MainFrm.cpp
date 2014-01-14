@@ -498,8 +498,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// prevent the menu bar from taking the focus on activation
 
-
-
+	CString test1;
+	test1 = _T("1234567891123456789");
+	__int64 aaaa = _wtoi64(test1);
 
 
 

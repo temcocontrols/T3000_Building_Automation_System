@@ -215,7 +215,7 @@ LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 		CString cs_temp = m_program_list.GetItemText(Changed_Item,Changed_SubItem);
 		if(cs_temp.GetLength()>= STR_PROGRAM_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
 		{
-			MessageBox(_T("Length can not higher than 8"),_T("Warning"));
+			MessageBox(_T("Length can not higher than 8"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 			PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 			return 0;
 		}
@@ -231,7 +231,7 @@ LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 		CString cs_temp = m_program_list.GetItemText(Changed_Item,Changed_SubItem);
 		if(cs_temp.GetLength()>= STR_PROGRAM_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
 		{
-			MessageBox(_T("Length can not higher than 20"),_T("Warning"));
+			MessageBox(_T("Length can not higher than 20"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 			PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 			return 0;
 		}

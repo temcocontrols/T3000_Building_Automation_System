@@ -328,6 +328,9 @@
     <ClInclude Include="BacnetProgram.h" />
     <ClInclude Include="BacnetProgramEdit.h" />
     <ClInclude Include="BacnetRange.h" />
+    <ClInclude Include="BacnetScreenEdit.h" />
+    <ClInclude Include="BacnetTool.h" />
+    <ClInclude Include="BacnetToolReadProperty.h" />
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
