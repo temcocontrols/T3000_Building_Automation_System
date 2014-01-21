@@ -707,7 +707,8 @@ void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 			if(this->IsWindowVisible())
 			{
 			::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
-			Post_Refresh_Message(g_bac_instance,READVARIABLE_T3000,0,63,sizeof(Str_variable_point),16);
+			if(bac_select_device_online)
+				Post_Refresh_Message(g_bac_instance,READVARIABLE_T3000,0,BAC_VARIABLE_ITEM_COUNT - 1,sizeof(Str_variable_point),BAC_VARIABLE_GROUP);
 			}
 		}
 		break;

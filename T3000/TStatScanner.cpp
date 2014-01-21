@@ -1166,7 +1166,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 		//while(pScanner->IsComScanRunning())
 
 		fd_set fdRead = fdSocket;
-		int nSelRet = ::select(0, &fdRead, NULL, NULL, &time);TRACE("recv nc info == %d\n", nSelRet);
+		int nSelRet = ::select(0, &fdRead, NULL, NULL, &time);//TRACE("recv nc info == %d\n", nSelRet);
 		if (nSelRet == SOCKET_ERROR)
 		{
 			int nError = WSAGetLastError();
@@ -3599,20 +3599,29 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 			TRACE(_T("gloab scan = %d\r\n"),ready_to_read_count);
 			for (int i=0;i<ready_to_read_count;i++)
 			{
-				int	resend_count = 0;
+				int id_fail_resend_count = 0;
 				do 
 				{
-					resend_count ++;
-					if(resend_count>20)
+					id_fail_resend_count ++;
+					if(id_fail_resend_count >3)
 						break;
-					g_invoke_id = GetPrivateData(
-						m_bac_scan_com_data.at(i).device_id,
-						GETSERIALNUMBERINFO,
-						0,
-						0,
-						sizeof(Str_Serial_info));
-					Sleep(SEND_COMMAND_DELAY_TIME);
-				} while (g_invoke_id<0);
+					int	resend_count = 0;
+					do 
+					{
+						resend_count ++;
+						if(resend_count>20)
+							break;
+						g_invoke_id = GetPrivateData(
+							m_bac_scan_com_data.at(i).device_id,
+							GETSERIALNUMBERINFO,
+							0,
+							0,
+							sizeof(Str_Serial_info));		
+
+						Sleep(SEND_COMMAND_DELAY_TIME);
+					} while (g_invoke_id<0);
+				} while (!tsm_invoke_id_free(g_invoke_id));
+					
 			}
 			Sleep(500);
 		}

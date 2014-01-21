@@ -46,6 +46,7 @@ const int TYPE_MONITOR = 10;
 const int TYPE_PROGRAMCODE = 11;
 const int TYPE_WEEKLYCODE = 12;
 const int TYPE_ANNUALCODE = 13;
+const int TYPE_ALARMLOG = 14;
 
 const int DELETE_WINDOW_MSG = 200;
 
@@ -66,6 +67,7 @@ const int BAC_READ_MONITOR_LIST = 10;
 const int BAC_READ_PROGRAMCODE_LIST = 11;
 const int BAC_READ_WEEKLTCODE_LIST = 12;
 const int BAC_READ_ANNUALCODE_LIST = 13;
+const int BAC_READ_ALARMLOG_LIST = 14;
 
 
 
@@ -112,6 +114,7 @@ const int BAC_SCREEN_COUNT = 32;
 const int BAC_MONITOR_COUNT = 12;
 const int BAC_ANNUAL_CODE_COUNT = 8;
 const int BAC_CONNECT_WITH_DEVICE_COUNT = 1;
+const int BAC_ALARMLOG_COUNT = 16;
 
 
 const int BAC_INPUT_GROUP = BAC_INPUT_ITEM_COUNT / BAC_READ_GROUP_NUMBER;
@@ -128,6 +131,7 @@ const int BAC_CONTROLLER_GROUP = BAC_CONTROLLER_COUNT / BAC_READ_GROUP_NUMBER;
 const int BAC_SCREEN_GROUP = BAC_SCREEN_COUNT / BAC_READ_GROUP_NUMBER;
 const int BAC_MONITOR_GROUP = BAC_MONITOR_COUNT / BAC_READ_GROUP_NUMBER;
 const int BAC_CONNECT_WITH_DEVICE_GROUP = 1;
+const int BAC_ALARMLOG_GROUP = BAC_ALARMLOG_COUNT;
 
 
 
@@ -135,7 +139,7 @@ const int BAC_CONNECT_WITH_DEVICE_GROUP = 1;
 const int BAC_SHOW_CONNECT_RESULTS = 1;
 const int BAC_SHOW_MISSION_RESULTS = 3;
 
-const int BAC_LIST_REFRESH_TIME = 10000;
+const int BAC_LIST_REFRESH_TIME = 10000;//ms
 
 
 const int SCHEDULE_TIME_NUM = 0;
@@ -208,6 +212,7 @@ struct _Refresh_Info
 	_Resend_Read_Info Read_Screen_Info[BAC_SCREEN_GROUP];
 	_Resend_Read_Info Read_Monitor_Info[BAC_MONITOR_GROUP];
 	_Resend_Read_Info Read_Connect_With_Device[BAC_CONNECT_WITH_DEVICE_GROUP];
+	_Resend_Read_Info Read_AlarmLog_Info[BAC_ALARMLOG_GROUP];
 };
 
 struct _Refresh_Write_Info 
@@ -280,7 +285,11 @@ const CString Units_Type[]=
 	//_T("Custom dig")
 };
 
-
+const CString Yes_No[] = 
+{
+	_T("NO"),
+	_T("YES")
+};
 
 const CString Digital_Units_Array[] = 
 {
@@ -464,5 +473,6 @@ const int WINDOW_SCREEN = 5;
 const int WINDOW_WEEKLY = 6;
 const int WINDOW_ANNUAL = 7;
 const int WINDOW_MONITOR = 8;
+const int WINDOW_ALARMLOG = 9;
 
 const int KEY_INSERT = 1020;

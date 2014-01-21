@@ -160,6 +160,7 @@ using namespace std;  // Ensure that the namespace is set to std
 #define		WM_REFRESH_BAC_SCREEN_LIST					WM_USER + 212
 #define		WM_REFRESH_BAC_MONITOR_LIST					WM_USER + 213
 #define		WM_REFRESH_BAC_MONITOR_INPUT_LIST			WM_USER + 214
+#define		WM_REFRESH_BAC_ALARMLOG_LIST				WM_USER + 215
 
 
 

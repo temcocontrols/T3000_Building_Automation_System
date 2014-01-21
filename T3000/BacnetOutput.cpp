@@ -715,7 +715,8 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 	if(this->IsWindowVisible())
 	{
 		PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
-		Post_Refresh_Message(g_bac_instance,READOUTPUT_T3000,0,BAC_OUTPUT_ITEM_COUNT - 1,sizeof(Str_out_point),BAC_OUTPUT_GROUP);
+		if(bac_select_device_online)
+			Post_Refresh_Message(g_bac_instance,READOUTPUT_T3000,0,BAC_OUTPUT_ITEM_COUNT - 1,sizeof(Str_out_point),BAC_OUTPUT_GROUP);
 	}
 
 

@@ -445,7 +445,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			BAC_ANNUAL_GROUP +
 			BAC_CONTROLLER_GROUP +
 			BAC_SCREEN_GROUP +
-			BAC_MONITOR_GROUP;
+			BAC_MONITOR_GROUP; 
 
 		int all_step = 1000 / total_count;
 		int input_step = 1000 / BAC_INPUT_GROUP;
@@ -458,6 +458,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		int controller_step = 1000 / BAC_CONTROLLER_GROUP;
 		int screen_step = 1000 / BAC_SCREEN_GROUP;
 		int monitor_step = 1000 /BAC_MONITOR_GROUP;
+		int alarmlog_step = 1000 /BAC_ALARMLOG_GROUP;
 		tempcs = tempcs + tempcs2;
 		int success_count =0;
 		int pos=0;
@@ -599,6 +600,26 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				{
 					success_count ++;
 					pos = pos + variable_step;
+				}
+			}
+		}
+
+		for (int i=0;i<BAC_ALARMLOG_GROUP ;i++ )
+		{
+			/*			if(bac_read_which_list ==BAC_READ_ALL_LIST)
+			{
+			if(Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result == BAC_RESULTS_OK)
+			{
+			success_count ++;
+			pos = pos +all_step;
+			}
+			}
+			else */if(bac_read_which_list == BAC_READ_ALARMLOG_LIST)
+			{
+				if(Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result == BAC_RESULTS_OK)
+				{
+					success_count ++;
+					pos = pos + alarmlog_step;
 				}
 			}
 		}
@@ -1147,6 +1168,73 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				}
 			}
 		}
+
+		for (int i=0;i<BAC_ALARMLOG_GROUP;i++)
+		{
+			if((bac_read_which_list == BAC_READ_ALARMLOG_LIST) /*|| (bac_read_which_list == BAC_READ_ALL_LIST)*/)
+			{
+				if(Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result == BAC_RESULTS_UNKONW)
+				{
+					if(Bacnet_Refresh_Info.Read_AlarmLog_Info[i].invoke_id > 0)
+					{
+						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].timeout_count ++;
+					}
+					if(Bacnet_Refresh_Info.Read_AlarmLog_Info[i].timeout_count > 20)
+					{
+						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result = BAC_RESULTS_FAIL;
+						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].timeout_count = 0;
+						continue;
+					}
+					m_wait_detail.SetWindowTextW(tempcs);
+					cotinue_waite = true;
+					break;
+					//goto endthis;
+				}
+				else if(Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result == BAC_RESULTS_FAIL)
+				{
+					Bacnet_Refresh_Info.Read_AlarmLog_Info[i].resend_count ++ ;
+					cotinue_waite = true;
+					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					if((Bacnet_Refresh_Info.Read_AlarmLog_Info[i].resend_count>RESEND_COUNT) 
+						|| (Bacnet_Refresh_Info.Read_AlarmLog_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
+					{
+						m_wait_detail.SetWindowTextW(_T("Read Alarm Log Time Out!"));
+						KillTimer(1);
+						SetTimer(2,2000,NULL);
+						goto endthis;
+					}
+					g_invoke_id = GetPrivateData(
+						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].device_id,
+						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].command,
+						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance,
+						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].end_instance,
+						sizeof(Alarm_point));
+					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					{
+						Sleep(50);
+						continue;
+					}
+					Bacnet_Refresh_Info.Read_AlarmLog_Info[i].has_resend_yes_or_no ++;
+					Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
+					Bacnet_Refresh_Info.Read_AlarmLog_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+
+					CString temp_cs_show;
+					temp_cs_show.Format(_T("Task ID = %d. Read Alarm Log %d "),g_invoke_id,
+						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance);
+					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
+
+
+					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
+
+					TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
+						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance,
+						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].end_instance);
+
+
+				}
+			}
+		}
+
 
 		if(bac_read_which_list == BAC_READ_PROGRAMCODE_LIST)
 		{

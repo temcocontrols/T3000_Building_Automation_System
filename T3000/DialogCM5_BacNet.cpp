@@ -51,6 +51,8 @@
 #include "BacnetProgramEdit.h"
 #include "rs485.h"
 #include "BacnetScheduleTime.h"
+#include "BacnetAlarmLog.h"
+#include "BacnetAlarmWindow.h"
 //bool CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
 //bool need_to_read_description = true;
 int g_gloab_bac_comport = 1;
@@ -67,6 +69,8 @@ BacnetWeeklyRoutine *WeeklyRoutine_Window = NULL;
 BacnetAnnualRoutine *AnnualRoutine_Window = NULL;
 BacnetController *Controller_Window = NULL;
 CBacnetMonitor *Monitor_Window = NULL;
+CBacnetAlarmLog *AlarmLog_Window = NULL;
+extern CBacnetAlarmWindow * AlarmWindow_Window;
 extern bool is_in_scan_mode;
 extern char mycode[1024];
 // CDialogCM5_BacNet
@@ -360,6 +364,25 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 				else
 					MessageBox(_T("Monitor list read time out!"));
 			}
+
+			if(bac_read_which_list == BAC_READ_ALARMLOG_LIST)
+			{
+				if(bac_alarmlog_read_results)
+				{
+					if(AlarmLog_Window == NULL)
+					{
+						AlarmLog_Window = new CBacnetAlarmLog;
+						AlarmLog_Window->Create(IDD_DIALOG_BACNET_ALARMLOG,this);
+					}
+					else
+					{
+						//Refresh the alarmlog list;
+					}
+					AlarmLog_Window->ShowWindow(SW_SHOW);
+					m_bac_main_tab.SetCurSel((WINDOW_ALARMLOG));
+				}
+			}
+
 			if(bac_read_which_list == BAC_READ_PROGRAMCODE_LIST)
 			{
 				if(bac_programcode_read_results)
@@ -539,6 +562,13 @@ LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
 			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_Annualcode_Info[i].invoke_id)
 				Bacnet_Refresh_Info.Read_Annualcode_Info[i].task_result = true;
 		}
+
+		for (int i=0;i<BAC_ALARMLOG_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_AlarmLog_Info[i].invoke_id)
+				Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result = true;
+		}
+
 		if(connect_replay)
 		{
 			if(connect_invoke_id == pInvoke->Invoke_ID)
@@ -632,6 +662,12 @@ LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
 				Bacnet_Refresh_Info.Read_Annualcode_Info[i].task_result = false;
 		}
 
+		for (int i=0;i<BAC_ALARMLOG_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_AlarmLog_Info[i].invoke_id)
+				Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result = false;
+		}
+
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		//AfxMessageBox(Show_Results);
@@ -678,6 +714,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	m_bac_main_tab.InsertItem(WINDOW_WEEKLY, _T("Weekly Routine    "));
 	m_bac_main_tab.InsertItem(WINDOW_ANNUAL, _T("Annual Routine    "));
 	m_bac_main_tab.InsertItem(WINDOW_MONITOR, _T("Monitor    "));
+	m_bac_main_tab.InsertItem(WINDOW_ALARMLOG, _T("Alarm Log    "));
 
 	pDialog[WINDOW_INPUT] = Input_Window = new CBacnetInput;
 	pDialog[WINDOW_OUTPUT] =Output_Window = new CBacnetOutput;
@@ -688,6 +725,8 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_WEEKLY] = WeeklyRoutine_Window = new BacnetWeeklyRoutine;
 	pDialog[WINDOW_ANNUAL] = AnnualRoutine_Window = new BacnetAnnualRoutine;
 	pDialog[WINDOW_MONITOR] = Monitor_Window = new CBacnetMonitor;
+	pDialog[WINDOW_ALARMLOG] = AlarmLog_Window = new CBacnetAlarmLog;
+	
 	//创建两个对话框;
 	Input_Window->Create(IDD_DIALOG_BACNET_INPUT, &m_bac_main_tab);
 	Output_Window->Create(IDD_DIALOG_BACNET_OUTPUT, &m_bac_main_tab);
@@ -698,6 +737,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	WeeklyRoutine_Window->Create(IDD_DIALOG_BACNET_WEEKLY_ROUTINES, &m_bac_main_tab);
 	AnnualRoutine_Window->Create(IDD_DIALOG_BACNET_ANNUAL_ROUTINES, &m_bac_main_tab);
 	Monitor_Window->Create(IDD_DIALOG_BACNET_MONITOR, &m_bac_main_tab);
+	AlarmLog_Window->Create(IDD_DIALOG_BACNET_ALARMLOG,&m_bac_main_tab);
 	//设定在Tab内显示的范围;
 	CRect rc;
 	m_bac_main_tab.GetClientRect(rc);
@@ -706,7 +746,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	//rc.left += 8;
 	//rc.right -= 8;
 
-	for (int i=0;i<9;i++)
+	for (int i=0;i<10;i++)
 	{
 		pDialog[i]->MoveWindow(&rc);
 	}
@@ -722,6 +762,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_WEEKLY]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_ANNUAL]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_MONITOR]->ShowWindow(SW_HIDE);
+	pDialog[WINDOW_ALARMLOG]->ShowWindow(SW_HIDE);
 
 	g_hwnd_now = m_input_dlg_hwnd;
 	//保存当前选择
@@ -741,6 +782,7 @@ void CDialogCM5_BacNet::Initial_All_Point()
 	m_controller_data.clear();
 	m_screen_data.clear();
 	m_monitor_data.clear();
+	m_alarmlog_data.clear();
 	for(int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
 	{
 		Str_in_point temp_in;
@@ -802,6 +844,13 @@ void CDialogCM5_BacNet::Initial_All_Point()
 	{
 		Str_monitor_point temp_monitor;
 		m_monitor_data.push_back(temp_monitor);
+	}
+
+	for (int i=0;i<BAC_ALARMLOG_COUNT;i++)
+	{
+		Alarm_point temp_alarmpoint;
+		memset(temp_alarmpoint.alarm_message,0,ALARM_MESSAGE_SIZE);
+		m_alarmlog_data.push_back(temp_alarmpoint);
 	}
 }
 //__declspec(dllexport) HANDLE	Get_RS485_Handle();
@@ -955,6 +1004,7 @@ void CDialogCM5_BacNet::Fresh()
 
 	SetTimer(1,500,NULL);
 	SetTimer(2,15000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
+	SetTimer(3,1000,NULL); //Check whether need  show Alarm dialog.
 	BacNet_hwd = this->m_hWnd;
 
 	CString temp_cs;
@@ -994,7 +1044,7 @@ void CDialogCM5_BacNet::Fresh()
 	else
 	{
 		SetPaneString(1,_T("Device is offline!"));
-		MessageBox(_T("Device is offline!"));
+		MessageBox(_T("Device is offline!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);;
 	}
 	//prevent when user doesn't click the bacnet device,the view also initial ,It's a waste of resource;
 #if 1
@@ -1717,30 +1767,23 @@ DWORD WINAPI  CDialogCM5_BacNet::Send_read_Command_Thread(LPVOID lpVoid)
 		}
 	}
 
-	//for (int i=0;i<BAC_CONNECT_WITH_DEVICE_GROUP;i++)
-	//{
-	//	if((bac_read_which_list == BAC_READ_CONNECT_WITH_DEVICE_LIST) )
-	//	{
-	//		Bacnet_Refresh_Info.Read_Connect_With_Device[i].command = 0;
-	//		Bacnet_Refresh_Info.Read_Connect_With_Device[i].device_id = 0;
-	//		Bacnet_Refresh_Info.Read_Connect_With_Device[i].start_instance =0;
-	//		Bacnet_Refresh_Info.Read_Connect_With_Device[i].end_instance =0;
-	//		Bacnet_Refresh_Info.Read_Connect_With_Device[i].has_resend_yes_or_no = 0;
-	//		Bacnet_Refresh_Info.Read_Connect_With_Device[i].task_result = BAC_RESULTS_UNKONW;
-	//		Bacnet_Refresh_Info.Read_Connect_With_Device[i].invoke_id = -1;
-	//		Bacnet_Refresh_Info.Read_Connect_With_Device[i].resend_count = 0;
-	//		bac_connect_read_results = 0;
-	//		Bacnet_Refresh_Info.Read_Connect_With_Device[i].timeout_count = 0;
-	//	}
-	//}
-	//Below is send command function;
-	//for (int i=0;i<BAC_CONNECT_WITH_DEVICE_GROUP;i++)
-	//{
-	//	if(bac_read_which_list == BAC_READ_CONNECT_WITH_DEVICE_LIST)
-	//	{
-	//		Post_Write_Message(g_bac_instance,CONNECTED_WITH_DEVICE,0,0,sizeof(Str_connected_point),BacNet_hwd ,temp_task_info);
-	//	}
-	//}
+
+	for (int i=0;i<BAC_ALARMLOG_GROUP;i++)
+	{
+		if((bac_read_which_list == BAC_READ_ALARMLOG_LIST)/* || (bac_read_which_list ==BAC_READ_ALL_LIST)*/)
+		{
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].command = 0;
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].device_id = 0;
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance =0;
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].end_instance =0;
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].has_resend_yes_or_no = 0;
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].task_result = BAC_RESULTS_UNKONW;
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].invoke_id = -1;
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].resend_count = 0;
+			bac_alarmlog_read_results = 0;
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].timeout_count = 0;
+		}
+	}
 
 
 	for (int i=0;i<BAC_MONITOR_GROUP;i++)
@@ -1932,6 +1975,36 @@ DWORD WINAPI  CDialogCM5_BacNet::Send_read_Command_Thread(LPVOID lpVoid)
 			temp_cs.Format(_T("Task ID = %d. Read Output List Item From %d to %d "),g_invoke_id,
 				Bacnet_Refresh_Info.Read_Output_Info[i].start_instance,
 				Bacnet_Refresh_Info.Read_Output_Info[i].end_instance);
+			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
+		}
+	}
+
+	for (int i=0;i<BAC_ALARMLOG_GROUP;i++)
+	{
+		if((bac_read_which_list == BAC_READ_ALARMLOG_LIST) /*|| (bac_read_which_list ==BAC_READ_ALL_LIST)*/)
+		{
+			resend_count = 0;
+			do 
+			{
+				resend_count ++;
+				if(resend_count>RESEND_COUNT)
+					goto myend;
+				g_invoke_id = GetPrivateData(g_bac_instance,READALARM_T3000,i,i,sizeof(Alarm_point));
+				Sleep(SEND_COMMAND_DELAY_TIME);
+				//if(g_invoke_id<0)
+				//	TRACE(_T("Input g_invoke_id = %d ,resend count = %d\r\n"),g_invoke_id,resend_count);
+			} while (g_invoke_id<0);
+
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].command = READALARM_T3000;
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].device_id = g_bac_instance;
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance = i;
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].end_instance = i;
+			Bacnet_Refresh_Info.Read_AlarmLog_Info[i].invoke_id = g_invoke_id;
+
+
+			CString temp_cs;
+			temp_cs.Format(_T("Task ID = %d. Read Alarm Log List %d"),g_invoke_id,
+				Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
 		}
 	}
@@ -2431,11 +2504,33 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 
 		break;
 	case 2:
-		//Send_WhoIs_Global(-1,-1);
+		{
 		if(!is_in_scan_mode)
 			m_bac_scan_com_data.clear();
 		if(g_bac_instance>0)
 			Send_WhoIs_Global(-1, -1);
+		}
+		break;
+	case 3:
+		{
+			if(AlarmWindow_Window!=NULL)
+			{
+				if(bac_show_alarm_window)//显示;
+				{
+					if(!(CBacnetAlarmWindow *)AlarmWindow_Window->IsWindowVisible())
+					{
+						AlarmWindow_Window->ShowWindow(SW_SHOW);
+					}
+				}
+				else//Not show
+				{
+					if((CBacnetAlarmWindow *)AlarmWindow_Window->IsWindowVisible())
+					{
+						AlarmWindow_Window->ShowWindow(SW_HIDE);
+					}
+				}
+			}
+		}
 		break;
 	default:
 		break;
@@ -2472,7 +2567,7 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 		break;
 	}
 
-	for (int i=0;i<9;i++)
+	for (int i=0;i<10;i++)
 	{
 		if(i==selected)
 		{
@@ -2523,6 +2618,12 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 				((CBacnetMonitor *)pDialog[i])->Fresh_Monitor_Input_List(NULL,NULL);
 				((CBacnetMonitor*)pDialog[i])->Reg_Hotkey();
 				g_hwnd_now = m_monitor_dlg_hwnd;
+				break;
+			case WINDOW_ALARMLOG:
+				//增加刷新list和改变当前window 的hwnd;
+				PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALARMLOG);
+				((CBacnetAlarmLog *)pDialog[i])->Fresh_Alarmlog_List(NULL,NULL);
+				g_hwnd_now = m_alarmlog_dlg_hwnd;
 				break;
 			}
 			
