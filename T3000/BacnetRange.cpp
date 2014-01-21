@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "gloab_define.h"
 
+int old_bac_range_number_choose = 0;
 // BacnetRange dialog
 
 IMPLEMENT_DYNAMIC(BacnetRange, CDialogEx)
@@ -35,6 +36,7 @@ void BacnetRange::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_RADIO35, m_digital_select);
 	DDX_Radio(pDX, IDC_RADIO47, m_output_Analog_select);
 	DDX_Radio(pDX, IDC_RADIO54, m_input_Analog_select);
+	DDX_Control(pDX, IDC_STATIC_RANGE_UNITE_SHOW, m_show_unit);
 }
 
 
@@ -51,6 +53,10 @@ END_MESSAGE_MAP()
 BOOL BacnetRange::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+	m_show_unit.ShowWindow(FALSE);
+	m_show_unit.SetWindowTextW(_T(""));
+	m_show_unit.textColor(RGB(255,0,0));
+	m_show_unit.setFont(24,12,NULL,_T("Arial"));
 	Initial_static();
 	// TODO:  Add extra initialization here
 	SetTimer(1,400,NULL);
@@ -60,7 +66,8 @@ BOOL BacnetRange::OnInitDialog()
 
 void BacnetRange::Initial_static()
 {
-	CRect Temp_Rect;;
+	CString temp_cs;
+	CRect Temp_Rect;
 	GetWindowRect(Temp_Rect);
 	if(bac_ranges_type == VARIABLE_RANGE_ANALOG_TYPE)
 	{
@@ -88,6 +95,21 @@ void BacnetRange::Initial_static()
 	}
 	else if((bac_ranges_type == VARIABLE_RANGE_DIGITAL_TYPE) ||(bac_ranges_type == OUTPUT_RANGE_DIGITAL_TYPE) || (bac_ranges_type == INPUT_RANGE_DIGITAL_TYPE))
 	{
+		if(bac_range_number_choose > 23)
+			bac_range_number_choose = 0;
+		
+		m_show_unit.ShowWindow(TRUE);
+		temp_cs.Format(_T("%d"),bac_range_number_choose);
+		GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(temp_cs);
+
+		m_show_unit.SetWindowTextW(Digital_Units_Array[bac_range_number_choose]);
+
+		if(bac_range_number_choose<=11)
+			m_digital_select = bac_range_number_choose ;
+		else
+			m_digital_select = bac_range_number_choose - 11;
+		old_bac_range_number_choose = m_digital_select;
+
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(0);
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(0);
 		GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->ShowWindow(1);
@@ -160,7 +182,7 @@ void BacnetRange::Initial_static()
 	}
 	GetDlgItem(IDC_EDIT_RANGE_SELECT)->ShowWindow(1);
 	GetDlgItem(IDC_STATIC_RANGE_ENTER_UNITS)->ShowWindow(1);
-
+	UpdateData(FALSE);
 }
 
 
@@ -227,7 +249,11 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 			}
 			else if((bac_ranges_type == VARIABLE_RANGE_DIGITAL_TYPE) ||(bac_ranges_type == OUTPUT_RANGE_DIGITAL_TYPE) || (bac_ranges_type == INPUT_RANGE_DIGITAL_TYPE))
 			{
-				bac_range_number_choose = m_digital_select;
+				if(m_digital_select != old_bac_range_number_choose)
+				{
+					bac_range_number_choose = m_digital_select;
+					m_show_unit.SetWindowTextW(Digital_Units_Array[bac_range_number_choose]);
+				}
 			}
 			else if(bac_ranges_type == OUTPUT_RANGE_ANALOG_TYPE)
 			{
@@ -275,7 +301,11 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 			else
 			{
 				bac_range_number_choose = sel_value;
-				m_digital_select = sel_value;
+				m_show_unit.SetWindowTextW(Digital_Units_Array[bac_range_number_choose]);
+				if(sel_value < 11)
+					m_digital_select = sel_value;
+				else
+					m_digital_select = sel_value - 11;
 				UpdateData(false);
 			}
 		}

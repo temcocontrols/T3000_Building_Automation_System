@@ -930,6 +930,7 @@ extern bool bac_monitor_read_results;
 extern bool bac_programcode_read_results;
 extern bool bac_weeklycode_read_results;
 extern bool bac_annualcode_read_results;
+extern bool bac_alarmlog_read_results;
 extern bool bac_cm5_graphic;
 
 extern int bac_gloab_panel;
@@ -956,6 +957,8 @@ extern HWND      m_controller_dlg_hwnd;
 extern HWND      m_screen_dlg_hwnd;
 extern HWND		m_screenedit_dlg_hwnd;
 extern HWND	  m_monitor_dlg_hwnd;
+extern HWND	  m_alarmlog_dlg_hwnd;
+extern HWND      m_alarmwindow_dlg_hwnd;
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
@@ -970,6 +973,7 @@ extern vector <_Bac_Scan_Com_Info> m_bac_scan_com_data;
 extern vector <_Com_Scan_Read_Info> m_bac_scan_resend_data;
 extern vector <_Graphic_Value_Info> m_graphic_refresh_data;
 extern vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
+extern vector <Alarm_point> m_alarmlog_data;
 extern Monitor_Block m_monitor_block;
 extern int Monitor_Input__Data[14][1000];
 extern Monitor_Input_Info my_input_info[14];
@@ -999,4 +1003,6 @@ extern bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，
 extern int connect_invoke_id ;
 extern bool connect_replay ;
 extern BACNET_OBJECT_PROPERTY_VALUE receive_object_value;  /* for bacapp printing */
+extern bool bac_show_alarm_window ;	//used for judge whether need to show the alarm window.
+extern bool bac_select_device_online ; //判断选中的bacnet device 是否在线;
 #pragma endregion For_bacnet

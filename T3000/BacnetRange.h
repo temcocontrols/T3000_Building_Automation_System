@@ -35,6 +35,7 @@ public:
 	int m_input_Analog_select;
 	afx_msg void OnEnKillfocusEditRangeSelect();
 	afx_msg void OnClose();
+	CStaticEx m_show_unit;
 };
 
 const CString Range_Type[] =

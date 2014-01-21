@@ -40,6 +40,8 @@
 #include "excel9.h"
 #include "ScanSelectDlg.h"
 
+#include "BacnetTool.h"
+#include "BacnetAlarmWindow.h"
 //////////////////////////////
 #include "isp/CDialogISPTOOL.h"
 
@@ -72,6 +74,7 @@ vector <MSG> My_Receive_msg;
 HANDLE hDeal_thread;
 DWORD nThreadID_Do;
 extern CBacnetScreenEdit * ScreenEdit_Window;
+extern CBacnetAlarmWindow * AlarmWindow_Window;
 CCriticalSection MyCriticalSection;
 CString SaveConfigFilePath;
 int m_MainHotKeyID[10] = 
@@ -242,6 +245,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_WM_SIZING()
 	ON_WM_PAINT()
 	ON_COMMAND(ID_DATABASE_BACNETTOOL, &CMainFrame::OnDatabaseBacnettool)
+	ON_COMMAND(ID_CONTROL_ALARM_LOG, &CMainFrame::OnControlAlarmLog)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -498,9 +502,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// prevent the menu bar from taking the focus on activation
 
-	CString test1;
-	test1 = _T("1234567891123456789");
-	__int64 aaaa = _wtoi64(test1);
+
 
 
 
@@ -695,30 +697,33 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	int nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'S'); //热键 ctrl + S   
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + S failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'P'); //热键 ctrl + d   
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'P'); //热键 ctrl + P  
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + P failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[2],MOD_ALT,'I'); //热键 ctrl + d   
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[2],MOD_ALT,'I'); //热键 ctrl + I   
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + I failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[3],MOD_ALT,'O'); //热键 ctrl + d   
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[3],MOD_ALT,'O'); //热键 ctrl + O   
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + O failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[4],MOD_ALT,'V'); //热键 ctrl + d   
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[4],MOD_ALT,'V'); //热键 ctrl + V  
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + V failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[5],MOD_ALT,'C'); //热键 ctrl + d   
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[5],MOD_ALT,'C'); //热键 ctrl + C   
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + C failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[6],MOD_ALT,'W'); //热键 ctrl + d   
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[6],MOD_ALT,'W'); //热键 ctrl + W   
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + W failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[7],MOD_ALT,'A'); //热键 ctrl + d   
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[7],MOD_ALT,'A'); //热键 ctrl + A   
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + A failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[8],MOD_ALT,'G'); //热键 ctrl + d   
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[8],MOD_ALT,'G'); //热键 ctrl + G   
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + G failure")); 
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[9],MOD_ALT,'L'); //热键 ctrl + L   
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + L failure")); 
 	#else //release版本   
 	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'S'); 
 	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'P'); 
@@ -729,6 +734,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[6],MOD_ALT,'W'); 
 	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[7],MOD_ALT,'A'); 
 	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[8],MOD_ALT,'G');
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[9],MOD_ALT,'L');
 	#endif  
 	for(int i=0;i<9;i++)
 	{
@@ -5109,7 +5115,7 @@ void CMainFrame::OnDestroy()
 	UpdataSlider(temp);
 
 
-	for(int i=0;i<9;i++)
+	for(int i=0;i<10;i++)
 	{
 		if(pDialog[i]!=NULL)
 		{
@@ -5129,7 +5135,7 @@ void CMainFrame::OnDestroy()
 	}
 
 	
-	for (int i=0;i<9;i++)
+	for (int i=0;i<10;i++)
 	{
 		UnregisterHotKey(GetSafeHwnd(), m_MainHotKeyID[i]);   
 	}
@@ -6864,7 +6870,10 @@ void CMainFrame::RefreshTreeView()
 					bOnLine=TRUE;
 					TRACE(_T("Device %d is Online\r\n"),(int)m_product.at(i).hardware_version);
 				}
-
+				if(g_bac_instance == m_product.at(i).hardware_version)//判断当前选中的设备是否在线，不在线就不允许操作 读写;
+				{
+					bac_select_device_online = bOnLine;
+				}
 
 			//	m_product.at(i).hardware_version ==
 			}
@@ -7178,7 +7187,10 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam,LPARAM lParam)
 	{
 		OnControlMonitors();
 	}
-
+	else if(MOD_ALT == fuModifiers && 'L' == uVirtKey)//Annual Routines
+	{
+		OnControlAlarmLog();
+	}
 	return 0;
 }
 
@@ -8305,7 +8317,11 @@ loop1:
 									resend_count ++;
 									if(resend_count>10)
 										break;
-									
+									if((unsigned char)My_WriteList_Struct->command == READALARM_T3000)//Because the Alarm list need to read one by one 
+									{
+									 g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,i,i,My_WriteList_Struct->entitysize);
+									}
+									else
 									g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,My_WriteList_Struct->entitysize);
 									Sleep(SEND_COMMAND_DELAY_TIME);
 								} while (g_invoke_id<0);
@@ -8702,20 +8718,40 @@ void CMainFrame::OnToolRegisterviewer()
 void CMainFrame::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	TRACE(_T("Main Paint\r\n"));
 	if(ScreenEdit_Window)
-	{
-		
+	{	
 		::PostMessage(m_screenedit_dlg_hwnd,MY_REDRAW_WINDOW,NULL,NULL);
+	}
+	if(AlarmWindow_Window)
+	{
+		::PostMessage(m_alarmwindow_dlg_hwnd,MY_REDRAW_WINDOW,NULL,NULL);
 	}
 	// TODO: Add your message handler code here
 	// Do not call CFrameWndEx::OnPaint() for painting messages
 }
 
-#include "BacnetTool.h"
+
 void CMainFrame::OnDatabaseBacnettool()
 {
+	//CBacnetAlarmWindow dlg;
+	//dlg.DoModal();
 	CBacnetTool dlg;
 	dlg.DoModal();
 	// TODO: Add your command handler code here
+}
+
+void CMainFrame::OnControlAlarmLog()
+{
+	// TODO: Add your command handler code here
+	if(g_protocol == PROTOCOL_BACNET_IP)
+	{
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALARMLOG);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
 }

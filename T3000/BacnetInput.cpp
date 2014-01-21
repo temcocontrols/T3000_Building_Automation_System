@@ -317,6 +317,7 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 		}
 		else if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_DIGITAL])==0)
 		{
+			bac_range_number_choose = m_Input_data.at(Changed_Item).range;
 			bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
 			dlg.DoModal();
 			if(range_cancel)
@@ -440,7 +441,7 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	{
 		CString cs_temp=m_input_list.GetItemText(Changed_Item,INPUT_FITLER);
 		int  temp2 = _wtoi(cs_temp);
-		m_Input_data.at(Changed_Item).filter = log((double)temp2)/log((double)2);
+		m_Input_data.at(Changed_Item).filter = (int8_t)(log((double)temp2)/log((double)2));
 	}
 	else if(Changed_SubItem==INPUT_DECOM)
 	{
@@ -675,7 +676,7 @@ void CBacnetInput::OnBnClickedButtonApply()
 
 		cs_temp=m_input_list.GetItemText(i,INPUT_FITLER);
 		int  temp2 = _wtoi(cs_temp);
-		m_Input_data.at(i).filter = log((double)temp2)/log((double)2);
+		m_Input_data.at(i).filter =(int8_t) (log((double)temp2)/log((double)2));
 
 
 		cs_temp = m_input_list.GetItemText(i,INPUT_DECOM);
@@ -814,7 +815,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		m_input_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
 		temp_task_info.Format(_T("Write Input List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
-		Post_Write_Message(g_bac_instance,WRITEINPUT_T3000,lRow,lRow,sizeof(Str_in_point),m_input_dlg_hwnd,temp_task_info,lRow,lCol);
+		Post_Write_Message(g_bac_instance,WRITEINPUT_T3000,(int8_t)lRow,(int8_t)lRow,sizeof(Str_in_point),m_input_dlg_hwnd,temp_task_info,lRow,lCol);
 	}
 
 
@@ -829,7 +830,8 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 	if(this->IsWindowVisible())
 	{
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-	Post_Refresh_Message(g_bac_instance,READINPUT_T3000,0,BAC_INPUT_ITEM_COUNT - 1,sizeof(Str_in_point), BAC_INPUT_GROUP);
+	if(bac_select_device_online)
+		Post_Refresh_Message(g_bac_instance,READINPUT_T3000,0,BAC_INPUT_ITEM_COUNT - 1,sizeof(Str_in_point), BAC_INPUT_GROUP);
 	}
 	CDialogEx::OnTimer(nIDEvent);
 }

@@ -1042,6 +1042,9 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case CONNECTED_WITH_DEVICE:
 		entitysize = sizeof(Str_connected_point);
 		break;
+	case  WRITEALARM_T3000:
+		entitysize = sizeof(Alarm_point);
+		break;
 	default:
 		{
 			//AfxMessageBox(_T("Entitysize length error!"));
@@ -1158,6 +1161,9 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case CONNECTED_WITH_DEVICE:
 		memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,sizeof(Str_connected_point),my_ip,sizeof(Str_connected_point));
 		//这里需要注意my_ip双网卡的问题;
+		break;
+	case  WRITEALARM_T3000:
+		memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,sizeof(Alarm_point),&m_alarmlog_data.at(start_instance),sizeof(Alarm_point));
 		break;
 	default:
 		{
@@ -1376,6 +1382,8 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
 
+			if(start_instance >= BAC_OUTPUT_ITEM_COUNT)
+				return -1;//超过长度了;
 			//my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
 			//m_Output_data.clear();
 			for (i=start_instance;i<=end_instance;i++)
@@ -1429,6 +1437,9 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			end_instance = *my_temp_point;
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
+
+			if(start_instance >= BAC_INPUT_ITEM_COUNT)
+				return -1;//超过长度了;
 			//my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
 			//m_Input_data.clear();
 			for (i=start_instance;i<=end_instance;i++)
@@ -1479,6 +1490,9 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
 
+			if(start_instance >= BAC_VARIABLE_ITEM_COUNT)
+				return -1;//超过长度了;
+
 			//m_Input_data_length = block_length;
 			//my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
 			//m_Variable_data.clear();
@@ -1527,6 +1541,9 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
 
+			if(start_instance >= BAC_WEEKLY_ROUTINES_COUNT)
+				return -1;//超过长度了;
+
 			for (i=start_instance;i<=end_instance;i++)
 			{
 				//Str_program_point temp_in;
@@ -1567,6 +1584,9 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 		my_temp_point++;
 		my_temp_point = my_temp_point + 2;
 
+		if(start_instance >= BAC_ANNUAL_ROUTINES_COUNT)
+			return -1;//超过长度了;
+
 		for (i=start_instance;i<=end_instance;i++)
 		{
 			//Str_program_point temp_in;
@@ -1605,6 +1625,9 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
 
+			if(start_instance >= BAC_PROGRAM_ITEM_COUNT)
+				return -1;//超过长度了;
+
 			for (i=start_instance;i<=end_instance;i++)
 			{
 				//Str_program_point temp_in;
@@ -1640,6 +1663,9 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			end_instance = *my_temp_point;
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
+
+			if(start_instance >= BAC_PROGRAMCODE_ITEM_COUNT)
+				return -1;//超过长度了;
 
 			block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
 		//	int code_length = (unsigned char)(my_temp_point[1]*256) + (unsigned char)my_temp_point[0];
@@ -1780,6 +1806,9 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 		my_temp_point++;
 		my_temp_point = my_temp_point + 2;
 
+		if(start_instance >= BAC_CONTROLLER_COUNT)
+			return -1;//超过长度了;
+
 		for (i=start_instance;i<=end_instance;i++)
 		{
 			m_controller_data.at(i).input.number = *(my_temp_point++);
@@ -1838,6 +1867,9 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 		my_temp_point++;
 		my_temp_point = my_temp_point + 2;
 
+		if(start_instance >= BAC_SCREEN_COUNT)
+			return -1;//超过长度了;
+
 		for (i=start_instance;i<=end_instance;i++)
 		{
 			if(strlen(my_temp_point) > STR_SCREEN_DESCRIPTION_LENGTH)
@@ -1881,6 +1913,8 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			end_instance = *my_temp_point;
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
+			if(start_instance >= BAC_MONITOR_COUNT)
+				return -1;//超过长度了;
 
 			for (i=start_instance;i<=end_instance;i++)
 			{
@@ -1916,6 +1950,81 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			}
 		}
 		return READMONITOR_T3000;
+		break;
+	case  READALARM_T3000:
+		{
+			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Alarm_point))!=0)
+				return -1;	//得到的结构长度错误;
+			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Alarm_point);
+
+			my_temp_point = (char *)Temp_CS.value + 3;
+			start_instance = *my_temp_point;
+			my_temp_point++;
+			end_instance = *my_temp_point;
+			my_temp_point++;
+			my_temp_point = my_temp_point + 2;
+			if(start_instance >= BAC_ALARMLOG_COUNT)
+				return -1;//超过长度了;
+			m_alarmlog_data.at(start_instance).point.number = *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).point.point_type = *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).point.panel = *(my_temp_point++);
+			temp_struct_value = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
+			m_alarmlog_data.at(start_instance).point.network = temp_struct_value;
+			my_temp_point = my_temp_point + 2;
+			m_alarmlog_data.at(start_instance).modem = *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).printer = *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).alarm =  *(my_temp_point++);
+
+			//if one of the alarm is not zero ,show the alarm window.
+			bac_show_alarm_window = bac_show_alarm_window || m_alarmlog_data.at(start_instance).alarm;
+
+			m_alarmlog_data.at(start_instance).restored =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).acknowledged =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).ddelete =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).type =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).cond_type =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).level =  *(my_temp_point++);
+
+			temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+			m_alarmlog_data.at(start_instance).alarm_time =(unsigned int) temp_struct_value;
+			my_temp_point = my_temp_point + 4;
+			m_alarmlog_data.at(start_instance).alarm_count =  *(my_temp_point++);
+
+
+			if(strlen(my_temp_point) > ALARM_MESSAGE_SIZE)
+				memset(m_alarmlog_data.at(start_instance).alarm_message,0,ALARM_MESSAGE_SIZE + 1);
+			else
+				memcpy_s( m_alarmlog_data.at(start_instance).alarm_message,ALARM_MESSAGE_SIZE + 1,my_temp_point,ALARM_MESSAGE_SIZE + 1);
+			my_temp_point=my_temp_point + ALARM_MESSAGE_SIZE + 1;
+
+			my_temp_point = my_temp_point + 5;//ignore char  none[5];
+
+			m_alarmlog_data.at(start_instance).panel_type =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).dest_panel_type =  *(my_temp_point++);
+
+			temp_struct_value = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
+			m_alarmlog_data.at(start_instance).alarm_id = (unsigned short)temp_struct_value;
+			my_temp_point = my_temp_point + 2;
+			m_alarmlog_data.at(start_instance).prg =  *(my_temp_point++);
+
+
+			m_alarmlog_data.at(start_instance).alarm_panel =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).where1 =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).where2 =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).where3 =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).where4 =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).where5 =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).where_state1 =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).where_state2 =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).where_state3 =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).where_state4 =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).where_state5 =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).change_flag =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).original =  *(my_temp_point++);
+			m_alarmlog_data.at(start_instance).no =  *(my_temp_point++);
+
+		}
+		return READALARM_T3000;
 		break;
 	case READMONITORDATA_T3000:
 		{
@@ -2141,6 +2250,9 @@ void local_handler_conf_private_trans_ack(
 		break;
 	case READSCREEN_T3000:
 		copy_data_to_ptrpanel(TYPE_ALL);
+		break;
+	case READALARM_T3000:
+		//::PostMessage(m_alarmlog_dlg_hwnd,WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
 		break;
 	default:
 		break;
@@ -2542,7 +2654,9 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 	{
 		if((m_bac_scan_com_data.at(i).device_id == temp_1.device_id)
 			|| (m_bac_scan_com_data.at(i).macaddress == temp_1.macaddress))
+		{
 			find_exsit = true;
+		}
 	}
 	if(!find_exsit)
 	{

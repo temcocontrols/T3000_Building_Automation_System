@@ -545,7 +545,8 @@ void CBacnetProgram::OnTimer(UINT_PTR nIDEvent)
 	if(this->IsWindowVisible())
 	{
 	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
-	Post_Refresh_Message(g_bac_instance,READPROGRAM_T3000,0,BAC_PROGRAM_ITEM_COUNT - 1,sizeof(Str_program_point),BAC_PROGRAM_GROUP);
+	if(bac_select_device_online)
+		Post_Refresh_Message(g_bac_instance,READPROGRAM_T3000,0,BAC_PROGRAM_ITEM_COUNT - 1,sizeof(Str_program_point),BAC_PROGRAM_GROUP);
 	}
 	CDialogEx::OnTimer(nIDEvent);
 }

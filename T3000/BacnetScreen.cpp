@@ -452,7 +452,8 @@ void BacnetScreen::OnTimer(UINT_PTR nIDEvent)
 	if(this->IsWindowVisible())
 	{
 	PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
-	Post_Refresh_Message(g_bac_instance,READSCREEN_T3000,0,BAC_SCREEN_COUNT - 1,sizeof(Control_group_point),BAC_SCREEN_GROUP);
+	if(bac_select_device_online)
+		Post_Refresh_Message(g_bac_instance,READSCREEN_T3000,0,BAC_SCREEN_COUNT - 1,sizeof(Control_group_point),BAC_SCREEN_GROUP);
 	}
 	CDialogEx::OnTimer(nIDEvent);
 }

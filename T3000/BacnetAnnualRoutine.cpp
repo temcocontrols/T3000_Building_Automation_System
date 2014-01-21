@@ -397,7 +397,8 @@ void BacnetAnnualRoutine::OnTimer(UINT_PTR nIDEvent)
 	if(this->IsWindowVisible())
 	{
 	PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
-	Post_Refresh_Message(g_bac_instance,READANNUALROUTINE_T3000,0,BAC_ANNUAL_ROUTINES_COUNT - 1,sizeof(Str_annual_routine_point),BAC_ANNUAL_GROUP);
+	if(bac_select_device_online)
+		Post_Refresh_Message(g_bac_instance,READANNUALROUTINE_T3000,0,BAC_ANNUAL_ROUTINES_COUNT - 1,sizeof(Str_annual_routine_point),BAC_ANNUAL_GROUP);
 	}
 	CDialogEx::OnTimer(nIDEvent);
 }

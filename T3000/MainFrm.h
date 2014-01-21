@@ -380,6 +380,7 @@ public:
 	afx_msg void OnDatabaseBacnettool();
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnPaint();
+	afx_msg void OnControlAlarmLog();
 };
 
 const int DLG_T3000_VIEW = 0;

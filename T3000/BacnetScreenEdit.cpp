@@ -723,7 +723,6 @@ void CBacnetScreenEdit::OnMouseMove(UINT nFlags, CPoint point)
 	CDialogEx::OnMouseMove(nFlags, point);
 }
 
-
 void CBacnetScreenEdit::OnCancel()
 {
 	// TODO: Add your specialized code here and/or call the base class
@@ -743,43 +742,45 @@ void CBacnetScreenEdit::OnCancel()
 void CBacnetScreenEdit::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	for (int i=0;i<(int)m_graphic_refresh_data.size();i++)
+	if(bac_select_device_online)
 	{
-		Post_Refresh_One_Message(m_graphic_refresh_data.at(i).deviceid,
-			m_graphic_refresh_data.at(i).command,
-			m_graphic_refresh_data.at(i).value_item,
-			m_graphic_refresh_data.at(i).value_item,
-			m_graphic_refresh_data.at(i).entitysize);
-		CString temp;
-		//	static int test_value;
+		for (int i=0;i<(int)m_graphic_refresh_data.size();i++)
+		{
+			Post_Refresh_One_Message(m_graphic_refresh_data.at(i).deviceid,
+				m_graphic_refresh_data.at(i).command,
+				m_graphic_refresh_data.at(i).value_item,
+				m_graphic_refresh_data.at(i).value_item,
+				m_graphic_refresh_data.at(i).entitysize);
+			CString temp;
+			//	static int test_value;
 #if 0
-		if(m_graphic_refresh_data.at(i).value_type == 0)
-		{
-			//	test_value ++;
-			//	temp.Format(_T("%d"),test_value);
-			temp.Format(_T("%d"),m_Input_data.at(m_graphic_refresh_data.at(i).value_item).value);
-		}
-		else if(m_graphic_refresh_data.at(i).value_type == 1)
-		{
-			//test_value ++;
-			//	test_value ++;
-			//	temp.Format(_T("%d"),test_value);
-			temp.Format(_T("%d"),m_Output_data.at(m_graphic_refresh_data.at(i).value_item).value);
-		}
-		else if(m_graphic_refresh_data.at(i).value_type == 2)
-		{
-			//	test_value ++;
-			//	test_value ++;
-			//	test_value ++;
-			//	temp.Format(_T("%d"),test_value);
-			temp.Format(_T("%d"),m_Variable_data.at(m_graphic_refresh_data.at(i).value_item).value);
-		}
+			if(m_graphic_refresh_data.at(i).value_type == 0)
+			{
+				//	test_value ++;
+				//	temp.Format(_T("%d"),test_value);
+				temp.Format(_T("%d"),m_Input_data.at(m_graphic_refresh_data.at(i).value_item).value);
+			}
+			else if(m_graphic_refresh_data.at(i).value_type == 1)
+			{
+				//test_value ++;
+				//	test_value ++;
+				//	temp.Format(_T("%d"),test_value);
+				temp.Format(_T("%d"),m_Output_data.at(m_graphic_refresh_data.at(i).value_item).value);
+			}
+			else if(m_graphic_refresh_data.at(i).value_type == 2)
+			{
+				//	test_value ++;
+				//	test_value ++;
+				//	test_value ++;
+				//	temp.Format(_T("%d"),test_value);
+				temp.Format(_T("%d"),m_Variable_data.at(m_graphic_refresh_data.at(i).value_item).value);
+			}
 
-		m_graphic_refresh_data.at(i).control_pt->m_strValueText = temp;	//在Label上 设置显示的 值;
+			m_graphic_refresh_data.at(i).control_pt->m_strValueText = temp;	//在Label上 设置显示的 值;
 #endif
-		m_graphic_refresh_data.at(i).control_pt->Invalidate();
-		//	m_graphic_refresh_data.at(i).control_pt->i
+			m_graphic_refresh_data.at(i).control_pt->Invalidate();
+			//	m_graphic_refresh_data.at(i).control_pt->i
+		}
 	}
-
 	CDialogEx::OnTimer(nIDEvent);
 }

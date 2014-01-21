@@ -1845,6 +1845,7 @@ bool bac_monitor_read_results;
 bool bac_programcode_read_results;
 bool bac_weeklycode_read_results;
 bool bac_annualcode_read_results;
+bool bac_alarmlog_read_results;
 
 bool bac_cm5_graphic;
 int bac_gloab_panel;
@@ -1871,6 +1872,8 @@ HWND      m_controller_dlg_hwnd;
 HWND      m_screen_dlg_hwnd;
 HWND		m_screenedit_dlg_hwnd;
 HWND	  m_monitor_dlg_hwnd;
+HWND	  m_alarmlog_dlg_hwnd;
+HWND      m_alarmwindow_dlg_hwnd;
 vector <Str_out_point> m_Output_data;
 vector <Str_in_point>  m_Input_data;
 vector <Str_program_point>  m_Program_data;
@@ -1884,6 +1887,7 @@ vector <Str_monitor_point> m_monitor_data;
 vector <_Com_Scan_Read_Info> m_bac_scan_resend_data;
 vector <_Bac_Scan_Com_Info> m_bac_scan_com_data;
 vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
+vector <Alarm_point> m_alarmlog_data;
 
 Monitor_Block m_monitor_block;
 int Monitor_Input__Data[14][1000];	
@@ -1923,4 +1927,6 @@ unsigned char my_ip[4];
 int connect_invoke_id = -1;
 bool connect_replay = false;
 BACNET_OBJECT_PROPERTY_VALUE receive_object_value;  /* for bacapp printing */
+bool bac_show_alarm_window = false;	//used for judge whether need to show the alarm window.
+bool bac_select_device_online = false; //判断选中的bacnet device 是否在线;
 #pragma endregion For_bacnet
