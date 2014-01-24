@@ -55,4 +55,5 @@ public:
 	afx_msg void OnEnKillfocusTextedit();
 	afx_msg void OnEnSetfocusTextedit();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnBnClickedArd();
 };

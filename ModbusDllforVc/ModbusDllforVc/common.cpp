@@ -6685,3 +6685,572 @@ OUTPUT int write_multi_tap(TS_UC device_var,TS_UC *to_write,TS_US start_address,
 	}
 	return -1;
 }
+
+
+
+
+OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int NET_COM)
+{	CString strlog;	
+    
+    
+	if(bComm_Type==0)
+	{
+		//the second time
+		//val         the value that you want to write to the register
+		//the return value == -1 ,no connecting
+		//the return value == -2 ,try it again
+		//the return value == -3,Maybe that have more than 2 Tstat is connecting
+		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
+		//the return value == -5 ,the input have some trouble
+		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
+		//清空串口缓冲区
+		//the return value is the register address
+		strlog.Format(_T("Com Scan:  From ID=%d To ID=%d"),devLo,devHi);
+		WriteLogFile(strlog);
+
+		if(devLo<1 || devHi>254)
+			return -5;
+		//the input inspect
+		for(int i=0;i<13;i++)
+			gval[i]=0;/////////////////////////////////////////clear buffer
+		TS_UC  pval[6];
+		TS_US crc;
+		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		pval[0] = 255;											
+		pval[1] = 25;  //put comments here,
+		pval[2] = devHi;
+		pval[3] = devLo;
+		crc = CRC16(pval,4);
+		pval[4] = (crc >>8) & 0xff;
+		pval[5] = crc & 0xff;
+		if(m_hSerial==NULL)
+		{			
+			return -1;
+		}
+		////////////////////////////////////////////////////////////overlapped declare
+		memset(&m_osWrite, 0, sizeof(OVERLAPPED));
+		if((m_osWrite.hEvent = CreateEvent(NULL,true,false,_T("Write")))==NULL)
+			return -2; 
+		m_osWrite.Offset = 0;
+		m_osWrite.OffsetHigh = 0 ;
+		////////////////////////////////////////////////clear com error
+		COMSTAT ComStat;
+		DWORD dwErrorFlags;
+
+		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
+		PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear buffer
+		int fState=WriteFile(m_hSerial,// 句柄
+			pval,// 数据缓冲区地址
+			6,// 数据大小
+			&m_had_send_data_number,// 返回发送出去的字节数
+			&m_osWrite);
+		if(!fState)// 不支持重叠	
+		{
+			if(GetLastError()==ERROR_IO_PENDING)
+			{
+				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
+				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+				//			if(GetLastError()==ERROR_IO_INCOMPLETE)
+				//				AfxMessageBox("wrong1");
+			}
+			else
+				m_had_send_data_number=0;
+		}
+
+		//	TRACE("%d T:%x %x %x %x %x %x\n",ddd,pval[0],pval[1],pval[2],pval[3],pval[4],pval[5]);
+		//CloseHandle(m_osWrite.hEvent);
+		///////////////////////////up is write
+		Sleep(LATENCY_TIME_COM);//because that scan have a delay lower 75ms
+		/////////////**************down is read
+		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
+		memset(&m_osRead, 0, sizeof(OVERLAPPED));
+		if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+			return -2; 
+		m_osRead.Offset = 0;
+		m_osRead.OffsetHigh = 0;
+		////////////////////////////////////////////////clear com error
+		fState=ReadFile(m_hSerial,// 句柄
+			gval,// 数据缓冲区地址
+			13,// 数据大小
+			&m_had_send_data_number,// 返回发送出去的字节数
+			&m_osRead);
+		if(!fState)// 不支持重叠	
+		{
+			if(GetLastError()==ERROR_IO_PENDING)
+			{
+				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
+				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+			}
+			else
+				m_had_send_data_number=0;
+		}
+		 
+		  
+
+		WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
+		CString filelog;
+		filelog=_T("Send a scan command to any devices: ");
+		
+		 
+
+		for (int i = 0; i < 6; i++)
+		{
+			int nValue = pval[i];
+			CString strValue;
+			strValue.Format(_T("%0X, "), nValue);
+			//g_fileScanLog->WriteString(strValue);
+			filelog+=strValue;
+		}
+		 
+		WriteLogFile(filelog);
+		filelog.Empty();
+		filelog=_T("Recv Data : ");
+		for (int i = 0; i < 13; i++)
+		{
+			int nValue = gval[i];
+			CString strValue;
+			strValue.Format(_T("%0X, "), nValue);
+			//g_fileScanLog->WriteString(strValue);
+			filelog+=strValue;
+		}
+		
+		WriteLogFile(filelog);
+		int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
+		if(index==-1)
+		{
+			WriteLogFile(_T(">>More than one device answer......"));
+		}
+		else
+		{
+			WriteLogFile(_T(">>No one device answer......"));
+		}
+
+
+
+		if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
+		{//old scan protocal
+			old_or_new_scan_protocal_in_dll=2;
+			if(gval[0]==0 && gval[1]==0 && gval[2]==0 && gval[3]==0 && gval[4]==0)
+			{
+				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				return -4;              //no response ,no connection
+
+			
+			}
+			// added by zgq; find this situation: t3000 can find a comport, 
+			//which don't connect a tstat, but write file to the com, will receive the same data with send, 
+			// infact the com port don't work fine. But it never give you a wrong data.
+			if(gval[0]==pval[0] && gval[1]==pval[1] && gval[2]==pval[2] && gval[3]==pval[3] && gval[4]==pval[4] && gval[5]==pval[5])
+			{
+
+			
+				Sleep(SLEEP_TIME);
+				return -4;    
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			if(gval[5]!=0 || gval[6]!=0)//to inspect
+			{
+				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				return -3;
+			}
+			if((gval[0]!=pval[0]) || (gval[1]!=25))
+			{
+				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				return -2;
+			}
+			crc=CRC16(gval,3);
+			if( (gval[3]!=((crc>>8) & 0xff)) || (gval[4]!=(crc & 0xff)))
+			{
+				Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				return -2;
+			}
+		}
+		else
+		{// new scan protocal,if many old tstat ,get into here ,scan result is oK too.
+			old_or_new_scan_protocal_in_dll=1;
+			Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+			if(gval[9]!=0 || gval[10]!=0 || gval[11]!=0 || gval[12]!=0)//to inspect
+				return -3;
+			if((gval[0]!=pval[0]) || (gval[1]!=25))
+				return -2;
+			crc=CRC16(gval,7);
+			if( gval[7]!=((crc>>8) & 0xff) )
+				return -2;
+			if(gval[8]!=(crc & 0xff))
+				return -2;
+		}
+		//here is different with CheckTstatOnline() function
+		//	TRACE("%d R:%x %x %x %x %x %x %x %x %x %x %x %x %x\n",ddd,gval[0],gval[1],gval[2],gval[3],gval[4],gval[5],gval[6],gval[7],gval[8],gval[9],gval[10],gval[11],gval[12]);
+		//	TRACE("%d ^-^ ^-^ %d^\n",ddd,gval[2]);
+		/*
+		if(default_file.Open(_T(saved_path.GetString()),CFile::modeCreate | CFile::modeWrite | CFile::modeNoTruncate)!=0)
+		{
+		default_file.SeekToEnd();
+		a_line.Format("exist:%d",gval[2]);
+		default_file.WriteString(a_line+"\n");
+		default_file.Flush();
+		default_file.Close();
+		}*/
+		return gval[2];
+	}
+
+	if(bComm_Type==1)
+	{
+		//the second time
+		//val         the value that you want to write to the register
+		//the return value == -1 ,no connecting
+		//the return value == -2 ,try it again
+		//the return value == -3,Maybe that have more than 2 Tstat is connecting
+		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
+		//the return value == -5 ,the input have some trouble
+		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
+		//清空串口缓冲区
+		//the return value is the register address
+		strlog.Format(_T("MINIPannel NET Scan:  From ID=%d To ID=%d"),devLo,devHi);
+		NET_WriteLogFile(strlog);
+		if(devLo<1 || devHi>254)
+			return -5;
+		//the input inspect
+		for(int i=0;i<13;i++)
+			gval[i]=0;/////////////////////////////////////////clear buffer
+
+		TS_UC  pval[11];
+//		TS_US crc;
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		pval[0]=1;
+		pval[1]=2;
+		pval[2]=3;
+		pval[3]=4;
+		pval[4]=5;
+		pval[5]=6;
+
+		pval[6] = 255;
+		pval[7] = 24;
+		pval[8] = devHi;
+		pval[9] = devLo;
+		pval[10] =NET_COM ;
+		
+		/*
+		crc = CRC16(pval,4);
+		pval[4] = (crc >>8) & 0xff;
+		pval[5] = crc & 0xff;
+		*/
+
+		if (m_hSocket==INVALID_SOCKET)
+		{			
+			return -1;
+		}
+		int nRet =::send(m_hSocket,(char*)pval,sizeof(pval),0);//scan 扫MINI Pannel中的TSTAT
+
+		//Sleep(SLEEP_TIME+8);
+		Sleep(LATENCY_TIME_NET+100);
+// 		TS_UC  rvData[19];
+// 		for(int i=0;i<19;i++)
+// 			rvData[i]=0;
+
+		TS_UC  rvData[100];
+		for(int i=0;i<100;i++)
+			rvData[i]=0;
+
+
+		int nRecv = ::recv(m_hSocket, (char*)rvData, sizeof(rvData), 0);
+		if (nRecv>0)
+		{
+			memcpy(gval,(void*)&rvData[6],sizeof(rvData));
+		}
+
+//		static int num = 0;
+		NET_WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
+		CString filelog;
+		filelog=_T("Send a scan command to any devices: ");
+	 
+
+		for (int i = 6; i <= 10; i++)
+		{
+			int nValue = pval[i];
+			CString strValue;
+			strValue.Format(_T("%0X, "), nValue);
+			//g_fileScanLog->WriteString(strValue);
+			filelog+=strValue;
+		}
+		 
+		NET_WriteLogFile(filelog);
+		filelog.Empty();
+		 
+		filelog=_T("Recv Data : ");
+		for (int i = 0; i <13; i++)
+		{
+			int nValue = gval[i];
+			CString strValue;
+			strValue.Format(_T("%0X, "), nValue);
+			//g_fileScanLog->WriteString(strValue);
+			filelog+=strValue;
+		}
+		//NET_WriteLogFile(_T("Recv Data:"));
+		NET_WriteLogFile(filelog);
+		int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
+		if(index==-1)
+		{
+			WriteLogFile(_T(">>More than one device answer......"));
+		}
+		else
+		{
+			WriteLogFile(_T(">>No one device answer......"));
+		}
+
+//		if (g_fileScanLog == NULL)
+//		{
+//			g_fileScanLog = new CStdioFile;
+//		}
+//
+//	if (g_fileScanLog != NULL)
+//		{
+//			TCHAR exeFullPath[MAX_PATH+1]; //
+//			GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
+//			(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
+//
+//			CString g_strExePth=exeFullPath;
+//			m_strFileINI = g_strExePth + _T("ScanLog.TXT");
+//			if(g_fileScanLog->Open(m_strFileINI.GetString(),CFile::modeReadWrite))
+//			{
+//#if 1
+//                g_fileScanLog->SeekToEnd();
+//				CString strsend,strreceive;
+//				strsend = _T("Send Data:");
+//				strreceive = _T("Receive Data:");
+//				g_fileScanLog->WriteString(strsend+_T("\n"));
+//
+//				CString str;
+//				int idate;
+//				//str.Format(_T("%"),pval);
+//				//m_pFile->WriteString(str+_T("\n"));
+//				for (int i =0;i<sizeof(pval);i++)
+//				{
+//					idate =(int)pval[i];
+//					str.Format(_T("%0x"),idate);
+//
+//					g_fileScanLog->WriteString(str+_T(" "));	
+//
+//				}
+//
+//				g_fileScanLog->WriteString(_T("\n"));	
+//				g_fileScanLog->WriteString(strreceive+_T("\n"));//↑
+//				for (int i =0;i<sizeof(rvData);i++)
+//				{
+//					idate =(int)rvData[i];
+//					str.Format(_T("%0x"),idate);
+//					g_fileScanLog->WriteString(str+_T(" "));	
+//				}
+//
+//
+//
+//				g_fileScanLog->WriteString(_T("\n"));
+//#endif
+//				
+//				
+//				g_fileScanLog->Close();
+//			}
+//		    else
+//			{
+//			 //-----
+//			}
+//
+//
+//		}
+        
+
+	
+
+
+
+
+
+		//if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)//// it's old code, modified by zgq:2011-12-14
+		if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0 && gval[3]==0 &&gval[4]==0 &&gval[5]==0 &&gval[6]==0)
+		{//old scan protocal
+ 			old_or_new_scan_protocal_in_dll=2;
+			if(gval[0]==0 && gval[1]==0 && gval[2]==0 && gval[3]==0 && gval[4]==0)
+			{
+				Sleep(SLEEP_TIME+8);//be must ,if not use this ,will found some trouble
+				return -4;              //no response ,no connection
+			}
+			if(gval[5]!=0 || gval[6]!=0)//to inspect
+			{
+				Sleep(SLEEP_TIME+8);//be must ,if not use this ,will found some trouble
+				return -3;
+			}
+			if((gval[0]!=255) || (gval[1]!=25))
+			{
+				//		Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				return -2;
+			} 
+			/*
+			crc=CRC16(gval,3);
+			if( (gval[3]!=((crc>>8) & 0xff)) || (gval[4]!=(crc & 0xff)))
+			{
+				//		Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+				return -2;
+			}
+			*/
+
+		}
+		else
+		{// new scan protocal,if many old tstat ,get into here ,scan result is oK too.
+			old_or_new_scan_protocal_in_dll=1;
+			Sleep(SLEEP_TIME);//be must ,if not use this ,will found some trouble
+
+				
+			//if(gval[7]!=0 || gval[8]!=0 || gval[9]!=0 || gval[10]!=0)//to inspect
+			if(gval[9]!=0 || gval[10]!=0 || gval[11]!=0 || gval[12]!=0)//to inspect  //zgq: same with com port scan
+			{
+				//Sleep(SLEEP_TIME+8);
+				return -3;
+
+			}
+				
+			if((gval[0]!=255) || (gval[1]!=25))
+				return -2;
+
+			/*
+			if (gval[0]==0&&gval[0]==0&&gval[0]==0)
+			{
+				return -3;
+			}
+			*/
+
+			/*
+			crc=CRC16(gval,7);
+			if( gval[7]!=((crc>>8) & 0xff) )
+				return -2;
+			if(gval[8]!=(crc & 0xff))
+				return -2;
+				*/
+		}
+		return gval[2];
+	}
+	return -1;
+}
+
+OUTPUT int MINI_CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int NET_COM)
+{	
+	if(bComm_Type==0)
+	{
+		//val         the value that you want to write to the register
+		//the return value == -1 ,no connecting
+		//the return value == -2 ,try it again
+		//the return value == -3,Maybe that have more than 2 Tstat is connecting
+		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
+		//the return value == -5 ,the input have some trouble
+		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
+		//清空串口缓冲区
+		//the return value is the register address
+		//Sleep(50);       //must use this function to slow computer
+		if(devLo<1 || devHi>254)
+			return -5;
+		if(m_hSerial==NULL)
+		{			
+			return -1;
+		}
+		int the_return_value;
+		int the_return_value2=0;
+		//CheckTstatOnline2_a 可以记录收发的数据
+		the_return_value=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type);
+		//down is inspect result first scan
+		if(the_return_value==-4)
+		{
+			the_return_value=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type);
+			return the_return_value;
+		}
+		if(old_or_new_scan_protocal_in_dll==1)
+		{//new protocal		
+			if(the_return_value>0)
+			{
+				the_return_value2=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type);
+				if(the_return_value2!=-4)
+					the_return_value=the_return_value2;
+			}
+			return the_return_value;
+		}  
+		else if(old_or_new_scan_protocal_in_dll==2)
+		{//old protocal
+			if(the_return_value==-2 || the_return_value==-3 || the_return_value==-4)
+				return the_return_value;
+			int i=0;
+			do{
+				the_return_value=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type);
+				if(the_return_value==-3 || the_return_value==-2 || the_return_value==-4)
+					return the_return_value;
+				else if(the_return_value>0)
+					i++;
+			}while(i<3);
+			return the_return_value;
+		}
+		//	if(the_return_value>0)
+		//		TRACE("^-^ ^-^ %d\n",the_return_value);
+		return the_return_value;
+	}
+
+	if(bComm_Type==1)//
+	{
+		//val         the value that you want to write to the register
+		//the return value == -1 ,no connecting
+		//the return value == -2 ,try it again
+		//the return value == -3,Maybe that have more than 2 Tstat is connecting
+		//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
+		//the return value == -5 ,the input have some trouble
+		//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
+		//清空串口缓冲区
+		//the return value is the register address
+		//Sleep(50);       //must use this function to slow computer
+		if(devLo<1 || devHi>254)
+			return -5;
+		if (m_hSocket==INVALID_SOCKET)
+		{			
+			return -1;
+		}
+		int the_return_value;
+		int the_return_value2=0;
+		the_return_value=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type,NET_COM);
+		//down is inspect result first scan
+		if(the_return_value==-4)
+		{
+			the_return_value=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type,NET_COM);
+			return the_return_value;
+		}
+		if(old_or_new_scan_protocal_in_dll==1)
+		{//new protocal		
+			if(the_return_value>0)
+			{
+				the_return_value2=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type,NET_COM);
+				if(the_return_value2!=-4)
+					the_return_value=the_return_value2;
+			}
+			return the_return_value;
+		}
+		else if(old_or_new_scan_protocal_in_dll==2)
+		{//old protocal
+// 			if(the_return_value==-2 || the_return_value==-3 || the_return_value==-4)
+// 				return the_return_value;
+// 			int i=0;
+// 			do{
+// 				the_return_value=CheckTstatOnline2(devLo,devHi, bComm_Type);
+// 				if(the_return_value==-3 || the_return_value==-2 || the_return_value==-4)
+// 					return the_return_value;
+// 				else if(the_return_value>0)
+// 					i++;
+// 			}while(i<3);
+			if(the_return_value>0)
+			{
+				the_return_value2=MINI_CheckTstatOnline2_a(devLo,devHi, bComm_Type,NET_COM);
+				if(the_return_value2!=-4)
+					the_return_value=the_return_value2;
+			}
+			return the_return_value;
+		}
+		//	if(the_return_value>0)
+		//		TRACE("^-^ ^-^ %d\n",the_return_value);
+		return the_return_value;
+	}
+	return -1; 
+}

@@ -3166,4 +3166,184 @@ bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
 	return TRUE;
 }
 
+#define MAX_STRING	100	// should be enough for everone (-:
 
+//********************************************************
+//*	FUNCTION: CheckForUpdate
+//*
+//*	DESCRIPTION:
+//*		Connects to the specified Ftp server, and looks
+//*		for the specified file (szFtpFilename) and reads
+//*		just one string from it. Compares the string with
+//*		the szCurrentVersion and if there is a difference,
+//*		assumes there is a new app version.
+//*
+//* PARAMS:
+//*		szFtpServer:	FTP server to access
+//*		szFtpUsername:	FTP account name
+//*		szFtpPassword:	appropriate password
+//*		szFtpFilename:	FTP file which holds the
+//*						version info
+//*		szCurrentVersion:	version of the app calling
+//*							this function
+//*		szLastVersion:	version retrieved from FTP
+//*						valid only if no error occurs
+//*
+//*	ASSUMES:
+//*		Existance of a valid internet connection.
+//*		AfxSocketInit() has already been called.
+//*		Brains (optional).
+//*
+//*	RETURNS:
+//*		TRUE only if new version is found
+//*		FALSE if there was an error OR no new version
+//*
+//*	AUTHOR: T1TAN <t1tan@cmar-net.org>
+//*
+//*	COPYRIGHT:	Copyleft (C) T1TAN 2004 - 3827
+//*				Copyleft (C) SprdSoft Inc. 2004 - 3827
+//*				FREE for (ab)use in any form.
+//*				(Leave the headers be)
+//*
+//*	VERSIONS:
+//*		VERSION	AUTHOR	DATE		NOTES
+//*		-------	------	----------	------------------
+//*		1.0		T1TAN	07/05/2004	initial version
+//********************************************************
+
+BOOL CheckForUpdate(
+		LPCTSTR szFtpServer,
+		LPCTSTR szFtpUsername,
+		LPCTSTR szFtpPassword,
+		LPCTSTR szFtpFilename,
+		LPCTSTR szCurrentVersion,
+		LPTSTR szLastVersion )
+{
+	CWaitCursor wait;
+	// zero the last anyway..
+	ZeroMemory( szLastVersion, sizeof(szLastVersion) );
+	// get a session
+	CInternetSession* pFtpSession = new CInternetSession();
+	CFtpConnection* pFtpConnection = NULL;
+
+	if ( pFtpSession == NULL )
+	{	// DAMN!
+		MessageBox( GetDesktopWindow(),
+			_T("Could not get internet session."),
+			_T("Error"), MB_OK|MB_ICONSTOP );
+		return FALSE;
+	}
+
+	try {
+		pFtpConnection = pFtpSession->GetFtpConnection
+			( szFtpServer, szFtpUsername, szFtpPassword,21);
+	}
+	catch ( CInternetException *err )
+	{	// no luck today...
+		err->ReportError( MB_OK|MB_ICONSTOP );
+		err->Delete();
+	}
+
+	if ( pFtpConnection == NULL )
+	{	// DAMN AGAIN!!
+		// cleanup
+		pFtpSession->Close();
+		delete pFtpSession;
+		return FALSE;
+	}
+
+	CFtpFileFind ffind( pFtpConnection );
+
+	BOOL isFound = ffind.FindFile( szFtpFilename );
+
+	if ( isFound == FALSE )
+	{	// CRAP!! WHERE IS OUR FILE?!?!
+		ffind.Close();
+		pFtpConnection->Close();
+		pFtpSession->Close();
+		delete pFtpConnection;
+		delete pFtpSession;
+		MessageBox( GetDesktopWindow(),
+			_T("Could not get version information."),
+			_T("Error"), MB_OK|MB_ICONSTOP );
+		return FALSE;
+	}
+	CString versionfilename=g_strExePth+_T("version.txt");
+
+	BOOL bResult = pFtpConnection->GetFile
+		( szFtpFilename, versionfilename, FALSE );
+
+	if ( bResult == 0 )
+	{	// DAMN ERRORS
+		ffind.Close();
+		pFtpConnection->Close();
+		pFtpSession->Close();
+		delete pFtpConnection;
+		delete pFtpSession;
+		MessageBox( GetDesktopWindow(),
+			_T("Could not get version information."),
+			_T("Error"), MB_OK|MB_ICONSTOP );
+		return FALSE;
+	}
+
+	CStdioFile verFile;
+	//CFile verFile;
+	CFileException error;
+
+	bResult = verFile.Open( versionfilename,
+		CFile::modeRead, &error );
+
+	if ( bResult == 0 )
+	{	// WHATTA HECK?!?
+		ffind.Close();
+		pFtpConnection->Close();
+		pFtpSession->Close();
+		delete pFtpConnection;
+		delete pFtpSession;
+		MessageBox( GetDesktopWindow(),
+			_T("Error opening local file."),
+			_T("Error"), MB_OK|MB_ICONSTOP );
+		// just in case...
+		DeleteFile(versionfilename);
+		return FALSE;
+	}
+	//verFile.SeekToBegin();
+	TCHAR buffer[MAX_STRING];
+	ZeroMemory( buffer, sizeof(buffer) );
+	//verFile.Read( buffer, MAX_STRING );
+	CString The_CurentVersion;
+	verFile.ReadString(The_CurentVersion);
+	//buffer=The_CurentVersion.GetBuffer()
+	//if ( _tcscmp( buffer, szCurrentVersion ) != 0 )
+	//{	// new version available!
+	//	_tcscpy( szLastVersion, buffer );
+	//	// cleanup..
+	//	// (i am sometimes impressed with comments
+	//	// like this one.. "cleanup.." OH REALLY,
+	//	// and i thought it's an airplane!!)
+	//	verFile.Close();
+	//	ffind.Close();
+	//	pFtpConnection->Close();
+	//	pFtpSession->Close();
+	//	delete pFtpConnection;
+	//	delete pFtpSession;
+
+	//	//DeleteFile( versionfilename );
+	//	// ok..
+	//	return TRUE;
+	//}
+
+	// obviously nothing new here...
+	// copy the current version to last version
+	// so that the caller knows no error occured
+	_tcscpy( szLastVersion, The_CurentVersion.GetBuffer() );
+	// cleanup.. (again...)
+	verFile.Close();
+	ffind.Close();
+	pFtpConnection->Close();
+	pFtpSession->Close();
+	delete pFtpConnection;
+	delete pFtpSession;
+	//DeleteFile( versionfilename );
+	return TRUE;
+}

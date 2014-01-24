@@ -63,13 +63,10 @@ END_MESSAGE_MAP()
 BOOL CRegisterViewerDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-//	m_registerlistGrid.put_BackColorSel(SINGLE_CLICKED);
 	Fresh_GridCol();
 	LoadDataFromDB();
 	m_curPage=1;
 	Show_ColorData();
-
-	
 	GetDlgItem(IDC_STATIC_PRODUCTNAME)->ShowWindow(FALSE);
 	GetDlgItem(IDC_EDIT_PRODUCTNAME)->ShowWindow(FALSE);
 	GetDlgItem(IDC_SAVETODB)->ShowWindow(FALSE);
@@ -86,111 +83,289 @@ BOOL CRegisterViewerDlg::OnInitDialog()
 }
 
 void CRegisterViewerDlg::LoadDataFromDB()
-{_variant_t temp_var;
-	CADO ado;
-	ado.OnInitADOConn();
-	if (ado.IsHaveTable(ado,_T("T3000_Register_Address_By_ID")))
-	{  
-		CString sql,temp;
-		DBRegister tempstruct;
-		sql.Format(_T("Select * from T3000_Register_Address_By_ID order by Register_Address"));
-		ado.m_pRecordset=ado.OpenRecordset(sql);
-		 
-		 
-		
-		while (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
-		{
-		    if (product_type==T3000_5ABCDFG_LED_ADDRESS)
-		    {
-				tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
-				tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_AddressName"));
-				tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DATATYPE"));
-				tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_LEN"));
-				temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DESCRIPTION"));
-				if (temp_var.vt==VT_NULL)
-				{
-				tempstruct.Description=_T("");
-				} 
-				else
-				{
-				tempstruct.Description=temp_var;
-				}
-				temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_Operation"));
-				if (temp_var.vt==VT_NULL)
-				{
-					tempstruct.Description=_T("");
-				} 
-				else
-				{
-					tempstruct.Operation=temp_var;
-				}
-			/*	tempstruct.Description=(CString)ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DESCRIPTION"));*/
-				 
-		    } 
-		    else if (product_type==T3000_5EH_LCD_ADDRESS)
-		    {
-			    _variant_t vartemp;
-				tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
-				tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_AddressName"));
-				tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DATATYPE"));
-				tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_LEN"));
-				//tempstruct.Description=(CString)ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DESCRIPTION"));
-				 vartemp=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DESCRIPTION"));
-				if (vartemp.vt==VT_NULL)
-				{
-				tempstruct.Description=_T("");
-				} 
-				else
-				{
-				tempstruct.Description=vartemp;
-				} 
-				temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_Operation"));
-				if (temp_var.vt==VT_NULL)
-				{
-					tempstruct.Description=_T("");
-				} 
-				else
-				{
-					tempstruct.Operation=temp_var;
-				}
-		    }
-			else if (product_type==T3000_6_ADDRESS)
-		    {
-				tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
-				tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT6_AddressName"));
-				tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT6_DATATYPE"));
-				tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT6_LEN"));
-				temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_DESCRIPTION")); 
-				 if (temp_var.vt==VT_NULL)
-				 {
-				  tempstruct.Description=_T("");
-				 } 
-				 else
-				 {
-				 tempstruct.Description=temp_var;
-				 }
-				 temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_Operation"));
-				 if (temp_var.vt==VT_NULL)
-				 {
-					 tempstruct.Description=_T("");
-				 } 
-				 else
-				 {
-					 tempstruct.Operation=temp_var;
-				 }
-		    }
-			if (tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)
+{   CString ProductModelName =Get_ProductModel();
+	_variant_t temp_var;
+    if (ProductModelName.Find(_T("Tstat"))!=-1)//Tstat serial
+    {
+		CADO ado;
+		ado.OnInitADOConn();
+		if (ado.IsHaveTable(ado,_T("T3000_Register_Address_By_ID")))
+		{  
+			CString sql,temp;
+			DBRegister tempstruct;
+			sql.Format(_T("Select * from T3000_Register_Address_By_ID order by Register_Address"));
+			ado.m_pRecordset=ado.OpenRecordset(sql);
+
+
+
+			while (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
 			{
-			ado.m_pRecordset->MoveNext();
-			continue;
+				if (product_type==T3000_5ABCDFG_LED_ADDRESS)
+				{
+					tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
+					tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_AddressName"));
+					tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DATATYPE"));
+					tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_LEN"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DESCRIPTION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Description=temp_var;
+					}
+					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_Operation"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Operation=temp_var;
+					}
+					/*	tempstruct.Description=(CString)ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DESCRIPTION"));*/
+
+				} 
+				else if (product_type==T3000_5EH_LCD_ADDRESS)
+				{
+					_variant_t vartemp;
+					tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
+					tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_AddressName"));
+					tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DATATYPE"));
+					tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_LEN"));
+					//tempstruct.Description=(CString)ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DESCRIPTION"));
+					vartemp=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DESCRIPTION"));
+					if (vartemp.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Description=vartemp;
+					} 
+					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_Operation"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Operation=temp_var;
+					}
+				}
+				else if (product_type==T3000_6_ADDRESS)
+				{
+					tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
+					tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT6_AddressName"));
+					tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT6_DATATYPE"));
+					tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT6_LEN"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_DESCRIPTION")); 
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Description=temp_var;
+					}
+					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_Operation"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Operation=temp_var;
+					}
+				}
+				if (tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)
+				{
+					ado.m_pRecordset->MoveNext();
+					continue;
+				}
+				m_VecregisterData.push_back(tempstruct);
+				m_recordcount++;
+				ado.m_pRecordset->MoveNext();
 			}
-			m_VecregisterData.push_back(tempstruct);
-			m_recordcount++;
-			ado.m_pRecordset->MoveNext();
+		} 
+		ado.CloseRecordset();
+		ado.CloseConn();
+    } 
+    else if (ProductModelName.Find(_T("T3"))!=-1)//T3 Serial
+    {
+		CADO ado;
+		ado.OnInitADOConn();
+		if (ado.IsHaveTable(ado,_T("T3_RegisterList")))
+		{
+			
+
+			CString sql,temp;
+			DBRegister tempstruct;
+			sql.Format(_T("Select * from T3_RegisterList order by RegID"));
+			ado.m_pRecordset=ado.OpenRecordset(sql);
+			if (m_modelno==PM_T38AIOD)
+			{
+				while(!ado.m_pRecordset->EndOfFile){
+					tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.AddressName=_T("");
+					} 
+					else
+					{
+						tempstruct.AddressName=temp_var;
+					}
+					if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
+					{
+						ado.m_pRecordset->MoveNext();
+						continue;
+					}
+					tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_DATATYPE"));
+					tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_LEN"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_DESCRIPTION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Description=temp_var;
+					}
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_OPERATION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Operation=temp_var;
+					}
+					m_VecregisterData.push_back(tempstruct);
+					m_recordcount++;
+					ado.m_pRecordset->MoveNext();
+				}
+
+
+
+			} 
+			else if (m_modelno==PM_T38AIOD)
+			{
+			while(!ado.m_pRecordset->EndOfFile){
+				tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
+				temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI16O"));
+				if (temp_var.vt==VT_NULL)
+				{
+					tempstruct.AddressName=_T("");
+				} 
+				else
+				{
+					tempstruct.AddressName=temp_var;
+				}
+				if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
+				{
+					ado.m_pRecordset->MoveNext();
+					continue;
+				}
+				tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_DATATYPE"));
+				tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_LEN"));
+				temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_DESCRIPTION"));
+				if (temp_var.vt==VT_NULL)
+				{
+					tempstruct.Description=_T("");
+				} 
+				else
+				{
+					tempstruct.Description=temp_var;
+				}
+				temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_OPERATION"));
+				if (temp_var.vt==VT_NULL)
+				{
+					tempstruct.Description=_T("");
+				} 
+				else
+				{
+					tempstruct.Operation=temp_var;
+				}
+				m_VecregisterData.push_back(tempstruct);
+				m_recordcount++;
+				ado.m_pRecordset->MoveNext();
+			}	
+			}
+			else if (m_modelno==PM_T3IOA)
+			{
+			}
+			else if (m_modelno==PM_T332AI)
+			{
+			}
+			else if (m_modelno==PM_T3AI16O)
+			{
+			}
+			else if (m_modelno==PM_T3PERFORMANCE)
+			{
+			}
+			else if (m_modelno==PM_T34AO)
+			{
+			while(!ado.m_pRecordset->EndOfFile){
+				tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
+				temp_var=ado.m_pRecordset->GetCollect(_T("T3-4AO"));
+				if (temp_var.vt==VT_NULL)
+				{
+					tempstruct.AddressName=_T("");
+				} 
+				else
+				{
+					tempstruct.AddressName=temp_var;
+				}
+				if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
+				{
+					ado.m_pRecordset->MoveNext();
+					continue;
+				}
+				tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-4AO_DATATYPE"));
+				tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-4AO_LEN"));
+				temp_var=ado.m_pRecordset->GetCollect(_T("T3-4AO_DESCRIPTION"));
+				if (temp_var.vt==VT_NULL)
+				{
+					tempstruct.Description=_T("");
+				} 
+				else
+				{
+					tempstruct.Description=temp_var;
+				}
+				temp_var=ado.m_pRecordset->GetCollect(_T("T3-4AO_OPERATION"));
+				if (temp_var.vt==VT_NULL)
+				{
+					tempstruct.Description=_T("");
+				} 
+				else
+				{
+					tempstruct.Operation=temp_var;
+				}
+				m_VecregisterData.push_back(tempstruct);
+				m_recordcount++;
+				ado.m_pRecordset->MoveNext();
+
+			}
+			}
+			else if (m_modelno==PM_T36CT)
+			{
+			}
+
+
+
+
+			
 		}
-	} 
-	ado.CloseRecordset();
-	ado.CloseConn();
+		ado.CloseRecordset();
+		ado.CloseConn();
+    }
+	else
+    {
+    }
+
+
 	CString temp;
 	m_Datapages=(m_recordcount/ROWS)+1;
 	temp.Format(_T("Product Name"));
@@ -199,6 +374,7 @@ void CRegisterViewerDlg::LoadDataFromDB()
 	GetDlgItem(IDC_PRODUCTNAME_T)->SetWindowText(GetProductName(product_register_value[7]));
 	temp.Format(_T("%d/%d"),m_curPage,m_Datapages);
 	GetDlgItem(IDC_PAGES)->SetWindowText(temp);
+
 }
 void CRegisterViewerDlg::ShowCurPage(){
 CString temp;
@@ -802,4 +978,25 @@ void CRegisterViewerDlg::OnDestroy()
 	CDialog::OnDestroy();
 
 	// TODO: Add your message handler code here
+}
+
+CString CRegisterViewerDlg::Get_ProductModel(){
+CString ModelName=_T("");
+if (!is_connect())
+{
+AfxMessageBox(_T("Please Connect to your device,firstly!"));
+} 
+else
+{
+	  m_modelno=read_one(g_tstat_id,7,20);
+	if (m_modelno>0)
+	{
+		ModelName=GetProductName(m_modelno);
+	} 
+	else
+	{
+	   AfxMessageBox(_T("Can't read your device"));
+	}
+}
+return ModelName;
 }

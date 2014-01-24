@@ -209,6 +209,9 @@
 #define IDD_DIALOG_BACNET_TOOL          583
 #define IDB_BITMAP_TMCO_LOGO            584
 #define IDD_DIALOG_BACNET_TOOL_READ_PRP 585
+
+#define IDD_PARTS_VENDORS               586
+#define IDD_REMOTE_CONNECTION           587
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -1554,12 +1557,16 @@
 #define IDC_LIST_ALARMLOG               1823
 #define IDC_STATIC_BAC_ALARM            1824
 #define IDC_STATIC_RANGE_UNITE_SHOW     1825
+#define IDC_TAB1                        1826
+#define IDC_ARD                         1827
+#define IDC_PORT                        1828
 #define IDC_EDIT_PID2OFFSETPOINT2       2002
 #define IDC_EDIT_PID2OFFSETPOINT4       2003
 #define IDC_EDIT_PID2OFFSETPOINT3       2004
 #define IDC_EDIT_PID2OFFSETPOINT5       2005
 #define IDC_MAX_SUPPLY                  2006
 #define IDC_MIN_SUPPLY                  2007
+#define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
 #define ID_LOAD_CONFIG                  32776
 #define ID_FILE_LOADCONFIGFILE          32777
@@ -1571,12 +1578,16 @@
 #define ID_BUILDINGBAR                  32787
 #define ID_DATABASE_BUILDINGCONFIGDATABASE 32788
 #define ID_BUILDINGCONFIGDB             32789
+#define ID_ADD_SETACTIVEBUILDING        32790
 #define ID_SETACTIVEBUILDING            32791
 #define ID_VIEW_IOPANE                  32792
 #define ID_TOOLBARSANDDOCKINGWINDOWS_INPUTOUTPUTPANE 32792
 #define ID_INPUTOUTPUTPANE              32793
+#define ID_ANNUAL_ADD                   32794
+#define ID_ANNUAL_CLEAR                 32795
 #define ID_ANNUALROUT_ADD               32796
 #define ID_ANNUALROUT_CLEAR             32797
+#define ID_CONNECT32798                 32798
 #define ID_CONNECT_CONNECT              32799
 #define ID_CONNECT_INSERT               32800
 #define ID_DATABASE_ALLNODESDATABASE    32801
@@ -1591,6 +1602,8 @@
 #define ID_DELALLLABELS                 32811
 #define ID_CONNECTMENU_CONNECT          32812
 #define ID_CONNECTMENU_DISCONNECT       32813
+#define ID_BUTTON32814                  32814
+#define ID_BUTTON32815                  32815
 #define ID_DISCONNECT2                  32816
 #define ID_BUILDINGSEL_SELECT           32817
 #define ID_BUILDINGSEL_UNSLECT          32818
@@ -1621,6 +1634,8 @@
 #define ID_TOOL_CONNECT                 32848
 #define ID_TOOL_DISCONNECT              32849
 #define ID_DATABASE_TEMCOPRODUCTS       32850
+#define ID__INPUT                       32852
+#define ID__GROUP                       32853
 #define ID_SETMAPPING_GROUP             32854
 #define ID_SETMAPPING_INPUTOUTPUT       32855
 #define ID_Menu32856                    32856
@@ -1679,6 +1694,8 @@
 #define ID_CONTROL_A                    34018
 #define ID_CONTROL_ALARM_LOG            34019
 #define ID_DATABASE_BACNETTOOL          34905
+#define ID_Menu_CHECKUPDATE             34020
+#define ID_DATABASE_PV                  34021
 #define ID_CONFIGFILE_SAVE_AS           35000
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925

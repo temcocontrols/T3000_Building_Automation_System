@@ -447,6 +447,12 @@
     <ClCompile Include="RegisterWriteValueDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+      <ClCompile Include="PVDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ARDDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="BacnetTool.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
@@ -595,6 +601,10 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\Exit.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+<None Include="res\t3000.mdb" />
+    <None Include="res\Input.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\Input.ico">
@@ -1081,6 +1091,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetAlarmWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+      <ClInclude Include="PVDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ARDDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

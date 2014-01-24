@@ -57,7 +57,7 @@ void CCalibrationHumDlg::OnBnClickedOk()
 BOOL CCalibrationHumDlg::OnInitDialog(){
 if (is_connect())
 {
-  m_humid=read_one(255,6);
+  m_humid=read_one(255,6,7);
 }
 if (m_humid<0)
 {
@@ -77,7 +77,9 @@ return TRUE;
 void CCalibrationHumDlg::OnTimer(UINT_PTR nIDEvent){
 if (CALIBRATION_HUM==nIDEvent)
 {  if (!is_connect())
+    Sleep(1000);
     return;
+	Sleep(50);
    int hum=read_one(m_humid,373);
     if (hum>0)
     {

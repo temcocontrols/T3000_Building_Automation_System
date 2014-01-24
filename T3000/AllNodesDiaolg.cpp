@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "MainFrm.h"
 #include "AllNodesDiaolg.h"
-
+#include "ARDDlg.h"
 
 // CAllNodesDiaolg dialog
 #define AN_MAINNAME 1
@@ -60,6 +60,7 @@ BEGIN_MESSAGE_MAP(CAllNodesDiaolg, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO1, &CAllNodesDiaolg::OnCbnSelchangeCombo1)
 	ON_EN_KILLFOCUS(IDC_TEXTEDIT, &CAllNodesDiaolg::OnEnKillfocusTextedit)
 	ON_EN_SETFOCUS(IDC_TEXTEDIT, &CAllNodesDiaolg::OnEnSetfocusTextedit)
+	ON_BN_CLICKED(IDC_ARD, &CAllNodesDiaolg::OnBnClickedArd)
 END_MESSAGE_MAP()
 
 
@@ -467,6 +468,7 @@ void CAllNodesDiaolg::OnCbnSelchangeCombo1()
 		m_SubLstCombox.GetLBText(nIdext,strSelect);
 		m_strSubNetName=strSelect;
 		ReloadAddBuildingDB();
+        m_bChanged=TRUE;
 	}
 }
 
@@ -721,4 +723,16 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 	ReloadAddBuildingDB();
 
 
+}
+
+void CAllNodesDiaolg::OnBnClickedArd()
+{
+	 CARDDlg dlg;
+	if (dlg.DoModal()==IDOK)
+	{
+     OnInitDialog();
+     m_bChanged=TRUE;
+	} 
+	 
+	  
 }

@@ -129,6 +129,7 @@
     <ClCompile Include="AnnualRout_InsertDia.cpp" />
     <ClCompile Include="ApplyGraphicLabelsDlg.cpp" />
     <ClCompile Include="BacnetAlarmLog.cpp" />
+    <ClCompile Include="ARDDlg.cpp" />
     <ClCompile Include="BacnetAlarmWindow.cpp" />
     <ClCompile Include="BacnetAnnualRoutine.cpp" />
     <ClCompile Include="BacnetController.cpp" />
@@ -206,6 +207,7 @@
     <ClCompile Include="OutputSetDlg.cpp" />
     <ClCompile Include="OutsidDailog.cpp" />
     <ClCompile Include="ParameterDlg.cpp" />
+    <ClCompile Include="PVDlg.cpp" />
     <ClCompile Include="RefreshTreeThread.cpp" />
     <ClCompile Include="RegDetails.cpp" />
     <ClCompile Include="RegisterViewerDlg.cpp" />
@@ -327,6 +329,7 @@
   <ItemGroup>
     <ClInclude Include="AirflowSettingDlg.h" />
     <ClInclude Include="BacnetAlarmLog.h" />
+    <ClInclude Include="ARDDlg.h" />
     <ClInclude Include="BacnetAlarmWindow.h" />
     <ClInclude Include="BacnetInfo.h" />
     <ClInclude Include="BacnetInput.h" />
@@ -366,6 +369,7 @@
     <ClInclude Include="MbPoll.h" />
     <ClInclude Include="MbPollFunctions.h" />
     <ClInclude Include="MbPollOptions.h" />
+    <ClInclude Include="PVDlg.h" />
     <ClInclude Include="RegDetails.h" />
     <ClInclude Include="RegisterViewerDlg.h" />
     <ClInclude Include="RegisterWriteValueDlg.h" />

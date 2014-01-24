@@ -28,24 +28,26 @@ void LoadDataFromDB();
 void ShowCurPage();
 void Fresh_GridCol();
 void Write_GridCol();
+CString Get_ProductModel();
 public:
 	CMsflexgrid m_registerlistGrid;
 	CString m_oldname;
 	CWinThread* pParamBackFresh;
 	struct DBRegister 
 	{
-	   int Register_Address;
-	   CString AddressName;
-	   CString DataType;
-	   int length;
-	   CString Description;
-	   CString Operation;
+		int Register_Address;
+		CString AddressName;
+		CString DataType;
+		int length;
+		CString Description;
+		CString Operation;
 	};
 	vector<DBRegister> m_VecregisterData;
 	int m_recordcount;
 	int m_Datapages;
 	int m_curPage;
 	BOOL m_CanEdit;
+	int m_modelno;
 	afx_msg void OnBnClickedLeft();
 	afx_msg void OnBnClickedRight();
 	afx_msg void OnBnClickedBegin();

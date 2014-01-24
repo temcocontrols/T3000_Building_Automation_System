@@ -17,6 +17,14 @@
 #define ORANGE_COLOR RGB(255,165,0)
 
 #include "global_variable_extern.h"
+#include <afxinet.h>
+BOOL CheckForUpdate(
+	LPCTSTR szFtpServer,
+	LPCTSTR szFtpUsername,
+	LPCTSTR szFtpPassword,
+	LPCTSTR szFtpFilename,
+	LPCTSTR szCurrentVersion,
+	LPTSTR szLastVersion );
 
 void FLEX_GRID_PUT_STR(CMsflexgrid m_FlexGri,int row,int col,CString str);
 int Set_Communication_Count(bool b_transmission,int bac_instanceid);

@@ -59,6 +59,7 @@
 #include "BacnetScreenEdit.h"
 #include "LanguageLocale.h"
  #include "RegisterViewerDlg.h"
+ #include "PVDlg.h"
 #pragma region Fance Test
 //For Test
 
@@ -246,6 +247,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_WM_PAINT()
 	ON_COMMAND(ID_DATABASE_BACNETTOOL, &CMainFrame::OnDatabaseBacnettool)
 	ON_COMMAND(ID_CONTROL_ALARM_LOG, &CMainFrame::OnControlAlarmLog)
+		ON_COMMAND(ID_Menu_CHECKUPDATE, &CMainFrame::OnMenuCheckupdate)
+	ON_COMMAND(ID_DATABASE_PV, &CMainFrame::OnDatabasePv)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -493,12 +496,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	BOOL bNameValid;
 	// set the visual manager and style based on persisted value
 	OnApplicationLook(theApp.m_nAppLook);
- //	if (!m_wndMenuBar.Create(this))
-	//{
-	//	TRACE0("Failed to create menubar\n");
-	//	return -1;      // fail to create
-	//}
- //	m_wndMenuBar.SetPaneStyle(m_wndMenuBar.GetPaneStyle() | CBRS_SIZE_DYNAMIC | CBRS_TOOLTIPS | CBRS_FLYBY);
+ 	if (!m_wndMenuBar.Create(this))
+	{
+		TRACE0("Failed to create menubar\n");
+		return -1;      // fail to create
+	}
+ 	m_wndMenuBar.SetPaneStyle(m_wndMenuBar.GetPaneStyle() | CBRS_SIZE_DYNAMIC | CBRS_TOOLTIPS | CBRS_FLYBY);
 
 	// prevent the menu bar from taking the focus on activation
 
@@ -581,14 +584,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// TODO: Delete these five lines if you don't want the toolbar and menubar to be dockable
 		
 	
-	//m_wndMenuBar.EnableDocking(CBRS_ALIGN_ANY);
+	m_wndMenuBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndWorkSpace.EnableDocking(CBRS_ALIGN_LEFT);
 
 	
 	EnableDocking(CBRS_ALIGN_ANY);	
 	
-	//DockPane(&m_wndMenuBar);
+	DockPane(&m_wndMenuBar);
 	DockPane(&m_wndToolBar);
 	DockPane (&m_wndWorkSpace);
 	
@@ -609,7 +612,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	
 	m_wndStatusBar.SetPaneInfo(0,ID_RW_INFO,SBPS_NOBORDERS,   300);
    // int index = m_wndStatusBar.CommandToIndex(ID_BUILDING_INFO);	
-	m_wndStatusBar.SetPaneInfo(1,ID_BUILDING_INFO,SBPS_NOBORDERS, 300);//SBPS_POPOUT | SBPS_NOBORDERS,300);	
+	m_wndStatusBar.SetPaneInfo(1,ID_BUILDING_INFO,SBPS_NOBORDERS, 300);
+//  SBPS_POPOUT | SBPS_NOBORDERS,300);	
 //	index = m_wndStatusBar.CommandToIndex(ID_RW_INFO);
 //	m_wndStatusBar.SetPaneInfo(index,ID_PROTOCOL_INFO,SBPS_NOBORDERS,250);//SBPS_POPOUT | SBPS_NOBORDERS,300);
 //	index = m_wndStatusBar.CommandToIndex(ID_PROTOCOL_INFO);
@@ -640,14 +644,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//InitTreeNodeConn();   //LSC
 
 	SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
-//#ifndef Fance_Enable_Test
-	m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
-	m_pRefreshThread->SetMainWnd(this);	
+#ifndef Fance_Enable_Test
+	 m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
+	  m_pRefreshThread->SetMainWnd(this);	
 
 	// 需要执行线程中的操作时
-	m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
-	m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
-//#endif
+	  m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
+	  m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
+#endif
 	//tstat6
 	Tstat6_func();//为TSTST6新寄存器用的。
 
@@ -6297,7 +6301,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				}
 				else  //For Zigbee
 				{
-		            int NC=read_one(g_tstat_id,7);
+		            int NC=read_one(g_tstat_id,7,20);
 					if (NC==100)
 					{
 
@@ -8388,10 +8392,17 @@ void CMainFrame::OnDatabaseMbpoll()
 
 
 LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
-{
+{  
+    m_pFreshMultiRegisters->ResumeThread();
+    m_pRefreshThread->ResumeThread();
+	m_pFreshTree->ResumeThread(); 
 	//mbPollDlgOpen = FALSE;
-    mbPoll = NULL; 
+	if (mbPoll!=NULL)
+	{   mbPoll = NULL; 
 	delete mbPoll;
+	}
+	//mbPoll->ShowWindow(FALSE);
+	
 	mbPollDlgOpen = FALSE;
     return 0;
 }
@@ -8656,18 +8667,19 @@ AfxMessageBox(infor);
 
 }
 void CMainFrame::OnLanguage34010()
-{CString infor;
-	 if (g_language==1)
-	 {
-		 infor=gLoadString(MESSAGEBOX,_T("3"));
-		 AfxMessageBox(infor);
-	 } 
-	 else
-	 {
-		 theApp.SetLanguage(1);
-		 infor=gLoadString(MESSAGEBOX,_T("4"));
-		 AfxMessageBox(infor);
-	 }
+{
+// 	CString infor;
+// 	if (g_language==1)
+// 	 {
+// 		 infor=gLoadString(MESSAGEBOX,_T("3"));
+// 		 AfxMessageBox(infor);
+// 	 } 
+// 	 else
+// 	 {
+// 		 theApp.SetLanguage(1);
+// 		 infor=gLoadString(MESSAGEBOX,_T("4"));
+// 		 AfxMessageBox(infor);
+// 	 }
 }
 
 
@@ -8754,4 +8766,61 @@ void CMainFrame::OnControlAlarmLog()
 	{
 		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
 	}
+}
+void CMainFrame::OnMenuCheckupdate()
+{
+CString version=_T("2014.1.2");
+TCHAR buffer[MAX_PATH];
+CString	m_szAddress=_T("web1232.ixwebhosting.com");
+CString	m_szFilename=_T("/software/T3000_Version.txt");
+CString	m_szPassword=_T("Travel123");
+CString	m_szUsername=_T("temcoftp");
+CString	m_szVersion;
+CString m_CurrentVersion;
+	BOOL bUpdate =CheckForUpdate(m_szAddress, m_szUsername, m_szPassword,
+		m_szFilename, m_szVersion, buffer);
+	if ( bUpdate )
+	{
+		CString text;
+		
+		if ( _tcscmp( buffer, version.GetBuffer() ) != 0 )//当前版本不和服务器保持一致，提醒更新
+			{
+				text.Format( _T("New T3000 version available,Please update your T3000!\n The lastest T3000_Ver=%s,Your Version="), buffer,version.GetBuffer());
+			 
+				 
+				int result = MessageBox( text, _T("New version available"), MB_YESNO|MB_ICONINFORMATION );
+				if ( result == IDYES )
+				{
+					ShellExecute( GetDesktopWindow()->m_hWnd, _T("open"),
+						_T("http://temcocontrols.com/ftp/software/9TstatSoftware.zip"), NULL, NULL, SW_SHOWMAXIMIZED );
+				}
+			}
+			else//保持一致的话，就对了，说明是最新的
+			{
+				text.Format( _T("Your T3000 is the lastest version \nT3000_Ver=%s"), version.GetBuffer());
+				AfxMessageBox(text);
+			}
+	}
+
+}
+
+
+void CMainFrame::OnDatabasePv()
+{
+	// TODO: Add your command handler code here
+	//AfxMessageBox(_T("Developing....."));
+	//return;
+    CLoginDlg Dlg(g_buser_log_in);
+   if (IDOK== Dlg.DoModal())
+   {
+       CPVDlg dlg;
+       dlg.DoModal();
+   } 
+   else
+   {
+     AfxMessageBox(_T("Loging.....fail!"));
+   }
+    
+
+	
 }
