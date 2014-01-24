@@ -190,7 +190,7 @@ public:
 #endif
 
 protected:  // control bar embedded members
-	//CMFCMenuBar				m_wndMenuBar;
+	 CMFCMenuBar				m_wndMenuBar;
 	CMFCToolBar				m_wndToolBar;
 
 	//CMFCToolBarImages		m_UserImages;
@@ -377,6 +377,12 @@ public:
 	afx_msg void OnLanguage34010();
 	afx_msg void OnLanguage34006();
 	afx_msg void OnToolRegisterviewer();
+	afx_msg void OnDatabaseBacnettool();
+	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
+	afx_msg void OnPaint();
+	afx_msg void OnControlAlarmLog();
+		afx_msg void OnMenuCheckupdate();
+	afx_msg void OnDatabasePv();
 };
 
 const int DLG_T3000_VIEW = 0;

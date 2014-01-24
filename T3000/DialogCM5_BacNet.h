@@ -73,8 +73,15 @@ public:
 	afx_msg void OnBnClickedBtnBacWriteTime();
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	CTabCtrl m_bac_main_tab;
+	void Tab_Initial();
+	
+
+	afx_msg void OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	int m_cur_tab_sel;
 };
-static void Init_Service_Handlers(void);
+//static void Init_Service_Handlers(void);
 
 
 

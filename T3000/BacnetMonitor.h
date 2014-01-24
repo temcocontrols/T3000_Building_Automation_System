@@ -47,6 +47,10 @@ public:
 //	afx_msg void OnNMKillfocusListMonitorInput(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMSetfocusListMonitor(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMSetfocusListMonitorInput(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnClose();
+	virtual void OnCancel();
+	void Reg_Hotkey();
+	void Unreg_Hotkey();
 };
 
 const int MONITOR_NUM = 0;

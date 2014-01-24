@@ -447,6 +447,27 @@
     <ClCompile Include="RegisterWriteValueDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+      <ClCompile Include="PVDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ARDDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetTool.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetToolReadProperty.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetScreenEdit.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetAlarmLog.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetAlarmWindow.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -582,6 +603,10 @@
     <None Include="res\Exit.ico">
       <Filter>Resource Files</Filter>
     </None>
+<None Include="res\t3000.mdb" />
+    <None Include="res\Input.ico">
+      <Filter>Resource Files</Filter>
+    </None>
     <None Include="res\Input.ico">
       <Filter>Resource Files</Filter>
     </None>
@@ -606,6 +631,10 @@
     <None Include="res\Back.bmp">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\temcologo.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\T3000.mdb" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1047,6 +1076,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MbPollFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetScreenEdit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetTool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetToolReadProperty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetAlarmLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetAlarmWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+      <ClInclude Include="PVDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ARDDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

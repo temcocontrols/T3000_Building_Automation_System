@@ -37,6 +37,7 @@ public:
 	int m_col;//0:是Value 1：Description
 	CEdit m_reg_name;
 	CEdit m_reg_no;
-
+	int m_color;//0:默认值，1：红色
 	CButton m_sendBtn;
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 };

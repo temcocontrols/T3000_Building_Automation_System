@@ -17,6 +17,14 @@
 #define ORANGE_COLOR RGB(255,165,0)
 
 #include "global_variable_extern.h"
+#include <afxinet.h>
+BOOL CheckForUpdate(
+	LPCTSTR szFtpServer,
+	LPCTSTR szFtpUsername,
+	LPCTSTR szFtpPassword,
+	LPCTSTR szFtpFilename,
+	LPCTSTR szCurrentVersion,
+	LPTSTR szLastVersion );
 
 void FLEX_GRID_PUT_STR(CMsflexgrid m_FlexGri,int row,int col,CString str);
 int Set_Communication_Count(bool b_transmission,int bac_instanceid);
@@ -120,7 +128,8 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
 	 uint16_t service_len,
 	 BACNET_ADDRESS * src,
 	 BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
- void Initial_bac_com(int comport = 1);
+  void local_rp_ack_print_data(	BACNET_READ_PROPERTY_DATA * data);
+ void Initial_bac(int comport = 1);
   bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket);
   unsigned char Str_to_Byte(CString need_conver);
   void Init_Service_Handlers(void);

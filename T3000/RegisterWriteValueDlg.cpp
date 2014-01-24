@@ -31,6 +31,7 @@ void CRegisterWriteValueDlg::Set(int Col,CString Type,CString Name,CString No,CS
 }
 BOOL CRegisterWriteValueDlg::OnInitDialog(){
 CDialog::OnInitDialog();
+m_color=0;
  m_caption=_T("Write Register Value-");
 m_caption+=m_type;
 SetWindowText(m_caption);
@@ -86,6 +87,7 @@ void CRegisterWriteValueDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CRegisterWriteValueDlg, CDialog)
 	ON_BN_CLICKED(IDOK, &CRegisterWriteValueDlg::OnBnClickedOk)
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 
@@ -108,20 +110,98 @@ void CRegisterWriteValueDlg::OnBnClickedOk()
 	   if (ret<0)
 	   {
 		   AfxMessageBox(_T("Write Fail"));
+		   m_color=1;
 		   return;
 	   }
-
 	   product_register_value[Add]=value;
+	   m_color=0;
 	   AfxMessageBox(_T("Write OK"));
    } 
    else
    {
+   int Address=_wtoi(m_no);
+   CString description;
+   m_descriptionEdit.GetWindowText(description);
    CADO ado;
+   ado.OnInitADOConn();
+   CString sql;
+   if (product_type==T3000_5ABCDFG_LED_ADDRESS)
+   {
+       try
+       {
+		   sql.Format(_T("update T3000_Register_Address_By_ID set TSTAT5_LED_DESCRIPTION='%s' where Register_Address=%d"),description.GetBuffer(),Address);
+		   ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+		   AfxMessageBox(_T("Save OK"));
+       }
+       catch (CException* e)
+       {
+	      AfxMessageBox(_T("Save Error"));
+       }
+	   
+   }
+   else if (product_type==T3000_5EH_LCD_ADDRESS)
+   {
+	   try
+	   {
+		   sql.Format(_T("update T3000_Register_Address_By_ID set TSTAT5_LCD_DESCRIPTION='%s' where Register_Address=%d"),description.GetBuffer(),Address);
+		   ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+		   AfxMessageBox(_T("Save OK"));
+	   }
+	   catch (CException* e)
+	   {
+		   AfxMessageBox(_T("Save Error"));
+	   }
+   }
+   else if (product_type==T3000_6_ADDRESS)
+   {
+	   try
+	   {
+		   sql.Format(_T("update T3000_Register_Address_By_ID set TSTAT6_DESCRIPTION='%s' where Register_Address=%d"),description.GetBuffer(),Address);
+		   ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+		   AfxMessageBox(_T("Save OK"));
+	   }
+	   catch (CException* e)
+	   {
+		   AfxMessageBox(_T("Save Error"));
+	   }
+   }
+   else
+   {
 
-   AfxMessageBox(_T("Save OK"));
+   }
+
    }
 	
   
 }
 
 
+
+
+HBRUSH CRegisterWriteValueDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	// TODO:  Change any attributes of the DC here
+	if (pWnd->GetDlgCtrlID()==IDC_EDIT_VALUE)
+	{
+	  if (m_color==0)
+	  {
+	      HBRUSH B = CreateSolidBrush(RGB(255,255,255));
+		  pDC->SetTextColor(RGB(0,0,0));
+		  pDC->SetBkColor(RGB(255,255,255));
+		  pDC->SetBkMode(TRANSPARENT);
+		  return (HBRUSH)B;
+	  } 
+	  else
+	  {
+		  pDC->SetTextColor(RGB(255,0,0));
+		  pDC->SetBkColor(RGB(0,0,0));
+		  pDC->SetBkMode(TRANSPARENT);
+		  HBRUSH B = CreateSolidBrush(RGB(255,0,0));
+		  return (HBRUSH)B;
+	  }
+	}
+	// TODO:  Return a different brush if the default is not desired
+	return hbr;
+}

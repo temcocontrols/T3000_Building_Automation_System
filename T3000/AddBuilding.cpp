@@ -398,7 +398,7 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 		m_AddBuiding_SetComBox.ResetContent();
 		m_AddBuiding_SetComBox.InsertString(0,_T("Modbus 485"));
 		m_AddBuiding_SetComBox.InsertString(1,_T("Modbus TCP"));
-		m_AddBuiding_SetComBox.InsertString(2,_T("Bacnet"));
+		m_AddBuiding_SetComBox.InsertString(2,_T("BacnetIP"));
 		m_AddBuiding_SetComBox.MoveWindow(&rcCell,1); //移动到选中格的位置
 		m_AddBuiding_SetComBox.BringWindowToTop();
 		m_AddBuiding_SetComBox.ShowWindow(SW_SHOW);//显示控件
@@ -549,6 +549,12 @@ void CAddBuilding::ReloadAddBuildingDB()
 		else
 			m_strIpPort=_T("");
 
+		temp_variant=m_pRs->GetCollect("Com_Port");
+		if(temp_variant.vt!=VT_NULL)
+			m_strComPort=temp_variant;
+		else
+			m_strComPort=_T("");
+
 		
 		if(m_strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
 		{
@@ -563,12 +569,8 @@ void CAddBuilding::ReloadAddBuildingDB()
 		
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		temp_variant=m_pRs->GetCollect("Com_Port");
-		if(temp_variant.vt!=VT_NULL)
-			m_strComPort=temp_variant;
-		else
-			m_strComPort=_T("");
-		
+
+#if 0
 		if(m_strProtocol.CompareNoCase(_T("Modbus 485"))==0)
 		{
 			if(IsValidCOM(m_strComPort))
@@ -585,7 +587,15 @@ void CAddBuilding::ReloadAddBuildingDB()
 			str_temp=NO_APPLICATION;//
 			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_COMPORT,str_temp);
 		}
-		
+#endif
+		if(IsValidCOM(m_strComPort))
+		{
+			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_COMPORT,m_strComPort);
+		}
+		else if(m_szComm.size()>0)
+		{
+			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_COMPORT,m_szComm[0]);
+		}
 
 		//Baudrate
 		temp_variant=m_pRs->GetCollect("Braudrate");
@@ -593,7 +603,7 @@ void CAddBuilding::ReloadAddBuildingDB()
 			m_strBaudrat=temp_variant;
 		else
 			m_strBaudrat=_T("");
-		
+#if 0		
 		if(m_strProtocol.CompareNoCase(_T("Modbus 485"))==0)
 		{
 			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_BAUDRAT,m_strBaudrat);
@@ -603,8 +613,8 @@ void CAddBuilding::ReloadAddBuildingDB()
 			str_temp=NO_APPLICATION;//
 			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_BAUDRAT,str_temp);
 		}
-
-		
+#endif
+		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_BAUDRAT,m_strBaudrat);
 
 		m_pRs->MoveNext();//
 	}	

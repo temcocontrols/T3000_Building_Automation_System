@@ -261,7 +261,8 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	//if(DEVICE_FORMAT_TYPE == cm5)	//后来的人如果看到这个代码请不要奇怪，老毛要求这样的.用IF ELSE 来区分不同的
-	if(1)
+	//if(1)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{								//器件。产品本来不同 界面就会有差异 都还要用一个界面。木有办法，只能 加在一起了。;
 		GetDlgItem(IDC_LIST1)->ShowWindow(0);
 		GetDlgItem(IDC_YEARSTATIC)->ShowWindow(0);
@@ -290,7 +291,9 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 		SYSTEMTIME timeFrom;
 		SYSTEMTIME timeUntil;
 		int nCount = m_month_ctrl.GetMonthRange(&timeFrom, &timeUntil, GMR_DAYSTATE);
-
+		PostMessage(WM_REFRESH_BAC_DAY_CAL,NULL,NULL);
+		
+#if 0
 		int retry_count =0;
 		do 
 		{
@@ -306,7 +309,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 		}
-
+#endif
 	}
 	else
 	{
@@ -740,14 +743,16 @@ void AnnualRout_InsertDia::OnMcnSelectBacMonthcalendar(NMHDR *pNMHDR, LRESULT *p
 	m_month_ctrl.SetDayState(12, pBacDayState);
 
 
-	for (int i=0;i<12;i++)
+	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		memcpy_s(&g_DayState[annual_list_line][i*4],4,&pBacDayState[i],4);
+		for (int i=0;i<12;i++)
+		{
+			memcpy_s(&g_DayState[annual_list_line][i*4],4,&pBacDayState[i],4);
+		}
+		CString temp_task_info;
+		temp_task_info.Format(_T("Write annual schedual List Item%d ."),annual_list_line + 1);
+		Post_Write_Message(g_bac_instance,WRITEANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48,this->m_hWnd,temp_task_info);
 	}
-	CString temp_task_info;
-	temp_task_info.Format(_T("Write annual schedual List Item%d ."),annual_list_line + 1);
-	Post_Write_Message(g_bac_instance,WRITEANNUALSCHEDULE_T3000,annual_list_line,annual_list_line,48,this->m_hWnd,temp_task_info);
-
 	*pResult = 0;
 }
 

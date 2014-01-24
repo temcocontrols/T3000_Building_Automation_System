@@ -175,7 +175,7 @@ CString CTStat_Net::GetProductName()
 		break;
 //20120424
     case PM_CM5:
-		if(m_nprotocol == 3)
+		if(m_nprotocol == PROTOCOL_BACNET_IP)
 		{
 		strProductName="CM5_BacnetIP";
 		}
@@ -183,10 +183,11 @@ CString CTStat_Net::GetProductName()
 	    strProductName="CM5_Ethernet";
 		break;
 	case PM_MINIPANEL:
-		if(m_nprotocol == 3)
+		if(m_nprotocol == PROTOCOL_BACNET_IP)
 		{
 			strProductName="MiniPanel_BacnetIP";
 		}
+		else
 	    strProductName="MiniPanel";
 		break;
 	default:
@@ -200,7 +201,7 @@ CString CTStat_Net::GetProductName()
 	strID.Format(_T("%u"), m_dwSerialID);//20120424  //scan 系列号总多出l
 
 	CString strDevID;
-	if(m_nprotocol == 3)//如果是bacnet ip
+	if(m_nprotocol == PROTOCOL_BACNET_IP)//如果是bacnet ip
 	{
 		strDevID.Format(_T("%d"), (int)m_fHardware_version);
 	}

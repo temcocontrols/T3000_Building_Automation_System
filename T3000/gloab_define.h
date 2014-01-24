@@ -1,6 +1,7 @@
 #pragma once
 
 //#define SHOW_MESSAGEBOX
+#define	 MY_REDRAW_WINDOW		WM_USER + 1231
 #define WM_FRESH_CM_LIST WM_USER + 975
 #define WM_DELETE_NEW_MESSAGE_DLG WM_USER + 2001
 #define MY_BAC_CONFIG_READ_RESULTS  WM_USER + 2002
@@ -8,8 +9,13 @@
 
 #define  WM_LIST_MONITOR_CHANGED WM_USER+ 976
 #define  WM_LIST_MONITOR_INPUT_CHANGED WM_USER+ 977
+#define WM_SCREENEDIT_CLOSE WM_USER + 1232
 
-
+const int MODBUS_RS485 = 0;
+const int MODBUS_TCPIP = 1;
+const int MODBUS_BACNET_MSTP = 2;
+const int PROTOCOL_BACNET_IP   = 3;
+const int PROTOCOL_UNKNOW = 255;
 
 #define WM_COMMAND_WHO_IS  1
 #define MENU_CLICK			2
@@ -21,12 +27,13 @@ const COLORREF LIST_ITEM_SELECTED = RGB(150,150,200);
 
 const bool REFRESH_ON_ITEM = TRUE;
 
-const int SEND_COMMAND_DELAY_TIME = 100;
+const int SEND_COMMAND_DELAY_TIME = 150;
 const int RESEND_COUNT = 100;
-const int FAIL_RESEND_COUNT = 4;
+const int FAIL_RESEND_COUNT = 2;
 
 const int TYPE_SVAE_CONFIG = 254;
 const int TYPE_ALL = 255;
+const int TYPE_CONNECT_WITH_DEVICE = 253;
 const int TYPE_INPUT = 1;
 const int TYPE_OUTPUT = 2;
 const int TYPE_PROGRAM = 3;
@@ -38,10 +45,15 @@ const int TYPE_SCREENS = 9;
 const int TYPE_MONITOR = 10;
 const int TYPE_PROGRAMCODE = 11;
 const int TYPE_WEEKLYCODE = 12;
+const int TYPE_ANNUALCODE = 13;
+const int TYPE_ALARMLOG = 14;
+
+const int DELETE_WINDOW_MSG = 200;
 
 
 const int BAC_READ_ALL_LIST = 255;
 const int BAC_READ_SVAE_CONFIG = 254;
+const int BAC_READ_CONNECT_WITH_DEVICE_LIST = 253;
 const int BAC_READ_INPUT_LIST = 1;
 const int BAC_READ_OUTPUT_LIST = 2;
 const int BAC_READ_PROGRAM_LIST = 3;
@@ -54,6 +66,9 @@ const int BAC_READ_SCREEN_LIST = 9;
 const int BAC_READ_MONITOR_LIST = 10;
 const int BAC_READ_PROGRAMCODE_LIST = 11;
 const int BAC_READ_WEEKLTCODE_LIST = 12;
+const int BAC_READ_ANNUALCODE_LIST = 13;
+const int BAC_READ_ALARMLOG_LIST = 14;
+
 
 
 
@@ -97,6 +112,9 @@ const int BAC_TIME_COMMAND_COUNT = 1;
 const int BAC_CONTROLLER_COUNT = 48;
 const int BAC_SCREEN_COUNT = 32;
 const int BAC_MONITOR_COUNT = 12;
+const int BAC_ANNUAL_CODE_COUNT = 8;
+const int BAC_CONNECT_WITH_DEVICE_COUNT = 1;
+const int BAC_ALARMLOG_COUNT = 16;
 
 
 const int BAC_INPUT_GROUP = BAC_INPUT_ITEM_COUNT / BAC_READ_GROUP_NUMBER;
@@ -108,10 +126,12 @@ const int BAC_WEEKLY_GROUP = BAC_WEEKLY_ROUTINES_COUNT / BAC_READ_GROUP_NUMBER;
 const int BAC_WEEKLYCODE_GOUP = BAC_WEEKLYCODE_ROUTINES_COUNT;
 const int BAC_ANNUAL_GROUP = BAC_ANNUAL_ROUTINES_COUNT / BAC_READ_GROUP_NUMBER;
 const int BAC_TIME_COMMAND_GROUP = 1;
+const int BAC_ANNUALCODE_GROUP = BAC_ANNUAL_CODE_COUNT;
 const int BAC_CONTROLLER_GROUP = BAC_CONTROLLER_COUNT / BAC_READ_GROUP_NUMBER;
 const int BAC_SCREEN_GROUP = BAC_SCREEN_COUNT / BAC_READ_GROUP_NUMBER;
 const int BAC_MONITOR_GROUP = BAC_MONITOR_COUNT / BAC_READ_GROUP_NUMBER;
-
+const int BAC_CONNECT_WITH_DEVICE_GROUP = 1;
+const int BAC_ALARMLOG_GROUP = BAC_ALARMLOG_COUNT;
 
 
 
@@ -119,7 +139,7 @@ const int BAC_MONITOR_GROUP = BAC_MONITOR_COUNT / BAC_READ_GROUP_NUMBER;
 const int BAC_SHOW_CONNECT_RESULTS = 1;
 const int BAC_SHOW_MISSION_RESULTS = 3;
 
-const int BAC_LIST_REFRESH_TIME = 10000;
+const int BAC_LIST_REFRESH_TIME = 10000;//ms
 
 
 const int SCHEDULE_TIME_NUM = 0;
@@ -135,7 +155,7 @@ const int SCHEDULE_TIME_HOLIDAY2 = 9;
 
 
 const int WEEKLY_SCHEDULE_SIZE = 144;
-
+const int ANNUAL_CODE_SIZE = 48;
 struct _Bac_Scan_Com_Info
 {
 	int device_id;
@@ -186,10 +206,13 @@ struct _Refresh_Info
 	_Resend_Read_Info Read_Weekly_Info[BAC_WEEKLY_GROUP];
 	_Resend_Read_Info Read_Weeklycode_Info[BAC_WEEKLYCODE_GOUP];
 	_Resend_Read_Info Read_Annual_Info[BAC_ANNUAL_GROUP];
+	_Resend_Read_Info Read_Annualcode_Info[BAC_ANNUALCODE_GROUP];
 	_Resend_Read_Info Read_Time_Command[BAC_TIME_COMMAND_GROUP];
 	_Resend_Read_Info Read_Controller_Info[BAC_CONTROLLER_GROUP];
 	_Resend_Read_Info Read_Screen_Info[BAC_SCREEN_GROUP];
 	_Resend_Read_Info Read_Monitor_Info[BAC_MONITOR_GROUP];
+	_Resend_Read_Info Read_Connect_With_Device[BAC_CONNECT_WITH_DEVICE_GROUP];
+	_Resend_Read_Info Read_AlarmLog_Info[BAC_ALARMLOG_GROUP];
 };
 
 struct _Refresh_Write_Info 
@@ -200,7 +223,9 @@ struct _Refresh_Write_Info
 	_Resend_Read_Info Write_Program_Info[BAC_PROGRAM_GROUP];
 	_Resend_Read_Info Write_Programcode_Info[BAC_PROGRAMCODE_GROUP];
 	_Resend_Read_Info Write_Weekly_Info[BAC_WEEKLY_GROUP];
+	_Resend_Read_Info Write_Weeklycode_Info[BAC_WEEKLYCODE_GOUP];
 	_Resend_Read_Info Write_Annual_Info[BAC_ANNUAL_GROUP];
+	_Resend_Read_Info Write_Annualcode_Info[BAC_ANNUALCODE_GROUP];
 	_Resend_Read_Info Write_Time_Command[BAC_TIME_COMMAND_GROUP];
 	_Resend_Read_Info Write_Controller_Info[BAC_CONTROLLER_GROUP];
 	_Resend_Read_Info Write_Screen_Info[BAC_SCREEN_GROUP];
@@ -260,7 +285,11 @@ const CString Units_Type[]=
 	//_T("Custom dig")
 };
 
-
+const CString Yes_No[] = 
+{
+	_T("NO"),
+	_T("YES")
+};
 
 const CString Digital_Units_Array[] = 
 {
@@ -275,7 +304,18 @@ const CString Digital_Units_Array[] =
 	_T("No/Yes"),
 	_T("Cool/Heat"),
 	_T("Unoccupy/Occupy"),
-	_T("Low/High")
+	_T("Low/High"),
+	_T("On/Off"),
+	_T("Open/Close"),
+	_T("Start/Stop"),
+	_T("Enable/Disable"),
+	_T("Alarm/Normal"),
+	_T("High/Normal"),
+	_T("Low/Normal"),
+	_T("Yes/No"),
+	_T("Heat/Cool"),
+	_T("Occupy/Unoccupy"),
+	_T("High/Low")
 };
 
 //const CString Input_Analog_Units_Show[] =
@@ -424,4 +464,15 @@ struct _Graphic_Value_Info
 	HWND hWnd;
 };
 
+const int WINDOW_INPUT = 0;
+const int WINDOW_OUTPUT = 1;
+const int WINDOW_VARIABLE = 2;
+const int WINDOW_PROGRAM = 3;
+const int WINDOW_CONTROLLER = 4;
+const int WINDOW_SCREEN = 5;
+const int WINDOW_WEEKLY = 6;
+const int WINDOW_ANNUAL = 7;
+const int WINDOW_MONITOR = 8;
+const int WINDOW_ALARMLOG = 9;
 
+const int KEY_INSERT = 1020;

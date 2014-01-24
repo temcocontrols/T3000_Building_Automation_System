@@ -1,7 +1,21 @@
 #pragma once
 #include "global_variable_extern.h"
 
+#ifdef _DEBUG
+#ifndef _WIN64
 #define FOR_DATABASE_CONNECT					_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=")
+#else
+#pragma comment(lib,"json/json_mtd_x64.lib")
+#define FOR_DATABASE_CONNECT					_T("Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider;Data Source=")
+#endif
+#else
+#ifndef _WIN64 
+#define FOR_DATABASE_CONNECT					_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=")
+#else
+#define FOR_DATABASE_CONNECT					_T("Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider;Data Source=")
+#endif
+#endif
+
 #define USER_DATABASE_PASSWORD					_T(";Jet OLEDB:Database Password=alancat")
 //Persist Security Info=False;
 #define NO_APPLICATION _T("N/A")

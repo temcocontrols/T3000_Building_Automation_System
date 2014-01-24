@@ -71,6 +71,9 @@ OUTPUT CString Get_NowTime();
 void SaveBufferToLogFile(TS_UC* pBuffer, int nSize);
 
 
+OUTPUT int MINI_CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int NET_COM=1);
+OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int NET_COM=1);
+//--------------------------------
 
 
 

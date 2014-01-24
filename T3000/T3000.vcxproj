@@ -128,6 +128,9 @@
     <ClCompile Include="Annual_Routines.cpp" />
     <ClCompile Include="AnnualRout_InsertDia.cpp" />
     <ClCompile Include="ApplyGraphicLabelsDlg.cpp" />
+    <ClCompile Include="BacnetAlarmLog.cpp" />
+    <ClCompile Include="ARDDlg.cpp" />
+    <ClCompile Include="BacnetAlarmWindow.cpp" />
     <ClCompile Include="BacnetAnnualRoutine.cpp" />
     <ClCompile Include="BacnetController.cpp" />
     <ClCompile Include="BacnetGraphic.cpp" />
@@ -140,6 +143,9 @@
     <ClCompile Include="BacnetRange.cpp" />
     <ClCompile Include="BacnetScheduleTime.cpp" />
     <ClCompile Include="BacnetScreen.cpp" />
+    <ClCompile Include="BacnetScreenEdit.cpp" />
+    <ClCompile Include="BacnetTool.cpp" />
+    <ClCompile Include="BacnetToolReadProperty.cpp" />
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
@@ -201,6 +207,7 @@
     <ClCompile Include="OutputSetDlg.cpp" />
     <ClCompile Include="OutsidDailog.cpp" />
     <ClCompile Include="ParameterDlg.cpp" />
+    <ClCompile Include="PVDlg.cpp" />
     <ClCompile Include="RefreshTreeThread.cpp" />
     <ClCompile Include="RegDetails.cpp" />
     <ClCompile Include="RegisterViewerDlg.cpp" />
@@ -302,8 +309,10 @@
     <None Include="res\serialnum.ico" />
     <None Include="C:\Documents and Settings\lee\桌面\serialnum.ico" />
     <None Include="res\T3000.ico" />
+    <None Include="res\T3000.mdb" />
     <None Include="res\T3000.rc2" />
     <None Include="res\T3000Doc.ico" />
+    <None Include="res\temcologo.bmp" />
     <None Include="res\Toolbar-48.bmp" />
     <None Include="res\Toolbar.bmp" />
     <None Include="res\toolbar1.bmp" />
@@ -319,12 +328,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AirflowSettingDlg.h" />
+    <ClInclude Include="BacnetAlarmLog.h" />
+    <ClInclude Include="ARDDlg.h" />
+    <ClInclude Include="BacnetAlarmWindow.h" />
     <ClInclude Include="BacnetInfo.h" />
     <ClInclude Include="BacnetInput.h" />
     <ClInclude Include="BacnetOutput.h" />
     <ClInclude Include="BacnetProgram.h" />
     <ClInclude Include="BacnetProgramEdit.h" />
     <ClInclude Include="BacnetRange.h" />
+    <ClInclude Include="BacnetScreenEdit.h" />
+    <ClInclude Include="BacnetTool.h" />
+    <ClInclude Include="BacnetToolReadProperty.h" />
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
@@ -354,6 +369,7 @@
     <ClInclude Include="MbPoll.h" />
     <ClInclude Include="MbPollFunctions.h" />
     <ClInclude Include="MbPollOptions.h" />
+    <ClInclude Include="PVDlg.h" />
     <ClInclude Include="RegDetails.h" />
     <ClInclude Include="RegisterViewerDlg.h" />
     <ClInclude Include="RegisterWriteValueDlg.h" />

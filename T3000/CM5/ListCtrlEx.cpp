@@ -102,6 +102,7 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		if(m_select_col >1)//left第一列无效;
 		{
 			m_select_col = m_select_col - 1;
+
 			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
 			
 			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
@@ -119,6 +120,11 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		if(m_select_raw>0)
 		{
 			m_select_raw = m_select_raw - 1;
+			if(GetColumnType(0)==ListCtrlEx::CheckBox)
+			{
+				SetCellChecked(old_select_raw,0,0);
+				SetCellChecked(m_select_raw,0,1);
+			}
 			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
 			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
 				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
@@ -150,6 +156,11 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		if(m_select_raw < GetItemCount() - 1)
 		{
 			m_select_raw = m_select_raw + 1;
+			if(GetColumnType(0)==ListCtrlEx::CheckBox)
+			{
+				SetCellChecked(old_select_raw,0,0);
+				SetCellChecked(m_select_raw,0,1);
+			}
 			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
 			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
 				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
@@ -243,6 +254,8 @@ CListCtrlEx::CellIndex CListCtrlEx::Point2Cell(const CPoint &point)
 	{
 		int nRow = lvHitTestInfo.iItem;
 		int nCol =  lvHitTestInfo.iSubItem;
+		if(nCol<0)
+			nCol = 0;
 		int nColCnt=GetColumnCount();
 
 		int old_select_col = m_select_col;	//把旧的的存起来;

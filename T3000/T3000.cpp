@@ -294,7 +294,8 @@ BOOL CT3000App::InitInstance()
 		return FALSE;
 	}
 	AfxEnableControlContainer();
-
+	CString T3000_Rev;
+//	T3000_Rev=getURLContext(_T("www.temcocontrols.com/ftp/software/T3000_Version.txt"));
 #if 1	
 	try
 	{

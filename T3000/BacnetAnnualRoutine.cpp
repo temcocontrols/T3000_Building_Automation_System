@@ -43,6 +43,7 @@ BEGIN_MESSAGE_MAP(BacnetAnnualRoutine, CDialogEx)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_BAC_ANNULE_LIST, &BacnetAnnualRoutine::OnNMClickListBacAnnuleList)
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Annual_Routine_Item)
 	ON_MESSAGE(WM_REFRESH_BAC_ANNUAL_LIST,Fresh_Annual_Routine_List)
+	ON_BN_CLICKED(IDC_BUTTON_ANNUAL_EDIT, &BacnetAnnualRoutine::OnBnClickedButtonAnnualEdit)
 //	ON_MESSAGE(MY_RESUME_DATA, AnnualResumeMessageCallBack)
 END_MESSAGE_MAP()
 
@@ -104,13 +105,14 @@ BOOL BacnetAnnualRoutine::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-const int KEY_INSERT = 1020;
+//const int KEY_INSERT = 1020;
 LRESULT BacnetAnnualRoutine::OnHotKey(WPARAM wParam,LPARAM lParam)
 {
 	if (wParam==KEY_INSERT)
 	{
-		AnnualRout_InsertDia Dlg;
-		Dlg.DoModal();
+		OnBnClickedButtonAnnualEdit();
+		//AnnualRout_InsertDia Dlg;
+		//Dlg.DoModal();
 	}
 	return 0;
 }
@@ -123,7 +125,7 @@ BOOL BacnetAnnualRoutine::OnInitDialog()
 
 	// TODO:  Add extra initialization here
 	Initial_List();
-	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);
+//	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);
 	PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -193,8 +195,19 @@ void BacnetAnnualRoutine::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	KillTimer(1);
+	m_annual_dlg_hwnd = NULL;
 	CDialogEx::OnClose();
+}
+
+void BacnetAnnualRoutine::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+	//KillTimer(1);
+	//m_annual_dlg_hwnd = NULL;
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
+	//CDialogEx::OnCancel();
 }
 
 
@@ -381,8 +394,39 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 void BacnetAnnualRoutine::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
+	if(this->IsWindowVisible())
+	{
 	PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
-	Post_Refresh_Message(g_bac_instance,READANNUALROUTINE_T3000,0,BAC_ANNUAL_ROUTINES_COUNT - 1,sizeof(Str_annual_routine_point),BAC_ANNUAL_GROUP);
+	if(bac_select_device_online)
+		Post_Refresh_Message(g_bac_instance,READANNUALROUTINE_T3000,0,BAC_ANNUAL_ROUTINES_COUNT - 1,sizeof(Str_annual_routine_point),BAC_ANNUAL_GROUP);
+	}
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void BacnetAnnualRoutine::OnBnClickedButtonAnnualEdit()
+{
+	// TODO: Add your control notification handler code here
+	for (int i=0;i<m_annualr_list.GetItemCount();++i)
+	{
+		if(m_annualr_list.GetCellChecked(i,0))
+		{
+			annual_list_line = i;
+			break;
+		}
+	}
+
+	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ANNUALCODE);
+
+}
+
+void BacnetAnnualRoutine::Reg_Hotkey()
+{
+	RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert¼ü
+}
+
+void BacnetAnnualRoutine::Unreg_Hotkey()
+{
+	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 }
 

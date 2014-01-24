@@ -773,7 +773,7 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		m_controller_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
 		temp_task_info.Format(_T("Write Controller List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
-		Post_Write_Message(g_bac_instance,WRITECONTROLLER_T3000,lRow,lRow,sizeof(Str_controller_point),m_controller_dlg_hwnd,temp_task_info,lRow,lCol);
+		Post_Write_Message(g_bac_instance,WRITECONTROLLER_T3000,(int8_t)lRow,(int8_t)lRow,sizeof(Str_controller_point),m_controller_dlg_hwnd,temp_task_info,lRow,lCol);
 
 	}
 
@@ -785,8 +785,12 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 void BacnetController::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
+	if(this->IsWindowVisible())
+	{
 	PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
-	Post_Refresh_Message(g_bac_instance,READCONTROLLER_T3000,0,BAC_CONTROLLER_COUNT - 1,sizeof(Str_controller_point),BAC_CONTROLLER_GROUP);
+	if(bac_select_device_online)
+		Post_Refresh_Message(g_bac_instance,READCONTROLLER_T3000,0,BAC_CONTROLLER_COUNT - 1,sizeof(Str_controller_point),BAC_CONTROLLER_GROUP);
+	}
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -794,5 +798,16 @@ void BacnetController::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
 	KillTimer(1);
+	m_controller_dlg_hwnd = NULL;
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	CDialogEx::OnClose();
+}
+
+void BacnetController::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+	//KillTimer(1);
+	//m_output_dlg_hwnd = NULL;
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
+	//CDialogEx::OnCancel();
 }

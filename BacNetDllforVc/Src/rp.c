@@ -38,7 +38,7 @@
 #include "rp.h"
 
 /** @file rp.c  Encode/Decode Read Property and RP ACKs */
-
+char prop_name[100];
 #if BACNET_SVC_RP_A
 /* encode service */
 int rp_encode_apdu(
@@ -221,6 +221,10 @@ int rp_ack_encode_apdu(
     return apdu_len;
 }
 
+char * get_prop_name()
+{
+	return prop_name;
+}
 
 #if BACNET_SVC_RP_A
 /** Decode the ReadProperty reply and store the result for one Property in a
@@ -234,11 +238,14 @@ int rp_ack_encode_apdu(
  * @return Number of decoded bytes (could be less than apdu_len),
  * 			or -1 on decoding error.
  */
+#include "indtext.h"
+extern INDTEXT_DATA bacnet_property_names[] ;
 int rp_ack_decode_service_request(
     uint8_t * apdu,
     int apdu_len,       /* total length of the apdu */
     BACNET_READ_PROPERTY_DATA * rpdata)
 {
+
     uint8_t tag_number = 0;
     uint32_t len_value_type = 0;
     int tag_len = 0;    /* length of tag decode */
@@ -247,6 +254,8 @@ int rp_ack_decode_service_request(
     uint32_t property = 0;      /* for decoding */
     uint32_t array_value = 0;   /* for decoding */
 
+
+	memset(prop_name,0,100);
     /* FIXME: check apdu_len against the len during decode   */
     /* Tag 0: Object ID */
     if (!decode_is_context_tag(&apdu[0], 0))
@@ -261,6 +270,10 @@ int rp_ack_decode_service_request(
         return -1;
     len += decode_enumerated(&apdu[len], len_value_type, &property);
     rpdata->object_property = (BACNET_PROPERTY_ID) property;
+	
+
+	if(rpdata->object_property < PROP_EGRESS_ACTIVE)
+		strcpy_s(prop_name,100,bacnet_property_names[rpdata->object_property ].pString);
     /* Tag 2: Optional Array Index */
     tag_len =
         decode_tag_number_and_value(&apdu[len], &tag_number, &len_value_type);

@@ -16,7 +16,7 @@ extern char *pmes;
 
 // CBacnetProgramEdit dialog
  char editbuf[25000];
- extern char my_display[1024];
+ extern char my_display[10240];
  extern int Encode_Program();
  extern int my_lengthcode;
  extern char mycode[1024];
@@ -27,7 +27,7 @@ extern char mesbuf[1024];
 extern int renumvar;
 
 extern char *desassembler_program();
-
+extern void copy_data_to_ptrpanel(int Data_type);
 HWND mParent_Hwnd;
 
 IMPLEMENT_DYNAMIC(CBacnetProgramEdit, CDialogEx)
@@ -190,7 +190,8 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	m_program_edit_hwnd = this->m_hWnd;
 	g_hwnd_now = m_program_edit_hwnd;
 
-	
+	copy_data_to_ptrpanel(TYPE_ALL);
+	memset(my_display,0,sizeof(my_display));
 	PostMessage(WM_REFRESH_BAC_PROGRAM_RICHEDIT,NULL,NULL);
 	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE

@@ -33,6 +33,9 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedButtonWeeklyScheduleEdit();
+	virtual void OnCancel();
+	void Reg_Hotkey();
+	void Unreg_Hotkey();
 };
 
 const int WEEKLY_ROUTINE_NUM = 0;
