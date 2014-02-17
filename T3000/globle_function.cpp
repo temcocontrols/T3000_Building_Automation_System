@@ -478,7 +478,7 @@ bool can_be_writed_hex_file(int product_model,int hex_file_product_model)
 		return true;
 	if(product_model==PM_T3IOA && hex_file_product_model==PM_T3IOA)
 		return true;
-	if(product_model==PM_T38AIOD && hex_file_product_model==PM_T38AIOD)
+	if(product_model==PM_T3PT10 && hex_file_product_model==PM_T3PT10)
 		return true;
 	if(product_model==T3_32I_PRODUCT_MODEL && hex_file_product_model==T3_32I_PRODUCT_MODEL)
 		return true;
@@ -2414,8 +2414,8 @@ CString GetProductName(int ModelID)
 		strProductName =g_strHumChamber;
 		break;
 
-	case PM_T38AIOD :
-		strProductName="T3-8I13O";
+	case PM_T3PT10 :
+		strProductName="T3-PT10";
 		break;
 	case PM_T3IOA :
 		strProductName="T3-8IOA";

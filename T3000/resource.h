@@ -185,7 +185,6 @@
 #define IDD_DIALOG_BACNET_SCHEDULE_TIME 470
 #define IDD_DIALOG_BACNET_CONTROLLER    472
 #define IDD_MBPOLL_REG_DIALOG           473
-#define IDD_CALIBRATION_HUM             474
 #define IDD_DIALOGAIRFLOW_SETTING       475
 #define IDD_DIALOG_8IOA_VIEW            476
 #define IDD_WRITEREGDLG                 477
@@ -202,6 +201,7 @@
 #define IDD_DIALOG_BACNET_ALARMLOG      489
 #define IDD_DIALOG_BACNET_ALARM_WINDOW  490
 #define IDD_DIALOG_BACNET_TSTAT         491
+#define IDD_DIALOG_CALIBRATION          493
 #define IDD_TRAFFIC_WINDOW              500
 #define IDD_DIALOG13                    501
 #define IDD_REGISTER_VIEWER             502
@@ -1560,7 +1560,12 @@
 #define IDC_TAB1                        1826
 #define IDC_LIST_TSTAT                  1826
 #define IDC_ARD                         1827
-#define IDC_PORT                        1828
+#define IDC_CHANGEID                    1828
+#define IDC_PORT                        1829
+#define IDC_INSERT                      1830
+#define IDC_RT                          1831
+#define IDC_STARTREGISTER               1832
+#define IDC_DATAGRID1                   1833
 #define IDC_EDIT_PID2OFFSETPOINT2       2002
 #define IDC_EDIT_PID2OFFSETPOINT4       2003
 #define IDC_EDIT_PID2OFFSETPOINT3       2004
@@ -1672,10 +1677,10 @@
 #define ID_CONTROL_WEEKLY               42884
 #define ID_VIEW_DATATRAFFIC             32885
 #define ID_FUNCTION_HUMCALIBRATION      32886
-#define ID_FUNCTION_HUMCALIBRATION_C    32887
 #define ID_FILE_EXIT                    32888
 #define ID_CONTROL_MONITORS             32985
 #define ID_DATABASE_MBPOLL              33867
+#define ID_CALIBRATION_CALIBRATIONHUM   33868
 #define ID_DISPLAYTYPE_SIGNED           34000
 #define ID_DISPLAYTYPE_UNSIGNED         34001
 #define ID_DISPLAYTYPE_HEX              34002

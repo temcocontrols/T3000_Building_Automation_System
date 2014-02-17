@@ -151,7 +151,7 @@
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
-    <ClCompile Include="CalibrationHumDlg.cpp" />
+    <ClCompile Include="CalibrationDlg.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
     <ClCompile Include="CM5\BacNetProgram_transplant.cpp" />
     <ClCompile Include="CM5\CStatic\staticex.cpp" />
@@ -345,7 +345,7 @@
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
-    <ClInclude Include="CalibrationHumDlg.h" />
+    <ClInclude Include="CalibrationDlg.h" />
     <ClInclude Include="CM5\ListCtrlCellEx.h" />
     <ClInclude Include="CM5\ListCtrlEx.h" />
     <ClInclude Include="CM5\MyOwnListCtrl.h" />

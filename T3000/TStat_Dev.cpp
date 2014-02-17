@@ -182,8 +182,8 @@ CString CTStat_Dev::GetProductName()
 		strProductName =g_strHumChamber;
 		break;
 
-	case PM_T38AIOD :
-	     strProductName="T3-8I13O";
+	case PM_T3PT10 :
+	     strProductName="T3-PT10";
 		 break;
 	case PM_T3IOA :
 		strProductName="T3-8IOA";
@@ -209,6 +209,9 @@ CString CTStat_Dev::GetProductName()
 	case PM_MINIPANEL:
 		strProductName="MiniPanel";
 		break;
+    case PM_AirQuality:
+        strProductName="Air Quality";
+        break;
 	default:
 		strProductName="TStat";
 		break;

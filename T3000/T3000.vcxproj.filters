@@ -390,9 +390,6 @@
     <ClCompile Include="BacnetController.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
-    <ClCompile Include="CalibrationHumDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AirflowSettingDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -470,6 +467,9 @@
     </ClCompile>
     <ClCompile Include="BacnetView.cpp">
       <Filter>CM5</Filter>
+    </ClCompile>
+     <ClCompile Include="CalibrationDlg.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1040,9 +1040,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RegDetails.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CalibrationHumDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AirflowSettingDlg.h">

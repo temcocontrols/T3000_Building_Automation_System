@@ -69,7 +69,7 @@ END_MESSAGE_MAP()
  
 CString CDisplayConfig::GetTextReg(unsigned short reg)
 {
-	CString str_temp;
+	CString str_temp=_T("");
 	unsigned short temp_buffer[4];
 	unsigned short temp_buffer_Char[THE_CHAR_LENGTH];
 	unsigned char p[THE_CHAR_LENGTH+1]={'\0'};
@@ -80,6 +80,10 @@ CString CDisplayConfig::GetTextReg(unsigned short reg)
 		temp_buffer[3]=product_register_value[reg+3];
 	 
 
+	   if (temp_buffer[0]==0||temp_buffer[0]==65535)
+	   {
+	     return str_temp;
+	   }
    unsigned short Hi_Char,Low_Char;
 
 	for (int i=0;i<4;i++)
@@ -205,6 +209,12 @@ CString CDisplayConfig::GetSel(int ID)
 	case 14:
 		selection=_T("CLOCK TIME");
 		break;
+	case 15:
+		selection=_T("CO2");
+		break;
+	case 16:
+		selection=_T("Humidity");
+		break;
 	default:
 		selection=_T("None");
 		break;
@@ -315,6 +325,8 @@ if(g_OutPutLevel==1)
 		m_ItemValueCombx.AddString(_T("USER INFO"));
 		m_ItemValueCombx.AddString(_T("CLOCK DATE"));
 		m_ItemValueCombx.AddString(_T("CLOCK TIME"));
+		m_ItemValueCombx.AddString(_T("CO2"));
+		m_ItemValueCombx.AddString(_T("Humidity"));
 		m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
 		m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 		m_ItemValueCombx.BringWindowToTop();

@@ -2677,8 +2677,9 @@ void CTStatScanner::ScanTstatFromNCForAuto()//scan 分别扫描各个NC中的TSTAT
 		 strlog.Format(_T("Scan Tstat connect to %s IPAdd: %s IPPort: %d"),pNCInfo->m_pNet->GetProductName(),strIP,nIPPort);
          NET_WriteLogFile(strlog);
 		//##############################
+		CString Product_Name_Mini=pNCInfo->m_pNet->GetProductName();
 		CString strInfo;
-		strInfo.Format(_T("Scan Tstat connected to %s"), pNCInfo->m_pNet->GetProductName());
+		strInfo.Format(_T("Scan Tstat connected to %s "),Product_Name_Mini);
 		ShowNetScanInfo(strInfo);
 		//##############################
 
@@ -2704,11 +2705,23 @@ void CTStatScanner::ScanTstatFromNCForAuto()//scan 分别扫描各个NC中的TSTAT
 			SetPaneString(1,strInfo);
 			continue;
 		}
-
-	//	BinaryScanTstatFromNC();
-//		SetCommunicationType(1);
-		//binarySearchforComDevice(-1, TRUE, 1, 254);
-		binarySearchforComDevice(-1, TRUE, 1, 254);	
+		if (Product_Name_Mini.Find(_T("MiniPanel"))!=-1)
+		{
+			strInfo.Format(_T("Scan Tstat connected to %s--COM0 "),Product_Name_Mini);
+			ShowNetScanInfo(strInfo);
+			binarySearchforComDevice(-1, TRUE, 1, 254);	
+			strInfo.Format(_T("Scan Tstat connected to %s--COM1 "),Product_Name_Mini);
+			ShowNetScanInfo(strInfo);
+			MINI_binarySearchforComDevice(-1, TRUE, 1, 254,1);	
+			strInfo.Format(_T("Scan Tstat connected to %s--COM2 "),Product_Name_Mini);
+			ShowNetScanInfo(strInfo);
+			MINI_binarySearchforComDevice(-1, TRUE, 1, 254,2);
+		} 
+		else
+		{
+		  binarySearchforComDevice(-1, TRUE, 1, 254);
+		}
+		
 
 		//##############################
 		   //Alex.....
@@ -3861,3 +3874,333 @@ endbacnetthread:
 	return 1;
 }
 #endif
+void CTStatScanner::MINI_binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo, BYTE devHi,int NET_COM)
+{
+   
+	if (m_bStopScan)
+	{
+		 
+		 
+		CString strlog=_T("Scan Stop Time: ")+Get_NowTime()+_T("\n");;
+		NET_WriteLogFile(strlog);
+		WriteLogFile(strlog);
+		return;
+	}
+	if (nComPort!=-1)
+	{
+		CString strlog;
+		strlog.Format(_T("Scan ComPort: %d From ID=%d To ID=%d"),nComPort,devLo,devHi);
+		WriteLogFile(strlog);
+	}
+	else
+	{
+		CString strlog;
+		strlog.Format(_T("Scan From ID=%d To ID=%d"),devLo,devHi);
+		NET_WriteLogFile(strlog);
+	}
+	g_strScanInfoPrompt.Format(_T("COM%d"), nComPort);
+
+	
+	
+
+	g_nStartID = devLo;
+	g_nEndID = devHi;
+
+	Sleep(50);	
+	int nCount=0;
+
+	int a=MINI_CheckTstatOnline_a(devLo,devHi, bForTStat,NET_COM);
+
+	if (a == -3 || a > 0)
+	{
+        g_llTxCount++;
+		g_llRxCount++;
+		if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
+
+			// construct status message string
+			CString str;
+			str.Format(_T("Addr:255 [Tx=%d Rx=%d Err=%d]"), 
+				  g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+
+			//Display it
+			((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
+
+		}
+
+		a=MINI_CheckTstatOnline_a(devLo,devHi, bForTStat,NET_COM);
+		g_llTxCount++;
+		g_llRxCount++;
+		if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
+
+			// construct status message string
+			CString str;
+			str.Format(_T("Addr:255 [Tx=%d Rx=%d Err=%d]"), 
+				g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+
+			//Display it
+			((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
+
+		}
+
+	}
+
+	//TRACE("L:%d   H:%d  a:%d\n",devLo,devHi,a);
+	if(binary_search_crc(a))
+	{
+		
+	return ;	 
+	}
+	char c_array_temp[5]={'0'};
+	CString temp=_T("");
+	if(a>0)
+	{
+		int ntempID=0;
+		BOOL bFindSameID=false;
+		int nPos=-1;
+//		temp.baudrate=m_baudrate2;
+		unsigned short SerialNum[9];
+		memset(SerialNum,0,sizeof(SerialNum));
+		int nRet=0;
+		nRet=read_multi2(a,&SerialNum[0],0,9,bForTStat);
+		SHOW_TX_RX
+		if(nRet>0)
+		{
+			CTStat_Dev* pTemp = new CTStat_Dev;			
+			_ComDeviceInfo* pInfo = new _ComDeviceInfo;
+			pInfo->m_pDev = pTemp;
+			if(IsRepeatedID(a))
+			{
+				TRACE(_T("Scan one with Repeated ID = %d\n"), a);
+				pInfo->m_bConflict = TRUE;								
+				pInfo->m_nSourceID = m_szRepeatedID[a];
+				pInfo->m_nTempID = a;
+			}
+			else
+			{
+				pInfo->m_bConflict = FALSE;
+				pInfo->m_nSourceID = a;
+				pInfo->m_nTempID = a;
+			}
+
+			pInfo->m_tstatip = m_ip;//scan
+			pInfo->m_tstatport = m_port;//scan
+			
+			m_szTstatScandRet.push_back(pInfo);
+// 			temp.id=a;
+// 			temp.serialnumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
+			//int nSerialNumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;//20120424
+			unsigned int nSerialNumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;//20120424
+			
+			pTemp->SetSerialID(nSerialNumber);
+// 			temp.product_class_id=SerialNum[7];
+// 			temp.hardware_version=SerialNum[8];
+			pTemp->SetDevID(a);
+			
+			float tstat_version2;
+			tstat_version2=SerialNum[4];//tstat version			
+			if(tstat_version2 >=240 && tstat_version2 <250)
+				tstat_version2 /=10;
+			else 
+			{
+				tstat_version2 = (float)(SerialNum[5]*256+SerialNum[4]);	
+				tstat_version2 /=10;
+			}//tstat_version
+			
+			//temp.software_version=tstat_version2;
+			pTemp->SetSoftwareVersion(tstat_version2);
+			if(Read_One2(a, 185, bForTStat)==0)	
+			//if(pTemp->ReadOneReg(185)==0)
+			{SHOW_TX_RX
+				//temp.baudrate=9600;
+				pTemp->SetBaudRate(9600);//scan
+
+			}
+			else
+			{
+					//temp.baudrate=19200;
+				pTemp->SetBaudRate(19200);//scan
+			}
+			//temp.nEPsize=Read_One2(temp.id,326, bForTStat);
+			pTemp->SetEPSize(pTemp->ReadOneReg(326));
+
+			//if(pTemp->GetComPort()>=0)
+			pTemp->SetComPort(nComPort);
+			// product type
+			//pTemp->ReadOneReg(8);
+			pTemp->SetProductType(SerialNum[7]);
+
+			// hardware_version
+			pTemp->SetHardwareVersion(SerialNum[8]);		
+				
+			pTemp->SetBuildingName(m_strBuildingName);
+			pTemp->SetSubnetName(m_strSubNet);
+
+			CString strlog ;
+			strlog.Format(_T("\nFind one Device << ID=%d,SerialNo=%d >>\n"),a,nSerialNumber);
+			WriteLogFile(strlog);
+		}
+		else
+			return;
+	}
+
+	switch(a)
+	{
+	case -2:
+		//crc error
+		if(devLo!=devHi)
+		{
+			MINI_binarySearchforComDevice(nComPort, bForTStat, devLo,(devLo+devHi)/2,NET_COM);
+			MINI_binarySearchforComDevice(nComPort, bForTStat, (devLo+devHi)/2+1,devHi,NET_COM);
+		}
+		else
+			MINI_binarySearchforComDevice(nComPort, bForTStat, devLo,devHi,NET_COM);
+		break;
+	case -3:
+		//more than 2 Tstat is connect
+		if(devLo!=devHi)
+		{
+			MINI_binarySearchforComDevice(nComPort, bForTStat, devLo,(devLo+devHi)/2,NET_COM);
+			MINI_binarySearchforComDevice(nComPort, bForTStat, (devLo+devHi)/2+1,devHi,NET_COM);
+		}
+		else
+		{			
+			m_szRepeatedID[devLo] = devLo;
+			TRACE(_T("Scan one with same ID = %d\n"), devLo);
+			do
+			{
+				///*
+				nCount++;
+				if(nCount>=5)
+				{
+					nCount=0;
+					break;
+				}
+				//*/
+				
+				//if(Read_One2(devLo,10, bForTStat)==-2)
+				Sleep(20);//////////////////////////////////for running is better
+				char c_temp_arr[100]={'\0'};
+			//	if(Read_One2(devLo,10, bForTStat)==-2)
+			//	{
+			//		break;
+			//	}
+				
+
+			//
+				if(Read_One2(devLo,10, bForTStat)!=-2)//one times
+				
+			//	{
+
+			//	}
+			//	else
+				{	
+					Sleep(100);
+					SHOW_TX_RX
+					CString str_temp;
+					for(int j=254;j>=1;j--)
+						if(j!=devLo)
+						{							
+						//	if(!found_same_net_work_controller_by_mac(a))
+							if(1)
+							{
+								bool find=false;//false==no find;true==find
+								for(UINT w=0;w<m_szTstatScandRet.size();w++)
+									if(j==(m_szTstatScandRet.at(w))->m_pDev->GetDevID())
+									{
+										find=true;
+										break;
+									}
+								if(find==false)
+								{
+									//if(Write_One(devLo,10,j)>0)//sometimes write failure ,so inspect,important
+									if(Write_One2(devLo,10,j, bForTStat)>0)//sometimes write failure ,so inspect,important
+									{	SHOW_TX_RX
+										m_szRepeatedID[j] = devLo;
+										if(j<devLo)
+										{
+											
+												CTStat_Dev* pTemp = new CTStat_Dev;
+												_ComDeviceInfo* pInfo = new _ComDeviceInfo;
+												pInfo->m_pDev = pTemp;
+												pInfo->m_bConflict = TRUE;
+												pInfo->m_nSourceID = devLo;
+												pInfo->m_nTempID = j;
+												TRACE(_T("Scan one with SRC ID = %d, New ID = %d\n"), devLo, j);
+
+											//	temp.baudrate=m_baudrate2;
+												unsigned short SerialNum[9];
+												memset(SerialNum,0,sizeof(SerialNum));
+												int nRet=0;
+												//temp.id=j;
+												pTemp->SetDevID(j);
+												nRet=read_multi2(j,&SerialNum[0],0,9,bForTStat);
+												if(nRet>0)
+												{		SHOW_TX_RX
+													//temp.serialnumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
+													//temp.product_class_id=SerialNum[7];
+													//temp.hardware_version=SerialNum[8];
+													int serialnumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
+													pTemp->SetSerialID(serialnumber);
+													pTemp->SetProductType(SerialNum[7]);
+													pTemp->SetHardwareVersion(SerialNum[8]);
+
+													float tstat_version2;
+													tstat_version2=SerialNum[4];//tstat version			
+													if(tstat_version2 >=240 && tstat_version2 <250)
+													{
+														tstat_version2 /=10;
+													}
+													else 
+													{
+														tstat_version2 = (float)(SerialNum[5]*256+SerialNum[4]);	
+														tstat_version2 /=10;
+													}//tstat_version
+													
+													//temp.software_version=tstat_version2;
+													pTemp->SetSoftwareVersion(tstat_version2);
+													if(Read_One2(j,185, bForTStat)==0)
+													//if(pTemp->ReadOneReg(185)==0)
+													{
+														//temp.baudrate=9600;
+														pTemp->SetBaudRate(9600);
+													}
+													else
+													{
+														pTemp->SetBaudRate(19200);
+													}
+
+													int nEPsize=Read_One2(j,326, bForTStat);
+													SHOW_TX_RX
+													pTemp->SetEPSize(nEPsize);
+											
+													pTemp->SetComPort(nComPort);
+
+													pTemp->SetBuildingName(m_strBuildingName);
+													pTemp->SetSubnetName(m_strSubNet);
+													//if(pTemp->GetComPort()>=0)
+													//{														
+													m_szTstatScandRet.push_back(pInfo);
+													//}												
+												}
+										}
+									
+										MINI_binarySearchforComDevice(nComPort, bForTStat, devLo,devHi,NET_COM);
+									}
+									return;
+								}
+							}
+							else
+							{
+								return;
+							}
+						}
+				}
+			}while(1);
+		}
+		break;
+	case -4:break;
+		//no connection 
+	case -5:break;
+		//the input error
+	}
+}
