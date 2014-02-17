@@ -102,7 +102,7 @@ extern int g_ifanStatus;
 extern CString g_strFan;
 
 extern BOOL g_bEnableRefreshTreeView;
-extern BOOL g_bScanStart;
+extern BOOL g_bPauseRefreshTree;
 extern int g_llTxCount;
 extern int g_llRxCount;
 extern BOOL g_unint;

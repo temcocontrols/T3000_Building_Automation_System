@@ -23,14 +23,12 @@
 #define SHOW_TX_RX 	g_llTxCount++;g_llRxCount++;if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {CString str;str.Format(_T("Addr:255 [Tx=%d Rx=%d Err=%d]"), g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());}
 //#define MAX_FIELDS	10
 //CRITICAL_SECTION g_Lock;
-#define UPD_BROADCAST_QRY_MSG 100
-#define RESPONSE_MSG          UPD_BROADCAST_QRY_MSG+1
-const int UDP_BROADCAST_PORT =1234;
-const int RECV_RESPONSE_PORT = 4321;
+
+
 
 const int TCP_COMM_PORT = 6001;
 extern int g_ScnnedNum;
-
+extern bool b_is_scan ;
 bool is_in_scan_mode = false;
 
 typedef struct infopack
@@ -1018,7 +1016,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 	//g_nStartID = -1; // this is a flag for udp scan.
 
 	CTStatScanner* pScanner = (CTStatScanner*)pParam;
-	SOCKET hBroad=NULL;
+	//SOCKET hBroad=NULL;
 	SOCKET sListen=NULL;
 //	IP_ADAPTER_INFO pAdapterInfo;
 //	ULONG len = sizeof(pAdapterInfo); 
@@ -1047,7 +1045,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 	g_strScanInfoPrompt = _T("NC by UDP");
 	
 	TRACE(_T("Start udp scan ! \n"));
-	SOCKET soAck =::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+	//SOCKET soAck =::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 
 	 
 	//UINT nGatewayIP,nLocalIP,nMaskIP;
@@ -1060,23 +1058,26 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 	//in_addr in;
 	//in.S_un.S_addr=nBroadCastIP;
 	//chBroadCast=inet_ntoa(in);
-	hBroad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+#if 0
+	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	BOOL bBroadcast=TRUE;
-	::setsockopt(hBroad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
 	int iMode=1;
-	ioctlsocket(hBroad,FIONBIO, (u_long FAR*) &iMode);
+	ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
 
-	SOCKADDR_IN bcast;
-	bcast.sin_family=AF_INET;
+	//SOCKADDR_IN bcast;
+	h_bcast.sin_family=AF_INET;
 	//bcast.sin_addr.s_addr=nBroadCastIP;
-	bcast.sin_addr.s_addr=INADDR_BROADCAST;
-	bcast.sin_port=htons(UDP_BROADCAST_PORT);
+	h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+	h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
 
-	SOCKADDR_IN siBind;
-	siBind.sin_family=AF_INET;
-	siBind.sin_addr.s_addr=INADDR_ANY;
-	siBind.sin_port=htons(RECV_RESPONSE_PORT);
-	int nRet = ::bind(hBroad, (sockaddr*)&siBind,sizeof(siBind));
+	//SOCKADDR_IN siBind;
+	h_siBind.sin_family=AF_INET;
+	h_siBind.sin_addr.s_addr=INADDR_ANY;
+	h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+
+	int nRet = ::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+
 	if (nRet == SOCKET_ERROR)
 	{	   strlog=_T("Binding socket failed. Please check your net work settings.");
 	      NET_WriteLogFile(strlog);
@@ -1086,6 +1087,8 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 		goto END_SCAN;
 		return 0;
 	}
+#endif
+	int nRet = 0;
 	//############################
 	strScanInfo = _T("Initialize UDP network...");
 	pScanner->ShowNetScanInfo(strScanInfo); 
@@ -1146,13 +1149,13 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 			break;
 		}
 		FD_ZERO(&fdSocket);	
-		FD_SET(hBroad, &fdSocket);
+		FD_SET(h_Broad, &fdSocket);
 		//############################
 		strScanInfo = _T("Send UDP scan broadcast...");
 		pScanner->ShowNetScanInfo(strScanInfo); 
 		NET_WriteLogFile(strScanInfo);
 		//############################
-		nRet = ::sendto(hBroad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&bcast,sizeof(bcast));
+		nRet = ::sendto(h_Broad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast,sizeof(h_bcast));
 		if (nRet == SOCKET_ERROR)
 		{
 			int  nError = WSAGetLastError();
@@ -1162,7 +1165,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 			goto END_SCAN;
 			return 0;
 		}
-		int nLen = sizeof(siBind);
+		int nLen = sizeof(h_siBind);
 		//while(pScanner->IsComScanRunning())
 
 		fd_set fdRead = fdSocket;
@@ -1181,7 +1184,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 		{
 			ZeroMemory(buffer, 512);
 
-			int nRet = ::recvfrom(hBroad,(char*)buffer, 512, 0, (sockaddr*)&siBind, &nLen);
+			int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
 //			int nRet = ::recvfrom(hBroad,(char*)&buffer[0], nsize, 0, (sockaddr*)&addrRemote, &nLen);
 			BYTE szIPAddr[4] = {0};
 			if(nRet > 0)
@@ -1221,7 +1224,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 					//////////////////////////////////////////////////////////////////////////
 					if (!bFlag)
 					{
-						pScanner->AddNCToList(buffer, nRet, siBind);
+						pScanner->AddNCToList(buffer, nRet, h_siBind);
 						//############################
 						strScanInfo = _T("Find Network device...");
 						pScanner->ShowNetScanInfo(strScanInfo); 
@@ -1288,8 +1291,8 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 
 END_SCAN:
 
-	closesocket(hBroad);
-	hBroad=NULL;
+	//closesocket(h_Broad);
+	//h_Broad=NULL;
 	//pScanner->m_bNetScanFinish = TRUE; // ³¬Ê±½áÊø
 
 	g_strScanInfoPrompt = _T("NC by TCP");
@@ -2099,10 +2102,35 @@ void CTStatScanner::AddNewNetToDB()
 			{
 				int nNodeSID = m_szNetNodes[j]->GetSerialID();
 				int nNodeProtocol = m_szNetNodes[j]->GetProtocol();
-				if ((nSID == nNodeSID)&&(nSProtocol == nNodeProtocol))
+				if (nSID == nNodeSID)
 				{
-					bIsNew = FALSE;
-					break;
+					if(nSProtocol == nNodeProtocol)
+					{
+						bIsNew = FALSE;
+						break;
+					}
+					else
+					{
+						CString strSql;
+						CString strText;
+						strText.Format(_T("%d"),nNodeSID);
+						strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"),strText);
+						CString strTemp;
+						strTemp.Format(_T("Are you sure to delete thise item"));
+						//if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
+						//{
+							try
+							{
+
+
+								t_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
+							}
+							catch(_com_error *e)
+							{
+								AfxMessageBox(e->ErrorMessage());
+							}
+						//}
+					}
 				}
 			}
 			else
@@ -2272,8 +2300,9 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 
 	CString strCom;//scan
 	//strCom.Format(_T("%d"), pInfo->m_pNet->GetIPPort());
-	strCom = pInfo->m_tstatport;
-	
+	//strCom = pInfo->m_tstatport;
+	strCom.Format(_T("%d"),pInfo->m_pDev->m_nComPort);
+
 	CString strMainetInfo = pInfo->m_pDev->m_mainnet_info.GetMainnetInfo();
 
 
@@ -3057,7 +3086,9 @@ void CTStatScanner::ScanAll()
 {	
 	
 #if 1	
+	b_is_scan = true ;
 	ScanComDevice();
+	
 	
 	ScanNetworkDevice();
 #endif	
@@ -3127,7 +3158,7 @@ UINT _WaitScanThread(PVOID pParam)
 		{
 		  pScanner->SendScanEndMsg();
 		}
-	
+	b_is_scan = false;
 
 	return 1;
 }
@@ -3555,11 +3586,11 @@ BOOL CTStatScanner::ScanBacnetComDevice()
 	m_szComs.clear();
 	GetSerialComPortNumber1(m_szComs);
 
-	if (m_szComs.size() <= 0)
-	{
-		//AfxMessageBox(_T("Can't scan without any com port installed."));
-		return FALSE;
-	}
+	//if (m_szComs.size() <= 0)
+	//{
+	//	//AfxMessageBox(_T("Can't scan without any com port installed."));
+	//	return FALSE;
+	//}
 	m_pScanBacnetComThread = AfxBeginThread(_ScanBacnetComThread,this);
 	return TRUE;
 }
@@ -3609,7 +3640,7 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 					do 
 					{
 						resend_count ++;
-						if(resend_count>20)
+						if(resend_count>50)
 							break;
 						g_invoke_id = GetPrivateData(
 							m_bac_scan_com_data.at(i).device_id,
@@ -3620,6 +3651,7 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 
 						Sleep(SEND_COMMAND_DELAY_TIME);
 					} while (g_invoke_id<0);
+					Sleep(2000);
 				} while (!tsm_invoke_id_free(g_invoke_id));
 					
 			}
@@ -3654,14 +3686,35 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 		DWORD dwIP = inet_addr(cTemp1); 
 
 		pTemp->SetIPAddr(dwIP);
-		pTemp->SetIPPort(47808);
+		pTemp->SetIPPort(BACNETIP_PORT);
 		//pTemp->SetBaudRate(19200);//scan
 		//pTemp->SetComPort(5);
 		// hardware_version
 		//pTemp->SetBuildingName(pScan->m_strBuildingName);
 		//pTemp->SetSubnetName(pScan->m_strSubNet);
+		int Find_serialID = false;
 
-		pScan->m_szNCScanRet.push_back(pInfo);
+		for (int i=0;i<pScan->m_szNCScanRet.size();i++)
+		{
+
+			if( pTemp->GetSerialID() ==    pScan->m_szNCScanRet.at(i)->m_pNet->GetSerialID())
+			{
+					Find_serialID = true;
+					pScan->m_szNCScanRet.at(i)->m_pNet->SetHardwareVersion(pTemp->GetHardwareVersion());
+					pScan->m_szNCScanRet.at(i)->m_pNet->SetSoftwareVersion(pTemp->GetSoftwareVersion());
+					pScan->m_szNCScanRet.at(i)->m_pNet->SetProtocol(PROTOCOL_BACNET_IP);
+
+					if(pTemp)
+						delete pTemp;
+					//pScan->m_szNCScanRet.at(i)->m_pNet->SetIPPort(BACNETIP_PORT);
+					break;
+			}
+
+		}
+
+		if(!Find_serialID)
+			pScan->m_szNCScanRet.push_back(pInfo);
+
 	}
 	
 #if 0
@@ -3694,7 +3747,7 @@ endbacnetthread:
 	{
 		pScan->m_eScanBacnetComEnd->SetEvent();
 	}
-	pScan->m_bStopScan = TRUE;
+	//pScan->m_bStopScan = TRUE;
 	is_in_scan_mode = false;
 	return 1;
 }

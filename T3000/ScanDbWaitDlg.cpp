@@ -228,7 +228,7 @@ LRESULT CScanDbWaitDlg::OnNetScanInfo(WPARAM wParam, LPARAM lParam)
 	CString* pStr = (CString*)(wParam);
 	m_strNetScanInfo = _T("Net Scan : ")  + *pStr;
 	
-	TRACE(_T("net scan info ! \n"));
+	//TRACE(_T("net scan info ! \n"));
 	//UpdateData(FALSE);
 	CWnd* pWnd = GetDlgItem(IDC_INFO_NET);
 	pWnd->SetWindowText(m_strNetScanInfo);
@@ -242,7 +242,7 @@ LRESULT CScanDbWaitDlg::OnNetScanInfo(WPARAM wParam, LPARAM lParam)
 LRESULT CScanDbWaitDlg::OnBacnetComScanInfo(WPARAM wParam, LPARAM lParam)
 {
 	CString* pStr = (CString*)(wParam);
-	m_strComScanInfo = _T("Com Port Scan : ") + *pStr;
+	m_strComScanInfo = _T("BacnetIP Scan : ") + *pStr;
 
 	//UpdateData(FALSE);
 

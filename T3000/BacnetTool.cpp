@@ -186,7 +186,7 @@ void CBacnetTool::InitialBacnetConnection()
 	Device_Set_Object_Instance_Number(4194300);
 	address_init();
 	Init_Service_Handlers_Tool();
-	int ret_1 = Open_bacnetSocket2(_T(""),47808,my_sokect);
+	int ret_1 = Open_bacnetSocket2(_T(""),BACNETIP_PORT,my_sokect);
 	bip_set_socket(my_sokect);
 	bip_set_port(49338);
 	static in_addr BIP_Broadcast_Address;

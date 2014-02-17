@@ -95,6 +95,10 @@ INPUT bool Open_Socket(CString strIPAdress);
 INPUT void SetCommunicationType(int nType);
 INPUT int NetController_CheckTstatOnline(unsigned char devLo=1,unsigned char devHi=254);
 INPUT bool Open_Socket2(CString strIPAdress,short nPort);
+
+INPUT int GetLastOpenedComport();
+INPUT int GetLastCommunicationType();
+
 INPUT HANDLE GetCommunicationHandle();
 //////////////////////////////////////////////////////////////////////////
 INPUT int NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
@@ -161,6 +165,7 @@ using namespace std;  // Ensure that the namespace is set to std
 #define		WM_REFRESH_BAC_MONITOR_LIST					WM_USER + 213
 #define		WM_REFRESH_BAC_MONITOR_INPUT_LIST			WM_USER + 214
 #define		WM_REFRESH_BAC_ALARMLOG_LIST				WM_USER + 215
+#define		WM_REFRESH_BAC_TSTAT_LIST					WM_USER + 216
 
 
 
