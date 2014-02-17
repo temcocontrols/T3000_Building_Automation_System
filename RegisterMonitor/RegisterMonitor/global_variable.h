@@ -103,7 +103,7 @@ CString g_strFan=_T("");
 
 
 BOOL g_bEnableRefreshTreeView = TRUE;
-BOOL g_bScanStart = FALSE;
+BOOL g_bPauseRefreshTree = FALSE;
 int g_llTxCount = 0;
 int g_llRxCount = 0;
 BOOL g_unint = TRUE;//TREE = °„C;FALSE = F;

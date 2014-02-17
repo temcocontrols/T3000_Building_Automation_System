@@ -43,7 +43,7 @@ public:
 
 
 
-protected:
+public:
 	int				m_nprotocol;				//协议
 	int				m_nBaudRate;				// 波特率
 	int				m_nComPort;				// 串口	

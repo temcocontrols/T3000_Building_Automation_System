@@ -139,4 +139,6 @@ CString Get_Table_Name(int SerialNo,CString Type ,int Row);
 void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString TableName); 
 int Get_Unit_Process(CString Unit);
 BOOL Get_Bit_FromRegister(unsigned short RegisterValue,unsigned short Position);
+int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind);
+UINT RefreshNetWorkDeviceListByUDPFunc();
 #endif

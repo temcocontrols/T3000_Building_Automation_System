@@ -1045,6 +1045,9 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case  WRITEALARM_T3000:
 		entitysize = sizeof(Alarm_point);
 		break;
+	case WRITETSTAT_T3000:
+		entitysize = sizeof(Str_TstatInfo_point);
+		break;
 	default:
 		{
 			//AfxMessageBox(_T("Entitysize length error!"));
@@ -1156,6 +1159,12 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 		for (int i=0;i<(end_instance-start_instance + 1);i++)
 		{
 			memcpy_s(SendBuffer + i*sizeof(Str_monitor_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_monitor_point),&m_monitor_data.at(i + start_instance),sizeof(Str_monitor_point));
+		}
+		break;
+	case WRITETSTAT_T3000:
+		for (int i=0;i<(end_instance-start_instance + 1);i++)
+		{
+			memcpy_s(SendBuffer + i*sizeof(Str_TstatInfo_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_TstatInfo_point),&m_Tstat_data.at(i + start_instance),sizeof(Str_TstatInfo_point));
 		}
 		break;
 	case CONNECTED_WITH_DEVICE:
@@ -1573,6 +1582,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 		}
 		break;
 	case READANNUALROUTINE_T3000  :
+		{
 		if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_annual_routine_point))!=0)
 			return -1;	//得到的结构长度错误;
 		block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_annual_routine_point);
@@ -1608,6 +1618,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			my_temp_point++;
 		}
 		return READANNUALROUTINE_T3000;
+		}
 		break;
 	case READPROGRAM_T3000:
 		{
@@ -2167,6 +2178,51 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 				 //pTemp->SetDevID(temp_struct.modbus_addr);
 				 //pTemp->SetProductType(temp_struct.product_type);
 			 }
+		}
+		break;
+	case READTSTAT_T3000:
+		{
+			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_TstatInfo_point))!=0)
+				return -1;	//得到的结构长度错误;
+			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_TstatInfo_point);
+			my_temp_point = (char *)Temp_CS.value + 3;
+			start_instance = *my_temp_point;
+			my_temp_point++;
+			end_instance = *my_temp_point;
+			my_temp_point++;
+			my_temp_point = my_temp_point + 2;
+
+			if(start_instance >= BAC_TSTAT_COUNT)
+				return -1;//超过长度了;
+
+			for (i=start_instance;i<=end_instance;i++)
+			{
+				m_Tstat_data.at(i).product_model = *(my_temp_point++);
+				m_Tstat_data.at(i).temperature = ((unsigned char)my_temp_point[0]<<8) | ((unsigned char)my_temp_point[1]);
+				my_temp_point = my_temp_point + 2;
+				m_Tstat_data.at(i).mode = *(my_temp_point++);
+				m_Tstat_data.at(i).cool_heat_mode = *(my_temp_point++);
+				m_Tstat_data.at(i).setpoint =  ((unsigned char)my_temp_point[0]<<8) | ((unsigned char)my_temp_point[1]);
+				my_temp_point = my_temp_point + 2;
+				m_Tstat_data.at(i).cool_setpoint =  ((unsigned char)my_temp_point[0]<<8) | ((unsigned char)my_temp_point[1]);
+				my_temp_point = my_temp_point + 2;
+				m_Tstat_data.at(i).heat_setpoint =  ((unsigned char)my_temp_point[0]<<8) | ((unsigned char)my_temp_point[1]);
+				my_temp_point = my_temp_point + 2;
+				m_Tstat_data.at(i).occupied = *(my_temp_point++);
+				m_Tstat_data.at(i).output_state = *(my_temp_point++);
+
+				m_Tstat_data.at(i).night_heat_db = *(my_temp_point++);
+				m_Tstat_data.at(i).night_cool_db = *(my_temp_point++);
+				m_Tstat_data.at(i).night_heat_sp = *(my_temp_point++);
+				m_Tstat_data.at(i).night_cool_sp = *(my_temp_point++);
+				m_Tstat_data.at(i).over_ride = *(my_temp_point++);
+				m_Tstat_data.at(i).tst_db.id = *(my_temp_point++);
+				m_Tstat_data.at(i).tst_db.sn = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
+				my_temp_point = my_temp_point + 4;
+				m_Tstat_data.at(i).tst_db.port = *(my_temp_point++);
+				m_Tstat_data.at(i).type = *(my_temp_point++);
+			}
+
 		}
 		break;
 	}
@@ -2738,7 +2794,7 @@ void Initial_bac(int comport)
 		//SetCommunicationType(1);
 		//close_com();
 		//Device_Set_Object_Instance_Number(4194300);
-		Device_Set_Object_Instance_Number(1115);
+		Device_Set_Object_Instance_Number(11152);
 		address_init();
 		Init_Service_Handlers();
 #if 0
@@ -2749,7 +2805,7 @@ void Initial_bac(int comport)
 		
 		//Open_bacnetSocket2(_T("127.0.0.1"),6002,my_sokect);
 		//int ret_1 = Open_bacnetSocket2(_T("192.168.0.177"),47808,my_sokect);
-		int ret_1 = Open_bacnetSocket2(_T("192.168.0.130"),47808,my_sokect);
+		int ret_1 = Open_bacnetSocket2(_T("192.168.0.130"),BACNETIP_PORT,my_sokect);
 	//	Open_Socket2(_T("127.0.0.1"),6002);
 	//	 = (int)GetCommunicationHandle();
 		bip_set_socket(my_sokect);
@@ -3346,4 +3402,181 @@ BOOL CheckForUpdate(
 	delete pFtpSession;
 	//DeleteFile( versionfilename );
 	return TRUE;
+}
+
+
+
+
+int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
+{
+	int nLen=buffer[2]+buffer[3]*256;
+	//int n =sizeof(char)+sizeof(unsigned char)+sizeof( unsigned short)*9;
+	unsigned short usDataPackage[16]={0};
+	if(nLen>=0)
+	{
+		refresh_net_device temp;
+		memcpy(usDataPackage,buffer+4,nLen*sizeof(unsigned short));
+
+		DWORD nSerial=usDataPackage[0]+usDataPackage[1]*256+usDataPackage[2]*256*256+usDataPackage[3]*256*256*256;
+		int modbusID=usDataPackage[5];
+		TRACE(_T("Serial = %d     ID = %d\r\n"),nSerial,modbusID);
+		temp.modbusID = modbusID;
+		temp.nSerial = nSerial;
+
+		bool find_exsit = false;
+
+		for (int i=0;i<(int)m_refresh_net_device_data.size();i++)
+		{
+			if(m_refresh_net_device_data.at(i).nSerial == nSerial)
+			{
+				find_exsit = true;
+				break;
+			}
+		}
+
+		if(!find_exsit)
+		{
+			m_refresh_net_device_data.push_back(temp);
+		}
+	}
+
+
+	return m_refresh_net_device_data.size();
+}
+
+
+//UINT RefreshNetWorkDeviceListByUDPFunc(LPVOID pParam)
+UINT RefreshNetWorkDeviceListByUDPFunc()
+{
+	
+	int nRet = 0;
+	//if (nRet == SOCKET_ERROR)
+	//{	  
+	//	/*goto END_SCAN;
+	//	return 0;*/
+	//}
+	short nmsgType=UPD_BROADCAST_QRY_MSG;
+
+
+	//////////////////////////////////////////////////////////////////////////
+	const DWORD END_FLAG = 0x00000000;
+	TIMEVAL time;
+	time.tv_sec =3;
+	time.tv_usec = 1000;
+
+	fd_set fdSocket;
+	BYTE buffer[512] = {0};
+
+	BYTE pSendBuf[1024];
+	ZeroMemory(pSendBuf, 255);
+	pSendBuf[0] = 100;
+	memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
+	int nSendLen = 5;
+
+	int time_out=0;
+	BOOL bTimeOut = FALSE;
+	while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
+	{
+		time_out++;
+		if(time_out>20)
+			bTimeOut = TRUE;
+		//if(pScanner->m_bStopScan)
+		//{
+		//	CString strlog=_T("Scan Stop Time: ")+Get_NowTime()+_T("\n");
+		//	NET_WriteLogFile(strlog);
+		//	break;
+		//}
+		FD_ZERO(&fdSocket);	
+		FD_SET(h_Broad, &fdSocket);
+
+		nRet = ::sendto(h_Broad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast,sizeof(h_bcast));
+		if (nRet == SOCKET_ERROR)
+		{
+			int  nError = WSAGetLastError();
+			goto END_SCAN;
+			return 0;
+		}
+		int nLen = sizeof(h_siBind);
+		fd_set fdRead = fdSocket;
+		int nSelRet = ::select(0, &fdRead, NULL, NULL, &time);//TRACE("recv nc info == %d\n", nSelRet);
+		if (nSelRet == SOCKET_ERROR)
+		{
+			int nError = WSAGetLastError();
+			goto END_SCAN;
+			return 0;
+		}
+
+		if(nSelRet > 0)
+		{
+			ZeroMemory(buffer, 512);
+			int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
+			BYTE szIPAddr[4] = {0};
+			if(nRet > 0)
+			{		
+				FD_ZERO(&fdSocket);
+				if(buffer[0]==RESPONSE_MSG)
+				{	
+					nLen=buffer[2]+buffer[3]*256;
+					unsigned short dataPackage[32]={0};
+					memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
+					szIPAddr[0]= (BYTE)dataPackage[7];
+					szIPAddr[1]= (BYTE)dataPackage[8];
+					szIPAddr[2]= (BYTE)dataPackage[9];
+					szIPAddr[3]= (BYTE)dataPackage[10];
+
+					int n = 1;
+					BOOL bFlag=FALSE;
+					//////////////////////////////////////////////////////////////////////////
+					// 检测IP重复
+					DWORD dwValidIP = 0;
+					memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
+					while(dwValidIP != END_FLAG)
+					{	
+						DWORD dwRecvIP=0;
+						memcpy((BYTE*)&dwRecvIP, szIPAddr, 4);
+						memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
+						if(dwRecvIP == dwValidIP)
+						{
+							bFlag = TRUE;
+							break;
+						}
+						n+=4;
+					}
+					//////////////////////////////////////////////////////////////////////////
+					if (!bFlag)
+					{
+						AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
+
+						//pSendBuf[nSendLen-1] = (BYTE)(modbusID);
+						pSendBuf[nSendLen-4] = szIPAddr[0];
+						pSendBuf[nSendLen-3] = szIPAddr[1];
+						pSendBuf[nSendLen-2] = szIPAddr[2];
+						pSendBuf[nSendLen-1] = szIPAddr[3];
+						memcpy(pSendBuf + nSendLen, (BYTE*)&END_FLAG, 4);
+						//////////////////////////////////////////////////////////////////////////
+
+						//pSendBuf[nSendLen+3] = 0xFF;
+						nSendLen+=4;
+					}
+				}	
+
+			}
+		}	
+		else
+		{
+			g_ScnnedNum = 0;
+			bTimeOut = TRUE;
+		}
+	}//end of while
+END_SCAN:
+
+	//closesocket(h_Broad);
+	//h_Broad=NULL;
+	//pScanner->m_bNetScanFinish = TRUE; // 超时结束
+
+	//g_strScanInfoPrompt = _T("NC by TCP");
+	//strlog=_T("UDP scan finished,Time: ")+Get_NowTime()+_T("\n");
+	//NET_WriteLogFile(strlog);
+	//pScanner->m_eScanNCEnd->SetEvent();
+	return 1;
 }

@@ -22,8 +22,8 @@
 	static int baudrate_in_dll=0;
 	static int open_com_port_number_in_dll=65535;
 	static int old_or_new_scan_protocal_in_dll=1;//1==new protocal;2==old protocal
-
-extern 	SOCKET m_hSocket;	
+	extern 	SOCKET m_hSocket;	
+	extern  SOCKET m_hSocket_for_list;
 int g_Commu_type=0;//0:serial modus//
 
 //CMutex scan_mutex;
@@ -34,7 +34,15 @@ CStdioFile* g_fileScanLog = NULL;
 CStdioFile* g_fileScanNetLog=NULL;
 
 
+OUTPUT int GetLastOpenedComport()
+{
+	return open_com_port_number_in_dll;
+}
 
+OUTPUT int GetLastCommunicationType()
+{
+	return g_Commu_type;
+}
 
 OUTPUT void SetCommunicationType(int nType)
 {
@@ -777,6 +785,8 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
 	}
 	return TRUE;
 }
+
+
 
 //////////////////////////////////////////////////////////////////////////
 // Connect 分为两种情况：
