@@ -82,6 +82,8 @@ typedef struct _tree_product//////////////////////
 	int nEPsize;
 	CString strImgPathName;
 	int protocol;
+	unsigned int ncomport;
+	bool status;
 	
 }tree_product;///////////////////////////////////////////////////////////////////////////////
 
@@ -158,6 +160,7 @@ public://scan
 	CWinThread* m_pFreshMultiRegisters;
 
 	CWinThread* m_pFreshTree;
+	CWinThread* m_pCheck_net_device_online;
 
 	vector <binary_search_result> m_binary_search_networkcontroller_background_thread;	////background thread search result
 	vector <binary_search_result> m_binary_search_product_background_thread;				////background thread search result
@@ -224,6 +227,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+	void  CheckDeviceStatus();
 	void	SaveBacnetConfigFile();
 	void	LoadBacnetConfigFile();
 	void  Show_Wait_Dialog_And_SendConfigMessage();
@@ -295,7 +299,9 @@ public:
 	void GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItems  );
 	//void EnableRefreshTreeView(BOOL bEnable);
 	void DoFreshAll();
-	void RefreshTreeView();
+	//void RefreshTreeView();
+
+	LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam);
 	// suspend refresh tree view thread, when flash or other operation need read or write large data by Modbus.
 	void SuspendRefreshThread();
 	void ContinueRefreshThread();
@@ -383,6 +389,7 @@ public:
 	afx_msg void OnControlAlarmLog();
 		afx_msg void OnMenuCheckupdate();
 	afx_msg void OnDatabasePv();
+	afx_msg void OnControlTstat();
 };
 
 const int DLG_T3000_VIEW = 0;

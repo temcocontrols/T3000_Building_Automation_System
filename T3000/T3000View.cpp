@@ -298,8 +298,8 @@ void CT3000View::OnInitialUpdate()
 	CString lightsensor;
 	lightsensor.Format(_T("%d"),product_register_value[MODBUS_VALUE_SENSOR]);
 	GetDlgItem(IDC_LIGHTING_SENSOR)->SetWindowText(lightsensor);
-	CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
-	pMain->OnConnect();
+	//CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+	//pMain->OnConnect();
   //gGetFormViewStrings(this->m_hWnd,IDD_T3000_FORM);
      //gSetFormViewStrings(this->m_hWnd,IDD_T3000_FORM);
 }

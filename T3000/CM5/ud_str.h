@@ -51,6 +51,7 @@ typedef enum {
 		 TIME_COMMAND              = 21,           /* read time            */
 		 CLEARPANEL_T3000          = 28,           /* clear panel          */
 		 SEND_ALARM_COMMAND        = 32,
+		 READTSTAT_T3000		   = 33,
 
 		 WRITEOUTPUT_T3000         = 100+ENUM_OUT+1,  /* write outputs          */
 		 WRITEINPUT_T3000          = 100+ENUM_IN+1,   /* write inputs           */
@@ -69,7 +70,7 @@ typedef enum {
 		 WRITEANNUALSCHEDULE_T3000 = 100+ENUM_AR_DATA+1,     /* write annual schedule*/
 		 WRITEPROGRAMCODE_T3000    = 100+16,           /* write program code    */
 		 WRITEINDIVIDUALPOINT_T3000 = 100+READINDIVIDUALPOINT_T3000,  /* write individual point*/
-
+		 WRITETSTAT_T3000			= 100 + READTSTAT_T3000,
 		 COMMAND_50                = 50,
 		 READ_COMMAND_50           = 50,
 		 WRITE_COMMAND_50          = 150,
@@ -713,6 +714,38 @@ typedef struct
 	char alarm_count;
 	char alarm_message[70];
 } Alarm_struct;
+
+typedef struct _SCAN_DATABASE_
+{
+	uint8_t id;
+	int32_t sn;
+	uint8_t port;
+} SCAN_DB;
+typedef  struct
+{
+	uint8_t product_model;
+	uint16_t temperature;
+	uint8_t mode;
+	uint8_t cool_heat_mode;
+	uint16_t setpoint;
+	uint16_t cool_setpoint;
+	uint16_t heat_setpoint;
+	uint8_t occupied; // occupied is 1 bit, 8 BIT is S8_T
+	uint8_t output_state;
+	uint8_t night_heat_db;
+	uint8_t night_cool_db;
+	uint8_t night_heat_sp;
+	uint8_t night_cool_sp;
+	uint8_t over_ride;
+	//	uint8_t serial_number[4];
+	//	uint8_t address; 
+	SCAN_DB tst_db;
+	uint8_t type;
+}Str_TstatInfo_point;
+
+
+
+
 
 
 

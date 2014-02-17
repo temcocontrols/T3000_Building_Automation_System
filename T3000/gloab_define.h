@@ -11,6 +11,12 @@
 #define  WM_LIST_MONITOR_INPUT_CHANGED WM_USER+ 977
 #define WM_SCREENEDIT_CLOSE WM_USER + 1232
 
+const int BACNETIP_PORT =  47808;
+const int UDP_BROADCAST_PORT =1234;
+const int RECV_RESPONSE_PORT = 4321;
+#define UPD_BROADCAST_QRY_MSG 100
+#define RESPONSE_MSG          UPD_BROADCAST_QRY_MSG+1
+
 const int MODBUS_RS485 = 0;
 const int MODBUS_TCPIP = 1;
 const int MODBUS_BACNET_MSTP = 2;
@@ -27,9 +33,9 @@ const COLORREF LIST_ITEM_SELECTED = RGB(150,150,200);
 
 const bool REFRESH_ON_ITEM = TRUE;
 
-const int SEND_COMMAND_DELAY_TIME = 150;
+const int SEND_COMMAND_DELAY_TIME = 100;
 const int RESEND_COUNT = 100;
-const int FAIL_RESEND_COUNT = 2;
+const int FAIL_RESEND_COUNT = 4;
 
 const int TYPE_SVAE_CONFIG = 254;
 const int TYPE_ALL = 255;
@@ -47,6 +53,7 @@ const int TYPE_PROGRAMCODE = 11;
 const int TYPE_WEEKLYCODE = 12;
 const int TYPE_ANNUALCODE = 13;
 const int TYPE_ALARMLOG = 14;
+const int TYPE_TSTAT = 15;
 
 const int DELETE_WINDOW_MSG = 200;
 
@@ -68,6 +75,7 @@ const int BAC_READ_PROGRAMCODE_LIST = 11;
 const int BAC_READ_WEEKLTCODE_LIST = 12;
 const int BAC_READ_ANNUALCODE_LIST = 13;
 const int BAC_READ_ALARMLOG_LIST = 14;
+const int BAC_READ_TSTAT_LIST = 15;
 
 
 
@@ -115,6 +123,8 @@ const int BAC_MONITOR_COUNT = 12;
 const int BAC_ANNUAL_CODE_COUNT = 8;
 const int BAC_CONNECT_WITH_DEVICE_COUNT = 1;
 const int BAC_ALARMLOG_COUNT = 16;
+const int BAC_TSTAT_COUNT = 8;
+
 
 
 const int BAC_INPUT_GROUP = BAC_INPUT_ITEM_COUNT / BAC_READ_GROUP_NUMBER;
@@ -132,6 +142,7 @@ const int BAC_SCREEN_GROUP = BAC_SCREEN_COUNT / BAC_READ_GROUP_NUMBER;
 const int BAC_MONITOR_GROUP = BAC_MONITOR_COUNT / BAC_READ_GROUP_NUMBER;
 const int BAC_CONNECT_WITH_DEVICE_GROUP = 1;
 const int BAC_ALARMLOG_GROUP = BAC_ALARMLOG_COUNT;
+const int BAC_TSTAT_GROUP = BAC_TSTAT_COUNT / BAC_READ_GROUP_NUMBER;
 
 
 
@@ -196,6 +207,12 @@ struct _Com_Scan_Read_Info
 	int retry_time;
 };
 
+struct refresh_net_device
+{
+	DWORD nSerial;
+	int modbusID;
+};
+
 struct _Refresh_Info 
 {
 	_Resend_Read_Info Read_Variable_Info[BAC_VARIABLE_GROUP];
@@ -213,6 +230,7 @@ struct _Refresh_Info
 	_Resend_Read_Info Read_Monitor_Info[BAC_MONITOR_GROUP];
 	_Resend_Read_Info Read_Connect_With_Device[BAC_CONNECT_WITH_DEVICE_GROUP];
 	_Resend_Read_Info Read_AlarmLog_Info[BAC_ALARMLOG_GROUP];
+	_Resend_Read_Info Read_Tstat_Info[BAC_TSTAT_GROUP];
 };
 
 struct _Refresh_Write_Info 
@@ -464,6 +482,8 @@ struct _Graphic_Value_Info
 	HWND hWnd;
 };
 
+
+const int WINDOW_TAB_COUNT = 11; //多少个Window 嵌入在TAB里面;
 const int WINDOW_INPUT = 0;
 const int WINDOW_OUTPUT = 1;
 const int WINDOW_VARIABLE = 2;
@@ -474,5 +494,8 @@ const int WINDOW_WEEKLY = 6;
 const int WINDOW_ANNUAL = 7;
 const int WINDOW_MONITOR = 8;
 const int WINDOW_ALARMLOG = 9;
+const int WINDOW_TSTAT	= 10;
+
+
 
 const int KEY_INSERT = 1020;

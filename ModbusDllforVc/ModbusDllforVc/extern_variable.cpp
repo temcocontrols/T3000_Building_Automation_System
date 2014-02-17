@@ -13,6 +13,7 @@
 	TS_UC  pval[13];//the data that send from com
 	TS_UC  multi_read_val[256];//the register value is put into here,by multi_read function//the number must less 256
 	SOCKET m_hSocket=NULL;
+	SOCKET m_hSocket_for_list =	NULL;
 
 
 	

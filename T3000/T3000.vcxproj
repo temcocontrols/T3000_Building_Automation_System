@@ -146,6 +146,7 @@
     <ClCompile Include="BacnetScreenEdit.cpp" />
     <ClCompile Include="BacnetTool.cpp" />
     <ClCompile Include="BacnetToolReadProperty.cpp" />
+    <ClCompile Include="BacnetTstat.cpp" />
     <ClCompile Include="BacnetVariable.cpp" />
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
@@ -161,7 +162,7 @@
     <ClCompile Include="CO2_View.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
     <ClCompile Include="CustomSTable.cpp" />
-    <ClCompile Include="DialogCM5_BacNet.cpp" />
+    <ClCompile Include="BacnetView.cpp" />
     <ClCompile Include="DisplayConfig.cpp" />
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
@@ -340,6 +341,7 @@
     <ClInclude Include="BacnetScreenEdit.h" />
     <ClInclude Include="BacnetTool.h" />
     <ClInclude Include="BacnetToolReadProperty.h" />
+    <ClInclude Include="BacnetTstat.h" />
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
