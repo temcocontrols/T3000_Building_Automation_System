@@ -16,7 +16,7 @@
 #include "globle_function.h"
 #include "AddBuilding.h"
 #include "ScanSelectDlg.h"
-
+#include "CalibrationDlg.h"
 #include "MannageBuidingDlg.h"
 #include "AllNodesDiaolg.h"
 #include "GridLoad.h"
@@ -52,14 +52,15 @@
 #include "T38I13O.h"
 #include "T332AI.h"
 #include "gloab_define.h"
-#include "CalibrationHumDlg.h"
+ 
 #include "T38AI8AO.h"
  #include "rs485.h" // For call Get_RS485_Handle() function
 #include "BacnetWait.h"
 #include "BacnetScreenEdit.h"
 #include "LanguageLocale.h"
- #include "RegisterViewerDlg.h"
- #include "PVDlg.h"
+#include "RegisterViewerDlg.h"
+#include "PVDlg.h"
+#include "T36CT.h"
 #pragma region Fance Test
 //For Test
 
@@ -225,7 +226,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_MESSAGE(WM_MBPOLL_CLOSED, &CMainFrame::OnMbpollClosed)
 	ON_COMMAND(ID_DATABASE_IONAMECONFIG, &CMainFrame::OnDatabaseIonameconfig)
 	ON_COMMAND(ID_TOOL_ISPTOOLFORONE, &CMainFrame::OnToolIsptoolforone)
-	ON_COMMAND(ID_TOOL_REGISTERMONITER, &CMainFrame::OnToolRegistermoniter)
+	 
 //	ON_COMMAND(ID_APP_EXIT, &CMainFrame::OnAppExit)
 	ON_COMMAND(ID_VIEW_COMMUNICATETRAFFIC, &CMainFrame::OnViewCommunicatetraffic)
 	ON_COMMAND(ID_FUNCTION_HUMCALIBRATION, &CMainFrame::OnFunctionHumcalibration)
@@ -252,6 +253,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 		ON_COMMAND(ID_Menu_CHECKUPDATE, &CMainFrame::OnMenuCheckupdate)
 	ON_COMMAND(ID_DATABASE_PV, &CMainFrame::OnDatabasePv)
 	ON_COMMAND(ID_CONTROL_TSTAT, &CMainFrame::OnControlTstat)
+	ON_COMMAND(ID_CALIBRATION_CALIBRATIONHUM, &CMainFrame::OnCalibrationCalibrationhum)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -481,6 +483,7 @@ void CMainFrame::InitViews()
 	m_pViews[DLG_DIALOGT38I13O_VIEW]=(CView*) new T38I13O;
 	m_pViews[DLG_DIALOGT332AI_VIEW]=(CView*)new T332AI;
 	m_pViews[DLG_DIALOGT38AI8AO]=(CView*)new T38AI8AO;
+    m_pViews[DLG_DIALOGT36CT]=(CView*)new T36CT;
 
 
 	CDocument* pCurrentDoc = GetActiveDocument();
@@ -1051,6 +1054,11 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 			DoConnectToANode(hSelItem); 
 			//SwitchToPruductType(DLG_DIALOGT38I13O_VIEW);
 			}
+            else if (m_product.at(i).product_class_id==PM_T36CT)
+            {
+                g_tstat_id = m_product.at(i).product_id;
+                SwitchToPruductType(DLG_DIALOGT36CT);
+            }
 			else 
 			{   
 			    g_tstat_id = m_product.at(i).product_id;
@@ -1399,7 +1407,7 @@ try
 					TVINSERV_SOLAR	
 				else if (temp_product_class_id == PM_CM5 ) //CM5		
 					TVINSERV_CMFIVE	
-				else if (temp_product_class_id == PM_T38AIOD) //T3
+				else if (temp_product_class_id == PM_T3PT10) //T3
 					TVINSERV_NET_WORK
 				else if (temp_product_class_id ==PM_T3IOA )//T3-8AI8AO
 					TVINSERV_NET_WORK
@@ -2186,6 +2194,12 @@ here:
 			m_nCurView=DLG_DIALOGT38AI8AO;
 			((T38AI8AO*)m_pViews[m_nCurView])->Fresh();
 		}	break;
+     case  DLG_DIALOGT36CT:
+     {
+        m_nCurView=DLG_DIALOGT36CT;
+       ((T36CT*)m_pViews[m_nCurView])->Fresh();
+     }
+     break;
 	}
 //here
 }
@@ -2310,24 +2324,27 @@ void CMainFrame::Scan_Product()
 	//	{	
 	CScanwaydlg dlg;
 
-	int ret =dlg.DoModal(); //AfxMessageBox(_T("YES: 'Quick Scan(Binary Search)' ,\n NO:'Deep Scan(One By One)'?"),MB_YESNOCANCEL ,3);
-	 	if ( ret == IDOK)
+	 dlg.DoModal(); //AfxMessageBox(_T("YES: 'Quick Scan(Binary Search)' ,\n NO:'Deep Scan(One By One)'?"),MB_YESNOCANCEL ,3);
+	 	if ( dlg.Is_Deep == 1)
 	 	{
 			CScanSelectDlg dlg;
-			dlg.DoModal();
-			m_pScanner->ScanComOneByOneDevice();
-			m_pScanner->WaitScan();
-			m_pScanner->m_scantype=4;
-
+			int ret=dlg.DoModal();
+            if (ret==IDOK)
+            {
+                m_pScanner->ScanComOneByOneDevice();
+                m_pScanner->WaitScan();
+                m_pScanner->m_scantype=4;
+            }
+            else
+            {
+            return;
+            }
 			
 		}
-		else if(ret==IDCANCEL)
+		else if(dlg.Is_Deep == 2)
 		{
 			m_pScanner->ScanAll();
 			m_pScanner->m_scantype = 3;
-		
-			
-
 		}
 		else
 		{
@@ -5045,7 +5062,7 @@ void CMainFrame::SaveConfigFile()
 		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
 		SetPaneString(1, strTips);
 	}
-	else if (product_register_value[7]==PM_T38AIOD||
+	else if (product_register_value[7]==PM_T3PT10||
 	product_register_value[7]==PM_T3IOA||
 	product_register_value[7]==PM_T332AI||
 	product_register_value[7]==PM_T3AI16O||
@@ -8859,10 +8876,7 @@ void CMainFrame::OnToolIsptoolforone()
 }
 
 
-void CMainFrame::OnToolRegistermoniter()
-{    close_com();
-show_RegisterMonitorDlg();
-}
+ 
 
 void CMainFrame::OnViewCommunicatetraffic()
 {
@@ -8879,8 +8893,8 @@ void CMainFrame::OnViewCommunicatetraffic()
 }
 void CMainFrame::OnFunctionHumcalibration()
 {
-	 CCalibrationHumDlg dlg;
-	 dlg.DoModal();
+	 CCalibrationDlg dlg;
+     dlg.DoModal();
 }
 void CMainFrame::OnControlInputs()
 {
@@ -9207,7 +9221,7 @@ void CMainFrame::OnControlAlarmLog()
 }
 void CMainFrame::OnMenuCheckupdate()
 {
-CString version=_T("2014.1.2");
+CString version=_T("2014.1.3");
 TCHAR buffer[MAX_PATH];
 CString	m_szAddress=_T("web1232.ixwebhosting.com");
 CString	m_szFilename=_T("/software/T3000_Version.txt");
@@ -9277,4 +9291,9 @@ void CMainFrame::OnControlTstat()
 	{
 		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
 	}
+}
+void CMainFrame::OnCalibrationCalibrationhum()
+{
+   CCalibrationDlg dlg;
+   dlg.DoModal();
 }

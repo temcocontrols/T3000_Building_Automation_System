@@ -433,8 +433,8 @@
 					stemp =g_strHumChamber;
 					break;
 
-				case PM_T38AIOD :
-					stemp="T3-8I13O";
+				case PM_T3PT10 :
+					stemp="T3-PT10";
 					break;
 				case PM_T3IOA :
 					stemp="T3-8IOA";
@@ -610,11 +610,11 @@
 				m_grid_flash.at(iitemp).device =PM_ZIGBEE;
 			else if(str_temp==_T("Led"))
 				m_grid_flash.at(iitemp).device =LED_PRODUCT_MODEL;//Others
-			else if(str_temp==_T("T3-8IOD"))
-				m_grid_flash.at(iitemp).device =PM_T38AIOD;//Others
+			else if(str_temp==_T("T3-PT10"))
+				m_grid_flash.at(iitemp).device =PM_T3PT10;//Others
 			else if(str_temp==_T("T3-8IOA"))
 				m_grid_flash.at(iitemp).device =PM_T3IOA;//Others
-			else if(str_temp==_T("T3-8I-16O"))
+			else if(str_temp==_T("T3-8I16O"))
 				m_grid_flash.at(iitemp).device =T3_8I_16O_PRODUCT_MODEL;//Others
 			else if(str_temp==_T("T3-32I"))
 				m_grid_flash.at(iitemp).device =T3_32I_PRODUCT_MODEL;//Others

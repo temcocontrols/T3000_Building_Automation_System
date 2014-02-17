@@ -190,6 +190,9 @@ CString CTStat_Net::GetProductName()
 		//else
 	    strProductName="MiniPanel";
 		break;
+    case PM_CO2_NET:
+        strProductName="CO2 Net";
+        break;
 	default:
 		strProductName="WIFI";
 

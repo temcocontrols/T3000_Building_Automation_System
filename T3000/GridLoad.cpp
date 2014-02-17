@@ -163,7 +163,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		{
 			product_type =T3000_5ABCDFG_LED_ADDRESS;
 		}
-		else if (nFlag==PM_T38AIOD||
+		else if (nFlag==PM_T3PT10||
 			nFlag==PM_T3IOA||
 			nFlag==PM_T332AI||
 			nFlag==PM_T3AI16O||
@@ -517,8 +517,8 @@ BOOL CGridLoad::OnInitDialog()
 			strTemp =g_strHumChamber;
 			break;
 
-		case PM_T38AIOD :
-			strTemp="T3-8I13O";
+		case PM_T3PT10 :
+			strTemp="T3-PT10";
 			break;
 		case PM_T3IOA :
 			strTemp="T3-8IOA";
@@ -1186,8 +1186,8 @@ void CGridLoad::LoadDeviceToGrid()
 			strTemp =g_strHumChamber;
 			break;
 
-		case PM_T38AIOD :
-			strTemp="T3-8I13O";
+		case PM_T3PT10 :
+			strTemp="T3-PT10";
 			break;
 		case PM_T3IOA :
 			strTemp="T3-8IOA";

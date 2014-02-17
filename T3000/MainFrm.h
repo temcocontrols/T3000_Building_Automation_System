@@ -24,7 +24,7 @@
 #include "MBP.h"
 #include "MbPoll.h"
 
-#define NUMVIEWS 15
+#define NUMVIEWS 16
 
 
 
@@ -109,7 +109,7 @@ private:
 	CMbp* m_pDlg;
 	BOOL m_bDialogOpen;
 	LONG OnDlgClose(UINT wParam, LONG lParam);
-protected: // create from serialization only
+public: // create from serialization only
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
 	void OnToolErease();
@@ -359,7 +359,7 @@ public:
 	afx_msg void OnDatabaseMbpoll();
 	afx_msg void OnViewCommunicatetraffic();
 	afx_msg void OnToolIsptoolforone();
-	afx_msg void OnToolRegistermoniter();
+	 
 	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
 	CMbPoll* mbPoll;
 	bool mbPollDlgOpen;
@@ -390,6 +390,7 @@ public:
 		afx_msg void OnMenuCheckupdate();
 	afx_msg void OnDatabasePv();
 	afx_msg void OnControlTstat();
+	afx_msg void OnCalibrationCalibrationhum();
 };
 
 const int DLG_T3000_VIEW = 0;
@@ -409,4 +410,5 @@ const int DLG_DIALOGT3_VIEW = 5;
 const int DLG_DIALOGT38I13O_VIEW=12;
 const int DLG_DIALOGT332AI_VIEW=13;
 const int DLG_DIALOGT38AI8AO=14;
+const int DLG_DIALOGT36CT=15;
 extern int g_gloab_bac_comport;

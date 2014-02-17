@@ -85,7 +85,7 @@ BOOL CRegisterViewerDlg::OnInitDialog()
 void CRegisterViewerDlg::LoadDataFromDB()
 {   CString ProductModelName =Get_ProductModel();
 	_variant_t temp_var;
-    if (ProductModelName.Find(_T("Tstat"))!=-1)//Tstat serial
+    if (ProductModelName.Find(_T("TStat"))!=-1)//Tstat serial
     {
 		CADO ado;
 		ado.OnInitADOConn();
@@ -204,11 +204,11 @@ void CRegisterViewerDlg::LoadDataFromDB()
 			DBRegister tempstruct;
 			sql.Format(_T("Select * from T3_RegisterList order by RegID"));
 			ado.m_pRecordset=ado.OpenRecordset(sql);
-			if (m_modelno==PM_T38AIOD)
+			if (m_modelno==PM_T3PT10)
 			{
 				while(!ado.m_pRecordset->EndOfFile){
 					tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-					temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-RTD"));
 					if (temp_var.vt==VT_NULL)
 					{
 						tempstruct.AddressName=_T("");
@@ -250,11 +250,11 @@ void CRegisterViewerDlg::LoadDataFromDB()
 
 
 			} 
-			else if (m_modelno==PM_T38AIOD)
+			else if (m_modelno==PM_T3PT10)
 			{
 			while(!ado.m_pRecordset->EndOfFile){
 				tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-				temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI16O"));
+				temp_var=ado.m_pRecordset->GetCollect(_T("T3-RTD"));
 				if (temp_var.vt==VT_NULL)
 				{
 					tempstruct.AddressName=_T("");
@@ -613,7 +613,8 @@ void CRegisterViewerDlg::MouseUpInputMsflexgrid(short Button, short Shift, long 
 		m_registerlistGrid.put_ColPosition(m_SelCurCol,col);
 		m_registerlistGrid.put_BackColorSel(m_registerlistGrid.get_GridColorFixed());
 		m_ColName.ShowWindow(SW_HIDE);
-		Write_GridCol();
+		//Write_GridCol();
+
 	}
 
 }
@@ -688,6 +689,17 @@ for (int i=0;i<6;i++)
 name=m_registerlistGrid.get_TextMatrix(0,i);
 m_Inifile.WriteProfileInt(SECTION,name,i);
 }
+
+CString inifilepath=g_strExePth;
+inifilepath+=_T("\\Config\\GRIDCONFIG.ini");
+m_Inifile.SetFileName(inifilepath);
+m_regno=m_Inifile.GetProfileInt(SECTION,_T("RegNo"),0);
+m_value=m_Inifile.GetProfileInt(SECTION,_T("Value"),1);
+m_name=m_Inifile.GetProfileInt(SECTION,_T("Name"),2);
+m_type=m_Inifile.GetProfileInt(SECTION,_T("Data Type"),3);
+m_length=m_Inifile.GetProfileInt(SECTION,_T("Data Length"),4);
+m_description=m_Inifile.GetProfileInt(SECTION,_T("Description"),5);
+m_Operation=m_Inifile.GetProfileInt(SECTION,_T("Operation"),6);
 }
 
 HBRUSH CRegisterViewerDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
