@@ -17,7 +17,7 @@
 #include "../FlexSlideBar/FSBContainer.h"
 
 #include "singleslider/MacSliderCtrl.h"
-#include "TemcoDataGrid.h"
+//#include "TemcoDataGrid.h"
 #define WM_FRESHVIEW WM_USER + 1100
 
 
@@ -160,8 +160,8 @@ public:
 	int m_inRows;
 	CWinThread* pMainUIBackFreshThread;
 
-	CTemcoDataGrid m_Output_Grid;
-	CTemcoDataGrid m_Input_Grid;
+	CMsflexgrid m_Output_Grid;
+	CMsflexgrid m_Input_Grid;
 
 	CTabCtrl m_SetPtTabCtrl;
 

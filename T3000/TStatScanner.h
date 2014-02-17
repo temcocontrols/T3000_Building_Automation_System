@@ -102,7 +102,8 @@ public:
 	void		background_binarysearch(int nComPort);
 	// bForTstat = TRUE : scan tstat, = FALSE : scan NC
 	void		binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254);
-
+	// bForTstat = TRUE : scan tstat, = FALSE : scan  MINI Pannel
+	void		MINI_binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254,int NET_COM=1);
 	void        OneByOneSearchforComDevice(int nComPort, bool bForTStat=FALSE, BYTE devLo=1, BYTE devHi=254);
 	// ะฃั้
 	BOOL		binary_search_crc(int a);

@@ -4549,9 +4549,9 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 							}
 
 						}
-						if(write_one(g_tstat_id,MODBUS_UNIVERSAL_OUTPUT_BEGIN + pos,tstatval)<0)
+						if(write_one(g_tstat_id,MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN + pos,tstatval)<0)
 							{MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);return;}
-							product_register_value[MODBUS_UNIVERSAL_OUTPUT_BEGIN + pos] = tstatval;
+							product_register_value[MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN + pos] = tstatval;
 						}
 						else
 						{

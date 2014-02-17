@@ -19,5 +19,8 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedQuick();
+//	afx_msg void OnBnClickedQuick();
+    afx_msg void OnBnClickedQuick();
+    int Is_Deep;
+    afx_msg void OnBnClickedOk();
 };

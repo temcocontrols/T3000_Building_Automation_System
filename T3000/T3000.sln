@@ -5,8 +5,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlexSlideBar", "..\FlexSlid
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T3000", "T3000.vcxproj", "{F7226464-C41C-4909-BF74-97328B72FFC8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegisterMonitor", "..\RegisterMonitor\RegisterMonitor\RegisterMonitor.vcxproj", "{5A25CD9E-D2CE-4066-902F-04E1F5350B0A}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BACnet_Stack_Library", "..\BacNetDllforVc\BACnet Stack Library.vcxproj", "{E9A65567-B028-4278-881D-674604B2E126}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModbusDllforVc", "..\ModbusDllforVc\ModbusDllforVc\ModbusDllforVc.vcxproj", "{86C4A754-63F3-44A8-949D-E01D4FACA97A}"
@@ -32,12 +30,6 @@ Global
 		{F7226464-C41C-4909-BF74-97328B72FFC8}.Release|Win32.Build.0 = Release|Win32
 		{F7226464-C41C-4909-BF74-97328B72FFC8}.Template|Win32.ActiveCfg = Template|Win32
 		{F7226464-C41C-4909-BF74-97328B72FFC8}.Template|Win32.Build.0 = Template|Win32
-		{5A25CD9E-D2CE-4066-902F-04E1F5350B0A}.Debug|Win32.ActiveCfg = Debug|Win32
-		{5A25CD9E-D2CE-4066-902F-04E1F5350B0A}.Debug|Win32.Build.0 = Debug|Win32
-		{5A25CD9E-D2CE-4066-902F-04E1F5350B0A}.Release|Win32.ActiveCfg = Release|Win32
-		{5A25CD9E-D2CE-4066-902F-04E1F5350B0A}.Release|Win32.Build.0 = Release|Win32
-		{5A25CD9E-D2CE-4066-902F-04E1F5350B0A}.Template|Win32.ActiveCfg = Release|Win32
-		{5A25CD9E-D2CE-4066-902F-04E1F5350B0A}.Template|Win32.Build.0 = Release|Win32
 		{E9A65567-B028-4278-881D-674604B2E126}.Debug|Win32.ActiveCfg = Debug|Win32
 		{E9A65567-B028-4278-881D-674604B2E126}.Debug|Win32.Build.0 = Debug|Win32
 		{E9A65567-B028-4278-881D-674604B2E126}.Release|Win32.ActiveCfg = Release|Win32

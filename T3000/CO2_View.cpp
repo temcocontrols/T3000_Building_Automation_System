@@ -661,7 +661,7 @@ void CCO2_View::OnEnKillfocusEditExternalTemp()
 
 void CCO2_View::OnEnKillfocusCo2PrepareAlarmSetpoint()
 {
-	// TODO: Add your control notification handler code here
+	 
 	UpdateData();
 	if(m_edit_pre_alarm_setpoint != product_register_value[CO2_485_MODBUS_INT_PRE_ALARM_SETPOINT])
 	{

@@ -5,6 +5,8 @@
 #include "T3000.h"
 #include "EreaseDlg.h"
 #include "globle_function.h"
+#include "ado/ADO.h"
+#include "MainFrm.h"
 
 // CEreaseDlg dialog
 
@@ -40,8 +42,61 @@ void CEreaseDlg::OnBnClickedMyOk()
 	// TODO: Add your control notification handler code here
 	if(AfxMessageBox(_T("Are you sure to erease the config parameters?"))==IDOK)
 	{
-		if(write_one(m_nTstatID,16,143)>0)
-			AfxMessageBox(_T("Ereased successfully!"));
+		/*if(write_one(m_nTstatID,16,143)>0)
+			AfxMessageBox(_T("Ereased successfully!"));*/
+			CString newid;
+			GetDlgItem(IDC_EDIT1)->GetWindowText(newid);
+			int serialno=get_serialnumber();
+			int ID=_wtoi(newid);
+			if (newid!=g_tstat_id)
+			{
+			int ret=write_one(g_tstat_id,6,ID);
+			if (ret>0)
+			{
+			  CADO ado;
+			  ado.OnInitADOConn();
+			  CString sql;
+			  sql.Format(_T("select * from ALL_NODE where Serial_ID='%d' "),serialno);
+			  ado.m_pRecordset = ado.OpenRecordset(sql);
+			  ado.m_pRecordset->MoveFirst();
+			  while(!ado.m_pRecordset->EndOfFile)
+			  {
+			      CString prodcut_name,product_id,screen_name;
+				  prodcut_name.Format(_T("%s:%d--%d"),GetProductName(product_register_value[7]),serialno,ID);
+				  product_id.Format(_T("%d"),ID);
+				  screen_name.Format(_T("Screen(S:%d--%d)"),serialno,ID);
+
+				  try 
+				  {
+					  ado.m_pRecordset->PutCollect("Product_name",(_bstr_t)(prodcut_name));
+					  ado.m_pRecordset->PutCollect("Product_ID",(_bstr_t)(product_id));
+					  ado.m_pRecordset->PutCollect("Screen_Name",(_bstr_t)(screen_name));
+					  ado.m_pRecordset->Update();
+					  ado.m_pRecordset->MoveNext();
+
+				  }
+				  catch(...)
+				  {
+
+
+				  }
+				  g_tstat_id=ID;
+
+				  CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+				  ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
+			  }
+			} 
+			else
+			{
+			AfxMessageBox(_T("Fail,Please try again!"));
+			}
+			} 
+			else
+			{
+			AfxMessageBox(_T("The same ID ,you input!"));
+			}
+			
+
 	}
 	else
 	{
@@ -56,7 +111,8 @@ BOOL CEreaseDlg::PreTranslateMessage(MSG* pMsg)
 	// TODO: Add your specialized code here and/or call the base class
 	if(pMsg->wParam == VK_RETURN )
 	{ 
-		GetDlgItem(ID_MYOK)->SetFocus();
+		//GetDlgItem(ID_MYOK)->SetFocus();
+		OnBnClickedMyOk();
 		return true; 
 	} 
 	return CDialog::PreTranslateMessage(pMsg);

@@ -137,8 +137,7 @@ CT3000View::CT3000View()
 
 	m_rcTabCtrl.CopyRect(CRect(620,500,850,800));//runningtime
 	m_bSliderSetPosWarning = TRUE; // permit warning
-	m_Input_Grid.Set_ParentWind(this);
-	m_Output_Grid.Set_ParentWind(this);
+	 
 }
 
 CT3000View::~CT3000View()
