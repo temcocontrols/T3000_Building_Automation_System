@@ -98,7 +98,7 @@ public:
 	void  UpdateCoolingandHeatingData();
 public:
 	//	unsigned short multi_register_value[513];
-	CWinThread* pParamBackFresh;
+	HANDLE hFirstThread;
 public:
 	CEdit m_idAdressEdit;
 	CComboBox m_braudRateCombox;

@@ -37,7 +37,7 @@ UINT _BackFreshing(LPVOID pParam)
 		{
 			register_critical_section.Lock();
 			
-			Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);
+			Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100);
 			register_critical_section.Unlock();
 		}
 		bPauseMultiRead=FALSE;

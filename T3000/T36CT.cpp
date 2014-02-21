@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "T36CT.h"
-#include "T3000.h"
+ 
  
 #include "Dialog_Progess.h"
 #include "ado/ADO.h"
@@ -613,8 +613,6 @@ BEGIN_EVENTSINK_MAP(T36CT, CFormView)
     ON_EVENT(T36CT, IDC_MSFLEXGRID_INPUT, DISPID_CLICK, T36CT::ClickMsflexgridInput, VTS_NONE)
     ON_EVENT(T36CT, IDC_MSFLEXGRID_INPUT2, DISPID_CLICK, T36CT::ClickMsflexgridInput2, VTS_NONE)
 END_EVENTSINK_MAP()
-
-
 void T36CT::ClickMsflexgridOutput()
 {
     grid_flag=3;
