@@ -468,7 +468,13 @@
     <ClCompile Include="BacnetView.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
-     <ClCompile Include="CalibrationDlg.cpp">
+    <ClCompile Include="CalibrationDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DisplayLEDLCDConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CO2NetView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -638,6 +644,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\T3000.mdb" />
+    <None Include="res\LED Table Button.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\LCD Table Button.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1100,6 +1112,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetTstat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CalibrationDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DisplayLEDLCDConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CO2NetView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

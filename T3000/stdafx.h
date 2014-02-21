@@ -64,7 +64,7 @@ using namespace Gdiplus;
 #pragma  comment(lib,"HtmlHelp.lib")
 #pragma  comment(lib,"Iphlpapi.lib")
 #pragma  comment(lib,"ISP.lib")
-#pragma  comment(lib,"RegisterMonitor.lib")
+//#pragma  comment(lib,"RegisterMonitor.lib")
 #import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 //**********************************link to dll*********************
 #define INPUT extern "C" __declspec(dllimport)
@@ -74,7 +74,7 @@ using namespace Gdiplus;
 #pragma comment(lib,"ISP")
 #pragma comment(lib,"BACnet_Stack_Library" )
 INPUT void  show_ISPDlg();
-INPUT void  show_RegisterMonitorDlg(); 
+//INPUT void  show_RegisterMonitorDlg(); 
 INPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length);
 //INPUT bool open_com(unsigned char m_com);
 

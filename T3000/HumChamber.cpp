@@ -374,13 +374,13 @@ void CHumChamber::Fresh()
 		m_StopBtn.ShowWindow(FALSE);
 		m_ContinueBtn.ShowWindow(TRUE);
 	}
-	  if(hFirstThread != NULL)
-		  TerminateThread(hFirstThread, 0);
-		  hFirstThread=NULL;
-	  if (!hFirstThread)
-	  {
-		  hFirstThread = CreateThread(NULL,NULL,_UpdateThread,this,NULL,0);
-	  }
+      if(hFirstThread != NULL)
+          TerminateThread(hFirstThread, 0);
+      hFirstThread=NULL;
+      if (!hFirstThread)
+      {
+          hFirstThread = CreateThread(NULL,NULL,_UpdateThread,this,NULL,0);
+      }
 	  
 }
 
