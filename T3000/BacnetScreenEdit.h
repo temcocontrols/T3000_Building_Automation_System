@@ -34,6 +34,7 @@ public:
 	void ReloadLabelsFromDB();
 	void PainNoImageInfo(CDC* pDC);
 	void Add_Label();
+	void Edit_Label();
 	int HitTestEx(CPoint & point);
 	void saveLabelInfo(int nItem);
 	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
@@ -59,4 +60,9 @@ public:
 	afx_msg LRESULT  RedrawScreeneditWindow(WPARAM wParam, LPARAM lParam);
 	virtual void OnCancel();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedButtonAdd();
+	afx_msg void OnBnClickedButtonEdit();
+	afx_msg void OnBnClickedButtonScreenExit();
+	afx_msg void OnBnClickedButtonDelete();
+	afx_msg void OnBnClickedButtonDeleteAll();
 };

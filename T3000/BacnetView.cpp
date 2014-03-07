@@ -1,6 +1,24 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2014-03-07
+1.Allow the user to change the IP address and subnet and gateway.
+2.Optimze the building graphic , user can add lable (inputs ,outputs,variable) and monitor this lable on the building view.
+3.The device of CO2 show a wrong firmware version. Fix it.
+4.Fix part of code which may crash the T3000.
+2014-02-21
+Update by Fance
+1.BacnetTstat background color ,white and gray interval.
+2.ISP tool in T3000 can't work , because the port 4321 is already bind by the T3000 .Already fix the problem
+3.Modify the debug window hot key to shift + D
+
+2014-02-20
+Update by Fance
+1.Code the BacnetScreenEdit.cpp , user can add PIC file and label in the pic file.user can monitor the value in the graphic.
+2.Fix the BacnetScreenEdit.cpp memory leak.
+3.Fix the BacnetScreen.cpp . No longer show  Text mode.
+4.Fix the Bacnet object instance , T3000 no longer has the static instance ,use a random value.
+
 2014-02-10
 	Update by Fance
 	1.TreeView update , support refresh different  com and network device.the Treeview of the device no longer
@@ -94,6 +112,7 @@ IMPLEMENT_DYNCREATE(CDialogCM5_BacNet, CFormView)
 
 CDialogCM5_BacNet::CDialogCM5_BacNet()
 	: CFormView(CDialogCM5_BacNet::IDD)
+	, m_bac_obtain_ip_mode(0)
 {
 	m_MSTP_THREAD = true;
 	m_cur_tab_sel = 0;
@@ -126,6 +145,12 @@ BEGIN_MESSAGE_MAP(CDialogCM5_BacNet, CFormView)
 	ON_NOTIFY(NM_SETFOCUS, IDC_DATE_PICKER, &CDialogCM5_BacNet::OnNMSetfocusDatePicker)
 	ON_NOTIFY(NM_SETFOCUS, IDC_TIME_PICKER, &CDialogCM5_BacNet::OnNMSetfocusTimePicker)
 	ON_BN_CLICKED(IDC_BTN_BAC_WRITE_TIME, &CDialogCM5_BacNet::OnBnClickedBtnBacWriteTime)
+	ON_BN_CLICKED(IDC_BAC_SYNC_LOCAL_PC, &CDialogCM5_BacNet::OnBnClickedBtnBacSYNCTime)
+	ON_BN_CLICKED(IDC_RADIO_BAC_IP_AUTO, &CDialogCM5_BacNet::OnBnClickedBtnBacIPAuto)
+	ON_BN_CLICKED(IDC_RADIO_BAC_IP_STATIC, &CDialogCM5_BacNet::OnBnClickedBtnBacIPStatic)
+	ON_BN_CLICKED(IDC_BUTTON_BAC_IP_CHANGED, &CDialogCM5_BacNet::OnBnClickedBtnBacIPChange)
+	ON_BN_CLICKED(IDC_BUTTON_BAC_IP_CANCLE, &CDialogCM5_BacNet::OnBnClickedBtnBacIPCancle)
+	
 	ON_WM_TIMER()
 	ON_NOTIFY(TCN_SELCHANGE, IDC_BAC_MAINTAB, &CDialogCM5_BacNet::OnTcnSelchangeBacMaintab)
 END_MESSAGE_MAP()
@@ -186,7 +211,14 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 					m_bac_main_tab.SetCurSel(WINDOW_INPUT);
 				}
 				else
+				{
+					if(hwait_thread)
+					{
+						TerminateThread(hwait_thread,0);
+						hwait_thread = NULL;
+					}
 					MessageBox(_T("Inputs list read time out!"));	
+				}
 				return 0;
 			}
 
@@ -208,7 +240,14 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 
 				}
 				else
+				{
+					if(hwait_thread)
+					{
+						TerminateThread(hwait_thread,0);
+						hwait_thread = NULL;
+					}
 					MessageBox(_T("Outputs list read time out!"));
+				}
 				return 0;
 			}
 
@@ -230,7 +269,14 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 
 				}
 				else
+				{
+					if(hwait_thread)
+					{
+						TerminateThread(hwait_thread,0);
+						hwait_thread = NULL;
+					}
 					MessageBox(_T("Variable list read time out!"));
+				}
 				return 0;
 			}
 
@@ -255,7 +301,14 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 
 				}
 				else
+				{
+					if(hwait_thread)
+					{
+						TerminateThread(hwait_thread,0);
+						hwait_thread = NULL;
+					}
 					MessageBox(_T("Program list read time out!"));
+				}
 				return 0;
 			}
 
@@ -279,7 +332,14 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 					m_bac_main_tab.SetCurSel(WINDOW_WEEKLY);
 				}
 				else
+				{
+					if(hwait_thread)
+					{
+						TerminateThread(hwait_thread,0);
+						hwait_thread = NULL;
+					}
 					MessageBox(_T("Weekly list read time out!"));
+				}
 				return 0;
 			}
 #if 0
@@ -311,7 +371,14 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 					m_bac_main_tab.SetCurSel(WINDOW_ANNUAL);
 				}
 				else
+				{
+					if(hwait_thread)
+					{
+						TerminateThread(hwait_thread,0);
+						hwait_thread = NULL;
+					}
 					MessageBox(_T("Annual Routine list read time out!"));
+				}
 			}
 
 			if(bac_read_which_list == BAC_READ_CONTROLLER_LIST)
@@ -331,7 +398,14 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 					m_bac_main_tab.SetCurSel(WINDOW_CONTROLLER);
 				}
 				else
+				{
+					if(hwait_thread)
+					{
+						TerminateThread(hwait_thread,0);
+						hwait_thread = NULL;
+					}
 					MessageBox(_T("Controller list read time out!"));
+				}
 			}
 			if(bac_read_which_list == BAC_READ_SCREEN_LIST)
 			{
@@ -350,7 +424,14 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 					m_bac_main_tab.SetCurSel(WINDOW_SCREEN);
 				}
 				else
+				{
+					if(hwait_thread)
+					{
+						TerminateThread(hwait_thread,0);
+						hwait_thread = NULL;
+					}
 					MessageBox(_T("Screens list read time out!"));
+				}
 			}
 			if(bac_read_which_list == BAC_READ_MONITOR_LIST)
 			{
@@ -370,7 +451,14 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 
 				}
 				else
+				{
+					if(hwait_thread)
+					{
+						TerminateThread(hwait_thread,0);
+						hwait_thread = NULL;
+					}
 					MessageBox(_T("Monitor list read time out!"));
+				}
 			}
 
 			if(bac_read_which_list == BAC_READ_ALARMLOG_LIST)
@@ -388,6 +476,15 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 					}
 					AlarmLog_Window->ShowWindow(SW_SHOW);
 					m_bac_main_tab.SetCurSel((WINDOW_ALARMLOG));
+				}
+				else
+				{
+					if(hwait_thread)
+					{
+						TerminateThread(hwait_thread,0);
+						hwait_thread = NULL;
+					}
+					MessageBox(_T("AlarmLog read time out!"));
 				}
 			}
 
@@ -423,63 +520,72 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 				else
 					MessageBox(_T("Annual day time read time out!"));
 			}
+
+
+			if((bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND) || (bac_read_which_list == BAC_READ_ALL_LIST))
+			{
+				if(bac_basic_setting_read_results)
+				{
+					PostMessage(WM_FRESH_CM_LIST,READ_SETTING_COMMAND,NULL);
+				}
+			}
 		}
 		break;
 	case DELETE_WINDOW_MSG:
 		m_bac_main_tab.SetFocus();
 	//	m_bac_main_tab.SetCurSel(m_cur_tab_sel);
 		break;
-		if(Screen_Window != NULL)
-		{
-			//Sleep(1000);
-			delete Screen_Window;
-			Screen_Window = NULL;
-		}
+		//if(Screen_Window != NULL)
+		//{
+		//	//Sleep(1000);
+		//	delete Screen_Window;
+		//	Screen_Window = NULL;
+		//}
 
-		if(Program_Window !=NULL)
-		{
-			delete Program_Window;
-			Program_Window = NULL;
-		}
+		//if(Program_Window !=NULL)
+		//{
+		//	delete Program_Window;
+		//	Program_Window = NULL;
+		//}
 
-		if(WeeklyRoutine_Window !=NULL)
-		{
-			delete WeeklyRoutine_Window;
-			WeeklyRoutine_Window = NULL;
-		}
+		//if(WeeklyRoutine_Window !=NULL)
+		//{
+		//	delete WeeklyRoutine_Window;
+		//	WeeklyRoutine_Window = NULL;
+		//}
 
-		if(Input_Window !=NULL)
-		{
-			delete Input_Window;
-			Input_Window = NULL;
-		}
+		//if(Input_Window !=NULL)
+		//{
+		//	delete Input_Window;
+		//	Input_Window = NULL;
+		//}
 
-		if(Output_Window !=NULL)
-		{
-			delete Output_Window;
-			Output_Window = NULL;
-		}
-		if(Variable_Window !=NULL)
-		{
-			delete Variable_Window;
-			Variable_Window = NULL;
-		}
-		if(Monitor_Window !=NULL)
-		{
-			delete Monitor_Window;
-			Monitor_Window = NULL;
-		}
-		if(Controller_Window !=NULL)
-		{
-			delete Controller_Window;
-			Controller_Window = NULL;
-		}
-		if(AnnualRoutine_Window !=NULL)
-		{
-			delete AnnualRoutine_Window;
-			AnnualRoutine_Window = NULL;
-		}
-		break;
+		//if(Output_Window !=NULL)
+		//{
+		//	delete Output_Window;
+		//	Output_Window = NULL;
+		//}
+		//if(Variable_Window !=NULL)
+		//{
+		//	delete Variable_Window;
+		//	Variable_Window = NULL;
+		//}
+		//if(Monitor_Window !=NULL)
+		//{
+		//	delete Monitor_Window;
+		//	Monitor_Window = NULL;
+		//}
+		//if(Controller_Window !=NULL)
+		//{
+		//	delete Controller_Window;
+		//	Controller_Window = NULL;
+		//}
+		//if(AnnualRoutine_Window !=NULL)
+		//{
+		//	delete AnnualRoutine_Window;
+		//	AnnualRoutine_Window = NULL;
+		//}
+		//break;
 	}
 	
 	return 0;
@@ -548,6 +654,13 @@ LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
 			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_Time_Command[i].invoke_id)
 				Bacnet_Refresh_Info.Read_Time_Command[i].task_result = true;
 		}
+
+		for (int i=0;i<BAC_BASIC_SETTING_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_BasicSetting_Info[i].invoke_id)
+				Bacnet_Refresh_Info.Read_BasicSetting_Info[i].task_result = true;
+		}
+
 		for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_Controller_Info[i].invoke_id)
@@ -582,25 +695,12 @@ LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
 			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_Tstat_Info[i].invoke_id)
 				Bacnet_Refresh_Info.Read_Tstat_Info[i].task_result = true;
 		}
-		//if(connect_replay)
-		//{
-		//	if(connect_invoke_id == pInvoke->Invoke_ID)
-		//	{
-		//		PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
-		//		CString temp_cstring;
-		//		temp_cstring.Format(_T("Connected"),g_bac_instance);
-		//		SetPaneString(1,temp_cstring);
-		//		m_bac_main_tab.SetFocus();
-		//		connect_invoke_id = -1;
-		//		connect_replay = false;
-		//	}
-		//}
+
 
 		Show_Results = temp_cs + _T("Success!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 		TRACE(Show_Results);
 		TRACE(_T("\r\n"));
-		//MessageBox(_T("Bacnet operation success!"));
 	}
 	else
 	{
@@ -656,6 +756,13 @@ LRESULT  CDialogCM5_BacNet::AllMessageCallBack(WPARAM wParam, LPARAM lParam)
 			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_Time_Command[i].invoke_id)
 				Bacnet_Refresh_Info.Read_Time_Command[i].task_result = false;
 		}
+
+		for (int i=0;i<BAC_BASIC_SETTING_GROUP;i++)
+		{
+			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_BasicSetting_Info[i].invoke_id)
+				Bacnet_Refresh_Info.Read_BasicSetting_Info[i].task_result = false;
+		}
+
 		for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Bacnet_Refresh_Info.Read_Controller_Info[i].invoke_id)
@@ -713,7 +820,7 @@ void CDialogCM5_BacNet::OnInitialUpdate()
 	//Fresh();//Fance
 	Initial_All_Point();
 
-	
+
 
 	//#endif
 	// TODO: Add your specialized code here and/or call the base class
@@ -880,7 +987,7 @@ void CDialogCM5_BacNet::Initial_All_Point()
 	for(int i=0;i<BAC_TSTAT_COUNT;i++)
 	{
 		Str_TstatInfo_point temp_tststpoint;
-		temp_tststpoint.product_model = 0;
+		temp_tststpoint.product_model = 255;  //default 255  means no device;
 		m_Tstat_data.push_back(temp_tststpoint);
 		
 	}
@@ -920,113 +1027,7 @@ void CDialogCM5_BacNet::Fresh()
 		my_ip[1] = _wtoi(TEMPCS.GetAt(2));
 		my_ip[0] = _wtoi(TEMPCS.GetAt(3));
 	}
-#if 0
-	BACNET_ADDRESS src = {
-		0
-	};  /* address where message came from */
-	uint16_t pdu_len = 0;
-	unsigned timeout = 100;     /* milliseconds */
-	BACNET_ADDRESS my_address, broadcast_address;
-	char my_port[50];
 
-	//if(bac_net_initial_once)
-	//{
-	//	BacNet_hwd = this->m_hWnd;
-	//}
-
-	if(!bac_net_initial_once)
-	{
-		bac_net_initial_once =true;
-		bac_program_pool_size = 26624;
-		bac_program_size = 0;
-		bac_free_memory = 26624;
-		hwait_thread = NULL;
-		HANDLE temphandle;
-		temphandle = Get_RS485_Handle();
-		if(temphandle !=NULL)
-		{
-			TerminateThread((HANDLE)Get_Thread1(),0);
-			TerminateThread((HANDLE)Get_Thread2(),0);
-
-			CloseHandle(temphandle);
-			Set_RS485_Handle(NULL);
-		}
-
-		SetCommunicationType(0);	//这里要同时关闭网络的和串口的;
-		close_com();
-		//SetCommunicationType(1);
-		//close_com();
-		Device_Set_Object_Instance_Number(4194300);
-		address_init();
-		Init_Service_Handlers();
-		dlmstp_set_baud_rate(19200);
-		dlmstp_set_mac_address(0);
-		dlmstp_set_max_info_frames(DEFAULT_MAX_INFO_FRAMES);
-		dlmstp_set_max_master(DEFAULT_MAX_MASTER);
-		memset(my_port,0,50);
-
-		CString Program_Path,Program_ConfigFile_Path;
-		int g_com=0;
-		GetModuleFileName(NULL,Program_Path.GetBuffer(MAX_PATH),MAX_PATH);  //获取当前运行的绝对地址;
-		PathRemoveFileSpec(Program_Path.GetBuffer(MAX_PATH) );            //返回绝对地址的上层目录?;
-		Program_Path.ReleaseBuffer();
-		Program_ConfigFile_Path = Program_Path + _T("\\MyConfig.ini");
-
-		CFileFind fFind;
-		if(!fFind.FindFile(Program_ConfigFile_Path))
-		{
-			WritePrivateProfileStringW(_T("Setting"),_T("ComPort"),_T("1"),Program_ConfigFile_Path);
-		}
-		g_com = GetPrivateProfileInt(_T("Setting"),_T("ComPort"),1,Program_ConfigFile_Path);
-		CString temp_cs;
-		temp_cs.Format(_T("COM%d"),g_com);
-
-		char cTemp1[255];
-		memset(cTemp1,0,255);
-		WideCharToMultiByte( CP_ACP, 0, temp_cs.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-		temp_cs.ReleaseBuffer();
-
-
-		sprintf(my_port,cTemp1);
-		dlmstp_init(my_port);
-
-
-		//Initial_List();
-		//		BacNet_hwd = this->m_hWnd;
-		//    dlenv_init();
-		datalink_get_broadcast_address(&broadcast_address);
-		//    print_address("Broadcast", &broadcast_address);
-		datalink_get_my_address(&my_address);
-		//		print_address("Address", &my_address);
-
-		CM5_hThread =CreateThread(NULL,NULL,MSTP_Receive,this,NULL, &nThreadID);
-
-		CM5_UI_Thread = CreateThread(NULL,NULL,CM5_UI,this,NULL, &cm5_nThreadID);
-
-		Send_WhoIs_Global(-1,-1);
-
-		m_cm5_date_picker.EnableWindow(0);
-		m_cm5_time_picker.EnableWindow(0);
-		GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(0);
-		GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(FALSE);
-		m_cm5_time_picker.SetFormat(_T("HH:mm"));
-
-
-		SetTimer(1,500,NULL);
-		BacNet_hwd = this->m_hWnd;
-		//m_bac_static_status.SetWindowTextW(_T("Disconnected"));	//放在这里，并且重发一次WHOIS
-		//m_bac_static_status.textColor(RGB(255,255,255));
-		//m_bac_static_status.bkColor(RGB(255,0,0));
-		//m_bac_static_status.setFont(26,18,NULL,_T("Cambria"));
-		timesec1970 = time(NULL);
-		timestart = 0;
-		init_info_table();
-		Init_table_bank();
-	}
-#endif
-	//Building_info build_info;
-	//build_info=m_subNetLst.at(m_nCurSubBuildingIndex);
-	//int nComPort = _wtoi(build_info.strComPort.Mid(3));
 
 	Initial_bac(g_gloab_bac_comport);
 	m_cm5_date_picker.EnableWindow(0);
@@ -1068,13 +1069,13 @@ void CDialogCM5_BacNet::Fresh()
 	{
 		//PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SVAE_CONFIG);
  		//Post_Write_Message(g_bac_instance,CONNECTED_WITH_DEVICE,0,0,sizeof(Str_connected_point),BacNet_hwd ,_T("Connect with device"));
-#if 1
+		#if 1
 		PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
 		CString temp_cstring;
 		temp_cstring.Format(_T("Connected"),g_bac_instance);
 		SetPaneString(1,temp_cstring);
 		m_bac_main_tab.SetFocus();
-#endif
+		#endif
 	}
 	else
 	{
@@ -1092,6 +1093,16 @@ void CDialogCM5_BacNet::Fresh()
 		Tab_Initial();
 	}
 #endif
+
+	HICON hIcon = NULL; 
+	HINSTANCE hInstResource    = NULL; 
+	hInstResource = AfxFindResourceHandle(MAKEINTRESOURCE(IDI_ICON_OK), RT_GROUP_ICON); 
+	hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_OK), IMAGE_ICON, 24, 24, 0); 
+	((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CHANGED))->SetIcon(hIcon);
+
+	hInstResource = AfxFindResourceHandle(MAKEINTRESOURCE(IDI_ICON_EXIT), RT_GROUP_ICON); 
+	hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_EXIT), IMAGE_ICON, 24, 24, 0); 
+	((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CANCLE))->SetIcon(hIcon);
 }
 
 
@@ -1123,7 +1134,7 @@ typedef struct _DEVICE_INFO
 
 
 
-vector <_DEVICE_INFO> g_device_info;
+//vector <_DEVICE_INFO> g_device_info;
 
 //Str_in_point Private_data[100];
 //int Private_data_length;
@@ -1210,11 +1221,11 @@ static void Read_Properties(
     return;
 }
 //uint32_t g_bac_instance;
-uint32_t g_vendor_id;
+//uint32_t g_vendor_id;
 //uint32_t g_mac;
-HTREEITEM FirstChild ;
-HTREEITEM SecondChild ;
-HTREEITEM DeviceChild;
+//HTREEITEM FirstChild ;
+//HTREEITEM SecondChild ;
+//HTREEITEM DeviceChild;
 
 
 
@@ -1344,7 +1355,32 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 
 		//m_cm5_date_picker.SetFormat(_T("YY/MM/DD"));
 		m_cm5_date_picker.SetTime(&TimeTemp);
-		break;;
+		break;
+	case READ_SETTING_COMMAND:
+		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->SetAddress(Device_Basic_Setting.reg.ip_addr[0],
+			Device_Basic_Setting.reg.ip_addr[1],Device_Basic_Setting.reg.ip_addr[2],Device_Basic_Setting.reg.ip_addr[3]);
+		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->SetAddress(Device_Basic_Setting.reg.subnet[0],
+			Device_Basic_Setting.reg.subnet[1],Device_Basic_Setting.reg.subnet[2],Device_Basic_Setting.reg.subnet[3]);
+		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->SetAddress(Device_Basic_Setting.reg.gate_addr[0],
+			Device_Basic_Setting.reg.gate_addr[1],Device_Basic_Setting.reg.gate_addr[2],Device_Basic_Setting.reg.gate_addr[3]);
+
+		if(Device_Basic_Setting.reg.tcp_type == 0)
+		{
+			((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->SetCheck(true);
+			((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->SetCheck(false);
+			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
+			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
+			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
+		}
+		else if(Device_Basic_Setting.reg.tcp_type == 1)
+		{
+			((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->SetCheck(false);
+			((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->SetCheck(true);
+			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(true);
+			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(true);
+			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
+		}
+		break;
 	case MENU_CLICK:
 		button_click = lParam;
 		if(button_click == WRITEPRGFLASH_COMMAND)
@@ -1636,6 +1672,25 @@ DWORD WINAPI  CDialogCM5_BacNet::Send_read_Command_Thread(LPVOID lpVoid)
 			Bacnet_Refresh_Info.Read_Time_Command[i].timeout_count = 0;
 		}
 	}
+
+	for (int i=0;i<BAC_BASIC_SETTING_GROUP;i++)//prg文件暂时不保存这些基本设置的东西，像IP地址和mac地址;
+	{
+		if((bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND) || (bac_read_which_list ==BAC_READ_ALL_LIST))
+		{
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].command = 0;
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].device_id = 0;
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].start_instance =0;
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].end_instance = 0;
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].has_resend_yes_or_no = 0;
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].resend_count =0;
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].task_result = BAC_RESULTS_UNKONW;
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].invoke_id = -1;
+			bac_basic_setting_read_results = 0;
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].timeout_count = 0;
+		}
+	}
+
+	
 
 	for(int i=0;i<BAC_WEEKLY_GROUP;i++)
 	{
@@ -1959,6 +2014,39 @@ DWORD WINAPI  CDialogCM5_BacNet::Send_read_Command_Thread(LPVOID lpVoid)
 			//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 		}
 	}
+
+
+
+	for (int i=0;i<BAC_BASIC_SETTING_GROUP;i++)
+	{
+		if((bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND) || (bac_read_which_list ==BAC_READ_ALL_LIST))
+		{
+			resend_count = 0;
+			do 
+			{
+				resend_count ++;
+				if(resend_count>RESEND_COUNT)
+					goto myend;
+				g_invoke_id = GetPrivateData(g_bac_instance,
+					READ_SETTING_COMMAND,0,
+					0,
+					sizeof(Str_Setting_Info));
+				Sleep(SEND_COMMAND_DELAY_TIME);
+			} while (g_invoke_id<0);
+
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].command = READ_SETTING_COMMAND;
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].device_id = g_bac_instance;
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].start_instance = 0;
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].end_instance =0;
+			Bacnet_Refresh_Info.Read_BasicSetting_Info[i].invoke_id = g_invoke_id;
+
+			CString temp_cs_show;
+			temp_cs_show.Format(_T("Task ID = %d. Read Basic Setting "),g_invoke_id);
+			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
+
+		}
+	}
+
 	// TODO: Add your control notification handler code here
 	for (int i=0;i<BAC_WEEKLY_GROUP;i++)
 	{
@@ -2389,8 +2477,9 @@ DWORD WINAPI  CDialogCM5_BacNet::Send_read_Command_Thread(LPVOID lpVoid)
 
 	return 0;
 		//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);
+
 myend:	hwait_thread = NULL;
-		AfxMessageBox(_T("Send Command Timeout!!!!!!!!!!"));
+		//AfxMessageBox(_T("Send Command Timeout!!!!!!!!!!"));
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,0,0);
 	return 0;
 }
@@ -2493,7 +2582,11 @@ void CDialogCM5_BacNet::Get_Time_Edit_By_Control()
 	CTime temp_day;
 
 	m_cm5_date_picker.GetTime(temp_day);
-	Device_time.year = temp_day.GetYear();
+	
+	int temp_year	= temp_day.GetYear();
+	if(temp_year > 2000)
+		temp_year = temp_year - 2000;
+	Device_time.year = temp_year;
 	Device_time.month = temp_day.GetMonth();
 	Device_time.dayofmonth = temp_day.GetDay();
 	Device_time.dayofweek = temp_day.GetDayOfWeek() -1;
@@ -2548,16 +2641,93 @@ void CDialogCM5_BacNet::OnNMSetfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+void CDialogCM5_BacNet::OnBnClickedBtnBacSYNCTime()
+{
+	CTime	TimeTemp;
+	CTime temp_time;
+	int nyear,nmonth,nday,nhour,nmin,nsec;
+	temp_time = CTime::GetCurrentTime();
+	if(temp_time.GetYear()<2000)
+		nyear = temp_time.GetYear() + 2000;
+	else
+		nyear = temp_time.GetYear();
+	nmonth = temp_time.GetMonth();
+	nday = temp_time.GetDay();
+	nhour = temp_time.GetHour();
+	nmin = temp_time.GetMinute();
+	nsec = temp_time.GetSecond();
+	TimeTemp = CTime(nyear,nmonth,nday,nhour,nmin,nsec);
+
+	m_cm5_time_picker.SetFormat(_T("HH:mm"));
+	m_cm5_time_picker.SetTime(&TimeTemp);
+
+	//m_cm5_date_picker.SetFormat(_T("YY/MM/DD"));
+	m_cm5_date_picker.SetTime(&TimeTemp);
+
+	GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
+	Get_Time_Edit_By_Control();
+	
+}
 
 void CDialogCM5_BacNet::OnBnClickedBtnBacWriteTime()
 {
 	// TODO: Add your control notification handler code here
 
-	int aaa = Get_MSTP_Connect_Status();
-	TRACE(_T("Status is %d\r\n"),aaa);
-
+	Get_Time_Edit_By_Control();
 
 }
+
+void CDialogCM5_BacNet::OnBnClickedBtnBacIPAuto()
+{
+	Device_Basic_Setting.reg.tcp_type = 0;
+
+	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
+	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
+	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
+}
+
+void CDialogCM5_BacNet::OnBnClickedBtnBacIPStatic()
+{
+	Device_Basic_Setting.reg.tcp_type = 1;
+	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(true);
+	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(true);
+	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
+}
+
+void CDialogCM5_BacNet::OnBnClickedBtnBacIPChange()
+{
+	BYTE address1,address2,address3,address4;
+	BYTE subnet1, subnet2, subnet3, subnet4;
+	BYTE gatway1,gatway2,gatway3,gatway4;
+	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->GetAddress(address1,address2,address3,address4);
+	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->GetAddress(subnet1,subnet2,subnet3,subnet4);
+	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->GetAddress(gatway1,gatway2,gatway3,gatway4);
+	Device_Basic_Setting.reg.ip_addr[0] = address1;
+	Device_Basic_Setting.reg.ip_addr[1] = address2;
+	Device_Basic_Setting.reg.ip_addr[2] = address3;
+	Device_Basic_Setting.reg.ip_addr[3] = address4;
+	Device_Basic_Setting.reg.subnet[0]  = subnet1;
+	Device_Basic_Setting.reg.subnet[1]  = subnet2;
+	Device_Basic_Setting.reg.subnet[2]  = subnet3;
+	Device_Basic_Setting.reg.subnet[3]  = subnet4;
+	Device_Basic_Setting.reg.gate_addr[0] = gatway1;
+	Device_Basic_Setting.reg.gate_addr[1] = gatway2;
+	Device_Basic_Setting.reg.gate_addr[2] = gatway3;
+	Device_Basic_Setting.reg.gate_addr[3] = gatway4;
+	bool isstatic = ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->GetCheck(); //返回1表示选上，0表示没选上;
+	Device_Basic_Setting.reg.tcp_type = isstatic;
+	CString temp_task_info;
+	temp_task_info.Format(_T("Change IP Address Information "));
+	Post_Write_Message(g_bac_instance,WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+}
+
+void CDialogCM5_BacNet::OnBnClickedBtnBacIPCancle()
+{
+	PostMessage(WM_FRESH_CM_LIST,READ_SETTING_COMMAND,NULL);
+}
+
+
+
 
 
 void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
@@ -2636,12 +2806,14 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				temp_cstring.Format(_T("Connected"),g_bac_instance);
 				SetPaneString(1,temp_cstring);
 				m_bac_main_tab.SetFocus();
+				bac_select_device_online = true;
 #endif
 			}
 			else
 			{
 				if(click_resend_time == 0)
 				{
+					bac_select_device_online = false;
 					KillTimer(4);
 					SetPaneString(1,_T("Device is offline!"));
 					MessageBox(_T("No response! Please Check the connection!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);;

@@ -107,6 +107,11 @@ BOOL BacnetScreen::PreTranslateMessage(MSG* pMsg)
 LRESULT BacnetScreen::Screeenedit_close_handle(WPARAM wParam,LPARAM lParam)
 {
 	Reg_Hotkey();
+	if(ScreenEdit_Window)
+	{
+		delete ScreenEdit_Window;
+		ScreenEdit_Window = NULL;
+	}
 	return 0;
 }
 
@@ -130,12 +135,12 @@ LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 		Unreg_Hotkey();
 
 
-		if(ScreenEdit_Window == NULL)
+		if(ScreenEdit_Window != NULL)
 		{
-			ScreenEdit_Window = new CBacnetScreenEdit;
-			ScreenEdit_Window->Create(IDD_DIALOG_BACNET_SCREENS_EDIT,this);	
+			delete ScreenEdit_Window;
 		}
-
+		ScreenEdit_Window = new CBacnetScreenEdit;
+		ScreenEdit_Window->Create(IDD_DIALOG_BACNET_SCREENS_EDIT,this);	
 		ScreenEdit_Window->ShowWindow(SW_SHOW);
 
 
@@ -189,7 +194,7 @@ void BacnetScreen::Initial_List()
 	m_screen_list.InsertColumn(SCREEN_DESCRIPTION, _T("Full Label"), 180, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_screen_list.InsertColumn(SCREEN_LABEL, _T("Label"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_screen_list.InsertColumn(SCREEN_PIC_FILE, _T("Picture File"), 140, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_screen_list.InsertColumn(SCREEN_MODE, _T("Mode"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_screen_list.InsertColumn(SCREEN_MODE, _T("Mode"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_screen_list.InsertColumn(SCREEN_REFRESH, _T("Refresh Time"), 110, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 
 	m_screen_dlg_hwnd = this->m_hWnd;
@@ -213,13 +218,13 @@ void BacnetScreen::Initial_List()
 		m_screen_list.InsertItem(i,temp_item);
 		m_screen_list.SetCellEnabled(i,SCREEN_NUM,0);
 		m_screen_list.SetCellChecked(0,0,1);// default will set the first one checked
-		if(ListCtrlEx::ComboBox == m_screen_list.GetColumnType(SCREEN_MODE))
-		{
-			ListCtrlEx::CStrList strlist;
-			strlist.push_back(_T("Graphic"));
-			strlist.push_back(_T("Text"));
-			m_screen_list.SetCellStringList(i, SCREEN_MODE, strlist);
-		}
+		//if(ListCtrlEx::ComboBox == m_screen_list.GetColumnType(SCREEN_MODE))
+		//{
+		//	ListCtrlEx::CStrList strlist;
+		//	strlist.push_back(_T("Graphic"));
+		//	strlist.push_back(_T("Text"));
+		//	m_screen_list.SetCellStringList(i, SCREEN_MODE, strlist);
+		//}
 
 		for (int x=0;x<SCREEN_COL_NUMBER;x++)
 		{
@@ -281,15 +286,15 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
 
 		m_screen_list.SetItemText(i,SCREEN_PIC_FILE,temp_pic_file);
 
-		if(m_screen_data.at(i).mode==0)	//In output table if it is auto ,the value can't be edit by user
-		{
-			m_screen_list.SetItemText(i,SCREEN_MODE,_T("Text"));
-		}
-		else
-		{
-			m_screen_list.SetItemText(i,SCREEN_MODE,_T("Graphic"));
-		}
-		
+		//if(m_screen_data.at(i).mode==0)	//In output table if it is auto ,the value can't be edit by user
+		//{
+		//	m_screen_list.SetItemText(i,SCREEN_MODE,_T("Text"));
+		//}
+		//else
+		//{
+		//	m_screen_list.SetItemText(i,SCREEN_MODE,_T("Graphic"));
+		//}
+		m_screen_list.SetItemText(i,SCREEN_MODE,_T("Graphic"));
 		CString cs_refresh_time;
 		cs_refresh_time.Format(_T("%d"),m_screen_data.at(i).update);
 		m_screen_list.SetItemText(i,SCREEN_REFRESH,cs_refresh_time);
@@ -310,7 +315,7 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 	CString New_CString =  m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
 	CString cstemp_value;
 
-	memcpy_s(&m_temp_screen_data[Changed_Item],sizeof(Control_group_point),&m_Program_data.at(Changed_Item),sizeof(Control_group_point));
+	memcpy_s(&m_temp_screen_data[Changed_Item],sizeof(Control_group_point),&m_screen_data.at(Changed_Item),sizeof(Control_group_point));
 
 	if(Changed_SubItem == SCREEN_DESCRIPTION)
 	{
@@ -360,17 +365,17 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 		memcpy_s(m_screen_data.at(Changed_Item).picture_file,STR_SCREEN_PIC_FILE_LENGTH,cTemp1,STR_SCREEN_PIC_FILE_LENGTH);
 	}
 
-	if(Changed_SubItem == SCREEN_MODE)
-	{
-		if(New_CString.CompareNoCase(_T("Text")) == 0)
-		{
-			m_screen_data.at(Changed_Item).mode = 0;
-		}
-		else
-		{
-			m_screen_data.at(Changed_Item).mode = 1;
-		}
-	}
+	//if(Changed_SubItem == SCREEN_MODE)
+	//{
+	//	if(New_CString.CompareNoCase(_T("Text")) == 0)
+	//	{
+	//		m_screen_data.at(Changed_Item).mode = 0;
+	//	}
+	//	else
+	//	{
+	//		m_screen_data.at(Changed_Item).mode = 1;
+	//	}
+	//}
 
 	if (Changed_SubItem == SCREEN_REFRESH)
 	{

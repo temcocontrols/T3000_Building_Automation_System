@@ -1123,6 +1123,9 @@
     <ClInclude Include="CO2NetView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DebugWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc">

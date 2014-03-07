@@ -58,10 +58,10 @@ CT3RTDView::CT3RTDView()
 CT3RTDView::~CT3RTDView()
 {
 
-    CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
-    pMain->m_pFreshMultiRegisters->ResumeThread();
-    //	pMain->m_pFreshTree->SuspendThread();
-    pMain->m_pRefreshThread->ResumeThread();
+    //CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+    //pMain->m_pFreshMultiRegisters->ResumeThread();
+    ////	pMain->m_pFreshTree->SuspendThread();
+    //pMain->m_pRefreshThread->ResumeThread();	//不能加这一段，否则 退出T3000的时候 报错; Fance comments
     if(hFirstThread != NULL)
         TerminateThread(hFirstThread, 0);
 }

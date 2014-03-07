@@ -1049,6 +1049,74 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		}
 
 
+		for (int i=0;i<BAC_BASIC_SETTING_GROUP;i++)
+		{
+			if((bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND) || (bac_read_which_list == BAC_READ_ALL_LIST))
+			{
+
+
+				if(Bacnet_Refresh_Info.Read_BasicSetting_Info[i].task_result == BAC_RESULTS_UNKONW)
+				{
+					if(Bacnet_Refresh_Info.Read_BasicSetting_Info[i].invoke_id > 0)
+					{
+						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].timeout_count ++;
+					}
+					if(Bacnet_Refresh_Info.Read_BasicSetting_Info[i].timeout_count > 20)
+					{
+						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].task_result = BAC_RESULTS_FAIL;
+						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].timeout_count = 0;
+						continue;
+					}
+
+					m_wait_detail.SetWindowTextW(tempcs);
+					cotinue_waite = true;
+					//goto endthis;
+					break;
+				}
+				else if(Bacnet_Refresh_Info.Read_BasicSetting_Info[i].task_result == BAC_RESULTS_FAIL)
+				{
+					Bacnet_Refresh_Info.Read_BasicSetting_Info[i].resend_count ++ ;
+					cotinue_waite = true;
+					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+					if((Bacnet_Refresh_Info.Read_BasicSetting_Info[i].resend_count>RESEND_COUNT) 
+						|| (Bacnet_Refresh_Info.Read_BasicSetting_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
+					{
+						m_wait_detail.SetWindowTextW(_T("Read Basic Setting Time Out!"));
+						KillTimer(1);
+						SetTimer(2,2000,NULL);
+						goto endthis;
+					}
+					g_invoke_id = GetPrivateData(
+						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].device_id,
+						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].command,
+						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].start_instance,
+						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].end_instance,
+						sizeof(Str_Setting_Info));
+					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+					{
+						Sleep(50);
+						continue;
+					}
+					Bacnet_Refresh_Info.Read_BasicSetting_Info[i].has_resend_yes_or_no ++;
+					Bacnet_Refresh_Info.Read_BasicSetting_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
+					Bacnet_Refresh_Info.Read_BasicSetting_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+
+					CString temp_cs_show;
+					temp_cs_show.Format(_T("Task ID = %d. Read basic setting "),g_invoke_id);
+					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
+
+
+					TRACE(_T("Read basic setting Resend start = %d , Resend end = %d\r\n"),
+						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].start_instance,
+						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].end_instance);
+
+
+				}
+			}
+		}
+
+
+
 		for (int i=0;i<BAC_ANNUAL_GROUP;i++)
 		{
 			if((bac_read_which_list == BAC_READ_ANNUAL_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST)|| (bac_read_which_list == TYPE_SVAE_CONFIG))
@@ -1986,6 +2054,8 @@ m_wait_persent.SetWindowTextW(_T("100%"));
 		bac_programcode_read_results = true;
 		bac_weeklycode_read_results = true;
 		bac_annualcode_read_results = true;
+		bac_alarmlog_read_results = true;
+		bac_basic_setting_read_results = true;
 			m_wait_detail.SetWindowTextW(_T("Reading descriptors success!"));
 			KillTimer(1);
 			if(bac_read_which_list ==BAC_READ_ALL_LIST)
