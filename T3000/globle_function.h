@@ -141,4 +141,5 @@ int Get_Unit_Process(CString Unit);
 BOOL Get_Bit_FromRegister(unsigned short RegisterValue,unsigned short Position);
 int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind);
 UINT RefreshNetWorkDeviceListByUDPFunc();
+void DFTrace(CString &nCString);
 #endif

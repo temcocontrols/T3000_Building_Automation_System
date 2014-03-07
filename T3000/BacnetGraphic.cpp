@@ -348,7 +348,7 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 		MyPaint_Mem(hMemDC);
 		BitBlt(gloab_hdc,0,0, myRect.right, myRect.bottom, hMemDC, 0, 0, SRCCOPY);//将绘制完成的内存位图贴到的Picture空间对象中;
 		PostMessage(test_hwnd, WM_FRESH_STATIC,0,0);	//当重绘了之后，控件会被重绘的画布遮盖住，所以发送消息让控件再次刷新;
-		Sleep(5000);
+		Sleep(3000);
 	}
 	return 0;
 }

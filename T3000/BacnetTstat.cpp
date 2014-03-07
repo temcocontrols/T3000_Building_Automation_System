@@ -32,6 +32,7 @@ BEGIN_MESSAGE_MAP(CBacnetTstat, CDialogEx)
 	ON_MESSAGE(WM_REFRESH_BAC_TSTAT_LIST,Fresh_Tstat_List)	
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Tstat_Item)	
 	ON_MESSAGE(MY_RESUME_DATA, TstatsMessageCallBack)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -45,6 +46,7 @@ BOOL CBacnetTstat::OnInitDialog()
 	// TODO:  Add extra initialization here
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
+	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -123,6 +125,14 @@ void CBacnetTstat::Initial_List()
 		CString temp_units;
 		temp_item.Format(_T("%d"),i+1);
 		m_tstat_list.InsertItem(i,temp_item);
+
+		for (int x=0;x<TSTAT_COL_NUMBER;x++)
+		{
+			if((i%2)==0)
+				m_tstat_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
+			else
+				m_tstat_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
+		}
 	}
 
 }
@@ -155,8 +165,12 @@ LRESULT CBacnetTstat::Fresh_Tstat_List(WPARAM wParam,LPARAM lParam)
 			i = Fresh_Item;
 		}
 
-		if(m_Tstat_data.at(i).product_model == 0)
+		if((m_Tstat_data.at(i).product_model == 255) || ((m_Tstat_data.at(i).tst_db.id == 0)))
 		{
+			for (int x = 1; x < TSTAT_COL_NUMBER ; x++)
+			{
+				m_tstat_list.SetItemText(i,x,_T(""));
+			}
 			continue;
 		}
 
@@ -181,13 +195,13 @@ LRESULT CBacnetTstat::Fresh_Tstat_List(WPARAM wParam,LPARAM lParam)
 		}
 		m_tstat_list.SetItemText(i,TSTAT_OCCUPIED,OCCUPIED);
 
-		Cool_Setpoint.Format(_T("%d"),m_Tstat_data.at(i).cool_setpoint);
+		Cool_Setpoint.Format(_T("%.1f"),((float)m_Tstat_data.at(i).cool_setpoint)/10);
 		m_tstat_list.SetItemText(i,TSTAT_COOL_SETPOINT,Cool_Setpoint);	
-		Heat_Setpoint.Format(_T("%d"),m_Tstat_data.at(i).heat_setpoint);
+		Heat_Setpoint.Format(_T("%.1f"),((float)m_Tstat_data.at(i).heat_setpoint)/10);
 		m_tstat_list.SetItemText(i,TSTAT_HEAT_SETPOINT,Heat_Setpoint);	
-		Room_Setpoint.Format(_T("%d"),m_Tstat_data.at(i).setpoint);
+		Room_Setpoint.Format(_T("%.1f"),((float)m_Tstat_data.at(i).setpoint)/10);
 		m_tstat_list.SetItemText(i,TSTAT_ROOM_SETPOINT,Room_Setpoint);
-		RoomTemperature.Format(_T("%d"),m_Tstat_data.at(i).temperature);
+		RoomTemperature.Format(_T("%.1f"),((float)m_Tstat_data.at(i).temperature)/10);
 		m_tstat_list.SetItemText(i,TSTAT_ROOM_TEM,RoomTemperature);
 		CS_TSTAT_MODE.Format(_T("%d"),m_Tstat_data.at(i).mode);
 		m_tstat_list.SetItemText(i,TSTAT_MODE,CS_TSTAT_MODE);
@@ -196,9 +210,13 @@ LRESULT CBacnetTstat::Fresh_Tstat_List(WPARAM wParam,LPARAM lParam)
 		{
 			CS_COOL_HEAT = CString_Cool_Heat[m_Tstat_data.at(i).cool_heat_mode];
 		}
-		else
+		else if(m_Tstat_data.at(i).cool_heat_mode == 0)
 		{
 			CS_COOL_HEAT = CString_Cool_Heat[0];
+		}
+		else
+		{
+			CS_COOL_HEAT = CString_Cool_Heat[3];
 		}
 		m_tstat_list.SetItemText(i,TSTAT_COOL_HEAT_MODE,CS_COOL_HEAT);
 		CS_OUTPUT_STAGE.Format(_T("%d"),m_Tstat_data.at(i).output_state);
@@ -233,7 +251,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 	CString cstemp_value;
 	//先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
 	memcpy_s(&m_temp_tstat_data[Changed_Item],sizeof(Str_TstatInfo_point),&m_Tstat_data.at(Changed_Item),sizeof(Str_TstatInfo_point));
-	if(m_Tstat_data.at(Changed_Item).product_model == 0)
+	if((m_Tstat_data.at(Changed_Item).product_model == 255) || (m_Tstat_data.at(Changed_Item).tst_db.id == 0))
 	{
 		for (int x = 1; x < TSTAT_COL_NUMBER ; x++)
 		{
@@ -245,7 +263,7 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem == TSTAT_COOL_SETPOINT )
 	{
 		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
-		int temp_value = _wtoi(cs_temp);
+		int temp_value = (int)(_wtof(cs_temp) * 10);
 		if(temp_value >= 65535)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Please input An effective value "),_T("Warning"));
@@ -254,6 +272,103 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 
 		m_Tstat_data.at(Changed_Item).cool_setpoint = temp_value;
 	}
+
+	if(Changed_SubItem == TSTAT_HEAT_SETPOINT )
+	{
+		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
+		int temp_value = (int)(_wtof(cs_temp) * 10);
+		if(temp_value >= 65535)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Please input An effective value "),_T("Warning"));
+			return 0;
+		}
+
+		m_Tstat_data.at(Changed_Item).heat_setpoint = temp_value;
+	}
+	
+	if(Changed_SubItem == TSTAT_ROOM_SETPOINT )
+	{
+		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
+		int temp_value = (int)(_wtof(cs_temp) * 10);
+		if(temp_value >= 65535)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Please input An effective value "),_T("Warning"));
+			return 0;
+		}
+
+		m_Tstat_data.at(Changed_Item).setpoint = temp_value;
+	}
+
+
+	if(Changed_SubItem == TSTAT_ROOM_TEM )
+	{
+		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
+		int temp_value = (int)(_wtof(cs_temp) * 10);
+		if(temp_value >= 65535)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Please input An effective value "),_T("Warning"));
+			return 0;
+		}
+
+		m_Tstat_data.at(Changed_Item).temperature = temp_value;
+	}
+
+	if(Changed_SubItem == TSTAT_NIGHT_HEAT_DB )
+	{
+		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
+		int temp_value = _wtoi(cs_temp);
+		if(temp_value >= 255)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Please input An effective value "),_T("Warning"));
+			return 0;
+		}
+
+		m_Tstat_data.at(Changed_Item).night_heat_db = temp_value;
+	}
+
+	if(Changed_SubItem == TSTAT_NIGHT_COOL_DB )
+	{
+		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
+		int temp_value = _wtoi(cs_temp);
+		if(temp_value >= 255)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Please input An effective value "),_T("Warning"));
+			return 0;
+		}
+
+		m_Tstat_data.at(Changed_Item).night_cool_db = temp_value;
+	}
+
+	if(Changed_SubItem == TSTAT_NIGHT_HEAT_SP )
+	{
+		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
+		int temp_value = _wtoi(cs_temp);
+		if(temp_value >= 255)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Please input An effective value "),_T("Warning"));
+			return 0;
+		}
+
+		m_Tstat_data.at(Changed_Item).night_heat_sp = temp_value;
+	}
+
+	if(Changed_SubItem == TSTAT_NIGHT_COOL_SP )
+	{
+		CString cs_temp = m_tstat_list.GetItemText(Changed_Item,Changed_SubItem);
+		int temp_value = _wtoi(cs_temp);
+		if(temp_value >= 255)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Please input An effective value "),_T("Warning"));
+			return 0;
+		}
+		m_Tstat_data.at(Changed_Item).night_cool_sp = temp_value;
+	}
+
+	
+
+	
+	
+	
 
 
 	cmp_ret = memcmp(&m_temp_tstat_data[Changed_Item],&m_Tstat_data.at(Changed_Item),sizeof(Str_TstatInfo_point));
@@ -265,4 +380,18 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 	}
 
 	return 1;
+}
+
+
+void CBacnetTstat::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+	if(this->IsWindowVisible())
+	{
+		PostMessage(WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
+		if(bac_select_device_online)
+			Post_Refresh_Message(g_bac_instance,READTSTAT_T3000,0,BAC_TSTAT_COUNT - 1,sizeof(Str_TstatInfo_point),BAC_TSTAT_GROUP);
+	}
+
+	CDialogEx::OnTimer(nIDEvent);
 }

@@ -110,6 +110,7 @@ typedef enum {
 
 
 		 TABLEPOINTS_COMMAND       = 75,
+		 READ_SETTING_COMMAND		= 98,
 		  GETSERIALNUMBERINFO       = 99,
 		 PANEL_INFO1_COMMAND       = 110,
 		 PANEL_INFO2_COMMAND       = 111,
@@ -124,7 +125,7 @@ typedef enum {
 		 RESTARTMINI_COMMAND       = 121,
 		 WRITEPRGFLASH_COMMAND     = 122,
 		 OPENSCREEN_COMMAND        = 123,
-		 CONNECTED_WITH_DEVICE		= 199
+		 WRITE_SETTING_COMMAND		= 198
 } CommandRequest;	  
 
 
@@ -237,10 +238,10 @@ typedef  struct
 
 } Str_in_point; /* 21+1+4+1+1+9 = 38 */
 
-typedef  struct
-{
-	int8_t label[4];		
-}Str_connected_point;
+//typedef  struct
+//{
+//	int8_t label[4];		
+//}Str_connected_point;
 
 typedef union {
 		Str_out_point             *pout;
@@ -418,11 +419,13 @@ typedef struct
 	byte  ti_min;         // 0-59
 	byte  ti_hour;           // 0-23
 	byte  dayofmonth;   // 1-31
+	byte  dayofweek;        // 0-6 ; 0=Sunday
 	byte  month;          // 0-11
 	byte  year;           // year - 1900
-	byte  dayofweek;        // 0-6 ; 0=Sunday
 	WORD   dayofyear;    // 0-365 gmtime
 	signed char isdst;
+
+
 } Time_block_mini;
 
 typedef struct
@@ -644,6 +647,22 @@ typedef struct
 	uint8_t noused[6];
 
 }Str_Serial_info;
+
+
+typedef union
+{
+	uint8_t all[20];
+	struct 
+	{  
+		uint8_t ip_addr[4];
+		uint8_t subnet[4];
+		uint8_t gate_addr[4];   
+		uint8_t mac_addr[6];
+		uint8_t tcp_type;   /* 0 -- DHCP, 1-- STATIC */
+	}reg;
+}Str_Setting_Info;
+
+
 
 
 typedef struct {

@@ -114,58 +114,36 @@ void CRelayLabel::DispalyInputValue_General(int nStatus,COLORREF textClr,COLORRE
 
 		if(m_Input_data.at(i).digital_analog == BAC_UNITS_ANALOG)
 		{
-
-			//m_input_list.SetCellEnabled(i,INPUT_CAL,1);
-
-
-			//m_input_list.SetItemText(i,INPUT_RANGE,Input_Analog_Units_Array[m_Input_data.at(i).range]);
-			//m_input_list.SetItemText(i,INPUT_UNITE,Input_List_Analog_Units[m_Input_data.at(i).range]);
-			temp_unite = Input_List_Analog_Units[m_Input_data.at(i).range];
-
-			
-			temp_value.Format(_T("%d"),m_Input_data.at(i).value);
-			//m_input_list.SetItemText(i,INPUT_VALUE,temp_value);
-
-			//temp_cal.Format(_T("%d"),(m_Input_data.at(i).calibration));
-			//m_input_list.SetItemText(i,INPUT_CAL,temp_cal);
+			temp_unite = Input_List_Analog_Units[m_Input_data.at(i).range];		
+			temp_value.Format(_T("%d"),m_Input_data.at(i).value / 1000);
+			m_strValueText = temp_value + _T(" ") + temp_unite;
 		}
 		else if(m_Input_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 		{
-
-			//m_input_list.SetItemText(i,INPUT_CAL,_T(""));
-			//m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[m_Input_data.at(i).range]);
-			//m_input_list.SetItemText(i,INPUT_UNITE,_T(""));
-
-			if((m_Input_data.at(i).range>=12)&&(m_Input_data.at(i).range<=22))
+			CString Show_Digital;
+			if((m_Input_data.at(i).range>22) || (m_Input_data.at(i).range == 0))
 			{
-				CString temp1;
-				CStringArray temparray;
-				temp1 = Digital_Units_Array[m_Input_data.at(i).range - 11];//11 is the sizeof the array
-				SplitCStringA(temparray,temp1,_T("/"));
-				if((temparray.GetSize()==2)&&(!temparray.GetAt(1).IsEmpty()))
-				{
-					temp_value = temparray.GetAt(1);
-					//m_input_list.SetItemText(i,INPUT_VALUE,temparray.GetAt(1));
-				}
-				//m_input_list.SetItemText(i,INPUT_RANGE,temp1);
+				Show_Digital = Digital_Units_Array[0];
 			}
-			else if((m_Input_data.at(i).range>=1)&&(m_Input_data.at(i).range<=11))
+			else
 			{
 				CString temp1;
 				CStringArray temparray;
+
 				temp1 = Digital_Units_Array[m_Input_data.at(i).range];
 				SplitCStringA(temparray,temp1,_T("/"));
-				if((temparray.GetSize()==2)&&(!temparray.GetAt(0).IsEmpty()))
+				if((temparray.GetSize()==2))
 				{
-					temp_value = temparray.GetAt(0);
-					//m_input_list.SetItemText(i,INPUT_VALUE,temparray.GetAt(0));
+					if(m_Input_data.at(i).control == 0)
+						Show_Digital = temparray.GetAt(0);
+					else
+						Show_Digital = temparray.GetAt(1);
 				}
-				//m_input_list.SetItemText(i,INPUT_RANGE,temp1);
 			}
-
+			m_strValueText = Show_Digital;
 		}
 
-		m_strValueText = temp_value + _T(" ") + temp_unite;
+		
 }
 
 void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
@@ -340,61 +318,36 @@ void CRelayLabel::DispalyOutputValue_General(int nStatus,COLORREF textClr,COLORR
 
 	if(m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG)
 	{
-		//m_output_list.SetCellEnabled(i,OUTPUT_0_PERSENT,1);
-		//m_output_list.SetCellEnabled(i,OUTPUT_100_PERSENT,1);
-
-		//m_output_list.SetItemText(i,OUTPUT_RANGE,OutPut_List_Analog_Range[m_Output_data.at(i).range]);
-		//m_output_list.SetItemText(i,OUTPUT_UNITE,OutPut_List_Analog_Units[m_Output_data.at(i).range]);
 		temp_unite = OutPut_List_Analog_Units[m_Output_data.at(i).range];
-		//CString temp_low,temp_high;
-		//temp_low.Format(_T("%d"),m_Output_data.at(i).m_del_low);
-		//temp_high.Format(_T("%d"),m_Output_data.at(i).s_del_high);
-
-		temp_value.Format(_T("%d"),m_Output_data.at(i).value);
-		//m_output_list.SetItemText(i,OUTPUT_VALUE,temp_value);
-		//m_output_list.SetItemText(i,OUTPUT_0_PERSENT,temp_low);
-		//m_output_list.SetItemText(i,OUTPUT_100_PERSENT,temp_high);
+		temp_value.Format(_T("%d"),m_Output_data.at(i).value / 1000);
+		m_strValueText = temp_value + _T(" ") + temp_unite;
 	}
 	else if(m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 	{
-		//m_output_list.SetCellEnabled(i,OUTPUT_0_PERSENT,0);
-		//m_output_list.SetCellEnabled(i,OUTPUT_100_PERSENT,0);
-		//m_output_list.SetItemText(i,OUTPUT_0_PERSENT,_T(""));
-		//m_output_list.SetItemText(i,OUTPUT_100_PERSENT,_T(""));
-		//m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[m_Output_data.at(i).range]);
-
-		//m_output_list.SetItemText(i,OUTPUT_UNITE,_T(""));
-
-		if((m_Output_data.at(i).range>=12)&&(m_Output_data.at(i).range<=22))
+		CString Show_Digital;
+		if((m_Output_data.at(i).range>22) || (m_Output_data.at(i).range == 0))
 		{
-			CString temp1;
-			CStringArray temparray;
-			temp1 = Digital_Units_Array[m_Output_data.at(i).range - 11];//11 is the sizeof the array
-			SplitCStringA(temparray,temp1,_T("/"));
-			if((temparray.GetSize()==2)&&(!temparray.GetAt(1).IsEmpty()))
-			{
-				temp_value = temparray.GetAt(1);
-			//	m_output_list.SetItemText(i,OUTPUT_VALUE,temparray.GetAt(1));
-			}
-			//m_output_list.SetItemText(i,OUTPUT_RANGE,temp1);
+			Show_Digital = Digital_Units_Array[0];
 		}
-		else if((m_Output_data.at(i).range>=1)&&(m_Output_data.at(i).range<=11))
+		else
 		{
 			CString temp1;
 			CStringArray temparray;
+
 			temp1 = Digital_Units_Array[m_Output_data.at(i).range];
 			SplitCStringA(temparray,temp1,_T("/"));
-			if((temparray.GetSize()==2)&&(!temparray.GetAt(0).IsEmpty()))
+			if((temparray.GetSize()==2))
 			{
-				temp_value = temparray.GetAt(0);
-				//m_output_list.SetItemText(i,OUTPUT_VALUE,temparray.GetAt(0));
+				if(m_Output_data.at(i).control == 0)
+					Show_Digital =temparray.GetAt(0);
+				else
+					Show_Digital =temparray.GetAt(1);
 			}
-			//m_output_list.SetItemText(i,OUTPUT_RANGE,temp1);
 		}
 
-
+		m_strValueText = Show_Digital;
 	}
-	m_strValueText = temp_value + _T(" ") + temp_unite;
+	
 }
 
 void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
@@ -698,36 +651,30 @@ void CRelayLabel::DispalyVariableValue_General(int nStatus,COLORREF textClr,COLO
 	CString temp_unite;
 	CString temp_value;
 	int i = nStatus ;
-
+	CString temp1;
 	if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 	{
-	//	m_variable_list.SetItemText(i,VARIABLE_UNITE,Digital_Units_Array[m_Variable_data.at(i).range]);	//单位 这个要商量 看要怎么搞;
-		if((m_Variable_data.at(i).range >= 12)&&(m_Variable_data.at(i).range <= 22))
+
+		if((m_Variable_data.at(i).range>22) || (m_Variable_data.at(i).range == 0))
 		{
-			CString temp1;
-			CStringArray temparray;
-			temp1 = Digital_Units_Array[m_Variable_data.at(i).range - 11];//11 is the sizeof the array
-			SplitCStringA(temparray,temp1,_T("/"));
-			if((temparray.GetSize()==2)&&(!temparray.GetAt(1).IsEmpty()))
-			{
-				temp_value = temparray.GetAt(1);
-				//m_variable_list.SetItemText(i,VARIABLE_VALUE,temparray.GetAt(1));
-			}
-			//m_variable_list.SetItemText(i,VARIABLE_UNITE,temp1);
+			temp1 = Digital_Units_Array[0];
 		}
-		else if((m_Variable_data.at(i).range >= 1)&&(m_Variable_data.at(i).range <= 11))
-		{
-			CString temp1;
+		else
+		{	
 			CStringArray temparray;
+
 			temp1 = Digital_Units_Array[m_Variable_data.at(i).range];
 			SplitCStringA(temparray,temp1,_T("/"));
-			if((temparray.GetSize()==2)&&(!temparray.GetAt(0).IsEmpty()))
+			if((temparray.GetSize()==2))
 			{
-				temp_value = temparray.GetAt(0);
-				//m_variable_list.SetItemText(i,VARIABLE_VALUE,temparray.GetAt(0));
+				if(m_Variable_data.at(i).control == 0)
+					temp1 = temparray.GetAt(0);
+				else
+					temp1 = temparray.GetAt(1);
 			}
-			//m_variable_list.SetItemText(i,VARIABLE_UNITE,temp1);
+
 		}
+		m_strValueText = temp1;
 	}
 	else
 	{
@@ -750,11 +697,12 @@ void CRelayLabel::DispalyVariableValue_General(int nStatus,COLORREF textClr,COLO
 		{
 			//m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
 			temp_unite = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
-			temp_value.Format(_T("%d"),m_Variable_data.at(i).value);
+			temp_value.Format(_T("%d"),m_Variable_data.at(i).value / 1000);
 			//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_value);
 		}
-	}
 		m_strValueText = temp_value + _T(" ") + temp_unite;
+	}
+		
 }
 
 void CRelayLabel::DispalyRigesterValue(int nStatus,COLORREF textClr,COLORREF bkClr)

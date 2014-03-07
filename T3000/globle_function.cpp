@@ -1030,6 +1030,9 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case RESTARTMINI_COMMAND:
 		entitysize = sizeof(Time_block_mini);
 		break;
+	case WRITE_SETTING_COMMAND:
+		entitysize = sizeof(Str_Setting_Info);
+		break;
 	case WRITECONTROLLER_T3000:
 		entitysize = sizeof(Str_controller_point);
 		break;
@@ -1039,9 +1042,7 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case WRITEMONITOR_T3000:
 		entitysize = sizeof(Str_monitor_point);
 		break;
-	case CONNECTED_WITH_DEVICE:
-		entitysize = sizeof(Str_connected_point);
-		break;
+
 	case  WRITEALARM_T3000:
 		entitysize = sizeof(Alarm_point);
 		break;
@@ -1130,17 +1131,12 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 		break;
 	case RESTARTMINI_COMMAND:
 		{
-			SendBuffer[7] = Device_time.ti_sec;
-			SendBuffer[8] = Device_time.ti_min;
-			SendBuffer[9] = Device_time.ti_hour;
-			SendBuffer[10] = Device_time.dayofmonth;
-			SendBuffer[11] = Device_time.month;
-			SendBuffer[12] = Device_time.year;
-			SendBuffer[13] = Device_time.dayofweek;
-			SendBuffer[14] =	Device_time.dayofyear && 0x00ff;
-			SendBuffer[15] =	(Device_time.dayofyear && 0xff00)>>8;
-			SendBuffer[16] = Device_time.isdst;
-
+			memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,sizeof(Time_block_mini),&Device_time,sizeof(Time_block_mini));
+		}
+		break;
+	case WRITE_SETTING_COMMAND:
+		{
+			memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,sizeof(Str_Setting_Info),&Device_Basic_Setting,sizeof(Str_Setting_Info));
 		}
 		break;
 	case WRITECONTROLLER_T3000:
@@ -1167,10 +1163,7 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 			memcpy_s(SendBuffer + i*sizeof(Str_TstatInfo_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_TstatInfo_point),&m_Tstat_data.at(i + start_instance),sizeof(Str_TstatInfo_point));
 		}
 		break;
-	case CONNECTED_WITH_DEVICE:
-		memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,sizeof(Str_connected_point),my_ip,sizeof(Str_connected_point));
-		//这里需要注意my_ip双网卡的问题;
-		break;
+
 	case  WRITEALARM_T3000:
 		memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,sizeof(Alarm_point),&m_alarmlog_data.at(start_instance),sizeof(Alarm_point));
 		break;
@@ -1393,11 +1386,9 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 
 			if(start_instance >= BAC_OUTPUT_ITEM_COUNT)
 				return -1;//超过长度了;
-			//my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
-			//m_Output_data.clear();
+
 			for (i=start_instance;i<=end_instance;i++)
 			{
-				//Str_out_point temp_out;
 				if(strlen(my_temp_point)>STR_OUT_DESCRIPTION_LENGTH)
 					memset(m_Output_data.at(i).description,0,STR_OUT_DESCRIPTION_LENGTH);
 				else
@@ -1760,9 +1751,10 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 		Device_time.ti_min = *(my_temp_point ++);
 		Device_time.ti_hour = *(my_temp_point ++);
 		Device_time.dayofmonth = *(my_temp_point ++);
+		Device_time.dayofweek = *(my_temp_point ++);
 		Device_time.month = *(my_temp_point ++);
 		Device_time.year = *(my_temp_point ++);
-		Device_time.dayofweek = *(my_temp_point ++);
+		
 
 		//temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 		//Device_time.dayofyear = temp_struct_value;
@@ -2037,12 +2029,73 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 		}
 		return READALARM_T3000;
 		break;
+	case READ_SETTING_COMMAND:
+		{
+			block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
+			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+			if(block_length!=sizeof(Str_Setting_Info))
+				return -1;
+
+			memcpy_s(Device_Basic_Setting.reg.ip_addr,4,my_temp_point,4);
+			my_temp_point = my_temp_point + 4;
+			memcpy_s(Device_Basic_Setting.reg.subnet,4,my_temp_point,4);
+			my_temp_point = my_temp_point + 4;
+			memcpy_s(Device_Basic_Setting.reg.gate_addr,4,my_temp_point,4);
+			my_temp_point = my_temp_point + 4;
+			memcpy_s(Device_Basic_Setting.reg.mac_addr,6,my_temp_point,6);
+			my_temp_point = my_temp_point + 4;
+			Device_Basic_Setting.reg.tcp_type = *my_temp_point;
+			return READ_SETTING_COMMAND;
+		}
+		break;
 	case READMONITORDATA_T3000:
 		{
 
 			my_temp_point = (char *)Temp_CS.value;
+
+			char * temp_print = my_temp_point;
+			CString temp_cs;
+			CString temp_char;
+
+			g_Print.Format(_T("Revice length = %d"),len_value_type);
+			DFTrace(g_Print);
+			 int split_part;
+			int part_value = 40;
+			split_part = len_value_type/40;
+			for (int x=0;x<split_part;x++)
+			{
+				temp_cs.Format(_T("%02d Part  "),x+1);
+				for (int i = part_value*x; i< (part_value)*(x+1) ; i++)
+				{
+					temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
+					temp_char.MakeUpper();
+					temp_print ++;
+					temp_cs = temp_cs + temp_char + _T(" ");
+				}
+				g_Print = temp_cs;
+				DFTrace(g_Print);
+			}
+
+
+
+			//temp_cs.Empty();
+			//temp_cs.Format(_T("2 Part  "));
+			//for (int i=sizeof(Monitor_Block)/5 + 1;i< sizeof(Monitor_Block);i++)
+			//{
+			//	temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
+			//	temp_char.MakeUpper();
+			//	temp_print ++;
+			//	temp_cs = temp_cs + temp_char + _T(" ");
+			//}
+			//g_Print = temp_cs;
+			//DFTrace(g_Print);
+
+			//Monitor_Block
 			my_temp_point = my_temp_point + PRIVATE_MONITOR_HEAD_LENGTH;
 			my_temp_point = my_temp_point + MAX_POINTS_IN_MONITOR * 5 ;
+
+			
+
 			m_monitor_block.monitor =  *(my_temp_point++);
 			m_monitor_block.no_points =  *(my_temp_point++);
 			m_monitor_block.second_interval_time =  *(my_temp_point++);
@@ -2080,6 +2133,12 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 					//return 1;
 				}
 				int data_group = 0;
+				if(m_monitor_data.at(monitor_list_line).an_inputs == 0)
+				{
+					g_Print.Format(_T("an_inputs = 0"));
+					DFTrace(g_Print);
+					return 1;
+				}
 				if((m_monitor_block.index % m_monitor_data.at(monitor_list_line).an_inputs) == 0)
 				{
 					data_group = m_monitor_block.index / m_monitor_data.at(monitor_list_line).an_inputs;
@@ -2138,17 +2197,17 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 				return -1;
 
 			_Bac_Scan_results_Info temp_struct;
-
-
 			my_temp_point = (char *)Temp_CS.value + 3;
 			start_instance = *my_temp_point;
 			my_temp_point++;
 			end_instance = *my_temp_point;
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
-			 temp_struct.device_id	= ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
+			temp_struct.device_id	= ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
+			
 			 my_temp_point = my_temp_point +2;
 			 memcpy_s(temp_struct.ipaddress,6,my_temp_point,6);
+			 
 			//  temp_struct.panel_number = *(my_temp_point + 3);//Notice
 			// temp_struct.macaddress = *my_temp_point;
 			 my_temp_point = my_temp_point + 6;
@@ -2156,8 +2215,8 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			 my_temp_point = my_temp_point + 4;
 			 temp_struct.modbus_addr =  *(my_temp_point++);
 			 temp_struct.product_type =  *(my_temp_point++);
-			// my_temp_point++;
 			  temp_struct.panel_number =  *(my_temp_point++);
+			  
 			 int find_exsit = false;
 			 TRACE(_T("serialnumber = %d ,modbus_addr = %d , product_type = %d ,ip = %u.%u.%u.%u , instance = %d\r\n"),temp_struct.serialnumber,
 				 temp_struct.modbus_addr,temp_struct.product_type,temp_struct.ipaddress[0],temp_struct.ipaddress[1] ,
@@ -2500,68 +2559,69 @@ void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString Table
 	ado.CloseConn();
 }
 
-int Get_Unit_Process(CString Unit){
-int ret_Value=1;
-if (Unit.CompareNoCase(_T("RAW DATA"))==0)
+int Get_Unit_Process(CString Unit)
 {
-ret_Value=1;
-}
-else if (Unit.CompareNoCase(_T("TYPE2 10K C"))==0)
-{ret_Value=10;
-}
-else if (Unit.CompareNoCase(_T("TYPE2 10K F"))==0)
-{
-ret_Value=10;
-}
-else if (Unit.CompareNoCase(_T("0-100%"))==0)
-{
-ret_Value=1;
-}
-else if (Unit.CompareNoCase(_T("ON/OFF"))==0)
-{
-ret_Value=1;
-}
+	int ret_Value=1;
+	if (Unit.CompareNoCase(_T("RAW DATA"))==0)
+	{
+		ret_Value=1;
+	}
+	else if (Unit.CompareNoCase(_T("TYPE2 10K C"))==0)
+	{ret_Value=10;
+	}
+	else if (Unit.CompareNoCase(_T("TYPE2 10K F"))==0)
+	{
+		ret_Value=10;
+	}
+	else if (Unit.CompareNoCase(_T("0-100%"))==0)
+	{
+		ret_Value=1;
+	}
+	else if (Unit.CompareNoCase(_T("ON/OFF"))==0)
+	{
+		ret_Value=1;
+	}
 
-else if (Unit.CompareNoCase(_T("OFF/ON"))==0)
-{
-ret_Value=1;
-}
-else if (Unit.CompareNoCase(_T("Pulse Input"))==0)
-{
-ret_Value=1;
-}
-else if (Unit.CompareNoCase(_T("Lighting Control"))==0)
-{
-ret_Value=1;
-}
-else if (Unit.CompareNoCase(_T("TYPE3 10K C"))==0)
-{
-ret_Value=10;
-}
-else if (Unit.CompareNoCase(_T("TYPE3 10K F"))==0)
-{
-ret_Value=10;
-}
-else if (Unit.CompareNoCase(_T("NO USE"))==0)
-{
-ret_Value=1;
-}
-else if (Unit.CompareNoCase(_T("0-5V"))==0)
-{
-ret_Value=1000;
-}
-else if (Unit.CompareNoCase(_T("0-10V"))==0)
-{
-ret_Value=1000;
-}
-else if (Unit.CompareNoCase(_T("0-20ma"))==0)
-{
-ret_Value=1000;
-}
+	else if (Unit.CompareNoCase(_T("OFF/ON"))==0)
+	{
+		ret_Value=1;
+	}
+	else if (Unit.CompareNoCase(_T("Pulse Input"))==0)
+	{
+		ret_Value=1;
+	}
+	else if (Unit.CompareNoCase(_T("Lighting Control"))==0)
+	{
+		ret_Value=1;
+	}
+	else if (Unit.CompareNoCase(_T("TYPE3 10K C"))==0)
+	{
+		ret_Value=10;
+	}
+	else if (Unit.CompareNoCase(_T("TYPE3 10K F"))==0)
+	{
+		ret_Value=10;
+	}
+	else if (Unit.CompareNoCase(_T("NO USE"))==0)
+	{
+		ret_Value=1;
+	}
+	else if (Unit.CompareNoCase(_T("0-5V"))==0)
+	{
+		ret_Value=1000;
+	}
+	else if (Unit.CompareNoCase(_T("0-10V"))==0)
+	{
+		ret_Value=1000;
+	}
+	else if (Unit.CompareNoCase(_T("0-20ma"))==0)
+	{
+		ret_Value=1000;
+	}
 
 
 
-return ret_Value;
+	return ret_Value;
 }
 
 
@@ -2700,6 +2760,8 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 
 	TRACE(_T("Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac + _T("\r\n"));
 
+	g_Print = _T("Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac;
+	DFTrace(g_Print);
 	_Bac_Scan_Com_Info temp_1;
 	temp_1.device_id = device_id;
 //	temp_1.vendor_id = vendor_id;
@@ -2717,34 +2779,6 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 	if(!find_exsit)
 	{
 		m_bac_scan_com_data.push_back(temp_1);
-#if 0
-		CString Program_Path,Program_ConfigFile_Path;
-		int g_com=0;
-		GetModuleFileName(NULL,Program_Path.GetBuffer(MAX_PATH),MAX_PATH);  
-		PathRemoveFileSpec(Program_Path.GetBuffer(MAX_PATH) );            
-		Program_Path.ReleaseBuffer();
-		Program_ConfigFile_Path = Program_Path + _T("\\BacnetDB.ini");
-
-		CString Section;
-		Section.Format(_T("Device_%d"),temp_1.device_id);
-
-		CString temp_csc;
-		CString temp_code;
-		unsigned char src_data[20];
-		memcpy_s(src_data,18,src,18);
-		unsigned char * temp_point = NULL;
-		temp_point = src_data;
-		for (int i=0;i<18;i++)
-		{
-			temp_csc.Format(_T("%02x"),*(temp_point + i));
-			temp_csc.MakeUpper();
-			temp_code = temp_code + temp_csc;
-		}
-		CString temp_apdu;
-		temp_apdu.Format(_T("%d"),max_apdu);
-		WritePrivateProfileStringW(Section,_T("SRC"),temp_code,Program_ConfigFile_Path);
-		WritePrivateProfileStringW(Section,_T("MAX_APDU"),temp_apdu,Program_ConfigFile_Path);
-#endif
 	}
 
 	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,WM_COMMAND_WHO_IS,NULL);
@@ -2789,22 +2823,16 @@ void Initial_bac(int comport)
 			Set_RS485_Handle(NULL);
 		}
 #endif
-		//SetCommunicationType(0);	
-		//close_com();
-		//SetCommunicationType(1);
-		//close_com();
 		//Device_Set_Object_Instance_Number(4194300);
-		Device_Set_Object_Instance_Number(11152);
+		srand((unsigned)time(NULL)); 
+		unsigned int temp_value;
+		temp_value = rand()%(0x3FFFFF);
+		g_Print.Format(_T("The initial T3000 Object Instance value is %d"),temp_value);
+		DFTrace(g_Print);
+		Device_Set_Object_Instance_Number(temp_value);
 		address_init();
 		Init_Service_Handlers();
-#if 0
-		SetCommunicationType(1);
-		close_com();
-#endif
-		//Open_Socket2(_T("192.168.0.177"),6001);
-		
-		//Open_bacnetSocket2(_T("127.0.0.1"),6002,my_sokect);
-		//int ret_1 = Open_bacnetSocket2(_T("192.168.0.177"),47808,my_sokect);
+
 		int ret_1 = Open_bacnetSocket2(_T("192.168.0.130"),BACNETIP_PORT,my_sokect);
 	//	Open_Socket2(_T("127.0.0.1"),6002);
 	//	 = (int)GetCommunicationHandle();
@@ -3009,36 +3037,6 @@ void local_rp_ack_print_data(	BACNET_READ_PROPERTY_DATA * data)
 			receive_object_value.array_index = data->array_index;
 			receive_object_value.value = &value;
 
-
-			//if(g_device_info.at(0).my_Property_value.size()==0)
-			//{
-			//	g_device_info.at(0).my_Property_value.push_back(object_value);
-			//}
-			/*else
-			{
-				bool find_id=false;
-				for (int i=0;i<g_device_info.at(0).my_Property_value.size();i++)
-				{
-					if((g_device_info.at(0).my_Property_value.at(i).value.type.Object_Id.instance!=object_value.value.type.Object_Id.instance)
-						||(g_device_info.at(0).my_Property_value.at(i).value.type.Object_Id.type!=object_value.value.type.Object_Id.type))
-						continue;
-					else
-					{
-						find_id = true;
-						break;
-					}
-				}
-				if(!find_id)
-					g_device_info.at(0).my_Property_value.push_back(object_value);
-			}*/
-
-
-			//	g_device_info.at(0).my_Property_value.push_back(object_value);
-
-			//	g_device_info.at(0).my_Property_value.push_back(object_value);
-
-			//TRACE("%d",object_value);
-			//	bacapp_print_value(stdout, &object_value);
 			if (len > 0) 
 			{
 				if (len < application_data_len) 
@@ -3419,7 +3417,9 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 		DWORD nSerial=usDataPackage[0]+usDataPackage[1]*256+usDataPackage[2]*256*256+usDataPackage[3]*256*256*256;
 		int modbusID=usDataPackage[5];
-		TRACE(_T("Serial = %d     ID = %d\r\n"),nSerial,modbusID);
+		TRACE(_T("Serial = %u     ID = %d\r\n"),nSerial,modbusID);
+		g_Print.Format(_T("Serial = %u     ID = %d\r\n"),nSerial,modbusID);
+		DFTrace(g_Print);
 		temp.modbusID = modbusID;
 		temp.nSerial = nSerial;
 
@@ -3558,6 +3558,10 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 						//pSendBuf[nSendLen+3] = 0xFF;
 						nSendLen+=4;
 					}
+					else
+					{
+						AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
+					}
 				}	
 
 			}
@@ -3579,4 +3583,17 @@ END_SCAN:
 	//NET_WriteLogFile(strlog);
 	//pScanner->m_eScanNCEnd->SetEvent();
 	return 1;
+}
+
+void DFTrace(CString &nCString)
+{
+	static int count = 0;
+	CTime print_time=CTime::GetCurrentTime();
+	CString str=print_time.Format("%H:%M:%S    ");
+
+	PrintText[count].Empty();
+	PrintText[count] =str + nCString;
+	PostMessage(h_debug_window,WM_ADD_DEBUG_CSTRING,(WPARAM)PrintText[count].GetBuffer(),NULL);
+	count = (count ++) % 90;
+	
 }

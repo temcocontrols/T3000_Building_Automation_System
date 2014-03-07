@@ -206,6 +206,7 @@ typedef struct _STATUSBARINFO
 #define MY_RESUME_DATA  WM_USER+200
 #define MY_READ_DATA_CALLBACK WM_USER+201
 #define MY_RX_TX_COUNT WM_USER + 202
+#define WM_ADD_DEBUG_CSTRING WM_USER + 106
 typedef struct _MessageWriteOneInfo
 {
 	unsigned char device_id;

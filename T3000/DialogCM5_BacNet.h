@@ -71,6 +71,11 @@ public:
 	afx_msg void OnNMSetfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMSetfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedBtnBacWriteTime();
+	afx_msg void OnBnClickedBtnBacSYNCTime();
+	afx_msg void OnBnClickedBtnBacIPAuto();
+	afx_msg void OnBnClickedBtnBacIPStatic();
+	afx_msg void OnBnClickedBtnBacIPChange();
+	afx_msg	void OnBnClickedBtnBacIPCancle();
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CTabCtrl m_bac_main_tab;
@@ -80,6 +85,7 @@ public:
 	afx_msg void OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	int m_cur_tab_sel;
+	int m_bac_obtain_ip_mode;
 };
 //static void Init_Service_Handlers(void);
 

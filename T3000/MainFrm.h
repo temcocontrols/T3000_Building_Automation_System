@@ -366,6 +366,7 @@ public:
 protected:
 	afx_msg LRESULT OnMbpollClosed(WPARAM wParam, LPARAM lParam);
 public:
+	void ShowDebugWindow();
 	afx_msg void OnFunctionHumcalibration();
 	afx_msg void OnControlInputs();
 	afx_msg void OnControlPrograms();

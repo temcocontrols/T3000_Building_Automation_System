@@ -9,12 +9,16 @@
 #include "MainFrm.h"
 
 #include "LabelEditDlg.h"
+
+extern CBacnetScreenEdit * ScreenEdit_Window ;
 // CBacnetScreenEdit dialog
 // CGraphicView
 #define XStart 0
-#define YStart 0
+#define YStart 30
 CRect mynew_rect;	//用来存储 窗体应该有多大;
-int m_screenHotKeyID[8] = 
+
+const int SCREEN_HOTKEY_COUNT = 9;
+int m_screenHotKeyID[SCREEN_HOTKEY_COUNT] = 
 {
 	4001,
 	4002,
@@ -23,7 +27,8 @@ int m_screenHotKeyID[8] =
 	4005,
 	4006,
 	4007,
-	4008
+	4008,
+	4009
 };
 
 IMPLEMENT_DYNAMIC(CBacnetScreenEdit, CDialogEx)
@@ -54,6 +59,11 @@ BEGIN_MESSAGE_MAP(CBacnetScreenEdit, CDialogEx)
 
 	ON_WM_TIMER()
 	ON_MESSAGE(MY_REDRAW_WINDOW, RedrawScreeneditWindow)
+	ON_BN_CLICKED(IDC_BUTTON_ADD, &CBacnetScreenEdit::OnBnClickedButtonAdd)
+	ON_BN_CLICKED(IDC_BUTTON_EDIT, &CBacnetScreenEdit::OnBnClickedButtonEdit)
+	ON_BN_CLICKED(IDC_BUTTON_SCREEN_EXIT, &CBacnetScreenEdit::OnBnClickedButtonScreenExit)
+	ON_BN_CLICKED(IDC_BUTTON_DELETE, &CBacnetScreenEdit::OnBnClickedButtonDelete)
+	ON_BN_CLICKED(IDC_BUTTON_DELETE_ALL, &CBacnetScreenEdit::OnBnClickedButtonDeleteAll)
 END_MESSAGE_MAP()
 
 
@@ -225,7 +235,10 @@ LRESULT CBacnetScreenEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 
 	if (wParam==KEY_INSERT)	//If the cursor not in the range of the label or other objects,it will means add label
 	{
-		Add_Label();
+		if(m_nFoucsIndext<0)
+			Add_Label();
+		else
+			Edit_Label();
 	}
 	return 0;
 }
@@ -245,8 +258,7 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	
 	MoveWindow(mynew_rect.left,mynew_rect.top,mynew_rect.Width(),mynew_rect.Height(),1);
 	//MoveWindow(0,0,m_cxScreen,m_cyScreen,1);
-	InitGraphic(222,1);
-
+	InitGraphic(g_serialNum,g_bac_instance);
 
 	SetClassLong(this->GetSafeHwnd(),GCL_HCURSOR ,(LONG)LoadCursor(NULL , IDC_CROSS));//IDC_ARROW
 
@@ -267,16 +279,16 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 		AfxMessageBox(_T("RegisterHotKey SHIFT + RIGHT failure"));  
 	nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[4],NULL,VK_UP);
 	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey SHIFT + RIGHT failure"));  
+		AfxMessageBox(_T("RegisterHotKey  UP failure"));  
 	nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[5],NULL,VK_DOWN);
 	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey SHIFT + RIGHT failure"));  
+		AfxMessageBox(_T("RegisterHotKey  DOWN failure"));  
 	nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[6],NULL,VK_LEFT);
 	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey SHIFT + RIGHT failure"));  
+		AfxMessageBox(_T("RegisterHotKey  LEDT failure"));  
 	nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[7],NULL,VK_RIGHT);
 	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey SHIFT + RIGHT failure"));  
+		AfxMessageBox(_T("RegisterHotKey  RIGHT failure"));  
 	nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[8],MOD_ALT,'M');
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + M failure"));  
@@ -293,7 +305,7 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 #endif  
 
 	m_screenedit_dlg_hwnd = this->m_hWnd;
-
+	SetTimer(1,7000,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -303,9 +315,14 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 void CBacnetScreenEdit::InitGraphic(int nSerialNum,int nInstanceID)
 {
 	//m_strImgPathName=g_strImgeFolder+g_strImagePathName;
-	m_strImgPathName=g_strImgeFolder+ _T("COOLT3.bmp");
+	CString PicFileTips;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(screen_list_line).picture_file, (int)strlen((char *)m_screen_data.at(screen_list_line).picture_file)+1, 
+		PicFileTips.GetBuffer(MAX_PATH), MAX_PATH );
+	PicFileTips.ReleaseBuffer();
+
+	m_strImgPathName=g_strImgeFolder+ PicFileTips ;//_T("sample1.bmp");
 	WIN32_FIND_DATA fData;
-	HANDLE hFile=NULL;
+	HANDLE hFile=NULL; 
 	hFile = FindFirstFile(m_strImgPathName,&fData);
 	if(hFile != INVALID_HANDLE_VALUE)
 	{
@@ -338,11 +355,17 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 	m_pCon.CreateInstance(_T("ADODB.Connection"));
 	m_pRs.CreateInstance(_T("ADODB.Recordset"));
 	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-	CString temp_screen_item;
-	temp_screen_item.Format(_T("%d"),screen_list_line);
+
+	CString PicFileTips;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(screen_list_line).picture_file, (int)strlen((char *)m_screen_data.at(screen_list_line).picture_file)+1, 
+	PicFileTips.GetBuffer(MAX_PATH), MAX_PATH );
+	PicFileTips.ReleaseBuffer();
+
+	//CString temp_screen_item;
+	//temp_screen_item.Format(_T("%d"),screen_list_line);
 	CString strSql;
 	//if(bac_cm5_graphic == false)
-	strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i and Tips='%s'"),m_nSerialNumber,m_nTstatID,temp_screen_item);
+	strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i and Tips='%s'"),m_nSerialNumber,m_nTstatID,PicFileTips);
 	//else
 	//strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i"),g_bac_instance,g_mac);
 	//strSql.Format(_T("select * from Screen_Label where Tstat_id=%i"),m_nTstatID);
@@ -372,7 +395,7 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 			label.point.x = (int)((temp_x_persent*mynew_rect.Width())/100);
 		nTemp=m_pRs->GetCollect("Point_Y");//
 		temp_y_persent = nTemp;
-		label.point.y=(int)((temp_y_persent*mynew_rect.Height())/100);
+		label.point.y=(int)((temp_y_persent*mynew_rect.Height())/100 - YStart);
 
 		nTemp=m_pRs->GetCollect("Height");//
 		label.height=nTemp;
@@ -387,9 +410,10 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 		if(temp_variant.vt!=VT_NULL)
 		{
 		strtemp=temp_variant;
-		int temp_tip_value =  _wtoi(strtemp);
-		if(screen_list_line != temp_tip_value)
-			continue;
+		label.strTips = strtemp;
+		//int temp_tip_value =  _wtoi(strtemp);
+		//if(screen_list_line != temp_tip_value)
+		//	continue;
 		}
 		else
 		{
@@ -525,19 +549,54 @@ void CBacnetScreenEdit::PainNoImageInfo(CDC* pDC)
 
 }
 
+void CBacnetScreenEdit::Edit_Label()
+{
+	if(m_nFoucsIndext<0)
+		return;
+	if(!m_bImgExist)
+	{
+		AfxMessageBox(_T("No image has been configed for current TSTAT, please config one first!"));
+		return;
+	}
+	//	g_bRefresh=FALSE;
+	CString PicFileTips;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(screen_list_line).picture_file, (int)strlen((char *)m_screen_data.at(screen_list_line).picture_file)+1, 
+		PicFileTips.GetBuffer(MAX_PATH), MAX_PATH );
+	PicFileTips.ReleaseBuffer();
+
+	CLabelEditDlg dlg;
+	dlg.SetCommandType(2);
+	//dlg.SetInitValueForEdit(m_nTstatID,m_nSerialNumber,m_strScreenName,0);
+	dlg.SetInitValueForEdit(m_nTstatID,m_nSerialNumber,PicFileTips,m_RelayLabelLst.at(m_nFoucsIndext).cstatic_id,m_RelayLabelLst.at(m_nFoucsIndext).input_or_output,
+		m_RelayLabelLst.at(m_nFoucsIndext).width,m_RelayLabelLst.at(m_nFoucsIndext).height,m_RelayLabelLst.at(m_nFoucsIndext).status,
+		m_RelayLabelLst.at(m_nFoucsIndext).clrTxt,m_RelayLabelLst.at(m_nFoucsIndext).bkColor);
+	dlg.DoModal();
+	//	if(g_bRefresh)
+	//	{
+	ReloadLabelsFromDB();
+	Invalidate();
+	//	}
+
+}
+
+
 void CBacnetScreenEdit::Add_Label()
 {
-
 	if(!m_bImgExist)
 	{
 		AfxMessageBox(_T("No image has been configed for current TSTAT, please config one first!"));
 		return;
 	}
 //	g_bRefresh=FALSE;
+	CString PicFileTips;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(screen_list_line).picture_file, (int)strlen((char *)m_screen_data.at(screen_list_line).picture_file)+1, 
+		PicFileTips.GetBuffer(MAX_PATH), MAX_PATH );
+	PicFileTips.ReleaseBuffer();
+
 	CLabelEditDlg dlg;
 	dlg.SetCommandType(1);
 	//dlg.SetInitValueForEdit(m_nTstatID,m_nSerialNumber,m_strScreenName,0);
-	dlg.SetInitValueForEdit(1,222,m_strScreenName,0);
+	dlg.SetInitValueForEdit(m_nTstatID,m_nSerialNumber,PicFileTips,0);
 	dlg.DoModal();
 //	if(g_bRefresh)
 //	{
@@ -582,12 +641,16 @@ void CBacnetScreenEdit::saveLabelInfo(int nItem)
 	ScreenToClient(&rcItem);
 	int nLeft,nTop;
 	nLeft = (rcItem.left*100)/mynew_rect.Width();
-	nTop = (rcItem.top*100)/mynew_rect.Height();
+	nTop = (rcItem.top*100)/(mynew_rect.Height());
 
 	//nLeft=rcItem.left-XStart;
 	//nTop=rcItem.top-YStart;
-	CString temp_screen_item;
-	temp_screen_item.Format(_T("%d"),screen_list_line);
+	CString PicFileTips;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(screen_list_line).picture_file, (int)strlen((char *)m_screen_data.at(screen_list_line).picture_file)+1, 
+		PicFileTips.GetBuffer(MAX_PATH), MAX_PATH );
+	PicFileTips.ReleaseBuffer();
+
+	CString temp_screen_item = PicFileTips;
 	try
 	{
 
@@ -633,7 +696,7 @@ void CBacnetScreenEdit::OnPaint()
 		Bitmap bitmap(m_strImgPathName);
 		//graphics.DrawImage(&bitmap,XStart,YStart,bitmap.GetWidth(),bitmap.GetHeight());
 		//graphics.DrawImage(&bitmap,XStart,YStart,m_cxScreen,m_cyScreen);
-		graphics.DrawImage(&bitmap,XStart,YStart,mynew_rect.Width(),mynew_rect.Height());
+		graphics.DrawImage(&bitmap,XStart ,YStart,mynew_rect.Width(),mynew_rect.Height() - YStart);
 		
 
 	}
@@ -678,7 +741,10 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 	if(n>=0)
 		m_nFoucsIndext=n;
 	else
+	{
+		m_nFoucsIndext = -1;
 		return;
+	}
 	//int nstate=m_bLockBtn.GetCheck();
 	//if(m_bLockBtn.GetCheck()==BST_CHECKED)
 	//	return;
@@ -727,12 +793,14 @@ void CBacnetScreenEdit::OnCancel()
 {
 	// TODO: Add your specialized code here and/or call the base class
 	SetClassLong(this->GetSafeHwnd(),GCL_HCURSOR ,(LONG)LoadCursor(NULL , IDC_ARROW));//IDC_ARROW
-	for (int i=0;i<8;i++)
+	for (int i=0;i<SCREEN_HOTKEY_COUNT;i++)
 	{
 		UnregisterHotKey(GetSafeHwnd(), m_screenHotKeyID[i]);   
 	}
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 	::PostMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
+	
+	KillTimer(1);
 	CDialogEx::OnCancel();
 }
 
@@ -742,7 +810,8 @@ void CBacnetScreenEdit::OnCancel()
 void CBacnetScreenEdit::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if(bac_select_device_online)
+	
+	if(this->IsWindowVisible())
 	{
 		for (int i=0;i<(int)m_graphic_refresh_data.size();i++)
 		{
@@ -751,36 +820,108 @@ void CBacnetScreenEdit::OnTimer(UINT_PTR nIDEvent)
 				m_graphic_refresh_data.at(i).value_item,
 				m_graphic_refresh_data.at(i).value_item,
 				m_graphic_refresh_data.at(i).entitysize);
-			CString temp;
-			//	static int test_value;
-#if 0
-			if(m_graphic_refresh_data.at(i).value_type == 0)
-			{
-				//	test_value ++;
-				//	temp.Format(_T("%d"),test_value);
-				temp.Format(_T("%d"),m_Input_data.at(m_graphic_refresh_data.at(i).value_item).value);
-			}
-			else if(m_graphic_refresh_data.at(i).value_type == 1)
-			{
-				//test_value ++;
-				//	test_value ++;
-				//	temp.Format(_T("%d"),test_value);
-				temp.Format(_T("%d"),m_Output_data.at(m_graphic_refresh_data.at(i).value_item).value);
-			}
-			else if(m_graphic_refresh_data.at(i).value_type == 2)
-			{
-				//	test_value ++;
-				//	test_value ++;
-				//	test_value ++;
-				//	temp.Format(_T("%d"),test_value);
-				temp.Format(_T("%d"),m_Variable_data.at(m_graphic_refresh_data.at(i).value_item).value);
-			}
-
-			m_graphic_refresh_data.at(i).control_pt->m_strValueText = temp;	//在Label上 设置显示的 值;
-#endif
 			m_graphic_refresh_data.at(i).control_pt->Invalidate();
-			//	m_graphic_refresh_data.at(i).control_pt->i
 		}
+		Invalidate(0);
 	}
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void CBacnetScreenEdit::OnBnClickedButtonAdd()
+{
+	// TODO: Add your control notification handler code here
+	Add_Label();
+}
+
+
+
+void CBacnetScreenEdit::OnBnClickedButtonEdit()
+{
+	// TODO: Add your control notification handler code here
+	if(m_nFoucsIndext<0)
+	{
+		MessageBox(_T("Please select a label first!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
+		return;
+	}
+	Edit_Label();
+}
+
+
+void CBacnetScreenEdit::OnBnClickedButtonScreenExit()
+{
+	// TODO: Add your control notification handler code here
+	PostMessage(WM_CLOSE,NULL,NULL);
+}
+
+
+void CBacnetScreenEdit::OnBnClickedButtonDelete()
+{
+	// TODO: Add your control notification handler code here
+	if(m_nFoucsIndext<0)
+	{
+		MessageBox(_T("Please select a label first!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
+		return;
+	}
+
+	if(AfxMessageBox(_T("Do you really want to delete current label?"),MB_YESNO)==IDYES)
+	{
+		m_pCon.CreateInstance(_T("ADODB.Connection"));
+		m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+
+		Label_information	label;
+		label=m_RelayLabelLst.at(m_nFoucsIndext);
+
+		try
+		{
+			CString strSql;
+			strSql.Format(_T("delete * from Screen_Label where Serial_Num =%i and Tstat_id=%i and  Cstatic_id=%i and Tips='%s'"),label.nSerialNum,label.tstat_id,label.cstatic_id,label.strTips);
+			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		}
+		catch(_com_error *e)
+		{
+			AfxMessageBox(e->ErrorMessage());
+		}
+		if(m_pCon->State) 
+			m_pCon->Close(); 
+
+		ReloadLabelsFromDB();
+		Invalidate();
+		m_nFoucsIndext=-1;
+	}
+}
+
+
+void CBacnetScreenEdit::OnBnClickedButtonDeleteAll()
+{
+	// TODO: Add your control notification handler code here
+
+	if(AfxMessageBox(_T("Do you really want to delete all labels?"),MB_YESNO)==IDYES)
+	{
+		//m_pCon.CreateInstance(_T("ADODB.Connection"));
+		//m_pRs.CreateInstance(_T("ADODB.Recordset"));
+		//m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+		m_pCon.CreateInstance(_T("ADODB.Connection"));
+		m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+
+		Label_information	label;
+		label=m_RelayLabelLst.at(m_nFoucsIndext);
+
+		try
+		{
+			CString strSql;
+			strSql.Format(_T("delete * from Screen_Label where Serial_Num =%i and Tstat_id=%i and Tips='%s'"),label.nSerialNum,label.tstat_id,label.strTips);
+			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		}
+		catch(_com_error *e)
+		{
+			AfxMessageBox(e->ErrorMessage());
+		}
+		if(m_pCon->State) 
+			m_pCon->Close(); 
+
+		ReloadLabelsFromDB();
+		Invalidate();
+		m_nFoucsIndext=-1;
+	}
 }

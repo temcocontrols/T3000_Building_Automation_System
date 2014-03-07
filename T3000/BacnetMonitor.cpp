@@ -751,10 +751,10 @@ void CBacnetMonitor::OnNMKillfocusDatetimepickerMonitor(NMHDR *pNMHDR, LRESULT *
 void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 {
 	// TODO: Add your control notification handler code here
-	this->ShowWindow(SW_HIDE);
+	//this->ShowWindow(SW_HIDE);
 	CBacnetGraphic dlg;
 	dlg.DoModal();
-	this->ShowWindow(SW_SHOW);
+	//this->ShowWindow(SW_SHOW);
 }
 
 
