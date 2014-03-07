@@ -134,7 +134,10 @@ void CCO2_View::Fresh()
 
 	m_co2_braudRateCombox.EnableWindow(0);
 
-	m_co2_firmwareversion=get_curtstat_version();
+	CString temp_firmversion;
+	temp_firmversion.Format(_T("%u.%u"),product_register_value[MODBUS_VERSION_NUMBER_HI],product_register_value[MODBUS_VERSION_NUMBER_LO]);
+	
+	m_co2_firmwareversion= _wtof(temp_firmversion);//get_curtstat_version();
 	m_co2_serialNumber=get_serialnumber();
 	m_co2_hardwareversion=product_register_value[CO2_485_MODBUS_HARDWARE_REV];//8
 	m_co2_temp_unit.ResetContent();

@@ -1847,6 +1847,7 @@ bool bac_weeklycode_read_results;
 bool bac_annualcode_read_results;
 bool bac_alarmlog_read_results;
 bool bac_tstat_read_results;
+bool bac_basic_setting_read_results;
 
 bool bac_cm5_graphic;
 int bac_gloab_panel;
@@ -1857,7 +1858,7 @@ int weekly_list_line ;
 int annual_list_line ;
 int screen_list_line ;
 int monitor_list_line;
-Time_block_mini Device_time;
+
 
 HWND      g_hwnd_now;
 HWND      m_input_dlg_hwnd;
@@ -1892,6 +1893,8 @@ vector <_Bac_Scan_Com_Info> m_bac_scan_com_data;
 vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 vector <Alarm_point> m_alarmlog_data;
 vector <Str_TstatInfo_point> m_Tstat_data;
+Time_block_mini Device_time;
+Str_Setting_Info Device_Basic_Setting;
 
 vector <refresh_net_device> m_refresh_net_device_data;
 
@@ -1925,7 +1928,11 @@ HANDLE CM5_hThread = NULL;
 HANDLE CM5_UI_Thread;
 DWORD nThreadID_x;
 DWORD cm5_nThreadID;
-CDialog *pDialog[10];
+CDialog *pDialog[11];
+CDialog *DebugWindow;
+HWND h_debug_window;
+CString PrintText[100];
+CString g_Print;
 bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，否则就为1;
 int g_protocol;
 bool bac_net_initial_once;

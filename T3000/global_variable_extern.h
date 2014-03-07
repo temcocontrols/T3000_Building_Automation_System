@@ -932,6 +932,7 @@ extern bool bac_weeklycode_read_results;
 extern bool bac_annualcode_read_results;
 extern bool bac_alarmlog_read_results;
 extern bool bac_tstat_read_results;
+extern bool bac_basic_setting_read_results;
 extern bool bac_cm5_graphic;
 
 extern int bac_gloab_panel;
@@ -978,6 +979,7 @@ extern vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 extern vector <Alarm_point> m_alarmlog_data;
 extern vector <refresh_net_device> m_refresh_net_device_data;
 extern vector <Str_TstatInfo_point> m_Tstat_data;
+extern Str_Setting_Info Device_Basic_Setting;
 
 extern Monitor_Block m_monitor_block;
 extern int Monitor_Input__Data[14][1000];
@@ -1001,7 +1003,11 @@ extern int g_protocol;
 extern bool bac_net_initial_once;
 extern unsigned char my_ip[4];
 extern byte	g_DayState[8][48];
-extern CDialog *pDialog[10];
+extern CDialog *pDialog[11];
+extern CDialog *DebugWindow;
+extern CString PrintText[100];
+extern CString g_Print;
+extern HWND h_debug_window;
 extern unsigned long timesec1970; 
 extern unsigned long timestart;   
 extern bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，否则就为1;

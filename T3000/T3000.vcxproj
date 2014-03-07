@@ -164,6 +164,7 @@
     <ClCompile Include="Config_Routines.cpp" />
     <ClCompile Include="CustomSTable.cpp" />
     <ClCompile Include="BacnetView.cpp" />
+    <ClCompile Include="DebugWindow.cpp" />
     <ClCompile Include="DisplayConfig.cpp" />
     <ClCompile Include="DisplayLEDLCDConfig.cpp" />
     <ClCompile Include="fileRW.cpp" />
@@ -362,6 +363,7 @@
     <ClInclude Include="CO2NetView.h" />
     <ClInclude Include="CO2_View.h" />
     <ClInclude Include="CustomSTable.h" />
+    <ClInclude Include="DebugWindow.h" />
     <ClInclude Include="DialogCM5_BacNet.h" />
     <ClInclude Include="DisplayConfig.h" />
     <ClInclude Include="DisplayLEDLCDConfig.h" />

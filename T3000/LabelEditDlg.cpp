@@ -165,8 +165,8 @@ void CLabelEditDlg::SaveEditValue()
 	CString strclrBk;
 	strclrTxt.Format(_T("%u"),m_clrTxt);
 	strclrBk.Format(_T("%u"),m_bkColor);
-	strSql.Format(_T("update Screen_Label set Width=%i,Height=%i,Status=%i, Tips='%s',Input_or_Output=%i,Text_Color='%s',Back_Color='%s' where Serial_Num =%i and Tstat_id=%i and  Cstatic_id=%i"),
-		m_nwidth,m_nheight,m_nstatus,_T(""),m_input_or_output,strclrTxt,strclrBk,m_nSerialNum,m_id,m_nControlID);
+	strSql.Format(_T("update Screen_Label set Width=%i,Height=%i,Status=%i,Input_or_Output=%i,Text_Color='%s',Back_Color='%s' where Serial_Num =%i and Tstat_id=%i and  Cstatic_id=%i and Tips='%s'"),
+		m_nwidth,m_nheight,m_nstatus,m_input_or_output,strclrTxt,strclrBk,m_nSerialNum,m_id,m_nControlID,m_strScreenName);
 	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
 	}
 	catch(_com_error *e)
@@ -181,7 +181,7 @@ void CLabelEditDlg::AddLabel()
 	{
 
 	CString strSql;
-	strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i"),m_nSerialNum,m_id);
+	strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i and Tips='%s'"),m_nSerialNum,m_id,m_strScreenName);
 	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 	CString strtemp;
 	strtemp.Empty();

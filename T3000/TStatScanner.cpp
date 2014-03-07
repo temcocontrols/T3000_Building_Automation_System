@@ -1010,7 +1010,7 @@ int CTStatScanner::_ScanNCFunc()
 	return 1;
 }
 
-
+extern volatile HANDLE Read_Mutex;
 UINT _ScanNCByUDPFunc(LPVOID pParam)
 {
 	//g_nStartID = -1; // this is a flag for udp scan.
@@ -1037,6 +1037,9 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 //SOCKADDR_IN sockAddress;   // commented by zgq;2010-12-06; unreferenced local variable
 
 	
+	WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .这里要等待Main Scan 那里弄完了 在去扫;
+
+	ReleaseMutex(Read_Mutex);
 	CString strScanInfo = _T("Start UDP scan.");
 	pScanner->ShowNetScanInfo(strScanInfo); 
 	CString strlog;
@@ -3623,19 +3626,21 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 			
 		}
 
-		for (int i=0;i<3;i++)
+		for (int i=0;i<6;i++)
 		{
 			CString strInfo;strInfo.Format(_T("Scan protocol Bacnetip.Send global command"));
 			pScan->ShowBacnetComScanInfo(strInfo);
 			Send_WhoIs_Global(-1,-1);
-			Sleep(1000);
+			Sleep(500);
 		}
 
 		for (int j=0;j<5;j++)
 		{
 			int ready_to_read_count =	m_bac_scan_com_data.size();
 
-			CString strInfo;strInfo.Format(_T("Scan  Bacnetip.Found %d BACNET device"),ready_to_read_count);
+			CString strInfo;
+			strInfo.Format(_T("Scan  Bacnetip.Found %d BACNET device"),ready_to_read_count);
+			DFTrace(strInfo);
 			pScan->ShowBacnetComScanInfo(strInfo);
 
 			if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//达到返回的个数后就break;
@@ -3643,12 +3648,12 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 			TRACE(_T("gloab scan = %d\r\n"),ready_to_read_count);
 			for (int i=0;i<ready_to_read_count;i++)
 			{
-				int id_fail_resend_count = 0;
-				do 
-				{
-					id_fail_resend_count ++;
-					if(id_fail_resend_count >3)
-						break;
+				//int id_fail_resend_count = 0;
+				//do 
+				//{
+				//	id_fail_resend_count ++;
+				//	if(id_fail_resend_count >3)
+				//		break;
 					int	resend_count = 0;
 					do 
 					{
@@ -3664,11 +3669,10 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 
 						Sleep(SEND_COMMAND_DELAY_TIME);
 					} while (g_invoke_id<0);
-					Sleep(2000);
-				} while (!tsm_invoke_id_free(g_invoke_id));
+				//	Sleep(1000);
+				//} while (!tsm_invoke_id_free(g_invoke_id));
 					
 			}
-			Sleep(500);
 		}
 
 	Sleep(200);
@@ -3764,116 +3768,6 @@ endbacnetthread:
 	is_in_scan_mode = false;
 	return 1;
 }
-
-#if 0
-UINT _ScanBacnetComThread(LPVOID pParam)
-{
-	CTStatScanner* pScan = (CTStatScanner*)(pParam);
-	m_bac_scan_com_data.clear();	//清空上次扫描的遗留数据;
-	m_bac_scan_result_data.clear();
-	while(1)
-	{
-		if(pScan->m_com_scan_end)
-			break;
-		Sleep(1);
-	}
-
-	if(pScan->m_bacnetComs.size()==0)//根据modbus 扫描的结果判断是否需要进行bacnet 扫描;
-	{
-		goto	endbacnetthread;
-	}
-		
-
-	//等Modbus 串口扫描完之后 开始bacnet 的扫描;
-	for (int i=0;i<pScan->m_bacnetComs.size();i++)
-	{
-		int temp_port;
-		CString temp_cs;
-		temp_cs = pScan->m_bacnetComs.at(i);
-		temp_cs = temp_cs.Right(temp_cs.GetLength() - 3);
-		temp_port = _wtoi(temp_cs);
-		SetCommunicationType(0);//如果没有关闭串口 就先关闭;
-		close_com();
-		bac_net_initial_once = false;
-		Initial_bac(temp_port);
-
-		TRACE(_T("Now scan with COM%d\r\n"),temp_port);
-
-		for (int i=0;i<20;i++)
-		{
-			CString strInfo;strInfo.Format(_T("Scan Com%d,protocol Bacnet MSTP.Send global command time left(%d)"),temp_port,19-i);
-			pScan->ShowBacnetComScanInfo(strInfo);
-			Send_WhoIs_Global(-1,-1);
-			Sleep(1000);
-		}
-
-		for (int j=0;j<5;j++)
-		{
-
-
-			int ready_to_read_count =	m_bac_scan_com_data.size();
-
-			CString strInfo;strInfo.Format(_T("Scan Com%d,protocol Bacnet MSTP.Found %d device"),temp_port,ready_to_read_count);
-			pScan->ShowBacnetComScanInfo(strInfo);
-
-			if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//达到返回的个数后就break;
-				break;
-			TRACE(_T("gloab scan = %d\r\n"),ready_to_read_count);
-			for (int i=0;i<ready_to_read_count;i++)
-			{
-				int	resend_count = 0;
-				do 
-				{
-					resend_count ++;
-					if(resend_count>20)
-						break;
-					g_invoke_id = GetPrivateData(
-						m_bac_scan_com_data.at(i).device_id,
-						GETSERIALNUMBERINFO,
-						0,
-						0,
-						sizeof(Str_Serial_info));
-					Sleep(SEND_COMMAND_DELAY_TIME);
-				} while (g_invoke_id<0);
-			}
-			Sleep(2000);
-		}
-	}
-	Sleep(2000);
-	int ret_3 =	m_bac_scan_result_data.size(); 
-	TRACE(_T("serial scan = %d\r\n"),ret_3);
-	for (int l=0;l<ret_3;l++)
-	{
-		CTStat_Dev* pTemp = new CTStat_Dev;			
-		_ComDeviceInfo* pInfo = new _ComDeviceInfo;
-		pInfo->m_pDev = pTemp;
-		pTemp->SetSerialID(m_bac_scan_result_data.at(l).serialnumber);
-		pTemp->SetDevID(m_bac_scan_result_data.at(l).modbus_addr);
-		pTemp->SetProductType(m_bac_scan_result_data.at(l).product_type);
-
-		pTemp->SetProtocol(2);//2就是bacnet;
-		pTemp->SetHardwareVersion(m_bac_scan_result_data.at(l).device_id);		//用HW Version 代替bacnet的 instance ID
-		pTemp->SetSoftwareVersion(m_bac_scan_result_data.at(l).macaddress);
-		pTemp->SetBaudRate(19200);//scan
-		pTemp->SetComPort(5);
-		// hardware_version
-		pTemp->SetBuildingName(pScan->m_strBuildingName);
-		pTemp->SetSubnetName(pScan->m_strSubNet);
-
-
-
-		
-		pScan->m_szTstatScandRet.push_back(pInfo);
-	}
-endbacnetthread:
-	if (pScan->m_eScanBacnetComEnd->m_hObject)
-	{
-		pScan->m_eScanBacnetComEnd->SetEvent();
-	}
-	pScan->m_bStopScan = TRUE;
-	return 1;
-}
-#endif
 void CTStatScanner::MINI_binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo, BYTE devHi,int NET_COM)
 {
    
