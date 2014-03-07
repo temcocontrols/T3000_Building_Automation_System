@@ -24,6 +24,7 @@
 #include "../FlexSlideBar/FlexSlideWnd.h"
 #include "../FlexSlideBar/FSBContainer.h"
 #include "DisplayConfig.h"
+#include "DisplayLEDLCDConfig.h"
 // #define _CRTDBG_MAP_ALLOC
 // #include "stdlib.h"
 // #include "crtdbg.h"
@@ -3984,17 +3985,19 @@ void CT3000View::OnBnClickedTrendlogview()
 {
 
 	//((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(3);
-//	SwitchToPruductType(3);
-	if ((product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
-	{
-		CDisplayConfig display_cfg;
-		display_cfg.DoModal();
-	} 
-	else
-	{
-		AfxMessageBox(_T("This model of TStat don't support Display Config!"));
-		return;
-	}
+////	SwitchToPruductType(3);
+//	if ((product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
+//	{
+//		CDisplayConfig display_cfg;
+//		display_cfg.DoModal();
+//	} 
+//	else
+//	{
+//		AfxMessageBox(_T("This model of TStat don't support Display Config!"));
+//		return;
+//	}
+CDisplayLEDLCDConfig dlg;
+dlg.DoModal();
 	// TODO: Add your control notification handler code here
 }
 

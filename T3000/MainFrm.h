@@ -24,7 +24,7 @@
 #include "MBP.h"
 #include "MbPoll.h"
 
-#define NUMVIEWS 16
+#define NUMVIEWS 17
 
 
 
@@ -411,4 +411,5 @@ const int DLG_DIALOGT38I13O_VIEW=12;
 const int DLG_DIALOGT332AI_VIEW=13;
 const int DLG_DIALOGT38AI8AO=14;
 const int DLG_DIALOGT36CT=15;
+const int DLG_DIALOGT3PT10=16;
 extern int g_gloab_bac_comport;

@@ -23,7 +23,11 @@ CDisplayConfig::~CDisplayConfig()
 BOOL CDisplayConfig::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-
+    if (product_register_value[7]==PM_TSTAT5E)
+    {
+        MODBUS_LINE1_CHAR1=MODBUS_UI_LINE1_CHAR1;
+        MODBUS_LINE2_CHAR1=MODBUS_UI_LINE2_CHAR1;
+    }
 	m_display_number=1;
 	m_FlexGrid1.put_Rows(1);
 	m_FlexGrid1.put_Cols(2);
@@ -31,6 +35,7 @@ BOOL CDisplayConfig::OnInitDialog()
 	m_FlexGrid1.put_TextMatrix(0,1,_T("Display_Choice"));
 	m_FlexGrid1.put_ColWidth(0,800);
 	m_FlexGrid1.put_ColWidth(1,2200);
+
 	UpdateData(FALSE);
 	OnBnClickedOk();
 	Fresh_Grid();

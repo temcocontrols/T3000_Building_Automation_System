@@ -61,6 +61,7 @@
 #include "RegisterViewerDlg.h"
 #include "PVDlg.h"
 #include "T36CT.h"
+#include "T3RTDView.h"
 #pragma region Fance Test
 //For Test
 
@@ -484,6 +485,7 @@ void CMainFrame::InitViews()
 	m_pViews[DLG_DIALOGT332AI_VIEW]=(CView*)new T332AI;
 	m_pViews[DLG_DIALOGT38AI8AO]=(CView*)new T38AI8AO;
     m_pViews[DLG_DIALOGT36CT]=(CView*)new T36CT;
+    m_pViews[DLG_DIALOGT3PT10]=(CView*)new CT3RTDView;
 
 
 	CDocument* pCurrentDoc = GetActiveDocument();
@@ -998,12 +1000,13 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 				m_isMiniPanel=TRUE;
 				DoConnectToANode(hSelItem); 
 			}
-			else if (m_product.at(i).product_class_id == PM_T3IOA)
-			{
-				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(DLG_DIALOGT38AI8AO);
-			}
-			else if (m_product.at(i).product_class_id == PM_T38I13O)
+            else if (m_product.at(i).product_class_id == PM_T3IOA)
+            {
+                g_tstat_id = m_product.at(i).product_id;
+                SwitchToPruductType(DLG_DIALOGT38AI8AO);
+            }
+
+            else if (m_product.at(i).product_class_id == PM_T38I13O)
 			{
 				g_tstat_id = m_product.at(i).product_id;
 				SwitchToPruductType(DLG_DIALOGT38I13O_VIEW);
@@ -1013,6 +1016,11 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 				g_tstat_id = m_product.at(i).product_id;
 				SwitchToPruductType(DLG_DIALOGT3_VIEW);
 			}
+            else if (m_product.at(i).product_class_id == PM_T3PT10)
+            {
+                g_tstat_id = m_product.at(i).product_id;
+                SwitchToPruductType(DLG_DIALOGT3PT10);
+            }
 			else if (m_product.at(i).product_class_id==PM_T332AI)
 			{
 			    g_tstat_id = m_product.at(i).product_id;
@@ -2198,6 +2206,11 @@ here:
      {
         m_nCurView=DLG_DIALOGT36CT;
        ((T36CT*)m_pViews[m_nCurView])->Fresh();
+     }break;
+     case DLG_DIALOGT3PT10:
+     {
+         m_nCurView=DLG_DIALOGT3PT10;
+         ((CT3RTDView*)m_pViews[m_nCurView])->Fresh();
      }
      break;
 	}
@@ -6550,7 +6563,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					//register_critical_section.Lock();
 					//int nStart = GetTickCount();
 					int itemp = 0;
-					itemp = Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64,5);
+					itemp = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100,5);
 					if(itemp == -2)
 					{
 						continue;

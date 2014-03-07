@@ -151,6 +151,7 @@
 #define IDD_MBP                         445
 #define IDD_DIALOG10                    446
 #define IDD_RENAME_DLG                  446
+#define IDD_DISPLAY_DLG                 446
 #define IDR_T3000_DATABASE              447
 #define IDR_MENU_MBP                    447
 #define IDD_SCANWAY                     448
@@ -201,7 +202,11 @@
 #define IDD_DIALOG_BACNET_ALARMLOG      489
 #define IDD_DIALOG_BACNET_ALARM_WINDOW  490
 #define IDD_DIALOG_BACNET_TSTAT         491
+#define IDB_LED                         492
 #define IDD_DIALOG_CALIBRATION          493
+#define IDB_LCD                         493
+#define IDD_DIALOG14                    497
+#define IDD_DIALOG_NET_CO2              497
 #define IDD_TRAFFIC_WINDOW              500
 #define IDD_DIALOG13                    501
 #define IDD_REGISTER_VIEWER             502
@@ -602,6 +607,7 @@
 #define IDC_COMBO_RANGE                 1129
 #define IDC_DELAY                       1129
 #define IDC_COMBO_BAC_OBJECT_IDENTIFIER 1129
+#define IDC_RANGE                       1129
 #define IDC_POWERMODELCOMBO             1130
 #define IDC_CHECK56                     1130
 #define IDC_COMBO_TIMESERVERLIST2       1130
@@ -1560,7 +1566,9 @@
 #define IDC_TAB1                        1826
 #define IDC_LIST_TSTAT                  1826
 #define IDC_ARD                         1827
+#define IDC_LED                         1827
 #define IDC_CHANGEID                    1828
+#define IDC_LCD                         1828
 #define IDC_PORT                        1829
 #define IDC_INSERT                      1830
 #define IDC_RT                          1831
@@ -1672,9 +1680,7 @@
 #define ID_CONTROL_ANNUALROUTINES       32881
 #define ID_MISCELLANEOUS_LOADDESCRIPTORS 32882
 #define ID_FILE_OPEN32883               32883
-#define ID_MISCELLANEOUS_UPDATEMINI     42883
 #define ID_FILE_SAVE32884               32884
-#define ID_CONTROL_WEEKLY               42884
 #define ID_VIEW_DATATRAFFIC             32885
 #define ID_FUNCTION_HUMCALIBRATION      32886
 #define ID_FILE_EXIT                    32888
@@ -1693,17 +1699,19 @@
 #define ID_LANGUAGE_34010               34010
 #define ID_LANGUAGE_34011               34011
 #define ID_FUNCTIONS_WRITEREGISTERS     34012
-#define ID_TOOL_REGISTERVIEWER          44012
 #define ID_CLEAR_CELL                   34015
 #define ID_MAIN_NEW                     34016
 #define ID_MAIN_SAVE                    34017
 #define ID_CONTROL_A                    34018
 #define ID_CONTROL_ALARM_LOG            34019
 #define ID_Menu_CHECKUPDATE             34020
-#define ID_CONTROL_TSTAT                44020
 #define ID_DATABASE_PV                  34021
 #define ID_DATABASE_BACNETTOOL          34905
 #define ID_CONFIGFILE_SAVE_AS           35000
+#define ID_MISCELLANEOUS_UPDATEMINI     42883
+#define ID_CONTROL_WEEKLY               42884
+#define ID_TOOL_REGISTERVIEWER          44012
+#define ID_CONTROL_TSTAT                44020
 #define ID_TOOL_SCAN                    57920
 #define IDC_DATETIMEPICKER_DATE         57925
 #define IDC_RANGECOMBO                  57926
@@ -1714,9 +1722,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        492
+#define _APS_NEXT_RESOURCE_VALUE        499
 #define _APS_NEXT_COMMAND_VALUE         34021
-#define _APS_NEXT_CONTROL_VALUE         1827
+#define _APS_NEXT_CONTROL_VALUE         1828
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

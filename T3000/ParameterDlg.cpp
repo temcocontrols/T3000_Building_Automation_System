@@ -226,7 +226,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 	END_MESSAGE_MAP()
 
 
-UINT BackparaFreshProc(LPVOID pParam)
+DWORD WINAPI BackparaFreshProc(LPVOID pParam)
 {
 	CParameterDlg* pdlg = (CParameterDlg*)pParam;
 
@@ -319,9 +319,15 @@ BOOL CParameterDlg::OnInitDialog()
 	Reflesh_ParameterDlg();
 
 
-
-	pParamBackFresh = AfxBeginThread(BackparaFreshProc,this);
-	pParamBackFresh->m_bAutoDelete =FALSE;
+    if(hFirstThread != NULL)
+        TerminateThread(hFirstThread, 0);
+    hFirstThread=NULL;
+    if (!hFirstThread)
+    {
+        hFirstThread = CreateThread(NULL,NULL,BackparaFreshProc,this,NULL,0);
+    }
+	// pParamBackFresh = AfxBeginThread(BackparaFreshProc,this);
+	//pParamBackFresh->m_bAutoDelete =FALSE;
 
 
 
@@ -570,18 +576,20 @@ void CParameterDlg::OnDestroy()
 
 	CDialog::OnDestroy();
 
-	DWORD dwCode;
-	if (pParamBackFresh!=NULL)
-	{
-		GetExitCodeThread(pParamBackFresh->m_hThread,&dwCode);
-		if (dwCode==STILL_ACTIVE)
-		{
-			Sleep(200);
+	//DWORD dwCode;
+	//if (pParamBackFresh!=NULL)
+	//{
+	//	GetExitCodeThread(pParamBackFresh->m_hThread,&dwCode);
+	//	if (dwCode==STILL_ACTIVE)
+	//	{
+	//		Sleep(200);
 
-			TerminateThread(pParamBackFresh->m_hThread,dwCode);
-			delete pParamBackFresh;
-		}
-	}
+	//		TerminateThread(pParamBackFresh->m_hThread,dwCode);
+	//		delete pParamBackFresh;
+	//	}
+	//}
+    if(hFirstThread != NULL)
+        TerminateThread(hFirstThread, 0);
 	// TODO: Add your message handler code here
 }
 
@@ -2933,7 +2941,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_UNIVERSAL_ITERM]/10.0);	//245  388
 	m_pidPitemEdt2.SetWindowText(strTemp);
 
-	 strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
+	strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
 	strTemp.Empty();
 	strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_UNIVERSAL_SET]/10.0);	//246  359
 	strTemp+=strUnit;
@@ -3035,7 +3043,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		m_HeadDEdt1.SetWindowText(strTemp);
 
 	}
-
+    strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
 	strTemp.Empty();
 	strTemp.Format(_T("%.1f"),product_register_value[MODBUS_UNIVERSAL_DB_LO]/10.0);//243->361
 	strTemp+=strUnit;
