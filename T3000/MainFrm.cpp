@@ -1013,28 +1013,35 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
             else if (m_product.at(i).product_class_id == PM_T3IOA)
             {
                 g_tstat_id = m_product.at(i).product_id;
-                SwitchToPruductType(DLG_DIALOGT38AI8AO);
+                DoConnectToANode(hSelItem);
+                //SwitchToPruductType(DLG_DIALOGT38AI8AO);
             }
 
             else if (m_product.at(i).product_class_id == PM_T38I13O)
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(DLG_DIALOGT38I13O_VIEW);
+				/*SwitchToPruductType(DLG_DIALOGT38I13O_VIEW);*/
+                DoConnectToANode(hSelItem);
 			}
 			else if (m_product.at(i).product_class_id == PM_T34AO) //T3
 			{
 				g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(DLG_DIALOGT3_VIEW);
+				/*SwitchToPruductType(DLG_DIALOGT3_VIEW);*/
+                DoConnectToANode(hSelItem);
+
 			}
             else if (m_product.at(i).product_class_id == PM_T3PT10)
             {
                 g_tstat_id = m_product.at(i).product_id;
-                SwitchToPruductType(DLG_DIALOGT3PT10);
+               /* SwitchToPruductType(DLG_DIALOGT3PT10);*/
+               DoConnectToANode(hSelItem);
             }
 			else if (m_product.at(i).product_class_id==PM_T332AI)
 			{
 			    g_tstat_id = m_product.at(i).product_id;
-				SwitchToPruductType(DLG_DIALOGT332AI_VIEW);
+			/*	SwitchToPruductType(DLG_DIALOGT332AI_VIEW);*/
+
+            DoConnectToANode(hSelItem);
 			}
 			else if (m_product.at(i).product_class_id ==PM_AirQuality) //AirQuality
 			{
@@ -1075,7 +1082,8 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
             else if (m_product.at(i).product_class_id==PM_T36CT)
             {
                 g_tstat_id = m_product.at(i).product_id;
-                SwitchToPruductType(DLG_DIALOGT36CT);
+                DoConnectToANode(hSelItem); 
+                /*SwitchToPruductType(DLG_DIALOGT36CT);*/
             }
 			else 
 			{   
@@ -6897,16 +6905,42 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{
 				SwitchToPruductType(DLG_DIALOGCM5_VIEW);
 			}
-			else if (nFlag == PM_T34AO)//T3
-			{
-				memset(newtstat6,0,sizeof(newtstat6));
-				SwitchToPruductType(DLG_DIALOGT3_VIEW);
+			//else if (nFlag == PM_T34AO)//T3
+			//{
+			//	memset(newtstat6,0,sizeof(newtstat6));
+			//	SwitchToPruductType(DLG_DIALOGT3_VIEW);
+			//}
+			//else if (nFlag == PM_T3IOA){
+			//SwitchToPruductType(DLG_DIALOGT38AI8AO);
+			//}
 
-			}
-			else if (nFlag == PM_T3IOA){
-				
-			SwitchToPruductType(DLG_DIALOGT38AI8AO);
-			}
+            else if (nFlag == PM_T3IOA)
+            {
+              
+                SwitchToPruductType(DLG_DIALOGT38AI8AO);
+            }
+
+            else if (nFlag== PM_T38I13O)
+            {
+                 
+                SwitchToPruductType(DLG_DIALOGT38I13O_VIEW);
+            }
+            else if (nFlag == PM_T34AO) //T3
+            {
+                SwitchToPruductType(DLG_DIALOGT3_VIEW);
+            }
+            else if (nFlag== PM_T3PT10)
+            {
+                SwitchToPruductType(DLG_DIALOGT3PT10);
+            }
+            else if (nFlag==PM_T332AI)
+            {
+                SwitchToPruductType(DLG_DIALOGT332AI_VIEW);
+            }
+            else if (m_product.at(i).product_class_id==PM_T36CT)
+            {
+                SwitchToPruductType(DLG_DIALOGT36CT);
+            }
 			else if (nFlag == PM_MINIPANEL)
 			{
 				SwitchToPruductType(DLG_DIALOGMINIPANEL_VIEW);

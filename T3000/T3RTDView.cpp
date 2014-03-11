@@ -697,40 +697,15 @@ int  CT3RTDView::Get_RegID(CString Name)
 
 void CT3RTDView::Fresh()
 {
-
-
-    CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
-    pMain->m_pFreshMultiRegisters->SuspendThread();
-    //	pMain->m_pFreshTree->SuspendThread();
-    pMain->m_pRefreshThread->SuspendThread();
-    if (!is_connect())
-    {
-        pMain->OnConnect();
-    }
-    float progress;
-    if (is_connect())
-    {  
-        CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
-        pDlg->Create(IDD_DIALOG10_Progress, this);
-        pDlg->ShowProgress(0,0);
-        pDlg->ShowWindow(SW_SHOW);
-        RECT RECT_SET1;
-        GetClientRect(&RECT_SET1);
-        pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20);
+   
+  
+       
 
         for (int i=0;i<3;i++)
-        {
-            if (pDlg!=NULL)
-            {
-                progress=float((i+1)*(100/3));
-                pDlg->ShowProgress(int(progress),(int)progress);
-            } 
+        { 
             Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
         }
-        pDlg->ShowWindow(SW_HIDE);
-        if(pDlg!=NULL)
-        {delete pDlg;
-        pDlg=NULL;}
+        
 
         Initial_RegisterList();
         InitialDialog();
@@ -743,12 +718,8 @@ void CT3RTDView::Fresh()
             hFirstThread = CreateThread(NULL,NULL,_BackFreshing_RTD,this,NULL,0);
         }
 
-    }
-    else
-    {
-        SetPaneString(1,_T("Disconnection"));
-        AfxMessageBox(_T("Please Open COM Port"));
-    }
+   
+   
 }
 
 void CT3RTDView::OnBnClickedChangeid()
