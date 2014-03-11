@@ -611,7 +611,7 @@ for(int i = 1;i<=8;i++)
 	}
 	else if (13==product_register_value[RANGE_INPUT1+i-1])
 	{
-		strresult=_T("0-20I");
+		strresult=_T("0-20 ma");
 	}
 
 	m_msflexgrid_input.put_TextMatrix(i,3,strresult);
@@ -777,30 +777,17 @@ void T38I13O::InitialTableName(){
 }
 void T38I13O::Fresh()
 {
-	float progress;
+ 
 	if (is_connect())
 	{  
-		CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
-		pDlg->Create(IDD_DIALOG10_Progress, this);
-		pDlg->ShowProgress(0,0);
-		pDlg->ShowWindow(SW_SHOW);
-		RECT RECT_SET1;
-		GetClientRect(&RECT_SET1);
-		pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20);
+		 
 
 		for (int i=0;i<3;i++)
 		{
-			if (pDlg!=NULL)
-			{
-				progress=float((i+1)*(100/3));
-				pDlg->ShowProgress(int(progress),(int)progress);
-			} 
+			  
 			Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
 		}
-		pDlg->ShowWindow(SW_HIDE);
-		if(pDlg!=NULL)
-		{delete pDlg;
-		pDlg=NULL;}
+		 
 
 		InitialDialog();
 		SetTimer(1,2000,NULL);
@@ -1260,7 +1247,7 @@ void T38I13O::OnTimer(UINT_PTR nIDEvent)
 		//Read_Multi(g_tstat_id,&product_register_value[ZONE_TIME_LEFT_INPUT1],ZONE_TIME_LEFT_INPUT1,8);
 
 		CString strresult;
-		int regValue;
+		 
 		for(int i = 1;i<=8;i++)
 		{  
 			strresult.Format(_T("%d min"),product_register_value[ZONE_TIME_LEFT_INPUT1+i-1]);
