@@ -30,7 +30,11 @@ END_MESSAGE_MAP()
 
 
 // CCO2NetView diagnostics
+void CCO2NetView::OnInitialUpdate()
+{
+    CFormView::OnInitialUpdate();
 
+}
 #ifdef _DEBUG
 void CCO2NetView::AssertValid() const
 {
@@ -45,5 +49,8 @@ void CCO2NetView::Dump(CDumpContext& dc) const
 #endif
 #endif //_DEBUG
 
+void CCO2NetView::Fresh(){
+
+}
 
 // CCO2NetView message handlers
