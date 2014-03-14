@@ -242,7 +242,7 @@ class CCO2NetView : public CFormView
 {
 	DECLARE_DYNCREATE(CCO2NetView)
 
-protected:
+public:
 	CCO2NetView();           // protected constructor used by dynamic creation
 	virtual ~CCO2NetView();
 
@@ -257,8 +257,10 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
+    virtual void OnInitialUpdate();
 	DECLARE_MESSAGE_MAP()
+public:
+    void Fresh();
 };
 
 
