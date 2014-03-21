@@ -2629,10 +2629,10 @@ void CInputSetDlg::InitGridtstat6()
 					   strTemp.Format(_T("%.1f"),product_register_value[MODBUS_INTERNAL_THERMISTOR]/10.0);//216
 
 				   }
-				   else if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
+				  /* else if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
 				   {
 					   strTemp.Format(_T("%.1f"),product_register_value[130]/10.0);
-				   }
+				   }*/
 				   else
 				   {
 					   strTemp.Format(_T("%.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);  //121

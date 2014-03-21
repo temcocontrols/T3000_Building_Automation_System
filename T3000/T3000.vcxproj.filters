@@ -477,6 +477,12 @@
     <ClCompile Include="CO2NetView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DebugWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Table_Tamplete.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -648,6 +654,18 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\LCD Table Button.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\menubaro.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\menubaro_Connected.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bitmap_v.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bitmap_v_Connected.bmp">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

@@ -24,7 +24,7 @@
 #include "MBP.h"
 #include "MbPoll.h"
 
-#define NUMVIEWS 17
+#define NUMVIEWS 18
 
 
 
@@ -388,10 +388,15 @@ public:
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnPaint();
 	afx_msg void OnControlAlarmLog();
-		afx_msg void OnMenuCheckupdate();
+	afx_msg void OnMenuCheckupdate();
 	afx_msg void OnDatabasePv();
 	afx_msg void OnControlTstat();
 	afx_msg void OnCalibrationCalibrationhum();
+    afx_msg void OnUpdateConnect2(CCmdUI *pCmdUI);
+    afx_msg void OnUpdateDisconnect2(CCmdUI *pCmdUI);
+    afx_msg void OnUpdateScanDevice(CCmdUI *pCmdUI);
+    afx_msg void OnUpdateAddBuildingConfig(CCmdUI *pCmdUI);
+    UINT m_nStyle;
 };
 
 const int DLG_T3000_VIEW = 0;
@@ -405,12 +410,14 @@ const int DLG_AIRQUALITY_VIEW = 7;
 const int DLG_LIGHTINGCONTROLLER_VIEW = 8;
 const int DLG_HUMCHAMBER = 9;
 const int DLG_CO2_VIEW = 10;
-const int DLG_CM5_BACNET_VIEW = 11;
+const int DLG_CO2_NET_VIEW=11;
+const int DLG_CM5_BACNET_VIEW = 12;
 //T3-Serials
 const int DLG_DIALOGT3_VIEW = 5;
-const int DLG_DIALOGT38I13O_VIEW=12;
-const int DLG_DIALOGT332AI_VIEW=13;
-const int DLG_DIALOGT38AI8AO=14;
-const int DLG_DIALOGT36CT=15;
-const int DLG_DIALOGT3PT10=16;
+const int DLG_DIALOGT38I13O_VIEW=13;
+const int DLG_DIALOGT332AI_VIEW=14;
+const int DLG_DIALOGT38AI8AO=15;
+const int DLG_DIALOGT36CT=16;
+const int DLG_DIALOGT3PT10=17;
+
 extern int g_gloab_bac_comport;

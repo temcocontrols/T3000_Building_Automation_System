@@ -63,6 +63,7 @@
 #include "PVDlg.h"
 #include "T36CT.h"
 #include "T3RTDView.h"
+#include "CO2NetView.h"
 #pragma region Fance Test
 //For Test
 
@@ -193,11 +194,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_FILE_SAVE_CONFIG, OnFileOpen)
 	ON_COMMAND(ID_CONFIGFILE_SAVE_AS, SaveConfigFile)
 	ON_COMMAND(ID_LOAD_CONFIG,OnLoadConfigFile)
-	ON_COMMAND(ID_CONNECT2,OnConnect)
-	ON_COMMAND(ID_DISCONNECT2,OnDisconnect)
-	ON_COMMAND(ID_SCAN,OnScanDevice)
+
 	//ON_COMMAND(ID_TOOL_SCAN,OnScanDevice)
-	ON_COMMAND(ID_BUILDINGCONFIGDB,OnAddBuildingConfig)
+	
 	ON_COMMAND(ID_ALLNODESDATABASE,OnAllNodeDatabase)
 	ON_COMMAND( ID_FILE_LOADCONFIGFILE,OnLoadConfigFile)
 	ON_COMMAND(ID_FILE_BATCHBURNHEX,OnBatchFlashHex)
@@ -256,6 +255,17 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_DATABASE_PV, &CMainFrame::OnDatabasePv)
 	ON_COMMAND(ID_CONTROL_TSTAT, &CMainFrame::OnControlTstat)
 	ON_COMMAND(ID_CALIBRATION_CALIBRATIONHUM, &CMainFrame::OnCalibrationCalibrationhum)
+
+    ON_COMMAND(ID_CONNECT2,OnConnect)
+    ON_UPDATE_COMMAND_UI(ID_CONNECT2, &CMainFrame::OnUpdateConnect2)
+    ON_COMMAND(ID_DISCONNECT2,OnDisconnect)
+    ON_UPDATE_COMMAND_UI(ID_DISCONNECT2, &CMainFrame::OnUpdateDisconnect2)
+    ON_COMMAND(ID_SCAN,OnScanDevice)
+    ON_UPDATE_COMMAND_UI(ID_SCAN, &CMainFrame::OnUpdateScanDevice)
+    ON_COMMAND(ID_BUILDINGCONFIGDB,OnAddBuildingConfig)
+    ON_UPDATE_COMMAND_UI(ID_BUILDINGCONFIGDB, &CMainFrame::OnUpdateAddBuildingConfig)
+    
+
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -295,23 +305,39 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			g_bEnableRefreshTreeView = FALSE;
 
 		if(g_bPauseMultiRead)
-			continue;
+        {
+            Sleep(10);
+            continue;
+        }
 
 		if(g_tstat_id_changed)
-			continue;
-		if(g_tstat_id<0&&g_tstat_id>255)
-			continue;
+        {
+            Sleep(10);
+            continue;
+        }
+		if(g_tstat_id<0||g_tstat_id>=255)
+        {
+            Sleep(10);
+            continue;
+        }
 
 		//Make sure the view is TSTATE VIEW ,if not ,don't read this register.
 		CView* pT3000View = pFrame->m_pViews[DLG_T3000_VIEW];
 		if (!pT3000View)
-			 continue;
+        {
+            Sleep(10);
+            continue;
+        }
 		CView* pActiveView =pFrame->GetActiveView();
 		if(pActiveView != pT3000View)
-			 continue;
+        {
+            Sleep(10);
+            continue;
+        }
 
 		if (!is_connect())
 		{
+            Sleep(10);
 			continue;
 		}
 
@@ -417,6 +443,7 @@ CMainFrame::CMainFrame()
 {
 	// TODO: add member initialization code here
 	theApp.m_nAppLook = theApp.GetInt(_T("ApplicationLook"), ID_VIEW_APPLOOK_VS_2005);
+    m_nStyle=0;
 	m_strCurSubBuldingName.Empty();
 	m_strCurMainBuildingName.Empty();
 	m_nBaudrate=19200;
@@ -487,7 +514,7 @@ void CMainFrame::InitViews()
 	m_pViews[DLG_DIALOGT38AI8AO]=(CView*)new T38AI8AO;
     m_pViews[DLG_DIALOGT36CT]=(CView*)new T36CT;
     m_pViews[DLG_DIALOGT3PT10]=(CView*)new CT3RTDView;
-
+    m_pViews[DLG_CO2_NET_VIEW]=(CView*)new CCO2NetView;
 
 	CDocument* pCurrentDoc = GetActiveDocument();
     CCreateContext newContext;
@@ -541,19 +568,13 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	UINT uiToolbarHotID = theApp.m_bHiColorIcons ? IDB_BITMAP_V25049 : 0;
 	UINT uiToolbarColdID = theApp.m_bHiColorIcons ? IDB_BITMAP_V25049 : 0;
-	UINT uiMenuID = theApp.m_bHiColorIcons ? IDB_MENUBAROWN_BITMAP : IDB_MENUBAROWN_BITMAP;
+    //theApp.m_bHiColorIcons=FALSE;
+	UINT uiMenuID = theApp.m_bHiColorIcons ? IDB_MENUBAROWN_BITMAP : IDB_MENUBAROWN_BITMAP;// 
 
-// 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
-// 	 		!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_MYTOOLBAR : IDR_MYTOOLBAR,uiToolbarColdID, uiMenuID, 
-// 	 			FALSE /* Not locked */, 0, 0, uiToolbarHotID))
-// 	{
-// 		TRACE0("Failed to create toolbar\n");
-// 		return -1;//fail to create
-// 	}
+ 
 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
 	 		!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_TOOLBAR_VER25049 : IDR_TOOLBAR_VER25049,uiToolbarColdID, uiMenuID, FALSE /* Not locked */, 0, 0, uiToolbarHotID))
-//	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE ) ||
-//	 	!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_TOOLBAR_VER25049 : IDR_TOOLBAR_VER25049,uiToolbarColdID, uiMenuID, FALSE /* Not locked */, 0, 0, uiToolbarHotID))
+
 	{
 		TRACE0("Failed to create toolbar\n");
 		return -1;//fail to create
@@ -774,8 +795,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DebugWindow = new CDebugWindow;
 	DebugWindow->Create(IDD_DIALOG_DEBUG_TRACE, this);
 	DebugWindow->ShowWindow(SW_HIDE);
-	g_Print = _T("Debug Time 14-03-07-10   Debug version 1.2");
-	DFTrace(g_Print);
+    g_Print = _T("Debug Time 14-03-07-10   Debug version 1.2");
+    DFTrace(g_Print);
 	MyRegAddress.MatchMoudleAddress();
 	bac_net_initial_once = false;
 
@@ -1675,6 +1696,8 @@ void CMainFrame::OnBatchFlashHex()
 
 void CMainFrame::OnConnect()
 {
+
+    
 	//	return;
 	if(m_strCurMainBuildingName.IsEmpty())
 		return;
@@ -1711,6 +1734,8 @@ void CMainFrame::OnConnect()
 					strInfo.Format((_T("Open IP:%s successful.")),build_info.strIp);//prompt info;
 					SetPaneString(1,strInfo);
 					connectionSuccessful = 1;
+                    m_nStyle=1;
+                    Invalidate();
 				}
 				else
 				{
@@ -1752,6 +1777,8 @@ void CMainFrame::OnConnect()
 					//SetPaneCommunicationPrompt(strInfo);
 					SetPaneString(1, strInfo);
 					Change_BaudRate(default_com1_port_baudrate);
+                    m_nStyle=1;
+                    Invalidate();
 				}	
 			}
 		}//endof rs485 checking
@@ -1765,7 +1792,8 @@ void CMainFrame::OnDisconnect()
 {
 	//AfxMessageBox(_T("DisConnect."));
 	close_com();
-	
+	m_nStyle=2;
+    Invalidate();
 	CString strInfo = _T("No Connnection");
 	connectionSuccessful = 0;
 	SetPaneString(1,strInfo);
@@ -1954,6 +1982,8 @@ void CMainFrame::OnAddBuildingConfig()
 	//	Dlg.DoModal();
 	}
 	*/
+    m_nStyle=4;
+    Invalidate();
 	CAddBuilding Dlg;
 	Dlg.DoModal();
 //	Treestatus();//展开树列表
@@ -1970,7 +2000,8 @@ void CMainFrame::OnScanDevice()
 	m_bScanFinished=FALSE;
 	m_bScanALL=FALSE;
 	g_bPauseMultiRead=TRUE;
-
+    m_nStyle=3;
+    Invalidate();
 	Scan_Product();
 	
 }
@@ -2191,12 +2222,19 @@ here:
 		((CHumChamber*)m_pViews[m_nCurView])->Fresh();
 	}
 	break;
-	case  DLG_CO2_VIEW:
-		{
-			m_nCurView = DLG_CO2_VIEW;
-			((CCO2_View*)m_pViews[m_nCurView])->Fresh();
-		}
-		break;
+    case  DLG_CO2_VIEW:
+        {
+            m_nCurView = DLG_CO2_VIEW;
+            ((CCO2_View*)m_pViews[m_nCurView])->Fresh();
+        }
+        break;
+    case  DLG_CO2_NET_VIEW:
+        {
+            m_nCurView = DLG_CO2_NET_VIEW;
+            ((CCO2NetView*)m_pViews[m_nCurView])->Fresh();
+        }
+        break;
+
 	case  DLG_CM5_BACNET_VIEW:
 		{
 			m_nCurView = DLG_CM5_BACNET_VIEW;
@@ -6950,10 +6988,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				 g_HumChamberThread=TRUE;
 				SwitchToPruductType(DLG_HUMCHAMBER);
 			}
-			else if((nFlag == PM_CO2_NET)||(nFlag == PM_CO2_RS485))
+			else if(nFlag == PM_CO2_RS485)//(nFlag == PM_CO2_NET)||
 			{
 				SwitchToPruductType(DLG_CO2_VIEW);
 			}
+            else if(nFlag == PM_CO2_NET)//(nFlag == PM_CO2_NET)||
+            {
+                SwitchToPruductType(DLG_CO2_NET_VIEW);
+            }
 			else if (nFlag==PM_T38I13O)
 			{
 			SwitchToPruductType(DLG_DIALOGT38I13O_VIEW);
@@ -9555,4 +9597,23 @@ void CMainFrame::ShowDebugWindow()
 		DebugWindow->ShowWindow(SW_HIDE);
 	else
 		DebugWindow->ShowWindow(SW_SHOW);
+}
+
+void CMainFrame::OnUpdateConnect2(CCmdUI *pCmdUI)
+{
+    pCmdUI->SetCheck(m_nStyle == 1);
+}
+
+ 
+
+void CMainFrame::OnUpdateDisconnect2(CCmdUI *pCmdUI)
+{
+   pCmdUI->SetCheck(m_nStyle == 2);
+}
+void CMainFrame::OnUpdateScanDevice(CCmdUI *pCmdUI)
+{
+    pCmdUI->SetCheck(m_nStyle == 3);
+}void CMainFrame::OnUpdateAddBuildingConfig(CCmdUI *pCmdUI)
+{
+  pCmdUI->SetCheck(m_nStyle ==4);
 }

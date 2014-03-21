@@ -1,3 +1,13 @@
+Ver 2014.2.2,date Released:2014-3-21
+*************************************************************************************
+1>Fixed In Main Page,The day Slider and the night Slide ,they are easy to use.
+2>Fixed Connected and Disconnected ,the two states show different icons
+3>Updated CO2 Sensors-Ethernet
+
+Ver 2014.2.1,date Released:2014-3-18
+*************************************************************************************
+1>Fixed In Advanced page,Cool and Heat Deadband's Value,unnormal
+2>Fixed In Inputset Dialog ,Internal Sensor's Calibration can not update ,immediately
 
 Ver 2014.2.0,date Released:2014-3-10
 *************************************************************************************
