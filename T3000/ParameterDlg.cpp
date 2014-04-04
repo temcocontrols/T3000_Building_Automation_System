@@ -414,7 +414,7 @@ void CParameterDlg::InitPID2ComboBox()
 		m_inputSelect2.AddString(g_strInName6);
 		m_inputSelect2.AddString(g_strInName7);
 		m_inputSelect2.AddString(g_strInName8);
-		if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
 		{	
 
 			m_inputSelect2.AddString(_T("Humidity"));
@@ -1219,7 +1219,7 @@ void CParameterDlg::OnCbnSelchangeEapplication()
 
 	float m_fFirmwareVersion=get_curtstat_version();
 
-	if (product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT6)
+	if (product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT6|| product_register_value[7] == PM_TSTAT5i)
 	{
 		short nOccupied = product_register_value[184];  // Day setpoint option  
 		BOOL bOccupied = nOccupied & 0x0001;
@@ -1543,7 +1543,7 @@ void CParameterDlg::OnEnKillfocusSpset1()
 			strText.Format(_T("%d"),product_register_value[MODBUS_MIN_SETPOINT]);
 		}
 
-		if ((product_register_value[7] == PM_TSTAT7)||(product_register_value[7]==PM_TSTAT6))
+		if ((product_register_value[7] == PM_TSTAT7)||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i))
 		{
 			if(product_register_value[MODBUS_DAY_SETPOINT]==short(nOrig*10))
 			{
@@ -1643,7 +1643,7 @@ void CParameterDlg::OnEnKillfocusEcooldeadband1()
 	int nValue= (int)(_wtof(strText)*10);
 
 	g_bPauseMultiRead = TRUE;
-	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
+	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
 	{
 		if(nValue == product_register_value[MODBUS_DAY_COOLING_DEADBAND])	//346
 			return;
@@ -1696,7 +1696,7 @@ void CParameterDlg::OnEnKillfocusEcoolingiterm1()
 	int nValue= (int)(_wtof(strText.GetBuffer())*10.0);
 	 
 	g_bPauseMultiRead = TRUE;
-	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
+	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
 	{
 		if(nValue == product_register_value[MODBUS_DAY_HEATING_DEADBAND])	//347
 			return;
@@ -1906,7 +1906,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 
 
 	g_bPauseMultiRead = TRUE;	
-	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,345,short(fValue*10),
 			product_register_value[345],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));*/
@@ -2551,7 +2551,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	m_inputvalue1.SetWindowText(strTemp+strUnit);
 
 
-	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
+	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
 	{
 #if 1
 		strTemp.Format(_T("%0.1f"),product_register_value[121]/10.0);
@@ -3188,7 +3188,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	 
-	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
 	{
 		m_coolsp= product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10;//348
 
@@ -3209,39 +3209,77 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		m_heatdbN=product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//352
 		m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
 	}
-	CenterWindow(this);
-	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
-	{
-		WINDOWPLACEMENT wp;
+    //CenterWindow(this);
+    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
+    {
+        //WINDOWPLACEMENT wp;
+        //GetWindowPlacement(&wp);
+        //wp.rcNormalPosition.bottom += 120;
+        //SetWindowPlacement(&wp);
+        //GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_1SP2SPN)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_COOLDBN)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_SPN)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_HEATDBN)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_HEATSPN)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_COOLSPN)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_COMBO1)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_DAYN)->ShowWindow(SW_NORMAL);
 
-		GetWindowPlacement(&wp);
+        GetDlgItem(IDC_EDIT_CDBDN)->ShowWindow(SW_NORMAL);
+         GetDlgItem(IDC_EDIT31)->ShowWindow(SW_NORMAL);
+          GetDlgItem(IDC_EDIT34)->ShowWindow(SW_NORMAL);
+           GetDlgItem(IDC_EDIT37)->ShowWindow(SW_NORMAL);
+            GetDlgItem(IDC_EDIT_CSPD)->ShowWindow(SW_NORMAL);
 
-		wp.rcNormalPosition.bottom += 120;
+             GetDlgItem(IDC_STATIC_NIGHTN)->ShowWindow(SW_NORMAL);
+             GetDlgItem(IDC_COMBO4)->ShowWindow(SW_NORMAL);
+             GetDlgItem(IDC_EDIT_CDBNN)->ShowWindow(SW_NORMAL);
+             GetDlgItem(IDC_EDIT32)->ShowWindow(SW_NORMAL);
+             GetDlgItem(IDC_EDIT35)->ShowWindow(SW_NORMAL);
+             GetDlgItem(IDC_EDIT38)->ShowWindow(SW_NORMAL);
+             GetDlgItem(IDC_EDIT_CSPNN)->ShowWindow(SW_NORMAL);
 
-		SetWindowPlacement(&wp);
+             GetDlgItem(IDC_STATIC_SETPOINTN)->ShowWindow(SW_NORMAL);
 
-		GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_NORMAL);
-
-
-	 
-	} 
+    } 
 	else
 	{
 
-		WINDOWPLACEMENT wp;
-		GetWindowPlacement(&wp);
+		//WINDOWPLACEMENT wp;
+		//GetWindowPlacement(&wp);
+		//CRect rc;
+		//CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
+		//pWnd->GetWindowRect(&rc);
+		////ScreenToClient(&rc);
+		//wp.rcNormalPosition.bottom = rc.bottom - 10;
+		//SetWindowPlacement(&wp);
+		//GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_HIDE); 
 
-		CRect rc;
-		CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
-		pWnd->GetWindowRect(&rc);
-		//ScreenToClient(&rc);
+        GetDlgItem(IDC_STATIC_1SP2SPN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_COOLDBN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_SPN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_HEATDBN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_HEATSPN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_COOLSPN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_COMBO1)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_DAYN)->ShowWindow(SW_HIDE);
 
-		wp.rcNormalPosition.bottom = rc.bottom - 10;
-		SetWindowPlacement(&wp);
+        GetDlgItem(IDC_EDIT_CDBDN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT31)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT34)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT37)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT_CSPD)->ShowWindow(SW_HIDE);
 
-		GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_HIDE); 
+        GetDlgItem(IDC_STATIC_NIGHTN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_COMBO4)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT_CDBNN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT32)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT35)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT38)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT_CSPNN)->ShowWindow(SW_HIDE);
 
-
+        GetDlgItem(IDC_STATIC_SETPOINTN)->ShowWindow(SW_HIDE);
 	 
 	}
 ShowPID3();

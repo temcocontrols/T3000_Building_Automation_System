@@ -64,6 +64,7 @@
 #include "T36CT.h"
 #include "T3RTDView.h"
 #include "CO2NetView.h"
+#include "htmlhelp.h"
 #pragma region Fance Test
 //For Test
 
@@ -1098,7 +1099,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 			{
 			g_tstat_id=m_product.at(i).product_id;
 			DoConnectToANode(hSelItem); 
-			//SwitchToPruductType(DLG_DIALOGT38I13O_VIEW);
+			 
 			}
             else if (m_product.at(i).product_class_id==PM_T36CT)
             {
@@ -1467,7 +1468,7 @@ try
 					TVINSERV_LC          //tree0412
 				else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
 					TVINSERV_LED //tree0412
-				else if(temp_product_class_id == PM_TSTAT6)
+				else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT5i)
 					TVINSERV_TSTAT6
 				else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485))
 					TVINSERV_CO2
@@ -5149,7 +5150,7 @@ void CMainFrame::SaveConfigFile()
 		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
 		SetPaneString(1, strTips);
 	}
-	else if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
+	else if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7)||(newtstat6[7] == PM_TSTAT5i))
 	{
 // 		nret=write_one(g_tstat_id,321,4);
 // 		nret=write_one(g_tstat_id,322,0);
@@ -7016,7 +7017,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				//else if product module is PM_TSTAT5E PM_TSTAT5H use T3000_5EH_LCD_ADDRESS
 				//else if product module is TSTAT5 ABCDFG USE T3000_5ABCDFG_LED_ADDRESS
 				//Fance_
-				if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7) )
+				if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) )
 				{
 					product_type =T3000_6_ADDRESS;
 				}
@@ -7041,7 +7042,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					MyRegAddress.Change_Register_Table();
 				}
 				//20120426
-				if ((nFlag == PM_TSTAT6)||(nFlag == PM_TSTAT7))
+				if ((nFlag == PM_TSTAT6)||(nFlag == PM_TSTAT7)||(nFlag == PM_TSTAT5i))
 				{
 					//multi_register_value[]列表交换。
 					//读取TXT
@@ -7050,7 +7051,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						Updata_db_tstat6(nFlag);
 						FistWdb = FALSE;
 					}
-					if ((nFlag == PM_TSTAT6&& flagsoftwareversion >35.5)||(nFlag == PM_TSTAT7))
+					if ((nFlag == PM_TSTAT6&& flagsoftwareversion >35.5)||(nFlag == PM_TSTAT7)||(nFlag == PM_TSTAT5i))
 					{
 
 						memset(tempchange,0,sizeof(tempchange));
@@ -8562,8 +8563,10 @@ void CMainFrame::JudgeTstat6dbExist( CString strtable,CString strsql )
 void CMainFrame::Updata_db_tstat6( unsigned short imodel )
 {
 	CString strtable;
-	if (imodel == PM_TSTAT6)
+	if (imodel == PM_TSTAT6||imodel == PM_TSTAT5i)
 		 strtable = _T("Tstat6");
+    if (imodel == PM_TSTAT5i)
+        strtable = _T("Tstat5i");
 	else if(imodel == PM_TSTAT7)
 		strtable = _T("Tstat7");
 	//CString strsql = _T("select * from Tstat6");
@@ -9530,7 +9533,7 @@ CString m_CurrentVersion;
 		
 		if ( _tcscmp( buffer, version.GetBuffer() ) != 0 )//当前版本不和服务器保持一致，提醒更新
 			{
-				text.Format( _T("New T3000 version available,Please update your T3000!\n The lastest T3000_Ver=%s,Your Version="), buffer,version.GetBuffer());
+				text.Format( _T("New T3000 version available,Please update your T3000!\n The lastest T3000_Ver=%s"), buffer,version.GetBuffer());
 			 
 				 
 				int result = MessageBox( text, _T("New version available"), MB_YESNO|MB_ICONINFORMATION );

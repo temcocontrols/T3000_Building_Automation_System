@@ -214,6 +214,8 @@
 #define IDD_TABLE_TEMPLETE              501
 #define IDD_REGISTER_VIEWER             502
 #define IDD_DIALOG_BACNET_MONITOR       503
+#define IDR_ACCELERATOR2                504
+#define IDR_T3000_DB1                   505
 #define IDD_DIALOG_BACNET_SCREENS_EDIT  582
 #define IDD_DIALOG_BACNET_TOOL          583
 #define IDB_BITMAP_TMCO_LOGO            584
@@ -1582,8 +1584,11 @@
 #define IDC_ENABLE_PASSWORD             1829
 #define IDC_INSERT                      1830
 #define IDC_BUTTON_SCREEN_EXIT          1830
+#define IDC_RESET                       1830
 #define IDC_RT                          1831
 #define IDC_SLIDER_DEBUG                1831
+#define IDC_HELP                        1831
+#define IDC_HELP_HELP                   1831
 #define IDC_STARTREGISTER               1832
 #define IDC_BUTTON_DEBUG_CLEARALL       1832
 #define IDC_DATAGRID1                   1833
@@ -1743,9 +1748,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        504
-#define _APS_NEXT_COMMAND_VALUE         34021
-#define _APS_NEXT_CONTROL_VALUE         1830
+#define _APS_NEXT_RESOURCE_VALUE        506
+#define _APS_NEXT_COMMAND_VALUE         34022
+#define _APS_NEXT_CONTROL_VALUE         1832
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

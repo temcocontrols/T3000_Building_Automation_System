@@ -134,6 +134,7 @@ int const PM_TSTAT5B2 = 3;
 int const PM_TSTAT5C = 4;
 int const PM_TSTAT6 = 6;
 int const PM_TSTAT7 = 7;
+int const PM_TSTAT5i=8;
 int const PM_TSTAT5D = 12;
 int const PM_AirQuality = 13;
 const int PM_TSTAT5E = 16;

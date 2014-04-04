@@ -150,7 +150,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		int nFlag=0;
 		nFlag = read_one(now_tstat_id,7,6);
 
-		if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7) )
+		if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7) || (nFlag == PM_TSTAT5i))
 		{
 			product_type =T3000_6_ADDRESS;
 		}
@@ -494,6 +494,9 @@ BOOL CGridLoad::OnInitDialog()
 		case PM_TSTAT6:
 			strTemp="TStat6";
 			break;
+        case PM_TSTAT5i:
+            strTemp="TStat6";
+            break;
 		case PM_TSTAT7:
 			strTemp="TStat7";
 			break;
@@ -1163,6 +1166,9 @@ void CGridLoad::LoadDeviceToGrid()
 		case PM_TSTAT6:
 			strTemp="TStat6";
 			break;
+        case PM_TSTAT5i:
+            strTemp="TStat5i";
+            break;
 		case PM_TSTAT7:
 			strTemp="TStat7";
 			break;

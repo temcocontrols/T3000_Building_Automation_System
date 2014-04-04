@@ -67,13 +67,13 @@ BOOL CTStatScheduleDlg::OnInitDialog()
 void CTStatScheduleDlg::InitGrid()
 {
 	// working day
-	m_fgWorkDay.put_Rows(5);
+	m_fgWorkDay.put_Rows(3);
 	m_fgWorkDay.put_Cols(4);
 
 	m_fgWorkDay.put_ColWidth(0,1200);
 	m_fgWorkDay.put_ColWidth(1,800);
-	m_fgWorkDay.put_ColWidth(2,800);
-	m_fgWorkDay.put_ColWidth(3,1200);
+	//m_fgWorkDay.put_ColWidth(2,800);
+	//m_fgWorkDay.put_ColWidth(3,1200);
 	
 
 	m_fgWorkDay.put_TextMatrix(0,1,_T("Hour"));	
@@ -81,22 +81,22 @@ void CTStatScheduleDlg::InitGrid()
 	//m_fgWorkDay.put_TextMatrix(0,3,_T("P.M./A.M."));	
 	m_fgWorkDay.put_TextMatrix(0,3,_T("Time Setting"));	
 
-	m_fgWorkDay.put_TextMatrix(1,0,_T("Awaking Time"));	
-	m_fgWorkDay.put_TextMatrix(2,0,_T("Away Time"));
-	m_fgWorkDay.put_TextMatrix(3,0,_T("Back Time"));	
-	m_fgWorkDay.put_TextMatrix(4,0,_T("Sleeping Time"));	
+	m_fgWorkDay.put_TextMatrix(1,0,_T("Occupied"));	
+	m_fgWorkDay.put_TextMatrix(2,0,_T("Unoccupied"));
+	//m_fgWorkDay.put_TextMatrix(3,0,_T("Back Time"));	
+	//m_fgWorkDay.put_TextMatrix(4,0,_T("Sleeping Time"));	
 
 
 
 	// weekend day
 
-	m_fgWeekend.put_Rows(5);
+	m_fgWeekend.put_Rows(3);
 	m_fgWeekend.put_Cols(4);
 
 	m_fgWeekend.put_ColWidth(0,1200);
 	m_fgWeekend.put_ColWidth(1,800);
-	m_fgWeekend.put_ColWidth(2,800);
-	m_fgWeekend.put_ColWidth(3,1200);
+	//m_fgWeekend.put_ColWidth(2,800);
+	//m_fgWeekend.put_ColWidth(3,1200);
 	//m_fgWeekend.put_ColWidth(4,1200);
 
 	m_fgWeekend.put_TextMatrix(0,1,_T("Hour"));	
@@ -104,11 +104,11 @@ void CTStatScheduleDlg::InitGrid()
 	//m_fgWeekend.put_TextMatrix(0,3,_T("P.M./A.M."));	
 	m_fgWeekend.put_TextMatrix(0,3,_T("Time Setting"));	
 
-	m_fgWeekend.put_TextMatrix(1,0,_T("Awaking Time"));	
-	m_fgWeekend.put_TextMatrix(2,0,_T("Away Time"));
-	m_fgWeekend.put_TextMatrix(3,0,_T("Back Time"));	
-	m_fgWeekend.put_TextMatrix(4,0,_T("Sleeping Time"));	
-	for (int i = 0; i <4; i++)
+	m_fgWeekend.put_TextMatrix(1,0,_T("Occupied"));	
+	m_fgWeekend.put_TextMatrix(2,0,_T("Unoccupied"));
+	//m_fgWeekend.put_TextMatrix(3,0,_T("Back Time"));	
+	//m_fgWeekend.put_TextMatrix(4,0,_T("Sleeping Time"));	
+	for (int i = 0; i <3; i++)
 	{
 		m_fgWorkDay.put_ColAlignment(i,4);
 		m_fgWeekend.put_ColAlignment(i,4);
@@ -123,7 +123,7 @@ void CTStatScheduleDlg::InitGrid()
 
 void CTStatScheduleDlg::FillGridByRegister()
 {
-	for (int i = 1; i <=4; i++)
+	for (int i = 1; i <=2; i++)
 	{
 		int nWorkDayAwakeH = m_szRegTable[0]; //357...
 		int nWorkDayAwakeM = m_szRegTable[1]; 
@@ -173,7 +173,7 @@ void CTStatScheduleDlg::SaveToRegister()
 	int nRet =0;	
 	BYTE szTime[16]={0};
 
-	for (int i =0; i <4 ; i++)
+	for (int i =0; i <2 ; i++)
 	{	
 		CString strTime,strHour,strMin,strSec;
 		strHour=m_fgWorkDay.get_TextMatrix(i+1,1);	
@@ -442,7 +442,7 @@ void CTStatScheduleDlg::OnBnClickedButtonSave()
 	//SaveToRegister();
 	///*
 	CString strTime,strHour,strMin,strPMAM;
-	for (int i = 1; i <=4; i++)
+	for (int i = 1; i <=2; i++)
 	{
 		strHour = m_fgWorkDay.get_TextMatrix(i,1);	
 		strMin = m_fgWorkDay.get_TextMatrix(i,2);	
@@ -483,7 +483,7 @@ void CTStatScheduleDlg::InitRegisterTable()
 {
 	m_szRegTable.clear();
 
-	if (multi_register_value[7] == PM_TSTAT6 || multi_register_value[7] == PM_TSTAT7 ) // TStat 6
+	if (multi_register_value[7] == PM_TSTAT6 || multi_register_value[7] == PM_TSTAT7|| multi_register_value[7] == PM_TSTAT5i ) // TStat 6
 	{
 		for (int i = 0 ; i < 16; i++)
 		{
