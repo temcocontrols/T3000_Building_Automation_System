@@ -618,7 +618,6 @@
     <None Include="res\Exit.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\t3000.mdb" />
     <None Include="res\Input.ico">
       <Filter>Resource Files</Filter>
     </None>
@@ -668,6 +667,7 @@
     <None Include="res\bitmap_v_Connected.bmp">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\t3000.mdb" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1142,6 +1142,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DebugWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Table_Tamplete.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

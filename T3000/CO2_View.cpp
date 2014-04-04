@@ -354,20 +354,20 @@ void CCO2_View::Fresh_External_List()
 		temp_cs_serial.Format(_T("%d"),temp_serialnumber);
 		
 
-		temp_cs_pre_alarm_sp.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXT_PRE_ALARM_SETPOINT_START + i - 1]);
-		temp_cs_alarm_sp.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXT_ALARM_SETPOINT_START + i - 1]);
-		temp_cs_cal_offset.Format(_T("%d"),(short)product_register_value[CO2_485_MODBUS_EXT_CO2_OFFSET_START + i - 1]);
+        temp_cs_pre_alarm_sp.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXT_PRE_ALARM_SETPOINT_START +  i- 1]);
+        temp_cs_alarm_sp.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXT_ALARM_SETPOINT_START + i - 1]);
+        temp_cs_cal_offset.Format(_T("%d"),(short)product_register_value[CO2_485_MODBUS_EXT_CO2_OFFSET_START + i - 1]);
 
-		if(product_register_value[CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + i - 1] == 65535)
-		{
-			temp_cs_ppm.Format(_T("No Sensor"));
-			m_co2_external_sensor_list.SetCellEnabled(i-1,CO2_EXTERNAL_PPM,0);
-		}
-		else
-		{
-			temp_cs_ppm.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + i - 1]);
-			m_co2_external_sensor_list.SetCellEnabled(i-1,CO2_EXTERNAL_PPM,1);
-		}
+        if(product_register_value[CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + i - 1] == 65535)
+        {
+            temp_cs_ppm.Format(_T("No Sensor"));
+            m_co2_external_sensor_list.SetCellEnabled(i-1,CO2_EXTERNAL_PPM,0);
+        }
+        else
+        {
+            temp_cs_ppm.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + i - 1]);
+            m_co2_external_sensor_list.SetCellEnabled(i-1,CO2_EXTERNAL_PPM,1);
+        }
 			
 		m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_DEVICE_ID,temp_cs_id);
 		m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_SERIAL_NUM,temp_cs_serial);

@@ -2447,9 +2447,12 @@ CString GetProductName(int ModelID)
 	case PM_TSTAT5H:
 		strProductName="TStat5H";
 		break;
-	case PM_TSTAT6:
-		strProductName="TStat6";
-		break;
+    case PM_TSTAT6:
+        strProductName="TStat6";
+        break;
+    case PM_TSTAT5i:
+        strProductName="TStat5i";
+        break;
 	case PM_TSTAT7:
 		strProductName="TStat7";
 		break;

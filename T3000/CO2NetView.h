@@ -2,6 +2,7 @@
 #include "afxwin.h"
 #include "afxcmn.h"
 #include "msflexgrid1.h"
+#include "afxdtctl.h"
 
 #define	PRODUCT_ID					32
 
@@ -185,8 +186,10 @@ CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS	=	1262	;
 CO2_NET_MODBUS_EXTERNAL_NODES_PLUG_AND_PLAY 	=	1263	;
 CO2_NET_MODBUS_SCAN_DB_CTR	=	1264	;
 CO2_NET_MODBUS_RESET_SCAN_DB	=	1265	;
+
 CO2_NET_MODBUS_SCAN_START	=	1266	;
 CO2_NET_MODBUS_SCAN_END 	=	2535	;
+
 CO2_NET_MODBUS_GET_NODES_PARA_START 	=	2536	;
 CO2_NET_MODBUS_GET_NODES_PARA_END 	=	2568	;
 CO2_NET_MODBUS_SCAN_OCCUPY_START	=	2568	;
@@ -248,8 +251,56 @@ public:
     void Initial_Registerlist();
     void Initial_Window();
    void Get_CO2_Temperature_unit(CString &strTemp);
+   void Show_PassWord();
+   void Show_TCPIP();
+   void Show_Temperature();
+   void Fresh_Grid();
+   int get_serialnumber();
+ void  Check_DayTime();
+
+     void  Check_HourTime();
+public:
+    CEdit m_edit_IDAddress;
+    CEdit m_edit_SN;
+    CEdit m_Edit_FVevsion;
+    CEdit m_Edit_HardVer;
+    CComboBox m_Combox_braudrate;
+    CEdit m_Edit_RHum;
+    CButton m_AlarmSetting_M;
+    CButton m_AlarmSetting_Auto;
+    CComboBox m_Combox_CO2State;
+    
+ 
+    CEdit m_Edit_Password;
+    CComboBox m_Combox_IpModel;
+    CEdit m_Edit_MACAddress;
+    CIPAddressCtrl m_IPCtrl_IpAddress;
+    CIPAddressCtrl m_IpCtrl_Gateway;
+    CIPAddressCtrl m_IpCtrl_Subnet;
+    CEdit m_Edit_Port;
+
+    CEdit m_Edit_External_Temp;
+    CEdit m_Internal_Temp;
+    CComboBox m_Combox_TempUnit;
+    CComboBox m_Edit_SensorSelect;
+
+    CEdit m_Edit_Calibrate_Offset;
+    CEdit m_Edit_Alarm_Setpoint;
+    CEdit m_Edit_PreAlarm_Setpoint;
+    CEdit m_Edit_AlarmOn;
+    CEdit m_Edit_AlarmOff;
+    CEdit m_Edit_MenuBlockTimes;
+    CEdit m_Edit_BacklightTime;
+    CButton m_HeatingHumiditySensor_Enable;
+    CButton m_HeatingHumiditySensor_Disable;
+    afx_msg void OnCbnSelchangeCo2TempUnit();
+    CButton m_Check_Enable_Password;
+    afx_msg void OnBnClickedBtnCo2ClearCal();
+    CMsflexgrid m_msflexgrid;
 private:
-BOOL Flag_Reg;
+    BOOL Flag_Reg;
+    CString cs_temp_unit;
+    unsigned short product_register_value[2700];
 #if 1
     int	CO2_NET_MODBUS_SERIALNUMBER_LOWORD	;
     int	CO2_NET_MODBUS_SERIALNUMBER_HIWORD	;
@@ -281,6 +332,7 @@ BOOL Flag_Reg;
     int	CO2_NET_MODBUS_GATEWAY_ADDRESS_START	;
     int	CO2_NET_MODBUS_TCP_SERVER_ENABLE 	;
     int	CO2_NET_MODBUS_LISTEN_PORT_AT_TCP_SERVER_MODE_START	;
+
     int	CO2_NET_MODBUS_IP_MODE_GHOST	;
     int	CO2_NET_MODBUS_IP_ADDRESS_GHOST_START	;
     int	CO2_NET_MODBUS_SUBNET_MASK_ADDRESS_GHOST_START	;
@@ -288,6 +340,7 @@ BOOL Flag_Reg;
     int	CO2_NET_MODBUS_TCP_SERVER_ENABLE_GHOST 	;
     int	CO2_NET_MODBUS_LISTEN_PORT_AT_TCP_SERVER_MODE_GHOST_START 	;
     int	CO2_NET_MODBUS_ENABLE_GHOST	;
+
     int	CO2_NET_MODBUS_SCAN_COMMAND	;
     int	CO2_NET_MODBUS_SUBNET_TYPE 	;
     int	CO2_NET_MODBUS_NTP_COMMAND	;
@@ -391,47 +444,29 @@ BOOL Flag_Reg;
     int	CO2_NET_MODBUS_HUMIDITY_SENSOR_TABLE_ADD_HUM	;
     int	CO2_NET_MODBUS_HUMIDITY_SENSOR_TABLE_ADD_FREQ	;
     int	CO2_NET_MODBUS_HUMIDITY_SENSOR_TABLE_ADD_ENABLE	;
-#endif
-  CString cs_temp_unit;
-  unsigned short product_register_value[2700];
+    #endif
 public:
-    CEdit m_edit_IDAddress;
-    CEdit m_edit_SN;
-    CEdit m_Edit_FVevsion;
-    CEdit m_Edit_HardVer;
-    CComboBox m_Combox_braudrate;
-    CEdit m_Edit_RHum;
-    CButton m_AlarmSetting_M;
-    CButton m_AlarmSetting_Auto;
-    CComboBox m_Combox_CO2State;
-    
- 
-    CEdit m_Edit_Password;
-    CComboBox m_Combox_IpModel;
-    CEdit m_Edit_MACAddress;
-    CIPAddressCtrl m_IPCtrl_IpAddress;
-    CIPAddressCtrl m_IpCtrl_Gateway;
-    CIPAddressCtrl m_IpCtrl_Subnet;
-    CEdit m_Edit_Port;
-
-    CEdit m_Edit_External_Temp;
-    CEdit m_Internal_Temp;
-    CComboBox m_Combox_TempUnit;
-    CComboBox m_Edit_SensorSelect;
-
-    CEdit m_Edit_Calibrate_Offset;
-    CEdit m_Edit_Alarm_Setpoint;
-    CEdit m_Edit_PreAlarm_Setpoint;
-    CEdit m_Edit_AlarmOn;
-    CEdit m_Edit_AlarmOff;
-    CEdit m_Edit_MenuBlockTimes;
-    CEdit m_Edit_BacklightTime;
-    CButton m_HeatingHumiditySensor_Enable;
-    CButton m_HeatingHumiditySensor_Disable;
-    afx_msg void OnCbnSelchangeCo2TempUnit();
-    CButton m_Check_Enable_Password;
-    afx_msg void OnBnClickedBtnCo2ClearCal();
-    CMsflexgrid m_msflexgrid;
+    afx_msg void OnBnClickedRadioAlarmManual();
+    afx_msg void OnBnClickedRadioAlarmAuto();
+    afx_msg void OnCbnSelchangeCo2AlarmState();
+    afx_msg void OnBnClickedEnablePassword();
+    afx_msg void OnEnKillfocusEditCo2Passwor();
+    afx_msg void OnCbnSelchangeComboIpmodel();
+    afx_msg void OnBnClickedButtonApply();
+    afx_msg void OnBnClickedCo2Enableidbutton();
+    afx_msg void OnEnKillfocusIdCo2Edit();
+    afx_msg void OnEnKillfocusCo2PrepareAlarmSetpoint();
+    afx_msg void OnEnKillfocusCo2AlarmSetpoint();
+    afx_msg void OnCbnSelchangeComboCo2SensorSel();
+    afx_msg void OnEnKillfocusCo2CalibratingOffset();
+    afx_msg void OnEnKillfocusCo2AlarmOnTime();
+    afx_msg void OnEnKillfocusCo2AlarmOffTime();
+    afx_msg void OnEnKillfocusEditCo2BlockTime();
+    afx_msg void OnEnKillfocusEditCo2BacklightTime();
+    afx_msg void OnBnClickedButtonCo2SyncTime();
+    afx_msg void OnBnClickedBtnCo2Refresh();
+    CDateTimeCtrl m_co2_time_picker;
+    CDateTimeCtrl m_co2_day_picker;
 };
 
 

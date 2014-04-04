@@ -2931,7 +2931,7 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 	if(strText.CompareNoCase(strInName)==0)
 		return;
 		int Model_ID=read_one(now_tstat_id,7,5);
-	if ((Model_ID==PM_TSTAT5G)||(Model_ID==PM_TSTAT5E)||(Model_ID==PM_TSTAT6)||(Model_ID==PM_TSTAT7))
+	if ((Model_ID==PM_TSTAT5G)||(Model_ID==PM_TSTAT5E)||(Model_ID==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(Model_ID==PM_TSTAT7))
 	{
 		strText.TrimRight();
 		unsigned char p[8];//input+input1
@@ -6240,11 +6240,16 @@ _Twrite_to_file_a_line(out,_T("//Input Output Config"));//space
 			m_inRows=5;
 
 		}break;
-	case PM_TSTAT6:
-		{
-			m_outRows=8;
-			m_inRows=12;
-		}break;
+    case PM_TSTAT6:
+        {
+            m_outRows=8;
+            m_inRows=12;
+        }break;
+    case PM_TSTAT5i:
+        {
+            m_outRows=8;
+            m_inRows=12;
+        }break;
 	case PM_TSTAT5E:
 		{
 			m_outRows=8;

@@ -31,8 +31,11 @@ public:
 	CString m_oldname;
 	CString m_newname;
 	virtual BOOL OnInitDialog();
+    void Refresh();
+    void ChangingLeftTime();
 	CMsflexgrid m_msflexgrid;
 	CComboBox m_controlcombo;
+    HANDLE hFirstThread;
 	CString m_strcombo;
 	DECLARE_EVENTSINK_MAP()
 	void ClickMsflexgridConfigure();
@@ -44,5 +47,8 @@ public:
 	WORD m_overridetime[24];
 	WORD m_MB[24];
 	WORD m_DT[24];
+    WORD m_LT[24];
+    WORD m_AM[24];
 	afx_msg void OnBnClickedButtonSend();
+    afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

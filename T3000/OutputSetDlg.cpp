@@ -209,6 +209,7 @@ void COutputSetDlg::Fresh_Grid()
 	case PM_PRESSURE: break;
 	case PM_TSTAT5D:m_outRows=8;break;
 	case PM_TSTAT6:
+    case PM_TSTAT5i:
 	case PM_TSTAT7:
 	case 16:m_outRows=8;break;
 	case 17:m_outRows=6;break;
@@ -379,7 +380,7 @@ void COutputSetDlg::Fresh_Grid()
 //----------------------------------------------------------------------------------
 
 	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16 
-		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)//||m_nModeType==17||m_nModeType==18)
+		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)//||m_nModeType==17||m_nModeType==18)
 	{
 		// just for row4 ///////////////////////////////////////////////////////////////
 		if((int)(nAMVAlue & 8))
@@ -4751,7 +4752,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 	*/
 
  #if 1//Tstat67
-	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7))
+	if ((newtstat6[7] == PM_TSTAT6)||(newtstat6[7] == PM_TSTAT7)||(newtstat6[7] == PM_TSTAT5i))
 	{
 	m_FlexGrid.SetFocus();
 	long lRow,lCol;
@@ -5669,7 +5670,7 @@ void COutputSetDlg::OnCbnSelchangeOvaluecombo()
 
 	//BCDE;
 	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16
-		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE) 
+		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_PRESSURE) 
 	{
 		if(m_nCurRow==4&&m_nCurCol==VALUE_OUTFIELD)
 		{
@@ -5823,7 +5824,7 @@ void COutputSetDlg::OnCbnSelchangeOvaluecombo()
 
 	//DEG:out6/out7:
 	//186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
-	if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_TSTAT6
+	if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i
 		||m_nModeType==PM_TSTAT7 ||m_nModeType==PM_PRESSURE)
 	{
 		if(m_nCurRow==6&&m_nCurCol==VALUE_OUTFIELD)
@@ -5935,7 +5936,7 @@ void COutputSetDlg::OnCbnSelchangeOamcombo()
 
 	//4,5
 	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16||m_nModeType==17
-		||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)
+		||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_PRESSURE)
 	{
 		if(m_nCurRow==4&&AM_OUTFIELD==m_nCurCol)
 		{
@@ -6008,7 +6009,7 @@ void COutputSetDlg::OnCbnSelchangeOamcombo()
 
 	//6.7
 	if(m_nModeType==12||m_nModeType==16||m_nModeType==18
-		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)
+		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_PRESSURE)
 	{
 		if(m_nCurRow==6&&AM_OUTFIELD==m_nCurCol)
 		{
@@ -6925,7 +6926,7 @@ void COutputSetDlg::OnCbnSelchangeOfuncombo()
 void COutputSetDlg::OnEnKillfocusValueedit()
 {
 	BeginWaitCursor();
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		CString strText;
 		m_OutValueEdt.GetWindowText(strText);
@@ -7078,7 +7079,7 @@ void COutputSetDlg::OnEnKillfocusValueedit()
 			}
 
 		}
-		if(m_nModeType==12||(m_nModeType==16)||(m_nModeType==18)||m_nModeType==PM_TSTAT6
+		if(m_nModeType==12||(m_nModeType==16)||(m_nModeType==18)||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i
 			||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)
 		{
 			//  commented by zgq;2010-12-06; 写入的值应当为实际设置电压值×100。

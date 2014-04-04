@@ -209,6 +209,9 @@ public:
 
 	void Automationflexrow();
 	afx_msg void OnBnClickedButtonAdd();
+    afx_msg void OnSave();
+    afx_msg void OnRefresh();
+    afx_msg void OnReset();
 	CComboBox m_comboboxpanel;
 	CComboBox m_comboboxouputboard;
 	CComboBox m_comboboxoutput;
