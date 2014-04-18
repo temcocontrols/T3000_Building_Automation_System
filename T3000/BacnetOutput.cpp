@@ -273,7 +273,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			temp_high.Format(_T("%d"),m_Output_data.at(i).s_del_high);
 
 			CString temp_value;
-			temp_value.Format(_T("%d"),m_Output_data.at(i).value);
+			temp_value.Format(_T("%.2f"),((float)m_Output_data.at(i).value) / 1000);
 			m_output_list.SetItemText(i,OUTPUT_VALUE,temp_value);
 #if 0
 			CString cstemp_value;
@@ -493,7 +493,8 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		int temp_int = (int)(_wtof(temp_cs) * 1000);
 		m_Output_data.at(Changed_Item).value = temp_int;
 #endif
-		int temp_int = _wtoi(temp_cs);
+	//	int temp_int = _wtoi(temp_cs);
+		int temp_int = (int)(_wtof(temp_cs) * 1000);
 		m_Output_data.at(Changed_Item).value = temp_int;
 	}
 

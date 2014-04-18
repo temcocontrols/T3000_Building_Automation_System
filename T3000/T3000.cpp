@@ -317,8 +317,8 @@ BOOL CT3000App::InitInstance()
 	{
 		//CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
 		  //没有找到就创建一个默认的数据库
-		FilePath=g_strExePth+_T("Database\\t3000.mdb");
-		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DB1), _T("T3000_DB"));   
+		FilePath=g_strExePth+_T("Database\\T3000.mdb");
+		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DATABASE), _T("DB"));   
 		HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 
 

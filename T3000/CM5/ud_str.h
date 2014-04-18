@@ -9,7 +9,8 @@
 
 #define PRIVATE_HEAD_LENGTH 7
 
-#define PRIVATE_MONITOR_HEAD_LENGTH 18
+//#define PRIVATE_MONITOR_HEAD_LENGTH 18
+#define PRIVATE_MONITOR_HEAD_LENGTH 20
 #ifndef ALARM_MESSAGE_SIZE 
 	#define ALARM_MESSAGE_SIZE    58
 #endif
@@ -173,7 +174,7 @@ typedef struct
 
 	int8_t auto_manual;  /* (1 bit; 0=auto, 1=manual)*/
 	int8_t digital_analog;  /* (1 bit; 0=digital, 1=analog)*/
-	int8_t access_level;  /* (3 bits; 0-5)*/
+	int8_t hw_switch_status;  /* (3 bits; 0-5)*/
 	int8_t control ;  /* (1 bit; 0=off, 1=on)*/
 	int8_t digital_control;  /* (1 bit)*/
 	int8_t decom;  /* (1 bit; 0=ok, 1=point decommissioned)*/
@@ -181,7 +182,7 @@ typedef struct
 #if 0
 	unsigned auto_manual : 1;  /* (1 bit; 0=auto, 1=manual)*/
 	unsigned digital_analog	: 1;  /* (1 bit; 0=digital, 1=analog)*/
-	unsigned access_level	  : 3;  /* (3 bits; 0-5)*/
+	unsigned hw_switch_status	  : 3;  /* (3 bits; 0-5)*/
 	unsigned control       : 1;  /* (1 bit; 0=off, 1=on)*/
 	unsigned digital_control: 1;  /* (1 bit)*/
 	unsigned decom	     	: 1;  /* (1 bit; 0=ok, 1=point decommissioned)*/
@@ -557,7 +558,11 @@ typedef struct              /* 645 bytes */
 	uint8_t fast_sampling;//   :1; /* 0 = normal sampling 1 = fast sampling */
 	uint8_t wrap_around ;//    :1; /* 1 - wrapped  */
 
-	int32_t          start_time;
+	uint16_t     send_lenght       ;//    :  2;
+	uint8_t     no_used[6];
+
+
+	uint32_t          start_time;
 
 	uint16_t          index;      /* pointer to the new free location in block */
 														/* equal with the number of samples in block */
@@ -565,7 +570,9 @@ typedef struct              /* 645 bytes */
 	                              255 = last block in chain */
 	uint8_t          block_no;      /* position of block in chain */
   	uint8_t      last_digital_state ;//: 14;
-  	uint8_t      not_used       ;//    :  2;
+  	//uint8_t      not_used       ;//    :  2;
+
+	uint8_t     reserved;
 
   	union {
 	int32_t           analog[MAX_ANALOG_SAMPLES_PER_BLOCK];   /* 140*4=560 bytes */
@@ -600,6 +607,9 @@ typedef struct              /* 85 bytes */
 	uint8_t fast_sampling;//   :1; /* 0 = normal sampling 1 = fast sampling */
 	uint8_t wrap_around  ;//   :1; /* 1 - wrapped  */
 
+	uint16_t     send_lenght       ;//    :  2;
+	uint8_t     no_used[6];
+
 	int32_t          start_time;
 
 	uint16_t          index;      /* pointer to the new free location in block */
@@ -610,18 +620,21 @@ typedef struct              /* 85 bytes */
 
 
   uint8_t      last_digital_state ;//: 14;
-  uint8_t      not_used       ;//    :  2;
+
+  /*  U8_T      index_fast         :  2;*/
+  uint8_t     reserved;
+ // uint8_t      not_used       ;//    :  2;
 /*  unsigned      index_fast         :  2;*/
 
 
-} Monitor_Block_Header;  /* 85 bytes */
+} Monitor_Block_Header;  /* 100 bytes */
 
 
 typedef struct {
 
 	long nsize;
-	long oldest_time;
-	long most_recent_time;
+	unsigned long oldest_time;
+	unsigned long most_recent_time;
 
 } MonitorUpdateData;
 
@@ -634,6 +647,8 @@ typedef struct
 	uint8_t type;
 	MonitorUpdateData conm_args;
 	uint8_t special;
+	uint8_t total_seg;
+	uint8_t seg_index;
 }Str_Monitor_data_header;
 
 typedef struct 
@@ -651,7 +666,7 @@ typedef struct
 
 typedef union
 {
-	uint8_t all[20];
+	uint8_t all[400];
 	struct 
 	{  
 		uint8_t ip_addr[4];
@@ -659,6 +674,8 @@ typedef union
 		uint8_t gate_addr[4];   
 		uint8_t mac_addr[6];
 		uint8_t tcp_type;   /* 0 -- DHCP, 1-- STATIC */
+		uint8_t mini_type;
+		uint8_t debug;
 	}reg;
 }Str_Setting_Info;
 

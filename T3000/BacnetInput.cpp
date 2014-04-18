@@ -161,19 +161,6 @@ void CBacnetInput::Initial_List()
 			m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
 		}
 
-
-
-		//if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
-		//{
-		//	ListCtrlEx::CStrList strlist;
-		//	int test = sizeof(Input_Range_Array)/sizeof(Input_Range_Array[0]);
-		//	for (int loop=0;loop<(int)sizeof(Input_Range_Array)/sizeof(Input_Range_Array[0]);loop++)
-		//	{
-		//		strlist.push_back(Input_Range_Array[loop]) ;
-		//	}
-		//	m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);
-		//}
-
 		if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_FITLER))
 		{
 			ListCtrlEx::CStrList strlist;

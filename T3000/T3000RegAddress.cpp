@@ -152,9 +152,11 @@ int _P(char *str,int mMdb_Adress_Map)
 //}
 
 
-
 bool T3000RegAddress::MatchMoudleAddress(void)
 {
+
+	//Open_MonitorDataBase1(_T("\\Database\\Data.mdb"));
+
 	_tcscpy_s(m_mdb_path_t3000,sizeof(m_mdb_path_t3000),_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source="));
 	GetModuleFileName(NULL, m_ini_path_t3000, MAX_PATH);
 	PathRemoveFileSpec(m_ini_path_t3000);

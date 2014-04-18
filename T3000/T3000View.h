@@ -256,6 +256,7 @@ public:
 	CMacSliderCtrl m_currentTemp;
 	afx_msg void OnNMReleasedcaptureSliderDay(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMReleasedcaptureSliderNight(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedBtnTopological();
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

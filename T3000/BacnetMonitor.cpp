@@ -12,12 +12,19 @@
 #include "gloab_define.h"
 
 #include "BacnetGraphic.h"
+#include "BacnetWait.h"
+
+#define  WM_MONITOR_USER_MESSAGE WM_USER + 902
+CBacnetGraphic * GraphicWindow = NULL;
+extern CString InputLable[15];
 Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
 // CBacnetMonitor dialog
 static int old_monitor_line = -1;
 extern int Station_NUM;
+extern BacnetWait *WaitDlg;
+HANDLE h_read_monitordata_thread = NULL;
 IMPLEMENT_DYNAMIC(CBacnetMonitor, CDialogEx)
-
+extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
 CBacnetMonitor::CBacnetMonitor(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetMonitor::IDD, pParent)
 {
@@ -55,9 +62,36 @@ BEGIN_MESSAGE_MAP(CBacnetMonitor, CDialogEx)
 	ON_NOTIFY(NM_SETFOCUS, IDC_LIST_MONITOR, &CBacnetMonitor::OnNMSetfocusListMonitor)
 	ON_NOTIFY(NM_SETFOCUS, IDC_LIST_MONITOR_INPUT, &CBacnetMonitor::OnNMSetfocusListMonitorInput)
 	ON_WM_CLOSE()
+	ON_MESSAGE(WM_MONITOR_USER_MESSAGE,&CBacnetMonitor::Graphic_Window_Own_Message)
 END_MESSAGE_MAP()
 
 
+
+
+LRESULT CBacnetMonitor::Graphic_Window_Own_Message(WPARAM wParam, LPARAM lParam)
+{
+	int commandtype = wParam ;
+	switch(commandtype)
+	{
+	case MONITOR_MESSAGE_CREATE:
+		//break;
+		if(GraphicWindow == NULL)
+		{
+			GraphicWindow = new CBacnetGraphic;
+			GraphicWindow->Create(IDD_DIALOG_BACNET_GRAPHIC, this);
+			GraphicWindow->ShowWindow(SW_SHOW);
+		}
+		
+		break;
+	case MONITOR_MESSAGE_DELETE:
+
+		break;
+	default:
+		break;
+	}
+
+	return 0;
+}
 // CBacnetMonitor message handlers
 
 LRESULT  CBacnetMonitor::MonitorMessageCallBack(WPARAM wParam, LPARAM lParam)
@@ -85,13 +119,15 @@ LRESULT  CBacnetMonitor::MonitorMessageCallBack(WPARAM wParam, LPARAM lParam)
 	}
 	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
 	{
+		if(pInvoke->mRow <= BAC_MONITOR_COUNT)
 		m_monitor_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 		m_monitor_input_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
 	}
 	else
 	{
+		if(pInvoke->mRow <= BAC_MONITOR_COUNT)
 		m_monitor_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
-		m_monitor_input_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
+		m_monitor_input_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
 	}
 
 	m_monitor_list.RedrawItems(pInvoke->mRow,pInvoke->mRow);
@@ -255,6 +291,8 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 		byte temp_point_type = m_monitor_data.at(monitor_list_line).inputs[i].point_type;
 		byte temp_number =  m_monitor_data.at(monitor_list_line).inputs[i].number;
 		unsigned temp_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
+
+
 		temppoint = look_label(m_monitor_data.at(monitor_list_line).inputs[i].panel,
 							  m_monitor_data.at(monitor_list_line).inputs[i].point_type,
 							  m_monitor_data.at(monitor_list_line).inputs[i].number,
@@ -283,11 +321,101 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-
+Str_monitor_point temp_monitor_data_analog;
+Str_monitor_point temp_monitor_data_digital;
 void CBacnetMonitor::Set_Input_Range_And_count()
 {
 	int temp_input_count = 0;
 	int temp_analog_count = 0;
+	int temp_digital_count = 0;
+	memset(&temp_monitor_data_analog,0,sizeof(Str_monitor_point));
+	memset(&temp_monitor_data_digital,0,sizeof(Str_monitor_point));
+	//ZeroMemory(&temp_monitor_data_analog,0,sizeof(Str_monitor_point));
+	//ZeroMemory(&temp_monitor_data_digital,0,sizeof(Str_monitor_point));
+
+	for (int i=0;i<MAX_POINTS_IN_MONITOR;i++)
+	{
+		byte temp_panel = m_monitor_data.at(monitor_list_line).inputs[i].panel;
+		byte temp_point_type = m_monitor_data.at(monitor_list_line).inputs[i].point_type;
+		byte temp_number = 0;
+		if(m_monitor_data.at(monitor_list_line).inputs[i].number > 0)
+			temp_number =  m_monitor_data.at(monitor_list_line).inputs[i].number - 1;
+
+		unsigned temp_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
+		if((temp_panel == 0) && (temp_point_type == 0) && (temp_number == 0))
+			continue;
+		if( temp_point_type == ENUM_OUT)
+		{
+			temp_input_count ++;
+			if(m_Output_data.at(temp_number).digital_analog == 1)
+			{
+				temp_analog_count ++;
+
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].panel =  temp_panel;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].point_type = temp_point_type;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number + 1;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
+			}
+			else
+			{
+				temp_digital_count ++;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].panel =  temp_panel;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].point_type = temp_point_type;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].number = temp_number + 1;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].network = temp_network;
+			}
+		}
+		else if(temp_point_type == ENUM_IN)
+		{
+			temp_input_count++;
+			if(m_Input_data.at(temp_number).digital_analog == 1)
+			{
+				temp_analog_count ++;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].panel =  temp_panel;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].point_type = temp_point_type;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number + 1;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
+			}
+			else
+			{
+				temp_digital_count ++;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].panel =  temp_panel;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].point_type = temp_point_type;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].number = temp_number + 1;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].network = temp_network;
+			}
+		}
+		else if(temp_point_type == ENUM_VAR)
+		{
+			temp_input_count++;
+			if(m_Variable_data.at(temp_number).digital_analog == 1)
+			{
+				temp_analog_count ++;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].panel =  temp_panel;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].point_type = temp_point_type;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number + 1;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
+			}
+			else
+			{
+				temp_digital_count ++;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].panel =  temp_panel;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].point_type = temp_point_type;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].number = temp_number + 1;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].network = temp_network;
+			}
+		}
+
+	}
+	int test1 = sizeof(Point_Net);
+	memset(m_monitor_data.at(monitor_list_line).inputs,0,MAX_POINTS_IN_MONITOR * sizeof(Point_Net));
+	memcpy_s(m_monitor_data.at(monitor_list_line).inputs,temp_analog_count*sizeof(Point_Net),temp_monitor_data_analog.inputs,temp_analog_count*sizeof(Point_Net));
+	memcpy_s(&m_monitor_data.at(monitor_list_line).inputs[temp_analog_count]  ,temp_digital_count * sizeof(Point_Net),&temp_monitor_data_digital.inputs[0],temp_digital_count * sizeof(Point_Net));
+
+
+	temp_input_count = 0;
+	temp_analog_count = 0;
+
 	for (int i=0;i<MAX_POINTS_IN_MONITOR;i++)
 	{
 		my_input_info[i].be_record =false;	//刚进来的时候全部都清空;如果满足条件就设置为已经采样;
@@ -349,7 +477,7 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 	return ;
 }
 
-extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
+
 LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 {
 	int Changed_Item = (int)wParam;
@@ -363,7 +491,25 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 	int k,num_net,num_point,num_panel;
 	var_type = num_point = point_type = 0;
 	k=0;
+	memcpy_s(&m_temp_monitor_data[Changed_Item],sizeof(Str_monitor_point),&m_monitor_data.at(Changed_Item),sizeof(Str_monitor_point));
 
+	New_CString.Trim();
+	if(New_CString.IsEmpty())
+	{
+		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = 0;//目前不知道network 怎么处理;
+		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].number = 0;
+		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].panel = 0;
+		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].point_type = 0;
+
+		int cmp_ret = memcmp(&m_temp_monitor_data[monitor_list_line],&m_monitor_data.at(monitor_list_line),sizeof(Str_monitor_point));
+		if(cmp_ret!=0)
+		{
+			m_monitor_input_list.SetItemBkColor(Changed_Item,Changed_SubItem,LIST_ITEM_CHANGED_BKCOLOR);
+			temp_task_info.Format(_T("Write Monitor List Item%d .Changed to empty "),monitor_list_line + 1);
+			Post_Write_Message(g_bac_instance,WRITEMONITOR_T3000,monitor_list_line,monitor_list_line,sizeof(Str_monitor_point),m_monitor_dlg_hwnd,temp_task_info,Changed_Item,Changed_SubItem);
+		}
+		return 0;
+	}
 
 	char cTemp1[255];
 	memset(cTemp1,0,255);
@@ -386,10 +532,11 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, temp_input, (int)strlen(temp_input)+1, 
 			temp_monitor_input.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_monitor_input.ReleaseBuffer();
-		m_monitor_input_list.SetItemText(Changed_Item,1,temp_monitor_input);
+		
 
 
 		Set_Input_Range_And_count();	//update the monitor structure analog and totol input number;
+		m_monitor_input_list.SetItemText(Changed_Item,1,temp_monitor_input);
 		//这里应该是 monitor_list_line，就是要改变的多少项 而不是右边的input label的项目;
 		int cmp_ret = memcmp(&m_temp_monitor_data[monitor_list_line],&m_monitor_data.at(monitor_list_line),sizeof(Str_monitor_point));
 		if(cmp_ret!=0)
@@ -551,6 +698,7 @@ LRESULT CBacnetMonitor::Fresh_MCallBack_Item(WPARAM wParam,LPARAM lParam)
 		PostMessage(WM_LIST_MONITOR_INPUT_CHANGED,wParam,lParam);
 
 	}
+
 	return 0;
 }
 
@@ -689,7 +837,8 @@ void CBacnetMonitor::OnTimer(UINT_PTR nIDEvent)
 	switch(nIDEvent)
 	{
 	case 1:
-		if(this->IsWindowVisible())
+
+		if(this->IsWindowVisible() && (bac_select_device_online))
 		{
 		PostMessage(WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
 		PostMessage(WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
@@ -751,12 +900,149 @@ void CBacnetMonitor::OnNMKillfocusDatetimepickerMonitor(NMHDR *pNMHDR, LRESULT *
 void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 {
 	// TODO: Add your control notification handler code here
-	//this->ShowWindow(SW_HIDE);
-	CBacnetGraphic dlg;
-	dlg.DoModal();
-	//this->ShowWindow(SW_SHOW);
+	for (int i=0;i<14;i++)
+	{
+		InputLable[i] =	m_monitor_input_list.GetItemText(i,1);	
+	}
+	read_type = 1;
+	if(WaitDlg==NULL)
+	{
+		WaitDlg = new BacnetWait((int)BAC_WAIT_READ_MONITOR_DATA);
+
+		WaitDlg->Create(IDD_DIALOG_BACNET_WAIT,this);
+		WaitDlg->ShowWindow(SW_SHOW);
+
+		RECT RECT_SET1;
+		::GetClientRect(BacNet_hwd,&RECT_SET1);
+		ClientToScreen(&RECT_SET1);
+		WaitDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 30,800,20);
+	}
+
+	if(h_read_monitordata_thread==NULL)
+	{
+		h_read_monitordata_thread =CreateThread(NULL,NULL,Readmonitorthreadfun,this,NULL, NULL);
+	}
+
+	//CBacnetGraphic dlg;
+	//dlg.DoModal();
+
 }
 
+bool read_monitordata(int digtal_or_analog)
+{
+	timestart = time(NULL);
+	MonitorUpdateData temp;
+	temp.nsize = 10000;
+	temp.oldest_time =timesec1970 - 6000;
+	temp.most_recent_time = timestart + 6000;
+	g_Print.Format(_T("Read Data Time %d - %d"),temp.oldest_time,timestart);
+	DFTrace(g_Print);
+	int ret = -2;
+	int send_count = 0;
+	//int time_count = 0;//用于动态计时只要有回复继续下一包;.
+	int recieve_flag = 0;
+	CString cs_my_temp;
+	cs_my_temp = _T("");
+	WaitDlg->Set_Show_String(cs_my_temp);
+	WaitDlg->Set_Pos(0);
+	m_monitor_head.total_seg = 0;
+	m_monitor_head.seg_index = 0;
+	for (int i=0;i<5;i++)
+	{
+		recieve_flag = false;
+		ret = GetMonitorBlockData(g_bac_instance,READMONITORDATA_T3000,monitor_list_line,digtal_or_analog,0,0,&temp);	
+		if(ret < 0)
+		{
+			Sleep(SEND_COMMAND_DELAY_TIME);
+			continue;
+		}
+		for(int time_loop=0;time_loop<500;time_loop++)
+		{
+			Sleep(1);
+			if(tsm_invoke_id_free(ret))
+			{
+				recieve_flag = true;
+				break;
+			}
+		} 
+		if(recieve_flag)
+		{
+			Sleep(1);
+			break;
+		}
+		else if((recieve_flag == false) &&( i == 5))
+		{
+			Sleep(1);
+			return false;
+		}
+	}
+
+	for (int read_index=m_monitor_head.seg_index + 1;read_index<m_monitor_head.total_seg;read_index++)
+	{
+		cs_my_temp.Format(_T("%d / %d"),read_index,m_monitor_head.total_seg);
+		WaitDlg->Set_Show_String(cs_my_temp);
+		int pos = (read_index * 100 ) / m_monitor_head.total_seg;
+		WaitDlg->Set_Pos(pos);
+		for (int i=0;i<5;i++)
+		{
+			recieve_flag = false;
+			ret = GetMonitorBlockData(g_bac_instance,READMONITORDATA_T3000,monitor_list_line,digtal_or_analog,m_monitor_head.total_seg,read_index,&temp);	
+			if(ret < 0)
+			{
+				Sleep(SEND_COMMAND_DELAY_TIME);
+				continue;
+			}
+			for(int time_loop=0;time_loop<500;time_loop++)
+			{
+				Sleep(1);
+				if(tsm_invoke_id_free(ret))
+				{
+					recieve_flag = true;
+					break;
+				}
+			} 
+			if(recieve_flag)
+			{
+				Sleep(1);
+				break;
+			}
+			else if((recieve_flag == false) &&( i == 5))
+			{
+				Sleep(1);
+				return false;
+				//goto readendthread;
+			}
+		}
+		if(recieve_flag)
+		{
+			continue;
+		}
+
+	}
+	return true;
+}
+
+DWORD WINAPI  CBacnetMonitor::Readmonitorthreadfun(LPVOID lpVoid)
+{
+	//Write_Config_Info
+	CBacnetMonitor *pParent = (CBacnetMonitor *)lpVoid;
+
+	if(read_monitordata(pParent->read_type))
+	{
+		pParent->PostMessage(WM_MONITOR_USER_MESSAGE,MONITOR_MESSAGE_CREATE,0);
+	}
+
+readendthread:
+	WaitDlg->Set_Pos(100);
+	h_read_monitordata_thread = NULL;
+	if(WaitDlg)
+	{
+		WaitDlg = NULL;
+	}
+	return 0;
+
+
+}
 
 void CBacnetMonitor::OnBnClickedBtnMonitorRefresh()
 {
@@ -771,14 +1057,34 @@ void CBacnetMonitor::OnBnClickedButtonMonitorTest()
 {
 	// TODO: Add your control notification handler code here
 
-	timestart = time(NULL);
-	MonitorUpdateData temp;
-	temp.nsize = 1000;
-	temp.oldest_time =timesec1970;
-	temp.most_recent_time = timestart ;
-	
-	GetMonitorBlockData(g_bac_instance,READMONITORDATA_T3000,0,1,0,&temp);
-	//GetMonitorBlockData(g_bac_instance,READMONITORDATA_T3000,0,0,1,&temp);
+	//timestart = time(NULL);
+	//MonitorUpdateData temp;
+	//temp.nsize = 1000;
+	//temp.oldest_time =timesec1970 - 1000;
+	//temp.most_recent_time = timestart ;
+	//g_Print.Format(_T("Read Data Time %d - %d"),timesec1970,timestart);
+	//DFTrace(g_Print);
+	//GetMonitorBlockData(g_bac_instance,READMONITORDATA_T3000,monitor_list_line,READ_ANALOG,0,0,&temp);
+	////GetMonitorBlockData(g_bac_instance,READMONITORDATA_T3000,0,0,1,&temp);
+	read_type = 2;
+	if(WaitDlg==NULL)
+	{
+		WaitDlg = new BacnetWait((int)BAC_WAIT_READ_MONITOR_DATA);
+
+		WaitDlg->Create(IDD_DIALOG_BACNET_WAIT,this);
+		WaitDlg->ShowWindow(SW_SHOW);
+
+		RECT RECT_SET1;
+		::GetClientRect(BacNet_hwd,&RECT_SET1);
+		ClientToScreen(&RECT_SET1);
+		WaitDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 30,800,20);
+	}
+
+	if(h_read_monitordata_thread==NULL)
+	{
+		h_read_monitordata_thread =CreateThread(NULL,NULL,Readmonitorthreadfun,this,NULL, NULL);
+	}
+
 }
 
 

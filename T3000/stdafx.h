@@ -133,6 +133,8 @@ INPUT int Write_One_log(unsigned char device_var,unsigned short address,unsigned
 INPUT int read_multi_log(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 INPUT int write_multi_log(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 
+INPUT HANDLE Open_Testo_USB();
+INPUT int ReadTestoDeviceData(float reveivevalue[]);
 //INPUT SOCKET GetSocketHandle();
 #include <stdint.h>
 //INPUT bool Device_Set_Object_Instance_Number(

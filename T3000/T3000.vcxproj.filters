@@ -303,9 +303,6 @@
     <ClCompile Include="CM5\MyOwnListCtrl.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
-    <ClCompile Include="BacnetInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MBP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -483,6 +480,12 @@
     <ClCompile Include="Table_Tamplete.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TstatZigbeeLogic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetSetting.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -618,6 +621,7 @@
     <None Include="res\Exit.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\t3000.mdb" />
     <None Include="res\Input.ico">
       <Filter>Resource Files</Filter>
     </None>
@@ -952,9 +956,6 @@
     <ClInclude Include="Bacnet_Include.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BacnetInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BacnetInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1142,6 +1143,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DebugWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+        <ClInclude Include="BacnetGraphic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TstatZigbeeLogic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetSetting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Table_Tamplete.h">
