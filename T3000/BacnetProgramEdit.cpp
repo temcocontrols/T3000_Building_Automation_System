@@ -151,7 +151,8 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	cf.dwMask|=CFM_SIZE;
 	cf.yHeight =300; //设置高度
 	cf.dwMask|=CFM_FACE;
-	_tcscpy(cf.szFaceName ,_T("SimSun-ExtB"));
+	//_tcscpy(cf.szFaceName ,_T("SimSun-ExtB"));
+	_tcscpy(cf.szFaceName ,_T("Times New Roman"));
 	//	strcpy(cf.szFaceName ,_T("隶书")); //设置字体
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSelectionCharFormat(cf);
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetDefaultCharFormat(cf); 
@@ -295,17 +296,17 @@ void CBacnetProgramEdit::OnSend()
 	if(error == -1)
 	{
 		TRACE(_T("Encode_Program length is %d ,copy length is %d\r\n"),program_code_length[program_list_line],my_lengthcode + 10);
-		if(my_lengthcode+10 <400)
-		memcpy_s(program_code[program_list_line],my_lengthcode+10,mycode,my_lengthcode + 10);
+		if(my_lengthcode <400)
+			memcpy_s(program_code[program_list_line],my_lengthcode,mycode,my_lengthcode);
 		else
 		{
 			CString temp_mycs;//如果npdu的长度过长，大于 400了，目前是通过换一个page来存;
-			temp_mycs.Format(_T("Encode Program Code Length is %d,Please Try to code in another page."),my_lengthcode+10);
+			temp_mycs.Format(_T("Encode Program Code Length is %d,Please Try to code in another page."),my_lengthcode);
 			MessageBox(temp_mycs);
 			memset(program_code[program_list_line],0,400);
 			return;
 		}
-			
+
 
 		g_invoke_id =WritePrivateData(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line/*,my_lengthcode*/);
 		if(g_invoke_id>=0)
@@ -314,6 +315,27 @@ void CBacnetProgramEdit::OnSend()
 			temp_cs_show.Format(_T("Task ID = %d. Write program code to item %d "),g_invoke_id,program_list_line);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd/*BacNet_hwd*/,temp_cs_show);
 		}
+
+		//TRACE(_T("Encode_Program length is %d ,copy length is %d\r\n"),program_code_length[program_list_line],my_lengthcode + 10);
+		//if(my_lengthcode+10 <400)
+		//memcpy_s(program_code[program_list_line],my_lengthcode+10,mycode,my_lengthcode + 10);
+		//else
+		//{
+		//	CString temp_mycs;//如果npdu的长度过长，大于 400了，目前是通过换一个page来存;
+		//	temp_mycs.Format(_T("Encode Program Code Length is %d,Please Try to code in another page."),my_lengthcode+10);
+		//	MessageBox(temp_mycs);
+		//	memset(program_code[program_list_line],0,400);
+		//	return;
+		//}
+		//	
+
+		//g_invoke_id =WritePrivateData(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line/*,my_lengthcode*/);
+		//if(g_invoke_id>=0)
+		//{
+		//	CString temp_cs_show;
+		//	temp_cs_show.Format(_T("Task ID = %d. Write program code to item %d "),g_invoke_id,program_list_line);
+		//	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd/*BacNet_hwd*/,temp_cs_show);
+		//}
 
 	}
 	else

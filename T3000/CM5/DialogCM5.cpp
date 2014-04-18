@@ -1672,10 +1672,10 @@ void CDialogCM5::ShowDialogData()
 	mac_address.Format(_T("%02x-%02x-%02x-%02x-%02x-%02x"),multi_register_value_tcp[100],multi_register_value_tcp[101],multi_register_value_tcp[102],multi_register_value_tcp[103],multi_register_value_tcp[104],multi_register_value_tcp[105]);
 	m_Mac_Address.SetWindowText(mac_address);
 
-    m_ip_addressCtrl.SetAddress((BYTE)multi_register_value_tcp[107],(BYTE)multi_register_value_tcp[108],(BYTE)multi_register_value_tcp[109],(BYTE)multi_register_value_tcp[110]);
-    m_subnet_addressCtrl.SetAddress((BYTE)multi_register_value_tcp[111],(BYTE)multi_register_value_tcp[112],(BYTE)multi_register_value_tcp[113],(BYTE)multi_register_value_tcp[114]);
-    m_gateway_addressCtrl.SetAddress((BYTE)multi_register_value_tcp[115],(BYTE)multi_register_value_tcp[116],(BYTE)multi_register_value_tcp[117],(BYTE)multi_register_value_tcp[118]);
-    /////
+	m_ip_addressCtrl.SetAddress((BYTE)multi_register_value_tcp[107],(BYTE)multi_register_value_tcp[108],(BYTE)multi_register_value_tcp[109],(BYTE)multi_register_value_tcp[110]);
+	m_subnet_addressCtrl.SetAddress((BYTE)multi_register_value_tcp[111],(BYTE)multi_register_value_tcp[112],(BYTE)multi_register_value_tcp[113],(BYTE)multi_register_value_tcp[114]);
+	m_gateway_addressCtrl.SetAddress((BYTE)multi_register_value_tcp[115],(BYTE)multi_register_value_tcp[116],(BYTE)multi_register_value_tcp[117],(BYTE)multi_register_value_tcp[118]);
+	/////
 	m_Display_Num=multi_register_value_tcp[7302];
 	m_Interval=multi_register_value_tcp[7303];
 	UpdateData(FALSE);

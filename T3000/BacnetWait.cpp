@@ -50,10 +50,21 @@ void BacnetWait::Set_Read_Write(bool read_0_write_1)
 	m_wait_type = read_0_write_1;
 }
 
+void BacnetWait::Set_Show_String(CString temp)
+{
+	PosString = temp;
+}
+
+void BacnetWait::Set_Pos(int temp_pos)
+{
+	m_pos = temp_pos;
+}
+
 BOOL BacnetWait::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	PosString.Empty();
+	m_pos = 0;
 	m_wait_detail.SetWindowTextW(_T("Send command to device..."));
 	m_wait_detail.textColor(RGB(0,0,255));
 	//m_static.bkColor(RGB(0,255,255));
@@ -68,14 +79,22 @@ BOOL BacnetWait::OnInitDialog()
 
 
 	// TODO:  Add extra initialization here
-	if(m_wait_type==1)	//1 is now write config
+	if(m_wait_type == BAC_WAIT_READ_CONFIG_WRITE_DEVICE)	//1 is now write config
 	{
 		SetTimer(4,200,NULL);
 	}
-	else	//Read one of the list or read all list;
+	else if((m_wait_type == BAC_WAIT_NORMAL_READ ) || (m_wait_type == BAC_WAIT_READ_DATA_WRITE_CONFIG))	//Read one of the list or read all list;
 	{
-	SetTimer(1,200,NULL);
-	SetTimer(5,120000,NULL);
+		SetTimer(1,200,NULL);
+		SetTimer(5,120000,NULL);
+	}
+	else if(m_wait_type == BAC_WAIT_READ_MONITOR_DATA)
+	{
+		SetTimer(READ_MONITORDATA_TIME,40,NULL);
+	}
+	else
+	{
+		PostMessage(WM_CLOSE,NULL,NULL);
 	}
 	m_wait_progress.SetPos(0);
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -139,7 +158,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 
 
-	if(m_wait_type == 1)//如果是写config;将config文件的data写入device;
+	if(m_wait_type == BAC_WAIT_READ_CONFIG_WRITE_DEVICE)//如果是写config;将config文件的data写入device;
 	{
 		int write_total_count = BAC_INPUT_GROUP +
 			BAC_OUTPUT_GROUP +	
@@ -266,7 +285,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		temp_pos.Format(_T("%d%%"),write_pos);
 
 	}
-	else if(m_wait_type == 2)	//这里是 读取config 所要的 资料;
+	else if(m_wait_type == BAC_WAIT_READ_DATA_WRITE_CONFIG)	//这里是 读取config 所要的 资料;
 	{
 		int read_config_total_count = BAC_INPUT_GROUP +
 									  BAC_OUTPUT_GROUP +
@@ -434,7 +453,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		temp_pos.Format(_T("%d%%"),read_config_pos);
 
 	}
-	else if(m_wait_type == 0)//这里是点击的时候读，只要INput output var program 和time;
+	else if(m_wait_type == BAC_WAIT_NORMAL_READ)//这里是点击的时候读，只要INput output var program 和time;
 	{
 		int total_count = BAC_INPUT_GROUP + 
 			BAC_OUTPUT_GROUP +	
@@ -2929,6 +2948,18 @@ write_endthis:
 			}
 			
 			PostMessage(WM_CLOSE,NULL,NULL);
+		}
+		break;
+	case  READ_MONITORDATA_TIME:
+		{
+			if(m_pos == 100)
+			{
+				KillTimer(READ_MONITORDATA_TIME);
+				PostMessage(WM_CLOSE,NULL,NULL);
+			}
+			m_wait_persent.SetWindowTextW(PosString);
+			m_wait_progress.SetPos(m_pos);
+			UpdateData();
 		}
 		break;
 	}

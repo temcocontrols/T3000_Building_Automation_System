@@ -633,7 +633,7 @@ typedef struct
 
 	unsigned auto_manual	   : 1;  /* (1 bit; 0=auto, 1=manual)*/
 	unsigned digital_analog : 1;  /* (1 bit; 0=digital, 1=analog)*/
-	unsigned access_level	: 3;  /* (3 bits; 0-5)*/
+	unsigned hw_switch_status	: 3;  /* (3 bits; 0-5)*/
 	unsigned control        : 1;  /* (1 bit; 0=off, 1=on)*/
 	unsigned digital_control: 1;  /* (1 bit)*/
 	unsigned decom	       	: 1;  /* (1 bit; 0=ok, 1=point decommissioned)*/
@@ -655,7 +655,7 @@ typedef struct
 
 	int8_t auto_manual;  /* (1 bit; 0=auto, 1=manual)*/
 	int8_t digital_analog;  /* (1 bit; 0=digital, 1=analog)*/
-	int8_t access_level;  /* (3 bits; 0-5)*/
+	int8_t hw_switch_status;  /* (3 bits; 0-5)*/
 	int8_t control ;  /* (1 bit; 0=off, 1=on)*/
 	int8_t digital_control;  /* (1 bit)*/
 	int8_t decom;  /* (1 bit; 0=ok, 1=point decommissioned)*/
@@ -663,7 +663,7 @@ typedef struct
 #if 0
 	unsigned auto_manual : 1;  /* (1 bit; 0=auto, 1=manual)*/
 	unsigned digital_analog	: 1;  /* (1 bit; 0=digital, 1=analog)*/
-	unsigned access_level	  : 3;  /* (3 bits; 0-5)*/
+	unsigned hw_switch_status	  : 3;  /* (3 bits; 0-5)*/
 	unsigned control       : 1;  /* (1 bit; 0=off, 1=on)*/
 	unsigned digital_control: 1;  /* (1 bit)*/
 	unsigned decom	     	: 1;  /* (1 bit; 0=ok, 1=point decommissioned)*/
@@ -921,7 +921,8 @@ char *p_buf;
 //jmp_buf e_buf ;
 
 FILE *fp;
-char null_buf[10],cod_line[150],label[9];
+//char null_buf[10],cod_line[150],label[9]; //Fance
+char null_buf[10],cod_line[450],label[9];
 //int n_local,n_global;
 long pos,vpos;
 unsigned line_value;
@@ -1232,8 +1233,8 @@ int Encode_Program ( /*GEdit *ppedit*/)
 	id=res=0;
 	ind_code=0;
 
+	memset(cod_line,0,sizeof(cod_line));//Fance
 
-	 
 
 	//  local_table[4000] , time_table[300]
 	local_table = new char[4000+300+sizeof(struct variable_table)*MAX_Var+
@@ -1364,7 +1365,7 @@ if(error!=-1)
 	for_count=0;
 	index_go_to = 0;
 //	creategauge(&gaugep,"Generating code");
-	prescan2() ; // find the location of all functions and global
+ 	prescan2() ; // find the location of all functions and global
 	if(error!=-1)
 		return error;
 //	deletegauge(&gaugep);
@@ -1454,6 +1455,7 @@ if(error!=-1)
 
 		 memcpy(code,&ind_time_table,2);
 		 memcpy(code+2,time_table,ind_time_table);
+		 code = code + 2 + ind_time_table;
 		}
 
 
@@ -3395,8 +3397,8 @@ char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *
 		pc[min((int)(q-token),10)]=0;
 		q++;
 		*num_panel = atoi(pc);
-		if ( *num_panel>32 || *num_panel==0 )
-			q=token;
+		//Fance //if ( *num_panel>32 || *num_panel==0 )
+				//	q=token;
 	}
 	else
 	{
@@ -3409,7 +3411,8 @@ char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *
 		*num_panel = atoi(pc);
 		if (*num_panel==0)
 			*num_panel = panel;
-		if ( *num_panel>32 && strlen(pc) )
+		//if ( *num_panel>32 && strlen(pc) )
+		 if ( *num_panel>255 && strlen(pc) )
 			//return 0;
 			return(islabel(token,num_point,var_type,point_type,num_panel));
 	}
@@ -3524,7 +3527,7 @@ char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *
 ////
 ////	unsigned auto_manual	   : 1;  /* (1 bit; 0=auto, 1=manual)*/
 ////	unsigned digital_analog : 1;  /* (1 bit; 0=digital, 1=analog)*/
-////	unsigned access_level	: 3;  /* (3 bits; 0-5)*/
+////	unsigned hw_switch_status	: 3;  /* (3 bits; 0-5)*/
 ////	unsigned control        : 1;  /* (1 bit; 0=off, 1=on)*/
 ////	unsigned digital_control: 1;  /* (1 bit)*/
 ////	unsigned decom	       	: 1;  /* (1 bit; 0=ok, 1=point decommissioned)*/
@@ -5594,7 +5597,7 @@ char * buf;
 char my_display[10240];
 
 char my_input_code[1024];
-char * pcode;
+char *pcode, *ptimebuf;
 char *local;
 char *desassembler_program()
 {
@@ -5610,24 +5613,25 @@ unsigned char cod;//,xtemp[15];
  index_stack = stack;
  int n;
  buf[0]=0;
- int bytes;
+ int bytes = 0;
 
   int code_length = ((unsigned char)code[1])*256 + (unsigned char)code[0];
- if(code_length == 0)
+ if((code_length == 0) || (code_length > 500)) //如果传过来的是无效的 大于500的编码 就说明是错的 直接清空;
 	 return my_display;
  pcode=code+2;
  memcpy(&bytes,code,2);
 // adjustint(&bytes, ptrprg->type);
  bytes += 2+3;
  code += bytes;
-#ifdef Fance
+#ifndef Fance
  memcpy(&ind_local_table,code,2);    //local var
 #endif
  local = code+2;  
-  #ifdef Fance
+ 
+  #ifndef Fance
 // adjustint(&bytes, ptrprg->type);
  code += ind_local_table + 2;
- //ptimebuf = code + 2;      //timer	Fance
+  ptimebuf = code + 2;      //timer	Fance
  memcpy(&bytes,code,2);
 // adjustint(&bytes, ptrprg->type);
  code += bytes + 2;
@@ -6530,14 +6534,15 @@ int	desexpr(void)
 								break;
 				 case TIME_ON:
 				 case TIME_OFF:
-					 #ifdef Fance
+					// #ifdef Fance
 							 char *oldcode, *oldbuf;
 							 par=0;
 							 strcpy(op1,look_func(*(code-1)));
 							 strcat(op1,"( ");
 							 oldcode = code;
 							 oldbuf = buf;
-							 code = ptimebuf+ *((int *)code);
+							// code = ptimebuf+ *((int *)code);
+							 code = ptimebuf+ *((char *)code);//Fance Chagned
 							 code -= 3;
 							 while( *code != 0xff && code >= ptimebuf)
 								 code--;
@@ -6556,12 +6561,12 @@ int	desexpr(void)
 										if (*(code-1) == TIME_ON || *(code-1) == TIME_OFF )
 //											if ( ind_line_array && line_array[ind_line_array-1][0]!=line)
 											 {
-												line_array[ind_line_array][0] = (unsigned int)((long)FP_SEG(code)*16+(long)FP_OFF(code)-(long)(FP_SEG(pcode)*16+(long)FP_OFF(pcode)) + 2);
-												memcpy(&line_array[ind_line_array++][1],code-3,2);
-											 }
+										//Fance mark		//line_array[ind_line_array][0] = (unsigned int)((long)FP_SEG(code)*16+(long)FP_OFF(code)-(long)(FP_SEG(pcode)*16+(long)FP_OFF(pcode)) + 2);
+												//memcpy(&line_array[ind_line_array++][1],code-3,2);
+											  }
 										code += 2;
 									 }
-							 #endif
+					//		 #endif
 								break;
 				 case AVG:
 				 case MAX:

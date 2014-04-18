@@ -59,6 +59,7 @@ CListCtrlEx::CListCtrlEx()
 	m_dwComboStyle = WS_BORDER | WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_AUTOVSCROLL | 
 		CBS_DROPDOWNLIST | CBS_DISABLENOSCROLL;
 	m_need_edit = true;
+	m_support_key = true;
 	memset(m_data,255,30000);
 	m_select_raw = 0;
 	m_select_col = 1;
@@ -94,83 +95,92 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	// TODO: Add your message handler code here and/or call default
 	//Get_clicked_mouse_position(select_raw,select_col);
-	int old_select_raw = m_select_raw;//记录下原来的行和列;
-	int old_select_col = m_select_col;
-	
-	if(nChar == VK_LEFT)
+	if(m_support_key)
 	{
-		if(m_select_col >1)//left第一列无效;
+		int old_select_raw = m_select_raw;//记录下原来的行和列;
+		int old_select_col = m_select_col;
+
+		if(nChar == VK_LEFT)
 		{
-			m_select_col = m_select_col - 1;
-
-			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
-			
-			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
-				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
-			else
-				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
-
-			RedrawItems(m_select_raw,m_select_raw);
-			return ;
-		}
-
-	}
-	else if(nChar == VK_UP)
-	{
-		if(m_select_raw>0)
-		{
-			m_select_raw = m_select_raw - 1;
-			if(GetColumnType(0)==ListCtrlEx::CheckBox)
+			if(m_select_col >1)//left第一列无效;
 			{
-				SetCellChecked(old_select_raw,0,0);
-				SetCellChecked(m_select_raw,0,1);
+				m_select_col = m_select_col - 1;
+
+				SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
+
+				if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
+				else
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+
+				RedrawItems(m_select_raw,m_select_raw);
+				return ;
 			}
-			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
-			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
-				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
-			else
-				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
 
-			RedrawItems(m_select_raw,m_select_raw);
-			RedrawItems(old_select_raw,old_select_raw);
-			return ;
 		}
-	}
-	else if(nChar == VK_RIGHT)
-	{
-		if(m_select_col < GetColumnCount() -1)
+		else if(nChar == VK_UP)
 		{
-			m_select_col = m_select_col + 1;
-			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
-			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
-				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
-			else
-				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
-
-			RedrawItems(m_select_raw,m_select_raw);
-			return ;
-		}
-	}
-	else if(nChar == VK_DOWN)
-	{
-		if(m_select_raw < GetItemCount() - 1)
-		{
-			m_select_raw = m_select_raw + 1;
-			if(GetColumnType(0)==ListCtrlEx::CheckBox)
+			if(m_select_raw>0)
 			{
-				SetCellChecked(old_select_raw,0,0);
-				SetCellChecked(m_select_raw,0,1);
-			}
-			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
-			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
-				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
-			else
-				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
-			RedrawItems(m_select_raw,m_select_raw);
-			RedrawItems(old_select_raw,old_select_raw);
-			return ;
-		}
+				m_select_raw = m_select_raw - 1;
+				if(GetColumnType(0)==ListCtrlEx::CheckBox)
+				{
+					SetCellChecked(old_select_raw,0,0);
+					SetCellChecked(m_select_raw,0,1);
+				}
+				SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
+				if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
+				else
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
 
+				RedrawItems(m_select_raw,m_select_raw);
+				RedrawItems(old_select_raw,old_select_raw);
+
+				//Scroll(CSize(0,m_select_raw));   
+				//SetScrollPos(m_select_raw);
+
+
+				return ;
+			}
+		}
+		else if(nChar == VK_RIGHT)
+		{
+			if(m_select_col < GetColumnCount() -1)
+			{
+				m_select_col = m_select_col + 1;
+				SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
+				if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
+				else
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+
+				RedrawItems(m_select_raw,m_select_raw);
+				return ;
+			}
+		}
+		else if(nChar == VK_DOWN)
+		{
+			if(m_select_raw < GetItemCount() - 1)
+			{
+				m_select_raw = m_select_raw + 1;
+				if(GetColumnType(0)==ListCtrlEx::CheckBox)
+				{
+					SetCellChecked(old_select_raw,0,0);
+					SetCellChecked(m_select_raw,0,1);
+				}
+				SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
+				if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
+				else
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+				RedrawItems(m_select_raw,m_select_raw);
+				RedrawItems(old_select_raw,old_select_raw);
+
+				return ;
+			}
+
+		}
 	}
 	CListCtrl::OnKeyDown(nChar, nRepCnt, nFlags);
 }
@@ -263,24 +273,25 @@ CListCtrlEx::CellIndex CListCtrlEx::Point2Cell(const CPoint &point)
 		m_select_raw = nRow;				//新的赋值给当前select
 		m_select_col = nCol;
 
-		if((old_select_raw != m_select_raw) || (old_select_col != m_select_col ))	//判断是否为选中的同一个;
-		{
-			SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
-			if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
-				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
-			else
-				SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
-			if(m_select_raw != old_select_raw)	//如果是换行了，就两行都要刷新;
+			if((old_select_raw != m_select_raw) || (old_select_col != m_select_col ))	//判断是否为选中的同一个;
 			{
-				RedrawItems(m_select_raw,m_select_raw);
-				RedrawItems(old_select_raw,old_select_raw);
-			}
-			else//没有换行就只刷新当前行
-			{
-				RedrawItems(m_select_raw,m_select_raw);
-			}
+				SetItemBkColor(m_select_raw,m_select_col,LIST_ITEM_SELECTED,0);
+				if((old_select_raw%2)==0)	//恢复前景和 背景 颜色;
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR,0);
+				else
+					SetItemBkColor(old_select_raw,old_select_col,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+				if(m_select_raw != old_select_raw)	//如果是换行了，就两行都要刷新;
+				{
+					RedrawItems(m_select_raw,m_select_raw);
+					RedrawItems(old_select_raw,old_select_raw);
+				}
+				else//没有换行就只刷新当前行
+				{
+					RedrawItems(m_select_raw,m_select_raw);
+				}
 
-		}
+			}
+		
 
 	
 
@@ -567,6 +578,10 @@ BOOL CListCtrlEx::GetCellRect(int iRow, int iCol, CRect &rect, int nArea)
 	return TRUE;
 }
 
+void	CListCtrlEx::Support_Keyboard(bool b_support)
+{
+	m_support_key = b_support;
+}
 void   CListCtrlEx::Set_Edit(bool b_edit)
 {
 	m_need_edit = b_edit;

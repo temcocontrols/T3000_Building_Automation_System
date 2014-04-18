@@ -83,7 +83,7 @@ extern CBacnetScreenEdit * ScreenEdit_Window;
 extern CBacnetAlarmWindow * AlarmWindow_Window;
 CCriticalSection MyCriticalSection;
 CString SaveConfigFilePath;
-bool b_is_scan = false;
+bool b_pause_refresh_tree = false;
 int m_MainHotKeyID[10] = 
 {
 	3001,
@@ -365,9 +365,12 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			}
 			register_critical_section.Lock();
 			//
-			Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);
+			int multy_ret = 0;
+			multy_ret = Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);
 			Sleep(500);
 			register_critical_section.Unlock();
+			if(multy_ret<0)		//Fance : 如果出现读失败 就跳出循环体,因为如果是由断开连接 造成的 读失败 会使其他需要用到读的地方一直无法获得资源;
+				break;
 		}
 
 		ReleaseMutex(Read_Mutex);//Add by Fance .
@@ -509,7 +512,7 @@ void CMainFrame::InitViews()
 	m_pViews[DLG_LIGHTINGCONTROLLER_VIEW]=(CView*) new CLightingController;//Lightingcontroller
 	m_pViews[DLG_HUMCHAMBER]=(CView*) new CHumChamber;
 	m_pViews[DLG_CO2_VIEW]=(CView*) new CCO2_View;
-	m_pViews[DLG_CM5_BACNET_VIEW]=(CView*) new CDialogCM5_BacNet; //CM5
+	m_pViews[DLG_BACNET_VIEW]=(CView*) new CDialogCM5_BacNet; //CM5
 	m_pViews[DLG_DIALOGT38I13O_VIEW]=(CView*) new T38I13O;
 	m_pViews[DLG_DIALOGT332AI_VIEW]=(CView*)new T332AI;
 	m_pViews[DLG_DIALOGT38AI8AO]=(CView*)new T38AI8AO;
@@ -793,11 +796,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	{
 			pDialog[i]=NULL;
 	}
-	DebugWindow = new CDebugWindow;
-	DebugWindow->Create(IDD_DIALOG_DEBUG_TRACE, this);
-	DebugWindow->ShowWindow(SW_HIDE);
-    g_Print = _T("Debug Time 14-03-07-10   Debug version 1.2");
-    DFTrace(g_Print);
+
 	MyRegAddress.MatchMoudleAddress();
 	bac_net_initial_once = false;
 
@@ -809,6 +808,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		int iMode=1;
 		ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
 
+	BOOL bDontLinger = FALSE;
+	setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
 		//SOCKADDR_IN bcast;
 		h_bcast.sin_family=AF_INET;
 		//bcast.sin_addr.s_addr=nBroadCastIP;
@@ -2166,19 +2167,11 @@ here:
 	case DLG_GRAPGIC_VIEW:
 		{
 			m_nCurView=DLG_GRAPGIC_VIEW;
-			if(bac_cm5_graphic == false)
-			{
-			
+
 			int nSerialNum=get_serialnumber();
 			((CGraphicView*)m_pViews[m_nCurView])->InitGraphic(nSerialNum,g_tstat_id);
-			}
-			else
-			{
-//#ifdef Fance_Enable_Test
-				int nSerialNum =2222;
-//#endif
-			((CGraphicView*)m_pViews[m_nCurView])->InitGraphic(nSerialNum,g_bac_instance);
-			}
+
+
 		}
 		break;
 	case DLG_TRENDLOG_VIEW:
@@ -2236,9 +2229,9 @@ here:
         }
         break;
 
-	case  DLG_CM5_BACNET_VIEW:
+	case  DLG_BACNET_VIEW:
 		{
-			m_nCurView = DLG_CM5_BACNET_VIEW;
+			m_nCurView = DLG_BACNET_VIEW;
 			((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Fresh();
 			g_protocol = PROTOCOL_BACNET_IP;
 		}
@@ -3521,9 +3514,7 @@ void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
 	if(WaitWriteDlg==NULL)
 	{
 		
-
-
-		WaitWriteDlg = new BacnetWait(1);
+		WaitWriteDlg = new BacnetWait(BAC_WAIT_READ_CONFIG_WRITE_DEVICE);
 		WaitWriteDlg->Create(IDD_DIALOG_BACNET_WAIT,this);
 		WaitWriteDlg->ShowWindow(SW_SHOW);
 
@@ -3532,9 +3523,10 @@ void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
 		::GetWindowRect(BacNet_hwd,&RECT_SET1);
 		else
 		GetWindowRect(&RECT_SET1);
-		//	GetClientRect(&RECT_SET1);
-		//WaitDlg->MoveWindow(RECT_SET1.left+100,RECT_SET1.bottom-200,560/*RECT_SET1.left+270*//*RECT_SET1.right/2+20*/,100);
-		WaitWriteDlg->MoveWindow(RECT_SET1.left+100,RECT_SET1.top+400,560/*RECT_SET1.left+270*//*RECT_SET1.right/2+20*/,100);
+	
+
+		ClientToScreen(&RECT_SET1);
+		WaitWriteDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 39,800,20);
 	}
 
 	//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);
@@ -4218,7 +4210,7 @@ void CMainFrame::LoadBacnetConfigFile()
 				m_Output_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
 
 				m_Output_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Analog"),0,FilePath);
-				m_Output_data.at(i).access_level = (unsigned char)GetPrivateProfileInt(temp_section,_T("Access_Level"),0,FilePath);
+				m_Output_data.at(i).hw_switch_status = (unsigned char)GetPrivateProfileInt(temp_section,_T("hw_switch_status"),0,FilePath);
 				m_Output_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Control"),0,FilePath);
 				m_Output_data.at(i).digital_control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Control"),0,FilePath);
 				m_Output_data.at(i).decom = (unsigned char)GetPrivateProfileInt(temp_section,_T("Decom"),0,FilePath);
@@ -4677,8 +4669,8 @@ void CMainFrame::SaveBacnetConfigFile()
 				WritePrivateProfileStringW(temp_section,_T("Auto_Manual"),temp_csc,FilePath);
 				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).digital_analog);
 				WritePrivateProfileStringW(temp_section,_T("Digital_Analog"),temp_csc,FilePath);
-				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).access_level);
-				WritePrivateProfileStringW(temp_section,_T("Access_Level"),temp_csc,FilePath);
+				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).hw_switch_status);
+				WritePrivateProfileStringW(temp_section,_T("hw_switch_status"),temp_csc,FilePath);
 				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).control);
 				WritePrivateProfileStringW(temp_section,_T("Control"),temp_csc,FilePath);
 				temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).digital_control);
@@ -6020,6 +6012,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					temp_csa =  product_Node.BuildingInfo.strComPort;
 					temp_csa = temp_csa.Right(temp_csa.GetLength() - 3);
 					g_bac_instance = m_product.at(i).hardware_version;
+					g_selected_serialnumber = m_product.at(i).serial_number;
 					g_mac = m_product.at(i).software_version;
 					g_gloab_bac_comport =_wtoi(temp_csa);
 					if((g_bac_instance == 0) || (g_mac == 0))
@@ -6036,8 +6029,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 							{
 								MessageBox(_T("This device may not support bacnetip protocol, please Scan again.!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
 								if(pDlg)
+								{
 									delete pDlg;//20120220
-								
+									pDlg = NULL ;
+								}
 								return;
 							}
 							else//更新数据库;如果是通过modbus扫描到得bacnet设备，因为不知道它的instance ID和panel number.所有读到后更新数据库;
@@ -6071,65 +6066,25 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 							}
 						}
-						
-						
-						//g_bac_instance = read_one(g_tstat_id,35,5);
-						//g_mac = read_one(g_tstat_id,110,5);
-
-						//if((g_bac_instance < 0) || (g_mac < 0))
-						//{
-						//	MessageBox(_T("Read Data Time Out!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
-						//	if(pDlg)
-						//		delete pDlg;//20120220
-						//	return;
-						//}
+						else
+						{
+							m_pTreeViewCrl->turn_item_image(hSelItem ,false);
+							MessageBox(_T("Device is offline , Please check the connection."),_T("Notice"),MB_OK | MB_ICONINFORMATION);
+							pDlg->ShowWindow(SW_HIDE);
+							if(pDlg)
+							{
+								delete pDlg;//20120220
+								pDlg = NULL;
+							}
+							return;
+						}
 					}
-#if 0
-					CString Program_Path,Program_ConfigFile_Path;
-					int g_com=0;
-					GetModuleFileName(NULL,Program_Path.GetBuffer(MAX_PATH),MAX_PATH);  //获取当前运行的绝对地址;
-					PathRemoveFileSpec(Program_Path.GetBuffer(MAX_PATH) );            //返回绝对地址的上层目录?;
-					Program_Path.ReleaseBuffer();
-					Program_ConfigFile_Path = Program_Path + _T("\\BacnetDB.ini");
-
-					CString section;
-					section.Format(_T("Device_%d"),g_bac_instance);
-					CString temp_src_code1;
-					GetPrivateProfileStringW(section,_T("SRC"),_T(""),temp_src_code1.GetBuffer(MAX_PATH),400,Program_ConfigFile_Path);
-					temp_src_code1.ReleaseBuffer();
-
-					unsigned int temp_max_apdu = GetPrivateProfileInt(section,_T("MAX_APDU"),1000,Program_ConfigFile_Path);
-					
-
-					CString temp_src_code = temp_src_code1;
-					int temp_length= temp_src_code.GetLength();
-					unsigned char device_src[20];
-					if(temp_length!=36)
-					{
-						pDlg->ShowWindow(SW_HIDE);
-						if(pDlg)
-							delete pDlg;
-						pDlg = NULL;
-						return;
-					}
-					for (int x=0;x<18;x++)
-					{
-						CString temp_value;
-						temp_value = temp_src_code.Left(2);
-						temp_src_code = temp_src_code.Right(temp_src_code.GetLength()-2);
-						device_src[x] = Str_to_Byte(temp_value);
-					}
-					BACNET_ADDRESS  src;
-					memcpy_s(&src,18,device_src,18);
-					address_add(g_bac_instance, temp_max_apdu, &src);//这句话很重要，将收到的 iam 信息 加入address list;
 
 
-#endif
-
-
+					((CDialogCM5_BacNet*)m_pViews[m_nCurView])->SetConnected_IP(product_Node.BuildingInfo.strIp);
 					g_serialNum = product_Node.serial_number;
 					/*bac_net_initial_once = false;*/
-					SwitchToPruductType(DLG_CM5_BACNET_VIEW);
+					SwitchToPruductType(DLG_BACNET_VIEW);
 					g_protocol = PROTOCOL_BACNET_IP;
 					pDlg->ShowWindow(SW_HIDE);
 					if(pDlg)
@@ -6307,6 +6262,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				nID=read_one(g_tstat_id,6);
 				if(nID<0)
 					bOnLine=FALSE;
+
+#if 0
 				int ndevice = read_one(nID,7);
 				if(ndevice == 50)	//if it is cm5 .
 				{
@@ -6317,14 +6274,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 						bac_net_initial_once =false; //设置为没有初始化，等进去后初始化串口 等等~
 						g_protocol = 2;	//设置全局协议变更为mstp;
-						//SwitchToPruductType(DLG_CM5_BACNET_VIEW);
+						//SwitchToPruductType(DLG_BACNET_VIEW);
 						if (pDlg !=NULL)
 						{
 							pDlg->ShowWindow(SW_HIDE);
 							delete pDlg;
 							pDlg=NULL;
 						}
-						SwitchToPruductType(DLG_CM5_BACNET_VIEW);
+						SwitchToPruductType(DLG_BACNET_VIEW);
 						return;
 					}
 					else if((protocol_type == 1) || (protocol_type == 0))//如果不是MSTP 就切换到以前的 界面;
@@ -6332,6 +6289,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 					}
 				}
+#endif
 				if(nID>0)
 				{
 					unsigned short SerialNum[4];
@@ -6349,6 +6307,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 						if(nSerialNumber==nSelectSerialNumber)
 							bOnLine=TRUE;
+						else
+						{
+							CString tempcs;
+							tempcs.Format(_T("The device serial number is %d,the database saved is %d \r\nPlease delete it and rescan."),nSerialNumber,nSelectSerialNumber);
+							MessageBox(tempcs);
+						}
 					}
 				}
 				else
@@ -6447,17 +6411,24 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 			else
 			{
-
+				int Use_zigee = 0;
+				int power_value = 1;
+				if(Device_Type == PM_TSTAT6)
+				{
+					//TSTAT6 如果是带zigbee的模块，cherly 说 没有寄存器 确认目前是用哪个在通信，只能读640寄存器大概判断;
+					//不靠谱;
+					Use_zigee = read_one(g_tstat_id,REGISTER_USE_ZIGBEE_485,5);	
+					if(Use_zigee == 1)
+						power_value = 2;
+				}
 				register_critical_section.Lock();
 				int i;
 				int it = 0;
 				float progress;
-				for(i=0;i<10;i++)	//暂定为0 ，因为TSTAT6 目前为600多
+				for(i=0;i<(10*power_value);i++)	//暂定为0 ，因为TSTAT6 目前为600多
 				{
-					//register_critical_section.Lock();
-					//int nStart = GetTickCount();
 					int itemp = 0;
-					itemp = Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64,5);
+					itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(64/power_value)],i*(64/power_value),64/power_value,5);
 					if(itemp < 0)
 					{
 						break;
@@ -6466,12 +6437,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 						if (pDlg!=NULL)
 						{
-							progress=float((it+1)*(100/10));
+							progress=float((it+1)*(100/(10*power_value)));
 							pDlg->ShowProgress(int(progress),int(progress));
 						} 
 					}							
 					it++;
-					Sleep(100);
+					Sleep(100 * power_value);
 				}
 
 				memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
@@ -7381,7 +7352,7 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
 			// 				if(nID==g_tstat_id)
 			// 					memset(&multi_register_value[0],0,sizeof(multi_register_value));
 		}
-		if(g_bac_instance == m_product.at(i).hardware_version)
+		if((g_bac_instance == m_product.at(i).hardware_version) && (g_selected_serialnumber == m_product.at(i).serial_number))
 		{
 			if(tp.status>0) 
 			bac_select_device_online = true;
@@ -7742,7 +7713,7 @@ UINT _FreshTreeView(LPVOID pParam )
 			ReleaseMutex(Read_Mutex);//Add by Fance .
 			continue;
 		}
-		if(b_is_scan)
+		if(b_pause_refresh_tree)
 		{
 			ReleaseMutex(Read_Mutex);//Add by Fance .
 			continue;
@@ -9205,7 +9176,11 @@ void CMainFrame::OnControlInputs()
 
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_INPUT);
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_INPUT);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
+
 	}
 	else
 	{
@@ -9226,7 +9201,10 @@ void CMainFrame::OnControlPrograms()
 
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAM);
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAM);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
 	}
 	else
 	{
@@ -9247,7 +9225,10 @@ void CMainFrame::OnControlOutputs()
 
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_OUTPUT);
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_OUTPUT);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
 	}
 	else
 	{
@@ -9267,7 +9248,11 @@ void CMainFrame::OnControlVariables()
 	//#endif
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_VARIABLE);
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_VARIABLE);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
+
 	}
 	else
 	{
@@ -9287,7 +9272,11 @@ void CMainFrame::OnControlWeekly()
 	//#endif
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLY);
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLY);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
+
 	}
 	else
 	{
@@ -9307,7 +9296,11 @@ void CMainFrame::OnControlAnnualroutines()
 	//#endif
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ANNUAL);
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ANNUAL);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
+
 	}
 	else
 	{
@@ -9327,7 +9320,10 @@ void CMainFrame::OnMiscellaneousLoaddescriptors()
 	//#endif
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
 	}
 	else
 	{
@@ -9347,7 +9343,11 @@ void CMainFrame::OnMiscellaneousUpdatemini()
 	//#endif
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,WRITEPRGFLASH_COMMAND);
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,WRITEPRGFLASH_COMMAND);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
+
 	}
 	else
 	{
@@ -9369,7 +9369,11 @@ void CMainFrame::OnControlControllers()
 	//#endif
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_CONTROLLER);
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_CONTROLLER);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
+
 	}
 	else
 	{
@@ -9388,7 +9392,10 @@ void CMainFrame::OnControlScreens()
 
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SCREENS);
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SCREENS);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
 	}
 	else
 	{
@@ -9451,7 +9458,10 @@ void CMainFrame::OnControlMonitors()
 
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_MONITOR);
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_MONITOR);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
 	}
 	else
 	{
@@ -9578,10 +9588,10 @@ void CMainFrame::OnControlTstat()
 	// TODO: Add your command handler code here
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
-		//if(bac_select_device_online)
+		if(bac_select_device_online)
 		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_TSTAT);
-		//else
-		//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 	}
 	else
 	{
@@ -9596,6 +9606,15 @@ void CMainFrame::OnCalibrationCalibrationhum()
 
 void CMainFrame::ShowDebugWindow()
 {
+	if(DebugWindow == NULL)
+	{
+		DebugWindow = new CDebugWindow;
+		DebugWindow->Create(IDD_DIALOG_DEBUG_TRACE, this);
+		DebugWindow->ShowWindow(SW_HIDE);
+		g_Print = _T("Debug Time 14-04-14   Debug version 1.6");
+		DFTrace(g_Print);
+	}
+	
 	if(DebugWindow->IsWindowVisible())
 		DebugWindow->ShowWindow(SW_HIDE);
 	else

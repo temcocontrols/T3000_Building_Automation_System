@@ -49,9 +49,15 @@ public:
 	afx_msg void OnNMSetfocusListMonitorInput(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnClose();
 	virtual void OnCancel();
+	afx_msg LRESULT Graphic_Window_Own_Message(WPARAM wParam, LPARAM lParam);
 	void Reg_Hotkey();
 	void Unreg_Hotkey();
+	static	DWORD WINAPI  Readmonitorthreadfun(LPVOID lpVoid);
+
+	int read_type;
 };
+
+bool read_monitordata(int digtal_or_analog = 1);
 
 const int MONITOR_NUM = 0;
 const int MONITOR_LABEL = 1;
@@ -65,4 +71,7 @@ const int MONITOR_COL_NUMBER = 14;
 const CString CS_DAYS = _T("Days");
 const CString CS_HOURS = _T("Hours");
 const CString CS_MINUTES =  _T("Minutes");
+
+const int MONITOR_MESSAGE_CREATE = 1;
+const int MONITOR_MESSAGE_DELETE = 2;
 

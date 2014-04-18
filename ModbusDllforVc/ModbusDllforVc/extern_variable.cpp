@@ -15,5 +15,7 @@
 	SOCKET m_hSocket=NULL;
 	SOCKET m_hSocket_for_list =	NULL;
 
+	HANDLE hDevice=INVALID_HANDLE_VALUE;
+
 
 	

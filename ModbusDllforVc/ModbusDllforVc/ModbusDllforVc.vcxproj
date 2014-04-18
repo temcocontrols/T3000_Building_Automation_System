@@ -111,6 +111,7 @@
   <ItemGroup>
     <ClCompile Include="common.cpp" />
     <ClCompile Include="crc.cpp" />
+    <ClCompile Include="DllFunction.cpp" />
     <ClCompile Include="extern_variable.cpp" />
     <ClCompile Include="ModbusDllforVc.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -126,6 +127,7 @@
     <ClInclude Include="common.h" />
     <ClInclude Include="crc.h" />
     <ClInclude Include="define.h" />
+    <ClInclude Include="DllFunction.h" />
     <ClInclude Include="ModbusDllforVc.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />

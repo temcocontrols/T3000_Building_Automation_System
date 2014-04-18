@@ -1272,7 +1272,7 @@ Get Bacnet Monitor Private Data
 <param name="ntype" > Analog data or digital data
 */
 /************************************************************************/
-int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t index,int8_t ntype,int8_t nspecial,MonitorUpdateData* up_data)
+int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, int8_t ntotal_seg,int8_t nseg_index,MonitorUpdateData* up_data)
 {
 	// TODO: Add your control notification handler code here
 
@@ -1293,12 +1293,14 @@ int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t index,int8_t nty
 	Str_Monitor_data_header private_data_chunk;
 	private_data_chunk.total_length = 0;
 	private_data_chunk.command = command;
-	private_data_chunk.index = index;
+	private_data_chunk.index = nIndex;
 	private_data_chunk.conm_args.nsize = up_data->nsize;
 	private_data_chunk.conm_args.oldest_time = up_data->oldest_time;
 	private_data_chunk.conm_args.most_recent_time = up_data->most_recent_time;
-	private_data_chunk.type = ntype;
-	private_data_chunk.special = nspecial;
+	private_data_chunk.type = ntype_ad;
+	private_data_chunk.special = 0;
+	private_data_chunk.total_seg = ntotal_seg;
+	private_data_chunk.seg_index = nseg_index;
 	Set_transfer_length(PRIVATE_MONITOR_HEAD_LENGTH);
 
 
@@ -1407,7 +1409,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 
 				m_Output_data.at(i).auto_manual = *(my_temp_point++);
 				m_Output_data.at(i).digital_analog = *(my_temp_point++);
-				m_Output_data.at(i).access_level = *(my_temp_point++);
+				m_Output_data.at(i).hw_switch_status = *(my_temp_point++);
 				m_Output_data.at(i).control = *(my_temp_point++);
 				m_Output_data.at(i).digital_control = *(my_temp_point++);
 				m_Output_data.at(i).decom	= *(my_temp_point++);
@@ -1462,7 +1464,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 				my_temp_point=my_temp_point+4;
 				m_Input_data.at(i).filter = *(my_temp_point++);
 				m_Input_data.at(i).decom	= *(my_temp_point++);
-				m_Input_data.at(i).sen_on	= *(my_temp_point++);;
+				m_Input_data.at(i).sen_on	= *(my_temp_point++);
 				m_Input_data.at(i).sen_off = *(my_temp_point++);
 				m_Input_data.at(i).control = *(my_temp_point++);
 				m_Input_data.at(i).auto_manual = *(my_temp_point++);
@@ -1674,19 +1676,23 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			int code_length = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
 			//my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
 			memset(mycode,0,1024);
-			if((code_length!=0) && (code_length <=400) && (code_length >0))
-			{
-				memcpy_s(mycode,code_length+ 10,my_temp_point,code_length+ 10);
-				memcpy_s(program_code[start_instance],code_length + 10,my_temp_point,code_length + 10);
-				program_code_length[start_instance] = code_length + 10;
-			}
-			else
-			{
-				//memset(program_code[start_instance],0,400);
-				memcpy_s(mycode,block_length+ 10,my_temp_point,block_length+ 10);
-				memcpy_s(program_code[start_instance],block_length + 10,my_temp_point,block_length + 10);
+
+				memcpy_s(mycode,block_length,my_temp_point,block_length);
+				memcpy_s(program_code[start_instance],block_length,my_temp_point,block_length);
 				program_code_length[start_instance] = block_length;
-			}
+
+			//if((code_length!=0) && (code_length <=400) && (code_length >0))
+			//{
+			//	memcpy_s(mycode,block_length+ 10,my_temp_point,block_length+ 10);
+			//	memcpy_s(program_code[start_instance],block_length + 10,my_temp_point,block_length + 10);
+			//	program_code_length[start_instance] = block_length + 10;
+			//}
+			//else
+			//{
+			//	memcpy_s(mycode,block_length+ 10,my_temp_point,block_length+ 10);
+			//	memcpy_s(program_code[start_instance],block_length + 10,my_temp_point,block_length + 10);
+			//	program_code_length[start_instance] = block_length;
+			//}
 
 			
 		return READPROGRAMCODE_T3000;
@@ -2050,144 +2056,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 		break;
 	case READMONITORDATA_T3000:
 		{
-
-			my_temp_point = (char *)Temp_CS.value;
-
-			char * temp_print = my_temp_point;
-			CString temp_cs;
-			CString temp_char;
-
-			g_Print.Format(_T("Revice length = %d"),len_value_type);
-			DFTrace(g_Print);
-			 int split_part;
-			int part_value = 40;
-			split_part = len_value_type/40;
-			for (int x=0;x<split_part;x++)
-			{
-				temp_cs.Format(_T("%02d Part  "),x+1);
-				for (int i = part_value*x; i< (part_value)*(x+1) ; i++)
-				{
-					temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
-					temp_char.MakeUpper();
-					temp_print ++;
-					temp_cs = temp_cs + temp_char + _T(" ");
-				}
-				g_Print = temp_cs;
-				DFTrace(g_Print);
-			}
-
-
-
-			//temp_cs.Empty();
-			//temp_cs.Format(_T("2 Part  "));
-			//for (int i=sizeof(Monitor_Block)/5 + 1;i< sizeof(Monitor_Block);i++)
-			//{
-			//	temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
-			//	temp_char.MakeUpper();
-			//	temp_print ++;
-			//	temp_cs = temp_cs + temp_char + _T(" ");
-			//}
-			//g_Print = temp_cs;
-			//DFTrace(g_Print);
-
-			//Monitor_Block
-			my_temp_point = my_temp_point + PRIVATE_MONITOR_HEAD_LENGTH;
-			my_temp_point = my_temp_point + MAX_POINTS_IN_MONITOR * 5 ;
-
-			
-
-			m_monitor_block.monitor =  *(my_temp_point++);
-			m_monitor_block.no_points =  *(my_temp_point++);
-			m_monitor_block.second_interval_time =  *(my_temp_point++);
-			m_monitor_block.minute_interval_time =  *(my_temp_point++);
-			m_monitor_block.hour_interval_time =  *(my_temp_point++);
-			m_monitor_block.priority =  *(my_temp_point++);
-			m_monitor_block.first_block =  *(my_temp_point++);
-			m_monitor_block.last_block =  *(my_temp_point++);
-			m_monitor_block.analog_digital =  *(my_temp_point++);
-			m_monitor_block.block_state =  *(my_temp_point++);
-			m_monitor_block.fast_sampling =  *(my_temp_point++);
-			m_monitor_block.wrap_around =  *(my_temp_point++);
-
-			temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-			m_monitor_block.start_time =temp_struct_value; 
-			my_temp_point = my_temp_point + 4;
-
-			temp_struct_value = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
-			m_monitor_block.index =temp_struct_value; 
-			my_temp_point = my_temp_point + 2;
-
-			m_monitor_block.next_block =  *(my_temp_point++);
-			m_monitor_block.block_no =  *(my_temp_point++);
-			m_monitor_block.last_digital_state =  *(my_temp_point++);
-			m_monitor_block.not_used =  *(my_temp_point++);
-
-
-			char *data_temp_point;
-			data_temp_point = my_temp_point;
-			if(m_monitor_block.analog_digital == 0)
-			{		
-				int data_index_check = (len_value_type -PRIVATE_MONITOR_HEAD_LENGTH - (MAX_POINTS_IN_MONITOR * 5) - 22)/4;
-				if(m_monitor_block.index != data_index_check)
-				{
-					//return 1;
-				}
-				int data_group = 0;
-				if(m_monitor_data.at(monitor_list_line).an_inputs == 0)
-				{
-					g_Print.Format(_T("an_inputs = 0"));
-					DFTrace(g_Print);
-					return 1;
-				}
-				if((m_monitor_block.index % m_monitor_data.at(monitor_list_line).an_inputs) == 0)
-				{
-					data_group = m_monitor_block.index / m_monitor_data.at(monitor_list_line).an_inputs;
-				}
-				else
-				{
-					return 1;
-				}
-
-				for (int j=0;j<data_group;j++)
-				{
-					for (int k=0;k< MAX_POINTS_IN_MONITOR; k++)
-					{
-						if(my_input_info[k].be_record)
-						{
-							temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-							Monitor_Input__Data[k][j] = temp_struct_value;
-							my_temp_point = my_temp_point + 4;
-						}
-						else
-						{
-							continue;
-						}
-					}
-
-				}
-
-#if 0	
-				for (int i=0;i<m_monitor_data.at(monitor_list_line).an_inputs;i++)
-				{
-					for (int j=0;j<m_monitor_block.index;j++)
-					{
-
-						Monitor_Input__Data[i][j] = 
-
-
-					}
-				}
-#endif
-				//memcpy_s(m_monitor_block.dat.analog,20,my_temp_point,20);
-			}
-			else if(m_monitor_block.analog_digital == 1)
-			{
-
-			}
-			else
-			{
-				Sleep(1);
-			}
+			handle_read_monitordata((char *)Temp_CS.value,len_value_type);
 			return READMONITORDATA_T3000;
 		}
 		break;
@@ -2288,6 +2157,331 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 	return 1;
 }
 
+void new_temp_analog_data_block(unsigned char nmonitor_count,unsigned int receive_length)
+{
+	int	temp_receive_data_count = receive_length / 4;
+	int	temp_new_each_data_count = temp_receive_data_count / nmonitor_count;	//得到那14个input 平均每组要new多少个;
+	for (int i=0;i<nmonitor_count;i++)		//new 每个的结构;
+	{
+		if(temp_new_each_data_count == 0 )
+			return;
+		temp_analog_data[i] = new Data_Time_Match[temp_new_each_data_count];
+		//memset(temp_analog_data[i],0,temp_new_each_data_count * sizeof(Data_Time_Match));
+	}	
+}
+
+//This function code by Fance du for receive the monitor data;
+int handle_read_monitordata(char *npoint,int nlength)
+{
+	char * my_temp_point = npoint;
+	char * temp_print = my_temp_point;
+	
+	unsigned short temp_send_length = 0;
+	int temp_struct_value = 0;
+	CString temp_cs;
+	CString temp_char;
+	static unsigned int receive_length = 0;						//需要接收多少个字节的数据;
+	static unsigned int already_receive_length = 0;				//已经接收了多少字节；
+	static unsigned int receive_all_data_count = 0 ;            //所有完整的里面有多少数据;
+	static unsigned int receive_data_count = 0;					//多少笔数据;
+	static unsigned int already_receive_count = 0;				//已经接收了多少笔数据;
+	static unsigned int each_count_input_data = 0;				//这写数据中 每笔input 含多少笔;
+
+	static unsigned int time_offset_count = 0;						//时间与原始的值偏移了多少次;
+	static unsigned char receive_monitor_count = 0;				//有几个模拟量 或数字量;
+	static bool flag_data_receive_finished = false;				//标记 是否带头的 数据 接收完毕，例如1000，那没帧 250 ，要4帧 不带头的;
+	static unsigned short Filledata_count = 0;					//用来记录该把数据填到那个结构里面去了;
+	static unsigned int interval_time = 0;						//每笔数据的间隔时间;
+	static unsigned int last_start_time = 0;					//上一帧数据的last time的值，Chealse 专用，用来判断最后一帧是不是多余的;
+	static bool ignore_left_data = false;						//如果收到相同的时间久忽略后面的 包;
+	if(nlength <= sizeof(Str_Monitor_data_header))
+	{
+		g_Print.Format(_T("Monitor_data_header = %d"),nlength);
+		DFTrace(g_Print);
+		return 0;
+	}
+
+	CString CS_Value;
+	CString Write_Position;
+	Write_Position.Format(_T("D:\\Test.txt"));
+	CS_Value.Empty();
+	for (int i =0; i< nlength ; i++)
+	{
+		temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
+		temp_char.MakeUpper();
+		temp_print ++;
+		temp_cs = temp_cs + temp_char + _T(" ");
+	}
+	CS_Value = temp_cs + _T("\r\n \r\n");
+
+	CFile file(Write_Position,CFile::modeCreate |CFile::modeReadWrite |CFile::modeNoTruncate);
+	file.SeekToEnd();
+	int write_length = sizeof(TCHAR)*wcslen(CS_Value.GetBuffer());
+	file.Write(CS_Value,write_length);
+	file.Flush();
+	CS_Value.ReleaseBuffer();
+	file.Close();
+	temp_print = my_temp_point;
+
+
+	m_monitor_head.total_length =  (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
+	my_temp_point = my_temp_point + 2;
+	m_monitor_head.command = *(my_temp_point++);
+	m_monitor_head.index = *(my_temp_point++);
+	m_monitor_head.type = *(my_temp_point++);
+	m_monitor_head.conm_args.nsize = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
+	my_temp_point = my_temp_point + 4;
+	m_monitor_head.conm_args.oldest_time = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
+	my_temp_point = my_temp_point + 4;
+	m_monitor_head.conm_args.most_recent_time = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
+	my_temp_point = my_temp_point + 4;
+	m_monitor_head.special = *(my_temp_point++);
+	m_monitor_head.total_seg = *(my_temp_point++);
+	m_monitor_head.seg_index = *(my_temp_point++); 
+
+	//	return 0;
+
+	if(m_monitor_head.seg_index == 0)
+	{			
+		receive_length = 0;					
+		already_receive_length = 0;				
+		receive_data_count = 0;				
+		already_receive_count = 0;				
+		time_offset_count = 0;					
+		receive_monitor_count = 0;				
+	
+		flag_data_receive_finished = false;				
+		Filledata_count = 0;					
+		interval_time = 0;	
+		receive_all_data_count = 0;
+		each_count_input_data = 0;
+		ignore_left_data = false;
+	}
+	else
+	{
+		if(flag_data_receive_finished == false) //上一笔的数据还没有传输完毕，这一笔直接继续 20头 + 数据;
+		{
+			goto fillindata_head;
+		}
+	}
+	g_Print.Format(_T("total_seg = %d , seg_index = %d"),m_monitor_head.total_seg,m_monitor_head.seg_index);
+	DFTrace(g_Print);
+	if(m_monitor_head.seg_index == 0)	//如果是第一帧数据，必须包含头;
+	{
+		if(nlength <= (sizeof(Str_Monitor_data_header) + sizeof(Monitor_Block_Header)))
+		{
+			g_Print.Format(_T("length is = %d"),nlength);
+			DFTrace(g_Print);
+			return 0;
+		}
+	}
+
+	//if((m_monitor_head.seg_index == 0) || (m_monitor_head.seg_index == 1))
+	if(m_monitor_head.seg_index < 10)
+	{
+		g_Print.Format(_T("Revice length = %d"),nlength);
+		DFTrace(g_Print);
+		int split_part;
+		int part_value = 40;
+		split_part = nlength/40;
+		for (int x=0;x<split_part;x++)
+		{
+			temp_cs.Format(_T("Seg_Index %02d Part%02d :"),m_monitor_head.seg_index,x+1);
+			for (int i = part_value*x; i< (part_value)*(x+1) ; i++)
+			{
+				temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
+				temp_char.MakeUpper();
+				temp_print ++;
+				temp_cs = temp_cs + temp_char + _T(" ");
+			}
+			g_Print = temp_cs;
+			DFTrace(g_Print);
+		}
+
+	}
+
+	if(ignore_left_data)	//只要收到相同时间的 包，就说明下位机发来的数据后面的都是以前发过的，忽略它;
+		return 1;
+
+reveive_head:
+	//my_temp_point = my_temp_point + PRIVATE_MONITOR_HEAD_LENGTH;
+	my_temp_point = my_temp_point + MAX_POINTS_IN_MONITOR * 5 ;
+	m_monitor_block.monitor =  *(my_temp_point++);
+	m_monitor_block.no_points =  *(my_temp_point++);
+	m_monitor_block.second_interval_time =  *(my_temp_point++);
+	m_monitor_block.minute_interval_time =  *(my_temp_point++);
+	m_monitor_block.hour_interval_time =  *(my_temp_point++);
+	m_monitor_block.priority =  *(my_temp_point++);
+	m_monitor_block.first_block =  *(my_temp_point++);
+	m_monitor_block.last_block =  *(my_temp_point++);
+	m_monitor_block.analog_digital =  *(my_temp_point++);
+	m_monitor_block.block_state =  *(my_temp_point++);
+	m_monitor_block.fast_sampling =  *(my_temp_point++);
+	m_monitor_block.wrap_around =  *(my_temp_point++);
+
+	temp_send_length = (unsigned char)my_temp_point[0]<<8 | (unsigned char)my_temp_point[1]; 
+	//下面的是正确的，等chelsea改完就用下面的;
+	//temp_send_length = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0]; 
+	m_monitor_block.send_lenght = temp_send_length;
+	my_temp_point = my_temp_point + 8;//这里是长度和 nouse;
+
+	//temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+	temp_struct_value = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
+	m_monitor_block.start_time =temp_struct_value; 
+	my_temp_point = my_temp_point + 4;
+
+	if(last_start_time != m_monitor_block.start_time)
+	{
+		last_start_time = m_monitor_block.start_time;
+	}
+	else
+	{
+		ignore_left_data = true;
+		TRACE(_T("last_start_time = start_time\r\n"));
+		return 1;
+	}
+
+	temp_struct_value = (unsigned char)my_temp_point[0]<<8 | (unsigned char)my_temp_point[1];
+	m_monitor_block.index =temp_struct_value; 
+	my_temp_point = my_temp_point + 2;
+
+
+	m_monitor_block.send_lenght = m_monitor_block.index * 4;
+
+	m_monitor_block.next_block =  *(my_temp_point++);
+	m_monitor_block.block_no =  *(my_temp_point++);
+	m_monitor_block.last_digital_state =  *(my_temp_point++);
+	my_temp_point = my_temp_point + 1; // uint8_t     reserved;
+
+	receive_length = m_monitor_block.send_lenght;
+	receive_data_count = receive_length / 4 ;	//模拟量才是除以4;每笔占用4个字节;
+
+	receive_monitor_count = m_monitor_block.no_points;
+	interval_time = m_monitor_block.hour_interval_time*3600 + m_monitor_block.minute_interval_time*60 + m_monitor_block.second_interval_time;
+	time_offset_count = 0; //每次新发头的时候 都要把偏移量清零;
+	already_receive_count = 0; //已经接收了多少 也要清零;
+	Filledata_count = 0; //填值的也要清零;
+	if(receive_monitor_count != 0)
+		each_count_input_data = receive_data_count / receive_monitor_count ;
+	else
+	{
+		each_count_input_data = 0;
+		flag_data_receive_finished = true ;
+		ignore_left_data = true;
+		return 2;
+	}
+	if(m_monitor_block.analog_digital == 0)	//如果这80几个字节的头里面是 传的模拟量 就new int;
+	{
+		new_temp_analog_data_block(receive_monitor_count,receive_length);
+	}
+	//if(m_monitor_block.analog_digital == 0)	//如果这80几个字节的头里面是 传的模拟量 就new int;
+	//{
+	//	receive_data_count = receive_length / 4;
+	//	new_each_data_count = receive_data_count / receive_monitor_count;	//得到那14个input 平均每组要new多少个;
+	//	for (int i=0;i<receive_monitor_count;i++)		//new 每个的结构;
+	//	{
+	//		temp_analog_data[i] = new Data_Time_Match[new_each_data_count];
+	//		memset(temp_analog_data[i],0,new_each_data_count * sizeof(Data_Time_Match));
+	//	}	
+	//}
+		 
+	//analog_data_point
+	if(m_monitor_head.seg_index == 0)
+	{
+		g_Print.Format(_T("(%d) monitor = %d ,no_points = %d , length = %d"),m_monitor_head.seg_index,m_monitor_block.monitor,m_monitor_block.no_points ,m_monitor_block.send_lenght);
+		DFTrace(g_Print);
+		g_Print.Format(_T("(%d)Interval time %d:%d:%d"),m_monitor_head.seg_index,m_monitor_block.hour_interval_time,m_monitor_block.minute_interval_time,m_monitor_block.second_interval_time);
+		DFTrace(g_Print);
+		g_Print.Format(_T("(%d)priority = %d ,first_block = %d ,last_block = %d ,analog_digital = %d"),m_monitor_head.seg_index,m_monitor_block.priority,
+			m_monitor_block.first_block,m_monitor_block.last_block,m_monitor_block.analog_digital);
+		DFTrace(g_Print);
+		g_Print.Format(_T("(%d)block_state = %d , fast_sampling = %d , wrap_around = %d"),m_monitor_head.seg_index,m_monitor_block.block_state,m_monitor_block.fast_sampling,m_monitor_block.wrap_around);
+		DFTrace(g_Print);
+	}
+
+	char *data_temp_point;
+	data_temp_point = my_temp_point;
+	int left_part_length =0; //此帧数据剩余的字节数;
+	int delta_pass_1 = my_temp_point - npoint;
+	left_part_length = nlength - delta_pass_1;
+
+
+	if((receive_length == 0) && (left_part_length > sizeof(Monitor_Block_Header)))	//发两个头在一帧里面 需要判断 够发两个头的数据;
+		goto reveive_head;
+	//already_receive_length
+
+
+fillindata_head:
+	if(each_count_input_data == 0)
+	{
+		flag_data_receive_finished = true ;
+		return 1;
+	}
+	//这里要重新计算还能继续取多少个数据;
+	int delta_pass = my_temp_point - npoint;
+	left_part_length = nlength - delta_pass;
+	int this_block_of_data_receive_count = 0;
+	
+	do 
+	{
+		if(temp_analog_data[Filledata_count] == NULL)
+		{
+			ignore_left_data = true;	
+			//DFTrace(_T("Reveive error"));
+			return 2;
+		}
+		temp_analog_data[Filledata_count][time_offset_count].loggingtime =  m_monitor_block.start_time + time_offset_count * interval_time;
+		temp_analog_data[Filledata_count][time_offset_count].analogdata  =  ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
+		if(temp_analog_data[Filledata_count][time_offset_count].analogdata > 100000)
+			Sleep(1);
+		//temp_analog_data[Filledata_count][time_offset_count].analogdata  =  ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+		my_temp_point = my_temp_point + 4;
+		Filledata_count ++;
+		Filledata_count = Filledata_count % receive_monitor_count;
+		if(Filledata_count == 0)
+			time_offset_count ++;
+		this_block_of_data_receive_count ++;
+		already_receive_count ++;	//已经接收了多少笔  ++;
+	} while ((this_block_of_data_receive_count*4 < left_part_length) && (already_receive_count < receive_data_count ));
+	
+	
+		if(already_receive_count < receive_data_count )
+		{
+			flag_data_receive_finished = false ;
+		}
+		else
+		{
+			flag_data_receive_finished = true ;
+			//total_new_how_long = total_new_how_long + time_offset_count;
+			receive_all_data_count = receive_all_data_count + already_receive_count;
+			for (int i=0;i<m_monitor_block.no_points;i++)		//new 每个的结构;
+			{
+				if(analog_data_point[i] == NULL)
+					analog_data_point[i] = new Data_Time_Match[10000];
+
+				analog_data_count[i] = analog_data_count[i] + each_count_input_data;
+				memcpy_s(analog_data_point[i] + analog_data_count[i] - each_count_input_data,each_count_input_data * sizeof(Data_Time_Match),
+					temp_analog_data[i],each_count_input_data * sizeof(Data_Time_Match));
+				if(temp_analog_data[i])
+				{
+					delete  temp_analog_data[i];
+					temp_analog_data[i] = NULL;
+				}
+			}	
+			get_data_count = m_monitor_block.no_points;
+
+
+			//这里还要判断 这一帧数据里面 还有没有头和数据;不能直接就退出再下一帧;
+			int  left_data =  my_temp_point - npoint;	//两个指针相减，得出长度;
+			if(left_data < nlength)	//说明后面还有数据;不要直接return;在去重新接受头;
+				goto reveive_head;
+
+		}
+	
+
+
+	return 1;
+}
 
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 void local_handler_conf_private_trans_ack(
@@ -2800,12 +2994,6 @@ void Initial_bac(int comport)
 	uint16_t pdu_len = 0;
 	unsigned timeout = 100;     /* milliseconds */
 	BACNET_ADDRESS my_address, broadcast_address;
-//	char my_port[50];
-
-	//if(bac_net_initial_once)
-	//{
-	//	BacNet_hwd = this->m_hWnd;
-	//}
 
 	if(!bac_net_initial_once)
 	{
@@ -3420,8 +3608,8 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 		DWORD nSerial=usDataPackage[0]+usDataPackage[1]*256+usDataPackage[2]*256*256+usDataPackage[3]*256*256*256;
 		int modbusID=usDataPackage[5];
-		TRACE(_T("Serial = %u     ID = %d\r\n"),nSerial,modbusID);
-		g_Print.Format(_T("Serial = %u     ID = %d\r\n"),nSerial,modbusID);
+		//TRACE(_T("Serial = %u     ID = %d\r\n"),nSerial,modbusID);
+		g_Print.Format(_T("Refresh list :Serial = %u     ID = %d\r\n"),nSerial,modbusID);
 		DFTrace(g_Print);
 		temp.modbusID = modbusID;
 		temp.nSerial = nSerial;
@@ -3577,8 +3765,33 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 	}//end of while
 END_SCAN:
 
-	//closesocket(h_Broad);
-	//h_Broad=NULL;
+	closesocket(h_Broad);
+	h_Broad=NULL;
+	{
+
+		//SOCKET soAck =::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+		h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+		BOOL bBroadcast=TRUE;
+		::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+		int iMode=1;
+		ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+
+		BOOL bDontLinger = FALSE;
+		setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+
+		//SOCKADDR_IN bcast;
+		h_bcast.sin_family=AF_INET;
+		//bcast.sin_addr.s_addr=nBroadCastIP;
+		h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+		h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+
+		//SOCKADDR_IN siBind;
+		h_siBind.sin_family=AF_INET;
+		h_siBind.sin_addr.s_addr=INADDR_ANY;
+		h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+		::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+
+	}
 	//pScanner->m_bNetScanFinish = TRUE; // 超时结束
 
 	//g_strScanInfoPrompt = _T("NC by TCP");
@@ -3586,6 +3799,38 @@ END_SCAN:
 	//NET_WriteLogFile(strlog);
 	//pScanner->m_eScanNCEnd->SetEvent();
 	return 1;
+}
+
+
+
+int Open_MonitorDataBase(CString DataSource)
+{
+	//m_pCon.CreateInstance(_T("ADODB.Connection"));
+	//m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	//strSql.Format(_T("update ALL_NODE set Hardware_Ver ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),hw_instance,str_serialid,str_baudrate);
+	//m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+	//strSql.Format(_T("update ALL_NODE set Software_Ver ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),sw_mac,str_serialid,str_baudrate);
+	//m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+	CString locol_path;
+	CString m_mdb_path_t3000;
+	CString m_application_path;
+	m_mdb_path_t3000 = _T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=");
+	GetModuleFileName(NULL, m_application_path.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(m_application_path.GetBuffer(MAX_PATH));
+	m_application_path.ReleaseBuffer();
+	m_mdb_path_t3000 = m_mdb_path_t3000 + m_application_path;
+	m_mdb_path_t3000 = m_mdb_path_t3000 + DataSource;
+
+	HRESULT hr;
+	m_global_pCon.CreateInstance(_T("ADODB.Connection"));
+	hr=m_global_pRs.CreateInstance(_T("ADODB.Recordset"));
+	if(FAILED(hr))
+	{
+		AfxMessageBox(_T("Load msado12.dll erro"));
+		return FALSE;
+	}
+	int ret = m_global_pCon->Open(m_mdb_path_t3000.GetString(),_T(""),_T(""),adModeUnknown);
+	return ret;
 }
 
 void DFTrace(CString &nCString)

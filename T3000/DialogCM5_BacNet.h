@@ -59,23 +59,9 @@ public:
 	void Initial_All_Point();
 	void Show_Wait_Dialog_And_SendMessage(int read_list_type);
 	void WriteFlash();
+	void SetConnected_IP(LPCTSTR myip);
 
 
-	afx_msg void OnBnClickedButtonBacTest();
-	CDateTimeCtrl m_cm5_time_picker;
-	CDateTimeCtrl m_cm5_date_picker;
-	afx_msg void OnBnClickedBacEnableEditTime();
-	afx_msg void OnNMKillfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMKillfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult);
-	void Get_Time_Edit_By_Control();
-	afx_msg void OnNMSetfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMSetfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnBnClickedBtnBacWriteTime();
-	afx_msg void OnBnClickedBtnBacSYNCTime();
-	afx_msg void OnBnClickedBtnBacIPAuto();
-	afx_msg void OnBnClickedBtnBacIPStatic();
-	afx_msg void OnBnClickedBtnBacIPChange();
-	afx_msg	void OnBnClickedBtnBacIPCancle();
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CTabCtrl m_bac_main_tab;
@@ -86,6 +72,8 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	int m_cur_tab_sel;
 	int m_bac_obtain_ip_mode;
+
+	
 };
 //static void Init_Service_Handlers(void);
 

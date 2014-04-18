@@ -28,7 +28,7 @@
 
 const int TCP_COMM_PORT = 6001;
 extern int g_ScnnedNum;
-extern bool b_is_scan ;
+extern bool b_pause_refresh_tree ;
 bool is_in_scan_mode = false;
 
 typedef struct infopack
@@ -1294,8 +1294,33 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 
 END_SCAN:
 
-	//closesocket(h_Broad);
-	//h_Broad=NULL;
+	closesocket(h_Broad);
+	h_Broad=NULL;
+	{
+
+		//SOCKET soAck =::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+		h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+		BOOL bBroadcast=TRUE;
+		::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+		int iMode=1;
+		ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+
+		BOOL bDontLinger = FALSE;
+		setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+
+		//SOCKADDR_IN bcast;
+		h_bcast.sin_family=AF_INET;
+		//bcast.sin_addr.s_addr=nBroadCastIP;
+		h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+		h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+
+		//SOCKADDR_IN siBind;
+		h_siBind.sin_family=AF_INET;
+		h_siBind.sin_addr.s_addr=INADDR_ANY;
+		h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+		::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+
+	}
 	//pScanner->m_bNetScanFinish = TRUE; // 超时结束
 
 	g_strScanInfoPrompt = _T("NC by TCP");
@@ -3100,9 +3125,9 @@ void CTStatScanner::ScanOldNC(BYTE devLo, BYTE devHi)
 
 void CTStatScanner::ScanAll()
 {	
-	
+	m_szNCScanRet.clear();	//Clear all the old information ,when we start a new scan;
 #if 1	
-	b_is_scan = true ;
+	b_pause_refresh_tree = true ;
 	ScanComDevice();
 	
 	
@@ -3174,7 +3199,7 @@ UINT _WaitScanThread(PVOID pParam)
 		{
 		  pScanner->SendScanEndMsg();
 		}
-	b_is_scan = false;
+	b_pause_refresh_tree = false;
 
 	return 1;
 }
@@ -3640,8 +3665,8 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 
 			CString strInfo;
 			strInfo.Format(_T("Scan  Bacnetip.Found %d BACNET device"),ready_to_read_count);
-			DFTrace(strInfo);
-			pScan->ShowBacnetComScanInfo(strInfo);
+			//DFTrace(strInfo);
+			//pScan->ShowBacnetComScanInfo(strInfo);
 
 			if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//达到返回的个数后就break;
 				break;
@@ -3677,6 +3702,9 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 
 	Sleep(200);
 	int ret_3 =	m_bac_scan_result_data.size(); 
+	CString bac_strInfo;
+	bac_strInfo.Format(_T("Scan  Bacnetip.Found %d recognizable Bacnet device"),ret_3);
+	pScan->ShowBacnetComScanInfo(bac_strInfo);
 	TRACE(_T("serial scan = %d\r\n"),ret_3);
 	for (int l=0;l<ret_3;l++)
 	{

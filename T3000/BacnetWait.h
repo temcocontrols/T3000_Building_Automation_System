@@ -35,4 +35,11 @@ public:
 	
 	CStaticEx m_wait_persent;
 	int m_wait_type;//0 µã»÷£»  1 Ð´config  £»2  ¶Áconfig;
+	CString PosString;
+	int m_pos;
+public:
+	void Set_Show_String(CString temp);
+	void Set_Pos(int temp_pos);
 };
+
+const int READ_MONITORDATA_TIME = 6 ;

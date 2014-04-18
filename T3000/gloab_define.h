@@ -2,7 +2,8 @@
 
 //#define SHOW_MESSAGEBOX
 #define	 MY_REDRAW_WINDOW		WM_USER + 1231
-#define WM_FRESH_CM_LIST WM_USER + 975
+#define WM_FRESH_CM_LIST		WM_USER + 975
+#define WM_FRESH_SETTING_UI		WM_USER + 976
 #define WM_DELETE_NEW_MESSAGE_DLG WM_USER + 2001
 #define MY_BAC_CONFIG_READ_RESULTS  WM_USER + 2002
 #define SHOW_ERROR_MESSAGE
@@ -22,6 +23,14 @@ const int MODBUS_TCPIP = 1;
 const int MODBUS_BACNET_MSTP = 2;
 const int PROTOCOL_BACNET_IP   = 3;
 const int PROTOCOL_UNKNOW = 255;
+
+const int BAC_WAIT_NORMAL_READ = 0;
+const int BAC_WAIT_READ_CONFIG_WRITE_DEVICE = 1;
+const int BAC_WAIT_READ_DATA_WRITE_CONFIG = 2;
+const int BAC_WAIT_READ_MONITOR_DATA = 3;
+
+const int READ_ANALOG = 1;
+const int READ_DIGITAL = 2;
 
 #define WM_COMMAND_WHO_IS  1
 #define MENU_CLICK			2
@@ -54,6 +63,7 @@ const int TYPE_WEEKLYCODE = 12;
 const int TYPE_ANNUALCODE = 13;
 const int TYPE_ALARMLOG = 14;
 const int TYPE_TSTAT = 15;
+const int TYPE_READ_MONITOR_DATA = 17;
 
 const int DELETE_WINDOW_MSG = 200;
 
@@ -77,6 +87,7 @@ const int BAC_READ_ANNUALCODE_LIST = 13;
 const int BAC_READ_ALARMLOG_LIST = 14;
 const int BAC_READ_TSTAT_LIST = 15;
 const int BAC_READ_BASIC_SETTING_COMMAND = 16;
+const int BAC_READ_MONITOR_DATA = 17;
 
 
 
@@ -108,18 +119,18 @@ const int BAC_DECOM_NO  = 1;
 
 const int BAC_READ_GROUP_NUMBER = 4;
 
-const int BAC_INPUT_ITEM_COUNT = 20;
-const int BAC_OUTPUT_ITEM_COUNT = 20;
+const int BAC_INPUT_ITEM_COUNT = 64;
+const int BAC_OUTPUT_ITEM_COUNT = 64;
 const int BAC_PROGRAM_ITEM_COUNT = 16;
 const int BAC_PROGRAMCODE_ITEM_COUNT = 16;
-const int BAC_VARIABLE_ITEM_COUNT = 64;
+const int BAC_VARIABLE_ITEM_COUNT = 128;
 const int BAC_WEEKLY_ROUTINES_COUNT = 16;
 const int BAC_WEEKLYCODE_ROUTINES_COUNT = 16;
 const int BAC_ANNUAL_ROUTINES_COUNT = 8;
 const int BAC_SCHEDULE_TIME_COUNT = 8;
 const int BAC_TIME_COMMAND_COUNT = 1;
 const int BAC_BASIC_SETTING_COUNT = 1;
-const int BAC_CONTROLLER_COUNT = 48;
+const int BAC_CONTROLLER_COUNT = 16;
 const int BAC_SCREEN_COUNT = 32;
 const int BAC_MONITOR_COUNT = 12;
 const int BAC_ANNUAL_CODE_COUNT = 8;
@@ -291,6 +302,12 @@ struct Changed_Item_Info
 	unsigned short entitysize;
 	int8_t block_size;
 	HWND hWnd;
+};
+
+struct Data_Time_Match
+{
+	int analogdata;
+	unsigned long loggingtime;
 };
 
 const int UNITS_TYPE_ANALOG = 0;
@@ -487,7 +504,7 @@ struct _Graphic_Value_Info
 };
 
 
-const int WINDOW_TAB_COUNT = 11; //多少个Window 嵌入在TAB里面;
+const int WINDOW_TAB_COUNT = 12; //多少个Window 嵌入在TAB里面;
 const int WINDOW_INPUT = 0;
 const int WINDOW_OUTPUT = 1;
 const int WINDOW_VARIABLE = 2;
@@ -499,6 +516,7 @@ const int WINDOW_ANNUAL = 7;
 const int WINDOW_MONITOR = 8;
 const int WINDOW_ALARMLOG = 9;
 const int WINDOW_TSTAT	= 10;
+const int WINDOW_SETTING = 11;
 
 
 
