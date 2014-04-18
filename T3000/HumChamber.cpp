@@ -692,14 +692,14 @@ void CHumChamber::OnBnClickedRefresh()
 }
 
 DWORD WINAPI _UpdateThread(LPVOID pParam)
-	{
-	 	 if (g_bChamber)
-	 	 { 
-		 CHumChamber* pDlg = (CHumChamber*)(pParam);
-		 pDlg->Fresh_Hum_Temp();
-	 	 }
-	return 1;
-	}
+{
+    if (g_bChamber)
+    { 
+        CHumChamber* pDlg = (CHumChamber*)(pParam);
+        pDlg->Fresh_Hum_Temp();
+    }
+    return 1;
+}
  
 BOOL CHumChamber::GetRegInfoFromDB(Register_info &reg_data,CString Area_Name)
 {

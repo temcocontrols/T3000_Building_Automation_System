@@ -49,7 +49,7 @@ void CDisplayLEDLCDConfig::OnBnClickedLed()
 void CDisplayLEDLCDConfig::OnBnClickedLcd()
 {
  CDialogEx::OnOK();
-    if ((product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
+    if ((product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT7))
     {
         CDisplayConfig display_cfg;
         display_cfg.DoModal();

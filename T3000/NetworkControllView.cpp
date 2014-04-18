@@ -355,7 +355,9 @@ void CNetworkControllView::OnBnClickedButton10()
 }
 
 void CNetworkControllView::OnBnClickedApplybutton()
-{   if (g_CommunicationType==0)
+{  
+
+ if (g_CommunicationType==0)
 {
 	if(!CheckSettingChanged()) // if setting changed,return TRUE
 	{

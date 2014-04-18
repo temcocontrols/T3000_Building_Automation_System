@@ -203,11 +203,11 @@ BOOL CMbPoll::OnInitDialog()
 	startStopBtnState();
 	restoreConfigs();
 
-	if (mbPollFirstTime == 1)
+	/*if (mbPollFirstTime == 1)
 	{
 		OnFileOpenWhileOpen();
 		mbPollFirstTime = 0;
-	}
+	}*/
 
 	ctrlGrid1.put_TextMatrix(0, 0, L"Alias");
 	ctrlGrid1.put_TextMatrix(0, 1, L"Addr");

@@ -196,7 +196,7 @@ BOOL COutPutDlg::OnInitDialog()
 	//129	107	1	Low byte	W/R	"AUTO_ONLY , enables or disables manual mode. 0 = Manual Fan Modes 1-x Allowed 
 	//(depending on R122 value, 1 = Auto Mode Only, 2 = DDC mode,the user can not change setpoint and fan speed from keypad."
 
-	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{	
 		if(product_register_value[107]==0)
 		{
@@ -269,7 +269,7 @@ BOOL COutPutDlg::OnInitDialog()
 	
 	//---------------------------------------------------
 	//Annul by Fance 2013 04 07
-	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		output4_value = product_register_value[MODBUS_MODE_OUTPUT4];// 283 205
 		output5_value = product_register_value[MODBUS_MODE_OUTPUT5];//284 206
@@ -283,7 +283,7 @@ BOOL COutPutDlg::OnInitDialog()
 		m_bFloat=TRUE;
 	}
  
-	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		i_104_pid1=product_register_value[384];
 		i_268_pid2=product_register_value[247];
@@ -316,7 +316,7 @@ void COutPutDlg::put_fan_variable()
 	m_fan.ResetContent(); //Comments by Fance . Removes all items from the list box and edit control of a combo box.
 	//129	107	1	Low byte	W/R	"AUTO_ONLY , enables or disables manual mode. 0 = Manual Fan Modes 1-x Allowed 
 	//(depending on R122 value, 1 = Auto Mode Only, 2 = DDC mode,the user can not change setpoint and fan speed from keypad."
-	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		strdemo = _T("1-4-0-1,");
 		SetPaneString(2,strdemo);
@@ -436,7 +436,7 @@ void COutPutDlg::OnCbnSelchangeFanmode()
 	//	The mode of operation (coasting, cooling, heating) is determined by the PID parameter.
 
  
-	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		write_one(g_tstat_id, 105,m_fan_mode_ctrl.GetCurSel()+1);
 		write_one(g_tstat_id, 273,m_fan.GetCurSel());
@@ -595,7 +595,7 @@ void COutPutDlg::OnEnKillfocusPid1coolstageedit()
 void COutPutDlg::FreshGrids()
 {
 	//if (newtstat6[7] == PM_TSTAT6)
-	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		FreshGrid_PID1tstat6();
 		FreshGrid_PID2tstat6();
@@ -778,6 +778,7 @@ if(product_register_value[129]==1)
 		case PM_PRESSURE:
 		case 12:m_nmoduleType=3;break;//tstat 5d
 		case PM_TSTAT6:
+        case PM_TSTAT5i:
 		case PM_TSTAT7:
 		case 16:m_nmoduleType=3;break;//tstat 5e
 		case 4:m_nmoduleType=2;break;//tstat 5c
@@ -2433,7 +2434,7 @@ void COutPutDlg::OnBnClickedFanautocheck()
 
 	//write_one(g_tstat_id,129,m_bFanAutoOnly);
 
-	if (product_register_value[7] ==PM_TSTAT6)
+	if (product_register_value[7] ==PM_TSTAT6||product_register_value[7] ==PM_TSTAT5i)
 	{
 		if(product_register_value[107]==0)
 			m_bFanAutoOnly=FALSE;
@@ -2560,7 +2561,7 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("On"));
 			m_ItemValueCombx.AddString(_T("DI1"));
-			if (product_register_value[7]== PM_TSTAT6)
+			if (product_register_value[7]== PM_TSTAT6||product_register_value[7]== PM_TSTAT5i)
 			{
 				if(product_register_value[MODBUS_ANALOG_IN1]==3)//on/off mode  //找不到对应的tstat6
 					m_ItemValueCombx.AddString(_T("AI1"));

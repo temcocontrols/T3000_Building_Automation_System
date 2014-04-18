@@ -412,7 +412,90 @@ int regValue;
 for(int i = 1;i<=6;i++)
 {  
     regValue=product_register_value[INPUT1_CT+i-1];
-    strresult.Format(_T("%d"),regValue);
+     
+
+    if (0==product_register_value[RANGE_INPUT1+i-1])
+    {
+        strresult.Format(_T("%d"),regValue);
+
+    } 
+    else if (1==product_register_value[RANGE_INPUT1+i-1])
+    {
+        strresult.Format(_T("%.1f C"),(float)regValue/10.0);
+    }
+    else if (2==product_register_value[RANGE_INPUT1+i-1])
+    {
+        strresult=_T("10K F");
+        strresult.Format(_T("%.1f F"),(float)regValue/10.0);
+    }
+    else if (3==product_register_value[RANGE_INPUT1+i-1])
+    {
+
+        strresult.Format(_T("%.1f"),(float)regValue);
+        strresult+=_T("%");
+    }
+    else if (4==product_register_value[RANGE_INPUT1+i-1])
+    {
+        //strresult.Format(_T("%.1f F"),(float)regValue/10.0);
+        if (regValue==0)
+        {
+            strresult=_T("OFF");
+        } 
+        else
+        {
+            strresult=_T("ON");
+        }
+    }
+    else if (5==product_register_value[RANGE_INPUT1+i-1])
+    {
+        if (regValue==0)
+        {
+            strresult=_T("ON");
+        } 
+        else
+        {
+            strresult=_T("OFF");
+        }
+    }
+    else if (6==product_register_value[RANGE_INPUT1+i-1])
+    {
+        strresult.Format(_T("%d"),regValue);
+    }
+    else if (7==product_register_value[RANGE_INPUT1+i-1])
+    {
+        strresult.Format(_T("%d"),regValue);
+    }
+    else if (8==product_register_value[RANGE_INPUT1+i-1])
+    {
+        //strresult=_T("TYPE3 10K C");
+        strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
+    }
+    else if (9==product_register_value[RANGE_INPUT1+i-1])
+    {
+        /*strresult=_T("TYPE3 10K F");*/
+        strresult.Format(_T("%0.1f F"),(float)regValue/10.0);
+    }
+    else if (10==product_register_value[RANGE_INPUT1+i-1])
+    {
+        strresult=_T("0");
+        //strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
+    }
+    else if (11==product_register_value[RANGE_INPUT1+i-1])
+    {
+        //strresult=_T("0-5V");
+        strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
+    }
+    else if (12==product_register_value[RANGE_INPUT1+i-1])
+    {
+        //strresult=_T("0-10V");
+        strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
+    }
+    else if (13==product_register_value[RANGE_INPUT1+i-1])
+    {
+        //strresult=_T("0-20I");
+        strresult.Format(_T("%0.1f ma"),(float)regValue/1000.0);
+    }
+
     m_msflexgrid_input.put_TextMatrix(i,1,strresult);
 
 
@@ -471,7 +554,7 @@ for(int i = 1;i<=6;i++)
     }
     else if (13==product_register_value[RANGE_INPUT1+i-1])
     {
-        strresult=_T("0-20I");
+        strresult=_T("0-20 ma");
     }
 
     m_msflexgrid_input.put_TextMatrix(i,2,strresult);
@@ -483,7 +566,87 @@ for(int i = 1;i<=6;i++)
 for(int i = 1;i<=10;i++)
 {  
     regValue=product_register_value[INPUT1+i-1];
-    strresult.Format(_T("%d"),regValue);
+    if (0==product_register_value[RANGE_INPUT7+i-1])
+    {
+        strresult.Format(_T("%d"),regValue);
+
+    } 
+    else if (1==product_register_value[RANGE_INPUT7+i-1])
+    {
+        strresult.Format(_T("%.1f C"),(float)regValue/10.0);
+    }
+    else if (2==product_register_value[RANGE_INPUT7+i-1])
+    {
+        strresult=_T("10K F");
+        strresult.Format(_T("%.1f F"),(float)regValue/10.0);
+    }
+    else if (3==product_register_value[RANGE_INPUT7+i-1])
+    {
+
+        strresult.Format(_T("%.1f"),(float)regValue);
+        strresult+=_T("%");
+    }
+    else if (4==product_register_value[RANGE_INPUT7+i-1])
+    {
+        //strresult.Format(_T("%.1f F"),(float)regValue/10.0);
+        if (regValue==0)
+        {
+            strresult=_T("OFF");
+        } 
+        else
+        {
+            strresult=_T("ON");
+        }
+    }
+    else if (5==product_register_value[RANGE_INPUT7+i-1])
+    {
+        if (regValue==0)
+        {
+            strresult=_T("ON");
+        } 
+        else
+        {
+            strresult=_T("OFF");
+        }
+    }
+    else if (6==product_register_value[RANGE_INPUT7+i-1])
+    {
+        strresult.Format(_T("%d"),regValue);
+    }
+    else if (7==product_register_value[RANGE_INPUT7+i-1])
+    {
+        strresult.Format(_T("%d"),regValue);
+    }
+    else if (8==product_register_value[RANGE_INPUT7+i-1])
+    {
+        //strresult=_T("TYPE3 10K C");
+        strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
+    }
+    else if (9==product_register_value[RANGE_INPUT7+i-1])
+    {
+        /*strresult=_T("TYPE3 10K F");*/
+        strresult.Format(_T("%0.1f F"),(float)regValue/10.0);
+    }
+    else if (10==product_register_value[RANGE_INPUT7+i-1])
+    {
+        strresult=_T("0");
+        //strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
+    }
+    else if (11==product_register_value[RANGE_INPUT7+i-1])
+    {
+        //strresult=_T("0-5V");
+        strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
+    }
+    else if (12==product_register_value[RANGE_INPUT7+i-1])
+    {
+        //strresult=_T("0-10V");
+        strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
+    }
+    else if (13==product_register_value[RANGE_INPUT7+i-1])
+    {
+         
+        strresult.Format(_T("%0.1f ma"),(float)regValue/1000.0);
+    }
     m_msflexgrid_Ainput.put_TextMatrix(i,1,strresult);
 
 
@@ -542,7 +705,7 @@ for(int i = 1;i<=10;i++)
     }
     else if (13==product_register_value[RANGE_INPUT7+i-1])
     {
-        strresult=_T("0-20I");
+        strresult=_T("0-20 ma");
     }
 
     m_msflexgrid_Ainput.put_TextMatrix(i,2,strresult);
@@ -568,30 +731,10 @@ for(int i = 1;i<=5;i++)
 
 void T36CT::Fresh()
 {
-    float progress;
+    
     if (is_connect())
     {  
-        CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
-        pDlg->Create(IDD_DIALOG10_Progress, this);
-        pDlg->ShowProgress(0,0);
-        pDlg->ShowWindow(SW_SHOW);
-        RECT RECT_SET1;
-        GetClientRect(&RECT_SET1);
-        pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20);
-
-        for (int i=0;i<3;i++)
-        {
-            if (pDlg!=NULL)
-            {
-                progress=float((i+1)*(100/3));
-                pDlg->ShowProgress(int(progress),(int)progress);
-            } 
-            Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
-        }
-        pDlg->ShowWindow(SW_HIDE);
-        if(pDlg!=NULL)
-        {delete pDlg;
-        pDlg=NULL;}
+         
 
         Initial_RegisterList();
         InitialDialog();
@@ -731,7 +874,7 @@ void T36CT::ClickMsflexgridInput()
         m_comboxRange.AddString(_T("NO USE"));
         m_comboxRange.AddString(_T("0-5V"));
         m_comboxRange.AddString(_T("0-10V"));
-        m_comboxRange.AddString(_T("0-20I"));
+        m_comboxRange.AddString(_T("0-20 ma"));
 
         m_comboxRange.ShowWindow(SW_SHOW);
         m_comboxRange.BringWindowToTop();
@@ -807,7 +950,7 @@ void T36CT::ClickMsflexgridInput2()
         m_comboxRange.AddString(_T("NO USE"));
         m_comboxRange.AddString(_T("0-5V"));
         m_comboxRange.AddString(_T("0-10V"));
-        m_comboxRange.AddString(_T("0-20I"));
+        m_comboxRange.AddString(_T("0-20 ma"));
         m_comboxRange.ShowWindow(SW_SHOW);
         m_comboxRange.BringWindowToTop();
         m_comboxRange.SetFocus(); //ªÒ»°Ωπµ„
@@ -982,4 +1125,10 @@ void T36CT::OnCbnSelchangeRangecombo()
             EndWaitCursor();
         }
     }
+    for (int i=0;i<3;i++)
+    {
+         
+        Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
+    }
+     InitialDialog();
 }

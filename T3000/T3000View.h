@@ -112,8 +112,8 @@ public:
 	void FreshIOGridTable();
 
 	void OnFlexSlideCallBackFor5E();
-	void OnFlexSlideCallBackFor5ABCD(CFSBContainer* pSlider);
-
+	 void OnFlexSlideCallBackFor5ABCD(CFSBContainer* pSlider);
+   
 	void InitFanSpeed();
 public:
 	// scan Tstats in database

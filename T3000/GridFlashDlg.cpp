@@ -411,6 +411,9 @@
 				case PM_TSTAT6:
 					stemp="TStat6";
 					break;
+                case PM_TSTAT5i:
+                    stemp="TStat5i";
+                    break;
 				case PM_TSTAT7:
 					stemp="TStat7";
 					break;

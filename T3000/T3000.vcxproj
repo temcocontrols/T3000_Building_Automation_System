@@ -77,7 +77,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\T3000 Output\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\WebForAlex\T3000_Building_Automation_System\HelpDocs;$(SolutionDir)\..\T3000 Output\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
@@ -110,7 +110,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\WebForAlex\T3000_Building_Automation_System\HelpDocs;$(SolutionDir)\..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -242,6 +242,7 @@
     <ClCompile Include="T38IOAView.cpp" />
     <ClCompile Include="T3Performance.cpp" />
     <ClCompile Include="T3RTDView.cpp" />
+    <ClCompile Include="Table_Tamplete.cpp" />
     <ClCompile Include="TDelayForm.cpp" />
     <ClCompile Include="TemcoDataGrid.cpp" />
     <ClCompile Include="TestMultiReadTraffic.cpp" />
@@ -285,6 +286,8 @@
     <None Include="res\bitmap2.bmp" />
     <None Include="res\bitmap4.bmp" />
     <None Include="C:\Users\pc\Desktop\bmp00001.bmp" />
+    <None Include="res\bitmap_v.bmp" />
+    <None Include="res\bitmap_v_Connected.bmp" />
     <None Include="res\bmp_down.bmp" />
     <None Include="res\bmp_up.bmp" />
     <None Include="res\check.bmp" />
@@ -301,6 +304,8 @@
     <None Include="res\LED Table Button.bmp" />
     <None Include="res\MDisable.bmp" />
     <None Include="res\MDown.bmp" />
+    <None Include="res\menubaro.bmp" />
+    <None Include="res\menubaro_Connected.bmp" />
     <None Include="res\menu_img.bmp" />
     <None Include="res\menu_imgeOwn.bmp" />
     <None Include="res\menu_imgeOwn16.bmp" />
@@ -394,6 +399,7 @@
     <ClInclude Include="T38IOAView.h" />
     <ClInclude Include="T3Performance.h" />
     <ClInclude Include="T3RTDView.h" />
+    <ClInclude Include="Table_Tamplete.h" />
     <ClInclude Include="TargetGrid.h" />
     <ClInclude Include="TemcoDataGrid.h" />
     <ClInclude Include="TestMultiReadTraffic.h" />

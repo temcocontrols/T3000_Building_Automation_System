@@ -40,7 +40,7 @@ IMPLEMENT_DYNAMIC(CParameterDlg, CDialog)
 	, m_heatdbN(0)
 	, m_heatspN(0)
 {
-	//memset(&multi_register_value[0],0,sizeof(multi_register_value));
+	//memset(&product_register_value[0],0,sizeof(product_register_value));
 	m_version=1.0;
 
 	strparamode = str;
@@ -414,7 +414,7 @@ void CParameterDlg::InitPID2ComboBox()
 		m_inputSelect2.AddString(g_strInName6);
 		m_inputSelect2.AddString(g_strInName7);
 		m_inputSelect2.AddString(g_strInName8);
-		if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
 		{	
 
 			m_inputSelect2.AddString(_T("Humidity"));
@@ -1191,9 +1191,9 @@ void CParameterDlg::OnEnKillfocusInputvalue2()
 		return;
 	int nValue=_wtoi(strTemp);
 	g_bPauseMultiRead = TRUE;	
-	if(multi_register_value[241]==2)
+	if(product_register_value[241]==2)
 	{
-		if(multi_register_value[189]==4||multi_register_value[189]==1)
+		if(product_register_value[189]==4||product_register_value[189]==1)
 			write_one(g_tstat_id, 181,nValue*10);
 		else
 			write_one(g_tstat_id, 181,nValue);
@@ -1219,9 +1219,9 @@ void CParameterDlg::OnCbnSelchangeEapplication()
 
 	float m_fFirmwareVersion=get_curtstat_version();
 
-	if (multi_register_value[7] == PM_TSTAT7 || multi_register_value[7] == PM_TSTAT6)
+	if (product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT6|| product_register_value[7] == PM_TSTAT5i)
 	{
-		short nOccupied = multi_register_value[184];  // Day setpoint option  
+		short nOccupied = product_register_value[184];  // Day setpoint option  
 		BOOL bOccupied = nOccupied & 0x0001;
 		if (bOccupied)  // day  - Occupied
 		{
@@ -1236,7 +1236,7 @@ void CParameterDlg::OnCbnSelchangeEapplication()
 		nRet = write_one(g_tstat_id,reg_tststold[125],m_application_ctrl.GetCurSel()); //tstat6 350 
 
 	}
-	else if(((multi_register_value[7]==PM_TSTAT5E)) && (m_fFirmwareVersion >= 35.4))//0912
+	else if(((product_register_value[7]==PM_TSTAT5E)) && (m_fFirmwareVersion >= 35.4))//0912
 	{
 		write_one(g_tstat_id,423 ,m_application_ctrl.GetCurSel()); // 
 		nRet=write_one(g_tstat_id,125 ,m_application_ctrl.GetCurSel()); // 
@@ -1265,16 +1265,16 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
 		{	
 			if (g_unint)
 			{
-				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);//182 
+				strText.Format(_T("%d C"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);//182 
 				m_nightheating.SetWindowText(strText);
-				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183 355
+				strText.Format(_T("%d C"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183 355
 				m_nightcooling.SetWindowText(strText);
 			}
 			else
 			{
-				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);//182
+				strText.Format(_T("%d F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);//182
 				m_nightheating.SetWindowText(strText);
-				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
+				strText.Format(_T("%d F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
 				m_nightcooling.SetWindowText(strText);
 			}
 
@@ -1283,18 +1283,18 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
 		{
 			if (g_unint)
 			{		
-				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10);//123
+				strText.Format(_T("%0.1f°C"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10);//123
 				m_nightheating.SetWindowText(strText);
 
-				//m_nightheating.Format("%d%c",multi_register_value[123],176);//night heating deadband
-				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10);		//124
+				//m_nightheating.Format("%d%c",product_register_value[123],176);//night heating deadband
+				strText.Format(_T("%0.1f°C"),(float)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10);		//124
 				m_nightcooling.SetWindowText(strText);
 
 			}else
 			{
-				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);//182   354
+				strText.Format(_T("%0.1f°F"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//182   354
 				m_nightheating.SetWindowText(strText);
-				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
+				strText.Format(_T("%0.1f°F"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//183
 				m_nightcooling.SetWindowText(strText);
 
 			}
@@ -1543,7 +1543,7 @@ void CParameterDlg::OnEnKillfocusSpset1()
 			strText.Format(_T("%d"),product_register_value[MODBUS_MIN_SETPOINT]);
 		}
 
-		if ((product_register_value[7] == PM_TSTAT7)||(product_register_value[7]==PM_TSTAT6))
+		if ((product_register_value[7] == PM_TSTAT7)||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i))
 		{
 			if(product_register_value[MODBUS_DAY_SETPOINT]==short(nOrig*10))
 			{
@@ -1561,7 +1561,7 @@ void CParameterDlg::OnEnKillfocusSpset1()
 			}
 			product_register_value[MODBUS_DAY_SETPOINT] = short(nOrig*10);
 		}
-		else if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E)
+		else if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E)
 		{
 			int nRet = write_one(g_tstat_id, 135, short(nOrig));	//Fance comments: because the version which below 34.9 is too low ,135 register I Don't know it's real meaning. 
 		}
@@ -1643,7 +1643,7 @@ void CParameterDlg::OnEnKillfocusEcooldeadband1()
 	int nValue= (int)(_wtof(strText)*10);
 
 	g_bPauseMultiRead = TRUE;
-	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
+	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
 	{
 		if(nValue == product_register_value[MODBUS_DAY_COOLING_DEADBAND])	//346
 			return;
@@ -1696,7 +1696,7 @@ void CParameterDlg::OnEnKillfocusEcoolingiterm1()
 	int nValue= (int)(_wtof(strText.GetBuffer())*10.0);
 	 
 	g_bPauseMultiRead = TRUE;
-	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
+	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
 	{
 		if(nValue == product_register_value[MODBUS_DAY_HEATING_DEADBAND])	//347
 			return;
@@ -1806,7 +1806,7 @@ void CParameterDlg::OnEnKillfocusEnigntheating()
 		}
 		
 		CString strText;
-		strText.Format(_T("0.1f%"),(float)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10.0);
+		strText.Format(_T("%0.1f"),(float)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10.0);
 		m_nightheating.SetWindowText(strText);
 
 	}
@@ -1832,7 +1832,7 @@ void CParameterDlg::OnEnKillfocusEnigntheating()
 
 
 		CString strText;
-		strText.Format(_T("0.1f%"),(float)(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0));
+		strText.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0));
 		m_nightheating.SetWindowText(strText);
 
 
@@ -1906,7 +1906,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 
 
 	g_bPauseMultiRead = TRUE;	
-	if ((multi_register_value[7]==PM_TSTAT6)||(multi_register_value[7] == PM_TSTAT7))
+	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,345,short(fValue*10),
 			product_register_value[345],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));*/
@@ -1928,7 +1928,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 
 
 	}
-	else if(multi_register_value[7] == PM_TSTAT5G || multi_register_value[7] == PM_TSTAT5E)  // 只有5E使用135
+	else if(product_register_value[7] == PM_TSTAT5G || product_register_value[7] == PM_TSTAT5E)  // 只有5E使用135
 	{
 		//short nVal = short(fValue);
 		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,135,short(fValue),
@@ -1996,11 +1996,11 @@ void CParameterDlg::OnCbnSelchangeOccupiedmodecombo()
 //			g_bPauseMultiRead = TRUE;
 //	write_one(g_tstat_id, 339,nItem);
 //
-//	if(multi_register_value[339]==0||multi_register_value[339]==2)
+//	if(product_register_value[339]==0||product_register_value[339]==2)
 //	{
 //		m_defSetPointEdit.EnableWindow(FALSE);
 //	}
-//	if(multi_register_value[339]==1)
+//	if(product_register_value[339]==1)
 //	{
 //		m_defSetPointEdit.EnableWindow(TRUE);
 //	}	
@@ -2261,7 +2261,7 @@ CString strTemp;
 		if(product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2]==1)	//359  122
 		{				
 			fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+InputNo-2]/10.0);	//367   131
-			strTemp.Format(_T("%.1f"),fValue);	
+			strTemp.Format(_T("%0.1f"),fValue);	
 
 			strTemp +=strValueUnit;
 		}
@@ -2280,7 +2280,7 @@ CString strTemp;
 		else if (product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2]==4 )  // custom sensor	359 122
 		{					
 			fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+InputNo-2]/10.0);	//367  131
-			strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
+			strTemp.Format(_T("%0.1f"), (float)fValue/10.0);	
 			strTemp +=strValueUnit;
 		}
 		else if(product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2]==2)	//359 122
@@ -2290,7 +2290,7 @@ CString strTemp;
 		}
 		else
 		{
-			//strTemp.Format(_T("%d"),multi_register_value[367+i-2]);//lsc
+			//strTemp.Format(_T("%d"),product_register_value[367+i-2]);//lsc
 			strTemp.Format(_T("UNUSED"));
 
 		}						
@@ -2367,7 +2367,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	// 		1 = setpoint, 2 = Blank Display,3 = PID2 value,4 = PID2 setpoint,
 	// 		5 = set segment code by manually, 6 = Display sleep"
 
-	//m_displayCombox.SetCurSel(multi_register_value[203]);
+	//m_displayCombox.SetCurSel(product_register_value[203]);
 	m_displayCombox.SetCurSel(product_register_value[MODBUS_DISPLAY]);	//203 397 MODBUS_DISPLAY
 
 	//	133	396	1	Low byte	W/R	"SPECIAL_MENU_LOCK, Special menu lockout via keypad, serial port only, 
@@ -2382,7 +2382,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	//279	243	1	Low byte	W/R	Valve travel time. The time of the valve travel  from one end to another end. The units is second.
-	strTemp.Format(_T("%.1f"),product_register_value[MODBUS_VALVE_TRAVEL_TIME]/10.0);	//279 T6=243
+	strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_VALVE_TRAVEL_TIME]/10.0);	//279 T6=243
 	m_valveEdit.SetWindowText(strTemp);
 
 	//214	113	1	Low byte	W/R(not to eeprom)
@@ -2393,7 +2393,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	m_powerSetPointEdit.SetWindowText(strTemp);
 
 	//293	373	1	Low byte	W/R	Setpoint increment on the display each time the user hits the up/down buttons. Units are 0.1Deg, 10 = 1Deg and so on. 
-	strTemp.Format(_T("%.1f"),product_register_value[MODBUS_SETPOINT_INCREASE]/10.0);		//293  373
+	strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_SETPOINT_INCREASE]/10.0);		//293  373
 	m_setpointIncreasement.SetWindowText(strTemp);
 
 
@@ -2412,7 +2412,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	{
 		m_defSetPointEdit.EnableWindow(FALSE);
 	}
-	//if(multi_register_value[339]==1)
+	//if(product_register_value[339]==1)
 	if(product_register_value[MODBUS_SETPOINT_CONTROL]==1)//339  T6=342
 	{
 		m_defSetPointEdit.EnableWindow(TRUE);
@@ -2421,23 +2421,23 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	 
 
 	//213	142	1	Low byte	W/R	Temperature sensor filter, FIL, weighted average of stored value to new raw value
-	//	strTemp.Format(_T("%d"),multi_register_value[213]);
+	//	strTemp.Format(_T("%d"),product_register_value[213]);
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_FILTER]);	//213  T6=142
 	m_inputFilterEdit.SetWindowText(strTemp);
 
 
 	//201	241	1	Low byte	W/R	"MODBUS_CYCLING_DELAY ¨C delay time (in minutes) for switching out of heating or cooling
-	//strTemp.Format(_T("%d"),multi_register_value[201]);
+	//strTemp.Format(_T("%d"),product_register_value[201]);
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_CYCLING_DELAY]);	//201  T6=241
 	m_cycledlayEdit.SetWindowText(strTemp);
 
 	//301	114	2	Full	W/R	Period timer ON time.
-	//strTemp.Format(_T("%d"),multi_register_value[301]);
+	//strTemp.Format(_T("%d"),product_register_value[301]);
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_TIMER_ON]);	//301   T6=114
 	m_timerOnEdit.SetWindowText(strTemp);
 
 	//302	115	2	Full	W/R	Period timer OFF time.
-	//strTemp.Format(_T("%d"),multi_register_value[302]);
+	//strTemp.Format(_T("%d"),product_register_value[302]);
 
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_TIMER_OFF]);	//302   115
 	m_timerOffEdit.SetWindowText(strTemp);
@@ -2464,7 +2464,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			ptimerout->SetWindowText(_T("Timer On:"));
 		}
 
-		//if(multi_register_value[284]==2)
+		//if(product_register_value[284]==2)
 		if(product_register_value[MODBUS_MODE_OUTPUT5]==2)	//284,206 
 		{
 
@@ -2485,7 +2485,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
 	//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 
-	//if(multi_register_value[283]==2||multi_register_value[284]==2)
+	//if(product_register_value[283]==2||product_register_value[284]==2)
 	if(product_register_value[MODBUS_MODE_OUTPUT4]==2||product_register_value[MODBUS_MODE_OUTPUT5]==2)//283 284	t6->//205  206
 	{
 		CComboBox* pCombox=(CComboBox*)GetDlgItem(IDC_TIMERDELECTCOMBO);
@@ -2501,7 +2501,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 	//327	408	1	Low byte	W/R	"Assign the timer to be used for which feature. 0 = period timer, 1 = rotation timer,
 	//409 
-	//m_timerSelectCombox.SetCurSel(multi_register_value[327]);
+	//m_timerSelectCombox.SetCurSel(product_register_value[327]);
 	m_timerSelectCombox.SetCurSel(product_register_value[MODBUS_TIMER_SELECT]);	//327  408->409才对
 
 
@@ -2515,7 +2515,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	//211	111	1	Low byte	W/R	Unoccupied Override Timer, Ort. 0=disabled, >0=number of minutes manual override is allowed
 	//212	112	1	Low byte	W/R	"OVERRIDE_TIMER_DOWN_COUNT - Number of minutes remaining on the timer when 
 
-	//strTemp.Format(_T("%d"),multi_register_value[212]);
+	//strTemp.Format(_T("%d"),product_register_value[212]);
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_OVERRIDE_TIMER_LEFT]);	//112
 	m_TimeEdit.SetWindowText(strTemp);
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_OVERRIDE_TIMER]);	//111
@@ -2547,14 +2547,14 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	}
 
 
-	strTemp.Format(_T("%.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);	//121
+	strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);	//121
 	m_inputvalue1.SetWindowText(strTemp+strUnit);
 
 
-	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
+	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
 	{
 #if 1
-		strTemp.Format(_T("%.1f"),product_register_value[121]/10.0);
+		strTemp.Format(_T("%0.1f"),product_register_value[121]/10.0);
 		m_inputvalue1.SetWindowText(strTemp+strUnit);
 		// float fValue;
 		int nValue=0;
@@ -2652,14 +2652,15 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		{
 			m_inputValue2.SetWindowText(_T("UNUSED"));
 		}
-		strTemp.Format(_T("%.1f"),product_register_value[MODBUS_UNIVERSAL_NIGHTSET]/10.0);			//275 
+		strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_UNIVERSAL_NIGHTSET]/10.0);			//275 
 		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->SetWindowText(strTemp+strUnit);
 #endif
+
 	} 
 	else
 	{
 #if 1
-		strTemp.Format(_T("%.1f"),product_register_value[101]/10.0);
+		strTemp.Format(_T("%0.1f"),product_register_value[101]/10.0);
 		m_inputvalue1.SetWindowText(strTemp+strUnit);
 		float fValue;int nValue=0;
 		CString strValueUnit=GetTempUnit(product_register_value[359], 1);
@@ -2667,14 +2668,14 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		{	
 			if(product_register_value[7]== PM_PRESSURE)  // pressure
 			{
-				strTemp.Format(_T("%.1f W.C"),product_register_value[180]/100.0);
+				strTemp.Format(_T("%0.1f W.C"),product_register_value[180]/100.0);
 			}
 			else if (product_register_value[7]==16)
 			{
 				if(product_register_value[359]==1)
 				{				
 					fValue=float(product_register_value[367]/10.0);
-					strTemp.Format(_T("%.1f"),fValue);	
+					strTemp.Format(_T("%0.1f"),fValue);	
 
 					strTemp +=strValueUnit;
 				}
@@ -2692,8 +2693,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 				}
 				else if (product_register_value[359]==4 )  // custom sensor
 				{					
-					fValue=float(multi_register_value[367]/10.0);
-					strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
+					fValue=float(product_register_value[367]/10.0);
+					strTemp.Format(_T("%0.1f"), (float)fValue/10.0);	
 					strTemp +=strValueUnit;
 				}
 				else if(product_register_value[359]==2)
@@ -2713,7 +2714,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			{
 				if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)
 				{
-					strTemp.Format(_T("%.1f"),(float)product_register_value[180]/10);
+					strTemp.Format(_T("%0.1f"),(float)product_register_value[180]/10);
 					strTemp=strTemp+strUnit;
 				}
 				if (strUnit==""||strUnit=="%")
@@ -2723,9 +2724,9 @@ void CParameterDlg::Reflesh_ParameterDlg()
 				}
 				if(product_register_value[180]==3)
 				{
-					if(multi_register_value[180]==0)
+					if(product_register_value[180]==0)
 						strTemp=_T("OFF");
-					if(multi_register_value[180]==1)
+					if(product_register_value[180]==1)
 						strTemp=_T("ON");
 				}
 			}
@@ -2738,7 +2739,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 				if(product_register_value[360]==1)
 				{				
 					fValue=float(product_register_value[368]/10.0);
-					strTemp.Format(_T("%.1f"),fValue);	
+					strTemp.Format(_T("%0.1f"),fValue);	
 
 					strTemp +=strValueUnit;
 				}
@@ -2757,7 +2758,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 				else if (product_register_value[360]==4 )  // custom sensor
 				{					
 					fValue=float(product_register_value[368]/10.0);
-					strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
+					strTemp.Format(_T("%0.1f"), (float)fValue/10.0);	
 					strTemp +=strValueUnit;
 				}
 				else if(product_register_value[360]==2)
@@ -2787,7 +2788,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 				strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
 				if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)//188
 				{	
-					strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_0]/10);//180
+					strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_0]/10);//180
 					strTemp=strTemp+strUnit;
 				}
 				if (product_register_value[MODBUS_ANALOG_IN1]==0||product_register_value[MODBUS_ANALOG_IN1]==2)//188
@@ -2816,7 +2817,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 				if(product_register_value[MODBUS_ANALOG_IN2]==4||product_register_value[MODBUS_ANALOG_IN2]==1)//189
 				{
 
-					strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_1]/10);	//181 
+					strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_1]/10);	//181 
 					strTemp=strTemp+strUnit;
 				}
 				if (product_register_value[MODBUS_ANALOG_IN2]==0||product_register_value[MODBUS_ANALOG_IN2]==2)//189
@@ -2849,7 +2850,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			m_inputValue2.SetWindowText(strTemp);
 
 		}
-		strTemp.Format(_T("%.1f"),product_register_value[MODBUS_UNIVERSAL_NIGHTSET]/10.0);			//275 
+		strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_UNIVERSAL_NIGHTSET]/10.0);			//275 
 		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->SetWindowText(strTemp+strValueUnit);
 #endif
 	}
@@ -2860,7 +2861,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	float m_fFirmwareVersion=get_curtstat_version();//0912
-	if (multi_register_value[7] == PM_TSTAT5E)//0912
+	if (product_register_value[7] == PM_TSTAT5E)//0912
 	{
 		short nOccupied = product_register_value[184];  // Day setpoint option  
 		BOOL bOccupied = nOccupied & 0x0001;
@@ -2896,8 +2897,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	switch(index)
 	{
 	case 0:
-		GetDlgItem(IDC_STATIC_CSP)->SetWindowText(_T("Cooling Set Point"));
-		GetDlgItem(IDC_STATIC_HSP)->SetWindowText(_T("Heating Set Point"));
+		GetDlgItem(IDC_STATIC_CSP)->SetWindowText(_T("Cooling SetPoint"));
+		GetDlgItem(IDC_STATIC_HSP)->SetWindowText(_T("Heating SetPoint"));
 		break;
 	case 1:
 		GetDlgItem(IDC_STATIC_CSP)->SetWindowText(_T("Cooling DB"));
@@ -2913,7 +2914,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 	strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
 	strTemp.Empty();
-	strTemp.Format(_T("%.1f"),product_register_value[MODBUS_UNIVERSAL_SET]/10.0);	 //246  359
+	strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_UNIVERSAL_SET]/10.0);	 //246  359
 	strTemp=strTemp+strUnit;
 	m_pid_setptEdt2.SetWindowText(strTemp);
 
@@ -2926,24 +2927,24 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	//114	385	1	Low byte	R	COOLING PTERM , proportional term for PI calculation
-	strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_COOLING_PTERM]/10.0);	//114  385
+	strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_COOLING_PTERM]/10.0);	//114  385
 	m_pternEdt1.SetWindowText(strTemp);
 
-	strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_UNIVERSAL_PTERM]/10.0);		//244  387
+	strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_UNIVERSAL_PTERM]/10.0);		//244  387
 	m_ptermEdt2.SetWindowText(strTemp);
 
 
 
 
-	strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_COOLING_ITERM]/10.0);	//115  386
+	strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_COOLING_ITERM]/10.0);	//115  386
 	m_coolingPitemEdt1.SetWindowText(strTemp);
 
-	strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_UNIVERSAL_ITERM]/10.0);	//245  388
+	strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_UNIVERSAL_ITERM]/10.0);	//245  388
 	m_pidPitemEdt2.SetWindowText(strTemp);
 
 	strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
 	strTemp.Empty();
-	strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_UNIVERSAL_SET]/10.0);	//246  359
+	strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_UNIVERSAL_SET]/10.0);	//246  359
 	strTemp+=strUnit;
 	m_dayOccEdt2.SetWindowText(strTemp);
 
@@ -2951,7 +2952,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	//下面有问题;
 	//if (product_register_value[MODBUS_INPUT1_SELECT]==3) // humidity		//241
 	//{
-	//	strTemp.Format(_T("%.1f%%"),multi_register_value[422]/10.0);	//422 Don't know why???
+	//	strTemp.Format(_T("%0.1f%%"),product_register_value[422]/10.0);	//422 Don't know why???
 	//	m_dayOccEdt2.SetWindowText(strTemp);
 	//}
 
@@ -2960,14 +2961,14 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 	if(product_type!=T3000_6_ADDRESS)
 	{
-		if(m_version<34.9 || multi_register_value[7] == PM_TSTAT5E||
+		if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E||
 			(product_register_value[7] == PM_TSTAT5G))   // ÀÏ°æ±¾135£¬ÐÂ°æ±¾374// ÀÏ°æ±¾²»³ý10£¬
 		{
 			strTemp.Format(_T("%d"),(int)product_register_value[MODBUS_COOLING_SETPOINT]);//135
 		}
 		else
 		{
-			strTemp.Format(_T("%.1f"),product_register_value[MODBUS_TWO_BYTE_SETPOINT]/10.0);	// set point for TStat A,B,C,D	//374
+			strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_TWO_BYTE_SETPOINT]/10.0);	// set point for TStat A,B,C,D	//374
 		}	
 
 		m_dayOccEdt1.SetWindowText(strTemp);
@@ -2981,14 +2982,14 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		else
 		{
 			// unoccupied and office mode, we should recalc the setpoint here	
-			short nOccupied = multi_register_value[184];  // Day setpoint option  //184
+			short nOccupied = product_register_value[184];  // Day setpoint option  //184
 
 
 			BOOL bOccupied = nOccupied & 0x0001;
-			if (!bOccupied && multi_register_value[125] == 0)  // unoccupied and office mode	//125
+			if (!bOccupied && product_register_value[125] == 0)  // unoccupied and office mode	//125
 			{ 
-				float temp =float( (multi_register_value[183]-multi_register_value[182]) / 2.0 + multi_register_value[182] );//183  182  182
-				//strTemp.Format(_T("%.1f"),temp);
+				float temp =float( (product_register_value[183]-product_register_value[182]) / 2.0 + product_register_value[182] );//183  182  182
+				//strTemp.Format(_T("%0.1f"),temp);
 				strTemp.Format(_T("%d"),(int)temp);
 			}
 			m_pid_setptEdt1.SetWindowText(strTemp+strUnit);
@@ -2998,9 +2999,11 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	}
 	else
 	{
-		strTemp.Format(_T("%.1f"),product_register_value[MODBUS_DAY_SETPOINT]/10.0);//345	set point 
+		strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_DAY_SETPOINT]/10.0);//345	set point 
+        strTemp+=strUnit;
 		m_dayOccEdt1.SetWindowText(strTemp);
 		float temp =float(product_register_value[MODBUS_DAY_SETPOINT]/10.0);
+         strTemp+=strUnit;
 		strTemp.Format(_T("%d"),(int)temp);
 		m_pid_setptEdt1.SetWindowText(strTemp+strUnit);
 	}
@@ -3013,44 +3016,46 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	m_setptHiEdit.SetWindowText(strTemp);
 
 	strTemp.Empty();
-	//strTemp.Format(_T("%d"),multi_register_value[132]);
+	//strTemp.Format(_T("%d"),product_register_value[132]);
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_MIN_SETPOINT]);//132  366
 	strTemp+=strUnit;
 	m_setptLoEdit.SetWindowText(strTemp);
 
 	//119	346	1	Low byte	W/R	(Day)Occupied cooling setpoint dead band  , offset from setpoint for cooling to begin.  Units are 0.1 deg.
 	//		347	1	Low byte	W/R	(Day)Occupied heating setpoint dead band  , offset from setpoint for heating to begin.  Units are 0.1 deg.
-
+    strUnit=GetTempUnit();
 	if(product_type!=T3000_6_ADDRESS)
 	{
 		strTemp.Empty();
-		strTemp.Format(_T("%.1f"),product_register_value[MODBUS_COOLING_DEADBAND]/10.0);	//119
+		strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_COOLING_DEADBAND]/10.0);	//119
 		strTemp+=strUnit;
 		m_setptCDDEdt1.SetWindowText(strTemp);
 
 		strTemp.Empty();
-		strTemp.Format(_T("%.1f"),product_register_value[MODBUS_HEATING_DEADBAND]/10.0);	//120
+		strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_HEATING_DEADBAND]/10.0);	//120
 		strTemp+=strUnit;
 		m_HeadDEdt1.SetWindowText(strTemp);
 	}
 	else
 	{
-		strTemp.Format(_T("%.1f"),product_register_value[MODBUS_DAY_COOLING_DEADBAND]/10.0);
+		strTemp.Format(_T("%0.1f"),((float)product_register_value[MODBUS_DAY_COOLING_DEADBAND])/10.0);
+         strTemp+=strUnit;
 		m_setptCDDEdt1.SetWindowText(strTemp);
 
 
-		strTemp.Format(_T("%.1f"),product_register_value[MODBUS_DAY_HEATING_DEADBAND]/10.0);
+		strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_DAY_HEATING_DEADBAND]/10.0);
+         strTemp+=strUnit;
 		m_HeadDEdt1.SetWindowText(strTemp);
 
 	}
     strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
 	strTemp.Empty();
-	strTemp.Format(_T("%.1f"),product_register_value[MODBUS_UNIVERSAL_DB_LO]/10.0);//243->361
+	strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_UNIVERSAL_DB_LO]/10.0);//243->361
 	strTemp+=strUnit;
 	m_setptCCDEdt2.SetWindowText(strTemp);
 
 	strTemp.Empty();
-	strTemp.Format(_T("%.1f"),product_register_value[MODBUS_UNIVERSAL_DB_HI]/10.0);// 242->360
+	strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_UNIVERSAL_DB_HI]/10.0);// 242->360
 	strTemp+=strUnit;
 	m_HeadDEdt2.SetWindowText(strTemp);
 
@@ -3183,7 +3188,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	 
-	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
 	{
 		m_coolsp= product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10;//348
 
@@ -3204,39 +3209,77 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		m_heatdbN=product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//352
 		m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
 	}
-	CenterWindow(this);
-	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
-	{
-		WINDOWPLACEMENT wp;
+    //CenterWindow(this);
+    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
+    {
+        //WINDOWPLACEMENT wp;
+        //GetWindowPlacement(&wp);
+        //wp.rcNormalPosition.bottom += 120;
+        //SetWindowPlacement(&wp);
+        //GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_1SP2SPN)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_COOLDBN)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_SPN)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_HEATDBN)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_HEATSPN)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_COOLSPN)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_COMBO1)->ShowWindow(SW_NORMAL);
+        GetDlgItem(IDC_STATIC_DAYN)->ShowWindow(SW_NORMAL);
 
-		GetWindowPlacement(&wp);
+        GetDlgItem(IDC_EDIT_CDBDN)->ShowWindow(SW_NORMAL);
+         GetDlgItem(IDC_EDIT31)->ShowWindow(SW_NORMAL);
+          GetDlgItem(IDC_EDIT34)->ShowWindow(SW_NORMAL);
+           GetDlgItem(IDC_EDIT37)->ShowWindow(SW_NORMAL);
+            GetDlgItem(IDC_EDIT_CSPD)->ShowWindow(SW_NORMAL);
 
-		wp.rcNormalPosition.bottom += 120;
+             GetDlgItem(IDC_STATIC_NIGHTN)->ShowWindow(SW_NORMAL);
+             GetDlgItem(IDC_COMBO4)->ShowWindow(SW_NORMAL);
+             GetDlgItem(IDC_EDIT_CDBNN)->ShowWindow(SW_NORMAL);
+             GetDlgItem(IDC_EDIT32)->ShowWindow(SW_NORMAL);
+             GetDlgItem(IDC_EDIT35)->ShowWindow(SW_NORMAL);
+             GetDlgItem(IDC_EDIT38)->ShowWindow(SW_NORMAL);
+             GetDlgItem(IDC_EDIT_CSPNN)->ShowWindow(SW_NORMAL);
 
-		SetWindowPlacement(&wp);
+             GetDlgItem(IDC_STATIC_SETPOINTN)->ShowWindow(SW_NORMAL);
 
-		GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_NORMAL);
-
-
-	 
-	} 
+    } 
 	else
 	{
 
-		WINDOWPLACEMENT wp;
-		GetWindowPlacement(&wp);
+		//WINDOWPLACEMENT wp;
+		//GetWindowPlacement(&wp);
+		//CRect rc;
+		//CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
+		//pWnd->GetWindowRect(&rc);
+		////ScreenToClient(&rc);
+		//wp.rcNormalPosition.bottom = rc.bottom - 10;
+		//SetWindowPlacement(&wp);
+		//GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_HIDE); 
 
-		CRect rc;
-		CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
-		pWnd->GetWindowRect(&rc);
-		//ScreenToClient(&rc);
+        GetDlgItem(IDC_STATIC_1SP2SPN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_COOLDBN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_SPN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_HEATDBN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_HEATSPN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_COOLSPN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_COMBO1)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_DAYN)->ShowWindow(SW_HIDE);
 
-		wp.rcNormalPosition.bottom = rc.bottom - 10;
-		SetWindowPlacement(&wp);
+        GetDlgItem(IDC_EDIT_CDBDN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT31)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT34)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT37)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT_CSPD)->ShowWindow(SW_HIDE);
 
-		GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_HIDE); 
+        GetDlgItem(IDC_STATIC_NIGHTN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_COMBO4)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT_CDBNN)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT32)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT35)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT38)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_EDIT_CSPNN)->ShowWindow(SW_HIDE);
 
-
+        GetDlgItem(IDC_STATIC_SETPOINTN)->ShowWindow(SW_HIDE);
 	 
 	}
 ShowPID3();
@@ -3275,7 +3318,7 @@ void CParameterDlg::OnEnKillfocusEditPid2offsetpoint()
 {
 
 	CString str;
-	//str.Format(_T("%d"),multi_register_value[275]);
+	//str.Format(_T("%d"),product_register_value[275]);
 	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->GetWindowText(str);
 	float nValue= _wtof(str);
 
@@ -3723,7 +3766,7 @@ void CParameterDlg::ShowPID3(){
 				strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
 				if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)//188
 				{	
-					strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_0]/10);//180
+					strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_0]/10);//180
 					strTemp=strTemp+strUnit;
 				}
 				if (product_register_value[MODBUS_ANALOG_IN1]==0||product_register_value[MODBUS_ANALOG_IN1]==2)//188
@@ -3752,7 +3795,7 @@ void CParameterDlg::ShowPID3(){
 				if(product_register_value[MODBUS_ANALOG_IN2]==4||product_register_value[MODBUS_ANALOG_IN2]==1)//189
 				{
 
-					strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_1]/10);	//181 
+					strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_1]/10);	//181 
 					strTemp=strTemp+strUnit;
 				}
 				if (product_register_value[MODBUS_ANALOG_IN2]==0||product_register_value[MODBUS_ANALOG_IN2]==2)//189
