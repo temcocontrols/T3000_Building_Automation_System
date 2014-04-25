@@ -6008,6 +6008,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				//if(( m_product.at(i).protocol == PROTOCOL_BACNET_IP) && (m_product.at(i).BuildingInfo.strProtocol.CompareNoCase(_T("BacnetIP")) == 0))
 				//if(product_Node.BuildingInfo.strProtocol.CompareNoCase(_T("BacnetIP")) == 0 )
 				//{
+					if(product_Node.product_class_id == PM_CM5)
+						bacnet_device_type = PRODUCT_CM5;
 					CString temp_csa;
 					temp_csa =  product_Node.BuildingInfo.strComPort;
 					temp_csa = temp_csa.Right(temp_csa.GetLength() - 3);
@@ -6015,7 +6017,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					g_selected_serialnumber = m_product.at(i).serial_number;
 					g_mac = m_product.at(i).software_version;
 					g_gloab_bac_comport =_wtoi(temp_csa);
-					if((g_bac_instance == 0) || (g_mac == 0))
+					if((g_bac_instance == 0) || (g_mac == 0) || (product_Node.product_class_id == PM_MINIPANEL))
 					{	
 						g_CommunicationType = 1;
 						SetCommunicationType(1);
@@ -6023,6 +6025,17 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						{
 							m_pTreeViewCrl->turn_item_image(hSelItem ,true);//只要能连接上这个IP 就说明这个设备在线;
 							
+							if(product_Node.product_class_id == PM_CM5)
+								bacnet_device_type = PRODUCT_CM5;
+							else
+							{
+								int ret = 0;
+								ret = read_one(g_tstat_id,34,5);
+								if(ret == 1)
+									bacnet_device_type = BIG_MINIPANEL;
+								else
+									bacnet_device_type = SMALL_MINIPANEL;
+							}
 							g_bac_instance = read_one(g_tstat_id,35,5);
 							g_mac = read_one(g_tstat_id,110,5);
 							if((g_bac_instance<=0) || (g_mac <=0))

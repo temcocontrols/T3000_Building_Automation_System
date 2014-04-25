@@ -26,6 +26,7 @@ public:
 	afx_msg LRESULT Fresh_Input_Item(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT InputMessageCallBack(WPARAM wParam, LPARAM lParam);
 	void Initial_List();
+	void Reload_Unit_Type();
 	ListCtrlEx::CListCtrlEx m_input_list;
 	afx_msg void OnBnClickedOk();
 //	afx_msg void OnBnClickedButtonCheckInvokeId();
@@ -49,11 +50,12 @@ const int INPUT_VALUE = 3;
 const int INPUT_UNITE = 4;
 const int INPUT_RANGE = 5;
 const int INPUT_CAL = 6;
-const int INPUT_FITLER = 7;
-const int INPUT_DECOM = 8;
-const int INPUT_LABLE = 9;
+const int INPUT_CAL_OPERATION = 7;
+const int INPUT_FITLER = 8;
+const int INPUT_DECOM = 9;
+const int INPUT_LABLE = 10;
 
-const int INPUT_COL_NUMBER = 10;
+const int INPUT_COL_NUMBER = 11;
 
 const CString Input_Range_Array[7] = 
 {
