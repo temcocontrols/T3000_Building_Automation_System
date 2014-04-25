@@ -9084,20 +9084,23 @@ void CMainFrame::OnDatabaseIonameconfig()
 
 void CMainFrame::OnDatabaseMbpoll()
 {
-	// TODO: Add your command handler code here
-	if (mbPollDlgOpen == TRUE) 
-		{
-		mbPoll->ShowWindow(SW_SHOW);
-		return;
-		}
+	//// TODO: Add your command handler code here
+	//if (mbPollDlgOpen == TRUE) 
+	//	{
+	//	mbPoll->ShowWindow(SW_SHOW);
+	//	return;
+	//	}
 
-	mbPollDlgOpen = TRUE;
+	//mbPollDlgOpen = TRUE;
 
-	mbPoll = new CMbPoll(this);
+	//mbPoll = new CMbPoll(this);
 
-	//mbPoll->Create(IDD_MBPOLL, GetDesktopWindow());
-	mbPoll->Create(IDD_MBPOLL, this);
-	mbPoll->ShowWindow(SW_SHOW);
+	////mbPoll->Create(IDD_MBPOLL, GetDesktopWindow());
+	//mbPoll->Create(IDD_MBPOLL, this);
+	//mbPoll->ShowWindow(SW_SHOW);
+
+	CString strHistotyFile=g_strExePth+_T("Modbus Poll.exe");
+	ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
 }
 
 

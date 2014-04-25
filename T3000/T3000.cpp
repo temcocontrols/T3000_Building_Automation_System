@@ -123,10 +123,14 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 
 
 
-void CT3000App::JudgeDB(){
+BOOL CT3000App::JudgeDB(){
  CADO ado;
  int versionno=0;
- ado.OnInitADOConn();
+ BOOL Ret=ado.OnInitADOConn();
+ if (!Ret)
+ {
+ return Ret;
+ }
  if (ado.IsHaveTable(ado,_T("Version")))//有Version表
  {
    CString sql=_T("Select * from Version");
@@ -198,7 +202,7 @@ void CT3000App::JudgeDB(){
 		 //CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
 		 //没有找到就创建一个默认的数据库
 		 filePath=g_strExePth+_T("Database\\T3000.mdb");
-		 HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DATABASE), _T("DB"));   
+		 HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DB2), _T("T3000_DB"));   
 		 HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 
 
@@ -251,6 +255,7 @@ void CT3000App::JudgeDB(){
  }
 
 
+ return TRUE;
 
 }
  
@@ -318,7 +323,7 @@ BOOL CT3000App::InitInstance()
 		//CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
 		  //没有找到就创建一个默认的数据库
 		FilePath=g_strExePth+_T("Database\\T3000.mdb");
-		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DATABASE), _T("DB"));   
+		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DB2), _T("T3000_DB"));   
 		HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 
 
@@ -337,7 +342,27 @@ BOOL CT3000App::InitInstance()
 	g_strImgeFolder=g_strExePth+_T("Database\\image\\");//
 	CreateDirectory(g_strImgeFolder,NULL);//
 
- 	JudgeDB();
+  
+   BOOL Ret=JudgeDB();
+   if (!Ret)
+   {
+       FilePath=g_strExePth+_T("Database\\t3000.mdb");
+       DeleteFile(FilePath.GetBuffer());
+       HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DB1), _T("T3000_DB"));   
+       HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+
+
+       LPVOID lpExe = LockResource(hGlobal);   
+       CFile file;
+       if(file.Open(FilePath, CFile::modeCreate | CFile::modeWrite))    
+           file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+       file.Close();    
+       ::UnlockResource(hGlobal);   
+       ::FreeResource(hGlobal);
+        JudgeDB();
+
+   }
+  
 	//CString strocx=g_strExePth+_T("MSFLXGRD.OCX");
 	
 	/*CStdioFile file;

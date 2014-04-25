@@ -212,22 +212,35 @@ WORD CHexFileParser::GetHighAddrFromFile(const CString& strLine)
 
 BOOL CHexFileParser::ReadLineFromFile(CFile& file, char* pBuffer)
 {
+	//当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题
+	int linecharnum=0;
 	char c;
 	int nRet = file.Read(&c, 1);
 
 	while(nRet != 0)
 	{
+		++linecharnum;
 		*pBuffer++ = c;
-
+		TRACE(_T("\n%c"),c);
 		if (c == 0x0d) // 回车
 		{
 			file.Read(&c, 1);  // 读一个换行
 			*pBuffer++ = c;
+			TRACE(_T("%s"),pBuffer);
 			return TRUE;
 		}
-		file.Read(&c, 1);
-	}
+		if (linecharnum<256)
+		{
+			file.Read(&c, 1);
+		}
+		else
+		{
+			AfxMessageBox(_T("The Hex File Corruption"));
+			return FALSE;
+		}
 
+	}
+	TRACE(_T("%s"),pBuffer);
 	return FALSE;
 }
 
