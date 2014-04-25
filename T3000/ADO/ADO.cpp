@@ -34,7 +34,7 @@ void CADO::DeleteDB(){
 CString filePath=g_strExePth+_T("Database\\T3000.mdb");
 DeleteFile(filePath);
 }
-void CADO::OnInitADOConn()
+BOOL CADO::OnInitADOConn()
 {
 	::CoInitialize(NULL);
 	try 
@@ -79,9 +79,11 @@ void CADO::OnInitADOConn()
 	}
 	catch(_com_error e)
 	{
-		AfxMessageBox(e.Description());
+		//AfxMessageBox(e.Description());
+        return FALSE;
 	}
 
+    return TRUE;
 
 }
 

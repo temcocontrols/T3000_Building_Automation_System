@@ -26,6 +26,7 @@
 #include "../FlexSlideBar/FSBContainer.h"
 #include "DisplayConfig.h"
 #include "DisplayLEDLCDConfig.h"
+#include "HtmlHelp.h"
 // #define _CRTDBG_MAP_ALLOC
 // #include "stdlib.h"
 // #include "crtdbg.h"
@@ -89,6 +90,8 @@ BEGIN_MESSAGE_MAP(CT3000View, CFormView)
 	ON_CBN_SELCHANGE(IDC_STATICUNINT, &CT3000View::OnCbnSelchangeStaticunint)
 	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_DAY, &CT3000View::OnNMReleasedcaptureSliderDay)
 	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_NIGHT, &CT3000View::OnNMReleasedcaptureSliderNight)
+ ON_WM_HELPINFO()
+    ON_BN_CLICKED(IDC_HELP, &CT3000View::OnBnClickedHelp)
 	ON_BN_CLICKED(IDC_BTN_TOPOLOGICAL, &CT3000View::OnBnClickedBtnTopological)
 END_MESSAGE_MAP()
 
@@ -282,21 +285,13 @@ void CT3000View::OnInitialUpdate()
 
 
 
-	m_singlesliderday.SetThumbColor(RGB(0, 0, 255));
-	m_singlesliderday.SetSelectionColor(RGB(64, 64, 255)); 
-	m_singlesliderday.SetChannelColor(RGB(196, 196, 255)); 
-
- 
+	//m_singlesliderday.SetThumbColor(RGB(0, 0, 255));RGB(96,192,0)
 
 
-	m_singleslidernight.SetThumbColor(RGB(0, 0, 255));
-	m_singleslidernight.SetSelectionColor(RGB(255, 0, 255)); 
-	m_singleslidernight.SetChannelColor(RGB(0, 255, 255)); 
 
+    //GetDlgItem(IDC_SLIDER_DAY)->ShowWindow(SW_HIDE);
 
- 	GetDlgItem(IDC_SLIDER_DAY)->ShowWindow(SW_HIDE);
- 
- 	GetDlgItem(IDC_SLIDER_NIGHT)->ShowWindow(SW_HIDE);
+    //GetDlgItem(IDC_SLIDER_NIGHT)->ShowWindow(SW_HIDE);
 	CString lightsensor;
 	lightsensor.Format(_T("%d"),product_register_value[MODBUS_VALUE_SENSOR]);
 	GetDlgItem(IDC_LIGHTING_SENSOR)->SetWindowText(lightsensor);
@@ -337,8 +332,8 @@ void CT3000View::CreateFlexSilde()
 		m_pNightTwoSP->SetChannelColor(RGB(192,192,192));
 		m_pNightTwoSP->SetThumbColor(RGB(0,0,255)); //改变上面滑块的颜色
 		m_pNightTwoSP->SetPageLength(5);
-		m_pNightTwoSP->SetChannelWidth(10);//中间的坚状条大小
-		m_pNightTwoSP->SetThumbWidth(24);//滑块的大小
+		m_pNightTwoSP->SetChannelWidth(20);//中间的坚状条大小
+		m_pNightTwoSP->SetThumbWidth(34);//滑块的大小
 
 		m_pNightTwoSP->SetRange(10, 0);
 		m_pNightTwoSP->SetPos(0, 1, 2);	
@@ -375,8 +370,8 @@ void CT3000View::CreateFlexSilde()
 
 
 		m_pNightSingleSP->SetPageLength(5);
-		m_pNightSingleSP->SetChannelWidth(10);
-		m_pNightSingleSP->SetThumbWidth(24);
+		m_pNightSingleSP->SetChannelWidth(20);
+		m_pNightSingleSP->SetThumbWidth(34);
 		
 		m_pNightSingleSP->SetRange(10, 0);
 		m_pNightSingleSP->SetPos(0, 1, 2);
@@ -406,8 +401,8 @@ void CT3000View::CreateFlexSilde()
 		m_pDayTwoSP->SetChannelColor(RGB(192,192,192));
 		m_pDayTwoSP->SetThumbColor(RGB(0,0,255));
 		m_pDayTwoSP->SetPageLength(5);
-		m_pDayTwoSP->SetChannelWidth(10);
-		m_pDayTwoSP->SetThumbWidth(24);
+		m_pDayTwoSP->SetChannelWidth(20);
+		m_pDayTwoSP->SetThumbWidth(34);
 
 		m_pDayTwoSP->SetRange(10, 0);
 		m_pDayTwoSP->SetPos(0, 1, 2);	
@@ -430,8 +425,8 @@ void CT3000View::CreateFlexSilde()
 		m_pDaySingleSP->SetChannelColor(RGB(192,192,192));
 		m_pDaySingleSP->SetThumbColor(RGB(255,128,128));
 		m_pDaySingleSP->SetPageLength(5);
-		m_pDaySingleSP->SetChannelWidth(10);
-		m_pDaySingleSP->SetThumbWidth(24);
+		m_pDaySingleSP->SetChannelWidth(20);
+		m_pDaySingleSP->SetThumbWidth(34);
 
 		m_pDaySingleSP->SetRange(10, 0);
 		m_pDaySingleSP->SetPos(0, 1, 2);	
@@ -527,6 +522,8 @@ void CT3000View::Fresh()
 	strTemp.Format(_T("Min=%d"),product_register_value[MODBUS_MIN_SETPOINT]);
 	GetDlgItem(IDC_MIN)->SetWindowText(strTemp);
 	GetDlgItem(IDC_MIN2)->SetWindowText(strTemp);
+    strTemp.Format(_T("%d"),product_register_value[MODBUS_PIC_VERSION]);
+    GetDlgItem(IDC_PIC_EDIT)->SetWindowText(strTemp);
     FreshCtrl();
 	FreshIOGridTable();
 	
@@ -543,6 +540,15 @@ HBRUSH CT3000View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	
 	switch(pWnd->GetDlgCtrlID())
 	{
+
+    case IDC_STATIC_DAYCOOL:
+        {
+            pDC->SetTextColor(RGB(255,255,255));
+            pDC->SetBkColor(RGB(0,0,255));
+            pDC->SetBkMode(TRANSPARENT);
+            HBRUSH B = CreateSolidBrush(RGB(0,0,255));
+            return (HBRUSH)B;
+        }
 	case IDC_EDIT_DAYCOOL:
 	{
 		pDC->SetTextColor(RGB(255,255,255));
@@ -559,6 +565,14 @@ HBRUSH CT3000View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 		HBRUSH B = CreateSolidBrush(RGB(0,0,255));
 		return (HBRUSH)B;
 	}
+    case IDC_STATIC_DAYHEAT:
+    {
+        pDC->SetTextColor(RGB(255,255,255));
+        //pDC->SetBkColor(RGB(255,255,255));
+        pDC->SetBkMode(TRANSPARENT);
+        HBRUSH B = CreateSolidBrush(RGB(255,0,0));
+        return (HBRUSH)B;
+    }
 	case IDC_EDIT_DAYHEAT:
 	{
 		pDC->SetTextColor(RGB(255,255,255));
@@ -575,6 +589,18 @@ HBRUSH CT3000View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 		HBRUSH B = CreateSolidBrush(RGB(255,0,0));
 		return (HBRUSH)B;
 	}
+    //RGB(96,192,0)
+  //  
+
+    case IDC_TEMPINFO_EDIT:
+        {
+            pDC->SetTextColor(RGB(255,255,255));
+            //pDC->SetBkColor(RGB(255,255,255));
+            pDC->SetBkMode(TRANSPARENT);
+            HBRUSH B = CreateSolidBrush(RGB(96,192,0));
+            return (HBRUSH)B;
+        }
+
 	default:
 		return CFormView::OnCtlColor(pDC,pWnd, nCtlColor);
 	}
@@ -607,23 +633,19 @@ void CT3000View::InitSliderBars2()
  
 
 	float itemp;
-	if(product_register_value[7] == PM_TSTAT5E)
-	{
-		itemp=(float)(product_register_value[135]);
-	}
-	else
-	{
-		itemp=(float)(product_register_value[374]/10.0);
-	}
-//0913
-// 	strTemp.Format(_T("%.1f"),itemp);
-// 	m_dayInfoEdit.SetWindowText(strTemp);
-	m_daySlider.SetRange(min,max);
-	m_daySlider.SetPos(int(max-itemp+min));
-	//m_daySlider.ShowWindow(SW_NORMAL);
+    if(product_register_value[7] == PM_TSTAT5E)
+    {
+        itemp=(float)(product_register_value[MODBUS_COOLING_SETPOINT]);
+    }
+    else
+    {
+        itemp=(float)(product_register_value[MODBUS_TWO_BYTE_SETPOINT]/10.0);
+    }
+ 
+ 
 	int nSP =(int)itemp;//(max-itemp+min);
 
-	short nOccupied = product_register_value[184];  // Day setpoint option  
+	short nOccupied = product_register_value[MODBUS_INFO_BYTE];  // Day setpoint option  
 	BOOL bOccupied = nOccupied & 0x0001;
 
 
@@ -1480,7 +1502,7 @@ void CT3000View::Fresh_In()
 	CString strTemp;
 	strTemp.Empty();
 	if( nModel==2||nModel==1||nModel==4||nModel==PM_TSTAT5D||nModel==17||nModel==18
-		|| nModel==3||nModel==PM_TSTAT6||nModel==PM_TSTAT7)//A,B,C,D ,F,G,6,7
+		|| nModel==3||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||nModel==PM_TSTAT7)//A,B,C,D ,F,G,6,7
 	{
 		//strTemp.Format(_T("Input %d"),1);
 		m_Input_Grid.put_TextMatrix(1,1,g_strSensorName);
@@ -1965,7 +1987,7 @@ void CT3000View::Fresh_In()
 
 
 	
-	if(nModel == PM_TSTAT6 ||nModel == PM_TSTAT7)// Tstat 6
+	if(nModel == PM_TSTAT6 ||nModel == PM_TSTAT7 ||nModel == PM_TSTAT5i)// Tstat 6
 	{
 
 		//Mdb_Adress_Map = T3000_6_ADDRESS; //让其在 T3000_6_ADDRESS 中 进行地址 Maping;
@@ -2280,7 +2302,7 @@ void CT3000View::Fresh_Out()
 	//==========================================================================
 	//ABCDEFG,noH
 	if(nModel==2||nModel==1||nModel==4||nModel==12||nModel==16	||nModel==17||nModel==18||nModel==3
-		||nModel==PM_TSTAT6||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
+		||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
 	{
 		m_Output_Grid.put_TextMatrix(1,1,g_strOutName1);
 		m_Output_Grid.put_TextMatrix(2,1,g_strOutName2);
@@ -2302,7 +2324,7 @@ void CT3000View::Fresh_Out()
 	////----------------------------------------------------------------------
 	//4,5
 	if(nModel==1||nModel==4||nModel==12||nModel==16||nModel==3
-		||nModel==PM_TSTAT6||nModel==PM_TSTAT7||nModel==PM_PRESSURE)//B,C,D,E
+		||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||nModel==PM_PRESSURE)//B,C,D,E
 	{
 		if(itemp &( 1<<3))
 				strTemp=_T("ON");
@@ -2327,7 +2349,7 @@ void CT3000View::Fresh_Out()
 
 		//:DEG 6. 7
 		int nRange=product_register_value[MODBUS_OUTPUT1_SCALE];
-		if(nModel==12||nModel==16||nModel==18||nModel==PM_TSTAT6||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
+		if(nModel==12||nModel==16||nModel==18||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
 		{
 			if(nRange==0)
 			{
@@ -2585,6 +2607,11 @@ void CT3000View::FreshIOGridTable()
 				m_outRows=8;
 				m_inRows=12;
 			}break;
+        case PM_TSTAT5i:
+            {
+                m_outRows=8;
+                m_inRows=12;
+            }break;
 		case PM_TSTAT5E:
 			{
 				m_outRows=8;
@@ -3358,23 +3385,24 @@ void CT3000View::OnBnClickedOccupacheck()
 
 
 	CButton* pBtn = (CButton*)GetDlgItem(IDC_UNOCCUPIED_MARK);
+    
 	if(m_OcupiedBtn.GetCheck()==BST_UNCHECKED)
 	{
-		int ret=write_one(g_tstat_id,MODBUS_CALIBRATION,0);	//184  109
+		int ret=write_one(g_tstat_id,MODBUS_INFO_BYTE,0);	//184  109
 
 		if (ret>0)
 		{
-		product_register_value[MODBUS_CALIBRATION]=0;
+		product_register_value[MODBUS_INFO_BYTE]=0;
 		}
 	 
 		pBtn->SetCheck(1);
-		product_register_value[MODBUS_CALIBRATION] = 0;//184
+		product_register_value[MODBUS_INFO_BYTE] = 0;//184
 	}
 		
 	
 	if(m_OcupiedBtn.GetCheck()==BST_CHECKED)
 	{
-		int ret=write_one(g_tstat_id,MODBUS_CALIBRATION,1);	//184  109
+		int ret=write_one(g_tstat_id,MODBUS_INFO_BYTE,1);	//184  109
 		//Marked by Fance ,no need to judge
 		//if ((m_strModelName.CompareNoCase(_T("Tstat6")) == 0)||(m_strModelName.CompareNoCase(_T("Tstat7")) == 0))
 		//	write_one(g_tstat_id,_G("MODBUS_CALIBRATION"),1);//109
@@ -3382,7 +3410,7 @@ void CT3000View::OnBnClickedOccupacheck()
 		//	write_one(g_tstat_id,_G("MODBUS_INFO_BYTE"),1);//184
 		if (ret>0)
 		{
-			product_register_value[MODBUS_CALIBRATION]=1;
+			product_register_value[MODBUS_INFO_BYTE]=1;
 		}
 			product_register_value[MODBUS_INFO_BYTE] = 1;//184
 
@@ -3391,6 +3419,40 @@ void CT3000View::OnBnClickedOccupacheck()
 		
 	UpdateData(TRUE);
 		//stat6
+
+    if (product_register_value[MODBUS_INFO_BYTE]&1)
+    {
+        m_singlesliderday.SetThumbColor(RGB(96,192,0));
+        m_singlesliderday.SetSelectionColor(RGB(64, 64, 255)); 
+        m_singlesliderday.SetChannelColor(RGB(196, 196, 255)); 
+        
+
+
+
+        /*m_singleslidernight.SetThumbColor(RGB(0, 0, 255));*/
+        m_singleslidernight.SetThumbColor(RGB(255,255,255));
+        m_singleslidernight.SetSelectionColor(RGB(255, 0, 255)); 
+        m_singleslidernight.SetChannelColor(RGB(0, 255, 255)); 
+    } 
+    else
+    {
+        m_singlesliderday.SetThumbColor(RGB(255,255,255));
+        m_singlesliderday.SetSelectionColor(RGB(64, 64, 255)); 
+        m_singlesliderday.SetChannelColor(RGB(196, 196, 255)); 
+
+
+
+
+        /*m_singleslidernight.SetThumbColor(RGB(0, 0, 255));*/
+        m_singleslidernight.SetThumbColor(RGB(96,192,0));
+        m_singleslidernight.SetSelectionColor(RGB(255, 0, 255)); 
+        m_singleslidernight.SetChannelColor(RGB(0, 255, 255)); 
+    }
+   
+    int currenttemp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]-(int)product_register_value[MODBUS_TEMPRATURE_CHIP]/10;
+    m_singlesliderday.SetPos(currenttemp);
+
+    m_singleslidernight.SetPos(currenttemp);
 	Fresh();
 
 }
@@ -3438,6 +3500,42 @@ void CT3000View::OnBnClickedUnoccupiedMark()
 	}
 
 UpdateData(TRUE);
+
+if (product_register_value[MODBUS_INFO_BYTE]&1)
+{
+    m_singlesliderday.SetThumbColor(RGB(96,192,0));
+    m_singlesliderday.SetSelectionColor(RGB(64, 64, 255)); 
+    m_singlesliderday.SetChannelColor(RGB(196, 196, 255)); 
+
+    
+     
+
+    /*m_singleslidernight.SetThumbColor(RGB(0, 0, 255));*/
+    m_singleslidernight.SetThumbColor(RGB(255,255,255));
+    m_singleslidernight.SetSelectionColor(RGB(255, 0, 255)); 
+    m_singleslidernight.SetChannelColor(RGB(0, 255, 255));
+  
+} 
+else
+{
+    m_singlesliderday.SetThumbColor(RGB(255,255,255));
+    m_singlesliderday.SetSelectionColor(RGB(64, 64, 255)); 
+    m_singlesliderday.SetChannelColor(RGB(196, 196, 255)); 
+
+
+
+
+    /*m_singleslidernight.SetThumbColor(RGB(0, 0, 255));*/
+    m_singleslidernight.SetThumbColor(RGB(96,192,0));
+    m_singleslidernight.SetSelectionColor(RGB(255, 0, 255)); 
+    m_singleslidernight.SetChannelColor(RGB(0, 255, 255)); 
+
+  
+}
+int currenttemp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]-(int)product_register_value[MODBUS_TEMPRATURE_CHIP]/10;
+m_singlesliderday.SetPos(currenttemp);
+
+m_singleslidernight.SetPos(currenttemp);
 //stat6
 Fresh();
 
@@ -3506,7 +3604,7 @@ LRESULT CT3000View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	// TODO: Add your specialized code here and/or call the base class
 if(MsgT3000ViewFresh==message)
 	{
-		if((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) )
+		if((product_register_value[7] == PM_TSTAT6) || (product_register_value[7] == PM_TSTAT7) || (product_register_value[7] == PM_TSTAT5i))
 		{
 			product_type =T3000_6_ADDRESS;
 		}
@@ -3522,10 +3620,10 @@ if(MsgT3000ViewFresh==message)
 		}
 
 #if 1
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7))
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		//if (product_register_value[7] == 6)
 		{
-			if ((product_register_value[7] == PM_TSTAT6&&m_fFirmwareVersion>35.5)||(product_register_value[7] == PM_TSTAT7))
+			if ((product_register_value[7] == PM_TSTAT6&&m_fFirmwareVersion>35.5)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 			{
 			
 			//product_register_value[]列表交换。
@@ -3648,23 +3746,31 @@ CString m_张振中=_T("zhangzhenzhong");
 	BeginWaitCursor();
 	GetDlgItem(IDC_BTN_SYNCTIME)->EnableWindow(FALSE);
 	
-	szTime[0] = 11;//(BYTE)(time.GetYear());
-	int nRet = Write_One(g_tstat_id, 349, szTime[0]);
+	szTime[0] =(BYTE)(time.GetYear()%100);
+	int nRet = write_one(g_tstat_id,MODBUS_YEAR, szTime[0]);
+    Sleep(1000);
 	szTime[1] = (BYTE)(time.GetMonth());
-	nRet = Write_One(g_tstat_id, 350, szTime[1]);
+	nRet = write_one(g_tstat_id, MODBUS_MONTH, szTime[1]);
+    Sleep(1000);
 	szTime[2] = (BYTE)(time.GetDayOfWeek()-1);
-	nRet = Write_One(g_tstat_id, 351, szTime[2]);
+	nRet = write_one(g_tstat_id, MODBUS_WEEK, szTime[2]);
+    Sleep(1000);
 	szTime[3] = (BYTE)(time.GetDay());
-	nRet = Write_One(g_tstat_id, 352, szTime[3]);
+	nRet = write_one(g_tstat_id, MODBUS_DAY, szTime[3]);
+    Sleep(1000);
 	szTime[4] = (BYTE)(time.GetHour());
-	nRet = Write_One(g_tstat_id, 353, szTime[4]);
+	nRet = write_one(g_tstat_id, MODBUS_HOUR, szTime[4]);
+    Sleep(1000);
 	szTime[5] = (BYTE)(time.GetMinute());
-	nRet = Write_One(g_tstat_id, 354, szTime[5]);
+	nRet = write_one(g_tstat_id, MODBUS_MINUTE, szTime[5]);
+    Sleep(1000);
 	szTime[6] = (BYTE)(time.GetSecond());
-	nRet = Write_One(g_tstat_id, 355, szTime[6]);
+	nRet = write_one(g_tstat_id, MODBUS_SECOND, szTime[6]);
 
 	GetDlgItem(IDC_BTN_SYNCTIME)->EnableWindow(TRUE);
+    
 	EndWaitCursor();
+    AfxMessageBox(_T("Time synchronization is complete!"));
 #endif
 	
 	//int nRet = Write_Multi(g_tstat_id, szTime, 450, 8, 3);  // 这个写入有问题，所以变成单个字节写多次
@@ -3672,7 +3778,7 @@ CString m_张振中=_T("zhangzhenzhong");
 
 void CT3000View::OnBnClickedButtonSchedule()
 {
-	if(product_register_value[7] != PM_TSTAT6)
+	if((product_register_value[7] != PM_TSTAT6)&&(product_register_value[7] != PM_TSTAT5i))
 	{
 		AfxMessageBox(_T("This model of TStat don't support schedule!"));
 		return;
@@ -3997,7 +4103,7 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
   
 
 
-	if ((m_strModelName.CompareNoCase(_T("Tstat6")) == 0)||(m_strModelName.CompareNoCase(_T("Tstat7")) == 0))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		switch(wParam)
 		{
@@ -4013,7 +4119,7 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
 				int nHeatSP = szPos[0] + nMin;
 				int nCoolSP= szPos[1] + nMin;
 
-				if (product_register_value[7]==6||product_register_value[7]==7)
+				if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
 				{
 
 
@@ -4157,7 +4263,7 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
 				// 			tstat6flex[DcoolDB] =nCoolSP;
 				// 			tstat6flex[DheatDB] = nHeatSP;
 
-				if (product_register_value[7]==6||product_register_value[7]==7)
+				if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
 				{
 					
                     nSP=tstat6flex[DaySP];
@@ -4272,7 +4378,7 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
 		}
         
         Sleep(1000);
-       if (product_register_value[7]==6||product_register_value[7]==7)
+       if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
        {
          int ret=read_one(g_tstat_id,MODBUS_DAY_SETPOINT);
 		 if (ret>0)
@@ -4617,9 +4723,11 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//nCoolSP,nSP,nHeatSP//nMinPos < nMidPos && nMidPos < nMaxPos && nMinPos >= 0)
 			//if (!(nCoolSP<nSP&&nSP<nHeatSP&&nCoolSP>=0))
 			//0910
+            BOOL Default=TRUE;
 			if (!(nHeatSP<nSP&&nSP<nCoolSP&&nHeatSP>=0))
-			{
-				return;
+			{  
+                Default=FALSE;
+				/*return;*/
 			}
 			//nMinPos-m_nMin >=0&& nMidPos-m_nMin >=0 && nMaxPos-m_nMin >= 0);
 
@@ -4627,13 +4735,13 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//0910
 			if (!(nHeatSP-nRangeMin>=0&&nSP-nRangeMin>=0&&nCoolSP-nRangeMin>=0))
 			{
-				return;
+				Default=FALSE;
 			}
 			//if (nRangeMin<=0||nRangeMin<=0||nRangeMax<nHeatSP||nRangeMin>nCoolSP)
 			//0910
 			if (nRangeMin<=0||nRangeMin<=0||nRangeMax<nCoolSP||nRangeMin>nHeatSP)
 			{
-				return;
+				Default=FALSE;
 			}
 
 
@@ -4642,6 +4750,11 @@ void CT3000View::InitFlexSliderBars_tstat6()
 
 			//BOOL bRetSP = m_pDayTwoSP->SetPos_tstat6_2pos(nCoolSP,nSP,nHeatSP);
 			//0910
+            if(!Default){
+            nHeatSP=20;
+            nSP=25;
+            nCoolSP=30;
+            }
 			BOOL bRetSP = m_pDayTwoSP->SetPos_tstat6_2pos(nHeatSP,nSP,nCoolSP);
 			if (bRetSP)
 			{			
@@ -4706,10 +4819,10 @@ void CT3000View::InitFlexSliderBars_tstat6()
 //  			nHeatSP = newtstat6[nHeatingDBRegister];
 
 
+        
 
 
-
-
+            BOOL Default=TRUE;
 			nSP = product_register_value[MODBUS_DAY_SETPOINT]/10;	
 			nCoolSP = product_register_value[MODBUS_DAY_COOLING_DEADBAND]/10;
 
@@ -4725,7 +4838,7 @@ void CT3000View::InitFlexSliderBars_tstat6()
 
 			if (!(nHeatSP<nSP&&nSP<nCoolSP&&nHeatSP>=0))
 			{
-				return;
+				Default=FALSE;
 			}
 			//nMinPos-m_nMin >=0&& nMidPos-m_nMin >=0 && nMaxPos-m_nMin >= 0);
 
@@ -4733,14 +4846,14 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//0910
 			if (!(nHeatSP-nRangeMin>=0&&nSP-nRangeMin>=0&&nCoolSP-nRangeMin>=0))
 			{
-				return;
+				Default=FALSE;
 			}
 
 			//if (nRangeMin<=0||nRangeMin<=0||nRangeMax<nHeatSP||nRangeMin>nCoolSP)
 			//0910
 			if (nRangeMin<=0||nRangeMin<=0||nRangeMax<nCoolSP||nRangeMin>nHeatSP)
 			{
-				return;
+				Default=FALSE;
 			}
 
 
@@ -4754,6 +4867,12 @@ void CT3000View::InitFlexSliderBars_tstat6()
  			//BOOL bRetSP = m_pDaySingleSP->SetPos(nHeatSP, nSP, nCoolSP);	
  			//BOOL bRetSP = m_pDaySingleSP->SetPos_tstat6_3pos(nCoolSP, nSP, nHeatSP);//tstat6		
 			//0910
+            if(!Default){
+                nHeatSP=20;
+                nSP=25;
+                nCoolSP=30;
+            }
+
 			BOOL bRetSP = m_pDaySingleSP->SetPos_tstat6_3pos(nHeatSP, nSP,nCoolSP);//tstat6		
 // 			CString strInfo;
 // 			strInfo.Format(_T("bOccupied;hotel"));			
@@ -4853,7 +4972,7 @@ void CT3000View::InitFlexSliderBars_tstat6()
 // 			nCoolSP = newtstat6[NcoolSP];
 // 			nHeatSP = newtstat6[NheatSP];
 
-
+             BOOL Default=TRUE;
 
 			nSP = product_register_value[MODBUS_NIGHT_SETPOINT]/10;	
 			nCoolSP = product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10;
@@ -4868,7 +4987,7 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//0910
 			if (!(nHeatSP<nSP&&nSP<nCoolSP&&nHeatSP>=0))
 			{
-				return;
+				Default=FALSE;
 			}
 			//nMinPos-m_nMin >=0&& nMidPos-m_nMin >=0 && nMaxPos-m_nMin >= 0);
 
@@ -4876,19 +4995,19 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//0910
 			if (!(nHeatSP-nRangeMin>=0&&nSP-nRangeMin>=0&&nCoolSP-nRangeMin>=0))
 			{
-				return;
+				Default=FALSE;
 			}
 
 			if (nRangeMin<=0||nRangeMin<=0)
 			{
-				return;
+				Default=FALSE;
 			}
 
 		//	if (nRangeMin<=0||nRangeMin<=0||nRangeMax<nHeatSP||nRangeMin>nCoolSP)
 			//0910
 			if (nRangeMin<=0||nRangeMin<=0||nRangeMax<nCoolSP||nRangeMin>nHeatSP)
 			{
-				return;
+				Default=FALSE;
 			}
 
 
@@ -4906,6 +5025,12 @@ void CT3000View::InitFlexSliderBars_tstat6()
  
  			//BOOL bRetSP = m_pNightTwoSP->SetPos_tstat6_2pos(nCoolSP , nSP,nHeatSP);
 			//0910
+            if(!Default){
+                nHeatSP=20;
+                nSP=25;
+                nCoolSP=30;
+            }
+
 			BOOL bRetSP = m_pNightTwoSP->SetPos_tstat6_2pos(nHeatSP,nSP,nCoolSP);
  
  
@@ -5069,9 +5194,10 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//nCoolSP,nSP,nHeatSP//nMinPos < nMidPos && nMidPos < nMaxPos && nMinPos >= 0)
 			//if (!(nCoolSP<nSP&&nSP<nHeatSP&&nCoolSP>=0))
 			//0910
+            BOOL Default=TRUE;
 			if (!(nHeatSP<nSP&&nSP<nCoolSP&&nHeatSP>=0))
 			{
-				return;
+				Default=FALSE;
 			}
 			//nMinPos-m_nMin >=0&& nMidPos-m_nMin >=0 && nMaxPos-m_nMin >= 0);
 
@@ -5079,14 +5205,14 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//0910
 			if (!(nHeatSP-nRangeMin>=0&&nSP-nRangeMin>=0&&nCoolSP-nRangeMin>=0))
 			{
-				return;
+				Default=FALSE;
 			}
 
 			//if (nRangeMin<=0||nRangeMin<=0||nRangeMax<nHeatSP||nRangeMin>nCoolSP)
 			//0910
 			if (nRangeMin<=0||nRangeMin<=0||nRangeMax<nCoolSP||nRangeMin>nHeatSP)
 			{
-				return;
+				Default=FALSE;
 			}
 
 
@@ -5161,6 +5287,12 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//	BOOL bRetSP =  m_pNightSingleSP->SetPos( nHeatSP, nSP, nCoolSP);
 			//BOOL bRetSP = m_pNightSingleSP->SetPos_tstat6_3pos(nCoolSP, nSP,nHeatSP);
 			//0910
+            if(!Default){
+                nHeatSP=20;
+                nSP=25;
+                nCoolSP=30;
+            }
+
 			BOOL bRetSP = m_pNightSingleSP->SetPos_tstat6_3pos(nHeatSP,nSP,nCoolSP);
 // 			if (!bRetSP)
 // 			{			
@@ -5245,7 +5377,7 @@ void CT3000View::InitFlexSliderBars_tstat6()
 void CT3000View::OnNMReleasedcaptureTempretureSlider(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	// TODO: Add your control notification handler code here
-	if ((m_strModelName.CompareNoCase(_T("Tstat6")) == 0)||(m_strModelName.CompareNoCase(_T("Tstat7")) == 0))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 	int icurtemp = m_TemperaureSlider.GetPos();
 	int ret =0;
@@ -5389,7 +5521,7 @@ void CT3000View::FreshCtrl()
 	case 17: m_strModelName=g_strTstat5f;break;
 	case 18:m_strModelName=g_strTstat5g;break;
 	case 19:m_strModelName=g_strTstat5h;break;
-
+    case PM_TSTAT5i:m_strModelName=_T("Tstat 5i");break;
 	case PM_TSTAT6:m_strModelName=g_strTstat6;break;
 	case PM_TSTAT7:m_strModelName=g_strTstat7;break;
 	case PM_PRESSURE:m_strModelName=g_strPressure;break;
@@ -5486,6 +5618,40 @@ void CT3000View::FreshCtrl()
 		pBtn->SetCheck(1);
 	}
 
+    if (product_register_value[MODBUS_INFO_BYTE]&1)
+    {
+        m_singlesliderday.SetThumbColor(RGB(96,192,0));
+        m_singlesliderday.SetSelectionColor(RGB(64, 64, 255)); 
+        m_singlesliderday.SetChannelColor(RGB(196, 196, 255)); 
+
+
+
+
+        /*m_singleslidernight.SetThumbColor(RGB(0, 0, 255));*/
+        m_singleslidernight.SetThumbColor(RGB(255,255,255));
+        m_singleslidernight.SetSelectionColor(RGB(255, 0, 255)); 
+        m_singleslidernight.SetChannelColor(RGB(0, 255, 255)); 
+    } 
+    else
+    {
+        m_singlesliderday.SetThumbColor(RGB(255,255,255));
+        m_singlesliderday.SetSelectionColor(RGB(64, 64, 255)); 
+        m_singlesliderday.SetChannelColor(RGB(196, 196, 255)); 
+
+
+
+
+        /*m_singleslidernight.SetThumbColor(RGB(0, 0, 255));*/
+        m_singleslidernight.SetThumbColor(RGB(96,192,0));
+        m_singleslidernight.SetSelectionColor(RGB(255, 0, 255)); 
+        m_singleslidernight.SetChannelColor(RGB(0, 255, 255)); 
+    }
+
+
+
+
+
+
 	//Free Cool available
 	//if(product_register_value[350]&0x4)//Free Cool available,yes or on
 	if(product_register_value[MODBUS_FREE_COOL_CONFIG]&0x4)	//350
@@ -5519,7 +5685,7 @@ void CT3000View::FreshCtrl()
 
 	//////////////////////////////////////////////////////////////////////////
 	// just for tstat6
-	if((product_register_value[MODBUS_PRODUCT_MODEL] == PM_TSTAT6)||(product_register_value[MODBUS_PRODUCT_MODEL] == PM_TSTAT7))
+	if((product_register_value[MODBUS_PRODUCT_MODEL] == PM_TSTAT6)||(product_register_value[MODBUS_PRODUCT_MODEL] == PM_TSTAT7)||(product_register_value[MODBUS_PRODUCT_MODEL] == PM_TSTAT5i))
 	{	
 		// humidity
 		BOOL m_disable_hum;
@@ -5571,21 +5737,17 @@ void CT3000View::FreshCtrl()
 	m_TemperaureSlider.SetPos((int)(product_register_value[MODBUS_MAX_SETPOINT]-m_fTemperature+product_register_value[MODBUS_MIN_SETPOINT]));//2.5.0.95
 
 
-	if ((product_register_value[7]==6)||(product_register_value[7]==7))
+	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
 	{
-	      Flexflash=1;
+	       Flexflash=1;
+
 		if (Flexflash)//只有点击树型列表时才执行下面的。
 		{
 			GetDlgItem(IDC_DAYSTATIC2)->ShowWindow(SW_HIDE);
-			GetDlgItem(IDC_DAYSTATIC)->ShowWindow(SW_HIDE);
-			GetDlgItem(IDC_OCCUPACHECK)->ShowWindow(SW_HIDE);
-			GetDlgItem(IDC_UNOCCUPIED_MARK)->ShowWindow(SW_HIDE);
-			//	GetDlgItem(IDC_STATIC_DAYSPMODE)->ShowWindow(SW_HIDE);//0903
-			//	GetDlgItem(IDC_STATIC_SPMODE)->ShowWindow(SW_HIDE);//0903
-			//GetDlgItem(IDC_TEMPRETURE_SLIDER)->ShowWindow(SW_HIDE);
-
-			//GetDlgItem(IDC_TEMPINFO_EDIT)->ShowWindow(SW_HIDE);
-			//GetDlgItem(IDC_STATIC1t)->ShowWindow(SW_HIDE);
+			//GetDlgItem(IDC_DAYSTATIC)->ShowWindow(SW_HIDE);
+			//GetDlgItem(IDC_OCCUPACHECK)->ShowWindow(SW_HIDE);
+			//GetDlgItem(IDC_UNOCCUPIED_MARK)->ShowWindow(SW_HIDE);
+			 
 
 			GetDlgItem(IDC_STATIC2SP)->ShowWindow(SW_SHOW);
 			GetDlgItem(IDC_STATIC1SP)->ShowWindow(SW_SHOW);
@@ -5610,11 +5772,13 @@ void CT3000View::FreshCtrl()
 			
 
 			
-			int currenttemp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]-(int)product_register_value[MODBUS_DAY_SETPOINT]/10;
-			
+			//int currenttemp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]-(int)product_register_value[MODBUS_DAY_SETPOINT]/10;
+			//MODBUS_TEMPRATURE_CHIP
+            int currenttemp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]-(int)product_register_value[MODBUS_TEMPRATURE_CHIP]/10;
 			m_singlesliderday.SetPos(currenttemp);
-			currenttemp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]
-			            -(int)product_register_value[MODBUS_NIGHT_SETPOINT]/10;
+            /*currenttemp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]
+            -(int)product_register_value[MODBUS_NIGHT_SETPOINT]/10;*/
+
 			m_singleslidernight.SetPos(currenttemp);
 			FlexSP =1;
 			FlexSPN =1;
@@ -5649,14 +5813,16 @@ void CT3000View::FreshCtrl()
 
 
 
-			int currenttemp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]-(int)product_register_value[MODBUS_DAY_SETPOINT]/10;
-			//m_currentTemp.SetPos(currenttemp);
+            m_singlesliderday.SetRange(product_register_value[MODBUS_MIN_SETPOINT], product_register_value[MODBUS_MAX_SETPOINT],TRUE);
+
+            m_singleslidernight.SetRange(product_register_value[MODBUS_MIN_SETPOINT], product_register_value[MODBUS_MAX_SETPOINT],TRUE);
+
+
+             
+            int currenttemp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]-(int)product_register_value[MODBUS_TEMPRATURE_CHIP]/10;
 			m_singlesliderday.SetPos(currenttemp);
-			currenttemp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]
-			-(int)product_register_value[MODBUS_NIGHT_SETPOINT]/10;
-			m_singleslidernight.SetPos(currenttemp);
-			m_singleslidernight.SetPos(tempd1);
-			m_singlesliderday.SetPos(tempd1);
+
+            m_singleslidernight.SetPos(currenttemp);
 
 
 			// 			float tempflot = (float)newtstat6[121]/10;
@@ -5672,22 +5838,21 @@ void CT3000View::FreshCtrl()
 			
 			FlexSP =0;
 			FlexSPN =0;
+            
 		}
-		// 		CString strInfo;
-		// 		strInfo.Format(_T("InitFlexSliderBars_tstat6();"));			
-		// 		SetPaneString(2, strInfo);
+		else
+        {
+        InitFlexSliderBars_tstat6();
+        }
 		return;
 	}
 	else
 	{
-        GetDlgItem(IDC_SLIDER_DAY)->ShowWindow(SW_HIDE);
-
-        GetDlgItem(IDC_SLIDER_NIGHT)->ShowWindow(SW_HIDE);
 		if (Flexflash)
 		{
 
-			GetDlgItem(IDC_DAYSTATIC2)->ShowWindow(SW_SHOW);
-			GetDlgItem(IDC_DAYSTATIC)->ShowWindow(SW_SHOW);
+            GetDlgItem(IDC_DAYSTATIC2)->ShowWindow(SW_SHOW);
+           // GetDlgItem(IDC_DAYSTATIC)->ShowWindow(SW_SHOW);
 			GetDlgItem(IDC_OCCUPACHECK)->ShowWindow(SW_SHOW);
 			GetDlgItem(IDC_UNOCCUPIED_MARK)->ShowWindow(SW_SHOW);
  
@@ -5699,14 +5864,10 @@ void CT3000View::FreshCtrl()
 			GetDlgItem(IDC_EDIT_CUR_SP)->EnableWindow(FALSE);
 			
 
+            #if 1
+            m_singlesliderday.SetRange(product_register_value[MODBUS_MIN_SETPOINT], product_register_value[MODBUS_MAX_SETPOINT],TRUE);
 
-
-			 
-
-
-			m_singlesliderday.SetRange(product_register_value[MODBUS_MIN_SETPOINT], product_register_value[MODBUS_MAX_SETPOINT],TRUE);
-			//m_currentTemp.SetRange(product_register_value[366], product_register_value[365],TRUE);
-			m_singleslidernight.SetRange(product_register_value[MODBUS_MIN_SETPOINT], product_register_value[MODBUS_MAX_SETPOINT],TRUE);
+            m_singleslidernight.SetRange(product_register_value[MODBUS_MIN_SETPOINT], product_register_value[MODBUS_MAX_SETPOINT],TRUE);
 
 
 			if ((product_register_value[MODBUS_MAX_SETPOINT] <=0)||(product_register_value[MODBUS_MAX_SETPOINT] >3000))
@@ -5738,39 +5899,40 @@ void CT3000View::FreshCtrl()
 			}
 
 
-			int tempd4 = product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]
-			-(int)product_register_value[MODBUS_COOLING_SETPOINT];
-			if (tempd4>product_register_value[MODBUS_MAX_SETPOINT])
-			{
-				tempd4 = product_register_value[MODBUS_MAX_SETPOINT];
-			}
-			else if (tempd4<product_register_value[MODBUS_MIN_SETPOINT])
-			{
-				tempd4 = product_register_value[MODBUS_MIN_SETPOINT];
-			}
-			m_singlesliderday.SetPos(tempd4);
+            int tempd4 = product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]
+            -(int)product_register_value[MODBUS_COOLING_SETPOINT];
+            if (tempd4>product_register_value[MODBUS_MAX_SETPOINT])
+            {
+                tempd4 = product_register_value[MODBUS_MAX_SETPOINT];
+            }
+            else if (tempd4<product_register_value[MODBUS_MIN_SETPOINT])
+            {
+                tempd4 = product_register_value[MODBUS_MIN_SETPOINT];
+            }
+          //  m_singlesliderday.SetPos(tempd4);
 
 
-			tempd4 = product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]
-			-(int)product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
-			if (tempd4<product_register_value[MODBUS_MAX_SETPOINT])
-			{
-				tempd4 = product_register_value[MODBUS_MAX_SETPOINT];
-			}
-			else if (tempd4>product_register_value[MODBUS_MIN_SETPOINT])
-			{
-				tempd4 = product_register_value[MODBUS_MIN_SETPOINT];
-			}
+            tempd4 = product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]
+            -(int)product_register_value[MODBUS_NIGHT_COOLING_SETPOINT];
+            if (tempd4<product_register_value[MODBUS_MAX_SETPOINT])
+            {
+                tempd4 = product_register_value[MODBUS_MAX_SETPOINT];
+            }
+            else if (tempd4>product_register_value[MODBUS_MIN_SETPOINT])
+            {
+                tempd4 = product_register_value[MODBUS_MIN_SETPOINT];
+            }
 
-			m_singleslidernight.SetPos(tempd4);
+            //m_singleslidernight.SetPos(tempd4);
+            #endif
+            int currenttemp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]-(int)product_register_value[MODBUS_TEMPRATURE_CHIP]/10;
+            m_singlesliderday.SetPos(currenttemp);
 
-
+            m_singleslidernight.SetPos(currenttemp);
 			Flexflash = FALSE;
 		}
 
-
-		
-
+        #if 1
 		m_singlesliderday.SetRange(product_register_value[MODBUS_MIN_SETPOINT], product_register_value[MODBUS_MAX_SETPOINT],TRUE);
 		//m_currentTemp.SetRange(product_register_value[366], product_register_value[365],TRUE);
 		m_singleslidernight.SetRange(product_register_value[MODBUS_MIN_SETPOINT], product_register_value[MODBUS_MAX_SETPOINT],TRUE);
@@ -5795,7 +5957,7 @@ void CT3000View::FreshCtrl()
 		{
 			tempd4 = product_register_value[MODBUS_MIN_SETPOINT];
 		}
-		m_singlesliderday.SetPos(tempd4);
+		//m_singlesliderday.SetPos(tempd4);
 		 
  
 		tempd4 = product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]
@@ -5805,11 +5967,16 @@ void CT3000View::FreshCtrl()
 			tempd4 = product_register_value[MODBUS_MAX_SETPOINT];
 		}else if (tempd4>product_register_value[MODBUS_MIN_SETPOINT])
 		{
-			tempd4 = product_register_value[MODBUS_MIN_SETPOINT];
-		}
+            tempd4 = product_register_value[MODBUS_MIN_SETPOINT];
+        }
 
-		m_singleslidernight.SetPos(tempd4);
+      //  m_singleslidernight.SetPos(tempd4);
+        #endif
 
+        int currenttemp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]-(int)product_register_value[MODBUS_TEMPRATURE_CHIP]/10;
+        m_singlesliderday.SetPos(currenttemp);
+
+        m_singleslidernight.SetPos(currenttemp);
 		InitSliderBars2();//
 	}
 
@@ -5951,6 +6118,7 @@ void CT3000View::Read_SliderData()
 }
 void CT3000View::OnNMReleasedcaptureSliderDay(NMHDR *pNMHDR, LRESULT *pResult)
 {
+
 	int pos=m_singlesliderday.GetPos();
 	int daysp=product_register_value[MODBUS_MIN_SETPOINT]+product_register_value[MODBUS_MAX_SETPOINT]-pos;
 	 if (
@@ -5966,7 +6134,7 @@ void CT3000View::OnNMReleasedcaptureSliderDay(NMHDR *pNMHDR, LRESULT *pResult)
 	 //m_singlesliderday.SetPos(pos);
 	 return;
 	 }
-	if (product_register_value[7]==6||product_register_value[7]==7)
+	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
 	{
 	  
 	  int ret=write_one(g_tstat_id,MODBUS_DAY_SETPOINT,daysp*10);
@@ -6019,7 +6187,7 @@ void CT3000View::OnNMReleasedcaptureSliderNight(NMHDR *pNMHDR, LRESULT *pResult)
 		return;
 	}
 
-	if (product_register_value[7]==6||product_register_value[7]==7)
+	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
 	{
 	  int ret=write_one(g_tstat_id,MODBUS_NIGHT_SETPOINT,daysp*10);
 	  if (ret>0)
@@ -6053,6 +6221,38 @@ void CT3000View::OnNMReleasedcaptureSliderNight(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 	}
 	*pResult = 0;
+}
+
+
+BOOL CT3000View::OnHelpInfo(HELPINFO* pHelpInfo)
+{
+    // TODO: Add your message handler code here and/or call default
+  /* T3000_help.chm::/T3000_Help/How%20to%20use%20T3000/How%20to%20use%20T3000,basicly.htm*/
+    CString filename=g_strExePth+_T("T3000_help.chm::/T3000_Help/How to use T3000/How to use T3000,basicly.htm");
+    ::HtmlHelp(
+        NULL,
+        filename.GetBuffer(),
+        HH_DISPLAY_TOPIC,
+        NULL);
+    return CFormView::OnHelpInfo(pHelpInfo);
+}
+
+
+void CT3000View::OnBnClickedHelp()
+{
+    //OnInitialUpdate();
+  //  Fresh();
+    m_singlesliderday.SetThumbColor(RGB(96,192,0));
+    m_singlesliderday.SetSelectionColor(RGB(64, 64, 255)); 
+    m_singlesliderday.SetChannelColor(RGB(196, 196, 255)); 
+
+
+
+
+    /*m_singleslidernight.SetThumbColor(RGB(0, 0, 255));*/
+   /* m_singleslidernight.SetThumbColor(RGB(255,255,255));
+    m_singleslidernight.SetSelectionColor(RGB(255, 0, 255)); 
+    m_singleslidernight.SetChannelColor(RGB(0, 255, 255)); */
 }
 extern bool b_pause_refresh_tree ;
 void CT3000View::OnBnClickedBtnTopological()

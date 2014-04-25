@@ -13,7 +13,7 @@ public:
 	CString g_strExePth;
 	CString g_strImgeFolder;
 public:
-	void OnInitADOConn();						// 连接数据库
+	BOOL OnInitADOConn();						// 连接数据库
 	_RecordsetPtr& OpenRecordset(CString sql);  //打开记录集
 	void CloseRecordset();						//关闭记录集
 	void CloseConn();							//关闭数据库连接

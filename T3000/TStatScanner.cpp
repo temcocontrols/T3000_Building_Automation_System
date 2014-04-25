@@ -8,6 +8,7 @@
 #include "MainFrm.h"
 #include "bip.h"
 
+#include "WhichOneToChooseDlg.h"
 //#include "global_variable.h"
 
 //AB means Add Building
@@ -1628,7 +1629,7 @@ void CTStatScanner::SendScanEndMsg()
 	{
 		FindNetConflict();
 		ResolveNetConflict();
-		AddNewNetToDB();
+		
 
 		//GetBuildingName();	// 获得当前选择的buildingname
 				
@@ -1636,7 +1637,14 @@ void CTStatScanner::SendScanEndMsg()
 		
 		ResolveComConflict();
 		
-		AddNewTStatToDB();//
+		CompareNetToComConflict();
+
+
+		AddNewNetToDB();
+		AddNewTStatToDB();
+
+
+		
 		
 	}
    // below is nc scan handle
@@ -1890,45 +1898,6 @@ void CTStatScanner::FindComConflict()
 	}
 }
 
-
-
-//////////////////////////////////////////////////////////////////////////
-// 如果Serial ID相同，而IP不同，视为冲突
-void CTStatScanner::FindNetConflict()
-{
-	for (UINT i = 0; i < m_szNCScanRet.size(); i++)
-	{
-		_NetDeviceInfo* pInfo = m_szNCScanRet[i];
-		int nScanID = pInfo->m_pNet->GetSerialID();
-		DWORD dwScanIP = pInfo->m_pNet->GetIPAddr();
-
-		pInfo->m_pNet->SetBuildingName(m_strBuildingName);
-		pInfo->m_pNet->SetSubnetName(m_strSubNet);	
-		for (UINT j = 0; j < m_szNetNodes.size(); j++)
-		{
-			int nSID = m_szNetNodes[j]->GetSerialID();
-			DWORD dwIP = m_szNetNodes[j]->GetIPAddr();
-			//加上 buildingname等私货
-
-			if (nScanID == nSID)
-			{	
-				if (dwScanIP != dwIP) // 需要矫正
-				{
-					pInfo->m_pNet->SetBuildingName(m_szNetNodes[j]->GetBuildingName());
-					pInfo->m_pNet->SetFloorName(m_szNetNodes[j]->GetFloorName());
-					pInfo->m_pNet->SetRoomName(m_szNetNodes[j]->GetRoomName());	
-					pInfo->m_pNet->SetSubnetName(m_szNetNodes[j]->GetSubnetName());	
-					pInfo->m_bConflict = TRUE;
-					pInfo->m_dwIPDB = dwIP;
-					pInfo->m_dwIPScan = dwScanIP;
-					m_szNetConfNodes.push_back(pInfo);
-				}				
-			}
-		}
-	}
-}
-
-
 // 解决冲突
 void  CTStatScanner::ResolveComConflict()
 {
@@ -2017,6 +1986,123 @@ void  CTStatScanner::ResolveComConflict()
 		//continue;// this alread inserted to database:
 //	}
 	
+}
+
+//////////////////////////////////////////////////////////////////////////
+// 如果Serial ID相同，而IP不同，视为冲突
+void CTStatScanner::FindNetConflict()
+{
+	for (UINT i = 0; i < m_szNCScanRet.size(); i++)
+	{
+		_NetDeviceInfo* pInfo = m_szNCScanRet[i];
+		int nScanID = pInfo->m_pNet->GetSerialID();
+		DWORD dwScanIP = pInfo->m_pNet->GetIPAddr();
+
+		pInfo->m_pNet->SetBuildingName(m_strBuildingName);
+		pInfo->m_pNet->SetSubnetName(m_strSubNet);	
+		for (UINT j = 0; j < m_szNetNodes.size(); j++)
+		{
+			int nSID = m_szNetNodes[j]->GetSerialID();
+			DWORD dwIP = m_szNetNodes[j]->GetIPAddr();
+			//加上 buildingname等私货
+
+			if (nScanID == nSID)
+			{	
+				if (dwScanIP != dwIP) // 需要矫正
+				{
+					pInfo->m_pNet->SetBuildingName(m_szNetNodes[j]->GetBuildingName());
+					pInfo->m_pNet->SetFloorName(m_szNetNodes[j]->GetFloorName());
+					pInfo->m_pNet->SetRoomName(m_szNetNodes[j]->GetRoomName());	
+					pInfo->m_pNet->SetSubnetName(m_szNetNodes[j]->GetSubnetName());	
+					pInfo->m_bConflict = TRUE;
+					pInfo->m_dwIPDB = dwIP;
+					pInfo->m_dwIPScan = dwScanIP;
+					m_szNetConfNodes.push_back(pInfo);
+				}				
+			}
+		}
+	}
+
+}
+
+void CTStatScanner::CompareNetToComConflict(){
+	CString NetInfor,ComInfor;
+	for (UINT i = 0; i < m_szNCScanRet.size(); i++)
+	{
+		_NetDeviceInfo* pNetInfo = m_szNCScanRet[i];
+		DWORD nNetSerialNo = pNetInfo->m_pNet->GetSerialID();
+		int nNetModel=pNetInfo->m_pNet->GetProductType();
+		int nNetID=pNetInfo->m_pNet->GetDevID();
+		CString NetDeivceName=pNetInfo->m_pNet->GetProductName();
+		 CString ip=pNetInfo->m_pNet->GetIPAddrStr();
+		for (UINT i = 0; i < m_szTstatScandRet.size(); i++)
+		{
+			_ComDeviceInfo* pComInfo = m_szTstatScandRet[i];
+			DWORD nComSerialNo= pComInfo->m_pDev->GetSerialID();
+			int nComModelNo = pComInfo->m_pDev->GetProductType();
+			int nComID=pComInfo->m_pDev->GetDevID();
+			CString ComDeviceName=pComInfo->m_pDev->GetProductName();
+			if ((nNetSerialNo==nComSerialNo)&&(nNetModel=nComModelNo)&&(nNetID==nComID))
+			{
+				
+				 CString StrCom;
+				 StrCom.Format(_T("COM%d"),pComInfo->m_pDev->GetComPort());
+				 NetInfor.Format(_T("Net Device:IP Address=%s Device Name=%s ID=%d Serial No=%d Model NO=%d"),ip.GetBuffer(),NetDeivceName.GetBuffer(),
+					 nNetID,nNetSerialNo,nNetModel);
+				 ComInfor.Format(_T("Com Device:Com Port=%s Device Name=%s ID=%d Serial No=%d Model NO=%d"),StrCom.GetBuffer(),ComDeviceName.GetBuffer(),
+					 nComID,nComSerialNo,nComModelNo);
+				 CWhichOneToChooseDlg dlg;
+				 dlg.m_Bool_Check_Net=1;
+				 dlg.m_Bool_Check_Com=0;
+				 dlg.m_StrNet=NetInfor;
+				 dlg.m_StrCom=ComInfor;
+				 if (dlg.DoModal()==IDOK)
+				 {
+ 					 if (!dlg.m_Bool_Check_Net)//不添加Net
+ 					 {
+ 						  for (vector<_NetDeviceInfo*>::iterator it=m_szNCScanRet.begin();it!=m_szNCScanRet.end();++it)
+ 						  {
+							  
+							  if ((nNetSerialNo==(*it)->m_pNet->GetSerialID())&&(nNetModel=(*it)->m_pNet->GetProductType())&&(nNetID==(*it)->m_pNet->GetDevID()))
+							  {
+								  m_szNCScanRet.erase(it);
+								  break;
+							  }
+ 						  }
+						  if (!dlg.m_Bool_Check_Com)
+						  {
+							  for (vector<_ComDeviceInfo*>::iterator it=m_szTstatScandRet.begin();it!=m_szTstatScandRet.end();++it)
+							  {
+								  if ((nComSerialNo==(*it)->m_pDev->GetSerialID())&&(nComModelNo=(*it)->m_pDev->GetProductType())&&(nComID==(*it)->m_pDev->GetDevID()))
+								  {
+									  m_szTstatScandRet.erase(it);
+									  break;
+								  }
+							  }
+						  }
+ 					 } 
+ 					 else if (!dlg.m_Bool_Check_Com)
+ 					 {
+						 for (vector<_ComDeviceInfo*>::iterator it=m_szTstatScandRet.begin();it!=m_szTstatScandRet.end();++it)
+						 {
+							 if ((nComSerialNo==(*it)->m_pDev->GetSerialID())&&(nComModelNo=(*it)->m_pDev->GetProductType())&&(nComID==(*it)->m_pDev->GetDevID()))
+							 {
+								 m_szTstatScandRet.erase(it);
+								 break;
+							 }
+						 }
+ 					 }
+ 					  
+				 } 
+				
+
+			} 
+			
+
+		}
+		//DWORD dwScanIP = pInfo->m_pNet->GetIPAddr();
+
+	}
 }
 
 

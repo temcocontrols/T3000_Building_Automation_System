@@ -3100,7 +3100,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	GetDlgItem(IDC_EDIT_ValueTravelTime)->SetWindowText(str);
 
 	//////////////////////////////////////////////////////////////////////////
-	if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))
+	/*if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))*/
+    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 
 

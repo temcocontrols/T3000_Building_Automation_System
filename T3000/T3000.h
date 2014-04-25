@@ -181,7 +181,7 @@ public:
 	void SetLanguage(DWORD Last);
 	DWORD m_maxClients;
 	DWORD password;
-	void JudgeDB();
+	BOOL JudgeDB();
 	void ImportData();
  
 	vector<ALL_NODE> m_AllNodes;
