@@ -1820,6 +1820,7 @@ int	MODBUS_PID3_OFF_OUTPUT_HEAT3		=	-1	;
 
 
 #pragma region For_bacnet
+int bacnet_device_type;
 int g_bac_instance;
 int g_selected_serialnumber;
 unsigned short g_mac;

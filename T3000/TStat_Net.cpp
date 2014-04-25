@@ -175,19 +175,9 @@ CString CTStat_Net::GetProductName()
 		break;
 //20120424
     case PM_CM5:
-		//if(m_nprotocol == PROTOCOL_BACNET_IP)
-		//{
-		//strProductName="CM5_Ethernet";
-		//}
-		//else
 	    strProductName="CM5_Ethernet";
 		break;
 	case PM_MINIPANEL:
-		//if(m_nprotocol == PROTOCOL_BACNET_IP)
-		//{
-		//	strProductName="MiniPanel";
-		//}
-		//else
 	    strProductName="MiniPanel";
 		break;
     case PM_CO2_NET:

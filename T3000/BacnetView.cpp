@@ -1,6 +1,21 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2014-04-22
+Update by Fance
+1.Auto adjust diferent device show different Unit.
+
+2014-04-21
+Update by Fance
+1.The analog trend logging feature has been added. Digital data still to be done. 
+2.Support to open the USB device "Testo-345" ,and read it's data.
+TBD: add a small GUI screen and integrate to trend logs and other features
+3.Add advanced setup screen for bacnet devices: IP address and others. 
+4.Fix the modbus DLL .If the device disconnected , the "read_one" and
+"write_one" used to fail if the node goes offline. Now it will automatically reconnect to the device.
+5.Add a screen to show the Zigbee network RSSI signal strenght now. TBD: add graphical version of zigbee network. 
+6.Fix the bacnet panel number, max before was 32, now supports up to 255nodes on each rs485/mstp subnet and 255 on the main bacnet IP network
+
 2014-04-16
 Update by Fance
 1.Fix the modbus DLL .If the device disconnected , the  "read_one" and "write_one" function will error until you connect again.
@@ -2471,6 +2486,8 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 			if(find_exsit)
 			{
 				KillTimer(4);
+				Input_Window->Reload_Unit_Type();
+				Output_Window->Reload_Unit_Type();
 				//PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SVAE_CONFIG);
 				//Post_Write_Message(g_bac_instance,CONNECTED_WITH_DEVICE,0,0,sizeof(Str_connected_point),BacNet_hwd ,_T("Connect with device"));
 #if 1

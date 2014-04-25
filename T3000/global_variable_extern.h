@@ -906,6 +906,7 @@ extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT1	   ;
 extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT2	   ;
 extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT3	   ;
 #pragma region For_bacnet
+extern int bacnet_device_type;
 extern int g_bac_instance;
 extern int g_selected_serialnumber;
 extern unsigned short g_mac;
