@@ -99,6 +99,101 @@ BOOL CBacnetOutput::OnInitDialog()
 }
 
 
+void CBacnetOutput::Reload_Unit_Type()
+{
+
+	for (int i=0;i<(int)m_Output_data.size();i++)	//Initial All first.
+	{
+		if(ListCtrlEx::ComboBox == m_output_list.GetColumnType(OUTPUT_RANGE))
+		{
+			ListCtrlEx::CStrList strlist;
+			for (int i=0;i<(int)sizeof(Units_Type)/sizeof(Units_Type[0]);i++)
+			{
+				strlist.push_back(Units_Type[i]);
+			}
+			m_output_list.SetCellStringList(i, OUTPUT_RANGE, strlist);		
+		}
+	}
+
+	int d_initial_count = 0;
+	int a_initial_count = 0;
+	if(bacnet_device_type == BIG_MINIPANEL)	//Special Initial
+	{	
+		if(BIG_MINIPANEL_OUT_D > (int)m_Output_data.size()) 
+			d_initial_count = (int)m_Output_data.size();
+		else
+			d_initial_count = BIG_MINIPANEL_OUT_D;
+
+		a_initial_count = BIG_MINIPANEL_OUT_A;
+		for (int i=0;i<d_initial_count;i++)
+		{
+			if(ListCtrlEx::ComboBox == m_output_list.GetColumnType(OUTPUT_RANGE))
+			{
+				ListCtrlEx::CStrList strlist;
+				strlist.push_back(Units_Digital_Only);
+				m_output_list.SetCellStringList(i, OUTPUT_RANGE, strlist);		
+			}
+		}
+
+		for (int i=d_initial_count;i< (d_initial_count + a_initial_count);i++ )
+		{
+			if(ListCtrlEx::ComboBox == m_output_list.GetColumnType(OUTPUT_RANGE))
+			{
+				ListCtrlEx::CStrList strlist;
+				strlist.push_back(Units_Analog_Only);
+				m_output_list.SetCellStringList(i, OUTPUT_RANGE, strlist);		
+			}
+		}
+
+		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH,80);
+	}
+	else if(bacnet_device_type == SMALL_MINIPANEL)
+	{
+		if(SMALL_MINIPANEL_OUT_D > (int)m_Output_data.size()) 
+			d_initial_count = (int)m_Output_data.size();
+		else
+			d_initial_count = SMALL_MINIPANEL_OUT_D;
+
+		a_initial_count = SMALL_MINIPANEL_OUT_A;
+		for (int i=0;i<d_initial_count;i++)
+		{
+			if(ListCtrlEx::ComboBox == m_output_list.GetColumnType(OUTPUT_RANGE))
+			{
+				ListCtrlEx::CStrList strlist;
+				strlist.push_back(Units_Digital_Only);
+				m_output_list.SetCellStringList(i, OUTPUT_RANGE, strlist);		
+			}
+		}
+
+		for (int i=d_initial_count;i< (d_initial_count + a_initial_count);i++ )
+		{
+			if(ListCtrlEx::ComboBox == m_output_list.GetColumnType(OUTPUT_RANGE))
+			{
+				ListCtrlEx::CStrList strlist;
+				strlist.push_back(Units_Analog_Only);
+				m_output_list.SetCellStringList(i, OUTPUT_RANGE, strlist);		
+			}
+		}
+		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH,80);
+	}
+	else if(bacnet_device_type == PRODUCT_CM5)
+	{
+		d_initial_count = CM5_MINIPANEL_OUT_D;
+		for (int i=0;i<d_initial_count;i++)
+		{
+			if(ListCtrlEx::ComboBox == m_output_list.GetColumnType(OUTPUT_RANGE))
+			{
+				ListCtrlEx::CStrList strlist;
+				strlist.push_back(Units_Digital_Only);
+				m_output_list.SetCellStringList(i, OUTPUT_RANGE, strlist);		
+			}
+		}
+		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH,0);
+	}
+
+}
+
+
 void CBacnetOutput::Initial_List()
 {
 	m_output_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
@@ -106,6 +201,7 @@ void CBacnetOutput::Initial_List()
 	m_output_list.InsertColumn(OUTPUT_NUM, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_output_list.InsertColumn(OUTPUT_FULL_LABLE, _T("Full Label"), 140, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_HW_SWITCH, _T("HW Switch"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_RANGE, _T("Range"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -115,7 +211,7 @@ void CBacnetOutput::Initial_List()
 	m_output_list.InsertColumn(OUTPUT_LABLE, _T("Label"), 70, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_output_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_output_dlg_hwnd;
-
+	
 	m_output_list.DeleteAllItems();
 	for (int i=0;i<(int)m_Output_data.size();i++)
 	{
@@ -248,16 +344,72 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 		m_output_list.SetItemText(i,OUTPUT_FULL_LABLE,temp_des);
 
-		if(m_Output_data.at(i).auto_manual==0)	//In output table if it is auto ,the value can't be edit by user
+
+		int digital_special_output_count = 0;
+		int analog_special_output_count = 0;
+
+		m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T(""));
+		//这样加实在是情非得已，老毛非得加一堆条件，还要smart;
+		if((bacnet_device_type == BIG_MINIPANEL) || ((bacnet_device_type == SMALL_MINIPANEL)))
 		{
-			m_output_list.SetItemText(i,OUTPUT_AUTO_MANUAL,_T("Auto"));
-			m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
+			if(bacnet_device_type == BIG_MINIPANEL)
+			{
+				digital_special_output_count = BIG_MINIPANEL_OUT_D;
+				analog_special_output_count = BIG_MINIPANEL_OUT_A;
+			}
+			else if(bacnet_device_type == SMALL_MINIPANEL)
+			{
+				digital_special_output_count = SMALL_MINIPANEL_OUT_D;
+				analog_special_output_count = SMALL_MINIPANEL_OUT_A;
+			}
+			if(i < (digital_special_output_count +analog_special_output_count) )
+			{
+				if(m_Output_data.at(i).hw_switch_status == HW_SW_OFF)
+				{
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("SW_OFF"));
+					m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
+					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
+				}
+				else if(m_Output_data.at(i).hw_switch_status == HW_SW_HAND)
+				{
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("SW_HAND"));
+					m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
+					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
+				}
+				else
+				{
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("SW_AUTO"));
+					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,1);
+					if(m_Output_data.at(i).auto_manual==0)	//In output table if it is auto ,the value can't be edit by user
+					{
+						m_output_list.SetItemText(i,OUTPUT_AUTO_MANUAL,_T("Auto"));
+						m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
+					}
+					else
+					{
+						m_output_list.SetItemText(i,OUTPUT_AUTO_MANUAL,_T("Manual"));
+						m_output_list.SetCellEnabled(i,OUTPUT_VALUE,1);
+					}
+				}
+			}
 		}
 		else
 		{
-			m_output_list.SetItemText(i,OUTPUT_AUTO_MANUAL,_T("Manual"));
-			m_output_list.SetCellEnabled(i,OUTPUT_VALUE,1);
+			m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,1);
+			if(m_Output_data.at(i).auto_manual==0)	//In output table if it is auto ,the value can't be edit by user
+			{
+				m_output_list.SetItemText(i,OUTPUT_AUTO_MANUAL,_T("Auto"));
+				m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
+			}
+			else
+			{
+				m_output_list.SetItemText(i,OUTPUT_AUTO_MANUAL,_T("Manual"));
+				m_output_list.SetCellEnabled(i,OUTPUT_VALUE,1);
+			}
 		}
+
+
+
 
 			m_output_list.SetCellEnabled(i,OUTPUT_UNITE,0);
 		if(m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG)

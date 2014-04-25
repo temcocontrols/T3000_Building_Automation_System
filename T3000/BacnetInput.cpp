@@ -108,6 +108,93 @@ BOOL CBacnetInput::OnInitDialog()
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
+void CBacnetInput::Reload_Unit_Type()
+{
+
+	for (int i=0;i<(int)m_Input_data.size();i++)	//Initial All first.
+	{
+		if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
+		{
+			ListCtrlEx::CStrList strlist;
+			for (int i=0;i<(int)sizeof(Units_Type)/sizeof(Units_Type[0]);i++)
+			{
+				strlist.push_back(Units_Type[i]);
+			}
+			m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
+		}
+	}
+
+	int initial_count = 0;
+	if(bacnet_device_type == BIG_MINIPANEL)	//Special Initial
+	{	
+		if(BIG_MINIPANEL_IN_A > (int)m_Input_data.size()) 
+			initial_count = (int)m_Input_data.size();
+		else
+			initial_count = BIG_MINIPANEL_IN_A;
+		for (int i=0;i<initial_count;i++)
+		{
+			if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
+			{
+				ListCtrlEx::CStrList strlist;
+				strlist.push_back(Units_Analog_Only);
+				m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
+			}
+		}
+	}
+	else if(bacnet_device_type == SMALL_MINIPANEL)
+	{
+		if(SMALL_MINIPANEL_IN_A > (int)m_Input_data.size()) 
+			initial_count = (int)m_Input_data.size();
+		else
+			initial_count = SMALL_MINIPANEL_IN_A;
+		for (int i=0;i<initial_count;i++)
+		{
+			if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
+			{
+				ListCtrlEx::CStrList strlist;
+				strlist.push_back(Units_Analog_Only);
+				m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
+			}
+		}
+	}
+	else if(bacnet_device_type == PRODUCT_CM5)
+	{
+		int analog_count;
+		int digital_count;
+		if(CM5_MINIPANEL_IN_A > (int)m_Input_data.size()) 
+			analog_count = (int)m_Input_data.size();
+		else
+			analog_count = CM5_MINIPANEL_IN_A;
+
+		digital_count = CM5_MINIPANEL_IN_D;
+		
+		for (int i=0;i<analog_count;i++)
+		{
+			if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
+			{
+				ListCtrlEx::CStrList strlist;
+				strlist.push_back(Units_Analog_Only);
+				m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
+			}
+		}
+
+		for (int i=analog_count;i< (analog_count + digital_count); i++ )
+		{
+			if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
+			{
+				ListCtrlEx::CStrList strlist;
+				strlist.push_back(Units_Digital_Only);
+				m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
+			}
+		}
+		
+		
+	}
+
+
+
+}
+
 void CBacnetInput::Initial_List()
 {
 	m_input_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
@@ -120,6 +207,7 @@ void CBacnetInput::Initial_List()
 	m_input_list.InsertColumn(INPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_RANGE, _T("Range"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_CAL, _T("Calibration"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_CAL_OPERATION, _T("Sign"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_FITLER, _T("Filter"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_DECOM, _T("Status"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_LABLE, _T("Label"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -535,6 +623,14 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 			temp_cal.Format(_T("%d"),(m_Input_data.at(i).calibration));
 			m_input_list.SetItemText(i,INPUT_CAL,temp_cal);
+			if(m_Input_data.at(i).calibration_sign == 0)
+			{
+				m_input_list.SetItemText(i,INPUT_CAL_OPERATION,_T("+"));
+			}
+			else
+			{
+				m_input_list.SetItemText(i,INPUT_CAL_OPERATION,_T("-"));
+			}
 		}
 		else if(m_Input_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 		{
@@ -728,73 +824,65 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		return;
 	if(lRow<0)
 		return;
-
-	if(lCol != INPUT_VALUE)	
-		return;
-
-	if(m_Input_data.at(lRow).digital_analog != BAC_UNITS_DIGITAL)
-		return;
-
-	if(m_Input_data.at(lRow).auto_manual == BAC_AUTO)	//If it is auto mode, disable to change the value.
-		return;
-
-	memcpy_s(&m_temp_Input_data[lRow],sizeof(Str_in_point),&m_Input_data.at(lRow),sizeof(Str_in_point));
-
 	CString New_CString;
 	CString temp_task_info;
 
 	CString temp1;
 	CStringArray temparray;
-	if((m_Input_data.at(lRow).range < 23) &&(m_Input_data.at(lRow).range !=0))
-		temp1 = Digital_Units_Array[m_Input_data.at(lRow).range];
+	if(lCol == INPUT_VALUE)
+	{
+		if(m_Input_data.at(lRow).digital_analog != BAC_UNITS_DIGITAL)
+			return;
+
+		if(m_Input_data.at(lRow).auto_manual == BAC_AUTO)	//If it is auto mode, disable to change the value.
+			return;
+
+		memcpy_s(&m_temp_Input_data[lRow],sizeof(Str_in_point),&m_Input_data.at(lRow),sizeof(Str_in_point));
+
+
+		if((m_Input_data.at(lRow).range < 23) &&(m_Input_data.at(lRow).range !=0))
+			temp1 = Digital_Units_Array[m_Input_data.at(lRow).range];
+		else
+			return;
+		SplitCStringA(temparray,temp1,_T("/"));
+
+		if(m_Input_data.at(lRow).control == 0)
+		{
+			m_Input_data.at(lRow).control = 1;
+			m_input_list.SetItemText(lRow,INPUT_VALUE,temparray.GetAt(1));
+			New_CString = temparray.GetAt(1);
+		}
+		else
+		{
+			m_Input_data.at(lRow).control = 0;
+			m_input_list.SetItemText(lRow,INPUT_VALUE,temparray.GetAt(0));
+			New_CString = temparray.GetAt(0);
+		}
+
+	}
+	else if(lCol == INPUT_CAL_OPERATION)
+	{
+		memcpy_s(&m_temp_Input_data[lRow],sizeof(Str_in_point),&m_Input_data.at(lRow),sizeof(Str_in_point));
+		if(m_Input_data.at(lRow).calibration_sign == 0)
+		{
+			m_Input_data.at(lRow).calibration_sign = 1;
+			m_input_list.SetItemText(lRow,INPUT_CAL_OPERATION,_T("-"));
+			New_CString = _T("-");
+		}
+		else
+		{
+			m_Input_data.at(lRow).calibration_sign = 0;
+			m_input_list.SetItemText(lRow,INPUT_CAL_OPERATION,_T("+"));
+			New_CString = _T("+");
+		}
+	}
 	else
 		return;
-	SplitCStringA(temparray,temp1,_T("/"));
 
-	if(m_Input_data.at(lRow).control == 0)
-	{
-		m_Input_data.at(lRow).control = 1;
-		m_input_list.SetItemText(lRow,INPUT_VALUE,temparray.GetAt(1));
-		New_CString = temparray.GetAt(1);
-	}
-	else
-	{
-		m_Input_data.at(lRow).control = 0;
-		m_input_list.SetItemText(lRow,INPUT_VALUE,temparray.GetAt(0));
-		New_CString = temparray.GetAt(0);
-	}
-#if 0
-	if(m_Input_data.at(lRow).range > 11)
-		temp1 = Digital_Units_Array[m_Input_data.at(lRow).range - 11];//11 is the sizeof the array
-	else
-		temp1 = Digital_Units_Array[m_Input_data.at(lRow).range];
-	SplitCStringA(temparray,temp1,_T("/"));
 
-	if(m_Input_data.at(lRow).range>=12)
-	{
 
-		if((temparray.GetSize()==2)&&(!temparray.GetAt(1).IsEmpty()))
-		{
-			m_input_list.SetItemText(lRow,INPUT_VALUE,temparray.GetAt(0));
-			m_Input_data.at(lRow).range = m_Input_data.at(lRow).range - 11;
-			New_CString = temparray.GetAt(0);
-			m_Input_data.at(lRow).control = 0;	
-		}
 
-	}
-	else if(m_Input_data.at(lRow).range>=1)
-	{
 
-		if((temparray.GetSize()==2)&&(!temparray.GetAt(0).IsEmpty()))
-		{
-			m_input_list.SetItemText(lRow,INPUT_VALUE,temparray.GetAt(1));
-			m_Input_data.at(lRow).range = m_Input_data.at(lRow).range + 11;
-			New_CString = temparray.GetAt(1);
-			m_Input_data.at(lRow).control = 1;	
-		}
-
-	}
-#endif
 	m_input_list.Set_Edit(false);
 
 	int cmp_ret = memcmp(&m_temp_Input_data[lRow],&m_Input_data.at(lRow),sizeof(Str_in_point));

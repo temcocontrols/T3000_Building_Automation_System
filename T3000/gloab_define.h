@@ -324,6 +324,9 @@ const CString Units_Type[]=
 	//_T("Custom dig")
 };
 
+const CString Units_Analog_Only = _T("Analog");
+const CString Units_Digital_Only = _T("Digital");
+
 const CString Yes_No[] = 
 {
 	_T("NO"),
@@ -521,3 +524,25 @@ const int WINDOW_SETTING = 11;
 
 
 const int KEY_INSERT = 1020;
+
+
+typedef enum
+{							//IN				//OUT	
+	BIG_MINIPANEL,			//32 A				//12D   12A
+	SMALL_MINIPANEL,		//16 A				//6 D	4 A
+	PRODUCT_CM5						//10A + 8 D			//10D
+};
+
+const int BIG_MINIPANEL_IN_A = 32;
+const int BIG_MINIPANEL_IN_D = 0;	//If  this place is not 0 ,need code.
+const int SMALL_MINIPANEL_IN_A = 16;
+const int SMALL_MINIPANEL_IN_D = 0;
+const int CM5_MINIPANEL_IN_A = 10;
+const int CM5_MINIPANEL_IN_D = 8;
+
+const int BIG_MINIPANEL_OUT_A = 12;
+const int BIG_MINIPANEL_OUT_D = 12;
+const int SMALL_MINIPANEL_OUT_A = 4;
+const int SMALL_MINIPANEL_OUT_D = 6;
+const int CM5_MINIPANEL_OUT_A = 0;
+const int CM5_MINIPANEL_OUT_D = 10;
