@@ -107,7 +107,7 @@ BOOL Post_Refresh_One_Message(uint32_t deviceid,int8_t command,int8_t start_inst
 BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,int block_size);
 BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,HWND hWnd,CString Task_Info = _T(""),int nRow = 0,int nCol = 0);
 int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int16_t entitysize);
-int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t index,int8_t ntype,int8_t nspecial,MonitorUpdateData* up_data);
+int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, int8_t ntotal_seg,int8_t nseg_index,MonitorUpdateData* up_data);
 int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance/*,int8_t entitysize*/ );
 
 int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
@@ -142,4 +142,6 @@ BOOL Get_Bit_FromRegister(unsigned short RegisterValue,unsigned short Position);
 int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind);
 UINT RefreshNetWorkDeviceListByUDPFunc();
 void DFTrace(CString &nCString);
+int Open_MonitorDataBase(WCHAR *DataSource);
+int handle_read_monitordata(char *npoint,int nlength);
 #endif

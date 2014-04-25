@@ -25,6 +25,8 @@
 	extern 	SOCKET m_hSocket;	
 	extern  SOCKET m_hSocket_for_list;
 int g_Commu_type=0;//0:serial modus//
+	CString last_connected_ip;
+	int last_connected_port = 0;
 
 //CMutex scan_mutex;
 
@@ -1181,7 +1183,11 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
 		//int xx=::send(m_hSocket,(char*)pval,sizeof(pval),MSG_OOB);
 		int xx=::send(m_hSocket,(char*)&data,sizeof(data),0);
 
-
+		if(xx < 0)	
+		{			
+			if(last_connected_port!=0)
+				Open_Socket2(last_connected_ip,last_connected_port);
+		}
 		////////////////////////////////////////////////clear com error
 		if(address==10)
 		{
@@ -1886,7 +1892,11 @@ OUTPUT int Write_One(TS_UC device_var,TS_US address,TS_US val)
 		//::send(m_hSocket,(char*)pval,sizeof(pval),MSG_OOB);
 		//::send(m_hSocket,(char*)data,sizeof(data),0);
 		int nRet = ::send(m_hSocket,(char*)data,nSendNum,0);
-
+		if(nRet < 0)	//Add by Fance ,if device is dosconnected , we need to connect the device again;
+		{			
+			if(last_connected_port!=0)
+				Open_Socket2(last_connected_ip,last_connected_port);
+		}
 		//Sleep(SLEEP_TIME+10);
 		Sleep(LATENCY_TIME_NET);
 		//Sleep(300);

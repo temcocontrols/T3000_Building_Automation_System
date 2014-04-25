@@ -20,6 +20,7 @@
 #include "TDelayForm.h"
 
 #include "TStatScheduleDlg.h"
+#include "TstatZigbeeLogic.h"
 
 #include "../FlexSlideBar/FlexSlideWnd.h"
 #include "../FlexSlideBar/FSBContainer.h"
@@ -88,6 +89,7 @@ BEGIN_MESSAGE_MAP(CT3000View, CFormView)
 	ON_CBN_SELCHANGE(IDC_STATICUNINT, &CT3000View::OnCbnSelchangeStaticunint)
 	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_DAY, &CT3000View::OnNMReleasedcaptureSliderDay)
 	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_NIGHT, &CT3000View::OnNMReleasedcaptureSliderNight)
+	ON_BN_CLICKED(IDC_BTN_TOPOLOGICAL, &CT3000View::OnBnClickedBtnTopological)
 END_MESSAGE_MAP()
 
 // CT3000View construction/destruction
@@ -6051,4 +6053,24 @@ void CT3000View::OnNMReleasedcaptureSliderNight(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 	}
 	*pResult = 0;
+}
+extern bool b_pause_refresh_tree ;
+void CT3000View::OnBnClickedBtnTopological()
+{
+	// TODO: Add your control notification handler code here
+	// 显示对话前 要 挂起很多线程的操作 ，避免出现抢资源的现象;
+	//在完成之后要恢复原状;
+	int temp_pause = g_bPauseRefreshTree;	//resume all the status.
+	int temp_g_id =  g_tstat_id;
+	int temp_value = b_pause_refresh_tree;
+	bool temp_pasueread = g_bPauseMultiRead;
+	b_pause_refresh_tree = true;
+	g_bPauseRefreshTree = true;
+	g_bPauseMultiRead = true;
+	CTstatZigbeeLogic dlg;
+	dlg.DoModal();
+	g_bPauseRefreshTree = temp_pause;
+	g_tstat_id = temp_g_id ;
+	b_pause_refresh_tree = temp_value;
+	g_bPauseMultiRead = temp_pasueread;
 }

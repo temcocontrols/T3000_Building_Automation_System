@@ -1,7 +1,47 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2014-04-16
+Update by Fance
+1.Fix the modbus DLL .If the device disconnected , the  "read_one" and "write_one" function will error until you connect again.
+2.Add a new setting interface in the bacnet view.
+2014-04-11
+Update by Fance
+1.Get the monitor data from the bacnet device.
+2.Draw the graphic on the screen.
+
+2014-03-28
+Update by Fance
+1.Update the Graphic view class.Now all the position and parameter can changed more easier. 
+2014-03-27
+Update by Fance
+1.Finished the function ,Open the Testo USB port and read the Testo-435 data.Put the two function into the Dll,named "DllFunction.cpp"
+2.Finished the Zigbee RSSI List , all the data will show on the list normally;
+
+2014-03-20
+Update by Fance
+1.Change the graphic static,from staticex to own draw.
+2.Change the ud_str.h ,some of the monitor struct.
+2014-03-19
+Update by Fance
+1.Update the progress bar ,change the position to the button of the view.
+2.Add read monitor data function.
+2014-03-18
+Update by Fance
+1.Net cable disconnected ,the scan result also show the last connected device . ->Fix it.
+2.If the Co2 external sensor count is a invalid value , the CO2 Window will crash . ->Fix it.
+2014-03-17
+Update by Fance
+1.Support read Zigbee Tstat.(Not finished)
+2014-03-14
+Update by Fance
+1.Program IDE user interface , panel upper 32 can't send program command,
+	eg:  IF 36-OUT1 >5 THEN 87-IN2 = 3   (This shows 36-OUT1 is not defind)
+	Fix this problem.
+2.About program TIME-ON , TIME-OFF INTERVAL command ,now it can use normally.
+3.Debug window don't always create when user don't needed.It will create when the user press SHIFT + 'D'
 2014-03-07
+Update by Fance
 1.Allow the user to change the IP address and subnet and gateway.
 2.Optimze the building graphic , user can add lable (inputs ,outputs,variable) and monitor this lable on the building view.
 3.The device of CO2 show a wrong firmware version. Fix it.
@@ -77,6 +117,7 @@ Update by Fance
 #include "BacnetAlarmLog.h"
 #include "BacnetAlarmWindow.h"
 #include "BacnetTstat.h"
+#include "BacnetSetting.h"
 //bool CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
 //bool need_to_read_description = true;
 int g_gloab_bac_comport = 1;
@@ -95,12 +136,13 @@ BacnetController *Controller_Window = NULL;
 CBacnetMonitor *Monitor_Window = NULL;
 CBacnetAlarmLog *AlarmLog_Window = NULL;
 CBacnetTstat *Tstat_Window = NULL;
+CBacnetSetting * Setting_Window = NULL;
 extern CBacnetAlarmWindow * AlarmWindow_Window;
 extern bool is_in_scan_mode;
 extern char mycode[1024];
 int click_resend_time = 0;//当点击的时候，要切换device时 发送whois的次数;
 // CDialogCM5_BacNet
-
+CString IP_ADDRESS;
 _Refresh_Info Bacnet_Refresh_Info;
 
 //#define WM_SEND_OVER     WM_USER + 1287
@@ -127,8 +169,7 @@ void CDialogCM5_BacNet::DoDataExchange(CDataExchange* pDX)
 {
 	CFormView::DoDataExchange(pDX);
 	//DDX_Control(pDX, IDC_LIST1, m_device_list_info);
-	DDX_Control(pDX, IDC_TIME_PICKER, m_cm5_time_picker);
-	DDX_Control(pDX, IDC_DATE_PICKER, m_cm5_date_picker);
+
 
 	DDX_Control(pDX, IDC_BAC_MAINTAB, m_bac_main_tab);
 }
@@ -138,18 +179,7 @@ BEGIN_MESSAGE_MAP(CDialogCM5_BacNet, CFormView)
 	ON_MESSAGE(WM_FRESH_CM_LIST,Fresh_UI)
 	ON_MESSAGE(MY_RESUME_DATA, AllMessageCallBack)
 	ON_MESSAGE(WM_DELETE_NEW_MESSAGE_DLG,Delete_New_Dlg)	
-	ON_BN_CLICKED(IDC_BUTTON_BAC_TEST, &CDialogCM5_BacNet::OnBnClickedButtonBacTest)
-	ON_BN_CLICKED(IDC_BAC_ENABLE_EDIT_TIME, &CDialogCM5_BacNet::OnBnClickedBacEnableEditTime)
-	ON_NOTIFY(NM_KILLFOCUS, IDC_DATE_PICKER, &CDialogCM5_BacNet::OnNMKillfocusDatePicker)
-	ON_NOTIFY(NM_KILLFOCUS, IDC_TIME_PICKER, &CDialogCM5_BacNet::OnNMKillfocusTimePicker)
-	ON_NOTIFY(NM_SETFOCUS, IDC_DATE_PICKER, &CDialogCM5_BacNet::OnNMSetfocusDatePicker)
-	ON_NOTIFY(NM_SETFOCUS, IDC_TIME_PICKER, &CDialogCM5_BacNet::OnNMSetfocusTimePicker)
-	ON_BN_CLICKED(IDC_BTN_BAC_WRITE_TIME, &CDialogCM5_BacNet::OnBnClickedBtnBacWriteTime)
-	ON_BN_CLICKED(IDC_BAC_SYNC_LOCAL_PC, &CDialogCM5_BacNet::OnBnClickedBtnBacSYNCTime)
-	ON_BN_CLICKED(IDC_RADIO_BAC_IP_AUTO, &CDialogCM5_BacNet::OnBnClickedBtnBacIPAuto)
-	ON_BN_CLICKED(IDC_RADIO_BAC_IP_STATIC, &CDialogCM5_BacNet::OnBnClickedBtnBacIPStatic)
-	ON_BN_CLICKED(IDC_BUTTON_BAC_IP_CHANGED, &CDialogCM5_BacNet::OnBnClickedBtnBacIPChange)
-	ON_BN_CLICKED(IDC_BUTTON_BAC_IP_CANCLE, &CDialogCM5_BacNet::OnBnClickedBtnBacIPCancle)
+
 	
 	ON_WM_TIMER()
 	ON_NOTIFY(TCN_SELCHANGE, IDC_BAC_MAINTAB, &CDialogCM5_BacNet::OnTcnSelchangeBacMaintab)
@@ -526,7 +556,7 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 			{
 				if(bac_basic_setting_read_results)
 				{
-					PostMessage(WM_FRESH_CM_LIST,READ_SETTING_COMMAND,NULL);
+					//PostMessage(WM_FRESH_CM_LIST,READ_SETTING_COMMAND,NULL);
 				}
 			}
 		}
@@ -843,7 +873,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	m_bac_main_tab.InsertItem(WINDOW_MONITOR, _T("Monitor   "));
 	m_bac_main_tab.InsertItem(WINDOW_ALARMLOG, _T("Alarm Log   "));
 	m_bac_main_tab.InsertItem(WINDOW_TSTAT, _T("Tstat   "));
-	
+	m_bac_main_tab.InsertItem(WINDOW_SETTING, _T("Setting   "));
 
 	pDialog[WINDOW_INPUT] = Input_Window = new CBacnetInput;
 	pDialog[WINDOW_OUTPUT] =Output_Window = new CBacnetOutput;
@@ -856,6 +886,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_MONITOR] = Monitor_Window = new CBacnetMonitor;
 	pDialog[WINDOW_ALARMLOG] = AlarmLog_Window = new CBacnetAlarmLog;
 	pDialog[WINDOW_TSTAT] = Tstat_Window = new CBacnetTstat;
+	pDialog[WINDOW_SETTING] = Setting_Window = new CBacnetSetting;
 	//创建两个对话框;
 	Input_Window->Create(IDD_DIALOG_BACNET_INPUT, &m_bac_main_tab);
 	Output_Window->Create(IDD_DIALOG_BACNET_OUTPUT, &m_bac_main_tab);
@@ -868,6 +899,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	Monitor_Window->Create(IDD_DIALOG_BACNET_MONITOR, &m_bac_main_tab);
 	AlarmLog_Window->Create(IDD_DIALOG_BACNET_ALARMLOG,&m_bac_main_tab);
 	Tstat_Window->Create(IDD_DIALOG_BACNET_TSTAT,&m_bac_main_tab);
+	Setting_Window->Create(IDD_DIALOG_BACNET_SETTING,&m_bac_main_tab);
 	//设定在Tab内显示的范围;
 	CRect rc;
 	m_bac_main_tab.GetClientRect(rc);
@@ -894,6 +926,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	pDialog[WINDOW_MONITOR]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_ALARMLOG]->ShowWindow(SW_HIDE);
 	pDialog[WINDOW_TSTAT]->ShowWindow(SW_HIDE);
+	pDialog[WINDOW_SETTING]->ShowWindow(SW_HIDE);
 	g_hwnd_now = m_input_dlg_hwnd;
 	//保存当前选择
 //	m_CurSelTab = WINDOW_INPUT;
@@ -1030,11 +1063,11 @@ void CDialogCM5_BacNet::Fresh()
 
 
 	Initial_bac(g_gloab_bac_comport);
-	m_cm5_date_picker.EnableWindow(0);
-	m_cm5_time_picker.EnableWindow(0);
-	GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(0);
-	GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(FALSE);
-	m_cm5_time_picker.SetFormat(_T("HH:mm"));
+	//m_cm5_date_picker.EnableWindow(0);
+	//m_cm5_time_picker.EnableWindow(0);
+	//GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(0);
+	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(FALSE);
+	//m_cm5_time_picker.SetFormat(_T("HH:mm"));
 
 	SetTimer(1,500,NULL);
 	SetTimer(2,15000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
@@ -1086,7 +1119,7 @@ void CDialogCM5_BacNet::Fresh()
 	//prevent when user doesn't click the bacnet device,the view also initial ,It's a waste of resource;
 #if 1
 	static bool initial_once = true;
-
+	
 	if(initial_once)
 	{
 		initial_once = false;
@@ -1094,15 +1127,7 @@ void CDialogCM5_BacNet::Fresh()
 	}
 #endif
 
-	HICON hIcon = NULL; 
-	HINSTANCE hInstResource    = NULL; 
-	hInstResource = AfxFindResourceHandle(MAKEINTRESOURCE(IDI_ICON_OK), RT_GROUP_ICON); 
-	hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_OK), IMAGE_ICON, 24, 24, 0); 
-	((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CHANGED))->SetIcon(hIcon);
 
-	hInstResource = AfxFindResourceHandle(MAKEINTRESOURCE(IDI_ICON_EXIT), RT_GROUP_ICON); 
-	hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_EXIT), IMAGE_ICON, 24, 24, 0); 
-	((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CANCLE))->SetIcon(hIcon);
 }
 
 
@@ -1325,7 +1350,6 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 	int command_type = wParam;
 	int button_click = 0;
 	CString temp_cs;
-	int temp_year;
 	CTime	TimeTemp;
 	switch(command_type)
 	{
@@ -1344,44 +1368,45 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 		/*((CStatic *)*/GetDlgItem(IDC_STATIC_CM5_VENDOR_ID)->SetWindowTextW(bac_cs_vendor_id);
 #endif
 		break;
-	case TIME_COMMAND:
-		if(Device_time.year<2000)
-			temp_year = Device_time.year + 2000;
-		TimeTemp = CTime(temp_year,Device_time.month,Device_time.dayofmonth,Device_time.ti_hour,Device_time.ti_min,Device_time.ti_sec);
-		
+	//case TIME_COMMAND:
+	//	if(Device_time.year<2000)
+	//		temp_year = Device_time.year + 2000;
+	//	TimeTemp = CTime(temp_year,Device_time.month,Device_time.dayofmonth,Device_time.ti_hour,Device_time.ti_min,Device_time.ti_sec);
+	//	
 
-		m_cm5_time_picker.SetFormat(_T("HH:mm"));
-		m_cm5_time_picker.SetTime(&TimeTemp);
+	//	m_cm5_time_picker.SetFormat(_T("HH:mm"));
+	//	m_cm5_time_picker.SetTime(&TimeTemp);
 
-		//m_cm5_date_picker.SetFormat(_T("YY/MM/DD"));
-		m_cm5_date_picker.SetTime(&TimeTemp);
-		break;
-	case READ_SETTING_COMMAND:
-		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->SetAddress(Device_Basic_Setting.reg.ip_addr[0],
-			Device_Basic_Setting.reg.ip_addr[1],Device_Basic_Setting.reg.ip_addr[2],Device_Basic_Setting.reg.ip_addr[3]);
-		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->SetAddress(Device_Basic_Setting.reg.subnet[0],
-			Device_Basic_Setting.reg.subnet[1],Device_Basic_Setting.reg.subnet[2],Device_Basic_Setting.reg.subnet[3]);
-		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->SetAddress(Device_Basic_Setting.reg.gate_addr[0],
-			Device_Basic_Setting.reg.gate_addr[1],Device_Basic_Setting.reg.gate_addr[2],Device_Basic_Setting.reg.gate_addr[3]);
+	//	//m_cm5_date_picker.SetFormat(_T("YY/MM/DD"));
+	//	m_cm5_date_picker.SetTime(&TimeTemp);
+	//	break;
+	//case READ_SETTING_COMMAND:
+	//	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->SetAddress(Device_Basic_Setting.reg.ip_addr[0],
+	//		Device_Basic_Setting.reg.ip_addr[1],Device_Basic_Setting.reg.ip_addr[2],Device_Basic_Setting.reg.ip_addr[3]);
+	//	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->SetAddress(Device_Basic_Setting.reg.subnet[0],
+	//		Device_Basic_Setting.reg.subnet[1],Device_Basic_Setting.reg.subnet[2],Device_Basic_Setting.reg.subnet[3]);
+	//	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->SetAddress(Device_Basic_Setting.reg.gate_addr[0],
+	//		Device_Basic_Setting.reg.gate_addr[1],Device_Basic_Setting.reg.gate_addr[2],Device_Basic_Setting.reg.gate_addr[3]);
 
-		if(Device_Basic_Setting.reg.tcp_type == 0)
-		{
-			((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->SetCheck(true);
-			((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->SetCheck(false);
-			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
-			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
-			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
-		}
-		else if(Device_Basic_Setting.reg.tcp_type == 1)
-		{
-			((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->SetCheck(false);
-			((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->SetCheck(true);
-			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(true);
-			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(true);
-			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
-		}
-		break;
+	//	if(Device_Basic_Setting.reg.tcp_type == 0)
+	//	{
+	//		((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->SetCheck(true);
+	//		((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->SetCheck(false);
+	//		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
+	//		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
+	//		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
+	//	}
+	//	else if(Device_Basic_Setting.reg.tcp_type == 1)
+	//	{
+	//		((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->SetCheck(false);
+	//		((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->SetCheck(true);
+	//		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(true);
+	//		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(true);
+	//		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
+	//	}
+	//	break;
 	case MENU_CLICK:
+
 		button_click = lParam;
 		if(button_click == WRITEPRGFLASH_COMMAND)
 		{
@@ -1404,166 +1429,7 @@ LRESULT CDialogCM5_BacNet::Fresh_UI(WPARAM wParam,LPARAM lParam)
 	
 	return 0;
 }
-#if 0
-DWORD WINAPI   CDialogCM5_BacNet::CM5_UI(LPVOID lpVoid)
-{
-	CDialogCM5_BacNet * mparent = (CDialogCM5_BacNet *)lpVoid;
-	while(1)
-	{
-		Sleep(500);
-		bool connect_results = Get_MSTP_Connect_Status();
-		static bool Old_connect_results = false;
 
-
-			if(Old_connect_results != connect_results)//Prevent repeatedly to redraw the Static.
-			{
-				if(connect_results)
-				{
-
-					SetPaneString(BAC_SHOW_CONNECT_RESULTS,_T("Connected"));
-
-					//mparent->m_bac_static_status.SetWindowTextW(_T("Connected"));
-					//mparent->m_bac_static_status.textColor(RGB(0,0,255));
-					//mparent->m_bac_static_status.bkColor(RGB(0,255,0));
-
-
-				}
-				else
-				{
-					SetPaneString(BAC_SHOW_CONNECT_RESULTS,_T("Disconnected"));
-					//mparent->m_bac_static_status.SetWindowTextW(_T("Disconnected"));
-					//mparent->m_bac_static_status.textColor(RGB(255,255,255));
-					//mparent->m_bac_static_status.bkColor(RGB(255,0,0));
-
-				}
-			}
-
-			/*((CStatic *)*/mparent->GetDlgItem(IDC_STATIC_CM_DEVICE_ID)->SetWindowTextW(bac_cs_device_id);
-			/*((CStatic *)*/mparent->GetDlgItem(IDC_STATIC_CM5_MAC)->SetWindowTextW(bac_cs_mac);
-			/*((CStatic *)*/mparent->GetDlgItem(IDC_STATIC_CM5_VENDOR_ID)->SetWindowTextW(bac_cs_vendor_id);
-			g_bac_instance = _wtoi(bac_cs_device_id);
-			bac_gloab_panel = _wtoi(bac_cs_mac);
-
-		Old_connect_results = connect_results;
-
-	}
-	return 0;
-}
-#endif
-#if 0
-DWORD WINAPI   CDialogCM5_BacNet::MSTP_Receive(LPVOID lpVoid)
-{
-	BACNET_ADDRESS src = {0};
-	uint16_t pdu_len;
-	CDialogCM5_BacNet *mparent = (CDialogCM5_BacNet *)lpVoid;
-	uint8_t Rx_Buf[MAX_MPDU] = { 0 };
-	while(mparent->m_MSTP_THREAD)
-	{
-		pdu_len = dlmstp_receive(&src, &Rx_Buf[0], MAX_MPDU, INFINITE);
-		if(pdu_len==0)
-			continue;
-		npdu_handler(&src, &Rx_Buf[0], pdu_len);
-		//CString TEMP1;
-		//TEMP1.Format("%s",Rx_Buf);
-		//	AfxMessageBox(TEMP1);
-	}
-	return 0;
-}
-#endif
-#if 0
-static void Init_Service_Handlers(
-	void)
-{
-	Device_Init(NULL);
-
-	/* we need to handle who-is to support dynamic device binding */
-	apdu_set_unconfirmed_handler(SERVICE_UNCONFIRMED_WHO_IS, handler_who_is);
-	apdu_set_unconfirmed_handler(SERVICE_UNCONFIRMED_I_AM, LocalIAmHandler);
-
-
-
-	apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_PRIVATE_TRANSFER,local_handler_conf_private_trans_ack);
-	//apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY,Read_Property_feed_back);
-
-	apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY,	Localhandler_read_property_ack);
-	/* set the handler for all the services we don't implement */
-	/* It is required to send the proper reject message... */
-	apdu_set_unrecognized_service_handler_handler
-		(handler_unrecognized_service);
-	/* we must implement read property - it's required! */
-	apdu_set_confirmed_handler(SERVICE_CONFIRMED_READ_PROPERTY,
-		handler_read_property);
-	apdu_set_confirmed_handler(SERVICE_CONFIRMED_READ_PROP_MULTIPLE,
-		handler_read_property_multiple);
-	/* handle the data coming back from confirmed requests */
-	//   apdu_set_confirmed_ack_handler(SERVICE_CONFIRMED_READ_PROPERTY,handler_read_property_ack);
-#if defined(BACFILE)
-	apdu_set_confirmed_handler(SERVICE_CONFIRMED_ATOMIC_READ_FILE,
-		handler_atomic_read_file);
-#endif
-	apdu_set_confirmed_handler(SERVICE_CONFIRMED_SUBSCRIBE_COV,
-		handler_cov_subscribe);
-
-////#if 0
-////	/* Adding these handlers require the project(s) to change. */
-////#if defined(BACFILE)
-////	apdu_set_confirmed_handler(SERVICE_CONFIRMED_ATOMIC_WRITE_FILE,
-////		handler_atomic_write_file);
-////#endif
-////	apdu_set_confirmed_handler(SERVICE_CONFIRMED_READ_RANGE,
-////		handler_read_range);
-////	apdu_set_confirmed_handler(SERVICE_CONFIRMED_REINITIALIZE_DEVICE,
-////		handler_reinitialize_device);
-////	apdu_set_unconfirmed_handler(SERVICE_UNCONFIRMED_UTC_TIME_SYNCHRONIZATION,
-////		handler_timesync_utc);
-////	apdu_set_unconfirmed_handler(SERVICE_UNCONFIRMED_TIME_SYNCHRONIZATION,
-////		handler_timesync);
-////	apdu_set_unconfirmed_handler(SERVICE_UNCONFIRMED_COV_NOTIFICATION,
-////		handler_ucov_notification);
-////	/* handle communication so we can shutup when asked */
-////	apdu_set_confirmed_handler(SERVICE_CONFIRMED_DEVICE_COMMUNICATION_CONTROL,
-////		handler_device_communication_control);
-////#endif
-}
-#endif
-//void CDialogCM5_BacNet::Initial_List()
-//{
-//	long style;
-//	style=GetWindowLong(m_device_list_info.m_hWnd,GWL_STYLE);
-//	style&=~LVS_TYPEMASK;
-//	style|=LVS_REPORT;	
-//	style|=LVS_EX_CHECKBOXES;
-//	//	style|=RC_CHKBOX_SINGLE;
-//
-//	m_device_list_info.SetExtendedStyle(style);
-//	SetWindowLong(m_device_list_info.m_hWnd,GWL_STYLE,style);//list_infomation.m_hWnd´
-//	DWORD dwstyle=m_device_list_info.GetExtendedStyle();
-//	dwstyle|=LVS_EX_FULLROWSELECT; //
-//	dwstyle|=LVS_EX_GRIDLINES;     //
-//	m_device_list_info.SetExtendedStyle(dwstyle);
-//	m_device_list_info.InsertColumn(0,_T("Device ID"),LVCFMT_CENTER,100);  
-//	m_device_list_info.InsertColumn(1,_T("MAC"),LVCFMT_CENTER,200);
-//	m_device_list_info.InsertColumn(2,_T("Vendor ID"),LVCFMT_CENTER,200);
-//	m_device_list_info.SetTextColor(RGB(0,0,255));
-//	m_device_list_info.SetCheckboxeStyle(RC_CHKBOX_SINGLE);
-//	//m_list_control.SortItems(0, FALSE); // sort the 1st column, ascending
-//	m_device_list_info.SetSortable(FALSE);
-//}
-
-
-
-
-
-
-
-
-
-
-//void CDialogCM5_BacNet::OnBnClickedButton1()
-//{
-//	// TODO: Add your control notification handler code here
-//	//WritePrivateData();
-//}
 
 
 
@@ -1574,20 +1440,23 @@ void CDialogCM5_BacNet::Show_Wait_Dialog_And_SendMessage(int read_list_type)
 	{
 		if(bac_read_which_list == BAC_READ_SVAE_CONFIG)
 		{
-			WaitDlg = new BacnetWait((int)2);//如果是保存为ini文件 就要读取全部的data;
+			WaitDlg = new BacnetWait((int)BAC_WAIT_READ_DATA_WRITE_CONFIG);//如果是保存为ini文件 就要读取全部的data;
 		}
 		else
 		{
-			WaitDlg = new BacnetWait((int)0);
+			WaitDlg = new BacnetWait((int)BAC_WAIT_NORMAL_READ);
 		}
 		WaitDlg->Create(IDD_DIALOG_BACNET_WAIT,this);
 		WaitDlg->ShowWindow(SW_SHOW);
 
+
 		RECT RECT_SET1;
-		GetWindowRect(&RECT_SET1);
-		//	GetClientRect(&RECT_SET1);
-		//WaitDlg->MoveWindow(RECT_SET1.left+100,RECT_SET1.bottom-200,560/*RECT_SET1.left+270*//*RECT_SET1.right/2+20*/,100);
-		WaitDlg->MoveWindow(RECT_SET1.left+100,RECT_SET1.top+400,560/*RECT_SET1.left+270*//*RECT_SET1.right/2+20*/,100);
+		GetClientRect(&RECT_SET1);
+		ClientToScreen(&RECT_SET1);
+		WaitDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 19,800,20);
+		//RECT RECT_SET1;
+		//GetWindowRect(&RECT_SET1);
+		//WaitDlg->MoveWindow(RECT_SET1.left+100,RECT_SET1.top+400,560/*RECT_SET1.left+270*//*RECT_SET1.right/2+20*/,100);
 	}
 
 	//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);
@@ -2472,6 +2341,15 @@ DWORD WINAPI  CDialogCM5_BacNet::Send_read_Command_Thread(LPVOID lpVoid)
 		}
 	}
 
+	if( bac_read_which_list == BAC_READ_ALL_LIST)
+	{
+		g_CommunicationType = 1;
+		SetCommunicationType(1);
+		if(Open_Socket2(IP_ADDRESS,6001))	//在线程里面去连接设备 用于modbus的 协议通讯;
+		{
+
+		}
+	}
 
 		hwait_thread = NULL;
 
@@ -2484,6 +2362,12 @@ myend:	hwait_thread = NULL;
 	return 0;
 }
 
+void CDialogCM5_BacNet::SetConnected_IP(LPCTSTR myip)
+{
+	IP_ADDRESS.Empty();
+	IP_ADDRESS.Format(_T("%s"),myip);
+	//IP_ADDRESS = myip;
+}
 
 void CDialogCM5_BacNet::WriteFlash()
 {
@@ -2514,217 +2398,6 @@ void CDialogCM5_BacNet::WriteFlash()
 
 
 
-
-
-
-void CDialogCM5_BacNet::OnBnClickedButtonBacTest()
-{
-	// TODO: Add your control notification handler code here
-
-	int	resend_count = 0;
-	do 
-	{
-		resend_count ++;
-		if(resend_count>20)
-			return;
-		g_invoke_id = GetPrivateData(g_bac_instance,
-			TIME_COMMAND,0,
-			0,
-			sizeof(Time_block_mini));
-		Sleep(200);
-	} while (g_invoke_id<0);
-
-	CString temp_cs_show;
-	temp_cs_show.Format(_T("Task ID = %d. Read time "),g_invoke_id);
-	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
-
-	//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-
-
-}
-
-
-void CDialogCM5_BacNet::OnBnClickedBacEnableEditTime()
-{
-	// TODO: Add your control notification handler code here
-	//g_invoke_id = GetPrivateData(
-	//	177,
-	//	GETSERIALNUMBERINFO, 
-	//	0,
-	//	0,
-	//	sizeof(Str_Serial_info));
-	//if(g_invoke_id<0)
-	//	MessageBox(_T("111"));
-#if 1
-
-	static bool edit_status = false;
-	if(edit_status == false)
-	{
-		edit_status = true;
-		m_cm5_date_picker.EnableWindow(1);
-		m_cm5_time_picker.EnableWindow(1);
-		GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(1);
-		GetDlgItem(IDC_BAC_ENABLE_EDIT_TIME)->SetWindowTextW(_T("Disable Edit"));
-	}
-	else
-	{
-		edit_status = false;
-		m_cm5_date_picker.EnableWindow(0);
-		m_cm5_time_picker.EnableWindow(0);
-		GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(0);
-		GetDlgItem(IDC_BAC_ENABLE_EDIT_TIME)->SetWindowTextW(_T("Enable Edit"));
-	}
-#endif
-}
-
-void CDialogCM5_BacNet::Get_Time_Edit_By_Control()
-{
-	CTime temp_day;
-
-	m_cm5_date_picker.GetTime(temp_day);
-	
-	int temp_year	= temp_day.GetYear();
-	if(temp_year > 2000)
-		temp_year = temp_year - 2000;
-	Device_time.year = temp_year;
-	Device_time.month = temp_day.GetMonth();
-	Device_time.dayofmonth = temp_day.GetDay();
-	Device_time.dayofweek = temp_day.GetDayOfWeek() -1;
-	Device_time.dayofyear = 1;
-
-	
-	CTime temp_time;
-	m_cm5_time_picker.GetTime(temp_time);
-	Device_time.ti_hour = temp_time.GetHour();
-	Device_time.ti_min = temp_time.GetMinute();
-	Device_time.ti_sec = temp_time.GetMinute();
-	CString temp_task_info;
-	temp_task_info.Format(_T("Write Device Time.Changed to %02d-%02d %02d:%02d  "),
-		Device_time.month,Device_time.dayofmonth,
-		Device_time.ti_hour,Device_time.ti_min);
-	Post_Write_Message(g_bac_instance,RESTARTMINI_COMMAND,0,0,sizeof(Time_block_mini),this->m_hWnd,temp_task_info);
-}
-
-void CDialogCM5_BacNet::OnNMKillfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	// TODO: Add your control notification handler code here
-
-	Get_Time_Edit_By_Control();
-	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(0);
-	*pResult = 0;
-}
-
-
-void CDialogCM5_BacNet::OnNMKillfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	// TODO: Add your control notification handler code here
-	Get_Time_Edit_By_Control();
-	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(0);
-	*pResult = 0;
-}
-
-
-
-
-void CDialogCM5_BacNet::OnNMSetfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	// TODO: Add your control notification handler code here
-	GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
-	*pResult = 0;
-}
-
-
-void CDialogCM5_BacNet::OnNMSetfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	// TODO: Add your control notification handler code here
-	GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
-	*pResult = 0;
-}
-
-void CDialogCM5_BacNet::OnBnClickedBtnBacSYNCTime()
-{
-	CTime	TimeTemp;
-	CTime temp_time;
-	int nyear,nmonth,nday,nhour,nmin,nsec;
-	temp_time = CTime::GetCurrentTime();
-	if(temp_time.GetYear()<2000)
-		nyear = temp_time.GetYear() + 2000;
-	else
-		nyear = temp_time.GetYear();
-	nmonth = temp_time.GetMonth();
-	nday = temp_time.GetDay();
-	nhour = temp_time.GetHour();
-	nmin = temp_time.GetMinute();
-	nsec = temp_time.GetSecond();
-	TimeTemp = CTime(nyear,nmonth,nday,nhour,nmin,nsec);
-
-	m_cm5_time_picker.SetFormat(_T("HH:mm"));
-	m_cm5_time_picker.SetTime(&TimeTemp);
-
-	//m_cm5_date_picker.SetFormat(_T("YY/MM/DD"));
-	m_cm5_date_picker.SetTime(&TimeTemp);
-
-	GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
-	Get_Time_Edit_By_Control();
-	
-}
-
-void CDialogCM5_BacNet::OnBnClickedBtnBacWriteTime()
-{
-	// TODO: Add your control notification handler code here
-
-	Get_Time_Edit_By_Control();
-
-}
-
-void CDialogCM5_BacNet::OnBnClickedBtnBacIPAuto()
-{
-	Device_Basic_Setting.reg.tcp_type = 0;
-
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
-}
-
-void CDialogCM5_BacNet::OnBnClickedBtnBacIPStatic()
-{
-	Device_Basic_Setting.reg.tcp_type = 1;
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(true);
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(true);
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
-}
-
-void CDialogCM5_BacNet::OnBnClickedBtnBacIPChange()
-{
-	BYTE address1,address2,address3,address4;
-	BYTE subnet1, subnet2, subnet3, subnet4;
-	BYTE gatway1,gatway2,gatway3,gatway4;
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->GetAddress(address1,address2,address3,address4);
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->GetAddress(subnet1,subnet2,subnet3,subnet4);
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->GetAddress(gatway1,gatway2,gatway3,gatway4);
-	Device_Basic_Setting.reg.ip_addr[0] = address1;
-	Device_Basic_Setting.reg.ip_addr[1] = address2;
-	Device_Basic_Setting.reg.ip_addr[2] = address3;
-	Device_Basic_Setting.reg.ip_addr[3] = address4;
-	Device_Basic_Setting.reg.subnet[0]  = subnet1;
-	Device_Basic_Setting.reg.subnet[1]  = subnet2;
-	Device_Basic_Setting.reg.subnet[2]  = subnet3;
-	Device_Basic_Setting.reg.subnet[3]  = subnet4;
-	Device_Basic_Setting.reg.gate_addr[0] = gatway1;
-	Device_Basic_Setting.reg.gate_addr[1] = gatway2;
-	Device_Basic_Setting.reg.gate_addr[2] = gatway3;
-	Device_Basic_Setting.reg.gate_addr[3] = gatway4;
-	bool isstatic = ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->GetCheck(); //返回1表示选上，0表示没选上;
-	Device_Basic_Setting.reg.tcp_type = isstatic;
-	CString temp_task_info;
-	temp_task_info.Format(_T("Change IP Address Information "));
-	Post_Write_Message(g_bac_instance,WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
-}
-
-void CDialogCM5_BacNet::OnBnClickedBtnBacIPCancle()
-{
-	PostMessage(WM_FRESH_CM_LIST,READ_SETTING_COMMAND,NULL);
-}
 
 
 
@@ -2926,6 +2599,10 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 				
 				g_hwnd_now = m_tstat_dlg_hwnd;
 				break;
+			case WINDOW_SETTING:
+				((CBacnetSetting *)pDialog[i])->Fresh_Setting_UI(READ_SETTING_COMMAND,NULL);
+				g_hwnd_now = m_setting_dlg_hwnd;
+				break;
 			}
 			
 //			pDialog[i]->OnInitDialog();
@@ -3023,6 +2700,10 @@ BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
 					PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_TSTAT);
 					//	((CBacnetTstat *)pDialog[i])->Fresh_Alarmlog_List(NULL,NULL);
 					g_hwnd_now = m_tstat_dlg_hwnd;
+					break;
+				case WINDOW_SETTING:
+					((CBacnetSetting *)pDialog[i])->Fresh_Setting_UI(NULL,NULL);
+					g_hwnd_now = m_setting_dlg_hwnd;
 					break;
 				}
 

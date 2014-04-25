@@ -145,6 +145,7 @@ namespace ListCtrlEx
 
 // operations
 	public:
+		void				Support_Keyboard(bool b_support);
 		void                Set_Edit(bool b_edit);
 		BOOL				Get_Edit();
 		void				SetListData(char *mydata,int data_length);
@@ -260,6 +261,7 @@ namespace ListCtrlEx
 		int				m_select_raw;
 		int				m_select_col;
 		bool			m_show_bk_color;//记录是否显示选中背景颜色;
+		bool			m_support_key;
 	protected:
 		struct _ColumnSort_t
 		{

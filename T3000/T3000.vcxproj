@@ -77,7 +77,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>E:\WebForAlex\T3000_Building_Automation_System\HelpDocs;$(SolutionDir)\..\T3000 Output\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\T3000 Output\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
@@ -110,7 +110,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>E:\WebForAlex\T3000_Building_Automation_System\HelpDocs;$(SolutionDir)\..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -134,7 +134,6 @@
     <ClCompile Include="BacnetAnnualRoutine.cpp" />
     <ClCompile Include="BacnetController.cpp" />
     <ClCompile Include="BacnetGraphic.cpp" />
-    <ClCompile Include="BacnetInfo.cpp" />
     <ClCompile Include="BacnetInput.cpp" />
     <ClCompile Include="BacnetMonitor.cpp" />
     <ClCompile Include="BacnetOutput.cpp" />
@@ -144,6 +143,7 @@
     <ClCompile Include="BacnetScheduleTime.cpp" />
     <ClCompile Include="BacnetScreen.cpp" />
     <ClCompile Include="BacnetScreenEdit.cpp" />
+    <ClCompile Include="BacnetSetting.cpp" />
     <ClCompile Include="BacnetTool.cpp" />
     <ClCompile Include="BacnetToolReadProperty.cpp" />
     <ClCompile Include="BacnetTstat.cpp" />
@@ -251,6 +251,7 @@
     <ClCompile Include="TrafficWindow.cpp" />
     <ClCompile Include="TrendLogView.cpp" />
     <ClCompile Include="TrendLogWnd.cpp" />
+    <ClCompile Include="TstatZigbeeLogic.cpp" />
     <ClCompile Include="TStat_Dev.cpp" />
     <ClCompile Include="TStat_Net.cpp" />
     <ClCompile Include="TStatBase.cpp" />
@@ -342,13 +343,14 @@
     <ClInclude Include="BacnetAlarmLog.h" />
     <ClInclude Include="ARDDlg.h" />
     <ClInclude Include="BacnetAlarmWindow.h" />
-    <ClInclude Include="BacnetInfo.h" />
+    <ClInclude Include="BacnetGraphic.h" />
     <ClInclude Include="BacnetInput.h" />
     <ClInclude Include="BacnetOutput.h" />
     <ClInclude Include="BacnetProgram.h" />
     <ClInclude Include="BacnetProgramEdit.h" />
     <ClInclude Include="BacnetRange.h" />
     <ClInclude Include="BacnetScreenEdit.h" />
+    <ClInclude Include="BacnetSetting.h" />
     <ClInclude Include="BacnetTool.h" />
     <ClInclude Include="BacnetToolReadProperty.h" />
     <ClInclude Include="BacnetTstat.h" />
@@ -405,6 +407,7 @@
     <ClInclude Include="TestMultiReadTraffic.h" />
     <ClInclude Include="TrafficWindow.h" />
     <ClInclude Include="TrendLogWnd.h" />
+    <ClInclude Include="TstatZigbeeLogic.h" />
     <ClInclude Include="WeeklySchedule.h" />
     <ClInclude Include="5EInputDialog.h" />
     <ClInclude Include="AddBuilding.h" />

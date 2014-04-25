@@ -678,7 +678,7 @@ void CGraphicView::OnBnClickedGobackbutton()
 #endif
 
 #ifdef Fance_Enable_Test
-	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(DLG_CM5_BACNET_VIEW);
+	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(DLG_BACNET_VIEW);
 	
 #endif
 }

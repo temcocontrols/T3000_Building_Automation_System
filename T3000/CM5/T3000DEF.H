@@ -406,7 +406,7 @@ typedef enum {
 		property_digital_analog,
 		property_range,
 		property_control,
-		property_access_level,
+		property_hw_switch_status,
 		property_decom,
 		property_m_del_low,
 		property_s_del_high,

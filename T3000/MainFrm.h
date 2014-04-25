@@ -411,7 +411,7 @@ const int DLG_LIGHTINGCONTROLLER_VIEW = 8;
 const int DLG_HUMCHAMBER = 9;
 const int DLG_CO2_VIEW = 10;
 const int DLG_CO2_NET_VIEW=11;
-const int DLG_CM5_BACNET_VIEW = 12;
+const int DLG_BACNET_VIEW = 12;
 //T3-Serials
 const int DLG_DIALOGT3_VIEW = 5;
 const int DLG_DIALOGT38I13O_VIEW=13;
@@ -421,3 +421,5 @@ const int DLG_DIALOGT36CT=16;
 const int DLG_DIALOGT3PT10=17;
 
 extern int g_gloab_bac_comport;
+
+const int REGISTER_USE_ZIGBEE_485 = 640;

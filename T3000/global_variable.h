@@ -1821,6 +1821,7 @@ int	MODBUS_PID3_OFF_OUTPUT_HEAT3		=	-1	;
 
 #pragma region For_bacnet
 int g_bac_instance;
+int g_selected_serialnumber;
 unsigned short g_mac;
 HWND MainFram_hwd;
 HWND BacNet_hwd;
@@ -1877,6 +1878,7 @@ HWND	  m_monitor_dlg_hwnd;
 HWND	  m_alarmlog_dlg_hwnd;
 HWND      m_alarmwindow_dlg_hwnd;
 HWND      m_tstat_dlg_hwnd;
+HWND      m_setting_dlg_hwnd;
 
 vector <Str_out_point> m_Output_data;
 vector <Str_in_point>  m_Input_data;
@@ -1888,7 +1890,6 @@ vector <Str_schedual_time_point> m_Schedual_Time_data;
 vector <Str_controller_point> m_controller_data;
 vector <Control_group_point> m_screen_data;
 vector <Str_monitor_point> m_monitor_data;
-vector <_Com_Scan_Read_Info> m_bac_scan_resend_data;
 vector <_Bac_Scan_Com_Info> m_bac_scan_com_data;
 vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 vector <Alarm_point> m_alarmlog_data;
@@ -1899,6 +1900,7 @@ Str_Setting_Info Device_Basic_Setting;
 vector <refresh_net_device> m_refresh_net_device_data;
 
 Monitor_Block m_monitor_block;
+Str_Monitor_data_header m_monitor_head;//用来接收monitor 的头，里面有需要接收的总包和目前是第几包;
 int Monitor_Input__Data[14][1000];	
 Monitor_Input_Info my_input_info[14];
 
@@ -1931,7 +1933,7 @@ DWORD cm5_nThreadID;
 CDialog *pDialog[11];
 CDialog *DebugWindow;
 HWND h_debug_window;
-CString PrintText[100];
+CString PrintText[1000];
 CString g_Print;
 bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，否则就为1;
 int g_protocol;
@@ -1946,4 +1948,11 @@ SOCKET h_Broad=NULL;
 SOCKADDR_IN h_siBind;
 SOCKADDR_IN h_bcast;
 
+_RecordsetPtr m_global_pRs;
+_ConnectionPtr m_global_pCon;
+
+Data_Time_Match * analog_data_point[MAX_POINTS_IN_MONITOR];
+int analog_data_count[MAX_POINTS_IN_MONITOR];	//用于记录analog data 这个指针到底存了多少数据;
+int get_data_count = 0;
+Data_Time_Match * temp_analog_data[MAX_POINTS_IN_MONITOR];	//临时存放新建的块;
 #pragma endregion For_bacnet
