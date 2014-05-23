@@ -63,10 +63,13 @@
 #define IDC_Model_FIRMVER               1039
 #define IDC_Model_Name3                 1040
 #define IDC_Model_HARDWAREVER           1040
+#define IDC_Model_Name2                 1041
 #define IDC_CLEAR_LOG                   1042
 #define IDC_CLEAR_LOG2                  1043
 #define IDC_SAVE_LOG                    1043
+#define IDC_Model_FIRMVER2              1044
 #define IDC_EDIT_MDBID1                 1045
+#define IDC_Model_HARDWAREVER2          1046
 #define IDC_COM_SHOW2                   1047
 #define IDC_STATIC_COM                  1047
 #define IDC_STATIC_NET                  1048
@@ -76,6 +79,7 @@
 #define IDC_HEX_SIZE                    1052
 #define IDC_BIN_INFORMATION             1053
 #define IDC_STATIC_FILEPATH             1054
+#define IDC_STATIC_INFO2                1054
 #define IDC_STATIC_HEX_BOOT             1055
 #define IDC_BUTTON_SETTING_OK           6001
 #define IDC_EDIT_SETTING_TIMEOUT        6021

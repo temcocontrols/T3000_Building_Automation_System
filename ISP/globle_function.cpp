@@ -621,21 +621,6 @@ BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
 }
 
 
-
-BOOL Ping(const CString& strIP, CWnd* pWndEcho)
-{
-	CMyPing* pPing = new CMyPing;
-
-	pPing->SetPingEchoWnd(pWndEcho);
-	pPing->TestPing(strIP);
-
-
-	delete pPing;
-	pPing = NULL;
-	return FALSE;
-}
-
-
 int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 {
 	CFileFind fFind;
@@ -662,4 +647,17 @@ int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 	}
 	return OPEN_FILE_ERROR;
 
+}
+
+BOOL Ping(const CString& strIP, CWnd* pWndEcho)
+{
+    CMyPing* pPing = new CMyPing;
+
+    pPing->SetPingEchoWnd(pWndEcho);
+    pPing->TestPing(strIP);
+
+
+    delete pPing;
+    pPing = NULL;
+    return FALSE;
 }

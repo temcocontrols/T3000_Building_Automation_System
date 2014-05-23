@@ -37,6 +37,7 @@ typedef struct _Product_IP_ID
 int ISP_STEP;
 //vector <Product_IP_ID> Product_Info;
 BYTE Byte_ISP_Device_IP[4];
+
 BYTE Product_Name[12];
 BYTE Rev[4];
 bool device_has_replay_lan_IP=false;
@@ -705,7 +706,8 @@ BOOL TFTPServer::StartServer()
 					OutPutsStatusInfo(strTips, FALSE);				
 				//}
 
-				goto StopServer;
+
+					goto StopServer;
 				//if(some_device_reply_the_broadcast == true)	//这个是用来支持 多个 在bootload中回复的 广播，如果有 则 先打印其中有几个回复
 				//{
 				//	CString temp_pro_cs;
@@ -751,11 +753,11 @@ BOOL TFTPServer::StartServer()
                 m_StrRev.Format(_T("%C%C%C%C"),Rev[0],Rev[1],Rev[2],Rev[3]);
                 m_StrRev.TrimLeft();
                 m_StrRev.TrimRight();
-                if (m_StrFileProductName.Find(m_StrProductName)==-1)
-                {
-                  nRet=0;
-                  goto StopServer;
-                }
+// 				if (m_StrFileProductName.Find(m_StrProductName)==-1)
+// 				{
+// 					nRet=0;
+// 					goto StopServer;
+// 				}
 
 
 			}
@@ -834,6 +836,24 @@ StopServer:
 	
 
 	return TRUE;
+}
+void TFTPServer::Set_bininfor(Bin_Info temp){
+	
+	int i;
+	for (  i=0;i<5;i++)
+	{
+		m_binInfor.company[i]=temp.company[i];
+	}
+	for (  i=0;i<10;i++)
+	{
+		m_binInfor.product_name[i]=temp.product_name[i];
+	}
+	for (  i=0;i<3;i++)
+	{
+		m_binInfor.reserved[i]=temp.reserved[i];
+	}
+	m_binInfor.software_high=temp.software_high;
+	m_binInfor.software_low=temp.software_low;
 }
 bool TFTPServer::Send_Tftp_File()
 {
@@ -1310,8 +1330,8 @@ void TFTPServer::FlashByEthernet()
 		add_port= rand() % 100+ 1;
 
 	GetDeviceIP_String();
-	int resualt=TCP_Flash_CMD_Socket.Create(0,SOCK_STREAM);//SOCK_STREAM
-//	int resualt=TCP_Flash_CMD_Socket.Create(m_nClientPort+add_port,SOCK_STREAM);//SOCK_STREAM
+	int resualt=TCP_Flash_CMD_Socket.Create(m_nClientPort+add_port,SOCK_STREAM);//SOCK_STREAM
+
 	if(resualt == 0)
 	{
 		DWORD error_msg=GetLastError();
@@ -1328,7 +1348,7 @@ void TFTPServer::FlashByEthernet()
 		return;
 	}
 	TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
-	
+	TCP_Flash_CMD_Socket.m_hex_bin_filepath=m_strFileName;
 	m_pThread = AfxBeginThread(_StartSeverFunc, this);
 
 	ASSERT(m_pThread);

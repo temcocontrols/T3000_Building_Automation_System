@@ -1,0 +1,217 @@
+END
+ChartCandlestickSerie.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/ChartCtrl/!svn/ver/111/ChartCtrl/ChartCandlestickSerie.cpp
+END
+ChartSerie.h
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/ChartCtrl/!svn/ver/116/ChartCtrl/ChartSerie.h
+END
+ChartSeriesMouseListener.h
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/ChartCtrl/!svn/ver/108/ChartCtrl/ChartSeriesMouseListener.h
+END
+ChartLabel.inl
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/ChartCtrl/!svn/ver/105/ChartCtrl/ChartLabel.inl
+END
+ChartSurfaceSerie.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/ChartCtrl/!svn/ver/98/ChartCtrl/ChartSurfaceSerie.cpp
+END
+ChartCursor.h
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/ChartCtrl/!svn/ver/114/ChartCtrl/ChartCursor.h
+END
+ChartLineSerie.h
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/ChartCtrl/!svn/ver/99/ChartCtrl/ChartLineSerie.h
+END
+PointsOrdering.h
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/ChartCtrl/!svn/ver/102/ChartCtrl/PointsOrdering.h
+END
+ChartBalloonLabel.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/ChartCtrl/!svn/ver/105/ChartCtrl/ChartBalloonLabel.h
+END
+ChartXYSerie.h
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/ChartCtrl/!svn/ver/102/ChartCtrl/ChartXYSerie.h
+END
+ChartBarSerie.h
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/ChartCtrl/!svn/ver/99/ChartCtrl/ChartBarSerie.h
+END
+ChartPointsSerie.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/ChartCtrl/!svn/ver/113/ChartCtrl/ChartPointsSerie.cpp
+END
+ChartCtrl.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/ChartCtrl/!svn/ver/111/ChartCtrl/ChartCtrl.cpp
+END
+ChartSerieBase.h
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/ChartCtrl/!svn/ver/113/ChartCtrl/ChartSerieBase.h
+END
+ChartSerie.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/ChartCtrl/!svn/ver/116/ChartCtrl/ChartSerie.cpp
+END
+ChartAxisLabel.h
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/ChartCtrl/!svn/ver/102/ChartCtrl/ChartAxisLabel.h
+END
+ChartAxis.h
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/ChartCtrl/!svn/ver/106/ChartCtrl/ChartAxis.h
+END
+ChartGanttSerie.h
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/ChartCtrl/!svn/ver/101/ChartCtrl/ChartGanttSerie.h
+END
+ChartLineSerie.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/ChartCtrl/!svn/ver/117/ChartCtrl/ChartLineSerie.cpp
+END
+ChartPointsArray.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/ChartCtrl/!svn/ver/103/ChartCtrl/ChartPointsArray.h
+END
+ChartDateTimeAxis.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/ChartCtrl/!svn/ver/107/ChartCtrl/ChartDateTimeAxis.cpp
+END
+ChartCandlestickSerie.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/ChartCtrl/!svn/ver/101/ChartCtrl/ChartCandlestickSerie.h
+END
+ChartLabel.h
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/ChartCtrl/!svn/ver/106/ChartCtrl/ChartLabel.h
+END
+ChartStandardAxis.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/ChartCtrl/!svn/ver/104/ChartCtrl/ChartStandardAxis.cpp
+END
+ChartSurfaceSerie.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/ChartCtrl/!svn/ver/98/ChartCtrl/ChartSurfaceSerie.h
+END
+ChartTitle.h
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/ChartCtrl/!svn/ver/112/ChartCtrl/ChartTitle.h
+END
+ChartBalloonLabel.inl
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/ChartCtrl/!svn/ver/113/ChartCtrl/ChartBalloonLabel.inl
+END
+ChartXYSerie.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/ChartCtrl/!svn/ver/116/ChartCtrl/ChartXYSerie.cpp
+END
+ChartBarSerie.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/ChartCtrl/!svn/ver/112/ChartCtrl/ChartBarSerie.cpp
+END
+ChartSerieBase.inl
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/ChartCtrl/!svn/ver/116/ChartCtrl/ChartSerieBase.inl
+END
+ChartMouseListener.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/ChartCtrl/!svn/ver/108/ChartCtrl/ChartMouseListener.h
+END
+ChartAxis.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/ChartCtrl/!svn/ver/106/ChartCtrl/ChartAxis.cpp
+END
+ChartGanttSerie.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/ChartCtrl/!svn/ver/111/ChartCtrl/ChartGanttSerie.cpp
+END
+ChartPointsSerie.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/ChartCtrl/!svn/ver/113/ChartCtrl/ChartPointsSerie.h
+END
+ChartCtrl.h
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/ChartCtrl/!svn/ver/111/ChartCtrl/ChartCtrl.h
+END
+ChartPointsArray.inl
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/ChartCtrl/!svn/ver/103/ChartCtrl/ChartPointsArray.inl
+END

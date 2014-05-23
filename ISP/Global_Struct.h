@@ -576,6 +576,8 @@ const TCHAR c_strFlashSNCfgFileName[] = _T("Flash_SN.cfg");				//	±£¥ÊFLASH SN µ
 const TCHAR c_strFlashHWVersion[] = _T("Hardware Verson : ");
 const TCHAR c_strFlashSNModel[] = _T("Product Model : ");
 
+
+ 
 typedef struct
 {
 	char company[5];
