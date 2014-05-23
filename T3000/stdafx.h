@@ -63,7 +63,7 @@ using namespace Gdiplus;
 
 #pragma  comment(lib,"HtmlHelp.lib")
 #pragma  comment(lib,"Iphlpapi.lib")
-#pragma  comment(lib,"ISP.lib")
+//#pragma  comment(lib,"ISP.lib")
 //#pragma  comment(lib,"RegisterMonitor.lib")
 #import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 //**********************************link to dll*********************
@@ -71,9 +71,9 @@ using namespace Gdiplus;
 #pragma comment(lib, "WS2_32")
 #pragma comment(lib,"ModbusDllforVc")
 #pragma comment(lib,"FlexSlideBar")
-#pragma comment(lib,"ISP")
+//#pragma comment(lib,"ISP")
 #pragma comment(lib,"BACnet_Stack_Library" )
-INPUT void  show_ISPDlg();
+//INPUT void  show_ISPDlg();
 //INPUT void  show_RegisterMonitorDlg(); 
 INPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length);
 //INPUT bool open_com(unsigned char m_com);
@@ -126,7 +126,7 @@ INPUT void NET_CloseLogFile();
 INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
 INPUT int Read_One(unsigned char device_var,unsigned short address);
 INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
-INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+//INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
 
 INPUT int Read_One_log(unsigned char device_var,unsigned short address,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 INPUT int Write_One_log(unsigned char device_var,unsigned short address,unsigned short val,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
@@ -169,6 +169,7 @@ using namespace std;  // Ensure that the namespace is set to std
 #define		WM_REFRESH_BAC_MONITOR_INPUT_LIST			WM_USER + 214
 #define		WM_REFRESH_BAC_ALARMLOG_LIST				WM_USER + 215
 #define		WM_REFRESH_BAC_TSTAT_LIST					WM_USER + 216
+#define     WM_DOWNLOADFILE_MESSAGE						WM_USER + 217
 
 
 

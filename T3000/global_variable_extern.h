@@ -905,6 +905,10 @@ extern	int	MODBUS_PID3_OFF_OUTPUT_COOL3	   ;
 extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT1	   ;
 extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT2	   ;
 extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT3	   ;
+
+
+extern int selected_product_index;
+
 #pragma region For_bacnet
 extern int bacnet_device_type;
 extern int g_bac_instance;
@@ -982,6 +986,7 @@ extern vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 extern vector <Alarm_point> m_alarmlog_data;
 extern vector <refresh_net_device> m_refresh_net_device_data;
 extern vector <Str_TstatInfo_point> m_Tstat_data;
+extern vector <Str_Remote_TstDB> m_remote_device_db;
 extern Str_Setting_Info Device_Basic_Setting;
 
 extern Monitor_Block m_monitor_block;

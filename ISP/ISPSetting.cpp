@@ -1,0 +1,95 @@
+// ISPSetting.cpp : implementation file
+//
+
+#include "stdafx.h"
+#include "ISP.h"
+#include "ISPSetting.h"
+#include "afxdialogex.h"
+
+extern unsigned int Remote_timeout;
+extern CString SettingPath;
+// CISPSetting dialog
+
+IMPLEMENT_DYNAMIC(CISPSetting, CDialogEx)
+
+CISPSetting::CISPSetting(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CISPSetting::IDD, pParent)
+{
+
+}
+
+CISPSetting::~CISPSetting()
+{
+}
+
+void CISPSetting::DoDataExchange(CDataExchange* pDX)
+{
+	CDialogEx::DoDataExchange(pDX);
+}
+
+
+BEGIN_MESSAGE_MAP(CISPSetting, CDialogEx)
+	ON_BN_CLICKED(IDC_BUTTON_SETTING_OK, &CISPSetting::OnBnClickedButtonSettingOk)
+	ON_BN_CLICKED(IDC_BUTTON_SETTING_CANCEL, &CISPSetting::OnBnClickedButtonSettingCancel)
+END_MESSAGE_MAP()
+
+
+// CISPSetting message handlers
+
+
+void CISPSetting::OnBnClickedButtonSettingOk()
+{
+	// TODO: Add your control notification handler code here
+	CString temptimeout;
+	GetDlgItemText(IDC_EDIT_SETTING_TIMEOUT,temptimeout);
+	unsigned int temp_value;
+	temp_value = _wtoi(temptimeout);
+	if(temp_value < 50)
+	{
+		MessageBox(_T("Please input a higher number"),_T("Information"),MB_OK | MB_INACTIVE);
+		return;
+	}
+	else
+	{
+
+		WritePrivateProfileStringW(_T("Setting"),_T("REMOTE_TIMEOUT"),temptimeout,SettingPath);
+		Remote_timeout = temp_value;
+		PostMessage(WM_CLOSE,NULL,NULL);
+
+	}
+}
+
+
+void CISPSetting::OnBnClickedButtonSettingCancel()
+{
+	// TODO: Add your control notification handler code here
+	PostMessage(WM_CLOSE,NULL,NULL);
+}
+
+
+BOOL CISPSetting::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if(pMsg->message == WM_KEYDOWN)
+	{
+		if(pMsg->wParam == VK_RETURN)
+		{
+			OnBnClickedButtonSettingOk();
+			return 1;
+		}
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
+
+
+BOOL CISPSetting::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+	CString temp_timeout;
+	temp_timeout.Format(_T("%d"),Remote_timeout);
+	SetDlgItemText(IDC_EDIT_SETTING_TIMEOUT,temp_timeout);
+	// TODO:  Add extra initialization here
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// EXCEPTION: OCX Property Pages should return FALSE
+}

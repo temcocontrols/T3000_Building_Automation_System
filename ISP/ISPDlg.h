@@ -5,17 +5,10 @@
 #pragma once
 #include "afxcmn.h"
 #include "afxwin.h"
-//#include "TstatFlashDlg.h"
+#include "TstatFlashDlg.h"
 #include "ConfigFileHandler.h"
-//#include "LightCtrlFlashDlg.h"
-//#include "NCFlashDlg.h"
-#include "FlashBase.h"
-#include "Resource.h"
-//#define  _declspec(dllexport)  EXPPORT_CLASS
-//#define  _declspec(dllimport)   IMPORT_CLASS
-extern "C" __declspec(dllexport) void  show_ISPDlg();
-
-
+#include "LightCtrlFlashDlg.h"
+#include "NCFlashDlg.h"
 
 enum NC_FLASH_TYPE
 {
@@ -33,13 +26,11 @@ enum NC_FLASH_TYPE
 #define FLASH_TSTAT_COM 1
 #define FLASH_NC_LC_NET 2
 #define FLASH_SUBID_NET 3
-#define FLASH_ONLY_SN 4
 
-
+ 
 class CComWriter;
 class TFTPServer;
-
-
+// CISPDlg dialog
 class CISPDlg : public CDialog ,public CFlashBase
 {
 // Construction
@@ -79,10 +70,10 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnBnClickedRadioFlhfirmware();
 	afx_msg void OnBnClickedRadioFlhbtldr();
-	
+	afx_msg LRESULT Show_Flash_DeviceInfor(WPARAM wParam, LPARAM lParam);
 	//afx_msg void OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
 	DECLARE_MESSAGE_MAP()
-
+    
 public:
 	//////////////////////////////////////////////////////////////////////////
 	// public method
@@ -98,19 +89,20 @@ public:
 	int GetCurSelTabPage();
 	CString GetCurSelPageStr();
 
-	void Show_Flash_DeviceInfor(int ID);
-	void Show_Flash_DeviceInfor_NET();
+	 
+	BOOL Show_Flash_DeviceInfor_NET();
 	CString Get_NET_Infor(CString strIPAdress,short nPort);
 	//void SetCurTabSel(int nSel);
 
 	//////////////////////////////////////////////////////////////////////////
 	// for flash sn
-	BOOL GetFlashSNParam(int& nHWVerison, CString& strProductModel);
-	
+	//BOOL GetFlashSNParam(int& nHWVerison, CString& strProductModel);
+BOOL	GetFlashSNParam(int& nHWVerison, CString& strProductModel,int &nProductID);
 	void OnTestPing(const CString& strIP);
 	//According to Model Name,return the hex file prefix of the Device Model Name
 	CString GetFilePrefix_FromDB(const CString& ModeName);
 	int   Judge_Model_Version();
+   void FlashSN();
 public: 
 	// public member
 	//CIPAddressCtrl m_IPAddr;
@@ -163,9 +155,7 @@ protected:	// private member
 	
 	TFTPServer*	m_pTFTPServer;				// 使用网络，TFTP协议flash，使用时实例化
 	CComWriter*		m_pTCPFlasher;//使用网络接口来flash subid
-	//CTstatFlashDlg			m_DlgTstatFlash;
-	//CNCFlashDlg			m_DlgNCFlash;
-	//CLightCtrlFlashDlg		m_DlgLightCtrlFlash;
+	
 public:
 	//CTabCtrl					m_tab;
 	CString					m_strHexFileName;			// hex文件名，包含路径，要烧录的文件，实际上也可能是bin文件
@@ -175,8 +165,8 @@ public:
 	int							m_nTabSel;
 	
 	BOOL						m_bShowSN;					// 是否显示隐藏的界面。
-
-
+   
+     
 	map<int, CString>	m_mapModel;
 
 	CString					m_strPingIP;	
@@ -188,7 +178,8 @@ public:
 	//是否点击了刷新子ID的按钮，点击了，标志位TRUE
 	void set_SUBID();
 	//void Set_Device_FHInfor();	//FirmVersion,HardVersion
-
+    CString m_strASIX;
+    CString m_strProductName;
 private:
 	CEdit id;
 	CComboBox m_ComPort;
@@ -218,6 +209,14 @@ private:
 		CStdioFile*		 m_plogFile;
 		//这个变量是数据库的路径
 		CString	m_strDatabasefilepath;
+
+
+		UINT m_ProductModel;
+		float m_softwareRev;
+		CString m_ProductName;
+		CString m_ChipName;
+		UINT m_ChipSize;
+
 public:
 	//点击click-box 的空间的触发事件
 	afx_msg void OnBnClickedCheckFlashSubid();
@@ -243,7 +242,8 @@ public:
 	 
  
 	short m_IPPort;
-	 
+    void InitISPUI();
+    void initFlashSN();
 	afx_msg void OnMainClear();
 	afx_msg void OnSaveLogInfo();
 	afx_msg void OnBnClickedClearLog();
@@ -253,4 +253,12 @@ public:
 
 	afx_msg void OnMenuApp();
 	afx_msg void OnMenuAbout();
+	afx_msg void OnBnClickedShowHex();
+    afx_msg void OnBnClickedFlashSn();
+	afx_msg void OnMenuSetting();
+//    CString m_bin_inforamtion;
+//    CString m_strFirmwarepath;
+//    afx_msg void OnBnClickedButtonSelfile2();
+	afx_msg void OnMenuCheckhex();
+	void CheckAutoFlash();
 };

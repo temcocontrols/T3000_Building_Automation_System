@@ -1430,7 +1430,6 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 		{
 			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_in_point))!=0)
 				return -1;	//得到的结构长度错误;
-			int test =  sizeof(Str_in_point);
 			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_in_point);
 			//m_Input_data_length = block_length;
 			my_temp_point = (char *)Temp_CS.value + 3;
@@ -2060,10 +2059,45 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			return READMONITORDATA_T3000;
 		}
 		break;
+	case READ_REMOTE_DEVICE_DB:
+		{
+			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_Remote_TstDB))!=0)
+				return -1;
+			m_remote_device_db.clear();
+
+			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_Remote_TstDB);
+			if(block_length == 0)
+				break;
+			my_temp_point = (char *)Temp_CS.value + 3;
+			start_instance = *my_temp_point;
+			my_temp_point++;
+			end_instance = *my_temp_point;
+			my_temp_point++;
+			my_temp_point = my_temp_point + 2;
+
+			for (int x=0;x<block_length;x++)
+			{
+				Str_Remote_TstDB temp;
+				m_remote_device_db.push_back(temp);
+				m_remote_device_db.at(x).sn = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point + 4;
+				m_remote_device_db.at(x).product_type = *(my_temp_point++);
+				m_remote_device_db.at(x).modbus_id = *(my_temp_point++);
+				memcpy_s(m_remote_device_db.at(x).ip_addr,4,my_temp_point,4);
+				my_temp_point = my_temp_point + 4;
+				m_remote_device_db.at(x).port =  ((unsigned char)my_temp_point[0]<<8) | ((unsigned char)my_temp_point[1]);
+				my_temp_point = my_temp_point + 2;
+				memcpy_s(m_remote_device_db.at(x).reserved,10,my_temp_point,10);
+
+			}
+			Sleep(1);
+		}
+		break;
 	case GETSERIALNUMBERINFO:
 		{
 			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_Serial_info))!=0)
 				return -1;
+
 
 			_Bac_Scan_results_Info temp_struct;
 			my_temp_point = (char *)Temp_CS.value + 3;
@@ -2200,7 +2234,7 @@ int handle_read_monitordata(char *npoint,int nlength)
 		DFTrace(g_Print);
 		return 0;
 	}
-
+#if 0
 	CString CS_Value;
 	CString Write_Position;
 	Write_Position.Format(_T("D:\\Test.txt"));
@@ -2221,6 +2255,7 @@ int handle_read_monitordata(char *npoint,int nlength)
 	file.Flush();
 	CS_Value.ReleaseBuffer();
 	file.Close();
+#endif
 	temp_print = my_temp_point;
 
 
@@ -2694,6 +2729,9 @@ CString GetProductName(int ModelID)
 	case PM_T36CT :
 		strProductName="T3-6CT";
 		break;
+	case PM_MINIPANEL:
+		strProductName="MiniPanel";
+		break;
 	default:
 		strProductName="TStat";
 		break;
@@ -2968,11 +3006,12 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 	for (int i=0;i<(int)m_bac_scan_com_data.size();i++)
 	{
 		if((m_bac_scan_com_data.at(i).device_id == temp_1.device_id)
-			|| (m_bac_scan_com_data.at(i).macaddress == temp_1.macaddress))
+			&& (m_bac_scan_com_data.at(i).macaddress == temp_1.macaddress))
 		{
 			find_exsit = true;
 		}
 	}
+
 	if(!find_exsit)
 	{
 		m_bac_scan_com_data.push_back(temp_1);
@@ -2997,6 +3036,7 @@ void Initial_bac(int comport)
 
 	if(!bac_net_initial_once)
 	{
+		Sleep(1);
 		bac_net_initial_once =true;
 		bac_program_pool_size = 26624;
 		bac_program_size = 0;
@@ -3802,6 +3842,100 @@ END_SCAN:
 }
 
 
+extern SOCKET my_sokect;
+void Send_WhoIs_remote_ip(CString ipaddress)
+{
+#if 0
+	SOCKET h_temp_sokcet=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+	BOOL bBroadcast=TRUE;
+	::setsockopt(h_temp_sokcet,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+	int iMode=1;
+	ioctlsocket(h_temp_sokcet,FIONBIO, (u_long FAR*) &iMode);
+
+	BOOL bDontLinger = FALSE;
+	setsockopt( h_temp_sokcet, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+#endif
+	//SOCKADDR_IN bcast;.
+	char temp_ip_address[20];
+	WideCharToMultiByte( CP_ACP, 0, ipaddress.GetBuffer(), -1, temp_ip_address, 255, NULL, NULL );
+
+	SOCKADDR_IN h_bcast_temp;
+
+	UINT temp_ip = inet_addr(temp_ip_address);
+	h_bcast_temp.sin_family=AF_INET;
+	h_bcast_temp.sin_addr.s_addr=temp_ip;
+	//h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+	h_bcast_temp.sin_port=htons(BACNETIP_PORT);
+
+
+#if 0
+	SOCKADDR_IN h_siBind_test;
+	h_siBind_test.sin_family=AF_INET;
+	h_siBind_test.sin_addr.s_addr=INADDR_ANY;
+	h_siBind_test.sin_port=htons(BACNETIP_PORT);
+#endif
+	//	::bind(h_temp_sokcet, (sockaddr*)&h_siBind,sizeof(h_siBind));
+
+	//	USES_CONVERSION;   
+
+
+	//int bind_ret =::bind(h_temp_sokcet, (sockaddr*)&h_siBind_test,sizeof(h_siBind_test));
+	//if(bind_ret<0)
+	//{
+	//	AfxMessageBox(_T("Locol port 47808 is not valiable"));
+
+	//}
+
+
+	const DWORD END_FLAG = 0x00000000;
+	TIMEVAL time;
+	time.tv_sec =3;
+	time.tv_usec = 1000;
+
+	fd_set fdSocket;
+	BYTE buffer[512] = {0};
+	//	char pSendBuf[255];
+	//	ZeroMemory(pSendBuf, 255);
+	BYTE pSendBuf[1024] = {0x81, 0x0B, 0x00, 0x0C, 0x01, 0x20, 0xFF, 0xFF, 0x00, 0xFF, 0x10, 0x08};
+
+	//pSendBuf[0] = 100;
+	//memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
+	int nSendLen = 12;
+
+	int time_out=0;
+	BOOL bTimeOut = FALSE;
+	int nRet = 0;
+	Sleep(1);
+	Initial_bac();
+	while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
+	{
+		time_out++;
+		if(time_out>5)
+			bTimeOut = TRUE;
+
+		//		FD_ZERO(&fdSocket);	
+		//		FD_SET(h_temp_sokcet, &fdSocket);
+		//my_sokect
+		nRet = ::sendto(my_sokect,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast_temp,sizeof(h_bcast_temp));
+		//nRet = ::sendto(h_temp_sokcet,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast_temp,sizeof(h_bcast_temp));
+		if (nRet == SOCKET_ERROR)
+		{
+			int  nError = WSAGetLastError();
+			//goto END_SCAN;
+			return ;
+		}
+		Sleep(200);
+		continue;//Test ///////////////////////////////////////////////////////////////////////////////////
+
+	}//end of while
+
+	//closesocket(h_Broad);
+
+
+}
+
+
+
 
 int Open_MonitorDataBase(CString DataSource)
 {
@@ -3832,6 +3966,49 @@ int Open_MonitorDataBase(CString DataSource)
 	int ret = m_global_pCon->Open(m_mdb_path_t3000.GetString(),_T(""),_T(""),adModeUnknown);
 	return ret;
 }
+
+bool IP_is_Local(LPCTSTR ip_address)
+{
+
+	IP_ADAPTER_INFO pAdapterInfo;
+	ULONG len = sizeof(pAdapterInfo); 
+	if(GetAdaptersInfo(&pAdapterInfo, &len) != ERROR_SUCCESS) 
+	{
+		return 0;
+	}
+	long nLocalIP=inet_addr(pAdapterInfo.IpAddressList.IpAddress.String);
+	DWORD dw_ip = htonl(nLocalIP);
+
+	CString temp_ip;
+	temp_ip.Format(_T("%s"),ip_address);
+	char tempchar[200];
+	memset(tempchar,0,200);
+	WideCharToMultiByte(CP_ACP,0,temp_ip.GetBuffer(),-1,tempchar,200,NULL,NULL);
+
+	DWORD m_dwClientIP = inet_addr((char *)tempchar);
+
+	BYTE byIP[4];
+	for (int i = 0, ic = 3; i < 4; i++,ic--)
+	{
+		byIP[i] = (dw_ip >> ic*8)&0x000000FF;
+	}
+
+	BYTE byISPDeviceIP[4];
+	DWORD dwClientIP = m_dwClientIP;
+	ZeroMemory(byISPDeviceIP,4);
+	for (int i = 0, ic = 3; i < 4; i++,ic--)
+	{
+		byISPDeviceIP[3-i] = (dwClientIP >> ic*8)&0x000000FF;
+	}
+	if(memcmp(byIP,byISPDeviceIP,3)==0)
+	{
+		return true;
+	}
+
+	//memcpy_s(byIP,3,byISPDeviceIP,3)
+	return false;
+}
+
 
 void DFTrace(CString &nCString)
 {

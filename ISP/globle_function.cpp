@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "globle_function.h"
+#include "MyPing.h"
 int turn_hex_str_to_ten_num(char *source)
 {//can only turn two char(hex string) to int
 	//return -1,the wrong input ,the char number>2;or the input char is not hex string;
@@ -206,7 +207,7 @@ char turn_unsigned_to_char(unsigned short source)
 
 	return 0;
 }
-BOOL GetSerialComm(vector<CString>& szComm)
+BOOL GetSerialComm_ISP(vector<CString>& szComm)
 {
 	LPCTSTR strRegEntry = _T("HARDWARE\\DEVICEMAP\\SERIALCOMM\\");
 
@@ -293,7 +294,7 @@ BOOL BinFileValidation(const CString& strFileName)
 	}
 	return TRUE;
 }
-CCriticalSection register_critical_section; 
+CCriticalSection register_critical_section1; 
 
 // 这个是原始的
 int read_one(unsigned char device_var,unsigned short address,int retry_times)
@@ -305,9 +306,9 @@ int read_one(unsigned char device_var,unsigned short address,int retry_times)
 	int j=0;
 	for(int i=0;i<retry_times;i++)
 	{
-		register_critical_section.Lock();
+		register_critical_section1.Lock();
 		j=Read_One(device_var,address);
-		register_critical_section.Unlock();
+		register_critical_section1.Unlock();
 	 
 
 		if(j!=-2 && j!=-3)
@@ -462,4 +463,203 @@ void ExtractString(CStringArray& arr, const CString strSrc, const CString sep)
 	}
 
 	arr.Add(str); // think
+}
+
+int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
+{
+	CFileFind fFind;
+	if(!fFind.FindFile(filepath))
+		return FILE_NOT_FIND;
+
+	//pBuf = new char[0x20000];
+		
+	CString strGetData;
+	int nBufCount = 0;
+//*****************inspect the file*********************
+
+
+	DWORD dwHiAddr = 0; // 高位地址
+	char readbuffer[256];
+	ZeroMemory(readbuffer, 256);
+	unsigned	char m_DeviceInfor[20];
+	memset(m_DeviceInfor,0,20);
+	CFile hexfile;
+	if(hexfile.Open(filepath,CFile::modeRead))
+	{
+		unsigned int nLineNum=0;
+
+
+		ZeroMemory(readbuffer, 256);
+		hexfile.Seek(0, CFile::begin);
+		while(ReadLineFromHexFile(hexfile, readbuffer))
+		{
+				nLineNum++;						//the line number that the wrong hex file;
+				if(nLineNum!=10)
+					continue;
+
+
+				TS_UC get_hex[128]={0};//get hex data,it is get from the line char
+				//the number is (i-1)
+				//int nLen = strGetData.GetLength();
+				for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
+				{
+					readbuffer[i]=readbuffer[i+1];
+				}
+
+				int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
+				if(strlen(readbuffer)%2==0)
+					turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int 
+				else
+				{
+					//wchar_t p_c_temp[74]={'\0'};
+					//swprintf_s(p_c_temp,_T("Error: the hex file had error at %d line!"),nLineNumErr);
+
+					//AddStringToOutPuts(p_c_temp);
+					//AfxMessageBox(p_c_temp);
+					//close_com();
+					return BAD_HEX_FILE;
+				}
+				turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex 
+				if(get_hex[3]==1)	//for to seektobegin() function,because to end of the file
+					break;
+
+
+				if(!DoHEXCRC( get_hex, nLen/2))
+				{
+					//wchar_t p_c_temp[74]={'\0'};
+					//swprintf_s(p_c_temp,_T("Error: the hex file had error at %d line!"),nLineNumErr);
+					//AddStringToOutPuts(p_c_temp);		
+					//AfxMessageBox(p_c_temp, MB_OK);
+
+					return BAD_HEX_FILE;
+				}
+
+
+				int temp;
+				char temp_buf[32];
+				memset(temp_buf,0,32);
+				if (nLineNum==10)
+				{
+
+					for (int i=0;i<32;i++)
+					{
+						temp_buf[i]=readbuffer[i+8];
+					}
+					for (int i=0;i<20;i++)
+					{   
+						temp=temp_buf[2*i]*16+temp_buf[2*i+1];
+						m_DeviceInfor[i]=temp;
+					}
+					memcpy_s(&ret_bin_Info,15,m_DeviceInfor,15);
+					ret_bin_Info.software_low = (readbuffer[38]*16+readbuffer[39]);
+					ret_bin_Info.software_high = readbuffer[40]*16 + readbuffer[41];
+					//m_softwareRev = (temp_buf[30] + temp_buf[31]*256)/10.0;
+
+
+					////m_ProductModel=m_DeviceInfor[0];
+					//m_softwareRev= ((a[38]*16+a[39]) + (a[40]*16 + a[41])*256)/10.0;
+					//m_ProductName.Empty();
+					//for (int i=0;i<10;i++)
+					//{
+					//	CString temp1;
+					//	temp1.Format(_T("%C"),m_DeviceInfor[5+i]);
+					//	m_ProductName = m_ProductName + temp1;
+					//}
+				}
+
+
+		}
+	}
+}
+
+BOOL DoHEXCRC( TS_UC* szBuf, int nLen)
+{
+	TS_UC uctemp=0;
+	for(int j=0; j < nLen; j++)
+		uctemp+=szBuf[j];
+
+	if(uctemp%256!=0)
+	{		
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
+{
+	//当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题
+	int linecharnum=0;
+	char c;
+	int nRet = file.Read(&c, 1);
+
+	while(nRet != 0)
+	{
+		++linecharnum;
+		*pBuffer++ = c;
+		//TRACE(_T("\n%c"),c);
+		if (c == 0x0d) // 回车
+		{
+			file.Read(&c, 1);  // 读一个换行
+			*pBuffer++ = c;
+			TRACE(_T("%s"),pBuffer);
+			return TRUE;
+		}
+		if (linecharnum<256)
+		{
+			file.Read(&c, 1);
+		}
+		else
+		{
+			AfxMessageBox(_T("The Hex File is broken"));
+			return FALSE;
+		}
+
+	}
+	//TRACE(_T("%s"),pBuffer);
+	return FALSE;
+}
+
+
+
+BOOL Ping(const CString& strIP, CWnd* pWndEcho)
+{
+	CMyPing* pPing = new CMyPing;
+
+	pPing->SetPingEchoWnd(pWndEcho);
+	pPing->TestPing(strIP);
+
+
+	delete pPing;
+	pPing = NULL;
+	return FALSE;
+}
+
+
+int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
+{
+	CFileFind fFind;
+	if(!fFind.FindFile(filepath))
+		return FILE_NOT_FIND;
+
+
+	CFile binFile;
+	if(binFile.Open(filepath,CFile::modeRead))
+	{
+		const int BUF_LEN = 1024;
+		int linenum=1;
+		TS_UC pBuf[BUF_LEN] = {'\0'};
+		int nRet = 0;
+		int nCount = 0;
+		binFile.Seek(0, CFile::begin);
+		while( (nRet = binFile.Read(pBuf, BUF_LEN)) != 0 )
+		{
+			if(nRet<(0x100 + sizeof(Bin_Info)))
+				return BIN_FILE_LENGTH_ERROR;
+			memcpy(&ret_bin_Info,&pBuf[0x100],sizeof(Bin_Info));
+			return READ_SUCCESS;
+		}
+	}
+	return OPEN_FILE_ERROR;
+
 }

@@ -111,6 +111,7 @@ typedef enum {
 
 
 		 TABLEPOINTS_COMMAND       = 75,
+		 READ_REMOTE_DEVICE_DB		= 97,
 		 READ_SETTING_COMMAND		= 98,
 		  GETSERIALNUMBERINFO       = 99,
 		 PANEL_INFO1_COMMAND       = 110,
@@ -678,6 +679,18 @@ typedef union
 		uint8_t debug;
 	}reg;
 }Str_Setting_Info;
+
+typedef struct
+{
+	//uint8_t sn[4];
+	unsigned int sn;
+	uint8_t product_type;
+	uint8_t modbus_id;
+	uint8_t ip_addr[4];
+	uint16_t port;
+	uint8_t reserved[10];
+
+}Str_Remote_TstDB;
 
 
 

@@ -17,7 +17,9 @@ typedef struct _DHCP_PACKET
 } DHCP_PACKET;
 
 #define DHCP_PACKET_SIZE (sizeof(DHCP_PACKET))
-const int  FLASH_UDP_PORT=10000; 
+
+const int  FLASH_UDP_PORT=6001; 
+//const int  FLASH_UDP_PORT=10000; 
 const int  LOCAL_UDP_PORT=10001;
 
 class CISPDlg;
@@ -34,9 +36,10 @@ public:
 
 	void SetFileName(const CString& strFileName);
 	void SetDataSource(BYTE* pBuf, int nLen);
+    
 	//////////////////////////////////////////////////////////////////////////
 	// 外部接口
-	void FlashByEthernet();
+	 void FlashByEthernet();
 	//////////////////////////////////////////////////////////////////////////
 	// tftp 功能流程函数
 	BOOL StartServer();
@@ -44,7 +47,7 @@ public:
 	// 获得本地IP
 	DWORD GetLocalIP();
 	//void ParseFile(const CString& strFileName);	
-
+	
 	int InitSocket();
 	// 广播通知NC
 	void BroadCastToClient();
@@ -62,18 +65,18 @@ public:
 
 	// 处理请求
 	void HandleWRRequest(BYTE* szBuf,  int nLen);
-
+	
 	// 打印信息
 	void OutPutsStatusInfo(const CString& strInfo, BOOL bReplace);
 
 	// flash 完成。
 	void WriteFinish(int nFlashFlag);
-
+	
 	// 发送数据流程
 	int SendProcess();
 
 	int SendEndDataPack();
-
+	
 	void SendBOOTPPack();
 	int GetDHCPData(BYTE* pBuf, int nLen);
 	BOOL SendDHCPPack();
@@ -97,7 +100,7 @@ protected:
 	DWORD			m_dwClientIP;
 	int					m_nClientPort;
 	int					m_nBlkNum;			// 块号
-
+	
 	CString			m_strFileName;
 
 
@@ -118,5 +121,9 @@ protected:
 
 public:
 	CString ISP_Device_IP;
+    CString m_StrProductName;
+    CString m_StrRev;
+    CString m_StrFileProductName;
+    void Set_FileProductName(CString Name);
 	int total_retry;
 };

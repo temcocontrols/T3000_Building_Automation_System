@@ -1818,6 +1818,8 @@ int	MODBUS_PID3_OFF_OUTPUT_HEAT1		=	-1	;
 int	MODBUS_PID3_OFF_OUTPUT_HEAT2		=	-1	;
 int	MODBUS_PID3_OFF_OUTPUT_HEAT3		=	-1	;
 
+//used for record the selected product , if user want to update this product ,we need to check whether it is on line or not.
+int selected_product_index;
 
 #pragma region For_bacnet
 int bacnet_device_type;
@@ -1895,6 +1897,7 @@ vector <_Bac_Scan_Com_Info> m_bac_scan_com_data;
 vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 vector <Alarm_point> m_alarmlog_data;
 vector <Str_TstatInfo_point> m_Tstat_data;
+vector <Str_Remote_TstDB> m_remote_device_db;
 Time_block_mini Device_time;
 Str_Setting_Info Device_Basic_Setting;
 

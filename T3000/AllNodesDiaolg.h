@@ -56,4 +56,5 @@ public:
 	afx_msg void OnEnSetfocusTextedit();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnBnClickedArd();
+	afx_msg void OnBnClickedAddBacnetRemoteDevice();
 };

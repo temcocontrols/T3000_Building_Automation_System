@@ -73,7 +73,7 @@ BacnetWait *WaitWriteDlg=NULL;
 HANDLE hwait_write_thread = NULL;
 _Refresh_Write_Info Write_Config_Info;
 HANDLE hStartEvent; // thread start event
-
+extern int product_id;
 vector <MSG> My_Receive_msg;
 
 #define  WM_REFRESH_TREEVIEW_MAP WM_USER + 2008
@@ -267,6 +267,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_UPDATE_COMMAND_UI(ID_BUILDINGCONFIGDB, &CMainFrame::OnUpdateAddBuildingConfig)
     
 
+	ON_COMMAND(ID_HELP_UPDATEFIRMWARE, &CMainFrame::OnHelpUpdatefirmware)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -3550,6 +3551,9 @@ LRESULT CMainFrame::Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam)
 
 		}
 		break;
+	case 1:
+		MessageBox(_T("Load config file failed , please try again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+		break;
 	}
 
 	return 0;
@@ -5223,6 +5227,18 @@ void CMainFrame::OnDestroy()
 #if 1
 
 	CDialogInfo *pDialogInfo = NULL;
+	m_Input_data.clear();
+	m_Variable_data.clear();
+	m_Output_data.clear();
+	m_Program_data.clear();
+	m_Weekly_data.clear();
+	m_Annual_data.clear();
+	m_Schedual_Time_data.clear();
+	m_controller_data.clear();
+	m_screen_data.clear();
+	m_monitor_data.clear();
+	m_alarmlog_data.clear();
+	m_Tstat_data.clear();
 
 	try
 	{
@@ -6002,6 +6018,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			int nTRet=-1;
 			//g_tstat_id=m_product.at(i).product_id;
 			product_Node=m_product.at(i);
+			selected_product_index = i;//记录目前选中的是哪一个 产品;用于后面自动更新firmware;
 			if((product_Node.product_class_id == PM_CM5) || (product_Node.product_class_id == PM_MINIPANEL))	//如果是CM5或者MINIPANEL 才有 bacnet协议;
 			{
 				
@@ -6094,7 +6111,18 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					}
 
 
-					((CDialogCM5_BacNet*)m_pViews[m_nCurView])->SetConnected_IP(product_Node.BuildingInfo.strIp);
+					BOOL is_local = IP_is_Local(product_Node.BuildingInfo.strIp);
+					if(is_local == false)	//判断是否是本地IP，不是本地的就要连接到远端的，远端的 Who  is  广播发布过去的;
+					{
+						((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Set_Device_Type(true);
+						((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Set_remote_device_IP(product_Node.BuildingInfo.strIp);
+						((CDialogCM5_BacNet*)m_pViews[m_nCurView])->SetConnected_IP(product_Node.BuildingInfo.strIp);
+					}
+					else
+					{
+						((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Set_Device_Type(false);
+						((CDialogCM5_BacNet*)m_pViews[m_nCurView])->SetConnected_IP(product_Node.BuildingInfo.strIp);
+					}
 					g_serialNum = product_Node.serial_number;
 					/*bac_net_initial_once = false;*/
 					SwitchToPruductType(DLG_BACNET_VIEW);
@@ -6316,6 +6344,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 						nSerialNumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
 					}
+					else
+					{
+						MessageBox(_T("Read Serial number failed!"));
+					}
 					if(nSerialNumber>0)
 					{
 						if(nSerialNumber==nSelectSerialNumber)
@@ -6433,6 +6465,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					Use_zigee = read_one(g_tstat_id,REGISTER_USE_ZIGBEE_485,5);	
 					if(Use_zigee == 1)
 						power_value = 2;
+					else
+						power_value = 1;
 				}
 				register_critical_section.Lock();
 				int i;
@@ -9130,13 +9164,15 @@ LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
 //}
 void CMainFrame::OnToolIsptoolforone()
 {
+	MessageBox(_T("This part of code is recoding,Please use ISP.exe to update now."),_T("Notice"),MB_OK | MB_ICONINFORMATION);
+	return;
 	//Fance 如果要已经处于连接状态的soket在调用closesocket()后强制关闭，不经历TIME_WAIT的过程：
 	BOOL bDontLinger = FALSE;
 	setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
 	closesocket(h_Broad);
 	h_Broad=NULL;
     OnDisconnect();
-	show_ISPDlg();
+//	show_ISPDlg();
 
 	//Fance Add. 在ISP 用完1234 4321 的端口之后，T3000 在重新打开使用，刷新listview 的网络设备要使用;
 	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
@@ -9599,6 +9635,24 @@ void CMainFrame::OnDatabasePv()
 	
 }
 
+#include "Dowmloadfile.h"
+//Add by Fance 14/05/21
+//When user want to update the firmware ,run this code to  get firmware and call ISP.exe to flash firmware.
+void CMainFrame::OnHelpUpdatefirmware()
+{
+	// TODO: Add your command handler code here
+	MessageBox(_T("This function is still under develepment!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
+	return;
+	if(m_product.at(selected_product_index).status == false)//说明不在线;
+	{
+		if(IDNO == MessageBox(_T("The device you selected is not on line or the communication is bad, are you sure you want to update!"),_T("Notice"),MB_YESNO | MB_ICONINFORMATION))
+			return;
+	}
+	product_id = m_product.at(selected_product_index).product_class_id;
+	Dowmloadfile Dlg;
+	Dlg.DoModal();
+	
+}
 void CMainFrame::OnControlTstat()
 {
 	// TODO: Add your command handler code here

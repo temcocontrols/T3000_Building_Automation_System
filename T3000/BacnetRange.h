@@ -36,6 +36,7 @@ public:
 	afx_msg void OnEnKillfocusEditRangeSelect();
 	afx_msg void OnClose();
 	CStaticEx m_show_unit;
+	afx_msg void OnBnClickedCancel();
 };
 
 const CString Range_Type[] =

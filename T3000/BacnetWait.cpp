@@ -2151,6 +2151,7 @@ endthis:
 							m_wait_detail.SetWindowTextW(_T("Write input Table Time Out!"));
 							KillTimer(4);
 							SetTimer(2,2000,NULL);
+							::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
 							goto write_endthis;
 						}
 						//if(Write_Config_Info.Write_Input_Info[i].device_id ==0)
@@ -2222,6 +2223,7 @@ endthis:
 						m_wait_detail.SetWindowTextW(_T("Write output Table Time Out!"));
 						KillTimer(4);
 						SetTimer(2,2000,NULL);
+						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
 						goto write_endthis;
 					}
 					//TRACE(_T("OUTPUT ID = %d ,command =%d\r\n"),Write_Config_Info.Write_Output_Info[i].device_id,Write_Config_Info.Write_Output_Info[i].command);
@@ -2294,6 +2296,7 @@ endthis:
 						m_wait_detail.SetWindowTextW(_T("Write variable Table Time Out!"));
 						KillTimer(4);
 						SetTimer(2,2000,NULL);
+						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
 						goto write_endthis;
 					}
 					g_invoke_id = WritePrivateData(
@@ -2365,6 +2368,7 @@ endthis:
 						m_wait_detail.SetWindowTextW(_T("Write program Table Time Out!"));
 						KillTimer(4);
 						SetTimer(2,2000,NULL);
+						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
 						goto write_endthis;
 					}
 					g_invoke_id = WritePrivateData(
@@ -2438,6 +2442,7 @@ endthis:
 						m_wait_detail.SetWindowTextW(_T("Write program code Time Out!"));
 						KillTimer(4);
 						SetTimer(2,2000,NULL);
+						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
 						goto write_endthis;
 					}
 					g_invoke_id = WritePrivateData(
@@ -2511,6 +2516,7 @@ endthis:
 						m_wait_detail.SetWindowTextW(_T("Write controller Table Time Out!"));
 						KillTimer(4);
 						SetTimer(2,2000,NULL);
+						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
 						goto write_endthis;
 					}
 					g_invoke_id = WritePrivateData(
@@ -2583,6 +2589,7 @@ endthis:
 						m_wait_detail.SetWindowTextW(_T("Write Screen Table Time Out!"));
 						KillTimer(4);
 						SetTimer(2,2000,NULL);
+						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
 						goto write_endthis;
 					}
 					//TRACE(_T("OUTPUT ID = %d ,command =%d\r\n"),Write_Config_Info.Write_Output_Info[i].device_id,Write_Config_Info.Write_Output_Info[i].command);
@@ -2655,6 +2662,7 @@ endthis:
 						m_wait_detail.SetWindowTextW(_T("Write Monitor Table Time Out!"));
 						KillTimer(4);
 						SetTimer(2,2000,NULL);
+						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
 						goto write_endthis;
 					}
 					//TRACE(_T("OUTPUT ID = %d ,command =%d\r\n"),Write_Config_Info.Write_Output_Info[i].device_id,Write_Config_Info.Write_Output_Info[i].command);
@@ -2714,6 +2722,7 @@ endthis:
 						m_wait_detail.SetWindowTextW(_T("Write Weekly routines Table Time Out!"));
 						KillTimer(4);
 						SetTimer(2,2000,NULL);
+						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
 						goto write_endthis;
 					}
 					//TRACE(_T("OUTPUT ID = %d ,command =%d\r\n"),Write_Config_Info.Write_Output_Info[i].device_id,Write_Config_Info.Write_Output_Info[i].command);
@@ -2773,6 +2782,7 @@ endthis:
 						m_wait_detail.SetWindowTextW(_T("Write weekly shcedule time Time Out!"));
 						KillTimer(4);
 						SetTimer(2,2000,NULL);
+						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
 						goto write_endthis;
 					}
 					g_invoke_id = WritePrivateData(
@@ -2831,6 +2841,7 @@ endthis:
 						m_wait_detail.SetWindowTextW(_T("Write weekly shcedule time Time Out!"));
 						KillTimer(4);
 						SetTimer(2,2000,NULL);
+						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
 						goto write_endthis;
 					}
 					g_invoke_id = WritePrivateData(
@@ -2889,6 +2900,7 @@ endthis:
 						m_wait_detail.SetWindowTextW(_T("Write Annual routines Table Time Out!"));
 						KillTimer(4);
 						SetTimer(2,2000,NULL);
+						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
 						goto write_endthis;
 					}
 					//TRACE(_T("OUTPUT ID = %d ,command =%d\r\n"),Write_Config_Info.Write_Output_Info[i].device_id,Write_Config_Info.Write_Output_Info[i].command);
@@ -2925,9 +2937,11 @@ endthis:
 			m_wait_detail.SetWindowTextW(_T("Write descriptors success!"));
 			KillTimer(4);
 			SetTimer(2,2000,NULL);
+			break;
 
 
 write_endthis:
+			
 			Sleep(1);
 
 		}
