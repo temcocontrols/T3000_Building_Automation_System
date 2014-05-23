@@ -2605,14 +2605,15 @@ void COutPutDlg::ClickMsflexgrid1()
 
 		int nOutReg,nValue;
 
-		//if (newtstat6[7] == 6)
-		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+		//if (product_register_value[7] == 6)
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		{
 			nOutReg=245+m_nCurRow-1;
 			nValue=product_register_value[nOutReg];
 
 
-		}else
+		}
+		else
 		{
 			nOutReg=286+m_nCurRow-1;
 			nValue=product_register_value[nOutReg];
@@ -2663,7 +2664,7 @@ void COutPutDlg::ClickMsflexgrid1()
 		    
 
 
-			 if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+			 if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 			 {
 			 if (lRow==6)
 				 {
@@ -2809,7 +2810,7 @@ void COutPutDlg::ClickMsflexgrid1()
 	{   
 	    if (lRow<=5)
 	    {
-		if (product_register_value[7]==6||product_register_value[7]==7)
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		{
 			if(product_register_value[MODBUS_MODE_OUTPUT1+lRow-1]==3)
 			{
@@ -2866,6 +2867,70 @@ void COutPutDlg::ClickMsflexgrid1()
 				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
 				m_ItemValueCombx.SetFocus(); //获取焦点
 			}
+
+				if (product_register_value[7]==PM_TSTAT5A)
+				{
+				if (lRow==4)
+					 {
+					 if (product_register_value[MODBUS_OUTPUT1_SCALE]==0)
+						 {
+					m_ItemValueCombx.ResetContent();
+				m_ItemValueCombx.AddString(_T("Off"));
+				m_ItemValueCombx.AddString(_T("On")); 
+			 
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.BringWindowToTop();
+				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
+				m_ItemValueCombx.SetFocus(); //获取焦点
+					} 
+					else
+					{
+					  m_ItemValueCombx.ResetContent();
+				 
+				m_ItemValueCombx.AddString(_T("Close"));
+				m_ItemValueCombx.AddString(_T("Open"));
+				m_ItemValueCombx.AddString(_T("0-100"));
+				m_ItemValueCombx.AddString(_T("50-100"));
+				m_ItemValueCombx.AddString(_T("0-50"));
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.BringWindowToTop();
+				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
+				m_ItemValueCombx.SetFocus(); //获取焦点
+					}
+					} 
+					else if (lRow==5)//lRow==7
+					{
+					  if (product_register_value[MODBUS_OUTPUT2_SCALE]==0)
+					  {
+					  m_ItemValueCombx.ResetContent();
+				m_ItemValueCombx.AddString(_T("Off"));
+				m_ItemValueCombx.AddString(_T("On")); 
+			 
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.BringWindowToTop();
+				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
+				m_ItemValueCombx.SetFocus(); //获取焦点
+					  } 
+					  else
+					  {
+						m_ItemValueCombx.ResetContent();
+			 
+				m_ItemValueCombx.AddString(_T("Close"));
+				m_ItemValueCombx.AddString(_T("Open"));
+				m_ItemValueCombx.AddString(_T("0-100"));
+				m_ItemValueCombx.AddString(_T("50-100"));
+				m_ItemValueCombx.AddString(_T("0-50"));
+				m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
+				m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
+				m_ItemValueCombx.BringWindowToTop();
+				m_ItemValueCombx.SelectString(-1,strValue); //内容全选。方便直接修改		
+				m_ItemValueCombx.SetFocus(); //获取焦点
+					  }
+					}
+				}
 		}
 		
 	    }
@@ -3299,7 +3364,7 @@ void COutPutDlg::OnCbnKillfocusValueitemcombo()
 void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 {
 	int ret=0;
-	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		if(g_OutPutLevel==1)
 			return;
@@ -4955,7 +5020,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 					if(m_fan.GetCurSel()==0)
 					{
 						//if (newtstat6[7] == 6)
-						if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+						if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 						{
 							write_one(g_tstat_id,334+pos,tstatval);
 							product_register_value[334+pos] = tstatval;
@@ -4974,7 +5039,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 					else
 					{
 						//if (newtstat6[7] == 6)
-						if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+						if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 						{
 							write_one(g_tstat_id,323+pos,tstatval);
 							product_register_value[323+pos] = tstatval;
@@ -5324,7 +5389,7 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 		//362	125	1	Low byte	W/R	ANALOG INPUT4 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
 
 		//if (newtstat6[7] == 6)
-		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		{
 			if(m_fan.GetCurSel()==0)
 			{
@@ -5545,7 +5610,7 @@ void COutPutDlg::ClickMsflexgrid2()
 	int nOutReg,nValue;
 
 	//if (newtstat6[7] == 6)
-	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		{
 		nOutReg=245+m_nCurRow-1;
 		nValue=product_register_value[nOutReg];
@@ -5606,7 +5671,7 @@ void COutPutDlg::ClickMsflexgrid2()
 		}
 		else if (lRow>5)
 		{
-		   if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+		   if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 			 {
 			 if (lRow==6)
 				 {
@@ -6419,7 +6484,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 				}
 			}
 		}
-   if (product_register_value[7]==7||product_register_value[7]==6)
+  if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
    {
 	   if (product_register_value[MODBUS_MODE_OUTPUT4]==3)
 	   {
@@ -7085,7 +7150,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 	#endif
 
 
-	if (product_register_value[7]==7||product_register_value[7]==6)
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		if (product_register_value[MODBUS_MODE_OUTPUT4]==3)
 		{
@@ -7652,7 +7717,7 @@ void COutPutDlg::FreshGrid_PID2tstat5GLessthan368()
 	#endif
 
 
-	if (product_register_value[7]==7||product_register_value[7]==6)
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		if (product_register_value[MODBUS_MODE_OUTPUT4]==3)
 		{
@@ -7903,7 +7968,7 @@ void COutPutDlg::ClickMsflexgrid3()
 	int nOutReg,nValue;
 
 	//if (newtstat6[7] == 6)
-	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		{
 		nOutReg=245+m_nCurRow-1;
 		nValue=product_register_value[nOutReg];
@@ -7964,7 +8029,7 @@ void COutPutDlg::ClickMsflexgrid3()
 		}
 		else if (lRow>5)
 		{
-		   if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+		   if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 			 {
 			 if (lRow==6)
 				 {

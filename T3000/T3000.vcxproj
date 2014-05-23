@@ -261,6 +261,7 @@
     <ClCompile Include="Weekly_Routines.cpp" />
     <ClCompile Include="WeeklyRout_InsertDia.cpp" />
     <ClCompile Include="WeeklySchedule.cpp" />
+    <ClCompile Include="WhichOneToChooseDlg.cpp" />
     <ClCompile Include="WorkspaceBar.cpp" />
     <ClCompile Include="T3\DialogT3.cpp" />
     <ClCompile Include="MiniPanel\DialgMiniPanel.cpp" />
@@ -489,6 +490,7 @@
     <ClInclude Include="vector_declare.h" />
     <ClInclude Include="Weekly_Routines.h" />
     <ClInclude Include="WeeklyRout_InsertDia.h" />
+    <ClInclude Include="WhichOneToChooseDlg.h" />
     <ClInclude Include="WorkspaceBar.h" />
     <ClInclude Include="T3\DialogT3.h" />
     <ClInclude Include="MiniPanel\DialgMiniPanel.h" />

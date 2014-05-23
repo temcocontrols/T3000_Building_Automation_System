@@ -144,7 +144,9 @@ public:
 	//  把一个tstat写到数据库里 All_Nodes表
 	void WriteOneDevInfoToDB( _ComDeviceInfo* pInfo);
 	void WriteOneNetInfoToDB( _NetDeviceInfo* pInfo);
-
+	/////////////////////////////////////////////////////////////////////////
+	void CompareNetToComConflict();
+	/////////////////////////////////////////////////////////////////////////
 	void GetBuildingName();
 
 	BOOL IsAllScanFinished();

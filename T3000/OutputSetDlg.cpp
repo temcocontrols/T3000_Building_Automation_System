@@ -277,7 +277,7 @@ void COutputSetDlg::Fresh_Grid()
 		//strTemp=_T("On/Off");
 		nRange=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
 		 
-		 if (product_register_value[7]==6||product_register_value[7]==7)
+		 if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		 {
 			 if(nRange>=0&&nRange<4)
 			 {
@@ -408,7 +408,7 @@ void COutputSetDlg::Fresh_Grid()
 		 
 		{
 			nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
-			if (product_register_value[7]==6||product_register_value[7]==7)
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 			{
 				if(nRange>=0&&nRange<=3)		//Modify by Fance_0412
 			{
@@ -502,7 +502,7 @@ void COutputSetDlg::Fresh_Grid()
 		//nRange=product_register_value[284];
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];
-		if (product_register_value[7]==7||product_register_value[7]==6)
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		{
 			if(nRange>=0&&nRange<=3)
 			{
@@ -627,7 +627,7 @@ void COutputSetDlg::Fresh_Grid()
 		//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT4]; //283  205
-		if (product_register_value[7]==7||product_register_value[7]==6)
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		{if(nRange>=0&&nRange<=3)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
@@ -667,7 +667,7 @@ void COutputSetDlg::Fresh_Grid()
 		{
 			int indext=-1;
 			//336	269	1	Low byte	W/R	Output4 function setting (see above)
-			if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 			{
 				indext=product_register_value[269];
 			}else
@@ -687,8 +687,8 @@ void COutputSetDlg::Fresh_Grid()
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 
 		////337	270	1	Low byte	W/R	Output5 function setting (see above)
-		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-		{
+        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+        {
 			nRang=product_register_value[206];
 		}else
 		{
@@ -697,7 +697,7 @@ void COutputSetDlg::Fresh_Grid()
 		//108	209	1	Low byte	W/R	Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.
 
 		nValue1 = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS];//108   209
-		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		{
 			if(nRang==0)
 			{
@@ -771,7 +771,7 @@ void COutputSetDlg::Fresh_Grid()
 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];  //284  206
-		if (product_register_value[7]==7||product_register_value[7]==6)
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		{
 			if(nRange>=0&&nRange<=3)
 			{
@@ -813,7 +813,7 @@ void COutputSetDlg::Fresh_Grid()
 			//337	270	1	Low byte	W/R	Output5 function setting (see above)
 
 			int indext=-1;
-			if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 			{
 				indext=product_register_value[270];
 			}else
@@ -1020,7 +1020,7 @@ else
 			{
 				float nvalue=0.0;
 				//if (newtstat6[7] == 6)
-				if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+				if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 				{
 					//AfxMessageBox(_T("It's impossible to enter this place!"));
 					if(nRange==1)//0-10v
@@ -1343,7 +1343,7 @@ else
 	CString strlock;
 	int stradd;// = 286;
 	//if (newtstat6[7] == 6)
-	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{
 		stradd =MODBUS_INTERLOCK_OUTPUT1; //245;
 		for (int i = 0;i<7;i++)
@@ -1375,7 +1375,7 @@ else
 	
 	//Delay
 	
-	if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 	{  CString strdelay;
 	for (int row=0;row<7;row++)
 	{
@@ -1412,7 +1412,7 @@ else
 	}
 	
 	
-	if ((product_register_value[7] == 6)||(product_register_value[7] == 7)){
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)){
 	nAMVAlue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];
 	for (int row=1;row<=5;row++)
 	{
@@ -4899,7 +4899,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 			//	for(int i=0;i<2;i++)
 			 
 
-			if (product_register_value[7]==7||product_register_value[7]==6)
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 			{
 				for(int i=0;i<4;i++)//2.5.0.98
 				{

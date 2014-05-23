@@ -256,6 +256,8 @@ public:
 	CMacSliderCtrl m_currentTemp;
 	afx_msg void OnNMReleasedcaptureSliderDay(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMReleasedcaptureSliderNight(NMHDR *pNMHDR, LRESULT *pResult);
+   afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+    afx_msg void OnBnClickedHelp();
 	afx_msg void OnBnClickedBtnTopological();
 };
 

@@ -2860,11 +2860,11 @@ void CMbPoll::OnFileSaveWhileClose()
 		//MessageBox(strConfigFilePathName);
 		//CString strConfigFileName = dlg.GetFileName();
 		//MessageBox(strConfigFileName);
-		CString strConfigFilePathName1 = g_strExePth+_T("savedConfig.txt");
+		//CString strConfigFilePathName1 = g_strExePth+_T("savedConfig.txt");
 
 
 		//f.Open(strConfigFilePathName1.GetString(), CFile::modeRead);
-		BOOL a = f.Open(strConfigFilePathName1.GetString(), CFile::modeCreate | CFile::modeWrite);
+		//BOOL a = f.Open(strConfigFilePathName1.GetString(), CFile::modeCreate | CFile::modeWrite);
 
 		//CString str1;
 		//str1 = L"Text1;Text2;Text3;";
@@ -2934,7 +2934,7 @@ void CMbPoll::OnFileOpenWhileOpen()
 
 	//CFileDialog dlg(true, _T("Open current Config"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER, strFilter);
 	//if (dlg.DoModal() == IDOK)
-	if (1)
+	if (0)
 	{
 		 CString strConfigFilePathName1 = g_strExePth+_T("savedConfig.txt");
 		 
@@ -3013,7 +3013,7 @@ void CMbPoll::OnFileSaveWhileClose()
 	//CFileDialog dlg(false, _T("Save current Config"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER, strFilter);
 
 	//if (dlg.DoModal() == IDOK)
-	if (1)
+	if (0)
 	{
 		//CString strConfigFilePathName = dlg.GetPathName();
 		//MessageBox(strConfigFilePathName);
@@ -3096,7 +3096,7 @@ void CMbPoll::OnFileOpenWhileOpen()
 		//CString strConfigFileName1 = dlg.GetFileName();
 		//MessageBox(strConfigFileName1);
 		//f.Open(strConfigFileName1, CFile::modeRead);
-		f.Open(L"LightingController\\savedConfig.txt", CFile::modeRead);
+		//f.Open(L"LightingController\\savedConfig.txt", CFile::modeRead);
 
 #if SHOW_ALL
 		for (int i = 0; i < 5; i++)
