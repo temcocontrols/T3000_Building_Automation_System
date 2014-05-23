@@ -39,7 +39,7 @@
 
 
 #include <afxsock.h>            // MFC socket extensions
-#include "common.h"
+
 #include <vector>
 #include <map>
 using namespace std;
@@ -48,6 +48,24 @@ using namespace std;
 
 
 
+#define INPUT extern "C" __declspec(dllimport)
+
+INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
+INPUT int Read_One(unsigned char device_var,unsigned short address);
+INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
+INPUT int write_multi_by_tcp(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
+INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+
+//INPUT bool open_com(unsigned char m_com);
+INPUT bool open_com(int m_com);
+
+INPUT void close_com();
+INPUT bool is_connect();
+//INPUT bool open_com_for_Command(unsigned char m_com);
+INPUT bool Open_Socket2(CString strIPAdress,short nPort);
+INPUT bool Change_BaudRate(TS_US new_baudrate);
+INPUT void SetCommunicationType(int nType);
+INPUT int GetCommunicationType();
 
 
 #import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")

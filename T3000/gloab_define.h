@@ -1,5 +1,88 @@
 #pragma once
 
+const int SEND_DOWNLOAD_COMMAND = 1;
+const int START_SEND_WANT_PACKAGE = 2;
+const int RECEIVE_WANTED_PACKAGE = 3;
+const int RECEIVE_COMPLET = 4;
+
+const int TFTP_SEND_LENGTH = 512;
+#pragma pack(push) //±£´æ¶ÔÆë×´Ì¬ 
+#pragma pack(1)
+typedef struct
+{
+	char HEAD_1;
+	char HEAD_2;
+	unsigned short length;
+	unsigned char commad;
+}Black_head_struct;
+
+typedef struct
+{
+	char HEAD_1;
+	char HEAD_2;
+	unsigned short length;
+	unsigned char commad;
+	unsigned char product_id;
+	unsigned char get_newest;
+	unsigned char file_type;
+	unsigned short softversion;
+	unsigned char CRC;
+}Download_Info;
+
+
+typedef struct
+{
+	char HEAD_1;
+	char HEAD_2;
+	unsigned short length;
+	unsigned char commad;
+	unsigned short send_package;
+	char download_filename[20];
+	unsigned char CRC;
+}Download_File_Return;
+
+typedef struct 
+{
+	char HEAD_1;
+	char HEAD_2;
+	unsigned short length;
+	unsigned char commad;
+	unsigned short package_index;
+	unsigned short total_package;
+	unsigned char CRC;
+}File_Package_Struct;
+
+
+#pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
+
+
+typedef enum
+{
+	GET_SERIAL_NUMBER = 1,
+	DOWNLOAD_FILE	= 2,
+	UPLOAD_FILE = 3,
+
+	RETURN_SERIAL_NUMBER = 101,
+	RETURN_FILE_SIZE = 102,
+	ACK_GET_UPLOAD_FILE_PAGE = 103,
+
+
+	ACK_SERIAL_NUMBER = 201,
+	ACK_GET_FILE_PAGE = 202,
+	TRANSFER_UPLOAD_FILE_PAGE = 203,
+	TRANSFER_FILE_PAGE = 212,
+	UPLOAD_COMPLET = 213,
+	DOWNLOAD_COMPLETE = 222,
+	UPLOAD_FILE_ERROR = 253,
+	DOWNLOAD_FILE_ERROR = 254,
+	HOST_BUSY = 255
+};
+
+
+
+const int DOWNLOAD_CONNECT_SUCCESS = 1;
+const int DOWNLOAD_DISCONNEC = 2;
+const int DOWNLOAD_CONNECT_FAILED = 3;
 //#define SHOW_MESSAGEBOX
 #define	 MY_REDRAW_WINDOW		WM_USER + 1231
 #define WM_FRESH_CM_LIST		WM_USER + 975

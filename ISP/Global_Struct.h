@@ -16,7 +16,8 @@ const	 int c_nSplashTime = 2000;	// splash windowµƒœ‘ æ ±º‰
 const TCHAR c_strCfgFileName[] = _T("config.txt");				//	≈‰÷√Œƒº˛√˚≥∆£¨”√”⁄±£¥Ê”√ªß…Ë÷√
 const TCHAR c_strLogoFileName[] = _T("ISPLogo.jpg");			// logo picture file name
 
-const CString c_strSNRecordFileName = _T("e:\\serial_records.txt");
+ 
+const CString c_strSNRecordFileName = _T("Z:\\Serial_Records\\serial_records.txt");
 //////////////////////////////////////////////////////////////////////////
 // for setting file
 const TCHAR c_strCfgTstatSection[] = _T("[Tstat]");
@@ -58,7 +59,7 @@ const DWORD c_nBinFileBufLen = 0x7FFFF;  // bin Œƒº˛◊Ó¥Û512k
 #define WM_REPLACE_STATUSINFO		WM_USER+1000 
 #define WM_ADD_STATUSINFO				WM_USER+1001 
 #define WM_FLASH_FINISH					WM_USER+1002
-
+#define WM_UPDATA_DEVICE_INFORMATION    WM_USER+1003
 //#define WM_TCP_STATUSINFO				WM_USER+1003
 
 
@@ -557,7 +558,9 @@ _T("LC=120")
 };
 
 
-
+const int NO_COMMAND = 0;
+const int START_AUTO_FLASH_COMMAND = 1;
+//const int
 
 
 
@@ -572,4 +575,22 @@ const TCHAR c_strFlashSNCfgFileName[] = _T("Flash_SN.cfg");				//	±£¥ÊFLASH SN µ
 
 const TCHAR c_strFlashHWVersion[] = _T("Hardware Verson : ");
 const TCHAR c_strFlashSNModel[] = _T("Product Model : ");
+
+typedef struct
+{
+	char company[5];
+	char product_name[10];
+	unsigned char software_low;
+	unsigned char software_high;
+	char reserved[3];
+}Bin_Info;
+
+enum
+{
+	READ_SUCCESS = 0,
+	FILE_NOT_FIND = 1,
+	OPEN_FILE_ERROR = 2,
+	BIN_FILE_LENGTH_ERROR = 3,
+	BAD_HEX_FILE = 4
+};
  

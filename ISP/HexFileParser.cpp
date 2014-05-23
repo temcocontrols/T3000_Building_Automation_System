@@ -26,7 +26,9 @@ void  CHexFileParser::SetFileName(const CString& strFileName)
 int  CHexFileParser::GetHexFileBuffer(char* pBuf, int nLen)
 {
 	CFile hexFile; //the hex file
-	
+	Bin_Info temp1;
+	Get_HexFile_Information(m_strFileName,temp1);
+
 	int nBufLen = 0;
 	if(hexFile.Open(m_strFileName, CFile::modeRead))
 	{
@@ -36,24 +38,20 @@ int  CHexFileParser::GetHexFileBuffer(char* pBuf, int nLen)
 		if (m_nHexFileType == 0)
 		{			
 			CString strTips = _T("Hex file verified okay.");//_T("The Hex File is Normal.");
-			//AddStringToOutPuts(strTips);
-
+			 
 			nBufLen = ReadNormalHexFile(hexFile, pBuf, nLen);	
 
 		}
 		else if(m_nHexFileType == 1)
 		{
 			CString strTips = _T("The hex file has a Extend Section Address Record(HEX86).");
-			//AddStringToOutPuts(strTips);
-
+			 
 			nBufLen = ReadExtendHexFile(hexFile, pBuf, nLen);	
 		}
 		else if (m_nHexFileType == 2)
 		{
 			CString strTips = _T("The hex file has a Extend Linear Addree Record(HEX86).");
-			//AddStringToOutPuts(strTips);
-
-
+			 
 			nBufLen = ReadExtLinearHexFile(hexFile, pBuf, nLen);	
 		}		
 	}
@@ -122,7 +120,7 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 		TS_UC get_hex[128]={0};		//get hex data,it is get from the line char
 	
 		UINT i = 0;
-		for( i=0;i<strlen(a); i++)		//get a line
+		for( i=0;i<strlen(a); i++)		//get a line//去掉第一个
 		{
 			a[i] = a[i+1];
 		}
@@ -209,7 +207,6 @@ WORD CHexFileParser::GetHighAddrFromFile(const CString& strLine)
 }
 
 
-
 BOOL CHexFileParser::ReadLineFromFile(CFile& file, char* pBuffer)
 {
 	//当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题
@@ -221,7 +218,7 @@ BOOL CHexFileParser::ReadLineFromFile(CFile& file, char* pBuffer)
 	{
 		++linecharnum;
 		*pBuffer++ = c;
-		TRACE(_T("\n%c"),c);
+		//TRACE(_T("\n%c"),c);
 		if (c == 0x0d) // 回车
 		{
 			file.Read(&c, 1);  // 读一个换行
@@ -229,23 +226,20 @@ BOOL CHexFileParser::ReadLineFromFile(CFile& file, char* pBuffer)
 			TRACE(_T("%s"),pBuffer);
 			return TRUE;
 		}
-		if (linecharnum<256)
-		{
-			file.Read(&c, 1);
-		}
-		else
-		{
-			AfxMessageBox(_T("The Hex File Corruption"));
-			return FALSE;
-		}
-
+		 if (linecharnum<256)
+		 {
+			 file.Read(&c, 1);
+		 }
+		 else
+		 {
+			 AfxMessageBox(_T("The Hex File is broken"));
+			 return FALSE;
+		 }
+		
 	}
-	TRACE(_T("%s"),pBuffer);
+	//TRACE(_T("%s"),pBuffer);
 	return FALSE;
 }
-
-
-
 ////////////////////////////////////////////////////////////////////////////
 // Parameter:
 // 1, CFile&  : hex file preference, to be read
@@ -365,7 +359,7 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 	DWORD dwHiAddr = 0; // 高位地址
 	char a[256];
 	ZeroMemory(a, 256);
-
+	
 	//while(NULL!=ar.ReadString(strGetData))	//循环读取文件，直到文件结束
 	while(ReadLineFromFile(hexfile, a))
 	{
@@ -393,6 +387,7 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 		{
 			a[i]=a[i+1];
 		}
+
 		int nLen = strlen(a)-2; // 不算回车换行的长度
 		if(strlen(a)%2==0)
 			turn_hex_file_line_to_unsigned_char(a);//turn every char to int 
@@ -426,6 +421,38 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 
 	//	if(get_hex[1]==0 && get_hex[2]==0)
 	//		get_hex[4]=255;//for the 0000 register to write 255
+	    int temp;
+		char temp_buf[32];
+		
+		if (nLineNumErr==9)
+		{
+
+		    for (int i=0;i<32;i++)
+		    {
+			  temp_buf[i]=a[i+8];
+		    }
+			for (int i=0;i<20;i++)
+			{   
+			    temp=temp_buf[2*i]*16+temp_buf[2*i+1];
+				m_DeviceInfor[i]=temp;
+			}
+			
+			//m_softwareRev = (temp_buf[30] + temp_buf[31]*256)/10.0;
+
+
+			//m_ProductModel=m_DeviceInfor[0];
+			m_softwareRev= ((a[38]*16+a[39]) + (a[40]*16 + a[41])*256)/10.0;
+			m_ProductName.Empty();
+			for (int i=0;i<10;i++)
+			{
+				CString temp1;
+				temp1.Format(_T("%C"),m_DeviceInfor[5+i]);
+				m_ProductName = m_ProductName + temp1;
+			}
+		}
+
+
+
 		unsigned int ltemp;
 		ltemp=get_hex[1]*256+get_hex[2] + dwHiAddr;
 		for(int j=0;j<get_hex[0];j++)
@@ -447,7 +474,10 @@ END:
 	//return 0 ;
 }
 
-
+CString CHexFileParser::Get_HexInfor(){
+ 
+ return m_ProductName+_T(" ")+m_ChipName;
+}
 HEXFILE_FORMAT	CHexFileParser::GetHexFileFormatType()
 {
 	return m_nHexFileType;
@@ -460,4 +490,12 @@ int	CHexFileParser::GetExtendHexFileSectionFlag(vector<int>& szFlags)
 	szFlags = m_szFlags;
 
 	return szFlags.size();
+}
+void CHexFileParser::Get_DeviceInfor(UINT &ProductModel,float &SoftwareVersion,CString &ProductName,CString &ChipName,UINT &Chipsize){
+ProductModel=m_ProductModel;
+SoftwareVersion=m_softwareRev;
+ProductName=m_ProductName;
+ChipName=m_ChipName;
+Chipsize=m_ChipSize;
+
 }

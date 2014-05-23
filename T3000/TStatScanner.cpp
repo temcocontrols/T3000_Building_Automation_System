@@ -2714,11 +2714,11 @@ void CTStatScanner::ScanTstatFromNCForManual()
 		int nIPPort=pNCInfo->m_pNet->GetIPPort();
 
 		CString strIP=pNCInfo->m_pNet->GetIPAddrStr();
-
+		int temp_port = pNCInfo->m_pNet->GetIPPort();
 
 		g_CommunicationType=1;
 		SetCommunicationType(g_CommunicationType);
-		bool b=Open_Socket2(strIP, TCP_COMM_PORT);
+		bool b=Open_Socket2(strIP, temp_port);
 		CString strInfo;
 		//	strInfo.Format((_T("Open IP:%s successful")),build_info.strIp);//prompt info;
 		//	SetPaneString(1,strInfo);
@@ -2801,11 +2801,11 @@ void CTStatScanner::ScanTstatFromNCForAuto()//scan 分别扫描各个NC中的TSTAT
 
 		m_ip = strIP;
 		
-
+				int temp_port = pNCInfo->m_pNet->GetIPPort();
 
 		g_CommunicationType=1;
 		SetCommunicationType(g_CommunicationType);
-		bool b=Open_Socket2(strIP, TCP_COMM_PORT);
+		bool b=Open_Socket2(strIP, temp_port);
 		if(b)
 		{	
 			strInfo.Format((_T("Connect to IP : %s successful")), strIP);//prompt info;
@@ -3387,10 +3387,10 @@ void CTStatScanner::GetTstatFromNCTable()
 		CString strInfo;strInfo.Format(_T("Scan Tstat connected to %s"), pNCInfo->m_pNet->GetProductName());
 		ShowNetScanInfo(strInfo);
 		//##############################
-
+		int temp_port = pNCInfo->m_pNet->GetIPPort();
 		g_CommunicationType=1;
 		SetCommunicationType(g_CommunicationType);
-		bool b=Open_Socket2(strIP, TCP_COMM_PORT);
+		bool b=Open_Socket2(strIP, temp_port);
 
 		//	strInfo.Format((_T("Open IP:%s successful")),build_info.strIp);//prompt info;
 		//	SetPaneString(1,strInfo);

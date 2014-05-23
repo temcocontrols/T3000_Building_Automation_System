@@ -152,6 +152,7 @@
 #define IDD_DIALOG10                    446
 #define IDD_RENAME_DLG                  446
 #define IDD_DISPLAY_DLG                 446
+#define IDR_T3000_DATABASE              447
 #define IDR_MENU_MBP                    447
 #define IDD_SCANWAY                     448
 #define IDD_IONAMECONFIG                449
@@ -215,6 +216,7 @@
 #define IDD_DIALOG_BACNET_MONITOR       503
 #define IDR_ACCELERATOR2                504
 #define IDR_T3000_DB1                   505
+#define IDD_DIALOG_DOWNLOAD_FILE        996
 #define IDD_DIALOG_THE_SAME_DEVICE      506
 #define IDR_T3000_DB2                   507
 #define IDD_DIALOG_BACNET_SCREENS_EDIT  582
@@ -1584,6 +1586,7 @@
 #define IDC_CHANGEID                    1828
 #define IDC_LCD                         1828
 #define IDC_BUTTON_DELETE               1828
+#define IDC_ADD_BACNET_REMOTE_DEVICE    1828
 #define IDC_PORT                        1829
 #define IDC_BUTTON_DELETE_ALL           1829
 #define IDC_ENABLE_PASSWORD             1829
@@ -1596,6 +1599,14 @@
 #define IDC_HELP_HELP                   1831
 #define IDC_STARTREGISTER               1832
 #define IDC_BUTTON_DEBUG_CLEARALL       1832
+#define IDC_IPADDRESS_ADD_BAC_NOTE      5832
+#define IDC_LIST_DOWNLOAD_INFO          5833
+#define IDC_COMBO_UPDATE_TYPE           5834
+#define IDC_IPADDRESS_TEMCO_IP          5835
+#define IDC_BUTTON_START_DOWNLOAD       5836
+#define IDC_EDIT_PRODUCT_ID             5837
+#define IDC_EDIT_PRODUCT_ID2            5838
+#define IDC_EDIT_PRODUCT_NAME           5838
 #define IDC_STATIC_COM                  1832
 #define IDC_DATAGRID1                   1833
 #define IDC_RADIO_BAC_IP_AUTO           1833
@@ -1752,6 +1763,7 @@
 #define ID_DATABASE_PV                  34021
 #define ID_TIMEBASE_4HOURS              34022
 #define ID_TIMEBASE_1DAY                34023
+#define ID_HELP_UPDATEFIRMWARE          35523
 #define ID_TIMEBASE_4DAYS               34024
 #define ID_EXIT34025                    34025
 #define ID_GRAPHIC_EXIT                 34026
@@ -1778,8 +1790,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        508
-#define _APS_NEXT_COMMAND_VALUE         34022
-#define _APS_NEXT_CONTROL_VALUE         1832
+#define _APS_NEXT_COMMAND_VALUE         34024
+#define _APS_NEXT_CONTROL_VALUE         1838
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

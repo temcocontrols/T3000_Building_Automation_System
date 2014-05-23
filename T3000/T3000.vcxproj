@@ -167,6 +167,8 @@
     <ClCompile Include="DebugWindow.cpp" />
     <ClCompile Include="DisplayConfig.cpp" />
     <ClCompile Include="DisplayLEDLCDConfig.cpp" />
+    <ClCompile Include="Dowmloadfile.cpp" />
+    <ClCompile Include="DownloadSocket.cpp" />
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
     <ClCompile Include="LanguageLocale.cpp" />
@@ -375,6 +377,8 @@
     <ClInclude Include="DialogCM5_BacNet.h" />
     <ClInclude Include="DisplayConfig.h" />
     <ClInclude Include="DisplayLEDLCDConfig.h" />
+    <ClInclude Include="Dowmloadfile.h" />
+    <ClInclude Include="DownloadSocket.h" />
     <ClInclude Include="fileRW.h" />
     <ClInclude Include="gloab_define.h" />
     <ClInclude Include="IONameConfig.h" />

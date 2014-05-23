@@ -44,7 +44,7 @@ CConfigFileHandler::~CConfigFileHandler(void)
 		//m_pFile->Close();
 		delete m_pFile;
 	}
-
+	
 }
 
 void CConfigFileHandler::SetParentWnd(CWnd* pWnd)
@@ -134,7 +134,7 @@ BOOL CConfigFileHandler::CreateConfigFile(const CString& strFilePath)
 		{
 			CString strTips = _T("├Cannot create a new config file. Please try again.");
 			((CISPDlg*)m_pParentWnd)->UpdateStatusInfo(strTips, FALSE);
-
+			
 			m_pFile->Close();
 
 			return FALSE;
@@ -177,16 +177,16 @@ void CConfigFileHandler::WriteTStatPageConfig(
 
 
 
-	// 	// NC section
-	// 	m_szCfgFile[CV_NC_Section] =(CString(c_strCfgNCSection));
-	// 	// NC flash file
-	// 	m_szCfgFile[CV_NCLastFlashFile] =(CString( c_strCfgDefaultIPPortItem) + strIPPort );
-	// 	// NC flash type
-	// 	m_szCfgFile[CV_NCLastFlashMethod] =(CString( c_strCfgDefaultIPPortItem) + strIPPort );
-	// 	// IP
-	// 	m_szCfgFile[CV_NCDeIP] =(CString(c_strCfgDefaultIPItem) + strIP);
-	// 	// Port
-	// 	m_szCfgFile[CV_NCDeIPPort] =(CString( c_strCfgDefaultIPPortItem) + strIPPort );
+// 	// NC section
+// 	m_szCfgFile[CV_NC_Section] =(CString(c_strCfgNCSection));
+// 	// NC flash file
+// 	m_szCfgFile[CV_NCLastFlashFile] =(CString( c_strCfgDefaultIPPortItem) + strIPPort );
+// 	// NC flash type
+// 	m_szCfgFile[CV_NCLastFlashMethod] =(CString( c_strCfgDefaultIPPortItem) + strIPPort );
+// 	// IP
+// 	m_szCfgFile[CV_NCDeIP] =(CString(c_strCfgDefaultIPItem) + strIP);
+// 	// Port
+// 	m_szCfgFile[CV_NCDeIPPort] =(CString( c_strCfgDefaultIPPortItem) + strIPPort );
 
 	WriteToCfgFile();
 
@@ -204,36 +204,36 @@ void CConfigFileHandler::ReadTStatPageConfig(
 	ASSERT(m_pFile);
 	{
 		ReadFromCfgFile();
-
-		strHexFileName = m_szCfgFile[CV_TstatLastFlashFile];
-		strFlashMethod = m_szCfgFile[CV_TstatLastFlashMethod];
-		strFlashTypePage = m_szCfgFile[CV_TstatLastFlashPage];
-		strModbusID = m_szCfgFile[CV_TstatDeAddr];
-		strComPort = m_szCfgFile[CV_TstatDeCOM];	
-		strBaudrate = m_szCfgFile[CV_TstatDeBaudrate];	
-		// 			strIP = m_szCfgFile[8];
-		// 			strIPPort = m_szCfgFile[9];		
-
-		// 取有效数据
-		TCHAR c = ':';
-		strHexFileName = strHexFileName.Mid(strHexFileName.Find(c)+2);
-		strFlashMethod = strFlashMethod.Mid(strFlashMethod.Find(c)+2);
-		strFlashTypePage = strFlashTypePage.Mid(strFlashTypePage.Find(c)+2);
-		strModbusID = strModbusID.Mid(strModbusID.Find(c)+2);
-		strComPort = strComPort.Mid(strComPort.Find(c)+2);
-		strBaudrate = strBaudrate.Mid(strBaudrate.Find(c)+2);
-
-		// 			strIP = strIP.Mid(strIP.Find(c)+2);
-		// 			strIPPort = strIPPort.Mid(strIPPort.Find(c)+2);
-	}
+			
+			strHexFileName = m_szCfgFile[CV_TstatLastFlashFile];
+			strFlashMethod = m_szCfgFile[CV_TstatLastFlashMethod];
+			strFlashTypePage = m_szCfgFile[CV_TstatLastFlashPage];
+			strModbusID = m_szCfgFile[CV_TstatDeAddr];
+			strComPort = m_szCfgFile[CV_TstatDeCOM];	
+			strBaudrate = m_szCfgFile[CV_TstatDeBaudrate];	
+// 			strIP = m_szCfgFile[8];
+// 			strIPPort = m_szCfgFile[9];		
+		
+			// 取有效数据
+			TCHAR c = ':';
+			strHexFileName = strHexFileName.Mid(strHexFileName.Find(c)+2);
+			strFlashMethod = strFlashMethod.Mid(strFlashMethod.Find(c)+2);
+			strFlashTypePage = strFlashTypePage.Mid(strFlashTypePage.Find(c)+2);
+			strModbusID = strModbusID.Mid(strModbusID.Find(c)+2);
+			strComPort = strComPort.Mid(strComPort.Find(c)+2);
+			strBaudrate = strBaudrate.Mid(strBaudrate.Find(c)+2);
+		
+// 			strIP = strIP.Mid(strIP.Find(c)+2);
+// 			strIPPort = strIPPort.Mid(strIPPort.Find(c)+2);
+		}
 
 }
 
 
 void CConfigFileHandler::WriteNCPageConfig(const CString& strFlashFileName,
-	const CString& strFlashType,
-	const CString& strIP,
-	const CString& strIPPort)
+										   const CString& strFlashType,
+										   const CString& strIP,
+										   const CString& strIPPort)
 {
 	ASSERT(m_pFile);
 
@@ -257,9 +257,9 @@ void CConfigFileHandler::WriteNCPageConfig(const CString& strFlashFileName,
 
 
 void CConfigFileHandler::ReadNCPageConfig( CString& strFlashFileName,
-	CString& strFlashType,
-	CString& strIP,
-	CString& strIPPort)
+										  CString& strFlashType,
+										  CString& strIP,
+										  CString& strIPPort)
 {
 	ASSERT(m_pFile);
 
@@ -281,13 +281,13 @@ void CConfigFileHandler::ReadNCPageConfig( CString& strFlashFileName,
 
 
 void CConfigFileHandler::WriteLCPageConfig(const CString& strFlashFileName,
-	const CString& strFlashType,
-	const CString& strIP,
-	const CString& strIPPort,
-	const CString& strMDBID)
+										   const CString& strFlashType,
+										   const CString& strIP,
+										   const CString& strIPPort,
+										   const CString& strMDBID)
 {
 	ASSERT(m_pFile);
-
+		
 	//m_szCfgFile[10] =(CString(c_strCfgLightCtrlSection) + _T("\n"));	
 	// hex file path
 	CString strHexFilePath = strFlashFileName;
@@ -301,32 +301,32 @@ void CConfigFileHandler::WriteLCPageConfig(const CString& strFlashFileName,
 	// MDB ID
 	m_szCfgFile[CV_LCDMDBID] = (CString( c_strCfgLastFlashMDBIDItem) + strMDBID);
 	WriteToCfgFile();
-
+	
 }
 
 
 void CConfigFileHandler::ReadLCPageConfig(	CString& strFlashFileName,
-	CString& strFlashType,
-	CString& strIP,
-	CString& strIPPort,
-	CString& strMDBID)
+										  CString& strFlashType,
+										  CString& strIP,
+										  CString& strIPPort,
+										  CString& strMDBID)
 {
 	ASSERT(m_pFile);
 
-	ReadFromCfgFile();
-	strFlashFileName = m_szCfgFile[CV_LCLastFlashFile];
-	strFlashType = m_szCfgFile[CV_LCLastFlashType];
-	strIP = m_szCfgFile[CV_LCDeIP];
-	strIPPort = m_szCfgFile[CV_LCDeIPPort];	
-	strMDBID = m_szCfgFile[CV_LCDMDBID];	
+		    ReadFromCfgFile();
+			strFlashFileName = m_szCfgFile[CV_LCLastFlashFile];
+			strFlashType = m_szCfgFile[CV_LCLastFlashType];
+			strIP = m_szCfgFile[CV_LCDeIP];
+			strIPPort = m_szCfgFile[CV_LCDeIPPort];	
+			strMDBID = m_szCfgFile[CV_LCDMDBID];	
 
-	// 取有效数据
-	TCHAR c = ':';
-	strFlashFileName = strFlashFileName.Mid(strFlashFileName.Find(c)+2);
-	strFlashType = strFlashType.Mid(strFlashType.Find(c)+2);
-	strIP = strIP.Mid(strIP.Find(c)+2);
-	strIPPort = strIPPort.Mid(strIPPort.Find(c)+2);
-	strMDBID = strMDBID.Mid(strMDBID.Find(c)+2);
+			// 取有效数据
+			TCHAR c = ':';
+			strFlashFileName = strFlashFileName.Mid(strFlashFileName.Find(c)+2);
+			strFlashType = strFlashType.Mid(strFlashType.Find(c)+2);
+			strIP = strIP.Mid(strIP.Find(c)+2);
+			strIPPort = strIPPort.Mid(strIPPort.Find(c)+2);
+			strMDBID = strMDBID.Mid(strMDBID.Find(c)+2);
 }
 
 void CConfigFileHandler::WriteToCfgFile(
@@ -348,7 +348,7 @@ void CConfigFileHandler::WriteToCfgFile(
 	// method
 	m_szCfgFile[CV_TstatLastFlashMethod] =(CString(c_strCfgLastFlashMethodItem) + FlashMethod );		
 	// flash page
-	//	m_szCfgFile[CV_TstatLastFlashPage] =(CString(c_strCfgLastFlashTypePageItem) + strFlashTypePage);			
+//	m_szCfgFile[CV_TstatLastFlashPage] =(CString(c_strCfgLastFlashTypePageItem) + strFlashTypePage);			
 	// id
 	m_szCfgFile[CV_TstatDeAddr] =(CString(c_strCfgDefaultAddrItem) + DeviceID );	
 	// com port
@@ -358,8 +358,8 @@ void CConfigFileHandler::WriteToCfgFile(
 	m_szCfgFile[CV_NCDeIP] =(CString(c_strCfgDefaultIPItem) + IP);
 	m_szCfgFile[CV_NCDeIPPort] =(CString(c_strCfgDefaultIPPortItem) + IPPort);
 
-	/*m_szCfgFile[CV_SubNot] =(CString(c_strCfgNote) +CString(subnot));
-	m_szCfgFile[CV_Sub_ID] =(CString(c_strCfgSubID) +CString(subID));*/
+	m_szCfgFile[CV_SubNot] =(CString(c_strCfgNote) +CString(subnot));
+	m_szCfgFile[CV_Sub_ID] =(CString(c_strCfgSubID) +CString(subID));
 
 	WriteToCfgFile();
 
@@ -376,7 +376,7 @@ void CConfigFileHandler::ReadFromCfgFileForAll(
 	CString& subID)
 {
 	ASSERT(m_pFile);
-
+	  
 	ReadFromCfgFile();
 	HexFileName = m_szCfgFile[CV_TstatLastFlashFile];
 	FlashMethod = m_szCfgFile[CV_TstatLastFlashMethod];
@@ -385,11 +385,11 @@ void CConfigFileHandler::ReadFromCfgFileForAll(
 	BD = m_szCfgFile[CV_TstatDeBaudrate];	
 	IP=m_szCfgFile[CV_NCDeIP];
 	IPPort=m_szCfgFile[CV_NCDeIPPort];
-	//subnote = m_szCfgFile[CV_SubNot];
-	//subID =  m_szCfgFile[CV_Sub_ID];
+	subnote = m_szCfgFile[CV_SubNot];
+	subID =  m_szCfgFile[CV_Sub_ID];
 	// 取有效数据
 	TCHAR c = ':';
-
+	 
 	HexFileName=HexFileName.Mid(HexFileName.Find(c)+2);
 	FlashMethod=FlashMethod.Mid(FlashMethod.Find(c)+2);
 	DeviceID=DeviceID.Mid(DeviceID.Find(c)+2);
@@ -397,32 +397,32 @@ void CConfigFileHandler::ReadFromCfgFileForAll(
 	BD=BD.Mid(BD.Find(c)+2);
 	IP=IP.Mid(IP.Find(c)+2);
 	IPPort=IPPort.Mid(IPPort.Find(c)+2);
-	//subnote = subnote.Mid(subnote.Find(c)+2);
-	//subID = subID.Mid(subID.Find(c)+2);
+	subnote = subnote.Mid(subnote.Find(c)+2);
+	subID = subID.Mid(subID.Find(c)+2);
 }
 
 void CConfigFileHandler::WriteToCfgFile()
 {
-	setlocale(LC_CTYPE,("chs"));
-	if(m_pFile->Open(m_strFilePath.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate ))
-	{
-		for (UINT i = 0; i < m_szCfgFile.size(); i++)
+	     setlocale(LC_CTYPE,("chs"));
+		if(m_pFile->Open(m_strFilePath.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate ))
 		{
-			TRACE(m_szCfgFile[i]);
-			m_pFile->WriteString(m_szCfgFile[i]+_T("\n"));	
-		}	
+			for (UINT i = 0; i < m_szCfgFile.size(); i++)
+			{
+				TRACE(m_szCfgFile[i]);
+				m_pFile->WriteString(m_szCfgFile[i]+_T("\n"));	
+			}	
 
-		m_pFile->Close();
-	}
-	else
-	{
-		ASSERT(0);
-		m_pFile->Close();
-		CString strTips = _T("├Cannot create a config file. Please try again.");
-		//UpdateStatusInfo(strTips, FALSE);
-		((CISPDlg*)m_pParentWnd)->UpdateStatusInfo(strTips, FALSE);
-	}
-
+			m_pFile->Close();
+		}
+		else
+		{
+				ASSERT(0);
+				m_pFile->Close();
+				CString strTips = _T("├Cannot create a config file. Please try again.");
+				//UpdateStatusInfo(strTips, FALSE);
+				((CISPDlg*)m_pParentWnd)->UpdateStatusInfo(strTips, FALSE);
+		}
+	
 }
 
 
@@ -542,7 +542,7 @@ int CConfigFileHandler::ReadPMFile(CStdioFile& file,  map<int, CString>& szPMMap
 		int nValue = _wtoi(strModelValue);
 		szPMMap[nValue] =strModel ;
 	}
-
+	
 	return szPMMap.size();
 
 }
@@ -591,7 +591,7 @@ void CConfigFileHandler::ReadFlashSNFile(CStdioFile& file, int &nHWVersion, int 
 {
 	CString strTemp;
 	TCHAR c = ':';	
-
+	
 	file.ReadString(strTemp);
 	CString strHWV = strTemp.Mid(strTemp.Find(c)+2);
 	file.ReadString(strTemp);

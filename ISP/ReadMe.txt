@@ -1,58 +1,96 @@
-﻿========================================================================
-    MICROSOFT 基础类库 : ISP 项目概述
-========================================================================
+================================================================================
+    MICROSOFT FOUNDATION CLASS LIBRARY : ISP Project Overview
+===============================================================================
 
+The application wizard has created this ISP application for
+you.  This application not only demonstrates the basics of using the Microsoft
+Foundation Classes but is also a starting point for writing your application.
 
-应用程序向导已为您创建了此 ISP DLL。  此 DLL 不仅演示 
-Microsoft 基础类的基本使用方法，还可作为您编写 DLL 的起点。
+This file contains a summary of what you will find in each of the files that
+make up your ISP application.
 
-本文件概要介绍组成 ISP DLL 的每个文件的内容。
-
-ISP.vcxproj
-    这是使用应用程序向导生成的 VC++ 项目的主项目文件，
-    其中包含生成该文件的 Visual C++ 
-    的版本信息，以及有关使用应用程序向导选择的平台、配置和项目功能的信息。
-
-ISP.vcxproj.filters
-    这是使用“应用程序向导”生成的 VC++ 项目筛选器文件。 
-    它包含有关项目文件与筛选器之间的关联信息。 在 IDE 
-    中，通过这种关联，
-    在特定节点下以分组形式显示具有相似扩展名的文件。
-    例如，“.cpp”文件与“源文件”筛选器关联。
+ISP.vcproj
+    This is the main project file for VC++ projects generated using an application wizard.
+    It contains information about the version of Visual C++ that generated the file, and
+    information about the platforms, configurations, and project features selected with the
+    application wizard.
 
 ISP.h
-    这是 DLL 的主头文件。  它声明了 CISPApp 类。
+    This is the main header file for the application.  It includes other
+    project specific headers (including Resource.h) and declares the
+    CISPApp application class.
 
 ISP.cpp
-    这是主 DLL 源文件。  它包含 CISPApp 类。
+    This is the main application source file that contains the application
+    class CISPApp.
 
 ISP.rc
-    这是程序使用的所有 Microsoft Windows 资源的列表。  它包括 RES 
-    子目录中存储的图标、位图和光标。  此文件可以直接在 Microsoft Visual C++ 
-    中进行编辑。
+    This is a listing of all of the Microsoft Windows resources that the
+    program uses.  It includes the icons, bitmaps, and cursors that are stored
+    in the RES subdirectory.  This file can be directly edited in Microsoft
+    Visual C++. Your project resources are in 1033.
+
+res\ISP.ico
+    This is an icon file, which is used as the application's icon.  This
+    icon is included by the main resource file ISP.rc.
 
 res\ISP.rc2
-    此文件包含不在 Microsoft Visual C++ 中进行编辑的资源。  
-    您应该将不可由资源编辑器编辑的所有资源放在此文件中。
+    This file contains resources that are not edited by Microsoft
+    Visual C++. You should place all resources not editable by
+    the resource editor in this file.
 
-ISP.def
-    此文件包含在 Microsoft Windows 中运行所必需的 DLL 的有关信息。它定义了 DLL 
-    的名称和说明等参数，而且还从 DLL 导出函数。
 
 /////////////////////////////////////////////////////////////////////////////
-其他标准文件：
 
-StdAfx.h，StdAfx.cpp
-    这些文件用于生成名为 ISP.pch 的预编译头 (PCH) 文件和名为 
-    StdAfx.obj 的预编译类型文件。
+The application wizard creates one dialog class:
+
+ISPDlg.h, ISPDlg.cpp - the dialog
+    These files contain your CISPDlg class.  This class defines
+    the behavior of your application's main dialog.  The dialog's template is
+    in ISP.rc, which can be edited in Microsoft Visual C++.
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+Other Features:
+
+ActiveX Controls
+    The application includes support to use ActiveX controls.
+
+Windows Sockets
+    The application has support for establishing communications over TCP/IP networks.
+
+/////////////////////////////////////////////////////////////////////////////
+
+Other standard files:
+
+StdAfx.h, StdAfx.cpp
+    These files are used to build a precompiled header (PCH) file
+    named ISP.pch and a precompiled types file named StdAfx.obj.
 
 Resource.h
-    这是标准头文件，可用于定义新的资源 ID。
-    Microsoft Visual C++ 将读取并更新此文件。
+    This is the standard header file, which defines new resource IDs.
+    Microsoft Visual C++ reads and updates this file.
 
+ISP.manifest
+	Application manifest files are used by Windows XP to describe an applications
+	dependency on specific versions of Side-by-Side assemblies. The loader uses this
+	information to load the appropriate assembly from the assembly cache or private
+	from the application. The Application manifest  maybe included for redistribution
+	as an external .manifest file that is installed in the same folder as the application
+	executable or it may be included in the executable in the form of a resource.
 /////////////////////////////////////////////////////////////////////////////
-其他注释：
 
-应用程序向导使用“TODO:”来指示应添加或自定义的源代码部分。
+Other notes:
+
+The application wizard uses "TODO:" to indicate parts of the source code you
+should add to or customize.
+
+If your application uses MFC in a shared DLL, you will need
+to redistribute the MFC DLLs. If your application is in a language
+other than the operating system's locale, you will also have to
+redistribute the corresponding localized resources MFC90XXX.DLL.
+For more information on both of these topics, please see the section on
+redistributing Visual C++ applications in MSDN documentation.
 
 /////////////////////////////////////////////////////////////////////////////

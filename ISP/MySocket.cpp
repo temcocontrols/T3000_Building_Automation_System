@@ -31,6 +31,8 @@ extern volatile int package_number;
 extern volatile int next_package_number;
 extern bool device_jump_from_runtime;
 extern bool has_enter_dhcp_has_lanip_block;
+extern BYTE Product_Name[12];
+extern BYTE Rev[4];
 //extern bool some_device_reply_the_broadcast;
 MySocket::MySocket()
 {
@@ -78,14 +80,66 @@ void MySocket::OnReceive(int nErrorCode)
 		}
 		else if(Receive_data_length == 31)
 		{
+        /*
+        typedef struct _DHCP_REPLY_PACKET
+        {
+        U8_T Reply[11];   // ReceiveDHCP
+        U32_T LanIp;    // LAN IP
+        U8_T Product[12]; 
+        U8_T    Rev[4];  
+        } DHCP_REPLY_PACKET;
+        [15:30:02] Evan: static void dhcp_reply_get_ready(void)
+        {
+        // U8_T XDATA i;
+
+        DHCP_Handshake_flag = HANDSHAKE_START;
+        pDHCP_Reply_Packet->Reply[0] = 'R';
+        pDHCP_Reply_Packet->Reply[1] = 'e';
+        pDHCP_Reply_Packet->Reply[2] = 'c';
+        pDHCP_Reply_Packet->Reply[3] = 'e';
+        pDHCP_Reply_Packet->Reply[4] = 'i';
+        pDHCP_Reply_Packet->Reply[5] = 'v';
+        pDHCP_Reply_Packet->Reply[6] = 'e';
+        pDHCP_Reply_Packet->Reply[7] = 'D';
+        pDHCP_Reply_Packet->Reply[8] = 'H';
+        pDHCP_Reply_Packet->Reply[9] = 'C';
+        pDHCP_Reply_Packet->Reply[10] = 'P';
+        pDHCP_Reply_Packet->LanIp = PNetStation->StationIP;
+        // for(i = 0; i < 16; i++)
+        // {  
+        //  pDHCP_Reply_Packet->Reserved[i] = 0;
+        // }
+
+        #if(PRODUCT == LC)
+        pDHCP_Reply_Packet->Product[0] = 'L';
+        pDHCP_Reply_Packet->Product[1] = 'C';
+        pDHCP_Reply_Packet->Product[2] = ' ';
+        pDHCP_Reply_Packet->Product[3] = ' ';
+        pDHCP_Reply_Packet->Product[4] = ' ';
+        pDHCP_Reply_Packet->Product[5] = ' ';
+        pDHCP_Reply_Packet->Product[6] = ' ';
+        pDHCP_Reply_Packet->Product[7] = ' ';
+        pDHCP_Reply_Packet->Product[8] = ' ';
+        pDHCP_Reply_Packet->Product[9] = ' ';
+        pDHCP_Reply_Packet->Product[10] = ' '; 
+        pDHCP_Reply_Packet->Product[11] = ' ';
+        pDHCP_Reply_Packet->Rev[0] = '2';
+        pDHCP_Reply_Packet->Rev[1] = '1';
+        pDHCP_Reply_Packet->Rev[2] = ' ';
+        pDHCP_Reply_Packet->Rev[3] = ' ';
+
+        */
 			char temp_data[100];
 			memset(temp_data,0,sizeof(temp_data));
 			memcpy_s(temp_data,sizeof(temp_data),receive_buf,11);//copy the first 11 byte and check
 			if(!strcmp(temp_data,"ReceiveDHCP"))
 			{
 				memcpy_s(Byte_ISP_Device_IP,sizeof(Byte_ISP_Device_IP),receive_buf+11,4);//copy the first 11 byte and check
+                memcpy_s(Product_Name,sizeof(Product_Name),receive_buf+15,12);//copy the first 11 byte and check
+                memcpy_s(Rev,sizeof(Rev),receive_buf+27,4);//copy the first 11 byte and check
 				device_has_replay_lan_IP = true;
 				ISP_STEP =ISP_SEND_DHCP_COMMAND_HAS_LANIP;
+                
 			#ifdef use_multy
 				some_device_reply_the_broadcast =true;	
 				bool find_exist_product=false;

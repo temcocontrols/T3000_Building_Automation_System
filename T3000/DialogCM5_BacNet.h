@@ -60,8 +60,9 @@ public:
 	void Show_Wait_Dialog_And_SendMessage(int read_list_type);
 	void WriteFlash();
 	void SetConnected_IP(LPCTSTR myip);
-
-
+	void Set_Device_Type(bool is_remote_device);
+	bool m_is_remote_device;
+	void Set_remote_device_IP(LPCTSTR ipaddress);
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CTabCtrl m_bac_main_tab;

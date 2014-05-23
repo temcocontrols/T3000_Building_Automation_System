@@ -47,10 +47,10 @@ char* CFlashBase::CreateFileBuffer(int nSize)
 	{
 		delete []m_pFileBuffer;
 	}
-
-
+	
+	
 	m_pFileBuffer = new char[nSize];
-
+	
 	return m_pFileBuffer;
 }
 

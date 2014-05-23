@@ -75,9 +75,9 @@ int CComWriter::BeginWirteByCom()
 	{
 		if (!WriteCommandtoReset())
 		{
-		return 0;
-		} 
-		 
+			return 0;
+		}
+	
 
 		HCURSOR hc;//load mouse cursor
 		hc = LoadCursor(NULL,IDC_WAIT);
@@ -109,7 +109,7 @@ int CComWriter::BeginWirteByCom()
 		
 		ASSERT(m_pWorkThread);
 	}
-		//这个是扩展的文件--针对128K的芯片
+
 	else if(m_nHexFileType == 2)
 	{
 		WirteExtendHexFileByCom();
@@ -127,81 +127,81 @@ BOOL CComWriter::WriteCommandtoReset()
 	CString strTips ;//= _T("|Error :The com port is occupied!");
 	if(open_com(m_nComPort)==false)
 	{
-		    strTips = _T("|Error :The com port is occupied!");
+		strTips = _T("|Error :The com port is occupied!");
 		OutPutsStatusInfo(strTips);	
 		//AfxMessageBox(strTips);
 		return FALSE;
 	}
-	
+
 	int nRet = Write_One(m_szMdbIDs[0],16,127);   // 进入ISP模式
-	  Sleep(2000);
-	 int ModelID= read_one(m_szMdbIDs[0],7,5);
-	 if (ModelID>0)
-	 {
-		 if (ModelID==6||ModelID==7)//Tstat6,7检测芯片大小，其余用串口烧写的都不检测
-		 {
-			 int Chipsize=read_one(m_szMdbIDs[0],11,5);
+	Sleep(2000);
+	int ModelID= read_one(m_szMdbIDs[0],7,5);
+	if (ModelID>0)
+	{
+		if (ModelID==6||ModelID==7)//Tstat6,7检测芯片大小，其余用串口烧写的都不检测
+		{
+			int Chipsize=read_one(m_szMdbIDs[0],11,5);
 
 
-			 if (Chipsize<37)	//64K
-			 {
-				 if (m_nHexFileType==0)
-				 {
-					 strTips = _T("|hex file   matches with the chip!");
-					 OutPutsStatusInfo(strTips);
-				 } 
-				 else
-				 {
-					 int ii=0;
-					 while(ii<=5){
-						 int ret=Write_One(m_szMdbIDs[0],16,1);
-						 if (ret>0)
-						 {
-							 break;
-						 }
-					 }
-					 strTips = _T("|hex file doesn't match with the chip!");
-					 OutPutsStatusInfo(strTips);	
-					 AfxMessageBox(_T("hex file doesn't match with the chip"));
-					 return FALSE;
-				 }
-			 } 
-			 else	//128K
-			 {
-				 if (m_nHexFileType==0)
-				 {
-					 int ii=0;
-					 while(ii<=5){
-						 int ret=Write_One(m_szMdbIDs[0],33,1);
-						 if (ret>0)
-						 {
-							 break;
-						 }
-					 }
+			if (Chipsize<37)	//64K
+			{
+				if (m_nHexFileType==0)
+				{
+					strTips = _T("|hex file   matches with the chip!");
+					OutPutsStatusInfo(strTips);
+				} 
+				else
+				{
+					int ii=0;
+					while(ii<=5){
+						int ret=Write_One(m_szMdbIDs[0],16,1);
+						if (ret>0)
+						{
+							break;
+						}
+					}
+					strTips = _T("|hex file doesn't match with the chip!");
+					OutPutsStatusInfo(strTips);	
+					AfxMessageBox(_T("hex file doesn't match with the chip"));
+					return FALSE;
+				}
+			} 
+			else	//128K
+			{
+				if (m_nHexFileType==0)
+				{
+					int ii=0;
+					while(ii<=5){
+						int ret=Write_One(m_szMdbIDs[0],33,1);
+						if (ret>0)
+						{
+							break;
+						}
+					}
 
-					 while(ii<=5){
-						 int ret=Write_One(m_szMdbIDs[0],16,1);
-						 if (ret>0)
-						 {
-							 break;
-						 }
-					 }
-					 strTips = _T("|hex file doesn't match with the chip!");
-					 OutPutsStatusInfo(strTips);	
-					 AfxMessageBox(_T("hex file doesn't match with the chip"));
-					 return FALSE;
-				 } 
-				 else
-				 {
-					 strTips = _T("|hex file   matches with the chip!");
-					 OutPutsStatusInfo(strTips);
-				 }
-			 }
-		 }
-	 }
-	
-			 
-			  
+					while(ii<=5){
+						int ret=Write_One(m_szMdbIDs[0],16,1);
+						if (ret>0)
+						{
+							break;
+						}
+					}
+					strTips = _T("|hex file doesn't match with the chip!");
+					OutPutsStatusInfo(strTips);	
+					AfxMessageBox(_T("hex file doesn't match with the chip"));
+					return FALSE;
+				} 
+				else
+				{
+					strTips = _T("|hex file   matches with the chip!");
+					OutPutsStatusInfo(strTips);
+				}
+			}
+		}
+	}
+
+
+
 
 	close_com();
 	//Sleep(1000);
@@ -273,11 +273,11 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 		pWriter->OutPutsStatusInfo(strID);
 		////显示flash之前的时间
 		pWriter->OutPutsStatusInfo(_T("|--------->>Begin"));
-		pWriter->OutPutsStatusInfo(_T("|-->>Start Time:")+GetSysTime());
+		pWriter->OutPutsStatusInfo(_T("|-->>Begin Time:")+GetSysTime());
 		//// 显示flash之前的设备状态信息
 
-		((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
-
+//		((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
+        pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]);
 
 		
 		////////	ASSERT(pWriter->m_nBufLen <= c_nHexFileBufLen);
@@ -333,10 +333,11 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 					case -9:strTemp.Format(_T("|ID %d Error : Programming was canceled."), pWriter->m_szMdbIDs[i]);break;
 					}
 					pWriter->OutPutsStatusInfo(strTemp);
+					AfxMessageBox(strTemp);
 					pWriter->OutPutsStatusInfo(_T("|-->>End Time:")+GetSysTime());
 					pWriter->OutPutsStatusInfo(_T("|------->>End"));
 					break;
-					//AfxMessageBox(strTemp);
+					
 				}
 				else
 				{		
@@ -348,15 +349,15 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 					pWriter->OutPutsStatusInfo(strText);
 
 
-					//CString strText;
-					//strText.Format(_T("|ID %d: Programming successful."), pWriter->m_szMdbIDs[i]);
-					//pWriter->OutPutsStatusInfo(strText);
-					////// 显示flash之前的设备状态信息
-					//Sleep(13000);//等待重启好之后
-					//((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
-					//pWriter->OutPutsStatusInfo(_T("|-->>End Time:")+GetSysTime());
-					//pWriter->OutPutsStatusInfo(_T("|------->>End"));
-					//AfxMessageBox(strText);				
+					/*CString strText;
+					strText.Format(_T("|ID %d: Programming successful."), pWriter->m_szMdbIDs[i]);
+					pWriter->OutPutsStatusInfo(strText);*/
+					//// 显示flash之前的设备状态信息
+					Sleep(13000);//等待重启好之后
+//					((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
+					pWriter->OutPutsStatusInfo(_T("|-->>End Time:")+GetSysTime());
+					pWriter->OutPutsStatusInfo(_T("|------->>End"));
+					AfxMessageBox(strText);				
 				}
 
 
@@ -396,7 +397,7 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 				pWriter->OutPutsStatusInfo(strTemp);
 				pWriter->OutPutsStatusInfo(_T("|-->>End Time:")+GetSysTime());
 				pWriter->OutPutsStatusInfo(_T("|------->>End"));
-				//AfxMessageBox(strTemp);
+				AfxMessageBox(strTemp);
 			}
 			else
 			{		
@@ -405,7 +406,7 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 				pWriter->OutPutsStatusInfo(strText);
 				//// 显示flash之前的设备状态信息
 				//Sleep(13000);//等待重启好之后
-				((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
+//				((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
 				pWriter->OutPutsStatusInfo(_T("|-->>End Time:")+GetSysTime());
 				pWriter->OutPutsStatusInfo(_T("|------->>End"));
 				//AfxMessageBox(strText);				
@@ -416,8 +417,6 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 	//}//For Test
 	//*******************************************************************************
 	//Sleep(500);
-	Sleep(8000);
-	Write_One(pWriter->m_szMdbIDs[i-1],16,143);
 	pWriter->WriteFinish(nFlashRet);
 	close_com();
 	return 1;//close thread
@@ -640,6 +639,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
 		do{
 			if(itemp<RETRY_TIMES)
 			{
+			    
 				if(-2==write_multi(m_ID,&register_data[ii],ii,128))//to write multiple 128 bytes
 					itemp++;
 				else
@@ -667,6 +667,14 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
 				
 			}
 		}while(itemp);
+		/*CString temp,aline;
+		for (int i=ii;i<ii+128;i++)
+		{
+		temp.Format(_T("%X"),register_data[i]);
+		aline+=temp;
+		}
+		aline+=_T("\n");
+		pWriter->OutPutsStatusInfo(aline,FALSE);*/
 		ii+=128;
 	}
 
@@ -741,14 +749,7 @@ void CComWriter::OutPutsStatusInfo(const CString& strInfo, BOOL bReplace)
 // 参数就是flash线程的返回值
 void CComWriter::WriteFinish(int nFlashFlag)
 {
-	if (m_nBautrate == 9600)
-	{
-		Write_One(m_szMdbIDs[0], 185, 0);
-	}
-	else
-	{
-		Write_One(m_szMdbIDs[0], 185, 1);
-	}
+ 
 
 	int	nRet =PostMessage(m_pParentWnd->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(nFlashFlag));
 }
@@ -762,11 +763,7 @@ void CComWriter::SetHexFileType(HEXFILE_FORMAT nHexFileType)
 
 int CComWriter::WirteExtendHexFileByCom()
 {
-	if (!WriteCommandtoReset())
-	{
-	return 0;
-	} 
-	 
+	WriteCommandtoReset();
 
 	HCURSOR hc;//load mouse cursor
 	hc = LoadCursor(NULL,IDC_WAIT);
@@ -808,79 +805,82 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 {
 	CComWriter* pWriter = (CComWriter*)(pParam);
 	CString strFailureList;
-//	do
-//	{
-		int nFlashRet=0;
-		UINT i=0;
-		int nFailureNum = 0;
-		for(i = 0; i < pWriter->m_szMdbIDs.size(); i++)
-		{
+	int nFlashRet=0;
+	UINT i=0;
+	int nFailureNum = 0;
+  
+	UINT times=0;
 
-			CString strID;
-			strID.Format(_T("|--------------->>ID-%d-<<---------------"), pWriter->m_szMdbIDs[i]);
-			pWriter->OutPutsStatusInfo(strID);
-			////显示flash之前的时间
-			pWriter->OutPutsStatusInfo(_T("|--------->>Begin"));
-			pWriter->OutPutsStatusInfo(_T("|-->>Start Time:")+GetSysTime());
-			//// 显示flash之前的设备状态信息
+   #if 1
 
-			((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
+	   for(i = 0; i < pWriter->m_szMdbIDs.size(); i++)
+	   {
+		   CString strID;
+		   strID.Format(_T("|Current Programming device ID is : %d"), pWriter->m_szMdbIDs[i]);
+		   pWriter->OutPutsStatusInfo(strID);
+		   pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]);
+		   int nCount = 0;
+		   for(UINT p = 0; p < pWriter->m_szHexFileFlags.size(); p++)
+		   {
+			   int nBufLen = pWriter->m_szHexFileFlags[p]-nCount;
 
-			/*CString strID;
-			strID.Format(_T("|Current Programming device ID is : %d"), pWriter->m_szMdbIDs[i]);
-			pWriter->OutPutsStatusInfo(strID);*/
+			   if((nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer+nCount), pParam)) < 0 )
+			   {
+				   nFailureNum++;
+				   CString strTemp=_T("");
+				   strTemp.Format(_T("%d;"), pWriter->m_szMdbIDs[i]);  
 
-			int nCount = 0;
-			for(UINT p = 0; p < pWriter->m_szHexFileFlags.size(); p++)
-			{
-				int nBufLen = pWriter->m_szHexFileFlags[p]-nCount;
-				
-				if((nFlashRet = flash_a_tstat(pWriter->m_szMdbIDs[i], nBufLen, (TS_UC*)(pWriter->m_pExtendFileBuffer+nCount), pParam)) < 0 )
-				{
-					nFailureNum++;
-					CString strTemp=_T("");
-					strTemp.Format(_T("%d;"), pWriter->m_szMdbIDs[i]);  
-				
-					strFailureList+=strTemp;  // flash多个使用
-					switch(nFlashRet)
-					{
-					case -1:strTemp.Format(_T("|ID %d Error : Please verify connection!"), pWriter->m_szMdbIDs[i]);break;
-					case -2:strTemp.Format(_T("|ID %d Error : Unable to Initialize..."), pWriter->m_szMdbIDs[i]);break;
-					case -3:strTemp.Format(_T("|ID %d Error : Unable to Erase..."), pWriter->m_szMdbIDs[i]);break;
-					case -4:strTemp.Format(_T("|ID %d Error : Unable to start programming..."), pWriter->m_szMdbIDs[i]);break;
-					case -5:strTemp.Format(_T("|ID %d Error : Unable to Initialize..."), pWriter->m_szMdbIDs[i]);break;
-					case -6:strTemp.Format(_T("|ID %d Error : Unable to Erase..."), pWriter->m_szMdbIDs[i]);break;
-					case -7:strTemp.Format(_T("|ID %d Error : Unable to start programming..."), pWriter->m_szMdbIDs[i]);break;
-					case -8:strTemp.Format(_T("|ID %d Error : Update was interrupted! Please verify connection."), pWriter->m_szMdbIDs[i]);break;
-					case -9:strTemp.Format(_T("|ID %d Error : Programming was canceled."), pWriter->m_szMdbIDs[i]);break;
-					}
-					pWriter->OutPutsStatusInfo(strTemp);
-					//AfxMessageBox(strTemp);
-					break;
-				}
-				else
-				{									
-					nCount += nBufLen;
+				   strFailureList+=strTemp;  // flash多个使用
+				   switch(nFlashRet)
+				   {
+				   case -1:strTemp.Format(_T("|ID %d Error : Please verify connection!"), pWriter->m_szMdbIDs[i]);break;
+				   case -2:strTemp.Format(_T("|ID %d Error : Unable to Initialize..."), pWriter->m_szMdbIDs[i]);break;
+				   case -3:strTemp.Format(_T("|ID %d Error : Unable to Erase..."), pWriter->m_szMdbIDs[i]);break;
+				   case -4:strTemp.Format(_T("|ID %d Error : Unable to start programming..."), pWriter->m_szMdbIDs[i]);break;
+				   case -5:strTemp.Format(_T("|ID %d Error : Unable to Initialize..."), pWriter->m_szMdbIDs[i]);break;
+				   case -6:strTemp.Format(_T("|ID %d Error : Unable to Erase..."), pWriter->m_szMdbIDs[i]);break;
+				   case -7:strTemp.Format(_T("|ID %d Error : Unable to start programming..."), pWriter->m_szMdbIDs[i]);break;
+				   case -8:strTemp.Format(_T("|ID %d Error : Update was interrupted! Please verify connection."), pWriter->m_szMdbIDs[i]);break;
+				   case -9:strTemp.Format(_T("|ID %d Error : Programming was canceled."), pWriter->m_szMdbIDs[i]);break;
+				   }
+				   pWriter->OutPutsStatusInfo(strTemp);
+				   //AfxMessageBox(strTemp);
+				   break;
+			   }
+			   else
+			   {									
+				   nCount += nBufLen;
 
-					CString strText;
-					strText.Format(_T("|ID %d: Programming section %d finished."), pWriter->m_szMdbIDs[i], p);
-					pWriter->OutPutsStatusInfo(strText);
-				
-					//AfxMessageBox(strText);				
-				}
+				   CString strText;
+				   strText.Format(_T("|ID %d: Programming section %d finished."), pWriter->m_szMdbIDs[i], p);
+				   pWriter->OutPutsStatusInfo(strText);
 
-				if (p==0)
-				{	
-					int nTemp = Write_One(pWriter->m_szMdbIDs[i], 16, 8);
-					nTemp = Write_One(pWriter->m_szMdbIDs[i], 33, 1);
+				   //AfxMessageBox(strText);				
+			   }
 
-				}
+			   if (p==0)
+			   {	
+				   int nTemp = Write_One(pWriter->m_szMdbIDs[i], 16, 8);
+				   nTemp = Write_One(pWriter->m_szMdbIDs[i], 33, 1);
 
-				Sleep(500); //must if not ,have some wrong
+			   }
 
-			}	
-		}
+			   Sleep(500); //must if not ,have some wrong
 
+		   }	
+
+
+	   }
+
+#endif
+   
+
+
+		
+		
+		
+		
+		
 		if(nFlashRet > 0) // flash 成功
 		{
 			CString strText;
@@ -890,8 +890,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 			//AfxMessageBox(strText);		
 		}
 //*******************************************************************************
-		Sleep(8000);
-		Write_One(pWriter->m_szMdbIDs[i-1],16,143);
+
 		pWriter->WriteFinish(nFlashRet);
 		Sleep(500);
 	
@@ -902,7 +901,25 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
 }
 
+void CComWriter::UpdataDeviceInformation(int& ID){
 
+	unsigned short Device_infor[10];
+	CString str_ret,temp;
+	int ret=read_multi(ID,&Device_infor[0],0,10);
+	for (int i=0;i<10;i++)
+	{
+		temp.Format(_T("%d "),Device_infor[i]);
+		str_ret+=temp;
+	}
+	int nCount = str_ret.GetLength();
+	WCHAR* strNew = new WCHAR[nCount+1];
+	ZeroMemory(strNew, (nCount+1)*sizeof(WCHAR));
+	LPCTSTR str = LPCTSTR(str_ret);
+	memcpy(strNew, str, nCount*sizeof(WCHAR));
+	PostMessage(m_pParentWnd->m_hWnd, WM_UPDATA_DEVICE_INFORMATION, 0, LPARAM(strNew));
+
+
+}
 void CComWriter::SetIPAddr(const CString& strIPAddr)
 {
 	m_strIPAddr = strIPAddr;	

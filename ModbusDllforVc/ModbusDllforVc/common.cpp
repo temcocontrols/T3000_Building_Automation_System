@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "common.h"
 #include "crc.h"
+
 #define TRUE_OR_FALSE	true
 #define SLEEP_TIME		50
 #define  LATENCY_TIME_COM	60      // 串口延迟，必须600，设为500或更小时，通过NC scan TStat容易失败
@@ -50,6 +51,12 @@ OUTPUT void SetCommunicationType(int nType)
 {
 	g_Commu_type=nType;
 }
+
+OUTPUT int GetCommunicationType(void)
+{
+	return g_Commu_type;
+}
+
 
 /*
 OUTPUT bool open_com(TS_UC m_com)
@@ -785,6 +792,8 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
 		m_hSocket=NULL;
 		return FALSE;
 	}
+	last_connected_ip = strIPAdress;
+	last_connected_port = nPort;
 	return TRUE;
 }
 
@@ -2346,6 +2355,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
 	return -1;//add by Fance 
 	///////////////////////////////////////////////////////////
 }
+       
 #if 0
 OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length)
 {
@@ -3556,6 +3566,11 @@ OUTPUT void SetComnicationHandle(int nType,HANDLE hCommunication)
 	}
 
 }
+
+
+
+
+
 
 OUTPUT bool open_com(int m_com)
 {	
@@ -7274,3 +7289,5 @@ OUTPUT int MINI_CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int 
 	}
 	return -1; 
 }
+
+

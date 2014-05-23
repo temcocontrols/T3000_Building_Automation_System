@@ -12,10 +12,15 @@
 #define IDR_HTML_LIGHTCTRLFLASHDLG      105
 #define R                               134
 #define IDR_MAINFRAME                   134
+#define IDD_DIALOG_TSTAT                135
+#define IDD_DIALOG_LIGHTCTRL            136
+#define IDD_DIALOG_NETCTRL              137
 #define IDR_MENU1                       138
 #define IDR_ISPTOOL                     140
+#define IDD_DIALOG_SETTING              441
 #define IDC_BUTTON1                     1000
 #define IDC_BUTTON_FLASH                1000
+#define IDC_BUTTON_PING                 1000
 #define IDC_EDIT_FILEPATH               1001
 #define IDC_BUTTON_SELFILE              1002
 #define IDC_LIST_INFO                   1003
@@ -23,6 +28,7 @@
 #define IDC_BUTTON_PING2                1004
 #define IDC_CHECK_SELTCP                1005
 #define IDC_CHECK_SELNET                1005
+#define IDC_EDIT_MDBID                  1006
 #define IDC_COMBO_COM                   1007
 #define IDC_BUTTON_CANCEL               1008
 #define IDC_EDIT_MDBID2                 1008
@@ -36,9 +42,13 @@
 #define IDC_RADIO_FLHBTLDR              1017
 #define IDC_TAB1                        1018
 #define IDC_STATIC_POS                  1019
+#define IDC_RADIO_MAIN                  1020
 #define IDC_EDIT1                       1021
-#define IDC_WEBSITE                     1021
+#define IDC_EDIT_LCIPPORT               1021
+#define IDC_RADIO_INPUT                 1022
 #define IDC_OUTPUT                      1023
+#define IDC_RADIO_OUTPUT                1023
+#define IDC_IPADDRESS_LC                1024
 #define IDC_IPADDRESS_NC                1025
 #define IDC_EDIT_NCPORT                 1026
 #define IDC_COMBO_PM                    1027
@@ -61,8 +71,17 @@
 #define IDC_STATIC_COM                  1047
 #define IDC_STATIC_NET                  1048
 #define IDC_STATIC_INFO                 1049
-#define IDC_RADIO1                      1051
-#define IDC_RADIO2                      1052
+#define IDC_SHOW_HEX                    1050
+#define IDC_FLASH_SN                    1051
+#define IDC_HEX_SIZE                    1052
+#define IDC_BIN_INFORMATION             1053
+#define IDC_STATIC_FILEPATH             1054
+#define IDC_STATIC_HEX_BOOT             1055
+#define IDC_BUTTON_SETTING_OK           6001
+#define IDC_EDIT_SETTING_TIMEOUT        6021
+#define IDC_BUTTON2                     6050
+#define IDC_BUTTON_SETTING_CANCLE       6050
+#define IDC_BUTTON_SETTING_CANCEL       6050
 #define ID_MAIN_CLEAR                   32771
 #define ID_Menu                         32772
 #define ID_SAVE_LOG_INFO                32773
@@ -71,15 +90,16 @@
 #define ID_MENU_ABOUT32776              32776
 #define ID_MENU_EXIT                    32777
 #define ID_MENU_EXIT32778               32778
-#define ID_MENU_VERSION                 32779
+#define ID_MENU_SETTING                 32779
+#define ID_MENU_CHECKHEX                32780
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        141
-#define _APS_NEXT_COMMAND_VALUE         32780
-#define _APS_NEXT_CONTROL_VALUE         1053
+#define _APS_NEXT_RESOURCE_VALUE        142
+#define _APS_NEXT_COMMAND_VALUE         32781
+#define _APS_NEXT_CONTROL_VALUE         1056
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

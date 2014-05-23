@@ -164,6 +164,7 @@ int Set_Communication_Count(bool b_transmission,int bac_instanceid)
   This does NOT lock the register_critical_section
 
   */
+int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
 int modbus_read_multi_value( 
 		unsigned short *put_data_into_here,
 		unsigned char device_var,
@@ -201,7 +202,7 @@ int modbus_read_multi_value(
 		g_llTxCount++;
 
 		// accept any return other than -2
-		if( error !=-2 )
+		if( error >= 0 )
 		{
 			// increment the number or replies we have received
 			g_llRxCount++;
