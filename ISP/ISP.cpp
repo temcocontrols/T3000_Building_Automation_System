@@ -1,66 +1,85 @@
-// ISP.cpp : 定义 DLL 的初始化例程。
+
+// ISP.cpp : Defines the class behaviors for the application.
 //
 
 #include "stdafx.h"
 #include "ISP.h"
+#include "ISPDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-HINSTANCE hResOld; // 旧的资源句柄
-HINSTANCE hDll; // DLL资源句柄
-//
-//TODO: 如果此 DLL 相对于 MFC DLL 是动态链接的，
-//		则从此 DLL 导出的任何调入
-//		MFC 的函数必须将 AFX_MANAGE_STATE 宏添加到
-//		该函数的最前面。
-//
-//		例如:
-//
-//		extern "C" BOOL PASCAL EXPORT ExportedFunction()
-//		{
-//			AFX_MANAGE_STATE(AfxGetStaticModuleState());
-//			// 此处为普通函数体
-//		}
-//
-//		此宏先于任何 MFC 调用
-//		出现在每个函数中十分重要。这意味着
-//		它必须作为函数中的第一个语句
-//		出现，甚至先于所有对象变量声明，
-//		这是因为它们的构造函数可能生成 MFC
-//		DLL 调用。
-//
-//		有关其他详细信息，
-//		请参阅 MFC 技术说明 33 和 58。
-//
-
 // CISPApp
 
-BEGIN_MESSAGE_MAP(CISPApp, CWinApp)
+BEGIN_MESSAGE_MAP(CISPApp, CWinAppEx)
+//	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
-// CISPApp 构造
+// CISPApp construction
 
 CISPApp::CISPApp()
 {
-	// TODO: 在此处添加构造代码，
-	// 将所有重要的初始化放置在 InitInstance 中
+ 
 }
 
 
-// 唯一的一个 CISPApp 对象
+// The one and only CISPApp object
 
 CISPApp theApp;
 
 
-// CISPApp 初始化
+
+// CISPApp initialization
 
 BOOL CISPApp::InitInstance()
 {
-	CWinApp::InitInstance();
-	hDll = m_hInstance;
-	return TRUE;
+	// InitCommonControlsEx() is required on Windows XP if an application
+	// manifest specifies use of ComCtl32.dll version 6 or later to enable
+	// visual styles.  Otherwise, any window creation will fail.
+	INITCOMMONCONTROLSEX InitCtrls;
+	InitCtrls.dwSize = sizeof(InitCtrls);
+	// Set this to include all the common control classes you want to use
+	// in your application.
+	InitCtrls.dwICC = ICC_WIN95_CLASSES;
+	InitCommonControlsEx(&InitCtrls);
+
+	CWinAppEx::InitInstance();
+
+	if (!AfxSocketInit())
+	{
+		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);
+		return FALSE;
+	}
+
+	AfxEnableControlContainer();
+
+	// Standard initialization
+	// If you are not using these features and wish to reduce the size
+	// of your final executable, you should remove from the following
+	// the specific initialization routines you do not need
+	// Change the registry key under which our settings are stored
+	// TODO: You should modify this string to be something appropriate
+	// such as the name of your company or organization
+	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
+
+	CISPDlg dlg;
+	m_pMainWnd = &dlg;
+	INT_PTR nResponse = dlg.DoModal();
+	if (nResponse == IDOK)
+	{
+		// TODO: Place code here to handle when the dialog is
+		//  dismissed with OK
+	}
+	else if (nResponse == IDCANCEL)
+	{
+		// TODO: Place code here to handle when the dialog is
+		//  dismissed with Cancel
+	}
+
+	// Since the dialog has been closed, return FALSE so that we exit the
+	//  application, rather than start the application's message pump.
+	return FALSE;
 }

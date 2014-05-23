@@ -69,7 +69,7 @@ bool CNCFinder::FindNC()
 DWORD CNCFinder::GetIPFromBuf(char* pBuf, int nLen)
 {
 	DWORD dwIP = 0;
-
+	
 	((BYTE*)&dwIP)[0] = pBuf[12];
 	((BYTE*)&dwIP)[1] = pBuf[13];
 	((BYTE*)&dwIP)[2] = pBuf[14];

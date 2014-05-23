@@ -33,7 +33,7 @@ int modbus_read_one_value(
 				unsigned char device_var,
 				unsigned short address, 
 				int retry_times );
-
+int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
 int modbus_read_multi_value( 
 		unsigned short *put_data_into_here,
 		unsigned char device_var,
@@ -143,5 +143,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind);
 UINT RefreshNetWorkDeviceListByUDPFunc();
 void DFTrace(CString &nCString);
 int Open_MonitorDataBase(WCHAR *DataSource);
+void Send_WhoIs_remote_ip(CString ipaddress);
 int handle_read_monitordata(char *npoint,int nlength);
+bool IP_is_Local(LPCTSTR ip_address);
 #endif

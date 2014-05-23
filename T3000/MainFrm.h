@@ -397,6 +397,7 @@ public:
     afx_msg void OnUpdateScanDevice(CCmdUI *pCmdUI);
     afx_msg void OnUpdateAddBuildingConfig(CCmdUI *pCmdUI);
     UINT m_nStyle;
+	afx_msg void OnHelpUpdatefirmware();
 };
 
 const int DLG_T3000_VIEW = 0;

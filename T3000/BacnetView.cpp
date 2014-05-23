@@ -3,7 +3,9 @@
 /*
 2014-04-22
 Update by Fance
-1.Auto adjust diferent device show different Unit.
+1.Auto adjust different device show different Unit type.Take CM5 for example .
+  CM5 contains 10 internal analog inputs and 8 internal digital inputs,So the inputs1 to input10,the "range" column only show "Analog",inputs11 to inputs18 only show "Digital"
+
 
 2014-04-21
 Update by Fance
@@ -159,6 +161,7 @@ int click_resend_time = 0;//当点击的时候，要切换device时 发送whois�
 // CDialogCM5_BacNet
 CString IP_ADDRESS;
 _Refresh_Info Bacnet_Refresh_Info;
+CString remote_ip_address;
 
 //#define WM_SEND_OVER     WM_USER + 1287
 // int m_Input_data_length;
@@ -1085,7 +1088,7 @@ void CDialogCM5_BacNet::Fresh()
 	//m_cm5_time_picker.SetFormat(_T("HH:mm"));
 
 	SetTimer(1,500,NULL);
-	SetTimer(2,15000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
+	SetTimer(2,60000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 	SetTimer(3,1000,NULL); //Check whether need  show Alarm dialog.
 	BacNet_hwd = this->m_hWnd;
 
@@ -1100,7 +1103,16 @@ void CDialogCM5_BacNet::Fresh()
 	//GetDlgItem(IDC_STATIC_CM5_MAC)->SetWindowTextW(bac_cs_mac);
 	GetDlgItem(IDC_STATIC_CM5_VENDOR_ID)->SetWindowTextW(bac_cs_vendor_id);
 	//Send_WhoIs_Global(-1,-1);
-	Send_WhoIs_Global(g_bac_instance, g_bac_instance);
+	if(m_is_remote_device)
+	{
+		Send_WhoIs_remote_ip(remote_ip_address);
+	}
+	else
+	{
+		Send_WhoIs_Global(g_bac_instance, g_bac_instance);
+	}
+	//MessageBox(_T("Test2"));
+	
 	SetTimer(4,500,NULL);
 	click_resend_time = 4;
 #if 0
@@ -2413,9 +2425,15 @@ void CDialogCM5_BacNet::WriteFlash()
 
 
 
+void CDialogCM5_BacNet::Set_Device_Type(bool is_remote_device)
+{
+	m_is_remote_device = is_remote_device;
+}
 
-
-
+void CDialogCM5_BacNet::Set_remote_device_IP(LPCTSTR ipaddress)
+{
+	remote_ip_address.Format(_T("%s"),ipaddress);
+}
 
 
 void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
@@ -2443,10 +2461,17 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 		break;
 	case 2:
 		{
-		//if(!is_in_scan_mode)
-		//	m_bac_scan_com_data.clear();
-		if(g_bac_instance>0)
-			Send_WhoIs_Global(-1, -1);
+			if(this->IsWindowVisible())
+			{
+				if(!is_in_scan_mode)
+					m_bac_scan_com_data.clear();
+				if(g_bac_instance>0)
+					Send_WhoIs_Global(-1, -1);
+
+				if(m_is_remote_device)
+					Send_WhoIs_remote_ip(remote_ip_address);
+			}
+
 		}
 		break;
 	case 3:
@@ -2473,7 +2498,10 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 	case 4:
 		{
 			click_resend_time --;
-			Send_WhoIs_Global(-1, -1);
+			if(m_is_remote_device)
+				Send_WhoIs_remote_ip(remote_ip_address);
+			else
+				Send_WhoIs_Global(-1, -1);
 			bool find_exsit = false;
 
 			for (int i=0;i<(int)m_bac_scan_com_data.size();i++)

@@ -9,24 +9,25 @@ public:
 
 	void SetComport(int nComport);
 	void SetIPPort(int nIPPort);
-	void SetIPAddress(DWORD dwIPAddr);
+
+	void SetIPAddress(CString dwIPAddr);
 	void SetFlashTpye(int nFlashType);
-
-	void SetFlashParam(const CString	& strProductModel, int nHardWareVersion);
+    void SetMBID(int ID);
+	void SetFlashParam(const CString	& strProductModel, int nHardWareVersion,int nProductID);
 	BOOL StartWriteSN();
-
+	int  GetSerialNumber();
 	void SetConfigFileHandler(CConfigFileHandler* pFileHandler);
 
 protected:
 	unsigned long GetNewSerialNumber();
 	void FlashTstatSN();
-
-protected:
+	void FlashNCSN();
+public:
 	int		m_nComPort;
 	int		m_nMBID;
-	int		m_dwIPAddr;
+	CString		m_dwIPAddr;
 	int		m_nIPPort;
-
+	
 	int		m_nFlashType;   // 0= com, 1=ethernet
 	int		m_nSerialNumber;
 	CString	m_strProductModel;
@@ -34,5 +35,5 @@ protected:
 	int			m_nHardWareVersion;
 
 	CConfigFileHandler* m_pFileHandler;
-
+	
 };

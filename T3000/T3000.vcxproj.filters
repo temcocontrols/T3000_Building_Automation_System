@@ -486,6 +486,12 @@
     <ClCompile Include="BacnetSetting.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
+    <ClCompile Include="Dowmloadfile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DownloadSocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="WhichOneToChooseDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

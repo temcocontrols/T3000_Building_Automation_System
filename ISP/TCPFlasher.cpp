@@ -30,10 +30,10 @@ CTCPFlasher::CTCPFlasher(void)
 
 CTCPFlasher::~CTCPFlasher(void)
 {
-	// 	if (m_socket)
-	// 	{
-	// 		closeSocket(m_socket);
-	// 	}
+// 	if (m_socket)
+// 	{
+// 		closeSocket(m_socket);
+// 	}
 }
 
 void CTCPFlasher::SetIPAddr(DWORD dwIP)
@@ -61,7 +61,7 @@ void CTCPFlasher::SetFileBuffer(char* pFileBuf, int nBufSize)
 BOOL CTCPFlasher::StartFlash()
 {
 	CWinThread* pThread = AfxBeginThread(_TCPFlashFunc, this);
-
+  
 	ASSERT(pThread);
 	return TRUE;
 }
@@ -81,7 +81,7 @@ UINT _TCPFlashFunc(PVOID pParam)
 	//sin.sin_addr.S_un.S_addr = htonl(pFlasher->m_dwIP);
 	sin.sin_addr.s_addr = (INADDR_ANY);
 	//siRecv.sin_addr.s_addr = htonl(INADDR_ANY);// inet_addr(_T("192.168.0.3"))
-
+	
 	if(bind(sockSend, (sockaddr*)&sin, sizeof(sin)) == SOCKET_ERROR)
 	{
 		DWORD dwError = WSAGetLastError();
@@ -97,7 +97,7 @@ UINT _TCPFlashFunc(PVOID pParam)
 	sinSend.sin_family = AF_INET;
 	sinSend.sin_port = htons(pFlasher->m_nIPPort);
 	sinSend.sin_addr.S_un.S_addr = htonl(pFlasher->m_dwIP);
-
+	
 	if (connect(sockSend, (sockaddr*)&sinSend, sizeof(sinSend))  == SOCKET_ERROR)
 	{
 		DWORD dwError = WSAGetLastError();
@@ -108,7 +108,7 @@ UINT _TCPFlashFunc(PVOID pParam)
 		goto FINISH;
 		return FALSE;
 	}
-
+	
 	char* pRecBuf = new char[16];
 	ZeroMemory(pRecBuf, 16);
 
@@ -121,7 +121,7 @@ UINT _TCPFlashFunc(PVOID pParam)
 	int nRet = ::send(sockSend, (char*)(TCPFLASH_INPUT_START), 7, 0);
 
 	nRet = ::recv(sockSend, pRecBuf, 16, 0);
-
+	
 	if (nRet == SOCKET_ERROR)  // 如果接受不对
 	{
 		pFlasher->ShowFlashInfo(_T("Send flash command failed. Please retry."), TRUE);
@@ -138,7 +138,7 @@ UINT _TCPFlashFunc(PVOID pParam)
 	while(1)
 	{		
 		memcpy(tempBuf, pFlasher->m_pFileBuf+nCount, nSendSize);
-
+	
 		int nRet = ::send(sockSend, tempBuf, nSendSize,0 );
 
 		nCount+= nSendSize;
@@ -161,7 +161,7 @@ UINT _TCPFlashFunc(PVOID pParam)
 
 FINISH:
 	pFlasher->NotifyFlashFinish();
-
+	
 	return 1;
 }
 

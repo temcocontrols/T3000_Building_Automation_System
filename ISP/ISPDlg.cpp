@@ -15,31 +15,17 @@
 #include "TFTPServer.h"
 #include "NCFinder.h"
 #include "FlashSN.h"
-#include "common.h"
+#include "ISPSetting.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 //int g_CommunicationType;
 
-extern HINSTANCE hDll;
-
-void show_ISPDlg()
-{
-//	AFX_MAMAGE_STATE(AfxGetStaticModuleState()); 
-
-
-	HINSTANCE hResOld = AfxGetResourceHandle();
-	AfxSetResourceHandle(hDll);
-	 
-		CISPDlg dlg;
-	    dlg.DoModal();
- 
-	AfxSetResourceHandle(hResOld);
-	
-}
 CString g_strExePath;
-
+CString SettingPath;
+HANDLE get_file_thread_handle = NULL;
 CString g_strFlashInfo;
  const TCHAR c_strLogFileName[]=_T("Log_info.txt");				//log information file name
  const TCHAR c_strDBFileName[]=_T("Database\\t3000.mdb") ;
@@ -47,9 +33,11 @@ CString g_strFlashInfo;
 const int BOOTLOADER_FILE_SIZE = 16384;
 /*这个变量虽然和DLL中的变量相同，但是他们两个没有关系，DLL中的该变量是被封装起来了
 如果想改变dll中的g_Commu_type 通过函数 SetCommunicationType*/
-extern int g_Commu_type;
+int g_Commu_type=0;
 UINT _PingThread(LPVOID pParam);
 
+unsigned int Remote_timeout = 1000;
+DWORD WINAPI GetFWFileProc(LPVOID lPvoid);
 
 class CAboutDlg : public CDialog
 {
@@ -143,6 +131,8 @@ CISPDlg::CISPDlg(CWnd* pParent /*=NULL*/)
 	, m_HardVer(_T(""))
 	 
 	, m_IPPort(0)
+    
+    
 {
 	 m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	//m_nTabSel = 0;
@@ -154,6 +144,7 @@ CISPDlg::CISPDlg(CWnd* pParent /*=NULL*/)
 	 m_plogFile=new CStdioFile;
 	 m_pTCPFlasher = NULL;
 	 m_pFileBuf = NULL;
+    
  
 }
 CISPDlg::~CISPDlg()
@@ -186,22 +177,24 @@ CISPDlg::~CISPDlg()
 
 void CISPDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LIST_INFO, m_lbStatusInfo);
-	//DDX_Control(pDX, IDC_TAB1, m_tab);
+    CDialog::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_LIST_INFO, m_lbStatusInfo);
+    //DDX_Control(pDX, IDC_TAB1, m_tab);
 
-	DDX_Control(pDX, IDC_EDIT_MDBID1, id);
-	DDX_Control(pDX, IDC_COMBO_COM, m_ComPort);
-	DDX_Control(pDX, IDC_IPADDRESS_NC, m_ipAddress);
-	DDX_Control(pDX, IDC_EDIT_NCPORT, m_ipPort);
-	DDX_Control(pDX, IDC_CHECK_FLASH_SUBID, m_Check_SubID);
-	DDX_Control(pDX, IDC_EDIT_MDBID2, m_SubID);
-	DDX_Text(pDX, IDC_EDIT_MDBID1, m_ID);
-	DDX_Control(pDX, IDC_BUTTON_PING2, m_Btn_ping);
-	DDX_Text(pDX, IDC_Model_Name, m_ModelName);
-	DDX_Text(pDX, IDC_Model_FIRMVER, m_FirmVer);
-	DDX_Text(pDX, IDC_Model_HARDWAREVER, m_HardVer);
-	DDX_Text(pDX, IDC_EDIT_NCPORT, m_IPPort);
+    DDX_Control(pDX, IDC_EDIT_MDBID1, id);
+    DDX_Control(pDX, IDC_COMBO_COM, m_ComPort);
+    DDX_Control(pDX, IDC_IPADDRESS_NC, m_ipAddress);
+    DDX_Control(pDX, IDC_EDIT_NCPORT, m_ipPort);
+    DDX_Control(pDX, IDC_CHECK_FLASH_SUBID, m_Check_SubID);
+    DDX_Control(pDX, IDC_EDIT_MDBID2, m_SubID);
+    DDX_Text(pDX, IDC_EDIT_MDBID1, m_ID);
+    DDX_Control(pDX, IDC_BUTTON_PING2, m_Btn_ping);
+    DDX_Text(pDX, IDC_Model_Name, m_ModelName);
+    DDX_Text(pDX, IDC_Model_FIRMVER, m_FirmVer);
+    DDX_Text(pDX, IDC_Model_HARDWAREVER, m_HardVer);
+    DDX_Text(pDX, IDC_EDIT_NCPORT, m_IPPort);
+    //  DDX_Text(pDX, IDC_BIN_INFORMATION, m_bin_inforamtion);
+    //  DDX_Text(pDX, IDC_EDIT_FILEPATH2, m_strFirmwarepath);
 }
 
 BEGIN_MESSAGE_MAP(CISPDlg, CDialog)
@@ -216,7 +209,7 @@ BEGIN_MESSAGE_MAP(CISPDlg, CDialog)
 	ON_MESSAGE(WM_ADD_STATUSINFO, OnAddStatusInfo)
 	//Finish 通知 Flash按钮是否可用
 	ON_MESSAGE(WM_FLASH_FINISH, OnFlashFinish)
-	 
+	 ON_MESSAGE(WM_UPDATA_DEVICE_INFORMATION,Show_Flash_DeviceInfor)
 	ON_WM_CLOSE()
 	//ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, &CISPDlg::OnTcnSelchangeTab1)
 	ON_WM_COPYDATA()
@@ -235,6 +228,10 @@ BEGIN_MESSAGE_MAP(CISPDlg, CDialog)
 
 	ON_COMMAND(ID_MENU_APP, &CISPDlg::OnMenuApp)
 	ON_COMMAND(ID_MENU_ABOUT, &CISPDlg::OnMenuAbout)
+	ON_BN_CLICKED(IDC_SHOW_HEX, &CISPDlg::OnBnClickedShowHex)
+    ON_BN_CLICKED(IDC_FLASH_SN, &CISPDlg::OnBnClickedFlashSn)
+	ON_COMMAND(ID_MENU_SETTING, &CISPDlg::OnMenuSetting)
+	ON_COMMAND(ID_MENU_CHECKHEX, &CISPDlg::OnMenuCheckhex)
 END_MESSAGE_MAP()
 
 
@@ -277,7 +274,7 @@ BOOL CISPDlg::OnInitDialog()
 	//展示启动图片
 	 g_strExePath=GetExePath(true);
 	 m_strLogoFileName=g_strExePath + c_strLogoFileName;
-	 
+	 SettingPath = g_strExePath + _T("\\Setting.ini");
 	 ShowSplashWnd(c_nSplashTime);
 	////////////////////////////////////////////////////////////////////////////
  	//从文件中读取配置参数
@@ -294,6 +291,8 @@ BOOL CISPDlg::OnInitDialog()
 
 	 CString subnote;
 	 CString subID;
+
+	 Remote_timeout = GetPrivateProfileInt(_T("Setting"),_T("REMOTE_TIMEOUT"),1000,SettingPath);
 	 m_cfgFileHandler.ReadFromCfgFileForAll(
 		 filename,
 		 flashmethod,
@@ -305,7 +304,43 @@ BOOL CISPDlg::OnInitDialog()
 		 subnote,
 		 subID
 		 );
+		 if(Remote_timeout < 50)
+			 Remote_timeout = 1000;
 
+
+		 CString AutoFlashConfigPath;
+		 AutoFlashConfigPath = g_strExePath + _T("//AutoFlashFile.ini");
+		 CFileFind fFind;
+		 if(fFind.FindFile(AutoFlashConfigPath))
+		 {
+			 int command = GetPrivateProfileInt(_T("Data"),_T("Command"),0,AutoFlashConfigPath);
+			 if(command != START_AUTO_FLASH_COMMAND)
+			 {
+				 DeleteFile(AutoFlashConfigPath);
+				 MessageBox(_T("ISP Tool will exit soon."));
+				 PostMessage(WM_CLOSE,NULL,NULL);
+				 return TRUE;
+				 //删除文件并退出;
+			 }
+			 GetPrivateProfileStringW(_T("Data"),_T("ID"),_T("255"),id.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+			 id.ReleaseBuffer();
+			 GetPrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("COM"),flashmethod.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+			 flashmethod.ReleaseBuffer();
+			 GetPrivateProfileStringW(_T("Data"),_T("COMPORT"),_T("COM1"),comport.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+			 comport.ReleaseBuffer();
+			 GetPrivateProfileStringW(_T("Data"),_T("Baudrate"),_T("19200"),BD.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+			 BD.ReleaseBuffer();
+			 GetPrivateProfileStringW(_T("Data"),_T("IPAddress"),_T("192.168.0.3"),ip.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+			 ip.ReleaseBuffer();
+			 GetPrivateProfileStringW(_T("Data"),_T("IPPort"),_T("6001"),ipport.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+			 ipport.ReleaseBuffer();
+			 GetPrivateProfileStringW(_T("Data"),_T("Subnote"),_T("0"),subnote.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+			 subnote.ReleaseBuffer();
+			 GetPrivateProfileStringW(_T("Data"),_T("SubID"),_T("255"),subID.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+			 subID.ReleaseBuffer();
+			 get_file_thread_handle=CreateThread(NULL,NULL,GetFWFileProc,this,NULL,NULL);
+			 CloseHandle(get_file_thread_handle);
+		 }
 
 	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename); 
 	 GetDlgItem(IDC_EDIT_MDBID1)->SetWindowText(id);
@@ -408,7 +443,7 @@ BOOL CISPDlg::OnInitDialog()
 	 CString TitleShow;
 	 CString m_strVersion;
 	 m_strVersion.LoadString(IDS_STR_VIRSIONNUM);
-	 TitleShow = _T("ISP Tool Rev ") + m_strVersion;
+	 TitleShow = _T("ISP Tool ") + m_strVersion;
 	 SetWindowTextW(TitleShow);
 
 
@@ -423,10 +458,80 @@ BOOL CISPDlg::OnInitDialog()
 		 FLASH_SUBID=FALSE;
 	 }
 
+     initFlashSN();
 
+
+     #if 0
+     GetDlgItem(IDC_EDIT_FILEPATH)->GetWindowText(m_strHexFileName);
+     m_strFlashFileName=m_strHexFileName;
+
+     if (m_pFileBuffer)
+     {
+         delete[] m_pFileBuffer;
+         m_pFileBuffer= NULL;
+     }
+     if(HexFileValidation(m_strHexFileName))
+     {
+         CHexFileParser* pHexFile = new CHexFileParser;
+         pHexFile->SetFileName(m_strHexFileName);
+
+         m_pFileBuffer = new char[c_nHexFileBufLen];
+         memset(m_pFileBuffer, 0xFF, c_nHexFileBufLen);
+         int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
+         CString hexinfor=_T("The Hex For ");
+         hexinfor+=pHexFile->Get_HexInfor();
+         CString strFilesize;
+         strFilesize.Format(_T("Hex size=%d Bs"),nDataSize);
+         GetDlgItem(IDC_HEX_SIZE)->SetWindowText(strFilesize);
+
+         GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
+         delete pHexFile;
+         pHexFile=NULL;
+     } 
+     if(BinFileValidation(m_strHexFileName))
+     {
+         CBinFileParser* pBinFile=new CBinFileParser;
+         pBinFile->SetBinFileName(m_strHexFileName);
+         m_pFileBuffer=new char[c_nBinFileBufLen];
+         memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
+
+         int nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
+
+         CString strFilesize;
+         strFilesize.Format(_T("Bin size=%d Bs"),nDataSize);
+         GetDlgItem(IDC_HEX_SIZE)->SetWindowText(strFilesize);
+         m_strASIX=pBinFile->m_strASIX;
+         m_strProductName=pBinFile->m_strProductName;
+
+         if (m_strASIX.Find(_T("ASIX"))!=-1)
+         {
+             
+
+             CString hexinfor=_T("The Bin For ");
+             hexinfor.Format(_T("The Bin file is for the firmware of %s"),m_strProductName.GetBuffer());
+             GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
+             
+
+         }
+         else
+         {
+             CString hexinfor=_T("The Bin For ");
+             hexinfor.Format(_T("The Bin file is for the bootloader of %s"),m_strProductName.GetBuffer());
+             GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
+
+             
+         }
+     }
+#endif
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
  
+
+void CISPDlg::CheckAutoFlash()
+{
+
+}
+
 void CISPDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
@@ -439,7 +544,89 @@ void CISPDlg::OnSysCommand(UINT nID, LPARAM lParam)
 		CDialog::OnSysCommand(nID, lParam);
 	}
 }
+void CISPDlg::InitISPUI()
+{
+    CenterWindow(this);
 
+    if(m_bShowSN)
+    {
+        WINDOWPLACEMENT wp;
+
+        GetWindowPlacement(&wp);
+
+        wp.rcNormalPosition.bottom += 0;
+
+        SetWindowPlacement(&wp);
+
+        GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_NORMAL);
+    }
+    else
+    {
+        WINDOWPLACEMENT wp;
+        GetWindowPlacement(&wp);
+
+        CRect rc;
+        CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
+        pWnd->GetWindowRect(&rc);
+        //ScreenToClient(&rc);
+
+        wp.rcNormalPosition.bottom = rc.bottom - 10;
+        SetWindowPlacement(&wp);
+
+        GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_HIDE); 
+    }
+
+}
+
+void CISPDlg::initFlashSN()
+{
+    
+    if (!m_bShowSN)
+    {
+        GetDlgItem(IDC_BUTTON_FLASH)->SetWindowText(_T("FLASH"));
+    }
+    else
+    {
+        GetDlgItem(IDC_BUTTON_FLASH)->SetWindowText(_T("FLASH"));
+    }
+    InitISPUI();
+
+
+
+    //////////////////////////////////////////////////////////////////////////
+    //
+    int nHWVersion = 0;
+    int nModelValue = 0;
+
+    m_cfgFileHandler.GetFlashSNParam(g_strExePath + CString(c_strFlashSNCfgFileName), nHWVersion, nModelValue);
+
+    CWnd* pWnd = GetDlgItem(IDC_EDIT_HWVERSION);
+    CString strTemp;strTemp.Format(_T("%d"), nHWVersion);
+
+    pWnd->SetWindowText(strTemp);
+
+    //////////////////////////////////////////////////////////////////////////
+    m_cfgFileHandler.GetProductModel(g_strExePath + CString(c_strProductModelFileName), m_mapModel);
+
+    CComboBox* pModel = (CComboBox*)GetDlgItem(IDC_COMBO_PM);
+
+    pModel->ResetContent();
+    map<int, CString>::iterator m1 = m_mapModel.begin();
+
+
+    int nCurrentSel = 0;
+    for (int i = 0 ; m1 != m_mapModel.end( ); m1++, i++ )
+    {
+        pModel->AddString(m1->second);
+        if (m1->first == nModelValue)
+        {
+            nCurrentSel = i;
+        }
+    }
+
+    pModel->SetCurSel(nCurrentSel);
+
+}
 // If you add a minimize button to your dialog, you will need the code below
 //  to draw the icon.  For MFC applications using the document/view model,
 //  this is automatically done for you by the framework.
@@ -491,15 +678,79 @@ void CISPDlg::OnBnClickedButtonSelfile()
 	UpdateData();
 	//CString strFilter = _T("hex File|*.hex|bin File|*.bin|all File|*.*||");
 	CString strFilter = _T("hex File;bin File|*.hex;*.bin|all File|*.*||");
-	CFileDialog dlg(true,_T("hex"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
-	dlg.DoModal();
-	m_strHexFileName=dlg.GetPathName();
-	m_strFlashFileName=dlg.GetPathName();
+    CFileDialog dlg(true,_T("hex"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
+    dlg.DoModal();
+    m_strHexFileName=dlg.GetPathName();
+    m_strFlashFileName=dlg.GetPathName();
 	 
 	CWnd* pEditFilePath = (CWnd*)GetDlgItem(IDC_EDIT_FILEPATH);
 	pEditFilePath->SetWindowText(m_strHexFileName);
 
  
+   
+    /* GetDlgItem(IDC_EDIT_FILEPATH)->GetWindowText(m_strHexFileName);
+     m_strFlashFileName=m_strHexFileName;*/
+	/*
+    if (m_pFileBuffer)
+    {
+        delete[] m_pFileBuffer;
+        m_pFileBuffer= NULL;
+    }
+    if(HexFileValidation(m_strHexFileName))
+    {
+        CHexFileParser* pHexFile = new CHexFileParser;
+        pHexFile->SetFileName(m_strHexFileName);
+
+        m_pFileBuffer = new char[c_nHexFileBufLen];
+        memset(m_pFileBuffer, 0xFF, c_nHexFileBufLen);
+        int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
+        CString hexinfor=_T("The Hex For ");
+        hexinfor+=pHexFile->Get_HexInfor();
+        CString strFilesize;
+        strFilesize.Format(_T("Hex size=%d Bs"),nDataSize);
+        GetDlgItem(IDC_HEX_SIZE)->SetWindowText(strFilesize);
+        
+        GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
+        delete pHexFile;
+        pHexFile=NULL;
+    } 
+    if(BinFileValidation(m_strHexFileName))
+    {
+       CBinFileParser* pBinFile=new CBinFileParser;
+       pBinFile->SetBinFileName(m_strHexFileName);
+       m_pFileBuffer=new char[c_nBinFileBufLen];
+       memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
+
+       int nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
+      
+       CString strFilesize;
+       strFilesize.Format(_T("Bin size=%d Bs"),nDataSize);
+       GetDlgItem(IDC_HEX_SIZE)->SetWindowText(strFilesize);
+       m_strASIX=pBinFile->m_strASIX;
+       m_strProductName=pBinFile->m_strProductName;
+       
+       if (m_strASIX.Find(_T("ASIX"))!=-1)
+       {
+         
+
+         CString hexinfor=_T("The Bin For ");
+         hexinfor.Format(_T("The Bin file is for the firmware of %s"),m_strProductName.GetBuffer());
+         GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
+    
+
+       }
+       else
+       {
+           CString hexinfor=_T("The Bin For ");
+           hexinfor.Format(_T("The Bin file is for the bootloader of %s"),m_strProductName.GetBuffer());
+           GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
+
+             
+         
+       }
+    }
+	*/
+
 }
 void CISPDlg::SaveParamToConfigFile()
 {	   
@@ -563,26 +814,25 @@ void CISPDlg::OnBnClickedButtonFlash()
 	  UpdateData();
 	  SaveParamToConfigFile();	//保存用户输入的数据
 
-	  //(CButton *)GetDlgItem(IDC_BUTTON_FLASH)->EnableWindow(FALSE);
-	  //(CButton *)GetDlgItem(IDC_CHECK_FLASH_SUBID)->EnableWindow(FALSE);
-	  //(CEdit *)GetDlgItem(IDC_EDIT_MDBID2)->EnableWindow(FALSE);
-	  //(CEdit *)GetDlgItem(IDC_EDIT_NCPORT)->EnableWindow(FALSE);
-	  //(CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_NC)->EnableWindow(FALSE);
-	  //(CButton *)GetDlgItem(IDC_NET)->EnableWindow(FALSE);
-	  //(CButton *)GetDlgItem(IDC_COM)->EnableWindow(FALSE);
-
+      
 	  switch(Judge_Flash_Type())
 	  {
 	  case FLASH_TSTAT_COM:
 		  {	 
 			  SetCommunicationType(0);
+
 			  FlashTstat();
 			  break;
 		  }
 	  case FLASH_NC_LC_NET:
 		  {	  
-			  SetCommunicationType(1);
-			  FlashNC_LC();
+          
+          
+              SetCommunicationType(1);
+              FlashNC_LC();
+		    
+		  
+			 
 			  
 			  break;
 		  }
@@ -651,11 +901,10 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
 	}
 	EnableFlash(TRUE);	
 
-	//FlashSN();
-	/*if (m_bShowSN)
-	{
-		FlashSN();
-	}*/
+    if (m_bShowSN	)
+    {
+        FlashSN();
+    }
 	return 1;
 }
 
@@ -727,7 +976,9 @@ BOOL CISPDlg::PreTranslateMessage(MSG* pMsg)
 		if (pMsg->wParam == VK_F2 )
 		{
 			if(GetKeyState(VK_MENU) == 1)
-			{}
+			{
+            initFlashSN();
+            }
 				//initFlashSN();
 		}
 	}
@@ -815,37 +1066,53 @@ CString CISPDlg::GetCurSelPageStr()
 	return strPageInfo;
 }
 //For Old UI 
-BOOL CISPDlg::GetFlashSNParam(int& nHWVerison, CString& strProductModel)
+BOOL CISPDlg::GetFlashSNParam(int& nHWVerison, CString& strProductModel,int &nProductID)
 {
-	if (m_bShowSN)
-	{
-		//nProductModel = 1;
+    if (m_bShowSN)
+    {
+        //nProductModel = 1;
 
-		CString strHWV;
-		CWnd* pWnd = GetDlgItem(IDC_EDIT_HWVERSION);
-		pWnd->GetWindowText(strHWV);
-		nHWVerison = _wtoi(strHWV);
+        CString strHWV;
+        CWnd* pWnd = GetDlgItem(IDC_EDIT_HWVERSION);
+        pWnd->GetWindowText(strHWV);
+        nHWVerison = _wtoi(strHWV);
 
-		CString strPM;
-		pWnd = GetDlgItem(IDC_COMBO_PM);
-		pWnd->GetWindowText(strProductModel);
-// 		map<int, CString>::iterator m1;
-// 		for (m1= m_mapModel.begin() ; m1 != m_mapModel.end() ; m1++)
-// 		{
-// 			CString strTemp = m1->second;
-// 			if (strPM.CompareNoCase(strTemp) == 0 )
-// 			{
-// 				nProductModel = m1->first;
-// 			}
-// 		}
-	}
-	else
-	{
-		nHWVerison = 0;
-		return FALSE;
-	}
+        CString strPM;
+        pWnd = GetDlgItem(IDC_COMBO_PM);
+        pWnd->GetWindowText(strProductModel);
 
-	return TRUE;
+        //nProductID=m_nproductid;
+        CString strModel;		
+        CComboBox* pCbx =(CComboBox*) GetDlgItem(IDC_COMBO_PM);
+        int nSel = pCbx->GetCurSel();
+
+        pCbx->GetWindowText(strModel);
+
+        CString strtemp = m_mapModel[nSel];
+
+        map<int, CString>::iterator m1;
+        int nModelVal= nSel;
+        for( m1=m_mapModel.begin(); m1 != m_mapModel.end(); m1++ )
+        {
+            CString strVal = m1->second;
+
+            if(strVal.CompareNoCase(strModel) == 0)
+            {
+                nProductID = m1->first;
+
+                break;
+            }
+        }
+
+
+    }
+    else
+    {
+        nHWVerison = 0;
+        return FALSE;
+    }
+
+    return TRUE;
 }
 
 //Ping 
@@ -976,7 +1243,7 @@ Initial COM Port
 void CISPDlg::InitCombox(void)
 {
 	vector<CString> szComms;
-	BOOL bRet = GetSerialComm(szComms);
+	BOOL bRet = GetSerialComm_ISP(szComms);
 	if (bRet && szComms.size()>0)
 	{
 		m_ComPort.Clear();
@@ -1006,14 +1273,25 @@ Choose com port,Flash Tstat.
 */
 BOOL CISPDlg::FlashTstat(void)
 {
+      int TempID=0;
+	  int times=0;
+	  CString temp;
+      if (m_strHexFileName.IsEmpty())
+      {
+      // PostMessage(WM_FLASH_FINISH, 0, LPARAM(1));
+      // int	nRet =PostMessage(m_pParentWnd->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(nFlashFlag));
 
+      FlashSN();
+      return FALSE;
+      }
 	if(!FileValidation(m_strHexFileName))
 	{
 		return FALSE;
 	}
 
 	if (g_Commu_type == 0)
-	{
+	{ 
+        int nPort = GetComPortNo();
 		if(!ValidMdbIDString())
 		{
 			return FALSE;
@@ -1023,8 +1301,76 @@ BOOL CISPDlg::FlashTstat(void)
 		{
 			return FALSE;		
 		}
+		BOOL flag=open_com(nPort);
+		if (flag)
+		{
+			if (m_szMdbIDs.size()<=1)
+			{
+				TempID=m_szMdbIDs[0];
 
-		//	FlashSN();
+
+				while(Read_One(TempID,0xee10)<0){//the return value == -1 ,no connecting
+					if(times<5)
+					{
+						times++;
+						continue;
+					}
+					else
+					{
+						break;
+					}
+
+				}
+				if (times>=5)
+				{
+					temp.Format(_T("ISPTool Can't connect to %d\n Do you want to change the broadcast address[255] to have a try?"),TempID);
+					UpdateStatusInfo(temp,false);
+					int ret=AfxMessageBox(temp,MB_OKCANCEL);
+					if(ret==IDOK)
+					{
+						TempID=255;
+						m_szMdbIDs[0]=255;
+						temp.Format(_T("%d"),TempID);
+						id.SetWindowText(temp);
+					}
+
+				}
+
+			} 
+			else
+			{   
+				for (UINT i=0;i<m_szMdbIDs.size();i++)
+				{
+					TempID=m_szMdbIDs[i];
+					while(Read_One(TempID,0xee10)<0){//the return value == -1 ,no connecting
+						if(times<5)
+						{
+							times++;
+							continue;
+						}
+						else
+						{
+							break;
+						}
+
+					}
+					if (times>=5)
+					{
+						temp.Format(_T("ISPTool Can't connect to %d\n"),TempID);
+						UpdateStatusInfo(temp,false);
+					}
+				}
+			}
+			close_com();
+		}
+		else{
+			UpdateStatusInfo(_T("Com Occupied"),false);
+			AfxMessageBox(_T("Com Occupied"));
+			return FALSE;
+		}
+
+		
+		 
 		FlashByCom();
 	}
 	else
@@ -1042,17 +1388,36 @@ BOOL CISPDlg::FlashTstat(void)
 */
 BOOL CISPDlg::FlashNC_LC(void)
 {
-	 
+   
+        if(!FileValidation(m_strHexFileName))
+        {
+            return FALSE;
+        }
+        if(BinFileValidation(m_strHexFileName))
+        {
+            CBinFileParser* pBinFile=new CBinFileParser;
+            pBinFile->SetBinFileName(m_strHexFileName);
+            m_pFileBuffer=new char[c_nBinFileBufLen];
+            memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
 
-	if(!FileValidation(m_strHexFileName))
-	{
-		return FALSE;
-	}
+            int nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
+            CString hexinfor=_T("The Bin For ");
+            hexinfor+=pBinFile->GetBinInfor();
+            CString strFilesize;
+            strFilesize.Format(_T("Bin size=%d Bs"),nDataSize);
+            GetDlgItem(IDC_HEX_SIZE)->SetWindowText(strFilesize);
+            m_strASIX=pBinFile->m_strASIX;
+            m_strProductName=pBinFile->m_strProductName;
+            GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
+        }
+        if (g_Commu_type == 1)
+        {
+            FlashByEthernet();
+        }
+       return TRUE;
+  
 
-	if (g_Commu_type == 1)
-	{
-		FlashByEthernet();
-	}
+	
 
 	return TRUE;
 }
@@ -1249,7 +1614,7 @@ void CISPDlg::FlashByEthernet()
 		delete[] m_pFileBuffer;
 		m_pFileBuffer = NULL;
 	}
-	Show_Flash_DeviceInfor_NET();
+	
 	CBinFileParser* pBinFile = new CBinFileParser;
 	pBinFile->SetBinFileName(m_strFlashFileName);
 	m_pFileBuffer = new char[c_nBinFileBufLen];
@@ -1260,6 +1625,12 @@ void CISPDlg::FlashByEthernet()
 	{
 		CString strTips = _T("|Firmware bin file verified okay.");
 		UpdateStatusInfo(strTips, FALSE);
+        if (!Show_Flash_DeviceInfor_NET())
+        {
+         return;
+        }
+         
+         
 
 		m_pTFTPServer=new TFTPServer;
 		DWORD dwIP = GetIPAddress();
@@ -1270,9 +1641,9 @@ void CISPDlg::FlashByEthernet()
 		m_pTFTPServer->SetClientPort(m_IPPort);
 		m_pTFTPServer->SetClientIP(dwIP);
 		m_pTFTPServer->SetFileName(m_strFlashFileName);
-
+        m_pTFTPServer->Set_FileProductName(m_strProductName);
 		m_pTFTPServer->SetDataSource((BYTE*)m_pFileBuffer, nDataSize);
-		//pServer->SetServerInfoWnd((CWnd*)(&(pDlg->m_ctlServerInfo)));
+	 
 		m_pTFTPServer->FlashByEthernet();
 		// disable flash button
 		 EnableFlash(FALSE);	
@@ -1306,7 +1677,7 @@ BOOL CISPDlg::FileValidation(const CString& strFileName)
 	if (g_Commu_type==0 && !HexFileValidation(strFileName))
 	{
 		CString strTips;
-		strTips = _T("|To Updating over Com port, please select a *.HEX file");
+		strTips = _T("|To Update over Com port, please select a *.HEX file");
 		AfxMessageBox(strTips);
 		UpdateStatusInfo(strTips, FALSE);
 		return FALSE;
@@ -1413,12 +1784,31 @@ void CISPDlg::FlashByCom()
 	}
 
 	CHexFileParser* pHexFile = new CHexFileParser;
-	pHexFile->SetFileName(m_strFlashFileName);
+	pHexFile->SetFileName(m_strHexFileName);
 
 	m_pFileBuffer = new char[c_nHexFileBufLen];
 	memset(m_pFileBuffer, 0xFF, c_nHexFileBufLen);
-	int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);
+	int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
 
+
+	pHexFile->Get_DeviceInfor(m_ProductModel,m_softwareRev,m_ProductName,m_ChipName,m_ChipSize);
+	if (m_ProductName.FindOneOf(_T("TSTAT"))!=-1)
+	{
+		CString temp;
+		UpdateStatusInfo(_T(">>>>>The Hex Information<<<<<"), FALSE);
+		temp.Format(_T("Product Model: %d"),m_ProductModel);
+		UpdateStatusInfo(temp,FALSE);
+		temp.Format(_T("The Hex Version: %0.1f"),m_softwareRev);
+		UpdateStatusInfo(temp,FALSE);
+		temp=_T("Product Name: ");
+		temp+=m_ProductName;
+		UpdateStatusInfo(temp,FALSE);
+		temp=_T("Chip Name: ");
+		temp+=m_ChipName;
+		UpdateStatusInfo(temp,FALSE);
+		temp.Format(_T("Chip Size: %d"),m_ChipSize);
+		UpdateStatusInfo(temp,FALSE);
+	}
 	if(nDataSize > 0)
 	{
 		CString strTips = _T("|Hex file verified okay.");
@@ -1489,149 +1879,145 @@ void CISPDlg::OnBnClickedButtonPing2()
   Show_Flash_DeviceInfor_NET();
  
 }
-//更新正在刷新的产品信息
-void CISPDlg::Show_Flash_DeviceInfor(int ID)
-{	 
-	
-	if (GetCommunicationType()!=0)	 //通过tcp/ip
+void Split_Cstring(CString Str,vector<CString>& ret_str,CString split_str)
+{  CString temp,str_temp;
+int index=0,start=0,count=-1;
+while (start<Str.GetLength())
+{
+	int index=Str.Find(split_str,start);
+	if (index!=-1)
 	{
-		//UpdateData(TRUE);
-		CString strIP;
-		GetDlgItem(IDC_IPADDRESS_NC)->GetWindowText(strIP);
-		if (Open_Socket2(strIP,m_IPPort))
+		str_temp.Empty();
+		++count;
+		for (int i=start;i<index;i++ )
 		{
-			int DeviceModel=-1; 
-			DeviceModel=read_one(ID,MODBUS_PRODUCT_MODEL);//获得了正在刷新的Model号-更加Model号码-返回产品的名字
-			m_ModelName=GetProductName(DeviceModel);
-
-
-			if (m_ModelName.Find(_T("ERROR"))!=0)
-			{
-				float tstat_version2=(float)read_one(ID,MODBUS_VERSION_NUMBER_LO); //tstat version			
-				if(tstat_version2<=0)
-					m_FirmVer.Format(_T("%0.1f"),tstat_version2);
-				if(tstat_version2 >=240 && tstat_version2 <250)
-					tstat_version2 /=10;
-				else 
-				{
-					tstat_version2 = (float)(read_one(ID,MODBUS_VERSION_NUMBER_HI)*256+read_one(ID,MODBUS_VERSION_NUMBER_LO));	
-					tstat_version2 /=10;
-				}
-				m_FirmVer.Format(_T("%.1f"),tstat_version2);
-				m_HardVer.Format(_T("%d"),read_one(ID,MODBUS_HARDWARE_REV));  
-				/*展示到消息log框中*/
-				////////UpdateStatusInfo(_T("|Device Information-Begin"),FALSE);
-				////////UpdateStatusInfo(_T("|Model  Name:")+m_ModelName,FALSE);
-				////////UpdateStatusInfo(_T("|Firmware Ver:")+m_FirmVer,FALSE);
-				////////UpdateStatusInfo(_T("|Hardware Ver:")+m_HardVer,FALSE);
-				////////UpdateStatusInfo(_T("|Device Information-End"),FALSE);
-				////////UpdateData(FALSE);
-			}
-			else
-			{ 
-				m_ModelName=_T("");
-				m_FirmVer=_T("");
-				m_HardVer=_T("");
-			}
-		} 
-		else
-		{
-			CString tips;
-			tips.Format(_T("IP:%s,Port:%d can't open,You can press Ping for test connection"),strIP,m_IPPort);
-			UpdateStatusInfo(tips,FALSE);
+			temp.Format(_T("%C"),Str.GetAt(i));
+			str_temp+=temp;
 		}
-	} 
-	else		//通过COM通信
-	{
-		int DeviceModel=-1; 
-		DeviceModel=read_one(ID,MODBUS_PRODUCT_MODEL);//获得了正在刷新的Model号-更加Model号码-返回产品的名字
-		m_ModelName=GetProductName(DeviceModel);
-		if (m_ModelName.Find(_T("ERROR"))!=0)
-		{
-			float tstat_version2=(float)read_one(ID,MODBUS_VERSION_NUMBER_LO); //tstat version			
-			if(tstat_version2<=0)
-				m_FirmVer.Format(_T("%0.1f"),tstat_version2);
-			if(tstat_version2 >=240 && tstat_version2 <250)
-				tstat_version2 /=10;
-			else 
-			{
-				tstat_version2 = (float)(read_one(ID,MODBUS_VERSION_NUMBER_HI)*256+read_one(ID,MODBUS_VERSION_NUMBER_LO));	
-				tstat_version2 /=10;
-			}
-			m_FirmVer.Format(_T("%.1f"),tstat_version2);
-			m_HardVer.Format(_T("%d"),read_one(ID,MODBUS_HARDWARE_REV));  
-			/*展示到消息log框中*/
-			//UpdateStatusInfo(_T("|Device Information-Begin"),FALSE);
-			//UpdateStatusInfo(_T("|Model  Name:")+m_ModelName,FALSE);
-			//UpdateStatusInfo(_T("|Firmware Ver:")+m_FirmVer,FALSE);
-			//UpdateStatusInfo(_T("|Hardware Ver:")+m_HardVer,FALSE);
-			//UpdateStatusInfo(_T("|Device Information-End"),FALSE);
-			//UpdateData(FALSE); //显示在界面上
-		}
-		else
-		{ m_ModelName=_T("");
-		  m_FirmVer=_T("");
-		  m_HardVer=_T("");
-		}
+		ret_str.push_back(str_temp);
+		start=index+1; 
 	}
-		
-	
-	
-	 //  close_com();
+	else
+		break;
+
 }
 
+}
+//更新正在刷新的产品信息
+afx_msg LRESULT CISPDlg::Show_Flash_DeviceInfor(WPARAM wParam, LPARAM lParam)
+{	 
+	CString Device_info = CString(LPTSTR(lParam));
+	vector<CString> vet_Device;
+	Split_Cstring(Device_info,vet_Device,_T(" "));
 
-void CISPDlg::Show_Flash_DeviceInfor_NET()
+	unsigned short US_Device_infor[10];
+	for (int i=0;i<10;i++)
+	{
+		US_Device_infor[i]=_wtoi(vet_Device[i]);
+	}
+
+	int DeviceModel=-1; 
+	//DeviceModel=read_multi(ID,&Device_infor[0],0,10);//获得了正在刷新的Model号-更加Model号码-返回产品的名字
+
+	m_ModelName=GetProductName(US_Device_infor[7]);
+	if (m_ModelName.Find(_T("ERROR"))!=0)
+	{
+
+		float tstat_version2 = (float)(US_Device_infor[MODBUS_VERSION_NUMBER_HI]*256+US_Device_infor[MODBUS_VERSION_NUMBER_LO]);	
+		tstat_version2 /=10;
+
+		m_FirmVer.Format(_T("%.1f"),tstat_version2);
+		m_HardVer.Format(_T("%d"),US_Device_infor[MODBUS_HARDWARE_REV]); 
+		/*展示到消息log框中*/
+		UpdateStatusInfo(_T("|Device Information-Begin"),FALSE);
+		UpdateStatusInfo(_T("|Model  Name:")+m_ModelName,FALSE);
+		UpdateStatusInfo(_T("|Firmware Ver:")+m_FirmVer,FALSE);
+		UpdateStatusInfo(_T("|Hardware Ver:")+m_HardVer,FALSE);
+		UpdateStatusInfo(_T("|Device Information-End"),FALSE);
+		UpdateData(FALSE); //显示在界面上
+	}
+	else
+	{ m_ModelName=_T("");
+	m_FirmVer=_T("");
+	m_HardVer=_T("");
+	}
+
+
+
+
+	return TRUE;
+	//  close_com();
+}
+
+BOOL CISPDlg::Show_Flash_DeviceInfor_NET()
 {
 	UpdateData(TRUE);
 	CString strIP;
 	GetDlgItem(IDC_IPADDRESS_NC)->GetWindowText(strIP);
 	
 
-	//if (Open_Socket2(strIP,m_IPPort))
-	//{
-	//	int DeviceModel=-1; 
-	//	DeviceModel=read_one(255,MODBUS_PRODUCT_MODEL);//获得了正在刷新的Model号-更加Model号码-返回产品的名字
-	//	m_ModelName=GetProductName(DeviceModel);
-	//	 
+	if (Open_Socket2(strIP,m_IPPort))
+	{
+		int DeviceModel=-1; 
+		DeviceModel=read_one(255,MODBUS_PRODUCT_MODEL);//获得了正在刷新的Model号-更加Model号码-返回产品的名字
+        if (DeviceModel<0)//Modbus 不通信，说明有可能在bootloader
+        {
+        return TRUE;
+        }
+		m_ModelName=GetProductName(DeviceModel);
+		CString modelname=m_ModelName;
+		CString productname=m_strProductName;
+		modelname.MakeUpper();
+		productname.MakeUpper();
+		if (productname.Find(modelname)==-1)
+		{
+          CString infor;
+          infor.Format(_T("The Bin file is for %s,but your device is %s"),m_strProductName.GetBuffer(),m_ModelName.GetBuffer());
+          AfxMessageBox(infor);
+          UpdateStatusInfo(infor,FALSE);
+          return FALSE;
+		}
 
-	//	if (m_ModelName.Find(_T("ERROR"))!=0)
-	//	{
-	//		float tstat_version2=(float)read_one(255,MODBUS_VERSION_NUMBER_LO); //tstat version			
-	//		if(tstat_version2<=0)
-	//			m_FirmVer.Format(_T("%0.1f"),tstat_version2);
-	//		if(tstat_version2 >=240 && tstat_version2 <250)
-	//			tstat_version2 /=10;
-	//		else 
-	//		{
-	//			tstat_version2 = (float)(read_one(255,MODBUS_VERSION_NUMBER_HI)*100+read_one(255,MODBUS_VERSION_NUMBER_LO));	
-	//			tstat_version2 /=100;
-	//		}
-	//		m_FirmVer.Format(_T("%.1f"),tstat_version2);
-	//		m_HardVer.Format(_T("%d"),read_one(255,MODBUS_HARDWARE_REV));  
-	//		/*展示到消息log框中*/
-	//		UpdateStatusInfo(_T("|Device Information-Begin"),FALSE);
-	//		UpdateStatusInfo(_T("|Model  Name:")+m_ModelName,FALSE);
-	//		UpdateStatusInfo(_T("|Firmware Ver:")+m_FirmVer,FALSE);
-	//		UpdateStatusInfo(_T("|Hardware Ver:")+m_HardVer,FALSE);
-	//		UpdateStatusInfo(_T("|Device Information-End"),FALSE);
-	//		UpdateData(FALSE);
-	//	}
-	//	else
-	//	{ 
-	//		m_ModelName=_T("");
-	//		m_FirmVer=_T("");
-	//		m_HardVer=_T("");
-	//	}
-	//} 
-	//else
-	//{
-	//	CString tips;
-	//	tips.Format(_T("IP:%s,Port:%d can't open,You can press Ping for test connection"),strIP,m_IPPort);
-	//	UpdateStatusInfo(tips,FALSE);
-	//}
-
-	//close_com();
+		if (m_ModelName.Find(_T("ERROR"))!=0)
+		{
+			float tstat_version2=(float)read_one(255,MODBUS_VERSION_NUMBER_LO); //tstat version			
+			if(tstat_version2<=0)
+				m_FirmVer.Format(_T("%0.1f"),tstat_version2);
+			if(tstat_version2 >=240 && tstat_version2 <250)
+				tstat_version2 /=10;
+			else 
+			{
+				tstat_version2 = (float)(read_one(255,MODBUS_VERSION_NUMBER_HI)*100+read_one(255,MODBUS_VERSION_NUMBER_LO));	
+				tstat_version2 /=100;
+			}
+			m_FirmVer.Format(_T("%.1f"),tstat_version2);
+			m_HardVer.Format(_T("%d"),read_one(255,MODBUS_HARDWARE_REV));  
+			/*展示到消息log框中*/
+ 			UpdateStatusInfo(_T("|Device Information-Begin"),FALSE);
+ 			UpdateStatusInfo(_T("|Model  Name:")+m_ModelName,FALSE);
+ 			UpdateStatusInfo(_T("|Firmware Ver:")+m_FirmVer,FALSE);
+ 			UpdateStatusInfo(_T("|Hardware Ver:")+m_HardVer,FALSE);
+ 			UpdateStatusInfo(_T("|Device Information-End"),FALSE);
+			UpdateData(FALSE);
+		}
+		else
+		{ 
+			m_ModelName=_T("");
+			m_FirmVer=_T("");
+			m_HardVer=_T("");
+             
+		}
+        return TRUE;
+	} 
+	else
+	{
+		CString tips;
+		tips.Format(_T("IP:%s,Port:%d can't open,You can press Ping for test connection"),strIP,m_IPPort);
+		UpdateStatusInfo(tips,FALSE);
+        return FALSE;
+	}
+    UpdateData(FALSE);
+	close_com();
 }
 CString CISPDlg::Get_NET_Infor(CString strIPAdress,short nPort){
 	CString modelname(_T(""));
@@ -1853,8 +2239,8 @@ void CISPDlg::OnMenuAbout()
  Author:	Alex
  Date: 2012-11-2 
  Function:
-从用户选择的文件路径中提取文件的名字，
-这样就不会作为无判断
+ 从用户选择的文件路径中提取文件的名字，
+ 这样就不会作为无判断
  */
  CString CISPDlg::GetFileName_FromFilePath() 
 {
@@ -1863,4 +2249,169 @@ void CISPDlg::OnMenuAbout()
 	CString str;
 	str.Format(_T("%s"),strArry.GetAt(strArry.GetCount()-1));
 	return str;
+ }
+
+ void CISPDlg::OnBnClickedShowHex()
+ {
+	 UpdateData();
+	 SaveParamToConfigFile();	//保存用户输入的数据
+
+
+	 if (m_pFileBuffer)
+	 {
+		 delete[] m_pFileBuffer;
+		 m_pFileBuffer= NULL;
+	 }
+
+	 CHexFileParser* pHexFile = new CHexFileParser;
+	 pHexFile->SetFileName(m_strHexFileName);
+
+	 m_pFileBuffer = new char[c_nHexFileBufLen];
+	 memset(m_pFileBuffer, 0xFF, c_nHexFileBufLen);
+	 int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
+	 TS_UC *Databuff=(TS_UC*)m_pFileBuffer;
+	 int ii=0;
+	 CString aline_hex(_T(""));
+	 CString temp;
+     if(nDataSize>0)
+     { 
+         while(ii<nDataSize){
+		  aline_hex=_T("");
+		 for (int i=ii;i<ii+128;i++)
+		 {
+		 temp.Format(_T("%02X"),Databuff[i]);
+		 aline_hex+=temp;
+		// aline_hex.AppendChar(m_pFileBuffer[i]);
+		 }
+		 aline_hex+=_T("\n");
+		 UpdateStatusInfo(aline_hex,FALSE);
+		 ii+=128;
+		 }
+	 }
+
+     
+     delete pHexFile;
+     pHexFile=NULL;
+ }
+
+
+ void CISPDlg::OnBnClickedFlashSn()
+ {
+     initFlashSN();
+ }
+
+ void CISPDlg::FlashSN(){
+     CFlashSN* pFlashSN = new CFlashSN;
+     int nComport = GetComPortNo();
+
+     pFlashSN->SetComport(nComport);
+     pFlashSN->SetFlashTpye(0);
+
+     if(!GetModbusID(m_szMdbIDs))
+     {
+         AfxMessageBox(_T("Please input a slave ID "));
+         return ;		
+     }
+     int nHWVerison;
+     //	int nProductModel;
+     CString  strProductModel;
+
+     int ProductID;
+
+     GetFlashSNParam(nHWVerison, strProductModel,ProductID);
+     pFlashSN->SetMBID(m_szMdbIDs[0]);
+     pFlashSN->SetFlashParam((static_cast<const CString>(strProductModel)), nHWVerison,ProductID);
+
+     pFlashSN->StartWriteSN();
+    CString SN;
+    SN.Format(_T("%d"),pFlashSN->m_nSerialNumber); 
+    GetDlgItem(IDC_EDIT_SN)->SetWindowText(SN);
+     delete pFlashSN;
+ }
+
+// void CISPDlg::OnBnClickedButtonSelfile2()
+// {
+//     UpdateData();
+//     //CString strFilter = _T("hex File|*.hex|bin File|*.bin|all File|*.*||");
+//     CString strFilter = _T("bin File|*.bin|all File|*.*||");
+//     CFileDialog dlg(true,_T("hex"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
+//     dlg.DoModal();
+//     m_strFirmwarepath=dlg.GetPathName();
+//     // m_strFlashFileName=dlg.GetPathName();
+//
+//     CWnd* pEditFilePath = (CWnd*)GetDlgItem(IDC_EDIT_FILEPATH2);
+//     pEditFilePath->SetWindowText(m_strFirmwarepath);
+// }
+void CISPDlg::OnMenuSetting()
+ {
+	 // TODO: Add your command handler code here
+	 CISPSetting Dlg;
+	 Dlg.DoModal();
+}
+
+void CISPDlg::OnMenuCheckhex()
+{
+	if (m_pFileBuffer)
+	{
+		delete[] m_pFileBuffer;
+		m_pFileBuffer= NULL;
+	}
+	if(HexFileValidation(m_strHexFileName))
+	{
+		CHexFileParser* pHexFile = new CHexFileParser;
+		pHexFile->SetFileName(m_strHexFileName);
+
+		m_pFileBuffer = new char[c_nHexFileBufLen];
+		memset(m_pFileBuffer, 0xFF, c_nHexFileBufLen);
+		int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
+		CString hexinfor=_T("The Hex For ");
+		hexinfor+=pHexFile->Get_HexInfor();
+		CString strFilesize;
+		strFilesize.Format(_T("Hex size=%d Bs"),nDataSize);
+		GetDlgItem(IDC_HEX_SIZE)->SetWindowText(strFilesize);
+
+		GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
+		delete pHexFile;
+		pHexFile=NULL;
+	} 
+	if(BinFileValidation(m_strHexFileName))
+	{
+		CBinFileParser* pBinFile=new CBinFileParser;
+		pBinFile->SetBinFileName(m_strHexFileName);
+		m_pFileBuffer=new char[c_nBinFileBufLen];
+		memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
+
+		int nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
+
+		CString strFilesize;
+		strFilesize.Format(_T("Bin size=%d Bs"),nDataSize);
+		GetDlgItem(IDC_HEX_SIZE)->SetWindowText(strFilesize);
+		m_strASIX=pBinFile->m_strASIX;
+		m_strProductName=pBinFile->m_strProductName;
+
+		if (m_strASIX.Find(_T("ASIX"))!=-1)
+		{
+
+
+			CString hexinfor=_T("The Bin For ");
+			hexinfor.Format(_T("The Bin file is for the firmware of %s"),m_strProductName.GetBuffer());
+			GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
+
+
+		}
+		else
+		{
+			CString hexinfor=_T("The Bin For ");
+			hexinfor.Format(_T("The Bin file is for the bootloader of %s"),m_strProductName.GetBuffer());
+			GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
+
+
+
+		}
+	}
+}
+
+DWORD WINAPI GetFWFileProc(LPVOID lPvoid)
+{
+	return 0;
 }

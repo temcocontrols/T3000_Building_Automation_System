@@ -44,6 +44,7 @@ BEGIN_MESSAGE_MAP(BacnetRange, CDialogEx)
 	ON_WM_TIMER()
 	ON_EN_KILLFOCUS(IDC_EDIT_RANGE_SELECT, &BacnetRange::OnEnKillfocusEditRangeSelect)
 	ON_WM_CLOSE()
+	ON_BN_CLICKED(IDCANCEL, &BacnetRange::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 
@@ -362,4 +363,12 @@ void BacnetRange::OnClose()
 	// TODO: Add your message handler code here and/or call default
 	range_cancel = true;
 	CDialogEx::OnClose();
+}
+
+
+void BacnetRange::OnBnClickedCancel()
+{
+	// TODO: Add your control notification handler code here
+	range_cancel = true;
+	CDialogEx::OnCancel();
 }

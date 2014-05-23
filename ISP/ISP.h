@@ -1,27 +1,32 @@
-// ISP.h : ISP DLL 的主头文件
+
+// ISP.h : main header file for the PROJECT_NAME application
 //
 
 #pragma once
 
 #ifndef __AFXWIN_H__
-	#error "在包含此文件之前包含“stdafx.h”以生成 PCH 文件"
+	#error "include 'stdafx.h' before including this file for PCH"
 #endif
 
-#include "resource.h"		// 主符号
+#include "resource.h"		// main symbols
 
 
-// CISPApp
-// 有关此类实现的信息，请参阅 ISP.cpp
+// CISPApp:
+// See ISP.cpp for the implementation of this class
 //
 
-class CISPApp : public CWinApp
+class CISPApp : public CWinAppEx
 {
 public:
 	CISPApp();
 
-// 重写
-public:
+// Overrides
+	public:
 	virtual BOOL InitInstance();
+
+// Implementation
 
 	DECLARE_MESSAGE_MAP()
 };
+
+extern CISPApp theApp;

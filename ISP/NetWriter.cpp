@@ -34,14 +34,14 @@ UINT _TFTPFlashFunc(PVOID pParam)
 	CNetWriter* pWriter = (CNetWriter*)pParam;	
 
 	pWriter->m_pTftpServer = new TFTPServer;
-
+	
 	if (pWriter->m_pTftpServer->StartServer())
 	{
 		return 1;
 	}
 
 	return 0;
-
+	
 }
 
 

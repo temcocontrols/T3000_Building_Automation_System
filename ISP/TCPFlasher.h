@@ -38,10 +38,10 @@ protected:
 
 
 	CWnd*			m_pParent;
-
+		
 	SOCKET			m_socket;
 
-
+	
 
 
 };
