@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TFTP Struct.h"
-//#include "ISPDlg.h"
+ 
 #include "MySocket.h"
 
 
@@ -17,9 +17,7 @@ typedef struct _DHCP_PACKET
 } DHCP_PACKET;
 
 #define DHCP_PACKET_SIZE (sizeof(DHCP_PACKET))
-
-const int  FLASH_UDP_PORT=6001; 
-//const int  FLASH_UDP_PORT=10000; 
+const int  FLASH_UDP_PORT=10000; 
 const int  LOCAL_UDP_PORT=10001;
 
 class CISPDlg;
@@ -94,6 +92,7 @@ public:
 	bool Send_Tftp_File();
 
 	BOOL StartServer_Old_Protocol();
+	void Set_bininfor(Bin_Info temp);
 protected:
 	BYTE*			m_szDataBuf;			// 要发送到数据
 	int					m_nDataBufLen;
@@ -102,7 +101,7 @@ protected:
 	int					m_nBlkNum;			// 块号
 	
 	CString			m_strFileName;
-
+    Bin_Info        m_binInfor;
 
 	SOCKET			m_sock;					// 接收tftp request socket, 绑定了69端口
 	SOCKET			m_soSend;				// 发送socket，发送tftp数据的

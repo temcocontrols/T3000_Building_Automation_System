@@ -71,7 +71,7 @@ public:
 	afx_msg void OnBnClickedRadioFlhfirmware();
 	afx_msg void OnBnClickedRadioFlhbtldr();
 	afx_msg LRESULT Show_Flash_DeviceInfor(WPARAM wParam, LPARAM lParam);
-	//afx_msg void OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
+	 
 	DECLARE_MESSAGE_MAP()
     
 public:
@@ -79,8 +79,9 @@ public:
 	// public method
 	////////////////////////////////////////////////////////////////////////////
 	// ²ÎÊý BOOL, =TRUE replace the current line, =FALSE add a new line
+	Bin_Info temp1;
 	void UpdateStatusInfo(const CString& strInfo, BOOL bReplace);
-
+	void ShowHexBinInfor();
 	void SetFlashFileName(const CString& strFileName);
 	CString GetFlashFileName();
 

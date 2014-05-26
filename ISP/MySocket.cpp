@@ -1,11 +1,12 @@
 // This Documents Add by Fance ,use this socket class communication
 // FanceSocket.cpp : implementation file
 //
-
+#pragma once
 #include "stdafx.h"
 #include "MySocket.h"
 #include "TFTPServer.h"
-
+#include "globle_function.h"
+#include "Global_Struct.h"
 typedef struct _Product_IP_ID 
 {
 	CString ISP_Device_IP;
@@ -33,6 +34,7 @@ extern bool device_jump_from_runtime;
 extern bool has_enter_dhcp_has_lanip_block;
 extern BYTE Product_Name[12];
 extern BYTE Rev[4];
+ 
 //extern bool some_device_reply_the_broadcast;
 MySocket::MySocket()
 {
@@ -45,8 +47,6 @@ MySocket::~MySocket()
 
 
 // Do not edit the following lines, which are needed by ClassWizard.
-
-
 /////////////////////////////////////////////////////////////////////////////
 // Fance Socket member functions
 void MySocket::OnAccept(int nErrorCode) 
@@ -73,6 +73,7 @@ void MySocket::OnReceive(int nErrorCode)
 				Byte_ISP_Device_IP[1] = temp_data[18];
 				Byte_ISP_Device_IP[2] = temp_data[20];
 				Byte_ISP_Device_IP[3] = temp_data[22];
+
 				device_has_replay_lan_IP = true;
 				ISP_STEP =ISP_SEND_DHCP_COMMAND_HAS_LANIP;
 				device_jump_from_runtime = true;
@@ -80,55 +81,7 @@ void MySocket::OnReceive(int nErrorCode)
 		}
 		else if(Receive_data_length == 31)
 		{
-        /*
-        typedef struct _DHCP_REPLY_PACKET
-        {
-        U8_T Reply[11];   // ReceiveDHCP
-        U32_T LanIp;    // LAN IP
-        U8_T Product[12]; 
-        U8_T    Rev[4];  
-        } DHCP_REPLY_PACKET;
-        [15:30:02] Evan: static void dhcp_reply_get_ready(void)
-        {
-        // U8_T XDATA i;
-
-        DHCP_Handshake_flag = HANDSHAKE_START;
-        pDHCP_Reply_Packet->Reply[0] = 'R';
-        pDHCP_Reply_Packet->Reply[1] = 'e';
-        pDHCP_Reply_Packet->Reply[2] = 'c';
-        pDHCP_Reply_Packet->Reply[3] = 'e';
-        pDHCP_Reply_Packet->Reply[4] = 'i';
-        pDHCP_Reply_Packet->Reply[5] = 'v';
-        pDHCP_Reply_Packet->Reply[6] = 'e';
-        pDHCP_Reply_Packet->Reply[7] = 'D';
-        pDHCP_Reply_Packet->Reply[8] = 'H';
-        pDHCP_Reply_Packet->Reply[9] = 'C';
-        pDHCP_Reply_Packet->Reply[10] = 'P';
-        pDHCP_Reply_Packet->LanIp = PNetStation->StationIP;
-        // for(i = 0; i < 16; i++)
-        // {  
-        //  pDHCP_Reply_Packet->Reserved[i] = 0;
-        // }
-
-        #if(PRODUCT == LC)
-        pDHCP_Reply_Packet->Product[0] = 'L';
-        pDHCP_Reply_Packet->Product[1] = 'C';
-        pDHCP_Reply_Packet->Product[2] = ' ';
-        pDHCP_Reply_Packet->Product[3] = ' ';
-        pDHCP_Reply_Packet->Product[4] = ' ';
-        pDHCP_Reply_Packet->Product[5] = ' ';
-        pDHCP_Reply_Packet->Product[6] = ' ';
-        pDHCP_Reply_Packet->Product[7] = ' ';
-        pDHCP_Reply_Packet->Product[8] = ' ';
-        pDHCP_Reply_Packet->Product[9] = ' ';
-        pDHCP_Reply_Packet->Product[10] = ' '; 
-        pDHCP_Reply_Packet->Product[11] = ' ';
-        pDHCP_Reply_Packet->Rev[0] = '2';
-        pDHCP_Reply_Packet->Rev[1] = '1';
-        pDHCP_Reply_Packet->Rev[2] = ' ';
-        pDHCP_Reply_Packet->Rev[3] = ' ';
-
-        */
+      
 			char temp_data[100];
 			memset(temp_data,0,sizeof(temp_data));
 			memcpy_s(temp_data,sizeof(temp_data),receive_buf,11);//copy the first 11 byte and check
@@ -136,7 +89,28 @@ void MySocket::OnReceive(int nErrorCode)
 			{
 				memcpy_s(Byte_ISP_Device_IP,sizeof(Byte_ISP_Device_IP),receive_buf+11,4);//copy the first 11 byte and check
                 memcpy_s(Product_Name,sizeof(Product_Name),receive_buf+15,12);//copy the first 11 byte and check
-                memcpy_s(Rev,sizeof(Rev),receive_buf+27,4);//copy the first 11 byte and check
+                
+
+				Bin_Info bin_infor;
+				Get_Binfile_Information(m_hex_bin_filepath.GetBuffer(),bin_infor);
+
+			    CString DeviceProductName ,FileProductName;
+				for (int i=0;i<12;i++)
+				{
+					DeviceProductName.AppendFormat(_T("%c"),Product_Name[i]);
+				}
+				for (int i=0;i<10;i++)
+				{
+					FileProductName.AppendFormat(_T("%c"),bin_infor.product_name[i]);
+				}
+				if (DeviceProductName.Find(FileProductName)==-1)
+				{
+					CString strTip;
+					strTip.Format(_T("Your device is %s,but your bin file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
+					//AfxMessageBox(strTip);
+				//	return;
+				}
+
 				device_has_replay_lan_IP = true;
 				ISP_STEP =ISP_SEND_DHCP_COMMAND_HAS_LANIP;
                 

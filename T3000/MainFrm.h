@@ -264,7 +264,7 @@ public:
 	void CheckConnectFailure(const CString& strIP);// 检查失败的原因，并给出详细的提示信息
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	BOOL ConnectSubBuilding(Building_info build_info);
-
+ BOOL ConnectDevice(tree_product tree_node);
 
 
 	//scan funtion:

@@ -1078,7 +1078,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 				if(m_product.at(i).BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(m_product.at(i).BuildingInfo.strBuildingName)!=0)
 				{
 					//connect:
-					BOOL bRet = ConnectSubBuilding(m_product.at(i).BuildingInfo);
+					BOOL bRet = ConnectDevice(m_product.at(i));
 					if (!bRet)
 					{
 						if(m_product.at(i).BuildingInfo.strProtocol.CompareNoCase(_T("Modbus TCP")) == 0) // net work protocol
@@ -1915,6 +1915,110 @@ BOOL CMainFrame::ConnectSubBuilding(Building_info build_info)
 	return FALSE;
 }
 
+BOOL CMainFrame::ConnectDevice(tree_product tree_node)
+{
+	CString strInfo;
+	if(m_hCurCommunication!=NULL)	
+	{
+		CloseHandle(m_hCurCommunication);
+		m_hCurCommunication=NULL;
+	}
+	if (!((tree_node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(tree_node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(tree_node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
+	{
+
+	/*}
+	if (build_info.strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
+	{*/
+		UINT n1,n2,n3,n4;
+		if (ValidAddress(tree_node.BuildingInfo.strIp,n1,n2,n3,n4)==FALSE)  // 验证NC的IP
+		{
+				/*
+				strInfo=_T("Invalidate IP Address!!");
+				AfxMessageBox(strInfo);
+				SetPaneString(1,strInfo);
+				strInfo=_T("disconnected");
+				SetPaneString(1,strInfo);
+				return FALSE;
+				*/
+
+				CString StringIP;
+				if(!GetIPbyHostName(tree_node.BuildingInfo.strIp,StringIP))
+				{
+					AfxMessageBox(_T("Can not get a validate IP adreess from the domain name!"));
+					return false;
+				}
+				CString strPort;
+				m_nIpPort=tree_node.ncomport;//_wtoi(tree_node.ncomport);
+				g_CommunicationType=1;
+				SetCommunicationType(g_CommunicationType);
+				bool b=Open_Socket2(StringIP,m_nIpPort);
+				CString strInfo;
+				if(b)
+				{	strInfo.Format((_T("Open IP:%s successful")),tree_node.BuildingInfo.strIp);//prompt info;
+					SetPaneString(1,strInfo);
+					return TRUE;
+				}
+				else
+				{
+					strInfo.Format((_T("Open IP:%s failure")),tree_node.BuildingInfo.strIp);//prompt info;
+					SetPaneString(1,strInfo);
+					return FALSE;
+				}
+		}
+		else
+		{
+			CString strPort;
+			m_nIpPort=tree_node.ncomport;//_wtoi(tree_node.BuildingInfo.strIpPort);
+
+			m_strIP=tree_node.BuildingInfo.strIp;
+
+			g_CommunicationType=1;
+			SetCommunicationType(g_CommunicationType);
+			bool b=Open_Socket2(tree_node.BuildingInfo.strIp,m_nIpPort);
+			CString strInfo;
+		//	strInfo.Format((_T("Open IP:%s successful")),build_info.str3Ip);//prompt info;
+		//	SetPaneString(1,strInfo);
+			if(b)
+			{	strInfo.Format((_T("Open IP:%s successful")),tree_node.BuildingInfo.strIp);//prompt info;
+				SetPaneString(1,strInfo);
+				return TRUE;
+			}
+			else
+			{
+				strInfo.Format((_T("Open IP:%s failure")),tree_node.BuildingInfo.strIp);//prompt info;
+				SetPaneString(1,strInfo);
+				//ValidOpenFailure(build_info.strIp,n1, n2,n3,n4); // 检查失败的原因，并给出详细的提示信息
+				return FALSE;
+			}
+		}
+	}	
+
+
+	g_CommunicationType = 0;
+	SetCommunicationType(g_CommunicationType);
+	CString strComport = tree_node.BuildingInfo.strComPort;
+	CString strComNum = strComport.Mid(3);
+	int nCom = _wtoi(strComNum);
+
+	open_com(nCom);//open*************************************
+	if(!is_connect())
+	{
+
+		//strInfo.Format(_T("COM: %d Connected: No"), nCom);
+		strInfo.Format(_T("COM %d : Not available "), nCom);
+		SetPaneString(1,strInfo);
+		AfxMessageBox(strInfo);
+		return FALSE;
+	}
+	else
+	{
+		strInfo.Format(_T("COM %d Connected: Yes"), nCom);
+		SetPaneString(1,strInfo);
+		Change_BaudRate(default_com1_port_baudrate);
+		return TRUE;
+	}	
+	return FALSE;
+}
 void CMainFrame::CheckConnectFailure(const CString& strIP) // 检查失败的原因，并给出详细的提示信息
 {
 	USES_CONVERSION;
@@ -6038,7 +6142,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{	
 						g_CommunicationType = 1;
 						SetCommunicationType(1);
-						if(Open_Socket2(product_Node.BuildingInfo.strIp,6001))
+						if(Open_Socket2(product_Node.BuildingInfo.strIp,product_Node.ncomport))
 						{
 							m_pTreeViewCrl->turn_item_image(hSelItem ,true);//只要能连接上这个IP 就说明这个设备在线;
 							
@@ -6177,7 +6281,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				if(product_Node.BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0)
 				{
 					pDlg->ShowProgress(2,10);//20120220
-					BOOL bRet = ConnectSubBuilding(product_Node.BuildingInfo);
+					BOOL bRet = ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
 					if (!bRet)
 					{
 						CheckConnectFailure(product_Node.BuildingInfo.strIp);
@@ -6195,7 +6299,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					}
 				}
 				
-			}else
+			}
+			else
 			{
 
 				if (product_Node.BuildingInfo.strComPort.CompareNoCase(_T("N/A")) == 0)
@@ -6206,7 +6311,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 					}
 
-				}else
+				}
+				else
 				{
 						//close_com();//关闭所有端口
 					//int nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
@@ -9132,7 +9238,7 @@ void CMainFrame::OnDatabaseMbpoll()
 	////mbPoll->Create(IDD_MBPOLL, GetDesktopWindow());
 	//mbPoll->Create(IDD_MBPOLL, this);
 	//mbPoll->ShowWindow(SW_SHOW);
-
+    OnDisconnect();
 	CString strHistotyFile=g_strExePth+_T("Modbus Poll.exe");
 	ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
 }
@@ -9164,34 +9270,37 @@ LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
 //}
 void CMainFrame::OnToolIsptoolforone()
 {
-	MessageBox(_T("This part of code is recoding,Please use ISP.exe to update now."),_T("Notice"),MB_OK | MB_ICONINFORMATION);
-	return;
+	//MessageBox(_T("This part of code is recoding,Please use ISP.exe to update now."),_T("Notice"),MB_OK | MB_ICONINFORMATION);
+	//return;
 	//Fance 如果要已经处于连接状态的soket在调用closesocket()后强制关闭，不经历TIME_WAIT的过程：
-	BOOL bDontLinger = FALSE;
-	setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
-	closesocket(h_Broad);
-	h_Broad=NULL;
-    OnDisconnect();
+	//BOOL bDontLinger = FALSE;
+	//setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+	//closesocket(h_Broad);
+	//h_Broad=NULL;
+  //  OnDisconnect();
 //	show_ISPDlg();
 
 	//Fance Add. 在ISP 用完1234 4321 的端口之后，T3000 在重新打开使用，刷新listview 的网络设备要使用;
-	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
-	BOOL bBroadcast=TRUE;
-	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
-	int iMode=1;
-	ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+// 	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+// 	BOOL bBroadcast=TRUE;
+// 	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+// 	int iMode=1;
+// 	ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
 
 	//SOCKADDR_IN bcast;
-	h_bcast.sin_family=AF_INET;
-	//bcast.sin_addr.s_addr=nBroadCastIP;
-	h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
-	h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
-
-	//SOCKADDR_IN siBind;
-	h_siBind.sin_family=AF_INET;
-	h_siBind.sin_addr.s_addr=INADDR_ANY;
-	h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
-	::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+// 	h_bcast.sin_family=AF_INET;
+// 	//bcast.sin_addr.s_addr=nBroadCastIP;
+// 	h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+// 	h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+// 
+// 	//SOCKADDR_IN siBind;
+// 	h_siBind.sin_family=AF_INET;
+// 	h_siBind.sin_addr.s_addr=INADDR_ANY;
+// 	h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+// 	::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+    OnDisconnect();
+    CString strHistotyFile=g_strExePth+_T("ISP.exe");
+    ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
 }
 
 

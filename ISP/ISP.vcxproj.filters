@@ -164,6 +164,9 @@
     <ClInclude Include="MyPing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MySocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Guestotel Icon.ico">

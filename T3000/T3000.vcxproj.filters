@@ -1169,6 +1169,12 @@
     <ClInclude Include="WhichOneToChooseDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Dowmloadfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DownloadSocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc">

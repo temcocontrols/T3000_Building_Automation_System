@@ -50,13 +50,16 @@ OUTPUT int read_multi2(TS_UC device_var,TS_US *put_data_into_here,TS_US start_ad
 
 OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
-OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
-OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
-
+OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+      OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_address,TS_US length,
+	unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here,
+	int* sendDataLength, int* recvDataLength);
 CStdioFile*					m_pFile;
 CString						m_strFileINI;
 CString m_strScanNetfilename;
-
+unsigned char g_data_to_send[6]={0,1,0,0,0,6};
+ 
 //CStdioFile* g_fileScanLog;
 CCriticalSection  logfile_section;
 CCriticalSection  NET_logfile_section;
@@ -77,9 +80,8 @@ void SaveBufferToLogFile(TS_UC* pBuffer, int nSize);
 OUTPUT int MINI_CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int NET_COM=1);
 OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int NET_COM=1);
 //--------------------------------
-OUTPUT void SetCommunicationType(int nType);
-OUTPUT int GetCommunicationType(void);
 
-OUTPUT BOOL Ping(const CString& strIP, CWnd* pWndEcho);
+
+
 
 #endif
