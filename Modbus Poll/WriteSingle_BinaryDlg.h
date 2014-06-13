@@ -61,4 +61,6 @@ public:
 	afx_msg void OnBnClickedRadioSingleRegB();
 	afx_msg void OnBnClickedRadioMultipleRegB();
 	afx_msg void OnBnClickedCheckCloseDlg();
+	CEdit m_editor_address;
+	afx_msg void OnPaint();
 };

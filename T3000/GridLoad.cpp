@@ -171,9 +171,10 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 			nFlag==PM_T3PERFORMANCE||
 			nFlag==PM_T34AO||
 			nFlag==PM_T36CT 
-			){
+			)
+		{
 			product_type =T3000_T3_MODULES;
-			}
+		}
 
 		 
 		//Code and comments by Fance

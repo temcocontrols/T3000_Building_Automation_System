@@ -139,6 +139,7 @@ void CChildFrame::OnSetupRead()
  pModbusView->m_Address_Cell=m_Address_Cell;
  pModbusView->m_PLC_Addresses=m_PLC_Adresses;
  pModbusView->m_address=m_address;
+ pModbusView->m_ischangedAddress=TRUE;
 ::PostMessage(pModbusView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
  //pModbusView->OnInitialUpdate();
  pModbusView=NULL;

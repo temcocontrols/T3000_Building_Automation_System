@@ -122,7 +122,17 @@ BOOL CModbusPollApp::InitInstance()
 	InitCommonControlsEx(&InitCtrls);
 
 	CWinAppEx::InitInstance();
-
+	if(!AfxInitRichEdit())
+	{
+		AfxMessageBox(_T("Initial RichEdit Control Error."));//
+		return FALSE;//
+	}
+	//AfxInitRichEdit2();
+	if(!AfxInitRichEdit2())
+	{
+		AfxMessageBox(_T("Initial RichEdit Control Error."));//
+		return FALSE;//
+	}
 	get_ExePath();
 	// Initialize OLE libraries
 	if (!AfxOleInit())

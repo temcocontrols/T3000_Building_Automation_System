@@ -50,6 +50,7 @@ BEGIN_MESSAGE_MAP(CWriteMultiRegistersDlg, CDialogEx)
 	ON_LBN_DBLCLK(IDC_LIST3, &CWriteMultiRegistersDlg::OnLbnDblclkList3)
 	ON_EN_KILLFOCUS(IDC_EDIT_ID, &CWriteMultiRegistersDlg::OnEnKillfocusEditId)
 	ON_BN_CLICKED(IDC_BUTTON1, &CWriteMultiRegistersDlg::OnBnClickedButton1)
+	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
@@ -382,6 +383,11 @@ unsigned char rev_back_rawData[300],send_data[100];
 		 m_Rx+=temp;
 	 }
 	 Traffic_Data(m_Rx);
+	 if (ret>0)
+	 {
+		 AfxMessageBox(_T("Write OK!"));
+		 return;
+	 }
 	 if (ret<0)
 	 {
 		 AfxMessageBox(_T("Write Fail,Try,again!"));
@@ -391,5 +397,15 @@ unsigned char rev_back_rawData[300],send_data[100];
 	 {
         AfxMessageBox(_T("OK!"));
 	 }
+
+}
+
+
+void CWriteMultiRegistersDlg::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+	// TODO: Add your message handler code here
+	// Do not call CDialogEx::OnPaint() for painting messages
+	m_ListBox_registers.SetCurSel(0);
 
 }

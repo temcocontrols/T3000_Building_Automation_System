@@ -495,6 +495,15 @@
     <ClCompile Include="WhichOneToChooseDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="T3000UpdateDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoRichEditCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T3000DefaultView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -681,6 +690,18 @@
     </None>
     <None Include="res\t3000.mdb" />
     <None Include="res\T3000.mdb" />
+    <None Include="res\temco_logo.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\temco_logo.jpg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default view.jpg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\default view.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1173,6 +1194,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DownloadSocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3000UpdateDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoRichEditCtrl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3000DefaultView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

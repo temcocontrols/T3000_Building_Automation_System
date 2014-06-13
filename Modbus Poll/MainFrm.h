@@ -39,7 +39,7 @@ protected:  // control bar embedded members
 	int m_communication_type;
 	int m_comport;
 	int m_bradrate;
-
+	HANDLE m_MultiRead_handle;
 	CString m_ipaddress;
 	int m_port;
 	int m_timeout;

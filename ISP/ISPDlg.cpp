@@ -23,9 +23,11 @@
 #endif
 //int g_CommunicationType;
 
+bool auto_flash_mode = false;
+CString AutoFlashConfigPath;
 CString g_strExePath;
 CString SettingPath;
-HANDLE get_file_thread_handle = NULL;
+//HANDLE get_file_thread_handle = NULL;
 CString g_strFlashInfo;
  const TCHAR c_strLogFileName[]=_T("Log_info.txt");				//log information file name
  const TCHAR c_strDBFileName[]=_T("Database\\t3000.mdb") ;
@@ -232,6 +234,7 @@ BEGIN_MESSAGE_MAP(CISPDlg, CDialog)
     ON_BN_CLICKED(IDC_FLASH_SN, &CISPDlg::OnBnClickedFlashSn)
 	ON_COMMAND(ID_MENU_SETTING, &CISPDlg::OnMenuSetting)
 	ON_COMMAND(ID_MENU_CHECKHEX, &CISPDlg::OnMenuCheckhex)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -242,7 +245,17 @@ BOOL CISPDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	// Add "About..." menu item to system menu.
+	CString filename;
+	CString flashmethod;
+	CString id;
+	CString comport;
+	CString BD;
+	CString ip;
+	CString ipport;
 
+	CString subnote;
+	CString subID;
+	CString firmware_path;
 	// IDM_ABOUTBOX must be in the system command range.
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
@@ -267,9 +280,18 @@ BOOL CISPDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+	CString ApplicationFolder;
+	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+	ApplicationFolder.ReleaseBuffer();
 
 
-	 GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(_T("19200"));
+	AutoFlashConfigPath = ApplicationFolder + _T("//AutoFlashFile.ini");
+	CFileFind fFind;
+
+
+
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//展示启动图片
 	 g_strExePath=GetExePath(true);
@@ -281,18 +303,9 @@ BOOL CISPDlg::OnInitDialog()
 	 m_cfgFileHandler.SetParentWnd(this);
 	 m_cfgFileHandler.CreateConfigFile(g_strExePath + c_strCfgFileName);
 	 m_strCfgFilePath = g_strExePath + c_strCfgFileName;
-	 CString filename;
-	 CString flashmethod;
-	 CString id;
-	 CString comport;
-	 CString BD;
-	 CString ip;
-	 CString ipport;
 
-	 CString subnote;
-	 CString subID;
 
-	 Remote_timeout = GetPrivateProfileInt(_T("Setting"),_T("REMOTE_TIMEOUT"),1000,SettingPath);
+
 	 m_cfgFileHandler.ReadFromCfgFileForAll(
 		 filename,
 		 flashmethod,
@@ -304,51 +317,74 @@ BOOL CISPDlg::OnInitDialog()
 		 subnote,
 		 subID
 		 );
+
+
+	 	 Remote_timeout = GetPrivateProfileInt(_T("Setting"),_T("REMOTE_TIMEOUT"),1000,SettingPath);
 		 if(Remote_timeout < 50)
 			 Remote_timeout = 1000;
 
-
-		 CString AutoFlashConfigPath;
-		 AutoFlashConfigPath = g_strExePath + _T("//AutoFlashFile.ini");
-		 CFileFind fFind;
 		 if(fFind.FindFile(AutoFlashConfigPath))
 		 {
+			
 			 int command = GetPrivateProfileInt(_T("Data"),_T("Command"),0,AutoFlashConfigPath);
 			 if(command != START_AUTO_FLASH_COMMAND)
 			 {
-				 DeleteFile(AutoFlashConfigPath);
-				 MessageBox(_T("ISP Tool will exit soon."));
-				 PostMessage(WM_CLOSE,NULL,NULL);
-				 return TRUE;
+				 //DeleteFile(AutoFlashConfigPath);
+				 //MessageBox(_T("ISP Tool will exit soon."));
+				 auto_flash_mode = false;
+				// PostMessage(WM_CLOSE,NULL,NULL);
+				// return TRUE;
 				 //删除文件并退出;
 			 }
-			 GetPrivateProfileStringW(_T("Data"),_T("ID"),_T("255"),id.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
-			 id.ReleaseBuffer();
-			 GetPrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("COM"),flashmethod.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
-			 flashmethod.ReleaseBuffer();
-			 GetPrivateProfileStringW(_T("Data"),_T("COMPORT"),_T("COM1"),comport.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
-			 comport.ReleaseBuffer();
-			 GetPrivateProfileStringW(_T("Data"),_T("Baudrate"),_T("19200"),BD.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
-			 BD.ReleaseBuffer();
-			 GetPrivateProfileStringW(_T("Data"),_T("IPAddress"),_T("192.168.0.3"),ip.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
-			 ip.ReleaseBuffer();
-			 GetPrivateProfileStringW(_T("Data"),_T("IPPort"),_T("6001"),ipport.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
-			 ipport.ReleaseBuffer();
-			 GetPrivateProfileStringW(_T("Data"),_T("Subnote"),_T("0"),subnote.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
-			 subnote.ReleaseBuffer();
-			 GetPrivateProfileStringW(_T("Data"),_T("SubID"),_T("255"),subID.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
-			 subID.ReleaseBuffer();
-			 get_file_thread_handle=CreateThread(NULL,NULL,GetFWFileProc,this,NULL,NULL);
-			 CloseHandle(get_file_thread_handle);
+			 else
+			 {
+				  auto_flash_mode = true;
+				 GetPrivateProfileStringW(_T("Data"),_T("ID"),_T("255"),id.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				 id.ReleaseBuffer();
+				 GetPrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("COM"),flashmethod.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				 flashmethod.ReleaseBuffer();
+				 GetPrivateProfileStringW(_T("Data"),_T("COMPORT"),_T("COM1"),comport.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				 comport.ReleaseBuffer();
+				 GetPrivateProfileStringW(_T("Data"),_T("Baudrate"),_T("19200"),BD.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				 BD.ReleaseBuffer();
+
+				 GetPrivateProfileStringW(_T("Data"),_T("ID"),_T("255"),id.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				 id.ReleaseBuffer();
+
+				 GetPrivateProfileStringW(_T("Data"),_T("IPAddress"),_T("192.168.0.3"),ip.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				 ip.ReleaseBuffer();
+				 GetPrivateProfileStringW(_T("Data"),_T("IPPort"),_T("6001"),ipport.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				 ipport.ReleaseBuffer();
+				 GetPrivateProfileStringW(_T("Data"),_T("Subnote"),_T("0"),subnote.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				 subnote.ReleaseBuffer();
+				 GetPrivateProfileStringW(_T("Data"),_T("SubID"),_T("255"),subID.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				 subID.ReleaseBuffer();
+				 GetPrivateProfileStringW(_T("Data"),_T("FirmwarePath"),_T(""),firmware_path.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				 firmware_path.ReleaseBuffer();
+				 CFileFind nfind;
+				 if(!nfind.FindFile(firmware_path))
+				 {
+					 DeleteFile(AutoFlashConfigPath);
+					 PostMessage(WM_CLOSE,NULL,NULL);
+					 return TRUE;
+				 }
+			 }
+			
+			//  DeleteFile(AutoFlashConfigPath);
+			 //get_file_thread_handle=CreateThread(NULL,NULL,GetFWFileProc,this,NULL,NULL);
+			 //CloseHandle(get_file_thread_handle);
 		 }
 
+
+
+	GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(_T("19200"));
 	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename); 
 	 GetDlgItem(IDC_EDIT_MDBID1)->SetWindowText(id);
 	 GetDlgItem(IDC_COMBO_COM)->SetWindowText(comport);
 	 GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(BD);
 	 m_ipAddress.SetWindowText(ip);
 	 GetDlgItem(IDC_EDIT_NCPORT)->SetWindowText(ipport);
-
+	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(firmware_path);
 
 
 	/////////////////
@@ -458,7 +494,17 @@ BOOL CISPDlg::OnInitDialog()
 		 FLASH_SUBID=FALSE;
 	 }
 
-     initFlashSN();
+	  InitISPUI();
+
+	 if(!auto_flash_mode)
+	 {
+		// initFlashSN();
+	 }
+	 else
+	 {
+		
+		 SetTimer(1,200,NULL);
+	 }
 // 	 GetDlgItem(IDC_EDIT_FILEPATH)->GetWindowText(m_strHexFileName);
 // 	 ShowHexBinInfor();
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -623,8 +669,13 @@ void CISPDlg::OnBnClickedButtonSelfile()
 	 
 	CWnd* pEditFilePath = (CWnd*)GetDlgItem(IDC_EDIT_FILEPATH);
 	pEditFilePath->SetWindowText(m_strHexFileName);
-
- ShowHexBinInfor();
+	int ret=Judge_BinHexFile(m_strHexFileName);
+	if (ret==0)
+	{
+		pEditFilePath->SetWindowText(_T(""));
+		return;
+	}
+    ShowHexBinInfor(ret);
    
   
 
@@ -687,7 +738,7 @@ void CISPDlg::SaveParamToConfigFile()
 
 void CISPDlg::OnBnClickedButtonFlash()
 {
- 
+
 	  UpdateData();
 	  SaveParamToConfigFile();	//保存用户输入的数据
 
@@ -782,6 +833,20 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
     {
         FlashSN();
     }
+
+	if(auto_flash_mode)
+	{
+		auto_flash_mode = false;	//烧入已经完成，允许手动关闭;
+		if(nRet)
+		{
+			WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("2"),AutoFlashConfigPath);	//FLASH_SUCCESS
+		}
+		else
+		{
+			WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("4"),AutoFlashConfigPath);	//FAILED_UNKNOW_ERROR
+		}
+		PostMessage(WM_CLOSE,NULL,NULL);
+	}
 	return 1;
 }
 
@@ -835,13 +900,24 @@ void CISPDlg::UpdateStatusInfo(const CString& strInfo, BOOL bReplace)
 
 void CISPDlg::OnClose()
 {
-
+	if(auto_flash_mode)
+		return;
 	CDialog::OnClose();
 }
 
 BOOL CISPDlg::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
+
+	if(auto_flash_mode)
+	{
+		if(pMsg->message == WM_KEYDOWN)
+		{
+			if((pMsg->wParam == VK_RETURN) || (pMsg->wParam == VK_ESCAPE))
+				return true;
+		}
+	}
+
 	if (pMsg->message == WM_KEYDOWN)
 	{
 	
@@ -1266,7 +1342,13 @@ BOOL CISPDlg::FlashTstat(void)
 		}
 		else{
 			UpdateStatusInfo(_T("Com Occupied"),false);
-			AfxMessageBox(_T("Com Occupied"));
+			if(!auto_flash_mode)
+				AfxMessageBox(_T("Com Occupied"));
+			else
+			{
+				PostMessage(WM_CLOSE,NULL,NULL);
+				return FALSE;
+			}
 			return FALSE;
 		}
 
@@ -1481,7 +1563,7 @@ void CISPDlg::OnFlashSubID()
 //Fance
 		//m_szHexFileFlags
 
-
+		m_pTCPFlasher->m_hexbinfilepath=m_strFlashFileName;
 		m_pTCPFlasher->BeginWirteByTCP();
 
 	}
@@ -1565,6 +1647,29 @@ DWORD CISPDlg::GetIPAddress()
 	m_ipAddress.GetAddress(dwIP);
 
 	return dwIP;
+}
+//0: not hex,not bin
+//1 hex
+//2 bin
+int CISPDlg::Judge_BinHexFile(CString filepath){
+	if (!HexFileValidation(filepath))
+	{
+		if (!BinFileValidation(filepath))
+		{
+			CString strTips;
+			strTips = _T("|please select a *.HEX or *.BIN file");
+			AfxMessageBox(strTips);
+			UpdateStatusInfo(strTips, FALSE);
+			return 0;
+		}
+		return 2;
+		
+	}
+	else
+	{
+		return 1;
+	}
+	 
 }
 /*
 Author:	Alex
@@ -1669,9 +1774,27 @@ int CISPDlg::GetModbusID(vector<int>& szMdbIDs)
 	return TRUE;
 }
 //When Flash by COM,use the function.
-void CISPDlg::ShowHexBinInfor(){
+//0: not hex,not bin
+//1 hex
+//2 bin
+void CISPDlg::ShowHexBinInfor(int hexbin){
+	if (hexbin==1)
+	{
+		if(READ_SUCCESS != Get_HexFile_Information(m_strHexFileName.GetBuffer(),temp1))
+		{
+			MessageBox(_T("The hex file dones't contains Temco logo,Can't flash into our products!"));
+			return;
+		}
+	}
+	if (hexbin==2)
+	{
+		if(READ_SUCCESS != Get_Binfile_Information(m_strHexFileName.GetBuffer(),temp1))
+		{
+			MessageBox(_T("The hex file dones't contains Temco logo,Can't flash this into your device!\r\nMake sure the hex or Bin is the newest.\r\nIf you really want to flash the old version ,please use the ISP.exe version before Rev4.6.6"));
+			return;
+		}
+	}
 
-	Get_HexFile_Information(m_strHexFileName.GetBuffer(),temp1);
 	CString temp;
 	UpdateStatusInfo(_T(">>>>>The File Information<<<<<"), FALSE);
 	temp.Format(_T("Company Name: "));
@@ -1696,7 +1819,7 @@ void CISPDlg::ShowHexBinInfor(){
 }
 void CISPDlg::FlashByCom()
 {
-	if (m_pComWriter)
+    if (m_pComWriter)
 	{
 		delete m_pComWriter;
 		m_pComWriter = NULL;
@@ -1710,10 +1833,10 @@ void CISPDlg::FlashByCom()
 
     CHexFileParser* pHexFile = new CHexFileParser;
     pHexFile->SetFileName(m_strHexFileName);
-
+ 
      
    /*  Get_HexFile_Information(m_strHexFileName.GetBuffer(),temp1);*/
-	 ShowHexBinInfor();
+	 ShowHexBinInfor(1);
 // 	 CString temp;
 // 	 UpdateStatusInfo(_T(">>>>>The Hex Information<<<<<"), FALSE);
 // 
@@ -1757,7 +1880,7 @@ void CISPDlg::FlashByCom()
 		m_pComWriter->SetModbusID(m_szMdbIDs);
         m_pComWriter->SetHexInfor(temp1);
 		m_pComWriter->SetHexFileType(pHexFile->GetHexFileFormatType());
-
+        m_pComWriter->m_hexbinfilepath=m_strHexFileName;
 		CString strBaudrate; GetDlgItem(IDC_EDIT_BAUDRATE)->GetWindowText(strBaudrate);
 		int nBautrate = _wtoi (strBaudrate.GetBuffer());
 		m_pComWriter->SetBautrate(nBautrate);
@@ -2350,7 +2473,23 @@ void CISPDlg::OnMenuCheckhex()
 	}
 }
 
-DWORD WINAPI GetFWFileProc(LPVOID lPvoid)
+//DWORD WINAPI GetFWFileProc(LPVOID lPvoid)
+//{
+//	return 0;
+//}
+
+
+void CISPDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	return 0;
+	// TODO: Add your message handler code here and/or call default
+	switch(nIDEvent)
+	{
+	case 1:
+		{
+			KillTimer(1);
+			OnBnClickedButtonFlash();
+		}
+		break;
+	}
+	__super::OnTimer(nIDEvent);
 }

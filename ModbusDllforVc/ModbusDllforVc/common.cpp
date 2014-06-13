@@ -52,6 +52,12 @@ OUTPUT void SetCommunicationType(int nType)
 	g_Commu_type=nType;
 }
 
+OUTPUT int GetCommunicationType(void)
+{
+	return g_Commu_type;
+}
+
+
 /*
 OUTPUT bool open_com(TS_UC m_com)
 {	
@@ -2588,7 +2594,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
 	///////////////////////////////////////////////////////////
 }
        
-#if 0
+#if 1
 OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length)
 {
 	if(g_Commu_type==0)
@@ -2874,7 +2880,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
 		memset(&m_osRead, 0, sizeof(OVERLAPPED));
 		if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
-			return -2; 
+			return -3; 
 		m_osRead.Offset = 0;
 		m_osRead.OffsetHigh = 0 ;
 		////////////////////////////////////////////////clear com error
@@ -2902,12 +2908,12 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 
 		///////////////////////////////////////////////////////////
 		if(to_send_data[0]!=device_var || to_send_data[1]!=3 || to_send_data[2]!=length*2)
-			return -2;
+			return -4;
 		crc=CRC16(to_send_data,length*2+3);
 		if(to_send_data[length*2+3]!=((crc>>8) & 0xff))
-			return -2;
+			return -5;
 		if(to_send_data[length*2+4]!=(crc & 0xff))
-			return -2;
+			return -5;
 		for(int i=0;i<length;i++)
 			put_data_into_here[i]=to_send_data[3+2*i]*256+to_send_data[4+2*i];
 

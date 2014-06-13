@@ -374,6 +374,13 @@ void CReadWrite_Multiple_RegDlg::OnBnClickedButtonSend()
 		m_Rx+=temp;
 	}
 	Traffic_Data(m_Rx);
+	if (ret>0)
+	{
+		AfxMessageBox(_T("Write OK!"));
+		return;
+	}
+	
+
 	if (ret<0)
 	{
 		AfxMessageBox(_T("Write Fail,Try,again!"));

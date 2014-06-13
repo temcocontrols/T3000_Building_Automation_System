@@ -42,7 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\T3000 Output\debug</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
+    <IntDir>..\T3000 Output\Modbus Pol object\debug</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -115,6 +115,8 @@
     <None Include="UserImages.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ADO\ADO.h" />
+    <ClInclude Include="AutoRichEditCtrl.h" />
     <ClInclude Include="ChartCtrl\ChartAxis.h" />
     <ClInclude Include="ChartCtrl\ChartAxisLabel.h" />
     <ClInclude Include="ChartCtrl\ChartBalloonLabel.h" />
@@ -173,6 +175,8 @@
     <ClInclude Include="WriteSingle_BinaryDlg.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ADO\ADO.cpp" />
+    <ClCompile Include="AutoRichEditCtrl.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxis.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxisLabel.cpp" />
     <ClCompile Include="ChartCtrl\ChartBarSerie.cpp" />

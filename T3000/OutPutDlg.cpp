@@ -37,7 +37,7 @@ void COutPutDlg::FLEX_GRID1_PUT_STR(int row,int col,CString str)
 	m_FlexGrid1.put_Row(row);
 	m_FlexGrid1.put_Col(col+5);
 	m_FlexGrid1.put_CellForeColor(RGB(0,0,0));
-	if((str.CompareNoCase(_T("Off"))==0)||(str.CompareNoCase(_T("Close"))==0))
+	if((str.CompareNoCase(_T("Off"))==0)||(str.CompareNoCase(_T("Closed"))==0))
 	{
 		m_FlexGrid1.put_CellBackColor(GREEN_COLOR);
 	}
@@ -61,7 +61,7 @@ m_FlexGrid2.put_TextMatrix(row,col+5,str);
 m_FlexGrid2.put_Row(row);
 m_FlexGrid2.put_Col(col+5);
 m_FlexGrid2.put_CellForeColor(RGB(0,0,0));
-if((str.CompareNoCase(_T("Off"))==0)||(str.CompareNoCase(_T("Close"))==0))
+if((str.CompareNoCase(_T("Off"))==0)||(str.CompareNoCase(_T("Closed"))==0))
 {
 	m_FlexGrid2.put_CellBackColor(GREEN_COLOR);
 }
@@ -84,7 +84,7 @@ void COutPutDlg::FLEX_GRID3_PUT_STR(int row,int col,CString str)
 	m_FlexGrid3.put_Row(row);
 	m_FlexGrid3.put_Col(col+5);
 	m_FlexGrid3.put_CellForeColor(RGB(0,0,0));
-	if((str.CompareNoCase(_T("Off"))==0)||(str.CompareNoCase(_T("Close"))==0))
+	if((str.CompareNoCase(_T("Off"))==0)||(str.CompareNoCase(_T("Closed"))==0))
 	{
 		m_FlexGrid3.put_CellBackColor(GREEN_COLOR);
 	}
@@ -294,7 +294,50 @@ BOOL COutPutDlg::OnInitDialog()
 		i_268_pid2=product_register_value[268];
 	}
 	//---------------------------------------------------
-
+	 m_pwm_row1=-1;
+	 m_pwm_row2=-1;
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	{
+		int currentrow=0;
+		for (int i=0;i<5;i++)
+		{
+			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==3)//找到了第一个pwm
+			{
+				m_pwm_row1=i+1;
+				currentrow=m_pwm_row1;
+				break;
+			}	
+		}
+		for (int i=currentrow;i<5;i++)
+		{
+			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==3)//找到了第一个pwm
+			{
+				m_pwm_row2=i+1;
+				break;
+			}	
+		}
+	} 
+	else
+	{
+		int currentrow=0;
+		for (int i=0;i<5;i++)
+		{
+			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==2)//找到了第一个pwm
+			{
+				m_pwm_row1=i+1;
+				currentrow=m_pwm_row1;
+				break;
+			}	
+		}
+		for (int i=currentrow;i<5;i++)
+		{
+			if(product_register_value[MODBUS_MODE_OUTPUT1+i]==2)//找到了第一个pwm
+			{
+				m_pwm_row2=i+1;
+				break;
+			}	
+		}
+	}
 	//put_fan_variable();	
 	FreshGrids();
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -1309,7 +1352,7 @@ if(product_register_value[129]==1)
 				switch(nValue)
 				{
 				case 0:
-					strTemp=_T("Close");
+					strTemp=_T("Closed");
 					break;
 				case 1:
 					strTemp=_T("Open");
@@ -1350,7 +1393,7 @@ if(product_register_value[129]==1)
 				switch(nValue)
 				{
 				case 0:
-					strTemp=_T("Close");
+					strTemp=_T("Closed");
 					break;
 				case 1:
 					strTemp=_T("Open");
@@ -1834,7 +1877,7 @@ if(row==(totalrows-1))
 				switch(nValue)
 				{
 				case 0:
-					strTemp=_T("Close");
+					strTemp=_T("Closed");
 					break;
 				case 1:
 					strTemp=_T("Open");
@@ -1878,7 +1921,7 @@ if(row==(totalrows-1))
 				switch(nValue)
 				{
 				case 0:
-					strTemp=_T("Close");
+					strTemp=_T("Closed");
 					break;
 				case 1:
 					strTemp=_T("Open");
@@ -2314,7 +2357,7 @@ if(row==(totalrows-1))
 				switch(nValue)
 				{
 				case 0:
-					strTemp=_T("Close");
+					strTemp=_T("Closed");
 					break;
 				case 1:
 					strTemp=_T("Open");
@@ -2355,7 +2398,7 @@ if(row==(totalrows-1))
 				switch(nValue)
 				{
 				case 0:
-					strTemp=_T("Close");
+					strTemp=_T("Closed");
 					break;
 				case 1:
 					strTemp=_T("Open");
@@ -2648,11 +2691,13 @@ void COutPutDlg::ClickMsflexgrid1()
 			m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On"));
-			/*		m_ItemValueCombx.AddString(_T("Close"));
+			/*		
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
-			m_ItemValueCombx.AddString(_T("0-50"));*/
+			m_ItemValueCombx.AddString(_T("0-50"));
+			*/
 			m_ItemValueCombx.ShowWindow(SW_SHOW);//显示控件
 			m_ItemValueCombx.MoveWindow(rc); //移动到选中格的位置，覆盖
 			m_ItemValueCombx.BringWindowToTop();
@@ -2673,7 +2718,7 @@ void COutPutDlg::ClickMsflexgrid1()
 				m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On")); 
-			/*m_ItemValueCombx.AddString(_T("Close"));
+			/*m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -2689,7 +2734,7 @@ void COutPutDlg::ClickMsflexgrid1()
 				  m_ItemValueCombx.ResetContent();
 			/*m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On"));*/
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -2719,7 +2764,7 @@ void COutPutDlg::ClickMsflexgrid1()
 				  {
 				    m_ItemValueCombx.ResetContent();
 			 
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -2742,7 +2787,7 @@ void COutPutDlg::ClickMsflexgrid1()
 				m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On")); 
-			/*m_ItemValueCombx.AddString(_T("Close"));
+			/*m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -2758,7 +2803,7 @@ void COutPutDlg::ClickMsflexgrid1()
 				  m_ItemValueCombx.ResetContent();
 			/*m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On"));*/
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -2788,7 +2833,7 @@ void COutPutDlg::ClickMsflexgrid1()
 				  {
 				    m_ItemValueCombx.ResetContent();
 			 
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -2815,7 +2860,7 @@ void COutPutDlg::ClickMsflexgrid1()
 			if(product_register_value[MODBUS_MODE_OUTPUT1+lRow-1]==3)
 			{
 				m_ItemValueCombx.ResetContent();
-				m_ItemValueCombx.AddString(_T("Close"));
+				m_ItemValueCombx.AddString(_T("Closed"));
 				m_ItemValueCombx.AddString(_T("Open"));
 				m_ItemValueCombx.AddString(_T("0-100"));
 				m_ItemValueCombx.AddString(_T("50-100"));
@@ -2844,7 +2889,7 @@ void COutPutDlg::ClickMsflexgrid1()
 			if(product_register_value[MODBUS_MODE_OUTPUT1+lRow-1]==2)
 			{
 				m_ItemValueCombx.ResetContent();
-				m_ItemValueCombx.AddString(_T("Close"));
+				m_ItemValueCombx.AddString(_T("Closed"));
 				m_ItemValueCombx.AddString(_T("Open"));
 				m_ItemValueCombx.AddString(_T("0-100"));
 				m_ItemValueCombx.AddString(_T("50-100"));
@@ -2888,7 +2933,7 @@ void COutPutDlg::ClickMsflexgrid1()
 					{
 					  m_ItemValueCombx.ResetContent();
 				 
-				m_ItemValueCombx.AddString(_T("Close"));
+				m_ItemValueCombx.AddString(_T("Closed"));
 				m_ItemValueCombx.AddString(_T("Open"));
 				m_ItemValueCombx.AddString(_T("0-100"));
 				m_ItemValueCombx.AddString(_T("50-100"));
@@ -2918,7 +2963,7 @@ void COutPutDlg::ClickMsflexgrid1()
 					  {
 						m_ItemValueCombx.ResetContent();
 			 
-				m_ItemValueCombx.AddString(_T("Close"));
+				m_ItemValueCombx.AddString(_T("Closed"));
 				m_ItemValueCombx.AddString(_T("Open"));
 				m_ItemValueCombx.AddString(_T("0-100"));
 				m_ItemValueCombx.AddString(_T("50-100"));
@@ -5283,10 +5328,9 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 	}
 	m_ItemValueCombx.ShowWindow(SW_HIDE);
 	//float are realized in onwrite:
-	
 		BYTE nreg;
-//		BYTE ntemp;
-		if(lRow==4 && m_bOut4PWM&&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
+//		BYTE ntemp;&& m_bOut4PWM  && m_bOut5PWM
+		if(lRow==m_pwm_row1 &&lCol>=6&&!m_bflexgrid1_or_2)//	if (lCol==6||lCol==7||lCol==8||lCol==9||lCol==10||lCol==11||lCol==12)
 		{
 			int CoastCol=m_PID1_heat_stages+6;
 			int nPos;
@@ -5305,22 +5349,22 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 				nPos = nCol - (m_PID1_heat_stages+1);
 
 			//nreg=read_one(tstat_id,341+nPos);
-			nreg=(BYTE)product_register_value[341+nPos];//341TSTAT6找不到对应
+			nreg=(BYTE)product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+nPos];//341TSTAT6找不到对应
 			nreg=nreg&0x0f;
 			nValue=nValue<<4;
 			nValue=nreg|nValue;
 			//write_one(g_tstat_id,341+nPos,nValue);
-			int ret1 = write_one(g_tstat_id,341+nPos,nValue);
+			int ret1 = write_one(g_tstat_id,MODBUS_OUTPUT_PWM_AUTO_COAST+nPos,nValue);
 			if (ret1<=0)
 				AfxMessageBox(_T("setting failure!"));
 			else
-				product_register_value[341+nPos]=nValue;
+				product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+nPos]=nValue;
 			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
 			m_FlexGrid1.SetFocus();
 			//FreshGrids();//lsc0928
 			return;
 		}
-		if(lRow==5 && m_bOut5PWM&&lCol>=6&&!m_bflexgrid1_or_2)
+		if(lRow==m_pwm_row2 &&lCol>=6&&!m_bflexgrid1_or_2)
 		{
 			int CoastCol=m_PID1_heat_stages+6;
 			int nPos;
@@ -5336,17 +5380,17 @@ void COutPutDlg::OnCbnSelchangeValueitemcombo()
 			else
 				nPos = nCol - (m_PID1_heat_stages+1);
 		//	nreg=read_one(tstat_id,341+nPos);
-			nreg=(BYTE)product_register_value[341+nPos];
+			nreg=(BYTE)product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+nPos];
 			nreg=nreg&0xf0;
 			nValue=nreg|nValue;
 
 		
 
-			int ret1 = write_one(g_tstat_id,341+nPos,nValue);
+			int ret1 = write_one(g_tstat_id,MODBUS_OUTPUT_PWM_AUTO_COAST+nPos,nValue);
 			if (ret1<=0)
 				AfxMessageBox(_T("setting failure!"));
 			else
-				product_register_value[341+nPos]=nValue;
+				product_register_value[MODBUS_OUTPUT_PWM_AUTO_COAST+nPos]=nValue;
 			m_FlexGrid1.put_TextMatrix(lRow,lCol,strNewText);
 			m_FlexGrid1.SetFocus();
 			//FreshGrids();//lsc0928
@@ -5594,7 +5638,7 @@ void COutPutDlg::ClickMsflexgrid2()
 		//m_ItemValueCombx.ResetContent();
 		//m_ItemValueCombx.AddString(_T("Off"));
 		//m_ItemValueCombx.AddString(_T("On"));
-		//m_ItemValueCombx.AddString(_T("Close"));
+		//m_ItemValueCombx.AddString(_T("Closed"));
 		//m_ItemValueCombx.AddString(_T("Open"));
 		//m_ItemValueCombx.AddString(_T("0-100"));
 		//m_ItemValueCombx.AddString(_T("50-100"));
@@ -5641,7 +5685,7 @@ void COutPutDlg::ClickMsflexgrid2()
 				m_ItemValueCombx.ResetContent();
 			/*m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On"));*/
-	 		m_ItemValueCombx.AddString(_T("Close"));
+	 		m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -5656,7 +5700,7 @@ void COutPutDlg::ClickMsflexgrid2()
 		    {m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On"));
-	/*		m_ItemValueCombx.AddString(_T("Close"));
+	/*		m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -5680,7 +5724,7 @@ void COutPutDlg::ClickMsflexgrid2()
 				m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On")); 
-			/*m_ItemValueCombx.AddString(_T("Close"));
+			/*m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -5696,7 +5740,7 @@ void COutPutDlg::ClickMsflexgrid2()
 				  m_ItemValueCombx.ResetContent();
 			/*m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On"));*/
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -5726,7 +5770,7 @@ void COutPutDlg::ClickMsflexgrid2()
 				  {
 				    m_ItemValueCombx.ResetContent();
 			 
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -5747,7 +5791,7 @@ void COutPutDlg::ClickMsflexgrid2()
 				 if (product_register_value[186]!=0)
 					 {
 					 m_ItemValueCombx.ResetContent();
-					 m_ItemValueCombx.AddString(_T("Close"));
+					 m_ItemValueCombx.AddString(_T("Closed"));
 					 m_ItemValueCombx.AddString(_T("Open"));
 					 m_ItemValueCombx.AddString(_T("0-100"));
 					 m_ItemValueCombx.AddString(_T("50-100"));
@@ -5778,7 +5822,7 @@ void COutPutDlg::ClickMsflexgrid2()
 			if (product_register_value[187]!=0)
 				{
 				m_ItemValueCombx.ResetContent();
-				m_ItemValueCombx.AddString(_T("Close"));
+				m_ItemValueCombx.AddString(_T("Closed"));
 				m_ItemValueCombx.AddString(_T("Open"));
 				m_ItemValueCombx.AddString(_T("0-100"));
 				m_ItemValueCombx.AddString(_T("50-100"));
@@ -5823,7 +5867,7 @@ void COutPutDlg::ClickMsflexgrid2()
 		if(lRow==4 && m_bOut4PWM)
 			{
 			m_ItemValueCombx.ResetContent();
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -5837,7 +5881,7 @@ void COutPutDlg::ClickMsflexgrid2()
 		if(lRow==5 &&m_bOut5PWM)
 			{
 			m_ItemValueCombx.ResetContent();
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -6508,7 +6552,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
    }
     
     
-	if(m_bOut4PWM)
+	if(m_pwm_row1!=-1)
 	{
 
 		for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
@@ -6529,7 +6573,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 			switch(nValue)
 			{
 			case 0:
-				strTemp=_T("Close");
+				strTemp=_T("Closed");
 				break;
 			case 1:
 				strTemp=_T("Open");
@@ -6547,13 +6591,13 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 				strTemp=_T("");
 			}
 			if(pid_select2[3]==1||pid_select2[row-1]==2)
-			FLEX_GRID1_PUT_COLOR_STR(4,col,strTemp);//col +1
+			FLEX_GRID1_PUT_COLOR_STR(m_pwm_row1,col,strTemp);//col +1
 			else
-			FLEX_GRID1_PUT_STR(4,col,strTemp);//col +1
+			FLEX_GRID1_PUT_STR(m_pwm_row1,col,strTemp);//col +1
 			
 		}
 	}	
-	if(m_bOut5PWM)
+	if(m_pwm_row2!=-1)
 	{
 		for(int col = 1 ;col <=(m_PID1_heat_stages+m_PID1_cool_stages+1);col++)
 		{
@@ -6572,7 +6616,7 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 			switch(nValue)
 			{
 			case 0:
-				strTemp=_T("Close");
+				strTemp=_T("Closed");
 				break;
 			case 1:
 				strTemp=_T("Open");
@@ -6591,9 +6635,9 @@ void COutPutDlg::FreshGrid_PID1tstat6()
 			}
 
 			if(pid_select2[4]==1||pid_select2[row-1]==2)
-			FLEX_GRID1_PUT_COLOR_STR(5,col,strTemp);//col +1
+			FLEX_GRID1_PUT_COLOR_STR(m_pwm_row2,col,strTemp);//col +1
 			else
-			FLEX_GRID1_PUT_STR(5,col,strTemp);//col +1
+			FLEX_GRID1_PUT_STR(m_pwm_row2,col,strTemp);//col +1
 				//totalrows
 		}
 	}
@@ -7173,7 +7217,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 		}
 	}
 
-	if(m_bOut4PWM)
+	if(m_pwm_row1!=-1)
 	{
 
 		for(int col = 1 ;col <=(m_PID2_heat_stages+m_PID2_cool_stages+1);col++)
@@ -7194,7 +7238,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 			switch(nValue)
 			{
 			case 0:
-				strTemp=_T("Close");
+				strTemp=_T("Closed");
 				break;
 			case 1:
 				strTemp=_T("Open");
@@ -7213,15 +7257,15 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 			}
 
 			if(pid_select2[3]==0||pid_select2[3]==2)
-				FLEX_GRID2_PUT_COLOR_STR(4,col,strTemp);//col +1
+				FLEX_GRID2_PUT_COLOR_STR(m_pwm_row1,col,strTemp);//col +1
 			else
-			FLEX_GRID2_PUT_STR(4,col,strTemp);//col +1
+			FLEX_GRID2_PUT_STR(m_pwm_row1,col,strTemp);//col +1
 
 
 			//FLEX_GRID2_PUT_STR(4,col,strTemp)//col +1
 		}
 	}	
-	if(m_bOut5PWM)
+	if(m_pwm_row2!=-1)
 	{
 		for(int col = 1 ;col <=(m_PID2_heat_stages+m_PID2_cool_stages+1);col++)
 		{
@@ -7240,7 +7284,7 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 			switch(nValue)
 			{
 			case 0:
-				strTemp=_T("Close");
+				strTemp=_T("Closed");
 				break;
 			case 1:
 				strTemp=_T("Open");
@@ -7258,9 +7302,9 @@ void COutPutDlg::FreshGrid_PID2tstat6()
 				strTemp=_T("");
 			}
 			if(pid_select2[4]==0||pid_select2[4]==2)
-				FLEX_GRID2_PUT_COLOR_STR(5,col,strTemp);//col +1
+				FLEX_GRID2_PUT_COLOR_STR(m_pwm_row2,col,strTemp);//col +1
 			else
-			FLEX_GRID2_PUT_STR(5,col,strTemp);//col +1
+			FLEX_GRID2_PUT_STR(m_pwm_row2,col,strTemp);//col +1
 				//totalrows
 		}
 	}
@@ -7761,7 +7805,7 @@ void COutPutDlg::FreshGrid_PID2tstat5GLessthan368()
 			switch(nValue)
 			{
 			case 0:
-				strTemp=_T("Close");
+				strTemp=_T("Closed");
 				break;
 			case 1:
 				strTemp=_T("Open");
@@ -7807,7 +7851,7 @@ void COutPutDlg::FreshGrid_PID2tstat5GLessthan368()
 			switch(nValue)
 			{
 			case 0:
-				strTemp=_T("Close");
+				strTemp=_T("Closed");
 				break;
 			case 1:
 				strTemp=_T("Open");
@@ -7952,7 +7996,7 @@ void COutPutDlg::ClickMsflexgrid3()
 		//m_ItemValueCombx.ResetContent();
 		//m_ItemValueCombx.AddString(_T("Off"));
 		//m_ItemValueCombx.AddString(_T("On"));
-		//m_ItemValueCombx.AddString(_T("Close"));
+		//m_ItemValueCombx.AddString(_T("Closed"));
 		//m_ItemValueCombx.AddString(_T("Open"));
 		//m_ItemValueCombx.AddString(_T("0-100"));
 		//m_ItemValueCombx.AddString(_T("50-100"));
@@ -7999,7 +8043,7 @@ void COutPutDlg::ClickMsflexgrid3()
 				m_ItemValueCombx.ResetContent();
 			/*m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On"));*/
-	 		m_ItemValueCombx.AddString(_T("Close"));
+	 		m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -8014,7 +8058,7 @@ void COutPutDlg::ClickMsflexgrid3()
 		    {m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On"));
-	/*		m_ItemValueCombx.AddString(_T("Close"));
+	/*		m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -8038,7 +8082,7 @@ void COutPutDlg::ClickMsflexgrid3()
 				m_ItemValueCombx.ResetContent();
 			m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On")); 
-			/*m_ItemValueCombx.AddString(_T("Close"));
+			/*m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -8054,7 +8098,7 @@ void COutPutDlg::ClickMsflexgrid3()
 				  m_ItemValueCombx.ResetContent();
 			/*m_ItemValueCombx.AddString(_T("Off"));
 			m_ItemValueCombx.AddString(_T("On"));*/
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -8084,7 +8128,7 @@ void COutPutDlg::ClickMsflexgrid3()
 				  {
 				    m_ItemValueCombx.ResetContent();
 			 
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -8105,7 +8149,7 @@ void COutPutDlg::ClickMsflexgrid3()
 				 if (product_register_value[186]!=0)
 					 {
 					 m_ItemValueCombx.ResetContent();
-					 m_ItemValueCombx.AddString(_T("Close"));
+					 m_ItemValueCombx.AddString(_T("Closed"));
 					 m_ItemValueCombx.AddString(_T("Open"));
 					 m_ItemValueCombx.AddString(_T("0-100"));
 					 m_ItemValueCombx.AddString(_T("50-100"));
@@ -8136,7 +8180,7 @@ void COutPutDlg::ClickMsflexgrid3()
 			if (product_register_value[187]!=0)
 				{
 				m_ItemValueCombx.ResetContent();
-				m_ItemValueCombx.AddString(_T("Close"));
+				m_ItemValueCombx.AddString(_T("Closed"));
 				m_ItemValueCombx.AddString(_T("Open"));
 				m_ItemValueCombx.AddString(_T("0-100"));
 				m_ItemValueCombx.AddString(_T("50-100"));
@@ -8181,7 +8225,7 @@ void COutPutDlg::ClickMsflexgrid3()
 		if(lRow==4 && m_bOut4PWM)
 			{
 			m_ItemValueCombx.ResetContent();
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));
@@ -8195,7 +8239,7 @@ void COutPutDlg::ClickMsflexgrid3()
 		if(lRow==5 &&m_bOut5PWM)
 			{
 			m_ItemValueCombx.ResetContent();
-			m_ItemValueCombx.AddString(_T("Close"));
+			m_ItemValueCombx.AddString(_T("Closed"));
 			m_ItemValueCombx.AddString(_T("Open"));
 			m_ItemValueCombx.AddString(_T("0-100"));
 			m_ItemValueCombx.AddString(_T("50-100"));

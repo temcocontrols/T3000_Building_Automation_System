@@ -35,4 +35,6 @@ public:
 	afx_msg void OnBnClickedRadioSingleReg();
 	afx_msg void OnBnClickedRadioMultipleReg();
 	CButton m_closeCheck;
+	afx_msg void OnPaint();
+	CEdit m_editor_value;
 };

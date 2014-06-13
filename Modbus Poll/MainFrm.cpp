@@ -10,17 +10,23 @@
 #include "global_variable_extern.h"
 #include "ModbusDllForVC.h"
 #include "RegisterValueAnalyzerDlg.h"
-
 #include "CommunicationTrafficDlg.h"
- 
 #include "Modbus PollView.h"
+
+
+ UINT _ReadMultiRegisters(LPVOID pParam)
+ {
+	  CMainFrame* pFrame=(CMainFrame*)(pParam);
+	  pFrame->OnConnectionQuickconnectf5();
+	  return 1;
+ }
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-//void Update_ViewData(CView* MBPollView);
-// CMainFrame
-//DWORD WINAPI _Multi_Read_Fun03_MF(LPVOID pParam);
+ void Update_ViewData(CView* MBPollView);
+ 
+	 DWORD WINAPI _Multi_Read_Fun03_MF(LPVOID pParam);
 IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
 
 const int  iMaxUserToolbars = 10;
@@ -178,7 +184,19 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
   	  //m_wndStatusBar.SetPaneInfo(0,ID_SEPARATOR,SBPS_NOBORDERS,   300);
   	  m_wndStatusBar.SetPaneInfo(1,IDS_CONNECTION,SBPS_NOBORDERS,   300);
 	 // m_wndStatusBar.SetPaneInfo(1,ID_BUILDING_INFO,SBPS_NOBORDERS, 300);
-	   // OnConnectionQuickconnectf5();
+	     //OnConnectionQuickconnectf5();
+	    AfxBeginThread(_ReadMultiRegisters,this);
+
+
+
+		if(m_MultiRead_handle != NULL)
+			TerminateThread(m_MultiRead_handle, 0);
+		m_MultiRead_handle=NULL;
+		if (!m_MultiRead_handle)
+		{
+			m_MultiRead_handle = CreateThread(NULL,NULL,_Multi_Read_Fun03_MF,this,NULL,0);
+		}
+
 
 		m_wndToolBar.ResetAll();
 
@@ -401,7 +419,7 @@ void CMainFrame::OnConnectionConnect32776()
 			if (!Open_Socket2(m_ipaddress,m_port))
 			{
 				CString temp;
-				temp.Format(_T("%s can't be connected"),m_ipaddress.GetBuffer());
+				temp.Format(_T("%s:%d can't be connected"),m_ipaddress.GetBuffer(),m_port);
 				AfxMessageBox(temp);
 				strpannel=temp;
 				SetPaneString(1,strpannel);
@@ -410,7 +428,7 @@ void CMainFrame::OnConnectionConnect32776()
 				return;
 			}
 			m_isconnect=TRUE;
-			m_isconnect=TRUE;
+			g_online=TRUE;
 			strpannel.Format(_T("IP%s :%d"),m_ipaddress,m_port);
 			SetPaneString(1,strpannel);
 		}
@@ -617,7 +635,7 @@ void CMainFrame::OnUpdateDispalyCommunication(CCmdUI *pCmdUI)
 		pCmdUI->Enable(TRUE);
 	}
 }
-/*
+
 volatile HANDLE Read_Mutex=NULL;
 DWORD WINAPI _Multi_Read_Fun03_MF(LPVOID pParam){
 	while(TRUE){
@@ -705,11 +723,17 @@ void Update_ViewData(CView* MBPollView){
 		{
             ret=read_multi_log(ID,&DataBuffer[0],startAdd,quantity,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
 		}
-		
+		/*
+		-1:no connection
+		-2:create write error
+		-3:create read error
+		-4:time out error
+		-5:crc error
+		*/
 		register_critical_section.Unlock();
  
 	
-	 
+	    pMBPollView->m_MultiReadReturnType=ret;
 			
 	
 		++g_Tx_Rx;
@@ -735,7 +759,17 @@ void Update_ViewData(CView* MBPollView){
 
 		Traffic_Data(m_Rx);
 
-
+		 register_critical_section.Lock();
+		int tt=read_multi_log(ID,&pMBPollView->m_modeldata[0],6,2,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
+		if (tt>0)
+		{
+			pMBPollView->m_isgetmodel=TRUE;
+		}
+		else
+		{
+			pMBPollView->m_isgetmodel=FALSE;
+		}
+		register_critical_section.Unlock();
 		if (ret>0)//读的正确之后，我们才把值传给view显示
 		{
 			memcpy_s(pMBPollView->m_DataBuffer,sizeof(pMBPollView->m_DataBuffer),DataBuffer,sizeof(DataBuffer));
@@ -755,7 +789,7 @@ void Update_ViewData(CView* MBPollView){
 
 	 
 }
-*/
+
 
 void CMainFrame::OnViewRegistervalueanalyzer()
 {

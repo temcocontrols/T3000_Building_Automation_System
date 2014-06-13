@@ -55,6 +55,7 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DWORD GetIPAddress();
+	int Judge_BinHexFile(CString filepath);
 public:
 	//选择flash文件
 	afx_msg void OnBnClickedButtonSelfile();
@@ -81,7 +82,7 @@ public:
 	// 参数 BOOL, =TRUE replace the current line, =FALSE add a new line
 	Bin_Info temp1;
 	void UpdateStatusInfo(const CString& strInfo, BOOL bReplace);
-	void ShowHexBinInfor();
+	void ShowHexBinInfor(int hexbin);
 	void SetFlashFileName(const CString& strFileName);
 	CString GetFlashFileName();
 
@@ -262,4 +263,5 @@ public:
 //    afx_msg void OnBnClickedButtonSelfile2();
 	afx_msg void OnMenuCheckhex();
 	void CheckAutoFlash();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

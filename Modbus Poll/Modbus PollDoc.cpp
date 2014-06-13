@@ -176,6 +176,7 @@ void CModbusPollDoc::Serialize(CArchive& ar)
 			ar>>m_DataBuffer[i];
 		}
 	}
+
 }
 
 

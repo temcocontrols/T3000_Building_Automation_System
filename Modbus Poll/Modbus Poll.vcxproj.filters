@@ -16,6 +16,9 @@
     <Filter Include="ChartCtrl">
       <UniqueIdentifier>{6ffa5f80-8d90-4384-a303-1907c8494c58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CADO">
+      <UniqueIdentifier>{ac051298-a5ea-4c53-8952-4af1cd5ab2d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -226,6 +229,12 @@
     <ClInclude Include="RegisterValueAnalyzerDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AutoRichEditCtrl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ADO\ADO.h">
+      <Filter>CADO</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Modbus Poll.cpp">
@@ -350,6 +359,12 @@
     </ClCompile>
     <ClCompile Include="RegisterValueAnalyzerDlg.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoRichEditCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ADO\ADO.cpp">
+      <Filter>CADO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

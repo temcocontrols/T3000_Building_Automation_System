@@ -58,8 +58,9 @@ void CReadWriteDefinitionDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO50, m_Radio_50);
 	DDX_Control(pDX, IDC_RADIO100, m_Radio_100);
 	DDX_Control(pDX, IDC_RADIOFIT, m_Radio_Fit);
-	
-	
+
+
+	DDX_Control(pDX, IDC_EDIT_SLAVE_ID, m_editor_slave_id);
 }
 
 
@@ -108,6 +109,7 @@ BEGIN_MESSAGE_MAP(CReadWriteDefinitionDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIO50, &CReadWriteDefinitionDlg::OnBnClickedRadio50)
 	ON_BN_CLICKED(IDC_RADIO100, &CReadWriteDefinitionDlg::OnBnClickedRadio100)
 	ON_BN_CLICKED(IDC_RADIOFIT, &CReadWriteDefinitionDlg::OnBnClickedRadiofit)
+	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
@@ -163,4 +165,14 @@ void CReadWriteDefinitionDlg::OnBnClickedRadiofit()
 {
 	
 	m_rows=4;
+}
+
+
+void CReadWriteDefinitionDlg::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+	// TODO: Add your message handler code here
+	// Do not call CDialogEx::OnPaint() for painting messages
+	m_editor_slave_id.SetSel(0,-1);
+	m_editor_slave_id.SetFocus();
 }

@@ -42,6 +42,9 @@ int modbus_read_multi_value(
 		int retry_times );
 
 int read_one(unsigned char device_var,unsigned short address,int retry_times=3);
+int g_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bComm_Type);
+int g_NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
+int g_MINI_CheckTstatOnline_a(unsigned char devLo,unsigned char devHi, bool bComm_Type,int NET_COM);
 int write_one(unsigned char device_var,unsigned short address,short value,int retry_times=3);
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times=3);
 int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times=3);

@@ -64,6 +64,7 @@ void CWriteSingleRegisterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_SINGLE_REG,m_radio_single);
 
 	DDX_Control(pDX, IDC_CHECK_CLOSE_DLG, m_closeCheck);
+	DDX_Control(pDX, IDC_EDIT_VALUE, m_editor_value);
 }
 
 
@@ -71,6 +72,7 @@ BEGIN_MESSAGE_MAP(CWriteSingleRegisterDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CWriteSingleRegisterDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_RADIO_SINGLE_REG, &CWriteSingleRegisterDlg::OnBnClickedRadioSingleReg)
 	ON_BN_CLICKED(IDC_RADIO_MULTIPLE_REG, &CWriteSingleRegisterDlg::OnBnClickedRadioMultipleReg)
+	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
@@ -97,7 +99,9 @@ BOOL CWriteSingleRegisterDlg::OnInitDialog(){
 		m_radio_mulitple.SetCheck(m_function);
 		m_radio_single.SetCheck(!m_function);
 	}
+
 	m_closeCheck.SetCheck(m_close_dlg);
+	
 	return CDialogEx::OnInitDialog();
 }
 void CWriteSingleRegisterDlg::OnBnClickedOk()
@@ -174,6 +178,11 @@ void CWriteSingleRegisterDlg::OnBnClickedOk()
 			m_Rx+=temp;
 		}
 		Traffic_Data(m_Rx);
+		if (ret>0)
+		{
+			AfxMessageBox(_T("Write OK!"));
+			return;
+		}
 		if (ret<0)
 		{
 			AfxMessageBox(_T("Write Fail,Try,again!"));
@@ -236,7 +245,11 @@ void CWriteSingleRegisterDlg::OnBnClickedOk()
 			m_Rx+=temp;
 		}
 		Traffic_Data(m_Rx);
-
+		if (ret>0)
+		{
+			AfxMessageBox(_T("Write OK!"));
+			return;
+		}
 		if (ret<0)
 		{
 			AfxMessageBox(_T("Write Fail,Try,again!"));
@@ -263,4 +276,15 @@ void CWriteSingleRegisterDlg::OnBnClickedRadioMultipleReg()
 {
 	// TODO: Add your control notification handler code here
 	m_function=1;
+}
+
+
+void CWriteSingleRegisterDlg::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+	// TODO: Add your message handler code here
+	// Do not call CDialogEx::OnPaint() for painting messages
+	m_editor_value.SetSel(0,-1);
+	m_editor_value.SetFocus();
+	//GetDlgItem(IDC_EDIT_VALUE)->SetCaretPos()
 }

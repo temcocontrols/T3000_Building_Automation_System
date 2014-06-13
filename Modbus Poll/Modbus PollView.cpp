@@ -8,13 +8,13 @@
 #ifndef SHARED_HANDLERS
 #include "Modbus Poll.h"
 #endif
-
 #include "Modbus PollDoc.h"
 #include "Modbus PollView.h"
 #include "ChildFrm.h"
 #include "WriteSingleRegisterDlg.h"
 #include "WriteSingle_BinaryDlg.h"
 #include "RegisterValueAnalyzerDlg.h"
+#include "ado/ADO.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -59,30 +59,193 @@ CModbusPollView::CModbusPollView()
 
 	  m_grid_cols=m_grid_rows=1;
 	  m_Current_Col=m_Current_Row=1;
-	    cFont=new CFont;
-	    cFont->CreateFont(16,0,0,0,FW_SEMIBOLD,FALSE,FALSE,0,
-		  ANSI_CHARSET,OUT_DEFAULT_PRECIS,
-		  CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
-		  DEFAULT_PITCH&FF_SWISS,_T("Arial"));
+	   
+	  m_ischangedAddress=TRUE;
 
 		    m_close_dlg=FALSE;
 			m_function=FALSE;
-			m_MultiRead_handle=NULL;
+			//m_MultiRead_handle=NULL;
 			Show_Name=FALSE;
-
+			m_isgetmodel=FALSE;
 }
 
 CModbusPollView::~CModbusPollView()
 {
-	delete cFont;
-	cFont=NULL;
+	 
 
 
-	if(m_MultiRead_handle != NULL)
-		TerminateThread(m_MultiRead_handle, 0);
-	m_MultiRead_handle=NULL;
+// 	if(m_MultiRead_handle != NULL)
+// 		TerminateThread(m_MultiRead_handle, 0);
+// 	m_MultiRead_handle=NULL;
 }
+void CModbusPollView::Initial_RegName(){
+	_variant_t temp_var;
+	if (!m_isgetmodel)
+	{
+		return;
+	}
+	if (!m_ischangedAddress)
+	{
+		return;
+	}
+	CString TableName,RegName,RegAddress;
+	CADO ado;
+	ado.OnInitADOConn();
+	if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
+	{  
+		CString sql,temp;
+		sql.Format(_T("Select * from ProductsTypeRegisterTables where ProductType=%d"),m_modeldata[1]);
+		ado.m_pRecordset=ado.OpenRecordset(sql);
+		if (!ado.m_pRecordset->EndOfFile)
+		{
+			TableName=ado.m_pRecordset->GetCollect(_T("TableName"));
+			RegName=ado.m_pRecordset->GetCollect(_T("Col_RegName"));
+			RegAddress=ado.m_pRecordset->GetCollect(_T("Col_RegAddress"));
+		}
+		//while (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+		//{
+		//	if (product_type==T3000_5ABCDFG_LED_ADDRESS)
+		//	{
+		//		tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
+		//		tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_AddressName"));
+		//		tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DATATYPE"));
+		//		tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_LEN"));
+		//		temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DESCRIPTION"));
+		//		if (temp_var.vt==VT_NULL)
+		//		{
+		//			tempstruct.Description=_T("");
+		//		} 
+		//		else
+		//		{
+		//			tempstruct.Description=temp_var;
+		//		}
+		//		temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_Operation"));
+		//		if (temp_var.vt==VT_NULL)
+		//		{
+		//			tempstruct.Description=_T("");
+		//		} 
+		//		else
+		//		{
+		//			tempstruct.Operation=temp_var;
+		//		}
+		//		/*	tempstruct.Description=(CString)ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DESCRIPTION"));*/
 
+		//	} 
+		//	else if (product_type==T3000_5EH_LCD_ADDRESS)
+		//	{
+		//		_variant_t vartemp;
+		//		tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
+		//		tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_AddressName"));
+		//		tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DATATYPE"));
+		//		tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_LEN"));
+		//		//tempstruct.Description=(CString)ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DESCRIPTION"));
+		//		vartemp=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DESCRIPTION"));
+		//		if (vartemp.vt==VT_NULL)
+		//		{
+		//			tempstruct.Description=_T("");
+		//		} 
+		//		else
+		//		{
+		//			tempstruct.Description=vartemp;
+		//		} 
+		//		temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_Operation"));
+		//		if (temp_var.vt==VT_NULL)
+		//		{
+		//			tempstruct.Description=_T("");
+		//		} 
+		//		else
+		//		{
+		//			tempstruct.Operation=temp_var;
+		//		}
+		//	}
+		//	else if (product_type==T3000_6_ADDRESS)
+		//	{
+		//		tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
+		//		tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT6_AddressName"));
+		//		tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT6_DATATYPE"));
+		//		tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT6_LEN"));
+		//		temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_DESCRIPTION")); 
+		//		if (temp_var.vt==VT_NULL)
+		//		{
+		//			tempstruct.Description=_T("");
+		//		} 
+		//		else
+		//		{
+		//			tempstruct.Description=temp_var;
+		//		}
+		//		temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_Operation"));
+		//		if (temp_var.vt==VT_NULL)
+		//		{
+		//			tempstruct.Description=_T("");
+		//		} 
+		//		else
+		//		{
+		//			tempstruct.Operation=temp_var;
+		//		}
+		//	}
+		//	if (tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)
+		//	{
+		//		ado.m_pRecordset->MoveNext();
+		//		continue;
+		//	}
+		//	m_VecregisterData.push_back(tempstruct);
+		//	m_recordcount++;
+		//	ado.m_pRecordset->MoveNext();
+	}
+	ado.CloseRecordset();
+	if (ado.IsHaveTable(ado,TableName))
+	{
+		DBRegister tempstuct;
+		CString sql;
+		sql.Format(_T("Select %s,%s from %s "),RegName,RegAddress,TableName);
+		ado.m_pRecordset=ado.OpenRecordset(sql);
+		while (!ado.m_pRecordset->EndOfFile)
+		{
+
+			 temp_var=ado.m_pRecordset->GetCollect(RegAddress.GetBuffer());
+			if (temp_var.vt!=NULL)
+			{
+				tempstuct.RegAddress=temp_var;
+			}
+			 temp_var=ado.m_pRecordset->GetCollect(RegName.GetBuffer());
+			 
+			if (temp_var.vt!=NULL)
+			{
+				tempstuct.RegName=temp_var;
+			}
+			m_VecregisterData.push_back(tempstuct);
+			ado.m_pRecordset->MoveNext();
+		}
+	}
+	ado.CloseConn();
+    
+	if (m_VecregisterData.size()>1)
+	{
+		int reglen=127;
+		if (m_VecregisterData.size()<127)
+		{
+			reglen=m_VecregisterData.size();
+		}
+		for (int i=0;i<reglen;i++)
+		{
+			m_Alias[i]=Find_RegName(i);
+		}
+	}
+   
+	m_ischangedAddress=FALSE;
+}
+CString CModbusPollView::Find_RegName(int index){
+	vector<DBRegister>::iterator it;
+	for (it=m_VecregisterData.begin();it!=m_VecregisterData.end();it++)
+	{ 
+		int tempregaddress=index+m_address;
+		if (it->RegAddress==tempregaddress)
+		{
+			return it->RegName;
+		}
+	}
+	return _T("");
+}
 void CModbusPollView::DoDataExchange(CDataExchange* pDX)
 {
 	CFormView::DoDataExchange(pDX);
@@ -90,6 +253,8 @@ void CModbusPollView::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CONNECTION_STATE, m_connectionState);
 	DDX_Control(pDX, IDC_STATIC_TX_RX, m_Tx_Rx);
 	DDX_Control(pDX, IDC_EDIT_NAME, m_edit_name);
+	DDX_Control(pDX, IDC_MODELNAME, m_ModelNameRichEdit);
+	DDX_Control(pDX, IDC_SLAVEID, m_SlaveIDRichEditCtrl);
 }
 
 BOOL CModbusPollView::PreCreateWindow(CREATESTRUCT& cs)
@@ -106,14 +271,23 @@ END_EVENTSINK_MAP()
 void CModbusPollView::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
+	COLORREF cf=RGB(212,208,200);
+	m_connectionState.SetReadOnly(TRUE);
+	m_connectionState.SetBackgroundColor(FALSE,cf);
+	         m_Tx_Rx.SetReadOnly(TRUE);
+			 m_Tx_Rx.SetBackgroundColor(FALSE,cf);
+	  
+	  m_ModelNameRichEdit.SetReadOnly(TRUE);
+	  m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
 
-	GetDlgItem(IDC_STATIC_TX_RX)->SetFont(cFont);
-	GetDlgItem(IDC_CONNECTION_STATE)->SetFont(cFont);
+	  m_SlaveIDRichEditCtrl.SetReadOnly(TRUE);
+	  m_SlaveIDRichEditCtrl.SetBackgroundColor(FALSE,cf);
+	 
 	ResizeParentToFit();
 
 	CRect ViewRect;
 	GetClientRect(&ViewRect);
-	TRACE(_T(" View:T=%d,B=%d,L=%d,R=%d\n"),ViewRect.top,ViewRect.bottom,ViewRect.left,ViewRect.right);
+	//TRACE(_T(" View:T=%d,B=%d,L=%d,R=%d\n"),ViewRect.top,ViewRect.bottom,ViewRect.left,ViewRect.right);
 	// m_MsDataGrid.SetWindowPos(this,ViewRect.top,ViewRect.left,ViewRect.Width(),ViewRect.Height(),SWP_SHOWWINDOW|SWP_NOZORDER);
 	if (m_MsDataGrid.GetSafeHwnd())
 	{
@@ -151,10 +325,11 @@ void CModbusPollView::OnInitialUpdate()
 	strTemp+=Stemp;
 	Stemp.Format(_T("F=%02d:  "),m_MBPoll_Function);
 	strTemp+=Stemp;
-	Stemp.Format(_T("Tx=%dms:  "),m_Scan_Rate);
+	Stemp.Format(_T("Tx=%dms  "),m_Scan_Rate);
 	strTemp+=Stemp;
 
 	m_Tx_Rx.SetWindowText(strTemp);
+	m_Tx_Rx.SetNumberDefaultFontSize(12);
 
 
 
@@ -212,33 +387,90 @@ void CModbusPollView::OnInitialUpdate()
 		pChildFrame=NULL;
 	}
 	
+// 	m_connectionState.SetReadOnly(TRUE);
+// 	m_Tx_Rx.SetReadOnly(TRUE);
+//     m_ModelNameRichEdit.SetReadOnly(TRUE);
+// 	m_SlaveIDRichEditCtrl.SetReadOnly(TRUE);
 
-
-
-	if(m_MultiRead_handle != NULL)
-		TerminateThread(m_MultiRead_handle, 0);
-	m_MultiRead_handle=NULL;
-	if (!m_MultiRead_handle)
-	{
-	 	m_MultiRead_handle = CreateThread(NULL,NULL,_Multi_Read_Fun03,this,NULL,0);
-	}
+// 	if(m_MultiRead_handle != NULL)
+// 		TerminateThread(m_MultiRead_handle, 0);
+// 	m_MultiRead_handle=NULL;
+// 	if (!m_MultiRead_handle)
+// 	{
+// 	 	m_MultiRead_handle = CreateThread(NULL,NULL,_Multi_Read_Fun03,this,NULL,0);
+// 	}
 }
 
 void CModbusPollView::Fresh_View(){
-
-	Fresh_Data();
+	               Fresh_Data();
 }
 void CModbusPollView::Fresh_Data(){
-	 
+	 /*
+		-1:no connection
+		-2:create write error
+		-3:create read error
+		-4:time out error
+		-5:crc error
+		*/
 
 	if (!g_online)
 	{
 		m_connectionState.SetWindowText(L"NO CONNECTION");
-		return;
+		m_connectionState.SetStringFontSize(12);
+		COLORREF cf=RGB(255,0,0);
+		m_connectionState.SetStringColor(cf);
+		//return;
 	} 
 	else
 	{
-		m_connectionState.SetWindowText(L"");
+		if (m_MultiReadReturnType==-1)
+		{
+			m_connectionState.SetWindowText(L"NO CONNECTION");
+			m_connectionState.SetStringFontSize(12);
+			COLORREF cf=RGB(255,0,0);
+			m_connectionState.SetStringColor(cf);
+			//return;
+		}
+		else if (m_MultiReadReturnType==-2)
+		{
+			m_connectionState.SetWindowText(L"Write Error");
+			m_connectionState.SetStringFontSize(12);
+			COLORREF cf=RGB(255,0,0);
+			m_connectionState.SetStringColor(cf);
+			//return;
+		}
+		else if (m_MultiReadReturnType==-3)
+		{
+			m_connectionState.SetWindowText(L"Read Error");
+			m_connectionState.SetStringFontSize(12);
+			COLORREF cf=RGB(255,0,0);
+			m_connectionState.SetStringColor(cf);
+			//return;
+		}
+		else if (m_MultiReadReturnType==-4)
+		{
+			m_connectionState.SetWindowText(L"Timeout Error");
+			m_connectionState.SetStringFontSize(12);
+			COLORREF cf=RGB(255,0,0);
+			m_connectionState.SetStringColor(cf);
+			//return;
+		}
+		else if (m_MultiReadReturnType==-5)
+		{
+			m_connectionState.SetWindowText(L"CRC Error");
+			m_connectionState.SetStringFontSize(12);
+			COLORREF cf=RGB(255,0,0);
+			m_connectionState.SetStringColor(cf);
+			//return;
+		}
+		else
+		{
+              m_connectionState.SetWindowText(L"");
+		}
+		
+// 		m_connectionState.SetStringFontSize(14);
+// 		COLORREF cf=RGB(0,0,0);
+// 		m_connectionState.SetStringColor(cf);
 	}
 	
 
@@ -271,11 +503,24 @@ void CModbusPollView::Fresh_Data(){
 	strTemp+=Stemp;
 	Stemp.Format(_T("F=%02d:  "),m_MBPoll_Function);
 	strTemp+=Stemp;
-	Stemp.Format(_T("Tx=%dms:  "),m_Scan_Rate);
+	Stemp.Format(_T("Tx=%dms  "),m_Scan_Rate);
 	strTemp+=Stemp;
 
 	m_Tx_Rx.SetWindowText(strTemp);
-
+	m_Tx_Rx.SetStringFontSize(15);
+	if (m_isgetmodel)
+	{
+		m_modelname=GetProductName(m_modeldata[1]);
+		CString showmodelname;
+		showmodelname.Format(_T("Model Name:%s"),m_modelname.GetBuffer());
+		m_ModelNameRichEdit.SetWindowText(showmodelname);
+		m_ModelNameRichEdit.SetStringFontSize(13);
+		CString showslaveid;
+		showslaveid.Format(_T("ID:%d"),m_modeldata[0]);
+		m_SlaveIDRichEditCtrl.SetWindowText(showslaveid);
+		m_SlaveIDRichEditCtrl.SetStringFontSize(13);
+	}
+	Initial_RegName();
 	if (m_Rows==0)
 	{
 		m_data_rows=10;
@@ -400,7 +645,7 @@ void CModbusPollView::Fresh_Data(){
 		 //初始化第0行
 		for (int i=1;i<m_MsDataGrid.get_Cols();i++)
 		{
-		index.Format(_T("%d"),(i-1)*(m_MsDataGrid.get_Rows()-1));
+		index.Format(_T("%d"),m_address+(i-1)*(m_MsDataGrid.get_Rows()-1));
 		m_MsDataGrid.put_TextMatrix(0,i,index);
 		}
 			for (int j=1;j<m_MsDataGrid.get_Cols();j++)
@@ -434,7 +679,7 @@ void CModbusPollView::Fresh_Data(){
 					 } 
 					 else
 					 {
-						 index.Format(_T("%d"),(i/2-1)*(m_MsDataGrid.get_Rows()-1));
+						 index.Format(_T("%d"),m_address+(i/2-1)*(m_MsDataGrid.get_Rows()-1));
 						 m_MsDataGrid.put_TextMatrix(0,i,index);
 					 }
                  } 
@@ -691,7 +936,7 @@ void CModbusPollView::OnSize(UINT nType, int cx, int cy)
 
 		 CRect ViewRect;
 		 GetClientRect(&ViewRect);
-		 TRACE(_T(" View:T=%d,B=%d,L=%d,R=%d\n"),ViewRect.top,ViewRect.bottom,ViewRect.left,ViewRect.right);
+		 //TRACE(_T(" View:T=%d,B=%d,L=%d,R=%d\n"),ViewRect.top,ViewRect.bottom,ViewRect.left,ViewRect.right);
 		// m_MsDataGrid.SetWindowPos(this,ViewRect.top,ViewRect.left,ViewRect.Width(),ViewRect.Height(),SWP_SHOWWINDOW|SWP_NOZORDER);
 		 if (m_MsDataGrid.GetSafeHwnd())
 		 {
@@ -818,28 +1063,8 @@ HBRUSH CModbusPollView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	// TODO:  Change any attributes of the DC here
 	switch (pWnd->GetDlgCtrlID())
 	{
-	case  IDC_CONNECTION_STATE:
-		{
-			 
-					pDC->SetBkMode(TRANSPARENT);
-					//设置背景为透明
-					pDC->SetTextColor(RGB(255,0,0)); //设置字体颜色
-					//pWnd->SetFont(cFont); //设置字体
-					//HBRUSH B = CreateSolidBrush(RGB(225,225,230));
-					//创建画刷
-					//return (HBRUSH) hbr; //返回画刷句柄
-		}
-	//case IDC_STATIC_TX_RX:
-	//	{
-	//		pDC->SetBkMode(TRANSPARENT);
-	//		//设置背景为透明
-	//		//pDC->SetTextColor(RGB(255,0,0)); //设置字体颜色
-	//	 
-	//		//HBRUSH B = CreateSolidBrush(RGB(190,190,190));
-	//		//创建画刷
-	//		//return (HBRUSH) B; //返回画刷句柄
-	//	}
-		 
+	 
+ 
 	 
 	 
 	}
@@ -1082,7 +1307,7 @@ void CModbusPollView::OnEnKillfocusEditName()
 		{
 			::PostMessage(pMBPollView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 		}
-		 
+		  continue;
 	}
 	//DataBuffer=pMBPollView->m_DataBuffer;
 	ID=pMBPollView->m_Slave_ID;
@@ -1105,27 +1330,18 @@ void CModbusPollView::OnEnKillfocusEditName()
 		ret=read_multi_log(ID,&DataBuffer[0],startAdd,quantity,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
 	}
 	register_critical_section.Unlock();
-
-
-
-
-
 	++g_Tx_Rx;
 	temp.Format(_T("%06d--"),g_Tx_Rx);
 	m_Tx+=temp;
-
 	for (int i=0;i<Send_length;i++)
 	{
 		temp.Format(_T("%02X "),send_data[i]);
 		m_Tx+=temp;
 	}
 	Traffic_Data(m_Tx);
-
-
 	++g_Tx_Rx;
 	temp.Format(_T("%06d--"),g_Tx_Rx);
 	m_Rx+=temp;
-
 	for(int i=0;i<Rev_length;i++){
 		temp.Format(_T("%02X "),rev_back_rawData[i]);
 		m_Rx+=temp;
@@ -1133,6 +1349,19 @@ void CModbusPollView::OnEnKillfocusEditName()
 
 	Traffic_Data(m_Rx);
 
+	/*if (!pMBPollView->m_isgetmodel)
+	{*/
+		unsigned char rev_back_rawData[300],send_data[100];
+		int tt=read_multi_log(ID,&pMBPollView->m_modeldata[0],6,2,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);
+		if (tt>0)
+		{
+			pMBPollView->m_isgetmodel=TRUE;
+		}
+		else
+		{
+			pMBPollView->m_isgetmodel=FALSE;
+		}
+	/*}*/
 
 	if (ret>0)//读的正确之后，我们才把值传给view显示
 	{
@@ -1144,12 +1373,13 @@ void CModbusPollView::OnEnKillfocusEditName()
 		++pMBPollView->m_Tx;
 		++pMBPollView->m_Err;
 	}
-	Sleep(sleep);
+	
 
 	if (pMBPollView->m_hWnd!=NULL)
 	{
 		::PostMessage(pMBPollView->m_hWnd,MY_FRESH_MBPOLLVIEW,0,0);
 	}
+	Sleep(sleep);
 	}
 
 	pMBPollView=NULL;

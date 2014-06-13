@@ -69,8 +69,123 @@ int read_one(unsigned char device_var,unsigned short address,int retry_times)
 		return value;
 	}
 }
+//val         the value that you want to write to the register
+//the return value == -1 ,no connecting
+//the return value == -2 ,try it again
+//the return value == -3,Maybe that have more than 2 Tstat is connecting
+//the return value == -4 ,between devLo and devHi,no Tstat is connected ,
+//the return value == -5 ,the input have some trouble
+//the return value == -6 , the bus has bannet protocol,scan stop;
+//the return value >=1 ,the devLo!=devHi,Maybe have 2 Tstat is connecting
+//Çå¿Õ´®¿Ú»º³åÇø
+//the return value is the register address
+//Sleep(50);       //must use this function to slow computer
+int g_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bComm_Type){
 
+	BOOL EnableRefreshTreeView_original_value = g_bEnableRefreshTreeView;
+	g_bEnableRefreshTreeView = false;
+	int j=-1;
+	// ensure no other threads attempt to access modbus communications
+		CSingleLock singleLock(&register_critical_section);
+		singleLock.Lock();
+		// call the modbus DLL method
+		j=CheckTstatOnline_a(devLo,devHi,bComm_Type);
+		// free the modbus communications for other threads
+		singleLock.Unlock();
+		// increment the number of transmissions we have done
+		g_llTxCount++;
+		// check for other errors
+		// increment the number or replies we have received
+		if (j!=-1&&j!=-4)
+		{
+			g_llRxCount++;
+		}
+	// check for running in the main GUI thread
+	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
 
+		// construct status message string
+		CString str;
+		str.Format(_T("San Command [Tx=%d Rx=%d Err=%d]"), 
+			g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+
+		//Display it
+		((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
+
+	}
+	g_bEnableRefreshTreeView |= EnableRefreshTreeView_original_value;
+	return j;
+}
+
+int g_NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bComm_Type){
+
+	BOOL EnableRefreshTreeView_original_value = g_bEnableRefreshTreeView;
+	g_bEnableRefreshTreeView = false;
+	int j=-1;
+	// ensure no other threads attempt to access modbus communications
+	CSingleLock singleLock(&register_critical_section);
+	singleLock.Lock();
+	// call the modbus DLL method
+	j=g_NetController_CheckTstatOnline_a(devLo,devHi,bComm_Type);
+	// free the modbus communications for other threads
+	singleLock.Unlock();
+	// increment the number of transmissions we have done
+	g_llTxCount++;
+	// check for other errors
+	// increment the number or replies we have received
+	if (j!=-1&&j!=-4)
+	{
+		g_llRxCount++;
+	}
+	// check for running in the main GUI thread
+	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
+
+		// construct status message string
+		CString str;
+		str.Format(_T("San Command [Tx=%d Rx=%d Err=%d]"), 
+			g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+
+		//Display it
+		((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
+
+	}
+	g_bEnableRefreshTreeView |= EnableRefreshTreeView_original_value;
+	return j;
+}
+int g_MINI_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bComm_Type){
+
+	BOOL EnableRefreshTreeView_original_value = g_bEnableRefreshTreeView;
+	g_bEnableRefreshTreeView = false;
+	int j=-1;
+	// ensure no other threads attempt to access modbus communications
+	CSingleLock singleLock(&register_critical_section);
+	singleLock.Lock();
+	// call the modbus DLL method
+	j=g_MINI_CheckTstatOnline_a(devLo,devHi,bComm_Type);
+	// free the modbus communications for other threads
+	singleLock.Unlock();
+	// increment the number of transmissions we have done
+	g_llTxCount++;
+	// check for other errors
+	// increment the number or replies we have received
+	if (j!=-1&&j!=-4)
+	{
+		g_llRxCount++;
+	}
+	// check for running in the main GUI thread
+	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
+
+		// construct status message string
+		CString str;
+		str.Format(_T("San Command [Tx=%d Rx=%d Err=%d]"), 
+			g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
+
+		//Display it
+		((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
+
+	}
+	g_bEnableRefreshTreeView |= EnableRefreshTreeView_original_value;
+	return j;
+}
 void SetPaneString(int nIndext,CString str)
 {
 	/*

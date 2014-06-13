@@ -55,9 +55,10 @@ void CWriteSingle_BinaryDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_MULTIPLE_REG_B, m_radio_mulitple);
 	DDX_Control(pDX, IDC_RADIO_SINGLE_REG_B,m_radio_single);
 
- 
+
 
 	DDX_Control(pDX, IDC_CHECK_CLOSE_DLG, m_closeCheck);
+	DDX_Control(pDX, IDC_EDIT_ADDRESS, m_editor_address);
 }
 
 
@@ -66,6 +67,7 @@ BEGIN_MESSAGE_MAP(CWriteSingle_BinaryDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIO_SINGLE_REG_B, &CWriteSingle_BinaryDlg::OnBnClickedRadioSingleRegB)
 	ON_BN_CLICKED(IDC_RADIO_MULTIPLE_REG_B, &CWriteSingle_BinaryDlg::OnBnClickedRadioMultipleRegB)
 	ON_BN_CLICKED(IDC_CHECK_CLOSE_DLG, &CWriteSingle_BinaryDlg::OnBnClickedCheckCloseDlg)
+	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 BOOL CWriteSingle_BinaryDlg::OnInitDialog(){
@@ -217,6 +219,11 @@ void CWriteSingle_BinaryDlg::OnBnClickedOk()
 			m_Rx+=temp;
 		}
 		Traffic_Data(m_Rx);
+		if (ret>0)
+		{
+			AfxMessageBox(_T("Write OK!"));
+			return;
+		}
 		if (ret<0)
 		{
 			AfxMessageBox(_T("Write Fail,Try,again!"));
@@ -255,7 +262,11 @@ void CWriteSingle_BinaryDlg::OnBnClickedOk()
 			m_Rx+=temp;
 		}
 		Traffic_Data(m_Rx);
-
+		if (ret>0)
+		{
+			AfxMessageBox(_T("Write OK!"));
+			return;
+		}
 		if (ret<0)
 		{
 			AfxMessageBox(_T("Write Fail,Try,again!"));
@@ -289,4 +300,14 @@ void CWriteSingle_BinaryDlg::OnBnClickedCheckCloseDlg()
 	// {
 		 m_close_dlg=!m_close_dlg;
 	 //}
+}
+
+
+void CWriteSingle_BinaryDlg::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+	// TODO: Add your message handler code here
+	// Do not call CDialogEx::OnPaint() for painting messages
+	m_editor_address.SetSel(0,-1);
+	m_editor_address.SetFocus();
 }
