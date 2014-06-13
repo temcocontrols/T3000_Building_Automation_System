@@ -22,11 +22,10 @@
 // CInputSetDlg dialog
 
 
-#define ANALOG_RANG_NUMBER 8
-// CString analog_range_0[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
-// CString analog_range_1[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KF Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
-CString analog_range_0[ANALOG_RANG_NUMBER]={_T("UNUSED"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied")};
-CString analog_range_1[ANALOG_RANG_NUMBER]={_T("UNUSED"),_T("10KF Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied")};
+#define ANALOG_RANG_NUMBER 11
+// CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
+// CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KF Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
+CString analog_range[ANALOG_RANG_NUMBER]={_T("UNUSED"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open")};
 CString INPUT_FUNS[8]={_T("Normal"),_T("Freeze Protect"),_T("Occupancy Sensor"),_T("Sweep Off"),_T("Clock"),_T("Changeover Mode"),_T("Outside Temp"),_T("Airflow")};
 
 //CString g_str5ERange2[5]={_T("Raw"),_T("Thermistor"),_T("On/Off"),_T("Off/On"),_T("%")};
@@ -139,7 +138,7 @@ DWORD WINAPI CInputSetDlg::StartRefresh(LPVOID lpVoid)
 	
 	register_critical_section.Lock();
 	pParent->b_is_fresh = true;
-	for( i=0;i<16;i++)
+	for( i=0;i<17;i++)
 	{
 		Read_Multi(g_tstat_id,&product_register_value[i*64],i*64,64);
 	}
@@ -191,7 +190,9 @@ BOOL CInputSetDlg::OnInitDialog()
 	m_AmCombox.ShowWindow(SW_HIDE);
 	m_inputFinCombox.ShowWindow(SW_HIDE);
 	m_customBtn.ShowWindow(SW_HIDE);
+	
 
+	m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
 //	m_FlexGrid.CellAlignment(1)=flexAlignCenterCenter;
 	m_nModel=product_register_value[MODBUS_PRODUCT_MODEL];
 	switch (m_nModel)
@@ -302,7 +303,7 @@ BOOL CInputSetDlg::OnInitDialog()
 	for(int i=1;i<m_inRows;i++)
 	{
 		CString strIndex;
-		strIndex.Format(_T("%d"), i);
+		strIndex.Format(_T("%d"), i-1);
 		m_FlexGrid.put_TextMatrix(i,INDEX_FIELD,strIndex);
 		switch(i)
 		{
@@ -377,7 +378,7 @@ void CInputSetDlg::Fresh_Grid()
 {
     
 
-	 m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
+	 
 
 	if(m_nModel == 16)
 	{
@@ -415,7 +416,7 @@ void CInputSetDlg::Fresh_Grid()
 	{
 		
 		
-		nValue=product_register_value[309];//MODBUS_INPUT_MANU_ENABLE309->545
+		nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];//MODBUS_INPUT_MANU_ENABLE309->545
 		 
 		if((nValue & 0x01)==1)
 		{
@@ -460,11 +461,11 @@ void CInputSetDlg::Fresh_Grid()
 
 					if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 					{
-						strTemp=analog_range_0[nValue];
+						strTemp=analog_range[nValue];
 					}
 					else
 					{
-						strTemp=analog_range_1[nValue];
+						strTemp=analog_range[nValue];
 					}
 					m_FlexGrid.put_TextMatrix(2,RANG_FIELD,strTemp);
 				}
@@ -477,11 +478,11 @@ void CInputSetDlg::Fresh_Grid()
 
 					if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 					{
-						strTemp=analog_range_0[nValue];
+						strTemp=analog_range[nValue];
 					}
 					else
 					{
-						strTemp=analog_range_1[nValue];
+						strTemp=analog_range[nValue];
 					}
 					m_FlexGrid.put_TextMatrix(2,RANG_FIELD,strTemp);
 				}
@@ -497,11 +498,11 @@ void CInputSetDlg::Fresh_Grid()
 
 				if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 				{
-					strTemp=analog_range_0[nValue];
+					strTemp=analog_range[nValue];
 				}
 				else
 				{
-					strTemp=analog_range_1[nValue];
+					strTemp=analog_range[nValue];
 				}
 				m_FlexGrid.put_TextMatrix(2,RANG_FIELD,strTemp);
 			}
@@ -594,7 +595,6 @@ void CInputSetDlg::Fresh_Grid()
 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
 							strTemp=_T("Off");
 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-
 							strTemp=_T("On");
 					} 
 					else
@@ -637,7 +637,7 @@ void CInputSetDlg::Fresh_Grid()
 	{
 
 	  
-		nValue=product_register_value[309];//MODBUS_INPUT_MANU_ENABLE309->545
+		nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];//MODBUS_INPUT_MANU_ENABLE309->545
 		 
 		if(((int)(nValue& 0x02)>>1)==1)
 		{
@@ -680,11 +680,11 @@ void CInputSetDlg::Fresh_Grid()
 
 					if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 					{
-						strTemp=analog_range_0[nValue];
+						strTemp=analog_range[nValue];
 					}
 					else
 					{
-						strTemp=analog_range_1[nValue];
+						strTemp=analog_range[nValue];
 					}
 					m_FlexGrid.put_TextMatrix(3,RANG_FIELD,strTemp);
 				}
@@ -697,11 +697,11 @@ void CInputSetDlg::Fresh_Grid()
 
 					if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 					{
-						strTemp=analog_range_0[nValue];
+						strTemp=analog_range[nValue];
 					}
 					else
 					{
-						strTemp=analog_range_1[nValue];
+						strTemp=analog_range[nValue];
 					}
 					m_FlexGrid.put_TextMatrix(3,RANG_FIELD,strTemp);
 				}
@@ -717,11 +717,11 @@ void CInputSetDlg::Fresh_Grid()
 
 				if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
 				{
-					strTemp=analog_range_0[nValue];
+					strTemp=analog_range[nValue];
 				}
 				else
 				{
-					strTemp=analog_range_1[nValue];
+					strTemp=analog_range[nValue];
 				}
 				m_FlexGrid.put_TextMatrix(3,RANG_FIELD,strTemp);
 			}
@@ -742,7 +742,7 @@ void CInputSetDlg::Fresh_Grid()
 			strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_1]);//181
 			strTemp=strTemp+strUnit;
 		}
-		nValue=product_register_value[309];
+		nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];
 		if (((int)(nValue& 0x02)>>1)==1) 
 		{
 		
@@ -1148,7 +1148,7 @@ void CInputSetDlg::Fresh_Grid()
 
 		
 		
-		nValue=product_register_value[545];//309MODBUS_INPUT_MANU_ENABLE-545
+		nValue=product_register_value[MODBUS_HUM_CAL_EREASE];//309MODBUS_INPUT_MANU_ENABLE-545
 		if(nValue==1)
 		{
 			m_FlexGrid.put_TextMatrix(4,AM_FIELD,strman);
@@ -1225,8 +1225,8 @@ void CInputSetDlg::ClickMsflexgrid1()
 	
 	if(lCol==VALUE_FIELD)
 	{
-		WORD wAM=product_register_value[309];
-		unsigned short AM_lrow4=product_register_value[545];
+		WORD wAM=product_register_value[MODBUS_INPUT_MANU_ENABLE];
+		unsigned short AM_lrow4=product_register_value[MODBUS_HUM_CAL_EREASE];
 		if(lRow==1)
 		{
 			m_inValueEdit.MoveWindow(rc); //移动到选中格的位置，覆盖
@@ -1601,14 +1601,14 @@ void CInputSetDlg::ClickMsflexgrid1()
 			{
 				for(int i=0;i<ANALOG_RANG_NUMBER;i++)
 				{
-					m_RangCombox.AddString(analog_range_0[i]);
+					m_RangCombox.AddString(analog_range[i]);
 				}
 			}
 			if(product_register_value[121]==1)
 			{
 				for(int i=0;i<ANALOG_RANG_NUMBER;i++)
 				{
-					m_RangCombox.AddString(analog_range_1[i]);
+					m_RangCombox.AddString(analog_range[i]);
 				}
 			}
 
@@ -1771,12 +1771,10 @@ void CInputSetDlg::OnCbnSelchangeRangCombo()
 		m_crange=nindext;
 		if (nindext==6)
 		{
-		
 		nindext=3;
 		}
 		if (nindext==7)
 		{
-		 
 		nindext=5;
 		}
 		 
@@ -2546,33 +2544,23 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
  
 void CInputSetDlg::InitGridtstat6()
    {
-	   if((product_register_value[20]&2)==2)
-	   {
-	       m_disable_hum=TRUE;
-	   }
-	   else
-	   {
-		   m_disable_hum=FALSE;
-	   }
-	   if((product_register_value[20]&4)==4)
-	   {
-		   m_disable_CO2=TRUE;
-	   }
-	   else
-	   {
-		   m_disable_CO2=FALSE;
-	   }
-	   m_FlexGrid.put_TextMatrix(1,INDEX_FIELD,_T("1"));
-	   m_FlexGrid.put_TextMatrix(2,INDEX_FIELD,_T("2"));
-	   m_FlexGrid.put_TextMatrix(3,INDEX_FIELD,_T("3"));
-	   m_FlexGrid.put_TextMatrix(4,INDEX_FIELD,_T("4"));
-	   m_FlexGrid.put_TextMatrix(5,INDEX_FIELD,_T("5"));
-	   m_FlexGrid.put_TextMatrix(6,INDEX_FIELD,_T("6"));
-	   m_FlexGrid.put_TextMatrix(7,INDEX_FIELD,_T("7"));
-	   m_FlexGrid.put_TextMatrix(8,INDEX_FIELD,_T("8"));
-	   m_FlexGrid.put_TextMatrix(9,INDEX_FIELD,_T("9")); 
-	   m_FlexGrid.put_TextMatrix(10,INDEX_FIELD,_T("10"));
-	   m_FlexGrid.put_TextMatrix(11,INDEX_FIELD,_T("11"));
+ 	   if((product_register_value[20]&2)==2)
+ 	   {
+ 	       m_disable_hum=TRUE;
+ 	   }
+ 	   else
+ 	   {
+ 		   m_disable_hum=FALSE;
+ 	   }
+ 	   if((product_register_value[20]&4)==4)
+ 	   {
+ 		   m_disable_CO2=TRUE;
+ 	   }
+ 	   else
+ 	   {
+ 		   m_disable_CO2=FALSE;
+ 	   }
+	  
 
 	   m_FlexGrid.put_TextMatrix(1,NAME_FIELD,g_strSensorName);
 	   m_FlexGrid.put_TextMatrix(2,NAME_FIELD,g_strInName1);
@@ -2593,12 +2581,13 @@ void CInputSetDlg::InitGridtstat6()
 	   //float nValue=0;
 	   CString strAuto=_T("Auto");
 	   CString strman=_T("Manual");
-
+	 
+	   m_fFirmwareVersion = get_curtstat_version();
 
 	   for(int i=1;i<=9;i++)
 	   {	
 		   CString strIndex;
-		   strIndex.Format(_T("%d"), i);
+		   strIndex.Format(_T("%d"), i-1);
 		   m_FlexGrid.put_TextMatrix(i,INDEX_FIELD,strIndex);
 
 		   for(int k=0;k<=8;k++)
@@ -2614,8 +2603,7 @@ void CInputSetDlg::InitGridtstat6()
 			   }
 		   }
 
-		   CString strTemp;
-		   m_fFirmwareVersion = get_curtstat_version();
+		  
 		   if(m_fFirmwareVersion>33.3)
 		   {
 			   float fValue;
@@ -2686,46 +2674,7 @@ void CInputSetDlg::InitGridtstat6()
 
 
 			   CString strValueUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+i-2], 1); //5e=359   122
-			   {
-				   if(product_register_value[MODBUS_ANALOG1_RANGE+i-2]==1)	//359  122
-				   {				
-					   fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-2]/10.0);	//367   131
-					   strTemp.Format(_T("%.1f"),fValue);	
 
-					   strTemp +=strValueUnit;
-				   }
-				   else if(product_register_value[MODBUS_ANALOG1_RANGE+i-2]==3 || product_register_value[MODBUS_ANALOG1_RANGE+i-2]==5) // On/Off or Off/On ==1 On ==0 Off   359  122
-				   {						
-					   int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
-					   if (nValue == 0)
-					   {
-						   strTemp = _T("Off");
-					   }
-					   else
-					   {
-						   strTemp = _T("On");
-					   }					
-				   }
-				   else if (product_register_value[MODBUS_ANALOG1_RANGE+i-2]==4 )  // custom sensor	359 122
-				   {					
-					   fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-2]/10.0);	//367  131
-					   strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
-					   strTemp +=strValueUnit;
-				   }
-				   else if(product_register_value[MODBUS_ANALOG1_RANGE+i-2]==2)	//359 122
-				   {
-					   nValue=product_register_value[MODBUS_ANALOG_INPUT1+i-2];		//367  131
-					   strTemp.Format(_T("%0.1f%%"),  (float)nValue);
-				   }
-				   else
-				   {
-					   //strTemp.Format(_T("%d"),product_register_value[367+i-2]);//lsc
-					   strTemp.Format(_T("UNUSED"));
-
-				   }						
-				   m_FlexGrid.put_TextMatrix(i,VALUE_FIELD,strTemp);
-				   strTemp.Empty();
-			   }
 
 			   //309	141	2	Full	W/R	Input auto/ manual enable.
 			   // column 2  Auto/Manual // Ö»ÓÐIN1£¬2²ÅÓÐ,internal sensor Ã»ÓÐ£¬´óÓÚ1 // 
@@ -2759,14 +2708,127 @@ void CInputSetDlg::InitGridtstat6()
 			    m_FlexGrid.put_TextMatrix(i,FILTER,strTemp);		
 			   // column 4  Range 
 			   //if( i >= 2 )
-			   {
-				   int nItem=product_register_value[MODBUS_ANALOG1_RANGE+i-2];		//359  122
-				   if(nItem>=0 && nItem<=5)
-				   {
-					   strTemp=analog_range_0[nItem];
-				   }
-				   m_FlexGrid.put_TextMatrix(i,RANG_FIELD,strTemp);
-			   }
+
+				m_crange=0;
+				CADO ado;
+				ado.OnInitADOConn();
+				if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+				{
+					CString sql;
+					sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),i-1,m_sn);
+					ado.m_pRecordset=ado.OpenRecordset(sql);
+					if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+					{    
+						ado.m_pRecordset->MoveFirst();
+						while (!ado.m_pRecordset->EndOfFile)
+						{
+							m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
+							ado.m_pRecordset->MoveNext();
+						}
+						nValue=m_crange;	 
+						if(nValue>=0)
+						{
+							strTemp=analog_range[nValue];
+						}
+					} 
+					else
+					{
+						nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];	//189
+						if(nValue>=0)
+						{
+						strTemp=analog_range[nValue]; 
+						}
+					}
+					ado.CloseRecordset();
+				}
+				else
+				{
+					nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];	//189
+					if(nValue>=0)
+					{
+							strTemp=analog_range[nValue]; 
+					}
+				}
+				ado.CloseConn();
+			   m_FlexGrid.put_TextMatrix(i,RANG_FIELD,strTemp);
+			   
+
+
+			{
+				if(product_register_value[MODBUS_ANALOG1_RANGE+i-2]==1)	//359  122
+				{				
+					fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-2]/10.0);	//367   131
+					strTemp.Format(_T("%.1f"),fValue);	
+
+					strTemp +=strValueUnit;
+				}
+				else if(product_register_value[MODBUS_ANALOG1_RANGE+i-2]==3 || product_register_value[MODBUS_ANALOG1_RANGE+i-2]==5) // On/Off or Off/On ==1 On ==0 Off   359  122
+				{						
+					if (m_crange==9||m_crange==10)
+					{
+						int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
+						if (nValue == 0)
+						{
+							strTemp = _T("Closed");
+						}
+						else
+						{
+							strTemp = _T("Open");
+						}	
+					}
+					else if (m_crange==7||m_crange==8)
+					{
+						 
+							int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
+							if (nValue == 0)
+							{
+								strTemp = _T("Unoccupied");
+							}
+							else
+							{
+								strTemp = _T("Occupied");
+							}	
+					 
+					}
+					else
+					{
+						 
+							int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
+							if (nValue == 0)
+							{
+								strTemp = _T("Off");
+							}
+							else
+							{
+								strTemp = _T("On");
+							}	
+						 
+					}
+					
+									
+				}
+				else if (product_register_value[MODBUS_ANALOG1_RANGE+i-2]==4 )  // custom sensor	359 122
+				{					
+					fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-2]/10.0);	//367  131
+					strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
+					strTemp +=strValueUnit;
+				}
+				else if(product_register_value[MODBUS_ANALOG1_RANGE+i-2]==2)	//359 122
+				{
+					nValue=product_register_value[MODBUS_ANALOG_INPUT1+i-2];		//367  131
+					strTemp.Format(_T("%0.1f%%"),  (float)nValue);
+				}
+				else
+				{
+					//strTemp.Format(_T("%d"),product_register_value[367+i-2]);//lsc
+					strTemp.Format(_T("UNUSED"));
+
+				}						
+				m_FlexGrid.put_TextMatrix(i,VALUE_FIELD,strTemp);
+				strTemp.Empty();
+			}
+
+
 
 			   //298	167	1	Low byte	W/R	Analog input1 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
 			   // column 5 Function Ö»ÓÐIN1£¬2²ÅÓÐ
@@ -2864,52 +2926,80 @@ void CInputSetDlg::InitGridtstat6()
 			   int nItem=product_register_value[341+i-2];
 			   if(nItem>=0&&nItem<=4)
 			   {
-				   strTemp=analog_range_0[nItem];					
+				   strTemp=analog_range[nItem];					
 			   }
 			   m_FlexGrid.put_TextMatrix(i,AM_FIELD,strTemp);
 		   }
 
 	   }
-	   	 CString temp;
-	   if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
+	   if (!m_disable_hum)
 	   {
+		   for (int col=0;col<TOTAL_COLS;col++)
+		   {
+			   m_FlexGrid.put_Col(col);
+			   m_FlexGrid.put_Row(10);
+			   m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+		   }
 
-		   temp.Format(_T("%0.1f%%"),(float)product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10.0);
-		    m_FlexGrid.put_TextMatrix(10,AM_FIELD,strAuto);
 	   }
 	   else
 	   {
-	       m_FlexGrid.put_TextMatrix(10,AM_FIELD,strman);
-		   temp.Format(_T("%0.1f%%"),(float)product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10);
 
+		   CString temp;
+		   if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
+		   {
+
+			   temp.Format(_T("%0.1f%%"),(float)product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10.0);
+			   m_FlexGrid.put_TextMatrix(10,AM_FIELD,strAuto);
+		   }
+		   else
+		   {
+			   m_FlexGrid.put_TextMatrix(10,AM_FIELD,strman);
+			   temp.Format(_T("%0.1f%%"),(float)product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10);
+
+		   }
+		   m_FlexGrid.put_TextMatrix(10,VALUE_FIELD,temp);
+		   m_FlexGrid.put_TextMatrix(10,CAL_FIELD,_T("Adjust..."));
+		   temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_HUM_FILTER]);
+		   m_FlexGrid.put_TextMatrix(10,FILTER,temp);
 	   }
-
-	  
-
-
-	   m_FlexGrid.put_TextMatrix(10,VALUE_FIELD,temp);
-	   m_FlexGrid.put_TextMatrix(10,CAL_FIELD,_T("Adjust..."));
-	    temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_HUM_FILTER]);
-		m_FlexGrid.put_TextMatrix(10,FILTER,temp);
-
-	   if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
-	   {     strUnit=_T("ppm");
-	   m_FlexGrid.put_TextMatrix(11,AM_FIELD,strAuto);
-	   temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
-	   temp+=strUnit;
-	   m_FlexGrid.put_TextMatrix(11,VALUE_FIELD,temp);
-	   }
+	 /*  m_FlexGrid.put_Col(FILTER);
+				   m_FlexGrid.put_Row(i);
+				   m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);*/
+	   if (!m_disable_CO2)
+	   {
+		   for (int col=0;col<TOTAL_COLS;col++)
+		   {
+			   m_FlexGrid.put_Col(col);
+			   m_FlexGrid.put_Row(11);
+			   m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+		   }
+	   } 
 	   else
 	   {
-		   m_FlexGrid.put_TextMatrix(11,AM_FIELD,strman);
-		   temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
+		   CString temp;
+		   if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
+		   {     strUnit=_T("ppm");
+		   m_FlexGrid.put_TextMatrix(11,AM_FIELD,strAuto);
+		   temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
 		   temp+=strUnit;
 		   m_FlexGrid.put_TextMatrix(11,VALUE_FIELD,temp);
-	   }	
-	   m_FlexGrid.put_TextMatrix(11,CAL_FIELD,_T("Adjust..."));
-	   temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_FILTER]);
-	   m_FlexGrid.put_TextMatrix(11,FILTER,temp);
+		   }
+		   else
+		   {
+			   m_FlexGrid.put_TextMatrix(11,AM_FIELD,strman);
+			   temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
+			   temp+=strUnit;
+			   m_FlexGrid.put_TextMatrix(11,VALUE_FIELD,temp);
+		   }	
+		   m_FlexGrid.put_TextMatrix(11,CAL_FIELD,_T("Adjust..."));
+		   temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_FILTER]);
+		   m_FlexGrid.put_TextMatrix(11,FILTER,temp);
+	   }
+	   
+
    }
+
 void CInputSetDlg::Init_not_5ABCD_Grid()
 {
 	m_FlexGrid.put_TextMatrix(1,NAME_FIELD,g_strSensorName);
@@ -2933,7 +3023,7 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 	for(int i=1;i<=9;i++)
 	{	
 		CString strIndex;
-		strIndex.Format(_T("%d"), i);
+		strIndex.Format(_T("%d"), i-1);
 		m_FlexGrid.put_TextMatrix(i,INDEX_FIELD,strIndex);
 
 		for(int k=0;k<=6;k++)
@@ -3012,7 +3102,178 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 			// 						16	138	2	Full	W/R	Analog input8 value
 
 
+			//m_crange=0;
+			//CADO ado;
+			//ado.OnInitADOConn();
+			//if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+			//{
+			//	CString sql;
+			//	sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),1,m_sn);
+			//	ado.m_pRecordset=ado.OpenRecordset(sql);
 
+			//	if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+			//	{    
+			//		ado.m_pRecordset->MoveFirst();
+			//		while (!ado.m_pRecordset->EndOfFile)
+			//		{
+			//			m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
+			//			ado.m_pRecordset->MoveNext();
+			//		}
+
+			//		nValue=m_crange;	 
+			//		if(nValue>=0)
+			//		{
+
+			//			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
+			//			{
+			//				strTemp=analog_range[nValue];
+			//			}
+			//			else
+			//			{
+			//				strTemp=analog_range[nValue];
+			//			}
+			//			m_FlexGrid.put_TextMatrix(2,RANG_FIELD,strTemp);
+			//		}
+			//	} 
+			//	else
+			//	{
+			//		nValue=product_register_value[MODBUS_ANALOG_IN1];	//189
+			//		if(nValue>=0)
+			//		{
+
+			//			if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
+			//			{
+			//				strTemp=analog_range[nValue];
+			//			}
+			//			else
+			//			{
+			//				strTemp=analog_range[nValue];
+			//			}
+			//			m_FlexGrid.put_TextMatrix(2,RANG_FIELD,strTemp);
+			//		}
+			//	}
+
+			//	ado.CloseRecordset();
+			//}
+			//else
+			//{
+			//	nValue=product_register_value[MODBUS_ANALOG_IN1];	//189
+			//	if(nValue>=0)
+			//	{
+
+			//		if(product_register_value[MODBUS_DEGC_OR_F]==0)//121
+			//		{
+			//			strTemp=analog_range[nValue];
+			//		}
+			//		else
+			//		{
+			//			strTemp=analog_range[nValue];
+			//		}
+			//		m_FlexGrid.put_TextMatrix(2,RANG_FIELD,strTemp);
+			//	}
+			//}
+			//ado.CloseConn();
+
+
+
+
+
+// 			strTemp.Empty();
+// 			strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
+// 			if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)//188
+// 			{	
+// 				strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_0]/10);	//180
+// 				strTemp=strTemp+strUnit;
+// 			}
+// 			if(product_register_value[MODBUS_ANALOG_IN1]==0)
+// 			{
+// 				// 		strTemp.Format(_T("%d"),product_register_value[180]);
+// 				// 		strTemp=strTemp;
+// 				strTemp=_T("UNUSED");//2.5.0.98
+// 			}
+// 			if(product_register_value[MODBUS_ANALOG_IN1]==2)
+// 			{
+// 				strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_0]);//180
+// 				strTemp=strTemp+_T("%");
+// 			}
+
+// 			if ((nValue & 0x01)==1)//Auto Model
+// 			{
+// 
+// 				if(product_register_value[MODBUS_ANALOG_IN1]==3 || product_register_value[MODBUS_ANALOG_IN1]==5)
+// 				{
+// 
+// 					if (m_crange==6||m_crange==7)
+// 					{
+// 
+// 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
+// 							strTemp=_T("Occupied");
+// 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
+// 							strTemp=_T("Unoccupied");
+// 
+// 
+// 					} 
+// 					else
+// 					{
+// 
+// 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
+// 							strTemp=_T("Off");
+// 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
+// 							strTemp=_T("On");
+// 
+// 					}
+// 
+// 
+// 				}
+// 
+// 
+// 			}
+			//else//Mannul
+			//{
+			//	if(product_register_value[MODBUS_ANALOG_IN1]==3 || product_register_value[MODBUS_ANALOG_IN1]==5)
+			//	{
+
+			//		if (m_crange==6||m_crange==7)
+			//		{
+			//			if (m_crange==6)
+			//			{
+			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
+			//					strTemp=_T("Occupied");
+			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
+			//					strTemp=_T("Unoccupied");
+			//			} 
+			//			else
+			//			{
+			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
+			//					strTemp=_T("Unoccupied");
+			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
+			//					strTemp=_T("Occupied");
+
+
+			//			}
+
+			//		} 
+			//		else
+			//		{
+			//			if (product_register_value[MODBUS_ANALOG_IN1]==3)
+			//			{
+			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
+			//					strTemp=_T("Off");
+			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
+			//					strTemp=_T("On");
+			//			} 
+			//			else
+			//			{
+			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
+			//					strTemp=_T("On");
+			//				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
+			//					strTemp=_T("Off");
+			//			}
+			//		}
+
+
+			//	}
+			//}
 
 			CString strValueUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+i-2], i-1); //5e=359   122
 			{
@@ -3033,7 +3294,8 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 					else
 					{
 						strTemp = _T("Off");
-					}					
+					}	
+
 				}
 				else if (product_register_value[MODBUS_ANALOG1_RANGE+i-2]==4 )  // custom sensor	359 122
 				{					
@@ -3090,7 +3352,7 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 				int nItem=product_register_value[MODBUS_ANALOG1_RANGE+i-2];		//359  122
 				if(nItem>=0 && nItem<=5)
 				{
-					strTemp=analog_range_0[nItem];
+					strTemp=analog_range[nItem];
 				}
 				m_FlexGrid.put_TextMatrix(i,RANG_FIELD,strTemp);
 			}
@@ -3188,7 +3450,7 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 			int nItem=product_register_value[341+i-2];
 			if(nItem>=0&&nItem<=4)
 			{
-				strTemp=analog_range_0[nItem];					
+				strTemp=analog_range[nItem];					
 			}
 			m_FlexGrid.put_TextMatrix(i,AM_FIELD,strTemp);
 		}
@@ -3245,16 +3507,8 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 	{
 		//309	141	2	Full	W/R	Input auto/ manual enable.
 		int nValue;// = product_register_value[309];
-		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-		{
-			nValue = product_register_value[141];
-		}
-		else
-		{
-			nValue = product_register_value[309];
-
-		}
-
+	 
+		nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];
 
 		int nFilter = 0x01;
 		nFilter = nFilter << (m_nCurRow - 1);
@@ -3265,12 +3519,24 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 			int nRangeValue = product_register_value[359+m_nCurRow-2];
 
 
-			if (nRangeValue == 3)  // 如果是on/off，用combo
+			if (nRangeValue == 3||nRangeValue==5)  // 如果是on/off，用combo
 			{	
 				m_valueCombx.ResetContent();
+				if (m_crange==9||m_crange==10)
+				{
+					m_valueCombx.InsertString(0,_T("Unoccupied"));
+					m_valueCombx.InsertString(1,_T("Occupied"));
+				}
+				else if (m_crange==7||m_crange==8)
+				{
+					m_valueCombx.InsertString(0,_T("Closed"));
+					m_valueCombx.InsertString(1,_T("Open"));
+				}
+				else{
+					m_valueCombx.InsertString(0,_T("Off"));
+					m_valueCombx.InsertString(1,_T("On"));
+				}
 
-				m_valueCombx.InsertString(0,_T("On"));
-				m_valueCombx.InsertString(1,_T("Off"));
 
 				m_valueCombx.MoveWindow(rcCell); //移动到选中格的位置，覆盖
 				m_valueCombx.ShowWindow(SW_SHOW);
@@ -3308,13 +3574,8 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 		//309	141	2	Full	W/R	Input auto/ manual enable.
 		BYTE nValue;// =BYTE(product_register_value[309]);
 	
-		if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-		{
-			nValue=BYTE(product_register_value[141]);
-		}else
-		{
-			nValue=BYTE(product_register_value[309]);
-		}
+		 
+		nValue=BYTE(product_register_value[MODBUS_INPUT_MANU_ENABLE]);
 		BYTE nFilter = 0x01;
 		nFilter = nFilter << (nRow-1);
 		if(nValue & nFilter)
@@ -3386,16 +3647,9 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 				////309	141	2	Full	W/R	Input auto/ manual enable.
 				BYTE nValue;// =BYTE(product_register_value[309]);
 			
-				if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
-				{
-					nValue =BYTE(product_register_value[141]);
+				 
 
-				}else
-				{
-					nValue =BYTE(product_register_value[309]);
-				}
-
-				
+				nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];
 				BYTE nFilter = 0x01;
 				nFilter = nFilter << (nRow-1);
 				if(nValue & nFilter) // only sel Auto, can calibrate
@@ -3474,17 +3728,17 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 				{
 					for(int i=0;i<ANALOG_RANG_NUMBER;i++)
 					{
-						m_RangCombox.AddString(analog_range_0[i]);
+						m_RangCombox.AddString(analog_range[i]);
 					}	
-					strTemp = analog_range_0[nValue];
+					strTemp = analog_range[nValue];
 				}
 				if(product_register_value[104]==1)
 				{
 					for(int i=0;i<ANALOG_RANG_NUMBER;i++)
 					{
-						m_RangCombox.AddString(analog_range_1[i]);
+						m_RangCombox.AddString(analog_range[i]);
 					}
-					strTemp = analog_range_1[nValue];
+					strTemp = analog_range[nValue];
 				}
 			}else
 			{
@@ -3493,17 +3747,17 @@ void CInputSetDlg::OnClickTstat6Grid(int nRow, int nCol, CRect rcCell)
 				{
 					for(int i=0;i<ANALOG_RANG_NUMBER;i++)
 					{
-						m_RangCombox.AddString(analog_range_0[i]);
+						m_RangCombox.AddString(analog_range[i]);
 					}	
-					strTemp = analog_range_0[nValue];
+					strTemp = analog_range[nValue];
 				}
 				if(product_register_value[121]==1)
 				{
 					for(int i=0;i<ANALOG_RANG_NUMBER;i++)
 					{
-						m_RangCombox.AddString(analog_range_1[i]);
+						m_RangCombox.AddString(analog_range[i]);
 					}
-					strTemp = analog_range_1[nValue];
+					strTemp = analog_range[nValue];
 				}	
 			}
 
@@ -3589,60 +3843,50 @@ void CInputSetDlg::OnCbnSelchangeRangComboFor5E()
 	}
 
 
-
+	//CString analog_range[ANALOG_RANG_NUMBER]={_T("UNUSED"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),
+	//	_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open")};
 
 	if(m_nCurRow >= 2 && m_nCurCol==RANG_FIELD)
 	{
-
-		vector<int> vet_Row;
-		for (int i=0;i<8;i++)
+		  m_crange=m_RangCombox.GetCurSel();
+		int regvalue=m_crange;
+		//_T("On/Off")=_T("Occupied/Unoccupied")=_T("Open/Close")
+		//_T("Off/On")=,_T("Unoccupied/Occupied")=_T("Close/Open")
+		//
+		if (m_crange==9||m_crange==7)
 		{
-			if (product_register_value[MODBUS_ANALOG1_RANGE+i]==4)
-			{   
-				vet_Row.push_back(i);
-			}
+			regvalue=3;
 		}
-		if (vet_Row.size()>=2)
+		if (m_crange==10||m_crange==8)
 		{
-			int nindext=m_RangCombox.GetCurSel();
-			if (nindext!=4)
-			{
-				int ret=write_one(g_tstat_id,MODBUS_ANALOG1_RANGE+m_nCurRow-2,nindext);	//5e=359  6=122
-				if(ret<0)
-				{
-					AfxMessageBox(_T("Write Fail!Please try again!"));
-					return;
-				}
-				product_register_value[MODBUS_ANALOG1_RANGE+m_nCurRow-2] = nindext;
-				Fresh_Grid();
-			}
-			//if ((product_register_value[7] == 6)||(product_register_value[7] == 7))//tstat6
-			else
-			{
-				AfxMessageBox(_T("More than 2 rows for custom sensor"));
-				
-			}
-
-			return;
-
-
+			regvalue=5;
 		}
-		 
-
-
-
-
-
-
-		int nindext=m_RangCombox.GetCurSel();
-		//if ((product_register_value[7] == 6)||(product_register_value[7] == 7))//tstat6
-		int ret=write_one(g_tstat_id,MODBUS_ANALOG1_RANGE+m_nCurRow-2,nindext);	//5e=359  6=122
+		int ret=write_one(g_tstat_id,MODBUS_ANALOG1_RANGE+m_nCurRow-2,regvalue);	//5e=359  6=122
 		if(ret<0)
 		{
 			AfxMessageBox(_T("Write Fail!Please try again!"));
 			return;
 		}
-		product_register_value[MODBUS_ANALOG1_RANGE+m_nCurRow-2] = nindext;
+		product_register_value[MODBUS_ANALOG1_RANGE+m_nCurRow-2] = regvalue;
+
+		CADO ado;
+		ado.OnInitADOConn();
+		CString sql;
+		sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),m_nCurRow-1,m_sn);
+		ado.m_pRecordset=ado.OpenRecordset(sql);
+
+		if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+		{
+			sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),m_crange,m_nCurRow-1,m_sn);
+			ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+		}
+		else
+		{
+			sql.Format(_T("Insert into Value_Range ( SN,CInputNo,CRange) values('%d','%d','%d')"),m_sn,m_nCurRow-1,m_crange);
+			ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+		}
+		ado.CloseRecordset();
+		ado.CloseConn();
 
 
 
@@ -3874,23 +4118,23 @@ void CInputSetDlg::OnCbnSelchangeAmcombo()
 	}
 	else
 	{
-	    if (m_nCurRow==4)
-	    {
-		 int nValue =product_register_value[545];
-		 if (nValue!=m_AmCombox.GetCurSel())
-		 {   nValue=m_AmCombox.GetCurSel();
-			 int nRet = write_one(g_tstat_id,545,nValue); 
-			 if(nRet<0)
-			 {
-				 AfxMessageBox(_T("Access fail!Retry it later!"));
-			 }
-			 product_register_value[545] = nValue;
-			 
-		 }
-	    }
+		if (m_nCurRow==4)
+		{
+			int nValue =product_register_value[545];
+			if (nValue!=m_AmCombox.GetCurSel())
+			{   nValue=m_AmCombox.GetCurSel();
+			int nRet = write_one(g_tstat_id,545,nValue); 
+			if(nRet<0)
+			{
+				AfxMessageBox(_T("Access fail!Retry it later!"));
+			}
+			product_register_value[545] = nValue;
+
+			}
+		}
 		else
 		{
-			int	nValue = product_register_value[309];//MODBUS_INPUT_MANU_ENABLE
+			int	nValue = product_register_value[MODBUS_INPUT_MANU_ENABLE];//MODBUS_INPUT_MANU_ENABLE
 			if(m_AmCombox.GetCurSel()==1)
 			{ // Manual
 				int nFilter = 0x01;
@@ -3906,13 +4150,13 @@ void CInputSetDlg::OnCbnSelchangeAmcombo()
 				nValue = nValue & nFilter;
 			}	
 			//MODBUS_INPUT_MANU_ENABLE
-			int nRet = write_one(g_tstat_id,309,nValue);//309  141
+			int nRet = write_one(g_tstat_id,MODBUS_INPUT_MANU_ENABLE,nValue);//309  141
 			if(nRet<0)
 			{
 				AfxMessageBox(_T("Access fail!Retry it later!"));
 			}
-			product_register_value[309] = nValue;
-		}
+			product_register_value[MODBUS_INPUT_MANU_ENABLE] = nValue;
+		}//nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];
 		
 	}
 
@@ -4016,7 +4260,7 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 	//
 	if (nCol == VALUE_FIELD)
 	{
-		int nValue = product_register_value[309];
+		int nValue = product_register_value[MODBUS_INPUT_MANU_ENABLE];
 		int nFilter = 0x01;
 		nFilter = nFilter << (m_nCurRow - 1);
 		CString strValue = m_FlexGrid.get_TextMatrix(nRow,nCol);
@@ -4062,7 +4306,7 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 		m_AmCombox.ShowWindow(SW_SHOW);//显示控件
 		m_AmCombox.SetFocus(); //获取焦点
 		CString strTemp;
-		BYTE nValue =BYTE(product_register_value[309]);
+		BYTE nValue =BYTE(product_register_value[MODBUS_INPUT_MANU_ENABLE]);
 		BYTE nFilter = 0x01;
 		nFilter = nFilter << (nRow-1);
 		if(nValue & nFilter)
@@ -4118,7 +4362,7 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 			}
 			else
 			{
-				BYTE nValue =BYTE(product_register_value[309]);
+				BYTE nValue =BYTE(product_register_value[MODBUS_INPUT_MANU_ENABLE]);
 				BYTE nFilter = 0x01;
 				nFilter = nFilter << (nRow-1);
 				if(nValue & nFilter) // only sel Auto, can calibrate
@@ -4162,17 +4406,17 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 			{
 				for(int i=0;i<ANALOG_RANG_NUMBER;i++)
 				{
-					m_RangCombox.AddString(analog_range_0[i]);
+					m_RangCombox.AddString(analog_range[i]);
 				}	
-				strTemp = analog_range_0[nValue];
+				strTemp = analog_range[nValue];
 			}
 			if(product_register_value[121]==1)
 			{
 				for(int i=0;i<ANALOG_RANG_NUMBER;i++)
 				{
-					m_RangCombox.AddString(analog_range_1[i]);
+					m_RangCombox.AddString(analog_range[i]);
 				}
-				strTemp = analog_range_1[nValue];
+				strTemp = analog_range[nValue];
 			}	
 		}
 		m_RangCombox.SetWindowText(strTemp);
@@ -4356,7 +4600,7 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 //				int nItem=product_register_value[359+i-2];
 //				if(nItem>=0 && nItem<=5)
 //				{
-//					strTemp=analog_range_0[nItem];
+//					strTemp=analog_range[nItem];
 //				}
 //				m_FlexGrid.put_TextMatrix(i,RANG_FIELD,strTemp);
 //			}
@@ -4416,7 +4660,7 @@ void CInputSetDlg::ClickMsflexgrid5E( int nRow, int nCol, CRect rcCell )
 //			int nItem=product_register_value[341+i-2];
 //			if(nItem>=0&&nItem<=4)
 //			{
-//				strTemp=analog_range_0[nItem];					
+//				strTemp=analog_range[nItem];					
 //			}
 //			m_FlexGrid.put_TextMatrix(i,AM_FIELD,strTemp);
 //		}

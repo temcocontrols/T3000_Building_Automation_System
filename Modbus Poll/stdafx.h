@@ -47,7 +47,7 @@ using namespace std;  // Ensure that the namespace is set to std
 
 #define WM_TRAFFIC_DATA_WINDOW  WM_USER + 111
 
-
+#import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 #ifdef _UNICODE
 #if defined _M_IX86
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")

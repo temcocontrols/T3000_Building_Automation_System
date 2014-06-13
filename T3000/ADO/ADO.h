@@ -1,4 +1,5 @@
 #pragma once
+
 class  CADO
 {
 public:
@@ -7,7 +8,7 @@ public:
 public:
 	_ConnectionPtr m_pConnection;
 	_RecordsetPtr  m_pRecordset;
-
+	        
 	CString g_strOrigDatabaseFilePath;
 	CString	g_strDatabasefilepath;
 	CString g_strExePth;

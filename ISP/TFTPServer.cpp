@@ -12,7 +12,7 @@
 #pragma  comment(lib,"Iphlpapi.lib")
 
 UINT _StartSeverFunc(LPVOID pParam);
-
+extern bool auto_flash_mode;	//用于自动烧写，不要弹框;
 char sendbuf[45];
 extern CString g_strFlashInfo;
 extern unsigned int Remote_timeout;
@@ -645,7 +645,7 @@ BOOL TFTPServer::StartServer()
 
 					SendFlashCommand();
 
-					 
+					#if 0 
 					nRet = RecvBOOTP();
 					if (nRet==-1)
 					{
@@ -669,9 +669,9 @@ BOOL TFTPServer::StartServer()
 						strTips.Format(_T("Use old protocol send flash command.Remain(%d)"),5-mode_send_flash_try_time);
 						OutPutsStatusInfo(strTips, TRUE);
 					}
-
+					#endif
 				int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
-				TRACE(_T("%d"),send_ret);
+				//TRACE(_T("%d"),send_ret);
 				if(send_ret<0)	//如果发送失败 就尝试 再次进行TCP连接
 				{
 					TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
@@ -818,10 +818,13 @@ StopServer:
 		temp_cs.Format(_T("Total package(%d).Resend package(%d)"),package_number,total_retry);
 		OutPutsStatusInfo(temp_cs, FALSE);
 		}
+
 		CString strTips=_T("Programming successful. ");
 		OutPutsStatusInfo(strTips, FALSE);
-		AfxMessageBox(strTips);
-
+		if(!auto_flash_mode)
+		{
+			AfxMessageBox(strTips);
+		}
 
 		//Sleep(5000); //if flash success, wait 5 seconds for LC or NC to start into runtime.
 		//if not , the user click flash, it will be not success.
@@ -830,7 +833,10 @@ StopServer:
 	{
 		CString strTips=_T("Programming failure.");
 		OutPutsStatusInfo(strTips, FALSE);
-		AfxMessageBox(strTips);
+		if(!auto_flash_mode)
+		{
+			AfxMessageBox(strTips);
+		}
 	}
 
 	
@@ -1323,14 +1329,14 @@ void TFTPServer::FlashByEthernet()
 	}
 
 	ISP_STEP = 0;
-	int add_port=0;
-	if(m_nClientPort<60000)
-		add_port= rand() % 30000+ 8000;
-	else
-		add_port= rand() % 100+ 1;
+	//int add_port=0;
+	//if(m_nClientPort<60000)
+	//	add_port= rand() % 30000+ 8000;
+	//else
+	//	add_port= rand() % 100+ 1;
 
 	GetDeviceIP_String();
-	int resualt=TCP_Flash_CMD_Socket.Create(m_nClientPort+add_port,SOCK_STREAM);//SOCK_STREAM
+	int resualt=TCP_Flash_CMD_Socket.Create(0,SOCK_STREAM);//SOCK_STREAM
 
 	if(resualt == 0)
 	{
@@ -1340,7 +1346,6 @@ void TFTPServer::FlashByEthernet()
 		FormatMessage(	FORMAT_MESSAGE_ALLOCATE_BUFFER | 	FORMAT_MESSAGE_FROM_SYSTEM,	NULL,	error_msg,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),	(LPTSTR) &lpMsgBuf,	0, NULL );
 		wsprintf(szBuf,_T("failed with error %d: %s"), 	 error_msg, lpMsgBuf); 
-
 		AfxMessageBox(szBuf);
 		LocalFree(lpMsgBuf);
 

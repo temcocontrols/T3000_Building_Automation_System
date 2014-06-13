@@ -1007,37 +1007,54 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID){
 
     unsigned short Device_infor[10];
     CString str_ret,temp;
-    int ret=read_multi(ID,&Device_infor[0],0,10);
+	Bin_Info temp1;
+	 CString hexproductname=_T("");
+  //  int ret=read_multi(ID,&Device_infor[0],0,10);
+	 int ret=read_multi_tap(ID,&Device_infor[0],0,10);
+	  if (ret<0)
+	  {
+      AfxMessageBox(_T("Can't get the device information ,please try again!"));
+      return FALSE;
+	  }
    CString prodcutname=GetProductName(Device_infor[7]);
-    for (int i=0;i<10;i++)
-    {
-        temp.Format(_T("%d "),Device_infor[i]);
-        str_ret+=temp;
-    }
-    int nCount = str_ret.GetLength();
-    WCHAR* strNew = new WCHAR[nCount+1];
-	ZeroMemory(strNew, (nCount+1)*sizeof(WCHAR));
-	LPCTSTR str = LPCTSTR(str_ret);
-	memcpy(strNew, str, nCount*sizeof(WCHAR));
-    prodcutname.MakeLower();
-   CString hexproductname=_T("");
+    
+        if(READ_SUCCESS != Get_HexFile_Information(m_hexbinfilepath.GetBuffer(),m_hexinfor))
+        {
+            AfxMessageBox(_T("The hex file dones't contains Temco logo,Can't flash into our products!"));
+            return FALSE;
+        }
+    
+   
+   
+        for (int i=0;i<10;i++)
+        {
+            str_ret.AppendFormat(_T("%c"),Device_infor[i]);
+        }
+   
+ 
    for (int i=0;i<10;i++)
    {
-  hexproductname.AppendFormat(_T("%c"),m_hexinfor.product_name[i]);
+	   hexproductname.AppendFormat(_T("%c"),m_hexinfor.product_name[i]);
    }
+   prodcutname.MakeLower();
+  
+ 
   hexproductname.MakeLower();
  
   prodcutname.MakeUpper();
   hexproductname.MakeUpper();
   CString strtips;
   strtips.Format(_T("Your device is %s   Your hex file is fit for %s "),prodcutname.GetBuffer(),hexproductname.GetBuffer());
-
-
   OutPutsStatusInfo(strtips,false);
- // UpdateStatusInfo(strtips,FALSE);
-    if(hexproductname.CompareNoCase(prodcutname)==0)
-    {
-	SendMessage(m_pParentWnd->m_hWnd, WM_UPDATA_DEVICE_INFORMATION, 0, LPARAM(strNew));
+
+//   int nCount = str_ret.GetLength();
+//   WCHAR* strNew = new WCHAR[nCount+1];
+//   ZeroMemory(strNew, (nCount+1)*sizeof(WCHAR));
+//   LPCTSTR str = LPCTSTR(str_ret);
+//   memcpy(strNew, str, nCount*sizeof(WCHAR));
+ // SendMessage(m_pParentWnd->m_hWnd, WM_UPDATA_DEVICE_INFORMATION, 0, LPARAM(strNew));
+     if(hexproductname.CompareNoCase(prodcutname)==0)
+     {
     return TRUE;
     }
     return FALSE;

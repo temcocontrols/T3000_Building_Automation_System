@@ -69,7 +69,7 @@ protected:
 	BOOL StopWrite();
 
 public:
-Bin_Info m_hexinfor;
+        Bin_Info m_hexinfor;
 		HEXFILE_FORMAT	m_nHexFileType;
 		CWnd*			m_pParentWnd;
 		TS_UC*			m_pFileBuffer;
@@ -78,7 +78,7 @@ Bin_Info m_hexinfor;
 		int					m_nComPort;
 		 
 		int					m_nBautrate;			// 波特率
-
+		CString m_hexbinfilepath;
 		CWinThread*	m_pWorkThread;
 		vector<int>		m_szMdbIDs;			// 所有的需要flash的Modbus ID
 		
@@ -88,5 +88,6 @@ Bin_Info m_hexinfor;
 
 		CString			m_strIPAddr;
 		int				m_nIPPort;
+	    
 
 };

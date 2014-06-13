@@ -47,4 +47,6 @@ public:
 	CButton m_Radio_50;
 	CButton m_Radio_100;
 	CButton m_Radio_Fit;
+	CEdit m_editor_slave_id;
+	afx_msg void OnPaint();
 };

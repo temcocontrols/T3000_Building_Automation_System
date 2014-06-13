@@ -216,9 +216,12 @@
 #define IDD_DIALOG_BACNET_MONITOR       503
 #define IDR_ACCELERATOR2                504
 #define IDR_T3000_DB1                   505
-#define IDD_DIALOG_DOWNLOAD_FILE        996
 #define IDD_DIALOG_THE_SAME_DEVICE      506
 #define IDR_T3000_DB2                   507
+#define IDD_DIALOG15                    508
+#define IDB_BITMAP_TEMCOLOGO            509
+#define IDD_DIALOG_T3000_DEFAULT        512
+#define IDB_BITMAP5                     514
 #define IDD_DIALOG_BACNET_SCREENS_EDIT  582
 #define IDD_DIALOG_BACNET_TOOL          583
 #define IDB_BITMAP_TMCO_LOGO            584
@@ -226,6 +229,7 @@
 #define IDD_PARTS_VENDORS               586
 #define IDD_REMOTE_CONNECTION           587
 #define IDD_DIALOG_DEBUG_TRACE          992
+#define IDD_DIALOG_DOWNLOAD_FILE        996
 #define IDC_AddBuiding                  1008
 #define IDC_DELBUILDING                 1009
 #define IDC_DELETEALLBUILDING           1010
@@ -1599,14 +1603,6 @@
 #define IDC_HELP_HELP                   1831
 #define IDC_STARTREGISTER               1832
 #define IDC_BUTTON_DEBUG_CLEARALL       1832
-#define IDC_IPADDRESS_ADD_BAC_NOTE      5832
-#define IDC_LIST_DOWNLOAD_INFO          5833
-#define IDC_COMBO_UPDATE_TYPE           5834
-#define IDC_IPADDRESS_TEMCO_IP          5835
-#define IDC_BUTTON_START_DOWNLOAD       5836
-#define IDC_EDIT_PRODUCT_ID             5837
-#define IDC_EDIT_PRODUCT_ID2            5838
-#define IDC_EDIT_PRODUCT_NAME           5838
 #define IDC_STATIC_COM                  1832
 #define IDC_DATAGRID1                   1833
 #define IDC_RADIO_BAC_IP_AUTO           1833
@@ -1617,8 +1613,13 @@
 #define IDC_IPADDRESS_BAC_GATEWAY       1836
 #define IDC_BUTTON_DEBUG_PAUSE          1837
 #define IDC_BUTTON_BAC_IP_CHANGED       1838
+#define IDC_EDIT_BACKLIGHT_TIME         1838
 #define IDC_BUTTON_BAC_IP_CANCLE        1839
+#define IDC_COMBO_SIGNAL_TYPE           1839
 #define IDC_RADIO_BAC_IP_STATIC         1840
+#define IDC_EDIT_OCCUPIED_TIMER         1840
+#define IDOK_DOWNLOAD                   1841
+#define IDC_RICHEDIT21                  1842
 #define IDC_EDIT_PID2OFFSETPOINT2       2002
 #define IDC_EDIT_PID2OFFSETPOINT4       2003
 #define IDC_EDIT_PID2OFFSETPOINT3       2004
@@ -1626,6 +1627,14 @@
 #define IDC_MAX_SUPPLY                  2006
 #define IDC_MIN_SUPPLY                  2007
 #define IDC_HELP_HELP1                  3831
+#define IDC_IPADDRESS_ADD_BAC_NOTE      5832
+#define IDC_LIST_DOWNLOAD_INFO          5833
+#define IDC_COMBO_UPDATE_TYPE           5834
+#define IDC_IPADDRESS_TEMCO_IP          5835
+#define IDC_BUTTON_START_DOWNLOAD       5836
+#define IDC_EDIT_PRODUCT_ID             5837
+#define IDC_EDIT_PRODUCT_ID2            5838
+#define IDC_EDIT_PRODUCT_NAME           5838
 #define IDD_DIALOG_TSTAT_ZIGBEE_LOGIC   8501
 #define IDD_DIALOG_BACNET_SETTING       8504
 #define IDC_BTN_TOPOLOGICAL             8829
@@ -1763,8 +1772,8 @@
 #define ID_DATABASE_PV                  34021
 #define ID_TIMEBASE_4HOURS              34022
 #define ID_TIMEBASE_1DAY                34023
-#define ID_HELP_UPDATEFIRMWARE          35523
 #define ID_TIMEBASE_4DAYS               34024
+#define ID_HELP_CONTACTSCREDITS         34024
 #define ID_EXIT34025                    34025
 #define ID_GRAPHIC_EXIT                 34026
 #define ID_                             34027
@@ -1775,6 +1784,7 @@
 #define ID_ZOOMOUT                      34032
 #define ID_DATABASE_BACNETTOOL          34905
 #define ID_CONFIGFILE_SAVE_AS           35000
+#define ID_HELP_UPDATEFIRMWARE          35523
 #define ID_MISCELLANEOUS_UPDATEMINI     42883
 #define ID_CONTROL_WEEKLY               42884
 #define ID_TOOL_REGISTERVIEWER          44012
@@ -1789,9 +1799,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        508
-#define _APS_NEXT_COMMAND_VALUE         34024
-#define _APS_NEXT_CONTROL_VALUE         1838
+#define _APS_NEXT_RESOURCE_VALUE        515
+#define _APS_NEXT_COMMAND_VALUE         34025
+#define _APS_NEXT_CONTROL_VALUE         1843
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

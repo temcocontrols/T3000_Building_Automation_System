@@ -102,11 +102,12 @@ INPUT int GetLastCommunicationType();
 INPUT HANDLE GetCommunicationHandle();
 //////////////////////////////////////////////////////////////////////////
 INPUT int NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
-INPUT int NetController_CheckTstatOnline2_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
+//INPUT int NetController_CheckTstatOnline2_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
 INPUT int CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bComm_Type);
-INPUT int CheckTstatOnline2_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
+//INPUT int CheckTstatOnline2_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
 INPUT int MINI_CheckTstatOnline_a(unsigned char devLo,unsigned char devHi, bool bComm_Type,int NET_COM=1);
-INPUT int MINI_CheckTstatOnline2_a(unsigned char devLo,unsigned char devHi, bool bComm_Type,int NET_COM=1);
+//INPUT int MINI_CheckTstatOnline2_a(unsigned char devLo,unsigned char devHi, bool bComm_Type,int NET_COM=1);
+
 INPUT int Read_One2(unsigned char  device_var,unsigned short  address, bool bComm_Type);
 INPUT int Write_One2(unsigned char  device_var,unsigned short  address,unsigned short  value, bool bComm_Type);
 //OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length);

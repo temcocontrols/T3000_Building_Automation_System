@@ -128,6 +128,7 @@
     <ClCompile Include="Annual_Routines.cpp" />
     <ClCompile Include="AnnualRout_InsertDia.cpp" />
     <ClCompile Include="ApplyGraphicLabelsDlg.cpp" />
+    <ClCompile Include="AutoRichEditCtrl.cpp" />
     <ClCompile Include="BacnetAlarmLog.cpp" />
     <ClCompile Include="ARDDlg.cpp" />
     <ClCompile Include="BacnetAlarmWindow.cpp" />
@@ -231,9 +232,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="T3000.cpp" />
+    <ClCompile Include="T3000DefaultView.cpp" />
     <ClCompile Include="T3000Doc.cpp" />
     <ClCompile Include="T3000RegAddress.cpp" />
     <ClCompile Include="T3000TableView.cpp" />
+    <ClCompile Include="T3000UpdateDlg.cpp" />
     <ClCompile Include="T3000View.cpp" />
     <ClCompile Include="T328IN.cpp" />
     <ClCompile Include="T332AI.cpp" />
@@ -301,6 +304,8 @@
     <None Include="res\ClearFouct.bmp" />
     <None Include="res\ClearUp.bmp" />
     <None Include="res\coldtool.bmp" />
+    <None Include="res\default view.bmp" />
+    <None Include="res\default view.jpg" />
     <None Include="res\Exit.ico" />
     <None Include="res\hottool.bmp" />
     <None Include="res\Input.ico" />
@@ -328,6 +333,8 @@
     <None Include="res\T3000.rc2" />
     <None Include="res\T3000Doc.ico" />
     <None Include="res\temcologo.bmp" />
+    <None Include="res\temco_logo.bmp" />
+    <None Include="res\temco_logo.jpg" />
     <None Include="res\Toolbar-48.bmp" />
     <None Include="res\Toolbar.bmp" />
     <None Include="res\toolbar1.bmp" />
@@ -343,6 +350,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AirflowSettingDlg.h" />
+    <ClInclude Include="AutoRichEditCtrl.h" />
     <ClInclude Include="BacnetAlarmLog.h" />
     <ClInclude Include="ARDDlg.h" />
     <ClInclude Include="BacnetAlarmWindow.h" />
@@ -397,6 +405,8 @@
     <ClInclude Include="RegisterWriteValueDlg.h" />
     <ClInclude Include="Scanwaydlg.h" />
     <ClInclude Include="StaticDlg.h" />
+    <ClInclude Include="T3000DefaultView.h" />
+    <ClInclude Include="T3000UpdateDlg.h" />
     <ClInclude Include="T328IN.h" />
     <ClInclude Include="T332AI.h" />
     <ClInclude Include="T36CT.h" />

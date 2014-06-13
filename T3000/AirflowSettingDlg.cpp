@@ -69,7 +69,7 @@ BOOL CAirflowSettingDlg::Get_Data_Bit(UINT Data,int n,int N)
 }
 BOOL CAirflowSettingDlg::OnInitDialog()
 {
-	  is_have_AVASensor=product_register_value[MODBUS_VAV_CONTROL]&2;
+	  is_have_AVASensor=product_register_value[MODBUS_VAV_CONTROL]&&2;
 	Fresh();
 CDialogEx::OnInitDialog();
 	return TRUE;
@@ -87,7 +87,7 @@ void CAirflowSettingDlg::Fresh(){
 	}
 	CString strUnit;CString temp,strTemp;
 	
-	if (!is_have_AVASensor)
+	if (is_have_AVASensor)
 	{
 		strUnit=_T("%");
 		temp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_AIRFLOW_SETPOINT]/10.0);
@@ -160,7 +160,7 @@ void CAirflowSettingDlg::OnEnKillfocusEditPid2offsetpoint4()
 	CString temp;
 	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT4)->GetWindowText(temp);
 	
-	if (!is_have_AVASensor)
+	if (is_have_AVASensor)
 	{
 		int Val=(int)(_wtof(temp)*10);
 		if (Val==product_register_value[MODBUS_MAX_AIRFLOW_HEATING])
@@ -205,7 +205,7 @@ void CAirflowSettingDlg::OnEnKillfocusEditPid2offsetpoint3()
 {
 	CString temp;
 	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT3)->GetWindowText(temp);
-	if (!is_have_AVASensor)
+	if (is_have_AVASensor)
 	{
 		int Val=(int)(_wtof(temp)*10);
 		if (Val==product_register_value[MODBUS_MAX_AIRFLOW_COOLING])
@@ -251,7 +251,7 @@ void CAirflowSettingDlg::OnEnKillfocusEditPid2offsetpoint5()
 	CString temp;
 	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT5)->GetWindowText(temp);
 
-	if (!is_have_AVASensor)
+	if (is_have_AVASensor)
 	{
 		int Val=(int)(_wtof(temp)*10);
 		if (Val==product_register_value[MODBUS_MIN_AIRFLOW])

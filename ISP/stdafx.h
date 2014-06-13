@@ -54,7 +54,7 @@ INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned sho
 INPUT int Read_One(unsigned char device_var,unsigned short address);
 INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
 INPUT int write_multi_by_tcp(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
-INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
 
 //INPUT bool open_com(unsigned char m_com);
 INPUT bool open_com(int m_com);

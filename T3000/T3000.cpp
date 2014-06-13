@@ -16,7 +16,8 @@
 
 #include "iniFile.h"
 #include "afxinet.h"
- const int g_versionNO=201401;
+#include "T3000DefaultView.h"
+const int g_versionNO=201406;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -150,6 +151,7 @@ BOOL CT3000App::JudgeDB(){
  if (g_versionNO>versionno)//°æ±¾¹ýµÍ
  {
      SetPaneString(0,_T("The version of DB is lower,Updating....."));
+	 _variant_t temp_var;
 	 _ConnectionPtr srcConTmp;
 	 _RecordsetPtr srcRsTemp;
 	 srcConTmp.CreateInstance("ADODB.Connection");
@@ -168,16 +170,56 @@ BOOL CT3000App::JudgeDB(){
 		 temp.Product_class_ID=srcRsTemp->GetCollect(_T("Product_class_ID"));
 		 temp.Product_ID=srcRsTemp->GetCollect(_T("Product_ID"));
 		 temp.Screen_Name=srcRsTemp->GetCollect(_T("Screen_Name"));
-		 temp.Bautrate=srcRsTemp->GetCollect(_T("Bautrate"));
+		 temp_var=srcRsTemp->GetCollect(_T("Bautrate"));
+		 if (temp_var.vt!=VT_NULL)
+		 { temp.Bautrate=temp_var;
+		 }
+		 else
+		 {
+			  temp.Bautrate=_T("");
+		 }
 		 temp.Background_imgID=srcRsTemp->GetCollect(_T("Background_imgID"));
-		 temp.Hardware_Ver=srcRsTemp->GetCollect(_T("Hardware_Ver"));
-		 temp.Software_Ver=srcRsTemp->GetCollect(_T("Software_Ver"));
-//		 temp.Com_Port=srcRsTemp->GetCollect(_T("Com_Port"));
-		 temp.EPsize=srcRsTemp->GetCollect(_T("EPsize"));
-		 // temp.Protocol=srcRsTemp->GetCollect(_T("Protocol"));
-
+		  temp_var=srcRsTemp->GetCollect(_T("Hardware_Ver"));
+		 if (temp_var.vt!=VT_NULL)
+		 { temp.Hardware_Ver=temp_var;
+		 }
+		 else
+		 {
+			 temp.Hardware_Ver=_T("");
+		 }
+		 temp_var=srcRsTemp->GetCollect(_T("Software_Ver"));
+		 if (temp_var.vt!=VT_NULL)
+		 { temp.Software_Ver=temp_var;
+		 }
+		 else
+		 {
+			 temp.Software_Ver=_T("");
+		 }
+ 		  temp_var=srcRsTemp->GetCollect(_T("Com_Port"));
+		 if (temp_var.vt!=VT_NULL)
+		 { temp.Com_Port=temp_var;
+		 }
+		 else
+		 {
+			 temp.Com_Port=_T("");
+		 }
+		 temp_var=srcRsTemp->GetCollect(_T("EPsize"));
+		 if (temp_var.vt!=VT_NULL)
+		 { temp.EPsize=temp_var;
+		 }
+		 else
+		 {
+			 temp.EPsize=_T("");
+		 }
+		 temp_var=srcRsTemp->GetCollect(_T("Protocol"));
+		 if (temp_var.vt!=VT_NULL)
+		 { temp.Protocol=temp_var;
+		 }
+		 else
+		 {
+			 temp.Protocol=_T("");
+		 }
 		 srcRsTemp->MoveNext();
-
 		 m_AllNodes.push_back(temp);
 	 }
 
@@ -261,6 +303,7 @@ BOOL CT3000App::JudgeDB(){
  
 BOOL CT3000App::InitInstance()
 {
+//TODO: call AfxInitRichEdit2() to initialize richedit2 library.
 	try
 	{
 	// InitCommonControlsEx() is required on Windows XP if an application
@@ -285,8 +328,12 @@ BOOL CT3000App::InitInstance()
 		AfxMessageBox(IDS_INIT_RICHEDIT_ERROR);//
 		return FALSE;//
 	}
-
- 
+	//AfxInitRichEdit2();
+	if(!AfxInitRichEdit2())
+	{
+		AfxMessageBox(IDS_INIT_RICHEDIT_ERROR);//
+		return FALSE;//
+	}
 	if (!AfxSocketInit())//
 	{
 		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);//
@@ -458,14 +505,14 @@ BOOL CT3000App::InitInstance()
 	}
 	 
 	
-	CString registerfilename;
-	 registerfilename=g_strExePth+_T("REG_msado15.bat");
-	// ::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
-	registerfilename=g_strExePth+_T("REG_MSFLXGRD.bat");
+	//CString registerfilename;
+	// registerfilename=g_strExePth+_T("REG_msado15.bat");
+	//// ::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
+	//registerfilename=g_strExePth+_T("REG_MSFLXGRD.bat");
 	//::ShellExecute(NULL, _T("open"), registerfilename.GetBuffer(), _T(""), _T(""), SW_HIDE);
-	CString languagepath=g_strExePth+_T("\\Language");
-	m_locale.AddCatalogLookupPath(languagepath);
-	m_locale.SetLanguage(CLanguageLocale::LANGUAGE_ENGLISH);
+	//CString languagepath=g_strExePth+_T("\\Language");
+	//m_locale.AddCatalogLookupPath(languagepath);
+	//m_locale.SetLanguage(CLanguageLocale::LANGUAGE_ENGLISH);
 
 	// Register the application's document templates.  Document templates
 	//  serve as the connection between documents, frame windows and views
@@ -576,8 +623,8 @@ BOOL CT3000App::InitInstance()
    	m_pMainWnd->SetWindowText(_T("T3000 Building Automation System"));//
   	m_pMainWnd->ShowWindow(SW_SHOW);
   	m_pMainWnd->UpdateWindow();
-     
-
+    //m_pMainWnd->SwitchToPruductType(18);  
+	((CMainFrame*)m_pMainWnd)->SwitchToPruductType(18);
 	}
 	catch (...)
 	{

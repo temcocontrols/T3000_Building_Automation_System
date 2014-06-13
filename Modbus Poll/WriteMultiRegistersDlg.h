@@ -40,4 +40,5 @@ public:
 	afx_msg void OnLbnDblclkList3();
 	afx_msg void OnEnKillfocusEditId();
 	afx_msg void OnBnClickedButton1();
+	afx_msg void OnPaint();
 };

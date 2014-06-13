@@ -16,7 +16,6 @@ public:
 	_ConnectionPtr m_pCon;
 	bool MatchMoudleAddress(void);
 	bool Change_Register_Table(void);
-
 };
 
 //int _G(char *str,int mMdb_Adress_Map=1);
@@ -24,4 +23,4 @@ int _P(char *str,int mMdb_Adress_Map=1);
 
 float my_get_tstat_version(unsigned short tstat_id);
 float my_get_curtstat_version();
-  BOOL DelDirW(CString strSrcPath);
+BOOL DelDirW(CString strSrcPath);

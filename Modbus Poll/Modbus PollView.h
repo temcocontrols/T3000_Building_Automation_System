@@ -13,6 +13,7 @@
 #include "globle_Function.h"
 #include "ModbusDllforVC.h"
 #include "global_struct.h"
+#include "AutoRichEditCtrl.h"
 
 class CModbusPollView : public CFormView
 {
@@ -44,8 +45,6 @@ public:
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
-
- 
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 // Generated message map functions
@@ -58,9 +57,10 @@ protected:
 	
 private:
 	CMsflexgrid1 m_MsDataGrid;
-	CStatic m_connectionState;
+	CAutoRichEditCtrl m_connectionState;
+
 public:
-	CStatic m_Tx_Rx;
+  CAutoRichEditCtrl m_Tx_Rx;
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	//自定义函数
 public:
@@ -75,7 +75,19 @@ public:
    void DBClickMsflexgridDataGrid();
    void ClickMsflexgridDataGrid();
  
-   CFont * cFont; 
+    void Initial_RegName(); 
+	CString Find_RegName(int index);
+	struct DBRegister 
+	{
+		int RegAddress;
+		CString RegName;
+// 		CString DataType;
+// 		int length;
+// 		CString Description;
+// 		CString Operation;
+	};
+	vector<DBRegister> m_VecregisterData;
+
 public:
 	int m_Slave_ID;
 	int m_Function;
@@ -108,8 +120,7 @@ public:
 	/////////////////////////DataBuffer/////////////////////////////////////////
 	unsigned short m_DataBuffer[127];
     CString m_Alias[127];
-
-	 HANDLE m_MultiRead_handle;
+	//HANDLE m_MultiRead_handle;
 //	afx_msg void OnBnClickedStart();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	CEdit m_edit_name;
@@ -119,6 +130,14 @@ public:
 	//afx_msg void OnViewRegistervalueanalyzer();
 	afx_msg void OnEditAdd();
 	COLORREF Get_Color(int i);
+
+	BOOL m_isgetmodel;
+	BOOL m_ischangedAddress;
+	CString m_modelname;
+	unsigned short m_modeldata[2];
+	CAutoRichEditCtrl m_ModelNameRichEdit;
+	CAutoRichEditCtrl m_SlaveIDRichEditCtrl;
+	int m_MultiReadReturnType;
 };
 
 #ifndef _DEBUG  // debug version in Modbus PollView.cpp
