@@ -37,6 +37,8 @@ public:
 	int m_version;
 	int m_nModeType;
 	int m_outRows;
+	int m_crange;
+	int m_sn;
 	CMsflexgrid m_FlexGrid;
 	CComboBox m_OutValueCmbox;
 	CComboBox m_outAMCmbox;
@@ -72,4 +74,6 @@ public:
 	afx_msg void OnClose();
 	CEdit m_onoffset;
 	CEdit m_offonset;
+	CComboBox m_combox_signal_type;
+	afx_msg void OnCbnSelchangeComboSignalType();
 };

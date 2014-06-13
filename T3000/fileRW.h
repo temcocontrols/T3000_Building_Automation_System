@@ -148,3 +148,4 @@ void get_var_write_var_T3(wifstream & inf,float tstat_version,CStdioFile *p_log_
 void get_write_var_line_T3(TCHAR *buf,float tstat_version,CStdioFile *p_log_file=NULL);
 
 void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,CStdioFile *p_log_file=NULL,load_file_every_step *p_log_file_one_time=NULL);
+void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdioFile *p_log_file=NULL,load_file_every_step *p_log_file_one_time=NULL);

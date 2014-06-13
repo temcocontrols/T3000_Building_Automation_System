@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "../ado/ADO.h"
-
 #ifdef _DEBUG
 #ifndef _WIN64
 #define FOR_DATABASE_CONNECT					_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=")

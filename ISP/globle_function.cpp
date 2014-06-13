@@ -377,7 +377,7 @@ CString GetProductName(int ModelID)
 		strProductName = _T("LC");	  //
 		break;
 	case PM_T38AIOD:
-		strProductName = _T("T38AIOD");	  //
+		strProductName = _T("T3-8I13O");	  //
 		break;
 	case PM_T3IOA:
 		strProductName = _T("T3IOA");	  //
@@ -465,6 +465,57 @@ void ExtractString(CStringArray& arr, const CString strSrc, const CString sep)
 	arr.Add(str); // think
 }
 
+BOOL DoHEXCRC( TS_UC* szBuf, int nLen)
+{
+	TS_UC uctemp=0;
+	for(int j=0; j < nLen; j++)
+		uctemp+=szBuf[j];
+
+	if(uctemp%256!=0)
+	{		
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
+{
+	//当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题
+	int linecharnum=0;
+	char c;
+	int nRet = file.Read(&c, 1);
+
+	while(nRet != 0)
+	{
+		++linecharnum;
+		*pBuffer++ = c;
+		//TRACE(_T("\n%c"),c);
+		if (c == 0x0d) // 回车
+		{
+			file.Read(&c, 1);  // 读一个换行
+			*pBuffer++ = c;
+			TRACE(_T("%s"),pBuffer);
+			return TRUE;
+		}
+		if (linecharnum<256)
+		{
+			file.Read(&c, 1);
+		}
+		else
+		{
+			AfxMessageBox(_T("The Hex File is broken"));
+			return FALSE;
+		}
+
+	}
+	//TRACE(_T("%s"),pBuffer);
+	return FALSE;
+}
+
+
+
+
 int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 {
 	CFileFind fFind;
@@ -498,7 +549,7 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 					continue;
 
 
-				TS_UC get_hex[128]={0};//get hex data,it is get from the line char
+				unsigned char get_hex[128]={0};//get hex data,it is get from the line char
 				//the number is (i-1)
 				//int nLen = strGetData.GetLength();
 				for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
@@ -551,8 +602,29 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 						m_DeviceInfor[i]=temp;
 					}
 					memcpy_s(&ret_bin_Info,15,m_DeviceInfor,15);
+
+					if(strlen(ret_bin_Info.product_name) > 200)
+						return NO_VERSION_INFO;
+
+					char temocolog[6];
+					memcpy_s(temocolog,5,ret_bin_Info.company,5);
+					temocolog[5] = 0;
+
+					CString Temco_logo;
+					MultiByteToWideChar( CP_ACP, 0, (char *)temocolog, 
+						(int)strlen(temocolog)+1, 
+						Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
+					Temco_logo.ReleaseBuffer();		
+					Temco_logo.MakeUpper();
+					if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0)
+					{
+						return NO_VERSION_INFO;
+					}
+
+
 					ret_bin_Info.software_low = (readbuffer[38]*16+readbuffer[39]);
 					ret_bin_Info.software_high = readbuffer[40]*16 + readbuffer[41];
+					return READ_SUCCESS;
 					//m_softwareRev = (temp_buf[30] + temp_buf[31]*256)/10.0;
 
 
@@ -572,68 +644,6 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 	}
 }
 
-BOOL DoHEXCRC( TS_UC* szBuf, int nLen)
-{
-	TS_UC uctemp=0;
-	for(int j=0; j < nLen; j++)
-		uctemp+=szBuf[j];
-
-	if(uctemp%256!=0)
-	{		
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
-BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
-{
-	//当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题
-	int linecharnum=0;
-	char c;
-	int nRet = file.Read(&c, 1);
-
-	while(nRet != 0)
-	{
-		++linecharnum;
-		*pBuffer++ = c;
-		//TRACE(_T("\n%c"),c);
-		if (c == 0x0d) // 回车
-		{
-			file.Read(&c, 1);  // 读一个换行
-			*pBuffer++ = c;
-			TRACE(_T("%s"),pBuffer);
-			return TRUE;
-		}
-		if (linecharnum<256)
-		{
-			file.Read(&c, 1);
-		}
-		else
-		{
-			AfxMessageBox(_T("The Hex File is broken"));
-			return FALSE;
-		}
-
-	}
-	//TRACE(_T("%s"),pBuffer);
-	return FALSE;
-}
-
-
-
-BOOL Ping(const CString& strIP, CWnd* pWndEcho)
-{
-	CMyPing* pPing = new CMyPing;
-
-	pPing->SetPingEchoWnd(pWndEcho);
-	pPing->TestPing(strIP);
-
-
-	delete pPing;
-	pPing = NULL;
-	return FALSE;
-}
 
 
 int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
@@ -657,9 +667,42 @@ int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 			if(nRet<(0x100 + sizeof(Bin_Info)))
 				return BIN_FILE_LENGTH_ERROR;
 			memcpy(&ret_bin_Info,&pBuf[0x100],sizeof(Bin_Info));
+			if(strlen(ret_bin_Info.product_name) > 200)
+				return NO_VERSION_INFO;
+			char temocolog[6];
+			memcpy_s(temocolog,5,ret_bin_Info.company,5);
+			temocolog[5] = 0;
+
+			CString Temco_logo;
+			MultiByteToWideChar( CP_ACP, 0, (char *)temocolog, 
+				(int)strlen(temocolog)+1, 
+				Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
+			Temco_logo.ReleaseBuffer();		
+			Temco_logo.MakeUpper();
+			if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0)
+			{
+				return NO_VERSION_INFO;
+			}
+
+
 			return READ_SUCCESS;
 		}
 	}
 	return OPEN_FILE_ERROR;
 
+}
+
+
+
+BOOL Ping(const CString& strIP, CWnd* pWndEcho)
+{
+    CMyPing* pPing = new CMyPing;
+
+    pPing->SetPingEchoWnd(pWndEcho);
+    pPing->TestPing(strIP);
+
+
+    delete pPing;
+    pPing = NULL;
+    return FALSE;
 }

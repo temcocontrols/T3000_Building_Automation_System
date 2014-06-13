@@ -560,6 +560,9 @@ _T("LC=120")
 
 const int NO_COMMAND = 0;
 const int START_AUTO_FLASH_COMMAND = 1;
+const int FLASH_SUCCESS = 2;
+const int FAILED_NORESPONSED = 3;
+const int FAILED_UNKNOW_ERROR = 4;
 //const int
 
 
@@ -576,6 +579,8 @@ const TCHAR c_strFlashSNCfgFileName[] = _T("Flash_SN.cfg");				//	±£¥ÊFLASH SN µ
 const TCHAR c_strFlashHWVersion[] = _T("Hardware Verson : ");
 const TCHAR c_strFlashSNModel[] = _T("Product Model : ");
 
+
+ 
 typedef struct
 {
 	char company[5];
@@ -591,6 +596,7 @@ enum
 	FILE_NOT_FIND = 1,
 	OPEN_FILE_ERROR = 2,
 	BIN_FILE_LENGTH_ERROR = 3,
-	BAD_HEX_FILE = 4
+	BAD_HEX_FILE = 4,
+	NO_VERSION_INFO = 5
 };
  

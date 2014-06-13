@@ -101,7 +101,7 @@ UINT BackMainUIFresh(LPVOID pParam)
 	CT3000View* pdlg = (CT3000View*)pParam;
 	while(1)
 	{
-		Sleep(15*1000);
+		Sleep(2000);
 		if(pdlg->IsWindowVisible())
 		{
 			pdlg->Fresh();
@@ -225,12 +225,14 @@ void CT3000View::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_DAYCOOL, m_DayCoolStatic);
 	DDX_Control(pDX, IDC_STATIC_DATSP, m_DaySPStatic);
 	DDX_Control(pDX, IDC_STATIC_DAYHEAT, m_DayHeatStatic);
-	DDX_Text(pDX, IDC_DAY_EDIT, m_daysetpoint);//0907
-	DDX_Text(pDX, IDC_EDIT_CUR_SP, m_nightpot);//0907
+	//DDX_Text(pDX, IDC_DAY_EDIT, m_daysetpoint);//0907
+	//DDX_Text(pDX, IDC_EDIT_CUR_SP, m_nightpot);//0907
 	DDX_Control(pDX, IDC_SLIDER_DAY, m_singlesliderday);
 	DDX_Control(pDX, IDC_SLIDER_NIGHT, m_singleslidernight);
 	DDX_Control(pDX, IDC_STATICUNINT, m_gUnit);
 	//DDX_Control(pDX, IDC_SLIDER_DAY_CurrentTemp, m_currentTemp);
+	DDX_Control(pDX, IDC_RICHEDIT21, m_RichEditor);
+	DDX_Control(pDX, IDC_EDIT_CUR_SP, m_nightpotEdit);
 }
 
 BOOL CT3000View::PreCreateWindow(CREATESTRUCT& cs)
@@ -295,10 +297,39 @@ void CT3000View::OnInitialUpdate()
 	CString lightsensor;
 	lightsensor.Format(_T("%d"),product_register_value[MODBUS_VALUE_SENSOR]);
 	GetDlgItem(IDC_LIGHTING_SENSOR)->SetWindowText(lightsensor);
-	//CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
-	//pMain->OnConnect();
-  //gGetFormViewStrings(this->m_hWnd,IDD_T3000_FORM);
-     //gSetFormViewStrings(this->m_hWnd,IDD_T3000_FORM);
+ 
+	m_DayCoolEdit.SetReadOnly(TRUE);
+  	COLORREF cf=RGB(0,0,255);
+ 	m_DayCoolEdit.SetBackgroundColor(FALSE,cf);
+
+	m_nightInfoEdit.SetReadOnly(TRUE);
+	  cf=RGB(0,0,255);
+	m_nightInfoEdit.SetBackgroundColor(FALSE,cf);
+	//---------------------------------------------
+	m_DayHeatEdit.SetReadOnly(TRUE);
+	  cf=RGB(255,0,0);
+	m_DayHeatEdit.SetBackgroundColor(FALSE,cf);
+
+	m_nightHeatInfoEdit.SetReadOnly(TRUE);
+	  cf=RGB(255,0,0);
+	m_nightHeatInfoEdit.SetBackgroundColor(FALSE,cf);
+	//---------------------------------------------
+	m_dayInfoEdit.SetReadOnly(TRUE);
+	  cf=RGB(212,208,200);
+	m_dayInfoEdit.SetBackgroundColor(FALSE,cf);
+
+	m_nightpotEdit.SetReadOnly(TRUE);
+	  cf=RGB(212,208,200);
+	m_nightpotEdit.SetBackgroundColor(FALSE,cf);
+	//---------------------------------------------
+	m_TempInfoEdit.SetReadOnly(TRUE);
+	cf=RGB(96,192,0);
+	m_TempInfoEdit.SetBackgroundColor(FALSE,cf); 
+// 	m_RichEditor.SetWindowText(_T("2001.5"));
+// 	m_RichEditor.SetNumberDefaultFontSize(15);
+// 	m_RichEditor.SetReadOnly(TRUE);
+// 	cf=RGB(212,208,200);
+// 	m_RichEditor.SetBackgroundColor(FALSE,cf);
 }
 
 void CT3000View::CreateFlexSilde()
@@ -507,6 +538,19 @@ void CT3000View::Fresh()
    //{
    //  return;
    //}
+	if (is_connect())
+	{
+		GetDlgItem(IDC_FANSPEEDCOMBO)->EnableWindow(TRUE);
+		GetDlgItem(IDC_INPUT_MSFLEXGRID)->EnableWindow(TRUE);
+		GetDlgItem(IDC_OUTPUT_MSFLEXGRID)->EnableWindow(TRUE);
+	} 
+	else
+	{
+		GetDlgItem(IDC_FANSPEEDCOMBO)->EnableWindow(FALSE);
+		GetDlgItem(IDC_INPUT_MSFLEXGRID)->EnableWindow(FALSE);
+		GetDlgItem(IDC_OUTPUT_MSFLEXGRID)->EnableWindow(FALSE);
+	}
+
     CString strTemp;
 	strTemp.Format(_T("%d"),product_register_value[MODBUS_COOLING_PID]);		//104 384
 	strTemp+=_T("%");
@@ -696,10 +740,12 @@ void CT3000View::InitSliderBars2()
 		m_daysetpoint = nSP;//0913
 
 		strTemp.Format(_T("%.1f"),(float)nCoolSP);
-		m_DayCoolEdit.SetWindowText(strTemp);
+		m_DayCoolEdit.FieldText(strTemp);
+		//m_DayCoolEdit.SetNumberDefaultTex();
+		
 		strTemp.Format(_T("%.1f"),(float)nHeatSP);
-		m_DayHeatEdit.SetWindowText(strTemp);
-
+		m_DayHeatEdit.FieldText(strTemp);
+		//m_DayHeatEdit.SetNumberDefaultTex();
 		//nSP= int(nSP/10.0);
 		if (nCoolSP == nHeatSP && nCoolSP== nSP )
 		{
@@ -728,14 +774,14 @@ void CT3000View::InitSliderBars2()
 		//m_nightSlider.SetPos((int)(max-(itemp-min)));
 		int nCoolSP = itemp/10.0;//(int)(max-(itemp-min));
 		strTemp.Format(_T("%.1f"),float(nCoolSP-nSP));
-		m_DayCoolEdit.SetWindowText(strTemp);
-
+		m_DayCoolEdit.FieldText(strTemp);
+		//m_DayCoolEdit.SetNumberDefaultTex();
 		itemp=product_register_value[136];//heat
 		//m_nightHeatSlider.SetPos((int)(max-(itemp-min)));
 		int nHeatSP = itemp;//((int)(max-(itemp-min)));
 		strTemp.Format(_T("%.1f"),float(nSP-nHeatSP));
-		m_DayHeatEdit.SetWindowText(strTemp);
-
+		m_DayHeatEdit.FieldText(strTemp);
+		//m_DayHeatEdit.SetNumberDefaultTex();
  		m_DayCoolStatic.SetWindowText(_T("Cooling DB"));
  		m_DayHeatStatic.SetWindowText(_T("Heating DB"));
 //0912
@@ -782,13 +828,14 @@ void CT3000View::InitSliderBars2()
 		//m_nightSlider.SetPos((int)(max-(itemp-min)));
 		int nCoolSP = (int)itemp;//(int)(max-(itemp-min));
 		strTemp.Format(_T("%.1f"),itemp);
-		m_nightInfoEdit.SetWindowText(strTemp);
-
+		m_nightInfoEdit.FieldText(strTemp);
+	//	m_nightInfoEdit.SetNumberDefaultTex();
 		itemp=product_register_value[182];//heat
 		//m_nightHeatSlider.SetPos((int)(max-(itemp-min)));
 		int nHeatSP = (int)itemp;//((int)(max-(itemp-min)));
 		strTemp.Format(_T("%.1f"),itemp);
-		m_nightHeatInfoEdit.SetWindowText(strTemp);
+		m_nightHeatInfoEdit.FieldText(strTemp);
+	//	m_nightHeatInfoEdit.SetNumberDefaultTex();
 		m_NightCoolStatic.SetWindowText(_T("Cooling SP"));
 		m_NightHeatStatic.SetWindowText(_T("Heating SP"));
 		//;GetDlgItem(IDC_NIGHTSTATIC)->SetWindowText(_T("Night Office"));
@@ -832,14 +879,14 @@ void CT3000View::InitSliderBars2()
 		//m_nightSlider.SetPos(max-(itemp-min));
 		int nCoolDB = product_register_value[124]/10;//(max-(itemp-min));
 		strTemp.Format(_T("%.1f"),(float)product_register_value[124]/10);
-		m_nightInfoEdit.SetWindowText(strTemp);
-
+		m_nightInfoEdit.FieldText(strTemp);
+		//m_nightInfoEdit.SetNumberDefaultTex();
 		//itemp=the_setpoint_ha_ha-product_register_value[123];//heat
 		//m_nightHeatSlider.SetPos(max-(itemp-min));
 		int nHeatDB = product_register_value[123]/10;//(max-(itemp-min));
 		strTemp.Format(_T("%.1f"),(float)product_register_value[123]/10);
-		m_nightHeatInfoEdit.SetWindowText(strTemp);
-
+		m_nightHeatInfoEdit.FieldText(strTemp);
+		//m_nightHeatInfoEdit.SetNumberDefaultTex();
 		strTemp.Format(_T("%d"), nSP);
 //0913
 // 		CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
@@ -915,7 +962,7 @@ void CT3000View::InitSliderBars2()
 	}
 	//0913
 	// 	strTemp.Format(_T("%.1f"),itemp);
-	// 	m_dayInfoEdit.SetWindowText(strTemp);
+	// 	m_dayInfoEdit.FieldText(strTemp);
 	m_daySlider.SetRange(min,max);
 	m_daySlider.SetPos(int(max-itemp+min));
 
@@ -977,9 +1024,9 @@ void CT3000View::InitSliderBars2()
 		m_daysetpoint = nSP;//0913
 
 		strTemp.Format(_T("%.1f"),(float)nCoolSP);
-		m_DayCoolEdit.SetWindowText(strTemp);
+		m_DayCoolEdit.FieldText(strTemp);
 		strTemp.Format(_T("%.1f"),(float)nHeatSP);
-		m_DayHeatEdit.SetWindowText(strTemp);
+		m_DayHeatEdit.FieldText(strTemp);
 
 		//nSP= int(nSP/10.0);
 		if (nCoolSP == nHeatSP && nCoolSP== nSP )
@@ -1020,13 +1067,13 @@ void CT3000View::InitSliderBars2()
 		//m_nightSlider.SetPos((int)(max-(itemp-min)));
 		int nCoolSP = itemp;//(int)(max-(itemp-min));
 		strTemp.Format(_T("%.1f"),float(nCoolSP-nSP));
-		m_DayCoolEdit.SetWindowText(strTemp);
+		m_DayCoolEdit.FieldText(strTemp);
 
 		itemp=product_register_value[MODBUS_HEATING_SETPOINT];//heat
 		//m_nightHeatSlider.SetPos((int)(max-(itemp-min)));
 		int nHeatSP = itemp;//((int)(max-(itemp-min)));
 		strTemp.Format(_T("%.1f"),float(nSP-nHeatSP));
-		m_DayHeatEdit.SetWindowText(strTemp);
+		m_DayHeatEdit.FieldText(strTemp);
 
 		m_DayCoolStatic.SetWindowText(_T("Cooling DB"));
 		m_DayHeatStatic.SetWindowText(_T("Heating DB"));
@@ -1082,11 +1129,11 @@ void CT3000View::InitSliderBars2()
 
 
 		strTemp.Format(_T("%.1f"),(float)nCoolSP);
-		m_nightInfoEdit.SetWindowText(strTemp);
+		m_nightInfoEdit.FieldText(strTemp);
 
 
 		strTemp.Format(_T("%.1f"),(float)nHeatSP);
-		m_nightHeatInfoEdit.SetWindowText(strTemp);
+		m_nightHeatInfoEdit.FieldText(strTemp);
 		m_NightCoolStatic.SetWindowText(_T("Cooling SP"));
 		m_NightHeatStatic.SetWindowText(_T("Heating SP"));
 
@@ -1126,13 +1173,13 @@ void CT3000View::InitSliderBars2()
 		//m_nightSlider.SetPos(max-(itemp-min));
 		int nCoolDB = product_register_value[124]/10;//(max-(itemp-min));
 		strTemp.Format(_T("%.1f"),(float)product_register_value[124]/10);
-		m_nightInfoEdit.SetWindowText(strTemp);
+		m_nightInfoEdit.FieldText(strTemp);
 
 		//itemp=the_setpoint_ha_ha-product_register_value[123];//heat
 		//m_nightHeatSlider.SetPos(max-(itemp-min));
 		int nHeatDB = product_register_value[123]/10;//(max-(itemp-min));
 		strTemp.Format(_T("%.1f"),(float)product_register_value[123]/10);
-		m_nightHeatInfoEdit.SetWindowText(strTemp);
+		m_nightHeatInfoEdit.FieldText(strTemp);
 
 		strTemp.Format(_T("%d"), nSP);
 		//0913
@@ -1245,10 +1292,11 @@ void CT3000View::UpdateSliderBars2()
 		m_daysetpoint = nSP;//0913
 
 		strTemp.Format(_T("%.1f"),(float)nCoolSP);
-		m_DayCoolEdit.SetWindowText(strTemp);
+		m_DayCoolEdit.FieldText(strTemp);
+		//m_DayCoolEdit.SetNumberDefaultTex();
 		strTemp.Format(_T("%.1f"),(float)nHeatSP);
-		m_DayHeatEdit.SetWindowText(strTemp);
-
+		m_DayHeatEdit.FieldText(strTemp);
+		//m_DayHeatEdit.SetNumberDefaultTex();
 		//nSP= int(nSP/10.0);
 		if (nCoolSP == nHeatSP && nCoolSP== nSP )
 		{
@@ -1298,11 +1346,12 @@ void CT3000View::UpdateSliderBars2()
 		CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
 		pSPWnd->SetWindowText(strTemp);
 
-		strTemp.Format(_T("%d"), nCoolSP);
-		m_nightInfoEdit.SetWindowText(strTemp);
-		strTemp.Format(_T("%d"), nHeatSP);
-		m_nightHeatInfoEdit.SetWindowText(strTemp);
-
+		strTemp.Format(_T("%0.1f"), (float)nCoolSP);
+		m_nightInfoEdit.FieldText(strTemp);
+	//	m_nightInfoEdit.SetNumberDefaultTex();
+		strTemp.Format(_T("%0.1f"), (float)nHeatSP);
+		m_nightHeatInfoEdit.FieldText(strTemp);
+		//m_nightHeatInfoEdit.SetNumberDefaultTex();
 		m_NightCoolStatic.SetWindowText(_T("Cooling SP"));
 		m_NightHeatStatic.SetWindowText(_T("Heating SP"));
 
@@ -1380,7 +1429,7 @@ void CT3000View::OnNMReleasedcaptureDaySlider(NMHDR *pNMHDR, LRESULT *pResult)
 		
 	CString strTemp;
 	strTemp.Format(_T("%d"),nCurDay);
-	m_dayInfoEdit.SetWindowText(strTemp);
+	m_dayInfoEdit.FieldText(strTemp);
 
 // 	if(m_fFirmwareVersion<34.9 || )
 // 		write_one(g_tstat_id,135,nCurDay);	//write setpoint ,for TStat5E
@@ -1443,8 +1492,8 @@ void CT3000View::OnNMReleasedcaptureNightSlider(NMHDR *pNMHDR, LRESULT *pResult)
 	m_nightSlider.SetPos(max-nCurNight+min);
 	CString strTemp;
 	strTemp.Format(_T("%d"),nCurNight);
-	m_nightInfoEdit.SetWindowText(strTemp);
-	
+	m_nightInfoEdit.FieldText(strTemp);
+	//m_nightInfoEdit.SetNumberDefaultTex();
 	if(hotel_or_office==0)
 	{//setpoint
 		write_one(g_tstat_id,MODBUS_NIGHT_COOLING_SETPOINT,nCurNight);//183
@@ -1473,8 +1522,8 @@ void CT3000View::OnNMReleasedcaptureNightheatSlider(NMHDR *pNMHDR, LRESULT *pRes
 	*/
 //	m_nightHeatSlider.SetPos(max-nCurNightHeat+min);
 	CString strTemp;
-	strTemp.Format(_T("%d"),nCurNightHeat);
-	m_nightHeatInfoEdit.SetWindowText(strTemp);
+	strTemp.Format(_T("%0.1f"),(float)nCurNightHeat);
+	m_nightHeatInfoEdit.FieldText(strTemp);
 	int hotel_or_office=product_register_value[MODBUS_APPLICATION];//125
 	if(hotel_or_office==0)
 	{
@@ -1989,7 +2038,7 @@ void CT3000View::Fresh_In()
 	
 	if(nModel == PM_TSTAT6 ||nModel == PM_TSTAT7 ||nModel == PM_TSTAT5i)// Tstat 6
 	{
-
+		int m_crange=0;
 		//Mdb_Adress_Map = T3000_6_ADDRESS; //让其在 T3000_6_ADDRESS 中 进行地址 Maping;
 		/*
 		for(int i=1;i++;i<=8)
@@ -2014,7 +2063,8 @@ void CT3000View::Fresh_In()
 		m_Input_Grid.put_TextMatrix(11,1,g_strInCO2);
 		strTemp.Empty();
 		if(m_fFirmwareVersion>33.3)
-		{	   BOOL m_disable_hum,m_disable_CO2;
+		{	  
+			BOOL m_disable_hum,m_disable_CO2;
 			float nValue;
 			for(int i=0;i<9;i++)
 			{
@@ -2033,7 +2083,6 @@ void CT3000View::Fresh_In()
 				}
 				else
 				{
-
 // 
 // 						359	122	1	Low byte	W/R	ANALOG INPUT1 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
 // 						2	123	1	Low byte	W/R	ANALOG INPUT2 RANGE. 0 = raw data, 1 = thermistor, 2 = %, 3 = ON/OFF, 4 = N/A, 5 = OFF/ON
@@ -2054,17 +2103,70 @@ void CT3000View::Fresh_In()
 // 						14	136	2	Full	W/R	Analog input6 value
 // 						15	137	2	Full	W/R	Analog input7 value
 // 						16	138	2	Full	W/R	Analog input8 value
-
-					//int yy =_G("MODBUS_ANALOG1_RANGE");
+					m_crange=0;
+					int m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
+					CADO ado;
+					ado.OnInitADOConn();
+					if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+					{
+						CString sql;
+						sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),i,m_sn);
+						ado.m_pRecordset=ado.OpenRecordset(sql);
+						if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+						{    
+							ado.m_pRecordset->MoveFirst();
+							while (!ado.m_pRecordset->EndOfFile)
+							{
+								m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
+								ado.m_pRecordset->MoveNext();
+							}
+							nValue=m_crange;	 
+							//if(nValue>=0)
+							//{
+							//	strTemp=analog_range[nValue];
+							//}
+						} 
+						else
+						{
+							//nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];	//189
+							//if(nValue>=0)
+							//{
+							//	strTemp=analog_range[nValue]; 
+							//}
+						}
+						ado.CloseRecordset();
+					}
+					else
+					{
+						//nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];	//189
+						//if(nValue>=0)
+						//{
+						//	strTemp=analog_range[nValue]; 
+						//}
+					}
+					ado.CloseConn();
+				 
 					if(product_register_value[MODBUS_ANALOG1_RANGE+i-1]==1) //122
 					{
 						nValue= (float)(product_register_value[MODBUS_ANALOG_INPUT1+i-1]/10.0); //131
 						strTemp.Format(_T("%.1f"),nValue);
 					}
-					else if(product_register_value[MODBUS_ANALOG1_RANGE+i-1]==3) // On/Off
-					{
+					else if(product_register_value[MODBUS_ANALOG1_RANGE+i-1]==3||product_register_value[MODBUS_ANALOG1_RANGE+i-1]==5) // On/Off
+					{   
+						if (m_crange==9||m_crange==10){
+						nValue=product_register_value[MODBUS_ANALOG_INPUT1+i-1];//131
+						strTemp= nValue ==1 ? _T("Open") : _T("Closed");
+					    }
+					    else if (m_crange==7||m_crange==8)
+					    {
+							nValue=product_register_value[MODBUS_ANALOG_INPUT1+i-1];//131
+							strTemp= nValue ==1 ? _T("Occupied") : _T("Unoccupied");
+					    }
+					else{
 						nValue=product_register_value[MODBUS_ANALOG_INPUT1+i-1];//131
 						strTemp= nValue ==1 ? _T("On") : _T("Off");
+					}
+						
 					}
 					else if(product_register_value[MODBUS_ANALOG1_RANGE+i-1]==2)
 					{
@@ -2078,11 +2180,11 @@ void CT3000View::Fresh_In()
 						strTemp.Format(_T("%.1f"), (float)nValue/10.0);	
 						strTemp +=strValueUnit;
 					}
-					else if(product_register_value[MODBUS_ANALOG1_RANGE+i-1]==5) // Off/On  //122
-					{
-						nValue=product_register_value[MODBUS_ANALOG_INPUT1+i-1];
-						strTemp= nValue ==1 ? _T("On") : _T("Off");
-					}
+// 					else if(product_register_value[MODBUS_ANALOG1_RANGE+i-1]==5) // Off/On  //122
+// 					{
+// 						nValue=product_register_value[MODBUS_ANALOG_INPUT1+i-1];
+// 						strTemp= nValue ==1 ? _T("On") : _T("Off");
+// 					}
 					else
 					{
 						//strTemp.Format(_T("%d"),product_register_value[367+i-1]);//tatat6
@@ -2105,33 +2207,71 @@ void CT3000View::Fresh_In()
 			{
 				m_disable_CO2=FALSE;
 			}
-		
-				if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
-				{
+		     if (!m_disable_hum)
+		     {
+				 for (int col=0;col<3;col++)
+				 {
+					 m_Input_Grid.put_Col(col);
+					 m_Input_Grid.put_Row(10);
+					 m_Input_Grid.put_CellBackColor(DISABLE_COLOR_CELL);
+				 }
+		     } 
+		     else
+		     {
+				 if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
+				 {
 
-					strTemp.Format(_T("%0.1f%%"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
-					m_Input_Grid.put_TextMatrix(10,2,strTemp);
+					 strTemp.Format(_T("%0.1f%%"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
+					 m_Input_Grid.put_TextMatrix(10,2,strTemp);
+				 }
+				 else
+				 {
+
+					 strTemp.Format(_T("%0.1f%%"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
+					 m_Input_Grid.put_TextMatrix(10,2,strTemp);
+				 }
+		     }
+				
+			if (!m_disable_CO2)
+			{
+				for (int col=0;col<3;col++)
+				{
+					m_Input_Grid.put_Col(col);
+					m_Input_Grid.put_Row(11);
+					m_Input_Grid.put_CellBackColor(DISABLE_COLOR_CELL);
 				}
-				else
+			}
+			else
+			{
+				if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
 				{
 
-					strTemp.Format(_T("%0.1f%%"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
-					m_Input_Grid.put_TextMatrix(10,2,strTemp);
-				}
-			
-				if (product_register_value[607]==0)
-				{
-
-					strTemp.Format(_T("%d"),product_register_value[139]);
+					strTemp.Format(_T("%dppm"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
 					m_Input_Grid.put_TextMatrix(11,2,strTemp);
 				}
 				else
 				{
 
-					strTemp.Format(_T("%d"),product_register_value[608]);
+					strTemp.Format(_T("%dppm"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
 					m_Input_Grid.put_TextMatrix(11,2,strTemp);
 				}
+			}
 			
+
+				/*if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
+				{     strUnit=_T("ppm");
+				m_FlexGrid.put_TextMatrix(11,AM_FIELD,strAuto);
+				temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
+				temp+=strUnit;
+				m_FlexGrid.put_TextMatrix(11,VALUE_FIELD,temp);
+				}
+				else
+				{
+					m_FlexGrid.put_TextMatrix(11,AM_FIELD,strman);
+					temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
+					temp+=strUnit;
+					m_FlexGrid.put_TextMatrix(11,VALUE_FIELD,temp);
+				}*/
 		
 		}
 		else
@@ -2294,7 +2434,10 @@ void CT3000View::Fresh_In()
 void CT3000View::Fresh_Out()
 {
 //	Savetmp_Mdb_Adress_Map();
+	int nRange;
 	int nModel=product_register_value[MODBUS_PRODUCT_MODEL];
+	int m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
+
 //	switch (nModel)
 	CString strTemp;
 	int itemp=product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS];
@@ -2311,11 +2454,69 @@ void CT3000View::Fresh_Out()
 		for(int i=1;i<=3;i++)
 		{
 			//strTemp.Format(_T("Output %d"),i);
-			
-			if(itemp &( 1<<(i-1)))
-				strTemp=_T("ON");
+			 
+			  nRange=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+			{
+
+				CADO ado;
+				ado.OnInitADOConn();
+				if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+				{
+					CString sql;
+					sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),i,i,m_sn);
+					ado.m_pRecordset=ado.OpenRecordset(sql);
+					if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+					{    
+						ado.m_pRecordset->MoveFirst();
+						while (!ado.m_pRecordset->EndOfFile)
+						{
+							nRange=ado.m_pRecordset->GetCollect(_T("CRange"));
+							ado.m_pRecordset->MoveNext();
+						}
+					} 
+					ado.CloseRecordset();
+				}
+				ado.CloseConn();
+
+				 
+			} 
+
+			 
+			if (nRange==0||nRange==4||nRange==5||nRange==6)
+			{
+				if(itemp&(1<<(i-1)))
+			{
+				if (nRange==0||nRange==4)
+				{
+					strTemp=_T("On");
+				} 
+				else if (nRange==5||nRange==6)
+				{
+					strTemp=_T("Open");
+				}
+
+
+			}
 			else
-				strTemp=_T("OFF");
+			{
+				if (nRange==0||nRange==4)
+				{
+					strTemp=_T("Off");
+				} 
+				else if (nRange==5||nRange==6)
+				{
+					strTemp=_T("Closed");
+				}
+			}
+			}
+			else
+			{
+				//comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
+				int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
+				strTemp.Format(_T("%d%%"), nValueTemp);
+			}
+			 
 			m_Output_Grid.put_TextMatrix(i,2,strTemp);
 			strTemp.Empty();
 		}
@@ -2326,10 +2527,66 @@ void CT3000View::Fresh_Out()
 	if(nModel==1||nModel==4||nModel==12||nModel==16||nModel==3
 		||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||nModel==PM_PRESSURE)//B,C,D,E
 	{
-		if(itemp &( 1<<3))
-				strTemp=_T("ON");
+
+		nRange = product_register_value[MODBUS_MODE_OUTPUT4];
+		CADO ado;
+		ado.OnInitADOConn();
+		if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+		{
+			CString sql;
+			sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),4,4,m_sn);
+			ado.m_pRecordset=ado.OpenRecordset(sql);
+			if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+			{    
+				ado.m_pRecordset->MoveFirst();
+				while (!ado.m_pRecordset->EndOfFile)
+				{
+					nRange=ado.m_pRecordset->GetCollect(_T("CRange"));
+					ado.m_pRecordset->MoveNext();
+				}	 
+			} 
+			 
+			ado.CloseRecordset();
+		} 
+		ado.CloseConn();
+
+
+		if(nRange == 0||nRange==4||nRange==5||nRange==6 ) // AM栏选择了Auto或者Range 栏选择了On/Off，value都显示ON/Off
+		{  // output is on/off
+
+
+			if(itemp&8)
+			{
+				if (nRange==0||nRange==4)
+				{
+					strTemp=_T("On");
+				} 
+				else if (nRange==5||nRange==6)
+				{
+					strTemp=_T("Open");
+				}
+
+
+			}
 			else
-				strTemp=_T("OFF");
+			{
+				if (nRange==0||nRange==4)
+				{
+					strTemp=_T("Off");
+				} 
+				else if (nRange==5||nRange==6)
+				{
+					strTemp=_T("Closed");
+				}
+			}
+
+		}
+		else // output is value
+		{
+			//comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
+			int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
+			strTemp.Format(_T("%d%%"), nValueTemp);
+		}
 
 		m_Output_Grid.put_TextMatrix(4,2,strTemp);
 	//	strTemp.Format(_T("Output %d"),4);
@@ -2340,6 +2597,68 @@ void CT3000View::Fresh_Out()
 				strTemp=_T("ON");
 		else
 				strTemp=_T("OFF");
+
+
+		nRange = product_register_value[MODBUS_MODE_OUTPUT5];
+		//CADO ado;
+		ado.OnInitADOConn();
+		if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+		{
+			CString sql;
+			sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),5,5,m_sn);
+			ado.m_pRecordset=ado.OpenRecordset(sql);
+			if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+			{    
+				ado.m_pRecordset->MoveFirst();
+				while (!ado.m_pRecordset->EndOfFile)
+				{
+					nRange=ado.m_pRecordset->GetCollect(_T("CRange"));
+					ado.m_pRecordset->MoveNext();
+				}	 
+			} 
+
+			ado.CloseRecordset();
+		} 
+		ado.CloseConn();
+
+
+		if(nRange == 0||nRange==4||nRange==5||nRange==6 ) // AM栏选择了Auto或者Range 栏选择了On/Off，value都显示ON/Off
+		{  // output is on/off
+
+
+			if(itemp&16)
+			{
+				if (nRange==0||nRange==4)
+				{
+					strTemp=_T("On");
+				} 
+				else if (nRange==5||nRange==6)
+				{
+					strTemp=_T("Open");
+				}
+
+
+			}
+			else
+			{
+				if (nRange==0||nRange==4)
+				{
+					strTemp=_T("Off");
+				} 
+				else if (nRange==5||nRange==6)
+				{
+					strTemp=_T("Closed");
+				}
+			}
+
+		}
+		else // output is value
+		{
+			//comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
+			int nValueTemp = product_register_value[MODBUS_PWM_OUT5]; //348 //598
+			strTemp.Format(_T("%d%%"), nValueTemp);
+		}
+
 		m_Output_Grid.put_TextMatrix(5,2,strTemp);
 
 		//strTemp.Format(_T("Output %d"),5);
@@ -2348,7 +2667,7 @@ void CT3000View::Fresh_Out()
 	}
 
 		//:DEG 6. 7
-		int nRange=product_register_value[MODBUS_OUTPUT1_SCALE];
+		  nRange=product_register_value[MODBUS_OUTPUT1_SCALE];
 		if(nModel==12||nModel==16||nModel==18||nModel==PM_TSTAT6||nModel==PM_TSTAT5i||nModel==PM_TSTAT7||nModel==PM_PRESSURE)
 		{
 			if(nRange==0)
@@ -2401,8 +2720,8 @@ void CT3000View::Fresh_Out()
 			nRange=product_register_value[MODBUS_OUTPUT2_SCALE];
 			if(nRange==0)
 			{
-				itemp=product_register_value[MODBUS_HEATING_VALVE];
-				
+				//itemp=product_register_value[MODBUS_HEATING_VALVE];
+				  itemp=product_register_value[103];
 				if(itemp==0)
 					strTemp=_T("OFF");
 				if(itemp==1)
@@ -2595,13 +2914,14 @@ void CT3000View::FreshIOGridTable()
 
 			 }
 			break;	
-		case PM_TSTAT7:
+		
 		case PM_TSTAT5D:  // 5D 同 TStat7
 			{
 				m_outRows=8;
 				m_inRows=5;
 
 			 }break;
+		case PM_TSTAT7:
 		case PM_TSTAT6:
 			{
 				m_outRows=8;
@@ -3820,7 +4140,7 @@ void CT3000View::InitFlexSliderBars()
 		strTemp.Format(_T("%.1f°C"),m_fTemperature);
 	else
 		strTemp.Format(_T("%.1f°F"),m_fTemperature);
-//	m_TempInfoEdit.SetWindowText(strTemp);	//2.5.0.95
+//	m_TempInfoEdit.FieldText(strTemp);	//2.5.0.95
 
 	// calc 
 	short nOccupied = product_register_value[MODBUS_INFO_BYTE];  // Day setpoint option  //184
@@ -3850,7 +4170,7 @@ void CT3000View::InitFlexSliderBars()
 			}
 
 			strTemp.Format(_T("%d"), nSP);
-			m_dayInfoEdit.SetWindowText(strTemp);
+			m_dayInfoEdit.FieldText(strTemp);
 
 			//CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
 			//pSPWnd->SetWindowText(strTemp);	
@@ -3858,10 +4178,11 @@ void CT3000View::InitFlexSliderBars()
 			m_DayCoolStatic.SetWindowText(_T("Cooling SP"));
 			m_DayHeatStatic.SetWindowText(_T("Heating SP"));
 			strTemp.Format(_T("%d"), nCoolSP);
-			m_DayCoolEdit.SetWindowText(strTemp);
+			m_DayCoolEdit.FieldText(strTemp);
+			//m_DayCoolEdit.SetNumberDefaultTex();
 			strTemp.Format(_T("%d"), nHeatSP);
-			m_DayHeatEdit.SetWindowText(strTemp);
-
+			m_DayHeatEdit.FieldText(strTemp);
+		//	m_DayHeatEdit.SetNumberDefaultTex();
 
 			nRangeMax = nCoolSP > nRangeMax ? nCoolSP : nRangeMax;
 			nRangeMin = nHeatSP < nRangeMin ? nHeatSP : nRangeMin;
@@ -3878,11 +4199,12 @@ void CT3000View::InitFlexSliderBars()
 			//stat6
 			m_pNightTwoSP->ShowWindow(SW_HIDE);
 			m_pNightSingleSP->ShowWindow(SW_HIDE);
-			strTemp.Format(_T("%d"), 0);
-			m_nightInfoEdit.SetWindowText(strTemp);
-			strTemp.Format(_T("%d"), 0);
-			m_nightHeatInfoEdit.SetWindowText(strTemp);
-
+			strTemp.Format(_T("0.0"));
+			m_nightInfoEdit.FieldText(strTemp);
+			//m_nightInfoEdit.SetNumberDefaultTex();
+			strTemp.Format(_T("0.0"));
+			m_nightHeatInfoEdit.FieldText(strTemp);
+			//m_nightHeatInfoEdit.SetNumberDefaultTex();
 			strTemp.Format(_T("%d"),0);
 			CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
 			pSPWnd->SetWindowText(strTemp);
@@ -3926,12 +4248,14 @@ void CT3000View::InitFlexSliderBars()
 			strTemp.Format(_T("%d"), nSP);
 			//CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
 			//pSPWnd->SetWindowText(strTemp);
-			m_dayInfoEdit.SetWindowText(strTemp);
+			m_dayInfoEdit.FieldText(strTemp);
 
 			strTemp.Format(_T("%d"), nCoolDeadband);
-			m_DayCoolEdit.SetWindowText(strTemp);
-			strTemp.Format(_T("%d"), product_register_value[nHeatingDBRegister]);
-			m_DayHeatEdit.SetWindowText(strTemp);
+			m_DayCoolEdit.FieldText(strTemp);
+			//m_DayCoolEdit.SetNumberDefaultTex();
+			strTemp.Format(_T("%0.1f"), (float)product_register_value[nHeatingDBRegister]);
+			m_DayHeatEdit.FieldText(strTemp);
+			//m_DayHeatEdit.SetNumberDefaultTex();
 			//0903
 // 			m_DayCoolStatic.SetWindowText(_T("Cooling DB"));
 // 			m_DayHeatStatic.SetWindowText(_T("Heating DB"));
@@ -3955,10 +4279,12 @@ void CT3000View::InitFlexSliderBars()
 			//stat6
 			m_pNightTwoSP->ShowWindow(SW_HIDE);
 			m_pNightSingleSP->ShowWindow(SW_HIDE);
-			strTemp.Format(_T("%d"), 0);
-			m_nightInfoEdit.SetWindowText(strTemp);
-			strTemp.Format(_T("%d"), 0);
-			m_nightHeatInfoEdit.SetWindowText(strTemp);
+			strTemp.Format(_T("0.0"));
+			m_nightInfoEdit.FieldText(strTemp);
+			//m_nightInfoEdit.SetNumberDefaultTex();
+			strTemp.Format(_T("0.0"));
+			m_nightHeatInfoEdit.FieldText(strTemp);
+			//m_nightHeatInfoEdit.SetNumberDefaultTex();
 			strTemp.Format(_T("%d"),0);
 			CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
 			pSPWnd->SetWindowText(strTemp);
@@ -3983,15 +4309,16 @@ void CT3000View::InitFlexSliderBars()
 				nCoolSP = nHeatSP + 1;
 			}
 
-			strTemp.Format(_T("%d"), (nCoolSP + nHeatSP)/2);
+			strTemp.Format(_T("%0.1f"),(float)((nCoolSP + nHeatSP))/2);
 			CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
 			pSPWnd->SetWindowText(strTemp);
 
 			strTemp.Format(_T("%d"), nCoolSP);
-			m_nightInfoEdit.SetWindowText(strTemp);
-			strTemp.Format(_T("%d"), nHeatSP);
-			m_nightHeatInfoEdit.SetWindowText(strTemp);
-
+			m_nightInfoEdit.FieldText(strTemp);
+			//m_nightInfoEdit.SetNumberDefaultTex();
+			strTemp.Format(_T("%0.1f"), (float)nHeatSP);
+			m_nightHeatInfoEdit.FieldText(strTemp);
+			
 			m_NightCoolStatic.SetWindowText(_T("Cooling SP"));
 			m_NightHeatStatic.SetWindowText(_T("Heating SP"));
 
@@ -4008,14 +4335,16 @@ void CT3000View::InitFlexSliderBars()
 			//stat6
 
 			strTemp.Format(_T("%d"), 0);
-			m_DayCoolEdit.SetWindowText(strTemp);
-			strTemp.Format(_T("%d"), 0);
-			m_DayHeatEdit.SetWindowText(strTemp);
+			m_DayCoolEdit.FieldText(strTemp);
+		//	m_DayCoolEdit.SetNumberDefaultTex();
+			strTemp.Format(_T("0.0"));
+			m_DayHeatEdit.FieldText(strTemp);
+			//m_DayHeatEdit.SetNumberDefaultTex();
 			m_pDaySingleSP->ShowWindow(SW_HIDE);
 			m_pDayTwoSP->ShowWindow(SW_HIDE);
 
 			strTemp.Format(_T("%d"), 0);
-			m_dayInfoEdit.SetWindowText(strTemp);
+			m_dayInfoEdit.FieldText(strTemp);
 		 }
 		else  // hotel
 		{
@@ -4051,10 +4380,11 @@ void CT3000View::InitFlexSliderBars()
 			CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
 			pSPWnd->SetWindowText(strTemp);
 
-			strTemp.Format(_T("%d"), product_register_value[nCoolingRegister]);
-			m_nightInfoEdit.SetWindowText(strTemp);
-			strTemp.Format(_T("%d"), product_register_value[nHeatingRegister]);
-			m_nightHeatInfoEdit.SetWindowText(strTemp);
+			strTemp.Format(_T("%0.1f"),(float) product_register_value[nCoolingRegister]);
+			m_nightInfoEdit.FieldText(strTemp);
+		//	m_nightInfoEdit.SetNumberDefaultTex();
+			strTemp.Format(_T("%0.1f"),(float) product_register_value[nHeatingRegister]);
+			m_nightHeatInfoEdit.FieldText(strTemp);
 //0903
 // 			m_NightCoolStatic.SetWindowText(_T("Cooling DB"));
 // 			m_NightHeatStatic.SetWindowText(_T("Heating DB"));
@@ -4076,13 +4406,14 @@ void CT3000View::InitFlexSliderBars()
 			//stat6
 
 			strTemp.Format(_T("%d"), 0);
-			m_DayCoolEdit.SetWindowText(strTemp);
-			strTemp.Format(_T("%d"), 0);
-			m_DayHeatEdit.SetWindowText(strTemp);
+			m_DayCoolEdit.FieldText(strTemp);
+		//	m_DayCoolEdit.SetNumberDefaultTex();
+			strTemp.Format(_T("0.0"));
+			m_DayHeatEdit.FieldText(strTemp);
 			m_pDaySingleSP->ShowWindow(SW_HIDE);
 			m_pDayTwoSP->ShowWindow(SW_HIDE);
 			strTemp.Format(_T("%d"), 0);
-			m_dayInfoEdit.SetWindowText(strTemp);
+			m_dayInfoEdit.FieldText(strTemp);
 		}
 	}
 
@@ -4147,10 +4478,11 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
 
 
 					//0910
-					strTemp.Format(_T("%d"),nCoolSP);
-					m_nightInfoEdit.SetWindowText(strTemp);
-					strTemp.Format(_T("%d"),nHeatSP);
-					m_nightHeatInfoEdit.SetWindowText(strTemp);
+					strTemp.Format(_T("%0.1f"),(float)nCoolSP);
+					m_nightInfoEdit.FieldText(strTemp);
+				//	m_nightInfoEdit.SetNumberDefaultTex();
+					strTemp.Format(_T("%0.1f"),(float)nHeatSP);
+					m_nightHeatInfoEdit.FieldText(strTemp);
 
 
 					BeginWaitCursor();
@@ -4225,14 +4557,15 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
 				pSPWnd->SetWindowText(strTemp);
 
 				//strTemp.Format(_T("%d"),nHeatSP);
-				//m_nightInfoEdit.SetWindowText(strTemp);
+				//m_nightInfoEdit.FieldText(strTemp);
 				//strTemp.Format(_T("%d"),nCoolSP);
-				//m_nightHeatInfoEdit.SetWindowText(strTemp);
+				//m_nightHeatInfoEdit.FieldText(strTemp);
 				//0910
-				strTemp.Format(_T("%d"),nCoolSP);
-				m_nightInfoEdit.SetWindowText(strTemp);
-				strTemp.Format(_T("%d"),nHeatSP);
-				m_nightHeatInfoEdit.SetWindowText(strTemp);
+				strTemp.Format(_T("%0.1f"),(float)nCoolSP);
+				m_nightInfoEdit.FieldText(strTemp);
+			//	m_nightInfoEdit.SetNumberDefaultTex();
+				strTemp.Format(_T("%0.1f"),(float)nHeatSP);
+				m_nightHeatInfoEdit.FieldText(strTemp);
 				BeginWaitCursor();
 
 				int ret=0;
@@ -4285,18 +4618,19 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
 
 					CString strTemp;
 					// 			strTemp.Format(_T("%d"), nHeatSP);
-					// 			m_DayCoolEdit.SetWindowText(strTemp);
+					// 			m_DayCoolEdit.FieldText(strTemp);
 					// 			strTemp.Format(_T("%d"), nCoolSP);
-					// 			m_DayHeatEdit.SetWindowText(strTemp);
+					// 			m_DayHeatEdit.FieldText(strTemp);
 
 					//0910
 					strTemp.Format(_T("%d"),nCoolSP );
-					TRACE(strTemp);
-					m_DayCoolEdit.SetWindowText(strTemp);
-					strTemp.Format(_T("%d"),nHeatSP );
-					TRACE(strTemp);
-					m_DayHeatEdit.SetWindowText(strTemp);
-
+					 
+					m_DayCoolEdit.FieldText(strTemp);
+				//	m_DayCoolEdit.SetNumberDefaultTex();
+					strTemp.Format(_T("%0.1f"),(float)nHeatSP );
+					 
+					m_DayHeatEdit.FieldText(strTemp);
+				//	m_DayHeatEdit.SetNumberDefaultTex();
 					BeginWaitCursor();
 					ret =write_one(g_tstat_id, MODBUS_DAY_COOLING_SETPOINT,nCoolSP*10,5);//t6 348;
 					//	ret =write_one(g_tstat_id, 345,nSP*10 ,5);
@@ -4348,19 +4682,20 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
 
 				CString strTemp;
 				strTemp.Format(_T("%d"), nSP);
-				m_dayInfoEdit.SetWindowText(strTemp);
+				m_dayInfoEdit.FieldText(strTemp);
 
 				// 			strTemp.Format(_T("%d"), nHeatSP);
-				// 			m_DayCoolEdit.SetWindowText(strTemp);
+				// 			m_DayCoolEdit.FieldText(strTemp);
 				// 			strTemp.Format(_T("%d"), nCoolSP);
-				// 			m_DayHeatEdit.SetWindowText(strTemp);
+				// 			m_DayHeatEdit.FieldText(strTemp);
 				//0910
 
 				strTemp.Format(_T("%d"), nCoolSP);
-				m_DayCoolEdit.SetWindowText(strTemp);
-				strTemp.Format(_T("%d"), nHeatSP);
-				m_DayHeatEdit.SetWindowText(strTemp);
-
+				m_DayCoolEdit.FieldText(strTemp);
+				//m_DayCoolEdit.SetNumberDefaultTex();
+				strTemp.Format(_T("%0.1f"), (float)nHeatSP);
+				m_DayHeatEdit.FieldText(strTemp);
+			//	m_DayHeatEdit.SetNumberDefaultTex();
 				BeginWaitCursor();
 				int ret1=0;int ret2=0;int ret3=0;
 				ret1 =write_one(g_tstat_id, MODBUS_DAY_COOLING_SETPOINT,nCoolSP*10,5);//348  t6
@@ -4632,7 +4967,7 @@ void CT3000View::InitFanSpeed()
 	}
 	else
 	{
-		switch(product_register_value[MODBUS_FAN_MODE])		//122   105
+		switch(product_register_value[MODBUS_FAN_MODE]-1)		//122   105
 		{
 		case 0:m_FanComBox.AddString(p[0]);m_FanComBox.AddString(p[1]);m_FanComBox.AddString(p[5]);break;
 		case 1:m_FanComBox.AddString(p[0]);m_FanComBox.AddString(p[2]);m_FanComBox.AddString(p[4]);m_FanComBox.AddString(p[5]);break;
@@ -4771,12 +5106,14 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			m_pDaySingleSP->ShowWindow(SW_HIDE);
 
 			strTemp.Format(_T("%0.1f"),((float)product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10.0) );
-			m_DayCoolEdit.SetWindowText(strTemp);
+			m_DayCoolEdit.FieldText(strTemp);
+			//m_DayCoolEdit.SetNumberDefaultTex();
 			strTemp.Format(_T("%0.1f"),((float)product_register_value[MODBUS_DAY_HEATING_SETPOINT]/10.0));
-			m_DayHeatEdit.SetWindowText(strTemp);
+			m_DayHeatEdit.FieldText(strTemp);
+			//m_DayHeatEdit.SetNumberDefaultTex();
 			m_daysetpoint = nSP;
 			strTemp.Format(_T("%0.1f"),((float)product_register_value[MODBUS_DAY_SETPOINT]/10.0));
-			m_dayInfoEdit.SetWindowText(strTemp);
+			m_dayInfoEdit.FieldText(strTemp);
 
 			UpdateData(FALSE);
  
@@ -4888,18 +5225,20 @@ void CT3000View::InitFlexSliderBars_tstat6()
  			m_pDayTwoSP->ShowWindow(SW_HIDE);
  
  			strTemp.Format(_T("%d"), nSP);
- 			m_dayInfoEdit.SetWindowText(strTemp);
+ 			m_dayInfoEdit.FieldText(strTemp);
  
 //  			strTemp.Format(_T("%d"),nHeatSP );
-//  			m_DayCoolEdit.SetWindowText(strTemp);
+//  			m_DayCoolEdit.FieldText(strTemp);
 //  			strTemp.Format(_T("%d"),nCoolSP);
-//  			m_DayHeatEdit.SetWindowText(strTemp);
+//  			m_DayHeatEdit.FieldText(strTemp);
 
 			//0910
 			strTemp.Format(_T("%d"),nCoolSP );
-			m_DayCoolEdit.SetWindowText(strTemp);
-			strTemp.Format(_T("%d"),nHeatSP);
-			m_DayHeatEdit.SetWindowText(strTemp);
+			m_DayCoolEdit.FieldText(strTemp);
+			//m_DayCoolEdit.SetNumberDefaultTex();
+			strTemp.Format(_T("%0.1f"),(float)nHeatSP);
+			m_DayHeatEdit.FieldText(strTemp);
+		//	m_DayHeatEdit.SetNumberDefaultTex();
 
 
 
@@ -4907,12 +5246,12 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//349	2	Full	W/R	(Day)Occupied  heating setpoint (day heating setpoint)
 
 // 			strTemp.Format(_T("%d"), newtstat6[345]/10);
-// 			m_dayInfoEdit.SetWindowText(strTemp);
+// 			m_dayInfoEdit.FieldText(strTemp);
 // 
 // 			strTemp.Format(_T("%d"),newtstat6[349]/10);
-// 			m_DayCoolEdit.SetWindowText(strTemp);
+// 			m_DayCoolEdit.FieldText(strTemp);
 // 			strTemp.Format(_T("%d"),newtstat6[348]/10);
-// 			m_DayHeatEdit.SetWindowText(strTemp);
+// 			m_DayHeatEdit.FieldText(strTemp);
 
 // 			m_DayCoolStatic.SetWindowText(_T("Heating SP"));
 // 			m_DayHeatStatic.SetWindowText(_T("Cooling SP"));
@@ -4928,9 +5267,9 @@ void CT3000View::InitFlexSliderBars_tstat6()
 //  			m_pNightTwoSP->ShowWindow(SW_HIDE);
 //  			m_pNightSingleSP->ShowWindow(SW_HIDE);
 //  			strTemp.Format(_T("%d"), 0);
-//  			m_nightInfoEdit.SetWindowText(strTemp);
+//  			m_nightInfoEdit.FieldText(strTemp);
 //  			strTemp.Format(_T("%d"), 0);
-//  			m_nightHeatInfoEdit.SetWindowText(strTemp);
+//  			m_nightHeatInfoEdit.FieldText(strTemp);
 //  			strTemp.Format(_T("%d"),0);
 //  			CWnd *pSPWnd = GetDlgItem(IDC_EDIT_CUR_SP);
 //  			pSPWnd->SetWindowText(strTemp);
@@ -5044,18 +5383,20 @@ void CT3000View::InitFlexSliderBars_tstat6()
 
 
  			m_nightpot = nSP;
- 			UpdateData(FALSE);
- 
+ 			//UpdateData(FALSE);
+			strTemp.Format(_T("%0.1f"),(float)nSP);
+            m_nightpotEdit.FieldText(strTemp);
 //  			strTemp.Format(_T("%d"),nHeatSP);
-//  			m_nightInfoEdit.SetWindowText(strTemp);
+//  			m_nightInfoEdit.FieldText(strTemp);
 //  			strTemp.Format(_T("%d"),nCoolSP);
-//  			m_nightHeatInfoEdit.SetWindowText(strTemp);
+//  			m_nightHeatInfoEdit.FieldText(strTemp);
 
 //0910
-			strTemp.Format(_T("%d"),nCoolSP);
-			m_nightInfoEdit.SetWindowText(strTemp);
-			strTemp.Format(_T("%d"),nHeatSP);
-			m_nightHeatInfoEdit.SetWindowText(strTemp);
+			strTemp.Format(_T("%0.1f"),(float)nCoolSP);
+			m_nightInfoEdit.FieldText(strTemp);
+			//m_nightInfoEdit.SetNumberDefaultTex();
+			strTemp.Format(_T("%0.1f"),(float)nHeatSP);
+			m_nightHeatInfoEdit.FieldText(strTemp);
 //0903
 // 			m_NightCoolStatic.SetWindowText(_T("Heating DB"));
 // 			m_NightHeatStatic.SetWindowText(_T("Cooling DB"));
@@ -5071,14 +5412,14 @@ void CT3000View::InitFlexSliderBars_tstat6()
  			//stat6
  
 //  			strTemp.Format(_T("%d"), 0);
-//  			m_DayCoolEdit.SetWindowText(strTemp);
+//  			m_DayCoolEdit.FieldText(strTemp);
 //  			strTemp.Format(_T("%d"), 0);
-//  			m_DayHeatEdit.SetWindowText(strTemp);
+//  			m_DayHeatEdit.FieldText(strTemp);
 //  			m_pDaySingleSP->ShowWindow(SW_HIDE);
 //  			m_pDayTwoSP->ShowWindow(SW_HIDE);
 //  
 //  			strTemp.Format(_T("%d"), 0);
-//  			m_dayInfoEdit.SetWindowText(strTemp);
+//  			m_dayInfoEdit.FieldText(strTemp);
  
  		}
 		else  // hotel  以下假设是night  1sp	
@@ -5323,25 +5664,27 @@ void CT3000View::InitFlexSliderBars_tstat6()
 // 			UpdateData(FALSE);
 // 
 // 			strTemp.Format(_T("%d"), newtstat6[354]/10);
-// 			m_nightInfoEdit.SetWindowText(strTemp);
+// 			m_nightInfoEdit.FieldText(strTemp);
 // 			strTemp.Format(_T("%d"), newtstat6[355]/10);
-// 			m_nightHeatInfoEdit.SetWindowText(strTemp);
+// 			m_nightHeatInfoEdit.FieldText(strTemp);
 
 
 
  			m_nightpot = nSP;
- 			UpdateData(FALSE);
+			strTemp.Format(_T("%0.1f"),(float)nSP);
+			m_nightpotEdit.FieldText(strTemp);
  
 //  			strTemp.Format(_T("%d"), nHeatSP);
-//  			m_nightInfoEdit.SetWindowText(strTemp);
+//  			m_nightInfoEdit.FieldText(strTemp);
 //  			strTemp.Format(_T("%d"), nCoolSP);
-//  			m_nightHeatInfoEdit.SetWindowText(strTemp);
+//  			m_nightHeatInfoEdit.FieldText(strTemp);
 
 //0910
-			strTemp.Format(_T("%d"),nCoolSP );
-			m_nightInfoEdit.SetWindowText(strTemp);
-			strTemp.Format(_T("%d"),nHeatSP);
-			m_nightHeatInfoEdit.SetWindowText(strTemp);
+			strTemp.Format(_T("%0.1f"),(float)nCoolSP);
+			m_nightInfoEdit.FieldText(strTemp);
+			//m_nightInfoEdit.SetNumberDefaultTex();
+			strTemp.Format(_T("%0.1f"),(float)nHeatSP);
+			m_nightHeatInfoEdit.FieldText(strTemp);
 
 
 // 			m_NightCoolStatic.SetWindowText(_T("Heating SP"));
@@ -5352,13 +5695,13 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//stat6
 // 
 // 			strTemp.Format(_T("%d"), 0);
-// 			m_DayCoolEdit.SetWindowText(strTemp);
+// 			m_DayCoolEdit.FieldText(strTemp);
 // 			strTemp.Format(_T("%d"), 0);
-// 			m_DayHeatEdit.SetWindowText(strTemp);
+// 			m_DayHeatEdit.FieldText(strTemp);
 // 			m_pDaySingleSP->ShowWindow(SW_HIDE);
 // 			//m_pDayTwoSP->ShowWindow(SW_HIDE);
 // 			strTemp.Format(_T("%d"), 0);
-// 			m_dayInfoEdit.SetWindowText(strTemp);
+// 			m_dayInfoEdit.FieldText(strTemp);
 		}
  
 	}
@@ -5729,7 +6072,7 @@ void CT3000View::FreshCtrl()
 	pEdit = (CEdit*)GetDlgItem(IDC_EDIT_RTC);
 	pEdit->SetWindowText(strDate);
 	 
-	m_TempInfoEdit.SetWindowText(strTemp);
+	m_TempInfoEdit.FieldText(strTemp);
 	m_TemperaureSlider.SetRange(product_register_value[MODBUS_MIN_SETPOINT],product_register_value[MODBUS_MAX_SETPOINT]);
 	m_TemperaureSlider.SetThumbColor(RGB(0, 0, 255));
 	m_TemperaureSlider.SetSelectionColor(RGB(255, 0, 0)); 

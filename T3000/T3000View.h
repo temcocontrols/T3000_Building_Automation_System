@@ -17,6 +17,7 @@
 #include "../FlexSlideBar/FSBContainer.h"
 
 #include "singleslider/MacSliderCtrl.h"
+#include "AutoRichEditCtrl.h"
 //#include "TemcoDataGrid.h"
 #define WM_FRESHVIEW WM_USER + 1100
 
@@ -179,10 +180,10 @@ public:
 
 //	CFSBContainer*  m_pTemperSP;
 
-	CEdit m_TempInfoEdit;
-	CEdit m_dayInfoEdit;
-	CEdit m_nightInfoEdit;
-	CEdit m_nightHeatInfoEdit;
+	CAutoRichEditCtrl m_TempInfoEdit;
+	CAutoRichEditCtrl m_dayInfoEdit;
+	CAutoRichEditCtrl m_nightInfoEdit;
+	CAutoRichEditCtrl m_nightHeatInfoEdit;
 
 	CStatic m_SetptStatic;
 	CStatic m_NightCoolStatic;
@@ -190,8 +191,8 @@ public:
 	CEdit m_inNameEdt;
 	CEdit m_outNameEdt;
 
-	CEdit m_DayCoolEdit;
-	CEdit m_DayHeatEdit;
+	CAutoRichEditCtrl m_DayCoolEdit;
+	CAutoRichEditCtrl m_DayHeatEdit;
 	CStatic m_DayCoolStatic;
 	CStatic m_DaySPStatic;
 	CStatic m_DayHeatStatic;
@@ -259,6 +260,8 @@ public:
    afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
     afx_msg void OnBnClickedHelp();
 	afx_msg void OnBnClickedBtnTopological();
+	 CAutoRichEditCtrl m_RichEditor;
+	 CAutoRichEditCtrl m_nightpotEdit;
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

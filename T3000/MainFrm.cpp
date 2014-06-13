@@ -65,6 +65,8 @@
 #include "T3RTDView.h"
 #include "CO2NetView.h"
 #include "htmlhelp.h"
+#include "T3000UpdateDlg.h"
+#include "T3000DefaultView.h"
 #pragma region Fance Test
 //For Test
 
@@ -311,7 +313,6 @@ UINT _ReadMultiRegisters(LPVOID pParam)
             Sleep(10);
             continue;
         }
-
 		if(g_tstat_id_changed)
         {
             Sleep(10);
@@ -353,7 +354,7 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 			continue;
 		}
  
-		for(int i=0;i<10;i++) //Modify by Fance , tstat 6 has more register than 512;
+		for(int i=0;i<17;i++) //Modify by Fance , tstat 6 has more register than 512;
 		 
 		{
 			if(g_tstat_id_changed)
@@ -520,6 +521,7 @@ void CMainFrame::InitViews()
     m_pViews[DLG_DIALOGT36CT]=(CView*)new T36CT;
     m_pViews[DLG_DIALOGT3PT10]=(CView*)new CT3RTDView;
     m_pViews[DLG_CO2_NET_VIEW]=(CView*)new CCO2NetView;
+	m_pViews[DLG_DIALOGDEFAULTVIEW]=(CView*)new CT3000DefaultView;
 
 	CDocument* pCurrentDoc = GetActiveDocument();
     CCreateContext newContext;
@@ -692,7 +694,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
 #ifndef Fance_Enable_Test
-	 m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
+	  m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
 	  m_pRefreshThread->SetMainWnd(this);	
 
 	// 需要执行线程中的操作时
@@ -1065,7 +1067,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 			    g_tstat_id = m_product.at(i).product_id;
 			/*	SwitchToPruductType(DLG_DIALOGT332AI_VIEW);*/
 
-            DoConnectToANode(hSelItem);
+                 DoConnectToANode(hSelItem);
 			}
 			else if (m_product.at(i).product_class_id ==PM_AirQuality) //AirQuality
 			{
@@ -1078,7 +1080,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 				if(m_product.at(i).BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(m_product.at(i).BuildingInfo.strBuildingName)!=0)
 				{
 					//connect:
-					BOOL bRet = ConnectSubBuilding(m_product.at(i).BuildingInfo);
+					BOOL bRet = ConnectDevice(m_product.at(i));
 					if (!bRet)
 					{
 						if(m_product.at(i).BuildingInfo.strProtocol.CompareNoCase(_T("Modbus TCP")) == 0) // net work protocol
@@ -1154,7 +1156,14 @@ g_bPauseMultiRead=FALSE;
 //  //  AfxMessageBox(m_strCurSelNodeName);
 //}
 
+void CMainFrame::Write_Config(){
+	 
 
+
+
+
+
+}
 
 void CMainFrame::OnHTreeItemEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 {
@@ -1738,6 +1747,39 @@ void CMainFrame::OnConnect()
 					SetPaneString(1,strInfo);
 					connectionSuccessful = 1;
                     m_nStyle=1;
+					CString	g_configfile_path=g_strExePth+_T("config.ini");
+					CFileFind fFind;
+					if(!fFind.FindFile(g_configfile_path))
+					{
+						/*WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),_T("0"),g_configfile_path);
+
+						WritePrivateProfileStringW(_T("Setting"),_T("COM Port"),_T("COM1"),g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("COM_Port"),_T("1"),g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("Baudrate"),_T("19200"),g_configfile_path);*/
+
+						WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),_T("1"),g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),build_info.strIp,g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),build_info.strIpPort,g_configfile_path);
+
+						WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
+
+						WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+					}
+					else
+					{
+						WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),_T("1"),g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),build_info.strIp,g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),build_info.strIpPort,g_configfile_path);
+
+						WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
+
+						WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+					}
+
+
+
                     Invalidate();
 				}
 				else
@@ -1781,6 +1823,36 @@ void CMainFrame::OnConnect()
 					SetPaneString(1, strInfo);
 					Change_BaudRate(default_com1_port_baudrate);
                     m_nStyle=1;
+					CString	g_configfile_path=g_strExePth+_T("config.ini");
+					CFileFind fFind;
+					if(!fFind.FindFile(g_configfile_path))
+					{
+						WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),_T("0"),g_configfile_path);
+						strInfo.Format(_T("COM%d"),nComPort);
+						WritePrivateProfileStringW(_T("Setting"),_T("COM Port"),strInfo,g_configfile_path);
+						strInfo.Format(_T("%d"),nComPort);
+						WritePrivateProfileStringW(_T("Setting"),_T("COM_Port"),strInfo,g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("Baudrate"),_T("19200"),g_configfile_path);
+
+
+					/*	WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),build_info.strIp,g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),build_info.strIpPort,g_configfile_path);
+
+						WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
+
+						WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);*/
+					}
+					else
+					{
+						WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),_T("0"),g_configfile_path);
+						strInfo.Format(_T("COM%d"),nComPort);
+						WritePrivateProfileStringW(_T("Setting"),_T("COM Port"),strInfo,g_configfile_path);
+						strInfo.Format(_T("%d"),nComPort);
+						WritePrivateProfileStringW(_T("Setting"),_T("COM_Port"),strInfo,g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("Baudrate"),_T("19200"),g_configfile_path); 
+					}
+
                     Invalidate();
 				}	
 			}
@@ -1915,6 +1987,210 @@ BOOL CMainFrame::ConnectSubBuilding(Building_info build_info)
 	return FALSE;
 }
 
+BOOL CMainFrame::ConnectDevice(tree_product tree_node)
+{
+	CString strInfo;
+	if(m_hCurCommunication!=NULL)	
+	{
+		CloseHandle(m_hCurCommunication);
+		m_hCurCommunication=NULL;
+	}
+	if (!((tree_node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(tree_node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(tree_node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
+	{
+
+	/*}
+	if (build_info.strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
+	{*/
+		UINT n1,n2,n3,n4;
+		if (ValidAddress(tree_node.BuildingInfo.strIp,n1,n2,n3,n4)==FALSE)  // 验证NC的IP
+		{
+				/*
+				strInfo=_T("Invalidate IP Address!!");
+				AfxMessageBox(strInfo);
+				SetPaneString(1,strInfo);
+				strInfo=_T("disconnected");
+				SetPaneString(1,strInfo);
+				return FALSE;
+				*/
+
+				CString StringIP;
+				if(!GetIPbyHostName(tree_node.BuildingInfo.strIp,StringIP))
+				{
+					AfxMessageBox(_T("Can not get a validate IP adreess from the domain name!"));
+					return false;
+				}
+				CString strPort;
+				m_nIpPort=tree_node.ncomport;//_wtoi(tree_node.ncomport);
+				g_CommunicationType=1;
+				SetCommunicationType(g_CommunicationType);
+				bool b=Open_Socket2(StringIP,m_nIpPort);
+				CString strInfo;
+				if(b)
+				{	strInfo.Format((_T("Open IP:%s:%d successful")),tree_node.BuildingInfo.strIp,m_nIpPort);//prompt info;
+					SetPaneString(1,strInfo);
+					CString	g_configfile_path=g_strExePth+_T("config.ini");
+					CFileFind fFind;
+					if(!fFind.FindFile(g_configfile_path))
+					{
+						CString strInfo;
+						strInfo.Format(_T("%d"),g_CommunicationType);
+ 						WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),strInfo,g_configfile_path);
+//  						strInfo.Format(_T("COM%d"),nCom);
+//  						WritePrivateProfileStringW(_T("Setting"),_T("COM Port"),strInfo,g_configfile_path);
+//  						strInfo.Format(_T("%d"),nCom);
+//  						WritePrivateProfileStringW(_T("Setting"),_T("COM_Port"),strInfo,g_configfile_path);
+//  						strInfo=_T("19200");
+//  						WritePrivateProfileStringW(_T("Setting"),_T("Baudrate"),_T("19200"),g_configfile_path);
+
+
+						WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),StringIP,g_configfile_path);
+						strInfo.Format(_T("%d"),m_nIpPort);
+						WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),strInfo,g_configfile_path);
+
+						WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
+
+						WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+					}
+					else{
+						CString strInfo;
+						strInfo.Format(_T("%d"),g_CommunicationType);
+						WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),strInfo,g_configfile_path);
+// 						strInfo.Format(_T("COM%d"),nCom);
+// 						WritePrivateProfileStringW(_T("Setting"),_T("COM Port"),strInfo,g_configfile_path);
+// 						strInfo.Format(_T("%d"),nCom);
+// 						WritePrivateProfileStringW(_T("Setting"),_T("COM_Port"),strInfo,g_configfile_path);
+// 						strInfo=_T("19200");
+// 						WritePrivateProfileStringW(_T("Setting"),_T("Baudrate"),_T("19200"),g_configfile_path);
+
+						WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),StringIP,g_configfile_path);
+						strInfo.Format(_T("%d"),m_nIpPort);
+						WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),strInfo,g_configfile_path);
+
+						WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
+						WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
+
+						WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+					}
+
+					return TRUE;
+				}
+				else
+				{
+					strInfo.Format((_T("Open IP:%s failure")),tree_node.BuildingInfo.strIp);//prompt info;
+					SetPaneString(1,strInfo);
+					return FALSE;
+				}
+		}
+		else
+		{
+			CString strPort;
+			m_nIpPort=tree_node.ncomport;//_wtoi(tree_node.BuildingInfo.strIpPort);
+
+			m_strIP=tree_node.BuildingInfo.strIp;
+
+			g_CommunicationType=1;
+			SetCommunicationType(g_CommunicationType);
+			bool b=Open_Socket2(tree_node.BuildingInfo.strIp,m_nIpPort);
+			CString strInfo;
+		//	strInfo.Format((_T("Open IP:%s successful")),build_info.str3Ip);//prompt info;
+		//	SetPaneString(1,strInfo);
+			if(b)
+			{	strInfo.Format((_T("Open IP:%s:%d successful")),tree_node.BuildingInfo.strIp,m_nIpPort);//prompt info;
+				SetPaneString(1,strInfo);
+				CString	g_configfile_path=g_strExePth+_T("config.ini");
+				CFileFind fFind;
+				if(!fFind.FindFile(g_configfile_path))
+				{
+					WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),_T("1"),g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),tree_node.BuildingInfo.strIp,g_configfile_path);
+					strInfo.Format(_T("%d"),m_nIpPort);
+					WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),strInfo,g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+				}
+				else
+				{
+					WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),_T("1"),g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),tree_node.BuildingInfo.strIp,g_configfile_path);
+					strInfo.Format(_T("%d"),m_nIpPort);
+					WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),strInfo,g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+				}
+				return TRUE;
+			}
+			else
+			{
+				strInfo.Format((_T("Open IP:%s failure")),tree_node.BuildingInfo.strIp);//prompt info;
+				SetPaneString(1,strInfo);
+				//ValidOpenFailure(build_info.strIp,n1, n2,n3,n4); // 检查失败的原因，并给出详细的提示信息
+				return FALSE;
+			}
+		}
+	}	
+
+
+	g_CommunicationType = 0;
+	SetCommunicationType(g_CommunicationType);
+	CString strComport = tree_node.BuildingInfo.strComPort;
+	CString strComNum = strComport.Mid(3);
+	int nCom = _wtoi(strComNum);
+
+	open_com(nCom);//open*************************************
+	if(!is_connect())
+	{
+
+		//strInfo.Format(_T("COM: %d Connected: No"), nCom);
+		strInfo.Format(_T("COM %d : Not available "), nCom);
+		SetPaneString(1,strInfo);
+		AfxMessageBox(strInfo);
+		return FALSE;
+	}
+	else
+	{
+		strInfo.Format(_T("COM %d Connected: Yes"), nCom);
+		SetPaneString(1,strInfo);
+		Change_BaudRate(default_com1_port_baudrate);
+	    CString	g_configfile_path=g_strExePth+_T("config.ini");
+		CFileFind fFind;
+		if(!fFind.FindFile(g_configfile_path))
+		{
+			CString strInfo;
+			strInfo.Format(_T("%d"),g_CommunicationType);
+			WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),strInfo,g_configfile_path);
+			strInfo.Format(_T("COM%d"),nCom);
+			WritePrivateProfileStringW(_T("Setting"),_T("COM Port"),strInfo,g_configfile_path);
+			strInfo.Format(_T("%d"),nCom);
+			WritePrivateProfileStringW(_T("Setting"),_T("COM_Port"),strInfo,g_configfile_path);
+			strInfo=_T("19200");
+			WritePrivateProfileStringW(_T("Setting"),_T("Baudrate"),_T("19200"),g_configfile_path);
+
+
+ 
+		}
+		else{
+			CString strInfo;
+			strInfo.Format(_T("%d"),g_CommunicationType);
+			WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),strInfo,g_configfile_path);
+			strInfo.Format(_T("COM%d"),nCom);
+			WritePrivateProfileStringW(_T("Setting"),_T("COM Port"),strInfo,g_configfile_path);
+			strInfo.Format(_T("%d"),nCom);
+			WritePrivateProfileStringW(_T("Setting"),_T("COM_Port"),strInfo,g_configfile_path);
+			strInfo=_T("19200");
+			WritePrivateProfileStringW(_T("Setting"),_T("Baudrate"),_T("19200"),g_configfile_path);
+
+
+ 
+		}
+
+
+		return TRUE;
+	}	
+	return FALSE;
+}
 void CMainFrame::CheckConnectFailure(const CString& strIP) // 检查失败的原因，并给出详细的提示信息
 {
 	USES_CONVERSION;
@@ -2264,6 +2540,11 @@ here:
          ((CT3RTDView*)m_pViews[m_nCurView])->Fresh();
      }
      break;
+	 case DLG_DIALOGDEFAULTVIEW:
+		 {
+			 m_nCurView=DLG_DIALOGDEFAULTVIEW;
+			 ((CT3000DefaultView*)m_pViews[m_nCurView])->Fresh();
+		 }
 	}
 //here
 }
@@ -2386,34 +2667,34 @@ void CMainFrame::Scan_Product()
 	//	int ret = AfxMessageBox(_T("default will scan via 'modbus 485',\n do you also need 'modbus TCP'?"),MB_YESNOCANCEL ,3);
 	//	if ( ret == IDYES)
 	//	{	
-	CScanwaydlg dlg;
+	//CScanwaydlg dlg;
 
-	 dlg.DoModal(); //AfxMessageBox(_T("YES: 'Quick Scan(Binary Search)' ,\n NO:'Deep Scan(One By One)'?"),MB_YESNOCANCEL ,3);
-	 	if ( dlg.Is_Deep == 1)
-	 	{
-			CScanSelectDlg dlg;
-			int ret=dlg.DoModal();
-            if (ret==IDOK)
-            {
-                m_pScanner->ScanComOneByOneDevice();
-                m_pScanner->WaitScan();
-                m_pScanner->m_scantype=4;
-            }
-            else
-            {
-            return;
-            }
-			
-		}
-		else if(dlg.Is_Deep == 2)
-		{
+	// dlg.DoModal(); //AfxMessageBox(_T("YES: 'Quick Scan(Binary Search)' ,\n NO:'Deep Scan(One By One)'?"),MB_YESNOCANCEL ,3);
+	// 	if ( dlg.Is_Deep == 1)
+	// 	{
+	//		CScanSelectDlg dlg;
+	//		int ret=dlg.DoModal();
+ //           if (ret==IDOK)
+ //           {
+ //               m_pScanner->ScanComOneByOneDevice();
+ //               m_pScanner->WaitScan();
+ //               m_pScanner->m_scantype=4;
+ //           }
+ //           else
+ //           {
+ //           return;
+ //           }
+	//		
+	//	}
+	//	else if(dlg.Is_Deep == 2)
+	//	{
 			m_pScanner->ScanAll();
 			m_pScanner->m_scantype = 3;
-		}
-		else
-		{
-			return;
-		}
+		//}
+		//else
+		//{
+		//	return;
+		//}
 
 	/*	}
 		else if(ret == IDNO)
@@ -5969,7 +6250,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 	
 	m_pTreeViewCrl->SetSelectItem(hTreeItem);
 
-   MainFram_hwd = this->m_hWnd;
+    MainFram_hwd = this->m_hWnd;
 	//20120420
 	CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
 	//创建对话框窗口
@@ -6038,7 +6319,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{	
 						g_CommunicationType = 1;
 						SetCommunicationType(1);
-						if(Open_Socket2(product_Node.BuildingInfo.strIp,6001))
+						if(Open_Socket2(product_Node.BuildingInfo.strIp,product_Node.ncomport))
 						{
 							m_pTreeViewCrl->turn_item_image(hSelItem ,true);//只要能连接上这个IP 就说明这个设备在线;
 							
@@ -6171,13 +6452,15 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			//AfxMessageBox(product_Node.BuildingInfo.strMainBuildingname);
 
 			g_strImagePathName=product_Node.strImgPathName;
+			//网络设置
 			if (!((product_Node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
 			{
 
 				if(product_Node.BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0)
 				{
 					pDlg->ShowProgress(2,10);//20120220
-					BOOL bRet = ConnectSubBuilding(product_Node.BuildingInfo);
+					BOOL bRet = ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
+					 
 					if (!bRet)
 					{
 						CheckConnectFailure(product_Node.BuildingInfo.strIp);
@@ -6195,7 +6478,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					}
 				}
 				
-			}else
+			}
+			//串口设置
+			else
 			{
 
 				if (product_Node.BuildingInfo.strComPort.CompareNoCase(_T("N/A")) == 0)
@@ -6206,7 +6491,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 					}
 
-				}else
+				}
+				else
 				{
 						//close_com();//关闭所有端口
 					//int nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
@@ -6237,6 +6523,56 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						SetPaneString(1, strInfo);
 						SetCommunicationType(0);
 						g_CommunicationType=0;
+
+
+
+
+						CString	g_configfile_path=g_strExePth+_T("config.ini");
+						CFileFind fFind;
+						if(!fFind.FindFile(g_configfile_path))
+						{
+							CString strInfo;
+							strInfo.Format(_T("%d"),g_CommunicationType);
+							WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),strInfo,g_configfile_path);
+							strInfo.Format(_T("COM%d"),nComPort);
+							WritePrivateProfileStringW(_T("Setting"),_T("COM Port"),strInfo,g_configfile_path);
+							strInfo.Format(_T("%d"),nComPort);
+							WritePrivateProfileStringW(_T("Setting"),_T("COM_Port"),strInfo,g_configfile_path);
+							strInfo=_T("19200");
+							WritePrivateProfileStringW(_T("Setting"),_T("Baudrate"),_T("19200"),g_configfile_path);
+
+							 
+						/*	WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),StringIP,g_configfile_path);
+							strInfo.Format(_T("%d"),m_nIpPort);
+							WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),strInfo,g_configfile_path);
+
+							WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
+							WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
+
+							WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);*/
+						}
+						else{
+							CString strInfo;
+							strInfo.Format(_T("%d"),g_CommunicationType);
+							WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),strInfo,g_configfile_path);
+							strInfo.Format(_T("COM%d"),nComPort);
+							WritePrivateProfileStringW(_T("Setting"),_T("COM Port"),strInfo,g_configfile_path);
+							strInfo.Format(_T("%d"),nComPort);
+							WritePrivateProfileStringW(_T("Setting"),_T("COM_Port"),strInfo,g_configfile_path);
+							strInfo=_T("19200");
+							WritePrivateProfileStringW(_T("Setting"),_T("Baudrate"),_T("19200"),g_configfile_path);
+
+							/*WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),_T("127.0.0.1"),g_configfile_path);
+							strInfo.Format(_T("%d"),m_nIpPort);
+							WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),strInfo,g_configfile_path);
+
+							WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
+							WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
+
+							WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);*/
+						}
+
+
 					}
 				}
 			}
@@ -6472,7 +6808,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				int i;
 				int it = 0;
 				float progress;
-				for(i=0;i<(10*power_value);i++)	//暂定为0 ，因为TSTAT6 目前为600多
+				for(i=0;i<(17*power_value);i++)	//暂定为0 ，因为TSTAT6 目前为600多
 				{
 					int itemp = 0;
 					itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(64/power_value)],i*(64/power_value),64/power_value,5);
@@ -6484,7 +6820,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 						if (pDlg!=NULL)
 						{
-							progress=float((it+1)*(100/(10*power_value)));
+							progress=float((it+1)*(100/(17*power_value)));
 							pDlg->ShowProgress(int(progress),int(progress));
 						} 
 					}							
@@ -9132,9 +9468,22 @@ void CMainFrame::OnDatabaseMbpoll()
 	////mbPoll->Create(IDD_MBPOLL, GetDesktopWindow());
 	//mbPoll->Create(IDD_MBPOLL, this);
 	//mbPoll->ShowWindow(SW_SHOW);
-
-	CString strHistotyFile=g_strExePth+_T("Modbus Poll.exe");
-	ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
+    
+	if (is_connect())
+	{
+		if (g_CommunicationType==0)
+		{
+			OnDisconnect();
+		}
+		CString strHistotyFile=g_strExePth+_T("Modbus Poll.exe");
+		ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
+	} 
+	else
+	{
+		AfxMessageBox(_T("Connect to your device ,firstly!"));
+	}
+	
+	
 }
 
 
@@ -9164,34 +9513,37 @@ LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
 //}
 void CMainFrame::OnToolIsptoolforone()
 {
-	MessageBox(_T("This part of code is recoding,Please use ISP.exe to update now."),_T("Notice"),MB_OK | MB_ICONINFORMATION);
-	return;
+	//MessageBox(_T("This part of code is recoding,Please use ISP.exe to update now."),_T("Notice"),MB_OK | MB_ICONINFORMATION);
+	//return;
 	//Fance 如果要已经处于连接状态的soket在调用closesocket()后强制关闭，不经历TIME_WAIT的过程：
-	BOOL bDontLinger = FALSE;
-	setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
-	closesocket(h_Broad);
-	h_Broad=NULL;
-    OnDisconnect();
+	//BOOL bDontLinger = FALSE;
+	//setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+	//closesocket(h_Broad);
+	//h_Broad=NULL;
+  //  OnDisconnect();
 //	show_ISPDlg();
 
 	//Fance Add. 在ISP 用完1234 4321 的端口之后，T3000 在重新打开使用，刷新listview 的网络设备要使用;
-	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
-	BOOL bBroadcast=TRUE;
-	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
-	int iMode=1;
-	ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+// 	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+// 	BOOL bBroadcast=TRUE;
+// 	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+// 	int iMode=1;
+// 	ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
 
 	//SOCKADDR_IN bcast;
-	h_bcast.sin_family=AF_INET;
-	//bcast.sin_addr.s_addr=nBroadCastIP;
-	h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
-	h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
-
-	//SOCKADDR_IN siBind;
-	h_siBind.sin_family=AF_INET;
-	h_siBind.sin_addr.s_addr=INADDR_ANY;
-	h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
-	::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+// 	h_bcast.sin_family=AF_INET;
+// 	//bcast.sin_addr.s_addr=nBroadCastIP;
+// 	h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+// 	h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+// 
+// 	//SOCKADDR_IN siBind;
+// 	h_siBind.sin_family=AF_INET;
+// 	h_siBind.sin_addr.s_addr=INADDR_ANY;
+// 	h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+// 	::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+    OnDisconnect();
+    CString strHistotyFile=g_strExePth+_T("ISP.exe");
+    ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
 }
 
 
@@ -9579,39 +9931,9 @@ void CMainFrame::OnControlAlarmLog()
 }
 void CMainFrame::OnMenuCheckupdate()
 {
-CString version=_T("2014.1.3");
-TCHAR buffer[MAX_PATH];
-CString	m_szAddress=_T("web1232.ixwebhosting.com");
-CString	m_szFilename=_T("/software/T3000_Version.txt");
-CString	m_szPassword=_T("Travel123");
-CString	m_szUsername=_T("temcoftp");
-CString	m_szVersion;
-CString m_CurrentVersion;
-	BOOL bUpdate =CheckForUpdate(m_szAddress, m_szUsername, m_szPassword,
-		m_szFilename, m_szVersion, buffer);
-	if ( bUpdate )
-	{
-		CString text;
-		
-		if ( _tcscmp( buffer, version.GetBuffer() ) != 0 )//当前版本不和服务器保持一致，提醒更新
-			{
-				text.Format( _T("New T3000 version available,Please update your T3000!\n The lastest T3000_Ver=%s"), buffer,version.GetBuffer());
-			 
-				 
-				int result = MessageBox( text, _T("New version available"), MB_YESNO|MB_ICONINFORMATION );
-				if ( result == IDYES )
-				{
-					ShellExecute( GetDesktopWindow()->m_hWnd, _T("open"),
-						_T("http://temcocontrols.com/ftp/software/9TstatSoftware.zip"), NULL, NULL, SW_SHOWMAXIMIZED );
-				}
-			}
-			else//保持一致的话，就对了，说明是最新的
-			{
-				text.Format( _T("Your T3000 is the lastest version \nT3000_Ver=%s"), version.GetBuffer());
-				AfxMessageBox(text);
-			}
-	}
 
+CT3000UpdateDlg dlg;
+dlg.DoModal();
 }
 
 

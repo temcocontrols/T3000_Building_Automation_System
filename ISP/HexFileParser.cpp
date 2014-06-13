@@ -26,8 +26,7 @@ void  CHexFileParser::SetFileName(const CString& strFileName)
 int  CHexFileParser::GetHexFileBuffer(char* pBuf, int nLen)
 {
 	CFile hexFile; //the hex file
-	Bin_Info temp1;
-	Get_HexFile_Information(m_strFileName,temp1);
+
 
 	int nBufLen = 0;
 	if(hexFile.Open(m_strFileName, CFile::modeRead))

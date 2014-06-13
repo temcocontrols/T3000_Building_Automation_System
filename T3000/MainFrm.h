@@ -24,7 +24,7 @@
 #include "MBP.h"
 #include "MbPoll.h"
 
-#define NUMVIEWS 18
+#define NUMVIEWS 19
 
 
 
@@ -115,7 +115,7 @@ public: // create from serialization only
 	void OnToolErease();
 	void OnToolFresh();
 	void OnToolRefreshLeftTreee();
-	 
+	void Write_Config();
 public:
 
     CView * m_pViews[NUMVIEWS];
@@ -264,7 +264,7 @@ public:
 	void CheckConnectFailure(const CString& strIP);// 检查失败的原因，并给出详细的提示信息
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	BOOL ConnectSubBuilding(Building_info build_info);
-
+ BOOL ConnectDevice(tree_product tree_node);
 
 
 	//scan funtion:
@@ -420,6 +420,7 @@ const int DLG_DIALOGT332AI_VIEW=14;
 const int DLG_DIALOGT38AI8AO=15;
 const int DLG_DIALOGT36CT=16;
 const int DLG_DIALOGT3PT10=17;
+const int DLG_DIALOGDEFAULTVIEW=18;
 
 extern int g_gloab_bac_comport;
 

@@ -253,18 +253,7 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 		CString strTips = _T("|Programming device...");
 		pWriter->OutPutsStatusInfo(strTips);
 	}
-	//WriteCommandtoReset();
-
-
-	//int test_count=0;
-	//CString cs_test_cnt;
-	//while(1)//For Test
-	//{
-	//	test_count++;
-	//	cs_test_cnt.Format(_T("******************************************"));
-	//	pWriter->OutPutsStatusInfo(cs_test_cnt);
-	//	cs_test_cnt.Format(_T("Test loop = %d"),test_count);
-	//	pWriter->OutPutsStatusInfo(cs_test_cnt);
+	
 	for(i = 0; i < pWriter->m_szMdbIDs.size(); i++)
 	{    
 
@@ -277,7 +266,57 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 		//// 显示flash之前的设备状态信息
 
 //		((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
-        pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]);
+        if (!pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]))
+        {
+			 
+           pWriter->OutPutsStatusInfo(_T("The device can't match with the hex"));
+#if 1		//复位
+		   int Chipsize=read_one(pWriter->m_szMdbIDs[i],11,5);
+		   if (Chipsize<37)	//64K
+		   {
+			    
+			    
+				   int ii=0;
+				   while(ii<=5){
+					   int ret=Write_One(pWriter->m_szMdbIDs[i],16,1);
+					   if (ret>0)
+					   {
+						   break;
+					   }
+				   }
+				 
+			   
+		   } 
+		   else	//128K
+		   {
+			    
+				   int ii=0;
+				   while(ii<=5){
+					   int ret=Write_One(pWriter->m_szMdbIDs[i],33,1);
+					   if (ret>0)
+					   {
+						   break;
+					   }
+				   }
+
+				   while(ii<=5){
+					   int ret=Write_One(pWriter->m_szMdbIDs[i],16,1);
+					   if (ret>0)
+					   {
+						   break;
+					   }
+				   }
+				  
+			   
+			 
+		   }
+#endif
+
+
+
+		   continue;
+        }
+         
 
 		
 		////////	ASSERT(pWriter->m_nBufLen <= c_nHexFileBufLen);
@@ -413,7 +452,7 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 			}
 		}
 	}
-	//Sleep(10000);//For Test
+ 
 	//}//For Test
 	//*******************************************************************************
 	//Sleep(500);
@@ -818,7 +857,54 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 		   CString strID;
 		   strID.Format(_T("|Current Programming device ID is : %d"), pWriter->m_szMdbIDs[i]);
 		   pWriter->OutPutsStatusInfo(strID);
-		   pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]);
+		 //  pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]);
+           if (!pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]))
+           {
+              // pWriter->OutPutsStatusInfo(_T("The device can't match with the hex"));
+#if 1		//复位
+			   int Chipsize=read_one(pWriter->m_szMdbIDs[i],11,5);
+			   if (Chipsize<37)	//64K
+			   {
+
+
+				   int ii=0;
+				   while(ii<=5){
+					   int ret=Write_One(pWriter->m_szMdbIDs[i],16,1);
+					   if (ret>0)
+					   {
+						   break;
+					   }
+				   }
+
+
+			   } 
+			   else	//128K
+			   {
+
+				   int ii=0;
+				   while(ii<=5){
+					   int ret=Write_One(pWriter->m_szMdbIDs[i],33,1);
+					   if (ret>0)
+					   {
+						   break;
+					   }
+				   }
+
+				   while(ii<=5){
+					   int ret=Write_One(pWriter->m_szMdbIDs[i],16,1);
+					   if (ret>0)
+					   {
+						   break;
+					   }
+				   }
+
+
+
+			   }
+#endif
+			 
+               continue;
+           }
 		   int nCount = 0;
 		   for(UINT p = 0; p < pWriter->m_szHexFileFlags.size(); p++)
 		   {
@@ -874,7 +960,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
 #endif
    
-
+	    
 
 		
 		
@@ -900,25 +986,80 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 
 
 }
+void CComWriter::SetHexInfor(Bin_Info temp){
+int i;
+for (  i=0;i<5;i++)
+{
+m_hexinfor.company[i]=temp.company[i];
+}
+for (  i=0;i<10;i++)
+{
+    m_hexinfor.product_name[i]=temp.product_name[i];
+}
+for (  i=0;i<3;i++)
+{
+    m_hexinfor.reserved[i]=temp.reserved[i];
+}
+m_hexinfor.software_high=temp.software_high;
+m_hexinfor.software_low=temp.software_low;
+}
+BOOL CComWriter::UpdataDeviceInformation(int& ID){
 
-void CComWriter::UpdataDeviceInformation(int& ID){
+    unsigned short Device_infor[10];
+    CString str_ret,temp;
+	Bin_Info temp1;
+	 CString hexproductname=_T("");
+  //  int ret=read_multi(ID,&Device_infor[0],0,10);
+	 int ret=read_multi_tap(ID,&Device_infor[0],0,10);
+	  if (ret<0)
+	  {
+      AfxMessageBox(_T("Can't get the device information ,please try again!"));
+      return FALSE;
+	  }
+   CString prodcutname=GetProductName(Device_infor[7]);
+    
+        if(READ_SUCCESS != Get_HexFile_Information(m_hexbinfilepath.GetBuffer(),m_hexinfor))
+        {
+            AfxMessageBox(_T("The hex file dones't contains Temco logo,Can't flash into our products!"));
+            return FALSE;
+        }
+    
+   
+   
+        for (int i=0;i<10;i++)
+        {
+            str_ret.AppendFormat(_T("%c"),Device_infor[i]);
+        }
+   
+ 
+   for (int i=0;i<10;i++)
+   {
+	   hexproductname.AppendFormat(_T("%c"),m_hexinfor.product_name[i]);
+   }
+   prodcutname.MakeLower();
+  
+ 
+  hexproductname.MakeLower();
+ 
+  prodcutname.MakeUpper();
+  hexproductname.MakeUpper();
+  CString strtips;
+  strtips.Format(_T("Your device is %s   Your hex file is fit for %s "),prodcutname.GetBuffer(),hexproductname.GetBuffer());
+  OutPutsStatusInfo(strtips,false);
 
-	unsigned short Device_infor[10];
-	CString str_ret,temp;
-	int ret=read_multi(ID,&Device_infor[0],0,10);
-	for (int i=0;i<10;i++)
-	{
-		temp.Format(_T("%d "),Device_infor[i]);
-		str_ret+=temp;
-	}
-	int nCount = str_ret.GetLength();
-	WCHAR* strNew = new WCHAR[nCount+1];
-	ZeroMemory(strNew, (nCount+1)*sizeof(WCHAR));
-	LPCTSTR str = LPCTSTR(str_ret);
-	memcpy(strNew, str, nCount*sizeof(WCHAR));
-	PostMessage(m_pParentWnd->m_hWnd, WM_UPDATA_DEVICE_INFORMATION, 0, LPARAM(strNew));
-
-
+//   int nCount = str_ret.GetLength();
+//   WCHAR* strNew = new WCHAR[nCount+1];
+//   ZeroMemory(strNew, (nCount+1)*sizeof(WCHAR));
+//   LPCTSTR str = LPCTSTR(str_ret);
+//   memcpy(strNew, str, nCount*sizeof(WCHAR));
+ // SendMessage(m_pParentWnd->m_hWnd, WM_UPDATA_DEVICE_INFORMATION, 0, LPARAM(strNew));
+     if(hexproductname.CompareNoCase(prodcutname)==0)
+     {
+    return TRUE;
+    }
+    return FALSE;
+	
+	
 }
 void CComWriter::SetIPAddr(const CString& strIPAddr)
 {

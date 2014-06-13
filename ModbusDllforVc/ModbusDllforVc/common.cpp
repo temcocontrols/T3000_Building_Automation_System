@@ -841,7 +841,7 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
 		data_to_write[2]=start_address >> 8 & 0xff;
 		data_to_write[3]=start_address & 0xff;
 		data_to_write[4]=0;
-		data_to_write[5]=length*0xff;
+		data_to_write[5]=length&0xff;
 		data_to_write[6]=length*2;//128 is better ,if you send more than 128, the ron software will meet some trouble,because it is too long one times,can not finish on time;on time
 		for(int i=0;i<length;i++)
 			{
@@ -851,9 +851,18 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
 			}
  
 
-		TS_US crc=CRC16(data_to_write,length+7);
+		TS_US crc=CRC16(data_to_write,2*length+7);
 		data_to_write[length*2+7]=crc>>8 & 0xff;
 		data_to_write[length*2+8]=crc & 0xff;
+
+		CString traceStr=_T("Send:");
+		CString temp;
+		for (int i=0;i<2*length+9;i++)
+		{
+			temp.Format(_T("%02X "),data_to_write[i]);
+			traceStr+=temp;
+		}
+		TRACE(_T("%s"),traceStr.GetBuffer());
 
 		hc = LoadCursor(NULL,IDC_WAIT);
 		hc = SetCursor(hc);
@@ -916,6 +925,12 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
 			else
 				m_had_send_data_number=0;
 		}	
+		traceStr=_T("Rev:");
+		for(int i=0;i<8;i++){
+			temp.Format(_T("%02X "),gval[i]);
+			traceStr+=temp;
+		}
+		TRACE(_T("%s"),traceStr);
 		///////////////////////////////////////////////////////////
 		for(int i=0;i<6;i++)
 			if(gval[i]!=*(data_to_write+i))
@@ -984,7 +999,200 @@ OUTPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,u
 	}
 	return -1;
 }
+OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_address,TS_US length,//参数命令部分
+	                            unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, //发送和接受的原始数据
+								int* sendDataLength, int* recvDataLength){//发送和接受数据长度
+		if(g_Commu_type==0)//
+	{
+		//the return value ,-2 is wrong
+		//the return value == -1 ,no connecting
+		HCURSOR hc;//load mouse cursor
+		TS_UC data_to_write[600]={0};
+		data_to_write[0]=device_var;
+		data_to_write[1]=0x10;
+		data_to_write[2]=start_address >> 8 & 0xff;
+		data_to_write[3]=start_address & 0xff;
+		data_to_write[4]=0;
+		data_to_write[5]=length&0xff;
+		data_to_write[6]=length*2;//128 is better ,if you send more than 128, the ron software will meet some trouble,because it is too long one times,can not finish on time;on time
+		for(int i=0;i<length;i++)
+			{
+                unsigned char UC_Value=to_write[i];
+				data_to_write[7+i*2] =UC_Value>>8&0xff;
+				data_to_write[7+i*2+1]=UC_Value& 0xff;
+			
+			}
+ 
 
+		TS_US crc=CRC16(data_to_write,2*length+7);
+		data_to_write[length*2+7]=crc>>8 & 0xff;
+		data_to_write[length*2+8]=crc & 0xff;
+		 
+		//CString traceStr=_T("Send:");
+		//CString temp;
+		//for (int i=0;i<2*length+9;i++)
+		//{
+		//	temp.Format(_T("%02X "),data_to_write[i]);
+		//	traceStr+=temp;
+		//}
+		*sendDataLength = 2*length+9;
+		for (int i = 0; i < *sendDataLength; i++)
+		{
+			*((char*)put_senddate_into_here + i) = data_to_write[i];
+		}
+
+	//	TRACE(_T("%s"),traceStr.GetBuffer());
+
+		hc = LoadCursor(NULL,IDC_WAIT);
+		hc = SetCursor(hc);
+		//length is the data length,if you want to write 128 bite,the length == 128
+		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		if(m_hSerial==NULL)
+		{
+			return -1;
+		}
+		////////////////////////////////////////////////clear com error
+		COMSTAT ComStat;
+		DWORD dwErrorFlags;
+
+		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
+		PurgeComm(m_hSerial, PURGE_TXABORT|PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//clear read buffer && write buffer
+		////////////////////////////////////////////////////////////overlapped declare
+		memset(&m_osMulWrite, 0, sizeof(OVERLAPPED));
+		if((m_osMulWrite.hEvent = CreateEvent(NULL,true,false,_T("MulWrite")))==NULL)
+			return -2; 
+		m_osMulWrite.Offset = 0;
+		m_osMulWrite.OffsetHigh = 0 ;
+		///////////////////////////////////////////////////////send the to read message
+		int fState=WriteFile(m_hSerial,// 句柄
+			data_to_write,// 数据缓冲区地址
+			length*2+9,// 数据大小
+			&m_had_send_data_number,// 返回发送出去的字节数
+			&m_osMulWrite);
+		if(!fState)// 不支持重叠	
+		{
+			if(GetLastError()==ERROR_IO_PENDING)
+			{
+				//WaitForSingleObject(m_osWrite.hEvent,INFINITE);
+				GetOverlappedResult(m_hSerial,&m_osWrite,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+			}
+			else
+				m_had_send_data_number=0;
+		}
+		///////////////////////////up is write
+		/////////////**************down is read
+		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
+		memset(&m_osRead, 0, sizeof(OVERLAPPED));
+		if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
+			return -2; 
+		m_osRead.Offset = 0;
+		m_osRead.OffsetHigh = 0 ;
+		Sleep(LATENCY_TIME_COM);
+		////////////////////////////////////////////////clear com error
+		fState=ReadFile(m_hSerial,// 句柄
+			gval,// 数据缓冲区地址
+			8,// 数据大小
+			&m_had_send_data_number,// 返回发送出去的字节数
+			&m_osRead);
+		if(!fState)// 不支持重叠	
+		{
+			if(GetLastError()==ERROR_IO_PENDING)
+			{
+				//WaitForSingleObject(m_osRead.hEvent,INFINITE);
+				GetOverlappedResult(m_hSerial,&m_osRead,&m_had_send_data_number,TRUE_OR_FALSE);// 等待
+			}
+			else
+				m_had_send_data_number=0;
+		}	
+		//traceStr=_T("Rev:");
+		//for(int i=0;i<8;i++){
+		//	temp.Format(_T("%02X "),gval[i]);
+		//	traceStr+=temp;
+		//}
+		//TRACE(_T("%s"),traceStr);
+		*recvDataLength=8;
+		for(int i=0;i<8;i++){
+			 *((char*)put_revdata_into_here + i) = gval[i];
+		}
+          //  *((char*)put_senddate_into_here + i) = data_to_write[i];
+		///////////////////////////////////////////////////////////
+		for(int i=0;i<6;i++)
+			{if(gval[i]!=*(data_to_write+i))
+			return -2;}
+		crc=CRC16(gval,6);
+		if(gval[6]!=((crc>>8)&0xff))
+			return -2;
+		if(gval[7]!=(crc & 0xff))
+			return -2;
+		return 1;
+	}
+	if(g_Commu_type==1)//tcp.
+	{
+		//the return value ,-2 is wrong
+		//the return value == -1 ,no connecting
+		HCURSOR hc;//load mouse cursor
+		TS_UC data_to_write[600]={'\0'};
+		TS_UC data_back_write[600]={'\0'};
+		
+		data_to_write[0]=1;
+		data_to_write[1]=2;
+		data_to_write[2]=3;
+		data_to_write[3]=4;
+		data_to_write[4]=5;
+		data_to_write[5]=6;
+
+		data_to_write[6]=device_var;
+		data_to_write[7]=0x10;
+		data_to_write[8]=start_address >> 8 & 0xff;
+		data_to_write[9]=start_address & 0xff;
+		data_to_write[10]=0;
+		data_to_write[11]=length&0xff;
+		data_to_write[12]=length*2;//128 is better ,if you send more than 128, the ron software will meet some trouble,because it is too long one times,can not finish on time;on time
+		for(int i=0;i<length;i++)
+			 {
+				 data_to_write[13+i*2] =to_write[i]  >> 8 & 0xff;
+				 data_to_write[13+i*2+1]=to_write[i] & 0xff;
+			 }
+		
+		*sendDataLength = 2*length+13;
+		for (int i = 0; i < *sendDataLength; i++)
+		{
+			*((char*)put_senddate_into_here + i) = data_to_write[i];
+		}
+	//	1 2 3 4 5 6 2 10 0 c8 0 8 8 5 5 5 5 5 5 5 5
+	//	TS_US crc=CRC16(data_to_write,i+7);
+	//	data_to_write[i+7]=crc>>8 & 0xff;
+	//	data_to_write[i+8]=crc & 0xff;
+		hc = LoadCursor(NULL,IDC_WAIT);
+		hc = SetCursor(hc);
+//length is the data length,if you want to write 128 bite,the length == 128
+//		DWORD m_had_send_data_number;//已经发送的数据的字节数
+		if(m_hSocket==INVALID_SOCKET)
+		{
+			return -1;
+		}
+	
+		int n=::send(m_hSocket,(char *)data_to_write,13+2*length,0);
+		int nRecv = ::recv(m_hSocket, (char *)data_back_write,13, 0);
+
+		*recvDataLength=13;
+		for(int i=0;i<13;i++){
+			*((char*)recvDataLength + i) = data_back_write[i];
+		}
+		if(nRecv<0)
+		{
+			return -2;
+		}
+
+	//	memcpy((void*)&to_send_data[0],(void*)&to_Reive_data[6],sizeof(to_Reive_data));
+		for(int i=0;i<6;i++)
+			if(data_back_write[i+6]!=*(data_to_write+i+6))
+				return -2;
+		return 1;
+
+	}
+	return -1;
+}
 OUTPUT int Read_One(TS_UC device_var,TS_US address)
 {
 
@@ -1463,6 +1671,26 @@ OUTPUT int Read_One_log(TS_UC device_var,TS_US address,unsigned char *put_sendda
 		data[3]=4;
 		data[4]=5;
 		data[5]=6;
+
+
+
+		++g_data_to_send[1];
+		if (g_data_to_send[1]%256==0)
+		{
+			++g_data_to_send[0];
+			g_data_to_send[1]=0;
+		}
+
+
+
+		data[0]=g_data_to_send[0];
+		data[1]=g_data_to_send[1];
+		data[2]=g_data_to_send[2];
+		data[3]=g_data_to_send[3];
+		data[4]=g_data_to_send[4];
+		data[5]=g_data_to_send[5];
+
+
 		data[6]=device_var;
 		data[7]=3;
 		data[8]=address>>8 & 0xFF ;
@@ -2196,12 +2424,22 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
 		}
 		ZeroMemory(data, nSendNum);
 
-		data[0]=1;
-		data[1]=2;
-		data[2]=3;
-		data[3]=4;
-		data[4]=5;
-		data[5]=6;
+
+		 ++g_data_to_send[1];
+		if (g_data_to_send[1]%256==0)
+		{
+			++g_data_to_send[0];
+			g_data_to_send[1]=0;
+		}
+
+
+
+		data[0]=g_data_to_send[0];
+		data[1]=g_data_to_send[1];
+		data[2]=g_data_to_send[2];
+		data[3]=g_data_to_send[3];
+		data[4]=g_data_to_send[4];
+		data[5]=g_data_to_send[5];
 //		DWORD m_had_send_data_number;//已经发送的数据的字节数
 		data[6] = device_var;
 		data[7] = 6;
@@ -2356,7 +2594,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
 	///////////////////////////////////////////////////////////
 }
        
-#if 0
+#if 1
 OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length)
 {
 	if(g_Commu_type==0)
@@ -2570,8 +2808,8 @@ OUTPUT int read_multi(TS_UC device_var,TS_US *put_data_into_here,TS_US start_add
 
 #endif
 
-OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
-{
+OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
+{    
 	if(g_Commu_type==0)
 	{
 		//device_var is the Tstat ID
@@ -2642,7 +2880,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 		ClearCommError(m_hSerial,&dwErrorFlags,&ComStat);
 		memset(&m_osRead, 0, sizeof(OVERLAPPED));
 		if((m_osRead.hEvent = CreateEvent(NULL,true,false,_T("Read")))==NULL)
-			return -2; 
+			return -3; 
 		m_osRead.Offset = 0;
 		m_osRead.OffsetHigh = 0 ;
 		////////////////////////////////////////////////clear com error
@@ -2670,12 +2908,12 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 
 		///////////////////////////////////////////////////////////
 		if(to_send_data[0]!=device_var || to_send_data[1]!=3 || to_send_data[2]!=length*2)
-			return -2;
+			return -4;
 		crc=CRC16(to_send_data,length*2+3);
 		if(to_send_data[length*2+3]!=((crc>>8) & 0xff))
-			return -2;
+			return -5;
 		if(to_send_data[length*2+4]!=(crc & 0xff))
-			return -2;
+			return -5;
 		for(int i=0;i<length;i++)
 			put_data_into_here[i]=to_send_data[3+2*i]*256+to_send_data[4+2*i];
 
@@ -2747,12 +2985,23 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 		//length is the number of register,that you want to read
 		//start_address is the start register
 		TS_UC data_to_send[12]={'\0'};//the array to used in writefile()
-		data_to_send[0]=1;
-		data_to_send[1]=2;
-		data_to_send[2]=3;
-		data_to_send[3]=4;
-		data_to_send[4]=5;
-		data_to_send[5]=6;
+		++g_data_to_send[1];
+		if (g_data_to_send[1]%256==0)
+		{
+			++g_data_to_send[0];
+			g_data_to_send[1]=0;
+		}
+		 
+		
+		
+		data_to_send[0]=g_data_to_send[0];
+		data_to_send[1]=g_data_to_send[1];
+
+		data_to_send[2]=g_data_to_send[2];
+		data_to_send[3]=g_data_to_send[3];
+
+		data_to_send[4]=g_data_to_send[4];
+		data_to_send[5]=g_data_to_send[5];
 
 
 
@@ -2818,7 +3067,7 @@ OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start
 	return -1;
 }
 
-OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length)
+OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_US length)
 {	
 	if(g_Commu_type==0)//
 	{
@@ -2970,7 +3219,7 @@ OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int 
 	return -1;
 }
 
-OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
+OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength)
 {	
 	if(g_Commu_type==0)//
 	{
@@ -3089,12 +3338,24 @@ OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,
 		TS_UC data_to_write[600]={'\0'};
 		TS_UC data_back_write[600]={'\0'};
 		
-		data_to_write[0]=1;
-		data_to_write[1]=2;
-		data_to_write[2]=3;
-		data_to_write[3]=4;
-		data_to_write[4]=5;
-		data_to_write[5]=6;
+		
+		++g_data_to_send[1];
+		if (g_data_to_send[1]%256==0)
+		{
+			++g_data_to_send[0];
+			g_data_to_send[1]=0;
+		}
+
+
+
+		data_to_write[0]=g_data_to_send[0];
+		data_to_write[1]=g_data_to_send[1];
+		data_to_write[2]=g_data_to_send[2];
+		data_to_write[3]=g_data_to_send[3];
+		data_to_write[4]=g_data_to_send[4];
+		data_to_write[5]=g_data_to_send[5];
+
+		 
 
 		data_to_write[6]=device_var;
 		data_to_write[7]=0x10;

@@ -68,8 +68,8 @@ int CBinFileParser::GetBinFileBuffer(char* pFileBuf, int nFileBufLen)
 		nFileBufSize = nCount;
 		binFile.Close();
 	}
-	Bin_Info test_info;
-	Get_Binfile_Information(m_strFileName.GetString(),test_info);
+// 	Bin_Info test_info;
+// 	Get_Binfile_Information(m_strFileName.GetString(),test_info);
 	return nFileBufSize;
 }
 

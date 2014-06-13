@@ -473,7 +473,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 	Sleep(50);	
 	int nCount=0;
 
-	int a=CheckTstatOnline_a(devLo,devHi, bForTStat);
+	int a=g_CheckTstatOnline_a(devLo,devHi, bForTStat);
 	if(a ==-6)//总线上存在bacnet协议，modbus协议无法扫描;
 	{
 		CString temp_cs;
@@ -497,7 +497,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 
 		}
 
-		a=CheckTstatOnline_a(devLo,devHi, bForTStat);
+		a=g_CheckTstatOnline_a(devLo,devHi, bForTStat);
 		g_llTxCount++;
 		g_llRxCount++;
 		if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
@@ -2714,11 +2714,11 @@ void CTStatScanner::ScanTstatFromNCForManual()
 		int nIPPort=pNCInfo->m_pNet->GetIPPort();
 
 		CString strIP=pNCInfo->m_pNet->GetIPAddrStr();
-		int temp_port = pNCInfo->m_pNet->GetIPPort();
+
 
 		g_CommunicationType=1;
 		SetCommunicationType(g_CommunicationType);
-		bool b=Open_Socket2(strIP, temp_port);
+		bool b=Open_Socket2(strIP, nIPPort);
 		CString strInfo;
 		//	strInfo.Format((_T("Open IP:%s successful")),build_info.strIp);//prompt info;
 		//	SetPaneString(1,strInfo);
@@ -2801,11 +2801,11 @@ void CTStatScanner::ScanTstatFromNCForAuto()//scan 分别扫描各个NC中的TSTAT
 
 		m_ip = strIP;
 		
-				int temp_port = pNCInfo->m_pNet->GetIPPort();
+		int net_port=pNCInfo->m_pNet->GetIPPort();
 
 		g_CommunicationType=1;
 		SetCommunicationType(g_CommunicationType);
-		bool b=Open_Socket2(strIP, temp_port);
+		bool b=Open_Socket2(strIP, net_port);
 		if(b)
 		{	
 			strInfo.Format((_T("Connect to IP : %s successful")), strIP);//prompt info;
@@ -2859,7 +2859,7 @@ void CTStatScanner::ScanTstatFromNCForAuto()//scan 分别扫描各个NC中的TSTAT
 void CTStatScanner::BinaryScanNCByComPort(BYTE devLo, BYTE devHi)//lsc
 {
 	g_strScanInfoPrompt.Format(_T("NC by COM"));
-	int a=NetController_CheckTstatOnline_a(devLo,devHi, false);
+	int a=g_NetController_CheckTstatOnline_a(devLo,devHi, false);
 
 	//int kk=Read_One2(255,7);
 	TRACE(_T("L:%d   H:%d  a:%d\n"),devLo,devHi,a);
@@ -3119,7 +3119,7 @@ void CTStatScanner::ScanOldNC(BYTE devLo, BYTE devHi)
 	TRACE(_T("start TCP scan^^^^^^^^^ \n"));
 	 CString strlog=_T("start TCP scan....... \n");
 	 WriteLogFile(strlog);
-	int a=NetController_CheckTstatOnline_a(1,254, true);
+	int a=g_NetController_CheckTstatOnline_a(1,254, true);
 	//int kk=Read_One2(255,7);
 	//TRACE("L:%d   H:%d  a:%d\n",devLo,devHi,a);
 
@@ -3214,7 +3214,7 @@ void CTStatScanner::ScanAll()
 	m_szNCScanRet.clear();	//Clear all the old information ,when we start a new scan;
 #if 1	
 	b_pause_refresh_tree = true ;
-	ScanComDevice();
+	 ScanComDevice();
 	
 	
 	ScanNetworkDevice();
@@ -3330,6 +3330,7 @@ void CTStatScanner::ShowComScanInfo(const CString& strInfo)
 
 void CTStatScanner::ShowBacnetComScanInfo(const CString& strInfo)
 {
+	 
 	CString* pstrInfo = new CString(strInfo);
 	if(((CMainFrame*)(m_pParent))->m_pWaitScanDlg)
 		PostMessage(((CMainFrame*)(m_pParent))->m_pWaitScanDlg->m_hWnd, WM_BACNETCOMSCANINFO, WPARAM(pstrInfo), LPARAM(0));
@@ -3387,10 +3388,10 @@ void CTStatScanner::GetTstatFromNCTable()
 		CString strInfo;strInfo.Format(_T("Scan Tstat connected to %s"), pNCInfo->m_pNet->GetProductName());
 		ShowNetScanInfo(strInfo);
 		//##############################
-		int temp_port = pNCInfo->m_pNet->GetIPPort();
+		int net_port=pNCInfo->m_pNet->GetIPPort();
 		g_CommunicationType=1;
 		SetCommunicationType(g_CommunicationType);
-		bool b=Open_Socket2(strIP, temp_port);
+		bool b=Open_Socket2(strIP, net_port);
 
 		//	strInfo.Format((_T("Open IP:%s successful")),build_info.strIp);//prompt info;
 		//	SetPaneString(1,strInfo);

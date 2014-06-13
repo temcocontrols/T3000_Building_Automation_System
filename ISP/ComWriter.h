@@ -56,18 +56,20 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// 立即结束flash
 	BOOL EndFlash();
-	void UpdataDeviceInformation(int& ID);
+	BOOL UpdataDeviceInformation(int& ID);
 
 	//////////////////////////////////////////////////////////////////////////
 	// 开始写hex，通过TCP
 	int BeginWirteByTCP();
 	void SetIPAddr(const CString& strIPAddr);
 	void SetIPPort(int nIPPort);
+    void SetHexInfor(Bin_Info temp);
 protected:
 	BOOL WriteCommandtoReset();
 	BOOL StopWrite();
 
 public:
+        Bin_Info m_hexinfor;
 		HEXFILE_FORMAT	m_nHexFileType;
 		CWnd*			m_pParentWnd;
 		TS_UC*			m_pFileBuffer;
@@ -76,7 +78,7 @@ public:
 		int					m_nComPort;
 		 
 		int					m_nBautrate;			// 波特率
-
+		CString m_hexbinfilepath;
 		CWinThread*	m_pWorkThread;
 		vector<int>		m_szMdbIDs;			// 所有的需要flash的Modbus ID
 		
@@ -86,5 +88,6 @@ public:
 
 		CString			m_strIPAddr;
 		int				m_nIPPort;
+	    
 
 };

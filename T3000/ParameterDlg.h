@@ -218,4 +218,10 @@ public:
 	afx_msg void OnEnKillfocusEsetpointlo2Pid3();
 	afx_msg void OnEnKillfocusEcooldeadband3Pid3();
 	afx_msg void OnEnKillfocusEcoolingiterm3Pid3();
+	CEdit m_edit_backlighttime;
+	afx_msg void OnEnKillfocusEditBacklightTime();
+	afx_msg void OnBnClickedCheck2();
+	CButton m_check_occupiedenable;
+	CEdit m_occupied_timer;
+	afx_msg void OnEnKillfocusEditOccupiedTimer();
 };

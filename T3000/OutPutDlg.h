@@ -71,7 +71,8 @@ public:
 	CEdit m_PID1_heatEdit;
 	CEdit m_PID1_coolEdit;
 
-
+	int m_pwm_row1;
+	int m_pwm_row2;
 	CEdit m_DescriptEdt;
 	CComboBox m_ItemValueCombx;
 	CEdit m_PID2_heatEdit;

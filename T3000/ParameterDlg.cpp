@@ -118,6 +118,9 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATICUNINT2, m_gUnit);
 	DDX_Control(pDX, IDC_INPUTSELECT3_PID3, m_inputSelect3);
 	DDX_Control(pDX, IDC_INPUTVALUE3_PID3, m_inputValue3);
+	DDX_Control(pDX, IDC_EDIT_BACKLIGHT_TIME, m_edit_backlighttime);
+	DDX_Control(pDX, IDC_CHECK2, m_check_occupiedenable);
+	DDX_Control(pDX, IDC_EDIT_OCCUPIED_TIMER, m_occupied_timer);
 }
 
 BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
@@ -223,6 +226,9 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 	ON_EN_KILLFOCUS(IDC_ESETPOINTLO2_PID3, &CParameterDlg::OnEnKillfocusEsetpointlo2Pid3)
 	ON_EN_KILLFOCUS(IDC_ECOOLDEADBAND3_PID3, &CParameterDlg::OnEnKillfocusEcooldeadband3Pid3)
 	ON_EN_KILLFOCUS(IDC_ECOOLINGITERM3_PID3, &CParameterDlg::OnEnKillfocusEcoolingiterm3Pid3)
+	ON_EN_KILLFOCUS(IDC_EDIT_BACKLIGHT_TIME, &CParameterDlg::OnEnKillfocusEditBacklightTime)
+	ON_BN_CLICKED(IDC_CHECK2, &CParameterDlg::OnBnClickedCheck2)
+	ON_EN_KILLFOCUS(IDC_EDIT_OCCUPIED_TIMER, &CParameterDlg::OnEnKillfocusEditOccupiedTimer)
 	END_MESSAGE_MAP()
 
 
@@ -369,7 +375,11 @@ BOOL CParameterDlg::OnInitDialog()
 	m_inputSelect3.AddString(g_strInName8);
 
 	ShowPID3();
-
+	m_keyLockCombox.AddString(_T("Lock On"));
+	m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Menu Lock."));
+	m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Menu Part Lock CAL,ORT,Unlock."));
+	m_keyLockCombox.AddString(_T("FAN.SP LOCK.Menu Lock"));
+	m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Most Menu Unlock "));
 	SetTimer(1,2000,NULL);
 	//////////////////////////////////////////////////////////////////////////
 	// TODO:  Add extra initialization here
@@ -1921,7 +1931,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 			{
 				AfxMessageBox(_T("Fail!"));
 			}
-			strText.Format(_T("%0.1f"),(product_register_value[345]/10));
+			strText.Format(_T("%0.1f"),(((float)product_register_value[345])/10));
 			}
 
 		
@@ -3142,11 +3152,32 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		//GetDlgItem(IDC_STATIC_1SP2SPN)->ShowWindow(FALSE);
 		//GetDlgItem(IDC_COMBO1)->ShowWindow(FALSE);
 		//GetDlgItem(IDC_COMBO4)->ShowWindow(FALSE);
-
-
+		
+		
+		m_edit_backlighttime.ShowWindow(TRUE);
+		CString backlight;
+		backlight.Format(_T("%d"),product_register_value[434]);
+		m_edit_backlighttime.SetWindowText(backlight);
+		
+// 		m_check_occupiedenable.ShowWindow(TRUE);
+// 		if ((product_register_value[629]==1)&&(product_register_value[565]==0))
+// 		{
+// 			m_check_occupiedenable.SetCheck(1);
+// 		} 
+// 		else
+// 		{
+// 			m_check_occupiedenable.SetCheck(0);
+// 		}
+// 		m_occupied_timer.ShowWindow(TRUE);
+		//CString occupiedtimer;
+		//occupiedtimer.Format(_T("%d"),product_register_value[641]);
+		//m_occupied_timer.SetWindowText(occupiedtimer);
 	}
 	else
 	{
+		//m_occupied_timer.ShowWindow(FALSE);
+		//m_check_occupiedenable.ShowWindow(FALSE);
+		m_edit_backlighttime.ShowWindow(FALSE);
 		GetDlgItem(IDC_EDIT_CSPD)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_CDBDN)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT31)->EnableWindow(FALSE);
@@ -3652,7 +3683,7 @@ BOOL CParameterDlg::Get_Data_Bit(UINT Data,int n,int N)
 }
 void CParameterDlg::ShowPID3(){
  float m_fFirmwareVersion=get_curtstat_version();
-	if (product_register_value[7]==PM_TSTAT5E||((product_register_value[7]==PM_TSTAT5G)&&(m_fFirmwareVersion>=37.5)))
+	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5E||((product_register_value[7]==PM_TSTAT5G)&&(m_fFirmwareVersion>=37.5)))
 	{
 		GetDlgItem(IDC_STATIC_PID3_LOOP3)->ShowWindow(TRUE);
 		GetDlgItem(IDC_SPSET4_PID3)->ShowWindow(TRUE);
@@ -4086,4 +4117,74 @@ void CParameterDlg::OnEnKillfocusEcoolingiterm3Pid3()
 	{
 		AfxMessageBox(_T("Fail"));
 	}
+}
+
+
+void CParameterDlg::OnEnKillfocusEditBacklightTime()
+{
+	CString temp;
+	m_edit_backlighttime.GetWindowText(temp);
+	int val=_wtoi(temp);
+	 int ret=write_one(g_tstat_id,434,val);
+	 if (ret>0)
+	 {
+		 product_register_value[434]=val;
+		 CString backlight;
+		 backlight.Format(_T("%d"),product_register_value[434]);
+		 m_edit_backlighttime.SetWindowText(backlight);
+	 }
+	 else{
+		 AfxMessageBox(_T("Write Fail!"));
+	 }
+}
+
+
+void CParameterDlg::OnBnClickedCheck2()
+{
+	 if (m_check_occupiedenable.GetCheck()==1)
+	 {
+		 int ret1=write_one(g_tstat_id,629,1);
+		 int ret2=write_one(g_tstat_id,565,0);
+		 if (ret1&&ret2)
+		 {
+			 product_register_value[629]=1;
+			 product_register_value[565]=0;
+		 }
+	 }
+
+	 if (m_check_occupiedenable.GetCheck()==0)
+	 {
+		 int ret1=write_one(g_tstat_id,629,0);
+		 
+		 if (ret1)
+		 {
+			 product_register_value[629]=0;
+		
+		 }
+	 }
+
+
+}
+
+
+void CParameterDlg::OnEnKillfocusEditOccupiedTimer()
+{
+	CString timer;
+	int times;
+	m_occupied_timer.GetWindowText(timer);
+	times=_wtoi(timer);
+	
+	if (product_register_value[641]!=times)
+	{
+		int ret=write_one(g_tstat_id,641,times);
+		if (ret>0)
+		{
+			product_register_value[641]=times;	
+		}
+	}
+
+	CString occupiedtimer;
+	occupiedtimer.Format(_T("%d"),product_register_value[641]);
+	m_occupied_timer.SetWindowText(occupiedtimer);
+
 }

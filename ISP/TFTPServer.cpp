@@ -12,7 +12,7 @@
 #pragma  comment(lib,"Iphlpapi.lib")
 
 UINT _StartSeverFunc(LPVOID pParam);
-
+extern bool auto_flash_mode;	//用于自动烧写，不要弹框;
 char sendbuf[45];
 extern CString g_strFlashInfo;
 extern unsigned int Remote_timeout;
@@ -37,6 +37,7 @@ typedef struct _Product_IP_ID
 int ISP_STEP;
 //vector <Product_IP_ID> Product_Info;
 BYTE Byte_ISP_Device_IP[4];
+
 BYTE Product_Name[12];
 BYTE Rev[4];
 bool device_has_replay_lan_IP=false;
@@ -644,7 +645,7 @@ BOOL TFTPServer::StartServer()
 
 					SendFlashCommand();
 
-					 
+					#if 0 
 					nRet = RecvBOOTP();
 					if (nRet==-1)
 					{
@@ -668,9 +669,9 @@ BOOL TFTPServer::StartServer()
 						strTips.Format(_T("Use old protocol send flash command.Remain(%d)"),5-mode_send_flash_try_time);
 						OutPutsStatusInfo(strTips, TRUE);
 					}
-
+					#endif
 				int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
-				TRACE(_T("%d"),send_ret);
+				//TRACE(_T("%d"),send_ret);
 				if(send_ret<0)	//如果发送失败 就尝试 再次进行TCP连接
 				{
 					TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
@@ -705,7 +706,8 @@ BOOL TFTPServer::StartServer()
 					OutPutsStatusInfo(strTips, FALSE);				
 				//}
 
-				goto StopServer;
+
+					goto StopServer;
 				//if(some_device_reply_the_broadcast == true)	//这个是用来支持 多个 在bootload中回复的 广播，如果有 则 先打印其中有几个回复
 				//{
 				//	CString temp_pro_cs;
@@ -751,11 +753,11 @@ BOOL TFTPServer::StartServer()
                 m_StrRev.Format(_T("%C%C%C%C"),Rev[0],Rev[1],Rev[2],Rev[3]);
                 m_StrRev.TrimLeft();
                 m_StrRev.TrimRight();
-                if (m_StrFileProductName.Find(m_StrProductName)==-1)
-                {
-                  nRet=0;
-                  goto StopServer;
-                }
+// 				if (m_StrFileProductName.Find(m_StrProductName)==-1)
+// 				{
+// 					nRet=0;
+// 					goto StopServer;
+// 				}
 
 
 			}
@@ -816,10 +818,13 @@ StopServer:
 		temp_cs.Format(_T("Total package(%d).Resend package(%d)"),package_number,total_retry);
 		OutPutsStatusInfo(temp_cs, FALSE);
 		}
+
 		CString strTips=_T("Programming successful. ");
 		OutPutsStatusInfo(strTips, FALSE);
-		AfxMessageBox(strTips);
-
+		if(!auto_flash_mode)
+		{
+			AfxMessageBox(strTips);
+		}
 
 		//Sleep(5000); //if flash success, wait 5 seconds for LC or NC to start into runtime.
 		//if not , the user click flash, it will be not success.
@@ -828,12 +833,33 @@ StopServer:
 	{
 		CString strTips=_T("Programming failure.");
 		OutPutsStatusInfo(strTips, FALSE);
-		AfxMessageBox(strTips);
+		if(!auto_flash_mode)
+		{
+			AfxMessageBox(strTips);
+		}
 	}
 
 	
 
 	return TRUE;
+}
+void TFTPServer::Set_bininfor(Bin_Info temp){
+	
+	int i;
+	for (  i=0;i<5;i++)
+	{
+		m_binInfor.company[i]=temp.company[i];
+	}
+	for (  i=0;i<10;i++)
+	{
+		m_binInfor.product_name[i]=temp.product_name[i];
+	}
+	for (  i=0;i<3;i++)
+	{
+		m_binInfor.reserved[i]=temp.reserved[i];
+	}
+	m_binInfor.software_high=temp.software_high;
+	m_binInfor.software_low=temp.software_low;
 }
 bool TFTPServer::Send_Tftp_File()
 {
@@ -1303,15 +1329,15 @@ void TFTPServer::FlashByEthernet()
 	}
 
 	ISP_STEP = 0;
-	int add_port=0;
-	if(m_nClientPort<60000)
-		add_port= rand() % 30000+ 8000;
-	else
-		add_port= rand() % 100+ 1;
+	//int add_port=0;
+	//if(m_nClientPort<60000)
+	//	add_port= rand() % 30000+ 8000;
+	//else
+	//	add_port= rand() % 100+ 1;
 
 	GetDeviceIP_String();
 	int resualt=TCP_Flash_CMD_Socket.Create(0,SOCK_STREAM);//SOCK_STREAM
-//	int resualt=TCP_Flash_CMD_Socket.Create(m_nClientPort+add_port,SOCK_STREAM);//SOCK_STREAM
+
 	if(resualt == 0)
 	{
 		DWORD error_msg=GetLastError();
@@ -1320,7 +1346,6 @@ void TFTPServer::FlashByEthernet()
 		FormatMessage(	FORMAT_MESSAGE_ALLOCATE_BUFFER | 	FORMAT_MESSAGE_FROM_SYSTEM,	NULL,	error_msg,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),	(LPTSTR) &lpMsgBuf,	0, NULL );
 		wsprintf(szBuf,_T("failed with error %d: %s"), 	 error_msg, lpMsgBuf); 
-
 		AfxMessageBox(szBuf);
 		LocalFree(lpMsgBuf);
 
@@ -1328,7 +1353,7 @@ void TFTPServer::FlashByEthernet()
 		return;
 	}
 	TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
-	
+	TCP_Flash_CMD_Socket.m_hex_bin_filepath=m_strFileName;
 	m_pThread = AfxBeginThread(_StartSeverFunc, this);
 
 	ASSERT(m_pThread);

@@ -175,6 +175,7 @@
     <ClInclude Include="JPGLoader.h" />
     <ClInclude Include="LightCtrlFlashDlg.h" />
     <ClInclude Include="MyPing.h" />
+    <ClInclude Include="MySocket.h" />
     <ClInclude Include="NCFinder.h" />
     <ClInclude Include="NCFlashDlg.h" />
     <ClInclude Include="NetWriter.h" />
