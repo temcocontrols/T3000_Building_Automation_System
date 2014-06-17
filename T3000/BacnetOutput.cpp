@@ -119,6 +119,7 @@ void CBacnetOutput::Reload_Unit_Type()
 	int a_initial_count = 0;
 	if(bacnet_device_type == BIG_MINIPANEL)	//Special Initial
 	{	
+		#ifdef NEED_ANALOG_DIGITAL_ONLY
 		if(BIG_MINIPANEL_OUT_D > (int)m_Output_data.size()) 
 			d_initial_count = (int)m_Output_data.size();
 		else
@@ -144,11 +145,12 @@ void CBacnetOutput::Reload_Unit_Type()
 				m_output_list.SetCellStringList(i, OUTPUT_RANGE, strlist);		
 			}
 		}
-
+		#endif
 		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH,80);
 	}
 	else if(bacnet_device_type == SMALL_MINIPANEL)
 	{
+		#ifdef NEED_ANALOG_DIGITAL_ONLY
 		if(SMALL_MINIPANEL_OUT_D > (int)m_Output_data.size()) 
 			d_initial_count = (int)m_Output_data.size();
 		else
@@ -174,10 +176,12 @@ void CBacnetOutput::Reload_Unit_Type()
 				m_output_list.SetCellStringList(i, OUTPUT_RANGE, strlist);		
 			}
 		}
+		#endif
 		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH,80);
 	}
 	else if(bacnet_device_type == PRODUCT_CM5)
 	{
+		#ifdef NEED_ANALOG_DIGITAL_ONLY
 		d_initial_count = CM5_MINIPANEL_OUT_D;
 		for (int i=0;i<d_initial_count;i++)
 		{
@@ -188,6 +192,7 @@ void CBacnetOutput::Reload_Unit_Type()
 				m_output_list.SetCellStringList(i, OUTPUT_RANGE, strlist);		
 			}
 		}
+		#endif
 		m_output_list.SetColumnWidth(OUTPUT_HW_SWITCH,0);
 	}
 
@@ -200,7 +205,7 @@ void CBacnetOutput::Initial_List()
 	m_output_list.SetExtendedStyle(m_output_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_output_list.InsertColumn(OUTPUT_NUM, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_output_list.InsertColumn(OUTPUT_FULL_LABLE, _T("Full Label"), 140, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_HW_SWITCH, _T("HW Switch"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -220,13 +225,13 @@ void CBacnetOutput::Initial_List()
 		CString temp_units;
 		temp_item.Format(_T("%d"),i+1);
 		m_output_list.InsertItem(i,temp_item);
-		if(ListCtrlEx::ComboBox == m_output_list.GetColumnType(OUTPUT_AUTO_MANUAL))
-		{
-			ListCtrlEx::CStrList strlist;
-			strlist.push_back(_T("Auto"));
-			strlist.push_back(_T("Manual"));
-			m_output_list.SetCellStringList(i, OUTPUT_AUTO_MANUAL, strlist);
-		}
+		//if(ListCtrlEx::ComboBox == m_output_list.GetColumnType(OUTPUT_AUTO_MANUAL))
+		//{
+		//	ListCtrlEx::CStrList strlist;
+		//	strlist.push_back(_T("Auto"));
+		//	strlist.push_back(_T("Manual"));
+		//	m_output_list.SetCellStringList(i, OUTPUT_AUTO_MANUAL, strlist);
+		//}
 
 		if(ListCtrlEx::ComboBox == m_output_list.GetColumnType(OUTPUT_RANGE))
 		{
@@ -334,6 +339,8 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		{
 			i = Fresh_Item;
 		}
+		if(i == 8)
+			Sleep(1);
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
 		CString temp_des;
 		CString temp_units;
@@ -656,6 +663,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		BacnetRange dlg;
 		if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_ANALOG])==0)
 		{
+			bac_range_number_choose = m_Output_data.at(Changed_Item).range;
 			bac_ranges_type = OUTPUT_RANGE_ANALOG_TYPE;
 			dlg.DoModal();
 			if(range_cancel)
@@ -687,6 +695,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		}
 		else if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_DIGITAL])==0)
 		{
+			bac_range_number_choose = m_Output_data.at(Changed_Item).range;
 			bac_ranges_type = OUTPUT_RANGE_DIGITAL_TYPE;
 			dlg.DoModal();
 			if(range_cancel)
@@ -784,69 +793,71 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 	if(lRow<0)
 		return;
 
-	if(lCol != OUTPUT_VALUE)	
-		return;
-
-	if(m_Output_data.at(lRow).digital_analog != BAC_UNITS_DIGITAL)
-		return;
-
-	if(m_Output_data.at(lRow).auto_manual == BAC_AUTO)	//If it is auto mode, disable to change the value.
-		return;
-
-	memcpy_s(&m_temp_output_data[lRow],sizeof(Str_out_point),&m_Output_data.at(lRow),sizeof(Str_out_point));
-
 	CString New_CString;
 	CString temp_task_info;
 	CString temp1;
 	CStringArray temparray;
-	if((m_Output_data.at(lRow).range < 23) &&(m_Output_data.at(lRow).range !=0))
-		temp1 = Digital_Units_Array[m_Output_data.at(lRow).range];
-	else
-		return;
-	//if(m_Output_data.at(lRow).range > 11)
-	//	temp1 = Digital_Units_Array[m_Output_data.at(lRow).range - 11];//11 is the sizeof the array
-	//else
-	//	temp1 = Digital_Units_Array[m_Output_data.at(lRow).range];
-	SplitCStringA(temparray,temp1,_T("/"));
-	if(m_Output_data.at(lRow).control == 0)
-	{
-		m_Output_data.at(lRow).control = 1;
-		m_output_list.SetItemText(lRow,OUTPUT_VALUE,temparray.GetAt(1));
-		New_CString = temparray.GetAt(1);
-	}
-	else
-	{
-		m_Output_data.at(lRow).control = 0;
-		m_output_list.SetItemText(lRow,OUTPUT_VALUE,temparray.GetAt(0));
-		New_CString = temparray.GetAt(0);
-	}
 
-#if 0
-	if(m_Output_data.at(lRow).range>=12)
+	if(lCol == OUTPUT_VALUE)
 	{
+		if(m_Output_data.at(lRow).digital_analog != BAC_UNITS_DIGITAL)
+			return;
 
-		if((temparray.GetSize()==2)&&(!temparray.GetAt(1).IsEmpty()))
+		if(m_Output_data.at(lRow).auto_manual == BAC_AUTO)	//If it is auto mode, disable to change the value.
+			return;
+
+		memcpy_s(&m_temp_output_data[lRow],sizeof(Str_out_point),&m_Output_data.at(lRow),sizeof(Str_out_point));
+
+
+		if((m_Output_data.at(lRow).range < 23) &&(m_Output_data.at(lRow).range !=0))
+			temp1 = Digital_Units_Array[m_Output_data.at(lRow).range];
+		else
+			return;
+		//if(m_Output_data.at(lRow).range > 11)
+		//	temp1 = Digital_Units_Array[m_Output_data.at(lRow).range - 11];//11 is the sizeof the array
+		//else
+		//	temp1 = Digital_Units_Array[m_Output_data.at(lRow).range];
+		SplitCStringA(temparray,temp1,_T("/"));
+		if(m_Output_data.at(lRow).control == 0)
 		{
-			m_output_list.SetItemText(lRow,OUTPUT_VALUE,temparray.GetAt(0));
-			m_Output_data.at(lRow).range = m_Output_data.at(lRow).range - 11;
-			New_CString = temparray.GetAt(0);
-			m_Output_data.at(lRow).control = 0;	
-		}
-
-	}
-	else if(m_Output_data.at(lRow).range>=1)
-	{
-
-		if((temparray.GetSize()==2)&&(!temparray.GetAt(0).IsEmpty()))
-		{
+			m_Output_data.at(lRow).control = 1;
 			m_output_list.SetItemText(lRow,OUTPUT_VALUE,temparray.GetAt(1));
-			m_Output_data.at(lRow).range = m_Output_data.at(lRow).range + 11;
 			New_CString = temparray.GetAt(1);
-			m_Output_data.at(lRow).control = 1;	
 		}
-
+		else
+		{
+			m_Output_data.at(lRow).control = 0;
+			m_output_list.SetItemText(lRow,OUTPUT_VALUE,temparray.GetAt(0));
+			New_CString = temparray.GetAt(0);
+		}
 	}
-#endif
+	else if(lCol == OUTPUT_AUTO_MANUAL)
+	{
+		memcpy_s(&m_temp_output_data[lRow],sizeof(Str_out_point),&m_Output_data.at(lRow),sizeof(Str_out_point));
+		if(m_Output_data.at(lRow).auto_manual == 0)
+		{
+			m_Output_data.at(lRow).auto_manual = 1;
+			m_output_list.SetItemText(lRow,OUTPUT_AUTO_MANUAL,_T("Manual"));
+			m_output_list.SetCellEnabled(lRow,OUTPUT_VALUE,TRUE);
+			New_CString = _T("Manual");
+		}
+		else
+		{
+			m_Output_data.at(lRow).auto_manual = 0;
+			m_output_list.SetItemText(lRow,OUTPUT_AUTO_MANUAL,_T("Auto"));
+			m_output_list.SetCellEnabled(lRow,OUTPUT_VALUE,FALSE);
+			New_CString = _T("Auto");
+		}
+	}
+	else
+	{
+		return;
+	}
+
+		//return;
+
+
+
 	m_output_list.Set_Edit(false);
 
 	int cmp_ret = memcmp(&m_temp_output_data[lRow],&m_Output_data.at(lRow),sizeof(Str_out_point));
@@ -900,8 +911,8 @@ void CBacnetOutput::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
 	KillTimer(1);
-	m_output_dlg_hwnd = NULL;
-	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
+	//m_output_dlg_hwnd = NULL;
+	//::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	CDialogEx::OnClose();
 }
 

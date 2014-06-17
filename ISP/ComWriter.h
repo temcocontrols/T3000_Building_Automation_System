@@ -69,7 +69,7 @@ protected:
 	BOOL StopWrite();
 
 public:
-        Bin_Info m_hexinfor;
+Bin_Info m_hexinfor;
 		HEXFILE_FORMAT	m_nHexFileType;
 		CWnd*			m_pParentWnd;
 		TS_UC*			m_pFileBuffer;

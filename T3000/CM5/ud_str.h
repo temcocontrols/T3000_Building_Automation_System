@@ -660,10 +660,23 @@ typedef struct
 	uint8_t modbus_addr;
 	uint8_t product_type;
 	uint8_t panel_number;
-	uint8_t noused[6];
+	uint16_t modbus_port;
+	uint16_t soft_version;
+	uint8_t hardware_version;
+	uint8_t noused[1];
 
 }Str_Serial_info;
 
+typedef struct
+{
+	uint8_t harware_rev;
+	uint8_t firmware0_rev_main;
+	uint8_t firmware0_rev_sub;
+	uint8_t frimware1_rev;    // PIC
+	uint8_t frimware2_rev; // C8051
+	uint8_t frimware3_rev; // SM5964
+	uint8_t bootloader_rev;
+}Str_Pro_Info;
 
 typedef union
 {
@@ -677,6 +690,7 @@ typedef union
 		uint8_t tcp_type;   /* 0 -- DHCP, 1-- STATIC */
 		uint8_t mini_type;
 		uint8_t debug;
+		Str_Pro_Info   pro_info;
 	}reg;
 }Str_Setting_Info;
 

@@ -3,7 +3,7 @@
 #include "globle_function.h"
 
 
-
+extern bool auto_flash_mode;
 CHexFileParser::CHexFileParser(void)
 {
 	m_nHexFileType = HEXFILE_DATA;
@@ -130,7 +130,8 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 		{
 			wchar_t p_c_temp[74]={'\0'};
 			swprintf_s(p_c_temp,_T("Error: the hex file had error at %d line!"),nLineNum);
-			AfxMessageBox(p_c_temp);
+			if(!auto_flash_mode)
+				AfxMessageBox(p_c_temp);
 			//close_com();
 			return 0;
 		}
@@ -145,7 +146,8 @@ int CHexFileParser::ReadNormalHexFile( CFile& hexFile,  char* pBuf, int nBufLen)
 		{
 			wchar_t p_c_temp[74]={'\0'};
 			swprintf_s(p_c_temp,_T("Error: the hex file had error at %d line!"),nLineNum);
-			AfxMessageBox(p_c_temp,MB_OK);
+			if(!auto_flash_mode)
+				AfxMessageBox(p_c_temp,MB_OK);
 			//close_com();
 			return 0;
 		}
@@ -231,7 +233,8 @@ BOOL CHexFileParser::ReadLineFromFile(CFile& file, char* pBuffer)
 		 }
 		 else
 		 {
-			 AfxMessageBox(_T("The Hex File is broken"));
+			 if(!auto_flash_mode)
+				 AfxMessageBox(_T("The Hex File is broken"));
 			 return FALSE;
 		 }
 		

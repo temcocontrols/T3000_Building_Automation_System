@@ -1997,23 +1997,35 @@ void CTStatScanner::FindNetConflict()
 		_NetDeviceInfo* pInfo = m_szNCScanRet[i];
 		int nScanID = pInfo->m_pNet->GetSerialID();
 		DWORD dwScanIP = pInfo->m_pNet->GetIPAddr();
-
+		float hw_version = pInfo->m_pNet->GetHardwareVersion();
+		float sw_version = pInfo->m_pNet->GetSoftwareVersion();
+		int   ip_port =  pInfo->m_pNet->GetIPPort();
+		int  modbus_id = pInfo->m_pNet->GetDevID();
 		pInfo->m_pNet->SetBuildingName(m_strBuildingName);
 		pInfo->m_pNet->SetSubnetName(m_strSubNet);	
+
 		for (UINT j = 0; j < m_szNetNodes.size(); j++)
 		{
 			int nSID = m_szNetNodes[j]->GetSerialID();
 			DWORD dwIP = m_szNetNodes[j]->GetIPAddr();
+			float db_hw_version = m_szNetNodes[j]->GetHardwareVersion();
+			float db_sw_version = m_szNetNodes[j]->GetSoftwareVersion();
+			int db_ip_port = m_szNetNodes[j]->GetIPPort();
+			int db_modbus_id = m_szNetNodes[j]->GetDevID();
 			//加上 buildingname等私货
 
 			if (nScanID == nSID)
 			{	
-				if (dwScanIP != dwIP) // 需要矫正
+				if ((dwScanIP != dwIP) ||(hw_version != db_hw_version) || (sw_version != db_sw_version) || (ip_port != db_ip_port) || (modbus_id != db_modbus_id) ) // 需要矫正
 				{
 					pInfo->m_pNet->SetBuildingName(m_szNetNodes[j]->GetBuildingName());
 					pInfo->m_pNet->SetFloorName(m_szNetNodes[j]->GetFloorName());
 					pInfo->m_pNet->SetRoomName(m_szNetNodes[j]->GetRoomName());	
 					pInfo->m_pNet->SetSubnetName(m_szNetNodes[j]->GetSubnetName());	
+					pInfo->m_pNet->SetHardwareVersion(hw_version);
+					pInfo->m_pNet->SetSoftwareVersion(sw_version);
+					pInfo->m_pNet->SetIPPort(ip_port);
+					pInfo->m_pNet->SetDevID(modbus_id);
 					pInfo->m_bConflict = TRUE;
 					pInfo->m_dwIPDB = dwIP;
 					pInfo->m_dwIPScan = dwScanIP;
@@ -2127,21 +2139,81 @@ void  CTStatScanner::ResolveNetConflict()
 				CString strID;
 				CString strSerial;
 				CString strSql;
+				CString str_IPaddr;
+				CString str_port;
+				CString str_modbus_id;
 				//strID.Format(_T("%d"),m_binary_search_product_background_thread.at(j).id);
 				strID.Format(_T("%d"),dwScanIP);
 				//strSerial.Format(_T("%d"),m_binary_search_product_background_thread.at(j).serialnumber);
 				strSerial.Format(_T("%d"),dwSID);
+
+
+				CString str_baudrate;
+				CString hw_instance;
+				CString sw_panelnamber;
+				hw_instance.Format(_T("%d"),(unsigned int)pInfo->m_pNet->GetHardwareVersion());
+				sw_panelnamber.Format(_T("%d"),(unsigned int)pInfo->m_pNet->GetSoftwareVersion());
+				str_IPaddr = pInfo->m_pNet->GetIPAddrStr();
+				str_baudrate =pInfo->m_pNet->GetIPAddrStr();
+				//str_port = pInfo->m_pNet->GetIPPort();
+				int int_port = pInfo->m_pNet->GetIPPort();
+				int int_id = pInfo->m_pNet->GetDevID();
+				str_modbus_id.Format(_T("%d"),int_id);
+				str_port.Format(_T("%d"),int_port);
 				try
 				{
 
-				//strSql.Format(_T("delete ALL_NODE set Product_ID ='%s' where Serial_ID = '%s'"),strID,strSerial);
-				strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"), strSerial);
-				t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+					strSql.Format(_T("update ALL_NODE set Hardware_Ver ='%s' where Serial_ID = '%s'"),hw_instance,strSerial);
+					t_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+
+					strSql.Format(_T("update ALL_NODE set Software_Ver ='%s' where Serial_ID = '%s'"),sw_panelnamber,strSerial);
+					t_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+
+					strSql.Format(_T("update ALL_NODE set Bautrate ='%s' where Serial_ID = '%s'"),str_IPaddr,strSerial);
+					t_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+
+					strSql.Format(_T("update ALL_NODE set Com_Port ='%s' where Serial_ID = '%s'"),str_port,strSerial);
+					t_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+
+					strSql.Format(_T("update ALL_NODE set Product_ID ='%s' where Serial_ID = '%s'"),str_modbus_id,strSerial);
+					t_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+					
+
 				}
 				catch(_com_error *e)
 				{
 					AfxMessageBox(e->ErrorMessage());
 				}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				//try
+				//{
+
+				////strSql.Format(_T("delete ALL_NODE set Product_ID ='%s' where Serial_ID = '%s'"),strID,strSerial);
+				//strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"), strSerial);
+				//t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+				//}
+				//catch(_com_error *e)
+				//{
+				//	AfxMessageBox(e->ErrorMessage());
+				//}
 		}
 	}
 }
@@ -2714,11 +2786,11 @@ void CTStatScanner::ScanTstatFromNCForManual()
 		int nIPPort=pNCInfo->m_pNet->GetIPPort();
 
 		CString strIP=pNCInfo->m_pNet->GetIPAddrStr();
-
+		int temp_port = pNCInfo->m_pNet->GetIPPort();
 
 		g_CommunicationType=1;
 		SetCommunicationType(g_CommunicationType);
-		bool b=Open_Socket2(strIP, nIPPort);
+		bool b=Open_Socket2(strIP, temp_port);
 		CString strInfo;
 		//	strInfo.Format((_T("Open IP:%s successful")),build_info.strIp);//prompt info;
 		//	SetPaneString(1,strInfo);
@@ -3818,7 +3890,10 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 		DWORD dwIP = inet_addr(cTemp1); 
 
 		pTemp->SetIPAddr(dwIP);
-		pTemp->SetIPPort(BACNETIP_PORT);
+		int temp_port = m_bac_scan_result_data.at(l).modbus_port;
+		g_Print.Format(_T("Scan bacnet device ,it's modbus port is %d"),temp_port);
+		DFTrace(g_Print);
+		pTemp->SetIPPort(temp_port);
 		//pTemp->SetBaudRate(19200);//scan
 		//pTemp->SetComPort(5);
 		// hardware_version
@@ -3826,7 +3901,7 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 		//pTemp->SetSubnetName(pScan->m_strSubNet);
 		int Find_serialID = false;
 
-		for (int i=0;i<pScan->m_szNCScanRet.size();i++)
+		for (int i=0;i<(int)pScan->m_szNCScanRet.size();i++)
 		{
 
 			if( pTemp->GetSerialID() ==    pScan->m_szNCScanRet.at(i)->m_pNet->GetSerialID())
@@ -3874,7 +3949,7 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 		pScan->m_szTstatScandRet.push_back(pInfo);
 	}
 #endif
-endbacnetthread:
+//endbacnetthread:
 	if (pScan->m_eScanBacnetComEnd->m_hObject)
 	{
 		pScan->m_eScanBacnetComEnd->SetEvent();

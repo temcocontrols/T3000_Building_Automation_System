@@ -1,11 +1,23 @@
 #pragma once
 
+
+const int NO_COMMAND = 0;
+const int START_AUTO_FLASH_COMMAND = 1;
+const int FLASH_SUCCESS = 2;
+const int FAILED_NORESPONSED = 3;
+const int FAILED_UNKNOW_ERROR = 4;
+
+
 const int SEND_DOWNLOAD_COMMAND = 1;
 const int START_SEND_WANT_PACKAGE = 2;
 const int RECEIVE_WANTED_PACKAGE = 3;
 const int RECEIVE_COMPLET = 4;
+const int SEND_GET_MD5_VALUE = 5;
+const int CHECK_MD5_VALUE = 6;
+const int THREAD_IDLE = 255;
 
 const int TFTP_SEND_LENGTH = 512;
+//const int TFTP_SEND_LENGTH = 1024;
 #pragma pack(push) //±£´æ¶ÔÆë×´Ì¬ 
 #pragma pack(1)
 typedef struct
@@ -53,6 +65,7 @@ typedef struct
 }File_Package_Struct;
 
 
+
 #pragma pack(pop)//»Ö¸´¶ÔÆë×´Ì¬ 
 
 
@@ -61,28 +74,44 @@ typedef enum
 	GET_SERIAL_NUMBER = 1,
 	DOWNLOAD_FILE	= 2,
 	UPLOAD_FILE = 3,
+	GET_MD5_VALUE = 99,
 
 	RETURN_SERIAL_NUMBER = 101,
 	RETURN_FILE_SIZE = 102,
 	ACK_GET_UPLOAD_FILE_PAGE = 103,
 
-
+	ACK_MD5_VALUE = 199,
 	ACK_SERIAL_NUMBER = 201,
 	ACK_GET_FILE_PAGE = 202,
 	TRANSFER_UPLOAD_FILE_PAGE = 203,
 	TRANSFER_FILE_PAGE = 212,
 	UPLOAD_COMPLET = 213,
 	DOWNLOAD_COMPLETE = 222,
+	NO_MD5_FILE_EXSIT = 252,
 	UPLOAD_FILE_ERROR = 253,
 	DOWNLOAD_FILE_ERROR = 254,
 	HOST_BUSY = 255
 };
 
 
-
 const int DOWNLOAD_CONNECT_SUCCESS = 1;
 const int DOWNLOAD_DISCONNEC = 2;
 const int DOWNLOAD_CONNECT_FAILED = 3;
+const int RETURN_ERROR = 4;
+const int DOWNLOAD_CLOSE_SOCKET = 5;
+const int DOWNLOAD_PERSENT = 6;
+const int DOWNLOAD_FINISHED = 7;
+const int DOWNLOAD_FILE_INFO = 8;
+const int DOWNLOAD_NOT_FIND_LOCAL = 9;
+const int DOWNLOAD_LOCAL_EXSIT = 10;
+const int DOWNLOAD_RESULTS = 11;
+
+const int DOWNLOAD_MD5_FAILED = 20;
+const int DOWNLOAD_MD5_CHECK_PASS = 21;
+
+
+
+
 //#define SHOW_MESSAGEBOX
 #define	 MY_REDRAW_WINDOW		WM_USER + 1231
 #define WM_FRESH_CM_LIST		WM_USER + 975
@@ -95,7 +124,8 @@ const int DOWNLOAD_CONNECT_FAILED = 3;
 #define  WM_LIST_MONITOR_INPUT_CHANGED WM_USER+ 977
 #define WM_SCREENEDIT_CLOSE WM_USER + 1232
 
-const int BACNETIP_PORT =  47808;
+//const int BACNETIP_PORT =  47808;
+const int BACNETIP_PORT =  47809;
 const int UDP_BROADCAST_PORT =1234;
 const int RECV_RESPONSE_PORT = 4321;
 #define UPD_BROADCAST_QRY_MSG 100
@@ -214,7 +244,7 @@ const int BAC_SCHEDULE_TIME_COUNT = 8;
 const int BAC_TIME_COMMAND_COUNT = 1;
 const int BAC_BASIC_SETTING_COUNT = 1;
 const int BAC_CONTROLLER_COUNT = 16;
-const int BAC_SCREEN_COUNT = 32;
+const int BAC_SCREEN_COUNT = 16;
 const int BAC_MONITOR_COUNT = 12;
 const int BAC_ANNUAL_CODE_COUNT = 8;
 const int BAC_CONNECT_WITH_DEVICE_COUNT = 1;
@@ -277,6 +307,9 @@ struct _Bac_Scan_results_Info
 	unsigned char product_type;
 	unsigned int serialnumber;
 	unsigned char panel_number;
+	unsigned short modbus_port;
+	unsigned short software_version;
+	unsigned char hardware_version;
 };
 
 
@@ -611,8 +644,8 @@ const int KEY_INSERT = 1020;
 
 typedef enum
 {							//IN				//OUT	
-	BIG_MINIPANEL,			//32 A				//12D   12A
-	SMALL_MINIPANEL,		//16 A				//6 D	4 A
+	BIG_MINIPANEL = 1,			//32 A				//12D   12A
+	SMALL_MINIPANEL = 2,		//16 A				//6 D	4 A
 	PRODUCT_CM5						//10A + 8 D			//10D
 };
 

@@ -255,7 +255,7 @@ BOOL CISPDlg::OnInitDialog()
 
 	CString subnote;
 	CString subID;
-	CString firmware_path;
+
 	// IDM_ABOUTBOX must be in the system command range.
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
@@ -291,14 +291,10 @@ BOOL CISPDlg::OnInitDialog()
 
 
 
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//展示启动图片
-	 g_strExePath=GetExePath(true);
-	 m_strLogoFileName=g_strExePath + c_strLogoFileName;
-	 SettingPath = g_strExePath + _T("\\Setting.ini");
-	 ShowSplashWnd(c_nSplashTime);
-	////////////////////////////////////////////////////////////////////////////
+	g_strExePath=GetExePath(true);
+	m_strLogoFileName=g_strExePath + c_strLogoFileName;
+	SettingPath = g_strExePath + _T("\\Setting.ini");
+
  	//从文件中读取配置参数
 	 m_cfgFileHandler.SetParentWnd(this);
 	 m_cfgFileHandler.CreateConfigFile(g_strExePath + c_strCfgFileName);
@@ -338,6 +334,8 @@ BOOL CISPDlg::OnInitDialog()
 			 }
 			 else
 			 {
+				  ModifyStyleEx(WS_EX_APPWINDOW,WS_EX_TOOLWINDOW); //这句话改变窗口的属性;
+				 SetWindowPos(NULL,0,0,0,0,0);
 				  auto_flash_mode = true;
 				 GetPrivateProfileStringW(_T("Data"),_T("ID"),_T("255"),id.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
 				 id.ReleaseBuffer();
@@ -359,15 +357,15 @@ BOOL CISPDlg::OnInitDialog()
 				 subnote.ReleaseBuffer();
 				 GetPrivateProfileStringW(_T("Data"),_T("SubID"),_T("255"),subID.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
 				 subID.ReleaseBuffer();
-				 GetPrivateProfileStringW(_T("Data"),_T("FirmwarePath"),_T(""),firmware_path.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
-				 firmware_path.ReleaseBuffer();
-				 CFileFind nfind;
-				 if(!nfind.FindFile(firmware_path))
-				 {
-					 DeleteFile(AutoFlashConfigPath);
-					 PostMessage(WM_CLOSE,NULL,NULL);
-					 return TRUE;
-				 }
+				 GetPrivateProfileStringW(_T("Data"),_T("FirmwarePath"),_T(""),filename.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				 filename.ReleaseBuffer();
+				 //CFileFind nfind;
+				 //if(!nfind.FindFile(filename))
+				 //{
+					// DeleteFile(AutoFlashConfigPath);
+					// PostMessage(WM_CLOSE,NULL,NULL);
+					// return TRUE;
+				 //}
 			 }
 			
 			//  DeleteFile(AutoFlashConfigPath);
@@ -375,7 +373,16 @@ BOOL CISPDlg::OnInitDialog()
 			 //CloseHandle(get_file_thread_handle);
 		 }
 
+		 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		 //展示启动图片
 
+
+		 if(!auto_flash_mode)
+		 {
+			  ShowSplashWnd(c_nSplashTime);
+		 }
+		
+		 ////////////////////////////////////////////////////////////////////////////
 
 	GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(_T("19200"));
 	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename); 
@@ -384,7 +391,7 @@ BOOL CISPDlg::OnInitDialog()
 	 GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(BD);
 	 m_ipAddress.SetWindowText(ip);
 	 GetDlgItem(IDC_EDIT_NCPORT)->SetWindowText(ipport);
-	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(firmware_path);
+	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
 
 
 	/////////////////
@@ -849,11 +856,21 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
 	}
 	return 1;
 }
-
+int Add_log_count = 0;
 afx_msg LRESULT CISPDlg::OnAddStatusInfo(WPARAM wParam, LPARAM lParam)
 {
 	CString strInfo = CString(LPTSTR(lParam));
 	UpdateStatusInfo(strInfo, false);
+	if(auto_flash_mode)
+	{
+		Add_log_count ++;
+		CString temp;
+		temp.Format(_T("%d"),Add_log_count);
+		WritePrivateProfileStringW(_T("LogInfo"),_T("AddCount"),temp,AutoFlashConfigPath);	
+		CString section;
+		section.Format(_T("AddText%d"),Add_log_count);
+		WritePrivateProfileStringW(_T("LogInfo"),section,strInfo,AutoFlashConfigPath);	
+	}
 	WCHAR* szTemp = (LPTSTR(lParam));
 	delete [] szTemp;
 
@@ -865,6 +882,16 @@ afx_msg LRESULT CISPDlg::OnReplaceStatusInfo(WPARAM wParam, LPARAM lParam)
 {
 	CString strInfo = CString(LPTSTR(lParam));
 	UpdateStatusInfo(strInfo, true);
+	if(auto_flash_mode)
+	{
+		WritePrivateProfileStringW(_T("LogInfo"),_T("Replace_Refresh"),_T("1"),AutoFlashConfigPath);	
+		CString temp;
+		temp.Format(_T("%d"),Add_log_count);
+		WritePrivateProfileStringW(_T("LogInfo"),_T("ReplaceCount"),temp,AutoFlashConfigPath);	
+		CString section;
+		section.Format(_T("ReplaceText%d"),Add_log_count);
+		WritePrivateProfileStringW(_T("LogInfo"),section,strInfo,AutoFlashConfigPath);	
+	}
 	WCHAR* szTemp = (LPTSTR(lParam));
 	delete[] szTemp;
 
@@ -901,7 +928,13 @@ void CISPDlg::UpdateStatusInfo(const CString& strInfo, BOOL bReplace)
 void CISPDlg::OnClose()
 {
 	if(auto_flash_mode)
-		return;
+	{
+		 if(IDNO == MessageBox(_T("Are you sure you want to exit ,the ISP is not finished yet!"),_T("Warning"),MB_YESNO | MB_ICONINFORMATION))
+		 {
+			 return;
+		 }
+	}
+		
 	CDialog::OnClose();
 }
 
@@ -1278,8 +1311,12 @@ BOOL CISPDlg::FlashTstat(void)
 				}
 				if (times>=5)
 				{
-					temp.Format(_T("ISPTool Can't connect to %d\n"),TempID);
+					temp.Format(_T("ISPTool Can't connect to %d,device maybe offline!\n"),TempID);
 					UpdateStatusInfo(temp,false);
+					if(auto_flash_mode)
+					{
+						PostMessage(WM_FLASH_FINISH, 0, LPARAM(0));
+					}
 					/*int ret=AfxMessageBox(temp,MB_OKCANCEL);
 					if(ret==IDOK)
 					{
@@ -1295,16 +1332,29 @@ BOOL CISPDlg::FlashTstat(void)
 				 {
 					 if (realID<0)
 					 {
-						 AfxMessageBox(_T("Can't read the device ID,please check the connection."));
+						 if(!auto_flash_mode)
+							AfxMessageBox(_T("Can't read the device ID,please check the connection."));
+						 else
+						 {
+							  temp.Format(_T("Can't read the device ID,please check the connection."));
+							  UpdateStatusInfo(temp,false);
+							  PostMessage(WM_FLASH_FINISH, 0, LPARAM(0));
+						 }
 						 return FALSE;
 					 }
 					 if (realID!=TempID)
 					 {
 						 temp.Format(_T("The ID is %d,retry to flash it !\n"),realID);
-						  AfxMessageBox(temp);
+						 if(!auto_flash_mode)
+							AfxMessageBox(temp);
 						  UpdateStatusInfo(temp,false);
 						  temp.Format(_T("%d"),realID);
 						  id.SetWindowText(temp);
+						  if(auto_flash_mode)
+						  {
+							  FlashByCom();
+							  return TRUE;
+						  }
 						  return FALSE;
 						
 					 }
@@ -1332,7 +1382,7 @@ BOOL CISPDlg::FlashTstat(void)
 					}
 					if (times>=5)
 					{
-						temp.Format(_T("ISPTool Can't connect to %d\n"),TempID);
+						temp.Format(_T("ISP   Tool Can't connect to %d\n"),TempID);
 						continue;
 						UpdateStatusInfo(temp,false);
 					}
@@ -1346,6 +1396,8 @@ BOOL CISPDlg::FlashTstat(void)
 				AfxMessageBox(_T("Com Occupied"));
 			else
 			{
+				WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("4"),AutoFlashConfigPath);	//FAILED_UNKNOW_ERROR
+				auto_flash_mode = false;//设置为false后 不在为自动模式，退出程序;
 				PostMessage(WM_CLOSE,NULL,NULL);
 				return FALSE;
 			}
@@ -1429,7 +1481,15 @@ BOOL CISPDlg::ValidMdbIDStringSUBID()
 	GetDlgItem(IDC_EDIT_MDBID2)->GetWindowText(strModbusID);
 	if (strModbusID==_T(""))
 	{
-		AfxMessageBox(_T("Please Input sub node IDs!"));
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("Please Input sub node IDs!"));
+		else
+		{
+			CString temp;
+			temp.Format(_T("The sub nodes ID is invalid. We suggest you scan the device ,and try again"));
+			UpdateStatusInfo(temp,false);
+			PostMessage(WM_FLASH_FINISH, 0, LPARAM(0));
+		}
 		return FALSE;
 	} 
 	else
@@ -1819,7 +1879,7 @@ void CISPDlg::ShowHexBinInfor(int hexbin){
 }
 void CISPDlg::FlashByCom()
 {
-    if (m_pComWriter)
+	if (m_pComWriter)
 	{
 		delete m_pComWriter;
 		m_pComWriter = NULL;
@@ -1833,7 +1893,7 @@ void CISPDlg::FlashByCom()
 
     CHexFileParser* pHexFile = new CHexFileParser;
     pHexFile->SetFileName(m_strHexFileName);
- 
+
      
    /*  Get_HexFile_Information(m_strHexFileName.GetBuffer(),temp1);*/
 	 ShowHexBinInfor(1);
@@ -1880,7 +1940,7 @@ void CISPDlg::FlashByCom()
 		m_pComWriter->SetModbusID(m_szMdbIDs);
         m_pComWriter->SetHexInfor(temp1);
 		m_pComWriter->SetHexFileType(pHexFile->GetHexFileFormatType());
-        m_pComWriter->m_hexbinfilepath=m_strHexFileName;
+		m_pComWriter->m_hexbinfilepath = m_strHexFileName;
 		CString strBaudrate; GetDlgItem(IDC_EDIT_BAUDRATE)->GetWindowText(strBaudrate);
 		int nBautrate = _wtoi (strBaudrate.GetBuffer());
 		m_pComWriter->SetBautrate(nBautrate);
