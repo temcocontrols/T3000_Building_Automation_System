@@ -815,8 +815,9 @@ void CAllNodesDiaolg::OnBnClickedAddBacnetRemoteDevice()
 		CString priduct_name;
 		CString device_modbus_address;
 		CString device_type;
+		CString device_modbus_port;
+		device_modbus_port.Format(_T("%d"),m_bac_scan_result_data.at(i).modbus_port);
 		device_modbus_address.Format(_T("%d"),m_bac_scan_result_data.at(i).modbus_addr);
-		
 		device_instance_id.Format(_T("%d"),m_bac_scan_result_data.at(i).device_id);
 		device_ip_address = Remote_IP_Address;
 		/*device_ip_address.Format(_T("%d.%d.%d.%d"),(unsigned char)m_bac_scan_result_data.at(i).ipaddress[0],
@@ -848,7 +849,7 @@ void CAllNodesDiaolg::OnBnClickedAddBacnetRemoteDevice()
 			changed_items = temp1 -1;
 			
 			CString strSql;
-			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('Building_1','Sub_net1','"+device_serial_number+"','floor1','room1','"+priduct_name+"','"+device_type+"','"+device_modbus_address+"','""','"+device_ip_address+"','""','"+device_instance_id+"','"+device_panel_number+"','0','0')"));
+			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('Building_1','Sub_net1','"+device_serial_number+"','floor1','room1','"+priduct_name+"','"+device_type+"','"+device_modbus_address+"','""','"+device_ip_address+"','""','"+device_instance_id+"','"+device_panel_number+"','"+device_modbus_port+"','0')"));
 			//new nc//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Mainnet_info) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
 			try
 			{
@@ -932,6 +933,7 @@ void CAllNodesDiaolg::OnBnClickedAddBacnetRemoteDevice()
 		CString priduct_name;
 		CString device_modbus_address;
 		CString device_type;
+		CString device_port;
 		device_modbus_address.Format(_T("%d"),m_remote_device_db.at(i).modbus_id);
 		device_ip_address = Remote_IP_Address;
 		/*device_ip_address.Format(_T("%d.%d.%d.%d"),(unsigned char)m_bac_scan_result_data.at(i).ipaddress[0],
@@ -943,6 +945,7 @@ void CAllNodesDiaolg::OnBnClickedAddBacnetRemoteDevice()
 		device_type.Format(_T("%d"),m_remote_device_db.at(i).product_type);
 		device_name = GetProductName(m_remote_device_db.at(i).product_type);
 		priduct_name = device_name + _T(":") + device_serial_number + _T("--") + device_modbus_address;
+		device_port.Format(_T("%d"), m_remote_device_db.at(i).port);
 		bool find_exsit = false;
 		int nitems = -1;
 		int changed_items;
@@ -964,7 +967,7 @@ void CAllNodesDiaolg::OnBnClickedAddBacnetRemoteDevice()
 			changed_items = temp1 -1;
 
 			CString strSql;
-			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('Building_1','Sub_net1','"+device_serial_number+"','floor1','room1','"+priduct_name+"','"+device_type+"','"+device_modbus_address+"','""','"+device_ip_address+"','""','""','""','0','0')"));
+			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('Building_1','Sub_net1','"+device_serial_number+"','floor1','room1','"+priduct_name+"','"+device_type+"','"+device_modbus_address+"','""','"+device_ip_address+"','""','""','""','"+device_port+"','0')"));
 			//new nc//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Mainnet_info) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
 			try
 			{
@@ -985,7 +988,7 @@ void CAllNodesDiaolg::OnBnClickedAddBacnetRemoteDevice()
 			CString strSql;
 			try
 			{
-				strSql.Format(_T("update ALL_NODE set Product_name ='%s' , Product_class_ID = '%s' , Product_ID = '%s' , Bautrate = '%s' , Hardware_Ver = '%s' , Software_Ver = '%s'  where Serial_ID = '%s'"),priduct_name,device_type,device_modbus_address,device_ip_address,device_instance_id,device_panel_number,device_serial_number);
+				strSql.Format(_T("update ALL_NODE set Product_name ='%s' , Product_class_ID = '%s' , Product_ID = '%s' , Bautrate = '%s' , Hardware_Ver = '%s' , Software_Ver = '%s' , Com_Port = '%s'  where Serial_ID = '%s'"),priduct_name,device_type,device_modbus_address,device_ip_address,device_instance_id,device_panel_number,device_port,device_serial_number);
 				m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
 			}
 			catch(_com_error *e)

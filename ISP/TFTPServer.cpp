@@ -922,7 +922,9 @@ flash_new_package:
 		{
 			CString ErrorMessage;
 			ErrorMessage.Format(_T("Flash Package %d Failed.Please try again."),package_number);
-			AfxMessageBox(ErrorMessage);
+			if(!auto_flash_mode)
+				AfxMessageBox(ErrorMessage);
+
 			nRet = 0;
 			return 0;
 		}
@@ -1250,14 +1252,16 @@ int TFTPServer::SendFlashCommand()
 	siBind.sin_family = AF_INET;
 	siBind.sin_port = htons(4321);
 	siBind.sin_addr.s_addr = htonl(INADDR_ANY);
-
-	int nRet = bind(soFalsh, (SOCKADDR *) &siBind, sizeof(siBind));
+	int nRet;
+#if 0
+	nRet = bind(soFalsh, (SOCKADDR *) &siBind, sizeof(siBind));
 	if (nRet == SOCKET_ERROR)
 	{
 		AfxMessageBox(_T("Bind Socket Error,Port 4321 not available"));
 		closesocket(soFalsh);
 		return FALSE;
 	}
+#endif
 
 	//-----------------------------------------------------------------------------------
 	// Bind the socket to any address and the specified port.

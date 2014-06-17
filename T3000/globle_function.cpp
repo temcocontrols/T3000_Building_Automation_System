@@ -2163,8 +2163,25 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			memcpy_s(Device_Basic_Setting.reg.gate_addr,4,my_temp_point,4);
 			my_temp_point = my_temp_point + 4;
 			memcpy_s(Device_Basic_Setting.reg.mac_addr,6,my_temp_point,6);
-			my_temp_point = my_temp_point + 4;
-			Device_Basic_Setting.reg.tcp_type = *my_temp_point;
+			my_temp_point = my_temp_point + 6;
+			Device_Basic_Setting.reg.tcp_type = *(my_temp_point++);
+			Device_Basic_Setting.reg.mini_type = *(my_temp_point++);
+			if(Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL)
+				bacnet_device_type = BIG_MINIPANEL;
+			else if(Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL)
+				bacnet_device_type = SMALL_MINIPANEL;
+			else
+				bacnet_device_type = PRODUCT_CM5;
+			my_temp_point = my_temp_point + 1;	//中间 minitype  和 debug  没什么用;
+			Device_Basic_Setting.reg.pro_info.harware_rev = *(my_temp_point++);
+			Device_Basic_Setting.reg.pro_info.firmware0_rev_main = *(my_temp_point++);
+			Device_Basic_Setting.reg.pro_info.firmware0_rev_sub = *(my_temp_point++);
+
+			Device_Basic_Setting.reg.pro_info.frimware1_rev = *(my_temp_point++);
+			Device_Basic_Setting.reg.pro_info.frimware2_rev = *(my_temp_point++);
+			Device_Basic_Setting.reg.pro_info.frimware3_rev = *(my_temp_point++);
+			Device_Basic_Setting.reg.pro_info.bootloader_rev = *(my_temp_point++);
+
 			return READ_SETTING_COMMAND;
 		}
 		break;
@@ -2203,7 +2220,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 				m_remote_device_db.at(x).port =  ((unsigned char)my_temp_point[0]<<8) | ((unsigned char)my_temp_point[1]);
 				my_temp_point = my_temp_point + 2;
 				memcpy_s(m_remote_device_db.at(x).reserved,10,my_temp_point,10);
-
+				my_temp_point = my_temp_point + 10;
 			}
 			Sleep(1);
 		}
@@ -2234,7 +2251,12 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			 temp_struct.modbus_addr =  *(my_temp_point++);
 			 temp_struct.product_type =  *(my_temp_point++);
 			  temp_struct.panel_number =  *(my_temp_point++);
-			  
+			  temp_struct.modbus_port = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
+			  my_temp_point = my_temp_point + 2;
+			  temp_struct.software_version = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
+			  my_temp_point = my_temp_point + 2;
+			  temp_struct.hardware_version =  *(my_temp_point++);
+			
 			 int find_exsit = false;
 			 TRACE(_T("serialnumber = %d ,modbus_addr = %d , product_type = %d ,ip = %u.%u.%u.%u , instance = %d\r\n"),temp_struct.serialnumber,
 				 temp_struct.modbus_addr,temp_struct.product_type,temp_struct.ipaddress[0],temp_struct.ipaddress[1] ,
@@ -2713,6 +2735,9 @@ void local_handler_conf_private_trans_ack(
 	case READALARM_T3000:
 		//::PostMessage(m_alarmlog_dlg_hwnd,WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
 		break;
+	case READ_SETTING_COMMAND:
+		::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);	
+		break;
 	default:
 		break;
 	}
@@ -3110,7 +3135,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 
 	TRACE(_T("Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac + _T("\r\n"));
 
-	g_Print = _T("Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac;
+	g_Print = _T("Globle Who is Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac;
 	DFTrace(g_Print);
 	_Bac_Scan_Com_Info temp_1;
 	temp_1.device_id = device_id;
@@ -4124,9 +4149,72 @@ bool IP_is_Local(LPCTSTR ip_address)
 	return false;
 }
 
-
-void DFTrace(CString &nCString)
+// 执行程序的路径 // 参数  // 执行环境目录   // 最大等待时间, 超过这个时间强行终止;
+DWORD WinExecAndWait( LPCTSTR lpszAppPath,LPCTSTR lpParameters,LPCTSTR lpszDirectory, 	DWORD dwMilliseconds)  
 {
+	SHELLEXECUTEINFO ShExecInfo = {0};
+	ShExecInfo.cbSize    = sizeof(SHELLEXECUTEINFO);
+	ShExecInfo.fMask    = SEE_MASK_NOCLOSEPROCESS;
+	//ShExecInfo.fMask    = SEE_MASK_HMONITOR;
+	ShExecInfo.hwnd        = NULL;
+	ShExecInfo.lpVerb    = NULL;
+	ShExecInfo.lpFile    = lpszAppPath;        
+	ShExecInfo.lpParameters = lpParameters;    
+	ShExecInfo.lpDirectory    = lpszDirectory;
+	ShExecInfo.nShow    = SW_HIDE;
+	ShExecInfo.hInstApp = NULL;    
+	ShellExecuteEx(&ShExecInfo);
+	if(dwMilliseconds==0)
+	{
+		WaitForSingleObject(ShExecInfo.hProcess,INFINITE);  //等待进程退出，才继续运行;
+	}
+	else if (dwMilliseconds!=0 && WaitForSingleObject(ShExecInfo.hProcess, dwMilliseconds) == WAIT_TIMEOUT)  	// 指定时间没结束;
+	{    // 强行杀死进程;
+		TRACE(_T("TerminateProcess        %s"),lpszAppPath);
+		TerminateProcess(ShExecInfo.hProcess, 0);
+		return 0;    //强行终止;
+	}
+
+	DWORD dwExitCode;
+	BOOL bOK = GetExitCodeProcess(ShExecInfo.hProcess, &dwExitCode);
+	ASSERT(bOK);
+
+	return dwExitCode;
+}
+
+
+
+BOOL DirectoryExist(CString Path)
+{
+	WIN32_FIND_DATA fd;
+	BOOL ret = FALSE;
+	HANDLE hFind = FindFirstFile(Path, &fd);
+	if ((hFind != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+	{
+		//目录存在
+		ret = TRUE;
+
+	}
+	FindClose(hFind);
+	return ret;
+}
+
+BOOL CreateDirectory(CString path)
+{
+	SECURITY_ATTRIBUTES attrib;
+	attrib.bInheritHandle = FALSE;
+	attrib.lpSecurityDescriptor = NULL;
+	attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
+
+	return CreateDirectory( path, &attrib);
+} 
+
+
+
+void DFTrace(LPCTSTR lpCString)
+{
+	CString nCString;
+	nCString = lpCString;
 	static int count = 0;
 	CTime print_time=CTime::GetCurrentTime();
 	CString str=print_time.Format("%H:%M:%S    ");

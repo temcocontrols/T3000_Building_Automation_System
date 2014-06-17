@@ -31,4 +31,11 @@ public:
 	afx_msg LRESULT DownloadFileMessage(WPARAM wParam,LPARAM lParam);
 	CListBox m_download_info;
 	static DWORD WINAPI   DownLoadFileProcess(LPVOID lpVoid);
+	static DWORD WINAPI  isp_thread(LPVOID lpVoid);
+	afx_msg void OnClose();
+	virtual void OnCancel();
+	BOOL IsNetDevice(int DevType);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
+
+

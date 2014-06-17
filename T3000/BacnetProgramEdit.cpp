@@ -15,6 +15,7 @@ extern char *pmes;
 //extern int program_list_line;
 
 // CBacnetProgramEdit dialog
+CString program_string;
  char editbuf[25000];
  extern char my_display[10240];
  extern int Encode_Program();
@@ -130,6 +131,7 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  Add extra initialization here
+	m_edit_changed = false;
 	my_panel = bac_gloab_panel; //Set the panel number
 	GetDlgItem(IDC_RICHEDIT2_PROGRAM)->SetFocus();
 
@@ -222,7 +224,8 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	
 
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(temp1);
-
+	m_edit_changed = false;
+	program_string = temp1;
 	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(-1,-1);
 	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->ReplaceSel(temp1);
 	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(-1,-1);
@@ -259,8 +262,10 @@ LRESULT  CBacnetProgramEdit::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM 
 		Show_Results = temp_cs + _T("Success!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 
-		//SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_ok);
-//#ifdef SHOW_MESSAGEBOX
+
+		CString Edit_Buffer;
+		GetDlgItemText(IDC_RICHEDIT2_PROGRAM,Edit_Buffer);
+		program_string = Edit_Buffer;
 		MessageBox(Show_Results);
 //#endif
 	}
@@ -286,7 +291,7 @@ void CBacnetProgramEdit::OnSend()
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
 
-	char*     pElementText;
+//	char*     pElementText;
 	int    iTextLen;
 	// wide char to multi char
 	iTextLen = WideCharToMultiByte( CP_ACP,0,tempcs,-1,NULL,0,NULL,NULL );
@@ -312,34 +317,16 @@ void CBacnetProgramEdit::OnSend()
 		if(g_invoke_id>=0)
 		{
 			CString temp_cs_show;
-			temp_cs_show.Format(_T("Task ID = %d. Write program code to item %d "),g_invoke_id,program_list_line);
+			temp_cs_show.Format(_T("Write program code to item %d "),program_list_line);
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd/*BacNet_hwd*/,temp_cs_show);
 		}
-
-		//TRACE(_T("Encode_Program length is %d ,copy length is %d\r\n"),program_code_length[program_list_line],my_lengthcode + 10);
-		//if(my_lengthcode+10 <400)
-		//memcpy_s(program_code[program_list_line],my_lengthcode+10,mycode,my_lengthcode + 10);
-		//else
-		//{
-		//	CString temp_mycs;//如果npdu的长度过长，大于 400了，目前是通过换一个page来存;
-		//	temp_mycs.Format(_T("Encode Program Code Length is %d,Please Try to code in another page."),my_lengthcode+10);
-		//	MessageBox(temp_mycs);
-		//	memset(program_code[program_list_line],0,400);
-		//	return;
-		//}
-		//	
-
-		//g_invoke_id =WritePrivateData(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line/*,my_lengthcode*/);
-		//if(g_invoke_id>=0)
-		//{
-		//	CString temp_cs_show;
-		//	temp_cs_show.Format(_T("Task ID = %d. Write program code to item %d "),g_invoke_id,program_list_line);
-		//	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd/*BacNet_hwd*/,temp_cs_show);
-		//}
+		m_information_window.ResetContent();
+		m_information_window.InsertString(0,_T("Resource Compile succeeded."));
 
 	}
 	else
 	{
+		m_information_window.ResetContent();
 		CString cstring_error;
 
 		int len = strlen(mesbuf);
@@ -350,7 +337,7 @@ void CBacnetProgramEdit::OnSend()
 
 //		MessageBox(cstring_error);
 		CStringArray  Error_info;  
-		SplitCStringA(Error_info,cstring_error,_T("\r\n"));//Splite the CString with "\r\n" and then add to the list.(Fance)
+		SplitCStringA(Error_info,cstring_error,_T("\r\n"));//Split the CString with "\r\n" and then add to the list.(Fance)
 		Sleep(1);
 		m_information_window.ResetContent();
 		for (int i=0;i<(int)Error_info.GetSize();i++)
@@ -395,7 +382,7 @@ void CBacnetProgramEdit::OnLoadfile()
 	// TODO: Add your command handler code here
 	CString FilePath;
 	CString ReadBuffer;
-	DWORD dwFileLen;
+
 	CFileDialog dlg(true,_T("*.txt"),_T(" "),OFN_HIDEREADONLY ,_T("txt files (*.txt)|*.txt|All Files (*.*)|*.*||"),NULL,0);
 	if(IDOK==dlg.DoModal())
 	{
@@ -408,7 +395,7 @@ void CBacnetProgramEdit::OnLoadfile()
 		
 		CFile file(FilePath,CFile::modeCreate |CFile::modeReadWrite |CFile::modeNoTruncate);
 
-		dwFileLen=file.GetLength();
+		dwFileLen=(DWORD)file.GetLength();
 		pBuf= new char[dwFileLen+1];
 		pBuf[dwFileLen]=0;
 
@@ -466,8 +453,19 @@ void CBacnetProgramEdit::OnSavefile()
 void CBacnetProgramEdit::OnCancel()
 {
 	// TODO: Add your specialized code here and/or call the base class
-	if(MessageBox(_T("Do you want to exit the programming?"),_T("Prompting"),MB_ICONINFORMATION | MB_YESNO) == IDYES)
+	
+	CString Edit_Buffer;
+	GetDlgItemText(IDC_RICHEDIT2_PROGRAM,Edit_Buffer);
+	if(program_string.CompareNoCase(Edit_Buffer) == 0)
+	{
 		CDialogEx::OnCancel();
+	}
+	else
+	{
+		if(MessageBox(_T("Do you want to exit the programming without saving?"),_T("Prompting"),MB_ICONINFORMATION | MB_YESNO) == IDYES)
+			CDialogEx::OnCancel();
+	}
+
 }
 
 //Fance 

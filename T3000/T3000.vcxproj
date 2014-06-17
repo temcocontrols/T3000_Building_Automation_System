@@ -110,7 +110,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -154,6 +154,8 @@
     <ClCompile Include="BuildTable1.cpp" />
     <ClCompile Include="CalibrationDlg.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
+    <ClCompile Include="Class\md5.cpp" />
+    <ClCompile Include="Class\MulitithreadSocket.cpp" />
     <ClCompile Include="CM5\BacNetProgram_transplant.cpp" />
     <ClCompile Include="CM5\CStatic\staticex.cpp" />
     <ClCompile Include="CM5\ListCtrlCellEx.cpp" />
@@ -171,6 +173,7 @@
     <ClCompile Include="Dowmloadfile.cpp" />
     <ClCompile Include="DownloadSocket.cpp" />
     <ClCompile Include="fileRW.cpp" />
+    <ClCompile Include="Flash_Multy.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
     <ClCompile Include="LanguageLocale.cpp" />
     <ClCompile Include="LCOutNameConfig.cpp" />
@@ -369,6 +372,7 @@
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
     <ClInclude Include="CalibrationDlg.h" />
+    <ClInclude Include="Class\md5.h" />
     <ClInclude Include="CM5\ListCtrlCellEx.h" />
     <ClInclude Include="CM5\ListCtrlEx.h" />
     <ClInclude Include="CM5\MyOwnListCtrl.h" />
@@ -388,6 +392,7 @@
     <ClInclude Include="Dowmloadfile.h" />
     <ClInclude Include="DownloadSocket.h" />
     <ClInclude Include="fileRW.h" />
+    <ClInclude Include="Flash_Multy.h" />
     <ClInclude Include="gloab_define.h" />
     <ClInclude Include="IONameConfig.h" />
     <ClInclude Include="LanguageLocale.h" />

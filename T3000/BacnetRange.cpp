@@ -72,6 +72,10 @@ void BacnetRange::Initial_static()
 	GetWindowRect(Temp_Rect);
 	if(bac_ranges_type == VARIABLE_RANGE_ANALOG_TYPE)
 	{
+		m_show_unit.ShowWindow(TRUE);
+		temp_cs.Format(_T("%d"),bac_range_number_choose);
+		GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(temp_cs);
+		m_analog_select = bac_range_number_choose;
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(0);
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(1);
 		GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->ShowWindow(0);
@@ -135,6 +139,11 @@ void BacnetRange::Initial_static()
 	}
 	else if(bac_ranges_type == OUTPUT_RANGE_ANALOG_TYPE)
 	{
+		m_show_unit.ShowWindow(TRUE);
+		temp_cs.Format(_T("%d"),bac_range_number_choose);
+		GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(temp_cs);
+		m_output_Analog_select = bac_range_number_choose;
+
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(1);
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(0);
 		GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->ShowWindow(0);
@@ -159,6 +168,11 @@ void BacnetRange::Initial_static()
 	}
 	else if(bac_ranges_type == INPUT_RANGE_ANALOG_TYPE)
 	{
+		m_show_unit.ShowWindow(TRUE);
+		temp_cs.Format(_T("%d"),bac_range_number_choose);
+		GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(temp_cs);
+		m_input_Analog_select = bac_range_number_choose;
+
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(0);
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(0);
 		GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->ShowWindow(0);
@@ -181,6 +195,9 @@ void BacnetRange::Initial_static()
 		}
 		MoveWindow(Temp_Rect.left,Temp_Rect.top,490,480);
 	}
+
+
+
 	GetDlgItem(IDC_EDIT_RANGE_SELECT)->ShowWindow(1);
 	GetDlgItem(IDC_STATIC_RANGE_ENTER_UNITS)->ShowWindow(1);
 	UpdateData(FALSE);
@@ -247,6 +264,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 			if(bac_ranges_type == VARIABLE_RANGE_ANALOG_TYPE)
 			{
 				bac_range_number_choose = m_analog_select;
+				m_show_unit.SetWindowTextW(Variable_Analog_Units_Array[bac_range_number_choose]);
 			}
 			else if((bac_ranges_type == VARIABLE_RANGE_DIGITAL_TYPE) ||(bac_ranges_type == OUTPUT_RANGE_DIGITAL_TYPE) || (bac_ranges_type == INPUT_RANGE_DIGITAL_TYPE))
 			{

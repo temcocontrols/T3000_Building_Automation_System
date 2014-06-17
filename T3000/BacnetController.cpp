@@ -120,7 +120,7 @@ void BacnetController::Initial_List()
 	m_controller_list.InsertColumn(CONTROLLER_INPUT, _T("Input"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_controller_list.InsertColumn(CONTROLLER_INPUTVALUE, _T("Value"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_controller_list.InsertColumn(CONTROLLER_INPUTUNITS, _T("Units"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_AUTO_MANUAL, _T("A/M"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_AUTO_MANUAL, _T("A/M"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_controller_list.InsertColumn(CONTROLLER_OUTPUT, _T("Output"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_controller_list.InsertColumn(CONTROLLER_SETPOINT, _T("Setpoint"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_controller_list.InsertColumn(CONTROLLER_SETVALUE, _T("Set Value"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -149,13 +149,13 @@ void BacnetController::Initial_List()
 		CString temp_units;
 		temp_item.Format(_T("%d"),i+1);
 		m_controller_list.InsertItem(i,temp_item);
-		if(ListCtrlEx::ComboBox == m_controller_list.GetColumnType(CONTROLLER_AUTO_MANUAL))
-		{
-			ListCtrlEx::CStrList strlist;
-			strlist.push_back(_T("Auto"));
-			strlist.push_back(_T("Manual"));
-			m_controller_list.SetCellStringList(i, CONTROLLER_AUTO_MANUAL, strlist);
-		}
+		//if(ListCtrlEx::ComboBox == m_controller_list.GetColumnType(CONTROLLER_AUTO_MANUAL))
+		//{
+		//	ListCtrlEx::CStrList strlist;
+		//	strlist.push_back(_T("Auto"));
+		//	strlist.push_back(_T("Manual"));
+		//	m_controller_list.SetCellStringList(i, CONTROLLER_AUTO_MANUAL, strlist);
+		//}
 		//m_controller_list.SetCellEnabled(i,CONTROLLER_INPUTVALUE,0);
 		m_controller_list.SetCellEnabled(i,CONTROLLER_INPUTUNITS,0);
 		m_controller_list.SetCellEnabled(i,CONTROLLER_SETPOINTUNITS,0);
@@ -739,8 +739,41 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 		return;
 	if(lRow<0)
 		return;
-
-	if(lCol != CONTROLLER_ACTION)	
+	CString New_CString;
+	CString temp_task_info;
+	if(lCol == CONTROLLER_ACTION)	
+	{
+		memcpy_s(&m_temp_controller_data[lRow],sizeof(Str_controller_point),&m_controller_data.at(lRow),sizeof(Str_controller_point));
+		if(m_controller_data.at(lRow).action == 0)
+		{
+			m_controller_data.at(lRow).action = 1;
+			m_controller_list.SetItemText(lRow,lCol,_T("+"));
+			New_CString.Format(_T("+"));
+		}
+		else
+		{
+			m_controller_data.at(lRow).action = 0;
+			m_controller_list.SetItemText(lRow,lCol,_T("-"));
+			New_CString.Format(_T("-"));
+		}
+	}
+	else if(lCol == CONTROLLER_AUTO_MANUAL)
+	{
+		memcpy_s(&m_temp_controller_data[lRow],sizeof(Str_controller_point),&m_controller_data.at(lRow),sizeof(Str_controller_point));
+		if(m_controller_data.at(lRow).auto_manual == 0)
+		{
+			m_controller_data.at(lRow).auto_manual = 1;
+			m_controller_list.SetItemText(lRow,CONTROLLER_AUTO_MANUAL,_T("Manual"));
+			New_CString = _T("Manual");
+		}
+		else
+		{
+			m_controller_data.at(lRow).auto_manual = 0;
+			m_controller_list.SetItemText(lRow,CONTROLLER_AUTO_MANUAL,_T("Auto"));
+			New_CString = _T("Auto");
+		}
+	}
+	else
 		return;
 
 	//if(m_Output_data.at(lRow).digital_analog != BAC_UNITS_DIGITAL)
@@ -748,23 +781,9 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 
 	//if(m_Output_data.at(lRow).auto_manual == BAC_AUTO)	//If it is auto mode, disable to change the value.
 	//	return;
-	memcpy_s(&m_temp_controller_data[lRow],sizeof(Str_controller_point),&m_controller_data.at(lRow),sizeof(Str_controller_point));
+	
 
 
-	CString New_CString;
-	CString temp_task_info;
-	if(m_controller_data.at(lRow).action == 0)
-	{
-		m_controller_data.at(lRow).action = 1;
-		m_controller_list.SetItemText(lRow,lCol,_T("+"));
-		New_CString.Format(_T("+"));
-	}
-	else
-	{
-		m_controller_data.at(lRow).action = 0;
-		m_controller_list.SetItemText(lRow,lCol,_T("-"));
-		New_CString.Format(_T("-"));
-	}
 
 	m_controller_list.Set_Edit(false);
 

@@ -37,6 +37,9 @@
     <Filter Include="CM5\CM5_H">
       <UniqueIdentifier>{f1c0a87b-351f-4535-a9ab-10e2bb3a8940}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ClassInfo">
+      <UniqueIdentifier>{c664f2cd-e719-4782-bcf4-c788a2753a9c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="5EInputDialog.cpp">
@@ -493,6 +496,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WhichOneToChooseDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+        <ClCompile Include="Class\md5.cpp">
+      <Filter>ClassInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\MulitithreadSocket.cpp">
+      <Filter>ClassInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="Flash_Multy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="T3000UpdateDlg.cpp">
@@ -1194,6 +1206,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DownloadSocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+       <ClInclude Include="Class\md5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Flash_Multy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="T3000UpdateDlg.h">

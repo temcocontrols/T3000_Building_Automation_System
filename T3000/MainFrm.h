@@ -20,7 +20,7 @@
 #include "T3/DialogT3.h"	//T3
 #include "MiniPanel/DialgMiniPanel.h" //Mini Panel
 #include "AirQuality/AirQuality.h"//AirQuality
-
+#include "Class/MulitithreadSocket.h"
 #include "MBP.h"
 #include "MbPoll.h"
 
@@ -115,7 +115,8 @@ public: // create from serialization only
 	void OnToolErease();
 	void OnToolFresh();
 	void OnToolRefreshLeftTreee();
-	void Write_Config();
+	CMulitithreadSocket m_wskServer;
+	BOOL m_bServer;
 public:
 
     CView * m_pViews[NUMVIEWS];
@@ -227,7 +228,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	void  CheckDeviceStatus();
+	BOOL  CheckDeviceStatus();
 	void	SaveBacnetConfigFile();
 	void	LoadBacnetConfigFile();
 	void  Show_Wait_Dialog_And_SendConfigMessage();
@@ -264,8 +265,8 @@ public:
 	void CheckConnectFailure(const CString& strIP);// 检查失败的原因，并给出详细的提示信息
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	BOOL ConnectSubBuilding(Building_info build_info);
- BOOL ConnectDevice(tree_product tree_node);
-
+	BOOL ConnectDevice(LPCTSTR ip_address,int nport);
+	BOOL ConnectDevice(tree_product tree_node);
 
 	//scan funtion:
 	void background_binarysearch_netcontroller();

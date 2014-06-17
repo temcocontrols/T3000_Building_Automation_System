@@ -219,7 +219,7 @@ void CBacnetSetting::OnBnClickedBtnBacWriteTime()
 
 void CBacnetSetting::OnBnClickedBtnBacIPAuto()
 {
-	Device_Basic_Setting.reg.tcp_type = 0;
+	Device_Basic_Setting.reg.tcp_type = 1;
 
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
@@ -228,7 +228,7 @@ void CBacnetSetting::OnBnClickedBtnBacIPAuto()
 
 void CBacnetSetting::OnBnClickedBtnBacIPStatic()
 {
-	Device_Basic_Setting.reg.tcp_type = 1;
+	Device_Basic_Setting.reg.tcp_type = 0;
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(true);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(true);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
@@ -255,7 +255,11 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 	Device_Basic_Setting.reg.gate_addr[2] = gatway3;
 	Device_Basic_Setting.reg.gate_addr[3] = gatway4;
 	bool isstatic = ((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->GetCheck(); //返回1表示选上，0表示没选上;
-	Device_Basic_Setting.reg.tcp_type = isstatic;
+	if(isstatic == true)
+		Device_Basic_Setting.reg.tcp_type = 0;
+	else
+		Device_Basic_Setting.reg.tcp_type = 1;
+	//Device_Basic_Setting.reg.tcp_type = isstatic;
 	CString temp_task_info;
 	temp_task_info.Format(_T("Change IP Address Information "));
 	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
@@ -275,6 +279,12 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	CString temp_cs;
 	int temp_year;
 	CTime	TimeTemp;
+	CString temp_hw_version = _T("Unknow");
+	CString temp_mcu_version = _T("Unknow");
+	CString temp_pic_version = _T("Unknow");
+	CString temp_c8051_version = _T("Unknow");
+	CString temp_5964_version = _T("Unknow");
+	CString temp_bootloader_version = _T("Unknow");
 	switch(command_type)
 	{
 	case READ_SETTING_COMMAND:
@@ -296,7 +306,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->SetAddress(Device_Basic_Setting.reg.gate_addr[0],
 			Device_Basic_Setting.reg.gate_addr[1],Device_Basic_Setting.reg.gate_addr[2],Device_Basic_Setting.reg.gate_addr[3]);
 
-		if(Device_Basic_Setting.reg.tcp_type == 0)
+		if(Device_Basic_Setting.reg.tcp_type == 1)
 		{
 			((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->SetCheck(true);
 			((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->SetCheck(false);
@@ -304,7 +314,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
 			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
 		}
-		else if(Device_Basic_Setting.reg.tcp_type == 1)
+		else if(Device_Basic_Setting.reg.tcp_type == 0)
 		{
 			((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_AUTO))->SetCheck(false);
 			((CButton *)GetDlgItem(IDC_RADIO_BAC_IP_STATIC))->SetCheck(true);
@@ -312,6 +322,40 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(true);
 			((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
 		}
+
+		if(bacnet_device_type == PRODUCT_CM5)
+		{
+			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("CM5"));
+		}
+		else if(bacnet_device_type == BIG_MINIPANEL)
+		{
+			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("Big Minipanel"));
+		}
+		else if(bacnet_device_type == SMALL_MINIPANEL)
+		{
+			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("Small Minipanel"));
+		}
+		else
+		{
+			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("Unknow device"));
+		}
+
+		if((Device_Basic_Setting.reg.mini_type == 1) || (Device_Basic_Setting.reg.mini_type == 2))
+		{
+			temp_hw_version.Format(_T("%d"),Device_Basic_Setting.reg.pro_info.harware_rev);
+			temp_pic_version.Format(_T("%d"),Device_Basic_Setting.reg.pro_info.frimware1_rev);
+			temp_c8051_version.Format(_T("%d"),Device_Basic_Setting.reg.pro_info.frimware2_rev);
+			temp_5964_version.Format(_T("%d"),Device_Basic_Setting.reg.pro_info.frimware3_rev);	
+			temp_mcu_version.Format(_T("%d.%d"),Device_Basic_Setting.reg.pro_info.firmware0_rev_main,Device_Basic_Setting.reg.pro_info.firmware0_rev_sub);
+			temp_bootloader_version.Format(_T("%d"),Device_Basic_Setting.reg.pro_info.bootloader_rev);
+		}
+		((CEdit *)GetDlgItem(IDC_STATIC_SEETING_HARDWARE_VERSION))->SetWindowTextW(temp_hw_version);
+		((CEdit *)GetDlgItem(IDC_STATIC_SEETING_MCU_VERSION))->SetWindowTextW(temp_mcu_version);
+		((CEdit *)GetDlgItem(IDC_STATIC_SEETING_PIC_VERSION))->SetWindowTextW(temp_pic_version);
+		((CEdit *)GetDlgItem(IDC_STATIC_SEETING_C8051_VERSION))->SetWindowTextW(temp_c8051_version);
+		((CEdit *)GetDlgItem(IDC_STATIC_SEETING_SM5964_VERSION2))->SetWindowTextW(temp_5964_version);
+		((CEdit *)GetDlgItem(IDC_STATIC_SEETING_BOOTLOADER_VERSION))->SetWindowTextW(temp_bootloader_version);
+		
 		break;
 	default: 
 		break;
@@ -378,6 +422,15 @@ void CBacnetSetting::OnBnClickedButtonRebootDevice()
 {
 	// TODO: Add your control notification handler code here
 	//Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RESET_REGISTER,77,0,this->m_hWnd,NULL,_T("Reboot Device"));
+	//if(GetCommunicationHandle() == NULL)
+	//{
+
+	//	CreateThread(NULL,NULL,ConnectToDevice,NULL,NULL,NULL);
+	//}
+	
+
+
+
 	write_one(g_tstat_id,RESET_REGISTER,SPECIAL_COMMAND_REBOOT);
 }
 

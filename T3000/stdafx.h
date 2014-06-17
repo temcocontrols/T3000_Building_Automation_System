@@ -91,14 +91,13 @@ INPUT int CheckTstatOnline(unsigned char devLo=1,unsigned char devHi=254);
 INPUT bool Change_BaudRate(unsigned short new_baurate);
 INPUT bool SetComm_Timeouts(LPCOMMTIMEOUTS lpCommTimeouts);
 INPUT void SetComnicationHandle(int nType,HANDLE hCommunication);
-INPUT bool Open_Socket(CString strIPAdress);
 INPUT void SetCommunicationType(int nType);
 INPUT int NetController_CheckTstatOnline(unsigned char devLo=1,unsigned char devHi=254);
 INPUT bool Open_Socket2(CString strIPAdress,short nPort);
 
 INPUT int GetLastOpenedComport();
 INPUT int GetLastCommunicationType();
-
+INPUT int GetCommunicationType();
 INPUT HANDLE GetCommunicationHandle();
 //////////////////////////////////////////////////////////////////////////
 INPUT int NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
@@ -171,6 +170,7 @@ using namespace std;  // Ensure that the namespace is set to std
 #define		WM_REFRESH_BAC_ALARMLOG_LIST				WM_USER + 215
 #define		WM_REFRESH_BAC_TSTAT_LIST					WM_USER + 216
 #define     WM_DOWNLOADFILE_MESSAGE						WM_USER + 217
+#define     WM_MULTY_FLASH_MESSAGE						WM_USER + 218
 
 
 

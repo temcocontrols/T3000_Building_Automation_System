@@ -114,7 +114,7 @@ void CBacnetVariable::Initial_List()
 	m_variable_list.SetExtendedStyle(m_variable_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_variable_list.InsertColumn(VARIABLE_NUM, _T("NUM"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_variable_list.InsertColumn(VARIABLE_FULL_LABLE, _T("Full Label"), 200, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_variable_list.InsertColumn(VARIABLE_AUTO_MANUAL, _T("Auto/Manual"), 150, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_variable_list.InsertColumn(VARIABLE_AUTO_MANUAL, _T("Auto/Manual"), 150, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_VALUE, _T("Value"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_UNITE, _T("Units"), 120, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_LABLE, _T("Label"), 130, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -141,13 +141,13 @@ void CBacnetVariable::Initial_List()
 		CString temp_units;
 		temp_item.Format(_T("%d"),i+1);
 		m_variable_list.InsertItem(i,temp_item);
-		if(ListCtrlEx::ComboBox == m_variable_list.GetColumnType(VARIABLE_AUTO_MANUAL))
-		{
-			ListCtrlEx::CStrList strlist;
-			strlist.push_back(_T("Auto"));
-			strlist.push_back(_T("Manual"));
-			m_variable_list.SetCellStringList(i, VARIABLE_AUTO_MANUAL, strlist);
-		}
+		//if(ListCtrlEx::ComboBox == m_variable_list.GetColumnType(VARIABLE_AUTO_MANUAL))
+		//{
+		//	ListCtrlEx::CStrList strlist;
+		//	strlist.push_back(_T("Auto"));
+		//	strlist.push_back(_T("Manual"));
+		//	m_variable_list.SetCellStringList(i, VARIABLE_AUTO_MANUAL, strlist);
+		//}
 
 		if(ListCtrlEx::ComboBox == m_variable_list.GetColumnType(VARIABLE_UNITE))
 		{
@@ -408,7 +408,7 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 		{
 
 
-
+			bac_range_number_choose = m_Variable_data.at(Changed_Item).range;
 			bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
 			dlg.DoModal();
 			if(range_cancel)
@@ -450,6 +450,7 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 		}
 		else if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_DIGITAL])==0)
 		{
+			bac_range_number_choose = m_Variable_data.at(Changed_Item).range;
 			bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
 			dlg.DoModal();
 			if(range_cancel)
@@ -569,11 +570,11 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 	m_col = lCol;
 
 	memcpy_s(&m_temp_variable_data[lRow],sizeof(Str_variable_point),&m_Variable_data.at(lRow),sizeof(Str_variable_point));
-
+	CString New_CString;
 	CString temp_task_info;
 	if((lCol == VARIABLE_VALUE) &&(m_Variable_data.at(lRow).digital_analog == BAC_UNITS_DIGITAL ) && (m_Variable_data.at(lRow).auto_manual != BAC_AUTO))
 	{
-		CString New_CString;
+		
 		
 		CString temp1;
 		CStringArray temparray;
@@ -595,37 +596,6 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			m_variable_list.SetItemText(lRow,VARIABLE_VALUE,temparray.GetAt(0));
 			New_CString = temparray.GetAt(0);
 		}
-#if 0
-		if(m_Variable_data.at(lRow).range > 11)
-			temp1 = Digital_Units_Array[m_Variable_data.at(lRow).range - 11];//11 is the sizeof the array
-		else
-			temp1 = Digital_Units_Array[m_Variable_data.at(lRow).range];
-		SplitCStringA(temparray,temp1,_T("/"));
-		if(m_Variable_data.at(lRow).range>=12)
-		{
-
-			if((temparray.GetSize()==2)&&(!temparray.GetAt(1).IsEmpty()))
-			{
-				m_variable_list.SetItemText(lRow,VARIABLE_VALUE,temparray.GetAt(0));
-				m_Variable_data.at(lRow).range = m_Variable_data.at(lRow).range - 11;
-				m_Variable_data.at(lRow).control = 0;	
-				New_CString = temparray.GetAt(0);
-			}
-
-		}
-		else if(m_Variable_data.at(lRow).range>=1)
-		{
-
-			if((temparray.GetSize()==2)&&(!temparray.GetAt(0).IsEmpty()))
-			{
-				m_variable_list.SetItemText(lRow,VARIABLE_VALUE,temparray.GetAt(1));
-				m_Variable_data.at(lRow).range = m_Variable_data.at(lRow).range + 11;
-				New_CString = temparray.GetAt(1);
-				m_Variable_data.at(lRow).control = 1;
-			}
-
-		}
-#endif
 		m_variable_list.Set_Edit(false);
 
 		temp_task_info.Format(_T("Write Variable List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
@@ -676,9 +646,24 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		m_variable_list.SetItemText(lRow,lCol,_T(""));
 		m_variable_time_picker.Invalidate();
 		SetTimer(2,100,NULL);
-
-
-
+	}
+	else if(lCol == VARIABLE_AUTO_MANUAL)
+	{
+		if(m_Variable_data.at(lRow).auto_manual == 0)
+		{
+			m_Variable_data.at(lRow).auto_manual = 1;
+			m_variable_list.SetItemText(lRow,VARIABLE_AUTO_MANUAL,_T("Manual"));
+			m_variable_list.SetCellEnabled(lRow,VARIABLE_VALUE,TRUE);
+			New_CString = _T("Manual");
+		}
+		else
+		{
+			m_Variable_data.at(lRow).auto_manual = 0;
+			m_variable_list.SetItemText(lRow,VARIABLE_AUTO_MANUAL,_T("Auto"));
+			m_variable_list.SetCellEnabled(lRow,VARIABLE_VALUE,FALSE);
+			New_CString = _T("Auto");
+		}
+		temp_task_info.Format(_T("Write Variable List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
 	}
 	else
 		return;

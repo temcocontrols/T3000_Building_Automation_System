@@ -11,7 +11,7 @@
 #include "T3000view.h"
 #include "WorkspaceBar.h"
 #include "NetworkControllView.h"
-
+#include "T3000DefaultView.h"
 #include "global_variable_extern.h"
 #include "globle_function.h"
 #include "AddBuilding.h"
@@ -66,16 +66,20 @@
 #include "CO2NetView.h"
 #include "htmlhelp.h"
 #include "T3000UpdateDlg.h"
-#include "T3000DefaultView.h"
+#include "Dowmloadfile.h"
+extern tree_product	m_product_isp_auto_flash;
 #pragma region Fance Test
 //For Test
-
+// 在没有鼠标和键盘消息的时候 就启用自动刷新 treeview,如果有就 不要刷新，因为如果正在刷新，客户肯能就无法第一时间读到自己想要的数据;
+bool no_mouse_keyboard_event_enable_refresh = true;
+bool start_record_time = true;	//开启计时，如果用户一段时间无键盘和鼠标左键操作就开启自动刷新;
+unsigned long time_click = 0;
 CTestMultiReadTraffic *g_testmultiReadtraffic_dlg=NULL;
 BacnetWait *WaitWriteDlg=NULL;
 HANDLE hwait_write_thread = NULL;
 _Refresh_Write_Info Write_Config_Info;
 HANDLE hStartEvent; // thread start event
-extern int product_id;
+extern int isp_product_id;
 vector <MSG> My_Receive_msg;
 
 #define  WM_REFRESH_TREEVIEW_MAP WM_USER + 2008
@@ -83,6 +87,7 @@ HANDLE hDeal_thread;
 DWORD nThreadID_Do;
 extern CBacnetScreenEdit * ScreenEdit_Window;
 extern CBacnetAlarmWindow * AlarmWindow_Window;
+extern bool m_is_remote_device ;
 CCriticalSection MyCriticalSection;
 CString SaveConfigFilePath;
 bool b_pause_refresh_tree = false;
@@ -100,6 +105,7 @@ int m_MainHotKeyID[10] =
 };
 
 //End for Test
+void CALLBACK Listen(SOCKET s, int ServerPort, const char *ClientIP);
 #pragma endregion 
 // #ifdef _DEBUG
 // #define new DEBUG_NEW
@@ -130,6 +136,7 @@ T3000RegAddress MyRegAddress;
 #define REFRESH_TIMER_VALUE	 35000
 #define ID_NODEFAULTMAINBUILDING_MSG 8000
 #define SCAN_TIMER 2
+#define MONITOR_MOUSE_KEYBOARD_TIMER 3
 
 CEvent g_killMultiReadEvent;
 
@@ -691,7 +698,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// added by zgq;2010-11-30;for update the treectrl;
 	//
 	//InitTreeNodeConn();   //LSC
-
+	SetTimer(MONITOR_MOUSE_KEYBOARD_TIMER,1000,NULL);
 	SetTimer(REFRESH_TIMER, REFRESH_TIMER_VALUE, NULL);
 #ifndef Fance_Enable_Test
 	  m_pRefreshThread =(CRefreshTreeThread*) AfxBeginThread(RUNTIME_CLASS(CRefreshTreeThread));
@@ -800,6 +807,18 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			pDialog[i]=NULL;
 	}
 
+	CString AutoFlashConfigPath;
+	CString ApplicationFolder;
+	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+	ApplicationFolder.ReleaseBuffer();
+	AutoFlashConfigPath = ApplicationFolder + _T("//AutoFlashFile.ini");
+	CFileFind fFind;
+	if(fFind.FindFile(AutoFlashConfigPath))
+	{
+		DeleteFile(AutoFlashConfigPath);
+	}
+
 	MyRegAddress.MatchMoudleAddress();
 	bac_net_initial_once = false;
 
@@ -820,10 +839,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
 
 		//SOCKADDR_IN siBind;
+#if 0
 		h_siBind.sin_family=AF_INET;
 		h_siBind.sin_addr.s_addr=INADDR_ANY;
 		h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
 		::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+#endif
 #endif
 	return 0;
 }
@@ -1080,7 +1101,7 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 				if(m_product.at(i).BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(m_product.at(i).BuildingInfo.strBuildingName)!=0)
 				{
 					//connect:
-					BOOL bRet = ConnectDevice(m_product.at(i));
+					BOOL bRet = ConnectSubBuilding(m_product.at(i).BuildingInfo);
 					if (!bRet)
 					{
 						if(m_product.at(i).BuildingInfo.strProtocol.CompareNoCase(_T("Modbus TCP")) == 0) // net work protocol
@@ -1156,14 +1177,14 @@ g_bPauseMultiRead=FALSE;
 //  //  AfxMessageBox(m_strCurSelNodeName);
 //}
 
-void CMainFrame::Write_Config(){
-	 
-
-
-
-
-
-}
+//void CMainFrame::Write_Config(){
+//	 
+//
+//
+//
+//
+//
+//}
 
 void CMainFrame::OnHTreeItemEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 {
@@ -1686,8 +1707,63 @@ void CMainFrame::OnLoadConfigFile()
 	ReFresh();
 	g_bPauseMultiRead=FALSE;
 }
+
+#include "Flash_Multy.h"
 void CMainFrame::OnBatchFlashHex()
 {
+
+	b_pause_refresh_tree = true;
+	bool temp_status = g_bPauseMultiRead;
+	g_bPauseMultiRead = true;
+	int temp_type = GetCommunicationType();
+
+
+	BOOL bDontLinger = FALSE;
+	setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+	closesocket(h_Broad);
+
+	SetCommunicationType(0);//关闭串口，供ISP 使用;
+	close_com();
+
+
+
+	CFlash_Multy dlg;
+	dlg.DoModal();
+
+	if(temp_type == 0)
+	{
+		int comport = GetLastOpenedComport();
+		open_com(comport);
+	}
+	else
+	{
+
+	}
+	SetCommunicationType(temp_type);
+
+	//Fance Add. 在ISP 用完1234 4321 的端口之后，T3000 在重新打开使用，刷新listview 的网络设备要使用;
+	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+	BOOL bBroadcast=TRUE;
+	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+	int iMode=1;
+	ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+
+	//SOCKADDR_IN bcast;
+	h_bcast.sin_family=AF_INET;
+	//bcast.sin_addr.s_addr=nBroadCastIP;
+	h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+	h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+
+	//SOCKADDR_IN siBind;
+	h_siBind.sin_family=AF_INET;
+	h_siBind.sin_addr.s_addr=INADDR_ANY;
+	h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+	::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+	b_pause_refresh_tree = false;
+	g_bPauseMultiRead = temp_status;
+
+	return;
+#if 0
 	g_bEnableRefreshTreeView = FALSE;
 	if(g_BurnHexLevel==1)
 	{
@@ -1704,6 +1780,7 @@ void CMainFrame::OnBatchFlashHex()
 	Dlg.DoModal();
 	g_bPauseMultiRead=FALSE;
 	g_bEnableRefreshTreeView = TRUE;
+#endif
 }
 
 void CMainFrame::OnConnect()
@@ -1881,6 +1958,40 @@ void CMainFrame::OnDisconnect()
 
 }
 
+BOOL CMainFrame::ConnectDevice(LPCTSTR ip_address,int nport)
+{
+	CString connect_ip;
+	if(m_hCurCommunication!=NULL)	
+	{
+		CloseHandle(m_hCurCommunication);
+		m_hCurCommunication=NULL;
+	}
+
+	CString strPort;
+	m_nIpPort=nport;
+
+	connect_ip=ip_address;
+
+	g_CommunicationType=1;
+	SetCommunicationType(g_CommunicationType);
+	bool b=Open_Socket2(connect_ip,m_nIpPort);
+	CString strInfo;
+	//	strInfo.Format((_T("Open IP:%s successful")),build_info.str3Ip);//prompt info;
+	//	SetPaneString(1,strInfo);
+	if(b)
+	{	strInfo.Format((_T("Open IP:%s successful")),connect_ip);//prompt info;
+	SetPaneString(1,strInfo);
+	return TRUE;
+	}
+	else
+	{
+		strInfo.Format((_T("Open IP:%s failure")),connect_ip);//prompt info;
+		SetPaneString(1,strInfo);
+		//ValidOpenFailure(build_info.strIp,n1, n2,n3,n4); // 检查失败的原因，并给出详细的提示信息
+		return FALSE;
+	}
+	return true;
+}
 
 BOOL CMainFrame::ConnectSubBuilding(Building_info build_info)
 {
@@ -2366,6 +2477,15 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		}
 	}
 
+	if(MONITOR_MOUSE_KEYBOARD_TIMER == nIDEvent)
+	{
+		unsigned long time_now = time(NULL);
+		if(time_now - time_click > 5)
+		{
+			no_mouse_keyboard_event_enable_refresh = true;
+		}
+		CFrameWndEx::OnTimer(nIDEvent);
+	}
 	CString str;
 	str.Format(_T("Addr:%d [Tx=%d Rx=%d : Err=%d]"), g_tstat_id, g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
 	SetPaneString(0,str);
@@ -4211,7 +4331,12 @@ LRESULT CMainFrame::Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam)
 {
 	int ret = (int)wParam;
 	if(ret == 1)
+	{
 	Set_Communication_Count(1,g_bac_instance);//成功，计数+1
+
+	m_pTreeViewCrl->turn_item_image(selected_tree_item ,true);
+	SetPaneConnectionPrompt(_T("Online"));
+	}
 	else
 	Set_Communication_Count(0,g_bac_instance);
 
@@ -5920,7 +6045,12 @@ void CMainFrame::OnGloabalOverrides()
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
-
+	if((pMsg->message == WM_KEYDOWN ) || (pMsg->message == WM_LBUTTONDOWN) || (pMsg->message == WM_LBUTTONUP))
+	{
+		
+		no_mouse_keyboard_event_enable_refresh = false;
+		time_click = time(NULL);
+	}
 	if(pMsg->message == WM_KEYDOWN  )
 	{
 		if(((GetAsyncKeyState( VK_LCONTROL ) & 0x8000))&&(pMsg->wParam ==VK_F2))
@@ -6300,12 +6430,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			//g_tstat_id=m_product.at(i).product_id;
 			product_Node=m_product.at(i);
 			selected_product_index = i;//记录目前选中的是哪一个 产品;用于后面自动更新firmware;
+			selected_tree_item = hTreeItem;
 			if((product_Node.product_class_id == PM_CM5) || (product_Node.product_class_id == PM_MINIPANEL))	//如果是CM5或者MINIPANEL 才有 bacnet协议;
 			{
 				
 				//if(( m_product.at(i).protocol == PROTOCOL_BACNET_IP) && (m_product.at(i).BuildingInfo.strProtocol.CompareNoCase(_T("BacnetIP")) == 0))
 				//if(product_Node.BuildingInfo.strProtocol.CompareNoCase(_T("BacnetIP")) == 0 )
 				//{
+					SetPaneString(1,_T(""));
 					if(product_Node.product_class_id == PM_CM5)
 						bacnet_device_type = PRODUCT_CM5;
 					CString temp_csa;
@@ -6315,11 +6447,15 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					g_selected_serialnumber = m_product.at(i).serial_number;
 					g_mac = m_product.at(i).software_version;
 					g_gloab_bac_comport =_wtoi(temp_csa);
-					if((g_bac_instance == 0) || (g_mac == 0) || (product_Node.product_class_id == PM_MINIPANEL))
+					if((g_bac_instance == 0) || (g_mac == 0) )
+					//if((g_bac_instance == 0) || (g_mac == 0) || (product_Node.product_class_id == PM_MINIPANEL))
 					{	
 						g_CommunicationType = 1;
 						SetCommunicationType(1);
-						if(Open_Socket2(product_Node.BuildingInfo.strIp,product_Node.ncomport))
+						int connect_port = product_Node.ncomport;
+						if((connect_port<=0) || (connect_port>=70000) || (connect_port == 47808))
+							connect_port = 10000;
+						if(Open_Socket2(product_Node.BuildingInfo.strIp,connect_port))
 						{
 							m_pTreeViewCrl->turn_item_image(hSelItem ,true);//只要能连接上这个IP 就说明这个设备在线;
 							
@@ -6331,14 +6467,18 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 								ret = read_one(g_tstat_id,34,5);
 								if(ret == 1)
 									bacnet_device_type = BIG_MINIPANEL;
-								else
+								else if(ret == 2)
 									bacnet_device_type = SMALL_MINIPANEL;
+								else
+									bacnet_device_type = PRODUCT_CM5;
 							}
 							g_bac_instance = read_one(g_tstat_id,35,5);
 							g_mac = read_one(g_tstat_id,110,5);
 							if((g_bac_instance<=0) || (g_mac <=0))
 							{
-								MessageBox(_T("This device may not support bacnetip protocol, please Scan again.!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
+								m_pTreeViewCrl->turn_item_image(hSelItem ,false);
+								SetPaneConnectionPrompt(_T("Offline"));
+								MessageBox(_T("Device no response, please check the connection and try again.!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
 								if(pDlg)
 								{
 									delete pDlg;//20120220
@@ -6380,7 +6520,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						else
 						{
 							m_pTreeViewCrl->turn_item_image(hSelItem ,false);
-							MessageBox(_T("Device is offline , Please check the connection."),_T("Notice"),MB_OK | MB_ICONINFORMATION);
+							SetPaneConnectionPrompt(_T("Offline"));
+							CString temp_info;
+							temp_info.Format(_T("Connect to IP %s , Port %d failed , Please check the connection!"),product_Node.BuildingInfo.strIp,connect_port);
+							MessageBox(temp_info,_T("Notice"),MB_OK | MB_ICONINFORMATION);
 							pDlg->ShowWindow(SW_HIDE);
 							if(pDlg)
 							{
@@ -6395,13 +6538,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					BOOL is_local = IP_is_Local(product_Node.BuildingInfo.strIp);
 					if(is_local == false)	//判断是否是本地IP，不是本地的就要连接到远端的，远端的 Who  is  广播发布过去的;
 					{
-						((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Set_Device_Type(true);
+						m_is_remote_device = true;
 						((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Set_remote_device_IP(product_Node.BuildingInfo.strIp);
 						((CDialogCM5_BacNet*)m_pViews[m_nCurView])->SetConnected_IP(product_Node.BuildingInfo.strIp);
 					}
 					else
 					{
-						((CDialogCM5_BacNet*)m_pViews[m_nCurView])->Set_Device_Type(false);
+						m_is_remote_device = false;
 						((CDialogCM5_BacNet*)m_pViews[m_nCurView])->SetConnected_IP(product_Node.BuildingInfo.strIp);
 					}
 					g_serialNum = product_Node.serial_number;
@@ -6459,7 +6602,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				if(product_Node.BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0)
 				{
 					pDlg->ShowProgress(2,10);//20120220
-					BOOL bRet = ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
+				BOOL bRet = ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
 					 
 					if (!bRet)
 					{
@@ -6711,13 +6854,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 			if(bOnLine)
 			{ 
-				SetPaneConnectionPrompt(_T("Device is Online!"));
+				SetPaneConnectionPrompt(_T("Online!"));
 				m_pTreeViewCrl->turn_item_image(hSelItem ,true);
 			}
 			else
 			{
 
-				SetPaneConnectionPrompt(_T("Device is Offline!"));
+				SetPaneConnectionPrompt(_T("Offline!"));
 				m_pTreeViewCrl->turn_item_image(hSelItem ,false);	
 				memset(&multi_register_value[0],0,sizeof(multi_register_value));
 				//20120424				
@@ -7538,14 +7681,16 @@ void CMainFrame::GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItem
 	}	
 }
 
-void CMainFrame::CheckDeviceStatus()
+BOOL CMainFrame::CheckDeviceStatus()
 {
 	for(UINT i=0;i<m_product.size();i++)
 	{
 		//tree0412if(!g_bEnableRefreshTreeView || g_bPauseRefreshTree || g_bPauseMultiRead) 
 		if( g_bPauseRefreshTree || g_bPauseMultiRead)
-			return;
+			return false;
 	
+		if(no_mouse_keyboard_event_enable_refresh == false)	//如果突然有客户操作了，就不要在刷新treeview了;
+			return false;
 
 		BOOL bOnLine=FALSE;
 		UINT nSerialNumber=0;
@@ -7700,8 +7845,7 @@ end_condition :
 					m_product.at(i).status = false;
 					for (int x=0;x<(int)m_refresh_net_device_data.size();x++)
 					{
-						if((nSerialNumber == m_refresh_net_device_data.at(x).nSerial) && 
-							(nIDNode == m_refresh_net_device_data.at(x).modbusID))
+						if(nSerialNumber == m_refresh_net_device_data.at(x).nSerial)
 						{
 							m_product.at(i).status = true;
 							bOnLine = TRUE;
@@ -7709,11 +7853,9 @@ end_condition :
 						}
 					}
 				}
-			//}
-
-			;
 		}
 	}
+	return TRUE;
 }
 
 LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
@@ -7723,6 +7865,10 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
  		tree_product tp = m_product.at(i);
 		if(tp.status>0)  // 如果online，更新显示图片
 		{
+			if(selected_product_index == i)
+			{
+				SetPaneConnectionPrompt(_T("Online!"));
+			}
 			//SetPaneConnectionPrompt(_T("Online!"));
 			m_pTreeViewCrl->turn_item_image(tp.product_item ,true);
 
@@ -7730,6 +7876,10 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
 		else  // 替换offline的图片
 		{
 			//SetPaneConnectionPrompt(_T("Offline!"));
+			if(selected_product_index == i)
+			{
+				SetPaneConnectionPrompt(_T("Offline!"));
+			}
 			m_pTreeViewCrl->turn_item_image(tp.product_item ,false);
 
 			// 				if(nID==g_tstat_id)
@@ -8088,8 +8238,15 @@ UINT _FreshTreeView(LPVOID pParam )
 	CMainFrame* pMain = (CMainFrame*)pParam;
 	while(1)
 	{
-
-		Sleep(20000);
+		Sleep(10000);
+		while(1)
+		{
+			if(no_mouse_keyboard_event_enable_refresh)//判断如果一段时间无人操作，才刷新tree，要不然串口资源会经常冲突;
+			{
+				break;
+			}
+			Sleep(100);
+		}
 		WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .
 		if(pMain->m_subNetLst.size()<=0)
 		{
@@ -8101,8 +8258,28 @@ UINT _FreshTreeView(LPVOID pParam )
 			ReleaseMutex(Read_Mutex);//Add by Fance .
 			continue;
 		}
+		//这里每一步都要确认客服是不是在操作T3000,如果客户在操作（读写）就不要和客户抢资源;
+		if(no_mouse_keyboard_event_enable_refresh == false)	
+		{
+			ReleaseMutex(Read_Mutex);
+			continue;
+		}
 		RefreshNetWorkDeviceListByUDPFunc();
-		pMain->CheckDeviceStatus();
+		if(no_mouse_keyboard_event_enable_refresh == false)
+		{
+			ReleaseMutex(Read_Mutex);
+			continue;
+		}
+		if(!pMain->CheckDeviceStatus())
+		{
+			ReleaseMutex(Read_Mutex);
+			continue;
+		}
+		if(no_mouse_keyboard_event_enable_refresh == false)
+		{
+			ReleaseMutex(Read_Mutex);
+			continue;
+		}
 		pMain->DoFreshAll();
 		ReleaseMutex(Read_Mutex);//Add by Fance .
 		
@@ -9513,37 +9690,70 @@ LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
 //}
 void CMainFrame::OnToolIsptoolforone()
 {
-	//MessageBox(_T("This part of code is recoding,Please use ISP.exe to update now."),_T("Notice"),MB_OK | MB_ICONINFORMATION);
-	//return;
-	//Fance 如果要已经处于连接状态的soket在调用closesocket()后强制关闭，不经历TIME_WAIT的过程：
-	//BOOL bDontLinger = FALSE;
-	//setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
-	//closesocket(h_Broad);
-	//h_Broad=NULL;
-  //  OnDisconnect();
-//	show_ISPDlg();
+
+
+
+	b_pause_refresh_tree = true;
+	bool temp_status = g_bPauseMultiRead;
+	g_bPauseMultiRead = true;
+	int temp_type = GetCommunicationType();
+
+
+	BOOL bDontLinger = FALSE;
+	setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+	closesocket(h_Broad);
+
+
+	//	isp_product_id = m_product.at(selected_product_index).product_class_id;
+	//	if (!((product_Node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
+	SetCommunicationType(0);//关闭串口，供ISP 使用;
+	close_com();
+
+
+	CString ISPtool_path;
+	CString ApplicationFolder;
+	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+	ApplicationFolder.ReleaseBuffer();
+	ISPtool_path = ApplicationFolder + _T("\\ISP.exe");
+	WinExecAndWait(ISPtool_path,NULL,NULL,0);
+
+	if(temp_type == 0)
+	{
+		int comport = GetLastOpenedComport();
+		open_com(comport);
+	}
+	else
+	{
+
+	}
+	SetCommunicationType(temp_type);
 
 	//Fance Add. 在ISP 用完1234 4321 的端口之后，T3000 在重新打开使用，刷新listview 的网络设备要使用;
-// 	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
-// 	BOOL bBroadcast=TRUE;
-// 	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
-// 	int iMode=1;
-// 	ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+	BOOL bBroadcast=TRUE;
+	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+	int iMode=1;
+	ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
 
 	//SOCKADDR_IN bcast;
-// 	h_bcast.sin_family=AF_INET;
-// 	//bcast.sin_addr.s_addr=nBroadCastIP;
-// 	h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
-// 	h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
-// 
-// 	//SOCKADDR_IN siBind;
-// 	h_siBind.sin_family=AF_INET;
-// 	h_siBind.sin_addr.s_addr=INADDR_ANY;
-// 	h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
-// 	::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
-    OnDisconnect();
-    CString strHistotyFile=g_strExePth+_T("ISP.exe");
-    ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
+	h_bcast.sin_family=AF_INET;
+	//bcast.sin_addr.s_addr=nBroadCastIP;
+	h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+	h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+
+	//SOCKADDR_IN siBind;
+	h_siBind.sin_family=AF_INET;
+	h_siBind.sin_addr.s_addr=INADDR_ANY;
+	h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+	::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+	b_pause_refresh_tree = false;
+	g_bPauseMultiRead = temp_status;
+
+
+
+	//MessageBox(_T("This part of code is recoding,Please use ISP.exe to update now."),_T("Notice"),MB_OK | MB_ICONINFORMATION);
+	return;
 }
 
 
@@ -9957,12 +10167,13 @@ void CMainFrame::OnDatabasePv()
 	
 }
 
-#include "Dowmloadfile.h"
+
 //Add by Fance 14/05/21
 //When user want to update the firmware ,run this code to  get firmware and call ISP.exe to flash firmware.
 void CMainFrame::OnHelpUpdatefirmware()
 {
 	// TODO: Add your command handler code here
+#if 0
 	MessageBox(_T("This function is still under develepment!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
 	return;
 	if(m_product.at(selected_product_index).status == false)//说明不在线;
@@ -9970,10 +10181,62 @@ void CMainFrame::OnHelpUpdatefirmware()
 		if(IDNO == MessageBox(_T("The device you selected is not on line or the communication is bad, are you sure you want to update!"),_T("Notice"),MB_YESNO | MB_ICONINFORMATION))
 			return;
 	}
-	product_id = m_product.at(selected_product_index).product_class_id;
+#endif
+	b_pause_refresh_tree = true;
+	bool temp_status = g_bPauseMultiRead;
+	g_bPauseMultiRead = true;
+	int temp_type = GetCommunicationType();
+
+
+	BOOL bDontLinger = FALSE;
+	setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+	closesocket(h_Broad);
+
+	m_product_isp_auto_flash.baudrate = m_product.at(selected_product_index).baudrate;
+	m_product_isp_auto_flash.BuildingInfo.strIp = m_product.at(selected_product_index).BuildingInfo.strIp;
+	m_product_isp_auto_flash.ncomport =  m_product.at(selected_product_index).ncomport;
+
+	m_product_isp_auto_flash.product_class_id =  m_product.at(selected_product_index).product_class_id;
+	m_product_isp_auto_flash.product_id =  m_product.at(selected_product_index).product_id;
+
+//	isp_product_id = m_product.at(selected_product_index).product_class_id;
+//	if (!((product_Node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
+	SetCommunicationType(0);//关闭串口，供ISP 使用;
+	close_com();
 	Dowmloadfile Dlg;
 	Dlg.DoModal();
 	
+	if(temp_type == 0)
+	{
+		int comport = GetLastOpenedComport();
+		open_com(comport);
+	}
+	else
+	{
+
+	}
+	SetCommunicationType(temp_type);
+
+	//Fance Add. 在ISP 用完1234 4321 的端口之后，T3000 在重新打开使用，刷新listview 的网络设备要使用;
+	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+	BOOL bBroadcast=TRUE;
+	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+	int iMode=1;
+	ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+
+	//SOCKADDR_IN bcast;
+	h_bcast.sin_family=AF_INET;
+	//bcast.sin_addr.s_addr=nBroadCastIP;
+	h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+	h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+
+	//SOCKADDR_IN siBind;
+	h_siBind.sin_family=AF_INET;
+	h_siBind.sin_addr.s_addr=INADDR_ANY;
+	h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+	::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+	b_pause_refresh_tree = false;
+	g_bPauseMultiRead = temp_status;
 }
 void CMainFrame::OnControlTstat()
 {
@@ -10016,6 +10279,52 @@ void CMainFrame::ShowDebugWindow()
 void CMainFrame::OnUpdateConnect2(CCmdUI *pCmdUI)
 {
     pCmdUI->SetCheck(m_nStyle == 1);
+}
+
+//TCP Server 的 回调函数 ，当客户端连接上 之后就可以用这个socket去发送数据了;//This function add by Fance.
+void CALLBACK Listen(SOCKET s, int ServerPort, const char *ClientIP)
+{
+	int nRet;
+	char buf[1000];
+
+	CMulitithreadSocket wsk;
+	wsk = s;
+	bool get_mutex_control = false;
+
+	while(1)
+	{
+		//info.Empty();
+		//nRet = wsk.ReadData(buf, 800, 60);
+		if(wsk.IsSockConnected(s))
+		{
+			char sendbuf[] = "Receive connect";
+			//memset(sendbuf,0,100);
+
+			wsk.SendData(sendbuf,20,3000);
+			TRACE(_T("OK\r\n"));
+			Sleep(30000);
+		}
+		else
+		{
+			//TRACE(_T("No connection\r\n"));
+			//Sleep(2000);
+			break;
+		}
+			
+		//memset(buf,0,1000);
+		//nRet = wsk.ReadData(buf, 1000, 120);
+		//if(nRet==-1)
+		//{
+
+		//	break;
+		//}
+
+	}
+
+
+
+	wsk.Close();
+
 }
 
  
