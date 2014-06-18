@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "globle_function.h"
 #include "MyPing.h"
+extern bool auto_flash_mode;
 int turn_hex_str_to_ten_num(char *source)
 {//can only turn two char(hex string) to int
 	//return -1,the wrong input ,the char number>2;or the input char is not hex string;
@@ -44,6 +45,7 @@ int turn_hex_str_to_ten_num(char *source)
 
 			default: 
 				{
+					if(!auto_flash_mode)
 					AfxMessageBox(_T("wrong input!\nin the turn_hex_str_to_ten_num function!"), MB_ICONWARNING);
 					return -1;//2
 				}
@@ -67,6 +69,7 @@ unsigned short turn_4_hex_char_to_unsigned_short(char *source)
 	int a=strlen(source);
 	if(a>4)
 	{
+		if(!auto_flash_mode)
 		AfxMessageBox(_T("wrong input!\nthat the length of the input string !=2!"), MB_ICONWARNING);
 		for(int i=0;i<a;i++)
 			*source='\0';
@@ -504,7 +507,8 @@ BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
 		}
 		else
 		{
-			AfxMessageBox(_T("The Hex File is broken"));
+			 if(!auto_flash_mode)
+				AfxMessageBox(_T("The Hex File is broken"));
 			return FALSE;
 		}
 

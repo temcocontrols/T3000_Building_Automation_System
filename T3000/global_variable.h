@@ -1820,7 +1820,7 @@ int	MODBUS_PID3_OFF_OUTPUT_HEAT3		=	-1	;
 
 //used for record the selected product , if user want to update this product ,we need to check whether it is on line or not.
 int selected_product_index;
-
+HTREEITEM selected_tree_item;
 #pragma region For_bacnet
 int bacnet_device_type;
 int g_bac_instance;
@@ -1882,6 +1882,7 @@ HWND	  m_alarmlog_dlg_hwnd;
 HWND      m_alarmwindow_dlg_hwnd;
 HWND      m_tstat_dlg_hwnd;
 HWND      m_setting_dlg_hwnd;
+HWND      m_flash_multy_hwnd;
 
 vector <Str_out_point> m_Output_data;
 vector <Str_in_point>  m_Input_data;

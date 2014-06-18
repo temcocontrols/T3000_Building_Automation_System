@@ -43,6 +43,7 @@ public:
 	CStaticEx m_program_size;
 	CStaticEx m_free_memory;
 	afx_msg void OnRefresh();
+	bool m_edit_changed;
 };
 
 

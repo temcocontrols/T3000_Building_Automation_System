@@ -162,7 +162,7 @@ BOOL CComWriter::WriteCommandtoReset()
 					}
 					strTips = _T("|hex file doesn't match with the chip!");
 					OutPutsStatusInfo(strTips);	
-					AfxMessageBox(_T("hex file doesn't match with the chip"));
+					//AfxMessageBox(_T("hex file doesn't match with the chip"));
 					return FALSE;
 				}
 			} 
@@ -188,7 +188,7 @@ BOOL CComWriter::WriteCommandtoReset()
 					}
 					strTips = _T("|hex file doesn't match with the chip!");
 					OutPutsStatusInfo(strTips);	
-					AfxMessageBox(_T("hex file doesn't match with the chip"));
+					//AfxMessageBox(_T("hex file doesn't match with the chip"));
 					return FALSE;
 				} 
 				else
@@ -372,7 +372,7 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 					case -9:strTemp.Format(_T("|ID %d Error : Programming was canceled."), pWriter->m_szMdbIDs[i]);break;
 					}
 					pWriter->OutPutsStatusInfo(strTemp);
-					AfxMessageBox(strTemp);
+					//AfxMessageBox(strTemp);
 					pWriter->OutPutsStatusInfo(_T("|-->>End Time:")+GetSysTime());
 					pWriter->OutPutsStatusInfo(_T("|------->>End"));
 					break;
@@ -396,7 +396,7 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 //					((CISPDlg*)pWriter->m_pParentWnd)->Show_Flash_DeviceInfor(pWriter->m_szMdbIDs[i]);
 					pWriter->OutPutsStatusInfo(_T("|-->>End Time:")+GetSysTime());
 					pWriter->OutPutsStatusInfo(_T("|------->>End"));
-					AfxMessageBox(strText);				
+					//AfxMessageBox(strText);				
 				}
 
 
@@ -436,7 +436,7 @@ UINT run_back_ground_flash_thread(LPVOID pParam)
 				pWriter->OutPutsStatusInfo(strTemp);
 				pWriter->OutPutsStatusInfo(_T("|-->>End Time:")+GetSysTime());
 				pWriter->OutPutsStatusInfo(_T("|------->>End"));
-				AfxMessageBox(strTemp);
+				//AfxMessageBox(strTemp);
 			}
 			else
 			{		
@@ -811,7 +811,7 @@ int CComWriter::WirteExtendHexFileByCom()
 	if(open_com(m_nComPort)==false)
 	{
 		CString srtInfo = _T("|Error :The com port is occupied!");
-		MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
+		//MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
 		//AddStringToOutPuts(_T("Error :The com port is occupied!"));	
 		OutPutsStatusInfo(srtInfo, FALSE);
 		return 0;
@@ -1003,38 +1003,31 @@ for (  i=0;i<3;i++)
 m_hexinfor.software_high=temp.software_high;
 m_hexinfor.software_low=temp.software_low;
 }
-BOOL CComWriter::UpdataDeviceInformation(int& ID){
-
+BOOL CComWriter::UpdataDeviceInformation(int& ID)
+{
+	  CString strtips;
     unsigned short Device_infor[10];
     CString str_ret,temp;
 	Bin_Info temp1;
 	 CString hexproductname=_T("");
   //  int ret=read_multi(ID,&Device_infor[0],0,10);
 	 int ret=read_multi_tap(ID,&Device_infor[0],0,10);
-	  if (ret<0)
-	  {
-      AfxMessageBox(_T("Can't get the device information ,please try again!"));
-      return FALSE;
-	  }
+	
    CString prodcutname=GetProductName(Device_infor[7]);
     
-        if(READ_SUCCESS != Get_HexFile_Information(m_hexbinfilepath.GetBuffer(),m_hexinfor))
-        {
-            AfxMessageBox(_T("The hex file dones't contains Temco logo,Can't flash into our products!"));
-            return FALSE;
-        }
-    
-   
-   
-        for (int i=0;i<10;i++)
-        {
-            str_ret.AppendFormat(_T("%c"),Device_infor[i]);
-        }
+   if(READ_SUCCESS != Get_HexFile_Information(m_hexbinfilepath.GetBuffer(),temp1))
+   {
+	   //AfxMessageBox(_T("The hex file dones't contains Temco logo,Can't flash into our products!"));
+	   strtips.Format(_T("The hex file doesn't contains Temco logo,Can't flash into our products!"));
+	   OutPutsStatusInfo(strtips,false);
+	   return FALSE;
+   }
+
    
  
    for (int i=0;i<10;i++)
    {
-	   hexproductname.AppendFormat(_T("%c"),m_hexinfor.product_name[i]);
+	   hexproductname.AppendFormat(_T("%c"),temp1.product_name[i]);
    }
    prodcutname.MakeLower();
   
@@ -1043,16 +1036,16 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID){
  
   prodcutname.MakeUpper();
   hexproductname.MakeUpper();
-  CString strtips;
+
   strtips.Format(_T("Your device is %s   Your hex file is fit for %s "),prodcutname.GetBuffer(),hexproductname.GetBuffer());
   OutPutsStatusInfo(strtips,false);
 
-//   int nCount = str_ret.GetLength();
-//   WCHAR* strNew = new WCHAR[nCount+1];
-//   ZeroMemory(strNew, (nCount+1)*sizeof(WCHAR));
-//   LPCTSTR str = LPCTSTR(str_ret);
-//   memcpy(strNew, str, nCount*sizeof(WCHAR));
- // SendMessage(m_pParentWnd->m_hWnd, WM_UPDATA_DEVICE_INFORMATION, 0, LPARAM(strNew));
+  //int nCount = str_ret.GetLength();
+  //WCHAR* strNew = new WCHAR[nCount+1];
+  //ZeroMemory(strNew, (nCount+1)*sizeof(WCHAR));
+  //LPCTSTR str = LPCTSTR(str_ret);
+  //memcpy(strNew, str, nCount*sizeof(WCHAR));
+  //SendMessage(m_pParentWnd->m_hWnd, WM_UPDATA_DEVICE_INFORMATION, 0, LPARAM(temp1));
      if(hexproductname.CompareNoCase(prodcutname)==0)
      {
     return TRUE;

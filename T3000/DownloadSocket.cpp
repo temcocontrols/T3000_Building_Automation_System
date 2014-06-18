@@ -5,6 +5,7 @@ extern char receive_buffer[4000];
 extern unsigned short totalpackage;
 extern unsigned short current_package;
 extern char download_filename[20];
+extern char receive_md5[20];
 extern int download_step ;
 int Receive_data_length = 0;
 
@@ -57,14 +58,26 @@ void DownloadSocket::OnReceive(int nErrorCode)
 			totalpackage = ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
 			temp_point = temp_point + 2;
 			memcpy(download_filename,temp_point,20);
-			download_step = START_SEND_WANT_PACKAGE;
+			download_step = SEND_GET_MD5_VALUE;
 
 			malloc_download_memory_size = totalpackage  * TFTP_SEND_LENGTH;
 			receivefile_buffer =  new char[malloc_download_memory_size];
 			memset(receivefile_buffer,0,malloc_download_memory_size);
+			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_FILE_INFO,NULL);
 		}
 		break;
-
+	case  ACK_MD5_VALUE:
+		{
+			memset(receive_md5,0,20);
+			if(Receive_data_length != 26)
+			{
+				break;
+			}
+			memcpy_s(receive_md5,20,temp_point,20);
+			temp_point = temp_point + 20;
+			download_step = CHECK_MD5_VALUE;
+		}
+		break;
 	case  TRANSFER_FILE_PAGE:
 		{
 			int ntemp_receive_package = ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
@@ -73,7 +86,8 @@ void DownloadSocket::OnReceive(int nErrorCode)
 			temp_point = temp_point + 2;
 			if((ntemptotalpackage != totalpackage) || (ntemp_receive_package > totalpackage))
 				break;
-
+			if(ntemp_receive_package != current_package)
+				break;
 			if(ntemp_receive_package < ntemptotalpackage)
 			{
 				memcpy_s(receivefile_buffer + TFTP_SEND_LENGTH * (ntemp_receive_package - 1),
@@ -99,6 +113,35 @@ void DownloadSocket::OnReceive(int nErrorCode)
 
 			break;
 		}
+
+	case  DOWNLOAD_FILE_ERROR:
+		{
+			SetDownloadResults(DOWNLOAD_RESULTS_FAILED);
+			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,RETURN_ERROR,DOWNLOAD_FILE_ERROR);
+			download_step = THREAD_IDLE;
+		}
+		break;
+	case  HOST_BUSY:
+		{
+			SetDownloadResults(DOWNLOAD_RESULTS_FAILED);
+			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,RETURN_ERROR,HOST_BUSY);
+			download_step = THREAD_IDLE;
+		}
+		break;
+	case NO_MD5_FILE_EXSIT:
+		{
+			SetDownloadResults(DOWNLOAD_RESULTS_FAILED);
+			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,RETURN_ERROR,NO_MD5_FILE_EXSIT);
+			download_step = THREAD_IDLE;
+		}
+		break;
+	default :
+		{
+			SetDownloadResults(DOWNLOAD_RESULTS_FAILED);
+			PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,RETURN_ERROR,NULL);
+			download_step = THREAD_IDLE;
+		}
+		break;
 	}
 
 	CAsyncSocket::OnReceive(nErrorCode);
@@ -108,6 +151,16 @@ void DownloadSocket::SetParentWindow(HWND n_hwnd)
 	m_parent_hwnd = n_hwnd;
 }
 
+void DownloadSocket::SetDownloadResults(int ret_results)
+{
+	m_results = ret_results;
+}
+
+int DownloadSocket::GetDownloadResults()
+{
+	return	m_results ;
+}
+
 void DownloadSocket::OnConnect(int nErrorCode)
 {
 	// TODO: Add your specialized code here and/or call the base class
@@ -115,6 +168,7 @@ void DownloadSocket::OnConnect(int nErrorCode)
 	// TODO: Add your specialized code here and/or call the base class
 	if(!nErrorCode)
 	{
+		SetDownloadResults(DOWNLOAD_RESULTS_UNKNOW);
 		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_CONNECT_SUCCESS,NULL);
 	}
 	else

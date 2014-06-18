@@ -135,6 +135,7 @@ Update by Fance
 #include "BacnetAlarmWindow.h"
 #include "BacnetTstat.h"
 #include "BacnetSetting.h"
+#include "MainFrm.h"
 //bool CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
 //bool need_to_read_description = true;
 int g_gloab_bac_comport = 1;
@@ -154,6 +155,7 @@ CBacnetMonitor *Monitor_Window = NULL;
 CBacnetAlarmLog *AlarmLog_Window = NULL;
 CBacnetTstat *Tstat_Window = NULL;
 CBacnetSetting * Setting_Window = NULL;
+bool m_is_remote_device = false;
 extern CBacnetAlarmWindow * AlarmWindow_Window;
 extern bool is_in_scan_mode;
 extern char mycode[1024];
@@ -167,6 +169,7 @@ CString remote_ip_address;
 // int m_Input_data_length;
 extern void  init_info_table( void );
 extern void Init_table_bank();
+DWORD WINAPI ConnectToDevice(LPVOID lPvoid);
 
 IMPLEMENT_DYNCREATE(CDialogCM5_BacNet, CFormView)
 
@@ -1114,7 +1117,7 @@ void CDialogCM5_BacNet::Fresh()
 	//MessageBox(_T("Test2"));
 	
 	SetTimer(4,500,NULL);
-	click_resend_time = 4;
+	click_resend_time = 8;
 #if 0
 	Sleep(300);
 	bool find_exsit = false;
@@ -2372,10 +2375,7 @@ DWORD WINAPI  CDialogCM5_BacNet::Send_read_Command_Thread(LPVOID lpVoid)
 	{
 		g_CommunicationType = 1;
 		SetCommunicationType(1);
-		if(Open_Socket2(IP_ADDRESS,6001))	//在线程里面去连接设备 用于modbus的 协议通讯;
-		{
-
-		}
+		CreateThread(NULL,NULL,ConnectToDevice,NULL,NULL,NULL);
 	}
 
 		hwait_thread = NULL;
@@ -2388,6 +2388,21 @@ myend:	hwait_thread = NULL;
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,0,0);
 	return 0;
 }
+
+
+DWORD WINAPI ConnectToDevice(LPVOID lPvoid)
+{
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	CString nconnectionip = pFrame->m_product.at(selected_product_index).BuildingInfo.strIp;
+	int nport =	pFrame->m_product.at(selected_product_index).ncomport;
+	int ret = Open_Socket2(nconnectionip,nport);
+
+	return 0;
+}
+
+
+
+
 
 void CDialogCM5_BacNet::SetConnected_IP(LPCTSTR myip)
 {
@@ -2514,15 +2529,24 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 			if(find_exsit)
 			{
 				KillTimer(4);
+
+				//老毛一会让这样改一会让那样改，受不了;先用宏定义标记起来;
+				#ifdef NEED_ANALOG_DIGITAL_ONLY
 				Input_Window->Reload_Unit_Type();
+				#endif
 				Output_Window->Reload_Unit_Type();
+
 				//PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SVAE_CONFIG);
 				//Post_Write_Message(g_bac_instance,CONNECTED_WITH_DEVICE,0,0,sizeof(Str_connected_point),BacNet_hwd ,_T("Connect with device"));
 #if 1
 				PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
 				CString temp_cstring;
-				temp_cstring.Format(_T("Connected"),g_bac_instance);
-				SetPaneString(1,temp_cstring);
+				//temp_cstring.Format(_T("Connected"),g_bac_instance);
+				//m_pTreeViewCrl->turn_item_image(selected_tree_item ,true);
+				CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+				pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,true);
+
+				SetPaneString(2,_T("Online"));
 				m_bac_main_tab.SetFocus();
 				bac_select_device_online = true;
 #endif
@@ -2533,7 +2557,9 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				{
 					bac_select_device_online = false;
 					KillTimer(4);
-					SetPaneString(1,_T("Device is offline!"));
+					SetPaneString(2,_T("Offline"));
+					CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+					pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
 					MessageBox(_T("No response! Please Check the connection!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);;
 				}
 				else

@@ -202,13 +202,13 @@ void CBacnetInput::Initial_List()
 	m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_input_list.InsertColumn(INPUT_NUM, _T("NUM"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_input_list.InsertColumn(INPUT_FULL_LABLE, _T("Full Label"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_RANGE, _T("Range"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_CAL, _T("Calibration"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_CAL_OPERATION, _T("Sign"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_input_list.InsertColumn(INPUT_FITLER, _T("Filter"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_FITLER, _T("Filter"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_DECOM, _T("Status"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_LABLE, _T("Label"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_dlg_hwnd = this->m_hWnd;
@@ -230,13 +230,13 @@ void CBacnetInput::Initial_List()
 		CString temp_units;
 		temp_item.Format(_T("%d"),i+1);
 		m_input_list.InsertItem(i,temp_item);
-		if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_AUTO_MANUAL))
-		{
-			ListCtrlEx::CStrList strlist;
-			strlist.push_back(_T("Auto"));
-			strlist.push_back(_T("Manual"));
-			m_input_list.SetCellStringList(i, INPUT_AUTO_MANUAL, strlist);
-		}
+		//if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_AUTO_MANUAL))
+		//{
+		//	ListCtrlEx::CStrList strlist;
+		//	strlist.push_back(_T("Auto"));
+		//	strlist.push_back(_T("Manual"));
+		//	m_input_list.SetCellStringList(i, INPUT_AUTO_MANUAL, strlist);
+		//}
 
 
 		if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
@@ -249,15 +249,15 @@ void CBacnetInput::Initial_List()
 			m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
 		}
 
-		if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_FITLER))
-		{
-			ListCtrlEx::CStrList strlist;
-			for (int m=0;m<(int)(sizeof(Input_Filter_Array)/sizeof(Input_Filter_Array[0]));m++)
-			{
-				strlist.push_back(Input_Filter_Array[m]);
-			}
-			m_input_list.SetCellStringList(i, INPUT_FITLER, strlist);
-		}
+		//if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_FITLER))
+		//{
+		//	ListCtrlEx::CStrList strlist;
+		//	for (int m=0;m<(int)(sizeof(Input_Filter_Array)/sizeof(Input_Filter_Array[0]));m++)
+		//	{
+		//		strlist.push_back(Input_Filter_Array[m]);
+		//	}
+		//	m_input_list.SetCellStringList(i, INPUT_FITLER, strlist);
+		//}
 
 		if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_DECOM))
 		{
@@ -360,6 +360,7 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 		BacnetRange dlg;
 		if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_ANALOG])==0)
 		{
+			bac_range_number_choose = m_Input_data.at(Changed_Item).range;
 			bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;
 			dlg.DoModal();
 			if(range_cancel)
@@ -445,78 +446,33 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	}
 
 
-	//if(Changed_SubItem==INPUT_RANGE)
-	//{
-	//	CString temp_cs = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
-	//	if(temp_cs.CompareNoCase(_T("Not Used"))==0)
-	//	{
-	//		m_input_list.SetItemText(Changed_Item,INPUT_UNITE,Input_Unit[_unused]);
-	//	}
-	//	else if(temp_cs.CompareNoCase(_T("10K(-40->120)"))==0)
-	//	{
-	//		ListCtrlEx::CStrList strlist;
-	//		strlist.clear();
-	//		strlist.push_back(Input_Unit[degC]);
-	//		//strlist.push_back(Input_Unit[degF]);
-	//		m_input_list.SetCellStringList(Changed_Item, INPUT_UNITE, strlist);
-	//		m_input_list.SetItemText(Changed_Item,INPUT_UNITE,Input_Unit[degC]);
-	//	}
-	//	else if(temp_cs.CompareNoCase(_T("I 4->20ma"))==0)
-	//	{
-	//		ListCtrlEx::CStrList strlist;
-	//		strlist.clear();
-	//		TRACE(Input_Unit[ma]);
-	//		strlist.push_back(Input_Unit[ma]);
-	//		m_input_list.SetCellStringList(Changed_Item, INPUT_UNITE, strlist);
-	//		m_input_list.SetItemText(Changed_Item,INPUT_UNITE,Input_Unit[ma]);
-	//	}
-	//	else if(temp_cs.CompareNoCase(_T("V 0->10V"))==0)
-	//	{
-	//		ListCtrlEx::CStrList strlist;
-	//		strlist.clear();
-	//		TRACE(Input_Unit[Volts]);
-	//		strlist.push_back(Input_Unit[Volts]);
-	//		m_input_list.SetCellStringList(Changed_Item, INPUT_UNITE, strlist);
-	//		m_input_list.SetItemText(Changed_Item,INPUT_UNITE,Input_Unit[Volts]);
-	//	}
-	//	else if(temp_cs.CompareNoCase(_T("V 0->5V"))==0)
-	//	{
-	//		ListCtrlEx::CStrList strlist;
-	//		strlist.clear();
-	//		TRACE(Input_Unit[Volts]);
-	//		strlist.push_back(Input_Unit[Volts]);
-	//		m_input_list.SetCellStringList(Changed_Item, INPUT_UNITE, strlist);
-	//		m_input_list.SetItemText(Changed_Item,INPUT_UNITE,Input_Unit[Volts]);
-	//	}
-	//	else if(temp_cs.CompareNoCase(_T("V 0->24AC"))==0)
-	//	{
-	//		ListCtrlEx::CStrList strlist;
-	//		strlist.clear();
-	//		strlist.push_back(_T("ON/OFF"));
-	//		m_input_list.SetCellStringList(Changed_Item, INPUT_UNITE, strlist);
-	//		m_input_list.SetItemText(Changed_Item,INPUT_UNITE,_T("ON/OFF"));
-	//	}
-	//	else if(temp_cs.CompareNoCase(_T("TST Normal"))==0)
-	//	{
-	//		ListCtrlEx::CStrList strlist;
-	//		strlist.clear();
-	//		strlist.push_back(_T("ON/OFF"));
-	//		m_input_list.SetCellStringList(Changed_Item, INPUT_UNITE, strlist);
-	//		m_input_list.SetItemText(Changed_Item,INPUT_UNITE,_T("ON/OFF"));
-	//	}
-	//}
-
 	if(Changed_SubItem==INPUT_CAL)
 	{
 		CString cs_temp=m_input_list.GetItemText(Changed_Item,INPUT_CAL);
-		int cal_value = _wtoi(cs_temp);
-		m_Input_data.at(Changed_Item).calibration = cal_value;
+		float temp_value = _wtof(cs_temp);
+		int cal_value = (int)(temp_value * 10);
+		if((cal_value<0) || (cal_value >255))
+		{
+			MessageBox(_T("Please Input an value between 0.0 - 25.6"),_T("Warning"),MB_OK);
+			PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+			return 0;
+		}
+
+		//int cal_value = _wtoi(cs_temp);
+		
+		m_Input_data.at(Changed_Item).calibration = (unsigned char)cal_value;
 	}
 	else if(Changed_SubItem==INPUT_FITLER)
 	{
 		CString cs_temp=m_input_list.GetItemText(Changed_Item,INPUT_FITLER);
 		int  temp2 = _wtoi(cs_temp);
-		m_Input_data.at(Changed_Item).filter = (int8_t)(log((double)temp2)/log((double)2));
+		if((temp2<0) || (temp2 >255))
+		{
+			MessageBox(_T("Please Input an value between 0 - 255"),_T("Warning"),MB_OK);
+			PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+			return 0;
+		}
+		m_Input_data.at(Changed_Item).filter = (unsigned char)temp2;//(int8_t)(log((double)temp2)/log((double)2));
 	}
 	else if(Changed_SubItem==INPUT_DECOM)
 	{
@@ -621,7 +577,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			//temp_value.Format(_T("%d"),m_Input_data.at(i).value);
 			//m_input_list.SetItemText(i,INPUT_VALUE,temp_value);
 
-			temp_cal.Format(_T("%d"),(m_Input_data.at(i).calibration));
+			temp_cal.Format(_T("%.1f"),(float(m_Input_data.at(i).calibration))/10);
 			m_input_list.SetItemText(i,INPUT_CAL,temp_cal);
 			if(m_Input_data.at(i).calibration_sign == 0)
 			{
@@ -675,7 +631,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		}
 
 
-		temp_filter.Format(_T("%d"),(int)pow((double)2,(int)m_Input_data.at(i).filter));
+		//temp_filter.Format(_T("%d"),(int)pow((double)2,(int)m_Input_data.at(i).filter));
+		temp_filter.Format(_T("%d"),(unsigned char)m_Input_data.at(i).filter);
 		m_input_list.SetItemText(i,INPUT_FITLER,temp_filter);
 
 		if(m_Input_data.at(i).decom==0)
@@ -874,6 +831,24 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_Input_data.at(lRow).calibration_sign = 0;
 			m_input_list.SetItemText(lRow,INPUT_CAL_OPERATION,_T("+"));
 			New_CString = _T("+");
+		}
+	}
+	else if(lCol == INPUT_AUTO_MANUAL)
+	{
+		memcpy_s(&m_temp_Input_data[lRow],sizeof(Str_in_point),&m_Input_data.at(lRow),sizeof(Str_in_point));
+		if(m_Input_data.at(lRow).auto_manual == 0)
+		{
+			m_Input_data.at(lRow).auto_manual = 1;
+			m_input_list.SetItemText(lRow,INPUT_AUTO_MANUAL,_T("Manual"));
+			m_input_list.SetCellEnabled(lRow,INPUT_VALUE,TRUE);
+			New_CString = _T("Manual");
+		}
+		else
+		{
+			m_Input_data.at(lRow).auto_manual = 0;
+			m_input_list.SetItemText(lRow,INPUT_AUTO_MANUAL,_T("Auto"));
+			m_input_list.SetCellEnabled(lRow,INPUT_VALUE,FALSE);
+			New_CString = _T("Auto");
 		}
 	}
 	else

@@ -908,7 +908,7 @@ extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT3	   ;
 
 
 extern int selected_product_index;
-
+extern HTREEITEM selected_tree_item;
 #pragma region For_bacnet
 extern int bacnet_device_type;
 extern int g_bac_instance;
@@ -970,6 +970,7 @@ extern HWND	  m_alarmlog_dlg_hwnd;
 extern HWND      m_alarmwindow_dlg_hwnd;
 extern HWND      m_tstat_dlg_hwnd;
 extern HWND      m_setting_dlg_hwnd;
+extern HWND      m_flash_multy_hwnd;
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;

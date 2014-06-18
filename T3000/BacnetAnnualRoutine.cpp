@@ -138,7 +138,7 @@ void BacnetAnnualRoutine::Initial_List()
 	m_annualr_list.SetExtendedStyle(m_annualr_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_NUM, _T("NUM"), 60, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_FULL_LABEL, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_AUTO_MANUAL, _T("Auto/Manual"), 90, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_AUTO_MANUAL, _T("Auto/Manual"), 90, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_VALUE, _T("Value"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_LABLE, _T("Label"), 90, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_annual_dlg_hwnd = this->m_hWnd;
@@ -160,13 +160,13 @@ void BacnetAnnualRoutine::Initial_List()
 		temp_item.Format(_T("%d"),i+1);
 		m_annualr_list.InsertItem(i,temp_item);
 		m_annualr_list.SetCellEnabled(i,ANNUAL_ROUTINE_NUM,0);
-		if(ListCtrlEx::ComboBox == m_annualr_list.GetColumnType(ANNUAL_ROUTINE_AUTO_MANUAL))
-		{
-			ListCtrlEx::CStrList strlist;
-			strlist.push_back(_T("Auto"));
-			strlist.push_back(_T("Manual"));
-			m_annualr_list.SetCellStringList(i, ANNUAL_ROUTINE_AUTO_MANUAL, strlist);
-		}
+		//if(ListCtrlEx::ComboBox == m_annualr_list.GetColumnType(ANNUAL_ROUTINE_AUTO_MANUAL))
+		//{
+		//	ListCtrlEx::CStrList strlist;
+		//	strlist.push_back(_T("Auto"));
+		//	strlist.push_back(_T("Manual"));
+		//	m_annualr_list.SetCellStringList(i, ANNUAL_ROUTINE_AUTO_MANUAL, strlist);
+		//}
 
 
 		if(ListCtrlEx::ComboBox == m_annualr_list.GetColumnType(ANNUAL_ROUTINE_VALUE))
@@ -234,9 +234,46 @@ void BacnetAnnualRoutine::OnNMClickListBacAnnuleList(NMHDR *pNMHDR, LRESULT *pRe
 			m_annualr_list.SetCellChecked(i,0,FALSE);
 		}
 	}
-
-
 	*pResult = 0;
+	long lRow,lCol;
+	lRow = lvinfo.iItem;
+	lCol = lvinfo.iSubItem;
+	CString New_CString;
+	CString temp_task_info;
+
+	if(lCol == ANNUAL_ROUTINE_AUTO_MANUAL)
+	{
+		//先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
+		memcpy_s(&m_temp_annual_data[lRow],sizeof(Str_annual_routine_point),&m_Annual_data.at(lRow),sizeof(Str_annual_routine_point));
+
+		if(m_Annual_data.at(lRow).auto_manual == 0)
+		{
+			m_Annual_data.at(lRow).auto_manual = 1;
+			m_annualr_list.SetItemText(lRow,ANNUAL_ROUTINE_AUTO_MANUAL,_T("Manual"));
+			m_annualr_list.SetCellEnabled(lRow,ANNUAL_ROUTINE_VALUE,TRUE);
+			New_CString = _T("Manual");
+		}
+		else
+		{
+			m_Annual_data.at(lRow).auto_manual = 0;
+			m_annualr_list.SetItemText(lRow,ANNUAL_ROUTINE_AUTO_MANUAL,_T("Auto"));
+			m_annualr_list.SetCellEnabled(lRow,ANNUAL_ROUTINE_VALUE,FALSE);
+			New_CString = _T("Auto");
+		}
+		temp_task_info.Format(_T("Write Annual List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
+	}
+	else
+		return;
+
+	int cmp_ret = memcmp(&m_temp_annual_data[lRow],&m_Annual_data.at(lRow),sizeof(Str_annual_routine_point));
+	if(cmp_ret!=0)
+	{
+		m_annualr_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
+		temp_task_info.Format(_T("Write Annual Routine List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
+		Post_Write_Message(g_bac_instance,WRITEANNUALROUTINE_T3000,lRow,lRow,sizeof(Str_annual_routine_point),m_annual_dlg_hwnd ,temp_task_info,lRow,lCol);
+	}
+
+	
 }
 LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_List(WPARAM wParam,LPARAM lParam)
 {

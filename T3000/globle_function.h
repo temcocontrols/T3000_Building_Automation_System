@@ -144,9 +144,13 @@ int Get_Unit_Process(CString Unit);
 BOOL Get_Bit_FromRegister(unsigned short RegisterValue,unsigned short Position);
 int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind);
 UINT RefreshNetWorkDeviceListByUDPFunc();
-void DFTrace(CString &nCString);
+//void DFTrace(CString &nCString);
+void DFTrace(LPCTSTR lpCString);
 int Open_MonitorDataBase(WCHAR *DataSource);
 void Send_WhoIs_remote_ip(CString ipaddress);
 int handle_read_monitordata(char *npoint,int nlength);
 bool IP_is_Local(LPCTSTR ip_address);
+BOOL DirectoryExist(CString Path);
+BOOL CreateDirectory(CString path);
+DWORD WinExecAndWait( LPCTSTR lpszAppPath,LPCTSTR lpParameters,LPCTSTR lpszDirectory, 	DWORD dwMilliseconds);
 #endif
