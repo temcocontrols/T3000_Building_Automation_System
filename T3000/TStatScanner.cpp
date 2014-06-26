@@ -1787,13 +1787,33 @@ int CTStatScanner::GetAllNodeFromDataBase()
 		{
 			pNode = new CTStat_Net;
 			// Port
-			CString strPort = m_pRs->GetCollect("Com_Port");
+			CString strPort;
+			temp_variant = m_pRs->GetCollect("Com_Port");
+			if(temp_variant.vt!=VT_NULL)
+				strPort=temp_variant;
+			else
+				strPort=_T("");
+
+
 			((CTStat_Net*)(pNode))->SetIPPort(_wtoi(strPort));
 			
-			 CString str_product_id = m_pRs->GetCollect("Product_class_ID");
+			 CString str_product_id ;
+			 temp_variant = m_pRs->GetCollect("Product_class_ID");
+			 if(temp_variant.vt!=VT_NULL)
+				 str_product_id=temp_variant;
+			 else
+				 str_product_id=_T("");
+
 			 if((_wtoi(str_product_id) == PM_MINIPANEL) ||(_wtoi(str_product_id) == PM_CM5))
 			 {
-				 CString strprotocol = m_pRs->GetCollect("Protocol");
+				 CString strprotocol;
+
+				 temp_variant=m_pRs->GetCollect("Protocol");
+				 if(temp_variant.vt!=VT_NULL)
+					 strprotocol=temp_variant;
+				 else
+					 strprotocol=_T("");
+
 				 ((CTStat_Net*)(pNode))->SetProtocol(_wtoi(strprotocol));
 			 }
 			 else
@@ -1803,8 +1823,12 @@ int CTStatScanner::GetAllNodeFromDataBase()
 
 
 			// IP Addr
-			CString strIP = m_pRs->GetCollect("Bautrate");
-
+			CString strIP ;
+			temp_variant = m_pRs->GetCollect("Bautrate");
+			if(temp_variant.vt!=VT_NULL)
+				strIP=temp_variant;
+			else
+				strIP=_T("");
 			//char temp_char[50];
 			//memset(temp_char,0,255);
 			//WideCharToMultiByte( CP_ACP, 0, strIP.GetBuffer(), -1, temp_char, 50, NULL, NULL );
@@ -1821,12 +1845,23 @@ int CTStatScanner::GetAllNodeFromDataBase()
 		{
 			pNode = new CTStat_Dev;
 			// BaudRate
-			CString strBaudRate = m_pRs->GetCollect("Bautrate");
+			CString strBaudRate ;
+			temp_variant = m_pRs->GetCollect("Bautrate");
+			if(temp_variant.vt!=VT_NULL)
+				strBaudRate=temp_variant;
+			else
+				strBaudRate=_T("");
+
 			((CTStat_Dev*)(pNode))->SetBaudRate(_wtoi(strBaudRate));
 
 			m_szComNodes.push_back(((CTStat_Dev*)(pNode)));
 
-			CString strComPort = m_pRs->GetCollect("Com_Port");
+			CString strComPort ;
+			temp_variant = m_pRs->GetCollect("Com_Port");
+			if(temp_variant.vt!=VT_NULL)
+				strComPort=temp_variant;
+			else
+				strComPort=_T("");
 			strComPort = strComPort.Mid(3);
 			((CTStat_Dev*)(pNode))->SetComPort(_wtoi(strComPort));
 		}
@@ -1837,15 +1872,36 @@ int CTStatScanner::GetAllNodeFromDataBase()
 		pNode->SetRoomName(m_pRs->GetCollect("Room_Name"));
 		pNode->SetSubnetName(m_pRs->GetCollect("Building_Name"));
 
-		CString strID = m_pRs->GetCollect("Product_ID");		
+		CString strID ;
+		temp_variant = m_pRs->GetCollect("Product_ID");		
+		if(temp_variant.vt!=VT_NULL)
+			strID=temp_variant;
+		else
+			strID=_T("");
 		pNode->SetDevID(_wtoi(strID));
 
-		CString strHwv = m_pRs->GetCollect("Hardware_Ver");
+		CString strHwv ;
+		temp_variant = m_pRs->GetCollect("Hardware_Ver");
+		if(temp_variant.vt!=VT_NULL)
+			strHwv=temp_variant;
+		else
+			strHwv=_T("");
 		pNode->SetHardwareVersion(float(_wtof(strHwv)));
-		CString strSwv = m_pRs->GetCollect("Software_Ver");
+
+		CString strSwv;
+		temp_variant = m_pRs->GetCollect("Software_Ver");
+		if(temp_variant.vt!=VT_NULL)
+			strSwv=temp_variant;
+		else
+			strSwv=_T("");
 		pNode->SetSoftwareVersion(float(_wtof(strSwv)));
 
-		CString strSerialID = m_pRs->GetCollect("Serial_ID");		
+		CString strSerialID;
+		temp_variant = m_pRs->GetCollect("Serial_ID");		
+		if(temp_variant.vt!=VT_NULL)
+			strSerialID=temp_variant;
+		else
+			strSerialID=_T("");
 		(pNode)->SetSerialID(_wtoi(strSerialID));
 
 		m_pRs->MoveNext();

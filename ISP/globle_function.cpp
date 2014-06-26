@@ -698,6 +698,7 @@ int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 
 
 
+
 BOOL Ping(const CString& strIP, CWnd* pWndEcho)
 {
     CMyPing* pPing = new CMyPing;

@@ -135,8 +135,11 @@ const CString Input_Unit_Digit[2]=
 	_T("ON/OFF")
 } ;
 
-const CString Decom_Array[2] =
+
+
+const CString Decom_Array[3] =
 {
-	_T("OK"),
-	_T("-"),
+	_T("Normal"),
+	_T("Open"),
+	_T("Short")
 };

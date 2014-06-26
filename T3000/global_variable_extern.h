@@ -1004,7 +1004,7 @@ extern int MIN_SCALE_5;
 extern int Total_SCALE;
 extern CString bac_cs_mac;
 extern CString bac_cs_device_id;
-extern CString bac_cs_vendor_id;
+//extern CString bac_cs_vendor_id;
 extern HANDLE CM5_hThread;
 extern HANDLE CM5_UI_Thread;
 extern DWORD nThreadID_x;

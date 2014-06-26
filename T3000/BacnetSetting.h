@@ -1,4 +1,5 @@
 #pragma once
+#include "afxwin.h"
 
 
 // CBacnetSetting dialog
@@ -23,7 +24,7 @@ public:
 	afx_msg void OnBnClickedButtonBacTest();
 	CDateTimeCtrl m_cm5_time_picker;
 	CDateTimeCtrl m_cm5_date_picker;
-	afx_msg void OnBnClickedBacEnableEditTime();
+	//afx_msg void OnBnClickedBacEnableEditTime();
 	afx_msg void OnNMKillfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMKillfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult);
 	void Get_Time_Edit_By_Control();
@@ -34,15 +35,20 @@ public:
 	afx_msg void OnBnClickedBtnBacIPAuto();
 	afx_msg void OnBnClickedBtnBacIPStatic();
 	afx_msg void OnBnClickedBtnBacIPChange();
-	afx_msg	void OnBnClickedBtnBacIPCancle();
+	//afx_msg	void OnBnClickedBtnBacIPCancle();
 	afx_msg LRESULT Fresh_Setting_UI(WPARAM wParam,LPARAM lParam);
 		virtual BOOL OnInitDialog();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	afx_msg void OnBnClickedButtonRebootDevice();
-	afx_msg void OnBnClickedButtonResetTcpip();
+	//afx_msg void OnBnClickedButtonRebootDevice();
+	//afx_msg void OnBnClickedButtonResetTcpip();
 	LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnBnClickedButtonEraseFlash();
+	//afx_msg void OnBnClickedButtonEraseFlash();
+	afx_msg void OnCbnSelchangeComboBacnetSettingCom0();
+	afx_msg void OnCbnSelchangeComboBacnetSettingCom1();
+	afx_msg void OnCbnSelchangeComboBacnetSettingCom2();
+	CComboBox m_device_com0;
+	virtual void OnCancel();
 };
 
 

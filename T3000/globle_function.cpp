@@ -1,5 +1,6 @@
 
 #include "stdafx.h"
+#include "../ISP/MyPing.h"
 #include "globle_function.h"
 #include "Windows.h"
 #include "T3000.h"
@@ -1443,7 +1444,7 @@ int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t nt
 ** Add by Fance
 ****************************************************/
 
-int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
+int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 {
 	int i;
 	int block_length;
@@ -1498,6 +1499,8 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			start_instance = *my_temp_point;
 			my_temp_point++;
 			end_instance = *my_temp_point;
+			if(end_instance == (BAC_OUTPUT_ITEM_COUNT - 1))
+				end_flag = true;
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
 
@@ -1553,6 +1556,8 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			end_instance = *my_temp_point;
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
+			if(end_instance == (BAC_INPUT_ITEM_COUNT - 1))
+				end_flag = true;
 
 			if(start_instance >= BAC_INPUT_ITEM_COUNT)
 				return -1;//超过长度了;
@@ -1605,7 +1610,8 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			end_instance = *my_temp_point;
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
-
+			if(end_instance == (BAC_VARIABLE_ITEM_COUNT - 1))
+				end_flag = true;
 			if(start_instance >= BAC_VARIABLE_ITEM_COUNT)
 				return -1;//超过长度了;
 
@@ -1875,6 +1881,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 		Device_time.month = *(my_temp_point ++);
 		Device_time.year = *(my_temp_point ++);
 		
+		
 
 		//temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 		//Device_time.dayofyear = temp_struct_value;
@@ -2086,6 +2093,10 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			end_instance = *my_temp_point;
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
+
+			if(end_instance == (BAC_ALARMLOG_COUNT - 1))
+				end_flag = true;
+
 			if(start_instance >= BAC_ALARMLOG_COUNT)
 				return -1;//超过长度了;
 			m_alarmlog_data.at(start_instance).point.number = *(my_temp_point++);
@@ -2181,7 +2192,12 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data)
 			Device_Basic_Setting.reg.pro_info.frimware2_rev = *(my_temp_point++);
 			Device_Basic_Setting.reg.pro_info.frimware3_rev = *(my_temp_point++);
 			Device_Basic_Setting.reg.pro_info.bootloader_rev = *(my_temp_point++);
-
+			my_temp_point = my_temp_point + 10;
+			Device_Basic_Setting.reg.com0_config = *(my_temp_point++);
+			Device_Basic_Setting.reg.com1_config = *(my_temp_point++);
+			Device_Basic_Setting.reg.com2_config = *(my_temp_point++);
+			Device_Basic_Setting.reg.refresh_flash_timer =  *(my_temp_point++);
+			Device_Basic_Setting.reg.en_plug_n_play =  *(my_temp_point++);
 			return READ_SETTING_COMMAND;
 		}
 		break;
@@ -2687,53 +2703,59 @@ void local_handler_conf_private_trans_ack(
 #endif
     }
 	int receive_data_type;
-
-	receive_data_type = CM5ProcessPTA(&data);
+	bool each_end_flag = false;
+	receive_data_type = CM5ProcessPTA(&data,each_end_flag);
 	switch(receive_data_type)
 	{
 	case READINPUT_T3000:
-	//	::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+		if(each_end_flag)
+			::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 		copy_data_to_ptrpanel(TYPE_INPUT);
 		break;
 	case READPROGRAM_T3000:
-	//	::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+		::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 		copy_data_to_ptrpanel(TYPE_ALL);
 		break;
 	case READPROGRAMCODE_T3000:
 		::PostMessage(m_program_edit_hwnd,WM_REFRESH_BAC_PROGRAM_RICHEDIT,NULL,NULL);
 		break;
 	case READVARIABLE_T3000:
-	//	::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+		if(each_end_flag)
+			::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 		copy_data_to_ptrpanel(TYPE_VARIABLE);
 		break;
 	case READOUTPUT_T3000:
-	//	::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+		if(each_end_flag)
+			::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 		copy_data_to_ptrpanel(TYPE_OUTPUT);
 		break;
 	case READWEEKLYROUTINE_T3000:
+		::PostMessage(m_weekly_dlg_hwnd,WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
 		copy_data_to_ptrpanel(TYPE_WEEKLY);
 		break;
 	case READANNUALROUTINE_T3000:
+		::PostMessage(m_annual_dlg_hwnd,WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 		copy_data_to_ptrpanel(TYPE_ANNUAL);
 		break;
 	case READTIMESCHEDULE_T3000:
 		::PostMessage(m_schedule_time_dlg_hwnd,WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
 		break;
 	case TIME_COMMAND:
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,TIME_COMMAND,NULL);
+		::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,TIME_COMMAND,NULL);
 		break;
 	case READANNUALSCHEDULE_T3000:
 		::PostMessage(m_schedule_day_dlg_hwnd,WM_REFRESH_BAC_DAY_CAL,NULL,NULL);
 		break;
 	case READCONTROLLER_T3000:
-		//::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+		::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
 		copy_data_to_ptrpanel(TYPE_ALL);
 		break;
 	case READSCREEN_T3000:
 		copy_data_to_ptrpanel(TYPE_ALL);
 		break;
 	case READALARM_T3000:
-		//::PostMessage(m_alarmlog_dlg_hwnd,WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
+		if(each_end_flag)
+			::PostMessage(m_alarmlog_dlg_hwnd,WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
 		break;
 	case READ_SETTING_COMMAND:
 		::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);	
@@ -3787,10 +3809,27 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 		memcpy(usDataPackage,buffer+4,nLen*sizeof(unsigned short));
 
 		DWORD nSerial=usDataPackage[0]+usDataPackage[1]*256+usDataPackage[2]*256*256+usDataPackage[3]*256*256*256;
+		int nproduct_id = usDataPackage[4];
+		CString nproduct_name = GetProductName(nproduct_id);
+		if(nproduct_name.CompareNoCase(_T("TStat")) == 0)	//如果产品号 没定义过，不认识这个产品 就exit;
+			return m_refresh_net_device_data.size();
+		
+		CString nip_address;
+		nip_address.Format(_T("%d.%d.%d.%d"),usDataPackage[6],usDataPackage[7],usDataPackage[8],usDataPackage[9]);
+
+		int nport = usDataPackage[10];
+		int nsw_version = usDataPackage[11];
+		int nhw_version = usDataPackage[12];
+			
 		int modbusID=usDataPackage[5];
 		//TRACE(_T("Serial = %u     ID = %d\r\n"),nSerial,modbusID);
-		g_Print.Format(_T("Refresh list :Serial = %u     ID = %d\r\n"),nSerial,modbusID);
+		g_Print.Format(_T("Refresh list :Serial = %u     ID = %d ,ip = %s  , Product name : %s"),nSerial,modbusID,nip_address ,nproduct_name);
 		DFTrace(g_Print);
+		temp.nport = nport;
+		temp.sw_version = nsw_version;
+		temp.hw_version = nhw_version;
+		temp.ip_address = nip_address;
+		temp.product_id = nproduct_id;
 		temp.modbusID = modbusID;
 		temp.nSerial = nSerial;
 
@@ -3849,7 +3888,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 	while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
 	{
 		time_out++;
-		if(time_out>20)
+		if(time_out>300)
 			bTimeOut = TRUE;
 		//if(pScanner->m_bStopScan)
 		//{
@@ -3965,12 +4004,13 @@ END_SCAN:
 		h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
 		h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
 
+#if 0
 		//SOCKADDR_IN siBind;
 		h_siBind.sin_family=AF_INET;
 		h_siBind.sin_addr.s_addr=INADDR_ANY;
 		h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
 		::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
-
+#endif
 	}
 	//pScanner->m_bNetScanFinish = TRUE; // 超时结束
 
@@ -4107,6 +4147,17 @@ int Open_MonitorDataBase(CString DataSource)
 	return ret;
 }
 
+bool Is_Bacnet_Device(unsigned short n_product_class_id)
+{
+	if((n_product_class_id == PM_CM5) ||
+		(n_product_class_id == PM_MINIPANEL))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool IP_is_Local(LPCTSTR ip_address)
 {
 
@@ -4199,6 +4250,21 @@ BOOL DirectoryExist(CString Path)
 	return ret;
 }
 
+
+BOOL Ping(const CString& strIP, CWnd* pWndEcho)
+{
+	CMyPing* pPing = new CMyPing;
+
+	pPing->SetPingEchoWnd(pWndEcho);
+	pPing->TestPing(strIP);
+
+
+	delete pPing;
+	pPing = NULL;
+	return FALSE;
+}
+
+
 BOOL CreateDirectory(CString path)
 {
 	SECURITY_ATTRIBUTES attrib;
@@ -4209,6 +4275,19 @@ BOOL CreateDirectory(CString path)
 	return CreateDirectory( path, &attrib);
 } 
 
+bool GetFileNameFromPath(CString ncstring,CString &cs_return)
+{
+	CStringArray ntemparray;
+	SplitCStringA(ntemparray,ncstring,_T("\\"));
+	int find_results = 0;
+	find_results = ntemparray.GetSize();
+	if(find_results>=2)
+	{
+		cs_return = ntemparray.GetAt(find_results - 1);
+		return true;
+	}
+	return false;
+}
 
 
 void DFTrace(LPCTSTR lpCString)
