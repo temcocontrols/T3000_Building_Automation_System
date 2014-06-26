@@ -113,7 +113,7 @@ int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t
 int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, int8_t ntotal_seg,int8_t nseg_index,MonitorUpdateData* up_data);
 int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance/*,int8_t entitysize*/ );
 
-int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data);
+int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag);
 void local_handler_conf_private_trans_ack(
 	uint8_t * service_request,
 	uint16_t service_len,
@@ -146,10 +146,13 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind);
 UINT RefreshNetWorkDeviceListByUDPFunc();
 //void DFTrace(CString &nCString);
 void DFTrace(LPCTSTR lpCString);
+bool GetFileNameFromPath(CString ncstring,CString &cs_return);
+BOOL Ping(const CString& strIP, CWnd* pWndEcho);
 int Open_MonitorDataBase(WCHAR *DataSource);
 void Send_WhoIs_remote_ip(CString ipaddress);
 int handle_read_monitordata(char *npoint,int nlength);
 bool IP_is_Local(LPCTSTR ip_address);
+bool Is_Bacnet_Device(unsigned short n_product_class_id);
 BOOL DirectoryExist(CString Path);
 BOOL CreateDirectory(CString path);
 DWORD WinExecAndWait( LPCTSTR lpszAppPath,LPCTSTR lpParameters,LPCTSTR lpszDirectory, 	DWORD dwMilliseconds);

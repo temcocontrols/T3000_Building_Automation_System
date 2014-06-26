@@ -218,10 +218,13 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 			MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(m_controller_data.at(i).input.number -1).label, 
 				(int)strlen((char *)m_Input_data.at(m_controller_data.at(i).input.number -1).label)+1, 
 				temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
-			temp_des2.ReleaseBuffer();		
-			if(temp_des2.GetLength()>9)
-				temp_des2.Format(_T("%d-IN%d"),m_controller_data.at(i).input.panel);
+			temp_des2.ReleaseBuffer();	
 
+			
+			if(temp_des2.GetLength()>9)
+				temp_des2.Format(_T("%d-IN%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number);
+			if(temp_des2.IsEmpty())
+				temp_des2.Format(_T("%d-IN%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number);
 
 			//temp_des3.Format(_T("%d"),m_Input_data.at(m_controller_data.at(i).input.number - 1).value);	
 			CString cstemp_value;
@@ -507,7 +510,10 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 			}
 			else
 			{
-				MessageBox(_T("Please input a effective label"),_T("Information"),MB_OK |MB_ICONINFORMATION);
+				CString temp_message;
+				temp_message.Format(_T("%s character not allowed in labels!"),cs_temp.GetString());
+				
+				MessageBox(temp_message,_T("Information"),MB_OK |MB_ICONINFORMATION);
 				m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
 				return 0;
 			}

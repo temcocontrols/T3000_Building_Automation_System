@@ -1929,7 +1929,7 @@ unsigned long timestart;
 
 CString bac_cs_mac;
 CString bac_cs_device_id;
-CString bac_cs_vendor_id;
+//CString bac_cs_vendor_id;
 
 HANDLE CM5_hThread = NULL;
 HANDLE CM5_UI_Thread;

@@ -1,5 +1,5 @@
 #pragma once
-
+#include "RelayLabel.h"
 
 const int NO_COMMAND = 0;
 const int START_AUTO_FLASH_COMMAND = 1;
@@ -126,6 +126,7 @@ const int DOWNLOAD_MD5_CHECK_PASS = 21;
 
 //const int BACNETIP_PORT =  47808;
 const int BACNETIP_PORT =  47809;
+const int TEMCO_SERVER_PORT = 31234;
 const int UDP_BROADCAST_PORT =1234;
 const int RECV_RESPONSE_PORT = 4321;
 #define UPD_BROADCAST_QRY_MSG 100
@@ -176,10 +177,15 @@ const int TYPE_WEEKLYCODE = 12;
 const int TYPE_ANNUALCODE = 13;
 const int TYPE_ALARMLOG = 14;
 const int TYPE_TSTAT = 15;
+const int TYPE_SETTING = 16;
 const int TYPE_READ_MONITOR_DATA = 17;
 
-const int DELETE_WINDOW_MSG = 200;
 
+
+
+const int DELETE_WINDOW_MSG = 200;
+const int START_BACNET_TIMER = 201;
+const int CONNECT_TO_MODBUS_FAILED = 202;
 
 const int BAC_READ_ALL_LIST = 255;
 const int BAC_READ_SVAE_CONFIG = 254;
@@ -277,7 +283,7 @@ const int BAC_TSTAT_GROUP = BAC_TSTAT_COUNT / BAC_READ_GROUP_NUMBER;
 const int BAC_SHOW_CONNECT_RESULTS = 1;
 const int BAC_SHOW_MISSION_RESULTS = 3;
 
-const int BAC_LIST_REFRESH_TIME = 10000;//ms
+const int BAC_LIST_REFRESH_TIME = 20000;//ms
 
 
 const int SCHEDULE_TIME_NUM = 0;
@@ -341,6 +347,11 @@ struct refresh_net_device
 {
 	DWORD nSerial;
 	int modbusID;
+	unsigned short product_id;
+	CString ip_address;
+	int nport;
+	float sw_version;
+	float hw_version;
 };
 
 struct _Refresh_Info 
@@ -571,11 +582,23 @@ const CString Output_Analog_Units_Array[] =
 	_T("0.0 -> 20   ma")
 };
 
+const CString Device_Serial_Port_Status[] =
+{
+	_T("Unused"),
+	_T("Bacnet MSTP"),
+	_T("Modbus Main Serial Port"),
+	_T("Bacnet PTP"),
+	_T("GSM"),
+	_T("Main Zigbee"),
+	_T("Sub Zigbee"),
+	_T("Modbus Sub Serial Port"),
+};
+
 const CString Variable_Analog_Units_Array[] = 
 {
 	_T("Unused"),
-	_T("deg.Celsius"),
-	_T("deg.Fahrenheit"),
+	_T("Deg.C"),
+	_T("Deg.F"),
 	_T("Feet per Min"),
 	_T("Pascals"),
 	_T("KPascals"),
@@ -609,7 +632,7 @@ const CString Variable_Analog_Units_Array[] =
 	_T("CMH"),
 };
 
-#include "RelayLabel.h"
+
 
 struct _Graphic_Value_Info
 {

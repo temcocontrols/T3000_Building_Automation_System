@@ -250,6 +250,7 @@ public:
 
 	void OnCheckIOPane();
 	void ScanTstatInDB(void);
+	void DeleteConflictInDB();
 	void SwitchToGraphicView();
 	void SetPaneConnectionPrompt(CString strInfo);
 	void OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult);
@@ -367,6 +368,7 @@ public:
 protected:
 	afx_msg LRESULT OnMbpollClosed(WPARAM wParam, LPARAM lParam);
 public:
+	CString					m_strPingIP;	
 	void ShowDebugWindow();
 	afx_msg void OnFunctionHumcalibration();
 	afx_msg void OnControlInputs();
@@ -397,6 +399,8 @@ public:
     afx_msg void OnUpdateDisconnect2(CCmdUI *pCmdUI);
     afx_msg void OnUpdateScanDevice(CCmdUI *pCmdUI);
     afx_msg void OnUpdateAddBuildingConfig(CCmdUI *pCmdUI);
+	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
+	void OnTestPing(const CString& strIP);
     UINT m_nStyle;
 	afx_msg void OnHelpUpdatefirmware();
 };

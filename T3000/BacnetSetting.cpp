@@ -26,28 +26,32 @@ void CBacnetSetting::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_TIME_PICKER, m_cm5_time_picker);
 	DDX_Control(pDX, IDC_DATE_PICKER, m_cm5_date_picker);
+	DDX_Control(pDX, IDC_COMBO_BACNET_SETTING_COM0, m_device_com0);
 }
 
 
 BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_MESSAGE(WM_FRESH_SETTING_UI,Fresh_Setting_UI)
 	ON_BN_CLICKED(IDC_BUTTON_BAC_TEST, &CBacnetSetting::OnBnClickedButtonBacTest)
-	ON_BN_CLICKED(IDC_BAC_ENABLE_EDIT_TIME, &CBacnetSetting::OnBnClickedBacEnableEditTime)
+	//ON_BN_CLICKED(IDC_BAC_ENABLE_EDIT_TIME, &CBacnetSetting::OnBnClickedBacEnableEditTime)
 	ON_NOTIFY(NM_KILLFOCUS, IDC_DATE_PICKER, &CBacnetSetting::OnNMKillfocusDatePicker)
 	ON_NOTIFY(NM_KILLFOCUS, IDC_TIME_PICKER, &CBacnetSetting::OnNMKillfocusTimePicker)
 	ON_NOTIFY(NM_SETFOCUS, IDC_DATE_PICKER, &CBacnetSetting::OnNMSetfocusDatePicker)
 	ON_NOTIFY(NM_SETFOCUS, IDC_TIME_PICKER, &CBacnetSetting::OnNMSetfocusTimePicker)
-	ON_BN_CLICKED(IDC_BTN_BAC_WRITE_TIME, &CBacnetSetting::OnBnClickedBtnBacWriteTime)
+	//ON_BN_CLICKED(IDC_BTN_BAC_WRITE_TIME, &CBacnetSetting::OnBnClickedBtnBacWriteTime)
 	ON_BN_CLICKED(IDC_BAC_SYNC_LOCAL_PC, &CBacnetSetting::OnBnClickedBtnBacSYNCTime)
 	ON_BN_CLICKED(IDC_RADIO_BAC_IP_AUTO, &CBacnetSetting::OnBnClickedBtnBacIPAuto)
 	ON_BN_CLICKED(IDC_RADIO_BAC_IP_STATIC, &CBacnetSetting::OnBnClickedBtnBacIPStatic)
 	ON_BN_CLICKED(IDC_BUTTON_BAC_IP_CHANGED, &CBacnetSetting::OnBnClickedBtnBacIPChange)
-	ON_BN_CLICKED(IDC_BUTTON_BAC_IP_CANCLE, &CBacnetSetting::OnBnClickedBtnBacIPCancle)
+	//ON_BN_CLICKED(IDC_BUTTON_BAC_IP_CANCLE, &CBacnetSetting::OnBnClickedBtnBacIPCancle)
 	ON_WM_TIMER()
-	ON_BN_CLICKED(IDC_BUTTON_REBOOT_DEVICE, &CBacnetSetting::OnBnClickedButtonRebootDevice)
-	ON_BN_CLICKED(IDC_BUTTON_RESET_TCPIP, &CBacnetSetting::OnBnClickedButtonResetTcpip)
+	//ON_BN_CLICKED(IDC_BUTTON_REBOOT_DEVICE, &CBacnetSetting::OnBnClickedButtonRebootDevice)
+	//ON_BN_CLICKED(IDC_BUTTON_RESET_TCPIP, &CBacnetSetting::OnBnClickedButtonResetTcpip)
 	ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
-	ON_BN_CLICKED(IDC_BUTTON_ERASE_FLASH, &CBacnetSetting::OnBnClickedButtonEraseFlash)
+	//ON_BN_CLICKED(IDC_BUTTON_ERASE_FLASH, &CBacnetSetting::OnBnClickedButtonEraseFlash)
+	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM0, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom0)
+	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM1, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom1)
+	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM2, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom2)
 END_MESSAGE_MAP()
 
 
@@ -83,7 +87,7 @@ void CBacnetSetting::OnBnClickedButtonBacTest()
 
 }
 
-
+#if 0
 void CBacnetSetting::OnBnClickedBacEnableEditTime()
 {
 	// TODO: Add your control notification handler code here
@@ -97,25 +101,26 @@ void CBacnetSetting::OnBnClickedBacEnableEditTime()
 	//	MessageBox(_T("111"));
 #if 1
 
-	static bool edit_status = false;
-	if(edit_status == false)
-	{
-		edit_status = true;
+	//static bool edit_status = false;
+	//if(edit_status == false)
+	//{
+	//	edit_status = true;
 		m_cm5_date_picker.EnableWindow(1);
 		m_cm5_time_picker.EnableWindow(1);
 		GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(1);
-		GetDlgItem(IDC_BAC_ENABLE_EDIT_TIME)->SetWindowTextW(_T("Disable Edit"));
-	}
-	else
-	{
-		edit_status = false;
-		m_cm5_date_picker.EnableWindow(0);
-		m_cm5_time_picker.EnableWindow(0);
-		GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(0);
-		GetDlgItem(IDC_BAC_ENABLE_EDIT_TIME)->SetWindowTextW(_T("Enable Edit"));
-	}
+		//GetDlgItem(IDC_BAC_ENABLE_EDIT_TIME)->SetWindowTextW(_T("Disable Edit"));
+	//}
+	//else
+	//{
+		//edit_status = false;
+		//m_cm5_date_picker.EnableWindow(0);
+		//m_cm5_time_picker.EnableWindow(0);
+		//GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(0);
+		//GetDlgItem(IDC_BAC_ENABLE_EDIT_TIME)->SetWindowTextW(_T("Enable Edit"));
+	//}
 #endif
 }
+#endif
 
 void CBacnetSetting::Get_Time_Edit_By_Control()
 {
@@ -169,7 +174,8 @@ void CBacnetSetting::OnNMKillfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult)
 void CBacnetSetting::OnNMSetfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	// TODO: Add your control notification handler code here
-	GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
+	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
+	Get_Time_Edit_By_Control();
 	*pResult = 0;
 }
 
@@ -177,7 +183,8 @@ void CBacnetSetting::OnNMSetfocusDatePicker(NMHDR *pNMHDR, LRESULT *pResult)
 void CBacnetSetting::OnNMSetfocusTimePicker(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	// TODO: Add your control notification handler code here
-	GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
+	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
+	Get_Time_Edit_By_Control();
 	*pResult = 0;
 }
 
@@ -204,7 +211,7 @@ void CBacnetSetting::OnBnClickedBtnBacSYNCTime()
 	//m_cm5_date_picker.SetFormat(_T("YY/MM/DD"));
 	m_cm5_date_picker.SetTime(&TimeTemp);
 
-	GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
+	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(TRUE);
 	Get_Time_Edit_By_Control();
 
 }
@@ -265,10 +272,10 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
 }
 
-void CBacnetSetting::OnBnClickedBtnBacIPCancle()
-{
-	PostMessage(WM_FRESH_CM_LIST,READ_SETTING_COMMAND,NULL);
-}
+//void CBacnetSetting::OnBnClickedBtnBacIPCancle()
+//{
+//	PostMessage(WM_FRESH_CM_LIST,READ_SETTING_COMMAND,NULL);
+//}
 
 
 
@@ -279,25 +286,19 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	CString temp_cs;
 	int temp_year;
 	CTime	TimeTemp;
-	CString temp_hw_version = _T("Unknow");
-	CString temp_mcu_version = _T("Unknow");
-	CString temp_pic_version = _T("Unknow");
-	CString temp_c8051_version = _T("Unknow");
-	CString temp_5964_version = _T("Unknow");
-	CString temp_bootloader_version = _T("Unknow");
+	CString temp_hw_version = _T("Unkown");
+	CString temp_mcu_version = _T("Unkown");
+	CString temp_pic_version = _T("Unkown");
+	CString temp_c8051_version = _T("Unkown");
+	CString temp_5964_version = _T("Unkown");
+	CString temp_bootloader_version = _T("Unkown");
+
+	
+
 	switch(command_type)
 	{
 	case READ_SETTING_COMMAND:
-		if(Device_time.year<2000)
-			temp_year = Device_time.year + 2000;
-		TimeTemp = CTime(temp_year,Device_time.month,Device_time.dayofmonth,Device_time.ti_hour,Device_time.ti_min,Device_time.ti_sec);
 
-
-		m_cm5_time_picker.SetFormat(_T("HH:mm"));
-		m_cm5_time_picker.SetTime(&TimeTemp);
-
-		//m_cm5_date_picker.SetFormat(_T("YY/MM/DD"));
-		m_cm5_date_picker.SetTime(&TimeTemp);
 
 		((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->SetAddress(Device_Basic_Setting.reg.ip_addr[0],
 			Device_Basic_Setting.reg.ip_addr[1],Device_Basic_Setting.reg.ip_addr[2],Device_Basic_Setting.reg.ip_addr[3]);
@@ -325,6 +326,47 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 
 		if(bacnet_device_type == PRODUCT_CM5)
 		{
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->EnableWindow(FALSE);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->EnableWindow(FALSE);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->EnableWindow(FALSE);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->SetWindowTextW(Device_Serial_Port_Status[SUB_MODBUS]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->SetWindowTextW(Device_Serial_Port_Status[MAIN_MODBUS]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->SetWindowTextW(Device_Serial_Port_Status[NOUSE]);
+		}
+		else if((bacnet_device_type == BIG_MINIPANEL) || (bacnet_device_type == SMALL_MINIPANEL))
+		{
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->ResetContent();
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[NOUSE]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[MAIN_PTP]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[MAIN_ZIG]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[SUB_ZIG]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[SUB_GSM]);
+
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->ResetContent();
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[NOUSE]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[MAIN_MSTP]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[MAIN_MODBUS]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->AddString(Device_Serial_Port_Status[SUB_MODBUS]);
+
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->ResetContent();
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[NOUSE]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[MAIN_MSTP]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[MAIN_MODBUS]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->AddString(Device_Serial_Port_Status[SUB_MODBUS]);
+
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->EnableWindow(TRUE);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->EnableWindow(TRUE);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->EnableWindow(TRUE);
+			if(Device_Basic_Setting.reg.com0_config < MAX_COM_TYPE)
+				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->SetWindowTextW(Device_Serial_Port_Status[Device_Basic_Setting.reg.com0_config]);
+			if(Device_Basic_Setting.reg.com1_config < MAX_COM_TYPE)
+				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->SetWindowTextW(Device_Serial_Port_Status[Device_Basic_Setting.reg.com1_config]);
+			if(Device_Basic_Setting.reg.com2_config < MAX_COM_TYPE)
+				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->SetWindowTextW(Device_Serial_Port_Status[Device_Basic_Setting.reg.com2_config]);
+		}
+
+		if(bacnet_device_type == PRODUCT_CM5)
+		{
 			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("CM5"));
 		}
 		else if(bacnet_device_type == BIG_MINIPANEL)
@@ -337,7 +379,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
-			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("Unknow device"));
+			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("Unkown device"));
 		}
 
 		if((Device_Basic_Setting.reg.mini_type == 1) || (Device_Basic_Setting.reg.mini_type == 2))
@@ -356,6 +398,26 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 		((CEdit *)GetDlgItem(IDC_STATIC_SEETING_SM5964_VERSION2))->SetWindowTextW(temp_5964_version);
 		((CEdit *)GetDlgItem(IDC_STATIC_SEETING_BOOTLOADER_VERSION))->SetWindowTextW(temp_bootloader_version);
 		
+
+
+		break;
+	case TIME_COMMAND:
+		{
+			#pragma  region about_time
+			if(Device_time.year<2000)
+				temp_year = Device_time.year + 2000;
+			if((Device_time.month == 0) || (Device_time.dayofmonth == 0))
+				return 1;
+			TimeTemp = CTime(temp_year,Device_time.month,Device_time.dayofmonth,Device_time.ti_hour,Device_time.ti_min,Device_time.ti_sec);
+
+
+			m_cm5_time_picker.SetFormat(_T("HH:mm"));
+			m_cm5_time_picker.SetTime(&TimeTemp);
+
+			//m_cm5_date_picker.SetFormat(_T("YY/MM/DD"));
+			m_cm5_date_picker.SetTime(&TimeTemp);
+			#pragma endregion about_time
+		}
 		break;
 	default: 
 		break;
@@ -375,10 +437,10 @@ BOOL CBacnetSetting::OnInitDialog()
 	// TODO:  Add extra initialization here
 	m_setting_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_setting_dlg_hwnd;
-	m_cm5_date_picker.EnableWindow(0);
-	m_cm5_time_picker.EnableWindow(0);
-	GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(0);
-	GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(FALSE);
+	m_cm5_date_picker.EnableWindow(1);
+	m_cm5_time_picker.EnableWindow(1);
+	GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->EnableWindow(1);
+	//GetDlgItem(IDC_BTN_BAC_WRITE_TIME)->EnableWindow(FALSE);
 	m_cm5_time_picker.SetFormat(_T("HH:mm"));
 
 	HICON hIcon = NULL; 
@@ -387,9 +449,9 @@ BOOL CBacnetSetting::OnInitDialog()
 	hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_OK), IMAGE_ICON, 24, 24, 0); 
 	((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CHANGED))->SetIcon(hIcon);
 
-	hInstResource = AfxFindResourceHandle(MAKEINTRESOURCE(IDI_ICON_EXIT), RT_GROUP_ICON); 
-	hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_EXIT), IMAGE_ICON, 24, 24, 0); 
-	((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CANCLE))->SetIcon(hIcon);
+	//hInstResource = AfxFindResourceHandle(MAKEINTRESOURCE(IDI_ICON_EXIT), RT_GROUP_ICON); 
+	//hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_EXIT), IMAGE_ICON, 24, 24, 0); 
+	//((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CANCLE))->SetIcon(hIcon);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -417,21 +479,16 @@ void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 	CDialogEx::OnTimer(nIDEvent);
 }
 
-
+#if 0
 void CBacnetSetting::OnBnClickedButtonRebootDevice()
 {
 	// TODO: Add your control notification handler code here
-	//Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RESET_REGISTER,77,0,this->m_hWnd,NULL,_T("Reboot Device"));
-	//if(GetCommunicationHandle() == NULL)
-	//{
-
-	//	CreateThread(NULL,NULL,ConnectToDevice,NULL,NULL,NULL);
-	//}
-	
-
-
-
-	write_one(g_tstat_id,RESET_REGISTER,SPECIAL_COMMAND_REBOOT);
+	CString temp_results;
+	if(write_one(g_tstat_id,RESET_REGISTER,SPECIAL_COMMAND_REBOOT))
+	{
+		temp_results.Format(_T("Send reboot command to device success!"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_results);
+	}
 }
 
 
@@ -439,13 +496,24 @@ void CBacnetSetting::OnBnClickedButtonResetTcpip()
 {
 	// TODO: Add your control notification handler code here
 	write_one(g_tstat_id,RESET_REGISTER,SPECIAL_COMMAND_RESET_TCP);
+
 }
 
 void CBacnetSetting::OnBnClickedButtonEraseFlash()
 {
 	// TODO: Add your control notification handler code here
-	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RESET_REGISTER,SPECIAL_COMMAND_ERASE_FLASH,0,this->m_hWnd,NULL,_T("Erase Flash"));
+	CString temp_results;
+	if(write_one(g_tstat_id,RESET_REGISTER,SPECIAL_COMMAND_ERASE_FLASH))
+	{
+		temp_results.Format(_T("Send erase command to device success!"));	
+	}
+	else
+	{
+		temp_results.Format(_T("Send erase command to device failed!"));	
+	}
+	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_results);
 }
+#endif
 
 
 
@@ -483,3 +551,77 @@ LRESULT  CBacnetSetting::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 }
 
 
+
+
+void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom0()
+{
+	// TODO: Add your control notification handler code here
+	UpdateData();
+	CString temp_string;
+	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->GetCurSel();	
+	m_device_com0.GetLBText(nSel,temp_string);
+
+
+	for(int i=0;i<MAX_COM_TYPE;i++)
+	{
+		if(temp_string.CompareNoCase(Device_Serial_Port_Status[i]) == 0 )
+		{
+			Device_Basic_Setting.reg.com0_config = i;
+			break;
+		}
+	}
+	CString temp_task_info;
+	temp_task_info.Format(_T("Change serial port 0 "));
+	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+}
+
+
+void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom1()
+{
+	// TODO: Add your control notification handler code here
+
+	CString temp_string;
+	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->GetCurSel();	
+	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->GetLBText(nSel,temp_string);
+	for(int i=0;i<MAX_COM_TYPE;i++)
+	{
+		if(temp_string.CompareNoCase(Device_Serial_Port_Status[i]) == 0 )
+		{
+			Device_Basic_Setting.reg.com1_config = i;
+			break;
+		}
+	}
+	CString temp_task_info;
+	temp_task_info.Format(_T("Change serial port 1 "));
+	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+}
+
+
+void CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom2()
+{
+	// TODO: Add your control notification handler code here
+
+	CString temp_string;
+	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->GetCurSel();	
+	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->GetLBText(nSel,temp_string);
+	for(int i=0;i<MAX_COM_TYPE;i++)
+	{
+		if(temp_string.CompareNoCase(Device_Serial_Port_Status[i]) == 0 )
+		{
+			Device_Basic_Setting.reg.com2_config = i;
+			break;
+		}
+	}
+	CString temp_task_info;
+	temp_task_info.Format(_T("Change serial port 2 "));
+	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+}
+
+
+
+void CBacnetSetting::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	//CDialogEx::OnCancel();
+}

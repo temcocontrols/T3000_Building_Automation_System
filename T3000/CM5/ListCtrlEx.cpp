@@ -1027,6 +1027,7 @@ void CListCtrlEx::DrawNormal(CDC *pDC, CString &strText, CRect &rcCell, BOOL bSe
 	{
 		nFormat=DT_RIGHT;
 	}
+	nFormat = DT_LEFT;//老毛要求的 靠左显示;
 
 	COLORREF crOldText=pDC->SetTextColor(crText);
 	rcText.left=rcIcon.right+3;
@@ -1284,6 +1285,7 @@ void CListCtrlEx::DrawEditBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL b
 #else
 #endif	
 	//------------draw text---------------------/
+
 	UINT nFormat=DT_CENTER;
 	switch(uLvcFmt)
 	{
@@ -1292,6 +1294,8 @@ void CListCtrlEx::DrawEditBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL b
 	case LVCFMT_LEFT: nFormat=DT_LEFT; break;
 	case LVCFMT_RIGHT: nFormat=DT_RIGHT; break;
 	}
+	nFormat = DT_LEFT;//老毛要求的 靠左显示;
+
 	COLORREF crOldText=pDC->SetTextColor(crText);
 	if (!cellData.GetEnable())
 	{

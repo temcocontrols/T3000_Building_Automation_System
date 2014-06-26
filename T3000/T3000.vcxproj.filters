@@ -498,7 +498,7 @@
     <ClCompile Include="WhichOneToChooseDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-        <ClCompile Include="Class\md5.cpp">
+    <ClCompile Include="Class\md5.cpp">
       <Filter>ClassInfo</Filter>
     </ClCompile>
     <ClCompile Include="Class\MulitithreadSocket.cpp">
@@ -515,6 +515,9 @@
     </ClCompile>
     <ClCompile Include="T3000DefaultView.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ISP\MyPing.cpp">
+      <Filter>ClassInfo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1208,7 +1211,7 @@
     <ClInclude Include="DownloadSocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-       <ClInclude Include="Class\md5.h">
+    <ClInclude Include="Class\md5.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Flash_Multy.h">

@@ -743,7 +743,7 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
 	if(g_Commu_type==0)
 		return false;
 
-	int nNetTimeout=3000;//1 second.
+	int nNetTimeout=2000;//1 second.
 	WSADATA wsaData;
 	WORD sockVersion = MAKEWORD(2, 2);
 	
@@ -759,8 +759,8 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
 		m_hSocket=NULL;
 		return FALSE;
 	}
-
-	m_hSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	int sockfd;
+	sockfd = m_hSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if(m_hSocket == INVALID_SOCKET)
 	{
 	//	AfxMessageBox(_T("Create socket failed!"));
@@ -775,6 +775,8 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
 	//pTemp=W2A(strIPAdress);     
     
 
+
+
 	//servAddr.sin_addr.S_un.S_addr =inet_addr("192.168.0.28");
 //	servAddr.sin_addr.S_un.S_addr =inet_addr((LPSTR)(LPCTSTR)strIPAdress);
 		servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
@@ -784,6 +786,54 @@ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
 	setsockopt(m_hSocket,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
 	//接收时限
 	setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
+
+	//****************************************************************************
+	// Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 ，老毛受不了。
+	//改为非阻塞的 2.5秒后还没连接上就 算连接失败;
+	int error = -1;int len;
+	len = sizeof(int);
+	timeval tm;
+	fd_set set;
+	unsigned long ul = 1;
+	ioctlsocket(m_hSocket, FIONBIO, &ul); //设置为非阻塞模式
+	bool ret = false;
+	if( connect(m_hSocket, (struct sockaddr *)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
+	{
+		tm.tv_sec = 3;//4.5s 如果连接不上就 算失败 ，不要重新retry了;
+		tm.tv_usec = 500;
+		FD_ZERO(&set);
+		FD_SET(sockfd, &set);
+		if( select(sockfd+1, NULL, &set, NULL, &tm) > 0)
+		{
+			getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (char *)&error, (socklen_t *)&len);
+			if(error == 0) 
+			{
+				ret = true;
+			}
+			else 
+				ret = false;
+		} 
+		else
+		{
+			ret = false;
+		}
+	}
+	else ret = true;
+	ul = 0;
+	ioctlsocket(sockfd, FIONBIO, &ul); //设置为阻塞模式
+	//****************************************************************************
+
+	if(ret)
+	{
+		last_connected_ip = strIPAdress;
+		last_connected_port = nPort;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
 	if(::connect(m_hSocket,(sockaddr*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
 	{
 		DWORD dwErr = WSAGetLastError();

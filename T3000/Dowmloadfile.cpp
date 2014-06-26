@@ -73,8 +73,9 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		//m_download_info.AddString(retmessage);
 		m_download_info.InsertString(m_download_info.GetCount(),retmessage);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+		if(Downloadfile_Thread == NULL)
+			Downloadfile_Thread = CreateThread(NULL,NULL,DownLoadFileProcess,this,NULL, &download_threadid);
 
-		Downloadfile_Thread = CreateThread(NULL,NULL,DownLoadFileProcess,this,NULL, &download_threadid);
 	}
 	else if(ncommand == DOWNLOAD_DISCONNEC)
 	{
@@ -100,9 +101,12 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 	else if(ncommand == DOWNLOAD_CLOSE_SOCKET)
 	{
 		TCP_File_Socket.Close();
-		GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
+		
 		if(TCP_File_Socket.GetDownloadResults() == DOWNLOAD_RESULTS_FAILED)
+		{
+			GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
 			return 0;
+		}
 		
 		CString ApplicationFolder;
 		GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
@@ -237,6 +241,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 	}
 	else if(ncommand == DOWNLOAD_RESULTS/*DOWNLOAD_RESULTS*/)
 	{
+		GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
 		KillTimer(1);
 		int ret_results =  GetPrivateProfileInt(_T("Data"),_T("Command"),0,AutoFlashConfigPath);
 		CString ret_message;
@@ -260,7 +265,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			break;
 		case FAILED_UNKNOW_ERROR:
 			{
-				ret_message.Format(_T("Unknow error! More details please reference Log_info.txt !"));
+				ret_message.Format(_T("Unkown error! More details please reference Log_info.txt !"));
 				//m_download_info.AddString(complete_message);
 				m_download_info.InsertString(m_download_info.GetCount(),ret_message);
 				m_download_info.SetTopIndex(m_download_info.GetCount()-1);
@@ -315,7 +320,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			break;
 		default:
 			{
-				show_error_message.Format(_T("Unknow error,please try again later!"));
+				show_error_message.Format(_T("Unkown error,please try again later!"));
 			}
 			break;
 
@@ -331,6 +336,7 @@ DWORD WINAPI  Dowmloadfile::isp_thread(LPVOID lpVoid)
 	//Write_Config_Info
 	Dowmloadfile *pParent = (Dowmloadfile *)lpVoid;
 	WinExecAndWait(ISPtool_path,NULL,NULL,0);
+
 	::PostMessage(downloadfile_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_RESULTS,NULL);
 	return 0;
 }
@@ -349,6 +355,7 @@ unsigned char Add_CRC(char *point , int nlength)
 DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 {
 	Dowmloadfile *mparent = (Dowmloadfile *)lpVoid;
+	int retry_time = 0;
 	//int retry_send_
 	char sendbuffer[1000];
 	while(download_thread_flag)
@@ -358,6 +365,14 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 		{
 		case SEND_DOWNLOAD_COMMAND:
 			{
+				if(retry_time>10)
+				{
+					mparent->TCP_File_Socket.SetDownloadResults(DOWNLOAD_RESULTS_FAILED);
+					download_step = THREAD_IDLE;
+					continue;
+				}
+				retry_time ++;
+
 				Download_Info temp_info;
 				temp_info.HEAD_1 = 0x55;
 				temp_info.HEAD_2 = 0xff;
@@ -376,6 +391,7 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 				{
 					if(download_step!= SEND_DOWNLOAD_COMMAND)
 					{
+						retry_time = 0;
 						current_package = 1;
 						break;
 					}
@@ -386,6 +402,14 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 			}
 		case SEND_GET_MD5_VALUE:
 			{
+				if(retry_time>10)
+				{
+					mparent->TCP_File_Socket.SetDownloadResults(DOWNLOAD_RESULTS_FAILED);
+					download_step = THREAD_IDLE;
+					continue;
+				}
+				retry_time ++;
+
 				Black_head_struct temp_info;
 				temp_info.HEAD_1 = 0x55;
 				temp_info.HEAD_2 = 0xff;
@@ -400,6 +424,7 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 					if(download_step!= SEND_GET_MD5_VALUE)
 					{
 						current_package = 1;
+						retry_time = 0;
 						break;
 					}
 					Sleep(1);
@@ -453,6 +478,14 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 			break;
 		case START_SEND_WANT_PACKAGE:
 			{
+				if(retry_time>10)
+				{
+					mparent->TCP_File_Socket.SetDownloadResults(DOWNLOAD_RESULTS_FAILED);
+					download_step = THREAD_IDLE;
+					continue;
+				}
+				retry_time ++;
+
 				File_Package_Struct temp_struct;
 				temp_struct.HEAD_1 = 0x55;
 				temp_struct.HEAD_2 = 0xff;
@@ -470,7 +503,7 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 					if(download_step!= START_SEND_WANT_PACKAGE)
 					{
 						int npersent = (current_package * 100) / totalpackage;
-
+						retry_time = 0;
 						::PostMessage(downloadfile_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_PERSENT,npersent);
 						break;
 					}
@@ -541,6 +574,7 @@ DWORD WINAPI   Dowmloadfile::DownLoadFileProcess(LPVOID lpVoid)
 				//mparent->TCP_File_Socket.Close();
 				::PostMessage(downloadfile_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_CLOSE_SOCKET,NULL);
 				Downloadfile_Thread = NULL;
+				retry_time = 0;
 				Sleep(1000);
 				return 0;
 			}
@@ -646,7 +680,7 @@ void Dowmloadfile::OnBnClickedButtonStartDownload()
 
 
 
-	TCP_File_Socket.Connect(Connect_ip,31234);
+	TCP_File_Socket.Connect(Connect_ip,TEMCO_SERVER_PORT);
 
 	const BOOL bReuseaddr=TRUE;
 	const BOOL bDontLinger = FALSE; 
@@ -702,7 +736,6 @@ BOOL Dowmloadfile::IsNetDevice(int DevType)
 	return FALSE;
 }
 
-
 void Dowmloadfile::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
@@ -740,6 +773,5 @@ void Dowmloadfile::OnTimer(UINT_PTR nIDEvent)
 		WritePrivateProfileStringW(_T("LogInfo"),_T("Replace_Refresh"),_T("0"),AutoFlashConfigPath);	
 
 	}
-	//UpdateData(FALSE);
 	CDialogEx::OnTimer(nIDEvent);
 }

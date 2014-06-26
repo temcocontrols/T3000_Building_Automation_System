@@ -25,6 +25,13 @@ typedef enum
 //OUT=0,IN, VAR, CON, WRT, AR, PRG, TBL, TZ, AMON, GRP, ARRAY, ALARMM,UNIT, USER_NAME, ALARM_SET, WR_TIME, AR_DATA
 //}Point_type_equate;
 
+enum
+{
+	INPUT_OK,
+	INPUT_NOUSE,
+	INPUT_SHORT
+};
+
 typedef enum { 
 		 READOUTPUT_T3000          = ENUM_OUT+1,  /* read outputs */
 		 READINPUT_T3000           = ENUM_IN+1,   /* read inputs  */
@@ -676,6 +683,8 @@ typedef struct
 	uint8_t frimware2_rev; // C8051
 	uint8_t frimware3_rev; // SM5964
 	uint8_t bootloader_rev;
+
+	uint8_t no_used[10];
 }Str_Pro_Info;
 
 typedef union
@@ -691,8 +700,19 @@ typedef union
 		uint8_t mini_type;
 		uint8_t debug;
 		Str_Pro_Info   pro_info;
+		uint8_t com0_config;
+		uint8_t com1_config;
+		uint8_t com2_config;
+
+		uint8_t refresh_flash_timer;
+		uint8_t en_plug_n_play;
 	}reg;
 }Str_Setting_Info;
+
+typedef enum
+{
+	NOUSE,MAIN_MSTP,MAIN_MODBUS,MAIN_PTP,SUB_GSM,MAIN_ZIG,SUB_ZIG,SUB_MODBUS,MAX_COM_TYPE
+};
 
 typedef struct
 {

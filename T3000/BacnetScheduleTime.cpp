@@ -136,7 +136,7 @@ void CBacnetScheduleTime::Initial_List()
 		temp_item.Format(_T("OFF"),i+1);
 		m_schedule_time_list.InsertItem(i,temp_item);
 	}
-	CTime TimeTemp(2013,1,1,0,0,0);
+	CTime TimeTemp(2014,1,1,0,0,0);
 
 	m_schedual_time_picker.SetFormat(_T("HH:mm"));
 	m_schedual_time_picker.SetTime(&TimeTemp);
@@ -255,7 +255,7 @@ void CBacnetScheduleTime::OnNMClickListScheduleTime(NMHDR *pNMHDR, LRESULT *pRes
 	m_schedual_time_picker.BringWindowToTop();
 	m_schedual_time_picker.MoveWindow(myrect);
 
-	CTime TimeTemp(2013,1,1,temp_hour,temp_minute,0);
+	CTime TimeTemp(2014,1,1,temp_hour,temp_minute,0);
 
 	m_schedual_time_picker.SetFormat(_T("HH:mm"));
 	m_schedual_time_picker.SetTime(&TimeTemp);

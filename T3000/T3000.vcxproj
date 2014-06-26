@@ -120,6 +120,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\ISP\MyPing.cpp" />
     <ClCompile Include="5EInputDialog.cpp" />
     <ClCompile Include="AddBuilding.cpp" />
     <ClCompile Include="AfxMessageDialog.cpp" />

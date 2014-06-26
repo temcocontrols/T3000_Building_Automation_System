@@ -768,7 +768,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						if((Bacnet_Refresh_Info.Read_Tstat_Info[i].resend_count>RESEND_COUNT) 
 							|| (Bacnet_Refresh_Info.Read_Tstat_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 						{
-							m_wait_detail.SetWindowTextW(_T("Read Tstats table Time Out!"));
+							//m_wait_detail.SetWindowTextW(_T("Read Tstats table Time Out!"));
+							m_wait_persent.SetWindowTextW(_T("Timeout"));
 							KillTimer(1);
 							SetTimer(2,2000,NULL);
 							goto endthis;
@@ -794,9 +795,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 
 
-						TRACE(_T("TSTATS Resend start = %d , Resend end = %d\r\n"),
-							Bacnet_Refresh_Info.Read_Tstat_Info[i].start_instance,
-							Bacnet_Refresh_Info.Read_Tstat_Info[i].end_instance);
+						//TRACE(_T("TSTATS Resend start = %d , Resend end = %d\r\n"),
+						//	Bacnet_Refresh_Info.Read_Tstat_Info[i].start_instance,
+						//	Bacnet_Refresh_Info.Read_Tstat_Info[i].end_instance);
 
 
 					}
@@ -835,7 +836,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					if((Bacnet_Refresh_Info.Read_Monitor_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Monitor_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read Monitor table Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read Monitor table Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -861,9 +863,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 
 
-					TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_Monitor_Info[i].start_instance,
-						Bacnet_Refresh_Info.Read_Monitor_Info[i].end_instance);
+					//TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_Monitor_Info[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_Monitor_Info[i].end_instance);
 					
 
 				}
@@ -901,7 +903,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					if((Bacnet_Refresh_Info.Read_Screen_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Screen_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read Screen table Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read Screen table Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -927,9 +930,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 
 
-					TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_Screen_Info[i].start_instance,
-						Bacnet_Refresh_Info.Read_Screen_Info[i].end_instance);
+					//TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_Screen_Info[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_Screen_Info[i].end_instance);
 					
 
 				}
@@ -967,7 +970,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						if((Bacnet_Refresh_Info.Read_Controller_Info[i].resend_count>RESEND_COUNT) 
 							|| (Bacnet_Refresh_Info.Read_Controller_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read Controller table Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read Controller table Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -993,9 +997,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 
 
-					TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_Controller_Info[i].start_instance,
-						Bacnet_Refresh_Info.Read_Controller_Info[i].end_instance);
+					//TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_Controller_Info[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_Controller_Info[i].end_instance);
 
 
 				}
@@ -1033,7 +1037,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					if((Bacnet_Refresh_Info.Read_Time_Command[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Time_Command[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read Device Time table Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read Device Time table Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -1058,9 +1063,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 
 
-					TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_Time_Command[i].start_instance,
-						Bacnet_Refresh_Info.Read_Time_Command[i].end_instance);
+					//TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_Time_Command[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_Time_Command[i].end_instance);
 
 
 				}
@@ -1100,7 +1105,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					if((Bacnet_Refresh_Info.Read_BasicSetting_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_BasicSetting_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read Basic Setting Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read Basic Setting Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -1125,9 +1131,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 
 
-					TRACE(_T("Read basic setting Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].start_instance,
-						Bacnet_Refresh_Info.Read_BasicSetting_Info[i].end_instance);
+					//TRACE(_T("Read basic setting Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_BasicSetting_Info[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_BasicSetting_Info[i].end_instance);
 
 
 				}
@@ -1168,7 +1174,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					if((Bacnet_Refresh_Info.Read_Annual_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Annual_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read Annual Table Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read Annual Table Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -1197,9 +1204,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-					TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_Annual_Info[i].start_instance,
-						Bacnet_Refresh_Info.Read_Annual_Info[i].end_instance);
+					//TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_Annual_Info[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_Annual_Info[i].end_instance);
 
 
 				}
@@ -1238,7 +1245,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					if((Bacnet_Refresh_Info.Read_Weekly_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Weekly_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read Weekly Routine Table Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read Weekly Routine Table Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -1267,9 +1275,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-					TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_Weekly_Info[i].start_instance,
-						Bacnet_Refresh_Info.Read_Weekly_Info[i].end_instance);
+					//TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_Weekly_Info[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_Weekly_Info[i].end_instance);
 
 
 				}
@@ -1305,7 +1313,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					if((Bacnet_Refresh_Info.Read_Program_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Program_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read input Table Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read input Table Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -1334,9 +1343,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-					TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_Program_Info[i].start_instance,
-						Bacnet_Refresh_Info.Read_Program_Info[i].end_instance);
+					//TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_Program_Info[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_Program_Info[i].end_instance);
 
 
 				}
@@ -1372,7 +1381,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					if((Bacnet_Refresh_Info.Read_AlarmLog_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_AlarmLog_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read Alarm Log Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read Alarm Log Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -1400,9 +1410,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-					TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance,
-						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].end_instance);
+					//TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_AlarmLog_Info[i].end_instance);
 
 
 				}
@@ -1434,7 +1444,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				if((Bacnet_Refresh_Info.Read_Programcode_Info[program_list_line].resend_count>RESEND_COUNT) 
 					|| (Bacnet_Refresh_Info.Read_Programcode_Info[program_list_line].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 				{
-					m_wait_detail.SetWindowTextW(_T("Read Program Code Time Out!"));
+					//m_wait_detail.SetWindowTextW(_T("Read Program Code Time Out!"));
+					m_wait_persent.SetWindowTextW(_T("Timeout"));
 					KillTimer(1);
 					SetTimer(2,2000,NULL);
 					goto endthis;
@@ -1462,9 +1473,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 				//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-				TRACE(_T("Program code Resend start = %d , Resend end = %d\r\n"),
-					Bacnet_Refresh_Info.Read_Programcode_Info[program_list_line].start_instance,
-					Bacnet_Refresh_Info.Read_Programcode_Info[program_list_line].end_instance);
+				//TRACE(_T("Program code Resend start = %d , Resend end = %d\r\n"),
+				//	Bacnet_Refresh_Info.Read_Programcode_Info[program_list_line].start_instance,
+				//	Bacnet_Refresh_Info.Read_Programcode_Info[program_list_line].end_instance);
 
 
 			}
@@ -1498,7 +1509,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						if((Bacnet_Refresh_Info.Read_Programcode_Info[i].resend_count>RESEND_COUNT) 
 							|| (Bacnet_Refresh_Info.Read_Programcode_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 						{
-							m_wait_detail.SetWindowTextW(_T("Read Program Code Time Out!"));
+							//m_wait_detail.SetWindowTextW(_T("Read Program Code Time Out!"));
+							m_wait_persent.SetWindowTextW(_T("Timeout"));
 							KillTimer(1);
 							SetTimer(2,2000,NULL);
 							goto endthis;
@@ -1527,9 +1539,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 						//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-						TRACE(_T("Program code Resend start = %d , Resend end = %d\r\n"),
-							Bacnet_Refresh_Info.Read_Programcode_Info[i].start_instance,
-							Bacnet_Refresh_Info.Read_Programcode_Info[i].end_instance);
+						//TRACE(_T("Program code Resend start = %d , Resend end = %d\r\n"),
+						//	Bacnet_Refresh_Info.Read_Programcode_Info[i].start_instance,
+						//	Bacnet_Refresh_Info.Read_Programcode_Info[i].end_instance);
 
 
 					}
@@ -1627,7 +1639,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				if((Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].resend_count>RESEND_COUNT) 
 					|| (Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 				{
-					m_wait_detail.SetWindowTextW(_T("Read Weekly Schedule Time Out!"));
+					//m_wait_detail.SetWindowTextW(_T("Read Weekly Schedule Time Out!"));
+					m_wait_persent.SetWindowTextW(_T("Timeout"));
 					KillTimer(1);
 					SetTimer(2,2000,NULL);
 					goto endthis;
@@ -1655,9 +1668,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 				//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-				TRACE(_T("Program code Resend start = %d , Resend end = %d\r\n"),
-					Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].start_instance,
-					Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].end_instance);
+				//TRACE(_T("Program code Resend start = %d , Resend end = %d\r\n"),
+				//	Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].start_instance,
+				//	Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].end_instance);
 
 
 			}
@@ -1691,7 +1704,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					if((Bacnet_Refresh_Info.Read_Weeklycode_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Weeklycode_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read weekly schedule Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read weekly schedule Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -1720,9 +1734,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-					TRACE(_T("Weekly schedule time Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_Weeklycode_Info[i].start_instance,
-						Bacnet_Refresh_Info.Read_Weeklycode_Info[i].end_instance);
+					//TRACE(_T("Weekly schedule time Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_Weeklycode_Info[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_Weeklycode_Info[i].end_instance);
 
 
 				}
@@ -1753,7 +1767,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				if((Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].resend_count>RESEND_COUNT) 
 					|| (Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 				{
-					m_wait_detail.SetWindowTextW(_T("Read annual day Time Out!"));
+					//m_wait_detail.SetWindowTextW(_T("Read annual day Time Out!"));
+					m_wait_persent.SetWindowTextW(_T("Timeout"));
 					KillTimer(1);
 					SetTimer(2,2000,NULL);
 					goto endthis;
@@ -1781,9 +1796,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 				//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-				TRACE(_T("Program code Resend start = %d , Resend end = %d\r\n"),
-					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].start_instance,
-					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].end_instance);
+				//TRACE(_T("Program code Resend start = %d , Resend end = %d\r\n"),
+				//	Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].start_instance,
+				//	Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].end_instance);
 
 
 			}
@@ -1817,7 +1832,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					if((Bacnet_Refresh_Info.Read_Annualcode_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Annualcode_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read annual day Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read annual day Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -1846,9 +1862,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-					TRACE(_T("Weekly schedule time Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_Annualcode_Info[i].start_instance,
-						Bacnet_Refresh_Info.Read_Annualcode_Info[i].end_instance);
+					//TRACE(_T("Weekly schedule time Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_Annualcode_Info[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_Annualcode_Info[i].end_instance);
 
 
 				}
@@ -1885,7 +1901,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					if((Bacnet_Refresh_Info.Read_Input_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Input_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read input Table Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read input Table Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -1915,9 +1932,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-					TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_Input_Info[i].start_instance,
-						Bacnet_Refresh_Info.Read_Input_Info[i].end_instance);
+					//TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_Input_Info[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_Input_Info[i].end_instance);
 
 				}
 			}
@@ -1953,7 +1970,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					if((Bacnet_Refresh_Info.Read_Output_Info[i].resend_count>RESEND_COUNT) 
 						|| (Bacnet_Refresh_Info.Read_Output_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 					{
-						m_wait_detail.SetWindowTextW(_T("Read input Table Time Out!"));
+						//m_wait_detail.SetWindowTextW(_T("Read input Table Time Out!"));
+						m_wait_persent.SetWindowTextW(_T("Timeout"));
 						KillTimer(1);
 						SetTimer(2,2000,NULL);
 						goto endthis;
@@ -1982,9 +2000,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-					TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
-						Bacnet_Refresh_Info.Read_Output_Info[i].start_instance,
-						Bacnet_Refresh_Info.Read_Output_Info[i].end_instance);
+					//TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
+					//	Bacnet_Refresh_Info.Read_Output_Info[i].start_instance,
+					//	Bacnet_Refresh_Info.Read_Output_Info[i].end_instance);
 
 				}
 			}
@@ -2020,7 +2038,8 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						if((Bacnet_Refresh_Info.Read_Variable_Info[i].resend_count>10) 
 							|| (Bacnet_Refresh_Info.Read_Variable_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
 						{
-							m_wait_detail.SetWindowTextW(_T("Read Variable Table Time Out!"));
+							//m_wait_detail.SetWindowTextW(_T("Read Variable Table Time Out!"));
+							m_wait_persent.SetWindowTextW(_T("Timeout"));
 							KillTimer(1);
 							SetTimer(2,2000,NULL);
 							goto endthis;
@@ -2049,9 +2068,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						
 						//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
 
-						TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
-							Bacnet_Refresh_Info.Read_Variable_Info[i].start_instance,
-							Bacnet_Refresh_Info.Read_Variable_Info[i].end_instance);
+						//TRACE(_T("Resend start = %d , Resend end = %d\r\n"),
+						//	Bacnet_Refresh_Info.Read_Variable_Info[i].start_instance,
+						//	Bacnet_Refresh_Info.Read_Variable_Info[i].end_instance);
 				}
 			}
 		}
@@ -2175,9 +2194,9 @@ endthis:
 						Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
 
 						//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-						TRACE(_T("Write input list Resend start = %d , Resend end = %d\r\n"),
-							Write_Config_Info.Write_Input_Info[i].start_instance,
-							Write_Config_Info.Write_Input_Info[i].end_instance);
+						//TRACE(_T("Write input list Resend start = %d , Resend end = %d\r\n"),
+						//	Write_Config_Info.Write_Input_Info[i].start_instance,
+						//	Write_Config_Info.Write_Input_Info[i].end_instance);
 					}
 			}
 
@@ -2248,9 +2267,9 @@ endthis:
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					TRACE(_T(" Write output list Resend start = %d , Resend end = %d\r\n"),
-						Write_Config_Info.Write_Output_Info[i].start_instance,
-						Write_Config_Info.Write_Output_Info[i].end_instance);
+					//TRACE(_T(" Write output list Resend start = %d , Resend end = %d\r\n"),
+					//	Write_Config_Info.Write_Output_Info[i].start_instance,
+					//	Write_Config_Info.Write_Output_Info[i].end_instance);
 				}
 			}
 
@@ -2320,9 +2339,9 @@ endthis:
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					TRACE(_T("Write variable list Resend start = %d , Resend end = %d\r\n"),
-						Write_Config_Info.Write_Variable_Info[i].start_instance,
-						Write_Config_Info.Write_Variable_Info[i].end_instance);
+					//TRACE(_T("Write variable list Resend start = %d , Resend end = %d\r\n"),
+					//	Write_Config_Info.Write_Variable_Info[i].start_instance,
+					//	Write_Config_Info.Write_Variable_Info[i].end_instance);
 				}
 			}
 
@@ -2392,9 +2411,9 @@ endthis:
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					TRACE(_T("Write program Table Resend start = %d , Resend end = %d\r\n"),
-						Write_Config_Info.Write_Program_Info[i].start_instance,
-						Write_Config_Info.Write_Program_Info[i].end_instance);
+					//TRACE(_T("Write program Table Resend start = %d , Resend end = %d\r\n"),
+					//	Write_Config_Info.Write_Program_Info[i].start_instance,
+					//	Write_Config_Info.Write_Program_Info[i].end_instance);
 				}
 			}
 
@@ -2466,9 +2485,9 @@ endthis:
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					TRACE(_T("Program code Resend start = %d , Resend end = %d\r\n"),
-						Write_Config_Info.Write_Programcode_Info[i].start_instance,
-						Write_Config_Info.Write_Programcode_Info[i].end_instance);
+					//TRACE(_T("Program code Resend start = %d , Resend end = %d\r\n"),
+					//	Write_Config_Info.Write_Programcode_Info[i].start_instance,
+					//	Write_Config_Info.Write_Programcode_Info[i].end_instance);
 				}
 			}
 
@@ -2540,9 +2559,9 @@ endthis:
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					TRACE(_T("Write controller list Resend start = %d , Resend end = %d\r\n"),
-						Write_Config_Info.Write_Controller_Info[i].start_instance,
-						Write_Config_Info.Write_Controller_Info[i].end_instance);
+					//TRACE(_T("Write controller list Resend start = %d , Resend end = %d\r\n"),
+					//	Write_Config_Info.Write_Controller_Info[i].start_instance,
+					//	Write_Config_Info.Write_Controller_Info[i].end_instance);
 				}
 			}
 
@@ -2614,9 +2633,9 @@ endthis:
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					TRACE(_T(" Write screen list Resend start = %d , Resend end = %d\r\n"),
-						Write_Config_Info.Write_Screen_Info[i].start_instance,
-						Write_Config_Info.Write_Screen_Info[i].end_instance);
+					//TRACE(_T(" Write screen list Resend start = %d , Resend end = %d\r\n"),
+					//	Write_Config_Info.Write_Screen_Info[i].start_instance,
+					//	Write_Config_Info.Write_Screen_Info[i].end_instance);
 				}
 			}
 
@@ -2687,9 +2706,9 @@ endthis:
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					TRACE(_T(" Write monitor list Resend start = %d , Resend end = %d\r\n"),
-						Write_Config_Info.Write_Monitor_Info[i].start_instance,
-						Write_Config_Info.Write_Monitor_Info[i].end_instance);
+					//TRACE(_T(" Write monitor list Resend start = %d , Resend end = %d\r\n"),
+					//	Write_Config_Info.Write_Monitor_Info[i].start_instance,
+					//	Write_Config_Info.Write_Monitor_Info[i].end_instance);
 				}
 			}
 
@@ -2747,9 +2766,9 @@ endthis:
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					TRACE(_T(" Write weekly routines Resend start = %d , Resend end = %d\r\n"),
-						Write_Config_Info.Write_Weekly_Info[i].start_instance,
-						Write_Config_Info.Write_Weekly_Info[i].end_instance);
+					//TRACE(_T(" Write weekly routines Resend start = %d , Resend end = %d\r\n"),
+					//	Write_Config_Info.Write_Weekly_Info[i].start_instance,
+					//	Write_Config_Info.Write_Weekly_Info[i].end_instance);
 				}
 			}
 
@@ -2806,9 +2825,9 @@ endthis:
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					TRACE(_T("weekly schedule time Resend start = %d , Resend end = %d\r\n"),
-						Write_Config_Info.Write_Weeklycode_Info[i].start_instance,
-						Write_Config_Info.Write_Weeklycode_Info[i].end_instance);
+					//TRACE(_T("weekly schedule time Resend start = %d , Resend end = %d\r\n"),
+					//	Write_Config_Info.Write_Weeklycode_Info[i].start_instance,
+					//	Write_Config_Info.Write_Weeklycode_Info[i].end_instance);
 				}
 			}
 
@@ -2865,9 +2884,9 @@ endthis:
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					TRACE(_T("annual day time Resend start = %d , Resend end = %d\r\n"),
-						Write_Config_Info.Write_Annualcode_Info[i].start_instance,
-						Write_Config_Info.Write_Annualcode_Info[i].end_instance);
+					//TRACE(_T("annual day time Resend start = %d , Resend end = %d\r\n"),
+					//	Write_Config_Info.Write_Annualcode_Info[i].start_instance,
+					//	Write_Config_Info.Write_Annualcode_Info[i].end_instance);
 				}
 			}
 
@@ -2925,9 +2944,9 @@ endthis:
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
 
 					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					TRACE(_T(" Write annual routines list Resend start = %d , Resend end = %d\r\n"),
-						Write_Config_Info.Write_Annual_Info[i].start_instance,
-						Write_Config_Info.Write_Annual_Info[i].end_instance);
+					//TRACE(_T(" Write annual routines list Resend start = %d , Resend end = %d\r\n"),
+					//	Write_Config_Info.Write_Annual_Info[i].start_instance,
+					//	Write_Config_Info.Write_Annual_Info[i].end_instance);
 				}
 			}
 			if(write_cotinue_waite == true)

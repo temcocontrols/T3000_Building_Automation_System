@@ -154,8 +154,10 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	cf.yHeight =300; //设置高度
 	cf.dwMask|=CFM_FACE;
 	//_tcscpy(cf.szFaceName ,_T("SimSun-ExtB"));
-	_tcscpy(cf.szFaceName ,_T("Times New Roman"));
+	//_tcscpy(cf.szFaceName ,_T("Times New Roman"));
 	//	strcpy(cf.szFaceName ,_T("隶书")); //设置字体
+	_tcscpy(cf.szFaceName ,_T("Arial"));
+	
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSelectionCharFormat(cf);
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetDefaultCharFormat(cf); 
 

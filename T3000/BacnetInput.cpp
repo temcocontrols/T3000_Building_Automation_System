@@ -210,7 +210,7 @@ void CBacnetInput::Initial_List()
 	m_input_list.InsertColumn(INPUT_CAL_OPERATION, _T("Sign"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_FITLER, _T("Filter"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_DECOM, _T("Status"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_input_list.InsertColumn(INPUT_LABLE, _T("Label"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_LABLE, _T("Label"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_input_dlg_hwnd;
 
@@ -639,6 +639,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			temp_status.Format(Decom_Array[0]);
 		else if(m_Input_data.at(i).decom==1)
 			temp_status.Format(Decom_Array[1]);
+		else if(m_Input_data.at(i).decom==2)
+			temp_status.Format(Decom_Array[2]);
 		else
 			temp_status.Empty();
 		m_input_list.SetItemText(i,INPUT_DECOM,temp_status);
@@ -819,6 +821,37 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	else if(lCol == INPUT_CAL_OPERATION)
 	{
+		CString n_option1;
+		CString n_option2;
+		CString n_value;
+
+
+		if(m_Input_data.at(lRow).calibration != 0)
+		{
+			float temp_float_value;
+			temp_float_value = ((float)m_Input_data.at(lRow).calibration) / 10;
+			n_value.Format(_T("%.1f"),temp_float_value);
+		}
+
+		if(m_Input_data.at(lRow).calibration_sign == 0)
+		{
+			n_option1.Format(_T("+"));
+			n_option2.Format(_T("-"));
+			n_option1 = n_option1 + n_value;
+			n_option2 = n_option2 + n_value;
+		}
+		else
+		{
+			n_option1.Format(_T("-"));
+			n_option2.Format(_T("+"));
+			n_option1 = n_option1 + n_value;
+			n_option2 = n_option2 + n_value;
+		}
+
+		CString notic_message;
+		notic_message.Format(_T("This will change the calibration of this input from %s to %s"),n_option1.GetString(),n_option2.GetString());
+		if(IDYES != MessageBox(notic_message,_T("Warning"),MB_YESNOCANCEL))
+			return;
 		memcpy_s(&m_temp_Input_data[lRow],sizeof(Str_in_point),&m_Input_data.at(lRow),sizeof(Str_in_point));
 		if(m_Input_data.at(lRow).calibration_sign == 0)
 		{
@@ -906,7 +939,7 @@ void CBacnetInput::OnCancel()
 BOOL CBacnetInput::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
+	if((pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN))
 	{
 		CRect list_rect,win_rect;
 		m_input_list.GetWindowRect(list_rect);

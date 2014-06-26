@@ -39,14 +39,16 @@ public:
 const int OUTPUT_NUM = 0;
 const int OUTPUT_FULL_LABLE = 1;
 const int OUTPUT_AUTO_MANUAL = 2;
-const int OUTPUT_HW_SWITCH = 3;
-const int OUTPUT_VALUE = 4;
-const int OUTPUT_UNITE = 5;
-const int OUTPUT_RANGE = 6;
-const int OUTPUT_0_PERSENT = 7;
-const int OUTPUT_100_PERSENT = 8;
-const int OUTPUT_DECOM = 9;
-const int OUTPUT_LABLE = 10;
+
+const int OUTPUT_VALUE = 3;
+const int OUTPUT_UNITE = 4;
+const int OUTPUT_RANGE = 5;
+const int OUTPUT_0_PERSENT = 6;
+const int OUTPUT_100_PERSENT = 7;
+const int OUTPUT_DECOM = 8;
+const int OUTPUT_LABLE = 9;
+
+const int OUTPUT_HW_SWITCH = 10;
 
 const int OUTPUT_COL_NUMBER = 11;
 
