@@ -193,7 +193,7 @@ void BacnetScreen::Initial_List()
 	m_screen_list.InsertColumn(SCREEN_NUM, _T("NUM"), 40, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_screen_list.InsertColumn(SCREEN_DESCRIPTION, _T("Full Label"), 180, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_screen_list.InsertColumn(SCREEN_LABEL, _T("Label"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_screen_list.InsertColumn(SCREEN_PIC_FILE, _T("Picture File"), 140, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_screen_list.InsertColumn(SCREEN_PIC_FILE, _T("Picture File"), 140, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_screen_list.InsertColumn(SCREEN_MODE, _T("Mode"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_screen_list.InsertColumn(SCREEN_REFRESH, _T("Refresh Time"), 110, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 
@@ -348,7 +348,7 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 		memcpy_s(m_screen_data.at(Changed_Item).label,STR_SCREEN_LABLE_LENGTH,cTemp1,STR_SCREEN_LABLE_LENGTH);
 	}
-
+#if 0
 	if(Changed_SubItem == SCREEN_PIC_FILE)
 	{
 		CString cs_temp = m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
@@ -364,7 +364,7 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 		memcpy_s(m_screen_data.at(Changed_Item).picture_file,STR_SCREEN_PIC_FILE_LENGTH,cTemp1,STR_SCREEN_PIC_FILE_LENGTH);
 	}
-
+#endif
 	//if(Changed_SubItem == SCREEN_MODE)
 	//{
 	//	if(New_CString.CompareNoCase(_T("Text")) == 0)
@@ -428,6 +428,83 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 			m_screen_list.SetCellChecked(i,0,FALSE);
 		}
 	}
+	int lRow = 0;
+	int lCol = 0;
+	lRow = lvinfo.iItem;
+	lCol = lvinfo.iSubItem;
+
+
+	if(lRow>m_screen_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的;
+		return;
+	if(lRow<0)
+		return;
+	m_screen_list.Set_Edit(true);
+	CString New_CString;
+	CString temp_task_info;
+
+	if(lCol == SCREEN_PIC_FILE)
+	{
+		CString FilePath;
+		CString image_fordor;
+		CString ApplicationFolder;
+		GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+		PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+		ApplicationFolder.ReleaseBuffer();
+		image_fordor = ApplicationFolder + _T("\\Database\\image");
+		SetCurrentDirectoryW(image_fordor);
+		//选择图片,如果选的不在database目录下就copy一份过来;如果在的话就重命名，因为文件名长度不能超过10个字节;
+		CString strFilter = _T("jpg file;bmp file;png file|*.jpg;*.bmp;*.png|all File|*.*||");
+		CFileDialog dlg(true,_T("bmp"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
+		if(IDOK==dlg.DoModal())
+		{
+			FilePath=dlg.GetPathName();
+			CString FileName;
+			GetFileNameFromPath(FilePath,FileName);
+			
+			CString temp1;
+			temp1 = FilePath;
+			PathRemoveFileSpec(temp1.GetBuffer(MAX_PATH));
+			temp1.ReleaseBuffer();
+
+			if(FileName.GetLength() >=11)
+			{
+				FileName = FileName.Right(10);
+			}
+			CString new_file_path;
+			new_file_path = image_fordor + _T("\\") + FileName;
+			if(temp1.CompareNoCase(image_fordor) != 0)//如果就在当前目录就不用copy过来了;
+			{
+				CopyFile(FilePath,new_file_path,false);
+			}
+			else
+			{
+				CFile::Rename(FilePath, new_file_path);
+			}
+			memcpy_s(&m_temp_screen_data[lRow],sizeof(Control_group_point),&m_screen_data.at(lRow),sizeof(Control_group_point));
+
+			char cTemp1[255];
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, FileName.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_screen_data.at(lRow).picture_file,STR_SCREEN_PIC_FILE_LENGTH,cTemp1,STR_SCREEN_PIC_FILE_LENGTH);
+
+			m_screen_list.SetItemText(lRow,SCREEN_PIC_FILE,FileName);
+			New_CString = FileName;
+		}
+	}
+	else
+		return;
+
+	m_screen_list.Set_Edit(false);
+
+	int cmp_ret = memcmp(&m_temp_screen_data[lRow],&m_screen_data.at(lRow),sizeof(Control_group_point));
+	if(cmp_ret!=0)
+	{
+		m_screen_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
+		temp_task_info.Format(_T("Write Screen List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
+		Post_Write_Message(g_bac_instance,WRITESCREEN_T3000,lRow,lRow,sizeof(Control_group_point),m_screen_dlg_hwnd ,temp_task_info,lRow,lCol);
+
+	}
+
 
 	*pResult = 0;
 }

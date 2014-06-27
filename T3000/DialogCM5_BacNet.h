@@ -66,6 +66,8 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CTabCtrl m_bac_main_tab;
 	void Tab_Initial();
+	void Set_Tab_Loaded_Parameter(int ntab);
+	void Inital_Tab_Loaded_Parameter();
 	
 
 	afx_msg void OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult);
@@ -73,7 +75,7 @@ public:
 	int m_cur_tab_sel;
 	int m_bac_obtain_ip_mode;
 
-	
+	bool tab_loaded[WINDOW_TAB_COUNT];
 };
 //static void Init_Service_Handlers(void);
 

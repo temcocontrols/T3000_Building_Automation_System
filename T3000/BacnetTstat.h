@@ -28,6 +28,7 @@ public:
 	afx_msg LRESULT Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT  TstatsMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	virtual void OnCancel();
 };
 typedef enum {
 	 TSTAT_NUM ,
@@ -54,7 +55,7 @@ const CString CString_Occupied[3] =
 {
 	_T("Unoccupied"),
 	_T("Occupied"),
-	_T("Unknow")
+	_T("Unkown")
 };
 
 const CString CString_Cool_Heat[4] =
@@ -62,7 +63,7 @@ const CString CString_Cool_Heat[4] =
 	_T("Coasting"),
 	_T("Cool"),
 	_T("Heat"),
-	_T("Unknow")
+	_T("Unkown")
 };
 
 //const int TSTAT_NUM = 0;

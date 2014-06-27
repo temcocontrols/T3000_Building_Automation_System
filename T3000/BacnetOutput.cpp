@@ -206,7 +206,7 @@ void CBacnetOutput::Initial_List()
 	m_output_list.InsertColumn(OUTPUT_NUM, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_output_list.InsertColumn(OUTPUT_FULL_LABLE, _T("Full Label"), 140, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_HW_SWITCH, _T("HW Switch"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_HW_SWITCH, _T("HOA Switch"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_RANGE, _T("Range"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -373,19 +373,19 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			{
 				if(m_Output_data.at(i).hw_switch_status == HW_SW_OFF)
 				{
-					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("SW_OFF"));
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-OFF"));
 					m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
 					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
 				}
 				else if(m_Output_data.at(i).hw_switch_status == HW_SW_HAND)
 				{
-					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("SW_HAND"));
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-ON"));
 					m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
 					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
 				}
 				else
 				{
-					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("SW_AUTO"));
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("AUTO"));
 					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,1);
 					if(m_Output_data.at(i).auto_manual==0)	//In output table if it is auto ,the value can't be edit by user
 					{
