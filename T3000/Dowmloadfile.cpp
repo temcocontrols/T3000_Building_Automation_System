@@ -114,8 +114,10 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		ApplicationFolder.ReleaseBuffer();
 		ISPtool_path = ApplicationFolder + _T("\\ISP.exe");
 		
-
+		CString temp_isp_info;
 		
+
+
 		AutoFlashConfigPath = ApplicationFolder + _T("//AutoFlashFile.ini");
 		
 		bool is_net_device = (bool)IsNetDevice(m_product_isp_auto_flash.product_class_id);
@@ -124,6 +126,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("1"),AutoFlashConfigPath);
 		if(m_product_isp_auto_flash.BuildingInfo.strIp.IsEmpty())//´®¿Ú
 		{
+			
 			 WritePrivateProfileStringW(_T("Data"),_T("COM_OR_NET"),_T("COM"),AutoFlashConfigPath);
 			 CString cs_comport;
 			 cs_comport.Format(_T("COM%d"), m_product_isp_auto_flash.ncomport);
@@ -133,6 +136,15 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			 CString nflash_id;
 			 nflash_id.Format(_T("%d"),m_product_isp_auto_flash.product_id);
 			 WritePrivateProfileStringW(_T("Data"),_T("ID"),nflash_id,AutoFlashConfigPath);
+
+			 temp_isp_info.Format(_T("ISP via : "));
+			 temp_isp_info = temp_isp_info + cs_comport;
+			 m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+			 temp_isp_info.Format(_T("ISP baudrate : 19200"));
+			 m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+			 temp_isp_info.Format(_T("Device ID :"));
+			 temp_isp_info = temp_isp_info + nflash_id;
+			 m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 		}
 		else
 		{
@@ -142,9 +154,20 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			 {
 				 m_product_isp_auto_flash.ncomport = 10000;
 			 }
+			 temp_isp_info.Format(_T("ISP via : network"));
+			 m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+			  temp_isp_info.Format(_T("IP Address : "));
+			  temp_isp_info = temp_isp_info + m_product_isp_auto_flash.BuildingInfo.strIp;
+			   m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+			   
+
 			 CString n_tcpport;
 			 n_tcpport.Format(_T("%d"),m_product_isp_auto_flash.ncomport);
 			 
+			  temp_isp_info.Format(_T("Port : "));
+			  temp_isp_info = temp_isp_info + n_tcpport;
+			  m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+
 			 WritePrivateProfileStringW(_T("Data"),_T("IPPort"),n_tcpport,AutoFlashConfigPath);
 			 if(is_net_device == false)
 			 {
@@ -152,10 +175,15 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 				   CString nsub_id;
 				   nsub_id.Format(_T("%d"),m_product_isp_auto_flash.product_id);
 				   WritePrivateProfileStringW(_T("Data"),_T("SubID"),nsub_id,AutoFlashConfigPath);
+
+				   temp_isp_info.Format(_T("Device is subnote."));
+				   m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 			 }
 			 else
 			 {
 				  WritePrivateProfileStringW(_T("Data"),_T("Subnote"),_T("0"),AutoFlashConfigPath);
+				  temp_isp_info.Format(_T("Device is not a subnote."));
+				  m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 			 }
 		}
 		CString exe_folder;
@@ -170,6 +198,12 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		mypath = mypath + _T("\\") + file_name;
 		WritePrivateProfileStringW(_T("Data"),_T("FirmwarePath"),mypath,AutoFlashConfigPath);
 		
+
+		temp_isp_info.Format(_T("FirmwarePath = "));
+		temp_isp_info = temp_isp_info + mypath;
+		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+
 		HANDLE Call_ISP_Application = NULL;
 		Call_ISP_Application =CreateThread(NULL,NULL,isp_thread,this,NULL, NULL);
 		
@@ -217,7 +251,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 	else if(ncommand == DOWNLOAD_NOT_FIND_LOCAL)
 	{
 		CString complete_message;
-		complete_message.Format(_T("Local Firmware folder doesn't exsit the file we needed.we will download it from server."));
+		complete_message.Format(_T("Local Firmware folder doen't exsit the file we needed.we will download it from server."));
 		//m_download_info.AddString(complete_message);
 		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
 		//m_download_info.SetTopIndex(m_download_info.GetCount()-1);

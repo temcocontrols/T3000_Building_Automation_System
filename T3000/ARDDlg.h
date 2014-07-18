@@ -25,4 +25,12 @@ public:
 	afx_msg void OnBnClickedOk();
 	CIPAddressCtrl m_ipaddress;
 	CEdit m_porteditor;
+	vector<CString> m_szComm;
+	CComboBox m_add_device_com_port;
+	CComboBox m_add_device_baudrate;
+	CEdit m_add_device_modbus_id;
+	void Enable_Net_UI(bool enable_net);
+	afx_msg void OnBnClickedRadioNetDevice();
+	afx_msg void OnBnClickedRadio2();
+	bool m_is_net_device;
 };

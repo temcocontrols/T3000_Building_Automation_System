@@ -223,7 +223,7 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	::MultiByteToWideChar( CP_ACP,  0,my_display,-1,temp.GetBuffer(unicodeLen),unicodeLen ); 
 	temp.ReleaseBuffer();
 	CString temp1 = temp;
-	
+	temp1.MakeUpper();
 
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(temp1);
 	m_edit_changed = false;
@@ -292,7 +292,7 @@ void CBacnetProgramEdit::OnSend()
 	error = -1; //Default no error;
 	CString tempcs;
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
-
+	tempcs.MakeUpper();
 //	char*     pElementText;
 	int    iTextLen;
 	// wide char to multi char

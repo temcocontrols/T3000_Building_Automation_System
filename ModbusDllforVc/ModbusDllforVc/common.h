@@ -23,6 +23,7 @@ OUTPUT bool Open_Socket(CString strIPAdress);
 OUTPUT void SetCommunicationType(int nType);
 OUTPUT bool Open_Socket2(CString strIPAdress,short nPort);
 
+OUTPUT int GetLastSuccessBaudrate();
 OUTPUT int GetLastOpenedComport();
 OUTPUT int GetLastCommunicationType();
 //for scan network controller

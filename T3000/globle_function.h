@@ -155,5 +155,6 @@ bool IP_is_Local(LPCTSTR ip_address);
 bool Is_Bacnet_Device(unsigned short n_product_class_id);
 BOOL DirectoryExist(CString Path);
 BOOL CreateDirectory(CString path);
+int GetHostAdaptersInfo(CString &IP_address_local);
 DWORD WinExecAndWait( LPCTSTR lpszAppPath,LPCTSTR lpParameters,LPCTSTR lpszDirectory, 	DWORD dwMilliseconds);
 #endif

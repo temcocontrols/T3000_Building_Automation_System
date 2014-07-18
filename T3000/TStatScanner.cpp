@@ -578,6 +578,8 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 			
 			//temp.software_version=tstat_version2;
 			pTemp->SetSoftwareVersion(tstat_version2);
+			pTemp->SetBaudRate(m_nBaudrate);//scan
+#if 0
 			if(Read_One2(a, 185, bForTStat)==0)	
 			//if(pTemp->ReadOneReg(185)==0)
 			{SHOW_TX_RX
@@ -590,6 +592,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 					//temp.baudrate=19200;
 				pTemp->SetBaudRate(19200);//scan
 			}
+#endif
 			//temp.nEPsize=Read_One2(temp.id,326, bForTStat);
 			pTemp->SetEPSize(pTemp->ReadOneReg(326));
 
@@ -1049,49 +1052,8 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 	g_strScanInfoPrompt = _T("NC by UDP");
 	
 	TRACE(_T("Start udp scan ! \n"));
-	//SOCKET soAck =::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 
-	 
-	//UINT nGatewayIP,nLocalIP,nMaskIP;
-	//nGatewayIP=inet_addr(pAdapterInfo.GatewayList.IpAddress.String);
-	//nLocalIP=inet_addr(pAdapterInfo.IpAddressList.IpAddress.String);
-	//nMaskIP=inet_addr(pAdapterInfo.IpAddressList.IpMask.String);
-	//UINT nBroadCastIP;
-	//nBroadCastIP=(~nMaskIP)|nLocalIP;
-//	char* chBroadCast;
-	//in_addr in;
-	//in.S_un.S_addr=nBroadCastIP;
-	//chBroadCast=inet_ntoa(in);
-#if 0
-	h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
-	BOOL bBroadcast=TRUE;
-	::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
-	int iMode=1;
-	ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
 
-	//SOCKADDR_IN bcast;
-	h_bcast.sin_family=AF_INET;
-	//bcast.sin_addr.s_addr=nBroadCastIP;
-	h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
-	h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
-
-	//SOCKADDR_IN siBind;
-	h_siBind.sin_family=AF_INET;
-	h_siBind.sin_addr.s_addr=INADDR_ANY;
-	h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
-
-	int nRet = ::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
-
-	if (nRet == SOCKET_ERROR)
-	{	   strlog=_T("Binding socket failed. Please check your net work settings.");
-	      NET_WriteLogFile(strlog);
-		int nError = WSAGetLastError();
-		
-		AfxMessageBox(strlog);
-		goto END_SCAN;
-		return 0;
-	}
-#endif
 	int nRet = 0;
 	//############################
 	strScanInfo = _T("Initialize UDP network...");
@@ -1108,9 +1070,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 	time.tv_usec = 1000;
 
 	fd_set fdSocket;
-// 	FD_ZERO(&fdSocket);
-// 	FD_SET(hBroad, &fdSocket);
-	//FD_SET(sListen, &fdSocket);
+
 
 	BYTE buffer[512] = {0};
 
@@ -1120,32 +1080,14 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 	//pSendBuf[1] = END_FLAG;
 	memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
 	int nSendLen = 5;
-	
-	/*/////////////////////////////////////////////////////////////////////////
-	BYTE t4 = 1;
-	for (int nnn = 0; nnn < 100; nnn++)
-	{
-		BYTE t1 = 192;
-		BYTE t2 = 168;
-		BYTE t3 = 0;
 
-		pSendBuf[nSendLen-4] = t1;
-		pSendBuf[nSendLen-3] = t2;
-		pSendBuf[nSendLen-2] = t3;
-		pSendBuf[nSendLen-1] = t4;
-		
-		nSendLen +=4;
-		t4++;
-		memcpy(pSendBuf + nSendLen, (BYTE*)&END_FLAG, 4);
-	}
-/////////////////////////////////////////////////////////////////////////*/
 	int time_out=0;
 	BOOL bTimeOut = FALSE;
 	while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
 	{
 		time_out++;
-		if(time_out>100)
-			 bTimeOut = TRUE;
+		if(time_out>5)
+			bTimeOut = TRUE;
 		if(pScanner->m_bStopScan)
 		{
 			CString strlog=_T("Scan Stop Time: ")+Get_NowTime()+_T("\n");
@@ -1186,112 +1128,91 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 
 		if(nSelRet > 0)
 		{
-			ZeroMemory(buffer, 512);
+			do 
+			{
+				ZeroMemory(buffer, 512);
+				int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
 
-			int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
-//			int nRet = ::recvfrom(hBroad,(char*)&buffer[0], nsize, 0, (sockaddr*)&addrRemote, &nLen);
-			BYTE szIPAddr[4] = {0};
-			if(nRet > 0)
-			{		
-				FD_ZERO(&fdSocket);
-				if(buffer[0]==RESPONSE_MSG)
-				{	
-					nLen=buffer[2]+buffer[3]*256;
-					unsigned short dataPackage[32]={0};
-					memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
-					//int modbusID=dataPackage[6];
-					szIPAddr[0]= (BYTE)dataPackage[7];
-					szIPAddr[1]= (BYTE)dataPackage[8];
-					szIPAddr[2]= (BYTE)dataPackage[9];
-					szIPAddr[3]= (BYTE)dataPackage[10];
-
-					int n = 1;
-					BOOL bFlag=FALSE;
-					//////////////////////////////////////////////////////////////////////////
-					// 检测IP重复
-					DWORD dwValidIP = 0;
-					memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
- 					while(dwValidIP != END_FLAG)
+				BYTE szIPAddr[4] = {0};
+				if(nRet > 0)
+				{		
+					FD_ZERO(&fdSocket);
+					if(buffer[0]==RESPONSE_MSG)
 					{	
-						DWORD dwRecvIP=0;
-						
-						memcpy((BYTE*)&dwRecvIP, szIPAddr, 4);
-						memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
-						
-						if(dwRecvIP == dwValidIP)
-						{
-							bFlag = TRUE;
-							break;
-						}
-						n+=4;
-					}
-					//////////////////////////////////////////////////////////////////////////
-					if (!bFlag)
-					{
-						pScanner->AddNCToList(buffer, nRet, h_siBind);
-						//############################
-						strScanInfo = _T("Find Network device...");
-						pScanner->ShowNetScanInfo(strScanInfo); 
-						//############################
-						//pSendBuf[nSendLen-1] = (BYTE)(modbusID);
-						pSendBuf[nSendLen-4] = szIPAddr[0];
-						pSendBuf[nSendLen-3] = szIPAddr[1];
-						pSendBuf[nSendLen-2] = szIPAddr[2];
-						pSendBuf[nSendLen-1] = szIPAddr[3];
-						memcpy(pSendBuf + nSendLen, (BYTE*)&END_FLAG, 4);
+						nLen=buffer[2]+buffer[3]*256;
+						unsigned short dataPackage[32]={0};
+						memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
+						//int modbusID=dataPackage[6];
+						szIPAddr[0]= (BYTE)dataPackage[7];
+						szIPAddr[1]= (BYTE)dataPackage[8];
+						szIPAddr[2]= (BYTE)dataPackage[9];
+						szIPAddr[3]= (BYTE)dataPackage[10];
+
+						int n = 1;
+						BOOL bFlag=FALSE;
 						//////////////////////////////////////////////////////////////////////////
-						
-						//pSendBuf[nSendLen+3] = 0xFF;
-						nSendLen+=4;
+						// 检测IP重复
+						DWORD dwValidIP = 0;
+						memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
+						while(dwValidIP != END_FLAG)
+						{	
+							DWORD dwRecvIP=0;
+
+							memcpy((BYTE*)&dwRecvIP, szIPAddr, 4);
+							memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
+
+							if(dwRecvIP == dwValidIP)
+							{
+								bFlag = TRUE;
+								break;
+							}
+							n+=4;
+						}
+						//////////////////////////////////////////////////////////////////////////
+						if (!bFlag)
+						{
+							pScanner->AddNCToList(buffer, nRet, h_siBind);
+							//############################
+							strScanInfo = _T("Find Network device...");
+							pScanner->ShowNetScanInfo(strScanInfo); 
+							//############################
+							//pSendBuf[nSendLen-1] = (BYTE)(modbusID);
+							pSendBuf[nSendLen-4] = szIPAddr[0];
+							pSendBuf[nSendLen-3] = szIPAddr[1];
+							pSendBuf[nSendLen-2] = szIPAddr[2];
+							pSendBuf[nSendLen-1] = szIPAddr[3];
+							memcpy(pSendBuf + nSendLen, (BYTE*)&END_FLAG, 4);
+							//////////////////////////////////////////////////////////////////////////
+
+							//pSendBuf[nSendLen+3] = 0xFF;
+							nSendLen+=4;
+						}
+
+						//}
+					}	
+					else
+					{
+						 break;
 					}
-
-// 					nLen=buffer[2]+buffer[3]*256;
-// 					//int n =sizeof(char)+sizeof(unsigned char)+sizeof( unsigned short)*9;
-// 					if(nLen>=0)
-// 					{
-// 						CTStat_Net* pT = new CTStat_Net;
-// 						unsigned short dataPackage[13];
-// 						memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
-// 						
-// 						DWORD nSerial=dataPackage[0]+dataPackage[1]*256+dataPackage[2]*256*256+dataPackage[3]*256*256*256;
-// 						int nProductID=dataPackage[5];
-// 						int modbusID=dataPackage[6];
-// 						CString strTemp;
-// 						strTemp.Format(_T("%d.%d.%d.%d"),dataPackage[7],dataPackage[8],dataPackage[9],dataPackage[10]);
-// 						CString strIP=strTemp;
-// 						int nPort=(dataPackage[11]);
-// 												
-// 						pT->SetSerialID(nSerial);
-// 						pT->SetDevID(modbusID);
-// 						pT->SetProductType(nProductID);
-// 						pT->SetIPPort(ntohs(siBind.sin_port));
-// 						LPSTR szIP = inet_ntoa(siBind.sin_addr);
-// 						pT->SetIPAddr((char*)szIP);
-// 
-// 						_NetDeviceInfo* pni = new _NetDeviceInfo;
-// 						pni->m_pNet = pT;										
-// 						pScanner->m_szNCScanRet.push_back(pni);
-				
-
-					//}
+					SHOW_TX_RX
+					
+					FD_ZERO(&fdSocket);	
+					FD_SET(h_Broad, &fdSocket);
+					nLen = sizeof(h_siBind);
+					fdRead = fdSocket;
+					nSelRet = ::select(0, &fdRead, NULL, NULL, &time);//TRACE("recv nc info == %d\n", nSelRet);
 				}	
-			SHOW_TX_RX
-			}
-		}	
+			} while (nSelRet);
+		}//end of while
 		else
 		{
 			//pScanner->ScanTstatFromNCForManual();
 			g_ScnnedNum = 0;
-			//pScanner->ScanTstatFromNCForAuto();
-			//pScanner->m_bNetScanFinish = TRUE; // 
-
-			//new nc//	 pScanner->GetTstatFromNCTable();
-			
 			bTimeOut = TRUE;
-			
+
 		}
-	}//end of while
-	//closesocket(sListen);
+	}
+
 
 END_SCAN:
 
@@ -1450,6 +1371,7 @@ UINT _ScanTstatThread2(LPVOID pParam)
 		if(pScan->OpenCom(n))
 		{
 			pScan->SetComPort(n);
+			pScan->SetBaudRate(_T("19200"));
 			bool bRet = Change_BaudRate(pScan->m_nBaudrate);
 			strlog.Empty();
 			strlog.Format(_T("Change BaudRate:%d"),pScan->m_nBaudrate);
@@ -1485,6 +1407,50 @@ UINT _ScanTstatThread2(LPVOID pParam)
 			SetPaneString(2, str);
 			int n =0 ;
 		}
+
+
+
+		if(pScan->OpenCom(n))
+		{
+			pScan->SetComPort(n);
+			pScan->SetBaudRate(_T("9600"));
+			bool bRet = Change_BaudRate(9600);
+			strlog.Empty();
+			strlog.Format(_T("Change BaudRate:%d"),9600);
+			WriteLogFile(strlog);
+			ASSERT(bRet);
+			g_strScanInfoPrompt.Format(_T("COM%d"), n);
+			//It's unnecessary to check one device. annulled by Fance. 
+			//We encountered such a situation that ,some device scan commond is not works well,if it only exsit on the modbus.
+			//it can be scan,but if other device also on modbus line , it will can't scan.
+			//So ,in order to check device works well, delete this code can help developer test our product.
+			//	BOOL bReadone = pScan->ReadOneCheckOnline(n);
+			//	if (!bReadone)//comscan oldcode
+			//{
+			//	pScan->background_binarysearch(n);				
+			//}		
+			strlog.Empty();
+			strlog.Format(_T("Success to Open the COM%d"),n);
+			WriteLogFile(strlog); 
+
+			pScan->background_binarysearch(n);	//lsc comscan new cold
+			close_com();
+			Sleep(500);
+			TRACE(_T("Success open the COM%d\n"), n);
+
+		}
+		else
+		{
+			// 不能打开串口X，提示信息
+			TRACE(_T("Cannot open the COM%d\n"), n);
+			CString str;
+			str.Format(_T("Cannot open the COM%d\n"), n);
+			WriteLogFile(str);
+			SetPaneString(2, str);
+			int n =0 ;
+		}
+
+
 
 	}
 	g_ScnnedNum=254;
@@ -2515,16 +2481,16 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 	int nClassID = pInfo->m_pDev->GetProductType();
 	CString strClassID;
 	strClassID.Format(_T("%d"), nClassID);
-
-// 	int nBaudRate = pInfo->m_pDev->GetBaudRate();//scan
-// 	CString strBaudRate;//scan
-// 	strBaudRate.Format(_T("%d"), nBaudRate);//scan
-
 	CString strBaudRate;//scan
+ 	int nBaudRate = pInfo->m_pDev->GetBaudRate();//scan
+ 	strBaudRate.Format(_T("%d"), nBaudRate);//scan
+
+
 // 	in_addr ia;
 // 	ia.S_un.S_addr = pInfo->m_pNet->GetIPAddr();
 // 	strBaudRate = CString(inet_ntoa(ia));	
-	strBaudRate = pInfo->m_tstatip;
+	if(!pInfo->m_tstatip.IsEmpty())
+		strBaudRate = pInfo->m_tstatip;
 
 	CString strScreenName;
 	strScreenName.Format(_T("Screen(S:%d--%d)"), pInfo->m_pDev->GetSerialID(), pInfo->m_pDev->GetDevID() );
@@ -2947,8 +2913,10 @@ void CTStatScanner::ScanTstatFromNCForAuto()//scan 分别扫描各个NC中的TSTAT
 			SetPaneString(1,strInfo);
 			continue;
 		}
-		if (Product_Name_Mini.Find(_T("MiniPanel"))!=-1)
+		if((pNCInfo->m_pNet->m_nProductType == 35) || (pNCInfo->m_pNet->m_nProductType == 50))
+//		if (Product_Name_Mini.Find(_T("MiniPanel"))!=-1)
 		{
+			continue;//Chelsea say it's no need;
 			strInfo.Format(_T("Scan Tstat connected to %s--COM0 "),Product_Name_Mini);
 			ShowNetScanInfo(strInfo);
 			binarySearchforComDevice(-1, TRUE, 1, 254);	

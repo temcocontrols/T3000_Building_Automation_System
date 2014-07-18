@@ -706,6 +706,7 @@ typedef union
 
 		uint8_t refresh_flash_timer;
 		uint8_t en_plug_n_play;
+		uint8_t reset_default;   // write 88
 	}reg;
 }Str_Setting_Info;
 
