@@ -49,6 +49,7 @@ public:
 	afx_msg void OnCbnSelchangeComboBacnetSettingCom2();
 	CComboBox m_device_com0;
 	virtual void OnCancel();
+	afx_msg void OnBnClickedButtonSettingLdf();
 };
 
 

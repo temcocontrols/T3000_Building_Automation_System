@@ -319,6 +319,6 @@ void CBacnetAlarmLog::OnClose()
 void CBacnetAlarmLog::OnCancel()
 {
 	// TODO: Add your specialized code here and/or call the base class
-
+	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	//CDialogEx::OnCancel();
 }

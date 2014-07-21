@@ -84,6 +84,7 @@ typedef struct _tree_product//////////////////////
 	int protocol;
 	unsigned int ncomport;
 	bool status;
+	bool status_last_time[3];
 	
 }tree_product;///////////////////////////////////////////////////////////////////////////////
 

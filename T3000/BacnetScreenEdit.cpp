@@ -14,7 +14,8 @@ extern CBacnetScreenEdit * ScreenEdit_Window ;
 // CBacnetScreenEdit dialog
 // CGraphicView
 #define XStart 0
-#define YStart 30
+//#define YStart 30
+#define YStart 0
 CRect mynew_rect;	//用来存储 窗体应该有多大;
 
 const int SCREEN_HOTKEY_COUNT = 9;

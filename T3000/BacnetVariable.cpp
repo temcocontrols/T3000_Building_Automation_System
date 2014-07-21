@@ -228,7 +228,8 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 
 			if((m_Variable_data.at(i).range>22) || (m_Variable_data.at(i).range == 0))
 			{
-				m_variable_list.SetItemText(i,VARIABLE_UNITE,Digital_Units_Array[0]);
+				//m_variable_list.SetItemText(i,VARIABLE_UNITE,Digital_Units_Array[0]);
+				m_variable_list.SetItemText(i,VARIABLE_UNITE,_T("Out of range"));
 			}
 			else
 			{
@@ -353,7 +354,7 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 			PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 			return 0;
 		}
-
+		cs_temp.MakeUpper();
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );

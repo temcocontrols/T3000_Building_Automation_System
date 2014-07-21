@@ -1948,8 +1948,8 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 			//这里先加卡关条件，目前暂时不支持 其他panel的Input
 			//if(m_controller_data.at(i).input.number>=BAC_INPUT_ITEM_COUNT)
 			//	m_controller_data.at(i).input.number = 0;
-			if(m_controller_data.at(i).input.panel != bac_gloab_panel )
-				m_controller_data.at(i).input.panel = bac_gloab_panel;
+			//if(m_controller_data.at(i).input.panel != bac_gloab_panel )
+			//	m_controller_data.at(i).input.panel = bac_gloab_panel;
 
 			temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 			m_controller_data.at(i).input_value = temp_struct_value;
@@ -2198,6 +2198,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 			Device_Basic_Setting.reg.com2_config = *(my_temp_point++);
 			Device_Basic_Setting.reg.refresh_flash_timer =  *(my_temp_point++);
 			Device_Basic_Setting.reg.en_plug_n_play =  *(my_temp_point++);
+			Device_Basic_Setting.reg.reset_default = *(my_temp_point++);
 			return READ_SETTING_COMMAND;
 		}
 		break;
@@ -3534,6 +3535,9 @@ unsigned char Str_to_Byte(CString need_conver)
 	return (the_first*16+the_second);
 }
 
+
+extern char local_network_ip[255];
+extern CString local_enthernet_ip;
 //socket dll.
 bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
 {
@@ -3566,7 +3570,10 @@ bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
 	sockaddr_in servAddr; 
 	servAddr.sin_family = AF_INET;
 	servAddr.sin_port = htons(nPort);
-	servAddr.sin_addr.s_addr = INADDR_ANY; 
+	if(local_enthernet_ip.IsEmpty())
+		servAddr.sin_addr.s_addr = INADDR_ANY; 
+	else
+		servAddr.sin_addr.s_addr =  inet_addr(local_network_ip);
 
 	USES_CONVERSION;   
 
@@ -3854,6 +3861,89 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 	return m_refresh_net_device_data.size();
 }
 
+int GetHostAdaptersInfo(CString &IP_address_local)
+{
+	CString szAdaptersInfo;
+	PIP_ADAPTER_INFO pAdapterInfo;
+	PIP_ADAPTER_INFO pAdapter = NULL;
+	DWORD dwRetVal = 0;
+	/* variables used to print DHCP time info */
+
+	pAdapterInfo = (IP_ADAPTER_INFO *) malloc( sizeof(IP_ADAPTER_INFO) );
+	ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+	// Make an initial call to GetAdaptersInfo to get
+	// the necessary size into the ulOutBufLen variable
+	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
+	{
+		free(pAdapterInfo);
+		pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen); 
+		if (pAdapterInfo == NULL) 
+		{
+			return -1;
+		}
+	}
+	int i_CntAdapters = 0;
+	CString szTmp;
+	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) == NO_ERROR) 
+	{
+		pAdapter = pAdapterInfo;
+		while (pAdapter) 
+		{            
+			szTmp.Format(_T("adapter name: %s "),pAdapter->AdapterName);
+			szAdaptersInfo += szTmp;
+			szTmp.Format(_T("adapter description: %s "),pAdapter->Description);
+			szAdaptersInfo += szTmp;
+			szTmp.Format(_T("adapter address: "));
+			szAdaptersInfo += szTmp;
+			for (UINT i = 0; i < pAdapter->AddressLength; i++) 
+			{
+				if (i == (pAdapter->AddressLength - 1))
+				{
+					szTmp.Format(_T("%.2X "),(int)pAdapter->Address[i]);
+					szAdaptersInfo += szTmp;
+				}
+				else                        
+				{
+					szTmp.Format(_T("%.2X-"),(int)pAdapter->Address[i]);
+					szAdaptersInfo += szTmp;
+				}                            
+			}                    
+			szTmp.Format(_T("ip address: %s "),pAdapter->IpAddressList.IpAddress.String);
+			szAdaptersInfo += szTmp;
+			szTmp.Format(_T("ip mask: %s "),pAdapter->IpAddressList.IpMask.String);
+			szAdaptersInfo += szTmp;
+			szTmp.Format(_T("gateway: %s "),pAdapter->GatewayList.IpAddress.String);
+			szAdaptersInfo += szTmp;
+
+			szTmp.Format(_T("type: %d "),pAdapter->Type);
+			szAdaptersInfo += szTmp;
+			if(pAdapter->Type == 6)
+			{
+				IP_address_local.Empty();
+				MultiByteToWideChar( CP_ACP,0,(char *)pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
+					IP_address_local.GetBuffer(MAX_PATH), MAX_PATH );
+				IP_address_local.ReleaseBuffer();
+				break;
+
+				//IP_address_local.fo
+			}
+
+			szTmp.Format(_T("index: %d "),pAdapter->Index);
+			szAdaptersInfo += szTmp;
+
+			pAdapter = pAdapter->Next;
+			i_CntAdapters++;
+		}
+	}
+	else 
+	{ 
+		if (pAdapterInfo)
+			free(pAdapterInfo);
+		return -1;
+	}
+	szTmp.ReleaseBuffer();
+	return i_CntAdapters;
+}
 
 //UINT RefreshNetWorkDeviceListByUDPFunc(LPVOID pParam)
 UINT RefreshNetWorkDeviceListByUDPFunc()
@@ -3866,7 +3956,6 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 	//	return 0;*/
 	//}
 	short nmsgType=UPD_BROADCAST_QRY_MSG;
-
 
 	//////////////////////////////////////////////////////////////////////////
 	const DWORD END_FLAG = 0x00000000;
@@ -3888,14 +3977,9 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 	while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
 	{
 		time_out++;
-		if(time_out>300)
+		if(time_out>5)
 			bTimeOut = TRUE;
-		//if(pScanner->m_bStopScan)
-		//{
-		//	CString strlog=_T("Scan Stop Time: ")+Get_NowTime()+_T("\n");
-		//	NET_WriteLogFile(strlog);
-		//	break;
-		//}
+
 		FD_ZERO(&fdSocket);	
 		FD_SET(h_Broad, &fdSocket);
 
@@ -3919,62 +4003,80 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 		if(nSelRet > 0)
 		{
 			ZeroMemory(buffer, 512);
-			int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
-			BYTE szIPAddr[4] = {0};
-			if(nRet > 0)
-			{		
-				FD_ZERO(&fdSocket);
-				if(buffer[0]==RESPONSE_MSG)
-				{	
-					nLen=buffer[2]+buffer[3]*256;
-					unsigned short dataPackage[32]={0};
-					memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
-					szIPAddr[0]= (BYTE)dataPackage[7];
-					szIPAddr[1]= (BYTE)dataPackage[8];
-					szIPAddr[2]= (BYTE)dataPackage[9];
-					szIPAddr[3]= (BYTE)dataPackage[10];
+			int nRet ;
+			int nSelRet;
+			do 
+			{
+				 nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
 
-					int n = 1;
-					BOOL bFlag=FALSE;
-					//////////////////////////////////////////////////////////////////////////
-					// 检测IP重复
-					DWORD dwValidIP = 0;
-					memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
-					while(dwValidIP != END_FLAG)
-					{	
-						DWORD dwRecvIP=0;
-						memcpy((BYTE*)&dwRecvIP, szIPAddr, 4);
-						memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
-						if(dwRecvIP == dwValidIP)
-						{
-							bFlag = TRUE;
-							break;
-						}
-						n+=4;
-					}
-					//////////////////////////////////////////////////////////////////////////
-					if (!bFlag)
-					{
-						AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
+				 BYTE szIPAddr[4] = {0};
+				 if(nRet > 0)
+				 {		
+					 FD_ZERO(&fdSocket);
+					 if(buffer[0]==RESPONSE_MSG)
+					 {	
+						 nLen=buffer[2]+buffer[3]*256;
+						 unsigned short dataPackage[32]={0};
+						 memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
+						 szIPAddr[0]= (BYTE)dataPackage[7];
+						 szIPAddr[1]= (BYTE)dataPackage[8];
+						 szIPAddr[2]= (BYTE)dataPackage[9];
+						 szIPAddr[3]= (BYTE)dataPackage[10];
 
-						//pSendBuf[nSendLen-1] = (BYTE)(modbusID);
-						pSendBuf[nSendLen-4] = szIPAddr[0];
-						pSendBuf[nSendLen-3] = szIPAddr[1];
-						pSendBuf[nSendLen-2] = szIPAddr[2];
-						pSendBuf[nSendLen-1] = szIPAddr[3];
-						memcpy(pSendBuf + nSendLen, (BYTE*)&END_FLAG, 4);
-						//////////////////////////////////////////////////////////////////////////
+						 int n = 1;
+						 BOOL bFlag=FALSE;
+						 //////////////////////////////////////////////////////////////////////////
+						 // 检测IP重复
+						 DWORD dwValidIP = 0;
+						 memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
+						 while(dwValidIP != END_FLAG)
+						 {	
+							 DWORD dwRecvIP=0;
+							 memcpy((BYTE*)&dwRecvIP, szIPAddr, 4);
+							 memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
+							 if(dwRecvIP == dwValidIP)
+							 {
+								 bFlag = TRUE;
+								 break;
+							 }
+							 n+=4;
+						 }
+						 //////////////////////////////////////////////////////////////////////////
+						 if (!bFlag)
+						 {
+							 AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
 
-						//pSendBuf[nSendLen+3] = 0xFF;
-						nSendLen+=4;
-					}
-					else
-					{
-						AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
-					}
-				}	
+							 //pSendBuf[nSendLen-1] = (BYTE)(modbusID);
+							 pSendBuf[nSendLen-4] = szIPAddr[0];
+							 pSendBuf[nSendLen-3] = szIPAddr[1];
+							 pSendBuf[nSendLen-2] = szIPAddr[2];
+							 pSendBuf[nSendLen-1] = szIPAddr[3];
+							 memcpy(pSendBuf + nSendLen, (BYTE*)&END_FLAG, 4);
+							 //////////////////////////////////////////////////////////////////////////
 
-			}
+							 //pSendBuf[nSendLen+3] = 0xFF;
+							 nSendLen+=4;
+						 }
+						 else
+						 {
+							 AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
+						 }
+					 }	
+				 }
+				 else
+				 {
+					 break;
+				 }
+
+
+				 FD_ZERO(&fdSocket);	
+				 FD_SET(h_Broad, &fdSocket);
+				 nLen = sizeof(h_siBind);
+				 fdRead = fdSocket;
+				 nSelRet = ::select(0, &fdRead, NULL, NULL, &time);//TRACE("recv nc info == %d\n", nSelRet);
+			} while (nSelRet);
+			//int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
+
 		}	
 		else
 		{
@@ -3998,11 +4100,26 @@ END_SCAN:
 		BOOL bDontLinger = FALSE;
 		setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
 
+#if 1
 		//SOCKADDR_IN bcast;
 		h_bcast.sin_family=AF_INET;
 		//bcast.sin_addr.s_addr=nBroadCastIP;
 		h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
 		h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+#endif
+
+		local_enthernet_ip.Empty();
+		GetHostAdaptersInfo(local_enthernet_ip);
+		if(!local_enthernet_ip.IsEmpty())
+		{
+
+			WideCharToMultiByte( CP_ACP, 0, local_enthernet_ip.GetBuffer(), -1, local_network_ip, 255, NULL, NULL );
+			h_siBind.sin_family=AF_INET;
+			h_siBind.sin_addr.s_addr =  inet_addr(local_network_ip);
+			//h_siBind.sin_addr.s_addr=INADDR_ANY;
+			h_siBind.sin_port= htons(57619);
+			::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+		}
 
 #if 0
 		//SOCKADDR_IN siBind;
@@ -4301,6 +4418,6 @@ void DFTrace(LPCTSTR lpCString)
 	PrintText[count].Empty();
 	PrintText[count] =str + nCString;
 	PostMessage(h_debug_window,WM_ADD_DEBUG_CSTRING,(WPARAM)PrintText[count].GetBuffer(),NULL);
-	count = (count ++) % 90;
+	count = (count ++) % 900;
 	
 }

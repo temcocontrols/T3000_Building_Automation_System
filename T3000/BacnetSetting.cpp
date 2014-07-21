@@ -52,6 +52,7 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM0, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom0)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM1, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom1)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM2, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom2)
+	ON_BN_CLICKED(IDC_BUTTON_SETTING_LDF, &CBacnetSetting::OnBnClickedButtonSettingLdf)
 END_MESSAGE_MAP()
 
 
@@ -624,4 +625,18 @@ void CBacnetSetting::OnCancel()
 	// TODO: Add your specialized code here and/or call the base class
 
 	//CDialogEx::OnCancel();
+}
+
+
+void CBacnetSetting::OnBnClickedButtonSettingLdf()
+{
+	// TODO: Add your control notification handler code here
+	if(IDYES == MessageBox(_T("Are you sure you want load factory default"),_T("Warning"),MB_YESNOCANCEL | MB_ICONINFORMATION))
+	{
+		Device_Basic_Setting.reg.reset_default = 88;
+		CString temp_task_info;
+		temp_task_info.Format(_T("Load Factory Default "));
+		Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+	}
+	
 }

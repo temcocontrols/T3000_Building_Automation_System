@@ -424,12 +424,21 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			m_output_list.SetCellEnabled(i,OUTPUT_0_PERSENT,1);
 			m_output_list.SetCellEnabled(i,OUTPUT_100_PERSENT,1);
 
-			m_output_list.SetItemText(i,OUTPUT_RANGE,OutPut_List_Analog_Range[m_Output_data.at(i).range]);
-			m_output_list.SetItemText(i,OUTPUT_UNITE,OutPut_List_Analog_Units[m_Output_data.at(i).range]);
+
+			if(m_Output_data.at(i).range < (sizeof(OutPut_List_Analog_Range)/sizeof(OutPut_List_Analog_Range[0])))
+				m_output_list.SetItemText(i,OUTPUT_RANGE,OutPut_List_Analog_Range[m_Output_data.at(i).range]);
+			else
+				m_output_list.SetItemText(i,OUTPUT_RANGE,_T("Out of range"));
+
+			if(m_Output_data.at(i).range < (sizeof(OutPut_List_Analog_Units)/sizeof(OutPut_List_Analog_Units[0])))
+				m_output_list.SetItemText(i,OUTPUT_UNITE,OutPut_List_Analog_Units[m_Output_data.at(i).range]);
+			else
+				m_output_list.SetItemText(i,OUTPUT_UNITE,_T(""));
 
 			CString temp_low,temp_high;
 			temp_low.Format(_T("%d"),m_Output_data.at(i).m_del_low);
 			temp_high.Format(_T("%d"),m_Output_data.at(i).s_del_high);
+
 
 			CString temp_value;
 			temp_value.Format(_T("%.2f"),((float)m_Output_data.at(i).value) / 1000);
@@ -609,6 +618,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 			return 0;
 		}
 
+		cs_temp.MakeUpper();
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );

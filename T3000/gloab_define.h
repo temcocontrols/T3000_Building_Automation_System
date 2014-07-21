@@ -125,7 +125,7 @@ const int DOWNLOAD_MD5_CHECK_PASS = 21;
 #define WM_SCREENEDIT_CLOSE WM_USER + 1232
 
 //const int BACNETIP_PORT =  47808;
-const int BACNETIP_PORT =  47809;
+const int BACNETIP_PORT =  47808;
 const int TEMCO_SERVER_PORT = 31234;
 const int UDP_BROADCAST_PORT =1234;
 const int RECV_RESPONSE_PORT = 4321;
@@ -462,7 +462,7 @@ const CString Yes_No[] =
 
 const CString Digital_Units_Array[] = 
 {
-	_T("Unused"),
+	_T(""),
 	_T("Off/On"),
 	_T("Close/Open"),
 	_T("Stop/Start"),
@@ -494,7 +494,7 @@ const CString Digital_Units_Array[] =
 
 const CString Output_Analog_Units_Show[] = 
 {
-	_T("Unused"),
+	_T(""),
 	_T("Volts"),
 	_T("%Open"),
 	_T("psi"),
@@ -505,7 +505,7 @@ const CString Output_Analog_Units_Show[] =
 
 const CString OutPut_List_Analog_Range[] =
 {
-	_T("Unused"),
+	_T(""),
 	_T("0.0 -> 10"),
 	_T("0.0 -> 100"),
 	_T("0.0 -> 20"),
@@ -516,7 +516,7 @@ const CString OutPut_List_Analog_Range[] =
 
 const CString OutPut_List_Analog_Units[] =
 {
-	_T("Unused"),
+	_T(""),
 	_T("Volts"),
 	_T("%Open"),
 	_T("psi"),
@@ -527,7 +527,7 @@ const CString OutPut_List_Analog_Units[] =
 
 const CString Input_List_Analog_Units[] =
 {
-	_T("Unused"),
+	_T(""),
 	 _T("Deg.C"),
 	 _T("Deg.F"),
 	 _T("Deg.C"),
@@ -550,7 +550,7 @@ const CString Input_List_Analog_Units[] =
 
 const CString Input_Analog_Units_Array[] =
 {
-	_T("Unused"),
+	 _T(""),
 	 _T("Y3K -40 to 150"),
 	 _T("Y3K -40 to 300"),
 	 _T("10K -40 to 120"),
@@ -596,7 +596,7 @@ const CString Device_Serial_Port_Status[] =
 
 const CString Variable_Analog_Units_Array[] = 
 {
-	_T("Unused"),
+	_T(""),
 	_T("Deg.C"),
 	_T("Deg.F"),
 	_T("Feet per Min"),

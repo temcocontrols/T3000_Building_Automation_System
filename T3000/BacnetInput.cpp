@@ -303,10 +303,11 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 		CString cs_temp = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
 		if(cs_temp.GetLength()>= STR_IN_LABEL)	//长度不能大于结构体定义的长度;
 		{
-			MessageBox(_T("Length can not higher than 8"),_T("Warning"));
+			MessageBox(_T("Length can not greater than 8"),_T("Warning"));
 			PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 			return 0;
 		}
+		cs_temp.MakeUpper();
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -562,9 +563,16 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 			m_input_list.SetCellEnabled(i,INPUT_CAL,1);
 
+			if(m_Input_data.at(i).range <  (sizeof(Input_Analog_Units_Array)/sizeof(Input_Analog_Units_Array[0])))
+				m_input_list.SetItemText(i,INPUT_RANGE,Input_Analog_Units_Array[m_Input_data.at(i).range]);
+			else
+				m_input_list.SetItemText(i,INPUT_RANGE,_T("Out of range"));
 
-			m_input_list.SetItemText(i,INPUT_RANGE,Input_Analog_Units_Array[m_Input_data.at(i).range]);
-			m_input_list.SetItemText(i,INPUT_UNITE,Input_List_Analog_Units[m_Input_data.at(i).range]);
+			if(m_Input_data.at(i).range <  (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
+				m_input_list.SetItemText(i,INPUT_UNITE,Input_List_Analog_Units[m_Input_data.at(i).range]);
+			else
+				m_input_list.SetItemText(i,INPUT_RANGE,_T(""));
+			
 
 
 			CString cstemp_value;

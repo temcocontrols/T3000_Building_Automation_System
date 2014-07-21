@@ -95,6 +95,7 @@ INPUT void SetCommunicationType(int nType);
 INPUT int NetController_CheckTstatOnline(unsigned char devLo=1,unsigned char devHi=254);
 INPUT bool Open_Socket2(CString strIPAdress,short nPort);
 
+INPUT int GetLastSuccessBaudrate();
 INPUT int GetLastOpenedComport();
 INPUT int GetLastCommunicationType();
 INPUT int GetCommunicationType();

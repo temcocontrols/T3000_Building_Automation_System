@@ -170,7 +170,8 @@ void BacnetController::Initial_List()
 		}
 	}
 }
-
+extern int pointtotext_for_controller(char *buf,Point_T3000 *point);
+extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
 LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 {
 	CString temp_des2;
@@ -184,6 +185,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 	}
 	else
 	{
+#if 1
 		if(m_controller_list.IsDataNewer((char *)&m_controller_data.at(0),sizeof(Str_controller_point) * BAC_CONTROLLER_COUNT))
 		{
 			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
@@ -193,6 +195,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 		{
 			return 0;
 		}
+#endif
 	}
 	
 
@@ -319,6 +322,23 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 				temp_des2.Empty();
 			else
 			{
+				int num_point,num_panel,num_net,k;
+				Point_T3000 point;
+				point.number = m_controller_data.at(i).setpoint.number;
+				point.panel = m_controller_data.at(i).setpoint.panel;
+				point.point_type = m_controller_data.at(i).setpoint.point_type;
+				byte point_type,var_type;
+				
+				int temp_network = 0;
+				char buf[255];
+				char q[17];
+				pointtotext_for_controller(q, &point);
+				strcpy(buf,ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, temp_network, point.panel, &k));
+				
+				MultiByteToWideChar( CP_ACP, 0, (char *)buf,(int)strlen((char *)buf)+1, 
+					temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
+				temp_des2.ReleaseBuffer();	
+#if 0
 				MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(m_controller_data.at(i).setpoint.number - 1).label, 
 					(int)strlen((char *)m_Variable_data.at(m_controller_data.at(i).setpoint.number - 1).label)+1, 
 					temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
@@ -347,6 +367,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 						//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_value);
 					}
 				}
+#endif
 			}
 
 

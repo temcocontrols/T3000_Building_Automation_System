@@ -28,7 +28,7 @@
 int g_Commu_type=0;//0:serial modus//
 	CString last_connected_ip;
 	int last_connected_port = 0;
-
+	int successful_baudrate = 19200;
 //CMutex scan_mutex;
 
 
@@ -36,6 +36,12 @@ int g_Commu_type=0;//0:serial modus//
 CStdioFile* g_fileScanLog = NULL;
 CStdioFile* g_fileScanNetLog=NULL;
 
+
+
+OUTPUT int GetLastSuccessBaudrate()
+{
+	return successful_baudrate;
+}
 
 OUTPUT int GetLastOpenedComport()
 {
@@ -677,6 +683,7 @@ OUTPUT bool Change_BaudRate(TS_US new_baudrate)
 		successful=true;
 		break;
 	}
+	successful_baudrate = new_baudrate;
 	return(successful);
 }
 

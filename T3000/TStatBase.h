@@ -68,7 +68,7 @@ public:
 	
 	
 	Mainnet_info	m_mainnet_info;
-protected:
+public:
 	DWORD	m_dwSerialID;				// 每个产品的序列号ID，出厂时设定
 	int			m_nDevID;					// 设备ID，当设备联网工作时的ID，这个内容必须与寄存器同步
 	BOOL		m_bOnLine;					// 连接状态，TRUE＝在线，FALSE＝掉线
