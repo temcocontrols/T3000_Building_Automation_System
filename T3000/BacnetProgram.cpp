@@ -219,7 +219,7 @@ LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 			PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 			return 0;
 		}
-
+		cs_temp.MakeUpper();
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );

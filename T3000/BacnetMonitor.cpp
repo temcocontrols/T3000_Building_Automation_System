@@ -566,6 +566,13 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Item(WPARAM wParam,LPARAM lParam)
 
 	if(Changed_SubItem == MONITOR_LABEL)
 	{
+		if(New_CString.GetLength()>= STR_MONITOR_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
+		{
+			MessageBox(_T("Length can not greater than 8"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+			PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+			return 0;
+		}
+		New_CString.MakeUpper();
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, New_CString, -1, cTemp1, 255, NULL, NULL );

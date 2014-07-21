@@ -1374,7 +1374,7 @@ if(error!=-1)
 	memcpy(mycode,&ncod,2);
 
 		for(i=0;i<lline;i++)
-		{
+		{ 
 		 if(line_table[i].go_to!=0)
 		 {
 				for(k=0;k<index_go_to;k++)
@@ -6291,6 +6291,33 @@ else
 }
 
 
+int pointtotext_for_controller(char *buf,Point_T3000 *point)
+{
+	char x[4];
+	byte num,panel,point_type;
+	num=point->number;
+	panel=point->panel;
+	point_type=point->point_type;
+	if (point_type==0)
+	{
+		buf[0]=0;
+		return 1;
+	}
+	strcpy(buf,"");
+#ifdef Fance_Enable
+	strcpy(buf,itoa(panel+1,x,10));
+	if(panel+1<10 || num+1 < 100)
+		strcat(buf,"-");
+#endif
+	//strcat(buf,lin);
+
+
+	//	ptr_panel.info[point_type-1].name = "VAR";
+	strcat(buf,ptr_panel.info[point_type].name);	
+	//	strcat(buf,ptr_panel->info[point_type-1].name);
+	strcat(buf,itoa(num,x,10));
+	return 0;
+}
 
 int pointtotext(char *buf,Point_T3000 *point)
 {
@@ -6314,7 +6341,7 @@ int pointtotext(char *buf,Point_T3000 *point)
 
 
 //	ptr_panel.info[point_type-1].name = "VAR";
-	strcat(buf,ptr_panel.info[point_type-1].name);
+	strcat(buf,ptr_panel.info[point_type-1].name);	
 	//	strcat(buf,ptr_panel->info[point_type-1].name);
 	strcat(buf,itoa(num+1,x,10));
 	return 0;
@@ -6393,6 +6420,9 @@ for( i = 0 ; *func_table[i].func_name ; i++ )
 return "" ; /* unkown command */
 }
 
+
+unsigned int line_array[50][2];
+int ind_line_array;
 int	desexpr(void)
 {
  char *op1,*op2,*op;
@@ -6561,8 +6591,9 @@ int	desexpr(void)
 										if (*(code-1) == TIME_ON || *(code-1) == TIME_OFF )
 //											if ( ind_line_array && line_array[ind_line_array-1][0]!=line)
 											 {
-										//Fance mark		//line_array[ind_line_array][0] = (unsigned int)((long)FP_SEG(code)*16+(long)FP_OFF(code)-(long)(FP_SEG(pcode)*16+(long)FP_OFF(pcode)) + 2);
-												//memcpy(&line_array[ind_line_array++][1],code-3,2);
+												//line_array[ind_line_array][0] = (unsigned int)((long)FP_SEG(code)*16+(long)FP_OFF(code)-(long)(FP_SEG(pcode)*16+(long)FP_OFF(pcode)) + 2);
+												line_array[ind_line_array][0] = (unsigned int)((long)(*code)*16+(long)(*code)-(long)((*pcode)*16+(long)(*pcode)) + 2);
+												memcpy(&line_array[ind_line_array++][1],code-3,2);
 											  }
 										code += 2;
 									 }

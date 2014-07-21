@@ -153,10 +153,16 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 				//Scroll(CSize(0,m_select_raw));   
 				//SetScrollPos(m_select_raw);
-
+				//Scroll(CSize(0,m_select_raw));   
+				//SetScrollPos (SB_VERT, m_select_raw, TRUE) ;
+				if((GetItemCount() - m_select_raw ) > 20)
+					SendMessage(WM_VSCROLL,SB_LINEUP, 0 );
 
 				return ;
 			}
+			else
+				return ;
+
 		}
 		else if(nChar == VK_RIGHT)
 		{
@@ -191,8 +197,16 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				RedrawItems(m_select_raw,m_select_raw);
 				RedrawItems(old_select_raw,old_select_raw);
 
+				//Scroll(CSize(0,m_select_raw));   
+				//SetScrollPos (SB_VERT, m_select_raw, TRUE) ;
+				if(m_select_raw>20)
+					SendMessage(WM_VSCROLL,SB_LINEDOWN, 0 );
+
 				return ;
 			}
+			else
+				return ;
+
 
 		}
 	}

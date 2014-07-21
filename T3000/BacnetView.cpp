@@ -1,6 +1,22 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2014-07-18
+Update by Fance
+1. Improve the quality of communication. 
+2. Improve the network scan feature.
+3. T3000 will scan device via serial port with baud rate both “9600” and “19200”.Before we only use 19200.
+4. Add feature user can add device not through the scan command.
+5. Bacnet programming feature support both lower-case and upper-case now.
+6. All the Bacnet list (input/output/…), it will auto scroll, when user press up or down , the list item will automatically up and down.
+7. Hide the graphic useless button. Add button feature to load factory default.(For Bacnet device)
+8. Improve code to support read TSTAT6 through Zigbee module. Now it read smoothly.
+
+
+2014-07-03
+Update by Fance
+1.All the Listctrl, it will auto scroll,when user press up or down , the list item will automatically up and down.
+2.Hide the graphic useless button.(Maurice required)
 
 2014-06-19
 Update by Fance
@@ -607,6 +623,7 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 		break;
 	case START_BACNET_TIMER:
 		{
+			DFTrace(_T("Connect to the device use the modbus ip and port success!"));
 			if(m_is_remote_device)
 			{
 				Send_WhoIs_remote_ip(remote_ip_address);
@@ -625,7 +642,8 @@ LRESULT CDialogCM5_BacNet::Delete_New_Dlg(WPARAM wParam,LPARAM lParam)
 		{
 			CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 			pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
-			MessageBox(_T("Connect to the device failed! No response! Please Check the connection!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);;
+			MessageBox(_T("Connect to the device failed! No response from the TCP server!\
+				\r\nPlease Check the connection!\r\n"),_T("Notice"),MB_OK | MB_ICONINFORMATION);;
 		}
 		break;
 	}
@@ -2284,6 +2302,7 @@ DWORD WINAPI ConnectToDevice(LPVOID lPvoid)
 		}
 		else//更新数据库;如果是通过modbus扫描到得bacnet设备，因为不知道它的instance ID和panel number.所有读到后更新数据库;
 		{
+			bac_gloab_panel = g_mac;
 			if((g_bac_instance != temp_instance) || (g_mac != temp_mac))
 			{
 				g_bac_instance = temp_instance;
@@ -2386,20 +2405,6 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 	
 	switch(nIDEvent)
 	{
-	//case 1:
-	//	if(Old_connect_results != connect_results)//Prevent repeatedly to redraw the Static.
-	//	{
-	//		if(connect_results)
-	//		{
-	//			SetPaneString(BAC_SHOW_CONNECT_RESULTS,_T("Connected"));
-	//		}
-	//		else
-	//		{
-	//			SetPaneString(BAC_SHOW_CONNECT_RESULTS,_T("Disconnected"));
-	//		}
-	//	}
-
-	//	break;
 	case 2:
 		{
 			if(this->IsWindowVisible())
@@ -2496,7 +2501,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					//SetPaneString(2,_T("Offline"));
 					CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 					pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
-					MessageBox(_T("No response! Please Check the connection!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);;
+					MessageBox(_T("Who is command no response! Please Check the connection!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);;
 				}
 				else
 				{
@@ -2693,6 +2698,9 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 			pDialog[i]->ShowWindow(SW_HIDE);
 		}
 	}
+
+	pDialog[selected]->SetFocus();
+
 	if(old_selected_item!= selected)
 		old_selected_item = selected;
 	*pResult = 0;
@@ -2707,11 +2715,12 @@ BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
 		m_cur_tab_sel = m_bac_main_tab.GetCurSel();
 		m_cur_tab_sel = (++m_cur_tab_sel)%WINDOW_TAB_COUNT;
 		m_bac_main_tab.SetCurSel(m_cur_tab_sel);
-
+		pDialog[m_cur_tab_sel]->SetFocus();
 		for (int i=0;i<WINDOW_TAB_COUNT;i++)
 		{
 			if(i==m_cur_tab_sel)
 			{
+				
 				pDialog[i]->ShowWindow(SW_SHOW);
 				switch(i)
 				{
@@ -2758,8 +2767,12 @@ BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
 					g_hwnd_now = m_monitor_dlg_hwnd;
 					break;
 				case WINDOW_TSTAT:
-					PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_TSTAT);
-					//	((CBacnetTstat *)pDialog[i])->Fresh_Alarmlog_List(NULL,NULL);
+					if(!tab_loaded[WINDOW_TSTAT])
+					{
+						PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_TSTAT);
+						Set_Tab_Loaded_Parameter(WINDOW_TSTAT);
+					}
+					((CBacnetTstat *)pDialog[i])->Fresh_Tstat_List(NULL,NULL);
 					g_hwnd_now = m_tstat_dlg_hwnd;
 					break;
 				case WINDOW_SETTING:
@@ -2767,7 +2780,8 @@ BOOL CDialogCM5_BacNet::PreTranslateMessage(MSG* pMsg)
 					g_hwnd_now = m_setting_dlg_hwnd;
 					break;
 				}
-
+				//SendMessageA(g_hwnd_now,WM_KEYDOWN,VK_ESCAPE,NULL);
+				keybd_event(VK_ESCAPE,0,0,0);
 				//			pDialog[i]->OnInitDialog();
 			}
 			else

@@ -61,7 +61,9 @@ BOOL BacnetRange::OnInitDialog()
 	Initial_static();
 	// TODO:  Add extra initialization here
 	SetTimer(1,400,NULL);
-	return TRUE;  // return TRUE unless you set the focus to a control
+	((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetFocus();
+	return FALSE;
+	//return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
@@ -299,6 +301,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 				MessageBox(_T("Please input a value between 0 - 33"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 				GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(_T(""));
 				((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetSel(0,-1);
+				((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetFocus();
 			}
 			else
 			{
@@ -316,6 +319,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 				MessageBox(_T("Please input a value between 0 - 22"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 				GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(_T(""));
 				((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetSel(0,-1);
+				((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetFocus();
 			}
 			else
 			{
@@ -335,6 +339,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 				MessageBox(_T("Please input a value between 0 - 6"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 				GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(_T(""));
 				((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetSel(0,-1);
+				((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetFocus();
 			}
 			else
 			{
@@ -350,6 +355,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 				MessageBox(_T("Please input a value between 0 - 18"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 				GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(_T(""));
 				((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetSel(0,-1);
+				((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetFocus();
 			}
 			else
 			{

@@ -80,7 +80,7 @@ int modbus_read_one_value(
 
 		// set value that we received
 		value = (int) j;
-
+		error_ret = 0;
 
 		// we have a good value, so no need to try again
 		break;
