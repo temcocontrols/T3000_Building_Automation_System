@@ -4771,7 +4771,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 		//清空串口缓冲区
 		//the return value is the register address
 			strlog.Format(_T("Scan From ID=%d To ID=%d"),devLo,devHi);
-			WriteLogFile(strlog);
+			//WriteLogFile(strlog);
 		if(devLo<1 || devHi>254)
 			return -5;
 		//the input inspect
@@ -4855,7 +4855,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 				CString strCom;
 				strCom.Format(_T("Com=%d : "), open_com_port_number_in_dll);
 			
-				WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
+				//WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
 				    CString filelog;
 				filelog=_T("Send a scan command to any devices: ");
 				//SaveBufferToLogFile(pval, 6);
@@ -4869,7 +4869,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 					//g_fileScanLog->WriteString(strValue);
 					filelog+=strValue;
 				}
-				WriteLogFile(filelog);
+				//WriteLogFile(filelog);
 				filelog.Empty();
 				filelog=_T("Recv Data : ");
 				for (int i = 0; i < 13; i++)
@@ -4880,15 +4880,15 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 					//g_fileScanLog->WriteString(strValue);
 					filelog+=strValue;
 				}
-				WriteLogFile(filelog);
+				//WriteLogFile(filelog);
 				int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
 				if(index==-1)
 				{
-				 WriteLogFile(_T(">>More than one device answer......"));
+				 //WriteLogFile(_T(">>More than one device answer......"));
 				}
 				else
 				{
-				  WriteLogFile(_T(">>No one device answer......"));
+				  //WriteLogFile(_T(">>No one device answer......"));
 				}
 				//SaveBufferToLogFile(gval, 13);
 
@@ -4968,7 +4968,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 		//清空串口缓冲区
 		//the return value is the register address
 		strlog.Format(_T("Scan From ID=%d To ID=%d"),devLo,devHi);
-		NET_WriteLogFile(strlog);
+		//NET_WriteLogFile(strlog);
 		if(devLo<1 || devHi>254)
 			return -5;
 		//the input inspect
@@ -5013,7 +5013,7 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 		}
 
 
-		NET_WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
+		//NET_WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
 		CString filelog;
 		filelog=_T("Send a scan command to any devices: ");
 
@@ -5025,9 +5025,9 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 			//g_fileScanLog->WriteString(strValue);
 			filelog+=strValue;
 		}
-		NET_WriteLogFile(filelog);
+		//NET_WriteLogFile(filelog);
 		filelog.Empty();
-		NET_WriteLogFile(_T("Recv Data : "));
+		//NET_WriteLogFile(_T("Recv Data : "));
 		for (int i = 0; i < 19; i++)
 		{
 			int nValue = rvdata[i];
@@ -5037,16 +5037,16 @@ OUTPUT int NetController_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm
 			filelog+=strValue;
 		}
 		
-		NET_WriteLogFile(filelog);
+		//NET_WriteLogFile(filelog);
 		 
 		int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
 		if(index==-1)
 		{
-			NET_WriteLogFile(_T(">>More than one device answer......"));
+			//NET_WriteLogFile(_T(">>More than one device answer......"));
 		}
 		else
 		{
-			NET_WriteLogFile(_T(">>No one device answer......"));
+			//NET_WriteLogFile(_T(">>No one device answer......"));
 		}
 
 		if(gval[8]==0 && gval[9]==0 && gval[10]==0 && gval[11]==0 && gval[12]==0)
@@ -5316,7 +5316,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		//清空串口缓冲区
 		//the return value is the register address
 		strlog.Format(_T("Com Scan:  From ID=%d To ID=%d"),devLo,devHi);
-		WriteLogFile(strlog);
+		//WriteLogFile(strlog);
 
 		if(devLo<1 || devHi>254)
 			return -5;
@@ -5397,7 +5397,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		 
 		  
 
-		WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
+		//WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
 		CString filelog;
 		filelog=_T("Send a scan command to any devices: ");
 		
@@ -5412,7 +5412,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 			filelog+=strValue;
 		}
 		 
-		WriteLogFile(filelog);
+		//WriteLogFile(filelog);
 		filelog.Empty();
 		filelog=_T("Recv Data : ");
 		for (int i = 0; i < 13; i++)
@@ -5436,15 +5436,15 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 			}
 		}
 		
-		WriteLogFile(filelog);
+		//WriteLogFile(filelog);
 		int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
 		if(index==-1)
 		{
-			WriteLogFile(_T(">>More than one device answer......"));
+			//WriteLogFile(_T(">>More than one device answer......"));
 		}
 		else
 		{
-			WriteLogFile(_T(">>No one device answer......"));
+			//WriteLogFile(_T(">>No one device answer......"));
 		}
 
 
@@ -5530,7 +5530,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		//清空串口缓冲区
 		//the return value is the register address
 		strlog.Format(_T("NET Scan:  From ID=%d To ID=%d"),devLo,devHi);
-		NET_WriteLogFile(strlog);
+		//NET_WriteLogFile(strlog);
 		if(devLo<1 || devHi>254)
 			return -5;
 		//the input inspect
@@ -5582,7 +5582,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		}
 
 //		static int num = 0;
-		NET_WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
+		//NET_WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
 		CString filelog;
 		filelog=_T("Send a scan command to any devices: ");
 	 
@@ -5596,7 +5596,7 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 			filelog+=strValue;
 		}
 		 
-		NET_WriteLogFile(filelog);
+		//NET_WriteLogFile(filelog);
 		filelog.Empty();
 		 
 		filelog=_T("Recv Data : ");
@@ -5608,16 +5608,16 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 			//g_fileScanLog->WriteString(strValue);
 			filelog+=strValue;
 		}
-		//NET_WriteLogFile(_T("Recv Data:"));
-		NET_WriteLogFile(filelog);
+		////NET_WriteLogFile(_T("Recv Data:"));
+		//NET_WriteLogFile(filelog);
 		int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
 		if(index==-1)
 		{
-			WriteLogFile(_T(">>More than one device answer......"));
+			//WriteLogFile(_T(">>More than one device answer......"));
 		}
 		else
 		{
-			WriteLogFile(_T(">>No one device answer......"));
+			//WriteLogFile(_T(">>No one device answer......"));
 		}
 
 //		if (g_fileScanLog == NULL)
@@ -5905,60 +5905,7 @@ OUTPUT void Createfile()
 	m_pFile->Open(m_strFileINI.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
 }
 
-OUTPUT void WriteLogFile(CString strlog){
-	logfile_section.Lock();
-	if (g_fileScanLog == NULL)
-	{
-		g_fileScanLog = new CStdioFile;
-	
-		TCHAR exeFullPath[MAX_PATH+1]; //
-		GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
-		(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
-		CString g_strExePth=exeFullPath;
-		m_strFileINI = g_strExePth + _T("COM_Log.TXT");
-		g_fileScanLog->Open(m_strFileINI.GetString(), CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone );
-		g_fileScanLog->Close();
-	}
 
-	if(g_fileScanLog != NULL)
-	{	
-		TCHAR exeFullPath[MAX_PATH+1]; //
-		GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
-		(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
-		CString g_strExePth=exeFullPath;
-		m_strFileINI = g_strExePth + _T("COM_Log.TXT");
-		if (g_fileScanLog->Open(m_strFileINI.GetString(),CFile::modeReadWrite | CFile::shareDenyNone ))
-		{
-			g_fileScanLog->SeekToEnd();
-			g_fileScanLog->WriteString(strlog);
-			g_fileScanLog->WriteString(_T("\n"));
-			g_fileScanLog->Flush();
-			g_fileScanLog->Close();
-		}
-		else
-		{
-			g_fileScanLog->Close();
-			g_fileScanLog->Open(m_strFileINI.GetString(), CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone );
-			g_fileScanLog->SeekToEnd();
-			g_fileScanLog->WriteString(strlog);
-			g_fileScanLog->WriteString(_T("\n"));
-			g_fileScanLog->Flush();
-			g_fileScanLog->Close();
-		}
-
-
-	}
-
-	logfile_section.Unlock();
-}
-
-OUTPUT void CloseLogFile()
-{
-	//g_fileScanLog->Close();
-	delete g_fileScanLog;
-	g_fileScanLog=NULL;
-
-}
 
 OUTPUT CString Get_NowTime()
 {
@@ -5974,60 +5921,7 @@ OUTPUT CString Get_NowTime()
 	return strDate;
 }
 
-OUTPUT void NET_WriteLogFile(CString strlog){
-	NET_logfile_section.Lock();
-	if (g_fileScanNetLog == NULL)
-	{
-		g_fileScanNetLog = new CStdioFile;
 
-		TCHAR exeFullPath[MAX_PATH+1]; //
-		GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
-		(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
-		CString g_strExePth=exeFullPath;
-		m_strScanNetfilename = g_strExePth + _T("NET_Log.TXT");
-		g_fileScanNetLog->Open(m_strScanNetfilename.GetString(), CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone );
-		g_fileScanNetLog->Close();
-	}
-
-	if(g_fileScanNetLog != NULL)
-	{	
-		TCHAR exeFullPath[MAX_PATH+1]; //
-		GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
-		(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
-		CString g_strExePth=exeFullPath;
-		m_strScanNetfilename = g_strExePth + _T("NET_Log.TXT");
-		if (g_fileScanNetLog->Open(m_strScanNetfilename.GetString(),CFile::modeReadWrite | CFile::shareDenyNone ))
-		{
-			g_fileScanNetLog->SeekToEnd();
-			g_fileScanNetLog->WriteString(strlog);
-			g_fileScanNetLog->WriteString(_T("\n"));
-			g_fileScanNetLog->Flush();
-			g_fileScanNetLog->Close();
-		}
-		else
-		{
-			g_fileScanNetLog->Close();
-			g_fileScanNetLog->Open(m_strScanNetfilename.GetString(), CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone );
-			g_fileScanNetLog->SeekToEnd();
-			g_fileScanNetLog->WriteString(strlog);
-			g_fileScanNetLog->WriteString(_T("\n"));
-			g_fileScanNetLog->Flush();
-			g_fileScanNetLog->Close();
-		}
-
-
-	}
-
-	NET_logfile_section.Unlock();
-}
-
-OUTPUT void NET_CloseLogFile()
-{
-	//g_fileScanLog->Close();
-	delete g_fileScanNetLog;
-	g_fileScanNetLog=NULL;
-
-}
 
 OUTPUT int Read_One_tap(TS_UC device_var,TS_US address)
 {
@@ -7059,7 +6953,7 @@ OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int
 		//清空串口缓冲区
 		//the return value is the register address
 		strlog.Format(_T("Com Scan:  From ID=%d To ID=%d"),devLo,devHi);
-		WriteLogFile(strlog);
+		//WriteLogFile(strlog);
 
 		if(devLo<1 || devHi>254)
 			return -5;
@@ -7140,7 +7034,7 @@ OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int
 		 
 		  
 
-		WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
+		//WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
 		CString filelog;
 		filelog=_T("Send a scan command to any devices: ");
 		
@@ -7155,7 +7049,7 @@ OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int
 			filelog+=strValue;
 		}
 		 
-		WriteLogFile(filelog);
+		//WriteLogFile(filelog);
 		filelog.Empty();
 		filelog=_T("Recv Data : ");
 		for (int i = 0; i < 13; i++)
@@ -7167,15 +7061,15 @@ OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int
 			filelog+=strValue;
 		}
 		
-		WriteLogFile(filelog);
+		//WriteLogFile(filelog);
 		int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
 		if(index==-1)
 		{
-			WriteLogFile(_T(">>More than one device answer......"));
+			//WriteLogFile(_T(">>More than one device answer......"));
 		}
 		else
 		{
-			WriteLogFile(_T(">>No one device answer......"));
+			//WriteLogFile(_T(">>No one device answer......"));
 		}
 
 
@@ -7261,7 +7155,7 @@ OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int
 		//清空串口缓冲区
 		//the return value is the register address
 		strlog.Format(_T("MINIPannel NET Scan:  From ID=%d To ID=%d"),devLo,devHi);
-		NET_WriteLogFile(strlog);
+		//NET_WriteLogFile(strlog);
 		if(devLo<1 || devHi>254)
 			return -5;
 		//the input inspect
@@ -7314,7 +7208,7 @@ OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int
 		}
 
 //		static int num = 0;
-		NET_WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
+		//NET_WriteLogFile(_T(">>broad cast commnad here, fast check is any devices are alive"));
 		CString filelog;
 		filelog=_T("Send a scan command to any devices: ");
 	 
@@ -7328,7 +7222,7 @@ OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int
 			filelog+=strValue;
 		}
 		 
-		NET_WriteLogFile(filelog);
+		//NET_WriteLogFile(filelog);
 		filelog.Empty();
 		 
 		filelog=_T("Recv Data : ");
@@ -7340,16 +7234,16 @@ OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int
 			//g_fileScanLog->WriteString(strValue);
 			filelog+=strValue;
 		}
-		//NET_WriteLogFile(_T("Recv Data:"));
-		NET_WriteLogFile(filelog);
+		////NET_WriteLogFile(_T("Recv Data:"));
+		//NET_WriteLogFile(filelog);
 		int index=filelog.Find(_T("0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"));
 		if(index==-1)
 		{
-			WriteLogFile(_T(">>More than one device answer......"));
+			//WriteLogFile(_T(">>More than one device answer......"));
 		}
 		else
 		{
-			WriteLogFile(_T(">>No one device answer......"));
+			//WriteLogFile(_T(">>No one device answer......"));
 		}
 
 //		if (g_fileScanLog == NULL)

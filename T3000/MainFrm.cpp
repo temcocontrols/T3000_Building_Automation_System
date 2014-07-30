@@ -71,7 +71,7 @@ extern tree_product	m_product_isp_auto_flash;
 #pragma region Fance Test
 //For Test
 // 在没有鼠标和键盘消息的时候 就启用自动刷新 treeview,如果有就 不要刷新，因为如果正在刷新，客户肯能就无法第一时间读到自己想要的数据;
-bool no_mouse_keyboard_event_enable_refresh = true;
+
 bool start_record_time = true;	//开启计时，如果用户一段时间无键盘和鼠标左键操作就开启自动刷新;
 unsigned long time_click = 0;
 CTestMultiReadTraffic *g_testmultiReadtraffic_dlg=NULL;
@@ -188,9 +188,11 @@ const UINT uiLastUserToolBarId = uiFirstUserToolBarId + iMaxUserToolbars - 1;
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_MESSAGE(WM_REFRESH_TREEVIEW_MAP, RefreshTreeViewMap)
+	ON_MESSAGE(WM_SCAN_PRODUCT, Message_Scan_Product)
 	ON_MESSAGE(MY_BAC_CONFIG_READ_RESULTS, ReadConfigFromDeviceMessageCallBack)
 	ON_MESSAGE(MY_RESUME_DATA, AllWriteMessageCallBack)
 	ON_MESSAGE(MY_RX_TX_COUNT, Refresh_RX_TX_Count)
+	ON_MESSAGE(WM_SHOW_PANNELINFOR,Show_Panel)
 	ON_MESSAGE(WM_DELETE_NEW_MESSAGE_DLG,Delete_Write_New_Dlg)	
 	ON_MESSAGE(WM_HOTKEY,&CMainFrame::OnHotKey)
 	ON_WM_CREATE()
@@ -281,6 +283,12 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     
 	ON_WM_COPYDATA()
 	ON_COMMAND(ID_HELP_UPDATEFIRMWARE, &CMainFrame::OnHelpUpdatefirmware)
+
+
+	ON_UPDATE_COMMAND_UI(IDS_SHOW_RESULTS, &CMainFrame::OnUpdateStatusBar)
+	//ON_UPDATE_COMMAND_UI(ID_INDICATOR_FILEPOS, &CMainFrame::OnUpdatePaneFilePos)
+
+
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -290,9 +298,9 @@ static UINT indicators[] =
 	ID_BUILDING_INFO,
 	ID_PROTOCOL_INFO,
 	IDS_SHOW_RESULTS,
-	ID_INDICATOR_CAPS,
-	ID_INDICATOR_NUM,
-	ID_INDICATOR_SCRL,
+//  	ID_INDICATOR_CAPS,//老毛说不要
+//  	ID_INDICATOR_NUM,
+//  	ID_INDICATOR_SCRL,
 };
 
 unsigned short tempchange[512];
@@ -698,24 +706,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndStatusBar.SetPaneInfo(0,ID_RW_INFO,SBPS_NOBORDERS,   300);
    // int index = m_wndStatusBar.CommandToIndex(ID_BUILDING_INFO);	
 	m_wndStatusBar.SetPaneInfo(1,ID_BUILDING_INFO,SBPS_NOBORDERS, 300);
-//  SBPS_POPOUT | SBPS_NOBORDERS,300);	
-//	index = m_wndStatusBar.CommandToIndex(ID_RW_INFO);
-//	m_wndStatusBar.SetPaneInfo(index,ID_PROTOCOL_INFO,SBPS_NOBORDERS,250);//SBPS_POPOUT | SBPS_NOBORDERS,300);
-//	index = m_wndStatusBar.CommandToIndex(ID_PROTOCOL_INFO);
-	m_wndStatusBar.SetPaneInfo(2,ID_PROTOCOL_INFO,SBPS_STRETCH | SBPS_NOBORDERS , 100);
-	m_wndStatusBar.SetPaneInfo(3,IDS_SHOW_RESULTS,SBPS_NORMAL , 500);
+	m_wndStatusBar.SetPaneInfo(2,ID_PROTOCOL_INFO,SBPS_STRETCH | SBPS_NOBORDERS , 0);
+	m_wndStatusBar.SetPaneInfo(3,IDS_SHOW_RESULTS,SBPS_NOBORDERS , 1000);
+ 	m_wndStatusBar.EnablePaneDoubleClick ();
 
-	//m_wndStatusBar.SetPaneText(1, _T("No Connection"), TRUE);
-	m_wndStatusBar.SetPaneTextColor(0, RGB(224,0,0));
-
-	m_wndStatusBar.EnablePaneDoubleClick ();
-
-	//m_wndStatusBar.SetPaneText(1,_T("Helo"));
 
 
 	m_pTreeViewCrl=&m_wndWorkSpace.m_TreeCtrl;	
 	m_pTreeViewCrl->SetExtendedStyle(TVS_EDITLABELS, TVS_EDITLABELS);
-
+	MainFram_hwd = this->m_hWnd;
 
 	//  2011,7,4, 先判断是否第一次运行，是否要导入数据库。
 	//ImportDataBaseForFirstRun();
@@ -896,8 +895,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 	return 0;
 }
-
-
 
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
@@ -1093,15 +1090,19 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	for(UINT i=0;i<m_product.size();i++)
 	{
 		if(hSelItem==m_product.at(i).product_item )
-		{			
+		{	
+			g_strT3000LogString.Format(_T("Trying to connect to %s:%d"),GetProductName(m_product.at(i).product_class_id),m_product.at(i).serial_number);
+			SetPaneString(3,g_strT3000LogString);
 			if(m_product.at(i).product_class_id == PM_CM5)
 			{
 				g_tstat_id=m_product.at(i).product_id;
 				//SetPaneString(2,_T("Connect To CM5"));
 				m_isCM5=TRUE;
+				
 				DoConnectToANode(hSelItem); 
 				//SwitchToPruductType(4);			
-			}else if (m_product.at(i).product_class_id == PM_MINIPANEL)
+			}
+			else if (m_product.at(i).product_class_id == PM_MINIPANEL)
 			{
 				g_tstat_id = m_product.at(i).product_id;
 				m_isMiniPanel=TRUE;
@@ -2076,9 +2077,9 @@ void CMainFrame::OnDisconnect()
 	close_com();
 	m_nStyle=2;
     Invalidate();
-	CString strInfo = _T("No Connnection");
+	//CString strInfo = _T("No Connnection");
 	connectionSuccessful = 0;
-	SetPaneString(1,strInfo);
+	//SetPaneString(1,strInfo);
 	//strInfo = _T("Offline!");
 	//SetPaneString(2,strInfo);
 
@@ -2137,6 +2138,8 @@ BOOL CMainFrame::ConnectSubBuilding(Building_info build_info)
 	/*}
 	if (build_info.strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
 	{*/
+		g_strT3000LogString.Format(_T("Trying to connect to %s,please waiting..."),build_info.strIp);
+		SetPaneString(3,g_strT3000LogString);
 		UINT n1,n2,n3,n4;
 		if (ValidAddress(build_info.strIp,n1,n2,n3,n4)==FALSE)  // 验证NC的IP
 		{
@@ -2590,7 +2593,8 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			CString strTip;
 			strTip.Format(_T("Scanning %s, %s. Please wait."), g_strScanInfoPrompt, strTemp);
 
-
+			g_strT3000LogString=strTip;
+			::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 			if(!m_bScanALL)
 				SetPaneString(1,strTip);
 #if 0
@@ -2843,15 +2847,17 @@ void CMainFrame::Scan_Product()
 	strTime=Get_NowTime();
 	//开始时间
 	
-	CString strlog=_T("--------------------------------Scan Begin--------------------------------\n");
+	g_strT3000LogString=_T("--------------------------------Scan Begin--------------------------------\n");
 
 	
-	WriteLogFile(strlog);
-	NET_WriteLogFile(strlog);
-	strlog=_T("Scan begin Time: ");
-	strlog+=strTime+_T("\n");;
-	WriteLogFile(strlog); 
-	NET_WriteLogFile(strlog);
+	//WriteLogFile(g_strT3000LogString);
+	//NET_WriteLogFile(g_strT3000LogString);
+	 ::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+	g_strT3000LogString=_T("Scan begin Time: ");
+	g_strT3000LogString+=strTime+_T("\n");;
+	//WriteLogFile(g_strT3000LogString); 
+	//NET_WriteLogFile(g_strT3000LogString);
+	::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 	if(m_pRs->State)
 	m_pRs->Close(); 
 	if(m_pCon->State)
@@ -2908,83 +2914,15 @@ void CMainFrame::Scan_Product()
 
 	g_nStartID = 1;
 	g_nEndID = 254;
-
+	if (m_pWaitScanDlg!=NULL)
+	{
+		delete m_pWaitScanDlg;
+		m_pWaitScanDlg=NULL;
+	}
 	m_pWaitScanDlg = new CScanDbWaitDlg;	
 	m_pWaitScanDlg->SetTStatScaner(m_pScanner);	
-
-
-	//scan 自动com,tcp扫描，如果单一扫描则不会出现多扫（一个产品有两个标识出现）
-	//if (strProtocol == strMB485)
-	//{
-	//	CString strlog=_T("default will scan via 'modbus 485',\n do you also need 'modbus TCP'?\n");
-	//		  
-	////	WriteLogFile(strlog);
-	//	int ret = AfxMessageBox(_T("default will scan via 'modbus 485',\n do you also need 'modbus TCP'?"),MB_YESNOCANCEL ,3);
-	//	if ( ret == IDYES)
-	//	{	
-	//CScanwaydlg dlg;
-
-	// dlg.DoModal(); //AfxMessageBox(_T("YES: 'Quick Scan(Binary Search)' ,\n NO:'Deep Scan(One By One)'?"),MB_YESNOCANCEL ,3);
-	// 	if ( dlg.Is_Deep == 1)
-	// 	{
-	//		CScanSelectDlg dlg;
-	//		int ret=dlg.DoModal();
- //           if (ret==IDOK)
- //           {
- //               m_pScanner->ScanComOneByOneDevice();
- //               m_pScanner->WaitScan();
- //               m_pScanner->m_scantype=4;
- //           }
- //           else
- //           {
- //           return;
- //           }
-	//		
-	//	}
-	//	else if(dlg.Is_Deep == 2)
-	//	{
-			m_pScanner->ScanAll();
-			m_pScanner->m_scantype = 3;
-		//}
-		//else
-		//{
-		//	return;
-		//}
-
-	/*	}
-		else if(ret == IDNO)
-		{	
-		WriteLogFile(_T("You choose the Modbus 485 to scan \n Only Scan Com Port in your computer..."));
-		
-		    m_pScanner->ScanComDevice();
-			m_pScanner->WaitScan();
-			m_pScanner->m_scantype = 1;
-		}else
-		{
-			return;
-		}
-	}*/
-	/*else
-	{
-
-		int ret1 = AfxMessageBox(_T("default will scan via 'modbus TCP',\n do you also need 'modbus 485'?"),MB_YESNOCANCEL,3); 
-		if (ret1 == IDYES)
-		{
-			m_pScanner->ScanAll();
-			m_pScanner->m_scantype = 3;
-		}
-		else if (ret1 == IDNO)
-		{
-			m_pScanner->ScanNetworkDevice();
-			m_pScanner->WaitScan();
-			m_pScanner->m_scantype = 2;
-		}else
-		{
-			return;
-		}
-
-	}*/
-
+	m_pScanner->ScanAll();
+	m_pScanner->m_scantype = 3;
 	m_pWaitScanDlg->DoModal();	
 
 	m_bScanALL = TRUE;
@@ -4477,7 +4415,11 @@ LRESULT CMainFrame::Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam)
 
 	return 0;
 }
-
+LRESULT CMainFrame::Show_Panel(WPARAM wParam, LPARAM lParam){
+	int ret = (int)wParam; 
+	SetPaneString(ret,g_strT3000LogString);
+	return 0;
+}
 LRESULT  CMainFrame::AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam)
 {
 	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
@@ -5746,7 +5688,7 @@ void CMainFrame::SaveConfigFile()
 
 		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
 
-		SetPaneString(1, strTips);
+		SetPaneString(3, strTips);
 		//AfxMessageBox(strTips);
 	}
 	else//save tstat config file:
@@ -6210,9 +6152,30 @@ void CMainFrame::OnGloabalOverrides()
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
+	if (pMsg->message == WM_LBUTTONDOWN && pMsg->hwnd == m_wndStatusBar.GetSafeHwnd())
+	{
+		CRect rect;  
+		CPoint pt;  
+		pt = pMsg->pt;  
+		m_wndStatusBar.GetItemRect(3,&rect);  
+		m_wndStatusBar.ClientToScreen(&rect);  
+		if(PtInRect(&rect,pt))  
+		{
+			//AfxMessageBox(_T("3"));
+			CString strHelp=g_strExePth+_T("T3000.log");
+			//::HtmlHelp(NULL, strHelp, HH_DISPLAY_TOPIC, 0);
+			ShellExecute(NULL, _T("open"), strHelp, NULL, NULL, SW_SHOWNORMAL);
+		}
+		m_wndStatusBar.GetItemRect(2,&rect);  
+		m_wndStatusBar.ClientToScreen(&rect);  
+		if(PtInRect(&rect,pt))  
+		{
+			//AfxMessageBox(_T("2"));
+		}
+	}
 	if((pMsg->message == WM_KEYDOWN ) || (pMsg->message == WM_LBUTTONDOWN) || (pMsg->message == WM_LBUTTONUP))
 	{
-		
+
 		no_mouse_keyboard_event_enable_refresh = false;
 		time_click = time(NULL);
 	}
@@ -6382,6 +6345,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 	{
 		if(hSelItem==m_product.at(i).product_item )
 		{
+			g_strT3000LogString.Format(_T("Trying to connect to %s:%d"),GetProductName(m_product.at(i).product_class_id),m_product.at(i).serial_number);
+			SetPaneString(3,g_strT3000LogString);
+
 			int nID=-1;
 			int nTRet=-1;
 			//g_tstat_id=m_product.at(i).product_id;
@@ -6396,10 +6362,38 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				SetPaneString(3,_T(""));
 			if((product_Node.product_class_id == PM_CM5) || (product_Node.product_class_id == PM_MINIPANEL))	//如果是CM5或者MINIPANEL 才有 bacnet协议;
 			{
-				
-				//if(( m_product.at(i).protocol == PROTOCOL_BACNET_IP) && (m_product.at(i).BuildingInfo.strProtocol.CompareNoCase(_T("BacnetIP")) == 0))
-				//if(product_Node.BuildingInfo.strProtocol.CompareNoCase(_T("BacnetIP")) == 0 )
-				//{
+#if 1
+				        m_nStyle=1;
+						
+
+				CString	g_configfile_path=g_strExePth+_T("config.ini");
+				CFileFind fFind;
+				if(!fFind.FindFile(g_configfile_path))
+				{
+					CString strInfo;
+					strInfo.Format(_T("%d"),1);
+					WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),strInfo,g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),product_Node.BuildingInfo.strIp,g_configfile_path);
+					strInfo.Format(_T("%d"),product_Node.ncomport);
+					WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),strInfo,g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+				}
+				else{
+					CString strInfo;
+					strInfo.Format(_T("%d"),1);
+					WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),strInfo,g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),product_Node.BuildingInfo.strIp,g_configfile_path);
+					strInfo.Format(_T("%d"),product_Node.ncomport);
+					WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),strInfo,g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
+					WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);
+				}
+
+#endif
+				 
 					SetPaneString(1,_T(""));
 					if(product_Node.product_class_id == PM_CM5)
 						bacnet_device_type = PRODUCT_CM5;
@@ -6411,96 +6405,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					g_mac = m_product.at(i).software_version;
 					bac_gloab_panel = g_mac;
 					g_gloab_bac_comport =_wtoi(temp_csa);
-					//if((g_bac_instance == 0) || (g_mac == 0) )
-					//if((g_bac_instance == 0) || (g_mac == 0) || (product_Node.product_class_id == PM_MINIPANEL))
-#if 0
-					{	
-						g_CommunicationType = 1;
-						SetCommunicationType(1);
-						int connect_port = product_Node.ncomport;
-						if((connect_port<=0) || (connect_port>=70000) || (connect_port == 47808))
-							connect_port = 10000;
-						if(Open_Socket2(product_Node.BuildingInfo.strIp,connect_port))
-						{
-							m_pTreeViewCrl->turn_item_image(hSelItem ,true);//只要能连接上这个IP 就说明这个设备在线;
-							
-							if(product_Node.product_class_id == PM_CM5)
-								bacnet_device_type = PRODUCT_CM5;
-							else
-							{
-								int ret = 0;
-								ret = read_one(g_tstat_id,34,5);
-								if(ret == 1)
-									bacnet_device_type = BIG_MINIPANEL;
-								else if(ret == 2)
-									bacnet_device_type = SMALL_MINIPANEL;
-								else
-									bacnet_device_type = PRODUCT_CM5;
-							}
-							g_bac_instance = read_one(g_tstat_id,35,5);
-							g_mac = read_one(g_tstat_id,110,5);
-							if((g_bac_instance<=0) || (g_mac <=0))
-							{
-								m_pTreeViewCrl->turn_item_image(hSelItem ,false);
-								//SetPaneConnectionPrompt(_T("Offline"));
-								MessageBox(_T("Device no response, please check the connection and try again.!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
-								if(pDlg)
-								{
-									delete pDlg;//20120220
-									pDlg = NULL ;
-								}
-								return;
-							}
-							else//更新数据库;如果是通过modbus扫描到得bacnet设备，因为不知道它的instance ID和panel number.所有读到后更新数据库;
-							{
-								CString strSql;
-								CString str_serialid;
-								CString str_baudrate;
-								CString hw_instance;
-								CString sw_mac;
-								hw_instance.Format(_T("%d"),g_bac_instance);
-								sw_mac.Format(_T("%d"),g_mac);
-								str_serialid.Format(_T("%d"),product_Node.serial_number);
-								str_baudrate =product_Node.BuildingInfo.strIp;
-								try
-								{
-								m_pCon.CreateInstance(_T("ADODB.Connection"));
-								m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-								strSql.Format(_T("update ALL_NODE set Hardware_Ver ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),hw_instance,str_serialid,str_baudrate);
-								m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
-								strSql.Format(_T("update ALL_NODE set Software_Ver ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),sw_mac,str_serialid,str_baudrate);
-								m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
-
-								
-								}
-								catch(_com_error *e)
-								{
-									AfxMessageBox(e->ErrorMessage());
-								}
-								if(m_pCon->State)
-									m_pCon->Close();
-
-							}
-						}
-						else
-						{
-							m_pTreeViewCrl->turn_item_image(hSelItem ,false);
-							//SetPaneConnectionPrompt(_T("Offline"));
-							CString temp_info;
-							temp_info.Format(_T("Connect to IP %s , Port %d failed , Please check the connection!"),product_Node.BuildingInfo.strIp,connect_port);
-							MessageBox(temp_info,_T("Notice"),MB_OK | MB_ICONINFORMATION);
-							pDlg->ShowWindow(SW_HIDE);
-							if(pDlg)
-							{
-								delete pDlg;//20120220
-								pDlg = NULL;
-							}
-							return;
-						}
-					}
-#endif
-
-
+					
 					BOOL is_local = IP_is_Local(product_Node.BuildingInfo.strIp);
 					if(is_local == false)	//判断是否是本地IP，不是本地的就要连接到远端的，远端的 Who  is  广播发布过去的;
 					{
@@ -6576,11 +6481,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						pDlg->ShowWindow(SW_HIDE);//20120220
 						delete pDlg;//20120220
 						pDlg = NULL;
+						m_nStyle=2;
 						m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
 						return;
 					}
 					else
 					{
+						m_nStyle=1;
 						m_CurSubBuldingInfo=product_Node.BuildingInfo;
 						g_CommunicationType=1;
 						SetCommunicationType(1);
@@ -6624,6 +6531,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 							delete pDlg;
 							pDlg=NULL;
 						}
+						m_nStyle=2;
 						return;
 					}else
 					{
@@ -6633,7 +6541,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						SetCommunicationType(0);
 						g_CommunicationType=0;
 
-
+						m_nStyle=1;
 
 
 						CString	g_configfile_path=g_strExePth+_T("config.ini");
@@ -6763,12 +6671,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 						if(nSerialNumber==nSelectSerialNumber)
 							bOnLine=TRUE;
+						m_nStyle=1;
 					}
 				}
 				else
 				{
 					CString str;
-					str.Format(_T("communication failure,error code:%d\n .Check the connection or try again!"),nID);
+					str.Format(_T("Can't get the information of the device.\n1.You can restart t3000 ,and then try connect to the device\n2.Try to connect to the device,again.3.Check you cable"));
 					MessageBox(str,_T("Warning"),MB_OK | MB_ICONWARNING);
 					//Reset the COM or check to make sure the product is open
 					//	AfxMessageBox(_T("Detect the product model not corresponding\nSelect COM port,try again!"));//\nDatabase->Building config Database	
@@ -6780,6 +6689,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						pDlg=NULL;
 					}
 					bOnLine=FALSE;
+					m_nStyle=2;
 					//return;
 				}
 #endif
@@ -6878,14 +6788,18 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						else
 						{
 							CString tempcs;
-							tempcs.Format(_T("The device serial number is %d,the database saved is %d \r\nPlease delete it and rescan."),nSerialNumber,nSelectSerialNumber);
-							MessageBox(tempcs);
+							tempcs.Format(_T("Can't get the information of the device.\n1.You can restart t3000 ,and then try connect to the device\n2.Try to connect to the device,again.3.Check you cable"));
+							MessageBox(tempcs,_T("Warning"),MB_OK | MB_ICONWARNING);
 						}
 					}
 				}
 				else
 				{
-					AfxMessageBox(_T("Can't read your selected ID or you have changed the serial no of the device"));//\nDatabase->Building config Database			
+					//AfxMessageBox(_T("Can't read your selected ID or you have changed the serial no of the device"));//\nDatabase->Building config Database			
+					 
+					CString tempcs;
+					tempcs.Format(_T("Can't get the information of the device.\n1.You can restart t3000 ,and then try connect to the device\n2.Try to connect to the device,again.3.Check you cable"));
+					MessageBox(tempcs,_T("Warning"),MB_OK | MB_ICONWARNING);
 					if (pDlg !=NULL)
 					{
 						pDlg->ShowWindow(SW_HIDE);
@@ -6901,6 +6815,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{ 
 				//SetPaneConnectionPrompt(_T("Online!"));
 				m_pTreeViewCrl->turn_item_image(hSelItem ,true);
+				m_nStyle=1;
 			}
 			else
 			{
@@ -6908,6 +6823,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				//SetPaneConnectionPrompt(_T("Offline!"));
 				m_pTreeViewCrl->turn_item_image(hSelItem ,false);	
 				memset(&multi_register_value[0],0,sizeof(multi_register_value));
+				m_nStyle=2;
 				//20120424				
 				if (pDlg !=NULL)
 				{
@@ -8099,6 +8015,308 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
 }
 
 
+LRESULT CMainFrame::Message_Scan_Product(WPARAM wParam, LPARAM lParam){
+	OnScanDevice();
+	return 0;
+}
+//////////////////////////////////////////////////////////////////////////
+// added by zgq;2010-12-1;从OnToolRefreshLeftTreee函数中抽取出来，
+// 这个函数主要是用来更新TreeCtrl的。
+#if 0
+void CMainFrame::RefreshTreeView()
+{
+	//TRACE("I'm start refreshing tree !!! \n");
+
+	if(m_subNetLst.size()<=0)
+		return;
+	RefreshNetWorkDeviceListByUDPFunc();
+	//BeginWaitCursor();
+	// 对所有节点都检测
+
+	for(UINT i=0;i<m_product.size();i++)
+	{
+		//tree0412if(!g_bEnableRefreshTreeView || g_bPauseRefreshTree || g_bPauseMultiRead) 
+		if( g_bPauseRefreshTree || g_bPauseMultiRead)
+			return;
+
+
+		BOOL bOnLine=FALSE;
+		UINT nSerialNumber=0;
+		int nID;
+
+		tree_product tp = m_product.at(i);
+		if(m_strCurSubBuldingName.CompareNoCase(tp.BuildingInfo.strBuildingName)==0)
+		{
+			int nIDNode=tp.product_id;
+			nSerialNumber=tp.serial_number;
+			//int newnID=read_one(nID,6,2);
+			/*
+			Get the protocol ,if it is bacnet ip,we compare the device id.
+			*/
+#if 0
+			if(m_product.at(i).protocol == PROTOCOL_BACNET_IP)
+			{
+				int find_exsit = false;
+				for (int x=0;x<(int)m_bac_scan_com_data.size();x++)
+				{
+					if(m_bac_scan_com_data.at(x).device_id == m_product.at(i).hardware_version)	//之前使用hardware 代替 device id的
+					{
+						find_exsit = true;
+						break;
+					}
+				}
+				if(find_exsit)
+				{
+					bOnLine=TRUE;
+					TRACE(_T("Device %d is Online\r\n"),(int)m_product.at(i).hardware_version);
+				}
+				if(g_bac_instance == m_product.at(i).hardware_version)//判断当前选中的设备是否在线，不在线就不允许操作 读写;
+				{
+					bac_select_device_online = bOnLine;
+				}
+			}
+			else
+			{
+#endif
+				
+				if(m_product.at(i).protocol == MODBUS_RS485)
+				{
+					register_critical_section.Lock();
+					SetCommunicationType(0);
+					int nComPort = m_product.at(i).ncomport;
+					if(nComPort == 0)
+					{
+						m_product.at(i).status = false;
+						bOnLine=FALSE;
+						register_critical_section.Unlock();
+						goto end_condition;
+					}
+						
+					BOOL  bret = open_com(nComPort);
+					if (!bret)
+					{
+						m_product.at(i).status = false;
+						bOnLine=FALSE;
+						register_critical_section.Unlock();
+						goto end_condition;
+					}
+					else
+					{
+						m_nbaudrat=19200;
+						Change_BaudRate(19200);
+
+						// read register offset 6
+						//int error = modbus_read_one_value( nID,nIDNode,6,5);
+						nID=read_one(nIDNode,6,5);
+						/* 
+						If an error was returned from the read,
+						we previously attempted to try again with a reduced baud rate.
+						However, a bug in the code meant this never was done correctly
+						and problems were reported when the baud rate was changed.
+						See discussion in ticket #14
+						Now we simply set the online flag to FALSE and give up.
+						*/
+						if (nID<0)
+						{
+							m_nbaudrat=9600;
+							Change_BaudRate(9600);
+							nID=read_one(g_tstat_id,6,5);
+							if (nID<0)
+							{
+								Change_BaudRate(19200);
+								m_product.at(i).status = false;
+								bOnLine=FALSE;
+								//continue;
+							}
+						} 
+
+						if( nID <0) 
+						{
+							m_product.at(i).status = false;
+							bOnLine=FALSE;
+						} 
+						else 
+						{
+							// successful read of register offset 6
+							unsigned short SerialNum[4];
+							memset(SerialNum,0,sizeof(SerialNum));
+							int nRet=0;//
+							// read first 4 registers 
+							//	nRet=modbus_read_multi_value(&SerialNum[0],nID,0,4,5); 
+							nRet=Read_Multi(nID,&SerialNum[0],0,4,5);
+							int nSerialNumberRead;
+
+							if(nRet>=0)  // 计算串口号
+							{
+								nSerialNumberRead=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256; 
+							}
+
+							if(nSerialNumber>=0)  
+							{
+								if(nSerialNumberRead==nSerialNumber) // 取到串口号，并相等，说明online;
+								{
+									m_product.at(i).status = true;
+									bOnLine=TRUE;
+								}
+							}
+						}
+					}		
+					close_com();
+
+					if( m_product.at(i).BuildingInfo.strProtocol.CompareNoCase(_T("Modbus 485")) == 0)
+					{
+						g_CommunicationType = 0;
+					}
+					else
+					{
+						g_CommunicationType = 1;
+					}
+
+					SetCommunicationType(g_CommunicationType);
+					if(g_CommunicationType == 0)
+					{
+
+						CString strComport = m_product.at(i).BuildingInfo.strComPort;
+						CString strComNum = strComport.Mid(3);
+						int nCom = _wtoi(strComNum);
+						open_com(nCom);
+					}
+					register_critical_section.Unlock();
+
+				}
+				else// if(m_product.at(i).protocol == MODBUS_TCPIP)
+				{
+					for (int x=0;x<(int)m_refresh_net_device_data.size();x++)
+					{
+						if((nSerialNumber == m_refresh_net_device_data.at(x).nSerial) && 
+							(nIDNode == m_refresh_net_device_data.at(x).modbusID))
+						{
+							m_product.at(i).status = true;
+							bOnLine = TRUE;
+							break;
+						}
+					}
+				}
+#if 0 //Fance recode 
+				if (g_CommunicationType==0) // 通信类型 0
+				{	
+					// force baud rate to 19200
+
+					m_nbaudrat=19200;
+					Change_BaudRate(19200);
+
+					// read register offset 6
+
+					//int error = modbus_read_one_value( nID,nIDNode,6,5);
+					nID=read_one(nIDNode,6,5);
+					/* 
+					If an error was returned from the read,
+					we previously attempted to try again with a reduced baud rate.
+					However, a bug in the code meant this never was done correctly
+					and problems were reported when the baud rate was changed.
+					See discussion in ticket #14
+
+					Now we simply set the online flag to FALSE and give up.
+					*/
+					if (nID<0)
+					{
+						m_nbaudrat=9600;
+						Change_BaudRate(9600);
+						nID=read_one(g_tstat_id,6,5);
+						if (nID<0)
+						{
+							Change_BaudRate(19200);
+							bOnLine=FALSE;
+							//continue;
+						}
+					} 
+
+					if( nID <0) {
+						bOnLine=FALSE;
+
+					} 
+
+					else {
+						// successful read of register offset 6
+						unsigned short SerialNum[4];
+						memset(SerialNum,0,sizeof(SerialNum));
+						int nRet=0;//
+						// read first 4 registers 
+						//	nRet=modbus_read_multi_value(&SerialNum[0],nID,0,4,5); 
+						nRet=Read_Multi(nID,&SerialNum[0],0,4,5);
+						int nSerialNumberRead;
+
+						if(nRet>=0)  // 计算串口号
+						{
+							nSerialNumberRead=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256; 
+						}
+
+						if(nSerialNumber>=0)  
+						{
+							if(nSerialNumberRead==nSerialNumber) // 取到串口号，并相等，说明online
+								bOnLine=TRUE;
+						}
+					}
+				}
+
+				if (g_CommunicationType==1)  // 通信类型1，重复上面的过程
+				{
+
+					int error = modbus_read_one_value( nID, nIDNode, 6 ,2);
+					if( error )
+						bOnLine=FALSE;
+
+					if( ! error )
+					{
+						unsigned short SerialNum[4];
+						memset(SerialNum,0,sizeof(SerialNum));
+						int nRet=0;
+
+						// read first 4 registers
+						nRet=modbus_read_multi_value(&SerialNum[0],nIDNode,0,4,2);
+
+						int nSerialNumberRead;
+
+						if(nRet>=0)
+						{
+
+							nSerialNumberRead=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
+						}
+						if(nSerialNumber>=0)
+						{
+							if(nSerialNumberRead==nSerialNumber)
+								bOnLine=TRUE;
+						}
+					}
+				}
+#endif
+
+			//}
+end_condition :
+
+			if(bOnLine>0)  // 如果online，更新显示图片
+			{
+				SetPaneConnectionPrompt(_T("Online!"));
+				m_pTreeViewCrl->turn_item_image(tp.product_item ,true);
+
+			}
+			else  // 替换offline的图片
+			{
+				SetPaneConnectionPrompt(_T("Offline!"));
+				m_pTreeViewCrl->turn_item_image(tp.product_item ,false);
+
+// 				if(nID==g_tstat_id)
+// 					memset(&multi_register_value[0],0,sizeof(multi_register_value));
+			}
+		}
+	}
+	//EndWaitCursor();	
+	//TRACE("Now End refreshing tree !!! \n");
+	m_bac_scan_com_data.clear();
+	m_refresh_net_device_data.clear();
+}
+#endif
+
 
 void CMainFrame::SuspendRefreshThread()
 {
@@ -8150,10 +8368,16 @@ UINT _FreshTreeView(LPVOID pParam )
 		{
 			if(no_mouse_keyboard_event_enable_refresh)//判断如果一段时间无人操作，才刷新tree，要不然串口资源会经常冲突;
 			{
+				g_strT3000LogString=_T("T3000 is free");
+				::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 				break;
 			}
+			g_strT3000LogString=_T("T3000 is busy.");
+			::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 			Sleep(100);
 		}
+		g_strT3000LogString=_T("T3000 is free,and then Checking the status of devices...");
+		::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 
 		m_refresh_net_device_data.clear();
 		
@@ -10296,4 +10520,9 @@ void CMainFrame::OnUpdateScanDevice(CCmdUI *pCmdUI)
 }void CMainFrame::OnUpdateAddBuildingConfig(CCmdUI *pCmdUI)
 {
   pCmdUI->SetCheck(m_nStyle ==4);
+}
+
+void CMainFrame::OnUpdateStatusBar(CCmdUI *pCmdUI){
+	pCmdUI->Enable(TRUE);
+
 }

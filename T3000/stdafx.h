@@ -116,13 +116,13 @@ INPUT void closefile();//scan
 INPUT void writefile( CString strip,CString strport);//scan
 INPUT void Createfile();//scan
 
-INPUT void WriteLogFile(CString strlog);
-INPUT void CloseLogFile();
+//INPUT void WriteLogFile(CString strlog);
+//INPUT void CloseLogFile();
 INPUT CString Get_NowTime();
 
 
-INPUT void NET_WriteLogFile(CString strlog);
-INPUT void NET_CloseLogFile();
+//INPUT void NET_WriteLogFile(CString strlog);
+//INPUT void //NET_CloseLogFile();
 
 INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
 INPUT int Read_One(unsigned char device_var,unsigned short address);
@@ -212,6 +212,9 @@ typedef struct _STATUSBARINFO
 #define MY_READ_DATA_CALLBACK WM_USER+201
 #define MY_RX_TX_COUNT WM_USER + 202
 #define WM_ADD_DEBUG_CSTRING WM_USER + 106
+#define  WM_SCAN_PRODUCT WM_USER+2014
+#define  WM_SHOW_PANNELINFOR WM_USER+2015
+
 typedef struct _MessageWriteOneInfo
 {
 	unsigned char device_id;

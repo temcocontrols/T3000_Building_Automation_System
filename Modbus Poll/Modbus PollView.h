@@ -99,7 +99,7 @@ public:
 	int m_Hide_Alias_Columns;
 	int m_Address_Cell;
 	int m_PLC_Addresses;
-
+	CStdioFile m_default_file;
 	////////////////
   LONG64 m_Tx;
   LONG64 m_Err;
@@ -117,6 +117,9 @@ public:
 	//Single Write
 	BOOL m_close_dlg;
 	BOOL m_function;
+	BOOL m_logText;
+	CString m_logTextPath;
+	BOOL m_logExcel;
 	/////////////////////////DataBuffer/////////////////////////////////////////
 	unsigned short m_DataBuffer[127];
     CString m_Alias[127];
@@ -130,6 +133,7 @@ public:
 	//afx_msg void OnViewRegistervalueanalyzer();
 	afx_msg void OnEditAdd();
 	COLORREF Get_Color(int i);
+	CString Get_Now();
 
 	BOOL m_isgetmodel;
 	BOOL m_ischangedAddress;
@@ -138,6 +142,14 @@ public:
 	CAutoRichEditCtrl m_ModelNameRichEdit;
 	CAutoRichEditCtrl m_SlaveIDRichEditCtrl;
 	int m_MultiReadReturnType;
+	afx_msg void OnSetupTxtLog();
+	afx_msg void OnSetupTxtlogoutOff();
+	afx_msg void OnUpdateSetupTxtlogoutOff(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateSetupTxtLog(CCmdUI *pCmdUI);
+	afx_msg void OnSetupExcellogingoff();
+	afx_msg void OnUpdateSetupExcellogingoff(CCmdUI *pCmdUI);
+	afx_msg void OnSetupExcelloging();
+	afx_msg void OnUpdateSetupExcelloging(CCmdUI *pCmdUI);
 };
 
 #ifndef _DEBUG  // debug version in Modbus PollView.cpp

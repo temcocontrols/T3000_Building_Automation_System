@@ -229,6 +229,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 	ON_EN_KILLFOCUS(IDC_EDIT_BACKLIGHT_TIME, &CParameterDlg::OnEnKillfocusEditBacklightTime)
 	ON_BN_CLICKED(IDC_CHECK2, &CParameterDlg::OnBnClickedCheck2)
 	ON_EN_KILLFOCUS(IDC_EDIT_OCCUPIED_TIMER, &CParameterDlg::OnEnKillfocusEditOccupiedTimer)
+	ON_EN_KILLFOCUS(IDC_EDIT_DEAD_MASTER, &CParameterDlg::OnEnKillfocusEditDeadMaster)
 	END_MESSAGE_MAP()
 
 
@@ -3108,7 +3109,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	CString str;//add by Fance. T5 also support this function
 	str.Format(_T("%d"),product_register_value[MODBUS_VALVE_TRAVEL_TIME]);	//279  243  
 	GetDlgItem(IDC_EDIT_ValueTravelTime)->SetWindowText(str);
-
+	str.Format(_T("%d"),product_register_value[MODBUS_DEAD_MASTER]);
+	GetDlgItem(IDC_EDIT_DEAD_MASTER)->SetWindowText(str);
 	//////////////////////////////////////////////////////////////////////////
 	/*if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))*/
     if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
@@ -3172,11 +3174,26 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		//CString occupiedtimer;
 		//occupiedtimer.Format(_T("%d"),product_register_value[641]);
 		//m_occupied_timer.SetWindowText(occupiedtimer);
+
+
+		GetDlgItem(IDC_STATIC_LCDSCREEN1)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_COMBO_LCDSCRN1)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_LCDSCREEN2)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_COMBO_LCDSCRN2)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_DISPLAYCOMBO)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_DISPLAY)->ShowWindow(SW_HIDE);
+
 	}
 	else
 	{
-		//m_occupied_timer.ShowWindow(FALSE);
-		//m_check_occupiedenable.ShowWindow(FALSE);
+		 
+		GetDlgItem(IDC_STATIC_DISPLAY)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_DISPLAYCOMBO)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_LCDSCREEN1)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_COMBO_LCDSCRN1)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_LCDSCREEN2)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_COMBO_LCDSCRN2)->ShowWindow(SW_SHOW);
+
 		m_edit_backlighttime.ShowWindow(FALSE);
 		GetDlgItem(IDC_EDIT_CSPD)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_CDBDN)->EnableWindow(FALSE);
@@ -4186,5 +4203,28 @@ void CParameterDlg::OnEnKillfocusEditOccupiedTimer()
 	CString occupiedtimer;
 	occupiedtimer.Format(_T("%d"),product_register_value[641]);
 	m_occupied_timer.SetWindowText(occupiedtimer);
+
+}
+
+
+void CParameterDlg::OnEnKillfocusEditDeadMaster()
+{
+	 CString deadmaster;
+	 GetDlgItem(IDC_EDIT_DEAD_MASTER)->GetWindowText(deadmaster);
+	 int deadmastervalue=_wtoi(deadmaster.GetBuffer());
+	 if (product_register_value[MODBUS_DEAD_MASTER]==deadmastervalue)
+	 {
+		 return;
+	 }
+	 else
+	 {
+
+		 int ret=write_one(g_tstat_id,MODBUS_DEAD_MASTER,deadmastervalue);
+		 if (ret>0)
+		 {
+			 product_register_value[MODBUS_DEAD_MASTER]=deadmastervalue;
+		 }
+
+	 }
 
 }

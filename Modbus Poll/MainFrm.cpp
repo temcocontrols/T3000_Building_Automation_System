@@ -14,12 +14,12 @@
 #include "Modbus PollView.h"
 
 
- UINT _ReadMultiRegisters(LPVOID pParam)
- {
-	  CMainFrame* pFrame=(CMainFrame*)(pParam);
-	  pFrame->OnConnectionQuickconnectf5();
-	  return 1;
- }
+UINT _ReadMultiRegisters(LPVOID pParam)
+{
+	CMainFrame* pFrame=(CMainFrame*)(pParam);
+	pFrame->OnConnectionQuickconnectf5();
+	return 1;
+}
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -789,8 +789,6 @@ void Update_ViewData(CView* MBPollView){
 
 	 
 }
-
-
 void CMainFrame::OnViewRegistervalueanalyzer()
 {
 	if (g_Draw_dlg==NULL)

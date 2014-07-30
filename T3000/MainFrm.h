@@ -224,6 +224,7 @@ protected:
 	afx_msg LRESULT OnAddTreeNode(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT  AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT Show_Panel(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT  ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
@@ -305,6 +306,7 @@ public:
 	//void RefreshTreeView();
 
 	LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam);
+	LRESULT  CMainFrame::Message_Scan_Product(WPARAM wParam,LPARAM lParam);
 	// suspend refresh tree view thread, when flash or other operation need read or write large data by Modbus.
 	void SuspendRefreshThread();
 	void ContinueRefreshThread();
@@ -404,6 +406,7 @@ public:
 	void OnTestPing(const CString& strIP);
     UINT m_nStyle;
 	afx_msg void OnHelpUpdatefirmware();
+	afx_msg void OnUpdateStatusBar(CCmdUI *pCmdUI);
 };
 
 const int DLG_T3000_VIEW = 0;
