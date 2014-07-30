@@ -6,7 +6,7 @@
 
 #define MY_MBPOLL_REG_DIALOG_MSG (WM_USER + 557)
 #define MY_MBPOLL_WRITE_REG_MSG (WM_USER + 558)
-
+extern bool no_mouse_keyboard_event_enable_refresh ;
 extern int g_invoke_id;
 extern vector <int> Change_Color_ID;
 extern HANDLE hThread;
@@ -62,7 +62,7 @@ extern	int g_nEndID;
 extern BOOL g_bCancelScan;
 extern int g_ScnnedNum;
 extern CString g_strScanInfoPrompt;
-
+extern CString g_strT3000LogString;
 extern int gCommunicationType;
 
 

@@ -17,7 +17,7 @@
 #include "iniFile.h"
 #include "afxinet.h"
 #include "T3000DefaultView.h"
-const int g_versionNO=201406;
+const int g_versionNO=201408;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -624,7 +624,7 @@ BOOL CT3000App::InitInstance()
   	m_pMainWnd->ShowWindow(SW_SHOW);
   	m_pMainWnd->UpdateWindow();
     //m_pMainWnd->SwitchToPruductType(18);  
-	((CMainFrame*)m_pMainWnd)->SwitchToPruductType(18);
+	//((CMainFrame*)m_pMainWnd)->SwitchToPruductType(18);
 	}
 	catch (...)
 	{
@@ -663,7 +663,10 @@ BOOL CT3000App::InitInstance()
 		
 	//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
 		//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
-		AfxMessageBox(_T("Open'T3000'Again,Please!"));
+       // http://www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip
+       AfxMessageBox(_T("Please install the database engine!"));
+       ::ShellExecute(NULL, _T("open"), _T("www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip"), _T(""), _T(""), SW_SHOW);
+		//AfxMessageBox(_T("Open'T3000'Again,Please!"));
 
 
 		return TRUE;

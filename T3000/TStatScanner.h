@@ -93,6 +93,7 @@ public:
 	BOOL ScanComOneByOneDevice();
 	BOOL ScanBacnetComDevice();//扫描 bacnet com port 设备;
 	void SetComPort(int nCom);
+	BOOL CheckTheSameSubnet(CString strIP);
 public:
 	// 释放资源
 	void		Release();
@@ -103,13 +104,13 @@ public:
 	// bForTstat = TRUE : scan tstat, = FALSE : scan NC
 	void		binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254);
 	// bForTstat = TRUE : scan tstat, = FALSE : scan  MINI Pannel
-	void		MINI_binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254,int NET_COM=1);
+	//void		MINI_binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254,int NET_COM=1);
 	void        OneByOneSearchforComDevice(int nComPort, bool bForTStat=FALSE, BYTE devLo=1, BYTE devHi=254);
 	// 校验
 	BOOL		binary_search_crc(int a);
 	// 搜索NC的函数
 	int _ScanNCFunc();
-	
+	BOOL m_thesamesubnet;
 	// 获得计算机上的所有串口,返回串口数量
 	//int GetAllComPort();
 
@@ -165,8 +166,7 @@ public:
 	void SetSubnetInfo(vector<Building_info>& szSubnets);
 	void SetBaudRate(const CString& strBaudrate);
 	
-	// 手动搜索TStat，
-	void ScanTstatFromNCForManual();
+	 
 	void BinaryScanNCByComPort(BYTE devLo = 1, BYTE devHi = 254);
 	void ScanTstatFromNCForAuto();
 	void GetTstatInfoFromID(int nTstatID);
@@ -200,23 +200,28 @@ public:
 	vector<CString>				m_bacnetComs;
 	vector<CString>				m_szComs;
 	CEvent*							m_eScanComEnd;
-	CEvent*							m_eScanComOneByOneEnd;
+	//CEvent*							m_eScanComOneByOneEnd;
 	CEvent*							m_eScanNCEnd;
+	
+
 	CEvent*							m_eScanOldNCEnd;
 	CEvent*						m_eScanBacnetComEnd;
 
 
 	BOOL								m_bStopScan;					// 强制结束SCAN，由用户选择exit时，停止两个搜索线程
 	BOOL								m_bNetScanFinish;			// 网络scan完成
+	BOOL m_isChecksubnet;
+	BOOL m_bCheckSubnetFinish;
 	int									m_nBaudrate;
 	int									m_nComPort;
 	CWnd*							m_pParent;	
 
 	CWinThread*					m_pScanBacnetComThread;
 	CWinThread*					m_pScanNCThread;
+	CWinThread*                  m_pCheckSubnetThread;
 	CWinThread*					m_pScanTstatThread;
-	CWinThread*					m_pScanTstatOneByOneThread;
-	CWinThread*					m_pWaitScanThread;
+	//CWinThread*					m_pScanTstatOneByOneThread;
+	//CWinThread*					m_pWaitScanThread;
 	bool						m_com_scan_end;
 
 	CString						m_strBuildingName;

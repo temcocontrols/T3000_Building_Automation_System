@@ -257,9 +257,10 @@ public:
    void Fresh_Grid();
    int get_serialnumber();
  void  Check_DayTime();
-
+ LRESULT OnFreshView(WPARAM wParam, LPARAM lParam);
      void  Check_HourTime();
 public:
+	HANDLE hFirstThread;
     CEdit m_edit_IDAddress;
     CEdit m_edit_SN;
     CEdit m_Edit_FVevsion;
@@ -297,7 +298,7 @@ public:
     CButton m_Check_Enable_Password;
     afx_msg void OnBnClickedBtnCo2ClearCal();
     CMsflexgrid m_msflexgrid;
-private:
+	public:
     BOOL Flag_Reg;
     CString cs_temp_unit;
     unsigned short product_register_value[2700];

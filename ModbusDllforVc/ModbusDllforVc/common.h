@@ -68,11 +68,7 @@ OUTPUT void closefile();
 OUTPUT void writefile(CString strip,CString strport);
 OUTPUT void Createfile();
 
-OUTPUT void WriteLogFile(CString strlog);
-OUTPUT void CloseLogFile();
 
-OUTPUT void NET_WriteLogFile(CString strlog);
-OUTPUT void NET_CloseLogFile();
 
 OUTPUT CString Get_NowTime();
 void SaveBufferToLogFile(TS_UC* pBuffer, int nSize);

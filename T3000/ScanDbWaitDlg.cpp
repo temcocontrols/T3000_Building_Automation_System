@@ -83,81 +83,7 @@ BOOL CScanDbWaitDlg::OnInitDialog()
 void CScanDbWaitDlg::OnTimer(UINT_PTR nIDEvent)
 {
 		static int nCount = 0;
-	// TODO: Add your message handler code here and/or call default
-		//if(g_ScanSecurity)
-		if(0)
-	{
-		SetWindowText(_T("Scaning..."));
-		if(g_ScnnedNum<=g_nEndID)
-		{
-			CString strTem;
-			strTem.Format(_T("Scan from Address ID %d to %d ,Current scanning ID=%d."),g_nStartID,g_nEndID,g_ScnnedNum);
-			if(m_strInfopromp.CompareNoCase(strTem)!=0)
-				m_strInfopromp=strTem;
-			UpdateData(FALSE);
-		}
-		else
-		{
-
-		//	CString strTem;
-		//	strTem=g_strScanInfoPrompt;
-			SetWindowText(_T("Checking Tstats status..."));
-
-			m_strInfopromp=g_strScanInfoPrompt;
-			UpdateData(FALSE);
-		}
-	}
-
-	/*
-	//if(g_Scanfully)
-	if (m_pScaner)
-	{
-		//if(g_ScnnedNum<254)
-		if(!m_pScaner->IsAllScanFinished())
-		{
-					
-			if (nCount++ > 30)
-			{
-				nCount = 0;
-			}
-			switch(nCount)
-			{
-			case 5:m_strDot = _T(".");break;
-			case 10:m_strDot = _T("..");break;
-			case 15:m_strDot = _T("...");break;
-			case 20:m_strDot = _T("....");break;
-			case 25:m_strDot = _T(".....");break;
-			case 30:m_strDot = _T("......");break;
-			
-			//default:strDot = _T("......");break;
-			}
-			CString strTemp;
-			if (g_nStartID == -1) // 用这个来区分是scan TStat 还是scan NC
-			{
-				strTemp = _T("sending scan broadcast");
-			}
-			else
-			{
-				strTemp.Format(_T("from address ID %d to %d"),g_nStartID,g_nEndID);
-			}
-		
-			CString strTip;
-			strTip.Format(_T("Scanning %s, %s. Please wait%s"), g_strScanInfoPrompt, strTemp, m_strDot);
-			
-			m_strInfopromp=strTip;
-			UpdateData(FALSE);
-		}
-		else
-		{
-
-			//CString strTem;
-			//strTem=g_strScanInfoPrompt;
-			//m_strInfopromp=g_strScanInfoPrompt;
-			//UpdateData(FALSE);
-		}
-	}
-	*/
-//		if(g_ScnnedNum>=254)
+	 
 
 	if (m_pScaner)
 	{		
@@ -219,6 +145,8 @@ void CScanDbWaitDlg::OnTimer(UINT_PTR nIDEvent)
 void CScanDbWaitDlg::SetPromtText(CString strInfo)
 {
 		m_strInfopromp=strInfo;
+		g_strT3000LogString=m_strInfopromp;
+		::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 		UpdateData(FALSE);
 }
 
@@ -228,11 +156,11 @@ LRESULT CScanDbWaitDlg::OnNetScanInfo(WPARAM wParam, LPARAM lParam)
 	CString* pStr = (CString*)(wParam);
 	m_strNetScanInfo = _T("Net Scan : ")  + *pStr;
 	
-	//TRACE(_T("net scan info ! \n"));
-	//UpdateData(FALSE);
+	
 	CWnd* pWnd = GetDlgItem(IDC_INFO_NET);
 	pWnd->SetWindowText(m_strNetScanInfo);
-	
+	g_strT3000LogString=m_strNetScanInfo;
+	::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 
 	delete pStr;
 	return 1;
@@ -248,6 +176,8 @@ LRESULT CScanDbWaitDlg::OnBacnetComScanInfo(WPARAM wParam, LPARAM lParam)
 
 	CWnd* pWnd = GetDlgItem(IDC_INFO_MSTP);
 	pWnd->SetWindowText(m_strComScanInfo);
+	g_strT3000LogString=m_strComScanInfo;
+	::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,2,0);
 	delete pStr;
 	return 1;
 }
@@ -260,6 +190,8 @@ LRESULT CScanDbWaitDlg::OnComScanInfo(WPARAM wParam, LPARAM lParam)
 	
 	CWnd* pWnd = GetDlgItem(IDC_INFO_COM);
 	pWnd->SetWindowText(m_strComScanInfo);
+	g_strT3000LogString=m_strComScanInfo;
+	::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,2,0);
 	delete pStr;
 	return 1;
 }

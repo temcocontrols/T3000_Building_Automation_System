@@ -15,6 +15,19 @@
 #include "WriteSingle_BinaryDlg.h"
 #include "RegisterValueAnalyzerDlg.h"
 #include "ado/ADO.h"
+
+
+
+// #include "Application.h"
+// #include "Workbooks.h"
+// #include "Workbook.h"
+// #include "Worksheets.h"
+// #include "Worksheet.h"
+// #include "Range.h"
+
+
+
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -33,6 +46,14 @@ ON_WM_CTLCOLOR()
 ON_EN_KILLFOCUS(IDC_EDIT_NAME, &CModbusPollView::OnEnKillfocusEditName)
  
 ON_COMMAND(ID_EDIT_ADD, &CModbusPollView::OnEditAdd)
+ON_COMMAND(ID_SETUP_TXT_LOG, &CModbusPollView::OnSetupTxtLog)
+ON_COMMAND(ID_SETUP_TXTLOGOUT_OFF, &CModbusPollView::OnSetupTxtlogoutOff)
+ON_UPDATE_COMMAND_UI(ID_SETUP_TXTLOGOUT_OFF, &CModbusPollView::OnUpdateSetupTxtlogoutOff)
+ON_UPDATE_COMMAND_UI(ID_SETUP_TXT_LOG, &CModbusPollView::OnUpdateSetupTxtLog)
+ON_COMMAND(ID_SETUP_EXCELLOGINGOFF, &CModbusPollView::OnSetupExcellogingoff)
+ON_UPDATE_COMMAND_UI(ID_SETUP_EXCELLOGINGOFF, &CModbusPollView::OnUpdateSetupExcellogingoff)
+ON_COMMAND(ID_SETUP_EXCELLOGING, &CModbusPollView::OnSetupExcelloging)
+ON_UPDATE_COMMAND_UI(ID_SETUP_EXCELLOGING, &CModbusPollView::OnUpdateSetupExcelloging)
 END_MESSAGE_MAP()
 
  
@@ -67,6 +88,9 @@ CModbusPollView::CModbusPollView()
 			//m_MultiRead_handle=NULL;
 			Show_Name=FALSE;
 			m_isgetmodel=FALSE;
+			m_logText=TRUE;
+			m_logTextPath=_T("");
+			m_logExcel=TRUE;
 }
 
 CModbusPollView::~CModbusPollView()
@@ -98,9 +122,34 @@ void CModbusPollView::Initial_RegName(){
 		ado.m_pRecordset=ado.OpenRecordset(sql);
 		if (!ado.m_pRecordset->EndOfFile)
 		{
-			TableName=ado.m_pRecordset->GetCollect(_T("TableName"));
-			RegName=ado.m_pRecordset->GetCollect(_T("Col_RegName"));
-			RegAddress=ado.m_pRecordset->GetCollect(_T("Col_RegAddress"));
+			 
+			temp_var=ado.m_pRecordset->GetCollect(_T("TableName"));
+			if (temp_var.vt!=VT_NULL)
+			{
+				TableName=temp_var;
+			}
+			else
+			{
+                TableName=_T("");
+			}
+			temp_var=ado.m_pRecordset->GetCollect(_T("Col_RegName"));
+			if (temp_var.vt!=VT_NULL)
+			{
+				RegName=temp_var;
+			}
+			else
+			{
+				RegName=_T("");
+			}
+			temp_var=ado.m_pRecordset->GetCollect(_T("Col_RegAddress"));
+			if (temp_var.vt!=VT_NULL)
+			{
+				RegAddress=temp_var;
+			}
+			else
+			{
+				RegAddress=_T("");
+			}
 		}
 		//while (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
 		//{
@@ -193,46 +242,50 @@ void CModbusPollView::Initial_RegName(){
 		//	ado.m_pRecordset->MoveNext();
 	}
 	ado.CloseRecordset();
-	if (ado.IsHaveTable(ado,TableName))
+	if (TableName.GetLength()!=0)
 	{
-		DBRegister tempstuct;
-		CString sql;
-		sql.Format(_T("Select %s,%s from %s "),RegName,RegAddress,TableName);
-		ado.m_pRecordset=ado.OpenRecordset(sql);
-		while (!ado.m_pRecordset->EndOfFile)
+		if (ado.IsHaveTable(ado,TableName))
 		{
+			DBRegister tempstuct;
+			CString sql;
+			sql.Format(_T("Select [%s],[%s] from %s "),RegName.GetBuffer(),RegAddress.GetBuffer(),TableName.GetBuffer());
+			ado.m_pRecordset=ado.OpenRecordset(sql);
+			while (!ado.m_pRecordset->EndOfFile)
+			{
 
-			 temp_var=ado.m_pRecordset->GetCollect(RegAddress.GetBuffer());
-			if (temp_var.vt!=NULL)
-			{
-				tempstuct.RegAddress=temp_var;
+				temp_var=ado.m_pRecordset->GetCollect(RegAddress.GetBuffer());
+				if (temp_var.vt!=VT_NULL)
+				{
+					tempstuct.RegAddress=temp_var;
+				}
+				temp_var=ado.m_pRecordset->GetCollect(RegName.GetBuffer());
+
+				if (temp_var.vt!=VT_NULL)
+				{
+					tempstuct.RegName=temp_var;
+				}
+				m_VecregisterData.push_back(tempstuct);
+				ado.m_pRecordset->MoveNext();
 			}
-			 temp_var=ado.m_pRecordset->GetCollect(RegName.GetBuffer());
-			 
-			if (temp_var.vt!=NULL)
+		}
+		ado.CloseConn();
+
+		if (m_VecregisterData.size()>1)
+		{
+			int reglen=127;
+			if (m_VecregisterData.size()<127)
 			{
-				tempstuct.RegName=temp_var;
+				reglen=m_VecregisterData.size();
 			}
-			m_VecregisterData.push_back(tempstuct);
-			ado.m_pRecordset->MoveNext();
+			for (int i=0;i<reglen;i++)
+			{
+				m_Alias[i]=Find_RegName(i);
+			}
 		}
+
+		m_ischangedAddress=FALSE;
 	}
-	ado.CloseConn();
-    
-	if (m_VecregisterData.size()>1)
-	{
-		int reglen=127;
-		if (m_VecregisterData.size()<127)
-		{
-			reglen=m_VecregisterData.size();
-		}
-		for (int i=0;i<reglen;i++)
-		{
-			m_Alias[i]=Find_RegName(i);
-		}
-	}
-   
-	m_ischangedAddress=FALSE;
+	
 }
 CString CModbusPollView::Find_RegName(int index){
 	vector<DBRegister>::iterator it;
@@ -610,8 +663,6 @@ void CModbusPollView::Fresh_Data(){
 	m_grid_cols=2*m_data_cols+1;
 	m_grid_rows=m_data_rows+1;
 	}
-
-
 	m_MsDataGrid.put_Cols(m_grid_cols);
 	m_MsDataGrid.put_Rows(m_grid_rows);
 
@@ -726,15 +777,45 @@ void CModbusPollView::Fresh_Data(){
 		it->Reg_Point.push_back(pt);
 		++it;
 	}
-	if (g_Draw_dlg!=NULL&&g_Draw_dlg->IsWindowVisible())
-	{::PostMessage(g_Draw_dlg->m_hWnd,MY_FRESH_DRAW_GRAPHIC,0,0);
-	}
-// 	if(g_Draw_dlg->IsWindowVisible())
-// 	{
-// 		::PostMessage(g_Draw_dlg->m_hWnd,MY_FRESH_DRAW_GRAPHIC,0,0);
-// 	}
+/////////////////记录数据 Txt 
+	if (!m_logText)
+	{
+		if (!m_logTextPath.IsEmpty())
+		{
+			CString Data;
+			 
+				CString TxtString=Get_Now();
+				Data.Format(_T("<%04d>"),m_address);
+				TxtString+=Data;
+				TxtString+=_T("    ");
+				for (int i=0;i<m_Quantity;i++)
+				{
 
+					Data.Format(_T("%d    "),m_DataBuffer[i]);
+					TxtString+=Data;
+
+				}
+				TxtString+=_T("\n");
+				m_default_file.WriteString(TxtString);
+			 
+	 	}
+		
+		
+	}
 	 
+	
+	 
+}
+CString CModbusPollView::Get_Now(){
+	 
+		SYSTEMTIME st;
+		CString strDate,strTime;
+		GetLocalTime(&st);
+		strDate.Format(_T("%4d-%2d-%2d"),st.wYear,st.wMonth,st.wDay);
+		strTime.Format(_T("%2d:%2d:%2d:%4d"), st.wHour,st.wMinute,st.wSecond,st.wMilliseconds);
+		strDate+=_T(" ");
+		strDate+=strTime;
+		return strDate;
 }
 CString CModbusPollView::Get_Data(int index){
 	static CString tempStr;
@@ -1491,4 +1572,95 @@ COLORREF Array[]={
 
 
 return Array[i];
+}
+
+void CModbusPollView::OnSetupTxtLog()
+{
+	 m_logText=FALSE; 
+     if (m_logTextPath.IsEmpty())
+     {
+		 CString strFilter;
+		 strFilter =_T( "Text File|*.txt|All File|*.*|");
+		 CFileDialog dlg(false,_T("txt"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
+		 if (dlg.DoModal() != IDOK)
+			 return;
+		 m_logTextPath=dlg.GetPathName();
+     }
+	 if (!m_logTextPath.IsEmpty())
+	 {
+		 CString Data;
+		 if(m_default_file.Open(m_logTextPath.GetBuffer(),CFile::modeCreate | CFile::modeWrite)!=0){
+			 
+		 }
+		 else
+		 {
+			 AfxMessageBox(_T("Open file failure!"));
+		 }
+      
+      }
+}
+
+
+void CModbusPollView::OnSetupTxtlogoutOff()
+{
+	 m_logText=TRUE;
+	 m_default_file.Flush();
+	 m_default_file.Close();
+}
+
+
+void CModbusPollView::OnUpdateSetupTxtlogoutOff(CCmdUI *pCmdUI)
+{
+	 pCmdUI->Enable(!m_logText);
+}
+
+
+void CModbusPollView::OnUpdateSetupTxtLog(CCmdUI *pCmdUI)
+{
+	 pCmdUI->Enable(m_logText);
+}
+
+
+void CModbusPollView::OnSetupExcellogingoff()
+{
+	 m_logExcel=TRUE;
+}
+
+
+void CModbusPollView::OnUpdateSetupExcellogingoff(CCmdUI *pCmdUI)
+{
+	 pCmdUI->Enable(!m_logExcel);
+}
+
+
+void CModbusPollView::OnSetupExcelloging()
+{
+// 	_Application app;    
+// 	Workbooks books;
+// 	_Workbook book;
+// 	Worksheets sheets;
+// 	_Worksheet sheet;
+// 	Range range;
+// 
+// 	Range rgMyRge1, rgMyRge2; 	
+// 	CString rowContent;
+// 	COleVariant covTrue((short)TRUE), covFalse((short)FALSE), covOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
+// 	Sleep(2000);
+// 	if (!app.CreateDispatch(_T("Excel.Application"),NULL)) 
+// 	{ 
+// 		AfxMessageBox(_T("Create Excel false!")); 
+// 		return;
+// 	} 
+// 
+// 
+// 
+// 	m_logExcel=FALSE;
+
+
+}
+
+
+void CModbusPollView::OnUpdateSetupExcelloging(CCmdUI *pCmdUI)
+{
+	pCmdUI->Enable(m_logExcel);
 }

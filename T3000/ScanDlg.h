@@ -8,16 +8,33 @@
 #define WM_SCANFINISH WM_USER + 1100
 #define WM_ADDCOMSCAN WM_USER + 1101
 #define WM_ADDNETSCAN WM_USER + 1102
+#define ICMP_ECHO 8 
+#define ICMP_ECHOREPLY 0 
+#define ICMP_MIN 8 // minimum 8 byte icmp packet (just header) 
 
-
-
+typedef struct iphdr { 
+	//	unsigned int h_len:4; // length of the header 
+	//	unsigned int version:4; // Version of IP 
+	BYTE  h_len:4;
+	BYTE  ver:4;
+	unsigned char tos; // Type of service 
+	unsigned short total_len; // total length of the packet 
+	unsigned short ident; // unique identifier 
+	unsigned short frag_and_flags; // flags 
+	unsigned char ttl; 
+	unsigned char proto; // protocol (TCP, UDP etc) 
+	unsigned short checksum; // IP checksum 
+	unsigned int sourceIP; 
+	unsigned int destIP; 
+}IpHeader; 
 // CScanDlg dialog
 class CTStat_Dev;
 class CTStat_Net;
 class CTStatBase;
 //class CTStatScanner;
 class CGridButton;
-
+#define xmalloc(s) HeapAlloc(GetProcessHeap(),HEAP_ZERO_MEMORY,(s)) 
+#define xfree(p) HeapFree (GetProcessHeap(),0,(p)) 
 
 class CScanDlg : public CDialog
 {
@@ -45,7 +62,15 @@ public:
 	afx_msg LRESULT OnScanFinish(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnAddComScanRet(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnAddNetScanRet(WPARAM wParam, LPARAM lParam);
-
+BOOL	CheckTheSameSubnet(CString strIP);
+void FLEX_GRID_PUT_COLOR_STR(int row,int col,CString str);
+void GetIPMaskGetWay(CString &StrIP,CString &StrMask,CString &StrGetway);
+BOOL GetNewIP(CString &newIP);
+BOOL TestPing(const CString& strIP);
+void FillIcmpData(char * icmp_data, int datasize);
+USHORT Checksum(USHORT *buffer, int size);
+int DecodeResp(char *buf, int bytes,struct sockaddr_in *from);
+void ChangeIPAddress(CString newip,CString oldip);
 public:
 	void InitScanGrid();
 
@@ -90,7 +115,15 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	//
 	//////////////////////////////////////////////////////////////////////////
-
+	typedef struct icmphdr { 
+		BYTE i_type; 
+		BYTE i_code; /* type sub code */ 
+		USHORT i_cksum; 
+		USHORT i_id; 
+		USHORT i_seq; 
+		/* This is not the std header, but we reserve space for time */ 
+		ULONG timestamp; 
+	}IcmpHeader; 
 protected:
 	void		CalcClickPos(CSize& size);
 	void		GetGridEditString(); // 记录edit的数据
