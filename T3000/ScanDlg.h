@@ -78,6 +78,8 @@ public:
 	void AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList);
 
 	void SetScanner(CTStatScanner* pScanner);
+	void SetNode(tree_product product_Node);
+	void Set_IsScan(BOOL Is_Scan);
 	void Release();
 protected:
 	// 读出所有存在数据库中的设备节点。准备与搜索到的设备比较
@@ -87,6 +89,9 @@ protected:
 	// 打开原来的端口
 	void OpenDefaultCom();
 
+	tree_product m_net_product_node;
+	BOOL m_IsScan;
+	
 	//void DrawButtonOnGrid(int iRow, int iCol);
 
 	CTStat_Dev* FindComDeviceBySerialIDInDB(DWORD dwSerialID);
@@ -160,4 +165,11 @@ public:
 	DECLARE_EVENTSINK_MAP()
 	void ClickMsflexgrid1();
 	CEdit m_editGrid;
+	int m_curcol;
+	int m_currow;
+
+	CString m_strlocalipaddress;
+	CString m_strlocalsubnet;
+	CString m_strlocalgateway;
+	afx_msg void OnEnKillfocusEditGridedit();
 };

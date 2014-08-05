@@ -12,7 +12,9 @@ class CImageTreeCtrl : public CTreeCtrl
 public:
 	CImageTreeCtrl();
 	virtual ~CImageTreeCtrl();
-	
+	virtual void	DisplayContextMenu(CPoint & point);
+/*	virtual void	ExtendContextMenu(CMenu & menu);*/
+	afx_msg void	OnContextCmd(UINT uID);
 protected:
 	DECLARE_MESSAGE_MAP()
 	virtual bool	HandleKeyDown(WPARAM wParam, LPARAM lParam);
@@ -97,6 +99,7 @@ public:
 	COLORREF GetItemColor(HTREEITEM hItem);
 	afx_msg void OnPaint();
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
+	afx_msg void OnRclick(NMHDR* pNMHDR, LRESULT* pResult);
 
 };
 

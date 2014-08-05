@@ -124,29 +124,29 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		{
 		   continue;
 		}
-		int nID=-1;
-		int nTempID =pDlg->m_grid_load.at(iitemp).ID;//get temp tstat id
-		if (g_CommunicationType==0)
-		{
-			int baudrate=19200;
-			Change_BaudRate(19200);
-			nID=read_one(nTempID,6);
-			if(nID<=0)
-			{
-			baudrate=9600;
-			Change_BaudRate(9600);
-			nID=read_one(nTempID,6);
-			}
-		}
-		if (g_CommunicationType==1)
-		{
-			nID=read_one(nTempID,6);
-		}
-		if (nID<0)//没有读到 ID，就省略掉
-		{
-		   continue;
-		}
-		now_tstat_id=nID;
+		//int nID=-1;
+		//int nTempID =pDlg->m_grid_load.at(iitemp).ID;//get temp tstat id
+		//if (g_CommunicationType==0)
+		//{
+		//	int baudrate=19200;
+		//	Change_BaudRate(19200);
+		//	nID=read_one(nTempID,6);
+		//	if(nID<=0)
+		//	{
+		//	baudrate=9600;
+		//	Change_BaudRate(9600);
+		//	nID=read_one(nTempID,6);
+		//	}
+		//}
+		//if (g_CommunicationType==1)
+		//{
+		//	nID=read_one(nTempID,6);
+		//}
+		//if (nID<0)//没有读到 ID，就省略掉
+		//{
+		//   continue;
+		//}
+		now_tstat_id=pDlg->m_grid_load.at(iitemp).ID;
 		int nFlag=0;
 		nFlag = read_one(now_tstat_id,7,6);
 

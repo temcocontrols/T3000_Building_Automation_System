@@ -519,6 +519,7 @@ void CModbusPollView::Fresh_Data(){
 		else
 		{
               m_connectionState.SetWindowText(L"");
+			  SetPaneString(1,L"Connected");
 		}
 		
 // 		m_connectionState.SetStringFontSize(14);
@@ -655,12 +656,12 @@ void CModbusPollView::Fresh_Data(){
 
 	if (m_Hide_Alias_Columns!=0)
 	{
-	m_grid_cols=m_data_cols+1;
+	m_grid_cols=2*m_data_cols+1;
 	m_grid_rows=m_data_rows+1;
 	} 
 	else
 	{
-	m_grid_cols=2*m_data_cols+1;
+	m_grid_cols=3*m_data_cols+1;
 	m_grid_rows=m_data_rows+1;
 	}
 	m_MsDataGrid.put_Cols(m_grid_cols);
@@ -710,6 +711,52 @@ void CModbusPollView::Fresh_Data(){
 					}
 				}
 			}
+
+
+			for (int i=1;i<m_MsDataGrid.get_Cols();i++)
+			{
+
+
+
+				for (int j=0;j<m_MsDataGrid.get_Rows();j++)
+				{
+
+					if (j==0)
+					{
+						//初始化第0行
+						if (i%2!=0)
+						{
+							index=L"Address";
+							m_MsDataGrid.put_TextMatrix(0,i,index);
+						} 
+						else
+						{
+							index=L"Value";
+							m_MsDataGrid.put_TextMatrix(0,i,index);
+						}
+					} 
+					else
+					{
+						Index=(j-1)*(m_MsDataGrid.get_Rows()-1)+(i-1);
+						if (i%2!=0)//Add
+						{
+							if (Index<=m_Quantity)
+							{
+								CString StrTemp;
+								StrTemp.Format(_T("%d"),Get_Reg_Add(Index));
+								m_MsDataGrid.put_TextMatrix(i,j,StrTemp);
+							}
+						}
+						else//Value
+						{
+							if (Index<=m_Quantity)
+							{
+								m_MsDataGrid.put_TextMatrix(i,j,Get_Data(Index));
+							}
+						}
+					}
+				}
+			}
 	}
 	else{
 		//初始化行
@@ -723,31 +770,46 @@ void CModbusPollView::Fresh_Data(){
                  if (j==0)
                  {
 					 //初始化第0行
-					 if (i%2!=0)
+					 if((i%3)==1)
 					 {
 						 index=L"Alias";
 						 m_MsDataGrid.put_TextMatrix(0,i,index);
 					 } 
-					 else
+					else if ((i%3)==2)
 					 {
-						 index.Format(_T("%d"),m_address+(i/2-1)*(m_MsDataGrid.get_Rows()-1));
+						 index=L"Address";
+						 m_MsDataGrid.put_TextMatrix(0,i,index);
+					 } 
+					 else if ((i%3)==0)
+					 {
+						 index=L"Value";
 						 m_MsDataGrid.put_TextMatrix(0,i,index);
 					 }
+					 
                  } 
                  else
                  {
-					 if (i%2!=0)
+					 if ((i%3)==1)
 					 {
-
-						 Index=((i+1)/2-1)*(m_MsDataGrid.get_Rows()-1)+(j-1);
-
-
+						 Index=((i+2)/3-1)*(m_MsDataGrid.get_Rows()-1)+(j-1);
 						 m_MsDataGrid.put_TextMatrix(j,i, m_Alias[Index]);
 
 					 }
-					 else
+					 else if ((i%3)==2)
 					 {
-						 Index=(i/2-1)*(m_MsDataGrid.get_Rows()-1)+(j-1);
+						 Index=((i+1)/3-1)*(m_MsDataGrid.get_Rows()-1)+(j-1);
+						 if (Index<=m_Quantity)
+						 {
+							 CString StrTemp;
+							 StrTemp.Format(_T("%d"),Get_Reg_Add(Index));
+							 m_MsDataGrid.put_TextMatrix(j,i,StrTemp);
+							 
+						 }
+						 
+					 }
+					 else if ((i%3)==0)
+					 {
+						 Index=(i/3-1)*(m_MsDataGrid.get_Rows()-1)+(j-1);
 						 if (Index<=m_Quantity)
 						 {
 							 m_MsDataGrid.put_TextMatrix(j,i,Get_Data(Index));
@@ -1142,13 +1204,7 @@ HBRUSH CModbusPollView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	
 
 	// TODO:  Change any attributes of the DC here
-	switch (pWnd->GetDlgCtrlID())
-	{
-	 
- 
-	 
-	 
-	}
+
 	// TODO:  Return a different brush if the default is not desired
 	return hbr;
 }

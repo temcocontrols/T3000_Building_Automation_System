@@ -289,7 +289,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	//ON_UPDATE_COMMAND_UI(ID_INDICATOR_FILEPOS, &CMainFrame::OnUpdatePaneFilePos)
 
 
-END_MESSAGE_MAP()
+	ON_COMMAND(ID_HELP_FEEDBACKTOTEMCO, &CMainFrame::OnHelpFeedbacktotemco)
+	END_MESSAGE_MAP()
 
 static UINT indicators[] =
 {
@@ -6303,7 +6304,7 @@ void CMainFrame::OnToolRefreshLeftTreee()
 	EndWaitCursor();
 
 } 
-
+#include "ScanDlg.h"
 void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 {
 
@@ -6357,9 +6358,23 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			if(!m_product.at(i).BuildingInfo.strIp.IsEmpty())
 			{
 				//OnTestPing(product_Node.BuildingInfo.strIp);
+				CScanDlg scandlg;
+				if (!scandlg.TestPing(m_product.at(i).BuildingInfo.strIp))
+				{
+					//去掉进度条
+					pDlg->ShowWindow(SW_HIDE);
+					if(pDlg)
+						delete pDlg;//20120220
+					pDlg = NULL;
+					//显示 IP部分
+					scandlg.Set_IsScan(FALSE);
+					scandlg.SetNode(product_Node);
+					scandlg.DoModal();
+					return;
+				}
 			}
-			else
-				SetPaneString(3,_T(""));
+			 
+
 			if((product_Node.product_class_id == PM_CM5) || (product_Node.product_class_id == PM_MINIPANEL))	//如果是CM5或者MINIPANEL 才有 bacnet协议;
 			{
 #if 1
@@ -7663,6 +7678,7 @@ void CMainFrame::GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItem
 	}	
 }
 
+
 BOOL CMainFrame::CheckDeviceStatus()
 {
 	bool find_new_device = false;
@@ -7895,7 +7911,8 @@ end_condition :
 		if(db_exsit)	//数据库存在，就查看是否要更新;
 		{
 				if((m_refresh_net_device_data.at(y).ip_address.CompareNoCase(m_product.at(n_index).BuildingInfo.strIp) != 0) ||
-					(m_refresh_net_device_data.at(y).nport != m_product.at(n_index).ncomport))
+					(m_refresh_net_device_data.at(y).nport != m_product.at(n_index).ncomport) ||
+					(m_refresh_net_device_data.at(y).modbusID != m_product.at(n_index).product_id))
 				{
 					m_pCon.CreateInstance(_T("ADODB.Connection"));
 					m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
@@ -7904,11 +7921,12 @@ end_condition :
 					CString str_ip_address;
 					CString str_n_port;
 					CString str_serialid;
+					CString str_modbus_id;
 					str_ip_address = m_refresh_net_device_data.at(y).ip_address;
 					str_n_port.Format(_T("%d"),m_refresh_net_device_data.at(y).nport);
 
 					str_serialid.Format(_T("%d"),m_refresh_net_device_data.at(y).nSerial);
-
+					str_modbus_id.Format(_T("%d"),m_refresh_net_device_data.at(y).modbusID);
 					try
 					{
 						m_pCon.CreateInstance(_T("ADODB.Connection"));
@@ -7917,6 +7935,8 @@ end_condition :
 						m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
 						strSql.Format(_T("update ALL_NODE set Com_Port ='%s' where Serial_ID = '%s'"),str_n_port,str_serialid);
 						m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+						strSql.Format(_T("update ALL_NODE set Product_ID ='%s' where Serial_ID = '%s'"),str_modbus_id,str_serialid);
+						m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
 					}
 					catch(_com_error *e)
 					{
@@ -7927,6 +7947,7 @@ end_condition :
 
 					m_product.at(n_index).ncomport = m_refresh_net_device_data.at(y).nport;
 					m_product.at(n_index).BuildingInfo.strIp = m_refresh_net_device_data.at(y).ip_address;
+					m_product.at(n_index).product_id = m_refresh_net_device_data.at(y).modbusID;
 				}
 			
 		}
@@ -7973,6 +7994,7 @@ end_condition :
 		 PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
 	return TRUE;
 }
+
 
 LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
 {
@@ -10525,4 +10547,19 @@ void CMainFrame::OnUpdateScanDevice(CCmdUI *pCmdUI)
 void CMainFrame::OnUpdateStatusBar(CCmdUI *pCmdUI){
 	pCmdUI->Enable(TRUE);
 
+}
+#include "MailFeedbackDlg.h"
+void CMainFrame::OnHelpFeedbacktotemco()
+{
+// 	 CMailFeedbackDlg dlg;
+// 	 dlg.DoModal();
+	CString m_strWebLinker;
+	m_strWebLinker.Format(_T("mailto:alex@temcocontrols.com?subject=feedback to temco &body=please add the attachment in the \n%sT3000.log "),g_strExePth);
+	try{
+		ShellExecute(GetSafeHwnd(), NULL,m_strWebLinker,   NULL, NULL,   SW_SHOWNORMAL);
+	}
+	catch(...)
+	{
+		AfxMessageBox(_T("Error:Can't find the email client in your pc!"));
+	}
 }

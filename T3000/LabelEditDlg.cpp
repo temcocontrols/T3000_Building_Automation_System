@@ -10,7 +10,7 @@
 #define INPUT_NUMBER 4
 #define OUTPUT_NUMBER 7
 //CString m_input[INPUT_NUMBER]={_T("Internal"),_T("Analog 1"),_T("Analog 2"),_T("Digital 1")};
-CString m_input[INPUT_NUMBER]={_T("Internal Sensor"),_T("Input2"),_T("Input3"),_T("Input4")};
+CString m_input[INPUT_NUMBER]={_T("Internal Sensor"),_T("Input1"),_T("Input2"),_T("Input3")};
 CString m_output[OUTPUT_NUMBER]={_T("Relay 1"),_T("Relay 2"),_T("Relay 3"),_T("Relay 4"),_T("Relay 5"),_T("Analog 1"),_T("Analog 2")};
 
 IMPLEMENT_DYNAMIC(CLabelEditDlg, CDialog)
