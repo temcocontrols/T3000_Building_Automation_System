@@ -29,7 +29,7 @@ bool g_register_occuppied = false; //Add by Alex
 
 unsigned short cm5_register_value[512]; //CM5
 unsigned short m_buffer[512];//CM5
-
+bool no_mouse_keyboard_event_enable_refresh = true;
 int nCom;
 //CString program_path=_T("");
 int g_tstat_id=255;
@@ -53,7 +53,7 @@ int g_nEndID=254;
 BOOL g_bCancelScan=FALSE;
 int g_ScnnedNum=0;
 CString g_strScanInfoPrompt;
-
+CString g_strT3000LogString;
 CString g_strTstat5a;
 CString g_strTstat5b;
 CString g_strTstat5b2;

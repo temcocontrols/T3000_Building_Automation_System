@@ -224,4 +224,5 @@ public:
 	CButton m_check_occupiedenable;
 	CEdit m_occupied_timer;
 	afx_msg void OnEnKillfocusEditOccupiedTimer();
+	afx_msg void OnEnKillfocusEditDeadMaster();
 };

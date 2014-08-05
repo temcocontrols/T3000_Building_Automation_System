@@ -62,6 +62,17 @@ int read_one(unsigned char device_var,unsigned short address,int retry_times)
 {
 	int value;
 	int j = modbus_read_one_value( value, device_var, address, retry_times );
+	if (j>0)
+	{
+		g_strT3000LogString.Format(_T("Read One ID=%d,address=%d,result=%d,Status=OK"),device_var,address,j);
+		//::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+	}
+	else
+	{
+		g_strT3000LogString.Format(_T("Read One ID=%d,address=%d,Status:Fail"),device_var,address);
+		//::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+	}
+	 SetPaneString(3,g_strT3000LogString);
 	if( j != 0 ) {
 		// there was an error, so return the error flag
 		return j;
@@ -152,41 +163,7 @@ int g_NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi,
 	g_bEnableRefreshTreeView |= EnableRefreshTreeView_original_value;
 	return j;
 }
-int g_MINI_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bComm_Type){
-
-	BOOL EnableRefreshTreeView_original_value = g_bEnableRefreshTreeView;
-	g_bEnableRefreshTreeView = false;
-	int j=-1;
-	// ensure no other threads attempt to access modbus communications
-	CSingleLock singleLock(&register_critical_section);
-	singleLock.Lock();
-	// call the modbus DLL method
-	j=g_MINI_CheckTstatOnline_a(devLo,devHi,bComm_Type);
-	// free the modbus communications for other threads
-	singleLock.Unlock();
-	// increment the number of transmissions we have done
-	g_llTxCount++;
-	// check for other errors
-	// increment the number or replies we have received
-	if (j!=-1&&j!=-4)
-	{
-		g_llRxCount++;
-	}
-	// check for running in the main GUI thread
-	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
-
-		// construct status message string
-		CString str;
-		str.Format(_T("San Command [Tx=%d Rx=%d Err=%d]"), 
-			g_llTxCount, g_llRxCount, g_llTxCount-g_llRxCount);
-
-		//Display it
-		((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
-
-	}
-	g_bEnableRefreshTreeView |= EnableRefreshTreeView_original_value;
-	return j;
-}
+ 
 void SetPaneString(int nIndext,CString str)
 {
 	/*
@@ -203,38 +180,76 @@ void SetPaneString(int nIndext,CString str)
 		return;
 	pStatusBar = (CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR);
 	pStatusBar->SetPaneText(nIndext,str.GetString());
-	//pStatusBar->SetPaneTextColor (RGB(128,0,0));
+	pStatusBar->SetPaneTextColor (nIndext, RGB(0,0,0));
+  	if (nIndext==3)
+  	{
+  		pStatusBar->SetPaneTextColor (nIndext, RGB(255,255,255));
+  		pStatusBar->SetPaneBackgroundColor(nIndext,RGB(42,58,87));
+  	}
+ 
 
-// 	CRect rc;
-// 	pStatusBar->GetItemRect(0, &rc);
-// 	CDC* pDC = pStatusBar->GetWindowDC();
-// 	rc.DeflateRect(2,0,2,0);
-// 	pDC->Rectangle(rc);
+	if (nIndext==3)
+	{
+		CCriticalSection  logfile_section;
+		logfile_section.Lock();
+		
+		TCHAR exeFullPath[MAX_PATH+1]; //
+		GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
+		(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
+		CString g_strExePth=exeFullPath;
+		CString t3000logfilename = g_strExePth + _T("T3000.log");
 
-
-// 	if (nIndext == 0)
-// 	{
-// 		HBITMAP hBmp = LoadBitmap(AfxGetResourceHandle(),  MAKEINTRESOURCE(IDB_UPBMP));
-// 		pStatusBar->SetPaneIcon(nIndext, hBmp, RGB(192,192,192));
-// 
-// 	}
-	/*
-	status_info infoStatusbar;
-	infoStatusbar.nIndex=nIndext;
-	infoStatusbar.strInfoText=str;
-	::PostMessage(AfxGetMainWnd()->GetActiveWindow()->m_hWnd,WM_USER_FRESHSTATUSBAR,0,(WPARAM)&infoStatusbar);
-*/
-
-
+		CTime nowtime=CTime::GetCurrentTime();
+		CString time;
+		time.Format(_T("%4d-%.2d-%.2d %.2d:%.2d:%.2d  >>"),nowtime.GetYear(), nowtime.GetMonth(), nowtime.GetDay(),     
+			nowtime.GetHour(), nowtime.GetMinute(), nowtime.GetSecond());
+		CString logstr=time+str;
+		CStdioFile* fileScanLog = new CStdioFile;
+		if (!fileScanLog->Open(t3000logfilename.GetString(),CFile::modeReadWrite | CFile::shareDenyNone ))
+		{
+			if (fileScanLog->Open(t3000logfilename.GetString(), CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone ))
+			{
+				fileScanLog->WriteString(logstr.GetBuffer());
+			}
+		} 
+		else
+		{
+			fileScanLog->SeekToEnd();
+			fileScanLog->WriteString(logstr.GetBuffer());
+			fileScanLog->WriteString(_T("\n"));
+		}
+		
+		fileScanLog->Flush();
+		fileScanLog->Close();
+		delete fileScanLog;
+		logfile_section.Unlock();
+	}
+	
 }
-
-
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
 {
 	BOOL bTemp = g_bEnableRefreshTreeView;
 	g_bEnableRefreshTreeView = FALSE;
 	int j = Write_Multi_org(device_var, to_write, start_address, length, retry_times);
 	g_bEnableRefreshTreeView |= bTemp;
+ 	CString data;
+ 	for (int i=0;i<length;i++)
+ 	{
+ 		CString strTemp;
+ 		strTemp.Format(_T("%d "),to_write[i]);
+ 		data+=strTemp;
+ 	}
+	if (j>0)
+	{
+		g_strT3000LogString.Format(_T("Multi Write ID=%d,start address=%d,length=%d,Status=OK"),device_var,start_address,length,data.GetBuffer());
+		//::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+	}
+	else
+	{
+		g_strT3000LogString.Format(_T("Multi Write ID=%d,start address=%d,length=%d,Status:Fail"),device_var,start_address,length);
+		//::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+	}
+	 SetPaneString(3,g_strT3000LogString);
 	return j;
 }
 int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times)
@@ -243,6 +258,23 @@ int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned
 	g_bEnableRefreshTreeView = FALSE;
 	int j = Write_Multi_org_short(device_var, to_write, start_address, length, retry_times);
 	g_bEnableRefreshTreeView |= bTemp;
+	CString data;
+	for (int i=0;i<length;i++)
+	{
+		CString strTemp;
+		strTemp.Format(_T("%d"),to_write[i]);
+		data+=strTemp;
+	}
+	if (j>0)
+	{
+		g_strT3000LogString.Format(_T("Multi Write ID=%d,start address=%d,length=%d,result=%s"),device_var,start_address,length,data.GetBuffer());
+		::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+	}
+	else
+	{
+		g_strT3000LogString.Format(_T("Multi Write ID=%d,start address=%d,length=%d,result:Fail"),device_var,start_address,length);
+		::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+	}
 	return j;
 }
 int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
@@ -336,12 +368,32 @@ int Write_Multi_org_short(unsigned char device_var,unsigned short *to_write,unsi
 //	int retry_times );
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times)
 {
-	return modbus_read_multi_value(
+	 int ret=modbus_read_multi_value(
 		put_data_into_here,
 		device_var,
 		start_address,
 		length,
 		retry_times );
+	 CString data;
+	 for (int i=0;i<length;i++)
+	 {
+		 CString strTemp;
+		 strTemp.Format(_T("%d"),put_data_into_here[i]);
+		 data+=strTemp;
+	 }
+	 if (ret>0)
+	 {
+		 g_strT3000LogString.Format(_T("Multi Read ID=%d,start address=%d,length=%d,Status=OK"),device_var,start_address,length,data.GetBuffer());
+		// ::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+		 
+	 }
+	 else
+	 {
+		 g_strT3000LogString.Format(_T("Multi Read ID=%d,start address=%d,length=%d,Status:Fail"),device_var,start_address,length);
+		// ::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+	 }
+	 SetPaneString(3,g_strT3000LogString);
+	 return ret;
 }
 
 

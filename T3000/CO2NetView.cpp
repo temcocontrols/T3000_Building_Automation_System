@@ -7,10 +7,43 @@
 #include "MainFrm.h"
 #include "ado/ADO.h"
 #include "Dialog_Progess.h"
-
+#define CO2NETVIEWFRESH   WM_USER+20000
 
 // CCO2NetView
+DWORD WINAPI _ReadMultiRegisters_CO2(LPVOID pParam)
+{
+	CCO2NetView* pView=(CCO2NetView*)(pParam);
+	BOOL bFirst=TRUE;
+	while(1)
+	{
+		if (!is_connect())
+		{
+			Sleep(10);
+			continue;
+		}
+		Sleep(2000);
+		for(int i=0;i<27;i++) //Modify 
+		{
+			register_critical_section.Lock();
+			int multy_ret = 0;
 
+			multy_ret = Read_Multi(g_tstat_id,&pView->product_register_value[i*100],i*100,100);
+			register_critical_section.Unlock();
+		}
+
+		if(pView->m_hWnd!=NULL)
+		{
+			::PostMessage(pView->m_hWnd,CO2NETVIEWFRESH,0,0);
+		}
+
+		 
+
+	}
+
+
+
+	return 1;
+}
 IMPLEMENT_DYNCREATE(CCO2NetView, CFormView)
 
 CCO2NetView::CCO2NetView()
@@ -21,7 +54,8 @@ Flag_Reg=FALSE;
 
 
 CCO2NetView::~CCO2NetView()
-{
+{if(hFirstThread != NULL)
+TerminateThread(hFirstThread, 0);
 }
 
 void CCO2NetView::DoDataExchange(CDataExchange* pDX)
@@ -85,6 +119,7 @@ BEGIN_MESSAGE_MAP(CCO2NetView, CFormView)
     ON_EN_KILLFOCUS(IDC_EDIT_CO2_BACKLIGHT_TIME, &CCO2NetView::OnEnKillfocusEditCo2BacklightTime)
     ON_BN_CLICKED(IDC_BUTTON_CO2_SYNC_TIME, &CCO2NetView::OnBnClickedButtonCo2SyncTime)
     ON_BN_CLICKED(IDC_BTN_CO2_REFRESH, &CCO2NetView::OnBnClickedBtnCo2Refresh)
+	ON_MESSAGE(CO2NETVIEWFRESH, OnFreshView)
 END_MESSAGE_MAP()
 
 
@@ -109,15 +144,22 @@ void CCO2NetView::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 void CCO2NetView::Fresh(){
-if (!Flag_Reg)
-{
-Initial_Registerlist();
-Flag_Reg=TRUE;
-}
-for(int i=0;i<27;i++){
-Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
-}
-Initial_Window();
+	if (!Flag_Reg)
+	{
+		Initial_Registerlist();
+		Flag_Reg=TRUE;
+	}
+	for(int i=0;i<27;i++){
+		Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
+	}
+	Initial_Window();
+	if(hFirstThread != NULL)
+		TerminateThread(hFirstThread, 0);
+	hFirstThread=NULL;
+	if (!hFirstThread)
+	{
+		hFirstThread = CreateThread(NULL,NULL,_ReadMultiRegisters_CO2,this,NULL,0);
+	}
 }
 void CCO2NetView::Initial_Registerlist(){
     CO2_NET_MODBUS_SERIALNUMBER_LOWORD	=	0	;
@@ -574,6 +616,10 @@ void CCO2NetView::OnBnClickedBtnCo2ClearCal()
      dlg.DoModal();
 }
 
+LRESULT CCO2NetView::OnFreshView(WPARAM wParam, LPARAM lParam){
+	Fresh();
+	return 0;
+}
 
 void CCO2NetView::OnBnClickedRadioAlarmManual()
 {

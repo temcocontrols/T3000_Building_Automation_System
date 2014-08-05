@@ -68,7 +68,7 @@ public:
 //	afx_msg void OnSetupRead32783();
 	afx_msg void OnDispalyCommunication();
 	afx_msg void OnUpdateDispalyCommunication(CCmdUI *pCmdUI);
-     
+     afx_msg void OnUpdateStatusBar(CCmdUI *pCmdUI);
 	afx_msg void OnViewRegistervalueanalyzer();
 };
 

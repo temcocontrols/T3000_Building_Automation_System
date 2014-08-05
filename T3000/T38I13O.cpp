@@ -10,8 +10,8 @@
 #include "WriteSingleRegDlg.h"
 #include "Dialog_Progess.h"
 CString Range_Unit[]={_T("RAW DATA"),_T("TYPE2 10K C"),_T("TYPE2 10K F"),_T("0-100%"),_T("ON/OFF"),_T("OFF/ON"),_T("Pulse Input"),_T("Lighting Control"),_T("TYPE3 10K C"),_T("TYPE3 10K F"),_T("NO USE"),_T("0-5V"),_T("0-10V"),_T("0-20ma")};
-
-
+ 
+#define  WM_FRESH_T38I13O WM_USER+2016
 UINT _ReadMulti_T38I13ORegisters(LPVOID pParam){
 T38I13O *pParent = (T38I13O *)pParam;
 while (TRUE)
@@ -24,11 +24,15 @@ continue;
 else
 {
 Sleep(2000);
-Read_Multi(g_tstat_id,&product_register_value[pParent->ZONE_TIME_LEFT_INPUT1],pParent->ZONE_TIME_LEFT_INPUT1,8);
+//Read_Multi(g_tstat_id,&product_register_value[pParent->ZONE_TIME_LEFT_INPUT1],pParent->ZONE_TIME_LEFT_INPUT1,8);
+for (int i=0;i<3;i++)
+{
+
+	Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
+}
+::SendMessage(pParent->m_hWnd,WM_FRESH_T38I13O,0,0);
 }
 }
-
-
 }
 IMPLEMENT_DYNCREATE(T38I13O, CFormView)
 
@@ -1271,4 +1275,443 @@ void T38I13O::OnDestroy()
 	CFormView::OnDestroy();
 
 	 
+}
+
+
+//BOOL T38I13O::PreTranslateMessage(MSG* pMsg)
+//{
+//	// TODO: Add your specialized code here and/or call the base class
+//	// CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+//	if(pMsg->message==WM_FRESH_T38I13O){
+//		if (no_mouse_keyboard_event_enable_refresh)
+//		{
+//			CString strresult;
+//			int regValue;
+//			for(int i = 1;i<=8;i++)
+//			{  
+//
+//
+//				strresult.Format(_T("%4d/%4d/%4d  %2d:%2d"),product_register_value[DATE_STAMP_INPUT1_YEAR+3*(i-1)],product_register_value[DATE_STAMP_INPUT1_MONTH+3*(i-1)],product_register_value[DATE_STAMP_INPUT1_DAY+3*(i-1)],product_register_value[DATE_STAMP_INPUT1_HOUR+3*(i-1)],product_register_value[DATE_STAMP_INPUT1_MINUTE+3*(i-1)]);
+//				m_msflexgrid_input.put_TextMatrix(i,2,strresult);
+//
+//				strresult.Format(_T("%d"),product_register_value[RANGE_INPUT1+i-1]);
+//				if (0==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("RAW DATA");
+//
+//				} 
+//				else if (1==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("10K C");
+//				}
+//				else if (2==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("10K F");
+//				}
+//				else if (3==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("0-100%");
+//				}
+//				else if (4==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("ON/OFF");
+//				}
+//				else if (5==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("OFF/ON");
+//				}
+//				else if (6==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("Pulse Input");
+//				}
+//				else if (7==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("Lighting Control");
+//				}
+//				else if (8==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("TYPE3 10K C");
+//				}
+//				else if (9==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("TYPE3 10K F");
+//				}
+//				else if (10==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("NO USE");
+//				}
+//				else if (11==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("0-5V");
+//				}
+//				else if (12==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("0-10V");
+//				}
+//				else if (13==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("0-20 ma");
+//				}
+//
+//				m_msflexgrid_input.put_TextMatrix(i,3,strresult);
+//
+//
+//				regValue=(short)product_register_value[INPUT1_PULSE_COUNT_LOW+2*(i-1)];
+//
+//				if (0==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult.Format(_T("%d"),regValue);
+//
+//				} 
+//				else if (1==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult.Format(_T("%.1f C"),(float)regValue/10.0);
+//				}
+//				else if (2==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("10K F");
+//					strresult.Format(_T("%.1f F"),(float)regValue/10.0);
+//				}
+//				else if (3==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//
+//					strresult.Format(_T("%.1f"),(float)regValue);
+//					strresult+=_T("%");
+//				}
+//				else if (4==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					//strresult.Format(_T("%.1f F"),(float)regValue/10.0);
+//					if (regValue==0)
+//					{
+//						strresult=_T("OFF");
+//					} 
+//					else
+//					{
+//						strresult=_T("ON");
+//					}
+//				}
+//				else if (5==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					if (regValue==0)
+//					{
+//						strresult=_T("ON");
+//					} 
+//					else
+//					{
+//						strresult=_T("OFF");
+//					}
+//				}
+//				else if (6==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult.Format(_T("%d"),regValue);
+//				}
+//				else if (7==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult.Format(_T("%d"),regValue);
+//				}
+//				else if (8==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					//strresult=_T("TYPE3 10K C");
+//					strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
+//				}
+//				else if (9==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					/*strresult=_T("TYPE3 10K F");*/
+//					strresult.Format(_T("%0.1f F"),(float)regValue/10.0);
+//				}
+//				else if (10==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					strresult=_T("0");
+//					//strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
+//				}
+//				else if (11==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					//strresult=_T("0-5V");
+//					strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
+//				}
+//				else if (12==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					//strresult=_T("0-10V");
+//					strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
+//				}
+//				else if (13==product_register_value[RANGE_INPUT1+i-1])
+//				{
+//					//strresult=_T("0-20I");
+//					strresult.Format(_T("%0.1f ma"),(float)regValue/1000.0);
+//				}
+//
+//
+//
+//
+//				m_msflexgrid_input.put_TextMatrix(i,1,strresult);
+//
+//
+//
+//				strresult.Format(_T("%d"),product_register_value[FILTER_INPUT1+i-1]);
+//				m_msflexgrid_input.put_TextMatrix(i,4,strresult);
+//
+//				strresult.Format(_T("%d min"),product_register_value[LIGHTING_ZONE_TIME_INPUT1+i-1]);
+//				m_msflexgrid_input.put_TextMatrix(i,5,strresult);
+//
+//				strresult.Format(_T("%d min"),product_register_value[ZONE_TIME_LEFT_INPUT1+i-1]);
+//				m_msflexgrid_input.put_TextMatrix(i,6,strresult);
+//			}
+//
+//			CString CstresultDO;
+//			for(int i = 1;i<=13;i++)
+//			{  
+//
+//				CstresultDO.Format(_T("%d"),product_register_value[OUTPUT1+i-1]);
+//				if (product_register_value[OUTPUT1+i-1]==0)
+//				{
+//					CstresultDO=_T("Off");
+//				}
+//				else
+//				{
+//					CstresultDO=_T("On");
+//				}
+//				m_msflexgrid_output.put_TextMatrix(i,1,CstresultDO);
+//
+//				if (product_register_value[LIGHT_SWITCH_OUTPUT1+i-1]>0)
+//				{
+//					CstresultDO=Get_Table_Name(m_sn,_T("Input"),product_register_value[LIGHT_SWITCH_OUTPUT1+i-1]);
+//				}
+//				else
+//				{
+//					CstresultDO=_T("UNUSED");
+//				}
+//				m_msflexgrid_output.put_TextMatrix(i,2,CstresultDO);
+//				if (((product_register_value[AUTO_MANUAL_OUTPUTS]>>(i-1))&0x01)==1)
+//				{
+//					CstresultDO=_T("Manual");
+//				} 
+//				else
+//				{
+//					CstresultDO=_T("Auto");
+//				}
+//				m_msflexgrid_output.put_TextMatrix(i,3,CstresultDO);
+//			}
+//		}
+//		
+//	}
+//	return CFormView::PreTranslateMessage(pMsg);
+//}
+
+
+LRESULT T38I13O::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	 
+	if(message==WM_FRESH_T38I13O){
+				if (no_mouse_keyboard_event_enable_refresh)
+				{
+					CString strresult;
+					int regValue;
+					for(int i = 1;i<=8;i++)
+					{  
+		
+		
+						strresult.Format(_T("%4d/%4d/%4d  %2d:%2d"),product_register_value[DATE_STAMP_INPUT1_YEAR+3*(i-1)],product_register_value[DATE_STAMP_INPUT1_MONTH+3*(i-1)],product_register_value[DATE_STAMP_INPUT1_DAY+3*(i-1)],product_register_value[DATE_STAMP_INPUT1_HOUR+3*(i-1)],product_register_value[DATE_STAMP_INPUT1_MINUTE+3*(i-1)]);
+						m_msflexgrid_input.put_TextMatrix(i,2,strresult);
+		
+						strresult.Format(_T("%d"),product_register_value[RANGE_INPUT1+i-1]);
+						if (0==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("RAW DATA");
+		
+						} 
+						else if (1==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("10K C");
+						}
+						else if (2==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("10K F");
+						}
+						else if (3==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("0-100%");
+						}
+						else if (4==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("ON/OFF");
+						}
+						else if (5==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("OFF/ON");
+						}
+						else if (6==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("Pulse Input");
+						}
+						else if (7==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("Lighting Control");
+						}
+						else if (8==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("TYPE3 10K C");
+						}
+						else if (9==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("TYPE3 10K F");
+						}
+						else if (10==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("NO USE");
+						}
+						else if (11==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("0-5V");
+						}
+						else if (12==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("0-10V");
+						}
+						else if (13==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("0-20 ma");
+						}
+		
+						m_msflexgrid_input.put_TextMatrix(i,3,strresult);
+		
+		
+						regValue=(short)product_register_value[INPUT1_PULSE_COUNT_LOW+2*(i-1)];
+		
+						if (0==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult.Format(_T("%d"),regValue);
+		
+						} 
+						else if (1==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult.Format(_T("%.1f C"),(float)regValue/10.0);
+						}
+						else if (2==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("10K F");
+							strresult.Format(_T("%.1f F"),(float)regValue/10.0);
+						}
+						else if (3==product_register_value[RANGE_INPUT1+i-1])
+						{
+		
+							strresult.Format(_T("%.1f"),(float)regValue);
+							strresult+=_T("%");
+						}
+						else if (4==product_register_value[RANGE_INPUT1+i-1])
+						{
+							//strresult.Format(_T("%.1f F"),(float)regValue/10.0);
+							if (regValue==0)
+							{
+								strresult=_T("OFF");
+							} 
+							else
+							{
+								strresult=_T("ON");
+							}
+						}
+						else if (5==product_register_value[RANGE_INPUT1+i-1])
+						{
+							if (regValue==0)
+							{
+								strresult=_T("ON");
+							} 
+							else
+							{
+								strresult=_T("OFF");
+							}
+						}
+						else if (6==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult.Format(_T("%d"),regValue);
+						}
+						else if (7==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult.Format(_T("%d"),regValue);
+						}
+						else if (8==product_register_value[RANGE_INPUT1+i-1])
+						{
+							//strresult=_T("TYPE3 10K C");
+							strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
+						}
+						else if (9==product_register_value[RANGE_INPUT1+i-1])
+						{
+							/*strresult=_T("TYPE3 10K F");*/
+							strresult.Format(_T("%0.1f F"),(float)regValue/10.0);
+						}
+						else if (10==product_register_value[RANGE_INPUT1+i-1])
+						{
+							strresult=_T("0");
+							//strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
+						}
+						else if (11==product_register_value[RANGE_INPUT1+i-1])
+						{
+							//strresult=_T("0-5V");
+							strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
+						}
+						else if (12==product_register_value[RANGE_INPUT1+i-1])
+						{
+							//strresult=_T("0-10V");
+							strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
+						}
+						else if (13==product_register_value[RANGE_INPUT1+i-1])
+						{
+							//strresult=_T("0-20I");
+							strresult.Format(_T("%0.1f ma"),(float)regValue/1000.0);
+						}
+		
+		
+		
+		
+						m_msflexgrid_input.put_TextMatrix(i,1,strresult);
+		
+		
+		
+						strresult.Format(_T("%d"),product_register_value[FILTER_INPUT1+i-1]);
+						m_msflexgrid_input.put_TextMatrix(i,4,strresult);
+		
+						strresult.Format(_T("%d min"),product_register_value[LIGHTING_ZONE_TIME_INPUT1+i-1]);
+						m_msflexgrid_input.put_TextMatrix(i,5,strresult);
+		
+						strresult.Format(_T("%d min"),product_register_value[ZONE_TIME_LEFT_INPUT1+i-1]);
+						m_msflexgrid_input.put_TextMatrix(i,6,strresult);
+					}
+		
+					CString CstresultDO;
+					for(int i = 1;i<=13;i++)
+					{  
+		
+						CstresultDO.Format(_T("%d"),product_register_value[OUTPUT1+i-1]);
+						if (product_register_value[OUTPUT1+i-1]==0)
+						{
+							CstresultDO=_T("Off");
+						}
+						else
+						{
+							CstresultDO=_T("On");
+						}
+						m_msflexgrid_output.put_TextMatrix(i,1,CstresultDO);
+		
+						if (product_register_value[LIGHT_SWITCH_OUTPUT1+i-1]>0)
+						{
+							CstresultDO=Get_Table_Name(m_sn,_T("Input"),product_register_value[LIGHT_SWITCH_OUTPUT1+i-1]);
+						}
+						else
+						{
+							CstresultDO=_T("UNUSED");
+						}
+						m_msflexgrid_output.put_TextMatrix(i,2,CstresultDO);
+						if (((product_register_value[AUTO_MANUAL_OUTPUTS]>>(i-1))&0x01)==1)
+						{
+							CstresultDO=_T("Manual");
+						} 
+						else
+						{
+							CstresultDO=_T("Auto");
+						}
+						m_msflexgrid_output.put_TextMatrix(i,3,CstresultDO);
+					}
+				}
+				
+			}
+	return CFormView::WindowProc(message, wParam, lParam);
 }
