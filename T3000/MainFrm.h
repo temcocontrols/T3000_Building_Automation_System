@@ -407,6 +407,7 @@ public:
     UINT m_nStyle;
 	afx_msg void OnHelpUpdatefirmware();
 	afx_msg void OnUpdateStatusBar(CCmdUI *pCmdUI);
+	afx_msg void OnHelpFeedbacktotemco();
 };
 
 const int DLG_T3000_VIEW = 0;

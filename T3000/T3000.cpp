@@ -395,7 +395,7 @@ BOOL CT3000App::InitInstance()
    {
        FilePath=g_strExePth+_T("Database\\t3000.mdb");
        DeleteFile(FilePath.GetBuffer());
-       HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DB1), _T("T3000_DB"));   
+       HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DB2), _T("T3000_DB"));   
        HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 
 
@@ -664,6 +664,15 @@ BOOL CT3000App::InitInstance()
 	//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
 		//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
        // http://www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip
+       CString str_msado;
+       str_msado.Format(_T("%sREG_MSFLXGRD.bat"),g_strExePth.GetBuffer());
+        ::ShellExecute(NULL, _T("open"),str_msado.GetBuffer(), _T(""), _T(""), SW_SHOW);
+        //vcredist_x86.zip
+
+        //	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
+        //这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
+        
+
        AfxMessageBox(_T("Please install the database engine!"));
        ::ShellExecute(NULL, _T("open"), _T("www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip"), _T(""), _T(""), SW_SHOW);
 		//AfxMessageBox(_T("Open'T3000'Again,Please!"));
@@ -784,8 +793,17 @@ void CT3000App::InitModeName()
 // CT3000App message handlers
 void CAboutDlg::OnBnClickedButton1()
 {
-	CString m_strWebLinker=_T("http://www.temcocontrols.com");
-	ShellExecute(GetSafeHwnd(), NULL,m_strWebLinker,   NULL, NULL,   SW_SHOWNORMAL);
+	
+	CString m_strWebLinker;
+	m_strWebLinker.Format(_T("mailto:alex@temcocontrols.com?subject=feedback to temco &body=please add the attachment in the \n%sT3000.log "),g_strExePth);
+	try{
+          ShellExecute(GetSafeHwnd(), NULL,m_strWebLinker,   NULL, NULL,   SW_SHOWNORMAL);
+	}
+	catch(...)
+	{
+		AfxMessageBox(_T("Error:Can't find the email client in your pc!"));
+	}
+	
 }
 int CT3000App::ExitInstance()
 {

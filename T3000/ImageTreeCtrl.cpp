@@ -65,9 +65,19 @@ BEGIN_MESSAGE_MAP(CImageTreeCtrl, CTreeCtrl)
 	ON_WM_CONTEXTMENU()
 	ON_NOTIFY_REFLECT(TVN_BEGINLABELEDIT, OnBeginlabeledit)
 	ON_NOTIFY_REFLECT(TVN_ENDLABELEDIT, OnEndlabeledit)
+	ON_NOTIFY_REFLECT(NM_RCLICK, OnRclick)
+	ON_COMMAND_RANGE(ID_RENAME, ID_MAX_CMD-1, OnContextCmd)
 	ON_WM_KILLFOCUS()
 END_MESSAGE_MAP()
-
+void CImageTreeCtrl::OnContextCmd(UINT id) {
+	HTREEITEM hCur = GetSelectedItem();
+	method fnc = m_Commandmap[id];
+	if(fnc) {
+		(this->*fnc)(hCur);
+		return;
+	}
+	ASSERT(false);
+}
 bool CImageTreeCtrl::DoEditLabel(HTREEITEM hItem) {
 m_hSelItem=hItem;
 	return hItem ? (EditLabel(hItem) != 0) : false;
@@ -724,54 +734,7 @@ bool CImageTreeCtrl::CanInsertItem(HTREEITEM hItem) {
 }
 void CImageTreeCtrl::OnContextMenu(CWnd* /*pWnd*/, CPoint point)
 {
-	// TODO: Add your message handler code here
-
-	
-	CPoint pt(point);
-	ScreenToClient(&pt);
-	UINT flags;
-	HTREEITEM hItem = HitTest(pt, &flags);
-	bool bOnItem = (flags & TVHT_ONITEM) != 0;
-
-	CMenu add;
-	VERIFY(add.CreatePopupMenu());
-	if(bOnItem) {
-		if(CanInsertItem(GetParentItem(hItem)))
-			VERIFY(add.AppendMenu(MF_STRING, ID_ADD_SIBLING, _T("New Sibling\tINS")));
-		if(CanInsertItem(hItem))
-			VERIFY(add.AppendMenu(MF_STRING, ID_ADD_CHILD, _T("New Child Item\tCtrl+INS")));
-	}
-	if(CanInsertItem(0))
-		VERIFY(add.AppendMenu(MF_STRING, ID_ADD_ROOT, _T("New Root Item\tShift+INS")));
-
-	CMenu sort;
-	VERIFY(sort.CreatePopupMenu());
-	VERIFY(sort.AppendMenu(MF_STRING, ID_SORT_LEVEL, _T("Current Level\tCtrl+S")));
-	VERIFY(sort.AppendMenu(MF_STRING, ID_SORT_LEVELANDBELOW, _T("Current Level And Below\tCtrl+Shift+S")));
-
-	CMenu menu;
-	VERIFY(menu.CreatePopupMenu());
-	if(bOnItem) {
-		if(CanEditLabel(hItem))
-			VERIFY(menu.AppendMenu(MF_STRING, ID_RENAME, _T("Rename\tF2")));
-		if(CanDeleteItem(hItem))
-			VERIFY(menu.AppendMenu(MF_STRING, ID_DELETE, _T("Delete\tDEL")));
-	}
-	if(add.GetMenuItemCount() > 0)
-		VERIFY(menu.AppendMenu(MF_POPUP, UINT(add.GetSafeHmenu()), _T("Add")));
-	if(bOnItem) {
-		if(menu.GetMenuItemCount() > 0)
-			VERIFY(menu.AppendMenu(MF_SEPARATOR));
-		VERIFY(menu.AppendMenu(MF_POPUP, UINT(sort.GetSafeHmenu()), _T("Sort")));
-	}
-
-	
-
-	// maybe the menu is empty...
-	if(menu.GetMenuItemCount() > 0)
-		menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
-	
-
+	DisplayContextMenu(point);
 }
 
 bool CImageTreeCtrl::CanDeleteItem(HTREEITEM hItem) {
@@ -1033,5 +996,65 @@ void CImageTreeCtrl::OnKillFocus(CWnd* pNewWnd)
 	CTreeCtrl::OnKillFocus(pNewWnd);
 
 	// TODO: Add your message handler code here
+}
+
+
+void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
+	CPoint pt(point);
+	ScreenToClient(&pt);
+	UINT flags;
+	HTREEITEM hItem = HitTest(pt, &flags);
+	bool bOnItem = (flags & TVHT_ONITEM) != 0;
+
+// 	CMenu add;
+// 	VERIFY(add.CreatePopupMenu());
+// 	if(bOnItem) {
+// 		if(CanInsertItem(GetParentItem(hItem)))
+// 			VERIFY(add.AppendMenu(MF_STRING, ID_ADD_SIBLING, _T("New Sibling\tINS")));
+// 		if(CanInsertItem(hItem))
+// 			VERIFY(add.AppendMenu(MF_STRING, ID_ADD_CHILD, _T("New Child Item\tCtrl+INS")));
+// 	}
+// 	if(CanInsertItem(0))
+// 		VERIFY(add.AppendMenu(MF_STRING, ID_ADD_ROOT, _T("New Root Item\tShift+INS")));
+
+// 	CMenu sort;
+// 	VERIFY(sort.CreatePopupMenu());
+// 	VERIFY(sort.AppendMenu(MF_STRING, ID_SORT_LEVEL, _T("Current Level\tCtrl+S")));
+// 	VERIFY(sort.AppendMenu(MF_STRING, ID_SORT_LEVELANDBELOW, _T("Current Level And Below\tCtrl+Shift+S")));
+
+	CMenu menu;
+	VERIFY(menu.CreatePopupMenu());
+	if(bOnItem) {
+		if(CanEditLabel(hItem))
+			VERIFY(menu.AppendMenu(MF_STRING, ID_RENAME, _T("Rename\tF2")));
+// 		if(CanDeleteItem(hItem))
+// 			VERIFY(menu.AppendMenu(MF_STRING, ID_DELETE, _T("Delete\tDEL")));
+	}
+// 	if(add.GetMenuItemCount() > 0)
+// 		VERIFY(menu.AppendMenu(MF_POPUP, UINT(add.GetSafeHmenu()), _T("Add")));
+// 	if(bOnItem) {
+// 		if(menu.GetMenuItemCount() > 0)
+// 			VERIFY(menu.AppendMenu(MF_SEPARATOR));
+// 		VERIFY(menu.AppendMenu(MF_POPUP, UINT(sort.GetSafeHmenu()), _T("Sort")));
+// 	}
+
+	//ExtendContextMenu(menu);
+
+	// maybe the menu is empty...
+	if(menu.GetMenuItemCount() > 0)
+		menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
+}
+void CImageTreeCtrl::OnRclick(NMHDR* pNMHDR, LRESULT* pResult) 
+{
+	*pResult = 1;
+	UINT flags;
+	CPoint point;
+	GetCursorPos(&point);
+	ScreenToClient(&point);
+	HTREEITEM hItem = HitTest(point, &flags);
+	if(hItem && (flags & TVHT_ONITEM) && !(flags & TVHT_ONITEMRIGHT))
+		SelectItem(hItem);
+	ClientToScreen(&point);
+	DisplayContextMenu(point);
 }
 #pragma endregion

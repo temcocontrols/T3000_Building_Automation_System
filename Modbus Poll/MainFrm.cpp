@@ -14,12 +14,12 @@
 #include "Modbus PollView.h"
 
 
-UINT _ReadMultiRegisters(LPVOID pParam)
-{
-	CMainFrame* pFrame=(CMainFrame*)(pParam);
-	pFrame->OnConnectionQuickconnectf5();
-	return 1;
-}
+ UINT _ReadMultiRegisters(LPVOID pParam)
+ {
+	  CMainFrame* pFrame=(CMainFrame*)(pParam);
+	  pFrame->OnConnectionQuickconnectf5();
+	  return 1;
+ }
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -52,6 +52,7 @@ ON_COMMAND(ID_DISPALY_COMMUNICATION, &CMainFrame::OnDispalyCommunication)
 ON_UPDATE_COMMAND_UI(ID_DISPALY_COMMUNICATION, &CMainFrame::OnUpdateDispalyCommunication)
  
 ON_COMMAND(ID_VIEW_REGISTERVALUEANALYZER, &CMainFrame::OnViewRegistervalueanalyzer)
+ON_UPDATE_COMMAND_UI(IDS_CONNECTION, &CMainFrame::OnUpdateStatusBar)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -59,9 +60,9 @@ static UINT indicators[] =
 	ID_SEPARATOR,           // status line indicator
 	IDS_CONNECTION,
 	//IDS_ADDINFOR,
-	ID_INDICATOR_CAPS,
-	ID_INDICATOR_NUM,
-	ID_INDICATOR_SCRL,
+// 	ID_INDICATOR_CAPS,
+// 	ID_INDICATOR_NUM,
+// 	ID_INDICATOR_SCRL,
 };
 
 // CMainFrame construction/destruction
@@ -368,8 +369,6 @@ BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParent
 	return TRUE;
 }
 
-
-
 void CMainFrame::OnConnectionConnect32776()
 {   
 	if (m_communication_type==0)
@@ -440,7 +439,7 @@ void CMainFrame::OnConnectionConnect32776()
 
 void CMainFrame::OnDestroy()
 {
-	CMDIFrameWndEx::OnDestroy();
+	
 
  
 	if(g_data_trafficdlg !=NULL)
@@ -465,8 +464,11 @@ void CMainFrame::OnDestroy()
 		SetCommunicationType(0);
 		close_com();
 	}
-
- 
+	 
+	if(m_MultiRead_handle != NULL)
+		TerminateThread(m_MultiRead_handle, 0);
+	m_MultiRead_handle=NULL;
+	CMDIFrameWndEx::OnDestroy();
 }
 
 void CMainFrame::Read_Config(){
@@ -649,6 +651,7 @@ DWORD WINAPI _Multi_Read_Fun03_MF(LPVOID pParam){
 				POSITION pos=pTemplate->GetFirstDocPosition();
 				while(pos){
 					CDocument *pDoc=pTemplate->GetNextDoc(pos);
+					if (pDoc!=NULL)
 					{
 						POSITION pos=pDoc->GetFirstViewPosition();
 						while(pos){
@@ -813,4 +816,8 @@ void CMainFrame::OnViewRegistervalueanalyzer()
 			 ::PostMessage(g_Draw_dlg->m_hWnd,MY_FRESH_DRAW_GRAPHIC,0,0);
 		 }
 	 }
+}
+void CMainFrame::OnUpdateStatusBar(CCmdUI *pCmdUI){
+	pCmdUI->Enable(TRUE);
+
 }
