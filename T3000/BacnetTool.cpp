@@ -30,17 +30,7 @@ struct _Bac_Tool_Device_Info
 	Htree_Info Htree_Vendor_identifier;
 	Htree_Info Htree_Prop_object_name;
 
-	//CString update_time;
-	//CString IP_Address;
-	//CString Object_identifier;
-	//CString Vendor_identifier;
-	//CString Prop_object_name;
-	//HTREEITEM Device_Htree;
-	//HTREEITEM Htree_Update_time;
-	//HTREEITEM Htree_IP_Address;
-	//HTREEITEM Htree_Object_identifier;
-	//HTREEITEM Htree_Vendor_identifier;
-	//HTREEITEM Htree_Prop_object_name;
+
 
 
 	//int Object_identifier;
@@ -139,13 +129,13 @@ LRESULT CBacnetTool::FreshListView(WPARAM wParam, LPARAM lParam)
 		//m_TreeCtrl.Expand(ToolFirstChild,TVE_EXPAND);
 		//m_TreeCtrl.Expand(m_bacnet_tool_device.at(i).Device_Htree,TVE_EXPAND);
 		//m_TreeCtrl.InsertItem(()
-#if 0
-		m_bacnet_tool_device.at(i).Device_Htree = m_TreeCtrl.InsertItem(m_bacnet_tool_device.at(i).Object_identifier,ToolFirstChild,TVI_SORT);
-		m_bacnet_tool_device.at(i).Htree_Update_time = m_TreeCtrl.InsertItem(_T("Last Update : ") + m_bacnet_tool_device.at(i).update_time ,m_bacnet_tool_device.at(i).Device_Htree,TVI_SORT);
-		m_bacnet_tool_device.at(i).Htree_IP_Address = m_TreeCtrl.InsertItem(_T("IP Address: ") + m_bacnet_tool_device.at(i).IP_Address,m_bacnet_tool_device.at(i).Device_Htree,TVI_SORT);
-		m_bacnet_tool_device.at(i).Htree_Object_identifier = m_TreeCtrl.InsertItem(_T("object_identifier: ") + m_bacnet_tool_device.at(i).Object_identifier,m_bacnet_tool_device.at(i).Device_Htree,TVI_SORT);
-		m_bacnet_tool_device.at(i).Htree_Vendor_identifier = m_TreeCtrl.InsertItem(_T("vendor_identifier: ") + m_bacnet_tool_device.at(i).Vendor_identifier,m_bacnet_tool_device.at(i).Device_Htree,TVI_SORT);
-#endif
+	#if 0
+			m_bacnet_tool_device.at(i).Device_Htree = m_TreeCtrl.InsertItem(m_bacnet_tool_device.at(i).Object_identifier,ToolFirstChild,TVI_SORT);
+			m_bacnet_tool_device.at(i).Htree_Update_time = m_TreeCtrl.InsertItem(_T("Last Update : ") + m_bacnet_tool_device.at(i).update_time ,m_bacnet_tool_device.at(i).Device_Htree,TVI_SORT);
+			m_bacnet_tool_device.at(i).Htree_IP_Address = m_TreeCtrl.InsertItem(_T("IP Address: ") + m_bacnet_tool_device.at(i).IP_Address,m_bacnet_tool_device.at(i).Device_Htree,TVI_SORT);
+			m_bacnet_tool_device.at(i).Htree_Object_identifier = m_TreeCtrl.InsertItem(_T("object_identifier: ") + m_bacnet_tool_device.at(i).Object_identifier,m_bacnet_tool_device.at(i).Device_Htree,TVI_SORT);
+			m_bacnet_tool_device.at(i).Htree_Vendor_identifier = m_TreeCtrl.InsertItem(_T("vendor_identifier: ") + m_bacnet_tool_device.at(i).Vendor_identifier,m_bacnet_tool_device.at(i).Device_Htree,TVI_SORT);
+	#endif
 	}
 	
 	//Device_Htree

@@ -5,7 +5,7 @@
 #include "CM5\ud_str.h"
 #include "gloab_define.h"
 
-
+CString USB_Serial;
 vector <int> Change_Color_ID;
 const bool WRITE_SUCCESS = true;
 const bool WRITE_FAIL    = false;
@@ -1822,6 +1822,7 @@ int	MODBUS_PID3_OFF_OUTPUT_HEAT3		=	-1	;
 int selected_product_index;
 HTREEITEM selected_tree_item;
 #pragma region For_bacnet
+unsigned char bacnet_add_id[254];
 int bacnet_device_type;
 int g_bac_instance;
 int g_selected_serialnumber;

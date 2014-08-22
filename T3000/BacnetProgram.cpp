@@ -405,39 +405,6 @@ void CBacnetProgram::OnBnClickedButtonProgramApply()
 
 }
 
-//LRESULT  CBacnetProgram::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
-//{
-//	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
-//	CString temp_cs = pInvoke->task_info;
-//	bool msg_result=WRITE_FAIL;
-//	msg_result = MKBOOL(wParam);
-//	CString Show_Results;
-//	if(msg_result)
-//	{
-//		//CString temp_ok;
-//		//temp_ok = _T("Bacnet operation success!   Request ID:") +  temp_cs;
-//
-//		Show_Results = temp_cs + _T("Success!");
-//		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-//
-//		//SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_ok);
-//#ifdef SHOW_MESSAGEBOX
-//		MessageBox(Show_Results);
-//#endif
-//	}
-//	else
-//	{
-//		Show_Results = temp_cs + _T("Fail!");
-//		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
-//#ifdef SHOW_ERROR_MESSAGE
-//		MessageBox(Show_Results);
-//#endif
-//	}
-//	if(pInvoke)
-//		delete pInvoke;
-//	return 0;
-//}
-
 
 void CBacnetProgram::OnBnClickedButtonProgramEdit()
 {
@@ -451,45 +418,8 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 		}
 	}
 
-#if 0
-	int	resend_count = 0;
-	do 
-	{
-		resend_count ++;
-		if(resend_count>RESEND_COUNT)
-			return;
-		if(m_Program_data.at(program_list_line).bytes <450)
-			g_invoke_id = GetPrivateData(g_bac_instance,READPROGRAMCODE_T3000,program_list_line,program_list_line,m_Program_data.at(program_list_line).bytes + 10);
-			//g_invoke_id = GetPrivateData(g_bac_instance,READPROGRAMCODE_T3000,program_list_line,program_list_line,200);
-		else
-		{
-			g_invoke_id = GetPrivateData(g_bac_instance,READPROGRAMCODE_T3000,program_list_line,program_list_line, 10);
-			TRACE("m_Program_data.at(program_list_line).bytes = %d\r\n",m_Program_data.at(program_list_line).bytes);
-		}
-		Sleep(200);
-	} while (g_invoke_id<0);
-
-
-
-	if(g_invoke_id>=0)
-	{
-		CString temp_cs;
-		temp_cs.Format(_T("Task ID = %d. Read program code from item %d "),g_invoke_id,program_list_line);
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs);
-	}
-	KillTimer(1);
-	this->ShowWindow(0);
-	CBacnetProgramEdit dlg;
-	dlg.DoModal();
-	this->ShowWindow(1);
-	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
-#endif
 	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAMCODE);
 
-	//PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
-		//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
-	
-	//OnBnClickedButtonProgramRead();
 }
 
 
