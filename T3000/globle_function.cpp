@@ -947,7 +947,7 @@ BOOL GetSerialComPortNumber1(vector<CString>& szComm)
 	HKEY   hKey;   
 	LONG   lReturnCode=0;   
 	lReturnCode=::RegOpenKeyEx(HKEY_LOCAL_MACHINE, strRegEntry, 0, KEY_READ, &hKey);   
-
+	USB_Serial.Empty();
 	if(lReturnCode==ERROR_SUCCESS)   
 	{  
 		DWORD dwIndex = 0;
@@ -975,6 +975,12 @@ BOOL GetSerialComPortNumber1(vector<CString>& szComm)
 			memcpy(ch, lpData, lpcbData);
 			CString str = CString(ch);
 			szComm.push_back(str);
+
+            if(strValueName.Find(_T("USBSER")) >=0)
+			{
+                DFTrace(_T("Find USB Serial Port!"));
+                USB_Serial = str;
+            }
 
 			ZeroMemory(lpData, MAX_PATH);
 			lpcbData = MAX_PATH;
@@ -1217,6 +1223,9 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case WRITETSTAT_T3000:
 		entitysize = sizeof(Str_TstatInfo_point);
 		break;
+	case WRITE_SUB_ID_BY_HAND:
+		entitysize = 254;
+		break;
 	default:
 		{
 			//AfxMessageBox(_T("Entitysize length error!"));
@@ -1334,6 +1343,9 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 
 	case  WRITEALARM_T3000:
 		memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,sizeof(Alarm_point),&m_alarmlog_data.at(start_instance),sizeof(Alarm_point));
+		break;
+	case  WRITE_SUB_ID_BY_HAND:
+		memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,254,bacnet_add_id,254);
 		break;
 	default:
 		{
@@ -2251,6 +2263,11 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 			Device_Basic_Setting.reg.refresh_flash_timer =  *(my_temp_point++);
 			Device_Basic_Setting.reg.en_plug_n_play =  *(my_temp_point++);
 			Device_Basic_Setting.reg.reset_default = *(my_temp_point++);
+
+			Device_Basic_Setting.reg.com_baudrate0 = *(my_temp_point++);
+			Device_Basic_Setting.reg.com_baudrate1 = *(my_temp_point++);
+			Device_Basic_Setting.reg.com_baudrate2 = *(my_temp_point++);
+
 			return READ_SETTING_COMMAND;
 		}
 		break;
@@ -2363,6 +2380,8 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 			if(start_instance >= BAC_TSTAT_COUNT)
 				return -1;//超过长度了;
 
+			if(end_instance == (BAC_TSTAT_COUNT - 1))
+				end_flag = true;
 			for (i=start_instance;i<=end_instance;i++)
 			{
 				m_Tstat_data.at(i).product_model = *(my_temp_point++);
@@ -2812,6 +2831,10 @@ void local_handler_conf_private_trans_ack(
 		break;
 	case READ_SETTING_COMMAND:
 		::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);	
+		break;
+	case READTSTAT_T3000:
+		if(each_end_flag)
+			::PostMessage(m_tstat_dlg_hwnd,WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
 		break;
 	default:
 		break;

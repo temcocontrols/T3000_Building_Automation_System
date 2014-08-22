@@ -75,8 +75,6 @@ LRESULT  CBacnetInput::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
 		Show_Results = temp_cs + _T("Fail!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
 
-		//AfxMessageBox(Show_Results);
-		//MessageBox(_T("Bacnet operation fail!"));
 	}
 	if((pInvoke->mRow%2)==0)	//恢复前景和 背景 颜色;
 		m_input_list.SetItemBkColor(pInvoke->mRow,pInvoke->mCol,LIST_ITEM_DEFAULT_BKCOLOR,0);
@@ -205,7 +203,7 @@ void CBacnetInput::Initial_List()
 	m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_input_list.InsertColumn(INPUT_RANGE, _T("Range"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_RANGE, _T("Range"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_CAL, _T("Calibration"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_CAL_OPERATION, _T("Sign"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_FITLER, _T("Filter"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -230,13 +228,7 @@ void CBacnetInput::Initial_List()
 		CString temp_units;
 		temp_item.Format(_T("%d"),i+1);
 		m_input_list.InsertItem(i,temp_item);
-		//if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_AUTO_MANUAL))
-		//{
-		//	ListCtrlEx::CStrList strlist;
-		//	strlist.push_back(_T("Auto"));
-		//	strlist.push_back(_T("Manual"));
-		//	m_input_list.SetCellStringList(i, INPUT_AUTO_MANUAL, strlist);
-		//}
+
 
 
 		if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
@@ -249,15 +241,6 @@ void CBacnetInput::Initial_List()
 			m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
 		}
 
-		//if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_FITLER))
-		//{
-		//	ListCtrlEx::CStrList strlist;
-		//	for (int m=0;m<(int)(sizeof(Input_Filter_Array)/sizeof(Input_Filter_Array[0]));m++)
-		//	{
-		//		strlist.push_back(Input_Filter_Array[m]);
-		//	}
-		//	m_input_list.SetCellStringList(i, INPUT_FITLER, strlist);
-		//}
 
 		if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_DECOM))
 		{
@@ -355,96 +338,7 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 		m_Input_data.at(Changed_Item).value = temp_int;
 	}
 
-	if(Changed_SubItem == INPUT_RANGE)
-	{
-		CString temp_cs = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
-		BacnetRange dlg;
-		if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_ANALOG])==0)
-		{
-			bac_range_number_choose = m_Input_data.at(Changed_Item).range;
-			bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;
-			dlg.DoModal();
-			if(range_cancel)
-			{
-				PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
-				return 0;
-			}
-			m_Input_data.at(Changed_Item).digital_analog =  BAC_UNITS_ANALOG;
-			m_Input_data.at(Changed_Item).range =  bac_range_number_choose;
-			m_input_list.SetItemText(Changed_Item,INPUT_RANGE,Input_Analog_Units_Array[bac_range_number_choose]);		
-			m_input_list.SetItemText(Changed_Item,INPUT_UNITE,Input_List_Analog_Units[bac_range_number_choose]);	
-			
-			cstemp_value.Format(_T("%d"),m_Input_data.at(Changed_Item).calibration);
-			m_input_list.SetItemText(Changed_Item,INPUT_CAL,cstemp_value);
-
-
-			m_input_list.SetCellEnabled(Changed_Item,INPUT_CAL,1);
-			m_input_list.SetCellEnabled(Changed_Item,INPUT_UNITE,1);
-			//m_input_list.SetItemText(Changed_Item,OUTPUT_100_PERSENT,_T("10"));
-			//m_input_list.SetCellEnabled(Changed_Item,OUTPUT_100_PERSENT,1);
-
-			CString cstemp_value;
-			float temp_float_value;
-			temp_float_value = ((float)m_Input_data.at(Changed_Item).value) / 1000;
-			cstemp_value.Format(_T("%.2f"),temp_float_value);
-			m_input_list.SetItemText(Changed_Item,INPUT_VALUE,cstemp_value);	
-
-			//cstemp_value.Format(_T("%d"),m_Input_data.at(Changed_Item).value);
-			//m_input_list.SetItemText(Changed_Item,INPUT_VALUE,cstemp_value);	
-		}
-		else if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_DIGITAL])==0)
-		{
-			bac_range_number_choose = m_Input_data.at(Changed_Item).range;
-			bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
-			dlg.DoModal();
-			if(range_cancel)
-			{
-				PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
-				return 0;
-			}
-			m_Input_data.at(Changed_Item).digital_analog =  BAC_UNITS_DIGITAL;
-			m_Input_data.at(Changed_Item).range =  bac_range_number_choose;
-			//m_input_list.SetItemText(Changed_Item,INPUT_RANGE,INPUT_Digital_Units_Show[bac_range_number_choose]);		
-
-			m_input_list.SetItemText(Changed_Item,INPUT_CAL,_T(""));
-			m_input_list.SetCellEnabled(Changed_Item,INPUT_CAL,0);
-			m_input_list.SetItemText(Changed_Item,INPUT_UNITE,_T(""));
-			m_input_list.SetCellEnabled(Changed_Item,INPUT_UNITE,0);
-
-			CString temp1;
-			CStringArray temparray;
-			temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
-			SplitCStringA(temparray,temp1,_T("/"));
-
-			if(m_Input_data.at(Changed_Item).control == 1)
-			{
-				if((temparray.GetSize()==2)&&(!temparray.GetAt(1).IsEmpty()))
-				{
-					m_input_list.SetItemText(Changed_Item,INPUT_VALUE,temparray.GetAt(1));
-				}
-			}
-			else
-			{
-				if((temparray.GetSize()==2)&&(!temparray.GetAt(0).IsEmpty()))
-				{
-					m_input_list.SetItemText(Changed_Item,INPUT_VALUE,temparray.GetAt(0));
-				}			
-			}
-			m_input_list.SetItemText(Changed_Item,INPUT_RANGE,temp1);
-
-
-		}
-		else if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_CUSTOM])==0)
-		{
-			bac_ranges_type = OUTPUT_RANGE_CUSTOM_DIG_TYPE;
-			//dlg.DoModal();
-		}	
-		else
-		{
-			PostMessage(WM_REFRESH_BAC_INPUT_LIST,Changed_Item,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
-			//m_input_list.SetItemText(Changed_Item,INPUT_RANGE,temp_cs);
-		}
-	}
+	
 
 
 	if(Changed_SubItem==INPUT_CAL)
@@ -754,10 +648,6 @@ void CBacnetInput::OnBnClickedButtonApply()
 
 void CBacnetInput::OnBnClickedButtonRead()
 {
-	//CPoint temp;
-	//temp.x = 130;
-	//temp.y = 201;
- //	::PostMessage((HWND)GetDlgItem(IDC_LIST1),WM_LBUTTONDOWN,1,0);
 	// TODO: Add your control notification handler code here
 	Post_Refresh_Message(g_bac_instance,READINPUT_T3000,0,BAC_INPUT_ITEM_COUNT - 1,sizeof(Str_in_point), BAC_INPUT_GROUP);
 	PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
@@ -891,6 +781,81 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_input_list.SetCellEnabled(lRow,INPUT_VALUE,FALSE);
 			New_CString = _T("Auto");
 		}
+	}
+	else if(lCol == INPUT_RANGE)
+	{
+		if(m_Input_data.at(lRow).digital_analog == BAC_UNITS_ANALOG)
+		{
+			bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;
+		}
+		else
+		{
+			bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
+		}
+		//CString temp_cs = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
+		BacnetRange dlg;
+		//if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_ANALOG])==0)
+		//{
+			bac_range_number_choose = m_Input_data.at(lRow).range;
+			dlg.DoModal();
+			if(range_cancel)
+			{
+				PostMessage(WM_REFRESH_BAC_INPUT_LIST,lRow,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
+				return ;
+			}
+			if(bac_ranges_type == INPUT_RANGE_ANALOG_TYPE)
+			{
+				m_Input_data.at(lRow).digital_analog =  BAC_UNITS_ANALOG;
+				m_Input_data.at(lRow).range =  bac_range_number_choose;
+				m_input_list.SetItemText(lRow,INPUT_RANGE,Input_Analog_Units_Array[bac_range_number_choose]);		
+				m_input_list.SetItemText(lRow,INPUT_UNITE,Input_List_Analog_Units[bac_range_number_choose]);	
+				CString cstemp_value;
+				cstemp_value.Format(_T("%d"),m_Input_data.at(lRow).calibration);
+				m_input_list.SetItemText(lRow,INPUT_CAL,cstemp_value);
+
+
+				m_input_list.SetCellEnabled(lRow,INPUT_CAL,1);
+				m_input_list.SetCellEnabled(lRow,INPUT_UNITE,1);
+				//m_input_list.SetItemText(Changed_Item,OUTPUT_100_PERSENT,_T("10"));
+				//m_input_list.SetCellEnabled(Changed_Item,OUTPUT_100_PERSENT,1);
+
+				float temp_float_value;
+				temp_float_value = ((float)m_Input_data.at(lRow).value) / 1000;
+				cstemp_value.Format(_T("%.2f"),temp_float_value);
+				m_input_list.SetItemText(lRow,INPUT_VALUE,cstemp_value);	
+			}
+			else if((bac_ranges_type == VARIABLE_RANGE_DIGITAL_TYPE) || (bac_ranges_type == INPUT_RANGE_DIGITAL_TYPE) || (bac_ranges_type == OUTPUT_RANGE_DIGITAL_TYPE))
+			{
+				m_Input_data.at(lRow).digital_analog =  BAC_UNITS_DIGITAL;
+				m_Input_data.at(lRow).range =  bac_range_number_choose;
+				//m_input_list.SetItemText(Changed_Item,INPUT_RANGE,INPUT_Digital_Units_Show[bac_range_number_choose]);		
+
+				m_input_list.SetItemText(lRow,INPUT_CAL,_T(""));
+				m_input_list.SetCellEnabled(lRow,INPUT_CAL,0);
+				m_input_list.SetItemText(lRow,INPUT_UNITE,_T(""));
+				m_input_list.SetCellEnabled(lRow,INPUT_UNITE,0);
+
+				CString temp1;
+				CStringArray temparray;
+				temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
+				SplitCStringA(temparray,temp1,_T("/"));
+
+				if(m_Input_data.at(lRow).control == 1)
+				{
+					if((temparray.GetSize()==2)&&(!temparray.GetAt(1).IsEmpty()))
+					{
+						m_input_list.SetItemText(lRow,INPUT_VALUE,temparray.GetAt(1));
+					}
+				}
+				else
+				{
+					if((temparray.GetSize()==2)&&(!temparray.GetAt(0).IsEmpty()))
+					{
+						m_input_list.SetItemText(lRow,INPUT_VALUE,temparray.GetAt(0));
+					}			
+				}
+				m_input_list.SetItemText(lRow,INPUT_RANGE,temp1);
+			}
 	}
 	else
 		return;

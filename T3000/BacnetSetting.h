@@ -50,6 +50,11 @@ public:
 	CComboBox m_device_com0;
 	virtual void OnCancel();
 	afx_msg void OnBnClickedButtonSettingLdf();
+	afx_msg void OnCbnSelchangeComboBacnetSettingBaudrate0();
+	afx_msg void OnCbnSelchangeComboBacnetSettingBaudrate1();
+	afx_msg void OnCbnSelchangeComboBacnetSettingBaudrate2();
+	afx_msg void OnBnClickedButtonSettingCleanDb();
+	afx_msg void OnBnClickedButtonSettingAddIntoDb();
 };
 
 
