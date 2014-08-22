@@ -13,8 +13,6 @@
 #include "MainFrm.h"
 #include "BacnetScreenEdit.h"
 CBacnetScreenEdit * ScreenEdit_Window = NULL;
-// BacnetScreen dialog
-//const int KEY_INSERT = 1020;
 Control_group_point m_temp_screen_data[BAC_SCREEN_COUNT];
 IMPLEMENT_DYNAMIC(BacnetScreen, CDialogEx)
 
@@ -147,16 +145,6 @@ LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 
 
 		// TODO: Add your command handler code here
-		//CBacnetScreenEdit Dlg;
-		//Dlg.DoModal();
-
-#if 0
-		this->ShowWindow(SW_HIDE);
-#endif
-		//((CMainFrame*)(theApp.m_pMainWnd))->SwitchToGraphicView(); //No longer to switch to the products tstats view;
-
-		//PostMessage(WM_CLOSE,NULL,NULL);
-		//this place do module a full screen dlg;
 	}
 	return 0;
 }
@@ -218,13 +206,7 @@ void BacnetScreen::Initial_List()
 		m_screen_list.InsertItem(i,temp_item);
 		m_screen_list.SetCellEnabled(i,SCREEN_NUM,0);
 		m_screen_list.SetCellChecked(0,0,1);// default will set the first one checked
-		//if(ListCtrlEx::ComboBox == m_screen_list.GetColumnType(SCREEN_MODE))
-		//{
-		//	ListCtrlEx::CStrList strlist;
-		//	strlist.push_back(_T("Graphic"));
-		//	strlist.push_back(_T("Text"));
-		//	m_screen_list.SetCellStringList(i, SCREEN_MODE, strlist);
-		//}
+
 
 		for (int x=0;x<SCREEN_COL_NUMBER;x++)
 		{
@@ -286,14 +268,6 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
 
 		m_screen_list.SetItemText(i,SCREEN_PIC_FILE,temp_pic_file);
 
-		//if(m_screen_data.at(i).mode==0)	//In output table if it is auto ,the value can't be edit by user
-		//{
-		//	m_screen_list.SetItemText(i,SCREEN_MODE,_T("Text"));
-		//}
-		//else
-		//{
-		//	m_screen_list.SetItemText(i,SCREEN_MODE,_T("Graphic"));
-		//}
 		m_screen_list.SetItemText(i,SCREEN_MODE,_T("Graphic"));
 		CString cs_refresh_time;
 		cs_refresh_time.Format(_T("%d"),m_screen_data.at(i).update);
@@ -348,34 +322,6 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 		memcpy_s(m_screen_data.at(Changed_Item).label,STR_SCREEN_LABLE_LENGTH,cTemp1,STR_SCREEN_LABLE_LENGTH);
 	}
-#if 0
-	if(Changed_SubItem == SCREEN_PIC_FILE)
-	{
-		CString cs_temp = m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
-		if(cs_temp.GetLength()>= STR_SCREEN_PIC_FILE_LENGTH)	//长度不能大于结构体定义的长度;
-		{
-			MessageBox(_T("Length can not higher than 10"),_T("Warning"));
-			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
-			return 0;
-		}
-
-		char cTemp1[255];
-		memset(cTemp1,0,255);
-		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-		memcpy_s(m_screen_data.at(Changed_Item).picture_file,STR_SCREEN_PIC_FILE_LENGTH,cTemp1,STR_SCREEN_PIC_FILE_LENGTH);
-	}
-#endif
-	//if(Changed_SubItem == SCREEN_MODE)
-	//{
-	//	if(New_CString.CompareNoCase(_T("Text")) == 0)
-	//	{
-	//		m_screen_data.at(Changed_Item).mode = 0;
-	//	}
-	//	else
-	//	{
-	//		m_screen_data.at(Changed_Item).mode = 1;
-	//	}
-	//}
 
 	if (Changed_SubItem == SCREEN_REFRESH)
 	{

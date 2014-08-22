@@ -2656,19 +2656,6 @@ endthis:
 					m_wait_detail.SetWindowTextW(tempcs);
 					write_cotinue_waite = true;
 					break;
-					//if(Write_Config_Info.Write_Monitor_Info[i].invoke_id > 0)
-					//{
-					//	Write_Config_Info.Write_Monitor_Info[i].timeout_count ++;
-					//}
-					//if((Write_Config_Info.Write_Monitor_Info[i].timeout_count > 20) ||
-					//	((Write_Config_Info.Write_Monitor_Info[i].invoke_id <=0) &&((Write_Config_Info.Write_Monitor_Info[i].has_resend_yes_or_no >0)) ))
-					//{
-					//	Write_Config_Info.Write_Monitor_Info[i].task_result = BAC_RESULTS_FAIL;
-					//	Write_Config_Info.Write_Monitor_Info[i].timeout_count = 0;
-					//	//continue;
-					//}
-					//m_wait_detail.SetWindowTextW(tempcs);
-					//goto write_endthis;
 				}
 				else if(Write_Config_Info.Write_Monitor_Info[i].task_result == BAC_RESULTS_FAIL)
 				{

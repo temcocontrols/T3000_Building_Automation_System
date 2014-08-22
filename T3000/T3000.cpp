@@ -17,7 +17,7 @@
 #include "iniFile.h"
 #include "afxinet.h"
 #include "T3000DefaultView.h"
-const int g_versionNO=201408;
+const int g_versionNO=20140818;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -171,6 +171,8 @@ BOOL CT3000App::JudgeDB(){
 		 temp.Product_ID=srcRsTemp->GetCollect(_T("Product_ID"));
 		 temp.Screen_Name=srcRsTemp->GetCollect(_T("Screen_Name"));
 		 temp_var=srcRsTemp->GetCollect(_T("Bautrate"));
+		// temp.Com_Port = srcRsTemp->GetCollect(_T("Com_Port"));
+		 
 		 if (temp_var.vt!=VT_NULL)
 		 { temp.Bautrate=temp_var;
 		 }
@@ -264,7 +266,7 @@ BOOL CT3000App::JudgeDB(){
 
 		 for (int i=0;i<m_AllNodes.size();i++)
 		 {
-			 strsql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,EPsize) values('"
+			 strsql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"
 				 +m_AllNodes[i].MainBuilding_Name+"','"
 				 +m_AllNodes[i].Building_Name+"','"
 				 +m_AllNodes[i].Serial_ID+"','"
@@ -278,6 +280,7 @@ BOOL CT3000App::JudgeDB(){
 				 +m_AllNodes[i].Background_imgID+"','"
 				 +m_AllNodes[i].Hardware_Ver+"','"
 				 +m_AllNodes[i].Software_Ver+"','"
+				 +m_AllNodes[i].Com_Port+"','"
 				 +m_AllNodes[i].EPsize+"')"));
 
 

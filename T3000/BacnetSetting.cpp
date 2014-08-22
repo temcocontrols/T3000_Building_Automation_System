@@ -6,7 +6,7 @@
 #include "BacnetSetting.h"
 #include "afxdialogex.h"
 #include "globle_function.h"
-
+#include "Bacnetaddintodb.h"
 // CBacnetSetting dialog
 
 IMPLEMENT_DYNAMIC(CBacnetSetting, CDialogEx)
@@ -53,6 +53,11 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM1, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom1)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM2, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom2)
 	ON_BN_CLICKED(IDC_BUTTON_SETTING_LDF, &CBacnetSetting::OnBnClickedButtonSettingLdf)
+	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_BAUDRATE0, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate0)
+	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_BAUDRATE1, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate1)
+	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_BAUDRATE2, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate2)
+	ON_BN_CLICKED(IDC_BUTTON_SETTING_CLEAN_DB, &CBacnetSetting::OnBnClickedButtonSettingCleanDb)
+	ON_BN_CLICKED(IDC_BUTTON_SETTING_ADD_INTO_DB, &CBacnetSetting::OnBnClickedButtonSettingAddIntoDb)
 END_MESSAGE_MAP()
 
 
@@ -333,6 +338,10 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->SetWindowTextW(Device_Serial_Port_Status[SUB_MODBUS]);
 			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->SetWindowTextW(Device_Serial_Port_Status[MAIN_MODBUS]);
 			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->SetWindowTextW(Device_Serial_Port_Status[NOUSE]);
+
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->EnableWindow(false);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->EnableWindow(false);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->EnableWindow(false);
 		}
 		else if((bacnet_device_type == BIG_MINIPANEL) || (bacnet_device_type == SMALL_MINIPANEL))
 		{
@@ -364,6 +373,34 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->SetWindowTextW(Device_Serial_Port_Status[Device_Basic_Setting.reg.com1_config]);
 			if(Device_Basic_Setting.reg.com2_config < MAX_COM_TYPE)
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->SetWindowTextW(Device_Serial_Port_Status[Device_Basic_Setting.reg.com2_config]);
+
+
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->EnableWindow(1);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->EnableWindow(1);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->EnableWindow(1);
+
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->ResetContent();
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->ResetContent();
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->ResetContent();
+
+
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->AddString(Baudrate_Array[UART_9600]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->AddString(Baudrate_Array[UART_19200]);
+
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->AddString(Baudrate_Array[UART_9600]);
+			((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->AddString(Baudrate_Array[UART_19200]);
+			for (int x=0;x<sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]);x++)
+			{
+				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->AddString(Baudrate_Array[x]);
+			}
+			if((Device_Basic_Setting.reg.com_baudrate0 == UART_9600) || (Device_Basic_Setting.reg.com_baudrate0 == UART_19200))
+				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->SetWindowTextW(Baudrate_Array[Device_Basic_Setting.reg.com_baudrate0]);
+
+			if((Device_Basic_Setting.reg.com_baudrate1 == UART_9600) || (Device_Basic_Setting.reg.com_baudrate0 == UART_19200))
+				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->SetWindowTextW(Baudrate_Array[Device_Basic_Setting.reg.com_baudrate0]);
+
+			if(Device_Basic_Setting.reg.com_baudrate2 < sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]))
+				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->SetWindowTextW(Baudrate_Array[Device_Basic_Setting.reg.com_baudrate0]);
 		}
 
 		if(bacnet_device_type == PRODUCT_CM5)
@@ -424,7 +461,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 		break;
 	}
 
-
+	GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME)->SetFocus();
 	return 0;
 }
 
@@ -450,11 +487,10 @@ BOOL CBacnetSetting::OnInitDialog()
 	hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_OK), IMAGE_ICON, 24, 24, 0); 
 	((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CHANGED))->SetIcon(hIcon);
 
-	//hInstResource = AfxFindResourceHandle(MAKEINTRESOURCE(IDI_ICON_EXIT), RT_GROUP_ICON); 
-	//hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_EXIT), IMAGE_ICON, 24, 24, 0); 
-	//((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CANCLE))->SetIcon(hIcon);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
+	GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME)->SetFocus();
+	
+	return false;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
@@ -470,50 +506,45 @@ BOOL CBacnetSetting::PreTranslateMessage(MSG* pMsg)
 void CBacnetSetting::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	//if(this->IsWindowVisible())
-	//{
-	//	PostMessage(WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
-	//	if(bac_select_device_online)
-	//		Post_Refresh_Message(g_bac_instance,READTSTAT_T3000,0,BAC_TSTAT_COUNT - 1,sizeof(Str_TstatInfo_point),BAC_TSTAT_GROUP);
-	//}
+
 
 	CDialogEx::OnTimer(nIDEvent);
 }
 
 #if 0
-void CBacnetSetting::OnBnClickedButtonRebootDevice()
-{
-	// TODO: Add your control notification handler code here
-	CString temp_results;
-	if(write_one(g_tstat_id,RESET_REGISTER,SPECIAL_COMMAND_REBOOT))
+	void CBacnetSetting::OnBnClickedButtonRebootDevice()
 	{
-		temp_results.Format(_T("Send reboot command to device success!"));
+		// TODO: Add your control notification handler code here
+		CString temp_results;
+		if(write_one(g_tstat_id,RESET_REGISTER,SPECIAL_COMMAND_REBOOT))
+		{
+			temp_results.Format(_T("Send reboot command to device success!"));
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_results);
+		}
+	}
+
+
+	void CBacnetSetting::OnBnClickedButtonResetTcpip()
+	{
+		// TODO: Add your control notification handler code here
+		write_one(g_tstat_id,RESET_REGISTER,SPECIAL_COMMAND_RESET_TCP);
+
+	}
+
+	void CBacnetSetting::OnBnClickedButtonEraseFlash()
+	{
+		// TODO: Add your control notification handler code here
+		CString temp_results;
+		if(write_one(g_tstat_id,RESET_REGISTER,SPECIAL_COMMAND_ERASE_FLASH))
+		{
+			temp_results.Format(_T("Send erase command to device success!"));	
+		}
+		else
+		{
+			temp_results.Format(_T("Send erase command to device failed!"));	
+		}
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_results);
 	}
-}
-
-
-void CBacnetSetting::OnBnClickedButtonResetTcpip()
-{
-	// TODO: Add your control notification handler code here
-	write_one(g_tstat_id,RESET_REGISTER,SPECIAL_COMMAND_RESET_TCP);
-
-}
-
-void CBacnetSetting::OnBnClickedButtonEraseFlash()
-{
-	// TODO: Add your control notification handler code here
-	CString temp_results;
-	if(write_one(g_tstat_id,RESET_REGISTER,SPECIAL_COMMAND_ERASE_FLASH))
-	{
-		temp_results.Format(_T("Send erase command to device success!"));	
-	}
-	else
-	{
-		temp_results.Format(_T("Send erase command to device failed!"));	
-	}
-	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_results);
-}
 #endif
 
 
@@ -639,4 +670,95 @@ void CBacnetSetting::OnBnClickedButtonSettingLdf()
 		Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
 	}
 	
+}
+
+
+void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate0()
+{
+	// TODO: Add your control notification handler code here
+	CString temp_string;
+	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->GetCurSel();	
+	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->GetLBText(nSel,temp_string);
+	for(int i=0;i<sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]);i++)
+	{
+		if(temp_string.CompareNoCase(Baudrate_Array[i]) == 0 )
+		{
+			Device_Basic_Setting.reg.com_baudrate0 = i;
+			break;
+		}
+	}
+	CString temp_task_info;
+	temp_task_info.Format(_T("Change serial port 0 baudrate "));
+	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+
+}
+
+
+void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate1()
+{
+	// TODO: Add your control notification handler code here
+	CString temp_string;
+	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->GetCurSel();	
+	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->GetLBText(nSel,temp_string);
+	for(int i=0;i<sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]);i++)
+	{
+		if(temp_string.CompareNoCase(Baudrate_Array[i]) == 0 )
+		{
+			Device_Basic_Setting.reg.com_baudrate0 = i;
+			break;
+		}
+	}
+	CString temp_task_info;
+	temp_task_info.Format(_T("Change serial port 1 baudrate "));
+	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+}
+
+
+void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate2()
+{
+	// TODO: Add your control notification handler code here
+	CString temp_string;
+	int nSel = ((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->GetCurSel();	
+	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->GetLBText(nSel,temp_string);
+	for(int i=0;i<sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]);i++)
+	{
+		if(temp_string.CompareNoCase(Baudrate_Array[i]) == 0 )
+		{
+			Device_Basic_Setting.reg.com_baudrate0 = i;
+			break;
+		}
+	}
+	CString temp_task_info;
+	temp_task_info.Format(_T("Change serial port 2 baudrate "));
+	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+}
+
+
+void CBacnetSetting::OnBnClickedButtonSettingCleanDb()
+{
+	// TODO: Add your control notification handler code here
+	if(IDYES == MessageBox(_T("Are you sure you want clean the device database"),_T("Warning"),MB_YESNOCANCEL | MB_ICONINFORMATION))
+	{
+		Device_Basic_Setting.reg.reset_default = 150;
+		CString temp_task_info;
+		temp_task_info.Format(_T("Load Factory Default "));
+		Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+	}
+}
+
+
+extern bool cancle_send ;
+void CBacnetSetting::OnBnClickedButtonSettingAddIntoDb()
+{
+	// TODO: Add your control notification handler code here
+	CBacnetaddintodb dlg;
+	dlg.DoModal();
+
+	if(!cancle_send)
+	{
+		CString temp_task_info;
+		temp_task_info.Format(_T("Add device into database "));
+		Post_Write_Message(g_bac_instance,(int8_t)WRITE_SUB_ID_BY_HAND,0,0,254,this->m_hWnd,temp_task_info);
+	}
+
 }

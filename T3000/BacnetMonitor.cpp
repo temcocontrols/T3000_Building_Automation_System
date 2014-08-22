@@ -57,8 +57,6 @@ BEGIN_MESSAGE_MAP(CBacnetMonitor, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_MONITOR_GRAPHIC, &CBacnetMonitor::OnBnClickedBtnMonitorGraphic)
 	ON_BN_CLICKED(IDC_BTN_MONITOR_REFRESH, &CBacnetMonitor::OnBnClickedBtnMonitorRefresh)
 	ON_BN_CLICKED(IDC_BUTTON_MONITOR_TEST, &CBacnetMonitor::OnBnClickedButtonMonitorTest)
-//	ON_NOTIFY(NM_KILLFOCUS, IDC_LIST_MONITOR, &CBacnetMonitor::OnNMKillfocusListMonitor)
-//	ON_NOTIFY(NM_KILLFOCUS, IDC_LIST_MONITOR_INPUT, &CBacnetMonitor::OnNMKillfocusListMonitorInput)
 	ON_NOTIFY(NM_SETFOCUS, IDC_LIST_MONITOR, &CBacnetMonitor::OnNMSetfocusListMonitor)
 	ON_NOTIFY(NM_SETFOCUS, IDC_LIST_MONITOR_INPUT, &CBacnetMonitor::OnNMSetfocusListMonitorInput)
 	ON_WM_CLOSE()
@@ -192,11 +190,7 @@ BOOL CBacnetMonitor::PreTranslateMessage(MSG* pMsg)
 			{
 				GetDlgItem(IDC_LIST_MONITOR)->SetFocus();
 			}
-			//CWnd *temp_focus=GetFocus();	//Maurice require ,click enter and the cursor still in this edit or combobox.
-			//GetDlgItem(IDC_BTN_MONITOR_REFRESH)->SetFocus();
 
-			
-			//temp_focus->SetFocus();
 			return 1;
 		}
 	}
@@ -271,9 +265,6 @@ void CBacnetMonitor::Initial_List()
 	}
 	m_monitor_input_list.SetWhetherShowBkCol(false);
 	//m_monitor_list.SetItemTextColor(2,MONITOR_LABEL,RGB(0,255,0));
-	//m_monitor_list.SetItemTextColor(2,MONITOR_INTERVAL,RGB(0,255,0));
-	//m_monitor_list.SetItemTextColor(2,MONITOR_UNITS,RGB(0,255,0));
-	//m_monitor_list.SetItemBkColor(2,MONITOR_LABEL,RGB(255,0,0));
 }
 extern char *look_label(int panel, int point_type, int num, int network);
 LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)

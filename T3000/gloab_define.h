@@ -255,7 +255,7 @@ const int BAC_MONITOR_COUNT = 12;
 const int BAC_ANNUAL_CODE_COUNT = 8;
 const int BAC_CONNECT_WITH_DEVICE_COUNT = 1;
 const int BAC_ALARMLOG_COUNT = 16;
-const int BAC_TSTAT_COUNT = 8;
+const int BAC_TSTAT_COUNT = 32;
 
 
 
@@ -685,3 +685,37 @@ const int SMALL_MINIPANEL_OUT_A = 4;
 const int SMALL_MINIPANEL_OUT_D = 6;
 const int CM5_MINIPANEL_OUT_A = 0;
 const int CM5_MINIPANEL_OUT_D = 10;
+
+enum
+{
+	UART_1200 = 0,
+	UART_2400,
+	UART_3600,
+	UART_4800,
+	UART_7200,
+	UART_9600,
+	UART_19200,
+	UART_38400,
+	UART_57600,
+	UART_115200,
+	UART_921600
+
+};
+
+
+const CString Baudrate_Array[] = 
+{
+	_T("1200"),
+	_T("2400"),
+	_T("3600"),
+	_T("4800"),
+	_T("7200"),
+	_T("9600"),
+	_T("19200"),
+	_T("38400"),
+	_T("57600"),
+	_T("115200"),
+	_T("921600"),
+};
+
+

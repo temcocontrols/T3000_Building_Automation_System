@@ -214,7 +214,7 @@ int bip_send_pdu(
     bytes_sent =
         sendto(BIP_Socket, (char *) mtu, mtu_len, 0,
         (struct sockaddr *) &bip_dest, sizeof(struct sockaddr));
-
+	//send(BIP_Socket,(char *)mtu,mtu_len,0);
 	return bytes_sent;
    // return 0;//bytes_sent;
 }

@@ -5849,13 +5849,22 @@ unsigned char cod;//,xtemp[15];
 			case GOTO:
 			case GOTOIF:
 									 cod = *(code-1);
-									 memcpy(&n,code,2);
+									 unsigned short temp_n;
+									 memcpy(&temp_n,code,2);
+									 itoa(*((unsigned short *)&pcode[temp_n-2+1]),buf,10);
+									 buf += strlen(buf);
+									 code += 2;
+									 if(cod == GOTOIF)
+										 code++;    //FF
+									 //memcpy(&n,code,2);
 //									 adjustint(&n, ptrprg->type);
+#if fance_debug
 									 itoa(*((int *)&pcode[n-2+1]),buf,10);
 									 buf += strlen(buf);
 									 code += 2;
 									 if(cod == GOTOIF)
 											code++;    //FF
+#endif
 									break;
 			case Alarm:
 /*									if ( ind_line_array && line_array[ind_line_array-1][0]!=line)

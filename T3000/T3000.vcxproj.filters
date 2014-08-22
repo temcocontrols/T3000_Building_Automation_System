@@ -519,7 +519,7 @@
     <ClCompile Include="..\ISP\MyPing.cpp">
       <Filter>ClassInfo</Filter>
     </ClCompile>
-    <ClCompile Include="MailFeedbackDlg.cpp">
+    <ClCompile Include="Bacnetaddintodb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -720,6 +720,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\t3000.mdb" />
+    <None Include="res\t3000_db.bin">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1229,7 +1232,7 @@
     <ClInclude Include="T3000DefaultView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MailFeedbackDlg.h">
+    <ClInclude Include="Bacnetaddintodb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

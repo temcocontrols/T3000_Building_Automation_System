@@ -74,7 +74,8 @@ extern tree_product	m_product_isp_auto_flash;
 
 bool start_record_time = true;	//开启计时，如果用户一段时间无键盘和鼠标左键操作就开启自动刷新;
 unsigned long time_click = 0;
-CTestMultiReadTraffic *g_testmultiReadtraffic_dlg=NULL;
+CDialogEx *g_testmultiReadtraffic_dlg=NULL;
+//CTestMultiReadTraffic *g_testmultiReadtraffic_dlg=NULL;
 bool first_run_refresh_list_skip_wait = true; //第一次运行时不等待，直接检测状态;
 bool enable_show_debug_window = false; 
 BacnetWait *WaitWriteDlg=NULL;
@@ -592,7 +593,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
 		return -1;
-
+	g_testmultiReadtraffic_dlg = NULL;
 	BOOL bNameValid;
 	// set the visual manager and style based on persisted value
 	OnApplicationLook(theApp.m_nAppLook);
@@ -722,6 +723,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	ScanTstatInDB();
 	DeleteConflictInDB();//用于处理数据库中重复的数据，这些数据有相同的序列号;
+	PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);
 //20120420	SelectTreeNodeFromRecord();
 
 	//////////////////////////////////////////////////////////////////////////
@@ -852,6 +854,19 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	MyRegAddress.MatchMoudleAddress();
 	bac_net_initial_once = false;
+
+
+	//if(m_wskServer.CreateServer(31234, SOMAXCONN))
+	//{
+	//	m_bServer = m_wskServer.StartServer(Listen);
+	//}
+
+	//if(!m_bServer)
+	//{
+	//	CString info;
+	//	info.Format(_T("Start Server Failed：%d"), m_wskServer.err);
+	//	AfxMessageBox(info);
+	//}
 
 #if 1
 		//SOCKET soAck =::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
@@ -1340,7 +1355,7 @@ void CMainFrame::DeleteConflictInDB()
 				m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 				CString mtemp_serial_number;
 				CString strSql;
-				mtemp_serial_number.Format(_T("%d"),m_product.at(i).serial_number);
+				mtemp_serial_number.Format(_T("%u"),m_product.at(i).serial_number);
 				try
 				{
 					strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"), mtemp_serial_number);
@@ -1637,7 +1652,30 @@ try
 					strSql=temp_variant;
 				else
 					strSql=_T("");
-				m_product_temp.serial_number=_wtol(strSql);
+
+				long temp_serial_id = (long)(_wtoi64(strSql));
+				unsigned int correct_id = (DWORD)(_wtoi64(strSql));
+
+				//long temp_serial_id = _wtol(strSql);
+				//unsigned int correct_id = (DWORD)(_wtol(strSql));
+				//用于将以前数据库中的 负的序列号 修改为正的;Add by Fance
+				if(temp_serial_id < 0)
+				{
+					CString wrong_serial_id;
+					wrong_serial_id = strSql;
+					CString correct_serial_id;
+					correct_serial_id.Format(_T("%u"),correct_id);
+					try
+					{
+						str_temp.Format(_T("update ALL_NODE set Serial_ID ='%s' where Serial_ID = '%s'"),correct_serial_id, wrong_serial_id);
+						m_pCon->Execute(str_temp.GetString(),NULL,adCmdText);
+					}
+					catch(_com_error *e)
+					{
+						AfxMessageBox(e->ErrorMessage());
+					}
+				}
+				m_product_temp.serial_number= correct_id;
 
 				//m_product_temp.product_id =m_pRs->GetCollect("Product_ID");
 				temp_variant=m_pRs->GetCollect("Product_ID");//
@@ -1708,16 +1746,34 @@ try
 				else
 					m_product_temp.baudrate=_wtoi(strSql);
 				if (m_product_temp.product_class_id == PM_NC)
-				{m_product_temp.baudrate = 19200;
+				{
+					m_product_temp.baudrate = 19200;
 				}
 				////
+				temp_variant=m_pRs->GetCollect("Online_Status");//
+				if(temp_variant.vt!=VT_NULL)
+				{
+					m_product_temp.status = temp_variant;
+					m_product_temp.status_last_time[0] = m_product_temp.status;
+					m_product_temp.status_last_time[1] = m_product_temp.status;
+					m_product_temp.status_last_time[2] = m_product_temp.status;
+				}
+				else
+				{
+					m_product_temp.status = false;
+					m_product_temp.status_last_time[0] = false;
+					m_product_temp.status_last_time[1] = false;
+					m_product_temp.status_last_time[2] = false;
+				}
+
+
 
 				//m_product_temp.BuildingInfo.strMainBuildingname=m_pRs->GetCollect("MainBuilding_Name");
 				//AfxMessageBox(m_product_temp.BuildingInfo.strMainBuildingname);
 				//m_product_temp.BuildingInfo.strBuildingName=m_pRs->GetCollect("Building_Name");
 				m_product_temp.BuildingInfo=m_subNetLst.at(m_nCurSubBuildingIndex);
 //20120423	
-				if(((strSql.CompareNoCase(_T("19200")) == 0)) || (strSql.CompareNoCase(_T("9600")) == 0))
+				if(((strSql.CompareNoCase(_T("19200")) == 0)) || (strSql.CompareNoCase(_T("9600")) == 0) || ((strSql.CompareNoCase(_T("38400")) == 0)))
 				{
 					m_product_temp.BuildingInfo.strIp.Empty();
 					m_product_temp.BuildingInfo.strBaudRate = strSql;
@@ -1772,9 +1828,7 @@ try
 				else
 			    	m_product_temp.strImgPathName=_T("");
 
-					m_product_temp.status_last_time[0] = false;
-					m_product_temp.status_last_time[1] = false;
-					m_product_temp.status_last_time[2] = false;
+
 				m_product.push_back(m_product_temp);
 				m_pRs->MoveNext();
 			}
@@ -5739,6 +5793,26 @@ LRESULT CMainFrame::OnFreshStatusBar(WPARAM wParam, LPARAM lParam)
 void CMainFrame::OnDestroy()
 {
 #if 1
+	
+	for(int i=0;i<m_product.size();i++)//用于更新 产品的状态，以便下次打开的时候直接显示上次关闭的时候的状态;
+	{
+		CString serial_number_temp;
+		serial_number_temp.Format(_T("%u"),m_product.at(i).serial_number);
+		CString execute_str;
+		try
+		{
+			m_pCon.CreateInstance(_T("ADODB.Connection"));
+			m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+			execute_str.Format(_T("update ALL_NODE set Online_Status = %d where Serial_ID = '%s'"),m_product.at(i).status,serial_number_temp);
+			m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);		
+		}
+		catch(_com_error *e)
+		{
+			//AfxMessageBox(e->ErrorMessage());
+		}
+		if(m_pCon->State)
+			m_pCon->Close();
+	}
 
 	CDialogInfo *pDialogInfo = NULL;
 	m_Input_data.clear();
@@ -5765,11 +5839,7 @@ void CMainFrame::OnDestroy()
 			pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Processing Information,please wait..."));
 //		}
 
-	}
-	catch (...)//这个无效，当pDialogInfo->Create(IDC_STATIC_INFO,this);中的ID写错时，这个函数没有throw抛出错误，所以捕获不到
-	{
 
-	}
 
 
 
@@ -5779,6 +5849,9 @@ void CMainFrame::OnDestroy()
 
 	UpdataSlider(temp);
 
+	g_bEnableRefreshTreeView = FALSE;
+	HTREEITEM htiSel = m_pTreeViewCrl->GetSelectedItem();
+	SaveTreeNodeRecordToReg(htiSel);
 
 	for(int i=0;i<10;i++)
 	{
@@ -5789,9 +5862,7 @@ void CMainFrame::OnDestroy()
 		}
 	}
 
-	g_bEnableRefreshTreeView = FALSE;
-	HTREEITEM htiSel = m_pTreeViewCrl->GetSelectedItem();
-	SaveTreeNodeRecordToReg(htiSel);
+
 
 	if (mbPoll!=NULL)
 	{
@@ -5822,6 +5893,7 @@ void CMainFrame::OnDestroy()
 	g_killMultiReadEvent.SetEvent();
 
 	Sleep(500);//wait for the end of the thread.
+
 	if (WaitForSingleObject(m_pFreshMultiRegisters->m_hThread, 1000) != WAIT_OBJECT_0)
 
 	//Sleep(500);//wait for the end of the thread.
@@ -5835,11 +5907,12 @@ void CMainFrame::OnDestroy()
 		else
 		{		
 			BOOL bRet = TerminateThread(m_pFreshMultiRegisters->m_hThread,0);
-			delete m_pFreshMultiRegisters;
+			//delete m_pFreshMultiRegisters;
 			m_pFreshMultiRegisters=NULL;
 		}
 
 	}
+
 		if(CM5_hThread!=NULL)
 			TerminateThread(CM5_hThread,0);
 		if(CM5_UI_Thread!=NULL)
@@ -5885,12 +5958,22 @@ void CMainFrame::OnDestroy()
 		pDialogInfo = NULL;
 	}
 
-	if (g_testmultiReadtraffic_dlg!=NULL)
+	if (g_testmultiReadtraffic_dlg != NULL)
 	{
 		delete g_testmultiReadtraffic_dlg;
 		g_testmultiReadtraffic_dlg=NULL;
 	}
 #endif
+
+
+
+		}
+		catch (...)//这个无效，当pDialogInfo->Create(IDC_STATIC_INFO,this);中的ID写错时，这个函数没有throw抛出错误，所以捕获不到
+		{
+			Sleep(1);
+		}
+
+
 	CFrameWndEx::OnDestroy();
 	// TODO: Add your message handler code here
 }
@@ -6235,6 +6318,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			
 
 	}
+
 	return CFrameWndEx::PreTranslateMessage(pMsg);
 }
 void CMainFrame::ReFresh()
@@ -6322,13 +6406,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 	//pDlg->MoveWindow(100,100,500,1000);
 	pDlg->ShowProgress(0,0);
 	//显示对话框窗口
-	pDlg->ShowWindow(SW_SHOW);
+	
 
-
+	//::SetWindowPos(pDlg->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 	RECT RECT_SET1;
 	GetClientRect(&RECT_SET1);
-	pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20);
-
+	pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20,1);
+	pDlg->ShowWindow(SW_SHOW);
 
 
 	//20120420
@@ -6355,6 +6439,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			product_Node=m_product.at(i);
 			selected_product_index = i;//记录目前选中的是哪一个 产品;用于后面自动更新firmware;
 			selected_tree_item = hTreeItem;
+
 			if(!m_product.at(i).BuildingInfo.strIp.IsEmpty())
 			{
 				//OnTestPing(product_Node.BuildingInfo.strIp);
@@ -6366,14 +6451,31 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					if(pDlg)
 						delete pDlg;//20120220
 					pDlg = NULL;
-					//显示 IP部分
-					scandlg.Set_IsScan(FALSE);
-					scandlg.SetNode(product_Node);
-					scandlg.DoModal();
+					if (!scandlg.CheckTheSameSubnet(m_product.at(i).BuildingInfo.strIp))
+					{
+					    CString StrTips;
+						StrTips.Format(_T("The net device is not in the same subnet.\nDo you want to try to make them in the same subnet?"));
+						int ret = AfxMessageBox(StrTips,MB_YESNOCANCEL ,3);
+						if ( ret == IDYES)
+						{
+						scandlg.Set_IsScan(FALSE);
+						scandlg.SetNode(product_Node);
+						scandlg.DoModal();
+						}
+						 
+					}
+					else
+					{
+						CString strTitle;
+						strTitle.Format(_T("Can't connect to %s"),m_product.at(i).BuildingInfo.strIp);
+						AfxMessageBox(strTitle);
+					}
+
+
 					return;
 				}
 			}
-			 
+	 
 
 			if((product_Node.product_class_id == PM_CM5) || (product_Node.product_class_id == PM_MINIPANEL))	//如果是CM5或者MINIPANEL 才有 bacnet协议;
 			{
@@ -6482,13 +6584,17 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 			g_strImagePathName=product_Node.strImgPathName;
 			//网络设置
-			if (!((product_Node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)||(product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||(product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
+			if (!(
+				(product_Node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)	||
+				(product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||
+				(product_Node.BuildingInfo.strIp.CompareNoCase(_T("38400"))==0) ||
+				(product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
 			{
 
 				if(product_Node.BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0)
 				{
-					pDlg->ShowProgress(2,10);//20120220
-				BOOL bRet = ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
+					//pDlg->ShowProgress(2,10);//20120220
+					BOOL bRet = ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
 					 
 					if (!bRet)
 					{
@@ -6498,6 +6604,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						pDlg = NULL;
 						m_nStyle=2;
 						m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
+						m_product.at(i).status_last_time[0] = false;
+						m_product.at(i).status_last_time[1] = false;
+						m_product.at(i).status_last_time[2] = false;
 						return;
 					}
 					else
@@ -6617,7 +6726,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{
 				//m_nbaudrat=_wtoi(product_Node.BuildingInfo.strBaudRate);
 				m_nbaudrat= product_Node.baudrate;
-				if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200))
+				if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200) && (m_nbaudrat != 38400))
 					m_nbaudrat = 19200;
 				Change_BaudRate(m_nbaudrat);
 
@@ -6635,6 +6744,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						pDlg=NULL;
 					}
 					bOnLine=FALSE;
+                    m_pTreeViewCrl->turn_item_image(hSelItem ,false);	
+                    m_product.at(i).status_last_time[0] = false;
+                    m_product.at(i).status_last_time[1] = false;
+                    m_product.at(i).status_last_time[2] = false;
 					return;
 				}
 				else
@@ -6829,6 +6942,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			if(bOnLine)
 			{ 
 				//SetPaneConnectionPrompt(_T("Online!"));
+				pDlg->ShowWindow(SW_SHOW);
 				m_pTreeViewCrl->turn_item_image(hSelItem ,true);
 				m_nStyle=1;
 			}
@@ -6839,6 +6953,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				m_pTreeViewCrl->turn_item_image(hSelItem ,false);	
 				memset(&multi_register_value[0],0,sizeof(multi_register_value));
 				m_nStyle=2;
+				m_product.at(i).status_last_time[0] = false;
+				m_product.at(i).status_last_time[1] = false;
+				m_product.at(i).status_last_time[2] = false;
 				//20120424				
 				if (pDlg !=NULL)
 				{
@@ -7725,7 +7842,7 @@ BOOL CMainFrame::CheckDeviceStatus()
 					close_com();
 					int nComPort = m_product.at(i).ncomport;
 					int n_baudrate = m_product.at(i).baudrate;
-					if((n_baudrate != 19200) && (n_baudrate != 9600))
+					if((n_baudrate != 19200) && (n_baudrate != 9600) && (n_baudrate != 38400))
 						n_baudrate = 19200;
 					if(nComPort == 0)
 					{
@@ -7802,7 +7919,7 @@ BOOL CMainFrame::CheckDeviceStatus()
 							// read first 4 registers 
 							//	nRet=modbus_read_multi_value(&SerialNum[0],nID,0,4,5); 
 							nRet=Read_Multi(nID,&SerialNum[0],0,4,5);
-							int nSerialNumberRead;
+							unsigned int nSerialNumberRead;
 
 							if(nRet>=0)  // 计算串口号
 							{
@@ -7970,7 +8087,7 @@ end_condition :
 			str_ip_address = m_refresh_net_device_data.at(y).ip_address;
 			str_n_port.Format(_T("%d"),m_refresh_net_device_data.at(y).nport);
 
-			str_serialid.Format(_T("%d"),m_refresh_net_device_data.at(y).nSerial);
+			str_serialid.Format(_T("%u"),m_refresh_net_device_data.at(y).nSerial);
 			product_class_id.Format(_T("%d"),m_refresh_net_device_data.at(y).product_id);
 			product_name = GetProductName(m_refresh_net_device_data.at(y).product_id);
 			product_name = product_name + _T(":") + str_serialid + _T("-") + modbusid + _T("-") + str_ip_address;
@@ -8041,303 +8158,6 @@ LRESULT CMainFrame::Message_Scan_Product(WPARAM wParam, LPARAM lParam){
 	OnScanDevice();
 	return 0;
 }
-//////////////////////////////////////////////////////////////////////////
-// added by zgq;2010-12-1;从OnToolRefreshLeftTreee函数中抽取出来，
-// 这个函数主要是用来更新TreeCtrl的。
-#if 0
-void CMainFrame::RefreshTreeView()
-{
-	//TRACE("I'm start refreshing tree !!! \n");
-
-	if(m_subNetLst.size()<=0)
-		return;
-	RefreshNetWorkDeviceListByUDPFunc();
-	//BeginWaitCursor();
-	// 对所有节点都检测
-
-	for(UINT i=0;i<m_product.size();i++)
-	{
-		//tree0412if(!g_bEnableRefreshTreeView || g_bPauseRefreshTree || g_bPauseMultiRead) 
-		if( g_bPauseRefreshTree || g_bPauseMultiRead)
-			return;
-
-
-		BOOL bOnLine=FALSE;
-		UINT nSerialNumber=0;
-		int nID;
-
-		tree_product tp = m_product.at(i);
-		if(m_strCurSubBuldingName.CompareNoCase(tp.BuildingInfo.strBuildingName)==0)
-		{
-			int nIDNode=tp.product_id;
-			nSerialNumber=tp.serial_number;
-			//int newnID=read_one(nID,6,2);
-			/*
-			Get the protocol ,if it is bacnet ip,we compare the device id.
-			*/
-#if 0
-			if(m_product.at(i).protocol == PROTOCOL_BACNET_IP)
-			{
-				int find_exsit = false;
-				for (int x=0;x<(int)m_bac_scan_com_data.size();x++)
-				{
-					if(m_bac_scan_com_data.at(x).device_id == m_product.at(i).hardware_version)	//之前使用hardware 代替 device id的
-					{
-						find_exsit = true;
-						break;
-					}
-				}
-				if(find_exsit)
-				{
-					bOnLine=TRUE;
-					TRACE(_T("Device %d is Online\r\n"),(int)m_product.at(i).hardware_version);
-				}
-				if(g_bac_instance == m_product.at(i).hardware_version)//判断当前选中的设备是否在线，不在线就不允许操作 读写;
-				{
-					bac_select_device_online = bOnLine;
-				}
-			}
-			else
-			{
-#endif
-				
-				if(m_product.at(i).protocol == MODBUS_RS485)
-				{
-					register_critical_section.Lock();
-					SetCommunicationType(0);
-					int nComPort = m_product.at(i).ncomport;
-					if(nComPort == 0)
-					{
-						m_product.at(i).status = false;
-						bOnLine=FALSE;
-						register_critical_section.Unlock();
-						goto end_condition;
-					}
-						
-					BOOL  bret = open_com(nComPort);
-					if (!bret)
-					{
-						m_product.at(i).status = false;
-						bOnLine=FALSE;
-						register_critical_section.Unlock();
-						goto end_condition;
-					}
-					else
-					{
-						m_nbaudrat=19200;
-						Change_BaudRate(19200);
-
-						// read register offset 6
-						//int error = modbus_read_one_value( nID,nIDNode,6,5);
-						nID=read_one(nIDNode,6,5);
-						/* 
-						If an error was returned from the read,
-						we previously attempted to try again with a reduced baud rate.
-						However, a bug in the code meant this never was done correctly
-						and problems were reported when the baud rate was changed.
-						See discussion in ticket #14
-						Now we simply set the online flag to FALSE and give up.
-						*/
-						if (nID<0)
-						{
-							m_nbaudrat=9600;
-							Change_BaudRate(9600);
-							nID=read_one(g_tstat_id,6,5);
-							if (nID<0)
-							{
-								Change_BaudRate(19200);
-								m_product.at(i).status = false;
-								bOnLine=FALSE;
-								//continue;
-							}
-						} 
-
-						if( nID <0) 
-						{
-							m_product.at(i).status = false;
-							bOnLine=FALSE;
-						} 
-						else 
-						{
-							// successful read of register offset 6
-							unsigned short SerialNum[4];
-							memset(SerialNum,0,sizeof(SerialNum));
-							int nRet=0;//
-							// read first 4 registers 
-							//	nRet=modbus_read_multi_value(&SerialNum[0],nID,0,4,5); 
-							nRet=Read_Multi(nID,&SerialNum[0],0,4,5);
-							int nSerialNumberRead;
-
-							if(nRet>=0)  // 计算串口号
-							{
-								nSerialNumberRead=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256; 
-							}
-
-							if(nSerialNumber>=0)  
-							{
-								if(nSerialNumberRead==nSerialNumber) // 取到串口号，并相等，说明online;
-								{
-									m_product.at(i).status = true;
-									bOnLine=TRUE;
-								}
-							}
-						}
-					}		
-					close_com();
-
-					if( m_product.at(i).BuildingInfo.strProtocol.CompareNoCase(_T("Modbus 485")) == 0)
-					{
-						g_CommunicationType = 0;
-					}
-					else
-					{
-						g_CommunicationType = 1;
-					}
-
-					SetCommunicationType(g_CommunicationType);
-					if(g_CommunicationType == 0)
-					{
-
-						CString strComport = m_product.at(i).BuildingInfo.strComPort;
-						CString strComNum = strComport.Mid(3);
-						int nCom = _wtoi(strComNum);
-						open_com(nCom);
-					}
-					register_critical_section.Unlock();
-
-				}
-				else// if(m_product.at(i).protocol == MODBUS_TCPIP)
-				{
-					for (int x=0;x<(int)m_refresh_net_device_data.size();x++)
-					{
-						if((nSerialNumber == m_refresh_net_device_data.at(x).nSerial) && 
-							(nIDNode == m_refresh_net_device_data.at(x).modbusID))
-						{
-							m_product.at(i).status = true;
-							bOnLine = TRUE;
-							break;
-						}
-					}
-				}
-#if 0 //Fance recode 
-				if (g_CommunicationType==0) // 通信类型 0
-				{	
-					// force baud rate to 19200
-
-					m_nbaudrat=19200;
-					Change_BaudRate(19200);
-
-					// read register offset 6
-
-					//int error = modbus_read_one_value( nID,nIDNode,6,5);
-					nID=read_one(nIDNode,6,5);
-					/* 
-					If an error was returned from the read,
-					we previously attempted to try again with a reduced baud rate.
-					However, a bug in the code meant this never was done correctly
-					and problems were reported when the baud rate was changed.
-					See discussion in ticket #14
-
-					Now we simply set the online flag to FALSE and give up.
-					*/
-					if (nID<0)
-					{
-						m_nbaudrat=9600;
-						Change_BaudRate(9600);
-						nID=read_one(g_tstat_id,6,5);
-						if (nID<0)
-						{
-							Change_BaudRate(19200);
-							bOnLine=FALSE;
-							//continue;
-						}
-					} 
-
-					if( nID <0) {
-						bOnLine=FALSE;
-
-					} 
-
-					else {
-						// successful read of register offset 6
-						unsigned short SerialNum[4];
-						memset(SerialNum,0,sizeof(SerialNum));
-						int nRet=0;//
-						// read first 4 registers 
-						//	nRet=modbus_read_multi_value(&SerialNum[0],nID,0,4,5); 
-						nRet=Read_Multi(nID,&SerialNum[0],0,4,5);
-						int nSerialNumberRead;
-
-						if(nRet>=0)  // 计算串口号
-						{
-							nSerialNumberRead=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256; 
-						}
-
-						if(nSerialNumber>=0)  
-						{
-							if(nSerialNumberRead==nSerialNumber) // 取到串口号，并相等，说明online
-								bOnLine=TRUE;
-						}
-					}
-				}
-
-				if (g_CommunicationType==1)  // 通信类型1，重复上面的过程
-				{
-
-					int error = modbus_read_one_value( nID, nIDNode, 6 ,2);
-					if( error )
-						bOnLine=FALSE;
-
-					if( ! error )
-					{
-						unsigned short SerialNum[4];
-						memset(SerialNum,0,sizeof(SerialNum));
-						int nRet=0;
-
-						// read first 4 registers
-						nRet=modbus_read_multi_value(&SerialNum[0],nIDNode,0,4,2);
-
-						int nSerialNumberRead;
-
-						if(nRet>=0)
-						{
-
-							nSerialNumberRead=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
-						}
-						if(nSerialNumber>=0)
-						{
-							if(nSerialNumberRead==nSerialNumber)
-								bOnLine=TRUE;
-						}
-					}
-				}
-#endif
-
-			//}
-end_condition :
-
-			if(bOnLine>0)  // 如果online，更新显示图片
-			{
-				SetPaneConnectionPrompt(_T("Online!"));
-				m_pTreeViewCrl->turn_item_image(tp.product_item ,true);
-
-			}
-			else  // 替换offline的图片
-			{
-				SetPaneConnectionPrompt(_T("Offline!"));
-				m_pTreeViewCrl->turn_item_image(tp.product_item ,false);
-
-// 				if(nID==g_tstat_id)
-// 					memset(&multi_register_value[0],0,sizeof(multi_register_value));
-			}
-		}
-	}
-	//EndWaitCursor();	
-	//TRACE("Now End refreshing tree !!! \n");
-	m_bac_scan_com_data.clear();
-	m_refresh_net_device_data.clear();
-}
-#endif
 
 
 void CMainFrame::SuspendRefreshThread()
@@ -8355,7 +8175,7 @@ void CMainFrame::DoFreshAll()
 {	
 	PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);
 	//RefreshTreeView();
-	if (m_nCurView == 0)
+	if ((m_nCurView == 0) && (g_tstat_id != 0) && (g_tstat_id != 255))
 	{
 		((CT3000View*)m_pViews[m_nCurView])->PostMessage(WM_FRESHVIEW,0,0)	;
 	}
@@ -8394,8 +8214,8 @@ UINT _FreshTreeView(LPVOID pParam )
 				::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 				break;
 			}
-			g_strT3000LogString=_T("T3000 is busy.");
-			::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+			//g_strT3000LogString=_T("T3000 is busy.");
+			//::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 			Sleep(100);
 		}
 		g_strT3000LogString=_T("T3000 is free,and then Checking the status of devices...");
@@ -10431,7 +10251,7 @@ void CMainFrame::ShowDebugWindow()
 		DebugWindow = new CDebugWindow;
 		DebugWindow->Create(IDD_DIALOG_DEBUG_TRACE, this);
 		DebugWindow->ShowWindow(SW_HIDE);
-		g_Print = _T("Debug Time 14-06-26   Debug version 1.8");
+		g_Print = _T("Debug Time 14-08-05   Debug version 2.0");
 		DFTrace(g_Print);
 	}
 	
@@ -10563,3 +10383,5 @@ void CMainFrame::OnHelpFeedbacktotemco()
 		AfxMessageBox(_T("Error:Can't find the email client in your pc!"));
 	}
 }
+
+

@@ -122,19 +122,7 @@ LRESULT CBacnetScreenEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 	
 	if( MOD_SHIFT == fuModifiers && VK_UP == uVirtKey )  //Screen
 	{  
-		//if(m_nFoucsIndext>=0)
-		//{
-		//	CRect rcItem;
-		//	m_RelayLabelLst.at(m_nFoucsIndext).plabelCtrl->GetWindowRect(&rcItem);
-		//	CRect rcNew(rcItem);
-		//	if(rcNew.top > 1)
-		//	{
-		//		rcNew.top = rcItem.top - 1;
-		//		rcNew.bottom = rcNew.bottom - 1;
-		//	}
-		//	m_RelayLabelLst.at(m_nFoucsIndext).plabelCtrl->MoveWindow(&rcNew,1);
-		//	return 0;
-		//}
+
 		CPoint mypoint;
 		GetCursorPos(&mypoint);
 		if(mypoint.y>10)
@@ -145,19 +133,7 @@ LRESULT CBacnetScreenEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 	}  
 	else if(MOD_SHIFT == fuModifiers && VK_DOWN == uVirtKey)//Program
 	{
-		//if(m_nFoucsIndext>=0)
-		//{
-		//	CRect rcItem;
-		//	m_RelayLabelLst.at(m_nFoucsIndext).plabelCtrl->GetWindowRect(&rcItem);
-		//	CRect rcNew(rcItem);
-		//	if(rcNew.bottom < m_cyScreen)
-		//	{
-		//		rcNew.top = rcItem.top + 1;
-		//		rcNew.bottom = rcNew.bottom + 1;
-		//	}
-		//	m_RelayLabelLst.at(m_nFoucsIndext).plabelCtrl->MoveWindow(&rcNew,1);
-		//	return 0;
-		//}
+
 		CPoint mypoint;
 		GetCursorPos(&mypoint);
 		if(mypoint.y<m_cyScreen - 10)

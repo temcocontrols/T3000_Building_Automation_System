@@ -25,6 +25,9 @@ typedef enum
 //OUT=0,IN, VAR, CON, WRT, AR, PRG, TBL, TZ, AMON, GRP, ARRAY, ALARMM,UNIT, USER_NAME, ALARM_SET, WR_TIME, AR_DATA
 //}Point_type_equate;
 
+
+
+
 enum
 {
 	INPUT_OK,
@@ -134,7 +137,8 @@ typedef enum {
 		 RESTARTMINI_COMMAND       = 121,
 		 WRITEPRGFLASH_COMMAND     = 122,
 		 OPENSCREEN_COMMAND        = 123,
-		 WRITE_SETTING_COMMAND		= 198
+		 WRITE_SETTING_COMMAND		= 198,
+		 WRITE_SUB_ID_BY_HAND = 199
 } CommandRequest;	  
 
 
@@ -687,6 +691,9 @@ typedef struct
 	uint8_t no_used[10];
 }Str_Pro_Info;
 
+
+
+
 typedef union
 {
 	uint8_t all[400];
@@ -707,6 +714,9 @@ typedef union
 		uint8_t refresh_flash_timer;
 		uint8_t en_plug_n_play;
 		uint8_t reset_default;   // write 88
+		uint8_t com_baudrate0; 
+		uint8_t com_baudrate1; 
+		uint8_t com_baudrate2; 
 	}reg;
 }Str_Setting_Info;
 

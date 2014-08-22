@@ -39,6 +39,7 @@ CScanDlg::CScanDlg(CWnd* pParent /*=NULL*/)
 	m_pScanner = NULL;
 	m_szGridEditPos.cx = -1;
 	m_szGridEditPos.cy = -1;
+	m_IsScan=TRUE;
 }
 
 CScanDlg::~CScanDlg()
@@ -65,6 +66,7 @@ BEGIN_MESSAGE_MAP(CScanDlg, CDialog)
 	ON_MESSAGE(WM_ADDNETSCAN, 	OnAddNetScanRet)
 
 	ON_WM_CLOSE()
+	ON_EN_KILLFOCUS(IDC_EDIT_GRIDEDIT, &CScanDlg::OnEnKillfocusEditGridedit)
 END_MESSAGE_MAP()
 
 
@@ -97,19 +99,23 @@ void CScanDlg::GetIPMaskGetWay(CString &StrIP,CString &StrMask,CString &StrGetwa
 		pAdapter = pAdapterInfo; 
 		while (pAdapter) 
 		{ 
+		if(pAdapter->Type == 6)
+		{
 			MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
-				StrIP.GetBuffer(MAX_PATH), MAX_PATH );
+			StrIP.GetBuffer(MAX_PATH), MAX_PATH );
 			StrIP.ReleaseBuffer();
 			//StrIP.Format(_T("%s"),pAdapter->IpAddressList.IpAddress.String); 
 			MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1, 
 				StrMask.GetBuffer(MAX_PATH), MAX_PATH );
 			StrMask.ReleaseBuffer();
 
-		  //StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
+			//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
 
 			MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
 				StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
 			StrGetway.ReleaseBuffer();
+		}
+			
 		/*StrGetway.Format(_T("%s"), pAdapter->GatewayList.IpAddress.String); */
 			pAdapter = pAdapter->Next; 
 		} 
@@ -122,12 +128,74 @@ void CScanDlg::GetIPMaskGetWay(CString &StrIP,CString &StrMask,CString &StrGetwa
 BOOL CScanDlg::OnInitDialog()
 {	
 	CDialog::OnInitDialog();	
-
-	ASSERT(m_pScanner);	
+	//CString m_strlocalipaddress;
+	//CString m_strlocalsubnet;
+	//CString m_strlocalgateway;
+	GetIPMaskGetWay(m_strlocalipaddress,m_strlocalsubnet,m_strlocalgateway);
+	
 	InitScanGrid();	
 //	Sleep(3000);
-	AddComDeviceToGrid(m_pScanner->m_szTstatScandRet);
-	AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
+	if (m_IsScan)
+	{
+		AddComDeviceToGrid(m_pScanner->m_szTstatScandRet);
+		AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
+	}
+	else
+	{
+		CString anewip;
+		if (GetNewIP(anewip))
+		{
+			FLEX_GRID_PUT_COLOR_STR(1,NEW_IPADRESS,anewip); 
+		}
+	     
+		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_ADDRESS,m_net_product_node.BuildingInfo.strIp); 
+
+		CString strType =GetProductName(m_net_product_node.product_class_id);		
+		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_TYPE,strType); 
+		CString strSerailID;
+		int nSID =m_net_product_node.serial_number;
+		strSerailID.Format(_T("%d"), nSID);
+		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_SERIALID,strSerailID);
+		
+		 		 
+		 		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_COMPORT,m_net_product_node.BuildingInfo.strIpPort); 
+
+// 		CString strBuilding =m_net_product_node.BuildingInfo.strBuildingName;		
+// 		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_BUILDING,strBuilding); 
+
+		/*CString strFloor = m_net_product_node.BuildingInfo.;
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_FLOOR,strFloor); 
+
+		CString strRoom = pNetInfo->m_pNet->GetRoomName();
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_ROOM,strRoom); 
+
+		CString strSubnet = pNetInfo->m_pNet->GetSubnetName();
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_SUBNET,strSubnet); 
+
+		CString strSerailID;
+		int nSID = pNetInfo->m_pNet->GetSerialID();
+		strSerailID.Format(_T("%d"), nSID);
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_SERIALID,strSerailID); */
+		/////
+
+		/////
+// 		CString strPort;
+// 		int nPort = pNetInfo->m_pNet->GetIPPort();
+// 		strPort.Format(_T("%d"), nPort);
+// 		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_COMPORT,strPort); 
+// 		////
+// 		CString strProtocol;		
+// 		if(pNetInfo->m_pNet->GetProtocol() == 3)
+// 		{
+// 			strProtocol.Format(_T("BacnetIP"));
+// 		}
+// 		else
+// 			strProtocol.Format(_T("TCP/IP"));
+// 		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_PROTOCOL,strProtocol); 
+		 
+
+	}
+
 
 
 
@@ -135,34 +203,18 @@ BOOL CScanDlg::OnInitDialog()
 }
 BOOL CScanDlg::GetNewIP(CString &newIP){
 	USES_CONVERSION;
- 
-	 
-
-	//////////////////////////////////////////////////////////////////////////
-	char hostname[256];
-	int res = gethostname(hostname, sizeof(hostname));
-	if(res != 0)
-		return FALSE; 
-
-	hostent* pHostent = gethostbyname(hostname); 
-	if(pHostent==NULL) 
-		return FALSE;
-
-	hostent& he = *pHostent;
-	sockaddr_in sa; 
-
-	memcpy(&sa.sin_addr.s_addr, he.h_addr_list[0],he.h_length); 
-
-	//return   inet_ntoa(sa.sin_addr); 
-	CString strHostIP;
-	//strHostIP.Format(_T("%d.%d.%d.%d"), sa.sin_addr.S_un.S_un_b.s_b1,sa.sin_addr.S_un.S_un_b.s_b2,sa.sin_addr.S_un.S_un_b.s_b3,sa.sin_addr.S_un.S_un_b.s_b4);
-	//AfxMessageBox(strIP);
+	IN_ADDR sa;
+	//----------------------
+	LPCSTR szIP=W2A(m_strlocalipaddress);
+	 DWORD dwIP=inet_addr(szIP);
+	
+	sa.S_un.S_addr=dwIP;
 
 
-	for (int i=1;i<255;i++)
+	for (int i=2;i<255;i++)
 	{
 		CString anewip;
-		anewip.Format(_T("%d.%d.%d.%d"), sa.sin_addr.S_un.S_un_b.s_b1,sa.sin_addr.S_un.S_un_b.s_b2,sa.sin_addr.S_un.S_un_b.s_b3,i);
+		anewip.Format(_T("%d.%d.%d.%d"), sa.S_un.S_un_b.s_b1,sa.S_un.S_un_b.s_b2,sa.S_un.S_un_b.s_b3,i);
 
 		if (!TestPing(anewip))
 		{
@@ -310,6 +362,9 @@ memset(&dest,0,sizeof(dest));
 
 		if(!DecodeResp(recvbuf,bread,&from))
 		{
+			xfree(icmp_data);
+			xfree(recvbuf);
+			WSACleanup();
 			return TRUE;
 		}
 		
@@ -402,37 +457,22 @@ void CScanDlg::FillIcmpData(char * icmp_data, int datasize)
 	memset(datapart, 'E', datasize - sizeof(IcmpHeader)); 
 } 
 BOOL CScanDlg::CheckTheSameSubnet(CString strIP){
+GetIPMaskGetWay(m_strlocalipaddress,m_strlocalsubnet,m_strlocalgateway);
 	USES_CONVERSION;
 	LPCSTR szIP = W2A(strIP);
 	DWORD dwIP = inet_addr(szIP);
-
-	IN_ADDR ia;
+	IN_ADDR ia,sa;
 	ia.S_un.S_addr = dwIP;
-
-	//////////////////////////////////////////////////////////////////////////
-	char hostname[256];
-	int res = gethostname(hostname, sizeof(hostname));
-	if(res != 0)
-		return FALSE; 
-
-	hostent* pHostent = gethostbyname(hostname); 
-	if(pHostent==NULL) 
-		return FALSE;
-
-	hostent& he = *pHostent;
-	sockaddr_in sa; 
-
-	memcpy(&sa.sin_addr.s_addr, he.h_addr_list[0],he.h_length); 
-
-	//return   inet_ntoa(sa.sin_addr); 
-	CString strHostIP;
-	strHostIP.Format(_T("%d.%d.%d.%d"), sa.sin_addr.S_un.S_un_b.s_b1,sa.sin_addr.S_un.S_un_b.s_b2,sa.sin_addr.S_un.S_un_b.s_b3,sa.sin_addr.S_un.S_un_b.s_b4);
-	//AfxMessageBox(strIP);
+	//----------------------
+	szIP=W2A(m_strlocalipaddress);
+	 dwIP=inet_addr(szIP);
+	sa.S_un.S_addr=dwIP;
+ 
 
 	// 是否是同一子网
-	if ( ia.S_un.S_un_b.s_b1 == sa.sin_addr.S_un.S_un_b.s_b1 &&
-		ia.S_un.S_un_b.s_b2 == sa.sin_addr.S_un.S_un_b.s_b2 &&
-		ia.S_un.S_un_b.s_b3 == sa.sin_addr.S_un.S_un_b.s_b3 
+	if ( ia.S_un.S_un_b.s_b1 == sa.S_un.S_un_b.s_b1 &&
+		ia.S_un.S_un_b.s_b2 == sa.S_un.S_un_b.s_b2 &&
+		ia.S_un.S_un_b.s_b3 == sa.S_un.S_un_b.s_b3 
 		)
 	{
 		// 是同一子网，但是连接不上，那么提示检查设备连接
@@ -461,35 +501,68 @@ void CScanDlg::InitScanGrid()
 	m_flexGrid.put_TextMatrix(0,6,_T("Address"));
 	m_flexGrid.put_TextMatrix(0,7,_T("Port"));
 	m_flexGrid.put_TextMatrix(0,8,_T("Protocol"));
-	if (!m_pScanner->m_thesamesubnet)
+	
+	if (!m_IsScan)
 	{
 		m_flexGrid.put_Cols(10);
 		m_flexGrid.put_TextMatrix(0,9,_T("Assign New Ip"));
 		GetDlgItem(IDC_BUTTON_SCANALL)->ShowWindow(SW_SHOW);
+
+
+		for(int i = 0; i < 9; i++)
+		{
+			m_flexGrid.put_ColAlignment(i,4);
+		}
+
+		m_flexGrid.put_ColWidth(0,1000);	//type
+		m_flexGrid.put_ColWidth(1,0);		//building
+		m_flexGrid.put_ColWidth(2,0);		//floor
+		m_flexGrid.put_ColWidth(3,0);		//room
+		m_flexGrid.put_ColWidth(4,0);		//subnet
+
+		m_flexGrid.put_ColWidth(5,1000);		//serial#
+		m_flexGrid.put_ColWidth(6,1400);	//Address
+		m_flexGrid.put_ColWidth(7,800);		//Port
+		m_flexGrid.put_ColWidth(8,0);	//protocol
+		m_flexGrid.put_ColWidth(9,1200);
+
+
 	}
 	else
 	{
-		GetDlgItem(IDC_BUTTON_SCANALL)->ShowWindow(SW_HIDE);
+		ASSERT(m_pScanner);	
+		if (!m_pScanner->m_thesamesubnet)
+		{
+			m_flexGrid.put_Cols(10);
+			m_flexGrid.put_TextMatrix(0,9,_T("Assign New Ip"));
+			GetDlgItem(IDC_BUTTON_SCANALL)->ShowWindow(SW_SHOW);
+		}
+		else
+		{
+			GetDlgItem(IDC_BUTTON_SCANALL)->ShowWindow(SW_HIDE);
+		}
+
+		for(int i = 0; i < 9; i++)
+		{
+			m_flexGrid.put_ColAlignment(i,4);
+		}
+
+		m_flexGrid.put_ColWidth(0,1000);	//type
+		m_flexGrid.put_ColWidth(1,800);		//building
+		m_flexGrid.put_ColWidth(2,800);		//floor
+		m_flexGrid.put_ColWidth(3,800);		//room
+		m_flexGrid.put_ColWidth(4,800);		//subnet
+
+		m_flexGrid.put_ColWidth(5,1000);		//serial#
+		m_flexGrid.put_ColWidth(6,1400);	//Address
+		m_flexGrid.put_ColWidth(7,800);		//Port
+		m_flexGrid.put_ColWidth(8,1200);	//protocol
+
 	}
-	
 	// 	m_flexGrid.put_TextMatrix(0,8,_T("Confilct"));
 	// 	m_flexGrid.put_TextMatrix(0,9,_T("Fix Conflict"));
 
-	for(int i = 0; i < 9; i++)
-	{
-		m_flexGrid.put_ColAlignment(i,4);
-	}
-
-	m_flexGrid.put_ColWidth(0,1000);	//type
-	m_flexGrid.put_ColWidth(1,800);		//building
-	m_flexGrid.put_ColWidth(2,800);		//floor
-	m_flexGrid.put_ColWidth(3,800);		//room
-	m_flexGrid.put_ColWidth(4,800);		//subnet
-
-	m_flexGrid.put_ColWidth(5,1000);		//serial#
-	m_flexGrid.put_ColWidth(6,1400);	//Address
-	m_flexGrid.put_ColWidth(7,800);		//Port
-	m_flexGrid.put_ColWidth(8,1200);	//protocol
+	
 
 // 	m_flexGrid.put_ColWidth(8,600);		//if conflict
 // 	m_flexGrid.put_ColWidth(9,800);		//fix
@@ -711,8 +784,12 @@ int CScanDlg::GetAllNodeFromDataBase()
 	return m_szNetNodes.size() + m_szComNodes.size();
 }
 
-
-
+void CScanDlg::SetNode(tree_product product_Node){
+m_net_product_node=product_Node;
+}
+void CScanDlg::Set_IsScan(BOOL Is_Scan){
+	m_IsScan=Is_Scan;
+}
 
 LRESULT CScanDlg::OnAddComScanRet(WPARAM wParam, LPARAM lParam)
 {
@@ -857,7 +934,11 @@ void CScanDlg::OnClose()
 	// TODO: Add your message handler code here and/or call default
 
 	//RecoveryID();
-	
+	if (!m_IsScan)
+	{
+		CDialog::OnClose();
+		return;
+	}
 	if (!m_pScanner->m_bCheckSubnetFinish)
 	{
 		int ret1 = AfxMessageBox(_T("Are you sure to exit?The devices are exited,which are in the different subnet.please apply all new net ips."),MB_YESNOCANCEL,3); 
@@ -964,6 +1045,46 @@ END_EVENTSINK_MAP()
 
 void CScanDlg::ClickMsflexgrid1()
 {
+
+#if 1
+	long lRow,lCol;
+	lRow = m_flexGrid.get_RowSel();//获取点击的行号	
+	lCol = m_flexGrid.get_ColSel(); //获取点击的列号
+	TRACE(_T("Click input grid!\n"));
+	m_currow=lRow;
+	m_curcol=lCol;
+	CRect rect;
+	m_flexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形	
+	CDC* pDC =GetDC();
+
+	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
+	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//计算选中格的左上角的坐标(象素为单位)
+	long y = m_flexGrid.get_RowPos(lRow)/nTwipsPerDotY;
+	long x = m_flexGrid.get_ColPos(lCol)/nTwipsPerDotX;
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	long width = m_flexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
+	long height = m_flexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	//形成选中个所在的矩形区域
+	CRect rcCell(x,y,x+width,y+height);
+	//转换成相对对话框的坐标
+	rcCell.OffsetRect(rect.left+1,rect.top+1);
+	ReleaseDC(pDC);
+	CString strValue = m_flexGrid.get_TextMatrix(lRow,lCol);
+	if (lCol==9)
+	{
+		m_editGrid.MoveWindow(&rcCell,1);
+		m_editGrid.ShowWindow(SW_SHOW);
+		m_editGrid.SetWindowText(strValue);
+		m_editGrid.SetFocus();
+		m_editGrid.SetCapture();//LSC
+		int nLenth=m_editGrid.GetLineCount();//m_editGrid.GetLength();
+		m_editGrid.SetSel(nLenth,nLenth); //全选//
+		return;
+		
+	}
+#endif
 	CSize szTemp;
 	CalcClickPos(szTemp);// 计算点中的位置
 	if (szTemp == m_szGridEditPos)
@@ -1060,16 +1181,12 @@ void CScanDlg::CalcClickPos(CSize& size)
 	size.cx=lRow;
 	size.cy = lCol;
 }
-
-
 void CScanDlg::DestroyFlexEdit()
 {
 	m_editGrid.ShowWindow(SW_HIDE);	
 	CString strText;
 	m_editGrid.GetWindowText(strText);		
 }
-
-
 // 将数据库里的值取出放到内存
 // 将内存的值将被写入数据库
 //
@@ -1168,7 +1285,6 @@ void CScanDlg::SaveAllNodeToDB()
 
 	m_pCon->Close();
 }
-
 
 // 合并数据库和scan结果，以便存入数据库
 // 如果Serial ID相同的，则以grid的数据为准
@@ -1637,7 +1753,11 @@ void CScanDlg::OnBnClickedButtonScanall()
 			
 		}
 	}
-	m_pScanner->m_bCheckSubnetFinish=TRUE;
+	if (m_IsScan)
+	{
+		m_pScanner->m_bCheckSubnetFinish=TRUE;
+	}
+	
 // 	OnClose();
 END_SCAN:
 
@@ -1689,3 +1809,16 @@ void CScanDlg::OnBnClickedButtonManual()
 //	AfxMessageBox(_T("111"), MB_OK);
 }
 
+
+
+void CScanDlg::OnEnKillfocusEditGridedit()
+{
+  if (m_curcol==9)
+  {
+	  CString strValue;
+	  m_editGrid.GetWindowText(strValue);
+	  m_flexGrid.put_TextMatrix(m_currow,m_curcol,strValue);
+	  m_editGrid.ShowWindow(SW_HIDE);
+  }
+
+}

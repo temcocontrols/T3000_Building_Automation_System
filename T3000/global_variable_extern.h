@@ -7,6 +7,7 @@
 #define MY_MBPOLL_REG_DIALOG_MSG (WM_USER + 557)
 #define MY_MBPOLL_WRITE_REG_MSG (WM_USER + 558)
 extern bool no_mouse_keyboard_event_enable_refresh ;
+extern CString USB_Serial;
 extern int g_invoke_id;
 extern vector <int> Change_Color_ID;
 extern HANDLE hThread;
@@ -910,6 +911,7 @@ extern	int	MODBUS_PID3_OFF_OUTPUT_HEAT3	   ;
 extern int selected_product_index;
 extern HTREEITEM selected_tree_item;
 #pragma region For_bacnet
+extern unsigned char bacnet_add_id[254];
 extern int bacnet_device_type;
 extern int g_bac_instance;
 extern int g_selected_serialnumber;

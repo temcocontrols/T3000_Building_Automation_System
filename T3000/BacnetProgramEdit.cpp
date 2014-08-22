@@ -164,21 +164,7 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 
 	//((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->PasteSpecial(CF_TEXT);
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->PostMessage(WM_VSCROLL, SB_BOTTOM,0);
-	//int retry_count =0;
-	//do 
-	//{
-	//	retry_count ++;
-	//	g_invoke_id = GetPrivateData(g_bac_instance,READPROGRAMCODE_T3000,program_list_line,program_list_line,100);
-	//	Sleep(200);
-	//} while ((retry_count<10)&&(g_invoke_id<0));
-	
-	//if(g_invoke_id>=0)
-	//{
-	//	CString temp_cs_show;
-	//	temp_cs_show.Format(_T("Task ID = %d. Read program code from item %d "),g_invoke_id,program_list_line);
-	//	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
-	//}
-		//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd);
+
 
 	RegisterHotKey(GetSafeHwnd(),KEY_F2,NULL,VK_F2);//F2¼ü
 	RegisterHotKey(GetSafeHwnd(),KEY_F3,NULL,VK_F3);
