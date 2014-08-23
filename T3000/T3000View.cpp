@@ -741,11 +741,26 @@ void CT3000View::InitSliderBars2()
 // 		pSPWnd->SetWindowText(strTemp);
 		m_daysetpoint = nSP;//0913
 
-		strTemp.Format(_T("%.1f"),(float)nCoolSP);
+		if (g_unint)
+		{
+		strTemp.Format(_T("%.1f C"),(float)nCoolSP);
+		} 
+		else
+		{
+		strTemp.Format(_T("%.1f F"),(float)nCoolSP);
+		}
 		m_DayCoolEdit.FieldText(strTemp);
 		//m_DayCoolEdit.SetNumberDefaultTex();
 		
-		strTemp.Format(_T("%.1f"),(float)nHeatSP);
+		
+		if (g_unint)
+		{
+		strTemp.Format(_T("%.1f C"),(float)nHeatSP);
+		} 
+		else
+		{
+		strTemp.Format(_T("%.1f F"),(float)nHeatSP);
+		}
 		m_DayHeatEdit.FieldText(strTemp);
 		//m_DayHeatEdit.SetNumberDefaultTex();
 		//nSP= int(nSP/10.0);
@@ -775,7 +790,16 @@ void CT3000View::InitSliderBars2()
 		itemp=product_register_value[380];
 		//m_nightSlider.SetPos((int)(max-(itemp-min)));
 		int nCoolSP = itemp/10.0;//(int)(max-(itemp-min));
-		strTemp.Format(_T("%.1f"),float(nCoolSP-nSP));
+		 
+		if (g_unint)
+		{
+			strTemp.Format(_T("%.1fC"),float(nCoolSP-nSP));
+		} 
+		else
+		{
+			strTemp.Format(_T("%.1fF"),float(nCoolSP-nSP));
+		}
+
 		m_DayCoolEdit.FieldText(strTemp);
 		//m_DayCoolEdit.SetNumberDefaultTex();
 		itemp=product_register_value[136];//heat
@@ -829,13 +853,28 @@ void CT3000View::InitSliderBars2()
 		itemp=product_register_value[183];
 		//m_nightSlider.SetPos((int)(max-(itemp-min)));
 		int nCoolSP = (int)itemp;//(int)(max-(itemp-min));
-		strTemp.Format(_T("%.1f"),itemp);
+		if (g_unint)
+		{
+		strTemp.Format(_T("%.1f C"),itemp);
+		} 
+		else
+		{
+		strTemp.Format(_T("%.1f F"),itemp);
+		}
 		m_nightInfoEdit.FieldText(strTemp);
 	//	m_nightInfoEdit.SetNumberDefaultTex();
 		itemp=product_register_value[182];//heat
 		//m_nightHeatSlider.SetPos((int)(max-(itemp-min)));
 		int nHeatSP = (int)itemp;//((int)(max-(itemp-min)));
-		strTemp.Format(_T("%.1f"),itemp);
+		
+		if (g_unint)
+		{
+		strTemp.Format(_T("%.1f C"),itemp);
+		} 
+		else
+		{
+		strTemp.Format(_T("%.1f F"),itemp);
+		}
 		m_nightHeatInfoEdit.FieldText(strTemp);
 	//	m_nightHeatInfoEdit.SetNumberDefaultTex();
 		m_NightCoolStatic.SetWindowText(_T("Cooling SP"));
@@ -880,13 +919,29 @@ void CT3000View::InitSliderBars2()
 		//itemp=product_register_value[124]+the_setpoint_ha_ha;//cool
 		//m_nightSlider.SetPos(max-(itemp-min));
 		int nCoolDB = product_register_value[124]/10;//(max-(itemp-min));
-		strTemp.Format(_T("%.1f"),(float)product_register_value[124]/10);
+		
+		if (g_unint)
+		{
+		strTemp.Format(_T("%.1f C"),(float)product_register_value[124]/10);
+		} 
+		else
+		{
+		strTemp.Format(_T("%.1f F"),(float)product_register_value[124]/10);
+		}
 		m_nightInfoEdit.FieldText(strTemp);
 		//m_nightInfoEdit.SetNumberDefaultTex();
 		//itemp=the_setpoint_ha_ha-product_register_value[123];//heat
 		//m_nightHeatSlider.SetPos(max-(itemp-min));
 		int nHeatDB = product_register_value[123]/10;//(max-(itemp-min));
-		strTemp.Format(_T("%.1f"),(float)product_register_value[123]/10);
+		
+		if (g_unint)
+		{
+		strTemp.Format(_T("%.1f C"),(float)product_register_value[123]/10);
+		} 
+		else
+		{
+		strTemp.Format(_T("%.1f F"),(float)product_register_value[123]/10);
+		}
 		m_nightHeatInfoEdit.FieldText(strTemp);
 		//m_nightHeatInfoEdit.SetNumberDefaultTex();
 		strTemp.Format(_T("%d"), nSP);
@@ -1293,10 +1348,26 @@ void CT3000View::UpdateSliderBars2()
 		 		pSPWnd->SetWindowText(strTemp);
 		m_daysetpoint = nSP;//0913
 
-		strTemp.Format(_T("%.1f"),(float)nCoolSP);
+		
+		if (g_unint)
+		{
+		strTemp.Format(_T("%.1f C"),(float)nCoolSP);
+		} 
+		else
+		{
+		strTemp.Format(_T("%.1f F"),(float)nCoolSP);
+		}
 		m_DayCoolEdit.FieldText(strTemp);
 		//m_DayCoolEdit.SetNumberDefaultTex();
-		strTemp.Format(_T("%.1f"),(float)nHeatSP);
+		if (g_unint)
+		{
+		strTemp.Format(_T("%.1f C"),(float)nHeatSP);
+		} 
+		else
+		{
+		strTemp.Format(_T("%.1f F"),(float)nHeatSP);
+		}
+		
 		m_DayHeatEdit.FieldText(strTemp);
 		//m_DayHeatEdit.SetNumberDefaultTex();
 		//nSP= int(nSP/10.0);
@@ -4185,10 +4256,26 @@ void CT3000View::InitFlexSliderBars()
 
 			m_DayCoolStatic.SetWindowText(_T("Cooling SP"));
 			m_DayHeatStatic.SetWindowText(_T("Heating SP"));
-			strTemp.Format(_T("%d"), nCoolSP);
+			
+			if (g_unint)
+			{
+			strTemp.Format(_T("%d C"), nCoolSP);
+			} 
+			else
+			{
+			strTemp.Format(_T("% F"), nCoolSP);
+			}
 			m_DayCoolEdit.FieldText(strTemp);
 			//m_DayCoolEdit.SetNumberDefaultTex();
-			strTemp.Format(_T("%d"), nHeatSP);
+			if (g_unint)
+			{
+			strTemp.Format(_T("%d C"), nHeatSP);
+			}
+			else
+			{
+			strTemp.Format(_T("%d F"), nHeatSP);
+			}
+			
 			m_DayHeatEdit.FieldText(strTemp);
 		//	m_DayHeatEdit.SetNumberDefaultTex();
 
@@ -4631,11 +4718,26 @@ LRESULT CT3000View::OnFlexSlideCallBack(WPARAM wParam, LPARAM lParam)
 					// 			m_DayHeatEdit.FieldText(strTemp);
 
 					//0910
-					strTemp.Format(_T("%d"),nCoolSP );
-					 
+					
+					 if (g_unint)
+					 {
+					 strTemp.Format(_T("%0.1fC"),(float)nCoolSP );
+					 } 
+					 else
+					 {
+					 strTemp.Format(_T("%0.1fF"),(float)nCoolSP );
+					 }
 					m_DayCoolEdit.FieldText(strTemp);
-				//	m_DayCoolEdit.SetNumberDefaultTex();
-					strTemp.Format(_T("%0.1f"),(float)nHeatSP );
+		 
+				     if (g_unint)
+				     {
+					 strTemp.Format(_T("%0.1fC"),(float)nHeatSP );
+				     } 
+				     else
+				     {
+					 strTemp.Format(_T("%0.1fF"),(float)nHeatSP );
+				     }
+					
 					 
 					m_DayHeatEdit.FieldText(strTemp);
 				//	m_DayHeatEdit.SetNumberDefaultTex();
@@ -5098,6 +5200,9 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//BOOL bRetSP = m_pDayTwoSP->SetPos_tstat6_2pos(nCoolSP,nSP,nHeatSP);
 			//0910
             if(!Default){
+				nRangeMax=50;
+				nRangeMin=0;
+				m_pDayTwoSP->SetRange(nRangeMax, nRangeMin);
             nHeatSP=20;
             nSP=25;
             nCoolSP=30;
@@ -5117,14 +5222,39 @@ void CT3000View::InitFlexSliderBars_tstat6()
 
 			m_pDaySingleSP->ShowWindow(SW_HIDE);
 
-			strTemp.Format(_T("%0.1f"),((float)product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10.0) );
+			if (g_unint)
+			{
+			strTemp.Format(_T("%0.1f C"),((float)product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10.0) );
+			}
+			else
+			{
+			strTemp.Format(_T("%0.1f F"),((float)product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10.0) );
+			}
+			
 			m_DayCoolEdit.FieldText(strTemp);
 			//m_DayCoolEdit.SetNumberDefaultTex();
-			strTemp.Format(_T("%0.1f"),((float)product_register_value[MODBUS_DAY_HEATING_SETPOINT]/10.0));
+		   if (g_unint)
+		   {
+		   strTemp.Format(_T("%0.1f C"),((float)product_register_value[MODBUS_DAY_HEATING_SETPOINT]/10.0));
+		   } 
+		   else
+		   {
+		   strTemp.Format(_T("%0.1f F"),((float)product_register_value[MODBUS_DAY_HEATING_SETPOINT]/10.0));
+		   }
+
+			
 			m_DayHeatEdit.FieldText(strTemp);
 			//m_DayHeatEdit.SetNumberDefaultTex();
 			m_daysetpoint = nSP;
-			strTemp.Format(_T("%0.1f"),((float)product_register_value[MODBUS_DAY_SETPOINT]/10.0));
+			if (g_unint)
+			{
+			strTemp.Format(_T("%0.1f C"),((float)product_register_value[MODBUS_DAY_SETPOINT]/10.0));
+			} 
+			else
+			{
+			strTemp.Format(_T("%0.1f F"),((float)product_register_value[MODBUS_DAY_SETPOINT]/10.0));
+			}
+			
 			m_dayInfoEdit.FieldText(strTemp);
 
 			UpdateData(FALSE);
@@ -5217,6 +5347,9 @@ void CT3000View::InitFlexSliderBars_tstat6()
  			//BOOL bRetSP = m_pDaySingleSP->SetPos_tstat6_3pos(nCoolSP, nSP, nHeatSP);//tstat6		
 			//0910
             if(!Default){
+				nRangeMax=50;
+				nRangeMin=0;
+				m_pDaySingleSP->SetRange(nRangeMax, nRangeMin);
                 nHeatSP=20;
                 nSP=25;
                 nCoolSP=30;
@@ -5322,6 +5455,8 @@ void CT3000View::InitFlexSliderBars_tstat6()
 // 			nSP = newtstat6[NightSP];
 // 			nCoolSP = newtstat6[NcoolSP];
 // 			nHeatSP = newtstat6[NheatSP];
+			  nRangeMin	=product_register_value[MODBUS_MIN_SETPOINT];
+			  nRangeMax	=product_register_value[MODBUS_MAX_SETPOINT];
 
              BOOL Default=TRUE;
 
@@ -5376,7 +5511,12 @@ void CT3000View::InitFlexSliderBars_tstat6()
  
  			//BOOL bRetSP = m_pNightTwoSP->SetPos_tstat6_2pos(nCoolSP , nSP,nHeatSP);
 			//0910
-            if(!Default){
+            if(Default){
+				 
+					nRangeMax=50;
+					nRangeMin=0;
+				 m_pNightTwoSP->SetRange(nRangeMax, nRangeMin);
+
                 nHeatSP=20;
                 nSP=25;
                 nCoolSP=30;
@@ -5396,7 +5536,15 @@ void CT3000View::InitFlexSliderBars_tstat6()
 
  			m_nightpot = nSP;
  			//UpdateData(FALSE);
-			strTemp.Format(_T("%0.1f"),(float)nSP);
+			if (g_unint)
+			{
+			strTemp.Format(_T("%0.1f C"),(float)nSP);
+			} 
+			else
+			{
+			strTemp.Format(_T("%0.1f F"),(float)nSP);
+			}
+			
             m_nightpotEdit.FieldText(strTemp);
 //  			strTemp.Format(_T("%d"),nHeatSP);
 //  			m_nightInfoEdit.FieldText(strTemp);
@@ -5404,10 +5552,25 @@ void CT3000View::InitFlexSliderBars_tstat6()
 //  			m_nightHeatInfoEdit.FieldText(strTemp);
 
 //0910
-			strTemp.Format(_T("%0.1f"),(float)nCoolSP);
+            if (g_unint)
+            {
+			strTemp.Format(_T("%0.1f C"),(float)nCoolSP);
+            } 
+            else
+            {
+			strTemp.Format(_T("%0.1f F"),(float)nCoolSP);
+			}
 			m_nightInfoEdit.FieldText(strTemp);
 			//m_nightInfoEdit.SetNumberDefaultTex();
-			strTemp.Format(_T("%0.1f"),(float)nHeatSP);
+			if (g_unint)
+			{
+			strTemp.Format(_T("%0.1f C"),(float)nHeatSP);
+			} 
+			else
+			{
+			strTemp.Format(_T("%0.1f F"),(float)nHeatSP);
+			}
+			
 			m_nightHeatInfoEdit.FieldText(strTemp);
 //0903
 // 			m_NightCoolStatic.SetWindowText(_T("Heating DB"));
@@ -5640,7 +5803,10 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			//	BOOL bRetSP =  m_pNightSingleSP->SetPos( nHeatSP, nSP, nCoolSP);
 			//BOOL bRetSP = m_pNightSingleSP->SetPos_tstat6_3pos(nCoolSP, nSP,nHeatSP);
 			//0910
-            if(!Default){
+            if(Default){
+				nRangeMax=50;
+				nRangeMin=0;
+				m_pNightSingleSP->SetRange(nRangeMax, nRangeMin);
                 nHeatSP=20;
                 nSP=25;
                 nCoolSP=30;
@@ -5683,7 +5849,15 @@ void CT3000View::InitFlexSliderBars_tstat6()
 
 
  			m_nightpot = nSP;
-			strTemp.Format(_T("%0.1f"),(float)nSP);
+			if (g_unint)
+			{
+			strTemp.Format(_T("%0.1f C"),(float)nSP);
+			} 
+			else
+			{
+			strTemp.Format(_T("%0.1f F"),(float)nSP);
+			}
+			
 			m_nightpotEdit.FieldText(strTemp);
  
 //  			strTemp.Format(_T("%d"), nHeatSP);
@@ -5692,10 +5866,26 @@ void CT3000View::InitFlexSliderBars_tstat6()
 //  			m_nightHeatInfoEdit.FieldText(strTemp);
 
 //0910
-			strTemp.Format(_T("%0.1f"),(float)nCoolSP);
+            if (g_unint)
+            {
+			strTemp.Format(_T("%0.1f C"),(float)nCoolSP);
+            } 
+            else
+            {
+			strTemp.Format(_T("%0.1f F"),(float)nCoolSP);
+            }
+			
 			m_nightInfoEdit.FieldText(strTemp);
 			//m_nightInfoEdit.SetNumberDefaultTex();
-			strTemp.Format(_T("%0.1f"),(float)nHeatSP);
+			if (g_unint)
+			{
+			strTemp.Format(_T("%0.1f C"),(float)nHeatSP);
+			} 
+			else
+			{
+			strTemp.Format(_T("%0.1f F"),(float)nHeatSP);
+			}
+			
 			m_nightHeatInfoEdit.FieldText(strTemp);
 
 
@@ -5750,11 +5940,6 @@ void CT3000View::OnNMReleasedcaptureTempretureSlider(NMHDR *pNMHDR, LRESULT *pRe
 void CT3000View::OnEnKillfocusDayEdit()
 {
 #if 1//0907
-	//345	1	Low byte	W/R	(Day)Occupied   setpoint 
-
-// 	UpdateData();
-// 	tstat6flex[0] = m_daysetpoint;
-
 BeginWaitCursor();
 	UpdateData();
 	CString str,str2;
@@ -5794,8 +5979,7 @@ EndWaitCursor();
 
 void CT3000View::OnEnKillfocusEditCurSp()
 {
-	// TODO: Add your control notification handler code here
-
+// TODO: Add your control notification handler code here
 #if 1//0907
 
 BeginWaitCursor();

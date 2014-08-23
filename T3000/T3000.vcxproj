@@ -110,7 +110,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -154,7 +154,9 @@
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
+    <ClCompile Include="CalibartionHT.cpp" />
     <ClCompile Include="CalibrationDlg.cpp" />
+    <ClCompile Include="CalibrationHumDlg.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
     <ClCompile Include="Class\md5.cpp" />
     <ClCompile Include="Class\MulitithreadSocket.cpp" />
@@ -375,7 +377,9 @@
     <ClInclude Include="BacnetVariable.h" />
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
+    <ClInclude Include="CalibartionHT.h" />
     <ClInclude Include="CalibrationDlg.h" />
+    <ClInclude Include="CalibrationHumDlg.h" />
     <ClInclude Include="Class\md5.h" />
     <ClInclude Include="CM5\ListCtrlCellEx.h" />
     <ClInclude Include="CM5\ListCtrlEx.h" />

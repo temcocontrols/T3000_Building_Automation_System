@@ -32,4 +32,5 @@ public:
     afx_msg void OnBnClickedRt();
     afx_msg void OnBnClickedCancel();
     CMainFrame *pMain;
+	afx_msg void OnBnClickedOk();
 };
