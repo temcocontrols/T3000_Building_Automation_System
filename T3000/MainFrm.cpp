@@ -291,6 +291,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 
 
 	ON_COMMAND(ID_HELP_FEEDBACKTOTEMCO, &CMainFrame::OnHelpFeedbacktotemco)
+	ON_COMMAND(ID_CALIBRATION_CALIBRATIONHUMTEMP, &CMainFrame::OnCalibrationCalibrationhumtemp)
 	END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -10384,4 +10385,9 @@ void CMainFrame::OnHelpFeedbacktotemco()
 	}
 }
 
-
+#include "CalibrationHumDlg.h"
+void CMainFrame::OnCalibrationCalibrationhumtemp()
+{
+	 CCalibrationHumDlg dlg;
+	 dlg.DoModal();
+}

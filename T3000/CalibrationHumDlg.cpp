@@ -69,16 +69,18 @@ m_humid=255;
 pMain->m_pFreshMultiRegisters->SuspendThread();
 pMain->m_pRefreshThread->SuspendThread();//
 pMain->m_pFreshTree->SuspendThread();
-SetTimer(CALIBRATION_HUM,1000,NULL);
+SetTimer(CALIBRATION_HUM,4000,NULL);
 
 return TRUE;
 }
 
 void CCalibrationHumDlg::OnTimer(UINT_PTR nIDEvent){
 if (CALIBRATION_HUM==nIDEvent)
-{  if (!is_connect())
-    Sleep(1000);
-    return;
+{  if (!is_connect()){
+	Sleep(2000);
+	AfxMessageBox(_T("Please open com port!"));
+	return;
+}
 	Sleep(50);
    int hum=read_one(m_humid,373);
     if (hum>0)
@@ -95,22 +97,6 @@ if (CALIBRATION_HUM==nIDEvent)
 }
 
 }
-
-//void CCalibrationHumDlg::OnEnKillfocusHum()
-//{
-//	 
-//	 
-//	 
-//}
-
-
-//void CCalibrationHumDlg::OnEnKillfocusTemp()
-//{
-//	
-//	
-//}
-
-
 void CCalibrationHumDlg::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
@@ -121,23 +107,9 @@ void CCalibrationHumDlg::OnBnClickedCancel()
 	CDialogEx::OnCancel();
 }
 
-
-//void CCalibrationHumDlg::OnEnSetfocusHum()
-//{
-//	// TODO: Add your control notification handler code here
-//
-//}
-
-
-//void CCalibrationHumDlg::OnEnSetfocusTemp()
-//{
-//	// TODO: Add your control notification handler code here
-//	
-//}
-
-
 void CCalibrationHumDlg::OnEnKillfocusHumEd()
-{	KillTimer(MiniPanelTimer);
+{	
+KillTimer(MiniPanelTimer);
 CString temphum;
 GetDlgItem(IDC_HUM_ED)->GetWindowText(temphum);
  

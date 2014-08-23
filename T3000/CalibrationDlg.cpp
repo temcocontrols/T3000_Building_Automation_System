@@ -37,6 +37,7 @@ BEGIN_MESSAGE_MAP(CCalibrationDlg, CDialogEx)
     ON_BN_CLICKED(IDC_INSERT, &CCalibrationDlg::OnBnClickedInsert)
     ON_BN_CLICKED(IDC_RT, &CCalibrationDlg::OnBnClickedRt)
     ON_BN_CLICKED(IDCANCEL, &CCalibrationDlg::OnBnClickedCancel)
+	ON_BN_CLICKED(IDOK, &CCalibrationDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 BOOL CCalibrationDlg::OnInitDialog(){
 CDialogEx::OnInitDialog();
@@ -135,4 +136,11 @@ void CCalibrationDlg::OnBnClickedCancel()
     pMain->m_pRefreshThread->ResumeThread();//
     pMain->m_pFreshTree->ResumeThread();
     CDialogEx::OnCancel();
+}
+
+
+void CCalibrationDlg::OnBnClickedOk()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnOK();
 }

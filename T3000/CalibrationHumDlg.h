@@ -33,3 +33,5 @@ public:
 	afx_msg void OnEnKillfocusHumEd();
 	afx_msg void OnEnKillfocusTempEd();
 };
+ 
+ 
