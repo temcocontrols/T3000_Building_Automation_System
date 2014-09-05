@@ -225,6 +225,7 @@
 #define IDD_DIALOG_BACNET_ADD_DEVICE    516
 #define IDR_T3000_DB3                   517
 #define IDR_T3000_DB2                   517
+
 #define IDD_DIALOG_BACNET_SCREENS_EDIT  582
 #define IDD_DIALOG_BACNET_TOOL          583
 #define IDB_BITMAP_TMCO_LOGO            584
@@ -1578,6 +1579,8 @@
 #define IDC_EDIT_PID2OFFSETPOINT5       2005
 #define IDC_MAX_SUPPLY                  2006
 #define IDC_MIN_SUPPLY                  2007
+#define IDD_DIALOG_TH_CALIBAETION       2008
+#define IDD_CALIBRATION_HUM             2009
 #define IDC_HELP_HELP1                  3831
 #define IDC_IPADDRESS_ADD_BAC_NOTE      5832
 #define IDC_LIST_DOWNLOAD_INFO          5833
@@ -1816,6 +1819,7 @@
 #define ID_TIMEBASE_4DAYS               34024
 #define ID_HELP_CONTACTSCREDITS         34024
 #define ID_EXIT34025                    34025
+#define ID_CALIBRATION_CALIBRATIONHUMTEMP 34025
 #define ID_GRAPHIC_EXIT                 34026
 #define ID_                             34027
 #define ID_34028                        34028

@@ -17,7 +17,7 @@
 #include "iniFile.h"
 #include "afxinet.h"
 #include "T3000DefaultView.h"
-const int g_versionNO=20140818;
+const int g_versionNO=20140820;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -199,7 +199,8 @@ BOOL CT3000App::JudgeDB(){
 		 }
  		  temp_var=srcRsTemp->GetCollect(_T("Com_Port"));
 		 if (temp_var.vt!=VT_NULL)
-		 { temp.Com_Port=temp_var;
+		 { 
+		 temp.Com_Port=temp_var;
 		 }
 		 else
 		 {
@@ -622,8 +623,9 @@ BOOL CT3000App::InitInstance()
 	
 
   	((CMainFrame*)m_pMainWnd)->InitViews();//
-
-   	m_pMainWnd->SetWindowText(_T("T3000 Building Automation System"));//
+    CString strTile;
+    strTile.Format(_T("T3000 Building Automation System Rev2014.8.20"));
+   	m_pMainWnd->SetWindowText(strTile);//
   	m_pMainWnd->ShowWindow(SW_SHOW);
   	m_pMainWnd->UpdateWindow();
     //m_pMainWnd->SwitchToPruductType(18);  

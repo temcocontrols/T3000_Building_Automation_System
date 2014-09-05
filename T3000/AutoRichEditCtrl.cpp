@@ -412,19 +412,29 @@ void CAutoRichEditCtrl::SetNumberDefaultTex()
 	int len=floatstrnumber.GetLength();
 	if (index!=-1)
 	{
-		SetSel(0,index);
-		CHARFORMAT cf = GetCharFormat();
-		nPointSize *= 20;	// convert from to twips
-		cf.yHeight = nPointSize;
-		cf.dwMask = CFM_SIZE;
-		SetSelectionCharFormat(cf);
-		SetSel(index,len);
-		cf = GetCharFormat();
-		nPointSize=size-3;
-		nPointSize*=20;	// convert from to twips
-		cf.yHeight = nPointSize;
-		cf.dwMask = CFM_SIZE;
-		SetSelectionCharFormat(cf);
+ 		SetSel(0,len);
+ 		CHARFORMAT cf = GetCharFormat();
+ 		nPointSize *= 20;	// convert from to twips
+ 		cf.yHeight = nPointSize;
+ 		cf.dwMask = CFM_SIZE;
+ 		SetSelectionCharFormat(cf);
+
+ 		SetSel(index,len);
+ 		cf = GetCharFormat();
+ 		nPointSize=size-4;
+ 		nPointSize*=20;	// convert from to twips
+ 		cf.yHeight = nPointSize;
+ 		cf.dwMask = CFM_SIZE;
+ 		SetSelectionCharFormat(cf);
+
+
+  		SetSel(index+2,len);
+  		 cf = GetCharFormat();
+		 nPointSize=size;
+  		nPointSize *= 20;	// convert from to twips
+  		cf.yHeight = nPointSize;
+  		cf.dwMask = CFM_SIZE;
+  		SetSelectionCharFormat(cf);
 	}
 	else
 	{

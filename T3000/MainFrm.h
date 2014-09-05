@@ -408,7 +408,7 @@ public:
 	afx_msg void OnHelpUpdatefirmware();
 	afx_msg void OnUpdateStatusBar(CCmdUI *pCmdUI);
 	afx_msg void OnHelpFeedbacktotemco();
-//	virtual BOOL OnCloseMiniFrame(CPaneFrameWnd* pWnd);
+	afx_msg void OnCalibrationCalibrationhumtemp();
 };
 
 const int DLG_T3000_VIEW = 0;
