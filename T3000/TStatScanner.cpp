@@ -2034,7 +2034,8 @@ int CTStatScanner::GetAllNodeFromDataBase()
 			strSerialID=temp_variant;
 		else
 			strSerialID=_T("");
-		(pNode)->SetSerialID(_wtoi(strSerialID));
+		unsigned int temp_serial = _wtoi64(strSerialID);
+		(pNode)->SetSerialID(temp_serial);
 
 		m_pRs->MoveNext();
 	}
@@ -2183,7 +2184,7 @@ void CTStatScanner::FindNetConflict()
 	for (UINT i = 0; i < m_szNCScanRet.size(); i++)
 	{
 		_NetDeviceInfo* pInfo = m_szNCScanRet[i];
-		int nScanID = pInfo->m_pNet->GetSerialID();
+		unsigned int nScanID = pInfo->m_pNet->GetSerialID();
 		DWORD dwScanIP = pInfo->m_pNet->GetIPAddr();
 		float hw_version = pInfo->m_pNet->GetHardwareVersion();
 		float sw_version = pInfo->m_pNet->GetSoftwareVersion();
@@ -2194,7 +2195,7 @@ void CTStatScanner::FindNetConflict()
 
 		for (UINT j = 0; j < m_szNetNodes.size(); j++)
 		{
-			int nSID = m_szNetNodes[j]->GetSerialID();
+			unsigned int nSID = m_szNetNodes[j]->GetSerialID();
 			DWORD dwIP = m_szNetNodes[j]->GetIPAddr();
 			float db_hw_version = m_szNetNodes[j]->GetHardwareVersion();
 			float db_sw_version = m_szNetNodes[j]->GetSoftwareVersion();
@@ -2333,14 +2334,14 @@ void  CTStatScanner::ResolveNetConflict()
 				//strID.Format(_T("%d"),m_binary_search_product_background_thread.at(j).id);
 				strID.Format(_T("%d"),dwScanIP);
 				//strSerial.Format(_T("%d"),m_binary_search_product_background_thread.at(j).serialnumber);
-				strSerial.Format(_T("%d"),dwSID);
+				strSerial.Format(_T("%u"),dwSID);
 
 
 				CString str_baudrate;
 				CString hw_instance;
 				CString sw_panelnamber;
-				hw_instance.Format(_T("%d"),(unsigned int)pInfo->m_pNet->GetHardwareVersion());
-				sw_panelnamber.Format(_T("%d"),(unsigned int)pInfo->m_pNet->GetSoftwareVersion());
+				hw_instance.Format(_T("%u"),(unsigned int)pInfo->m_pNet->GetHardwareVersion());
+				sw_panelnamber.Format(_T("%u"),(unsigned int)pInfo->m_pNet->GetSoftwareVersion());
 				str_IPaddr = pInfo->m_pNet->GetIPAddrStr();
 				str_baudrate =pInfo->m_pNet->GetIPAddrStr();
 				//str_port = pInfo->m_pNet->GetIPPort();
@@ -2461,20 +2462,20 @@ void CTStatScanner::AddNewNetToDB()
 		pInfo->m_pNet->SetFloorName(m_strFloorName);
 		pInfo->m_pNet->SetRoomName(m_strRoomName);
 
-		int nSID = pInfo->m_pNet->GetSerialID();
+		unsigned int nSID = pInfo->m_pNet->GetSerialID();
 		int nSProtocol = pInfo->m_pNet->GetProtocol();
 		if((nSProtocol <0) || (nSProtocol >3))
 			nSProtocol = MODBUS_TCPIP;//default it will be modbus protocol;
 		for (UINT j = 0; j < m_szNetNodes.size(); j++)
 		{
-			int nNodeSID = m_szNetNodes[j]->GetSerialID();
+			unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
 			//Comment by Fance
 			//if the scan device is CM5 or minipanel, this products has 3 protocol, BacnetIP modbus485 modbus tcp;
 			//So when scan bacnet ip and midbus tcp ,the or replay to t3000,
 			//So I display the device in two format,judge to 2 decvice;
 			if((pInfo->m_pNet->GetProductType() == PM_CM5) || (pInfo->m_pNet->GetProductType() == PM_MINIPANEL))
 			{
-				int nNodeSID = m_szNetNodes[j]->GetSerialID();
+				unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
 				int nNodeProtocol = m_szNetNodes[j]->GetProtocol();
 				if (nSID == nNodeSID)
 				{
@@ -2487,7 +2488,7 @@ void CTStatScanner::AddNewNetToDB()
 					{
 						CString strSql;
 						CString strText;
-						strText.Format(_T("%d"),nNodeSID);
+						strText.Format(_T("%u"),nNodeSID);
 						strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"),strText);
 						CString strTemp;
 						strTemp.Format(_T("Are you sure to delete thise item"));
@@ -2504,6 +2505,8 @@ void CTStatScanner::AddNewNetToDB()
 								AfxMessageBox(e->ErrorMessage());
 							}
 						//}
+							bIsNew = TRUE;
+							break;
 					}
 				}
 			}
@@ -3985,6 +3988,7 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 			Sleep(500);
 		}
 
+		//Get bacnet device serial information.获取 bacnet 的设备信息;
 		for (int j=0;j<5;j++)
 		{
 			int ready_to_read_count =	m_bac_scan_com_data.size();

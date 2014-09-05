@@ -223,9 +223,9 @@
 #define IDB_BITMAP5                     514
 #define IDD_DIALOG_FEEDBACK             515
 #define IDD_DIALOG_BACNET_ADD_DEVICE    516
-#define IDR_T3000_DB3                   517
-#define IDR_T3000_DB2                   517
 
+#define IDR_T3000_DB2                   518
+#define IDD_DIALOG_BACNET_CUSTOMER_RANGE 519
 #define IDD_DIALOG_BACNET_SCREENS_EDIT  582
 #define IDD_DIALOG_BACNET_TOOL          583
 #define IDB_BITMAP_TMCO_LOGO            584
@@ -1573,6 +1573,8 @@
 #define IDC_BUTTON_SETTING_ADD_OK       1864
 #define IDC_BUTTON_SETTING_ADD_CANCEL   1865
 #define IDC_BACNET_SETTING_CLEAR_BTN    1866
+#define IDC_LIST_CUSTOMER_DIGITAL_RANGE 1875
+#define IDC_STATIC_CUSTOMER_GROUP       1876
 #define IDC_EDIT_PID2OFFSETPOINT2       2002
 #define IDC_EDIT_PID2OFFSETPOINT4       2003
 #define IDC_EDIT_PID2OFFSETPOINT3       2004
@@ -1687,6 +1689,14 @@
 #define IDC_RADIO70                     15563
 #define IDC_RADIO71                     15564
 #define IDC_RADIO72                     15565
+#define IDC_RADIO73                     15566
+#define IDC_RADIO74                     15567
+#define IDC_RADIO75                     15568
+#define IDC_RADIO76                     15569
+#define IDC_RADIO77                     15570
+#define IDC_RADIO78                     15571
+#define IDC_RADIO79                     15572
+#define IDC_RADIO80                     15573
 #define ID_TIMEBASE_1HOUR               19485
 #define ID_BUTTON32774                  32774
 #define ID_FILE_SAVE_CONFIG             32775
@@ -1819,7 +1829,8 @@
 #define ID_TIMEBASE_4DAYS               34024
 #define ID_HELP_CONTACTSCREDITS         34024
 #define ID_EXIT34025                    34025
-#define ID_CALIBRATION_CALIBRATIONHUMTEMP 34025
+#define ID_CONTROL_CUSTOMERUNITS        34025
+#define ID_CALIBRATION_CALIBRATIONHUMTEMP 34026
 #define ID_GRAPHIC_EXIT                 34026
 #define ID_                             34027
 #define ID_34028                        34028
@@ -1846,9 +1857,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        518
-#define _APS_NEXT_COMMAND_VALUE         34025
-#define _APS_NEXT_CONTROL_VALUE         1867
+#define _APS_NEXT_RESOURCE_VALUE        520
+#define _APS_NEXT_COMMAND_VALUE         34026
+#define _APS_NEXT_CONTROL_VALUE         1877
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

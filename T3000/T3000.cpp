@@ -624,7 +624,7 @@ BOOL CT3000App::InitInstance()
 
   	((CMainFrame*)m_pMainWnd)->InitViews();//
     CString strTile;
-    strTile.Format(_T("T3000 Building Automation System Rev2014.8.20"));
+    strTile.Format(_T("T3000 Building Automation System Rev2014.9.05"));
    	m_pMainWnd->SetWindowText(strTile);//
   	m_pMainWnd->ShowWindow(SW_SHOW);
   	m_pMainWnd->UpdateWindow();

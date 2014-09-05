@@ -93,13 +93,13 @@ CString CTStatBase::GetRoomName()const
 	return m_strRoomName;
 }
 
-void CTStatBase::SetSerialID(DWORD dwSerialID)
+void CTStatBase::SetSerialID(unsigned int dwSerialID)
 {
 	m_dwSerialID = dwSerialID;
 }
 
 
-DWORD  CTStatBase::GetSerialID()const
+unsigned int  CTStatBase::GetSerialID()const
 {
 	return m_dwSerialID;
 }

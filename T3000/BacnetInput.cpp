@@ -423,7 +423,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		m_input_list.Get_Selected_Item(temp_select_raw,temp_select_col);
 		m_input_list.SetItemBkColor(temp_select_raw,temp_select_col,LIST_ITEM_SELECTED,0);
 	}
-
+	CString temp1;
 	//m_input_list.DeleteAllItems();
 	for (int i=0;i<(int)m_Input_data.size();i++)
 	{
@@ -494,32 +494,39 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		{
 
 			m_input_list.SetItemText(i,INPUT_CAL,_T(""));
-#if 0
-			if(m_Input_data.at(i).range>=12)
-				m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[m_Input_data.at(i).range -11]);
-			else
-				m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[m_Input_data.at(i).range]);
-#endif
+
 			if(m_Input_data.at(i).range<=22)
 				m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[m_Input_data.at(i).range]);
+			else if((m_Input_data.at(i).range >= 23) && (m_Input_data.at(i).range <= 30))
+			{
+				if(receive_customer_unit)
+				   m_input_list.SetItemText(i,INPUT_RANGE,temp_unit_no_index[m_Input_data.at(i).range - 23]);
+				else
+					m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[0]);
+			}
 			else
 				m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[0]);
 			m_input_list.SetItemText(i,INPUT_UNITE,_T(""));
 
-			if((m_Input_data.at(i).range>22) || (m_Input_data.at(i).range == 0))
+			if((m_Input_data.at(i).range>30))
 			{
-				m_input_list.SetItemText(i,INPUT_UNITE,Digital_Units_Array[0]);
+				//m_input_list.SetItemText(i,INPUT_UNITE,Digital_Units_Array[0]);
 			}
 			else
 			{
-				CString temp1;
+				
 				CStringArray temparray;
-#if 0
-				if(m_Input_data.at(i).range>=12)
-					temp1 = Digital_Units_Array[m_Input_data.at(i).range - 11];//11 is the sizeof the array
-				else
-#endif
+
+				if((m_Input_data.at(i).range < 23) &&(m_Input_data.at(i).range !=0))
 					temp1 = Digital_Units_Array[m_Input_data.at(i).range];
+				else if((m_Input_data.at(i).range >=23) && (m_Input_data.at(i).range <= 30))
+				{
+					if(receive_customer_unit)
+						temp1 = temp_unit_no_index[m_Input_data.at(i).range - 23];
+				}
+
+
+				//temp1 = Digital_Units_Array[m_Input_data.at(i).range];
 				SplitCStringA(temparray,temp1,_T("/"));
 				if((temparray.GetSize()==2))
 				{
@@ -662,7 +669,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO: Add your control notification handler code here
-
+	CString temp_cstring;
 	long lRow,lCol;
 	m_input_list.Set_Edit(true);
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
@@ -699,6 +706,16 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 		if((m_Input_data.at(lRow).range < 23) &&(m_Input_data.at(lRow).range !=0))
 			temp1 = Digital_Units_Array[m_Input_data.at(lRow).range];
+		else if((m_Input_data.at(lRow).range >=23) && (m_Input_data.at(lRow).range <= 30))
+		{
+			if(receive_customer_unit)
+				temp1 = temp_unit_no_index[m_Input_data.at(lRow).range - 23];
+			else
+			{
+				m_input_list.Set_Edit(false);
+				return;
+			}
+		}
 		else
 			return;
 		SplitCStringA(temparray,temp1,_T("/"));
@@ -794,6 +811,34 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 		//CString temp_cs = m_input_list.GetItemText(Changed_Item,Changed_SubItem);
 		BacnetRange dlg;
+
+		if(!read_customer_unit)
+		{
+			for (int i=0;i<BAC_CUSTOMER_UNIT_GROUP;i++)
+			{
+				int	resend_count = 0;
+				do 
+				{
+					resend_count ++;
+					if(resend_count>50)
+						break;
+					g_invoke_id = GetPrivateData(
+						g_bac_instance,
+						READUNIT_T3000,
+						0 + i*4 ,
+						3 + i*4 ,
+						sizeof(Str_Units_element));		
+
+					Sleep(SEND_COMMAND_DELAY_TIME);
+				} while (g_invoke_id<0);
+			}
+			read_customer_unit = true;
+			Sleep(1000);
+		}
+
+	
+
+
 		//if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_ANALOG])==0)
 		//{
 			bac_range_number_choose = m_Input_data.at(lRow).range;
@@ -835,9 +880,16 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				m_input_list.SetItemText(lRow,INPUT_UNITE,_T(""));
 				m_input_list.SetCellEnabled(lRow,INPUT_UNITE,0);
 
-				CString temp1;
+				
+
 				CStringArray temparray;
-				temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
+				if((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
+				{
+					//temp1.Format(_T("%s"), temp_unit_no_index[bac_range_number_choose - 23]);
+					temp1 = temp_unit_no_index[bac_range_number_choose - 23];
+				}
+				else
+					temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
 				SplitCStringA(temparray,temp1,_T("/"));
 
 				if(m_Input_data.at(lRow).control == 1)

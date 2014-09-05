@@ -30,9 +30,11 @@
 
 /* declare a single physical layer using your compiler define.
    see datalink.h for possible defines. */
-#if !(defined(BACDL_ETHERNET) || defined(BACDL_ARCNET) || defined(BACDL_MSTP) || defined(BACDL_BIP) || defined(BACDL_TEST) || defined(BACDL_ALL))
+//#if !(defined(BACDL_ETHERNET) || defined(BACDL_ARCNET) || defined(BACDL_MSTP) || defined(BACDL_BIP) || defined(BACDL_TEST) || defined(BACDL_ALL))
+#define BACDL_ALL 	 // choose protocal   added by chelsea
 #define BACDL_BIP
-#endif
+#define BACDL_MSTP
+//#endif
 
 /* optional configuration for BACnet/IP datalink layers */
 #if (defined(BACDL_BIP) || defined(BACDL_ALL))
