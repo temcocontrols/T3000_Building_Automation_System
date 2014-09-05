@@ -1175,6 +1175,9 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case WRITEPROGRAM_T3000:
 		entitysize = sizeof(Str_variable_point);
 		break;
+	case WRITEUNIT_T3000:
+		entitysize = sizeof(Str_Units_element);
+		break;
 	case WRITEPROGRAMCODE_T3000:
 		entitysize = program_code_length[start_instance];
 		
@@ -1260,6 +1263,12 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 			memcpy_s(SendBuffer + i*sizeof(Str_program_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_program_point),&m_Program_data.at(i + start_instance),sizeof(Str_program_point));
 		}
 
+		break;
+	case  WRITEUNIT_T3000:
+		for (int i=0;i<(end_instance-start_instance + 1);i++)
+		{
+			memcpy_s(SendBuffer + i*sizeof(Str_Units_element) + PRIVATE_HEAD_LENGTH,sizeof(Str_Units_element),&m_customer_unit_data.at(i + start_instance),sizeof(Str_Units_element));
+		}
 		break;
 	case WRITEPROGRAMCODE_T3000:
  		//memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,entitysize,mycode,my_lengthcode);
@@ -2412,6 +2421,52 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 
 		}
 		break;
+	case READUNIT_T3000:
+		{
+			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_Units_element))!=0)
+				return -1;	//得到的结构长度错误;
+			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_Units_element);
+			my_temp_point = (char *)Temp_CS.value + 3;
+			start_instance = *my_temp_point;
+			my_temp_point++;
+			end_instance = *my_temp_point;
+			my_temp_point++;
+			my_temp_point = my_temp_point + 2;
+
+			if(start_instance >= BAC_CUSTOMER_UNITS_COUNT)
+				return -1;//超过长度了;
+			if(end_instance == (BAC_CUSTOMER_UNITS_COUNT - 1))
+			{
+				end_flag = true;
+				receive_customer_unit = true;
+			}
+			for (i=start_instance;i<=end_instance;i++)
+			{
+				m_customer_unit_data.at(i).direct = *(my_temp_point++);
+				memcpy_s(m_customer_unit_data.at(i).digital_units_off,12,my_temp_point,12);
+				my_temp_point = my_temp_point + 12;
+				memcpy_s(m_customer_unit_data.at(i).digital_units_on,12,my_temp_point,12);
+				my_temp_point = my_temp_point + 12;
+
+
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_off, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_off)+1, 
+					temp_off[i].GetBuffer(MAX_PATH), MAX_PATH );
+				temp_off[i].ReleaseBuffer();
+				if(temp_off[i].GetLength() >= 12)
+					temp_off[i].Empty();
+
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_on, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_on)+1, 
+					temp_on[i].GetBuffer(MAX_PATH), MAX_PATH );
+				temp_on[i].ReleaseBuffer();
+				if(temp_on[i].GetLength() >= 12)
+					temp_on[i].Empty();
+
+				temp_unit_no_index[i] = temp_off[i] + _T("/") + temp_on[i];
+
+			}
+
+		}
+		break;
 	}
 	return 1;
 }
@@ -3259,6 +3314,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 	return;
 
 }
+
 SOCKET my_sokect;
 extern void  init_info_table( void );
 extern void Init_table_bank();
@@ -3391,7 +3447,7 @@ void Initial_bac(int comport)
 		Init_table_bank();
 	}
 }
-
+//#include "datalink.h"
 DWORD WINAPI   MSTP_Receive(LPVOID lpVoid)
 {
 	BACNET_ADDRESS src = {0};
@@ -3401,7 +3457,9 @@ DWORD WINAPI   MSTP_Receive(LPVOID lpVoid)
 	//while(mparent->m_MSTP_THREAD)
 	while(1)
 	{
-		pdu_len =  bip_receive(&src,&Rx_Buf[0],MAX_MPDU, INFINITE);
+		//datalink_set("bip");
+		pdu_len = datalink_receive(&src,&Rx_Buf[0],MAX_MPDU,INFINITE,PROTOCOL_BACNET_IP);
+	//	pdu_len =  bip_receive(&src,&Rx_Buf[0],MAX_MPDU, INFINITE);
 		//pdu_len = dlmstp_receive(&src, &Rx_Buf[0], MAX_MPDU, INFINITE);
 		if(pdu_len==0)
 			continue;

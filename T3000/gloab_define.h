@@ -179,6 +179,7 @@ const int TYPE_ALARMLOG = 14;
 const int TYPE_TSTAT = 15;
 const int TYPE_SETTING = 16;
 const int TYPE_READ_MONITOR_DATA = 17;
+const int TYPE_READ_CUSTOMER_UNIT = 18;
 
 
 
@@ -207,6 +208,7 @@ const int BAC_READ_ALARMLOG_LIST = 14;
 const int BAC_READ_TSTAT_LIST = 15;
 const int BAC_READ_BASIC_SETTING_COMMAND = 16;
 const int BAC_READ_MONITOR_DATA = 17;
+const int BAC_READ_CUSTOMER_UNITS = 18;
 
 
 
@@ -256,6 +258,7 @@ const int BAC_ANNUAL_CODE_COUNT = 8;
 const int BAC_CONNECT_WITH_DEVICE_COUNT = 1;
 const int BAC_ALARMLOG_COUNT = 16;
 const int BAC_TSTAT_COUNT = 32;
+const int BAC_CUSTOMER_UNITS_COUNT = 8;
 
 
 
@@ -276,6 +279,7 @@ const int BAC_MONITOR_GROUP = BAC_MONITOR_COUNT / BAC_READ_GROUP_NUMBER;
 const int BAC_CONNECT_WITH_DEVICE_GROUP = 1;
 const int BAC_ALARMLOG_GROUP = BAC_ALARMLOG_COUNT;
 const int BAC_TSTAT_GROUP = BAC_TSTAT_COUNT / BAC_READ_GROUP_NUMBER;
+const int BAC_CUSTOMER_UNIT_GROUP = BAC_CUSTOMER_UNITS_COUNT / BAC_READ_GROUP_NUMBER;
 
 
 
@@ -373,6 +377,7 @@ struct _Refresh_Info
 	_Resend_Read_Info Read_AlarmLog_Info[BAC_ALARMLOG_GROUP];
 	_Resend_Read_Info Read_Tstat_Info[BAC_TSTAT_GROUP];
 	_Resend_Read_Info Read_BasicSetting_Info[BAC_BASIC_SETTING_GROUP];
+	_Resend_Read_Info Read_Customer_unit_Info[BAC_CUSTOMER_UNIT_GROUP];
 };
 
 struct _Refresh_Write_Info 

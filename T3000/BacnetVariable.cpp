@@ -226,7 +226,7 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		{
 			
 
-			if((m_Variable_data.at(i).range>22) || (m_Variable_data.at(i).range == 0))
+			if(m_Variable_data.at(i).range>30)
 			{
 				//m_variable_list.SetItemText(i,VARIABLE_UNITE,Digital_Units_Array[0]);
 				m_variable_list.SetItemText(i,VARIABLE_UNITE,_T("Out of range"));
@@ -235,12 +235,15 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 			{
 				CString temp1;
 				CStringArray temparray;
-#if 0
-				if(m_Variable_data.at(i).range>=12)
-					temp1 = Digital_Units_Array[m_Variable_data.at(i).range - 11];//11 is the sizeof the array
-				else
-#endif
-				temp1 = Digital_Units_Array[m_Variable_data.at(i).range];
+
+				if((m_Variable_data.at(i).range < 23) &&(m_Variable_data.at(i).range !=0))
+					temp1 = Digital_Units_Array[m_Variable_data.at(i).range];
+				else if((m_Variable_data.at(i).range >=23) && (m_Variable_data.at(i).range <= 30))
+				{
+					if(receive_customer_unit)
+						temp1 = temp_unit_no_index[m_Variable_data.at(i).range - 23];
+				}
+
 				SplitCStringA(temparray,temp1,_T("/"));
 				if((temparray.GetSize()==2))
 				{
@@ -476,7 +479,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 
-
+	CString temp1;
 	m_row = lRow;
 	m_col = lCol;
 
@@ -492,9 +495,22 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 
 		if((m_Variable_data.at(lRow).range < 23) &&(m_Variable_data.at(lRow).range !=0))
 			temp1 = Digital_Units_Array[m_Variable_data.at(lRow).range];
+		else if((m_Variable_data.at(lRow).range >=23) && (m_Variable_data.at(lRow).range <= 30))
+		{
+			if(receive_customer_unit)
+				temp1 = temp_unit_no_index[m_Variable_data.at(lRow).range - 23];
+			else
+			{
+				m_variable_list.Set_Edit(false);
+				return;
+			}
+		}
 		else
 			return;
 		SplitCStringA(temparray,temp1,_T("/"));
+
+
+
 		if(m_Variable_data.at(lRow).control == 0)
 		{
 			m_Variable_data.at(lRow).control = 1;
@@ -588,6 +604,31 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 
 		BacnetRange dlg;
+
+		if(!read_customer_unit)
+		{
+			for (int i=0;i<BAC_CUSTOMER_UNIT_GROUP;i++)
+			{
+				int	resend_count = 0;
+				do 
+				{
+					resend_count ++;
+					if(resend_count>50)
+						break;
+					g_invoke_id = GetPrivateData(
+						g_bac_instance,
+						READUNIT_T3000,
+						0 + i*4 ,
+						3 + i*4 ,
+						sizeof(Str_Units_element));		
+
+					Sleep(SEND_COMMAND_DELAY_TIME);
+				} while (g_invoke_id<0);
+			}
+			read_customer_unit = true;
+			Sleep(1000);
+		}
+
 		//CString temp_cs = m_variable_list.GetItemText(lRow,lCol);
 		//if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_ANALOG])==0)
 		//{
@@ -640,11 +681,19 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 				m_Variable_data.at(lRow).digital_analog = BAC_UNITS_DIGITAL;
 				m_Variable_data.at(lRow).range = bac_range_number_choose;
 
-				CString temp1;
-				CStringArray temparray;
 
-				temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
+				CStringArray temparray;
+				if((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
+				{
+					//temp1.Format(_T("%s"), temp_unit_no_index[bac_range_number_choose - 23]);
+					temp1 = temp_unit_no_index[bac_range_number_choose - 23];
+				}
+				else
+					temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
+
 				SplitCStringA(temparray,temp1,_T("/"));
+
+
 
 
 

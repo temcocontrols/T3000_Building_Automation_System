@@ -460,8 +460,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	default: 
 		break;
 	}
-
-	GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME)->SetFocus();
+	GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->SetFocus();
 	return 0;
 }
 
@@ -488,7 +487,7 @@ BOOL CBacnetSetting::OnInitDialog()
 	((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CHANGED))->SetIcon(hIcon);
 
 
-	GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME)->SetFocus();
+	GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->SetFocus();
 	
 	return false;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE

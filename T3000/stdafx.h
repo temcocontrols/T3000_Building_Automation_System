@@ -172,7 +172,7 @@ using namespace std;  // Ensure that the namespace is set to std
 #define		WM_REFRESH_BAC_TSTAT_LIST					WM_USER + 216
 #define     WM_DOWNLOADFILE_MESSAGE						WM_USER + 217
 #define     WM_MULTY_FLASH_MESSAGE						WM_USER + 218
-
+#define		WM_REFRESH_BAC_CUSTOMER_DIGITAL_RANGE_LIST	WM_USER + 219
 
 
 //#pragma warning(disable:4244)

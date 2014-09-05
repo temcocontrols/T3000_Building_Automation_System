@@ -27,94 +27,160 @@
 #include "config.h"
 #include "bacdef.h"
 
-#if defined(BACDL_ETHERNET)
+
+
 #include "ethernet.h"
-
-#define datalink_init ethernet_init
-#define datalink_send_pdu ethernet_send_pdu
-#define datalink_receive ethernet_receive
-#define datalink_cleanup ethernet_cleanup
-#define datalink_get_broadcast_address ethernet_get_broadcast_address
-#define datalink_get_my_address ethernet_get_my_address
-
-#elif defined(BACDL_ARCNET)
 #include "arcnet.h"
-
-#define datalink_init arcnet_init
-#define datalink_send_pdu arcnet_send_pdu
-#define datalink_receive arcnet_receive
-#define datalink_cleanup arcnet_cleanup
-#define datalink_get_broadcast_address arcnet_get_broadcast_address
-#define datalink_get_my_address arcnet_get_my_address
-
-#elif defined(BACDL_MSTP)
 #include "dlmstp.h"
-
-#define datalink_init dlmstp_init
-#define datalink_send_pdu dlmstp_send_pdu
-#define datalink_receive dlmstp_receive
-#define datalink_cleanup dlmstp_cleanup
-#define datalink_get_broadcast_address dlmstp_get_broadcast_address
-#define datalink_get_my_address dlmstp_get_my_address
-#include "bip.h"
-#include "bvlc.h"//Fance
-#elif defined(BACDL_BIP)
 #include "bip.h"
 #include "bvlc.h"
-
-#define datalink_init bip_init
-#if defined(BBMD_ENABLED) && BBMD_ENABLED
-#define datalink_send_pdu bvlc_send_pdu
-#define datalink_receive bvlc_receive
-#else
-#define datalink_send_pdu bip_send_pdu
-#define datalink_receive bip_receive
-#endif
-#define datalink_cleanup bip_cleanup
-#define datalink_get_broadcast_address bip_get_broadcast_address
-#ifdef BAC_ROUTING
-extern void routed_get_my_address(
-    BACNET_ADDRESS * my_address);
-#define datalink_get_my_address routed_get_my_address
-#else
-#define datalink_get_my_address bip_get_my_address
-#endif
-
-#else /* Ie, BACDL_ALL */
 #include "npdu.h"
 
-#define MAX_HEADER (8)
-#define MAX_MPDU (MAX_HEADER+MAX_PDU)
+
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-    int datalink_send_pdu(
-        BACNET_ADDRESS * dest,
-        BACNET_NPDU_DATA * npdu_data,
-        uint8_t * pdu,
-        unsigned pdu_len);
-    extern uint16_t datalink_receive(
-        BACNET_ADDRESS * src,
-        uint8_t * pdu,
-        uint16_t max_pdu,
-        unsigned timeout);
-    extern void datalink_cleanup(
-        void);
-    extern void datalink_get_broadcast_address(
-        BACNET_ADDRESS * dest);
-    extern void datalink_get_my_address(
-        BACNET_ADDRESS * my_address);
-    extern void datalink_set_interface(
-        char *ifname);
-    extern void datalink_set(
-        char *datalink_string);
+
+	int datalink_send_pdu(
+		BACNET_ADDRESS * dest,
+		BACNET_NPDU_DATA * npdu_data,
+		uint8_t * pdu,
+		unsigned pdu_len);//,
+	//uint8_t protocal);
+	__declspec(dllexport) uint16_t datalink_receive(
+		BACNET_ADDRESS * src,
+		uint8_t * pdu,
+		uint16_t max_pdu,
+		unsigned timeout,
+		int nprotocol);//,
+	//uint8_t protocal);
+	void datalink_cleanup(uint8_t protocal);
+	__declspec(dllexport) void datalink_get_broadcast_address(
+		BACNET_ADDRESS * dest);//,
+	//uint8_t protocal);
+	__declspec(dllexport) void datalink_get_my_address(
+		BACNET_ADDRESS * my_address);//,
+	//uint8_t protocal);
+	void datalink_set_interface(
+		char *ifname);
+
+
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif
+
+
+
+
+
+
+
+
+
+//#if 0
+//
+//#if defined(BACDL_ETHERNET)
+//#include "ethernet.h"
+//
+//#define datalink_init ethernet_init
+//#define datalink_send_pdu ethernet_send_pdu
+//#define datalink_receive ethernet_receive
+//#define datalink_cleanup ethernet_cleanup
+//#define datalink_get_broadcast_address ethernet_get_broadcast_address
+//#define datalink_get_my_address ethernet_get_my_address
+//
+//#elif defined(BACDL_ARCNET)
+//#include "arcnet.h"
+//
+//#define datalink_init arcnet_init
+//#define datalink_send_pdu arcnet_send_pdu
+//#define datalink_receive arcnet_receive
+//#define datalink_cleanup arcnet_cleanup
+//#define datalink_get_broadcast_address arcnet_get_broadcast_address
+//#define datalink_get_my_address arcnet_get_my_address
+//
+//#elif defined(BACDL_MSTP)
+//#include "dlmstp.h"
+//
+//#define datalink_init dlmstp_init
+//#define datalink_send_pdu dlmstp_send_pdu
+//#define datalink_receive dlmstp_receive
+//#define datalink_cleanup dlmstp_cleanup
+//#define datalink_get_broadcast_address dlmstp_get_broadcast_address
+//#define datalink_get_my_address dlmstp_get_my_address
+//#include "bip.h"
+//#include "bvlc.h"//Fance
+//#elif defined(BACDL_BIP)
+//
+//
+//#include "bip.h"
+//#include "bvlc.h"
+//
+//#define datalink_init bip_init
+//#if defined(BBMD_ENABLED) && BBMD_ENABLED
+//#define datalink_send_pdu bvlc_send_pdu
+//#define datalink_receive bvlc_receive
+//#else
+//#define datalink_send_pdu bip_send_pdu
+//#define datalink_receive bip_receive
+//#endif
+//#define datalink_cleanup bip_cleanup
+//#define datalink_get_broadcast_address bip_get_broadcast_address
+//#ifdef BAC_ROUTING
+//extern void routed_get_my_address(
+//	BACNET_ADDRESS * my_address);
+//#define datalink_get_my_address routed_get_my_address
+//#else
+//#define datalink_get_my_address bip_get_my_address
+//#endif
+//
+//
+//
+//
+//
+//
+//#else /* Ie, BACDL_ALL */
+//#include "npdu.h"
+//
+//#define MAX_HEADER (8)
+//#define MAX_MPDU (MAX_HEADER+MAX_PDU)
+//
+//#ifdef __cplusplus
+//extern "C" {
+//#endif /* __cplusplus */
+//
+//    int datalink_send_pdu(
+//        BACNET_ADDRESS * dest,
+//        BACNET_NPDU_DATA * npdu_data,
+//        uint8_t * pdu,
+//        unsigned pdu_len);
+//    extern uint16_t datalink_receive(
+//        BACNET_ADDRESS * src,
+//        uint8_t * pdu,
+//        uint16_t max_pdu,
+//        unsigned timeout);
+//    extern void datalink_cleanup(
+//        void);
+//    extern void datalink_get_broadcast_address(
+//        BACNET_ADDRESS * dest);
+//    extern void datalink_get_my_address(
+//        BACNET_ADDRESS * my_address);
+//    extern void datalink_set_interface(
+//        char *ifname);
+//    extern void datalink_set(
+//        char *datalink_string);
+//
+//#ifdef __cplusplus
+//}
+//#endif /* __cplusplus */
+//#endif
+//
+//
+//#endif
 /** @defgroup DataLink The BACnet Network (DataLink) Layer
  * <b>6 THE NETWORK LAYER </b><br>
  * The purpose of the BACnet network layer is to provide the means by which
