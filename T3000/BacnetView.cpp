@@ -1102,9 +1102,12 @@ HWND temp_hwnd;
 //INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
-
+	static bool initial_once_ip = false;
+	if(initial_once_ip == false)
+	{
+		initial_once_ip = true;
 	Initial_bac(g_gloab_bac_comport);
-
+	}
 
 	//SetTimer(1,500,NULL);
 	SetTimer(2,60000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;

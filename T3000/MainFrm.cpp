@@ -6628,7 +6628,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					g_selected_serialnumber = m_product.at(i).serial_number;
 					g_mac = m_product.at(i).software_version;
 					bac_gloab_panel = g_mac;
-					g_gloab_bac_comport =_wtoi(temp_csa);
+					g_gloab_bac_comport = m_product.at(i).ncomport;
+					//g_gloab_bac_comport =_wtoi(temp_csa);
+					//g_gloab_bac_comport = 1;
 					
 					BOOL is_local = IP_is_Local(product_Node.BuildingInfo.strIp);
 					if(is_local == false)	//判断是否是本地IP，不是本地的就要连接到远端的，远端的 Who  is  广播发布过去的;

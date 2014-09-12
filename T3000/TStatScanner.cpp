@@ -3964,6 +3964,10 @@ BOOL CTStatScanner::ScanBacnetComDevice()
 	m_pScanBacnetComThread = AfxBeginThread(_ScanBacnetComThread,this);
 	return TRUE;
 }
+
+//需要先让串口的modbus 扫完，那里会记录有哪些串口存在 bacnet的协议.
+//在扫描bacnet的时候 将bacnet ip 扫描完后，要去依次扫描 串口的MS/TP
+//Scan bacnet
 UINT _ScanBacnetComThread(LPVOID pParam)
 {
 	CTStatScanner* pScan = (CTStatScanner*)(pParam);
@@ -3973,12 +3977,15 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 	is_in_scan_mode = true;
 
 
-		if(!bip_valid())
-		{
-			bac_net_initial_once = false;
-			Initial_bac();
-			
-		}
+
+
+#if 1 // bacnet ip 
+	if(!bip_valid())
+	{
+		bac_net_initial_once = false;
+		//Initial_bac(0);
+		Initial_bac(0);
+	}
 
 		for (int i=0;i<6;i++)
 		{
@@ -4031,6 +4038,85 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 		}
 
 	Sleep(200);
+#endif
+
+
+
+
+
+#if 0 // bacnet mstp
+	//for (int i=0;i<pScan->m_bacnetComs.size();i++)
+	//{
+
+		CString temp_cs;
+		////temp_cs = pScan->m_bacnetComs.at(i);
+		////temp_cs = temp_cs.Right(temp_cs.GetLength() - 3);
+		////temp_port = _wtoi(temp_cs);
+		////SetCommunicationType(0);//如果没有关闭串口 就先关闭;
+		////close_com();
+		////bac_net_initial_once = false;
+		//Initial_bac_com(temp_port);
+		int temp_port = 1;
+		Initial_bac(1);
+		TRACE(_T("Now scan with COM%d\r\n"),temp_port);
+
+		for (int i=0;i<45;i++)
+		{
+			CString strInfo;strInfo.Format(_T("Scan Com%d,protocol Bacnet MSTP.Send global command time left(%d)"),temp_port,14-i);
+			pScan->ShowBacnetComScanInfo(strInfo);
+			Send_WhoIs_Global(-1,-1);
+			Sleep(1000);
+		}
+
+
+
+
+		for (int j=0;j<50;j++)
+		{
+			int ready_to_read_count =	m_bac_scan_com_data.size();
+
+			CString strInfo;
+			strInfo.Format(_T("Scan  Bacnet mstp.Found %d BACNET device"),ready_to_read_count);
+			//DFTrace(strInfo);
+			//pScan->ShowBacnetComScanInfo(strInfo);
+
+			if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//达到返回的个数后就break;
+				break;
+			TRACE(_T("gloab scan = %d\r\n"),ready_to_read_count);
+			for (int i=0;i<ready_to_read_count;i++)
+			{
+				//int id_fail_resend_count = 0;
+				//do 
+				//{
+				//	id_fail_resend_count ++;
+				//	if(id_fail_resend_count >3)
+				//		break;
+				int	resend_count = 0;
+				do 
+				{
+					resend_count ++;
+					if(resend_count>50)
+						break;
+					g_invoke_id = GetPrivateData(
+						m_bac_scan_com_data.at(i).device_id,
+						GETSERIALNUMBERINFO,
+						0,
+						0,
+						sizeof(Str_Serial_info));		
+
+					Sleep(SEND_COMMAND_DELAY_TIME);
+				} while (g_invoke_id<0);
+				//	Sleep(1000);
+				//} while (!tsm_invoke_id_free(g_invoke_id));
+
+			}
+		}
+
+
+	//}
+#endif
+
+
 	int ret_3 =	m_bac_scan_result_data.size(); 
 	CString bac_strInfo;
 	bac_strInfo.Format(_T("Scan  Bacnetip.Found %d recognizable Bacnet device"),ret_3);

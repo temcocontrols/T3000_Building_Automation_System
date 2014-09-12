@@ -167,6 +167,7 @@
     <ClCompile Include="CM5\ListCtrlEx.cpp" />
     <ClCompile Include="CM5\MyOwnListCtrl.cpp" />
     <ClCompile Include="CM5\PointItem.cpp" />
+    <ClCompile Include="CM5\PTP\PTP.Cpp" />
     <ClCompile Include="CO2NetView.cpp" />
     <ClCompile Include="CO2_View.cpp" />
     <ClCompile Include="Config_Routines.cpp" />

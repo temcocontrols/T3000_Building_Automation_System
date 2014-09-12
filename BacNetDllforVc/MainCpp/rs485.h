@@ -40,25 +40,30 @@
 #include "mstp.h"
 #include "net.h"
 
+#include "..\..\T3000\CM5\PTP\ptp.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-    void RS485_Set_Interface(
+    __declspec(dllexport) void RS485_Set_Interface(
         char *ifname);
     const char *RS485_Interface(
         void);
 		__declspec(dllexport) HANDLE Get_RS485_Handle();
 		__declspec(dllexport) void  Set_RS485_Handle(HANDLE temp_handle);
-    void RS485_Initialize(
+  __declspec(dllexport)  void RS485_Initialize(
         void);
-    void RS485_Send_Frame(
+  __declspec(dllexport)  void RS485_Send_Frame(
         volatile struct mstp_port_struct_t *mstp_port,  /* port specific data */
         uint8_t * buffer,       /* frame to send (up to 501 bytes of data) */
         uint16_t nbytes);       /* number of bytes of data (up to 501) */
 
     void RS485_Check_UART_Data(
         volatile struct mstp_port_struct_t *mstp_port); /* port specific data */
+
+__declspec(dllexport)	void RS485_PTP_Check_UART_Data(
+		volatile struct STR_PTP *ptp_port);
 
     uint32_t RS485_Get_Baud_Rate(
         void);

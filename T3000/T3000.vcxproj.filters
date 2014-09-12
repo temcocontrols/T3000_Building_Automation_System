@@ -528,6 +528,9 @@
     <ClCompile Include="BacnetCustomerDigitalRange.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
+    <ClCompile Include="CM5\PTP\PTP.Cpp">
+      <Filter>CM5\PTP</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
