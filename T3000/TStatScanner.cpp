@@ -4004,7 +4004,6 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 			strInfo.Format(_T("Scan  Bacnetip.Found %d BACNET device"),ready_to_read_count);
 			//DFTrace(strInfo);
 			//pScan->ShowBacnetComScanInfo(strInfo);
-
 			if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//达到返回的个数后就break;
 				break;
 			TRACE(_T("gloab scan = %d\r\n"),ready_to_read_count);

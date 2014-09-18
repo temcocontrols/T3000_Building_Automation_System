@@ -332,7 +332,7 @@ void BacnetRange::Initial_static()
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(false);//variable
 		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(false);//output
 		GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(true);//input
-		
+		//new player,
 		//MoveWindow(Temp_Rect.left,Temp_Rect.top,490,480);
 		MoveWindow(Temp_Rect.left,Temp_Rect.top,580,780);
 	}

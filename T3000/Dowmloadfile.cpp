@@ -299,7 +299,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			break;
 		case FAILED_UNKNOW_ERROR:
 			{
-				ret_message.Format(_T("Unkown error! More details please reference Log_info.txt !"));
+				ret_message.Format(_T("Unknown error! More details please reference Log_info.txt !"));
 				//m_download_info.AddString(complete_message);
 				m_download_info.InsertString(m_download_info.GetCount(),ret_message);
 				m_download_info.SetTopIndex(m_download_info.GetCount()-1);
@@ -354,7 +354,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			break;
 		default:
 			{
-				show_error_message.Format(_T("Unkown error,please try again later!"));
+				show_error_message.Format(_T("Unknown error,please try again later!"));
 			}
 			break;
 
