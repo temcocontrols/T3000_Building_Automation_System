@@ -2034,7 +2034,8 @@ int CTStatScanner::GetAllNodeFromDataBase()
 			strSerialID=temp_variant;
 		else
 			strSerialID=_T("");
-		(pNode)->SetSerialID(_wtoi(strSerialID));
+		unsigned int temp_serial = _wtoi64(strSerialID);
+		(pNode)->SetSerialID(temp_serial);
 
 		m_pRs->MoveNext();
 	}
@@ -2183,7 +2184,7 @@ void CTStatScanner::FindNetConflict()
 	for (UINT i = 0; i < m_szNCScanRet.size(); i++)
 	{
 		_NetDeviceInfo* pInfo = m_szNCScanRet[i];
-		int nScanID = pInfo->m_pNet->GetSerialID();
+		unsigned int nScanID = pInfo->m_pNet->GetSerialID();
 		DWORD dwScanIP = pInfo->m_pNet->GetIPAddr();
 		float hw_version = pInfo->m_pNet->GetHardwareVersion();
 		float sw_version = pInfo->m_pNet->GetSoftwareVersion();
@@ -2194,7 +2195,7 @@ void CTStatScanner::FindNetConflict()
 
 		for (UINT j = 0; j < m_szNetNodes.size(); j++)
 		{
-			int nSID = m_szNetNodes[j]->GetSerialID();
+			unsigned int nSID = m_szNetNodes[j]->GetSerialID();
 			DWORD dwIP = m_szNetNodes[j]->GetIPAddr();
 			float db_hw_version = m_szNetNodes[j]->GetHardwareVersion();
 			float db_sw_version = m_szNetNodes[j]->GetSoftwareVersion();
@@ -2333,14 +2334,14 @@ void  CTStatScanner::ResolveNetConflict()
 				//strID.Format(_T("%d"),m_binary_search_product_background_thread.at(j).id);
 				strID.Format(_T("%d"),dwScanIP);
 				//strSerial.Format(_T("%d"),m_binary_search_product_background_thread.at(j).serialnumber);
-				strSerial.Format(_T("%d"),dwSID);
+				strSerial.Format(_T("%u"),dwSID);
 
 
 				CString str_baudrate;
 				CString hw_instance;
 				CString sw_panelnamber;
-				hw_instance.Format(_T("%d"),(unsigned int)pInfo->m_pNet->GetHardwareVersion());
-				sw_panelnamber.Format(_T("%d"),(unsigned int)pInfo->m_pNet->GetSoftwareVersion());
+				hw_instance.Format(_T("%u"),(unsigned int)pInfo->m_pNet->GetHardwareVersion());
+				sw_panelnamber.Format(_T("%u"),(unsigned int)pInfo->m_pNet->GetSoftwareVersion());
 				str_IPaddr = pInfo->m_pNet->GetIPAddrStr();
 				str_baudrate =pInfo->m_pNet->GetIPAddrStr();
 				//str_port = pInfo->m_pNet->GetIPPort();
@@ -2461,20 +2462,20 @@ void CTStatScanner::AddNewNetToDB()
 		pInfo->m_pNet->SetFloorName(m_strFloorName);
 		pInfo->m_pNet->SetRoomName(m_strRoomName);
 
-		int nSID = pInfo->m_pNet->GetSerialID();
+		unsigned int nSID = pInfo->m_pNet->GetSerialID();
 		int nSProtocol = pInfo->m_pNet->GetProtocol();
 		if((nSProtocol <0) || (nSProtocol >3))
 			nSProtocol = MODBUS_TCPIP;//default it will be modbus protocol;
 		for (UINT j = 0; j < m_szNetNodes.size(); j++)
 		{
-			int nNodeSID = m_szNetNodes[j]->GetSerialID();
+			unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
 			//Comment by Fance
 			//if the scan device is CM5 or minipanel, this products has 3 protocol, BacnetIP modbus485 modbus tcp;
 			//So when scan bacnet ip and midbus tcp ,the or replay to t3000,
 			//So I display the device in two format,judge to 2 decvice;
 			if((pInfo->m_pNet->GetProductType() == PM_CM5) || (pInfo->m_pNet->GetProductType() == PM_MINIPANEL))
 			{
-				int nNodeSID = m_szNetNodes[j]->GetSerialID();
+				unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
 				int nNodeProtocol = m_szNetNodes[j]->GetProtocol();
 				if (nSID == nNodeSID)
 				{
@@ -2487,7 +2488,7 @@ void CTStatScanner::AddNewNetToDB()
 					{
 						CString strSql;
 						CString strText;
-						strText.Format(_T("%d"),nNodeSID);
+						strText.Format(_T("%u"),nNodeSID);
 						strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"),strText);
 						CString strTemp;
 						strTemp.Format(_T("Are you sure to delete thise item"));
@@ -2504,6 +2505,8 @@ void CTStatScanner::AddNewNetToDB()
 								AfxMessageBox(e->ErrorMessage());
 							}
 						//}
+							bIsNew = TRUE;
+							break;
 					}
 				}
 			}
@@ -3961,6 +3964,10 @@ BOOL CTStatScanner::ScanBacnetComDevice()
 	m_pScanBacnetComThread = AfxBeginThread(_ScanBacnetComThread,this);
 	return TRUE;
 }
+
+//需要先让串口的modbus 扫完，那里会记录有哪些串口存在 bacnet的协议.
+//在扫描bacnet的时候 将bacnet ip 扫描完后，要去依次扫描 串口的MS/TP
+//Scan bacnet
 UINT _ScanBacnetComThread(LPVOID pParam)
 {
 	CTStatScanner* pScan = (CTStatScanner*)(pParam);
@@ -3970,12 +3977,15 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 	is_in_scan_mode = true;
 
 
-		if(!bip_valid())
-		{
-			bac_net_initial_once = false;
-			Initial_bac();
-			
-		}
+
+
+#if 1 // bacnet ip 
+	if(!bip_valid())
+	{
+		bac_net_initial_once = false;
+		//Initial_bac(0);
+		Initial_bac(0);
+	}
 
 		for (int i=0;i<6;i++)
 		{
@@ -3985,6 +3995,7 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 			Sleep(500);
 		}
 
+		//Get bacnet device serial information.获取 bacnet 的设备信息;
 		for (int j=0;j<5;j++)
 		{
 			int ready_to_read_count =	m_bac_scan_com_data.size();
@@ -3993,7 +4004,6 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 			strInfo.Format(_T("Scan  Bacnetip.Found %d BACNET device"),ready_to_read_count);
 			//DFTrace(strInfo);
 			//pScan->ShowBacnetComScanInfo(strInfo);
-
 			if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//达到返回的个数后就break;
 				break;
 			TRACE(_T("gloab scan = %d\r\n"),ready_to_read_count);
@@ -4027,6 +4037,85 @@ UINT _ScanBacnetComThread(LPVOID pParam)
 		}
 
 	Sleep(200);
+#endif
+
+
+
+
+
+#if 0 // bacnet mstp
+	//for (int i=0;i<pScan->m_bacnetComs.size();i++)
+	//{
+
+		CString temp_cs;
+		////temp_cs = pScan->m_bacnetComs.at(i);
+		////temp_cs = temp_cs.Right(temp_cs.GetLength() - 3);
+		////temp_port = _wtoi(temp_cs);
+		////SetCommunicationType(0);//如果没有关闭串口 就先关闭;
+		////close_com();
+		////bac_net_initial_once = false;
+		//Initial_bac_com(temp_port);
+		int temp_port = 1;
+		Initial_bac(1);
+		TRACE(_T("Now scan with COM%d\r\n"),temp_port);
+
+		for (int i=0;i<45;i++)
+		{
+			CString strInfo;strInfo.Format(_T("Scan Com%d,protocol Bacnet MSTP.Send global command time left(%d)"),temp_port,14-i);
+			pScan->ShowBacnetComScanInfo(strInfo);
+			Send_WhoIs_Global(-1,-1);
+			Sleep(1000);
+		}
+
+
+
+
+		for (int j=0;j<50;j++)
+		{
+			int ready_to_read_count =	m_bac_scan_com_data.size();
+
+			CString strInfo;
+			strInfo.Format(_T("Scan  Bacnet mstp.Found %d BACNET device"),ready_to_read_count);
+			//DFTrace(strInfo);
+			//pScan->ShowBacnetComScanInfo(strInfo);
+
+			if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//达到返回的个数后就break;
+				break;
+			TRACE(_T("gloab scan = %d\r\n"),ready_to_read_count);
+			for (int i=0;i<ready_to_read_count;i++)
+			{
+				//int id_fail_resend_count = 0;
+				//do 
+				//{
+				//	id_fail_resend_count ++;
+				//	if(id_fail_resend_count >3)
+				//		break;
+				int	resend_count = 0;
+				do 
+				{
+					resend_count ++;
+					if(resend_count>50)
+						break;
+					g_invoke_id = GetPrivateData(
+						m_bac_scan_com_data.at(i).device_id,
+						GETSERIALNUMBERINFO,
+						0,
+						0,
+						sizeof(Str_Serial_info));		
+
+					Sleep(SEND_COMMAND_DELAY_TIME);
+				} while (g_invoke_id<0);
+				//	Sleep(1000);
+				//} while (!tsm_invoke_id_free(g_invoke_id));
+
+			}
+		}
+
+
+	//}
+#endif
+
+
 	int ret_3 =	m_bac_scan_result_data.size(); 
 	CString bac_strInfo;
 	bac_strInfo.Format(_T("Scan  Bacnetip.Found %d recognizable Bacnet device"),ret_3);

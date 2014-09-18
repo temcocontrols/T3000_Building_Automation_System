@@ -96,7 +96,7 @@ CString SaveConfigFilePath;
 bool b_pause_refresh_tree = false;
 char local_network_ip[255];
 CString local_enthernet_ip;
-int m_MainHotKeyID[10] = 
+int m_MainHotKeyID[11] = 
 {
 	3001,
 	3002,
@@ -106,7 +106,8 @@ int m_MainHotKeyID[10] =
 	3006,
 	3007,
 	3008,
-	3009
+	3009,
+	3010
 };
 
 //End for Test
@@ -292,6 +293,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 
 	ON_COMMAND(ID_HELP_FEEDBACKTOTEMCO, &CMainFrame::OnHelpFeedbacktotemco)
 	ON_COMMAND(ID_CALIBRATION_CALIBRATIONHUMTEMP, &CMainFrame::OnCalibrationCalibrationhumtemp)
+	ON_COMMAND(ID_CONTROL_CUSTOMERUNITS, &CMainFrame::OnControlCustomerunits)
 	END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -816,6 +818,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[9],MOD_ALT,'L'); //热键 ctrl + L   
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + L failure")); 
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[10],MOD_ALT,'U'); //热键 ctrl + L   
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + U failure")); 
 	nRet = RegisterHotKey(GetSafeHwnd(),1111,MOD_SHIFT,'D'); //热键 ctrl + L   
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey MOD_SHIFT + D failure")); 
@@ -833,6 +838,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[7],MOD_ALT,'A'); 
 	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[8],MOD_ALT,'G');
 	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[9],MOD_ALT,'L');
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[10],MOD_ALT,'U');
 	RegisterHotKey(GetSafeHwnd(),1111,MOD_SHIFT,'D');
 	RegisterHotKey(GetSafeHwnd(),1112,MOD_SHIFT,'F');
 	#endif  
@@ -5630,6 +5636,101 @@ void CMainFrame::SaveBacnetConfigFile()
 				delete pBuf;
 			DeleteFile(FilePath);
 		
+			m_pCon.CreateInstance(_T("ADODB.Connection"));
+			m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+
+			CString temp_serial;
+			temp_serial.Format(_T("%u"),g_selected_serialnumber);
+
+			if(m_pRs->State)
+				m_pRs->Close(); 
+
+			CString strSql;
+			strSql.Format(_T("select * from Product_Data where Serial_ID = '%s'"),temp_serial);
+			m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+			int count = m_pRs->GetRecordCount();
+			_variant_t temp_variant;
+			if(count<=0)
+			{
+				//需要插入;
+
+
+				
+				strSql.Format(_T("insert into Product_Data(Serial_ID)  values('%s')"),temp_serial);		
+				m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
+
+			}
+
+			if(m_pRs->State)
+				m_pRs->Close(); 
+
+			CFile Filetxt;//用来读取位图文件
+			DWORD FileLen=0;//位图的长度
+			char* FileBuff;//用于存放位图信息
+
+			if(!Filetxt.Open(SaveConfigFilePath,CFile::modeRead))//打开文件
+			{
+				//MessageBox(NULL,"打开文本信息失败!",NULL, MB_OK);
+				return ;
+			}
+			FileLen=Filetxt.GetLength();//得到位图的长度
+			FileBuff=new char[FileLen+1];//给位图文件申请内在空间
+			DWORD DwPic=Filetxt.GetLength();
+			memset(FileBuff,0,FileLen+1);//初始化位图文件的空间
+			if(!FileBuff)//判断位图空间是否申请成功
+			{
+				return ;
+			}
+			if(Filetxt.Read(FileBuff,FileLen)!=FileLen)//读取文本信息，存入到FileBuff中去
+			{
+				return ;
+			}
+			char* pBuff= FileBuff;
+			VARIANT varPic;//该对象用于存放位图信息
+			SAFEARRAY *safeArray;//定义一个SAFEARRAY结构对象
+			SAFEARRAYBOUND rgsabound[1];//此结构体用来定义SAFEARRAY的边界，详情见MSDN
+			if(pBuff)//判断位图文件是否为空
+			{
+				rgsabound[0].lLbound=0;//定义下界
+				rgsabound[0].cElements=DwPic;//定义上限
+				safeArray=SafeArrayCreate(VT_UI1,1,rgsabound);// 使用SafeArrayCreate在堆上创建一维数组
+				for(long i=0;i<(long)DwPic;i++)
+				{
+					SafeArrayPutElement(safeArray,&i,pBuff++);//传值
+				}
+				varPic.vt=VT_ARRAY|VT_UI1;//把值给VARIANT对象
+				varPic.parray=safeArray; //把值给VARIANT对象
+			}
+
+
+			HRESULT hr;
+			hr=m_pRs.CreateInstance(_T("ADODB.Recordset"));
+
+			if(FAILED(hr))
+			{
+				AfxMessageBox(_T("Load msado.dll erro"));
+				return ;
+			}
+
+
+
+
+			strSql.Format(_T("select * from Product_Data where Serial_ID = '%s'"),temp_serial);
+			m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+			while(VARIANT_FALSE == m_pRs->EndOfFile)
+			{
+				m_pRs->GetFields()->GetItem("Register_Data")->put_Value(varPic);
+				break;
+			}
+			m_pRs->Update();
+
+
+			if(m_pRs->State)
+				m_pRs->Close();
+
+
+
+		
 	}
 }
 
@@ -5877,11 +5978,12 @@ void CMainFrame::OnDestroy()
 		DebugWindow = NULL;
 	}
 	
-	for (int i=0;i<10;i++)
+	for (int i=0;i<11;i++)
 	{
 		UnregisterHotKey(GetSafeHwnd(), m_MainHotKeyID[i]);   
 	}
 	UnregisterHotKey(GetSafeHwnd(), 1111);  
+	UnregisterHotKey(GetSafeHwnd(), 1112);  
 
 #ifdef Fance_Enable_Test		//For Test Use
 	if (is_connect())
@@ -6469,6 +6571,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 						CString strTitle;
 						strTitle.Format(_T("Can't connect to %s"),m_product.at(i).BuildingInfo.strIp);
+						m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
+						m_product.at(i).status_last_time[0] = false;
+						m_product.at(i).status_last_time[1] = false;
+						m_product.at(i).status_last_time[2] = false;
 						AfxMessageBox(strTitle);
 					}
 
@@ -6522,7 +6628,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					g_selected_serialnumber = m_product.at(i).serial_number;
 					g_mac = m_product.at(i).software_version;
 					bac_gloab_panel = g_mac;
-					g_gloab_bac_comport =_wtoi(temp_csa);
+					g_gloab_bac_comport = m_product.at(i).ncomport;
+					//g_gloab_bac_comport =_wtoi(temp_csa);
+					//g_gloab_bac_comport = 1;
 					
 					BOOL is_local = IP_is_Local(product_Node.BuildingInfo.strIp);
 					if(is_local == false)	//判断是否是本地IP，不是本地的就要连接到远端的，远端的 Who  is  广播发布过去的;
@@ -7797,6 +7905,9 @@ void CMainFrame::GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItem
 }
 
 
+//网络的部分先发广播 扫描, 在确认是不是有新的设备，若有就存进数据库.若扫描到的与数据库的有出入，就更新数据库;
+//一乡二里共三夫子，不识四书五经六义，竟敢教七八九子，十分大胆
+//十室九贫，
 BOOL CMainFrame::CheckDeviceStatus()
 {
 	bool find_new_device = false;
@@ -7824,11 +7935,12 @@ BOOL CMainFrame::CheckDeviceStatus()
 			nSerialNumber=tp.serial_number;
 			
 			//int newnID=read_one(nID,6,2);
-			/*
+			/*需要先保存之前的通信协议;
 			Get the protocol ,if it is bacnet ip,we compare the device id.
 			*/		
 			//如果strip不是空的就说明这个设备室挂在NC或LC等等下面的MODBUS  RS485设备
 				//if((m_product.at(i).protocol == MODBUS_RS485) && (m_product.at(i).BuildingInfo.strIp.IsEmpty()))
+
 				int temp_port = 0;
 				temp_port = m_product.at(i).ncomport;
 				if((m_product.at(i).protocol == MODBUS_RS485) && (temp_port > 0 ) && (m_product.at(i).BuildingInfo.strIp.IsEmpty()))
@@ -7843,6 +7955,7 @@ BOOL CMainFrame::CheckDeviceStatus()
 					close_com();
 					int nComPort = m_product.at(i).ncomport;
 					int n_baudrate = m_product.at(i).baudrate;
+					//38400是有一个zigbee 的 USB  它的波特率,所以也需要判断38400;
 					if((n_baudrate != 19200) && (n_baudrate != 9600) && (n_baudrate != 38400))
 						n_baudrate = 19200;
 					if(nComPort == 0)
@@ -7879,8 +7992,14 @@ BOOL CMainFrame::CheckDeviceStatus()
 						
 						// read register offset 6
 						//int error = modbus_read_one_value( nID,nIDNode,6,5);
-						nID=read_one(nIDNode,6,5);
-						TRACE(_T("%d = Read_One(%d)     "),nID,nIDNode);
+						//nID=read_one(nIDNode,6,5);
+
+						unsigned short first_ten_reg[10];
+						int read_block_ret;
+						read_block_ret=Read_Multi(nIDNode,&first_ten_reg[0],0,10,3);
+						
+
+						//TRACE(_T("%d = Read_One(%d)     "),nID,nIDNode);
 						/* 
 						If an error was returned from the read,
 						we previously attempted to try again with a reduced baud rate.
@@ -7905,7 +8024,7 @@ BOOL CMainFrame::CheckDeviceStatus()
 						} 
 #endif
 
-						if( nID <0) 
+						if( read_block_ret <0) 
 						{
 							temp_online = false;
 							//m_product.at(i).status = false;
@@ -7914,17 +8033,19 @@ BOOL CMainFrame::CheckDeviceStatus()
 						else 
 						{
 							// successful read of register offset 6
-							unsigned short SerialNum[4];
-							memset(SerialNum,0,sizeof(SerialNum));
+							//unsigned short SerialNum[4];
+							//memset(SerialNum,0,sizeof(SerialNum));
 							int nRet=0;//
 							// read first 4 registers 
 							//	nRet=modbus_read_multi_value(&SerialNum[0],nID,0,4,5); 
-							nRet=Read_Multi(nID,&SerialNum[0],0,4,5);
+							//nRet=Read_Multi(nID,&SerialNum[0],0,4,5);
+							//memcpy((char *)SerialNum,(char *)first_ten_reg,4);
+
 							unsigned int nSerialNumberRead;
 
 							if(nRet>=0)  // 计算串口号
 							{
-								nSerialNumberRead=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256; 
+								nSerialNumberRead=first_ten_reg[0]+first_ten_reg[1]*256+first_ten_reg[2]*256*256+first_ten_reg[3]*256*256*256; 
 							}
 
 							if(nSerialNumber>=0)  
@@ -8423,6 +8544,10 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam,LPARAM lParam)
 	else if(MOD_ALT == fuModifiers && 'L' == uVirtKey)//Annual Routines
 	{
 		OnControlAlarmLog();
+	}
+	else if(MOD_ALT == fuModifiers && 'U' == uVirtKey)//Annual Routines
+	{
+		OnControlCustomerunits();
 	}
 	else if(MOD_SHIFT == fuModifiers && 'D' == uVirtKey)//Annual Routines
 	{
@@ -10125,6 +10250,25 @@ void CMainFrame::OnControlAlarmLog()
 		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
 	}
 }
+
+
+void CMainFrame::OnControlCustomerunits()
+{
+	// TODO: Add your command handler code here
+	if(g_protocol == PROTOCOL_BACNET_IP)
+	{
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_READ_CUSTOMER_UNIT);
+		else
+			MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+	}
+	else
+	{
+		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+	}
+}
+
+
 void CMainFrame::OnMenuCheckupdate()
 {
 
@@ -10227,6 +10371,24 @@ void CMainFrame::OnHelpUpdatefirmware()
 void CMainFrame::OnControlTstat()
 {
 	// TODO: Add your command handler code here
+#if 0
+	char my_port[50];
+
+	CString temp_cs11;
+	//temp_cs.Format(_T("COM%d"),g_com);
+	temp_cs11.Format(_T("COM%d"),5);
+	char cTemp11[255];
+	memset(cTemp11,0,255);
+	WideCharToMultiByte( CP_ACP, 0, temp_cs11.GetBuffer(), -1, cTemp11, 255, NULL, NULL );
+	temp_cs11.ReleaseBuffer();
+	sprintf(my_port,cTemp11);
+
+
+	dl_ptp_init(my_port);
+
+
+	return;
+#endif
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		if(bac_select_device_online)
@@ -10252,7 +10414,7 @@ void CMainFrame::ShowDebugWindow()
 		DebugWindow = new CDebugWindow;
 		DebugWindow->Create(IDD_DIALOG_DEBUG_TRACE, this);
 		DebugWindow->ShowWindow(SW_HIDE);
-		g_Print = _T("Debug Time 14-08-05   Debug version 2.0");
+		g_Print = _T("Debug Time 14-09-15   Debug version 2.1");
 		DFTrace(g_Print);
 	}
 	

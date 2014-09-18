@@ -201,7 +201,16 @@ CString CTStat_Net::GetProductName()
 	//else
 		strDevID.Format(_T("%d"), m_nDevID);
 
-	strProductName = strProductName+_T(":")+strID+_T("--")+strDevID;
+	CString temp_ipaddr;
+	temp_ipaddr = GetIPAddrStr();
+
+
+
+	strProductName = strProductName+_T(":")+strID+_T("-")+strDevID + _T("-") + temp_ipaddr  ;
+
+
+	//product_name = GetProductName(m_refresh_net_device_data.at(y).product_id);
+	//product_name = product_name + _T(":") + str_serialid + _T("-") + modbusid + _T("-") + str_ip_address;
 
 	return strProductName;
 

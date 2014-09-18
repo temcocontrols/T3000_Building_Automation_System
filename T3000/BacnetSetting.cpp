@@ -33,22 +33,16 @@ void CBacnetSetting::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_MESSAGE(WM_FRESH_SETTING_UI,Fresh_Setting_UI)
 	ON_BN_CLICKED(IDC_BUTTON_BAC_TEST, &CBacnetSetting::OnBnClickedButtonBacTest)
-	//ON_BN_CLICKED(IDC_BAC_ENABLE_EDIT_TIME, &CBacnetSetting::OnBnClickedBacEnableEditTime)
 	ON_NOTIFY(NM_KILLFOCUS, IDC_DATE_PICKER, &CBacnetSetting::OnNMKillfocusDatePicker)
 	ON_NOTIFY(NM_KILLFOCUS, IDC_TIME_PICKER, &CBacnetSetting::OnNMKillfocusTimePicker)
 	ON_NOTIFY(NM_SETFOCUS, IDC_DATE_PICKER, &CBacnetSetting::OnNMSetfocusDatePicker)
 	ON_NOTIFY(NM_SETFOCUS, IDC_TIME_PICKER, &CBacnetSetting::OnNMSetfocusTimePicker)
-	//ON_BN_CLICKED(IDC_BTN_BAC_WRITE_TIME, &CBacnetSetting::OnBnClickedBtnBacWriteTime)
 	ON_BN_CLICKED(IDC_BAC_SYNC_LOCAL_PC, &CBacnetSetting::OnBnClickedBtnBacSYNCTime)
 	ON_BN_CLICKED(IDC_RADIO_BAC_IP_AUTO, &CBacnetSetting::OnBnClickedBtnBacIPAuto)
 	ON_BN_CLICKED(IDC_RADIO_BAC_IP_STATIC, &CBacnetSetting::OnBnClickedBtnBacIPStatic)
 	ON_BN_CLICKED(IDC_BUTTON_BAC_IP_CHANGED, &CBacnetSetting::OnBnClickedBtnBacIPChange)
-	//ON_BN_CLICKED(IDC_BUTTON_BAC_IP_CANCLE, &CBacnetSetting::OnBnClickedBtnBacIPCancle)
 	ON_WM_TIMER()
-	//ON_BN_CLICKED(IDC_BUTTON_REBOOT_DEVICE, &CBacnetSetting::OnBnClickedButtonRebootDevice)
-	//ON_BN_CLICKED(IDC_BUTTON_RESET_TCPIP, &CBacnetSetting::OnBnClickedButtonResetTcpip)
 	ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
-	//ON_BN_CLICKED(IDC_BUTTON_ERASE_FLASH, &CBacnetSetting::OnBnClickedButtonEraseFlash)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM0, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom0)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM1, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom1)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_COM2, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingCom2)
@@ -292,12 +286,12 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	CString temp_cs;
 	int temp_year;
 	CTime	TimeTemp;
-	CString temp_hw_version = _T("Unkown");
-	CString temp_mcu_version = _T("Unkown");
-	CString temp_pic_version = _T("Unkown");
-	CString temp_c8051_version = _T("Unkown");
-	CString temp_5964_version = _T("Unkown");
-	CString temp_bootloader_version = _T("Unkown");
+	CString temp_hw_version = _T("Unknown");
+	CString temp_mcu_version = _T("Unknown");
+	CString temp_pic_version = _T("Unknown");
+	CString temp_c8051_version = _T("Unknown");
+	CString temp_5964_version = _T("Unknown");
+	CString temp_bootloader_version = _T("Unknown");
 
 	
 
@@ -417,7 +411,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
-			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("Unkown device"));
+			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME))->SetWindowTextW(_T("Unknown device"));
 		}
 
 		if((Device_Basic_Setting.reg.mini_type == 1) || (Device_Basic_Setting.reg.mini_type == 2))
@@ -460,8 +454,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 	default: 
 		break;
 	}
-
-	GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME)->SetFocus();
+	GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->SetFocus();
 	return 0;
 }
 
@@ -488,7 +481,7 @@ BOOL CBacnetSetting::OnInitDialog()
 	((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CHANGED))->SetIcon(hIcon);
 
 
-	GetDlgItem(IDC_STATIC_SEETING_DEVICE_NAME)->SetFocus();
+	GetDlgItem(IDC_BAC_SYNC_LOCAL_PC)->SetFocus();
 	
 	return false;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE

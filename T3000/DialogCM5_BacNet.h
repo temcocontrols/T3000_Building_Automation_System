@@ -76,6 +76,7 @@ public:
 	int m_bac_obtain_ip_mode;
 
 	bool tab_loaded[WINDOW_TAB_COUNT];
+	
 };
 //static void Init_Service_Handlers(void);
 

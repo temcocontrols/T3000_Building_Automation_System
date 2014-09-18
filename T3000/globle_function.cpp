@@ -35,7 +35,7 @@
 #define	Modbus_TCP	1
 
 #include "modbus_read_write.cpp"
-
+#include "CM5\PTP\ptp.h"
 #pragma region For_Bacnet_program_Use
 
 extern char mycode[1024];
@@ -1175,6 +1175,9 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case WRITEPROGRAM_T3000:
 		entitysize = sizeof(Str_variable_point);
 		break;
+	case WRITEUNIT_T3000:
+		entitysize = sizeof(Str_Units_element);
+		break;
 	case WRITEPROGRAMCODE_T3000:
 		entitysize = program_code_length[start_instance];
 		
@@ -1260,6 +1263,12 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 			memcpy_s(SendBuffer + i*sizeof(Str_program_point) + PRIVATE_HEAD_LENGTH,sizeof(Str_program_point),&m_Program_data.at(i + start_instance),sizeof(Str_program_point));
 		}
 
+		break;
+	case  WRITEUNIT_T3000:
+		for (int i=0;i<(end_instance-start_instance + 1);i++)
+		{
+			memcpy_s(SendBuffer + i*sizeof(Str_Units_element) + PRIVATE_HEAD_LENGTH,sizeof(Str_Units_element),&m_customer_unit_data.at(i + start_instance),sizeof(Str_Units_element));
+		}
 		break;
 	case WRITEPROGRAMCODE_T3000:
  		//memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,entitysize,mycode,my_lengthcode);
@@ -2412,6 +2421,52 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 
 		}
 		break;
+	case READUNIT_T3000:
+		{
+			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_Units_element))!=0)
+				return -1;	//得到的结构长度错误;
+			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_Units_element);
+			my_temp_point = (char *)Temp_CS.value + 3;
+			start_instance = *my_temp_point;
+			my_temp_point++;
+			end_instance = *my_temp_point;
+			my_temp_point++;
+			my_temp_point = my_temp_point + 2;
+
+			if(start_instance >= BAC_CUSTOMER_UNITS_COUNT)
+				return -1;//超过长度了;
+			if(end_instance == (BAC_CUSTOMER_UNITS_COUNT - 1))
+			{
+				end_flag = true;
+				receive_customer_unit = true;
+			}
+			for (i=start_instance;i<=end_instance;i++)
+			{
+				m_customer_unit_data.at(i).direct = *(my_temp_point++);
+				memcpy_s(m_customer_unit_data.at(i).digital_units_off,12,my_temp_point,12);
+				my_temp_point = my_temp_point + 12;
+				memcpy_s(m_customer_unit_data.at(i).digital_units_on,12,my_temp_point,12);
+				my_temp_point = my_temp_point + 12;
+
+
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_off, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_off)+1, 
+					temp_off[i].GetBuffer(MAX_PATH), MAX_PATH );
+				temp_off[i].ReleaseBuffer();
+				if(temp_off[i].GetLength() >= 12)
+					temp_off[i].Empty();
+
+				MultiByteToWideChar( CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_on, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_on)+1, 
+					temp_on[i].GetBuffer(MAX_PATH), MAX_PATH );
+				temp_on[i].ReleaseBuffer();
+				if(temp_on[i].GetLength() >= 12)
+					temp_on[i].Empty();
+
+				temp_unit_no_index[i] = temp_off[i] + _T("/") + temp_on[i];
+
+			}
+
+		}
+		break;
 	}
 	return 1;
 }
@@ -3219,6 +3274,8 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 #if 1
 	if(src->mac_len==6)
 		bac_cs_mac.Format(_T("%d"),src->mac[3]);
+	else if(src->mac_len==1)
+		bac_cs_mac.Format(_T("%d"),src->mac[0]);
 	else
 		return;
 #endif
@@ -3259,6 +3316,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 	return;
 
 }
+
 SOCKET my_sokect;
 extern void  init_info_table( void );
 extern void Init_table_bank();
@@ -3271,43 +3329,49 @@ void Initial_bac(int comport)
 	uint16_t pdu_len = 0;
 	unsigned timeout = 100;     /* milliseconds */
 	BACNET_ADDRESS my_address, broadcast_address;
+	char my_port[50];
+	
+	bac_program_pool_size = 26624;
+	bac_program_size = 0;
+	bac_free_memory = 26624;
+	//Device_Set_Object_Instance_Number(4194300);
+	srand((unsigned)time(NULL)); 
+	unsigned int temp_value;
+	temp_value = rand()%(0x3FFFFF);
+	g_Print.Format(_T("The initial T3000 Object Instance value is %d"),temp_value);
+	DFTrace(g_Print);
+	Device_Set_Object_Instance_Number(temp_value);
+	address_init();
+	Init_Service_Handlers();
+	
 
-	if(!bac_net_initial_once)
-	{
-		Sleep(1);
-		bac_net_initial_once =true;
-		bac_program_pool_size = 26624;
-		bac_program_size = 0;
-		bac_free_memory = 26624;
-		//hwait_thread = NULL;
-#if 0
-		HANDLE temphandle;
-		temphandle = Get_RS485_Handle();
-		if(temphandle !=NULL)
-		{
-			TerminateThread((HANDLE)Get_Thread1(),0);
-			TerminateThread((HANDLE)Get_Thread2(),0);
 
-			CloseHandle(temphandle);
-			Set_RS485_Handle(NULL);
-		}
+#ifdef OPEN_PTP
+	CString temp_cs11;
+	//temp_cs.Format(_T("COM%d"),g_com);
+	temp_cs11.Format(_T("COM%d"),5);
+	char cTemp11[255];
+	memset(cTemp11,0,255);
+	WideCharToMultiByte( CP_ACP, 0, temp_cs11.GetBuffer(), -1, cTemp11, 255, NULL, NULL );
+	temp_cs11.ReleaseBuffer();
+	sprintf(my_port,cTemp11);
+
+
+	dl_ptp_init(my_port);
 #endif
-		//Device_Set_Object_Instance_Number(4194300);
-		srand((unsigned)time(NULL)); 
-		unsigned int temp_value;
-		temp_value = rand()%(0x3FFFFF);
-		g_Print.Format(_T("The initial T3000 Object Instance value is %d"),temp_value);
-		DFTrace(g_Print);
-		Device_Set_Object_Instance_Number(temp_value);
-		address_init();
-		Init_Service_Handlers();
 
+#ifndef test_ptp
+
+#if 0
+	if(comport == 0)	//如果是 0 的话就要初始化网络的socket,否则 就是串口的mstp 或者ptp
+	{
+#endif	
 		int ret_1 = Open_bacnetSocket2(_T("192.168.0.130"),BACNETIP_PORT,my_sokect);
-	//	Open_Socket2(_T("127.0.0.1"),6002);
-	//	 = (int)GetCommunicationHandle();
+		//	Open_Socket2(_T("127.0.0.1"),6002);
+		//	 = (int)GetCommunicationHandle();
 		bip_set_socket(my_sokect);
 		bip_set_port(49338);
-	//	int test_port = bip_get_port();
+		//	int test_port = bip_get_port();
 #if 1
 		static in_addr BIP_Broadcast_Address;
 		BIP_Broadcast_Address.S_un.S_addr =  inet_addr("255.255.255.255");
@@ -3333,8 +3397,35 @@ void Initial_bac(int comport)
 		BIP_Address.S_un.S_addr =  inet_addr(cTemp1);
 		bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
 #endif	
+
+		set_datalink_protocol(PROTOCOL_BACNET_IP);
+		datalink_get_broadcast_address(&broadcast_address);
+		//    print_address("Broadcast", &broadcast_address);
+		datalink_get_my_address(&my_address);
+		//		print_address("Address", &my_address);
+		//int * comport_parameter = new int;
+		//*comport_parameter = PROTOCOL_BACNET_IP;
+		CM5_hThread =CreateThread(NULL,NULL,MSTP_Receive,NULL,NULL, &nThreadID_x);
+
 #if 0
-		dlmstp_set_baud_rate(19200);
+	}
+
+	else
+	{
+		HANDLE temphandle;
+		temphandle = Get_RS485_Handle();
+		if(temphandle !=NULL)
+		{
+			TerminateThread((HANDLE)Get_Thread1(),0);
+			TerminateThread((HANDLE)Get_Thread2(),0);
+
+			CloseHandle(temphandle);
+			Set_RS485_Handle(NULL);
+		}
+
+		Sleep(10000);
+
+				dlmstp_set_baud_rate(19200);
 		dlmstp_set_mac_address(0);
 		dlmstp_set_max_info_frames(DEFAULT_MAX_INFO_FRAMES);
 		dlmstp_set_max_master(DEFAULT_MAX_MASTER);
@@ -3364,44 +3455,45 @@ void Initial_bac(int comport)
 
 		sprintf(my_port,cTemp1);
 		dlmstp_init(my_port);
-#endif
 
-		//Initial_List();
-		//		BacNet_hwd = this->m_hWnd;
-		//    dlenv_init();
+		set_datalink_protocol(MODBUS_BACNET_MSTP);
 		datalink_get_broadcast_address(&broadcast_address);
 		//    print_address("Broadcast", &broadcast_address);
 		datalink_get_my_address(&my_address);
 		//		print_address("Address", &my_address);
+		int * comport_parameter = new int;
+		*comport_parameter = MODBUS_BACNET_MSTP;
+		CM5_hThread =CreateThread(NULL,NULL,MSTP_Receive,comport_parameter,NULL, &nThreadID_x);
+	}
+#endif
 
-		CM5_hThread =CreateThread(NULL,NULL,MSTP_Receive,NULL,NULL, &nThreadID_x);
+#endif //nodef ptp
 
-		//CM5_UI_Thread = CreateThread(NULL,NULL,CM5_UI,this,NULL, &cm5_nThreadID);
-
-		//Send_WhoIs_Global(g_bac_instance, g_bac_instance);
-
-
-		//m_bac_static_status.SetWindowTextW(_T("Disconnected"));
-		//m_bac_static_status.textColor(RGB(255,255,255));
-		//m_bac_static_status.bkColor(RGB(255,0,0));
-		//m_bac_static_status.setFont(26,18,NULL,_T("Cambria"));
+	if(!bac_net_initial_once)
+	{
+		bac_net_initial_once =true;
 		timesec1970 = (unsigned long)time(NULL);
 		timestart = 0;
 		init_info_table();
 		Init_table_bank();
 	}
 }
-
+//#include "datalink.h"
 DWORD WINAPI   MSTP_Receive(LPVOID lpVoid)
 {
 	BACNET_ADDRESS src = {0};
 	uint16_t pdu_len;
-	CDialogCM5_BacNet *mparent = (CDialogCM5_BacNet *)lpVoid;
+	//int *mparent = (int *)lpVoid;
+	//int protocol_new = *mparent;
+
 	uint8_t Rx_Buf[MAX_MPDU] = { 0 };
 	//while(mparent->m_MSTP_THREAD)
 	while(1)
 	{
-		pdu_len =  bip_receive(&src,&Rx_Buf[0],MAX_MPDU, INFINITE);
+		//datalink_set("bip");
+		
+		pdu_len = datalink_receive(&src,&Rx_Buf[0],MAX_MPDU,INFINITE);
+	//	pdu_len =  bip_receive(&src,&Rx_Buf[0],MAX_MPDU, INFINITE);
 		//pdu_len = dlmstp_receive(&src, &Rx_Buf[0], MAX_MPDU, INFINITE);
 		if(pdu_len==0)
 			continue;
@@ -4278,7 +4370,7 @@ void Send_WhoIs_remote_ip(CString ipaddress)
 	BOOL bTimeOut = FALSE;
 	int nRet = 0;
 	Sleep(1);
-	Initial_bac();
+	Initial_bac(0);
 	while(!bTimeOut)//!pScanner->m_bNetScanFinish)  // 超时结束
 	{
 		time_out++;

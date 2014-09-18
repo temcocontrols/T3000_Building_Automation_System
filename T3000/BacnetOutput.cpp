@@ -290,7 +290,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	}
 
 
-
+	CString temp1;
 	//int Fresh_Item;
 	//int isFreshOne = (int)lParam;
 	//if(isFreshOne == REFRESH_ON_ITEM)
@@ -428,6 +428,13 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 			if(m_Output_data.at(i).range<=22)
 				m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[m_Output_data.at(i).range]);
+			else if((m_Output_data.at(i).range >= 23) && (m_Output_data.at(i).range <= 30))
+			{
+				if(receive_customer_unit)
+					m_output_list.SetItemText(i,OUTPUT_RANGE,temp_unit_no_index[m_Output_data.at(i).range - 23]);
+				else
+					m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[0]);
+			}
 			else
 				m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[0]);
 #if 0
@@ -436,20 +443,28 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			else
 				m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[m_Output_data.at(i).range]);
 #endif
-			if((m_Output_data.at(i).range>22) || (m_Output_data.at(i).range == 0))
+			if(m_Output_data.at(i).range>30)
 			{
 				m_output_list.SetItemText(i,OUTPUT_UNITE,Digital_Units_Array[0]);
 			}
 			else
 			{
-				CString temp1;
+				
 				CStringArray temparray;
-#if 0
-				if(m_Output_data.at(i).range>=12)
-					temp1 = Digital_Units_Array[m_Output_data.at(i).range - 11];//11 is the sizeof the array
-				else
-#endif
+
+				if((m_Output_data.at(i).range < 23) &&(m_Output_data.at(i).range !=0))
 					temp1 = Digital_Units_Array[m_Output_data.at(i).range];
+				else if((m_Output_data.at(i).range >=23) && (m_Output_data.at(i).range <= 30))
+				{
+					if(receive_customer_unit)
+						temp1 = temp_unit_no_index[m_Output_data.at(i).range - 23];
+				}
+				else
+				{
+					temp1.Empty();
+					m_output_list.SetItemText(i,OUTPUT_VALUE,_T(""));
+				}
+
 				SplitCStringA(temparray,temp1,_T("/"));
 				if((temparray.GetSize()==2))
 				{
@@ -666,10 +681,25 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 		memcpy_s(&m_temp_output_data[lRow],sizeof(Str_out_point),&m_Output_data.at(lRow),sizeof(Str_out_point));
 
 
+
+
+
 		if((m_Output_data.at(lRow).range < 23) &&(m_Output_data.at(lRow).range !=0))
 			temp1 = Digital_Units_Array[m_Output_data.at(lRow).range];
+		else if((m_Output_data.at(lRow).range >=23) && (m_Output_data.at(lRow).range <= 30))
+		{
+			if(receive_customer_unit)
+				temp1 = temp_unit_no_index[m_Output_data.at(lRow).range - 23];
+			else
+			{
+				m_output_list.Set_Edit(false);
+				return;
+			}
+		}
 		else
 			return;
+
+
 		//if(m_Output_data.at(lRow).range > 11)
 		//	temp1 = Digital_Units_Array[m_Output_data.at(lRow).range - 11];//11 is the sizeof the array
 		//else
@@ -720,6 +750,30 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 
 			//CString temp_cs = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
 			BacnetRange dlg;
+			if(!read_customer_unit)
+			{
+				for (int i=0;i<BAC_CUSTOMER_UNIT_GROUP;i++)
+				{
+					int	resend_count = 0;
+					do 
+					{
+						resend_count ++;
+						if(resend_count>50)
+							break;
+						g_invoke_id = GetPrivateData(
+							g_bac_instance,
+							READUNIT_T3000,
+							0 + i*4 ,
+							3 + i*4 ,
+							sizeof(Str_Units_element));		
+
+						Sleep(SEND_COMMAND_DELAY_TIME);
+					} while (g_invoke_id<0);
+				}
+				read_customer_unit = true;
+				Sleep(1000);
+			}
+
 			//if(temp_cs.CompareNoCase(Units_Type[UNITS_TYPE_ANALOG])==0)
 			//{
 				bac_range_number_choose = m_Output_data.at(lRow).range;
@@ -763,9 +817,20 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 					m_output_list.SetItemText(lRow,OUTPUT_100_PERSENT,_T(""));
 					m_output_list.SetCellEnabled(lRow,OUTPUT_100_PERSENT,0);
 
-					CString temp1;
+
+
 					CStringArray temparray;
-					temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
+
+					if((bac_range_number_choose >= 23) && (bac_range_number_choose <= 30))
+					{
+						//temp1.Format(_T("%s"), temp_unit_no_index[bac_range_number_choose - 23]);
+						temp1 = temp_unit_no_index[bac_range_number_choose - 23];
+					}
+					else
+						temp1 = Digital_Units_Array[bac_range_number_choose];//22 is the sizeof the array
+
+
+
 					SplitCStringA(temparray,temp1,_T("/"));
 
 					if(m_Output_data.at(lRow).control == 1)

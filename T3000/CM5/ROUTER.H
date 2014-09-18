@@ -72,6 +72,8 @@ struct Port {
 //            0x13 RS485 active    { 0001 0011 )
 //            ETHERNET             { 0010 0011 )
 
+
+
 typedef struct {
 		char 		status;
 		struct 	Port Port;
@@ -79,6 +81,10 @@ typedef struct {
 		int      task;
 		PORT_STATUS_variables port_status_vars;
 	} ROUTING_TABLE;
+
+
+
+
 
 typedef struct
 {

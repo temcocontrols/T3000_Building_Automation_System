@@ -40,6 +40,9 @@
     <Filter Include="ClassInfo">
       <UniqueIdentifier>{c664f2cd-e719-4782-bcf4-c788a2753a9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CM5\PTP">
+      <UniqueIdentifier>{01b5bfaf-b471-4aaf-9189-632840902c18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="5EInputDialog.cpp">
@@ -520,7 +523,13 @@
       <Filter>ClassInfo</Filter>
     </ClCompile>
     <ClCompile Include="Bacnetaddintodb.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetCustomerDigitalRange.cpp">
+      <Filter>CM5</Filter>
+    </ClCompile>
+    <ClCompile Include="CM5\PTP\PTP.Cpp">
+      <Filter>CM5\PTP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

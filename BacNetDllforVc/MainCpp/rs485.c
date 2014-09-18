@@ -292,7 +292,8 @@ void RS485_Initialize(
     if (RS485_Handle == INVALID_HANDLE_VALUE) {
         fprintf(stderr, "Unable to open %s\n", RS485_Port_Name);
         RS485_Print_Error();
-        exit(1);
+		return; // if open com port fail , don't exit ;
+        //exit(1);
     }
     if (!GetCommTimeouts(RS485_Handle, &RS485_Timeouts)) {
         RS485_Print_Error();
@@ -508,6 +509,41 @@ void RS485_Check_UART_Data(
         }
     }
 }
+
+
+
+
+
+/* called by timer, interrupt(?) or other thread */
+void RS485_PTP_Check_UART_Data(
+	volatile struct STR_PTP *ptp_port)
+{
+	char lpBuf[1];
+	DWORD dwRead = 0;
+
+		/* check for data */
+		if (!ReadFile(RS485_Handle, lpBuf, sizeof(lpBuf), &dwRead, NULL)) 
+		{
+			if (GetLastError() != ERROR_IO_PENDING) {
+				int tempa = GetLastError();
+				//mstp_port->ReceiveError = TRUE;
+				//	PurgeComm(RS485_Handle, PURGE_TXABORT| PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//每次读都清空一次，多次调用后会触发错误,重叠模式
+				RS485_Cleanup();
+				RS485_Initialize();
+			}
+		}
+		else 
+		{
+			if (dwRead) {
+				ptp_port->Rx_work_byte = lpBuf[0];
+				//mstp_port->DataAvailable = TRUE;
+			}
+		}
+
+}
+
+
+
 
 #ifdef TEST_RS485
 

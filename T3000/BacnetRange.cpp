@@ -8,6 +8,7 @@
 #include "gloab_define.h"
 
 int old_bac_range_number_choose = 0;
+
 // BacnetRange dialog
 
 IMPLEMENT_DYNAMIC(BacnetRange, CDialogEx)
@@ -72,43 +73,279 @@ void BacnetRange::Initial_static()
 	CString temp_cs;
 	CRect Temp_Rect;
 	GetWindowRect(Temp_Rect);
-	if(bac_ranges_type == VARIABLE_RANGE_ANALOG_TYPE)
+
+	if(receive_customer_unit)	//如果接受到了 customer unit 的回复;
+	{
+
+		for(int i=0 ;i < BAC_CUSTOMER_UNITS_COUNT ; i++)
+		{
+			MultiByteToWideChar( CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_off, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_off)+1, 
+				temp_off[i].GetBuffer(MAX_PATH), MAX_PATH );
+			temp_off[i].ReleaseBuffer();
+			if(temp_off[i].GetLength() >= 12)
+				temp_off[i].Empty();
+
+			MultiByteToWideChar( CP_ACP, 0, (char *)m_customer_unit_data.at(i).digital_units_on, (int)strlen((char *)m_customer_unit_data.at(i).digital_units_on)+1, 
+				temp_on[i].GetBuffer(MAX_PATH), MAX_PATH );
+			temp_on[i].ReleaseBuffer();
+			if(temp_on[i].GetLength() >= 12)
+				temp_on[i].Empty();
+
+			CString unit_index;
+			unit_index.Format(_T("%d.     "),i+23);
+
+			temp_unit[i] =unit_index + temp_off[i] + _T("/") + temp_on[i];
+			temp_unit_no_index[i] = temp_off[i] + _T("/") + temp_on[i];
+		}
+
+		for(int j=0;j<=7 ; j++)
+		{
+			GetDlgItem(IDC_RADIO73 + j)->SetWindowTextW(temp_unit[j]);
+		}
+
+		
+		GetDlgItem(IDC_RADIO73)->ShowWindow(true);
+		GetDlgItem(IDC_RADIO74)->ShowWindow(true);
+		GetDlgItem(IDC_RADIO75)->ShowWindow(true);
+		GetDlgItem(IDC_RADIO76)->ShowWindow(true);
+		GetDlgItem(IDC_RADIO77)->ShowWindow(true);
+		GetDlgItem(IDC_RADIO78)->ShowWindow(true);
+		GetDlgItem(IDC_RADIO79)->ShowWindow(true);
+		GetDlgItem(IDC_RADIO80)->ShowWindow(true);
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->ShowWindow(true);
+		
+	}
+	else
+	{
+		GetDlgItem(IDC_RADIO73)->ShowWindow(false);
+		GetDlgItem(IDC_RADIO74)->ShowWindow(false);
+		GetDlgItem(IDC_RADIO75)->ShowWindow(false);
+		GetDlgItem(IDC_RADIO76)->ShowWindow(false);
+		GetDlgItem(IDC_RADIO77)->ShowWindow(false);
+		GetDlgItem(IDC_RADIO78)->ShowWindow(false);
+		GetDlgItem(IDC_RADIO79)->ShowWindow(false);
+		GetDlgItem(IDC_RADIO80)->ShowWindow(false);
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->ShowWindow(false);
+	}
+
+	if((bac_ranges_type == VARIABLE_RANGE_ANALOG_TYPE) || (bac_ranges_type == VARIABLE_RANGE_DIGITAL_TYPE))
 	{
 		m_show_unit.ShowWindow(TRUE);
 		temp_cs.Format(_T("%d"),bac_range_number_choose);
 		GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(temp_cs);
 		m_analog_select = bac_range_number_choose;
-		//GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(0);
-		//GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(1);
-		//GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->ShowWindow(0);
-		//GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(0);
 		for (int i=IDC_RADIO1;i<=IDC_RADIO34;i++)
 		{
 				//GetDlgItem(i)->ShowWindow(true);
-				GetDlgItem(i)->EnableWindow(true);
+			CRect c1; 
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			ScreenToClient(c1);  
+			GetDlgItem(i)->SetWindowPos(NULL,c1.left - 420,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
+
+			GetDlgItem(i)->ShowWindow(true);
 		}
 		for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
 		{
 			//GetDlgItem(i)->ShowWindow(false);
-			GetDlgItem(i)->EnableWindow(true);
+			CRect c1; 
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			ScreenToClient(c1);  
+			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 30,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
+			GetDlgItem(i)->ShowWindow(true);
 		}
+
+		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)
+		{
+			CRect c1; 
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			ScreenToClient(c1);  
+			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 30,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
+			GetDlgItem(i)->ShowWindow(true);
+		}
+
+		CRect c1; 
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+		ScreenToClient(c1);  
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->SetWindowPos(NULL,c1.left + 30,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->ShowWindow(true);
+
+
 		for (int i=IDC_RADIO47;i<=IDC_RADIO53;i++)
 		{
 			//GetDlgItem(i)->ShowWindow(0);
-			GetDlgItem(i)->EnableWindow(false);
+			GetDlgItem(i)->ShowWindow(false);
 		}
 		for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
 		{
 			//GetDlgItem(i)->ShowWindow(0);
-			GetDlgItem(i)->EnableWindow(false);
+			GetDlgItem(i)->ShowWindow(false);
 		}
+
+		CRect c3;
+		GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->GetWindowRect(c3);   
+		ScreenToClient(c3);  
+		GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->SetWindowPos(NULL,c3.left - 420,c3.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
+
+		CRect c2; 
+		GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->GetWindowRect(c2);   
+		ScreenToClient(c2);  
+		GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->SetWindowPos(NULL,c2.left + 25,c2.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
+
+
+
+		GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(true);//variable
+		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(false);//output
+		GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(false);//input
+		MoveWindow(Temp_Rect.left,Temp_Rect.top,550,780);
 		//MoveWindow(Temp_Rect.left,Temp_Rect.top,580,550);
 	}
-	else if((bac_ranges_type == VARIABLE_RANGE_DIGITAL_TYPE) ||(bac_ranges_type == OUTPUT_RANGE_DIGITAL_TYPE) || (bac_ranges_type == INPUT_RANGE_DIGITAL_TYPE))
+	else if((bac_ranges_type == OUTPUT_RANGE_ANALOG_TYPE) || (bac_ranges_type == OUTPUT_RANGE_DIGITAL_TYPE))
+	{
+		m_show_unit.ShowWindow(TRUE);
+		temp_cs.Format(_T("%d"),bac_range_number_choose);
+		GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(temp_cs);
+		m_output_Analog_select = bac_range_number_choose;
+
+		for (int i=IDC_RADIO47;i<=IDC_RADIO53;i++)
+		{
+			//GetDlgItem(i)->ShowWindow(true);
+			CRect c2; 
+			GetDlgItem(i)->GetWindowRect(c2);   //获取控件的位置 ，饼调整位置;
+			ScreenToClient(c2);  
+			GetDlgItem(i)->SetWindowPos(NULL,c2.left - 400,c2.top - 370,0,0,SWP_NOZORDER|SWP_NOSIZE);
+
+			GetDlgItem(i)->ShowWindow(true);
+		}
+		for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
+		{
+			//GetDlgItem(i)->ShowWindow(0);
+			CRect c1; 
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			ScreenToClient(c1);  
+			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top - 170,0,0,SWP_NOZORDER|SWP_NOSIZE);
+			GetDlgItem(i)->ShowWindow(true);
+		}
+		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)
+		{
+			CRect c1; 
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			ScreenToClient(c1);  
+			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top - 170,0,0,SWP_NOZORDER|SWP_NOSIZE);
+			GetDlgItem(i)->ShowWindow(true);
+		}
+		CRect c1; 
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+		ScreenToClient(c1);  
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->SetWindowPos(NULL,c1.left + 50,c1.top - 170,0,0,SWP_NOZORDER|SWP_NOSIZE);
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->ShowWindow(true);
+
+
+		for (int i=IDC_RADIO1;i<=IDC_RADIO34;i++)
+		{
+			//GetDlgItem(i)->ShowWindow(false);
+			GetDlgItem(i)->ShowWindow(false);
+		}
+		for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
+		{
+			//GetDlgItem(i)->ShowWindow(0);
+			GetDlgItem(i)->ShowWindow(false);
+		}
+		CRect c3;
+		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->GetWindowRect(c3);   
+		ScreenToClient(c3);  
+		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->SetWindowPos(NULL,c3.left - 400,c3.top - 370,0,0,SWP_NOZORDER|SWP_NOSIZE);
+
+		CRect c2; 
+		GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->GetWindowRect(c2);   
+		ScreenToClient(c2);  
+		GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->SetWindowPos(NULL,c2.left + 45,c2.top - 170,0,0,SWP_NOZORDER|SWP_NOSIZE);
+
+		GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(false);//variable
+		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(true);//output
+		GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(false);//input
+		MoveWindow(Temp_Rect.left,Temp_Rect.top,550,610);
+		//MoveWindow(Temp_Rect.left,Temp_Rect.top,400,400);
+	}
+	else if((bac_ranges_type == INPUT_RANGE_ANALOG_TYPE) || (bac_ranges_type == INPUT_RANGE_DIGITAL_TYPE))
+	{
+		m_show_unit.ShowWindow(TRUE);
+		temp_cs.Format(_T("%d"),bac_range_number_choose);
+		((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetWindowTextW(temp_cs);
+		m_input_Analog_select = bac_range_number_choose;
+
+		for (int i=IDC_RADIO47;i<=IDC_RADIO53;i++)
+		{
+			//GetDlgItem(i)->ShowWindow(false);
+			((CButton *)GetDlgItem(i))->ShowWindow(false);
+		}
+		for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
+		{
+			GetDlgItem(i)->ShowWindow(0);
+			CRect c1; 
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			ScreenToClient(c1);  
+			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
+			((CButton *)GetDlgItem(i))->ShowWindow(1);
+
+		}
+
+		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)
+		{
+			CRect c1; 
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			ScreenToClient(c1);  
+			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
+			GetDlgItem(i)->ShowWindow(true);
+		}
+
+		CRect c1; 
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+		ScreenToClient(c1);  
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->ShowWindow(true);
+
+		for (int i=IDC_RADIO1;i<=IDC_RADIO34;i++)
+		{
+			//GetDlgItem(i)->ShowWindow(false);
+			((CButton *)GetDlgItem(i))->ShowWindow(false);
+		}
+		for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
+		{
+			CRect c1; 
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			ScreenToClient(c1);  
+			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
+
+			((CButton *)GetDlgItem(i))->ShowWindow(1);
+		}
+
+		CRect c2; 
+		GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->GetWindowRect(c2);   
+		ScreenToClient(c2);  
+		GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->SetWindowPos(NULL,c2.left + 50,c2.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
+
+		GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->GetWindowRect(c2);   
+		ScreenToClient(c2);  
+		GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->SetWindowPos(NULL,c2.left + 50,c2.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
+
+
+		GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(false);//variable
+		GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(false);//output
+		GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(true);//input
+		//new player,
+		//MoveWindow(Temp_Rect.left,Temp_Rect.top,490,480);
+		MoveWindow(Temp_Rect.left,Temp_Rect.top,580,780);
+	}
+
+
+
+
+
+	if((bac_ranges_type == VARIABLE_RANGE_DIGITAL_TYPE) ||(bac_ranges_type == OUTPUT_RANGE_DIGITAL_TYPE) || (bac_ranges_type == INPUT_RANGE_DIGITAL_TYPE))
 	{
 		if(bac_range_number_choose > 23)
 			bac_range_number_choose = 0;
-		
+
 		m_show_unit.ShowWindow(TRUE);
 		temp_cs.Format(_T("%d"),bac_range_number_choose);
 		GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(temp_cs);
@@ -121,29 +358,28 @@ void BacnetRange::Initial_static()
 			m_digital_select = bac_range_number_choose - 11;
 		old_bac_range_number_choose = m_digital_select;
 
-		//GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(0);
-		//GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(0);
-		//GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->ShowWindow(1);
-		//GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(0);
 		for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
 		{
 			//GetDlgItem(i)->ShowWindow(true);
-			GetDlgItem(i)->EnableWindow(1);
+			GetDlgItem(i)->ShowWindow(1);
 		}
 		if(bac_ranges_type == VARIABLE_RANGE_DIGITAL_TYPE)
 		{
 			for (int i=IDC_RADIO1;i<=IDC_RADIO34;i++)
 			{
 				//GetDlgItem(i)->ShowWindow(false);
-				GetDlgItem(i)->EnableWindow(1);
-			}		
+				GetDlgItem(i)->ShowWindow(1);
+			}	
+			GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(true);//variable
+			GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(false);//output
+			GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(false);//input
 		}
 		else
 		{
 			for (int i=IDC_RADIO1;i<=IDC_RADIO34;i++)
 			{
 				//GetDlgItem(i)->ShowWindow(false);
-				GetDlgItem(i)->EnableWindow(0);
+				GetDlgItem(i)->ShowWindow(0);
 			}	
 		}
 
@@ -151,14 +387,17 @@ void BacnetRange::Initial_static()
 		{
 			for (int i=IDC_RADIO47;i<=IDC_RADIO53;i++)
 			{
-				GetDlgItem(i)->EnableWindow(1);
+				GetDlgItem(i)->ShowWindow(1);
 			}
+			GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(false);//variable
+			GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(true);//output
+			GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(false);//input
 		}
 		else
 		{
 			for (int i=IDC_RADIO47;i<=IDC_RADIO53;i++)
 			{
-				GetDlgItem(i)->EnableWindow(0);
+				GetDlgItem(i)->ShowWindow(0);
 			}
 		}
 
@@ -166,86 +405,22 @@ void BacnetRange::Initial_static()
 		{
 			for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
 			{
-				GetDlgItem(i)->EnableWindow(1);
+				GetDlgItem(i)->ShowWindow(1);
 			}
+			GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(false);//variable
+			GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(false);//output
+			GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(true);//input
 		}
 		else
 		{
 			for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
 			{
-				GetDlgItem(i)->EnableWindow(0);
+				GetDlgItem(i)->ShowWindow(0);
 			}
 		}
 
 		//MoveWindow(Temp_Rect.left,Temp_Rect.top,600,300);
 	}
-	else if(bac_ranges_type == OUTPUT_RANGE_ANALOG_TYPE)
-	{
-		m_show_unit.ShowWindow(TRUE);
-		temp_cs.Format(_T("%d"),bac_range_number_choose);
-		GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(temp_cs);
-		m_output_Analog_select = bac_range_number_choose;
-
-		//GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(1);
-		//GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(0);
-		//GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->ShowWindow(0);
-		//GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(0);
-		for (int i=IDC_RADIO47;i<=IDC_RADIO53;i++)
-		{
-			//GetDlgItem(i)->ShowWindow(true);
-			GetDlgItem(i)->EnableWindow(true);
-		}
-		for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
-		{
-			//GetDlgItem(i)->ShowWindow(0);
-			GetDlgItem(i)->EnableWindow(true);
-		}
-		for (int i=IDC_RADIO1;i<=IDC_RADIO34;i++)
-		{
-			//GetDlgItem(i)->ShowWindow(false);
-			GetDlgItem(i)->EnableWindow(false);
-		}
-		for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
-		{
-			//GetDlgItem(i)->ShowWindow(0);
-			GetDlgItem(i)->EnableWindow(false);
-		}
-		//MoveWindow(Temp_Rect.left,Temp_Rect.top,400,400);
-	}
-	else if(bac_ranges_type == INPUT_RANGE_ANALOG_TYPE)
-	{
-		m_show_unit.ShowWindow(TRUE);
-		temp_cs.Format(_T("%d"),bac_range_number_choose);
-		((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetWindowTextW(temp_cs);
-		m_input_Analog_select = bac_range_number_choose;
-
-		//GetDlgItem(IDC_STATIC_ANALOG_UNITS)->ShowWindow(0);
-		//GetDlgItem(IDC_STATIC_ANALOG_UNITS2)->ShowWindow(0);
-		//GetDlgItem(IDC_STATIC_DIGITAL_UNITS)->ShowWindow(0);
-		//GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(1);
-		for (int i=IDC_RADIO47;i<=IDC_RADIO53;i++)
-		{
-			//GetDlgItem(i)->ShowWindow(false);
-			((CButton *)GetDlgItem(i))->EnableWindow(false);
-		}
-		for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
-		{
-			//GetDlgItem(i)->ShowWindow(0);
-			((CButton *)GetDlgItem(i))->EnableWindow(1);
-		}
-		for (int i=IDC_RADIO1;i<=IDC_RADIO34;i++)
-		{
-			//GetDlgItem(i)->ShowWindow(false);
-			((CButton *)GetDlgItem(i))->EnableWindow(false);
-		}
-		for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
-		{
-			//GetDlgItem(i)->ShowWindow(true);
-			((CButton *)GetDlgItem(i))->EnableWindow(1);
-		}
-		//MoveWindow(Temp_Rect.left,Temp_Rect.top,490,480);
-	}
-
 
 	GetDlgItem(IDC_EDIT_RANGE_SELECT)->EnableWindow(1);
 	GetDlgItem(IDC_EDIT_RANGE_SELECT)->ShowWindow(1);
@@ -335,6 +510,10 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 			{
 					bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
 			}
+			else if((nfocusid >= IDC_RADIO73) && (nfocusid <= IDC_RADIO80))
+			{
+				bac_ranges_type = INPUT_RANGE_DIGITAL_TYPE;
+			}
 			else if(nfocusid == IDC_EDIT_RANGE_SELECT)
 			{
 
@@ -353,8 +532,22 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 			{
 				if(m_digital_select != old_bac_range_number_choose)
 				{
-					bac_range_number_choose = m_digital_select;
-					m_show_unit.SetWindowTextW(Digital_Units_Array[bac_range_number_choose]);
+					//TRACE(_T("%d\r\n"),m_digital_select);
+					if(m_digital_select >11)
+					{
+						bac_range_number_choose = m_digital_select - 11 + 22;
+					}
+					else
+					{
+						bac_range_number_choose = m_digital_select;
+					}
+					
+					if((bac_range_number_choose >= 23) && (bac_range_number_choose <=30))
+					{
+						m_show_unit.SetWindowTextW(temp_unit_no_index[bac_range_number_choose - 23]);
+					}
+					else
+						m_show_unit.SetWindowTextW(Digital_Units_Array[bac_range_number_choose]);
 				}
 			}
 			else if(bac_ranges_type == OUTPUT_RANGE_ANALOG_TYPE)
@@ -397,21 +590,33 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 			||(bac_ranges_type == OUTPUT_RANGE_DIGITAL_TYPE) 
 			|| (bac_ranges_type == INPUT_RANGE_DIGITAL_TYPE))	//12
 		{
-			if(sel_value>=23)
+			if(sel_value>=31)
 			{
-				MessageBox(_T("Please input a value between 0 - 22"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+				MessageBox(_T("Please input a value between 0 - 30"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 				GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(_T(""));
 				((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetSel(0,-1);
 				((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetFocus();
 			}
 			else
 			{
-				bac_range_number_choose = sel_value;
-				m_show_unit.SetWindowTextW(Digital_Units_Array[bac_range_number_choose]);
-				if(sel_value < 11)
-					m_digital_select = sel_value;
+				if(sel_value <= 22)
+				{
+					bac_range_number_choose = sel_value;
+					m_show_unit.SetWindowTextW(Digital_Units_Array[bac_range_number_choose]);
+					if(sel_value < 11)
+						m_digital_select = sel_value;
+					else
+						m_digital_select = sel_value - 11;
+				}
 				else
+				{
+					bac_range_number_choose = sel_value;
 					m_digital_select = sel_value - 11;
+					CString temp_cs;
+					temp_cs = temp_off[bac_range_number_choose - 23] + _T("/") + temp_on[bac_range_number_choose - 23];
+					m_show_unit.SetWindowTextW(temp_cs);
+				}
+
 				UpdateData(false);
 			}
 		}

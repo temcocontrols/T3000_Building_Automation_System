@@ -60,8 +60,8 @@ public:
 	void SetRoomName(const CString& strRoomName); 
 	CString GetRoomName()const;
 
-	void SetSerialID(DWORD dwSerialID); 
-	DWORD  GetSerialID()const;
+	void SetSerialID(unsigned int dwSerialID); 
+	unsigned int  GetSerialID()const;
 
 	CString GetSubnetName() const;
 	void SetSubnetName(const CString& strSubnetName);
@@ -69,7 +69,7 @@ public:
 	
 	Mainnet_info	m_mainnet_info;
 public:
-	DWORD	m_dwSerialID;				// 每个产品的序列号ID，出厂时设定
+	unsigned int	m_dwSerialID;				// 每个产品的序列号ID，出厂时设定
 	int			m_nDevID;					// 设备ID，当设备联网工作时的ID，这个内容必须与寄存器同步
 	BOOL		m_bOnLine;					// 连接状态，TRUE＝在线，FALSE＝掉线
 	int			m_nProductType;			//	产品型号，由此判断5A，5B。。。等等，或者是否是NC

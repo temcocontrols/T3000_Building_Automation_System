@@ -55,7 +55,7 @@ const CString CString_Occupied[3] =
 {
 	_T("Unoccupied"),
 	_T("Occupied"),
-	_T("Unkown")
+	_T("Unknown")
 };
 
 const CString CString_Cool_Heat[4] =
@@ -63,7 +63,7 @@ const CString CString_Cool_Heat[4] =
 	_T("Coasting"),
 	_T("Cool"),
 	_T("Heat"),
-	_T("Unkown")
+	_T("Unknown")
 };
 
 //const int TSTAT_NUM = 0;

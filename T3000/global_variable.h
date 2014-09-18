@@ -1822,6 +1822,14 @@ int	MODBUS_PID3_OFF_OUTPUT_HEAT3		=	-1	;
 int selected_product_index;
 HTREEITEM selected_tree_item;
 #pragma region For_bacnet
+
+
+CString temp_off[BAC_CUSTOMER_UNITS_COUNT];		//用于 保存 客户自定义的 单位;
+CString temp_on[BAC_CUSTOMER_UNITS_COUNT];
+CString temp_unit[BAC_CUSTOMER_UNITS_COUNT];
+CString temp_unit_no_index[BAC_CUSTOMER_UNITS_COUNT];
+bool read_customer_unit;	//如果这个设备没有读过 customer unit这一项,就要尝试去读，以前老版本的没有;
+bool receive_customer_unit; //收到回复，flag就置 true;
 unsigned char bacnet_add_id[254];
 int bacnet_device_type;
 int g_bac_instance;
@@ -1853,6 +1861,7 @@ bool bac_annualcode_read_results;
 bool bac_alarmlog_read_results;
 bool bac_tstat_read_results;
 bool bac_basic_setting_read_results;
+bool bac_customer_unit_read_results;
 
 bool bac_cm5_graphic;
 int bac_gloab_panel;
@@ -1884,6 +1893,7 @@ HWND      m_alarmwindow_dlg_hwnd;
 HWND      m_tstat_dlg_hwnd;
 HWND      m_setting_dlg_hwnd;
 HWND      m_flash_multy_hwnd;
+HWND      m_customer_digital_range_dlg_hwnd;
 
 vector <Str_out_point> m_Output_data;
 vector <Str_in_point>  m_Input_data;
@@ -1900,6 +1910,7 @@ vector <_Bac_Scan_results_Info> m_bac_scan_result_data;
 vector <Alarm_point> m_alarmlog_data;
 vector <Str_TstatInfo_point> m_Tstat_data;
 vector <Str_Remote_TstDB> m_remote_device_db;
+vector <Str_Units_element> m_customer_unit_data;
 Time_block_mini Device_time;
 Str_Setting_Info Device_Basic_Setting;
 

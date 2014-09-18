@@ -110,7 +110,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -136,6 +136,7 @@
     <ClCompile Include="BacnetAlarmWindow.cpp" />
     <ClCompile Include="BacnetAnnualRoutine.cpp" />
     <ClCompile Include="BacnetController.cpp" />
+    <ClCompile Include="BacnetCustomerDigitalRange.cpp" />
     <ClCompile Include="BacnetGraphic.cpp" />
     <ClCompile Include="BacnetInput.cpp" />
     <ClCompile Include="BacnetMonitor.cpp" />
@@ -166,6 +167,7 @@
     <ClCompile Include="CM5\ListCtrlEx.cpp" />
     <ClCompile Include="CM5\MyOwnListCtrl.cpp" />
     <ClCompile Include="CM5\PointItem.cpp" />
+    <ClCompile Include="CM5\PTP\PTP.Cpp" />
     <ClCompile Include="CO2NetView.cpp" />
     <ClCompile Include="CO2_View.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
@@ -363,6 +365,7 @@
     <ClInclude Include="BacnetAlarmLog.h" />
     <ClInclude Include="ARDDlg.h" />
     <ClInclude Include="BacnetAlarmWindow.h" />
+    <ClInclude Include="BacnetCustomerDigitalRange.h" />
     <ClInclude Include="BacnetGraphic.h" />
     <ClInclude Include="BacnetInput.h" />
     <ClInclude Include="BacnetOutput.h" />

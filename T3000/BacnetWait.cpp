@@ -299,6 +299,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 									  BAC_MONITOR_GROUP +
 									  BAC_WEEKLYCODE_GOUP +
 									  BAC_ANNUALCODE_GROUP;//这里还有很多要加;
+									  BAC_BASIC_SETTING_GROUP;
 		int read_config_all_step = 1000 / read_config_total_count;
 		int read_config_success_count =0;
 		int read_config_pos = 0;
@@ -330,6 +331,19 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			if(bac_read_which_list ==BAC_READ_SVAE_CONFIG)
 			{
 				if(Bacnet_Refresh_Info.Read_Annualcode_Info[i].task_result == BAC_RESULTS_OK)
+				{
+					read_config_success_count ++;
+					read_config_pos = read_config_pos +read_config_all_step;
+				}
+			}
+		}
+
+		
+		for (int i=0;i<BAC_BASIC_SETTING_GROUP;i++)
+		{
+			if(bac_read_which_list ==BAC_READ_SVAE_CONFIG)
+			{
+				if(Bacnet_Refresh_Info.Read_BasicSetting_Info[i].task_result == BAC_RESULTS_OK)
 				{
 					read_config_success_count ++;
 					read_config_pos = read_config_pos +read_config_all_step;
@@ -480,6 +494,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		int monitor_step = 1000 /BAC_MONITOR_GROUP;
 		int alarmlog_step = 1000 /BAC_ALARMLOG_GROUP;
 		int tstat_step = 1000 / BAC_TSTAT_GROUP;
+		int customer_unit_step = 1000 / BAC_CUSTOMER_UNIT_GROUP;
 		tempcs = tempcs + tempcs2;
 		int success_count =0;
 		int pos=0;
@@ -522,6 +537,20 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				}
 			}
 		}
+
+
+		for (int i=0;i<BAC_CUSTOMER_UNIT_GROUP;i++ )
+		{
+			if(bac_read_which_list == BAC_READ_TSTAT_LIST)
+			{
+				if(Bacnet_Refresh_Info.Read_Customer_unit_Info[i].task_result == BAC_RESULTS_OK)
+				{
+					success_count ++;
+					pos = pos + customer_unit_step;
+				}
+			}
+		}
+
 
 		for (int i=0;i<BAC_PROGRAM_GROUP;i++ )
 		{
@@ -739,6 +768,65 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 		{
+			for (int i=0;i<BAC_CUSTOMER_UNIT_GROUP;i++)
+			{
+				if(bac_read_which_list == BAC_READ_CUSTOMER_UNITS)
+				{
+					if(Bacnet_Refresh_Info.Read_Customer_unit_Info[i].task_result == BAC_RESULTS_UNKONW)
+					{
+						if(Bacnet_Refresh_Info.Read_Customer_unit_Info[i].invoke_id > 0)
+						{
+							Bacnet_Refresh_Info.Read_Customer_unit_Info[i].timeout_count ++;
+						}
+						if(Bacnet_Refresh_Info.Read_Customer_unit_Info[i].timeout_count > 20)
+						{
+							Bacnet_Refresh_Info.Read_Customer_unit_Info[i].task_result = BAC_RESULTS_FAIL;
+							Bacnet_Refresh_Info.Read_Customer_unit_Info[i].timeout_count = 0;
+							continue;
+						}
+						m_wait_detail.SetWindowTextW(tempcs);
+						cotinue_waite = true;
+						break;
+						//goto endthis;
+					}
+					else if(Bacnet_Refresh_Info.Read_Customer_unit_Info[i].task_result == BAC_RESULTS_FAIL)
+					{
+						cotinue_waite = true;
+						Bacnet_Refresh_Info.Read_Customer_unit_Info[i].resend_count ++ ;
+						//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
+						if((Bacnet_Refresh_Info.Read_Customer_unit_Info[i].resend_count>RESEND_COUNT) 
+							|| (Bacnet_Refresh_Info.Read_Customer_unit_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
+						{
+							//m_wait_detail.SetWindowTextW(_T("Read Tstats table Time Out!"));
+							m_wait_persent.SetWindowTextW(_T("Timeout"));
+							KillTimer(1);
+							SetTimer(2,2000,NULL);
+							goto endthis;
+						}
+
+						g_invoke_id = GetPrivateData(
+							Bacnet_Refresh_Info.Read_Customer_unit_Info[i].device_id,
+							Bacnet_Refresh_Info.Read_Customer_unit_Info[i].command,
+							Bacnet_Refresh_Info.Read_Customer_unit_Info[i].start_instance,
+							Bacnet_Refresh_Info.Read_Customer_unit_Info[i].end_instance,
+							sizeof(Str_Units_element));
+						if(g_invoke_id<0)	//如果没有获取到 就继续循环;
+						{
+							Sleep(50);
+							continue;
+						}
+						Bacnet_Refresh_Info.Read_Customer_unit_Info[i].has_resend_yes_or_no ++;
+						Bacnet_Refresh_Info.Read_Customer_unit_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
+						Bacnet_Refresh_Info.Read_Customer_unit_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
+
+						CString temp_cs_show;
+						temp_cs_show.Format(_T("Task ID = %d. Read Customer units "),g_invoke_id);
+						Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
+					}
+				}
+			}
+
+
 			for (int i=0;i<BAC_TSTAT_GROUP;i++)
 			{
 				if((bac_read_which_list == BAC_READ_TSTAT_LIST) || (bac_read_which_list == BAC_READ_ALL_LIST))
@@ -803,9 +891,6 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					}
 				}
 			}
-
-
-
 
 		for (int i=0;i<BAC_MONITOR_GROUP;i++)
 		{
@@ -1075,7 +1160,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 		for (int i=0;i<BAC_BASIC_SETTING_GROUP;i++)
 		{
-			if((bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND) || (bac_read_which_list == BAC_READ_ALL_LIST))
+			if((bac_read_which_list == BAC_READ_BASIC_SETTING_COMMAND) || (bac_read_which_list == BAC_READ_ALL_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG))
 			{
 
 
@@ -2094,6 +2179,7 @@ m_wait_persent.SetWindowTextW(_T("100%"));
 		bac_annualcode_read_results = true;
 		bac_alarmlog_read_results = true;
 		bac_basic_setting_read_results = true;
+		bac_customer_unit_read_results = true;
 			m_wait_detail.SetWindowTextW(_T("Reading descriptors success!"));
 			KillTimer(1);
 			if(bac_read_which_list ==BAC_READ_ALL_LIST)

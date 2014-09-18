@@ -49,6 +49,8 @@
  * @return True if the interface is successfully initialized,
  *         else False if the initialization fails.
  */
+int m_protocol = 3;
+
 bool(*datalink_init) (char *ifname);
 
 /** Function template to send a packet via the DataLink.
@@ -60,62 +62,109 @@ bool(*datalink_init) (char *ifname);
  * @param pdu_len [in] Number of bytes in the pdu buffer.
  * @return Number of bytes sent on success, negative number on failure.
  */
-int (
-    *datalink_send_pdu) (
+#if 1
+int datalink_send_pdu (
     BACNET_ADDRESS * dest,
     BACNET_NPDU_DATA * npdu_data,
     uint8_t * pdu,
-    unsigned pdu_len);
+    unsigned pdu_len)
+{
 
-uint16_t(*datalink_receive) (BACNET_ADDRESS * src, uint8_t * pdu,
-    uint16_t max_pdu, unsigned timeout);
+	if(m_protocol == 2)
+	{
+		dlmstp_send_pdu(dest,npdu_data,pdu,pdu_len);
+	}
+	else if(m_protocol == 3)
+	{
+		bip_send_pdu(dest,npdu_data,pdu,pdu_len);
+	}
+}
 
+__declspec(dllexport) uint16_t datalink_receive (BACNET_ADDRESS * src, uint8_t * pdu,
+    uint16_t max_pdu, unsigned timeout)
+{
+	if(m_protocol == 3)
+	{
+		bip_receive(src,pdu,max_pdu,timeout);
+	}
+	else if(m_protocol == 2)
+	{
+		dlmstp_receive(src, pdu, max_pdu, timeout);
+	}
+	
+}
+#endif
 /** Function template to close the DataLink services and perform any cleanup.
  * @ingroup DLTemplates
  */
-void (
-    *datalink_cleanup) (
-    void);
+//void (
+//    *datalink_cleanup) (
+//    void);
 
-void (
-    *datalink_get_broadcast_address) (
-    BACNET_ADDRESS * dest);
-
-void (
-    *datalink_get_my_address) (
-    BACNET_ADDRESS * my_address);
-
-void datalink_set(
-    char *datalink_string)
+void set_datalink_protocol(int nprotocol)
 {
-    if (strcasecmp("bip", datalink_string) == 0) {
-        datalink_init = bip_init;
-        datalink_send_pdu = bip_send_pdu;
-        datalink_receive = bip_receive;
-        datalink_cleanup = bip_cleanup;
-        datalink_get_broadcast_address = bip_get_broadcast_address;
-        datalink_get_my_address = bip_get_my_address;
-    } else if (strcasecmp("ethernet", datalink_string) == 0) {
-        datalink_init = ethernet_init;
-        datalink_send_pdu = ethernet_send_pdu;
-        datalink_receive = ethernet_receive;
-        datalink_cleanup = ethernet_cleanup;
-        datalink_get_broadcast_address = ethernet_get_broadcast_address;
-        datalink_get_my_address = ethernet_get_my_address;
-    } else if (strcasecmp("arcnet", datalink_string) == 0) {
-        datalink_init = arcnet_init;
-        datalink_send_pdu = arcnet_send_pdu;
-        datalink_receive = arcnet_receive;
-        datalink_cleanup = arcnet_cleanup;
-        datalink_get_broadcast_address = arcnet_get_broadcast_address;
-        datalink_get_my_address = arcnet_get_my_address;
-    } else if (strcasecmp("mstp", datalink_string) == 0) {
-        datalink_init = dlmstp_init;
-        datalink_send_pdu = dlmstp_send_pdu;
-        datalink_receive = dlmstp_receive;
-        datalink_cleanup = dlmstp_cleanup;
-        datalink_get_broadcast_address = dlmstp_get_broadcast_address;
-        datalink_get_my_address = dlmstp_get_my_address;
-    }
+	m_protocol = nprotocol;
 }
+
+ void datalink_get_broadcast_address (
+    BACNET_ADDRESS * dest)
+{
+	//and so on
+	if(m_protocol == 2)
+	{
+		dlmstp_get_broadcast_address(dest);
+	}
+	else if(m_protocol == 3)
+	{
+		bip_get_broadcast_address(dest);
+	}
+}
+
+ void datalink_get_my_address (
+	BACNET_ADDRESS * my_address)
+{
+	//if(protocal == BAC_MSTP || protocal == BAC_PTP)
+	if(m_protocol == 2)
+	{
+		dlmstp_get_my_address(my_address);
+	}
+	else if(m_protocol == 3)
+	{
+		bip_get_my_address(my_address);
+	}
+}
+
+//void datalink_set(
+//    char *datalink_string)
+//{
+//    if (strcasecmp("bip", datalink_string) == 0) {
+//        datalink_init = bip_init;
+//        datalink_send_pdu = bip_send_pdu;
+//        datalink_receive = bip_receive;
+//        datalink_cleanup = bip_cleanup;
+//        datalink_get_broadcast_address = bip_get_broadcast_address;
+//        datalink_get_my_address = bip_get_my_address;
+//    } else if (strcasecmp("ethernet", datalink_string) == 0) {
+//        datalink_init = ethernet_init;
+//        datalink_send_pdu = ethernet_send_pdu;
+//        datalink_receive = ethernet_receive;
+//        datalink_cleanup = ethernet_cleanup;
+//        datalink_get_broadcast_address = ethernet_get_broadcast_address;
+//        datalink_get_my_address = ethernet_get_my_address;
+//    } else if (strcasecmp("arcnet", datalink_string) == 0) {
+//        datalink_init = arcnet_init;
+//        datalink_send_pdu = arcnet_send_pdu;
+//        datalink_receive = arcnet_receive;
+//        datalink_cleanup = arcnet_cleanup;
+//        datalink_get_broadcast_address = arcnet_get_broadcast_address;
+//        datalink_get_my_address = arcnet_get_my_address;
+//    } else if (strcasecmp("mstp", datalink_string) == 0) {
+//        datalink_init = dlmstp_init;
+//        datalink_send_pdu = dlmstp_send_pdu;
+//        datalink_receive = dlmstp_receive;
+//        datalink_cleanup = dlmstp_cleanup;
+//        datalink_get_broadcast_address = dlmstp_get_broadcast_address;
+//        datalink_get_my_address = dlmstp_get_my_address;
+//    }
+//}
 #endif

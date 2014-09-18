@@ -49,6 +49,7 @@ typedef enum {
 		 READSCREEN_T3000          = ENUM_GRP+1,        /* read screens        */
 		 READARRAY_T3000           = ENUM_ARRAY+1,      /* read arrays         */
 		 READALARM_T3000		   = ENUM_ALARMM + 1, /* read alarm */
+		 READUNIT_T3000			   = 14,			/*customer defined units * /
 //		 READARRAYVALUE_T3000      = AYVALUE+1,    /* read array elements */
 		 READTIMESCHEDULE_T3000    = ENUM_WR_TIME+1,    /* read time schedule  */
 		 READANNUALSCHEDULE_T3000  = ENUM_AR_DATA+1,    /* read annual schedule*/
@@ -76,7 +77,8 @@ typedef enum {
 		 WRITEMONITOR_T3000        = 100+ENUM_AMON+1,       /* write monitors       */
 		 WRITESCREEN_T3000         = 100+ENUM_GRP+1,        /* write screens        */
 		 WRITEARRAY_T3000          = 100+ENUM_ARRAY+1,      /* write arrays         */
-		  WRITEALARM_T3000		   = 100+ ENUM_ALARMM + 1, /* read alarm */
+		  WRITEALARM_T3000		   = 100+ ENUM_ALARMM + 1, /* write alarm */
+		  WRITEUNIT_T3000          = 114,                 /* write customer units*/
 		 WRITETIMESCHEDULE_T3000   = 100+ENUM_WR_TIME+1,    /* write time schedule  */
 		 WRITEANNUALSCHEDULE_T3000 = 100+ENUM_AR_DATA+1,     /* write annual schedule*/
 		 WRITEPROGRAMCODE_T3000    = 100+16,           /* write program code    */
@@ -836,6 +838,32 @@ typedef  struct
 	SCAN_DB tst_db;
 	uint8_t type;
 }Str_TstatInfo_point;
+
+
+typedef struct
+{
+	uint8_t direct;
+	char digital_units_off[12];       /*12 bytes; string)*/
+	char digital_units_on[12];        /*12 bytes; string)*/
+
+} Str_Units_element;  
+
+typedef struct
+{
+	unsigned char primitive;
+	unsigned short DNET;
+	unsigned char DLEN;
+	char D_MAC_ADR[6];
+	unsigned char dest_LSAP;
+	unsigned short SNET;
+	unsigned char SLEN;
+	char S_MAC_ADR[6];
+	unsigned char source_LSAP;
+
+} UNITDATA_PARAMETERS;
+
+
+
 
 
 

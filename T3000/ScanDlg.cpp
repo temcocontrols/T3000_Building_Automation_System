@@ -153,8 +153,8 @@ BOOL CScanDlg::OnInitDialog()
 		CString strType =GetProductName(m_net_product_node.product_class_id);		
 		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_TYPE,strType); 
 		CString strSerailID;
-		int nSID =m_net_product_node.serial_number;
-		strSerailID.Format(_T("%d"), nSID);
+		unsigned int nSID =m_net_product_node.serial_number;
+		strSerailID.Format(_T("%u"), nSID);
 		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_SERIALID,strSerailID);
 		
 		 		 
@@ -1363,13 +1363,13 @@ void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 	CString strProductName = pDev->GetProductName();
 
 	CString strSerialID;
-	strSerialID.Format(_T("%d"), pDev->GetSerialID());
+	strSerialID.Format(_T("%u"), pDev->GetSerialID());
 
 
 
 	 int nClassID = pDev->GetProductType();
 	CString strClassID;
-	strClassID.Format(_T("%d"), nClassID);
+	strClassID.Format(_T("%u"), nClassID);
 
 	int nBaudRate = pDev->GetBaudRate();
 	CString strBaudRate;
@@ -1430,11 +1430,11 @@ void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
 	CString strProductName = pNet->GetProductName();
 
 	CString strSerialID;
-	strSerialID.Format(_T("%d"), pNet->GetSerialID());
+	strSerialID.Format(_T("%u"), pNet->GetSerialID());
 
 	int nClassID = pNet->GetProductType();
 	CString strClassID;
-	strClassID.Format(_T("%d"), nClassID);
+	strClassID.Format(_T("%u"), nClassID);
 
 	CString strScreenName;
 	strScreenName.Format(_T("Screen(S:%d--%d)"), pNet->GetSerialID(), pNet->GetDevID() );
@@ -1533,7 +1533,7 @@ void CScanDlg::AddComDeviceToGrid(vector<_ComDeviceInfo*>& szList)
 
 		CString strSerialID;
 		int nSID = pDevInfo->m_pDev->GetSerialID();
-		strSerialID.Format(_T("%d"), nSID);
+		strSerialID.Format(_T("%u"), nSID);
 		m_flexGrid.put_TextMatrix(i+nSize,SCAN_TABLE_SERIALID,strSerialID); 
 		///// ID
 		int nID = 0;
@@ -1602,7 +1602,7 @@ CTStatBase* CScanDlg::FindDeviceByRowNum( int nRow )
 	int nRows = m_flexGrid.get_Rows();
 
 	CString strSID = m_flexGrid.get_TextMatrix(nRow, SCAN_TABLE_SERIALID);
-	int nSID = _wtoi(strSID);
+	unsigned int nSID = _wtoi64(strSID);
 
 
 	for (UINT i = 0 ; i < m_pScanner->m_szTstatScandRet.size(); i++)
