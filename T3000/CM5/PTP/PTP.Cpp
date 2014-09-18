@@ -5,7 +5,7 @@
 
 //#include "product.h"
 //#include "..\..\T3000\CM5\ROUTER.H"
-#ifndef PTP
+//#ifndef PTP
 
 #include <string.h>
 //#include "main.h"
@@ -18,7 +18,7 @@
 //#include "mstp.h"
 #include "stdio.h"
 //#include "delay.h"
-
+#include "rs485.h"
 
 #define TRUE      1
 
@@ -403,6 +403,7 @@ void PTP_Send_frame( FRAME_ENTRY *frame, int frame_type, int dest,STR_PTP *ps )
 	ps->ResponseTimer = 0;
 	ps->SilenceTimer = 0; 
 
+	RS485_Send_Frame(NULL,(uint8_t *)send_buffer,Send_index);
 #if 0 //
   	uart_send_string(send_buffer,Send_index,1);
     Timer_Silence_Reset();
@@ -468,10 +469,19 @@ S16_T init_idle_state( S16_T r )
 		/*SET COMM PORT*/
 
 
-
+	return 0;
 }
+HANDLE hThread_Receive = NULL;
+HANDLE hThread_connection = NULL;
+HANDLE hThread_reception = NULL;
+HANDLE hThread_transmission = NULL;
+HANDLE hThread_timer = NULL;
 
-
+DWORD nThreadID_Receive;
+DWORD nThreadID_connection;
+DWORD nThreadID_reception;
+DWORD nThreadID_transmission;
+DWORD nThreadID_timer;
 
 
 
@@ -491,7 +501,8 @@ void vStartPTPTask(void)
 /*
  * Note:  PTP connect state machine have 5 state : DISCONNECTED, INBOUND, OUTBOUND, CONNECTED, DISCONNECTING
  */
-void PTP_connection_sm(void )
+DWORD WINAPI    PTP_connection_sm(LPVOID lpVoid)
+//void PTP_connection_sm(void )
 {
 	FRAME_ENTRY *rec_frame, *frame;
 	STR_PTP *ps;
@@ -505,7 +516,7 @@ void PTP_connection_sm(void )
 	for( ;; )
 	{
 		ps = &Ptp_para;
-
+		Sleep(1);
 #if 0
 		vTaskDelay(xDelayPeriod);		
 #endif
@@ -516,9 +527,10 @@ void PTP_connection_sm(void )
 				/* connect Outbound
 					if a DL-CONNECT.request is received, establish a physical connection
 				*/
-				
+#if 0 //fance				
 				if( NL_PARAMETERS.primitive == DL_CONNECT_REQUEST )  // if a DL-CONNECT.request is received, establish a physical connection
 				{
+#endif
 					/* start sending */
 					ps->SendFrameTimer = 12;
 #if 0 //
@@ -537,12 +549,16 @@ void PTP_connection_sm(void )
 #endif
 
 					break;
+#if 0 //fance
 				}
-
+#endif
 				/*	connect inbound
 					if a physical layer connection has been made and the "BACnet<CR>" trigger sequence is receive
 					transmit ConnectRequestFrame
 				*/
+
+				RS485_Send_Frame(NULL,(uint8_t *)&trigger_sequence,8);
+				Sleep(1000);
 				/* for test */
 				if( ps->rec_trigger_sequence >= 7 &&  ps->rec_trigger_sequence != 255)
 				{
@@ -605,7 +621,7 @@ void PTP_connection_sm(void )
 						break;
 					}
 				}
-			
+
 				if( ps->ResponseTimer >= T_CONN_REQ )
 				{
 #if (DEBUG_UART1)
@@ -621,6 +637,8 @@ void PTP_connection_sm(void )
 #if 0 //
 						uart_send_string(trigger_sequence, 7,1);   /* send trigger squence "BACnet<CR>"*/
 #endif
+						RS485_Send_Frame(NULL,(uint8_t *)&trigger_sequence,8);
+
 						PTP_connection_sleep = T_CONN_REQ;
 						ps->PTP_connection_state = OUTBOUND;  /*enter OUTBOUND status */
 						break;
@@ -733,8 +751,10 @@ void PTP_connection_sm(void )
 			are exchanging BACnet PDUs. The data link remains in this
 			PTP_connection_state until termination	*/
 				/*	Network disconnect	*/
+
 				if( NL_PARAMETERS.primitive == DL_DISCONNECT_REQUEST )  
 				{
+
 #if (DEBUG_UART1)
 	sprintf(debug_str," CONNECTED send DISCONNECT_REQUEST\r\n");
 	uart_send_string(debug_str,strlen(debug_str),UART_SUB1);
@@ -876,6 +896,7 @@ void PTP_connection_sm(void )
 				init_idle_state( 1);
 		}	
 	}
+	return 0;
 }
 
 
@@ -888,7 +909,8 @@ void PTP_connection_sm(void )
  * Note:  PTP reception state machine have 5 state : REC_IDLE, REC_READY, DATA, DATA_ACK, DATA_NAK
  * ----------------------------------------------------------------------------
  */
-void PTP_reception_sm( void)
+DWORD WINAPI    PTP_reception_sm(LPVOID lpVoid)
+//void PTP_reception_sm( void)
 {
 //	FRAME_ENTRY *rec_frame/*, *frame*/;
 //	U8_T ttframe[520];
@@ -905,6 +927,7 @@ void PTP_reception_sm( void)
 #if 0
 		vTaskDelay(xDelayPeriod);	
 #endif	
+		Sleep(1);
 		#if 1
 		{	
 			ps = &Ptp_para;			
@@ -1149,6 +1172,7 @@ void PTP_reception_sm( void)
 		}
 		#endif
 	}
+	return 0;
 }
 
 
@@ -1163,20 +1187,21 @@ void PTP_reception_sm( void)
  * ----------------------------------------------------------------------------
  */
  //void handle_PTP_rx_interrupt( STR_PTP *ps );
-
-void PTP_transmission_sm(void )
+DWORD WINAPI    PTP_transmission_sm(LPVOID lpVoid)
+//void PTP_transmission_sm(void )
 {
 	FRAME_ENTRY *frame;
 	STR_PTP *ps;
     S16_T ResponseTimer;
 #if 0 //
 	portTickType xDelayPeriod = ( portTickType ) 50 / portTICK_RATE_MS;
-#endif
-	ps->HeartbeatTimer = 0;
+
+ps->HeartbeatTimer = 0;
+	#endif
 	for( ; ; ) 
 	{
 		ps = &Ptp_para;
-	
+	Sleep(1);
 	
 	//	ps->transmission_blocked = 1;
 #if 0
@@ -1392,6 +1417,7 @@ void PTP_transmission_sm(void )
 			}
 		}
 	}
+	return 0;
 }
 
 
@@ -1415,7 +1441,7 @@ U16_T CalcBlockDataCRC( U8_T *dat,U16_T length , U16_T crcValue )
 
 //extern 
 uint8_t  PDUBuffer_ptp[MAX_APDU];
-void PTP_Receive_task(void) 
+DWORD WINAPI    PTP_Receive_task(LPVOID lpVoid)
 {
 #if 0
 	portTickType xDelayPeriod  = ( portTickType ) 5 / portTICK_RATE_MS; // 1000
@@ -1428,7 +1454,7 @@ void PTP_Receive_task(void)
 	for (;;)
     { 	
 		//task_test.count[11]++; 
-
+		Sleep(1);
 		//if(Modbus.com_config[1] == PTP_RS232_GSM)
 		{
 #if 0
@@ -1441,7 +1467,8 @@ void PTP_Receive_task(void)
 				Modbus.protocal = BAC_PTP;
 #endif
 				//pdu_len = datalink_receive(&src, &PDUBuffer_ptp[0], sizeof(PDUBuffer_ptp), 0,Modbus.protocal);
-				pdu_len = datalink_receive(&src, &PDUBuffer_ptp[0], sizeof(PDUBuffer_ptp), 0,3);
+				//pdu_len = datalink_receive(&src, &PDUBuffer_ptp[0], sizeof(PDUBuffer_ptp), 0);
+				pdu_len = dl_ptp_receive(&src, &PDUBuffer_ptp[0], sizeof(PDUBuffer_ptp), 0);
 			    { 
 					
 				    if(pdu_len > 0) 
@@ -1459,6 +1486,10 @@ void PTP_Receive_task(void)
 
 			            npdu_handler(&src, &PDUBuffer_ptp[0], pdu_len);	
 			        }
+					else
+					{
+						Sleep(1);
+					}
 					
 				}
 #if 0
@@ -1477,9 +1508,70 @@ void PTP_Receive_task(void)
 	
 		
     }		
-
+	return 0;
 }
 
+
+
+
+/* Return the length of the packet */
+uint16_t dl_ptp_receive(
+    BACNET_ADDRESS * src,       /* source address */
+    uint8_t * pdu,      /* PDU data */
+    uint16_t max_pdu,   /* amount of space available in the PDU  */
+    unsigned port)
+{       /* milliseconds to wait for a packet */
+    uint16_t pdu_len = 0;       /* return value */
+    /* dummy - unused parameter */
+//    timeout = timeout;
+	pdu_len = 0;
+    /* set the input buffer to the same data storage for zero copy */
+
+	if (!Ptp_para.DataBuffer) {
+        Ptp_para.DataBuffer = (char *)pdu;
+  //      InputBufferSize = max_pdu;
+   		}
+    /* only do receive state machine while we don't have a frame */
+	    if ((Ptp_para.received_valid_frame == false) &&
+	        (Ptp_para.received_invalid_frame == false)) 
+		{
+	        for (;;) {
+					
+				PTP_Receive_Frame_FSM();
+
+	            if (Ptp_para.received_valid_frame || Ptp_para.received_invalid_frame)
+				{	
+	                break;
+				}
+	            /* if we are not idle, then we are
+	               receiving a frame or timing out */
+	            if (Ptp_para.Rec_frame_state == RX_IDLE)
+				{	
+	                break;
+				}
+	        }
+	    }
+
+    /* only do master state machine while rx is idle */
+
+#if 0
+    /* if there is a packet that needs processed, do it now. */
+    if (MSTP_Flag.ReceivePacketPending) {
+        MSTP_Flag.ReceivePacketPending = false;
+
+
+        	pdu_len = Ptp_para.Length;
+
+
+        src->mac_len = 1;
+        src->mac[0] = SourceAddress;
+
+
+        /* data is already in the pdu pointer */
+    }
+#endif
+    return pdu_len;
+}
 
 
 
@@ -1490,8 +1582,9 @@ void PTP_Receive_Frame_FSM( void)
 	ps = &Ptp_para;	
 
 	ps->Rx_work_byte = 0;
-	
-	if (RS485_DataAvailable(&ps->Rx_work_byte,1)) 
+	RS485_PTP_Check_UART_Data(ps);
+	Sleep(1);
+	//if (RS485_DataAvailable(&ps->Rx_work_byte,1)) 
 	{	
 		if( ps->Rx_work_byte != 0x11 && ps->Rx_work_byte != 0x13 )
 	 	{	  
@@ -1822,5 +1915,119 @@ void PTP_Receive_Frame_FSM( void)
     return;
 }
 
+DWORD WINAPI    PTP_timer(LPVOID lpVoid)
+{
+	while(1)
+	{
+		Sleep(1);
+		Ptp_para.SilenceTimer ++; 
+		Ptp_para.HeartbeatTimer++; 
+		Ptp_para.InactivityTimer ++;  
+		Ptp_para.ResponseTimer++;
+	}
+	return 0;
+}
 
+void vstartptptask()
+{
+	hThread_Receive =CreateThread(NULL,NULL,PTP_Receive_task,NULL,NULL, &nThreadID_Receive);
+	hThread_connection =CreateThread(NULL,NULL,PTP_connection_sm,NULL,NULL, &nThreadID_connection);
+	hThread_reception =CreateThread(NULL,NULL,PTP_reception_sm,NULL,NULL, &nThreadID_reception);
+	hThread_transmission =CreateThread(NULL,NULL,PTP_transmission_sm,NULL,NULL, &nThreadID_transmission);
+	hThread_timer =CreateThread(NULL,NULL,PTP_timer,NULL,NULL, &nThreadID_timer);
+}
+
+
+
+
+bool dl_ptp_init(
+    char *ifname)
+{
+  //  unsigned long hThread = 0;
+    uint32_t arg_value = 0;
+	Sleep(1);
+    /* initialize packet queue */
+#if 0
+    Receive_Packet.ready = false;
+    Receive_Packet.pdu_len = 0;
+    Receive_Packet_Flag = CreateSemaphore(NULL, 0, 1, "dlmstpReceivePacket");
+   // if (Receive_Packet_Flag == NULL)
+   //     exit(1);
+    Received_Frame_Flag = CreateSemaphore(NULL, 0, 1, "dlsmtpReceiveFrame");
+    if (Received_Frame_Flag == NULL) {
+        CloseHandle(Receive_Packet_Flag);
+   //     exit(1);
+    }
 #endif
+    /* initialize hardware */
+  //  timer_init();
+    if (ifname) {
+        RS485_Set_Interface(ifname);
+    }
+    RS485_Initialize();
+#if 0
+    MSTP_Port.InputBuffer = &RxBuffer[0];
+    MSTP_Port.InputBufferSize = sizeof(RxBuffer);
+    MSTP_Port.OutputBuffer = &TxBuffer[0];
+    MSTP_Port.OutputBufferSize = sizeof(TxBuffer);
+    MSTP_Port.SilenceTimer = Timer_Silence;
+    MSTP_Port.SilenceTimerReset = Timer_Silence_Reset;
+    MSTP_Init(&MSTP_Port);
+#endif
+	init_PTP_structures();
+#if 0
+    uint8_t data;
+
+    /* FIXME: implement your data storage */
+    data = 64;  /* I2C_Read_Byte(
+                   EEPROM_DEVICE_ADDRESS,
+                   EEPROM_MSTP_MAC_ADDR); */
+    if (data <= 127)
+        MSTP_Port.This_Station = data;
+    else
+        dlmstp_set_my_address(DEFAULT_MAC_ADDRESS);
+    /* FIXME: implement your data storage */
+    data = 127; /* I2C_Read_Byte(
+                   EEPROM_DEVICE_ADDRESS,
+                   EEPROM_MSTP_MAX_MASTER_ADDR); */
+    if ((data <= 127) && (data >= MSTP_Port.This_Station))
+        MSTP_Port.Nmax_master = data;
+    else
+        dlmstp_set_max_master(DEFAULT_MAX_MASTER);
+    /* FIXME: implement your data storage */
+    data = 1;
+    /* I2C_Read_Byte(
+       EEPROM_DEVICE_ADDRESS,
+       EEPROM_MSTP_MAX_INFO_FRAMES_ADDR); */
+    if (data >= 1)
+        MSTP_Port.Nmax_info_frames = data;
+    else
+        dlmstp_set_max_info_frames(DEFAULT_MAX_INFO_FRAMES);
+#endif
+#if PRINT_ENABLED
+    fprintf(stderr, "MS/TP MAC: %02X\n", MSTP_Port.This_Station);
+    fprintf(stderr, "MS/TP Max_Master: %02X\n", MSTP_Port.Nmax_master);
+    fprintf(stderr, "MS/TP Max_Info_Frames: %u\n",
+        (unsigned) MSTP_Port.Nmax_info_frames);
+#endif
+
+
+#if 0 //Fance
+    hThread1 = _beginthread(dlmstp_receive_fsm_task, 4096, &arg_value);
+    if (hThread1 == 0) {
+        fprintf(stderr, "Failed to start recive FSM task\n");
+    }
+    hThread2 = _beginthread(dlmstp_master_fsm_task, 4096, &arg_value);
+    if (hThread2 == 0) {
+        fprintf(stderr, "Failed to start Master Node FSM task\n");
+    }
+#endif
+
+	vstartptptask();
+    return true;
+}
+
+
+
+
+//#endif

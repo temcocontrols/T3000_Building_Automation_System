@@ -6628,7 +6628,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					g_selected_serialnumber = m_product.at(i).serial_number;
 					g_mac = m_product.at(i).software_version;
 					bac_gloab_panel = g_mac;
-					g_gloab_bac_comport =_wtoi(temp_csa);
+					g_gloab_bac_comport = m_product.at(i).ncomport;
+					//g_gloab_bac_comport =_wtoi(temp_csa);
+					//g_gloab_bac_comport = 1;
 					
 					BOOL is_local = IP_is_Local(product_Node.BuildingInfo.strIp);
 					if(is_local == false)	//判断是否是本地IP，不是本地的就要连接到远端的，远端的 Who  is  广播发布过去的;
@@ -7903,6 +7905,9 @@ void CMainFrame::GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItem
 }
 
 
+//网络的部分先发广播 扫描, 在确认是不是有新的设备，若有就存进数据库.若扫描到的与数据库的有出入，就更新数据库;
+//一乡二里共三夫子，不识四书五经六义，竟敢教七八九子，十分大胆
+//十室九贫，
 BOOL CMainFrame::CheckDeviceStatus()
 {
 	bool find_new_device = false;
@@ -7930,11 +7935,12 @@ BOOL CMainFrame::CheckDeviceStatus()
 			nSerialNumber=tp.serial_number;
 			
 			//int newnID=read_one(nID,6,2);
-			/*
+			/*需要先保存之前的通信协议;
 			Get the protocol ,if it is bacnet ip,we compare the device id.
 			*/		
 			//如果strip不是空的就说明这个设备室挂在NC或LC等等下面的MODBUS  RS485设备
 				//if((m_product.at(i).protocol == MODBUS_RS485) && (m_product.at(i).BuildingInfo.strIp.IsEmpty()))
+
 				int temp_port = 0;
 				temp_port = m_product.at(i).ncomport;
 				if((m_product.at(i).protocol == MODBUS_RS485) && (temp_port > 0 ) && (m_product.at(i).BuildingInfo.strIp.IsEmpty()))
@@ -7949,6 +7955,7 @@ BOOL CMainFrame::CheckDeviceStatus()
 					close_com();
 					int nComPort = m_product.at(i).ncomport;
 					int n_baudrate = m_product.at(i).baudrate;
+					//38400是有一个zigbee 的 USB  它的波特率,所以也需要判断38400;
 					if((n_baudrate != 19200) && (n_baudrate != 9600) && (n_baudrate != 38400))
 						n_baudrate = 19200;
 					if(nComPort == 0)
@@ -7990,7 +7997,7 @@ BOOL CMainFrame::CheckDeviceStatus()
 						unsigned short first_ten_reg[10];
 						int read_block_ret;
 						read_block_ret=Read_Multi(nIDNode,&first_ten_reg[0],0,10,3);
-
+						
 
 						//TRACE(_T("%d = Read_One(%d)     "),nID,nIDNode);
 						/* 
@@ -8033,6 +8040,7 @@ BOOL CMainFrame::CheckDeviceStatus()
 							//	nRet=modbus_read_multi_value(&SerialNum[0],nID,0,4,5); 
 							//nRet=Read_Multi(nID,&SerialNum[0],0,4,5);
 							//memcpy((char *)SerialNum,(char *)first_ten_reg,4);
+
 							unsigned int nSerialNumberRead;
 
 							if(nRet>=0)  // 计算串口号
@@ -10363,6 +10371,24 @@ void CMainFrame::OnHelpUpdatefirmware()
 void CMainFrame::OnControlTstat()
 {
 	// TODO: Add your command handler code here
+#if 0
+	char my_port[50];
+
+	CString temp_cs11;
+	//temp_cs.Format(_T("COM%d"),g_com);
+	temp_cs11.Format(_T("COM%d"),5);
+	char cTemp11[255];
+	memset(cTemp11,0,255);
+	WideCharToMultiByte( CP_ACP, 0, temp_cs11.GetBuffer(), -1, cTemp11, 255, NULL, NULL );
+	temp_cs11.ReleaseBuffer();
+	sprintf(my_port,cTemp11);
+
+
+	dl_ptp_init(my_port);
+
+
+	return;
+#endif
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		if(bac_select_device_online)
@@ -10388,7 +10414,7 @@ void CMainFrame::ShowDebugWindow()
 		DebugWindow = new CDebugWindow;
 		DebugWindow->Create(IDD_DIALOG_DEBUG_TRACE, this);
 		DebugWindow->ShowWindow(SW_HIDE);
-		g_Print = _T("Debug Time 14-08-05   Debug version 2.0");
+		g_Print = _T("Debug Time 14-09-15   Debug version 2.1");
 		DFTrace(g_Print);
 	}
 	

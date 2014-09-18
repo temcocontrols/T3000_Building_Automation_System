@@ -321,10 +321,10 @@ __declspec(dllexport)    void handler_cov_subscribe(
         uint16_t service_len,
         BACNET_ADDRESS * src,
         BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
-
+#if 0
 	void ProcessPTA(
 		BACNET_PRIVATE_TRANSFER_DATA * data);	//Fance;
-
+#endif
 //__declspec(dllexport)	bool CM5ProcessPTA(
 //		BACNET_PRIVATE_TRANSFER_DATA * data);	//Fance;
 

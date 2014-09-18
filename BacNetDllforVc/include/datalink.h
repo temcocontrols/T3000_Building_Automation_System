@@ -54,15 +54,18 @@ extern "C" {
 		BACNET_ADDRESS * src,
 		uint8_t * pdu,
 		uint16_t max_pdu,
-		unsigned timeout,
-		int nprotocol);//,
+		unsigned timeout
+		);//,
 	//uint8_t protocal);
 	void datalink_cleanup(uint8_t protocal);
-	__declspec(dllexport) void datalink_get_broadcast_address(
+	__declspec(dllexport) void datalink_get_broadcast_address (
 		BACNET_ADDRESS * dest);//,
+
+	__declspec(dllexport) void set_datalink_protocol(int nprotocol);
+
 	//uint8_t protocal);
-	__declspec(dllexport) void datalink_get_my_address(
-		BACNET_ADDRESS * my_address);//,
+	__declspec(dllexport) void datalink_get_my_address (
+	BACNET_ADDRESS * my_address);//,
 	//uint8_t protocal);
 	void datalink_set_interface(
 		char *ifname);

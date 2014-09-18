@@ -47,9 +47,9 @@
 #include "bacstr.h"
 extern uint8_t IOBufferPT[300]; /* Somewhere to build the encoded result block for Private Transfers */
 
-#include "..\..\BacNetDllforVc\include\ud_str.h"
+//#include "..\..\BacNetDllforVc\include\ud_str.h"
 //#include "..\gloab_variable_extern.h"
-Str_in_point Private_data[100];
+//Str_in_point Private_data[100];
 int Private_data_length;
 extern HWND BacNet_hwd;
 static void DecodeBlock(
@@ -255,7 +255,7 @@ static void DecodeBlock(
 //}
 //#endif
 
-
+#if 0
  void ProcessPTA(
     BACNET_PRIVATE_TRANSFER_DATA * data)
 {
@@ -292,6 +292,7 @@ static void DecodeBlock(
     //    decode_unsigned(&data->serviceParameters[iLen], len_value_type,
     //    &uiErrorCode);
 	 decode_octet_string(&data->serviceParameters[iLen], len_value_type,&Temp_CS);
+
 	 if((len_value_type - 6)%44!=0)
 		 return;	//得到的结构长度错误;
 
@@ -389,7 +390,7 @@ static void DecodeBlock(
     }
 }
 
-
+#endif
 // void ProcessPTA(
 //	 BACNET_PRIVATE_TRANSFER_DATA * data)
 // {
@@ -494,9 +495,9 @@ void handler_conf_private_trans_ack(
         printf("cpta: Bad Encoding!\n");
 #endif
     }
-
+#if 0	// fance
     ProcessPTA(&data);  /* See what to do with the response */
-
+#endif
     return;
 }
 

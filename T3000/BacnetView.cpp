@@ -1,6 +1,9 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+
+
+
 2014-07-18
 Update by Fance
 1. Improve the quality of communication. 
@@ -1098,14 +1101,17 @@ void CDialogCM5_BacNet::Initial_All_Point()
 	
 }
 //__declspec(dllexport) HANDLE	Get_RS485_Handle();
-HWND temp_hwnd;
+
 //INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
-
+	static bool initial_once_ip = false;
+	if(initial_once_ip == false)
+	{
+		initial_once_ip = true;
 	Initial_bac(g_gloab_bac_comport);
-
-
+	}
+	//
 	//SetTimer(1,500,NULL);
 	SetTimer(2,60000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 	SetTimer(3,1000,NULL); //Check whether need  show Alarm dialog.
@@ -1117,7 +1123,7 @@ void CDialogCM5_BacNet::Fresh()
 	temp_cs.Format(_T("%d"),g_mac);
 	GetDlgItem(IDC_STATIC_CM5_MAC)->SetWindowTextW(temp_cs);
 	Station_NUM = g_mac;
-
+	//
 	//需要先连接上设备，读取设备的一些panel number和 instance 之后 在用 private 的方法读取 信息;
 	if(hconnect_modbus_thread == NULL)
 		hconnect_modbus_thread = CreateThread(NULL,NULL,ConnectToDevice,NULL,NULL,NULL);
@@ -1127,7 +1133,7 @@ void CDialogCM5_BacNet::Fresh()
 		hconnect_modbus_thread = NULL;
 		hconnect_modbus_thread = CreateThread(NULL,NULL,ConnectToDevice,NULL,NULL,NULL);
 	}
-
+	
 	//prevent when user doesn't click the bacnet device,the view also initial ,It's a waste of resource;
 #if 1
 	static bool initial_once = true;

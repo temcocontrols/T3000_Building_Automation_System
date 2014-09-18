@@ -49,6 +49,8 @@
  * @return True if the interface is successfully initialized,
  *         else False if the initialization fails.
  */
+int m_protocol = 3;
+
 bool(*datalink_init) (char *ifname);
 
 /** Function template to send a packet via the DataLink.
@@ -67,17 +69,25 @@ int datalink_send_pdu (
     uint8_t * pdu,
     unsigned pdu_len)
 {
-	bip_send_pdu(dest,npdu_data,pdu,pdu_len);
+
+	if(m_protocol == 2)
+	{
+		dlmstp_send_pdu(dest,npdu_data,pdu,pdu_len);
+	}
+	else if(m_protocol == 3)
+	{
+		bip_send_pdu(dest,npdu_data,pdu,pdu_len);
+	}
 }
 
 __declspec(dllexport) uint16_t datalink_receive (BACNET_ADDRESS * src, uint8_t * pdu,
-    uint16_t max_pdu, unsigned timeout,int nprotocol)
+    uint16_t max_pdu, unsigned timeout)
 {
-	if(nprotocol == 3)
+	if(m_protocol == 3)
 	{
 		bip_receive(src,pdu,max_pdu,timeout);
 	}
-	else if(nprotocol == 2)
+	else if(m_protocol == 2)
 	{
 		dlmstp_receive(src, pdu, max_pdu, timeout);
 	}
@@ -91,18 +101,37 @@ __declspec(dllexport) uint16_t datalink_receive (BACNET_ADDRESS * src, uint8_t *
 //    *datalink_cleanup) (
 //    void);
 
+void set_datalink_protocol(int nprotocol)
+{
+	m_protocol = nprotocol;
+}
+
  void datalink_get_broadcast_address (
     BACNET_ADDRESS * dest)
 {
 	//and so on
-	bip_get_broadcast_address(dest);
+	if(m_protocol == 2)
+	{
+		dlmstp_get_broadcast_address(dest);
+	}
+	else if(m_protocol == 3)
+	{
+		bip_get_broadcast_address(dest);
+	}
 }
 
  void datalink_get_my_address (
 	BACNET_ADDRESS * my_address)
 {
-	//dengdeng
-	bip_get_my_address(my_address);
+	//if(protocal == BAC_MSTP || protocal == BAC_PTP)
+	if(m_protocol == 2)
+	{
+		dlmstp_get_my_address(my_address);
+	}
+	else if(m_protocol == 3)
+	{
+		bip_get_my_address(my_address);
+	}
 }
 
 //void datalink_set(
