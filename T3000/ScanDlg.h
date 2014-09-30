@@ -71,6 +71,7 @@ void FillIcmpData(char * icmp_data, int datasize);
 USHORT Checksum(USHORT *buffer, int size);
 int DecodeResp(char *buf, int bytes,struct sockaddr_in *from);
 void ChangeIPAddress(CString newip,CString oldip);
+void SaveNewIPAddress(CString newip,CString oldip);
 public:
 	void InitScanGrid();
 

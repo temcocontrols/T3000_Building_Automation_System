@@ -5,7 +5,7 @@
 #include "T3000.h"
 #include "ImageTreeCtrl.h"
 
-
+#include "MainFrm.h"
 
 // CImageTreeCtrl
 enum ECmdHandler {
@@ -134,7 +134,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 					}
 
 					m_pRs->Close();
-					return TRUE;
+					 
 				}
 				else
 				{
@@ -145,11 +145,21 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 				break;	
 			}
 		case 1:		//Floor
-			{	 // strSql=_T("select * from Building where Default_SubBuilding=-1");
-				// m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-				HTREEITEM parentnode=GetParentItem(m_hSelItem);
+			{	 
+			CString subnetname;
+			     strSql=_T("select * from Building where Default_SubBuilding=-1");
+				 m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+				 while(VARIANT_FALSE==m_pRs->EndOfFile)
+				 {	   	
+				  subnetname.Empty();
+				 subnetname=m_pRs->GetCollect("Building_Name");	
+				 m_pRs->MoveNext();
+				 }
+				 m_pRs->Close();
 
-				CString subnetname=GetItemText(parentnode);//m_pRs->GetCollect("Building_Name");
+// 				HTREEITEM parentnode=GetParentItem(m_hSelItem);
+// 
+// 				CString subnetname=GetItemText(parentnode);//m_pRs->GetCollect("Building_Name");
 
 				//  m_pRs->Close();
 				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' order by Building_Name"),subnetname,m_name_new);
@@ -166,11 +176,11 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 				}
 				m_pRs->Close();
 
-				if (is_exist)
+				/*if (is_exist)
 				{
 					return FALSE;
 				} 
-				else
+				else*/
 				{  	strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' order by Building_Name"),subnetname,m_name_old);
 				m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 				while(VARIANT_FALSE==m_pRs->EndOfFile)
@@ -180,10 +190,10 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 					m_pRs->MoveNext();
 				}
 				m_pRs->Close();
-				return TRUE;
+				 
 				}
 
-
+				 
 				break;
 			}
 		case 2:		//Room
@@ -194,7 +204,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 				//Floor
 				HTREEITEM parentnode=GetParentItem(m_hSelItem);
 				CString Floorname=GetItemText(parentnode);
-				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' order by Building_Name"),subnetname,Floorname,m_name_new);
+				/*strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' order by Building_Name"),subnetname,Floorname,m_name_new);
 				m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 
 				while(VARIANT_FALSE==m_pRs->EndOfFile)
@@ -213,8 +223,9 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 				{
 					return FALSE;
 				} 
-				else
-				{strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' order by Building_Name"),subnetname,Floorname,m_name_old);
+				else*/
+				{
+				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' order by Building_Name"),subnetname,Floorname,m_name_old);
 				m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 
 				while(VARIANT_FALSE==m_pRs->EndOfFile)
@@ -225,7 +236,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 				}
 				m_pRs->Close();
 
-				return TRUE; 
+				 
 				}
 
 
@@ -242,27 +253,28 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 				//Floor
 				HTREEITEM floornode=GetParentItem(parentnode);
 				CString Floorname=GetItemText(floornode);
-				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' and Product_name='%s' order by Building_Name"),subnetname,Floorname,Roomname,m_name_new);
-				m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+// 				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' and Product_name='%s' order by Building_Name"),subnetname,Floorname,Roomname,m_name_new);
+// 				m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+// 
+// 				while(VARIANT_FALSE==m_pRs->EndOfFile)
+// 				{	   	 str_temp.Empty();
+// 				str_temp=m_pRs->GetCollect("Product_name");
+// 				if (str_temp.Compare(m_name_new)==0)
+// 				{	   is_exist=TRUE;
+// 				break;
+// 				}			
+// 				m_pRs->MoveNext();
+// 				}
+// 
+// 				m_pRs->Close();	
 
-				while(VARIANT_FALSE==m_pRs->EndOfFile)
-				{	   	 str_temp.Empty();
-				str_temp=m_pRs->GetCollect("Product_name");
-				if (str_temp.Compare(m_name_new)==0)
-				{	   is_exist=TRUE;
-				break;
-				}			
-				m_pRs->MoveNext();
-				}
-
-				m_pRs->Close();	
-
-				if (is_exist)
+				//if (is_exist)
+				//{
+				//	return FALSE;
+				//}
+				//else
 				{
-					return FALSE;
-				}
-				else
-				{
+					
 					strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' and Product_name='%s' order by Building_Name"),subnetname,Floorname,Roomname,m_name_old);
 					m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 					while(VARIANT_FALSE==m_pRs->EndOfFile)
@@ -272,7 +284,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 						m_pRs->MoveNext();
 					}
 					m_pRs->Close();
-					return TRUE;
+					 
 				}
 
 				break;
@@ -288,13 +300,17 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 		m_pCon->Close();
 	}
 	m_pCon->Close();  
+
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
+
 	return TRUE;
 }
 // CImageTreeCtrl 消息处理程序
 bool CImageTreeCtrl::HandleKeyDown(WPARAM wParam, LPARAM lParam) {
 	bool bCtrl = (::GetKeyState(VK_CONTROL) & 0x8000) != 0;
 	bool bShift = (::GetKeyState(VK_SHIFT) & 0x8000) != 0;
-	HTREEITEM m_hSelItem = GetSelectedItem();
+	  m_hSelItem = GetSelectedItem();
 	m_level=get_item_level(m_hSelItem);
 	m_name_old=GetItemText(m_hSelItem);
 	if(GetEditControl() == 0) {

@@ -169,6 +169,7 @@ void CFSBThumb::DrawRectThumb(CDC* pDC)
 	//pDC->Draw3dRect(m_rc, RGB(255, 0, 0), RGB(0, 255, 0));
 	pDC->Draw3dRect(m_rc, GetSysColor(COLOR_3DHIGHLIGHT), GetSysColor(COLOR_3DSHADOW));
 
+
 	pDC->SelectObject(pOldBrush);
 }
 

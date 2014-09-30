@@ -1154,80 +1154,29 @@ void CNetworkControllView::InitGrid()
 	m_gridSub.put_TextMatrix(0,0,_T("No"));
 	m_gridSub.put_TextMatrix(0,1,_T("Address"));
 	m_gridSub.put_TextMatrix(0,2,_T("Serial Number"));
-	//for(int i = 0; i < rows; i++)
-	//{
-	//	m_gridSub.put_ColAlignment(i,4);
-	//}
 
-	WORD data[254*5];
-	memset(data,0,sizeof(data));
-	int times=(rows*5)/100 +1;
-/*	int ret3 = Read_One(g_tstat_id,7001);
-	int ret =  Read_One(g_tstat_id,7000);*///NC扫描到的TSTAT数量,2个字节 先放在高字节
+	
+
+ 	unsigned short data[254*5+30];
+ 	memset(data,0,sizeof(data));
+ 	int times=(rows*5)/100 +1;
+    
 	for (int i=0;i<times;i++)
 	{
-	  Read_Multi(g_tstat_id,&data[100*i],5671+i*100,100);
+		Read_Multi(g_tstat_id,&data[100*i],5671+i*100,100);
 	}
-	//if (ret>0&&ret<4)
-	//{
-	//	Read_Multi(g_tstat_id,&data[0],7002,ret*30);
-	//}
-	//else if(ret<=245)
-	//{
-	//	int ret1 = Read_One(g_tstat_id,7003);//第一个TSTAT ID地址
-	//	if (ret1!= 255&&ret1!=0)
-	//	{
-	//		int i =0;
-	//		for (i;i<ret;i++)
-	//		{
-	//			if ((data[i*30+1]!=0)&&(i>0))
-	//			{
-	//				Read_Multi(g_tstat_id,&data[30*i],7002+i*30,30);
-	//			}else
-	//			{
-	//				ret = i;
-	//				break;
-	//			}
-	//			
-	//		}
-	//	}else
-	//	{
-	//		ret = 0;//不显示TSTAT列表
-	//	}
 
-	//	
-	//}
-	//else
-	//{
-	//	ret = 0;
-	//}
-
-	//if (ret!=0)
-	//{
-	//	ret = ret+ret3*256;
-	//}
 	
-	_subnetwork.clear();
-	for (int i = 0;i<rows;i++)
-	{
-
-
-	/*	m_subetwork.m_coolingSet.Format(_T("%.1f°C"),(float)data[i*30+12]/10);
-		m_subetwork.m_heatingSet.Format(_T("%.1f°C"),(float)data[i*30+14]/10);
-		m_subetwork.m_setpoint.Format(_T("%.1f°C"),(float)data[i*30+13]/10); 
-		m_subetwork.m_roomTemper.Format(_T("%.1f°C"),(float)data[i*30+15]/10); 
-		m_subetwork.m_mode = m_buffer[i*30+16];     
-		m_subetwork.m_outputState.Format(_T("%.1f"),(float)data[i*30+17]/10); 
-		m_subetwork.m_nightHeating.Format(_T("%.1f°C"),(float)data[i*30+20]/10);
-		m_subetwork.m_nightCooling.Format(_T("%.1f°C"),(float)data[i*30+21]/10); 
-		m_subetwork.m_tstatProduct = data[i*30+5]; 
-		m_subetwork.m_modbusaddr.Format(_T("%d"),data[i*30+1]);*/
-		m_subetwork.ID.Format(_T("%d"),data[i*5]);
-		long sn=data[i*5+1]+data[i*5+2]*256+data[i*5+3]*256*256+data[i*5+4]*256*256*256;
-		m_subetwork.SN.Format(_T("%d"),sn);
-		_subnetwork.push_back(m_subetwork);
-
-	}
+ 	_subnetwork.clear();
+ 	for (int i = 0;i<rows;i++)
+ 	{
+ 
+ 		m_subetwork.ID.Format(_T("%d"),data[i*5]);
+ 		long sn=data[i*5+1]+data[i*5+2]*256+data[i*5+3]*256*256+data[i*5+4]*256*256*256;
+ 		m_subetwork.SN.Format(_T("%d"),sn);
+ 		_subnetwork.push_back(m_subetwork);
+ 
+ 	}
 
 
 	CString m_num,strtemp1,strtemp2;
@@ -1236,87 +1185,12 @@ void CNetworkControllView::InitGrid()
 	for (int i=1;i<rows+1;i++)
 	{
  
-
 		m_num.Format(_T("%d"),i);
 		m_gridSub.put_TextMatrix(i,0,m_num);//第一列：序号
-
-
-
-	/*	switch(_subnetwork.at(i-1).m_tstatProduct)
-		{
-		case 1:strtemp1=g_strTstat5b;break;
-		case 2:strtemp1=g_strTstat5a;break;
-		case 3:strtemp1=g_strTstat5b;break;
-		case 4:strtemp1=g_strTstat5c;break;
-		case 12:			strtemp1=g_strTstat5d;break;
-		case 100:		strtemp1=g_strnetWork;break;
-		case NET_WORK_OR485_PRODUCT_MODEL:strtemp1=g_strOR485;break;
-		case 17:strtemp1=g_strTstat5f;break;
-		case 18:strtemp1=g_strTstat5g;break;
-		case 16:strtemp1=g_strTstat5e;break;
-		case 19:strtemp1=g_strTstat5h;break;
-
-		case 26:strtemp1=g_strTstat6;break;
-		case 27:strtemp1=g_strTstat7;break;
-		case 13:
-		case 14:break;
-		default:strtemp1=g_strTstat5a;break;
-		}*/
 		
 		m_gridSub.put_TextMatrix(i,1,_subnetwork.at(i-1).ID);
 		m_gridSub.put_TextMatrix(i,2,_subnetwork.at(i-1).SN);
-		//m_gridSub.put_TextMatrix(i,3,_subnetwork.at(i-1).m_coolingSet);
-		//m_gridSub.put_TextMatrix(i,4,_subnetwork.at(i-1).m_heatingSet);
-		//m_gridSub.put_TextMatrix(i,5,_subnetwork.at(i-1).m_setpoint);
-		//m_gridSub.put_TextMatrix(i,6,_subnetwork.at(i-1).m_roomTemper);
-
-
-
-
-
-
-
-		//switch (_subnetwork.at(i-1).m_tstatProduct)		 
-		//{
-		//case 0:
-		//	strtemp2.Format(_T("%s"),_T("COASTING"));
-		//	//coasting_temp++;
-		//	break;
-		//case 1:
-		//	strtemp2.Format(_T("%s"),_T("COOLING1"));
-		//	//cooling_temp++;
-		//	break;
-		//case 2:
-		//	strtemp2.Format(_T("%s"),_T("COOLING2"));	
-		//	//cooling_temp++;
-		//	break;
-		//case 3:
-		//	strtemp2.Format(_T("%s"),_T("COOLING3"));
-		//	//cooling_temp++;
-		//	break;
-		//case 4:
-		//	strtemp2.Format(_T("%s"),_T("HEATING1"));
-		//	//heating_temp++;
-		//	break;
-		//case 5:
-		//	strtemp2.Format(_T("%s"),_T("HEATING2"));
-		//	//heating_temp++;
-		//	break;
-		//case 6:
-		//	strtemp2.Format(_T("%s"),_T("HEATING3"));
-		//	//heating_temp++;
-		//	break;
-
-		//default:
-		//	strtemp2.Format(_T("%s"),_T("COASTING"));
-		//	//coasting_temp++;
-		//	break;
-		//}
-		//m_gridSub.put_TextMatrix(i,7,strtemp2);
- 
-
-		//m_gridSub.put_TextMatrix(i,8,_subnetwork.at(i-1).m_nightHeating);
-		//m_gridSub.put_TextMatrix(i,9,_subnetwork.at(i-1).m_nightCooling);
+		 
 	}
 
 

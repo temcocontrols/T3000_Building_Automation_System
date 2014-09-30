@@ -352,12 +352,24 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 	if(0==lCol)
 	{
 		//ID_BUILDINGSEL_SELECT
-		CMenu menu;
-		menu.LoadMenu(IDR_BUILDINGSELE_MENU);
-		CMenu *pmenu=menu.GetSubMenu(0);
-		CPoint point;
-		GetCursorPos(&point);
-		pmenu->TrackPopupMenu(TPM_LEFTBUTTON | TPM_LEFTALIGN ,point.x,point.y,this);	
+
+		int rows = m_AddBuiding_FlexGrid.get_Rows();
+		if ((lRow == 0)||(lRow + 1 == rows))
+		{
+		return;
+		}
+		
+		if (lRow!=0)
+		{
+			CMenu menu;
+			menu.LoadMenu(IDR_BUILDINGSELE_MENU);
+			CMenu *pmenu=menu.GetSubMenu(0);
+			CPoint point;
+			GetCursorPos(&point);
+			pmenu->TrackPopupMenu(TPM_LEFTBUTTON | TPM_LEFTALIGN ,point.x,point.y,this);	
+		}
+		
+		
 
 	}
 	if(lCol==AB_MAINNAME)
@@ -666,7 +678,7 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 				{
 					if(strText.IsEmpty())
 					{
-						AfxMessageBox(_T("Please input a validate IP adreess or domain name!"));
+						//AfxMessageBox(_T("Please input a validate IP adreess or domain name!"));
 						return;
 					}
 					/*
@@ -737,7 +749,7 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 
 					if(strText.IsEmpty())
 					{
-						AfxMessageBox(_T("Please input a validate IP adreess or domain name!"));
+						//AfxMessageBox(_T("Please input a validate IP adreess or domain name!"));
 						return;
 					}
 				
@@ -772,6 +784,8 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 		}
 	
 		m_AddBuiding_SetEditCtrl.ShowWindow(SW_HIDE);
+
+		OnBnClickedAddbuiding();
 #endif
 }
 
@@ -843,6 +857,7 @@ void CAddBuilding::Update_Recorder()
 void CAddBuilding::OnBnClickedExit()
 {
 	// TODO: Add your control notification handler code here
+	m_Changed=TRUE;
 	   if (m_Changed)
 	   {
 		   CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
@@ -1081,7 +1096,7 @@ void CAddBuilding::OnEnKillfocusMainbuildedit()
 			strTemp=m_BuildNameLst.at(i).strMainBuildName;
 			if(strText.CompareNoCase(strTemp)==0&&m_strBuilding_Name2.CompareNoCase(m_BuildNameLst.at(i).strSubBuildName)==0)
 			{
-				AfxMessageBox(_T("The building Name has exist, please change another one."));
+				    AfxMessageBox(_T("The building Name has exist, please change another one."));
 					m_mainBuildEdt.ShowWindow(SW_HIDE);
 				return;
 			}
@@ -1109,6 +1124,7 @@ void CAddBuilding::OnEnKillfocusMainbuildedit()
 		}
 	}
 	m_mainBuildEdt.ShowWindow(SW_HIDE);
+
 }
 
 void CAddBuilding::OnEnSetfocusMainbuildedit()
@@ -1812,7 +1828,7 @@ void CAddBuilding::OnBnClickedAddbuiding()
 	CString strMainBuildName=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_MAINNAME);
 	if(strMainBuildName.IsEmpty())
 	{
-		AfxMessageBox(_T("Input the building info in the last row of grid, the building and sub building NAME can not be empty."));
+		//AfxMessageBox(_T("Input the building info in the last row of grid, the building and sub building NAME can not be empty."));
 		return ;
 	}
 

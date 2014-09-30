@@ -65,7 +65,7 @@ public:
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CTabCtrl m_bac_main_tab;
-	void Tab_Initial();
+	BOOL Tab_Initial();
 	void Set_Tab_Loaded_Parameter(int ntab);
 	void Inital_Tab_Loaded_Parameter();
 	

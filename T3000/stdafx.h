@@ -112,12 +112,11 @@ INPUT int Read_One2(unsigned char  device_var,unsigned short  address, bool bCom
 INPUT int Write_One2(unsigned char  device_var,unsigned short  address,unsigned short  value, bool bComm_Type);
 //OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length);
 INPUT int read_multi2(unsigned char device_var,unsigned short  *put_data_into_here,unsigned short  start_address,int length, bool bComm_Type);
-INPUT void closefile();//scan
-INPUT void writefile( CString strip,CString strport);//scan
-INPUT void Createfile();//scan
 
-//INPUT void WriteLogFile(CString strlog);
-//INPUT void CloseLogFile();
+INPUT void close_T3000_log_file();//scan
+INPUT void write_T3000_log_file( CString StrTips);//scan
+INPUT void Create_T3000_log_file();//scan
+
 INPUT CString Get_NowTime();
 
 

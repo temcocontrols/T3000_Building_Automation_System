@@ -47,36 +47,92 @@ struct ALL_NODE {
 };
 
 struct Building{
-CString Main_BuildingName;
-CString Building_Name;
-CString Protocal;
-CString Com_Port;
-CString Ip_Address;
-CString Ip_Port;
-CString Brandrate;
-BOOL Default_SubBuilding;
+_variant_t Main_BuildingName;
+_variant_t Building_Name;
+_variant_t Protocal;
+_variant_t Com_Port;
+_variant_t Ip_Address;
+_variant_t Ip_Port;
+_variant_t Braudrate;
+_variant_t Default_SubBuilding;
+};
+struct Building_ALL{
+_variant_t Building_Name;
+_variant_t Default_Building;
+_variant_t Telephone;
+_variant_t Address;
 };
 
-struct IONAME{
-CString SERIAL_ID;
-CString INPUT1;
-CString INPUT2;
-CString INPUT3;
-CString INPUT4;
-CString INPUT5;
-CString INPUT6;
-CString INPUT7;
-CString INPUT8;
-CString INPUT9;
-CString OUTPUT1;
-CString OUTPUT2;
-CString OUTPUT3;
-CString OUTPUT4;
-CString OUTPUT5;
-CString OUTPUT6;
-CString OUTPUT7;
-CString SENSORNAME;
+struct CustomProductTable{
+_variant_t ModelNo;
+_variant_t Reg_Description;
+_variant_t Reg_ID;
 };
+struct IONAME{
+_variant_t SERIAL_ID;
+_variant_t INPUT1;
+_variant_t INPUT2;
+_variant_t INPUT3;
+_variant_t INPUT4;
+_variant_t INPUT5;
+_variant_t INPUT6;
+_variant_t INPUT7;
+_variant_t INPUT8;
+_variant_t INPUT9;
+_variant_t OUTPUT1;
+_variant_t OUTPUT2;
+_variant_t OUTPUT3;
+_variant_t OUTPUT4;
+_variant_t OUTPUT5;
+_variant_t OUTPUT6;
+_variant_t OUTPUT7;
+_variant_t SENSORNAME;
+};
+struct IONAME_Config{
+_variant_t InOutName;
+_variant_t Type;
+_variant_t Row;
+_variant_t SerialNo;
+};
+struct LCNameConfigure{
+_variant_t SN;
+_variant_t Card;
+_variant_t Output;
+_variant_t OutputName;
+};
+struct LightingController_Name{
+_variant_t Address;
+_variant_t Type;
+_variant_t ID_No;
+_variant_t OutputName;
+_variant_t Status;
+};
+struct Product_Data{
+_variant_t Serial_ID;
+_variant_t Register_Data;
+};
+struct Screen_Label{
+_variant_t Cstatic_id;
+_variant_t Serial_Num;
+_variant_t Point_X ;
+_variant_t Point_Y;
+_variant_t Height;
+_variant_t Width;
+_variant_t Tstat_id;
+_variant_t Status;
+_variant_t Tips;
+_variant_t Input_or_Output;
+_variant_t Text_Color;
+_variant_t Back_Color;
+};
+struct Value_Range{
+_variant_t SN;
+_variant_t CInputNo;
+_variant_t CRange;
+};
+
+
+
 class COwnMemDC : public CDC {
 	private:
 		CBitmap m_bitmap; // Offscreen bitmap
@@ -141,6 +197,7 @@ class COwnMemDC : public CDC {
 		// Allow usage as a pointer
 		operator COwnMemDC*() {return this;}
 };
+
 class CT3000App : public CWinAppEx
 {
 
@@ -185,8 +242,19 @@ public:
 	void ImportData();
  
 	vector<ALL_NODE> m_AllNodes;
-	 vector<Building> m_Building;
-	 vector<IONAME>   m_ioname;
+
+	vector<Building> m_Building;
+	vector<Building_ALL> m_Building_ALL;
+	vector<CustomProductTable>  m_CustomProductTable;
+	vector<IONAME> m_IONAME;
+	vector<IONAME_Config> m_IONAME_Config;
+	vector<LCNameConfigure> m_LCNameConfigure;
+	vector<LightingController_Name> m_LightingController_Name;
+	vector<Product_Data> m_Product_Data;
+	vector<Screen_Label> m_Screen_Label;
+
+	vector<Value_Range>m_Value_Range;
+
 	
 };
 

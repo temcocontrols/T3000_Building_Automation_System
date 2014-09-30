@@ -247,8 +247,8 @@ BOOL CTStatScanner::ScanComDevice()//02
 		return FALSE;
 	}
 	g_strT3000LogString=_T("scanning your computer com port ....");
-    //WriteLogFile(g_strT3000LogString);
-	::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+   write_T3000_log_file(g_strT3000LogString);
+	::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 
 	SetCommunicationType(0);   //设置为串口通信方式
 
@@ -456,32 +456,17 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 		 
 		 
 		g_strT3000LogString=_T("Scan Stop Time: ")+Get_NowTime()+_T("\n");;
-		//NET_WriteLogFile(g_strT3000LogString);
+		write_T3000_log_file(g_strT3000LogString);
  
 		//WriteLogFile(g_strT3000LogString);
 		::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 		return;
 	}
-	if (nComPort!=-1)
-	{
-		 
-		g_strT3000LogString.Format(_T("Scan ComPort: %d From ID=%d To ID=%d"),nComPort,devLo,devHi);
-		//WriteLogFile(g_strT3000LogString);
-		//WriteLogFile(g_strT3000LogString);
-		::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
-	}
-	else
-	{
-		 
-		g_strT3000LogString.Format(_T("Scan From ID=%d To ID=%d"),devLo,devHi);
-		//NET_WriteLogFile(g_strT3000LogString);
-		//WriteLogFile(g_strT3000LogString);
-		::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
-	}
+
 	g_strScanInfoPrompt.Format(_T("COM%d"), nComPort);
 
 	
-	
+	//write_T3000_log_file(g_strScanInfoPrompt);
 
 	g_nStartID = devLo;
 	g_nEndID = devHi;
@@ -489,6 +474,19 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 	Sleep(50);	
 	int nCount=0;
 
+	CString strlog;
+    if (nComPort==-1)
+    {
+		strlog.Format(_T("Sending scan broadcast command by TCP to ID From %d to %d"),devLo,devHi);
+		write_T3000_log_file(strlog);
+    } 
+    else
+    {
+		strlog.Format(_T("Sending scan broadcast command by com%d to ID From %d to %d"),nComPort,devLo,devHi);
+		write_T3000_log_file(strlog);
+    }
+    
+	
 	int a=g_CheckTstatOnline_a(devLo,devHi, bForTStat);
 	if(a ==-6)//总线上存在bacnet协议，modbus协议无法扫描;
 	{
@@ -499,9 +497,11 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 	}
 	if (a == -3 || a > 0)
 	{
+	  strlog.Format(_T("The data is coming,but it is not clear!"));
         g_llTxCount++;
 		g_llRxCount++;
-		if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
+		if( AfxGetMainWnd()->GetActiveWindow() != NULL )
+		{
 
 			// construct status message string
 			CString str;
@@ -510,10 +510,12 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 
 			//Display it
 			((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
-
 		}
 
 		a=g_CheckTstatOnline_a(devLo,devHi, bForTStat);
+		strlog.Format(_T("Sending scan broadcast command by com%d to ID From %d to %d"),nComPort,devLo,devHi);
+		write_T3000_log_file(strlog);
+
 		g_llTxCount++;
 		g_llRxCount++;
 		if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
@@ -533,13 +535,16 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 	//TRACE("L:%d   H:%d  a:%d\n",devLo,devHi,a);
 	if(binary_search_crc(a))
 	{
-		
+		strlog.Format(_T("NO Response com%d to ID From %d to %d"),nComPort,devLo,devHi);
+		write_T3000_log_file(strlog);
 	return ;	 
 	}
 	char c_array_temp[5]={'0'};
 	CString temp=_T("");
 	if(a>0)
 	{
+		 
+
 		int ntempID=0;
 		BOOL bFindSameID=false;
 		int nPos=-1;
@@ -572,14 +577,11 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 			pInfo->m_tstatport = m_port;//scan
 			
 			m_szTstatScandRet.push_back(pInfo);
-// 			temp.id=a;
-// 			temp.serialnumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
-			//int nSerialNumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;//20120424
+ 
 			unsigned int nSerialNumber=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;//20120424
 			
 			pTemp->SetSerialID(nSerialNumber);
-// 			temp.product_class_id=SerialNum[7];
-// 			temp.hardware_version=SerialNum[8];
+ 
 			pTemp->SetDevID(a);
 			
 			float tstat_version2;
@@ -626,8 +628,9 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 
 			 
 			g_strT3000LogString.Format(_T("\nFind one Device << ID=%d,SerialNo=%d >>\n"),a,nSerialNumber);
-			//WriteLogFile(g_strT3000LogString);
-			::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+		 
+			write_T3000_log_file(g_strT3000LogString);
+			::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 		}
 		else
 			return;
@@ -637,9 +640,11 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 	{
 		g_strT3000LogString.Format(_T("Send scan command..."));
 		//WriteLogFile(g_strT3000LogString);
-		::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+		::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 	case -2:
 		//crc error
+		strlog.Format(_T("CRC ERROR by com%d to ID From %d to %d"),nComPort,devLo,devHi);
+		write_T3000_log_file(strlog);
 		if(devLo!=devHi)
 		{
 			binarySearchforComDevice(nComPort, bForTStat, devLo,(devLo+devHi)/2);
@@ -650,6 +655,8 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 		break;
 	case -3:
 		//more than 2 Tstat is connect
+		strlog.Format(_T("More than two tstats by com%d to ID From %d to %d"),nComPort,devLo,devHi);
+		write_T3000_log_file(strlog);
 		if(devLo!=devHi)
 		{
 			binarySearchforComDevice(nComPort, bForTStat, devLo,(devLo+devHi)/2);
@@ -673,19 +680,7 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 				//if(Read_One2(devLo,10, bForTStat)==-2)
 				Sleep(20);//////////////////////////////////for running is better
 				char c_temp_arr[100]={'\0'};
-			//	if(Read_One2(devLo,10, bForTStat)==-2)
-			//	{
-			//		break;
-			//	}
-				
-
-			//
 				if(Read_One2(devLo,10, bForTStat)!=-2)//one times
-				
-			//	{
-
-			//	}
-			//	else
 				{	
 					Sleep(100);
 					SHOW_TX_RX
@@ -792,10 +787,19 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 		}
 		break;
 	case -4:break;
+		strlog.Format(_T("No Response by com%d to ID From %d to %d"),nComPort,devLo,devHi);
+		write_T3000_log_file(strlog);
 		//no connection 
-	case -5:break;
+	case -5:
+		strlog.Format(_T("No Response by com%d to ID From %d to %d"),nComPort,devLo,devHi);
+		write_T3000_log_file(strlog);
+	break;
+
 		//the input error
 	}
+
+
+
 }
 
 //---------------------------------------------------------------------------------------------
@@ -1105,7 +1109,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 	int nRet = 0;
 	//############################
 	g_strT3000LogString = _T("Initialize UDP network...");
-	pScanner->ShowNetScanInfo(g_strT3000LogString); 
+	//pScanner->ShowNetScanInfo(g_strT3000LogString); 
 	//############################
 	//NET_WriteLogFile(g_strT3000LogString);
 	 
@@ -1180,7 +1184,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 			g_strT3000LogString=	_T("Sending scan command failed. Please check your net work settings.");
 			//NET_WriteLogFile(g_strT3000LogString);
 			 ::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
-			AfxMessageBox(g_strT3000LogString);
+			//AfxMessageBox(g_strT3000LogString);
 			goto END_SCAN;
 			return 0;
 		}
@@ -1195,7 +1199,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 			g_strT3000LogString=_T("Recving scan infomation failed. Please check your net work settings.");
 			//NET_WriteLogFile(g_strT3000LogString);
 			 ::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
-			AfxMessageBox(g_strT3000LogString);
+			//AfxMessageBox(g_strT3000LogString);
 			goto END_SCAN;
 			return 0;
 		} 
@@ -1448,7 +1452,7 @@ UINT _ScanTstatThread2(LPVOID pParam)
 			g_strT3000LogString=_T("Scan Stop Time: ")+GetCurrentTime();
 			 
 
-			//WriteLogFile(g_strT3000LogString);
+			write_T3000_log_file(g_strT3000LogString);
 			::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 			break;
 		}
@@ -1456,10 +1460,11 @@ UINT _ScanTstatThread2(LPVOID pParam)
 		TRACE(_T("Scanning @ ") + strComPort + _T("\n"));
 		if(!USB_Serial.IsEmpty())
 		{
+		  //  SetPaneString(1,_T("USB Serial"));
 			if(USB_Serial.CompareNoCase(strComPort) == 0 )
 			{
-				CString strlog=_T("Scanning @")+strComPort+_T(" ")+Get_NowTime()+_T("\n");
-				//WriteLogFile(strlog);
+				CString strlog=_T("Scanning SUB Serial @")+strComPort+_T(" ")+Get_NowTime()+_T("\n");
+			    write_T3000_log_file(strlog);
 
 				CString tc = strComPort.Mid(3);
 
@@ -1472,18 +1477,21 @@ UINT _ScanTstatThread2(LPVOID pParam)
 				{
 					pScan->SetComPort(n);
 					pScan->SetBaudRate(_T("38400"));
+					 
 					bool bRet = Change_BaudRate(pScan->m_nBaudrate);
 					strlog.Empty();
 					strlog.Format(_T("Change BaudRate:%d"),pScan->m_nBaudrate);
-					//WriteLogFile(strlog);
+					 write_T3000_log_file(strlog);
 					ASSERT(bRet);
 					g_strScanInfoPrompt.Format(_T("COM%d"), n);
 					strlog.Empty();
 					strlog.Format(_T("Success to Open the COM%d"),n);
-					//WriteLogFile(strlog); 
+					write_T3000_log_file(strlog); 
 
 					pScan->background_binarysearch(n);	//lsc comscan new cold
 					close_com();
+					strlog=_T("Close com port");
+					write_T3000_log_file(strlog);
 					Sleep(500);
 					TRACE(_T("Success open the COM%d\n"), n);
 
@@ -1495,7 +1503,7 @@ UINT _ScanTstatThread2(LPVOID pParam)
 					CString str;
 					str.Format(_T("Cannot open the COM%d\n"), n);
 					//WriteLogFile(str);
-					SetPaneString(2, str);
+					//SetPaneString(2, str);
 					int n =0 ;
 				}
 				continue;
@@ -1516,7 +1524,7 @@ UINT _ScanTstatThread2(LPVOID pParam)
 			bool bRet = Change_BaudRate(pScan->m_nBaudrate);
 			g_strT3000LogString.Empty();
 			g_strT3000LogString.Format(_T("Change BaudRate:%d"),pScan->m_nBaudrate);
-			 
+			  //SetPaneString(1,g_strT3000LogString);
 			//WriteLogFile(g_strT3000LogString);
 			::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 
@@ -1540,7 +1548,7 @@ UINT _ScanTstatThread2(LPVOID pParam)
 			CString str;
 			str.Format(_T("Cannot open the COM%d\n"), n);
 // 			WriteLogFile(str);
-			SetPaneString(2, str);
+			//SetPaneString(2, str);
 			int n =0 ;
 		}
 
@@ -1580,7 +1588,7 @@ UINT _ScanTstatThread2(LPVOID pParam)
 			CString str;
 		str.Format(_T("Cannot open the COM%d\n"), n);
 // 			WriteLogFile(str);
-			SetPaneString(2, str);
+			//SetPaneString(2, str);
 			int n =0 ;
 		}
 
@@ -1597,11 +1605,16 @@ UINT _ScanTstatThread2(LPVOID pParam)
 	g_strT3000LogString=_T("Com port Scan Finished.Time: ")+Get_NowTime()+_T("\n");
 	//WriteLogFile( g_strT3000LogString);
 	 ::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
-	if (pScan->m_eScanComEnd->m_hObject)
-	{
-		pScan->m_eScanComEnd->SetEvent();
-		pScan->m_com_scan_end = true;
-	}
+	 if (!pScan->m_bStopScan)
+	 {
+		 if (pScan->m_eScanComEnd->m_hObject)
+		 {
+			 pScan->m_eScanComEnd->SetEvent();
+			 pScan->m_com_scan_end = true;
+		 }
+	 }
+	 
+	
 
 	return 1;
 }
@@ -1849,17 +1862,22 @@ void CTStatScanner::SendScanEndMsg()
 
 BOOL CTStatScanner::OpenCom(int nCom)
 {
-	for (int i  = 0; i < 3; i++ )
-	{
-		if(open_com(nCom))
-		{
-			if(is_connect())
-			{			
-				return TRUE;
-			}		
-		}
-		Sleep(100);
-	}
+  if (!m_bStopScan)
+  {
+	  for (int i  = 0; i < 3; i++ )
+	  {
+		  if(open_com(nCom))
+		  {
+			  if(is_connect())
+			  {			
+				  return TRUE;
+			  }		
+		  }
+		  Sleep(100);
+	  }
+  }
+  
+
 
 	return FALSE;
 }
@@ -2568,7 +2586,7 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
 	CString strScreenName;
 	strScreenName.Format(_T("Screen(S:%d--%d)"), pInfo->m_pNet->GetSerialID(), pInfo->m_pNet->GetDevID() );
 
-	CString strBackground_bmp=_T("Clicking here to add a image...");
+	CString strBackground_bmp=_T("T3000_Default_Building_PIC.bmp");
 
 	CString strHWV;
 	strHWV.Format(_T("%0.1f"), pInfo->m_pNet->GetHardwareVersion());
@@ -2664,7 +2682,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 	CString strScreenName;
 	strScreenName.Format(_T("Screen(S:%d--%d)"), pInfo->m_pDev->GetSerialID(), pInfo->m_pDev->GetDevID() );
 
-	CString strBackground_bmp=_T("Clicking here to add a image...");
+	CString strBackground_bmp=_T("T3000_Default_Building_PIC.bmp");
 
 	CString strHWV;
 	strHWV.Format(_T("%0.1f"), pInfo->m_pDev->GetHardwareVersion());
@@ -3499,8 +3517,12 @@ UINT _WaitScanThread(PVOID pParam)
 			 
 			g_nStartID = 1;
 			  //Alex_Flag
-
-			pScanner->ScanTstatFromNCForAuto();	
+			  if (!pScanner->m_bStopScan)
+			  {
+			  pScanner->ScanTstatFromNCForAuto();	
+			  }
+			  
+			
 
 			pScanner->m_bNetScanFinish = TRUE; // at this time, two thread end, all scan end
 			pScanner->SendScanEndMsg();
@@ -3679,14 +3701,14 @@ void CTStatScanner::GetTstatFromNCTable2()
 		if(b)
 		{	
 			strInfo.Format((_T("Open Com %d successful.")), nComPort);//prompt info;
-			SetPaneString(1,strInfo);
+			//SetPaneString(1,strInfo);
 			::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,1,0);
 			::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 		}
 		else
 		{
 			strInfo.Format((_T("Open Com %d failure.")), nComPort);//prompt info;
-			SetPaneString(1,strInfo);
+		//	SetPaneString(1,strInfo);
 			::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 			continue;
 		}

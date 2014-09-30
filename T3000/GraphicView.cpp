@@ -132,6 +132,7 @@ void CGraphicView::InitGraphic(int nSerialNum,int nTstatID)
 	ReloadLabelsFromDB();
 	this->SetFocus();
 	SetTimer(1,7000,NULL);//此定时器是用于刷新 Label的;
+	SetTimer(2,2000,NULL);
 }
 // CGraphicView message handlers
 
@@ -878,6 +879,10 @@ void CGraphicView::OnTimer(UINT_PTR nIDEvent)
 
 		}
 		break;
+	case 2:
+	//ReloadLabelsFromDB();
+	break;
+	     
 	}
 	CFormView::OnTimer(nIDEvent);
 }

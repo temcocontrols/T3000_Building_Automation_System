@@ -224,7 +224,7 @@ void T38AI8AO::InitialRegister(){
 	while(!m_ado.m_pRecordset->EndOfFile)
 	{
 		temp.regID=m_ado.m_pRecordset->GetCollect(_T("RegID"));
-		vartemp =m_ado.m_pRecordset->GetCollect(_T("T3-8IOA"));
+		vartemp =m_ado.m_pRecordset->GetCollect(_T("T3-8AI8AO"));
 		if (vartemp.vt==VT_NULL)
 			temp.regName=_T("");
 		else

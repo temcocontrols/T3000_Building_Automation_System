@@ -383,13 +383,13 @@ CString GetProductName(int ModelID)
 		strProductName = _T("T3-8I13O");	  //
 		break;
 	case PM_T3IOA:
-		strProductName = _T("T3IOA");	  //
+		strProductName = _T("T3-8IOA");	  //
 		break;
 	case PM_T332AI:
-		strProductName = _T("T332AI");	  //
+		strProductName = _T("T3-32AI");	  //
 		break;
 	case PM_T3AI16O:
-		strProductName = _T("T3AI160");	  //
+		strProductName = _T("T3-8AI160");	  //
 		break;
 	case PM_ZIGBEE:
 		strProductName = _T("ZigBee");	  //
@@ -397,17 +397,17 @@ CString GetProductName(int ModelID)
 	case PM_FLEXDRIVER:
 		strProductName = _T("FlexDriver");	  //
 		break;
-	case PM_T38I13O:
-		strProductName = _T("T38I13O");	  //
+	case PM_T3PT10:
+		strProductName = _T("T3-PT10");	  //
 		break;
 	case PM_T3PERFORMANCE:
-		strProductName = _T("T3PERFORMANCE");	  //
+		strProductName = _T("T3-PERFORMANCE");	  //
 		break;
 	case PM_T34AO:
-		strProductName = _T("T34AO");	  //
+		strProductName = _T("T3-4AO");	  //
 		break;
 	case PM_T36CT:
-		strProductName = _T("T36CT");	  //
+		strProductName = _T("T3-6CT");	  //
 		break;
 	case PM_SOLAR:
 		strProductName = _T("Solar");	  //
@@ -423,6 +423,9 @@ CString GetProductName(int ModelID)
 		break;
 	case PM_AirQuality:
 		strProductName = _T("AirQuality");	  //
+		break;
+	case PM_HUM:
+		strProductName = _T("TstatHUM");	  //
 		break;
 	default:
 		strProductName=_T("ERROR");
@@ -517,9 +520,6 @@ BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
 	return FALSE;
 }
 
-
-
-
 int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 {
 	CFileFind fFind;
@@ -549,11 +549,16 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 		while(ReadLineFromHexFile(hexfile, readbuffer))
 		{
 				nLineNum++;						//the line number that the wrong hex file;
-				if(nLineNum!=10)
-					continue;
-
-
-				unsigned char get_hex[128]={0};//get hex data,it is get from the line char
+                CString bufferlen;
+                CString bufferaddress;         
+                bufferlen.Format(_T("%c%c"),readbuffer[1],readbuffer[2]);
+                bufferaddress.Format(_T("%c%c%c%c"),readbuffer[3],readbuffer[4],readbuffer[5],readbuffer[6]);
+                if (bufferaddress.CompareNoCase(_T("0100"))!=0)
+                {
+                continue;
+                }
+				unsigned char get_hex[128]={0};
+				//get hex data,it is get from the line char
 				//the number is (i-1)
 				//int nLen = strGetData.GetLength();
 				for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
@@ -563,49 +568,79 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 
 				int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
 				if(strlen(readbuffer)%2==0)
-					turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int 
+				turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int 
 				else
 				{
-					//wchar_t p_c_temp[74]={'\0'};
-					//swprintf_s(p_c_temp,_T("Error: the hex file had error at %d line!"),nLineNumErr);
-
-					//AddStringToOutPuts(p_c_temp);
-					//AfxMessageBox(p_c_temp);
-					//close_com();
 					return BAD_HEX_FILE;
 				}
 				turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex 
 				if(get_hex[3]==1)	//for to seektobegin() function,because to end of the file
 					break;
-
-
 				if(!DoHEXCRC( get_hex, nLen/2))
 				{
-					//wchar_t p_c_temp[74]={'\0'};
-					//swprintf_s(p_c_temp,_T("Error: the hex file had error at %d line!"),nLineNumErr);
-					//AddStringToOutPuts(p_c_temp);		
-					//AfxMessageBox(p_c_temp, MB_OK);
-
 					return BAD_HEX_FILE;
 				}
 
 
 				int temp;
-				char temp_buf[32];
-				memset(temp_buf,0,32);
-				if (nLineNum==10)
+				char temp_buf[64];
+				memset(temp_buf,0,64);
+ 
+				if (bufferlen.CompareNoCase(_T("20"))==0)
 				{
+					for (int i=0;i<64;i++)
+					{
+						temp_buf[i]=readbuffer[i+8];
+					}
+				} 
 
+				if (bufferlen.CompareNoCase(_T("10"))==0)
+				{
 					for (int i=0;i<32;i++)
 					{
 						temp_buf[i]=readbuffer[i+8];
 					}
+					hexfile.Seek(0, CFile::begin);
+					while(ReadLineFromHexFile(hexfile, readbuffer))
+					{
+						bufferlen.Format(_T("%c%c"),readbuffer[1],readbuffer[2]);
+						bufferaddress.Format(_T("%c%c%c%c"),readbuffer[3],readbuffer[4],readbuffer[5],readbuffer[6]);
+						if (bufferaddress.CompareNoCase(_T("0110"))!=0)
+						{
+							continue;
+						}
+						for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
+						{
+							readbuffer[i]=readbuffer[i+1];
+						}
+						int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
+						if(strlen(readbuffer)%2==0)
+							turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int 
+						else
+						{
+							return BAD_HEX_FILE;
+						}
+						turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex 
+
+						int bufferlength=_wtoi(bufferlen);
+
+						int i=32;
+						for (int j=0;j<2*bufferlength;j++)
+						{
+							temp_buf[i]=readbuffer[j+8];
+							i++;
+						}
+
+					}
+
+				}
+
 					for (int i=0;i<20;i++)
 					{   
 						temp=temp_buf[2*i]*16+temp_buf[2*i+1];
 						m_DeviceInfor[i]=temp;
 					}
-					memcpy_s(&ret_bin_Info,15,m_DeviceInfor,15);
+					memcpy_s(&ret_bin_Info,20,m_DeviceInfor,20);
 
 					if(strlen(ret_bin_Info.product_name) > 200)
 						return NO_VERSION_INFO;
@@ -626,29 +661,15 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 					}
 
 
-					ret_bin_Info.software_low = (readbuffer[38]*16+readbuffer[39]);
-					ret_bin_Info.software_high = readbuffer[40]*16 + readbuffer[41];
+					ret_bin_Info.software_low = m_DeviceInfor[15];
+					ret_bin_Info.software_high =m_DeviceInfor[16];
 					return READ_SUCCESS;
-					//m_softwareRev = (temp_buf[30] + temp_buf[31]*256)/10.0;
-
-
-					////m_ProductModel=m_DeviceInfor[0];
-					//m_softwareRev= ((a[38]*16+a[39]) + (a[40]*16 + a[41])*256)/10.0;
-					//m_ProductName.Empty();
-					//for (int i=0;i<10;i++)
-					//{
-					//	CString temp1;
-					//	temp1.Format(_T("%C"),m_DeviceInfor[5+i]);
-					//	m_ProductName = m_ProductName + temp1;
-					//}
-				}
+			 
 
 
 		}
 	}
 }
-
-
 
 int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 {
@@ -696,18 +717,12 @@ int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 
 }
 
-
-
-
 BOOL Ping(const CString& strIP, CWnd* pWndEcho)
 {
-    CMyPing* pPing = new CMyPing;
-
-    pPing->SetPingEchoWnd(pWndEcho);
-    pPing->TestPing(strIP);
-
-
-    delete pPing;
-    pPing = NULL;
-    return FALSE;
+	CMyPing* pPing = new CMyPing;
+	pPing->SetPingEchoWnd(pWndEcho);
+	pPing->TestPing(strIP);
+	delete pPing;
+	pPing = NULL;
+	return FALSE;
 }

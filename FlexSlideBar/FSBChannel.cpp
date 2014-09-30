@@ -105,7 +105,22 @@ void CFSBChannel::Draw(CDC* pDC)
 	//////////////////////////////////////////////////////////////////////////
  	for (UINT i = 0; i < m_szRC.size(); i++)
  	{
- 		pDC->FillSolidRect(m_szRC[i]->rc,  m_szRC[i]->clr);
+ 	 	pDC->FillSolidRect(m_szRC[i]->rc,  m_szRC[i]->clr);
+// 		if (i==0)
+// 		{
+// 			int left=m_szRC[i]->rc.left+1;
+// 			int right=m_szRC[i]->rc.right-1;
+// 			for (UINT j=m_szRC[i]->rc.top+1;j<m_szRC[i]->rc.bottom;j+=5)
+// 			{
+// 
+// 				CPoint PointA(left,j),PointB(left+16,j);
+// 
+// 				pDC->LineTo(PointA);
+// 				pDC->MoveTo(PointB);
+// 
+// 			}
+// 		}
+		
  	}
 //}
 

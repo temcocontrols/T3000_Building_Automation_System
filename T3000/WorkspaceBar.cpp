@@ -123,6 +123,13 @@ CWorkspaceBar::~CWorkspaceBar()
 	 //    
 
 	 //}	 
+	 if(pMsg->message == WM_LBUTTONDOWN)
+	 {
+		 DFTrace(_T("return 0"));
+		 return 0;
+	 }
+
+
    return CDockablePane::PreTranslateMessage(pMsg);
  }
    	/*

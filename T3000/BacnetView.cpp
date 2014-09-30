@@ -911,7 +911,7 @@ void CDialogCM5_BacNet::OnInitialUpdate()
 	// TODO: Add your specialized code here and/or call the base class
 }
 
-void CDialogCM5_BacNet::Tab_Initial()
+BOOL CDialogCM5_BacNet::Tab_Initial()
 {
 	GetParentFrame()->RecalcLayout();
 	ResizeParentToFit();
@@ -985,7 +985,7 @@ void CDialogCM5_BacNet::Tab_Initial()
 	g_hwnd_now = m_input_dlg_hwnd;
 	//保存当前选择
 //	m_CurSelTab = WINDOW_INPUT;
-
+	return true;
 }
 
 void CDialogCM5_BacNet::Initial_All_Point()
@@ -1113,8 +1113,7 @@ void CDialogCM5_BacNet::Fresh()
 	}
 	//
 	//SetTimer(1,500,NULL);
-	SetTimer(2,60000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
-	SetTimer(3,1000,NULL); //Check whether need  show Alarm dialog.
+
 	BacNet_hwd = this->m_hWnd;
 
 	CString temp_cs;
@@ -1137,14 +1136,19 @@ void CDialogCM5_BacNet::Fresh()
 	//prevent when user doesn't click the bacnet device,the view also initial ,It's a waste of resource;
 #if 1
 	static bool initial_once = true;
-	
+	static bool initial_finished = false;
 	if(initial_once)
 	{
 		initial_once = false;
-		Tab_Initial();
+		initial_finished = Tab_Initial();
+		
 	}
 #endif
-
+	if(initial_finished)	//只有在初始化完成了的情况下 才打开timer;
+	{
+		SetTimer(2,60000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
+		SetTimer(3,1000,NULL); //Check whether need  show Alarm dialog.
+	}
 
 }
 
@@ -2524,13 +2528,24 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				//SetPaneString(2,_T("Online"));
 				m_bac_main_tab.SetFocus();
 				m_bac_main_tab.SetCurSel(0);
+				#if 1
 				for (int i=0;i<WINDOW_TAB_COUNT;i++)
 				{	
 					if(i!=0)
-						pDialog[i]->ShowWindow(SW_HIDE);
+					{
+						if(pDialog[i]->IsWindowVisible() == TRUE)
+						{
+							pDialog[i]->ShowWindow(SW_HIDE);
+						}
+					}
 					else
-						pDialog[i]->ShowWindow(SW_NORMAL);
+					{
+							if(pDialog[i]->IsWindowVisible() == false)
+								pDialog[i]->ShowWindow(SW_NORMAL);
+					}
+				
 				}
+				#endif
 				bac_select_device_online = true;
 
 #endif
@@ -2768,7 +2783,6 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 				break;
 			}
 			
-//			pDialog[i]->OnInitDialog();
 		}
 		else
 		{

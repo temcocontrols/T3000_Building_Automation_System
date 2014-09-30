@@ -69,6 +69,8 @@ void CScanDbWaitDlg::OnBnClickedExitbutton()
 		g_bCancelScan=TRUE;
 		m_pScaner->StopScan();
 		OnCancel();
+		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
 }
 
 BOOL CScanDbWaitDlg::OnInitDialog()

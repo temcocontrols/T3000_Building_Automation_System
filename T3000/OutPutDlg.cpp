@@ -710,7 +710,29 @@ void COutPutDlg::FreshGrids()
 		GetDlgItem(IDC_PID3COOLSTAGEEDIT)->ShowWindow(FALSE);
 	}
 
-	
+	if (product_register_value[7]==PM_PRESSURE)
+	{
+		WINDOWPLACEMENT wp;
+		GetWindowPlacement(&wp);
+
+		CRect rc;
+		CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR2);
+		pWnd->GetWindowRect(&rc);
+		 
+
+		wp.rcNormalPosition.bottom = rc.bottom;
+		SetWindowPlacement(&wp);
+
+		GetDlgItem(IDC_STATIC_SEPERATOR2)->ShowWindow(SW_HIDE); 
+
+
+		m_FlexGrid3.ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_HS)->ShowWindow(FALSE);
+		GetDlgItem(IDC_PID3_HEATSTAGEEDIT)->ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_CS)->ShowWindow(FALSE);
+		GetDlgItem(IDC_PID3COOLSTAGEEDIT)->ShowWindow(FALSE);
+	}
 
 }
 void COutPutDlg::FreshGrid_PID1()

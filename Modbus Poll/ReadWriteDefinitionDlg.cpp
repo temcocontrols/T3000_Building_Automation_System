@@ -15,6 +15,7 @@ CReadWriteDefinitionDlg::CReadWriteDefinitionDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CReadWriteDefinitionDlg::IDD, pParent)
 	, m_slave_id(0)
 	, m_plc_addresses(FALSE)
+	, m_is_read_write_once(FALSE)
 {
 
 	m_slave_id = 255;
@@ -61,6 +62,7 @@ void CReadWriteDefinitionDlg::DoDataExchange(CDataExchange* pDX)
 
 
 	DDX_Control(pDX, IDC_EDIT_SLAVE_ID, m_editor_slave_id);
+	DDX_Check(pDX, IDC_CHECK_READ_WRITE_ONCE, m_is_read_write_once);
 }
 
 

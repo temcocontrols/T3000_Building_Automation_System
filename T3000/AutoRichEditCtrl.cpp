@@ -50,6 +50,12 @@ void CAutoRichEditCtrl::FieldText(LPCTSTR lpszString){
 	SetNumberDefaultTex();
 
 }
+void CAutoRichEditCtrl::FieldText(COLORREF rcf,LPCTSTR lpszString){
+	/*__super::SetWindowText(lpszString);*/
+	SetWindowText(lpszString);
+	SetNumberDefaultTex(rcf);
+
+}
 CString CAutoRichEditCtrl::GetRTF()
 {
 	// Return the RTF string of the text in the control.
@@ -403,7 +409,7 @@ void CAutoRichEditCtrl::SetNumberDefaultFontSize(int nPointSize)
 	}
 	
 }
-void CAutoRichEditCtrl::SetNumberDefaultTex()
+void CAutoRichEditCtrl::SetNumberDefaultTex(COLORREF crf)
 {   int nPointSize=11;
 	CString floatstrnumber;
 	int size=nPointSize;
@@ -452,7 +458,7 @@ void CAutoRichEditCtrl::SetNumberDefaultTex()
 	CHARFORMAT cf = GetCharFormat();
 
 	if (cf.dwEffects & CFE_AUTOCOLOR) cf.dwEffects -= CFE_AUTOCOLOR;
-	cf.crTextColor =RGB(255,255,255);
+	cf.crTextColor =crf;
 	cf.dwMask = CFM_COLOR;
 
 	SetSelectionCharFormat(cf);

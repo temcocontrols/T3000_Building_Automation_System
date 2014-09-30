@@ -27,6 +27,7 @@ CString GetSysTime();
 void ExtractString(CStringArray& arr, const CString strSrc, const CString sep = _T("\r\n"));
 int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
 int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
+
 BOOL ReadLineFromHexFile(CFile& file, char* pBuffer);
 BOOL DoHEXCRC( TS_UC* szBuf, int nLen);
 BOOL Ping(const CString& strIP, CWnd* pWndEcho);

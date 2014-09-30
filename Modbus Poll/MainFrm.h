@@ -70,6 +70,7 @@ public:
 	afx_msg void OnUpdateDispalyCommunication(CCmdUI *pCmdUI);
      afx_msg void OnUpdateStatusBar(CCmdUI *pCmdUI);
 	afx_msg void OnViewRegistervalueanalyzer();
+	afx_msg void OnFunctionsTestcenter();
 };
 
 

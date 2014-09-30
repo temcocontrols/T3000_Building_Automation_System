@@ -53,6 +53,7 @@ ON_UPDATE_COMMAND_UI(ID_DISPALY_COMMUNICATION, &CMainFrame::OnUpdateDispalyCommu
  
 ON_COMMAND(ID_VIEW_REGISTERVALUEANALYZER, &CMainFrame::OnViewRegistervalueanalyzer)
 ON_UPDATE_COMMAND_UI(IDS_CONNECTION, &CMainFrame::OnUpdateStatusBar)
+ON_COMMAND(ID_FUNCTIONS_TESTCENTER, &CMainFrame::OnFunctionsTestcenter)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -404,7 +405,7 @@ void CMainFrame::OnConnectionConnect32776()
 				
 				 
 				SetPaneString(1,strpannel);
-
+				 
 				return;
 			} 
 			m_isconnect=TRUE;
@@ -820,4 +821,9 @@ void CMainFrame::OnViewRegistervalueanalyzer()
 void CMainFrame::OnUpdateStatusBar(CCmdUI *pCmdUI){
 	pCmdUI->Enable(TRUE);
 
+}
+
+void CMainFrame::OnFunctionsTestcenter()
+{
+	
 }

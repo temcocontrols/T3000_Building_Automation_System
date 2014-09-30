@@ -224,6 +224,9 @@ void Traffic_Data(CString &nCString)
 	 case PM_MINIPANEL:
 		 strProductName="MiniPanel";
 		 break;
+		case  PM_PRESSURE:
+		strProductName="Pressure Sensor";
+		break;
 	 default:
 		 strProductName="TStat";
 		 break;

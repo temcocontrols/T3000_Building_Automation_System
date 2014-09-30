@@ -5879,19 +5879,43 @@ OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 	return -1; 
 }
 
-OUTPUT void closefile()
+OUTPUT void close_T3000_log_file()
 {
 		m_pFile->Close();
 		delete m_pFile;
 }
 
-OUTPUT void writefile( CString strip,CString strport )
+OUTPUT void write_T3000_log_file(CString StrTips)
 {
-	m_pFile->WriteString(strip+_T("\t"));
-	m_pFile->WriteString(strport+_T("\n\n"));
+ 
+
+
+	CCriticalSection  logfile_section;
+	logfile_section.Lock();
+
+ 
+
+	CTime nowtime=CTime::GetCurrentTime();
+	CString time;
+	time.Format(_T("%4d-%.2d-%.2d %.2d:%.2d:%.2d  >>"),nowtime.GetYear(), nowtime.GetMonth(), nowtime.GetDay(),     
+		nowtime.GetHour(), nowtime.GetMinute(), nowtime.GetSecond());
+	CString logstr=time+StrTips;
+	 
+
+	    m_pFile->SeekToEnd();
+		m_pFile->WriteString(logstr.GetBuffer());
+		m_pFile->WriteString(_T("\n"));
+ 
+
+	    m_pFile->Flush();
+	    
+	 
+ 
+	logfile_section.Unlock();
+
 }
 
-OUTPUT void Createfile()
+OUTPUT void Create_T3000_log_file()
 {
 	m_pFile = new CStdioFile;//txt
 
@@ -5900,9 +5924,9 @@ OUTPUT void Createfile()
 	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
 	CString g_strDatabasefilepath=exeFullPath;
 	CString g_strExePth=g_strDatabasefilepath;
-	m_strFileINI = g_strExePth + _T("SANC.TXT");
-
+	m_strFileINI = g_strExePth + _T("T3000.log");
 	m_pFile->Open(m_strFileINI.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate );
+
 }
 
 

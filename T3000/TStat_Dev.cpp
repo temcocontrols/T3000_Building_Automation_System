@@ -147,6 +147,9 @@ CString CTStat_Dev::GetProductName()
 	case PM_TSTAT5E:
 		strProductName="TStat5E";
 		break;
+	case PM_TSTATRUNAR:
+		strProductName="TStatRunar";
+		break;
 	case PM_TSTAT5F:
 		strProductName="TStat5F";
 		break;
@@ -215,6 +218,12 @@ CString CTStat_Dev::GetProductName()
     case PM_AirQuality:
         strProductName="Air Quality";
         break;
+	case PM_PRESSURE:
+	    strProductName="Pressure Sensor";
+		break;
+	case PM_HUMTEMPSENSOR:
+		strProductName="Hum Temp Sensor";
+		break;
 	default:
 		strProductName="TStat";
 		break;
