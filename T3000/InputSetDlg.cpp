@@ -21,11 +21,10 @@
 #define TOTAL_ROWS 7
 // CInputSetDlg dialog
 
-
 #define ANALOG_RANG_NUMBER 11
 // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
 // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KF Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
-CString analog_range[ANALOG_RANG_NUMBER]={_T("UNUSED"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open")};
+CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open")};
 CString INPUT_FUNS[8]={_T("Normal"),_T("Freeze Protect"),_T("Occupancy Sensor"),_T("Sweep Off"),_T("Clock"),_T("Changeover Mode"),_T("Outside Temp"),_T("Airflow")};
 
 //CString g_str5ERange2[5]={_T("Raw"),_T("Thermistor"),_T("On/Off"),_T("Off/On"),_T("%")};
@@ -37,7 +36,7 @@ CInputSetDlg::CInputSetDlg(CWnd* pParent /*=NULL*/)
 	//, m_filterValue(0)
 {
 	m_nCurRow=m_nCurCol=0;
-	 InputThread=NULL;
+	InputThread=NULL;
 	 b_is_fresh = false;
 	   m_cvalue=0;
 	   m_crange=0;
@@ -97,6 +96,7 @@ BEGIN_MESSAGE_MAP(CInputSetDlg, CDialog)
 	ON_WM_CLOSE()
 	ON_EN_KILLFOCUS(IDC_FILTER, &CInputSetDlg::OnEnKillfocusFilter)
 	ON_CBN_SELCHANGE(IDC_VALUECOMBO, &CInputSetDlg::OnCbnSelchangeValuecombo)
+	ON_BN_CLICKED(IDC_FRESH, &CInputSetDlg::OnBnClickedFresh)
 END_MESSAGE_MAP()
 
 // CInputSetDlg message handlers
@@ -202,6 +202,7 @@ BOOL CInputSetDlg::OnInitDialog()
 		case 1:m_inRows=3;break; // 5A
 		case 4:m_inRows=5;break; // 5C
 		case PM_TSTAT7:
+		m_inRows=12;break;
 		case PM_PRESSURE:
 		case 12:m_inRows=5;break; // 5D 同 TStat7
 		case PM_TSTAT6:	m_inRows=12;break;
@@ -385,7 +386,7 @@ void CInputSetDlg::Fresh_Grid()
 		Init_not_5ABCD_Grid();
 		return ;
 	}
-	if (m_nModel==PM_TSTAT6||m_nModel==PM_TSTAT5i)
+	if (m_nModel==PM_TSTAT6||m_nModel==PM_TSTAT5i||m_nModel==PM_TSTAT7)
 	{
 		InitGridtstat6();
 		return ;
@@ -522,9 +523,9 @@ void CInputSetDlg::Fresh_Grid()
 		}
 		if(product_register_value[MODBUS_ANALOG_IN1]==0)
 		{
-			// 		strTemp.Format(_T("%d"),product_register_value[180]);
+					strTemp.Format(_T("%d"),product_register_value[180]);
 			// 		strTemp=strTemp;
-			strTemp=_T("UNUSED");//2.5.0.98
+			//strTemp=_T("Raw");//2.5.0.98
 		}
 		if(product_register_value[MODBUS_ANALOG_IN1]==2)
 		{
@@ -541,9 +542,9 @@ void CInputSetDlg::Fresh_Grid()
 				if (m_crange==6||m_crange==7)
 				{
 
-					if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-						strTemp=_T("Occupied");
 					if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
+						strTemp=_T("Occupied");
+					if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
 						strTemp=_T("Unoccupied");
 
 
@@ -570,40 +571,24 @@ void CInputSetDlg::Fresh_Grid()
 
 				if (m_crange==6||m_crange==7)
 				{
-					if (m_crange==6)
-					{
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-							strTemp=_T("Occupied");
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-							strTemp=_T("Unoccupied");
-					} 
-					else
-					{
+					
 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
 							strTemp=_T("Unoccupied");
 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
 							strTemp=_T("Occupied");
 
 
-					}
+					
 
 				} 
 				else
 				{
-					if (product_register_value[MODBUS_ANALOG_IN1]==3)
-					{
+					
 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
 							strTemp=_T("Off");
 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
 							strTemp=_T("On");
-					} 
-					else
-					{
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//181
-							strTemp=_T("On");
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//181
-							strTemp=_T("Off");
-					}
+					
 				}
 
 
@@ -751,9 +736,9 @@ void CInputSetDlg::Fresh_Grid()
 				if (m_crange==6||m_crange==7)
 				{
 
-					if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
-						strTemp=_T("Occupied");
 					if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
+						strTemp=_T("Occupied");
+					if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
 						strTemp=_T("Unoccupied");
 
 
@@ -781,40 +766,24 @@ void CInputSetDlg::Fresh_Grid()
 			{
 				if (m_crange==6||m_crange==7)
 				{
-					if (m_crange==6)
-					{
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
-							strTemp=_T("Occupied");
+					
 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
+							strTemp=_T("Occupied");
+						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
 							strTemp=_T("Unoccupied");
 
 
-					} 
-					else
-					{
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
-							strTemp=_T("Unoccupied");
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
-							strTemp=_T("Occupied");
-					}
+					
 
 				} 
 				else
 				{
-					if (product_register_value[MODBUS_ANALOG_IN2]==3)
-					{
+					
 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
 							strTemp=_T("Off");
 						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
 							strTemp=_T("On");
-					} 
-					else
-					{
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
-							strTemp=_T("On");
-						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
-							strTemp=_T("Off");
-					}
+					
 				}
 
 
@@ -828,7 +797,7 @@ void CInputSetDlg::Fresh_Grid()
 
 		if (product_register_value[MODBUS_ANALOG_IN2] == 0)	//189
 		{
-			strTemp = _T("UNUSED");//2.5.0.98
+			strTemp = _T("Raw");//2.5.0.98
 		}
 
 
@@ -871,10 +840,10 @@ void CInputSetDlg::Fresh_Grid()
 			   m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
 			   ado.m_pRecordset->MoveNext();
 		   }
-
+		  
 		   if (nValue==0)//Auto Model
-		   {
-			   if((product_register_value[546]==0)&&(m_crange==0))//546
+		   { strTemp=_T("");
+			   if((product_register_value[MODBUS_DIGITAL_IN1]==0)&&(m_crange==0))//546
 			   {
 				   CString strTemp2;
 				   if(product_register_value[311]==0)
@@ -888,10 +857,10 @@ void CInputSetDlg::Fresh_Grid()
 				   strTemp2=_T("On/Off");
 				   m_FlexGrid.put_TextMatrix(4,RANG_FIELD,strTemp2);
 			   }
-			   else  if((product_register_value[546]==0)&&(m_crange==2))//546
+			   else  if((product_register_value[MODBUS_DIGITAL_IN1]==0)&&(m_crange==2))//546
 			   {
 				   CString strTemp2;
-				   if (product_register_value[311]==1)
+				   if (product_register_value[311]==0)
 				   {
 					   strTemp=_T("UnOccupied");
 
@@ -904,10 +873,10 @@ void CInputSetDlg::Fresh_Grid()
 				   strTemp2=_T("Occupied/UnOccupied");
 				   m_FlexGrid.put_TextMatrix(4,RANG_FIELD,strTemp2);
 			   }
-			   if ((product_register_value[546]==1)&&(m_crange==1))//546
+			  else if ((product_register_value[MODBUS_DIGITAL_IN1]==1)&&(m_crange==1))//546
 			   {
 				   CString strTemp2;
-				   if (product_register_value[311]==1)
+				   if (product_register_value[311]==0)
 				   {
 					   strTemp=_T("Off");
 
@@ -918,7 +887,7 @@ void CInputSetDlg::Fresh_Grid()
 				   strTemp2=_T("Off/On");
 				   m_FlexGrid.put_TextMatrix(4,RANG_FIELD,strTemp2);
 			   }
-			   else if ((product_register_value[546]==1)&&(m_crange==3))//546
+			   else if ((product_register_value[MODBUS_DIGITAL_IN1]==1)&&(m_crange==3))//546
 			   {
 				   CString strTemp2;
 				   if (product_register_value[311]==1)
@@ -935,8 +904,8 @@ void CInputSetDlg::Fresh_Grid()
 		   } 
 		   else
 		   {
-
-			   if((product_register_value[546]==0)&&(m_crange==0))//546
+		       strTemp=_T("");
+			   if((product_register_value[MODBUS_DIGITAL_IN1]==0)&&(m_crange==0))//546
 			   {
 				   CString strTemp2;
 				   if(product_register_value[311]==0)
@@ -950,10 +919,10 @@ void CInputSetDlg::Fresh_Grid()
 				   strTemp2=_T("On/Off");
 				   m_FlexGrid.put_TextMatrix(4,RANG_FIELD,strTemp2);
 			   }
-			   else  if((product_register_value[546]==0)&&(m_crange==2))//546
+			   else  if((product_register_value[MODBUS_DIGITAL_IN1]==0)&&(m_crange==2))//546
 			   {
 				   CString strTemp2;
-				   if (product_register_value[311]==1)
+				   if (product_register_value[311]==0)
 				   {
 					   strTemp=_T("UnOccupied");
 
@@ -966,7 +935,7 @@ void CInputSetDlg::Fresh_Grid()
 				   strTemp2=_T("Occupied/UnOccupied");
 				   m_FlexGrid.put_TextMatrix(4,RANG_FIELD,strTemp2);
 			   }
-			   if ((product_register_value[546]==1)&&(m_crange==1))//546
+			  else if ((product_register_value[MODBUS_DIGITAL_IN1]==1)&&(m_crange==1))//546
 			   {
 				   CString strTemp2;
 				   if(product_register_value[311]==0)
@@ -980,10 +949,10 @@ void CInputSetDlg::Fresh_Grid()
 				   strTemp2=_T("Off/On");
 				   m_FlexGrid.put_TextMatrix(4,RANG_FIELD,strTemp2);
 			   }
-			   else if ((product_register_value[546]==1)&&(m_crange==3))//546
+			   else if ((product_register_value[MODBUS_DIGITAL_IN1]==1)&&(m_crange==3))//546
 			   {
 				   CString strTemp2;
-				   if (product_register_value[311]==1)
+				   if (product_register_value[311]==0)
 				   {
 					   strTemp=_T("UnOccupied");
 
@@ -997,15 +966,14 @@ void CInputSetDlg::Fresh_Grid()
 		   }
 		  
 		  
-		  
-		  
+		 
 		   m_FlexGrid.put_TextMatrix(4,VALUE_FIELD,strTemp);
 		   } 
 		   else
 		   {   
 		   if (nValue==0)
-		   {
-			   if (product_register_value[546]==0)//546
+		   { strTemp=_T("");
+			   if (product_register_value[MODBUS_DIGITAL_IN1]==0)//546
 			   {
 				   CString strTemp2;
 
@@ -1019,10 +987,10 @@ void CInputSetDlg::Fresh_Grid()
 				   strTemp2=_T("On/Off");
 				   m_FlexGrid.put_TextMatrix(4,RANG_FIELD,strTemp2);
 			   }
-			   if (product_register_value[546]==1)//546
-			   {
+			   if (product_register_value[MODBUS_DIGITAL_IN1]==1)//546
+			   { strTemp=_T("");
 				   CString strTemp2;
-				   if (product_register_value[311]==1)
+				   if (product_register_value[311]==0)
 				   {
 					   strTemp=_T("Off");
 
@@ -1033,13 +1001,13 @@ void CInputSetDlg::Fresh_Grid()
 				   strTemp2=_T("Off/On");
 				   m_FlexGrid.put_TextMatrix(4,RANG_FIELD,strTemp2);
 			   }
-
+			   
 		   } 
 		   else
 		   {
-
-			   if (product_register_value[546]==0)//546
-			   {
+		    
+			   if (product_register_value[MODBUS_DIGITAL_IN1]==0)//546
+			   {strTemp=_T("");
 				   CString strTemp2;
 
 				   if (product_register_value[311]==1)
@@ -1052,7 +1020,7 @@ void CInputSetDlg::Fresh_Grid()
 				   strTemp2=_T("On/Off");
 				   m_FlexGrid.put_TextMatrix(4,RANG_FIELD,strTemp2);
 			   }
-			   if (product_register_value[546]==1)//546
+			   if (product_register_value[MODBUS_DIGITAL_IN1]==1)//546
 			   {
 				   CString strTemp2;
 				   if (product_register_value[311]==1)
@@ -1073,11 +1041,11 @@ void CInputSetDlg::Fresh_Grid()
 		   ado.CloseRecordset();
 	   }
 	   else
-	   {
+	   { 
 		   if (nValue==0)
 		   {
-			   if (product_register_value[546]==0)//546
-			   {
+			   if (product_register_value[MODBUS_DIGITAL_IN1]==0)//546
+			   {strTemp=_T("");
 				   CString strTemp2;
 
 				   if (product_register_value[311]==1)
@@ -1089,11 +1057,11 @@ void CInputSetDlg::Fresh_Grid()
 				   }
 				   strTemp2=_T("On/Off");
 				   m_FlexGrid.put_TextMatrix(4,RANG_FIELD,strTemp2);
-			   }
-			   if (product_register_value[546]==1)//546
-			   {
+			   } 
+			   if (product_register_value[MODBUS_DIGITAL_IN1]==1)//546
+			   {strTemp=_T("");
 				   CString strTemp2;
-				   if (product_register_value[311]==1)
+				   if (product_register_value[311]==0)
 				   {
 					   strTemp=_T("Off");
 
@@ -1109,10 +1077,9 @@ void CInputSetDlg::Fresh_Grid()
 		   else
 		   {
 
-			   if (product_register_value[546]==0)//546
-			   {
+			   
 				   CString strTemp2;
-
+strTemp=_T("");
 				   if (product_register_value[311]==1)
 				   {
 					   strTemp=_T("On");
@@ -1122,20 +1089,8 @@ void CInputSetDlg::Fresh_Grid()
 				   }
 				   strTemp2=_T("On/Off");
 				   m_FlexGrid.put_TextMatrix(4,RANG_FIELD,strTemp2);
-			   }
-			   if (product_register_value[546]==1)//546
-			   {
-				   CString strTemp2;
-				   if (product_register_value[311]==1)
-				   {
-					   strTemp=_T("On");
-				   }else
-				   {
-					   strTemp=_T("Off");
-				   }
-				   strTemp2=_T("Off/On");
-				   m_FlexGrid.put_TextMatrix(4,RANG_FIELD,strTemp2);
-			   }
+			   
+			  
 		   }
 
 		   m_FlexGrid.put_TextMatrix(4,VALUE_FIELD,strTemp);
@@ -1889,10 +1844,10 @@ void CInputSetDlg::OnCbnSelchangeRangCombo()
 		{
 		nindext=1;
 		}
-		int ret=write_one(g_tstat_id,546,nindext);
+		int ret=write_one(g_tstat_id,MODBUS_DIGITAL_IN1,nindext);
 		if (ret>0)
 		{
-		product_register_value[546]=nindext;
+		product_register_value[MODBUS_DIGITAL_IN1]=nindext;
 
 
 		CADO ado;
@@ -2552,14 +2507,14 @@ void CInputSetDlg::InitGridtstat6()
  	   {
  		   m_disable_hum=FALSE;
  	   }
- 	   if((product_register_value[20]&4)==4)
- 	   {
- 		   m_disable_CO2=TRUE;
- 	   }
- 	   else
- 	   {
- 		   m_disable_CO2=FALSE;
- 	   }
+	   if((product_register_value[MODBUS_TSTAT6_CO2_AVALUE]>=0)&&(product_register_value[MODBUS_TSTAT6_CO2_AVALUE]<=3000))
+	   {
+		   m_disable_CO2=TRUE;
+	   }
+	   else
+	   {
+		   m_disable_CO2=FALSE;
+	   }
 	  
 
 	   m_FlexGrid.put_TextMatrix(1,NAME_FIELD,g_strSensorName);
@@ -2571,8 +2526,8 @@ void CInputSetDlg::InitGridtstat6()
 	   m_FlexGrid.put_TextMatrix(7,NAME_FIELD,g_strInName6);
 	   m_FlexGrid.put_TextMatrix(8,NAME_FIELD,g_strInName7);
 	   m_FlexGrid.put_TextMatrix(9,NAME_FIELD,g_strInName8); 
-	   m_FlexGrid.put_TextMatrix(10,NAME_FIELD,g_strInHumName);
-	   m_FlexGrid.put_TextMatrix(11,NAME_FIELD,g_strInCO2);
+	  m_FlexGrid.put_TextMatrix(10,NAME_FIELD,g_strInHumName);
+	  m_FlexGrid.put_TextMatrix(11,NAME_FIELD,g_strInCO2);
 	    
 	   
 	   CString strUnit=GetTempUnit();
@@ -2618,10 +2573,7 @@ void CInputSetDlg::InitGridtstat6()
 					   strTemp.Format(_T("%.1f"),product_register_value[MODBUS_INTERNAL_THERMISTOR]/10.0);//216
 
 				   }
-				  /* else if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7))
-				   {
-					   strTemp.Format(_T("%.1f"),product_register_value[130]/10.0);
-				   }*/
+				   
 				   else
 				   {
 					   strTemp.Format(_T("%.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);  //121
@@ -2738,6 +2690,7 @@ void CInputSetDlg::InitGridtstat6()
 						{
 						strTemp=analog_range[nValue]; 
 						}
+						m_crange=nValue;
 					}
 					ado.CloseRecordset();
 				}
@@ -2748,6 +2701,7 @@ void CInputSetDlg::InitGridtstat6()
 					{
 							strTemp=analog_range[nValue]; 
 					}
+					m_crange=nValue;
 				}
 				ado.CloseConn();
 			   m_FlexGrid.put_TextMatrix(i,RANG_FIELD,strTemp);
@@ -2803,9 +2757,7 @@ void CInputSetDlg::InitGridtstat6()
 								strTemp = _T("On");
 							}	
 						 
-					}
-					
-									
+					}					
 				}
 				else if (product_register_value[MODBUS_ANALOG1_RANGE+i-2]==4 )  // custom sensor	359 122
 				{					
@@ -2820,9 +2772,7 @@ void CInputSetDlg::InitGridtstat6()
 				}
 				else
 				{
-					//strTemp.Format(_T("%d"),product_register_value[367+i-2]);//lsc
-					strTemp.Format(_T("UNUSED"));
-
+					strTemp.Format(_T("%d"),product_register_value[MODBUS_ANALOG_INPUT1+i-2]);//lsc
 				}						
 				m_FlexGrid.put_TextMatrix(i,VALUE_FIELD,strTemp);
 				strTemp.Empty();
@@ -2830,18 +2780,7 @@ void CInputSetDlg::InitGridtstat6()
 
 
 
-			   //298	167	1	Low byte	W/R	Analog input1 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-			   // column 5 Function Ö»ÓÐIN1£¬2²ÅÓÐ
-
-
-			   // 				298	167	1	Low byte	W/R	Analog input1 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-			   // 				299	168	1	Low byte	W/R	Analog input2 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-			   // 				169	1	Low byte	W/R	(future)Analog input3 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-			   // 				170	1	Low byte	W/R	(future)Analog input4 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-			   // 				171	1	Low byte	W/R	(future)Analog input5 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-			   // 				172	1	Low byte	W/R	(future)Analog input6 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-			   // 				173	1	Low byte	W/R	(future)Analog input7 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
-			   // 				174	1	Low byte	W/R	(future)Analog input8 function selection. 0, normal; 1, freeze protect sensor input; 2, occupancy sensor input; 3, sweep off mode; 4, clock mode; 5, change over mode.
+		 
 
 
 			   nValue=product_register_value[MODBUS_ANALOG1_FUNCTION+i-2];		//298   167
@@ -2857,8 +2796,16 @@ void CInputSetDlg::InitGridtstat6()
 			   {
 				   if(i== 2 || i==3)
 				   {
-					   nValue=product_register_value[298+i-2];
-					   strTemp=INPUT_FUNS[nValue];
+					   nValue=product_register_value[MODBUS_ANALOG1_FUNCTION+i-2];
+					   if (nValue>=0&&nValue<=7)
+					   {
+					    strTemp=INPUT_FUNS[nValue];
+					   } 
+					   else
+					   {
+					    strTemp=_T("Default");
+					   }
+					  
 					   m_FlexGrid.put_TextMatrix(i,FUN_FIELD,strTemp);
 				   }
 				   else
@@ -2896,14 +2843,7 @@ void CInputSetDlg::InitGridtstat6()
 				   }
 			   }
 				
-			  /* for (int i=1;i<=8;i++)
-			   {*/
-				  
-				  
-
-					 
-				 
-			   /*}*/
+			 
 			  
 
 		   }
@@ -2996,7 +2936,22 @@ void CInputSetDlg::InitGridtstat6()
 		   temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_FILTER]);
 		   m_FlexGrid.put_TextMatrix(11,FILTER,temp);
 	   }
-	   
+	   if (product_register_value[7] == PM_TSTAT7)
+	   {
+		   for (int row=6;row<=11;row++)
+		   {
+			   //   m_Input_Grid.put_TextMatrix(row,0,_T("UNUSED"));
+			   m_FlexGrid.put_TextMatrix(row,1,_T("UNUSED"));
+			   m_FlexGrid.put_TextMatrix(row,2,_T("UNUSED"));
+			   m_FlexGrid.put_TextMatrix(row,3,_T("UNUSED"));
+			   m_FlexGrid.put_TextMatrix(row,4,_T("UNUSED"));
+			   m_FlexGrid.put_TextMatrix(row,5,_T("UNUSED"));
+			   m_FlexGrid.put_TextMatrix(row,6,_T("UNUSED"));
+			   m_FlexGrid.put_TextMatrix(row,7,_T("UNUSED"));
+			   m_FlexGrid.put_TextMatrix(row,8,_T("UNUSED"));
+		   }
+
+	   }
 
    }
 
@@ -3310,8 +3265,8 @@ void CInputSetDlg::Init_not_5ABCD_Grid()
 				}
 				else
 				{
-					//strTemp.Format(_T("%d"),product_register_value[367+i-2]);//lsc
-					strTemp.Format(_T("UNUSED"));
+					 strTemp.Format(_T("%d"),product_register_value[367+i-2]);//lsc
+					//strTemp.Format(_T("Raw"));
 
 				}						
 				m_FlexGrid.put_TextMatrix(i,VALUE_FIELD,strTemp);
@@ -4873,5 +4828,18 @@ void CInputSetDlg::OnCbnSelchangeValuecombo()
 	}
 
 
+	Fresh_Grid();
+}
+
+
+void CInputSetDlg::OnBnClickedFresh()
+{
+	for(int i=0;i<(9);i++)	//暂定为0 ，因为TSTAT6 目前为600多
+	{
+		int itemp = 0;
+		itemp = Read_Multi(g_tstat_id,&product_register_value[i*(100)],i*(100),100,5);
+
+		Sleep(200);
+	}
 	Fresh_Grid();
 }

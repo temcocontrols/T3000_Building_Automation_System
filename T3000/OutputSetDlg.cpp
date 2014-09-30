@@ -1560,7 +1560,7 @@ else
 		}
 		CString strTemp;
 		 int ST=product_register_value[692];
-		 if (ST>=5)
+		 if (ST>=5&&ST<=16)
 		 {
 			 strTemp=OUTPUT_ANRANGE[ST];
 		 }

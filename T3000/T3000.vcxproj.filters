@@ -309,18 +309,6 @@
     <ClCompile Include="CM5\MyOwnListCtrl.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
-    <ClCompile Include="MBP.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MbpGlobalFuncs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MbPoll.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MbPollOptions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DisplayConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -381,9 +369,6 @@
     <ClCompile Include="CustomSTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TrafficWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BacnetWeeklyRoutine.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
@@ -399,9 +384,6 @@
     <ClCompile Include="BacnetScheduleTime.cpp">
       <Filter>CM5</Filter>
     </ClCompile>
-    <ClCompile Include="RegDetails.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="T38IOAView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -412,9 +394,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LanguageLocale.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MbPollFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BacnetGraphic.cpp">
@@ -530,6 +509,21 @@
     </ClCompile>
     <ClCompile Include="CM5\PTP\PTP.Cpp">
       <Filter>CM5\PTP</Filter>
+    </ClCompile>
+    <ClCompile Include="Bacnetaddintodb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CalibartionHT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CalibrationHumDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PressureSensorForm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TempHumSensorForm.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1028,24 +1022,6 @@
     <ClInclude Include="BacnetVariable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MBP.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MbpDefines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MbpExterns.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MbpGlobals.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MbPoll.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MbPollOptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DisplayConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1127,12 +1103,6 @@
     <ClInclude Include="CustomSTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TrafficWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RegDetails.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AirflowSettingDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1164,9 +1134,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RegisterWriteValueDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MbPollFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetScreenEdit.h">
@@ -1242,6 +1209,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Bacnetaddintodb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CalibartionHT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CalibrationHumDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PressureSensorForm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TempHumSensorForm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

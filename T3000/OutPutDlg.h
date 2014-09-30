@@ -1,8 +1,8 @@
 #pragma once
 #include "afxwin.h"
 #include "msflexgrid1.h"
-
-// COutPutDlg dialog
+#include "PressureSensorForm.h"
+ 
 
 class COutPutDlg : public CDialog
 {
@@ -11,7 +11,7 @@ class COutPutDlg : public CDialog
 public:
 	COutPutDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~COutPutDlg();
-
+	/*CPressureSensorForm pressuresensorview;*/
 	// Dialog Data
 	enum { IDD = IDD_OUTPUTDIALOG };
 
@@ -116,4 +116,5 @@ public:
 	void ClickMsflexgrid3();
 	afx_msg void OnEnKillfocusPid3Heatstageedit();
 	afx_msg void OnEnKillfocusPid3coolstageedit();
+	
 };

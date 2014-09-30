@@ -15,7 +15,7 @@ DWORD nThreadID;
 HWND hMbpollWnd;
 HWND hMbpollWritePopWnd;
 int regDetailsOpenedFrom = 0;	// 0 = MbPoll.cpp; 1 = mbpollFunctions.cpp
-
+bool list_mouse_click = false;
 //#include "stdafx.h"
 unsigned short multi_register_value[1024]={-1};
 unsigned short multi_register_value_tcp[10000]={-1};
@@ -1935,6 +1935,7 @@ unsigned char weeklt_time_schedule[BAC_WEEKLY_ROUTINES_COUNT][WEEKLY_SCHEDULE_SI
 unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][500];//ÔÝ¶¨400;
 int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 
+BOOL g_mstp_flag;
 
 unsigned long timesec1970; 
 unsigned long timestart;   
@@ -1947,7 +1948,7 @@ HANDLE CM5_hThread = NULL;
 HANDLE CM5_UI_Thread;
 DWORD nThreadID_x;
 DWORD cm5_nThreadID;
-CDialog *pDialog[11];
+CDialog *pDialog[12];
 CDialog *DebugWindow;
 HWND h_debug_window;
 CString PrintText[1000];

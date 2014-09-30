@@ -21,8 +21,8 @@
 #include "MiniPanel/DialgMiniPanel.h" //Mini Panel
 #include "AirQuality/AirQuality.h"//AirQuality
 #include "Class/MulitithreadSocket.h"
-#include "MBP.h"
-#include "MbPoll.h"
+// #include "MBP.h"
+// #include "MbPoll.h"
 
 #define NUMVIEWS 19
 
@@ -107,9 +107,9 @@ class CScanDbWaitDlg;
 class CMainFrame : public CFrameWndEx
 {	
 private:
-	CMbp* m_pDlg;
+	 
 	BOOL m_bDialogOpen;
-	LONG OnDlgClose(UINT wParam, LONG lParam);
+//	LONG OnDlgClose(UINT wParam, LONG lParam);
 public: // create from serialization only
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
@@ -366,10 +366,10 @@ public:
 	afx_msg void OnToolIsptoolforone();
 	 
 	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
-	CMbPoll* mbPoll;
+	 
 	bool mbPollDlgOpen;
 protected:
-	afx_msg LRESULT OnMbpollClosed(WPARAM wParam, LPARAM lParam);
+	//afx_msg LRESULT OnMbpollClosed(WPARAM wParam, LPARAM lParam);
 public:
 	CString					m_strPingIP;	
 	void ShowDebugWindow();
@@ -432,7 +432,7 @@ const int DLG_DIALOGT332AI_VIEW=14;
 const int DLG_DIALOGT38AI8AO=15;
 const int DLG_DIALOGT36CT=16;
 const int DLG_DIALOGT3PT10=17;
-const int DLG_DIALOGDEFAULTVIEW=18;
+const int DLG_DIALOG_PRESSURE_SENSOR=18;
 
 extern int g_gloab_bac_comport;
 

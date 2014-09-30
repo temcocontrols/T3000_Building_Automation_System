@@ -700,7 +700,43 @@ for (UINT i=0;i<m_pScanner->m_szNCScanRet.size();i++)
 	}
 }
 }
+void CScanDlg::SaveNewIPAddress(CString newip,CString oldip){
+	_ConnectionPtr m_pCon;
+	_RecordsetPtr m_pRs;
+	::CoInitialize(NULL);
+	try 
+	{
+	CString strSql;
+		////////////////////////////////////////////////////////////////////////////////////////////
+		//获取数据库名称及路径
+		/////////////////////////////////////////////////////////////////////////////////////////////////
+		//连接数据库
+		m_pCon.CreateInstance("ADODB.Connection");
+		m_pRs.CreateInstance(_T("ADODB.Recordset"));
+		m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+		strSql.Format(_T("select * from ALL_NODE where Bautrate='%s' "),oldip);
+		m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 
+		while(VARIANT_FALSE==m_pRs->EndOfFile)
+		{
+			strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Bautrate='%s'"),newip,oldip);
+			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+			m_pRs->MoveNext();
+		}
+		m_pRs->Close();
+		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
+	}
+	catch(_com_error e)
+	{
+		/* AfxMessageBox(e.Description());*/
+		//MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
+
+		 
+		m_pCon->Close();
+	}
+	m_pCon->Close(); 
+}
 int CScanDlg::GetAllNodeFromDataBase()
 {
 	//_ConnectionPtr m_pCon;//for ado connection
@@ -1741,7 +1777,8 @@ void CScanDlg::OnBnClickedButtonScanall()
 						m_flexGrid.put_CellBackColor(ref);
 					}
 					m_flexGrid.put_TextMatrix(row_flags+1,SCAN_TABLE_ADDRESS,strnewipadress);
-					ChangeIPAddress(strnewipadress,stroldipaddress);
+					SaveNewIPAddress(strnewipadress,stroldipaddress);
+					AfxMessageBox(_T("Change the ip successfully!"));
 				}	
 		
 			}

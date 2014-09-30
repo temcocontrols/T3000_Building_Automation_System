@@ -5,13 +5,7 @@
 #include "T3000.h"
 #include "LabelEditDlg.h"
 
-#define START_ID 20000
-// CLabelEditDlg dialog
-#define INPUT_NUMBER 4
-#define OUTPUT_NUMBER 7
-//CString m_input[INPUT_NUMBER]={_T("Internal"),_T("Analog 1"),_T("Analog 2"),_T("Digital 1")};
-CString m_input[INPUT_NUMBER]={_T("Internal Sensor"),_T("Input1"),_T("Input2"),_T("Input3")};
-CString m_output[OUTPUT_NUMBER]={_T("Relay 1"),_T("Relay 2"),_T("Relay 3"),_T("Relay 4"),_T("Relay 5"),_T("Analog 1"),_T("Analog 2")};
+
 
 IMPLEMENT_DYNAMIC(CLabelEditDlg, CDialog)
 
@@ -80,6 +74,30 @@ BOOL CLabelEditDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+
+	/*  m_input[INPUT_NUMBER]={g_strSensorName,g_strInName1,g_strInName2,g_strInName3,g_strInName4,g_strInName5,g_strInName6,g_strInName7,g_strInName8,g_strInHumName,g_strInCO2};
+
+	  m_output[OUTPUT_NUMBER]={_T("Relay 1"),_T("Relay 2"),_T("Relay 3"),_T("Relay 4"),_T("Relay 5"),_T("Analog 1"),_T("Analog 2")};*/
+
+	m_input[0]=g_strSensorName;
+	m_input[1]=g_strInName1;
+	m_input[2]=g_strInName2;
+	m_input[3]=g_strInName3;
+	m_input[4]=g_strInName4;
+	m_input[5]=g_strInName5;
+	m_input[6]=g_strInName6;
+	m_input[7]=g_strInName7;
+    m_input[8]=g_strInName8;
+    m_input[9]=g_strInHumName;
+    m_input[10]=g_strInCO2;
+	m_output[0]=_T("Relay 1");
+	m_output[1]=_T("Relay 2");
+	m_output[2]=_T("Relay 3");
+	m_output[3]=_T("Relay 4");
+	m_output[4]=_T("Relay 5");
+	m_output[5]=_T("Analog 1");
+	m_output[6]=_T("RAnalog 2");
+	 
 	m_pCon.CreateInstance(_T("ADODB.Connection"));
 	m_pRs.CreateInstance(_T("ADODB.Recordset"));
 	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
@@ -159,14 +177,13 @@ void CLabelEditDlg::SaveEditValue()
 {
 	try
 	{
-
 	CString strSql;
 	CString strclrTxt;
 	CString strclrBk;
 	strclrTxt.Format(_T("%u"),m_clrTxt);
 	strclrBk.Format(_T("%u"),m_bkColor);
 	strSql.Format(_T("update Screen_Label set Width=%i,Height=%i,Status=%i,Input_or_Output=%i,Text_Color='%s',Back_Color='%s' where Serial_Num =%i and Tstat_id=%i and  Cstatic_id=%i and Tips='%s'"),
-		m_nwidth,m_nheight,m_nstatus,m_input_or_output,strclrTxt,strclrBk,m_nSerialNum,m_id,m_nControlID,m_strScreenName);
+	m_nwidth,m_nheight,m_nstatus,m_input_or_output,strclrTxt,strclrBk,m_nSerialNum,m_id,m_nControlID,m_strScreenName);
 	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
 	}
 	catch(_com_error *e)
@@ -239,17 +256,40 @@ void CLabelEditDlg::SaveToDb()
 void CLabelEditDlg::OnCbnSelchangeIocombox()
 {
 //	m_statusComBox.ResetContent();
+int m_inRows;
 	m_input_or_output=m_IOCombox.GetCurSel();
 	if(bac_cm5_graphic == false)	//如果不是CM5 
 	{
 		if(m_input_or_output==0)
 		{
+			int m_nModel=product_register_value[MODBUS_PRODUCT_MODEL];
+			switch (m_nModel)
+			{
+			case 3:m_inRows=4;break; // 5B
+			case 2:
+			case 1:m_inRows=3;break; // 5A
+			case 4:m_inRows=5;break; // 5C
+			case PM_TSTAT7:m_inRows=12;break;
+			case PM_PRESSURE:
+			case 12:m_inRows=5;break; // 5D 同 TStat7
+			case PM_TSTAT6:	m_inRows=12;break;
+			case PM_TSTAT5i:	m_inRows=12;break;
+			case 16:m_inRows=10;break; // 5E
+			case 17:m_inRows=5;break; // 5F
+			case 18:m_inRows=5;break; // 5G
+			case 19:m_inRows=9;break; // 5H
+			default:
+				break;
+			}
+			--m_inRows;//去掉一行
+
+
 			GetDlgItem(IDC_REG_STATIC)->SetWindowText(_T("Input"));
-			for(int i=0;i<INPUT_NUMBER;i++)
+			for(int i=0;i<m_inRows;i++)
 			{
 				m_statusComBox.AddString(m_input[i]);
 			}
-			if(m_nstatus>=0&&m_nstatus<=7)
+			if(m_nstatus>=0&&m_nstatus<=11)
 				m_statusComBox.SetCurSel(m_nstatus);
 			m_regEdit.ShowWindow(SW_HIDE);
 			m_statusComBox.ShowWindow(SW_SHOW);
@@ -347,6 +387,7 @@ void CLabelEditDlg::OnEnKillfocusWidthedit()
 	if(strText.IsEmpty())
 		return;
 	m_nwidth=_wtoi(strText);
+	
 }
 
 void CLabelEditDlg::OnEnKillfocusHeightedit()

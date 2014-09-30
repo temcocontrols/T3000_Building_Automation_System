@@ -110,7 +110,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -210,11 +210,6 @@
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="ManageAccountDlg.cpp" />
     <ClCompile Include="MannageBuidingDlg.cpp" />
-    <ClCompile Include="MBP.cpp" />
-    <ClCompile Include="MbpGlobalFuncs.cpp" />
-    <ClCompile Include="MbPoll.cpp" />
-    <ClCompile Include="MbPollFunctions.cpp" />
-    <ClCompile Include="MbPollOptions.cpp" />
     <ClCompile Include="monthview1.cpp" />
     <ClCompile Include="msflexgrid1.cpp" />
     <ClCompile Include="NetworkControllView.cpp" />
@@ -223,9 +218,9 @@
     <ClCompile Include="OutputSetDlg.cpp" />
     <ClCompile Include="OutsidDailog.cpp" />
     <ClCompile Include="ParameterDlg.cpp" />
+    <ClCompile Include="PressureSensorForm.cpp" />
     <ClCompile Include="PVDlg.cpp" />
     <ClCompile Include="RefreshTreeThread.cpp" />
-    <ClCompile Include="RegDetails.cpp" />
     <ClCompile Include="RegisterViewerDlg.cpp" />
     <ClCompile Include="RegisterWriteValueDlg.cpp" />
     <ClCompile Include="RelayLabel.cpp" />
@@ -259,10 +254,10 @@
     <ClCompile Include="Table_Tamplete.cpp" />
     <ClCompile Include="TDelayForm.cpp" />
     <ClCompile Include="TemcoDataGrid.cpp" />
+    <ClCompile Include="TempHumSensorForm.cpp" />
     <ClCompile Include="TestMultiReadTraffic.cpp" />
     <ClCompile Include="Timer_Calibrate.cpp" />
     <ClCompile Include="ToolCalibrateDlg.cpp" />
-    <ClCompile Include="TrafficWindow.cpp" />
     <ClCompile Include="TrendLogView.cpp" />
     <ClCompile Include="TrendLogWnd.cpp" />
     <ClCompile Include="TstatZigbeeLogic.cpp" />
@@ -365,7 +360,6 @@
     <ClInclude Include="BacnetAlarmLog.h" />
     <ClInclude Include="ARDDlg.h" />
     <ClInclude Include="BacnetAlarmWindow.h" />
-    <ClInclude Include="BacnetCustomerDigitalRange.h" />
     <ClInclude Include="BacnetGraphic.h" />
     <ClInclude Include="BacnetInput.h" />
     <ClInclude Include="BacnetOutput.h" />
@@ -408,15 +402,8 @@
     <ClInclude Include="IONameConfig.h" />
     <ClInclude Include="LanguageLocale.h" />
     <ClInclude Include="LCOutNameConfig.h" />
-    <ClInclude Include="MBP.h" />
-    <ClInclude Include="MbpDefines.h" />
-    <ClInclude Include="MbpExterns.h" />
-    <ClInclude Include="MbpGlobals.h" />
-    <ClInclude Include="MbPoll.h" />
-    <ClInclude Include="MbPollFunctions.h" />
-    <ClInclude Include="MbPollOptions.h" />
+    <ClInclude Include="PressureSensorForm.h" />
     <ClInclude Include="PVDlg.h" />
-    <ClInclude Include="RegDetails.h" />
     <ClInclude Include="RegisterViewerDlg.h" />
     <ClInclude Include="RegisterWriteValueDlg.h" />
     <ClInclude Include="Scanwaydlg.h" />
@@ -435,8 +422,8 @@
     <ClInclude Include="Table_Tamplete.h" />
     <ClInclude Include="TargetGrid.h" />
     <ClInclude Include="TemcoDataGrid.h" />
+    <ClInclude Include="TempHumSensorForm.h" />
     <ClInclude Include="TestMultiReadTraffic.h" />
-    <ClInclude Include="TrafficWindow.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="TstatZigbeeLogic.h" />
     <ClInclude Include="WeeklySchedule.h" />

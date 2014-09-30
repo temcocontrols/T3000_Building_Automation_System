@@ -117,6 +117,7 @@
   <ItemGroup>
     <ClInclude Include="ADO\ADO.h" />
     <ClInclude Include="AutoRichEditCtrl.h" />
+    <ClInclude Include="CApplication.h" />
     <ClInclude Include="ChartCtrl\ChartAxis.h" />
     <ClInclude Include="ChartCtrl\ChartAxisLabel.h" />
     <ClInclude Include="ChartCtrl\ChartBalloonLabel.h" />
@@ -151,8 +152,15 @@
     <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="CommunicationTrafficDlg.h" />
     <ClInclude Include="ConnectionSetup.h" />
+    <ClInclude Include="CRange.h" />
+    <ClInclude Include="CRanges.h" />
+    <ClInclude Include="CWorkbook.h" />
+    <ClInclude Include="CWorkbooks.h" />
+    <ClInclude Include="CWorksheet.h" />
+    <ClInclude Include="CWorksheets.h" />
     <ClInclude Include="EnterValueDlg.h" />
     <ClInclude Include="Enter_Value_BinaryDlg.h" />
+    <ClInclude Include="excel9.h" />
     <ClInclude Include="gloab_define.h" />
     <ClInclude Include="global_struct.h" />
     <ClInclude Include="global_variable.h" />
@@ -205,6 +213,7 @@
     <ClCompile Include="ConnectionSetup.cpp" />
     <ClCompile Include="EnterValueDlg.cpp" />
     <ClCompile Include="Enter_Value_BinaryDlg.cpp" />
+    <ClCompile Include="excel9.cpp" />
     <ClCompile Include="globle_function.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="Modbus Poll.cpp" />

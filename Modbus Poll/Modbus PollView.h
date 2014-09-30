@@ -14,7 +14,7 @@
 #include "ModbusDllforVC.h"
 #include "global_struct.h"
 #include "AutoRichEditCtrl.h"
-
+#include "excel9.h"
 class CModbusPollView : public CFormView
 {
 protected: // create from serialization only
@@ -137,11 +137,20 @@ public:
 
 	BOOL m_isgetmodel;
 	BOOL m_ischangedAddress;
+	BOOL m_isnewmodel;
+	BOOL m_ischangeModelName;
 	CString m_modelname;
 	unsigned short m_modeldata[2];
 	CAutoRichEditCtrl m_ModelNameRichEdit;
 	CAutoRichEditCtrl m_SlaveIDRichEditCtrl;
+	CAutoRichEditCtrl m_modelib;
 	int m_MultiReadReturnType;
+
+	int m_cur_modelNo;
+	CString m_cur_modelName;
+	CString m_cur_TableName;
+	CString m_cur_Col_RegName;
+	CString m_cur_col_RegAddress;
 	afx_msg void OnSetupTxtLog();
 	afx_msg void OnSetupTxtlogoutOff();
 	afx_msg void OnUpdateSetupTxtlogoutOff(CCmdUI *pCmdUI);
@@ -150,6 +159,22 @@ public:
 	afx_msg void OnUpdateSetupExcellogingoff(CCmdUI *pCmdUI);
 	afx_msg void OnSetupExcelloging();
 	afx_msg void OnUpdateSetupExcelloging(CCmdUI *pCmdUI);
+	afx_msg void OnEnKillfocusModelname();
+	afx_msg void OnEditChangemodelname();
+
+
+
+
+	_Application m_ExcelApp; 
+	Workbooks m_wbsMyBooks; 
+	_Workbook m_wbMyBook; 
+	Worksheets m_wssMysheets; 
+	_Worksheet m_wsMysheet; 
+	Range m_rgMyRge;
+
+	int m_curexcelrow;
+
+	afx_msg void OnFunctionsTestcenter();
 };
 
 #ifndef _DEBUG  // debug version in Modbus PollView.cpp

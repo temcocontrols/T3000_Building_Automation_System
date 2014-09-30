@@ -34,7 +34,7 @@
 #include "LightingController/LightingController.h"//Lightingcontroller
 #include "HumChamber.h"
 #include "CO2_View.h"
-#include "MbpGlobals.h"
+//#include "MbpGlobals.h"
 #include "Dialog_Progess.h"
 
 #include "excel9.h"
@@ -67,6 +67,8 @@
 #include "htmlhelp.h"
 #include "T3000UpdateDlg.h"
 #include "Dowmloadfile.h"
+
+#include "PressureSensorForm.h"
 extern tree_product	m_product_isp_auto_flash;
 #pragma region Fance Test
 //For Test
@@ -74,7 +76,7 @@ extern tree_product	m_product_isp_auto_flash;
 
 bool start_record_time = true;	//开启计时，如果用户一段时间无键盘和鼠标左键操作就开启自动刷新;
 unsigned long time_click = 0;
-CDialogEx *g_testmultiReadtraffic_dlg=NULL;
+/*CDialogEx *g_testmultiReadtraffic_dlg=NULL;*/
 //CTestMultiReadTraffic *g_testmultiReadtraffic_dlg=NULL;
 bool first_run_refresh_list_skip_wait = true; //第一次运行时不等待，直接检测状态;
 bool enable_show_debug_window = false; 
@@ -240,9 +242,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 
 	//ON_COMMAND(ID_DATABASE_TEMCOPRODUCTS, &CMainFrame::OnDatabaseTemcoproducts)
 	//ON_COMMAND(ID_FILE_ISPTOOL, &CMainFrame::OnFileIsptool)
-	ON_MESSAGE(WM_DLG_CLOSE, OnDlgClose)
+	/*ON_MESSAGE(WM_DLG_CLOSE, OnDlgClose)*/
 	ON_COMMAND(ID_DATABASE_MBPOLL, &CMainFrame::OnDatabaseMbpoll)
-	ON_MESSAGE(WM_MBPOLL_CLOSED, &CMainFrame::OnMbpollClosed)
+	/*ON_MESSAGE(WM_MBPOLL_CLOSED, &CMainFrame::OnMbpollClosed)*/
 	ON_COMMAND(ID_DATABASE_IONAMECONFIG, &CMainFrame::OnDatabaseIonameconfig)
 	ON_COMMAND(ID_TOOL_ISPTOOLFORONE, &CMainFrame::OnToolIsptoolforone)
 	 
@@ -484,7 +486,7 @@ CMainFrame::CMainFrame()
 	m_nCurSubBuildingIndex=-1;
 	m_bScanALL=FALSE;
 	m_strIP=_T("");
-
+	list_mouse_click = false;
 	//////////////////////////////////////////////////////////////////////////
 	m_bEnableRefreshTreeView = TRUE;
 	m_pRefreshThread = NULL;
@@ -498,7 +500,7 @@ CMainFrame::CMainFrame()
 	m_bDialogOpen = FALSE;
 	mbPollDlgOpen = FALSE;
 
-	mbPoll=NULL;
+ 
 }
 
 
@@ -545,7 +547,7 @@ void CMainFrame::InitViews()
     m_pViews[DLG_DIALOGT36CT]=(CView*)new T36CT;
     m_pViews[DLG_DIALOGT3PT10]=(CView*)new CT3RTDView;
     m_pViews[DLG_CO2_NET_VIEW]=(CView*)new CCO2NetView;
-	m_pViews[DLG_DIALOGDEFAULTVIEW]=(CView*)new CT3000DefaultView;
+	m_pViews[DLG_DIALOG_PRESSURE_SENSOR]=(CView*)new CPressureSensorForm;
 
 	CDocument* pCurrentDoc = GetActiveDocument();
     CCreateContext newContext;
@@ -596,7 +598,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
 		return -1;
-	g_testmultiReadtraffic_dlg = NULL;
+	/*g_testmultiReadtraffic_dlg = NULL;*/
 	BOOL bNameValid;
 	// set the visual manager and style based on persisted value
 	OnApplicationLook(theApp.m_nAppLook);
@@ -1082,6 +1084,8 @@ void CMainFrame::OnUpdateCheckIOPane(CCmdUI* pCmdUI)
 void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {	
      
+	 
+
 	g_bPauseRefreshTree = TRUE;
 	Flexflash = TRUE;
 	HTREEITEM hSelItem;//=m_pTreeViewCrl->GetSelectedItem();
@@ -1219,8 +1223,13 @@ g_bPauseMultiRead=FALSE;
 	//CM5
 	//m_pFreshMultiRegisters->ResumeThread();
 	//m_pFreshTree->ResumeThread();
+
+ 
+
+
 	EndWaitCursor();
 	g_bPauseRefreshTree = FALSE;
+
 }
 
 //void CMainFrame::OnHTreeItemKeyDownChanged(NMHDR* pNMHDR, LRESULT* pResult)
@@ -1294,7 +1303,12 @@ LRESULT CMainFrame::OnHTreeItemBeginlabeledit(NMHDR *pNMHDR, LRESULT *pResult)
 
 void  CMainFrame::OnHTreeItemClick(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	if(list_mouse_click)
+	{
+		list_mouse_click = true;
+	}
 	OnHTreeItemSeletedChanged(pNMHDR, pResult);
+	list_mouse_click = false;
 }
 
 BOOL CMainFrame::ValidAddress(CString sAddress)
@@ -2015,7 +2029,7 @@ void CMainFrame::OnConnect()
 					CString strInfo;
 					strInfo.Format((_T("Open IP:%s successful.")),build_info.strIp);//prompt info;
 					SetPaneString(1,strInfo);
-					connectionSuccessful = 1;
+					//connectionSuccessful = 1;
                     m_nStyle=1;
 					CString	g_configfile_path=g_strExePth+_T("config.ini");
 					CFileFind fFind;
@@ -2057,7 +2071,7 @@ void CMainFrame::OnConnect()
 					CString strInfo;
 					strInfo.Format((_T("Open IP:%s failed.")),build_info.strIp);//prompt info;
 					SetPaneString(1,strInfo);
-					connectionSuccessful = 0;
+					//connectionSuccessful = 0;
 				}
 
 			}
@@ -2080,7 +2094,7 @@ void CMainFrame::OnConnect()
 					//strInfo=_T("Open ")+build_info.strComPort+_T(" Failure!");
 					//strInfo.Format(_T("COM: %d Connected: No"), nComPort);		
 					strInfo.Format(_T("COM %d : Not available "), nComPort);
-					connectionSuccessful = 0;
+					//connectionSuccessful = 0;
 					//SetPaneCommunicationPrompt(strInfo);
 					SetPaneString(1, strInfo);
 				}
@@ -2088,7 +2102,7 @@ void CMainFrame::OnConnect()
 				{
 					//strInfo=_T("Open ")+build_info.strComPort+_T(" Sucessful!");
 					strInfo.Format(_T("COM %d Connected: Yes"), nComPort);	
-					connectionSuccessful = 1;
+					//connectionSuccessful = 1;
 					//SetPaneCommunicationPrompt(strInfo);
 					SetPaneString(1, strInfo);
 					Change_BaudRate(default_com1_port_baudrate);
@@ -2139,9 +2153,9 @@ void CMainFrame::OnDisconnect()
 	close_com();
 	m_nStyle=2;
     Invalidate();
-	//CString strInfo = _T("No Connnection");
-	connectionSuccessful = 0;
-	//SetPaneString(1,strInfo);
+	CString strInfo = _T("No Connnection");
+	//connectionSuccessful = 0;
+	SetPaneString(1,strInfo);
 	//strInfo = _T("Offline!");
 	//SetPaneString(2,strInfo);
 
@@ -2857,10 +2871,10 @@ here:
          ((CT3RTDView*)m_pViews[m_nCurView])->Fresh();
      }
      break;
-	 case DLG_DIALOGDEFAULTVIEW:
+	 case DLG_DIALOG_PRESSURE_SENSOR:
 		 {
-			 m_nCurView=DLG_DIALOGDEFAULTVIEW;
-			 ((CT3000DefaultView*)m_pViews[m_nCurView])->Fresh();
+			 m_nCurView=DLG_DIALOG_PRESSURE_SENSOR;
+			 ((CPressureSensorForm*)m_pViews[m_nCurView])->Fresh();
 		 }
 	}
 //here
@@ -2911,15 +2925,15 @@ void CMainFrame::Scan_Product()
 	
 	g_strT3000LogString=_T("--------------------------------Scan Begin--------------------------------\n");
 
-	
+	write_T3000_log_file(g_strT3000LogString);
 	//WriteLogFile(g_strT3000LogString);
 	//NET_WriteLogFile(g_strT3000LogString);
-	 ::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+	 ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 	g_strT3000LogString=_T("Scan begin Time: ");
 	g_strT3000LogString+=strTime+_T("\n");;
-	//WriteLogFile(g_strT3000LogString); 
+	write_T3000_log_file(g_strT3000LogString);
 	//NET_WriteLogFile(g_strT3000LogString);
-	::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+	::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 	if(m_pRs->State)
 	m_pRs->Close(); 
 	if(m_pCon->State)
@@ -3842,18 +3856,18 @@ _ConnectionPtr t_pCon;//for ado connection
 
 void CMainFrame::OnMBP()
 {
-    if (m_bDialogOpen == TRUE) return;
-    //m_pDlg->m_nColor = m_nClientColor;   // sets dialog's variables
-    //m_pDlg->m_sTitle = m_sMainWindowTitle;
-	m_bDialogOpen = TRUE;
-    m_pDlg->Create();
+//     if (m_bDialogOpen == TRUE) return;
+//     //m_pDlg->m_nColor = m_nClientColor;   // sets dialog's variables
+//     //m_pDlg->m_sTitle = m_sMainWindowTitle;
+// 	m_bDialogOpen = TRUE;
+//     m_pDlg->Create();
 }
 
-LONG CMainFrame::OnDlgClose(UINT wParam, LONG lParam)
-{
-    m_bDialogOpen = FALSE;
-    return 1;
-}
+//LONG CMainFrame::OnDlgClose(UINT wParam, LONG lParam)
+//{
+//	/*m_bDialogOpen = FALSE;*/
+//	return 1;
+//}
 
 void CMainFrame::OnLabel()
 {
@@ -4479,6 +4493,7 @@ LRESULT CMainFrame::Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam)
 }
 LRESULT CMainFrame::Show_Panel(WPARAM wParam, LPARAM lParam){
 	int ret = (int)wParam; 
+ 
 	SetPaneString(ret,g_strT3000LogString);
 	return 0;
 }
@@ -5895,7 +5910,7 @@ LRESULT CMainFrame::OnFreshStatusBar(WPARAM wParam, LPARAM lParam)
 void CMainFrame::OnDestroy()
 {
 #if 1
-	
+	g_mstp_flag=FALSE;
 	for(int i=0;i<m_product.size();i++)//用于更新 产品的状态，以便下次打开的时候直接显示上次关闭的时候的状态;
 	{
 		CString serial_number_temp;
@@ -5916,7 +5931,7 @@ void CMainFrame::OnDestroy()
 			m_pCon->Close();
 	}
 
-	CDialogInfo *pDialogInfo = NULL;
+	//close_T3000_log_file();
 	m_Input_data.clear();
 	m_Variable_data.clear();
 	m_Output_data.clear();
@@ -5929,17 +5944,17 @@ void CMainFrame::OnDestroy()
 	m_monitor_data.clear();
 	m_alarmlog_data.clear();
 	m_Tstat_data.clear();
-
+	CDialogInfo *pDialogInfo = NULL;
 	try
 	{
-// 		if(pDialogInfo==NULL)
-// 		{
+ 		if(pDialogInfo==NULL)
+ 		{
 			pDialogInfo = new CDialogInfo;
 			pDialogInfo->Create(IDD_DIALOG_INFO,this);
 			pDialogInfo->ShowWindow(SW_SHOW);
 			pDialogInfo->CenterWindow();
 			pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Processing Information,please wait..."));
-//		}
+		}
 
 
 
@@ -5966,11 +5981,11 @@ void CMainFrame::OnDestroy()
 
 
 
-	if (mbPoll!=NULL)
-	{
-	  delete mbPoll;
-	  mbPoll=NULL;
-	}
+// 	if (mbPoll!=NULL)
+// 	{
+// 	  delete mbPoll;
+// 	  mbPoll=NULL;
+// 	}
 
 	if(DebugWindow !=NULL)
 	{
@@ -6015,7 +6030,22 @@ void CMainFrame::OnDestroy()
 		}
 
 	}
+	if (WaitForSingleObject(m_pFreshTree->m_hThread, 1000) != WAIT_OBJECT_0)
+		if (m_pFreshTree) 
 
+		{
+			if (WaitForSingleObject(m_pFreshTree->m_hThread, 3000) == WAIT_OBJECT_0)
+			{
+
+			}
+			else
+			{		
+				BOOL bRet = TerminateThread(m_pFreshTree->m_hThread,0);
+				//delete m_pFreshMultiRegisters;
+				m_pFreshTree=NULL;
+			}
+
+		}
 		if(CM5_hThread!=NULL)
 			TerminateThread(CM5_hThread,0);
 		if(CM5_UI_Thread!=NULL)
@@ -6052,19 +6082,13 @@ void CMainFrame::OnDestroy()
 	{
 		close_com(); // added by zgq:12-16-2011
 	}
-
+	close_T3000_log_file();
 	
 
 	if (pDialogInfo!=NULL)
 	{
 		delete pDialogInfo;
 		pDialogInfo = NULL;
-	}
-
-	if (g_testmultiReadtraffic_dlg != NULL)
-	{
-		delete g_testmultiReadtraffic_dlg;
-		g_testmultiReadtraffic_dlg=NULL;
 	}
 #endif
 
@@ -6362,9 +6386,11 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 	}
 	if((pMsg->message == WM_KEYDOWN ) || (pMsg->message == WM_LBUTTONDOWN) || (pMsg->message == WM_LBUTTONUP))
 	{
-
+		
 		no_mouse_keyboard_event_enable_refresh = false;
 		time_click = time(NULL);
+
+
 	}
 	if(pMsg->message == WM_KEYDOWN  )
 	{
@@ -6766,7 +6792,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						}
 						m_nStyle=2;
 						return;
-					}else
+					}
+					else
 					{
 						CString strInfo;
 						strInfo.Format(_T("COM %d Connected: Yes"), nComPort);	
@@ -7141,12 +7168,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				int power_value = 1;
 				if(Device_Type == PM_TSTAT6)
 				{
-					//TSTAT6 如果是带zigbee的模块，cherly 说 没有寄存器 确认目前是用哪个在通信，只能读640寄存器大概判断;
-					//不靠谱;
-					//Use_zigee = read_one(g_tstat_id,REGISTER_USE_ZIGBEE_485,5);	
-					//if(Use_zigee == 1)
-					//	power_value = 2;
-					//else
+					 
 						power_value = 1;
 				}
 				register_critical_section.Lock();
@@ -7172,7 +7194,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					it++;
 					Sleep(20 * power_value);
 				}
-
 #if 0
 				for(i=0;i<(13*power_value);i++)	//暂定为0 ，因为TSTAT6 目前为600多
 				{
@@ -7729,6 +7750,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{
 			  SwitchToPruductType(DLG_DIALOGT38AI8AO);
 			}
+			else if (nFlag==PM_PRESSURE)
+			{
+			 SwitchToPruductType(DLG_DIALOG_PRESSURE_SENSOR);
+			}
 			else if(nFlag<PM_NC)	
 			{	
 
@@ -7905,9 +7930,6 @@ void CMainFrame::GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItem
 }
 
 
-//网络的部分先发广播 扫描, 在确认是不是有新的设备，若有就存进数据库.若扫描到的与数据库的有出入，就更新数据库;
-//一乡二里共三夫子，不识四书五经六义，竟敢教七八九子，十分大胆
-//十室九贫，
 BOOL CMainFrame::CheckDeviceStatus()
 {
 	bool find_new_device = false;
@@ -8213,7 +8235,7 @@ end_condition :
 			product_class_id.Format(_T("%d"),m_refresh_net_device_data.at(y).product_id);
 			product_name = GetProductName(m_refresh_net_device_data.at(y).product_id);
 			product_name = product_name + _T(":") + str_serialid + _T("-") + modbusid + _T("-") + str_ip_address;
-			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('Building_1','Sub_net1','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','""','0','0','"+str_n_port+"','0')"));
+			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','0','0','"+str_n_port+"','0')"));
 			try
 			{
 
@@ -9768,7 +9790,9 @@ void CMainFrame::OnDatabaseMbpoll()
 	} 
 	else
 	{
-		AfxMessageBox(_T("Connect to your device ,firstly!"));
+		AfxMessageBox(_T("Please config the way of your connection!"));
+		OnAddBuildingConfig();
+		OnConnect();
 	}
 	
 	
@@ -9776,21 +9800,18 @@ void CMainFrame::OnDatabaseMbpoll()
 
 
 
-LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
-{  
-    m_pFreshMultiRegisters->ResumeThread();
-    m_pRefreshThread->ResumeThread();
-	m_pFreshTree->ResumeThread(); 
-	//mbPollDlgOpen = FALSE;
-	if (mbPoll!=NULL)
-	{   mbPoll = NULL; 
-	delete mbPoll;
-	}
-	//mbPoll->ShowWindow(FALSE);
-	
-	mbPollDlgOpen = FALSE;
-    return 0;
-}
+// LRESULT CMainFrame::OnMbpollClosed(WPARAM wParam, LPARAM lParam)
+// {  
+//     m_pFreshMultiRegisters->ResumeThread();
+//     m_pRefreshThread->ResumeThread();
+// 	m_pFreshTree->ResumeThread(); 
+// 	//mbPollDlgOpen = FALSE;
+// 	 
+// 	//mbPoll->ShowWindow(FALSE);
+// 	
+// 	 
+//     return 0;
+// }
 
 
 //void CMainFrame::OnAppExit()
@@ -9873,15 +9894,15 @@ void CMainFrame::OnToolIsptoolforone()
 void CMainFrame::OnViewCommunicatetraffic()
 {
 
-	 if(g_testmultiReadtraffic_dlg==NULL){
-	 g_testmultiReadtraffic_dlg=new CTestMultiReadTraffic;
-	 g_testmultiReadtraffic_dlg->Create(IDD_TEST_MULTI_READ,this);
-	 g_testmultiReadtraffic_dlg->ShowWindow(SW_SHOW);
-	 }
-	 else
-	 {
-	  g_testmultiReadtraffic_dlg->ShowWindow(SW_SHOW);
-	 }
+// 	 if(g_testmultiReadtraffic_dlg==NULL){
+// 	 g_testmultiReadtraffic_dlg=new CTestMultiReadTraffic;
+// 	 g_testmultiReadtraffic_dlg->Create(IDD_TEST_MULTI_READ,this);
+// 	 g_testmultiReadtraffic_dlg->ShowWindow(SW_SHOW);
+// 	 }
+// 	 else
+// 	 {
+// 	  g_testmultiReadtraffic_dlg->ShowWindow(SW_SHOW);
+// 	 }
 }
 void CMainFrame::OnFunctionHumcalibration()
 {
@@ -10371,24 +10392,6 @@ void CMainFrame::OnHelpUpdatefirmware()
 void CMainFrame::OnControlTstat()
 {
 	// TODO: Add your command handler code here
-#if 0
-	char my_port[50];
-
-	CString temp_cs11;
-	//temp_cs.Format(_T("COM%d"),g_com);
-	temp_cs11.Format(_T("COM%d"),5);
-	char cTemp11[255];
-	memset(cTemp11,0,255);
-	WideCharToMultiByte( CP_ACP, 0, temp_cs11.GetBuffer(), -1, cTemp11, 255, NULL, NULL );
-	temp_cs11.ReleaseBuffer();
-	sprintf(my_port,cTemp11);
-
-
-	dl_ptp_init(my_port);
-
-
-	return;
-#endif
 	if(g_protocol == PROTOCOL_BACNET_IP)
 	{
 		if(bac_select_device_online)

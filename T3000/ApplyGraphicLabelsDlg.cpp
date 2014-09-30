@@ -48,7 +48,14 @@ void ApplyGraphicLabelsDlg::OnUnSelect()
 void ApplyGraphicLabelsDlg::OnSelect()
 {
 
+   if (m_nCurRow==0)
+   {
+   return;
+   }
+   
+
 	m_FlexGrid.put_TextMatrix(m_nCurRow,0,_T("Select"));
+
 }
 
 void ApplyGraphicLabelsDlg::OnSelectAll()

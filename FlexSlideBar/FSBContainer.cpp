@@ -206,7 +206,7 @@ void CFSBContainer::ShowWindow(int nFlag)
 
 BOOL CFSBContainer::SetPos_tstat6_2pos( int nMinPos, int nMidPos, int nMaxPos )
 {
-
+  
 	return m_pFSWnd->SetPos_tstat6_2pos(nMinPos, nMidPos, nMaxPos);
 }
 

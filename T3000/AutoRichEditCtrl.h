@@ -36,7 +36,7 @@ public:
 	void SetFontSize(int nPointSize);
 	void SetNumberDefaultFontSize(int nPointSize);
 	//size=11 color=white
-	void SetNumberDefaultTex();
+	void SetNumberDefaultTex(COLORREF crf=RGB(255,255,255));
 	void SetFontName(CString sFontName);
 	void SelectColor();
 	bool ParagraphIsBulleted();
@@ -44,6 +44,7 @@ public:
 	void SetSelectTextColor(COLORREF cf);
 	PARAFORMAT GetParagraphFormat();
 	void FieldText(LPCTSTR lpszString);
+	void FieldText(COLORREF rcf,LPCTSTR lpszString);
 	bool ParagraphIsRight();
 	bool ParagraphIsLeft();
 	bool ParagraphIsCentered();

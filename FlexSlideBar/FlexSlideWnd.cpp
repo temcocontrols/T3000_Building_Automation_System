@@ -633,6 +633,14 @@ int	CFlexSlideWnd::GetPos(vector<int>& szPos)
 
 BOOL CFlexSlideWnd::SetPos_tstat6_2pos( int nMinPos, int nMidPos, int nMaxPos )
 {
+	if (nMinPos<m_nMin)
+	{
+		nMinPos=m_nMin;
+	}
+	if (nMaxPos>m_nMax)
+	{
+		nMaxPos=m_nMax;
+	}
 	ASSERT(nMinPos < nMidPos && nMidPos < nMaxPos && nMinPos >= 0);//tstat6
 	ASSERT(m_pThumbOpter);
 
@@ -645,6 +653,7 @@ BOOL CFlexSlideWnd::SetPos_tstat6_2pos( int nMinPos, int nMidPos, int nMaxPos )
 		return FALSE;
 
 	}
+	
 	m_pThumbOpter->SetThumbPosition(0, nMinPos-m_nMin);
 //	m_pThumbOpter->SetThumbPosition(1, nMidPos-m_nMin);
 //	m_pThumbOpter->SetThumbPosition(2, nMaxPos-m_nMin);

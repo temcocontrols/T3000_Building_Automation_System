@@ -121,6 +121,8 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_BACKLIGHT_TIME, m_edit_backlighttime);
 	DDX_Control(pDX, IDC_CHECK2, m_check_occupiedenable);
 	DDX_Control(pDX, IDC_EDIT_OCCUPIED_TIMER, m_occupied_timer);
+	DDX_Control(pDX, IDC_COMBO_ENABLE_DIS, m_combox_pir_endisable);
+	DDX_Control(pDX, IDC_EDIT_SENSITIVTY, m_sensitivity_editor);
 }
 
 BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
@@ -230,6 +232,8 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 	ON_BN_CLICKED(IDC_CHECK2, &CParameterDlg::OnBnClickedCheck2)
 	ON_EN_KILLFOCUS(IDC_EDIT_OCCUPIED_TIMER, &CParameterDlg::OnEnKillfocusEditOccupiedTimer)
 	ON_EN_KILLFOCUS(IDC_EDIT_DEAD_MASTER, &CParameterDlg::OnEnKillfocusEditDeadMaster)
+	ON_CBN_SELCHANGE(IDC_COMBO_ENABLE_DIS, &CParameterDlg::OnCbnSelchangeComboEnableDis)
+	ON_EN_KILLFOCUS(IDC_EDIT_SENSITIVTY, &CParameterDlg::OnEnKillfocusEditSensitivty)
 	END_MESSAGE_MAP()
 
 
@@ -2564,6 +2568,12 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
 	{
+
+	m_combox_pir_endisable.ResetContent();
+	m_combox_pir_endisable.AddString(_T("Enable"));
+	m_combox_pir_endisable.AddString(_T("Disable"));
+
+
 #if 1
 		strTemp.Format(_T("%0.1f"),product_register_value[121]/10.0);
 		m_inputvalue1.SetWindowText(strTemp+strUnit);
@@ -3183,10 +3193,40 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		GetDlgItem(IDC_DISPLAYCOMBO)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_STATIC_DISPLAY)->ShowWindow(SW_HIDE);
 
+		GetDlgItem(IDC_STATIC_PIR_SENSOR_SETTING)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ENDIS)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_SENSITIVTY)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_EDIT_SENSITIVTY)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_COMBO_ENABLE_DIS)->ShowWindow(SW_SHOW);
+		if (product_register_value[629]==1&&product_register_value[565]==0)
+		{
+		    m_combox_pir_endisable.SetCurSel(0);
+		} 
+		else
+		{
+		   m_combox_pir_endisable.SetCurSel(1);
+		}
+	/*	if (product_register_value[641]>=20&&product_register_value[641]<=100)
+		{*/
+		strTemp.Format(_T("%d"),product_register_value[641]);
+		/*}
+		else
+		{
+		strTemp=_T("N/A");
+		}*/
+		
+		m_sensitivity_editor.SetWindowTextW(strTemp);
 	}
 	else
 	{
 		 
+
+		GetDlgItem(IDC_STATIC_PIR_SENSOR_SETTING)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ENDIS)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_SENSITIVTY)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDIT_SENSITIVTY)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_COMBO_ENABLE_DIS)->ShowWindow(SW_HIDE);
+
 		GetDlgItem(IDC_STATIC_DISPLAY)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_DISPLAYCOMBO)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_STATIC_LCDSCREEN1)->ShowWindow(SW_SHOW);
@@ -3575,73 +3615,89 @@ void CParameterDlg::OnBnClickedCs2()
 void CParameterDlg::Read_SliderData()
 {   
 
-    int ret=read_one(g_tstat_id,MODBUS_DAY_COOLING_SETPOINT);
-	if (ret>0)
+
+ //   int ret=read_one(g_tstat_id,MODBUS_DAY_COOLING_SETPOINT);
+	//if (ret>0)
+	//{
+	//product_register_value[MODBUS_DAY_COOLING_SETPOINT]=ret;
+	//}
+
+	// ret=read_one(g_tstat_id,MODBUS_DAY_COOLING_DEADBAND);
+	//if (ret>0)
+	//{
+	//	product_register_value[MODBUS_DAY_COOLING_DEADBAND]=ret;
+	//}
+
+	// ret=read_one(g_tstat_id,MODBUS_DAY_SETPOINT);
+	//if (ret>0)
+	//{
+	//	product_register_value[MODBUS_DAY_SETPOINT]=ret;
+	//}
+
+	// ret=read_one(g_tstat_id,MODBUS_DAY_HEATING_DEADBAND);
+	//if (ret>0)
+	//{
+	//	product_register_value[MODBUS_DAY_HEATING_DEADBAND]=ret;
+	//}
+	// ret=read_one(g_tstat_id,MODBUS_DAY_HEATING_SETPOINT);
+	//if (ret>0)
+	//{
+	//	product_register_value[MODBUS_DAY_HEATING_SETPOINT]=ret;
+	//}
+	// ret=read_one(g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND);
+	//if (ret>0)
+	//{
+	//	product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]=ret;
+	//}
+	// ret=read_one(g_tstat_id,MODBUS_NIGHT_SETPOINT);
+	//if (ret>0)
+	//{
+	//	product_register_value[MODBUS_NIGHT_SETPOINT]=ret;
+	//}
+
+
+	// ret=read_one(g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND);
+	//if (ret>0)
+	//{
+	//	product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=ret;
+	//}
+
+
+	// ret=read_one(g_tstat_id,MODBUS_DAY_HEATING_SETPOINT);
+	//if (ret>0)
+	//{
+	//	product_register_value[MODBUS_DAY_HEATING_SETPOINT]=ret;
+	//}
+
+
+
+	//m_coolsp= product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10;//348
+
+	//m_cooldb=product_register_value[MODBUS_DAY_COOLING_DEADBAND]/10;//346
+	//m_setpoint =product_register_value[MODBUS_DAY_SETPOINT]/10;//345
+	//m_heatdb =product_register_value[MODBUS_DAY_HEATING_DEADBAND]/10;//347
+	//m_heatsp =product_register_value[MODBUS_DAY_HEATING_SETPOINT]/10;//349
+
+	//m_coolspN=product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10;//355
+	//m_cooldbN=product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10;//353
+	//m_setpointN=product_register_value[MODBUS_NIGHT_SETPOINT]/10;//350
+	//m_heatdbN=product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//352
+	//m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
+
+
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
 	{
-	product_register_value[MODBUS_DAY_COOLING_SETPOINT]=ret;
-	}
-
-	 ret=read_one(g_tstat_id,MODBUS_DAY_COOLING_DEADBAND);
-	if (ret>0)
+	Read_Multi(g_tstat_id,&product_register_value[MODBUS_DAY_SETPOINT],MODBUS_DAY_SETPOINT,20);
+	} 
+	else
 	{
-		product_register_value[MODBUS_DAY_COOLING_DEADBAND]=ret;
+	Read_Multi(g_tstat_id,&product_register_value[MODBUS_COOLING_DEADBAND],MODBUS_COOLING_DEADBAND,2);
+	Read_Multi(g_tstat_id,&product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],MODBUS_NIGHT_HEATING_DEADBAND,2);
+	
+	Read_Multi(g_tstat_id,&product_register_value[MODBUS_COOLING_SETPOINT],MODBUS_COOLING_SETPOINT,2);
+	
+	Read_Multi(g_tstat_id,&product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],MODBUS_NIGHT_HEATING_SETPOINT,2);
 	}
-
-	 ret=read_one(g_tstat_id,MODBUS_DAY_SETPOINT);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_DAY_SETPOINT]=ret;
-	}
-
-	 ret=read_one(g_tstat_id,MODBUS_DAY_HEATING_DEADBAND);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_DAY_HEATING_DEADBAND]=ret;
-	}
-	 ret=read_one(g_tstat_id,MODBUS_DAY_HEATING_SETPOINT);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_DAY_HEATING_SETPOINT]=ret;
-	}
-	 ret=read_one(g_tstat_id,MODBUS_NIGHT_COOLING_DEADBAND);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]=ret;
-	}
-	 ret=read_one(g_tstat_id,MODBUS_NIGHT_SETPOINT);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_NIGHT_SETPOINT]=ret;
-	}
-
-
-	 ret=read_one(g_tstat_id,MODBUS_NIGHT_HEATING_DEADBAND);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]=ret;
-	}
-
-
-	 ret=read_one(g_tstat_id,MODBUS_DAY_HEATING_SETPOINT);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_DAY_HEATING_SETPOINT]=ret;
-	}
-
-
-
-	m_coolsp= product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10;//348
-
-	m_cooldb=product_register_value[MODBUS_DAY_COOLING_DEADBAND]/10;//346
-	m_setpoint =product_register_value[MODBUS_DAY_SETPOINT]/10;//345
-	m_heatdb =product_register_value[MODBUS_DAY_HEATING_DEADBAND]/10;//347
-	m_heatsp =product_register_value[MODBUS_DAY_HEATING_SETPOINT]/10;//349
-
-	m_coolspN=product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10;//355
-	m_cooldbN=product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10;//353
-	m_setpointN=product_register_value[MODBUS_NIGHT_SETPOINT]/10;//350
-	m_heatdbN=product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//352
-	m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
 }
 
 
@@ -4227,4 +4283,51 @@ void CParameterDlg::OnEnKillfocusEditDeadMaster()
 
 	 }
 
+}
+
+
+void CParameterDlg::OnCbnSelchangeComboEnableDis()
+{
+	 int sel=m_combox_pir_endisable.GetCurSel();
+	 if (sel==0)
+	 {
+	    int ret1=write_one(g_tstat_id,629,1);
+		int ret2=write_one(g_tstat_id,565,0);
+		if (ret1>0&&ret2>0)
+		{
+		   product_register_value[629]=1;
+		   product_register_value[565]=0;
+		   
+		}
+	 } 
+	 else
+	 {
+	    int ret1= write_one(g_tstat_id,629,00);
+		if (ret1>0)
+		{
+		   product_register_value[629]=0;
+		}
+	 }
+	 Reflesh_ParameterDlg();
+}
+
+
+void CParameterDlg::OnEnKillfocusEditSensitivty()
+{
+     CString strTemp;
+	 m_sensitivity_editor.GetWindowTextW(strTemp);
+	 int intTemp=_wtoi(strTemp);
+	 if (intTemp>=20&&intTemp<=100)
+	 {
+	    int ret=write_one(g_tstat_id,641,intTemp);
+		if (ret>0)
+		{
+		 product_register_value[641]=intTemp;
+		}
+	 } 
+	 else
+	 {
+	 AfxMessageBox(_T("please input a value between 20 and 100!"));
+	 }
+	Reflesh_ParameterDlg();
 }

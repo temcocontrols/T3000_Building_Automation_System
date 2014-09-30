@@ -6,7 +6,7 @@
 #include "RelayLabel.h"
 #include "globle_function.h"
 #include "global_variable_extern.h"
-
+#include "ado/ADO.h"
 
 // CRelayLabel
 
@@ -350,6 +350,170 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 		
 	}
 	
+	if (nModel==PM_TSTAT6||nModel==PM_TSTAT7||nModel==PM_TSTAT5i)
+	{
+	   if (nStatus==0)
+	   {
+		   CString strUnit=GetTempUnit();
+		   strTemp.Format(_T("%.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);  //121
+		   m_strValueText=strTemp+strUnit;
+	   }
+	   else if (nStatus>=1&&nStatus<=8)
+	   {
+	      
+		  int  m_crange=0;
+		   int m_sn=m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
+		   CADO ado;
+		   ado.OnInitADOConn();
+		   if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+		   {
+			   CString sql;
+			   sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),nStatus,m_sn);
+			   ado.m_pRecordset=ado.OpenRecordset(sql);
+			   if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+			   {    
+				   ado.m_pRecordset->MoveFirst();
+				   while (!ado.m_pRecordset->EndOfFile)
+				   {
+					   m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
+					   ado.m_pRecordset->MoveNext();
+				   }
+				    
+			   } 
+			   else
+			   {
+				   m_crange=product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1];	//189
+				   
+			   }
+			   ado.CloseRecordset();
+		   }
+		   else
+		   {
+			   m_crange=product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1];
+		   }
+		   ado.CloseConn();
+
+		    CString strValueUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1], 1);
+		   int nValue;
+		   float fValue;
+		   if(product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1]==1)	//359  122
+		   {				
+			   fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1]/10.0);	//367   131
+			   strTemp.Format(_T("%.1f"),fValue);	
+
+			   strTemp +=strValueUnit;
+		   }
+		   else if(product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1]==3 || product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1]==5) // On/Off or Off/On ==1 On ==0 Off   359  122
+		   {						
+			   if (m_crange==9||m_crange==10)
+			   {
+				   int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1]); //367  131
+				   if (nValue == 0)
+				   {
+					   strTemp = _T("Closed");
+				   }
+				   else
+				   {
+					   strTemp = _T("Open");
+				   }	
+			   }
+			   else if (m_crange==7||m_crange==8)
+			   {
+
+				   int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1]); //367  131
+				   if (nValue == 0)
+				   {
+					   strTemp = _T("Unoccupied");
+				   }
+				   else
+				   {
+					   strTemp = _T("Occupied");
+				   }	
+
+			   }
+			   else
+			   {
+
+				   int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1]); //367  131
+				   if (nValue == 0)
+				   {
+					   strTemp = _T("Off");
+				   }
+				   else
+				   {
+					   strTemp = _T("On");
+				   }	
+
+			   }					
+		   }
+		   else if (product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1]==4 )  // custom sensor	359 122
+		   {					
+			   fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1]/10.0);	//367  131
+			   strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
+			   strTemp +=strValueUnit;
+		   }
+		   else if(product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1]==2)	//359 122
+		   {
+			   nValue=product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1];		//367  131
+			   strTemp.Format(_T("%0.1f%%"),  (float)nValue);
+		   }
+		   else
+		   {
+			   strTemp.Format(_T("%d"),product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1]);//lsc
+		   }	
+           m_strValueText=strTemp;
+	   }
+	   else if (nStatus==9)
+	   {
+	      
+		   if((product_register_value[20]&2)==2)
+		   {
+			   if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
+			   {
+				   strTemp.Format(_T("%0.1f%%"),(float)product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10.0);    
+			   }
+			   else
+			   {
+				   strTemp.Format(_T("%0.1f%%"),(float)product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10);
+			   }
+		   }
+		   else
+		   {
+			   strTemp=_T("NULL");
+		   }
+		   m_strValueText=strTemp;
+	   }
+	   else if (nStatus==10)
+	   {
+		   if((product_register_value[20]&4)==4)
+		   {
+			   if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
+			   {    
+			    strUnit=_T("ppm");
+			   
+			   strTemp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
+			   strTemp+=strUnit;
+			   
+			   }
+			   else
+			   {
+				   
+				   strTemp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
+				   strTemp+=strUnit;
+				   
+			   }
+			   
+		   }
+		   else
+		   {
+			   strTemp=_T("NULL");  
+		   }
+
+		   	m_strValueText=strTemp;
+	   }
+	  
+
+	}
 }
 
 void CRelayLabel::DispalyOutputValue_General(int nStatus,COLORREF textClr,COLORREF bkClr)

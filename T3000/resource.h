@@ -148,7 +148,6 @@
 #define IDI_ICON_REFRESH                443
 #define IDI_ICON2                       444
 #define IDI_ICON_EXIT                   444
-#define IDD_MBP                         445
 #define IDD_DIALOG10                    446
 #define IDD_RENAME_DLG                  446
 #define IDD_DISPLAY_DLG                 446
@@ -156,7 +155,6 @@
 #define IDR_MENU_MBP                    447
 #define IDD_SCANWAY                     448
 #define IDD_IONAMECONFIG                449
-#define IDD_MBPOLL                      451
 #define IDD_DIALOG_BACNET_INPUT         452
 #define IDD_DIALOG11                    453
 #define IDD_DISPLAY_CONFIG              453
@@ -185,11 +183,9 @@
 #define IDD_DIALOG_BACNET_ANNUAL_ROUTINES 469
 #define IDD_DIALOG_BACNET_SCHEDULE_TIME 470
 #define IDD_DIALOG_BACNET_CONTROLLER    472
-#define IDD_MBPOLL_REG_DIALOG           473
 #define IDD_DIALOGAIRFLOW_SETTING       475
 #define IDD_DIALOG_8IOA_VIEW            476
 #define IDD_WRITEREGDLG                 477
-#define IDD_DIALOG_MBPOLL_FUNCS         478
 #define IDD_LC_OUTPUTS_NAMECONFIG       478
 #define IDD_DIALOG_BACNET_SCREENS       479
 #define IDD_DIALOG_BACNET_GRAPHIC       481
@@ -223,9 +219,10 @@
 #define IDB_BITMAP5                     514
 #define IDD_DIALOG_FEEDBACK             515
 #define IDD_DIALOG_BACNET_ADD_DEVICE    516
-
 #define IDR_T3000_DB2                   518
 #define IDD_DIALOG_BACNET_CUSTOMER_RANGE 519
+#define IDD_PRESSURE_SENSOR             520
+#define IDD_DIALOG_HUM_TEMP_SENSOR      521
 #define IDD_DIALOG_BACNET_SCREENS_EDIT  582
 #define IDD_DIALOG_BACNET_TOOL          583
 #define IDB_BITMAP_TMCO_LOGO            584
@@ -356,6 +353,7 @@
 #define IDC_COMBO14                     1052
 #define IDC_MODEL_EDIT2                 1052
 #define IDC_PIC_EDIT                    1052
+#define IDC_COMBO_ENABLE_DIS            1052
 #define IDC_TEMP_LEFT4                  1053
 #define IDC_TEMP5                       1054
 #define IDC_HUM5                        1055
@@ -402,11 +400,13 @@
 #define IDC_OUTPUT4_DELAY_ON_EDIT       1066
 #define IDC_TEMP8                       1066
 #define IDC_CO2_ALARM_SETPOINT          1066
+#define IDC_EDIT53                      1066
 #define IDC_NIGHT_SLIDER                1067
 #define IDC_OUTPUT3_DELAY_ON_EDIT       1067
 #define IDC_SLIDER5                     1067
 #define IDC_HUM8                        1067
 #define IDC_CO2_CALIBRATING_OFFSET      1067
+#define IDC_EDIT55                      1067
 #define IDC_EDIT3                       1068
 #define IDC_NIGHT_EDIT                  1068
 #define IDC_INFILEREDIT                 1068
@@ -421,14 +421,17 @@
 #define IDC_OCCUPACHECK                 1070
 #define IDC_OUTPUT5_DELAY_ON_EDIT       1070
 #define IDC_TEMP9                       1070
+#define IDC_EDIT52                      1070
 #define IDC_TEMPINFO_EDIT               1071
 #define IDC_CHANGE_OVER_EDIT            1071
 #define IDC_SLIDER6                     1071
 #define IDC_HUM9                        1071
+#define IDC_EDIT54                      1071
 #define ID_VIEW_IOPANE_DLGBAR           1072
 #define IDC_NIGHTHEAT_EDIT2             1072
 #define IDC_EDIT_DAYHEAT                1072
 #define IDC_TIME9                       1072
+#define IDC_EDIT56                      1072
 #define IDC_BUTTON1                     1073
 #define IDD_TRENDLOGFORMVIEW            1073
 #define IDC_SLIDER8                     1073
@@ -451,14 +454,10 @@
 #define IDC_BUTTON9                     1076
 #define IDD_DIALOG_CM5_BACNET           1076
 #define IDC_EDIT5                       1077
-#define IDC_TEMP_LEFT10                 1077
-#define IDD_DIALOG_BACNET_PROGRAM       1077
 #define IDC_EDIT6                       1078
 #define IDC_RH2                         1078
-#define IDD_DIALOG_BACNET_OUTPUT        1078
 #define IDC_EDIT7                       1079
 #define IDC_FREQ3                       1079
-#define IDD_DIALOG_BACNET_VARIABLE      1079
 #define IDC_IPADDRESS1                  1080
 #define IDC_EDIT31                      1080
 #define IDC_RH3                         1080
@@ -585,6 +584,7 @@
 #define IDC_RANGE                       1129
 #define IDC_COMBO_ADD_DEVICE_BAUDRATE   1129
 #define IDC_COMBO_BACNET_SETTING_BAUDRATE1 1129
+#define IDC_COMBO_OUTPUTTYPE            1129
 #define IDC_POWERMODELCOMBO             1130
 #define IDC_CHECK56                     1130
 #define IDC_COMBO_TIMESERVERLIST2       1130
@@ -1311,6 +1311,7 @@
 #define IDC_BUTTON_CO2_SYNC_TIME        1654
 #define IDC_STATIC_SEPERATOR            1654
 #define IDC_AIR_FLOW_BACK               1655
+#define IDC_STATIC_SEPERATOR2           1655
 #define IDC_RADIO_PASSWORD_ENABLE       1656
 #define IDB_MENUBAROWN_CONNECTED        1656
 #define IDC_RADIO_PASSWORD_DISABLE      1657
@@ -1406,7 +1407,6 @@
 #define IDC_ID_ADD                      1719
 #define IDC_BUTTON_ANNUAL_EDIT          1720
 #define IDC_SERIAL_NUMBER               1720
-#define IDC_FIRMWARE                    1721
 #define IDC_BAC_MAINTAB                 1721
 #define IDC_MODEL                       1722
 #define IDC_BUTTON_SCREEN_EDIT_TEST     1722
@@ -1573,8 +1573,28 @@
 #define IDC_BUTTON_SETTING_ADD_OK       1864
 #define IDC_BUTTON_SETTING_ADD_CANCEL   1865
 #define IDC_BACNET_SETTING_CLEAR_BTN    1866
+#define IDC_PRESSURE_SENSOR             1867
+#define IDC_BOXUNIT                     1868
+#define IDC_EDIT_SENSOR_MIN             1869
+#define IDC_EDIT_SENSOR_MAX             1870
+#define IDC_BUTTON_OUTPUTTABLE          1871
+#define IDC_FRESH                       1872
+#define IDC_BUTTON_HUM_DEFAULT          1874
+#define IDC_BUTTON_TEMP_DEFAULT         1875
 #define IDC_LIST_CUSTOMER_DIGITAL_RANGE 1875
+#define IDC_MSCHART1                    1876
 #define IDC_STATIC_CUSTOMER_GROUP       1876
+#define IDC_EDIT_TEMP_VALUE             1877
+#define IDC_EDIT_SENSITIVTY             1877
+#define IDC_EDIT_HUM_VALUE              1878
+#define IDC_STATIC_PIR_SENSOR_SETTING   1878
+#define IDC_COMBO_UNITS                 1879
+#define IDC_STATIC_ENDIS                1879
+#define IDC_RADIO_TAUTO                 1880
+#define IDC_STATIC_SENSITIVTY           1880
+#define IDC_RADIO_TMANUAL               1881
+#define IDC_RADIO_HMANUAL               1882
+#define IDC_RADIO_HAUTO                 1883
 #define IDC_EDIT_PID2OFFSETPOINT2       2002
 #define IDC_EDIT_PID2OFFSETPOINT4       2003
 #define IDC_EDIT_PID2OFFSETPOINT3       2004
@@ -1583,6 +1603,7 @@
 #define IDC_MIN_SUPPLY                  2007
 #define IDD_DIALOG_TH_CALIBAETION       2008
 #define IDD_CALIBRATION_HUM             2009
+#define IDC_TEMP_LEFT10                 2010
 #define IDC_HELP_HELP1                  3831
 #define IDC_IPADDRESS_ADD_BAC_NOTE      5832
 #define IDC_LIST_DOWNLOAD_INFO          5833
@@ -1616,6 +1637,7 @@
 #define IDC_LIST_MULTY_INFORMATION      9846
 #define IDC_STATIC_SEETING_BOOTLOADER_VERSION 9847
 #define IDC_BUTTON_STATRT               9847
+#define IDC_FIRMWARE                    9848
 #define IDC_EDIT_INTER                  10000
 #define IDC_RADIO1                      15494
 #define IDC_RADIO2                      15495
@@ -1829,8 +1851,6 @@
 #define ID_TIMEBASE_4DAYS               34024
 #define ID_HELP_CONTACTSCREDITS         34024
 #define ID_EXIT34025                    34025
-#define ID_CONTROL_CUSTOMERUNITS        34025
-#define ID_CALIBRATION_CALIBRATIONHUMTEMP 34026
 #define ID_GRAPHIC_EXIT                 34026
 #define ID_                             34027
 #define ID_34028                        34028
@@ -1840,6 +1860,9 @@
 #define ID_ZOOMOUT                      34032
 #define ID_HELP_FEEDBACKTOTEMCO         34040
 #define ID_DATABASE_BACNETTOOL          34905
+#define IDD_DIALOG_BACNET_PROGRAM       34906
+#define IDD_DIALOG_BACNET_OUTPUT        34907
+#define IDD_DIALOG_BACNET_VARIABLE      34908
 #define ID_CONFIGFILE_SAVE_AS           35000
 #define ID_HELP_UPDATEFIRMWARE          35523
 #define ID_MISCELLANEOUS_UPDATEMINI     42883
@@ -1852,6 +1875,8 @@
 #define IDC_RANGECOMBO                  57926
 #define IDD_TEST_MULTI_READ             57927
 #define IDC_BUTTON_TRAFFIC1             57928
+#define ID_CONTROL_CUSTOMERUNITS        57929
+#define ID_CALIBRATION_CALIBRATIONHUMTEMP 57930
 
 // Next default values for new objects
 // 
@@ -1859,7 +1884,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        520
 #define _APS_NEXT_COMMAND_VALUE         34026
-#define _APS_NEXT_CONTROL_VALUE         1877
+#define _APS_NEXT_CONTROL_VALUE         1881
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

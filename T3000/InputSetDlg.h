@@ -107,4 +107,5 @@ public:
 	CEdit m_Filter;
 	UINT m_filterValue;
 	afx_msg void OnCbnSelchangeValuecombo();
+	afx_msg void OnBnClickedFresh();
 };

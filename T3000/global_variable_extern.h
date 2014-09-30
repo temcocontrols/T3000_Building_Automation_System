@@ -21,6 +21,7 @@ extern const bool WRITE_FAIL ;
 extern	   bool g_HumChamberThread;
 extern bool g_register_occuppied ; //Add by Alex
 extern			  BOOL g_bChamber;
+extern bool list_mouse_click;
 //Fance_4
 extern unsigned short product_register_value[1024];
 extern int product_type ;
@@ -55,7 +56,7 @@ extern	CString g_strExePth;
 extern  CString g_strImgeFolder;
 extern  CString g_strOrigDatabaseFilePath;
 
-
+extern BOOL g_mstp_flag;
 extern	BOOL g_Scanfully;
 extern	BOOL g_ScanSecurity;
 extern	int g_nStartID;
@@ -138,6 +139,8 @@ int const PM_TSTAT7 = 7;
 int const PM_TSTAT5i=8;
 int const PM_TSTAT5D = 12;
 int const PM_AirQuality = 13;
+int const PM_HUMTEMPSENSOR = 14;
+int const PM_TSTATRUNAR = 15;
 const int PM_TSTAT5E = 16;
 int const PM_TSTAT5F = 17;
 int const PM_TSTAT5G = 18;
@@ -1026,7 +1029,7 @@ extern int g_protocol;
 extern bool bac_net_initial_once;
 extern unsigned char my_ip[4];
 extern byte	g_DayState[8][48];
-extern CDialog *pDialog[11];
+extern CDialog *pDialog[12];
 extern CDialog *DebugWindow;
 extern CString PrintText[1000];
 extern CString g_Print;

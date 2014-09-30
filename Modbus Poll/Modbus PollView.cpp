@@ -15,18 +15,15 @@
 #include "WriteSingle_BinaryDlg.h"
 #include "RegisterValueAnalyzerDlg.h"
 #include "ado/ADO.h"
+ 
+// #include "CApplication.h"
+// #include "CWorkbook.h"
+// #include "CWorkbooks.h"
+// #include "CWorksheet.h"
+// #include "CWorkbooks.h"
 
 
-
-// #include "Application.h"
-// #include "Workbooks.h"
-// #include "Workbook.h"
-// #include "Worksheets.h"
-// #include "Worksheet.h"
-// #include "Range.h"
-
-
-
+// #include "excel9.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -54,6 +51,9 @@ ON_COMMAND(ID_SETUP_EXCELLOGINGOFF, &CModbusPollView::OnSetupExcellogingoff)
 ON_UPDATE_COMMAND_UI(ID_SETUP_EXCELLOGINGOFF, &CModbusPollView::OnUpdateSetupExcellogingoff)
 ON_COMMAND(ID_SETUP_EXCELLOGING, &CModbusPollView::OnSetupExcelloging)
 ON_UPDATE_COMMAND_UI(ID_SETUP_EXCELLOGING, &CModbusPollView::OnUpdateSetupExcelloging)
+ON_EN_KILLFOCUS(IDC_MODELNAME, &CModbusPollView::OnEnKillfocusModelname)
+ON_COMMAND(ID_EDIT_CHANGEMODELNAME, &CModbusPollView::OnEditChangemodelname)
+ON_COMMAND(ID_FUNCTIONS_TESTCENTER, &CModbusPollView::OnFunctionsTestcenter)
 END_MESSAGE_MAP()
 
  
@@ -91,6 +91,9 @@ CModbusPollView::CModbusPollView()
 			m_logText=TRUE;
 			m_logTextPath=_T("");
 			m_logExcel=TRUE;
+
+
+			m_ischangeModelName=FALSE;
 }
 
 CModbusPollView::~CModbusPollView()
@@ -102,191 +105,7 @@ CModbusPollView::~CModbusPollView()
 // 		TerminateThread(m_MultiRead_handle, 0);
 // 	m_MultiRead_handle=NULL;
 }
-void CModbusPollView::Initial_RegName(){
-	_variant_t temp_var;
-	if (!m_isgetmodel)
-	{
-		return;
-	}
-	if (!m_ischangedAddress)
-	{
-		return;
-	}
-	CString TableName,RegName,RegAddress;
-	CADO ado;
-	ado.OnInitADOConn();
-	if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
-	{  
-		CString sql,temp;
-		sql.Format(_T("Select * from ProductsTypeRegisterTables where ProductType=%d"),m_modeldata[1]);
-		ado.m_pRecordset=ado.OpenRecordset(sql);
-		if (!ado.m_pRecordset->EndOfFile)
-		{
-			 
-			temp_var=ado.m_pRecordset->GetCollect(_T("TableName"));
-			if (temp_var.vt!=VT_NULL)
-			{
-				TableName=temp_var;
-			}
-			else
-			{
-                TableName=_T("");
-			}
-			temp_var=ado.m_pRecordset->GetCollect(_T("Col_RegName"));
-			if (temp_var.vt!=VT_NULL)
-			{
-				RegName=temp_var;
-			}
-			else
-			{
-				RegName=_T("");
-			}
-			temp_var=ado.m_pRecordset->GetCollect(_T("Col_RegAddress"));
-			if (temp_var.vt!=VT_NULL)
-			{
-				RegAddress=temp_var;
-			}
-			else
-			{
-				RegAddress=_T("");
-			}
-		}
-		//while (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
-		//{
-		//	if (product_type==T3000_5ABCDFG_LED_ADDRESS)
-		//	{
-		//		tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
-		//		tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_AddressName"));
-		//		tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DATATYPE"));
-		//		tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_LEN"));
-		//		temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DESCRIPTION"));
-		//		if (temp_var.vt==VT_NULL)
-		//		{
-		//			tempstruct.Description=_T("");
-		//		} 
-		//		else
-		//		{
-		//			tempstruct.Description=temp_var;
-		//		}
-		//		temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_Operation"));
-		//		if (temp_var.vt==VT_NULL)
-		//		{
-		//			tempstruct.Description=_T("");
-		//		} 
-		//		else
-		//		{
-		//			tempstruct.Operation=temp_var;
-		//		}
-		//		/*	tempstruct.Description=(CString)ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DESCRIPTION"));*/
 
-		//	} 
-		//	else if (product_type==T3000_5EH_LCD_ADDRESS)
-		//	{
-		//		_variant_t vartemp;
-		//		tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
-		//		tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_AddressName"));
-		//		tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DATATYPE"));
-		//		tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_LEN"));
-		//		//tempstruct.Description=(CString)ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DESCRIPTION"));
-		//		vartemp=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DESCRIPTION"));
-		//		if (vartemp.vt==VT_NULL)
-		//		{
-		//			tempstruct.Description=_T("");
-		//		} 
-		//		else
-		//		{
-		//			tempstruct.Description=vartemp;
-		//		} 
-		//		temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_Operation"));
-		//		if (temp_var.vt==VT_NULL)
-		//		{
-		//			tempstruct.Description=_T("");
-		//		} 
-		//		else
-		//		{
-		//			tempstruct.Operation=temp_var;
-		//		}
-		//	}
-		//	else if (product_type==T3000_6_ADDRESS)
-		//	{
-		//		tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
-		//		tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT6_AddressName"));
-		//		tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT6_DATATYPE"));
-		//		tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT6_LEN"));
-		//		temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_DESCRIPTION")); 
-		//		if (temp_var.vt==VT_NULL)
-		//		{
-		//			tempstruct.Description=_T("");
-		//		} 
-		//		else
-		//		{
-		//			tempstruct.Description=temp_var;
-		//		}
-		//		temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_Operation"));
-		//		if (temp_var.vt==VT_NULL)
-		//		{
-		//			tempstruct.Description=_T("");
-		//		} 
-		//		else
-		//		{
-		//			tempstruct.Operation=temp_var;
-		//		}
-		//	}
-		//	if (tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)
-		//	{
-		//		ado.m_pRecordset->MoveNext();
-		//		continue;
-		//	}
-		//	m_VecregisterData.push_back(tempstruct);
-		//	m_recordcount++;
-		//	ado.m_pRecordset->MoveNext();
-	}
-	ado.CloseRecordset();
-	if (TableName.GetLength()!=0)
-	{
-		if (ado.IsHaveTable(ado,TableName))
-		{
-			DBRegister tempstuct;
-			CString sql;
-			sql.Format(_T("Select [%s],[%s] from %s "),RegName.GetBuffer(),RegAddress.GetBuffer(),TableName.GetBuffer());
-			ado.m_pRecordset=ado.OpenRecordset(sql);
-			while (!ado.m_pRecordset->EndOfFile)
-			{
-
-				temp_var=ado.m_pRecordset->GetCollect(RegAddress.GetBuffer());
-				if (temp_var.vt!=VT_NULL)
-				{
-					tempstuct.RegAddress=temp_var;
-				}
-				temp_var=ado.m_pRecordset->GetCollect(RegName.GetBuffer());
-
-				if (temp_var.vt!=VT_NULL)
-				{
-					tempstuct.RegName=temp_var;
-				}
-				m_VecregisterData.push_back(tempstuct);
-				ado.m_pRecordset->MoveNext();
-			}
-		}
-		ado.CloseConn();
-
-		if (m_VecregisterData.size()>1)
-		{
-			int reglen=127;
-			if (m_VecregisterData.size()<127)
-			{
-				reglen=m_VecregisterData.size();
-			}
-			for (int i=0;i<reglen;i++)
-			{
-				m_Alias[i]=Find_RegName(i);
-			}
-		}
-
-		m_ischangedAddress=FALSE;
-	}
-	
-}
 CString CModbusPollView::Find_RegName(int index){
 	vector<DBRegister>::iterator it;
 	for (it=m_VecregisterData.begin();it!=m_VecregisterData.end();it++)
@@ -300,7 +119,7 @@ CString CModbusPollView::Find_RegName(int index){
 	return _T("");
 }
 void CModbusPollView::DoDataExchange(CDataExchange* pDX)
-{
+{//IDC_RICHEDIT_MOD_LIB
 	CFormView::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_MSFLEXGRID1, m_MsDataGrid);
 	DDX_Control(pDX, IDC_CONNECTION_STATE, m_connectionState);
@@ -308,6 +127,7 @@ void CModbusPollView::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_NAME, m_edit_name);
 	DDX_Control(pDX, IDC_MODELNAME, m_ModelNameRichEdit);
 	DDX_Control(pDX, IDC_SLAVEID, m_SlaveIDRichEditCtrl);
+	DDX_Control(pDX, IDC_RICHEDIT_MOD_LIB, m_modelib);
 }
 
 BOOL CModbusPollView::PreCreateWindow(CREATESTRUCT& cs)
@@ -327,15 +147,16 @@ void CModbusPollView::OnInitialUpdate()
 	COLORREF cf=RGB(212,208,200);
 	m_connectionState.SetReadOnly(TRUE);
 	m_connectionState.SetBackgroundColor(FALSE,cf);
-	         m_Tx_Rx.SetReadOnly(TRUE);
-			 m_Tx_Rx.SetBackgroundColor(FALSE,cf);
-	  
-	  m_ModelNameRichEdit.SetReadOnly(TRUE);
-	  m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
+	m_Tx_Rx.SetReadOnly(TRUE);
+	m_Tx_Rx.SetBackgroundColor(FALSE,cf);
+			 
+	m_ModelNameRichEdit.SetReadOnly(TRUE);
+	m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
 
-	  m_SlaveIDRichEditCtrl.SetReadOnly(TRUE);
-	  m_SlaveIDRichEditCtrl.SetBackgroundColor(FALSE,cf);
-	 
+	m_SlaveIDRichEditCtrl.SetReadOnly(TRUE);
+	m_SlaveIDRichEditCtrl.SetBackgroundColor(FALSE,cf);
+	m_modelib.SetReadOnly(TRUE);
+	m_modelib.SetBackgroundColor(FALSE,cf);
 	ResizeParentToFit();
 
 	CRect ViewRect;
@@ -518,7 +339,10 @@ void CModbusPollView::Fresh_Data(){
 		}
 		else
 		{
-              m_connectionState.SetWindowText(L"");
+              m_connectionState.SetWindowText(L"Connected");
+			  m_connectionState.SetStringFontSize(12);
+			  COLORREF cf=RGB(255,0,0);
+			  m_connectionState.SetStringColor(cf);
 			  SetPaneString(1,L"Connected");
 		}
 		
@@ -562,19 +386,54 @@ void CModbusPollView::Fresh_Data(){
 
 	m_Tx_Rx.SetWindowText(strTemp);
 	m_Tx_Rx.SetStringFontSize(15);
-	if (m_isgetmodel)
-	{
-		m_modelname=GetProductName(m_modeldata[1]);
-		CString showmodelname;
-		showmodelname.Format(_T("Model Name:%s"),m_modelname.GetBuffer());
-		m_ModelNameRichEdit.SetWindowText(showmodelname);
-		m_ModelNameRichEdit.SetStringFontSize(13);
+	CString showmodelname;
+ 	if (m_isgetmodel)
+ 	{
+		
+		//Model Name:
+		showmodelname=_T("Model Name:");
+		m_modelib.SetWindowText(showmodelname);
+		m_modelib.SetStringFontSize(13);
 		CString showslaveid;
 		showslaveid.Format(_T("ID:%d"),m_modeldata[0]);
 		m_SlaveIDRichEditCtrl.SetWindowText(showslaveid);
 		m_SlaveIDRichEditCtrl.SetStringFontSize(13);
 	}
+	if (m_cur_modelNo!=m_modeldata[0])
+	{
+	  m_ischangedAddress=TRUE;
+	}
 	Initial_RegName();
+	COLORREF  cf=RGB(255,255,255);
+/*	m_modelname=GetProductName(m_modeldata[1]);*/
+	if (m_modelname.IsEmpty())
+	{
+
+		m_ModelNameRichEdit.SetReadOnly(FALSE);
+		m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
+	}
+	else
+	{
+	   if (m_ischangeModelName)
+	   {
+		   m_ModelNameRichEdit.SetReadOnly(FALSE);
+		   m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
+	   } 
+	   else
+	   {
+		   
+
+		   cf=RGB(212,208,200);
+		   m_ModelNameRichEdit.SetReadOnly(TRUE);
+		   m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
+		   showmodelname.Format(_T("%s"),m_cur_modelName.GetBuffer());
+		   m_ModelNameRichEdit.SetWindowText(showmodelname);
+		   m_ModelNameRichEdit.SetStringFontSize(13);
+	   }
+	    
+	}
+	
+
 	if (m_Rows==0)
 	{
 		m_data_rows=10;
@@ -700,63 +559,68 @@ void CModbusPollView::Fresh_Data(){
 		index.Format(_T("%d"),m_address+(i-1)*(m_MsDataGrid.get_Rows()-1));
 		m_MsDataGrid.put_TextMatrix(0,i,index);
 		}
-			for (int j=1;j<m_MsDataGrid.get_Cols();j++)
-			{
-				for (int i=1;i<m_MsDataGrid.get_Rows();i++)
-				{
-					Index=(j-1)*(m_MsDataGrid.get_Rows()-1)+(i-1);
-					if (Index<=m_Quantity)
-					{
-						m_MsDataGrid.put_TextMatrix(i,j,Get_Data(Index));
-					}
-				}
-			}
+// 			for (int j=1;j<m_MsDataGrid.get_Cols();j++)
+// 			{
+// 				for (int i=1;i<m_MsDataGrid.get_Rows();i++)
+// 				{
+// 					Index=(j-1)*(m_MsDataGrid.get_Rows()-1)+(i-1);
+// 					if (Index<=m_Quantity)
+// 					{
+// 						m_MsDataGrid.put_TextMatrix(i,j,Get_Data(Index));
+// 					}
+// 				}
+// 			}
 
 
-			for (int i=1;i<m_MsDataGrid.get_Cols();i++)
-			{
-
-
-
-				for (int j=0;j<m_MsDataGrid.get_Rows();j++)
-				{
-
-					if (j==0)
-					{
-						//初始化第0行
-						if (i%2!=0)
-						{
-							index=L"Address";
-							m_MsDataGrid.put_TextMatrix(0,i,index);
-						} 
-						else
-						{
-							index=L"Value";
-							m_MsDataGrid.put_TextMatrix(0,i,index);
-						}
-					} 
-					else
-					{
-						Index=(j-1)*(m_MsDataGrid.get_Rows()-1)+(i-1);
-						if (i%2!=0)//Add
-						{
-							if (Index<=m_Quantity)
-							{
-								CString StrTemp;
-								StrTemp.Format(_T("%d"),Get_Reg_Add(Index));
-								m_MsDataGrid.put_TextMatrix(i,j,StrTemp);
-							}
-						}
-						else//Value
-						{
-							if (Index<=m_Quantity)
-							{
-								m_MsDataGrid.put_TextMatrix(i,j,Get_Data(Index));
-							}
-						}
-					}
-				}
-			}
+ 			for (int i=1;i<m_MsDataGrid.get_Cols();i++)
+ 			{
+ 				for (int j=0;j<m_MsDataGrid.get_Rows();j++)
+ 				{
+ 
+ 					if (j==0)
+ 					{
+ 						//初始化第0行
+ 						if (i%2==1)
+ 						{
+ 							index=L"Address";
+ 							m_MsDataGrid.put_TextMatrix(0,i,index);
+ 						} 
+ 						else
+ 						{
+ 							index=L"Value";
+ 							m_MsDataGrid.put_TextMatrix(0,i,index);
+ 						}
+ 					} 
+ 					else
+ 					{
+					    if (i%2==0)
+					    {
+						Index=(i/2-1)*(m_MsDataGrid.get_Rows()-1)+(j-1);
+					    } 
+					    else
+					    {
+						Index=(i/2)*(m_MsDataGrid.get_Rows()-1)+(j-1);
+					    }
+  						
+  						if (i%2==1)//Add
+  						{
+  							if (Index<=m_Quantity)
+  							{
+  								CString StrTemp;
+  								StrTemp.Format(_T("%d"),Get_Reg_Add(Index));
+  								m_MsDataGrid.put_TextMatrix(j,i,StrTemp);
+  							}
+  						}
+  						else//Value
+  						{
+  							if (Index<=m_Quantity)
+  							{
+  								m_MsDataGrid.put_TextMatrix(j,i,Get_Data(Index));
+  							}
+  						}
+ 					}
+ 				}
+ 			}
 	}
 	else{
 		//初始化行
@@ -864,7 +728,79 @@ void CModbusPollView::Fresh_Data(){
 		
 		
 	}
-	 
+	CString str;
+	if (!m_logExcel)
+	{
+	   ++m_curexcelrow;
+
+	   str=Get_Now();
+	   m_rgMyRge.SetItem(_variant_t((long)m_curexcelrow),_variant_t((long)1),_variant_t(str));
+	   for (int i=0;i<m_Quantity;i++)
+	   {
+		   str.Format(_T("%d"),m_DataBuffer[i]);
+		   m_rgMyRge.SetItem(_variant_t((long)m_curexcelrow),_variant_t((long)i+2),_variant_t(str));
+	   }
+
+	}
+	// 	CString str;
+// 	str = _T("医疗机构许可证信息查询结果");
+// 	rgMyRge.SetItem(_variant_t((long)1),_variant_t((long)2),_variant_t(str)); 
+// 	str = _T("许可证编号");
+// 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)1),_variant_t(str)); 
+// 	str = _T("机构名称");
+// 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)2),_variant_t(str)); 
+// 	str = _T("经营性质");
+// 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)3),_variant_t(str));
+// 	str = _T("经济性质");
+// 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)4),_variant_t(str));
+// 	str = _T("负责人");
+// 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)5),_variant_t(str));
+// 	str = _T("法人代表");
+// 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)6),_variant_t(str));
+// 	str = _T("诊疗科目");
+// 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)7),_variant_t(str));
+// 	str =_T( "地址");
+// 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)8),_variant_t(str));
+// 	str = _T("电话");
+// 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)8),_variant_t(str));
+// 	str = _T("发证日期");
+// 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)9),_variant_t(str));
+// 	str = _T("有效期截止");
+// 	rgMyRge.SetItem(_variant_t((long)2),_variant_t((long)10),_variant_t(str));
+// 	
+// 	
+// 	
+// 	//ExcelApp.SetVisible(true); 
+// 	
+// 	
+// 	 
+// 	rgMyRge.AttachDispatch(wsMysheet.GetCells());
+// 
+// 
+// 	for (int i = 0; i < 200; i++)
+// 	{
+// 
+// 
+//         rgMyRge1.AttachDispatch(rgMyRge.GetItem(COleVariant((long)3+i), COleVariant((long)3+i)).pdispVal, TRUE);
+//         rgMyRge1.AttachDispatch(rgMyRge1.GetEntireRow(), TRUE);
+// 
+//         rgMyRge2.AttachDispatch(rgMyRge.GetItem(COleVariant((long)2+i), COleVariant((long)1+i)).pdispVal, TRUE);
+//         rgMyRge2.AttachDispatch(rgMyRge2.GetEntireRow(), TRUE);
+// 
+//         rgMyRge2.Copy(covOptional);
+//         rgMyRge1.Insert(COleVariant((long)3+i));
+// 
+// 		Sleep(2000);
+// 		/*rgMyRge2.Copy(covOptional);
+// 		rgMyRge1.Insert(COleVariant(1L));*/
+// 	}
+	//for (int i = 0; i < 5; i++)
+	//{
+	//	rgMyRge1.Insert(COleVariant(1L));
+	//}
+	
+	//wbMyBook.PrintPreview(_variant_t(false)); 
+	//释放对象 
 	
 	 
 }
@@ -1242,19 +1178,40 @@ void CModbusPollView::DBClickMsflexgridDataGrid(){
     UINT Address;
 	if (m_Hide_Alias_Columns!=0)//都是数值的
 	{
-		Index=(lCol-1)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
+	//	Index=(lCol/3)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
+		if (lCol%2==0)
+		{
+			Index=(lCol/2-1)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
+		} 
+		else
+		{
+			Index=(lCol/2)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
+		}
+
 		Show_Name=FALSE;
 	}
 	else//含义名字的
 	{
-		if (lCol%2!=0)
+		if (lCol%3==1)
 		{
 			Show_Name=TRUE;
 		}
 		else
 		{
 			Show_Name=FALSE;
-			Index=(lCol/2-1)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
+
+
+			if (lCol%3==0)
+			{
+				Index=(lCol/3-1)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
+			} 
+			else
+			{
+				Index=(lCol/3)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
+			}
+
+
+			//Index=(lCol/4)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
 		}
 
 		//Index=(lCol/2-1)*(m_MsDataGrid.get_Rows()-1)+(lRow-1);
@@ -1345,7 +1302,7 @@ void CModbusPollView::ClickMsflexgridDataGrid(){
 	}
 	else//含义名字的
 	{
-		if (lCol%2!=0)
+		if (lCol%3==1)
 		{
 			Show_Name=TRUE;
 		}
@@ -1401,15 +1358,7 @@ void CModbusPollView::ClickMsflexgridDataGrid(){
 
 }
 
-void CModbusPollView::OnEnKillfocusEditName()
-{
-	 CString strText;
-	 m_edit_name.GetWindowTextW(strText);
-	 m_MsDataGrid.put_TextMatrix(m_Current_Row,m_Current_Col,strText);
-     int Index=((m_Current_Col+1)/2-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
-     m_Alias[Index]=strText;
 
-}
 
 
  DWORD WINAPI _Multi_Read_Fun03(LPVOID pParam){
@@ -1530,14 +1479,6 @@ BOOL CModbusPollView::DestroyWindow()
 	return CFormView::DestroyWindow();
 }
 
-
-//void CModbusPollView::OnViewRegistervalueanalyzer()
-//{
-//	 CRegisterValueAnalyzerDlg dlg;
-//	 dlg.DoModal();
-//}
-
-
 void CModbusPollView::OnEditAdd()
 {
 	int Index;
@@ -1625,11 +1566,8 @@ COLORREF Array[]={
 		RGB(0xE6, 0xE6, 0xFA),
 		RGB(0xFF, 0xFF, 0xFF)
       };
-
-
 return Array[i];
 }
-
 void CModbusPollView::OnSetupTxtLog()
 {
 	 m_logText=FALSE; 
@@ -1656,7 +1594,6 @@ void CModbusPollView::OnSetupTxtLog()
       }
 }
 
-
 void CModbusPollView::OnSetupTxtlogoutOff()
 {
 	 m_logText=TRUE;
@@ -1664,24 +1601,28 @@ void CModbusPollView::OnSetupTxtlogoutOff()
 	 m_default_file.Close();
 }
 
-
 void CModbusPollView::OnUpdateSetupTxtlogoutOff(CCmdUI *pCmdUI)
 {
 	 pCmdUI->Enable(!m_logText);
 }
-
 
 void CModbusPollView::OnUpdateSetupTxtLog(CCmdUI *pCmdUI)
 {
 	 pCmdUI->Enable(m_logText);
 }
 
-
 void CModbusPollView::OnSetupExcellogingoff()
 {
+   
 	 m_logExcel=TRUE;
-}
+	 m_rgMyRge.ReleaseDispatch(); 
+	 m_wsMysheet.ReleaseDispatch(); 
+	 m_wssMysheets.ReleaseDispatch(); 
+	 m_wbMyBook.ReleaseDispatch(); 
+	 m_wbsMyBooks.ReleaseDispatch(); 
+	 m_ExcelApp.ReleaseDispatch(); 
 
+}
 
 void CModbusPollView::OnUpdateSetupExcellogingoff(CCmdUI *pCmdUI)
 {
@@ -1691,32 +1632,346 @@ void CModbusPollView::OnUpdateSetupExcellogingoff(CCmdUI *pCmdUI)
 
 void CModbusPollView::OnSetupExcelloging()
 {
-// 	_Application app;    
-// 	Workbooks books;
-// 	_Workbook book;
-// 	Worksheets sheets;
-// 	_Worksheet sheet;
-// 	Range range;
-// 
-// 	Range rgMyRge1, rgMyRge2; 	
-// 	CString rowContent;
-// 	COleVariant covTrue((short)TRUE), covFalse((short)FALSE), covOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
-// 	Sleep(2000);
-// 	if (!app.CreateDispatch(_T("Excel.Application"),NULL)) 
-// 	{ 
-// 		AfxMessageBox(_T("Create Excel false!")); 
-// 		return;
-// 	} 
-// 
-// 
-// 
-// 	m_logExcel=FALSE;
+ 
 
 
+   COleVariant covTrue((short)TRUE), covFalse((short)FALSE), covOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
+	
+	 
+	//创建Excel 2000服务器(启动Excel) 
+	if (!m_ExcelApp.CreateDispatch(_T("Excel.Application"),NULL)) 
+	{ 
+		AfxMessageBox(_T("Create Excel Fail!")); 
+		exit(1); 
+	} 
+	m_ExcelApp.SetVisible(TRUE); 
+	
+	m_wbsMyBooks.AttachDispatch(m_ExcelApp.GetWorkbooks(),true); 
+	
+	m_wbMyBook.AttachDispatch(m_wbsMyBooks.Add(covOptional));
+	//得到Worksheets 
+	m_wssMysheets.AttachDispatch(m_wbMyBook.GetWorksheets(),true);
+	//得到sheet1 
+	m_wsMysheet.AttachDispatch(m_wssMysheets.GetItem(_variant_t("Sheet1")),true);
+	//得到全部Cells，此时,rgMyRge是cells的集合 
+	m_rgMyRge.AttachDispatch(m_wsMysheet.GetCells(),true); 
+	m_rgMyRge.SetValue(_variant_t(""));
+	m_curexcelrow=1;
+
+	CString str;
+	str=_T("Time");
+	m_rgMyRge.SetItem(_variant_t((long)m_curexcelrow),_variant_t((long)m_curexcelrow),_variant_t(str));
+	for (int i=0;i<m_Quantity;i++)
+	{
+	    str.Format(_T("%d"),m_address+i);
+		m_rgMyRge.SetItem(_variant_t((long)m_curexcelrow),_variant_t((long)i+2),_variant_t(str));
+	}
+  	m_logExcel=FALSE;
 }
-
-
+//----
 void CModbusPollView::OnUpdateSetupExcelloging(CCmdUI *pCmdUI)
 {
 	pCmdUI->Enable(m_logExcel);
+}
+void CModbusPollView::Initial_RegName(){
+	_variant_t temp_var;
+	if ((!m_isgetmodel)&&(!m_ischangedAddress)&&(!m_ischangeModelName))
+	{
+		return;
+	}
+	 
+	 //	m_ischangeModelName=FALSE
+	m_VecregisterData.clear();
+	for (int i=0;i<127;i++)
+	{
+		m_Alias[i]=_T("");
+	}
+	CString TableName,RegName,RegAddress;
+	CADO ado;
+	ado.OnInitADOConn();
+	if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
+	{  
+		CString sql,temp;
+		sql.Format(_T("Select * from ProductsTypeRegisterTables where ProductType=%d"),m_modeldata[1]);
+		m_cur_modelNo=m_modeldata[1];
+		ado.m_pRecordset=ado.OpenRecordset(sql);
+		if (!ado.m_pRecordset->EndOfFile)
+		{
+
+			temp_var=ado.m_pRecordset->GetCollect(_T("TableName"));
+			if (temp_var.vt!=VT_NULL)
+			{
+				TableName=temp_var;
+			}
+			else
+			{
+				TableName=_T("");
+			}
+			m_cur_TableName=TableName;
+			temp_var=ado.m_pRecordset->GetCollect(_T("Col_RegName"));
+			if (temp_var.vt!=VT_NULL)
+			{
+				RegName=temp_var;
+			}
+			else
+			{
+				RegName=_T("");
+			}
+			m_cur_Col_RegName=RegName;
+			temp_var=ado.m_pRecordset->GetCollect(_T("Col_RegAddress"));
+			if (temp_var.vt!=VT_NULL)
+			{
+				RegAddress=temp_var;
+			}
+			else
+			{
+				RegAddress=_T("");
+			}
+			m_cur_col_RegAddress=RegAddress;
+			temp_var=ado.m_pRecordset->GetCollect(_T("ProductName"));
+			if (temp_var.vt!=VT_NULL)
+			{
+				m_modelname=temp_var;
+			}
+			else
+			{
+				m_modelname=_T("");
+			}
+			m_cur_modelName=m_modelname;
+		}
+	 
+	}
+	ado.CloseRecordset();
+	if (TableName.GetLength()!=0)
+	{
+		if (ado.IsHaveTable(ado,TableName))
+		{
+			DBRegister tempstuct;
+			CString sql;
+		    if (TableName.CompareNoCase(_T("CustomProductTable"))==0)
+		    {
+				sql.Format(_T("Select [%s],[%s] from %s where ModelNo=%d "),RegName.GetBuffer(),RegAddress.GetBuffer(),TableName.GetBuffer(),m_cur_modelNo);
+				ado.m_pRecordset=ado.OpenRecordset(sql);
+				while (!ado.m_pRecordset->EndOfFile)
+				{
+
+					temp_var=ado.m_pRecordset->GetCollect(RegAddress.GetBuffer());
+					if (temp_var.vt!=VT_NULL)
+					{
+						tempstuct.RegAddress=temp_var;
+					}
+					temp_var=ado.m_pRecordset->GetCollect(RegName.GetBuffer());
+
+					if (temp_var.vt!=VT_NULL)
+					{
+						tempstuct.RegName=temp_var;
+					}
+					m_VecregisterData.push_back(tempstuct);
+					ado.m_pRecordset->MoveNext();
+				}
+		    } 
+		    else
+		    {
+				sql.Format(_T("Select [%s],[%s] from %s "),RegName.GetBuffer(),RegAddress.GetBuffer(),TableName.GetBuffer());
+				ado.m_pRecordset=ado.OpenRecordset(sql);
+				while (!ado.m_pRecordset->EndOfFile)
+				{
+
+					temp_var=ado.m_pRecordset->GetCollect(RegAddress.GetBuffer());
+					if (temp_var.vt!=VT_NULL)
+					{
+						tempstuct.RegAddress=temp_var;
+					}
+					temp_var=ado.m_pRecordset->GetCollect(RegName.GetBuffer());
+
+					if (temp_var.vt!=VT_NULL)
+					{
+						tempstuct.RegName=temp_var;
+					}
+					m_VecregisterData.push_back(tempstuct);
+					ado.m_pRecordset->MoveNext();
+				}
+		    }
+		
+			
+		}
+
+
+		if (m_VecregisterData.size()>=1)
+		{
+			int reglen=127;
+			if (m_VecregisterData.size()<127)
+			{
+				reglen=m_VecregisterData.size();
+			}
+			for (int i=0;i<reglen;i++)
+			{
+				m_Alias[i]=Find_RegName(i);
+			}
+		}
+
+		m_ischangedAddress=FALSE;
+		m_isnewmodel=FALSE;
+	}
+ 	else
+ 	{
+ 		m_isnewmodel=TRUE;
+ 		for (int i=0;i<127;i++)
+ 		{
+ 			m_Alias[i]=_T("");
+ 		}
+ 	}
+	ado.CloseConn();
+
+
+	/*m_ischangeModelName=FALSE;*/
+}
+
+void CModbusPollView::OnEnKillfocusModelname()
+{
+    CString ModelName;
+    GetDlgItem(IDC_MODELNAME)->GetWindowText(ModelName);
+
+
+// 	cf=RGB(212,208,200);
+// 	m_ModelNameRichEdit.SetReadOnly(TRUE);
+// 	m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
+// 	showmodelname.Format(_T("%s"),m_modelname.GetBuffer());
+// 	m_ModelNameRichEdit.SetWindowText(showmodelname);
+// 	m_ModelNameRichEdit.SetStringFontSize(13);
+if (ModelName.CompareNoCase(m_cur_modelName)==0)
+{
+return;
+}
+    
+   if (m_isnewmodel)
+   {
+    int ret=   AfxMessageBox(_T("This is a new product model!\nDo you want to add it to Database?"),MB_OKCANCEL,0);
+
+	if (ret==1)
+	{
+		CADO ado;
+		ado.OnInitADOConn();
+		if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
+		{  
+			CString sql;
+			sql.Format(_T("Insert into ProductsTypeRegisterTables(ProductType,TableName,ProductName,Col_RegName,Col_RegAddress) values('%d','CustomProductTable','%s','Reg_Description','Reg_ID')"),m_modeldata[1],ModelName);
+			try
+			{
+				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+			}
+			catch (_com_error *e)
+			{
+				AfxMessageBox(e->ErrorMessage());
+			}
+		}
+	} 
+	 
+   }
+   if (m_ischangeModelName)
+   {
+      int ret=   AfxMessageBox(_T("Are you sure to change the name of the unit?"),MB_OKCANCEL,0);
+	   
+		  if (ret==1)
+		  {
+			  CADO ado;
+			  ado.OnInitADOConn();
+			  if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
+			  {  
+				  CString sql;
+				  sql.Format(_T("update  ProductsTypeRegisterTables Set ProductName='%s'  where ProductType=%d"),ModelName,m_cur_modelNo);
+				  try
+				  {
+					  ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+				  }
+				  catch (_com_error *e)
+				  {
+					  AfxMessageBox(e->ErrorMessage());
+				  }
+			  }
+		  } 
+
+	  }
+    
+ COLORREF  cf=RGB(212,208,200);
+   m_ModelNameRichEdit.SetReadOnly(TRUE);
+   m_ModelNameRichEdit.SetBackgroundColor(FALSE,cf);
+   CString showmodelname;
+   showmodelname.Format(_T("%s"),ModelName.GetBuffer());
+   m_ModelNameRichEdit.SetWindowText(showmodelname);
+   m_ModelNameRichEdit.SetStringFontSize(13);
+   m_ischangeModelName=FALSE;
+}
+void CModbusPollView::OnEnKillfocusEditName()
+{
+	CString strText;
+	m_edit_name.GetWindowTextW(strText);
+	if (strText.IsEmpty())
+	{
+		return;
+	}
+	m_MsDataGrid.put_TextMatrix(m_Current_Row,m_Current_Col,strText);
+	int Index;
+	if (m_Current_Col%3==0)
+	{
+
+		Index=(m_Current_Col/3-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
+	} 
+	else
+	{
+		Index=(m_Current_Col/3)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
+	}
+	m_Alias[Index]=strText;
+	int RegAddress=Get_Reg_Add(Index);
+	CADO ado;
+	ado.OnInitADOConn();
+	CString SqlText;
+	if (m_cur_TableName.CompareNoCase(_T("CustomProductTable"))==0)
+	{
+	SqlText.Format(_T("Select * from CustomProductTable where ModelNo=%d and Reg_ID=%d"),m_cur_modelNo,RegAddress);
+	ado.m_pRecordset=ado.OpenRecordset(SqlText);
+	if (!ado.m_pRecordset->EndOfFile)
+	{
+		//strSql.Format(_T("update ALL_NODE set Hardware_Ver ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),hw_instance,str_serialid,str_baudrate);
+		//m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		SqlText.Format(_T("update CustomProductTable set Reg_Description='%s' where ModelNo=%d and Reg_ID=%d "),strText.GetBuffer(),m_cur_modelNo,RegAddress);
+		try
+		{
+		ado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
+		}
+		catch (_com_error *e)
+		{
+			AfxMessageBox(e->ErrorMessage());
+		}
+	} 
+	else
+	{
+		SqlText.Format(_T("Insert into CustomProductTable(Reg_Description,ModelNo,Reg_ID) values('%s',%d,%d)"),strText.GetBuffer(),m_cur_modelNo,RegAddress);
+		try
+		{
+			ado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
+		}
+		catch (_com_error *e)
+		{
+			AfxMessageBox(e->ErrorMessage());
+		}
+	}
+	   
+	} 
+	else
+	{
+
+	}
+
+}
+
+void CModbusPollView::OnEditChangemodelname()
+{
+	m_ischangeModelName=TRUE;
+}
+
+
+void CModbusPollView::OnFunctionsTestcenter()
+{
+	 
 }

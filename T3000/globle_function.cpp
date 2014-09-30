@@ -41,6 +41,16 @@
 extern char mycode[1024];
 extern int my_lengthcode;// the length of the edit of code
 #pragma endregion
+
+
+
+int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length)
+{
+	int retVal;
+	retVal =  read_multi_tap(device_var, put_data_into_here, start_address, length);
+	return retVal; 
+}
+
 /**
 
 A wrapper for modbus_read_one_value which returns BOTH read value and error flag
@@ -65,14 +75,14 @@ int read_one(unsigned char device_var,unsigned short address,int retry_times)
 	if (j>0)
 	{
 		g_strT3000LogString.Format(_T("Read One ID=%d,address=%d,result=%d,Status=OK"),device_var,address,j);
-		//::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+		 ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 	}
 	else
 	{
 		g_strT3000LogString.Format(_T("Read One ID=%d,address=%d,Status:Fail"),device_var,address);
-		//::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+		 ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 	}
-	 SetPaneString(3,g_strT3000LogString);
+	 //SetPaneString(3,g_strT3000LogString);
 	if( j != 0 ) {
 		// there was an error, so return the error flag
 		return j;
@@ -166,15 +176,7 @@ int g_NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi,
  
 void SetPaneString(int nIndext,CString str)
 {
-	/*
-//	static CMFCStatusBar * pStatusBar=NULL;
-	CMFCStatusBar * pStatusBar=NULL;
-	if(AfxGetMainWnd()->GetActiveWindow()==NULL)//if this function is called by a thread ,return 
-		return;
-	if(pStatusBar==NULL)
-		pStatusBar = (CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR);
-	pStatusBar->SetPaneText(nIndext,str.GetString());
-	*/
+	
 	CMFCStatusBar * pStatusBar=NULL;
 	if(AfxGetMainWnd()->GetActiveWindow()==NULL)//if this function is called by a thread ,return 
 		return;
@@ -186,45 +188,6 @@ void SetPaneString(int nIndext,CString str)
   		pStatusBar->SetPaneTextColor (nIndext, RGB(255,255,255));
   		pStatusBar->SetPaneBackgroundColor(nIndext,RGB(42,58,87));
   	}
- 
-
-	if (nIndext==3)
-	{
-		CCriticalSection  logfile_section;
-		logfile_section.Lock();
-		
-		TCHAR exeFullPath[MAX_PATH+1]; //
-		GetModuleFileName(NULL, exeFullPath, MAX_PATH); 
-		(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;
-		CString g_strExePth=exeFullPath;
-		CString t3000logfilename = g_strExePth + _T("T3000.log");
-
-		CTime nowtime=CTime::GetCurrentTime();
-		CString time;
-		time.Format(_T("%4d-%.2d-%.2d %.2d:%.2d:%.2d  >>"),nowtime.GetYear(), nowtime.GetMonth(), nowtime.GetDay(),     
-			nowtime.GetHour(), nowtime.GetMinute(), nowtime.GetSecond());
-		CString logstr=time+str;
-		CStdioFile* fileScanLog = new CStdioFile;
-		if (!fileScanLog->Open(t3000logfilename.GetString(),CFile::modeReadWrite | CFile::shareDenyNone ))
-		{
-			if (fileScanLog->Open(t3000logfilename.GetString(), CFile::modeCreate | CFile::modeReadWrite | CFile::shareDenyNone ))
-			{
-				fileScanLog->WriteString(logstr.GetBuffer());
-			}
-		} 
-		else
-		{
-			fileScanLog->SeekToEnd();
-			fileScanLog->WriteString(logstr.GetBuffer());
-			fileScanLog->WriteString(_T("\n"));
-		}
-		
-		fileScanLog->Flush();
-		fileScanLog->Close();
-		delete fileScanLog;
-		logfile_section.Unlock();
-	}
-	
 }
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
 {
@@ -242,14 +205,14 @@ int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short 
 	if (j>0)
 	{
 		g_strT3000LogString.Format(_T("Multi Write ID=%d,start address=%d,length=%d,Status=OK"),device_var,start_address,length,data.GetBuffer());
-		//::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+		 ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 	}
 	else
 	{
 		g_strT3000LogString.Format(_T("Multi Write ID=%d,start address=%d,length=%d,Status:Fail"),device_var,start_address,length);
-		//::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+		 ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 	}
-	 SetPaneString(3,g_strT3000LogString);
+	// SetPaneString(3,g_strT3000LogString);
 	return j;
 }
 int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length,int retry_times)
@@ -384,15 +347,15 @@ int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsig
 	 if (ret>0)
 	 {
 		 g_strT3000LogString.Format(_T("Multi Read ID=%d,start address=%d,length=%d,Status=OK"),device_var,start_address,length,data.GetBuffer());
-		// ::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+		  ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 		 
 	 }
 	 else
 	 {
 		 g_strT3000LogString.Format(_T("Multi Read ID=%d,start address=%d,length=%d,Status:Fail"),device_var,start_address,length);
-		// ::PostMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
+		  ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,3,0);
 	 }
-	 SetPaneString(3,g_strT3000LogString);
+	// SetPaneString(3,g_strT3000LogString);
 	 return ret;
 }
 
@@ -3025,6 +2988,9 @@ CString GetProductName(int ModelID)
 	case PM_MINIPANEL:
 		strProductName="MiniPanel";
 		break;
+	case PM_PRESSURE:
+		strProductName="Pressure Sensor";
+		break;
 	default:
 		strProductName="TStat";
 		break;
@@ -3488,7 +3454,8 @@ DWORD WINAPI   MSTP_Receive(LPVOID lpVoid)
 
 	uint8_t Rx_Buf[MAX_MPDU] = { 0 };
 	//while(mparent->m_MSTP_THREAD)
-	while(1)
+	  g_mstp_flag=true;
+	while(g_mstp_flag)
 	{
 		//datalink_set("bip");
 		

@@ -225,4 +225,8 @@ public:
 	CEdit m_occupied_timer;
 	afx_msg void OnEnKillfocusEditOccupiedTimer();
 	afx_msg void OnEnKillfocusEditDeadMaster();
+	CComboBox m_combox_pir_endisable;
+	CEdit m_sensitivity_editor;
+	afx_msg void OnCbnSelchangeComboEnableDis();
+	afx_msg void OnEnKillfocusEditSensitivty();
 };

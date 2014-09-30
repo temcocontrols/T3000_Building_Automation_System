@@ -56,6 +56,9 @@ public:
 	int ShowLogo();
 	JPGLoader* m_pPicLoader;
 // Implementation
+
+
+
 protected:
 	DECLARE_MESSAGE_MAP()
 		afx_msg void OnPaint();
@@ -512,6 +515,16 @@ BOOL CISPDlg::OnInitDialog()
 		
 		 SetTimer(1,200,NULL);
 	 }
+// 	 CWnd* pEditFilePath = (CWnd*)GetDlgItem(IDC_EDIT_FILEPATH);
+// 	 pEditFilePath->SetWindowText(filename);
+// 	 int ret=Judge_BinHexFile(filename);
+// 	 if (ret==0)
+// 	 {
+// 		 pEditFilePath->SetWindowText(_T(""));
+// 		 return TRUE;
+// 	 }
+// 	 m_strHexFileName=filename;
+// 	 ShowHexBinInfor(ret);
 // 	 GetDlgItem(IDC_EDIT_FILEPATH)->GetWindowText(m_strHexFileName);
 // 	 ShowHexBinInfor();
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -682,6 +695,7 @@ void CISPDlg::OnBnClickedButtonSelfile()
 		pEditFilePath->SetWindowText(_T(""));
 		return;
 	}
+	
     ShowHexBinInfor(ret);
    
   
@@ -1842,7 +1856,7 @@ void CISPDlg::ShowHexBinInfor(int hexbin){
 	{
 		if(READ_SUCCESS != Get_HexFile_Information(m_strHexFileName.GetBuffer(),temp1))
 		{
-			MessageBox(_T("The hex file dones't contains Temco logo,Can't flash into our products!"));
+			MessageBox(_T("Sorry,This firmware is an old version,Contact vendor for new firmware!"));
 			return;
 		}
 	}
@@ -1850,7 +1864,7 @@ void CISPDlg::ShowHexBinInfor(int hexbin){
 	{
 		if(READ_SUCCESS != Get_Binfile_Information(m_strHexFileName.GetBuffer(),temp1))
 		{
-			MessageBox(_T("The hex file dones't contains Temco logo,Can't flash this into your device!\r\nMake sure the hex or Bin is the newest.\r\nIf you really want to flash the old version ,please use the ISP.exe version before Rev4.6.6"));
+			MessageBox(_T("Sorry,This firmware is an old version,Contact vendor for new firmware!"));
 			return;
 		}
 	}
