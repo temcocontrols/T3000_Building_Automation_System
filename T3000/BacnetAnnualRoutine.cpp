@@ -45,6 +45,7 @@ BEGIN_MESSAGE_MAP(BacnetAnnualRoutine, CDialogEx)
 	ON_MESSAGE(WM_REFRESH_BAC_ANNUAL_LIST,Fresh_Annual_Routine_List)
 	ON_BN_CLICKED(IDC_BUTTON_ANNUAL_EDIT, &BacnetAnnualRoutine::OnBnClickedButtonAnnualEdit)
 //	ON_MESSAGE(MY_RESUME_DATA, AnnualResumeMessageCallBack)
+	ON_WM_HELPINFO()
 END_MESSAGE_MAP()
 
 
@@ -369,6 +370,10 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 			PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 			return 0;
 		}
+		if(Check_Label_Exsit(cs_temp))
+		{
+			return 0;
+		}
 
 		char cTemp1[255];
 		memset(cTemp1,0,255);
@@ -431,7 +436,7 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 void BacnetAnnualRoutine::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if(this->IsWindowVisible())
+	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 	if(bac_select_device_online)
@@ -439,7 +444,6 @@ void BacnetAnnualRoutine::OnTimer(UINT_PTR nIDEvent)
 	}
 	CDialogEx::OnTimer(nIDEvent);
 }
-
 
 void BacnetAnnualRoutine::OnBnClickedButtonAnnualEdit()
 {
@@ -467,3 +471,22 @@ void BacnetAnnualRoutine::Unreg_Hotkey()
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 }
 
+BOOL BacnetAnnualRoutine::OnHelpInfo(HELPINFO* pHelpInfo)
+{ 
+
+	if (g_protocol==PROTOCOL_BACNET_IP){
+		HWND hWnd;
+
+		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 			
+			theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+		else
+			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
+			HH_HELP_CONTEXT, IDH_TOPIC_HOLIDAY_SCHEDULES);
+		return (hWnd != NULL);
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
+
+	return CDialogEx::OnHelpInfo(pHelpInfo);
+}

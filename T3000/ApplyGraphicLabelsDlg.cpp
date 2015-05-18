@@ -83,9 +83,9 @@ BOOL ApplyGraphicLabelsDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 		
-	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+// 	m_pCon.CreateInstance(_T("ADODB.Connection"));
+// 	m_pRs.CreateInstance(_T("ADODB.Recordset"));
+// 	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 
 
 	SetWindowText(_T("Set graphic labels to the others dialog"));
@@ -202,6 +202,9 @@ void ApplyGraphicLabelsDlg::ReloadAddBuildingDB()
 	m_FlexGrid.Clear();
 	
 	//m_FlexGrid.put_ColAlignment(0,4);
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
 
 	m_FlexGrid.put_TextMatrix(0,1,_T("Serial ID"));
 	m_FlexGrid.put_ColWidth(1,1000);
@@ -219,23 +222,24 @@ void ApplyGraphicLabelsDlg::ReloadAddBuildingDB()
 
 	CString strSql;
 	strSql.Format(_T("select * from ALL_NODE where MainBuilding_Name = '%s'and Building_Name='%s'"),m_strMainBuilding,m_strSubNetName);
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);			
-	m_nTotalRecoders=m_pRs->RecordCount;
-	m_FlexGrid.put_Rows(m_pRs->RecordCount+1);	
+	//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);			
+	bado.m_pRecordset=bado.OpenRecordset(strSql);
+	m_nTotalRecoders=bado.m_pRecordset->RecordCount;
+	m_FlexGrid.put_Rows(bado.m_pRecordset->RecordCount+1);	
 	int temp_row=0;
 	CString str_temp;
 	str_temp.Empty();
 	_variant_t temp_variant;
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 	{	
-		temp_variant=m_pRs->GetCollect("Product_class_ID");//
+		temp_variant=bado.m_pRecordset->GetCollect("Product_class_ID");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
 			m_strID=_T("");
 		if(_wtoi(m_strID)==100)// not include NC
 		{
-				m_pRs->MoveNext();
+				bado.m_pRecordset->MoveNext();
 				continue;
 		}
 			
@@ -245,7 +249,7 @@ void ApplyGraphicLabelsDlg::ReloadAddBuildingDB()
 		
 		m_FlexGrid.put_TextMatrix(temp_row,0,_T("Select"));
 
-		temp_variant=m_pRs->GetCollect("Serial_ID");//
+		temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
@@ -253,14 +257,14 @@ void ApplyGraphicLabelsDlg::ReloadAddBuildingDB()
 		m_FlexGrid.put_ColAlignment(1,4);
 		m_FlexGrid.put_TextMatrix(temp_row,1,m_strID);
 	
-		temp_variant=m_pRs->GetCollect("Product_ID");//
+		temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
 			m_strID=_T("");
 		m_FlexGrid.put_ColAlignment(2,4);
 		m_FlexGrid.put_TextMatrix(temp_row,2,m_strID);
-		temp_variant=m_pRs->GetCollect("Floor_name");//
+		temp_variant=bado.m_pRecordset->GetCollect("Floor_name");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
@@ -268,7 +272,7 @@ void ApplyGraphicLabelsDlg::ReloadAddBuildingDB()
 		m_FlexGrid.put_ColAlignment(3,4);
 		m_FlexGrid.put_TextMatrix(temp_row,3,m_strID);
 
-		temp_variant=m_pRs->GetCollect("Room_name");//
+		temp_variant=bado.m_pRecordset->GetCollect("Room_name");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
@@ -276,16 +280,18 @@ void ApplyGraphicLabelsDlg::ReloadAddBuildingDB()
 		m_FlexGrid.put_ColAlignment(4,4);
 		m_FlexGrid.put_TextMatrix(temp_row,4,m_strID);
 		
-			temp_variant=m_pRs->GetCollect("Product_name");//
+			temp_variant=bado.m_pRecordset->GetCollect("Product_name");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
 			m_strID=_T("");
 		m_FlexGrid.put_ColAlignment(5,4);
 		m_FlexGrid.put_TextMatrix(temp_row,5,m_strID);
-		m_pRs->MoveNext();
+		bado.m_pRecordset->MoveNext();
 	}
-	m_pRs->Close();
+	//m_pRs->Close();
+	bado.CloseRecordset();
+	bado.CloseRecordset();
 }
 void ApplyGraphicLabelsDlg::ApplyTo()
 {
@@ -297,6 +303,10 @@ void ApplyGraphicLabelsDlg::ApplyTo()
 	}
 	else
 		return;
+	
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
 
 	CString strSelect;
 	CString strSerialID;
@@ -326,7 +336,7 @@ void ApplyGraphicLabelsDlg::ApplyTo()
 
 			CString strSql;
 			strSql.Format(_T("delete * from Screen_Label where Serial_Num=%i and Tstat_id=%i"),nSerialID,nProductID);
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 			}
 			catch(_com_error *e)
 			{
@@ -384,7 +394,7 @@ void ApplyGraphicLabelsDlg::ApplyTo()
 
 
 
-					m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+					bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
 				}
 				catch(_com_error *e)
 				{
@@ -395,6 +405,7 @@ void ApplyGraphicLabelsDlg::ApplyTo()
 
 		}
 	}
+	bado.CloseConn();
 }
 LRESULT ApplyGraphicLabelsDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {

@@ -33,4 +33,8 @@ public:
 	afx_msg void OnBnClickedRadioNetDevice();
 	afx_msg void OnBnClickedRadio2();
 	bool m_is_net_device;
+	afx_msg void OnBnClickedButtonLocalMstpDevice();
+
+// 	_ConnectionPtr				m_pCon;//for ado connection
+// 	_RecordsetPtr				m_pRs;//for ado 
 };

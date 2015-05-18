@@ -8,12 +8,16 @@ typedef struct
 {
 	int nitem;
 	CString nID;
+	CString devicename;
+	CString strSN;
 	CString ncomport;
 	CString nIPaddress;
 	CString nipport;
 	bool	b_is_sub;
 	CString file_position;
 	int	nresult;
+	CString config_file_position;
+
 }Str_flash_device;
 
 class CFlash_Multy : public CDialogEx
@@ -48,8 +52,18 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg LRESULT MultyFlashMessage(WPARAM wParam,LPARAM lParam);
 	CListBox m_multy_flash_listbox;
-
+	BOOL			m_bTstatLoadFinished;
 	afx_msg void OnNMClickListFlashMulty(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnBnClickedButtonMultySel2();
+	CEdit m_configure_edit;
+	CButton m_AllCheckBtn;
+	CString m_configure_path;
+	CString		m_strLogFilePath;
+	CString m_StrTips_old;
+	CString m_StrTips_new;
+	afx_msg void OnBnClickedAllcheck();
+ 
 };
 
 const int FLASH_ITEM = 0;
@@ -61,9 +75,11 @@ const int FLASH_IPADDRESS = 5;
 const int FLASH_IPPORT = 6;
 const int FLASH_SUB_NOTE = 7;
 const int FLASH_FILE_POSITION = 8;
-const int FLASH_RESULTS = 9;
+const int FLASH_CONFIG_FILE_POSITION = 9;
+const int FLASH_RESULTS = 10;
+const int FLASH_CONFIG_RESULTS = 11;
 
-const int FLASH_MAX_COUNT = 10;
+const int FLASH_MAX_COUNT = 12;
 
 
 

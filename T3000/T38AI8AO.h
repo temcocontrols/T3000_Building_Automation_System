@@ -44,7 +44,7 @@ public:
 	CMsflexgrid m_msflexgrid_input;
 	CMsflexgrid m_msflexgrid_output;
 	CString m_address;
-
+	HANDLE hFirstThread;
 private:
 	vector<T3Register> m_vecT3Register;
 	int	SN_LOW	;
@@ -105,6 +105,8 @@ public:
 	CEdit m_inNameEdt;
 	afx_msg void OnEnKillfocusEditName();
 	afx_msg void OnCbnSelchangeRangecombo();
+	afx_msg void OnDestroy();
+	afx_msg void OnBnClickedButtonReset();
 };
 
 

@@ -515,7 +515,7 @@ void RS485_Check_UART_Data(
 
 
 /* called by timer, interrupt(?) or other thread */
-void RS485_PTP_Check_UART_Data(
+BOOL RS485_PTP_Check_UART_Data(
 	volatile struct STR_PTP *ptp_port)
 {
 	char lpBuf[1];
@@ -536,10 +536,16 @@ void RS485_PTP_Check_UART_Data(
 		{
 			if (dwRead) {
 				ptp_port->Rx_work_byte = lpBuf[0];
+				return true;
 				//mstp_port->DataAvailable = TRUE;
 			}
+			else
+			{
+				Sleep(1);
+				return false;
+			}
 		}
-
+		return false;
 }
 
 

@@ -25,7 +25,7 @@ protected:
 	virtual void OnOK();
 public:
 	void FreshGrids();
-	void Color_Grid1();
+	 
 	void FreshGrid_PID1();
 	void FreshGrid_PID2();
 	void FreshGrid_PID3();

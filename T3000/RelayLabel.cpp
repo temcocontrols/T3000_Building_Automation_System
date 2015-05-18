@@ -7,6 +7,7 @@
 #include "globle_function.h"
 #include "global_variable_extern.h"
 #include "ado/ADO.h"
+#include "bado/BADO.h"
 
 // CRelayLabel
 
@@ -363,7 +364,8 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 	      
 		  int  m_crange=0;
 		   int m_sn=m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
-		   CADO ado;
+		   CBADO ado;
+		   ado.SetDBPath(g_strCurBuildingDatabasefilePath);
 		   ado.OnInitADOConn();
 		   if (ado.IsHaveTable(ado,_T("Value_Range")))//ÓÐVersion±í
 		   {

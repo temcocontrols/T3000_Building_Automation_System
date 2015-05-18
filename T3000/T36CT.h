@@ -36,6 +36,7 @@ public:
     CString m_oldname;
     int m_curcol;
     int m_currow;
+	HANDLE hFirstThread;
 private:
     int	SN_LOW	;
     int	SN_HI	;
@@ -127,6 +128,12 @@ public:
     //Output grid_flag=3
     afx_msg void OnEnKillfocusEditName();
     afx_msg void OnCbnSelchangeRangecombo();
+	CComboBox m_brandrateBoxbox;
+	afx_msg void OnCbnSelchangeBraudratecombo();
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	afx_msg void OnDestroy();
+	void EnterCellMsflexgridOutput();
+	afx_msg void OnBnClickedButtonReset();
 };
 
 

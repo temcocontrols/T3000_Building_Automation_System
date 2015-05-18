@@ -19,6 +19,7 @@ CRegisterWriteValueDlg::CRegisterWriteValueDlg(CWnd* pParent /*=NULL*/)
 
 CRegisterWriteValueDlg::~CRegisterWriteValueDlg()
 {
+
 }
 void CRegisterWriteValueDlg::Set(int Col,CString Type,CString Name,CString No,CString Value,CString description,CString operation){
 	m_col=Col;

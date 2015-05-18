@@ -145,6 +145,7 @@ namespace ListCtrlEx
 
 // operations
 	public:
+		void                Dont_DT_Left();
 		void				Support_Keyboard(bool b_support);
 		void                Set_Edit(bool b_edit);
 		BOOL				Get_Edit();
@@ -260,6 +261,7 @@ namespace ListCtrlEx
 		CRect			m_list_rect;
 		int				m_select_raw;
 		int				m_select_col;
+		bool            m_dt_left; //是否要左对齐;
 		bool			m_show_bk_color;//记录是否显示选中背景颜色;
 		bool			m_support_key;
 	protected:

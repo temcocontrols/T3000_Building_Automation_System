@@ -156,7 +156,6 @@ __declspec(dllexport)    void apdu_set_unconfirmed_handler(
         size_t * index,
         bool * bIsConfirmed);
 
-
     void apdu_set_error_handler(
         BACNET_CONFIRMED_SERVICE service_choice,
         error_function pFunction);

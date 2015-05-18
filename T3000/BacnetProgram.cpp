@@ -48,6 +48,7 @@ BEGIN_MESSAGE_MAP(CBacnetProgram, CDialogEx)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_PROGRAM, &CBacnetProgram::OnNMClickListProgram)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
+	ON_WM_HELPINFO()
 END_MESSAGE_MAP()
 
 
@@ -220,6 +221,12 @@ LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 			return 0;
 		}
 		cs_temp.MakeUpper();
+		if(Check_Label_Exsit(cs_temp))
+		{
+			PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0;
+		}
+
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -300,9 +307,9 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 
 
 
-	bac_program_pool_size = 26624;
+	bac_program_pool_size = 2000;
 	bac_program_size = 0;
-	bac_free_memory = 26624;
+	bac_free_memory = 2000;
 	for (int i=0;i<(int)m_Program_data.size();i++)
 	{
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
@@ -317,7 +324,6 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).description, (int)strlen((char *)m_Program_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
-
 
 		m_program_list.SetItemText(i,PROGRAM_FULL_LABLE,temp_des);
 
@@ -335,7 +341,7 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		temp_value.Format(_T("%d"),m_Program_data.at(i).bytes);
 		m_program_list.SetItemText(i,PROGRAM_SIZE_LIST,temp_value);
 
-		bac_program_size = bac_program_size + m_Program_data.at(i).bytes;
+
 
 		if(m_Program_data.at(i).com_prg==0)
 			m_program_list.SetItemText(i,PROGRAM_RUN_STATUS,_T("Normal"));
@@ -356,7 +362,7 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		}
 
 	}
-	bac_free_memory = bac_program_pool_size - bac_program_size;
+
 	copy_data_to_ptrpanel(TYPE_PROGRAM);
 	return 0;
 }
@@ -417,8 +423,12 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 			break;
 		}
 	}
-
-	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAMCODE);
+	if(bac_select_device_online)
+		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAMCODE);
+	else
+	{
+		MessageBox(_T("Device is offline,Please check connection!"));
+	}
 
 }
 
@@ -453,8 +463,6 @@ void CBacnetProgram::OnNMClickListProgram(NMHDR *pNMHDR, LRESULT *pResult)
 
 	*pResult = 0;
 }
-
-
 void CBacnetProgram::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
@@ -472,7 +480,7 @@ void CBacnetProgram::OnCancel()
 void CBacnetProgram::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if(this->IsWindowVisible())
+	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 	if(bac_select_device_online)
@@ -503,3 +511,23 @@ BOOL CBacnetProgram::PreTranslateMessage(MSG* pMsg)
 
 
 
+
+
+BOOL CBacnetProgram::OnHelpInfo(HELPINFO* pHelpInfo)
+{  
+	if (g_protocol==PROTOCOL_BACNET_IP){
+		HWND hWnd;
+
+		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 
+			theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+		else
+			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 
+			HH_HELP_CONTEXT, IDH_TOPIC_PROGRAMS);
+		return (hWnd != NULL);
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
+
+	return CDialogEx::OnHelpInfo(pHelpInfo);
+}

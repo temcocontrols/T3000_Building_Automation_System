@@ -54,6 +54,7 @@ ON_UPDATE_COMMAND_UI(ID_SETUP_EXCELLOGING, &CModbusPollView::OnUpdateSetupExcell
 ON_EN_KILLFOCUS(IDC_MODELNAME, &CModbusPollView::OnEnKillfocusModelname)
 ON_COMMAND(ID_EDIT_CHANGEMODELNAME, &CModbusPollView::OnEditChangemodelname)
 ON_COMMAND(ID_FUNCTIONS_TESTCENTER, &CModbusPollView::OnFunctionsTestcenter)
+ON_COMMAND(ID_SETUP_USEASDEFAULT, &CModbusPollView::OnSetupUseasdefault)
 END_MESSAGE_MAP()
 
  
@@ -62,25 +63,23 @@ END_MESSAGE_MAP()
 CModbusPollView::CModbusPollView()
 	: CFormView(CModbusPollView::IDD)
 {
-	  m_Slave_ID=255;
-	  m_Function=0;
-	  m_Quantity=10;
-	  m_Scan_Rate=1000;
-	  m_Rows=0;
-	  m_Display=1;
-	  m_Hide_Alias_Columns=0;
-	  m_Address_Cell=0;
-	  m_PLC_Addresses=0;
 
 	  m_Err=0;
 	  m_Tx=0;
-
-	  m_address=0;
 	  m_MBPoll_Function=3;
+	  m_Slave_ID=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("SLAVE_ID"),255,g_configfile_path);
+	  m_Function=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("FUNCTION"),0,g_configfile_path);
+	  m_address=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("ADDRESS"),0,g_configfile_path);
+	  m_Quantity=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("QUANTITY"),100,g_configfile_path);
+	  m_Scan_Rate=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("SCANRATE"),1000,g_configfile_path);
+	  m_Rows=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("ROWS"),0,g_configfile_path);
+	  m_Display=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("DATA_TYPE"),1,g_configfile_path);
+	  m_Hide_Alias_Columns=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("HIDEALIAS"),0,g_configfile_path);
+	  m_Address_Cell=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("ADDRESSINCELL"),0,g_configfile_path);
+	  m_PLC_Addresses=GetPrivateProfileInt(_T("MBPOLL_VIEW_SETTING"),_T("PLCBASE1"),0,g_configfile_path);
 
 	  m_grid_cols=m_grid_rows=1;
 	  m_Current_Col=m_Current_Row=1;
-	   
 	  m_ischangedAddress=TRUE;
 
 		    m_close_dlg=FALSE;
@@ -94,6 +93,10 @@ CModbusPollView::CModbusPollView()
 
 
 			m_ischangeModelName=FALSE;
+
+
+			m_apply=TRUE;
+			m_wronce=FALSE;
 }
 
 CModbusPollView::~CModbusPollView()
@@ -140,6 +143,7 @@ BOOL CModbusPollView::PreCreateWindow(CREATESTRUCT& cs)
 BEGIN_EVENTSINK_MAP(CModbusPollView, CFormView)
 	ON_EVENT(CModbusPollView, IDC_MSFLEXGRID1, DISPID_DBLCLICK, CModbusPollView::DBClickMsflexgridDataGrid, VTS_NONE)
 	ON_EVENT(CModbusPollView, IDC_MSFLEXGRID1, DISPID_CLICK, CModbusPollView::ClickMsflexgridDataGrid, VTS_NONE)
+//	ON_EVENT(CModbusPollView, IDC_MSFLEXGRID1, DISPID_MOUSEMOVE, CModbusPollView::MouseMoveMsflexgrid1, VTS_I2 VTS_I2 VTS_I4 VTS_I4)
 END_EVENTSINK_MAP()
 void CModbusPollView::OnInitialUpdate()
 {
@@ -286,7 +290,7 @@ void CModbusPollView::Fresh_Data(){
 		-4:time out error
 		-5:crc error
 		*/
-
+		SetPaneString(1,g_StrConnection);
 	if (!g_online)
 	{
 		m_connectionState.SetWindowText(L"NO CONNECTION");
@@ -341,9 +345,9 @@ void CModbusPollView::Fresh_Data(){
 		{
               m_connectionState.SetWindowText(L"Connected");
 			  m_connectionState.SetStringFontSize(12);
-			  COLORREF cf=RGB(255,0,0);
+			  COLORREF cf=RGB(100,100,0);
 			  m_connectionState.SetStringColor(cf);
-			  SetPaneString(1,L"Connected");
+			  //SetPaneString(1,L"Connected");
 		}
 		
 // 		m_connectionState.SetStringFontSize(14);
@@ -549,16 +553,19 @@ void CModbusPollView::Fresh_Data(){
 		m_MsDataGrid.put_TextMatrix(row,0,index);
 		row++;
 	}
-	
-
+	//把索引隐藏掉
+	m_MsDataGrid.put_ColWidth(0,0);
+	//这里主要是不要显示index行，如果要显示的话，就要把这行屏蔽掉，就可以了
+	//Modbus Poll的
 	if (m_Hide_Alias_Columns!=0)
 	{
 		 //初始化第0行
 		for (int i=1;i<m_MsDataGrid.get_Cols();i++)
 		{
-		index.Format(_T("%d"),m_address+(i-1)*(m_MsDataGrid.get_Rows()-1));
-		m_MsDataGrid.put_TextMatrix(0,i,index);
+			index.Format(_T("%d"),m_address+(i-1)*(m_MsDataGrid.get_Rows()-1));
+			m_MsDataGrid.put_TextMatrix(0,i,index);
 		}
+		
 // 			for (int j=1;j<m_MsDataGrid.get_Cols();j++)
 // 			{
 // 				for (int i=1;i<m_MsDataGrid.get_Rows();i++)
@@ -636,7 +643,7 @@ void CModbusPollView::Fresh_Data(){
 					 //初始化第0行
 					 if((i%3)==1)
 					 {
-						 index=L"Alias";
+						 index=L"Description";
 						 m_MsDataGrid.put_TextMatrix(0,i,index);
 					 } 
 					else if ((i%3)==2)
@@ -1019,7 +1026,7 @@ void CModbusPollView::OnSize(UINT nType, int cx, int cy)
 		// m_MsDataGrid.SetWindowPos(this,ViewRect.top,ViewRect.left,ViewRect.Width(),ViewRect.Height(),SWP_SHOWWINDOW|SWP_NOZORDER);
 		 if (m_MsDataGrid.GetSafeHwnd())
 		 {
-		 m_MsDataGrid.MoveWindow(CRect(0,60,ViewRect.Width(),ViewRect.Height()),TRUE);
+		     m_MsDataGrid.MoveWindow(CRect(0,60,ViewRect.Width(),ViewRect.Height()),TRUE);
 		 }
 		
 	 }
@@ -1290,6 +1297,7 @@ void CModbusPollView::ClickMsflexgridDataGrid(){
 	//转换成相对对话框的坐标
 	rcCell.OffsetRect(rect.left+1,rect.top+1);
 	ReleaseDC(pDC);
+
 	CString strValue = m_MsDataGrid.get_TextMatrix(lRow,lCol);
 
 	m_Current_Col=lCol;
@@ -1317,12 +1325,12 @@ void CModbusPollView::ClickMsflexgridDataGrid(){
 
 	if (Show_Name)
 	{
-		m_edit_name.ShowWindow(SW_SHOW);	
-		m_edit_name.SetWindowText(strValue);
-		m_edit_name.MoveWindow(rcCell); //移动到选中格的位置，覆盖
-		m_edit_name.BringWindowToTop();
-		m_edit_name.SetFocus(); //获取焦点
-
+// 		m_edit_name.ShowWindow(SW_SHOW);	
+// 		m_edit_name.SetWindowText(strValue);
+// 		m_edit_name.MoveWindow(rcCell); //移动到选中格的位置，覆盖
+// 		m_edit_name.BringWindowToTop();
+// 		m_edit_name.SetFocus(); //获取焦点
+    
 	} 
 
 	   //          m_MsDataGrid.put_Row(lRow);
@@ -1697,7 +1705,6 @@ void CModbusPollView::Initial_RegName(){
 		ado.m_pRecordset=ado.OpenRecordset(sql);
 		if (!ado.m_pRecordset->EndOfFile)
 		{
-
 			temp_var=ado.m_pRecordset->GetCollect(_T("TableName"));
 			if (temp_var.vt!=VT_NULL)
 			{
@@ -1960,7 +1967,21 @@ void CModbusPollView::OnEnKillfocusEditName()
 	} 
 	else
 	{
-
+	   SqlText.Format(_T("Select * from %s where %s=%d"),m_cur_TableName,m_cur_col_RegAddress,RegAddress);
+	   ado.m_pRecordset=ado.OpenRecordset(SqlText);
+	   if (!ado.m_pRecordset->EndOfFile)
+	   {
+	     SqlText.Format(_T("update %s set %s ='%s' where %s =%d "),m_cur_TableName,m_cur_Col_RegName,strText.GetBuffer(),m_cur_col_RegAddress,RegAddress);
+		 try
+		 {
+		 ado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
+		 }
+		 catch (_com_error *e)
+		 {
+		 	AfxMessageBox(e->ErrorMessage());
+		 }
+		 
+	   }
 	}
 
 }
@@ -1974,4 +1995,61 @@ void CModbusPollView::OnEditChangemodelname()
 void CModbusPollView::OnFunctionsTestcenter()
 {
 	 
+}
+
+
+// void CModbusPollView::MouseMoveMsflexgrid1(short Button, short Shift, long x, long y)
+// {
+// 	long lRow,lCol;
+// 	lRow = m_MsDataGrid.get_RowSel();//获取点击的行号	
+// 	lCol = m_MsDataGrid.get_ColSel(); //获取点击的列号
+// 	TRACE(_T("lRow=%d,lCol=%d\n"),lRow,lCol);
+// 
+// 	CRect rect;
+// 	m_MsDataGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+// 	ScreenToClient(rect); //转换为客户区矩形	
+// 	CDC* pDC =GetDC();
+// 
+// 	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
+// 	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+// 	//计算选中格的左上角的坐标(象素为单位)
+// //	long y = m_MsDataGrid.get_RowPos(lRow)/nTwipsPerDotY;
+// 	//long x = m_MsDataGrid.get_ColPos(lCol)/nTwipsPerDotX;
+// 	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+// 	//long width = m_MsDataGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
+// //	long height = m_MsDataGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+// 	//形成选中个所在的矩形区域
+// //	CRect rcCell(x,y,x+width,y+height);
+// 	//转换成相对对话框的坐标
+// //	rcCell.OffsetRect(rect.left+1,rect.top+1);
+// //	ReleaseDC(pDC);
+// 
+// 	CString strValue = m_MsDataGrid.get_TextMatrix(lRow,lCol);
+// }
+
+
+void CModbusPollView::OnSetupUseasdefault()
+{
+
+	CString StrTemp;
+	StrTemp.Format(_T("%d"),m_Slave_ID);
+	WritePrivateProfileStringW(_T("MBPOLL_VIEW_SETTING"),_T("SLAVE_ID"),StrTemp,g_configfile_path);
+	StrTemp.Format(_T("%d"),m_Function);
+	WritePrivateProfileStringW(_T("MBPOLL_VIEW_SETTING"),_T("FUNCTION"),StrTemp,g_configfile_path);
+	StrTemp.Format(_T("%d"),m_address);
+	WritePrivateProfileStringW(_T("MBPOLL_VIEW_SETTING"),_T("ADDRESS"),StrTemp,g_configfile_path);
+	StrTemp.Format(_T("%d"),m_Quantity);
+	WritePrivateProfileStringW(_T("MBPOLL_VIEW_SETTING"),_T("QUANTITY"),StrTemp,g_configfile_path);
+	StrTemp.Format(_T("%d"),m_Scan_Rate);
+	WritePrivateProfileStringW(_T("MBPOLL_VIEW_SETTING"),_T("SCANRATE"),StrTemp,g_configfile_path);
+	StrTemp.Format(_T("%d"),m_Rows);
+	WritePrivateProfileStringW(_T("MBPOLL_VIEW_SETTING"),_T("ROWS"),StrTemp,g_configfile_path);
+	StrTemp.Format(_T("%d"),m_Display);
+	WritePrivateProfileStringW(_T("MBPOLL_VIEW_SETTING"),_T("DATA_TYPE"),StrTemp,g_configfile_path);
+	StrTemp.Format(_T("%d"),m_Hide_Alias_Columns);
+	WritePrivateProfileStringW(_T("MBPOLL_VIEW_SETTING"),_T("HIDEALIAS"),StrTemp,g_configfile_path);
+	StrTemp.Format(_T("%d"),m_Address_Cell);
+	WritePrivateProfileStringW(_T("MBPOLL_VIEW_SETTING"),_T("ADDRESSINCELL"),StrTemp,g_configfile_path);
+	StrTemp.Format(_T("%d"),m_PLC_Addresses);
+	WritePrivateProfileStringW(_T("MBPOLL_VIEW_SETTING"),_T("PLCBASE1"),StrTemp,g_configfile_path);
 }

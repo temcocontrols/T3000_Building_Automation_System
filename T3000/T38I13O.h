@@ -13,7 +13,7 @@ class T38I13O : public CFormView
 public:
 	T38I13O();           // protected constructor used by dynamic creation
 	virtual ~T38I13O();
-	HANDLE m_threadT38I13o;
+	 
 public:
 	enum { IDD = IDD_T38I13O };
 #ifdef _DEBUG
@@ -39,6 +39,7 @@ public:
 	int m_currow;
 	int m_sn;
 	CString m_oldname;
+	HANDLE hFirstThread;
 public:
 	    int	SN_LOW											 ;
 		int	SN_HI											 ;
@@ -195,6 +196,7 @@ public:
 	afx_msg void OnDestroy();
 //	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	afx_msg void OnBnClickedButtonReset();
 };
 
 

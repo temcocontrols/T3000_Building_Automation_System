@@ -88,7 +88,7 @@ public:
 	unsigned short LightCregister[512];
 	BOOL prodtopcData();//采集数据
 	BOOL checkDB(CString DBname,CString strSQL);//决定是否创建数据库
-	BOOL ReadDB();//读取数据库数据
+	 
 	BOOL UpdateDBALL();
 	BOOL UpdateDBPART(int startnum,int endnum,WORD*savedata);
 
@@ -134,9 +134,9 @@ public:
 	 //存放输出名称Status
 	 vector<ONS>m_vecONS;
 	 ONS m_structONS;
- 	 void ReadDB_OutNameStatus();
+  
 
-	 void SaveDB_OutNameStatus();
+ 
 
 
 

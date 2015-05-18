@@ -7,7 +7,7 @@
 #include "GridButton.h"
 #include "TStatScanner.h"
 #include "MainFrm.h"
- 
+#include "bado/BADO.h"
 #define STATUS_FAILED 0xFFFF 
 #define DEF_PACKET_SIZE    32
 #define DEF_PACKET_NUMBER  4    /* 发送数据报的个数 */
@@ -67,6 +67,7 @@ BEGIN_MESSAGE_MAP(CScanDlg, CDialog)
 
 	ON_WM_CLOSE()
 	ON_EN_KILLFOCUS(IDC_EDIT_GRIDEDIT, &CScanDlg::OnEnKillfocusEditGridedit)
+
 END_MESSAGE_MAP()
 
 
@@ -80,6 +81,7 @@ void CScanDlg::OnBnClickedButtonExit()
 	Release();
 	CDialog::OnOK();
 }
+//CString &StrIP,CString &StrMask,CString &StrGetway
 void CScanDlg::GetIPMaskGetWay(CString &StrIP,CString &StrMask,CString &StrGetway){
 	PIP_ADAPTER_INFO pAdapterInfo; 
 	PIP_ADAPTER_INFO pAdapter = NULL; 
@@ -87,7 +89,7 @@ void CScanDlg::GetIPMaskGetWay(CString &StrIP,CString &StrMask,CString &StrGetwa
 	ULONG ulOutBufLen; 
 	pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO)); 
 	ulOutBufLen = sizeof(IP_ADAPTER_INFO); 
-
+	 ;
 	// 第一次调用GetAdapterInfo获取ulOutBufLen大小 
 	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
 	{ 
@@ -99,30 +101,122 @@ void CScanDlg::GetIPMaskGetWay(CString &StrIP,CString &StrMask,CString &StrGetwa
 		pAdapter = pAdapterInfo; 
 		while (pAdapter) 
 		{ 
-		if(pAdapter->Type == 6)
-		{
-			MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
-			StrIP.GetBuffer(MAX_PATH), MAX_PATH );
-			StrIP.ReleaseBuffer();
+			 if(pAdapter->Type == MIB_IF_TYPE_ETHERNET){
+			 				MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
+			 					StrIP.GetBuffer(MAX_PATH), MAX_PATH );
+			 					StrIP.ReleaseBuffer();
+			 				//StrIP.Format(_T("%s"),pAdapter->IpAddressList.IpAddress.String); 
+			 				MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1, 
+			 					StrMask.GetBuffer(MAX_PATH), MAX_PATH );
+			 					StrMask.ReleaseBuffer();
+			 
+			 				//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
+			 
+			 				MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
+			 					StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
+			 					StrGetway.ReleaseBuffer();
+			 				if (StrMask.CompareNoCase(_T("0.0.0.0"))!=0)
+			 				{
+			 					break;
+			 				}
+						}
+		else if (pAdapter->Type == IF_TYPE_IEEE80211){
+							MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
+							StrIP.GetBuffer(MAX_PATH), MAX_PATH );
+							StrIP.ReleaseBuffer();
 			//StrIP.Format(_T("%s"),pAdapter->IpAddressList.IpAddress.String); 
-			MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1, 
-				StrMask.GetBuffer(MAX_PATH), MAX_PATH );
-			StrMask.ReleaseBuffer();
+							MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1, 
+							StrMask.GetBuffer(MAX_PATH), MAX_PATH );
+							StrMask.ReleaseBuffer();
 
 			//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
 
-			MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
-				StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
-			StrGetway.ReleaseBuffer();
-		}
-			
-		/*StrGetway.Format(_T("%s"), pAdapter->GatewayList.IpAddress.String); */
+							MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
+							StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
+							StrGetway.ReleaseBuffer();
+			 				if (StrMask.CompareNoCase(_T("0.0.0.0"))!=0)
+			 				{
+			 					break;
+			 				}
+					}
+
+			/*StrGetway.Format(_T("%s"), pAdapter->GatewayList.IpAddress.String); */
+						pAdapter = pAdapter->Next; 
+		} 
+	} 
+	else 
+	{ 
+
+	} 
+}
+
+
+void CScanDlg::GetIPMaskGetWay(vector<ALL_LOCAL_SUBNET_NODE>& Vector_Subnet){
+	PIP_ADAPTER_INFO pAdapterInfo; 
+	PIP_ADAPTER_INFO pAdapter = NULL; 
+	DWORD dwRetVal = 0; 
+	ULONG ulOutBufLen; 
+	pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO)); 
+	ulOutBufLen = sizeof(IP_ADAPTER_INFO); 
+	ALL_LOCAL_SUBNET_NODE  Temp_Node;
+	// 第一次调用GetAdapterInfo获取ulOutBufLen大小 
+	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
+	{ 
+		free(pAdapterInfo); 
+		pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen); 
+	} 
+
+	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) == NO_ERROR) { 
+		pAdapter = pAdapterInfo; 
+		while (pAdapter) 
+		{ 
+// 			if(pAdapter->Type == MIB_IF_TYPE_ETHERNET)
+// 			{
+// 				MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
+// 					StrIP.GetBuffer(MAX_PATH), MAX_PATH );
+// 				StrIP.ReleaseBuffer();
+// 				//StrIP.Format(_T("%s"),pAdapter->IpAddressList.IpAddress.String); 
+// 				MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1, 
+// 					StrMask.GetBuffer(MAX_PATH), MAX_PATH );
+// 				StrMask.ReleaseBuffer();
+// 
+// 				//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
+// 
+// 				MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
+// 					StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
+// 				StrGetway.ReleaseBuffer();
+// 				if (StrMask.CompareNoCase(_T("0.0.0.0"))!=0)
+// 				{
+// 					break;
+// 				}
+// 
+// 			}
+// 			else if (pAdapter->Type == IF_TYPE_IEEE80211)
+// 			{
+				MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
+					Temp_Node.StrIP.GetBuffer(MAX_PATH), MAX_PATH );
+				    Temp_Node.StrIP.ReleaseBuffer();
+				//StrIP.Format(_T("%s"),pAdapter->IpAddressList.IpAddress.String); 
+				MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1, 
+					Temp_Node.StrMask.GetBuffer(MAX_PATH), MAX_PATH );
+				    Temp_Node.StrMask.ReleaseBuffer();
+
+				//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
+
+				MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
+					Temp_Node.StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
+				    Temp_Node.StrGetway.ReleaseBuffer();
+
+				    Temp_Node.NetworkCardType=pAdapter->Type;
+ 
+	           Vector_Subnet.push_back(Temp_Node);
+			/*StrGetway.Format(_T("%s"), pAdapter->GatewayList.IpAddress.String); */
 			pAdapter = pAdapter->Next; 
 		} 
 	} 
 	else 
 	{ 
-		 
+
 	} 
 }
 BOOL CScanDlg::OnInitDialog()
@@ -158,7 +252,7 @@ BOOL CScanDlg::OnInitDialog()
 		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_SERIALID,strSerailID);
 		
 		 		 
-		 		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_COMPORT,m_net_product_node.BuildingInfo.strIpPort); 
+		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_COMPORT,m_net_product_node.BuildingInfo.strIpPort); 
 
 // 		CString strBuilding =m_net_product_node.BuildingInfo.strBuildingName;		
 // 		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_BUILDING,strBuilding); 
@@ -198,14 +292,35 @@ BOOL CScanDlg::OnInitDialog()
 
 
 
-
 	return TRUE;
 }
+
 BOOL CScanDlg::GetNewIP(CString &newIP){
 	USES_CONVERSION;
 	IN_ADDR sa;
 	//----------------------
-	LPCSTR szIP=W2A(m_strlocalipaddress);
+	for (int i=0;i<allsubnets.size();i++)
+	{
+// 		szIP=W2A(allsubnets[i].StrIP);
+// 		dwIP=inet_addr(szIP);
+// 		sa.S_un.S_addr=dwIP;
+// 
+// 		if ( ia.S_un.S_un_b.s_b1 == sa.S_un.S_un_b.s_b1 &&
+// 			ia.S_un.S_un_b.s_b2 == sa.S_un.S_un_b.s_b2 &&
+// 			ia.S_un.S_un_b.s_b3 == sa.S_un.S_un_b.s_b3 
+// 			)
+// 		{
+// 			ret=TRUE;
+// 			break;
+// 		}
+//         if((allsubnets[i].NetworkCardType!=)&&(allsubnets[i].StrIP.Find(_T("0.0."))==-1))
+//         {
+//         }
+        
+	}
+
+
+	 LPCSTR szIP=W2A(m_strlocalipaddress);
 	 DWORD dwIP=inet_addr(szIP);
 	
 	sa.S_un.S_addr=dwIP;
@@ -226,153 +341,224 @@ BOOL CScanDlg::GetNewIP(CString &newIP){
 	}
 	return FALSE;
 }
-BOOL CScanDlg::TestPing(const CString& strIP)
-{		
-	USES_CONVERSION;   
-	LPSTR szIP=W2A(strIP); 
-	WSADATA wsaData; 
-	SOCKET sockRaw; 
-	struct sockaddr_in dest,from; 
-	struct hostent * hp; 
-	int bread,datasize,times; 
-	int fromlen = sizeof(from); 
-	int timeout = 300;
-	int statistic = 0;  /* 用于统计结果 */  
-	char *dest_ip; 
-	char *icmp_data; 
-	char *recvbuf; 
-	unsigned int addr=0; 
-	USHORT seq_no = 0; 
-	if (WSAStartup(MAKEWORD(2,1),&wsaData) != 0)
-	{  
-		return FALSE;
-	} 
+
+BOOL CScanDlg::GetNewIP(CString &newIP,CString BaseIP){
+	USES_CONVERSION;
+	IN_ADDR sa;
  
 
-	sockRaw = WSASocket(AF_INET,SOCK_RAW,IPPROTO_ICMP,NULL, 0,WSA_FLAG_OVERLAPPED);
-	//
-	//注：为了使用发送接收超时设置(即设置SO_RCVTIMEO, SO_SNDTIMEO)，
-	//    必须将标志位设为WSA_FLAG_OVERLAPPED !
-	// 
-	if (sockRaw == INVALID_SOCKET) 
-	{  
-		return FALSE;
-	} 
-	bread = setsockopt(sockRaw,SOL_SOCKET,SO_RCVTIMEO,(char*)&timeout, sizeof(timeout)); 
-	
-	if(bread == SOCKET_ERROR) 
-	{ 
-		//ExitProcess(STATUS_FAILED); 
-		return FALSE;
-	} 
-	
-	bread = setsockopt(sockRaw,SOL_SOCKET,SO_SNDTIMEO,(char*)&timeout, sizeof(timeout)); 
-	if(bread == SOCKET_ERROR) 
-	{ 
-		return FALSE;
-	} 
-memset(&dest,0,sizeof(dest)); 
-	hp = gethostbyname(szIP); 
-	if (!hp)
-	{ 
-		addr = inet_addr(szIP); 
-	} 
-	if ((!hp) && (addr == INADDR_NONE) ) 
-	{ 
-		return FALSE;
-	} 
 
-	if (hp != NULL) 
-		memcpy(&(dest.sin_addr),hp->h_addr,hp->h_length); 
-	else 
-		dest.sin_addr.s_addr = addr; 
-	if (hp) 
-		dest.sin_family = hp->h_addrtype; 
-	else 
-		dest.sin_family = AF_INET; 
-	dest_ip = inet_ntoa(dest.sin_addr); 
-		times=DEF_PACKET_NUMBER;
-		datasize = DEF_PACKET_SIZE; 
+	LPCSTR szIP=W2A(BaseIP);
+	DWORD dwIP=inet_addr(szIP);
 
-	datasize += sizeof(IcmpHeader); 
-	icmp_data = (char*)xmalloc(MAX_PACKET); 
-	recvbuf = (char*)xmalloc(MAX_PACKET); 
-	if (!icmp_data) 
-	{ 
-		return FALSE;
-	} 
+	sa.S_un.S_addr=dwIP;
 
-	memset(icmp_data,0,MAX_PACKET); 
- 
-	FillIcmpData(icmp_data,datasize);
-	
-	
-	
-		int bwrote; 
-		((IcmpHeader*)icmp_data)->i_cksum = 0; 
-		((IcmpHeader*)icmp_data)->timestamp = GetTickCount(); 
-		((IcmpHeader*)icmp_data)->i_seq = seq_no++; 
-		((IcmpHeader*)icmp_data)->i_cksum = Checksum((USHORT*)icmp_data,datasize);
-		bwrote = sendto(sockRaw,icmp_data,datasize,0,(struct sockaddr*)&dest,sizeof(dest)); 
-		if (bwrote == SOCKET_ERROR)
-		{ 
-			if (WSAGetLastError() == WSAETIMEDOUT) 
-			{ 
-				//printf("Request timed out.\n"); 
-				CString str;
-				str.Format(_T("Request timed out.\n"));
-				//SendEchoMessage(str);
-				 
-			} 
-			//fprintf(stderr,"sendto failed: %d\n",WSAGetLastError()); 
-			//ExitProcess(STATUS_FAILED); 
-			CString str;
-			str.Format(_T("sendto failed: %d\n"),WSAGetLastError());
-			//SendEchoMessage(str);
-			return FALSE;
-		} 
 
-		if (bwrote < datasize ) 
-		{ 
-			//fprintf(stdout,"Wrote %d bytes\n",bwrote);
-			CString str;
-			str.Format(_T("Wrote %d bytes\n"),bwrote);
-			//SendEchoMessage(str);
-		} 
+	for (int i=2;i<255;i++)
+	{
+		CString anewip;
+		anewip.Format(_T("%d.%d.%d.%d"), sa.S_un.S_un_b.s_b1,sa.S_un.S_un_b.s_b2,sa.S_un.S_un_b.s_b3,i);
 
-		bread = recvfrom(sockRaw,recvbuf,MAX_PACKET,0,(struct sockaddr*)&from,&fromlen); 
-		if (bread == SOCKET_ERROR)
-		{ 
-			if (WSAGetLastError() == WSAETIMEDOUT) 
-			{ 
-				//printf("Request timed out.\n"); 
-				CString str;
-				str.Format(_T("Request timed out.\n"));
-				//SendEchoMessage(str);
-				 
-			} 
-
-			//fprintf(stderr,"recvfrom failed: %d\n",WSAGetLastError()); 
-			//ExitProcess(STATUS_FAILED); 
-			CString str;
-			str.Format(_T("recvfrom failed: %d\n"),WSAGetLastError());
-			//SendEchoMessage(str);
-			return FALSE;
-		} 
-
-		if(!DecodeResp(recvbuf,bread,&from))
+		if (!TestPing(anewip))
 		{
-			xfree(icmp_data);
-			xfree(recvbuf);
-			WSACleanup();
+			newIP=anewip;
 			return TRUE;
 		}
-		
-	
-	xfree(icmp_data);
-	xfree(recvbuf);
-	WSACleanup();
-	return 0; 
+
+
+	}
+	return FALSE;
+}
+
+#include "ping.h"
+BOOL CScanDlg::TestPing(const CString& strIP)
+{	
+ #ifdef CPING_USE_ICMP
+CPing p1;
+CPingReply pr1;
+if (p1.Ping1((LPCTSTR)strIP, pr1))
+{
+// 	hostent* phostent = gethostbyaddr((char *)&pr1.Address.S_un.S_addr, 4, PF_INET);
+// 	printf("%d.%d.%d.%d [%s], replied in RTT:%dms\n", 
+// 		pr1.Address.S_un.S_un_b.s_b1, pr1.Address.S_un.S_un_b.s_b2, pr1.Address.S_un.S_un_b.s_b3, 
+// 		pr1.Address.S_un.S_un_b.s_b4, phostent->h_name, pr1.RTT);
+return TRUE;
+}
+else
+{
+ return FALSE;
+}
+#endif	
+
+
+// #ifdef CPING_USE_WINSOCK2
+// {
+// 	CPing p2;
+// 	CPingReply pr2;
+// 	if (p2.Ping2((LPCTSTR)strIP, pr2))
+// 	{
+// // 		hostent* phostent = gethostbyaddr((char *)&pr2.Address.S_un.S_addr, 4, PF_INET);
+// 		printf("%d.%d.%d.%d [%s], replied in RTT:%dms\n", 
+// 			pr2.Address.S_un.S_un_b.s_b1, pr2.Address.S_un.S_un_b.s_b2, pr2.Address.S_un.S_un_b.s_b3, 
+// 			pr2.Address.S_un.S_un_b.s_b4, phostent->h_name, pr2.RTT);
+// return TRUE;
+// 	}
+// 	else
+// 		 return FALSE;
+// }
+// #end
+
+// 	USES_CONVERSION;   
+// 	LPSTR szIP=W2A(strIP); 
+// 	WSADATA wsaData; 
+// 	SOCKET sockRaw; 
+// 	struct sockaddr_in dest,from; 
+// 	struct hostent * hp; 
+// 	int bread,datasize,times; 
+// 	int fromlen = sizeof(from); 
+// 	int timeout = 300;
+// 	int statistic = 0;  /* 用于统计结果 */  
+// 	char *dest_ip; 
+// 	char *icmp_data; 
+// 	char *recvbuf; 
+// 	unsigned int addr=0; 
+// 	USHORT seq_no = 0; 
+// 	if (WSAStartup(MAKEWORD(2,1),&wsaData) != 0)
+// 	{  
+// 		return FALSE;
+// 	} 
+//  
+// 
+// 	sockRaw = WSASocket(AF_INET,SOCK_RAW,IPPROTO_ICMP,NULL, 0,WSA_FLAG_OVERLAPPED);
+// 	//
+// 	//注：为了使用发送接收超时设置(即设置SO_RCVTIMEO, SO_SNDTIMEO)，
+// 	//    必须将标志位设为WSA_FLAG_OVERLAPPED !
+// 	// 
+// 	if (sockRaw == INVALID_SOCKET) 
+// 	{  
+// 		return FALSE;
+// 	} 
+// 	BOOL bDontLinger = FALSE;
+// 	setsockopt(sockRaw,SOL_SOCKET,SO_DONTLINGER,(const char* )&bDontLinger, sizeof( BOOL ) );
+// 	bread = setsockopt(sockRaw,SOL_SOCKET,SO_RCVTIMEO,(char*)&timeout, sizeof(timeout)); 
+// 	
+// 	if(bread == SOCKET_ERROR) 
+// 	{ 
+// 		//ExitProcess(STATUS_FAILED); 
+// 		return FALSE;
+// 	} 
+// 	
+// 
+// 	 bDontLinger = FALSE;
+// 	        setsockopt(sockRaw,SOL_SOCKET,SO_DONTLINGER,(const char* )&bDontLinger, sizeof( BOOL ) );
+// 
+// 	bread = setsockopt(sockRaw,SOL_SOCKET,SO_SNDTIMEO,(char*)&timeout, sizeof(timeout)); 
+// 	if(bread == SOCKET_ERROR) 
+// 	{ 
+// 		return FALSE;
+// 	} 
+// memset(&dest,0,sizeof(dest)); 
+// 	hp = gethostbyname(szIP); 
+// 	if (!hp)
+// 	{ 
+// 		addr = inet_addr(szIP); 
+// 	} 
+// 	if ((!hp) && (addr == INADDR_NONE) ) 
+// 	{ 
+// 		return FALSE;
+// 	} 
+// 
+// 	if (hp != NULL) 
+// 		memcpy(&(dest.sin_addr),hp->h_addr,hp->h_length); 
+// 	else 
+// 		dest.sin_addr.s_addr = addr; 
+// 	if (hp) 
+// 		dest.sin_family = hp->h_addrtype; 
+// 	else 
+// 		dest.sin_family = AF_INET; 
+// 	dest_ip = inet_ntoa(dest.sin_addr); 
+// 		times=DEF_PACKET_NUMBER;
+// 		datasize = DEF_PACKET_SIZE; 
+// 
+// 	datasize += sizeof(IcmpHeader); 
+// 	icmp_data = (char*)xmalloc(MAX_PACKET); 
+// 	recvbuf = (char*)xmalloc(MAX_PACKET); 
+// 	if (!icmp_data) 
+// 	{ 
+// 		return FALSE;
+// 	} 
+// 
+// 	memset(icmp_data,0,MAX_PACKET); 
+//  
+// 	FillIcmpData(icmp_data,datasize);
+// 	
+// 	
+// 	
+// 		int bwrote; 
+// 		((IcmpHeader*)icmp_data)->i_cksum = 0; 
+// 		((IcmpHeader*)icmp_data)->timestamp = GetTickCount(); 
+// 		((IcmpHeader*)icmp_data)->i_seq = seq_no++; 
+// 		((IcmpHeader*)icmp_data)->i_cksum = Checksum((USHORT*)icmp_data,datasize);
+// 		bwrote = sendto(sockRaw,icmp_data,datasize,0,(struct sockaddr*)&dest,sizeof(dest)); 
+// 		if (bwrote == SOCKET_ERROR)
+// 		{ 
+// 			if (WSAGetLastError() == WSAETIMEDOUT) 
+// 			{ 
+// 				//printf("Request timed out.\n"); 
+// 				CString str;
+// 				str.Format(_T("Request timed out.\n"));
+// 				//SendEchoMessage(str);
+// 				 
+// 			} 
+// 			//fprintf(stderr,"sendto failed: %d\n",WSAGetLastError()); 
+// 			//ExitProcess(STATUS_FAILED); 
+// 			CString str;
+// 			str.Format(_T("sendto failed: %d\n"),WSAGetLastError());
+// 			//SendEchoMessage(str);
+// 			return FALSE;
+// 		} 
+// 
+// 		if (bwrote < datasize ) 
+// 		{ 
+// 			//fprintf(stdout,"Wrote %d bytes\n",bwrote);
+// 			CString str;
+// 			str.Format(_T("Wrote %d bytes\n"),bwrote);
+// 			//SendEchoMessage(str);
+// 		} 
+// 
+// 		bread = recvfrom(sockRaw,recvbuf,MAX_PACKET,0,(struct sockaddr*)&from,&fromlen); 
+// 		if (bread == SOCKET_ERROR)
+// 		{ 
+// 			if (WSAGetLastError() == WSAETIMEDOUT) 
+// 			{ 
+// 				//printf("Request timed out.\n"); 
+// 				CString str;
+// 				str.Format(_T("Request timed out.\n"));
+// 				//SendEchoMessage(str);
+// 				 
+// 			} 
+// 
+// 			//fprintf(stderr,"recvfrom failed: %d\n",WSAGetLastError()); 
+// 			//ExitProcess(STATUS_FAILED); 
+// 			CString str;
+// 			str.Format(_T("recvfrom failed: %d\n"),WSAGetLastError());
+// 			//SendEchoMessage(str);
+// 			return FALSE;
+// 		} 
+// 
+// 		if(!DecodeResp(recvbuf,bread,&from))
+// 		{
+// 			xfree(icmp_data);
+// 			xfree(recvbuf);
+// 			WSACleanup();
+// 			return TRUE;
+// 		}
+// 		
+// 	
+// 		xfree(icmp_data);
+// 		xfree(recvbuf);
+// 		WSACleanup();
+// 	return 0; 
 }
 
 int CScanDlg::DecodeResp(char *buf, int bytes,struct sockaddr_in *from)
@@ -457,38 +643,394 @@ void CScanDlg::FillIcmpData(char * icmp_data, int datasize)
 	memset(datapart, 'E', datasize - sizeof(IcmpHeader)); 
 } 
 BOOL CScanDlg::CheckTheSameSubnet(CString strIP){
-GetIPMaskGetWay(m_strlocalipaddress,m_strlocalsubnet,m_strlocalgateway);
+    BOOL ret=FALSE;
 	USES_CONVERSION;
 	LPCSTR szIP = W2A(strIP);
 	DWORD dwIP = inet_addr(szIP);
 	IN_ADDR ia,sa;
 	ia.S_un.S_addr = dwIP;
-	//----------------------
-	szIP=W2A(m_strlocalipaddress);
-	 dwIP=inet_addr(szIP);
-	sa.S_un.S_addr=dwIP;
- 
 
-	// 是否是同一子网
-	if ( ia.S_un.S_un_b.s_b1 == sa.S_un.S_un_b.s_b1 &&
-		ia.S_un.S_un_b.s_b2 == sa.S_un.S_un_b.s_b2 &&
-		ia.S_un.S_un_b.s_b3 == sa.S_un.S_un_b.s_b3 
-		)
+	allsubnets.clear();
+	GetIPMaskGetWay(allsubnets);
+	for (int i=0;i<allsubnets.size();i++)
 	{
-		// 是同一子网，但是连接不上，那么提示检查设备连接
-		// 		CString strTip;
-		// 		strTip.Format(_T("Can not set up the connection with %s, please check its IP address and net cable. "), strIP);
-		// 		AfxMessageBox(strTip);
-		return TRUE;
+		szIP=W2A(allsubnets[i].StrIP);
+		dwIP=inet_addr(szIP);
+		sa.S_un.S_addr=dwIP;
+
+		if ( ia.S_un.S_un_b.s_b1 == sa.S_un.S_un_b.s_b1 &&
+			ia.S_un.S_un_b.s_b2 == sa.S_un.S_un_b.s_b2 &&
+			ia.S_un.S_un_b.s_b3 == sa.S_un.S_un_b.s_b3 
+			)
+		{
+			ret=TRUE;
+			break;
+		}
+
 	}
-	else
+	
+	return ret;
+
+}	
+
+
+extern volatile HANDLE Read_Mutex;
+void CScanDlg::OnBnClickedButtonScanall()
+{
+    allsubnets.clear();
+	GetIPMaskGetWay(allsubnets);
+	
+	WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .这里要等待Main Scan 那里弄完了 在去扫;
+	ReleaseMutex(Read_Mutex);
+
+	SOCKET sListen=NULL;
+	CString strlog;
+	int nRet = 0;
+	short nmsgType=UPD_BROADCAST_QRY_MSG;
+	const DWORD END_FLAG = 0x00000000;
+	TIMEVAL time;
+	time.tv_sec =3;
+	time.tv_usec = 1000;
+	fd_set fdSocket;
+	BYTE buffer[512] = {0};
+	BYTE pSendBuf[1024];
+	ZeroMemory(pSendBuf, 255);
+	pSendBuf[0] = 0x66;
+	memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
+	int nSendLen = 17;
+	int time_out=0;
+	int row_flags=m_flexGrid.get_Rows()-1;
+	CString stroldipaddress,strnewipadress,strlocalipaddress,strnewsubnet,strnewgateway;
+	GetIPMaskGetWay(strlocalipaddress,strnewsubnet,strnewgateway);
+	while(row_flags>=1)  // 超时结束
 	{
-		// 		CString strTip;
-		// 		strTip.Format(_T("Your host IP is %s, and NC' IP is %s. They are not in same sub net, please reset your IP address. "),strHostIP, strIP);
-		// 		AfxMessageBox(strTip);
-		return FALSE;
+		USES_CONVERSION;
+		//strnewipadress=m_flexGrid.get_TextMatrix(row_flags,NEW_IPADRESS);
+		stroldipaddress=m_flexGrid.get_TextMatrix(row_flags,SCAN_TABLE_ADDRESS);
+		ChangeNetDeviceIP(stroldipaddress,row_flags);
+		--row_flags;
+// 		if (strnewipadress.GetLength()==0)
+// 		{
+// 			continue;
+// 		}
+// 		LPCSTR szIP = W2A(stroldipaddress);
+// 		DWORD dwIP = inet_addr(szIP);
+// 		IN_ADDR ia;
+// 		ia.S_un.S_addr = dwIP;
+// 		//////////////////Old IP////////////////////////////////////
+// 		pSendBuf[1]=ia.S_un.S_un_b.s_b1;
+// 		pSendBuf[2]=ia.S_un.S_un_b.s_b2;
+// 		pSendBuf[3]=ia.S_un.S_un_b.s_b3;
+// 		pSendBuf[4]=ia.S_un.S_un_b.s_b4;
+// 		///////////////////New IP///////////////////////////////////////////
+// 		szIP = W2A(strnewipadress);
+// 		dwIP = inet_addr(szIP);
+// 		ia.S_un.S_addr = dwIP;
+// 		///////////////////////////////////////////////////////////
+// 		pSendBuf[5]=ia.S_un.S_un_b.s_b1;
+// 		pSendBuf[6]=ia.S_un.S_un_b.s_b2;
+// 		pSendBuf[7]=ia.S_un.S_un_b.s_b3;
+// 		pSendBuf[8]=ia.S_un.S_un_b.s_b4;
+// 		////////////////////////////////////////////////////////////////////
+// 		szIP = W2A(strnewsubnet);
+// 		dwIP = inet_addr(szIP);
+// 		ia.S_un.S_addr = dwIP;
+// 		pSendBuf[9]=ia.S_un.S_un_b.s_b1;
+// 		pSendBuf[10]=ia.S_un.S_un_b.s_b2;
+// 		pSendBuf[11]=ia.S_un.S_un_b.s_b3;
+// 		pSendBuf[12]=ia.S_un.S_un_b.s_b4;
+// 		////////////////////////////////////////////////////////////////////
+// 		szIP = W2A(strnewgateway);
+// 		dwIP = inet_addr(szIP);
+// 		ia.S_un.S_addr = dwIP;
+// 		pSendBuf[13]=ia.S_un.S_un_b.s_b1;
+// 		pSendBuf[14]=ia.S_un.S_un_b.s_b2;
+// 		pSendBuf[15]=ia.S_un.S_un_b.s_b3;
+// 		pSendBuf[16]=ia.S_un.S_un_b.s_b4;
+// 
+// 		FD_ZERO(&fdSocket);	
+// 		FD_SET(h_Broad, &fdSocket);
+// 		nRet = ::sendto(h_Broad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast,sizeof(h_bcast));
+// 		if (nRet == SOCKET_ERROR)
+// 		{
+// 			int  nError = WSAGetLastError();
+// 			goto END_SCAN;
+// 			return ;
+// 		}
+// 		int nLen = sizeof(h_siBind);
+// 		//while(pScanner->IsComScanRunning())
+// 
+// 		fd_set fdRead = fdSocket;
+// 		int nSelRet = ::select(0, &fdRead, NULL, NULL, &time);
+// 		if (nSelRet == SOCKET_ERROR)
+// 		{
+// 			int nError = WSAGetLastError();
+// 			goto END_SCAN;
+// 			return  ;
+// 		}
+// 
+// 		if(nSelRet > 0)
+// 		{
+// 			ZeroMemory(buffer, 512);
+// 
+// 			int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
+// 			//			int nRet = ::recvfrom(hBroad,(char*)&buffer[0], nsize, 0, (sockaddr*)&addrRemote, &nLen);
+// 			BYTE szIPAddr[4] = {0};
+// 			if(nRet > 0)
+// 			{		
+// 				FD_ZERO(&fdSocket);
+// 				if(buffer[0]==0x67)//收到正确的回复了
+// 				{	
+// 					for (int i=0;i<10;i++)
+// 					{
+// 						COLORREF ref=RGB(255,255,255); 
+// 						m_flexGrid.put_Row(row_flags+1);
+// 						m_flexGrid.put_Col(i);
+// 						m_flexGrid.put_CellBackColor(ref);
+// 					}
+// 					m_flexGrid.put_TextMatrix(row_flags+1,SCAN_TABLE_ADDRESS,strnewipadress);
+// 					SaveNewIPAddress(strnewipadress,stroldipaddress);
+// 					AfxMessageBox(_T("Change the ip successfully!"));
+// 				}	
+// 
+// 			}
+// 		}	
+// 		else
+// 		{
+// 
+// 
+// 
+// 		}
 	}
-}				
+	if (m_IsScan)
+	{
+		m_pScanner->m_bCheckSubnetFinish=TRUE;
+	}
+
+	// 	OnClose();
+// END_SCAN:
+// 
+// 	closesocket(h_Broad);
+// 	h_Broad=NULL;
+// 	{
+// 
+// 		//SOCKET soAck =::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+// 		h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+// 		BOOL bBroadcast=TRUE;
+// 		::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+// 		int iMode=1;
+// 		ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+// 
+// 		BOOL bDontLinger = FALSE;
+// 		setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+// 
+// 		//SOCKADDR_IN bcast;
+// 		h_bcast.sin_family=AF_INET;
+// 		//bcast.sin_addr.s_addr=nBroadCastIP;
+// 		h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+// 		h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+// 
+// 		//SOCKADDR_IN siBind;
+// 		h_siBind.sin_family=AF_INET;
+// 		h_siBind.sin_addr.s_addr=INADDR_ANY;
+// 		h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+// 		::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+// 
+// 	}
+
+
+
+	//############################
+
+	//	return 1;
+
+
+}
+
+
+BOOL CScanDlg::ChangeNetDeviceIP(CString strIP,int row_flags ){
+BOOL ret=FALSE;
+SOCKET sListen=NULL;
+CString strlog;
+int nRet = 0;
+short nmsgType=UPD_BROADCAST_QRY_MSG;
+const DWORD END_FLAG = 0x00000000;
+TIMEVAL time;
+time.tv_sec =3;
+time.tv_usec = 1000;
+fd_set fdSocket;
+BYTE buffer[512] = {0};
+BYTE pSendBuf[1024];
+ZeroMemory(pSendBuf, 255);
+pSendBuf[0] = 0x66;
+memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
+int nSendLen = 17;
+int time_out=0;
+USES_CONVERSION;
+CString stroldipaddress,strnewipadress,strlocalipaddress,strnewsubnet,strnewgateway;
+stroldipaddress=strIP;
+
+
+	for (int i=0;i<allsubnets.size();i++)
+	{
+		GetNewIP(strnewipadress,allsubnets[i].StrIP);
+		if (strnewipadress.Find(_T("0.0.0"))!=-1)//对0.0.0.0的过滤掉
+		{
+			continue;
+		}
+
+		LPCSTR szIP = W2A(stroldipaddress);
+		DWORD dwIP = inet_addr(szIP);
+		IN_ADDR ia;
+		ia.S_un.S_addr = dwIP;
+		//////////////////Old IP////////////////////////////////////
+		pSendBuf[1]=ia.S_un.S_un_b.s_b1;
+		pSendBuf[2]=ia.S_un.S_un_b.s_b2;
+		pSendBuf[3]=ia.S_un.S_un_b.s_b3;
+		pSendBuf[4]=ia.S_un.S_un_b.s_b4;
+		///////////////////New IP///////////////////////////////////////////
+		szIP = W2A(strnewipadress);
+		dwIP = inet_addr(szIP);
+		ia.S_un.S_addr = dwIP;
+		///////////////////////////////////////////////////////////
+		pSendBuf[5]=ia.S_un.S_un_b.s_b1;
+		pSendBuf[6]=ia.S_un.S_un_b.s_b2;
+		pSendBuf[7]=ia.S_un.S_un_b.s_b3;
+		pSendBuf[8]=ia.S_un.S_un_b.s_b4;
+		////////////////////////////////////////////////////////////////////
+		szIP = W2A(strnewsubnet);
+		dwIP = inet_addr(szIP);
+		ia.S_un.S_addr = dwIP;
+		pSendBuf[9]=ia.S_un.S_un_b.s_b1;
+		pSendBuf[10]=ia.S_un.S_un_b.s_b2;
+		pSendBuf[11]=ia.S_un.S_un_b.s_b3;
+		pSendBuf[12]=ia.S_un.S_un_b.s_b4;
+		////////////////////////////////////////////////////////////////////
+		szIP = W2A(strnewgateway);
+		dwIP = inet_addr(szIP);
+		ia.S_un.S_addr = dwIP;
+		pSendBuf[13]=ia.S_un.S_un_b.s_b1;
+		pSendBuf[14]=ia.S_un.S_un_b.s_b2;
+		pSendBuf[15]=ia.S_un.S_un_b.s_b3;
+		pSendBuf[16]=ia.S_un.S_un_b.s_b4;
+
+		FD_ZERO(&fdSocket);	
+		FD_SET(h_Broad, &fdSocket);
+		nRet = ::sendto(h_Broad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast,sizeof(h_bcast));
+		if (nRet == SOCKET_ERROR)
+		{
+			int  nError = WSAGetLastError();
+			goto END_SCAN;
+			return FALSE ;
+		}
+		int nLen = sizeof(h_siBind);
+		//while(pScanner->IsComScanRunning())
+
+		fd_set fdRead = fdSocket;
+		int nSelRet = ::select(0, &fdRead, NULL, NULL, &time);
+		if (nSelRet == SOCKET_ERROR)
+		{
+			int nError = WSAGetLastError();
+			goto END_SCAN;
+			return FALSE ;
+		}
+
+		if(nSelRet > 0)
+		{
+			ZeroMemory(buffer, 512);
+
+			int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
+			//			int nRet = ::recvfrom(hBroad,(char*)&buffer[0], nsize, 0, (sockaddr*)&addrRemote, &nLen);
+			BYTE szIPAddr[4] = {0};
+			if(nRet > 0)
+			{		
+				FD_ZERO(&fdSocket);
+				if(buffer[0]==0x67)//收到正确的回复了
+				{	
+
+				    Sleep(8000);
+					//if (!TestPing(strnewipadress))
+					//{
+					//   stroldipaddress=strnewipadress;
+					//	continue;
+					//}
+					SetCommunicationType(1);
+					 if (!Open_Socket2(strnewipadress,_wtoi(m_net_product_node.BuildingInfo.strIpPort)))
+					 {
+						 stroldipaddress=strnewipadress;
+						 continue;
+					 }
+					 else
+					 {
+						 close_com();
+					 }
+
+					for (int i=0;i<10;i++)
+					{
+						COLORREF ref=RGB(255,255,255); 
+						m_flexGrid.put_Row(row_flags);
+						m_flexGrid.put_Col(i);
+						m_flexGrid.put_CellBackColor(ref);
+					}
+					m_flexGrid.put_TextMatrix(row_flags,NEW_IPADRESS,strnewipadress);
+					SaveNewIPAddress(strnewipadress,stroldipaddress);
+					//AfxMessageBox(_T("Change the ip successfully!"));
+					ret=TRUE;
+					break;
+				}	
+
+			}
+			else
+			{
+				if (!TestPing(strnewipadress))
+				{
+					stroldipaddress=strnewipadress;
+					continue;
+				}
+			}
+		}	
+		else
+		{
+
+
+
+		}
+
+
+	}
+
+	return ret;
+END_SCAN:
+
+	closesocket(h_Broad);
+	h_Broad=NULL;
+	{
+
+		//SOCKET soAck =::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+		h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+		BOOL bBroadcast=TRUE;
+		::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+		int iMode=1;
+		ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+
+		BOOL bDontLinger = FALSE;
+		setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+
+		//SOCKADDR_IN bcast;
+		h_bcast.sin_family=AF_INET;
+		//bcast.sin_addr.s_addr=nBroadCastIP;
+		h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+		h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+
+		//SOCKADDR_IN siBind;
+		h_siBind.sin_family=AF_INET;
+		h_siBind.sin_addr.s_addr=INADDR_ANY;
+		h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+		::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+
+	}
+	return ret; 
+}			
 void CScanDlg::InitScanGrid()
 {
 	//m_flexGrid.put_TextMatrix(0,0,_T("NO."));
@@ -534,8 +1076,10 @@ void CScanDlg::InitScanGrid()
 		if (!m_pScanner->m_thesamesubnet)
 		{
 			m_flexGrid.put_Cols(10);
+			
 			m_flexGrid.put_TextMatrix(0,9,_T("Assign New Ip"));
 			GetDlgItem(IDC_BUTTON_SCANALL)->ShowWindow(SW_SHOW);
+			
 		}
 		else
 		{
@@ -701,29 +1245,34 @@ for (UINT i=0;i<m_pScanner->m_szNCScanRet.size();i++)
 }
 }
 void CScanDlg::SaveNewIPAddress(CString newip,CString oldip){
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
-	::CoInitialize(NULL);
+// 	_ConnectionPtr m_pCon;
+// 	_RecordsetPtr m_pRs;
+// 	::CoInitialize(NULL);
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
 	try 
 	{
-	CString strSql;
+		CString strSql;
 		////////////////////////////////////////////////////////////////////////////////////////////
 		//获取数据库名称及路径
 		/////////////////////////////////////////////////////////////////////////////////////////////////
 		//连接数据库
-		m_pCon.CreateInstance("ADODB.Connection");
-		m_pRs.CreateInstance(_T("ADODB.Recordset"));
-		m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+// 		m_pCon.CreateInstance("ADODB.Connection");
+// 		m_pRs.CreateInstance(_T("ADODB.Recordset"));
+		//m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
 		strSql.Format(_T("select * from ALL_NODE where Bautrate='%s' "),oldip);
-		m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-
-		while(VARIANT_FALSE==m_pRs->EndOfFile)
+		//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+		bado.m_pRecordset=bado.OpenRecordset(strSql);
+		while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 		{
 			strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Bautrate='%s'"),newip,oldip);
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 			m_pRs->MoveNext();
 		}
-		m_pRs->Close();
+		//m_pRs->Close();
+		bado.CloseRecordset();
+
 		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 		::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
 	}
@@ -733,44 +1282,47 @@ void CScanDlg::SaveNewIPAddress(CString newip,CString oldip){
 		//MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
 
 		 
-		m_pCon->Close();
+		//m_pCon->Close();
 	}
-	m_pCon->Close(); 
+	//m_pCon->Close(); 
+	bado.CloseConn();
 }
 int CScanDlg::GetAllNodeFromDataBase()
 {
 	//_ConnectionPtr m_pCon;//for ado connection
 	//_RecordsetPtr m_pRs;//for ado 
 
-	m_pCon.CreateInstance("ADODB.Connection");
-	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-	m_pRs.CreateInstance("ADODB.Recordset");
-
+// 	m_pCon.CreateInstance("ADODB.Connection");
+// 	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+// 	m_pRs.CreateInstance("ADODB.Recordset");
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn();
 	_variant_t temp_variant;
 	CString strTemp;
 
 	CString temp_str=_T("select * from ALL_NODE");
-	m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
-
+//	m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
+    bado.m_pRecordset=bado.OpenRecordset(temp_str);
 	//return m_pRs->get_RecordCount();
 
 	int nTemp = 0;
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 	{
 		nTemp++;
 		int nDefault=0;
-		CString strDevType = m_pRs->GetCollect("Product_class_ID");
+		CString strDevType = bado.m_pRecordset->GetCollect("Product_class_ID");
 
 		CTStatBase* pNode = NULL;
 		if (strDevType.CompareNoCase(_T("100")) == 0)	 //100 =  NC
 		{
 			pNode = new CTStat_Net;
 			// IP Addr
-			CString strIP = m_pRs->GetCollect("Product_ID");
+			CString strIP = bado.m_pRecordset->GetCollect("Product_ID");
 			//((CTStat_Net*)(pNode))->SetIPAddr(strIP);
 			
 			// Port
-			CString strPort = m_pRs->GetCollect("Bautrate");
+			CString strPort = bado.m_pRecordset->GetCollect("Bautrate");
 			((CTStat_Net*)(pNode))->SetIPAddr(_wtoi(strPort));
 
 			m_szNetNodes.push_back(((CTStat_Net*)(pNode)));
@@ -779,44 +1331,46 @@ int CScanDlg::GetAllNodeFromDataBase()
 		{
 			pNode = new CTStat_Dev;
 			// BaudRate
-			CString strBaudRate = m_pRs->GetCollect("Bautrate");
+			CString strBaudRate = bado.m_pRecordset->GetCollect("Bautrate");
 			((CTStat_Dev*)(pNode))->SetBaudRate(_wtoi(strBaudRate));
 
 			m_szComNodes.push_back(((CTStat_Dev*)(pNode)));
 
-			CString strComPort = m_pRs->GetCollect("Com_Port");
+			CString strComPort = bado.m_pRecordset->GetCollect("Com_Port");
 			strComPort = strComPort.Mid(3);
 			((CTStat_Dev*)(pNode))->SetComPort(_wtoi(strComPort));
 
-			CString strEPSize = m_pRs->GetCollect("EPsize");
+			CString strEPSize = bado.m_pRecordset->GetCollect("EPsize");
 			((CTStat_Dev*)(pNode))->SetEPSize(int(_wtoi(strEPSize)));
 
 		}
 		pNode->SetProductType(_wtoi(strDevType));
 
-		pNode->SetBuildingName(m_pRs->GetCollect("MainBuilding_Name"));
-		pNode->SetSubnetName(m_pRs->GetCollect("Building_Name"));
+		pNode->SetBuildingName(bado.m_pRecordset->GetCollect("MainBuilding_Name"));
+		pNode->SetSubnetName(bado.m_pRecordset->GetCollect("Building_Name"));
 
-		pNode->SetFloorName(m_pRs->GetCollect("Floor_Name"));
-		pNode->SetRoomName(m_pRs->GetCollect("Room_Name"));
+		pNode->SetFloorName(bado.m_pRecordset->GetCollect("Floor_Name"));
+		pNode->SetRoomName(bado.m_pRecordset->GetCollect("Room_Name"));
 
-		CString strID = m_pRs->GetCollect("Product_ID");		
+		CString strID = bado.m_pRecordset->GetCollect("Product_ID");		
 		pNode->SetDevID(_wtoi(strID));
 		
-		CString strHwv = m_pRs->GetCollect("Hardware_Ver");
+		CString strHwv = bado.m_pRecordset->GetCollect("Hardware_Ver");
 		pNode->SetHardwareVersion(float(_wtof(strHwv)));
-		CString strSwv = m_pRs->GetCollect("Software_Ver");
+		CString strSwv = bado.m_pRecordset->GetCollect("Software_Ver");
 		pNode->SetSoftwareVersion(float(_wtof(strSwv)));
 	
 
 
 
 
-		CString strSerialID = m_pRs->GetCollect("Serial_ID");		
+		CString strSerialID = bado.m_pRecordset->GetCollect("Serial_ID");		
 		(pNode)->SetSerialID(_wtoi(strSerialID));
 		
-		m_pRs->MoveNext();		
+		bado.m_pRecordset->MoveNext();		
 	}
+	bado.CloseRecordset();
+	bado.CloseConn();
 	return m_szNetNodes.size() + m_szComNodes.size();
 }
 
@@ -1275,17 +1829,21 @@ void CScanDlg::SaveAllNodeToDB()
 	GetDataFromGrid();	
 	CombineDBandScanRet();
 
-	m_pCon.CreateInstance("ADODB.Connection");
-	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+// 	m_pCon.CreateInstance("ADODB.Connection");
+// 	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
 
 	// 先删除数据库 // maurice说不要删
+
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
 
 	try
 	{
 
 	CString strSql;
 	strSql.Format(_T("delete * from ALL_NODE"));
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 
 	}
 	catch(_com_error *e)
@@ -1318,8 +1876,8 @@ void CScanDlg::SaveAllNodeToDB()
 		WriteOneNetInfoToDB(pNetInfo);
 	}
 
-
-	m_pCon->Close();
+	bado.CloseConn();
+	//m_pCon->Close();
 }
 
 // 合并数据库和scan结果，以便存入数据库
@@ -1385,7 +1943,9 @@ void CScanDlg::CombineDBandScanRet()
 void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 {
 	ASSERT(pDev);
-	
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
 	CString strBuildingName = pDev->GetBuildingName();
 
 	CString strFloorName = pDev->GetFloorName();
@@ -1414,7 +1974,7 @@ void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 	CString strScreenName;
 	strScreenName.Format(_T("Screen(S:%d--%d)"), pDev->GetSerialID(), pDev->GetDevID() );
 
-	CString strBackground_bmp=_T("Clicking here to add a image...");
+	CString strBackground_bmp=_T("T3000_Default_Building_PIC.bmp");
 
 	CString strHWV;
 	strHWV.Format(_T("%.1f"), pDev->GetHardwareVersion());
@@ -1437,12 +1997,13 @@ void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 
 	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+"','"+strEpSize+"')"));
 	//new nc // strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 	}
 	catch(_com_error *e)
 	{
 		AfxMessageBox(e->ErrorMessage());
 	}
+	bado.CloseConn();
 }
 
 void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
@@ -1451,6 +2012,9 @@ void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
 // 	_ConnectionPtr t_pCon;//for ado connection
 // 	t_pCon.CreateInstance(_T("ADODB.Connection"));
 // 	t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
 
 	CString strBuildingName = pNet->GetBuildingName();
 
@@ -1475,7 +2039,7 @@ void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
 	CString strScreenName;
 	strScreenName.Format(_T("Screen(S:%d--%d)"), pNet->GetSerialID(), pNet->GetDevID() );
 
-	CString strBackground_bmp=_T("Clicking here to add a image...");
+	CString strBackground_bmp=_T("T3000_Default_Building_PIC.bmp");
 
 	CString strHWV;
 	strHWV.Format(_T("%0.1f"), pNet->GetHardwareVersion());
@@ -1510,13 +2074,13 @@ void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
 	try
 	{
 
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 	}
 	catch(_com_error *e)
 	{
 		AfxMessageBox(e->ErrorMessage());
 	}
-
+  bado.CloseConn();
 }
 
 
@@ -1667,174 +2231,10 @@ CTStatBase* CScanDlg::FindDeviceByRowNum( int nRow )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // below the code disposed
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-extern volatile HANDLE Read_Mutex;
-void CScanDlg::OnBnClickedButtonScanall()
-{
-	SOCKET sListen=NULL;
-	WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .这里要等待Main Scan 那里弄完了 在去扫;
-	ReleaseMutex(Read_Mutex);
-	CString strlog;
-	int nRet = 0;
-	short nmsgType=UPD_BROADCAST_QRY_MSG;
-	const DWORD END_FLAG = 0x00000000;
-	TIMEVAL time;
-	time.tv_sec =3;
-	time.tv_usec = 1000;
-	fd_set fdSocket;
-	BYTE buffer[512] = {0};
-	BYTE pSendBuf[1024];
-	ZeroMemory(pSendBuf, 255);
-	pSendBuf[0] = 0x66;
-	memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
-	int nSendLen = 17;
-	int time_out=0;
-    int row_flags=m_flexGrid.get_Rows()-1;
-	CString stroldipaddress,strnewipadress,strlocalipaddress,strnewsubnet,strnewgateway;
-	GetIPMaskGetWay(strlocalipaddress,strnewsubnet,strnewgateway);
-	while(row_flags>=1)  // 超时结束
-	{
-		USES_CONVERSION;
-		strnewipadress=m_flexGrid.get_TextMatrix(row_flags,NEW_IPADRESS);
-		stroldipaddress=m_flexGrid.get_TextMatrix(row_flags,SCAN_TABLE_ADDRESS);
-		--row_flags;
-		if (strnewipadress.GetLength()==0)
-		{
-			continue;
-		}
-		LPCSTR szIP = W2A(stroldipaddress);
-		DWORD dwIP = inet_addr(szIP);
-		IN_ADDR ia;
-		ia.S_un.S_addr = dwIP;
-		//////////////////Old IP////////////////////////////////////
-		pSendBuf[1]=ia.S_un.S_un_b.s_b1;
-		pSendBuf[2]=ia.S_un.S_un_b.s_b2;
-		pSendBuf[3]=ia.S_un.S_un_b.s_b3;
-		pSendBuf[4]=ia.S_un.S_un_b.s_b4;
-		///////////////////New IP///////////////////////////////////////////
-		  szIP = W2A(strnewipadress);
-		  dwIP = inet_addr(szIP);
-		ia.S_un.S_addr = dwIP;
-		///////////////////////////////////////////////////////////
-		pSendBuf[5]=ia.S_un.S_un_b.s_b1;
-		pSendBuf[6]=ia.S_un.S_un_b.s_b2;
-		pSendBuf[7]=ia.S_un.S_un_b.s_b3;
-		pSendBuf[8]=ia.S_un.S_un_b.s_b4;
-		////////////////////////////////////////////////////////////////////
-		  szIP = W2A(strnewsubnet);
-		  dwIP = inet_addr(szIP);
-		ia.S_un.S_addr = dwIP;
-		pSendBuf[9]=ia.S_un.S_un_b.s_b1;
-		pSendBuf[10]=ia.S_un.S_un_b.s_b2;
-		pSendBuf[11]=ia.S_un.S_un_b.s_b3;
-		pSendBuf[12]=ia.S_un.S_un_b.s_b4;
-		////////////////////////////////////////////////////////////////////
-		  szIP = W2A(strnewgateway);
-		  dwIP = inet_addr(szIP);
-		  ia.S_un.S_addr = dwIP;
-		pSendBuf[13]=ia.S_un.S_un_b.s_b1;
-		pSendBuf[14]=ia.S_un.S_un_b.s_b2;
-		pSendBuf[15]=ia.S_un.S_un_b.s_b3;
-		pSendBuf[16]=ia.S_un.S_un_b.s_b4;
-	 
-		FD_ZERO(&fdSocket);	
-		FD_SET(h_Broad, &fdSocket);
-		nRet = ::sendto(h_Broad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast,sizeof(h_bcast));
-		if (nRet == SOCKET_ERROR)
-		{
-			int  nError = WSAGetLastError();
-			goto END_SCAN;
-			return ;
-		}
-		int nLen = sizeof(h_siBind);
-		//while(pScanner->IsComScanRunning())
-
-		fd_set fdRead = fdSocket;
-		int nSelRet = ::select(0, &fdRead, NULL, NULL, &time);
-		if (nSelRet == SOCKET_ERROR)
-		{
-			int nError = WSAGetLastError();
-			goto END_SCAN;
-			return  ;
-		}
-
-		if(nSelRet > 0)
-		{
-			ZeroMemory(buffer, 512);
-
-			int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
-//			int nRet = ::recvfrom(hBroad,(char*)&buffer[0], nsize, 0, (sockaddr*)&addrRemote, &nLen);
-			BYTE szIPAddr[4] = {0};
-			if(nRet > 0)
-			{		
-				FD_ZERO(&fdSocket);
-				if(buffer[0]==0x67)//收到正确的回复了
-				{	
-					for (int i=0;i<10;i++)
-					{
-						COLORREF ref=RGB(255,255,255); 
-						m_flexGrid.put_Row(row_flags+1);
-						m_flexGrid.put_Col(i);
-						m_flexGrid.put_CellBackColor(ref);
-					}
-					m_flexGrid.put_TextMatrix(row_flags+1,SCAN_TABLE_ADDRESS,strnewipadress);
-					SaveNewIPAddress(strnewipadress,stroldipaddress);
-					AfxMessageBox(_T("Change the ip successfully!"));
-				}	
-		
-			}
-		}	
-		else
-		{
-			 
-
-			
-		}
-	}
-	if (m_IsScan)
-	{
-		m_pScanner->m_bCheckSubnetFinish=TRUE;
-	}
-	
-// 	OnClose();
-END_SCAN:
-
-	closesocket(h_Broad);
-	h_Broad=NULL;
-	{
-
-		//SOCKET soAck =::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
-		h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
-		BOOL bBroadcast=TRUE;
-		::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
-		int iMode=1;
-		ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
-
-		BOOL bDontLinger = FALSE;
-		setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
-
-		//SOCKADDR_IN bcast;
-		h_bcast.sin_family=AF_INET;
-		//bcast.sin_addr.s_addr=nBroadCastIP;
-		h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
-		h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
-
-		//SOCKADDR_IN siBind;
-		h_siBind.sin_family=AF_INET;
-		h_siBind.sin_addr.s_addr=INADDR_ANY;
-		h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
-		::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
-
-	}
-	
-	 
-
-	//############################
-
-//	return 1;
 
 
-}
 
+ 
 void CScanDlg::OnBnClickedButtonAuto()
 {
 	//AutoFixComConflict();

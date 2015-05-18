@@ -37,6 +37,9 @@ BEGIN_MESSAGE_MAP(CBacnetAlarmLog, CDialogEx)
 //	ON_NOTIFY(HDN_ITEMCLICK, 0, &CBacnetAlarmLog::OnHdnItemclickListAlarmlog)
 ON_NOTIFY(NM_CLICK, IDC_LIST_ALARMLOG, &CBacnetAlarmLog::OnClickListAlarmlog)
 ON_WM_CLOSE()
+
+ON_WM_HELPINFO()
+
 END_MESSAGE_MAP()
 
 
@@ -238,7 +241,7 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 void CBacnetAlarmLog::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if(this->IsWindowVisible())
+	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 	{
 		PostMessage(WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
 		if(bac_select_device_online)
@@ -321,4 +324,24 @@ void CBacnetAlarmLog::OnCancel()
 	// TODO: Add your specialized code here and/or call the base class
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	//CDialogEx::OnCancel();
+}
+
+BOOL CBacnetAlarmLog::OnHelpInfo(HELPINFO* pHelpInfo)
+{ 
+
+	if (g_protocol==PROTOCOL_BACNET_IP){
+		HWND hWnd;
+
+		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 			
+			theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+		else
+			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
+			HH_HELP_CONTEXT, IDH_TOPIC_7_DATA);
+		return (hWnd != NULL);
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
+
+	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

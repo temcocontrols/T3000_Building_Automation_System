@@ -110,7 +110,7 @@ CString get_ExePath(){
 	GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
 	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
 	g_strExEPath=exeFullPath;//
-	g_configfile_path=g_strExEPath+_T("config.ini");
+	g_configfile_path=g_strExEPath+_T("T3000_config.ini");
 	return g_strExEPath;
 }
 
@@ -193,6 +193,9 @@ void Traffic_Data(CString &nCString)
 	 case  PM_CO2_RS485:
 		 strProductName = "CO2";
 		 break;
+	 case  PM_CO2_NODE:
+		strProductName = "CO2 Node";
+		break;
 	 case PM_TSTAT6_HUM_Chamber:
 		 strProductName = "HumCharmber";
 		 break;
@@ -206,7 +209,7 @@ void Traffic_Data(CString &nCString)
 	 case PM_T332AI :
 		 strProductName="T3-32AI";
 		 break;
-	 case PM_T3AI16O :
+	 case  PM_T38AI16O :
 		 strProductName="T3-8AI160";
 		 break;
 	 case PM_T38I13O :
@@ -227,6 +230,12 @@ void Traffic_Data(CString &nCString)
 		case  PM_PRESSURE:
 		strProductName="Pressure Sensor";
 		break;
+		case PM_HUM_R:
+		strProductName="HUM-R";
+		break;
+		case PM_RUNNAR:
+			strProductName="TStatRunar";
+			break;
 	 default:
 		 strProductName="TStat";
 		 break;

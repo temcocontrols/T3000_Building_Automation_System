@@ -98,8 +98,8 @@ protected:
 
 	vector<CFSBThumb*>				m_szThumb;
 
-	vector<int>*							m_szTicMarks;  // 位置与象素对应的数组
-	int											m_nFocusThumb;
+	vector<int>*					m_szTicMarks;  // 位置与象素对应的数组
+	int								m_nFocusThumb;
 
 	
 

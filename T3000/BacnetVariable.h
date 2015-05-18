@@ -40,6 +40,7 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnClose();
 	virtual void OnCancel();
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 };
 
 

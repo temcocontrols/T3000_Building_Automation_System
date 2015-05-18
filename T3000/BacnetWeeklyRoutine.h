@@ -36,6 +36,8 @@ public:
 	virtual void OnCancel();
 	void Reg_Hotkey();
 	void Unreg_Hotkey();
+
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 };
 
 const int WEEKLY_ROUTINE_NUM = 0;

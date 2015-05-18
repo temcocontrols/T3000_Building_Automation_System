@@ -242,6 +242,7 @@ void CWriteMultiRegistersDlg::Transfer_Data(int index){
 }
 void CWriteMultiRegistersDlg::OnLbnDblclkList3()
 {
+    int sel=m_ListBox_registers.GetCurSel();
 	
 	if (m_dataformate<3)
 	{
@@ -336,6 +337,9 @@ void CWriteMultiRegistersDlg::OnLbnDblclkList3()
 			 m_ListBox_registers.DeleteString(index);
 			 m_ListBox_registers.InsertString(index,itemstr);
 }
+
+	m_ListBox_registers.SetCurSel(sel);
+	m_ListBox_registers.SetFocus();
 }
 
 

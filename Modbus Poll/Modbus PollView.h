@@ -99,6 +99,9 @@ public:
 	int m_Hide_Alias_Columns;
 	int m_Address_Cell;
 	int m_PLC_Addresses;
+
+	BOOL m_apply;
+	BOOL m_wronce;
 	CStdioFile m_default_file;
 	////////////////
   LONG64 m_Tx;
@@ -175,6 +178,8 @@ public:
 	int m_curexcelrow;
 
 	afx_msg void OnFunctionsTestcenter();
+/*	void MouseMoveMsflexgrid1(short Button, short Shift, long x, long y);*/
+	afx_msg void OnSetupUseasdefault();
 };
 
 #ifndef _DEBUG  // debug version in Modbus PollView.cpp

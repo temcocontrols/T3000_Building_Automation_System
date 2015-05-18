@@ -11,7 +11,10 @@
 #include "MainFrm.h"
 #include "EreaseDlg.h"
 
+
+
 // CT3RTDView
+#define FRESH_PT10_BACK  WM_USER+1004
 
 DWORD WINAPI _BackFreshing_RTD(LPVOID pParam)
 {
@@ -20,28 +23,39 @@ DWORD WINAPI _BackFreshing_RTD(LPVOID pParam)
     Sleep(1000);
 
 
-    while(1)
-    {
-        
-        if (!is_connect())
-        {
-           Sleep(1000);
-            continue;
-        }
-        Sleep(1000);
-        
-        for(int i=1;i<3;i++) //Modify by Fance , tstat 6 has more register than 512;
-        {
-            register_critical_section.Lock();
+     while(dlg->IsWindowVisible())
+     {
+         
+         if (!is_connect())
+         {
+            Sleep(1000);
+             continue;
+         }
+		 if (dlg->m_EDIT_ID!=0)
+		 {
+		 Sleep(1000);
+		 continue;
+		 }
+		 	 
+            Sleep(1000);
+          /* register_critical_section.Lock();*/
+//          for(int i=1;i<3;i++) 
+			//          {
+			if(g_bPauseMultiRead)
+			{
 
-            Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
-            register_critical_section.Unlock();
-        }
-     
-        //memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
-        dlg->InitialDialog();
+				return 0;
+			}
+             Read_Multi(g_tstat_id,&product_register_value[100],100,100);  
 
-    }
+			 Read_Multi(g_tstat_id,&product_register_value[248],248,10); 
+			 //SENSOR_STATUS_CHANNEL1
+        /* }*/
+        /*  register_critical_section.Unlock();*/
+         //memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
+     //    dlg->InitialDialog();
+        PostMessage(dlg->m_hWnd,FRESH_PT10_BACK,0,0);
+     }
 
 
 
@@ -52,7 +66,8 @@ IMPLEMENT_DYNCREATE(CT3RTDView, CFormView)
 CT3RTDView::CT3RTDView()
 	: CFormView(CT3RTDView::IDD)
 {
-
+m_EDIT_ID=0;
+hFirstThread=NULL;
 }
 
 CT3RTDView::~CT3RTDView()
@@ -79,9 +94,15 @@ void CT3RTDView::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CT3RTDView, CFormView)
     ON_BN_CLICKED(IDC_CHANGEID, &CT3RTDView::OnBnClickedChangeid)
     ON_CBN_SELCHANGE(IDC_COMBO1, &CT3RTDView::OnCbnSelchangeCombo1)
-    ON_EN_KILLFOCUS(IDC_EDIT1, &CT3RTDView::OnEnKillfocusEdit1)
+    //ON_EN_KILLFOCUS(IDC_EDIT1, &CT3RTDView::OnEnKillfocusEdit1)
     ON_CBN_SELCHANGE(IDC_RANGE, &CT3RTDView::OnCbnSelchangeRange)
-    ON_EN_KILLFOCUS(IDC_EDIT_NAME, &CT3RTDView::OnEnKillfocusEdit2)
+//    ON_EN_KILLFOCUS(IDC_EDIT_NAME, &CT3RTDView::OnEnKillfocusEdit2)
+ 
+	ON_WM_DESTROY()
+//	ON_EN_SETFOCUS(IDC_EDIT1, &CT3RTDView::OnEnSetfocusEdit1)
+ON_EN_SETFOCUS(IDC_EDIT1, &CT3RTDView::OnEnSetfocusEdit1)
+ON_EN_SETFOCUS(IDC_EDIT_NAME, &CT3RTDView::OnEnSetfocusEditName)
+ON_BN_CLICKED(IDC_BUTTON_RESET, &CT3RTDView::OnBnClickedButtonReset)
 END_MESSAGE_MAP()
 
 
@@ -536,10 +557,7 @@ void CT3RTDView::InitialDialog(){
 
     CString strresult;
     int regValue;
-    union{
-    float floatData;
-    char  charData[4];
-    }DataFormat;
+
     if (product_register_value[MODBUS_FORMAT]==0)//Float
     {
        int accuracy=product_register_value[RESOLUTION];
@@ -557,45 +575,46 @@ void CT3RTDView::InitialDialog(){
                 strresult=_T("¦¸");
             }
             m_msflexgrid_input.put_TextMatrix(i,3,strresult);
+			DataFormat mydata;
             CString unit=strresult;
             regValue=0;
             regValue=product_register_value[CHANNEL1_HIGHT+2*(i-1)];
             int Data=regValue;
             int Data1=regValue&0x00FF;
             int Data2=(regValue&0xFF00)>>8;
-            DataFormat.charData[3]=Data2;
-            DataFormat.charData[2]=Data1;
+            mydata.charData[3]=Data2;
+            mydata.charData[2]=Data1;
 
             regValue=0;
             regValue=product_register_value[CHANNEL1_LOW+2*(i-1)];
             Data=regValue;
             Data1=regValue&0x00FF;
             Data2=(regValue&0xFF00)>>8;
-            DataFormat.charData[1]=Data2;
-            DataFormat.charData[0]=Data1;
+            mydata.charData[1]=Data2;
+            mydata.charData[0]=Data1;
             if (1==accuracy)
             {
-            strresult.Format(_T("%0.1f"),DataFormat.floatData);
+            strresult.Format(_T("%0.1f"),mydata.floatData);
             } 
             else if (2==accuracy)
             {
-            strresult.Format(_T("%0.2f"),DataFormat.floatData);
+            strresult.Format(_T("%0.2f"),mydata.floatData);
             }
             else if (3==accuracy)
             {
-            strresult.Format(_T("%0.3f"),DataFormat.floatData);
+            strresult.Format(_T("%0.3f"),mydata.floatData);
             }
             else if (4==accuracy)
             {
-            strresult.Format(_T("%0.4f"),DataFormat.floatData);
+            strresult.Format(_T("%0.4f"),mydata.floatData);
             }
             else if (5==accuracy)
             {
-            strresult.Format(_T("%0.5f"),DataFormat.floatData);
+            strresult.Format(_T("%0.5f"),mydata.floatData);
             }
             else if (6==accuracy)
             {
-            strresult.Format(_T("%0.6f"),DataFormat.floatData);
+            strresult.Format(_T("%0.6f"),mydata.floatData);
             }
             
 
@@ -609,7 +628,7 @@ void CT3RTDView::InitialDialog(){
             } 
             else if (1==product_register_value[SENSOR_STATUS_CHANNEL1+i-1])
             {
-                strresult=_T("Short");
+                strresult=_T("Unconnect");
             }
             else if (2==product_register_value[SENSOR_STATUS_CHANNEL1+i-1])
             {
@@ -701,10 +720,10 @@ void CT3RTDView::Fresh()
   
        
 
-        for (int i=0;i<3;i++)
-        { 
-            Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
-        }
+//         for (int i=0;i<3;i++)
+//         { 
+//             Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
+//         }
         
 
         Initial_RegisterList();
@@ -755,6 +774,7 @@ int value=_wtoi(strvalue);
     if (value!=product_register_value[RESOLUTION])
     {
      int ret=write_one(g_tstat_id,RESOLUTION,value);
+	 m_EDIT_ID=0;
      if (ret>0)
      {
       product_register_value[RESOLUTION]=value;
@@ -762,6 +782,7 @@ int value=_wtoi(strvalue);
      strvalue.Format(_T("%d"),product_register_value[RESOLUTION]);
      m_accuracy.SetWindowTextW(strvalue);
     }
+	m_EDIT_ID=0;
 }
 BEGIN_EVENTSINK_MAP(CT3RTDView, CFormView)
     ON_EVENT(CT3RTDView, IDC_MSFLEXGRID_INPUT, DISPID_CLICK, CT3RTDView::ClickMsflexgridInput, VTS_NONE)
@@ -771,6 +792,7 @@ END_EVENTSINK_MAP()
 void CT3RTDView::ClickMsflexgridInput()
 {
     m_comboxRange.ShowWindow(FALSE);
+	m_inNameEdt.ShowWindow(FALSE);
     UpdateData(FALSE);
 
     long lRow,lCol;
@@ -803,7 +825,7 @@ void CT3RTDView::ClickMsflexgridInput()
 
 
 
-    if (lRow==0)
+    if (lCol==0||lCol==5||lCol==1)
     {
         return;
     }
@@ -858,7 +880,7 @@ void CT3RTDView::OnEnKillfocusEdit2()
 {
     CString strTemp;
     GetDlgItem(IDC_EDIT_NAME)->GetWindowText(strTemp);
-    int Value=_wtoi(strTemp);
+    
 
     if (strTemp.Compare(m_oldname)==0)
     {
@@ -870,5 +892,137 @@ void CT3RTDView::OnEnKillfocusEdit2()
         Insert_Update_Table_Name(m_sn,_T("PT_Channel"),m_currow,strTemp);
         m_msflexgrid_input.put_TextMatrix(m_currow,m_curcol,strTemp);
     }
+
+	if (m_curcol==2)
+	{
+		if (0==product_register_value[MODBUS_FORMAT])//float
+		{
+  			 float Value=_wtof(strTemp);
+			
+  			 DataFormat mydate;
+ 			 mydate.floatData=Value;
+			 unsigned char temp;
+			temp= mydate.charData[1];
+			mydate.charData[1]=mydate.charData[0];
+			mydate.charData[0]=temp;
+
+			temp=mydate.charData[3];
+			mydate.charData[3]=mydate.charData[2];
+			mydate.charData[2]=temp;
+ 			 Write_Multi(g_tstat_id,&mydate.charData[0],CHANNEL1_LOW+2*(m_currow-1),4);
+			 m_EDIT_ID=0;
+  			 Read_Multi(g_tstat_id,&product_register_value[CHANNEL1_LOW+2*(m_currow-1)],CHANNEL1_LOW+2*(m_currow-1),10);
+ 			 PostMessage(FRESH_PT10_BACK,0,0);
+		} 
+		else//int
+		{
+			 int Value=_wtoi(strTemp);
+		}
+
+	   
+	}
+	
      
 }
+
+
+afx_msg LRESULT CT3RTDView::OnFreshPt10Back(WPARAM wParam, LPARAM lParam)
+{
+
+    InitialDialog();
+	return 0;
+}
+
+
+BOOL CT3RTDView::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if (message==FRESH_PT10_BACK)
+	{
+	   InitialDialog();
+	}
+	return CFormView::OnWndMsg(message, wParam, lParam, pResult);
+}
+
+
+void CT3RTDView::OnDestroy()
+{
+
+
+	if(hFirstThread != NULL)
+		TerminateThread(hFirstThread, 0);
+	hFirstThread=NULL;
+	 
+	CFormView::OnDestroy();
+
+	// TODO: Add your message handler code here
+}
+
+
+BOOL CT3RTDView::PreTranslateMessage(MSG* pMsg)
+{
+	if(WM_KEYDOWN == pMsg->message)
+	{
+
+	//	CEdit* pEdit = (CEdit*)GetDlgItem(m_EDIT_ID);
+
+		//ASSERT(pEdit);
+
+		if( VK_RETURN == pMsg->wParam)
+		{
+
+			m_comboxRange.ShowWindow(FALSE);
+			m_inNameEdt.ShowWindow(FALSE);
+
+			switch (m_EDIT_ID)
+			{
+			case 1:
+				{
+				OnEnKillfocusEdit1();
+				}
+				break;
+
+			case 2:
+				{
+				OnEnKillfocusEdit2();
+				}
+				break;
+			default:
+			{
+			   
+			}
+			break;
+
+
+
+			}
+	
+		}
+		
+  }
+
+ return CFormView::PreTranslateMessage(pMsg);
+ 
+}
+
+	void CT3RTDView::OnEnSetfocusEdit1()
+	{
+		 m_EDIT_ID=1;
+	}
+
+
+	void CT3RTDView::OnEnSetfocusEditName()
+	{
+		// TODO: Add your control notification handler code here
+		 m_EDIT_ID=2;
+	}
+
+
+	void CT3RTDView::OnBnClickedButtonReset()
+	{
+		if(AfxMessageBox(_T(" This will reset the module to the factory defaults,Are you sure to reset it ?"))==IDOK)
+		{
+			//  write_one(g_tstat_id,299,1);
+			write_one(g_tstat_id,300,1);
+		}
+	}

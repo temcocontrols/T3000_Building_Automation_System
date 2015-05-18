@@ -227,7 +227,7 @@ BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,7,191,20,20
 END
 
-IDD_ISP_DIALOG DIALOGEX 0, 0, 307, 314
+IDD_ISP_DIALOG DIALOGEX 0, 0, 307, 342
 STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "ISP Tool"
@@ -257,20 +257,20 @@ BEGIN
     EDITTEXT        IDC_EDIT_MDBID2,207,123,97,12,ES_AUTOHSCROLL
     CONTROL         "Flash SubNode By ID",IDC_CHECK_FLASH_SUBID,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,191,112,86,10
     LTEXT           "ID:",IDC_STATIC,193,124,12,8
-    GROUPBOX        "Model Infor:",IDC_STATIC_INFO,190,138,116,43,BS_CENTER | BS_FLAT
-    LTEXT           "Hardware Ver:",IDC_STATIC,194,168,48,8
-    LTEXT           "Firmware Ver:",IDC_STATIC,195,157,47,8
-    LTEXT           "Model  Name:",IDC_STATIC,195,147,47,8
-    LTEXT           "Static Text",IDC_Model_Name,243,148,63,8
-    LTEXT           "Static Text",IDC_Model_FIRMVER,243,159,63,8
-    LTEXT           "Static Text",IDC_Model_HARDWAREVER,243,169,63,8
+    GROUPBOX        "Model Infor:",IDC_STATIC_INFO,190,138,116,43,BS_CENTER | BS_FLAT | NOT WS_VISIBLE
+    LTEXT           "Hardware Ver:",IDC_STATIC,194,168,48,8,NOT WS_VISIBLE
+    LTEXT           "Firmware Ver:",IDC_STATIC,195,157,47,8,NOT WS_VISIBLE
+    LTEXT           "Model  Name:",IDC_STATIC,195,147,47,8,NOT WS_VISIBLE
+    LTEXT           "Static Text",IDC_Model_Name,243,148,63,8,NOT WS_VISIBLE
+    LTEXT           "Static Text",IDC_Model_FIRMVER,243,159,63,8,NOT WS_VISIBLE
+    LTEXT           "Static Text",IDC_Model_HARDWAREVER,243,169,63,8,NOT WS_VISIBLE
     PUSHBUTTON      "PING     IP    Address",IDC_BUTTON_PING2,193,97,109,14
     CONTROL         "Clear_Log",IDC_CLEAR_LOG,"MfcButton",NOT WS_VISIBLE | WS_TABSTOP,260,58,46,11
     CONTROL         "Save_Log",IDC_SAVE_LOG,"MfcButton",NOT WS_VISIBLE | WS_TABSTOP,235,57,46,11
     PUSHBUTTON      "Show Hex",IDC_SHOW_HEX,256,260,37,14,NOT WS_VISIBLE
-    EDITTEXT        IDC_EDIT_HWVERSION,68,293,30,12,ES_AUTOHSCROLL
-    COMBOBOX        IDC_COMBO_PM,249,293,48,109,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_EDIT_SN,154,293,33,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_HWVERSION,68,293,30,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    COMBOBOX        IDC_COMBO_PM,249,293,48,109,CBS_DROPDOWN | WS_VSCROLL
+    EDITTEXT        IDC_EDIT_SN,154,293,33,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
     LTEXT           "Product Model:",IDC_STATIC,198,296,50,8
     LTEXT           "Hardware Verison:",IDC_STATIC,8,296,58,8
     LTEXT           "SerialNumber:",IDC_STATIC,108,296,46,8
@@ -282,6 +282,10 @@ BEGIN
     LTEXT           "",IDC_Model_Name2,192,191,114,8
     LTEXT           "",IDC_Model_FIRMVER2,192,205,114,8
     LTEXT           "",IDC_Model_HARDWAREVER2,192,217,114,8
+    LTEXT           "Software Version:",IDC_STATIC,9,315,58,8
+    EDITTEXT        IDC_EDIT_SWVERSION,67,311,40,14,ES_AUTOHSCROLL
+    LTEXT           "User Name:",IDC_STATIC,199,314,41,8
+    EDITTEXT        IDC_FLASH_USER_ID,248,312,55,14,ES_AUTOHSCROLL
 END
 
 
@@ -303,7 +307,7 @@ BEGIN
 
     IDD_ISP_DIALOG, DIALOG
     BEGIN
-        BOTTOMMARGIN, 313
+        BOTTOMMARGIN, 341
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -315,8 +319,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 4,7,0,0
- PRODUCTVERSION 4,7,0,0
+ FILEVERSION 4,7,9,0
+ PRODUCTVERSION 4,7,9,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -331,13 +335,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "FileVersion", "4.7.0.0"
+            VALUE "FileVersion", "4.7.9.0"
             VALUE "InternalName", "ISP.exe"
             VALUE "LegalCopyright", "Copyright 1999-2014 (c).  All rights reserved."
             VALUE "OriginalFilename", "ISP.exe"
             VALUE "ProductName", "ISP Tool"
-            VALUE "ProductVersion", "4.7.0.0"
-            VALUE "SpecialBuild", "4.7.0"
+            VALUE "ProductVersion", "4.7.9.0"
+            VALUE "SpecialBuild", "4.7.9"
         END
     END
     BLOCK "VarFileInfo"
@@ -410,7 +414,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About NEWISP..."
-    IDS_STR_VIRSIONNUM      "Version 4.7.0"
+    IDS_STR_VIRSIONNUM      "Version 4.7.9"
     IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
 END
 

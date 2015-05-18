@@ -16,20 +16,54 @@
 #define	ID_PROTOCOL_INFO	102
 */
 
-#include "CM5/DialogCM5.h"  //CM5
+//#include "CM5/DialogCM5.h"  //CM5
 #include "T3/DialogT3.h"	//T3
 #include "MiniPanel/DialgMiniPanel.h" //Mini Panel
 #include "AirQuality/AirQuality.h"//AirQuality
-#include "Class/MulitithreadSocket.h"
+#include "bado/BADO.h"
+//#include "Class/MulitithreadSocket.h"
 // #include "MBP.h"
 // #include "MbPoll.h"
-
-#define NUMVIEWS 19
-
+#include "ConfigFileHandler.h"
 
 
 
+const int DLG_T3000_VIEW = 0;
+const int DLG_NETWORKCONTROL_VIEW = 1;
+const int DLG_GRAPGIC_VIEW = 2;
+const int DLG_TRENDLOG_VIEW =3;
+const int DLG_DIALOGCM5_VIEW = 4;
 
+const int DLG_DIALOGMINIPANEL_VIEW = 6;
+const int DLG_AIRQUALITY_VIEW = 7;
+const int DLG_LIGHTINGCONTROLLER_VIEW = 8;
+const int DLG_HUMCHAMBER = 9;
+const int DLG_CO2_VIEW = 10;
+const int DLG_CO2_NET_VIEW=11;
+const int DLG_BACNET_VIEW = 12;
+//T3-Serials
+const int DLG_DIALOGT3_VIEW = 5;
+const int DLG_DIALOGT38I13O_VIEW=13;
+const int DLG_DIALOGT332AI_VIEW=14;
+const int DLG_DIALOGT38AI8AO=15;
+const int DLG_DIALOGT36CT=16;
+const int DLG_DIALOGT3PT10=17;
+const int DLG_DIALOG_PRESSURE_SENSOR=18;
+const int DLG_DIALOG_DEFAULT_BUILDING = 19;
+const int DLG_DIALOG_TEMP_HUMSENSOR = 20;
+const int DLG_DIALOG_DEFAULT_T3000_VIEW = 21;
+const int DLG_DIALOG_T3_INPUTS_VIEW =22;
+const int NUMVIEWS = 23;
+
+
+extern int g_gloab_bac_comport;
+
+const int REGISTER_USE_ZIGBEE_485 = 640;
+union UNION_INPUT_NAME{
+	unsigned short reg_value[4];
+	unsigned char char_name[8];
+};
+ 
 typedef struct _tree_floor///////////////////////////////////////////////////////////////////////////////
 {//for vector
 	HTREEITEM building_item;//building name
@@ -85,6 +119,8 @@ typedef struct _tree_product//////////////////////
 	unsigned int ncomport;
 	bool status;
 	bool status_last_time[3];
+	CString NetworkCard_Address;
+	CString NameShowOnTree;
 	
 }tree_product;///////////////////////////////////////////////////////////////////////////////
 
@@ -116,28 +152,31 @@ public: // create from serialization only
 	void OnToolErease();
 	void OnToolFresh();
 	void OnToolRefreshLeftTreee();
-	CMulitithreadSocket m_wskServer;
+	void BuildingComportConfig();
+//	CMulitithreadSocket m_wskServer;
 	BOOL m_bServer;
 public:
 
     CView * m_pViews[NUMVIEWS];
     UINT m_nCurView;    
 	void InitViews();
-
+	CConfigFileHandler		m_cfgFileHandler;
+	CString					m_strCfgFilePath;
 public://for scan
 	int m_nScanType;
 	CString m_strsubNetSelectedScan;
  	HANDLE m_hCurCommunication;
     BOOL m_bScanFinished;
 	BOOL m_bScanALL;
-
-
+	vector <CString> m_vector_comport;
+	BOOL m_frist_start;
 // Attributes
 public:
 	CImageTreeCtrl*	m_pTreeViewCrl;
 	int						m_nIpPort;
 	CString				m_strIP;
 	int						m_nBaudrate;
+	int					m_building_com_port;
 	CString				g_strIpAdress;
 	vector<Building_info>	m_subNetLst;
 	vector<CString>			m_buildingLst;
@@ -148,9 +187,10 @@ public:
 	vector <tree_room>		m_roomLst;//for every room name	
 	vector <background_infor> m_backgroundLst;
 	vector <tree_product>	m_product;//for every product leaf
-	_ConnectionPtr				m_pCon;//for ado connection
-	_RecordsetPtr				m_pRs;//for ado 
-	
+// 	_ConnectionPtr				m_pCon;//for ado connection
+// 	_RecordsetPtr				m_pRs;//for ado 
+	 
+
 	CString m_strCurSubBuldingName;
 	Building_info m_CurSubBuldingInfo;
 	CString m_strCurMainBuildingName;
@@ -164,8 +204,7 @@ public://scan
 	CWinThread* m_pFreshTree;
 	CWinThread* m_pCheck_net_device_online;
 
-	vector <binary_search_result> m_binary_search_networkcontroller_background_thread;	////background thread search result
-	vector <binary_search_result> m_binary_search_product_background_thread;				////background thread search result
+
 	
 	
 	CScanDbWaitDlg*		m_pWaitScanDlg;	
@@ -198,6 +237,7 @@ protected:  // control bar embedded members
 	 CMFCMenuBar				m_wndMenuBar;
 	CMFCToolBar				m_wndToolBar;
 
+	CMFCToolBar				m_testtoolbar;
 	//CMFCToolBarImages		m_UserImages;
 public: 
 	CWorkspaceBar			m_wndWorkSpace;
@@ -224,15 +264,15 @@ protected:
 	afx_msg LRESULT OnAddTreeNode(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT  AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT Show_Panel(WPARAM wParam, LPARAM lParam);
+	//afx_msg LRESULT Show_Panel(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT  ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 public:
-	BOOL  CheckDeviceStatus();
-	void	SaveBacnetConfigFile();
-	void	LoadBacnetConfigFile();
+	BOOL  CheckDeviceStatus(int refresh_com);
+	//void	SaveBacnetConfigFile();
+	//void	LoadBacnetConfigFile();
 	void  Show_Wait_Dialog_And_SendConfigMessage();
 	static DWORD WINAPI  Send_Set_Config_Command_Thread(LPVOID lpVoid);
 	void OnMBP();
@@ -262,7 +302,7 @@ public:
 	void  OnHTreeItemClick(NMHDR *pNMHDR, LRESULT *pResult);
 	
 			
-			BOOL ValidAddress(CString sAddress);
+			//BOOL ValidAddress(CString sAddress);
 	BOOL ValidAddress(CString sAddress,UINT& n1,UINT& n2,UINT& n3,UINT& n4);
 	 
 	void CheckConnectFailure(const CString& strIP);// 检查失败的原因，并给出详细的提示信息
@@ -272,14 +312,7 @@ public:
 	BOOL ConnectDevice(tree_product tree_node);
 
 	//scan funtion:
-	void background_binarysearch_netcontroller();
-	void binarySearchforview_networkcontroller(BYTE devLo=1, BYTE devHi=254);
-	void binarySearchforview(BYTE devLo=1, BYTE devHi=254);
-	void background_binarysearch();
-	BOOL binary_search_crc(int a);
-	void scanForTstat();
-	void AddScanedDeviceToDatabase(Building_info buildInfo);
-	int find_Address_towrite ();
+
 
 	afx_msg void OnDestroy();
 	void OnChangeAdminPassword();
@@ -288,6 +321,9 @@ public:
 	void GetIONanme();
 	void OnImportDatase();
 	void ReFresh();
+
+	CString GetFWVersionFromFTP(CString ProductName);
+ 
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 public:
@@ -313,14 +349,12 @@ public:
 	CString GetDeviceClassName(int nClassID);
 	CString GetScreenName(int nSerialNumber, int nModbusID);
 protected:
-	void UpdateAllNodesInfo(HTREEITEM& htiEdit);
-	void UpdateFloorNode(HTREEITEM& htiEdit);
-	void UpdateRoomNode(HTREEITEM& htiEdit);
-	void UpdateDeviceNodes(HTREEITEM& htiEdit);
+
+
 	// for record tree node 
-	void SaveTreeNodeRecordToReg(HTREEITEM& htiCurSel);
-	BOOL WriteValueToReg(CRegKey& reg, HTREEITEM& htiItem);
-	void SelectTreeNodeFromRecord();
+	//void SaveTreeNodeRecordToReg(HTREEITEM& htiCurSel);
+	//BOOL WriteValueToReg(CRegKey& reg, HTREEITEM& htiItem);
+	//void SelectTreeNodeFromRecord();
 	HTREEITEM GetLastSelNodeFromRecord(CRegKey& reg, HTREEITEM& htiRoot);
 	HTREEITEM SearchItemByName(HTREEITEM& htiRoot, const CString& strItemName);
 	BOOL ImportDataBaseForFirstRun();
@@ -410,30 +444,56 @@ public:
 	afx_msg void OnHelpFeedbacktotemco();
 	afx_msg void OnControlCustomerunits();
 	afx_msg void OnCalibrationCalibrationhumtemp();
+	afx_msg void OnMiscellaneousGsmconnection();
+public:
+	CString m_sURLToDownload;
+	CString m_sFileToDownloadInto;
+	CString m_sUserName;
+	CString m_sPassword;
+	CString       m_sError;
+	CString       m_sServer; 
+	CString       m_sObject; 
+	CString       m_sFilename;
+	INTERNET_PORT m_nPort;
+	DWORD         m_dwServiceType;
+	HINTERNET     m_hInternetSession;
+	HINTERNET     m_hHttpConnection;
+	HINTERNET     m_hHttpFile;
+ 
+	BOOL          m_bSafeToClose;
+	CFile         m_FileToWrite;
+	CWinThread*   m_pThread;
+
+	CString      m_file_firmware_Time;
+	 
+public:
+    BOOL DownloadFromFTP();
+	static void CALLBACK _OnStatusCallBack(HINTERNET hInternet, DWORD dwContext, DWORD dwInternetStatus, 
+		LPVOID lpvStatusInformation, DWORD dwStatusInformationLength);
+	void OnStatusCallBack(HINTERNET hInternet, DWORD dwInternetStatus, 
+		LPVOID lpvStatusInformation, DWORD dwStatusInformationLength);
+	static UINT _DownloadThread(LPVOID pParam);
+	void HandleThreadErrorWithLastError(UINT nIDError, DWORD dwLastError=0);
+	void HandleThreadError(UINT nIDError);
+	BOOL DownloadThread();
+	void DownloadAllThread();
+	afx_msg LRESULT OnThreadFinished(WPARAM wParam, LPARAM lParam);
+	void GetProductFPTAndLocalPath(int ProductModel,CString &FtpPath,CString &ProductFileName); 
+	void GetProductFirmwareFTPDirectory(int ProductModel,CString &FtpPath,CString &ProductFileName);
+	afx_msg void OnToolDetectonlineproducts();
+	afx_msg void OnControlSettings();
+	afx_msg void OnUpdateControlInputs(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateControlOutputs(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateControlVariables(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateControlPrograms(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateControlScreens(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateControlControllers(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateControlWeekly(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateControlAnnualroutines(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateControlMonitors(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateControlAlarmLog(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateControlTstat(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateControlSettings(CCmdUI *pCmdUI);
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	afx_msg void OnFileExportregiseterslist();
 };
-
-const int DLG_T3000_VIEW = 0;
-const int DLG_NETWORKCONTROL_VIEW = 1;
-const int DLG_GRAPGIC_VIEW = 2;
-const int DLG_TRENDLOG_VIEW =3;
-const int DLG_DIALOGCM5_VIEW = 4;
-
-const int DLG_DIALOGMINIPANEL_VIEW = 6;
-const int DLG_AIRQUALITY_VIEW = 7;
-const int DLG_LIGHTINGCONTROLLER_VIEW = 8;
-const int DLG_HUMCHAMBER = 9;
-const int DLG_CO2_VIEW = 10;
-const int DLG_CO2_NET_VIEW=11;
-const int DLG_BACNET_VIEW = 12;
-//T3-Serials
-const int DLG_DIALOGT3_VIEW = 5;
-const int DLG_DIALOGT38I13O_VIEW=13;
-const int DLG_DIALOGT332AI_VIEW=14;
-const int DLG_DIALOGT38AI8AO=15;
-const int DLG_DIALOGT36CT=16;
-const int DLG_DIALOGT3PT10=17;
-const int DLG_DIALOG_PRESSURE_SENSOR=18;
-
-extern int g_gloab_bac_comport;
-
-const int REGISTER_USE_ZIGBEE_485 = 640;

@@ -84,26 +84,48 @@ enum error_msg { SYNTAX , UNBAL_PARENS , NO_EXP , EQUALS_EXPECTED,
 									PAREN_EXPECTED , WHILE_EXPECTED, QUOTE_EXPECTED ,
 									NOT_TEMP , TOO_MANY_LVARS, NOT_LINE, GREATER_THEN_MAX,
 									TOOBIG, TOOMANYLINES, TOOMANYVARS, TOOMANYGOTO,
-									WARN_PANEL_MISSING, WARN_POINT_MISSING } ;
+									WARN_PANEL_MISSING, WARN_POINT_MISSING ,OUTPUT_BREAK,INPUT_BREAK,VARIABLE_BREAK} ;
 
+
+//struct variable_table {
+//				char name[12];
+//				char label[9];
+//				char type;
+//				char var_type;
+//				int  l;
+//				int  c;
+//				int  network;
+//				char panel;
+//				char point_type;
+//				char num_point;
+//};
 
 struct variable_table {
-				char name[12];
-				char label[9];
-				char type;
-				char var_type;
-				int  l;
-				int  c;
-				int  network;
-				char panel;
-				char point_type;
-				char num_point;
+	char name[20];
+	char label[9];
+	char type;
+	char var_type;
+	int  l;
+	int  c;
+	unsigned char  network;
+	unsigned char  sub_panel;
+	char panel;
+	char point_type;
+	//char num_point;
+	unsigned short num_point;
 };
 
+//struct buf_str {
+//		 int v;
+//		 char var[12];
+//		 float fvar;
+//		 char op[10];
+//};//Fance 把字节改大
+
 struct buf_str {
-		 int v;
-		 char var[12];
-		 float fvar;
-		 char op[10];
+	int v;
+	char var[20];
+	float fvar;
+	char op[10];
 };
 

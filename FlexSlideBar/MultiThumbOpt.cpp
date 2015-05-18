@@ -224,8 +224,8 @@ void CMultiThumbOpt::OnLButtonDown(const CPoint& point)
 	}
 	else
 	{
-		MovePage(point);
-		ReCalcChannelRect();
+// 		MovePage(point);
+// 		ReCalcChannelRect();
 	}
 }
 
@@ -458,8 +458,11 @@ void CMultiThumbOpt::OnLButtonUp(const CPoint& point)
 		MoveToPosition(m_nFocusThumb, nPos);
 
 		ReCalcChannelRect();
+
+
+		((CFlexSlideWnd*)m_pParent)->SendCallBackMsg();
 	}
-	((CFlexSlideWnd*)m_pParent)->SendCallBackMsg();
+	
 }
 
 

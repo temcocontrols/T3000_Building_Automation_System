@@ -40,10 +40,11 @@ END_MESSAGE_MAP()
 void CEreaseDlg::OnBnClickedMyOk()
 {
 	// TODO: Add your control notification handler code here
-	if(AfxMessageBox(_T("Are you sure to erease the config parameters?"))==IDOK)
-	{
+// 	if(AfxMessageBox(_T("Are you sure to erease the config parameters?"))==IDOK)
+// 	{
 		/*if(write_one(m_nTstatID,16,143)>0)
 			AfxMessageBox(_T("Ereased successfully!"));*/
+			int times=5;
 			CString newid;
 			GetDlgItem(IDC_EDIT1)->GetWindowText(newid);
 			int serialno=get_serialnumber();
@@ -51,15 +52,31 @@ void CEreaseDlg::OnBnClickedMyOk()
 			if (newid!=g_tstat_id)
 			{
 			int ret=write_one(g_tstat_id,6,ID);
+			while (times>=0&&ret<0)
+			{
+			    Sleep(1000);
+			    ret=write_one(g_tstat_id,6,ID);
+				--times;
+			}
+			
 			if (ret>0)
 			{
-			  CADO ado;
-			  ado.OnInitADOConn();
+				CBADO bado;
+				bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+				bado.OnInitADOConn(); 
 			  CString sql;
 			  sql.Format(_T("select * from ALL_NODE where Serial_ID='%d' "),serialno);
-			  ado.m_pRecordset = ado.OpenRecordset(sql);
-			  ado.m_pRecordset->MoveFirst();
-			  while(!ado.m_pRecordset->EndOfFile)
+			  bado.m_pRecordset = bado.OpenRecordset(sql);
+			  int Recount=bado.GetRecordCount(bado.m_pRecordset);
+			  if (Recount<=0)
+			  {
+				  CString strTips;
+				  strTips.Format(_T("Serial No=%d No Exsits!"),serialno);
+				  AfxMessageBox(strTips);
+				  return;
+			  }
+			  bado.m_pRecordset->MoveFirst();
+			  while(!bado.m_pRecordset->EndOfFile)
 			  {
 			      CString prodcut_name,product_id,screen_name;
 				  prodcut_name.Format(_T("%s:%d--%d"),GetProductName(product_register_value[7]),serialno,ID);
@@ -68,11 +85,11 @@ void CEreaseDlg::OnBnClickedMyOk()
 
 				  try 
 				  {
-					  ado.m_pRecordset->PutCollect("Product_name",(_bstr_t)(prodcut_name));
-					  ado.m_pRecordset->PutCollect("Product_ID",(_bstr_t)(product_id));
-					  ado.m_pRecordset->PutCollect("Screen_Name",(_bstr_t)(screen_name));
-					  ado.m_pRecordset->Update();
-					  ado.m_pRecordset->MoveNext();
+					  bado.m_pRecordset->PutCollect("Product_name",(_bstr_t)(prodcut_name));
+					  bado.m_pRecordset->PutCollect("Product_ID",(_bstr_t)(product_id));
+					  bado.m_pRecordset->PutCollect("Screen_Name",(_bstr_t)(screen_name));
+					  bado.m_pRecordset->Update();
+					  bado.m_pRecordset->MoveNext();
 
 				  }
 				  catch(...)
@@ -85,10 +102,13 @@ void CEreaseDlg::OnBnClickedMyOk()
 				  CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 				  ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
 			  }
+			  bado.CloseRecordset();
+			  bado.CloseConn();
 			} 
 			else
 			{
 			AfxMessageBox(_T("Fail,Please try again!"));
+			return;
 			}
 			} 
 			else
@@ -97,24 +117,18 @@ void CEreaseDlg::OnBnClickedMyOk()
 			}
 			
 
-	}
-	else
-	{
-		return;
-	}
+// 	}
+// 	else
+// 	{
+// 		return;
+// 	}
 	
 	OnOK();
 }
 
 BOOL CEreaseDlg::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
-	if(pMsg->wParam == VK_RETURN )
-	{ 
-		//GetDlgItem(ID_MYOK)->SetFocus();
-		OnBnClickedMyOk();
-		return true; 
-	} 
+ 
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
@@ -144,9 +158,7 @@ BOOL CEreaseDlg::OnInitDialog()
 	strText.Format(_T("%d"),m_nTstatID);
 	m_tstatIDEdit.SetWindowText(strText);
 
-
 	// TODO:  Add extra initialization here
-
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }

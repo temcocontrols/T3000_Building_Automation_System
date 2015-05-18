@@ -1,7 +1,7 @@
 #pragma once
 #include "afxwin.h"
 
-
+#include "ChildFrm.h"
 // CReadWriteDefinitionDlg dialog
 
 class CReadWriteDefinitionDlg : public CDialogEx
@@ -48,6 +48,14 @@ public:
 	CButton m_Radio_100;
 	CButton m_Radio_Fit;
 	CEdit m_editor_slave_id;
+
+
+	BOOL m_apply;
+	BOOL m_wronce;
 	afx_msg void OnPaint();
-	BOOL m_is_read_write_once;
+//	BOOL m_is_read_write_once;
+	afx_msg void OnBnClickedButtonApply();
+	afx_msg void OnBnClickedButtonRwOnce();
+	HWND m_pWnd;
+	 
 };

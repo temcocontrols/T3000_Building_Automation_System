@@ -36,6 +36,7 @@ public:
 	virtual void OnCancel();
 	void Reg_Hotkey();
 	void Unreg_Hotkey();
+	afx_msg void OnBnClickedInsert();
 //	afx_msg void OnDestroy();
 };
 

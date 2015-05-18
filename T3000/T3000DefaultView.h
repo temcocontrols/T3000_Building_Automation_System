@@ -23,9 +23,10 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	CAutoRichEditCtrl m_RichEditor;
+//	CAutoRichEditCtrl m_RichEditor;
 	virtual void OnInitialUpdate();
 	void Fresh();
+	afx_msg void OnPaint();
 };
 
 

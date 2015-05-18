@@ -84,6 +84,7 @@ BEGIN_MESSAGE_MAP(CARDDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CARDDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_RADIO_NET_DEVICE, &CARDDlg::OnBnClickedRadioNetDevice)
 	ON_BN_CLICKED(IDC_RADIO2, &CARDDlg::OnBnClickedRadio2)
+	ON_BN_CLICKED(IDC_BUTTON_LOCAL_MSTP_DEVICE, &CARDDlg::OnBnClickedButtonLocalMstpDevice)
 END_MESSAGE_MAP()
 
 
@@ -188,20 +189,7 @@ void CARDDlg::OnBnClickedOk()
 
 	  
 	   
-	  /* CString temp_str=_T("select * from Building where Default_SubBuilding=-1");
-	   m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
-	   int recordcount=m_pRs->GetRecordCount();
-	   if(m_pRs->GetRecordCount()<=0)
-	   {
-		   AfxMessageBox(_T("There is no default building,please select a building First."));
-		   return;
-	   }
-
-
-	   if(m_pRs->State)
-		   m_pRs->Close(); 
-	   if(m_pCon->State)
-           m_pCon->Close();*/
+	 
 	   CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	   strMainBuildName= pFrame->m_strCurMainBuildingName;
 	   strSubBuildingName= pFrame->m_strCurSubBuldingName;
@@ -232,11 +220,12 @@ void CARDDlg::OnBnClickedOk()
 	   strEPSize=_T("0.0");
 	   try
 	   {
-		   CADO ado;
-		   ado.OnInitADOConn();
+		   CBADO bado;
+		   bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+		   bado.OnInitADOConn(); 
            strSql.Format(_T("Select * from ALL_NODE where Product_name='%s'"),strProName.GetBuffer());
-           ado.m_pRecordset=ado.OpenRecordset(strSql);
-           if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+           bado.m_pRecordset=bado.OpenRecordset(strSql);
+           if (!bado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
            {
             AfxMessageBox(_T("Already Exists!"));
             return;
@@ -258,8 +247,8 @@ void CARDDlg::OnBnClickedOk()
 			   +strStVersion+"','"
 			   +strCom+"','"
 			   +strEPSize+"')"));
-		   ado.m_pRecordset=ado.OpenRecordset(strSql);
-		   ado.CloseConn();
+		   bado.m_pRecordset=bado.OpenRecordset(strSql);
+		   bado.CloseConn();
 		   AfxMessageBox(_T("Add OK!"));
            CDialogEx::OnOK();
 	   }
@@ -290,4 +279,168 @@ void CARDDlg::OnBnClickedRadio2()
 {
 	// TODO: Add your control notification handler code here
 	Enable_Net_UI(0);
+}
+
+
+void CARDDlg::OnBnClickedButtonLocalMstpDevice()
+{
+	// TODO: Add your control notification handler code here
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
+	MessageBox(_T("Scan device may take a few minutes , Please wait!!"));
+	vector<CString>				m_szComs;
+	GetSerialComPortNumber1(m_szComs);
+	int com_port_count =  m_szComs.size();
+	for (int z=1;z<com_port_count;z++)
+	{
+		CString temp_cstring;
+		temp_cstring = m_szComs.at(z).Right(m_szComs.at(z).GetLength() - 3);
+		int com_port =  _wtoi(temp_cstring);
+		Initial_bac(com_port);
+
+
+
+
+		for (int x=0;x<25;x++)
+		{
+			//CString strInfo;strInfo.Format(_T("Scan Com%d,protocol Bacnet MSTP.Send global command time left(%d)"),temp_port,14-i);
+			//pScan->ShowBacnetComScanInfo(strInfo);
+			Send_WhoIs_Global(-1,-1);
+			Sleep(1000);
+		}
+
+
+
+
+		for (int j=0;j<5;j++)
+		{
+			int ready_to_read_count =	m_bac_scan_com_data.size();
+
+			CString strInfo;
+			strInfo.Format(_T("Scan  Bacnet mstp.Found %d BACNET device"),ready_to_read_count);
+			if((int)m_bac_scan_result_data.size()>= ready_to_read_count)
+				break;
+			TRACE(_T("gloab scan = %d\r\n"),ready_to_read_count);
+			for (int i=0;i<ready_to_read_count;i++)
+			{
+				int	resend_count = 0;
+				do 
+				{
+					resend_count ++;
+					if(resend_count>50)
+						break;
+					g_invoke_id = GetPrivateData(
+						m_bac_scan_com_data.at(i).device_id,
+						GETSERIALNUMBERINFO,
+						0,
+						0,
+						sizeof(Str_Serial_info));		
+
+					Sleep(SEND_COMMAND_DELAY_TIME);
+				} while (g_invoke_id<0);
+				//	Sleep(1000);
+			}
+		}
+
+
+
+
+		int ret_scan_count =	m_bac_scan_result_data.size(); 
+		if(ret_scan_count == 0 )
+		{
+			MessageBox(_T("No bacnet mstp device found."));
+			return;
+		}
+		CString bac_strInfo;
+		bac_strInfo.Format(_T("Scan  Bacnetip.Found %d recognizable Bacnet device"),ret_scan_count);
+		//pScan->ShowBacnetComScanInfo(bac_strInfo);
+		TRACE(_T("serial scan = %d\r\n"),ret_scan_count);
+
+		CString strMainBuildName,strSubBuildingName;
+		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		strMainBuildName= pFrame->m_strCurMainBuildingName;
+		strSubBuildingName= pFrame->m_strCurSubBuldingName;
+		int product_count = pFrame->m_product.size();
+
+		for (int scan_count = 0; scan_count < ret_scan_count ; scan_count ++)
+		{
+			bool exist_in_db = false;
+			int m_product_count = 0;
+			for (int a=0;a<product_count;a++)
+			{
+				if(m_bac_scan_result_data.at(scan_count).serialnumber == pFrame->m_product.at(a).serial_number)
+				{
+					m_product_count = a;
+					exist_in_db = true;
+					break;
+				}
+			}
+			CString modbusid;
+			CString str_ip_address;
+			CString str_n_port;
+			CString str_serialid;
+			CString product_class_id;
+			CString str_product_name;
+			CString strSql;
+// 			m_pCon.CreateInstance(_T("ADODB.Connection"));
+// 			m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+
+			modbusid.Format(_T("%d"),m_bac_scan_result_data.at(scan_count).modbus_addr);
+
+
+			str_ip_address.Format(_T("%u.%u.%u.%u"),(unsigned char)m_bac_scan_result_data.at(scan_count).ipaddress[0],
+													(unsigned char)m_bac_scan_result_data.at(scan_count).ipaddress[1],
+													(unsigned char)m_bac_scan_result_data.at(scan_count).ipaddress[2],
+													(unsigned char)m_bac_scan_result_data.at(scan_count).ipaddress[3])  ;
+			str_n_port.Format(_T("%d"),m_bac_scan_result_data.at(scan_count).modbus_port);
+			str_serialid.Format(_T("%u"),m_bac_scan_result_data.at(scan_count).serialnumber);
+			product_class_id.Format(_T("%d"),m_bac_scan_result_data.at(scan_count).product_type);
+			str_product_name = GetProductName(m_bac_scan_result_data.at(scan_count).product_type);
+			str_product_name = str_product_name + _T(":") + str_serialid + _T("-") + modbusid + _T("-") + str_ip_address;
+
+			if(exist_in_db)
+			{
+				if((str_ip_address.CompareNoCase(pFrame->m_product.at(m_product_count).BuildingInfo.strIp) != 0) ||
+					(m_bac_scan_result_data.at(scan_count).modbus_port != pFrame->m_product.at(m_product_count).ncomport) ||
+					(m_bac_scan_result_data.at(scan_count).modbus_addr != pFrame->m_product.at(m_product_count).product_id) ||
+					(m_bac_scan_result_data.at(scan_count).device_id != ((int)pFrame->m_product.at(m_product_count).hardware_version )))
+				{
+					CString instance_value;
+					instance_value.Format(_T("%u"),m_bac_scan_result_data.at(scan_count).device_id);
+					try
+					{
+						 
+						strSql.Format(_T("update ALL_NODE set Bautrate ='%s' where Serial_ID = '%s'"),str_ip_address,str_serialid);
+						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
+						strSql.Format(_T("update ALL_NODE set Com_Port ='%s' where Serial_ID = '%s'"),str_n_port,str_serialid);
+						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
+						strSql.Format(_T("update ALL_NODE set Product_ID ='%s' where Serial_ID = '%s'"),modbusid,str_serialid);
+						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+						strSql.Format(_T("update ALL_NODE set Hardware_Ver ='%s' where Serial_ID = '%s'"),instance_value,str_serialid);
+						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+					}
+					catch(_com_error *e)
+					{
+						AfxMessageBox(e->ErrorMessage());
+					}
+					 
+					 bado.CloseRecordset();
+					 bado.CloseConn();
+
+					pFrame->m_product.at(m_product_count).ncomport = m_bac_scan_result_data.at(scan_count).modbus_port;
+					pFrame->m_product.at(m_product_count).BuildingInfo.strIp = str_ip_address;
+					pFrame->m_product.at(m_product_count).product_id = m_bac_scan_result_data.at(scan_count).modbus_addr;
+				}
+
+			}
+			else
+			{
+
+			}
+
+		}
+
+	}
 }

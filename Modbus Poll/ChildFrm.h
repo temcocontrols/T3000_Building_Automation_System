@@ -43,6 +43,10 @@ public:
 	int m_Hide_Alias_Columns;
 	int m_Address_Cell;
 	int m_PLC_Adresses;
+
+	BOOL m_apply;
+	BOOL m_wronce;
+
 public:
 	afx_msg void OnSetupRead32783();
 //	afx_msg void OnDispalyCommunication();
@@ -76,4 +80,5 @@ public:
 	afx_msg void OnFunctions06();
 	afx_msg void OnFunctions16();
 	afx_msg void OnFunctions23();
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };

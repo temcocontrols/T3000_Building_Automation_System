@@ -77,6 +77,7 @@ CListCtrlEx::CListCtrlEx()
 	memset(m_data,255,30000);
 	m_select_raw = 0;
 	m_select_col = 1;
+	m_dt_left = true;
 }
 
 CListCtrlEx::~CListCtrlEx()
@@ -1041,14 +1042,18 @@ void CListCtrlEx::DrawNormal(CDC *pDC, CString &strText, CRect &rcCell, BOOL bSe
 	{
 		nFormat=DT_RIGHT;
 	}
-	nFormat = DT_LEFT;//老毛要求的 靠左显示;
+	if(m_dt_left)
+		nFormat = DT_LEFT;//老毛要求的 靠左显示;
 
 	COLORREF crOldText=pDC->SetTextColor(crText);
 	rcText.left=rcIcon.right+3;
 	pDC->DrawText(strText, &rcText, nFormat);
 	pDC->SetTextColor(crOldText);
 }
-
+void CListCtrlEx::Dont_DT_Left()
+{
+	m_dt_left = false;
+}
 // draw a check box cell
 void CListCtrlEx::DrawCheckBox(CDC *pDC,  CString &strText, CRect &rcCell, BOOL bSelected, const CellData &cellData,COLORREF n_crtext,COLORREF n_crtextbkgrnd)
 {

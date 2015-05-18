@@ -90,8 +90,10 @@ public:
  	BOOL ScanNetworkDevice(); 
  	// 搜索串口设备
  	BOOL ScanComDevice();
-	BOOL ScanComOneByOneDevice();
-	BOOL ScanBacnetComDevice();//扫描 bacnet com port 设备;
+
+	BOOL ScanRemoteIPDevice(); //扫描 远程设备;
+	BOOL ScanBacnetIPDevice();//扫描 bacnet IP 设备;
+	BOOL ScanBacnetMstpDevice(); //扫描Bacnet MSTP 设备;
 	void SetComPort(int nCom);
 	BOOL CheckTheSameSubnet(CString strIP);
 public:
@@ -171,6 +173,7 @@ public:
 	void ScanTstatFromNCForAuto();
 	void GetTstatInfoFromID(int nTstatID);
 
+	void Initial_Scan_Info();
 	void ScanAll();
 	void WaitScan();//scan
 	int  m_scantype;
@@ -205,8 +208,9 @@ public:
 	
 
 	CEvent*							m_eScanOldNCEnd;
-	CEvent*						m_eScanBacnetComEnd;
-
+	CEvent*						m_eScanBacnetIpEnd;
+	CEvent*						m_eScanRemoteIPEnd;
+	//CEvent*						m_eScanBacnetMstpEnd;
 
 	BOOL								m_bStopScan;					// 强制结束SCAN，由用户选择exit时，停止两个搜索线程
 	BOOL								m_bNetScanFinish;			// 网络scan完成
@@ -215,8 +219,9 @@ public:
 	int									m_nBaudrate;
 	int									m_nComPort;
 	CWnd*							m_pParent;	
-
-	CWinThread*					m_pScanBacnetComThread;
+	//CWinThread*					m_pScanBacnetMstpThread;
+	CWinThread*					m_pScanRemoteIPThread;
+	CWinThread*					m_pScanBacnetIPThread;
 	CWinThread*					m_pScanNCThread;
 	CWinThread*                  m_pCheckSubnetThread;
 	CWinThread*					m_pScanTstatThread;
@@ -254,8 +259,8 @@ protected:
 
 
 	//BOOL							m_bAllScanFinish;	
-	_ConnectionPtr					t_pCon;
-	
+//	_ConnectionPtr					t_pCon;
+	CBADO bado;
 	vector<Building_info>		m_szSubnetsInfo;
 	CString m_ip;
 	CString m_port;

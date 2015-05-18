@@ -56,7 +56,7 @@ const DWORD c_nBinFileBufLen = 0x7FFFF;  // bin 文件最大512k
 
 
 
-#define WM_REPLACE_STATUSINFO		WM_USER+1000 
+#define WM_REPLACE_STATUSINFO		    WM_USER+1000 
 #define WM_ADD_STATUSINFO				WM_USER+1001 
 #define WM_FLASH_FINISH					WM_USER+1002
 #define WM_UPDATA_DEVICE_INFORMATION    WM_USER+1003
@@ -498,6 +498,7 @@ int const PM_TSTAT5B2 = 3;//
 int const PM_TSTAT5C = 4; //
 int const PM_TSTAT6 = 6;  //
 int const PM_TSTAT7 = 7;	//
+int const PM_TSTAT5I = 8;  //
 int const PM_TSTAT5D = 12;//
 const int PM_TSTAT5E = 16;	//
 int const PM_TSTAT5F = 17;	//
@@ -506,7 +507,7 @@ int const PM_TSTAT5H = 19;	 //
 int const PM_T38AIOD= 20;  //
 int const PM_T3IOA = 21;  //
 int const PM_T332AI = 22; //
-int const PM_T3AI16O = 23;
+int const  PM_T38AI16O = 23;
 int const PM_ZIGBEE = 24;
 int const PM_FLEXDRIVER = 25;
 int const PM_T3PT10 = 26;
@@ -522,7 +523,11 @@ int const PM_NC = 100;	//
 int const PM_AirQuality = 13;
 int const PM_HUM = 14;
 int const PM_LightingController = 103;	//
-
+int const PM_HUM_R=42;
+int const PM_RUNNAR=15;
+int const PM_CO2_NET = 32;
+int const PM_CO2_RS485 = 33;
+int const PM_CO2_NODE = 34;
 const TCHAR c_strProductModelFileName[] = _T("ProductModel.cfg");				//	Product Model 配置文件名称
 
 

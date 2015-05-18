@@ -15,6 +15,7 @@ CPointItem::CPointItem(void)
 
 CPointItem::~CPointItem(void)
 {
+	m_pNextItem =NULL;
 }
 
 void CPointItem::SetPoint(MyPoint point)  //设置此ItemPoint的坐标
@@ -54,11 +55,14 @@ CPointItem* CPointItem::GetNext(void) const
 	return m_pNextItem;
 }
 
-
-
-void CPointItem::SetCPUPersent(int ncpupersent)
+int CPointItem::GetPointValue()
 {
-	m_CPU_Loading = ncpupersent;
+	return m_value;
+}
+
+void CPointItem::SetPointValue(int nvalue)
+{
+	m_value = nvalue;
 }
 
 

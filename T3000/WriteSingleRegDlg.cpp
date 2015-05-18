@@ -73,22 +73,22 @@ void CWriteSingleRegDlg::OnBnClickedOk()
 	int ret=write_one(g_tstat_id,m_address,m_value);
 	if (ret>0)
 	{
-	  multi_register_value[m_address]=m_value;
+	  product_register_value[m_address]=m_value;
 	  AfxMessageBox(_T("Write OK"));
 
 	} 
 	else
 	{
-	 int value_ret=read_one(g_tstat_id,m_address,7);
-	 if (value_ret==m_value)
-	 {
-	 multi_register_value[m_address]=m_value;
-	 AfxMessageBox(_T("Write OK"));
-	 	UpdateData(FALSE);
-		return;
-	 }
-	 m_value=multi_register_value[m_address];
-	 AfxMessageBox(_T("Write Fail"));
+// 	 int value_ret=read_one(g_tstat_id,m_address,7);
+// 	 if (value_ret==m_value)
+// 	 {
+// 	 multi_register_value[m_address]=m_value;
+// 	 AfxMessageBox(_T("Write OK"));
+// 	 	UpdateData(FALSE);
+// 		return;
+// 	 }
+// 	 m_value=multi_register_value[m_address];
+// 	 AfxMessageBox(_T("Write Fail"));
 	}
 
 }

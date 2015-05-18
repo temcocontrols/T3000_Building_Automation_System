@@ -24,9 +24,9 @@ int GetIndex() const;
 
 void SetNext(CPointItem *pnext);
 CPointItem* GetNext(void) const;
+void SetPointValue(int nvalue);
+int GetPointValue();
 
-
-void SetCPUPersent(int ncpupersent);
 
 
 
@@ -34,7 +34,7 @@ protected:
 	MyPoint			m_point;
 	int				m_index;
 	CPointItem		*m_pNextItem;
-	int				m_CPU_Loading;
+	int				m_value;
 };
 
 #endif

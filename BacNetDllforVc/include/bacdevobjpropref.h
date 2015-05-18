@@ -46,8 +46,6 @@ typedef struct {
     BACNET_OBJECT_ID objectIdentifier;
 } BACNET_DEVICE_OBJECT_REFERENCE;
 
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -70,7 +68,6 @@ extern "C" {
         uint8_t tag_number,
         BACNET_DEVICE_OBJECT_PROPERTY_REFERENCE * value);
 
-
     int bacapp_encode_device_obj_ref(
         uint8_t * apdu,
         BACNET_DEVICE_OBJECT_REFERENCE * value);
@@ -88,7 +85,6 @@ extern "C" {
         uint8_t * apdu,
         uint8_t tag_number,
         BACNET_DEVICE_OBJECT_REFERENCE * value);
-
 
 #ifdef __cplusplus
 }

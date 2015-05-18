@@ -69,7 +69,7 @@ int datalink_send_pdu (
     uint8_t * pdu,
     unsigned pdu_len)
 {
-
+	//m_protocol = 4;
 	if(m_protocol == 2)
 	{
 		dlmstp_send_pdu(dest,npdu_data,pdu,pdu_len);
@@ -78,6 +78,10 @@ int datalink_send_pdu (
 	{
 		bip_send_pdu(dest,npdu_data,pdu,pdu_len);
 	}
+	else if(m_protocol == 4)
+	{
+		//ptp_send_pdu(dest,npdu_data,pdu,pdu_len);
+	}
 }
 
 __declspec(dllexport) uint16_t datalink_receive (BACNET_ADDRESS * src, uint8_t * pdu,
@@ -85,11 +89,11 @@ __declspec(dllexport) uint16_t datalink_receive (BACNET_ADDRESS * src, uint8_t *
 {
 	if(m_protocol == 3)
 	{
-		bip_receive(src,pdu,max_pdu,timeout);
+		return	bip_receive(src,pdu,max_pdu,timeout);
 	}
 	else if(m_protocol == 2)
 	{
-		dlmstp_receive(src, pdu, max_pdu, timeout);
+		return dlmstp_receive(src, pdu, max_pdu, timeout);
 	}
 	
 }
@@ -124,7 +128,7 @@ void set_datalink_protocol(int nprotocol)
 	BACNET_ADDRESS * my_address)
 {
 	//if(protocal == BAC_MSTP || protocal == BAC_PTP)
-	if(m_protocol == 2)
+	if((m_protocol == 2) || (m_protocol == 4))	//如果协议时MSTP 或者PTP  就采用mstp的 地址;
 	{
 		dlmstp_get_my_address(my_address);
 	}

@@ -11,16 +11,10 @@ wchar_t m_mdb_path_t3000[255];
 int Mdb_Adress_Map=0;
 int temp_Mdb_Adress_Map=0;
 
-struct AddressMap
-{
-	char AddressName[255];
-	int AddressValue;
-};
+
 
 //目前数据库支持这3张表的查询，在切换器件时，一次性载入新的数据库，并不影响效率。;
-AddressMap TSTAT_6_ADDRESS[1000];
-AddressMap TSTAT_5EH_LCD_ADDRESS[1000];
-AddressMap TSTAT_5ABCDFG_LED_ADDRESS[1000];
+
 
 
 T3000RegAddress::T3000RegAddress(void)
@@ -153,6 +147,104 @@ bool T3000RegAddress::MatchMoudleAddress(void)
 	}
 	if(m_pRs->State)
 		m_pRs->Close();
+#if 1
+	strSql.Format(_T("select * from T3_RegisterList order by RegID"));
+	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	{
+		unsigned char nlength;
+		char cTemp[256];
+		memset(cTemp,0,256);
+		CString cs_temp;
+		temp_variant_item = m_pRs->GetCollect(_T("RegID"));
+		T3_8AI8AO[temp_variant_item].AddressValue = temp_variant_item;
+		T3_8AI16O[temp_variant_item].AddressValue = temp_variant_item;
+		T3_32AI[temp_variant_item].AddressValue = temp_variant_item;
+		T3_Performance[temp_variant_item].AddressValue = temp_variant_item;
+		T3_4AO[temp_variant_item].AddressValue = temp_variant_item;
+		T3_6CT[temp_variant_item].AddressValue = temp_variant_item;
+		T3_28IN[temp_variant_item].AddressValue = temp_variant_item;
+		T3_RTD[temp_variant_item].AddressValue = temp_variant_item;
+
+		temp_variant=m_pRs->GetCollect(_T("T3-8AI8AO"));
+		cs_temp=temp_variant;
+		cs_temp = cs_temp.Trim();
+		nlength = cs_temp.GetLength() + 1;
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
+		strcpy_s(T3_8AI8AO[temp_variant_item].AddressName,nlength,cTemp);
+
+		temp_variant=m_pRs->GetCollect(_T("T3-8AI16O"));
+		memset(cTemp,0,256);
+		cs_temp=temp_variant;
+		cs_temp = cs_temp.Trim();
+		nlength = cs_temp.GetLength() + 1;
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
+		strcpy_s(T3_8AI16O[temp_variant_item].AddressName,nlength,cTemp);
+
+		temp_variant=m_pRs->GetCollect(_T("T3-32AI"));
+		memset(cTemp,0,256);
+		cs_temp=temp_variant;
+		cs_temp = cs_temp.Trim();
+		nlength = cs_temp.GetLength() + 1;
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
+		strcpy_s(T3_32AI[temp_variant_item].AddressName,nlength,cTemp);
+
+		temp_variant=m_pRs->GetCollect(_T("T3-Performance"));
+		memset(cTemp,0,256);
+		cs_temp=temp_variant;
+		cs_temp = cs_temp.Trim();
+		nlength = cs_temp.GetLength() + 1;
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
+		strcpy_s(T3_Performance[temp_variant_item].AddressName,nlength,cTemp);
+
+		temp_variant=m_pRs->GetCollect(_T("T3-4AO"));
+		memset(cTemp,0,256);
+		cs_temp=temp_variant;
+		cs_temp = cs_temp.Trim();
+		nlength = cs_temp.GetLength() + 1;
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
+		strcpy_s(T3_4AO[temp_variant_item].AddressName,nlength,cTemp);
+
+		temp_variant=m_pRs->GetCollect(_T("T3-6CT"));
+		memset(cTemp,0,256);
+		cs_temp=temp_variant;
+		cs_temp = cs_temp.Trim();
+		nlength = cs_temp.GetLength() + 1;
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
+		strcpy_s(T3_6CT[temp_variant_item].AddressName,nlength,cTemp);
+
+		temp_variant=m_pRs->GetCollect(_T("T3-28IN"));
+		memset(cTemp,0,256);
+		cs_temp=temp_variant;
+		cs_temp = cs_temp.Trim();
+		nlength = cs_temp.GetLength() + 1;
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
+		strcpy_s(T3_28IN[temp_variant_item].AddressName,nlength,cTemp);
+
+		temp_variant=m_pRs->GetCollect(_T("T3-RTD"));
+		memset(cTemp,0,256);
+		cs_temp=temp_variant;
+		cs_temp = cs_temp.Trim();
+		nlength = cs_temp.GetLength() + 1;
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
+		strcpy_s(T3_RTD[temp_variant_item].AddressName,nlength,cTemp);
+
+		temp_variant=m_pRs->GetCollect(_T("T3-8I13O"));
+		memset(cTemp,0,256);
+		cs_temp=temp_variant;
+		cs_temp = cs_temp.Trim();
+		nlength = cs_temp.GetLength() + 1;
+		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 256, NULL, NULL );
+		strcpy_s(T3_8I13O[temp_variant_item].AddressName,nlength,cTemp);
+
+		
+
+		m_pRs->MoveNext();
+	}
+#endif
+
+	if(m_pRs->State)
+		m_pRs->Close();
 	if(m_pCon->State)
 		m_pCon->Close();
 
@@ -165,7 +257,7 @@ bool T3000RegAddress::MatchMoudleAddress(void)
  bool T3000RegAddress::Change_Register_Table(void)
  {
     MODBUS_SERIALNUMBER_LOWORD                            =  _P("MODBUS_SERIALNUMBER_LOWORD");              
-                                                                                                         
+                                                                                                     
     MODBUS_SERIALNUMBER_HIWORD                            =  _P("MODBUS_SERIALNUMBER_HIWORD");              
                                                                                                          
     MODBUS_VERSION_NUMBER_LO                              =  _P("MODBUS_VERSION_NUMBER_LO");                
@@ -428,20 +520,20 @@ bool T3000RegAddress::MatchMoudleAddress(void)
     MODBUS_VALVE_OFF_TABLE_HEAT3                          =  _P("MODBUS_VALVE_OFF_TABLE_HEAT3");            
     MODBUS_DEFAULT_SETPOINT                               =  _P("MODBUS_DEFAULT_SETPOINT");                 
     MODBUS_SETPOINT_CONTROL                               =  _P("MODBUS_SETPOINT_CONTROL");                 
-    MODBUS_DAYSETPOINT_OPTION                             =  _P("MODBUS_DAYSETPOINT_OPTION");               
-    MODBUS_MIDDLE_SETPOINT                                =  _P("MODBUS_MIDDLE_SETPOINT");                  
-    MODBUS_DAY_SETPOINT                                   =  _P("MODBUS_DAY_SETPOINT");                     
-    MODBUS_DAY_COOLING_DEADBAND                           =  _P("MODBUS_DAY_COOLING_DEADBAND");             
-    MODBUS_DAY_HEATING_DEADBAND                           =  _P("MODBUS_DAY_HEATING_DEADBAND");             
-    MODBUS_DAY_COOLING_SETPOINT                           =  _P("MODBUS_DAY_COOLING_SETPOINT");             
-    MODBUS_DAY_HEATING_SETPOINT                           =  _P("MODBUS_DAY_HEATING_SETPOINT");             
-    MODBUS_NIGHT_SETPOINT                                 =  _P("MODBUS_NIGHT_SETPOINT");                   
-    MODBUS_APPLICATION                                    =  _P("MODBUS_APPLICATION");                      
-    MODBUS_NIGHT_HEATING_DEADBAND                         =  _P("MODBUS_NIGHT_HEATING_DEADBAND");           
-    MODBUS_NIGHT_COOLING_DEADBAND                         =  _P("MODBUS_NIGHT_COOLING_DEADBAND");           
-    MODBUS_NIGHT_HEATING_SETPOINT                         =  _P("MODBUS_NIGHT_HEATING_SETPOINT");           
-    MODBUS_NIGHT_COOLING_SETPOINT                         =  _P("MODBUS_NIGHT_COOLING_SETPOINT");           
-    MODBUS_WINDOW_INTERLOCK_COOLING_SETPOINT              =  _P("MODBUS_WINDOW_INTERLOCK_COOLING_SETPOINT");
+	MODBUS_DAYSETPOINT_OPTION                             =  _P("MODBUS_DAYSETPOINT_OPTION");               
+	MODBUS_MIDDLE_SETPOINT                                =  _P("MODBUS_MIDDLE_SETPOINT");                  
+	MODBUS_DAY_SETPOINT                                   =  _P("MODBUS_DAY_SETPOINT");                     
+	MODBUS_DAY_COOLING_DEADBAND                           =  _P("MODBUS_DAY_COOLING_DEADBAND");             
+	MODBUS_DAY_HEATING_DEADBAND                           =  _P("MODBUS_DAY_HEATING_DEADBAND");             
+	MODBUS_DAY_COOLING_SETPOINT                           =  _P("MODBUS_DAY_COOLING_SETPOINT");             
+	MODBUS_DAY_HEATING_SETPOINT                           =  _P("MODBUS_DAY_HEATING_SETPOINT");             
+	MODBUS_NIGHT_SETPOINT                                 =  _P("MODBUS_NIGHT_SETPOINT");                   
+	MODBUS_APPLICATION                                    =  _P("MODBUS_APPLICATION");                      
+	MODBUS_NIGHT_HEATING_DEADBAND                         =  _P("MODBUS_NIGHT_HEATING_DEADBAND");           
+	MODBUS_NIGHT_COOLING_DEADBAND                         =  _P("MODBUS_NIGHT_COOLING_DEADBAND");           
+	MODBUS_NIGHT_HEATING_SETPOINT                         =  _P("MODBUS_NIGHT_HEATING_SETPOINT");           
+	MODBUS_NIGHT_COOLING_SETPOINT                         =  _P("MODBUS_NIGHT_COOLING_SETPOINT");           
+	MODBUS_WINDOW_INTERLOCK_COOLING_SETPOINT              =  _P("MODBUS_WINDOW_INTERLOCK_COOLING_SETPOINT");
     MODBUS_WINDOW_INTERLOCK_HEATING_SETPOINT              =  _P("MODBUS_WINDOW_INTERLOCK_HEATING_SETPOINT");
     MODBUS_UNIVERSAL_NIGHTSET                             =  _P("MODBUS_UNIVERSAL_NIGHTSET");               
     MODBUS_UNIVERSAL_SET                                  =  _P("MODBUS_UNIVERSAL_SET");                    

@@ -11,6 +11,7 @@
 #include "ado/ADO.h"
 #include "Global_Struct.h"
 #include "define.h"
+#include "bado/BADO.h"
 //#include "Weekly_Routines.h"
 //#define TSTAT26_VAR_NUM 75
 //#define TSTAT26_VAR_NUM 80
@@ -1448,7 +1449,7 @@ void delay_time_write(wofstream & out)
 {   //write the delay
 	//used by save2file functiojn
 	int rows;
-	if (product_register_value[7]==6||product_register_value[7]==7)
+	if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT5i))
 	{
 	  rows=7;
 	}
@@ -1499,7 +1500,7 @@ void delay_time_write_Tstat67(wofstream & out)
 {   //write the delay
 	//used by save2file functiojn
 	int rows;
-	if (product_register_value[7]==6||product_register_value[7]==7)
+	if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT5i))
 	{
 		rows=7;
 	}
@@ -2750,7 +2751,26 @@ bool find_load_file_error(load_file_every_step temppp)
 		return false;
 }
 
+bool Check_Config_File(wifstream & inf){
+	    TCHAR buf[1024];
+	    bool ret=false;
+ 
+		inf.getline(buf,1024);
+		if (find_sub_chars(buf,_T("Config File")))
+		{
+			inf.getline(buf,1024);//T3000 版本号
+			inf.getline(buf,1024);
+			if (find_sub_chars(buf,GetProductName(product_register_value[7])))
+			{
+				ret=true; 
+			}
+		   
+		}
 
+
+		return ret;
+  
+}
 
 int get_fan_var(wifstream & inf,int fan_value[])
 {//used by loadfile2Tstat function
@@ -2879,8 +2899,7 @@ bool section_end_find(TCHAR *buf)
 		return true;
 	if(find_sub_chars(buf,_T("//   VALVE AUTO END")))
 		return true;
-
-
+ 
 	if(find_sub_chars(buf,_T("serialnumber:")))
 		return true;	
 	return false;
@@ -3140,7 +3159,7 @@ void get_delay_setting_line_value(TCHAR *buf,int array[7])
 
 void get_delay_setting(wifstream & inf,int value_setting[14])
 {    int rows=5;
-    if (product_register_value[7]==6||product_register_value[7]==7)
+    if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT5i))
         rows=7;
 	TCHAR buf[1024];
 	while(!inf.eof())
@@ -3296,6 +3315,7 @@ void get_var_write_var(wifstream & inf,float tstat_version,CStdioFile *p_log_fil
 void get_write_var_line_T3(TCHAR *buf,float tstat_version,CStdioFile *p_log_file)
 {
 	CString for_showing_text;
+	Reg_Infor Reg_Infor_Temp;
 	if(_wtoi(buf)==0)
 		return ;
 	TCHAR *temp=buf;
@@ -3310,6 +3330,9 @@ void get_write_var_line_T3(TCHAR *buf,float tstat_version,CStdioFile *p_log_file
 	}
 	
 	j=write_one(now_tstat_id,register_id,register_value);	
+	Reg_Infor_Temp.regAddress=register_id;
+
+	Reg_Infor_Temp.RegValue=register_value;
 	if(p_log_file!=NULL)
 	{
 		for_showing_text.Format(_T("register ID:%d,VALUE:%d write "),register_id,register_value);
@@ -3317,12 +3340,14 @@ void get_write_var_line_T3(TCHAR *buf,float tstat_version,CStdioFile *p_log_file
 			for_showing_text=for_showing_text+_T("OK\r\n");
 		else
 		{
-			
-			for_showing_text=for_showing_text+_T("Error******************\r\n");
+			g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+			//for_showing_text=for_showing_text+_T("Error******************\r\n");
 		}
 		change_showing_text_variable(for_showing_text);
 		p_log_file->WriteString(for_showing_text);
 	}
+
+
 }
 
 
@@ -3339,6 +3364,7 @@ void get_var_write_var_T3(wifstream & inf,float tstat_version,CStdioFile *p_log_
 
 		get_write_var_line_T3(buf,tstat_version,p_log_file);//get a line ,one register value,
 	}
+
 }
 
 
@@ -3365,7 +3391,8 @@ void write_input_output_var(wifstream & inf,float tstat_version,CStdioFile *p_lo
 		get_write_var_line_output(buf,tstat_version,outputno,p_log_file,p_log_file_one_time);//get a line ,one register value,
 		outputno++;
 	}
-	CADO ado;
+	CBADO ado;
+	ado.SetDBPath(g_strCurBuildingDatabasefilePath);
 	ado.OnInitADOConn();
 	while(!inf.eof())
 	{
@@ -3404,6 +3431,7 @@ int fan_number;
 
 void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,load_file_every_step *p_log_file_one_time)
 {//used by get_value_setting function only
+Reg_Infor Reg_Infor_Temp;
 	CString for_showing_text;
 	if(_wtoi(buf)==0)
 		return ;
@@ -3447,6 +3475,9 @@ void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,lo
 		Sleep(14000);	
 		j=write_one(now_tstat_id,register_id,register_value);	
 	}
+	Reg_Infor_Temp.regAddress=register_id;
+
+	Reg_Infor_Temp.RegValue=register_value;
 	if(p_log_file!=NULL)
 	{
 		for_showing_text.Format(_T("register ID:%d,VALUE:%d write "),register_id,register_value);
@@ -3461,7 +3492,8 @@ void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,lo
 		else
 		{
 			p_log_file_one_time->seven_step=false;
-			for_showing_text=for_showing_text+_T("Error******************\r\n");
+			g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+			//for_showing_text=for_showing_text+_T("Error******************\r\n");
 		}
 		change_showing_text_variable(for_showing_text);
 	//	p_log_file->Write(for_showing_text.GetString(),for_showing_text.GetLength());
@@ -3542,8 +3574,8 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 			} 
 			else
 			{
-				AfxMessageBox(_T("Error"));
-				return;
+				//AfxMessageBox(_T("Error"));
+				//return;
 			}
 
 		}
@@ -3556,19 +3588,19 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 		{  unsigned short num[4];  
 		   Read_Multi(now_tstat_id,&num[0],0,4);
 		   g_serialNum=num[0]+num[1]*256+num[2]*256*256+num[3]*256*256;
-		   _ConnectionPtr m_ConTmp;
-		   _RecordsetPtr m_RsTmp;
-			m_ConTmp.CreateInstance("ADODB.Connection");
-			m_RsTmp.CreateInstance("ADODB.Recordset");
-			m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+		  
+		   CBADO bado;
+		   bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+		   bado.OnInitADOConn(); 
 
 			CString strSerial;
 			strSerial.Format(_T("%d"),g_serialNum);
 
 			CString strsql;
 			strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
-			m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-			if(VARIANT_FALSE==m_RsTmp->EndOfFile)//update
+			//m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
+			 bado.m_pRecordset=bado.OpenRecordset(strsql);
+			if(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)//update
 			{			
 				CString strField;
 				switch (lRow)
@@ -3606,7 +3638,7 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 					CString str_temp;
 					str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
 					//AfxMessageBox(str_temp );
-					m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+					bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
 					//m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
 				}
 				catch(_com_error *e)
@@ -3672,7 +3704,7 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 				try
 				{
 
-					m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+					bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
 				//	m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
 				}
 				catch(_com_error *e)
@@ -3708,19 +3740,19 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 				g_strInName8=strText;
 				break;
 			}
-			if(m_RsTmp->State) 
-				m_RsTmp->Close(); 
-			if(m_ConTmp->State)
-				m_ConTmp->Close();	
-		}	
+			 
 
+			 bado.CloseRecordset();
+			 bado.CloseConn();
+		}	
+        
 	}
 	catch (...)
 	{
 
 
 	}
-
+	
     //wrong value
 	/*
 	else if(register_id==128 && register_value>5)
@@ -3822,19 +3854,22 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 		{  unsigned short num[4];  
 		   Read_Multi(now_tstat_id,&num[0],0,4);
 		   g_serialNum=num[0]+num[1]*256+num[2]*256*256+num[3]*256*256;
-		   _ConnectionPtr m_ConTmp;
-		   _RecordsetPtr m_RsTmp;
-			m_ConTmp.CreateInstance("ADODB.Connection");
-			m_RsTmp.CreateInstance("ADODB.Recordset");
-			m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-
+// 		   _ConnectionPtr m_ConTmp;
+// 		   _RecordsetPtr m_RsTmp;
+// 			m_ConTmp.CreateInstance("ADODB.Connection");
+// 			m_RsTmp.CreateInstance("ADODB.Recordset");
+// 			m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+		   CBADO bado;
+		   bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+		   bado.OnInitADOConn(); 
 			CString strSerial;
 			strSerial.Format(_T("%d"),g_serialNum);
 
 			CString strsql;
 			strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
-			m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-			if(VARIANT_FALSE==m_RsTmp->EndOfFile)//update
+			//m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
+			bado.m_pRecordset=bado.OpenRecordset(strsql);
+			if(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)//update
 			{			
 				CString strField;
 				switch (lRow)
@@ -3869,7 +3904,7 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 					CString str_temp;
 					str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
 					//AfxMessageBox(str_temp );
-					m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+					bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
 					//m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
 				}
 				catch(_com_error *e)
@@ -3919,7 +3954,7 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 				try
 				{
 
-					m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+					bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
 				//	m_FlexGrid.put_TextMatrix(lRow,lCol,strText);
 				}
 				catch(_com_error *e)
@@ -3955,10 +3990,12 @@ void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdi
 				g_strOutName8=strText;
 				break;
 			}
-			if(m_RsTmp->State) 
-				m_RsTmp->Close(); 
-			if(m_ConTmp->State)
-				m_ConTmp->Close();	
+// 			if(m_RsTmp->State) 
+// 				m_RsTmp->Close(); 
+// 			if(m_ConTmp->State)
+// 				m_ConTmp->Close();	
+            bado.CloseRecordset();
+			bado.CloseConn();
 		}	
 
 	}
@@ -3981,7 +4018,29 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 // 		269	331	1	Low byte	W/R	Number of Cooling Stages (Max heat + Cool = 6) 
 // 		276	332	1	Low byte	W/R	Number of Heating Stages in Original Table - (Maximum # of total heating and cooling states is 6)
 // 		277	333	1	Low byte	W/R	Number of Cooling Stages in Original Table - (Maximum # of total heating and cooling states is 6)
-	
+	int multy_ret = 0;
+	for(int i=0;i<17;i++) //Modify by Fance , tstat 6 has more register than 512;
+
+	{
+	 
+		//register_critical_section.Lock();
+		//
+		
+		multy_ret = Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100);
+		//register_critical_section.Unlock();
+		Sleep(100);
+		if(multy_ret<0)		//Fance : 如果出现读失败 就跳出循环体,因为如果是由断开连接 造成的 读失败 会使其他需要用到读的地方一直无法获得资源;
+			break;
+	}
+
+     if (multy_ret<0)
+     {
+	    AfxMessageBox(_T("Saving Error ,Please try again."));
+		return ;
+     }
+
+	//Fance_1
+	memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
 
 
 	int m_25_heat_stages,m_25_cool_stages,m_26_heat_stages,m_26_cool_stages;
@@ -4071,9 +4130,11 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 	out.open(fn,ios_base::out) ;
 
 	_Twrite_to_file_a_line(out,_T("Tstat Config File"));//added the header marker.
-
+	CString T3000Version;
+	T3000Version.Format(_T("T3000 Version:%s"),CurrentT3000Version);
+	_Twrite_to_file_a_line(out,T3000Version);//added the header marker.
 	//int nModelID = read_one(g_tstat_id, 7);
-	CString strProductClassName = get_product_class_name_by_model_ID(product_register_value[7]);
+	CString strProductClassName = GetProductName(product_register_value[7]);
 	strProductClassName = _T("Model : ") + strProductClassName;
 	_Twrite_to_file_a_line(out, strProductClassName);//added the model
 	//////////////////////////////////////////////////////////////////////////
@@ -4134,7 +4195,7 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 	WriteAddress(out);
 	_Twrite_to_file_a_line(out,_T(" "));//space
 	//////////////////////////////////////////////////////////////////////////
-	strTips = _T("Config file saved 100%...");
+	strTips = _T("Finished");
 	SetPaneString(3, strTips);
 	//////////////////////////////////////////////////////////////////////////
 	var_write_Tstat67(out);
@@ -4164,7 +4225,11 @@ void LoadFile2Tstat_T3(load_file_every_step &load_file_one_time,TCHAR* fn,CStdio
 	tstat_version=get_tstat_version(now_tstat_id);///////////////////get version
 	wifstream inf;//file
 	inf.open(fn,ios_base::in);
-
+	if (!Check_Config_File(inf))
+	{
+		AfxMessageBox(_T("It's not a good config file!"));
+		return;
+	}
 	for_showing_text=_T("Begin.....");
 	TCHAR buf[1024];
 
@@ -4178,7 +4243,55 @@ void LoadFile2Tstat_T3(load_file_every_step &load_file_one_time,TCHAR* fn,CStdio
 			if(p_log_file!=NULL)
 				p_log_file->WriteString(_T("\r\n"));
 		}
-	}	
+	}
+	
+	int Try_Times=5;
+	while(g_Vector_Write_Error.size()>0&&Try_Times>0){
+		int vecInt_index = 0;
+		for (vector <Reg_Infor>::iterator iter_index = g_Vector_Write_Error.begin(); 
+			iter_index != g_Vector_Write_Error.end();) 
+		{
+			int i_i=write_one(now_tstat_id,iter_index->regAddress,iter_index->RegValue);
+			if(p_log_file!=NULL)
+			{
+				if(i_i>0)
+				{
+					for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),iter_index->regAddress,iter_index->RegValue);
+					vecInt_index = iter_index - g_Vector_Write_Error.begin(); 
+					g_Vector_Write_Error.erase(iter_index);
+					iter_index = g_Vector_Write_Error.begin() + vecInt_index; 
+				}
+
+				else
+				{
+					//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
+					//g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+					//load_file_one_time.sixth_step=false;
+					++iter_index;
+				}
+				change_showing_text_variable(for_showing_text);
+				p_log_file->WriteString(for_showing_text.GetString());
+			}
+
+		}
+		--Try_Times;
+	}
+
+
+	for (vector <Reg_Infor>::iterator iter_index = g_Vector_Write_Error.begin(); 
+		iter_index != g_Vector_Write_Error.end(); ++iter_index) 
+	{
+
+		for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),iter_index->regAddress,iter_index->RegValue);
+
+		//load_file_one_time.sixth_step=false;
+
+		change_showing_text_variable(for_showing_text);
+		p_log_file->WriteString(for_showing_text.GetString());
+	}
+
+
+	p_log_file->Flush();	
 	inf.close();
 	Sleep(5000);
 }
@@ -4187,13 +4300,22 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
    //int nSpecialValue=read_one(now_tstat_id,326);
 	//write_one(g_tstat_id,324,0);
 	//every step is false
-
+	Reg_Infor Reg_Infor_Temp;
 	CString for_showing_text;
 	load_file_one_time.first_step=load_file_one_time.second_step=load_file_one_time.third_step=load_file_one_time.thurth_step=load_file_one_time.fifth_step=load_file_one_time.sixth_step=load_file_one_time.seven_step=load_file_one_time.eight_step=false;
 	float tstat_version;
 	tstat_version=get_tstat_version(now_tstat_id);///////////////////get version
+
 	wifstream inf;//file
 	inf.open(fn,ios_base::in);
+	if (!Check_Config_File(inf))
+	{
+		CString strTips;
+		strTips.Format(_T("Your configuration file is not fit for %s"),GetProductName(product_register_value[7]));
+
+		AfxMessageBox(strTips);
+		return;
+	}
 	int fan_value[35]={0};//fan_value 
 	for(int i=0;i<35;i++)
 		fan_value[i]=0;	
@@ -4215,7 +4337,10 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 						for_showing_text.Format(_T("register ID: %d value:%d write OK\r\n"),real_fan_address,fan_value[i*7+t_i]);
 					else
 					{
-						for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),real_fan_address,fan_value[i*7+t_i]);
+						//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),real_fan_address,fan_value[i*7+t_i]);
+						Reg_Infor_Temp.regAddress=real_fan_address;
+						Reg_Infor_Temp.RegValue=fan_value[i*7+t_i];
+						g_Vector_Write_Error.push_back(Reg_Infor_Temp);
 						load_file_one_time.first_step=false;
 					}
 					change_showing_text_variable(for_showing_text);
@@ -4226,13 +4351,14 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 	}
 			if(p_log_file!=NULL)
 				p_log_file->WriteString(_T("\r\n"));	
+
+				//   VALVE SETTING
 			int value_setting[7]={0};
 			memset(value_setting,0,sizeof(value_setting));
-
 			get_value_setting(inf,value_setting);//value setting
 			Show_load_file_error_message(load_file_one_time,2,p_log_file);
 			load_file_one_time.second_step=true;
-	for(int i=0;i<7;i++)
+	        for(int i=0;i<7;i++)
 			{
 				if(value_setting[i]>=0)
 				{
@@ -4243,7 +4369,11 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 							for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),173+i,value_setting[i]);
 						else
 						{
-							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),173+i,value_setting[i]);
+							//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),173+i,value_setting[i]);
+							Reg_Infor_Temp.regAddress=MODBUS_VALVE_OPERATION_TABLE_BEGIN+i;
+							Reg_Infor_Temp.RegValue=value_setting[i];
+							g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+
 							load_file_one_time.second_step=false;
 						}
 						change_showing_text_variable(for_showing_text);
@@ -4251,7 +4381,35 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 					}
 				}
 			}
-		
+		   // FANOFF  VALVE SETTING
+		   memset(value_setting,0,sizeof(value_setting));
+
+		   get_value_setting(inf,value_setting);//value setting
+		   Show_load_file_error_message(load_file_one_time,2,p_log_file);
+		   load_file_one_time.second_step=true;
+		   for(int i=0;i<7;i++)
+		   {
+			   if(value_setting[i]>=0)
+			   {
+				   int i_i=write_one(now_tstat_id,MODBUS_VALVE_OFF_TABLE_COAST+i,value_setting[i]);
+				   if(p_log_file!=NULL)
+				   {
+					   if(i_i>0)
+						   for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),173+i,value_setting[i]);
+					   else
+					   {
+						   //for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),173+i,value_setting[i]);
+						   Reg_Infor_Temp.regAddress=MODBUS_VALVE_OFF_TABLE_COAST+i;
+						   Reg_Infor_Temp.RegValue=value_setting[i];
+						   g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+
+						   load_file_one_time.second_step=false;
+					   }
+					   change_showing_text_variable(for_showing_text);
+					   p_log_file->WriteString(for_showing_text);
+				   }
+			   }
+		   }
 
 
 
@@ -4267,7 +4425,7 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 
 		if(wcscmp(buf,_T("//   DELAY TIMES"))==0)
 		{   int rows;
-		    if (product_register_value[7]==6||product_register_value[7]==7)
+		    if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT5i))
 		    {
 			rows=7;
 		    }
@@ -4291,7 +4449,10 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 							for_showing_text.Format(_T("register ID:%d vlaue:%d write OK\r\n"),MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i,delay_setting[i]);
 						else
 						{
-							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i,delay_setting[i]);
+							//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i,delay_setting[i]);
+							Reg_Infor_Temp.regAddress=MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i;
+							Reg_Infor_Temp.RegValue=delay_setting[i];
+							g_Vector_Write_Error.push_back(Reg_Infor_Temp);
 							load_file_one_time.third_step=false;
 						}
 						change_showing_text_variable(for_showing_text);
@@ -4310,7 +4471,10 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 							for_showing_text.Format(_T("register ID:%d vlaue:%d write OK\r\n"),MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i,delay_setting[rows+i]);
 						else
 						{
-							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i,delay_setting[rows+i]);
+							Reg_Infor_Temp.regAddress=MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i;
+							Reg_Infor_Temp.RegValue=delay_setting[rows+i];
+							g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+							//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i,delay_setting[rows+i]);
 							load_file_one_time.third_step=false;
 						}
 						change_showing_text_variable(for_showing_text);
@@ -4341,8 +4505,12 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 							if(i_i>0)
 								for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),MODBUS_TABLE1_ZERO+i,lookup_table_setting[i]);
 							else
-							{							
-								for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),MODBUS_TABLE1_ZERO+i,lookup_table_setting[i]);
+							{		
+								Reg_Infor_Temp.regAddress=MODBUS_TABLE1_ZERO+i;
+								Reg_Infor_Temp.RegValue=lookup_table_setting[i];
+								g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+													
+								//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),MODBUS_TABLE1_ZERO+i,lookup_table_setting[i]);
 								load_file_one_time.thurth_step=false;
 							}
 							change_showing_text_variable(for_showing_text);
@@ -4372,7 +4540,10 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 								for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),254+i,universal_value[i]);
 							else
 							{
-								for_showing_text.Format(_T("register ID:%d vlaue:%d write Error******************\r\n"),254+i,universal_value[i]);
+								//for_showing_text.Format(_T("register ID:%d vlaue:%d write Error******************\r\n"),254+i,universal_value[i]);
+								Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_OUTPUT_BEGIN+i;
+								Reg_Infor_Temp.RegValue=universal_value[i];
+								g_Vector_Write_Error.push_back(Reg_Infor_Temp);
 								load_file_one_time.fifth_step=false;
 							}
 							change_showing_text_variable(for_showing_text);
@@ -4403,7 +4574,11 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 								for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),261+i,value_setting[i]);
 							else
 							{
-								for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
+								//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
+								Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_VALVE_BEGIN+i;
+								Reg_Infor_Temp.RegValue=value_setting[i];
+								g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+
 								load_file_one_time.sixth_step=false;
 							}
 							change_showing_text_variable(for_showing_text);
@@ -4430,7 +4605,57 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 			p_log_file->WriteString(_T("\r\n"));
 		}
 	  /*  else */
-	}	
+	}
+	
+	int Try_Times=5;
+	while(g_Vector_Write_Error.size()>0&&Try_Times>0){
+		int vecInt_index = 0;
+		for (vector <Reg_Infor>::iterator iter_index = g_Vector_Write_Error.begin(); 
+			iter_index != g_Vector_Write_Error.end();) 
+		{
+			int i_i=write_one(now_tstat_id,iter_index->regAddress,iter_index->RegValue);
+			if(p_log_file!=NULL)
+			{
+				if(i_i>0)
+				{
+					for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),iter_index->regAddress,iter_index->RegValue);
+					vecInt_index = iter_index - g_Vector_Write_Error.begin(); 
+					g_Vector_Write_Error.erase(iter_index);
+					iter_index = g_Vector_Write_Error.begin() + vecInt_index; 
+				}
+
+				else
+				{
+					//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
+					//g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+					//load_file_one_time.sixth_step=false;
+					++iter_index;
+				}
+				change_showing_text_variable(for_showing_text);
+				p_log_file->WriteString(for_showing_text.GetString());
+			}
+
+		}
+		--Try_Times;
+	}
+
+
+	for (vector <Reg_Infor>::iterator iter_index = g_Vector_Write_Error.begin(); 
+		iter_index != g_Vector_Write_Error.end(); ++iter_index) 
+	{
+
+		for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),iter_index->regAddress,iter_index->RegValue);
+
+		//load_file_one_time.sixth_step=false;
+
+		change_showing_text_variable(for_showing_text);
+		p_log_file->WriteString(for_showing_text.GetString());
+	}
+
+
+	p_log_file->Flush();
+	
+		
 	inf.close();
 	Sleep(5000);
 ////LoadFile2Tstat_twofile(load_file_one_time,fn,p_log_file);
@@ -4441,13 +4666,19 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
    //int nSpecialValue=read_one(now_tstat_id,326);
 	//write_one(g_tstat_id,324,0);
 	//every step is false
-
+	Reg_Infor Reg_Infor_Temp;
 	CString for_showing_text;
 	load_file_one_time.first_step=load_file_one_time.second_step=load_file_one_time.third_step=load_file_one_time.thurth_step=load_file_one_time.fifth_step=load_file_one_time.sixth_step=load_file_one_time.seven_step=load_file_one_time.eight_step=false;
 	float tstat_version;
 	tstat_version=get_tstat_version(now_tstat_id);///////////////////get version
 	wifstream inf;//file
 	inf.open(fn,ios_base::in);
+	if (!Check_Config_File(inf))
+	{
+		AfxMessageBox(_T("It's not a good config file!"));
+		return;
+	}
+	
 	int fan_value[35]={0};//fan_value 
 	for(int i=0;i<35;i++)
 		fan_value[i]=0;	
@@ -4463,14 +4694,18 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 				if(fan_value[i]>=0)
 				{
 					int i_i=write_one(now_tstat_id,real_fan_address,fan_value[i*7+t_i]);
+					Reg_Infor_Temp.regAddress=real_fan_address;
+					Reg_Infor_Temp.RegValue=fan_value[i*7+t_i];
 					if(p_log_file!=NULL)
 					{
 						if(i_i>0)
 							for_showing_text.Format(_T("register ID: %d value:%d write OK\r\n"),real_fan_address,fan_value[i*7+t_i]);
 						else
 						{
-							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),real_fan_address,fan_value[i*7+t_i]);
+							//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),real_fan_address,fan_value[i*7+t_i]);
+							g_Vector_Write_Error.push_back(Reg_Infor_Temp);
 							load_file_one_time.first_step=false;
+
 						}
 						change_showing_text_variable(for_showing_text);
 							p_log_file->WriteString(for_showing_text);
@@ -4491,13 +4726,16 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 				if(value_setting[i]>=0)
 				{
 					int i_i=write_one(now_tstat_id,MODBUS_VALVE_OPERATION_TABLE_BEGIN+i,value_setting[i]);
+					Reg_Infor_Temp.regAddress=MODBUS_VALVE_OPERATION_TABLE_BEGIN+i;
+					Reg_Infor_Temp.RegValue=value_setting[i];
 					if(p_log_file!=NULL)
 					{
 						if(i_i>0)
 							for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),173+i,value_setting[i]);
 						else
 						{
-							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),173+i,value_setting[i]);
+							//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),173+i,value_setting[i]);
+							g_Vector_Write_Error.push_back(Reg_Infor_Temp);
 							load_file_one_time.second_step=false;
 						}
 						change_showing_text_variable(for_showing_text);
@@ -4534,13 +4772,17 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 				if(delay_setting[i]>=0)
 				{
 					int i_i=write_one(now_tstat_id,MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i,delay_setting[i]);
+					Reg_Infor_Temp.regAddress=MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i;
+
+					Reg_Infor_Temp.RegValue=delay_setting[i];
 					if(p_log_file!=NULL)
 					{
 						if(i_i>0)
 							for_showing_text.Format(_T("register ID:%d vlaue:%d write OK\r\n"),MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i,delay_setting[i]);
 						else
 						{
-							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i,delay_setting[i]);
+							//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),MODBUS_OUTPUT1_DELAY_OFF_TO_ON+i,delay_setting[i]);
+							g_Vector_Write_Error.push_back(Reg_Infor_Temp);
 							load_file_one_time.third_step=false;
 						}
 						change_showing_text_variable(for_showing_text);
@@ -4554,13 +4796,17 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 				if(delay_setting[rows+i]>=0)
 				{
 					int i_i=write_one(now_tstat_id,MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i,delay_setting[rows+i]);
+					Reg_Infor_Temp.regAddress=MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i;
+
+					Reg_Infor_Temp.RegValue=delay_setting[rows+i];
 					if(p_log_file!=NULL)
 					{
 						if(i_i>0)
 							for_showing_text.Format(_T("register ID:%d vlaue:%d write OK\r\n"),MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i,delay_setting[rows+i]);
 						else
 						{
-							for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i,delay_setting[rows+i]);
+						   g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+							//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),MODBUS_OUTPUT1_DELAY_ON_TO_OFF+i,delay_setting[rows+i]);
 							load_file_one_time.third_step=false;
 						}
 						change_showing_text_variable(for_showing_text);
@@ -4765,13 +5011,17 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 						if(universal_value[i]>=0)          
 						{
 							int i_i=write_one(now_tstat_id,MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN+i,universal_value[i]);
+							Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_OFF_OUTPUT_BEGIN+i;
+
+							Reg_Infor_Temp.RegValue=universal_value[i];
 							if(p_log_file!=NULL)
 							{
 								if(i_i>0)
 									for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),254+i,universal_value[i]);
 								else
 								{
-									for_showing_text.Format(_T("register ID:%d vlaue:%d write Error******************\r\n"),254+i,universal_value[i]);
+									//for_showing_text.Format(_T("register ID:%d vlaue:%d write Error******************\r\n"),254+i,universal_value[i]);
+									g_Vector_Write_Error.push_back(Reg_Infor_Temp);
 									load_file_one_time.fifth_step=false;
 								}
 								change_showing_text_variable(for_showing_text);
@@ -4796,13 +5046,17 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 						if(value_setting[i]>=0)
 						{
 							int i_i=write_one(now_tstat_id,MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+i,value_setting[i]);
+							Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_OFF_VALVE_BEGIN+i;
+
+							Reg_Infor_Temp.RegValue=value_setting[i];
 							if(p_log_file!=NULL)
 							{
 								if(i_i>0)
 									for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),261+i,value_setting[i]);
 								else
 								{
-									for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
+								    g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+									//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
 									load_file_one_time.sixth_step=false;
 								}
 								change_showing_text_variable(for_showing_text);
@@ -4825,13 +5079,16 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 					if(universal_value[i]>=0)          
 					{
 						int i_i=write_one(now_tstat_id,MODBUS_UNIVERSAL_OUTPUT_BEGIN+i,universal_value[i]);
+						Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_OUTPUT_BEGIN+i;
+
+						Reg_Infor_Temp.RegValue=universal_value[i];
 						if(p_log_file!=NULL)
 						{
 							if(i_i>0)
 								for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),254+i,universal_value[i]);
 							else
-							{
-								for_showing_text.Format(_T("register ID:%d vlaue:%d write Error******************\r\n"),254+i,universal_value[i]);
+							{g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+								//for_showing_text.Format(_T("register ID:%d vlaue:%d write Error******************\r\n"),254+i,universal_value[i]);
 								load_file_one_time.fifth_step=false;
 							}
 							change_showing_text_variable(for_showing_text);
@@ -4856,13 +5113,17 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 					if(value_setting[i]>=0)
 					{
 						int i_i=write_one(now_tstat_id,MODBUS_UNIVERSAL_VALVE_BEGIN+i,value_setting[i]);
+						Reg_Infor_Temp.regAddress=MODBUS_UNIVERSAL_VALVE_BEGIN+i;
+
+						Reg_Infor_Temp.RegValue=value_setting[i];
 						if(p_log_file!=NULL)
 						{
 							if(i_i>0)
 								for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),261+i,value_setting[i]);
 							else
 							{
-								for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
+								//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
+								g_Vector_Write_Error.push_back(Reg_Infor_Temp);
 								load_file_one_time.sixth_step=false;
 							}
 							change_showing_text_variable(for_showing_text);
@@ -4889,6 +5150,53 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 			p_log_file->WriteString(_T("\r\n"));
 		}
 	}	
+	int Try_Times=5;
+	while(g_Vector_Write_Error.size()>0&&Try_Times>0){
+	    int vecInt_index = 0;
+		 	for (vector <Reg_Infor>::iterator iter_index = g_Vector_Write_Error.begin(); 
+		 		iter_index != g_Vector_Write_Error.end();) 
+		 	{
+				int i_i=write_one(now_tstat_id,iter_index->regAddress,iter_index->RegValue);
+				if(p_log_file!=NULL)
+				{
+					if(i_i>0)
+						{
+						for_showing_text.Format(_T("register ID:%d value:%d write OK\r\n"),iter_index->regAddress,iter_index->RegValue);
+						vecInt_index = iter_index - g_Vector_Write_Error.begin(); 
+						g_Vector_Write_Error.erase(iter_index);
+						iter_index = g_Vector_Write_Error.begin() + vecInt_index; 
+						}
+
+					else
+					{
+						//for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),261+i,value_setting[i]);
+						//g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+						//load_file_one_time.sixth_step=false;
+						++iter_index;
+					}
+					change_showing_text_variable(for_showing_text);
+					p_log_file->WriteString(for_showing_text.GetString());
+				}
+			
+			}
+		--Try_Times;
+	}
+
+
+	for (vector <Reg_Infor>::iterator iter_index = g_Vector_Write_Error.begin(); 
+		iter_index != g_Vector_Write_Error.end(); ++iter_index) 
+	{
+		 
+				for_showing_text.Format(_T("register ID:%d value:%d write Error******************\r\n"),iter_index->regAddress,iter_index->RegValue);
+		
+				//load_file_one_time.sixth_step=false;
+		 
+			change_showing_text_variable(for_showing_text);
+			p_log_file->WriteString(for_showing_text.GetString());
+	}
+
+
+	p_log_file->Flush();
 	inf.close();
 	Sleep(5000);
 ////LoadFile2Tstat_twofile(load_file_one_time,fn,p_log_file);
@@ -5404,7 +5712,7 @@ void save_T3Modules_file(TCHAR* fn,int schedule_id){
 CStdioFile default_file;
 CString line;
 if(default_file.Open(fn,CFile::modeCreate | CFile::modeWrite)!=0){
-	default_file.WriteString(_T("T3 Modules config file\n"));
+	default_file.WriteString(_T("T3 Modules Config File\n"));
 	default_file.WriteString(_T("Model :"));
 	CString productname=GetProductName(product_register_value[7]);
 	default_file.WriteString(productname);
@@ -7160,7 +7468,8 @@ _Twrite_to_file_a_line(out,_T("//Input Name Config"));//space
 
  int m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
 int  m_crange,inoutputno;
- CADO ado;
+ CBADO ado;
+ ado.SetDBPath(g_strCurBuildingDatabasefilePath);
  ado.OnInitADOConn();
  if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
  {

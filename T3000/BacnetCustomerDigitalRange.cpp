@@ -32,6 +32,8 @@ BEGIN_MESSAGE_MAP(CBacnetCustomerDigitalRange, CDialogEx)
 	ON_MESSAGE(WM_REFRESH_BAC_CUSTOMER_DIGITAL_RANGE_LIST,Fresh_Customer_Digital_Range_List)	
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Customer_Digital_Range_Item)	
 	ON_NOTIFY(NM_CLICK, IDC_LIST_CUSTOMER_DIGITAL_RANGE, &CBacnetCustomerDigitalRange::OnNMClickListCustomerDigitalRange)
+
+	ON_WM_HELPINFO()
 END_MESSAGE_MAP()
 
 
@@ -279,4 +281,25 @@ void CBacnetCustomerDigitalRange::OnNMClickListCustomerDigitalRange(NMHDR *pNMHD
 	}
 
 	*pResult = 0;
+}
+
+
+BOOL CBacnetCustomerDigitalRange::OnHelpInfo(HELPINFO* pHelpInfo)
+{ 
+
+	if (g_protocol==PROTOCOL_BACNET_IP){
+		HWND hWnd;
+
+		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 			
+			theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+		else
+			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
+			HH_HELP_CONTEXT, IDH_TOPIC_7_DATA);
+		return (hWnd != NULL);
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
+
+	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

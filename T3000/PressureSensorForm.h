@@ -36,7 +36,10 @@ void Show_Pressure();
 int  Get_RegID(CString Name);
 	DECLARE_MESSAGE_MAP()
 	virtual void OnInitialUpdate();
-	CString Get_PressureSensor(int sensor_value);
+	CString Get_PressureSensor(double sensor_value);
+	void Changing_Parter();
+	HANDLE hFirstThread;
+UINT m_EDIT_ID;
 private:
 	int	MODBUS_SERIALNUMBER_LOWORD	;
 	int	MODBUS_SERIALNUMBER_HIWORD	;
@@ -419,12 +422,42 @@ private:
 	int	MODBUS_OUTPUT_CURRENT_CALIBRATION9	;
 	int	MODBUS_OUTPUT_CURRENT_CALIBRATION10	;
 	int	MODBUS_CAL_UNIT	;
+	int    MODBUS_PRESSURE_RATIO;
+	int	MODBUS_PRESSURE_INDEX;
+	int	MODBUS_PRESSURE_ORG_VALUE;
 public:
 	CComboBox m_combox_unit;
 	afx_msg void OnCbnSelchangeBoxunit();
 	CComboBox m_cmbox_outputtype;
 	afx_msg void OnCbnSelchangeComboOutputtype();
 	afx_msg void OnBnClickedButtonOutputtable();
+	CComboBox m_keypad_lock;
+	CComboBox m_Sensor_Type_Combox;
+	CComboBox m_am_combox;
+	CComboBox m_combox_output_range;
+	CEdit m_input_filter;
+	CEdit m_edit_signal;
+	CMsflexgrid m_pressure_table;
+	double m_output_value;
+	double m_signal_value;
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	afx_msg void OnDestroy();
+	afx_msg void OnCbnSelchangeKeypadlockcombo();
+	afx_msg void OnCbnSelchangeSensorType();
+	afx_msg void OnCbnSelchangeComboAm();
+	 /*afx_msg*/ void OnEnKillfocusEditFilter();
+	afx_msg void OnCbnSelchangeComboOutputRange();
+	 /*afx_msg*/ void OnEnKillfocusPressureSensor();
+	/*afx_msg*/  void OnEnKillfocusEditSensorMin();
+	/*afx_msg*/  void OnEnKillfocusEditSensorMax();
+//	virtual BOOL PreTranslateMessage(MSG* pMsg);
+//	afx_msg void OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2);
+   // afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);//手动加入.
+	afx_msg void OnEnSetfocusPressureSensor();
+	afx_msg void OnEnSetfocusEditFilter();
+	afx_msg void OnSetfocusEditSensorMin();
+	afx_msg void OnSetfocusEditSensorMax();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 

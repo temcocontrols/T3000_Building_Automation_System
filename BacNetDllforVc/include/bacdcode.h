@@ -220,7 +220,6 @@ __declspec(dllexport)    int decode_octet_string(
         uint8_t tag_number,
         BACNET_OCTET_STRING * octet_string);
 
-
 /* from clause 20.2.9 Encoding of a Character String Value */
 /* and 20.2.1 General Rules for Encoding BACnet Tags */
 /* returns the number of apdu bytes consumed */
@@ -248,7 +247,6 @@ __declspec(dllexport)    int decode_octet_string(
         uint8_t * apdu,
         uint8_t tag_number,
         BACNET_CHARACTER_STRING * char_string);
-
 
 /* from clause 20.2.4 Encoding of an Unsigned Integer Value */
 /* and 20.2.1 General Rules for Encoding BACnet Tags */
@@ -293,7 +291,6 @@ __declspec(dllexport)    int decode_octet_string(
         uint8_t * apdu,
         uint8_t tag_number,
         int32_t * value);
-
 
 /* from clause 20.2.11 Encoding of an Enumerated Value */
 /* and 20.2.1 General Rules for Encoding BACnet Tags */
@@ -344,7 +341,6 @@ __declspec(dllexport)    int decode_octet_string(
         uint8_t * apdu,
         uint8_t tag_number,
         BACNET_TIME * btime);
-
 
 /* BACnet Date */
 /* year = years since 1900 */
@@ -417,9 +413,7 @@ __declspec(dllexport)    int decode_octet_string(
 /* true if the tag is a closing tag */
 #define IS_CLOSING_TAG(x) ((x & 0x07) == 7)
 
-
 #ifdef __cplusplus
-
 }
 #endif /* __cplusplus */
 #endif

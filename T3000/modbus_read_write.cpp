@@ -80,7 +80,7 @@ int modbus_read_one_value(
 
 		// set value that we received
 		value = (int) j;
-		error_ret = 0;
+		error_ret = j;
 
 		// we have a good value, so no need to try again
 		break;
@@ -165,6 +165,7 @@ int Set_Communication_Count(bool b_transmission,int bac_instanceid)
 
   */
 int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+
 int modbus_read_multi_value( 
 		unsigned short *put_data_into_here,
 		unsigned char device_var,
@@ -180,11 +181,13 @@ int modbus_read_multi_value(
 	 is abandoned, not just delayed.
 	 But it is used in over 40 places in the rest of the code, so leave it alone
 	 */
+	 
 	g_bEnableRefreshTreeView = false;
-
+	TRACE(L"\nMulti -Read -Function -Enter\n");
 	int error=0;
-	CSingleLock singleLock(&register_critical_section);
-	singleLock.Lock() ;
+	//CSingleLock singleLock(&register_critical_section);
+	register_critical_section.Lock() ;
+	TRACE(L"\nMulti -Read -Lock\n");
 	for(int i=0;i<retry_times;i++)
 	{
 
@@ -209,7 +212,8 @@ int modbus_read_multi_value(
 			break;
 		}
 	}
-	  	singleLock.Unlock();
+	  	register_critical_section.Unlock();
+	TRACE(L"\nMulti -Read -UNLock\n");
 	// check for running in the main GUI thread
 	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
 

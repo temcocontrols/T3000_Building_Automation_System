@@ -57,6 +57,7 @@ __declspec(dllexport)    bool bip_init(
     /* common BACnet/IP functions */
  __declspec(dllexport)   void bip_set_socket(
         int sock_fd);
+__declspec(dllexport) void bip_setgsm(bool isconnect);
 __declspec(dllexport)    int bip_socket(
         void);
 __declspec(dllexport)    bool bip_valid(

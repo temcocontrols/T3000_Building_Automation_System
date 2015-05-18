@@ -31,7 +31,7 @@ public:
 	void Set_Read_Write(bool read_0_write_1);
 	CStaticEx m_wait_detail;
 	CProgressCtrl m_wait_progress;
-	static DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid);
+	//static DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid);
 	
 	CStaticEx m_wait_persent;
 	int m_wait_type;//0 µã»÷£»  1 Ð´config  £»2  ¶Áconfig;
@@ -40,6 +40,7 @@ public:
 public:
 	void Set_Show_String(CString temp);
 	void Set_Pos(int temp_pos);
+	virtual void PostNcDestroy();
 };
 
 const int READ_MONITORDATA_TIME = 6 ;

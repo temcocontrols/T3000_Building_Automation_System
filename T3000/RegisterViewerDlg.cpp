@@ -33,6 +33,8 @@ CRegisterViewerDlg::CRegisterViewerDlg(CWnd* pParent /*=NULL*/)
 
 CRegisterViewerDlg::~CRegisterViewerDlg()
 {
+
+
 }
 
 void CRegisterViewerDlg::DoDataExchange(CDataExchange* pDX)
@@ -45,47 +47,52 @@ void CRegisterViewerDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CRegisterViewerDlg, CDialog)
-	ON_BN_CLICKED(IDC_LEFT, &CRegisterViewerDlg::OnBnClickedLeft)
-	ON_BN_CLICKED(IDC_RIGHT, &CRegisterViewerDlg::OnBnClickedRight)
-	ON_BN_CLICKED(IDC_BEGIN, &CRegisterViewerDlg::OnBnClickedBegin)
-	ON_BN_CLICKED(IDC_END, &CRegisterViewerDlg::OnBnClickedEnd)
+//	ON_BN_CLICKED(IDC_LEFT, &CRegisterViewerDlg::OnBnClickedLeft)
+//	ON_BN_CLICKED(IDC_RIGHT, &CRegisterViewerDlg::OnBnClickedRight)
+//	ON_BN_CLICKED(IDC_BEGIN, &CRegisterViewerDlg::OnBnClickedBegin)
+//	ON_BN_CLICKED(IDC_END, &CRegisterViewerDlg::OnBnClickedEnd)
 	ON_WM_CTLCOLOR()
 //	ON_BN_CLICKED(IDC_ADDNEWPRODUCT, &CRegisterViewerDlg::OnBnClickedAddnewproduct)
 ON_COMMAND(ID_MAIN_NEW, &CRegisterViewerDlg::OnMainNew)
 //ON_WM_MOUSEHWHEEL()
 ON_WM_MOUSEWHEEL()
 ON_EN_KILLFOCUS(IDC_CELLEDIT, &CRegisterViewerDlg::OnEnKillfocusCelledit)
-ON_BN_CLICKED(IDC_SAVETODB, &CRegisterViewerDlg::OnBnClickedSavetodb)
+//ON_BN_CLICKED(IDC_SAVETODB, &CRegisterViewerDlg::OnBnClickedSavetodb)
 ON_BN_CLICKED(IDOK, &CRegisterViewerDlg::OnBnClickedOk)
 ON_WM_DESTROY()
+ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 BOOL CRegisterViewerDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	Fresh_GridCol();
 	LoadDataFromDB();
+	Fresh_GridCol();
+	if (!is_connect())
+	{
+		AfxMessageBox(_T("Please Connect to your device,firstly!"));
+		return FALSE;
+	} 
+	
 	m_curPage=1;
 	Show_ColorData();
-	GetDlgItem(IDC_STATIC_PRODUCTNAME)->ShowWindow(FALSE);
-	GetDlgItem(IDC_EDIT_PRODUCTNAME)->ShowWindow(FALSE);
-	GetDlgItem(IDC_SAVETODB)->ShowWindow(FALSE);
-	GetDlgItem(IDC_PRODUCTNAME)->ShowWindow(TRUE);
-	GetDlgItem(IDC_PRODUCTNAME_T)->ShowWindow(TRUE);
-	GetDlgItem(IDC_LEFT)->ShowWindow(TRUE);
-	GetDlgItem(IDC_BEGIN)->ShowWindow(TRUE);
-	GetDlgItem(IDC_RIGHT)->ShowWindow(TRUE);
-	GetDlgItem(IDC_END)->ShowWindow(TRUE);
-	GetDlgItem(IDC_PAGES)->ShowWindow(TRUE);
+// 	GetDlgItem(IDC_STATIC_PRODUCTNAME)->ShowWindow(FALSE);
+// 	GetDlgItem(IDC_EDIT_PRODUCTNAME)->ShowWindow(FALSE);
+	 
+	 
+	 
 	pParamBackFresh=AfxBeginThread(BackRegisterViewerFreshProc,this);
 	pParamBackFresh->m_bAutoDelete =FALSE;
 	return TRUE; 
 }
 
 void CRegisterViewerDlg::LoadDataFromDB()
-{   CString ProductModelName =Get_ProductModel();
+{   
+	CString m_cur_TableName,m_cur_Col_RegName,m_cur_col_RegAddress,m_modelname;
+    m_VecregisterData.clear();
+    CString ProductModelName =Get_ProductModel();
 	_variant_t temp_var;
-    if (ProductModelName.Find(_T("TStat"))!=-1)//Tstat serial
+    if (product_type==T3000_5ABCDFG_LED_ADDRESS||product_type==T3000_5EH_LCD_ADDRESS||product_type==T3000_6_ADDRESS)//Tstat serial
     {
 		CADO ado;
 		ado.OnInitADOConn();
@@ -106,7 +113,7 @@ void CRegisterViewerDlg::LoadDataFromDB()
 					tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_AddressName"));
 					tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DATATYPE"));
 					tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_LEN"));
-					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DESCRIPTION"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_INSTRUCTION"));
 					if (temp_var.vt==VT_NULL)
 					{
 						tempstruct.Description=_T("");
@@ -135,7 +142,7 @@ void CRegisterViewerDlg::LoadDataFromDB()
 					tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DATATYPE"));
 					tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_LEN"));
 					//tempstruct.Description=(CString)ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DESCRIPTION"));
-					vartemp=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_DESCRIPTION"));
+					vartemp=ado.m_pRecordset->GetCollect(_T("TSTAT5_LCD_INSTRUCTION"));
 					if (vartemp.vt==VT_NULL)
 					{
 						tempstruct.Description=_T("");
@@ -156,11 +163,52 @@ void CRegisterViewerDlg::LoadDataFromDB()
 				}
 				else if (product_type==T3000_6_ADDRESS)
 				{
-					tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
-					tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT6_AddressName"));
-					tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT6_DATATYPE"));
-					tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT6_LEN"));
-					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_DESCRIPTION")); 
+				    temp_var=ado.m_pRecordset->GetCollect(_T("Register_Address")); 
+
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Register_Address=-1;
+					} 
+					else
+					{
+						tempstruct.Register_Address=temp_var;
+					}
+
+					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_AddressName")); 
+
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.AddressName=_T("");
+					} 
+					else
+					{
+						tempstruct.AddressName=temp_var;
+					}
+					 
+					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_DATATYPE")); 
+
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.DataType=_T("");
+					} 
+					else
+					{
+						tempstruct.DataType=temp_var;
+					}
+
+					 
+					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_LEN")); 
+
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.length=-1;
+					} 
+					else
+					{
+						tempstruct.length=temp_var;
+					}
+				 
+					temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT6_INSTRUCTION")); 
 					if (temp_var.vt==VT_NULL)
 					{
 						tempstruct.Description=_T("");
@@ -179,6 +227,8 @@ void CRegisterViewerDlg::LoadDataFromDB()
 						tempstruct.Operation=temp_var;
 					}
 				}
+
+
 				if (tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)
 				{
 					ado.m_pRecordset->MoveNext();
@@ -192,14 +242,12 @@ void CRegisterViewerDlg::LoadDataFromDB()
 		ado.CloseRecordset();
 		ado.CloseConn();
     } 
-    else if (ProductModelName.Find(_T("T3"))!=-1)//T3 Serial
+    else if (product_type==T3000_T3_MODULES)//T3 Serial
     {
 		CADO ado;
 		ado.OnInitADOConn();
 		if (ado.IsHaveTable(ado,_T("T3_RegisterList")))
 		{
-			
-
 			CString sql,temp;
 			DBRegister tempstruct;
 			sql.Format(_T("Select * from T3_RegisterList order by RegID"));
@@ -246,160 +294,334 @@ void CRegisterViewerDlg::LoadDataFromDB()
 					m_recordcount++;
 					ado.m_pRecordset->MoveNext();
 				}
-
-
-
 			} 
-			else if (m_modelno==PM_T3PT10)
+			else if (m_modelno==PM_T38AI16O)
 			{
-			while(!ado.m_pRecordset->EndOfFile){
-				tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-				temp_var=ado.m_pRecordset->GetCollect(_T("T3-RTD"));
-				if (temp_var.vt==VT_NULL)
-				{
-					tempstruct.AddressName=_T("");
-				} 
-				else
-				{
-					tempstruct.AddressName=temp_var;
-				}
-				if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
-				{
+				while(!ado.m_pRecordset->EndOfFile){
+					tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI16O"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.AddressName=_T("");
+					} 
+					else
+					{
+						tempstruct.AddressName=temp_var;
+					}
+					if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
+					{
+						ado.m_pRecordset->MoveNext();
+						continue;
+					}
+					tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_DATATYPE"));
+					tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_LEN"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_DESCRIPTION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Description=temp_var;
+					}
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_OPERATION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Operation=temp_var;
+					}
+					m_VecregisterData.push_back(tempstruct);
+					m_recordcount++;
 					ado.m_pRecordset->MoveNext();
-					continue;
-				}
-				tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_DATATYPE"));
-				tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_LEN"));
-				temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_DESCRIPTION"));
-				if (temp_var.vt==VT_NULL)
-				{
-					tempstruct.Description=_T("");
-				} 
-				else
-				{
-					tempstruct.Description=temp_var;
-				}
-				temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI16O_OPERATION"));
-				if (temp_var.vt==VT_NULL)
-				{
-					tempstruct.Description=_T("");
-				} 
-				else
-				{
-					tempstruct.Operation=temp_var;
-				}
-				m_VecregisterData.push_back(tempstruct);
-				m_recordcount++;
-				ado.m_pRecordset->MoveNext();
-			}	
+				}	
 			}
 			else if (m_modelno==PM_T3IOA)
 			{
+				while(!ado.m_pRecordset->EndOfFile){
+					tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.AddressName=_T("");
+					} 
+					else
+					{
+						tempstruct.AddressName=temp_var;
+					}
+					if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
+					{
+						ado.m_pRecordset->MoveNext();
+						continue;
+					}
+					tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_DATATYPE"));
+					tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_LEN"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_DESCRIPTION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Description=temp_var;
+					}
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-8AI8AO_OPERATION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Operation=temp_var;
+					}
+					m_VecregisterData.push_back(tempstruct);
+					m_recordcount++;
+					ado.m_pRecordset->MoveNext();
+				}
 			}
 			else if (m_modelno==PM_T332AI)
 			{
-			}
-			else if (m_modelno==PM_T3AI16O)
-			{
-			}
-			else if (m_modelno==PM_T3PERFORMANCE)
-			{
-			}
+				while(!ado.m_pRecordset->EndOfFile){
+					tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-32AI"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.AddressName=_T("");
+					} 
+					else
+					{
+						tempstruct.AddressName=temp_var;
+					}
+					if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
+					{
+						ado.m_pRecordset->MoveNext();
+						continue;
+					}
+					tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-32AI_DATATYPE"));
+					tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-32AI_LEN"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-32AI_DESCRIPTION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Description=temp_var;
+					}
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-32AI_OPERATION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Operation=temp_var;
+					}
+					m_VecregisterData.push_back(tempstruct);
+					m_recordcount++;
+					ado.m_pRecordset->MoveNext();
+				}
+			}			 
 			else if (m_modelno==PM_T34AO)
 			{
-			while(!ado.m_pRecordset->EndOfFile){
-				tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
-				temp_var=ado.m_pRecordset->GetCollect(_T("T3-4AO"));
-				if (temp_var.vt==VT_NULL)
-				{
-					tempstruct.AddressName=_T("");
-				} 
-				else
-				{
-					tempstruct.AddressName=temp_var;
-				}
-				if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
-				{
+				while(!ado.m_pRecordset->EndOfFile){
+					tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-4AO"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.AddressName=_T("");
+					} 
+					else
+					{
+						tempstruct.AddressName=temp_var;
+					}
+					if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
+					{
+						ado.m_pRecordset->MoveNext();
+						continue;
+					}
+					tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-4AO_DATATYPE"));
+					tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-4AO_LEN"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-4AO_DESCRIPTION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Description=temp_var;
+					}
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-4AO_OPERATION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Operation=temp_var;
+					}
+					m_VecregisterData.push_back(tempstruct);
+					m_recordcount++;
 					ado.m_pRecordset->MoveNext();
-					continue;
-				}
-				tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-4AO_DATATYPE"));
-				tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-4AO_LEN"));
-				temp_var=ado.m_pRecordset->GetCollect(_T("T3-4AO_DESCRIPTION"));
-				if (temp_var.vt==VT_NULL)
-				{
-					tempstruct.Description=_T("");
-				} 
-				else
-				{
-					tempstruct.Description=temp_var;
-				}
-				temp_var=ado.m_pRecordset->GetCollect(_T("T3-4AO_OPERATION"));
-				if (temp_var.vt==VT_NULL)
-				{
-					tempstruct.Description=_T("");
-				} 
-				else
-				{
-					tempstruct.Operation=temp_var;
-				}
-				m_VecregisterData.push_back(tempstruct);
-				m_recordcount++;
-				ado.m_pRecordset->MoveNext();
 
-			}
+				}
 			}
 			else if (m_modelno==PM_T36CT)
 			{
+				while(!ado.m_pRecordset->EndOfFile){
+					tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("RegID"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-6CT"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.AddressName=_T("");
+					} 
+					else
+					{
+						tempstruct.AddressName=temp_var;
+					}
+					if ((tempstruct.AddressName.CompareNoCase(_T("RESERVED"))==0)||tempstruct.AddressName.IsEmpty())
+					{
+						ado.m_pRecordset->MoveNext();
+						continue;
+					}
+					tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("T3-6CT_DATATYPE"));
+					tempstruct.length=ado.m_pRecordset->GetCollect(_T("T3-6CT_LEN"));
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-6CT_DESCRIPTION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Description=temp_var;
+					}
+					temp_var=ado.m_pRecordset->GetCollect(_T("T3-6CT_OPERATION"));
+					if (temp_var.vt==VT_NULL)
+					{
+						tempstruct.Description=_T("");
+					} 
+					else
+					{
+						tempstruct.Operation=temp_var;
+					}
+					m_VecregisterData.push_back(tempstruct);
+					m_recordcount++;
+					ado.m_pRecordset->MoveNext();
+				}
 			}
 
-
-
-
-			
 		}
 		ado.CloseRecordset();
 		ado.CloseConn();
     }
-	else
-    {
+	else	//other products ,there are no the property of data type ,data length and so on .
+    {   
+// 		CADO ado;
+// 		ado.OnInitADOConn();
+// 		if(ado.IsHaveTable(ado,_T("ProductsTypeRegisterTables")))
+// 		{  
+// 			CString sql,temp;
+// 			sql.Format(_T("Select * from ProductsTypeRegisterTables where ProductType=%d"),product_type);
+// 			 
+// 			ado.m_pRecordset=ado.OpenRecordset(sql);
+// 			if (!ado.m_pRecordset->EndOfFile)
+// 			{
+// 				temp_var=ado.m_pRecordset->GetCollect(_T("TableName"));
+// 				if (temp_var.vt!=VT_NULL)
+// 				{
+// 					temp=temp_var;
+// 				}
+// 				else
+// 				{
+// 					temp=_T("");
+// 				}
+// 				m_cur_TableName=temp;
+// 				temp_var=ado.m_pRecordset->GetCollect(_T("Col_RegName"));
+// 				if (temp_var.vt!=VT_NULL)
+// 				{
+// 					temp=temp_var;
+// 				}
+// 				else
+// 				{
+// 					temp=_T("");
+// 				}
+// 				m_cur_Col_RegName=temp;
+// 				temp_var=ado.m_pRecordset->GetCollect(_T("Col_RegAddress"));
+// 				if (temp_var.vt!=VT_NULL)
+// 				{
+// 					temp=temp_var;
+// 				}
+// 				else
+// 				{
+// 					temp=_T("");
+// 				}
+// 				m_cur_col_RegAddress=temp;
+// 				temp_var=ado.m_pRecordset->GetCollect(_T("ProductName"));
+// 				if (temp_var.vt!=VT_NULL)
+// 				{
+// 					m_modelname=temp_var;
+// 				}
+// 				else
+// 				{
+// 					m_modelname=_T("");
+// 				}
+// 				 
+// 			}
+// 		}
+// 
+// 		if (!m_cur_TableName.IsEmpty())
+// 		{
+// 			CString sql,temp;
+// 			DBRegister tempstruct;
+// 			sql.Format(_T("Select [%s] , [%s]  from [%s] order by [%s]"),m_cur_Col_RegName,m_cur_col_RegAddress,m_cur_TableName,m_cur_col_RegAddress);
+// 			ado.m_pRecordset=ado.OpenRecordset(sql);
+// 
+// 			while (!ado.m_pRecordset->EndOfFile)
+// 			{
+// 
+// 				temp_var=ado.m_pRecordset->GetCollect(m_cur_Col_RegName.GetBuffer());
+// 				if (temp_var.vt!=VT_NULL)
+// 				{
+// 					tempstruct.AddressName=temp_var;
+// 				}
+// 				temp_var=ado.m_pRecordset->GetCollect(RegName.GetBuffer());
+// 
+// 				if (temp_var.vt!=VT_NULL)
+// 				{
+// 					tempstruct.RegName=temp_var;
+// 				}
+// 				m_VecregisterData.push_back(tempstruct);
+// 				ado.m_pRecordset->MoveNext();
+// 			}
+// 		}
     }
 
 
 	CString temp;
 	m_Datapages=(m_recordcount/ROWS)+1;
 	temp.Format(_T("Product Name"));
-	GetDlgItem(IDC_PRODUCTNAME)->SetWindowText(temp);
+	GetDlgItem(IDC_STATIC_PRODUCTNAME)->SetWindowText(temp);
 	
-	GetDlgItem(IDC_PRODUCTNAME_T)->SetWindowText(GetProductName(product_register_value[7]));
-	temp.Format(_T("%d/%d"),m_curPage,m_Datapages);
-	GetDlgItem(IDC_PAGES)->SetWindowText(temp);
+	GetDlgItem(IDC_EDIT_PRODUCTNAME)->SetWindowText(GetProductName(product_register_value[7]));
+// 	temp.Format(_T("%d/%d"),m_curPage,m_Datapages);
+// 	GetDlgItem(IDC_PAGES)->SetWindowText(temp);
 
 }
 void CRegisterViewerDlg::ShowCurPage(){
 CString temp;
-temp.Format(_T("%d/%d"),m_curPage,m_Datapages);
-GetDlgItem(IDC_PAGES)->SetWindowText(temp);
  
-int startAdd=(m_curPage-1)*ROWS;
-int endAdd=m_curPage*ROWS;
-if (m_curPage==m_Datapages)
-{
-endAdd=m_recordcount;//m_recordcount-(m_curPage-1)*ROWS+1;
-} 
-else
-{
-  endAdd=m_curPage*ROWS;
-}
+//GetDlgItem(IDC_PAGES)->SetWindowText(temp);
+ 
+int startAdd=0;
+int endAdd=m_VecregisterData.size();
 
 for (int i=startAdd;i<endAdd;i++)
 {
-	 
-     
-    
-	temp.Format(_T("%d"),m_VecregisterData[i].Register_Address);  
-	m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_regno,temp);
 
+	temp.Format(_T("%d"),m_VecregisterData[i].Register_Address);  
+	m_registerlistGrid.put_TextMatrix(i+1,m_regno,temp);
 	if (product_register_value[m_VecregisterData[i].Register_Address]==65535)
 	{
 	temp=_T("0");
@@ -409,40 +631,31 @@ for (int i=startAdd;i<endAdd;i++)
 	temp.Format(_T("%d"),product_register_value[m_VecregisterData[i].Register_Address]);
 	}
 	
-	m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_value,temp);
-	m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_name,m_VecregisterData[i].AddressName);
-	m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_type,m_VecregisterData[i].DataType);
+	m_registerlistGrid.put_TextMatrix(i+1,m_value,temp);
+	m_registerlistGrid.put_TextMatrix(i+1,m_name,m_VecregisterData[i].AddressName);
+	m_registerlistGrid.put_TextMatrix(i+1,m_type,m_VecregisterData[i].DataType);
 	temp.Format(_T("%d"),m_VecregisterData[i].length);
-	m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_length,temp);
-	m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_description,m_VecregisterData[i].Description);
-	m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_Operation,m_VecregisterData[i].Operation);
-}
-
- 
+	m_registerlistGrid.put_TextMatrix(i+1,m_length,temp);
+	m_registerlistGrid.put_TextMatrix(i+1,m_description,m_VecregisterData[i].Description);
+	m_registerlistGrid.put_TextMatrix(i+1,m_Operation,m_VecregisterData[i].Operation);
+} 
 }
 
 void CRegisterViewerDlg::Show_ColorData(){
 	
 	CString temp;
-	temp.Format(_T("%d/%d"),m_curPage,m_Datapages);
-	GetDlgItem(IDC_PAGES)->SetWindowText(temp);
+ 
+	//GetDlgItem(IDC_PAGES)->SetWindowText(temp);
 
-	int startAdd=(m_curPage-1)*ROWS;
-	int endAdd=m_curPage*ROWS;
-	if (m_curPage==m_Datapages)
-	{
-		endAdd=m_recordcount;//m_recordcount-(m_curPage-1)*ROWS+1;
-	} 
-	else
-	{
-		endAdd=m_curPage*ROWS;
-	}
+	int startAdd=0;
+	int endAdd=m_VecregisterData.size();
+	 
 	for (int i=startAdd;i<endAdd;i++)
 	{
 		 
-			for (int j=0;j<m_registerlistGrid.get_Cols();j++)
+			for(int j=0;j<m_registerlistGrid.get_Cols();j++)
 			{
-				m_registerlistGrid.put_Row(i%ROWS+1);
+				m_registerlistGrid.put_Row(i+1);
 				m_registerlistGrid.put_Col(j);
 				m_registerlistGrid.put_CellBackColor(WRITE_COLOR);
 			}
@@ -454,15 +667,14 @@ void CRegisterViewerDlg::Show_ColorData(){
 		{
 			for (int j=0;j<m_registerlistGrid.get_Cols();j++)
 			{
-				m_registerlistGrid.put_Row(i%ROWS+1);
+				m_registerlistGrid.put_Row(i+1);
 				m_registerlistGrid.put_Col(j);
 				m_registerlistGrid.put_CellBackColor(DIMGREY);
 			}
 		} 
 
-
 		temp.Format(_T("%d"),m_VecregisterData[i].Register_Address);  
-		m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_regno,temp);
+		m_registerlistGrid.put_TextMatrix(i+1,m_regno,temp);
 
 		if (product_register_value[m_VecregisterData[i].Register_Address]==65535)
 		{
@@ -473,63 +685,62 @@ void CRegisterViewerDlg::Show_ColorData(){
 			temp.Format(_T("%d"),product_register_value[m_VecregisterData[i].Register_Address]);
 		}
 
-		m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_value,temp);
-		m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_name,m_VecregisterData[i].AddressName);
-		m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_type,m_VecregisterData[i].DataType);
+		m_registerlistGrid.put_TextMatrix(i+1,m_value,temp);
+		m_registerlistGrid.put_TextMatrix(i+1,m_name,m_VecregisterData[i].AddressName);
+		m_registerlistGrid.put_TextMatrix(i+1,m_type,m_VecregisterData[i].DataType);
 		temp.Format(_T("%d"),m_VecregisterData[i].length);
-		m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_length,temp);
-		m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_description,m_VecregisterData[i].Description);
-		m_registerlistGrid.put_TextMatrix(i%ROWS+1,m_Operation,m_VecregisterData[i].Operation);
+		m_registerlistGrid.put_TextMatrix(i+1,m_length,temp);
+		m_registerlistGrid.put_TextMatrix(i+1,m_description,m_VecregisterData[i].Description);
+		m_registerlistGrid.put_TextMatrix(i+1,m_Operation,m_VecregisterData[i].Operation);
 	}
 
 	 
 }
 
-void CRegisterViewerDlg::OnBnClickedLeft()
-{
-	if (m_curPage>1)
-	{
-	
-	--m_curPage;
-	Show_ColorData();
-	m_registerlistGrid.put_TopRow(0);
-	}
-}
+//void CRegisterViewerDlg::OnBnClickedLeft()
+//{
+//	if (m_curPage>1)
+//	{
+//		--m_curPage;
+//		Show_ColorData();
+//		m_registerlistGrid.put_TopRow(0);
+//	}
+//}
 
 
 
-void CRegisterViewerDlg::OnBnClickedRight()
-{
-	// TODO: Add your control notification handler code here
-	if (m_curPage<m_Datapages)
-	{
-	  ++m_curPage;
-	  Show_ColorData();
-	  m_registerlistGrid.put_TopRow(0);
-	}
-}
+//void CRegisterViewerDlg::OnBnClickedRight()
+//{
+//	// TODO: Add your control notification handler code here
+//	if (m_curPage<m_Datapages)
+//	{
+//	  ++m_curPage;
+//	  Show_ColorData();
+//	  m_registerlistGrid.put_TopRow(0);
+//	}
+//}
 
 
-void CRegisterViewerDlg::OnBnClickedBegin()
-{
-	// TODO: Add your control notification handler code here
-	m_curPage=1;
-	Show_ColorData();
-	m_registerlistGrid.put_TopRow(0);
-}
+//void CRegisterViewerDlg::OnBnClickedBegin()
+//{
+//	// TODO: Add your control notification handler code here
+//	m_curPage=1;
+//	Show_ColorData();
+//	m_registerlistGrid.put_TopRow(0);
+//}
 
-
-void CRegisterViewerDlg::OnBnClickedEnd()
-{
-	// TODO: Add your control notification handler code here
-	m_curPage=m_Datapages;
-	Show_ColorData();
-	m_registerlistGrid.put_TopRow(0);
-}
+ 
+//void CRegisterViewerDlg::OnBnClickedEnd()
+//{
+//	// TODO: Add your control notification handler code here
+//	m_curPage=m_Datapages;
+//	Show_ColorData();
+//	m_registerlistGrid.put_TopRow(0);
+//}
 BEGIN_EVENTSINK_MAP(CRegisterViewerDlg, CDialog)
-	ON_EVENT(CRegisterViewerDlg, IDC_INPUT_MSFLEXGRID, DISPID_MOUSEDOWN, CRegisterViewerDlg::MouseDownInputMsflexgrid, VTS_I2 VTS_I2 VTS_I4 VTS_I4)
-	ON_EVENT(CRegisterViewerDlg, IDC_INPUT_MSFLEXGRID, DISPID_MOUSEMOVE, CRegisterViewerDlg::MouseMoveInputMsflexgrid, VTS_I2 VTS_I2 VTS_I4 VTS_I4)
-	ON_EVENT(CRegisterViewerDlg, IDC_INPUT_MSFLEXGRID, DISPID_MOUSEUP, CRegisterViewerDlg::MouseUpInputMsflexgrid, VTS_I2 VTS_I2 VTS_I4 VTS_I4)
+//	ON_EVENT(CRegisterViewerDlg, IDC_INPUT_MSFLEXGRID, DISPID_MOUSEDOWN, CRegisterViewerDlg::MouseDownInputMsflexgrid, VTS_I2 VTS_I2 VTS_I4 VTS_I4)
+//	ON_EVENT(CRegisterViewerDlg, IDC_INPUT_MSFLEXGRID, DISPID_MOUSEMOVE, CRegisterViewerDlg::MouseMoveInputMsflexgrid, VTS_I2 VTS_I2 VTS_I4 VTS_I4)
+//	ON_EVENT(CRegisterViewerDlg, IDC_INPUT_MSFLEXGRID, DISPID_MOUSEUP, CRegisterViewerDlg::MouseUpInputMsflexgrid, VTS_I2 VTS_I2 VTS_I4 VTS_I4)
 	ON_EVENT(CRegisterViewerDlg, IDC_INPUT_MSFLEXGRID, DISPID_CLICK, CRegisterViewerDlg::ClickInputMsflexgrid, VTS_NONE)
 //	ON_EVENT(CRegisterViewerDlg, IDC_INPUT_MSFLEXGRID, 73, CRegisterViewerDlg::ScrollInputMsflexgrid, VTS_NONE)
 //ON_EVENT(CRegisterViewerDlg, IDC_INPUT_MSFLEXGRID, 73, CRegisterViewerDlg::ScrollInputMsflexgrid, VTS_NONE)
@@ -537,94 +748,94 @@ ON_EVENT(CRegisterViewerDlg, IDC_INPUT_MSFLEXGRID, DISPID_DBLCLICK, CRegisterVie
 END_EVENTSINK_MAP()
 
 
-void CRegisterViewerDlg::MouseDownInputMsflexgrid(short Button, short Shift, long x, long y)
-{
-	// TODO: Add your message handler code here
-	if (Button&0x1)
-	{
-		m_SelCurCol=m_registerlistGrid.get_ColSel();
-		m_SelCurRow=m_registerlistGrid.get_RowSel();
-		 
-		if (m_SelCurRow!=0)
-		{
-			return;
-		}
-		m_CurColName=m_registerlistGrid.get_TextMatrix(0,m_SelCurCol);
-		m_ColName.SetWindowText(m_CurColName);
-		m_ColName.ShowWindow(SW_SHOW);
-
-		m_registerlistGrid.put_BackColorSel(m_registerlistGrid.get_GridColorFixed());
-	}
-	
-}
-
-
-void CRegisterViewerDlg::MouseMoveInputMsflexgrid(short Button, short Shift, long x, long y)
-{
-    
- 
-	 if (Button&0x1) // 1 - vbLeftButton 
-	 {
-		 if (m_SelCurRow!=0)
-		 {
-			 return;
-		 }
-			CRect rect;
-			m_registerlistGrid.GetWindowRect(&rect);                 //获取FlexGrid控件的窗口矩形
-			ScreenToClient(&rect);                                    //转换为客户区矩形
-			CDC* pDC=GetDC();
-			//MSFlexGrid 控件的函数的长度单位是“缇(twips)”，需要将其转化为像素，1440 缇 = 1 英寸
-			//计算象素点和缇的转换比例
-			int nTwipsPerDotX=1440/pDC->GetDeviceCaps(LOGPIXELSX);
-			int nTwipsPerDotY=1440/pDC->GetDeviceCaps(LOGPIXELSY);
-
-			//x = m_registerlistGrid.get_ColPos(lCol)/nTwipsPerDotX;
-			y = m_registerlistGrid.get_RowPos(0)/nTwipsPerDotY;
-			//long x = m_outputname.get_ColPos(lCol)/nTwipsPerDotX;
-			int left=m_registerlistGrid.get_CellLeft()/nTwipsPerDotY-1;
-			int top=m_registerlistGrid.get_CellTop()/nTwipsPerDotX-1;
-
-			long width = m_registerlistGrid.get_ColWidth(m_SelCurCol)/nTwipsPerDotX+1;
-			long height = m_registerlistGrid.get_RowHeight(m_SelCurRow)/nTwipsPerDotY+1;
-			//形成选中个所在的矩形区域
-			CRect rc(x,y,x+width,y+height);
-			//转换成相对对话框的坐标
-			rc.OffsetRect(rect.left,rect.top);
-			m_ColName.MoveWindow(rc);      
-			m_registerlistGrid.put_BackColorSel(m_registerlistGrid.get_GridColor());  
-		 
-		
-	 }
-	                     //改变大小并移到选中格位置 
-}
+//void CRegisterViewerDlg::MouseDownInputMsflexgrid(short Button, short Shift, long x, long y)
+//{
+//	// TODO: Add your message handler code here
+//	if (Button&0x1)
+//	{
+//		m_SelCurCol=m_registerlistGrid.get_ColSel();
+//		m_SelCurRow=m_registerlistGrid.get_RowSel();
+//		 
+//		if (m_SelCurRow!=0)
+//		{
+//			return;
+//		}
+//		m_CurColName=m_registerlistGrid.get_TextMatrix(0,m_SelCurCol);
+//		m_ColName.SetWindowText(m_CurColName);
+//		m_ColName.ShowWindow(SW_SHOW);
+//
+//		m_registerlistGrid.put_BackColorSel(m_registerlistGrid.get_GridColorFixed());
+//	}
+//	
+//}
 
 
-void CRegisterViewerDlg::MouseUpInputMsflexgrid(short Button, short Shift, long x, long y)
-{
-	// TODO: Add your message handler code here
-	if (Button&0x1)
-	{  if (m_SelCurRow!=0)
-	{
-		return;
-	}
-		int row = m_registerlistGrid.get_MouseRow();
-		int col = m_registerlistGrid.get_MouseCol();
+//void CRegisterViewerDlg::MouseMoveInputMsflexgrid(short Button, short Shift, long x, long y)
+//{
+//    
+// 
+//	 if (Button&0x1) // 1 - vbLeftButton 
+//	 {
+//		 if (m_SelCurRow!=0)
+//		 {
+//			 return;
+//		 }
+//			CRect rect;
+//			m_registerlistGrid.GetWindowRect(&rect);                 //获取FlexGrid控件的窗口矩形
+//			ScreenToClient(&rect);                                    //转换为客户区矩形
+//			CDC* pDC=GetDC();
+//			//MSFlexGrid 控件的函数的长度单位是“缇(twips)”，需要将其转化为像素，1440 缇 = 1 英寸
+//			//计算象素点和缇的转换比例
+//			int nTwipsPerDotX=1440/pDC->GetDeviceCaps(LOGPIXELSX);
+//			int nTwipsPerDotY=1440/pDC->GetDeviceCaps(LOGPIXELSY);
+//
+//			//x = m_registerlistGrid.get_ColPos(lCol)/nTwipsPerDotX;
+//			y = m_registerlistGrid.get_RowPos(0)/nTwipsPerDotY;
+//			//long x = m_outputname.get_ColPos(lCol)/nTwipsPerDotX;
+//			int left=m_registerlistGrid.get_CellLeft()/nTwipsPerDotY-1;
+//			int top=m_registerlistGrid.get_CellTop()/nTwipsPerDotX-1;
+//
+//			long width = m_registerlistGrid.get_ColWidth(m_SelCurCol)/nTwipsPerDotX+1;
+//			long height = m_registerlistGrid.get_RowHeight(m_SelCurRow)/nTwipsPerDotY+1;
+//			//形成选中个所在的矩形区域
+//			CRect rc(x,y,x+width,y+height);
+//			//转换成相对对话框的坐标
+//			rc.OffsetRect(rect.left,rect.top);
+//			m_ColName.MoveWindow(rc);      
+//			m_registerlistGrid.put_BackColorSel(m_registerlistGrid.get_GridColor());  
+//		 
+//		
+//	 }
+//	                     //改变大小并移到选中格位置 
+//}
 
-		m_registerlistGrid.put_ColPosition(m_SelCurCol,col);
-		m_registerlistGrid.put_BackColorSel(m_registerlistGrid.get_GridColorFixed());
-		m_ColName.ShowWindow(SW_HIDE);
-		//Write_GridCol();
 
-	}
-
-}
+//void CRegisterViewerDlg::MouseUpInputMsflexgrid(short Button, short Shift, long x, long y)
+//{
+//	// TODO: Add your message handler code here
+//	if (Button&0x1)
+//	{  if (m_SelCurRow!=0)
+//	{
+//		return;
+//	}
+//		int row = m_registerlistGrid.get_MouseRow();
+//		int col = m_registerlistGrid.get_MouseCol();
+//
+//		m_registerlistGrid.put_ColPosition(m_SelCurCol,col);
+//		m_registerlistGrid.put_BackColorSel(m_registerlistGrid.get_GridColorFixed());
+//		m_ColName.ShowWindow(SW_HIDE);
+//		//Write_GridCol();
+//
+//	}
+//
+//}
 
  
 
 void CRegisterViewerDlg::Fresh_GridCol(){
     
      m_registerlistGrid.Clear();
-	 m_VecregisterData.clear();
+	/* m_VecregisterData.clear();*/
 	CString inifilepath=g_strExePth;
 	inifilepath+=_T("\\Config\\GRIDCONFIG.ini");
 	m_Inifile.SetFileName(inifilepath);
@@ -636,7 +847,7 @@ void CRegisterViewerDlg::Fresh_GridCol(){
 	m_description=m_Inifile.GetProfileInt(SECTION,_T("Description"),5);
 	m_Operation=m_Inifile.GetProfileInt(SECTION,_T("Operation"),6);
 
-	m_registerlistGrid.put_Rows(ROWS+1);
+	m_registerlistGrid.put_Rows(m_VecregisterData.size()+1);
 	m_registerlistGrid.put_Cols(COLS);
 	m_registerlistGrid.put_TextMatrix(0,m_regno,_T("RegNo"));
 	m_registerlistGrid.put_Row(0);
@@ -732,16 +943,7 @@ HBRUSH CRegisterViewerDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 void CRegisterViewerDlg::OnMainNew()
 {
      m_CanEdit=TRUE;
-	 GetDlgItem(IDC_STATIC_PRODUCTNAME)->ShowWindow(TRUE);
-	 GetDlgItem(IDC_EDIT_PRODUCTNAME)->ShowWindow(TRUE);
-	 GetDlgItem(IDC_SAVETODB)->ShowWindow(TRUE);
-	 GetDlgItem(IDC_PRODUCTNAME)->ShowWindow(FALSE);
-	 GetDlgItem(IDC_PRODUCTNAME_T)->ShowWindow(FALSE);
-	 GetDlgItem(IDC_LEFT)->ShowWindow(FALSE);
-	 GetDlgItem(IDC_BEGIN)->ShowWindow(FALSE);
-	 GetDlgItem(IDC_RIGHT)->ShowWindow(FALSE);
-	 GetDlgItem(IDC_END)->ShowWindow(FALSE);
-	 GetDlgItem(IDC_PAGES)->ShowWindow(FALSE);
+	
 	 Fresh_GridCol();
 }
 
@@ -942,10 +1144,10 @@ void CRegisterViewerDlg::DblClickInputMsflexgrid()
 }
 
 
-void CRegisterViewerDlg::OnBnClickedSavetodb()
-{
-	 
-}
+//void CRegisterViewerDlg::OnBnClickedSavetodb()
+//{
+//	 
+//}
 
 
 void CRegisterViewerDlg::OnBnClickedOk()
@@ -965,7 +1167,7 @@ UINT BackRegisterViewerFreshProc(LPVOID pParam)
 	{
 		Sleep(1000);
 	 
-	pdlg->ShowCurPage();
+		pdlg->ShowCurPage();
 	}
 
 	return 0;
@@ -996,7 +1198,7 @@ CString CRegisterViewerDlg::Get_ProductModel(){
 CString ModelName=_T("");
 if (!is_connect())
 {
-AfxMessageBox(_T("Please Connect to your device,firstly!"));
+	AfxMessageBox(_T("Please Connect to your device,firstly!"));
 } 
 else
 {
@@ -1011,4 +1213,23 @@ else
 	}
 }
 return ModelName;
+}
+
+void CRegisterViewerDlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialog::OnSize(nType, cx, cy);
+	if (nType==SIZE_RESTORED)
+	{
+
+		CRect ViewRect;
+		GetClientRect(&ViewRect);
+		//TRACE(_T(" View:T=%d,B=%d,L=%d,R=%d\n"),ViewRect.top,ViewRect.bottom,ViewRect.left,ViewRect.right);
+		// m_MsDataGrid.SetWindowPos(this,ViewRect.top,ViewRect.left,ViewRect.Width(),ViewRect.Height(),SWP_SHOWWINDOW|SWP_NOZORDER);
+		if (m_registerlistGrid.GetSafeHwnd())
+		{
+			m_registerlistGrid.MoveWindow(CRect(ViewRect.left+10,ViewRect.top+40,ViewRect.Width(),ViewRect.Height()),TRUE);
+		}
+
+	}
+	// TODO: Add your message handler code here
 }

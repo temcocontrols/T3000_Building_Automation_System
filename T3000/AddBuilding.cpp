@@ -644,6 +644,9 @@ void CAddBuilding::ReloadAddBuildingDB()
 	if(m_pRs->State) 
 		m_pRs->Close(); 
 }
+
+
+
 void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 {
 #if 1
@@ -674,11 +677,76 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 			
 			if(m_nCurCol==AB_IPADDRESS)
 			{
+				CString strIP;
+				bool is_domain = false;
+				strIP = strText;
+				if(strIP.IsEmpty())
+					return;
+				CStringArray temparray;
+				SplitCStringA(temparray,strIP,_T("."));
+				if((temparray.GetSize()==4))	//有3个  . 4段
+				{
+					CString temp_0;
+					CString temp_1;
+					CString temp_2;
+					CString temp_3;
+					temp_0 = temparray.GetAt(0);
+					temp_1 = temparray.GetAt(1);
+					temp_2 = temparray.GetAt(2);
+					temp_3 = temparray.GetAt(3);
+
+					if((Is_Dig_Num(temp_0)) && (Is_Dig_Num(temp_1)) && (Is_Dig_Num(temp_2)) && (Is_Dig_Num(temp_3)))
+					{
+						if(::ValidAddress(strIP) == false)
+						{
+							MessageBox(_T("Warning!IP address error!"));
+							return;
+						}
+
+					}
+					else	//否则判断为 域名;
+					{
+						is_domain = true;
+					}
+				}
+				else	//判断为 域名;
+				{
+					is_domain = true;
+				}
+
+				if(is_domain)
+				{
+					CString temp_host_ip;
+					if(!GetIPbyHostName(strText,temp_host_ip))
+					{
+						AfxMessageBox(_T("Can not get a validate IP adreess from the domain name!"));
+						return;
+					}
+					strText = temp_host_ip;
+					//char temp_domain[200];
+					//WideCharToMultiByte( CP_ACP, 0, strIP.GetBuffer(), -1, temp_domain, 255, NULL, NULL );
+					//strIP.ReleaseBuffer();
+					//hostent* host = gethostbyname(temp_domain);
+					//if(host == NULL)
+					//{
+					//	if(IDYES == MessageBox(_T("The domain is unreachable .Continue?"),_T("Warning"),MB_YESNO))
+					//	{
+
+					//	}
+					//	else
+					//	{
+					//		return;
+					//	}
+					//}
+				}
+
+
+#if 0
 				if(!ValidAddress(strText))
 				{
 					if(strText.IsEmpty())
 					{
-						//AfxMessageBox(_T("Please input a validate IP adreess or domain name!"));
+						AfxMessageBox(_T("Please input a validate IP adreess or domain name!"));
 						return;
 					}
 					/*
@@ -699,6 +767,7 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 				//{
 				//	return;
 				//}
+#endif
 				m_strIpAddress=strText;
 				m_AddBuiding_FlexGrid.put_TextMatrix(m_nCurRow,m_nCurCol,strText);
 			}
@@ -741,7 +810,7 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 			if(m_nCurCol==AB_IPADDRESS)
 			{
 		
-				if(!ValidAddress(strText))
+				if(!::ValidAddress(strText))
 				{
 					
 					//if(strText.CompareNoCase((CString)NO_APPLICATION)==0)
@@ -831,26 +900,19 @@ void CAddBuilding::Update_Recorder()
 {
 	try
 	{
-
-	CString strSql;
-	strSql.Format(_T("update Building set Main_BuildingName='%s',Building_Name='%s',Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s' where Building_Name='%s' and Main_BuildingName='%s'"),m_strMainBuildingName,m_strBuildingName,m_strProtocol,m_strIpAddress,m_strIpPort,m_strComPort,m_strBaudrat,m_strBuilding_Name2,m_strMainBuildingName2);
-	//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
-	
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-	if(m_nCurCol==AB_NAME)
-	{
-		m_strBuilding_Name2=m_strBuildingName;
-	}
-	if(m_pRs->State) 
-		m_pRs->Close();
-
+		CString strSql;
+		strSql.Format(_T("update Building set Main_BuildingName='%s',Building_Name='%s',Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s' where Building_Name='%s' and Main_BuildingName='%s'"),m_strMainBuildingName,m_strBuildingName,m_strProtocol,m_strIpAddress,m_strIpPort,m_strComPort,m_strBaudrat,m_strBuilding_Name2,m_strMainBuildingName2);
+		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		if(m_nCurCol==AB_NAME)
+		{
+			m_strBuilding_Name2=m_strBuildingName;
+		}
+		if(m_pRs->State) 
+			m_pRs->Close();
 	}
 	catch (...)
 	{
-
 	}
-
-
 	ReloadAddBuildingDB();
 }
 
@@ -922,31 +984,7 @@ BOOL CAddBuilding::ValidAddress(CString sAddress,UINT& n1,UINT& n2,UINT& n3,UINT
 
 	return true;
 }
-BOOL CAddBuilding::ValidAddress(CString sAddress)
-{
-	int nPos;
-	UINT n1,n2,n3,n4;
-	CString sTemp=sAddress;
-	n1=_wtoi(sTemp);
-	nPos=sTemp.Find(_T("."));
-	if(nPos==-1) return false;
-	sTemp=sTemp.Mid(nPos+1);
 
-	n2=_wtoi(sTemp);
-	nPos=sTemp.Find(_T("."));
-	if(nPos==-1) return false;
-	sTemp=sTemp.Mid(nPos+1);
-	n3=_wtoi(sTemp);
-	nPos=sTemp.Find(_T("."));
-	if(nPos==-1) return false;
-	sTemp=sTemp.Mid(nPos+1);
-	n4=_wtoi(sTemp);
-	if(n1<0 ||n1>255) return false;
-	if(n2<0 ||n2>255) return false;
-	if(n3<0 ||n3>255) return false;
-	if(n4<0 ||n4>255) return false;
-	return TRUE;
-}
 
 void CAddBuilding::SetBuildingMainName(CString strBuildName)
 {
@@ -972,16 +1010,16 @@ catch (...)
 }
 void CAddBuilding::OnMainBuildingUnSelect()
 {
-try
-{
+	try
+	{
 
-	CString execute_str=_T("update Building set Default_SubBuilding = 0 where Default_SubBuilding = -1");
-	m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);	
-}
-catch (...)
-{
+		CString execute_str=_T("update Building set Default_SubBuilding = 0 where Default_SubBuilding = -1");
+		m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);	
+	}
+	catch (...)
+	{
 
-}
+	}
 
 	ReloadAddBuildingDB();
 }
@@ -993,21 +1031,21 @@ void CAddBuilding::OnBuildingDelete()
 	}
 	CString strSql;
 	strSql.Format(_T("delete * from Building where Building_Name='%s' and Main_BuildingName='%s'"),m_strBuilding_Name2,m_strMainBuildingName);
-try
-{
-
-
-	CString strTemp;
-	strTemp.Format(_T("Are you sure to delete the building:'%s->%s'"),m_strMainBuildingName,m_strBuilding_Name2);
-	if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
+	try
 	{
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-	}
-}
-catch (...)
-{
 
-}
+
+		CString strTemp;
+		strTemp.Format(_T("Are you sure to delete the building:'%s->%s'"),m_strMainBuildingName,m_strBuilding_Name2);
+		if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
+		{
+			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		}
+	}
+	catch (...)
+	{
+
+	}
 	ReloadAddBuildingDB();
 
 }
@@ -1553,7 +1591,7 @@ void CAddBuilding::OnTimer(UINT_PTR nIDEvent)
 }
 
 
-BOOL CAddBuilding::GetIPbyHostName(CString strHostName,CString strIP)
+BOOL CAddBuilding::GetIPbyHostName(CString strHostName,CString &strIP)
 {
 	WSAData   wsdata; 
 	WORD wVersionRequested=MAKEWORD(2,0);   
@@ -1729,7 +1767,7 @@ void CAddBuilding::SaveAll()
 		strproduct_class_id.Format(_T("%d"),g_NCList.at(j).nProductID);
 		strproduct_id.Format(_T("%d"),g_NCList.at(j).modbusID);
 		strscreen_name.Format(_T("Sceen(S:%d--%d)"),g_NCList.at(j).nSerial,g_NCList.at(j).modbusID);
-		strbackground_bmp=_T("Clicking here to add a image...");
+		strbackground_bmp=_T("T3000_Default_Building_PIC.bmp");
 		strSerialnumber.Format(_T("%d"), g_NCList.at(j).nSerial);
 		strIPAddress=g_NCList.at(j).strIP;
 		strIPPortNum.Format(_T("%d"),g_NCList.at(j).nPort);

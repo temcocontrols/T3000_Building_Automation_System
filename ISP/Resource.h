@@ -45,6 +45,7 @@
 #define IDC_RADIO_MAIN                  1020
 #define IDC_EDIT1                       1021
 #define IDC_EDIT_LCIPPORT               1021
+#define IDC_EDIT_SWVERSION              1021
 #define IDC_RADIO_INPUT                 1022
 #define IDC_OUTPUT                      1023
 #define IDC_RADIO_OUTPUT                1023
@@ -81,6 +82,8 @@
 #define IDC_STATIC_FILEPATH             1054
 #define IDC_STATIC_INFO2                1054
 #define IDC_STATIC_HEX_BOOT             1055
+#define IDC_EDIT2                       1056
+#define IDC_FLASH_USER_ID               1056
 #define IDC_BUTTON_SETTING_OK           6001
 #define IDC_EDIT_SETTING_TIMEOUT        6021
 #define IDC_BUTTON2                     6050
@@ -103,7 +106,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
 #define _APS_NEXT_COMMAND_VALUE         32781
-#define _APS_NEXT_CONTROL_VALUE         1056
+#define _APS_NEXT_CONTROL_VALUE         1057
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

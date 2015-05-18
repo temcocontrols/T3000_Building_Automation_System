@@ -101,6 +101,9 @@ public:
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	afx_msg void OnRclick(NMHDR* pNMHDR, LRESULT* pResult);
 
+	void SetSelectSerialNumber(unsigned int nserial);
+	unsigned int GetSelectSerialNumber();
+	unsigned int m_serial_number;
 };
 
 

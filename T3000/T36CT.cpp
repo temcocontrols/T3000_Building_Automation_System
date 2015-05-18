@@ -12,6 +12,55 @@
 #include "MainFrm.h"
 
 // T36CT
+#define FRESH_CT6_BACK  WM_USER+1006
+
+DWORD WINAPI _BackFreshing_6CT(LPVOID pParam)
+{
+	T36CT* dlg=(T36CT*)(pParam);
+
+	Sleep(1000);
+
+
+	while(dlg->IsWindowVisible())
+	{
+
+		if (!is_connect())
+		{
+			Sleep(1000);
+			continue;
+		}
+		Sleep(1000);
+		/* register_critical_section.Lock();*/
+		//          for(int i=1;i<3;i++) 
+		//          {
+
+		if(!no_mouse_keyboard_event_enable_refresh) 
+		{
+			Sleep(3000);
+			continue ;
+		}
+		else
+		{
+			Sleep(2000);
+		}
+
+		if(g_bPauseMultiRead)
+		{
+			 
+			return 0;
+		}
+		Read_Multi(g_tstat_id,&product_register_value[0],0,100);  
+
+		Read_Multi(g_tstat_id,&product_register_value[100],100,100); 
+
+		PostMessage(dlg->m_hWnd,FRESH_CT6_BACK,0,0);
+	}
+
+
+
+	return 1;
+}
+
 
 IMPLEMENT_DYNCREATE(T36CT, CFormView)
 
@@ -27,18 +76,22 @@ T36CT::~T36CT()
 
 void T36CT::DoDataExchange(CDataExchange* pDX)
 {
-    CFormView::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_MSFLEXGRID_INPUT, m_msflexgrid_input);
-    DDX_Control(pDX, IDC_MSFLEXGRID_OUTPUT, m_msflexgrid_output);
-    DDX_Control(pDX, IDC_MSFLEXGRID_INPUT2, m_msflexgrid_Ainput);
-    DDX_Control(pDX, IDC_EDIT_NAME, m_inNameEdt);
-    DDX_Control(pDX, IDC_RANGECOMBO, m_comboxRange);
+	CFormView::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_MSFLEXGRID_INPUT, m_msflexgrid_input);
+	DDX_Control(pDX, IDC_MSFLEXGRID_OUTPUT, m_msflexgrid_output);
+	DDX_Control(pDX, IDC_MSFLEXGRID_INPUT2, m_msflexgrid_Ainput);
+	DDX_Control(pDX, IDC_EDIT_NAME, m_inNameEdt);
+	DDX_Control(pDX, IDC_RANGECOMBO, m_comboxRange);
+	DDX_Control(pDX, IDC_BRAUDRATECOMBO, m_brandrateBoxbox);
 }
 
 BEGIN_MESSAGE_MAP(T36CT, CFormView)
     ON_BN_CLICKED(IDC_CHANGEID, &T36CT::OnBnClickedChangeid)
-    ON_EN_KILLFOCUS(IDC_EDIT_NAME, &T36CT::OnEnKillfocusEditName)
+   // ON_EN_KILLFOCUS(IDC_EDIT_NAME, &T36CT::OnEnKillfocusEditName)
     ON_CBN_SELCHANGE(IDC_RANGECOMBO, &T36CT::OnCbnSelchangeRangecombo)
+	ON_CBN_SELCHANGE(IDC_BRAUDRATECOMBO, &T36CT::OnCbnSelchangeBraudratecombo)
+	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BUTTON_RESET, &T36CT::OnBnClickedButtonReset)
 END_MESSAGE_MAP()
 
 
@@ -337,20 +390,17 @@ void T36CT::OnInitialUpdate()
 
     //设置行/列数量
     m_msflexgrid_output.put_Rows(6);
-    m_msflexgrid_output.put_Cols(2);
+    m_msflexgrid_output.put_Cols(3);
     //设置列宽	
 
 
     //显示横标题
     m_msflexgrid_output.put_TextMatrix(0,0,_T("Output Name"));
-    m_msflexgrid_output.put_TextMatrix(0,1,_T("Output Value"));
-  
+    m_msflexgrid_output.put_TextMatrix(0,1,_T("Switch Status"));
+    m_msflexgrid_output.put_TextMatrix(0,2,_T("Output Value"));
 
-   /* m_msflexgrid_output.put_ColWidth(0,1500);
-    m_msflexgrid_output.put_ColWidth(1,1200);*/
-    //m_msflexgrid_output.put_ColWidth(2,1500);
-    //m_msflexgrid_output.put_ColWidth(3,1500);//居中显示
-    for (int col=0;col<2;col++)
+
+    for (int col=0;col<3;col++)
     { 
         m_msflexgrid_output.put_ColAlignment(col,4);
     }
@@ -390,6 +440,16 @@ void T36CT::OnInitialUpdate()
 
 void T36CT::InitialDialog(){
     InitialTableName();
+
+	if (product_register_value[BAUDRATE]==0)
+	{
+	  m_brandrateBoxbox.SetCurSel(0);
+	}
+	else
+	{
+	   m_brandrateBoxbox.SetCurSel(1);
+	}
+	
     CString strTemp;
     strTemp.Format(_T("%d"),product_register_value[MODBUS_ID]);
     GetDlgItem(IDC_EDIT_T3ADDRESS)->SetWindowText(strTemp);
@@ -569,14 +629,17 @@ for(int i = 1;i<=10;i++)
     if (0==product_register_value[RANGE_INPUT7+i-1])
     {
         strresult.Format(_T("%d"),regValue);
-
     } 
     else if (1==product_register_value[RANGE_INPUT7+i-1])
     {
+	   regValue=(short)product_register_value[INPUT1+i-1];
+
         strresult.Format(_T("%.1f C"),(float)regValue/10.0);
     }
     else if (2==product_register_value[RANGE_INPUT7+i-1])
     {
+
+	    regValue=(short)product_register_value[INPUT1+i-1];
         strresult=_T("10K F");
         strresult.Format(_T("%.1f F"),(float)regValue/10.0);
     }
@@ -713,17 +776,50 @@ for(int i = 1;i<=10;i++)
     m_msflexgrid_Ainput.put_TextMatrix(i,3,strresult);
 }
 CString CstresultDO;
+int b0,b1,b;
 for(int i = 1;i<=5;i++)
 {  
-    if (product_register_value[OUTPUT1+i-1]==0)
-    {
-    CstresultDO=_T("OFF");
-    }
-    else
-    {
-    CstresultDO=_T("ON");
-    }
-    m_msflexgrid_output.put_TextMatrix(i,1,CstresultDO);
+   
+	/*if (product_register_value[OUTPUT1+i-1]==0)
+	{
+		CstresultDO=_T("OFF");
+	}
+	else
+	{
+		CstresultDO=_T("ON");
+	}*/
+	
+	CstresultDO.Format(_T("%d"),product_register_value[OUTPUT1+i-1]);
+	m_msflexgrid_output.put_TextMatrix(i,2,CstresultDO);
+	b0=Get_Bit_FromRegister(product_register_value[SWITCH1_BANK],2*(i-1)+1);
+	b1=Get_Bit_FromRegister(product_register_value[SWITCH1_BANK],2*(i-1)+2);
+	b=b1*2+b0;
+
+	if (i==5)
+	{
+		b0=Get_Bit_FromRegister(product_register_value[SWITCH1_BANK],1);
+		b1=Get_Bit_FromRegister(product_register_value[SWITCH1_BANK],2);
+		b=b1*2+b0;
+
+	}
+	if (b==0)
+	{
+		CstresultDO=_T("OFF");
+	}
+	else if (b==1)
+	{
+		CstresultDO=_T("ON");
+	}
+	else if (b==2)
+	{
+		CstresultDO=_T("AUTO");
+	}
+	else
+	{
+		CstresultDO=_T("");
+	}
+	m_msflexgrid_output.put_TextMatrix(i,1,CstresultDO);
+	
 }
 
 
@@ -738,6 +834,13 @@ void T36CT::Fresh()
 
         Initial_RegisterList();
         InitialDialog();
+		if(hFirstThread != NULL)
+			TerminateThread(hFirstThread, 0);
+		hFirstThread=NULL;
+		if (!hFirstThread)
+		{
+			hFirstThread = CreateThread(NULL,NULL,_BackFreshing_6CT,this,NULL,0);
+		}
     }
     else
     {
@@ -755,6 +858,7 @@ BEGIN_EVENTSINK_MAP(T36CT, CFormView)
     ON_EVENT(T36CT, IDC_MSFLEXGRID_OUTPUT, DISPID_CLICK, T36CT::ClickMsflexgridOutput, VTS_NONE)
     ON_EVENT(T36CT, IDC_MSFLEXGRID_INPUT, DISPID_CLICK, T36CT::ClickMsflexgridInput, VTS_NONE)
     ON_EVENT(T36CT, IDC_MSFLEXGRID_INPUT2, DISPID_CLICK, T36CT::ClickMsflexgridInput2, VTS_NONE)
+	ON_EVENT(T36CT, IDC_MSFLEXGRID_OUTPUT, 71, T36CT::EnterCellMsflexgridOutput, VTS_NONE)
 END_EVENTSINK_MAP()
 void T36CT::ClickMsflexgridOutput()
 {
@@ -790,7 +894,7 @@ void T36CT::ClickMsflexgridOutput()
     if(lRow!=0)
     {
         //return; // 2012.2.7老毛说不允许修改
-        if (m_curcol==0)
+        if (m_curcol==0||m_curcol==2)
         {
             m_inNameEdt.MoveWindow(&rcCell,1);
             m_inNameEdt.ShowWindow(SW_SHOW);
@@ -800,17 +904,17 @@ void T36CT::ClickMsflexgridOutput()
             int nLenth=strValue.GetLength();
             m_inNameEdt.SetSel(nLenth,nLenth); //全选//
         } 
-        else
-        {
-            m_comboxRange.MoveWindow(&rcCell,1);
-            m_comboxRange.ResetContent();
-            m_comboxRange.AddString(_T("OFF"));
-            m_comboxRange.AddString(_T("ON"));
-            m_comboxRange.ShowWindow(SW_SHOW);
-            m_comboxRange.BringWindowToTop();
-            m_comboxRange.SetFocus(); //获取焦点
-            m_comboxRange.SetWindowText(strValue);
-        }
+        //else 
+        //{
+        //    m_comboxRange.MoveWindow(&rcCell,1);
+        //    m_comboxRange.ResetContent();
+        //    m_comboxRange.AddString(_T("OFF"));
+        //    m_comboxRange.AddString(_T("ON"));
+        //    m_comboxRange.ShowWindow(SW_SHOW);
+        //    m_comboxRange.BringWindowToTop();
+        //    m_comboxRange.SetFocus(); //获取焦点
+        //    m_comboxRange.SetWindowText(strValue);
+        //}
         
     }
     
@@ -1031,6 +1135,20 @@ void T36CT::OnEnKillfocusEditName()
            Insert_Update_Table_Name(m_sn,_T("Output"),m_currow,strTemp);
            m_msflexgrid_output.put_TextMatrix(m_currow,m_curcol,strTemp);
        }
+	   if (m_curcol==2)
+	   {
+		   int regvalue=product_register_value[OUTPUT1+m_currow-1];
+		   if (Value!=regvalue)
+		   {
+			   int ret1=write_one(g_tstat_id,OUTPUT1+m_currow-1,Value);
+			   if (ret1>0)
+			   {
+				   product_register_value[OUTPUT1+m_currow-1]=Value;
+				   InitialDialog();
+			   }
+		   }
+	   }
+	   
    }
 }
 void T36CT::InitialTableName(){
@@ -1131,4 +1249,95 @@ void T36CT::OnCbnSelchangeRangecombo()
         Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
     }
      InitialDialog();
+}
+
+
+void T36CT::OnCbnSelchangeBraudratecombo()
+{
+   int sel=m_brandrateBoxbox.GetCurSel();
+   int bandrate;
+   if (product_register_value[BAUDRATE]!=sel)
+   {
+        write_one(g_tstat_id,BAUDRATE,sel);
+
+	   if (sel==0)
+	   {
+		   bandrate=9600;
+	   }
+	   else
+	   {
+		   bandrate=19200;
+	   }
+
+	    Change_BaudRate(bandrate);
+		Sleep(1000);
+
+		int nowbandrate=Read_One(g_tstat_id,BAUDRATE);
+		if (nowbandrate!=sel)
+		{
+		   return;
+		}
+		
+	    product_register_value[BAUDRATE] = sel;
+		CADO ado;
+		ado.OnInitADOConn();
+		CString sql;
+		sql.Format(_T("Select * from ALL_NODE where Serial_ID = '%d' "),m_sn);
+		ado.m_pRecordset=ado.OpenRecordset(sql);
+		if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+		{
+			sql.Format(_T("update ALL_NODE set Bautrate = '%d' where Serial_ID = '%d'"),bandrate,m_sn);
+			ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+		}
+		ado.CloseRecordset();
+		ado.CloseConn();
+		InitialDialog();
+		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
+	  
+	   
+   }
+}
+
+
+LRESULT T36CT::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if (message==FRESH_CT6_BACK)
+	{
+	    InitialDialog();
+	}
+	return CFormView::WindowProc(message, wParam, lParam);
+}
+
+
+void T36CT::OnDestroy()
+{
+
+
+
+	if(hFirstThread != NULL)
+		TerminateThread(hFirstThread, 0);
+	hFirstThread=NULL;
+ 
+
+	CFormView::OnDestroy();
+
+	// TODO: Add your message handler code here
+}
+
+
+void T36CT::EnterCellMsflexgridOutput()
+{
+	 OnEnKillfocusEditName();
+}
+
+
+void T36CT::OnBnClickedButtonReset()
+{
+	if(AfxMessageBox(_T(" This will reset the module to the factory defaults,Are you sure to reset it ?"))==IDOK)
+	{
+		//  write_one(g_tstat_id,299,1);
+		write_one(g_tstat_id,300,1);
+	}
 }

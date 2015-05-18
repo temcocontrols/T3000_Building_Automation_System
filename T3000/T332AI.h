@@ -159,6 +159,7 @@ public:
 	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
 	CComboBox m_comboxRange;
 	afx_msg void OnCbnSelchangeRangecombo();
+	afx_msg void OnBnClickedButtonReset();
 };
 
 

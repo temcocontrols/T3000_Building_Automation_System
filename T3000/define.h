@@ -1,28 +1,47 @@
 #pragma once
 #include "global_variable_extern.h"
 
-#ifdef _DEBUG
-#ifndef _WIN64
+// #ifdef _DEBUG
+// #ifndef _WIN64
+
 #define FOR_DATABASE_CONNECT					_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=")
-#else
-#pragma comment(lib,"json/json_mtd_x64.lib")
-#define FOR_DATABASE_CONNECT					_T("Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider;Data Source=")
-#endif
-#else
-#ifndef _WIN64 
-#define FOR_DATABASE_CONNECT					_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=")
-#else
-#define FOR_DATABASE_CONNECT					_T("Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider;Data Source=")
-#endif
-#endif
+
+// #else
+// #pragma comment(lib,"json/json_mtd_x64.lib")
+// #define FOR_DATABASE_CONNECT					_T("Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider;Data Source=")
+// #endif
+// #else
+// #ifndef _WIN64 
+// #define FOR_DATABASE_CONNECT					_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=")
+// #else
+// #define FOR_DATABASE_CONNECT					_T("Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider;Data Source=")
+// #endif
+// #endif
 
 #define USER_DATABASE_PASSWORD					_T(";Jet OLEDB:Database Password=alancat")
 //Persist Security Info=False;
+
 #define NO_APPLICATION _T("N/A")
+#define NO_ADDRESS			-1
+#define NO_REGISTER_VALUE	-1
+
+#define REG_READ_ONLY TRUE
+#define REG_READ_WRITE FALSE
+
+#define Global_String_AUTO    _T("Auto")
+#define Global_String_MANUAL  _T("Manual")
+#define Global_String_NO     _T("On")
+#define Global_String_OFF   _T("Off")
+
+#define Global_String_C _T("°„C")
+#define Glocal_String_F _T("°„F")
+
 #define Modbus_Serial	0
 #define Modbus_TCP		1
 #define	default_com1_port_baudrate	19200
 
+#define LIST_TYPE_INPUT_TSTAT 1
+#define LIST_TYPE_OUTPUT_TSTAT 2
 #define COLOR_CELL RGB(226,238,251)
 #define DISABLE_COLOR_CELL RGB(140,140,140)
 #define SETPOINT_SPECIAL_VERSION	50

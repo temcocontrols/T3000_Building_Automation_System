@@ -31,6 +31,8 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnClose();
 	virtual void OnCancel();
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+
 };
 
 const int CONTROLLER_NUM = 0;
@@ -47,6 +49,7 @@ const int CONTROLLER_PROPORTIONAL = 10;
 const int CONTROLLER_RESET = 11;
 const int CONTROLLER_RATE = 12;
 const int CONTROLLER_BIAS = 13;
+const int CONTROLLER_SAMPLE_TIME = 14;
 
-const int CONTROLLER_COL_NUMBER = 14;
+const int CONTROLLER_COL_NUMBER = 15;
 

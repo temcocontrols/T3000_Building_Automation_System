@@ -3,9 +3,15 @@
 #include "Bacnet_Include.h"
 #include "CM5\ud_str.h"
 #include "gloab_define.h"
-
+#include "Global_Struct.h"
 #define MY_MBPOLL_REG_DIALOG_MSG (WM_USER + 557)
 #define MY_MBPOLL_WRITE_REG_MSG (WM_USER + 558)
+
+extern const int WRITE_ONE_SUCCESS_LIST;
+extern const int WRITE_ONE_FAIL_LIST ;
+extern const int WRITE_MULTI_SUCCESS_LIST  ;
+extern const int WRITE_MULTI_FAIL_LIST  ;
+
 extern bool no_mouse_keyboard_event_enable_refresh ;
 extern CString USB_Serial;
 extern int g_invoke_id;
@@ -22,11 +28,13 @@ extern	   bool g_HumChamberThread;
 extern bool g_register_occuppied ; //Add by Alex
 extern			  BOOL g_bChamber;
 extern bool list_mouse_click;
+extern CString CurrentT3000Version;
 //Fance_4
 extern unsigned short product_register_value[1024];
 extern int product_type ;
 extern int old_product_type;
-
+extern HWND      m_building_config_hwnd;
+extern bool g_fresh_T3000_background;
 extern unsigned short multi_register_value_tcp[10000];
 extern	unsigned short multi_register_value[1024];
 extern unsigned short cm5_register_value[512]; //CM5
@@ -46,15 +54,19 @@ extern int m_slidertsta6[12];
 extern int nCom;
 extern	CString program_path;
 extern	int g_tstat_id;
-extern int g_serialNum;
+extern unsigned int g_serialNum;
 extern	BOOL g_tstat_id_changed;
 extern  BOOL g_bPauseMultiRead;     // for background read register
 extern  int now_tstat_id;//for batch load/flash read/write
 extern  CString g_strImagePathName;
 extern	CString	g_strDatabasefilepath;
 extern	CString g_strExePth;
+extern  CString g_achive_folder;
+extern  CString g_achive_device_name_path;
 extern  CString g_strImgeFolder;
+extern  CString g_strBuildingFolder;
 extern  CString g_strOrigDatabaseFilePath;
+extern  CString g_achive_monitor_datatbase_path ;
 
 extern BOOL g_mstp_flag;
 extern	BOOL g_Scanfully;
@@ -64,10 +76,10 @@ extern	int g_nEndID;
 extern BOOL g_bCancelScan;
 extern int g_ScnnedNum;
 extern CString g_strScanInfoPrompt;
-extern CString g_strT3000LogString;
+ 
 extern int gCommunicationType;
-
-
+extern CString g_strCurBuildingDatabasefilePath;
+extern CString m_str_curBuilding_Domain_IP;
 
 extern CString g_strTstat5a;
 extern CString g_strTstat5b;
@@ -112,6 +124,7 @@ extern CString g_strInName8;
 
 extern CString g_strInHumName;		// for tstat6 humidity input
 extern CString			   g_strInCO2;
+extern CString g_strLightingSensor;
 
 extern CString g_strOutName1;
 extern CString g_strOutName2;
@@ -145,13 +158,15 @@ const int PM_TSTAT5E = 16;
 int const PM_TSTAT5F = 17;
 int const PM_TSTAT5G = 18;
 int const PM_TSTAT5H = 19;
+
 int const PM_T3PT10= 26;
 int const PM_T3IOA = 21;
 int const PM_T332AI = 22;
-int const PM_T3AI16O = 23;
+int const PM_T38AI16O = 23;
 int const PM_T38I13O = 20;
 int const PM_T34AO = 28;
 int const PM_T36CT = 29;
+
 int const PM_ZIGBEE = 24;
 int const PM_FLEXDRIVER = 25;
 int const PM_T3PERFORMANCE = 27;
@@ -159,13 +174,23 @@ int const PM_SOLAR = 30;
 int const PM_FWMTRANSDUCER = 31;
 int const PM_CO2_NET = 32;
 int const PM_CO2_RS485 = 33;
+int const PM_CO2_NODE = 34;
 int const PM_MINIPANEL = 35;
+int const PM_CS_SM_AC = 36;
+int const PM_CS_SM_DC = 37;
+int const PM_CS_RSM_AC = 38;
+int const PM_CS_RSM_DC = 39;
+
+
 int const PM_PRESSURE = 40;
+int const PM_PM5E = 41;
+int const PM_HUM_R=42;
 int const PM_CM5 = 50;
 int const PM_TSTAT6_HUM_Chamber=64;
 int const PM_NC = 100;
 int const PM_LightingController = 103;
 
+/*int const PM_TSTATRUNAR = 15;*/
 
 
 extern int MODBUS_SERIALNUMBER_LOWORD                          ;
@@ -954,6 +979,9 @@ extern bool bac_alarmlog_read_results;
 extern bool bac_tstat_read_results;
 extern bool bac_basic_setting_read_results;
 extern bool bac_customer_unit_read_results;
+extern bool bac_user_login_read_results;
+extern bool bac_graphic_label_read_results;
+extern bool bac_remote_point_read_results;
 extern bool bac_cm5_graphic;
 
 extern int bac_gloab_panel;
@@ -986,6 +1014,14 @@ extern HWND      m_tstat_dlg_hwnd;
 extern HWND      m_setting_dlg_hwnd;
 extern HWND      m_flash_multy_hwnd;
 extern HWND      m_customer_digital_range_dlg_hwnd;
+extern HWND      m_scan_dlg_hwnd;
+extern HWND	  m_tcp_server_hwnd;
+extern HWND      m_user_login_hwnd;
+extern HWND      m_user_config_hwnd;
+extern HWND      m_add_label;
+extern HWND      m_edit_label;
+extern HWND      m_at_command_hwnd;
+extern HWND      m_remote_point_hwnd;
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
@@ -1004,14 +1040,24 @@ extern vector <refresh_net_device> m_refresh_net_device_data;
 extern vector <Str_TstatInfo_point> m_Tstat_data;
 extern vector <Str_Remote_TstDB> m_remote_device_db;
 extern vector <Str_Units_element> m_customer_unit_data;
+extern vector <Str_userlogin_point> m_user_login_data;
+
+extern vector <GSM_connection_info> m_gsm_connect_info;
+extern vector <Scan_Info> m_scan_info;
+extern vector <Scan_Info> m_scan_info_buffer;
+extern vector <Client_Info> m_tcp_connect_info;
+extern vector <Str_label_point> m_graphic_label_data;	//图片里面的Label的信息要存在设备里面;
+extern vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
 extern Str_Setting_Info Device_Basic_Setting;
+extern char m_at_write_buf[100];
+extern char m_at_read_buf[450];
 
 extern Monitor_Block m_monitor_block;
 extern Str_Monitor_data_header m_monitor_head;
 extern int Monitor_Input__Data[14][1000];
 extern Monitor_Input_Info my_input_info[14];
 extern unsigned char weeklt_time_schedule[BAC_WEEKLY_ROUTINES_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
-extern unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][500];//暂定400;
+extern unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//暂定2000;
 extern int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 extern int Max_Scale_value;
 extern int Min_Scale_value;
@@ -1029,8 +1075,9 @@ extern int g_protocol;
 extern bool bac_net_initial_once;
 extern unsigned char my_ip[4];
 extern byte	g_DayState[8][48];
-extern CDialog *pDialog[12];
+extern CDialog *pDialog[14];
 extern CDialog *DebugWindow;
+extern CDialog *Tcp_Server_Window;
 extern CString PrintText[1000];
 extern CString g_Print;
 extern HWND h_debug_window;
@@ -1048,8 +1095,71 @@ extern SOCKADDR_IN h_bcast;
 
 extern _RecordsetPtr m_global_pRs;
 extern _ConnectionPtr m_global_pCon;
+extern Data_Time_Match * digital_data_point[MAX_POINTS_IN_MONITOR];
 extern Data_Time_Match * analog_data_point[MAX_POINTS_IN_MONITOR];
+extern int analog_data_max_value[MAX_POINTS_IN_MONITOR];
+extern int analog_data_min_value[MAX_POINTS_IN_MONITOR];
+extern int digital_data_count[MAX_POINTS_IN_MONITOR];	//用于记录digital data 这个指针到底存了多少数据;
 extern int analog_data_count[MAX_POINTS_IN_MONITOR];
 extern int get_data_count ;
+extern int monitor_analog_count ;	//暂存monitor 的模拟和数字的个数;
+extern int monitor_digital_count ;
 extern Data_Time_Match * temp_analog_data[MAX_POINTS_IN_MONITOR];
+extern int SEND_COMMAND_DELAY_TIME ;
+extern bool TCP_Server_Running ;
+extern bool Gsm_communication ;	//如果是通过GSM 读远程设备 许多地方要特殊处理;不能刷新太频繁;
+extern CString SaveConfigFilePath;
+extern vector<ALL_LOCAL_SUBNET_NODE> g_Vector_Subnet;
+extern vector<ALL_LOCAL_SUBNET_NODE> g_Scan_Vector_Subnet;
+extern vector<Reg_Infor> g_Vector_Write_Error;
+extern CString g_strStartInterface_config;
+extern bool need_read_bacnet_graphic_label_flag;
+extern bool read_write_bacnet_config ;	//读写Bacnet config 的时候禁止刷新 List;
+
+
+extern vector <Tstat_Input_Struct> m_tstat_input_data;
+
+extern vector <Tstat_Output_Struct> m_tstat_output_data;
+extern CString analog_range[11];
+extern CString analog_range_TSTAT6[12];
+extern CString INPUT_FUNS[8];
+extern CString Interlock[6];
+extern CString ONTPUT_FUNS[];
+
+extern CString OUTPUT_RANGE5[3];
+extern CString OUTPUT_RANGE45[4];
+extern CString OUTPUT_ANRANGE6[];
+extern CString OUTPUT_ANRANGE[];
+
+
+extern AddressMap TSTAT_6_ADDRESS[2000];
+extern AddressMap TSTAT_5EH_LCD_ADDRESS[2000];
+extern AddressMap TSTAT_5ABCDFG_LED_ADDRESS[2000];
+
+extern AddressMap T3_8AI8AO[T3_REG_TOTAL_COUNT];
+extern AddressMap T3_8AI16O[T3_REG_TOTAL_COUNT];
+extern AddressMap T3_32AI[T3_REG_TOTAL_COUNT];
+extern AddressMap T3_Performance[T3_REG_TOTAL_COUNT];
+extern AddressMap T3_4AO[T3_REG_TOTAL_COUNT];
+extern AddressMap T3_6CT[T3_REG_TOTAL_COUNT];
+extern AddressMap T3_28IN[T3_REG_TOTAL_COUNT];
+extern AddressMap T3_RTD[T3_REG_TOTAL_COUNT];
+extern AddressMap T3_8I13O[T3_REG_TOTAL_COUNT];
+
+extern int current_building_protocol;
+extern int current_building_comport;
+extern int current_building_baudrate;
+extern int current_building_ip;
+extern int current_building_ipport;
+
+extern int m_user_level;
+
+extern CString CS3000_INPUT_RANGE[4];
+extern BOOL g_NEED_MULTI_READ;
+extern CString STRING_SWITCH_STATUS[3];
+
+
+extern vector<Registers_Infor> g_vectRegisters;
+
+extern BOOL g_fresh_Graphic;
 #pragma endregion For_bacnet

@@ -31,4 +31,9 @@ public:
 	afx_msg void OnBnClickedButtonDebugPause();
 
 	bool m_is_pause;
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnBnClickedButtonDebugSave();
+	CString Logfile_path;
+	CStdioFile*		 m_plogFile;
+	afx_msg void OnDestroy();
 };

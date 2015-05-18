@@ -35,9 +35,18 @@ void CMulitithreadSocket::Close()
     if(!m_bConnected) return;
 	if(m_sSocket == NULL) return;
 
-	shutdown(m_sSocket, SD_RECEIVE);
+	//BOOL  bDontLinger  =  FALSE;  
+
+	//::setsockopt(m_sSocket,SOL_SOCKET,SO_DONTLINGER,(LPCSTR)&bDontLinger,sizeof(BOOL));  
+
+	//linger m_sLinger;
+	//m_sLinger.l_onoff = 0; 
+	//m_sLinger.l_linger = 0; 
+	//setsockopt( m_sSocket, SOL_SOCKET, SO_LINGER, ( const char* )&m_sLinger, sizeof( linger ) );
+
+	shutdown(m_sSocket, SD_BOTH);
 	Sleep(50);
-	closesocket(m_sSocket);
+	::closesocket(m_sSocket);
 	m_sSocket = NULL;
 	m_bConnected = FALSE;
 }
@@ -46,7 +55,13 @@ void CMulitithreadSocket::CloseServer()
     if(!m_bListened) return;
 	if(m_sServer == NULL) return;
 
-	shutdown(m_sServer, SD_RECEIVE);
+
+	//BOOL  bDontLinger  =  FALSE;  
+
+	//::setsockopt(m_sServer,SOL_SOCKET,SO_DONTLINGER,(LPCSTR)&bDontLinger,sizeof(BOOL));  
+
+	shutdown(m_sServer, SD_BOTH);
+	//shutdown(m_sServer, SD_RECEIVE);
 	Sleep(50);
 	closesocket(m_sServer);
 	m_sServer = NULL;

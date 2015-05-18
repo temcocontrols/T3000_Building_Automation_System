@@ -154,7 +154,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		{
 			product_type =T3000_6_ADDRESS;
 		}
-		else if((nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H)||(nFlag == PM_TSTAT5G))
+		else if((nFlag == PM_TSTAT5E)||(product_register_value[7]==PM_TSTATRUNAR) || (nFlag == PM_TSTAT5H)||(nFlag == PM_TSTAT5G))
 		{
 			product_type = T3000_5EH_LCD_ADDRESS;
 		}
@@ -166,7 +166,7 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		else if (nFlag==PM_T3PT10||
 			nFlag==PM_T3IOA||
 			nFlag==PM_T332AI||
-			nFlag==PM_T3AI16O||
+			nFlag== PM_T38AI16O||
 			nFlag==PM_T38I13O||
 			nFlag==PM_T3PERFORMANCE||
 			nFlag==PM_T34AO||
@@ -255,17 +255,17 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 				}
 				else if (nowmoder==PM_LightingController)
 				{
-				 config_file.Close();
+					config_file.Close();
 
-				 load_file_2_schedule_LC((LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(), now_tstat_id, log_file);
+					load_file_2_schedule_LC((LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(), now_tstat_id, log_file);
 				}
 				else if (nowmoder==PM_NC)
 				{
-				 load_file_2_schedule_NC((LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(), now_tstat_id, log_file);
+					load_file_2_schedule_NC((LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(), now_tstat_id, log_file);
 				}
 				else
 				{
-				LoadFile2Tstat(temppp,(LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(),&log_file);
+					LoadFile2Tstat(temppp,(LPTSTR)(LPCTSTR)pDlg->m_grid_load.at(iitemp).hex_file_path.GetString(),&log_file);
 				}
 				
 				}
@@ -483,6 +483,9 @@ BOOL CGridLoad::OnInitDialog()
 		case PM_TSTAT5E:
 			strTemp="TStat5E";
 			break;
+		case PM_TSTATRUNAR:
+			strTemp="TStatRunar";
+			break; 
 		case PM_TSTAT5F:
 			strTemp="TStat5F";
 			break;
@@ -517,6 +520,9 @@ BOOL CGridLoad::OnInitDialog()
 		case  PM_CO2_RS485:
 			strTemp = "CO2";
 			break;
+		case  PM_CO2_NODE:
+			strTemp = "CO2 Node";
+			break;
 		case PM_TSTAT6_HUM_Chamber:
 			strTemp =g_strHumChamber;
 			break;
@@ -530,7 +536,7 @@ BOOL CGridLoad::OnInitDialog()
 		case PM_T332AI :
 			strTemp="T3-32AI";
 			break;
-		case PM_T3AI16O :
+		case  PM_T38AI16O :
 			strTemp="T3-8AI160";
 			break;
 		case PM_T38I13O :
@@ -714,63 +720,65 @@ void CGridLoad::OnCbnSelchangeSublist()
 	if(strMainBuilding.IsEmpty())
 		return;
 	CString str_temp;
-	_ConnectionPtr pCon=NULL;
-	_RecordsetPtr pRs=NULL;
-	pCon.CreateInstance(_T("ADODB.Connection"));
-	pRs.CreateInstance(_T("ADODB.Recordset"));
-	pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
 	str_temp.Format(_T("select * from ALL_NODE where MainBuilding_Name = '%s' and Building_Name = '%s'"),strMainBuilding,strCurSubNet);
-	pRs->Open(str_temp.GetString(),_variant_t((IDispatch *)pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-	if(pRs!=NULL||pRs->GetRecordCount()<=0)
+	//pRs->Open(str_temp.GetString(),_variant_t((IDispatch *)pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+	bado.m_pRecordset=bado.OpenRecordset(str_temp);
+	if(bado.m_pRecordset!=NULL||bado.m_pRecordset->GetRecordCount()<=0)
 	{
-		if(pRs->State) 
-			pRs->Close(); 
-		if(pCon->State)
-			pCon->Close(); 
+// 		if(pRs->State) 
+// 			pRs->Close(); 
+// 		if(pCon->State)
+// 			pCon->Close(); 
+    bado.CloseRecordset();
+	bado.CloseConn();  
 		return;
 	}
 	_variant_t temp_variant;
 	CString strTemp;
 
-	while(VARIANT_FALSE==pRs->EndOfFile)
+	while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 	{
 		GRID_LOAD temp_grid_flash;
-		temp_variant=pRs->GetCollect("Serial_ID");//
+		temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
 			strTemp=_T("");
 		temp_grid_flash.serialnumber=_wtoi(strTemp);
 
-		temp_variant=pRs->GetCollect("Product_ID");//
+		temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
 			strTemp=_T("");
 		temp_grid_flash.ID=_wtoi(strTemp);
 
-		temp_variant=pRs->GetCollect(_T("Bautrate"));//
+		temp_variant=bado.m_pRecordset->GetCollect(_T("Bautrate"));//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
 			strTemp=_T("");
 		temp_grid_flash.baudrate=_wtoi(strTemp);
 		
-		temp_variant=pRs->GetCollect(_T("Hardware_Ver"));//
+		temp_variant=bado.m_pRecordset->GetCollect(_T("Hardware_Ver"));//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
 			strTemp=_T("");
 		temp_grid_flash.hardware_revisin=(short)_wtof(strTemp);
 
-		temp_variant=pRs->GetCollect(_T("Software_Ver"));//
+		temp_variant=bado.m_pRecordset->GetCollect(_T("Software_Ver"));//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
 			strTemp=_T("");
 		temp_grid_flash.software_version=(short)_wtof(strTemp);
 
-		temp_variant=pRs->GetCollect(_T("EPsize"));//
+		temp_variant=bado.m_pRecordset->GetCollect(_T("EPsize"));//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
@@ -778,8 +786,10 @@ void CGridLoad::OnCbnSelchangeSublist()
 		temp_grid_flash.EpSize=_wtoi(strTemp);
 
 		m_grid_load.push_back(temp_grid_flash);
-		pRs->MoveNext();
+		bado.m_pRecordset->MoveNext();
 	}
+	bado.CloseRecordset();
+	bado.CloseConn();  
 }
 BEGIN_EVENTSINK_MAP(CGridLoad, CDialog)
 	ON_EVENT(CGridLoad, IDC_MSFLEXGRID1, DISPID_CLICK, CGridLoad::ClickMsflexgrid1, VTS_NONE)
@@ -925,11 +935,11 @@ void CGridLoad::OnBnClickedConfigbutton()
 // 		{
 // 			m_ploadThread=AfxBeginThread(_NC_LoadThread,this);////////////////////////create thread,read information	
 // 		}
-		{
-			m_eTstatLoadFinish.ResetEvent(); //no signal
+		//{
+			//m_eTstatLoadFinish.ResetEvent(); //no signal
 			m_ploadThread=AfxBeginThread(run_back_ground_load_thread,this);////////////////////////create thread,read information	
 		//	m_ploadThread=AfxBeginThread(_NC_LoadThread,this);////////////////////////create thread,read information	
-		}
+	//	}
 	//	showing_text="";
 		SetTimer(1,10,NULL);/////////////10 ms is better 
 
@@ -972,7 +982,7 @@ void CGridLoad::OnTimer(UINT_PTR nIDEvent)
 			m_infoListBox.InsertString(-1,temp_str.GetString());
 
 			AfxMessageBox(m_strInfoText);
-		}
+		  }
 	//	else
 	//		m_infoListBox.InsertString(0,m_strInfoText);
 	}
@@ -992,7 +1002,7 @@ void CGridLoad::OnBnClickedCancelloadbutton()
 {
 	m_bStopLoadingfile=TRUE;
 }
-
+#if 0
 void CGridLoad::OnDestroy()
 {
 	CDialog::OnDestroy();
@@ -1020,6 +1030,48 @@ void CGridLoad::OnDestroy()
 			m_ploadThread=NULL;
 			Sleep(300);
 		}
+	}
+
+}
+#endif
+
+void CGridLoad::OnDestroy()
+{
+	CDialog::OnDestroy();
+
+
+	if (is_connect())
+	{
+		SetCommunicationType(0);
+		close_com(); // added by zgq:12-16-2011
+		SetCommunicationType(1);
+		close_com();
+		SetCommunicationType(0);
+	}
+
+	m_bStopLoadingfile=TRUE;
+	Sleep(200);
+	DWORD dwExidCode;
+	if(m_pLoadBackCheckThread)
+	{
+		//Sleep(300);
+		// 		GetExitCodeThread(m_pLoadBackCheckThread->m_hThread,&dwExidCode);
+		// 		if(dwExidCode==STILL_ACTIVE)
+		// 		{
+		TerminateThread(m_pLoadBackCheckThread->m_hThread,0);
+		m_pLoadBackCheckThread=NULL;
+		//  }
+	}
+
+	if(m_ploadThread!=NULL)
+	{
+		// 		GetExitCodeThread(m_ploadThread->m_hThread,&dwExidCode);
+		// 		if(dwExidCode==STILL_ACTIVE)
+		// 		{
+		TerminateThread(m_ploadThread->m_hThread,0);
+		m_ploadThread=NULL;
+		Sleep(300);
+		//}
 	}
 
 }
@@ -1155,6 +1207,9 @@ void CGridLoad::LoadDeviceToGrid()
 		case PM_TSTAT5E:
 			strTemp="TStat5E";
 			break;
+		case PM_TSTATRUNAR:
+			strTemp="TStatRunar";
+			break;
 		case PM_TSTAT5F:
 			strTemp="TStat5F";
 			break;
@@ -1189,6 +1244,9 @@ void CGridLoad::LoadDeviceToGrid()
 		case  PM_CO2_RS485:
 			strTemp = "CO2";
 			break;
+		case  PM_CO2_NODE:
+			strTemp = "CO2 Node";
+			break;
 		case PM_TSTAT6_HUM_Chamber:
 			strTemp =g_strHumChamber;
 			break;
@@ -1202,7 +1260,7 @@ void CGridLoad::LoadDeviceToGrid()
 		case PM_T332AI :
 			strTemp="T3-32AI";
 			break;
-		case PM_T3AI16O :
+		case  PM_T38AI16O :
 			strTemp="T3-8AI160";
 			break;
 		case PM_T38I13O :

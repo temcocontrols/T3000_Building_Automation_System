@@ -4,11 +4,17 @@
 #include "Bacnet_Include.h"
 #include "CM5\ud_str.h"
 #include "gloab_define.h"
-
+#include "Global_Struct.h"
 CString USB_Serial;
 vector <int> Change_Color_ID;
 const bool WRITE_SUCCESS = true;
 const bool WRITE_FAIL    = false;
+
+const int WRITE_ONE_SUCCESS_LIST = 1;
+const int WRITE_ONE_FAIL_LIST =2 ;
+const int WRITE_MULTI_SUCCESS_LIST =3 ;
+const int WRITE_MULTI_FAIL_LIST =4 ;
+
 int g_invoke_id;
 HANDLE hThread;
 DWORD nThreadID;
@@ -30,10 +36,12 @@ bool g_register_occuppied = false; //Add by Alex
 unsigned short cm5_register_value[512]; //CM5
 unsigned short m_buffer[512];//CM5
 bool no_mouse_keyboard_event_enable_refresh = true;
+bool g_fresh_T3000_background = false;
+CString CurrentT3000Version ;
 int nCom;
 //CString program_path=_T("");
 int g_tstat_id=255;
-int g_serialNum=0;
+unsigned int g_serialNum=0;
 BOOL g_tstat_id_changed=FALSE;
 BOOL g_bPauseMultiRead=FALSE;
 BOOL g_bChamber=FALSE;
@@ -45,6 +53,10 @@ CString g_strOrigDatabaseFilePath=_T("");
 CString	g_strDatabasefilepath=_T("");
 CString g_strExePth=_T("");
 CString g_strImgeFolder=_T("");
+CString g_strBuildingFolder=_T("");
+CString g_achive_folder=_T("");
+CString g_achive_device_name_path = _T("");
+CString g_achive_monitor_datatbase_path = _T("");
 
 BOOL g_Scanfully=FALSE;
 BOOL g_ScanSecurity=TRUE;
@@ -53,7 +65,7 @@ int g_nEndID=254;
 BOOL g_bCancelScan=FALSE;
 int g_ScnnedNum=0;
 CString g_strScanInfoPrompt;
-CString g_strT3000LogString;
+ 
 CString g_strTstat5a;
 CString g_strTstat5b;
 CString g_strTstat5b2;
@@ -106,7 +118,7 @@ CString g_strInName7;
 CString g_strInName8;
  CString g_strInCO2;
 CString g_strInHumName;		// for tstat6 humidity input
-
+CString g_strLightingSensor;
 CString g_strOutName1;
 CString g_strOutName2;
 CString g_strOutName3;
@@ -118,8 +130,8 @@ CString g_strOutName8;
 int g_ifanStatus;
 CString g_strFan=_T("");
 
-
-
+CString g_strCurBuildingDatabasefilePath=L"";
+	CString m_str_curBuilding_Domain_IP;
 BOOL g_bEnableRefreshTreeView = TRUE;
 BOOL g_bPauseRefreshTree = FALSE;
 int g_llTxCount = 0;
@@ -1862,6 +1874,9 @@ bool bac_alarmlog_read_results;
 bool bac_tstat_read_results;
 bool bac_basic_setting_read_results;
 bool bac_customer_unit_read_results;
+bool bac_user_login_read_results;
+bool bac_graphic_label_read_results;
+bool bac_remote_point_read_results;
 
 bool bac_cm5_graphic;
 int bac_gloab_panel;
@@ -1894,6 +1909,15 @@ HWND      m_tstat_dlg_hwnd;
 HWND      m_setting_dlg_hwnd;
 HWND      m_flash_multy_hwnd;
 HWND      m_customer_digital_range_dlg_hwnd;
+HWND      m_building_config_hwnd;
+HWND      m_scan_dlg_hwnd;
+HWND	  m_tcp_server_hwnd;
+HWND      m_user_login_hwnd;
+HWND      m_user_config_hwnd;
+HWND      m_add_label = NULL;
+HWND      m_edit_label = NULL;
+HWND      m_at_command_hwnd = NULL;
+HWND      m_remote_point_hwnd = NULL;
 
 vector <Str_out_point> m_Output_data;
 vector <Str_in_point>  m_Input_data;
@@ -1911,11 +1935,20 @@ vector <Alarm_point> m_alarmlog_data;
 vector <Str_TstatInfo_point> m_Tstat_data;
 vector <Str_Remote_TstDB> m_remote_device_db;
 vector <Str_Units_element> m_customer_unit_data;
+vector <Str_userlogin_point> m_user_login_data;
+vector <Client_Info> m_tcp_connect_info;
+vector <Str_label_point> m_graphic_label_data;	//图片里面的Label的信息要存在设备里面;
+vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
+
 Time_block_mini Device_time;
 Str_Setting_Info Device_Basic_Setting;
+char m_at_write_buf[100];
+char m_at_read_buf[450];
 
 vector <refresh_net_device> m_refresh_net_device_data;
-
+vector <GSM_connection_info> m_gsm_connect_info;
+vector <Scan_Info> m_scan_info;
+vector <Scan_Info> m_scan_info_buffer;
 Monitor_Block m_monitor_block;
 Str_Monitor_data_header m_monitor_head;//用来接收monitor 的头，里面有需要接收的总包和目前是第几包;
 int Monitor_Input__Data[14][1000];	
@@ -1932,7 +1965,7 @@ vector <_Graphic_Value_Info> m_graphic_refresh_data;
 
 byte	g_DayState[8][48];
 unsigned char weeklt_time_schedule[BAC_WEEKLY_ROUTINES_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
-unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][500];//暂定400;
+unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//暂定2000;
 int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 
 BOOL g_mstp_flag;
@@ -1948,13 +1981,14 @@ HANDLE CM5_hThread = NULL;
 HANDLE CM5_UI_Thread;
 DWORD nThreadID_x;
 DWORD cm5_nThreadID;
-CDialog *pDialog[12];
+CDialog *pDialog[14];
 CDialog *DebugWindow;
+CDialog *Tcp_Server_Window =NULL;
 HWND h_debug_window;
 CString PrintText[1000];
 CString g_Print;
 bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，否则就为1;
-int g_protocol;
+int g_protocol=PROTOCOL_UNKNOW;
 bool bac_net_initial_once;
 unsigned char my_ip[4];
 int connect_invoke_id = -1;
@@ -1969,8 +2003,88 @@ SOCKADDR_IN h_bcast;
 _RecordsetPtr m_global_pRs;
 _ConnectionPtr m_global_pCon;
 
+Data_Time_Match * digital_data_point[MAX_POINTS_IN_MONITOR];
 Data_Time_Match * analog_data_point[MAX_POINTS_IN_MONITOR];
+int analog_data_max_value[MAX_POINTS_IN_MONITOR];
+int analog_data_min_value[MAX_POINTS_IN_MONITOR];
+int digital_data_count[MAX_POINTS_IN_MONITOR];	//用于记录digital data 这个指针到底存了多少数据;
 int analog_data_count[MAX_POINTS_IN_MONITOR];	//用于记录analog data 这个指针到底存了多少数据;
 int get_data_count = 0;
+int monitor_analog_count = 0;	//暂存monitor 的模拟和数字的个数;
+int monitor_digital_count = 0;
 Data_Time_Match * temp_analog_data[MAX_POINTS_IN_MONITOR];	//临时存放新建的块;
+int SEND_COMMAND_DELAY_TIME = 100;
+bool TCP_Server_Running = false; //开启TCP 服务器就将标志位置1;
+bool Gsm_communication = false;	//如果是通过GSM 读远程设备 许多地方要特殊处理;不能刷新太频繁;
+CString SaveConfigFilePath;
+vector<ALL_LOCAL_SUBNET_NODE> g_Vector_Subnet;
+vector<ALL_LOCAL_SUBNET_NODE> g_Scan_Vector_Subnet;
+
+CString g_strStartInterface_config = _T("T3000_config.ini");
+
+vector<Reg_Infor> g_Vector_Write_Error;
+bool need_read_bacnet_graphic_label_flag = true;	//用于防止重复读取 graphic label ;只有切换设备的时候才需要再次读取;
+bool read_write_bacnet_config = false;	//读写Bacnet config 的时候禁止刷新 List;
+
+ vector <Tstat_Input_Struct> m_tstat_input_data;
+ vector <Tstat_Output_Struct> m_tstat_output_data;
+ // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
+ // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KF Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
+ CString analog_range[11]={_T("UNUSED"),_T("10K Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open")};
+ CString analog_range_TSTAT6[12]={_T("UNUSED"),_T("10K Thermistor Type2"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open"),_T("10K Thermistor Type3")};
+
+ CString INPUT_FUNS[8]={_T("Normal"),_T("Freeze Protect"),_T("Occupancy Sensor"),_T("Sweep Off"),_T("Clock"),_T("Changeover Mode"),_T("Outside Temp"),_T("Airflow")};
+
+
+ CString Interlock[6]={_T("ON"),_T("DI1"),_T("AI1") ,_T("AI2"),_T("TIMER OR"),_T("TIMER AND")};
+ CString ONTPUT_FUNS[5]={_T("Normal"),_T("Rotation Timer"),_T("Lighting Control") ,_T("VAV Control"),_T("Transducer")};
+
+ CString OUTPUT_RANGE5[3]={_T("On/Off"),_T("Float(0-100%)"),_T("PWM(0-100%)")};
+
+ CString OUTPUT_RANGE45[4]={_T("On/Off"),_T("Float(Cooling)"),_T("Float(Heating)"),_T("PWM(0-100%)")};//2.5.0.98
+
+ CString OUTPUT_ANRANGE6[5]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("PWM(0-100%)")};
+
+//  CString OUTPUT_ANRANGE[18]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)"),_T("Internal Sensor"),_T("Setpoint"),
+// 	 _T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),_T("Hum Sensor"),_T("CO2 Sensor"),_T("PWM(0-100%)")};
+ CString OUTPUT_ANRANGE[22]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)"),_T("Internal Sensor"),_T("Setpoint"),
+	 _T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),_T("Hum Sensor"),_T("CO2 Sensor"),_T("Avg Temperature"),_T("Avg AI1ToAI2"),_T("Avg AI1ToAI3"),_T("Avg AI1ToAI4"),_T("PWM(0-100%)")};
+AddressMap TSTAT_6_ADDRESS[2000];
+AddressMap TSTAT_5EH_LCD_ADDRESS[2000];
+AddressMap TSTAT_5ABCDFG_LED_ADDRESS[2000];
+
+
+AddressMap T3_8AI8AO[T3_REG_TOTAL_COUNT];
+AddressMap T3_8AI16O[T3_REG_TOTAL_COUNT];
+AddressMap T3_32AI[T3_REG_TOTAL_COUNT];
+AddressMap T3_Performance[T3_REG_TOTAL_COUNT];
+AddressMap T3_4AO[T3_REG_TOTAL_COUNT];
+AddressMap T3_6CT[T3_REG_TOTAL_COUNT];
+AddressMap T3_28IN[T3_REG_TOTAL_COUNT];
+AddressMap T3_RTD[T3_REG_TOTAL_COUNT];
+AddressMap T3_8I13O[T3_REG_TOTAL_COUNT];
+
+
+
+int current_building_protocol;
+int current_building_comport;
+int current_building_baudrate;
+int current_building_ip;
+int current_building_ipport;
+
+// 需要刷新--在MainFrm.cpp中的线程中需要判断这个变量
+//主要是两个地方
+//1>T3000View-Fresh()--进入到这里说明是需要刷新的因为这个是Tstat
+BOOL g_NEED_MULTI_READ = FALSE;
+
+//AC.0:0~10A,1:0~20A.2:0~50A. DC.10:0-100A
+CString CS3000_INPUT_RANGE[4]={L"0-10A",L"0-20A",L"0-50A",L"0-100A"};
+CString STRING_SWITCH_STATUS[3]={_T("Off"),_T("Hand"),_T("Auto")};
+int m_user_level = 2;
+
+
+
+vector<Registers_Infor> g_vectRegisters;
+
+BOOL g_fresh_Graphic = FALSE;
 #pragma endregion For_bacnet

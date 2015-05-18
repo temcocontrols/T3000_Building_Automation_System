@@ -50,6 +50,7 @@ typedef struct
 	unsigned char commad;
 	unsigned short send_package;
 	char download_filename[20];
+	unsigned short fw_version;
 	unsigned char CRC;
 }Download_File_Return;
 
@@ -113,12 +114,17 @@ const int DOWNLOAD_MD5_CHECK_PASS = 21;
 
 
 //#define SHOW_MESSAGEBOX
+#define	 DELETE_LABEL_MESSAGE	WM_USER + 1228
+#define  EDIT_LABEL_MESSAGE		WM_USER + 1229
+#define  ADD_LABEL_MESSAGE		WM_USER + 1230
 #define	 MY_REDRAW_WINDOW		WM_USER + 1231
 #define WM_FRESH_CM_LIST		WM_USER + 975
 #define WM_FRESH_SETTING_UI		WM_USER + 976
 #define WM_DELETE_NEW_MESSAGE_DLG WM_USER + 2001
 #define MY_BAC_CONFIG_READ_RESULTS  WM_USER + 2002
 #define SHOW_ERROR_MESSAGE
+
+#define  MY_FRESH_DRAW_GRAPHIC      WM_USER + 2003
 
 #define  WM_LIST_MONITOR_CHANGED WM_USER+ 976
 #define  WM_LIST_MONITOR_INPUT_CHANGED WM_USER+ 977
@@ -136,6 +142,8 @@ const int MODBUS_RS485 = 0;
 const int MODBUS_TCPIP = 1;
 const int MODBUS_BACNET_MSTP = 2;
 const int PROTOCOL_BACNET_IP   = 3;
+const int PROTOCOL_GSM = 4;
+const int PROTOCOL_REMOTE_IP = 6;
 const int PROTOCOL_UNKNOW = 255;
 
 const int BAC_WAIT_NORMAL_READ = 0;
@@ -156,13 +164,15 @@ const COLORREF LIST_ITEM_SELECTED = RGB(150,150,200);
 
 const bool REFRESH_ON_ITEM = TRUE;
 
-const int SEND_COMMAND_DELAY_TIME = 100;
-const int RESEND_COUNT = 100;
+//const int SEND_COMMAND_DELAY_TIME = 100;
+
+const int RESEND_COUNT = 10;
 const int FAIL_RESEND_COUNT = 4;
 
 const int TYPE_SVAE_CONFIG = 254;
 const int TYPE_ALL = 255;
 const int TYPE_CONNECT_WITH_DEVICE = 253;
+const int TYPE_IN_OUT_VAR = 252;
 const int TYPE_INPUT = 1;
 const int TYPE_OUTPUT = 2;
 const int TYPE_PROGRAM = 3;
@@ -180,17 +190,22 @@ const int TYPE_TSTAT = 15;
 const int TYPE_SETTING = 16;
 const int TYPE_READ_MONITOR_DATA = 17;
 const int TYPE_READ_CUSTOMER_UNIT = 18;
+const int TYPE_READ_USER_LOGIN_INFO = 19;
+const int TYPE_READ_GRAPHIC_LABEL_INFO = 20;
+const int TYPE_READ_REMOTE_POINT_INFO = 21;
 
-
-
+const int TYPE_TSTAT_MAIN_INFOR = 22;
 
 const int DELETE_WINDOW_MSG = 200;
 const int START_BACNET_TIMER = 201;
 const int CONNECT_TO_MODBUS_FAILED = 202;
+const int PASSWORD_OK_INITIAL_UI = 203;
+const int SHOW_PROGRAM_IDE = 204;
 
 const int BAC_READ_ALL_LIST = 255;
 const int BAC_READ_SVAE_CONFIG = 254;
 const int BAC_READ_CONNECT_WITH_DEVICE_LIST = 253;
+const int BAC_READ_IN_OUT_VAR_LIST = 252;
 const int BAC_READ_INPUT_LIST = 1;
 const int BAC_READ_OUTPUT_LIST = 2;
 const int BAC_READ_PROGRAM_LIST = 3;
@@ -209,6 +224,9 @@ const int BAC_READ_TSTAT_LIST = 15;
 const int BAC_READ_BASIC_SETTING_COMMAND = 16;
 const int BAC_READ_MONITOR_DATA = 17;
 const int BAC_READ_CUSTOMER_UNITS = 18;
+const int BAC_READ_USER_LOGIN_INFO = 19;
+const int BAC_READ_GRAPHIC_LABEL_INFO = 20;
+const int BAC_READ_REMOTE_POINT_INFO = 21;
 
 
 
@@ -240,56 +258,109 @@ const int BAC_DECOM_NO  = 1;
 
 const int BAC_READ_GROUP_NUMBER = 4;
 
-const int BAC_INPUT_ITEM_COUNT = 64;
-const int BAC_OUTPUT_ITEM_COUNT = 64;
-const int BAC_PROGRAM_ITEM_COUNT = 16;
+const int BAC_READ_INPUT_GROUP_NUMBER = 10;
+const int BAC_READ_OUTPUT_GROUP_NUMBER = 10;
+const int BAC_READ_VARIABLE_GROUP_NUMBER = 10;
+const int BAC_READ_PROGRAM_GROUP_NUMBER = 10;
+const int BAC_READ_CONTROLLER_GROUP_NUMBER = 10;
+const int BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER = 10;
+const int BAC_READ_ANNUAL_ROUTINES_GROUP_NUMBER = 8;
+
+const int BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER = 8;
+
+const int BAC_READ_SCREEN_GROUP_NUMBER = 8;
+const int BAC_READ_MONITOR_GROUP_NUMBER = 4;
+const int BAC_READ_ALARMLOG_GROUP_NUMBER = 4;
+const int BAC_READ_TSTAT_GROUP_NUMBER = 8;
+const int BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER = 8;
+
+const int BAC_READ_GRPHIC_LABEL_GROUP_NUMBER = 6;
+const int BAC_REMOTE_POINT_GROUP_NUMBER = 25;
+
+
+const int BAC_READ_INPUT_REMAINDER = BAC_READ_INPUT_GROUP_NUMBER - 1;
+const int BAC_READ_OUTPUT_REMAINDER = BAC_READ_OUTPUT_GROUP_NUMBER - 1;
+const int BAC_READ_VARIABLE_REMAINDER = BAC_READ_VARIABLE_GROUP_NUMBER - 1;
+const int BAC_READ_PROGRAM_REMAINDER = BAC_READ_PROGRAM_GROUP_NUMBER - 1;
+const int BAC_READ_CONTROLLER_REMAINDER = BAC_READ_CONTROLLER_GROUP_NUMBER - 1;
+const int BAC_READ_WEEKLY_ROUTINES_REMAINDER = BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER - 1;
+const int BAC_READ_ANNUAL_ROUTINES_REMAINDER = BAC_READ_ANNUAL_ROUTINES_GROUP_NUMBER - 1;
+const int BAC_READ_USER_LOGIN_INFO_REMAINDER = BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER - 1;
+
+const int BAC_READ_CUSTOMER_UNITS_REMAINDER = BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER - 1;;
+
+const int BAC_READ_SCREEN_REMAINDER = BAC_READ_SCREEN_GROUP_NUMBER - 1;
+const int BAC_READ_MONOTOR_REMAINDER = BAC_READ_MONITOR_GROUP_NUMBER - 1;
+const int BAC_READ_ALARMLOG_REMAINDER = BAC_READ_ALARMLOG_GROUP_NUMBER - 1;
+const int BAC_READ_TSTAT_REMAINDER = BAC_READ_TSTAT_GROUP_NUMBER - 1;
+const int BAC_READ_GRPHIC_LABEL_REMAINDER	= BAC_READ_GRPHIC_LABEL_GROUP_NUMBER - 1;
+const int BAC_REMOTE_POINT_GROUP_REMAINDER = BAC_REMOTE_POINT_GROUP_NUMBER - 1;
+
+const int BAC_INPUT_ITEM_COUNT = 64;	//sizeof(Str_in_point);					//46
+const int BAC_OUTPUT_ITEM_COUNT = 64;	//sizeof(Str_out_point);					//45
+const int BAC_VARIABLE_ITEM_COUNT = 128; // sizeof(Str_variable_point);			//39
+const int BAC_PROGRAM_ITEM_COUNT = 16;	//sizeof(Str_program_point);				//37
 const int BAC_PROGRAMCODE_ITEM_COUNT = 16;
-const int BAC_VARIABLE_ITEM_COUNT = 128;
-const int BAC_WEEKLY_ROUTINES_COUNT = 16;
-const int BAC_WEEKLYCODE_ROUTINES_COUNT = 16;
-const int BAC_ANNUAL_ROUTINES_COUNT = 8;
-const int BAC_SCHEDULE_TIME_COUNT = 8;
-const int BAC_TIME_COMMAND_COUNT = 1;
-const int BAC_BASIC_SETTING_COUNT = 1;
+
 const int BAC_CONTROLLER_COUNT = 16;
 const int BAC_SCREEN_COUNT = 16;
-const int BAC_MONITOR_COUNT = 12;
+
+const int BAC_WEEKLY_ROUTINES_COUNT = 16;
+const int BAC_WEEKLYCODE_ROUTINES_COUNT = 16;
+
+const int BAC_ANNUAL_ROUTINES_COUNT = 8;
 const int BAC_ANNUAL_CODE_COUNT = 8;
-const int BAC_CONNECT_WITH_DEVICE_COUNT = 1;
+
+const int BAC_MONITOR_COUNT = 12;
 const int BAC_ALARMLOG_COUNT = 16;
 const int BAC_TSTAT_COUNT = 32;
 const int BAC_CUSTOMER_UNITS_COUNT = 8;
 
+const int BAC_SCHEDULE_TIME_COUNT = 8;
+const int BAC_TIME_COMMAND_COUNT = 1;
+const int BAC_BASIC_SETTING_COUNT = 1;
+const int BAC_USER_LOGIN_COUNT = 8;
+
+const int BAC_CONNECT_WITH_DEVICE_COUNT = 1;
+
+const int BAC_GRPHIC_LABEL_COUNT = 64;
+const int BAC_REMOTE_POINT_COUNT = 128;
 
 
-const int BAC_INPUT_GROUP = BAC_INPUT_ITEM_COUNT / BAC_READ_GROUP_NUMBER;
-const int BAC_OUTPUT_GROUP = BAC_OUTPUT_ITEM_COUNT / BAC_READ_GROUP_NUMBER;
-const int BAC_PROGRAM_GROUP = BAC_PROGRAM_ITEM_COUNT / BAC_READ_GROUP_NUMBER;
+
+
+
+const int BAC_INPUT_GROUP = (BAC_INPUT_ITEM_COUNT + BAC_READ_INPUT_GROUP_NUMBER - 1)  / BAC_READ_INPUT_GROUP_NUMBER;
+const int BAC_OUTPUT_GROUP = (BAC_OUTPUT_ITEM_COUNT + BAC_READ_OUTPUT_GROUP_NUMBER -1)  / BAC_READ_OUTPUT_GROUP_NUMBER;
+const int BAC_VARIABLE_GROUP = (BAC_VARIABLE_ITEM_COUNT + BAC_READ_VARIABLE_GROUP_NUMBER - 1) / BAC_READ_VARIABLE_GROUP_NUMBER;
+
+const int BAC_PROGRAM_GROUP = (BAC_PROGRAM_ITEM_COUNT + BAC_READ_PROGRAM_GROUP_NUMBER - 1) / BAC_READ_PROGRAM_GROUP_NUMBER;
 const int BAC_PROGRAMCODE_GROUP = BAC_PROGRAMCODE_ITEM_COUNT;
-const int BAC_VARIABLE_GROUP = BAC_VARIABLE_ITEM_COUNT / BAC_READ_GROUP_NUMBER;
-const int BAC_WEEKLY_GROUP = BAC_WEEKLY_ROUTINES_COUNT / BAC_READ_GROUP_NUMBER;
+
+const int BAC_CONTROLLER_GROUP = (BAC_CONTROLLER_COUNT + BAC_READ_CONTROLLER_GROUP_NUMBER - 1) / BAC_READ_CONTROLLER_GROUP_NUMBER;
+
+const int BAC_WEEKLY_GROUP = (BAC_WEEKLY_ROUTINES_COUNT + BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER - 1) / BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER;
 const int BAC_WEEKLYCODE_GOUP = BAC_WEEKLYCODE_ROUTINES_COUNT;
-const int BAC_ANNUAL_GROUP = BAC_ANNUAL_ROUTINES_COUNT / BAC_READ_GROUP_NUMBER;
+const int BAC_ANNUAL_GROUP = (BAC_ANNUAL_ROUTINES_COUNT + BAC_READ_ANNUAL_ROUTINES_GROUP_NUMBER - 1) / BAC_READ_ANNUAL_ROUTINES_GROUP_NUMBER;
 const int BAC_TIME_COMMAND_GROUP = 1;
 const int BAC_BASIC_SETTING_GROUP = 1;
 const int BAC_ANNUALCODE_GROUP = BAC_ANNUAL_CODE_COUNT;
-const int BAC_CONTROLLER_GROUP = BAC_CONTROLLER_COUNT / BAC_READ_GROUP_NUMBER;
-const int BAC_SCREEN_GROUP = BAC_SCREEN_COUNT / BAC_READ_GROUP_NUMBER;
-const int BAC_MONITOR_GROUP = BAC_MONITOR_COUNT / BAC_READ_GROUP_NUMBER;
+const int BAC_SCREEN_GROUP = (BAC_SCREEN_COUNT + BAC_READ_SCREEN_GROUP_NUMBER -1) / BAC_READ_SCREEN_GROUP_NUMBER;
+const int BAC_MONITOR_GROUP = (BAC_MONITOR_COUNT + BAC_READ_MONITOR_GROUP_NUMBER - 1) / BAC_READ_MONITOR_GROUP_NUMBER;
 const int BAC_CONNECT_WITH_DEVICE_GROUP = 1;
-const int BAC_ALARMLOG_GROUP = BAC_ALARMLOG_COUNT;
-const int BAC_TSTAT_GROUP = BAC_TSTAT_COUNT / BAC_READ_GROUP_NUMBER;
-const int BAC_CUSTOMER_UNIT_GROUP = BAC_CUSTOMER_UNITS_COUNT / BAC_READ_GROUP_NUMBER;
-
-
-
+const int BAC_ALARMLOG_GROUP = (BAC_ALARMLOG_COUNT + BAC_READ_ALARMLOG_GROUP_NUMBER - 1) / BAC_READ_ALARMLOG_GROUP_NUMBER;
+const int BAC_TSTAT_GROUP = (BAC_TSTAT_COUNT + BAC_READ_TSTAT_GROUP_NUMBER - 1) / BAC_READ_TSTAT_GROUP_NUMBER;
+const int BAC_CUSTOMER_UNIT_GROUP = (BAC_CUSTOMER_UNITS_COUNT + BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER - 1) / BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER;
+const int BAC_USER_LOGIN_GROUP = (BAC_USER_LOGIN_COUNT + BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER - 1) / BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER;
+const int BAC_GRPHIC_LABEL_GROUP = (BAC_GRPHIC_LABEL_COUNT + BAC_READ_GRPHIC_LABEL_GROUP_NUMBER - 1)/ BAC_READ_GRPHIC_LABEL_GROUP_NUMBER;
+const int BAC_REMOTE_POINT_GROUP = (BAC_REMOTE_POINT_COUNT + BAC_REMOTE_POINT_GROUP_NUMBER - 1) / BAC_REMOTE_POINT_GROUP_NUMBER;
 
 const int BAC_SHOW_CONNECT_RESULTS = 1;
 const int BAC_SHOW_MISSION_RESULTS = 3;
 
-const int BAC_LIST_REFRESH_TIME = 20000;//ms
+const int BAC_LIST_REFRESH_TIME = 15000;//ms
 
-
+  
 const int SCHEDULE_TIME_NUM = 0;
 const int SCHEDULE_TIME_MONDAY = 1;
 const int SCHEDULE_TIME_TUESDAY = 2;
@@ -320,8 +391,21 @@ struct _Bac_Scan_results_Info
 	unsigned short modbus_port;
 	unsigned short software_version;
 	unsigned char hardware_version;
+	unsigned char m_protocol;
 };
 
+struct Client_Info
+{
+	SOCKET client_socket;
+	CString IPAddress;
+	int ipport;
+	CString Product_name;
+	unsigned int serialnumber;
+	int object_instance;
+	int pannel_number;
+	unsigned char protocol;
+	
+};
 
 struct _Resend_Read_Info
 {
@@ -356,6 +440,7 @@ struct refresh_net_device
 	int nport;
 	float sw_version;
 	float hw_version;
+	CString NetCard_Address;
 };
 
 struct _Refresh_Info 
@@ -378,6 +463,9 @@ struct _Refresh_Info
 	_Resend_Read_Info Read_Tstat_Info[BAC_TSTAT_GROUP];
 	_Resend_Read_Info Read_BasicSetting_Info[BAC_BASIC_SETTING_GROUP];
 	_Resend_Read_Info Read_Customer_unit_Info[BAC_CUSTOMER_UNIT_GROUP];
+	_Resend_Read_Info Read_UserLogin[BAC_USER_LOGIN_GROUP];
+	_Resend_Read_Info Read_Label_Graphic_Info[BAC_GRPHIC_LABEL_GROUP];
+	_Resend_Read_Info Read_Remote_Point_Info[BAC_REMOTE_POINT_GROUP];
 };
 
 struct _Refresh_Write_Info 
@@ -551,6 +639,7 @@ const CString Input_List_Analog_Units[] =
 	 _T("FPM"),
 	 _T("%(0-5V)"),
 	 _T("%(4-20ma)"),
+	 _T("Volts"),
 };
 
 const CString Input_Analog_Units_Array[] =
@@ -574,6 +663,7 @@ const CString Input_Analog_Units_Array[] =
 	 _T("0.0 to 3000"),
 	 _T("0 to 100"),
 	 _T("0 to 100"),
+	  _T("0.0 to 10.0"),
 };
 
 const CString Output_Analog_Units_Array[] = 
@@ -587,16 +677,93 @@ const CString Output_Analog_Units_Array[] =
 	_T("0.0 -> 20   ma")
 };
 
+const CString Time_Server_Name[] =
+{
+	_T("ntp.sjtu.edu.cn"),
+	_T("time.nist.gov"),
+	_T("NTSC"),
+	_T("time.nist.gov"),
+	_T("time.windowns.com")
+	
+};
+
+const signed short Time_Zone_Value[] =
+{
+	-1200,
+	-1100,
+	-1000,
+	-900,
+	-800,
+	-700,
+	-600,
+	-500,
+	-400,
+	-300,
+	-200,
+	-100,
+	0,
+	100,
+	200,
+	300,
+	400,
+	500,
+	600,
+	700,
+	800,
+	900,
+	1000,
+	1100,
+	1200,
+	1300
+};
+
+const CString Time_Zone_Name[] =
+{
+	_T("UTC - 12:00"),
+	_T("UTC - 11:00"),
+	_T("UTC - 10:00"),
+	_T("UTC - 09:00"),
+	_T("UTC - 08:00"),
+	_T("UTC - 07:00"),
+	_T("UTC - 06:00"),
+	_T("UTC - 05:00"),
+	_T("UTC - 04:00"),
+	_T("UTC - 03:00"),
+	_T("UTC - 02:00"),
+	_T("UTC - 01:00"),
+	_T("UTC"),
+	_T("UTC + 01:00"),
+	_T("UTC + 02:00"),
+	_T("UTC + 03:00"),
+	_T("UTC + 04:00"),
+	_T("UTC + 05:00"),
+	_T("UTC + 06:00"),
+	_T("UTC + 07:00"),
+	_T("UTC + 08:00"),
+	_T("UTC + 09:00"),
+	_T("UTC + 10:00"),
+	_T("UTC + 11:00"),
+	_T("UTC + 12:00"),
+	_T("UTC + 13:00")
+};
+
+const CString DDNS_Server_Name[] =
+{
+	_T("www.3322.org"),
+	_T("www.dyndns.com"),
+	_T("www.no-ip.com")
+};
+
 const CString Device_Serial_Port_Status[] =
 {
 	_T("Unused"),
 	_T("Bacnet MSTP"),
-	_T("Modbus Main Serial Port"),
+	_T("Modbus Slave"),
 	_T("Bacnet PTP"),
 	_T("GSM"),
 	_T("Main Zigbee"),
 	_T("Sub Zigbee"),
-	_T("Modbus Sub Serial Port"),
+	_T("Modbus Master"),
 };
 
 const CString Variable_Analog_Units_Array[] = 
@@ -651,7 +818,7 @@ struct _Graphic_Value_Info
 };
 
 
-const int WINDOW_TAB_COUNT = 12; //多少个Window 嵌入在TAB里面;
+const int WINDOW_TAB_COUNT = 14; //多少个Window 嵌入在TAB里面;
 const int WINDOW_INPUT = 0;
 const int WINDOW_OUTPUT = 1;
 const int WINDOW_VARIABLE = 2;
@@ -664,6 +831,8 @@ const int WINDOW_MONITOR = 8;
 const int WINDOW_ALARMLOG = 9;
 const int WINDOW_TSTAT	= 10;
 const int WINDOW_SETTING = 11;
+const int WINDOW_USER_LOGIN = 12;
+const int WINDOW_REMOTE_POINT = 13;
 
 
 
@@ -671,10 +840,12 @@ const int KEY_INSERT = 1020;
 
 
 typedef enum
-{							//IN				//OUT	
+{		
+	PRODUCT_CM5 = 0,//10A + 8 D			//10D
+	//IN				//OUT	
 	BIG_MINIPANEL = 1,			//32 A				//12D   12A
 	SMALL_MINIPANEL = 2,		//16 A				//6 D	4 A
-	PRODUCT_CM5						//10A + 8 D			//10D
+	TINY_MINIPANEL = 3,				
 };
 
 const int BIG_MINIPANEL_IN_A = 32;
@@ -723,4 +894,206 @@ const CString Baudrate_Array[] =
 	_T("921600"),
 };
 
+typedef struct
+{
+	SOCKET m_gsm_socket;
+	UINT   product_serialnumber;
+}GSM_connection_info;
+
+
+enum
+{
+	SCAN_BY_SERIAL_PORT = 1,
+	SCAN_BY_UDP,
+	SCAN_BY_BACNET_IP,
+	SCAN_BY_MSTP,
+	SCAN_BY_REMOTE_IP
+};
+
+enum
+{
+	SCAN_STATUS_WAIT = 1,
+	SCAN_STATUS_RUNNING ,
+	SCAN_STATUS_FINISHED ,
+	SCAN_STATUS_FAILED,
+	SCAN_STATUS_SKIP
+};
+
+typedef struct
+{
+	int scan_list_item;
+	int scan_mode;
+	int scan_com_port;
+	int scan_baudrate;
+	bool scan_skip;
+	int scan_status;
+	char scan_notes[250];
+	int scan_found;
+}Scan_Info;	// 扫描的时候 用于显示给list 的结构;
+
+
+typedef struct
+{
+	int nSerialNum;
+	int nScreen_index;
+	int nLabel_index;
+	uint8_t nMain_Panel;
+	uint8_t nSub_Panel;
+	uint8_t nPoint_type;
+	uint8_t nPoint_number;
+	int  nPoint_x;
+	int  nPoint_y;
+	COLORREF nclrTxt;
+	uint8_t nDisplay_Type;
+	uint8_t nMouse_Status;
+	char ico_name[10];
+	char ico_name_2[10];
+	uint8_t ntext_place;
+	uint8_t n_iconsize;
+}Bacnet_Label_Info;
+
+const int LABEL_MOUSE_NORMAL = 0;
+const int LABEL_MOUSE_ON = 1;
+const int LABEL_MOUSE_ON_LB_DOWN = 2;
+const int LABEL_MOUSE_ON_LB_UP = 3;
+
+
+
+
+#pragma region Label_Display
+const int LABEL_SHOW_VALUE = 0;
+const int LABEL_SHOW_FULL_DESCRIPTION = 1;
+const int LABEL_SHOW_LABEL = 2;
+const int LABEL_ICON_VALUE = 3;
+const int LABEL_ICON_FULL_DESCRIPTION = 4;
+const int LABEL_ICON_LABEL = 5;
+const CString Label_Display_Array[] = 
+{
+	_T("Value"),
+	_T("Full Description"),
+	_T("Label"),
+	_T("Icon"),
+	_T("Icon Description"),
+	_T("Icon Label"),
+	_T(""),
+	_T(""),
+	_T(""),
+	_T(""),
+};
+#pragma endregion Label_Display
+
+
+#pragma region Label_position
+const int  LABEL_TEXT_BOTTOM = 0;
+const int LABEL_TEXT_LEFT = 1;
+const int  LABEL_TEXT_TOP = 2;
+const int  LABEL_TEXT_RIGHT = 3;
+
+const CString Label_Text_Place[] = 
+{
+	_T("Bottom"),
+	_T("Left"),
+	_T("Top"),
+	_T("Right"),
+	_T(""),
+	_T(""),
+	_T(""),
+	_T(""),
+};
+#pragma endregion Label_position
+
+
+#pragma region Label_Icon_Size
+const int  LABEL_ICON_SMALL = 0;
+const int LABEL_ICON_NORMAL = 1;
+const int  LABEL_ICON_LARGE = 2;
+
+const CString Label_ICON_SIZE[] = 
+{
+	_T("Small"),
+	_T("Normal"),
+	_T("Large"),
+	_T(""),
+	_T(""),
+};
+
+#pragma endregion Label_Icon_Size
+
+
+
+const int LOGIN_SUCCESS_READ_ONLY = 1;
+const int LOGIN_SUCCESS_FULL_ACCESS = 2;
+const int LOGIN_SUCCESS_GRAPHIC_MODE = 3;
+const int LOGIN_SUCCESS_ROUTINE_MODE = 4;
+const int LOGIN_USER_ERROR = 100;
+const int LOGIN_PASSWORD_ERROR = 110;
+const int LOGIN_USER_OR_PASSWORD_ERROR = 120;
+
+#define LABEL_START_ID 1
+
+const int AT_CLEAR = 0;
+const int AT_SEND = 1;
+const int AT_OPEN = 2;
+const int AT_CLOSE = 3;
+
+const int NO_UNSED_LABEL = 0;
+const int ENABLE_LABEL = 1;
+const int EMPTY_LABEL = 2;
+
+const int SCREEN_HOTKEY_COUNT = 9;
+const int m_screenHotKeyID[SCREEN_HOTKEY_COUNT] = 
+{
+	4001,
+	4002,
+	4003,
+	4004,
+	4005,
+	4006,
+	4007,
+	4008,
+	4009
+};
+
+struct AddressMap
+{
+	char AddressName[255];
+	int AddressValue;
+};
+
+const int P_MODBUS_485 = 0;
+const int P_MODBUS_TCP = 1;
+const int P_BACNET_MSTP = 2;
+const int P_BACNET_IP = 3;
+const int P_GSM = 4;
+const int P_AUTO = 5;
+const int P_REMOTE_DEVICE = 6;
+
+//const CString Building_Protocol[] =
+//{
+//	_T("Modbus 485"),
+//	_T("Modbus TCP"),
+//	_T("Bacnet MSTP"),
+//	_T("Bacnet IP"),
+//	_T("GSM"),
+//	_T("Auto"),
+//	_T("Remote Device")
+//
+//};
+
+const CString Building_Protocol[] =
+{
+	_T("Modbus 485"),
+	_T("Modbus TCP"),
+	_T("Bacnet MSTP"),
+	_T("Remote Device"),
+	_T("Auto")
+};
+
+const CString Building_Baudrate[] =
+{
+	_T("9600"),
+	_T("19200")
+};
+
+const int T3_REG_TOTAL_COUNT = 292;
 
