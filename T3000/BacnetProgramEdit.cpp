@@ -20,7 +20,7 @@ CString program_string;
  extern char my_display[10240];
  extern int Encode_Program();
  extern int my_lengthcode;
- extern char mycode[1024];
+ extern char mycode[2000];
 
 extern void  init_info_table( void );
 extern void Init_table_bank();
@@ -64,6 +64,7 @@ BEGIN_MESSAGE_MAP(CBacnetProgramEdit, CDialogEx)
 	ON_COMMAND(ID_SAVEFILE, &CBacnetProgramEdit::OnSavefile)
 	ON_EN_SETFOCUS(IDC_RICHEDIT2_PROGRAM, &CBacnetProgramEdit::OnEnSetfocusRichedit2Program)
 	ON_COMMAND(ID_REFRESH, &CBacnetProgramEdit::OnRefresh)
+	ON_WM_HELPINFO()
 END_MESSAGE_MAP()
 
 
@@ -108,7 +109,7 @@ LRESULT CBacnetProgramEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 void CBacnetProgramEdit::Initial_static()
 {
 	CString temp_cs_size,temp_cs_free;
-	m_pool_size.SetWindowTextW(_T("26624"));
+	m_pool_size.SetWindowTextW(_T("2000"));
 	m_pool_size.textColor(RGB(255,0,0));
 	//m_static.bkColor(RGB(0,255,255));
 	m_pool_size.setFont(15,10,NULL,_T("Arial"));
@@ -195,11 +196,11 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
  	temp_point = desassembler_program();
 	if(temp_point == NULL)
 	{
-		MessageBox(_T("ERROR!!!!Decode Error!!!!!!!!!!!!!"));
-		
+		//MessageBox(_T("ERROR!!!!Decode Error!!!!!!!!!!!!!"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Decode Error!"));
 		return 1;
 	}
-		
+	Initial_static();	
 	CString temp;
 
 
@@ -245,7 +246,7 @@ LRESULT  CBacnetProgramEdit::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM 
 	{
 		//CString temp_ok;
 		//temp_ok = _T("Bacnet operation success!   Request ID:") +  temp_cs;
-		m_Program_data.at(program_list_line).bytes =	program_code_length[program_list_line] - PRIVATE_HEAD_LENGTH;
+		//m_Program_data.at(program_list_line).bytes =	program_code_length[program_list_line] - PRIVATE_HEAD_LENGTH;
 
 		Show_Results = temp_cs + _T("Success!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
@@ -274,6 +275,8 @@ LRESULT  CBacnetProgramEdit::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM 
 void CBacnetProgramEdit::OnSend()
 {
 	// TODO: Add your command handler code here
+	memset(program_code[program_list_line],0,2000);
+
 	renumvar = 1;
 	error = -1; //Default no error;
 	CString tempcs;
@@ -285,10 +288,13 @@ void CBacnetProgramEdit::OnSend()
 	iTextLen = WideCharToMultiByte( CP_ACP,0,tempcs,-1,NULL,0,NULL,NULL );
 	memset( ( void* )editbuf, 0, sizeof( char ) * ( iTextLen + 1 ) );
 	::WideCharToMultiByte( CP_ACP,0,tempcs,-1,editbuf,iTextLen,NULL,NULL );
+
 	Encode_Program();
 	if(error == -1)
 	{
-		TRACE(_T("Encode_Program length is %d ,copy length is %d\r\n"),program_code_length[program_list_line],my_lengthcode + 10);
+	
+		TRACE(_T("Encode_Program length is %d ,copy length is %d\r\n"),program_code_length[program_list_line],my_lengthcode );
+#if 0
 		if(my_lengthcode <400)
 			memcpy_s(program_code[program_list_line],my_lengthcode,mycode,my_lengthcode);
 		else
@@ -299,18 +305,77 @@ void CBacnetProgramEdit::OnSend()
 			memset(program_code[program_list_line],0,400);
 			return;
 		}
-
-
-		g_invoke_id =WritePrivateData(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line/*,my_lengthcode*/);
-		if(g_invoke_id>=0)
+#endif
+		if(my_lengthcode > 2000)
 		{
-			CString temp_cs_show;
-			temp_cs_show.Format(_T("Write program code to item %d "),program_list_line);
-			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd/*BacNet_hwd*/,temp_cs_show);
+			MessageBox(_T("Encode Program Code Length is too large"));
+			return;
 		}
+		memset(program_code[program_list_line],0,2000);
+		memcpy_s(program_code[program_list_line],my_lengthcode,mycode,my_lengthcode);
+		program_code_length[program_list_line] = program_code[program_list_line][1] *256 + (unsigned char)program_code[program_list_line][0];
+		bac_program_size = program_code_length[program_list_line];// my_lengthcode;
+		bac_free_memory = 2000 - bac_program_size;
+
+
+		int npart = (my_lengthcode / 401) + 1;
+
+		bool b_program_status = true;
+		for (int j=0;j<npart;j++)
+		{
+			int send_status = true;
+			int resend_count = 0;
+			int temp_invoke_id = -1;
+			do 
+			{
+				resend_count ++;
+				if(resend_count>5)
+				{
+					send_status = false;
+					b_program_status = false;
+					MessageBox(_T("Write Program Code Timeout!"));
+					return;
+				}
+				temp_invoke_id =  WriteProgramData(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line,j);
+
+				Sleep(SEND_COMMAND_DELAY_TIME);
+			} while (temp_invoke_id<0);
+
+			if(send_status)
+			{
+				for (int i=0;i<2000;i++)
+				{
+					Sleep(1);
+					if(tsm_invoke_id_free(temp_invoke_id))
+					{
+						//MessageBox(_T("Operation success!"),_T("Information"),MB_OK);
+						//return;
+						goto	part_success;
+					}
+				}
+				b_program_status = false;
+				MessageBox(_T("Write Program Code Timeout!"));
+				return;
+
+part_success:
+				continue;
+			}
+		}
+		if(b_program_status)
+		{
+			CString temp_string;
+			temp_string.Format(_T("Resource Compile succeeded.\r\nTotal size 2000 bytes.\r\nAlready used %d"),bac_program_size);
+			MessageBox(temp_string);
+		}
+
 		m_information_window.ResetContent();
 		m_information_window.InsertString(0,_T("Resource Compile succeeded."));
-
+		m_Program_data.at(program_list_line).bytes = bac_program_size;
+		Initial_static();
+		CString temp1;
+		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(temp1);
+		m_edit_changed = false;
+		program_string = temp1;
 	}
 	else
 	{
@@ -472,17 +537,63 @@ void CBacnetProgramEdit::OnEnSetfocusRichedit2Program()
 void CBacnetProgramEdit::OnRefresh()
 {
 	// TODO: Add your command handler code here
-	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(_T(""));
-	if(m_Program_data.at(program_list_line).bytes <450)
-		g_invoke_id = GetPrivateData(g_bac_instance,READPROGRAMCODE_T3000,program_list_line,program_list_line,m_Program_data.at(program_list_line).bytes + 10);
-	else
+
+	memset(mycode,0,2000);
+
+
+
+	for (int x=0;x<5;x++)
 	{
-		g_invoke_id = GetPrivateData(g_bac_instance,READPROGRAMCODE_T3000,program_list_line,program_list_line, 10);
+		int send_status = true;
+		int resend_count = 0;
+		int temp_invoke_id = -1;
+		do 
+		{
+			resend_count ++;
+			if(resend_count>RESEND_COUNT)
+				return;
+			temp_invoke_id = GetProgramData(g_bac_instance,program_list_line,program_list_line,x);
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (temp_invoke_id<0);
+
+		Sleep(SEND_COMMAND_DELAY_TIME);
+		if(send_status)
+		{
+			for (int i=0;i<2000;i++)
+			{
+				Sleep(1);
+				if(tsm_invoke_id_free(temp_invoke_id))
+				{
+					goto	dlg_part_success;
+				}
+			}
+			return;
+
+dlg_part_success:
+			continue;
+		}
 	}
-	if(g_invoke_id>=0)
-	{
-		CString temp_cs_show;
-		temp_cs_show.Format(_T("Task ID = %d. Read program code from item %d "),g_invoke_id,program_list_line);
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
+	Sleep(100);
+	PostMessage(WM_REFRESH_BAC_PROGRAM_RICHEDIT,NULL,NULL);
+
+
+}
+
+
+
+BOOL CBacnetProgramEdit::OnHelpInfo(HELPINFO* pHelpInfo)
+{
+	// TODO: Add your message handler code here and/or call default
+	if (g_protocol==PROTOCOL_BACNET_IP){
+		HWND hWnd;
+
+		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle,theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+		else
+			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile,HH_HELP_CONTEXT, IDH_TOPIC_EXPORT_TO_BITMAPS);
+		return (hWnd != NULL);
 	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
+	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

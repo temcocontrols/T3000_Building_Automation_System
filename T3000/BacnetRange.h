@@ -37,6 +37,8 @@ public:
 	afx_msg void OnClose();
 	CStaticEx m_show_unit;
 	afx_msg void OnBnClickedCancel();
+	CStatic m_rang_pic;
+	void Timer2_handle();
 };
 
 const CString Range_Type[] =

@@ -11,35 +11,51 @@
 #include "Dialog_Progess.h"
 CString Range_Unit[]={_T("RAW DATA"),_T("TYPE2 10K C"),_T("TYPE2 10K F"),_T("0-100%"),_T("ON/OFF"),_T("OFF/ON"),_T("Pulse Input"),_T("Lighting Control"),_T("TYPE3 10K C"),_T("TYPE3 10K F"),_T("NO USE"),_T("0-5V"),_T("0-10V"),_T("0-20ma")};
  
-#define  WM_FRESH_T38I13O WM_USER+2016
-UINT _ReadMulti_T38I13ORegisters(LPVOID pParam){
-T38I13O *pParent = (T38I13O *)pParam;
-while (TRUE)
-{
-if (!is_connect())
-{
-Sleep(5000);
-continue;
-} 
-else
-{
-Sleep(2000);
-//Read_Multi(g_tstat_id,&product_register_value[pParent->ZONE_TIME_LEFT_INPUT1],pParent->ZONE_TIME_LEFT_INPUT1,8);
-for (int i=0;i<3;i++)
-{
-
-	Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
-}
-::SendMessage(pParent->m_hWnd,WM_FRESH_T38I13O,0,0);
-}
-}
+#define  WM_FRESH_T38I13O WM_USER+1005
+DWORD WINAPI  _ReadMulti_T38I13ORegisters(LPVOID pParam){
+	//return 0;
+	T38I13O *pParent = (T38I13O *)pParam;
+	while (TRUE)
+	{
+	    if (!pParent->IsWindowVisible())
+	    {
+		   
+		   return 0;
+	    }
+		
+		if(g_bPauseMultiRead)
+		{
+			 return 0;
+		}
+		if (!is_connect())
+	  	{
+			Sleep(5000);
+			continue;
+		} 
+		else
+		{
+			Sleep(3000);
+			//Read_Multi(g_tstat_id,&product_register_value[pParent->ZONE_TIME_LEFT_INPUT1],pParent->ZONE_TIME_LEFT_INPUT1,8);
+			for (int i=0;i<3;i++)
+			{
+				if(g_bPauseMultiRead)
+				{
+				    TRACE(L"return Multi Read -T3");
+					return 0;
+				}
+				TRACE(L"Multi Read -T3");
+				Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
+			}
+			::SendMessage(pParent->m_hWnd,WM_FRESH_T38I13O,0,0);
+		}
+	}
 }
 IMPLEMENT_DYNCREATE(T38I13O, CFormView)
 
 T38I13O::T38I13O()
 	: CFormView(T38I13O::IDD)
 {
-m_threadT38I13o=NULL;
+hFirstThread=NULL;
 }
 
 T38I13O::~T38I13O()
@@ -65,6 +81,7 @@ BEGIN_MESSAGE_MAP(T38I13O, CFormView)
 	ON_CBN_SELCHANGE(IDC_DELAY, &T38I13O::OnCbnSelchangeDelay)
 	ON_WM_TIMER()
 	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BUTTON_RESET, &T38I13O::OnBnClickedButtonReset)
 END_MESSAGE_MAP()
 
 
@@ -149,7 +166,7 @@ for(int i=1;i<9;i++)
 
 //设置行/列数量
 m_msflexgrid_output.put_Rows(14);
-m_msflexgrid_output.put_Cols(4);
+m_msflexgrid_output.put_Cols(5);
 //设置列宽	
 
 
@@ -158,11 +175,13 @@ m_msflexgrid_output.put_TextMatrix(0,0,_T("Output Name"));
 m_msflexgrid_output.put_TextMatrix(0,1,_T("Output Value"));
 m_msflexgrid_output.put_TextMatrix(0,2,_T("Light Switch"));
 m_msflexgrid_output.put_TextMatrix(0,3,_T("A/M"));
+m_msflexgrid_output.put_TextMatrix(0,4,_T("Switch Status"));
 
 m_msflexgrid_output.put_ColWidth(0,1000);
 m_msflexgrid_output.put_ColWidth(1,1000);
 m_msflexgrid_output.put_ColWidth(2,1500);
 m_msflexgrid_output.put_ColWidth(3,700);//居中显示
+m_msflexgrid_output.put_ColWidth(4,1500);
 for (int col=0;col<4;col++)
 { 
 	m_msflexgrid_output.put_ColAlignment(col,4);
@@ -528,7 +547,6 @@ int  T38I13O::Get_RegID(CString Name)
 	return regid;
 }
 // T38I13O message handlers
-
 void T38I13O::InitialDialog(){
 Initial_RegisterList();
 InitialTableName();
@@ -722,19 +740,33 @@ for(int i = 1;i<=8;i++)
 	m_msflexgrid_input.put_TextMatrix(i,6,strresult);
 }
 
+bitset<16> BitSwitchValue(product_register_value[SWITCH1_STATUS]);
+int SwitchValue[13];
+for (int i=0;i<8;i++)
+{
+	SwitchValue[i]=BitSwitchValue[2*i]+BitSwitchValue[2*i+1]*2;
+}
+
+bitset<16> BitSwitchValue2(product_register_value[SWITCH2_STATUS]);
+for (int i=8;i<13;i++)
+{
+	SwitchValue[i]=BitSwitchValue2[2*(i-8)]+BitSwitchValue2[2*(i-8)+1]*2;
+}
+
+
 CString CstresultDO;
 for(int i = 1;i<=13;i++)
 {  
 
 	CstresultDO.Format(_T("%d"),product_register_value[OUTPUT1+i-1]);
-	if (product_register_value[OUTPUT1+i-1]==0)
-	{
-	CstresultDO=_T("Off");
-	}
-	else
-	{
-	CstresultDO=_T("On");
-	}
+// 	if (product_register_value[OUTPUT1+i-1]==0)
+// 	{
+// 	CstresultDO=_T("Off");
+// 	}
+// 	else
+// 	{
+// 	CstresultDO=_T("On");
+// 	}
 	m_msflexgrid_output.put_TextMatrix(i,1,CstresultDO);
     
 	if (product_register_value[LIGHT_SWITCH_OUTPUT1+i-1]>0)
@@ -755,6 +787,8 @@ for(int i = 1;i<=13;i++)
 	CstresultDO=_T("Auto");
     }
 	m_msflexgrid_output.put_TextMatrix(i,3,CstresultDO);
+
+	m_msflexgrid_output.put_TextMatrix(i,4,STRING_SWITCH_STATUS[SwitchValue[i-1]]); 
 }
 }
 void T38I13O::InitialTableName(){
@@ -781,21 +815,28 @@ void T38I13O::InitialTableName(){
 }
 void T38I13O::Fresh()
 {
- 
+   
 	if (is_connect())
 	{  
 		 
 
-		for (int i=0;i<3;i++)
+		/*for (int i=0;i<3;i++)
 		{
 			  
 			Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
-		}
+		}*/
 		 
-
+		g_bPauseMultiRead=FALSE;
 		InitialDialog();
 		SetTimer(1,2000,NULL);
-		AfxBeginThread(_ReadMulti_T38I13ORegisters,this);
+		//AfxBeginThread(_ReadMulti_T38I13ORegisters,this);
+		if(hFirstThread != NULL)
+			TerminateThread(hFirstThread, 0);
+		hFirstThread=NULL;
+		if (!hFirstThread)
+		{
+			hFirstThread = CreateThread(NULL,NULL,_ReadMulti_T38I13ORegisters,this,NULL,0);
+		}
 	}
 	else
 	{
@@ -1268,9 +1309,9 @@ void T38I13O::OnTimer(UINT_PTR nIDEvent)
 void T38I13O::OnDestroy()
 {
 
-   if (m_threadT38I13o!=NULL)
+   if (hFirstThread!=NULL)
    {
-   TerminateThread(m_threadT38I13o, 0);
+   TerminateThread(hFirstThread, 0);
    }
 	CFormView::OnDestroy();
 
@@ -1675,7 +1716,20 @@ LRESULT T38I13O::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 						strresult.Format(_T("%d min"),product_register_value[ZONE_TIME_LEFT_INPUT1+i-1]);
 						m_msflexgrid_input.put_TextMatrix(i,6,strresult);
 					}
-		
+					bitset<16> BitSwitchValue(product_register_value[SWITCH1_STATUS]);
+
+					int SwitchValue[13];
+					for (int i=0;i<8;i++)
+					{
+						SwitchValue[i]=BitSwitchValue[2*i]+BitSwitchValue[2*i+1]*2;
+					}
+
+					bitset<16> BitSwitchValue2(product_register_value[SWITCH2_STATUS]);
+					for (int i=8;i<13;i++)
+					{
+						SwitchValue[i]=BitSwitchValue2[2*(i-8)]+BitSwitchValue2[2*(i-8)+1]*2;
+					}
+
 					CString CstresultDO;
 					for(int i = 1;i<=13;i++)
 					{  
@@ -1709,9 +1763,20 @@ LRESULT T38I13O::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 							CstresultDO=_T("Auto");
 						}
 						m_msflexgrid_output.put_TextMatrix(i,3,CstresultDO);
+						m_msflexgrid_output.put_TextMatrix(i,4,STRING_SWITCH_STATUS[SwitchValue[i-1]]); 
 					}
 				}
 				
 			}
 	return CFormView::WindowProc(message, wParam, lParam);
+}
+
+
+void T38I13O::OnBnClickedButtonReset()
+{
+	if(AfxMessageBox(_T(" This will reset the module to the factory defaults,Are you sure to reset it ?"))==IDOK)
+	{
+		//  write_one(g_tstat_id,299,1);
+		write_one(g_tstat_id,300,1);
+	}
 }

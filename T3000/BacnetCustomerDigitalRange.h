@@ -27,6 +27,9 @@ public:
 	afx_msg LRESULT Fresh_Customer_Digital_Range_List(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Fresh_Customer_Digital_Range_Item(WPARAM wParam,LPARAM lParam);
 	afx_msg void OnNMClickListCustomerDigitalRange(NMHDR *pNMHDR, LRESULT *pResult);
+
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+
 };
 
 const int CUSTOMER_DIGITAL_RANGE_NUM = 0;

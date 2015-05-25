@@ -24,7 +24,7 @@ public:
 	virtual BOOL OnInitDialog();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	void AddTSTAT_ID(unsigned short * npoint , int nlength,unsigned char nId);
-	static DWORD WINAPI GetZigbeeInfo(LPVOID lpVoid);
+   static	UINT   GetZigbeeInfo(LPVOID lpVoid);
 	void HandleOneTSTAT(unsigned char nId);
 	afx_msg LRESULT  HandleMessage(WPARAM wParam, LPARAM lParam);
 	void Initial_ID_List();
@@ -34,6 +34,10 @@ public:
 	vector <unsigned char> Zigbee_Show_Tstat_Id;
 	ListCtrlEx::CListCtrlEx m_tstat_id_list;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnDestroy();
+	COLORREF GetCOLORREF(int Value);
+	BOOL m_abort;
+
 };
 
 

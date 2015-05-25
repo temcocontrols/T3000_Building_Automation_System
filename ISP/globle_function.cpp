@@ -367,6 +367,9 @@ CString GetProductName(int ModelID)
 	case PM_TSTAT6:
 		strProductName=_T("TStat6");   //
 		break;
+	case PM_TSTAT5I:
+		strProductName=_T("TStat5I");   //
+		break;
 	case PM_TSTAT7:
 		strProductName=_T("TStat7");   //
 		break;
@@ -388,7 +391,7 @@ CString GetProductName(int ModelID)
 	case PM_T332AI:
 		strProductName = _T("T3-32AI");	  //
 		break;
-	case PM_T3AI16O:
+	case  PM_T38AI16O:
 		strProductName = _T("T3-8AI160");	  //
 		break;
 	case PM_ZIGBEE:
@@ -427,8 +430,24 @@ CString GetProductName(int ModelID)
 	case PM_HUM:
 		strProductName = _T("TstatHUM");	  //
 		break;
+	case PM_HUM_R:
+		strProductName=_T("HUM-R");
+		break;
+	case PM_RUNNAR:
+		strProductName="TStatRunar";
+		break;
+	case  PM_CO2_NET:
+		strProductName = "CO2 Net";
+		break;
+	case  PM_CO2_RS485:
+		strProductName = "CO2";
+		break;
+	case  PM_CO2_NODE:
+		strProductName = "CO2 Node";
+		break;
+
 	default:
-		strProductName=_T("ERROR");
+		strProductName.Format(_T("Model ID:%d is out of control"),ModelID);
 		break;
 	}
 	return strProductName;
@@ -576,16 +595,57 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 				turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex 
 				if(get_hex[3]==1)	//for to seektobegin() function,because to end of the file
 					break;
-				if(!DoHEXCRC( get_hex, nLen/2))
+// 				if(!DoHEXCRC( get_hex, nLen/2))
+// 				{
+// 					return BAD_HEX_FILE;
+// 				}
+				 char TempChar[32];
+				for (int i=0;i<31;i++)
 				{
-					return BAD_HEX_FILE;
+					TempChar[i]=get_hex[i+4];
 				}
+				TempChar[31]='\0';
+ 
+				 
+                 CString Product_String;
+ 				 MultiByteToWideChar( CP_ACP, 0, (char *)TempChar, 
+ 					 (int)strlen(TempChar)+1, 
+ 					 Product_String.GetBuffer(MAX_PATH), MAX_PATH );
+ 				 Product_String.ReleaseBuffer();		
+ 				 Product_String.MakeUpper();
+
+
+
+				 if(Product_String.Find(_T("CO2")) !=-1)
+				 {
+					  ret_bin_Info.company[0]='T';
+					  ret_bin_Info.company[1]='E';
+					  ret_bin_Info.company[2]='M';
+					  ret_bin_Info.company[3]='C';
+					  ret_bin_Info.company[4]='O';
+					  ret_bin_Info.product_name[0]='C';
+					  ret_bin_Info.product_name[1]='O';
+					  ret_bin_Info.product_name[2]='2';
+					  ret_bin_Info.product_name[3]=0;
+					  ret_bin_Info.product_name[4]=0;
+					  ret_bin_Info.product_name[5]=0;
+					  ret_bin_Info.product_name[6]=0;
+					  ret_bin_Info.product_name[7]=0;
+					  ret_bin_Info.product_name[8]=0;
+					  ret_bin_Info.product_name[9]=0;
+
+					  ret_bin_Info.software_high=TempChar[5];
+					   ret_bin_Info.software_low=TempChar[4];
+					  
+					  return READ_SUCCESS;
+				 }
+
 
 
 				int temp;
 				char temp_buf[64];
 				memset(temp_buf,0,64);
- 
+                
 				if (bufferlen.CompareNoCase(_T("20"))==0)
 				{
 					for (int i=0;i<64;i++)
@@ -634,6 +694,7 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 					}
 
 				}
+			 
 
 					for (int i=0;i<20;i++)
 					{   

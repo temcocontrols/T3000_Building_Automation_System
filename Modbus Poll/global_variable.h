@@ -12,7 +12,7 @@ CCriticalSection  register_critical_section;
 //CWinThread* m_pBackground_Read;
 CString PrintText[100];
 BOOL g_online=FALSE;
-
+CString g_StrConnection;
 CDialog *g_data_trafficdlg=NULL;
 
 CDialog *g_Draw_dlg=NULL;
@@ -24,3 +24,5 @@ BOOL g_is_show_Data_Traffic_Window=FALSE;
 long g_Tx_Rx;
 vector<Registers_Infor> g_vectRegisters;
 UINT g_Color_Index=0;
+//BOOL g_apply=TRUE;
+//BOOL g_rwonce=FALSE;

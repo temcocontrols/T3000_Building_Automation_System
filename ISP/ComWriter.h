@@ -57,7 +57,7 @@ public:
 	// 立即结束flash
 	BOOL EndFlash();
 	BOOL UpdataDeviceInformation(int& ID);
-
+	BOOL UpdataDeviceInformation_ex(unsigned short device_productID);
 	//////////////////////////////////////////////////////////////////////////
 	// 开始写hex，通过TCP
 	int BeginWirteByTCP();

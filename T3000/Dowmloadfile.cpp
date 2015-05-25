@@ -204,8 +204,8 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 
-		HANDLE Call_ISP_Application = NULL;
-		Call_ISP_Application =CreateThread(NULL,NULL,isp_thread,this,NULL, NULL);
+		//HANDLE Call_ISP_Application = NULL;
+		//Call_ISP_Application =CreateThread(NULL,NULL,isp_thread,this,NULL, NULL);
 		
 		
 	}

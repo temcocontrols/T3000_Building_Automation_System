@@ -125,7 +125,6 @@ CWorkspaceBar::~CWorkspaceBar()
 	 //}	 
 	 if(pMsg->message == WM_LBUTTONDOWN)
 	 {
-		 DFTrace(_T("return 0"));
 		 return 0;
 	 }
 
@@ -139,18 +138,25 @@ CWorkspaceBar::~CWorkspaceBar()
 	2：改变的名字，有新旧比较
    	*/
 BOOL CWorkspaceBar::UpdateDataToDB(){
-	 _ConnectionPtr m_pCon;
+	/* _ConnectionPtr m_pCon;
 	 _RecordsetPtr m_pRs;
-	 ::CoInitialize(NULL);
+	 ::CoInitialize(NULL);*/
+	CADO ado;
+	ado.OnInitADOConn();
+
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn();
+
 	 try 
 	 {
 		 ////////////////////////////////////////////////////////////////////////////////////////////
 		 //获取数据库名称及路径
 		 /////////////////////////////////////////////////////////////////////////////////////////////////
 		 //连接数据库
-		 m_pCon.CreateInstance("ADODB.Connection");
+	/*	 m_pCon.CreateInstance("ADODB.Connection");
 		 m_pRs.CreateInstance(_T("ADODB.Recordset"));
-		 m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+		 m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);*/
 		 CString strSql;   BOOL is_exist=FALSE;	  CString str_temp;
          switch (m_level)
          {
@@ -160,45 +166,57 @@ BOOL CWorkspaceBar::UpdateDataToDB(){
 						
 				 //strSql.Format(_T("select * from Building where Main_BuildingName = '%s'"),m_strMainBuildingName);
 				 strSql.Format(_T("select * from Building order by Main_BuildingName"));
-				 m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-
-				 while(VARIANT_FALSE==m_pRs->EndOfFile)
+				 //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+				 ado.m_pRecordset=ado.OpenRecordset(strSql);
+				 while(VARIANT_FALSE== ado.m_pRecordset->EndOfFile)
 				 {	   	 str_temp.Empty();
-					 str_temp=m_pRs->GetCollect("Building_Name");
+					 str_temp= ado.m_pRecordset->GetCollect("Building_Name");
 				 if (str_temp.Compare(m_name_new)==0)
 				 {	   is_exist=TRUE;
 				 break;
 				 }			
-					 m_pRs->MoveNext();
+					  ado.m_pRecordset->MoveNext();
 				 }
-				 m_pRs->Close();
+				// m_pRs->Close();
+				ado.CloseRecordset();
 				 if (!is_exist)	 //更新的名字在数据库中查找不到的
 				 {
 				 ////////////先更新Building表/////////////////////
 					 //CString strSql;
-					 strSql.Format(_T("update Building set Building_Name='%s' where Building_Name='%s'"),m_name_new,m_name_old);
+					 strSql.Format(_T("delete * from Building_ALL where Building_Name = '%s' "),m_name_old);
+					 ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+
+					 strSql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),m_name_new,1);
+					 ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+
+					 strSql.Format(_T("update Building set Building_Name='%s',Main_BuildingName= where Building_Name='%s'"),m_name_new,m_name_new,m_name_old);
 					 //MessageBox(strSql);
-				     m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-					 
+					 ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+
+
 					 strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' order by Building_Name"),m_name_old);
-					 m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-					 while(VARIANT_FALSE==m_pRs->EndOfFile)
+
+					 bado.m_pRecordset=bado.OpenRecordset(strSql);
+					 while(VARIANT_FALSE== bado.m_pRecordset->EndOfFile)
 					 {
-					    strSql.Format(_T("update ALL_NODE set Building_Name='%s' where Building_Name='%s'"),m_name_new,m_name_old);
-						 m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-						m_pRs->MoveNext();
+						 strSql.Format(_T("update ALL_NODE set Building_Name='%s' where Building_Name='%s'"),m_name_new,m_name_old);
+						 bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+						 bado.m_pRecordset->MoveNext();
 					 }
 
-					 m_pRs->Close();
-					 return TRUE;
+					 //m_pRs->Close();
+					 bado.CloseRecordset();
+
 				 }
 				 else
 				 {
-					  
+
 					 return FALSE;
 				 }
+
+				 break;	
 				 
-         	break;	
+          
 			 }
 		 case 1:		//Floor
 		 {	 // strSql=_T("select * from Building where Default_SubBuilding=-1");
@@ -209,33 +227,36 @@ BOOL CWorkspaceBar::UpdateDataToDB(){
 	 
 			 //  m_pRs->Close();
 			   strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' order by Building_Name"),subnetname,m_name_new);
-				 m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-			  
-				 while(VARIANT_FALSE==m_pRs->EndOfFile)
+				// m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+			  bado.m_pRecordset=bado.OpenRecordset(strSql);
+				 while(VARIANT_FALSE== bado.m_pRecordset->EndOfFile)
 				 {	   	 str_temp.Empty();
-				 str_temp=m_pRs->GetCollect("Floor_name");
+				 str_temp= bado.m_pRecordset->GetCollect("Floor_name");
 				 if (str_temp.Compare(m_name_new)==0)
 				 {is_exist=TRUE;
 				 break;
 				 }			
-				 m_pRs->MoveNext();
+				  bado.m_pRecordset->MoveNext();
 				 }
-				 m_pRs->Close();
+				 bado.CloseRecordset();
 
 				if (is_exist)
 				{
 				return FALSE;
 				} 
 				else
-				{  	strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' order by Building_Name"),subnetname,m_name_old);
-				m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-				while(VARIANT_FALSE==m_pRs->EndOfFile)
+				{  
+				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' order by Building_Name"),subnetname,m_name_old);
+				//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+				bado.m_pRecordset=bado.OpenRecordset(strSql);
+				while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 				{
 					strSql.Format(_T("update ALL_NODE set Floor_name='%s' where Floor_name='%s'"),m_name_new,m_name_old);
-					m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-					m_pRs->MoveNext();
+					bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+					bado.m_pRecordset->MoveNext();
 				}
-				m_pRs->Close();
+				//m_pRs->Close();
+				bado.CloseRecordset();
 				return TRUE;
 				}
 			
@@ -251,19 +272,19 @@ BOOL CWorkspaceBar::UpdateDataToDB(){
 			HTREEITEM parentnode=m_TreeCtrl.GetParentItem(m_hSelItem);
 			CString Floorname=m_TreeCtrl.GetItemText(parentnode);
 			  strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' order by Building_Name"),subnetname,Floorname,m_name_new);
-			  m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-
-			  while(VARIANT_FALSE==m_pRs->EndOfFile)
+			 // m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+			 bado.m_pRecordset=bado.OpenRecordset(strSql);
+			  while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 			  {	   	 str_temp.Empty();
-			  str_temp=m_pRs->GetCollect("Room_name");
+			  str_temp=bado.m_pRecordset->GetCollect("Room_name");
 			  if (str_temp.Compare(m_name_new)==0)
 			  {	   is_exist=TRUE;
 			  break;
 			  }			
-			  m_pRs->MoveNext();
+			  bado.m_pRecordset->MoveNext();
 			  }
-			  m_pRs->Close();
-
+			 // bado.m_pRecordset->Close();
+			 bado.CloseRecordset();
 
 			  if (is_exist)
 			  {
@@ -271,16 +292,16 @@ BOOL CWorkspaceBar::UpdateDataToDB(){
 			  } 
 			  else
 			  {strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' order by Building_Name"),subnetname,Floorname,m_name_old);
-			  m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-
-			  while(VARIANT_FALSE==m_pRs->EndOfFile)
+			  //bado.m_pConnection->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+			   bado.m_pRecordset=bado.OpenRecordset(strSql);
+			  while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 			  {
 				  strSql.Format(_T("update ALL_NODE set Room_name='%s' where Room_name='%s'"),m_name_new,m_name_old);
-				  m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-				  m_pRs->MoveNext();
+				  bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+				  bado.m_pRecordset->MoveNext();
 			  }
-			  m_pRs->Close();
-
+			  //m_pRs->Close();
+			  bado.CloseRecordset();
 			  return TRUE; 
 			  }
 			  																				  
@@ -299,20 +320,20 @@ BOOL CWorkspaceBar::UpdateDataToDB(){
 			 HTREEITEM floornode=m_TreeCtrl.GetParentItem(parentnode);
 			 CString Floorname=m_TreeCtrl.GetItemText(floornode);
 			 strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' and Product_name='%s' order by Building_Name"),subnetname,Floorname,Roomname,m_name_new);
-			 m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-			 
-			 while(VARIANT_FALSE==m_pRs->EndOfFile)
+			// m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+			 bado.m_pRecordset=bado.OpenRecordset(strSql);
+			 while(VARIANT_FALSE== bado.m_pRecordset->EndOfFile)
 			 {	   	 str_temp.Empty();
-			 str_temp=m_pRs->GetCollect("Product_name");
+			 str_temp= bado.m_pRecordset->GetCollect("Product_name");
 			 if (str_temp.Compare(m_name_new)==0)
 			 {	   is_exist=TRUE;
 			 break;
 			 }			
-			 m_pRs->MoveNext();
+			  bado.m_pRecordset->MoveNext();
 			 }
 			 
-			 m_pRs->Close();	
-
+			// m_pRs->Close();	
+			  bado.CloseRecordset();
 			 if (is_exist)
 			 {
 			 return FALSE;
@@ -320,14 +341,16 @@ BOOL CWorkspaceBar::UpdateDataToDB(){
 			 else
 			 {
 				  strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' and Product_name='%s' order by Building_Name"),subnetname,Floorname,Roomname,m_name_old);
-			 m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-			 while(VARIANT_FALSE==m_pRs->EndOfFile)
+			// m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+			 bado.m_pRecordset=bado.OpenRecordset(strSql);
+			 while(VARIANT_FALSE== bado.m_pRecordset->EndOfFile)
 			 {
 				 strSql.Format(_T("update ALL_NODE set Product_name='%s' where Product_name='%s'"),m_name_new,m_name_old);
-				 m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-				 m_pRs->MoveNext();
+				 bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+				  bado.m_pRecordset->MoveNext();
 			 }
-			 m_pRs->Close();
+			 //m_pRs->Close();
+			 bado.CloseRecordset();
 			 return TRUE;
 			 }
 			 
@@ -339,11 +362,15 @@ BOOL CWorkspaceBar::UpdateDataToDB(){
 	 {
 		/* AfxMessageBox(e.Description());*/
 		 //MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
-
+		 bado.CloseConn();
 		 return FALSE;
-		 m_pCon->Close();
+		 //m_pCon->Close();
+
 	 }
-	m_pCon->Close();  
+	 ado.CloseRecordset();
+	 ado.CloseConn();
+	 bado.CloseRecordset();
+	bado.CloseConn();
 	return TRUE;
  }
 int CWorkspaceBar::OnCreate(LPCREATESTRUCT lpCreateStruct) 

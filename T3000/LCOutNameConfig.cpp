@@ -184,7 +184,10 @@ void CLCOutNameConfig::OnEnKillfocusEdit1()
 
 BOOL CLCOutNameConfig::LoadFromDB(){
 BOOL ret=FALSE;
-CADO ado;
+//CADO ado;
+//ado.OnInitADOConn();
+CBADO ado;
+ado.SetDBPath(g_strCurBuildingDatabasefilePath);
 ado.OnInitADOConn();
 if (ado.IsHaveTable(ado,_T("LCNameConfigure")))
 {
@@ -237,7 +240,10 @@ CString CLCOutNameConfig::get_OutputName(int card,int output){
 	return Table_Name;
 }
 void CLCOutNameConfig::Insert_Update_OutputName(int sn,int card,int output ,CString outputname){
-	CADO ado;
+	//CADO ado;
+	//ado.OnInitADOConn();
+	CBADO ado;
+	ado.SetDBPath(g_strCurBuildingDatabasefilePath);
 	ado.OnInitADOConn();
 	CString sql;
 	sql.Format(_T("Select * from LCNameConfigure where SN=%d and  Card=%d and Output=%d"),sn,card,output);

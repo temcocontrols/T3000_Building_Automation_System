@@ -1,6 +1,6 @@
 #pragma once
 #include "afxwin.h"
-
+#include "bado/BADO.h"
 
 // CLabelEditDlg dialog
 #define START_ID 20000
@@ -50,8 +50,9 @@ public:
 	void SaveToDb();
 private:
 	int m_nCommandType;//1:Add;2:Edit
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
+// 	_ConnectionPtr m_pCon;
+// 	_RecordsetPtr m_pRs;
+CBADO m_bado;
 public:
 	void SetInitValueForEdit(int id,int serialNum,CString strScreen,int idControl,int in_out_put=0,int nWidth=75,int nHeight=25,int nStatus=0,int clrText=RGB(0, 0, 0),int bkClr=RGB(224, 232, 246));
 	int m_nControlID;

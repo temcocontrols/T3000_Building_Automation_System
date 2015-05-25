@@ -132,7 +132,6 @@ void CGraphicView::InitGraphic(int nSerialNum,int nTstatID)
 	ReloadLabelsFromDB();
 	this->SetFocus();
 	SetTimer(1,7000,NULL);//此定时器是用于刷新 Label的;
-	SetTimer(2,2000,NULL);
 }
 // CGraphicView message handlers
 
@@ -674,14 +673,10 @@ void CGraphicView::OnInitialUpdate()
 
 void CGraphicView::OnBnClickedGobackbutton()
 {
-#ifndef Fance_Enable_Test
-	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(0);
-#endif
 
-#ifdef Fance_Enable_Test
-	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(DLG_BACNET_VIEW);
-	
-#endif
+	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(0);
+
+
 }
 void CGraphicView::saveLabelInfo(int nItem)
 {
@@ -740,11 +735,15 @@ void CGraphicView::OnBnClickedImgcnfigbutton()
 			}	
 			FindClose(hFile);
 
-			_ConnectionPtr tmpCon;
-			_RecordsetPtr tmppRs;
-			tmpCon.CreateInstance(_T("ADODB.Connection"));
-			tmppRs.CreateInstance(_T("ADODB.Recordset"));
-			tmpCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+// 			_ConnectionPtr tmpCon;
+// 			_RecordsetPtr tmppRs;
+// 			tmpCon.CreateInstance(_T("ADODB.Connection"));
+// 			tmppRs.CreateInstance(_T("ADODB.Recordset"));
+// 			tmpCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+			CBADO bado;
+			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+			bado.OnInitADOConn(); 
+
 			try
 			{
 
@@ -753,11 +752,8 @@ void CGraphicView::OnBnClickedImgcnfigbutton()
 			strImgFileName=_T("");
 			CString strSql;
 			strSql.Format(_T("update ALL_NODE set Background_imgID ='%s' where Serial_ID = '%d'"),strImgFileName,m_nSerialNumber);
-			tmpCon->Execute(strSql.GetString(),NULL,adCmdText);
-			if(tmppRs->State) 
-				tmppRs->Close(); 
-			if(tmpCon->State)
-				tmpCon->Close();	
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			bado.CloseConn();
 			g_strImagePathName=strImgFileName;
 			m_strImgPathName=g_strImgeFolder+g_strImagePathName;
 			InitGraphic(m_nSerialNumber,m_nTstatID);
@@ -799,23 +795,18 @@ void CGraphicView::OnBnClickedImgcnfigbutton()
 			CString strDestFileName=g_strImgeFolder+strImgFileName;
 
 			CopyFile(strImgFilePathName,strDestFileName,FALSE);
-			_ConnectionPtr tmpCon;
-			_RecordsetPtr tmppRs;
-			tmpCon.CreateInstance(_T("ADODB.Connection"));
-			tmppRs.CreateInstance(_T("ADODB.Recordset"));
-			tmpCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-
+			 
+			CBADO bado;
+			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+			bado.OnInitADOConn(); 
 			try
 			{
 
 			CString strSql;
 			strSql.Format(_T("update ALL_NODE set Background_imgID ='%s' where Serial_ID = '%d'"),strImgFileName,m_nSerialNumber);
-			tmpCon->Execute(strSql.GetString(),NULL,adCmdText);
-			if(tmppRs->State) 
-				tmppRs->Close(); 
-			if(tmpCon->State)
-				tmpCon->Close();
-
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			 
+			 bado.CloseConn();
 			}
 			catch(_com_error *e)
 			{
@@ -879,10 +870,6 @@ void CGraphicView::OnTimer(UINT_PTR nIDEvent)
 
 		}
 		break;
-	case 2:
-	//ReloadLabelsFromDB();
-	break;
-	     
 	}
 	CFormView::OnTimer(nIDEvent);
 }

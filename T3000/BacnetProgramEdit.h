@@ -44,6 +44,7 @@ public:
 	CStaticEx m_free_memory;
 	afx_msg void OnRefresh();
 	bool m_edit_changed;
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 };
 
 

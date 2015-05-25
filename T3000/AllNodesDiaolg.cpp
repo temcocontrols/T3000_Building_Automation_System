@@ -61,7 +61,6 @@ BEGIN_MESSAGE_MAP(CAllNodesDiaolg, CDialog)
 	ON_EN_KILLFOCUS(IDC_TEXTEDIT, &CAllNodesDiaolg::OnEnKillfocusTextedit)
 	ON_EN_SETFOCUS(IDC_TEXTEDIT, &CAllNodesDiaolg::OnEnSetfocusTextedit)
 	ON_BN_CLICKED(IDC_ARD, &CAllNodesDiaolg::OnBnClickedArd)
-	ON_BN_CLICKED(IDC_ADD_BACNET_REMOTE_DEVICE, &CAllNodesDiaolg::OnBnClickedAddBacnetRemoteDevice)
 END_MESSAGE_MAP()
 
 
@@ -89,9 +88,9 @@ BOOL CAllNodesDiaolg::OnInitDialog()
 	m_SubLstCombox.ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
 	
-	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+// 	m_pCon.CreateInstance(_T("ADODB.Connection"));
+// 	m_pRs.CreateInstance(_T("ADODB.Recordset"));
+// 	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 
 	ReloadAddBuildingDB();
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -154,15 +153,21 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
 	m_FlexGrid.put_TextMatrix(0,AN_EPSIZE,_T("EPSize"));
 	m_FlexGrid.put_ColWidth(AN_EPSIZE,800);
 
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
 	CString strSql;
 	strSql.Format(_T("select * from ALL_NODE where MainBuilding_Name = '%s' ORDER BY Product_ID ASC"),m_strMainBuildingName);
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);			
-	m_FlexGrid.put_Rows(m_pRs->RecordCount+2);	
+	//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);		
+	bado.m_pRecordset=bado.OpenRecordset(strSql);	
+	int recordcount= bado.GetRecordCount(bado.m_pRecordset);
+	m_FlexGrid.put_Rows(recordcount+2);	
 	int temp_row=0;
 	CString str_temp;
 	str_temp.Empty();
 	_variant_t temp_variant;
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 	{	
 	
 		//m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTTYPE,m_strID);
@@ -172,51 +177,51 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
 		m_FlexGrid.put_TextMatrix(temp_row,0,strIndex);
 
 		m_FlexGrid.put_TextMatrix(temp_row,AN_MAINNAME,m_strMainBuildingName);
-		m_strSubNetName=m_pRs->GetCollect("Building_Name");//
+		m_strSubNetName=bado.m_pRecordset->GetCollect("Building_Name");//
 		m_FlexGrid.put_TextMatrix(temp_row,AN_NAME,m_strSubNetName);
-		temp_variant=m_pRs->GetCollect("Serial_ID");//
+		temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
 			m_strID=_T("");
 		m_FlexGrid.put_TextMatrix(temp_row,AN_SerialID,m_strID);
 	
-		temp_variant=m_pRs->GetCollect("Floor_name");//
+		temp_variant=bado.m_pRecordset->GetCollect("Floor_name");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
 			m_strID=_T("");
 		m_FlexGrid.put_TextMatrix(temp_row,AN_FLOORNAME,m_strID);
 
-		temp_variant=m_pRs->GetCollect("Room_name");//
+		temp_variant=bado.m_pRecordset->GetCollect("Room_name");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
 			m_strID=_T("");
 		m_FlexGrid.put_TextMatrix(temp_row,AN_ROOMNAME,m_strID);
 		
-			temp_variant=m_pRs->GetCollect("Product_name");//
+			temp_variant=bado.m_pRecordset->GetCollect("Product_name");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
 			m_strID=_T("");
 		m_FlexGrid.put_TextMatrix(temp_row,AN_PRUDUCTNAME,m_strID);
 
-		temp_variant=m_pRs->GetCollect("Product_class_ID");//
+		temp_variant=bado.m_pRecordset->GetCollect("Product_class_ID");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
 			m_strID=_T("");
 		m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTTYPE,m_strID);
 		
-		temp_variant=m_pRs->GetCollect("Product_ID");//
+		temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
 			m_strID=_T("");
 		m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTID,m_strID);
 
-		temp_variant=m_pRs->GetCollect("Screen_Name");//
+		temp_variant=bado.m_pRecordset->GetCollect("Screen_Name");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
@@ -225,14 +230,14 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
 
 
 
-		temp_variant=m_pRs->GetCollect("Bautrate");//
+		temp_variant=bado.m_pRecordset->GetCollect("Bautrate");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
 			m_strID=_T("");
 		m_FlexGrid.put_TextMatrix(temp_row,AN_BAUDRATE,m_strID);
 
-		temp_variant=m_pRs->GetCollect("Background_imgID");//
+		temp_variant=bado.m_pRecordset->GetCollect("Background_imgID");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
@@ -240,7 +245,7 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
 		m_FlexGrid.put_TextMatrix(temp_row,AN_GRAPHICID,m_strID);
 		
 
-		temp_variant=m_pRs->GetCollect("Hardware_Ver");//
+		temp_variant=bado.m_pRecordset->GetCollect("Hardware_Ver");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
@@ -248,22 +253,24 @@ void CAllNodesDiaolg::ReloadAddBuildingDB()
 		m_FlexGrid.put_TextMatrix(temp_row,AN_HDVERSION,m_strID);
 		
 
-		temp_variant=m_pRs->GetCollect("Software_Ver");//
+		temp_variant=bado.m_pRecordset->GetCollect("Software_Ver");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
 			m_strID=_T("");
 		m_FlexGrid.put_TextMatrix(temp_row,AN_SWVERSION,m_strID);
 
-		temp_variant=m_pRs->GetCollect("EPsize");//
+		temp_variant=bado.m_pRecordset->GetCollect("EPsize");//
 		if(temp_variant.vt!=VT_NULL)
 			m_strID=temp_variant;
 		else
 			m_strID=_T("");
 		m_FlexGrid.put_TextMatrix(temp_row,AN_EPSIZE,m_strID);
-		m_pRs->MoveNext();
+		bado.m_pRecordset->MoveNext();
 	}
-	m_pRs->Close();
+	//m_pRs->Close();
+	bado.CloseRecordset();
+	bado.CloseConn();
 }
 void CAllNodesDiaolg::SetBuildingMainName(CString strBuildName)
 {
@@ -284,6 +291,10 @@ void CAllNodesDiaolg::OnBnClickedDelbutton()
 	{
 		AfxMessageBox(_T("No item Selected!"));
 	}
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
 	CString strhw_version;
 	strhw_version = m_FlexGrid.get_TextMatrix(m_nCurRow,AN_HDVERSION);
 	CString strSql;
@@ -296,13 +307,14 @@ void CAllNodesDiaolg::OnBnClickedDelbutton()
 		{
 
 
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 		}
 		catch(_com_error *e)
 		{
 			AfxMessageBox(e->ErrorMessage());
 		}
 	}
+	bado.CloseConn();
 	ReloadAddBuildingDB();
 	m_bChanged=TRUE;
 
@@ -310,6 +322,11 @@ void CAllNodesDiaolg::OnBnClickedDelbutton()
 
 void CAllNodesDiaolg::OnBnClickedDelallbutton()
 {
+
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
 	CString strSql;
 	strSql=_T("delete * from ALL_NODE ");
 	CString strTemp;
@@ -320,13 +337,14 @@ void CAllNodesDiaolg::OnBnClickedDelallbutton()
 		{
 
 
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 		}
 		catch(_com_error *e)
 		{
 			AfxMessageBox(e->ErrorMessage());
 		}
 	}
+	bado.CloseConn();
 	ReloadAddBuildingDB();
 	m_bChanged=TRUE;
 }
@@ -435,6 +453,9 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 			CopyFile(strImgFilePathName,strDestFileName,FALSE);
 			m_FlexGrid.put_TextMatrix(m_nCurRow,m_nCurCol,strImgFileName);
 			//update recorder;
+			CBADO bado;
+			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+			bado.OnInitADOConn(); 
 
 			if(m_nCurRow<m_FlexGrid.get_Rows())
 			{
@@ -447,7 +468,7 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 
 				CString strSql;
 				strSql.Format(_T("update ALL_NODE set Background_imgID ='%s' where Serial_ID = '%s' "/*and Building_Name = '%s'*/),strImgFileName,strSerial/*,m_strSubNetName*/);
-				m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+				bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 				m_bChanged=TRUE;
 				g_strImagePathName=strImgFileName;			
 				}
@@ -455,7 +476,8 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 				{
 					AfxMessageBox(e->ErrorMessage());
 				}
-				}
+			}
+			bado.CloseConn();
 		}
 	}
 }
@@ -483,7 +505,11 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 	m_InputTextEdt.ShowWindow(SW_HIDE);
 	CString strName;
 	m_InputTextEdt.GetWindowText(strName);
-	
+
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
 	if (m_nCurRow < m_FlexGrid.get_Rows()-1)
 	{
 		if(m_nCurCol==AN_PRUDUCTNAME)
@@ -497,7 +523,7 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 
 
 			strSql.Format(_T("update ALL_NODE set Product_name ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
 			}
 			catch(_com_error *e)
 			{
@@ -511,17 +537,19 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 			if(strSerial.IsEmpty())
 				return;
 			CString strSql;
+			bado.OnInitADOConn(); 
 			try
 			{
 
 
 			strSql.Format(_T("update ALL_NODE set Room_name ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 			}
 			catch(_com_error *e)
 			{
 				AfxMessageBox(e->ErrorMessage());
 			}
+			  bado.CloseConn();
 			ReloadAddBuildingDB();
 		}
 		if(m_nCurCol==AN_FLOORNAME)
@@ -536,13 +564,13 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 			CString strSql;
 
 			strSql.Format(_T("update ALL_NODE set Floor_name ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
 			}
 			catch(_com_error *e)
 			{
 				AfxMessageBox(e->ErrorMessage());
 			}
-
+			  bado.CloseConn();
 			ReloadAddBuildingDB();
 		}
 	}
@@ -554,6 +582,7 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 		}
 
 	}
+ 
 }
 
 void CAllNodesDiaolg::OnEnSetfocusTextedit()
@@ -705,7 +734,10 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 	}
 
 	CString strCom = _T("0");
-	
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
 	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"')"));
 	//new nc//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Mainnet_info) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
 	try
@@ -715,12 +747,13 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 
 	TRACE(strSql);
 	
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 	}
 	catch(_com_error *e)
 	{
 		AfxMessageBox(e->ErrorMessage());
 	}
+	bado.CloseConn();
 	ReloadAddBuildingDB();
 
 
@@ -738,301 +771,3 @@ void CAllNodesDiaolg::OnBnClickedArd()
 	  
 }
 
-
-void CAllNodesDiaolg::OnBnClickedAddBacnetRemoteDevice()
-{
-	// TODO: Add your control notification handler code here
-	m_bac_scan_result_data.clear();
-	m_bac_scan_com_data.clear();
-
-	BYTE address1,address2,address3,address4;
-	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_ADD_BAC_NOTE))->GetAddress(address1,address2,address3,address4);
-	if((address1 == 0) && (address2 == 0) &&(address3 == 0)&&(address4 == 0))
-	{
-		MessageBox(_T("Can't connect to a invalid IP address!"),_T("Warning"),MB_OK |MB_ICONINFORMATION);
-		return;
-	}
-	CString Remote_IP_Address;
-	Remote_IP_Address.Format(_T("%d.%d.%d.%d"),address1,address2,address3,address4);
-
-		//return;
-	Send_WhoIs_remote_ip(Remote_IP_Address);
-	Sleep(1000);
-	for (int j=0;j<5;j++)
-	{
-		int ready_to_read_count =	m_bac_scan_com_data.size();
-
-		CString strInfo;
-		strInfo.Format(_T("Scan  Bacnetip.Found %d BACNET device"),ready_to_read_count);
-		//DFTrace(strInfo);
-		//pScan->ShowBacnetComScanInfo(strInfo);
-
-		if((int)m_bac_scan_result_data.size()>= ready_to_read_count)	//达到返回的个数后就break;
-			break;
-		TRACE(_T("gloab scan = %d\r\n"),ready_to_read_count);
-		for (int i=0;i<ready_to_read_count;i++)
-		{
-			//int id_fail_resend_count = 0;
-			//do 
-			//{
-			//	id_fail_resend_count ++;
-			//	if(id_fail_resend_count >3)
-			//		break;
-			int	resend_count = 0;
-			do 
-			{
-				resend_count ++;
-				if(resend_count>50)
-					break;
-				g_invoke_id = GetPrivateData(
-					m_bac_scan_com_data.at(i).device_id,
-					GETSERIALNUMBERINFO,
-					0,
-					0,
-					sizeof(Str_Serial_info));		
-
-				Sleep(SEND_COMMAND_DELAY_TIME);
-			} while (g_invoke_id<0);
-			//	Sleep(1000);
-			//} while (!tsm_invoke_id_free(g_invoke_id));
-
-		}
-	}
-	Sleep(1);
-	if(m_bac_scan_result_data.size() == 0)
-	{
-		MessageBox(_T("No device found in remote area!"),_T("Notice"),MB_OK | MB_ICONINFORMATION);
-		return;
-	}
-	for (int i=0;i<(int)m_bac_scan_result_data.size();i++)
-	{
-		int temp1 = m_FlexGrid.get_Rows();
-		CString device_instance_id;
-		CString device_ip_address;
-		CString device_panel_number;
-		CString device_serial_number;
-		CString device_name;
-		CString priduct_name;
-		CString device_modbus_address;
-		CString device_type;
-		CString device_modbus_port;
-		device_modbus_port.Format(_T("%d"),m_bac_scan_result_data.at(i).modbus_port);
-		device_modbus_address.Format(_T("%d"),m_bac_scan_result_data.at(i).modbus_addr);
-		device_instance_id.Format(_T("%d"),m_bac_scan_result_data.at(i).device_id);
-		device_ip_address = Remote_IP_Address;
-		/*device_ip_address.Format(_T("%d.%d.%d.%d"),(unsigned char)m_bac_scan_result_data.at(i).ipaddress[0],
-													(unsigned char)m_bac_scan_result_data.at(i).ipaddress[1],
-													(unsigned char)m_bac_scan_result_data.at(i).ipaddress[2],
-													(unsigned char)m_bac_scan_result_data.at(i).ipaddress[3]);*/
-		device_panel_number.Format(_T("%d"),m_bac_scan_result_data.at(i).panel_number);
-		device_serial_number.Format(_T("%d"),m_bac_scan_result_data.at(i).serialnumber);
-		device_type.Format(_T("%d"),m_bac_scan_result_data.at(i).product_type);
-		device_name = GetProductName(m_bac_scan_result_data.at(i).product_type);
-		priduct_name = device_name + _T(":") + device_serial_number + _T("--") + device_modbus_address;
-		bool find_exsit = false;
-		int nitems = -1;
-		int changed_items;
-		for (int x=1;x<(temp1-1);x++)
-		{
-			CString temp_serial_number;
-
-			temp_serial_number = m_FlexGrid.get_TextMatrix(x,AN_SerialID);
-			if(temp_serial_number.CompareNoCase(device_serial_number) == 0)
-			{
-				nitems = x;
-				find_exsit = true;
-				break;
-			}
-		}
-		if(!find_exsit)//没有发现相同的序列号就插入;
-		{
-			changed_items = temp1 -1;
-			
-			CString strSql;
-			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('Building_1','Sub_net1','"+device_serial_number+"','floor1','room1','"+priduct_name+"','"+device_type+"','"+device_modbus_address+"','""','"+device_ip_address+"','""','"+device_instance_id+"','"+device_panel_number+"','"+device_modbus_port+"','0')"));
-			//new nc//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Mainnet_info) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
-			try
-			{
-
-				TRACE(strSql);
-				m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-			}
-			catch(_com_error *e)
-			{
-				AfxMessageBox(e->ErrorMessage());
-			}
-			m_FlexGrid.put_Rows(changed_items + 2);	
-
-		}
-		else
-		{
-			changed_items = nitems;
-			CString strSql;
-			try
-			{
-				strSql.Format(_T("update ALL_NODE set Product_name ='%s' , Product_class_ID = '%s' , Product_ID = '%s' , Bautrate = '%s' , Hardware_Ver = '%s' , Software_Ver = '%s'  where Serial_ID = '%s'"),priduct_name,device_type,device_modbus_address,device_ip_address,device_instance_id,device_panel_number,device_serial_number);
-				m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
-			}
-			catch(_com_error *e)
-			{
-				AfxMessageBox(e->ErrorMessage());
-			}
-			
-		}
-		CString nmessage;
-		nmessage.Format(_T("Find SerialNumber is %s ,and Product is %s "),device_serial_number,priduct_name);
-		MessageBox(nmessage,_T("Notice"),MB_OK | MB_ICONINFORMATION);
-
-		CString nitem;
-		nitem.Format(_T("%d"),temp1 - 2);
-		m_FlexGrid.put_TextMatrix(changed_items,0,nitem);
-		m_FlexGrid.put_TextMatrix(changed_items,AN_MAINNAME,_T("Building_1"));
-		m_FlexGrid.put_TextMatrix(changed_items,AN_NAME,_T("Sub_net1"));
-		m_FlexGrid.put_TextMatrix(changed_items,AN_SerialID,device_serial_number);
-		m_FlexGrid.put_TextMatrix(changed_items,AN_FLOORNAME,_T("floor1"));
-		m_FlexGrid.put_TextMatrix(changed_items,AN_ROOMNAME,_T("room1"));
-		m_FlexGrid.put_TextMatrix(changed_items,AN_PRUDUCTNAME,priduct_name);
-		m_FlexGrid.put_TextMatrix(changed_items,AN_PRODUCTTYPE,device_type);
-		m_FlexGrid.put_TextMatrix(changed_items,AN_PRODUCTID,device_modbus_address);
-		m_FlexGrid.put_TextMatrix(changed_items,AN_BAUDRATE,device_ip_address);		
-		//m_FlexGrid.put_TextMatrix(changed_items,AN_BAUDRATE,_T(""));
-		m_FlexGrid.put_TextMatrix(changed_items,AN_GRAPHICID,_T(""));
-		m_FlexGrid.put_TextMatrix(changed_items,AN_HDVERSION,device_instance_id);
-		m_FlexGrid.put_TextMatrix(changed_items,AN_SWVERSION,device_panel_number);
-		
-		m_bChanged = true;
-		//m_FlexGrid.put_TextMatrix(changed_items + 1,0,strIndex);
-
-		int	resend_count = 0;
-		do 
-		{
-			resend_count ++;
-			if(resend_count>50)
-				break;
-			g_invoke_id = GetPrivateData(
-				m_bac_scan_result_data.at(i).device_id,
-				READ_REMOTE_DEVICE_DB,
-				0,
-				0,
-				sizeof(Str_Remote_TstDB));		
-
-			Sleep(SEND_COMMAND_DELAY_TIME);
-		} while (g_invoke_id<0);
-
-	}
-	Sleep(500);
-
-	for (int i=0;i<(int)m_remote_device_db.size();i++)
-	{
-		int temp1 = m_FlexGrid.get_Rows();
-		CString device_instance_id;
-		CString device_ip_address;
-		CString device_panel_number;
-		CString device_serial_number;
-		CString device_name;
-		CString priduct_name;
-		CString device_modbus_address;
-		CString device_type;
-		CString device_port;
-		device_modbus_address.Format(_T("%d"),m_remote_device_db.at(i).modbus_id);
-		device_ip_address = Remote_IP_Address;
-		/*device_ip_address.Format(_T("%d.%d.%d.%d"),(unsigned char)m_bac_scan_result_data.at(i).ipaddress[0],
-													(unsigned char)m_bac_scan_result_data.at(i).ipaddress[1],
-													(unsigned char)m_bac_scan_result_data.at(i).ipaddress[2],
-													(unsigned char)m_bac_scan_result_data.at(i).ipaddress[3]);*/
-
-		device_serial_number.Format(_T("%d"),m_remote_device_db.at(i).sn);
-		device_type.Format(_T("%d"),m_remote_device_db.at(i).product_type);
-		device_name = GetProductName(m_remote_device_db.at(i).product_type);
-		priduct_name = device_name + _T(":") + device_serial_number + _T("--") + device_modbus_address;
-		device_port.Format(_T("%d"), m_remote_device_db.at(i).port);
-		bool find_exsit = false;
-		int nitems = -1;
-		int changed_items;
-		for (int x=1;x<(temp1-1);x++)
-		{
-			CString temp_serial_number;
-
-			temp_serial_number = m_FlexGrid.get_TextMatrix(x,AN_SerialID);
-			if(temp_serial_number.CompareNoCase(device_serial_number) == 0)
-			{
-				nitems = x;
-				find_exsit = true;
-				break;
-			}
-		}
-
-		if(!find_exsit)//没有发现相同的序列号就插入;
-		{
-			changed_items = temp1 -1;
-
-			CString strSql;
-			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('Building_1','Sub_net1','"+device_serial_number+"','floor1','room1','"+priduct_name+"','"+device_type+"','"+device_modbus_address+"','""','"+device_ip_address+"','""','""','""','"+device_port+"','0')"));
-			//new nc//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Mainnet_info) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
-			try
-			{
-
-				TRACE(strSql);
-				m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-			}
-			catch(_com_error *e)
-			{
-				AfxMessageBox(e->ErrorMessage());
-			}
-			m_FlexGrid.put_Rows(changed_items + 2);	
-
-		}
-		else
-		{
-			changed_items = nitems;
-			CString strSql;
-			try
-			{
-				strSql.Format(_T("update ALL_NODE set Product_name ='%s' , Product_class_ID = '%s' , Product_ID = '%s' , Bautrate = '%s' , Hardware_Ver = '%s' , Software_Ver = '%s' , Com_Port = '%s'  where Serial_ID = '%s'"),priduct_name,device_type,device_modbus_address,device_ip_address,device_instance_id,device_panel_number,device_port,device_serial_number);
-				m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
-			}
-			catch(_com_error *e)
-			{
-				AfxMessageBox(e->ErrorMessage());
-			}
-
-		}
-
-
-		CString nitem;
-		nitem.Format(_T("%d"),temp1 - 2);
-		m_FlexGrid.put_TextMatrix(changed_items,0,nitem);
-		m_FlexGrid.put_TextMatrix(changed_items,AN_MAINNAME,_T("Building_1"));
-		m_FlexGrid.put_TextMatrix(changed_items,AN_NAME,_T("Sub_net1"));
-		m_FlexGrid.put_TextMatrix(changed_items,AN_SerialID,device_serial_number);
-		m_FlexGrid.put_TextMatrix(changed_items,AN_FLOORNAME,_T("floor1"));
-		m_FlexGrid.put_TextMatrix(changed_items,AN_ROOMNAME,_T("room1"));
-		m_FlexGrid.put_TextMatrix(changed_items,AN_PRUDUCTNAME,priduct_name);
-		m_FlexGrid.put_TextMatrix(changed_items,AN_PRODUCTTYPE,device_type);
-		m_FlexGrid.put_TextMatrix(changed_items,AN_PRODUCTID,device_modbus_address);
-		m_FlexGrid.put_TextMatrix(changed_items,AN_BAUDRATE,device_ip_address);		
-		//m_FlexGrid.put_TextMatrix(changed_items,AN_BAUDRATE,_T(""));
-		m_FlexGrid.put_TextMatrix(changed_items,AN_GRAPHICID,_T(""));
-		//m_FlexGrid.put_TextMatrix(changed_items,AN_HDVERSION,device_instance_id);
-		//m_FlexGrid.put_TextMatrix(changed_items,AN_SWVERSION,device_panel_number);
-
-
-	}
-
-
-}
-
-//#define AN_MAINNAME 1
-//#define AN_NAME		2
-//#define AN_SerialID	3
-//#define AN_FLOORNAME	4
-//#define	AN_ROOMNAME	5
-//#define	AN_PRUDUCTNAME	6
-//#define AN_PRODUCTTYPE	7
-//#define AN_PRODUCTID	8
-//#define AN_SCREENID	    9
-//#define AN_BAUDRATE		10
-//#define	AN_GRAPHICID	11
-//#define AN_HDVERSION	12
-//#define AN_SWVERSION	13
-//#define AN_EPSIZE		14

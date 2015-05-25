@@ -1,6 +1,6 @@
 #pragma once
 #include "afxwin.h"
-
+#include "CM5\CStatic\staticex.h"
 
 // CBacnetSetting dialog
 
@@ -19,7 +19,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
-
+	
 public:
 	afx_msg void OnBnClickedButtonBacTest();
 	CDateTimeCtrl m_cm5_time_picker;
@@ -55,6 +55,36 @@ public:
 	afx_msg void OnCbnSelchangeComboBacnetSettingBaudrate2();
 	afx_msg void OnBnClickedButtonSettingCleanDb();
 	afx_msg void OnBnClickedButtonSettingAddIntoDb();
+	afx_msg void OnBnClickedButtonSettingUserList();
+	afx_msg void OnBnClickedRadioUsbDevice();
+	afx_msg void OnBnClickedRadioUsbHost();
+	afx_msg void OnBnClickedButtonSettingGsmModual();
+	afx_msg void OnClose();
+
+	afx_msg void OnEnKillfocusEditSettingPanel();
+
+	afx_msg void OnEnKillfocusEditSettingNodesLabelSetting();
+
+	_ConnectionPtr				m_pCon;//for ado connection
+	_RecordsetPtr				m_pRs;//for ado 
+
+	CStatic m_static_panel_title;
+	CEdit m_edit_panel;
+	CStatic m_static_nodes_title;
+	CEdit m_edit_nodes_label;
+	afx_msg void OnCbnSelchangeComboBacnetSettingTimeServer();
+	afx_msg void OnBnClickedCheckSettingSyncTime();
+	afx_msg void OnEnKillfocusEditDyndnsUserName();
+	afx_msg void OnEnKillfocusEditDyndnsPassword();
+	afx_msg void OnEnKillfocusEditDyndnsDomain();
+	CEdit m_dyndns_user;
+	CEdit m_dyndns_password;
+	CEdit m_dyndns_domain;
+	afx_msg void OnBnClickedCheckSettingDyndns();
+	CEdit m_edit_ddns_update_time;
+	afx_msg void OnCbnSelchangeComboBacnetSettingDdnsServer();
+	afx_msg void OnEnKillfocusEditTimeUpdate();
+	afx_msg void OnCbnSelchangeComboBacnetSettingTimeZone();
 };
 
 

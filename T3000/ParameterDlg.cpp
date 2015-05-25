@@ -17,17 +17,68 @@
 #include "MainFrm.h"
 
 #include "Dialog_Progess.h"//tstat6
-
+#include "TstatZigbeeLogic.h"
 
 #include "T3000RegAddress.h"
 #include "CustomSTable.h"
 #include "AirflowSettingDlg.h"
 extern int Mdb_Adress_Map;
 // CParameterDlg dialog
+//#define PID_INTERNAL_TEMPERATURE									   2
+//#define PID_HUM_TEMPERATURE										   4
+//#define PID_AI1                                                      5
+//#define PID_AI2                                                      6
+//#define PID_AI3                                                      7
+//#define PID_AI4                                                      8
+//#define PID_AI5                                                      9
+//#define PID_AI6                                                      10
+//#define PID_AI7                                                      11
+//#define PID_AI8                                                      12
+//#define PID_CO2													   13
+//#define PID_HUM													   14
+//#define PID_AIRFLOW_SENSOR										   15
+#define NUM_INPUT_SETTING 17
+CString INPUT_SETTING[NUM_INPUT_SETTING]={
+	_T("Internal Sensor"),
+	_T("Avg Temperature"),
+	_T(""),
+	_T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),
+	_T("CO2 Sensor"),_T("HUM Sensor"),_T("Airflow Sensor"),
+	_T("Avg AI1ToAI2"),_T("Avg AI1ToAI3"),_T("Avg AI1ToAI4")
+};
 
+CString INPUT_SETTING_LCD[6]={_T("Internal Sensor"),
+	_T("Avg Temperature"),
+	//_T(""),
+	_T("AI1"),
+	/*_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),
+	_T("CO2 Sensor"),_T("HUM Sensor"),_T("Airflow Sensor"),*/
+	_T("Avg AI1ToAI2"),_T("Avg AI1ToAI3"),_T("Avg AI1ToAI4")
+	};
+
+typedef enum{
+	PID_INTERNAL_TEMPERATURE=2,
+	PID_AVG_TEMP=3,
+	PID_HUM_TEMPERATURE=4,
+	PID_AI1,
+	PID_AI2,
+	PID_AI3,
+	PID_AI4,
+	PID_AI5,
+	PID_AI6,
+	PID_AI7,
+	PID_AI8,
+	PID_CO2,
+	PID_HUM,
+	PID_AIRFLOW_SENSOR,
+	PID_AVG_A12,
+	PID_AVG_A13,
+	PID_AVG_A14
+}INPUT_SETTING_VALUE;
+ 
 IMPLEMENT_DYNAMIC(CParameterDlg, CDialog)
 
-	CParameterDlg::CParameterDlg(CWnd* pParent /*=NULL*/,CString str)
+CParameterDlg::CParameterDlg(CWnd* pParent /*=NULL*/,CString str)
 	: CDialog(CParameterDlg::IDD, pParent)
 	, m_coolsp(0)
 	, m_cooldb(0)
@@ -61,7 +112,7 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DISPLAYCOMBO, m_displayCombox);
 	DDX_Control(pDX, IDC_KEYPADLOCKCOMBO, m_keyLockCombox);
 	DDX_Control(pDX, IDC_SEQUENCECOMBOX, m_SequenceCombox);
-	DDX_Control(pDX, IDC_AUTOONLYCOMBO, m_autoOnlyCombox);
+	//DDX_Control(pDX, IDC_AUTOONLYCOMBO, m_autoOnlyCombox);
 	DDX_Control(pDX, IDC_VALUPOSEDIT, m_value_percentEdit);
 	DDX_Control(pDX, IDC_VALVEEDIT, m_valveEdit);
 	DDX_Control(pDX, IDC_HCCHANGECOMBO, m_hcChangeCombox);
@@ -123,6 +174,12 @@ void CParameterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_OCCUPIED_TIMER, m_occupied_timer);
 	DDX_Control(pDX, IDC_COMBO_ENABLE_DIS, m_combox_pir_endisable);
 	DDX_Control(pDX, IDC_EDIT_SENSITIVTY, m_sensitivity_editor);
+	DDX_Control(pDX, IDC_COMBO_SETPOINTDISPLAY, m_combox_setpointdisplay);
+	DDX_Control(pDX, IDC_COMBO_ZIGBEETYPE, m_combox_zigbee);
+	DDX_Control(pDX, IDC_COMBO_CHANNEL, m_combox_channel);
+	DDX_Control(pDX, IDC_ZIGBEE_TSTATS_TABLE, m_zigbee_tstat_table);
+	DDX_Control(pDX, IDC_COMBO1, m_day_combox);
+	DDX_Control(pDX, IDC_COMBO4, m_night_combox);
 }
 
 BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
@@ -133,7 +190,7 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_POWERMODELCOMBO, &CParameterDlg::OnCbnSelchangePowermodelcombo)
 	ON_CBN_SELCHANGE(IDC_KEYPADLOCKCOMBO, &CParameterDlg::OnCbnSelchangeKeypadlockcombo)
 	ON_CBN_SELCHANGE(IDC_DISPLAYCOMBO, &CParameterDlg::OnCbnSelchangeDisplaycombo)
-	ON_CBN_SELCHANGE(IDC_AUTOONLYCOMBO, &CParameterDlg::OnCbnSelchangeAutoonlycombo)
+//	ON_CBN_SELCHANGE(IDC_AUTOONLYCOMBO, &CParameterDlg::OnCbnSelchangeAutoonlycombo)
 
 	ON_CBN_SELCHANGE(IDC_KEYPADSELECT, &CParameterDlg::OnCbnSelchangekeypadcombo)
 
@@ -234,6 +291,19 @@ BEGIN_MESSAGE_MAP(CParameterDlg, CDialog)
 	ON_EN_KILLFOCUS(IDC_EDIT_DEAD_MASTER, &CParameterDlg::OnEnKillfocusEditDeadMaster)
 	ON_CBN_SELCHANGE(IDC_COMBO_ENABLE_DIS, &CParameterDlg::OnCbnSelchangeComboEnableDis)
 	ON_EN_KILLFOCUS(IDC_EDIT_SENSITIVTY, &CParameterDlg::OnEnKillfocusEditSensitivty)
+	ON_CBN_SELCHANGE(IDC_COMBO_SETPOINTDISPLAY, &CParameterDlg::OnCbnSelchangeComboSetpointdisplay)
+	ON_CBN_SELCHANGE(IDC_COMBO_ZIGBEETYPE, &CParameterDlg::OnCbnSelchangeComboZigbeetype)
+	ON_CBN_SELCHANGE(IDC_COMBO_CHANNEL, &CParameterDlg::OnCbnSelchangeComboChannel)
+	ON_BN_CLICKED(IDC_BUTTON_ZIGBEE_REBOOT, &CParameterDlg::OnBnClickedButtonZigbeeReboot)
+	ON_BN_CLICKED(IDC_BTN_TOPOLOGICAL, &CParameterDlg::OnBnClickedBtnTopological)
+	ON_EN_KILLFOCUS(IDC_EDIT_PID2OFFSETPOINT6, &CParameterDlg::OnEnKillfocusEditPid2offsetpoint6)
+	ON_BN_CLICKED(IDC_UNLOCK, &CParameterDlg::OnBnClickedUnlock)
+	ON_BN_CLICKED(IDC_LOCK, &CParameterDlg::OnBnClickedLock)
+	ON_BN_CLICKED(IDC_TRENDLOGVIEW, &CParameterDlg::OnBnClickedTrendlogview)
+	ON_CBN_SELCHANGE(IDC_COMBO1, &CParameterDlg::OnCbnSelchangeCombo1)
+	ON_CBN_SELCHANGE(IDC_COMBO4, &CParameterDlg::OnCbnSelchangeCombo4)
+	ON_EN_KILLFOCUS(IDC_EDIT_TRANDUCER_MAX, &CParameterDlg::OnEnKillfocusEditTranducerMax)
+	ON_EN_KILLFOCUS(IDC_EDIT_TRANDUCER_MIN, &CParameterDlg::OnEnKillfocusEditTranducerMin)
 	END_MESSAGE_MAP()
 
 
@@ -250,11 +320,7 @@ DWORD WINAPI BackparaFreshProc(LPVOID pParam)
 	while(1)
 	{
 		Sleep(15*1000);
-		//pdlg->Refresh();
-		//if ((pdlg->strparamode.CompareNoCase(_T("Tstat6")) == 0)||(pdlg->strparamode.CompareNoCase(_T("Tstat7")) == 0))
-		//	pdlg->Refresh6();
-		//else
-		//	pdlg->Refresh();
+	 
 		pdlg->Reflesh_ParameterDlg();
 	}
 
@@ -282,8 +348,6 @@ BOOL CParameterDlg::OnInitDialog()
 	
 	RECT RECT_SET1;
 	pMain->GetClientRect(&RECT_SET1);
-
-
 
 	CDialog::OnInitDialog();
 	m_gUnit.AddString(_T("°C"));
@@ -316,9 +380,19 @@ BOOL CParameterDlg::OnInitDialog()
 		CStatic* ptimerout=(CStatic*)GetDlgItem(IDC_TIMERON_STATIC);
 		ptimerout->SetWindowText(_T("Timer On"));
 	}
-
+	m_combox_setpointdisplay.ResetContent();
+	m_combox_setpointdisplay.AddString(_T("Temperature "));
+	m_combox_setpointdisplay.AddString(_T("Co2"));
+	m_combox_setpointdisplay.AddString(_T("Hum"));
 	// initialize PID2 combo box
-
+	if (product_register_value[704]>=0&&product_register_value[704]<=2)
+	{
+	 m_combox_setpointdisplay.SetCurSel(product_register_value[704]);
+	}
+	else
+	{
+	m_combox_setpointdisplay.SetCurSel(0);
+	}
 
 	InitPID2ComboBox();
 
@@ -368,6 +442,8 @@ BOOL CParameterDlg::OnInitDialog()
 	((CButton *)GetDlgItem(IDC_REFRESHBUTTON))->SetIcon(hIcon);
 
 	m_brush.CreateSolidBrush(RGB(255,0,0));
+	
+	 
 	m_inputSelect3.ResetContent();
 	m_inputSelect3.AddString(_T("None"));
 	m_inputSelect3.AddString(g_strInName1);
@@ -378,13 +454,248 @@ BOOL CParameterDlg::OnInitDialog()
 	m_inputSelect3.AddString(g_strInName6);
 	m_inputSelect3.AddString(g_strInName7);
 	m_inputSelect3.AddString(g_strInName8);
-
-	ShowPID3();
-	m_keyLockCombox.AddString(_T("Lock On"));
+	if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	{
+		m_InputSelect1.ResetContent();
+		m_inputSelect2.ResetContent();
+		m_inputSelect3.ResetContent();
+		for (int i=0;i<NUM_INPUT_SETTING;i++)
+		{
+			m_InputSelect1.AddString(INPUT_SETTING[i]);
+			m_inputSelect2.AddString(INPUT_SETTING[i]);
+			m_inputSelect3.AddString(INPUT_SETTING[i]);
+		}
+	}
+	//ShowPID3();
+	m_keyLockCombox.AddString(_T("Lock Off"));
 	m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Menu Lock."));
 	m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Menu Part Lock CAL,ORT,Unlock."));
 	m_keyLockCombox.AddString(_T("FAN.SP LOCK.Menu Lock"));
 	m_keyLockCombox.AddString(_T("FAN.SP UNLOCK.Most Menu Unlock "));
+
+	CRect rect;
+	GetClientRect(&rect);
+	CString strTemp;
+
+#if 1//Zigbee
+	if (product_register_value[7]==PM_TSTAT6&&product_register_value[MODBUS_RS485_MODE]==1)
+	{
+
+		WINDOWPLACEMENT wp;
+		GetWindowPlacement(&wp);
+		wp.rcNormalPosition.left += 120;
+		SetWindowPlacement(&wp);
+		GetDlgItem(IDC_STATIC_SPLIT_WINDOW)->ShowWindow(SW_NORMAL);
+
+		GetDlgItem(IDC_STATIC_ZIGBEE_INFORMATION)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ZIGBEE_ID)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_EDIT_ZIGBEE_ID)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ZIGBEE_TYPE)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_COMBO_ZIGBEETYPE)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ZIGBEE_CHANNEL)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_COMBO_CHANNEL)->ShowWindow(SW_SHOW);
+
+
+
+		GetDlgItem(IDC_STATIC_ZIGBEE_SV)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_EDIT_ZIGBEE_SV)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_BUTTON_ZIGBEE_REBOOT)->ShowWindow(SW_SHOW);
+		GetDlgItem( IDC_STATIC_ZIGBEE_SK)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_EDIT_ZIGBEE_SK)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_ZIGBEE_MAC)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_EDIT_ZIGBEE_MAC)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC_NUMBER_TSSTATS)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_ZIGBEE_TSTATS_TABLE)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_BTN_TOPOLOGICAL)->ShowWindow(SW_SHOW);
+		strTemp.Format(_T("%d"),product_register_value[21]);	
+		GetDlgItem(IDC_EDIT_ZIGBEE_ID)->SetWindowText(strTemp);
+		m_combox_zigbee.ResetContent();
+		m_combox_zigbee.AddString(_T("Coordinator"));
+		m_combox_zigbee.AddString(_T("Router"));
+		if (product_register_value[22]<2)
+		{
+			m_combox_zigbee.SetCurSel(product_register_value[22]);
+		}
+		m_combox_channel.ResetContent();
+		for (int channel=11;channel<27;channel++)
+		{
+			strTemp.Format(_T("%d"),channel);
+			m_combox_channel.AddString(strTemp);
+		}
+
+		int ChannelValue=product_register_value[24]+product_register_value[23]*65535;
+		int ChannelNO=0;
+		if (ChannelValue==0x04000000)
+		{
+			ChannelNO=26;
+		}
+		else if (ChannelValue==0x02000000)
+		{
+			ChannelNO=25;
+		}
+		else if (ChannelValue==0x01000000)
+		{
+			ChannelNO=24;
+		}
+		else if (ChannelValue==0x00800000)
+		{
+			ChannelNO=23;
+		}
+		else if (ChannelValue==0x00400000)
+		{
+			ChannelNO=22;
+		}
+		else if (ChannelValue==0x00200000)
+		{
+			ChannelNO=21;
+		}
+		else if (ChannelValue==0x00100000)
+		{
+			ChannelNO=20;
+		}
+		else if (ChannelValue==0x00080000)
+		{
+			ChannelNO=19;
+		}
+		else if (ChannelValue==0x00040000)
+		{
+			ChannelNO=18;
+		}
+		else if (ChannelValue==0x00020000)
+		{
+			ChannelNO=17;
+		}
+		else if (ChannelValue==0x00010000)
+		{
+			ChannelNO=16;
+		}
+		else if (ChannelValue==0x00008000)
+		{
+			ChannelNO=15;
+		}
+		else if (ChannelValue==0x00004000)
+		{
+			ChannelNO=14;
+		}
+		else if (ChannelValue==0x00002000)
+		{
+			ChannelNO=13;
+		}
+		else if (ChannelValue==0x00001000)
+		{
+			ChannelNO=12;
+		}
+		else if (ChannelValue==0x07FFF8000)
+		{
+			ChannelNO=11;
+		}
+		else
+		{
+			ChannelNO=0;
+		}
+		if (ChannelNO>0)
+		{
+			ChannelNO-=11;
+		}
+		m_combox_channel.SetCurSel(ChannelNO);
+
+
+
+
+
+		strTemp.Format(_T("%d"),product_register_value[25]);
+		GetDlgItem(IDC_EDIT_ZIGBEE_SV)->SetWindowText(strTemp);
+		strTemp=_T("");
+		for (int Address=35;Address<51;Address++)
+		{
+			CString StrValue;
+			StrValue.Format(_T("%02X"),product_register_value[Address]);
+			strTemp+=StrValue;
+		}
+
+		GetDlgItem(IDC_EDIT_ZIGBEE_SK)->SetWindowText(strTemp);
+		strTemp.Format(_T("%02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X"),product_register_value[26],product_register_value[27],product_register_value[28],product_register_value[29],product_register_value[30],product_register_value[31],product_register_value[32],product_register_value[33]);
+		GetDlgItem(IDC_EDIT_ZIGBEE_MAC)->SetWindowText(strTemp);
+
+		if (product_register_value[51]>0)
+		{
+			m_zigbee_tstat_table.put_Cols(3);
+			m_zigbee_tstat_table.put_Rows(product_register_value[51]+1);
+			m_zigbee_tstat_table.put_TextMatrix(0,0,_T("Index"));
+			m_zigbee_tstat_table.put_TextMatrix(0,1,_T("TstatIDs"));
+			m_zigbee_tstat_table.put_TextMatrix(0,2,_T("Signal Strength"));
+			for (int ids=0;ids<product_register_value[51];ids++)
+			{
+				strTemp.Format(_T("%d"),ids+1);
+				m_zigbee_tstat_table.put_TextMatrix(ids+1,0,strTemp);
+
+
+				strTemp.Format(_T("%d"),product_register_value[52+ids]);
+				m_zigbee_tstat_table.put_TextMatrix(ids+1,1,strTemp);
+
+				char strength=product_register_value[52+product_register_value[51]+ids];
+
+				strTemp.Format(_T("%d"),strength);
+
+				m_zigbee_tstat_table.put_TextMatrix(ids+1,2,strTemp);
+
+			}
+		}
+		else
+		{
+			m_zigbee_tstat_table.put_Cols(3);
+			m_zigbee_tstat_table.put_Rows(1);
+			m_zigbee_tstat_table.put_TextMatrix(0,0,_T("Index"));
+			m_zigbee_tstat_table.put_TextMatrix(0,1,_T("TstatIDs"));
+			m_zigbee_tstat_table.put_TextMatrix(0,2,_T("Signal Strength"));
+		}
+
+
+
+
+	}
+	else
+	{
+		WINDOWPLACEMENT wp;
+		GetWindowPlacement(&wp);
+		CRect rc;
+		CWnd* pWnd = GetDlgItem(IDC_STATIC_SPLIT_WINDOW);
+		pWnd->GetWindowRect(&rc);
+		//ScreenToClient(&rc);
+		wp.rcNormalPosition.right =rc.right-10; /*rc.left - 10;*/
+		SetWindowPlacement(&wp);
+		GetDlgItem(IDC_STATIC_SPLIT_WINDOW)->ShowWindow(SW_HIDE); 
+
+		GetDlgItem(IDC_STATIC_ZIGBEE_INFORMATION)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ZIGBEE_ID)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDIT_ZIGBEE_ID)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ZIGBEE_TYPE)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_COMBO_ZIGBEETYPE)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ZIGBEE_CHANNEL)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_COMBO_CHANNEL)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_BTN_TOPOLOGICAL)->ShowWindow(SW_HIDE);
+
+
+		GetDlgItem(IDC_STATIC_ZIGBEE_SV)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDIT_ZIGBEE_SV)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_BUTTON_ZIGBEE_REBOOT)->ShowWindow(SW_HIDE);
+		GetDlgItem( IDC_STATIC_ZIGBEE_SK)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDIT_ZIGBEE_SK)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_ZIGBEE_MAC)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDIT_ZIGBEE_MAC)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC_NUMBER_TSSTATS)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_ZIGBEE_TSTATS_TABLE)->ShowWindow(SW_HIDE);
+	}
+#endif
+	if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	{
+		GetDlgItem(IDC_INPUTSBUTTON)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_OutPutsBUTTON)->ShowWindow(SW_HIDE);		 
+	}
+	else{
+		GetDlgItem(IDC_INPUTSBUTTON)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_OutPutsBUTTON)->ShowWindow(SW_SHOW);
+	}
 	SetTimer(1,2000,NULL);
 	//////////////////////////////////////////////////////////////////////////
 	// TODO:  Add extra initialization here
@@ -408,16 +719,28 @@ void CParameterDlg::InitPID2ComboBox()
 	else
 	{
 		if((product_register_value[20]&2)==2)
-		{m_disable_hum=TRUE;}
+		{
+		m_disable_hum=TRUE;}
 		else
 		{
 			m_disable_hum=FALSE;
 		}
 		if((product_register_value[20]&4)==4){
-			m_disable_CO2=TRUE;}
+			m_disable_CO2=TRUE;
+			}
 		else
 		{
 			m_disable_CO2=FALSE;
+		}
+
+		//Loop1 : LCD  
+		if (product_type == T3000_5EH_LCD_ADDRESS)
+		{
+		   m_InputSelect1.ResetContent();
+		   for (int i=0;i<6;i++)
+		   {
+		      m_InputSelect1.AddString(INPUT_SETTING_LCD[i]);
+		   }
 		}
 
 		m_inputSelect2.AddString(_T("None"));
@@ -429,14 +752,35 @@ void CParameterDlg::InitPID2ComboBox()
 		m_inputSelect2.AddString(g_strInName6);
 		m_inputSelect2.AddString(g_strInName7);
 		m_inputSelect2.AddString(g_strInName8);
-		if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
-		{	
-
-			m_inputSelect2.AddString(_T("Humidity"));
-			m_inputSelect2.AddString(_T("CO2"));
 
 
+		// VAV  LCD  
+
+	/*	m_inputSelect3.AddString(_T("None"));
+		m_inputSelect3.AddString(g_strInName1);
+		m_inputSelect3.AddString(g_strInName2);
+		m_inputSelect3.AddString(g_strInName3);
+		m_inputSelect3.AddString(g_strInName4);
+		m_inputSelect3.AddString(g_strInName5);
+		m_inputSelect3.AddString(g_strInName6);
+		m_inputSelect3.AddString(g_strInName7);
+		m_inputSelect3.AddString(g_strInName8);*/
+
+	 
+		
+		if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		{
+			m_InputSelect1.ResetContent();
+			m_inputSelect2.ResetContent();
+			m_inputSelect3.ResetContent();
+			for (int i=0;i<NUM_INPUT_SETTING;i++)
+			{
+				m_InputSelect1.AddString(INPUT_SETTING[i]);
+				m_inputSelect2.AddString(INPUT_SETTING[i]);
+				m_inputSelect3.AddString(INPUT_SETTING[i]);
+			}
 		}
+
 	}
 
 
@@ -476,14 +820,14 @@ void CParameterDlg::OnBnClickedEnableidbutton()
 
 void CParameterDlg::OnCbnSelchangeAutoonlycombo()
 {
-	int nindext=m_autoOnlyCombox.GetCurSel();
+	//int nindext=m_autoOnlyCombox.GetCurSel();
 
 
-	if(product_register_value[MODBUS_AUTO_ONLY]==nindext)	//Add this to judge weather this value need to change.
-		return;
+	//if(product_register_value[MODBUS_AUTO_ONLY]==nindext)	//Add this to judge weather this value need to change.
+	//	return;
 
-	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_AUTO_ONLY,nindext,
-		product_register_value[MODBUS_AUTO_ONLY],this->m_hWnd,IDC_AUTOONLYCOMBO,_T("AUTO ONLY"));
+	//Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_AUTO_ONLY,nindext,
+	//	product_register_value[MODBUS_AUTO_ONLY],this->m_hWnd,IDC_AUTOONLYCOMBO,_T("AUTO ONLY"));
 
 
 	// TODO: Add your control notification handler code here
@@ -509,28 +853,38 @@ void CParameterDlg::OnEnKillfocusIdaddressedit()
 	if(g_tstat_id==nID)
 		return;
 
-	_ConnectionPtr m_pConTmp;
-	_RecordsetPtr m_pRsTemp;
-	m_pConTmp.CreateInstance("ADODB.Connection");
-	m_pRsTemp.CreateInstance("ADODB.Recordset");
-	m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+// 	_ConnectionPtr m_pConTmp;
+// 	_RecordsetPtr m_pRsTemp;
+// 	m_pConTmp.CreateInstance("ADODB.Connection");
+// 	m_pRsTemp.CreateInstance("ADODB.Recordset");
+// 	m_pConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
 
 	CString strSql;
 	strSql.Format(_T("select * from ALL_NODE where Product_ID ='%s'"),strTemp);
-	m_pRsTemp->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-	if(m_pRsTemp->GetRecordCount()>0)
+	//m_pRsTemp->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
+	bado.m_pRecordset=bado.OpenRecordset(strSql);
+	if(bado.m_pRecordset->GetRecordCount()>0)
 	{
 		CString strPop;
 		strPop.Format(_T("There is another TSTAT has the ID ='%s', Please input a new one!"),strTemp);
 		AfxMessageBox(strPop);
-		if(m_pRsTemp->State)
-			m_pRsTemp->Close();
+// 		if(m_pRsTemp->State)
+// 			m_pRsTemp->Close();
+		bado.CloseRecordset();
+		bado.CloseConn();
 		return;
 	}
-	if(m_pRsTemp->State)
-		m_pRsTemp->Close();
+	bado.CloseRecordset();
+	 
 	int nRet=0;
 	g_bPauseMultiRead = TRUE;	
+	nRet=write_one(g_tstat_id, 6,nID);
+	
+	Sleep(1000);
+
 	nRet=write_one(g_tstat_id, 6,nID);
 	if(nRet>0)
 	{		
@@ -566,7 +920,7 @@ void CParameterDlg::OnEnKillfocusIdaddressedit()
 		{
 
 			strSql.Format(_T("update ALL_NODE set Product_ID ='%s', Product_name = '%s', Screen_Name = '%s' where Serial_ID = '%s'"),strNewID,strProductName,strScreenName,strSerial);
-			m_pConTmp->Execute(strSql.GetString(),NULL,adCmdText);
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 		}
 		catch(_com_error *e)
 		{
@@ -579,8 +933,7 @@ void CParameterDlg::OnEnKillfocusIdaddressedit()
 	}
 	g_bPauseMultiRead = FALSE;
 
-	if(m_pConTmp->State)
-		m_pConTmp->Close();	
+	bado.CloseConn();
 
 	//Sleep(1000);
 	pPraent->ScanTstatInDB();
@@ -739,6 +1092,27 @@ void CParameterDlg::OnCbnSelendcancelBraudratecombo()
 
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_BAUDRATE,m_braudRateCombox.GetCurSel(),
 		product_register_value[MODBUS_BAUDRATE],this->m_hWnd,IDC_BRAUDRATECOMBO,_T("BAUDRATE"));
+
+
+
+	CString SqlText;
+	if (m_braudRateCombox.GetCurSel()==0)
+	{
+		SqlText.Format(_T("update ALL_NODE set Bautrate = '9600' where Serial_ID='%d'"),get_serialnumber());
+		Change_BaudRate(9600);
+	} 
+	else
+	{
+		SqlText.Format(_T("update ALL_NODE set Bautrate = '19200' where Serial_ID='%d'"),get_serialnumber());
+		Change_BaudRate(19200);
+	}
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+	bado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
+
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	pFrame->ScanTstatInDB();
 
 
 	//g_bPauseMultiRead = TRUE;
@@ -1078,11 +1452,15 @@ void CParameterDlg::OnCbnSelchangeTimerdelectcombo()
 {
 	if(g_ParamLevel==1)
 		return;	
-
-	if(product_register_value[MODBUS_TIMER_SELECT]==m_timerSelectCombox.GetCurSel())	//Add this to judge weather this value need to change.
+		int sel=m_timerSelectCombox.GetCurSel();
+		if (sel!=0)
+		{
+		 sel++;
+		}
+	if(product_register_value[MODBUS_TIMER_SELECT]==sel)	//Add this to judge weather this value need to change.
 		return;
 
-	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TIMER_SELECT,m_timerSelectCombox.GetCurSel(),
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TIMER_SELECT,sel,
 		product_register_value[MODBUS_TIMER_SELECT],this->m_hWnd,IDC_TIMERDELECTCOMBO,_T("TIMER_SELECT"));
 	/*if (product_register_value[MODBUS_TIMER_SELECT]==3)
 	{
@@ -1166,15 +1544,65 @@ void CParameterDlg::OnBnClickedOutdoorresetbtn()
 //Recode by Fance
 void CParameterDlg::OnCbnSelchangeInputselect1()
 {
-
+	//typedef enum{
+	//	PID_INTERNAL_TEMPERATURE=2,
+	//	PID_HUM_TEMPERATURE=4,
+	//	PID_AI1,
+	//	PID_AI2,
+	//	PID_AI3,
+	//	PID_AI4,
+	//	PID_AI5,
+	//	PID_AI6,
+	//	PID_AI7,
+	//	PID_AI8,
+	//	PID_CO2,
+	//	PID_HUM,
+	//	PID_AIRFLOW_SENSOR
+	//}INPUT_SETTING_VALUE;
 	if(g_ParamLevel==1)
 		return;
-
-	if(product_register_value[MODBUS_TEMP_SELECT]==m_InputSelect1.GetCurSel()+1)	//Add this to judge weather this value need to change.
+		unsigned short TempValue;
+		int sel=m_InputSelect1.GetCurSel();
+		 
+// 		CString strText;
+// 		m_InputSelect1.GetWindowTextW(strText);
+// 		if(strText.IsEmpty())
+// 		{
+// 		Reflesh_ParameterDlg();
+// 		return;
+// 		}
+//// 		if (sel==0)
+//// 		{
+//		TempValue=sel+2;
+//// 		}
+//// 		else
+//// 		{
+//// 		TempValue=sel+4;
+//// 		}INPUT_SETTING[NUM_INPUT_SETTING]
+// 		if (product_type==T3000_5EH_LCD_ADDRESS||product_type == T3000_6_ADDRESS)
+// 		{
+// 		 
+// 		    strText= INPUT_SETTING_LCD[sel];
+// 			for (int i=0;i<NUM_INPUT_SETTING;i++)
+// 			{
+// 				if (strText.CompareNoCase(INPUT_SETTING[i])==0)
+// 				{
+// 					TempValue = i;
+// 					break;
+// 				}
+// 			}
+// 		} 
+// 		else
+// 		{
+// 				TempValue = sel;
+// 		}
+  		sel+=2;
+	if(product_register_value[MODBUS_TEMP_SELECT]==sel)//Add this to judge weather this value need to change.
 		return;
 
-	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TEMP_SELECT,m_InputSelect1.GetCurSel()+1,
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_TEMP_SELECT,sel,
 		product_register_value[MODBUS_TEMP_SELECT],this->m_hWnd,IDC_INPUTSELECT1,_T("TEMP SELECT"));
+		Reflesh_ParameterDlg();
 }
 
 
@@ -1183,10 +1611,28 @@ void CParameterDlg::OnCbnSelchangeInputselect2()
 {
 	if(g_ParamLevel==1)
 		return;
-	int nSel = m_inputSelect2.GetCurSel();	
-	if(product_register_value[MODBUS_INPUT1_SELECT]==nSel)	//Add this to judge weather this value need to change.
+/*	int nSel = m_inputSelect2.GetCurSel();	*/
+	unsigned short TempValue;
+	int sel=m_inputSelect2.GetCurSel();
+// 	if (sel==0)
+// 	{
+		TempValue=sel+2;
+// 	}
+// 	else
+// 	{
+// 		TempValue=sel+4;
+// 	}
+
+		CString strText;
+		m_inputSelect2.GetWindowTextW(strText);
+		if (strText.IsEmpty())
+		{
+			Reflesh_ParameterDlg();
+			return;
+		}
+	if(product_register_value[MODBUS_INPUT1_SELECT]==TempValue)	//Add this to judge weather this value need to change.
 		return;
-	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_INPUT1_SELECT,nSel,
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_INPUT1_SELECT,TempValue,
 		product_register_value[MODBUS_INPUT1_SELECT],this->m_hWnd,IDC_INPUTSELECT2,_T("INPUT1_SELECT"));
 
 
@@ -1251,7 +1697,7 @@ void CParameterDlg::OnCbnSelchangeEapplication()
 		nRet = write_one(g_tstat_id,reg_tststold[125],m_application_ctrl.GetCurSel()); //tstat6 350 
 
 	}
-	else if(((product_register_value[7]==PM_TSTAT5E)) && (m_fFirmwareVersion >= 35.4))//0912
+	else if(((product_register_value[7]==PM_TSTAT5E)||(product_register_value[7]==PM_TSTATRUNAR)) && (m_fFirmwareVersion >= 35.4))//0912
 	{
 		write_one(g_tstat_id,423 ,m_application_ctrl.GetCurSel()); // 
 		nRet=write_one(g_tstat_id,125 ,m_application_ctrl.GetCurSel()); // 
@@ -1264,6 +1710,7 @@ void CParameterDlg::OnCbnSelchangeEapplication()
 
 	if(nRet>0)
 		product_register_value[125] =m_application_ctrl.GetCurSel();
+		product_register_value[423] =m_application_ctrl.GetCurSel();
 		Reflesh_ParameterDlg();
 	g_bPauseMultiRead = FALSE;
 }
@@ -1273,91 +1720,191 @@ void  CParameterDlg::UpdateCoolingandHeatingData()
 
 	CString strText;
 	UINT uint_temp=GetOEMCP();		//get system is for chinese or english'
+	if (product_type == T3000_5ABCDFG_LED_ADDRESS ||product_type == T3000_6_ADDRESS){
+		if(uint_temp!=936 && uint_temp!=950)
+		{//not chinese
+			if(m_application_ctrl.GetCurSel()==0)
+			{	
 
-	if(uint_temp!=936 && uint_temp!=950)
-	{//not chinese
-		if(m_application_ctrl.GetCurSel()==0)
-		{	
-			if (g_unint)
-			{
-				strText.Format(_T("%d C"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);//182 
-				m_nightheating.SetWindowText(strText);
-				strText.Format(_T("%d C"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183 355
-				m_nightcooling.SetWindowText(strText);
+
+				if (g_unint)
+				{
+					strText.Format(_T("%d C"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10);//182 
+					m_nightheating.SetWindowText(strText);
+					strText.Format(_T("%d C"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10);//183 355
+					m_nightcooling.SetWindowText(strText);
+				}
+				else
+				{
+					strText.Format(_T("%d F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10);//182
+					m_nightheating.SetWindowText(strText);
+					strText.Format(_T("%d F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10);//183
+					m_nightcooling.SetWindowText(strText);
+				}
+
+
+
 			}
 			else
 			{
-				strText.Format(_T("%d F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);//182
-				m_nightheating.SetWindowText(strText);
-				strText.Format(_T("%d F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
-				m_nightcooling.SetWindowText(strText);
-			}
+				if (g_unint)
+				{		
+					strText.Format(_T("%0.1f°C"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10);//123
+					m_nightheating.SetWindowText(strText);
 
+					//m_nightheating.Format("%d%c",product_register_value[123],176);//night heating deadband
+					strText.Format(_T("%0.1f°C"),(float)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10);		//124
+					m_nightcooling.SetWindowText(strText);
+
+				}else
+				{
+					strText.Format(_T("%0.1f°F"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//182   354
+					m_nightheating.SetWindowText(strText);
+					strText.Format(_T("%0.1f°F"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//183
+					m_nightcooling.SetWindowText(strText);
+
+				}
+
+			}
 		}
 		else
 		{
-			if (g_unint)
-			{		
-				strText.Format(_T("%0.1f°C"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10);//123
-				m_nightheating.SetWindowText(strText);
-
-				//m_nightheating.Format("%d%c",product_register_value[123],176);//night heating deadband
-				strText.Format(_T("%0.1f°C"),(float)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10);		//124
-				m_nightcooling.SetWindowText(strText);
-
-			}else
+			if(m_application_ctrl.GetCurSel()==0)
 			{
-				strText.Format(_T("%0.1f°F"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//182   354
-				m_nightheating.SetWindowText(strText);
-				strText.Format(_T("%0.1f°F"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//183
-				m_nightcooling.SetWindowText(strText);
+				if (g_unint)
+				{
+					strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
+					m_nightheating.SetWindowText(strText);
+
+					strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
+					m_nightcooling.SetWindowText(strText);
+				}
+				else
+				{
+					strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10);
+					m_nightheating.SetWindowText(strText);
+
+					strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10);//183
+					m_nightcooling.SetWindowText(strText);
+				}
 
 			}
+			else
+			{
+				if (g_unint)
+				{		
+					strText.Format(_T("%0.1f°C"),(float)(product_register_value[123]/10.0));
+					m_nightheating.SetWindowText(strText);
 
+					strText.Format(_T("%0.1f°C"),(float)(product_register_value[124]/10.0));
+					m_nightcooling.SetWindowText(strText);
+				}else
+				{
+					strText.Format(_T("%0.1f°F"),(float)product_register_value[123]/10.0);
+					m_nightheating.SetWindowText(strText);
+
+					strText.Format(_T("%0.1f°F"),(float)product_register_value[124]/10.0);
+					m_nightcooling.SetWindowText(strText);
+
+				}
+
+			}
 		}
 	}
 	else
 	{
-		if(m_application_ctrl.GetCurSel()==0)
-		{
-			if (g_unint)
-			{
-				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
-				m_nightheating.SetWindowText(strText);
+		if(uint_temp!=936 && uint_temp!=950)
+		{//not chinese
+			if(m_application_ctrl.GetCurSel()==0)
+			{	
 
-				strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
-				m_nightcooling.SetWindowText(strText);
-			}else
-			{
-				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
-				m_nightheating.SetWindowText(strText);
 
-				strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
-				m_nightcooling.SetWindowText(strText);
+				if (g_unint)
+				{
+					strText.Format(_T("%d C"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);//182 
+					m_nightheating.SetWindowText(strText);
+					strText.Format(_T("%d C"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183 355
+					m_nightcooling.SetWindowText(strText);
+				}
+				else
+				{
+					strText.Format(_T("%d F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);//182
+					m_nightheating.SetWindowText(strText);
+					strText.Format(_T("%d F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
+					m_nightcooling.SetWindowText(strText);
+				}
+
+
+
 			}
+			else
+			{
+				if (g_unint)
+				{		
+					strText.Format(_T("%0.1f°C"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10);//123
+					m_nightheating.SetWindowText(strText);
 
+					//m_nightheating.Format("%d%c",product_register_value[123],176);//night heating deadband
+					strText.Format(_T("%0.1f°C"),(float)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10);		//124
+					m_nightcooling.SetWindowText(strText);
+
+				}else
+				{
+					strText.Format(_T("%0.1f°F"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//182   354
+					m_nightheating.SetWindowText(strText);
+					strText.Format(_T("%0.1f°F"),(float)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10.0);//183
+					m_nightcooling.SetWindowText(strText);
+
+				}
+
+			}
 		}
 		else
 		{
-			if (g_unint)
-			{		
-				strText.Format(_T("%0.1f°C"),(float)(product_register_value[123]/10.0));
-				m_nightheating.SetWindowText(strText);
-
-				strText.Format(_T("%0.1f°C"),(float)(product_register_value[124]/10.0));
-				m_nightcooling.SetWindowText(strText);
-			}else
+			if(m_application_ctrl.GetCurSel()==0)
 			{
-				strText.Format(_T("%0.1f°F"),(float)product_register_value[123]/10.0);
-				m_nightheating.SetWindowText(strText);
+				if (g_unint)
+				{
+					strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
+					m_nightheating.SetWindowText(strText);
 
-				strText.Format(_T("%0.1f°F"),(float)product_register_value[124]/10.0);
-				m_nightcooling.SetWindowText(strText);
+					strText.Format(_T("%d°C"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
+					m_nightcooling.SetWindowText(strText);
+				}
+				else
+				{
+					strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]);
+					m_nightheating.SetWindowText(strText);
+
+					strText.Format(_T("%d°F"),product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]);//183
+					m_nightcooling.SetWindowText(strText);
+				}
 
 			}
+			else
+			{
+				if (g_unint)
+				{		
+					strText.Format(_T("%0.1f°C"),(float)(product_register_value[123]/10.0));
+					m_nightheating.SetWindowText(strText);
 
+					strText.Format(_T("%0.1f°C"),(float)(product_register_value[124]/10.0));
+					m_nightcooling.SetWindowText(strText);
+				}else
+				{
+					strText.Format(_T("%0.1f°F"),(float)product_register_value[123]/10.0);
+					m_nightheating.SetWindowText(strText);
+
+					strText.Format(_T("%0.1f°F"),(float)product_register_value[124]/10.0);
+					m_nightcooling.SetWindowText(strText);
+
+				}
+
+			}
 		}
 	}
+
+
  
 }
 
@@ -1547,15 +2094,15 @@ void CParameterDlg::OnEnKillfocusSpset1()
 	{
 		fValue=float(_wtof(strText));
 		nOrig=(short)fValue;
-		nMax=product_register_value[MODBUS_MAX_SETPOINT];	//131	365
-		nMin=product_register_value[MODBUS_MIN_SETPOINT];	//132	366
+		nMax=(short)product_register_value[MODBUS_MAX_SETPOINT];	//131	365
+		nMin=(short)product_register_value[MODBUS_MIN_SETPOINT];	//132	366
 		if (nOrig>nMax)
 		{
-			strText.Format(_T("%d"),product_register_value[MODBUS_MAX_SETPOINT]);
+			strText.Format(_T("%d"),(short)product_register_value[MODBUS_MAX_SETPOINT]);
 		}
 		if (nOrig<nMin)
 		{
-			strText.Format(_T("%d"),product_register_value[MODBUS_MIN_SETPOINT]);
+			strText.Format(_T("%d"),(short)product_register_value[MODBUS_MIN_SETPOINT]);
 		}
 
 		if ((product_register_value[7] == PM_TSTAT7)||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i))
@@ -1576,7 +2123,7 @@ void CParameterDlg::OnEnKillfocusSpset1()
 			}
 			product_register_value[MODBUS_DAY_SETPOINT] = short(nOrig*10);
 		}
-		else if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E)
+		else if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR))
 		{
 			int nRet = write_one(g_tstat_id, 135, short(nOrig));	//Fance comments: because the version which below 34.9 is too low ,135 register I Don't know it's real meaning. 
 		}
@@ -1623,12 +2170,25 @@ void CParameterDlg::OnEnKillfocusEsetpointhi()
 		return;
 	}
 
-	if(product_register_value[MODBUS_MAX_SETPOINT]==nValue)	//Add this to judge weather this value need to change.
+	if((short)product_register_value[MODBUS_MAX_SETPOINT]==nValue)	//Add this to judge weather this value need to change.
 		return;
 
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_MAX_SETPOINT,nValue,
-		product_register_value[MODBUS_MAX_SETPOINT],this->m_hWnd,IDC_ESETPOINTHI,_T("MAX SETPOINT"));
+		(short)product_register_value[MODBUS_MAX_SETPOINT],this->m_hWnd,IDC_ESETPOINTHI,_T("MAX SETPOINT"));
 
+
+
+// 	CString strText;
+// 	m_setptHiEdit.GetWindowText(strText);
+// 	int nValue= _wtoi(strText);
+// 	if(nValue<=0||nValue>=255)
+// 	{
+// 		AfxMessageBox(_T("Setpoint Max must between 10 and 99"));
+// 		return;
+// 	}
+// 	g_bPauseMultiRead = TRUE;	
+// 	write_one(g_tstat_id,131 , nValue);g_bPauseMultiRead = FALSE;
+//	Refresh();
 }
 
 void CParameterDlg::OnEnKillfocusEsetpointlo()
@@ -1641,11 +2201,15 @@ void CParameterDlg::OnEnKillfocusEsetpointlo()
 	int nValue= _wtoi(strText);
 
 
-	if(product_register_value[MODBUS_MIN_SETPOINT]==nValue)	//Add this to judge weather this value need to change.
+	if((short)product_register_value[MODBUS_MIN_SETPOINT]==nValue)	//Add this to judge weather this value need to change.
 		return;
 
 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_MIN_SETPOINT,nValue,
-		product_register_value[MODBUS_MIN_SETPOINT],this->m_hWnd,IDC_ESETPOINTLO,_T("MIN SETPOINT"));
+		(short)product_register_value[MODBUS_MIN_SETPOINT],this->m_hWnd,IDC_ESETPOINTLO,_T("MIN SETPOINT"));
+
+
+
+
 }
 
 void CParameterDlg::OnEnKillfocusEcooldeadband1()
@@ -1866,10 +2430,10 @@ void CParameterDlg::OnEnKillfocusEnigntcooling1()
 	
 	if(m_application_ctrl.GetCurSel()==0)
 	{
-		if(product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]==(int)(nValue/10))	//Add this to judge weather this value need to change.
+		if(product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]==(int)(nValue))	//Add this to judge weather this value need to change.
 			return;
 
-		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_SETPOINT,(int)(nValue/10),
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_NIGHT_COOLING_SETPOINT,(int)(nValue),
 			product_register_value[MODBUS_NIGHT_COOLING_SETPOINT],this->m_hWnd,IDC_ENIGNTCOOLING1,_T("NIGHT COOLING SETPOINT"));
 	}
 	else
@@ -1943,7 +2507,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 
 
 	}
-	else if(product_register_value[7] == PM_TSTAT5G || product_register_value[7] == PM_TSTAT5E)  // 只有5E使用135
+	else if(product_register_value[7] == PM_TSTAT5G || product_register_value[7] == PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR))  // 只有5E使用135
 	{
 		//short nVal = short(fValue);
 		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,135,short(fValue),
@@ -2113,30 +2677,30 @@ void CParameterDlg::OnCbnSelchangeComboRounddis()
 void CParameterDlg::OnCbnKillfocusCombo1()
 {
 	// TODO: Add your control notification handler code here
-	CString str;
+	//CString str;
 
-	GetDlgItem(IDC_COMBO1)->GetWindowText(str);
+	//GetDlgItem(IDC_COMBO1)->GetWindowText(str);
 
-	if (str.CompareNoCase(_T("1 SP")) == 0)
-		MDAY = 0;
-	else
-		MDAY = 1;
+	//if (str.CompareNoCase(_T("Single")) == 0)
+	//	MDAY = 0;
+	//else
+	//	MDAY = 1;
 
-	FlexSP = 1;
+//	FlexSP = 1;
 }
 
 void CParameterDlg::OnCbnKillfocusCombo4()
 {
 	// TODO: Add your control notification handler code here
-	CString str;
+//CString str;
 
-	GetDlgItem(IDC_COMBO4)->GetWindowText(str);
+	//GetDlgItem(IDC_COMBO4)->GetWindowText(str);
 
-	if (str.CompareNoCase(_T("1 SP")) == 0)
-		MNIGHT = 0;
-	else
-		MNIGHT = 1;
-	FlexSPN = 1;
+//	if (str.CompareNoCase(_T("Single")) == 0)
+	//	MNIGHT = 0;
+	//else
+//		MNIGHT = 1;
+//FlexSPN = 1;
 
 }
 
@@ -2305,8 +2869,8 @@ CString strTemp;
 		}
 		else
 		{
-			//strTemp.Format(_T("%d"),product_register_value[367+i-2]);//lsc
-			strTemp.Format(_T("UNUSED"));
+			strTemp.Format(_T("%d"),product_register_value[MODBUS_ANALOG_INPUT1+InputNo-2]);//lsc
+		//	strTemp.Format(_T("UNUSED"));
 
 		}						
 		return strTemp;
@@ -2330,7 +2894,16 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			GetDlgItem(IDC_STATICUNINT2)->SetWindowText(_T("°C"));
 		}
 		 
-	 
+#if 1
+		if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR))
+		{
+			GetDlgItem(IDC_TRENDLOGVIEW)->SetWindowText(_T("LCD"));
+		}
+		else
+		{
+			GetDlgItem(IDC_TRENDLOGVIEW)->SetWindowText(_T("LED"));
+		}
+#endif
  
 
 	CString strTemp;
@@ -2390,7 +2963,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	//129	107	1	Low byte	W/R	"AUTO_ONLY , enables or disables manual mode. 0 = Manual Fan Modes 1-x Allowed 
-	m_autoOnlyCombox.SetCurSel(product_register_value[MODBUS_AUTO_ONLY]);		//129 107
+	//m_autoOnlyCombox.SetCurSel(product_register_value[MODBUS_AUTO_ONLY]);		//129 107
 	//118	103	1	Low byte	W/R(Reboot after write)	SEQUENCE , 0 = internal test sequence, outputs slowly cycle on/off or ramp up & down. 1 = normal, operation according to the output tables.
 	m_SequenceCombox.SetCurSel(product_register_value[MODBUS_SEQUENCE]);	//118 103
 
@@ -2517,7 +3090,12 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	//327	408	1	Low byte	W/R	"Assign the timer to be used for which feature. 0 = period timer, 1 = rotation timer,
 	//409 
 	//m_timerSelectCombox.SetCurSel(product_register_value[327]);
-	m_timerSelectCombox.SetCurSel(product_register_value[MODBUS_TIMER_SELECT]);	//327  408->409才对
+	int sel=product_register_value[MODBUS_TIMER_SELECT];
+	if (sel!=0)
+	{
+	--sel;
+	}
+	m_timerSelectCombox.SetCurSel(sel);	//327  408->409才对
 
 
 
@@ -2537,29 +3115,37 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	m_OverRideEdit.SetWindowText(strTemp);
 	//tstat6
 	//111	382	1	Low byte	W/R	Sensor to be used for the PID calculations,  1= external sensor analog input 1 , 2 = internal thermistor, 3 = average the internal thermistor and analog input1
-	if (product_register_value[MODBUS_TEMP_SELECT]<1)	//382
-	{
-		m_InputSelect1.SetCurSel(0);
-	}
-	else if (product_register_value[MODBUS_TEMP_SELECT]>3)//382
-	{
-		m_InputSelect1.SetCurSel(2);
-	}
-	else
-	{
-		m_InputSelect1.SetCurSel(product_register_value[MODBUS_TEMP_SELECT]-1);//382
-	}
+// 	if (product_register_value[MODBUS_TEMP_SELECT]<3)	//382
+// 	{
+// 		m_InputSelect1.SetCurSel(0);
+// 	}
+// 	else if (product_register_value[MODBUS_TEMP_SELECT]>4)//382
+// 	{
+        //int 
+		//m_InputSelect1.SetCurSel(product_register_value[MODBUS_TEMP_SELECT]-2);
+		 sel =product_register_value[MODBUS_TEMP_SELECT]-2;
+		strTemp=INPUT_SETTING[sel];
+		m_InputSelect1.SetWindowText(strTemp);
+// 	}
+// 	else 
+// 	{
+// 		m_InputSelect1.SetCurSel(0);
+// 	}
 
 	 
 
-	if (product_register_value[MODBUS_INPUT1_SELECT]<0)	//383
-	{
-		m_inputSelect2.SetCurSel(0);
-	}
-	else
-	{
-		m_inputSelect2.SetCurSel(product_register_value[MODBUS_INPUT1_SELECT]);	//383
-	}
+// 	if (product_register_value[MODBUS_INPUT1_SELECT]<3)	//383
+// 	{
+// 		m_inputSelect2.SetCurSel(0);
+// 	}
+// 	else if (product_register_value[MODBUS_INPUT1_SELECT]>4)
+// 	{
+	m_inputSelect2.SetCurSel(product_register_value[MODBUS_INPUT1_SELECT]-2);	
+// 	}
+// 	else
+// 	{
+// 		 m_inputSelect2.SetCurSel(0);
+// 	}
 
 
 	strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);	//121
@@ -2575,61 +3161,162 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 #if 1
-		strTemp.Format(_T("%0.1f"),product_register_value[121]/10.0);
+
+
+		 if(product_register_value[382]==5) // input1
+	{	
+
+		strTemp=GetInputValue(1);
+		m_inputvalue1.SetWindowText(strTemp);
+	}
+	else if(product_register_value[382]==6) // input2 //m_inputvalue1
+	{
+
+		strTemp=GetInputValue(2);
+		m_inputvalue1.SetWindowText(strTemp);
+	}
+	else if(product_register_value[382]==7) // input2 //m_inputvalue1
+	{
+
+		strTemp=GetInputValue(3);
+		m_inputvalue1.SetWindowText(strTemp);
+	}
+	else if(product_register_value[382]==8) // input2 //m_inputvalue1
+	{
+
+		strTemp=GetInputValue(4);
+		m_inputvalue1.SetWindowText(strTemp);
+	}
+	else if(product_register_value[382]==9) // input2 //m_inputvalue1
+	{
+
+		strTemp=GetInputValue(5);
+		m_inputvalue1.SetWindowText(strTemp);
+	}
+	else if(product_register_value[382]==10) // input2 //m_inputvalue1
+	{
+
+		strTemp=GetInputValue(6);
+		m_inputvalue1.SetWindowText(strTemp);
+	}
+	else if(product_register_value[382]==11) // input2 //m_inputvalue1
+	{
+
+		strTemp=GetInputValue(7);
+		m_inputvalue1.SetWindowText(strTemp);
+	}
+	else if(product_register_value[382]==12) // input2 //m_inputvalue1
+	{
+
+		strTemp=GetInputValue(8);
+		m_inputvalue1.SetWindowText(strTemp);
+	}
+	else if (product_register_value[382]==13)//Humidity
+	{		CString temp;
+	strUnit=_T("%");
+	if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
+	{
+
+		temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
+
+	}
+	else
+	{
+		temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
+	}
+
+
+	m_inputvalue1.SetWindowText(temp+strUnit); 
+
+
+	}
+	else if (product_register_value[382]==14)//Co2
+	{ CString temp;
+	strUnit=_T("ppm");
+	if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
+	{
+
+		temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
+		temp=temp+strUnit;
+
+	}
+	else
+	{
+
+		temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
+		temp=temp+strUnit;
+	}
+
+	m_inputvalue1.SetWindowText(temp);
+
+
+	}
+	else
+	{
+		//m_inputvalue1.SetWindowText(_T("UNUSED"));
+		int ret=read_one(g_tstat_id,MODBUS_TEMPRATURE_CHIP,5);
+		if (ret>0)
+		{
+		product_register_value[MODBUS_TEMPRATURE_CHIP]=ret;
+		}
+		strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);	//121
 		m_inputvalue1.SetWindowText(strTemp+strUnit);
+	}
+
+     
 		// float fValue;
 		int nValue=0;
 	   CString strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+product_register_value[383]-1], product_register_value[383]);
 		
-		if(product_register_value[383]==1) // input1
+			 if(product_register_value[383]==5) // input1
 		{	
 			 
 			strTemp=GetInputValue(1);
 			m_inputValue2.SetWindowText(strTemp);
 		}
-		else if(product_register_value[383]==2) // input2 //m_inputvalue1
+		else if(product_register_value[383]==6) // input2 //m_inputvalue1
 		{
 			
 			strTemp=GetInputValue(2);
 			m_inputValue2.SetWindowText(strTemp);
 		}
-		else if(product_register_value[383]==3) // input2 //m_inputvalue1
+		else if(product_register_value[383]==7) // input2 //m_inputvalue1
 		{
 			
 			strTemp=GetInputValue(3);
 			m_inputValue2.SetWindowText(strTemp);
 		}
-		else if(product_register_value[383]==4) // input2 //m_inputvalue1
+		else if(product_register_value[383]==8) // input2 //m_inputvalue1
 		{
 			
 			strTemp=GetInputValue(4);
 			m_inputValue2.SetWindowText(strTemp);
 		}
-		else if(product_register_value[383]==5) // input2 //m_inputvalue1
+		else if(product_register_value[383]==9) // input2 //m_inputvalue1
 		{
 		
 			strTemp=GetInputValue(5);
 			m_inputValue2.SetWindowText(strTemp);
 		}
-		else if(product_register_value[383]==6) // input2 //m_inputvalue1
+		else if(product_register_value[383]==10) // input2 //m_inputvalue1
 		{
 		
 			strTemp=GetInputValue(6);
 			m_inputValue2.SetWindowText(strTemp);
 		}
-		else if(product_register_value[383]==7) // input2 //m_inputvalue1
+		else if(product_register_value[383]==11) // input2 //m_inputvalue1
 		{
 		
 			strTemp=GetInputValue(7);
 			m_inputValue2.SetWindowText(strTemp);
 		}
-		else if(product_register_value[383]==8) // input2 //m_inputvalue1
+		else if(product_register_value[383]==12) // input2 //m_inputvalue1
 		{
 			
 			strTemp=GetInputValue(8);
 			m_inputValue2.SetWindowText(strTemp);
 		}
-		else if (product_register_value[383]==9)//Humidity
+		else if (product_register_value[383]==13)//Humidity
 		{		CString temp;
 		strUnit=_T("%");
 		if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
@@ -2648,7 +3335,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 		}
-		else if (product_register_value[383]==10)//Co2
+		else if (product_register_value[383]==14)//Co2
 		{ CString temp;
 		strUnit=_T("ppm");
 		if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
@@ -2671,7 +3358,11 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		}
 		else
 		{
-			m_inputValue2.SetWindowText(_T("UNUSED"));
+			//m_inputValue2.SetWindowText(_T("UNUSED"));
+
+			strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);	//121
+			m_inputValue2.SetWindowText(strTemp+strUnit);
+
 		}
 		strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_UNIVERSAL_NIGHTSET]/10.0);			//275 
 		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->SetWindowText(strTemp+strUnit);
@@ -2882,7 +3573,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	float m_fFirmwareVersion=get_curtstat_version();//0912
-	if (product_register_value[7] == PM_TSTAT5E)//0912
+	if (product_register_value[7] == PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR))//0912
 	{
 		short nOccupied = product_register_value[184];  // Day setpoint option  
 		BOOL bOccupied = nOccupied & 0x0001;
@@ -2964,9 +3655,11 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	m_pidPitemEdt2.SetWindowText(strTemp);
 
 	strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
+
 	strTemp.Empty();
-	strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_UNIVERSAL_SET]/10.0);	//246  359
+	strTemp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_UNIVERSAL_SET]/10.0));	//246  359
 	strTemp+=strUnit;
+
 	m_dayOccEdt2.SetWindowText(strTemp);
 
 
@@ -2982,7 +3675,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 	if(product_type!=T3000_6_ADDRESS)
 	{
-		if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E||
+		if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR)||
 			(product_register_value[7] == PM_TSTAT5G))   // ÀÏ°æ±¾135£¬ÐÂ°æ±¾374// ÀÏ°æ±¾²»³ý10£¬
 		{
 			strTemp.Format(_T("%d"),(int)product_register_value[MODBUS_COOLING_SETPOINT]);//135
@@ -2992,8 +3685,8 @@ void CParameterDlg::Reflesh_ParameterDlg()
 			strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_TWO_BYTE_SETPOINT]/10.0);	// set point for TStat A,B,C,D	//374
 		}	
 
-		m_dayOccEdt1.SetWindowText(strTemp);
-		if (product_register_value[7] == PM_TSTAT5E||
+		m_dayOccEdt1.SetWindowText(strTemp+GetTempUnit());
+		if (product_register_value[7] == PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR)||
 			(product_register_value[7] == PM_TSTAT5G))//0911
 		{
 			strUnit=GetTempUnit();
@@ -3038,7 +3731,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 	strTemp.Empty();
 	//strTemp.Format(_T("%d"),product_register_value[132]);
-	strTemp.Format(_T("%d"),product_register_value[MODBUS_MIN_SETPOINT]);//132  366
+	strTemp.Format(_T("%d"),(short)product_register_value[MODBUS_MIN_SETPOINT]);//132  366
 	strTemp+=strUnit;
 	m_setptLoEdit.SetWindowText(strTemp);
 
@@ -3107,14 +3800,14 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	if (MDAY == 0)
-		GetDlgItem(IDC_COMBO1)->SetWindowText(_T("1 SP"));
+		GetDlgItem(IDC_COMBO1)->SetWindowText(_T("Single"));
 	else
-		GetDlgItem(IDC_COMBO1)->SetWindowText(_T("2 SP"));
+		GetDlgItem(IDC_COMBO1)->SetWindowText(_T("Dual"));
 
 	if (MNIGHT == 0)
-		GetDlgItem(IDC_COMBO4)->SetWindowText(_T("1 SP"));
+		GetDlgItem(IDC_COMBO4)->SetWindowText(_T("Single"));
 	else
-		GetDlgItem(IDC_COMBO4)->SetWindowText(_T("2 SP"));
+		GetDlgItem(IDC_COMBO4)->SetWindowText(_T("Dual"));
 
 	CString str;//add by Fance. T5 also support this function
 	str.Format(_T("%d"),product_register_value[MODBUS_VALVE_TRAVEL_TIME]);	//279  243  
@@ -3279,12 +3972,94 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	 
 	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
 	{
-		m_coolsp= product_register_value[MODBUS_DAY_COOLING_SETPOINT]/10;//348
+	   
 
-		m_cooldb=product_register_value[MODBUS_DAY_COOLING_DEADBAND]/10;//346
-		m_setpoint =product_register_value[MODBUS_DAY_SETPOINT]/10;//345
-		m_heatdb =product_register_value[MODBUS_DAY_HEATING_DEADBAND]/10;//347
-		m_heatsp =product_register_value[MODBUS_DAY_HEATING_SETPOINT]/10;//349
+// 		if (product_register_value[MODBUS_TEMP_SELECT]<3)	//382
+// 		{
+// 			m_InputSelect1.SetCurSel(0);
+// 		}
+// 		else if (product_register_value[MODBUS_TEMP_SELECT]>4)//382
+// 		{
+// 			m_InputSelect1.SetCurSel(3);
+// 		}
+// 		else
+// 		{
+// 			m_InputSelect1.SetCurSel(product_register_value[MODBUS_TEMP_SELECT]-1);//382
+// 		}
+
+
+
+// 		if (product_register_value[MODBUS_INPUT1_SELECT]<0)	//383
+// 		{
+// 			m_inputSelect2.SetCurSel(0);
+// 		}
+// 		else
+// 		{
+// 			m_inputSelect2.SetCurSel(product_register_value[MODBUS_INPUT1_SELECT]);	//383
+// 		}
+
+
+	    int TempSel=product_register_value[MODBUS_TEMP_SELECT];
+// 		if (TempSel==2)	//382
+// 		{
+// 			m_InputSelect1.SetCurSel(0);
+// 		}
+// 		else if (TempSel>4)//382
+// 		{
+			m_InputSelect1.SetCurSel(TempSel-2);
+// 		}
+// 		else
+// 		{
+// 			m_InputSelect1.SetCurSel(0);//382
+// 		}
+
+		TempSel=product_register_value[MODBUS_INPUT1_SELECT];
+		 
+// 		if (TempSel==2)	//383
+// 		{
+// 			m_inputSelect2.SetCurSel(0);
+// 		}
+// 		else if (TempSel>4)//383
+// 		{
+			m_inputSelect2.SetCurSel(TempSel-2);
+// 		}
+// 		else
+// 		{
+// 			m_inputSelect2.SetCurSel(0);//383
+// 		}
+
+
+		int RegAddress=-1;
+		if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		{
+			RegAddress=650;
+		}
+		else
+		{
+			RegAddress=MODBUS_SUPPLY_TEMP_SELECT;
+		}
+
+		TempSel=product_register_value[RegAddress];
+// 		if (TempSel==2)
+// 		{
+// 			m_inputSelect3.SetCurSel(0);
+// 		}
+// 		else if (TempSel>4&&TempSel<16)
+// 		{
+			m_inputSelect3.SetCurSel(TempSel-2);
+// 		}
+// 		else
+// 		{
+// 			m_inputSelect3.SetCurSel(0); 
+// 		}
+
+
+		m_coolsp= ((float)(short)product_register_value[MODBUS_DAY_COOLING_SETPOINT])/10;//348
+
+		m_cooldb=((float)(short)product_register_value[MODBUS_DAY_COOLING_DEADBAND])/10;//346
+		m_setpoint =((float)(short)product_register_value[MODBUS_DAY_SETPOINT])/10;//345
+		m_heatdb =((float)(short)product_register_value[MODBUS_DAY_HEATING_DEADBAND])/10;//347
+		m_heatsp =((float)(short)product_register_value[MODBUS_DAY_HEATING_SETPOINT])/10;//349
 
 		// 		350	1	Low byte	W/R	(Night)Unoccupied  setpoin.
 		// 		351	1	Low byte		spare
@@ -3292,11 +4067,11 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		// 		353	1	Low byte	W/R	(Night)Unoccupied cooling setpoint dead band , cooling deadband for the night (OFF) mode. Units of 1 deg.
 		// 		354	2	Full	W/R	(Night)Unoccupied heating setpoint
 		// 		355	2	Full	W/R	(Night)Unoccupied cooling setpoint
-		m_coolspN=product_register_value[MODBUS_NIGHT_COOLING_SETPOINT]/10;//355
-		m_cooldbN=product_register_value[MODBUS_NIGHT_COOLING_DEADBAND]/10;//353
-		m_setpointN=product_register_value[MODBUS_NIGHT_SETPOINT]/10;//350
-		m_heatdbN=product_register_value[MODBUS_NIGHT_HEATING_DEADBAND]/10;//352
-		m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
+		m_coolspN=((float)(short)product_register_value[MODBUS_NIGHT_COOLING_SETPOINT])/10;//355
+		m_cooldbN=((float)(short)product_register_value[MODBUS_NIGHT_COOLING_DEADBAND])/10;//353
+		m_setpointN=((float)(short)product_register_value[MODBUS_NIGHT_SETPOINT])/10;//350
+		m_heatdbN=((float)(short)product_register_value[MODBUS_NIGHT_HEATING_DEADBAND])/10;//352
+		m_heatspN=((float)(short)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT])/10;
 	}
     //CenterWindow(this);
     if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
@@ -3371,12 +4146,25 @@ void CParameterDlg::Reflesh_ParameterDlg()
         GetDlgItem(IDC_STATIC_SETPOINTN)->ShowWindow(SW_HIDE);
 	 
 	}
-ShowPID3();
+     ShowPID3();
+
+   strTemp.Format(_T("%d"),product_register_value[726]);
+   GetDlgItem(IDC_EDIT_TRANDUCER_MIN)->SetWindowText(strTemp);
+
+   strTemp.Format(_T("%d"),product_register_value[727]);
+   GetDlgItem(IDC_EDIT_TRANDUCER_MAX)->SetWindowText(strTemp);
 }
 
 void CParameterDlg::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
+// 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+// 	CView* pT3000View = pFrame->m_pViews[DLG_T3000_VIEW];
+// 	if(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd!=NULL)
+// 	{
+// 		::PostMessage(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
+// 	}
+
 	OnCancel();
 }
 
@@ -3469,7 +4257,7 @@ LRESULT  CParameterDlg::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
 		product_register_value[Write_Struct_feedback->address]= Write_Struct_feedback->new_value;
 		if(Write_Struct_feedback!=NULL)
 			delete Write_Struct_feedback;
-		//MessageBox(temp);
+		 
 	}
 	else
 	{
@@ -3543,10 +4331,9 @@ void CParameterDlg::OnTimer(UINT_PTR nIDEvent)
 	//Post_Read_one_Thread_Message(g_tstat_id,MODBUS_EXTERNAL_SENSOR_0,this->m_hWnd);
 	//Post_Read_one_Thread_Message(g_tstat_id,MODBUS_COOLING_PID,this->m_hWnd);
 	//Post_Read_one_Thread_Message(g_tstat_id,MODBUS_PID_UNIVERSAL,this->m_hWnd);
-
 	//Fresh_Single_UI();
-
 	//Reflesh_ParameterDlg();
+
 	CDialog::OnTimer(nIDEvent);
 }
 
@@ -3685,42 +4472,63 @@ void CParameterDlg::Read_SliderData()
 	//m_heatspN=product_register_value[MODBUS_NIGHT_HEATING_SETPOINT]/10;
 
 
-	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
-	{
-	Read_Multi(g_tstat_id,&product_register_value[MODBUS_DAY_SETPOINT],MODBUS_DAY_SETPOINT,20);
-	} 
-	else
-	{
-	Read_Multi(g_tstat_id,&product_register_value[MODBUS_COOLING_DEADBAND],MODBUS_COOLING_DEADBAND,2);
-	Read_Multi(g_tstat_id,&product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],MODBUS_NIGHT_HEATING_DEADBAND,2);
-	
-	Read_Multi(g_tstat_id,&product_register_value[MODBUS_COOLING_SETPOINT],MODBUS_COOLING_SETPOINT,2);
-	
-	Read_Multi(g_tstat_id,&product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],MODBUS_NIGHT_HEATING_SETPOINT,2);
-	}
+// 	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+// 	{
+// 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_DAY_SETPOINT],MODBUS_DAY_SETPOINT,20);
+// 	} 
+// 	else
+// 	{
+// 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_COOLING_DEADBAND],MODBUS_COOLING_DEADBAND,2);
+// 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_NIGHT_HEATING_DEADBAND],MODBUS_NIGHT_HEATING_DEADBAND,2);
+// 	
+// 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_COOLING_SETPOINT],MODBUS_COOLING_SETPOINT,2);
+// 	
+// 	Read_Multi(g_tstat_id,&product_register_value[MODBUS_NIGHT_HEATING_SETPOINT],MODBUS_NIGHT_HEATING_SETPOINT,2);
+// 	}
 }
-
-
-
-
-
-
 void CParameterDlg::OnBnClickedAirflowSetting()
 {
  CAirflowSettingDlg dlg;
  dlg.DoModal();
 }
-
-
 void CParameterDlg::OnCbnSelchangeInputselect3Pid3()
 {
 	if(g_ParamLevel==1)
 		return;
-	int nSel = m_inputSelect3.GetCurSel();	
-	if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==nSel)	//Add this to judge weather this value need to change.
+	 
+	unsigned short TempValue;
+	int sel=m_inputSelect3.GetCurSel();
+// 	if (sel==0)
+// 	{
+		TempValue=sel+2;
+// 	}
+// 	else
+// 	{
+// 		TempValue=sel+4;
+// 	}
+	int RegAddress=-1;
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	{
+		RegAddress=650;
+	}
+	else
+	{
+		RegAddress=MODBUS_SUPPLY_TEMP_SELECT;
+	}
+
+
+	CString strText;
+	m_inputSelect3.GetWindowTextW(strText);
+	if (strText.IsEmpty())
+	{
+		Reflesh_ParameterDlg();
 		return;
-	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_SUPPLY_TEMP_SELECT,nSel,
-		product_register_value[MODBUS_SUPPLY_TEMP_SELECT],this->m_hWnd,IDC_INPUTSELECT3_PID3,_T("INPUT3_SELECT"));
+	}
+
+	if(product_register_value[RegAddress]==TempValue)	//Add this to judge weather this value need to change.
+		return;
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RegAddress,TempValue,
+		product_register_value[RegAddress],this->m_hWnd,IDC_INPUTSELECT3_PID3,_T("INPUT3_SELECT"));
 
 
 	Reflesh_ParameterDlg();
@@ -3756,7 +4564,14 @@ BOOL CParameterDlg::Get_Data_Bit(UINT Data,int n,int N)
 }
 void CParameterDlg::ShowPID3(){
  float m_fFirmwareVersion=get_curtstat_version();
-	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5E||((product_register_value[7]==PM_TSTAT5G)&&(m_fFirmwareVersion>=37.5)))
+	if (product_register_value[7]==PM_TSTAT6||
+		product_register_value[7]==PM_TSTAT7||
+		product_register_value[7]==PM_TSTAT5i||
+		product_register_value[7]==PM_TSTAT5E||
+		(product_register_value[7]==PM_TSTATRUNAR)||
+		((product_register_value[7]==PM_TSTAT5G)
+		&&(m_fFirmwareVersion>=37.5))
+		)
 	{
 		GetDlgItem(IDC_STATIC_PID3_LOOP3)->ShowWindow(TRUE);
 		GetDlgItem(IDC_SPSET4_PID3)->ShowWindow(TRUE);
@@ -3775,7 +4590,8 @@ void CParameterDlg::ShowPID3(){
 
 		GetDlgItem(IDC_AIRFLOW_SETTING)->ShowWindow(TRUE);
 
-
+		GetDlgItem(IDC_STATIC_PID2OFFSETPOINT2)->ShowWindow(TRUE);
+		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT6)->ShowWindow(TRUE);
 		 
 		CString strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);
 
@@ -3795,139 +4611,220 @@ void CParameterDlg::ShowPID3(){
 		temp.Format(_T("%d"),product_register_value[MODBUS_PID3_HEATING_DB]);
 		temp+=strUnit;
 		GetDlgItem(IDC_ECOOLINGITERM3_PID3)->SetWindowText(temp);
-
-		if (product_register_value[MODBUS_SUPPLY_TEMP_SELECT]<0) 
+		int RegAddress=-1;
+		if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
 		{
-			m_inputSelect3.SetCurSel(0);
-		}
-		else if (product_register_value[MODBUS_SUPPLY_TEMP_SELECT]>8)
-		{
-			m_inputSelect3.SetCurSel(0);
+		      RegAddress=650;
 		}
 		else
 		{
-			m_inputSelect3.SetCurSel(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]);	 
+		     RegAddress=MODBUS_SUPPLY_TEMP_SELECT;
 		}
-		if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==0) // input1
-		{	
+// 		if (product_register_value[RegAddress]<3) 
+// 		{
+// 			m_inputSelect3.SetCurSel(0);
+// 		}
+// 		else if (product_register_value[RegAddress]>4)
+// 		{
+			m_inputSelect3.SetCurSel(product_register_value[RegAddress]-2);
+// 		}
+// 		else
+// 		{
+// 			m_inputSelect3.SetCurSel(0);	 
+// 		}
 
-			strTemp=_T("UNUSED");
-			m_inputValue3.SetWindowText(strTemp);
+
+		 
+	    
+		 RegAddress=-1;
+		if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		{
+			RegAddress=650;
+		}
+		else
+		{
+			RegAddress=MODBUS_SUPPLY_TEMP_SELECT;
 		}
 
-		if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==1) // input1
+		if(product_register_value[RegAddress]==5) // input1
 		{	
 
 			strTemp=GetInputValue(1);
 			m_inputValue3.SetWindowText(strTemp);
 		}
-		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==2) // input2 //m_inputvalue1
+		else if(product_register_value[RegAddress]==6) // input2 //m_inputvalue1
 		{
 
 			strTemp=GetInputValue(2);
 			m_inputValue3.SetWindowText(strTemp);
 		}
-		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==3) // input2 //m_inputvalue1
+		else if(product_register_value[RegAddress]==7) // input2 //m_inputvalue1
 		{
 
 			strTemp=GetInputValue(3);
 			m_inputValue3.SetWindowText(strTemp);
 		}
-		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==4) // input2 //m_inputvalue1
+		else if(product_register_value[RegAddress]==8) // input2 //m_inputvalue1
 		{
 
 			strTemp=GetInputValue(4);
 			m_inputValue3.SetWindowText(strTemp);
 		}
-		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==5) // input2 //m_inputvalue1
+		else if(product_register_value[RegAddress]==9) // input2 //m_inputvalue1
 		{
 
 			strTemp=GetInputValue(5);
 			m_inputValue3.SetWindowText(strTemp);
 		}
-		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==6) // input2 //m_inputvalue1
+		else if(product_register_value[RegAddress]==10) // input2 //m_inputvalue1
 		{
 
 			strTemp=GetInputValue(6);
 			m_inputValue3.SetWindowText(strTemp);
 		}
-		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==7) // input2 //m_inputvalue1
+		else if(product_register_value[RegAddress]==11) // input2 //m_inputvalue1
 		{
 
 			strTemp=GetInputValue(7);
 			m_inputValue3.SetWindowText(strTemp);
 		}
-		else if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==8) // input2 //m_inputvalue1
+		else if(product_register_value[RegAddress]==12) // input2 //m_inputvalue1
 		{
 
 			strTemp=GetInputValue(8);
 			m_inputValue3.SetWindowText(strTemp);
 		}
-		
-		if (product_register_value[7]==PM_TSTAT5G)
+		else if (product_register_value[RegAddress]==13)//Humidity
+		{		CString temp;
+		strUnit=_T("%");
+		if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
 		{
-			if(product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==1)
+
+			temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
+
+		}
+		else
+		{
+			temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
+		}
+
+
+		m_inputValue3.SetWindowText(temp+strUnit); 
+
+		}
+		else if (product_register_value[RegAddress]==14)//Co2
+		{ CString temp;
+		strUnit=_T("ppm");
+		if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
+		{
+
+			temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
+			temp=temp+strUnit;
+
+		}
+		else
+		{
+
+			temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
+			temp=temp+strUnit;
+		}
+
+		m_inputValue3.SetWindowText(temp);
+
+
+		}
+		else
+		{
+			//m_inputvalue1.SetWindowText(_T("UNUSED"));
+			strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);	//121
+			m_inputValue3.SetWindowText(strTemp+strUnit);
+		}
+
+
+		if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		{
+
+			temp.Format(_T("%.1f"),((float)(short)product_register_value[705])/10);
+			//temp+=strUnit;
+			GetDlgItem(IDC_SETVALUE3_PID3)->SetWindowText(temp);
+			temp.Format(_T("%d%%"),product_register_value[664]);
+			//temp+=strUnit;
+			GetDlgItem(IDC_OUTPUT3_PID3)->SetWindowText(temp);
+			temp.Format(_T("%0.1f"),((float)(short)product_register_value[660])/10);
+			GetDlgItem(IDC_ECOOLINGPTERM3_PID3)->SetWindowText(temp);
+			temp.Format(_T("%0.1f"),((float)(short)product_register_value[661])/10);
+			GetDlgItem(IDC_EDIT52_PID3)->SetWindowText(temp);
+
+			temp.Format(_T("%0.1f"),((float)(short)product_register_value[706])/10);
+
+			GetDlgItem(IDC_EDIT_PID2OFFSETPOINT6)->SetWindowText(temp);
+		}
+		else
+		{
+			if (product_register_value[7]==PM_TSTAT5G)
 			{
-				strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
-				if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)//188
-				{	
-					strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_0]/10);//180
-					strTemp=strTemp+strUnit;
-				}
-				if (product_register_value[MODBUS_ANALOG_IN1]==0||product_register_value[MODBUS_ANALOG_IN1]==2)//188
+				if(product_register_value[RegAddress]==1)
 				{
-					//strUnit=GetTempUnit(180);
-					strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_0]);//180
-				}
-				if(product_register_value[MODBUS_ANALOG_IN1]==3)//188
-				{
-					if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//180
-						strTemp=_T("ON");
-					if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//180
-						strTemp=_T("OFF");
-				}
+					strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);//188
+					if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)//188
+					{	
+						strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_0]/10);//180
+						strTemp=strTemp+strUnit;
+					}
+					if (product_register_value[MODBUS_ANALOG_IN1]==0||product_register_value[MODBUS_ANALOG_IN1]==2)//188
+					{
+						//strUnit=GetTempUnit(180);
+						strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_0]);//180
+					}
+					if(product_register_value[MODBUS_ANALOG_IN1]==3)//188
+					{
+						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)//180
+							strTemp=_T("ON");
+						if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)//180
+							strTemp=_T("OFF");
+					}
 
 
-				if (product_register_value[MODBUS_ANALOG_IN1] == 0)//188
+					if (product_register_value[MODBUS_ANALOG_IN1] == 0)//188
+					{
+						strTemp = _T("UNUSED");
+					}
+				}
+				else if (product_register_value[RegAddress]==2)
+				{
+					strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN2],2);
+					strTemp.Empty();
+					if(product_register_value[MODBUS_ANALOG_IN2]==4||product_register_value[MODBUS_ANALOG_IN2]==1)//189
+					{
+
+						strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_1]/10);	//181 
+						strTemp=strTemp+strUnit;
+					}
+					if (product_register_value[MODBUS_ANALOG_IN2]==0||product_register_value[MODBUS_ANALOG_IN2]==2)//189
+					{
+						strUnit=GetTempUnit(181);
+						strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_1]);//181
+						strTemp=strTemp+strUnit;
+					}
+					if(product_register_value[MODBUS_ANALOG_IN2]==3)//189
+					{
+						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
+							strTemp=_T("ON");
+						if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
+							strTemp=_T("OFF");
+					}	
+
+
+					if (product_register_value[MODBUS_ANALOG_IN2] == 0)//189
+					{
+						strTemp = _T("UNUSED");
+					}
+
+				}
+				else
 				{
 					strTemp = _T("UNUSED");
 				}
-			}
-			else if (product_register_value[MODBUS_SUPPLY_TEMP_SELECT]==2)
-			{
-				strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN2],2);
-				strTemp.Empty();
-				if(product_register_value[MODBUS_ANALOG_IN2]==4||product_register_value[MODBUS_ANALOG_IN2]==1)//189
-				{
-
-					strTemp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_1]/10);	//181 
-					strTemp=strTemp+strUnit;
-				}
-				if (product_register_value[MODBUS_ANALOG_IN2]==0||product_register_value[MODBUS_ANALOG_IN2]==2)//189
-				{
-					strUnit=GetTempUnit(181);
-					strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_1]);//181
-					strTemp=strTemp+strUnit;
-				}
-				if(product_register_value[MODBUS_ANALOG_IN2]==3)//189
-				{
-					if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)//181
-						strTemp=_T("ON");
-					if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)//181
-						strTemp=_T("OFF");
-				}	
-
-
-				if (product_register_value[MODBUS_ANALOG_IN2] == 0)//189
-				{
-					strTemp = _T("UNUSED");
-				}
-
-			}
-			else
-			{
-				strTemp = _T("UNUSED");
-			}
 
 
 			m_inputValue3.SetWindowText(strTemp);
@@ -3944,23 +4841,28 @@ void CParameterDlg::ShowPID3(){
 		temp.Format(_T("%0.1f"),(float)product_register_value[MODBUS_PID3_ITERM]/10);
 		GetDlgItem(IDC_EDIT52_PID3)->SetWindowText(temp);
 
-		BOOL is_have_AVASensor=product_register_value[MODBUS_VAV_CONTROL]&2;
-		if (!is_have_AVASensor)
-		{
-			GetDlgItem(IDC_STATIC_PID3_LOOP3)->EnableWindow(FALSE);
-			GetDlgItem(IDC_SPSET4_PID3)->EnableWindow(FALSE);
-			//GetDlgItem(IDC_ESETPOINTHI2_PID3)->ShowWindow(FALSE);
-			//GetDlgItem(IDC_ESETPOINTLO2_PID3)->ShowWindow(FALSE);
-			GetDlgItem(IDC_ECOOLDEADBAND3_PID3)->EnableWindow(FALSE);
-			GetDlgItem(IDC_ECOOLINGITERM3_PID3)->EnableWindow(FALSE);
-			GetDlgItem(IDC_STATIC_LOOP3)->EnableWindow(FALSE);
-			GetDlgItem(IDC_INPUTSELECT3_PID3)->EnableWindow(FALSE);
-			GetDlgItem(IDC_INPUTVALUE3_PID3)->EnableWindow(FALSE);
-			GetDlgItem(IDC_SETVALUE3_PID3)->EnableWindow(FALSE);
-			GetDlgItem(IDC_OUTPUT3_PID3)->EnableWindow(FALSE);
-			GetDlgItem(IDC_ECOOLINGPTERM3_PID3)->EnableWindow(FALSE);
-			GetDlgItem(IDC_EDIT52_PID3)->EnableWindow(FALSE);
+			BOOL is_have_AVASensor=product_register_value[MODBUS_VAV_CONTROL]&2;
+			if (!is_have_AVASensor)
+			{
+				GetDlgItem(IDC_STATIC_PID3_LOOP3)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SPSET4_PID3)->EnableWindow(FALSE);
+				//GetDlgItem(IDC_ESETPOINTHI2_PID3)->ShowWindow(FALSE);
+				//GetDlgItem(IDC_ESETPOINTLO2_PID3)->ShowWindow(FALSE);
+				GetDlgItem(IDC_ECOOLDEADBAND3_PID3)->EnableWindow(FALSE);
+				GetDlgItem(IDC_ECOOLINGITERM3_PID3)->EnableWindow(FALSE);
+				GetDlgItem(IDC_STATIC_LOOP3)->EnableWindow(FALSE);
+				GetDlgItem(IDC_INPUTSELECT3_PID3)->EnableWindow(FALSE);
+				GetDlgItem(IDC_INPUTVALUE3_PID3)->EnableWindow(FALSE);
+				GetDlgItem(IDC_SETVALUE3_PID3)->EnableWindow(FALSE);
+				GetDlgItem(IDC_OUTPUT3_PID3)->EnableWindow(FALSE);
+				GetDlgItem(IDC_ECOOLINGPTERM3_PID3)->EnableWindow(FALSE);
+				GetDlgItem(IDC_EDIT52_PID3)->EnableWindow(FALSE);
+			}
 		}
+
+
+
+
 
 	}
 	else
@@ -3981,100 +4883,170 @@ void CParameterDlg::ShowPID3(){
 
 		GetDlgItem(IDC_AIRFLOW_SETTING)->ShowWindow(FALSE);
 
+
+		GetDlgItem(IDC_STATIC_PID2OFFSETPOINT2)->ShowWindow(FALSE);
+		GetDlgItem(IDC_EDIT_PID2OFFSETPOINT6)->ShowWindow(FALSE);
+
 	}
 }
 
 void CParameterDlg::OnEnKillfocusSetvalue3Pid3()
 {
-	CString temp;
+
+CString temp;
+GetDlgItem(IDC_SETVALUE3_PID3)->GetWindowText(temp);
+float Val=_wtof(temp)*10;
+
+int RegValue=(int)Val;
+int RegAddress;
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	{
+
+	
+	   RegAddress=705;
+	  
+
+	}
+	else{
+		RegAddress=MODBUS_SUPPLY_SETPOINT;
+
+	}
+	
 	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
-	GetDlgItem(IDC_SETVALUE3_PID3)->GetWindowText(temp);
-	int Val=_wtoi(temp);
-	if (Val==product_register_value[MODBUS_SUPPLY_SETPOINT])
+	
+	 
+	if (RegValue==product_register_value[RegAddress])
 	{
 		return;
 	}
-	int ret=write_one(g_tstat_id,MODBUS_SUPPLY_SETPOINT,Val);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_SUPPLY_SETPOINT]=Val;
-		ShowPID3();
-	} 
-	else
-	{
-		AfxMessageBox(_T("Fail"));
-	}
+
+
+
+
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RegAddress,RegValue,
+		product_register_value[RegAddress],this->m_hWnd,IDC_SETVALUE3_PID3,_T("SetPoint PID3"));
+
+ 
 }
 
-
+//PID3 Output
 void CParameterDlg::OnEnKillfocusOutput3Pid3()
 {
 	CString temp;
 	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
 	GetDlgItem(IDC_OUTPUT3_PID3)->GetWindowText(temp);
 	int Val=_wtoi(temp);
-	if (Val==product_register_value[MODBUS_PID3_OUTPUT])
+	int RegValue=(int)Val;
+	int RegAddress;
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	{
+		RegAddress=664;
+	}
+	else{
+		RegAddress=MODBUS_PID3_OUTPUT;
+	}
+	if (RegValue==product_register_value[RegAddress])
 	{
 		return;
 	}
-	int ret=write_one(g_tstat_id,MODBUS_PID3_OUTPUT,Val);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_PID3_OUTPUT]=Val;
-		ShowPID3();
-	} 
-	else
-	{
-		AfxMessageBox(_T("Fail"));
-	}
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RegAddress,RegValue,
+		product_register_value[RegAddress],this->m_hWnd,IDC_OUTPUT3_PID3,_T("Output PID3"));
+
 }
 
-
+//PID3 Ptem
 void CParameterDlg::OnEnKillfocusEcoolingpterm3Pid3()
 {
 	CString temp;
 	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
 	GetDlgItem(IDC_ECOOLINGPTERM3_PID3)->GetWindowText(temp);
-	int Val=_wtoi(temp);
-	if (Val==product_register_value[MODBUS_PID3_PTERM])
+	//int Val=_wtoi(temp);
+	float Val=_wtof(temp)*10;
+	//if (Val==product_register_value[MODBUS_PID3_PTERM])
+	//{
+	//	return;
+	//}
+	//int ret=write_one(g_tstat_id,MODBUS_PID3_PTERM,Val);
+	//if (ret>0)
+	//{
+	//	product_register_value[MODBUS_PID3_PTERM]=Val;
+	//	ShowPID3();
+	//} 
+	//else
+	//{
+	//	AfxMessageBox(_T("Fail"));
+	//}
+
+	int RegValue=(int)Val;
+	int RegAddress;
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	{
+		RegAddress=660;
+	}
+	else{
+		RegAddress=MODBUS_PID3_PTERM;
+	}
+	if (RegValue==product_register_value[RegAddress])
 	{
 		return;
 	}
-	int ret=write_one(g_tstat_id,MODBUS_PID3_PTERM,Val);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_PID3_PTERM]=Val;
-		ShowPID3();
-	} 
-	else
-	{
-		AfxMessageBox(_T("Fail"));
-	}
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RegAddress,RegValue,
+		product_register_value[RegAddress],this->m_hWnd,IDC_ECOOLINGPTERM3_PID3,_T("Ptem PID3"));
+
 }
 
-
+//PID3 Item
 void CParameterDlg::OnEnKillfocusEdit52Pid3()
 {
 	CString temp;
 	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
 	GetDlgItem(IDC_EDIT52_PID3)->GetWindowText(temp);
-	int Val=_wtoi(temp);
-	if (Val==product_register_value[MODBUS_PID3_ITERM])
+	//int Val=_wtoi(temp);
+    float Val=_wtof(temp)*10;
+	int RegValue=(int)Val;
+	int RegAddress;
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	{
+		RegAddress=661;
+	}
+	else{
+		RegAddress=MODBUS_PID3_ITERM;
+	}
+	if (RegValue==product_register_value[RegAddress])
 	{
 		return;
 	}
-	int ret=write_one(g_tstat_id,MODBUS_PID3_ITERM,Val);
-	if (ret>0)
-	{
-		product_register_value[MODBUS_PID3_ITERM]=Val;
-		ShowPID3();
-	} 
-	else
-	{
-		AfxMessageBox(_T("Fail"));
-	}
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RegAddress,RegValue,
+		product_register_value[RegAddress],this->m_hWnd,IDC_EDIT52_PID3,_T("Item PID3"));
+
 }
 
+
+///PID3   off setpoint 
+void CParameterDlg::OnEnKillfocusEditPid2offsetpoint6()
+{
+	CString temp;
+	//temp.Format(_T("%d"),product_register_value[MODBUS_SUPPLY_SETPOINT]);
+	GetDlgItem(IDC_EDIT_PID2OFFSETPOINT6)->GetWindowText(temp);
+//	int Val=_wtoi(temp);
+	float Val=_wtof(temp)*10;
+	int RegValue=(int)Val;
+	int RegAddress;
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	{
+		RegAddress=706;	
+	if (RegValue==product_register_value[RegAddress])
+	{
+		return;
+	}
+		Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RegAddress,RegValue,
+			product_register_value[RegAddress],this->m_hWnd,IDC_EDIT_PID2OFFSETPOINT6,_T("Off Setpoint PID3"));
+	}
+	 
+	
+
+}
 //SetPoint 
 void CParameterDlg::OnEnKillfocusSpset4Pid3()
 {
@@ -4330,4 +5302,249 @@ void CParameterDlg::OnEnKillfocusEditSensitivty()
 	 AfxMessageBox(_T("please input a value between 20 and 100!"));
 	 }
 	Reflesh_ParameterDlg();
+}
+
+
+void CParameterDlg::OnCbnSelchangeComboSetpointdisplay()
+{
+	 int sel=m_combox_setpointdisplay.GetCurSel();
+	 int ret=write_one(g_tstat_id,704,sel);
+	 if (ret>0)
+	 {
+	  product_register_value[704]=sel;
+	 }
+	 m_combox_setpointdisplay.SetCurSel(product_register_value[704]);
+}
+
+
+void CParameterDlg::OnCbnSelchangeComboZigbeetype()
+{
+	int sel=m_combox_zigbee.GetCurSel();
+	if (sel==product_register_value[22])
+	{
+		return;
+	}
+	int ret=write_one(g_tstat_id,22,sel);
+	if (ret>0)
+	{
+		product_register_value[22]=sel;
+	}
+}
+
+
+void CParameterDlg::OnCbnSelchangeComboChannel()
+{
+	int sel=m_combox_channel.GetCurSel();
+	int channelno=sel+11;
+	int channelvalue=0;
+	if (channelno==11)
+	{
+		channelvalue=0x07FFF8000;
+	}
+	else if (channelno==12)
+	{
+		channelvalue=0x00001000;
+	}
+	else if (channelno==13)
+	{
+		channelvalue=0x00002000;
+	}
+	else if (channelno==14)
+	{
+		channelvalue=0x00004000;
+	}
+	else if (channelno==15)
+	{
+		channelvalue=0x00008000;
+	}
+	else if (channelno==16)
+	{
+		channelvalue=0x00010000;
+	}
+	else if (channelno==17)
+	{
+		channelvalue=0x00020000;
+	}
+	else if (channelno==18)
+	{
+		channelvalue=0x00040000;
+	}
+	else if (channelno==19)
+	{
+		channelvalue=0x00080000;
+	}
+	else if (channelno==20)
+	{
+		channelvalue=0x00100000;
+	}
+	else if (channelno==21)
+	{
+		channelvalue=0x00200000;
+	}
+	else if (channelno==22)
+	{
+		channelvalue=0x00400000;
+	}
+	else if (channelno==23)
+	{
+		channelvalue=0x00800000;
+	}
+	else if (channelno==24)
+	{
+		channelvalue=0x01000000;
+	}
+	else if (channelno==25)
+	{
+		channelvalue=0x02000000;
+	}
+	else if (channelno==26)
+	{
+		channelvalue=0x04000000;
+	}
+	else
+	{
+
+		channelvalue=0;
+	}
+	int high=0;
+	int low=0;
+	if (channelvalue>0)
+	{
+		high=channelvalue/65535;
+		low=channelvalue%65535;
+	}
+	if ((product_register_value[23]!=high)||(product_register_value[24]!=low))
+	{
+		write_one(g_tstat_id,23,high);
+		write_one(g_tstat_id,24,low);
+	}
+
+}
+
+
+void CParameterDlg::OnBnClickedButtonZigbeeReboot()
+{
+	int ret= write_one(g_tstat_id,34,1);
+	if (ret<0)
+	{
+		AfxMessageBox(_T("Reboot it ,again"));
+	}
+}
+
+extern bool b_pause_refresh_tree ;
+void CParameterDlg::OnBnClickedBtnTopological()
+{
+	int temp_pause = g_bPauseRefreshTree;	//resume all the status.
+	int temp_g_id =  g_tstat_id;
+	int temp_value = b_pause_refresh_tree;
+	bool temp_pasueread = g_bPauseMultiRead;
+	b_pause_refresh_tree = true;
+	g_bPauseRefreshTree = true;
+	g_bPauseMultiRead = true;
+	CTstatZigbeeLogic dlg;
+	dlg.DoModal();
+	g_bPauseRefreshTree = temp_pause;
+	g_tstat_id = temp_g_id ;
+	b_pause_refresh_tree = temp_value;
+	g_bPauseMultiRead = temp_pasueread;
+}
+
+
+
+
+
+void CParameterDlg::OnBnClickedUnlock()
+{
+     if (product_register_value[7]==6)
+     {
+	  write_one(g_tstat_id,639,0);
+     }
+	
+}
+
+
+void CParameterDlg::OnBnClickedLock()
+{
+	if (product_register_value[7]==6)
+	{
+		write_one(g_tstat_id,639,1);
+	}
+}
+#include "DisplayConfig.h"
+#include "LedsDialog.h"
+
+void CParameterDlg::OnBnClickedTrendlogview()
+{
+	if ((product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT7))
+	{
+		CDisplayConfig display_cfg;
+		display_cfg.DoModal();
+	} 
+	else
+	{
+		CLedsDialog dialog;
+		dialog.DoModal();
+	}
+}
+
+
+void CParameterDlg::OnCbnSelchangeCombo1()
+{
+	CString str;
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	GetDlgItem(IDC_COMBO1)->GetWindowText(str);
+
+	/*if (str.CompareNoCase(_T("Single")) == 0)
+		MDAY = 0;
+	else
+		MDAY = 1;*/
+	MDAY=m_day_combox.GetCurSel();
+	FlexSP = 1;
+	::PostMessage(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
+}
+
+
+void CParameterDlg::OnCbnSelchangeCombo4()
+{
+	CString str;
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	//GetDlgItem(IDC_COMBO4)->GetWindowText(str);
+	
+	/*if (str.CompareNoCase(_T("Single")) == 0)
+		MNIGHT = 0;
+	else
+		MNIGHT = 1;*/
+	 MNIGHT=m_night_combox.GetCurSel();
+	 FlexSPN = 1;
+	::PostMessage(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
+}
+
+
+void CParameterDlg::OnEnKillfocusEditTranducerMax()
+{
+	CString deadmaster;
+	GetDlgItem(IDC_EDIT_TRANDUCER_MAX)->GetWindowText(deadmaster);
+	int deadmastervalue=_wtoi(deadmaster.GetBuffer());
+	if (product_register_value[727]==deadmastervalue)
+	{
+		return;
+	}
+	 
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,727,deadmastervalue,
+		product_register_value[727],this->m_hWnd,IDC_EDIT_TRANDUCER_MAX,_T("Tranducer Max"));
+}
+
+
+void CParameterDlg::OnEnKillfocusEditTranducerMin()
+{
+	CString deadmaster;
+	GetDlgItem(IDC_EDIT_TRANDUCER_MIN)->GetWindowText(deadmaster);
+	int deadmastervalue=_wtoi(deadmaster.GetBuffer());
+	if (product_register_value[726]==deadmastervalue)
+	{
+		return;
+	}
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,726,deadmastervalue,
+		product_register_value[726],this->m_hWnd,IDC_EDIT_TRANDUCER_MIN,_T("Tranducer Min"));
 }

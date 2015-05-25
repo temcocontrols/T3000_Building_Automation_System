@@ -48,6 +48,9 @@ BEGIN_MESSAGE_MAP(BacnetWeeklyRoutine, CDialogEx)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_BAC_WEEKLY, &BacnetWeeklyRoutine::OnNMClickListBacWeekly)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
+
+	ON_WM_HELPINFO()
+
 END_MESSAGE_MAP()
 
 
@@ -255,6 +258,11 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 			return 0;
 		}
 		cs_temp.MakeUpper();
+		if(Check_Label_Exsit(cs_temp))
+		{
+			PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0;
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -453,7 +461,7 @@ void BacnetWeeklyRoutine::OnCancel()
 void BacnetWeeklyRoutine::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if(this->IsWindowVisible())
+	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
 	Post_Refresh_Message(g_bac_instance,READWEEKLYROUTINE_T3000,0,BAC_WEEKLY_ROUTINES_COUNT - 1,sizeof(Str_weekly_routine_point), BAC_WEEKLY_GROUP);
@@ -476,4 +484,23 @@ void BacnetWeeklyRoutine::OnBnClickedButtonWeeklyScheduleEdit()
 
 	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLYCODE);
 
+}
+BOOL BacnetWeeklyRoutine::OnHelpInfo(HELPINFO* pHelpInfo)
+{ 
+
+	if (g_protocol==PROTOCOL_BACNET_IP){
+		HWND hWnd;
+
+		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 
+			theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+		else
+			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 
+			HH_HELP_CONTEXT, IDH_TOPIC_WEEKLY_SCHEDULES);
+		return (hWnd != NULL);
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
+
+	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

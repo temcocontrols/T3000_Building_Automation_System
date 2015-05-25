@@ -159,17 +159,9 @@ void CFSBThumb::DrawRectThumb(CDC* pDC)
 {
 	CBrush brush(m_clr);
 	CBrush* pOldBrush = pDC->SelectObject(&brush);
-
-	// create and select a thick, black pen
-	//CPen penBlack;
-	//penBlack.CreatePen(PS_SOLID, 1, RGB(200, 200, 200));
-	//CPen* pOldPen = pDC->SelectObject(&penBlack);
-
 	pDC->Rectangle(m_rc);
 	//pDC->Draw3dRect(m_rc, RGB(255, 0, 0), RGB(0, 255, 0));
 	pDC->Draw3dRect(m_rc, GetSysColor(COLOR_3DHIGHLIGHT), GetSysColor(COLOR_3DSHADOW));
-
-
 	pDC->SelectObject(pOldBrush);
 }
 

@@ -52,6 +52,7 @@ CImageTreeCtrl::CImageTreeCtrl()
 	//m_Commandmap[ID_SORT_LEVEL]         = &CImageTreeCtrl::DoSortCurrentLevel;
 	//m_Commandmap[ID_SORT_LEVELANDBELOW] = &CImageTreeCtrl::DoSortCurrentLevelAndBelow;
 	old_hItem = NULL;
+	m_serial_number = 0;
 }
 
 CImageTreeCtrl::~CImageTreeCtrl()
@@ -83,8 +84,14 @@ m_hSelItem=hItem;
 	return hItem ? (EditLabel(hItem) != 0) : false;
 }
 BOOL CImageTreeCtrl::UpdateDataToDB(){
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
+	CADO ado;
+	ado.OnInitADOConn();
+
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
+
 	::CoInitialize(NULL);
 	try 
 	{
@@ -92,9 +99,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 		//获取数据库名称及路径
 		/////////////////////////////////////////////////////////////////////////////////////////////////
 		//连接数据库
-		m_pCon.CreateInstance("ADODB.Connection");
-		m_pRs.CreateInstance(_T("ADODB.Recordset"));
-		m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	    
 		CString strSql;   BOOL is_exist=FALSE;	  CString str_temp;
 		switch (m_level)
 		{
@@ -104,37 +109,50 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 
 				//strSql.Format(_T("select * from Building where Main_BuildingName = '%s'"),m_strMainBuildingName);
 				strSql.Format(_T("select * from Building order by Main_BuildingName"));
-				m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-
-				while(VARIANT_FALSE==m_pRs->EndOfFile)
-				{	   	 str_temp.Empty();
-				str_temp=m_pRs->GetCollect("Building_Name");
+				//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+				ado.m_pRecordset=ado.OpenRecordset(strSql);
+				while(VARIANT_FALSE==ado.m_pRecordset->EndOfFile)
+				{	   	
+				str_temp.Empty();
+				str_temp=ado.m_pRecordset->GetCollect("Building_Name");
 				if (str_temp.Compare(m_name_new)==0)
-				{	   is_exist=TRUE;
-				break;
+				{	   
+					is_exist=TRUE;
+					break;
 				}			
-				m_pRs->MoveNext();
+				ado.m_pRecordset->MoveNext();
 				}
-				m_pRs->Close();
+				//ado.m_pRecordset->Close();
+				ado.CloseRecordset();
 				if (!is_exist)	 //更新的名字在数据库中查找不到的
 				{
 					////////////先更新Building表/////////////////////
 					//CString strSql;
-					strSql.Format(_T("update Building set Building_Name='%s' where Building_Name='%s'"),m_name_new,m_name_old);
+
+// 					strSql.Format(_T("delete * from Building_ALL where Building_Name = '%s' "),m_name_old);
+// 					ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText
+					 strSql.Format(_T("update Building_ALL set Building_Name='%s' where Building_Name='%s' "),m_name_new,m_name_old);
+
+					ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+
+					strSql.Format(_T("update Building set Building_Name='%s',Main_BuildingName='%s' where Building_Name='%s'"),m_name_new,m_name_new,m_name_old);
 					//MessageBox(strSql);
-					m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+					ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+
 
 					strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' order by Building_Name"),m_name_old);
-					m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-					while(VARIANT_FALSE==m_pRs->EndOfFile)
+				 
+				   bado.m_pRecordset=bado.OpenRecordset(strSql);
+					while(VARIANT_FALSE== bado.m_pRecordset->EndOfFile)
 					{
-						strSql.Format(_T("update ALL_NODE set Building_Name='%s' where Building_Name='%s'"),m_name_new,m_name_old);
-						m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-						m_pRs->MoveNext();
+						strSql.Format(_T("update ALL_NODE set Building_Name='%s',MainBuilding_Name='%s' where Building_Name='%s'"),m_name_new,m_name_new,m_name_old);
+						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+						bado.m_pRecordset->MoveNext();
 					}
 
-					m_pRs->Close();
-					 
+					//m_pRs->Close();
+					bado.CloseRecordset();
+				
 				}
 				else
 				{
@@ -148,49 +166,52 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 			{	 
 			CString subnetname;
 			     strSql=_T("select * from Building where Default_SubBuilding=-1");
-				 m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-				 while(VARIANT_FALSE==m_pRs->EndOfFile)
+				// m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+				 ado.m_pRecordset=ado.OpenRecordset(strSql);
+				 while(VARIANT_FALSE== ado.m_pRecordset->EndOfFile)
 				 {	   	
 				  subnetname.Empty();
-				 subnetname=m_pRs->GetCollect("Building_Name");	
-				 m_pRs->MoveNext();
+				 subnetname= ado.m_pRecordset->GetCollect("Building_Name");	
+				  ado.m_pRecordset->MoveNext();
 				 }
-				 m_pRs->Close();
-
+				// m_pRs->Close();
+				ado.CloseRecordset();
 // 				HTREEITEM parentnode=GetParentItem(m_hSelItem);
 // 
 // 				CString subnetname=GetItemText(parentnode);//m_pRs->GetCollect("Building_Name");
 
 				//  m_pRs->Close();
 				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' order by Building_Name"),subnetname,m_name_new);
-				m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-
-				while(VARIANT_FALSE==m_pRs->EndOfFile)
+				//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+				 bado.m_pRecordset=bado.OpenRecordset(strSql);
+				while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 				{	   	 str_temp.Empty();
-				str_temp=m_pRs->GetCollect("Floor_name");
+				str_temp=bado.m_pRecordset->GetCollect("Floor_name");
 				if (str_temp.Compare(m_name_new)==0)
 				{is_exist=TRUE;
 				break;
 				}			
-				m_pRs->MoveNext();
+				bado.m_pRecordset->MoveNext();
 				}
-				m_pRs->Close();
-
+				//m_pRs->Close();
+				bado.CloseRecordset();
 				/*if (is_exist)
 				{
 					return FALSE;
 				} 
 				else*/
-				{  	strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' order by Building_Name"),subnetname,m_name_old);
-				m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-				while(VARIANT_FALSE==m_pRs->EndOfFile)
+				{  
+				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' order by Building_Name"),subnetname,m_name_old);
+				//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+				bado.m_pRecordset=bado.OpenRecordset(strSql);
+				while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 				{
 					strSql.Format(_T("update ALL_NODE set Floor_name='%s' where Floor_name='%s'"),m_name_new,m_name_old);
-					m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-					m_pRs->MoveNext();
+					bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+					bado.m_pRecordset->MoveNext();
 				}
-				m_pRs->Close();
-				 
+				//m_pRs->Close();
+				bado.CloseRecordset(); 
 				}
 
 				 
@@ -226,16 +247,16 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 				else*/
 				{
 				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' order by Building_Name"),subnetname,Floorname,m_name_old);
-				m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-
-				while(VARIANT_FALSE==m_pRs->EndOfFile)
+				//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+				bado.m_pRecordset=bado.OpenRecordset(strSql);
+				while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 				{
 					strSql.Format(_T("update ALL_NODE set Room_name='%s' where Room_name='%s'"),m_name_new,m_name_old);
-					m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-					m_pRs->MoveNext();
+					bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+					bado.m_pRecordset->MoveNext();
 				}
-				m_pRs->Close();
-
+				//m_pRs->Close();
+				bado.CloseRecordset();
 				 
 				}
 
@@ -276,15 +297,40 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 				{
 					
 					strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' and Product_name='%s' order by Building_Name"),subnetname,Floorname,Roomname,m_name_old);
-					m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-					while(VARIANT_FALSE==m_pRs->EndOfFile)
+					//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+					bado.m_pRecordset=bado.OpenRecordset(strSql);
+					while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 					{
-						strSql.Format(_T("update ALL_NODE set Product_name='%s' where Product_name='%s'"),m_name_new,m_name_old);
-						m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-						m_pRs->MoveNext();
+						CString temp_serial;
+						CString temp_product_type;
+						int int_product_type;
+						temp_serial = bado.m_pRecordset->GetCollect("Serial_ID");
+						//if(temp_variant.vt!=VT_NULL)
+						//	temp_serial=temp_variant;
+						//else
+						//	temp_serial=_T("");
+
+						temp_product_type = bado.m_pRecordset->GetCollect("Product_class_ID");
+						//if(temp_variant.vt!=VT_NULL)
+						//	temp_product_type=temp_variant;
+						//else
+						//	temp_product_type=_T("");
+
+						int_product_type = _wtoi(temp_product_type);
+						if((int_product_type == PM_MINIPANEL) || (int_product_type == PM_CM5))
+						{
+							WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
+							WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
+						}
+
+
+
+						strSql.Format(_T("update ALL_NODE set Product_name='%s' where Product_name='%s' and Serial_ID='%s'"),m_name_new,m_name_old,temp_serial);
+						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+						bado.m_pRecordset->MoveNext();
 					}
-					m_pRs->Close();
-					 
+					//m_pRs->Close();
+					 bado.CloseRecordset();
 				}
 
 				break;
@@ -295,12 +341,12 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 	{
 		/* AfxMessageBox(e.Description());*/
 		//MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
-
+		bado.CloseConn();
 		return FALSE;
-		m_pCon->Close();
+		//m_pCon->Close();
 	}
-	m_pCon->Close();  
-
+	//m_pCon->Close();  
+	bado.CloseConn();
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
 
@@ -369,6 +415,14 @@ void CImageTreeCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 1;
 
 	if(item.pszText && CanSetLabelText(item)) {
+	    if (m_name_new.IsEmpty())
+	    {
+		item.pszText=m_name_old.GetBuffer();
+		SetItem(&item);
+		*pResult = 0;
+		 return;
+	    }
+	    
 		if (UpdateDataToDB())
 		{
 		// item.pszText=m_name_new.GetBuffer();
@@ -683,6 +737,13 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
 			brother_nImage--;
 			brother_nSelectedImage--;
 		}
+		break;
+	case 22:
+	   if (state == false)
+	   {
+		   brother_nImage++;
+		   brother_nSelectedImage++;
+	   }
 	break;
 
 	}
@@ -816,6 +877,17 @@ void CImageTreeCtrl::SetItemBold(HTREEITEM hItem, BOOL bBold)
 	SetItemState( hItem, bBold ? TVIS_BOLD: 0, TVIS_BOLD );
 }
 
+void CImageTreeCtrl::SetSelectSerialNumber(unsigned int nserial)
+{
+	m_serial_number = nserial;
+}
+
+unsigned int CImageTreeCtrl::GetSelectSerialNumber()
+{
+	return m_serial_number;
+}
+
+
 void CImageTreeCtrl::SetSelectItem(HTREEITEM hItem)
 {
 	if(old_hItem != hItem)
@@ -891,6 +963,8 @@ COLORREF CImageTreeCtrl::GetItemColor(HTREEITEM hItem)
 //添加WM_PAINT 信息监控，重载OnPaint()函数来实现绘制
 
 void CImageTreeCtrl::OnPaint()
+{
+try
 {
 	//获取当前绘制对象的DC
 	CPaintDC dc(this);
@@ -996,10 +1070,22 @@ void CImageTreeCtrl::OnPaint()
 		}
 		hItem = GetNextVisibleItem( hItem );
 	}
+	
 
-
+	//TRACE(_T("Fresh...ImageTreeCtrl\r\n"));
 	dc.BitBlt( rcClip.left, rcClip.top, rcClip.Width(), rcClip.Height(), &memDC,
 		rcClip.left, rcClip.top, SRCCOPY );
+		memDC.DeleteDC();
+		bitmap.DeleteObject();
+}
+
+catch (CException* e)
+{
+ TRACE(_T("Exception...ImageTreeCtrl\r\n"));
+return;
+}
+
+	
 
 }
 

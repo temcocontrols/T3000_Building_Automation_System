@@ -152,14 +152,14 @@
 	{
 		CGridFlashDlg* pDlg=(CGridFlashDlg*)pParameter;
 		int iitemp;
-		_ConnectionPtr pCon=NULL;
-		_RecordsetPtr pRs=NULL;
-
-		pCon.CreateInstance(_T("ADODB.Connection"));
-		pRs.CreateInstance(_T("ADODB.Recordset"));
+		 
+		CBADO bado;
+		bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+		bado.OnInitADOConn(); 
+	 
 		UINT nSerial=0;
 		UINT nSerialNumber=0;
-		pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+		 
 		for(iitemp=0;iitemp<(int)pDlg->m_grid_flash.size();iitemp++)
 		{
 			int nTempID;
@@ -193,8 +193,9 @@
 			int nEpSize=0;
             _variant_t temp_variant;
 			str_temp.Format(_T("select * from ALL_NODE where Serial_ID = '%d'"),pDlg->m_grid_flash.at(iitemp).serialnumber);
-			pRs->Open(str_temp.GetString(),_variant_t((IDispatch *)pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-			if(pRs!=NULL)
+			bado.m_pRecordset=bado.OpenRecordset(str_temp);
+			//pRs->Open(str_temp.GetString(),_variant_t((IDispatch *)pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+			if(bado.m_pRecordset!=NULL)
 			{
 			//temp_variant=pRs->GetCollect(_T("EPsize"));//MODBUS_EEPROM_SIZE,
 			//if(temp_variant.vt!=VT_NULL)
@@ -210,15 +211,13 @@
 			{
 				pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,7,_T("256 Bytes"));
 			}
-			if(pRs->State) 
-				pRs->Close(); 
+// 			if(pRs->State) 
+// 				pRs->Close(); 
+			bado.CloseRecordset();
 		}
-
-		if(pRs->State) 
-			pRs->Close(); 
-		if(pCon->State)
-			pCon->Close(); 
-		return 1;
+		bado.CloseRecordset();
+		bado.CloseConn();
+     	return 1;
 	}
 
 	IMPLEMENT_DYNAMIC(CGridFlashDlg, CDialog)
@@ -399,6 +398,9 @@
 				case PM_TSTAT5E:
 					stemp="TStat5E";
 					break;
+				case PM_TSTATRUNAR:
+				    stemp="TStatRunar";
+					break;
 				case PM_TSTAT5F:
 					stemp="TStat5F";
 					break;
@@ -432,6 +434,9 @@
 				case  PM_CO2_RS485:
 					stemp = "CO2";
 					break;
+				case  PM_CO2_NODE:
+					stemp = "CO2 Node";
+					break;
 				case PM_TSTAT6_HUM_Chamber:
 					stemp =g_strHumChamber;
 					break;
@@ -445,7 +450,7 @@
 				case PM_T332AI :
 					stemp="T3-32AI";
 					break;
-				case PM_T3AI16O :
+				case  PM_T38AI16O :
 					stemp="T3-8AI160";
 					break;
 				case PM_T38I13O :
@@ -745,6 +750,17 @@
 			Sleep(100);
 		}
 
+		GetExitCodeThread(pThread_flash->m_hThread,&dwExidCode);
+		if(dwExidCode==STILL_ACTIVE)
+		{
+			TerminateThread(pThread_flash->m_hThread,dwExidCode);
+			pThread_flash=NULL;
+			Sleep(100);
+		}
+		SetCommunicationType(0);
+		close_com();
+		SetCommunicationType(1);
+		close_com();
 		ContinueRefreshTreeviewThread();
 	}
 	BEGIN_EVENTSINK_MAP(CGridFlashDlg, CDialog)
@@ -956,22 +972,22 @@
 						if(pDlg->m_grid_flash.at(iitemp).software_version==p_mode)
 						{
 							/////////////////////这段代码主要是从数据库中 根据序列号 查出Epsize///////////////////////
-							_ConnectionPtr pCon=NULL;
-							_RecordsetPtr pRs=NULL;
-							pCon.CreateInstance("ADODB.Connection");
-							pRs.CreateInstance("ADODB.Recordset");
-							pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+							CBADO bado;
+							bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+							bado.OnInitADOConn(); 
+
 							CString str_temp;
 							int nEpSize=0;
 							strSerial.Format(_T("%d"),pDlg->m_grid_flash.at(iitemp).serialnumber);
 							strID.Format(_T("%d"),pDlg->m_grid_flash.at(iitemp).ID);
 							str_temp.Format(_T("select * from ALL_NODE where Serial_ID ='%d'"),pDlg->m_grid_flash.at(iitemp).serialnumber);
-							pRs->Open(_variant_t(str_temp),_variant_t((IDispatch *)pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+							//pRs->Open(_variant_t(str_temp),_variant_t((IDispatch *)pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+							bado.m_pRecordset=bado.OpenRecordset(str_temp);
 							nEpSize=0;
 							CString temp;
-							if(pRs!=NULL)
+							if(bado.m_pRecordset!=NULL)
 						    {	_variant_t temp_variant;
-							 temp_variant=pRs->GetCollect(_T("EPsize"));//MODBUS_EEPROM_SIZE,
+							 temp_variant=bado.m_pRecordset->GetCollect(_T("EPsize"));//MODBUS_EEPROM_SIZE,
 							 if(temp_variant.vt!=VT_NULL)
 						 	nEpSize=atoi((LPCSTR)_bstr_t(temp_variant));
 							 else
@@ -1007,10 +1023,8 @@
 									}
 								}
 
-								if(pRs->State) 
-									pRs->Close(); 
-								if(pCon->State)
-									pCon->Close(); 
+								 bado.CloseRecordset();
+								 bado.CloseConn();
 							} 
 							else
 							{

@@ -36,7 +36,13 @@
 
 #include <afxdisp.h>        // MFC Automation classes
 
-
+#include <afxwin.h>     // MFC core and standard components
+#include <afxext.h>     // MFC extensions
+#include <afxcmn.h>			// MFC support for Windows Common Controls
+#include <afxinet.h>    // MFC Internet support
+#include <afxmt.h>      // MFC multithreading support
+#include <bitset>
+//#define  test_ptp
 
 #ifndef _AFX_NO_OLE_SUPPORT
 #include <afxdtctl.h>           // MFC support for Internet Explorer 4 Common Controls
@@ -63,6 +69,12 @@ using namespace Gdiplus;
 
 #pragma  comment(lib,"HtmlHelp.lib")
 #pragma  comment(lib,"Iphlpapi.lib")
+
+ 
+#include "HtmlHelp.h"
+
+#include "T3000_Help_Map.h"
+
 //#pragma  comment(lib,"ISP.lib")
 //#pragma  comment(lib,"RegisterMonitor.lib")
 #import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
@@ -95,6 +107,9 @@ INPUT void SetCommunicationType(int nType);
 INPUT int NetController_CheckTstatOnline(unsigned char devLo=1,unsigned char devHi=254);
 INPUT bool Open_Socket2(CString strIPAdress,short nPort);
 
+INPUT void SetLastSuccessBaudrate(int nbaudrate);
+INPUT void SetLastOpenedComport(int ncom_port);
+INPUT void SetLastCommunicationType(int n_commnication_type);
 INPUT int GetLastSuccessBaudrate();
 INPUT int GetLastOpenedComport();
 INPUT int GetLastCommunicationType();
@@ -133,8 +148,8 @@ INPUT int Write_One_log(unsigned char device_var,unsigned short address,unsigned
 INPUT int read_multi_log(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 INPUT int write_multi_log(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 
-INPUT HANDLE Open_Testo_USB();
-INPUT int ReadTestoDeviceData(float reveivevalue[]);
+//INPUT HANDLE Open_Testo_USB();
+/*INPUT int ReadTestoDeviceData(float reveivevalue[]);*/
 //INPUT SOCKET GetSocketHandle();
 #include <stdint.h>
 //INPUT bool Device_Set_Object_Instance_Number(
@@ -172,8 +187,10 @@ using namespace std;  // Ensure that the namespace is set to std
 #define     WM_DOWNLOADFILE_MESSAGE						WM_USER + 217
 #define     WM_MULTY_FLASH_MESSAGE						WM_USER + 218
 #define		WM_REFRESH_BAC_CUSTOMER_DIGITAL_RANGE_LIST	WM_USER + 219
-
-
+#define		WM_REFRESH_BAC_USER_NAME_LIST				WM_USER + 220
+#define		WM_REFRESH_BAC_AT_COMMAND					WM_USER + 221
+#define		WM_REFRESH_BAC_REMOTE_POINT_LIST					WM_USER + 222
+#define    WM_INITIAL_BAC_INPUT_LIST					WM_USER + 223
 //#pragma warning(disable:4244)
 //#pragma warning(disable:4018)
 //#pragma warning(disable:4800)
@@ -206,13 +223,18 @@ typedef struct _STATUSBARINFO
 #define MY_BAC_WRITE_LIST			WM_USER + 103
 #define MY_BAC_REFRESH_LIST			WM_USER + 104
 #define MY_BAC_REFRESH_ONE			WM_USER + 105
+
+#define MY_WRITE_ONE_LIST				WM_USER	+ 106
+#define MY_WRITE_MULTI_LIST				WM_USER	+ 107
+
 #define MY_CLOSE WM_USER+110
-#define MY_RESUME_DATA  WM_USER+200
-#define MY_READ_DATA_CALLBACK WM_USER+201
-#define MY_RX_TX_COUNT WM_USER + 202
-#define WM_ADD_DEBUG_CSTRING WM_USER + 106
+
+#define MY_RESUME_DATA  WM_USER + 300
+#define MY_READ_DATA_CALLBACK WM_USER+301
+#define MY_RX_TX_COUNT WM_USER + 302
+#define WM_ADD_DEBUG_CSTRING WM_USER + 303
 #define  WM_SCAN_PRODUCT WM_USER+2014
-#define  WM_SHOW_PANNELINFOR WM_USER+2015
+#define  WM_SHOW_PANNELINFOR WM_USER + 2222
 
 typedef struct _MessageWriteOneInfo
 {
@@ -225,6 +247,30 @@ typedef struct _MessageWriteOneInfo
 	CString Changed_Name;
 
 }MessageWriteOneInfo;
+
+typedef struct _MessageWriteOneInfo_List
+{
+    int list_type;
+	unsigned char device_id;
+	unsigned short address;
+	short new_value;
+	short db_value;
+	HWND hwnd;
+	int mRow;
+	int mCol;
+	CString Changed_Name;
+}MessageWriteOneInfo_List;
+
+typedef struct _MessageWriteMultiInfo_List
+{
+	unsigned char device_id;
+	unsigned short Start_Address;
+	unsigned char RegValue[8];
+	HWND hwnd;
+	int mRow;
+	int mCol;
+	CString Changed_Name;
+}MessageWriteMultiInfo_List;
 
 
 typedef struct _MessageReadOneInfo
@@ -244,7 +290,7 @@ typedef struct _MessageInvokeIDInfo
 	int mCol;
 }MessageInvokeODInfo;
 
-
+#define  CPING_USE_ICMP 1
 //#include "Bacnet_Include.h"
 //#define _DEBUG
 //*********************************link to dll***************************

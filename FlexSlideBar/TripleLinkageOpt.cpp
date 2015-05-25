@@ -101,7 +101,7 @@ BOOL CTripleLinkageOpt::InitThumb(BOOL bHorizontal, int nThumbWidth, CRect& rcCh
 	{
 		ptCenter.y = rcChannel.top;
 	}
-	
+
 	ASSERT(m_szThumb.size() <= m_szTicMarks->size());
 
 	int nPos = 0;
@@ -145,23 +145,25 @@ void CTripleLinkageOpt::SetThumbColor(COLORREF clr)
 	}
 
 	m_szThumb[1]->SetColor(RGB(0,0,128));
+	//GetSysColor(COLOR_BTNFACE)
+	//m_szThumb[1]->SetColor(GetSysColor(COLOR_BTNFACE));
 }
 
 
 void CTripleLinkageOpt::Draw(CDC* pDC)
 {
-// 	for (UINT i = 0 ; i < m_szThumb.size(); i++)
-// 	{
-// 		m_szThumb[i]->Draw(pDC);
-// 	}
 
-	m_szThumb[0]->SetColor(GetSysColor(COLOR_BTNFACE));
+
+		m_szThumb[0]->SetColor(GetSysColor(COLOR_BTNFACE));
+		//m_szThumb[0]->SetColor(RGB(255,0,0));
 		m_szThumb[0]->Draw(pDC);
 
-	m_szThumb[1]->Draw(pDC);
+		m_szThumb[1]->Draw(pDC);
+
 
 		m_szThumb[2]->SetColor(GetSysColor(COLOR_BTNFACE));
-	m_szThumb[2]->Draw(pDC);
+		//m_szThumb[2]->SetColor(RGB(0,0,255));
+		m_szThumb[2]->Draw(pDC);
 
 }
 
@@ -169,7 +171,11 @@ void CTripleLinkageOpt::Draw(CDC* pDC)
 void CTripleLinkageOpt::MovePage(const CPoint& pt)
 {	
 	ASSERT(m_nFocusThumb != FOCUS_ON_EMPTY);
-
+	//if (m_nFocusThumb==-1)
+	//{
+//	return;
+//	}
+	
 	if (m_nFocusThumb == FOCUS_ON_MID)
 	{
 		MovePageForMainThumb(pt);
@@ -180,7 +186,6 @@ void CTripleLinkageOpt::MovePage(const CPoint& pt)
 	}
 
 }
-
 
 // 专门为两个从属thumb movepage使用
 void CTripleLinkageOpt::MovePageForOtherThumb(const CPoint& pt)
@@ -443,28 +448,30 @@ void CTripleLinkageOpt::MovePageForMainThumb(const CPoint& pt)
 void CTripleLinkageOpt::OnLButtonDown(const CPoint& point)
 {
 	int nRet  = GetFocusThumb(point);
-
+	
+	
+	 //m_nFocusThumb = nRet;
 	if(nRet != -1) // begin to drag?
 	{	
 		m_nFocusThumb = nRet;
 
-		if( m_nFocusThumb == FOCUS_ON_TOPLEFT || m_nFocusThumb == FOCUS_ON_RIGHTBTM) //single button模式 两个从属的不能拖动
-		{
-			return;
-		}		
+ 		if( m_nFocusThumb == FOCUS_ON_TOPLEFT || m_nFocusThumb == FOCUS_ON_RIGHTBTM) //single button模式 两个从属的不能拖动
+ 		{
+ 			return;
+ 		}		
 		m_bStartDraging = TRUE;
 		//HWND hwnd = SetCapture(AfxGetApp()->GetMainWnd()->);
 	}
 	else
 	{
-
-		if( m_nFocusThumb == FOCUS_ON_TOPLEFT || m_nFocusThumb == FOCUS_ON_RIGHTBTM) //single button模式 两个从属的不能拖动
-		{
-			return;
-		}
-		MovePage(point);
-		
-		ReCalcChannelRect();
+	   
+		//if( m_nFocusThumb == FOCUS_ON_TOPLEFT || m_nFocusThumb == FOCUS_ON_RIGHTBTM) //single button模式 两个从属的不能拖动
+		//{
+		//	return;
+		//}
+		//MovePage(point);
+		//
+		//ReCalcChannelRect();
 	}
 }
 
@@ -549,6 +556,12 @@ void CTripleLinkageOpt::MoveToPosition(int nIndex, int nPosition)
 
 void CTripleLinkageOpt::OnMouseMove(const CPoint& point)
 {
+    if (m_nFocusThumb == FOCUS_ON_EMPTY)
+    {
+	return ;
+
+    }
+    
 	ASSERT(m_nFocusThumb != FOCUS_ON_EMPTY);
 
 	if(m_bStartDraging) // begin to drag?
@@ -806,11 +819,23 @@ void CTripleLinkageOpt::OnLButtonUp(const CPoint& point)
 		}		
 
 		ReCalcChannelRect();
+
+
+		if (m_nFocusThumb == FOCUS_ON_MID)
+		{
+			((CFlexSlideWnd*)m_pParent)->SendCallBackMsg();
+		}
 	}
-	if (m_nFocusThumb == FOCUS_ON_MID)
-	{
-	((CFlexSlideWnd*)m_pParent)->SendCallBackMsg();
-	}
+	
+	
+//	if (m_nFocusThumb != -1)
+//	{
+//	((CFlexSlideWnd*)m_pParent)->SendCallBackMsg();
+//	}
+	//else
+	//{
+	//((CFlexSlideWnd*)m_pParent)->SendCallBackMsg();
+	//}
 
 	
 }

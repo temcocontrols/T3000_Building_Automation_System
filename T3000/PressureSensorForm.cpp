@@ -7,9 +7,54 @@
 #include "ado/ADO.h"
 #include "globle_function.h"
 #include "OutPutDlg.h"
+#include "MainFrm.h"
 // CPressureSensorForm
  #define UNIT_PRESSURE 8
+ #define MENU_LOCK 5
 CString Pressure_Units[UNIT_PRESSURE]={_T("W.C"),_T("KP"),_T("Psi"),_T("mmHg"),_T("In.Hg"),_T("Kg.cm"),_T("atm"),_T("bar")};
+//SPECIAL_MENU_LOCK, Special menu lockout via keypad, serial port only, 
+//	0=Full Menu, 1=Menu Disabled, 2=User Menu, 3 = The user need adjust setpoint in menu mode,4=disable display
+CString STRING_MENU_LOCKS[MENU_LOCK]={_T("Full Menu"),_T("Menu Enable"),_T("Menu Disabled"),_T("Menu Setpoint"),_T("Display Disable")};
+
+#define FRESH_PRESSURE_SENSOR_BACK  WM_USER+1007
+
+DWORD WINAPI _BackFreshing_Pressure_Sensor(LPVOID pParam)
+{
+	CPressureSensorForm* dlg=(CPressureSensorForm*)(pParam);
+
+	Sleep(1000);
+
+
+	while(dlg->IsWindowVisible())
+	{
+
+		if (!is_connect())
+		{
+			Sleep(1000);
+			continue;
+		}
+	 
+		if(!no_mouse_keyboard_event_enable_refresh) 
+		{
+			Sleep(3000);
+			continue ;
+		}
+		else
+		{
+			Sleep(2000);
+		}
+		Read_Multi(g_tstat_id,&product_register_value[450],450,50);  
+
+		Read_Multi(g_tstat_id,&product_register_value[150],150,50); 
+		 
+		PostMessage(dlg->m_hWnd,FRESH_PRESSURE_SENSOR_BACK,0,0);
+	}
+
+
+
+	return 1;
+}
+
 
 IMPLEMENT_DYNCREATE(CPressureSensorForm, CFormView)
 
@@ -28,17 +73,31 @@ void CPressureSensorForm::DoDataExchange(CDataExchange* pDX)
 	CFormView::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_BOXUNIT, m_combox_unit);
 	DDX_Control(pDX, IDC_COMBO_OUTPUTTYPE, m_cmbox_outputtype);
+	DDX_Control(pDX, IDC_KEYPADLOCKCOMBO, m_keypad_lock);
+	DDX_Control(pDX, IDC_SENSOR_TYPE, m_Sensor_Type_Combox);
+	DDX_Control(pDX, IDC_COMBO_AM, m_am_combox);
+	DDX_Control(pDX, IDC_COMBO_OUTPUT_RANGE, m_combox_output_range);
+	DDX_Control(pDX, IDC_EDIT_FILTER, m_input_filter);
+	DDX_Control(pDX, IDC_EDIT_SIGNAL, m_edit_signal);
+	DDX_Control(pDX, IDC_MSFLEXGRID1, m_pressure_table);
 }
 
 BEGIN_MESSAGE_MAP(CPressureSensorForm, CFormView)
 	ON_CBN_SELCHANGE(IDC_BOXUNIT, &CPressureSensorForm::OnCbnSelchangeBoxunit)
 	ON_CBN_SELCHANGE(IDC_COMBO_OUTPUTTYPE, &CPressureSensorForm::OnCbnSelchangeComboOutputtype)
 	ON_BN_CLICKED(IDC_BUTTON_OUTPUTTABLE, &CPressureSensorForm::OnBnClickedButtonOutputtable)
+	ON_WM_DESTROY()
+	ON_CBN_SELCHANGE(IDC_KEYPADLOCKCOMBO, &CPressureSensorForm::OnCbnSelchangeKeypadlockcombo)
+	ON_CBN_SELCHANGE(IDC_SENSOR_TYPE, &CPressureSensorForm::OnCbnSelchangeSensorType)
+	ON_CBN_SELCHANGE(IDC_COMBO_AM, &CPressureSensorForm::OnCbnSelchangeComboAm)
+
+	ON_CBN_SELCHANGE(IDC_COMBO_OUTPUT_RANGE, &CPressureSensorForm::OnCbnSelchangeComboOutputRange)
+
+ON_EN_SETFOCUS(IDC_PRESSURE_SENSOR, &CPressureSensorForm::OnEnSetfocusPressureSensor)
+ON_EN_SETFOCUS(IDC_EDIT_FILTER, &CPressureSensorForm::OnEnSetfocusEditFilter)
+ON_EN_SETFOCUS(IDC_EDIT_SENSOR_MIN, &CPressureSensorForm::OnSetfocusEditSensorMin)
+ON_EN_SETFOCUS(IDC_EDIT_SENSOR_MAX, &CPressureSensorForm::OnSetfocusEditSensorMax)
 END_MESSAGE_MAP()
-
-
-// CPressureSensorForm diagnostics
-
 #ifdef _DEBUG
 void CPressureSensorForm::AssertValid() const
 {
@@ -54,7 +113,63 @@ void CPressureSensorForm::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 void CPressureSensorForm::Fresh(){
 Initial_RegisterList();
+m_pressure_table.put_Rows(11);
+m_pressure_table.put_Cols(3);
+m_pressure_table.put_TextMatrix(0,0,_T(""));
+m_pressure_table.put_TextMatrix(0,1,_T("Pressure"));
+m_pressure_table.put_TextMatrix(0,2,_T("AD"));
+CString Strindex;
+for (int i=1;i<11;i++)
+{
+  Strindex.Format(_T("%d"),i); 
+  m_pressure_table.put_TextMatrix(i,0,Strindex);
+
+}
+
+m_combox_unit.ResetContent();
+for (int i=0;i<UNIT_PRESSURE;i++)
+{
+	m_combox_unit.AddString(Pressure_Units[i]);
+}
+
+
+m_keypad_lock.ResetContent();
+for (int i=0;i<MENU_LOCK;i++)
+{
+	m_keypad_lock.AddString(STRING_MENU_LOCKS[i]);
+}
+
+m_cmbox_outputtype.ResetContent();
+m_cmbox_outputtype.AddString(_T("PID"));
+m_cmbox_outputtype.AddString(_T("Transducer"));
+//pressure sensor type.1=MPXV7002,2=26PCDFA,3=special
+m_Sensor_Type_Combox.ResetContent();
+m_Sensor_Type_Combox.AddString(_T("MPXV7002"));
+m_Sensor_Type_Combox.AddString(_T("26PCDFA"));
+m_Sensor_Type_Combox.AddString(_T("Special"));
+
+m_am_combox.ResetContent();
+m_am_combox.AddString(_T("Auto"));
+m_am_combox.AddString(_T("Manual"));
+/*
+Ou1 - Output1 Scale -
+1=0-10V, 
+2=0-5V,
+5= 4-20mA(for pressure)
+ */
+//
+m_combox_output_range.ResetContent();
+m_combox_output_range.AddString(_T("0-10V"));
+m_combox_output_range.AddString(_T("0-5V"));
+m_combox_output_range.AddString(_T("4-20mA"));
 Show_Pressure();
+if(hFirstThread != NULL)
+	TerminateThread(hFirstThread, 0);
+hFirstThread=NULL;
+if (!hFirstThread)
+{
+	hFirstThread = CreateThread(NULL,NULL,_BackFreshing_Pressure_Sensor,this,NULL,0);
+}
 }
 void CPressureSensorForm::Show_Pressure(){
 CString StrTemp;
@@ -73,7 +188,21 @@ GetDlgItem(IDC_HARDWAREV_EDIT)->SetWindowText(StrTemp);
 StrTemp.Format(_T("%d"),product_register_value[MODBUS_PIC_VERSION]);
 GetDlgItem(IDC_PIC_EDIT)->SetWindowText(StrTemp);
 //StrTemp.Format(_T("%d"),(short)product_register_value[MODBUS_PRESSURE_DATA_PA]);
-GetDlgItem(IDC_PRESSURE_SENSOR)->SetWindowText(Get_PressureSensor((short)product_register_value[MODBUS_PRESSURE_DATA_PA]));
+if (product_register_value[MODBUS_INPUT_MANU_ENABLE]==0)
+{
+
+	double reg467=(double)((short)product_register_value[MODBUS_PRESSURE_RATIO]);
+	double reg468=(double)((short)product_register_value[MODBUS_PRESSURE_INDEX]);
+    m_output_value=reg467*pow(10,reg468);
+}
+else
+{
+   //m_output_value=(double)product_register_value[MODBUS_PRESSURE_ORG_VALUE];
+  m_output_value= (double)((short)product_register_value[MODBUS_PRESSURE_ORG_VALUE]);
+}
+
+GetDlgItem(IDC_PRESSURE_SENSOR)->SetWindowText(Get_PressureSensor(m_output_value));
+
 
 if ((product_register_value[MODBUS_PRESSURE_UNIT_SELECT]-1)<UNIT_PRESSURE)
 {
@@ -93,67 +222,174 @@ else
 	m_cmbox_outputtype.SetCurSel(0); 
 }
 
-//-------------------------------
-GetDlgItem(IDC_EDIT_SENSOR_MIN)->SetWindowText(Get_PressureSensor((short)product_register_value[MODBUS_PRESSURE_MIN]));
-GetDlgItem(IDC_EDIT_SENSOR_MAX)->SetWindowText(Get_PressureSensor((short)product_register_value[MODBUS_PRESSURE_MAX]));
+if (product_register_value[MODBUS_SPECIAL_MENU_LOCK]>=0&&product_register_value[MODBUS_SPECIAL_MENU_LOCK]<=4)
+{
+  m_keypad_lock.SetCurSel(product_register_value[MODBUS_SPECIAL_MENU_LOCK]);
 }
-CString CPressureSensorForm::Get_PressureSensor(int sensor_value){
-int sensorvalue=sensor_value;//(short)product_register_value[MODBUS_PRESSURE_DATA_PA];
+else
+{
+  m_keypad_lock.SetCurSel(0);
+}
+
+//MODBUS_INPUT_MANU_ENABLE=309
+if (product_register_value[MODBUS_INPUT_MANU_ENABLE]>=0&&product_register_value[MODBUS_INPUT_MANU_ENABLE]<=1)
+{
+m_am_combox.SetCurSel(product_register_value[MODBUS_INPUT_MANU_ENABLE]);
+}
+else
+{
+  m_am_combox.SetCurSel(0);
+}
+
+StrTemp.Format(_T("%d"),product_register_value[MODBUS_FILTER]);
+m_input_filter.SetWindowTextW(StrTemp);
+//1,2,5
+double max,min;
+max=((double)((short)product_register_value[MODBUS_PRESSURE_MAX]))/100;
+min=((double)((short)product_register_value[MODBUS_PRESSURE_MIN]))/100;
+if (product_register_value[MODBUS_OUTPUT1_SCALE]==1)
+{
+   m_combox_output_range.SetCurSel(0);
+   m_signal_value=((m_output_value-min)/(max-min))*10;
+   if (m_signal_value>=10)
+   {
+     m_signal_value=10;
+   }
+   if (m_signal_value<=0)
+   {
+    m_signal_value = 0;
+   }
+   
+   
+   StrTemp.Format(_T("%.2lf V"),m_signal_value);
+}
+if (product_register_value[MODBUS_OUTPUT1_SCALE]==2)
+{
+	m_combox_output_range.SetCurSel(1);
+	m_signal_value=((m_output_value-min)/(max-min))*5;
+
+	if (m_signal_value>=5)
+	{
+		m_signal_value=5;
+	}
+	if (m_signal_value<=0)
+	{
+		m_signal_value = 0;
+	}
+
+	StrTemp.Format(_T("%.2lf V"),m_signal_value);
+}
+if (product_register_value[MODBUS_OUTPUT1_SCALE]==5)
+{
+	m_combox_output_range.SetCurSel(2);
+	m_signal_value=((m_output_value-min)/(max-min))*16+4;
+	if (m_signal_value>=20)
+	{
+		m_signal_value=20;
+	}
+	if (m_signal_value<=4)
+	{
+		m_signal_value = 4;
+	}
+	StrTemp.Format(_T("%.2lf ma"),m_signal_value);
+	
+}
+m_edit_signal.SetWindowTextW(StrTemp);
+
+
+if (product_register_value[MODBUS_PRESSURE_SENSOR_SELECT]>=1&&product_register_value[MODBUS_PRESSURE_SENSOR_SELECT]<=2)
+{
+	m_Sensor_Type_Combox.SetCurSel(product_register_value[MODBUS_PRESSURE_SENSOR_SELECT]-1);
+}
+else
+{
+
+	m_Sensor_Type_Combox.SetCurSel(0);
+}
+
+//
+ 
+for (int i=1;i<11;i++)
+{
+	StrTemp.Format(_T("%d"),(short)product_register_value[MODBUS_PRESSURE_CAL_PR1+2*(i-1)]); 
+	m_pressure_table.put_TextMatrix(i,1,StrTemp);
+
+	StrTemp.Format(_T("%d"),(short)product_register_value[MODBUS_PRESSURE_CAL_PR1+2*(i-1)+1]); 
+	m_pressure_table.put_TextMatrix(i,2,StrTemp);
+
+}
+//-------------------------------
+StrTemp.Format(_T("%.2f"),((float)((short)product_register_value[MODBUS_PRESSURE_MAX]))/100);
+GetDlgItem(IDC_EDIT_SENSOR_MAX)->SetWindowTextW(StrTemp);
+
+StrTemp.Format(_T("%.2f"),((float)((short)product_register_value[MODBUS_PRESSURE_MIN]))/100);
+GetDlgItem(IDC_EDIT_SENSOR_MIN)->SetWindowTextW(StrTemp);
+
+// GetDlgItem(IDC_EDIT_SENSOR_MIN)->SetWindowText(Get_PressureSensor((short)product_register_value[MODBUS_PRESSURE_MIN]));
+// GetDlgItem(IDC_EDIT_SENSOR_MAX)->SetWindowText(Get_PressureSensor((short)product_register_value[MODBUS_PRESSURE_MAX]));
+}
+CString CPressureSensorForm::Get_PressureSensor(double sensor_value){
+double sensorvalue=sensor_value;//(short)product_register_value[MODBUS_PRESSURE_DATA_PA];
  unsigned int unit=product_register_value[MODBUS_PRESSURE_UNIT_SELECT];
- double pressurevalue;
+ double pressurevalue=sensor_value ;
+ if (product_register_value[MODBUS_INPUT_MANU_ENABLE]==1)
+ {
+     pressurevalue/=100;
+ }
+ 
  CString StrPressureValue;
  switch(unit){
  case 1://W.C /inh2o
  {
- pressurevalue=0.01*sensorvalue;
  
- StrPressureValue.Format(_T("%.2f W.C"),pressurevalue);
+ 
+ StrPressureValue.Format(_T("%.2lf"),pressurevalue);
  }
  break;
  case 2:
  {
 	 //KP
-	 pressurevalue=((double)sensorvalue)*0.001;
-	 StrPressureValue.Format(_T("%.3lf KP"),pressurevalue);
+	 
+	 StrPressureValue.Format(_T("%.2lf"),pressurevalue);
  }
  break;
  case 3:
  	{
 		//Psi
-		pressurevalue=((double)sensorvalue)*0.00001;
-		StrPressureValue.Format(_T("%.5lf Psi"),pressurevalue);
+	 
+		StrPressureValue.Format(_T("%.2lf"),pressurevalue);
  	}
  	break;
  case 4:
  	{
 		//mmHg
-		pressurevalue=((double)sensorvalue)*0.01;
-		StrPressureValue.Format(_T("%.2lf mmHg"),pressurevalue);
+	 
+		StrPressureValue.Format(_T("%.2lf"),pressurevalue);
  	}
  	break;
  case 5://in.Hg
  	{
-		pressurevalue=((double)sensorvalue)*0.001;
-		StrPressureValue.Format(_T("%.3lf in.Hg"),pressurevalue);
+		 
+		StrPressureValue.Format(_T("%.2lf"),pressurevalue);
  
  	}
  	break;
  case 6://Kg/cm2
  	{
-		pressurevalue=((double)sensorvalue)*0.0001;
-		StrPressureValue.Format(_T("%.4lf Kg/cm2"),pressurevalue);
+		 
+		StrPressureValue.Format(_T("%.2lf"),pressurevalue);
  	}
  	break;
  case 7:
  	{//atm
-		pressurevalue=((double)sensorvalue)*0.0001;
-		StrPressureValue.Format(_T("%.4lf atm"),pressurevalue);
+		 
+		StrPressureValue.Format(_T("%.2lf"),pressurevalue);
  	}
  	break;
  case 8:
  	{//bar
-		pressurevalue=((double)sensorvalue)*0.0001;
-		StrPressureValue.Format(_T("%.4lf bar"),pressurevalue);
+		 
+		StrPressureValue.Format(_T("%.2lf"),pressurevalue);
  	}
  	break;
  default:
@@ -569,6 +805,10 @@ void CPressureSensorForm::Initial_RegisterList(){
 	MODBUS_OUTPUT_CURRENT_CALIBRATION9	=	464	;
 	MODBUS_OUTPUT_CURRENT_CALIBRATION10	=	465	;
 	MODBUS_CAL_UNIT	=	466	;
+	     MODBUS_PRESSURE_RATIO=	467;
+	 	MODBUS_PRESSURE_INDEX=	468;
+	 	MODBUS_PRESSURE_ORG_VALUE=	469;
+
 
 #endif
  
@@ -984,15 +1224,7 @@ void CPressureSensorForm::Initial_RegisterList(){
 }
 void CPressureSensorForm::OnInitialUpdate()
 {
-	CFormView::OnInitialUpdate();
-	m_combox_unit.ResetContent();
-	for (int i=0;i<UNIT_PRESSURE;i++)
-	{
-	m_combox_unit.AddString(Pressure_Units[i]);
-	}
-	m_cmbox_outputtype.ResetContent();
-	m_cmbox_outputtype.AddString(_T("PID"));
-	m_cmbox_outputtype.AddString(_T("Transducer"));
+	CFormView::OnInitialUpdate(); 
 }
 
 
@@ -1037,4 +1269,449 @@ void CPressureSensorForm::OnBnClickedButtonOutputtable()
 { 
 	COutPutDlg outputtabledlg;
 	outputtabledlg.DoModal();
+}
+
+void CPressureSensorForm::Changing_Parter(){
+CString StrTemp;
+	if (product_register_value[MODBUS_INPUT_MANU_ENABLE]==0)
+	{
+
+		double reg467=(double)((short)product_register_value[MODBUS_PRESSURE_RATIO]);
+		double reg468=(double)((short)product_register_value[MODBUS_PRESSURE_INDEX]);
+		m_output_value=reg467*pow(10,reg468);
+	}
+	else
+	{
+		m_output_value=(double)product_register_value[MODBUS_PRESSURE_ORG_VALUE];
+	}
+
+	GetDlgItem(IDC_PRESSURE_SENSOR)->SetWindowText(Get_PressureSensor(m_output_value));
+
+
+	double max,min;
+	max=((double)((short)product_register_value[MODBUS_PRESSURE_MAX]))/100;
+	min=((double)((short)product_register_value[MODBUS_PRESSURE_MIN]))/100;
+	if (product_register_value[MODBUS_OUTPUT1_SCALE]==1)
+	{
+		m_combox_output_range.SetCurSel(0);
+		m_signal_value=((m_output_value-min)/(max-min))*10;
+		if (m_signal_value>=10)
+		{
+			m_signal_value=10;
+		}
+		if (m_signal_value<=0)
+		{
+			m_signal_value = 0;
+		}
+
+
+		StrTemp.Format(_T("%.2lf V"),m_signal_value);
+	}
+	if (product_register_value[MODBUS_OUTPUT1_SCALE]==2)
+	{
+		m_combox_output_range.SetCurSel(1);
+		m_signal_value=((m_output_value-min)/(max-min))*5;
+
+		if (m_signal_value>=5)
+		{
+			m_signal_value=5;
+		}
+		if (m_signal_value<=0)
+		{
+			m_signal_value = 0;
+		}
+
+		StrTemp.Format(_T("%.2lf V"),m_signal_value);
+	}
+	if (product_register_value[MODBUS_OUTPUT1_SCALE]==5)
+	{
+		m_combox_output_range.SetCurSel(2);
+		m_signal_value=((m_output_value-min)/(max-min))*16+4;
+		if (m_signal_value>=20)
+		{
+			m_signal_value=20;
+		}
+		if (m_signal_value<=4)
+		{
+			m_signal_value = 4;
+		}
+		StrTemp.Format(_T("%.2lf ma"),m_signal_value);
+
+	}
+	m_edit_signal.SetWindowTextW(StrTemp);
+
+
+
+}
+LRESULT CPressureSensorForm::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if (message==FRESH_PRESSURE_SENSOR_BACK)
+	{
+	    Changing_Parter();
+	  
+	}
+ 
+	return CFormView::WindowProc(message, wParam, lParam);
+ 
+}
+
+
+void CPressureSensorForm::OnDestroy()
+{
+
+
+
+
+	if(hFirstThread != NULL)
+		TerminateThread(hFirstThread, 0);
+	hFirstThread=NULL;
+	CFormView::OnDestroy();
+
+	// TODO: Add your message handler code here
+}
+
+
+void CPressureSensorForm::OnCbnSelchangeKeypadlockcombo()
+{
+	int sel = m_keypad_lock.GetCurSel();
+	if (product_register_value[MODBUS_SPECIAL_MENU_LOCK]==sel)
+	{
+		return;
+	}
+	int ret=write_one(g_tstat_id,MODBUS_SPECIAL_MENU_LOCK,sel);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_SPECIAL_MENU_LOCK]=sel;
+
+	}
+	if (product_register_value[MODBUS_SPECIAL_MENU_LOCK]>=0&&product_register_value[MODBUS_SPECIAL_MENU_LOCK]<=4)
+	{
+		m_keypad_lock.SetCurSel(product_register_value[MODBUS_SPECIAL_MENU_LOCK]);
+	}
+	else
+	{
+		m_keypad_lock.SetCurSel(0);
+	}
+}
+
+
+void CPressureSensorForm::OnCbnSelchangeSensorType()
+{
+
+
+	int sel = m_Sensor_Type_Combox.GetCurSel();
+	sel+=1;
+	if (product_register_value[MODBUS_PRESSURE_SENSOR_SELECT]==sel)
+	{
+		return;
+	}
+	int ret=write_one(g_tstat_id,MODBUS_PRESSURE_SENSOR_SELECT,sel);
+	if (ret>0)
+	{
+	    product_register_value[MODBUS_PRESSURE_SENSOR_SELECT]=sel;
+		
+	}
+	else
+	{
+		MessageBox(_T("Write Fail!"));
+	}
+	if (product_register_value[MODBUS_PRESSURE_SENSOR_SELECT]>=1&&product_register_value[MODBUS_PRESSURE_SENSOR_SELECT]<=2)
+	{
+		m_Sensor_Type_Combox.SetCurSel(product_register_value[MODBUS_PRESSURE_SENSOR_SELECT]-1);
+	}
+	else
+	{
+
+		m_Sensor_Type_Combox.SetCurSel(0);
+	}
+}
+
+
+void CPressureSensorForm::OnCbnSelchangeComboAm()
+{
+	int sel = m_am_combox.GetCurSel();
+	if (product_register_value[MODBUS_INPUT_MANU_ENABLE]==sel)
+	{
+		return;
+	}
+	int ret=write_one(g_tstat_id,MODBUS_INPUT_MANU_ENABLE,sel);
+	if (ret>0)
+	{
+	 product_register_value[MODBUS_INPUT_MANU_ENABLE]=sel;
+	}
+	else
+	{
+	MessageBox(_T("Write Fail!"));
+	}
+	if (product_register_value[MODBUS_INPUT_MANU_ENABLE]>=0&&product_register_value[MODBUS_INPUT_MANU_ENABLE]<=2)
+	{
+		m_am_combox.SetCurSel(product_register_value[MODBUS_INPUT_MANU_ENABLE]);
+	}
+	else
+	{
+
+		m_am_combox.SetCurSel(0);
+	}
+}
+
+
+void CPressureSensorForm::OnEnKillfocusEditFilter()
+{
+
+    CString StrTemp;
+	m_input_filter.GetWindowTextW(StrTemp);
+	int IntValue=_wtoi(StrTemp);
+	int ret= write_one(g_tstat_id,MODBUS_FILTER,IntValue);
+	if (ret>0)
+	{
+	product_register_value[MODBUS_FILTER]=IntValue;
+	}
+	else
+	{
+	MessageBox(_T("Write Fail!"));
+	}
+	StrTemp.Format(_T("%d"),product_register_value[MODBUS_FILTER]);
+	m_input_filter.SetWindowTextW(StrTemp);
+
+}
+
+
+void CPressureSensorForm::OnCbnSelchangeComboOutputRange()
+{
+    CString StrTemp;
+	
+	int sel = m_combox_output_range.GetCurSel();
+	if (sel==0)
+	{
+	 sel =1;
+	}
+	else if (sel == 1)
+	{
+	 sel =2;
+	}
+	else if (sel == 2)
+	{
+	 sel =5;
+	}
+	else
+	{
+
+	}
+	if (product_register_value[186]==sel)
+	{
+	return ;
+	}
+
+	int ret=write_one(g_tstat_id,186,sel);
+	if (ret>0)
+	{
+		product_register_value[186]=sel;
+	}
+	else
+	{
+		MessageBox(_T("Write Fail!"));
+	}
+
+
+	Read_Multi(g_tstat_id,&product_register_value[450],450,50);  
+
+	Read_Multi(g_tstat_id,&product_register_value[150],150,50); 
+
+	//PostMessage(FRESH_PRESSURE_SENSOR_BACK,0,0);
+	Changing_Parter();
+}
+
+
+void CPressureSensorForm::OnEnKillfocusPressureSensor()
+{
+	 CString StrTemp;
+	 GetDlgItem(IDC_PRESSURE_SENSOR)->GetWindowTextW(StrTemp);
+	 float floatValue;
+	 int usValue;
+	 floatValue = _wtof(StrTemp);
+	 usValue= (int)(floatValue*100);
+	 if (product_register_value[MODBUS_INPUT_MANU_ENABLE]==0)
+	 {
+ 		 int ret=write_one(g_tstat_id,101,usValue);
+ 		 if (ret>0)
+		 {
+			 product_register_value[101]=usValue;
+		 }
+ 		 else
+ 		 {
+ 			 MessageBox(_T("Write Fail!"));
+ 		 }
+ 		 StrTemp.Format(_T("%0.2lf"),((float)(short)product_register_value[101])/100);
+
+	 }
+	 else
+	 {
+ 		 int ret=write_one(g_tstat_id,MODBUS_PRESSURE_ORG_VALUE,usValue);
+ 		 if (ret>0)
+		 {
+			 product_register_value[MODBUS_PRESSURE_ORG_VALUE]=usValue;
+		 }
+ 		 else
+ 		 {
+ 			 MessageBox(_T("Write Fail!"));
+ 		 }
+ 		 StrTemp.Format(_T("%0.2lf"),((float)(short)product_register_value[MODBUS_PRESSURE_ORG_VALUE])/100);
+	   
+
+
+// 		 if((short)product_register_value[MODBUS_PRESSURE_ORG_VALUE]==usValue)	//Add this to judge weather this value need to change.
+// 			 return;
+// 
+// 		 Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_PRESSURE_ORG_VALUE,usValue,
+// 			 (short)product_register_value[MODBUS_PRESSURE_ORG_VALUE],this->m_hWnd,IDC_PRESSURE_SENSOR,_T("Pressure Value"));
+
+	 }
+	 
+
+}
+
+
+void CPressureSensorForm::OnEnKillfocusEditSensorMin()
+{
+	CString StrTemp;
+	//Get_PressureSensor((short)product_register_value[MODBUS_PRESSURE_MIN])
+	GetDlgItem(IDC_EDIT_SENSOR_MIN)->GetWindowText(StrTemp);
+
+	int IntValue=(short)(_wtof(StrTemp)*100);
+ 	int ret= write_one(g_tstat_id,MODBUS_PRESSURE_MIN,IntValue);
+ 	if (ret>0)
+	{
+		product_register_value[MODBUS_PRESSURE_MIN]=IntValue;
+	}
+ 	else
+ 	{
+ 		MessageBox(_T("Write Fail!"));
+ 	}
+ 	StrTemp.Format(_T("%.2f"),((float)((short)product_register_value[MODBUS_PRESSURE_MIN]))/100);
+ 	
+	GetDlgItem(IDC_EDIT_SENSOR_MIN)->SetWindowTextW(StrTemp);
+
+// 
+// 	if((short)product_register_value[MODBUS_PRESSURE_MIN]==IntValue)	//Add this to judge weather this value need to change.
+// 		return;
+// 
+// 	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_PRESSURE_MIN,IntValue,
+// 		(short)product_register_value[MODBUS_PRESSURE_MIN],this->m_hWnd,IDC_EDIT_SENSOR_MIN,_T("Write Min"));
+
+}
+
+
+void CPressureSensorForm::OnEnKillfocusEditSensorMax()
+{
+	CString StrTemp;
+	//Get_PressureSensor((short)product_register_value[MODBUS_PRESSURE_MIN])
+	GetDlgItem(IDC_EDIT_SENSOR_MAX)->GetWindowText(StrTemp);
+	 
+	int IntValue=(short)(_wtof(StrTemp)*100);
+	int ret= write_one(g_tstat_id,MODBUS_PRESSURE_MAX,IntValue);
+	if (ret>0)
+	{
+		product_register_value[MODBUS_PRESSURE_MAX]=IntValue;
+	}
+	else
+	{
+		MessageBox(_T("Write Fail!"));
+	}
+	StrTemp.Format(_T("%.2f"),((float)((short)product_register_value[MODBUS_PRESSURE_MAX]))/100);
+	GetDlgItem(IDC_EDIT_SENSOR_MAX)->SetWindowTextW(StrTemp);
+
+ 
+
+}
+
+
+//BOOL CPressureSensorForm::PreTranslateMessage(MSG* pMsg)
+//{
+//	// TODO: Add your specialized code here and/or call the base class
+//     if (pMsg->)
+//     {
+//     }
+//	return CFormView::PreTranslateMessage(pMsg);
+//}
+
+
+//void CPressureSensorForm::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2)
+//{
+//	// TODO: Add your message handler code here and/or call default
+//
+//	CFormView::OnHotKey(nHotKeyId, nKey1, nKey2);
+//}
+
+
+void CPressureSensorForm::OnEnSetfocusPressureSensor()
+{
+	 m_EDIT_ID=IDC_PRESSURE_SENSOR;
+}
+
+
+void CPressureSensorForm::OnEnSetfocusEditFilter()
+{
+	 m_EDIT_ID=IDC_EDIT_FILTER;
+}
+
+
+void CPressureSensorForm::OnSetfocusEditSensorMin()
+{
+	m_EDIT_ID=IDC_EDIT_SENSOR_MIN;
+}
+
+
+void CPressureSensorForm::OnSetfocusEditSensorMax()
+{
+	m_EDIT_ID=IDC_EDIT_SENSOR_MAX;
+}
+BOOL CPressureSensorForm::PreTranslateMessage(MSG* pMsg)
+{
+
+	if(WM_KEYDOWN == pMsg->message)
+	{
+
+		CEdit* pEdit = (CEdit*)GetDlgItem(m_EDIT_ID);
+
+		ASSERT(pEdit);
+
+		if(pMsg->hwnd == pEdit->GetSafeHwnd() && VK_RETURN == pMsg->wParam)
+
+		{
+
+			switch (m_EDIT_ID)
+			{
+			case IDC_PRESSURE_SENSOR:
+				{
+					OnEnKillfocusEditFilter();
+				}
+				break;
+			case IDC_EDIT_FILTER:
+				{
+					OnEnKillfocusPressureSensor();
+				}
+				break;
+			case IDC_EDIT_SENSOR_MIN:
+				{
+					OnEnKillfocusEditSensorMin();
+				}
+				break;
+			case IDC_EDIT_SENSOR_MAX:
+				{
+					OnEnKillfocusEditSensorMax();
+				}
+				break;
+			default:
+				{
+					return -1;
+				}
+			}
+
+			return TRUE;
+
+		}
+
+	}
+	return CFormView::PreTranslateMessage(pMsg);
 }

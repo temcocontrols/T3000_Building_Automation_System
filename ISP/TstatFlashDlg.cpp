@@ -567,7 +567,9 @@ void CTstatFlashDlg::FlashSN()
     int ID;
 	((CISPDlg*)GetParent())->GetFlashSNParam(nHWVerison, strProductModel,ID);
 
-	pFlashSN->SetFlashParam((static_cast<const CString>(strProductModel)), nHWVerison,ID);
+
+
+	pFlashSN->SetFlashParam((static_cast<const CString>(strProductModel)), nHWVerison,ID,0,_T(""));
 
 	pFlashSN->StartWriteSN();
 

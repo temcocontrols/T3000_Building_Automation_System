@@ -1,0 +1,40 @@
+#pragma once
+#include "afxcmn.h"
+#include "CM5/ListCtrlEx.h"
+
+
+// CT3ModulesView form view
+
+class CT3ModulesView : public CFormView
+{
+	DECLARE_DYNCREATE(CT3ModulesView)
+
+public:
+	CT3ModulesView();           // protected constructor used by dynamic creation
+	virtual ~CT3ModulesView();
+
+public:
+	enum { IDD = IDD_DIALOG_T3_INPUTS };
+#ifdef _DEBUG
+	virtual void AssertValid() const;
+#ifndef _WIN32_WCE
+	virtual void Dump(CDumpContext& dc) const;
+#endif
+#endif
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+	DECLARE_MESSAGE_MAP()
+public:
+	ListCtrlEx::CListCtrlEx m_T3_Input_List;
+	virtual void OnInitialUpdate();
+
+
+	 
+	void Fresh();
+private:
+int m_sn;
+};
+
+

@@ -13,8 +13,10 @@
 
 #include "BacnetGraphic.h"
 #include "BacnetWait.h"
-
+#include "BADO/BADO.h"
 #define  WM_MONITOR_USER_MESSAGE WM_USER + 902
+extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
+extern char *look_label_ex(int panel,int sub_panel, int point_type, int num, int network);
 CBacnetGraphic * GraphicWindow = NULL;
 extern CString InputLable[15];
 Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
@@ -23,6 +25,9 @@ static int old_monitor_line = -1;
 extern int Station_NUM;
 extern BacnetWait *WaitDlg;
 HANDLE h_read_monitordata_thread = NULL;
+
+
+
 IMPLEMENT_DYNAMIC(CBacnetMonitor, CDialogEx)
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
 CBacnetMonitor::CBacnetMonitor(CWnd* pParent /*=NULL*/)
@@ -45,6 +50,7 @@ void CBacnetMonitor::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CBacnetMonitor, CDialogEx)
+	ON_MESSAGE(WM_HOTKEY,&CBacnetMonitor::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(MY_RESUME_DATA, MonitorMessageCallBack)
 	ON_MESSAGE(WM_REFRESH_BAC_MONITOR_LIST,Fresh_Monitor_List)
 	ON_MESSAGE(WM_REFRESH_BAC_MONITOR_INPUT_LIST,Fresh_Monitor_Input_List)
@@ -55,12 +61,13 @@ BEGIN_MESSAGE_MAP(CBacnetMonitor, CDialogEx)
 	ON_WM_TIMER()
 	ON_NOTIFY(NM_KILLFOCUS, IDC_DATETIMEPICKER_MONITOR, &CBacnetMonitor::OnNMKillfocusDatetimepickerMonitor)
 	ON_BN_CLICKED(IDC_BTN_MONITOR_GRAPHIC, &CBacnetMonitor::OnBnClickedBtnMonitorGraphic)
-	ON_BN_CLICKED(IDC_BTN_MONITOR_REFRESH, &CBacnetMonitor::OnBnClickedBtnMonitorRefresh)
-	ON_BN_CLICKED(IDC_BUTTON_MONITOR_TEST, &CBacnetMonitor::OnBnClickedButtonMonitorTest)
 	ON_NOTIFY(NM_SETFOCUS, IDC_LIST_MONITOR, &CBacnetMonitor::OnNMSetfocusListMonitor)
 	ON_NOTIFY(NM_SETFOCUS, IDC_LIST_MONITOR_INPUT, &CBacnetMonitor::OnNMSetfocusListMonitorInput)
 	ON_WM_CLOSE()
 	ON_MESSAGE(WM_MONITOR_USER_MESSAGE,&CBacnetMonitor::Graphic_Window_Own_Message)
+
+
+	ON_WM_HELPINFO()
 END_MESSAGE_MAP()
 
 
@@ -147,9 +154,31 @@ BOOL CBacnetMonitor::OnInitDialog()
 	PostMessage(WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
 
 	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_REFRESH);
-	((CButton *)GetDlgItem(IDC_BTN_MONITOR_REFRESH))->SetIcon(hIcon);	
-	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 
+	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
+	
+	//HRESULT hr_con = m_monitor_pCon.CreateInstance(_T("ADODB.Connection"));
+	//m_monitor_pRec.CreateInstance(_T("ADODB.Recordset"));
+
+	//HRESULT hr_rs=m_monitor_pRec.CreateInstance(_T("ADODB.Recordset"));
+	//if(FAILED(hr_con))
+	//{
+	//	AfxMessageBox(_T("Load msado12.dll erro"));
+	//	return FALSE;
+	//}
+
+	//if(FAILED(hr_rs))
+	//{
+	//	AfxMessageBox(_T("Load msado12.dll erro"));
+	//	return FALSE;
+	//}
+
+
+
+	
+
+
+//	m_monitor_pCon->Open(g_monitor_db_path.GetString(),_T(""),_T(""),adModeUnknown);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -165,7 +194,9 @@ BOOL CBacnetMonitor::PreTranslateMessage(MSG* pMsg)
 		{
 
 			CRect list_rect,win_rect;
-
+			CWnd * window_focus =	GetFocus();
+			if(window_focus == NULL)
+				return CDialogEx::PreTranslateMessage(pMsg);
 			if(GetFocus()->GetDlgCtrlID() == IDC_LIST_MONITOR)
 			{
 				m_monitor_list.GetWindowRect(list_rect);
@@ -206,10 +237,10 @@ void CBacnetMonitor::Initial_List()
 	//m_monitor_list.SetExtendedStyle(m_monitor_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_monitor_list.SetExtendedStyle(m_monitor_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_monitor_list.InsertColumn(MONITOR_NUM, _T("NUM"), 50, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-	m_monitor_list.InsertColumn(MONITOR_LABEL, _T("Label"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_monitor_list.InsertColumn(MONITOR_LABEL, _T("Label"), 150, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_monitor_list.InsertColumn(MONITOR_INTERVAL, _T("Interval"), 120, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_monitor_list.InsertColumn(MONITOR_LENGTH, _T("Length"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_monitor_list.InsertColumn(MONITOR_UNITS, _T("Units"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	//m_monitor_list.InsertColumn(MONITOR_UNITS, _T("Units"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_monitor_list.InsertColumn(MONITOR_STATUS, _T("Status"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 
 	m_monitor_dlg_hwnd = this->m_hWnd;
@@ -224,14 +255,14 @@ void CBacnetMonitor::Initial_List()
 		temp_item.Format(_T("%d"),i+1);
 		m_monitor_list.InsertItem(i,temp_item);
 		m_monitor_list.SetCellEnabled(i,0,0);//禁用num，只是用来显示;
-		if(ListCtrlEx::ComboBox == m_monitor_list.GetColumnType(MONITOR_UNITS))
-		{
-			ListCtrlEx::CStrList strlist;
-			strlist.push_back(_T("Minutes"));
-			strlist.push_back(_T("Hours"));
-			strlist.push_back(_T("Days"));
-			m_monitor_list.SetCellStringList(i, MONITOR_UNITS, strlist);
-		}
+		//if(ListCtrlEx::ComboBox == m_monitor_list.GetColumnType(MONITOR_UNITS))
+		//{
+		//	ListCtrlEx::CStrList strlist;
+		//	strlist.push_back(_T("Minutes"));
+		//	strlist.push_back(_T("Hours"));
+		//	strlist.push_back(_T("Days"));
+		//	m_monitor_list.SetCellStringList(i, MONITOR_UNITS, strlist);
+		//}
 
 		for (int x=0;x<MONITOR_COL_NUMBER;x++)
 		{
@@ -267,10 +298,13 @@ void CBacnetMonitor::Initial_List()
 	//m_monitor_list.SetItemTextColor(2,MONITOR_LABEL,RGB(0,255,0));
 }
 extern char *look_label(int panel, int point_type, int num, int network);
+extern int pointtotext(char *buf,Point_Net *point);
 LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 {
 	int temp_input_count = 0;
 	int temp_analog_count = 0;
+	char q[30];
+
 	for (int i=0;i<MAX_POINTS_IN_MONITOR;i++)
 	{
 		my_input_info[i].be_record =false; 
@@ -280,26 +314,93 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 		char *temppoint = NULL;
 		byte temp_panel = m_monitor_data.at(monitor_list_line).inputs[i].panel;
 		byte temp_point_type = m_monitor_data.at(monitor_list_line).inputs[i].point_type;
-		byte temp_number =  m_monitor_data.at(monitor_list_line).inputs[i].number;
+		//point type 取的时候减1  ,设备里 out = 1，in = 2 ，var = 3; 取出来是 out = 0; in = 1, var = 2;
+		if(temp_point_type > 0)
+			temp_point_type = temp_point_type - 1;
+
+		//byte external_high_bit = (m_monitor_data.at(monitor_list_line).inputs[i].point_type & 0xE0)>>5;
+
+		//byte temp_number =  m_monitor_data.at(monitor_list_line).inputs[i].number + external_high_bit*256;
+		//	temp_number =temp_number + 1;
 		unsigned temp_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
+		byte lowbyte_point_type = temp_point_type & 0x1F;	//高3位用于 存放
+		//if(temp_point_type > ENUM_AR_DATA)
+		//{
+		//	m_monitor_input_list.SetItemText(i,1,_T(""));
+		//	continue;
+		//}
+		if(((temp_panel == 0) || (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == 0)) ||(lowbyte_point_type > ENUM_AR_DATA))
+		{
+			m_monitor_data.at(monitor_list_line).inputs[i].network = 0;	//发现panel 是0  就说明这个数据是无效的,先设置为初始化值;
+			m_monitor_data.at(monitor_list_line).inputs[i].number = 0;
+			m_monitor_data.at(monitor_list_line).inputs[i].panel = 0;
+			m_monitor_data.at(monitor_list_line).inputs[i].point_type = 0;
+			m_monitor_data.at(monitor_list_line).inputs[i].sub_panel = 0;
+			m_monitor_input_list.SetItemText(i,1,_T(""));
+			continue;
+		}
+		
+	
 
 
-		temppoint = look_label(m_monitor_data.at(monitor_list_line).inputs[i].panel,
-							  m_monitor_data.at(monitor_list_line).inputs[i].point_type,
-							  m_monitor_data.at(monitor_list_line).inputs[i].number,
-							  m_monitor_data.at(monitor_list_line).inputs[i].network);
+		//Point_Net temp_point;
+		//memcpy(&temp_point,&m_monitor_data.at(monitor_list_line).inputs[i],sizeof(Point_Net));
+		//b = code;
+		Point_Net temp_point;
+		temp_point.network = m_monitor_data.at(monitor_list_line).inputs[i].network;
+		//if(m_monitor_data.at(monitor_list_line).inputs[i].number > 0)
+			temp_point.number = m_monitor_data.at(monitor_list_line).inputs[i].number ;//- 1;
+		//else
+		//	temp_point.number = 0;
+		//if(m_monitor_data.at(monitor_list_line).inputs[i].panel > 0)
+			temp_point.panel = m_monitor_data.at(monitor_list_line).inputs[i].panel;
+		//else
+		//	temp_point.panel = 0;
+		//temp_point.point_type = m_monitor_data.at(monitor_list_line).inputs[i].point_type ;//+ 1;
+		temp_point.point_type = temp_point_type ;//temp_point_type;
+		temp_point.sub_panel = m_monitor_data.at(monitor_list_line).inputs[i].sub_panel;
+
+		memset(q,0,30);
+		pointtotext(q,&temp_point);
+		temppoint = q;
+		char buf[100];
+		memset(buf,0,100);
+		if((m_monitor_data.at(monitor_list_line).inputs[i].panel == Station_NUM) && (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == Station_NUM))
+		{
+			char *temp_label =NULL;
+			byte point_type,var_type;
+			int num_point,num_panel,num_net,k;
+			unsigned char sub_panel = 0;
+			int my_network = 0;
+			temp_label = ispoint_ex(q,&num_point,&var_type, &point_type, &num_panel, &num_net, my_network,sub_panel, Station_NUM, &k);
+			if(temp_label != NULL)
+			{
+				strcpy(buf,temp_label);
+				temppoint= buf;
+			}
+			else
+				temppoint = NULL;
+		}
+
+
+
+
+		//temppoint = look_label(m_monitor_data.at(monitor_list_line).inputs[i].panel,
+		//					  m_monitor_data.at(monitor_list_line).inputs[i].point_type,
+		//					  m_monitor_data.at(monitor_list_line).inputs[i].number,
+		//					  m_monitor_data.at(monitor_list_line).inputs[i].network);
 		if(temppoint == NULL)
 		{
 			m_monitor_input_list.SetItemText(i,1,_T(""));
 			continue;
 		}
-		if(strlen(temppoint) >9)
-			memset(tempchar,0,50);
-		else
-		{
+		//if(strlen(temppoint) >9)
+		//	memset(tempchar,0,50);
+		//else
+		//{
 			memset(tempchar,0,50);
 			memcpy_s(tempchar,50,temppoint,strlen(temppoint));
-		}
+		//}
 		MultiByteToWideChar( CP_ACP, 0, tempchar, (int)strlen(tempchar)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
@@ -326,16 +427,32 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 
 	for (int i=0;i<MAX_POINTS_IN_MONITOR;i++)
 	{
+		byte temp_sub_panel = m_monitor_data.at(monitor_list_line).inputs[i].sub_panel;
 		byte temp_panel = m_monitor_data.at(monitor_list_line).inputs[i].panel;
 		byte temp_point_type = m_monitor_data.at(monitor_list_line).inputs[i].point_type;
 		byte temp_number = 0;
 		if(m_monitor_data.at(monitor_list_line).inputs[i].number > 0)
-			temp_number =  m_monitor_data.at(monitor_list_line).inputs[i].number - 1;
+			temp_number =  m_monitor_data.at(monitor_list_line).inputs[i].number ;//- 1;
 
 		unsigned temp_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
-		if((temp_panel == 0) && (temp_point_type == 0) && (temp_number == 0))
+		if((temp_panel == 0) || (temp_sub_panel == 0))
 			continue;
-		if( temp_point_type == ENUM_OUT)
+
+		//如果不是，就说明是远程的点;
+		if((temp_sub_panel!=Station_NUM) || (temp_panel != Station_NUM))
+		{
+			temp_input_count ++;
+			temp_analog_count ++;
+			temp_monitor_data_analog.inputs[temp_analog_count - 1].panel =  temp_panel;
+			temp_monitor_data_analog.inputs[temp_analog_count - 1].point_type = temp_point_type;
+			temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number ;
+			temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
+			temp_monitor_data_analog.inputs[temp_analog_count - 1].sub_panel = temp_sub_panel;
+			temp_monitor_data_analog.range[temp_analog_count - 1] = 0;
+			continue;
+		}
+
+		if( temp_point_type == ENUM_OUT + 1)
 		{
 			temp_input_count ++;
 			if(m_Output_data.at(temp_number).digital_analog == 1)
@@ -344,19 +461,22 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 
 				temp_monitor_data_analog.inputs[temp_analog_count - 1].panel =  temp_panel;
 				temp_monitor_data_analog.inputs[temp_analog_count - 1].point_type = temp_point_type;
-				temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number + 1;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number ;
 				temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].sub_panel = temp_sub_panel;
 			}
 			else
 			{
 				temp_digital_count ++;
 				temp_monitor_data_digital.inputs[temp_digital_count - 1].panel =  temp_panel;
 				temp_monitor_data_digital.inputs[temp_digital_count - 1].point_type = temp_point_type;
-				temp_monitor_data_digital.inputs[temp_digital_count - 1].number = temp_number + 1;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].number = temp_number ;
 				temp_monitor_data_digital.inputs[temp_digital_count - 1].network = temp_network;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].sub_panel = temp_sub_panel;
 			}
+				temp_monitor_data_analog.range[temp_analog_count - 1] = m_Output_data.at(temp_number).range;
 		}
-		else if(temp_point_type == ENUM_IN)
+		else if(temp_point_type == ENUM_IN + 1)
 		{
 			temp_input_count++;
 			if(m_Input_data.at(temp_number).digital_analog == 1)
@@ -364,19 +484,22 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 				temp_analog_count ++;
 				temp_monitor_data_analog.inputs[temp_analog_count - 1].panel =  temp_panel;
 				temp_monitor_data_analog.inputs[temp_analog_count - 1].point_type = temp_point_type;
-				temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number + 1;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number ;
 				temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].sub_panel = temp_sub_panel;
 			}
 			else
 			{
 				temp_digital_count ++;
 				temp_monitor_data_digital.inputs[temp_digital_count - 1].panel =  temp_panel;
 				temp_monitor_data_digital.inputs[temp_digital_count - 1].point_type = temp_point_type;
-				temp_monitor_data_digital.inputs[temp_digital_count - 1].number = temp_number + 1;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].number = temp_number ;
 				temp_monitor_data_digital.inputs[temp_digital_count - 1].network = temp_network;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].sub_panel = temp_sub_panel;
 			}
+			temp_monitor_data_analog.range[temp_analog_count - 1] = m_Input_data.at(temp_number).range;
 		}
-		else if(temp_point_type == ENUM_VAR)
+		else if(temp_point_type == ENUM_VAR + 1)
 		{
 			temp_input_count++;
 			if(m_Variable_data.at(temp_number).digital_analog == 1)
@@ -384,17 +507,20 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 				temp_analog_count ++;
 				temp_monitor_data_analog.inputs[temp_analog_count - 1].panel =  temp_panel;
 				temp_monitor_data_analog.inputs[temp_analog_count - 1].point_type = temp_point_type;
-				temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number + 1;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].number = temp_number ;
 				temp_monitor_data_analog.inputs[temp_analog_count - 1].network = temp_network;
+				temp_monitor_data_analog.inputs[temp_analog_count - 1].sub_panel = temp_sub_panel;
 			}
 			else
 			{
 				temp_digital_count ++;
 				temp_monitor_data_digital.inputs[temp_digital_count - 1].panel =  temp_panel;
 				temp_monitor_data_digital.inputs[temp_digital_count - 1].point_type = temp_point_type;
-				temp_monitor_data_digital.inputs[temp_digital_count - 1].number = temp_number + 1;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].number = temp_number ;
 				temp_monitor_data_digital.inputs[temp_digital_count - 1].network = temp_network;
+				temp_monitor_data_digital.inputs[temp_digital_count - 1].sub_panel = temp_sub_panel;
 			}
+			temp_monitor_data_analog.range[temp_analog_count - 1] = m_Variable_data.at(temp_number).range;
 		}
 
 	}
@@ -403,7 +529,7 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 	memcpy_s(m_monitor_data.at(monitor_list_line).inputs,temp_analog_count*sizeof(Point_Net),temp_monitor_data_analog.inputs,temp_analog_count*sizeof(Point_Net));
 	memcpy_s(&m_monitor_data.at(monitor_list_line).inputs[temp_analog_count]  ,temp_digital_count * sizeof(Point_Net),&temp_monitor_data_digital.inputs[0],temp_digital_count * sizeof(Point_Net));
 
-
+#if 0
 	temp_input_count = 0;
 	temp_analog_count = 0;
 
@@ -415,20 +541,39 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 		char tempchar[50];
 		char *temppoint = NULL;
 		byte temp_panel = m_monitor_data.at(monitor_list_line).inputs[i].panel;
-		byte temp_point_type = m_monitor_data.at(monitor_list_line).inputs[i].point_type;
-		byte temp_number =  m_monitor_data.at(monitor_list_line).inputs[i].number - 1;
-		unsigned temp_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
-		temppoint = look_label(m_monitor_data.at(monitor_list_line).inputs[i].panel,
-			m_monitor_data.at(monitor_list_line).inputs[i].point_type,
-			m_monitor_data.at(monitor_list_line).inputs[i].number,
+		byte temp_point_type = m_monitor_data.at(monitor_list_line).inputs[i].point_type & 0x1F;//point_type= (point->point_type ) & 0x1F;
+		byte temp_number =  m_monitor_data.at(monitor_list_line).inputs[i].number ;
+		byte temp_network = m_monitor_data.at(monitor_list_line).inputs[i].network;
+		byte temp_sub_panel =  m_monitor_data.at(monitor_list_line).inputs[i].sub_panel;
+		if((temp_panel == 0) ||	(temp_sub_panel == 0) )
+			continue;
+		if((m_monitor_data.at(monitor_list_line).inputs[i].sub_panel != Station_NUM) || (m_monitor_data.at(monitor_list_line).inputs[i].panel != Station_NUM))
+		{
+			temp_input_count ++;
+			temp_analog_count ++;
+			continue;
+		}
+
+		temppoint = look_label_ex(m_monitor_data.at(monitor_list_line).inputs[i].panel,
+			m_monitor_data.at(monitor_list_line).inputs[i].sub_panel,
+			temp_point_type - 1,
+			m_monitor_data.at(monitor_list_line).inputs[i].number + 1,
 			m_monitor_data.at(monitor_list_line).inputs[i].network);
+		//temppoint = look_label(m_monitor_data.at(monitor_list_line).inputs[i].panel,
+		//	m_monitor_data.at(monitor_list_line).inputs[i].point_type,
+		//	m_monitor_data.at(monitor_list_line).inputs[i].number,
+		//	m_monitor_data.at(monitor_list_line).inputs[i].network);
+		
 		if(temppoint == NULL)
 		{
-			m_monitor_input_list.SetItemText(i,1,_T(""));
+			temp_input_count ++;
+			temp_analog_count ++;
 			continue;
 		}
 		if(strlen(temppoint) >9)
+		{
 			memset(tempchar,0,50);
+		}
 		else
 		{
 			memset(tempchar,0,50);
@@ -440,21 +585,21 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 
 		my_input_info[i].be_record =true; //这一条进行了采样;
 
-		if( temp_point_type == ENUM_OUT)
+		if( temp_point_type == ENUM_OUT +1)
 		{
 			m_monitor_data.at(monitor_list_line).range[i] = m_Output_data.at(temp_number).range;
 			temp_input_count ++;
 			if(m_Output_data.at(temp_number).digital_analog == 1)
 				temp_analog_count ++;
 		}
-		else if(temp_point_type == ENUM_IN)
+		else if(temp_point_type == ENUM_IN +1)
 		{
 			m_monitor_data.at(monitor_list_line).range[i] = m_Input_data.at(temp_number).range;
 			temp_input_count++;
 			if(m_Input_data.at(temp_number).digital_analog == 1)
 				temp_analog_count ++;
 		}
-		else if(temp_point_type == ENUM_VAR)
+		else if(temp_point_type == ENUM_VAR +1)
 		{
 			m_monitor_data.at(monitor_list_line).range[i] = m_Variable_data.at(temp_number).range;
 			temp_input_count++;
@@ -465,6 +610,10 @@ void CBacnetMonitor::Set_Input_Range_And_count()
 	}
 	m_monitor_data.at(monitor_list_line).num_inputs = temp_input_count;
 	m_monitor_data.at(monitor_list_line).an_inputs = temp_analog_count;
+	CString TEST_CS;
+	TEST_CS.Format(_T("Input item = %d , Analog item = %d"),temp_input_count , temp_analog_count);
+	DFTrace(TEST_CS);
+#endif
 	return ;
 }
 
@@ -482,16 +631,16 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 	int k,num_net,num_point,num_panel;
 	var_type = num_point = point_type = 0;
 	k=0;
-	memcpy_s(&m_temp_monitor_data[Changed_Item],sizeof(Str_monitor_point),&m_monitor_data.at(Changed_Item),sizeof(Str_monitor_point));
+	memcpy_s(&m_temp_monitor_data[monitor_list_line],sizeof(Str_monitor_point),&m_monitor_data.at(monitor_list_line),sizeof(Str_monitor_point));
 
 	New_CString.Trim();
 	if(New_CString.IsEmpty())
 	{
-		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = 0;//目前不知道network 怎么处理;
+		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = 1;//目前不知道network 怎么处理;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].number = 0;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].panel = 0;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].point_type = 0;
-
+		Set_Input_Range_And_count();	//update the monitor structure analog and totol input number;
 		int cmp_ret = memcmp(&m_temp_monitor_data[monitor_list_line],&m_monitor_data.at(monitor_list_line),sizeof(Str_monitor_point));
 		if(cmp_ret!=0)
 		{
@@ -499,6 +648,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 			temp_task_info.Format(_T("Write Monitor List Item%d .Changed to empty "),monitor_list_line + 1);
 			Post_Write_Message(g_bac_instance,WRITEMONITOR_T3000,monitor_list_line,monitor_list_line,sizeof(Str_monitor_point),m_monitor_dlg_hwnd,temp_task_info,Changed_Item,Changed_SubItem);
 		}
+		PostMessage(WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
 		return 0;
 	}
 
@@ -507,13 +657,19 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 	WideCharToMultiByte( CP_ACP, 0, New_CString, -1, cTemp1, 255, NULL, NULL );
 
 	//目前只支持在本Panel下面寻找 各个Label 和值;
-	label=ispoint(cTemp1,&num_point,&var_type,&point_type,&num_panel,&num_net,0/*my_network*/,Station_NUM,&k);
+	//label=ispoint(cTemp1,&num_point,&var_type,&point_type,&num_panel,&num_net,0/*my_network*/,Station_NUM,&k);
+	unsigned char sub_panel_number = 0;
+	 label=ispoint_ex(cTemp1,&num_point,&var_type,&point_type,&num_panel,&num_net,0,sub_panel_number,Station_NUM,&k);
 	if(label!=NULL)
 	{
-		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = 0;//目前不知道network 怎么处理;
+		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].network = 1;//目前不知道network 怎么处理;
+		if(num_point > 0)
+			num_point = num_point - 1;
+		//point type 存的时候加1  ,原始 out = 0，in = 1 ，var = 2; 存进去是 out = 1; in = 2, var = 3;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].number = num_point;
 		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].panel = num_panel;
-		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].point_type = point_type;
+		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].sub_panel = sub_panel_number;
+		m_monitor_data.at(monitor_list_line).inputs[Changed_Item].point_type = point_type + 1;
 		char temp_input[250];
 		memset(temp_input,0,250);
 		strcpy(temp_input,label);
@@ -541,6 +697,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam)
 	{
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Error!Can't find the point!"));
 	}
+	PostMessage(WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
 	return 0;
 }
 LRESULT CBacnetMonitor::Fresh_Monitor_Item(WPARAM wParam,LPARAM lParam)
@@ -564,6 +721,11 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Item(WPARAM wParam,LPARAM lParam)
 			return 0;
 		}
 		New_CString.MakeUpper();
+		if(Check_Label_Exsit(New_CString))
+		{
+			PostMessage(WM_REFRESH_BAC_MONITOR_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0;
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, New_CString, -1, cTemp1, 255, NULL, NULL );
@@ -576,21 +738,21 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Item(WPARAM wParam,LPARAM lParam)
 			return 0;
 		m_monitor_data.at(Changed_Item).max_time_length = temp_value;
 	}
-	else if(Changed_SubItem == MONITOR_UNITS)
-	{
-		if(New_CString.CompareNoCase(_T("Days"))==0)
-		{
-			m_monitor_data.at(Changed_Item).unit = 2;
-		}
-		else if(New_CString.CompareNoCase(_T("Hours"))==0)
-		{
-			m_monitor_data.at(Changed_Item).unit = 1;
-		}
-		else if(New_CString.CompareNoCase(_T("Minutes"))==0)
-		{
-			m_monitor_data.at(Changed_Item).unit = 0;
-		}
-	}
+	//else if(Changed_SubItem == MONITOR_UNITS)
+	//{
+		//if(New_CString.CompareNoCase(_T("Days"))==0)
+		//{
+		//	m_monitor_data.at(Changed_Item).unit = 2;
+		//}
+		//else if(New_CString.CompareNoCase(_T("Hours"))==0)
+		//{
+		//	m_monitor_data.at(Changed_Item).unit = 1;
+		//}
+		//else if(New_CString.CompareNoCase(_T("Minutes"))==0)
+		//{
+		//	m_monitor_data.at(Changed_Item).unit = 0;
+		//}
+	//}
 
 	cmp_ret = memcmp(&m_temp_monitor_data[Changed_Item],&m_monitor_data.at(Changed_Item),sizeof(Str_monitor_point));
 	if(cmp_ret!=0)
@@ -653,18 +815,18 @@ LRESULT CBacnetMonitor::Fresh_Monitor_List(WPARAM wParam,LPARAM lParam)
 		temp_length.Format(_T("%d"),m_monitor_data.at(i).max_time_length);
 		m_monitor_list.SetItemText(i,MONITOR_LENGTH,temp_length);
 
-		if(m_monitor_data.at(i).unit == 2)
-		{
-			m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Days"));
-		}
-		else if(m_monitor_data.at(i).unit == 1)
-		{
-			m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Hours"));
-		}
-		else if(m_monitor_data.at(i).unit == 0)
-		{
-			m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Minutes"));
-		}
+		//if(m_monitor_data.at(i).unit == 2)
+		//{
+		//	m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Days"));
+		//}
+		//else if(m_monitor_data.at(i).unit == 1)
+		//{
+		//	m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Hours"));
+		//}
+		//else if(m_monitor_data.at(i).unit == 0)
+		//{
+		//	m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Minutes"));
+		//}
 
 		if(m_monitor_data.at(i).status == 1)
 		{
@@ -686,6 +848,13 @@ LRESULT CBacnetMonitor::Fresh_Monitor_List(WPARAM wParam,LPARAM lParam)
 //对于一个对话框里面有多个List 只能通过确认焦点 来发送Changed 消息;
 LRESULT CBacnetMonitor::Fresh_MCallBack_Item(WPARAM wParam,LPARAM lParam)
 {
+	//if (!::IsWindow(m_hWnd))
+	//{
+	//	return 0;
+	//}
+	CWnd * window_focus =	GetFocus();
+	if(window_focus == NULL)
+		return 0;
 	if(GetFocus()->GetDlgCtrlID() == IDC_LIST_MONITOR)
 	{
 		PostMessage(WM_LIST_MONITOR_CHANGED,wParam,lParam);
@@ -777,11 +946,13 @@ void CBacnetMonitor::OnNMClickListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 		m_monitor_list.GetSubItemRect(lRow,lCol,LVIR_BOUNDS,myrect);
 
 
-		myrect.left = myrect.left + list_rect.left - win_rect.left;
-		myrect.right = myrect.right + list_rect.left - win_rect.left;
-		myrect.top = myrect.top + 11;
-		myrect.bottom = myrect.bottom + 13;
+		myrect.left = myrect.left + list_rect.left - win_rect.left + 1;
+		myrect.right = myrect.right + list_rect.left - win_rect.left + 1;
+		myrect.top = myrect.top + 10;
+		myrect.bottom = myrect.bottom + 12;
 
+		myrect.top = myrect.top + 20;
+		myrect.bottom = myrect.bottom + 20;
 		m_monitor_time_picker.BringWindowToTop();
 		m_monitor_time_picker.MoveWindow(myrect);
 
@@ -898,11 +1069,11 @@ void CBacnetMonitor::OnNMKillfocusDatetimepickerMonitor(NMHDR *pNMHDR, LRESULT *
 void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 {
 	// TODO: Add your control notification handler code here
+
 	for (int i=0;i<14;i++)
 	{
 		InputLable[i] =	m_monitor_input_list.GetItemText(i,1);	
 	}
-	read_type = 1;
 	if(WaitDlg==NULL)
 	{
 		WaitDlg = new BacnetWait((int)BAC_WAIT_READ_MONITOR_DATA);
@@ -921,28 +1092,44 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 		h_read_monitordata_thread =CreateThread(NULL,NULL,Readmonitorthreadfun,this,NULL, NULL);
 	}
 
-	//CBacnetGraphic dlg;
-	//dlg.DoModal();
-
 }
 
 bool read_monitordata(int digtal_or_analog)
 {
 	timestart = time(NULL);
 	MonitorUpdateData temp;
-	temp.nsize = 10000;
-	temp.oldest_time =timesec1970 - 6000;
-	temp.most_recent_time = timestart + 6000;
-	g_Print.Format(_T("Read Data Time %d - %d"),temp.oldest_time,timestart);
-	DFTrace(g_Print);
+	memset(&temp,0,sizeof(MonitorUpdateData));
+	//temp.nsize = 10000;
+	//timesec1970 = (unsigned long)time(NULL);
+	//temp.oldest_time =timesec1970 - 43200;
+	//temp.most_recent_time = timestart + 43200;
+
+
+	//unsigned long nTime = temp.oldest_time;   //nTime类型为unsigned long
+	//unsigned long nTime1 = temp.most_recent_time;  //nTime类型为unsigned long
+	//CTime objTime(nTime);   //CTime类型变量直接获取时间值
+	//CTime objTime1(nTime1);   //CTime类型变量直接获取时间值
+	////string strTime;    //格式化string变量
+	////strTime.Format("d-d-d d:d:d", objTime.GetYear(), objTime.GetMonth(), objTime.GetDay(),objTime.GetHour(), objTime.GetMinute(), objTime.GetSecond());
+
+	//g_Print.Format(_T("Read Start Time %d-%d-%d %d:%d:%d   %d"), objTime.GetYear(), objTime.GetMonth(), objTime.GetDay(),objTime.GetHour(), objTime.GetMinute(), objTime.GetSecond(),temp.oldest_time);
+	//DFTrace(g_Print);
+	//g_Print.Format(_T("Read End Time %d-%d-%d %d:%d:%d   %d"), objTime1.GetYear(), objTime1.GetMonth(), objTime1.GetDay(),objTime1.GetHour(), objTime1.GetMinute(), objTime1.GetSecond(),temp.most_recent_time);
+	//DFTrace(g_Print);
 	int ret = -2;
 	int send_count = 0;
 	//int time_count = 0;//用于动态计时只要有回复继续下一包;.
 	int recieve_flag = 0;
 	CString cs_my_temp;
 	cs_my_temp = _T("");
-	WaitDlg->Set_Show_String(cs_my_temp);
-	WaitDlg->Set_Pos(0);
+	if(WaitDlg)
+	{
+		WaitDlg->Set_Show_String(cs_my_temp);
+		WaitDlg->Set_Pos(0);
+	}
+	else
+		return false;
+
 	m_monitor_head.total_seg = 0;
 	m_monitor_head.seg_index = 0;
 	for (int i=0;i<5;i++)
@@ -954,7 +1141,7 @@ bool read_monitordata(int digtal_or_analog)
 			Sleep(SEND_COMMAND_DELAY_TIME);
 			continue;
 		}
-		for(int time_loop=0;time_loop<500;time_loop++)
+		for(int time_loop=0;time_loop<2000;time_loop++)
 		{
 			Sleep(1);
 			if(tsm_invoke_id_free(ret))
@@ -965,21 +1152,34 @@ bool read_monitordata(int digtal_or_analog)
 		} 
 		if(recieve_flag)
 		{
-			Sleep(1);
 			break;
 		}
 		else if((recieve_flag == false) &&( i == 5))
 		{
-			Sleep(1);
 			return false;
 		}
 	}
 
-	for (int read_index=m_monitor_head.seg_index + 1;read_index<m_monitor_head.total_seg;read_index++)
+	CString temp_db_ini_folder;
+	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
+	CString temp_serial;
+	CString temp_monitor_index;
+	if(digtal_or_analog == BAC_UNITS_ANALOG)
+		temp_monitor_index.Format(_T("Index_%d"),monitor_list_line);
+	else
+		temp_monitor_index.Format(_T("Digital_Index_%d"),monitor_list_line);
+
+	temp_serial.Format(_T("%u"),g_selected_serialnumber);
+	int temp_index = GetPrivateProfileInt(temp_serial,temp_monitor_index,-1,temp_db_ini_folder) + 1;
+
+
+	for (int read_index= temp_index ;read_index<m_monitor_head.total_seg;read_index++)
 	{
-		cs_my_temp.Format(_T("%d / %d"),read_index,m_monitor_head.total_seg);
+		cs_my_temp.Format(_T("%d / %d"),read_index - temp_index,m_monitor_head.total_seg - temp_index);
 		WaitDlg->Set_Show_String(cs_my_temp);
-		int pos = (read_index * 100 ) / m_monitor_head.total_seg;
+		int pos = ((read_index - temp_index) * 100 ) / (m_monitor_head.total_seg - temp_index);
+		if(pos > 100)
+			pos = 100;
 		WaitDlg->Set_Pos(pos);
 		for (int i=0;i<5;i++)
 		{
@@ -990,7 +1190,7 @@ bool read_monitordata(int digtal_or_analog)
 				Sleep(SEND_COMMAND_DELAY_TIME);
 				continue;
 			}
-			for(int time_loop=0;time_loop<500;time_loop++)
+			for(int time_loop=0;time_loop<1500;time_loop++)
 			{
 				Sleep(1);
 				if(tsm_invoke_id_free(ret))
@@ -1001,7 +1201,6 @@ bool read_monitordata(int digtal_or_analog)
 			} 
 			if(recieve_flag)
 			{
-				Sleep(1);
 				break;
 			}
 			else if((recieve_flag == false) &&( i == 5))
@@ -1015,95 +1214,43 @@ bool read_monitordata(int digtal_or_analog)
 		{
 			continue;
 		}
+		else
+		{
+			return false;
+		}
 
 	}
+
 	return true;
 }
+
+
 
 DWORD WINAPI  CBacnetMonitor::Readmonitorthreadfun(LPVOID lpVoid)
 {
 	//Write_Config_Info
 	CBacnetMonitor *pParent = (CBacnetMonitor *)lpVoid;
 
-	if(read_monitordata(pParent->read_type))
+	if(read_monitordata(BAC_UNITS_ANALOG))
 	{
-		pParent->PostMessage(WM_MONITOR_USER_MESSAGE,MONITOR_MESSAGE_CREATE,0);
+		if(read_monitordata(BAC_UNITS_DIGITAL))
+			pParent->PostMessage(WM_MONITOR_USER_MESSAGE,MONITOR_MESSAGE_CREATE,0);
 	}
-
 readendthread:
-	WaitDlg->Set_Pos(100);
-	h_read_monitordata_thread = NULL;
+	
 	if(WaitDlg)
 	{
+		WaitDlg->Set_Pos(100);
 		WaitDlg = NULL;
 	}
+	h_read_monitordata_thread = NULL;
 	return 0;
 
 
 }
 
-void CBacnetMonitor::OnBnClickedBtnMonitorRefresh()
-{
-	// TODO: Add your control notification handler code here
-	Post_Refresh_Message(g_bac_instance,READMONITOR_T3000,0,BAC_MONITOR_COUNT - 1,sizeof(Str_monitor_point), BAC_MONITOR_GROUP);
-	PostMessage(WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
-	PostMessage(WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
-}
 
 
-void CBacnetMonitor::OnBnClickedButtonMonitorTest()
-{
-	// TODO: Add your control notification handler code here
-
-	//timestart = time(NULL);
-	//MonitorUpdateData temp;
-	//temp.nsize = 1000;
-	//temp.oldest_time =timesec1970 - 1000;
-	//temp.most_recent_time = timestart ;
-	//g_Print.Format(_T("Read Data Time %d - %d"),timesec1970,timestart);
-	//DFTrace(g_Print);
-	//GetMonitorBlockData(g_bac_instance,READMONITORDATA_T3000,monitor_list_line,READ_ANALOG,0,0,&temp);
-	////GetMonitorBlockData(g_bac_instance,READMONITORDATA_T3000,0,0,1,&temp);
-	read_type = 2;
-	if(WaitDlg==NULL)
-	{
-		WaitDlg = new BacnetWait((int)BAC_WAIT_READ_MONITOR_DATA);
-
-		WaitDlg->Create(IDD_DIALOG_BACNET_WAIT,this);
-		WaitDlg->ShowWindow(SW_SHOW);
-
-		RECT RECT_SET1;
-		::GetClientRect(BacNet_hwd,&RECT_SET1);
-		ClientToScreen(&RECT_SET1);
-		WaitDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 30,800,20);
-	}
-
-	if(h_read_monitordata_thread==NULL)
-	{
-		h_read_monitordata_thread =CreateThread(NULL,NULL,Readmonitorthreadfun,this,NULL, NULL);
-	}
-
-}
-
-
-//void CBacnetMonitor::OnNMKillfocusListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
-//{
-//	// TODO: Add your control notification handler code here
-//	
-//
-//	*pResult = 0;
-//}
-
-
-//void CBacnetMonitor::OnNMKillfocusListMonitorInput(NMHDR *pNMHDR, LRESULT *pResult)
-//{
-//	// TODO: Add your control notification handler code here
-//	TRACE(_T("Kill focus monitor inputs\r\n"));
-//#if 1
-//
-//#endif
-//	*pResult = 0;
-//}
 
 
 void CBacnetMonitor::OnNMSetfocusListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
@@ -1185,4 +1332,146 @@ void CBacnetMonitor::Reg_Hotkey()
 void CBacnetMonitor::Unreg_Hotkey()
 {
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
+}
+
+//This function code by Fance du for receive the monitor data;
+int handle_read_monitordata_ex(char *npoint,int nlength)
+{
+	char * my_temp_point = npoint;
+	char * temp_print = my_temp_point;
+
+
+	temp_print = my_temp_point;
+
+	//CString n_temp_print;
+	//n_temp_print.Format(_T("Monitor Rx (%03d): "),nlength);
+	//CString temp_char;
+	//for (int i = 0; i< nlength ; i++)
+	//{
+	//	temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
+	//	temp_char.MakeUpper();
+	//	temp_print ++;
+	//	n_temp_print = n_temp_print + temp_char + _T(" ");
+	//}
+	//DFTrace(n_temp_print);
+
+
+	bool analog_data = true;//1为Analog;
+
+
+	m_monitor_head.total_seg =  (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
+	my_temp_point = my_temp_point + 2;
+	m_monitor_head.command = *(my_temp_point++);
+	m_monitor_head.index = *(my_temp_point++);
+	m_monitor_head.type = *(my_temp_point++);
+	m_monitor_head.conm_args.nsize = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
+	my_temp_point = my_temp_point + 4;
+	m_monitor_head.conm_args.oldest_time = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
+	my_temp_point = my_temp_point + 4;
+	m_monitor_head.conm_args.most_recent_time = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
+	my_temp_point = my_temp_point + 4;
+	m_monitor_head.special = *(my_temp_point++);
+	//m_monitor_head.total_seg = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
+	//my_temp_point = my_temp_point + 2;
+	m_monitor_head.seg_index = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0]; 
+	my_temp_point = my_temp_point + 2;
+
+	if(nlength!= 420)	//每包必发420个字节;
+		return 0;
+	if(m_monitor_head.type == BAC_UNITS_ANALOG)
+		analog_data = true;
+	else if(m_monitor_head.type == BAC_UNITS_DIGITAL)
+		analog_data = false;
+	else
+		return 0;
+
+	CString temp_db_ini_folder;
+	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
+	CString temp_serial;
+	CString temp_monitor_index;
+	if(analog_data)
+		temp_monitor_index.Format(_T("Index_%d"),monitor_list_line);
+	else
+		temp_monitor_index.Format(_T("Digital_Index_%d"),monitor_list_line);
+	temp_serial.Format(_T("%u"),g_selected_serialnumber);
+	int temp_index = GetPrivateProfileInt(temp_serial,temp_monitor_index,-1,temp_db_ini_folder);
+	if(temp_index >= m_monitor_head.seg_index)
+		return 1;
+	if(temp_index >= m_monitor_head.total_seg)	//如果数据库里面的 index 已经比设备里面的 多，就说明已经读过了;不需要再往数据库里面存了;
+		return 1;
+
+	CBADO monitor_bado;
+	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
+	monitor_bado.OnInitADOConn(); 
+	int loop_count = 400/(sizeof(Str_mon_element));
+	for (int i=0;i<loop_count;i++)
+	{
+		Str_mon_element temp_data;
+		temp_data.index = *(my_temp_point++); 
+		temp_data.time = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
+		my_temp_point = my_temp_point + 4;
+		temp_data.point.number = *(my_temp_point++); 
+		temp_data.point.point_type = *(my_temp_point++); 
+
+		temp_data.point.panel = *(my_temp_point++); 
+		temp_data.point.sub_panel = *(my_temp_point++); 
+		temp_data.point.network = 1;my_temp_point ++; //*(my_temp_point++);  目前不考虑 多个net 的情况 ;
+		
+		temp_data.value = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
+		my_temp_point = my_temp_point + 4;
+
+		temp_data.mark =  (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
+		my_temp_point = my_temp_point + 2;
+		if(monitor_list_line != temp_data.index)
+			continue;
+		if(temp_data.mark != 0x0A0D)	//0d0a
+			continue;
+		if(temp_data.time == 0) //说明后面是无用的数据;填充的是0
+			continue;
+
+		CString temp_type;
+		temp_type.Format(_T("%u_%u_%u_%u_%u"),temp_data.point.number,temp_data.point.point_type,temp_data.point.panel,temp_data.point.sub_panel,temp_data.point.network);
+	
+		CString strSql;
+		strSql.Format(_T("insert into MonitorData values(%i,%i,'%s',%i,%i,%i)"),g_selected_serialnumber,screen_list_line,temp_type,temp_data.value,temp_data.time , analog_data);
+		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+
+	}
+	CString temp_write_index;
+	temp_write_index.Format(_T("%d"),m_monitor_head.seg_index);
+	WritePrivateProfileStringW(temp_serial,temp_monitor_index,temp_write_index,temp_db_ini_folder);
+	monitor_bado.CloseConn();
+
+
+
+	return 1;
+
+}
+
+// CBacnetProgramEdit message handlers
+LRESULT CBacnetMonitor::OnHotKey(WPARAM wParam,LPARAM lParam)
+{
+	if (wParam==KEY_INSERT)
+	{
+		OnBnClickedBtnMonitorGraphic();
+	}
+	return 0;
+}
+
+BOOL CBacnetMonitor::OnHelpInfo(HELPINFO* pHelpInfo)
+{ 
+
+	if (g_protocol==PROTOCOL_BACNET_IP){
+		HWND hWnd;
+
+		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle,theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+		else
+			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile,HH_HELP_CONTEXT, IDH_TOPIC_7_DATA);
+		return (hWnd != NULL);
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
+
+	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

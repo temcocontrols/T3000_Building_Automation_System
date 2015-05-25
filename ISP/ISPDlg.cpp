@@ -1,4 +1,4 @@
-
+// 4.7.1 版本 改动 公司内部获取 序列号的方式 改为从 数据库获取;
 // ISPDlg.cpp : implementation file
 //
 
@@ -39,6 +39,7 @@ int g_Commu_type=0;
 UINT _PingThread(LPVOID pParam);
 
 unsigned int Remote_timeout = 1000;
+CString Auto_flash_SN_connect_IP;
 DWORD WINAPI GetFWFileProc(LPVOID lPvoid);
 
 class CAboutDlg : public CDialog
@@ -322,6 +323,13 @@ BOOL CISPDlg::OnInitDialog()
 		 if(Remote_timeout < 50)
 			 Remote_timeout = 1000;
 
+		 GetPrivateProfileStringW(_T("Setting"),_T("DB_IPADDRESS"),_T("NULL"),Auto_flash_SN_connect_IP.GetBuffer(MAX_PATH),MAX_PATH,SettingPath);
+		 Auto_flash_SN_connect_IP.ReleaseBuffer();
+		 if(Auto_flash_SN_connect_IP.CompareNoCase(_T("NULL")) == 0)
+		 {
+			 WritePrivateProfileStringW(_T("Setting"),_T("DB_IPADDRESS"),_T("192.168.0.202"),SettingPath);
+			 Auto_flash_SN_connect_IP = _T("192.168.0.202");
+		 }
 		 if(fFind.FindFile(AutoFlashConfigPath))
 		 {
 			
@@ -387,7 +395,7 @@ BOOL CISPDlg::OnInitDialog()
 		
 		 ////////////////////////////////////////////////////////////////////////////
 
-	GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(_T("19200"));
+	 GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(_T("19200"));
 	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename); 
 	 GetDlgItem(IDC_EDIT_MDBID1)->SetWindowText(id);
 	 GetDlgItem(IDC_COMBO_COM)->SetWindowText(comport);
@@ -508,7 +516,7 @@ BOOL CISPDlg::OnInitDialog()
 
 	 if(!auto_flash_mode)
 	 {
-		// initFlashSN();
+		 initFlashSN();
 	 }
 	 else
 	 {
@@ -574,7 +582,7 @@ void CISPDlg::InitISPUI()
         pWnd->GetWindowRect(&rc);
         //ScreenToClient(&rc);
 
-        wp.rcNormalPosition.bottom = rc.bottom - 10;
+        wp.rcNormalPosition.bottom = rc.bottom ;//- 20;
         SetWindowPlacement(&wp);
 
         GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_HIDE); 
@@ -746,15 +754,15 @@ void CISPDlg::SaveParamToConfigFile()
 	  m_ipAddress.GetWindowText(strip);
 	  CString stripport;
 	 GetDlgItem(IDC_EDIT_NCPORT)-> GetWindowText(stripport);
-	m_cfgFileHandler.WriteToCfgFile(m_strHexFileName,
-		flashmethod,
-		strMID,
-		strComPort,
-		strBaudrate,
-		strip,
-		stripport,
-		subnote,
-		subID);
+	 m_cfgFileHandler.WriteToCfgFile(m_strHexFileName,
+		 flashmethod,
+		 strMID,
+		 strComPort,
+		 strBaudrate,
+		 strip,
+		 stripport,
+		 subnote,
+		 subID);
 }
 
 void CISPDlg::OnBnClickedButtonFlash()
@@ -769,15 +777,15 @@ void CISPDlg::OnBnClickedButtonFlash()
 	  case FLASH_TSTAT_COM:
 		  {	 
 			  SetCommunicationType(0);
-
 			  FlashTstat();
 			  break;
 		  }
 	  case FLASH_NC_LC_NET:
 		  {	  
           
-          
+              
               SetCommunicationType(1);
+			  
               FlashNC_LC();
 		    
 		  
@@ -1307,7 +1315,8 @@ BOOL CISPDlg::FlashTstat(void)
 			if (m_szMdbIDs.size()<=1)
 			{
 				TempID=m_szMdbIDs[0];
-
+				if (TempID!=255)
+				{
 				int realID=-1;
 					realID=Read_One(TempID,6);
 				while(realID<0){//the return value == -1 ,no connecting
@@ -1376,6 +1385,8 @@ BOOL CISPDlg::FlashTstat(void)
 
 
 				 }
+				}
+				
 			} 
 			else
 			{   
@@ -1422,10 +1433,7 @@ BOOL CISPDlg::FlashTstat(void)
 		 
 		FlashByCom();
 	}
-	else
-	{
-
-	}
+	 
 
 	return TRUE;
 }
@@ -1639,7 +1647,7 @@ void CISPDlg::OnFlashSubID()
 
 		m_pTCPFlasher->m_hexbinfilepath=m_strFlashFileName;
 		m_pTCPFlasher->BeginWirteByTCP();
-
+		 EnableFlash(FALSE);	
 	}
 	else
 	{
@@ -1856,7 +1864,13 @@ void CISPDlg::ShowHexBinInfor(int hexbin){
 	{
 		if(READ_SUCCESS != Get_HexFile_Information(m_strHexFileName.GetBuffer(),temp1))
 		{
-			MessageBox(_T("Sorry,This firmware is an old version,Contact vendor for new firmware!"));
+			 if(!auto_flash_mode)
+			 {
+			  MessageBox(_T("@1 This firmware is an old version,Contact vendor for new firmware!\n@2 If you want to flash the old firmware ,Please use the old ISPTool_Rev4.7.0"));
+			 }
+			 CString temp;
+			 temp.Format(_T("@1 This firmware is an old version,Contact vendor for new firmware!\n@2 If you want to flash the old firmware ,Please use the old ISPTool_Rev4.7.0"));
+			 UpdateStatusInfo(temp,false);
 			return;
 		}
 	}
@@ -1864,12 +1878,30 @@ void CISPDlg::ShowHexBinInfor(int hexbin){
 	{
 		if(READ_SUCCESS != Get_Binfile_Information(m_strHexFileName.GetBuffer(),temp1))
 		{
-			MessageBox(_T("Sorry,This firmware is an old version,Contact vendor for new firmware!"));
+			 if(!auto_flash_mode)
+			 {
+				MessageBox(_T("Sorry,This firmware is an old version,Contact vendor for new firmware!"));
+			 }
+			 CString temp1;
+			 temp1.Format(_T("Sorry,This firmware is an old version,Contact vendor for new firmware!"));
+			 UpdateStatusInfo(temp1,false);
 			return;
 		}
 	}
-
+	 
 	CString temp;
+	 
+		 
+	 MultiByteToWideChar( CP_ACP, 0, (char *)(temp1.product_name), 
+		 (int)strlen(temp1.product_name)+1, 
+		 temp.GetBuffer(MAX_PATH), MAX_PATH );
+	 temp.ReleaseBuffer();		
+	 
+	 
+	if (temp.CompareNoCase(_T("CO3"))==0)
+	{
+	  temp1.product_name[2]='2';
+	}
 	UpdateStatusInfo(_T(">>>>>The File Information<<<<<"), FALSE);
 	temp.Format(_T("Company Name: "));
 	for (int i=0;i<5;i++)
@@ -1909,7 +1941,7 @@ void CISPDlg::FlashByCom()
     pHexFile->SetFileName(m_strHexFileName);
 
      
-   /*  Get_HexFile_Information(m_strHexFileName.GetBuffer(),temp1);*/
+   
 	 ShowHexBinInfor(1);
 // 	 CString temp;
 // 	 UpdateStatusInfo(_T(">>>>>The Hex Information<<<<<"), FALSE);
@@ -2073,7 +2105,8 @@ afx_msg LRESULT CISPDlg::Show_Flash_DeviceInfor(WPARAM wParam, LPARAM lParam)
 		UpdateData(FALSE); //显示在界面上
 	}
 	else
-	{ m_ModelName=_T("");
+	{ 
+	m_ModelName=_T("");
 	m_FirmVer=_T("");
 	m_HardVer=_T("");
 	}
@@ -2449,14 +2482,23 @@ void CISPDlg::OnMenuAbout()
          return ;		
      }
      int nHWVerison;
+	 int nSoftwareVersion;
      //	int nProductModel;
      CString  strProductModel;
 
      int ProductID;
 
      GetFlashSNParam(nHWVerison, strProductModel,ProductID);
+	   CString strSWV;
+	 CWnd* pWnd = GetDlgItem(IDC_EDIT_HWVERSION);
+	 pWnd->GetWindowText(strSWV);
+	 nSoftwareVersion = _wtoi(strSWV);
      pFlashSN->SetMBID(m_szMdbIDs[0]);
-     pFlashSN->SetFlashParam((static_cast<const CString>(strProductModel)), nHWVerison,ProductID);
+
+	 CString username;
+	 pWnd = GetDlgItem(IDC_FLASH_USER_ID);
+	 pWnd->GetWindowText(username);
+     pFlashSN->SetFlashParam((static_cast<const CString>(strProductModel)), nHWVerison,ProductID,nSoftwareVersion,username);
 
      pFlashSN->StartWriteSN();
     CString SN;

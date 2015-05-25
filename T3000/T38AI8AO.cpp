@@ -8,15 +8,18 @@
  #include "Dialog_Progess.h"
 #include "globle_function.h"
 #include "MainFrm.h"
+#include <bitset>
 // T38AI8AO
 #define  INPUT_ROWS 8
 #define  INPUT_COLS 4
 #define  OUTPUT_ROWS 8
-#define  OUTPUT_COLS 2
+#define  OUTPUT_COLS 3
+
+
 vector<T3Register> g_VectorT3Register;
  BOOL bPauseMultiRead=FALSE;
 IMPLEMENT_DYNCREATE(T38AI8AO, CFormView)
-UINT _BackFreshing(LPVOID pParam)
+DWORD WINAPI _BackFreshing_8IAO(LPVOID pParam)
 {
 	T38AI8AO* dlg=(T38AI8AO*)(pParam);
 	
@@ -25,22 +28,25 @@ UINT _BackFreshing(LPVOID pParam)
 
 	while(1)
 	{
-		if(bPauseMultiRead)
-			continue;
+	 
 		if (!is_connect())
 		{
 			continue;
 		}
-		 Sleep(10*1000);
-		bPauseMultiRead=TRUE;
+		 Sleep(3*1000);
+		 
 		for(int i=0;i<3;i++) //Modify by Fance , tstat 6 has more register than 512;
 		{
-			register_critical_section.Lock();
-			
+			 
+			if(g_bPauseMultiRead)
+			{
+
+				return 0;
+			}
 			Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100);
-			register_critical_section.Unlock();
+			 
 		}
-		bPauseMultiRead=FALSE;
+		 
 		memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
 		dlg->InitialDialog();
 
@@ -55,7 +61,7 @@ T38AI8AO::T38AI8AO()
 	
 	, m_address(_T(""))
 {
-
+hFirstThread=NULL;
 }
 
 T38AI8AO::~T38AI8AO()
@@ -79,6 +85,8 @@ BEGIN_MESSAGE_MAP(T38AI8AO, CFormView)
 	ON_CBN_SELCHANGE(IDC_DELAY, &T38AI8AO::OnCbnSelchangeDelay)
 	ON_EN_KILLFOCUS(IDC_EDIT_NAME, &T38AI8AO::OnEnKillfocusEditName)
 	ON_CBN_SELCHANGE(IDC_RANGECOMBO, &T38AI8AO::OnCbnSelchangeRangecombo)
+	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BUTTON_RESET, &T38AI8AO::OnBnClickedButtonReset)
 END_MESSAGE_MAP()
 
 
@@ -108,7 +116,7 @@ void T38AI8AO::OnInitialUpdate()
 	//显示横标题
 	m_msflexgrid_input.put_TextMatrix(0,0,_T("Input Name"));
 	m_msflexgrid_input.put_TextMatrix(0,1,_T("Register Value"));
-	//m_msflexgrid_input.put_TextMatrix(0,2,_T("Date Stamp"));
+ 
 	m_msflexgrid_input.put_TextMatrix(0,2,_T("Range"));
 	m_msflexgrid_input.put_TextMatrix(0,3,_T("Filter"));
 
@@ -168,12 +176,12 @@ void T38AI8AO::OnInitialUpdate()
 	//显示横标题
 	m_msflexgrid_output.put_TextMatrix(0,0,_T("Output Name"));
 	m_msflexgrid_output.put_TextMatrix(0,1,_T("Output Value"));
-	//m_msflexgrid_output.put_TextMatrix(0,2,_T("Light Switch"));
+	m_msflexgrid_output.put_TextMatrix(0,2,_T("Switch Status"));
 	//m_msflexgrid_output.put_TextMatrix(0,3,_T("Auto/Manual"));
 
 	m_msflexgrid_output.put_ColWidth(0,1500);
 	m_msflexgrid_output.put_ColWidth(1,1200);
-	//m_msflexgrid_output.put_ColWidth(2,1500);
+	m_msflexgrid_output.put_ColWidth(2,1200);
 	//m_msflexgrid_output.put_ColWidth(3,1500);//居中显示
 	for (int col=0;col<OUTPUT_COLS;col++)
 	{ 
@@ -200,11 +208,8 @@ void T38AI8AO::OnInitialUpdate()
 	CString str_output;
 	for(int i=1;i<OUTPUT_ROWS+1;i++)
 	{
-
 		str_output.Format(_T("Output%d"),i);
 		m_msflexgrid_output.put_TextMatrix(i,0,str_output);	
-
-
 	}
 
 
@@ -475,6 +480,12 @@ void T38AI8AO::InitialDialog(){
 		m_msflexgrid_input.put_TextMatrix(i,3,strresult);
 	}
 
+	bitset<16> BitSwitchValue(product_register_value[SWITCH1_STATUS]);
+	int SwitchValue[OUTPUT_ROWS];
+	for (int i=0;i<OUTPUT_ROWS;i++)
+	{
+		SwitchValue[i]=BitSwitchValue[2*i]+BitSwitchValue[2*i+1]*2;
+	}
 	CString CstresultDO;
 	for(int i = 1;i<=OUTPUT_ROWS;i++)
 	{  
@@ -482,8 +493,7 @@ void T38AI8AO::InitialDialog(){
 		CstresultDO.Format(_T("%d"),product_register_value[OUTPUT1+i-1]);
 		m_msflexgrid_output.put_TextMatrix(i,1,CstresultDO);
 		 
-		/*CstresultDO.Format(_T("%d"),product_register_value[LIGHT_SWITCH_OUTPUT1+i-1]);
-		m_msflexgrid_output.put_TextMatrix(i,2,CstresultDO);*/
+		m_msflexgrid_output.put_TextMatrix(i,2,STRING_SWITCH_STATUS[SwitchValue[i-1]]); 
 
 
 	}
@@ -505,7 +515,14 @@ void T38AI8AO::Fresh(){
 
 		InitialRegister();	
 		InitialDialog();
-		AfxBeginThread(_BackFreshing,this);
+		if(hFirstThread != NULL)
+			TerminateThread(hFirstThread, 0);
+		hFirstThread=NULL;
+		if (!hFirstThread)
+		{
+			hFirstThread = CreateThread(NULL,NULL,_BackFreshing_8IAO,this,NULL,0);
+		}
+		//AfxBeginThread(_BackFreshing,this);
 	}
 	else
 	{
@@ -792,4 +809,39 @@ bPauseMultiRead=TRUE;
 	InitialDialog();
 	EndWaitCursor();
 	bPauseMultiRead=FALSE;
+}
+
+
+void T38AI8AO::OnDestroy()
+{
+	
+	if(hFirstThread != NULL)
+		TerminateThread(hFirstThread, 0);
+	hFirstThread=NULL;
+
+
+CFormView::OnDestroy();
+
+	// TODO: Add your message handler code here
+}
+
+
+void T38AI8AO::OnBnClickedButtonReset()
+{
+	if(AfxMessageBox(_T(" This will reset the module to the factory defaults,Are you sure to reset it ?"))==IDOK)
+	{
+		//  write_one(g_tstat_id,299,1);
+		write_one(g_tstat_id,300,1);
+		unsigned short RangeData[10];
+
+		int multi_ret = Read_Multi(g_tstat_id,RangeData,RANGE_INPUT1,10) ;
+		if (multi_ret >0 )
+		{
+			for (int i=0; i<10 ; i++)
+			{
+				product_register_value[RANGE_INPUT1+i] = RangeData[i];
+			}
+			InitialDialog();
+		}
+	}
 }

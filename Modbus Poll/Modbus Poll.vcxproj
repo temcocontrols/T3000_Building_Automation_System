@@ -43,6 +43,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\T3000 Output\debug</OutDir>
     <IntDir>..\T3000 Output\Modbus Pol object\debug</IntDir>
+    <EmbedManifest>false</EmbedManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -178,6 +179,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TestCenter.h" />
     <ClInclude Include="WriteMultiRegistersDlg.h" />
     <ClInclude Include="WriteSingleRegisterDlg.h" />
     <ClInclude Include="WriteSingle_BinaryDlg.h" />
@@ -227,6 +229,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TestCenter.cpp" />
     <ClCompile Include="WriteMultiRegistersDlg.cpp" />
     <ClCompile Include="WriteSingleRegisterDlg.cpp" />
     <ClCompile Include="WriteSingle_BinaryDlg.cpp" />

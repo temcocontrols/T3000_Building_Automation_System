@@ -5,7 +5,7 @@
 #include "CM5\MyOwnListCtrl.h"
 #include "afxcmn.h"
 #include "afxdtctl.h"
-
+#include "msflexgrid1.h"
 #define ALARM_AUTO   0
 #define ALARM_MANULE 1
 
@@ -65,6 +65,7 @@ protected:
 
 public:
 	void Fresh();
+	void Fresh_CO2();
 	CEdit m_co2_idAdressEdit;
 	
 	float m_co2_firmwareversion;
@@ -73,7 +74,13 @@ public:
 
 	bool m_temp_unit_c0_f1;
 	CString cs_temp_unit;
-	
+	bool m_start_tip;
+
+
+
+	int m_nCurRow;
+	int m_nCurCol;
+
 public:
 	void Get_CO2_Temperature_unit(CString &strTemp);
 	void CO2_Alarm_Set();
@@ -91,11 +98,11 @@ public:
 	CComboBox m_sensor_sel;
 	CButton m_co2_alarm_mode_ctr;
 	BOOL m_alarm_ctrl_manual_auto;
-	short m_alarm_on_time;
-	short m_alarm_off_time;
-	short m_edit_pre_alarm_setpoint;
-	short m_edit_alarm_setpoint;
-	short m_edit_calibrating_offset;
+	int m_alarm_on_time;
+	int m_alarm_off_time;
+	int m_edit_pre_alarm_setpoint;
+	int m_edit_alarm_setpoint;
+	int m_edit_calibrating_offset;
 
 	afx_msg void OnBnClickedCo2Enableidbutton();
 	DECLARE_EVENTSINK_MAP()
@@ -146,6 +153,16 @@ public:
 	afx_msg void OnBnClickedRadioHumidityHeatEnable();
 	afx_msg void OnBnClickedRadioHumidityHeatDisable();
     void Initial_Registerlist();
+
+
+	int m_message_down;
+	int m_message_up;
+
+	int m_value;
+	int m_address;
+	int m_times;
+
+	bool m_fresh_Grid;
     private:
         int	CO2_485_MODBUS_SERIALNUMBER_LOWORD	;
         int	CO2_485_MODBUS_SERIALNUMBER_HIWORD	;
@@ -247,6 +264,26 @@ public:
         int	CO2_485_MODBUS_RESET_SCAN_DB	;
         int	CO2_485_MODBUS_SCAN_START	;
 
+		int CO2_485_OIUTPUT_MODE ;
+
+public:
+	afx_msg void OnEnKillfocusEditCo2Humidity();
+	UINT m_co2_value;
+	afx_msg void OnEnKillfocusEditCo2value();
+	CMsflexgrid m_grid_input;
+	void ClickMsflexgridInput();
+	CMFCButton m_upButton;
+	CMFCButton m_downButton;
+	CEdit m_inValueEdit;
+	afx_msg void OnEnKillfocusEditValueGrid();
+	 void OnLButtonDown(CPoint pt);
+//	afx_msg void OnBnDropDownDownbutton(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedUpbutton();
+//	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	CEdit m_test_edit;
+	afx_msg void OnEnKillfocusIdCo2Edit();
+	afx_msg void OnCbnSelchangeCo2Braudratecombo();
 };
 /*
 typedef enum

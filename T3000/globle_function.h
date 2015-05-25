@@ -109,11 +109,15 @@ BOOL Post_Invoke_ID_Monitor_Thread(UINT MsgType,
 BOOL Post_Refresh_One_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize);
 BOOL Post_Refresh_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,int block_size);
 BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,unsigned short entitysize,HWND hWnd,CString Task_Info = _T(""),int nRow = 0,int nCol = 0);
-int GetPrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance,int16_t entitysize);
-int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, int8_t ntotal_seg,int8_t nseg_index,MonitorUpdateData* up_data);
-int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance/*,int8_t entitysize*/ );
-
+int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance,uint8_t npackgae);
+int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
+int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
+int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint16_t ntotal_seg,uint16_t nseg_index,MonitorUpdateData* up_data);
+int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance );
+int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
+int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t nstop_index);
 int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag);
+bool Check_Label_Exsit(LPCTSTR m_new_label);
 void local_handler_conf_private_trans_ack(
 	uint8_t * service_request,
 	uint16_t service_len,
@@ -150,11 +154,45 @@ bool GetFileNameFromPath(CString ncstring,CString &cs_return);
 BOOL Ping(const CString& strIP, CWnd* pWndEcho);
 int Open_MonitorDataBase(WCHAR *DataSource);
 void Send_WhoIs_remote_ip(CString ipaddress);
-int handle_read_monitordata(char *npoint,int nlength);
+void SaveBacnetConfigFile(CString &SaveConfigFilePath);
+void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath);
+int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path);
+int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path);
+int handle_read_monitordata_ex(char *npoint,int nlength);
 bool IP_is_Local(LPCTSTR ip_address);
 bool Is_Bacnet_Device(unsigned short n_product_class_id);
 BOOL DirectoryExist(CString Path);
 BOOL CreateDirectory(CString path);
+BOOL DeleteDirectory(CString path);
 int GetHostAdaptersInfo(CString &IP_address_local);
 DWORD WinExecAndWait( LPCTSTR lpszAppPath,LPCTSTR lpParameters,LPCTSTR lpszDirectory, 	DWORD dwMilliseconds);
+CString GetContentFromURL(CString URL);
+CString GetProductFirmwareTimeFromTemcoWebsite(CString URL,CString HexOrBinName,CString &FileSize);
+BOOL KillProcessFromName(CString strProcessName) ;
+BOOL CheckTheSameSubnet(CString strIP ,CString strIP2);
+
+
+void Save_Product_Value_Cache(CString &SaveFilePath);
+int Load_Product_Value_Cache(LPCTSTR tem_read_path);
+
+
+CString GetExePath(bool bHasSlash);
+void GetIPMaskGetWay();
+void GetIPMaskGetWayForScan();
+BOOL Is_Dig_Num(CString str);
+BOOL ValidAddress(CString sAddress);
+
+BOOL GetIPbyHostName(CString strHostName,CString &strIP);
+void TraverseFolder( const CString& strDir,std::vector<CString>& vecFile);
+
+
+
+void LoadTstat_InputData();
+void LoadInputData_CS3000();
+CString GetTextFromReg(unsigned short reg);
+void LoadTstat_OutputData();
+void LoadOutputData_CS3000();
+
+
+
 #endif

@@ -278,15 +278,18 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 		g_hwnd_now = m_schedule_day_dlg_hwnd;
 
 		SYSTEMTIME StartTime1;
-		StartTime1.wYear = 2013;
+		StartTime1.wYear = 2015;
 		StartTime1.wMonth = 1;
 		StartTime1.wDay = 1;
 		SYSTEMTIME EndTime1;
-		EndTime1.wYear = 2013;
+		EndTime1.wYear = 2015;
 		EndTime1.wMonth = 12;
 		EndTime1.wDay = 31;
 		m_month_ctrl.SetRange(&StartTime1,&EndTime1);
-
+			//m_month_ctrl.SetColor(MCSC_TEXT,RGB(240,0,0));
+			//int ret_results = m_month_ctrl.SetColor(MCSC_BACKGROUND,RGB(255,0,0));
+		int	ret_results = m_month_ctrl.SetColor(MCSC_TEXT  ,RGB(255,255,0));
+			ret_results = m_month_ctrl.GetColor(MCSC_TEXT);
 
 		SYSTEMTIME timeFrom;
 		SYSTEMTIME timeUntil;
@@ -386,7 +389,8 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 		m_monthViewCtrl.ShowWindow(SW_HIDE);
 
 		*/
-		//	m_month_ctrl.SetColor(MCSC_TEXT,RGB(240,0,0));
+
+			//m_month_ctrl.SetColor(MCSC_TEXT,RGB(240,0,0));
 		//m_month_ctrl.
 
 		month_nCount = m_month_ctrl.GetMonthRange(&timeFrom, &timeUntil, GMR_DAYSTATE);
@@ -553,15 +557,23 @@ BOOL AnnualRout_InsertDia::PreTranslateMessage(MSG* pMsg)
 {
 	if(pMsg->message == WM_RBUTTONDOWN )
 	{
-		if(pMsg->hwnd==m_month_ctrl.GetSafeHwnd())
+		if((g_protocol == PROTOCOL_BACNET_IP)|| (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_GSM))
 		{
-			CMenu menu;
-			menu.LoadMenu(IDR_POPUP_MENU);
-			CMenu *pmenu=menu.GetSubMenu(1);	
-			CPoint point=pMsg->pt;
-			pmenu->TrackPopupMenu(TPM_LEFTBUTTON | TPM_LEFTALIGN ,point.x,point.y,this);
 			return true;
 		}
+		else
+		{
+			if(pMsg->hwnd==m_month_ctrl.GetSafeHwnd())
+			{
+				CMenu menu;
+				menu.LoadMenu(IDR_POPUP_MENU);
+				CMenu *pmenu=menu.GetSubMenu(1);	
+				CPoint point=pMsg->pt;
+				pmenu->TrackPopupMenu(TPM_LEFTBUTTON | TPM_LEFTALIGN ,point.x,point.y,this);
+				return true;
+			}
+		}
+
 	}
 	if(pMsg->message == WM_LBUTTONDBLCLK )
 	{

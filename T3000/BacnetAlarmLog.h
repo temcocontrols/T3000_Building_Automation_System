@@ -31,6 +31,7 @@ public:
 	afx_msg LRESULT  AlarmLogMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnClose();
 	virtual void OnCancel();
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 };
 
 const int ALARMLOG_NUM = 0;

@@ -129,10 +129,7 @@ BOOL CFSBContainer::CreateFlexSlideBar(
 						)
 {
 	return m_pFSWnd->CreateFlexSlideBar(bHorizontal,	style,	nChannelWidth, nThumbWidth, tbShape );
-}
-
-
-//Sets the minimum and maximum positions for a slider. 
+} 
 void CFSBContainer::SetRange(int nMax, int nMin)
 {
 	m_pFSWnd->SetRange(nMax, nMin);

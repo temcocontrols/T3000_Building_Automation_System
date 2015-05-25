@@ -44,7 +44,7 @@
 #endif
 
 /** @file bip.c  Configuration and Operations for BACnet/IP */
-
+static bool b_gsm_connected = false;
 static int BIP_Socket = -1;
 /* port to use - stored in network byte order */
 static uint16_t BIP_Port = 0;   /* this will force initialization in demos */
@@ -61,6 +61,12 @@ void bip_set_socket(
     int sock_fd)
 {
     BIP_Socket = sock_fd;
+}
+
+//如果是GSM 的连接 将不会判断47808 之类的端口，采用特殊情况 通讯;
+void bip_setgsm(bool isconnect)
+{
+	b_gsm_connected = isconnect;
 }
 
 /** Getter for the BACnet/IP socket handle.
@@ -297,8 +303,8 @@ uint16_t bip_receive(
     if ((function == BVLC_ORIGINAL_UNICAST_NPDU) ||
         (function == BVLC_ORIGINAL_BROADCAST_NPDU)) {
         /* ignore messages from me */
-        if ((sin.sin_addr.s_addr == BIP_Address.s_addr) &&
-            (sin.sin_port == BIP_Port)) {
+        if ((sin.sin_addr.s_addr == BIP_Address.s_addr) &&(sin.sin_port == BIP_Port) &&(b_gsm_connected == false)) 
+		{
             pdu_len = 0;
 #if 0
             fprintf(stderr, "BIP: src is me. Discarded!\n");

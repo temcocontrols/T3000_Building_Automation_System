@@ -55,6 +55,7 @@ _variant_t Ip_Address;
 _variant_t Ip_Port;
 _variant_t Braudrate;
 _variant_t Default_SubBuilding;
+_variant_t Building_Path;
 };
 struct Building_ALL{
 _variant_t Building_Name;
@@ -100,13 +101,7 @@ _variant_t Card;
 _variant_t Output;
 _variant_t OutputName;
 };
-struct LightingController_Name{
-_variant_t Address;
-_variant_t Type;
-_variant_t ID_No;
-_variant_t OutputName;
-_variant_t Status;
-};
+ 
 struct Product_Data{
 _variant_t Serial_ID;
 _variant_t Register_Data;
@@ -226,7 +221,7 @@ public:
 	virtual int ExitInstance();
 	void CopyDirectory(CString strSrcPath,CString strDstPath);
 //	bool cm5_timer;	  //CM5
-
+    BOOL JudgeT3000Version();
 	BOOL haveRegister();
 	CString GetModulePath();
 	int GetSoftInstallDays();
@@ -240,7 +235,7 @@ public:
 	DWORD password;
 	BOOL JudgeDB();
 	void ImportData();
- 
+    BOOL Is_haveTable(CString TableName);
 	vector<ALL_NODE> m_AllNodes;
 
 	vector<Building> m_Building;
@@ -249,13 +244,18 @@ public:
 	vector<IONAME> m_IONAME;
 	vector<IONAME_Config> m_IONAME_Config;
 	vector<LCNameConfigure> m_LCNameConfigure;
-	vector<LightingController_Name> m_LightingController_Name;
+	 
 	vector<Product_Data> m_Product_Data;
 	vector<Screen_Label> m_Screen_Label;
 
 	vector<Value_Range>m_Value_Range;
 
-	
+	int m_lastinterface;
+
+
+public:
+	CString m_szAppPath;
+	CString m_szHelpFile;
 };
 
 extern CT3000App theApp;

@@ -36,6 +36,12 @@ class CGridButton;
 #define xmalloc(s) HeapAlloc(GetProcessHeap(),HEAP_ZERO_MEMORY,(s)) 
 #define xfree(p) HeapFree (GetProcessHeap(),0,(p)) 
 
+// struct ALL_LOCAL_SUBNET_NODE{
+// CString StrIP;
+// CString StrMask;
+// CString StrGetway;
+// int NetworkCardType;
+// };
 class CScanDlg : public CDialog
 {
 	DECLARE_DYNAMIC(CScanDlg)
@@ -63,9 +69,12 @@ public:
 	afx_msg LRESULT OnAddComScanRet(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnAddNetScanRet(WPARAM wParam, LPARAM lParam);
 BOOL	CheckTheSameSubnet(CString strIP);
+BOOL    ChangeNetDeviceIP(CString strIP,int row_flags);
 void FLEX_GRID_PUT_COLOR_STR(int row,int col,CString str);
+void GetIPMaskGetWay(vector<ALL_LOCAL_SUBNET_NODE>  &Vector_Subnet);
 void GetIPMaskGetWay(CString &StrIP,CString &StrMask,CString &StrGetway);
 BOOL GetNewIP(CString &newIP);
+BOOL GetNewIP(CString &newIP,CString BaseIP);
 BOOL TestPing(const CString& strIP);
 void FillIcmpData(char * icmp_data, int datasize);
 USHORT Checksum(USHORT *buffer, int size);
@@ -173,4 +182,8 @@ public:
 	CString m_strlocalsubnet;
 	CString m_strlocalgateway;
 	afx_msg void OnEnKillfocusEditGridedit();
+
+
+
+	vector<ALL_LOCAL_SUBNET_NODE> allsubnets;
 };

@@ -37,6 +37,7 @@ void CConnectionSetup::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_CONNECT_TIMEOUT, m_edit_connect_timeout);
 	DDX_Control(pDX, IDC_EDIT_PORT, m_edit_port);
 	DDX_Control(pDX, IDC_EDIT_TIMEOUT, m_edit_response_timeout);
+	DDX_Control(pDX, IDC_COMBO_BRANDRATE, m_combox_brandrate);
 }
 void CConnectionSetup::OnInitUI(){
     Read_Config();
@@ -122,32 +123,32 @@ void CConnectionSetup::Read_Config(){
 	CFileFind fFind;
 	if(!fFind.FindFile(g_configfile_path))
 	{
-		WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),_T("0"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connection Type"),_T("0"),g_configfile_path);
 
-		WritePrivateProfileStringW(_T("Setting"),_T("COM Port"),_T("COM1"),g_configfile_path);
-		WritePrivateProfileStringW(_T("Setting"),_T("COM_Port"),_T("1"),g_configfile_path);
-		WritePrivateProfileStringW(_T("Setting"),_T("Baudrate"),_T("19200"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("COM Port"),_T("COM1"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("COM_Port"),_T("1"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Baudrate"),_T("19200"),g_configfile_path);
 
 
-		WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),_T("127.0.0.1"),g_configfile_path);
-		WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),_T("6001"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("IP Address"),_T("127.0.0.1"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("IP Port"),_T("6001"),g_configfile_path);
 
-		WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
-		WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
 
-		WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("1000"),g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connect Timeout"),_T("1000"),g_configfile_path);
 	}
 
-	m_bradrate=GetPrivateProfileInt(_T("Setting"),_T("Baudrate"),19200,g_configfile_path);
-	m_Commication_Type=GetPrivateProfileInt(_T("Setting"),_T("Connection Type"),2,g_configfile_path);
-	GetPrivateProfileString(_T("Setting"),_T("COM Port"),_T("COM1"),m_comport.GetBuffer(MAX_PATH),MAX_PATH,g_configfile_path);
+	m_bradrate=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Baudrate"),19200,g_configfile_path);
+	m_Commication_Type=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Connection Type"),2,g_configfile_path);
+	GetPrivateProfileString(_T("MBPOLL_Setting"),_T("COM Port"),_T("COM1"),m_comport.GetBuffer(MAX_PATH),MAX_PATH,g_configfile_path);
 
-	m_between_time=GetPrivateProfileInt(_T("Setting"),_T("Delay Between Time"),1000,g_configfile_path);
-	m_response_timeout=GetPrivateProfileInt(_T("Setting"),_T("Response Timeout"),1000,g_configfile_path);
+	m_between_time=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Delay Between Time"),1000,g_configfile_path);
+	m_response_timeout=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Response Timeout"),1000,g_configfile_path);
 
-	GetPrivateProfileString(_T("Setting"),_T("IP Address"),_T("127.0.0.1"),m_ipaddress.GetBuffer(MAX_PATH),MAX_PATH,g_configfile_path);
-	m_ipport=GetPrivateProfileInt(_T("Setting"),_T("IP Port"),6001,g_configfile_path);
-	m_connect_timeout=GetPrivateProfileInt(_T("Setting"),_T("Connect Timeout"),1000,g_configfile_path);
+	GetPrivateProfileString(_T("MBPOLL_Setting"),_T("IP Address"),_T("127.0.0.1"),m_ipaddress.GetBuffer(MAX_PATH),MAX_PATH,g_configfile_path);
+	m_ipport=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("IP Port"),6001,g_configfile_path);
+	m_connect_timeout=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Connect Timeout"),1000,g_configfile_path);
 	
 	
 }
@@ -200,21 +201,21 @@ void CConnectionSetup::Write_Config(){
 	CString CT;
 	m_edit_connect_timeout.GetWindowText(CT);
 
-		WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),Connect_Type,g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Connection Type"),Connect_Type,g_configfile_path);
 
-		WritePrivateProfileStringW(_T("Setting"),_T("COM Port"),COM_Port,g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("COM Port"),COM_Port,g_configfile_path);
 
-		WritePrivateProfileStringW(_T("Setting"),_T("COM_Port"),Num_com_port,g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("COM_Port"),Num_com_port,g_configfile_path);
 
-		WritePrivateProfileStringW(_T("Setting"),_T("Baudrate"),bradrate,g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Baudrate"),bradrate,g_configfile_path);
 
 
-		WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),ipaddress,g_configfile_path);
-		WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),ipport,g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("IP Address"),ipaddress,g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("IP Port"),ipport,g_configfile_path);
 
-		WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),BT,g_configfile_path);
-		WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),RT,g_configfile_path);
-		WritePrivateProfileStringW(_T("Setting"),_T(" Connect Timeout"),CT,g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Delay Between Time"),BT,g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T("Response Timeout"),RT,g_configfile_path);
+		WritePrivateProfileStringW(_T("MBPOLL_Setting"),_T(" Connect Timeout"),CT,g_configfile_path);
 
 
 		  m_bradrate=_wtoi(bradrate);

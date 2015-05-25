@@ -95,11 +95,12 @@ public:
 	void Reflesh_ParameterDlg();
 	void Read_SliderData();
 	void InitPID2ComboBox();
-	void  UpdateCoolingandHeatingData();
+	void UpdateCoolingandHeatingData();
 public:
 	//	unsigned short multi_register_value[513];
 	HANDLE hFirstThread;
 public:
+ CMsflexgrid m_zigbee_tstat_table;
 	CEdit m_idAdressEdit;
 	CComboBox m_braudRateCombox;
 	CComboBox m_keySelectCombox;
@@ -107,7 +108,7 @@ public:
 	CComboBox m_displayCombox;
 	CComboBox m_keyLockCombox;
 	CComboBox m_SequenceCombox;
-	CComboBox m_autoOnlyCombox;
+	//CComboBox m_autoOnlyCombox;
 	CEdit m_valveEdit;
 	CEdit m_value_percentEdit;
 	CComboBox m_hcChangeCombox;
@@ -165,16 +166,16 @@ public:
 
 	afx_msg void OnCbnKillfocusCombo1();
 	afx_msg void OnCbnKillfocusCombo4();
-	int m_coolsp;
-	int m_cooldb;
-	int m_setpoint;
-	int m_heatdb;
-	int m_heatsp;
-	int m_coolspN;
-	int m_cooldbN;
-	int m_setpointN;
-	int m_heatdbN;
-	int m_heatspN;
+	float m_coolsp;
+	float m_cooldb;
+	float m_setpoint;
+	float m_heatdb;
+	float m_heatsp;
+	float m_coolspN;
+	float m_cooldbN;
+	float m_setpointN;
+	float m_heatdbN;
+	float m_heatspN;
 	afx_msg void OnEnKillfocusEditCspd();
 	afx_msg void OnEnKillfocusEditCdbdn();
 	afx_msg void OnEnKillfocusEdit31();
@@ -229,4 +230,22 @@ public:
 	CEdit m_sensitivity_editor;
 	afx_msg void OnCbnSelchangeComboEnableDis();
 	afx_msg void OnEnKillfocusEditSensitivty();
+	CComboBox m_combox_setpointdisplay;
+	afx_msg void OnCbnSelchangeComboSetpointdisplay();
+	CComboBox m_combox_zigbee;
+	CComboBox m_combox_channel;
+	afx_msg void OnCbnSelchangeComboZigbeetype();
+	afx_msg void OnCbnSelchangeComboChannel();
+	afx_msg void OnBnClickedButtonZigbeeReboot();
+	afx_msg void OnBnClickedBtnTopological();
+	afx_msg void OnEnKillfocusEditPid2offsetpoint6();
+	afx_msg void OnBnClickedUnlock();
+	afx_msg void OnBnClickedLock();
+	afx_msg void OnBnClickedTrendlogview();
+	afx_msg void OnCbnSelchangeCombo1();
+	afx_msg void OnCbnSelchangeCombo4();
+	CComboBox m_day_combox;
+	CComboBox m_night_combox;
+	afx_msg void OnEnKillfocusEditTranducerMax();
+	afx_msg void OnEnKillfocusEditTranducerMin();
 };

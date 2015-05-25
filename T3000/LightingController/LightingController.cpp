@@ -660,222 +660,9 @@ SetTimer(LIGHTINGCONTROLLERTIMER,1000,NULL);
 return flag;
 }
 
-BOOL CLightingController::checkDB( CString DBname,CString strSQL )
-{
-	CADO m_ado;
-	m_ado.OnInitADOConn();
 
 
-		//判断数据库是否存在
-
-		bool m_judge = m_ado.IsHaveTable(m_ado,DBname);
-		//不存在 创建数据库表
-
-		if(DBname.CompareNoCase(_T("LightingController")) == 0)
-		{
-
-			if (!m_judge) 
-			{	
-				m_ado.m_pRecordset = m_ado.OpenRecordset(strSQL);
-				//初始化表
-				if(DBname.CompareNoCase(_T("LightingController")) == 0)
-				{
-
-					CString sql = _T("select * from LightingController");
-					m_ado.m_pRecordset = m_ado.OpenRecordset(sql);
-					if (m_ado.m_pRecordset->EndOfFile)
-					{
-
-						for(int i = 0;i<400;i++)
-						{
-							try 
-							{
-								m_ado.m_pRecordset->AddNew();
-								m_ado.m_pRecordset->PutCollect("Address",(_bstr_t)(i+1));
-								m_ado.m_pRecordset->PutCollect("Data",(_bstr_t)"1");
-								m_ado.m_pRecordset->Update();
-
-							}
-
-
-							catch(...)
-							{
-								return FALSE;
-
-							}
-						}
-						m_ado.CloseRecordset();
-					}
-				}
-
-			}
-		}
-		else if(DBname.CompareNoCase(_T("LightingController_Name")) == 0)
-		{
-			if(!m_judge)
-			{
-				m_ado.m_pRecordset = m_ado.OpenRecordset(strSQL);
-				CString StrOutputName,StrStatus = _T("OFF");
-				CString sql = _T("select * from LightingController_Name");
-				m_ado.m_pRecordset = m_ado.OpenRecordset(sql);
-#if 1
-				if (m_ado.m_pRecordset->EndOfFile)
-				{
-					long start(0),end(0);
-					start = clock();
-					//初始化input-output-mapping
-					CString CSTYPE;
-					CString strtype = _T("Input");
-					BOOL flg = TRUE;
-					int maxin = 24;
-					for (int i =1;i<=maxin;i++)
-					{	
-						CSTYPE.Format(_T("%s%d"),strtype,i);
-						for (int j = 1;j<=20;j++)
-						{	
-							for(int k = 1;k<=32;k++)
-							{
-								StrOutputName.Format(_T("Output%d"),k);
-								try 
-								{
-									m_ado.m_pRecordset->AddNew();
-									m_ado.m_pRecordset->PutCollect("Address",(_bstr_t)j);
-									m_ado.m_pRecordset->PutCollect("Type",(_bstr_t)CSTYPE);
-									m_ado.m_pRecordset->PutCollect("ID_No",(_bstr_t)k);
-									m_ado.m_pRecordset->PutCollect("OutputName",(_bstr_t)StrOutputName);
-									m_ado.m_pRecordset->PutCollect("Status",(_bstr_t)StrStatus);
-									m_ado.m_pRecordset->Update();
-
-								}
-
-
-								catch(...)
-								{
-									return FALSE;
-
-								}
-							}
-						}
-// 						if(i == 24&&flg)//这样要慢将近15ms
-// 						{
-// 							i = 0;
-// 							strtype = _T("GroupMap");
-// 							flg = FALSE;
-// 							maxin = 20;
-// 
-// 						}
-
-					}
-
-#if 1
-
-					for (int i =1;i<=20;i++)
-					{	
-						CSTYPE.Format(_T("Group%d"),i);
-						for (int j = 1;j<=20;j++)
-						{	
-							for(int k = 1;k<=32;k++)
-							{
-								StrOutputName.Format(_T("Output%d"),k);
-								try 
-								{
-									m_ado.m_pRecordset->AddNew();
-									m_ado.m_pRecordset->PutCollect("Address",(_bstr_t)j);
-									m_ado.m_pRecordset->PutCollect("Type",(_bstr_t)CSTYPE);
-									m_ado.m_pRecordset->PutCollect("ID_No",(_bstr_t)k);
-									m_ado.m_pRecordset->PutCollect("OutputName",(_bstr_t)StrOutputName);
-									m_ado.m_pRecordset->PutCollect("Status",(_bstr_t)StrStatus);
-									m_ado.m_pRecordset->Update();
-
-								}
-
-
-								catch(...)
-								{
-									return FALSE;
-
-								}
-							}
-						}
-
-					}
-#endif
-					end = clock();
-					long resul = (end-start);
-					CString strshow;
-					strshow.Format(_T("initl DB spend\n%d seconds"),resul);
-		//			AfxMessageBox(strshow);
-
-					m_ado.CloseRecordset();
-				}
-#endif
-
-			}
-
-
-		}
-
-		m_ado.CloseConn();
-
-
-	return TRUE;
-}
-
-BOOL CLightingController::ReadDB()
-{
-
-	CADO m_ado;
-	m_ado.OnInitADOConn();
-
-	CString SQL = _T("select * from LightingController"); 
-	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
-	int num =0;
-	_variant_t vartemp;
-	veclightingcontroller.clear();
-	while(!m_ado.m_pRecordset->EndOfFile)
-	{
-		m_veclightingcontroller.iaddress =m_ado.m_pRecordset->GetCollect(_T("Address"));
-
-
-		vartemp =m_ado.m_pRecordset->GetCollect(_T("Data"));
-		if (vartemp.vt==VT_NULL)
-			m_veclightingcontroller.CStvalue =_T("");
-		else
-			m_veclightingcontroller.CStvalue =vartemp;
-
-
-		m_ado.m_pRecordset->MoveNext();
-
-		veclightingcontroller.push_back(m_veclightingcontroller);
-	}
-
-	//读取本电脑当前正在使用的串口。
-#if 1
-//会出问题，就是如果在数据存的这个串口与电脑的串口号不对应，则本类永远无法有正确数据采集？
-	CString CSTcompot;
-	BOOL BOdefault;
-	SQL = _T("select * from Building");
-	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
-	while(!m_ado.m_pRecordset->EndOfFile)
-	{
-		CSTcompot =(_variant_t)m_ado.m_pRecordset->GetCollect(_T("Com_Port"));
-		BOdefault =(_variant_t)m_ado.m_pRecordset->GetCollect(_T("Default_SubBuilding"));//TRUE = -1即非0，FALSE就是0
-		m_ado.m_pRecordset->MoveNext();
-
-		if (BOdefault)
-		{
-			comnum = _wtoi(CSTcompot.Mid(3));
-		}
-
-	}
-
-#endif
-
-	m_ado.CloseRecordset();
-	m_ado.CloseConn();
-	return TRUE;
-}
-
+ 
 BOOL CLightingController::UpdateDBALL()
 {
 	TRACE(_T("Updatedatabase()start!\n"));
@@ -1824,108 +1611,9 @@ void CLightingController::OnEnKillfocusEditTimeSaveDelay(){
 
 #if 1
 //屏蔽
-void CLightingController::ReadDB_OutNameStatus()
-{
-#if 0
-	CADO m_ado;
-	m_ado.OnInitADOConn();
-
-	CString SQL = _T("select * from LightingController_Name"); 
-	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
-	int num =0;
-	_variant_t vartemp;
-	m_vecONS.clear();
-	while(!m_ado.m_pRecordset->EndOfFile)
-	{
-		vartemp =m_ado.m_pRecordset->GetCollect(_T("Name"));
-		if (vartemp.vt==VT_NULL)
-			m_structONS.Name =_T("");
-		else
-			m_structONS.Name =vartemp;
-		vartemp = m_ado.m_pRecordset->GetCollect(_T("Status"));
-		if (vartemp.vt == VT_NULL)
-			m_structONS.Status = _T("");
-		else
-			m_structONS.Status = vartemp;
-
-
-		m_ado.m_pRecordset->MoveNext();
-
-		m_vecONS.push_back(m_structONS);
-	}
-
-	m_ado.CloseRecordset();
-	m_ado.CloseConn();
-#endif
-
-}
-//屏蔽
-void CLightingController::SaveDB_OutNameStatus()
-{
-	//存入数据库中
-#if 0
-	CADO saveADO;
-	saveADO.OnInitADOConn();
-	CString sql = _T("select * from LightingController_Name");
-	saveADO.m_pRecordset = saveADO.OpenRecordset(sql);
-	if (!saveADO.m_pRecordset->EndOfFile)
-	{
-		saveADO.m_pRecordset->MoveFirst();
-
-		for(int i = 1;i<96;i++)
-		{
-			try 
-			{
-
-				//saveADO.m_pRecordset->PutCollect("Address",(_bstr_t)veclightingcontroller.at(i).iaddress);
-				saveADO.m_pRecordset->PutCollect("Name",(_bstr_t)m_vecONS.at(i-1).Name);
-				saveADO.m_pRecordset->PutCollect("Status",(_bstr_t)m_vecONS.at(i-1).Status);
-
-
-				saveADO.m_pRecordset->Update();
-				saveADO.m_pRecordset->MoveNext();
-			}
-
-
-			catch(...)
-			{
-				SetPaneString(1,_T("Write dababase false!"));
-				//return FALSE;
-			}
-		}
-	}
-	else
-	{
-		for(int i = 0;i<400;i++)
-		{
-			try 
-			{
-
-				saveADO.m_pRecordset->AddNew();
-				saveADO.m_pRecordset->PutCollect("Address",(_bstr_t)veclightingcontroller.at(i).iaddress);
-				saveADO.m_pRecordset->PutCollect("Data",(_bstr_t)veclightingcontroller.at(i).CStvalue);
-
-				saveADO.m_pRecordset->Update();
-
-			}
-
-
-			catch(...)
-			{
-				SetPaneString(1,_T("Write dababase false!"));
-				//return FALSE;
-			}
-		}
-
-	}
-
-	saveADO.CloseRecordset();
-	saveADO.CloseConn(); 
-#endif
-
-
-
-}
+ 
+ 
+ 
 //屏蔽
 void CLightingController::OnSetmappingAddoutputbarod()
 {
@@ -3068,7 +2756,7 @@ HBRUSH CLightingController::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 			pDC->SetBkMode(TRANSPARENT);
 
 
-			HBRUSH B = CreateSolidBrush(RGB(130,130,130));
+			HBRUSH B =  CreateSolidBrush(RGB(130,130,130));
 			return (HBRUSH)B;
 		}
 
@@ -3501,7 +3189,9 @@ HBRUSH CLightingController::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 				pDC->SetBkMode(TRANSPARENT);
 
 
-				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));
+				 
+				return (HBRUSH)B;
 			} 
 			else
 			{
@@ -3516,30 +3206,7 @@ HBRUSH CLightingController::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 			
 		}
 
-	//case IDC_NIGHT_EDIT:
-	//	{
-	//		pDC->SetTextColor(RGB(255,255,255));
-	//		pDC->SetBkColor(RGB(0,0,255));
-	//		pDC->SetBkMode(TRANSPARENT);
-	//		HBRUSH B = CreateSolidBrush(RGB(0,0,255));
-	//		return (HBRUSH)B;
-	//	}
-	//case IDC_EDIT_DAYHEAT:
-	//	{
-	//		pDC->SetTextColor(RGB(255,255,255));
-	//		//pDC->SetBkColor(RGB(255,255,255));
-	//		pDC->SetBkMode(TRANSPARENT);
-	//		HBRUSH B = CreateSolidBrush(RGB(255,0,0));
-	//		return (HBRUSH)B;
-	//	}
-	//case IDC_NIGHTHEAT_EDIT:
-	//	{
-	//		pDC->SetTextColor(RGB(255,255,255));
-	//		//pDC->SetBkColor(RGB(255,255,255));
-	//		pDC->SetBkMode(TRANSPARENT);
-	//		HBRUSH B = CreateSolidBrush(RGB(255,0,0));
-	//		return (HBRUSH)B;
-	//	}
+ 
 	default:
 		return CFormView::OnCtlColor(pDC,pWnd, nCtlColor);
 	}

@@ -7,7 +7,10 @@
 #include "global_struct.h"
 
 // CT3RTDView form view
-
+union  DataFormat{
+	float floatData;
+	unsigned char  charData[4];
+};
 class CT3RTDView : public CFormView
 {
 	DECLARE_DYNCREATE(CT3RTDView)
@@ -35,6 +38,8 @@ public:
     int m_curcol;
     int m_currow;
     HANDLE hFirstThread;
+	UINT m_EDIT_ID;
+	BOOL m_BACK_fresh;
     private:
         int	SN_LOW	;
         int	SN_HI	;
@@ -204,13 +209,24 @@ public:
     CComboBox m_dataformat;
     CEdit m_accuracy;
     afx_msg void OnCbnSelchangeCombo1();
-    afx_msg void OnEnKillfocusEdit1();
+     void OnEnKillfocusEdit1();
     CComboBox m_comboxRange;
     DECLARE_EVENTSINK_MAP()
     void ClickMsflexgridInput();
     CEdit m_inNameEdt;
     afx_msg void OnCbnSelchangeRange();
-    afx_msg void OnEnKillfocusEdit2();
+     void OnEnKillfocusEdit2();
+protected:
+	afx_msg LRESULT OnFreshPt10Back(WPARAM wParam, LPARAM lParam);
+	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+public:
+	afx_msg void OnDestroy();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+//	afx_msg void OnEnSetfocusEdit1();
+	afx_msg void OnEnSetfocusEdit1();
+	afx_msg void OnEnSetfocusEditName();
+
+	afx_msg void OnBnClickedButtonReset();
 };
 
 

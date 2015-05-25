@@ -6,7 +6,7 @@
 #include "OutputSetDlg.h"
 #include "globle_function.h"
 #include "ado/ADO.h"
-
+#include "bado/BADO.h"
 #define INDEX_OUTFIELD 0
 #define NAME_OUTFIELD 1
 #define VALUE_OUTFIELD 2
@@ -22,12 +22,12 @@
 #define TOTAL_OUTCOLS 6
 #define TOTAL_OUTROWS 8
 
-CString Interlock[6]={_T("ON"),_T("DI1"),_T("AI1") ,_T("AI2"),_T("TIMER OR"),_T("TIMER AND")};
-CString ONTPUT_FUNS[]={_T("Normal"),_T("Rotation Timer"),_T("Lighting Control") ,_T("VAV Control"),_T("Transducer")};
-CString OUTPUT_ANRANGE[]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)"),_T("Internal Sensor"),_T("Setpoint"),_T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),_T("Hum Sensor"),_T("CO2 Sensor")};
-CString OUTPUT_RANGE5[3]={_T("On/Off"),_T("Float(0-100%)"),_T("PWM(0-100%)")};
-CString OUTPUT_RANGE45[7]={_T("On/Off"),_T("Float(Cooling)"),_T("Float(Heating)"),_T("PWM(0-100%)"),_T("Off/On"),_T("Open/Close"),_T("Close/Open")};//2.5.0.98
-CString OUTPUT_ANRANGE6[]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("PWM(0-100%)")};
+// CString Interlock[6]={_T("ON"),_T("DI1"),_T("AI1") ,_T("AI2"),_T("TIMER OR"),_T("TIMER AND")};
+// CString ONTPUT_FUNS[]={_T("Normal"),_T("Rotation Timer"),_T("Lighting Control") ,_T("VAV Control"),_T("Transducer")};
+// CString OUTPUT_ANRANGE[]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)"),_T("Internal Sensor"),_T("Setpoint"),_T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),_T("Hum Sensor"),_T("CO2 Sensor")};
+// CString OUTPUT_RANGE5[3]={_T("On/Off"),_T("Float(0-100%)"),_T("PWM(0-100%)")};
+// CString OUTPUT_RANGE45[7]={_T("On/Off"),_T("Float(Cooling)"),_T("Float(Heating)"),_T("PWM(0-100%)"),_T("Off/On"),_T("Open/Close"),_T("Close/Open")};//2.5.0.98
+// CString OUTPUT_ANRANGE6[]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("PWM(0-100%)")};
 const int REFRESH_GRID=1;
 const int ENABLE_REFRESH_BUTTON=2;
 
@@ -87,6 +87,7 @@ BEGIN_MESSAGE_MAP(COutputSetDlg, CDialog)
 	ON_MESSAGE(WM_REFRESH_OUTPUTDLG, &COutputSetDlg::RefreshGrid)//Add by Fan
 	ON_WM_CLOSE()
 	ON_CBN_SELCHANGE(IDC_COMBO_SIGNAL_TYPE, &COutputSetDlg::OnCbnSelchangeComboSignalType)
+
 END_MESSAGE_MAP()
 
 
@@ -290,7 +291,8 @@ void COutputSetDlg::Fresh_Grid()
 		 
 		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		{
-			CADO ado;
+			CBADO ado;
+			ado.SetDBPath(g_strCurBuildingDatabasefilePath);
 			ado.OnInitADOConn();
 			if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
 			 {
@@ -498,7 +500,8 @@ void COutputSetDlg::Fresh_Grid()
 			nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
 			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 			{
- 				CADO ado;
+ 				CBADO ado;
+				ado.SetDBPath(g_strCurBuildingDatabasefilePath);
 				ado.OnInitADOConn();
 				if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
 				{
@@ -652,7 +655,8 @@ void COutputSetDlg::Fresh_Grid()
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];
 		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		{
-			CADO ado;
+			CBADO ado;
+			ado.SetDBPath(g_strCurBuildingDatabasefilePath);
 			ado.OnInitADOConn();
 			if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
 			{
@@ -1039,7 +1043,7 @@ void COutputSetDlg::Fresh_Grid()
 	}
 	//row45/67 ANALOG
 	if ((m_nModeType==1||m_nModeType==3||m_nModeType==2)||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PRESSURE
-		||m_nModeType==18||m_nModeType==6||m_nModeType==7)//5ADEG
+		||m_nModeType==18||m_nModeType==6||m_nModeType==PM_TSTAT5i||m_nModeType==7)//5ADEG
 	{
 		//186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
 		//102	210	2	Full	W/R(write only when manual output6 enable)	Output6 ,Analog output1, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.
@@ -1218,7 +1222,7 @@ else
 			{				
 				if(nValue==0)	
 					strTemp=_T("Off");
-				if(nValue==1000)
+				else
 					strTemp=_T("On");
 			}
 			else
@@ -1325,7 +1329,7 @@ else
 
 					if(nValue==0)
 						strTemp=_T("Off");
-					if(nValue==1000)
+					else
 						strTemp=_T("On");
 				}
 				else
@@ -1333,7 +1337,7 @@ else
 					//strTemp.Format(_T("%.1f"),nValue/100.0);
 					float nvalue=0.0;
 					 
-					if ((product_register_value[7] == 6)||(product_register_value[7] == 7))
+					if ((product_register_value[7] == 6)||(product_register_value[7] == 7)||(product_register_value[7] == PM_TSTAT5i))
 					{
 						if(nRange==1)//0-10v
 						{
@@ -4984,6 +4988,24 @@ void COutputSetDlg::ClickMsflexgrid1()
 					}					
 				}
 			}
+			else
+			{
+				int nTempValue = product_register_value[MODBUS_OUTPUT1_SCALE+lRow-6];//180找不到对应的tstat6
+				if ( nTempValue != 0 )
+				{
+					m_OutValueCmbox.ShowWindow(SW_HIDE);
+					m_OutValueEdt.ShowWindow(SW_SHOW);	
+					m_OutValueEdt.SetWindowText(strValue);
+					m_OutValueEdt.MoveWindow(rc); //移动到选中格的位置，覆盖
+					m_OutValueEdt.BringWindowToTop();
+					m_OutValueEdt.SetFocus(); //获取焦点
+				}
+
+
+			    
+// 				nRange= product_register_value[MODBUS_OUTPUT2_SCALE];//187  208
+// 				nValue= product_register_value[MODBUS_HEATING_VALVE];//103  211
+			 }
 		
 		}
 	}
@@ -5257,7 +5279,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 				}
 			}
 
-			if((product_register_value[7]==PM_TSTAT5D||product_register_value[7]==PM_TSTAT5E ||
+			if((product_register_value[7]==PM_TSTAT5D||product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR) ||
 				(product_register_value[7] == PM_TSTAT5G)) && lRow>5)
 			{
 				int nTempValue = product_register_value[310];
@@ -5575,7 +5597,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 					return;
 			}
 		}
-		else if (product_register_value[7]==PM_TSTAT5E)
+		else if (product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR))
 		{
 			if (m_nCurRow<=5)
 			{
@@ -6386,7 +6408,8 @@ void COutputSetDlg::OnCbnSelchangeOrangcombo()
 				product_register_value[MODBUS_MODE_OUTPUT1+(m_nCurRow-1)] = nIndext;//280 202
 
 
-				CADO ado;
+				CBADO ado;
+				ado.SetDBPath(g_strCurBuildingDatabasefilePath);
 				ado.OnInitADOConn();
 				CString sql;
 				sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),m_nCurRow,m_nCurRow,m_sn);
@@ -7178,15 +7201,15 @@ void COutputSetDlg::OnEnKillfocusValueedit()
 		m_OutValueEdt.GetWindowText(strText);
 		if(strText.IsEmpty())
 			return;
-		int nValue=_wtoi(strText);
-		// added by zgq; 2010-12-06; 检测输入，必须在0－100之间
-		if( nValue > 100 || nValue < 0)
-		{
-			AfxMessageBox(_T("Please enter a value between 0 and 100!"), MB_ICONWARNING);
-			m_OutValueEdt.SetFocus();
-			return;
-		}
-		int nSrcValue = nValue;
+		int nValue=_wtof(strText);
+	 
+// 		if( nValue > 100 || nValue < 0)
+// 		{
+// 			AfxMessageBox(_T("Please enter a value between 0 and 100!"), MB_ICONWARNING);
+// 			m_OutValueEdt.SetFocus();
+// 			return;
+// 		}
+		int nSrcValue = (unsigned short)nValue;
 		nValue=nValue*100; 
 
 
@@ -7522,19 +7545,22 @@ void COutputSetDlg::OnEnKillfocusOutputnameedit()
 	//if(g_serialNum>0&&product_register_value[6]>0)
 	if(product_register_value[6]>0)
 	{
-		_ConnectionPtr m_ConTmp;
-		_RecordsetPtr m_RsTmp;
-		m_ConTmp.CreateInstance("ADODB.Connection");
-		m_RsTmp.CreateInstance("ADODB.Recordset");
-		m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-
+// 		_ConnectionPtr m_ConTmp;
+// 		_RecordsetPtr m_RsTmp;
+// 		m_ConTmp.CreateInstance("ADODB.Connection");
+// 		m_RsTmp.CreateInstance("ADODB.Recordset");
+// 		m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+		CBADO bado;
+		bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+		bado.OnInitADOConn(); 
 		CString strSerial;
 		strSerial.Format(_T("%d"),g_serialNum);
 
 		CString strsql;
 		strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
-		m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-		if(VARIANT_FALSE==m_RsTmp->EndOfFile)//update
+		bado.m_pRecordset=bado.OpenRecordset(strsql);
+		//m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
+		if(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)//update
 		{
 			
 			CString strField;
@@ -7569,7 +7595,7 @@ void COutputSetDlg::OnEnKillfocusOutputnameedit()
 			CString str_temp;
 			str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
 			//AfxMessageBox(str_temp );
-			m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+			bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
 			}
 			catch(_com_error *e)
 			{
@@ -7629,7 +7655,7 @@ void COutputSetDlg::OnEnKillfocusOutputnameedit()
 			try
 			{
 
-				m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+				bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
 			}
 			catch(_com_error *e)
 			{
@@ -7663,10 +7689,8 @@ void COutputSetDlg::OnEnKillfocusOutputnameedit()
 				break;
 		}
 	
-		if(m_RsTmp->State) 
-			m_RsTmp->Close(); 
-		if(m_ConTmp->State)
-			m_ConTmp->Close();	
+		 bado.CloseRecordset();
+		 bado.CloseConn();	
 	}
 	
 			}

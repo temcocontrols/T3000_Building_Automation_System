@@ -73,13 +73,13 @@ BOOL CEnterValueDlg::OnInitDialog(){
 	SetWindowTextW(title);
 
 	UpdateData(FALSE);
-	m_Value_Edit.SetFocus();
-	 
+	
+	
 	m_Value_Edit.SetCapture();//LSC
 	int nLenth=m_StrValue.GetLength();
-	m_Value_Edit.SetSel(nLenth,nLenth); //ȫѡ//
-
-	return TRUE;
+	m_Value_Edit.SetSel(0,nLenth); //ȫѡ//
+	 m_Value_Edit.SetFocus();
+	return FALSE;
 }
 
 void CEnterValueDlg::OnBnClickedOk()

@@ -70,10 +70,12 @@ public:
 	void CalcOnePixelTime();
 	void CalcOnePixelValue();
 
+
 	bool TimeValueToPoint(unsigned long ntime , int nvalue ,PointF &returnpoint);
+	bool DigitalTimeValueToPoint(unsigned long ntime , int nvalue ,PointF &returnpoint);
 
-	void InitialParameter();
-
+	void InitialParameter(int base_time,int y_min_value = 0,int y_max_value = 100000);
+	//void InitialParameter(int base_time);
 	void GetAnalogOrignPoint(PointF &returnpoint);
 	void GetDigitalOrignPoint(PointF &returnpoint);
 	void GetXaxisTime(unsigned long &returnstarttime,unsigned long &returnendtime);
@@ -85,6 +87,11 @@ public:
 	int GetXaxisScale();
 	int GetYaxisScale();
 	int Get_Time_Scale();
+	int Search_data_from_db();
+	void Delete_Ram_Data();
+	void Reset_X_Time_Parameter();
+	void Get_Input_Unit();
+	void Reset_X_Y_Parameter();
 public:
 	PointF last_used_point;
 	bool StaticShow[15];
@@ -117,20 +124,7 @@ afx_msg void OnTimer(UINT_PTR nIDEvent);
 //afx_msg void OnStnClickedStaticGraphicA();
 afx_msg LRESULT Fresh_Static_Function(WPARAM wParam,LPARAM lParam);
 
-CStaticEx m_graphic_st_1;
-CStaticEx m_graphic_st_2;
-CStaticEx m_graphic_st_3;
-CStaticEx m_graphic_st_4;
-CStaticEx m_graphic_st_5;
-CStaticEx m_graphic_st_6;
-CStaticEx m_graphic_st_7;
-CStaticEx m_graphic_st_8;
-CStaticEx m_graphic_st_9;
-CStaticEx m_graphic_st_a;
-CStaticEx m_graphic_st_b;
-CStaticEx m_graphic_st_c;
-CStaticEx m_graphic_st_d;
-CStaticEx m_graphic_st_e;
+
 virtual BOOL PreTranslateMessage(MSG* pMsg);
 virtual void OnCancel();
 virtual void OnOK();
@@ -138,6 +132,19 @@ afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 public:
 //	afx_msg void OnNcDestroy();
 	virtual void PostNcDestroy();
+	afx_msg void OnTimebase1hour();
+	afx_msg void OnTimebase1day();
+	afx_msg void OnTimebase1minites();
+	afx_msg void OnTimebase10minutes();
+	afx_msg void OnTimebase12hours();
+	afx_msg void OnTimebase4hours();
+	afx_msg void OnTimebase4days();
+	afx_msg void OnGraphicLeft();
+	afx_msg void OnGraphicRight();
+	afx_msg void OnZoomin();
+	afx_msg void OnZoomout();
+	
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 };
 
 //const int _6_min = 1;

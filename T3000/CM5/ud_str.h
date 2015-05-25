@@ -49,7 +49,8 @@ typedef enum {
 		 READSCREEN_T3000          = ENUM_GRP+1,        /* read screens        */
 		 READARRAY_T3000           = ENUM_ARRAY+1,      /* read arrays         */
 		 READALARM_T3000		   = ENUM_ALARMM + 1, /* read alarm */
-		 READUNIT_T3000			   = 14,			/*customer defined units * /
+		 READUNIT_T3000			   = 14,			
+		 READUSER_T3000            = 15,
 //		 READARRAYVALUE_T3000      = AYVALUE+1,    /* read array elements */
 		 READTIMESCHEDULE_T3000    = ENUM_WR_TIME+1,    /* read time schedule  */
 		 READANNUALSCHEDULE_T3000  = ENUM_AR_DATA+1,    /* read annual schedule*/
@@ -64,6 +65,8 @@ typedef enum {
 		 CLEARPANEL_T3000          = 28,           /* clear panel          */
 		 SEND_ALARM_COMMAND        = 32,
 		 READTSTAT_T3000		   = 33,
+		 READ_REMOTE_POINT         = 40,
+
 
 		 WRITEOUTPUT_T3000         = 100+ENUM_OUT+1,  /* write outputs          */
 		 WRITEINPUT_T3000          = 100+ENUM_IN+1,   /* write inputs           */
@@ -79,6 +82,7 @@ typedef enum {
 		 WRITEARRAY_T3000          = 100+ENUM_ARRAY+1,      /* write arrays         */
 		  WRITEALARM_T3000		   = 100+ ENUM_ALARMM + 1, /* write alarm */
 		  WRITEUNIT_T3000          = 114,                 /* write customer units*/
+		  WRITEUSER_T3000            = 115,
 		 WRITETIMESCHEDULE_T3000   = 100+ENUM_WR_TIME+1,    /* write time schedule  */
 		 WRITEANNUALSCHEDULE_T3000 = 100+ENUM_AR_DATA+1,     /* write annual schedule*/
 		 WRITEPROGRAMCODE_T3000    = 100+16,           /* write program code    */
@@ -91,31 +95,9 @@ typedef enum {
 		 SAVEPROGRAM_COMMAND       = 30,
 		 LOADPROGRAM_COMMAND       = 31,
 		 DEFAULT_PRG_COMMAND       = 32, 
-		 READFILES_COMMAND         = 40,  /* read the files of type define in*/
-																					/* a previous SETFILETYPE_COMMAND command*/
-																					/* from the current path.                */
-																					/* The data returned are an array of type*/
-																					/*  S8_T [13];                           */
-		 READDIRECTORIES_COMMAND   = 41,  /* read the directories name from            */
-																					/* the current path.                     */
-																					/* The data returned are of type         */
-																					/*  (*S8_T)[13];                         */
-		 GETCURRENTPATH_COMMAND    = 42,  /* get the current path                      */
-																					/* The command is a read command:        */
-																					/*  command  = READ_COMMAND_50           */
-																					/*  arg      = GETCURRENTPATH_COMMAND    */
-		 SETCURRENTPATH_COMMAND    = 43,  /* set the current path for the subsequent   */
-																					/* read directories and read files command*/
-																					/* The command is a write command:        */
-																					/*  command  = WRITE_COMMAND_50           */
-																					/*  arg      = SETCURRENTPATH_COMMAND     */
-		 SETFILETYPE_COMMAND       = 44,  /* set the file type (ex. "*.*", "*.prg").    */
-																					/* the next read files command will       */
-																					/* return only the files of type          */
-																					/* set in a SETFILETYPE_COMMAND command.  */
-																					/* The command is a write command:        */
-																					/*  command  = WRITE_COMMAND_50           */
-																					/*  arg      = SETFILETYPE_COMMAND        */
+
+
+
 		 ALARM_NOTIFY_COMMAND       = 51,
 		 SEND_INFO_COMMAND          = 52,
 		 SEND_WANTPOINTS_COMMAND    = 72,
@@ -123,6 +105,9 @@ typedef enum {
 
 
 		 TABLEPOINTS_COMMAND       = 75,
+
+		 READ_AT_COMMAND			= 90,	//450 length
+		 READ_GRPHIC_LABEL_COMMAND  = 91,
 		 READ_REMOTE_DEVICE_DB		= 97,
 		 READ_SETTING_COMMAND		= 98,
 		  GETSERIALNUMBERINFO       = 99,
@@ -139,6 +124,9 @@ typedef enum {
 		 RESTARTMINI_COMMAND       = 121,
 		 WRITEPRGFLASH_COMMAND     = 122,
 		 OPENSCREEN_COMMAND        = 123,
+		 WRITE_REMOTE_POINT         = 140,
+		 WRITE_AT_COMMAND			= 190,	//100 length
+		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
 		 WRITE_SETTING_COMMAND		= 198,
 		 WRITE_SUB_ID_BY_HAND = 199
 } CommandRequest;	  
@@ -153,6 +141,8 @@ typedef enum {
 //const int STR_IN_LABEL = 9;
 //const int STR_OUT_DESCRIPTION_LENGTH = 21;
 //const int STR_OUT_LABEL = 9;
+#define STR_ICON_1_NAME_LENGTH 20
+#define STR_ICON_2_NAME_LENGTH 20
 
 #define  STR_IN_DESCRIPTION_LENGTH  21
 #define	 STR_IN_LABEL  9
@@ -161,6 +151,9 @@ typedef enum {
 
 #define STR_VARIABLE_DESCRIPTION_LENGTH  21
 #define	 STR_VARIABLE_LABEL  9
+
+#define STR_USER_NAME_LENGTH 16
+#define  STR_USER_PASSWORD_LENGTH 9
 
 #define STR_PROGRAM_DESCRIPTION_LENGTH 21
 #define  STR_PROGRAM_LABEL_LENGTH 9
@@ -231,7 +224,7 @@ typedef  struct
 	int8_t digital_analog ; /* (1 bit; 1=analog, 0=digital)*/
 	int8_t calibration_sign; /* (1 bit; sign 0=positiv 1=negative )*/
 	int8_t calibration_increment; /* (1 bit;  0=0.1, 1=1.0)*/
-	int8_t unused; /* (5 bits - spare )*/
+	int8_t calibration_h; /* (5 bits - spare )*/  //去掉了 unused 把 calibration改为了双字节
 #if 0
 	unsigned  filter:3;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
 	unsigned decom	:1;  /* (1 bit; 0=ok, 1=point decommissioned)*/
@@ -247,7 +240,7 @@ typedef  struct
 //	uint8_t flag1;
 //	uint8_t flag2;
 
-	uint8_t calibration;  /* (8 bits; -25.6 to 25.6 / -256 to 256 )*/
+	int8_t calibration_l;  /* (8 bits; -25.6 to 25.6 / -256 to 256 )*/
 
 	uint8_t range;	      			/* (1 uint8_t ; input_range_equate)*/
 
@@ -275,16 +268,7 @@ typedef struct
 }Str_user_data_header;
 
 
-typedef enum 
-{ 
-	not_used,
-	KM_10K,
-	I_4_20ma,
-	V_0_10,
-	V_0_5V,
-	V_0_24AC,
-	TST_Normal
-} Analog_input_new_range_equate;
+
 
 typedef enum 
 { 
@@ -469,7 +453,7 @@ typedef struct
 	uint8_t auto_manual; /* (1 bit; 0=auto, 1=manual)*/
 	uint8_t action; /* (1 bit; 0=direct, 1=reverse)*/
 	uint8_t repeats_per_min; /* (1 bit; 0=repeats/hour,1=repeats/min)*/
-	uint8_t unused; /* (1 bit)*/
+	uint8_t sample_time; /* (1 bit)*/
 	uint8_t prop_high; /* (4 bits; high 4 bits of proportional bad)*/
 
 	uint8_t proportional;
@@ -500,19 +484,33 @@ typedef struct
 #endif
 
 #ifndef MAX_ANALOG_SAMPLES_PER_BLOCK
-#define MAX_ANALOG_SAMPLES_PER_BLOCK  140
+#define MAX_ANALOG_SAMPLES_PER_BLOCK  90
 #endif
 
 #ifndef MAX_DIGITAL_SAMPLES_PER_BLOCK
-#define MAX_DIGITAL_SAMPLES_PER_BLOCK 112
+#define MAX_DIGITAL_SAMPLES_PER_BLOCK 72
 #endif
+
+#define DYNDNS_MAX_USERNAME_SIZE 32
+#define DYNDNS_MAX_PASSWORD_SIZE 32
+#define DYNDNS_MAX_DOMAIN_SIZE 32
+
 /* Point_Net_T3000;*/
+//typedef struct
+//{
+//	byte number		;
+//	byte point_type;
+//	byte panel		;
+//	unsigned short  network;
+//}Point_Net ;
+
 typedef struct
 {
 	byte number		;
-	byte point_type;
+	byte point_type;	//高三位借给 number ，低5位是自己的;
 	byte panel		;
-	unsigned short  network;
+	byte sub_panel  ;
+	byte  network;
 }Point_Net ;
 
 
@@ -533,13 +531,13 @@ typedef struct
 
 	uint8_t num_inputs  ;// :4; 	/* total number of points */
 	uint8_t an_inputs ;//   :4; 	/* number of analog points */
-	uint8_t unit 		;//		:2; 	/* 2 bits - minutes=0, hours=1, days=2	*/
+////	uint8_t unit 		;//		:2; 	/* 2 bits - minutes=0, hours=1, days=2	*/
 //	uint8_t ind_views	;//	:2; 	/* number of views */
-	uint8_t wrap_flag	;//	:1;		/* (1 bit ; 0=no wrap, 1=data wrapped)*/
+////	uint8_t wrap_flag	;//	:1;		/* (1 bit ; 0=no wrap, 1=data wrapped)*/
 	uint8_t status		;//		:1;		/* monitor status 0=OFF / 1=ON */
-	uint8_t reset_flag	;//	:1; 	/* 1 bit; 0=no reset, 1=reset	*/
-	uint8_t double_flag;//	:1; 	/* 1 bit; 0= 4 bytes data, 1= 1(2) bytes data */
-
+////	uint8_t reset_flag	;//	:1; 	/* 1 bit; 0=no reset, 1=reset	*/
+////	uint8_t double_flag;//	:1; 	/* 1 bit; 0= 4 bytes data, 1= 1(2) bytes data */
+	int32_t next_sample_time;
 }	Str_monitor_point; 		/* 9+70+14+3+1+48+2 = 133 bytes */
 
 typedef struct              /* 5 bytes */
@@ -552,6 +550,26 @@ typedef struct              /* 5 bytes */
 
 } Digital_sample;        /* 5 bytes */
 
+typedef struct {
+
+	long nsize;
+	unsigned long oldest_time;
+	unsigned long most_recent_time;
+
+} MonitorUpdateData;
+
+typedef struct
+{
+	//uint16_t  		total_length;        /*	total length to be received or sent	*/
+	uint16_t total_seg;
+	uint8_t		command;
+	uint8_t index;
+	uint8_t type;
+	MonitorUpdateData conm_args;
+	uint8_t special;
+
+	uint16_t seg_index;
+}Str_Monitor_data_header;
 
 typedef struct              /* 645 bytes */
 {
@@ -591,8 +609,8 @@ typedef struct              /* 645 bytes */
   	union {
 	int32_t           analog[MAX_ANALOG_SAMPLES_PER_BLOCK];   /* 140*4=560 bytes */
   	Digital_sample digital[MAX_DIGITAL_SAMPLES_PER_BLOCK]; /* 112*5=560 bytes */
-  	uint8_t           raw_byte[560];
-  	uint16_t           raw_int[280];
+  	uint8_t           raw_byte[360];
+  	uint16_t           raw_int[180];
   	} dat;
 
 }	Monitor_Block;         /* 645 bytes */
@@ -644,26 +662,10 @@ typedef struct              /* 85 bytes */
 } Monitor_Block_Header;  /* 100 bytes */
 
 
-typedef struct {
-
-	long nsize;
-	unsigned long oldest_time;
-	unsigned long most_recent_time;
-
-} MonitorUpdateData;
 
 
-typedef struct
-{
-	uint16_t  		total_length;        /*	total length to be received or sent	*/
-	uint8_t		command;
-	uint8_t index;
-	uint8_t type;
-	MonitorUpdateData conm_args;
-	uint8_t special;
-	uint8_t total_seg;
-	uint8_t seg_index;
-}Str_Monitor_data_header;
+
+
 
 typedef struct 
 {
@@ -676,7 +678,7 @@ typedef struct
 	uint16_t modbus_port;
 	uint16_t soft_version;
 	uint8_t hardware_version;
-	uint8_t noused[1];
+	uint8_t n_protocol;
 
 }Str_Serial_info;
 
@@ -719,6 +721,31 @@ typedef union
 		uint8_t com_baudrate0; 
 		uint8_t com_baudrate1; 
 		uint8_t com_baudrate2; 
+
+		uint8_t user_name; // 0 ;no  1:disable 2:enable
+		uint8_t custmer_unite; // 0 :no
+
+		uint8_t usb_mode; //0 device   1:host.
+		uint8_t network_number;
+		uint8_t panel_type;
+
+		char panel_name[20];
+
+		uint8_t en_panel_name;
+		uint8_t panel_number;
+
+		char dyndns_user[DYNDNS_MAX_USERNAME_SIZE];
+		char dyndns_pass[DYNDNS_MAX_PASSWORD_SIZE];
+		char dyndns_domain[DYNDNS_MAX_DOMAIN_SIZE];
+		uint8_t en_dyndns;  // 0 - no  1 - disable 2 - enable
+		uint8_t dyndns_provider;  // 0- www.3322.org 1-www.dyndns.com  2 - www.no-ip.com
+		uint16_t dyndns_update_time;  // xx min
+		uint8_t en_sntp;  // 0 - no  1 - disable 
+		//0xca780265			202.120.2.101 ntp.sjtu.edu.cn      2
+		//0x1838b28c            24.56.178.140 time.nist.gov			3
+		//0xd248912d			210.72.145.45  NTSC					4
+		signed short time_zone;
+		unsigned int n_serial_number;
 	}reg;
 }Str_Setting_Info;
 
@@ -848,27 +875,74 @@ typedef struct
 
 } Str_Units_element;  
 
+
+
+
 typedef struct
 {
-	unsigned char primitive;
-	unsigned short DNET;
-	unsigned char DLEN;
-	char D_MAC_ADR[6];
-	unsigned char dest_LSAP;
-	unsigned short SNET;
-	unsigned char SLEN;
-	char S_MAC_ADR[6];
-	unsigned char source_LSAP;
+	char name[STR_USER_NAME_LENGTH];          /* (16 bytes; string) */
+	char password[STR_USER_PASSWORD_LENGTH];      /* (9 bytes; string) */
+	uint8_t access_level;        /* (1 byte ; 0-255) */
+	unsigned int rights_access;
+	uint8_t default_panel;
+	uint8_t default_group;
+	/* 2*((MAX_GRPS%8)?MAX_GRPS/8+1:MAX_GRPS/8) */
+	char screen_right[8*1];
+	/* 2*((MAX_PRGS%8)?MAX_PRGS/8+1:MAX_PRGS/8) */
+	char program_right[8*1];
 
-} UNITDATA_PARAMETERS;
-
-
-
+} Str_userlogin_point;  /* ( size = 52 bytes ); */
 
 
+typedef union
+{
+	uint8_t all[70];
+	struct
+	{
+		uint8_t label_status;
+		unsigned int nSerialNum;
+		uint8_t nScreen_index;
+		uint16_t nLabel_index;
+		uint8_t nMain_Panel;
+		uint8_t nSub_Panel;
+		uint8_t nPoint_type;
+		uint8_t nPoint_number;
+		uint16_t  nPoint_x;
+		uint16_t  nPoint_y;
+		unsigned int nclrTxt;
+		uint8_t nDisplay_Type;
+		uint8_t nIcon_size;
+		uint8_t nIcon_place;
+		char icon_name_1[STR_ICON_1_NAME_LENGTH];
+		char icon_name_2[STR_ICON_2_NAME_LENGTH];
+	}reg;
+
+} Str_label_point;
+
+typedef struct
+{
+	Point_Net point;            /* 5 bytes*/
+	int32_t point_value;
+	uint8_t auto_manual;//      : 1;  /* 0=auto, 1=manual*/
+	uint8_t digital_analog ;//    : 1;  /* 0=digital, 1=analog*/
+	uint8_t device_online;//       : 1;  /* 0=off line, 1=on line*/
+	uint8_t product_id  ;//            : 8;
+	uint8_t count;//              : 8;
+	uint8_t read_write;//         : 2;    0 - read only 1- written
+	uint8_t change ;//          : 2;
+
+} Str_remote_point; /* 1+5+4+2+2=14 bytes */
 
 
+typedef struct	//用来存储data log 的结构;
+{
+	uint8_t index;   // monitor
+	int32_t time;
+	Point_Net point;
+	int32_t value;
+	uint16_t mark;  // 0d 0a  end mark
 
+}Str_mon_element; // 18
 
 
 #pragma pack(pop)//恢复对齐状态 

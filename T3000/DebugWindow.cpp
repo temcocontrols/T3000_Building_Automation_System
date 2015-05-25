@@ -14,7 +14,7 @@ IMPLEMENT_DYNAMIC(CDebugWindow, CDialogEx)
 CDebugWindow::CDebugWindow(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CDebugWindow::IDD, pParent)
 {
-
+	m_plogFile=new CStdioFile;
 }
 
 CDebugWindow::~CDebugWindow()
@@ -34,6 +34,9 @@ BEGIN_MESSAGE_MAP(CDebugWindow, CDialogEx)
 ON_WM_HSCROLL()
 ON_BN_CLICKED(IDC_BUTTON_DEBUG_CLEARALL, &CDebugWindow::OnBnClickedButtonDebugClearall)
 ON_BN_CLICKED(IDC_BUTTON_DEBUG_PAUSE, &CDebugWindow::OnBnClickedButtonDebugPause)
+ON_WM_SIZE()
+ON_BN_CLICKED(IDC_BUTTON_DEBUG_SAVE, &CDebugWindow::OnBnClickedButtonDebugSave)
+ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -45,6 +48,7 @@ BOOL CDebugWindow::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	//::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 	// TODO:  Add extra initialization here
+	Logfile_path.Empty();
 	m_is_pause = false;
 	SetWindowLong(this->GetSafeHwnd(),GWL_EXSTYLE,GetWindowLong(this->GetSafeHwnd(),GWL_EXSTYLE)^0x80000);  
 	HINSTANCE    hInst    =    LoadLibrary(_T("User32.DLL"));  
@@ -145,4 +149,66 @@ void CDebugWindow::OnBnClickedButtonDebugPause()
 		SetDlgItemTextW(IDC_BUTTON_DEBUG_PAUSE,_T("Resume"));
 	}
 	
+}
+
+
+
+
+
+void CDebugWindow::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	if(m_debug_listbox.GetSafeHwnd()==NULL)   return;
+	CRect rect;
+	this->GetClientRect(&rect);
+	CPoint pot = rect.TopLeft();
+	m_debug_listbox.SetWindowPos(NULL, pot.x+10, pot.y+60, 
+		rect.Width()- 45, rect.Height() - 80, NULL);
+}
+
+
+void CDebugWindow::OnBnClickedButtonDebugSave()
+{
+	// TODO: Add your control notification handler code here
+	CTime temp_time = CTime::GetCurrentTime();
+	CString strtime = temp_time.Format(_T("%I_%M_%S_%p"));
+	Logfile_path = g_achive_folder + _T("\\") + strtime + _T(".txt");
+	if (m_debug_listbox.GetCount()!=0)
+	{
+
+		if(m_plogFile->Open(Logfile_path.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate ))
+		{
+			for (int i=0;i<m_debug_listbox.GetCount();i++)
+			{
+				CString logInfo;
+				m_debug_listbox.GetText(i,logInfo);
+				m_plogFile->WriteString(logInfo+_T("\n"));
+			}
+
+
+			m_plogFile->Close();
+		}
+		else
+		{
+			ASSERT(0);
+			m_plogFile->Close();
+
+		}
+		ShellExecute(this->m_hWnd, _T("open"), Logfile_path, NULL, NULL, SW_SHOWNORMAL);
+	}
+}
+
+
+void CDebugWindow::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	// TODO: Add your message handler code here
+	if (m_plogFile)
+	{
+		delete m_plogFile;
+		m_plogFile=NULL;
+	}
 }

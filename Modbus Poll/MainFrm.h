@@ -71,6 +71,8 @@ public:
      afx_msg void OnUpdateStatusBar(CCmdUI *pCmdUI);
 	afx_msg void OnViewRegistervalueanalyzer();
 	afx_msg void OnFunctionsTestcenter();
+	afx_msg void OnEditCopy();
+	 
 };
 
 

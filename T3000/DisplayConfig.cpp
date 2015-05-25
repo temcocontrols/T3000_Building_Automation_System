@@ -6,7 +6,8 @@
 #include "DisplayConfig.h"
 #include "afxdialogex.h"
 #include "globle_function.h"
-
+#include "MainFrm.h"
+#include <bitset>
 // CDisplayConfig dialog
 #define  THE_CHAR_LENGTH 8
 
@@ -14,6 +15,7 @@ IMPLEMENT_DYNAMIC(CDisplayConfig, CDialog)
 CDisplayConfig::CDisplayConfig(CWnd* pParent /*=NULL*/)
 	: CDialog(CDisplayConfig::IDD, pParent)
 {
+m_EDIT_ID=-1;
 /*m_display_number=15;*/
 }
 
@@ -39,15 +41,25 @@ BOOL CDisplayConfig::OnInitDialog()
 	UpdateData(FALSE);
 	OnBnClickedOk();
 	Fresh_Grid();
+
+	Fresh_Checks();
 	return TRUE;
 }
 void CDisplayConfig::DoDataExchange(CDataExchange* pDX)
 {
-CDialog::DoDataExchange(pDX);
-DDX_Control(pDX, IDC_INPUT_MSFLEXGRID, m_FlexGrid1);
-DDX_Text(pDX, IDC_INPUT_9, m_display_number);
-DDX_Control(pDX, IDC_SEQ_COM, m_ItemValueCombx);
-DDX_Control(pDX, IDC_PROCESS, m_progress);
+	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_INPUT_MSFLEXGRID, m_FlexGrid1);
+	DDX_Text(pDX, IDC_INPUT_9, m_display_number);
+	DDX_Control(pDX, IDC_SEQ_COM, m_ItemValueCombx);
+	DDX_Control(pDX, IDC_PROCESS, m_progress);
+	DDX_Control(pDX, IDC_CHECK_ICON_AM, m_am_check);
+	DDX_Control(pDX, IDC_CHECK2, m_check2);
+	DDX_Control(pDX, IDC_CHECK3, m_check3);
+	DDX_Control(pDX, IDC_CHECK4, m_check4);
+	DDX_Control(pDX, IDC_CHECK5, m_check5);
+	DDX_Control(pDX, IDC_CHECK6, m_check6);
+	DDX_Control(pDX, IDC_CHECK7, m_check7);
+	DDX_Control(pDX, IDC_CHECK8, m_check8);
 }
 BEGIN_MESSAGE_MAP(CDisplayConfig, CDialog)
 	ON_BN_CLICKED(IDOK, &CDisplayConfig::OnBnClickedOk)
@@ -68,6 +80,24 @@ ON_BN_CLICKED(IDC_SAVE_INPUT7, &CDisplayConfig::OnBnClickedSaveInput7)
 ON_BN_CLICKED(IDC_SAVE_INPUT8, &CDisplayConfig::OnBnClickedSaveInput8)
 ON_BN_CLICKED(IDC_FRESH_TABLE, &CDisplayConfig::OnBnClickedFreshTable)
 //ON_BN_CLICKED(IDC_FRESH, &CDisplayConfig::OnBnClickedFresh)
+ON_EN_SETFOCUS(IDC_INPUT_1, &CDisplayConfig::OnSetfocusInput1)
+ON_EN_SETFOCUS(IDC_INPUT_2, &CDisplayConfig::OnSetfocusInput2)
+ON_EN_SETFOCUS(IDC_INPUT_3, &CDisplayConfig::OnSetfocusInput3)
+ON_EN_SETFOCUS(IDC_INPUT_4, &CDisplayConfig::OnSetfocusInput4)
+ON_EN_SETFOCUS(IDC_INPUT_5, &CDisplayConfig::OnSetfocusInput5)
+ON_EN_SETFOCUS(IDC_INPUT_6, &CDisplayConfig::OnSetfocusInput6)
+ON_EN_SETFOCUS(IDC_INPUT_7, &CDisplayConfig::OnSetfocusInput7)
+ON_EN_SETFOCUS(IDC_INPUT_8, &CDisplayConfig::OnSetfocusInput8)
+ON_EN_SETFOCUS(IDC_LINE_1, &CDisplayConfig::OnSetfocusLine1)
+ON_EN_SETFOCUS(IDC_LINE_2, &CDisplayConfig::OnSetfocusLine2)
+ON_BN_CLICKED(IDC_CHECK_ICON_AM, &CDisplayConfig::OnBnClickedCheckIconAm)
+ON_BN_CLICKED(IDC_CHECK2, &CDisplayConfig::OnBnClickedCheck2)
+ON_BN_CLICKED(IDC_CHECK3, &CDisplayConfig::OnBnClickedCheck3)
+ON_BN_CLICKED(IDC_CHECK4, &CDisplayConfig::OnBnClickedCheck4)
+ON_BN_CLICKED(IDC_CHECK5, &CDisplayConfig::OnBnClickedCheck5)
+ON_BN_CLICKED(IDC_CHECK6, &CDisplayConfig::OnBnClickedCheck6)
+ON_BN_CLICKED(IDC_CHECK7, &CDisplayConfig::OnBnClickedCheck7)
+ON_BN_CLICKED(IDC_CHECK8, &CDisplayConfig::OnBnClickedCheck8)
 END_MESSAGE_MAP()
 
 
@@ -406,7 +436,7 @@ else
 }
 void CDisplayConfig::OnBnClickedCancel()
 {
-// TODO: Add your control notification handler code here
+
 CDialog::OnCancel();
 }
 void CDisplayConfig::OnBnClickedOk()
@@ -459,12 +489,16 @@ void CDisplayConfig::OnBnClickedOk()
 	Fresh_Grid();
 	temp.Format(_T("%d"),get_serialnumber());
 
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
-	::CoInitialize(NULL);
-	m_pCon.CreateInstance("ADODB.Connection");
-	m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+// 	_ConnectionPtr m_pCon;
+// 	_RecordsetPtr m_pRs;
+// 	::CoInitialize(NULL);
+// 	m_pCon.CreateInstance("ADODB.Connection");
+// 	m_pRs.CreateInstance(_T("ADODB.Recordset"));
+// 	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
 	try
 	{
 		CString strSql;BOOL is_exist=FALSE;	  CString str_temp;
@@ -483,7 +517,7 @@ void CDisplayConfig::OnBnClickedOk()
 			Input8=input8;
 
 			strSql.Format(_T("update IONAME set INPUT1='%s',INPUT2='%s',INPUT3='%s',INPUT4='%s',INPUT5='%s',INPUT6='%s',INPUT7='%s',INPUT8='%s' where SERIAL_ID='%s'"),Input1,Input2,Input3,Input4,Input5,Input6,Input7,Input8,SerialNo);
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 			 
 			g_strInName1=Input1;
 			g_strInName2=Input2;
@@ -502,11 +536,12 @@ void CDisplayConfig::OnBnClickedOk()
 		//MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
 
 
-		m_pCon->Close();
+		//m_pCon->Close();
+		bado.CloseConn();
 		return ;
 	}
-	m_pCon->Close(); 
-  
+	//m_pCon->Close(); 
+  bado.CloseConn();
     }
 	//Write Line1,Line2
 void CDisplayConfig::OnBnClickedSave2()
@@ -897,7 +932,7 @@ void CDisplayConfig::OnBnClickedSaveInput8()
 
 void CDisplayConfig::OnBnClickedFreshTable()
 	{
-	// TODO: Add your control notification handler code here
+	
 	    m_progress.ShowWindow(TRUE);
 		m_progress.SetRange(0,10);
 		register_critical_section.Lock();
@@ -922,3 +957,245 @@ void CDisplayConfig::OnBnClickedFreshTable()
 
 
  
+
+
+BOOL CDisplayConfig::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if(WM_KEYDOWN == pMsg->message)
+	{
+
+		CEdit* pEdit = (CEdit*)GetDlgItem(m_EDIT_ID);
+
+		ASSERT(pEdit);
+
+		if(pMsg->hwnd == pEdit->GetSafeHwnd() && VK_RETURN == pMsg->wParam)
+		{
+			switch (m_EDIT_ID)
+			{
+			  case IDC_INPUT_1:{
+			  OnBnClickedSaveInput1();
+			  }break;
+			  case IDC_INPUT_2:{
+			  OnBnClickedSaveInput2();
+			  }break;
+			  case IDC_INPUT_3:{
+			  OnBnClickedSaveInput3();
+			 }break;
+			  case IDC_INPUT_4:{
+			  OnBnClickedSaveInput4();
+			 }break;
+			  case IDC_INPUT_5:{
+			  OnBnClickedSaveInput5();
+			 }break;
+			  case IDC_INPUT_6:{
+			  OnBnClickedSaveInput6();
+			 }break;
+			  case IDC_INPUT_7:{
+			  OnBnClickedSaveInput7();
+			 }break;
+			  case IDC_INPUT_8:{
+			  OnBnClickedSaveInput8();
+			 }break;
+			 case IDC_LINE_1:{
+			 OnBnClickedSaveLine2();
+			 }break;
+			 case IDC_LINE_2:{
+			 OnBnClickedSaveLine2();
+			 }break;
+			}
+        }
+	}
+	return CDialog::PreTranslateMessage(pMsg);
+}
+
+
+void CDisplayConfig::OnSetfocusInput1()
+{
+	m_EDIT_ID=IDC_INPUT_1; 
+}
+
+
+void CDisplayConfig::OnSetfocusInput2()
+{
+	m_EDIT_ID=IDC_INPUT_2; 
+}
+
+
+void CDisplayConfig::OnSetfocusInput3()
+{
+	m_EDIT_ID=IDC_INPUT_3; 
+}
+
+
+void CDisplayConfig::OnSetfocusInput4()
+{
+	m_EDIT_ID=IDC_INPUT_4; 
+}
+
+
+void CDisplayConfig::OnSetfocusInput5()
+{
+	m_EDIT_ID=IDC_INPUT_5; 
+}
+
+
+void CDisplayConfig::OnSetfocusInput6()
+{
+	m_EDIT_ID=IDC_INPUT_6; 
+}
+
+
+void CDisplayConfig::OnSetfocusInput7()
+{
+	m_EDIT_ID=IDC_INPUT_7; 
+}
+
+
+void CDisplayConfig::OnSetfocusInput8()
+{
+	m_EDIT_ID=IDC_INPUT_8; 
+}
+
+
+void CDisplayConfig::OnSetfocusLine1()
+{	
+	m_EDIT_ID=IDC_LINE_1;
+}
+
+
+void CDisplayConfig::OnSetfocusLine2()
+{
+	m_EDIT_ID=IDC_LINE_2;
+}
+void CDisplayConfig::Fresh_Checks(){
+	int AM=product_register_value[728];
+	if (AM==0)
+	{
+	  m_am_check.SetCheck(0);
+	  GetDlgItem(IDC_CHECK2)->EnableWindow(FALSE);
+	  GetDlgItem(IDC_CHECK3)->EnableWindow(FALSE);
+	  GetDlgItem(IDC_CHECK4)->EnableWindow(FALSE);
+	  GetDlgItem(IDC_CHECK5)->EnableWindow(FALSE);
+	  GetDlgItem(IDC_CHECK6)->EnableWindow(FALSE);
+	  GetDlgItem(IDC_CHECK7)->EnableWindow(FALSE);
+	  GetDlgItem(IDC_CHECK8)->EnableWindow(FALSE);
+	  
+	}
+	else
+	{
+	  m_am_check.SetCheck(1);
+
+	  GetDlgItem(IDC_CHECK2)->EnableWindow(TRUE);
+	  GetDlgItem(IDC_CHECK3)->EnableWindow(TRUE);
+	  GetDlgItem(IDC_CHECK4)->EnableWindow(TRUE);
+	  GetDlgItem(IDC_CHECK5)->EnableWindow(TRUE);
+	  GetDlgItem(IDC_CHECK6)->EnableWindow(TRUE);
+	  GetDlgItem(IDC_CHECK7)->EnableWindow(TRUE);
+	  GetDlgItem(IDC_CHECK8)->EnableWindow(TRUE);
+
+
+	}
+	bitset<16> IconValue(product_register_value[729]);
+	m_check2.SetCheck(IconValue[0]);
+	m_check3.SetCheck(IconValue[1]);
+	m_check4.SetCheck(IconValue[2]);
+	m_check5.SetCheck(IconValue[3]);
+	m_check6.SetCheck(IconValue[4]);
+	m_check7.SetCheck(IconValue[5]);
+	m_check8.SetCheck(IconValue[6]);
+}
+
+void CDisplayConfig::OnBnClickedCheckIconAm()
+{
+    int AM=product_register_value[728];
+	if (AM==0)
+	{
+	  int ret=write_one(g_tstat_id,728,1);
+	  if (ret>0)
+	  {
+	    product_register_value[728]=1;
+	  }
+	  else
+	  {
+	    AfxMessageBox(_T("Try again"));
+	  }
+	} 
+	else
+	{
+		int ret=write_one(g_tstat_id,728,0);
+		if (ret>0)
+		{
+			product_register_value[728]=0;
+		}
+		else
+		{
+			AfxMessageBox(_T("Try again"));
+		}
+	}
+	
+	Fresh_Checks();
+}
+
+void CDisplayConfig::Write_Setting(){
+	bitset<16> IconValue(product_register_value[729]);
+	IconValue.set(0,m_check2.GetCheck());
+	IconValue.set(1,m_check3.GetCheck());
+	IconValue.set(2,m_check4.GetCheck());
+	IconValue.set(3,m_check5.GetCheck());
+	IconValue.set(4,m_check6.GetCheck());
+	IconValue.set(5,m_check7.GetCheck());
+	IconValue.set(6,m_check8.GetCheck());
+	int Reg729=IconValue.to_ulong();
+	int ret=write_one(g_tstat_id,729,Reg729);
+	if (ret>0)
+	{
+	 product_register_value[729] = Reg729;
+	}
+	else
+	{
+	AfxMessageBox(_T("Write Setting Fail"));
+	}
+
+	Fresh_Checks();
+}
+void CDisplayConfig::OnBnClickedCheck2()
+{
+	Write_Setting();
+}
+
+
+void CDisplayConfig::OnBnClickedCheck3()
+{
+	Write_Setting();
+}
+
+
+void CDisplayConfig::OnBnClickedCheck4()
+{
+	Write_Setting();
+}
+
+
+void CDisplayConfig::OnBnClickedCheck5()
+{
+	Write_Setting();
+}
+
+
+void CDisplayConfig::OnBnClickedCheck6()
+{
+	Write_Setting();
+}
+
+
+void CDisplayConfig::OnBnClickedCheck7()
+{
+	Write_Setting();
+}
+
+
+void CDisplayConfig::OnBnClickedCheck8()
+{
+	Write_Setting();
+}

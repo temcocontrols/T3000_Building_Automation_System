@@ -16,6 +16,10 @@
 extern int Station_NUM;
 // BacnetController dialog
 Str_controller_point m_temp_controller_data[BAC_CONTROLLER_COUNT];
+
+extern int pointtotext_for_controller(char *buf,Point_T3000 *point);
+extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
+
 IMPLEMENT_DYNAMIC(BacnetController, CDialogEx)
 
 BacnetController::BacnetController(CWnd* pParent /*=NULL*/)
@@ -42,6 +46,8 @@ BEGIN_MESSAGE_MAP(BacnetController, CDialogEx)
 		ON_NOTIFY(NM_CLICK, IDC_LIST_BACNET_CONTROLLER, &BacnetController::OnNMClickListController)
 		ON_WM_TIMER()
 		ON_WM_CLOSE()
+		ON_WM_HELPINFO()
+
 END_MESSAGE_MAP()
 
 
@@ -130,6 +136,8 @@ void BacnetController::Initial_List()
 	m_controller_list.InsertColumn(CONTROLLER_RESET, _T("Reset"), 70, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_controller_list.InsertColumn(CONTROLLER_RATE, _T("Rate"), 70, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_controller_list.InsertColumn(CONTROLLER_BIAS, _T("Bias"), 70, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_SAMPLE_TIME, _T("Sample Time"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	
 	m_controller_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_controller_dlg_hwnd;
 
@@ -170,13 +178,13 @@ void BacnetController::Initial_List()
 		}
 	}
 }
-extern int pointtotext_for_controller(char *buf,Point_T3000 *point);
-extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
+
 LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 {
 	CString temp_des2;
 	CString temp_des3;
 	CString temp_in_unit;
+	CString temp_set_unit;
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
 	if(isFreshOne == REFRESH_ON_ITEM)
@@ -193,7 +201,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
-			return 0;
+			//return 0;
 		}
 #endif
 	}
@@ -211,15 +219,15 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 		temp_des2.Empty();
 		if(m_controller_data.at(i).input.number< BAC_INPUT_ITEM_COUNT)
 		{	
-			if(m_controller_data.at(i).input.number == 0 )
+			if(m_controller_data.at(i).input.point_type != 2 )	//如果不是Input
 			{
 				temp_des2.Empty();
 				temp_in_unit.Empty();
 			}
-			else//如果 number不是0  还需要 -1 才是 data的 vector;
+			else//
 			{
-			MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(m_controller_data.at(i).input.number -1).label, 
-				(int)strlen((char *)m_Input_data.at(m_controller_data.at(i).input.number -1).label)+1, 
+			MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(m_controller_data.at(i).input.number ).label, 
+				(int)strlen((char *)m_Input_data.at(m_controller_data.at(i).input.number ).label)+1, 
 				temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 			temp_des2.ReleaseBuffer();	
 
@@ -232,18 +240,19 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 			//temp_des3.Format(_T("%d"),m_Input_data.at(m_controller_data.at(i).input.number - 1).value);	
 			CString cstemp_value;
 			float temp_float_value;
-			temp_float_value = ((float)m_Input_data.at(m_controller_data.at(i).input.number - 1).value) / 1000;
+			temp_float_value = ((float)m_controller_data.at(i).input_value) / 1000;
+
 			cstemp_value.Format(_T("%.1f"),temp_float_value);
 			m_controller_list.SetItemText(i,CONTROLLER_INPUTVALUE,cstemp_value);
 
 
 			//********************************************************************************************************
 			// bind the the input units.
-
-			if(m_Input_data.at(i).digital_analog == BAC_UNITS_ANALOG)
+			int x = m_controller_data.at(i).input.number;
+			if(m_Input_data.at(x).digital_analog == BAC_UNITS_ANALOG)
 			{
 				//m_input_list.SetItemText(i,INPUT_RANGE,Input_Analog_Units_Array[m_Input_data.at(i).range]);
-				m_controller_list.SetItemText(i,CONTROLLER_INPUTUNITS,Input_List_Analog_Units[m_Input_data.at(i).range]);
+				m_controller_list.SetItemText(i,CONTROLLER_INPUTUNITS,Input_List_Analog_Units[m_Input_data.at(x).range]);
 
 
 				//CString temp_value;
@@ -302,6 +311,9 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 		temp_output_value.Format(_T("%.1f%%"),persend_data);
 		m_controller_list.SetItemText(i,CONTROLLER_OUTPUT,temp_output_value);
 
+		CString temp_sample_time;
+		temp_sample_time.Format(_T("%u"),m_controller_data.at(i).sample_time);
+		m_controller_list.SetItemText(i,CONTROLLER_SAMPLE_TIME,temp_sample_time);
 		//temp_des2.Format(_T("%d"),m_controller_data.at(i).input_value);
 		//m_controller_list.SetItemText(i,CONTROLLER_INPUTVALUE,temp_des2);
 
@@ -316,15 +328,179 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 			
 		temp_des2.Empty();
 		temp_des3.Empty();
+		temp_set_unit.Empty();
+		if(m_controller_data.at(i).setpoint.point_type == 1) 
+		{
+			if(m_controller_data.at(i).setpoint.number< BAC_OUTPUT_ITEM_COUNT)
+			{
+
+			}
+		}
+		else if(m_controller_data.at(i).setpoint.point_type == 2) 
+		{
+			if(m_controller_data.at(i).setpoint.number< BAC_INPUT_ITEM_COUNT)
+			{
+					int num_point,num_panel,num_net,k;
+					Point_T3000 point;
+					point.number = m_controller_data.at(i).setpoint.number;
+					point.number = point.number + 1;	//input setpoint 是从 0 开始计数的 ，但是要去找point label 要从1开始;
+					point.panel = m_controller_data.at(i).setpoint.panel;
+					point.point_type = m_controller_data.at(i).setpoint.point_type - 1;	//调用 ispoint的时候要减一;
+					byte point_type,var_type;
+
+					int temp_network = 0;
+					char buf[255];
+					char q[17];
+					pointtotext_for_controller(q, &point);
+
+					char * temp1 = ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, temp_network, point.panel, &k);
+					if(temp1!=NULL)
+					{
+						if(strlen(temp1) < 255)
+						{
+							strcpy(buf,temp1);
+
+							MultiByteToWideChar( CP_ACP, 0, (char *)buf,(int)strlen((char *)buf)+1, 
+								temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
+							temp_des2.ReleaseBuffer();	
+
+							float temp_float_value;
+							temp_float_value = ((float)m_controller_data.at(i).setpoint_value) / 1000;
+							temp_des3.Format(_T("%.1f"),temp_float_value);
+
+
+
+							int x = m_controller_data.at(i).setpoint.number;
+							if(m_Input_data.at(x).digital_analog == BAC_UNITS_ANALOG)
+							{
+
+								if(m_Input_data.at(x).range <  (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
+									temp_set_unit = Input_List_Analog_Units[m_Input_data.at(x).range];
+									
+							}
+						}
+					}
+				
+			}
+		}
+		else if(m_controller_data.at(i).setpoint.point_type == 3)	//Variable
+		{
+			if(m_controller_data.at(i).setpoint.number< BAC_VARIABLE_ITEM_COUNT)
+			{
+				int num_point,num_panel,num_net,k;
+				Point_T3000 point;
+				point.number = m_controller_data.at(i).setpoint.number;
+				point.number = point.number + 1;	//input setpoint 是从 0 开始计数的 ，但是要去找point label 要从1开始;
+				point.panel = m_controller_data.at(i).setpoint.panel;
+				point.point_type = m_controller_data.at(i).setpoint.point_type - 1;	//调用 ispoint的时候要减一;
+				byte point_type,var_type;
+
+				int temp_network = 0;
+				char buf[255];
+				char q[17];
+				pointtotext_for_controller(q, &point);
+
+				char * temp1 = ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, temp_network, point.panel, &k);
+				if(temp1!=NULL)
+				{
+					if(strlen(temp1) < 255)
+					{
+						strcpy(buf,temp1);
+
+						MultiByteToWideChar( CP_ACP, 0, (char *)buf,(int)strlen((char *)buf)+1, 
+							temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
+						temp_des2.ReleaseBuffer();	
+
+						float temp_float_value;
+						temp_float_value = ((float)m_controller_data.at(i).setpoint_value) / 1000;
+						temp_des3.Format(_T("%.1f"),temp_float_value);
+
+
+
+						int x = m_controller_data.at(i).setpoint.number;
+						if(m_Variable_data.at(x).digital_analog == BAC_UNITS_DIGITAL)
+						{
+
+
+							if(m_Variable_data.at(x).range>30)
+							{
+								temp_set_unit = _T("");
+							}
+							else
+							{
+								CString temp1;
+								CStringArray temparray;
+
+								if((m_Variable_data.at(x).range < 23) &&(m_Variable_data.at(x).range !=0))
+									temp1 = Digital_Units_Array[m_Variable_data.at(x).range];
+								else if((m_Variable_data.at(x).range >=23) && (m_Variable_data.at(x).range <= 30))
+								{
+									if(receive_customer_unit)
+										temp1 = temp_unit_no_index[m_Variable_data.at(x).range - 23];
+								}
+
+								SplitCStringA(temparray,temp1,_T("/"));
+								if((temparray.GetSize()==2))
+								{
+									if(m_Variable_data.at(x).control == 0)
+										temp_set_unit = temparray.GetAt(0);
+									else
+										temp_set_unit = temparray.GetAt(1);
+								}
+
+							}
+						}
+						else
+						{
+							if(m_Variable_data.at(x).range == 20)	//如果是时间;
+							{
+								temp_set_unit = Variable_Analog_Units_Array[m_Variable_data.at(x).range];
+								char temp_char[50];
+								int time_seconds = m_Variable_data.at(x).value / 1000;
+								intervaltotext(temp_char,time_seconds,0,0);
+								CString temp_11;
+								MultiByteToWideChar( CP_ACP, 0, temp_char, strlen(temp_char) + 1, 
+									temp_11.GetBuffer(MAX_PATH), MAX_PATH );
+								temp_11.ReleaseBuffer();		
+								
+								temp_set_unit = temp_11;
+								//temp_value.Format(_T("%d"),m_Variable_data.at(i).value);
+								//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_value);
+							}
+							else if(m_Variable_data.at(x).range<=sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))
+							{
+								//m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
+								temp_set_unit = Variable_Analog_Units_Array[m_Variable_data.at(x).range];
+								//CString cstemp_value;
+								//float temp_float_value;
+								//temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+								//cstemp_value.Format(_T("%.3f"),temp_float_value);
+								//m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value);
+
+								//temp_value.Format(_T("%d"),m_Variable_data.at(i).value);
+								//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_value);
+							}
+						}
+
+
+
+
+
+					}
+				}
+			}
+		}
+#if 0
 		if(m_controller_data.at(i).setpoint.number< BAC_VARIABLE_ITEM_COUNT)
 		{	
-			if(m_controller_data.at(i).setpoint.number == 0 )//如果number是0 说明是默认初始值，无意义，置空;
+			if(m_controller_data.at(i).setpoint.point_type == 0 )
 				temp_des2.Empty();
 			else
 			{
 				int num_point,num_panel,num_net,k;
 				Point_T3000 point;
 				point.number = m_controller_data.at(i).setpoint.number;
+				point.number = point.number + 1;	//input setpoint 是从 0 开始计数的 ，但是要去找point label 要从1开始;
 				point.panel = m_controller_data.at(i).setpoint.panel;
 				point.point_type = m_controller_data.at(i).setpoint.point_type;
 				byte point_type,var_type;
@@ -333,11 +509,20 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 				char buf[255];
 				char q[17];
 				pointtotext_for_controller(q, &point);
-				strcpy(buf,ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, temp_network, point.panel, &k));
-				
-				MultiByteToWideChar( CP_ACP, 0, (char *)buf,(int)strlen((char *)buf)+1, 
-					temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
-				temp_des2.ReleaseBuffer();	
+
+				char * temp1 = ispoint(q,&num_point,&var_type, &point_type, &num_panel, &num_net, temp_network, point.panel, &k);
+				if(temp1!=NULL)
+				{
+					if(strlen(temp1) < 255)
+					{
+						strcpy(buf,temp1);
+
+						MultiByteToWideChar( CP_ACP, 0, (char *)buf,(int)strlen((char *)buf)+1, 
+							temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
+						temp_des2.ReleaseBuffer();	
+					}
+				}
+
 #if 0
 				MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(m_controller_data.at(i).setpoint.number - 1).label, 
 					(int)strlen((char *)m_Variable_data.at(m_controller_data.at(i).setpoint.number - 1).label)+1, 
@@ -375,9 +560,10 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 
 			
 		}
+#endif
 		m_controller_list.SetItemText(i,CONTROLLER_SETPOINT,temp_des2);
 		m_controller_list.SetItemText(i,CONTROLLER_SETVALUE,temp_des3);
-
+		m_controller_list.SetItemText(i,CONTROLLER_SETPOINTUNITS,temp_set_unit);
 	
 		//if(m_controller_data.at(i).units < VARIABLE_ANALOG_UNITE_COUNT)
 		//	m_controller_list.SetItemText(i,CONTROLLER_SETPOINTUNITS,Variable_Analog_Units_Array[m_controller_data.at(i).units]);
@@ -447,7 +633,7 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 	return	 0;
 }
 
-extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
+
 
 
 
@@ -507,7 +693,14 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 					m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
 					return 0;
 				}
-
+				if(temp_number > 0);	//因为Input2  的number 是1;
+					temp_number = temp_number - 1;
+				temp_point_type = temp_point_type + 1;
+				if(temp_point_type != 2)
+				{
+					m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
+					return 0;
+				}
 				m_controller_data.at(Changed_Item).input.number = temp_number;
 				m_controller_data.at(Changed_Item).input.panel = temp_panel;//bac_gloab_panel;
 				m_controller_data.at(Changed_Item).input.point_type = temp_point_type;//1 means input point
@@ -519,11 +712,11 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 
 					CString cstemp_value;
 					float temp_float_value;
-					temp_float_value = ((float)m_Input_data.at(temp_number - 1).value) / 1000;
+					temp_float_value = ((float)m_Input_data.at(temp_number).value) / 1000;
 					temp_des3.Format(_T("%.1f"),temp_float_value);
 
 
-					m_controller_data.at(Changed_Item).input_value = m_Input_data.at(temp_number - 1).value;	
+					m_controller_data.at(Changed_Item).input_value = m_Input_data.at(temp_number).value;	
 
 					m_controller_list.SetItemText(Changed_Item,CONTROLLER_INPUTVALUE,temp_des3);
 				}
@@ -631,7 +824,9 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 				m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
 				return 0;
 			}
-
+			if(temp_number > 0)	//Setpoint 也是这样;从0 开始的;
+				temp_number = temp_number - 1;
+			temp_point_type = temp_point_type + 1; //OUTPUT=1, INPUT, VARIABLE 要错位;
 			m_controller_data.at(Changed_Item).setpoint.number = temp_number;
 			m_controller_data.at(Changed_Item).setpoint.panel = temp_panel;//bac_gloab_panel;
 			m_controller_data.at(Changed_Item).setpoint.point_type = temp_point_type;//1 means input point
@@ -639,14 +834,14 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 			CString temp_des3;
 			if(temp_number < BAC_VARIABLE_ITEM_COUNT)
 			{
-				if(m_Variable_data.at(temp_number - 1).range < VARIABLE_ANALOG_UNITE_COUNT)
-					temp_des3 = Variable_Analog_Units_Array[m_Variable_data.at(temp_number - 1).range];
+				if(m_Variable_data.at(temp_number).range < VARIABLE_ANALOG_UNITE_COUNT)
+					temp_des3 = Variable_Analog_Units_Array[m_Variable_data.at(temp_number).range];
 				m_controller_list.SetItemText(Changed_Item,CONTROLLER_SETPOINTUNITS,temp_des3);
 			}
 			char tempAAAA[250];
 			memset(tempAAAA,0,250);
 			temp_des3.Empty();
-			if(m_Variable_data.at(temp_number - 1).range  == 20 )
+			if(m_Variable_data.at(temp_number).range  == 20 )
 			{
 				if((m_controller_data.at(Changed_Item).setpoint_value>=0)&&(m_controller_data.at(Changed_Item).setpoint_value<86400))
 					intervaltotext( tempAAAA, m_controller_data.at(Changed_Item).setpoint_value ,0 , 0);
@@ -659,7 +854,7 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 			{
 				CString cstemp_value;
 				float temp_float_value;
-				temp_float_value = ((float)m_Variable_data.at(m_controller_data.at(Changed_Item).setpoint.number - 1).value) / 1000;
+				temp_float_value = ((float)m_Variable_data.at(m_controller_data.at(Changed_Item).setpoint.number).value) / 1000;
 				temp_des3.Format(_T("%.1f"),temp_float_value);
 
 			}
@@ -727,6 +922,22 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 			m_controller_data.at(Changed_Item).bias = _wtoi(cs_temp);
 		}
 	}
+
+	if(Changed_SubItem == CONTROLLER_SAMPLE_TIME)
+	{
+		//int temp_value = _wtoi(New_CString);
+		int temp_value = (int)(_wtoi(New_CString));
+		if((temp_value > 255) || (temp_value < 0))
+		{
+			MessageBox(_T("Please input a effective value"),_T("Information"),MB_OK |MB_ICONINFORMATION);
+			m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
+			return 0;
+		}
+		
+
+		m_controller_data.at(Changed_Item).sample_time = temp_value;
+	}
+
 
 	cmp_ret = memcmp(&m_temp_controller_data[Changed_Item],&m_controller_data.at(Changed_Item),sizeof(Str_controller_point));
 	if(cmp_ret!=0)
@@ -831,9 +1042,9 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 void BacnetController::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if(this->IsWindowVisible())
+	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 	{
-	PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+	//PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
 	if(bac_select_device_online)
 		Post_Refresh_Message(g_bac_instance,READCONTROLLER_T3000,0,BAC_CONTROLLER_COUNT - 1,sizeof(Str_controller_point),BAC_CONTROLLER_GROUP);
 	}
@@ -856,4 +1067,25 @@ void BacnetController::OnCancel()
 	//m_output_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	//CDialogEx::OnCancel();
+}
+
+
+BOOL BacnetController::OnHelpInfo(HELPINFO* pHelpInfo)
+{ 
+
+	if (g_protocol==PROTOCOL_BACNET_IP){
+		HWND hWnd;
+
+		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 			
+			theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+		else
+			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
+			HH_HELP_CONTEXT, IDH_TOPIC_PID);
+		return (hWnd != NULL);
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
+
+	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

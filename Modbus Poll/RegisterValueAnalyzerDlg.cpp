@@ -28,7 +28,7 @@
 
 #include "ChartCtrl/ChartCrossHairCursor.h"
 #include "ChartCtrl/ChartDragLineCursor.h"
- 
+
 #include <math.h>
 #include <stdlib.h>
 #include <sstream>
@@ -708,7 +708,6 @@ void CRegisterValueAnalyzerDlg::Fresh(){
 				CChartLineSerie* pLineSeries = m_ChartCtrl.CreateLineSerie(bSecondHorizAxis, bSecondVertAxis);
 				pSeries[i] = pLineSeries;
 
-				 
 				/*
 				实心;下划线;点;下划线-点;下划线-点-点;
 				*/

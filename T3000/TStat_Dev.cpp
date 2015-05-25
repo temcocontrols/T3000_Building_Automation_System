@@ -184,6 +184,9 @@ CString CTStat_Dev::GetProductName()
 	case  PM_CO2_RS485:
 		strProductName = "CO2";
 		break;
+	case  PM_CO2_NODE:
+		strProductName = "CO2 Node";
+		break;
 	case PM_TSTAT6_HUM_Chamber:
 		strProductName =g_strHumChamber;
 		break;
@@ -197,7 +200,7 @@ CString CTStat_Dev::GetProductName()
 	case PM_T332AI :
 		strProductName="T3-32AI";
 			break;
-	case PM_T3AI16O :
+	case  PM_T38AI16O :
 		strProductName="T3-8AI160";
 			break;
 	case PM_T38I13O :
@@ -223,6 +226,21 @@ CString CTStat_Dev::GetProductName()
 		break;
 	case PM_HUMTEMPSENSOR:
 		strProductName="Hum Temp Sensor";
+		break;
+	case PM_CS_SM_AC:
+		strProductName="CS-SM-AC";
+		break;
+	case PM_CS_SM_DC:
+		strProductName="CS-SM-DC";
+		break;
+	case PM_CS_RSM_AC:
+		strProductName="CS-RSM-AC";
+		break;
+	case PM_CS_RSM_DC:
+		strProductName="CS-RSM-DC";
+		break;
+	case PM_HUM_R:
+	    strProductName="HUM-R";
 		break;
 	default:
 		strProductName="TStat";

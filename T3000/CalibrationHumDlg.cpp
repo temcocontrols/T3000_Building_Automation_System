@@ -42,6 +42,7 @@ BEGIN_MESSAGE_MAP(CCalibrationHumDlg, CDialogEx)
 //	ON_EN_SETFOCUS(IDC_TEMP, &CCalibrationHumDlg::OnEnSetfocusTemp)
 	ON_EN_KILLFOCUS(IDC_HUM_ED, &CCalibrationHumDlg::OnEnKillfocusHumEd)
 	ON_EN_KILLFOCUS(IDC_TEMP_ED, &CCalibrationHumDlg::OnEnKillfocusTempEd)
+	ON_EN_SETFOCUS(IDC_HUM_ED, &CCalibrationHumDlg::OnEnSetfocusHumEd)
 END_MESSAGE_MAP()
 
 
@@ -133,4 +134,9 @@ void CCalibrationHumDlg::OnEnKillfocusTempEd()
 		write_one(m_humid,101,temp,2);
 	}
 	SetTimer(CALIBRATION_HUM,1000,NULL);
+}
+
+void CCalibrationHumDlg::OnEnSetfocusHumEd()
+{
+	// TODO: Add your control notification handler code here
 }

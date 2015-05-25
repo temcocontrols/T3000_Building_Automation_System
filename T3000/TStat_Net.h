@@ -42,8 +42,11 @@ public:
 	// 波特率
 	virtual int GetBaudRate()const; 
 	virtual void SetBaudRate(int nBaudRate);
-
-
+	//NetworkCard address
+	  CString GetNetworkCardAddress(); 
+	  void SetNetworkCardAddress(CString networkcardAddress);
+	
+	
 	//----------------------------------------------------------------
 	// 以下两个才需要去读写寄存器
 	virtual int WriteDevID(int nID)const;	
@@ -62,7 +65,7 @@ protected:
 	int				m_nComPort;				// 串口	
 	DWORD		m_dwIPAddr;				// IP Address
 	int				m_nPort;					// 当前端口
-
+	CString NetworkCard_Address;
 	
 	
 };

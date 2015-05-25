@@ -26,6 +26,7 @@ public:
 	DECLARE_EVENTSINK_MAP()
 	void DblClickInputMsflexgrid();
 	void Fresh_Grid();
+	void Write_Setting();
 	BOOL WriteCharsToReg(unsigned char *to_write,unsigned short start_address,int length);
 	BOOL ReadCharsFromReg(unsigned short *put_data_into_here,unsigned short start_address,int length);
 	//Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times/* =3 */)
@@ -34,14 +35,15 @@ private:
 	int m_nCurRow;
 	int m_nCurCol;
 	CComboBox m_ItemValueCombx;
-
+	UINT m_EDIT_ID;
 public:
   
 	afx_msg void OnEnKillfocusInput9();
 //	afx_msg void OnEnHscrollInput9();
 //	afx_msg void OnEnChangeInput9();
 	afx_msg void OnCbnSelchangeSeqCom();
- 
+    
+	void Fresh_Checks();
  CString GetTextFromReg(unsigned short reg);
  CString GetTextReg(unsigned short reg);
 	afx_msg void OnBnClickedCancel();
@@ -60,4 +62,31 @@ public:
 	afx_msg void OnBnClickedFreshTable();
 	afx_msg void OnBnClickedFresh();
 	CString GetSel(int ID);
-	};
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnSetfocusInput1();
+	afx_msg void OnSetfocusInput2();
+	afx_msg void OnSetfocusInput3();
+	afx_msg void OnSetfocusInput4();
+	afx_msg void OnSetfocusInput5();
+	afx_msg void OnSetfocusInput6();
+	afx_msg void OnSetfocusInput7();
+	afx_msg void OnSetfocusInput8();
+	afx_msg void OnSetfocusLine1();
+	afx_msg void OnSetfocusLine2();
+	afx_msg void OnBnClickedCheckIconAm();
+	afx_msg void OnBnClickedCheck2();
+	afx_msg void OnBnClickedCheck3();
+	afx_msg void OnBnClickedCheck4();
+	afx_msg void OnBnClickedCheck5();
+	afx_msg void OnBnClickedCheck6();
+	afx_msg void OnBnClickedCheck7();
+	afx_msg void OnBnClickedCheck8();
+	CButton m_am_check;
+	CButton m_check2;
+	CButton m_check3;
+	CButton m_check4;
+	CButton m_check5;
+	CButton m_check6;
+	CButton m_check7;
+	CButton m_check8;
+};

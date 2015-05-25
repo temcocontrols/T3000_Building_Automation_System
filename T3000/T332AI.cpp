@@ -35,6 +35,7 @@ BEGIN_MESSAGE_MAP(T332AI, CFormView)
 	ON_EN_KILLFOCUS(IDC_EDIT_NAME, &T332AI::OnEnKillfocusEditName)
 	ON_MESSAGE(WM_HOTKEY,&T332AI::OnHotKey)//快捷键消息映射手动加入
 	ON_CBN_SELCHANGE(IDC_RANGECOMBO, &T332AI::OnCbnSelchangeRangecombo)
+	ON_BN_CLICKED(IDC_BUTTON_RESET, &T332AI::OnBnClickedButtonReset)
 END_MESSAGE_MAP()
 
 
@@ -708,4 +709,26 @@ void T332AI::OnCbnSelchangeRangecombo()
 	Read_Multi(g_tstat_id,&product_register_value[Range1],Range1,32);
 	InitialDialog();
 	EndWaitCursor();
+}
+
+
+void T332AI::OnBnClickedButtonReset()
+{
+	if(AfxMessageBox(_T(" This will reset the module to the factory defaults,Are you sure to reset it ?"))==IDOK)
+	{
+		//  write_one(g_tstat_id,299,1);
+		write_one(g_tstat_id,300,1);
+
+		unsigned short RangeData[40];
+
+		int multi_ret = Read_Multi(g_tstat_id,RangeData,Range1,40) ;
+		if (multi_ret >0 )
+		{
+			for (int i=0; i<40 ; i++)
+			{
+			 product_register_value[Range1+i] = RangeData[i];
+			}
+			InitialDialog();
+		}
+	}
 }

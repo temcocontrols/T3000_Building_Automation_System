@@ -64,13 +64,13 @@ public:
 	 
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	unsigned short shmPRegister[512];
+	afx_msg void OnBnClickedBtnReset();
 	vector<t3model>vect3model;
 	t3model m_t3model;
 	int comnum;//¶ÁÈ¡´®¿ÚºÅ
-	BOOL MiniUpdateData();
-	void Updatedatabase();
-	CProgressCtrl m_progress;
+	 
+	 
+	 
 	CEdit m_inNameEdt;
 	void Initial_RegisterList();
 	int  Get_RegID(CString Name);

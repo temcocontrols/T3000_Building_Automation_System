@@ -48,12 +48,12 @@ public:
 	int m_curPage;
 	BOOL m_CanEdit;
 	int m_modelno;
-	afx_msg void OnBnClickedLeft();
-	afx_msg void OnBnClickedRight();
-	afx_msg void OnBnClickedBegin();
-	afx_msg void OnBnClickedEnd();
+//	afx_msg void OnBnClickedLeft();
+//	afx_msg void OnBnClickedRight();
+//	afx_msg void OnBnClickedBegin();
+//	afx_msg void OnBnClickedEnd();
 	DECLARE_EVENTSINK_MAP()
-	void MouseDownInputMsflexgrid(short Button, short Shift, long x, long y);
+//	void MouseDownInputMsflexgrid(short Button, short Shift, long x, long y);
 private:
    int m_SelCurCol;
    int m_SelCurRow;
@@ -68,9 +68,9 @@ private:
 	   int m_Operation;
 	   CRegisterWriteValueDlg m_WriteValueDlg;
 public:
-	void MouseMoveInputMsflexgrid(short Button, short Shift, long x, long y);
+//	void MouseMoveInputMsflexgrid(short Button, short Shift, long x, long y);
 	CStatic m_ColName;
-	void MouseUpInputMsflexgrid(short Button, short Shift, long x, long y);
+//	void MouseUpInputMsflexgrid(short Button, short Shift, long x, long y);
 //	void RowColChangeInputMsflexgrid();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 //	afx_msg void OnBnClickedAddnewproduct();
@@ -83,8 +83,9 @@ public:
 	CEdit m_inNameEdt;
 	afx_msg void OnEnKillfocusCelledit();
 	void DblClickInputMsflexgrid();
-	afx_msg void OnBnClickedSavetodb();
+//	afx_msg void OnBnClickedSavetodb();
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnDestroy();
 	void Show_ColorData();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 };

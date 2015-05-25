@@ -130,7 +130,12 @@ void CTStat_Net::SetBaudRate(int nBaudRate)
 	m_nBaudRate = nBaudRate;
 }
 
-
+void CTStat_Net::SetNetworkCardAddress(CString networkcardAddress){
+NetworkCard_Address=networkcardAddress;
+}
+CString CTStat_Net::GetNetworkCardAddress(){
+return NetworkCard_Address;
+}
 //----------------------------------------------------------------
 // 以下两个才需要去读写寄存器
 
@@ -173,7 +178,6 @@ CString CTStat_Net::GetProductName()
 	case PM_LightingController:
 		strProductName = "LC";
 		break;
-//20120424
     case PM_CM5:
 	    strProductName="CM5_Ethernet";
 		break;
@@ -183,6 +187,21 @@ CString CTStat_Net::GetProductName()
     case PM_CO2_NET:
         strProductName="CO2 Net";
         break;
+	case PM_TSTATRUNAR:
+		strProductName="TStatRunar";
+		break;
+	case PM_CS_SM_AC:
+		strProductName="CS-SM-AC";
+		break;
+	case PM_CS_SM_DC:
+		strProductName="CS-SM-DC";
+		break;
+	case PM_CS_RSM_AC:
+		strProductName="CS-RSM-AC";
+		break;
+	case PM_CS_RSM_DC:
+		strProductName="CS-RSM-DC";
+		break;
 	default:
 		strProductName="WIFI";
 

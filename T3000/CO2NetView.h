@@ -3,7 +3,8 @@
 #include "afxcmn.h"
 #include "msflexgrid1.h"
 #include "afxdtctl.h"
-
+#include "CM5/ListCtrlEx.h"
+#include "CM5\MyOwnListCtrl.h"
 #define	PRODUCT_ID					32
 
 #define	FLASH_OFFSET				0x70000
@@ -248,6 +249,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
     void Fresh();
+	 void Fresh_View();
     void Initial_Registerlist();
     void Initial_Window();
    void Get_CO2_Temperature_unit(CString &strTemp);
@@ -259,7 +261,12 @@ public:
  void  Check_DayTime();
  LRESULT OnFreshView(WPARAM wParam, LPARAM lParam);
      void  Check_HourTime();
+
+	 afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
+	 afx_msg LRESULT  ReadDataCallBack(WPARAM wParam, LPARAM lParam);
+
 public:
+CBrush m_brush;
 	HANDLE hFirstThread;
     CEdit m_edit_IDAddress;
     CEdit m_edit_SN;
@@ -302,6 +309,8 @@ public:
     BOOL Flag_Reg;
     CString cs_temp_unit;
     unsigned short product_register_value[2700];
+
+	 
 #if 1
     int	CO2_NET_MODBUS_SERIALNUMBER_LOWORD	;
     int	CO2_NET_MODBUS_SERIALNUMBER_HIWORD	;
@@ -468,6 +477,15 @@ public:
     afx_msg void OnBnClickedBtnCo2Refresh();
     CDateTimeCtrl m_co2_time_picker;
     CDateTimeCtrl m_co2_day_picker;
+	CEdit m_edit_co2_value;
+	afx_msg void OnEnKillfocusEditCo2Value();
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+//	ListCtrlEx::CListCtrlEx m_co2_inputs_list;
+	CMsflexgrid m_grid_input;
+
+	void Show_InputList();
 };
 
 

@@ -90,6 +90,8 @@ void CReadWrite_Multiple_RegDlg::FreshListbox(){
 		m_ListBox_registers.InsertString(i,Get_Data_No_Address(i));
 
 	}
+
+	m_ListBox_registers.SetCurSel(0);
 }
 CString CReadWrite_Multiple_RegDlg::Get_Data_No_Address(int index){
 	static CString tempStr;
@@ -176,7 +178,8 @@ int CReadWrite_Multiple_RegDlg::Get_Reg_Add(int index){
 	}
 }
 void CReadWrite_Multiple_RegDlg::OnLbnDblclkList3()
-{
+{	
+	int sel=m_ListBox_registers.GetCurSel();
 	if (m_dataformate<3)
 	{
 		CString itemstr;
@@ -261,6 +264,9 @@ void CReadWrite_Multiple_RegDlg::OnLbnDblclkList3()
 		m_ListBox_registers.DeleteString(index);
 		m_ListBox_registers.InsertString(index,itemstr);
 	}
+
+	m_ListBox_registers.SetCurSel(sel);
+	m_ListBox_registers.SetFocus();
 }
 unsigned short CReadWrite_Multiple_RegDlg::Get_Data_Unsigned(int index){
 	int ret=0;
@@ -295,14 +301,17 @@ unsigned short CReadWrite_Multiple_RegDlg::Get_Data_Unsigned(int index){
 void CReadWrite_Multiple_RegDlg::OnBnClickedOk()
 {
 	 
-	//UpdateData(TRUE);
-	CDialogEx::OnOK();
+	 UpdateData(TRUE);
+	 OnLbnDblclkList3();
+
+	//CDialogEx::OnOK();
 }
 
 
 void CReadWrite_Multiple_RegDlg::OnEnKillfocusEditId()
 {
 	UpdateData(TRUE);
+	FreshListbox();
 	// TODO: Add your control notification handler code here
 }
 
@@ -310,6 +319,7 @@ void CReadWrite_Multiple_RegDlg::OnEnKillfocusEditId()
 void CReadWrite_Multiple_RegDlg::OnEnKillfocusEditAddress()
 {
 	UpdateData(TRUE);
+	FreshListbox();
 	// TODO: Add your control notification handler code here
 }
 
@@ -317,6 +327,7 @@ void CReadWrite_Multiple_RegDlg::OnEnKillfocusEditAddress()
 void CReadWrite_Multiple_RegDlg::OnEnKillfocusEditQuantity()
 {
 	UpdateData(TRUE);
+	FreshListbox();
 	// TODO: Add your control notification handler code here
 }
 
@@ -324,12 +335,15 @@ void CReadWrite_Multiple_RegDlg::OnEnKillfocusEditQuantity()
 void CReadWrite_Multiple_RegDlg::OnEnKillfocusEdit1()
 {
 	UpdateData(TRUE);
+	FreshListbox();
 	// TODO: Add your control notification handler code here
 }
 
 
 void CReadWrite_Multiple_RegDlg::OnEnKillfocusEdit2()
 {
+   UpdateData(TRUE);
+   FreshListbox();
 	// TODO: Add your control notification handler code here
 }
 

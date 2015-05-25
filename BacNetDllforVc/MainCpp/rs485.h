@@ -40,7 +40,8 @@
 #include "mstp.h"
 #include "net.h"
 
-#include "..\..\T3000\CM5\PTP\ptp.h"
+//#include "..\..\T3000\CM5\PTP\ptp.h"
+#include "ptp.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,7 +63,7 @@ extern "C" {
     void RS485_Check_UART_Data(
         volatile struct mstp_port_struct_t *mstp_port); /* port specific data */
 
-__declspec(dllexport)	void RS485_PTP_Check_UART_Data(
+__declspec(dllexport)	BOOL RS485_PTP_Check_UART_Data(
 		volatile struct STR_PTP *ptp_port);
 
     uint32_t RS485_Get_Baud_Rate(

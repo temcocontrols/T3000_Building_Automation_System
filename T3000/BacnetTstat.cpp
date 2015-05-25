@@ -55,7 +55,10 @@ BOOL CBacnetTstat::OnInitDialog()
 BOOL CBacnetTstat::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
-
+	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
+	{
+		return 1;
+	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
@@ -386,11 +389,11 @@ LRESULT CBacnetTstat::Fresh_Tstat_Item(WPARAM wParam,LPARAM lParam)
 void CBacnetTstat::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if(this->IsWindowVisible())
+	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 	{
-		PostMessage(WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
-		if(bac_select_device_online)
-			Post_Refresh_Message(g_bac_instance,READTSTAT_T3000,0,BAC_TSTAT_COUNT - 1,sizeof(Str_TstatInfo_point),BAC_TSTAT_GROUP);
+		//PostMessage(WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
+		//if(bac_select_device_online)
+		//	Post_Refresh_Message(g_bac_instance,READTSTAT_T3000,0,BAC_TSTAT_COUNT - 1,sizeof(Str_TstatInfo_point),BAC_TSTAT_GROUP);
 	}
 
 	CDialogEx::OnTimer(nIDEvent);

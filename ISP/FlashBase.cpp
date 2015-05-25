@@ -46,6 +46,7 @@ char* CFlashBase::CreateFileBuffer(int nSize)
 	if (m_pFileBuffer)
 	{
 		delete []m_pFileBuffer;
+		m_pFileBuffer=NULL;
 	}
 	
 	

@@ -135,6 +135,7 @@ void write_input_output_var(wifstream & inf,float tstat_version,CStdioFile *p_lo
 
 bool section_end_find(TCHAR *buf);
 int  get_fan_var(wifstream & inf,int fan_value[]);
+bool Check_Config_File(wifstream & inf);
 void get_universal_fan_var(wifstream & inf,int fan_value[]);//UNIVERSAL 
 void get_fan_line_value(TCHAR *buf,int array[7]);//used by forget_fan_var function
 

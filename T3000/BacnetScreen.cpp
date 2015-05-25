@@ -40,6 +40,7 @@ BEGIN_MESSAGE_MAP(BacnetScreen, CDialogEx)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_SCREEN, &BacnetScreen::OnNMClickListScreen)
 	ON_MESSAGE(WM_HOTKEY,&BacnetScreen::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(WM_SCREENEDIT_CLOSE,&BacnetScreen::Screeenedit_close_handle)//快捷键消息映射手动加入
+	ON_BN_CLICKED(IDC_BUTTON_GRAPHIC_INSERT, &BacnetScreen::OnBnClickedInsert)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
 //	ON_WM_DESTROY()
@@ -129,17 +130,25 @@ LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 		}
 
 
-		bac_cm5_graphic = true;
-		Unreg_Hotkey();
 
-
-		if(ScreenEdit_Window != NULL)
+		if(need_read_bacnet_graphic_label_flag)
 		{
-			delete ScreenEdit_Window;
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_READ_GRAPHIC_LABEL_INFO);
 		}
-		ScreenEdit_Window = new CBacnetScreenEdit;
-		ScreenEdit_Window->Create(IDD_DIALOG_BACNET_SCREENS_EDIT,this);	
-		ScreenEdit_Window->ShowWindow(SW_SHOW);
+		else
+		{
+			Unreg_Hotkey();
+			if(ScreenEdit_Window != NULL)
+			{
+				delete ScreenEdit_Window;
+				ScreenEdit_Window = NULL;
+			}
+			ScreenEdit_Window = new CBacnetScreenEdit;
+			ScreenEdit_Window->Create(IDD_DIALOG_BACNET_SCREENS_EDIT,this);	
+			ScreenEdit_Window->ShowWindow(SW_SHOW);
+		}
+		
+
 
 
 
@@ -183,7 +192,7 @@ void BacnetScreen::Initial_List()
 	m_screen_list.InsertColumn(SCREEN_LABEL, _T("Label"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_screen_list.InsertColumn(SCREEN_PIC_FILE, _T("Picture File"), 140, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_screen_list.InsertColumn(SCREEN_MODE, _T("Mode"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_screen_list.InsertColumn(SCREEN_REFRESH, _T("Refresh Time"), 110, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_screen_list.InsertColumn(SCREEN_REFRESH, _T("Refresh Rate"), 110, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 
 	m_screen_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_screen_dlg_hwnd;
@@ -317,6 +326,11 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 			return 0;
 		}
 		cs_temp.MakeUpper();
+		if(Check_Label_Exsit(cs_temp))
+		{
+			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0;
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -390,13 +404,18 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if(lCol == SCREEN_PIC_FILE)
 	{
+
 		CString FilePath;
 		CString image_fordor;
 		CString ApplicationFolder;
 		GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
 		PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
 		ApplicationFolder.ReleaseBuffer();
-		image_fordor = ApplicationFolder + _T("\\Database\\image");
+		//image_fordor = ApplicationFolder + _T("\\Database\\image");
+		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+
+		image_fordor = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+		
 		SetCurrentDirectoryW(image_fordor);
 		//选择图片,如果选的不在database目录下就copy一份过来;如果在的话就重命名，因为文件名长度不能超过10个字节;
 		CString strFilter = _T("jpg file;bmp file;png file|*.jpg;*.bmp;*.png|all File|*.*||");
@@ -477,7 +496,7 @@ void BacnetScreen::OnCancel()
 void BacnetScreen::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if(this->IsWindowVisible())
+	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 	if(bac_select_device_online)
@@ -495,5 +514,52 @@ void BacnetScreen::Unreg_Hotkey()
 {
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 }
+
+void BacnetScreen::OnBnClickedInsert()
+{
+	PostMessage(WM_HOTKEY,KEY_INSERT,NULL);
+}
+
+int GetScreenLabel(int index,CString &ret_label)
+{
+	if(index >= BAC_SCREEN_COUNT)
+	{
+		ret_label.Empty();
+		return -1;
+	}
+	int i = index;
+	CString temp_des2;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).label, (int)strlen((char *)m_screen_data.at(i).label)+1, 
+		ret_label.GetBuffer(MAX_PATH), MAX_PATH );
+	ret_label.ReleaseBuffer();
+
+	if(ret_label.IsEmpty())
+	{
+		ret_label.Format(_T("GRP%d"),index + 1);
+	}
+
+	return 1;
+}
+
+int GetScreenFullLabel(int index,CString &ret_full_label)
+{
+	if(index >= BAC_SCREEN_COUNT)
+	{
+		ret_full_label.Empty();
+		return -1;
+	}
+	int i = index;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(i).description, (int)strlen((char *)m_screen_data.at(i).description)+1, 
+		ret_full_label.GetBuffer(MAX_PATH), MAX_PATH );
+	ret_full_label.ReleaseBuffer();
+
+	if(ret_full_label.IsEmpty())
+	{
+		ret_full_label.Format(_T("GRP%d"),index + 1);
+	}
+
+	return 1;
+}
+
 
 

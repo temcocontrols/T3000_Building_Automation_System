@@ -12,6 +12,7 @@
 #include "gloab_define.h"
 #include "BacnetRange.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
+extern int initial_dialog;
 Str_variable_point m_temp_variable_data[BAC_VARIABLE_ITEM_COUNT];
 IMPLEMENT_DYNAMIC(CBacnetVariable, CDialogEx)
 
@@ -44,6 +45,7 @@ BEGIN_MESSAGE_MAP(CBacnetVariable, CDialogEx)
 	ON_WM_TIMER()
 	ON_NOTIFY(NM_KILLFOCUS, IDC_DATETIMEPICKER2_VARIABLE, &CBacnetVariable::OnNMKillfocusDatetimepicker2Variable)
 	ON_WM_CLOSE()
+	ON_WM_HELPINFO()
 END_MESSAGE_MAP()
 
 
@@ -59,6 +61,12 @@ LRESULT  CBacnetVariable::VariableMessageCallBack(WPARAM wParam, LPARAM lParam)
 	{
 		Show_Results = temp_cs + _T("Success!");
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,Show_Results);
+		if((pInvoke->mRow < BAC_VARIABLE_ITEM_COUNT) && (pInvoke->mRow >= 0))
+		{
+			Post_Refresh_One_Message(g_bac_instance,READVARIABLE_T3000,
+				pInvoke->mRow,pInvoke->mRow,sizeof(Str_variable_point));
+			SetTimer(3,2000,NULL);
+		}
 		//MessageBox(_T("Bacnet operation success!"));
 	}
 	else
@@ -94,7 +102,7 @@ BOOL CBacnetVariable::OnInitDialog()
 	((CButton *)GetDlgItem(IDC_BUTTON_VARIABLE_READ))->SetIcon(hIcon);	
 	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_OK);
 	((CButton *)GetDlgItem(IDC_BUTTON_VARIABLE_APPLY))->SetIcon(hIcon);
-	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
+	SetTimer(1,BAC_LIST_REFRESH_TIME + 5000,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -357,7 +365,13 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 			PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 			return 0;
 		}
+		cs_temp.Replace(_T("-"),_T("_"));
 		cs_temp.MakeUpper();
+		if(Check_Label_Exsit(cs_temp))
+		{
+			PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0;
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -594,39 +608,55 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	else if(lCol == VARIABLE_UNITE)
 	{
-		if(m_Variable_data.at(lRow).digital_analog == BAC_UNITS_ANALOG)
-		{
-			bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
-		}
-		else
-		{
-			bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
-		}
+
 
 		BacnetRange dlg;
 
+		//点击产品的时候 需要读customer units，老的产品firmware 说不定没有 这些，所以不强迫要读到;
 		if(!read_customer_unit)
 		{
-			for (int i=0;i<BAC_CUSTOMER_UNIT_GROUP;i++)
+
+			int temp_invoke_id = -1;
+			int send_status = true;
+			int	resend_count = 0;
+			for (int z=0;z<3;z++)
 			{
-				int	resend_count = 0;
 				do 
 				{
 					resend_count ++;
-					if(resend_count>50)
+					if(resend_count>5)
+					{
+						send_status = false;
 						break;
-					g_invoke_id = GetPrivateData(
+					}
+					temp_invoke_id =  GetPrivateData(
 						g_bac_instance,
 						READUNIT_T3000,
-						0 + i*4 ,
-						3 + i*4 ,
+						0,
+						BAC_CUSTOMER_UNITS_COUNT - 1,
 						sizeof(Str_Units_element));		
 
 					Sleep(SEND_COMMAND_DELAY_TIME);
 				} while (g_invoke_id<0);
+				if(send_status)
+				{
+					for (int z=0;z<1000;z++)
+					{
+						Sleep(1);
+						if(tsm_invoke_id_free(temp_invoke_id))
+						{
+							read_customer_unit = true;
+							break;
+						}
+						else
+							continue;
+					}
+
+				}
+				if(read_customer_unit)
+					break;
 			}
-			read_customer_unit = true;
-			Sleep(1000);
+
 		}
 
 		//CString temp_cs = m_variable_list.GetItemText(lRow,lCol);
@@ -634,6 +664,27 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		//{
 
 
+		if(m_Variable_data.at(lRow).digital_analog == BAC_UNITS_ANALOG)
+		{
+			bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
+			if(m_Variable_data.at(lRow).range > (sizeof(Variable_Analog_Units_Array) / sizeof(Variable_Analog_Units_Array[0])))
+			{
+				m_Variable_data.at(lRow).range = 0;
+				bac_range_number_choose = 0;
+			}
+		}
+		else
+		{
+			bac_ranges_type = VARIABLE_RANGE_DIGITAL_TYPE;
+			if(m_Variable_data.at(lRow).range > 30)
+			{
+				m_Variable_data.at(lRow).range = 0;
+				bac_range_number_choose = 0;
+			}
+		}
+
+
+			initial_dialog = 1;
 			bac_range_number_choose = m_Variable_data.at(lRow).range;
 			//bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
 			dlg.DoModal();
@@ -641,6 +692,11 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 			{
 				PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,lRow,REFRESH_ON_ITEM);//这里调用 刷新线程重新刷新会方便一点;
 				return ;
+			}
+			if(bac_range_number_choose == 0)	//如果选择的是 unused 就认为是analog 的unused;这样 能显示对应的value;
+			{
+				m_Variable_data.at(lRow).digital_analog =  BAC_UNITS_ANALOG;
+				bac_ranges_type = VARIABLE_RANGE_ANALOG_TYPE;
 			}
 
 			if(bac_ranges_type == VARIABLE_RANGE_ANALOG_TYPE)
@@ -740,7 +796,7 @@ void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 		{
-			if(this->IsWindowVisible())
+			if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 			{
 			::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 			if(bac_select_device_online)
@@ -753,6 +809,18 @@ void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 			KillTimer(2);
 			m_variable_time_picker.Invalidate();
 		}
+		break;
+	case 3:
+		{
+			//在更改某一列之后要在读取此列的值，并刷新此列;
+
+			if(this->IsWindowVisible())
+				PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+			KillTimer(3);
+
+		}
+		break;
+	default:
 		break;
 	}
 
@@ -838,4 +906,140 @@ void CBacnetVariable::OnCancel()
 	//m_variable_dlg_hwnd = NULL;
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	//CDialogEx::OnCancel();
+}
+
+
+
+int GetVariableLabel(int index,CString &ret_label)
+{
+	if(index >= BAC_VARIABLE_ITEM_COUNT)
+	{
+		ret_label.Empty();
+		return -1;
+	}
+	int i = index;
+	CString temp_des2;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).label, (int)strlen((char *)m_Variable_data.at(i).label)+1, 
+		ret_label.GetBuffer(MAX_PATH), MAX_PATH );
+	ret_label.ReleaseBuffer();
+
+	return 1;
+}
+
+int GetVariableFullLabel(int index,CString &ret_full_label)
+{
+	if(index >= BAC_VARIABLE_ITEM_COUNT)
+	{
+		ret_full_label.Empty();
+		return -1;
+	}
+	int i = index;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).description, (int)strlen((char *)m_Variable_data.at(i).description)+1, 
+		ret_full_label.GetBuffer(MAX_PATH), MAX_PATH );
+	ret_full_label.ReleaseBuffer();
+	return 1;
+}
+
+int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M,int &digital_value)
+{
+	CStringArray temparray;
+	CString temp1;
+	if(index >= BAC_VARIABLE_ITEM_COUNT)
+	{
+		ret_cstring.Empty();
+		ret_unit.Empty();
+		Auto_M.Empty();
+		return -1;
+	}
+	int i = index;
+
+	if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+	{
+		if(m_Variable_data.at(i).range>30)
+		{
+			ret_cstring.Empty();
+			return -1;
+		}
+		else
+		{
+			if((m_Variable_data.at(i).range < 23) &&(m_Variable_data.at(i).range !=0))
+				temp1 = Digital_Units_Array[m_Variable_data.at(i).range];
+			else if((m_Variable_data.at(i).range >=23) && (m_Variable_data.at(i).range <= 30))
+			{
+				if(receive_customer_unit)
+					temp1 = temp_unit_no_index[m_Variable_data.at(i).range - 23];
+			}
+			else
+			{
+				ret_cstring.Empty();
+				return -1;
+			}
+
+
+			SplitCStringA(temparray,temp1,_T("/"));
+			if((temparray.GetSize()==2))
+			{
+				if(m_Variable_data.at(i).control == 0)
+				{
+					digital_value = 0;
+					ret_cstring = temparray.GetAt(0);
+					return 1;
+				}
+				else
+				{
+					digital_value = 1;
+					ret_cstring = temparray.GetAt(1);
+				}
+			}
+
+		}
+	}
+	else
+	{
+		if(m_Variable_data.at(i).range == 20)	//如果是时间;
+		{
+			ret_unit = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
+			char temp_char[50];
+			int time_seconds = m_Variable_data.at(i).value / 1000;
+			intervaltotext(temp_char,time_seconds,0,0);
+
+			MultiByteToWideChar( CP_ACP, 0, temp_char, strlen(temp_char) + 1, 
+				ret_cstring.GetBuffer(MAX_PATH), MAX_PATH );
+			ret_cstring.ReleaseBuffer();	
+			digital_value = 2;
+		}
+		else if((m_Variable_data.at(i).range<=sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0])) && (m_Variable_data.at(i).range != 0))
+		{
+			ret_unit = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
+			CString cstemp_value;
+			float temp_float_value;
+			temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+			ret_cstring.Format(_T("%.3f"),temp_float_value);
+			digital_value = 2;
+		}
+		else
+		{
+			ret_cstring.Empty();
+			return -1;
+		}
+	}
+
+	return 1;
+}
+
+
+BOOL CBacnetVariable::OnHelpInfo(HELPINFO* pHelpInfo)
+{
+	if (g_protocol==PROTOCOL_BACNET_IP){
+		HWND hWnd;
+		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+		else
+			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_VARIABLES);
+		return (hWnd != NULL);
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
+
+	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

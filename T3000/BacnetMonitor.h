@@ -53,8 +53,14 @@ public:
 	void Reg_Hotkey();
 	void Unreg_Hotkey();
 	static	DWORD WINAPI  Readmonitorthreadfun(LPVOID lpVoid);
-
+	afx_msg LRESULT OnHotKey(WPARAM wParam,LPARAM lParam);
 	int read_type;
+
+	_ConnectionPtr m_monitor_pCon;
+	_RecordsetPtr m_monitor_pRec;
+
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+
 };
 
 bool read_monitordata(int digtal_or_analog = 1);
@@ -63,8 +69,8 @@ const int MONITOR_NUM = 0;
 const int MONITOR_LABEL = 1;
 const int MONITOR_INTERVAL = 2;
 const int MONITOR_LENGTH = 3;
-const int MONITOR_UNITS = 4 ;
-const int MONITOR_STATUS = 5 ;
+//const int MONITOR_UNITS = 4 ;
+const int MONITOR_STATUS = 4 ;
 
 const int MONITOR_COL_NUMBER = 14;
 

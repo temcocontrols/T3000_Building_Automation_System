@@ -5,7 +5,8 @@
 #include "Modbus Poll.h"
 #include "ReadWriteDefinitionDlg.h"
 #include "afxdialogex.h"
-
+#include "global_variable_extern.h"
+#include "Modbus PollView.h"
 
 // CReadWriteDefinitionDlg dialog
 
@@ -15,7 +16,7 @@ CReadWriteDefinitionDlg::CReadWriteDefinitionDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CReadWriteDefinitionDlg::IDD, pParent)
 	, m_slave_id(0)
 	, m_plc_addresses(FALSE)
-	, m_is_read_write_once(FALSE)
+	 
 {
 
 	m_slave_id = 255;
@@ -24,6 +25,8 @@ CReadWriteDefinitionDlg::CReadWriteDefinitionDlg(CWnd* pParent /*=NULL*/)
 	m_address = 0;
 	m_function = 0;
 	m_data_formate = 1;
+	m_apply=TRUE;
+	m_wronce=FALSE;
 	 
 
  
@@ -62,7 +65,7 @@ void CReadWriteDefinitionDlg::DoDataExchange(CDataExchange* pDX)
 
 
 	DDX_Control(pDX, IDC_EDIT_SLAVE_ID, m_editor_slave_id);
-	DDX_Check(pDX, IDC_CHECK_READ_WRITE_ONCE, m_is_read_write_once);
+	//  DDX_Check(pDX, IDC_CHECK_READ_WRITE_ONCE, m_is_read_write_once);
 }
 
 
@@ -112,6 +115,8 @@ BEGIN_MESSAGE_MAP(CReadWriteDefinitionDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIO100, &CReadWriteDefinitionDlg::OnBnClickedRadio100)
 	ON_BN_CLICKED(IDC_RADIOFIT, &CReadWriteDefinitionDlg::OnBnClickedRadiofit)
 	ON_WM_PAINT()
+	ON_BN_CLICKED(IDC_BUTTON_APPLY, &CReadWriteDefinitionDlg::OnBnClickedButtonApply)
+	ON_BN_CLICKED(IDC_BUTTON_RW_ONCE, &CReadWriteDefinitionDlg::OnBnClickedButtonRwOnce)
 END_MESSAGE_MAP()
 
 
@@ -177,4 +182,22 @@ void CReadWriteDefinitionDlg::OnPaint()
 	// Do not call CDialogEx::OnPaint() for painting messages
 	m_editor_slave_id.SetSel(0,-1);
 	m_editor_slave_id.SetFocus();
+}
+
+
+void CReadWriteDefinitionDlg::OnBnClickedButtonApply()
+{
+	m_apply=TRUE;
+	m_wronce=FALSE;
+    ::PostMessage(m_pWnd,MY_READ_ONCE,(WPARAM)this,0);
+ 
+}
+
+
+void CReadWriteDefinitionDlg::OnBnClickedButtonRwOnce()
+{
+   m_apply=FALSE;
+   m_wronce=TRUE;
+   ::PostMessage(m_pWnd,MY_READ_ONCE,(WPARAM)this,0);
+ 
 }

@@ -7,7 +7,7 @@
 #include "MainFrm.h"
 #include "ado/ADO.h"
 #include "Dialog_Progess.h"
-#define CO2NETVIEWFRESH   WM_USER+20000
+#define CO2NETVIEWFRESH   WM_USER+1008
 
 // CCO2NetView
 DWORD WINAPI _ReadMultiRegisters_CO2(LPVOID pParam)
@@ -21,19 +21,20 @@ DWORD WINAPI _ReadMultiRegisters_CO2(LPVOID pParam)
 			Sleep(10);
 			continue;
 		}
-		Sleep(2000);
+		Sleep(5000);
+		register_critical_section.Lock();
 		for(int i=0;i<27;i++) //Modify 
 		{
-			register_critical_section.Lock();
+			
 			int multy_ret = 0;
 
 			multy_ret = Read_Multi(g_tstat_id,&pView->product_register_value[i*100],i*100,100);
-			register_critical_section.Unlock();
+			
 		}
-
+		register_critical_section.Unlock();
 		if(pView->m_hWnd!=NULL)
 		{
-			::PostMessage(pView->m_hWnd,CO2NETVIEWFRESH,0,0);
+			::SendMessage(pView->m_hWnd,CO2NETVIEWFRESH,0,0);
 		}
 
 		 
@@ -54,47 +55,53 @@ Flag_Reg=FALSE;
 
 
 CCO2NetView::~CCO2NetView()
-{if(hFirstThread != NULL)
+{
+
+if(hFirstThread != NULL)
 TerminateThread(hFirstThread, 0);
+
 }
 
 void CCO2NetView::DoDataExchange(CDataExchange* pDX)
 {
-    CFormView::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_ID_CO2_EDIT, m_edit_IDAddress);
-    DDX_Control(pDX, IDC_SERIALNUM_CO2_EDIT, m_edit_SN);
-    DDX_Control(pDX, IDC_FIRMWARV_CO2_EDIT, m_Edit_FVevsion);
-    DDX_Control(pDX, IDC_HARDWAREV_CO2_EDIT, m_Edit_HardVer);
-    DDX_Control(pDX, IDC_CO2_BRAUDRATECOMBO, m_Combox_braudrate);
-    DDX_Control(pDX, IDC_EDIT_CO2_HUMIDITY, m_Edit_RHum);
-    DDX_Control(pDX, IDC_RADIO_ALARM_MANUAL, m_AlarmSetting_M);
-    DDX_Control(pDX, IDC_RADIO_ALARM_AUTO, m_AlarmSetting_Auto);
-    DDX_Control(pDX, IDC_CO2_ALARM_STATE, m_Combox_CO2State);
+	CFormView::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_ID_CO2_EDIT, m_edit_IDAddress);
+	DDX_Control(pDX, IDC_SERIALNUM_CO2_EDIT, m_edit_SN);
+	DDX_Control(pDX, IDC_FIRMWARV_CO2_EDIT, m_Edit_FVevsion);
+	DDX_Control(pDX, IDC_HARDWAREV_CO2_EDIT, m_Edit_HardVer);
+	DDX_Control(pDX, IDC_CO2_BRAUDRATECOMBO, m_Combox_braudrate);
+	DDX_Control(pDX, IDC_EDIT_CO2_HUMIDITY, m_Edit_RHum);
+	DDX_Control(pDX, IDC_RADIO_ALARM_MANUAL, m_AlarmSetting_M);
+	DDX_Control(pDX, IDC_RADIO_ALARM_AUTO, m_AlarmSetting_Auto);
+	DDX_Control(pDX, IDC_CO2_ALARM_STATE, m_Combox_CO2State);
 
-    DDX_Control(pDX, IDC_EDIT_CO2_PASSWOR, m_Edit_Password);
-    DDX_Control(pDX, IDC_COMBO_IPModel, m_Combox_IpModel);
-    DDX_Control(pDX, IDC_MAC_ADDRESS, m_Edit_MACAddress);
-    DDX_Control(pDX, IDC_IPADDRESS_IP, m_IPCtrl_IpAddress);
-    DDX_Control(pDX, IDC_IPADDRESS_Gateway, m_IpCtrl_Gateway);
-    DDX_Control(pDX, IDC_IPADDRESS_Subnet, m_IpCtrl_Subnet);
-    DDX_Control(pDX, IDC_EDIT_ListeningPort, m_Edit_Port);
-    DDX_Control(pDX, IDC_EDIT_EXTERNAL_TEMP, m_Edit_External_Temp);
-    DDX_Control(pDX, IDC_EDIT_INTERNAL_TEMP, m_Internal_Temp);
-    DDX_Control(pDX, IDC_CO2_TEMP_UNIT, m_Combox_TempUnit);
-    DDX_Control(pDX, IDC_COMBO_CO2_SENSOR_SEL, m_Edit_SensorSelect);
-    DDX_Control(pDX, IDC_CO2_CALIBRATING_OFFSET, m_Edit_Calibrate_Offset);
-    DDX_Control(pDX, IDC_CO2_ALARM_SETPOINT, m_Edit_Alarm_Setpoint);
-    DDX_Control(pDX, IDC_CO2_PREPARE_ALARM_SETPOINT, m_Edit_PreAlarm_Setpoint);
-    DDX_Control(pDX, IDC_CO2_ALARM_ON_TIME, m_Edit_AlarmOn);
-    DDX_Control(pDX, IDC_CO2_ALARM_OFF_TIME, m_Edit_AlarmOff);
-    DDX_Control(pDX, IDC_EDIT_CO2_BLOCK_TIME, m_Edit_MenuBlockTimes);
-    DDX_Control(pDX, IDC_EDIT_CO2_BACKLIGHT_TIME, m_Edit_BacklightTime);
-    DDX_Control(pDX, IDC_RADIO_HUMIDITY_HEAT_ENABLE, m_HeatingHumiditySensor_Enable);
-    DDX_Control(pDX, IDC_RADIO_HUMIDITY_HEAT_DISABLE, m_HeatingHumiditySensor_Disable);
-    DDX_Control(pDX, IDC_ENABLE_PASSWORD, m_Check_Enable_Password);
-    DDX_Control(pDX, IDC_MSFLEXGRID1, m_msflexgrid);
-    DDX_Control(pDX, IDC_CO2_DATETIMEPICKER_TIME, m_co2_time_picker);
-    DDX_Control(pDX, IDC_CO2_DATETIMEPICKER1, m_co2_day_picker);
+	DDX_Control(pDX, IDC_EDIT_CO2_PASSWOR, m_Edit_Password);
+	DDX_Control(pDX, IDC_COMBO_IPModel, m_Combox_IpModel);
+	DDX_Control(pDX, IDC_MAC_ADDRESS, m_Edit_MACAddress);
+	DDX_Control(pDX, IDC_IPADDRESS_IP, m_IPCtrl_IpAddress);
+	DDX_Control(pDX, IDC_IPADDRESS_Gateway, m_IpCtrl_Gateway);
+	DDX_Control(pDX, IDC_IPADDRESS_Subnet, m_IpCtrl_Subnet);
+	DDX_Control(pDX, IDC_EDIT_ListeningPort, m_Edit_Port);
+	DDX_Control(pDX, IDC_EDIT_EXTERNAL_TEMP, m_Edit_External_Temp);
+	DDX_Control(pDX, IDC_EDIT_INTERNAL_TEMP, m_Internal_Temp);
+	DDX_Control(pDX, IDC_CO2_TEMP_UNIT, m_Combox_TempUnit);
+	DDX_Control(pDX, IDC_COMBO_CO2_SENSOR_SEL, m_Edit_SensorSelect);
+	DDX_Control(pDX, IDC_CO2_CALIBRATING_OFFSET, m_Edit_Calibrate_Offset);
+	DDX_Control(pDX, IDC_CO2_ALARM_SETPOINT, m_Edit_Alarm_Setpoint);
+	DDX_Control(pDX, IDC_CO2_PREPARE_ALARM_SETPOINT, m_Edit_PreAlarm_Setpoint);
+	DDX_Control(pDX, IDC_CO2_ALARM_ON_TIME, m_Edit_AlarmOn);
+	DDX_Control(pDX, IDC_CO2_ALARM_OFF_TIME, m_Edit_AlarmOff);
+	DDX_Control(pDX, IDC_EDIT_CO2_BLOCK_TIME, m_Edit_MenuBlockTimes);
+	DDX_Control(pDX, IDC_EDIT_CO2_BACKLIGHT_TIME, m_Edit_BacklightTime);
+	DDX_Control(pDX, IDC_RADIO_HUMIDITY_HEAT_ENABLE, m_HeatingHumiditySensor_Enable);
+	DDX_Control(pDX, IDC_RADIO_HUMIDITY_HEAT_DISABLE, m_HeatingHumiditySensor_Disable);
+	DDX_Control(pDX, IDC_ENABLE_PASSWORD, m_Check_Enable_Password);
+	DDX_Control(pDX, IDC_MSFLEXGRID1, m_msflexgrid);
+	DDX_Control(pDX, IDC_CO2_DATETIMEPICKER_TIME, m_co2_time_picker);
+	DDX_Control(pDX, IDC_CO2_DATETIMEPICKER1, m_co2_day_picker);
+	DDX_Control(pDX, IDC_EDIT_CO2_VALUE, m_edit_co2_value);
+	//  DDX_Control(pDX, IDC_CO2_INPUT_LIST, m_co2_inputs_list);
+	DDX_Control(pDX, IDC_MSFLEXGRID_INPUT, m_grid_input);
 }
 
 BEGIN_MESSAGE_MAP(CCO2NetView, CFormView)
@@ -120,14 +127,21 @@ BEGIN_MESSAGE_MAP(CCO2NetView, CFormView)
     ON_BN_CLICKED(IDC_BUTTON_CO2_SYNC_TIME, &CCO2NetView::OnBnClickedButtonCo2SyncTime)
     ON_BN_CLICKED(IDC_BTN_CO2_REFRESH, &CCO2NetView::OnBnClickedBtnCo2Refresh)
 	ON_MESSAGE(CO2NETVIEWFRESH, OnFreshView)
+	ON_EN_KILLFOCUS(IDC_EDIT_CO2_VALUE, &CCO2NetView::OnEnKillfocusEditCo2Value)
+
+
+	ON_MESSAGE(MY_RESUME_DATA, ResumeMessageCallBack)
+	ON_MESSAGE(MY_READ_DATA_CALLBACK, ReadDataCallBack)
+
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 
 // CCO2NetView diagnostics
 void CCO2NetView::OnInitialUpdate()
 {
-    CFormView::OnInitialUpdate();
-     
+	CFormView::OnInitialUpdate();
+	m_brush.CreateSolidBrush(RGB(255,0,0));
 }
 #ifdef _DEBUG
 void CCO2NetView::AssertValid() const
@@ -144,14 +158,18 @@ void CCO2NetView::Dump(CDumpContext& dc) const
 #endif //_DEBUG
 
 void CCO2NetView::Fresh(){
+   
 	if (!Flag_Reg)
 	{
 		Initial_Registerlist();
 		Flag_Reg=TRUE;
 	}
+	g_NEED_MULTI_READ = FALSE;
+	register_critical_section.Lock();
 	for(int i=0;i<27;i++){
 		Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
 	}
+	register_critical_section.Unlock();
 	Initial_Window();
 	if(hFirstThread != NULL)
 		TerminateThread(hFirstThread, 0);
@@ -160,6 +178,9 @@ void CCO2NetView::Fresh(){
 	{
 		hFirstThread = CreateThread(NULL,NULL,_ReadMultiRegisters_CO2,this,NULL,0);
 	}
+}
+void CCO2NetView::Fresh_View(){
+Initial_Window();
 }
 void CCO2NetView::Initial_Registerlist(){
     CO2_NET_MODBUS_SERIALNUMBER_LOWORD	=	0	;
@@ -211,13 +232,18 @@ void CCO2NetView::Initial_Registerlist(){
     CO2_NET_MODBUS_TIME_SERVER4_IP_START	=	191	;
     CO2_NET_MODBUS_TIME_SERVER5_IP_START	=	195	;
     CO2_NET_MODBUS_TIME_SYNC_RESULT	=	199	;
+
+
     CO2_NET_MODBUS_TEMPERATURE_SENSOR_SELECT	=	200	;
+
     CO2_NET_MODBUS_TEMPERATURE_DEGREE_C_OR_F	=	201	;
+
     CO2_NET_MODBUS_INTERNAL_TEMPERATURE_CELSIUS	=	202	;
     CO2_NET_MODBUS_INTERNAL_TEMPERATURE_FAHRENHEIT	=	203	;
     CO2_NET_MODBUS_EXTERNAL_TEMPERATURE_CELSIUS	=	204	;
     CO2_NET_MODBUS_EXTERNAL_TEMPERATURE_FAHRENHEIT	=	205	;
     CO2_NET_MODBUS_TEMPERATURE_OFFSET_INTERNAL	=	206	;
+
     CO2_NET_MODBUS_HUMIDITY	=	207	;
     CO2_NET_MODBUS_HUMIDITY_FREQUENCY	=	208	;
     CO2_NET_MODBUS_HUMIDITY_CALIBRATION_TABLE_COUNTER	=	209	;
@@ -312,7 +338,7 @@ IntTemp=product_register_value[CO2_NET_MODBUS_SERIALNUMBER_LOWORD]+product_regis
         product_register_value[CO2_NET_MODBUS_SERIALNUMBER_HIWORD]*255*255+product_register_value[CO2_NET_MODBUS_SERIALNUMBER_HIWORD+1]*255*255*255;
 strTemp.Format(_T("%d"),IntTemp);
 m_edit_SN.SetWindowText(strTemp);
-strTemp.Format(_T("%u.%u"),product_register_value[CO2_NET_MODBUS_SOFTWARE_VERSION_HI],product_register_value[CO2_NET_MODBUS_SOFTWARE_VERSION_LO]);
+strTemp.Format(_T("%0.1f"),((float)(product_register_value[CO2_NET_MODBUS_SOFTWARE_VERSION_HI]*256+product_register_value[CO2_NET_MODBUS_SOFTWARE_VERSION_LO]))/10);
 m_Edit_FVevsion.SetWindowText(strTemp);
 strTemp.Format(_T("%u"),product_register_value[CO2_NET_MODBUS_HARDWARE_REV]);
 m_Edit_HardVer.SetWindowText(strTemp);
@@ -366,6 +392,8 @@ else
  //CEdit m_Edit_Calibrate_Offset;
  //CEdit m_Edit_Alarm_Setpoint;
  //CEdit m_Edit_PreAlarm_Setpoint;
+  strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_CO2_INTERNAL]);
+  m_edit_co2_value.SetWindowText(strTemp);
  strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_CO2_INTERNAL_OFFSET]);
   m_Edit_Calibrate_Offset.SetWindowText(strTemp);
  strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_CO2_INTERNAL_PREALARM_SETPOINT]);
@@ -409,8 +437,134 @@ else
    m_msflexgrid.put_TextMatrix(0,4,_T("Prepare Alarm Setpoint"));
    m_msflexgrid.put_TextMatrix(0,5,_T("Alarm Setpoint"));
    m_msflexgrid.put_TextMatrix(0,6,_T("Calibrating Offset"));
+
+
+
+
+   m_grid_input.put_Cols(6);
+   m_grid_input.put_Rows(4);
+   m_grid_input.put_TextMatrix(0,1,_T("Name"));
+   m_grid_input.put_TextMatrix(0,2,_T("Range"));
+   m_grid_input.put_TextMatrix(0,3,_T("A/M"));
+   m_grid_input.put_TextMatrix(0,4,_T("Value"));
+   m_grid_input.put_TextMatrix(0,5,_T("Calibration"));
+
+   m_grid_input.put_TextMatrix(1,0,_T("1"));
+   m_grid_input.put_TextMatrix(2,0,_T("2"));
+   m_grid_input.put_TextMatrix(3,0,_T("3"));
+
+
+   m_grid_input.put_TextMatrix(1,1,_T("Tempreture"));
+   m_grid_input.put_TextMatrix(2,1,_T("Hum"));
+   m_grid_input.put_TextMatrix(3,1,_T("CO2"));
+
+
+   m_grid_input.put_TextMatrix(2,2,_T("%"));
+   m_grid_input.put_TextMatrix(3,2,_T("ppm"));
+
+
    Fresh_Grid();
- 
+   Show_InputList();
+}
+void CCO2NetView::Show_InputList(){
+	int i_internal_temp = 0;
+	int i_external_temp = 0;
+	float f_internal_temp = 0;
+	float f_external_temp = 0;
+	CString temp_internal_value,temp_external_value;
+	// 	m_sensor_sel.ResetContent();
+	// 	m_sensor_sel.InsertString(0,_T("Internal"));
+	// 	m_sensor_sel.InsertString(1,_T("External"));
+
+
+	CString strTemp1,strTemp2,strUnit,strHUM,strCO2;
+	strTemp1.Format(_T("%cC"),176);
+	strTemp2.Format(_T("%cF"),176);
+
+
+	// 	m_co2_temp_unit.ResetContent();
+	// 	m_co2_temp_unit.AddString(strTemp1);
+	// 	m_co2_temp_unit.AddString(strTemp2);
+
+	//CO2_NET_MODBUS_INTERNAL_TEMPERATURE_CELSIUS	=	202	;
+	//CO2_NET_MODBUS_INTERNAL_TEMPERATURE_FAHRENHEIT	=	203	;
+	//CO2_NET_MODBUS_EXTERNAL_TEMPERATURE_CELSIUS	=	204	;
+	//CO2_NET_MODBUS_EXTERNAL_TEMPERATURE_FAHRENHEIT	=	205	;
+	if(product_register_value[CO2_NET_MODBUS_TEMPERATURE_DEGREE_C_OR_F] == 0)		
+	{
+		i_internal_temp = product_register_value[CO2_NET_MODBUS_INTERNAL_TEMPERATURE_CELSIUS];
+		i_external_temp = product_register_value[CO2_NET_MODBUS_EXTERNAL_TEMPERATURE_CELSIUS];
+		// 		((CStatic *)GetDlgItem(IDC_STATIC_CO2_UNIT1))->SetWindowText(strTemp1);
+		// 		((CStatic *)GetDlgItem(IDC_STATIC_CO2_UNIT2))->SetWindowText(strTemp1);
+		/*m_co2_temp_unit.SetCurSel(0);*/
+		strUnit=strTemp1;
+	}
+	else if((product_register_value[CO2_NET_MODBUS_TEMPERATURE_DEGREE_C_OR_F] == 1))
+	{
+		i_internal_temp = product_register_value[CO2_NET_MODBUS_INTERNAL_TEMPERATURE_FAHRENHEIT];
+		i_external_temp = product_register_value[CO2_NET_MODBUS_EXTERNAL_TEMPERATURE_FAHRENHEIT];
+		// 		((CStatic *)GetDlgItem(IDC_STATIC_CO2_UNIT1))->SetWindowText(strTemp2);
+		// 		((CStatic *)GetDlgItem(IDC_STATIC_CO2_UNIT2))->SetWindowText(strTemp2);
+		/*m_co2_temp_unit.SetCurSel(1);*/
+		strUnit=strTemp2;
+	}
+	else
+	{
+		/*return;*/
+	}
+	f_internal_temp = (float)i_internal_temp / 10;
+	f_external_temp = (float)i_external_temp / 10;
+	CString  TempValue,StrAM;
+	m_grid_input.put_TextMatrix(1,2,strUnit);
+
+	if(product_register_value[CO2_NET_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//内部
+	{
+		TempValue.Format(_T("%0.1f"),f_internal_temp);
+	}
+	else
+	{
+		TempValue.Format(_T("%0.1f"),f_external_temp);
+	}
+	m_grid_input.put_TextMatrix(1,4,TempValue);
+
+	BOOL AM=Get_Bit_FromRegister(product_register_value[CO2_NET_MODBUS_OUTPUT_AUTO_MANUAL],1);
+	if (AM)
+	{
+		StrAM=_T("Manual");
+	} 
+	else
+	{
+		StrAM=_T("Auto");
+	}
+	m_grid_input.put_TextMatrix(1,3,StrAM);
+
+	AM=Get_Bit_FromRegister(product_register_value[CO2_NET_MODBUS_OUTPUT_AUTO_MANUAL],2);
+	if (AM)
+	{
+		StrAM=_T("Manual");
+	} 
+	else
+	{
+		StrAM=_T("Auto");
+	}
+	m_grid_input.put_TextMatrix(2,3,StrAM);
+
+	AM=Get_Bit_FromRegister(product_register_value[CO2_NET_MODBUS_OUTPUT_AUTO_MANUAL],3);
+	if (AM)
+	{
+		StrAM=_T("Manual");
+	} 
+	else
+	{
+		StrAM=_T("Auto");
+	}
+	m_grid_input.put_TextMatrix(3,3,StrAM);
+	//CO2_NET_MODBUS_HUMIDITY	=	207	;
+
+	strHUM.Format(_T("%0.1f"),(float)(product_register_value[CO2_NET_MODBUS_HUMIDITY])/10.0);
+	m_grid_input.put_TextMatrix(2,4,strHUM);
+	strCO2.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_CO2_INTERNAL]);
+	m_grid_input.put_TextMatrix(3,4,strCO2);
 }
 void CCO2NetView::Fresh_Grid(){
     //CO2_NET_MODBUS_SCAN_START	=	1266	;ID+SN
@@ -606,18 +760,15 @@ void CCO2NetView::Get_CO2_Temperature_unit(CString &strTemp)
     }
 }
 
-#include "Table_Tamplete.h"
+ 
 
 void CCO2NetView::OnBnClickedBtnCo2ClearCal()
 {
-     CTable_Tamplete dlg;
-    // dlg=new CTable_Tamplete;
-   //  dlg->SetWindowText(_T("External Calibration List"));
-     dlg.DoModal();
+ 
 }
 
 LRESULT CCO2NetView::OnFreshView(WPARAM wParam, LPARAM lParam){
-	Fresh();
+	Fresh_View();
 	return 0;
 }
 
@@ -721,13 +872,14 @@ void CCO2NetView::OnEnKillfocusIdCo2Edit()
         int ret=write_one(g_tstat_id,6,ID);
         if (ret>0)
         {
-            CADO ado;
-            ado.OnInitADOConn();
+			CBADO bado;
+			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+			bado.OnInitADOConn(); 
             CString sql;
             sql.Format(_T("select * from ALL_NODE where Serial_ID='%d' "),serialno);
-            ado.m_pRecordset = ado.OpenRecordset(sql);
-            ado.m_pRecordset->MoveFirst();
-            while(!ado.m_pRecordset->EndOfFile)
+            bado.m_pRecordset = bado.OpenRecordset(sql);
+            bado.m_pRecordset->MoveFirst();
+            while(!bado.m_pRecordset->EndOfFile)
             {
                 CString prodcut_name,product_id,screen_name;
                 prodcut_name.Format(_T("%s:%d--%d"),GetProductName(product_register_value[7]),serialno,ID);
@@ -736,11 +888,11 @@ void CCO2NetView::OnEnKillfocusIdCo2Edit()
 
                 try 
                 {
-                    ado.m_pRecordset->PutCollect("Product_name",(_bstr_t)(prodcut_name));
-                    ado.m_pRecordset->PutCollect("Product_ID",(_bstr_t)(product_id));
-                    ado.m_pRecordset->PutCollect("Screen_Name",(_bstr_t)(screen_name));
-                    ado.m_pRecordset->Update();
-                    ado.m_pRecordset->MoveNext();
+                    bado.m_pRecordset->PutCollect("Product_name",(_bstr_t)(prodcut_name));
+                    bado.m_pRecordset->PutCollect("Product_ID",(_bstr_t)(product_id));
+                    bado.m_pRecordset->PutCollect("Screen_Name",(_bstr_t)(screen_name));
+                    bado.m_pRecordset->Update();
+                    bado.m_pRecordset->MoveNext();
 
                 }
                 catch(...)
@@ -753,6 +905,9 @@ void CCO2NetView::OnEnKillfocusIdCo2Edit()
                 CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
                 ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
             }
+
+			bado.CloseRecordset();
+			bado.CloseConn();
         } 
         else
         {
@@ -798,6 +953,7 @@ void CCO2NetView::OnEnKillfocusCo2AlarmSetpoint()
     //strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_CO2_INTERNAL_ALARM_SETPOINT]);
     //m_Edit_Alarm_Setpoint.SetWindowText(strTemp);
 }
+
 void CCO2NetView::OnEnKillfocusCo2CalibratingOffset()
 {
     //strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_CO2_INTERNAL_OFFSET]);
@@ -812,13 +968,16 @@ void CCO2NetView::OnEnKillfocusCo2CalibratingOffset()
     //strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_CO2_INTERNAL_ALARM_SETPOINT]);
     //m_Edit_Alarm_Setpoint.SetWindowText(strTemp);
 }
+
 void CCO2NetView::OnCbnSelchangeCo2TempUnit()
 {
     int sel=m_Combox_TempUnit.GetCurSel();
     write_one(g_tstat_id,CO2_NET_MODBUS_TEMPERATURE_DEGREE_C_OR_F,sel);
     product_register_value[CO2_NET_MODBUS_TEMPERATURE_DEGREE_C_OR_F]=sel;
     Show_Temperature();
+	Show_InputList();
 }
+
 void CCO2NetView::OnCbnSelchangeComboCo2SensorSel()
 {
      int sel=m_Edit_SensorSelect.GetCurSel();
@@ -826,6 +985,8 @@ void CCO2NetView::OnCbnSelchangeComboCo2SensorSel()
      product_register_value[CO2_NET_MODBUS_TEMPERATURE_SENSOR_SELECT]=sel;
    
    Show_Temperature();
+
+   Show_InputList();
 }
 ////////////////////////IP Config/////////////////////////////////////
 void CCO2NetView::OnCbnSelchangeComboIpmodel()
@@ -876,7 +1037,7 @@ int n=write_one(g_tstat_id,CO2_NET_MODBUS_IP_ADDRESS_GHOST_START,address1);
     n=write_one(g_tstat_id,CO2_NET_MODBUS_ENABLE_GHOST,1);//使能之后
     Sleep(5*1000);
 
-
+	
 
 	CMainFrame* pPraent=(CMainFrame*)GetParent();
 
@@ -905,10 +1066,10 @@ int n=write_one(g_tstat_id,CO2_NET_MODBUS_IP_ADDRESS_GHOST_START,address1);
 		{
 			try
 			{
-
-			_ConnectionPtr t_pCon;//for ado connection
-			t_pCon.CreateInstance(_T("ADODB.Connection"));
-			t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+				CBADO bado;
+				bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+				bado.OnInitADOConn(); 
+			 
 			CString strSql;
 			//strSql.Format(_T("update Building set Ip_Address='%s' where Ip_Address='%s'"),strIP,pPraent->m_strIP);
 			//t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
@@ -918,16 +1079,16 @@ int n=write_one(g_tstat_id,CO2_NET_MODBUS_IP_ADDRESS_GHOST_START,address1);
           
 			strSID.Format(_T("%d"), get_serialnumber());
 			strSql.Format(_T("update ALL_NODE set Bautrate='%s',Com_Port='%s' where Serial_ID='%s'"),strIP,strPort,strSID); //bautrate 放IP
-			t_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 
-
-			if(t_pCon->State)
-				t_pCon->Close();
+			bado.CloseConn();
+			 
 			}
 			catch(_com_error *e)
 			{
 				AfxMessageBox(e->ErrorMessage());
 			}
+			
 			pPraent->m_strIP=strIP;
 			pPraent->ScanTstatInDB();
 
@@ -952,10 +1113,16 @@ void CCO2NetView::OnEnKillfocusCo2AlarmOnTime()
    unsigned short IntTemp;
    m_Edit_AlarmOn.GetWindowText(strTemp);
    IntTemp=_wtoi(strTemp);
-   write_one(g_tstat_id,CO2_NET_MODBUS_PRE_ALARM_SETTING_ON_TIME,IntTemp);
-   product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_ON_TIME]=IntTemp;
-    strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_ON_TIME]);
-    m_Edit_AlarmOn.SetWindowText(strTemp);
+
+   if(product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_ON_TIME]==IntTemp)	//Add this to judge weather this value need to change.
+	   return;
+   Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_NET_MODBUS_PRE_ALARM_SETTING_ON_TIME,IntTemp,
+	   product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_ON_TIME],this->m_hWnd,IDC_CO2_ALARM_ON_TIME,_T("Alarm on Time"));
+
+   //write_one(g_tstat_id,CO2_NET_MODBUS_PRE_ALARM_SETTING_ON_TIME,IntTemp);
+   //product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_ON_TIME]=IntTemp;
+   // strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_ON_TIME]);
+   // m_Edit_AlarmOn.SetWindowText(strTemp);
     //strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_OFF_TIME]);
     //m_Edit_AlarmOff.SetWindowText(strTemp);
     //strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_MENU_BLOCK_SECONDS]);
@@ -971,10 +1138,15 @@ void CCO2NetView::OnEnKillfocusCo2AlarmOffTime()
     unsigned short IntTemp;
     m_Edit_AlarmOff.GetWindowText(strTemp);
     IntTemp=_wtoi(strTemp);
-    write_one(g_tstat_id,CO2_NET_MODBUS_PRE_ALARM_SETTING_OFF_TIME,IntTemp);
+	if(product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_OFF_TIME]==IntTemp)	//Add this to judge weather this value need to change.
+		return;
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_NET_MODBUS_PRE_ALARM_SETTING_OFF_TIME,IntTemp,
+		product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_OFF_TIME],this->m_hWnd,IDC_CO2_ALARM_OFF_TIME,_T("Alarm off Time"));
+
+  /*  write_one(g_tstat_id,CO2_NET_MODBUS_PRE_ALARM_SETTING_OFF_TIME,IntTemp);
     product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_OFF_TIME]=IntTemp;
     strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_OFF_TIME]);
-    m_Edit_AlarmOff.SetWindowText(strTemp);
+    m_Edit_AlarmOff.SetWindowText(strTemp);*/
     //strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_OFF_TIME]);
     //m_Edit_AlarmOff.SetWindowText(strTemp);
     //strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_MENU_BLOCK_SECONDS]);
@@ -990,10 +1162,15 @@ void CCO2NetView::OnEnKillfocusEditCo2BlockTime()
     unsigned short IntTemp;
     m_Edit_MenuBlockTimes.GetWindowText(strTemp);
     IntTemp=_wtoi(strTemp);
-    write_one(g_tstat_id,CO2_NET_MODBUS_MENU_BLOCK_SECONDS,IntTemp);
+
+	if(product_register_value[CO2_NET_MODBUS_MENU_BLOCK_SECONDS]==IntTemp)	//Add this to judge weather this value need to change.
+		return;
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_NET_MODBUS_MENU_BLOCK_SECONDS,IntTemp,
+		product_register_value[CO2_NET_MODBUS_MENU_BLOCK_SECONDS],this->m_hWnd,IDC_EDIT_CO2_BLOCK_TIME,_T("Menu Block Time"));
+   /* write_one(g_tstat_id,CO2_NET_MODBUS_MENU_BLOCK_SECONDS,IntTemp);
     product_register_value[CO2_NET_MODBUS_MENU_BLOCK_SECONDS]=IntTemp;
     strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_MENU_BLOCK_SECONDS]);
-    m_Edit_MenuBlockTimes.SetWindowText(strTemp);
+    m_Edit_MenuBlockTimes.SetWindowText(strTemp);*/
     //strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_OFF_TIME]);
     //m_Edit_AlarmOff.SetWindowText(strTemp);
     //strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_MENU_BLOCK_SECONDS]);
@@ -1009,10 +1186,18 @@ void CCO2NetView::OnEnKillfocusEditCo2BacklightTime()
     unsigned short IntTemp;
     m_Edit_BacklightTime.GetWindowText(strTemp);
     IntTemp=_wtoi(strTemp);
-    write_one(g_tstat_id,CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS,IntTemp);
-    product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS]=IntTemp;
-    strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS]);
-    m_Edit_BacklightTime.SetWindowText(strTemp);
+
+    //write_one(g_tstat_id,CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS,IntTemp);
+    //product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS]=IntTemp;
+    //strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS]);
+    //m_Edit_BacklightTime.SetWindowText(strTemp);
+
+	if(product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS]==IntTemp)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS,IntTemp,
+		product_register_value[CO2_NET_MODBUS_BACKLIGHT_KEEP_SECONDS],this->m_hWnd,IDC_EDIT_CO2_BACKLIGHT_TIME,_T("Backlight Time"));
+
     //strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_PRE_ALARM_SETTING_OFF_TIME]);
     //m_Edit_AlarmOff.SetWindowText(strTemp);
     //strTemp.Format(_T("%d"),product_register_value[CO2_NET_MODBUS_MENU_BLOCK_SECONDS]);
@@ -1139,4 +1324,161 @@ void CCO2NetView::OnBnClickedBtnCo2Refresh()
         delete pDlg;
     pDlg=NULL;
 
+}
+
+
+void CCO2NetView::OnEnKillfocusEditCo2Value()
+{
+	CString str;
+	//str.Format(_T("%d"),product_register_value[275]);
+	//GetDlgItem(IDC_EDIT_PID2OFFSETPOINT)->GetWindowText(str);
+	m_edit_co2_value.GetWindowText(str);
+	int nValue= _wtoi(str);
+
+	if(product_register_value[CO2_NET_MODBUS_CO2_INTERNAL]==nValue)	//Add this to judge weather this value need to change.
+		return;
+
+	Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,CO2_NET_MODBUS_CO2_INTERNAL,nValue,
+		product_register_value[CO2_NET_MODBUS_CO2_INTERNAL],this->m_hWnd,IDC_EDIT_CO2_VALUE,_T("CO2 Value"));
+}
+
+
+HBRUSH CCO2NetView::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CFormView::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	// TODO:  Change any attributes of the DC here
+	for (int i=0;i<(int)Change_Color_ID.size();i++)
+	{
+		if(pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//注意此处的（pWnd->），否则没效果
+		{
+			pDC->SetTextColor(RGB(0,0,0));
+			pDC->SetBkColor(RGB(255,0,0));//设置文本背景色
+			pDC->SetBkMode(TRANSPARENT);//设置背景透明
+			hbr = (HBRUSH)m_brush;
+		}
+
+	}
+	// TODO:  Return a different brush if the default is not desired
+	return hbr;
+}
+
+
+
+LRESULT  CCO2NetView::ResumeMessageCallBack(WPARAM wParam, LPARAM lParam)
+{
+	UINT temp_id;
+	_MessageWriteOneInfo *Write_Struct_feedback =(_MessageWriteOneInfo *)lParam;
+	bool msg_result=WRITE_FAIL;
+	msg_result = MKBOOL(wParam);
+	vector <int>::iterator Iter;
+	if(msg_result)
+	{
+		int indexid = -1;
+		for (int i=0;i<(int)Change_Color_ID.size();i++)
+		{
+			if(Change_Color_ID.at(i)!=Write_Struct_feedback->CTRL_ID)
+				continue;
+			else
+				indexid = i;
+		}
+
+		if(indexid!=-1)
+		{
+			Iter = Change_Color_ID.begin()+indexid;
+			Change_Color_ID.erase(Iter);
+		}
+
+		CString temp;
+		temp.Format(_T("Change \"%s\" value from %d to %d success!"),
+			Write_Struct_feedback->Changed_Name,
+			Write_Struct_feedback->old_value,
+			Write_Struct_feedback->new_value);
+		temp_id = Write_Struct_feedback->CTRL_ID;
+		SetPaneString(1,temp);
+		product_register_value[Write_Struct_feedback->address]= Write_Struct_feedback->new_value;
+		if(Write_Struct_feedback!=NULL)
+			delete Write_Struct_feedback;
+
+	}
+	else
+	{
+		CString temp;
+		temp.Format(_T("Change \"%s\" value from %d to %d Fail!"),
+			Write_Struct_feedback->Changed_Name,
+			Write_Struct_feedback->old_value,
+			Write_Struct_feedback->new_value);
+
+		temp_id = Write_Struct_feedback->CTRL_ID;
+		SetPaneString(1,temp);
+		Beep(10,100);
+		product_register_value[Write_Struct_feedback->address]= Write_Struct_feedback->old_value;
+		//GetDlgItem(Write_Struct_feedback->CTRL_ID)->SetWindowTextW(_T(""));
+
+		int indexid = -1;
+		for (int i=0;i<(int)Change_Color_ID.size();i++)
+		{
+			if(Change_Color_ID.at(i)!=Write_Struct_feedback->CTRL_ID)
+				continue;
+			else
+				indexid = i;
+		}
+		Iter = Change_Color_ID.begin()+indexid;
+		if(indexid!=-1)
+		{
+			Iter = Change_Color_ID.begin()+indexid;
+			Change_Color_ID.erase(Iter);
+		}
+
+		if(Write_Struct_feedback!=NULL)
+		{
+			delete Write_Struct_feedback;
+		}
+	}
+	//Reflesh_ParameterDlg();
+    Initial_Window();
+	GetDlgItem(temp_id)->Invalidate();
+
+	return 0;
+}
+
+
+LRESULT  CCO2NetView::ReadDataCallBack(WPARAM wParam, LPARAM lParam)
+{
+	_MessageReadOneInfo *Read_Struct_feedback =(_MessageReadOneInfo *)lParam;
+	bool msg_result=WRITE_FAIL;
+	msg_result = MKBOOL(wParam);
+	if(msg_result)
+	{
+		product_register_value[Read_Struct_feedback->address]=Read_Struct_feedback->new_value;	
+	}
+	if(Read_Struct_feedback!=NULL)
+		delete Read_Struct_feedback;
+	return 1;
+}
+
+
+BOOL CCO2NetView::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if(pMsg->message == WM_KEYDOWN  )
+	{
+		if(pMsg->wParam == VK_RETURN)
+		{
+			CWnd *temp_focus=GetFocus();	//Maurice require ,click enter and the cursor still in this edit or combobox.
+			GetDlgItem(IDC_EDIT1_TEST)->SetFocus();
+			temp_focus->SetFocus();
+
+			return 1;
+		}
+	}
+	return CFormView::PreTranslateMessage(pMsg);
+}
+
+
+LRESULT CCO2NetView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	return CFormView::WindowProc(message, wParam, lParam);
 }

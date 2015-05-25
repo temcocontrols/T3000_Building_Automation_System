@@ -7,7 +7,7 @@
 #include "globle_function.h"
 #include "AfxMessageDialog.h"
 // COutPutDlg dialog
-
+#include "bado/BADO.h"
 IMPLEMENT_DYNAMIC(COutPutDlg, CDialog)
 CString heat_hand[6]={_T("Heat1"),_T("Heat2"),_T("Heat3"),_T("Heat4"),_T("Heat5"),_T("Heat6")};
 CString cool_hand[6]={_T("Cool1"),_T("Cool2"),_T("Cool3"),_T("Cool4"),_T("Cool5"),_T("Cool6")};
@@ -338,6 +338,78 @@ BOOL COutPutDlg::OnInitDialog()
 			}	
 		}
 	}
+
+
+	CenterWindow(this);
+	if (product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_TSTAT5G||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
+	{
+		WINDOWPLACEMENT wp;
+
+		GetWindowPlacement(&wp);
+
+		wp.rcNormalPosition.bottom += 120;
+
+		SetWindowPlacement(&wp);
+
+		GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_NORMAL);
+
+
+		m_FlexGrid3.ShowWindow(TRUE);
+		GetDlgItem(IDC_STATIC_PID3)->ShowWindow(TRUE);
+		GetDlgItem(IDC_STATIC_HS)->ShowWindow(TRUE);
+		GetDlgItem(IDC_PID3_HEATSTAGEEDIT)->ShowWindow(TRUE);
+		GetDlgItem(IDC_STATIC_CS)->ShowWindow(TRUE);
+		GetDlgItem(IDC_PID3COOLSTAGEEDIT)->ShowWindow(TRUE);
+	//	FreshGrid_PID3();
+	} 
+	else
+	{
+
+		WINDOWPLACEMENT wp;
+		GetWindowPlacement(&wp);
+
+		CRect rc;
+		CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
+		pWnd->GetWindowRect(&rc);
+		//ScreenToClient(&rc);
+
+		wp.rcNormalPosition.bottom = rc.bottom - 10;
+		SetWindowPlacement(&wp);
+
+		GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_HIDE); 
+
+
+		m_FlexGrid3.ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_HS)->ShowWindow(FALSE);
+		GetDlgItem(IDC_PID3_HEATSTAGEEDIT)->ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_CS)->ShowWindow(FALSE);
+		GetDlgItem(IDC_PID3COOLSTAGEEDIT)->ShowWindow(FALSE);
+	}
+	if (product_register_value[7]==PM_PRESSURE)
+	{
+		WINDOWPLACEMENT wp;
+		GetWindowPlacement(&wp);
+
+		CRect rc;
+		CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR2);
+		pWnd->GetWindowRect(&rc);
+
+
+		wp.rcNormalPosition.bottom = rc.bottom;
+		SetWindowPlacement(&wp);
+
+		GetDlgItem(IDC_STATIC_SEPERATOR2)->ShowWindow(SW_HIDE); 
+
+
+		m_FlexGrid3.ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_PID3)->ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_HS)->ShowWindow(FALSE);
+		GetDlgItem(IDC_PID3_HEATSTAGEEDIT)->ShowWindow(FALSE);
+		GetDlgItem(IDC_STATIC_CS)->ShowWindow(FALSE);
+		GetDlgItem(IDC_PID3COOLSTAGEEDIT)->ShowWindow(FALSE);
+	}
+
 	//put_fan_variable();	
 	FreshGrids();
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -644,11 +716,11 @@ void COutPutDlg::FreshGrids()
 		FreshGrid_PID2tstat6();
 		//FreshGrid_PID1tstat6();
 	}
-	else if (product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_TSTAT5G)
+	else if ((product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_TSTAT5G)||(product_register_value[7]==PM_TSTATRUNAR))
 	{
 		FreshGrid_PID1tstat6();
 		float version=get_curtstat_version();
-		if (product_register_value[7]==PM_TSTAT5E)
+		if ((product_register_value[7]==PM_TSTAT5E)||(product_register_value[7]==PM_TSTATRUNAR))
 		{
          FreshGrid_PID2tstat6();
 		} 
@@ -663,76 +735,14 @@ void COutPutDlg::FreshGrids()
 		FreshGrid_PID1();
 		FreshGrid_PID2();
 	}
-	CenterWindow(this);
-	if (product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_TSTAT5G)
+	//CenterWindow(this);
+	if (product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_TSTAT5G||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
 	{
-		WINDOWPLACEMENT wp;
-
-		GetWindowPlacement(&wp);
-
-		wp.rcNormalPosition.bottom += 120;
-
-		SetWindowPlacement(&wp);
-
-		GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_NORMAL);
-
-
-	m_FlexGrid3.ShowWindow(TRUE);
-	GetDlgItem(IDC_STATIC_PID3)->ShowWindow(TRUE);
-	GetDlgItem(IDC_STATIC_HS)->ShowWindow(TRUE);
-	GetDlgItem(IDC_PID3_HEATSTAGEEDIT)->ShowWindow(TRUE);
-	GetDlgItem(IDC_STATIC_CS)->ShowWindow(TRUE);
-	GetDlgItem(IDC_PID3COOLSTAGEEDIT)->ShowWindow(TRUE);
 	FreshGrid_PID3();
 	} 
-	else
-	{
+ 
 
-		WINDOWPLACEMENT wp;
-		GetWindowPlacement(&wp);
-
-		CRect rc;
-		CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR);
-		pWnd->GetWindowRect(&rc);
-		//ScreenToClient(&rc);
-
-		wp.rcNormalPosition.bottom = rc.bottom - 10;
-		SetWindowPlacement(&wp);
-
-		GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_HIDE); 
-
-
-		m_FlexGrid3.ShowWindow(FALSE);
-		GetDlgItem(IDC_STATIC_PID3)->ShowWindow(FALSE);
-		GetDlgItem(IDC_STATIC_HS)->ShowWindow(FALSE);
-		GetDlgItem(IDC_PID3_HEATSTAGEEDIT)->ShowWindow(FALSE);
-		GetDlgItem(IDC_STATIC_CS)->ShowWindow(FALSE);
-		GetDlgItem(IDC_PID3COOLSTAGEEDIT)->ShowWindow(FALSE);
-	}
-
-	if (product_register_value[7]==PM_PRESSURE)
-	{
-		WINDOWPLACEMENT wp;
-		GetWindowPlacement(&wp);
-
-		CRect rc;
-		CWnd* pWnd = GetDlgItem(IDC_STATIC_SEPERATOR2);
-		pWnd->GetWindowRect(&rc);
-		 
-
-		wp.rcNormalPosition.bottom = rc.bottom;
-		SetWindowPlacement(&wp);
-
-		GetDlgItem(IDC_STATIC_SEPERATOR2)->ShowWindow(SW_HIDE); 
-
-
-		m_FlexGrid3.ShowWindow(FALSE);
-		GetDlgItem(IDC_STATIC_PID3)->ShowWindow(FALSE);
-		GetDlgItem(IDC_STATIC_HS)->ShowWindow(FALSE);
-		GetDlgItem(IDC_PID3_HEATSTAGEEDIT)->ShowWindow(FALSE);
-		GetDlgItem(IDC_STATIC_CS)->ShowWindow(FALSE);
-		GetDlgItem(IDC_PID3COOLSTAGEEDIT)->ShowWindow(FALSE);
-	}
+	
 
 }
 void COutPutDlg::FreshGrid_PID1()
@@ -875,19 +885,11 @@ if(product_register_value[129]==1)
 		totalrows = 7;//只要是Tstat都是7个输出
 
 	int pid_select2[7]={0};
-	if (m_nmoduleType==1)
-	{
-		for(i=0;i<3;i++)
-		pid_select2[i]=product_register_value[247+i];/////////////////////////////get pid select ;col one 1
-		pid_select2[3]=product_register_value[252];
-		pid_select2[4]=product_register_value[253];
-		//
-	}
-	else
-	{
+	 
 		for(i=0;i<7;i++)
-			pid_select2[i]=product_register_value[247+i];/////////////////////////////get pid select ;col one 1
-	}
+			pid_select2[i]=product_register_value[MODBUS_PID_OUTPUT1+i];/////////////////////////////get pid select ;col one 1
+			
+ 
 	m_pids = pid_select2[0];//lsc add 默认为pid1
 	//new feature:
 	short nRotation;
@@ -1530,12 +1532,7 @@ if(product_register_value[129]==1)
 #endif
 
 }
-void COutPutDlg::Color_Grid1()
-{
-
-
-}
-
+ 
 void COutPutDlg::FreshGrid_PID2()
 {
 	CString strTemp;
@@ -1609,21 +1606,24 @@ void COutPutDlg::FreshGrid_PID2()
 		totalrows = 7;
 	}
 	
-	int pid_select2[7]={0};
-	if (m_nmoduleType==1)
-	{
-		for(i=0;i<3;i++)
-			pid_select2[i]=product_register_value[247+i];/////////////////////////////get pid select ;col one 1
+	//int pid_select2[7]={0};
+	//if (m_nmoduleType==1)
+	//{
+	//	for(i=0;i<3;i++)
+	//		pid_select2[i]=product_register_value[247+i];/////////////////////////////get pid select ;col one 1
 
-		pid_select2[3]=product_register_value[252];
-		pid_select2[4]=product_register_value[253];
-		//
-	}
-	else
-	{
-		for(i=0;i<7;i++)
-			pid_select2[i]=product_register_value[247+i];/////////////////////////////get pid select ;col one 1
-	}
+	//	pid_select2[3]=product_register_value[252];
+	//	pid_select2[4]=product_register_value[253];
+	//	//
+	//}
+	//else
+	//{
+	//	for(i=0;i<7;i++)
+	//		pid_select2[i]=product_register_value[247+i];/////////////////////////////get pid select ;col one 1
+	//}
+	int pid_select2[7]={0};
+	for(i=0;i<7;i++)
+		pid_select2[i]=product_register_value[MODBUS_PID_OUTPUT1+i];
 	////////////////////////down code is for m_flexgrid2
 	for(int col = 1 ;col <= (m_PID2_heat_stages+m_PID2_heat_stages+1);col++)
 	{
@@ -2042,21 +2042,26 @@ void COutPutDlg::FreshGrid_PID3()
 	 
 		totalrows = 7;
 	 
-	int pid_select2[7]={0};
-	if (m_nmoduleType==1)
-	{
-		for(i=0;i<3;i++)
-			pid_select2[i]=product_register_value[247+i];/////////////////////////////get pid select ;col one 1
+	//int pid_select2[7]={0};
+	//if (m_nmoduleType==1)
+	//{
+	//	for(i=0;i<3;i++)
+	//		pid_select2[i]=product_register_value[247+i];/////////////////////////////get pid select ;col one 1
 
-		pid_select2[3]=product_register_value[252];
-		pid_select2[4]=product_register_value[253];
-		//
-	}
-	else
-	{
+	//	pid_select2[3]=product_register_value[252];
+	//	pid_select2[4]=product_register_value[253];
+	//	//
+	//}
+	//else
+	//{
+	//	for(i=0;i<7;i++)
+	//		pid_select2[i]=product_register_value[247+i];/////////////////////////////get pid select ;col one 1
+	//}
+		int pid_select2[7]={0};
+
 		for(i=0;i<7;i++)
-			pid_select2[i]=product_register_value[247+i];/////////////////////////////get pid select ;col one 1
-	}
+			pid_select2[i]=product_register_value[MODBUS_PID_OUTPUT1+i];/////////////////////////////get pid select ;col one 1
+
 	////////////////////////down code is for m_flexgrid2
 	for(int col = 1 ;col <= (m_PID3_cool_stages+m_PID3_heat_stages+1);col++)
 	{
@@ -4044,7 +4049,7 @@ void COutPutDlg::OnWrite(int bflexgrid1_or_2,int col,int row)
 		 FreshGrids();
 		 //FreshGrids();
 	}
-	else if(product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_TSTAT5G)
+	else if(product_register_value[7]==PM_TSTAT5E||product_register_value[7]==PM_TSTAT5G||(product_register_value[7]==PM_TSTATRUNAR))
 	{
 			if(g_OutPutLevel==1)
 			return;
@@ -5942,7 +5947,7 @@ void COutPutDlg::OnEnKillfocusPid2Heatstageedit2()
 			{
 			product_register_value[MODBUS_HEAT_UNIVERSAL_TABLE] = m_PID2_heat_stages;
 			float version=get_curtstat_version();
-			if (version>=36.8||product_register_value[7]==PM_TSTAT5E)
+			if (version>=36.8||product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR))
 			{
 				FreshGrid_PID2tstat6();
 			} 
@@ -5987,7 +5992,7 @@ void COutPutDlg::OnEnKillfocusPid2coolstageedit2()
 			{
 				product_register_value[MODBUS_COOL_UNIVERSAL_TABLE] =m_PID2_cool_stages;
 				float version=get_curtstat_version();
-				if (version>=36.8||product_register_value[7]==PM_TSTAT5E)
+				if (version>=36.8||product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR))
 				{
 					FreshGrid_PID2tstat6();
 				} 
@@ -6053,19 +6058,23 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 	//if(g_serialNum>0&&multi_register_value[6]>0)
 	if(product_register_value[6]>0)
 	{
-		_ConnectionPtr m_ConTmp;
+		/*_ConnectionPtr m_ConTmp;
 		_RecordsetPtr m_RsTmp;
 		m_ConTmp.CreateInstance("ADODB.Connection");
 		m_RsTmp.CreateInstance("ADODB.Recordset");
-		m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+		m_ConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);*/
+		CBADO bado;
+		bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+		bado.OnInitADOConn(); 
 
 		CString strSerial;
 		strSerial.Format(_T("%d"),g_serialNum);
 
 		CString strsql;
 		strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
-		m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-		if(VARIANT_FALSE==m_RsTmp->EndOfFile)//update
+		//m_RsTmp->Open((_variant_t)strsql,_variant_t((IDispatch *)m_ConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
+		 bado.m_pRecordset=bado.OpenRecordset(strsql);
+		if(VARIANT_FALSE== bado.m_pRecordset->EndOfFile)//update
 		{
 			
 			CString strField;
@@ -6100,7 +6109,7 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 			CString str_temp;
 			str_temp.Format(_T("update IONAME set "+strField+" = '"+strText+"' where SERIAL_ID = '"+strSerial+"'"));
 
-			m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+			bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
 			}
 			catch(_com_error *e)
 			{
@@ -6167,7 +6176,7 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 			try
 			{
 
-				m_ConTmp->Execute(str_temp.GetString(),NULL,adCmdText);
+				bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
 			}
 			catch(_com_error *e)
 			{
@@ -6207,11 +6216,12 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 				g_strOutName7=strText;
 				break;
 		}
-	
-		if(m_RsTmp->State) 
+	    bado.CloseRecordset();
+		bado.CloseConn();
+		/*if(m_RsTmp->State) 
 			m_RsTmp->Close(); 
 		if(m_ConTmp->State)
-			m_ConTmp->Close();	
+			m_ConTmp->Close();	*/
 	}
 	
 	

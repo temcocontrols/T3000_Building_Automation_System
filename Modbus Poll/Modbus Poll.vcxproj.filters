@@ -259,6 +259,9 @@
     <ClInclude Include="excel9.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TestCenter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Modbus Poll.cpp">
@@ -391,6 +394,9 @@
       <Filter>CADO</Filter>
     </ClCompile>
     <ClCompile Include="excel9.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestCenter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

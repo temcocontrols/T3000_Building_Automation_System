@@ -27,8 +27,8 @@ public:
 	vector<Label_information> m_labelList;
 	void SetLabelLst(vector<Label_information>* pLabelLst);
 public:
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
+// 	_ConnectionPtr m_pCon;
+// 	_RecordsetPtr m_pRs;
 	int m_nCurRow;
 	int m_nCurCol;
 	CMsflexgrid m_FlexGrid;

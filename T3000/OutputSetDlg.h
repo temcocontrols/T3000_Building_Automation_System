@@ -3,7 +3,7 @@
 #include "msflexgrid1.h"
 
 // COutputSetDlg dialog
-#define  WM_REFRESH_OUTPUTDLG WM_USER + 100
+#define  WM_REFRESH_OUTPUTDLG WM_USER + 500
 
 
 class COutputSetDlg : public CDialog

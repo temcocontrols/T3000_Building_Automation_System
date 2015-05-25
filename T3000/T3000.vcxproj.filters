@@ -18,9 +18,6 @@
     <Filter Include="CADO">
       <UniqueIdentifier>{b1d039be-af63-4fdd-a8cf-e8638bd8a25e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CM5">
-      <UniqueIdentifier>{47872dd0-6006-4513-92b4-d6258d979013}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AirQuality">
       <UniqueIdentifier>{3757b5c7-f245-412e-bc02-5b9fe8cbf1a8}</UniqueIdentifier>
     </Filter>
@@ -28,20 +25,26 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
-    <Filter Include="ISP">
-      <UniqueIdentifier>{dafcb4ff-63f4-4e10-8bf9-24df487af357}</UniqueIdentifier>
-    </Filter>
     <Filter Include="singleslider">
       <UniqueIdentifier>{38d4558f-60de-4677-87c1-5a273a6fc23a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CM5\CM5_H">
-      <UniqueIdentifier>{f1c0a87b-351f-4535-a9ab-10e2bb3a8940}</UniqueIdentifier>
     </Filter>
     <Filter Include="ClassInfo">
       <UniqueIdentifier>{c664f2cd-e719-4782-bcf4-c788a2753a9c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CM5\PTP">
-      <UniqueIdentifier>{01b5bfaf-b471-4aaf-9189-632840902c18}</UniqueIdentifier>
+    <Filter Include="BADO">
+      <UniqueIdentifier>{c4576a71-639c-4b70-a1ac-7b0688be04b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bacnet">
+      <UniqueIdentifier>{47872dd0-6006-4513-92b4-d6258d979013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bacnet\CM5_H">
+      <UniqueIdentifier>{f1c0a87b-351f-4535-a9ab-10e2bb3a8940}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bacnet\Tstat_Input">
+      <UniqueIdentifier>{c79cf686-7d67-4908-905b-2e3a96aabb31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ChartCtrl">
+      <UniqueIdentifier>{27e725d7-6589-49bc-8746-034b8bae4c5a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -109,9 +112,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="hangeIDDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HumChamber.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ImageTreeCtrl.cpp">
@@ -273,20 +273,14 @@
     <ClCompile Include="ADO\ADO.cpp">
       <Filter>CADO</Filter>
     </ClCompile>
-    <ClCompile Include="CM5\DialogCM5.cpp">
-      <Filter>CM5</Filter>
-    </ClCompile>
     <ClCompile Include="CM5\SliderBoth.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="CM5\SliderBothBtn.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="AirQuality\AirQuality.cpp">
       <Filter>AirQuality</Filter>
-    </ClCompile>
-    <ClCompile Include="ISP\CDialogISPTOOL.cpp">
-      <Filter>ISP</Filter>
     </ClCompile>
     <ClCompile Include="singleslider\MacSliderCtrl.cpp">
       <Filter>singleslider</Filter>
@@ -301,13 +295,13 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CM5\ListCtrlCellEx.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="CM5\ListCtrlEx.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="CM5\MyOwnListCtrl.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="DisplayConfig.cpp">
       <Filter>Source Files</Filter>
@@ -337,31 +331,31 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CM5\BacNetProgram_transplant.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetProgramEdit.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetInput.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetOutput.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetProgram.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetVariable.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="CM5\CStatic\staticex.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetRange.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetWait.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="TestMultiReadTraffic.cpp">
       <Filter>Source Files</Filter>
@@ -370,19 +364,19 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BacnetWeeklyRoutine.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetAnnualRoutine.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetController.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="AirflowSettingDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BacnetScheduleTime.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="T38IOAView.cpp">
       <Filter>Source Files</Filter>
@@ -397,16 +391,16 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BacnetGraphic.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetMonitor.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetScreen.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="CM5\PointItem.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="LCOutNameConfig.cpp">
       <Filter>Source Files</Filter>
@@ -430,25 +424,25 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BacnetTool.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetToolReadProperty.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetScreenEdit.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetAlarmLog.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetAlarmWindow.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetTstat.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetView.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="CalibrationDlg.cpp">
       <Filter>Source Files</Filter>
@@ -459,23 +453,11 @@
     <ClCompile Include="CO2NetView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DebugWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Table_Tamplete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TstatZigbeeLogic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BacnetSetting.cpp">
-      <Filter>CM5</Filter>
-    </ClCompile>
-    <ClCompile Include="Dowmloadfile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DownloadSocket.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="WhichOneToChooseDlg.cpp">
       <Filter>Source Files</Filter>
@@ -502,13 +484,10 @@
       <Filter>ClassInfo</Filter>
     </ClCompile>
     <ClCompile Include="Bacnetaddintodb.cpp">
-      <Filter>CM5</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="BacnetCustomerDigitalRange.cpp">
-      <Filter>CM5</Filter>
-    </ClCompile>
-    <ClCompile Include="CM5\PTP\PTP.Cpp">
-      <Filter>CM5\PTP</Filter>
+      <Filter>Bacnet</Filter>
     </ClCompile>
     <ClCompile Include="Bacnetaddintodb.cpp">
       <Filter>Source Files</Filter>
@@ -523,6 +502,147 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TempHumSensorForm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NewHumChamberView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DllFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetUserConfig.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetUserlogin.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetAddLabel.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetEditLabel.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigFileHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TroubleShootDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetATCommand.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildingConfigration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BADO\BADO.cpp">
+      <Filter>BADO</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectOnlineDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugWindow.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="Dowmloadfile.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="DownloadSocket.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="TCP_Server.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetRemotePoint.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetInputForTstat.cpp">
+      <Filter>Bacnet\Tstat_Input</Filter>
+    </ClCompile>
+    <ClCompile Include="TstatRangeDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TstatsCPP\BacnetOutputForTstat.cpp">
+      <Filter>Bacnet\Tstat_Input</Filter>
+    </ClCompile>
+    <ClCompile Include="T3000_Default_MainView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartAxis.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartAxisLabel.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartBarSerie.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartCandlestickSerie.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartCrossHairCursor.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartCtrl.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartCursor.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartDateTimeAxis.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartDragLineCursor.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartFont.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartGanttSerie.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartGradient.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartGrid.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartLegend.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartLineSerie.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartLogarithmicAxis.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartPointsSerie.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartScrollBar.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartSerie.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartStandardAxis.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartSurfaceSerie.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartTitle.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartXYSerie.cpp">
+      <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="T3ModulesView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T3RangeDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -723,8 +843,59 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\t3000.mdb" />
-    <None Include="res\t3000_db.bin">
+    <None Include="res\Scan.ico">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Login.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Login" />
+    <None Include="res\relay.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\switch_on.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\switch_off.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Building.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Select.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\T3000Building.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\T3000_DEFAULT.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Building.mdb" />
+    <None Include="res\bmp_bacnet.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bmp00001.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bacnet_menu_bit.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\monitor_.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\MonitorData.mdb" />
+    <None Include="ChartCtrl\ChartBalloonLabel.inl">
+      <Filter>ChartCtrl</Filter>
+    </None>
+    <None Include="ChartCtrl\ChartLabel.inl">
+      <Filter>ChartCtrl</Filter>
+    </None>
+    <None Include="ChartCtrl\ChartPointsArray.inl">
+      <Filter>ChartCtrl</Filter>
+    </None>
+    <None Include="ChartCtrl\ChartSerieBase.inl">
+      <Filter>ChartCtrl</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -986,12 +1157,6 @@
     <ClInclude Include="ADO\ADO.h">
       <Filter>CADO</Filter>
     </ClInclude>
-    <ClInclude Include="AirQuality\AirQuality.h">
-      <Filter>AirQuality</Filter>
-    </ClInclude>
-    <ClInclude Include="ISP\CDialogISPTOOL.h">
-      <Filter>ISP</Filter>
-    </ClInclude>
     <ClInclude Include="singleslider\MacSliderCtrl.h">
       <Filter>singleslider</Filter>
     </ClInclude>
@@ -1053,40 +1218,40 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CM5\DialogCM5.h">
-      <Filter>CM5\CM5_H</Filter>
+      <Filter>Bacnet\CM5_H</Filter>
     </ClInclude>
     <ClInclude Include="CM5\ListCtrlCellEx.h">
-      <Filter>CM5\CM5_H</Filter>
+      <Filter>Bacnet\CM5_H</Filter>
     </ClInclude>
     <ClInclude Include="CM5\ListCtrlEx.h">
-      <Filter>CM5\CM5_H</Filter>
+      <Filter>Bacnet\CM5_H</Filter>
     </ClInclude>
     <ClInclude Include="CM5\PARSER.H">
-      <Filter>CM5\CM5_H</Filter>
+      <Filter>Bacnet\CM5_H</Filter>
     </ClInclude>
     <ClInclude Include="CM5\ROUTER.H">
-      <Filter>CM5\CM5_H</Filter>
+      <Filter>Bacnet\CM5_H</Filter>
     </ClInclude>
     <ClInclude Include="CM5\PerfTimer.h">
-      <Filter>CM5\CM5_H</Filter>
+      <Filter>Bacnet\CM5_H</Filter>
     </ClInclude>
     <ClInclude Include="CM5\MyOwnListCtrl.h">
-      <Filter>CM5\CM5_H</Filter>
+      <Filter>Bacnet\CM5_H</Filter>
     </ClInclude>
     <ClInclude Include="CM5\SliderBoth.h">
-      <Filter>CM5\CM5_H</Filter>
+      <Filter>Bacnet\CM5_H</Filter>
     </ClInclude>
     <ClInclude Include="CM5\SliderBothBtn.h">
-      <Filter>CM5\CM5_H</Filter>
+      <Filter>Bacnet\CM5_H</Filter>
     </ClInclude>
     <ClInclude Include="CM5\T3000DEF.H">
-      <Filter>CM5\CM5_H</Filter>
+      <Filter>Bacnet\CM5_H</Filter>
     </ClInclude>
     <ClInclude Include="CM5\ud_str.h">
-      <Filter>CM5\CM5_H</Filter>
+      <Filter>Bacnet\CM5_H</Filter>
     </ClInclude>
     <ClInclude Include="CM5\user_data.h">
-      <Filter>CM5\CM5_H</Filter>
+      <Filter>Bacnet\CM5_H</Filter>
     </ClInclude>
     <ClInclude Include="BacnetRange.h">
       <Filter>Header Files</Filter>
@@ -1181,9 +1346,6 @@
     <ClInclude Include="BacnetSetting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Table_Tamplete.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WhichOneToChooseDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1211,6 +1373,9 @@
     <ClInclude Include="Bacnetaddintodb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BacnetCustomerDigitalRange.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="CalibartionHT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1221,6 +1386,165 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TempHumSensorForm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildingConfigration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NewHumChamberView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DllFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TCP_Server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetUserlogin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetUserConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetAddLabel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetEditLabel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigFileHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="global_struct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TroubleShootDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetATCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BADO\BADO.h">
+      <Filter>BADO</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectOnlineDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetRemotePoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TstatRangeDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3000_Help_Map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3000_Default_MainView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartAxis.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartAxisLabel.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartBalloonLabel.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartBarSerie.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartCandlestickSerie.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartCrossHairCursor.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartCtrl.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartCursor.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartDateTimeAxis.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartDragLineCursor.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartFont.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartGanttSerie.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartGradient.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartGrid.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartLabel.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartLegend.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartLineSerie.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartLogarithmicAxis.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartMouseListener.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartPointsArray.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartPointsSerie.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartScrollBar.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartSerie.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartSerieBase.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartSeriesMouseListener.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartStandardAxis.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartString.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartSurfaceSerie.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartTitle.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartXYSerie.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\PointsOrdering.h">
+      <Filter>ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="AirQuality\AirQuality.h">
+      <Filter>AirQuality</Filter>
+    </ClInclude>
+    <ClInclude Include="T3ModulesView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3RangeDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
