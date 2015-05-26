@@ -16,7 +16,7 @@
 #include "globle_function.h"
 #include "AddBuilding.h"
 #include "ScanSelectDlg.h"
-#include "CalibrationDlg.h"
+
 #include "MannageBuidingDlg.h"
 #include "AllNodesDiaolg.h"
 #include "GridLoad.h"
@@ -27,9 +27,9 @@
 #include "LoginDlg.h"
 #include "AfxMessageDialog.h"
 #include "ImportDatabaseDlg.h"
-#include "ToolCalibrateDlg.h"
+
 #include "EreaseDlg.h"
-#include "ToolCalibrateDlg.h"
+
 #include "hangeIDDlg.h"
 #include "LightingController/LightingController.h"//Lightingcontroller
 #include "NewHumChamberView.h"
@@ -282,8 +282,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_UPDATE_COMMAND_UI(ID_USERACCOUNT_MANNAGEUSER,OnUserMannageMentUpdate)
 	ON_COMMAND(ID_USERACCOUNT_LOGIN,OnUserLogin)
 	ON_COMMAND(ID_HELP,OnHelp)
-	ON_COMMAND(ID_TOOL_CALIBRATE,OnCaliBrate)
-	ON_COMMAND(ID_TOOL_GLOABALOVERRIDE,OnGloabalOverrides)
 	ON_COMMAND(ID_TOOL_EREASE_CHANGE_ID,OnToolErease)
 	ON_COMMAND(ID_TOOL_FRESH,OnToolFresh)
 	ON_COMMAND(ID_TOOL_FRESHLEFTTREEVIEW,OnToolRefreshLeftTreee)
@@ -298,7 +296,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	 
 //	ON_COMMAND(ID_APP_EXIT, &CMainFrame::OnAppExit)
 	ON_COMMAND(ID_VIEW_COMMUNICATETRAFFIC, &CMainFrame::OnViewCommunicatetraffic)
-	ON_COMMAND(ID_FUNCTION_HUMCALIBRATION, &CMainFrame::OnFunctionHumcalibration)
+ 
 	ON_COMMAND(ID_CONTROL_INPUTS, &CMainFrame::OnControlInputs)
 	ON_COMMAND(ID_CONTROL_PROGRAMS, &CMainFrame::OnControlPrograms)
 	ON_COMMAND(ID_CONTROL_OUTPUTS, &CMainFrame::OnControlOutputs)
@@ -322,7 +320,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 		ON_COMMAND(ID_Menu_CHECKUPDATE, &CMainFrame::OnMenuCheckupdate)
 	ON_COMMAND(ID_DATABASE_PV, &CMainFrame::OnDatabasePv)
 	ON_COMMAND(ID_CONTROL_TSTAT, &CMainFrame::OnControlTstat)
-	ON_COMMAND(ID_CALIBRATION_CALIBRATIONHUM, &CMainFrame::OnCalibrationCalibrationhum)
+	
 
     ON_COMMAND(ID_CONNECT2,OnConnect)
     ON_UPDATE_COMMAND_UI(ID_CONNECT2, &CMainFrame::OnUpdateConnect2)
@@ -342,7 +340,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 
 
 	ON_COMMAND(ID_HELP_FEEDBACKTOTEMCO, &CMainFrame::OnHelpFeedbacktotemco)
-	ON_COMMAND(ID_CALIBRATION_CALIBRATIONHUMTEMP, &CMainFrame::OnCalibrationCalibrationhumtemp)
+	
 	ON_COMMAND(ID_CONTROL_CUSTOMERUNITS, &CMainFrame::OnControlCustomerunits)
 	ON_COMMAND(ID_MISCELLANEOUS_GSMCONNECTION, &CMainFrame::OnMiscellaneousGsmconnection)
 
@@ -365,7 +363,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_TOOL_DETECTONLINEPRODUCTS, &CMainFrame::OnToolDetectonlineproducts)
 	ON_WM_HELPINFO()
 	ON_COMMAND(ID_FILE_EXPORTREGISETERSLIST, &CMainFrame::OnFileExportregiseterslist)
-	END_MESSAGE_MAP()
+  //  ON_COMMAND(ID_TOOL_PRODUCTSREGISTERSMAINTENANCE, &CMainFrame::OnToolProductsregistersmaintenance)
+  ON_COMMAND(ID_TOOL_REGISTERSMAINTENANCESYSTEM, &CMainFrame::OnToolRegistersmaintenancesystem)
+  END_MESSAGE_MAP()
 
 static UINT indicators[] =
 {
@@ -541,7 +541,7 @@ CMainFrame::CMainFrame()
 	m_hHttpFile = NULL;
 	 
 	m_bSafeToClose = TRUE;
-	m_pThread = NULL;
+	//m_pThread = NULL;
  
  
 }
@@ -935,12 +935,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		// 需要执行线程中的操作时
 		m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
 		m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
-		m_pThread =NULL;// AfxBeginThread(_DownloadThread, this, THREAD_PRIORITY_NORMAL, CREATE_SUSPENDED);
-		if (m_pThread == NULL)
-		{
-			TRACE(_T("Failed to create download thread, dialog is aborting\n"));
-
-		}
+		//m_pThread =NULL;// AfxBeginThread(_DownloadThread, this, THREAD_PRIORITY_NORMAL, CREATE_SUSPENDED);
+// 		if (m_pThread == NULL)
+// 		{
+// 			TRACE(_T("Failed to create download thread, dialog is aborting\n"));
+// 
+// 		}
 
 
 	return 0;
@@ -1768,16 +1768,14 @@ try
 				int temp_product_class_id=bado.m_pRecordset->GetCollect("Product_class_ID");
 				
 				/*
-				
-				int const PM_T3PT10= 26;
-				int const PM_T3IOA = 21;
-				int const PM_T332AI = 22;
-				int const  PM_T38AI16O = 23;
-				int const PM_T38I13O = 20;
-				int const PM_T34AO = 28;
-				int const PM_T36CT = 29;
-
-				*/
+                int const PM_T3PT10= 26;
+                int const PM_T3IOA = 21;
+                int const PM_T332AI = 22;
+                int const PM_T38AI16O = 23;
+                int const PM_T38I13O = 20;
+                int const PM_T34AO = 28;
+                int const PM_T36CT = 29;
+                */
 #if 1			
 				if(temp_product_class_id==PM_NC) 
 					TVINSERV_NET_WORK
@@ -4369,6 +4367,9 @@ LRESULT CMainFrame::OnFreshStatusBar(WPARAM wParam, LPARAM lParam)
 
 void CMainFrame::OnDestroy()
 {
+
+	 OnDisconnect();
+
 	CBADO bado;
 	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
 	bado.OnInitADOConn(); 
@@ -4392,19 +4393,7 @@ void CMainFrame::OnDestroy()
 		 
 	}
 	 bado.CloseConn();
-	if (m_pThread) {
-		if (WaitForSingleObject(m_pThread->m_hThread, 3000) == WAIT_OBJECT_0)
-		{
-
-		}
-		else
-		{		
-			BOOL bRet = TerminateThread(m_pThread->m_hThread,0);
-			//delete m_pFreshMultiRegisters;
-			m_pThread=NULL;
-		}
-
-	}
+	 
 
 	//close_T3000_log_file();
 	m_Input_data.clear();
@@ -4549,13 +4538,12 @@ void CMainFrame::OnDestroy()
 		//m_pRefreshThread->Delete();
 	}
 	
-	if (is_connect())
-	{
+	 
 	    SetCommunicationType(0);
 		close_com(); // added by zgq:12-16-2011
 		SetCommunicationType(1);
 		close_com();
-	}
+ 
 	close_T3000_log_file();
 	
 
@@ -4865,18 +4853,6 @@ void CMainFrame::OnImportDatase()
 	CImportDatabaseDlg Dlg;
 	Dlg.DoModal();
 	
-}
-void CMainFrame::OnCaliBrate()
-{
-	CToolCalibrateDlg Dlg;
-	Dlg.DoModal();
-}
-
-void CMainFrame::OnGloabalOverrides()
-{
-	CToolCalibrateDlg Dlg;
-	Dlg.DoModal();
-
 }
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
@@ -5616,15 +5592,32 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					int nComPort = product_Node.ncomport;
 					if(nComPort == 0 )
 					{
-						 nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
+						 //nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
+						 AfxMessageBox(_T("Comport is 0,Error"));
+						 if (pDlg !=NULL)
+						 {
+							 pDlg->ShowWindow(SW_HIDE);
+							 delete pDlg;
+							 pDlg=NULL;
+						 }
+						 return;
 					}
 					//SetPaneCommunicationPrompt(strInfo);
 					SetCommunicationType(0);
+					if (is_connect())
+					{
 					close_com();
+					}
+					Sleep(1000);  
 					BOOL  bret = open_com(nComPort);
+					if (!bret)	 //Try one more time
+					{
+					   bret =	open_com(nComPort);
+					}
 					if (!bret)
 					{
-						AfxMessageBox(_T("COM port open failure!"));			
+						strTemp.Format(_T("Open COM%d  Failed,Try again!"),nComPort);
+						AfxMessageBox(strTemp);			
 						if (pDlg !=NULL)
 						{
 							pDlg->ShowWindow(SW_HIDE);
@@ -5633,7 +5626,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						}
 						m_nStyle=2;
 						return;
-					}else
+					}
+					else
 					{
 						CString strInfo;
 						strInfo.Format(_T("COM %d Connected: Yes"), nComPort);	
@@ -5692,7 +5686,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 
 
-						#if 1 //ISPTool Config 
+						#if 1 
+				//ISPTool Config 
 				/*	CString filename;
 				CString flashmethod;
 				CString id;
@@ -6228,11 +6223,11 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			}
 			//------------------------------------------------------------------
 			 g_HumChamberThread=FALSE;
-			 if (nFlag==PM_HUMTEMPSENSOR)
+			 /* if (nFlag==PM_HUMTEMPSENSOR)
 			 {
-			  SwitchToPruductType(DLG_DIALOG_TEMP_HUMSENSOR);
-			 }
-			else if(nFlag==PM_NC)	
+			 SwitchToPruductType(DLG_DIALOG_TEMP_HUMSENSOR);
+			 }*/
+			  if(nFlag==PM_NC)	
 			{	
 				SwitchToPruductType(DLG_NETWORKCONTROL_VIEW);
 			}
@@ -6301,7 +6296,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{
 			 SwitchToPruductType(DLG_DIALOG_PRESSURE_SENSOR);
 			}
-			else if (nFlag==PM_AirQuality||nFlag==PM_HUM_R)
+			else if (nFlag==PM_AirQuality||nFlag==PM_HUM_R||nFlag==PM_HUMTEMPSENSOR)
 			{
 			SwitchToPruductType(DLG_AIRQUALITY_VIEW);
 			}
@@ -6554,7 +6549,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 
 		BOOL bOnLine=FALSE;
 		UINT nSerialNumber=0;
-		int nID;
+		 
 		bool temp_online = false;
 		tree_product tp = m_product.at(i);
 		if(m_strCurSubBuldingName.CompareNoCase(tp.BuildingInfo.strBuildingName)==0)
@@ -8607,11 +8602,7 @@ void CMainFrame::OnViewCommunicatetraffic()
 // 	  g_testmultiReadtraffic_dlg->ShowWindow(SW_SHOW);
 // 	 }
 }
-void CMainFrame::OnFunctionHumcalibration()
-{
-	 CCalibrationDlg dlg;
-     dlg.DoModal();
-}
+ 
 void CMainFrame::OnControlInputs()
 {
 	// TODO: Add your command handler code here
@@ -8692,7 +8683,7 @@ void CMainFrame::OnControlInputs()
 	}
 	else if (product_type == T3000_T3_MODULES )
 	{
-		//  SwitchToPruductType(DLG_DIALOG_T3_INPUTS_VIEW);
+		   SwitchToPruductType(DLG_DIALOG_T3_INPUTS_VIEW);
 	}
 	else{
 	MessageBox(_T("This function can't support for the product!\r\n"));
@@ -9618,11 +9609,7 @@ void CMainFrame::OnControlTstat()
 	}
 	bacnet_view_number = TYPE_TSTAT ;
 }
-void CMainFrame::OnCalibrationCalibrationhum()
-{
-   CCalibrationDlg dlg;
-   dlg.DoModal();
-}
+
 
 void CMainFrame::ShowDebugWindow()
 {
@@ -9850,12 +9837,7 @@ void CMainFrame::OnHelpFeedbacktotemco()
 // 	DownloadFromFTP();
 }
 
-#include "CalibrationHumDlg.h"
-void CMainFrame::OnCalibrationCalibrationhumtemp()
-{
-	 CCalibrationHumDlg dlg;
-	 dlg.DoModal();
-}
+
 CString CMainFrame::GetFWVersionFromFTP(CString ProductName){
 	CString strHtml("");
 	CInternetSession sess;
@@ -9906,19 +9888,7 @@ LRESULT CMainFrame::OnThreadFinished(WPARAM wParam, LPARAM /*lParam*/)
 	{ 
 		//EndDialog(IDOK);
 		m_bSafeToClose=TRUE;
-		if (m_pThread) {
-			if (WaitForSingleObject(m_pThread->m_hThread, 3000) == WAIT_OBJECT_0)
-			{
-
-			}
-			else
-			{		
-				BOOL bRet = TerminateThread(m_pThread->m_hThread,0);
-				//delete m_pFreshMultiRegisters;
-				m_pThread=NULL;
-			}
-
-		}
+		 
 		//Free up the internet handles we may be using
 		if (m_hHttpFile)
 		{
@@ -11025,6 +10995,7 @@ void CMainFrame::OnFileExportregiseterslist()
 	BOOL IS_Write=TRUE;
 	m_pFile = new CStdioFile;//txt
 	CString HeadFold = g_strExePth;
+    
 	HeadFold += _T("Product Head File");
 	CreateDirectory(HeadFold,NULL);
 
@@ -12394,4 +12365,18 @@ void CMainFrame::OnFileExportregiseterslist()
 	book.ReleaseDispatch(); 
 	books.ReleaseDispatch();
 	app.ReleaseDispatch(); 
+}
+
+
+//void CMainFrame::OnToolProductsregistersmaintenance()
+//{
+//    CString strHistotyFile=g_strExePth+_T("RegisterListManager.exe");
+//    ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
+//}
+
+
+void CMainFrame::OnToolRegistersmaintenancesystem()
+{
+         CString strHistotyFile=g_strExePth+_T("RegisterListManager.exe");
+       ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
 }

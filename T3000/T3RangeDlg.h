@@ -3,22 +3,7 @@
 #include "CM5\CStatic\staticex.h"
 
 // CT3RangeDlg dialog
-CString Range_Units[14] = {
-	_T("RAW DATA"),
-	_T("10K C"),
-	_T("10K F"),
-	_T("0-100%"),
-	_T("ON/OFF"),
-	_T("OFF/ON"),
-	_T("Pulse Input"),
-	_T("Lighting Control"),
-	_T("TYPE3 10K C"),
-	_T("TYPE3 10K F"),
-	_T("NO USE"),
-	_T("0-5V"),
-	_T("0-10V"),
-	_T("0-20 ma")
-};
+#define  WM_T3_RANGE WM_USER + 3301
 class CT3RangeDlg : public CDialog
 {
 	DECLARE_DYNAMIC(CT3RangeDlg)
@@ -41,5 +26,11 @@ public:
 	int m_current_range;
 	int m_input_Analog_select; 
 	virtual BOOL OnInitDialog();
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	void Initial_window();
+	afx_msg void OnBnClickedClick_Radio();
+	 
+ 
+	afx_msg void OnEnKillfocusEditRangeSelect();
 };

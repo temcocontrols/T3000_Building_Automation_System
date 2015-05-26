@@ -53,6 +53,7 @@ public:
 
  
 	afx_msg void OnBnClickedButton_Change_ID();
+	afx_msg void OnBnClickedButton_Graphic();
 	afx_msg void OnBnClickedButton_Factory_Reset();
 
 	afx_msg void OnBnClickedButton_UserTable_Add();
@@ -63,7 +64,7 @@ public:
 	afx_msg void OnCbnSelchangeComboBacklight();
 
  
-
+	 void ShowChecks();
 	afx_msg void OnBnClickedUser();
 	afx_msg void OnBnClickedDefault();
 	 
@@ -81,10 +82,10 @@ public:
 	 
  
  
-	void ShowChecks();
+	
 
 	void InitChartData();
-
+ 
 
 
 	void InitChartCtrl();
@@ -301,6 +302,7 @@ private: //画图所需要的数据
 	short User_Ydata[10];
 	short Factory_Xdata[10];
 	short Factory_Ydata[10];
+
 
 public:
 	CChartCtrl m_ChartCtrl;

@@ -338,13 +338,13 @@ CString StrTemp;
 	 {
 	  AMValue.BOOLRegValue[i]=FALSE;
 	 }
-	 AMValue.RegValue=product_register_value[MODBUS_OUTPUT_CALIBRATION_AUTO_MANUAL];
+	   AMValue.RegValue=product_register_value[MODBUS_OUTPUT_CALIBRATION_AUTO_MANUAL];
 	   m_combox_am1.SetCurSel(AMValue.BOOLRegValue[0]);
 	   m_combox_am3.SetCurSel(AMValue.BOOLRegValue[0]);
 	   m_combox_am2.SetCurSel(AMValue.BOOLRegValue[1]);
 	   m_combox_am4.SetCurSel(AMValue.BOOLRegValue[1]);
 	     
-       float offsetvalue,Vtemp,Vhum;
+	   float offsetvalue,Vtemp,Vhum;
 	   float Temp,HUM;
 	   offsetvalue=((float)((short)product_register_value[MODBUS_OUTPUT_TEMP_SENSOR_RANGE]));
 	   if (AMValue.BOOLRegValue[0]==0)//Auto
@@ -374,7 +374,7 @@ CString StrTemp;
 	   {   
 		   if (product_register_value[MODBUS_OUTPUT1_SCALE]==1)
 		   {
-		       Temp=((float)((short)product_register_value[MODBUS_TEMPRATURE_CHIP]));
+			   Temp=((float)((short)product_register_value[MODBUS_TEMPRATURE_CHIP]));
 			   Vtemp=(Temp+offsetvalue)/100;
 			   if (Vtemp>10)
 			   {
@@ -388,7 +388,7 @@ CString StrTemp;
 		   }
 		   else if (product_register_value[MODBUS_OUTPUT1_SCALE]==2)
 		   {
-		      Temp=((float)((short)product_register_value[MODBUS_TEMPRATURE_CHIP]));
+			   Temp=((float)((short)product_register_value[MODBUS_TEMPRATURE_CHIP]));
 			   Vtemp=(Temp+offsetvalue)/200;
 			   if (Vtemp>5)
 			   {
@@ -486,6 +486,10 @@ CString StrTemp;
 	   }
 
 	    m_edit_temp_signal.SetWindowTextW(StrTemp);
+
+
+
+
 		CString humsignal;
 	   if (AMValue.BOOLRegValue[1]==0)
 	   {

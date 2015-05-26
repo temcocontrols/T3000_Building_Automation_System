@@ -76,29 +76,29 @@ int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsig
 
 A wrapper for modbus_read_one_value which returns BOTH read value and error flag
 
-  @param[in]   device_var	the modbus device address
-  @param[in]   address		the offset of the value to be read in the device
-  @param[in]   retry_times	the number of times to retry on read failure before giving up
+@param[in]   device_var	the modbus device address
+@param[in]   address		the offset of the value to be read in the device
+@param[in]   retry_times	the number of times to retry on read failure before giving up
 
-  @return -1, -2, -3 on error, otherwise value read cast to integer
+@return -1, -2, -3 on error, otherwise value read cast to integer
 
-  This interface is provided for compatibility with existing code.
-  New code should use modbus_read_one_value() directly,
-  since it returns a separate error flag and read value -
-  allowing simpler, more easily understood calling code design.
- CString* pstrInfo = new CString(strInfo);
+This interface is provided for compatibility with existing code.
+New code should use modbus_read_one_value() directly,
+since it returns a separate error flag and read value -
+allowing simpler, more easily understood calling code design.
+CString* pstrInfo = new CString(strInfo);
 */
 
 int read_one(unsigned char device_var,unsigned short address,int retry_times)
 {
-    CString g_strT3000LogString;
+	CString g_strT3000LogString;
 	int value;
 	int j = modbus_read_one_value( value, device_var, address, retry_times );
 	if (j>0)
 	{
-		  g_strT3000LogString.Format(_T("Read One ID=%d,address=%d,result=%d,Status=OK"),device_var,address,j);
-		   CString* pstrInfo = new CString(g_strT3000LogString); 
-		 ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
+		g_strT3000LogString.Format(_T("Read One ID=%d,address=%d,result=%d,Status=OK"),device_var,address,j);
+		CString* pstrInfo = new CString(g_strT3000LogString); 
+		::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
 	}
 	else
 	{
@@ -106,7 +106,7 @@ int read_one(unsigned char device_var,unsigned short address,int retry_times)
 		CString* pstrInfo = new CString(g_strT3000LogString); 
 		::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
 	}
-	 //SetPaneString(3,g_strT3000LogString);
+	//SetPaneString(3,g_strT3000LogString);
 	if( j != 0 ) {
 		// there was an error, so return the error flag
 		return j;
@@ -132,20 +132,20 @@ int g_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bComm_Ty
 	g_bEnableRefreshTreeView = false;
 	int j=-1;
 	// ensure no other threads attempt to access modbus communications
-		CSingleLock singleLock(&register_critical_section);
-		singleLock.Lock();
-		// call the modbus DLL method
-		j=CheckTstatOnline_a(devLo,devHi,bComm_Type);
-		// free the modbus communications for other threads
-		singleLock.Unlock();
-		// increment the number of transmissions we have done
-		g_llTxCount++;
-		// check for other errors
-		// increment the number or replies we have received
-		if (j!=-1&&j!=-4)
-		{
-			g_llRxCount++;
-		}
+	CSingleLock singleLock(&register_critical_section);
+	singleLock.Lock();
+	// call the modbus DLL method
+	j=CheckTstatOnline_a(devLo,devHi,bComm_Type);
+	// free the modbus communications for other threads
+	singleLock.Unlock();
+	// increment the number of transmissions we have done
+	g_llTxCount++;
+	// check for other errors
+	// increment the number or replies we have received
+	if (j!=-1&&j!=-4)
+	{
+		g_llRxCount++;
+	}
 	// check for running in the main GUI thread
 	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
 
@@ -199,21 +199,21 @@ int g_NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi,
 	g_bEnableRefreshTreeView |= EnableRefreshTreeView_original_value;
 	return j;
 }
- 
+
 void SetPaneString(int nIndext,CString str)
 {
-	
+
 	CMFCStatusBar * pStatusBar=NULL;
 	if(AfxGetMainWnd()->GetActiveWindow()==NULL)//if this function is called by a thread ,return 
 		return;
 	pStatusBar = (CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR);
 	pStatusBar->SetPaneText(nIndext,str.GetString());
 	pStatusBar->SetPaneTextColor (nIndext, RGB(0,0,0));
-  	if (nIndext==3)
-  	{
-  		pStatusBar->SetPaneTextColor (nIndext, RGB(255,255,255));
-  		pStatusBar->SetPaneBackgroundColor(nIndext,RGB(42,58,87));
-  	}
+	if (nIndext==3)
+	{
+		pStatusBar->SetPaneTextColor (nIndext, RGB(255,255,255));
+		pStatusBar->SetPaneBackgroundColor(nIndext,RGB(42,58,87));
+	}
 }
 int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
 {
@@ -221,14 +221,14 @@ int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short 
 	g_bEnableRefreshTreeView = FALSE;
 	int j = Write_Multi_org(device_var, to_write, start_address, length, retry_times);
 	g_bEnableRefreshTreeView |= bTemp;
- 	CString data;
+	CString data;
 	CString g_strT3000LogString;
- 	for (int i=0;i<length;i++)
- 	{
- 		CString strTemp;
- 		strTemp.Format(_T("%d "),to_write[i]);
- 		data+=strTemp;
- 	}
+	for (int i=0;i<length;i++)
+	{
+		CString strTemp;
+		strTemp.Format(_T("%d "),to_write[i]);
+		data+=strTemp;
+	}
 	if (j>0)
 	{
 		g_strT3000LogString.Format(_T("Multi Write ID=%d,start address=%d,length=%d,Status=OK"),device_var,start_address,length,data.GetBuffer());
@@ -274,9 +274,9 @@ int Write_Multi_short(unsigned char device_var,unsigned short *to_write,unsigned
 }
 int Write_Multi_org(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,int retry_times)
 {
-// 	CString str;
-// 	str.Format(_T("ID :%d Multi writing start :%d Amount: %d"),device_var,start_address,length);
-// 	SetPaneString(2,str);
+	// 	CString str;
+	// 	str.Format(_T("ID :%d Multi writing start :%d Amount: %d"),device_var,start_address,length);
+	// 	SetPaneString(2,str);
 	int j=0;
 	for(int i=0;i<retry_times;i++)
 	{
@@ -336,25 +336,25 @@ int Write_Multi_org_short(unsigned char device_var,unsigned short *to_write,unsi
 }
 /**
 
-  Read multiple values from a modbus device
+Read multiple values from a modbus device
 
-  @param[out]  put_data_into_here	the values read
-  @param[in]   device_var			the modbus device address
-  @param[in]   start_address		the offset of thefirt value to be read in the device
-  @param[in]   length				number of values to be read
-  @param[in]   retry_times			the number of times to retry on read failure before giving up
+@param[out]  put_data_into_here	the values read
+@param[in]   device_var			the modbus device address
+@param[in]   start_address		the offset of thefirt value to be read in the device
+@param[in]   length				number of values to be read
+@param[in]   retry_times			the number of times to retry on read failure before giving up
 
-  @return  0 if there were no errors
+@return  0 if there were no errors
 
-  This does NOT lock the register_critical_section
+This does NOT lock the register_critical_section
 
-  This is a wrapper for modbus_read_multi_value
-  It is provided for compatibility with existing code.
-  New code should use modbus_read_multi_value() directly.
+This is a wrapper for modbus_read_multi_value
+It is provided for compatibility with existing code.
+New code should use modbus_read_multi_value() directly.
 
-  This does NOT lock the critical section.
+This does NOT lock the critical section.
 
-  */
+*/
 //extern int modbus_read_multi_value( 
 //	unsigned short *put_data_into_here,
 //	unsigned char device_var,
@@ -363,35 +363,35 @@ int Write_Multi_org_short(unsigned char device_var,unsigned short *to_write,unsi
 //	int retry_times );
 int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times)
 {
-	 int ret=modbus_read_multi_value(
+	int ret=modbus_read_multi_value(
 		put_data_into_here,
 		device_var,
 		start_address,
 		length,
 		retry_times );
-	 CString data;
-	 CString g_strT3000LogString;
-	 for (int i=0;i<length;i++)
-	 {
-		 CString strTemp;
-		 strTemp.Format(_T("%d"),put_data_into_here[i]);
-		 data+=strTemp;
-	 }
-	 if (ret>0)
-	 {
-		 g_strT3000LogString.Format(_T("Multi Read ID=%d,start address=%d,length=%d,Status=OK"),device_var,start_address,length,data.GetBuffer());
-		 CString* pstrInfo = new CString(g_strT3000LogString); 
-		 ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
-		 
-	 }
-	 else
-	 {
-		 g_strT3000LogString.Format(_T("Multi Read ID=%d,start address=%d,length=%d,Status:Fail"),device_var,start_address,length);
-		 CString* pstrInfo = new CString(g_strT3000LogString); 
-		 ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
-	 }
+	CString data;
+	CString g_strT3000LogString;
+	for (int i=0;i<length;i++)
+	{
+		CString strTemp;
+		strTemp.Format(_T("%d"),put_data_into_here[i]);
+		data+=strTemp;
+	}
+	if (ret>0)
+	{
+		g_strT3000LogString.Format(_T("Multi Read ID=%d,start address=%d,length=%d,Status=OK"),device_var,start_address,length,data.GetBuffer());
+		CString* pstrInfo = new CString(g_strT3000LogString); 
+		::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
+
+	}
+	else
+	{
+		g_strT3000LogString.Format(_T("Multi Read ID=%d,start address=%d,length=%d,Status:Fail"),device_var,start_address,length);
+		CString* pstrInfo = new CString(g_strT3000LogString); 
+		::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
+	}
 	// SetPaneString(3,g_strT3000LogString);
-	 return ret;
+	return ret;
 }
 
 
@@ -428,7 +428,7 @@ int turn_hex_str_to_ten_num(char *source)
 			case 'D':k=13;break;
 			case 'E':k=14;break;
 			case 'F':k=15;break;
-			
+
 			default:return -1;
 			}
 			for( ;j<2-i-1;j++)
@@ -441,41 +441,41 @@ int turn_hex_str_to_ten_num(char *source)
 			i--;
 		}
 		l+=k;
-	return l;
+		return l;
 }
 
 int turn_hex_char_to_int(char c)
 {
-		int k=0;
-		switch(c)
-		{
-		case '0':k=0;break;
-		case '1':k=1;break;
-		case '2':k=2;break;
-		case '3':k=3;break;
-		case '4':k=4;break;
-		case '5':k=5;break;
-		case '6':k=6;break;
-		case '7':k=7;break;
-		case '8':k=8;break;
-		case '9':k=9;break;
+	int k=0;
+	switch(c)
+	{
+	case '0':k=0;break;
+	case '1':k=1;break;
+	case '2':k=2;break;
+	case '3':k=3;break;
+	case '4':k=4;break;
+	case '5':k=5;break;
+	case '6':k=6;break;
+	case '7':k=7;break;
+	case '8':k=8;break;
+	case '9':k=9;break;
 
-		case 'a':k=10;break;
-		case 'b':k=11;break;
-		case 'c':k=12;break;
-		case 'd':k=13;break;
-		case 'e':k=14;break;
-		case 'f':k=15;break;
-		case 'A':k=10;break;
-		case 'B':k=11;break;
-		case 'C':k=12;break;
-		case 'D':k=13;break;
-		case 'E':k=14;break;
-		case 'F':k=15;break;
+	case 'a':k=10;break;
+	case 'b':k=11;break;
+	case 'c':k=12;break;
+	case 'd':k=13;break;
+	case 'e':k=14;break;
+	case 'f':k=15;break;
+	case 'A':k=10;break;
+	case 'B':k=11;break;
+	case 'C':k=12;break;
+	case 'D':k=13;break;
+	case 'E':k=14;break;
+	case 'F':k=15;break;
 
-		default: return -1;//2
-		}
-		return k;
+	default: return -1;//2
+	}
+	return k;
 }
 
 bool turn_hex_file_line_to_unsigned_char(char *str)
@@ -521,7 +521,7 @@ float get_tstat_version(unsigned short tstat_id)
 {//get tstat version and judge the tstat is online or no
 	//tstat is online ,return >0
 	//tstat is not online ,return -2
-	
+
 	float tstat_version2=(float)product_register_value[4];//tstat version			
 	if(tstat_version2==-2 || tstat_version2==-3)
 		return tstat_version2;
@@ -583,7 +583,7 @@ bool get_serialnumber(long & serial,int the_id_of_product)
 		serial=SerialNum[0]+SerialNum[1]*256+SerialNum[2]*256*256+SerialNum[3]*256*256*256;
 		return TRUE;
 	}
-		return FALSE;
+	return FALSE;
 }
 
 
@@ -630,7 +630,7 @@ bool can_be_writed_hex_file(int product_model,int hex_file_product_model)
 	//Tstat5D-------------12
 	//Solar---------------30
 	//hex_file_product_model parameter is the hex_file_register 0x100 (256)
-//	if (product_model==18||product_model==17)
+	//	if (product_model==18||product_model==17)
 	{
 		return true;
 	}
@@ -928,7 +928,7 @@ CString get_product_class_name_by_model_ID(int nModelID)
 	case 16:strClassName=g_strTstat5e;break;
 	case 19:strClassName=g_strTstat5h;break;
 	case PM_LightingController: strClassName = g_strLightingCtrl;
-	
+
 	case 13:
 	case 14:break;
 	default:strClassName=g_strTstat5a;break;
@@ -965,20 +965,20 @@ BOOL GetSerialComPortNumber1(vector<CString>& szComm)
 
 			lpcchValueName = MAX_PATH; 
 			//lpValueName[0] = '\0'; 
-			
+
 			CString strValueName= CString(lpValueName);
-		
+
 			WCHAR ch[MAX_PATH];
 			ZeroMemory(ch, MAX_PATH);
 			memcpy(ch, lpData, lpcbData);
 			CString str = CString(ch);
 			szComm.push_back(str);
 
-            if(strValueName.Find(_T("USBSER")) >=0)
+			if(strValueName.Find(_T("USBSER")) >=0)
 			{
-                DFTrace(_T("Find USB Serial Port!"));
-                USB_Serial = str;
-            }
+				DFTrace(_T("Find USB Serial Port!"));
+				USB_Serial = str;
+			}
 
 			ZeroMemory(lpData, MAX_PATH);
 			lpcbData = MAX_PATH;
@@ -1113,7 +1113,7 @@ BOOL Post_Thread_Message(UINT MsgType,
 		Change_Color_ID.push_back(CTRL_ID);
 	else
 		return FALSE;
-	
+
 	if(!PostThreadMessage(nThreadID,MY_WRITE_ONE,(WPARAM)My_Write_Struct,NULL))//post thread msg
 	{
 		return FALSE;
@@ -1261,14 +1261,14 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case WRITEUNIT_T3000:
 		entitysize = sizeof(Str_Units_element);
 		break;
-	//case WRITEPROGRAMCODE_T3000:
-	//	entitysize = program_code_length[start_instance];
-	//	
-	//	//m_Program_data.at(program_list_line).bytes = my_lengthcode -7;
-	//	//entitysize = my_lengthcode;
-	//	if((entitysize<0)||(entitysize>400))
-	//		entitysize = 0;
-	//	break;
+		//case WRITEPROGRAMCODE_T3000:
+		//	entitysize = program_code_length[start_instance];
+		//	
+		//	//m_Program_data.at(program_list_line).bytes = my_lengthcode -7;
+		//	//entitysize = my_lengthcode;
+		//	if((entitysize<0)||(entitysize>400))
+		//		entitysize = 0;
+		//	break;
 	case WRITEVARIABLE_T3000:
 		entitysize = sizeof(Str_variable_point);
 		break;
@@ -1318,7 +1318,7 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 			TRACE(_T("Entitysize length error!"));
 			break;
 		}
-		
+
 	}
 	Str_user_data_header private_data_chunk;
 	private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + (end_instance - start_instance + 1)*entitysize;
@@ -1375,25 +1375,25 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 			memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,entitysize,m_at_read_buf,entitysize);
 		}
 		break;
-	//case WRITEPROGRAMCODE_T3000:
-	//	{
- //		//memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,entitysize,mycode,my_lengthcode);
-	//	memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,entitysize,program_code[start_instance],entitysize);
-	//
-	//	CString n_temp_print;
-	//	n_temp_print.Format(_T("Tx : "));
-	//	CString temp_char;
-	//	char * temp_print = SendBuffer;
-	//	for (int i = 0; i< entitysize + 2 ; i++)
-	//	{
-	//		temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
-	//		temp_char.MakeUpper();
-	//		temp_print ++;
-	//		n_temp_print = n_temp_print + temp_char + _T(" ");
-	//	}
-	//	DFTrace(n_temp_print);
-	//	}
-	//	break;
+		//case WRITEPROGRAMCODE_T3000:
+		//	{
+		//		//memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,entitysize,mycode,my_lengthcode);
+		//	memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,entitysize,program_code[start_instance],entitysize);
+		//
+		//	CString n_temp_print;
+		//	n_temp_print.Format(_T("Tx : "));
+		//	CString temp_char;
+		//	char * temp_print = SendBuffer;
+		//	for (int i = 0; i< entitysize + 2 ; i++)
+		//	{
+		//		temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
+		//		temp_char.MakeUpper();
+		//		temp_print ++;
+		//		n_temp_print = n_temp_print + temp_char + _T(" ");
+		//	}
+		//	DFTrace(n_temp_print);
+		//	}
+		//	break;
 	case WRITEVARIABLE_T3000:
 		for (int i=0;i<(end_instance-start_instance + 1);i++)
 		{
@@ -1422,7 +1422,7 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 				*(temp_buffer++) = m_Schedual_Time_data.at(start_instance).Schedual_Day_Time[i][j].time_hours;// = *(my_temp_point ++);
 			}
 		}
-		
+
 		break;
 	case  WRITEANNUALROUTINE_T3000:
 		for (int i=0;i<(end_instance-start_instance + 1);i++)
@@ -1581,7 +1581,7 @@ int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t ns
 				else
 					continue;
 			}
-			
+
 
 		}
 	}
@@ -1612,9 +1612,9 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
 	int private_data_len = 0;	
 	unsigned max_apdu = 0;
 	BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
-//	BACNET_APPLICATION_DATA_VALUE test_data_value = { 0 };
+	//	BACNET_APPLICATION_DATA_VALUE test_data_value = { 0 };
 	BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
-//	BACNET_PRIVATE_TRANSFER_DATA test_data = { 0 };
+	//	BACNET_PRIVATE_TRANSFER_DATA test_data = { 0 };
 	bool status = false;
 
 	private_data.vendorID = BACNET_VENDOR_ID;
@@ -1641,9 +1641,9 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
 #ifndef test_ptp
 	status = address_get_by_device(deviceid, &max_apdu, &dest);
 	if (status) 
-	//if (1) 
+		//if (1) 
 	{
-		
+
 		return Send_ConfirmedPrivateTransfer(&dest,&private_data);
 		//return g_invoke_id;
 	}
@@ -1651,9 +1651,9 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
 		return -2;
 #endif
 
-//#ifdef test_ptp
-//	return Send_ConfirmedPrivateTransfer(&dest,&private_data);
-//#endif
+	//#ifdef test_ptp
+	//	return Send_ConfirmedPrivateTransfer(&dest,&private_data);
+	//#endif
 }
 
 
@@ -1823,7 +1823,7 @@ bool Check_Label_Exsit(LPCTSTR m_new_label)
 			return true;
 		}
 	}
-	
+
 	for (int i=0;i<BAC_VARIABLE_ITEM_COUNT;i++)
 	{
 		if(strcmp(cTemp1,(char *)m_Variable_data.at(i).label) == 0)
@@ -1896,9 +1896,9 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 
 
 	int iLen;   /* Index to current location in data */
-//	uint32_t uiErrorCode;
-//	char cBlockNumber;
-//	uint32_t ulTemp;
+	//	uint32_t uiErrorCode;
+	//	char cBlockNumber;
+	//	uint32_t ulTemp;
 	int tag_len;
 	uint8_t tag_number;
 	uint32_t len_value_type;
@@ -2085,7 +2085,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 				if(strlen(my_temp_point)>STR_OUT_DESCRIPTION_LENGTH)
 					memset(m_Output_data.at(i).description,0,STR_OUT_DESCRIPTION_LENGTH);
 				else
-				memcpy_s( m_Output_data.at(i).description,STR_OUT_DESCRIPTION_LENGTH,my_temp_point,STR_OUT_DESCRIPTION_LENGTH);
+					memcpy_s( m_Output_data.at(i).description,STR_OUT_DESCRIPTION_LENGTH,my_temp_point,STR_OUT_DESCRIPTION_LENGTH);
 				my_temp_point=my_temp_point + STR_OUT_DESCRIPTION_LENGTH;
 				if(strlen(my_temp_point)>STR_OUT_LABEL)
 					memset(m_Output_data.at(i).label,0,STR_OUT_LABEL);
@@ -2156,7 +2156,7 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 			//m_Input_data.clear();
 			for (i=start_instance;i<=end_instance;i++)
 			{
-			//	Str_in_point temp_in;
+				//	Str_in_point temp_in;
 				if(strlen(my_temp_point) > STR_IN_DESCRIPTION_LENGTH)
 					memset(m_Input_data.at(i).description,0,STR_IN_DESCRIPTION_LENGTH);
 				else
@@ -2261,8 +2261,8 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 				m_Variable_data.at(i).value = temp_struct_value;
 				//memcpy_s(Private_data[i].value,4,temp_struct_value,4);
 				my_temp_point=my_temp_point+4;
-				
-				
+
+
 				m_Variable_data.at(i).auto_manual = *(my_temp_point++);
 				m_Variable_data.at(i).digital_analog = *(my_temp_point++);
 				m_Variable_data.at(i).control = *(my_temp_point++);
@@ -2321,41 +2321,41 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 		break;
 	case READANNUALROUTINE_T3000  :
 		{
-		if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_annual_routine_point))!=0)
-			return -1;	//得到的结构长度错误;
-		block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_annual_routine_point);
+			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_annual_routine_point))!=0)
+				return -1;	//得到的结构长度错误;
+			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_annual_routine_point);
 
-		my_temp_point = (char *)Temp_CS.value + 3;
-		start_instance = *my_temp_point;
-		my_temp_point++;
-		end_instance = *my_temp_point;
-		my_temp_point++;
-		my_temp_point = my_temp_point + 2;
-
-		if(start_instance >= BAC_ANNUAL_ROUTINES_COUNT)
-			return -1;//超过长度了;
-
-		for (i=start_instance;i<=end_instance;i++)
-		{
-			//Str_program_point temp_in;
-			if(strlen(my_temp_point) > STR_ANNUAL_DESCRIPTION_LENGTH)
-				memset(m_Annual_data.at(i).description,0,STR_ANNUAL_DESCRIPTION_LENGTH);
-			else
-				memcpy_s( m_Annual_data.at(i).description,STR_ANNUAL_DESCRIPTION_LENGTH,my_temp_point,STR_ANNUAL_DESCRIPTION_LENGTH);
-			my_temp_point=my_temp_point + STR_ANNUAL_DESCRIPTION_LENGTH;
-
-			if(strlen(my_temp_point) > STR_ANNUAL_DESCRIPTION_LENGTH)
-				memset(m_Annual_data.at(i).label,0,STR_ANNUAL_DESCRIPTION_LENGTH);
-			else
-				memcpy_s( m_Annual_data.at(i).label,STR_ANNUAL_LABEL_LENGTH ,my_temp_point,STR_ANNUAL_LABEL_LENGTH );
-			my_temp_point=my_temp_point + STR_ANNUAL_LABEL_LENGTH ;
-
-
-			m_Annual_data.at(i).value = (unsigned char)(*(my_temp_point++));
-			m_Annual_data.at(i).auto_manual = (unsigned char)(*(my_temp_point++));
+			my_temp_point = (char *)Temp_CS.value + 3;
+			start_instance = *my_temp_point;
 			my_temp_point++;
-		}
-		return READANNUALROUTINE_T3000;
+			end_instance = *my_temp_point;
+			my_temp_point++;
+			my_temp_point = my_temp_point + 2;
+
+			if(start_instance >= BAC_ANNUAL_ROUTINES_COUNT)
+				return -1;//超过长度了;
+
+			for (i=start_instance;i<=end_instance;i++)
+			{
+				//Str_program_point temp_in;
+				if(strlen(my_temp_point) > STR_ANNUAL_DESCRIPTION_LENGTH)
+					memset(m_Annual_data.at(i).description,0,STR_ANNUAL_DESCRIPTION_LENGTH);
+				else
+					memcpy_s( m_Annual_data.at(i).description,STR_ANNUAL_DESCRIPTION_LENGTH,my_temp_point,STR_ANNUAL_DESCRIPTION_LENGTH);
+				my_temp_point=my_temp_point + STR_ANNUAL_DESCRIPTION_LENGTH;
+
+				if(strlen(my_temp_point) > STR_ANNUAL_DESCRIPTION_LENGTH)
+					memset(m_Annual_data.at(i).label,0,STR_ANNUAL_DESCRIPTION_LENGTH);
+				else
+					memcpy_s( m_Annual_data.at(i).label,STR_ANNUAL_LABEL_LENGTH ,my_temp_point,STR_ANNUAL_LABEL_LENGTH );
+				my_temp_point=my_temp_point + STR_ANNUAL_LABEL_LENGTH ;
+
+
+				m_Annual_data.at(i).value = (unsigned char)(*(my_temp_point++));
+				m_Annual_data.at(i).auto_manual = (unsigned char)(*(my_temp_point++));
+				my_temp_point++;
+			}
+			return READANNUALROUTINE_T3000;
 		}
 		break;
 	case READPROGRAM_T3000:
@@ -2390,13 +2390,13 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 				else
 					memcpy_s( m_Program_data.at(i).label,STR_PROGRAM_LABEL_LENGTH ,my_temp_point,STR_PROGRAM_LABEL_LENGTH );
 				my_temp_point=my_temp_point + STR_PROGRAM_LABEL_LENGTH ;
-				 m_Program_data.at(i).bytes	= ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
-				 my_temp_point = my_temp_point + 2;
-				 m_Program_data.at(i).on_off = *(my_temp_point++);
-				 m_Program_data.at(i).auto_manual = *(my_temp_point++);
-				 m_Program_data.at(i).com_prg = *(my_temp_point++);
-				 m_Program_data.at(i).errcode = *(my_temp_point++);
-				 m_Program_data.at(i).unused = *(my_temp_point++);
+				m_Program_data.at(i).bytes	= ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point + 2;
+				m_Program_data.at(i).on_off = *(my_temp_point++);
+				m_Program_data.at(i).auto_manual = *(my_temp_point++);
+				m_Program_data.at(i).com_prg = *(my_temp_point++);
+				m_Program_data.at(i).errcode = *(my_temp_point++);
+				m_Program_data.at(i).unused = *(my_temp_point++);
 				//m_Program_data.push_back(temp_in);
 			}
 			return READPROGRAM_T3000;
@@ -2467,38 +2467,38 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 				return -1;
 			int code_length = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
 			//my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
-			
-				if(package == 0)
-				{
-					program_code_length[start_instance] = ((unsigned char)my_temp_point[1])*256 + (unsigned char)my_temp_point[0];
-					if(program_code_length[start_instance] > 2000)
-						program_code_length[start_instance] = 0;
-					TRACE(_T("program_code_length%d = %d   [1] = %d [0] = %d \r\n"),start_instance,program_code_length[start_instance],(unsigned char)my_temp_point[1],(unsigned char)my_temp_point[0]);
-				}
-				else if(package == 4)
-					end_flag = true;
-				memset(mycode + package*400 ,0,400);
 
-				memcpy_s(mycode + package*400 ,400 ,my_temp_point,400);
-				unsigned char * temp_point = (program_code[start_instance]) + package*400;
-				memcpy_s((program_code[start_instance]) + package*400,400,my_temp_point,400);
-				//program_code_length[start_instance] = 400;
+			if(package == 0)
+			{
+				program_code_length[start_instance] = ((unsigned char)my_temp_point[1])*256 + (unsigned char)my_temp_point[0];
+				if(program_code_length[start_instance] > 2000)
+					program_code_length[start_instance] = 0;
+				TRACE(_T("program_code_length%d = %d   [1] = %d [0] = %d \r\n"),start_instance,program_code_length[start_instance],(unsigned char)my_temp_point[1],(unsigned char)my_temp_point[0]);
+			}
+			else if(package == 4)
+				end_flag = true;
+			memset(mycode + package*400 ,0,400);
 
-				CString n_temp_print;
-				n_temp_print.Format(_T("Rx : "));
-				CString temp_char;
-				char * temp_print = (char *)Temp_CS.value;
-				for (int i = 0; i< len_value_type ; i++)
-				{
-					temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
-					temp_char.MakeUpper();
-					temp_print ++;
-					n_temp_print = n_temp_print + temp_char + _T(" ");
-				}
-				DFTrace(n_temp_print);
-		
-			
-		return READPROGRAMCODE_T3000;
+			memcpy_s(mycode + package*400 ,400 ,my_temp_point,400);
+			unsigned char * temp_point = (program_code[start_instance]) + package*400;
+			memcpy_s((program_code[start_instance]) + package*400,400,my_temp_point,400);
+			//program_code_length[start_instance] = 400;
+
+			CString n_temp_print;
+			n_temp_print.Format(_T("Rx : "));
+			CString temp_char;
+			char * temp_print = (char *)Temp_CS.value;
+			for (int i = 0; i< len_value_type ; i++)
+			{
+				temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
+				temp_char.MakeUpper();
+				temp_print ++;
+				n_temp_print = n_temp_print + temp_char + _T(" ");
+			}
+			DFTrace(n_temp_print);
+
+
+			return READPROGRAMCODE_T3000;
 		}
 		break;
 	case  READTIMESCHEDULE_T3000:
@@ -2552,169 +2552,169 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 		break;
 	case  TIME_COMMAND:
 		{
-		block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
-		my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
-		if(block_length!=sizeof(Time_block_mini))
-			return -1;
-		Device_time.ti_sec = *(my_temp_point ++);
-		Device_time.ti_min = *(my_temp_point ++);
-		Device_time.ti_hour = *(my_temp_point ++);
-		Device_time.dayofmonth = *(my_temp_point ++);
-		Device_time.dayofweek = *(my_temp_point ++);
-		Device_time.month = *(my_temp_point ++);
-		Device_time.year = *(my_temp_point ++);
-		
-		
-
-		//temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-		//Device_time.dayofyear = temp_struct_value;
-		//my_temp_point = my_temp_point + 4;
-
-		temp_struct_value = ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-		Device_time.dayofyear = temp_struct_value;
-		my_temp_point = my_temp_point + 2;
-
-		Device_time.isdst = *(my_temp_point ++);
-
-		if(Device_time.ti_sec>=60)
-			Device_time.ti_sec=0;
-		if(Device_time.ti_min>=60)
-			Device_time.ti_min=0;
-		if(Device_time.ti_hour>=24)
-			Device_time.ti_hour=0;
-		if((Device_time.dayofmonth>=32)||(Device_time.dayofmonth==0))
-			Device_time.dayofmonth=1;
-		if((Device_time.month>12) || (Device_time.month == 0))
-			Device_time.month = 1;
-		if((Device_time.year>50))
-			Device_time.year = 13;
-		if((Device_time.dayofweek >7) || (Device_time.dayofweek == 0))
-			Device_time.dayofweek = 1;
-		if((Device_time.dayofyear >366) || (Device_time.dayofyear == 0))
-			Device_time.dayofyear = 1;
-		//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,NULL,NULL);
-		//byte  ti_min;         // 0-59
-		//byte  ti_hour;           // 0-23
-		//byte  dayofmonth;   // 1-31
-		//byte  month;          // 0-11
-		//byte  year;           // year - 1900
-		//byte  dayofweek;        // 0-6 ; 0=Sunday
-		//int   dayofyear;    // 0-365 gmtime
-		//signed char isdst;
+			block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
+			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+			if(block_length!=sizeof(Time_block_mini))
+				return -1;
+			Device_time.ti_sec = *(my_temp_point ++);
+			Device_time.ti_min = *(my_temp_point ++);
+			Device_time.ti_hour = *(my_temp_point ++);
+			Device_time.dayofmonth = *(my_temp_point ++);
+			Device_time.dayofweek = *(my_temp_point ++);
+			Device_time.month = *(my_temp_point ++);
+			Device_time.year = *(my_temp_point ++);
 
 
-		return TIME_COMMAND;
+
+			//temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+			//Device_time.dayofyear = temp_struct_value;
+			//my_temp_point = my_temp_point + 4;
+
+			temp_struct_value = ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+			Device_time.dayofyear = temp_struct_value;
+			my_temp_point = my_temp_point + 2;
+
+			Device_time.isdst = *(my_temp_point ++);
+
+			if(Device_time.ti_sec>=60)
+				Device_time.ti_sec=0;
+			if(Device_time.ti_min>=60)
+				Device_time.ti_min=0;
+			if(Device_time.ti_hour>=24)
+				Device_time.ti_hour=0;
+			if((Device_time.dayofmonth>=32)||(Device_time.dayofmonth==0))
+				Device_time.dayofmonth=1;
+			if((Device_time.month>12) || (Device_time.month == 0))
+				Device_time.month = 1;
+			if((Device_time.year>50))
+				Device_time.year = 13;
+			if((Device_time.dayofweek >7) || (Device_time.dayofweek == 0))
+				Device_time.dayofweek = 1;
+			if((Device_time.dayofyear >366) || (Device_time.dayofyear == 0))
+				Device_time.dayofyear = 1;
+			//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,NULL,NULL);
+			//byte  ti_min;         // 0-59
+			//byte  ti_hour;           // 0-23
+			//byte  dayofmonth;   // 1-31
+			//byte  month;          // 0-11
+			//byte  year;           // year - 1900
+			//byte  dayofweek;        // 0-6 ; 0=Sunday
+			//int   dayofyear;    // 0-365 gmtime
+			//signed char isdst;
+
+
+			return TIME_COMMAND;
 		}
 		break;
 	case READCONTROLLER_T3000:
 		{
-		if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_controller_point))!=0)
-			return -1;	//得到的结构长度错误;
-		block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_controller_point);
+			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_controller_point))!=0)
+				return -1;	//得到的结构长度错误;
+			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Str_controller_point);
 
-		my_temp_point = (char *)Temp_CS.value + 3;
-		start_instance = *my_temp_point;
-		my_temp_point++;
-		end_instance = *my_temp_point;
-		my_temp_point++;
-		my_temp_point = my_temp_point + 2;
+			my_temp_point = (char *)Temp_CS.value + 3;
+			start_instance = *my_temp_point;
+			my_temp_point++;
+			end_instance = *my_temp_point;
+			my_temp_point++;
+			my_temp_point = my_temp_point + 2;
 
-		if(start_instance >= BAC_CONTROLLER_COUNT)
-			return -1;//超过长度了;
+			if(start_instance >= BAC_CONTROLLER_COUNT)
+				return -1;//超过长度了;
 
-		if(end_instance == (BAC_CONTROLLER_COUNT - 1))
-			end_flag = true;
+			if(end_instance == (BAC_CONTROLLER_COUNT - 1))
+				end_flag = true;
 
-		for (i=start_instance;i<=end_instance;i++)
-		{
-			m_controller_data.at(i).input.number = *(my_temp_point++);
-			m_controller_data.at(i).input.point_type = *(my_temp_point++);
-			m_controller_data.at(i).input.panel = *(my_temp_point++);
+			for (i=start_instance;i<=end_instance;i++)
+			{
+				m_controller_data.at(i).input.number = *(my_temp_point++);
+				m_controller_data.at(i).input.point_type = *(my_temp_point++);
+				m_controller_data.at(i).input.panel = *(my_temp_point++);
 
-			//这里先加卡关条件，目前暂时不支持 其他panel的Input
-			//if(m_controller_data.at(i).input.number>=BAC_INPUT_ITEM_COUNT)
-			//	m_controller_data.at(i).input.number = 0;
-			//if(m_controller_data.at(i).input.panel != bac_gloab_panel )
-			//	m_controller_data.at(i).input.panel = bac_gloab_panel;
+				//这里先加卡关条件，目前暂时不支持 其他panel的Input
+				//if(m_controller_data.at(i).input.number>=BAC_INPUT_ITEM_COUNT)
+				//	m_controller_data.at(i).input.number = 0;
+				//if(m_controller_data.at(i).input.panel != bac_gloab_panel )
+				//	m_controller_data.at(i).input.panel = bac_gloab_panel;
 
-			temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-			m_controller_data.at(i).input_value = temp_struct_value;
+				temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				m_controller_data.at(i).input_value = temp_struct_value;
 
-			my_temp_point=my_temp_point+4;
-			temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-			m_controller_data.at(i).value = temp_struct_value;
-			my_temp_point=my_temp_point+4;
+				my_temp_point=my_temp_point+4;
+				temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				m_controller_data.at(i).value = temp_struct_value;
+				my_temp_point=my_temp_point+4;
 
-			m_controller_data.at(i).setpoint.number = *(my_temp_point++);
-			m_controller_data.at(i).setpoint.point_type = *(my_temp_point++);
-			m_controller_data.at(i).setpoint.panel = *(my_temp_point++);
+				m_controller_data.at(i).setpoint.number = *(my_temp_point++);
+				m_controller_data.at(i).setpoint.point_type = *(my_temp_point++);
+				m_controller_data.at(i).setpoint.panel = *(my_temp_point++);
 
-			temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-			m_controller_data.at(i).setpoint_value = temp_struct_value;
-			my_temp_point=my_temp_point+4;
+				temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				m_controller_data.at(i).setpoint_value = temp_struct_value;
+				my_temp_point=my_temp_point+4;
 
-			m_controller_data.at(i).units = *(my_temp_point++);
-			m_controller_data.at(i).auto_manual = *(my_temp_point++);
-			m_controller_data.at(i).action = *(my_temp_point++);
-			m_controller_data.at(i).repeats_per_min = *(my_temp_point++);
-			m_controller_data.at(i).sample_time = *(my_temp_point++);
-			m_controller_data.at(i).prop_high = *(my_temp_point++);
-			m_controller_data.at(i).proportional = *(my_temp_point++);
-			m_controller_data.at(i).reset = *(my_temp_point++);
-			m_controller_data.at(i).bias = *(my_temp_point++);
-			m_controller_data.at(i).rate = *(my_temp_point++);
-		}
+				m_controller_data.at(i).units = *(my_temp_point++);
+				m_controller_data.at(i).auto_manual = *(my_temp_point++);
+				m_controller_data.at(i).action = *(my_temp_point++);
+				m_controller_data.at(i).repeats_per_min = *(my_temp_point++);
+				m_controller_data.at(i).sample_time = *(my_temp_point++);
+				m_controller_data.at(i).prop_high = *(my_temp_point++);
+				m_controller_data.at(i).proportional = *(my_temp_point++);
+				m_controller_data.at(i).reset = *(my_temp_point++);
+				m_controller_data.at(i).bias = *(my_temp_point++);
+				m_controller_data.at(i).rate = *(my_temp_point++);
+			}
 
 
 
-		return READCONTROLLER_T3000;
+			return READCONTROLLER_T3000;
 		}
 		break;
 	case READSCREEN_T3000:
 		{
-		if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Control_group_point))!=0)
-			return -1;	
-		block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Control_group_point);
+			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Control_group_point))!=0)
+				return -1;	
+			block_length=(len_value_type - PRIVATE_HEAD_LENGTH)/sizeof(Control_group_point);
 
-		my_temp_point = (char *)Temp_CS.value + 3;
-		start_instance = *my_temp_point;
-		my_temp_point++;
-		end_instance = *my_temp_point;
-		my_temp_point++;
-		my_temp_point = my_temp_point + 2;
-
-		if(start_instance >= BAC_SCREEN_COUNT)
-			return -1;//超过长度了;
-
-		for (i=start_instance;i<=end_instance;i++)
-		{
-			if(strlen(my_temp_point) > STR_SCREEN_DESCRIPTION_LENGTH)
-				memset(m_screen_data.at(i).description,0,STR_SCREEN_DESCRIPTION_LENGTH);
-			else
-				memcpy_s( m_screen_data.at(i).description,STR_SCREEN_DESCRIPTION_LENGTH,my_temp_point,STR_SCREEN_DESCRIPTION_LENGTH);
-			my_temp_point=my_temp_point + STR_SCREEN_DESCRIPTION_LENGTH;
-
-			if(strlen(my_temp_point) > STR_SCREEN_LABLE_LENGTH)
-				memset(m_screen_data.at(i).label,0,STR_SCREEN_LABLE_LENGTH);
-			else
-				memcpy_s( m_screen_data.at(i).label,STR_SCREEN_LABLE_LENGTH ,my_temp_point,STR_SCREEN_LABLE_LENGTH );
-			my_temp_point=my_temp_point + STR_SCREEN_LABLE_LENGTH ;
-
-			if(strlen(my_temp_point) > STR_SCREEN_PIC_FILE_LENGTH)
-				memset(m_screen_data.at(i).picture_file,0,STR_SCREEN_PIC_FILE_LENGTH);
-			else
-				memcpy_s( m_screen_data.at(i).picture_file,STR_SCREEN_PIC_FILE_LENGTH ,my_temp_point,STR_SCREEN_PIC_FILE_LENGTH );
-			my_temp_point=my_temp_point + STR_SCREEN_PIC_FILE_LENGTH ;
-
-			m_screen_data.at(i).update = *(my_temp_point++);
-			m_screen_data.at(i).mode = *(my_temp_point++);
-			m_screen_data.at(i).xcur_grp = *(my_temp_point++);
-			unsigned short temp_ycur_grp;
-			temp_ycur_grp = ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-			m_screen_data.at(i).ycur_grp = temp_ycur_grp;
+			my_temp_point = (char *)Temp_CS.value + 3;
+			start_instance = *my_temp_point;
+			my_temp_point++;
+			end_instance = *my_temp_point;
+			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
-		}
-		return READSCREEN_T3000;
+
+			if(start_instance >= BAC_SCREEN_COUNT)
+				return -1;//超过长度了;
+
+			for (i=start_instance;i<=end_instance;i++)
+			{
+				if(strlen(my_temp_point) > STR_SCREEN_DESCRIPTION_LENGTH)
+					memset(m_screen_data.at(i).description,0,STR_SCREEN_DESCRIPTION_LENGTH);
+				else
+					memcpy_s( m_screen_data.at(i).description,STR_SCREEN_DESCRIPTION_LENGTH,my_temp_point,STR_SCREEN_DESCRIPTION_LENGTH);
+				my_temp_point=my_temp_point + STR_SCREEN_DESCRIPTION_LENGTH;
+
+				if(strlen(my_temp_point) > STR_SCREEN_LABLE_LENGTH)
+					memset(m_screen_data.at(i).label,0,STR_SCREEN_LABLE_LENGTH);
+				else
+					memcpy_s( m_screen_data.at(i).label,STR_SCREEN_LABLE_LENGTH ,my_temp_point,STR_SCREEN_LABLE_LENGTH );
+				my_temp_point=my_temp_point + STR_SCREEN_LABLE_LENGTH ;
+
+				if(strlen(my_temp_point) > STR_SCREEN_PIC_FILE_LENGTH)
+					memset(m_screen_data.at(i).picture_file,0,STR_SCREEN_PIC_FILE_LENGTH);
+				else
+					memcpy_s( m_screen_data.at(i).picture_file,STR_SCREEN_PIC_FILE_LENGTH ,my_temp_point,STR_SCREEN_PIC_FILE_LENGTH );
+				my_temp_point=my_temp_point + STR_SCREEN_PIC_FILE_LENGTH ;
+
+				m_screen_data.at(i).update = *(my_temp_point++);
+				m_screen_data.at(i).mode = *(my_temp_point++);
+				m_screen_data.at(i).xcur_grp = *(my_temp_point++);
+				unsigned short temp_ycur_grp;
+				temp_ycur_grp = ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				m_screen_data.at(i).ycur_grp = temp_ycur_grp;
+				my_temp_point = my_temp_point + 2;
+			}
+			return READSCREEN_T3000;
 		}
 		break;
 	case READMONITOR_T3000:
@@ -2981,44 +2981,44 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
 			temp_struct.device_id	= ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
-			
-			 my_temp_point = my_temp_point +2;
-			 memcpy_s(temp_struct.ipaddress,6,my_temp_point,6);
-			 
+
+			my_temp_point = my_temp_point +2;
+			memcpy_s(temp_struct.ipaddress,6,my_temp_point,6);
+
 			//  temp_struct.panel_number = *(my_temp_point + 3);//Notice
 			// temp_struct.macaddress = *my_temp_point;
-			 my_temp_point = my_temp_point + 6;
-			 temp_struct.serialnumber = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-			 my_temp_point = my_temp_point + 4;
-			 temp_struct.modbus_addr =  *(my_temp_point++);
-			 temp_struct.product_type =  *(my_temp_point++);
-			  temp_struct.panel_number =  *(my_temp_point++);
-			  temp_struct.modbus_port = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
-			  my_temp_point = my_temp_point + 2;
-			  temp_struct.software_version = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
-			  my_temp_point = my_temp_point + 2;
-			  temp_struct.hardware_version =  *(my_temp_point++);
-				temp_struct.m_protocol = *(my_temp_point++);
-			 int find_exsit = false;
-			 TRACE(_T("serialnumber = %d ,modbus_addr = %d , product_type = %d ,ip = %u.%u.%u.%u , instance = %d\r\n"),temp_struct.serialnumber,
-				 temp_struct.modbus_addr,temp_struct.product_type,temp_struct.ipaddress[0],temp_struct.ipaddress[1] ,
-				 temp_struct.ipaddress[2],temp_struct.ipaddress[3],temp_struct.device_id);
-			 for (int x=0;x<(int)m_bac_scan_result_data.size();x++)
-			 {
-				 if(temp_struct.serialnumber == m_bac_scan_result_data.at(x).serialnumber)
-					 find_exsit = true;
-			 }
-			 if(!find_exsit)
-			 {
-				 m_bac_scan_result_data.push_back(temp_struct);
-				 //CTStat_Dev* pTemp = new CTStat_Dev;			
-				 //_ComDeviceInfo* pInfo = new _ComDeviceInfo;
-				 //pInfo->m_pDev = pTemp;
+			my_temp_point = my_temp_point + 6;
+			temp_struct.serialnumber = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+			my_temp_point = my_temp_point + 4;
+			temp_struct.modbus_addr =  *(my_temp_point++);
+			temp_struct.product_type =  *(my_temp_point++);
+			temp_struct.panel_number =  *(my_temp_point++);
+			temp_struct.modbus_port = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
+			my_temp_point = my_temp_point + 2;
+			temp_struct.software_version = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
+			my_temp_point = my_temp_point + 2;
+			temp_struct.hardware_version =  *(my_temp_point++);
+			temp_struct.m_protocol = *(my_temp_point++);
+			int find_exsit = false;
+			TRACE(_T("serialnumber = %d ,modbus_addr = %d , product_type = %d ,ip = %u.%u.%u.%u , instance = %d\r\n"),temp_struct.serialnumber,
+				temp_struct.modbus_addr,temp_struct.product_type,temp_struct.ipaddress[0],temp_struct.ipaddress[1] ,
+				temp_struct.ipaddress[2],temp_struct.ipaddress[3],temp_struct.device_id);
+			for (int x=0;x<(int)m_bac_scan_result_data.size();x++)
+			{
+				if(temp_struct.serialnumber == m_bac_scan_result_data.at(x).serialnumber)
+					find_exsit = true;
+			}
+			if(!find_exsit)
+			{
+				m_bac_scan_result_data.push_back(temp_struct);
+				//CTStat_Dev* pTemp = new CTStat_Dev;			
+				//_ComDeviceInfo* pInfo = new _ComDeviceInfo;
+				//pInfo->m_pDev = pTemp;
 
-				 //pTemp->SetSerialID(temp_struct.serialnumber);
-				 //pTemp->SetDevID(temp_struct.modbus_addr);
-				 //pTemp->SetProductType(temp_struct.product_type);
-			 }
+				//pTemp->SetSerialID(temp_struct.serialnumber);
+				//pTemp->SetDevID(temp_struct.modbus_addr);
+				//pTemp->SetProductType(temp_struct.product_type);
+			}
 		}
 		break;
 	case READTSTAT_T3000:
@@ -3139,35 +3139,35 @@ void new_temp_analog_data_block(unsigned char nmonitor_count,unsigned int receiv
 
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 void local_handler_conf_private_trans_ack(
-    uint8_t * service_request,
-    uint16_t service_len,
-    BACNET_ADDRESS * src,
-    BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data)
+	uint8_t * service_request,
+	uint16_t service_len,
+	BACNET_ADDRESS * src,
+	BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data)
 {
-    BACNET_PRIVATE_TRANSFER_DATA data;
-    int len;
+	BACNET_PRIVATE_TRANSFER_DATA data;
+	int len;
 
-/*
- * Note:
- * We currently don't look at the source address and service data
- * but we probably should to verify that the ack is oneit is what
- * we were expecting. But this is just to silence some compiler
- * warnings from Borland.
- */
-    src = src;
-    service_data = service_data;
+	/*
+	* Note:
+	* We currently don't look at the source address and service data
+	* but we probably should to verify that the ack is oneit is what
+	* we were expecting. But this is just to silence some compiler
+	* warnings from Borland.
+	*/
+	src = src;
+	service_data = service_data;
 
-    len = 0;
+	len = 0;
 #if PRINT_ENABLED
-    printf("Received Confirmed Private Transfer Ack!\n");
+	printf("Received Confirmed Private Transfer Ack!\n");
 #endif
 
-    len = ptransfer_decode_service_request(service_request, service_len, &data);        /* Same decode for ack as for service request! */
-    if (len < 0) {
+	len = ptransfer_decode_service_request(service_request, service_len, &data);        /* Same decode for ack as for service request! */
+	if (len < 0) {
 #if PRINT_ENABLED
-        printf("cpta: Bad Encoding!\n");
+		printf("cpta: Bad Encoding!\n");
 #endif
-    }
+	}
 	int receive_data_type;
 	bool each_end_flag = false;
 	receive_data_type = CM5ProcessPTA(&data,each_end_flag);
@@ -3261,7 +3261,7 @@ void local_handler_conf_private_trans_ack(
 		break;
 	}
 
-    return;
+	return;
 }
 
 //This function coded by Fance,used to split the cstring to each part.
@@ -3335,15 +3335,15 @@ CString GetProductName(int ModelID)
 	case PM_TSTAT5H:
 		strProductName="TStat5H";
 		break;
-    case PM_TSTAT6:
-        strProductName="TStat6";
-        break;
-    case PM_TSTAT5i:
-        strProductName="TStat5i";
-        break;
+	case PM_TSTAT6:
+		strProductName="TStat6";
+		break;
+	case PM_TSTAT5i:
+		strProductName="TStat5i";
+		break;
 	case PM_HUMTEMPSENSOR:
-	strProductName="Hum Temp Sensor";
-	    break;
+		strProductName="Hum Temp Sensor";
+		break;
 	case PM_AirQuality:
 		strProductName="Air Quality";
 		break;
@@ -3408,8 +3408,8 @@ CString GetProductName(int ModelID)
 		strProductName="Pressure Sensor";
 		break;
 	case PM_HUM_R:
-			strProductName="HUM-R";
-			break;
+		strProductName="HUM-R";
+		break;
 	default:
 		strProductName="";
 		break;
@@ -3419,7 +3419,7 @@ CString GetProductName(int ModelID)
 
 
 CString Get_Table_Name(int SerialNo,CString Type ,int Row){
-//	CADO ado;
+	//	CADO ado;
 	CString Table_Name;
 	//ado.OnInitADOConn();
 	CBADO bado;
@@ -3442,12 +3442,12 @@ CString Get_Table_Name(int SerialNo,CString Type ,int Row){
 		}
 		else
 		{
-		  Table_Name.Format(_T("%s%d"),Type.GetBuffer(),Row);
+			Table_Name.Format(_T("%s%d"),Type.GetBuffer(),Row);
 		}
 	}
 	else
 	{
-	    Table_Name.Format(_T("%s%d"),Type.GetBuffer(),Row);
+		Table_Name.Format(_T("%s%d"),Type.GetBuffer(),Row);
 	}
 	bado.CloseRecordset();
 	bado.CloseConn();
@@ -3469,7 +3469,7 @@ void    Insert_Update_Table_Name(int SerialNo,CString Type,int Row,CString Table
 	}
 	else
 	{
-			ado.CloseRecordset();
+		ado.CloseRecordset();
 		sql.Format(_T("Insert into IONAME_CONFIG(InOutName,Type,Row,SerialNo) values('%s','%s','%d','%d')"),TableName.GetBuffer(),Type.GetBuffer(),Row,SerialNo);
 		ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
 	}
@@ -3485,7 +3485,8 @@ int Get_Unit_Process(CString Unit)
 		ret_Value=1;
 	}
 	else if (Unit.CompareNoCase(_T("TYPE2 10K C"))==0)
-	{ret_Value=10;
+	{
+		ret_Value=10;
 	}
 	else if (Unit.CompareNoCase(_T("TYPE2 10K F"))==0)
 	{
@@ -3544,12 +3545,12 @@ int Get_Unit_Process(CString Unit)
 
 
 BOOL Get_Bit_FromRegister(unsigned short RegisterValue,unsigned short Position){
- 
-int postionvalue=1;
-  postionvalue=postionvalue<<(Position-1);
-  postionvalue= RegisterValue&postionvalue;
-  BOOL ret=postionvalue>>(Position-1);
-  return ret;
+
+	int postionvalue=1;
+	postionvalue=postionvalue<<(Position-1);
+	postionvalue= RegisterValue&postionvalue;
+	BOOL ret=postionvalue>>(Position-1);
+	return ret;
 }
 
 
@@ -3671,12 +3672,12 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 	else
 		return;
 #endif
-//	bac_cs_mac.Format(_T("%d"),vendor_id);
+	//	bac_cs_mac.Format(_T("%d"),vendor_id);
 
 	bac_cs_device_id.Format(_T("%d"),device_id);
 
 
-//	bac_cs_vendor_id.Format(_T("%d"),vendor_id);
+	//	bac_cs_vendor_id.Format(_T("%d"),vendor_id);
 	//g_bac_instance =device_id;
 	//g_mac = _wtoi(bac_cs_mac);
 
@@ -3686,7 +3687,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 	//DFTrace(g_Print);
 	_Bac_Scan_Com_Info temp_1;
 	temp_1.device_id = device_id;
-//	temp_1.vendor_id = vendor_id;
+	//	temp_1.vendor_id = vendor_id;
 	temp_1.macaddress = _wtoi(bac_cs_mac);
 
 	int find_exsit = false;
@@ -3722,7 +3723,7 @@ void Initial_bac(int comport)
 	unsigned timeout = 100;     /* milliseconds */
 	BACNET_ADDRESS my_address, broadcast_address;
 	char my_port[50];
-	
+
 	bac_program_pool_size = 26624;
 	bac_program_size = 0;
 	bac_free_memory = 26624;
@@ -3735,7 +3736,7 @@ void Initial_bac(int comport)
 	Device_Set_Object_Instance_Number(temp_value);
 	address_init();
 	Init_Service_Handlers();
-	
+
 
 
 #ifndef test_ptp
@@ -3808,7 +3809,7 @@ void Initial_bac(int comport)
 
 
 		//dlmstp_set_baud_rate(38400);
-				dlmstp_set_baud_rate(19200);
+		dlmstp_set_baud_rate(19200);
 		dlmstp_set_mac_address(0);
 		dlmstp_set_max_info_frames(DEFAULT_MAX_INFO_FRAMES);
 		dlmstp_set_max_master(DEFAULT_MAX_MASTER);
@@ -3824,7 +3825,7 @@ void Initial_bac(int comport)
 		/*CFileFind fFind;
 		if(!fFind.FindFile(Program_ConfigFile_Path))
 		{
-			WritePrivateProfileStringW(_T("Setting"),_T("ComPort"),_T("1"),Program_ConfigFile_Path);
+		WritePrivateProfileStringW(_T("Setting"),_T("ComPort"),_T("1"),Program_ConfigFile_Path);
 		}
 		g_com = GetPrivateProfileInt(_T("Setting"),_T("ComPort"),1,Program_ConfigFile_Path);*/
 		CString temp_cs;
@@ -3876,15 +3877,15 @@ DWORD WINAPI   MSTP_Receive(LPVOID lpVoid)
 
 	uint8_t Rx_Buf[MAX_MPDU] = { 0 };
 	//while(mparent->m_MSTP_THREAD)
-	  g_mstp_flag=true;
+	g_mstp_flag=true;
 	while(g_mstp_flag)
 	{
 		//datalink_set("bip");
-		
+
 		//pdu_len = datalink_receive(&src,&Rx_Buf[0],MAX_MPDU,INFINITE);
 		pdu_len = datalink_receive(&src,&Rx_Buf[0],MAX_MPDU,INFINITE);
 
-	//	pdu_len =  bip_receive(&src,&Rx_Buf[0],MAX_MPDU, INFINITE);
+		//	pdu_len =  bip_receive(&src,&Rx_Buf[0],MAX_MPDU, INFINITE);
 		//pdu_len = dlmstp_receive(&src, &Rx_Buf[0], MAX_MPDU, INFINITE);
 		if(pdu_len==0)
 		{
@@ -4036,14 +4037,14 @@ void Localhandler_read_property_ack(
 	//char my_pro_name[100];
 	//char * temp = get_prop_name();
 	//strcpy_s(my_pro_name,100,temp);
-	
+
 #if 0
 	fprintf(stderr, "Received Read-Property Ack!\n");
 #endif
 	if (len > 0)
 	{
 		local_rp_ack_print_data(&data);
-	//	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,WM_COMMAND_WHO_IS,NULL);
+		//	::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,WM_COMMAND_WHO_IS,NULL);
 	}
 }
 
@@ -4122,11 +4123,11 @@ bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
 	if(::WSAStartup(sockVersion, &wsaData) != 0)
 	{
 		//AfxMessageBox(_T("Init Socket failed!"));
-	//	m_hSocket=NULL;
+		//	m_hSocket=NULL;
 		return FALSE;
 	}
 
-//	mysocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	//	mysocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	mysocket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if(mysocket == INVALID_SOCKET)
 	{
@@ -4233,12 +4234,12 @@ bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
 //********************************************************
 
 BOOL CheckForUpdate(
-		LPCTSTR szFtpServer,
-		LPCTSTR szFtpUsername,
-		LPCTSTR szFtpPassword,
-		LPCTSTR szFtpFilename,
-		LPCTSTR szCurrentVersion,
-		LPTSTR szLastVersion )
+	LPCTSTR szFtpServer,
+	LPCTSTR szFtpUsername,
+	LPCTSTR szFtpPassword,
+	LPCTSTR szFtpFilename,
+	LPCTSTR szCurrentVersion,
+	LPTSTR szLastVersion )
 {
 	CWaitCursor wait;
 	// zero the last anyway..
@@ -4376,7 +4377,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 {
 	int nLen=buffer[2]+buffer[3]*256;
 	//int n =sizeof(char)+sizeof(unsigned char)+sizeof( unsigned short)*9;
-	unsigned short usDataPackage[16]={0};
+	unsigned short usDataPackage[30]={0};
 	if(nLen>=0)
 	{
 		refresh_net_device temp;
@@ -4387,14 +4388,14 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 		CString nproduct_name = GetProductName(nproduct_id);
 		if(nproduct_name.CompareNoCase(_T("TStat")) == 0)	//如果产品号 没定义过，不认识这个产品 就exit;
 			return m_refresh_net_device_data.size();
-		
+
 		CString nip_address;
 		nip_address.Format(_T("%d.%d.%d.%d"),usDataPackage[6],usDataPackage[7],usDataPackage[8],usDataPackage[9]);
 
 		int nport = usDataPackage[10];
 		int nsw_version = usDataPackage[11];
 		int nhw_version = usDataPackage[12];
-			
+
 		int modbusID=usDataPackage[5];
 		//TRACE(_T("Serial = %u     ID = %d\r\n"),nSerial,modbusID);
 		g_Print.Format(_T("Refresh list :Serial = %u     ID = %d ,ip = %s  , Product name : %s"),nSerial,modbusID,nip_address ,nproduct_name);
@@ -4420,7 +4421,11 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 		if(!find_exsit)
 		{
-			m_refresh_net_device_data.push_back(temp);
+			if (temp.modbusID!=0)
+			{
+				m_refresh_net_device_data.push_back(temp);
+			}
+
 		}
 	}
 
@@ -4516,7 +4521,7 @@ int GetHostAdaptersInfo(CString &IP_address_local)
 //UINT RefreshNetWorkDeviceListByUDPFunc(LPVOID pParam)
 UINT RefreshNetWorkDeviceListByUDPFunc1()
 {
-	
+
 	int nRet = 0;
 	//if (nRet == SOCKET_ERROR)
 	//{	  
@@ -4575,73 +4580,73 @@ UINT RefreshNetWorkDeviceListByUDPFunc1()
 			int nSelRet;
 			do 
 			{
-				 nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
+				nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
 
-				 BYTE szIPAddr[4] = {0};
-				 if(nRet > 0)
-				 {		
-					 FD_ZERO(&fdSocket);
-					 if(buffer[0]==RESPONSE_MSG)
-					 {	
-						 nLen=buffer[2]+buffer[3]*256;
-						 unsigned short dataPackage[32]={0};
-						 memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
-						 szIPAddr[0]= (BYTE)dataPackage[7];
-						 szIPAddr[1]= (BYTE)dataPackage[8];
-						 szIPAddr[2]= (BYTE)dataPackage[9];
-						 szIPAddr[3]= (BYTE)dataPackage[10];
+				BYTE szIPAddr[4] = {0};
+				if(nRet > 0)
+				{		
+					FD_ZERO(&fdSocket);
+					if(buffer[0]==RESPONSE_MSG)
+					{	
+						nLen=buffer[2]+buffer[3]*256;
+						unsigned short dataPackage[32]={0};
+						memcpy(dataPackage,buffer+2,nLen*sizeof(unsigned short));
+						szIPAddr[0]= (BYTE)dataPackage[7];
+						szIPAddr[1]= (BYTE)dataPackage[8];
+						szIPAddr[2]= (BYTE)dataPackage[9];
+						szIPAddr[3]= (BYTE)dataPackage[10];
 
-						 int n = 1;
-						 BOOL bFlag=FALSE;
-						 //////////////////////////////////////////////////////////////////////////
-						 // 检测IP重复
-						 DWORD dwValidIP = 0;
-						 memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
-						 while(dwValidIP != END_FLAG)
-						 {	
-							 DWORD dwRecvIP=0;
-							 memcpy((BYTE*)&dwRecvIP, szIPAddr, 4);
-							 memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
-							 if(dwRecvIP == dwValidIP)
-							 {
-								 bFlag = TRUE;
-								 break;
-							 }
-							 n+=4;
-						 }
-						 //////////////////////////////////////////////////////////////////////////
-						 if (!bFlag)
-						 {
-							 AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
+						int n = 1;
+						BOOL bFlag=FALSE;
+						//////////////////////////////////////////////////////////////////////////
+						// 检测IP重复
+						DWORD dwValidIP = 0;
+						memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
+						while(dwValidIP != END_FLAG)
+						{	
+							DWORD dwRecvIP=0;
+							memcpy((BYTE*)&dwRecvIP, szIPAddr, 4);
+							memcpy((BYTE*)&dwValidIP, pSendBuf+n, 4);
+							if(dwRecvIP == dwValidIP)
+							{
+								bFlag = TRUE;
+								break;
+							}
+							n+=4;
+						}
+						//////////////////////////////////////////////////////////////////////////
+						if (!bFlag)
+						{
+							AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
 
-							 //pSendBuf[nSendLen-1] = (BYTE)(modbusID);
-							 pSendBuf[nSendLen-4] = szIPAddr[0];
-							 pSendBuf[nSendLen-3] = szIPAddr[1];
-							 pSendBuf[nSendLen-2] = szIPAddr[2];
-							 pSendBuf[nSendLen-1] = szIPAddr[3];
-							 memcpy(pSendBuf + nSendLen, (BYTE*)&END_FLAG, 4);
-							 //////////////////////////////////////////////////////////////////////////
+							//pSendBuf[nSendLen-1] = (BYTE)(modbusID);
+							pSendBuf[nSendLen-4] = szIPAddr[0];
+							pSendBuf[nSendLen-3] = szIPAddr[1];
+							pSendBuf[nSendLen-2] = szIPAddr[2];
+							pSendBuf[nSendLen-1] = szIPAddr[3];
+							memcpy(pSendBuf + nSendLen, (BYTE*)&END_FLAG, 4);
+							//////////////////////////////////////////////////////////////////////////
 
-							 //pSendBuf[nSendLen+3] = 0xFF;
-							 nSendLen+=4;
-						 }
-						 else
-						 {
-							 AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
-						 }
-					 }	
-				 }
-				 else
-				 {
-					 break;
-				 }
+							//pSendBuf[nSendLen+3] = 0xFF;
+							nSendLen+=4;
+						}
+						else
+						{
+							AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
+						}
+					}	
+				}
+				else
+				{
+					break;
+				}
 
 
-				 FD_ZERO(&fdSocket);	
-				 FD_SET(h_Broad, &fdSocket);
-				 nLen = sizeof(h_siBind);
-				 fdRead = fdSocket;
-				 nSelRet = ::select(0, &fdRead, NULL, NULL, &time);//TRACE("recv nc info == %d\n", nSelRet);
+				FD_ZERO(&fdSocket);	
+				FD_SET(h_Broad, &fdSocket);
+				nLen = sizeof(h_siBind);
+				fdRead = fdSocket;
+				nSelRet = ::select(0, &fdRead, NULL, NULL, &time);//TRACE("recv nc info == %d\n", nSelRet);
 			} while (nSelRet);
 			//int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
 
@@ -4710,56 +4715,56 @@ END_SCAN:
 #endif
 
 void GetIPMaskGetWay(){
-g_Vector_Subnet.clear();
- 	PIP_ADAPTER_INFO pAdapterInfo; 
- 	PIP_ADAPTER_INFO pAdapter = NULL; 
- 	DWORD dwRetVal = 0; 
- 	ULONG ulOutBufLen; 
- 	pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO)); 
- 	ulOutBufLen = sizeof(IP_ADAPTER_INFO); 
- 	ALL_LOCAL_SUBNET_NODE  Temp_Node;
- 	// 第一次调用GetAdapterInfo获取ulOutBufLen大小 
- 	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
- 	{ 
- 		free(pAdapterInfo); 
- 		pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen); 
- 	} 
- 
- 	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) == NO_ERROR) { 
- 		pAdapter = pAdapterInfo; 
- 		while (pAdapter) 
- 		{ 
-//             CString Name;//=pAdapter->AdapterName;
-// 			MultiByteToWideChar( CP_ACP, 0, pAdapter->AdapterName, (int)strlen((char *)pAdapter->AdapterName)+1, 
-// 				Name.GetBuffer(MAX_PATH), MAX_PATH );
-// 			Name.ReleaseBuffer();
+	g_Vector_Subnet.clear();
+	PIP_ADAPTER_INFO pAdapterInfo; 
+	PIP_ADAPTER_INFO pAdapter = NULL; 
+	DWORD dwRetVal = 0; 
+	ULONG ulOutBufLen; 
+	pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO)); 
+	ulOutBufLen = sizeof(IP_ADAPTER_INFO); 
+	ALL_LOCAL_SUBNET_NODE  Temp_Node;
+	// 第一次调用GetAdapterInfo获取ulOutBufLen大小 
+	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
+	{ 
+		free(pAdapterInfo); 
+		pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen); 
+	} 
 
- 			MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
- 				Temp_Node.StrIP.GetBuffer(MAX_PATH), MAX_PATH );
- 			Temp_Node.StrIP.ReleaseBuffer();
- 			//StrIP.Format(_T("%s"),pAdapter->IpAddressList.IpAddress.String); 
- 			MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1, 
- 				Temp_Node.StrMask.GetBuffer(MAX_PATH), MAX_PATH );
- 			Temp_Node.StrMask.ReleaseBuffer();
- 
- 			//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
- 
- 			MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
- 				Temp_Node.StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
- 			Temp_Node.StrGetway.ReleaseBuffer();
- 
- 			Temp_Node.NetworkCardType=pAdapter->Type;
- 
- 			g_Vector_Subnet.push_back(Temp_Node);
-			
- 			/*StrGetway.Format(_T("%s"), pAdapter->GatewayList.IpAddress.String); */
- 			pAdapter = pAdapter->Next; 
- 		} 
- 	} 
- 	else 
- 	{ 
- 
- 	} 
+	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) == NO_ERROR) { 
+		pAdapter = pAdapterInfo; 
+		while (pAdapter) 
+		{ 
+			//             CString Name;//=pAdapter->AdapterName;
+			// 			MultiByteToWideChar( CP_ACP, 0, pAdapter->AdapterName, (int)strlen((char *)pAdapter->AdapterName)+1, 
+			// 				Name.GetBuffer(MAX_PATH), MAX_PATH );
+			// 			Name.ReleaseBuffer();
+
+			MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
+				Temp_Node.StrIP.GetBuffer(MAX_PATH), MAX_PATH );
+			Temp_Node.StrIP.ReleaseBuffer();
+			//StrIP.Format(_T("%s"),pAdapter->IpAddressList.IpAddress.String); 
+			MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1, 
+				Temp_Node.StrMask.GetBuffer(MAX_PATH), MAX_PATH );
+			Temp_Node.StrMask.ReleaseBuffer();
+
+			//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
+
+			MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
+				Temp_Node.StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
+			Temp_Node.StrGetway.ReleaseBuffer();
+
+			Temp_Node.NetworkCardType=pAdapter->Type;
+
+			g_Vector_Subnet.push_back(Temp_Node);
+
+			/*StrGetway.Format(_T("%s"), pAdapter->GatewayList.IpAddress.String); */
+			pAdapter = pAdapter->Next; 
+		} 
+	} 
+	else 
+	{ 
+
+	} 
 }
 
 
@@ -4820,7 +4825,7 @@ BOOL ValidAddress(CString sAddress)
 
 
 void GetIPMaskGetWayForScan(){
-g_Scan_Vector_Subnet.clear();
+	g_Scan_Vector_Subnet.clear();
 	PIP_ADAPTER_INFO pAdapterInfo; 
 	PIP_ADAPTER_INFO pAdapter = NULL; 
 	DWORD dwRetVal = 0; 
@@ -4965,7 +4970,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 						FD_ZERO(&fdSocket);
 						if(buffer[0]==RESPONSE_MSG)
 						{	
-						    g_llTxCount++;
+							g_llTxCount++;
 							g_llRxCount++;
 							nLen=buffer[2]+buffer[3]*256;
 							unsigned short dataPackage[32]={0};
@@ -5018,7 +5023,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 					}
 					else
 					{
-					
+
 						break;
 					}
 
@@ -5104,9 +5109,9 @@ END_SCAN:
 			((CMFCStatusBar *) AfxGetMainWnd()->GetDescendantWindow(AFX_IDW_STATUS_BAR))->SetPaneText(0,str.GetString());
 
 		}
-	
+
 	}
-	 
+
 
 	//pScanner->m_bNetScanFinish = TRUE; // 超时结束
 
@@ -5117,7 +5122,7 @@ END_SCAN:
 
 	if (g_Vector_Subnet.size()==0)
 	{
-	   SetPaneString(3,_T("No Network Card is installed in your PC"));
+		SetPaneString(3,_T("No Network Card is installed in your PC"));
 	}
 	return 1;
 }
@@ -5281,484 +5286,484 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 				return -1;
 		}
 
-			
-			
+
+
 #if 1
-			CFile myfile(FilePath,CFile::modeRead);
-			char *pBuf;
-			DWORD dwFileLen;
-			dwFileLen=myfile.GetLength();
-			pBuf= new char[dwFileLen+1];
-			pBuf[dwFileLen]=0;
-			myfile.Read(pBuf,dwFileLen);     //MFC   CFile 类 很方便
-			myfile.Close();
-			//MessageBox(pBuf);
-			char * temp_buffer = pBuf;
-			for (int i=0;i<dwFileLen;i++)
-			{
-				*temp_buffer = *temp_buffer ^ 1;
-				temp_buffer ++;
-			}
+		CFile myfile(FilePath,CFile::modeRead);
+		char *pBuf;
+		DWORD dwFileLen;
+		dwFileLen=myfile.GetLength();
+		pBuf= new char[dwFileLen+1];
+		pBuf[dwFileLen]=0;
+		myfile.Read(pBuf,dwFileLen);     //MFC   CFile 类 很方便
+		myfile.Close();
+		//MessageBox(pBuf);
+		char * temp_buffer = pBuf;
+		for (int i=0;i<dwFileLen;i++)
+		{
+			*temp_buffer = *temp_buffer ^ 1;
+			temp_buffer ++;
+		}
 
-			CString new_file;
-			new_file = FilePath.Left(FilePath.GetLength()-3) + _T("ini");
+		CString new_file;
+		new_file = FilePath.Left(FilePath.GetLength()-3) + _T("ini");
 
-			HANDLE hFile;
-			hFile=CreateFile(new_file,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
-			DWORD dWrites;
-			WriteFile(hFile,pBuf,dwFileLen,&dWrites,NULL);
-			CloseHandle(hFile);  
-			if(pBuf)
-				delete pBuf;
+		HANDLE hFile;
+		hFile=CreateFile(new_file,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+		DWORD dWrites;
+		WriteFile(hFile,pBuf,dwFileLen,&dWrites,NULL);
+		CloseHandle(hFile);  
+		if(pBuf)
+			delete pBuf;
 
 
-			FilePath = new_file;
+		FilePath = new_file;
 #endif
 
-			int ntemp_version = GetPrivateProfileInt(_T("Setting"),_T("Version"),0,FilePath);
-			//if(ntemp_version != 1)
+		int ntemp_version = GetPrivateProfileInt(_T("Setting"),_T("Version"),0,FilePath);
+		//if(ntemp_version != 1)
+		//{
+		//	DeleteFile(new_file);
+		//	return -1;
+		//}
+
+		//			CString FilePath;
+		//		FilePath=dlg.GetPathName();
+		for (int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
+		{
+			CString temp_input,temp_des,temp_csc;
+			temp_input.Format(_T("Input%d"),i);
+
+			CString cs_temp;
+			char cTemp1[255];
+			GetPrivateProfileStringW(temp_input,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_Input_data.at(i).description,STR_IN_DESCRIPTION_LENGTH,cTemp1,STR_IN_DESCRIPTION_LENGTH);
+
+			cs_temp.Empty();
+			GetPrivateProfileStringW(temp_input,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_Input_data.at(i).label,STR_IN_LABEL,cTemp1,STR_IN_LABEL);
+
+			m_Input_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_input,_T("Auto_Manual"),0,FilePath);
+			m_Input_data.at(i).value = GetPrivateProfileInt(temp_input,_T("Value"),0,FilePath);
+
+			m_Input_data.at(i).filter = (unsigned char)GetPrivateProfileInt(temp_input,_T("Filter"),0,FilePath);
+			m_Input_data.at(i).decom = (unsigned char)GetPrivateProfileInt(temp_input,_T("Decom"),0,FilePath);
+			m_Input_data.at(i).sen_on = (unsigned char)GetPrivateProfileInt(temp_input,_T("Sen_On"),0,FilePath);
+
+			m_Input_data.at(i).sen_off = (unsigned char)GetPrivateProfileInt(temp_input,_T("Sen_Off"),0,FilePath);
+			m_Input_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_input,_T("Control"),0,FilePath);
+			m_Input_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_input,_T("Digital_Analog"),0,FilePath);
+
+			m_Input_data.at(i).calibration_sign = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration_Sign"),0,FilePath);
+			m_Input_data.at(i).calibration_increment = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration_Increment"),0,FilePath);
+			m_Input_data.at(i).calibration_h = (unsigned char)GetPrivateProfileInt(temp_input,_T("Unused"),0,FilePath);
+
+			m_Input_data.at(i).calibration_l = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration"),0,FilePath);
+			m_Input_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_input,_T("Range"),0,FilePath);
+
+		}
+
+		for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			temp_section.Format(_T("Output%d"),i);
+			CString cs_temp;
+			char cTemp1[255];
+			GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_Output_data.at(i).description,STR_OUT_DESCRIPTION_LENGTH,cTemp1,STR_OUT_DESCRIPTION_LENGTH);
+
+			cs_temp.Empty();
+			GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_Output_data.at(i).label,STR_OUT_LABEL,cTemp1,STR_OUT_LABEL);
+
+			m_Output_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+			m_Output_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
+
+			m_Output_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Analog"),0,FilePath);
+			m_Output_data.at(i).hw_switch_status = (unsigned char)GetPrivateProfileInt(temp_section,_T("hw_switch_status"),0,FilePath);
+			m_Output_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Control"),0,FilePath);
+			m_Output_data.at(i).digital_control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Control"),0,FilePath);
+			m_Output_data.at(i).decom = (unsigned char)GetPrivateProfileInt(temp_section,_T("Decom"),0,FilePath);
+			m_Output_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_section,_T("Range"),0,FilePath);
+			m_Output_data.at(i).m_del_low = (unsigned char)GetPrivateProfileInt(temp_section,_T("M_Del_Low"),0,FilePath);
+			m_Output_data.at(i).s_del_high = (unsigned char)GetPrivateProfileInt(temp_section,_T("S_Del_High"),0,FilePath);
+			m_Output_data.at(i).delay_timer = (unsigned char)GetPrivateProfileInt(temp_section,_T("Delay_Timer"),0,FilePath);
+		}
+
+		for (int i=0;i<BAC_VARIABLE_ITEM_COUNT;i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			temp_section.Format(_T("Variable%d"),i);
+			CString cs_temp;
+			char cTemp1[255];
+			GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_Variable_data.at(i).description,STR_VARIABLE_DESCRIPTION_LENGTH,cTemp1,STR_VARIABLE_DESCRIPTION_LENGTH);
+
+			cs_temp.Empty();
+			GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_Variable_data.at(i).label,STR_VARIABLE_LABEL,cTemp1,STR_VARIABLE_LABEL);
+
+
+
+			m_Variable_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
+			m_Variable_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+			m_Variable_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Analog"),0,FilePath);
+			m_Variable_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Control"),0,FilePath);
+			m_Variable_data.at(i).unused = (unsigned char)GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
+			m_Variable_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_section,_T("Range"),0,FilePath);
+
+		}
+
+		for (int i=0;i<BAC_PROGRAM_ITEM_COUNT;i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			temp_section.Format(_T("Program%d"),i);
+			CString cs_temp;
+			char cTemp1[255];
+			GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_Program_data.at(i).description,STR_PROGRAM_DESCRIPTION_LENGTH,cTemp1,STR_PROGRAM_DESCRIPTION_LENGTH);
+
+			cs_temp.Empty();
+			GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_Program_data.at(i).label,STR_PROGRAM_LABEL_LENGTH,cTemp1,STR_PROGRAM_LABEL_LENGTH);
+
+			m_Program_data.at(i).bytes = (unsigned short)GetPrivateProfileInt(temp_section,_T("Bytes"),0,FilePath);
+			m_Program_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+			m_Program_data.at(i).on_off = (unsigned char)GetPrivateProfileInt(temp_section,_T("On_Off"),0,FilePath);
+			m_Program_data.at(i).com_prg = (unsigned char)GetPrivateProfileInt(temp_section,_T("Com_Prg"),0,FilePath);
+			m_Program_data.at(i).errcode = (unsigned char)GetPrivateProfileInt(temp_section,_T("Errcode"),0,FilePath);
+			m_Program_data.at(i).unused = (unsigned char)GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
+		}
+
+		for (int i=0;i<BAC_CONTROLLER_COUNT;i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			temp_section.Format(_T("Controller%d"),i);
+
+			m_controller_data.at(i).input.number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Number"),0,FilePath);
+			m_controller_data.at(i).input.panel = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Panel"),0,FilePath);
+			m_controller_data.at(i).input.point_type = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Point_Type"),0,FilePath);
+			m_controller_data.at(i).input_value = GetPrivateProfileInt(temp_section,_T("Input_Value"),0,FilePath);
+			m_controller_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
+			m_controller_data.at(i).setpoint.number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Number"),0,FilePath);
+			m_controller_data.at(i).setpoint.panel = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Panel"),0,FilePath);
+			m_controller_data.at(i).setpoint.point_type = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Point_Type"),0,FilePath);
+			m_controller_data.at(i).setpoint_value = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Value"),0,FilePath);
+			m_controller_data.at(i).units = (unsigned char)GetPrivateProfileInt(temp_section,_T("Units"),0,FilePath);
+			m_controller_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+			m_controller_data.at(i).action = (unsigned char)GetPrivateProfileInt(temp_section,_T("Action"),0,FilePath);
+			m_controller_data.at(i).repeats_per_min = (unsigned char)GetPrivateProfileInt(temp_section,_T("Repeats_Per_Min"),0,FilePath);
+			m_controller_data.at(i).sample_time = (unsigned char)GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
+			m_controller_data.at(i).prop_high = (unsigned char)GetPrivateProfileInt(temp_section,_T("Prop_High"),0,FilePath);
+			m_controller_data.at(i).proportional = (unsigned char)GetPrivateProfileInt(temp_section,_T("Proportional"),0,FilePath);
+			m_controller_data.at(i).reset = (unsigned char)GetPrivateProfileInt(temp_section,_T("Reset"),0,FilePath);
+			m_controller_data.at(i).bias = (unsigned char)GetPrivateProfileInt(temp_section,_T("Bias"),0,FilePath);
+			m_controller_data.at(i).rate = (unsigned char)GetPrivateProfileInt(temp_section,_T("Rate"),0,FilePath);
+		}
+
+
+		for (int i=0;i<BAC_WEEKLYCODE_ROUTINES_COUNT;i++)
+		{
+			CString tempsection,temp_code,temp_csc;
+			tempsection.Format(_T("WeeklyRoutinesData_%d"),i);
+			CString temp_weeklycode_code;
+			GetPrivateProfileStringW(tempsection,_T("Data"),_T(""),temp_weeklycode_code.GetBuffer(300),300,FilePath);
+			temp_weeklycode_code.ReleaseBuffer();
+
+			for (int j=0;j<WEEKLY_SCHEDULE_SIZE;j++)
+			{
+				CString temp_value;
+				temp_value = temp_weeklycode_code.Left(2);
+				temp_weeklycode_code = temp_weeklycode_code.Right(temp_weeklycode_code.GetLength()-2);
+				weeklt_time_schedule[i][j]= Str_to_Byte(temp_value);
+			}
+			unsigned char * temp_point = NULL;
+			temp_point = weeklt_time_schedule[i];
+			for (int x=0;x<9;x++)
+			{
+				for (int y=0;y<8;y++)
+				{
+					m_Schedual_Time_data.at(i).Schedual_Day_Time[y][x].time_minutes = *(temp_point ++);
+					m_Schedual_Time_data.at(i).Schedual_Day_Time[y][x].time_hours = *(temp_point ++);
+				}
+			}
+
+			//for (int x=0;x<9;x++)
 			//{
-			//	DeleteFile(new_file);
-			//	return -1;
+			//	for (int y=0;y<8;y++)
+			//	{
+			//		m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_minutes = *(my_temp_point ++);
+			//		m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_hours = *(my_temp_point ++);
+			//	}
 			//}
 
-			//			CString FilePath;
-			//		FilePath=dlg.GetPathName();
-			for (int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
+		}
+
+		for (int i=0;i<BAC_ANNUAL_CODE_COUNT;i++)
+		{
+			CString tempsection,temp_code,temp_csc;
+			tempsection.Format(_T("AnnualRoutinesData_%d"),i);
+			CString temp_annualcode_code;
+			GetPrivateProfileStringW(tempsection,_T("Data"),_T(""),temp_annualcode_code.GetBuffer(MAX_PATH),MAX_PATH,FilePath);
+			temp_annualcode_code.ReleaseBuffer();
+
+			for (int j=0;j<ANNUAL_CODE_SIZE;j++)
 			{
-				CString temp_input,temp_des,temp_csc;
-				temp_input.Format(_T("Input%d"),i);
+				CString temp_value;
+				temp_value = temp_annualcode_code.Left(2);
+				temp_annualcode_code = temp_annualcode_code.Right(temp_annualcode_code.GetLength()-2);
+				g_DayState[i][j]= Str_to_Byte(temp_value);
+				//weeklt_time_schedule[i][j]= Str_to_Byte(temp_value);
+			}
+		}
 
-				CString cs_temp;
-				char cTemp1[255];
-				GetPrivateProfileStringW(temp_input,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_Input_data.at(i).description,STR_IN_DESCRIPTION_LENGTH,cTemp1,STR_IN_DESCRIPTION_LENGTH);
+		for (int i=0;i<BAC_PROGRAMCODE_ITEM_COUNT;i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			CString temp_code;
+			unsigned char * temp_point = NULL;
+			temp_point = program_code[i];
+			temp_section.Format(_T("Program_Code%d"),i);
+			program_code_length[i] = (unsigned int)GetPrivateProfileInt(temp_section,_T("Program_Length"),0,FilePath);
 
-				cs_temp.Empty();
-				GetPrivateProfileStringW(temp_input,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_Input_data.at(i).label,STR_IN_LABEL,cTemp1,STR_IN_LABEL);
-
-				m_Input_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_input,_T("Auto_Manual"),0,FilePath);
-				m_Input_data.at(i).value = GetPrivateProfileInt(temp_input,_T("Value"),0,FilePath);
-
-				m_Input_data.at(i).filter = (unsigned char)GetPrivateProfileInt(temp_input,_T("Filter"),0,FilePath);
-				m_Input_data.at(i).decom = (unsigned char)GetPrivateProfileInt(temp_input,_T("Decom"),0,FilePath);
-				m_Input_data.at(i).sen_on = (unsigned char)GetPrivateProfileInt(temp_input,_T("Sen_On"),0,FilePath);
-
-				m_Input_data.at(i).sen_off = (unsigned char)GetPrivateProfileInt(temp_input,_T("Sen_Off"),0,FilePath);
-				m_Input_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_input,_T("Control"),0,FilePath);
-				m_Input_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_input,_T("Digital_Analog"),0,FilePath);
-
-				m_Input_data.at(i).calibration_sign = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration_Sign"),0,FilePath);
-				m_Input_data.at(i).calibration_increment = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration_Increment"),0,FilePath);
-				m_Input_data.at(i).calibration_h = (unsigned char)GetPrivateProfileInt(temp_input,_T("Unused"),0,FilePath);
-
-				m_Input_data.at(i).calibration_l = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration"),0,FilePath);
-				m_Input_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_input,_T("Range"),0,FilePath);
-
+			if(program_code_length[i] >2000)
+			{
+				program_code_length[i]=0;
+				memset(program_code[i],0,2000);
+				continue;
 			}
 
-			for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+			CString part_section;
+			part_section.Format(_T("Program_Code_Text"));
+
+
+			CString temp_program_code;
+			GetPrivateProfileStringW(temp_section,part_section,_T(""),temp_program_code.GetBuffer(4000),4000,FilePath);
+			temp_program_code.ReleaseBuffer();
+
+			if(ntemp_version < 2)	//如果是加载的旧版本的 配置档,code 就清零;
 			{
-				CString temp_section,temp_des,temp_csc;
-				temp_section.Format(_T("Output%d"),i);
-				CString cs_temp;
-				char cTemp1[255];
-				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_Output_data.at(i).description,STR_OUT_DESCRIPTION_LENGTH,cTemp1,STR_OUT_DESCRIPTION_LENGTH);
-
-				cs_temp.Empty();
-				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_Output_data.at(i).label,STR_OUT_LABEL,cTemp1,STR_OUT_LABEL);
-
-				m_Output_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
-				m_Output_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
-
-				m_Output_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Analog"),0,FilePath);
-				m_Output_data.at(i).hw_switch_status = (unsigned char)GetPrivateProfileInt(temp_section,_T("hw_switch_status"),0,FilePath);
-				m_Output_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Control"),0,FilePath);
-				m_Output_data.at(i).digital_control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Control"),0,FilePath);
-				m_Output_data.at(i).decom = (unsigned char)GetPrivateProfileInt(temp_section,_T("Decom"),0,FilePath);
-				m_Output_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_section,_T("Range"),0,FilePath);
-				m_Output_data.at(i).m_del_low = (unsigned char)GetPrivateProfileInt(temp_section,_T("M_Del_Low"),0,FilePath);
-				m_Output_data.at(i).s_del_high = (unsigned char)GetPrivateProfileInt(temp_section,_T("S_Del_High"),0,FilePath);
-				m_Output_data.at(i).delay_timer = (unsigned char)GetPrivateProfileInt(temp_section,_T("Delay_Timer"),0,FilePath);
-			}
-
-			for (int i=0;i<BAC_VARIABLE_ITEM_COUNT;i++)
-			{
-				CString temp_section,temp_des,temp_csc;
-				temp_section.Format(_T("Variable%d"),i);
-				CString cs_temp;
-				char cTemp1[255];
-				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_Variable_data.at(i).description,STR_VARIABLE_DESCRIPTION_LENGTH,cTemp1,STR_VARIABLE_DESCRIPTION_LENGTH);
-
-				cs_temp.Empty();
-				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_Variable_data.at(i).label,STR_VARIABLE_LABEL,cTemp1,STR_VARIABLE_LABEL);
-
-
-
-				m_Variable_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
-				m_Variable_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
-				m_Variable_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Analog"),0,FilePath);
-				m_Variable_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Control"),0,FilePath);
-				m_Variable_data.at(i).unused = (unsigned char)GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
-				m_Variable_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_section,_T("Range"),0,FilePath);
-
-			}
-
-			for (int i=0;i<BAC_PROGRAM_ITEM_COUNT;i++)
-			{
-				CString temp_section,temp_des,temp_csc;
-				temp_section.Format(_T("Program%d"),i);
-				CString cs_temp;
-				char cTemp1[255];
-				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_Program_data.at(i).description,STR_PROGRAM_DESCRIPTION_LENGTH,cTemp1,STR_PROGRAM_DESCRIPTION_LENGTH);
-
-				cs_temp.Empty();
-				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_Program_data.at(i).label,STR_PROGRAM_LABEL_LENGTH,cTemp1,STR_PROGRAM_LABEL_LENGTH);
-
-				m_Program_data.at(i).bytes = (unsigned short)GetPrivateProfileInt(temp_section,_T("Bytes"),0,FilePath);
-				m_Program_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
-				m_Program_data.at(i).on_off = (unsigned char)GetPrivateProfileInt(temp_section,_T("On_Off"),0,FilePath);
-				m_Program_data.at(i).com_prg = (unsigned char)GetPrivateProfileInt(temp_section,_T("Com_Prg"),0,FilePath);
-				m_Program_data.at(i).errcode = (unsigned char)GetPrivateProfileInt(temp_section,_T("Errcode"),0,FilePath);
-				m_Program_data.at(i).unused = (unsigned char)GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
-			}
-
-			for (int i=0;i<BAC_CONTROLLER_COUNT;i++)
-			{
-				CString temp_section,temp_des,temp_csc;
-				temp_section.Format(_T("Controller%d"),i);
-
-				m_controller_data.at(i).input.number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Number"),0,FilePath);
-				m_controller_data.at(i).input.panel = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Panel"),0,FilePath);
-				m_controller_data.at(i).input.point_type = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Point_Type"),0,FilePath);
-				m_controller_data.at(i).input_value = GetPrivateProfileInt(temp_section,_T("Input_Value"),0,FilePath);
-				m_controller_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
-				m_controller_data.at(i).setpoint.number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Number"),0,FilePath);
-				m_controller_data.at(i).setpoint.panel = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Panel"),0,FilePath);
-				m_controller_data.at(i).setpoint.point_type = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Point_Type"),0,FilePath);
-				m_controller_data.at(i).setpoint_value = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Value"),0,FilePath);
-				m_controller_data.at(i).units = (unsigned char)GetPrivateProfileInt(temp_section,_T("Units"),0,FilePath);
-				m_controller_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
-				m_controller_data.at(i).action = (unsigned char)GetPrivateProfileInt(temp_section,_T("Action"),0,FilePath);
-				m_controller_data.at(i).repeats_per_min = (unsigned char)GetPrivateProfileInt(temp_section,_T("Repeats_Per_Min"),0,FilePath);
-				m_controller_data.at(i).sample_time = (unsigned char)GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
-				m_controller_data.at(i).prop_high = (unsigned char)GetPrivateProfileInt(temp_section,_T("Prop_High"),0,FilePath);
-				m_controller_data.at(i).proportional = (unsigned char)GetPrivateProfileInt(temp_section,_T("Proportional"),0,FilePath);
-				m_controller_data.at(i).reset = (unsigned char)GetPrivateProfileInt(temp_section,_T("Reset"),0,FilePath);
-				m_controller_data.at(i).bias = (unsigned char)GetPrivateProfileInt(temp_section,_T("Bias"),0,FilePath);
-				m_controller_data.at(i).rate = (unsigned char)GetPrivateProfileInt(temp_section,_T("Rate"),0,FilePath);
-			}
-
-
-			for (int i=0;i<BAC_WEEKLYCODE_ROUTINES_COUNT;i++)
-			{
-				CString tempsection,temp_code,temp_csc;
-				tempsection.Format(_T("WeeklyRoutinesData_%d"),i);
-				CString temp_weeklycode_code;
-				GetPrivateProfileStringW(tempsection,_T("Data"),_T(""),temp_weeklycode_code.GetBuffer(300),300,FilePath);
-				temp_weeklycode_code.ReleaseBuffer();
-
-				for (int j=0;j<WEEKLY_SCHEDULE_SIZE;j++)
-				{
-					CString temp_value;
-					temp_value = temp_weeklycode_code.Left(2);
-					temp_weeklycode_code = temp_weeklycode_code.Right(temp_weeklycode_code.GetLength()-2);
-					weeklt_time_schedule[i][j]= Str_to_Byte(temp_value);
-				}
-				unsigned char * temp_point = NULL;
-				temp_point = weeklt_time_schedule[i];
-				for (int x=0;x<9;x++)
-				{
-					for (int y=0;y<8;y++)
-					{
-						m_Schedual_Time_data.at(i).Schedual_Day_Time[y][x].time_minutes = *(temp_point ++);
-						m_Schedual_Time_data.at(i).Schedual_Day_Time[y][x].time_hours = *(temp_point ++);
-					}
-				}
-
-				//for (int x=0;x<9;x++)
-				//{
-				//	for (int y=0;y<8;y++)
-				//	{
-				//		m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_minutes = *(my_temp_point ++);
-				//		m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_hours = *(my_temp_point ++);
-				//	}
-				//}
-
-			}
-
-			for (int i=0;i<BAC_ANNUAL_CODE_COUNT;i++)
-			{
-				CString tempsection,temp_code,temp_csc;
-				tempsection.Format(_T("AnnualRoutinesData_%d"),i);
-				CString temp_annualcode_code;
-				GetPrivateProfileStringW(tempsection,_T("Data"),_T(""),temp_annualcode_code.GetBuffer(MAX_PATH),MAX_PATH,FilePath);
-				temp_annualcode_code.ReleaseBuffer();
-
-				for (int j=0;j<ANNUAL_CODE_SIZE;j++)
-				{
-					CString temp_value;
-					temp_value = temp_annualcode_code.Left(2);
-					temp_annualcode_code = temp_annualcode_code.Right(temp_annualcode_code.GetLength()-2);
-					g_DayState[i][j]= Str_to_Byte(temp_value);
-					//weeklt_time_schedule[i][j]= Str_to_Byte(temp_value);
-				}
-			}
-
-			for (int i=0;i<BAC_PROGRAMCODE_ITEM_COUNT;i++)
-			{
-				CString temp_section,temp_des,temp_csc;
-				CString temp_code;
-				unsigned char * temp_point = NULL;
-				temp_point = program_code[i];
-				temp_section.Format(_T("Program_Code%d"),i);
-				program_code_length[i] = (unsigned int)GetPrivateProfileInt(temp_section,_T("Program_Length"),0,FilePath);
-
-				if(program_code_length[i] >2000)
-				{
-					program_code_length[i]=0;
-					memset(program_code[i],0,2000);
-					continue;
-				}
-
-				CString part_section;
-				part_section.Format(_T("Program_Code_Text"));
-	
-
-				CString temp_program_code;
-				GetPrivateProfileStringW(temp_section,part_section,_T(""),temp_program_code.GetBuffer(4000),4000,FilePath);
-				temp_program_code.ReleaseBuffer();
-
-				if(ntemp_version < 2)	//如果是加载的旧版本的 配置档,code 就清零;
-				{
-					program_code_length[i] = 0;
-					memset(program_code[i],0,2000);
-				}
-				else
-				{
-					if(temp_program_code.GetLength() == 2*program_code_length[i])
-					{
-						for (int x=0;x<program_code_length[i];x++)
-						{
-							CString temp_value;
-							temp_value = temp_program_code.Left(2);
-							temp_program_code = temp_program_code.Right(temp_program_code.GetLength()-2);
-							program_code[i][x] = Str_to_Byte(temp_value);
-						}
-					}
-				}
-
-
-			}
-
-
-			for (int i=0;i<BAC_SCREEN_COUNT;i++)
-			{
-				CString temp_section,temp_des,temp_csc;
-				temp_section.Format(_T("Screen%d"),i);
-
-				CString cs_temp;
-				char cTemp1[255];
-				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_screen_data.at(i).description,STR_SCREEN_DESCRIPTION_LENGTH,cTemp1,STR_SCREEN_DESCRIPTION_LENGTH);
-
-				cs_temp.Empty();
-				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_screen_data.at(i).label,STR_SCREEN_LABLE_LENGTH,cTemp1,STR_SCREEN_LABLE_LENGTH);
-				cs_temp.Empty();
-				GetPrivateProfileStringW(temp_section,_T("Picture_file"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_screen_data.at(i).label,STR_SCREEN_PIC_FILE_LENGTH,cTemp1,STR_SCREEN_PIC_FILE_LENGTH);
-
-				m_screen_data.at(i).update = GetPrivateProfileInt(temp_section,_T("Update"),0,FilePath);
-				m_screen_data.at(i).mode = GetPrivateProfileInt(temp_section,_T("Mode"),0,FilePath);
-				m_screen_data.at(i).xcur_grp = GetPrivateProfileInt(temp_section,_T("Xcur_grp"),0,FilePath);
-				m_screen_data.at(i).ycur_grp = GetPrivateProfileInt(temp_section,_T("Ycur_grp"),0,FilePath);
-			}
-
-			for (int i=0;i<BAC_WEEKLY_ROUTINES_COUNT;i++)
-			{
-				CString temp_section,temp_des,temp_csc;
-				temp_section.Format(_T("Weekly_Routines%d"),i);
-
-				CString cs_temp;
-				char cTemp1[255];
-				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_Weekly_data.at(i).description,STR_WEEKLY_DESCRIPTION_LENGTH,cTemp1,STR_WEEKLY_DESCRIPTION_LENGTH);
-
-				cs_temp.Empty();
-				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_Weekly_data.at(i).label,STR_WEEKLY_LABEL_LENGTH,cTemp1,STR_WEEKLY_LABEL_LENGTH);
-
-				m_Weekly_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
-				m_Weekly_data.at(i).auto_manual = GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
-				m_Weekly_data.at(i).override_1_value = GetPrivateProfileInt(temp_section,_T("Override_1_Value"),0,FilePath);
-				m_Weekly_data.at(i).override_2_value = GetPrivateProfileInt(temp_section,_T("Override_2_Value"),0,FilePath);
-				m_Weekly_data.at(i).off = GetPrivateProfileInt(temp_section,_T("Off"),0,FilePath);
-				m_Weekly_data.at(i).unused = GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
-
-				m_Weekly_data.at(i).override_1.number = GetPrivateProfileInt(temp_section,_T("Override_1_Number"),0,FilePath);
-				m_Weekly_data.at(i).override_1.panel = GetPrivateProfileInt(temp_section,_T("Override_1_Panel"),0,FilePath);
-				m_Weekly_data.at(i).override_1.point_type = GetPrivateProfileInt(temp_section,_T("Override_1_Point_Type"),0,FilePath);
-				m_Weekly_data.at(i).override_2.number = GetPrivateProfileInt(temp_section,_T("Override_2_number"),0,FilePath);
-				m_Weekly_data.at(i).override_2.panel = GetPrivateProfileInt(temp_section,_T("Override_2_Panel"),0,FilePath);
-				m_Weekly_data.at(i).override_2.point_type = GetPrivateProfileInt(temp_section,_T("Override_2_Point_Type"),0,FilePath);
-			}
-
-			for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
-			{
-				CString temp_section,temp_des,temp_csc;
-				temp_section.Format(_T("Annual_Routines%d"),i);
-
-				CString cs_temp;
-				char cTemp1[255];
-				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_Annual_data.at(i).description,STR_ANNUAL_DESCRIPTION_LENGTH,cTemp1,STR_ANNUAL_DESCRIPTION_LENGTH);
-
-				cs_temp.Empty();
-				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_Annual_data.at(i).label,STR_ANNUAL_LABEL_LENGTH,cTemp1,STR_ANNUAL_LABEL_LENGTH);
-
-				m_Annual_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
-				m_Annual_data.at(i).auto_manual = GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
-				m_Annual_data.at(i).unused = GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
-
-			}
-
-			for (int i=0;i<BAC_MONITOR_COUNT;i++)
-			{
-				CString temp_section,temp_des,temp_csc;
-				temp_section.Format(_T("Monitor%d"),i);
-
-				CString cs_temp;
-				char cTemp1[255];
-				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-				cs_temp.ReleaseBuffer();
-				memset(cTemp1,0,255);
-				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-				memcpy_s(m_monitor_data.at(i).label,STR_MONITOR_LABEL_LENGTH,cTemp1,STR_MONITOR_LABEL_LENGTH);
-
-
-				CString temp_input_code1;
-				GetPrivateProfileStringW(temp_section,_T("Inputs"),_T(""),temp_input_code1.GetBuffer(MAX_PATH),255,FilePath);
-				temp_input_code1.ReleaseBuffer();
-
-				CString temp_input = temp_input_code1;
-				if(temp_input.GetLength()!= (sizeof(Point_Net)*MAX_POINTS_IN_MONITOR) )
-					continue;	//如果这一个的长度不正确 就继续下一个;忽略这个;
-				unsigned char temp_in_array[sizeof(Point_Net)*MAX_POINTS_IN_MONITOR];
-				for (int x=0;x<(sizeof(Point_Net)*MAX_POINTS_IN_MONITOR);x++)
-				{
-					CString temp_value;
-					temp_value = temp_input.Left(2);
-					temp_input = temp_input.Right(temp_input.GetLength()-2);
-					temp_in_array[x] = Str_to_Byte(temp_value);
-				}
-				memcpy_s(&m_monitor_data.at(i).inputs[0],sizeof(Point_Net)*MAX_POINTS_IN_MONITOR,temp_in_array,sizeof(Point_Net)*MAX_POINTS_IN_MONITOR);//copy 70 
-
-				CString temp_range_code1;
-				GetPrivateProfileStringW(temp_section,_T("Range"),_T(""),temp_range_code1.GetBuffer(MAX_PATH),255,FilePath);
-				temp_range_code1.ReleaseBuffer();
-
-				CString temp_range = temp_range_code1;
-
-				if(temp_range.GetLength() != MAX_POINTS_IN_MONITOR)
-					continue;
-				unsigned char rang_array[MAX_POINTS_IN_MONITOR];
-				for (int r=0;r<MAX_POINTS_IN_MONITOR;r++)
-				{
-					CString temp_value;
-					temp_value = temp_range.Left(2);
-					temp_range = temp_range.Right(temp_range.GetLength()-2);
-					rang_array[r] = Str_to_Byte(temp_value);
-				}
-				memcpy_s(&m_monitor_data.at(i).range[0],MAX_POINTS_IN_MONITOR,rang_array,MAX_POINTS_IN_MONITOR);//copy MAX_POINTS_IN_MONITOR 14 
-
-				m_monitor_data.at(i).second_interval_time = GetPrivateProfileInt(temp_section,_T("Second_Interval_Time"),0,FilePath);
-				m_monitor_data.at(i).minute_interval_time = GetPrivateProfileInt(temp_section,_T("Minute_Interval_Time"),0,FilePath);
-				m_monitor_data.at(i).hour_interval_time = GetPrivateProfileInt(temp_section,_T("Hour_Interval_Time"),0,FilePath);
-				m_monitor_data.at(i).max_time_length = GetPrivateProfileInt(temp_section,_T("Max_Time_Length"),0,FilePath);
-				m_monitor_data.at(i).num_inputs = GetPrivateProfileInt(temp_section,_T("Num_Inputs"),0,FilePath);
-				m_monitor_data.at(i).an_inputs = GetPrivateProfileInt(temp_section,_T("An_Inputs"),0,FilePath);
-				m_monitor_data.at(i).next_sample_time = GetPrivateProfileInt(temp_section,_T("next_sample_time"),0,FilePath);
-				//m_monitor_data.at(i).wrap_flag = GetPrivateProfileInt(temp_section,_T("Wrap_flag"),0,FilePath);
-				m_monitor_data.at(i).status = GetPrivateProfileInt(temp_section,_T("Status"),0,FilePath);
-				//m_monitor_data.at(i).reset_flag = GetPrivateProfileInt(temp_section,_T("Reset_Flag"),0,FilePath);
-				//m_monitor_data.at(i).double_flag = GetPrivateProfileInt(temp_section,_T("Double_flag"),0,FilePath);
-
-			}
-
-			DeleteFile(new_file);
-			if(write_to_device)	//如果是客户手动load 就让客户选择路径，不是手动load就说明是读缓存;
-			{
-				CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-				pFrame->Show_Wait_Dialog_And_SendConfigMessage();
+				program_code_length[i] = 0;
+				memset(program_code[i],0,2000);
 			}
 			else
 			{
-				if(Input_Window->IsWindowVisible())
-					::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-				else if(Output_Window->IsWindowVisible())
-					::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
-				else if(Variable_Window->IsWindowVisible())
-					::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+				if(temp_program_code.GetLength() == 2*program_code_length[i])
+				{
+					for (int x=0;x<program_code_length[i];x++)
+					{
+						CString temp_value;
+						temp_value = temp_program_code.Left(2);
+						temp_program_code = temp_program_code.Right(temp_program_code.GetLength()-2);
+						program_code[i][x] = Str_to_Byte(temp_value);
+					}
+				}
 			}
-					
-		}
-	
 
-		return 0;
+
+		}
+
+
+		for (int i=0;i<BAC_SCREEN_COUNT;i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			temp_section.Format(_T("Screen%d"),i);
+
+			CString cs_temp;
+			char cTemp1[255];
+			GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_screen_data.at(i).description,STR_SCREEN_DESCRIPTION_LENGTH,cTemp1,STR_SCREEN_DESCRIPTION_LENGTH);
+
+			cs_temp.Empty();
+			GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_screen_data.at(i).label,STR_SCREEN_LABLE_LENGTH,cTemp1,STR_SCREEN_LABLE_LENGTH);
+			cs_temp.Empty();
+			GetPrivateProfileStringW(temp_section,_T("Picture_file"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_screen_data.at(i).label,STR_SCREEN_PIC_FILE_LENGTH,cTemp1,STR_SCREEN_PIC_FILE_LENGTH);
+
+			m_screen_data.at(i).update = GetPrivateProfileInt(temp_section,_T("Update"),0,FilePath);
+			m_screen_data.at(i).mode = GetPrivateProfileInt(temp_section,_T("Mode"),0,FilePath);
+			m_screen_data.at(i).xcur_grp = GetPrivateProfileInt(temp_section,_T("Xcur_grp"),0,FilePath);
+			m_screen_data.at(i).ycur_grp = GetPrivateProfileInt(temp_section,_T("Ycur_grp"),0,FilePath);
+		}
+
+		for (int i=0;i<BAC_WEEKLY_ROUTINES_COUNT;i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			temp_section.Format(_T("Weekly_Routines%d"),i);
+
+			CString cs_temp;
+			char cTemp1[255];
+			GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_Weekly_data.at(i).description,STR_WEEKLY_DESCRIPTION_LENGTH,cTemp1,STR_WEEKLY_DESCRIPTION_LENGTH);
+
+			cs_temp.Empty();
+			GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_Weekly_data.at(i).label,STR_WEEKLY_LABEL_LENGTH,cTemp1,STR_WEEKLY_LABEL_LENGTH);
+
+			m_Weekly_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
+			m_Weekly_data.at(i).auto_manual = GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+			m_Weekly_data.at(i).override_1_value = GetPrivateProfileInt(temp_section,_T("Override_1_Value"),0,FilePath);
+			m_Weekly_data.at(i).override_2_value = GetPrivateProfileInt(temp_section,_T("Override_2_Value"),0,FilePath);
+			m_Weekly_data.at(i).off = GetPrivateProfileInt(temp_section,_T("Off"),0,FilePath);
+			m_Weekly_data.at(i).unused = GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
+
+			m_Weekly_data.at(i).override_1.number = GetPrivateProfileInt(temp_section,_T("Override_1_Number"),0,FilePath);
+			m_Weekly_data.at(i).override_1.panel = GetPrivateProfileInt(temp_section,_T("Override_1_Panel"),0,FilePath);
+			m_Weekly_data.at(i).override_1.point_type = GetPrivateProfileInt(temp_section,_T("Override_1_Point_Type"),0,FilePath);
+			m_Weekly_data.at(i).override_2.number = GetPrivateProfileInt(temp_section,_T("Override_2_number"),0,FilePath);
+			m_Weekly_data.at(i).override_2.panel = GetPrivateProfileInt(temp_section,_T("Override_2_Panel"),0,FilePath);
+			m_Weekly_data.at(i).override_2.point_type = GetPrivateProfileInt(temp_section,_T("Override_2_Point_Type"),0,FilePath);
+		}
+
+		for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			temp_section.Format(_T("Annual_Routines%d"),i);
+
+			CString cs_temp;
+			char cTemp1[255];
+			GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_Annual_data.at(i).description,STR_ANNUAL_DESCRIPTION_LENGTH,cTemp1,STR_ANNUAL_DESCRIPTION_LENGTH);
+
+			cs_temp.Empty();
+			GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_Annual_data.at(i).label,STR_ANNUAL_LABEL_LENGTH,cTemp1,STR_ANNUAL_LABEL_LENGTH);
+
+			m_Annual_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
+			m_Annual_data.at(i).auto_manual = GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+			m_Annual_data.at(i).unused = GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
+
+		}
+
+		for (int i=0;i<BAC_MONITOR_COUNT;i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			temp_section.Format(_T("Monitor%d"),i);
+
+			CString cs_temp;
+			char cTemp1[255];
+			GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+			cs_temp.ReleaseBuffer();
+			memset(cTemp1,0,255);
+			WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+			memcpy_s(m_monitor_data.at(i).label,STR_MONITOR_LABEL_LENGTH,cTemp1,STR_MONITOR_LABEL_LENGTH);
+
+
+			CString temp_input_code1;
+			GetPrivateProfileStringW(temp_section,_T("Inputs"),_T(""),temp_input_code1.GetBuffer(MAX_PATH),255,FilePath);
+			temp_input_code1.ReleaseBuffer();
+
+			CString temp_input = temp_input_code1;
+			if(temp_input.GetLength()!= (sizeof(Point_Net)*MAX_POINTS_IN_MONITOR) )
+				continue;	//如果这一个的长度不正确 就继续下一个;忽略这个;
+			unsigned char temp_in_array[sizeof(Point_Net)*MAX_POINTS_IN_MONITOR];
+			for (int x=0;x<(sizeof(Point_Net)*MAX_POINTS_IN_MONITOR);x++)
+			{
+				CString temp_value;
+				temp_value = temp_input.Left(2);
+				temp_input = temp_input.Right(temp_input.GetLength()-2);
+				temp_in_array[x] = Str_to_Byte(temp_value);
+			}
+			memcpy_s(&m_monitor_data.at(i).inputs[0],sizeof(Point_Net)*MAX_POINTS_IN_MONITOR,temp_in_array,sizeof(Point_Net)*MAX_POINTS_IN_MONITOR);//copy 70 
+
+			CString temp_range_code1;
+			GetPrivateProfileStringW(temp_section,_T("Range"),_T(""),temp_range_code1.GetBuffer(MAX_PATH),255,FilePath);
+			temp_range_code1.ReleaseBuffer();
+
+			CString temp_range = temp_range_code1;
+
+			if(temp_range.GetLength() != MAX_POINTS_IN_MONITOR)
+				continue;
+			unsigned char rang_array[MAX_POINTS_IN_MONITOR];
+			for (int r=0;r<MAX_POINTS_IN_MONITOR;r++)
+			{
+				CString temp_value;
+				temp_value = temp_range.Left(2);
+				temp_range = temp_range.Right(temp_range.GetLength()-2);
+				rang_array[r] = Str_to_Byte(temp_value);
+			}
+			memcpy_s(&m_monitor_data.at(i).range[0],MAX_POINTS_IN_MONITOR,rang_array,MAX_POINTS_IN_MONITOR);//copy MAX_POINTS_IN_MONITOR 14 
+
+			m_monitor_data.at(i).second_interval_time = GetPrivateProfileInt(temp_section,_T("Second_Interval_Time"),0,FilePath);
+			m_monitor_data.at(i).minute_interval_time = GetPrivateProfileInt(temp_section,_T("Minute_Interval_Time"),0,FilePath);
+			m_monitor_data.at(i).hour_interval_time = GetPrivateProfileInt(temp_section,_T("Hour_Interval_Time"),0,FilePath);
+			m_monitor_data.at(i).max_time_length = GetPrivateProfileInt(temp_section,_T("Max_Time_Length"),0,FilePath);
+			m_monitor_data.at(i).num_inputs = GetPrivateProfileInt(temp_section,_T("Num_Inputs"),0,FilePath);
+			m_monitor_data.at(i).an_inputs = GetPrivateProfileInt(temp_section,_T("An_Inputs"),0,FilePath);
+			m_monitor_data.at(i).next_sample_time = GetPrivateProfileInt(temp_section,_T("next_sample_time"),0,FilePath);
+			//m_monitor_data.at(i).wrap_flag = GetPrivateProfileInt(temp_section,_T("Wrap_flag"),0,FilePath);
+			m_monitor_data.at(i).status = GetPrivateProfileInt(temp_section,_T("Status"),0,FilePath);
+			//m_monitor_data.at(i).reset_flag = GetPrivateProfileInt(temp_section,_T("Reset_Flag"),0,FilePath);
+			//m_monitor_data.at(i).double_flag = GetPrivateProfileInt(temp_section,_T("Double_flag"),0,FilePath);
+
+		}
+
+		DeleteFile(new_file);
+		if(write_to_device)	//如果是客户手动load 就让客户选择路径，不是手动load就说明是读缓存;
+		{
+			CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+			pFrame->Show_Wait_Dialog_And_SendConfigMessage();
+		}
+		else
+		{
+			if(Input_Window->IsWindowVisible())
+				::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+			else if(Output_Window->IsWindowVisible())
+				::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+			else if(Variable_Window->IsWindowVisible())
+				::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+		}
+
+	}
+
+
+	return 0;
 }
 
 
@@ -5766,7 +5771,7 @@ int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
 {
 	if((g_mac!=0) &&(g_bac_instance!=0))
 	{
-		
+
 		CString FilePath;
 		FilePath.Format(_T("%s"),tem_read_path);
 		CFileFind temp_find;
@@ -5874,27 +5879,27 @@ int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
 			delete pBuf;
 			pBuf = NULL;
 		}
-			if(Input_Window->IsWindowVisible())
-				::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-			else if(Output_Window->IsWindowVisible())
-				::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
-			else if(Variable_Window->IsWindowVisible())
-				::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
-			else if(Screen_Window->IsWindowVisible())
-				::PostMessage(m_screen_dlg_hwnd,WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
-			else if(Program_Window->IsWindowVisible())
-				::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
-			else if(Controller_Window->IsWindowVisible())
-				::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
-			else if(Monitor_Window->IsWindowVisible())
-			{
-				::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
-				::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
-			}
-			else if(Setting_Window->IsWindowVisible())
-			{
-				::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);	
-			}
+		if(Input_Window->IsWindowVisible())
+			::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+		else if(Output_Window->IsWindowVisible())
+			::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+		else if(Variable_Window->IsWindowVisible())
+			::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+		else if(Screen_Window->IsWindowVisible())
+			::PostMessage(m_screen_dlg_hwnd,WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
+		else if(Program_Window->IsWindowVisible())
+			::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+		else if(Controller_Window->IsWindowVisible())
+			::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+		else if(Monitor_Window->IsWindowVisible())
+		{
+			::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
+			::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
+		}
+		else if(Setting_Window->IsWindowVisible())
+		{
+			::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);	
+		}
 
 	}
 
@@ -6887,7 +6892,7 @@ BOOL CreateDirectory(CString path)
 } 
 #if 1
 BOOL DeleteDirectory(CString path){
-   
+
 	CFileFind finder;
 	CString temppath;
 	temppath=path;
@@ -6895,7 +6900,7 @@ BOOL DeleteDirectory(CString path){
 	BOOL ret;
 	//temppath.Format(_T("%s*.*",path));
 	temppath += "\\*.*";
-	 
+
 	BOOL bWorking = finder.FindFile(temppath);
 	ret=bWorking;
 	while(bWorking){
@@ -6910,7 +6915,7 @@ BOOL DeleteDirectory(CString path){
 		}
 	}
 	RemoveDirectory(path);
-   return ret; 
+	return ret; 
 }
 #endif
 
@@ -6989,7 +6994,7 @@ void DFTrace(LPCTSTR lpCString)
 	PrintText[count] =str + nCString;
 	PostMessage(h_debug_window,WM_ADD_DEBUG_CSTRING,(WPARAM)PrintText[count].GetBuffer(),NULL);
 	count = (count ++) % 900;
-	
+
 }
 
 CString GetContentFromURL(CString URL){
@@ -6998,36 +7003,36 @@ CString GetContentFromURL(CString URL){
 	CHttpFile* pHttpFile = NULL;
 	try
 	{
-	pHttpFile = (CHttpFile*)sess.OpenURL(URL.GetBuffer());
-	char sRecived[1024];
-	if(pHttpFile)
-	{
-		while(pHttpFile->ReadString((LPTSTR)sRecived, 1024)) //解决Cstring乱码
+		pHttpFile = (CHttpFile*)sess.OpenURL(URL.GetBuffer());
+		char sRecived[1024];
+		if(pHttpFile)
 		{
-			CString temp(sRecived);
-			strHtml += temp;
+			while(pHttpFile->ReadString((LPTSTR)sRecived, 1024)) //解决Cstring乱码
+			{
+				CString temp(sRecived);
+				strHtml += temp;
+			}
 		}
-	}
 
 	}
-	
+
 	catch (CException* e)
 	{
-	strHtml=_T("");
+		strHtml=_T("");
 	}
-	
 
-	
+
+
 	return strHtml;
 }
 CString GetProductFirmwareTimeFromTemcoWebsite(CString URL,CString HexOrBinName,CString &FileSize){
 	CString ftp_T3000Version;
 	ftp_T3000Version=GetContentFromURL(URL);
 	CStringArray HtmlArray;
-    CString VersionString;
+	CString VersionString;
 	if (ftp_T3000Version.GetLength()<=1)
 	{
-	   return VersionString;
+		return VersionString;
 	}
 	HtmlArray.RemoveAll();
 	SplitCStringA(HtmlArray,ftp_T3000Version,_T("<hr>"));
@@ -7046,7 +7051,7 @@ CString GetProductFirmwareTimeFromTemcoWebsite(CString URL,CString HexOrBinName,
 				break;
 			}
 		}
-	
+
 		HtmlArray.RemoveAll();
 
 		if(ImageString.GetLength()>1)
@@ -7070,10 +7075,10 @@ CString GetProductFirmwareTimeFromTemcoWebsite(CString URL,CString HexOrBinName,
 			VersionString=HtmlArray[0];
 			FileSize=HtmlArray[1];
 		}
-		
-}
 
-return VersionString;
+	}
+
+	return VersionString;
 }
 
 BOOL CheckTheSameSubnet(CString strIP ,CString strIP2)
@@ -7087,19 +7092,19 @@ BOOL CheckTheSameSubnet(CString strIP ,CString strIP2)
 
 
 
-		szIP=W2A(strIP2);
-		dwIP=inet_addr(szIP);
-		sa.S_un.S_addr=dwIP;
+	szIP=W2A(strIP2);
+	dwIP=inet_addr(szIP);
+	sa.S_un.S_addr=dwIP;
 
-		if ( ia.S_un.S_un_b.s_b1 == sa.S_un.S_un_b.s_b1 &&
-			ia.S_un.S_un_b.s_b2 == sa.S_un.S_un_b.s_b2 &&
-			ia.S_un.S_un_b.s_b3 == sa.S_un.S_un_b.s_b3 
-			)
-		{
-			ret=TRUE;
-		}
+	if ( ia.S_un.S_un_b.s_b1 == sa.S_un.S_un_b.s_b1 &&
+		ia.S_un.S_un_b.s_b2 == sa.S_un.S_un_b.s_b2 &&
+		ia.S_un.S_un_b.s_b3 == sa.S_un.S_un_b.s_b3 
+		)
+	{
+		ret=TRUE;
+	}
 
-	
+
 
 	return ret;
 
@@ -7158,10 +7163,10 @@ void Save_Product_Value_Cache(CString &SaveFilePath){
 	CFile savefile(SaveFilePath,CFile::modeCreate|CFile::modeReadWrite);
 
 	CArchive oar(&savefile,CArchive::store);
-	
+
 	for (int i=0;i<1024;i++)
 	{
-	 oar<<product_register_value[i];
+		oar<<product_register_value[i];
 	}
 	oar.Close();
 	savefile.Close();
@@ -7198,22 +7203,22 @@ int Load_Product_Value_Cache(LPCTSTR tem_read_path){
 //
 //////////////////////////////////////////////////////////////////////////
 void LoadTstat_InputData(){
-	 
+
 	int m_cvalue=0;
 	int m_crange=0;
 	long m_sn=0;
-    CString strAuto=_T("Auto");
+	CString strAuto=_T("Auto");
 	CString strman=_T("Manual");
 	m_tstat_input_data.clear();
-    Tstat_Input_Struct temp_tstat_input;
+	Tstat_Input_Struct temp_tstat_input;
 	CString strTemp;
 	m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
 	int	m_nModel=product_register_value[MODBUS_PRODUCT_MODEL];
 	int Product_Type=product_register_value[7];
 	if((Product_Type!=PM_TSTAT6)&&(Product_Type!=PM_TSTAT5i)&&(Product_Type!=PM_TSTAT7)){
-	return;
+		return;
 	}
-	#if 1//  g_strSensorName
+#if 1//  g_strSensorName
 	strTemp.Format(_T("%.1f"),product_register_value[MODBUS_INTERNAL_THERMISTOR]/10.0);//216
 	temp_tstat_input.InputName.StrValue=g_strSensorName;
 	temp_tstat_input.Value.StrValue=strTemp;
@@ -7225,12 +7230,12 @@ void LoadTstat_InputData(){
 	temp_tstat_input.AM.RegValue=product_register_value[695];
 	if (product_register_value[695]!=0)
 	{
-	temp_tstat_input.AM.StrValue=strman;
+		temp_tstat_input.AM.StrValue=strman;
 		//m_FlexGrid.put_TextMatrix(1,AM_FIELD,_T("Manual"));
 	} 
 	else
 	{temp_tstat_input.AM.StrValue=strAuto;
-		//m_FlexGrid.put_TextMatrix(1,AM_FIELD,_T("Auto"));
+	//m_FlexGrid.put_TextMatrix(1,AM_FIELD,_T("Auto"));
 	}
 	temp_tstat_input.Range.StrValue=strUnit;
 	temp_tstat_input.Range.regAddress=MODBUS_DEGC_OR_F;
@@ -7243,9 +7248,9 @@ void LoadTstat_InputData(){
 
 	temp_tstat_input.CustomTable.StrValue=NO_APPLICATION;
 	m_tstat_input_data.push_back(temp_tstat_input);
-    #endif
-	 
-	#if 1//初始化InputName
+#endif
+
+#if 1//初始化InputName
 	strTemp=GetTextFromReg(MODBUS_AI1_CHAR1);
 	if (!strTemp.IsEmpty())
 	{
@@ -7334,331 +7339,331 @@ void LoadTstat_InputData(){
 
 	temp_tstat_input.InputName.StrValue=g_strLightingSensor;
 	m_tstat_input_data.push_back(temp_tstat_input);
-	#endif
+#endif
 
-	#if 1   //初始化其他的input的其他值
-	   int nValue=0;
-	
-	   float fValue=0;
-	   for (int i=2;i<=9;i++)
-	   {
+#if 1   //初始化其他的input的其他值
+	int nValue=0;
 
-	  // m_tstat_input_data.at(i-1).CustomTable.StrValue=NO_APPLICATION;
-	     
-		  //Auto Manual
-		  nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];//309    141
-		  BYTE bFilter=0x01;
-		  bFilter = bFilter<< (i-2);
-		  m_tstat_input_data.at(i-1).AM.regAddress=MODBUS_INPUT_MANU_ENABLE;
-		  m_tstat_input_data.at(i-1).AM.RegValue=nValue;
-		  if((nValue & bFilter))
-		  {
-			 	m_tstat_input_data.at(i-1).AM.StrValue=strman;		
-		  }
-		  else
-		  {
-			    m_tstat_input_data.at(i-1).AM.StrValue=strAuto;
-		  }
-		  //Filter
-		  strTemp.Format(_T("%d"),product_register_value[141+i]);
-		  m_tstat_input_data.at(i-1).Filter.regAddress=141+i;
-		  m_tstat_input_data.at(i-1).Filter.StrValue=strTemp;
+	float fValue=0;
+	for (int i=2;i<=9;i++)
+	{
 
-		  //Range
-		       m_crange=0;
- 
-			  nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];	//189
-			  if(nValue>=0)
-			  {
-				  strTemp=analog_range_TSTAT6[nValue]; 
-			  }
-			  m_crange=nValue;
- 
-		  m_tstat_input_data.at(i-1).Range.StrValue=strTemp;
-		  m_tstat_input_data.at(i-1).Range.RegValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];
-		  m_tstat_input_data.at(i-1).Range.regAddress=MODBUS_ANALOG1_RANGE+i-2;
-		 // nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];
-		  //Custom
-		  if(m_crange==4)
-		  {
-		  m_tstat_input_data.at(i-1).CustomTable.StrValue=_T("Custom1...");
-		  }
-		  else if (m_crange==6)
-		  {
-		  m_tstat_input_data.at(i-1).CustomTable.StrValue=_T("Custom2...");
-		  }
-		  else
-		  {
-		  m_tstat_input_data.at(i-1).CustomTable.StrValue=NO_APPLICATION;
-		  }
-		  //Function
-		  nValue=product_register_value[MODBUS_ANALOG1_FUNCTION+i-2];		//298   167
-		  m_tstat_input_data.at(i-1).Function.regAddress=MODBUS_ANALOG1_FUNCTION+i-2;
-		  m_tstat_input_data.at(i-1).Function.RegValue=nValue;
-		  strTemp=INPUT_FUNS[0];
-		  m_tstat_input_data.at(i-1).Function.StrValue=strTemp;
-		  if (nValue>=0&&nValue<8)//tstat6
-		  {		
-			  strTemp=INPUT_FUNS[nValue];
-			  m_tstat_input_data.at(i-1).Function.StrValue=strTemp;
-		  }
- 
-		  if(m_crange==1)	//359  122
-		  {				
-			  fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-2]/10.0);	//367   131
-			  strTemp.Format(_T("%.1f"),fValue);	
-		  }
-		  else if (m_crange==3||m_crange==5||m_crange==7||m_crange==8||m_crange==9||m_crange==10)
-		  {			   
-		     if (m_crange==9||m_crange==10)
-			  {
-				  int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
-				  if (nValue == 0)
-				  {
-					  strTemp = _T("Closed");
-				  }
-				  else
-				  {
-					  strTemp = _T("Open");
-				  }	
-			  }
-			  else if (m_crange==7||m_crange==8)
-			  {
+		// m_tstat_input_data.at(i-1).CustomTable.StrValue=NO_APPLICATION;
 
-				  int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
-				  if (nValue == 0)
-				  {
-					  strTemp = _T("Unoccupied");
-				  }
-				  else
-				  {
-					  strTemp = _T("Occupied");
-				  }	
+		//Auto Manual
+		nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];//309    141
+		BYTE bFilter=0x01;
+		bFilter = bFilter<< (i-2);
+		m_tstat_input_data.at(i-1).AM.regAddress=MODBUS_INPUT_MANU_ENABLE;
+		m_tstat_input_data.at(i-1).AM.RegValue=nValue;
+		if((nValue & bFilter))
+		{
+			m_tstat_input_data.at(i-1).AM.StrValue=strman;		
+		}
+		else
+		{
+			m_tstat_input_data.at(i-1).AM.StrValue=strAuto;
+		}
+		//Filter
+		strTemp.Format(_T("%d"),product_register_value[141+i]);
+		m_tstat_input_data.at(i-1).Filter.regAddress=141+i;
+		m_tstat_input_data.at(i-1).Filter.StrValue=strTemp;
 
-			  }
-			  else
-			  {
+		//Range
+		m_crange=0;
 
-				  int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
-				  if (nValue == 0)
-				  {
-					  strTemp = _T("Off");
-				  }
-				  else
-				  {
-					  strTemp = _T("On");
-				  }	
+		nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];	//189
+		if(nValue>=0)
+		{
+			strTemp=analog_range_TSTAT6[nValue]; 
+		}
+		m_crange=nValue;
 
-			  }	
-		  } 	
-		  else if (m_crange==4||m_crange==6)  // custom sensor	359 122
-		  {					
-			  fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-2]/10.0);	//367  131
-			  strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
-			 
-		  }
-		  else if(m_crange==2)	//359 122
-		  {
-			  nValue=product_register_value[MODBUS_ANALOG_INPUT1+i-2];		//367  131
-			  strTemp.Format(_T("%0.1f"),  (float)nValue);
-		  }
-		  else
-		  {
-			  strTemp.Format(_T("%d"),product_register_value[MODBUS_ANALOG_INPUT1+i-2]);
-		  }	
+		m_tstat_input_data.at(i-1).Range.StrValue=strTemp;
+		m_tstat_input_data.at(i-1).Range.RegValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];
+		m_tstat_input_data.at(i-1).Range.regAddress=MODBUS_ANALOG1_RANGE+i-2;
+		// nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];
+		//Custom
+		if(m_crange==4)
+		{
+			m_tstat_input_data.at(i-1).CustomTable.StrValue=_T("Custom1...");
+		}
+		else if (m_crange==6)
+		{
+			m_tstat_input_data.at(i-1).CustomTable.StrValue=_T("Custom2...");
+		}
+		else
+		{
+			m_tstat_input_data.at(i-1).CustomTable.StrValue=NO_APPLICATION;
+		}
+		//Function
+		nValue=product_register_value[MODBUS_ANALOG1_FUNCTION+i-2];		//298   167
+		m_tstat_input_data.at(i-1).Function.regAddress=MODBUS_ANALOG1_FUNCTION+i-2;
+		m_tstat_input_data.at(i-1).Function.RegValue=nValue;
+		strTemp=INPUT_FUNS[0];
+		m_tstat_input_data.at(i-1).Function.StrValue=strTemp;
+		if (nValue>=0&&nValue<8)//tstat6
+		{		
+			strTemp=INPUT_FUNS[nValue];
+			m_tstat_input_data.at(i-1).Function.StrValue=strTemp;
+		}
 
+		if(m_crange==1)	//359  122
+		{				
+			fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-2]/10.0);	//367   131
+			strTemp.Format(_T("%.1f"),fValue);	
+		}
+		else if (m_crange==3||m_crange==5||m_crange==7||m_crange==8||m_crange==9||m_crange==10)
+		{			   
+			if (m_crange==9||m_crange==10)
+			{
+				int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
+				if (nValue == 0)
+				{
+					strTemp = _T("Closed");
+				}
+				else
+				{
+					strTemp = _T("Open");
+				}	
+			}
+			else if (m_crange==7||m_crange==8)
+			{
 
-		  //Unit
-		  CString strValueUnit=GetTempUnit(m_crange, 1);
-		  m_tstat_input_data.at(i-1).Unit.StrValue=strValueUnit;
+				int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
+				if (nValue == 0)
+				{
+					strTemp = _T("Unoccupied");
+				}
+				else
+				{
+					strTemp = _T("Occupied");
+				}	
+
+			}
+			else
+			{
+
+				int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
+				if (nValue == 0)
+				{
+					strTemp = _T("Off");
+				}
+				else
+				{
+					strTemp = _T("On");
+				}	
+
+			}	
+		} 	
+		else if (m_crange==4||m_crange==6)  // custom sensor	359 122
+		{					
+			fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-2]/10.0);	//367  131
+			strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
+
+		}
+		else if(m_crange==2)	//359 122
+		{
+			nValue=product_register_value[MODBUS_ANALOG_INPUT1+i-2];		//367  131
+			strTemp.Format(_T("%0.1f"),  (float)nValue);
+		}
+		else
+		{
+			strTemp.Format(_T("%d"),product_register_value[MODBUS_ANALOG_INPUT1+i-2]);
+		}	
 
 
-		  m_tstat_input_data.at(i-1).Value.regAddress=MODBUS_ANALOG_INPUT1+i-2;
-		  m_tstat_input_data.at(i-1).Value.RegValue=product_register_value[MODBUS_ANALOG_INPUT1+i-2];
-		  m_tstat_input_data.at(i-1).Value.StrValue=strTemp;
-	   }
-	 
-	#endif
-	   bool m_disable_hum,m_disable_CO2;
-	   if((product_register_value[20]&2)==2)
-	   {
-		   m_disable_hum=TRUE;
-	   }
-	   else
-	   {
-		   m_disable_hum=FALSE;
-	   }
-	   if((product_register_value[MODBUS_TSTAT6_CO2_AVALUE]>=0)&&(product_register_value[MODBUS_TSTAT6_CO2_AVALUE]<=3000))
-	   {
-		   m_disable_CO2=TRUE;
-	   }
-	   else
-	   {
-		   m_disable_CO2=FALSE;
-	   }
-	   if (!m_disable_hum)
-	   {   
-        m_tstat_input_data.at(9).AM.StrValue=NO_APPLICATION;
+		//Unit
+		CString strValueUnit=GetTempUnit(m_crange, 1);
+		m_tstat_input_data.at(i-1).Unit.StrValue=strValueUnit;
+
+
+		m_tstat_input_data.at(i-1).Value.regAddress=MODBUS_ANALOG_INPUT1+i-2;
+		m_tstat_input_data.at(i-1).Value.RegValue=product_register_value[MODBUS_ANALOG_INPUT1+i-2];
+		m_tstat_input_data.at(i-1).Value.StrValue=strTemp;
+	}
+
+#endif
+	bool m_disable_hum,m_disable_CO2;
+	if((product_register_value[20]&2)==2)
+	{
+		m_disable_hum=TRUE;
+	}
+	else
+	{
+		m_disable_hum=FALSE;
+	}
+	if((product_register_value[MODBUS_TSTAT6_CO2_AVALUE]>=0)&&(product_register_value[MODBUS_TSTAT6_CO2_AVALUE]<=3000))
+	{
+		m_disable_CO2=TRUE;
+	}
+	else
+	{
+		m_disable_CO2=FALSE;
+	}
+	if (!m_disable_hum)
+	{   
+		m_tstat_input_data.at(9).AM.StrValue=NO_APPLICATION;
 		m_tstat_input_data.at(9).CustomTable.StrValue=NO_APPLICATION;
 		m_tstat_input_data.at(9).Filter.StrValue=NO_APPLICATION;
 		m_tstat_input_data.at(9).Function.StrValue=NO_APPLICATION;
 		m_tstat_input_data.at(9).Range.StrValue=NO_APPLICATION;
 		m_tstat_input_data.at(9).Unit.StrValue=NO_APPLICATION;
 		m_tstat_input_data.at(9).Value.StrValue=NO_APPLICATION;
-		 
-	   }
-	   else
-	   {
 
-		   CString temp;
-		   m_tstat_input_data.at(9).AM.regAddress=MODBUS_TSTAT6_HUM_AM;
-		   m_tstat_input_data.at(9).AM.RegValue=product_register_value[MODBUS_TSTAT6_HUM_AM];
+	}
+	else
+	{
 
-		   if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
-		   {
+		CString temp;
+		m_tstat_input_data.at(9).AM.regAddress=MODBUS_TSTAT6_HUM_AM;
+		m_tstat_input_data.at(9).AM.RegValue=product_register_value[MODBUS_TSTAT6_HUM_AM];
 
-			   temp.Format(_T("%0.1f%%"),(float)product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10.0);
-			   //m_FlexGrid.put_TextMatrix(10,AM_FIELD,strAuto);
-			   m_tstat_input_data.at(9).AM.StrValue=strAuto;
+		if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
+		{
 
-			   m_tstat_input_data.at(9).Value.regAddress=MODBUS_TSTAT6_HUM_AVALUE;
-			   m_tstat_input_data.at(9).Value.RegValue=product_register_value[MODBUS_TSTAT6_HUM_AVALUE];
-			   m_tstat_input_data.at(9).Value.StrValue=temp;
-			   
-		   }
-		   else
-		   {
-			  // m_FlexGrid.put_TextMatrix(10,AM_FIELD,strman);
-			  m_tstat_input_data.at(9).AM.StrValue=strman;
-			   temp.Format(_T("%0.1f%%"),(float)product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10);
+			temp.Format(_T("%0.1f%%"),(float)product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10.0);
+			//m_FlexGrid.put_TextMatrix(10,AM_FIELD,strAuto);
+			m_tstat_input_data.at(9).AM.StrValue=strAuto;
 
-			   m_tstat_input_data.at(9).Value.regAddress=MODBUS_TSTAT6_HUM_MVALUE;
-			   m_tstat_input_data.at(9).Value.RegValue=product_register_value[MODBUS_TSTAT6_HUM_MVALUE];
-			   m_tstat_input_data.at(9).Value.StrValue=temp;
+			m_tstat_input_data.at(9).Value.regAddress=MODBUS_TSTAT6_HUM_AVALUE;
+			m_tstat_input_data.at(9).Value.RegValue=product_register_value[MODBUS_TSTAT6_HUM_AVALUE];
+			m_tstat_input_data.at(9).Value.StrValue=temp;
 
+		}
+		else
+		{
+			// m_FlexGrid.put_TextMatrix(10,AM_FIELD,strman);
+			m_tstat_input_data.at(9).AM.StrValue=strman;
+			temp.Format(_T("%0.1f%%"),(float)product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10);
 
-		   }
-		    m_tstat_input_data.at(9).Unit.StrValue=_T("%");
-		   
-		   temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_HUM_FILTER]);
-		   m_tstat_input_data.at(9).Filter.regAddress=MODBUS_TSTAT6_HUM_FILTER;
-		   m_tstat_input_data.at(9).Filter.RegValue=product_register_value[MODBUS_TSTAT6_HUM_FILTER];
-		   m_tstat_input_data.at(9).Filter.StrValue=temp;
-		   m_tstat_input_data.at(9).Range.StrValue=NO_APPLICATION;
-	   }
+			m_tstat_input_data.at(9).Value.regAddress=MODBUS_TSTAT6_HUM_MVALUE;
+			m_tstat_input_data.at(9).Value.RegValue=product_register_value[MODBUS_TSTAT6_HUM_MVALUE];
+			m_tstat_input_data.at(9).Value.StrValue=temp;
 
 
-	   if (!m_disable_CO2)
-	   {
-		   m_tstat_input_data.at(10).AM.StrValue=NO_APPLICATION;
-		   m_tstat_input_data.at(10).CustomTable.StrValue=NO_APPLICATION;
-		   m_tstat_input_data.at(10).Filter.StrValue=NO_APPLICATION;
-		   m_tstat_input_data.at(10).Function.StrValue=NO_APPLICATION;
-		   m_tstat_input_data.at(10).Range.StrValue=NO_APPLICATION;
-		   m_tstat_input_data.at(10).Unit.StrValue=NO_APPLICATION;
-		   m_tstat_input_data.at(10).Value.StrValue=NO_APPLICATION;
-	   } 
-	   else
-	   {
-		   CString temp;
-		   m_tstat_input_data.at(10).AM.regAddress=MODBUS_TSTAT6_CO2_AM;
-		   m_tstat_input_data.at(10).AM.RegValue=product_register_value[MODBUS_TSTAT6_CO2_AM];
-            strUnit=_T("ppm");
-			m_tstat_input_data.at(10).Unit.StrValue=strUnit;
-		   if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
-		   {     
-				
-			 
-				m_tstat_input_data.at(10).AM.StrValue=strAuto;
-				temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
-			    
-				m_tstat_input_data.at(10).Value.regAddress=MODBUS_TSTAT6_CO2_AVALUE;
-				m_tstat_input_data.at(10).Value.RegValue=product_register_value[MODBUS_TSTAT6_CO2_AVALUE];
-				m_tstat_input_data.at(10).Value.StrValue=temp;
-		        
-		   }
-		   else
-		   {
-		      m_tstat_input_data.at(10).AM.StrValue=strman;
-			   temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
-			   m_tstat_input_data.at(10).Value.regAddress=MODBUS_TSTAT6_CO2_MVALUE;
-			   m_tstat_input_data.at(10).Value.RegValue=product_register_value[MODBUS_TSTAT6_CO2_MVALUE];
-			   m_tstat_input_data.at(10).Value.StrValue=temp;
- 
-		   }	
-		  
-		   temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_FILTER]);
-		   m_tstat_input_data.at(10).Filter.regAddress=MODBUS_TSTAT6_CO2_FILTER;
-		   m_tstat_input_data.at(10).Filter.RegValue=product_register_value[MODBUS_TSTAT6_CO2_FILTER];
-		   m_tstat_input_data.at(10).Filter.StrValue=temp;
-		    m_tstat_input_data.at(10).Range.StrValue=NO_APPLICATION;
-	   }
+		}
+		m_tstat_input_data.at(9).Unit.StrValue=_T("%");
 
-	   strTemp.Format(_T("%d"),product_register_value[MODBUS_VALUE_SENSOR]);
-	  // LUX
-	   m_tstat_input_data.at(11).AM.StrValue=NO_APPLICATION;
-	   m_tstat_input_data.at(11).CustomTable.StrValue=NO_APPLICATION;
-	   m_tstat_input_data.at(11).Filter.StrValue=NO_APPLICATION;
-	   m_tstat_input_data.at(11).Function.StrValue=NO_APPLICATION;
-	   m_tstat_input_data.at(11).Range.StrValue=L"LUX";
-	   m_tstat_input_data.at(11).Unit.StrValue=L"LUX";
-	   m_tstat_input_data.at(11).Value.regAddress=MODBUS_VALUE_SENSOR;
-	   m_tstat_input_data.at(11).Value.RegValue=product_register_value[MODBUS_VALUE_SENSOR];
-	   m_tstat_input_data.at(11).Value.StrValue=strTemp;
+		temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_HUM_FILTER]);
+		m_tstat_input_data.at(9).Filter.regAddress=MODBUS_TSTAT6_HUM_FILTER;
+		m_tstat_input_data.at(9).Filter.RegValue=product_register_value[MODBUS_TSTAT6_HUM_FILTER];
+		m_tstat_input_data.at(9).Filter.StrValue=temp;
+		m_tstat_input_data.at(9).Range.StrValue=NO_APPLICATION;
+	}
+
+
+	if (!m_disable_CO2)
+	{
+		m_tstat_input_data.at(10).AM.StrValue=NO_APPLICATION;
+		m_tstat_input_data.at(10).CustomTable.StrValue=NO_APPLICATION;
+		m_tstat_input_data.at(10).Filter.StrValue=NO_APPLICATION;
+		m_tstat_input_data.at(10).Function.StrValue=NO_APPLICATION;
+		m_tstat_input_data.at(10).Range.StrValue=NO_APPLICATION;
+		m_tstat_input_data.at(10).Unit.StrValue=NO_APPLICATION;
+		m_tstat_input_data.at(10).Value.StrValue=NO_APPLICATION;
+	} 
+	else
+	{
+		CString temp;
+		m_tstat_input_data.at(10).AM.regAddress=MODBUS_TSTAT6_CO2_AM;
+		m_tstat_input_data.at(10).AM.RegValue=product_register_value[MODBUS_TSTAT6_CO2_AM];
+		strUnit=_T("ppm");
+		m_tstat_input_data.at(10).Unit.StrValue=strUnit;
+		if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
+		{     
+
+
+			m_tstat_input_data.at(10).AM.StrValue=strAuto;
+			temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
+
+			m_tstat_input_data.at(10).Value.regAddress=MODBUS_TSTAT6_CO2_AVALUE;
+			m_tstat_input_data.at(10).Value.RegValue=product_register_value[MODBUS_TSTAT6_CO2_AVALUE];
+			m_tstat_input_data.at(10).Value.StrValue=temp;
+
+		}
+		else
+		{
+			m_tstat_input_data.at(10).AM.StrValue=strman;
+			temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
+			m_tstat_input_data.at(10).Value.regAddress=MODBUS_TSTAT6_CO2_MVALUE;
+			m_tstat_input_data.at(10).Value.RegValue=product_register_value[MODBUS_TSTAT6_CO2_MVALUE];
+			m_tstat_input_data.at(10).Value.StrValue=temp;
+
+		}	
+
+		temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_FILTER]);
+		m_tstat_input_data.at(10).Filter.regAddress=MODBUS_TSTAT6_CO2_FILTER;
+		m_tstat_input_data.at(10).Filter.RegValue=product_register_value[MODBUS_TSTAT6_CO2_FILTER];
+		m_tstat_input_data.at(10).Filter.StrValue=temp;
+		m_tstat_input_data.at(10).Range.StrValue=NO_APPLICATION;
+	}
+
+	strTemp.Format(_T("%d"),product_register_value[MODBUS_VALUE_SENSOR]);
+	// LUX
+	m_tstat_input_data.at(11).AM.StrValue=NO_APPLICATION;
+	m_tstat_input_data.at(11).CustomTable.StrValue=NO_APPLICATION;
+	m_tstat_input_data.at(11).Filter.StrValue=NO_APPLICATION;
+	m_tstat_input_data.at(11).Function.StrValue=NO_APPLICATION;
+	m_tstat_input_data.at(11).Range.StrValue=L"LUX";
+	m_tstat_input_data.at(11).Unit.StrValue=L"LUX";
+	m_tstat_input_data.at(11).Value.regAddress=MODBUS_VALUE_SENSOR;
+	m_tstat_input_data.at(11).Value.RegValue=product_register_value[MODBUS_VALUE_SENSOR];
+	m_tstat_input_data.at(11).Value.StrValue=strTemp;
 }
 
 void LoadInputData_CS3000(){
-   m_tstat_input_data.clear();
-  Tstat_Input_Struct temp_tstat_input;
+	m_tstat_input_data.clear();
+	Tstat_Input_Struct temp_tstat_input;
 
-  temp_tstat_input.InputName.StrValue=L"Current";
-  m_tstat_input_data.push_back(temp_tstat_input);
-  temp_tstat_input.InputName.StrValue=L"Voltage";
-  m_tstat_input_data.push_back(temp_tstat_input);
+	temp_tstat_input.InputName.StrValue=L"Current";
+	m_tstat_input_data.push_back(temp_tstat_input);
+	temp_tstat_input.InputName.StrValue=L"Voltage";
+	m_tstat_input_data.push_back(temp_tstat_input);
 
-  m_tstat_input_data.at(0).Value.Reg_Property=REG_READ_WRITE;
-  m_tstat_input_data.at(0).Value.regAddress=100;
-  m_tstat_input_data.at(0).Value.RegValue=(short)product_register_value[100];
+	m_tstat_input_data.at(0).Value.Reg_Property=REG_READ_WRITE;
+	m_tstat_input_data.at(0).Value.regAddress=100;
+	m_tstat_input_data.at(0).Value.RegValue=(short)product_register_value[100];
 
 
-  m_tstat_input_data.at(0).Range.regAddress = 104;
-  m_tstat_input_data.at(0).Range.RegValue = (short)product_register_value[104];
+	m_tstat_input_data.at(0).Range.regAddress = 104;
+	m_tstat_input_data.at(0).Range.RegValue = (short)product_register_value[104];
 
-  if (product_register_value[7]==PM_CS_RSM_AC||product_register_value[7]==PM_CS_SM_AC)
-  {
+	if (product_register_value[7]==PM_CS_RSM_AC||product_register_value[7]==PM_CS_SM_AC)
+	{
 
-    m_tstat_input_data.at(0).Value.StrValue.Format(_T("%0.2f"),(float)(m_tstat_input_data.at(0).Value.RegValue)/100);
-    if (m_tstat_input_data.at(0).Range.RegValue>=0&&m_tstat_input_data.at(0).Range.RegValue<=2)
-    {
-	  m_tstat_input_data.at(0).Range.StrValue=CS3000_INPUT_RANGE[m_tstat_input_data.at(0).Range.RegValue];
-	  m_tstat_input_data.at(0).Range.Reg_Property=REG_READ_WRITE;
-    }
-  }
-  else
-  {
-     m_tstat_input_data.at(0).Value.StrValue.Format(_T("%0.1f"),(float)(m_tstat_input_data.at(0).Value.RegValue)/10);
-	 if(m_tstat_input_data.at(0).Range.RegValue==10)
-	 {
-	  m_tstat_input_data.at(0).Range.StrValue=CS3000_INPUT_RANGE[3];
-	 }  
-  }
-  m_tstat_input_data.at(1).Value.Reg_Property=REG_READ_WRITE;
-  m_tstat_input_data.at(1).Value.regAddress=101;
-  m_tstat_input_data.at(1).Value.RegValue=(short)product_register_value[101];
-  m_tstat_input_data.at(1).Value.StrValue.Format(_T("%0.1f"),(float)(m_tstat_input_data.at(1).Value.RegValue)/10);
+		m_tstat_input_data.at(0).Value.StrValue.Format(_T("%0.2f"),(float)(m_tstat_input_data.at(0).Value.RegValue)/100);
+		if (m_tstat_input_data.at(0).Range.RegValue>=0&&m_tstat_input_data.at(0).Range.RegValue<=2)
+		{
+			m_tstat_input_data.at(0).Range.StrValue=CS3000_INPUT_RANGE[m_tstat_input_data.at(0).Range.RegValue];
+			m_tstat_input_data.at(0).Range.Reg_Property=REG_READ_WRITE;
+		}
+	}
+	else
+	{
+		m_tstat_input_data.at(0).Value.StrValue.Format(_T("%0.1f"),(float)(m_tstat_input_data.at(0).Value.RegValue)/10);
+		if(m_tstat_input_data.at(0).Range.RegValue==10)
+		{
+			m_tstat_input_data.at(0).Range.StrValue=CS3000_INPUT_RANGE[3];
+		}  
+	}
+	m_tstat_input_data.at(1).Value.Reg_Property=REG_READ_WRITE;
+	m_tstat_input_data.at(1).Value.regAddress=101;
+	m_tstat_input_data.at(1).Value.RegValue=(short)product_register_value[101];
+	m_tstat_input_data.at(1).Value.StrValue.Format(_T("%0.1f"),(float)(m_tstat_input_data.at(1).Value.RegValue)/10);
 
-  m_tstat_input_data.at(0).Unit.StrValue=_T("A");
-  m_tstat_input_data.at(1).Unit.StrValue=_T("V");
+	m_tstat_input_data.at(0).Unit.StrValue=_T("A");
+	m_tstat_input_data.at(1).Unit.StrValue=_T("V");
 
-  m_tstat_input_data.at(0).Filter.Reg_Property=REG_READ_WRITE;
-  m_tstat_input_data.at(0).Filter.regAddress=136;
-  m_tstat_input_data.at(0).Filter.RegValue=product_register_value[136];
-  m_tstat_input_data.at(0).Filter.StrValue.Format(_T("%d"),product_register_value[136]);
+	m_tstat_input_data.at(0).Filter.Reg_Property=REG_READ_WRITE;
+	m_tstat_input_data.at(0).Filter.regAddress=136;
+	m_tstat_input_data.at(0).Filter.RegValue=product_register_value[136];
+	m_tstat_input_data.at(0).Filter.StrValue.Format(_T("%d"),product_register_value[136]);
 
-  m_tstat_input_data.at(1).Filter.Reg_Property=REG_READ_WRITE;
-  m_tstat_input_data.at(1).Filter.regAddress=136;
-  m_tstat_input_data.at(1).Filter.RegValue=product_register_value[136];
-  m_tstat_input_data.at(1).Filter.StrValue.Format(_T("%d"),product_register_value[136]);
+	m_tstat_input_data.at(1).Filter.Reg_Property=REG_READ_WRITE;
+	m_tstat_input_data.at(1).Filter.regAddress=136;
+	m_tstat_input_data.at(1).Filter.RegValue=product_register_value[136];
+	m_tstat_input_data.at(1).Filter.StrValue.Format(_T("%d"),product_register_value[136]);
 
 }
 #define  THE_CHAR_LENGTH 8
@@ -7703,92 +7708,102 @@ CString GetTextFromReg(unsigned short reg)
 }
 #define  OUTPUT_NUMBER 7
 void LoadTstat_OutputData(){
-m_tstat_output_data.clear();
-int nVAlue;int nValue=0;
-int m_crange=0;
-int m_nModeType = product_register_value[7];
-if((m_nModeType!=PM_TSTAT6)&&(m_nModeType!=PM_TSTAT5i)&&(m_nModeType!=PM_TSTAT7)){
-	return;
-}
-int m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
-float m_version = get_curtstat_version();
-Tstat_Output_Struct out_struct_temp;
-out_struct_temp.OutputName.StrValue=g_strOutName1;
-m_tstat_output_data.push_back(out_struct_temp);
-out_struct_temp.OutputName.StrValue=g_strOutName2;
-m_tstat_output_data.push_back(out_struct_temp);
-out_struct_temp.OutputName.StrValue=g_strOutName3;
-m_tstat_output_data.push_back(out_struct_temp);
-out_struct_temp.OutputName.StrValue=g_strOutName4;
-m_tstat_output_data.push_back(out_struct_temp);
-out_struct_temp.OutputName.StrValue=g_strOutName5;
-m_tstat_output_data.push_back(out_struct_temp);
-out_struct_temp.OutputName.StrValue=g_strOutName6;
-m_tstat_output_data.push_back(out_struct_temp);
-out_struct_temp.OutputName.StrValue=g_strOutName7;
-m_tstat_output_data.push_back(out_struct_temp);
-if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7)
-{	 
-}
-else{
-	for (int i=0;i<OUTPUT_NUMBER;i++)
-	{
-	  m_tstat_output_data.at(i).Signal_Type.StrValue=NO_APPLICATION;
-	  m_tstat_output_data.at(i).Signal_Type.regAddress=NO_ADDRESS;
-	  m_tstat_output_data.at(i).Signal_Type.RegValue = NO_REGISTER_VALUE;
+	m_tstat_output_data.clear();
+	int nVAlue;int nValue=0;
+	int m_crange=0;
+	int m_nModeType = product_register_value[7];
+	if((m_nModeType!=PM_TSTAT6)&&(m_nModeType!=PM_TSTAT5i)&&(m_nModeType!=PM_TSTAT7)){
+		return;
 	}
-}
-CString strTemp;
-//108  209 Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.  Fan.
-nVAlue = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS]; //t5=108   t6=209;
-int nRange=0;
-//310	254	1	Low byte	W/R	"Output auto/manual enable. Bit 0 to 4 correspond to output1 to output5, bit 5 correspond to 
-//	output6, bit 6 correspond to output7. 0, auto mode; 1, manual mode."
-int nAMVAlue=0;//=product_register_value[310];
-nAMVAlue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];
-//Row 1-3 初始化 Value，A/M，Range
-for(int i=1;i<=3;i++)
-{
-	//int temp=1<<(i-1);
-	//int a = nAMVAlue;
-	//int b = nAMVAlue & (1<<(i-1));
-	if((int)(nAMVAlue & (1<<(i-1))) == (1<<(i-1)))
-	{
-		strTemp=_T("Manual");
+	int m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
+	float m_version = get_curtstat_version();
+	Tstat_Output_Struct out_struct_temp;
+	out_struct_temp.OutputName.StrValue=g_strOutName1;
+	m_tstat_output_data.push_back(out_struct_temp);
+	out_struct_temp.OutputName.StrValue=g_strOutName2;
+	m_tstat_output_data.push_back(out_struct_temp);
+	out_struct_temp.OutputName.StrValue=g_strOutName3;
+	m_tstat_output_data.push_back(out_struct_temp);
+	out_struct_temp.OutputName.StrValue=g_strOutName4;
+	m_tstat_output_data.push_back(out_struct_temp);
+	out_struct_temp.OutputName.StrValue=g_strOutName5;
+	m_tstat_output_data.push_back(out_struct_temp);
+	out_struct_temp.OutputName.StrValue=g_strOutName6;
+	m_tstat_output_data.push_back(out_struct_temp);
+	out_struct_temp.OutputName.StrValue=g_strOutName7;
+	m_tstat_output_data.push_back(out_struct_temp);
+	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7)
+	{	 
 	}
-	else
-	{
-		strTemp=_T("Auto");
-	} 
-	m_tstat_output_data.at(i-1).AM.regAddress=MODBUS_OUTPUT_MANU_ENABLE;
-	m_tstat_output_data.at(i-1).AM.RegValue=nAMVAlue;
-	m_tstat_output_data.at(i-1).AM.StrValue=strTemp;
-	//strTemp=_T("On/Off");
-	nRange=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
-
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
-	{
-		CADO ado;
-		ado.OnInitADOConn();
-		if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+	else{
+		for (int i=0;i<OUTPUT_NUMBER;i++)
 		{
-			CString sql;
-			sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),i,i,m_sn);
-			ado.m_pRecordset=ado.OpenRecordset(sql);
-			if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
-			{    
-				ado.m_pRecordset->MoveFirst();
-				while (!ado.m_pRecordset->EndOfFile)
+			m_tstat_output_data.at(i).Signal_Type.StrValue=NO_APPLICATION;
+			m_tstat_output_data.at(i).Signal_Type.regAddress=NO_ADDRESS;
+			m_tstat_output_data.at(i).Signal_Type.RegValue = NO_REGISTER_VALUE;
+		}
+	}
+	CString strTemp;
+	//108  209 Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.  Fan.
+	nVAlue = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS]; //t5=108   t6=209;
+	int nRange=0;
+	//310	254	1	Low byte	W/R	"Output auto/manual enable. Bit 0 to 4 correspond to output1 to output5, bit 5 correspond to 
+	//	output6, bit 6 correspond to output7. 0, auto mode; 1, manual mode."
+	int nAMVAlue=0;//=product_register_value[310];
+	nAMVAlue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];
+	//Row 1-3 初始化 Value，A/M，Range
+	for(int i=1;i<=3;i++)
+	{
+		//int temp=1<<(i-1);
+		//int a = nAMVAlue;
+		//int b = nAMVAlue & (1<<(i-1));
+		if((int)(nAMVAlue & (1<<(i-1))) == (1<<(i-1)))
+		{
+			strTemp=_T("Manual");
+		}
+		else
+		{
+			strTemp=_T("Auto");
+		} 
+		m_tstat_output_data.at(i-1).AM.regAddress=MODBUS_OUTPUT_MANU_ENABLE;
+		m_tstat_output_data.at(i-1).AM.RegValue=nAMVAlue;
+		m_tstat_output_data.at(i-1).AM.StrValue=strTemp;
+		//strTemp=_T("On/Off");
+		nRange=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
+
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+		{
+			CADO ado;
+			ado.OnInitADOConn();
+			if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+			{
+				CString sql;
+				sql.Format(_T("Select * from Value_Range where CInputNo=%d%d and SN=%d"),i,i,m_sn);
+				ado.m_pRecordset=ado.OpenRecordset(sql);
+				if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+				{    
+					ado.m_pRecordset->MoveFirst();
+					while (!ado.m_pRecordset->EndOfFile)
+					{
+						m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
+						ado.m_pRecordset->MoveNext();
+					}
+					nRange=m_crange;	 
+					if(nRange>=0)
+					{
+						strTemp=OUTPUT_RANGE45[nRange];
+					}
+				} 
+				else
 				{
-					m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
-					ado.m_pRecordset->MoveNext();
+
+					if(nRange>=0)
+					{
+						strTemp=OUTPUT_RANGE45[nRange]; 
+					}
 				}
-				nRange=m_crange;	 
-				if(nRange>=0)
-				{
-					strTemp=OUTPUT_RANGE45[nRange];
-				}
-			} 
+				ado.CloseRecordset();
+			}
 			else
 			{
 
@@ -7797,80 +7812,70 @@ for(int i=1;i<=3;i++)
 					strTemp=OUTPUT_RANGE45[nRange]; 
 				}
 			}
-			ado.CloseRecordset();
+			ado.CloseConn();
+
+			if(nRange>=0&&nRange<7)
+			{
+				strTemp=OUTPUT_RANGE45[nRange];
+			}
+		} 
+		else
+		{
+			if(nRange>=0&&nRange<3)
+			{
+				strTemp=OUTPUT_RANGE5[nRange];
+			}
+		}
+
+		m_tstat_output_data.at(i-1).Range.regAddress=MODBUS_MODE_OUTPUT1+i-1;
+		m_tstat_output_data.at(i-1).Range.RegValue=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
+		m_tstat_output_data.at(i-1).Range.StrValue=strTemp;
+
+		if (nRange==0||nRange==4||nRange==5||nRange==6)
+		{
+			m_tstat_output_data.at(i-1).Value.regAddress=MODBUS_DIGITAL_OUTPUT_STATUS;
+			m_tstat_output_data.at(i-1).Value.RegValue=nVAlue;
+
+			if(nVAlue&(1<<(i-1)))
+			{
+				if (nRange==0||nRange==4)
+				{
+					strTemp=_T("On");
+				} 
+				else if (nRange==5||nRange==6)
+				{
+					strTemp=_T("Open");
+				}
+
+			}
+			else
+			{
+				if (nRange==0||nRange==4)
+				{
+					strTemp=_T("Off");
+				} 
+				else if (nRange==5||nRange==6)
+				{
+					strTemp=_T("Closed");
+				}
+			}
+			m_tstat_output_data.at(i-1).Value.StrValue=strTemp;
 		}
 		else
 		{
+			//comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
+			int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
+			strTemp.Format(_T("%d%%"), nValueTemp);
+			m_tstat_output_data.at(i-1).Value.regAddress=MODBUS_PWM_OUT4;
+			m_tstat_output_data.at(i-1).Value.RegValue=nValueTemp;
+			m_tstat_output_data.at(i-1).Value.StrValue=strTemp;
 
-			if(nRange>=0)
-			{
-				strTemp=OUTPUT_RANGE45[nRange]; 
-			}
+			m_tstat_output_data.at(i-1).Unit.StrValue = _T("%");
 		}
-		ado.CloseConn();
 
-		if(nRange>=0&&nRange<7)
-		{
-			strTemp=OUTPUT_RANGE45[nRange];
-		}
-	} 
-	else
-	{
-		if(nRange>=0&&nRange<3)
-		{
-			strTemp=OUTPUT_RANGE5[nRange];
-		}
 	}
-
-	m_tstat_output_data.at(i-1).Range.regAddress=MODBUS_MODE_OUTPUT1+i-1;
-	m_tstat_output_data.at(i-1).Range.RegValue=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
-	m_tstat_output_data.at(i-1).Range.StrValue=strTemp;
-
-	if (nRange==0||nRange==4||nRange==5||nRange==6)
-	{
-	m_tstat_output_data.at(i-1).Value.regAddress=MODBUS_DIGITAL_OUTPUT_STATUS;
-	m_tstat_output_data.at(i-1).Value.RegValue=nVAlue;
-
-	if(nVAlue&(1<<(i-1)))
-	{
-		if (nRange==0||nRange==4)
-		{
-			strTemp=_T("On");
-		} 
-		else if (nRange==5||nRange==6)
-		{
-			strTemp=_T("Open");
-		}
-		
-	}
-	else
-	{
-		if (nRange==0||nRange==4)
-		{
-			strTemp=_T("Off");
-		} 
-		else if (nRange==5||nRange==6)
-		{
-			strTemp=_T("Closed");
-		}
-	}
-	m_tstat_output_data.at(i-1).Value.StrValue=strTemp;
-	}
-	else
-	{
-		//comments by Fance ,此前没有 348 -》对应 t6的598  ，现在有了。;所以该不该改为现在的？？？
-		int nValueTemp = product_register_value[MODBUS_PWM_OUT4]; //348 //598
-		strTemp.Format(_T("%d%%"), nValueTemp);
-		m_tstat_output_data.at(i-1).Value.regAddress=MODBUS_PWM_OUT4;
-		m_tstat_output_data.at(i-1).Value.RegValue=nValueTemp;
-		m_tstat_output_data.at(i-1).Value.StrValue=strTemp;
-
-		m_tstat_output_data.at(i-1).Unit.StrValue = _T("%");
-	}
-
-}
-//Function
- #if 1 
+	//Function
+#if 1 
 	for(int i=0;i<OUTPUT_NUMBER;i++){
 		int nFun=0;//=product_register_value[328];//tstat6找不到对应的
 		nFun = product_register_value[MODBUS_OUTPUT1_FUNCTION+i]; //328   266
@@ -7901,7 +7906,7 @@ for(int i=1;i<=3;i++)
 		m_tstat_output_data.at(3).AM.RegValue=nAMVAlue;
 		m_tstat_output_data.at(3).AM.StrValue=strTemp;
 		strTemp.Empty();
-}
+	}
 
 	nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
 	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
@@ -8008,12 +8013,12 @@ for(int i=1;i<=3;i++)
 	if((int)(nAMVAlue & 16))
 	{
 		strTemp=_T("Manual");
-		 
+
 	}
 	else
 	{
 		strTemp=_T("Auto");
-		 
+
 	}
 
 	m_tstat_output_data.at(4).AM.regAddress=MODBUS_OUTPUT_MANU_ENABLE;
@@ -8130,14 +8135,14 @@ for(int i=1;i<=3;i++)
 
 	}
 
-	#if 0
-if(m_nModeType==17||m_nModeType==18)
+#if 0
+	if(m_nModeType==17||m_nModeType==18)
 	{
 		//out4:
 		int nRang=0;//product_register_value[283];
 		nRang= product_register_value[MODBUS_OUTPUT1_FUNCTION];//328  266
 		int nValue1;//=product_register_value[108];
-		 
+
 		nValue1 = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS];//108   209
 		if(nRang==0)
 		{
@@ -8186,12 +8191,12 @@ if(m_nModeType==17||m_nModeType==18)
 		//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT4]; //283  205
-		 
-			if(nRange>=0&&nRange<=2)
-			{
-				strTemp=OUTPUT_RANGE5[nRange];
-			}
-		 
+
+		if(nRange>=0&&nRange<=2)
+		{
+			strTemp=OUTPUT_RANGE5[nRange];
+		}
+
 
 		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
 
@@ -8219,11 +8224,11 @@ if(m_nModeType==17||m_nModeType==18)
 		{
 			int indext=-1;
 			//336	269	1	Low byte	W/R	Output4 function setting (see above)
-		 
-				//indext=product_register_value[336];//2.5.0.96
-				indext=product_register_value[283];//2.5.0.98		//Fance_?_   //269 对应 336 这里为什么 要变为 283;
 
-			 
+			//indext=product_register_value[336];//2.5.0.96
+			indext=product_register_value[283];//2.5.0.98		//Fance_?_   //269 对应 336 这里为什么 要变为 283;
+
+
 			if(indext>=0&&indext<=4)
 				strTemp=ONTPUT_FUNS[indext];
 
@@ -8235,13 +8240,13 @@ if(m_nModeType==17||m_nModeType==18)
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 
 		////337	270	1	Low byte	W/R	Output5 function setting (see above)
-		 
-			nRang=product_register_value[337];			//Fance_?_ 不明白 为什么 tstat5 要用337=MODBUS_OUTPUT5_FUNCTION 而tstat 要用206=MODBUS_MODE_OUTPUT5;
-		 
+
+		nRang=product_register_value[337];			//Fance_?_ 不明白 为什么 tstat5 要用337=MODBUS_OUTPUT5_FUNCTION 而tstat 要用206=MODBUS_MODE_OUTPUT5;
+
 		//108	209	1	Low byte	W/R	Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.
 
 		nValue1 = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS];//108   209
-		 if (product_register_value[7]==18)
+		if (product_register_value[7]==18)
 		{
 			//2.5.0.94
 			if(product_register_value[MODBUS_MODE_OUTPUT5]==0)// 284   206
@@ -8299,12 +8304,12 @@ if(m_nModeType==17||m_nModeType==18)
 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];  //284  206
-	 
-			if(nRange>=0&&nRange<=2)
-			{
-				strTemp=OUTPUT_RANGE5[nRange];
-			}
-		 
+
+		if(nRange>=0&&nRange<=2)
+		{
+			strTemp=OUTPUT_RANGE5[nRange];
+		}
+
 
 		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
 		strTemp.Empty();
@@ -8333,11 +8338,11 @@ if(m_nModeType==17||m_nModeType==18)
 			//337	270	1	Low byte	W/R	Output5 function setting (see above)
 
 			int indext=-1;
-		 
-		 
-				//indext=product_register_value[337];//2.5.0.96
-				indext=product_register_value[284];//2.5.0.98			//Fance_?_  为什么要不对应;
- 
+
+
+			//indext=product_register_value[337];//2.5.0.96
+			indext=product_register_value[284];//2.5.0.98			//Fance_?_  为什么要不对应;
+
 
 			if(indext>=0&&indext<=4)
 				strTemp=ONTPUT_FUNS[indext];
@@ -8348,8 +8353,8 @@ if(m_nModeType==17||m_nModeType==18)
 			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
 		}
 	}
-    #endif
-	
+#endif
+
 
 
 	if ((m_nModeType==1||m_nModeType==3||m_nModeType==2)||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PRESSURE
@@ -8386,13 +8391,13 @@ if(m_nModeType==17||m_nModeType==18)
 			{
 				//strTemp.Format(_T("%.1f"),nValue/100.0);
 				//strTemp.Format(_T("%.1f"),product_register_value[102]/100.0);
-				   float fvalue=0.0;
-					//if(nRange==1)//0-10v
-					//{
-					//nvalue=product_register_value[102]/100 /10.0 * 100%;
+				float fvalue=0.0;
+				//if(nRange==1)//0-10v
+				//{
+				//nvalue=product_register_value[102]/100 /10.0 * 100%;
 				//	nvalue=product_register_value[102]/10.0f;
-					 fvalue=(float)(nValue)/10.0f;
-				
+				fvalue=(float)(nValue)/10.0f;
+
 				strTemp.Format(_T("%.1f%%"),fvalue);
 				m_tstat_output_data.at(3).Unit.StrValue = _T("%");
 			}
@@ -8403,27 +8408,27 @@ if(m_nModeType==17||m_nModeType==18)
 			if((int)(nAMVAlue & 8))
 			{
 				strTemp=_T("Manual");
-// 				m_FlexGrid.put_Col(VALUE_OUTFIELD);
-// 				m_FlexGrid.put_Row(4);
-// 				m_FlexGrid.put_CellBackColor(COLOR_CELL);
+				// 				m_FlexGrid.put_Col(VALUE_OUTFIELD);
+				// 				m_FlexGrid.put_Row(4);
+				// 				m_FlexGrid.put_CellBackColor(COLOR_CELL);
 			}
 			else
 			{
 				strTemp=_T("Auto");
-// 				m_FlexGrid.put_Col(VALUE_OUTFIELD);
-// 				m_FlexGrid.put_Row(4);
-// 				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+				// 				m_FlexGrid.put_Col(VALUE_OUTFIELD);
+				// 				m_FlexGrid.put_Row(4);
+				// 				m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
 			}
-			  //m_FlexGrid.put_TextMatrix(4,AM_OUTFIELD,strTemp);
-			  m_tstat_output_data.at(3).AM.regAddress=MODBUS_OUTPUT_MANU_ENABLE;
-			  m_tstat_output_data.at(3).AM.RegValue=nAMVAlue;
-			  m_tstat_output_data.at(3).AM.StrValue=strTemp;
+			//m_FlexGrid.put_TextMatrix(4,AM_OUTFIELD,strTemp);
+			m_tstat_output_data.at(3).AM.regAddress=MODBUS_OUTPUT_MANU_ENABLE;
+			m_tstat_output_data.at(3).AM.RegValue=nAMVAlue;
+			m_tstat_output_data.at(3).AM.StrValue=strTemp;
 			if(nRange>=0&&nRange<17)
 			{
 				strTemp=OUTPUT_ANRANGE[nRange];
 			}
 			//m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
-			 m_tstat_output_data.at(3).Range.StrValue=strTemp;
+			m_tstat_output_data.at(3).Range.StrValue=strTemp;
 
 
 			nRange=product_register_value[MODBUS_OUTPUT2_SCALE];
@@ -8446,13 +8451,13 @@ if(m_nModeType==17||m_nModeType==18)
 				//strTemp.Format(_T("%.1f"),nValue/100.0);
 
 				float nvalue=0.0;
-				 
+
 				nvalue=(float)nValue/10.0f;
-			 
+
 				strTemp.Format(_T("%.1f%%"),nvalue);
 				m_tstat_output_data.at(4).Unit.StrValue = _T("%");
 			}
- 
+
 			m_tstat_output_data.at(4).Value.StrValue=strTemp;
 
 
@@ -8460,12 +8465,12 @@ if(m_nModeType==17||m_nModeType==18)
 			if((int)(nAMVAlue & 16))
 			{
 				strTemp=_T("Manual");
- 
+
 			}
 			else
 			{
 				strTemp=_T("Auto");
- 
+
 			}
 			//m_FlexGrid.put_TextMatrix(5,AM_OUTFIELD,strTemp);
 			m_tstat_output_data.at(4).AM.regAddress=MODBUS_OUTPUT_MANU_ENABLE;
@@ -8476,7 +8481,7 @@ if(m_nModeType==17||m_nModeType==18)
 				strTemp=OUTPUT_ANRANGE[nRange];
 			}
 			m_tstat_output_data.at(4).Range.StrValue=strTemp;
-	 
+
 
 		}
 		else
@@ -8502,52 +8507,52 @@ if(m_nModeType==17||m_nModeType==18)
 			{
 				float nvalue=0.0;
 				//if (product_register_value[7] == 6)
-// 				if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
-// 				{
-// 					//AfxMessageBox(_T("It's impossible to enter this place!"));
-// 					if(nRange==1)//0-10v
-// 					{
-						nvalue= product_register_value[MODBUS_COOLING_VALVE]/10.0f;//  T6=210
-// 					}
-// 					if(nRange==2)//0-5v
-// 					{
-// 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/5.0f;
-// 					}
-// 					if(nRange==3)//2-10v
-// 					{
-// 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/8.0f;
-// 					}
-// 					if(nRange==3)//10-0v
-// 					{
-// 						nvalue=(10-product_register_value[MODBUS_COOLING_VALVE]/100.0f)/10.0f *100;
-// 					}
-// 					if (nRange==17)
-// 					{
-// 						nvalue= product_register_value[MODBUS_COOLING_VALVE]/10.0f;
-// 					}
-// 				}
-// 				else
-// 				{
-// 
-// 
-// 					if(nRange==1)//0-10v
-// 					{
-// 						//nvalue=product_register_value[102]/100 /10.0 * 100%;
-// 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/10.0f;//102   210
-// 					}
-// 					if(nRange==2)//0-5v
-// 					{
-// 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/5.0f;
-// 					}
-// 					if(nRange==3)//2-10v
-// 					{
-// 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/8.0f;
-// 					}
-// 					if(nRange==3)//10-0v
-// 					{
-// 						nvalue=(10-product_register_value[MODBUS_COOLING_VALVE]/100.0f)/10.0f *100;
-// 					}
-// 				}
+				// 				if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+				// 				{
+				// 					//AfxMessageBox(_T("It's impossible to enter this place!"));
+				// 					if(nRange==1)//0-10v
+				// 					{
+				nvalue= product_register_value[MODBUS_COOLING_VALVE]/10.0f;//  T6=210
+				// 					}
+				// 					if(nRange==2)//0-5v
+				// 					{
+				// 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/5.0f;
+				// 					}
+				// 					if(nRange==3)//2-10v
+				// 					{
+				// 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/8.0f;
+				// 					}
+				// 					if(nRange==3)//10-0v
+				// 					{
+				// 						nvalue=(10-product_register_value[MODBUS_COOLING_VALVE]/100.0f)/10.0f *100;
+				// 					}
+				// 					if (nRange==17)
+				// 					{
+				// 						nvalue= product_register_value[MODBUS_COOLING_VALVE]/10.0f;
+				// 					}
+				// 				}
+				// 				else
+				// 				{
+				// 
+				// 
+				// 					if(nRange==1)//0-10v
+				// 					{
+				// 						//nvalue=product_register_value[102]/100 /10.0 * 100%;
+				// 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/10.0f;//102   210
+				// 					}
+				// 					if(nRange==2)//0-5v
+				// 					{
+				// 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/5.0f;
+				// 					}
+				// 					if(nRange==3)//2-10v
+				// 					{
+				// 						nvalue=product_register_value[MODBUS_COOLING_VALVE]/8.0f;
+				// 					}
+				// 					if(nRange==3)//10-0v
+				// 					{
+				// 						nvalue=(10-product_register_value[MODBUS_COOLING_VALVE]/100.0f)/10.0f *100;
+				// 					}
+				// 				}
 				strTemp.Format(_T("%.1f%%"),nvalue);
 				m_tstat_output_data.at(5).Unit.StrValue = _T("%");
 			}
@@ -8561,16 +8566,16 @@ if(m_nModeType==17||m_nModeType==18)
 				if((int)(nAMVAlue & 32))
 				{
 					strTemp=_T("Manual");
-// 					m_FlexGrid.put_Col(VALUE_OUTFIELD);
-// 					m_FlexGrid.put_Row(6);
-// 					m_FlexGrid.put_CellBackColor(COLOR_CELL);
+					// 					m_FlexGrid.put_Col(VALUE_OUTFIELD);
+					// 					m_FlexGrid.put_Row(6);
+					// 					m_FlexGrid.put_CellBackColor(COLOR_CELL);
 				}
 				else
 				{
 					strTemp=_T("Auto");
-// 					m_FlexGrid.put_Col(VALUE_OUTFIELD);
-// 					m_FlexGrid.put_Row(6);
-// 					m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
+					// 					m_FlexGrid.put_Col(VALUE_OUTFIELD);
+					// 					m_FlexGrid.put_Row(6);
+					// 					m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
 				}
 				m_tstat_output_data.at(5).AM.regAddress=MODBUS_OUTPUT_MANU_ENABLE;
 				m_tstat_output_data.at(5).AM.RegValue=nAMVAlue;
@@ -8597,8 +8602,8 @@ if(m_nModeType==17||m_nModeType==18)
 
 
 
-// 				nRange= product_register_value[MODBUS_OUTPUT2_SCALE];//187  208
-// 				nValue= product_register_value[MODBUS_HEATING_VALVE];//103  211
+				// 				nRange= product_register_value[MODBUS_OUTPUT2_SCALE];//187  208
+				// 				nValue= product_register_value[MODBUS_HEATING_VALVE];//103  211
 
 				nRange = product_register_value[MODBUS_OUTPUT2_SCALE]; //186  207
 				m_tstat_output_data.at(6).Range.regAddress=MODBUS_OUTPUT2_SCALE;
@@ -8622,94 +8627,94 @@ if(m_nModeType==17||m_nModeType==18)
 					//strTemp.Format(_T("%.1f"),nValue/100.0);
 					float nvalue=0.0;
 
-// 					if ((product_register_value[7] == 6)||(product_register_value[7] == 7)||(product_register_value[7] == PM_TSTAT5i))
-// 					{
-// 						if(nRange==1)//0-10v
-// 						{
-// 							//nvalue=product_register_value[102]/100 /10.0 * 100%;
-// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/10.0f;//103 211
-// 						}
-// 						if(nRange==2)//0-5v
-// 						{
-// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/5.0f;
-// 						}
-// 						if(nRange==3)//2-10v
-// 						{
-// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/8.0f;
-// 						}
-// 						if(nRange==4)//10-0v
-// 						{
-// 							nvalue=(10-product_register_value[MODBUS_HEATING_VALVE]/100.0f)/10.0f *100;
-// 						}
-// 						if (nRange==17)
-// 						{
-// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/10.0f;//103 211
-// 						}
-// 					}
-// 					else
-// 					{
-						if(nRange==1)//0-10v
-						{
-							//nvalue=product_register_value[102]/100 /10.0 * 100%;
-							nvalue=product_register_value[MODBUS_HEATING_VALVE]/10.0f;
-// 						}
-// 						if(nRange==2)//0-5v
-// 						{
-// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/5.0f;
-// 						}
-// 						if(nRange==3)//2-10v
-// 						{
-// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/8.0f;
-// 						}
-// 						if(nRange==4)//10-0v
-// 						{
-// 							nvalue=(10-product_register_value[MODBUS_HEATING_VALVE]/100.0f)/10.0f *100;
-// 						}
-// 					}
-					strTemp.Format(_T("%.1f%%"),nvalue);
+					// 					if ((product_register_value[7] == 6)||(product_register_value[7] == 7)||(product_register_value[7] == PM_TSTAT5i))
+					// 					{
+					// 						if(nRange==1)//0-10v
+					// 						{
+					// 							//nvalue=product_register_value[102]/100 /10.0 * 100%;
+					// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/10.0f;//103 211
+					// 						}
+					// 						if(nRange==2)//0-5v
+					// 						{
+					// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/5.0f;
+					// 						}
+					// 						if(nRange==3)//2-10v
+					// 						{
+					// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/8.0f;
+					// 						}
+					// 						if(nRange==4)//10-0v
+					// 						{
+					// 							nvalue=(10-product_register_value[MODBUS_HEATING_VALVE]/100.0f)/10.0f *100;
+					// 						}
+					// 						if (nRange==17)
+					// 						{
+					// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/10.0f;//103 211
+					// 						}
+					// 					}
+					// 					else
+					// 					{
+					if(nRange==1)//0-10v
+					{
+						//nvalue=product_register_value[102]/100 /10.0 * 100%;
+						nvalue=product_register_value[MODBUS_HEATING_VALVE]/10.0f;
+						// 						}
+						// 						if(nRange==2)//0-5v
+						// 						{
+						// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/5.0f;
+						// 						}
+						// 						if(nRange==3)//2-10v
+						// 						{
+						// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/8.0f;
+						// 						}
+						// 						if(nRange==4)//10-0v
+						// 						{
+						// 							nvalue=(10-product_register_value[MODBUS_HEATING_VALVE]/100.0f)/10.0f *100;
+						// 						}
+						// 					}
+						strTemp.Format(_T("%.1f%%"),nvalue);
+					}
+
+					m_tstat_output_data.at(6).Value.StrValue=strTemp;
+					m_tstat_output_data.at(6).Unit.StrValue = _T("%");
+					if((int)(nAMVAlue & 64))
+					{
+						strTemp=_T("Manual");
+
+					}
+					else
+					{
+						strTemp=_T("Auto");
+
+					}
+					m_tstat_output_data.at(6).AM.regAddress=MODBUS_OUTPUT_MANU_ENABLE;
+					m_tstat_output_data.at(6).AM.RegValue=nAMVAlue;
+					m_tstat_output_data.at(6).AM.StrValue=strTemp;
+
+					strTemp.Empty();
+					if (nRange==17)
+					{
+						nRange=4;
+					}
+					if(nRange>=0&&nRange<5)
+					{
+						strTemp=OUTPUT_ANRANGE6[nRange];
+					}
+					m_tstat_output_data.at(6).Range.StrValue=strTemp;
+
 				}
 
-				  m_tstat_output_data.at(6).Value.StrValue=strTemp;
-				  m_tstat_output_data.at(6).Unit.StrValue = _T("%");
-				if((int)(nAMVAlue & 64))
-				{
-					strTemp=_T("Manual");
 
-				}
-				else
-				{
-					strTemp=_T("Auto");
-
-				}
-				m_tstat_output_data.at(6).AM.regAddress=MODBUS_OUTPUT_MANU_ENABLE;
-				m_tstat_output_data.at(6).AM.RegValue=nAMVAlue;
-				m_tstat_output_data.at(6).AM.StrValue=strTemp;
-			
-				strTemp.Empty();
-				if (nRange==17)
-				{
-					nRange=4;
-				}
-				if(nRange>=0&&nRange<5)
-				{
-					strTemp=OUTPUT_ANRANGE6[nRange];
-				}
-				m_tstat_output_data.at(6).Range.StrValue=strTemp;
-			
 			}
-	
+
+
+
+			strTemp.Empty();
 
 		}
 
+		CString strlock;
+		int stradd;// = 286;
 
-
-		strTemp.Empty();
-
-	}
-
-	CString strlock;
-	int stradd;// = 286;
- 
 		stradd =MODBUS_INTERLOCK_OUTPUT1; //245;
 		for (int i = 0;i<7;i++)
 		{
@@ -8726,28 +8731,28 @@ if(m_nModeType==17||m_nModeType==18)
 
 		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
 		{ 
-		 CString strdelay;
-		for (int row=0;row<7;row++)
-		{
-			stradd=MODBUS_OUTPUT1_DELAY_OFF_TO_ON+row;	 //213
-			int itemp=product_register_value[stradd];
-			m_tstat_output_data.at(row).OFFON_Delay.regAddress=stradd;
-			m_tstat_output_data.at(row).OFFON_Delay.RegValue=itemp;
-			strdelay.Format(_T("%d"),itemp);
-			m_tstat_output_data.at(row).OFFON_Delay.StrValue=strdelay;
-			//m_FlexGrid.put_TextMatrix(row+1,DELAY_OFFON,strdelay);
-		}
-		for (int row=0;row<7;row++)
-		{
-			stradd=MODBUS_OUTPUT1_DELAY_ON_TO_OFF+row;	 //227
-			int itemp=product_register_value[stradd];
-			strdelay.Format(_T("%d"),itemp);
-			m_tstat_output_data.at(row).ONOFF_Delay.regAddress=stradd;
-			m_tstat_output_data.at(row).ONOFF_Delay.RegValue=itemp;
+			CString strdelay;
+			for (int row=0;row<7;row++)
+			{
+				stradd=MODBUS_OUTPUT1_DELAY_OFF_TO_ON+row;	 //213
+				int itemp=product_register_value[stradd];
+				m_tstat_output_data.at(row).OFFON_Delay.regAddress=stradd;
+				m_tstat_output_data.at(row).OFFON_Delay.RegValue=itemp;
+				strdelay.Format(_T("%d"),itemp);
+				m_tstat_output_data.at(row).OFFON_Delay.StrValue=strdelay;
+				//m_FlexGrid.put_TextMatrix(row+1,DELAY_OFFON,strdelay);
+			}
+			for (int row=0;row<7;row++)
+			{
+				stradd=MODBUS_OUTPUT1_DELAY_ON_TO_OFF+row;	 //227
+				int itemp=product_register_value[stradd];
+				strdelay.Format(_T("%d"),itemp);
+				m_tstat_output_data.at(row).ONOFF_Delay.regAddress=stradd;
+				m_tstat_output_data.at(row).ONOFF_Delay.RegValue=itemp;
 
-			m_tstat_output_data.at(row).ONOFF_Delay.StrValue=strdelay;
-			//m_FlexGrid.put_TextMatrix(row+1,DELAY_ONOFF,strdelay);
-		}
+				m_tstat_output_data.at(row).ONOFF_Delay.StrValue=strdelay;
+				//m_FlexGrid.put_TextMatrix(row+1,DELAY_ONOFF,strdelay);
+			}
 		}
 		else
 		{
@@ -8803,8 +8808,8 @@ if(m_nModeType==17||m_nModeType==18)
 		///////////////////////////////////////Signal Type//////////////////////////
 		if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7)
 		{
-		    if (product_register_value[7]==PM_TSTAT6)
-		    {
+			if (product_register_value[7]==PM_TSTAT6)
+			{
 				for (int row=1;row<6;row++)
 				{
 					m_tstat_output_data.at(row-1).Signal_Type.StrValue=NO_APPLICATION;
@@ -8835,11 +8840,11 @@ if(m_nModeType==17||m_nModeType==18)
 				{
 					strTemp=_T("UNUSED");
 				}
-					// 693 ->208
+				// 693 ->208
 				m_tstat_output_data.at(6).Signal_Type.regAddress=208;
 				m_tstat_output_data.at(6).Signal_Type.RegValue=ST;
 				m_tstat_output_data.at(6).Signal_Type.StrValue=strTemp;
-		    }
+			}
 			else{
 				for (int row=1;row<8;row++)
 				{
@@ -8850,50 +8855,123 @@ if(m_nModeType==17||m_nModeType==18)
 			//m_FlexGrid.put_TextMatrix(7,SIGUAL_TYPE,strTemp);
 
 		}
-}
+	}
 
 }
 
 void LoadOutputData_CS3000(){
-m_tstat_output_data.clear();
-if (product_register_value[7]==PM_CS_SM_AC||product_register_value[7]==PM_CS_SM_DC)
-{
-	return;
+	m_tstat_output_data.clear();
+	if (product_register_value[7]==PM_CS_SM_AC||product_register_value[7]==PM_CS_SM_DC)
+	{
+		return;
+	}
+
+	Tstat_Output_Struct out_struct_temp;
+	m_tstat_output_data.push_back(out_struct_temp);
+	m_tstat_output_data.at(0).OutputName.StrValue=_T("Output-1");
+	m_tstat_output_data.at(0).Signal_Type.regAddress=142;
+	m_tstat_output_data.at(0).Signal_Type.Reg_Property=REG_READ_WRITE;
+	m_tstat_output_data.at(0).Signal_Type.RegValue=product_register_value[142];
+	float signalvalue=-1;
+	if (product_register_value[142]==0)
+	{
+		m_tstat_output_data.at(0).Signal_Type.StrValue=L"Current";
+		m_tstat_output_data.at(0).Range.Reg_Property=REG_READ_WRITE;
+		m_tstat_output_data.at(0).Range.regAddress=145;
+		m_tstat_output_data.at(0).Range.RegValue=product_register_value[145];
+		m_tstat_output_data.at(0).Range.StrValue.Format(_T("%d"),product_register_value[145]);
+
+		float fValue=_wtoi(m_tstat_input_data.at(0).Value.StrValue);
+		float frange=(float)(product_register_value[145]);
+		signalvalue=(fValue/frange)*5;
+		m_tstat_output_data.at(0).Value.StrValue.Format(_T("%0.2f V"),signalvalue);
+	}
+	else if(product_register_value[142]==1)
+	{
+		m_tstat_output_data.at(0).Signal_Type.StrValue=L"Voltage";
+		m_tstat_output_data.at(0).Range.Reg_Property=REG_READ_WRITE;
+		m_tstat_output_data.at(0).Range.regAddress=146;
+		m_tstat_output_data.at(0).Range.RegValue=product_register_value[146];
+		m_tstat_output_data.at(0).Range.StrValue.Format(_T("%d"),product_register_value[146]);
+
+
+		float fValue=_wtoi(m_tstat_input_data.at(1).Value.StrValue);
+		float frange=(float)(product_register_value[146]);
+		signalvalue=(fValue/frange)*5;
+		m_tstat_output_data.at(0).Value.StrValue.Format(_T("%0.2f V"),signalvalue);
+	}
+
 }
 
-Tstat_Output_Struct out_struct_temp;
-m_tstat_output_data.push_back(out_struct_temp);
-m_tstat_output_data.at(0).OutputName.StrValue=_T("Output-1");
-m_tstat_output_data.at(0).Signal_Type.regAddress=142;
-m_tstat_output_data.at(0).Signal_Type.Reg_Property=REG_READ_WRITE;
-m_tstat_output_data.at(0).Signal_Type.RegValue=product_register_value[142];
-float signalvalue=-1;
-if (product_register_value[142]==0)
-{
-	m_tstat_output_data.at(0).Signal_Type.StrValue=L"Current";
-	m_tstat_output_data.at(0).Range.Reg_Property=REG_READ_WRITE;
-	m_tstat_output_data.at(0).Range.regAddress=145;
-	m_tstat_output_data.at(0).Range.RegValue=product_register_value[145];
-	m_tstat_output_data.at(0).Range.StrValue.Format(_T("%d"),product_register_value[145]);
-
-	float fValue=_wtoi(m_tstat_input_data.at(0).Value.StrValue);
-	float frange=(float)(product_register_value[145]);
-	signalvalue=(fValue/frange)*5;
-    m_tstat_output_data.at(0).Value.StrValue.Format(_T("%0.2f V"),signalvalue);
-}
-else if(product_register_value[142]==1)
-{
-	m_tstat_output_data.at(0).Signal_Type.StrValue=L"Voltage";
-	m_tstat_output_data.at(0).Range.Reg_Property=REG_READ_WRITE;
-	m_tstat_output_data.at(0).Range.regAddress=146;
-	m_tstat_output_data.at(0).Range.RegValue=product_register_value[146];
-	m_tstat_output_data.at(0).Range.StrValue.Format(_T("%d"),product_register_value[146]);
-
-
-	float fValue=_wtoi(m_tstat_input_data.at(1).Value.StrValue);
-	float frange=(float)(product_register_value[146]);
-	signalvalue=(fValue/frange)*5;
-	m_tstat_output_data.at(0).Value.StrValue.Format(_T("%0.2f V"),signalvalue);
+void LoadRegistersGraphicMode(){
+    int Product_Mode = product_register_value[7];
+    if (Product_Mode == 0 ||Product_Mode == 255)
+    {
+        return;
+    }
+    switch (Product_Mode)
+    {
+    case PM_AirQuality:{
+        LoadRegistersGraphicMode_AQ();
+                       }
+                       break;
+    case PM_HUM_R:{
+        LoadRegistersGraphicMode_AQ();
+                  }
+                  break;
+    case PM_HUMTEMPSENSOR:{
+        LoadRegistersGraphicMode_HUMTEMPSENSOR();
+                          }
+                          break;
+    case PM_CO2_RS485:{
+        LoadRegistersGraphicMode_CO2485();
+                          }
+                          break;
+    }
 }
 
+void LoadRegistersGraphicMode_AQ(){
+	g_calibration_module_data.Current_Frequency.regAddress = 305;
+    g_calibration_module_data.Current_Frequency.StrValue = _T('Frequency');
+	g_calibration_module_data.User_Table_Selection.regAddress=309; 
+	g_calibration_module_data.User_Table_Point_Number.regAddress= 307;
+	g_calibration_module_data.User_Offset.regAddress = 106;
+	g_calibration_module_data.User_Offset.RegValue = product_register_value[106]-500;
+	g_calibration_module_data.User_Fre.regAddress	=312	 ;
+	g_calibration_module_data.User_Hum.regAddress	=313;
+	g_calibration_module_data.Factory_Fre.regAddress  = 2005 ;
+	g_calibration_module_data.Factory_Hum.regAddress  =	 2004  ;
+}
+void LoadRegistersGraphicMode_HUMTEMPSENSOR(){
+	g_calibration_module_data.Current_Frequency.regAddress = 374;
+    g_calibration_module_data.Current_Frequency.StrValue = _T('Frequency'); 
+	g_calibration_module_data.User_Table_Selection.regAddress=454;
+	g_calibration_module_data.User_Table_Point_Number.regAddress=455;
+	g_calibration_module_data.User_Offset.regAddress = 451;
+	g_calibration_module_data.User_Offset.RegValue = (short)product_register_value[451]; 
+	g_calibration_module_data.User_Fre.regAddress	 = 457;
+    g_calibration_module_data.User_Fre.StrValue=_T("Frequency");
+	g_calibration_module_data.User_Hum.regAddress	 = 456 ;
+    g_calibration_module_data.User_Hum.StrValue =_T("Humidity(%)");
+	g_calibration_module_data.Factory_Fre.regAddress  =381;
+    g_calibration_module_data.Factory_Hum.StrValue=_T("Frequency");
+	g_calibration_module_data.Factory_Hum.regAddress  =382;
+    g_calibration_module_data.Factory_Hum.StrValue =_T("Humidity(%)");
+}
+void LoadRegistersGraphicMode_CO2485(){
+	g_calibration_module_data.Current_Frequency.regAddress = 710; 
+    g_calibration_module_data.Current_Frequency.StrValue = _T("AD");
+
+	g_calibration_module_data.User_Table_Selection.regAddress=737;
+	g_calibration_module_data.User_Table_Point_Number.regAddress=738;
+	g_calibration_module_data.User_Offset.regAddress = 712;
+	g_calibration_module_data.User_Offset.RegValue = (short)product_register_value[712]; 
+	g_calibration_module_data.User_Fre.regAddress	 = 740;
+    g_calibration_module_data.User_Fre.StrValue=_T("AD");
+	g_calibration_module_data.User_Hum.regAddress	 = 739 ;
+    g_calibration_module_data.User_Hum.StrValue =_T("Pressure");
+	g_calibration_module_data.Factory_Fre.regAddress  =718;
+    g_calibration_module_data.Factory_Fre.StrValue=_T("AD");
+	g_calibration_module_data.Factory_Hum.regAddress  =717;
+    g_calibration_module_data.Factory_Hum.StrValue =_T("Pressure");
 }

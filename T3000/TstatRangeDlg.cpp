@@ -300,7 +300,7 @@ void CTstatRangeDlg::OnBnClickedOk()
 
 void CTstatRangeDlg::OnBnClickedRadioT0()
 {
-	 Click_Radio();
+	Click_Radio();
 }
 
 

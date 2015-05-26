@@ -102,13 +102,11 @@
 #define IDD_USERPRIVILEGDLG             388
 #define IDD_APPLYGRAPHIC_DLG            390
 #define IDR_APPLYGRAPHICLABELS          392
-#define IDD_5EINPUTDLG                  394
 #define IDR_MENU3                       396
 #define IDR_IMGCONFIGMENU               396
 #define IDD_DIALOG3                     397
 #define IDD_DIA_Timer_Calibrate         397
 #define IDD_INPORTDATADIALOG            398
-#define IDD_CALIBRATEDIALOG             399
 #define IDD_LEDS_DIALOG                 402
 #define IDB_BITMAP2                     403
 #define IDD_DELAY                       405
@@ -166,7 +164,6 @@
 #define IDI_ICON_VARIABLE               457
 #define IDD_T332AI                      457
 #define IDI_ICON_WEEKLY                 458
-#define IDD_T3PERFORMANCEe              458
 #define IDI_ICON_ANNUAL                 459
 #define IDD_T36CT                       459
 #define IDD_T328IN                      460
@@ -198,7 +195,6 @@
 #define IDD_DIALOG_BACNET_ALARM_WINDOW  490
 #define IDD_DIALOG_BACNET_TSTAT         491
 #define IDB_LED                         492
-#define IDD_DIALOG_CALIBRATION          493
 #define IDB_LCD                         493
 #define IDD_DIALOG14                    497
 #define IDD_DIALOG_NET_CO2              497
@@ -238,6 +234,8 @@
 #define IDD_DIALOG_DEFAULT_MAIN_VIEW    560
 #define IDD_DIALOG_T3_INPUTS            562
 #define IDD_DIALOG_T3_RANGE             563
+#define IDD_DIALOG_GRAPHIC_MODE         564
+#define IDD_DIALOG_T3_OUTPUTS           565
 #define IDR_TOOLBAR_BACNET              579
 #define IDB_BITMAP7                     580
 #define IDB_BITMAP_BACNET_MENU_BIT      581
@@ -526,6 +524,7 @@
 #define IDC_SLIDER10                    1089
 #define IDC_CHECK97                     1089
 #define IDC_FREQ8                       1089
+#define IDC_AXISVISIBLE_CHECK           1089
 #define IDC_BUTTON10                    1090
 #define IDC_CHECK113                    1090
 #define IDC_RH8                         1090
@@ -841,9 +840,7 @@
 #define IDC_5EBUTTON                    1240
 #define IDC_INPUTNAMEEDIT               1241
 #define IDC_OUTPUTNAMEEDIT              1242
-#define IDC_5EMSFLEXGRID                1243
 #define IDC_5EVALUEEDIT                 1244
-#define IDC_5ERANGECOMBO                1245
 #define IDC_IMGCNFIGBUTTON              1246
 #define IDC_BROWSE_BUTTON               1247
 #define IDC_MONTHVIEW1                  1251
@@ -1564,14 +1561,11 @@
 #define IDC_PORT                        1829
 #define IDC_BUTTON_DELETE_ALL           1829
 #define IDC_ENABLE_PASSWORD             1829
-#define IDC_INSERT                      1830
 #define IDC_BUTTON_SCREEN_EXIT          1830
 #define IDC_RESET                       1830
-#define IDC_RT                          1831
 #define IDC_SLIDER_DEBUG                1831
 #define IDC_HELP1                       1831
 #define IDC_HELP_HELP                   1831
-#define IDC_STARTREGISTER               1832
 #define IDC_BUTTON_DEBUG_CLEARALL       1832
 #define IDC_STATIC_COM                  1832
 #define IDC_DATAGRID1                   1833
@@ -1758,7 +1752,6 @@
 #define IDC_CHECK_ONE_BY_ONE            2007
 #define IDD_DIALOG_TH_CALIBAETION       2008
 #define IDC_CHECK_BINARY_SCAN           2008
-#define IDD_CALIBRATION_HUM             2009
 #define IDC_EDIT_TRY_TIMES              2009
 #define IDC_LIST_REMOTE_POINT           2010
 #define IDC_CO28                        2011
@@ -1824,7 +1817,32 @@
 #define IDC_LIST_USER                   2055
 #define IDC_LIST_T3INPUTS               2056
 #define IDC_EDIT_FRE                    2057
-#define c                               2057
+#define IDC_STATIC_BLT                  2058
+#define IDC_STATIC_BLS                  2059
+#define IDC_STATIC_UNIT_TIME            2060
+#define IDC_GRAPIC                      2061
+#define IDC_LIST_T3OUTPUTS              2062
+#define IDC_STATIC_RELATIVE_HUMIDITY    2063
+#define IDC_STATIC_CO2                  2064
+#define IDC_STATIC_ALARM_SETTING        2065
+#define IDC_STATIC_ALARM_STATE          2066
+#define IDC_STATIC_PASSWORD             2067
+#define IDC_STATIC_HEATINNG_HUM_SENSOR  2068
+#define IDC_STATIC_CO2_SENSOR           2069
+#define IDC_STATIC_ALARM_MENU           2070
+#define IDC_STATIC_PERCENT              2071
+#define IDC_STATIC_PPM                  2072
+#define IDC_STATIC_PRE_ALARM_SETPOINT   2073
+#define IDC_STATIC_ALARM_SETPOINT       2074
+#define IDC_STATIC_CALIBRATION_OFFSET   2075
+#define IDC_STATIC_ALON                 2076
+#define IDC_STATIC_ALOFF                2077
+#define IDC_STATIC_MBT                  2078
+#define IDC_STATIC_BT                   2079
+#define IDC_STATIC_INPUT_SETTING        2080
+#define IDC_STATIC_OUTPUT_SETTING       2081
+#define IDC_STATIC_X_NAME               2082
+#define IDC_STATIC_ISP                  2083
 #define IDC_HELP_HELP1                  3831
 #define IDC_STATIC_SETTING_PANEL_TITLE  5828
 #define IDC_EDIT_SETTING_PANEL          5829
@@ -2186,6 +2204,7 @@
 #define ID_TIMEBASE_12HOURS             34043
 #define ID_TOOL_EREASE_CHANGE_ID        34044
 #define ID_FILE_EXPORTREGISETERSLIST    34045
+#define ID_TOOL_REGISTERSMAINTENANCESYSTEM 34046
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
 #define IDD_DIALOG_BACNET_OUTPUT        34907
@@ -2251,9 +2270,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        564
-#define _APS_NEXT_COMMAND_VALUE         34044
-#define _APS_NEXT_CONTROL_VALUE         2058
+#define _APS_NEXT_RESOURCE_VALUE        566
+#define _APS_NEXT_COMMAND_VALUE         34047
+#define _APS_NEXT_CONTROL_VALUE         2084
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

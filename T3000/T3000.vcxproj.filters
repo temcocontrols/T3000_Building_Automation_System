@@ -5,10 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="T3">
       <UniqueIdentifier>{04864613-5791-4496-a45f-a558636f058f}</UniqueIdentifier>
     </Filter>
@@ -46,11 +42,12 @@
     <Filter Include="ChartCtrl">
       <UniqueIdentifier>{27e725d7-6589-49bc-8746-034b8bae4c5a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="5EInputDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AddBuilding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -127,9 +124,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IODisplayBar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IOSetDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LabelEditDlg.cpp">
@@ -225,9 +219,6 @@
     <ClCompile Include="Timer_Calibrate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ToolCalibrateDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TrendLogView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -307,9 +298,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="T3RTDView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="T3Performance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="T38I13O.cpp">
@@ -444,9 +432,6 @@
     <ClCompile Include="BacnetView.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
-    <ClCompile Include="CalibrationDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DisplayLEDLCDConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -493,9 +478,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CalibartionHT.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CalibrationHumDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PressureSensorForm.cpp">
@@ -643,6 +625,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="T3RangeDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicMode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="T3ModulesOutputDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -905,9 +893,6 @@
     <ClInclude Include="WeeklySchedule.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="5EInputDialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AddBuilding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -996,9 +981,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IODisplayBar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IOSetDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LabelEditDlg.h">
@@ -1112,9 +1094,6 @@
     <ClInclude Include="Timer_Calibrate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ToolCalibrateDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TrendLogView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1191,9 +1170,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="T3RTDView.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="T3Performance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="T38I13O.h">
@@ -1325,9 +1301,6 @@
     <ClInclude Include="BacnetTstat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CalibrationDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DisplayLEDLCDConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1377,9 +1350,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CalibartionHT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CalibrationHumDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PressureSensorForm.h">
@@ -1545,6 +1515,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="T3RangeDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicMode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3ModulesOutputDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

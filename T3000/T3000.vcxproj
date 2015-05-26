@@ -121,7 +121,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\ISP\MyPing.cpp" />
-    <ClCompile Include="5EInputDialog.cpp" />
     <ClCompile Include="AddBuilding.cpp" />
     <ClCompile Include="AfxMessageDialog.cpp" />
     <ClCompile Include="AirflowSettingDlg.cpp" />
@@ -165,8 +164,6 @@
     <ClCompile Include="BuildingConfigration.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
     <ClCompile Include="CalibartionHT.cpp" />
-    <ClCompile Include="CalibrationDlg.cpp" />
-    <ClCompile Include="CalibrationHumDlg.cpp" />
     <ClCompile Include="ChangePasswordDlg.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxis.cpp" />
     <ClCompile Include="ChartCtrl\ChartAxisLabel.cpp" />
@@ -214,6 +211,7 @@
     <ClCompile Include="DownloadSocket.cpp" />
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="Flash_Multy.cpp" />
+    <ClCompile Include="GraphicMode.cpp" />
     <ClCompile Include="IONameConfig.cpp" />
     <ClCompile Include="LanguageLocale.cpp" />
     <ClCompile Include="LCOutNameConfig.cpp" />
@@ -234,7 +232,6 @@
     <ClCompile Include="IniFile.cpp" />
     <ClCompile Include="InputSetDlg.cpp" />
     <ClCompile Include="IODisplayBar.cpp" />
-    <ClCompile Include="IOSetDlg.cpp" />
     <ClCompile Include="LabelEditDlg.cpp" />
     <ClCompile Include="LedsDialog.cpp" />
     <ClCompile Include="LightingController\LightingController.cpp" />
@@ -285,8 +282,8 @@
     <ClCompile Include="T38AI8AO.cpp" />
     <ClCompile Include="T38I13O.cpp" />
     <ClCompile Include="T38IOAView.cpp" />
+    <ClCompile Include="T3ModulesOutputDlg.cpp" />
     <ClCompile Include="T3ModulesView.cpp" />
-    <ClCompile Include="T3Performance.cpp" />
     <ClCompile Include="T3RangeDlg.cpp" />
     <ClCompile Include="T3RTDView.cpp" />
     <ClCompile Include="TCP_Server.cpp" />
@@ -295,7 +292,6 @@
     <ClCompile Include="TempHumSensorForm.cpp" />
     <ClCompile Include="TestMultiReadTraffic.cpp" />
     <ClCompile Include="Timer_Calibrate.cpp" />
-    <ClCompile Include="ToolCalibrateDlg.cpp" />
     <ClCompile Include="TrendLogView.cpp" />
     <ClCompile Include="TrendLogWnd.cpp" />
     <ClCompile Include="TroubleShootDlg.cpp" />
@@ -443,8 +439,6 @@
     <ClInclude Include="BADO\BADO.h" />
     <ClInclude Include="BuildingConfigration.h" />
     <ClInclude Include="CalibartionHT.h" />
-    <ClInclude Include="CalibrationDlg.h" />
-    <ClInclude Include="CalibrationHumDlg.h" />
     <ClInclude Include="ChartCtrl\ChartAxis.h" />
     <ClInclude Include="ChartCtrl\ChartAxisLabel.h" />
     <ClInclude Include="ChartCtrl\ChartBalloonLabel.h" />
@@ -502,6 +496,7 @@
     <ClInclude Include="Flash_Multy.h" />
     <ClInclude Include="gloab_define.h" />
     <ClInclude Include="global_struct.h" />
+    <ClInclude Include="GraphicMode.h" />
     <ClInclude Include="IONameConfig.h" />
     <ClInclude Include="LanguageLocale.h" />
     <ClInclude Include="LCOutNameConfig.h" />
@@ -524,8 +519,8 @@
     <ClInclude Include="T38AI8AO.h" />
     <ClInclude Include="T38I13O.h" />
     <ClInclude Include="T38IOAView.h" />
+    <ClInclude Include="T3ModulesOutputDlg.h" />
     <ClInclude Include="T3ModulesView.h" />
-    <ClInclude Include="T3Performance.h" />
     <ClInclude Include="T3RangeDlg.h" />
     <ClInclude Include="T3RTDView.h" />
     <ClInclude Include="TargetGrid.h" />
@@ -538,7 +533,6 @@
     <ClInclude Include="TstatRangeDlg.h" />
     <ClInclude Include="TstatZigbeeLogic.h" />
     <ClInclude Include="WeeklySchedule.h" />
-    <ClInclude Include="5EInputDialog.h" />
     <ClInclude Include="AddBuilding.h" />
     <ClInclude Include="AfxMessageDialog.h" />
     <ClInclude Include="AllNodesDiaolg.h" />
@@ -569,7 +563,6 @@
     <ClInclude Include="IniFile.h" />
     <ClInclude Include="InputSetDlg.h" />
     <ClInclude Include="IODisplayBar.h" />
-    <ClInclude Include="IOSetDlg.h" />
     <ClInclude Include="LabelEditDlg.h" />
     <ClInclude Include="LedsDialog.h" />
     <ClInclude Include="LightingController\LightingController.h" />
@@ -607,7 +600,6 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TDelayForm.h" />
     <ClInclude Include="Timer_Calibrate.h" />
-    <ClInclude Include="ToolCalibrateDlg.h" />
     <ClInclude Include="TrendLogView.h" />
     <ClInclude Include="TStat_Dev.h" />
     <ClInclude Include="TStat_Net.h" />

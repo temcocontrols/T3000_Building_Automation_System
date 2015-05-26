@@ -2028,6 +2028,7 @@ bool read_write_bacnet_config = false;	//¶ÁÐ´Bacnet config µÄÊ±ºò½ûÖ¹Ë¢ÐÂ List;
 
  vector <Tstat_Input_Struct> m_tstat_input_data;
  vector <Tstat_Output_Struct> m_tstat_output_data;
+
  // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
  // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KF Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
  CString analog_range[11]={_T("UNUSED"),_T("10K Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open")};
@@ -2087,4 +2088,7 @@ int m_user_level = 2;
 vector<Registers_Infor> g_vectRegisters;
 
 BOOL g_fresh_Graphic = FALSE;
+
+Global_Calibration_Module   g_calibration_module_data;
+
 #pragma endregion For_bacnet

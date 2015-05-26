@@ -18,6 +18,7 @@
 
 #include "singleslider/MacSliderCtrl.h"
 #include "AutoRichEditCtrl.h"
+#include "CM5/CStatic/staticex.h"
 //#include "TemcoDataGrid.h"
 #define WM_FRESHVIEW WM_USER + 1100
 
@@ -285,6 +286,7 @@ public:
 	 afx_msg LRESULT  ReadDataCallBack(WPARAM wParam, LPARAM lParam);
 	 int DayMax;
 	 int DayMin;
+     CStaticEx m_isp;
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

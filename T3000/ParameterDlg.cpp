@@ -477,8 +477,8 @@ BOOL CParameterDlg::OnInitDialog()
 	GetClientRect(&rect);
 	CString strTemp;
 
-#if 1//Zigbee
-	if (product_register_value[7]==PM_TSTAT6&&product_register_value[MODBUS_RS485_MODE]==1)
+#if 1//Zigbee		  &&product_register_value[MODBUS_RS485_MODE]==1
+	if (product_register_value[7]==PM_TSTAT6)
 	{
 
 		WINDOWPLACEMENT wp;
@@ -598,10 +598,6 @@ BOOL CParameterDlg::OnInitDialog()
 			ChannelNO-=11;
 		}
 		m_combox_channel.SetCurSel(ChannelNO);
-
-
-
-
 
 		strTemp.Format(_T("%d"),product_register_value[25]);
 		GetDlgItem(IDC_EDIT_ZIGBEE_SV)->SetWindowText(strTemp);

@@ -14,10 +14,7 @@
 #include "ChartCtrl/ChartSurfaceSerie.h"
 #include "ChartCtrl/ChartGrid.h"
 
-//#include "SeriesPropDlg.h"
-//#include "LinePropDialog.h"
-//#include "SurfacePropDialog.h"
-//#include "PointsPropDialog.h"
+ 
 
 #include "ChartCtrl/ChartBarSerie.h"
 #include "ChartCtrl/ChartLabel.h"
