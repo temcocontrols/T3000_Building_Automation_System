@@ -23,6 +23,11 @@ OUTPUT bool Open_Socket(CString strIPAdress);
 OUTPUT void SetCommunicationType(int nType);
 OUTPUT bool Open_Socket2(CString strIPAdress,short nPort);
 
+OUTPUT void SetLastSuccessBaudrate(int nbaudrate);
+OUTPUT void SetLastOpenedComport(int ncom_port);
+OUTPUT void SetLastCommunicationType(int n_commnication_type);
+
+
 OUTPUT int GetLastSuccessBaudrate();
 OUTPUT int GetLastOpenedComport();
 OUTPUT int GetLastCommunicationType();

@@ -1158,18 +1158,7 @@ void T38I13O::OnEnKillfocusEditName()
 	  }
 	  if (m_curcol==1)//Value
 	  {
-
-
-		  /*int RegValue=product_register_value[INPUT1_PULSE_COUNT_HIGHT+2*(m_currow-1)]*65535+product_register_value[INPUT1_PULSE_COUNT_LOW+2*(m_currow-1)];
-
-		  int high;
-		  int low;
-		  if(RegValue==Value)
-		  {
-		  return;
-		  } 
-		  else*/
-	    {
+	  
 
 			int regvalue=product_register_value[RANGE_INPUT1+m_currow-1];
 			if (regvalue>13)
@@ -1188,7 +1177,7 @@ void T38I13O::OnEnKillfocusEditName()
 		product_register_value[INPUT1_PULSE_COUNT_LOW+2*(m_currow-1)]=low;
 		InitialDialog();
 		} 
-		}
+	 
 	    
 	  } 
 	  if (m_curcol==4)

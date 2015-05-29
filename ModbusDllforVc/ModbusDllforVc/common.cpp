@@ -28,7 +28,9 @@
 int g_Commu_type=0;//0:serial modus//
 	CString last_connected_ip;
 	int last_connected_port = 0;
+	int last_communication_type = 0;
 	int successful_baudrate = 19200;
+	int successful_com_port = 0;
 //CMutex scan_mutex;
 
 
@@ -36,6 +38,21 @@ int g_Commu_type=0;//0:serial modus//
 CStdioFile* g_fileScanLog = NULL;
 CStdioFile* g_fileScanNetLog=NULL;
 
+
+OUTPUT void SetLastSuccessBaudrate(int nbaudrate)
+{
+	successful_baudrate = nbaudrate;
+}
+
+OUTPUT void SetLastOpenedComport(int ncom_port)
+{
+	successful_com_port = ncom_port;
+}
+
+OUTPUT void SetLastCommunicationType(int n_commnication_type)
+{
+	last_communication_type = n_commnication_type;
+}
 
 
 OUTPUT int GetLastSuccessBaudrate()
@@ -45,12 +62,12 @@ OUTPUT int GetLastSuccessBaudrate()
 
 OUTPUT int GetLastOpenedComport()
 {
-	return open_com_port_number_in_dll;
+	return successful_com_port;
 }
 
 OUTPUT int GetLastCommunicationType()
 {
-	return g_Commu_type;
+	return last_communication_type;
 }
 
 OUTPUT void SetCommunicationType(int nType)
@@ -654,7 +671,9 @@ OUTPUT bool Change_BaudRate(TS_US new_baudrate)
 	if(new_baudrate!=9600 && new_baudrate!=19200)
 		return false;
 	if(baudrate_in_dll==new_baudrate)
+	{
 		return true;
+	}
 	else
 		baudrate_in_dll=new_baudrate;
     DCB  PortDCB;    
@@ -683,7 +702,6 @@ OUTPUT bool Change_BaudRate(TS_US new_baudrate)
 		successful=true;
 		break;
 	}
-	successful_baudrate = new_baudrate;
 	return(successful);
 }
 
@@ -745,118 +763,172 @@ OUTPUT bool Open_Socket(CString strIPAdress)
 }
 
 //socket dll.
-OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
-{
-	if(g_Commu_type==0)
-		return false;
+ OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
+ {
+ 	//if(g_Commu_type==0)
+ 	//	return false;
+ 
+ 	int nNetTimeout=2000;//1 second.
+ 	WSADATA wsaData;
+ 	WORD sockVersion = MAKEWORD(2, 2);
+ 	
+ 	if (m_hSocket!=INVALID_SOCKET)
+ 	{
+ 		::closesocket(m_hSocket);
+ 		m_hSocket=NULL;
+ 	}
+ 
+ 	if(::WSAStartup(sockVersion, &wsaData) != 0)
+ 	{
+ 		//AfxMessageBox(_T("Init Socket failed!"));
+ 		m_hSocket=NULL;
+ 		return FALSE;
+ 	}
+ 	int sockfd;
+ 	sockfd = m_hSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+ 	if(m_hSocket == INVALID_SOCKET)
+ 	{
+ 	//	AfxMessageBox(_T("Create socket failed!"));
+ 		m_hSocket=NULL;
+ 		return FALSE;
+ 	}
+ 	sockaddr_in servAddr; 
+ 	servAddr.sin_family = AF_INET;
+ 	servAddr.sin_port = htons(nPort);
+ 	USES_CONVERSION;   
+ 	//char pTemp[20];
+ 	//pTemp=W2A(strIPAdress);     
+     
+ 
+ 
+ 
+ 	//servAddr.sin_addr.S_un.S_addr =inet_addr("192.168.0.28");
+ //	servAddr.sin_addr.S_un.S_addr =inet_addr((LPSTR)(LPCTSTR)strIPAdress);
+ 		servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
+ 	//	u_long ul=1;
+ 	//	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
+ 	//发送时限
+ 	setsockopt(m_hSocket,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
+ 	//接收时限
+ 	setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
+ 
+ 	//****************************************************************************
+ 	// Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 ，老毛受不了。
+ 	//改为非阻塞的 2.5秒后还没连接上就 算连接失败;
+ 	int error = -1;int len;
+ 	len = sizeof(int);
+ 	timeval tm;
+ 	fd_set set;
+ 	unsigned long ul = 1;
+ 	ioctlsocket(m_hSocket, FIONBIO, &ul); //设置为非阻塞模式
+ 	bool ret = false;
+ 	if( connect(m_hSocket, (struct sockaddr *)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
+ 	{
+ 		tm.tv_sec = 3;//4.5s 如果连接不上就 算失败 ，不要重新retry了;
+ 		tm.tv_usec = 500;
+ 		FD_ZERO(&set);
+ 		FD_SET(sockfd, &set);
+ 		if( select(sockfd+1, NULL, &set, NULL, &tm) > 0)
+ 		{
+ 			getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (char *)&error, (socklen_t *)&len);
+ 			if(error == 0) 
+ 			{
+ 				ret = true;
+ 			}
+ 			else 
+ 				ret = false;
+ 		} 
+ 		else
+ 		{
+ 			ret = false;
+ 		}
+ 	}
+ 	else ret = true;
+ 	ul = 0;
+ 	ioctlsocket(sockfd, FIONBIO, &ul); //设置为阻塞模式
+ 	//****************************************************************************
+ 
+ 	if(ret)
+ 	{
+ 		last_connected_ip = strIPAdress;
+ 		last_connected_port = nPort;
+ 		return true;
+ 	}
+ 	else
+ 	{
+ 		return false;
+ 	}
+ 
+ 	if(::connect(m_hSocket,(sockaddr*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
+ 	{
+ 		DWORD dwErr = WSAGetLastError();
+ 		//AfxMessageBox(_T(" Failed connect() \n"));
+ 		::closesocket(m_hSocket);
+ 		m_hSocket=NULL;
+ 		return FALSE;
+ 	}
+ 	last_connected_ip = strIPAdress;
+ 	last_connected_port = nPort;
+ 	return TRUE;
+ }
 
-	int nNetTimeout=2000;//1 second.
-	WSADATA wsaData;
-	WORD sockVersion = MAKEWORD(2, 2);
-	
-	if (m_hSocket!=INVALID_SOCKET)
-	{
-		::closesocket(m_hSocket);
-		m_hSocket=NULL;
-	}
 
-	if(::WSAStartup(sockVersion, &wsaData) != 0)
-	{
-		//AfxMessageBox(_T("Init Socket failed!"));
-		m_hSocket=NULL;
-		return FALSE;
-	}
-	int sockfd;
-	sockfd = m_hSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if(m_hSocket == INVALID_SOCKET)
-	{
-	//	AfxMessageBox(_T("Create socket failed!"));
-		m_hSocket=NULL;
-		return FALSE;
-	}
-	sockaddr_in servAddr; 
-	servAddr.sin_family = AF_INET;
-	servAddr.sin_port = htons(nPort);
-	USES_CONVERSION;   
-	//char pTemp[20];
-	//pTemp=W2A(strIPAdress);     
-    
-
-
-
-	//servAddr.sin_addr.S_un.S_addr =inet_addr("192.168.0.28");
-//	servAddr.sin_addr.S_un.S_addr =inet_addr((LPSTR)(LPCTSTR)strIPAdress);
-		servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
-	//	u_long ul=1;
-	//	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
-	//发送时限
-	setsockopt(m_hSocket,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
-	//接收时限
-	setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
-
-	//****************************************************************************
-	// Fance added ,不要用阻塞的模式，如果设备不在线 经常性的 要等10几秒 ，老毛受不了。
-	//改为非阻塞的 2.5秒后还没连接上就 算连接失败;
-	int error = -1;int len;
-	len = sizeof(int);
-	timeval tm;
-	fd_set set;
-	unsigned long ul = 1;
-	ioctlsocket(m_hSocket, FIONBIO, &ul); //设置为非阻塞模式
-	bool ret = false;
-	if( connect(m_hSocket, (struct sockaddr *)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
-	{
-		tm.tv_sec = 3;//4.5s 如果连接不上就 算失败 ，不要重新retry了;
-		tm.tv_usec = 500;
-		FD_ZERO(&set);
-		FD_SET(sockfd, &set);
-		if( select(sockfd+1, NULL, &set, NULL, &tm) > 0)
-		{
-			getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (char *)&error, (socklen_t *)&len);
-			if(error == 0) 
-			{
-				ret = true;
-			}
-			else 
-				ret = false;
-		} 
-		else
-		{
-			ret = false;
-		}
-	}
-	else ret = true;
-	ul = 0;
-	ioctlsocket(sockfd, FIONBIO, &ul); //设置为阻塞模式
-	//****************************************************************************
-
-	if(ret)
-	{
-		last_connected_ip = strIPAdress;
-		last_connected_port = nPort;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-
-	if(::connect(m_hSocket,(sockaddr*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
-	{
-		DWORD dwErr = WSAGetLastError();
-		//AfxMessageBox(_T(" Failed connect() \n"));
-		::closesocket(m_hSocket);
-		m_hSocket=NULL;
-		return FALSE;
-	}
-	last_connected_ip = strIPAdress;
-	last_connected_port = nPort;
-	return TRUE;
-}
-
-
-
-//////////////////////////////////////////////////////////////////////////
+// OUTPUT bool Open_Socket2(CString strIPAdress,short nPort)
+// {
+// 	if(g_Commu_type==0)
+// 		return false;
+// 
+// 	int nNetTimeout=3000;//1 second.
+// 	WSADATA wsaData;
+// 	WORD sockVersion = MAKEWORD(2, 2);
+// 
+// 	if (m_hSocket!=INVALID_SOCKET)
+// 	{
+// 		::closesocket(m_hSocket);
+// 		m_hSocket=NULL;
+// 	}
+// 
+// 	if(::WSAStartup(sockVersion, &wsaData) != 0)
+// 	{
+// 		//AfxMessageBox(_T("Init Socket failed!"));
+// 		m_hSocket=NULL;
+// 		return FALSE;
+// 	}
+// 
+// 	m_hSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+// 	if(m_hSocket == INVALID_SOCKET)
+// 	{
+// 		//	AfxMessageBox(_T("Create socket failed!"));
+// 		m_hSocket=NULL;
+// 		return FALSE;
+// 	}
+// 	sockaddr_in servAddr; 
+// 	servAddr.sin_family = AF_INET;
+// 	servAddr.sin_port = htons(nPort);
+// 	USES_CONVERSION;   
+// 	//char pTemp[20];
+// 	//pTemp=W2A(strIPAdress);     
+// 
+// 
+// 	//servAddr.sin_addr.S_un.S_addr =inet_addr("192.168.0.28");
+// 	//	servAddr.sin_addr.S_un.S_addr =inet_addr((LPSTR)(LPCTSTR)strIPAdress);
+// 	servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
+// 	//	u_long ul=1;
+// 	//	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
+// 	//发送时限
+// 	setsockopt(m_hSocket,SOL_SOCKET,SO_SNDTIMEO,(char *)&nNetTimeout,sizeof(int));
+// 	//接收时限
+// 	setsockopt(m_hSocket,SOL_SOCKET,SO_RCVTIMEO,(char *)&nNetTimeout,sizeof(int));
+// 	if(::connect(m_hSocket,(sockaddr*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
+// 	{
+// 		DWORD dwErr = WSAGetLastError();
+// 		//AfxMessageBox(_T(" Failed connect() \n"));
+// 		::closesocket(m_hSocket);
+// 		m_hSocket=NULL;
+// 		return FALSE;
+// 	}
+// 	return TRUE;
+////////////////////////////////////////////////////////////////////////////
 // Connect 分为两种情况：
 // 1，串口打开工作正常，但是设备通信失败（断电，掉线等等）。
 // 表现为对串口操作正常，但是没有通信数据。
@@ -1377,8 +1449,9 @@ OUTPUT int Read_One(TS_UC device_var,TS_US address)
 				serinumber_in_dll[0]=gval[5];
 				serinumber_in_dll[1]=gval[6];
 				serinumber_in_dll[2]=gval[7];
-				serinumber_in_dll[3]=gval[8];//stay serialnumber	
-				//			TRACE("R:%x %x %x %x\n",serinumber_in_dll[0],serinumber_in_dll[1],serinumber_in_dll[2],serinumber_in_dll[3]);
+				serinumber_in_dll[3]=gval[8];
+				 //stay serialnumber	
+				 //			TRACE("R:%x %x %x %x\n",serinumber_in_dll[0],serinumber_in_dll[1],serinumber_in_dll[2],serinumber_in_dll[3]);
 			}
 			else
 			{//old protocal
@@ -5881,8 +5954,8 @@ OUTPUT int CheckTstatOnline_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 
 OUTPUT void close_T3000_log_file()
 {
-		m_pFile->Close();
-		delete m_pFile;
+	m_pFile->Close();
+	delete m_pFile;
 }
 
 OUTPUT void write_T3000_log_file(CString StrTips)

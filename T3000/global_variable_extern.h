@@ -1158,8 +1158,10 @@ extern CString CS3000_INPUT_RANGE[4];
 extern BOOL g_NEED_MULTI_READ;
 extern CString STRING_SWITCH_STATUS[3];
 
-
 extern vector<Registers_Infor> g_vectRegisters;
 
 extern BOOL g_fresh_Graphic;
+
+extern Global_Calibration_Module   g_calibration_module_data;
+
 #pragma endregion For_bacnet

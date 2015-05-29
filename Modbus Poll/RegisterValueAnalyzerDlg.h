@@ -64,7 +64,6 @@ public:
 	void DrawerPoint();
 	void Fresh();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-// protected:
-// 	afx_msg LRESULT OnMyFreshDrawGraphic(WPARAM wParam, LPARAM lParam);
+ 
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };

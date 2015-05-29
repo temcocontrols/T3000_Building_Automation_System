@@ -257,8 +257,8 @@ protected:
 	afx_msg void OnScanDevice();
 	afx_msg void SaveConfigFile();
 	afx_msg void OnHelp();
-	afx_msg void OnCaliBrate();
-	afx_msg void OnGloabalOverrides();
+	
+	
 	afx_msg LRESULT OnFreshStatusBar(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnUserMannageMentUpdate(CCmdUI *pCmdUI);
 	afx_msg LRESULT OnAddTreeNode(WPARAM wParam, LPARAM lParam);
@@ -407,7 +407,7 @@ protected:
 public:
 	CString					m_strPingIP;	
 	void ShowDebugWindow();
-	afx_msg void OnFunctionHumcalibration();
+	
 	afx_msg void OnControlInputs();
 	afx_msg void OnControlPrograms();
 	afx_msg void OnControlOutputs();
@@ -431,7 +431,7 @@ public:
 	afx_msg void OnMenuCheckupdate();
 	afx_msg void OnDatabasePv();
 	afx_msg void OnControlTstat();
-	afx_msg void OnCalibrationCalibrationhum();
+
     afx_msg void OnUpdateConnect2(CCmdUI *pCmdUI);
     afx_msg void OnUpdateDisconnect2(CCmdUI *pCmdUI);
     afx_msg void OnUpdateScanDevice(CCmdUI *pCmdUI);
@@ -443,7 +443,7 @@ public:
 	afx_msg void OnUpdateStatusBar(CCmdUI *pCmdUI);
 	afx_msg void OnHelpFeedbacktotemco();
 	afx_msg void OnControlCustomerunits();
-	afx_msg void OnCalibrationCalibrationhumtemp();
+	
 	afx_msg void OnMiscellaneousGsmconnection();
 public:
 	CString m_sURLToDownload;
@@ -462,7 +462,7 @@ public:
  
 	BOOL          m_bSafeToClose;
 	CFile         m_FileToWrite;
-	CWinThread*   m_pThread;
+	//CWinThread*   m_pThread;
 
 	CString      m_file_firmware_Time;
 	 
@@ -496,4 +496,6 @@ public:
 	afx_msg void OnUpdateControlSettings(CCmdUI *pCmdUI);
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	afx_msg void OnFileExportregiseterslist();
+   // afx_msg void OnToolProductsregistersmaintenance();
+    afx_msg void OnToolRegistersmaintenancesystem();
 };

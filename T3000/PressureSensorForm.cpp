@@ -11,7 +11,7 @@
 // CPressureSensorForm
  #define UNIT_PRESSURE 8
  #define MENU_LOCK 5
-CString Pressure_Units[UNIT_PRESSURE]={_T("W.C"),_T("KP"),_T("Psi"),_T("mmHg"),_T("In.Hg"),_T("Kg.cm"),_T("atm"),_T("bar")};
+CString Pressure_Units[UNIT_PRESSURE]={_T("W.C"),_T("KPa"),_T("Psi"),_T("mmHg"),_T("In.Hg"),_T("Kg.cm"),_T("atm"),_T("bar")};
 //SPECIAL_MENU_LOCK, Special menu lockout via keypad, serial port only, 
 //	0=Full Menu, 1=Menu Disabled, 2=User Menu, 3 = The user need adjust setpoint in menu mode,4=disable display
 CString STRING_MENU_LOCKS[MENU_LOCK]={_T("Full Menu"),_T("Menu Enable"),_T("Menu Disabled"),_T("Menu Setpoint"),_T("Display Disable")};

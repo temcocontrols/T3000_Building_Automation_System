@@ -15,7 +15,7 @@
 #include "InputSetDlg.h"
 #include "OutputSetDlg.h"
 #include "AfxMessageDialog.h"
-//#include "5EInputDialog.h"
+
 #include "LedsDialog.h"
 #include "TDelayForm.h"
 
@@ -360,65 +360,66 @@ CT3000View::~CT3000View()
 
 void CT3000View::DoDataExchange(CDataExchange* pDX)
 {
-	CFormView::DoDataExchange(pDX);
-	//	DDX_Text(pDX, IDC_ID_EDIT, m_strIDAddress);
-	DDX_Text(pDX, IDC_ID_EDIT, m_nID);
-	DDX_Text(pDX, IDC_FIRMWARV_EDIT, m_fFirmwareVersion);
-	DDX_Text(pDX, IDC_SERIALNUM_EDIT, m_nSerialNumber);
-	DDX_Text(pDX, IDC_HARDWAREV_EDIT, m_nHardwareVersion);
-	DDX_Text(pDX, IDC_MODEL_EDIT, m_strModelName);
-	DDX_Text(pDX, IDC_TEMPERATURE_EDIT, m_fTemperature);
-	DDX_Control(pDX, IDC_FANSPEEDCOMBO, m_FanComBox);
-	DDX_CBIndex(pDX, IDC_FANSPEEDCOMBO, m_iCurFanSpeed);
-	DDX_Text(pDX, IDC_OVERIDETIME_EDIT, m_nOverrideTime);
-	DDX_Text(pDX, IDC_TIMELEFT_EDIT, m_nTimeLeft);
-	DDX_Text(pDX, IDC_PID1_EDIT, m_nstrPID1);
-	DDX_Text(pDX, IDC_PID2_EDIT, m_nstrPID2);
-	DDX_Control(pDX, IDC_COOL_RADIO, m_CoolCtrl);
-	DDX_Control(pDX, IDC_HEAT_RADIO, m_HeatCtrl);
+    CFormView::DoDataExchange(pDX);
+    //	DDX_Text(pDX, IDC_ID_EDIT, m_strIDAddress);
+    DDX_Text(pDX, IDC_ID_EDIT, m_nID);
+    DDX_Text(pDX, IDC_FIRMWARV_EDIT, m_fFirmwareVersion);
+    DDX_Text(pDX, IDC_SERIALNUM_EDIT, m_nSerialNumber);
+    DDX_Text(pDX, IDC_HARDWAREV_EDIT, m_nHardwareVersion);
+    DDX_Text(pDX, IDC_MODEL_EDIT, m_strModelName);
+    DDX_Text(pDX, IDC_TEMPERATURE_EDIT, m_fTemperature);
+    DDX_Control(pDX, IDC_FANSPEEDCOMBO, m_FanComBox);
+    DDX_CBIndex(pDX, IDC_FANSPEEDCOMBO, m_iCurFanSpeed);
+    DDX_Text(pDX, IDC_OVERIDETIME_EDIT, m_nOverrideTime);
+    DDX_Text(pDX, IDC_TIMELEFT_EDIT, m_nTimeLeft);
+    DDX_Text(pDX, IDC_PID1_EDIT, m_nstrPID1);
+    DDX_Text(pDX, IDC_PID2_EDIT, m_nstrPID2);
+    DDX_Control(pDX, IDC_COOL_RADIO, m_CoolCtrl);
+    DDX_Control(pDX, IDC_HEAT_RADIO, m_HeatCtrl);
 
-	//DDX_Radio(pDX, IDC_OCCUPA_RADIO, m_OcupaCtrl);
-	//DDX_Radio(pDX, IDC_UNOCCUPA_RADIO, m_UnOcupaCtrl);
-	DDX_Check(pDX, IDC_OCCUPACHECK, m_bOccupied);
-	DDX_Control(pDX, IDC_OCCUPACHECK, m_OcupiedBtn);
-	DDX_Text(pDX, IDC_FREECOOLA_EDIT, m_strFreeCool);
-	DDX_Text(pDX, IDC_FREECOOLF_EDIT, m_strFreeCoolFN);
+    //DDX_Radio(pDX, IDC_OCCUPA_RADIO, m_OcupaCtrl);
+    //DDX_Radio(pDX, IDC_UNOCCUPA_RADIO, m_UnOcupaCtrl);
+    DDX_Check(pDX, IDC_OCCUPACHECK, m_bOccupied);
+    DDX_Control(pDX, IDC_OCCUPACHECK, m_OcupiedBtn);
+    DDX_Text(pDX, IDC_FREECOOLA_EDIT, m_strFreeCool);
+    DDX_Text(pDX, IDC_FREECOOLF_EDIT, m_strFreeCoolFN);
 
-	// 	DDX_Control(pDX, IDC_TEMPRETURE_SLIDER, m_TemperaureSlider);
-	// 	DDX_Control(pDX, IDC_DAY_SLIDER, m_daySlider);
-	// 	DDX_Control(pDX, IDC_NIGHT_SLIDER, m_nightSlider);
-	// 	DDX_Control(pDX, IDC_NIGHTHEAT_SLIDER, m_nightHeatSlider);
+    // 	DDX_Control(pDX, IDC_TEMPRETURE_SLIDER, m_TemperaureSlider);
+    // 	DDX_Control(pDX, IDC_DAY_SLIDER, m_daySlider);
+    // 	DDX_Control(pDX, IDC_NIGHT_SLIDER, m_nightSlider);
+    // 	DDX_Control(pDX, IDC_NIGHTHEAT_SLIDER, m_nightHeatSlider);
 
-	DDX_Control(pDX, IDC_TEMPINFO_EDIT, m_TempInfoEdit);
-	DDX_Control(pDX, IDC_DAY_EDIT, m_dayInfoEdit);
-	DDX_Control(pDX, IDC_NIGHT_EDIT, m_nightInfoEdit);
-	DDX_Control(pDX, IDC_NIGHTHEAT_EDIT, m_nightHeatInfoEdit);
-	DDX_Control(pDX, IDC_OUTPUT_MSFLEXGRID, m_Output_Grid);
-	DDX_Control(pDX, IDC_INPUT_MSFLEXGRID, m_Input_Grid);
-	DDX_Control(pDX, IDC_INPUTNAMEEDIT, m_inNameEdt);
-	DDX_Control(pDX, IDC_OUTPUTNAMEEDIT, m_outNameEdt);
-	DDX_Control(pDX, IDC_SETPTSTATIC, m_SetptStatic);
-
-
+    DDX_Control(pDX, IDC_TEMPINFO_EDIT, m_TempInfoEdit);
+    DDX_Control(pDX, IDC_DAY_EDIT, m_dayInfoEdit);
+    DDX_Control(pDX, IDC_NIGHT_EDIT, m_nightInfoEdit);
+    DDX_Control(pDX, IDC_NIGHTHEAT_EDIT, m_nightHeatInfoEdit);
+    DDX_Control(pDX, IDC_OUTPUT_MSFLEXGRID, m_Output_Grid);
+    DDX_Control(pDX, IDC_INPUT_MSFLEXGRID, m_Input_Grid);
+    DDX_Control(pDX, IDC_INPUTNAMEEDIT, m_inNameEdt);
+    DDX_Control(pDX, IDC_OUTPUTNAMEEDIT, m_outNameEdt);
+    DDX_Control(pDX, IDC_SETPTSTATIC, m_SetptStatic);
 
 
 
-	DDX_Control(pDX, IDC_EDIT_DAYCOOL, m_DayCoolEdit);
-	DDX_Control(pDX, IDC_EDIT_DAYHEAT, m_DayHeatEdit);
-	DDX_Control(pDX, IDC_STATIC_DAYCOOL, m_DayCoolStatic);
-	DDX_Control(pDX, IDC_STATIC_DATSP, m_DaySPStatic);
-	DDX_Control(pDX, IDC_STATIC_DAYHEAT, m_DayHeatStatic);
-
-	DDX_Control(pDX, IDC_SLIDER_DAY, m_singlesliderday);
-
-	DDX_Control(pDX, IDC_STATICUNINT, m_gUnit);
 
 
-	DDX_Control(pDX, IDC_EDIT_CUR_SP, m_nightpotEdit);
-	 
-	 
-	 
-	 
+    DDX_Control(pDX, IDC_EDIT_DAYCOOL, m_DayCoolEdit);
+    DDX_Control(pDX, IDC_EDIT_DAYHEAT, m_DayHeatEdit);
+    DDX_Control(pDX, IDC_STATIC_DAYCOOL, m_DayCoolStatic);
+    DDX_Control(pDX, IDC_STATIC_DATSP, m_DaySPStatic);
+    DDX_Control(pDX, IDC_STATIC_DAYHEAT, m_DayHeatStatic);
+
+    DDX_Control(pDX, IDC_SLIDER_DAY, m_singlesliderday);
+
+    DDX_Control(pDX, IDC_STATICUNINT, m_gUnit);
+
+
+    DDX_Control(pDX, IDC_EDIT_CUR_SP, m_nightpotEdit);
+
+
+
+
+    DDX_Control(pDX, IDC_STATIC_ISP, m_isp);
 }
 
 BOOL CT3000View::PreCreateWindow(CREATESTRUCT& cs)
@@ -1020,7 +1021,20 @@ int index;
 	   m_pFreshBackground = AfxBeginThread(BackMainUIFresh,this);
 	}
 	
-	
+	if (product_register_value[11]!=0)
+	{
+        m_isp.ShowWindow(TRUE);
+        CString StrTemp;
+        StrTemp = _T("Your device may be in ISP Model,Please check your device");
+        m_isp.SetWindowTextW(StrTemp);
+        m_isp.textColor(RGB(255,0,0));
+        //m_current_product.bkColor(RGB(255,255,255));
+        m_isp.setFont(30,10,NULL,_T("Arial"));
+	}
+    else
+    {
+        m_isp.ShowWindow(FALSE);
+    }
 
 }
 
@@ -1492,7 +1506,19 @@ void CT3000View::InitSliderBars2()
 // 		m_pDayTwoSP->ShowWindow(SW_HIDE);
 // 		m_pDaySingleSP->ShowWindow(SW_NORMAL);	
 
-		m_pDaySingleSP->SetRange(DayMax*10, DayMin*10);
+		
+        if (dHeatSP<dSP&&dSP<dCoolSP)
+        {
+        }
+        else
+        {
+         DayMax =5;
+         DayMin = 0;
+         dHeatSP = 1;
+         dSP = 2;
+         dCoolSP = 3;  
+        }
+        m_pDaySingleSP->SetRange(DayMax*10, DayMin*10);
 		BOOL bRetSP = m_pDaySingleSP->SetPos_tstat6_3pos(dHeatSP*10, dSP*10, dCoolSP*10);  
 		HandleSliderSetPos(bRetSP);
 		m_pDaySingleSP->ShowWindow(SW_NORMAL);
@@ -1602,12 +1628,24 @@ void CT3000View::InitSliderBars2()
 			nHeatSP = nSP - 1;
 			nCoolSP = nSP+1;	
 		}
+
 		/*m_pNightSingleSP->SetRange(nRangeMax, nRangeMin);
 		BOOL bRetSP = m_pNightSingleSP->SetPos(nHeatSP, nSP, nCoolSP);		
 		HandleSliderSetPos(bRetSP);
 		m_pNightSingleSP->ShowWindow(SW_NORMAL);
 		m_pNightTwoSP->ShowWindow(SW_HIDE);*/
 
+        if (nHeatSP<nSP&&nSP<nCoolSP)
+        {
+        }
+        else
+        {
+            DayMax =5;
+            DayMin = 0;
+            nHeatSP = 1;
+            nSP = 2;
+            nCoolSP = 3;  
+        }
 		m_pNightSingleSP->SetRange(DayMax*10, DayMin*10);
 		BOOL bRetSP = m_pNightSingleSP->SetPos_tstat6_3pos(nHeatSP*10, nSP*10, nCoolSP*10);		
 		HandleSliderSetPos(bRetSP);
@@ -5749,6 +5787,18 @@ void CT3000View::InitFlexSliderBars_tstat6()
 			GetDlgItem(IDC_STATIC_MAX_DAY)->SetWindowText(strInfo);
 			strInfo.Format(_T("%d"),DayMin);
 			GetDlgItem(IDC_STATIC_MIN_DAY)->SetWindowText(strInfo);
+            if (DayHeatingSP<DaySP&&DaySP<DayCoolingSP)
+            {
+            }
+            else
+            {
+                DayMax =5;
+                DayMin = 0;
+                DayHeatingSP = 1;
+                DaySP = 2;
+                DayCoolingSP = 3;  
+            }
+
 			m_pDaySingleSP->SetRange(DayMax*10, DayMin*10);
 			
 			BOOL bRetSP = m_pDaySingleSP->SetPos_tstat6_3pos(DayHeatingSP, DaySP,DayCoolingSP);//tstat6		
@@ -5878,6 +5928,18 @@ void CT3000View::InitFlexSliderBars_tstat6()
 		    GetDlgItem(IDC_STATIC_MAX_NIGHT)->SetWindowText(strInfo);
 		    strInfo.Format(_T("%d"),DayMin);
 		    GetDlgItem(IDC_STATIC_MIN_NIGHT)->SetWindowText(strInfo);
+            if (NightHeatingSP<NightSP&&NightSP<NightCoolingSP)
+            {
+            }
+            else
+            {
+                DayMax =5;
+                DayMin = 0;
+                NightHeatingSP = 1;
+                NightSP = 2;
+                NightCoolingSP = 3;  
+            }
+
 			m_pNightSingleSP->SetRange(DayMax*10, DayMin*10);	
 			BOOL bRetSP = m_pNightSingleSP->SetPos_tstat6_3pos(NightHeatingSP,NightSP,NightCoolingSP);
 			HandleSliderSetPos(bRetSP);//tstat6

@@ -5,6 +5,18 @@ typedef struct T3_Register
 	int regID;
 	CString regName;
 }T3Register;
+
+struct RegPoint{
+	double Time_offset;
+	double Value_offset;
+};
+struct Registers_Infor
+{
+	vector<RegPoint> Reg_Point;
+	COLORREF Point_Color;
+	CString Reg_Name;
+	int address;
+};
 //////////////////////////////////////////////////////////////////////////
 // for setting file
 const TCHAR c_strCfgTstatSection[] = _T("[Tstat]");
@@ -74,6 +86,25 @@ struct Tstat_Input_Struct{
 	Reg_Infor CustomTable;
 };
 
+struct Calibration_Table_Struct{
+	Reg_Infor Frequency;
+	Reg_Infor Humidity;
+};
+ struct Calibration_Mode_Struct{
+	Reg_Infor Current_Frequency;
+	Reg_Infor User_Table_Selection;
+	Reg_Infor User_Table_Point_Number;
+	Reg_Infor User_Offset;
+	Reg_Infor User_Fre; 
+	Reg_Infor User_Hum;
+	Reg_Infor Factory_Fre;
+	Reg_Infor Factory_Hum;
+	vector<RegPoint> User_Table;
+	vector<RegPoint> Factory_Table;	
+	vector<Registers_Infor> Graphic_Data;
+} ;
+typedef   Calibration_Mode_Struct  Global_Calibration_Module;
+
 struct Tstat_Output_Struct{
 	Reg_Infor  OutputName;
 	Reg_Infor  Value;
@@ -88,14 +119,3 @@ struct Tstat_Output_Struct{
 };
  
 
-typedef struct RegPoint{
-	double Time_offset;
-	double Value_offset;
-};
-typedef struct Registers_Infor
-{
-	vector<RegPoint> Reg_Point;
-	COLORREF Point_Color;
-	CString Reg_Name;
-	int address;
-};

@@ -6,6 +6,7 @@
 #include "afxcmn.h"
 #include "afxdtctl.h"
 #include "msflexgrid1.h"
+ 
 #define ALARM_AUTO   0
 #define ALARM_MANULE 1
 
@@ -66,6 +67,7 @@ protected:
 public:
 	void Fresh();
 	void Fresh_CO2();
+    void SH_Window();
 	CEdit m_co2_idAdressEdit;
 	
 	float m_co2_firmwareversion;
@@ -263,8 +265,68 @@ public:
         int	CO2_485_MODBUS_SCAN_DB_CTR	;
         int	CO2_485_MODBUS_RESET_SCAN_DB	;
         int	CO2_485_MODBUS_SCAN_START	;
-
 		int CO2_485_OIUTPUT_MODE ;
+        int CO2_485_MODBUS_SCAN_END ;            
+        int CO2_485_MODBUS_GET_NODES_PARA_START; 
+        int CO2_485_MODBUS_GET_NODES_PARA_END ;
+        int CO2_485_MODBUS_SCAN_OCCUPY_START ;
+        int CO2_485_MODBUS_SCAN_OCCUPY_END    ;
+
+       int CO2_485_MODBUS_SCAN_ONLINE_START                              ;
+       int CO2_485_MODBUS_SCAN_ONLINE_END                                ;
+       int CO2_485_MODBUS_PRESSURE_SENSOR_MODEL                          ;
+       int CO2_485_MODBUS_PRESSURE_UNIT                                  ;
+       int CO2_485_MODBUS_PRESSURE_UNIT_DEFAULT                          ;
+       int CO2_485_MODBUS_OUTPUT_RANGE_MIN_PRESSURE                      ;
+       int CO2_485_MODBUS_OUTPUT_RANGE_MAX_PRESSURE                      ;
+       int CO2_485_MODBUS_PRESSURE_FILTER                                ;
+       int CO2_485_MODBUS_PRESSURE_SLOPE                                 ;
+       int CO2_485_MODBUS_PRESSURE_INTERCEPT                             ;
+       int CO2_485_MODBUS_INPUT_AUTO_MANUAL_PRE                          ;
+       int CO2_485_MODBUS_INPUTPUT_MANUAL_VALUE_PRE                      ;
+       int CO2_485_MODBUS_PREESURE_AD                                    ;
+       int CO2_485_MODBUS_PRESSURE_VALUE_ORG                             ;
+       int CO2_485_MODBUS_PRESSURE_VALUE_ORG_OFFSET                      ;
+       int CO2_485_MODBUS_PRESSURE_VALUE_INDEX                           ;
+       int CO2_485_MODBUS_PRESSURE_VALUE_BASE_L                          ;
+       int CO2_485_MODBUS_PRESSURE_VALUE_BASE_H                          ;
+       int CO2_485_MODBUS_PRESSURE_CAL_POINT                             ;
+       int CO2_485_MODBUS_PRESSURE_CAL_PR0                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_AD0                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_PR1                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_AD1                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_PR2                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_AD2                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_PR3                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_AD3                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_PR4                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_AD4                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_PR5                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_AD5                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_PR6                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_AD6                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_PR7                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_AD7                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_PR8                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_AD8                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_PR9                               ;
+       int CO2_485_MODBUS_PRESSURE_CAL_AD9                               ;
+       int CO2_485_MODBUS_TABLE_SEL                                      ;
+       int CO2_485_MODBUS_USER_CAL_POINT                                 ;
+       int CO2_485_MODBUS_USER_CAL_PR0                                   ;
+       int CO2_485_MODBUS_USER_CAL_AD0                                   ;
+       int CO2_485_MODBUS_USER_CAL_PR9                                   ;
+       int CO2_485_MODBUS_USER_CAL_AD9                                   ;
+       int CO2_485_MODBUS_PRESSURE_VALUE_AD                              ;
+       int CO2_485_MODBUS_PRESSURE_TEMPER_AD                             ;
+       int CO2_485_MODBUS_PRESSURE_VALUE                                 ;
+       int CO2_485_MODBUS_PRESSURE_TEMPER                                ;
+       int CO2_485_MODBUS_PRESSURE_STATUS                                ;
+       int CO2_485_MODBUS_PRESSURE_READ_ENABLE                           ;
+       int CO2_485_MODBUS_PRESSURE_READ_ALL                              ;
+       int CO2_485_MODBUS_PRESSURE_READ_ONLY                             ;
+       int CO2_485_MODBUS_PRESSURE_OFFSET                                ;
+             
 
 public:
 	afx_msg void OnEnKillfocusEditCo2Humidity();
@@ -282,126 +344,25 @@ public:
 //	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CEdit m_test_edit;
+    int m_product_type; //1.CO2,2.Pressure sensor
 	afx_msg void OnEnKillfocusIdCo2Edit();
 	afx_msg void OnCbnSelchangeCo2Braudratecombo();
+    ListCtrlEx::CListCtrlEx m_input_list;
+    ListCtrlEx::CListCtrlEx m_output_list;
+    void Initial_InputList();
+    void Initial_OutputList();
+    afx_msg void OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult);
+    afx_msg void OnNMClickList_Output(NMHDR *pNMHDR, LRESULT *pResult);
+    afx_msg void OnNMClickList_CO2List(NMHDR *pNMHDR, LRESULT *pResult);
+    float get_mmhg_ratio(unsigned char unit);
+    float get_units_ratio(unsigned char new_unit,unsigned char default_unit);
+    afx_msg LRESULT Change_Item_List(WPARAM wParam,LPARAM lParam);
+     
+    afx_msg LRESULT Fresh_Lists(WPARAM wParam,LPARAM lParam);
+    int m_list_type ;
+
+    afx_msg void OnBnClickedGrapic();
 };
-/*
-typedef enum
-{
-	CO2_485_MODBUS_SERIALNUMBER_LOWORD = 0,             
-	CO2_485_MODBUS_SERIALNUMBER_HIWORD = 2,
-	CO2_485_MODBUS_VERSION_NUMBER_LO = 4,
-	CO2_485_MODBUS_VERSION_NUMBER_HI = 5,
-	CO2_485_MODBUS_ADDRESS = 6,
-	CO2_485_MODBUS_PRODUCT_MODEL,
-	CO2_485_MODBUS_HARDWARE_REV,
-	CO2_485_MODBUS_PIC_VERSION,
-	CO2_485_MODBUS_ADDRESS_PLUG_N_PLAY,
-	CO2_485_MODBUS_BASE_ADDRESS = 15,			// base address select
-	CO2_485_MODBUS_UPDATE_STATUS = 16,			// status for update flash
-	CO2_485_MODBUS_SERINALNUMBER_WRITE_FLAG,
-
-	CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT = 100,	//0 internal sensor
-	CO2_485_MODBUS_DEG_C_OR_F,				// 101
-	CO2_485_MODBUS_TEMPERATURE_C_INTERNAL,	// 102
-	CO2_485_MODBUS_TEMPERATURE_F_INTERNAL,	// 103
-	CO2_485_MODBUS_TEMPERATURE_C_EXTERNAL,	// 104
-	CO2_485_MODBUS_TEMPERATURE_F_EXTERNAL,	// 105
-
-	CO2_485_MODBUS_HUMIDITY_RH,				// 106,  relative humidity in percentage, 112
-	CO2_485_MODBUS_HUMIDITY_FREQUENCY, 		// 107, raw frequency reading
-	CO2_485_MODBUS_HUM_SENSOR_HEATING,		// 108
-
-	CO2_485_MODBUS_INTERNAL_SENSOR_EXIST,	// 109, Internal co2 sensor exist, 0 = no, 1 = yes.
-	CO2_485_MODBUS_INTERNAL_CO2_PPM,		// 110, internal co2 ppm
-	CO2_485_MODBUS_EXTERNAL_CO2_PPM_START,	// 111, external c02 ppm
-	CO2_485_MODBUS_ALARM_AUTO_MANUAL = 161,	// 161, bit7: 0 = auto, 1 = manual; bit0:1 = pre_alarm; bit1: 1 = continuous_alarm; bit(1:0): 00 = stop_ alarm		
-	CO2_485_MODBUS_PRE_ALARM_SETTING_ON_TIME,	// 162
-	CO2_485_MODBUS_PRE_ALARM_SETTING_OFF_TIME,	// 163
-	CO2_485_MODBUS_ALARM_DELAY_TIME,			// 164
-
-	CO2_485_MODBUS_INT_PRE_ALARM_SETPOINT,		// 165
-	CO2_485_MODBUS_INT_ALARM_SETPOINT,			// 166
-	CO2_485_MODBUS_INT_CO2_OFFSET,				// 167
-
-	CO2_485_MODBUS_CO2_SLOPE_DETECT_VALUE,		// 168
-	CO2_485_MODBUS_CO2_FILTER,					// 169
-
-	CO2_485_MODBUS_EXT_PRE_ALARM_SETPOINT_START,// 170
-	CO2_485_MODBUS_EXT_ALARM_SETPOINT_START = 220, // 220
-	CO2_485_MODBUS_EXT_CO2_OFFSET_START = 270, // 270
-	//CO2_485_MODBUS_EXT_CO2_OFFSET_END = 320,
-
-	CO2_485_MODBUS_OUTPUT_AUTO_MANUAL = 320,		// 320
-	CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_TEM,
-	CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_HUM,
-	CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_CO2,
-
-	CO2_485_MODBUS_OUTPUT_RANGE_MIN_TEM,	// 324				
-	CO2_485_MODBUS_OUTPUT_RANGE_MAX_TEM,
-	CO2_485_MODBUS_OUTPUT_RANGE_MIN_HUM,				
-	CO2_485_MODBUS_OUTPUT_RANGE_MAX_HUM,
-	CO2_485_MODBUS_OUTPUT_RANGE_MIN_CO2,				
-	CO2_485_MODBUS_OUTPUT_RANGE_MAX_CO2,
-
-
-	CO2_485_MODBUS_INFO_BYTE, 				// 330
-	CO2_485_MODBUS_BAUDRATE,  				// 331
-
-	CO2_485_MODBUS_TEM_OUTPUT_CURRENT_CALIBRATION_1,// 333
-	CO2_485_MODBUS_TEM_OUTPUT_CURRENT_CALIBRATION_2,
-	CO2_485_MODBUS_TEM_OUTPUT_CURRENT_CALIBRATION_3,
-	CO2_485_MODBUS_TEM_OUTPUT_CURRENT_CALIBRATION_4,
-	CO2_485_MODBUS_TEM_OUTPUT_CURRENT_CALIBRATION_5,
-	CO2_485_MODBUS_TEM_OUTPUT_CURRENT_CALIBRATION_6,
-	CO2_485_MODBUS_TEM_OUTPUT_CURRENT_CALIBRATION_7,
-	CO2_485_MODBUS_TEM_OUTPUT_CURRENT_CALIBRATION_8,
-	CO2_485_MODBUS_TEM_OUTPUT_CURRENT_CALIBRATION_9,
-	CO2_485_MODBUS_TEM_OUTPUT_CURRENT_CALIBRATION_10,
-
-	CO2_485_MODBUS_HUM_OUTPUT_CURRENT_CALIBRATION_1,// 342
-	CO2_485_MODBUS_HUM_OUTPUT_CURRENT_CALIBRATION_2,
-	CO2_485_MODBUS_HUM_OUTPUT_CURRENT_CALIBRATION_3,
-	CO2_485_MODBUS_HUM_OUTPUT_CURRENT_CALIBRATION_4,
-	CO2_485_MODBUS_HUM_OUTPUT_CURRENT_CALIBRATION_5,
-	CO2_485_MODBUS_HUM_OUTPUT_CURRENT_CALIBRATION_6,
-	CO2_485_MODBUS_HUM_OUTPUT_CURRENT_CALIBRATION_7,
-	CO2_485_MODBUS_HUM_OUTPUT_CURRENT_CALIBRATION_8,
-	CO2_485_MODBUS_HUM_OUTPUT_CURRENT_CALIBRATION_9,
-	CO2_485_MODBUS_HUM_OUTPUT_CURRENT_CALIBRATION_10,
-
-	CO2_485_MODBUS_CO2_OUTPUT_CURRENT_CALIBRATION_1,// 352
-	CO2_485_MODBUS_CO2_OUTPUT_CURRENT_CALIBRATION_2,
-	CO2_485_MODBUS_CO2_OUTPUT_CURRENT_CALIBRATION_3,
-	CO2_485_MODBUS_CO2_OUTPUT_CURRENT_CALIBRATION_4,
-	CO2_485_MODBUS_CO2_OUTPUT_CURRENT_CALIBRATION_5,
-	CO2_485_MODBUS_CO2_OUTPUT_CURRENT_CALIBRATION_6,
-	CO2_485_MODBUS_CO2_OUTPUT_CURRENT_CALIBRATION_7,
-	CO2_485_MODBUS_CO2_OUTPUT_CURRENT_CALIBRATION_8,
-	CO2_485_MODBUS_CO2_OUTPUT_CURRENT_CALIBRATION_9,
-	CO2_485_MODBUS_CO2_OUTPUT_CURRENT_CALIBRATION_10,
-	CO2_485_MODBUS_RTC_SEC,			// 362			
-	CO2_485_MODBUS_RTC_MIN,							
-	CO2_485_MODBUS_RTC_HOUR,
-	CO2_485_MODBUS_RTC_DAY,
-	CO2_485_MODBUS_RTC_WEEK,
-	CO2_485_MODBUS_RTC_MONTH,
-	CO2_485_MODBUS_RTC_YEAR,
-	CO2_485_MODBUS_PASSWORD_ENABLE,	// 369
-	CO2_485_MODBUS_USER_PASSWORD0, 					
-	CO2_485_MODBUS_USER_PASSWORD1,
-	CO2_485_MODBUS_USER_PASSWORD2,
-	CO2_485_MODBUS_USER_PASSWORD3,
-	CO2_485_MODBUS_MENU_BLOCK_SECONDS,
-	CO2_485_MODBUS_BACKLIGHT_KEEP_SECONDS,
-	CO2_485_MODBUS_EXTERNAL_NODES_PLUG_AND_PLAY,	// 376
-	CO2_485_MODBUS_SCAN_DB_CTR,						// 377
-	CO2_485_MODBUS_RESET_SCAN_DB,					
-	CO2_485_MODBUS_SCAN_START,						// 379						
-
-
-} MODBUS_CO2_485_REGISTER_LIST;
-*/
 const int CO2_EXTERNAL_NUM = 0;
 const int CO2_EXTERNAL_DEVICE_ID = 1;
 const int CO2_EXTERNAL_SERIAL_NUM = 2;

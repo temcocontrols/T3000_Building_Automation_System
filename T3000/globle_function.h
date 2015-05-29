@@ -171,7 +171,6 @@ CString GetProductFirmwareTimeFromTemcoWebsite(CString URL,CString HexOrBinName,
 BOOL KillProcessFromName(CString strProcessName) ;
 BOOL CheckTheSameSubnet(CString strIP ,CString strIP2);
 
-
 void Save_Product_Value_Cache(CString &SaveFilePath);
 int Load_Product_Value_Cache(LPCTSTR tem_read_path);
 
@@ -194,5 +193,9 @@ void LoadTstat_OutputData();
 void LoadOutputData_CS3000();
 
 
+void  LoadRegistersGraphicMode();
+void  LoadRegistersGraphicMode_AQ();
+void  LoadRegistersGraphicMode_HUMTEMPSENSOR();
+void  LoadRegistersGraphicMode_CO2485();
 
 #endif

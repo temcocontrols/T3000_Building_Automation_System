@@ -26,6 +26,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ISP", "ISP\ISP.vcxproj", "{
 		{86C4A754-63F3-44A8-949D-E01D4FACA97A} = {86C4A754-63F3-44A8-949D-E01D4FACA97A}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegisterListManager", "RegisterListManager\RegisterListManager\RegisterListManager.vcxproj", "{B566CEE2-2F03-4D4A-A1F2-9D3AF83503BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -95,16 +97,16 @@ Global
 		{ECE89A1C-344C-4B1C-B6A7-6266F9BB607A}.Unicode Debug|Win32.Build.0 = Debug|Win32
 		{ECE89A1C-344C-4B1C-B6A7-6266F9BB607A}.Unicode Release|Win32.ActiveCfg = Release|Win32
 		{ECE89A1C-344C-4B1C-B6A7-6266F9BB607A}.Unicode Release|Win32.Build.0 = Release|Win32
-		{81153549-190B-4121-A27E-4F1DD6CF2244}.Debug|Win32.ActiveCfg = Debug|Win32
-		{81153549-190B-4121-A27E-4F1DD6CF2244}.Debug|Win32.Build.0 = Debug|Win32
-		{81153549-190B-4121-A27E-4F1DD6CF2244}.Release|Win32.ActiveCfg = Release|Win32
-		{81153549-190B-4121-A27E-4F1DD6CF2244}.Release|Win32.Build.0 = Release|Win32
-		{81153549-190B-4121-A27E-4F1DD6CF2244}.Template|Win32.ActiveCfg = Release|Win32
-		{81153549-190B-4121-A27E-4F1DD6CF2244}.Template|Win32.Build.0 = Release|Win32
-		{81153549-190B-4121-A27E-4F1DD6CF2244}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
-		{81153549-190B-4121-A27E-4F1DD6CF2244}.Unicode Debug|Win32.Build.0 = Debug|Win32
-		{81153549-190B-4121-A27E-4F1DD6CF2244}.Unicode Release|Win32.ActiveCfg = Release|Win32
-		{81153549-190B-4121-A27E-4F1DD6CF2244}.Unicode Release|Win32.Build.0 = Release|Win32
+		{B566CEE2-2F03-4D4A-A1F2-9D3AF83503BB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B566CEE2-2F03-4D4A-A1F2-9D3AF83503BB}.Debug|Win32.Build.0 = Debug|Win32
+		{B566CEE2-2F03-4D4A-A1F2-9D3AF83503BB}.Release|Win32.ActiveCfg = Release|Win32
+		{B566CEE2-2F03-4D4A-A1F2-9D3AF83503BB}.Release|Win32.Build.0 = Release|Win32
+		{B566CEE2-2F03-4D4A-A1F2-9D3AF83503BB}.Template|Win32.ActiveCfg = Release|Win32
+		{B566CEE2-2F03-4D4A-A1F2-9D3AF83503BB}.Template|Win32.Build.0 = Release|Win32
+		{B566CEE2-2F03-4D4A-A1F2-9D3AF83503BB}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
+		{B566CEE2-2F03-4D4A-A1F2-9D3AF83503BB}.Unicode Debug|Win32.Build.0 = Debug|Win32
+		{B566CEE2-2F03-4D4A-A1F2-9D3AF83503BB}.Unicode Release|Win32.ActiveCfg = Release|Win32
+		{B566CEE2-2F03-4D4A-A1F2-9D3AF83503BB}.Unicode Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

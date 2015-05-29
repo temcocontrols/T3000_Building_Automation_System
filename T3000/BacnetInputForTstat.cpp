@@ -453,11 +453,11 @@ void CBacnetInput::OnNMClickList_Tstat(NMHDR *pNMHDR, LRESULT *pResult){
 				//Manual 的开关量
 				if (
 					m_tstat_input_data.at(lRow).Value.StrValue.CompareNoCase(_T("On"))==0||
-					// m_tstat_input_data.at(lRow).Value.StrValue.CompareNoCase(_T("Off"))==0||
+					 
 					m_tstat_input_data.at(lRow).Value.StrValue.CompareNoCase(_T("Occupied"))==0||
-					//m_tstat_input_data.at(lRow).Value.StrValue.CompareNoCase(_T("Unoccupied"))==0||
+					 
 					m_tstat_input_data.at(lRow).Value.StrValue.CompareNoCase(_T("Open"))==0
-					// m_tstat_input_data.at(lRow).Value.StrValue.CompareNoCase(_T("Close"))==0
+					 
 					){
 						pwrite_info->Changed_Name.Format(_T("%s's Value,From 1 to 0"),lRow,m_tstat_input_data.at(lRow).InputName.StrValue);
 						pwrite_info->address=m_tstat_input_data.at(lRow).Value.regAddress;
@@ -520,7 +520,8 @@ void CBacnetInput::OnNMClickList_Tstat(NMHDR *pNMHDR, LRESULT *pResult){
 				}
 
 				if (IDOK==dlg.DoModal())
-				{   int realRange,dbRange;
+				{   
+				int realRange,dbRange;
 				int range=dlg.m_current_range;
 				//m_input_list.SetItemText(lRow,lCol,analog_range[range]);
 				realRange=range;

@@ -2108,7 +2108,8 @@ void CNewHumChamberView::Fresh_CalibartionPoints(){
      CString Status_Calibartion=_T("");
 
 	 if (product_register_value[MODBUS_SENSOR_TYPE]==2)
-	 {	 unsigned short current_sensor=product_register_value[MODBUS_POINT_NUM];
+	 {	
+		 unsigned short current_sensor=product_register_value[MODBUS_POINT_NUM];
 		 if (product_register_value[MODBUS_CALIBRATE_STATE]==254)
 		 {
 			 Status_Calibartion=_T("                      Ready");
@@ -2129,6 +2130,14 @@ void CNewHumChamberView::Fresh_CalibartionPoints(){
 			 m_Static_TestStatus.SetWindowTextW(Status_Calibartion);
 		 }
 		 else  if (product_register_value[MODBUS_CALIBRATE_STATE]==5)
+		 {
+			 m_Start=TRUE;
+
+
+			 Status_Calibartion.Format(_T("The current sensor is %d,Temp=%0.1f C,Hum=%0.1f%%"),current_sensor,(float)(short)product_register_value[MODBUS_TEMP_SETTING0+current_sensor-1]/10.0,(float)(short)product_register_value[MODBUS_HUM_SETTING0+current_sensor-1]/10.0);
+			 m_Static_TestStatus.SetWindowTextW(Status_Calibartion);
+		 }
+		 else
 		 {
 			 m_Start=TRUE;
 
@@ -4825,7 +4834,7 @@ void CNewHumChamberView::OnCbnSelchangeComboSettingCo2()
 
 }
 void CNewHumChamberView::Fresh_CO2_Time(){
-CString StrTemp;
+	CString StrTemp;
 	StrTemp.Empty();
 	if (product_register_value[MODBUS_CAL_STEPS]==0)
 	{
