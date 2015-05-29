@@ -135,6 +135,9 @@ LRESULT  CBacnetScreenEdit::Edit_label_Handle(WPARAM wParam, LPARAM lParam)
 LRESULT  CBacnetScreenEdit::Delete_Label_Handle(WPARAM wParam, LPARAM lParam)
 {
 	Bacnet_Label_Info * temp_info =  (Bacnet_Label_Info *)wParam;
+
+
+
 	try
 	{
 		CString strSql;
@@ -153,6 +156,10 @@ LRESULT  CBacnetScreenEdit::Delete_Label_Handle(WPARAM wParam, LPARAM lParam)
 		temp_info = NULL;
 	}
 	ReloadLabelsFromDB();
+	if(UpdateDeviceLabelFlash())
+	{
+		memcpy_s(&m_temp_graphic_label_data,sizeof(Str_label_point) * BAC_GRPHIC_LABEL_COUNT,&m_graphic_label_data.at(0),sizeof(Str_label_point) * BAC_GRPHIC_LABEL_COUNT);
+	}
 	Invalidate(1);
 	return 0;
 }
@@ -193,8 +200,19 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
 
 	int nLeft,nTop;
-	nLeft = (insert_point.x * 1000)/mynew_rect.Width();	//保存的是相对X和Y
-	nTop = (insert_point.y * 1000)/(mynew_rect.Height());
+	//nLeft = (insert_point.x * 1000)/mynew_rect.Width();	//保存的是相对X和Y
+	//nTop = (insert_point.y * 1000)/(mynew_rect.Height());
+	if(m_full_screen_mode)
+	{
+		nLeft = (insert_point.x * 1000)/m_cxScreen;	//保存的是相对X和Y
+		nTop = (insert_point.y * 1000)/m_cyScreen;
+	}
+	else
+	{
+		nLeft = (insert_point.x * 1000)/m_paint_right_limit;	//保存的是相对X和Y
+		nTop = (insert_point.y * 1000)/m_paint_botton_limit;
+	}
+
 
 
 	if(temp_panel != Station_NUM)	//目前不支持读其他Minipanel的东西;
@@ -248,7 +266,10 @@ void CBacnetScreenEdit::AddLabel(unsigned char point_type,uint8_t point_number,u
 
 		int text_color = RGB(0,0,255);
 		int display_type = LABEL_SHOW_LABEL;
-
+		if(point_type == 11)	//GRP
+		{
+			display_type = LABEL_ICON_LABEL;
+		}
 		strSql.Format(_T("insert into Screen_Bacnet_Label values(%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,'%s','%s',%i,%i)"),m_nSerialNumber,screen_list_line,Max_Control_ID,main_panel,sub_panel,point_type,point_number,point_x,point_y,text_color,display_type,_T(""),_T(""),LABEL_TEXT_BOTTOM,LABEL_ICON_NORMAL);
 
 		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
@@ -391,7 +412,6 @@ LRESULT CBacnetScreenEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 
 	CPoint mypoint;
 	GetCursorPos(&mypoint);
-
 	if( MOD_SHIFT == fuModifiers && VK_UP == uVirtKey )  //Screen
 	{  
 		if(mypoint.y>10)
@@ -484,8 +504,12 @@ LRESULT CBacnetScreenEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 		ScreenToClient(&mypoint);
 		if((m_bac_select_label >=0) && (m_bac_hotkey_lb_down))
 		{
-			m_bac_label_vector.at(m_bac_select_label).nPoint_x = mypoint.x;
-			m_bac_label_vector.at(m_bac_select_label).nPoint_y = mypoint.y;
+			if(m_bac_label_vector.at(m_bac_select_label).nPoint_y > 0)
+			{
+				m_bac_label_vector.at(m_bac_select_label).nPoint_y --;
+			}
+			//m_bac_label_vector.at(m_bac_select_label).nPoint_x = mypoint.x;
+			//m_bac_label_vector.at(m_bac_select_label).nPoint_y = mypoint.y;
 			Invalidate(0);
 		}
 
@@ -498,8 +522,12 @@ LRESULT CBacnetScreenEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 		ScreenToClient(&mypoint);
 		if((m_bac_select_label >=0) && (m_bac_hotkey_lb_down))
 		{
-			m_bac_label_vector.at(m_bac_select_label).nPoint_x = mypoint.x;
-			m_bac_label_vector.at(m_bac_select_label).nPoint_y = mypoint.y;
+			if(m_bac_label_vector.at(m_bac_select_label).nPoint_y < m_cyScreen)
+			{
+				m_bac_label_vector.at(m_bac_select_label).nPoint_y ++;
+			}
+			//m_bac_label_vector.at(m_bac_select_label).nPoint_x = mypoint.x;
+			//m_bac_label_vector.at(m_bac_select_label).nPoint_y = mypoint.y;
 			Invalidate(0);
 		}
 
@@ -512,8 +540,12 @@ LRESULT CBacnetScreenEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 		ScreenToClient(&mypoint);
 		if((m_bac_select_label >=0) && (m_bac_hotkey_lb_down))
 		{
-			m_bac_label_vector.at(m_bac_select_label).nPoint_x = mypoint.x;
-			m_bac_label_vector.at(m_bac_select_label).nPoint_y = mypoint.y;
+			if(m_bac_label_vector.at(m_bac_select_label).nPoint_x > 0)
+			{
+				m_bac_label_vector.at(m_bac_select_label).nPoint_x --;
+			}
+			//m_bac_label_vector.at(m_bac_select_label).nPoint_x = mypoint.x;
+			//m_bac_label_vector.at(m_bac_select_label).nPoint_y = mypoint.y;
 			Invalidate(0);
 		}
 
@@ -526,8 +558,12 @@ LRESULT CBacnetScreenEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 		ScreenToClient(&mypoint);
 		if((m_bac_select_label >=0) && (m_bac_hotkey_lb_down))
 		{
-			m_bac_label_vector.at(m_bac_select_label).nPoint_x = mypoint.x;
-			m_bac_label_vector.at(m_bac_select_label).nPoint_y = mypoint.y;
+			if(m_bac_label_vector.at(m_bac_select_label).nPoint_x < m_cxScreen)
+			{
+				m_bac_label_vector.at(m_bac_select_label).nPoint_x ++;
+			}
+			//m_bac_label_vector.at(m_bac_select_label).nPoint_x = mypoint.x;
+			//m_bac_label_vector.at(m_bac_select_label).nPoint_y = mypoint.y;
 			Invalidate(0);
 		}
 
@@ -537,7 +573,21 @@ LRESULT CBacnetScreenEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 	if (wParam==KEY_INSERT)	//If the cursor not in the range of the label or other objects,it will means add label
 	{
 		if(m_bac_select_label<0)
-			Bacnet_Add_Label();
+		{
+			if(m_full_screen_mode)
+			{
+				Bacnet_Add_Label();
+			}
+			else
+			{	
+				if((mypoint.x > m_paint_right_limit) || (mypoint.y > m_paint_botton_limit))
+				{
+					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Insert point out of range!")); 
+					return 0;			
+				}
+				Bacnet_Add_Label();
+			}		
+		}
 		else
 			Bacnet_Edit_Label();
 
@@ -773,6 +823,10 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 		temp_x_persent = m_pRs->GetCollect("Point_X");
 
 		temp_y_persent =  m_pRs->GetCollect("Point_Y");
+		if(temp_x_persent > 1000)
+			temp_x_persent = 980;
+		if(temp_y_persent > 1000)
+			temp_y_persent = 980;
 		if(!m_full_screen_mode)
 		{
 			bac_label.nPoint_x = (int)((temp_x_persent*m_paint_right_limit)/1000);
@@ -1320,10 +1374,10 @@ void CBacnetScreenEdit::OnPaint()
 						//}
 						if(m_bac_label_vector.at(i).nDisplay_Type == LABEL_SHOW_VALUE)
 							m_bac_label_vector.at(i).nDisplay_Type = LABEL_SHOW_LABEL;
-						else if(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE)
-						{
-							m_bac_label_vector.at(i).nDisplay_Type = LABEL_ICON_LABEL;
-						}
+						//else if(m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE)
+						//{
+						//	m_bac_label_vector.at(i).nDisplay_Type = LABEL_ICON_LABEL;
+						//}
 						GetScreenLabel(read_bac_index,cs_label);
 						GetScreenFullLabel(read_bac_index,cs_full_label);
 						cs_value.Empty();

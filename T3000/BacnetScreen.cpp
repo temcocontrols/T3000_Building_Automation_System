@@ -187,7 +187,7 @@ void BacnetScreen::Initial_List()
 
 	m_screen_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	m_screen_list.SetExtendedStyle(m_screen_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_screen_list.InsertColumn(SCREEN_NUM, _T("NUM"), 40, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+	m_screen_list.InsertColumn(SCREEN_NUM, _T("Graphic"), 60, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_screen_list.InsertColumn(SCREEN_DESCRIPTION, _T("Full Label"), 180, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_screen_list.InsertColumn(SCREEN_LABEL, _T("Label"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_screen_list.InsertColumn(SCREEN_PIC_FILE, _T("Picture File"), 140, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -431,9 +431,19 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 			PathRemoveFileSpec(temp1.GetBuffer(MAX_PATH));
 			temp1.ReleaseBuffer();
 
-			if(FileName.GetLength() >=11)
+			//The next part of code change file name length larger than 11 and rename it  move to image folder.
+			// Eg : T3000Building.bmp  ->  T3000B.bmp
+			CString extension_name;
+			extension_name = PathFindExtension(FileName.GetBuffer());
+			int extension_length = extension_name.GetLength();
+			if(extension_length > 10)
+				return;
+			PathRemoveExtension(FileName.GetBuffer(MAX_PATH));
+			FileName.ReleaseBuffer();
+			if(FileName.GetLength() >=11 - extension_length)
 			{
-				FileName = FileName.Right(10);
+				FileName = FileName.Left(10 - extension_length);
+				FileName = FileName + extension_name;
 			}
 			CString new_file_path;
 			new_file_path = image_fordor + _T("\\") + FileName;

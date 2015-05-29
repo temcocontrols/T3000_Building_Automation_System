@@ -42,6 +42,8 @@
 
 #include "BacnetTool.h"
 #include "BacnetAlarmWindow.h"
+#include "Dialog_Progess.h"
+extern CDialog_Progess *WaitRead_Data_Dlg;
 //////////////////////////////
 //#include "isp/CDialogISPTOOL.h"
 
@@ -80,7 +82,7 @@ extern CBacnetUserlogin * User_Login_Window;
 #include "bado/BADO.h"
 
 #include <algorithm>
-
+#include "BacnetMonitor.h"
 #include "T3ModulesView.h"
 #include "T3000_Default_MainView.h"
 
@@ -365,6 +367,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_FILE_EXPORTREGISETERSLIST, &CMainFrame::OnFileExportregiseterslist)
   //  ON_COMMAND(ID_TOOL_PRODUCTSREGISTERSMAINTENANCE, &CMainFrame::OnToolProductsregistersmaintenance)
   ON_COMMAND(ID_TOOL_REGISTERSMAINTENANCESYSTEM, &CMainFrame::OnToolRegistersmaintenancesystem)
+  ON_COMMAND(ID_TOOL_FLASHSN, &CMainFrame::OnToolFlashsn)
   END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -5320,8 +5323,24 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 								}
 								
 							}
-							 
+							
 						}
+
+					}
+					else if(m_product.at(i).protocol == MODBUS_BACNET_MSTP)
+					{
+						g_protocol = MODBUS_BACNET_MSTP;
+						SEND_COMMAND_DELAY_TIME = 200;
+						SwitchToPruductType(DLG_BACNET_VIEW);
+
+						pDlg->ShowWindow(SW_HIDE);
+						if(pDlg)
+							delete pDlg;//20120220
+						pDlg = NULL;
+						m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
+						m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
+						g_selected_serialnumber = m_product.at(i).serial_number;
+						return;
 
 					}
 					else
@@ -5390,7 +5409,11 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					subID);
 
 #endif
-                 	g_protocol = PROTOCOL_BACNET_IP;
+                 	//g_protocol = PROTOCOL_BACNET_IP;
+					if(product_Node.protocol == PROTOCOL_BIP_TO_MSTP)
+						g_protocol = PROTOCOL_BIP_TO_MSTP;
+					else
+						g_protocol =PROTOCOL_BACNET_IP;
 					/*bac_net_initial_once = false;*/
 					SwitchToPruductType(DLG_BACNET_VIEW);
 				
@@ -5857,6 +5880,22 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 					nSerialNumber=read_data[0]+read_data[1]*256+read_data[2]*256*256+read_data[3]*256*256*256;
 					Device_Type = read_data[7];
+					CString Temp_product_name = GetProductName(Device_Type);
+					if(Temp_product_name.IsEmpty())
+					{
+						CString tempcs;
+						tempcs.Format(_T("Product ID is invalid .Product id is %d \r\n"),Device_Type);
+						if (pDlg !=NULL)
+						{
+							pDlg->ShowWindow(SW_HIDE);
+							delete pDlg;
+							pDlg=NULL;
+						}
+						MessageBox(tempcs);
+
+						return;
+
+					}
 					if(nSerialNumber>=0)
 					{
 						//if(nSerialNumber==nSelectSerialNumber)
@@ -6549,7 +6588,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 
 		BOOL bOnLine=FALSE;
 		UINT nSerialNumber=0;
-		 
+		int nID;
 		bool temp_online = false;
 		tree_product tp = m_product.at(i);
 		if(m_strCurSubBuldingName.CompareNoCase(tp.BuildingInfo.strBuildingName)==0)
@@ -6781,14 +6820,17 @@ end_condition :
 				break;
 			}
 		}
-
+		CString str_hw_instance;
+		CString str_sw_panel_number;
+		str_hw_instance.Format(_T("%u"),m_refresh_net_device_data.at(y).object_instance);
+		str_sw_panel_number.Format(_T("%u"),m_refresh_net_device_data.at(y).panal_number);
 		if(db_exsit)	//数据库存在，就查看是否要更新;
 		{
 				if((m_refresh_net_device_data.at(y).ip_address.CompareNoCase(m_product.at(n_index).BuildingInfo.strIp) != 0) ||
 				   (m_refresh_net_device_data.at(y).NetCard_Address.CompareNoCase(m_product.at(n_index).NetworkCard_Address) != 0) ||
 					(m_refresh_net_device_data.at(y).nport != m_product.at(n_index).ncomport) ||
 					(m_refresh_net_device_data.at(y).modbusID != m_product.at(n_index).product_id) ||
-					((m_product.at(n_index).protocol != MODBUS_TCPIP) && (m_product.at(n_index).protocol != PROTOCOL_BACNET_IP)))
+					((m_product.at(n_index).protocol != MODBUS_TCPIP) && (m_product.at(n_index).protocol != PROTOCOL_BACNET_IP) && (m_product.at(n_index).protocol != PROTOCOL_BIP_TO_MSTP)    ))
 				{
 					 
 					find_new_device = 1;
@@ -6807,20 +6849,35 @@ end_condition :
 					NetwordCard_Address=m_refresh_net_device_data.at(y).NetCard_Address;
 					try
 					{
-						 
+						CString temp_pname;
+						CString temp_modbusid;
+						temp_modbusid.Format(_T("%d"),m_refresh_net_device_data.at(y).modbusID);
+						temp_pname = GetProductName(m_refresh_net_device_data.at(y).product_id);
+						str_Product_name_view = temp_pname + _T(":") + str_serialid + _T("-") + temp_modbusid + _T("-") + str_ip_address_exist;
+
 						if(m_refresh_net_device_data.at(y).ip_address.CompareNoCase(m_product.at(n_index).BuildingInfo.strIp) != 0)
 						{
-							CString temp_pname;
-							CString temp_modbusid;
-							temp_modbusid.Format(_T("%d"),m_refresh_net_device_data.at(y).modbusID);
-							temp_pname = GetProductName(m_refresh_net_device_data.at(y).product_id);
-							str_Product_name_view = temp_pname + _T(":") + str_serialid + _T("-") + temp_modbusid + _T("-") + str_ip_address_exist;
-							strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s',  Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='1',Product_name = '%s',Online_Status = 1 where Serial_ID = '%s'"),NetwordCard_Address,str_ip_address_exist,str_n_port,str_modbus_id,str_Product_name_view,str_serialid);
+							if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0))
+							{
+								CString temp_pro;
+								temp_pro.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
+								strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Hardware_Ver = '%s' , Software_Ver = '%s' , Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1 where Serial_ID = '%s'"),NetwordCard_Address,str_hw_instance,str_sw_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,temp_pro,str_Product_name_view,str_serialid);
+							}
+							else
+								strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s',  Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='1',Product_name = '%s',Online_Status = 1 where Serial_ID = '%s'"),NetwordCard_Address,str_ip_address_exist,str_n_port,str_modbus_id,str_Product_name_view,str_serialid);
 							find_new_device = true;
 						}
 						else
-						{strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s',  Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='1',Online_Status = 1 where Serial_ID = '%s'"),NetwordCard_Address,str_ip_address_exist,str_n_port,str_modbus_id,str_serialid);
-						 }
+						{
+							if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0))
+							{
+								CString temp_pro1;
+								temp_pro1.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
+								strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Hardware_Ver = '%s' , Software_Ver = '%s' , Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1 where Serial_ID = '%s'"),NetwordCard_Address,str_hw_instance,str_sw_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,temp_pro1,str_Product_name_view,str_serialid);
+							}
+							else
+								strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s',  Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='1',Online_Status = 1 where Serial_ID = '%s'"),NetwordCard_Address,str_ip_address_exist,str_n_port,str_modbus_id,str_serialid);
+						}
 						    bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
 						//strSql.Format(_T("update ALL_NODE set Com_Port ='%s' where Serial_ID = '%s'"),str_n_port,str_serialid);
 						//m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
@@ -6841,7 +6898,6 @@ end_condition :
 		}
 		else			//不存在 就插入;
 		{
-			find_new_device = true;
 			CString strSql;
 			CString str_ip_address;
 			CString str_n_port;
@@ -6862,16 +6918,25 @@ end_condition :
 			str_serialid.Format(_T("%u"),m_refresh_net_device_data.at(y).nSerial);
 			product_class_id.Format(_T("%d"),m_refresh_net_device_data.at(y).product_id);
 			product_name = GetProductName(m_refresh_net_device_data.at(y).product_id);
+			if(product_name.IsEmpty())
+				continue;
+			find_new_device = true;
 			product_name = product_name + _T(":") + str_serialid + _T("-") + modbusid + _T("-") + str_ip_address;
 			NetwordCard_Address=m_refresh_net_device_data.at(y).NetCard_Address;
 			//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,NetworkCard_Address,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Online_Status)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','"+NetwordCard_Address+"','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','0','0','"+str_n_port+"','0','1')"));
-			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Online_Status)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','0','0','"+str_n_port+"','0','1')"));
+			if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0))
+			{
+				product_name = product_name + _T("-Subclass");
+				CString temp_pro2;
+				temp_pro2.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
+				strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_instance+"','"+str_sw_panel_number+"','"+str_n_port+"','0','"+temp_pro2+"','1')"));
+			}
+			else
+				strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Online_Status)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','0','0','"+str_n_port+"','0','1')"));
 
 			 try
 			{
 
-			//TRACE(strSql);
-		//	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
 		    bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 			}
 			catch(_com_error *e)
@@ -8407,6 +8472,14 @@ loop1:
 											end_temp_instance = BAC_VARIABLE_ITEM_COUNT - 1;
 										g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance,My_WriteList_Struct->entitysize);
 									}
+									else if((unsigned char)My_WriteList_Struct->command == READWEEKLYROUTINE_T3000)
+									{
+										int end_temp_instance = 0;
+										end_temp_instance = BAC_READ_WEEKLY_ROUTINES_REMAINDER + (BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER*i) ;
+										if(end_temp_instance >= BAC_WEEKLY_ROUTINES_COUNT)
+											end_temp_instance = BAC_WEEKLY_ROUTINES_COUNT - 1;
+										g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,(BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER)*i,end_temp_instance,My_WriteList_Struct->entitysize);
+									}
 									else
 									g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,My_WriteList_Struct->entitysize);
 									Sleep(SEND_COMMAND_DELAY_TIME);
@@ -8608,7 +8681,7 @@ void CMainFrame::OnControlInputs()
 	// TODO: Add your command handler code here
  
 
-	if(g_protocol == PROTOCOL_BACNET_IP)
+	if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
 	{
 		if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) || 
 			(m_user_level == LOGIN_SUCCESS_ROUTINE_MODE))
@@ -8643,16 +8716,23 @@ void CMainFrame::OnControlInputs()
 		((BacnetAnnualRoutine*)pDialog[WINDOW_ANNUAL])->Unreg_Hotkey();
 		((CBacnetMonitor*)pDialog[WINDOW_MONITOR])->Unreg_Hotkey();
 
-
-		if(bac_select_device_online)
+		if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+		{
+			Create_Thread_Read_Item(TYPE_INPUT);
+		}
+		else
+		{
+			//if(bac_select_device_online)
 			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_INPUT);
-		//else
-		//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
+			//else
+			//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
+		}
+
 
 	}
 	else
 	{   
-	if (!is_connect())
+		if (!is_connect())
 	{
 	AfxMessageBox(_T("NO Connection,Please connect your device,fristly!"));
 	return;
@@ -8686,7 +8766,7 @@ void CMainFrame::OnControlInputs()
 		   SwitchToPruductType(DLG_DIALOG_T3_INPUTS_VIEW);
 	}
 	else{
-	MessageBox(_T("This function can't support for the product!\r\n"));
+	MessageBox(_T("This function don't support this product!\r\n"));
 	}
  
 	}
@@ -8699,7 +8779,7 @@ void CMainFrame::OnControlPrograms()
 	// TODO: Add your command handler code here
 
 
-	if(g_protocol == PROTOCOL_BACNET_IP)
+	if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
 	{
 		if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) || 
 			(m_user_level == LOGIN_SUCCESS_ROUTINE_MODE))
@@ -8730,15 +8810,22 @@ void CMainFrame::OnControlPrograms()
 			bacnet_view_number = TYPE_PROGRAM;
 			g_hwnd_now = m_pragram_dlg_hwnd;
 		}
+		if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+		{
+			Create_Thread_Read_Item(TYPE_PROGRAM);
+		}
+		else
+		{
+			if(bac_select_device_online)
+				::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAM);
+			//else
+			//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
+		}
 
-		if(bac_select_device_online)
-			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAM);
-		//else
-		//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
 	}
 	else
 	{
-		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+		MessageBox(_T("This function don't support this product!\r\n"));
 	}
 }
 
@@ -8748,7 +8835,7 @@ void CMainFrame::OnControlOutputs()
 	// TODO: Add your command handler code here
 
 
-	if(g_protocol == PROTOCOL_BACNET_IP)
+	if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
 	{
 		if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) || 
 			(m_user_level == LOGIN_SUCCESS_ROUTINE_MODE))
@@ -8779,11 +8866,18 @@ void CMainFrame::OnControlOutputs()
 		((BacnetWeeklyRoutine*)pDialog[WINDOW_WEEKLY])->Unreg_Hotkey();
 		((BacnetAnnualRoutine*)pDialog[WINDOW_ANNUAL])->Unreg_Hotkey();
 		((CBacnetMonitor*)pDialog[WINDOW_MONITOR])->Unreg_Hotkey();
+		if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+		{
+			Create_Thread_Read_Item(TYPE_OUTPUT);
+		}
+		else
+		{
+			if(bac_select_device_online)
+				::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_OUTPUT);
+			//else
+			//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
+		}
 
-		if(bac_select_device_online)
-			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_OUTPUT);
-		//else
-		//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
 	}
 	else
 	{  
@@ -8811,7 +8905,7 @@ void CMainFrame::OnControlOutputs()
 		   ::PostMessage(g_hwnd_now,WM_REFRESH_BAC_OUTPUT_LIST,0,0);
 		   }
 		else{
-			MessageBox(_T("This function can't support for the product!\r\n"));
+			MessageBox(_T("This function don't support this product!\r\n"));
 		}
 		//MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
 	}
@@ -8821,7 +8915,7 @@ void CMainFrame::OnControlOutputs()
 void CMainFrame::OnControlVariables()
 {
 	// TODO: Add your command handler code here
-	if(g_protocol == PROTOCOL_BACNET_IP)
+	if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
 	{
 		if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) || 
 			(m_user_level == LOGIN_SUCCESS_ROUTINE_MODE))
@@ -8853,15 +8947,23 @@ void CMainFrame::OnControlVariables()
 		((BacnetAnnualRoutine*)pDialog[WINDOW_ANNUAL])->Unreg_Hotkey();
 		((CBacnetMonitor*)pDialog[WINDOW_MONITOR])->Unreg_Hotkey();
 
-		if(bac_select_device_online)
-			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_VARIABLE);
-		//else
-		//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
+		if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+		{
+			Create_Thread_Read_Item(TYPE_VARIABLE);
+		}
+		else
+		{
+			if(bac_select_device_online)
+				::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_VARIABLE);
+			//else
+			//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
+		}
+
 
 	}
 	else
 	{
-		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+		MessageBox(_T("This function don't support this product!\r\n"));
 	}
 }
 
@@ -8869,7 +8971,7 @@ void CMainFrame::OnControlVariables()
 void CMainFrame::OnControlWeekly()
 {
 	// TODO: Add your command handler code here
-	if(g_protocol == PROTOCOL_BACNET_IP)
+	if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
 	{
 		if((m_user_level !=	LOGIN_SUCCESS_ROUTINE_MODE) && 
 			(m_user_level != LOGIN_SUCCESS_FULL_ACCESS) &&
@@ -8902,16 +9004,23 @@ void CMainFrame::OnControlWeekly()
 			g_hwnd_now = m_weekly_dlg_hwnd;
 		}
 
+		if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+		{
+			Create_Thread_Read_Item(TYPE_WEEKLY);
+		}
+		else
+		{
+			if(bac_select_device_online)
+				::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLY);
+			//else
+			//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
+		}
 
-		if(bac_select_device_online)
-			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_WEEKLY);
-		//else
-		//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
 
 	}
 	else
 	{
-		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+		MessageBox(_T("This function don't support this product!\r\n"));
 	}
 }
 
@@ -8920,7 +9029,7 @@ void CMainFrame::OnControlAnnualroutines()
 {
 	// TODO: Add your command handler code here
 
-	if(g_protocol == PROTOCOL_BACNET_IP)
+	if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
 	{
 		if((m_user_level !=	LOGIN_SUCCESS_ROUTINE_MODE) && 
 			(m_user_level != LOGIN_SUCCESS_FULL_ACCESS) &&
@@ -8953,12 +9062,17 @@ void CMainFrame::OnControlAnnualroutines()
 			g_hwnd_now = m_annual_dlg_hwnd;
 		}
 
-
-		if(bac_select_device_online)
-			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ANNUAL);
-		//else
-		//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
-
+		if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+		{
+			Create_Thread_Read_Item(TYPE_ANNUAL);
+		}
+		else
+		{
+			if(bac_select_device_online)
+				::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ANNUAL);
+			//else
+			//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
+		}
 	}
 	else
 	{
@@ -8973,14 +9087,14 @@ void CMainFrame::OnControlAnnualroutines()
 			g_bPauseMultiRead = FALSE;
 		}
 		else
-		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+		MessageBox(_T("This function don't support this product!\r\n"));
 	}
 }
 #include "ParameterDlg.h"
 void CMainFrame::OnControlSettings()
 {
 	// TODO: Add your command handler code here
-	if(g_protocol == PROTOCOL_BACNET_IP)
+	if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == MODBUS_BACNET_MSTP))
 	{
 		if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) || 
 			(m_user_level == LOGIN_SUCCESS_ROUTINE_MODE))
@@ -9009,9 +9123,15 @@ void CMainFrame::OnControlSettings()
 		((BacnetWeeklyRoutine*)pDialog[WINDOW_WEEKLY])->Unreg_Hotkey();
 		((BacnetAnnualRoutine*)pDialog[WINDOW_ANNUAL])->Unreg_Hotkey();
 		((CBacnetMonitor*)pDialog[WINDOW_MONITOR])->Unreg_Hotkey();
-
-		if(bac_select_device_online)
-			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SETTING);
+		if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+		{
+			Create_Thread_Read_Item(TYPE_SETTING);
+		}
+		else
+		{
+			if(bac_select_device_online)
+				::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SETTING);
+		}
 	}
 	else
 	{
@@ -9021,7 +9141,7 @@ void CMainFrame::OnControlSettings()
 			dlg.DoModal();
 		}
 		else
-		 MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+		 MessageBox(_T("This function don't support this product!\r\n"));
 	}
 }
 
@@ -9038,7 +9158,7 @@ void CMainFrame::OnMiscellaneousLoaddescriptors()
 	}
 	else
 	{
-		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+		MessageBox(_T("This function don't support this product!\r\n"));
 	}
 }
 
@@ -9057,7 +9177,7 @@ void CMainFrame::OnMiscellaneousUpdatemini()
 	}
 	else
 	{
-		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+		MessageBox(_T("This function don't support this product!\r\n"));
 	}
 }
 
@@ -9066,7 +9186,7 @@ void CMainFrame::OnControlControllers()
 {
 	// TODO: Add your command handler code here
 
-	if(g_protocol == PROTOCOL_BACNET_IP)
+	if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
 	{
 		if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) || 
 			(m_user_level == LOGIN_SUCCESS_ROUTINE_MODE))
@@ -9098,15 +9218,21 @@ void CMainFrame::OnControlControllers()
 		((BacnetAnnualRoutine*)pDialog[WINDOW_ANNUAL])->Unreg_Hotkey();
 		((CBacnetMonitor*)pDialog[WINDOW_MONITOR])->Unreg_Hotkey();
 
-		if(bac_select_device_online)
-			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_CONTROLLER);
-		//else
-		//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
-
+		if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+		{
+			Create_Thread_Read_Item(TYPE_CONTROLLER);
+		}
+		else
+		{
+			if(bac_select_device_online)
+				::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_CONTROLLER);
+			//else
+			//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
+		}
 	}
 	else
 	{
-		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+		MessageBox(_T("This function don't support this product!\r\n"));
 	}
 }
 
@@ -9119,7 +9245,7 @@ void CMainFrame::OnControlScreens()
 //	Dlg.DoModal();
 //	return;
 
-	if(g_protocol == PROTOCOL_BACNET_IP)
+	if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
 	{
 		if((m_user_level !=	LOGIN_SUCCESS_GRAPHIC_MODE) && 
 			(m_user_level != LOGIN_SUCCESS_FULL_ACCESS) &&
@@ -9151,11 +9277,17 @@ void CMainFrame::OnControlScreens()
 			bacnet_view_number = TYPE_SCREENS;
 			g_hwnd_now = m_screen_dlg_hwnd;
 		}
-
-		if(bac_select_device_online)
-			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SCREENS);
-		//else
-		//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
+		if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+		{
+			Create_Thread_Read_Item(TYPE_SCREENS);
+		}
+		else
+		{
+			if(bac_select_device_online)
+				::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SCREENS);
+			//else
+			//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
+		}
 	}
 	else
 	{    
@@ -9210,7 +9342,7 @@ void CMainFrame::OnLanguage34006()
 	 
 }
 
-#include "BacnetMonitor.h"
+
 void CMainFrame::OnControlMonitors()
 {
 	// TODO: Add your command handler code here
@@ -9253,7 +9385,7 @@ void CMainFrame::OnControlMonitors()
 	}
 	else
 	{
-		MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+		MessageBox(_T("This function don't support this product!\r\n"));
 	}
 
 	//CBacnetMonitor Dlg;
@@ -9618,7 +9750,7 @@ void CMainFrame::ShowDebugWindow()
 		DebugWindow = new CDebugWindow;
 		DebugWindow->Create(IDD_DIALOG_DEBUG_TRACE, this);
 		DebugWindow->ShowWindow(SW_HIDE);
-		g_Print = _T("Debug Time 15-01-27   Debug version 2.3");
+		g_Print = _T("Debug Time 15-05-28   Debug version 2.4");
 		DFTrace(g_Print);
 	}
 	
@@ -10950,6 +11082,27 @@ void CMainFrame::OnUpdateControlAlarmLog(CCmdUI *pCmdUI)
 	 pCmdUI->SetCheck(bacnet_view_number == TYPE_ALARMLOG);
 }
 
+void CMainFrame::Create_Thread_Read_Item(int n_item)
+{
+	if(WaitRead_Data_Dlg)
+	{
+		delete WaitRead_Data_Dlg;
+		WaitRead_Data_Dlg = 0;
+	}
+	WaitRead_Data_Dlg = new CDialog_Progess(this,1,100);
+	//创建对话框窗口
+	WaitRead_Data_Dlg->Create(IDD_DIALOG10_Progress, this);
+	WaitRead_Data_Dlg->ShowProgress(0,0);
+	RECT RECT_SET1;
+	::GetWindowRect(BacNet_hwd,&RECT_SET1);
+	WaitRead_Data_Dlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 19,800,20,1);
+	WaitRead_Data_Dlg->ShowWindow(SW_SHOW);
+	g_bac_read_type = n_item;
+	if(click_read_thread==NULL)
+	{
+		click_read_thread =CreateThread(NULL,NULL,MSTP_Send_read_Command_Thread,this,NULL, NULL);
+	}
+}
 
 void CMainFrame::OnUpdateControlTstat(CCmdUI *pCmdUI)
 {
@@ -12377,6 +12530,25 @@ void CMainFrame::OnFileExportregiseterslist()
 
 void CMainFrame::OnToolRegistersmaintenancesystem()
 {
+         //维护寄存器列表管理的 一个应用程序
+         //它能够维护所以产品的寄存器
+        // 它的所有的功能列表
+        /*
+        1>用户管理
+        2>密码修改
+        3>项目管理
+        4>寄存器信息修改
+        5>产品的添加
+        */
          CString strHistotyFile=g_strExePth+_T("RegisterListManager.exe");
        ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
+}
+
+#include "BatchSNDlg.h"
+void CMainFrame::OnToolFlashsn()
+{
+    g_bPauseMultiRead =TRUE;
+   CBatchSNDlg dlg;
+   dlg.DoModal();
+   g_bPauseMultiRead =FALSE; 
 }

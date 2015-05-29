@@ -8,6 +8,7 @@
 #define MAX_INS     5
 
 #define PRIVATE_HEAD_LENGTH 7
+#define PRIVATE_SUB_HEAD_LENGTH 12
 
 //#define PRIVATE_MONITOR_HEAD_LENGTH 18
 #define PRIVATE_MONITOR_HEAD_LENGTH 20
@@ -96,7 +97,7 @@ typedef enum {
 		 LOADPROGRAM_COMMAND       = 31,
 		 DEFAULT_PRG_COMMAND       = 32, 
 
-
+		 SUB_READ_COMMAND = 34,
 
 		 ALARM_NOTIFY_COMMAND       = 51,
 		 SEND_INFO_COMMAND          = 52,
@@ -124,6 +125,7 @@ typedef enum {
 		 RESTARTMINI_COMMAND       = 121,
 		 WRITEPRGFLASH_COMMAND     = 122,
 		 OPENSCREEN_COMMAND        = 123,
+		 SUB_WRITE_COMMAND	       = 134,
 		 WRITE_REMOTE_POINT         = 140,
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
@@ -186,22 +188,11 @@ typedef struct
 	int8_t digital_control;  /* (1 bit)*/
 	int8_t decom;  /* (1 bit; 0=ok, 1=point decommissioned)*/
 	int8_t range;	/* (1 Byte ; output_range_equate)*/
-#if 0
-	unsigned auto_manual : 1;  /* (1 bit; 0=auto, 1=manual)*/
-	unsigned digital_analog	: 1;  /* (1 bit; 0=digital, 1=analog)*/
-	unsigned hw_switch_status	  : 3;  /* (3 bits; 0-5)*/
-	unsigned control       : 1;  /* (1 bit; 0=off, 1=on)*/
-	unsigned digital_control: 1;  /* (1 bit)*/
-	unsigned decom	     	: 1;  /* (1 bit; 0=ok, 1=point decommissioned)*/
-	unsigned range        : 8;	/* (1 Byte ; output_range_equate)*/
-	
-#endif
-//	uint8_t flag1;
-//	uint8_t range  ;	/* (1 uint8_t ; output_range_equate)*/
 
-	uint8_t m_del_low;  /* (1 uint8_t ; if analog then low)*/
-	uint8_t s_del_high; /* (1 uint8_t ; if analog then high)*/
-	uint16_t delay_timer;      /* (2 bytes;  seconds,minutes)*/
+	uint8_t sub_id;  /* (1 uint8_t ; if analog then low)*/
+	uint8_t sub_product; /* (1 uint8_t ; if analog then high)*/
+	uint8_t sub_number;
+	uint8_t delay_timer;      /* (2 bytes;  seconds,minutes)*/
 
 } Str_out_point;  /* 21+9+4+2+2+2 = 40 */
 
@@ -217,13 +208,13 @@ typedef  struct
 	//int8_t value[4];
 	int8_t  filter;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
 	int8_t decom;/* (1 bit; 0=ok, 1=point decommissioned)*/
-	int8_t sen_on;/* (1 bit)*/
-	int8_t sen_off;  /* (1 bit)*/
+	int8_t sub_id;/* (1 bit)*/
+	int8_t sub_product;  /* (1 bit)*/
 	int8_t control; /*  (1 bit; 0=OFF, 1=ON)*/
 	int8_t auto_manual; /* (1 bit; 0=auto, 1=manual)*/
 	int8_t digital_analog ; /* (1 bit; 1=analog, 0=digital)*/
 	int8_t calibration_sign; /* (1 bit; sign 0=positiv 1=negative )*/
-	int8_t calibration_increment; /* (1 bit;  0=0.1, 1=1.0)*/
+	int8_t sub_number; /* (1 bit;  0=0.1, 1=1.0)*/
 	int8_t calibration_h; /* (5 bits - spare )*/  //去掉了 unused 把 calibration改为了双字节
 #if 0
 	unsigned  filter:3;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
@@ -246,10 +237,6 @@ typedef  struct
 
 } Str_in_point; /* 21+1+4+1+1+9 = 38 */
 
-//typedef  struct
-//{
-//	int8_t label[4];		
-//}Str_connected_point;
 
 typedef union {
 		Str_out_point             *pout;
@@ -267,6 +254,19 @@ typedef struct
 
 }Str_user_data_header;
 
+
+typedef struct
+{
+	uint16_t    total_length;        /* total length to be received or sent */
+	uint8_t  command;
+	uint8_t  point_start_instance;
+	uint8_t  point_end_instance;
+	uint16_t  entitysize;
+	uint16_t device_id;
+	uint8_t  subcmd;
+	uint8_t  reserved[2];
+
+}Str_sub_user_data_header;
 
 
 
@@ -331,12 +331,6 @@ typedef struct {
 	int32_t 	oi;
 }	Con_aux;
 
-//class Point_T3000 {
-//public:
-//	byte number		;
-//	byte point_type;
-//	byte panel	 ;
-//};
 
 typedef struct {
 public:
@@ -367,22 +361,6 @@ typedef struct
 {
 	byte time_minutes;
 	byte time_hours;
-	//byte time_on_minutes1;		// (1 byte ; 0-59)
-	//byte time_on_hours1;		// (1 byte ; 0-23)
-	//byte time_off_minutes1;	// (1 byte ; 0-59)
-	//byte time_off_hours1;		// (1 byte ; 0-23)
-	//byte time_on_minutes2;		// (1 byte ; 0-59)
-	//byte time_on_hours2;		// (1 byte ; 0-23)
-	//byte time_off_minutes2;	// (1 byte ; 0-59)
-	//byte time_off_hours2;		// (1 byte ; 0-23)
-	//byte time_on_minutes3;		// (1 byte ; 0-59)
-	//byte time_on_hours3;		// (1 byte ; 0-23)
-	//byte time_off_minutes3;	// (1 byte ; 0-59)
-	//byte time_off_hours3;		// (1 byte ; 0-23)
-	//byte time_on_minutes4;		// (1 byte ; 0-59)
-	//byte time_on_hours4;		// (1 byte ; 0-23)
-	//byte time_off_minutes4;	// (1 byte ; 0-59)
-	//byte time_off_hours4;		// (1 byte ; 0-23)
 }Day_Time;
 
 typedef struct 		// (size = 16 byte s)
@@ -495,14 +473,6 @@ typedef struct
 #define DYNDNS_MAX_PASSWORD_SIZE 32
 #define DYNDNS_MAX_DOMAIN_SIZE 32
 
-/* Point_Net_T3000;*/
-//typedef struct
-//{
-//	byte number		;
-//	byte point_type;
-//	byte panel		;
-//	unsigned short  network;
-//}Point_Net ;
 
 typedef struct
 {
@@ -526,26 +496,15 @@ typedef struct
 	uint8_t hour_interval_time;   				/* 1 byte ; 0-255 */
 
 	uint8_t max_time_length;      /* the length of the monitor in time units */
-
-//	Views views[MAX_VIEWS];			/* 16 x MAX_VIEWS bytes */
-
 	uint8_t num_inputs  ;// :4; 	/* total number of points */
 	uint8_t an_inputs ;//   :4; 	/* number of analog points */
-////	uint8_t unit 		;//		:2; 	/* 2 bits - minutes=0, hours=1, days=2	*/
-//	uint8_t ind_views	;//	:2; 	/* number of views */
-////	uint8_t wrap_flag	;//	:1;		/* (1 bit ; 0=no wrap, 1=data wrapped)*/
 	uint8_t status		;//		:1;		/* monitor status 0=OFF / 1=ON */
-////	uint8_t reset_flag	;//	:1; 	/* 1 bit; 0=no reset, 1=reset	*/
-////	uint8_t double_flag;//	:1; 	/* 1 bit; 0= 4 bytes data, 1= 1(2) bytes data */
 	int32_t next_sample_time;
 }	Str_monitor_point; 		/* 9+70+14+3+1+48+2 = 133 bytes */
 
 typedef struct              /* 5 bytes */
 {
 	uint8_t pointno_and_value;    // bit0-bit6 point_no     value bit7
-	// uint8_t unused ;
-	// uint8_t value;
-
 	int32_t          time;
 
 } Digital_sample;        /* 5 bytes */
@@ -560,7 +519,6 @@ typedef struct {
 
 typedef struct
 {
-	//uint16_t  		total_length;        /*	total length to be received or sent	*/
 	uint16_t total_seg;
 	uint8_t		command;
 	uint8_t index;
@@ -623,10 +581,6 @@ typedef struct              /* 85 bytes */
 
 	uint8_t monitor;//	       :4; /* monitors' number */
 	uint8_t no_points ;//      :4; /* number of points in block */
-/*	unsigned tenths_of_seconds    : 4; /* 4 bits ; 0-15 */
-/*	unsigned second_interval_time : 6; /* 6 bits ; 0-59 */
-/*	unsigned minute_interval_time : 6; /* 6 bits ; 0-59 */
-
 	uint8_t second_interval_time; /* 1 uint8_t ; 0-59 */
 	uint8_t minute_interval_time; /* 1 uint8_t ; 0-59 */
 	uint8_t hour_interval_time;   /* 1 uint8_t ; 0-255 */
@@ -653,11 +607,7 @@ typedef struct              /* 85 bytes */
 
   uint8_t      last_digital_state ;//: 14;
 
-  /*  U8_T      index_fast         :  2;*/
   uint8_t     reserved;
- // uint8_t      not_used       ;//    :  2;
-/*  unsigned      index_fast         :  2;*/
-
 
 } Monitor_Block_Header;  /* 100 bytes */
 
@@ -695,8 +645,24 @@ typedef struct
 	uint8_t no_used[10];
 }Str_Pro_Info;
 
+#define UN_TIME_LENGTH  10
+typedef union
+{
+	uint8_t all[UN_TIME_LENGTH];
+	struct 
+	{
+		uint8_t sec;    /* 0-59 */
+		uint8_t min;      /* 0-59 */
+		uint8_t hour;        /* 0-23 */
+		uint8_t day;         /* 1-31 */
+		uint8_t week;    /* 0-6, 0=Sunday */
+		uint8_t mon;       /* 0-11 */
+		uint8_t year;        /* 0-99 */
+		uint16_t day_of_year;  /* 0-365 */
+		uint8_t is_dst;        /* daylight saving time on / off */  
 
-
+	}Clk;
+}UN_Time;
 
 typedef union
 {
@@ -746,6 +712,8 @@ typedef union
 		//0xd248912d			210.72.145.45  NTSC					4
 		signed short time_zone;
 		unsigned int n_serial_number;
+
+		 UN_Time update_dyndns; 
 	}reg;
 }Str_Setting_Info;
 

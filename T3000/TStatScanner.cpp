@@ -1261,6 +1261,7 @@ UINT _ScanNCByUDPFunc(LPVOID pParam)
 									n+=4;
 								}
 								//////////////////////////////////////////////////////////////////////////
+								bFlag = FALSE;
 								if (!bFlag)	//不判断 Ip是否重复，因为 Minipanel能挂载TSTAT的设备 会将底下的设备也回复过来;
 								{
 									m_scan_info.at(scan_udp_item).scan_found ++;
@@ -1362,7 +1363,7 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 {
 	int nLen=buffer[2]+buffer[3]*256;
 	//int n =sizeof(char)+sizeof(unsigned char)+sizeof( unsigned short)*9;
-	unsigned short usDataPackage[16]={0};
+	unsigned short usDataPackage[30]={0};
 	if(nLen>=0)
 	{
 		CTStat_Net* pT = new CTStat_Net;
@@ -1390,8 +1391,19 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 		pT->SetNetworkCardAddress(local_enthernet_ip);
 
 		_NetDeviceInfo* pni = new _NetDeviceInfo;
-		pni->m_pNet = pT;										
-		m_szNCScanRet.push_back(pni);
+		pni->m_pNet = pT;		
+		bool found_exsit = false;
+		for (int z=0;z<m_szNCScanRet.size();z++)
+		{
+			unsigned int temp_serial_id;
+			temp_serial_id = ((CTStatBase *)(m_szNCScanRet.at(z)->m_pNet))->m_dwSerialID;
+			if(temp_serial_id == nSerial)
+			{
+				found_exsit = true;
+			}
+		}
+		if(!found_exsit)
+			m_szNCScanRet.push_back(pni);
 	}
 	
 
@@ -2385,6 +2397,12 @@ void CTStatScanner::AddNewNetToDB()
 		int nSProtocol = pInfo->m_pNet->GetProtocol();
 		if((nSProtocol <0) || (nSProtocol >3))
 			nSProtocol = MODBUS_TCPIP;//default it will be modbus protocol;
+
+		CString temp_cs;
+		temp_cs.Format(_T("%d"),pInfo->m_pNet->GetProductType());
+		if(!IsNetDevice(temp_cs))
+			continue;
+
 		for (UINT j = 0; j < m_szNetNodes.size(); j++)
 		{
 			unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();

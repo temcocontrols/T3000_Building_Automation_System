@@ -950,7 +950,8 @@ extern bool receive_customer_unit; //收到回复，flag就置 true;
 extern unsigned char bacnet_add_id[254];
 extern int bacnet_device_type;
 extern int g_bac_instance;
-extern int g_selected_serialnumber;
+extern unsigned int g_sub_instace;
+extern unsigned int g_selected_serialnumber;
 extern unsigned short g_mac;
 extern HWND MainFram_hwd;
 extern HWND BacNet_hwd;//Used for send a message to father delete the dlg;
@@ -986,7 +987,8 @@ extern bool bac_cm5_graphic;
 
 extern int bac_gloab_panel;
 
-
+extern int input_list_line;
+extern int output_list_line;
 extern int program_list_line ;
 extern int weekly_list_line ;
 extern int annual_list_line ;
@@ -1072,6 +1074,9 @@ extern HANDLE CM5_UI_Thread;
 extern DWORD nThreadID_x;
 extern DWORD cm5_nThreadID;
 extern int g_protocol;
+extern int g_bac_read_type;
+extern bool g_bac_need_read_setting;  //如果是第一次点击 需要读Setting里面的 数据;判断是否需要更改Label之类的;
+extern HANDLE click_read_thread;
 extern bool bac_net_initial_once;
 extern unsigned char my_ip[4];
 extern byte	g_DayState[8][48];

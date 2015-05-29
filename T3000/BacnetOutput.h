@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CM5/ListCtrlEx.h"
+#include "afxwin.h"
+#include "CM5/CStatic/staticex.h"
 // CBacnetOutput dialog
 
 class CBacnetOutput : public CDialogEx
@@ -33,7 +35,6 @@ public:
 	void Initial_ListFor_Tstat();
 	void Initial_Combox_Show_Tstat();
 	void Reload_Unit_Type();
-	afx_msg void OnBnClickedButtonOutputApply();
 	afx_msg void OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult);
 			void OnNMClickListOutput_Tstat(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
@@ -44,6 +45,7 @@ public:
 	int m_latest_protocol;
 	void Fresh_One_Item(int row);
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	CStaticEx m_output_item_info;
 };
 
 const int OUTPUT_NUM = 0;

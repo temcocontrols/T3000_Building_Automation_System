@@ -236,6 +236,7 @@
 #define IDD_DIALOG_T3_RANGE             563
 #define IDD_DIALOG_GRAPHIC_MODE         564
 #define IDD_DIALOG_T3_OUTPUTS           565
+#define IDD_DIALOG_SN                   567
 #define IDR_TOOLBAR_BACNET              579
 #define IDB_BITMAP7                     580
 #define IDB_BITMAP_BACNET_MENU_BIT      581
@@ -272,6 +273,7 @@
 #define IDC_EDIT_HUM_FILTER             1027
 #define IDC_EDIT4_HUM                   1027
 #define IDC_EDIT_TRANDUCER_MIN          1027
+#define IDC_EDIT_END                    1027
 #define IDC_OUTPUT3_DELAY_OFF_EDIT      1028
 #define IDC_CUR_TEMP                    1028
 #define IDC_EDIT42                      1028
@@ -1843,6 +1845,8 @@
 #define IDC_STATIC_OUTPUT_SETTING       2081
 #define IDC_STATIC_X_NAME               2082
 #define IDC_STATIC_ISP                  2083
+#define IDC_EDIT_START                  2084
+#define IDC_EDIT_TEST                   2085
 #define IDC_HELP_HELP1                  3831
 #define IDC_STATIC_SETTING_PANEL_TITLE  5828
 #define IDC_EDIT_SETTING_PANEL          5829
@@ -1902,6 +1906,9 @@
 #define IDC_CHANGE_ID                   9864
 #define IDC_RADIO_T_13                  9864
 #define IDC_EDIT_INTER                  10000
+#define IDC_STATIC_SEETING_SERIAL_NUMBER 15491
+#define IDC_STATIC_INPUT_ITEM_INFO      15492
+#define IDC_STATIC_OUTPUT_ITEM_INFO     15493
 #define IDC_RADIO1                      15494
 #define IDC_RADIO2                      15495
 #define IDC_RADIO3                      15496
@@ -2205,6 +2212,7 @@
 #define ID_TOOL_EREASE_CHANGE_ID        34044
 #define ID_FILE_EXPORTREGISETERSLIST    34045
 #define ID_TOOL_REGISTERSMAINTENANCESYSTEM 34046
+#define ID_TOOL_FLASHSN                 34047
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
 #define IDD_DIALOG_BACNET_OUTPUT        34907
@@ -2270,9 +2278,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        566
-#define _APS_NEXT_COMMAND_VALUE         34047
-#define _APS_NEXT_CONTROL_VALUE         2084
+#define _APS_NEXT_RESOURCE_VALUE        568
+#define _APS_NEXT_COMMAND_VALUE         34048
+#define _APS_NEXT_CONTROL_VALUE         2086
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

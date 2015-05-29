@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "T3000.h"
 #include "BacnetProgramEdit.h"
+#include "BacnetProgram.h"
 #include "afxdialogex.h"
 
 #include "CM5/ud_str.h"
@@ -127,10 +128,11 @@ void CBacnetProgramEdit::Initial_static()
 	m_free_memory.setFont(15,10,NULL,_T("Arial"));
 }
 extern char my_panel;
+
 BOOL CBacnetProgramEdit::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Unreg_Hotkey();
 	// TODO:  Add extra initialization here
 	m_edit_changed = false;
 	my_panel = bac_gloab_panel; //Set the panel number
@@ -196,10 +198,10 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
  	temp_point = desassembler_program();
 	if(temp_point == NULL)
 	{
-		//MessageBox(_T("ERROR!!!!Decode Error!!!!!!!!!!!!!"));
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Decode Error!"));
 		return 1;
 	}
+	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Decode success!"));
 	Initial_static();	
 	CString temp;
 
@@ -215,9 +217,6 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(temp1);
 	m_edit_changed = false;
 	program_string = temp1;
-	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(-1,-1);
-	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->ReplaceSel(temp1);
-	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(-1,-1);
 	return 0;
 }
 
@@ -321,46 +320,65 @@ void CBacnetProgramEdit::OnSend()
 		int npart = (my_lengthcode / 401) + 1;
 
 		bool b_program_status = true;
-		for (int j=0;j<npart;j++)
+
+		if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 		{
-			int send_status = true;
-			int resend_count = 0;
-			int temp_invoke_id = -1;
-			do 
+			for (int j=0;j<npart;j++)
 			{
-				resend_count ++;
-				if(resend_count>5)
+			   int n_ret = 0;
+			   n_ret = WriteProgramData_Blocking(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line,j);
+			   if(n_ret< 0)
+			   {
+				   MessageBox(_T("Write Program Code Timeout!"));
+				   return;
+			   }
+			}
+			b_program_status = true;
+		}
+		else
+		{
+			for (int j=0;j<npart;j++)
+			{
+				int send_status = true;
+				int resend_count = 0;
+				int temp_invoke_id = -1;
+				do 
 				{
-					send_status = false;
+					resend_count ++;
+					if(resend_count>5)
+					{
+						send_status = false;
+						b_program_status = false;
+						MessageBox(_T("Write Program Code Timeout!"));
+						return;
+					}
+					temp_invoke_id =  WriteProgramData(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line,j);
+
+					Sleep(SEND_COMMAND_DELAY_TIME);
+				} while (temp_invoke_id<0);
+
+				if(send_status)
+				{
+					for (int i=0;i<3000;i++)
+					{
+						Sleep(1);
+						if(tsm_invoke_id_free(temp_invoke_id))
+						{
+							//MessageBox(_T("Operation success!"),_T("Information"),MB_OK);
+							//return;
+							goto	part_success;
+						}
+					}
 					b_program_status = false;
 					MessageBox(_T("Write Program Code Timeout!"));
 					return;
-				}
-				temp_invoke_id =  WriteProgramData(g_bac_instance,WRITEPROGRAMCODE_T3000,program_list_line,program_list_line,j);
-
-				Sleep(SEND_COMMAND_DELAY_TIME);
-			} while (temp_invoke_id<0);
-
-			if(send_status)
-			{
-				for (int i=0;i<2000;i++)
-				{
-					Sleep(1);
-					if(tsm_invoke_id_free(temp_invoke_id))
-					{
-						//MessageBox(_T("Operation success!"),_T("Information"),MB_OK);
-						//return;
-						goto	part_success;
-					}
-				}
-				b_program_status = false;
-				MessageBox(_T("Write Program Code Timeout!"));
-				return;
 
 part_success:
-				continue;
+					continue;
+				}
 			}
 		}
+
 		if(b_program_status)
 		{
 			CString temp_string;
@@ -384,7 +402,7 @@ part_success:
 
 		int len = strlen(mesbuf);
 		int  unicodeLen = ::MultiByteToWideChar( CP_ACP,0, mesbuf,-1,NULL,0 ); 
-		::MultiByteToWideChar( CP_ACP,  0,mesbuf,-1,cstring_error.GetBuffer(MAX_PATH),unicodeLen );  
+		::MultiByteToWideChar( CP_ACP,  0,mesbuf,-1,cstring_error.GetBuffer(2000),unicodeLen );  
 		cstring_error.ReleaseBuffer();
 
 
@@ -511,12 +529,16 @@ void CBacnetProgramEdit::OnCancel()
 	GetDlgItemText(IDC_RICHEDIT2_PROGRAM,Edit_Buffer);
 	if(program_string.CompareNoCase(Edit_Buffer) == 0)
 	{
+		((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Reg_Hotkey();
 		CDialogEx::OnCancel();
 	}
 	else
 	{
 		if(MessageBox(_T("Do you want to exit the programming without saving?"),_T("Prompting"),MB_ICONINFORMATION | MB_YESNO) == IDYES)
+		{
+			((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Reg_Hotkey();
 			CDialogEx::OnCancel();
+		}
 	}
 
 }

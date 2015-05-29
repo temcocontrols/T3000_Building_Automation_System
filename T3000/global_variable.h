@@ -89,6 +89,8 @@ CString showing_text;
  CCriticalSection  critical_section;
  CCriticalSection  register_critical_section;
 
+
+
 CEvent g_eventPauseMultiRead;
 
 BOOL g_buser_log_in=FALSE;
@@ -1845,7 +1847,8 @@ bool receive_customer_unit; //收到回复，flag就置 true;
 unsigned char bacnet_add_id[254];
 int bacnet_device_type;
 int g_bac_instance;
-int g_selected_serialnumber;
+unsigned int g_sub_instace;
+unsigned int g_selected_serialnumber;
 unsigned short g_mac;
 HWND MainFram_hwd;
 HWND BacNet_hwd;
@@ -1881,7 +1884,8 @@ bool bac_remote_point_read_results;
 bool bac_cm5_graphic;
 int bac_gloab_panel;
 //int g_bac_instance;
-
+int input_list_line;
+int output_list_line;
 int program_list_line ;
 int weekly_list_line ;
 int annual_list_line ;
@@ -1989,6 +1993,9 @@ CString PrintText[1000];
 CString g_Print;
 bool range_cancel;//用于监测Range 对话框是否正常修改，如果正常修改就为0，否则就为1;
 int g_protocol=PROTOCOL_UNKNOW;
+int g_bac_read_type;	//用于记录将要读取哪一个，input 还是output,给线程使用;
+bool g_bac_need_read_setting;  //如果是第一次点击 需要读Setting里面的 数据;判断是否需要更改Label之类的;
+HANDLE click_read_thread;
 bool bac_net_initial_once;
 unsigned char my_ip[4];
 int connect_invoke_id = -1;

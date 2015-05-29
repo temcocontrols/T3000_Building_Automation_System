@@ -155,13 +155,13 @@ typedef  struct
 	//int8_t value[4];
 	int8_t  filter;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
 	int8_t decom;/* (1 bit; 0=ok, 1=point decommissioned)*/
-	int8_t sen_on;/* (1 bit)*/
-	int8_t sen_off;  /* (1 bit)*/
+	int8_t sub_id;/* (1 bit)*/
+	int8_t sub_product;  /* (1 bit)*/
 	int8_t control; /*  (1 bit; 0=OFF, 1=ON)*/
 	int8_t auto_manual; /* (1 bit; 0=auto, 1=manual)*/
 	int8_t digital_analog ; /* (1 bit; 1=analog, 0=digital)*/
 	int8_t calibration_sign; /* (1 bit; sign 0=positiv 1=negative )*/
-	int8_t calibration_increment; /* (1 bit;  0=0.1, 1=1.0)*/
+	int8_t sub_number; /* (1 bit;  0=0.1, 1=1.0)*/
 	int8_t unused; /* (5 bits - spare )*/
 #if 0
 	unsigned  filter:3;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
@@ -681,8 +681,8 @@ typedef struct
 	//	uint8_t flag1;
 	//	uint8_t range  ;	/* (1 uint8_t ; output_range_equate)*/
 
-	uint8_t m_del_low;  /* (1 uint8_t ; if analog then low)*/
-	uint8_t s_del_high; /* (1 uint8_t ; if analog then high)*/
+	uint8_t sub_id;  /* (1 uint8_t ; if analog then low)*/
+	uint8_t sub_product; /* (1 uint8_t ; if analog then high)*/
 	uint16_t delay_timer;      /* (2 bytes;  seconds,minutes)*/
 
 } Str_out_point;  /* 21+9+4+2+2+2 = 40 */
@@ -2585,6 +2585,9 @@ int define_var(char *tok, int t,int l,int c, int lstr)
  {             // local var
 //  if ((strlen(token) == 1 ) && (token[0]>='A' && token[0]<='Z'))
 //  {
+	 sntx_err(NOT_VAR); 
+	 error = 1;
+	 return 0;
 	 var_type = LOCAL_VAR;
 	 label = tok;
 	 while( *label )
@@ -6388,7 +6391,7 @@ return "" ; /* unkown command */
 void ftoa(float f, int length, int ndec, char *buf)
 {
 	int i,n;
-	char xxxtmp[20],*p,c;
+	char xxxtmp[50],*p,c;
 	for(i=0;i<length-ndec;i++)
 		buf[i]=' ';
 	buf[length-ndec-1]='.';
@@ -6592,13 +6595,15 @@ else
 						}
 						else
 						{
-							if((long)f==f && (f<1000000 && f>-1000000 ))
+							if((long)f==f && (f<1000000 && f>-1000000 )) //原始的;  但是 有问题; （long）f 一直不等于f
 							{
 								ltoa((long)f,buf,10);
 							}
 							else
 							{
-								ftoa(f, 15, 2, buf);
+								//ftoa(f, 15, 2, buf);//original
+								sprintf(buf,"%.3f",f);
+							//	ftoa(f, 35, 2, buf);//Fance modify
 								ltrim(buf);
 							}
 						}

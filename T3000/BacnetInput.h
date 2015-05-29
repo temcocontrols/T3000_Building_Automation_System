@@ -3,6 +3,8 @@
 
 //#include "CM5/MyOwnListCtrl.h"
 #include "CM5/ListCtrlEx.h"
+#include "afxwin.h"
+#include "CM5/CStatic/staticex.h"
 // CBacnetInput dialog
 
 class CBacnetInput : public CDialogEx
@@ -77,6 +79,7 @@ public:
 	BOOL   m_disable_CO2;
 #endif
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	CStaticEx m_input_item_info;
 };
 //int GetPrivateData();
 //int WritePrivateData();

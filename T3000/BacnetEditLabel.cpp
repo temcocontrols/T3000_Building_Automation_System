@@ -6,7 +6,7 @@
 #include "BacnetEditLabel.h"
 #include "globle_function.h"
 #include "afxdialogex.h"
-
+#include "MainFrm.h"
 #define WM_EDIT_CHANGE_VALUE WM_USER + 1115
 extern int Station_NUM;
 extern int pointtotext(char *buf,Point_Net *point);
@@ -1047,7 +1047,15 @@ void CBacnetEditLabel::OnStnClickedEditIconPath()
 	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
 	PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
 	ApplicationFolder.ReleaseBuffer();
-	image_fordor = ApplicationFolder + _T("\\Database\\image");
+
+
+
+	//image_fordor = ApplicationFolder + _T("\\Database\\image");
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+
+	image_fordor = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+
+
 	SetCurrentDirectoryW(image_fordor);
 	//选择图片,如果选的不在database目录下就copy一份过来;如果在的话就重命名，因为文件名长度不能超过10个字节;
 	CString strFilter = _T("Ico file;jpg file;bmp file;png file|*.ico;*.jpg;*.bmp;*.png||");
@@ -1105,7 +1113,11 @@ void CBacnetEditLabel::OnStnClickedEditIconPath2()
 	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
 	PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
 	ApplicationFolder.ReleaseBuffer();
-	image_fordor = ApplicationFolder + _T("\\Database\\image");
+
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+
+	image_fordor = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+
 	SetCurrentDirectoryW(image_fordor);
 	//选择图片,如果选的不在database目录下就copy一份过来;如果在的话就重命名，因为文件名长度不能超过10个字节;
 	CString strFilter = _T("Ico file;jpg file;bmp file;png file|*.ico;*.jpg;*.bmp;*.png||");
