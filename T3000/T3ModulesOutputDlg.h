@@ -20,5 +20,12 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
+void Fresh();
+afx_msg LRESULT Fresh_Input_List(WPARAM wParam,LPARAM lParam);
+afx_msg LRESULT Change_Input_Item(WPARAM wParam,LPARAM lParam);
+afx_msg void OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pResult);
+
+public:
+    int m_sn;
     ListCtrlEx::CListCtrlEx m_outputlist;
 };

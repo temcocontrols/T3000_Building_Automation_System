@@ -14,6 +14,9 @@
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
 Str_variable_point m_temp_variable_data[BAC_VARIABLE_ITEM_COUNT];
+
+int variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;	//variable list 要显示多少个variable 的个数， 不是根据vector 的size 来判断大小;
+
 IMPLEMENT_DYNAMIC(CBacnetVariable, CDialogEx)
 
 CBacnetVariable::CBacnetVariable(CWnd* pParent /*=NULL*/)
@@ -118,16 +121,20 @@ void CBacnetVariable::OnBnClickedButtonVariableRead()
 
 void CBacnetVariable::Initial_List()
 {
+	m_variable_list.ShowWindow(SW_HIDE);
+	m_variable_list.DeleteAllItems();
+	while ( m_variable_list.DeleteColumn (0)) ;
+
 	m_variable_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	m_variable_list.SetExtendedStyle(m_variable_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_variable_list.InsertColumn(VARIABLE_NUM, _T("NUM"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+	m_variable_list.InsertColumn(VARIABLE_NUM, _T("Variable"), 70, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_variable_list.InsertColumn(VARIABLE_FULL_LABLE, _T("Full Label"), 200, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_AUTO_MANUAL, _T("Auto/Manual"), 150, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_VALUE, _T("Value"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_UNITE, _T("Units"), 120, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_variable_list.InsertColumn(VARIABLE_LABLE, _T("Label"), 130, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_variable_dlg_hwnd = this->m_hWnd;
-	g_hwnd_now = m_variable_dlg_hwnd;
+	//g_hwnd_now = m_variable_dlg_hwnd;
 
 	CRect list_rect,win_rect;
 	m_variable_list.GetWindowRect(list_rect);
@@ -147,6 +154,10 @@ void CBacnetVariable::Initial_List()
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
 		CString temp_des;
 		CString temp_units;
+
+		if(i>=variable_item_limit_count)
+			break;
+
 		temp_item.Format(_T("%d"),i+1);
 		m_variable_list.InsertItem(i,temp_item);
 		//if(ListCtrlEx::ComboBox == m_variable_list.GetColumnType(VARIABLE_AUTO_MANUAL))
@@ -177,6 +188,7 @@ void CBacnetVariable::Initial_List()
 		}
 
 	}
+	m_variable_list.ShowWindow(SW_SHOW);
 }
 
 
@@ -212,6 +224,11 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		if(isFreshOne)
 		{
 			i = Fresh_Item;
+		}
+
+		if(i>=variable_item_limit_count)
+		{
+			return 0;
 		}
 
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(i).description, (int)strlen((char *)m_Variable_data.at(i).description)+1, 
@@ -796,7 +813,11 @@ void CBacnetVariable::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 		{
-			if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+			if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+			{
+				PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+			}
+			else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 			{
 			::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 			if(bac_select_device_online)
@@ -952,6 +973,15 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 		return -1;
 	}
 	int i = index;
+
+	if(m_Variable_data.at(i).auto_manual == 1)
+	{
+		Auto_M = _T("M");
+	}
+	else
+	{
+		Auto_M.Empty();
+	}
 
 	if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 	{

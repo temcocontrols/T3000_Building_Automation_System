@@ -633,6 +633,9 @@
     <ClCompile Include="T3ModulesOutputDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BatchSNDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1521,6 +1524,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="T3ModulesOutputDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchSNDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

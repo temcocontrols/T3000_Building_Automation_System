@@ -87,7 +87,6 @@ BEGIN_MESSAGE_MAP(COutputSetDlg, CDialog)
 	ON_MESSAGE(WM_REFRESH_OUTPUTDLG, &COutputSetDlg::RefreshGrid)//Add by Fan
 	ON_WM_CLOSE()
 	ON_CBN_SELCHANGE(IDC_COMBO_SIGNAL_TYPE, &COutputSetDlg::OnCbnSelchangeComboSignalType)
-
 END_MESSAGE_MAP()
 
 
@@ -4868,7 +4867,7 @@ else
 //}
 
 BEGIN_EVENTSINK_MAP(COutputSetDlg, CDialog)
-	ON_EVENT(COutputSetDlg, IDC_MSFLEXGRID1, DISPID_CLICK, COutputSetDlg::ClickMsflexgrid1, VTS_NONE)
+	//ON_EVENT(COutputSetDlg, IDC_MSFLEXGRID1, DISPID_CLICK, COutputSetDlg::ClickMsflexgrid1, VTS_NONE)
 END_EVENTSINK_MAP()
 
 void COutputSetDlg::ClickMsflexgrid1()

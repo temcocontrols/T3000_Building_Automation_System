@@ -134,7 +134,7 @@ void CBacnetProgram::Initial_List()
 	m_program_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	//m_program_list.SetExtendedStyle(m_program_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_program_list.SetExtendedStyle(m_program_list.GetExtendedStyle() |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_program_list.InsertColumn(0, _T("Num"), 80, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+	m_program_list.InsertColumn(0, _T("Program"), 80, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_program_list.InsertColumn(1, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_program_list.InsertColumn(2, _T("Status"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_program_list.InsertColumn(3, _T("Auto/Manual"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -410,8 +410,10 @@ void CBacnetProgram::OnBnClickedButtonProgramApply()
 	Post_Write_Message(g_bac_instance,WRITEPROGRAM_T3000,0,15,sizeof(Str_program_point),BacNet_hwd);
 
 }
-
-
+#include "Dialog_Progess.h"
+#include "DialogCM5_BacNet.h"
+extern CDialog_Progess *WaitRead_Data_Dlg;
+#include "MainFrm.h"
 void CBacnetProgram::OnBnClickedButtonProgramEdit()
 {
 	// TODO: Add your control notification handler code here
@@ -423,12 +425,76 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 			break;
 		}
 	}
-	if(bac_select_device_online)
-		::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAMCODE);
+	if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+	{
+		//CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		//pFrame->Create_Thread_Read_Item(TYPE_PROGRAMCODE);
+		if(WaitRead_Data_Dlg)
+		{
+			delete WaitRead_Data_Dlg;
+			WaitRead_Data_Dlg = 0;
+		}
+		WaitRead_Data_Dlg = new CDialog_Progess(this,1,100);
+		//创建对话框窗口
+		WaitRead_Data_Dlg->Create(IDD_DIALOG10_Progress, this);
+		WaitRead_Data_Dlg->ShowProgress(0,0);
+		RECT RECT_SET1;
+		::GetWindowRect(BacNet_hwd,&RECT_SET1);
+		WaitRead_Data_Dlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 19,800,20,1);
+		WaitRead_Data_Dlg->ShowWindow(SW_SHOW);
+		g_bac_read_type = TYPE_PROGRAMCODE;
+
+
+		int m_finished_count = 0;
+		int m_persent = 0;
+		int m_total_count = 1;
+		bac_read_which_list = BAC_READ_PROGRAMCODE_LIST;
+		for (int i=0;i<1;i++)
+		{
+			int ret_variable;
+			ret_variable = GetProgramData_Blocking(g_bac_instance,program_list_line,program_list_line,i);
+			CString *temp_cstring = new CString;
+			if(ret_variable < 0)
+			{
+				temp_cstring->Format(_T("Read program item %d timeout!\r\n"),i+1);
+				::PostMessage(BacNet_hwd,WM_SHOW_PANELSTRING,0,(LPARAM)(temp_cstring));
+				::PostMessage(BacNet_hwd,WM_SHOW_PROGRESS,0,1);
+				click_read_thread = NULL;
+				return ;
+			}
+			else
+			{
+				temp_cstring->Format(_T("Read program code part%d success!\r\n"),i+1);
+				m_finished_count ++;
+				m_persent = m_finished_count * 100 / m_total_count;
+				::PostMessage(BacNet_hwd,WM_SHOW_PROGRESS,0,0);
+				::PostMessage(BacNet_hwd,WM_SHOW_PANELSTRING,0,(LPARAM)(temp_cstring));
+			}
+		}
+		if(g_bac_read_type == TYPE_PROGRAMCODE)
+		{
+			bac_programcode_read_results = true;
+			::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,SHOW_PROGRAM_IDE,0);
+		}
+
+
+
+		//if(click_read_thread==NULL)
+		//{
+		//	click_read_thread =CreateThread(NULL,NULL,MSTP_Send_read_Command_Thread,this,NULL, NULL);
+		//}
+
+	}
 	else
 	{
-		MessageBox(_T("Device is offline,Please check connection!"));
+		if(bac_select_device_online)
+			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_PROGRAMCODE);
+		else
+		{
+			MessageBox(_T("Device is offline,Please check connection!"));
+		}
 	}
+
 
 }
 

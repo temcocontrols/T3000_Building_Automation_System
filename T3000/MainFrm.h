@@ -467,6 +467,7 @@ public:
 	CString      m_file_firmware_Time;
 	 
 public:
+	void Create_Thread_Read_Item(int n_item);
     BOOL DownloadFromFTP();
 	static void CALLBACK _OnStatusCallBack(HINTERNET hInternet, DWORD dwContext, DWORD dwInternetStatus, 
 		LPVOID lpvStatusInformation, DWORD dwStatusInformationLength);
@@ -498,4 +499,5 @@ public:
 	afx_msg void OnFileExportregiseterslist();
    // afx_msg void OnToolProductsregistersmaintenance();
     afx_msg void OnToolRegistersmaintenancesystem();
+    afx_msg void OnToolFlashsn();
 };

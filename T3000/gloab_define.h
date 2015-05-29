@@ -27,7 +27,11 @@ typedef struct
 	unsigned short length;
 	unsigned char commad;
 }Black_head_struct;
-
+struct Batch_SN{
+    int ModbusID;
+    int SN;
+    BOOL Result;
+};
 typedef struct
 {
 	char HEAD_1;
@@ -120,6 +124,8 @@ const int DOWNLOAD_MD5_CHECK_PASS = 21;
 #define	 MY_REDRAW_WINDOW		WM_USER + 1231
 #define WM_FRESH_CM_LIST		WM_USER + 975
 #define WM_FRESH_SETTING_UI		WM_USER + 976
+#define  WM_SHOW_PROGRESS		WM_USER + 977
+#define  WM_SHOW_PANELSTRING		WM_USER + 978
 #define WM_DELETE_NEW_MESSAGE_DLG WM_USER + 2001
 #define MY_BAC_CONFIG_READ_RESULTS  WM_USER + 2002
 #define SHOW_ERROR_MESSAGE
@@ -144,6 +150,7 @@ const int MODBUS_BACNET_MSTP = 2;
 const int PROTOCOL_BACNET_IP   = 3;
 const int PROTOCOL_GSM = 4;
 const int PROTOCOL_REMOTE_IP = 6;
+const int PROTOCOL_BIP_TO_MSTP = 10;
 const int PROTOCOL_UNKNOW = 255;
 
 const int BAC_WAIT_NORMAL_READ = 0;
@@ -323,7 +330,7 @@ const int BAC_USER_LOGIN_COUNT = 8;
 
 const int BAC_CONNECT_WITH_DEVICE_COUNT = 1;
 
-const int BAC_GRPHIC_LABEL_COUNT = 64;
+const int BAC_GRPHIC_LABEL_COUNT = 240;
 const int BAC_REMOTE_POINT_COUNT = 128;
 
 
@@ -440,6 +447,8 @@ struct refresh_net_device
 	int nport;
 	float sw_version;
 	float hw_version;
+	unsigned short object_instance;
+	unsigned char panal_number;
 	CString NetCard_Address;
 };
 
@@ -855,12 +864,18 @@ const int SMALL_MINIPANEL_IN_D = 0;
 const int CM5_MINIPANEL_IN_A = 10;
 const int CM5_MINIPANEL_IN_D = 8;
 
+const int TINY_MINIPANEL_IN_A = 11;
+const int TINY_MINIPANEL_IN_D = 0;
+
 const int BIG_MINIPANEL_OUT_A = 12;
 const int BIG_MINIPANEL_OUT_D = 12;
 const int SMALL_MINIPANEL_OUT_A = 4;
 const int SMALL_MINIPANEL_OUT_D = 6;
 const int CM5_MINIPANEL_OUT_A = 0;
 const int CM5_MINIPANEL_OUT_D = 10;
+
+const int TINY_MINIPANEL_OUT_D = 6;
+const int TINY_MINIPANEL_OUT_A = 2;
 
 enum
 {

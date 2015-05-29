@@ -171,13 +171,13 @@ void CCO2NetView::Fresh(){
 	}
 	register_critical_section.Unlock();
 	Initial_Window();
-	if(hFirstThread != NULL)
-		TerminateThread(hFirstThread, 0);
-	hFirstThread=NULL;
-	if (!hFirstThread)
-	{
-		hFirstThread = CreateThread(NULL,NULL,_ReadMultiRegisters_CO2,this,NULL,0);
-	}
+    if(hFirstThread != NULL)
+        TerminateThread(hFirstThread, 0);
+    hFirstThread=NULL;
+    if (!hFirstThread)
+    {
+        hFirstThread = CreateThread(NULL,NULL,_ReadMultiRegisters_CO2,this,NULL,0);
+    }
 }
 void CCO2NetView::Fresh_View(){
 Initial_Window();

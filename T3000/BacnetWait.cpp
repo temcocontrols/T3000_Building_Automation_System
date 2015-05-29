@@ -814,7 +814,10 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		{
 			this->ShowWindow(SW_HIDE);
 		}
-		
+		if(bac_read_which_list == BAC_READ_GRAPHIC_LABEL_INFO)	// 如果是第一次 读 图片里面的label,就慢慢读,并且显示 进度条.
+		{
+			this->ShowWindow(SW_SHOW);
+		}
 
 	}
 

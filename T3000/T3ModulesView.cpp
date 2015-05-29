@@ -30,9 +30,9 @@ void CT3ModulesView::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CT3ModulesView, CFormView)
-	ON_MESSAGE(WM_REFRESH_BAC_INPUT_LIST,Fresh_Input_List)
-	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Change_Input_Item)
-	ON_NOTIFY(NM_CLICK, IDC_LIST_T3INPUTS, &CT3ModulesView::OnNMClickList_Input)
+    ON_MESSAGE(WM_REFRESH_BAC_INPUT_LIST,Fresh_Input_List)
+    ON_MESSAGE(WM_LIST_ITEM_CHANGED,Change_Input_Item)
+    ON_NOTIFY(NM_CLICK, IDC_LIST_T3INPUTS, &CT3ModulesView::OnNMClickList_Input)
 END_MESSAGE_MAP()
 
 

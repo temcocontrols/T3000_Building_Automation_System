@@ -15,6 +15,8 @@ Str_in_point m_temp_Input_data[BAC_INPUT_ITEM_COUNT];
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
 
+
+int input_item_limit_count = BAC_INPUT_ITEM_COUNT;	//input list 要显示多少个input 的个数， 不是根据vector 的size 来判断大小;
 // CBacnetInput dialog
 
 
@@ -35,17 +37,16 @@ void CBacnetInput::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST1, m_input_list);
+	DDX_Control(pDX, IDC_STATIC_INPUT_ITEM_INFO, m_input_item_info);
 }
 
 
 BEGIN_MESSAGE_MAP(CBacnetInput, CDialogEx)
 	ON_MESSAGE(MY_RESUME_DATA, InputMessageCallBack)
 	ON_MESSAGE(WM_REFRESH_BAC_INPUT_LIST,Fresh_Input_List)
-	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Input_Item)
-	ON_NOTIFY(NM_CLICK, IDC_LIST1, &CBacnetInput::OnNMClickList1)
-		
+	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Input_Item)	
 	ON_BN_CLICKED(IDOK, &CBacnetInput::OnBnClickedOk)
-	
+	ON_NOTIFY(NM_CLICK, IDC_LIST1, &CBacnetInput::OnNMClickList1)
 	ON_WM_TIMER()
 	ON_WM_CLOSE()
 
@@ -58,7 +59,8 @@ END_MESSAGE_MAP()
 // CBacnetInput message handlers
 LRESULT  CBacnetInput::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
 {
-	if(g_protocol != PROTOCOL_BACNET_IP){
+	if((g_protocol != PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP) && (g_protocol != PROTOCOL_BIP_TO_MSTP))
+	{
 
 		return InputMessageCallBack_Tstat(wParam,lParam);
 	}
@@ -104,6 +106,11 @@ LRESULT  CBacnetInput::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
 BOOL CBacnetInput::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
+	m_input_item_info.SetWindowTextW(_T(""));
+	m_input_item_info.textColor(RGB(0,0,255));
+	//m_static.bkColor(RGB(0,255,255));
+	m_input_item_info.setFont(20,14,NULL,_T("Arial"));
 
 	// TODO:  Add extra initialization here
 	Initial_List();
@@ -164,6 +171,22 @@ void CBacnetInput::Reload_Unit_Type()
 			}
 		}
 	}
+	else if(bacnet_device_type == TINY_MINIPANEL)
+	{
+		if(TINY_MINIPANEL_IN_A > (int)m_Input_data.size()) 
+			initial_count = (int)m_Input_data.size();
+		else
+			initial_count = TINY_MINIPANEL_IN_A;
+		for (int i=0;i<initial_count;i++)
+		{
+			if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
+			{
+				ListCtrlEx::CStrList strlist;
+				strlist.push_back(Units_Analog_Only);
+				m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
+			}
+		}
+	}
 	else if(bacnet_device_type == PRODUCT_CM5)
 	{
 		int analog_count;
@@ -211,7 +234,7 @@ void CBacnetInput::Initial_List()
 	m_input_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	//m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_input_list.InsertColumn(INPUT_NUM, _T("NUM"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+	m_input_list.InsertColumn(INPUT_NUM, _T("Input"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
 	m_input_list.InsertColumn(INPUT_FULL_LABLE, _T("Full Label"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -239,6 +262,10 @@ void CBacnetInput::Initial_List()
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
 		CString temp_des;
 		CString temp_units;
+
+		if(i>=input_item_limit_count)	//vector的大小始终不变 ,用次变量来 约束 要显示的 item 数量;
+			break;
+
 		temp_item.Format(_T("%d"),i+1);
 		m_input_list.InsertItem(i,temp_item);
 
@@ -288,8 +315,7 @@ void CBacnetInput::OnBnClickedOk()
 LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 {   
    
-    
-	if (g_protocol != PROTOCOL_BACNET_IP)
+	if ((g_protocol != PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP) && (g_protocol != PROTOCOL_BIP_TO_MSTP))
 	{
 		return Fresh_Input_Item_Tstat(wParam,lParam);
 	}
@@ -436,7 +462,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	if((g_protocol!=255)&&(m_latest_protocol!=g_protocol))
 	{
 		m_latest_protocol=g_protocol;
-		if (m_latest_protocol==PROTOCOL_BACNET_IP)
+		if ((m_latest_protocol==PROTOCOL_BACNET_IP) || (m_latest_protocol == MODBUS_BACNET_MSTP) || (m_latest_protocol == PROTOCOL_BIP_TO_MSTP))
 		{
 			Initial_List();
 			TRACE("Fresh_List Mini \n");
@@ -449,7 +475,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 	}
 	
-	if (g_protocol != PROTOCOL_BACNET_IP)
+	if ((g_protocol != PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP) && (g_protocol != PROTOCOL_BIP_TO_MSTP))
 	{
 		//Initial_ListFor_Tstat();
 		return Fresh_Input_List_Tstat( wParam, lParam);
@@ -493,6 +519,9 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			i = Fresh_Item;
 		}
 
+		if(i>=input_item_limit_count)
+			break;
+
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).description, (int)strlen((char *)m_Input_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
@@ -514,7 +543,9 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 			m_input_list.SetCellEnabled(i,INPUT_CAL,1);
 
-			if(m_Input_data.at(i).range <  (sizeof(Input_Analog_Units_Array)/sizeof(Input_Analog_Units_Array[0])))
+			if(m_Input_data.at(i).range == 0)
+				m_input_list.SetItemText(i,INPUT_RANGE,_T("Unused"));
+			else if(m_Input_data.at(i).range <  (sizeof(Input_Analog_Units_Array)/sizeof(Input_Analog_Units_Array[0])))
 				m_input_list.SetItemText(i,INPUT_RANGE,Input_Analog_Units_Array[m_Input_data.at(i).range]);
 			else
 				m_input_list.SetItemText(i,INPUT_RANGE,_T("Out of range"));
@@ -522,7 +553,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			if(m_Input_data.at(i).range <  (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
 				m_input_list.SetItemText(i,INPUT_UNITE,Input_List_Analog_Units[m_Input_data.at(i).range]);
 			else
-				m_input_list.SetItemText(i,INPUT_RANGE,_T(""));
+				m_input_list.SetItemText(i,INPUT_RANGE,_T("Unused"));
 			
 
 
@@ -651,7 +682,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO: Add your control notification handler code here
-	if (g_protocol != PROTOCOL_BACNET_IP)
+	if ((g_protocol != PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP) && (g_protocol != PROTOCOL_BIP_TO_MSTP))
 	{
 		OnNMClickList_Tstat(pNMHDR,pResult);
 		return;
@@ -671,7 +702,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	lCol = lvinfo.iSubItem;
 
 
-	if(lRow>m_input_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+	if(lRow>m_input_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的;
 		return;
 	if(lRow<0)
 		return;
@@ -970,12 +1001,13 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 	// TODO: Add your message handler code here and/or call default
 	switch(nIDEvent)
 	{
-		if(g_protocol == PROTOCOL_BACNET_IP){
-			return ;
-		}
 	case 1:
 		{
-			if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+			if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+			{
+				PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+			}
+			else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 			{
 				PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 				if(bac_select_device_online)

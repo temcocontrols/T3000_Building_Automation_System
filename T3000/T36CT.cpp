@@ -779,47 +779,38 @@ CString CstresultDO;
 int b0,b1,b;
 for(int i = 1;i<=5;i++)
 {  
-   
-	/*if (product_register_value[OUTPUT1+i-1]==0)
-	{
-		CstresultDO=_T("OFF");
-	}
-	else
-	{
-		CstresultDO=_T("ON");
-	}*/
-	
-	CstresultDO.Format(_T("%d"),product_register_value[OUTPUT1+i-1]);
-	m_msflexgrid_output.put_TextMatrix(i,2,CstresultDO);
-	b0=Get_Bit_FromRegister(product_register_value[SWITCH1_BANK],2*(i-1)+1);
-	b1=Get_Bit_FromRegister(product_register_value[SWITCH1_BANK],2*(i-1)+2);
-	b=b1*2+b0;
 
-	if (i==5)
-	{
-		b0=Get_Bit_FromRegister(product_register_value[SWITCH1_BANK],1);
-		b1=Get_Bit_FromRegister(product_register_value[SWITCH1_BANK],2);
-		b=b1*2+b0;
+    CstresultDO.Format(_T("%d"),product_register_value[OUTPUT1+i-1]);
+    m_msflexgrid_output.put_TextMatrix(i,2,CstresultDO);
+    b0=Get_Bit_FromRegister(product_register_value[SWITCH1_BANK],2*(i-1)+1);
+    b1=Get_Bit_FromRegister(product_register_value[SWITCH1_BANK],2*(i-1)+2);
+    b=b1*2+b0;
 
-	}
-	if (b==0)
-	{
-		CstresultDO=_T("OFF");
-	}
-	else if (b==1)
-	{
-		CstresultDO=_T("ON");
-	}
-	else if (b==2)
-	{
-		CstresultDO=_T("AUTO");
-	}
-	else
-	{
-		CstresultDO=_T("");
-	}
-	m_msflexgrid_output.put_TextMatrix(i,1,CstresultDO);
-	
+    if (i==5)
+    {
+        b0=Get_Bit_FromRegister(product_register_value[SWITCH1_BANK],1);
+        b1=Get_Bit_FromRegister(product_register_value[SWITCH1_BANK],2);
+        b=b1*2+b0;
+
+    }
+    if (b==0)
+    {
+        CstresultDO=_T("OFF");
+    }
+    else if (b==1)
+    {
+        CstresultDO=_T("ON");
+    }
+    else if (b==2)
+    {
+        CstresultDO=_T("AUTO");
+    }
+    else
+    {
+        CstresultDO=_T("");
+    }
+    m_msflexgrid_output.put_TextMatrix(i,1,CstresultDO);
+
 }
 
 

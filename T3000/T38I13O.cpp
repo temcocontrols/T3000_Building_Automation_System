@@ -803,15 +803,15 @@ void T38I13O::InitialTableName(){
 		 m_msflexgrid_input.put_TextMatrix(i,0,str_input);	 
 	}
 
-	CString str_output;
-	for(int i=1;i<14;i++)
-	{
+    CString str_output;
+    for(int i=1;i<14;i++)
+    {
 
-		str_output=Get_Table_Name(m_sn,_T("Output"),i);
-		m_msflexgrid_output.put_TextMatrix(i,0,str_output);	
+        str_output=Get_Table_Name(m_sn,_T("Output"),i);
+        m_msflexgrid_output.put_TextMatrix(i,0,str_output);	
 
 
-	}
+    }
 }
 void T38I13O::Fresh()
 {

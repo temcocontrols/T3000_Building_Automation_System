@@ -161,6 +161,7 @@
     <ClCompile Include="BacnetWait.cpp" />
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
+    <ClCompile Include="BatchSNDlg.cpp" />
     <ClCompile Include="BuildingConfigration.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
     <ClCompile Include="CalibartionHT.cpp" />
@@ -437,6 +438,7 @@
     <ClInclude Include="BacnetWait.h" />
     <ClInclude Include="Bacnet_Include.h" />
     <ClInclude Include="BADO\BADO.h" />
+    <ClInclude Include="BatchSNDlg.h" />
     <ClInclude Include="BuildingConfigration.h" />
     <ClInclude Include="CalibartionHT.h" />
     <ClInclude Include="ChartCtrl\ChartAxis.h" />

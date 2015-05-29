@@ -205,12 +205,12 @@ void T38AI8AO::OnInitialUpdate()
 		}
 	}
 	//œ‘ æ◊›±ÍÃ‚
-	CString str_output;
-	for(int i=1;i<OUTPUT_ROWS+1;i++)
-	{
-		str_output.Format(_T("Output%d"),i);
-		m_msflexgrid_output.put_TextMatrix(i,0,str_output);	
-	}
+    CString str_output;
+    for(int i=1;i<OUTPUT_ROWS+1;i++)
+    {
+        str_output.Format(_T("Output%d"),i);
+        m_msflexgrid_output.put_TextMatrix(i,0,str_output);	
+    }
 
 
 
@@ -480,20 +480,20 @@ void T38AI8AO::InitialDialog(){
 		m_msflexgrid_input.put_TextMatrix(i,3,strresult);
 	}
 
-	bitset<16> BitSwitchValue(product_register_value[SWITCH1_STATUS]);
-	int SwitchValue[OUTPUT_ROWS];
-	for (int i=0;i<OUTPUT_ROWS;i++)
-	{
-		SwitchValue[i]=BitSwitchValue[2*i]+BitSwitchValue[2*i+1]*2;
-	}
+    bitset<16> BitSwitchValue(product_register_value[SWITCH1_STATUS]);
+    int SwitchValue[OUTPUT_ROWS];
+    for (int i=0;i<OUTPUT_ROWS;i++)
+    {
+        SwitchValue[i]=BitSwitchValue[2*i]+BitSwitchValue[2*i+1]*2;
+    }
 	CString CstresultDO;
 	for(int i = 1;i<=OUTPUT_ROWS;i++)
 	{  
 
-		CstresultDO.Format(_T("%d"),product_register_value[OUTPUT1+i-1]);
-		m_msflexgrid_output.put_TextMatrix(i,1,CstresultDO);
-		 
-		m_msflexgrid_output.put_TextMatrix(i,2,STRING_SWITCH_STATUS[SwitchValue[i-1]]); 
+        CstresultDO.Format(_T("%d"),product_register_value[OUTPUT1+i-1]);
+        m_msflexgrid_output.put_TextMatrix(i,1,CstresultDO);
+
+        m_msflexgrid_output.put_TextMatrix(i,2,STRING_SWITCH_STATUS[SwitchValue[i-1]]); 
 
 
 	}
