@@ -59,6 +59,7 @@ public:
 	afx_msg void OnBuildingconfigUnselect();
 	afx_msg void OnBuildingconfigDelete();
 	void Update_Building();
+    void Deal_BuildingPath();
 	int m_curRow;
 	int m_curCol;
 	int m_changedRow;

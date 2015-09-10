@@ -62,9 +62,9 @@
 #define MAX_OUTS		 128
 #define MAX_INS		   128
 #define MAX_VARS		 128
-#define MAX_CONS		  48
-#define MAX_WR			  16
-#define MAX_AR			   8
+#define MAX_PIDS		  48
+#define MAX_SCHS		16
+#define MAX_HOLS		8
 #define MAX_PRGS		  32
 #define MAX_TABS		   5
 #define MAX_DIGM		   1
@@ -316,9 +316,9 @@ typedef enum {
 		 WRITEOUTPUT_T3000         = 100+OUT+1,  // write outputs
 		 WRITEINPUT_T3000          = 100+IN+1,   // write inputs
 		 WRITEVARIABLE_T3000       = 100+VAR+1,        // write variables
-		 WRITECONTROLLER_T3000     = 100+CON+1,        // write controllers
-		 WRITEWEEKLYROUTINE_T3000  = 100+WR+1,         // write weekly routines
-		 WRITEANNUALROUTINE_T3000  = 100+AR+1,         // write annual routines
+		 WRITEPID_T3000     = 100+CON+1,        // write controllers
+		 WRITESCHEDULE_T3000  = 100+WR+1,         // write weekly routines
+		 WRITEHOLIDAY_T3000  = 100+AR+1,         // write annual routines
 		 WRITEPROGRAM_T3000        = 100+PRG+1,        // write programs
 		 WRITETABLE_T3000          = 100+TBL+1,        // write tables
 		 WRITEMONITOR_T3000        = 100+AMON+1,       // write monitors

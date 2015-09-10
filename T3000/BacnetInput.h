@@ -25,7 +25,7 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg LRESULT Fresh_Input_List(WPARAM wParam,LPARAM lParam);
-	afx_msg LRESULT Initial_Input_List(WPARAM wParam,LPARAM lParam);
+	//afx_msg LRESULT Initial_Input_List(WPARAM wParam,LPARAM lParam);
 	LRESULT Fresh_Input_List_Tstat(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Fresh_Input_Item(WPARAM wParam,LPARAM lParam);
 	LRESULT Fresh_Input_Item_Tstat(WPARAM wParam,LPARAM lParam);
@@ -52,7 +52,7 @@ public:
 	void Fresh_One_Item(int row);
 
 	int m_latest_protocol;
- 
+   
 /*
 Alex
 For Help system
@@ -94,9 +94,10 @@ const int INPUT_CAL = 6;
 const int INPUT_CAL_OPERATION = 7;
 const int INPUT_FITLER = 8;
 const int INPUT_DECOM = 9;
-const int INPUT_LABLE = 10;
+const int INPUT_JUMPER = 10;
+const int INPUT_LABLE = 11;
 
-const int INPUT_COL_NUMBER = 11;
+const int INPUT_COL_NUMBER = 12;
 
 
 

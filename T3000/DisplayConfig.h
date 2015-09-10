@@ -74,6 +74,7 @@ public:
 	afx_msg void OnSetfocusLine1();
 	afx_msg void OnSetfocusLine2();
 	afx_msg void OnBnClickedCheckIconAm();
+    afx_msg void OnBnClickedCheckIconMan();
 	afx_msg void OnBnClickedCheck2();
 	afx_msg void OnBnClickedCheck3();
 	afx_msg void OnBnClickedCheck4();
@@ -82,6 +83,7 @@ public:
 	afx_msg void OnBnClickedCheck7();
 	afx_msg void OnBnClickedCheck8();
 	CButton m_am_check;
+    CButton m_man_check;
 	CButton m_check2;
 	CButton m_check3;
 	CButton m_check4;
@@ -89,4 +91,6 @@ public:
 	CButton m_check6;
 	CButton m_check7;
 	CButton m_check8;
+    afx_msg void OnEnKillfocusLine1();
+    afx_msg void OnEnKillfocusLine2();
 };

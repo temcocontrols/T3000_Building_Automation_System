@@ -97,7 +97,7 @@ public:
 	CComboBox m_brandratebombox;
 	CComboBox m_delaycombox;
 	afx_msg void OnCbnSelchangeBrandrate();
-	afx_msg void OnCbnSelchangeDelay();
+//	afx_msg void OnCbnSelchangeDelay();
 	DECLARE_EVENTSINK_MAP()
 	void ClickMsflexgridInput();
 	void ClickMsflexgridOutput();
@@ -107,6 +107,7 @@ public:
 	afx_msg void OnCbnSelchangeRangecombo();
 	afx_msg void OnDestroy();
 	afx_msg void OnBnClickedButtonReset();
+    afx_msg void OnEnKillfocusEditResponseDelay();
 };
 
 

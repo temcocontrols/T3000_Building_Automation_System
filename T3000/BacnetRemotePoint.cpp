@@ -65,15 +65,15 @@ void CBacnetRemotePoint::Initial_List()
 
 	m_remote_point_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	m_remote_point_list.SetExtendedStyle(m_remote_point_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_remote_point_list.InsertColumn(REMOTE_NUMBER, _T("Item"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-	m_remote_point_list.InsertColumn(REMOTE_DEVICE_ID, _T("Device ID"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_remote_point_list.InsertColumn(REMOTE_REG, _T("Point number"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_remote_point_list.InsertColumn(REMOTE_VALUE, _T("Value"), 120, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_remote_point_list.InsertColumn(REMOTE_DEVICE_STATUS, _T("Status"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_remote_point_list.InsertColumn(REMOTE_DESCRIPTION, _T("Description"), 200, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_remote_point_list.InsertColumn(REMOTE_NUMBER, _T("Item"), 50, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_remote_point_list.InsertColumn(REMOTE_DEVICE_ID, _T("Device ID"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_remote_point_list.InsertColumn(REMOTE_REG, _T("Point number"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_remote_point_list.InsertColumn(REMOTE_VALUE, _T("Value"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_remote_point_list.InsertColumn(REMOTE_DEVICE_STATUS, _T("Status"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_remote_point_list.InsertColumn(REMOTE_DESCRIPTION, _T("Description"), 200, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	
 	m_remote_point_hwnd = this->m_hWnd;
-	g_hwnd_now = m_screen_dlg_hwnd;
+	//g_hwnd_now = m_screen_dlg_hwnd;
 
 	CRect list_rect,win_rect;
 	m_remote_point_list.GetWindowRect(list_rect);

@@ -6,7 +6,8 @@
 extern bool auto_flash_mode;
 CHexFileParser::CHexFileParser(void)
 {
-	m_nHexFileType = HEXFILE_DATA;
+    m_nHexFileType = HEXFILE_DATA;
+    m_IsRAM=FALSE;
 }
 
 CHexFileParser::~CHexFileParser(void)
@@ -36,21 +37,18 @@ int  CHexFileParser::GetHexFileBuffer(char* pBuf, int nLen)
 
 		if (m_nHexFileType == 0)
 		{			
-			CString strTips = _T("Hex file verified okay.");//_T("The Hex File is Normal.");
-			 
+			CString strTips = _T("Hex file verified okay.");//_T("The Hex File is Normal."); 
 			nBufLen = ReadNormalHexFile(hexFile, pBuf, nLen);	
 
 		}
 		else if(m_nHexFileType == 1)
 		{
 			CString strTips = _T("The hex file has a Extend Section Address Record(HEX86).");
-			 
 			nBufLen = ReadExtendHexFile(hexFile, pBuf, nLen);	
 		}
 		else if (m_nHexFileType == 2)
 		{
 			CString strTips = _T("The hex file has a Extend Linear Addree Record(HEX86).");
-			 
 			nBufLen = ReadExtLinearHexFile(hexFile, pBuf, nLen);	
 		}		
 	}
@@ -60,7 +58,9 @@ int  CHexFileParser::GetHexFileBuffer(char* pBuf, int nLen)
 
 }
 
-
+BOOL CHexFileParser::Is_RAM_HEXType(){
+    return m_IsRAM;
+}
 
 // 读第7，8个字符，00为Normal，02为扩展，04为扩展线性
 HEXFILE_FORMAT	CHexFileParser::GetHexFileType(CFile& hexFile)
@@ -205,7 +205,11 @@ WORD CHexFileParser::GetHighAddrFromFile(const CString& strLine)
 	TS_UC szBuf[64] = {0};
 	turn_int_to_unsigned_char(ch, strLine.GetLength()-1, szBuf);
 	dwTemp = szBuf[4]*0x100 + szBuf[5];
-
+    if (dwTemp>=800)
+    {
+        dwTemp-=0x800;
+        m_IsRAM=TRUE;
+    }
 	return dwTemp;
 }
 
@@ -355,7 +359,7 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 		pBuf = NULL;
 	}
 
-	pBuf = new char[0x20000];
+	pBuf = new char[c_nHexFileBufLen];
 		
 	CString strGetData;
 	int nBufCount = 0;
@@ -463,6 +467,10 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 
 		unsigned int ltemp;
 		ltemp=get_hex[1]*256+get_hex[2] + dwHiAddr;
+//         if (m_IsRAM)
+//         {
+//             ltemp-=0x00008000; 
+//         }
 		for(int j=0;j<get_hex[0];j++)
 			pBuf[ltemp+j]=get_hex[4+j];//get the data
 		if((UINT)nBufCount<(ltemp+get_hex[0]))

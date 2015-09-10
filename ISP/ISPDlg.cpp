@@ -22,7 +22,8 @@
 #define new DEBUG_NEW
 #endif
 //int g_CommunicationType;
-
+unsigned int the_max_register_number_parameter_Count=0;
+unsigned int the_max_register_number_parameter_Finished=0;
 bool auto_flash_mode = false;
 CString AutoFlashConfigPath;
 CString g_strExePath;
@@ -703,11 +704,30 @@ void CISPDlg::OnBnClickedButtonSelfile()
 		pEditFilePath->SetWindowText(_T(""));
 		return;
 	}
-	
-    ShowHexBinInfor(ret);
-   
-  
+	if (ret == 1)
+	{
+		char*			pFileBuffer;
+		CHexFileParser* pHexFile = new CHexFileParser;
+		pHexFile->SetFileName(m_strHexFileName);
+		pFileBuffer = new char[c_nHexFileBufLen];
+		memset(pFileBuffer, 0xFF, c_nHexFileBufLen);
+		int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
 
+		if (!pHexFile->Is_RAM_HEXType())
+		{
+			ShowHexBinInfor(ret);
+		}
+
+		if (pFileBuffer)
+		{
+			delete []pFileBuffer;
+			pFileBuffer = NULL;
+		}
+		delete pFileBuffer;
+	}
+
+     
+   
 }
 void CISPDlg::SaveParamToConfigFile()
 {	   
@@ -1708,6 +1728,7 @@ void CISPDlg::FlashByEthernet()
         m_pTFTPServer->Set_FileProductName(m_strProductName);
 		m_pTFTPServer->SetDataSource((BYTE*)m_pFileBuffer, nDataSize);
 	    m_pTFTPServer->Set_bininfor(bin_infor);
+
 		m_pTFTPServer->FlashByEthernet();
 		
 		 EnableFlash(FALSE);	
@@ -1925,6 +1946,8 @@ void CISPDlg::ShowHexBinInfor(int hexbin){
 }
 void CISPDlg::FlashByCom()
 {
+    the_max_register_number_parameter_Count=0;
+    the_max_register_number_parameter_Finished=0;
 	if (m_pComWriter)
 	{
 		delete m_pComWriter;
@@ -1942,7 +1965,7 @@ void CISPDlg::FlashByCom()
 
      
    
-	 ShowHexBinInfor(1);
+	 
 // 	 CString temp;
 // 	 UpdateStatusInfo(_T(">>>>>The Hex Information<<<<<"), FALSE);
 // 
@@ -1974,7 +1997,10 @@ void CISPDlg::FlashByCom()
 	int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
 
 	
-
+    if (!pHexFile->Is_RAM_HEXType())
+    {
+        ShowHexBinInfor(1);
+    }
 		
 	
 	if(nDataSize > 0)
@@ -1986,6 +2012,7 @@ void CISPDlg::FlashByCom()
 		m_pComWriter->SetModbusID(m_szMdbIDs);
         m_pComWriter->SetHexInfor(temp1);
 		m_pComWriter->SetHexFileType(pHexFile->GetHexFileFormatType());
+        m_pComWriter->Is_Ram=pHexFile->Is_RAM_HEXType();
 		m_pComWriter->m_hexbinfilepath = m_strHexFileName;
 		CString strBaudrate; GetDlgItem(IDC_EDIT_BAUDRATE)->GetWindowText(strBaudrate);
 		int nBautrate = _wtoi (strBaudrate.GetBuffer());
@@ -2007,7 +2034,7 @@ void CISPDlg::FlashByCom()
 
 		int nRet = m_pComWriter->BeginWirteByCom();
 
-		// disable flash button
+		// Disable flash button
 		if (nRet != 0) // 表示开始写了
 		{
 			EnableFlash(FALSE);

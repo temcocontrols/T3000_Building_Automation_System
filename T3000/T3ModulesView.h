@@ -29,6 +29,7 @@ public:
 	ListCtrlEx::CListCtrlEx m_T3_Input_List;
 	virtual void OnInitialUpdate(); 
 	void Fresh();
+    CString GetValue(int regValue,int RangeValue);
     afx_msg LRESULT Fresh_Input_List(WPARAM wParam,LPARAM lParam);
     afx_msg LRESULT Change_Input_Item(WPARAM wParam,LPARAM lParam);
     afx_msg void OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult);

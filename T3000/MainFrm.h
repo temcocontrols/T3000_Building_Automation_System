@@ -15,17 +15,17 @@
 #define	ID_RW_INFO			101
 #define	ID_PROTOCOL_INFO	102
 */
-
+#include "globle_function.h"
 //#include "CM5/DialogCM5.h"  //CM5
 #include "T3/DialogT3.h"	//T3
-#include "MiniPanel/DialgMiniPanel.h" //Mini Panel
+
 #include "AirQuality/AirQuality.h"//AirQuality
 #include "bado/BADO.h"
 //#include "Class/MulitithreadSocket.h"
 // #include "MBP.h"
 // #include "MbPoll.h"
 #include "ConfigFileHandler.h"
-
+#include "DialogInfo.h"
 
 
 const int DLG_T3000_VIEW = 0;
@@ -53,7 +53,12 @@ const int DLG_DIALOG_DEFAULT_BUILDING = 19;
 const int DLG_DIALOG_TEMP_HUMSENSOR = 20;
 const int DLG_DIALOG_DEFAULT_T3000_VIEW = 21;
 const int DLG_DIALOG_T3_INPUTS_VIEW =22;
-const int NUMVIEWS = 23;
+const int DLG_DIALOG_T3_OUTPUTS_VIEW =23;
+const int DLG_DIALOG_CUSTOM_VIEW = 24;
+const int DLG_DIALOG_TSTAT_INPUT_VIEW=25;
+const int DLG_DIALOG_TSTAT_OUTPUT_VIEW = 26;
+const int DLG_DIALOG_BOATMONITOR = 27;
+const int NUMVIEWS = 28;
 
 
 extern int g_gloab_bac_comport;
@@ -63,7 +68,16 @@ union UNION_INPUT_NAME{
 	unsigned short reg_value[4];
 	unsigned char char_name[8];
 };
- 
+
+typedef struct _com_port_tree
+{//for vector
+	HTREEITEM building_item;//building name
+	HTREEITEM serial_port_item;	//floor name
+	HTREEITEM each_port_item;	//floor name
+	CString strComPortName;
+}com_port_tree;
+
+
 typedef struct _tree_floor///////////////////////////////////////////////////////////////////////////////
 {//for vector
 	HTREEITEM building_item;//building name
@@ -97,7 +111,6 @@ typedef struct _BUILDING_TAG
 	CString strComPort;
 	CString strIpPort;
 	CString strBaudRate;
-
 	CString strMainBuildingname;
 	CString strConnectionType;
 }Building_info;
@@ -121,10 +134,14 @@ typedef struct _tree_product//////////////////////
 	bool status_last_time[3];
 	CString NetworkCard_Address;
 	CString NameShowOnTree;
+    CString Custom;
+	unsigned int note_parent_serial_number;
+	unsigned char panel_number;
+	unsigned int object_instance;
 	
 }tree_product;///////////////////////////////////////////////////////////////////////////////
 
-
+//
 
 typedef struct _binary_search_result
 {
@@ -137,6 +154,18 @@ typedef struct _binary_search_result
 	int nEPsize;
 	
 }binary_search_result;
+
+
+
+class CViewClientToolBar : public CMFCToolBar
+{
+public:
+    HWND Get_Tip_HWND(){
+    return  m_pToolTip->m_hWnd;
+    }
+};
+
+
 
 class CTStatScanner;
 class CScanDbWaitDlg;
@@ -183,6 +212,7 @@ public:
 	 vector<CString> m_szComs;
      //vector <HTREEITEM> m_rootLst;//for every building name
 	//HTREEITEM treem[20];
+	vector <com_port_tree> m_comportlist;
 	vector <tree_floor>		m_floorLst;//for every building name
 	vector <tree_room>		m_roomLst;//for every room name	
 	vector <background_infor> m_backgroundLst;
@@ -190,7 +220,8 @@ public:
 // 	_ConnectionPtr				m_pCon;//for ado connection
 // 	_RecordsetPtr				m_pRs;//for ado 
 	 
-
+    tree_product m_current_tree_node ;
+    tree_product m_lasttime_tree_node;
 	CString m_strCurSubBuldingName;
 	Building_info m_CurSubBuldingInfo;
 	CString m_strCurMainBuildingName;
@@ -213,7 +244,7 @@ public:
 	void OnLabel();
 	void OnLabe2();
 	void OnLabe3();
-
+                
 // Operations
 public:
 	CMFCStatusBar& GetStatusBar ()
@@ -237,7 +268,7 @@ protected:  // control bar embedded members
 	 CMFCMenuBar				m_wndMenuBar;
 	CMFCToolBar				m_wndToolBar;
 
-	CMFCToolBar				m_testtoolbar;
+	CViewClientToolBar		m_testtoolbar;
 	//CMFCToolBarImages		m_UserImages;
 public: 
 	CWorkspaceBar			m_wndWorkSpace;
@@ -258,7 +289,7 @@ protected:
 	afx_msg void SaveConfigFile();
 	afx_msg void OnHelp();
 	
-	
+	afx_msg LRESULT OnCreateStatusBarWindow(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnFreshStatusBar(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnUserMannageMentUpdate(CCmdUI *pCmdUI);
 	afx_msg LRESULT OnAddTreeNode(WPARAM wParam, LPARAM lParam);
@@ -289,7 +320,7 @@ public:
 	void OnCheckBuildingBar();
 	void ClearBuilding();
 	void Scan_Product();
-
+	void LoadProductFromDB();
 	void OnCheckIOPane();
 	void ScanTstatInDB(void);
 	void DeleteConflictInDB();
@@ -300,7 +331,7 @@ public:
 	void OnHTreeItemEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult);
 	LRESULT OnHTreeItemBeginlabeledit(NMHDR *pNMHDR, LRESULT *pResult);
 	void  OnHTreeItemClick(NMHDR *pNMHDR, LRESULT *pResult);
-	
+	void  OnHTreeMessageSeletedChanged(NMHDR *pNMHDR, LRESULT *pResult);
 			
 			//BOOL ValidAddress(CString sAddress);
 	BOOL ValidAddress(CString sAddress,UINT& n1,UINT& n2,UINT& n3,UINT& n4);
@@ -335,7 +366,7 @@ public:
 	//
 
 	void DoConnectToANode( const HTREEITEM& hTreeItem );
-	void InitTreeNodeConn();
+	//void InitTreeNodeConn();
 	void GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItems  );
 	//void EnableRefreshTreeView(BOOL bEnable);
 	void DoFreshAll();
@@ -394,6 +425,7 @@ public:
 	void Treestatus();
 	static	DWORD WINAPI Get_All_Dlg_Message(LPVOID lpVoid);
 	static	DWORD WINAPI Translate_My_Message(LPVOID lpVoid);
+ //   static DWORD WINAPI ConnectToTreeNode(LPVOID);
 	afx_msg void OnDatabaseIonameconfig();
 	afx_msg void OnDatabaseMbpoll();
 	afx_msg void OnViewCommunicatetraffic();
@@ -463,9 +495,9 @@ public:
 	BOOL          m_bSafeToClose;
 	CFile         m_FileToWrite;
 	//CWinThread*   m_pThread;
-
+     int  m_lastinterface;
 	CString      m_file_firmware_Time;
-	 
+	CDialogInfo *m_pDialogInfo;
 public:
 	void Create_Thread_Read_Item(int n_item);
     BOOL DownloadFromFTP();
@@ -500,4 +532,9 @@ public:
    // afx_msg void OnToolProductsregistersmaintenance();
     afx_msg void OnToolRegistersmaintenancesystem();
     afx_msg void OnToolFlashsn();
+ 	//virtual void GetMessageString(UINT nID, CString& rMessage) const;
+		afx_msg BOOL  OnToolTipNotify(UINT id,NMHDR *Pnmhdr,LRESULT *pResult);
+		virtual INT_PTR OnToolHitTest(CPoint point, TOOLINFO* pTI) const;
+        afx_msg void OnMove(int x, int y);
+  // virtual void GetMessageString(UINT nID, CString& rMessage);
 };

@@ -49,3 +49,9 @@ void CThumbOperator::SetLengthOfTic(int nLengthOfTic)
 	m_nLengthOfTic = nLengthOfTic;
 }
 
+void CThumbOperator::SetPosValue(int nMinPos, int nMidPos, int nMaxPos){
+    m_nMinPos=nMinPos;
+    m_nMidPos=nMidPos;
+    m_nMaxPos=nMaxPos;
+}
+

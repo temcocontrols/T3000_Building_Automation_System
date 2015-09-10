@@ -44,6 +44,7 @@ struct ALL_NODE {
 	CString Com_Port;
 	CString EPsize;
 	CString Protocol;
+    CString Custom;
 };
 
 struct Building{
@@ -68,7 +69,11 @@ struct CustomProductTable{
 _variant_t ModelNo;
 _variant_t Reg_Description;
 _variant_t Reg_ID;
+
 };
+
+
+
 struct IONAME{
 _variant_t SERIAL_ID;
 _variant_t INPUT1;

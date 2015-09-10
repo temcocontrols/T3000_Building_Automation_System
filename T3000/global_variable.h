@@ -5,6 +5,7 @@
 #include "CM5\ud_str.h"
 #include "gloab_define.h"
 #include "Global_Struct.h"
+ 
 CString USB_Serial;
 vector <int> Change_Color_ID;
 const bool WRITE_SUCCESS = true;
@@ -136,8 +137,9 @@ CString g_strCurBuildingDatabasefilePath=L"";
 	CString m_str_curBuilding_Domain_IP;
 BOOL g_bEnableRefreshTreeView = TRUE;
 BOOL g_bPauseRefreshTree = FALSE;
-int g_llTxCount = 0;
-int g_llRxCount = 0;
+unsigned int g_llTxCount = 0;
+unsigned int g_llRxCount = 0;
+int g_llerrCount = 0;
 BOOL g_unint = TRUE;//TREE = °C;FALSE = F;
 
 int parameterSet = 0;//用于初始化SLIDER。
@@ -1923,6 +1925,7 @@ HWND      m_edit_label = NULL;
 HWND      m_at_command_hwnd = NULL;
 HWND      m_remote_point_hwnd = NULL;
 
+HWND	  m_statusbar_hwnd = NULL;
 vector <Str_out_point> m_Output_data;
 vector <Str_in_point>  m_Input_data;
 vector <Str_program_point>  m_Program_data;
@@ -1946,8 +1949,10 @@ vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 
 
 Time_block_mini Device_time;
 Str_Setting_Info Device_Basic_Setting;
+Str_MISC Device_Misc_Data;
 char m_at_write_buf[100];
 char m_at_read_buf[450];
+
 
 vector <refresh_net_device> m_refresh_net_device_data;
 vector <GSM_connection_info> m_gsm_connect_info;
@@ -1956,7 +1961,7 @@ vector <Scan_Info> m_scan_info_buffer;
 Monitor_Block m_monitor_block;
 Str_Monitor_data_header m_monitor_head;//用来接收monitor 的头，里面有需要接收的总包和目前是第几包;
 int Monitor_Input__Data[14][1000];	
-Monitor_Input_Info my_input_info[14];
+
 
 int Max_Scale_value;	//保存整个屏幕的最大刻度值;
 int Min_Scale_value;
@@ -1968,7 +1973,7 @@ int Total_SCALE;
 vector <_Graphic_Value_Info> m_graphic_refresh_data;
 
 byte	g_DayState[8][48];
-unsigned char weeklt_time_schedule[BAC_WEEKLY_ROUTINES_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
+unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
 unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//暂定2000;
 int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 
@@ -2039,7 +2044,7 @@ bool read_write_bacnet_config = false;	//读写Bacnet config 的时候禁止刷新 List;
  // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
  // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KF Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
  CString analog_range[11]={_T("UNUSED"),_T("10K Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open")};
- CString analog_range_TSTAT6[12]={_T("UNUSED"),_T("10K Thermistor Type2"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open"),_T("10K Thermistor Type3")};
+ CString analog_range_TSTAT6[13]={_T("-"),_T("10K Thermistor Type2"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open"),_T("10K Thermistor Type3"),_T("0-20ma")};
 
  CString INPUT_FUNS[8]={_T("Normal"),_T("Freeze Protect"),_T("Occupancy Sensor"),_T("Sweep Off"),_T("Clock"),_T("Changeover Mode"),_T("Outside Temp"),_T("Airflow")};
 
@@ -2053,10 +2058,11 @@ bool read_write_bacnet_config = false;	//读写Bacnet config 的时候禁止刷新 List;
 
  CString OUTPUT_ANRANGE6[5]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("PWM(0-100%)")};
 
-//  CString OUTPUT_ANRANGE[18]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)"),_T("Internal Sensor"),_T("Setpoint"),
-// 	 _T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),_T("Hum Sensor"),_T("CO2 Sensor"),_T("PWM(0-100%)")};
- CString OUTPUT_ANRANGE[22]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)"),_T("Internal Sensor"),_T("Setpoint"),
-	 _T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),_T("Hum Sensor"),_T("CO2 Sensor"),_T("Avg Temperature"),_T("Avg AI1ToAI2"),_T("Avg AI1ToAI3"),_T("Avg AI1ToAI4"),_T("PWM(0-100%)")};
+  CString OUTPUT_ANRANGE[18]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)"),_T("Internal Sensor"),_T("Setpoint"),
+ 	 _T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),_T("Hum Sensor"),_T("CO2 Sensor"),_T("PWM(0-100%)")};
+ //CString OUTPUT_ANRANGE[22]={_T("On/Off"),_T("0-10V(100%)"),_T("0-5V(100%)"),_T("2-10V(100%)"),_T("10-0V(100%)"),_T("Internal Sensor"),_T("Setpoint"),
+	//                          _T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),_T("Hum Sensor"),_T("CO2 Sensor"),
+ //                             _T("Avg Temperature"),_T("Avg AI1ToAI2"),_T("Avg AI1ToAI3"),_T("Avg AI1ToAI4"),_T("PWM(0-100%)")};
 AddressMap TSTAT_6_ADDRESS[2000];
 AddressMap TSTAT_5EH_LCD_ADDRESS[2000];
 AddressMap TSTAT_5ABCDFG_LED_ADDRESS[2000];
@@ -2080,6 +2086,7 @@ int current_building_baudrate;
 int current_building_ip;
 int current_building_ipport;
 
+
 // 需要刷新--在MainFrm.cpp中的线程中需要判断这个变量
 //主要是两个地方
 //1>T3000View-Fresh()--进入到这里说明是需要刷新的因为这个是Tstat
@@ -2097,5 +2104,33 @@ vector<Registers_Infor> g_vectRegisters;
 BOOL g_fresh_Graphic = FALSE;
 
 Global_Calibration_Module   g_calibration_module_data;
+
+CDialog *g_Draw_dlg=NULL;
+unsigned int g_progress_persent = 0;	//用来记录全局状态栏该显示的 进度 百分比;
+bool b_stop_read_grp_label = false;		//如果读到空的grp label 就不要继续读下一个了;
+
+CString Statuspanel;   //在状态栏显示panel 2-3;
+
+CString g_cstring_ini_path;
+unsigned char product_sort_way;		//0 default   1 by connection      2 bu floor
+int input_item_limit_count = BAC_INPUT_ITEM_COUNT;	//input list 要显示多少个input 的个数， 不是根据vector 的size 来判断大小;
+int output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;	//output list 要显示多少个output 的个数， 不是根据vector 的size 来判断大小;
+int variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;	//variable list 要显示多少个variable 的个数， 不是根据vector 的size 来判断大小;
+int program_item_limit_count = BAC_PROGRAM_ITEM_COUNT;
+int controller_item_limit_count = BAC_PID_COUNT;
+int screen_item_limit_count = BAC_SCREEN_COUNT;
+
+Str_out_point m_temp_output_data[BAC_OUTPUT_ITEM_COUNT];
+Str_in_point m_temp_Input_data[BAC_INPUT_ITEM_COUNT];
+Str_variable_point m_temp_variable_data[BAC_VARIABLE_ITEM_COUNT];
+Str_program_point m_temp_program_data[BAC_PROGRAM_ITEM_COUNT];
+Str_controller_point m_temp_controller_data[BAC_PID_COUNT];
+Control_group_point m_temp_screen_data[BAC_SCREEN_COUNT];
+Str_weekly_routine_point m_temp_weekly_data[BAC_SCHEDULE_COUNT];
+Str_annual_routine_point m_temp_annual_data[BAC_HOLIDAY_COUNT];
+Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
+Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
+
+char monitor_database_flag[24];   //用于标记哪些Database需要删除的 ，1 为删除;
 
 #pragma endregion For_bacnet

@@ -183,11 +183,11 @@ int modbus_read_multi_value(
 	 */
 	 
 	g_bEnableRefreshTreeView = false;
-	TRACE(L"\nMulti -Read -Function -Enter\n");
+	//TRACE(L"\nMulti -Read -Function -Enter\n");
 	int error=0;
 	//CSingleLock singleLock(&register_critical_section);
 	register_critical_section.Lock() ;
-	TRACE(L"\nMulti -Read -Lock\n");
+	//TRACE(L"\nMulti -Read -Lock\n");
 	for(int i=0;i<retry_times;i++)
 	{
 
@@ -213,7 +213,7 @@ int modbus_read_multi_value(
 		}
 	}
 	  	register_critical_section.Unlock();
-	TRACE(L"\nMulti -Read -UNLock\n");
+	//TRACE(L"\nMulti -Read -UNLock\n");
 	// check for running in the main GUI thread
 	if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
 

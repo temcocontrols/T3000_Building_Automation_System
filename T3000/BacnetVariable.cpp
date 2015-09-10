@@ -13,9 +13,9 @@
 #include "BacnetRange.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
-Str_variable_point m_temp_variable_data[BAC_VARIABLE_ITEM_COUNT];
 
-int variable_item_limit_count = BAC_VARIABLE_ITEM_COUNT;	//variable list 要显示多少个variable 的个数， 不是根据vector 的size 来判断大小;
+
+
 
 IMPLEMENT_DYNAMIC(CBacnetVariable, CDialogEx)
 
@@ -127,12 +127,12 @@ void CBacnetVariable::Initial_List()
 
 	m_variable_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	m_variable_list.SetExtendedStyle(m_variable_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_variable_list.InsertColumn(VARIABLE_NUM, _T("Variable"), 70, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-	m_variable_list.InsertColumn(VARIABLE_FULL_LABLE, _T("Full Label"), 200, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_variable_list.InsertColumn(VARIABLE_AUTO_MANUAL, _T("Auto/Manual"), 150, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_variable_list.InsertColumn(VARIABLE_VALUE, _T("Value"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_variable_list.InsertColumn(VARIABLE_UNITE, _T("Units"), 120, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_variable_list.InsertColumn(VARIABLE_LABLE, _T("Label"), 130, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_variable_list.InsertColumn(VARIABLE_NUM, _T("Variable"), 70, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_variable_list.InsertColumn(VARIABLE_FULL_LABLE, _T("Full Label"), 200, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_variable_list.InsertColumn(VARIABLE_AUTO_MANUAL, _T("Auto/Manual"), 150, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_variable_list.InsertColumn(VARIABLE_VALUE, _T("Value"), 120, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_variable_list.InsertColumn(VARIABLE_UNITE, _T("Units"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_variable_list.InsertColumn(VARIABLE_LABLE, _T("Label"), 130, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_variable_dlg_hwnd = this->m_hWnd;
 	//g_hwnd_now = m_variable_dlg_hwnd;
 
@@ -143,7 +143,7 @@ void CBacnetVariable::Initial_List()
 	m_variable_list.Set_My_WindowRect(win_rect);
 	m_variable_list.Set_My_ListRect(list_rect);
 
-	CTime TimeTemp(2014,1,1,0,0,0);
+	CTime TimeTemp(2015,1,1,0,0,0);
 	m_variable_time_picker.SetFormat(_T("HH:mm"));
 	m_variable_time_picker.SetTime(&TimeTemp);
 	m_variable_time_picker.ShowWindow(SW_HIDE);
@@ -158,7 +158,7 @@ void CBacnetVariable::Initial_List()
 		if(i>=variable_item_limit_count)
 			break;
 
-		temp_item.Format(_T("%d"),i+1);
+		temp_item.Format(_T("VAR%d"),i+1);
 		m_variable_list.InsertItem(i,temp_item);
 		//if(ListCtrlEx::ComboBox == m_variable_list.GetColumnType(VARIABLE_AUTO_MANUAL))
 		//{
@@ -188,6 +188,8 @@ void CBacnetVariable::Initial_List()
 		}
 
 	}
+	m_variable_list.InitListData();
+	//m_variable_list.SetListData((char *)m_temp_variable_data,sizeof(Str_variable_point) * BAC_VARIABLE_ITEM_COUNT);
 	m_variable_list.ShowWindow(SW_SHOW);
 }
 
@@ -238,23 +240,26 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 		if(m_Variable_data.at(i).auto_manual==0)
 		{
 			m_variable_list.SetItemText(i,VARIABLE_AUTO_MANUAL,_T("Auto"));
-			m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,0);
+			//m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,0);
 		}
 		else
 		{
 			m_variable_list.SetItemText(i,VARIABLE_AUTO_MANUAL,_T("Manual"));
-			m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,1);
+			//m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,1);
 		}
 
 
 		if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 		{
 			
-
-			if(m_Variable_data.at(i).range>30)
+			if((m_Variable_data.at(i).range == 0) || (m_Variable_data.at(i).range>30))
 			{
-				//m_variable_list.SetItemText(i,VARIABLE_UNITE,Digital_Units_Array[0]);
-				m_variable_list.SetItemText(i,VARIABLE_UNITE,_T("Out of range"));
+				CString cstemp_value2;
+				float temp_float_value1;
+				temp_float_value1 = ((float)m_Variable_data.at(i).value) / 1000;
+				cstemp_value2.Format(_T("%.3f"),temp_float_value1);
+				m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value2);
+				m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[0]);
 			}
 			else
 			{
@@ -267,6 +272,11 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				{
 					if(receive_customer_unit)
 						temp1 = temp_unit_no_index[m_Variable_data.at(i).range - 23];
+				}
+				else
+				{
+					temp1 = Digital_Units_Array[0];
+					m_variable_list.SetItemText(i,VARIABLE_UNITE,temp1);
 				}
 
 				SplitCStringA(temparray,temp1,_T("/"));
@@ -329,6 +339,10 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 				//temp_value.Format(_T("%d"),m_Variable_data.at(i).value);
 				//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_value);
 			}
+			//else if(m_Variable_data.at(i).range == 0)
+			//{
+			//	m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[0]);
+			//}
 			else if(m_Variable_data.at(i).range<=sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))
 			{
 			m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
@@ -342,6 +356,17 @@ LRESULT CBacnetVariable::Fresh_Variable_List(WPARAM wParam,LPARAM lParam)
 			//temp_value.Format(_T("%d"),m_Variable_data.at(i).value);
 			//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_value);
 			}
+			else
+			{
+				m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[0]);
+
+				CString cstemp_value;
+				float temp_float_value;
+				temp_float_value = ((float)m_Variable_data.at(i).value) / 1000;
+				cstemp_value.Format(_T("%.3f"),temp_float_value);
+				m_variable_list.SetItemText(i,VARIABLE_VALUE,cstemp_value);
+			}
+
 		}
 		
 		CString temp_des2;
@@ -404,7 +429,11 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 			PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
 			return 0;
 		}
-
+		if(Check_FullLabel_Exsit(cs_temp))
+		{
+			PostMessage(WM_REFRESH_BAC_VARIABLE_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0;
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -417,12 +446,12 @@ LRESULT CBacnetVariable::Fresh_Variable_Item(WPARAM wParam,LPARAM lParam)
 		CString temp_cs = m_variable_list.GetItemText(Changed_Item,Changed_SubItem);
 		if(temp_cs.CompareNoCase(_T("Auto"))==0)
 		{
-			m_variable_list.SetCellEnabled(Changed_Item,VARIABLE_VALUE,0);
+			//m_variable_list.SetCellEnabled(Changed_Item,VARIABLE_VALUE,0);
 			m_Variable_data.at(Changed_Item).auto_manual = BAC_AUTO;
 		}
 		else
 		{
-			m_variable_list.SetCellEnabled(Changed_Item,VARIABLE_VALUE,1);
+			//m_variable_list.SetCellEnabled(Changed_Item,VARIABLE_VALUE,1);
 			m_Variable_data.at(Changed_Item).auto_manual = BAC_MANUAL;
 		}
 	}
@@ -462,12 +491,12 @@ void CBacnetVariable::OnBnClickedButtonVariableApply()
 		if(cs_temp.CompareNoCase(_T("Auto"))==0)
 		{
 			m_Variable_data.at(i).auto_manual= BAC_AUTO;
-			m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,0);
+			//m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,0);
 		}
 		else
 		{
 			m_Variable_data.at(i).auto_manual = BAC_MANUAL;
-			m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,1);
+			//m_variable_list.SetCellEnabled(i,VARIABLE_VALUE,1);
 		}
 
 
@@ -569,11 +598,12 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		m_variable_list.GetSubItemRect(lRow,lCol,LVIR_BOUNDS,myrect);
 
 
-		myrect.left = myrect.left + list_rect.left - win_rect.left;
-		myrect.right = myrect.right + list_rect.left - win_rect.left;
-		myrect.top = myrect.top + 11;
-		myrect.bottom = myrect.bottom + 13;
-
+		myrect.left = myrect.left + list_rect.left - win_rect.left  +2 ;
+		myrect.right = myrect.right + list_rect.left - win_rect.left + 2;
+		//myrect.top = myrect.top + 11;
+		//myrect.bottom = myrect.bottom + 13;
+		myrect.top = myrect.top + 24;
+		myrect.bottom = myrect.bottom + 26;
 		m_variable_time_picker.BringWindowToTop();
 		m_variable_time_picker.MoveWindow(myrect);
 
@@ -605,20 +635,28 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		m_variable_time_picker.Invalidate();
 		SetTimer(2,100,NULL);
 	}
+	else if(lCol == VARIABLE_VALUE)
+	{
+		if(m_Variable_data.at(lRow).auto_manual == BAC_AUTO)
+		{
+			m_variable_list.Set_Edit(false);
+			return;
+		}
+	}
 	else if(lCol == VARIABLE_AUTO_MANUAL)
 	{
 		if(m_Variable_data.at(lRow).auto_manual == 0)
 		{
 			m_Variable_data.at(lRow).auto_manual = 1;
 			m_variable_list.SetItemText(lRow,VARIABLE_AUTO_MANUAL,_T("Manual"));
-			m_variable_list.SetCellEnabled(lRow,VARIABLE_VALUE,TRUE);
+			//m_variable_list.SetCellEnabled(lRow,VARIABLE_VALUE,TRUE);
 			New_CString = _T("Manual");
 		}
 		else
 		{
 			m_Variable_data.at(lRow).auto_manual = 0;
 			m_variable_list.SetItemText(lRow,VARIABLE_AUTO_MANUAL,_T("Auto"));
-			m_variable_list.SetCellEnabled(lRow,VARIABLE_VALUE,FALSE);
+			//m_variable_list.SetCellEnabled(lRow,VARIABLE_VALUE,FALSE);
 			New_CString = _T("Auto");
 		}
 		temp_task_info.Format(_T("Write Variable List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
@@ -790,7 +828,10 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 	
 	}
 	else
+	{
+		//m_variable_list.Set_Edit(false);
 		return;
+	}
 
 	int cmp_ret = memcmp(&m_temp_variable_data[lRow],&m_Variable_data.at(lRow),sizeof(Str_variable_point));
 	if(cmp_ret!=0)

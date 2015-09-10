@@ -52,7 +52,8 @@ void CDisplayConfig::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_INPUT_9, m_display_number);
 	DDX_Control(pDX, IDC_SEQ_COM, m_ItemValueCombx);
 	DDX_Control(pDX, IDC_PROCESS, m_progress);
-	DDX_Control(pDX, IDC_CHECK_ICON_AM, m_am_check);
+	DDX_Control(pDX, IDC_CHECK_ICON_AUTO, m_am_check);
+    DDX_Control(pDX, IDC_CHECK_ICON_MANUAL, m_man_check);
 	DDX_Control(pDX, IDC_CHECK2, m_check2);
 	DDX_Control(pDX, IDC_CHECK3, m_check3);
 	DDX_Control(pDX, IDC_CHECK4, m_check4);
@@ -90,7 +91,8 @@ ON_EN_SETFOCUS(IDC_INPUT_7, &CDisplayConfig::OnSetfocusInput7)
 ON_EN_SETFOCUS(IDC_INPUT_8, &CDisplayConfig::OnSetfocusInput8)
 ON_EN_SETFOCUS(IDC_LINE_1, &CDisplayConfig::OnSetfocusLine1)
 ON_EN_SETFOCUS(IDC_LINE_2, &CDisplayConfig::OnSetfocusLine2)
-ON_BN_CLICKED(IDC_CHECK_ICON_AM, &CDisplayConfig::OnBnClickedCheckIconAm)
+ON_BN_CLICKED(IDC_CHECK_ICON_AUTO, &CDisplayConfig::OnBnClickedCheckIconAm)
+ON_BN_CLICKED(IDC_CHECK_ICON_MANUAL, &CDisplayConfig::OnBnClickedCheckIconMan)
 ON_BN_CLICKED(IDC_CHECK2, &CDisplayConfig::OnBnClickedCheck2)
 ON_BN_CLICKED(IDC_CHECK3, &CDisplayConfig::OnBnClickedCheck3)
 ON_BN_CLICKED(IDC_CHECK4, &CDisplayConfig::OnBnClickedCheck4)
@@ -98,6 +100,8 @@ ON_BN_CLICKED(IDC_CHECK5, &CDisplayConfig::OnBnClickedCheck5)
 ON_BN_CLICKED(IDC_CHECK6, &CDisplayConfig::OnBnClickedCheck6)
 ON_BN_CLICKED(IDC_CHECK7, &CDisplayConfig::OnBnClickedCheck7)
 ON_BN_CLICKED(IDC_CHECK8, &CDisplayConfig::OnBnClickedCheck8)
+ON_EN_KILLFOCUS(IDC_LINE_1, &CDisplayConfig::OnEnKillfocusLine1)
+ON_EN_KILLFOCUS(IDC_LINE_2, &CDisplayConfig::OnEnKillfocusLine2)
 END_MESSAGE_MAP()
 
 
@@ -123,18 +127,18 @@ CString CDisplayConfig::GetTextReg(unsigned short reg)
 
 	for (int i=0;i<4;i++)
 		{
-		Hi_Char=temp_buffer[i];
-		Hi_Char=Hi_Char&0xff00;
-		Hi_Char=Hi_Char>>8;
-		Low_Char=temp_buffer[i];
-		Low_Char=Low_Char&0x00ff;
-		temp_buffer_Char[2*i]=Hi_Char;
-		temp_buffer_Char[2*i+1]=Low_Char;
-		} 
+            Hi_Char=temp_buffer[i];
+            Hi_Char=Hi_Char&0xff00;
+            Hi_Char=Hi_Char>>8;
+            Low_Char=temp_buffer[i];
+            Low_Char=Low_Char&0x00ff;
+            temp_buffer_Char[2*i]=Hi_Char;
+            temp_buffer_Char[2*i+1]=Low_Char;
+       } 
 
 	for (int i=0;i<THE_CHAR_LENGTH;i++)
 		{
-		p[i] =(unsigned char)temp_buffer_Char[i];
+		    p[i] =(unsigned char)temp_buffer_Char[i];
 		}
 	str_temp.Format(_T("%c%c%c%c%c%c%c%c"),p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);	
  
@@ -209,34 +213,34 @@ CString CDisplayConfig::GetSel(int ID)
 		selection=_T("setpoint");
 		break;
 	case 3:
-		selection=_T("AI1");
+		selection=g_strInName1;
 		break;
 	case 4:
-		selection=_T("AI2");
+		selection=g_strInName2;
 		break;
 	case 5:
-		selection=_T("AI3");
+		selection=g_strInName3;
 		break;
 	case 6:
-		selection=_T("AI4");
+		selection=g_strInName4;
 		break;
 	case 7:
-		selection=_T("AI5");
+		selection=g_strInName5;
 		break;
 	case 8:
-		selection=_T("AI6");
+		selection=g_strInName6;
 		break;
 	case 9:
-		selection=_T("AI7");
+		selection=g_strInName7;
 		break;
 	case 10:
-		selection=_T("AI8");
+		selection=g_strInName8;
 		break;
 	case 11:
 		selection=_T("MODE");
 		break;
 	case 12:
-		selection=_T("USER INFO");
+		selection=_T("Custom Message");
 		break;
 	case 13:
 		selection=_T("CLOCK DATE");
@@ -260,6 +264,7 @@ void CDisplayConfig::Fresh_Grid(){
 	 
 		m_display_number=product_register_value[MODBUS_LCD_ROTATE_ENABLE];//newtstat6[Get_RegID(multi_register_value[7],_T("Display Number"))];
 		int display_number=1;
+        bool is_user_infor=false;
 		if (m_display_number>=0)
 		{
 			display_number=m_display_number+1;
@@ -275,7 +280,28 @@ void CDisplayConfig::Fresh_Grid(){
 				str_No.Format(_T("%d"),i);
 				m_FlexGrid1.put_TextMatrix(i,0,str_No);
 				m_FlexGrid1.put_TextMatrix(i,1,GetSel(product_register_value[MODBUS_DISP_ITEM_TEMPERATURE+i-1]));
+                if (product_register_value[MODBUS_DISP_ITEM_TEMPERATURE+i-1]==12)
+                {
+                     is_user_infor = true;
+                }
 			}
+
+            if (is_user_infor)
+            {
+                GetDlgItem(IDC_STATIC_USER_INFOR)->ShowWindow(TRUE);
+                GetDlgItem(IDC_STATIC_LINE1)->ShowWindow(TRUE);
+                GetDlgItem(IDC_STATIC_LINE2)->ShowWindow(TRUE);
+                GetDlgItem(IDC_LINE_1)->ShowWindow(TRUE);
+                GetDlgItem(IDC_LINE_2)->ShowWindow(TRUE);
+            }
+            else
+            {
+                GetDlgItem(IDC_STATIC_USER_INFOR)->ShowWindow(FALSE);
+                GetDlgItem(IDC_STATIC_LINE1)->ShowWindow(FALSE);
+                GetDlgItem(IDC_STATIC_LINE2)->ShowWindow(FALSE);
+                GetDlgItem(IDC_LINE_1)->ShowWindow(FALSE);
+                GetDlgItem(IDC_LINE_2)->ShowWindow(FALSE);
+            }
 		} 
 		else
 		{
@@ -348,16 +374,16 @@ if(g_OutPutLevel==1)
 		m_ItemValueCombx.AddString(_T("None"));
 		m_ItemValueCombx.AddString(_T("temperature"));
 		m_ItemValueCombx.AddString(_T("setpoint"));
-		m_ItemValueCombx.AddString(_T("AI1"));
-		m_ItemValueCombx.AddString(_T("AI2"));
-		m_ItemValueCombx.AddString(_T("AI3"));
-		m_ItemValueCombx.AddString(_T("AI4"));
-		m_ItemValueCombx.AddString(_T("AI5"));
-		m_ItemValueCombx.AddString(_T("AI6"));
-		m_ItemValueCombx.AddString(_T("AI7"));
-		m_ItemValueCombx.AddString(_T("AI8"));
+		m_ItemValueCombx.AddString(g_strInName1);
+		m_ItemValueCombx.AddString(g_strInName2);
+		m_ItemValueCombx.AddString(g_strInName3);
+		m_ItemValueCombx.AddString(g_strInName4);
+		m_ItemValueCombx.AddString(g_strInName5);
+		m_ItemValueCombx.AddString(g_strInName6);
+		m_ItemValueCombx.AddString(g_strInName7);
+		m_ItemValueCombx.AddString(g_strInName8);
 		m_ItemValueCombx.AddString(_T("MODE"));
-		m_ItemValueCombx.AddString(_T("USER INFO"));
+		m_ItemValueCombx.AddString(_T("Custom Message"));
 		m_ItemValueCombx.AddString(_T("CLOCK DATE"));
 		m_ItemValueCombx.AddString(_T("CLOCK TIME"));
 		m_ItemValueCombx.AddString(_T("CO2"));
@@ -441,108 +467,139 @@ CDialog::OnCancel();
 }
 void CDisplayConfig::OnBnClickedOk()
 	{ 
-	 // CString temp;
-	 CString input1,input2,input3,input4,input5,input6,input7,input8;
-
-	 int reg=MODBUS_LCD_ROTATE_ENABLE; 
-	 int m_display_number=product_register_value[reg];
-
-	 
-	GetDlgItem(IDC_LINE_1)->SetWindowText(GetTextReg(MODBUS_LINE1_CHAR1));
-	 
-	//UpdateData(FALSE);
-	
-	GetDlgItem(IDC_LINE_2)->SetWindowText(GetTextReg(MODBUS_LINE2_CHAR1)); 
- 
-	//UpdateData(FALSE);
-	input1=GetTextReg(MODBUS_AI1_CHAR1);
-	GetDlgItem(IDC_INPUT_1)->SetWindowText(input1);
-	 
-	//UpdateData(FALSE);
-	input2=GetTextReg(MODBUS_AI2_CHAR1);
-	GetDlgItem(IDC_INPUT_2)->SetWindowText(input2);
-	 
-	//UpdateData(FALSE);
-	input3=GetTextReg(MODBUS_AI3_CHAR1);
-	GetDlgItem(IDC_INPUT_3)->SetWindowText(input3);
-	 
-	//UpdateData(FALSE);
-	input4=GetTextReg(MODBUS_AI4_CHAR1);
-	GetDlgItem(IDC_INPUT_4)->SetWindowText(input4);
-	 
-	//UpdateData(FALSE);
-	input5=GetTextReg(MODBUS_AI5_CHAR1);
-	GetDlgItem(IDC_INPUT_5)->SetWindowText(input5);
-	 
-	//UpdateData(FALSE);
-	input6=GetTextReg(MODBUS_AI6_CHAR1);
-	GetDlgItem(IDC_INPUT_6)->SetWindowText(input6);
-	 input7=GetTextReg(MODBUS_AI7_CHAR1);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_7)->SetWindowText(input7);
-	 input8=GetTextReg(MODBUS_AI8_CHAR1);
-	//UpdateData(FALSE);
-	GetDlgItem(IDC_INPUT_8)->SetWindowText(input8);
-	CString temp;
-	temp.Format(_T("%d"),product_register_value[MODBUS_LCD_ROTATE_ENABLE]);
-	GetDlgItem(IDC_INPUT_9)->SetWindowText(temp);
-	Fresh_Grid();
-	temp.Format(_T("%d"),get_serialnumber());
-
-// 	_ConnectionPtr m_pCon;
-// 	_RecordsetPtr m_pRs;
-// 	::CoInitialize(NULL);
-// 	m_pCon.CreateInstance("ADODB.Connection");
-// 	m_pRs.CreateInstance(_T("ADODB.Recordset"));
-// 	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-	CBADO bado;
-	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-	bado.OnInitADOConn(); 
-
-	try
-	{
-		CString strSql;BOOL is_exist=FALSE;	  CString str_temp;
-		 
-	 
-			CString SerialNo,Input1,Input2,Input3,Input4,Input5,Input6,Input7,Input8;
-			SerialNo=temp;
-			 
-			Input1=input1;
-			Input2=input2;
-			Input3=input3;
-			Input4=input4;
-			Input5=input5;
-			Input6=input6;
-			Input7=input7;
-			Input8=input8;
-
-			strSql.Format(_T("update IONAME set INPUT1='%s',INPUT2='%s',INPUT3='%s',INPUT4='%s',INPUT5='%s',INPUT6='%s',INPUT7='%s',INPUT8='%s' where SERIAL_ID='%s'"),Input1,Input2,Input3,Input4,Input5,Input6,Input7,Input8,SerialNo);
-			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-			 
-			g_strInName1=Input1;
-			g_strInName2=Input2;
-			g_strInName3=Input3;
-			g_strInName4=Input4;
-			g_strInName5=Input5;
-			g_strInName6=Input6;
-			g_strInName7=Input7;
-			g_strInName8=Input8;
-
-		 
-	}
-	catch(_com_error e)
-	{
-		/* AfxMessageBox(e.Description());*/
-		//MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
-
-
-		//m_pCon->Close();
-		bado.CloseConn();
-		return ;
-	}
-	//m_pCon->Close(); 
-  bado.CloseConn();
-    }
+  CString temp;
+ 	 
+//
+ 	 int reg=MODBUS_LCD_ROTATE_ENABLE; 
+ 	 int m_display_number=product_register_value[reg];
+//
+//	 
+ 	GetDlgItem(IDC_LINE_1)->SetWindowText(GetTextReg(MODBUS_LINE1_CHAR1));
+//	 
+//	//UpdateData(FALSE);
+//	
+ 	GetDlgItem(IDC_LINE_2)->SetWindowText(GetTextReg(MODBUS_LINE2_CHAR1)); 
+// 
+ 	//UpdateData(FALSE);
+//	input1=GetTextReg(MODBUS_AI1_CHAR1);
+//    if (input1.IsEmpty())
+//    {
+//        input1=_T("AI1");
+//    }
+//	GetDlgItem(IDC_INPUT_1)->SetWindowText(input1);
+//	
+//	 
+//	//UpdateData(FALSE);
+//	input2=GetTextReg(MODBUS_AI2_CHAR1);
+//    if (input2.IsEmpty())
+//    {
+//        input2=_T("AI2");
+//    }
+//	GetDlgItem(IDC_INPUT_2)->SetWindowText(input2);
+//	 
+//	//UpdateData(FALSE);
+//	input3=GetTextReg(MODBUS_AI3_CHAR1);
+//    if (input3.IsEmpty())
+//    {
+//        input3=_T("AI3");
+//    }
+//	GetDlgItem(IDC_INPUT_3)->SetWindowText(input3);
+//	 
+//	//UpdateData(FALSE);
+//	input4=GetTextReg(MODBUS_AI4_CHAR1);
+//    if (input4.IsEmpty())
+//    {
+//        input4=_T("AI4");
+//    }
+//	GetDlgItem(IDC_INPUT_4)->SetWindowText(input4);
+//	 
+//	//UpdateData(FALSE);
+//	input5=GetTextReg(MODBUS_AI5_CHAR1);
+//    if (input5.IsEmpty())
+//    {
+//        input5=_T("AI5");
+//    }
+//	GetDlgItem(IDC_INPUT_5)->SetWindowText(input5);
+//	 
+//	//UpdateData(FALSE);
+//	input6=GetTextReg(MODBUS_AI6_CHAR1);
+//    if (input6.IsEmpty())
+//    {
+//        input6=_T("AI6");
+//    }
+//	GetDlgItem(IDC_INPUT_6)->SetWindowText(input6);
+//	 input7=GetTextReg(MODBUS_AI7_CHAR1);
+//     if (input7.IsEmpty())
+//     {
+//         input7=_T("AI7");
+//     }
+//	GetDlgItem(IDC_INPUT_7)->SetWindowText(input7);
+//	 input8=GetTextReg(MODBUS_AI8_CHAR1);
+//     if (input8.IsEmpty())
+//     {
+//         input8=_T("AI8");
+//     }
+//	GetDlgItem(IDC_INPUT_8)->SetWindowText(input8);
+//	CString temp;
+//	temp.Format(_T("%d"),product_register_value[MODBUS_LCD_ROTATE_ENABLE]);
+//	GetDlgItem(IDC_INPUT_9)->SetWindowText(temp);
+//	Fresh_Grid();
+//	temp.Format(_T("%d"),get_serialnumber());
+//
+//// 	_ConnectionPtr m_pCon;
+//// 	_RecordsetPtr m_pRs;
+//// 	::CoInitialize(NULL);
+//// 	m_pCon.CreateInstance("ADODB.Connection");
+//// 	m_pRs.CreateInstance(_T("ADODB.Recordset"));
+//// 	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+//	CBADO bado;
+//	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+//	bado.OnInitADOConn(); 
+//
+//	try
+//	{
+//		CString strSql;BOOL is_exist=FALSE;	  CString str_temp;
+//		 
+//	 
+//			CString SerialNo,Input1,Input2,Input3,Input4,Input5,Input6,Input7,Input8;
+//			SerialNo=temp;
+//			 
+//			Input1=input1;
+//			Input2=input2;
+//			Input3=input3;
+//			Input4=input4;
+//			Input5=input5;
+//			Input6=input6;
+//			Input7=input7;
+//			Input8=input8;
+//
+//			strSql.Format(_T("update IONAME set INPUT1='%s',INPUT2='%s',INPUT3='%s',INPUT4='%s',INPUT5='%s',INPUT6='%s',INPUT7='%s',INPUT8='%s' where SERIAL_ID='%s'"),Input1,Input2,Input3,Input4,Input5,Input6,Input7,Input8,SerialNo);
+//			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+//			 
+//			g_strInName1=Input1;
+//			g_strInName2=Input2;
+//			g_strInName3=Input3;
+//			g_strInName4=Input4;
+//			g_strInName5=Input5;
+//			g_strInName6=Input6;
+//			g_strInName7=Input7;
+//			g_strInName8=Input8;
+//
+//		 
+//	}
+//	catch(_com_error e)
+//	{
+//		/* AfxMessageBox(e.Description());*/
+//		//MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
+//
+//
+//		//m_pCon->Close();
+//		bado.CloseConn();
+//		return ;
+//	}
+//	//m_pCon->Close(); 
+//  bado.CloseConn();
+     }
 	//Write Line1,Line2
 void CDisplayConfig::OnBnClickedSave2()
 {
@@ -560,7 +617,7 @@ void CDisplayConfig::OnBnClickedSave2()
 	   if(i<input.GetLength())
 		   p[i]=input.GetAt(i);
 	   else
-		   p[i]=' ';
+		   p[i]=0;
 	   }
 	   //input1
    for(int i=0;i<THE_CHAR_LENGTH;i++)
@@ -568,7 +625,7 @@ void CDisplayConfig::OnBnClickedSave2()
 	   if(i<input2.GetLength())
 		   p[i+THE_CHAR_LENGTH]=input2.GetAt(i);
 	   else
-		   p[i+THE_CHAR_LENGTH]=' ';
+		   p[i+THE_CHAR_LENGTH]=0;
 	   }
    if (input.GetLength()>16)
 	 {
@@ -605,7 +662,7 @@ for(int i=0;i<THE_CHAR_LENGTH;i++)
 	if(i<input.GetLength())
 		p[i]=input.GetAt(i);
 	else
-		p[i]=' ';
+		p[i]=0;
 	}
 //input1
 for(int i=0;i<THE_CHAR_LENGTH;i++)
@@ -613,7 +670,7 @@ for(int i=0;i<THE_CHAR_LENGTH;i++)
 	if(i<input2.GetLength())
 		p[i+THE_CHAR_LENGTH]=input2.GetAt(i);
 	else
-		p[i+THE_CHAR_LENGTH]=' ';
+		p[i+THE_CHAR_LENGTH]=0;
 	}
 if (input.GetLength()>16)
 	{
@@ -642,21 +699,21 @@ m_progress.SetPos(0);
  m_progress.SetPos(10);
  OnBnClickedSaveLine2();
  m_progress.SetPos(20);
- OnBnClickedSaveInput1();
+ //OnBnClickedSaveInput1();
  m_progress.SetPos(30);
- OnBnClickedSaveInput2();
+ //OnBnClickedSaveInput2();
  m_progress.SetPos(40);
- OnBnClickedSaveInput3();
+ //OnBnClickedSaveInput3();
  m_progress.SetPos(50);
- OnBnClickedSaveInput4();
+ //OnBnClickedSaveInput4();
  m_progress.SetPos(60);
- OnBnClickedSaveInput5();
+ //OnBnClickedSaveInput5();
  m_progress.SetPos(70);
- OnBnClickedSaveInput6();
+ //OnBnClickedSaveInput6();
  m_progress.SetPos(80);
- OnBnClickedSaveInput7();
+// OnBnClickedSaveInput7();
  m_progress.SetPos(90);
- OnBnClickedSaveInput8();
+// OnBnClickedSaveInput8();
  m_progress.SetPos(100);
  m_progress.ShowWindow(FALSE);
 
@@ -676,7 +733,7 @@ for(int i=0;i<THE_CHAR_LENGTH;i++)
 	if(i<input.GetLength())
 		p[i]=input.GetAt(i);
 	else
-		p[i]=' ';
+		p[i]=0;
 }
 if (input.GetLength()>8)
 	{
@@ -710,7 +767,7 @@ void CDisplayConfig::OnBnClickedSaveInput2()
 		if(i<input.GetLength())
 			p[i]=input.GetAt(i);
 		else
-			p[i]=' ';
+			p[i]=0;
 		}
 	if (input.GetLength()>8)
 		{
@@ -743,7 +800,7 @@ void CDisplayConfig::OnBnClickedSaveInput3()
 		if(i<input.GetLength())
 			p[i]=input.GetAt(i);
 		else
-			p[i]=' ';
+			p[i]=0;
 		}
 	if (input.GetLength()>8)
 		{
@@ -776,7 +833,7 @@ void CDisplayConfig::OnBnClickedSaveInput4()
 		if(i<input.GetLength())
 			p[i]=input.GetAt(i);
 		else
-			p[i]=' ';
+			p[i]=0;
 		}
 	if (input.GetLength()>8)
 		{
@@ -809,7 +866,7 @@ void CDisplayConfig::OnBnClickedSaveInput5()
 		if(i<input.GetLength())
 			p[i]=input.GetAt(i);
 		else
-			p[i]=' ';
+			p[i]=0;
 		}
 	if (input.GetLength()>8)
 		{
@@ -842,7 +899,7 @@ void CDisplayConfig::OnBnClickedSaveInput6()
 		if(i<input.GetLength())
 			p[i]=input.GetAt(i);
 		else
-			p[i]=' ';
+			p[i]=0;
 		}
 	if (input.GetLength()>8)
 		{
@@ -875,7 +932,7 @@ void CDisplayConfig::OnBnClickedSaveInput7()
 		if(i<input.GetLength())
 			p[i]=input.GetAt(i);
 		else
-			p[i]=' ';
+			p[i]=0;
 		}
 	if (input.GetLength()>8)
 		{
@@ -908,7 +965,7 @@ void CDisplayConfig::OnBnClickedSaveInput8()
 		if(i<input.GetLength())
 			p[i]=input.GetAt(i);
 		else
-			p[i]=' ';
+			p[i]=0;
 		}
 	if (input.GetLength()>8)
 		{
@@ -946,7 +1003,7 @@ void CDisplayConfig::OnBnClickedFreshTable()
 			{
 				continue;
 			}
-			Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);	
+			Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100);	
 			m_progress.SetPos(i);
 		}
 		register_critical_section.Unlock();
@@ -1072,7 +1129,8 @@ void CDisplayConfig::Fresh_Checks(){
 	int AM=product_register_value[728];
 	if (AM==0)
 	{
-	  m_am_check.SetCheck(0);
+	  m_am_check.SetCheck(1);
+      m_man_check.SetCheck(0);
 	  GetDlgItem(IDC_CHECK2)->EnableWindow(FALSE);
 	  GetDlgItem(IDC_CHECK3)->EnableWindow(FALSE);
 	  GetDlgItem(IDC_CHECK4)->EnableWindow(FALSE);
@@ -1084,8 +1142,8 @@ void CDisplayConfig::Fresh_Checks(){
 	}
 	else
 	{
-	  m_am_check.SetCheck(1);
-
+	  m_am_check.SetCheck(0);
+       m_man_check.SetCheck(1);
 	  GetDlgItem(IDC_CHECK2)->EnableWindow(TRUE);
 	  GetDlgItem(IDC_CHECK3)->EnableWindow(TRUE);
 	  GetDlgItem(IDC_CHECK4)->EnableWindow(TRUE);
@@ -1109,34 +1167,42 @@ void CDisplayConfig::Fresh_Checks(){
 void CDisplayConfig::OnBnClickedCheckIconAm()
 {
     int AM=product_register_value[728];
-	if (AM==0)
-	{
-	  int ret=write_one(g_tstat_id,728,1);
-	  if (ret>0)
-	  {
-	    product_register_value[728]=1;
-	  }
-	  else
-	  {
-	    AfxMessageBox(_T("Try again"));
-	  }
-	} 
-	else
-	{
-		int ret=write_one(g_tstat_id,728,0);
-		if (ret>0)
-		{
-			product_register_value[728]=0;
-		}
-		else
-		{
-			AfxMessageBox(_T("Try again"));
-		}
-	}
+    if (AM==1)
+    {
+        int ret=write_one(g_tstat_id,728,0);
+        if (ret>0)
+        {
+            product_register_value[728]=0;
+        }
+        else
+        {
+            AfxMessageBox(_T("Try again"));
+        }
+        Fresh_Checks();
+    } 
+	 
 	
-	Fresh_Checks();
+	
 }
+void CDisplayConfig::OnBnClickedCheckIconMan()
+{
+    int AM=product_register_value[728];
+    if (AM==0)
+    {
+        int ret=write_one(g_tstat_id,728,1);
+        if (ret>0)
+        {
+            product_register_value[728]=1;
+        }
+        else
+        {
+            AfxMessageBox(_T("Try again"));
+        }
+        Fresh_Checks();
+    } 
 
+    
+}
 void CDisplayConfig::Write_Setting(){
 	bitset<16> IconValue(product_register_value[729]);
 	IconValue.set(0,m_check2.GetCheck());
@@ -1198,4 +1264,16 @@ void CDisplayConfig::OnBnClickedCheck7()
 void CDisplayConfig::OnBnClickedCheck8()
 {
 	Write_Setting();
+}
+
+
+void CDisplayConfig::OnEnKillfocusLine1()
+{
+      OnBnClickedSaveLine2();
+}
+
+
+void CDisplayConfig::OnEnKillfocusLine2()
+{
+    OnBnClickedSaveLine2();
 }

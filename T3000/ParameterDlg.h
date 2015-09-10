@@ -42,7 +42,7 @@ public:
 	afx_msg void OnCbnSelchangeHcchangecombo();
 	afx_msg void OnEnKillfocusPowsetpomitedit();
 	afx_msg void OnEnKillfocusStincreaedit();
-	afx_msg void OnEnKillfocusValveedit();
+//	afx_msg void OnEnKillfocusValveedit();
 	afx_msg void OnEnKillfocusDefSetpointEdt();
 	afx_msg void OnEnKillfocusSetpointctledit();
 	afx_msg void OnEnKillfocusCycleedit();
@@ -248,4 +248,6 @@ public:
 	CComboBox m_night_combox;
 	afx_msg void OnEnKillfocusEditTranducerMax();
 	afx_msg void OnEnKillfocusEditTranducerMin();
+    afx_msg void OnEnKillfocusEditChangeOverTime();
+    afx_msg void OnEnKillfocusEditTstatName();
 };

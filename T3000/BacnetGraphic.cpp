@@ -42,6 +42,7 @@ CPointItem * pTempItem = NULL;
 CPointItem *pPrevItem = NULL;
 CPointItem	*m_pFirstItem[INPUT_NUMBER];
 
+unsigned int time_interval_point = 0;
 //MyPoint temppoint={0,0};
 //int nindex=0;
 //int Total_count=0;
@@ -49,6 +50,7 @@ CPointItem	*m_pFirstItem[INPUT_NUMBER];
 //static int m_interval = 0;
 
 bool draw_graphic_finished = false;
+extern bool read_monitor_sd_ret;
 
 RECT RectPosition[15];
 static bool b_has_create_point = false ;
@@ -56,17 +58,21 @@ int start_wait_init = 0;	//用于控制显示刷新的变量;
 extern CBacnetGraphic * GraphicWindow;
 //CRect Static_Num_Rect[15];
 bool flag_continue_thread = true;
+bool flag_auto_scroll = true;
 HWND myhWnd;
 RECT myRect;
 HANDLE mythread =NULL;
+HANDLE updatedatathread = NULL;
 HDC hMemDC;
 HBITMAP hBmp;
 HDC gloab_hdc;
 
 int scale_type;
 DWORD WINAPI MyThreadPro(LPVOID lPvoid);
+DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid);
 
 IMPLEMENT_DYNAMIC(CBacnetGraphic, CDialogEx)
+
 
 CBacnetGraphic::CBacnetGraphic(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetGraphic::IDD, pParent)
@@ -174,7 +180,7 @@ BOOL CBacnetGraphic::OnInitDialog()
 	flag_continue_thread = true;
 	scale_type = TIME_ONE_HOUR;
 	m_time_monitor_now = time(NULL);
-
+	::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 	// TODO:  Add extra initialization here
 	MSG msg;
 	WNDCLASS wndClass;
@@ -189,15 +195,32 @@ BOOL CBacnetGraphic::OnInitDialog()
 	myRect.right=myRect.right-myRect.left;
 	myRect.bottom=myRect.bottom-myRect.top;
 
+	time_interval_point = m_monitor_data.at(monitor_list_line).hour_interval_time *3600 + m_monitor_data.at(monitor_list_line).minute_interval_time * 60 + m_monitor_data.at(monitor_list_line).second_interval_time;
+
 	Get_Input_Unit();
 	for(int i=0;i<14;i++)
 		StaticShow[i] = true;	//初始化时都让显示,显示第一次的时候这些值会被自动的修改;
-	InitialParameter(TIME_FOUR_HOUR);
+	InitialParameter(TIME_ONE_HOUR);
 	if(mythread == NULL)
 	{
 		mythread=CreateThread(NULL,NULL,MyThreadPro,this,NULL,NULL);
 		CloseHandle(mythread);
 	}
+
+	if(read_monitor_sd_ret == false)
+	{
+		MessageBox(_T("Read Monitor Data Timeout!"));
+	}
+
+	if(updatedatathread == NULL)
+	{
+		updatedatathread = CreateThread(NULL,NULL,UpdateDataThreadPro,this,NULL,NULL);
+		CloseHandle(updatedatathread);
+	}
+
+
+
+
 	InitDC();
 
 	test_hwnd = this->m_hWnd;
@@ -210,7 +233,7 @@ BOOL CBacnetGraphic::OnInitDialog()
 	window_hight = Graphic_Window_Rect.bottom - Graphic_Window_Rect.top;
 
 
-
+	
 
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -419,18 +442,26 @@ void CBacnetGraphic::Create_Line_Point()
 					return;
 				TimeValueToPoint(analog_data_point[x][i].loggingtime,analog_data_point[x][i].analogdata,mytemppoint);
 				//TRACE(_T("X = %d , Y = %d \r\n"),(int)mytemppoint.X,(int)mytemppoint.Y);
+
 				MyPoint Mypoint={0,0};
 				Mypoint.x = mytemppoint.X;
 				Mypoint.y = mytemppoint.Y;
 				pTempItem->SetPoint(Mypoint);
 				if(pPrevItem != NULL)
+				{
 					pPrevItem->SetNext(pTempItem);
+					if(analog_data_point[x][i].loggingtime - analog_data_point[x][i - 1].loggingtime > 2*time_interval_point)
+					{
+						pPrevItem->m_link_to_next = false;
+					}
+				}
 				pPrevItem = pTempItem;
 
 				if(m_pFirstItem[x] == NULL)
 				{
 					m_pFirstItem[x] = pTempItem;
 					m_pFirstItem[x]->SetIndex(0);
+					pTempItem->m_link_to_next = true;
 				}
 			}
 		}
@@ -472,6 +503,80 @@ void CBacnetGraphic::Create_Line_Point()
 
 	return;
 }
+
+DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
+{
+	CBacnetGraphic * mparent = (CBacnetGraphic *)lPvoid;
+
+	for (int i=0;i<1000;i++)
+	{
+		Sleep(10);
+		if(!flag_continue_thread)
+		{
+			updatedatathread = NULL;
+			return 0;
+		}
+	}
+
+	while(flag_continue_thread)
+	{
+		bool refresh_ret = false;
+		if(flag_auto_scroll == false)
+		{
+			Sleep(100);
+			continue;
+		}
+		if(read_monitordata(BAC_UNITS_ANALOG))
+		{
+			refresh_ret = true;
+		}
+
+		if(read_monitordata(BAC_UNITS_DIGITAL))
+		{
+			refresh_ret = true;
+		}
+
+		if(!refresh_ret)
+		{
+			Sleep(5000);
+			continue;
+		}
+
+		if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+		{
+			Sleep(5000);
+			continue;
+		}
+		unsigned long tempstarttime;
+		unsigned long tempendtime;
+	    mparent->GetXaxisTime(tempstarttime,tempendtime);
+		unsigned long temp_x_total_time = tempendtime - tempstarttime;
+		unsigned long temp_timestart = time(NULL);
+		m_time_monitor_now = temp_timestart;
+		temp_timestart = temp_timestart - temp_x_total_time;
+
+		mparent->SetXaxisStartTime(temp_timestart);
+		draw_graphic_finished = false;
+
+		Delete_Ram_Data();
+
+		b_has_create_point = false;
+
+		for (int i=0;i<1000;i++)
+		{
+			Sleep(10);
+			if(!flag_continue_thread)
+			{
+				updatedatathread = NULL;
+				return 0;
+			}
+		}
+	}
+	updatedatathread = NULL;
+	return 0 ;
+}
+	
+
 volatile HANDLE Point_Mutex=NULL;
 DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 {
@@ -499,7 +604,7 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 			draw_graphic_finished = true;
 		}
 		WaitForSingleObject(Point_Mutex,INFINITE); 
-		mparent->MyPaint_Mem(hMemDC);
+		mparent->Draw_Graphic(hMemDC);
 		ReleaseMutex(Point_Mutex);
 
 		BitBlt(gloab_hdc,0,0, myRect.right, myRect.bottom, hMemDC, 0, 0, SRCCOPY);//将绘制完成的内存位图贴到的Picture空间对象中;
@@ -522,7 +627,7 @@ LRESULT CBacnetGraphic::Fresh_Static_Function(WPARAM wParam,LPARAM lParam)
 
 
 
-void CBacnetGraphic::MyPaint_Mem(HDC my_hdc)
+void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 {
 	Graphics *mygraphics;
 	mygraphics = new Graphics(my_hdc);
@@ -531,6 +636,7 @@ void CBacnetGraphic::MyPaint_Mem(HDC my_hdc)
 	Pen * my_inline_pen;
 	Pen * static_write_bord;
 	Pen * static_black_bord;
+	Pen * static_auto_scroll_pen;
 
 	Pen * CurePen;
 
@@ -542,7 +648,7 @@ void CBacnetGraphic::MyPaint_Mem(HDC my_hdc)
 
 	static_write_bord = new  Pen(Color(255,255,255,255),2.0f);
 	static_black_bord = new  Pen(Color(255,0,0,0),2.0f);
-
+	static_auto_scroll_pen = new  Pen(Color(255,255,255,255),4.0f);
 
 	REAL dashValues[2] = {3, 7};
 	//Pen blackPen(Color(255, 0, 0, 0), 5);
@@ -557,25 +663,54 @@ void CBacnetGraphic::MyPaint_Mem(HDC my_hdc)
 	
 	mygraphics->FillRectangle(BlackBrush,0,0,window_width,window_hight);
 	mygraphics->DrawRectangle(myRectangle_pen,(int)m_analogorignpoint.X,(int)m_analogorignpoint.Y,m_X_ASIX_WIDTH,m_Y_ASIX_HIGHT);
-
-	//mygraphics->FillRectangle(BlackBrush,(int)m_digitalorignpoint.X,(int)m_digitalorignpoint.Y,m_Digital_X_WIDTH,m_Digital_Y_HIGHT  );	//Digital region
 	mygraphics->DrawRectangle(myRectangle_pen,(int)m_digitalorignpoint.X,(int)m_digitalorignpoint.Y,m_Digital_X_WIDTH,m_Digital_Y_HIGHT  );
-
-	//mygraphics->FillRectangle(BlackBrush,(int)m_analogorignpoint.X,(int)m_analogorignpoint.Y,m_X_ASIX_WIDTH,m_Y_ASIX_HIGHT);
-	//mygraphics->DrawRectangle(myRectangle_pen,(int)m_analogorignpoint.X,(int)m_analogorignpoint.Y,m_X_ASIX_WIDTH,m_Y_ASIX_HIGHT);
-
-	//mygraphics->FillRectangle(BlackBrush,(int)m_digitalorignpoint.X,(int)m_digitalorignpoint.Y,m_Digital_X_WIDTH,m_Digital_Y_HIGHT  );	//Digital region
-	//mygraphics->DrawRectangle(myRectangle_pen,(int)m_digitalorignpoint.X,(int)m_digitalorignpoint.Y,m_Digital_X_WIDTH,m_Digital_Y_HIGHT  );
-
 
 	SolidBrush *Static_blackground_Brush;
 	Pen *mystaticRectangle_pen;
 	mystaticRectangle_pen = new Pen(Color(255,0,0,0),2.0f);
 	Static_blackground_Brush =new SolidBrush(Color(255,187,187,187));	//This part is draw the 14 label and it's background;
-	//mygraphics->FillRectangle(Static_blackground_Brush,0,window_hight - 120,window_width,120);
-	//mygraphics->DrawRectangle(mystaticRectangle_pen,2,window_hight - 110,window_width-15,110 -30);
 	mygraphics->FillRectangle(Static_blackground_Brush,0,window_hight - 145,window_width,135);
 	mygraphics->DrawRectangle(mystaticRectangle_pen,2,window_hight - 135,window_width-15,135 -55);
+
+
+	FontFamily  ScrollfontFamily(_T("Arial"));
+
+	SolidBrush  Font_brush_temp(Color(255,255,255,0));
+	SolidBrush  Font_brush_on_off(Color(255,255,0,0));
+	Gdiplus::Font  Scroll_font(&ScrollfontFamily, 18, FontStyleRegular, UnitPixel);
+
+
+	SolidBrush *Static_scroll_blackground_Brush;
+	Static_scroll_blackground_Brush =new SolidBrush(Color(255,255,255,255));	//This part is draw the 14 label and it's background;
+
+	PointF      scrollpointF(0, 0);
+	mygraphics->FillRectangle(Static_scroll_blackground_Brush,120,684,50,20);
+	scrollpointF.X = 25;
+	scrollpointF.Y = 685;
+	mygraphics->DrawString(_T("Auto Scroll"), -1, &Scroll_font, scrollpointF,&Font_brush_temp);
+	scrollpointF.X = 122;
+	scrollpointF.Y = 684;
+	if(flag_auto_scroll)
+		mygraphics->DrawString(_T("ON"), -1, &Scroll_font, scrollpointF,&Font_brush_on_off);
+	else
+		mygraphics->DrawString(_T("OFF"), -1, &Scroll_font, scrollpointF,&Font_brush_on_off);
+
+	delete Static_scroll_blackground_Brush;
+
+
+#if 0
+	SolidBrush *   pen_unit_brush = new SolidBrush(Graphic_Color[i+1]);
+	pointF.X =  70;
+	pointF.Y =  40 + i*30;
+
+	mygraphics->DrawString(InputUnit[i], -1, &unitfont, pointF, pen_unit_brush);
+	delete pen_unit_brush;
+	pen_unit_brush = NULL;
+#endif
+
+
+
+
 
 	//****************************************************************************************************
 	//画下面的 1 到 E 的lable	;
@@ -636,8 +771,6 @@ void CBacnetGraphic::MyPaint_Mem(HDC my_hdc)
 			staticpointF.Y = 742 + 40 ;
 		}
 		mygraphics->DrawString(temp_cs, -1, &Input_font, staticpointF,&Font_brush);
-
-
 
 
 		//************************************************************************************
@@ -775,7 +908,8 @@ void CBacnetGraphic::MyPaint_Mem(HDC my_hdc)
 					second_item[i]=first_item[i]->GetNext();
 					if(second_item[i]==NULL)
 						break;
-					mygraphics->DrawLine(DrawLinePen[i],first_item[i]->GetPoint().x,first_item[i]->GetPoint().y,second_item[i]->GetPoint().x,second_item[i]->GetPoint().y);
+					if(first_item[i]->m_link_to_next)
+						mygraphics->DrawLine(DrawLinePen[i],first_item[i]->GetPoint().x,first_item[i]->GetPoint().y,second_item[i]->GetPoint().x,second_item[i]->GetPoint().y);
 
 					first_item[i] = second_item[i];
 				} while ((second_item[i]->GetNext())!=NULL);
@@ -843,6 +977,7 @@ void CBacnetGraphic::MyPaint_Mem(HDC my_hdc)
 
 	delete static_write_bord;
 	delete static_black_bord;
+	delete static_auto_scroll_pen;
 }
 
 
@@ -865,6 +1000,19 @@ void CBacnetGraphic::OnTimer(UINT_PTR nIDEvent)
 BOOL CBacnetGraphic::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
+	if(pMsg->message == WM_KEYDOWN)
+	{
+		if(pMsg->wParam == VK_LEFT)
+		{
+			OnGraphicLeft();
+			return 0;
+		}
+		else if(pMsg->wParam == VK_RIGHT)
+		{
+			OnGraphicRight();
+			return 0;
+		}
+	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
@@ -910,6 +1058,18 @@ void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 	}
 
+	//点击时间轴是否 自动 卷动的 自绘按钮;
+	if((point.x > 120) &&
+		(point.x <170) &&
+		(point.y > 684) &&
+		(point.y < 684+ 20))
+	{
+		if(flag_auto_scroll)
+			flag_auto_scroll = false;
+		else
+			flag_auto_scroll = true;
+	}
+
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
 
@@ -939,14 +1099,14 @@ void CBacnetGraphic::SetYaxisValue(int nlowvalue,int nhighvalue)
 
 void CBacnetGraphic::GetXaxisTime(unsigned long &returnstarttime,unsigned long &returnendtime)
 {
-	ASSERT(returnendtime > returnstarttime);
+	//ASSERT(m_endtime > m_starttime);
 	returnstarttime = m_starttime;
 	returnendtime = m_endtime;
 }
 
 void CBacnetGraphic::GetYaxisValue(int &returnlowvalue,int &returnhighvalue)
 {
-	ASSERT(returnhighvalue > returnlowvalue);
+	//ASSERT(m_highvalue > m_lowvalue);
 	returnlowvalue = m_lowvalue;
 	returnhighvalue = m_highvalue;
 }
@@ -1094,6 +1254,8 @@ bool CBacnetGraphic::TimeValueToPoint(unsigned long ntime , int nvalue ,PointF &
 	nvalue = nvalue / 1000;
 	//TRACE(_T("value = %d\r\n"),nvalue);
 	long delta_time = ntime - m_starttime;
+
+
 	if((delta_time <0) ||(delta_time > x_axis_total_time))
 	{
 		
@@ -1334,9 +1496,12 @@ void CBacnetGraphic::PostNcDestroy()
 {
 	// TODO: Add your specialized code here and/or call the base class
 	flag_continue_thread = false;
-	Sleep(200);
+	Sleep(400);
 	TerminateThread(mythread,2);
 	mythread = NULL;
+	TerminateThread(updatedatathread,2);
+	updatedatathread = NULL;
+
 	CDialogEx::PostNcDestroy();
 	delete this;//类对象的销毁   ;
 	GraphicWindow = NULL;
@@ -1344,7 +1509,8 @@ void CBacnetGraphic::PostNcDestroy()
 	Delete_Ram_Data();
 }
 
-void CBacnetGraphic::Delete_Ram_Data()
+//void CBacnetGraphic::Delete_Ram_Data()
+void Delete_Ram_Data()
 {
 	WaitForSingleObject(Point_Mutex,INFINITE);	//防止删除数据的时候  绘图的线程又调用此数据;加锁保护;
 	//for (int i=0;i<10;i++)
@@ -1643,7 +1809,10 @@ void CBacnetGraphic::OnZoomin()
 		Delete_Ram_Data();
 	}
 	else
+	{
 		m_time_selected = 1;
+		Delete_Ram_Data();
+	}
 
 }
 
@@ -1663,7 +1832,10 @@ void CBacnetGraphic::OnZoomout()
 		Delete_Ram_Data();
 	}
 	else
+	{
 		m_time_selected = TIME_FOUR_DAY;
+		Delete_Ram_Data();
+	}
 }
 
 void CBacnetGraphic::Get_Input_Unit()

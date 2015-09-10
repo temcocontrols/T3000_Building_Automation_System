@@ -170,7 +170,9 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 			nFlag==PM_T38I13O||
 			nFlag==PM_T3PERFORMANCE||
 			nFlag==PM_T34AO||
-			nFlag==PM_T36CT 
+			nFlag==PM_T36CT||
+            nFlag==PM_T322AI  ||
+            nFlag==PM_T38AI8AO6DO 
 			)
 		{
 			product_type =T3000_T3_MODULES;
@@ -520,6 +522,9 @@ BOOL CGridLoad::OnInitDialog()
 		case  PM_CO2_RS485:
 			strTemp = "CO2";
 			break;
+        case  PM_PRESSURE_SENSOR:
+            strTemp = "Pressure";
+            break;
 		case  PM_CO2_NODE:
 			strTemp = "CO2 Node";
 			break;
@@ -551,6 +556,12 @@ BOOL CGridLoad::OnInitDialog()
 		case PM_T36CT :
 			strTemp="T3-6CT";
 			break;
+        case PM_T322AI:
+            strTemp="T3-22AI";
+            break;
+        case PM_T38AI8AO6DO:
+            strTemp="T3-8AI8AO6DO";
+            break;
 		default:
 			strTemp="TStat";
 			break;
@@ -1244,6 +1255,9 @@ void CGridLoad::LoadDeviceToGrid()
 		case  PM_CO2_RS485:
 			strTemp = "CO2";
 			break;
+        case  PM_PRESSURE_SENSOR:
+            strTemp = "Pressure";
+            break;
 		case  PM_CO2_NODE:
 			strTemp = "CO2 Node";
 			break;
@@ -1275,6 +1289,12 @@ void CGridLoad::LoadDeviceToGrid()
 		case PM_T36CT :
 			strTemp="T3-6CT";
 			break;
+        case PM_T322AI:
+            strTemp="T3-22AI";
+            break;
+        case PM_T38AI8AO6DO:
+            strTemp="T3-8AI8AO6DO";
+            break;
 		default:
 			strTemp="TStat";
 			break;

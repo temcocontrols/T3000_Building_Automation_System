@@ -6,11 +6,7 @@
 #include "../global_struct.h"
 #define FLEXGRID_CELL_COLOR						13421772
 #define FLEXGRID_CELL_GRAY_COLOR				13421772
-
-
-
-
-
+  
 typedef struct T3_MODEL 
 {
 	int iaddress;

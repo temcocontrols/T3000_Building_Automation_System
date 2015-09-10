@@ -28,13 +28,14 @@ void SetPointValue(int nvalue);
 int GetPointValue();
 
 
-
+bool			m_link_to_next;//连接至下一个点;
 
 protected:
 	MyPoint			m_point;
 	int				m_index;
 	CPointItem		*m_pNextItem;
 	int				m_value;
+
 };
 
 #endif

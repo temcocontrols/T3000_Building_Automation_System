@@ -69,8 +69,8 @@ static uint16_t Treply_timeout = 260;
 /* node must wait for a remote node to begin using a token or replying to */
 /* a Poll For Master frame: 20 milliseconds. (Implementations may use */
 /* larger values for this timeout, not to exceed 100 milliseconds.) */
-static uint8_t Tusage_timeout = 50;
-//static uint8_t Tusage_timeout = 20;//Fance
+//static uint8_t Tusage_timeout = 50;
+static uint8_t Tusage_timeout = 20;//Fance default is 50
 /* Timer that indicates line silence - and functions */
 static uint32_t Timer_Silence(
     void *pArg)
@@ -139,6 +139,8 @@ uint16_t dlmstp_receive(
     /* see if there is a packet available, and a place
        to put the reply (if necessary) and process it */
     wait_status = WaitForSingleObject(Receive_Packet_Flag, timeout);
+
+	
     if (wait_status == WAIT_OBJECT_0) {
         if (Receive_Packet.ready) {
             if (Receive_Packet.pdu_len) {
@@ -659,11 +661,13 @@ bool dlmstp_init(
     fprintf(stderr, "MS/TP Max_Info_Frames: %u\n",
         (unsigned) MSTP_Port.Nmax_info_frames);
 #endif
-    hThread1 = _beginthread(dlmstp_receive_fsm_task, 4096, &arg_value);
+    //hThread1 = _beginthread(dlmstp_receive_fsm_task, 4096, &arg_value);
+	  hThread1 = _beginthread(dlmstp_receive_fsm_task, 0, &arg_value);
     if (hThread1 == 0) {
         fprintf(stderr, "Failed to start recive FSM task\n");
     }
-    hThread2 = _beginthread(dlmstp_master_fsm_task, 4096, &arg_value);
+    //hThread2 = _beginthread(dlmstp_master_fsm_task, 4096, &arg_value);
+	  hThread2 = _beginthread(dlmstp_master_fsm_task, 0, &arg_value);
     if (hThread2 == 0) {
         fprintf(stderr, "Failed to start Master Node FSM task\n");
     }

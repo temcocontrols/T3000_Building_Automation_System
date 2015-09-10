@@ -804,6 +804,7 @@ void CTempHumSensorForm::OnDestroy()
 void CTempHumSensorForm::OnEnSetfocusEditTempValue()
 {
 	m_EDIT_ID=IDC_EDIT_TEMP_VALUE; 
+   
 }
 
 
@@ -895,8 +896,8 @@ void CTempHumSensorForm::OnEnKillfocusEditTempFilter()
 void CTempHumSensorForm::OnEnKillfocusEditHumFilter()
 {
 	if (m_EDIT_ID==0)
-	{
-		return;
+    {
+        return;
 	}
 	GetDlgItem(m_EDIT_ID)->GetWindowTextW(m_newvalue);
 	if (m_newvalue.CompareNoCase(m_oldvalue)==0)

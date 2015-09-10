@@ -11,12 +11,16 @@
 #include "Bacnet_Include.h"
 #include "globle_function.h"
 #include "gloab_define.h"
+#include "BacnetProgramSetting.h"
 extern int error;
 extern char *pmes;
+//extern int Station_NUM;
 //extern int program_list_line;
-
+vector <Str_char_pos_color> m_prg_char_color;	//用于highlight 关键字用;
+vector <Str_char_pos_color> buffer_prg_char_color; //用于防止频繁更新界面引起的闪烁问题;
 // CBacnetProgramEdit dialog
 CString program_string;
+CString AnalysisString;
  char editbuf[25000];
  extern char my_display[10240];
  extern int Encode_Program();
@@ -27,10 +31,19 @@ extern void  init_info_table( void );
 extern void Init_table_bank();
 extern char mesbuf[1024];
 extern int renumvar;
-
 extern char *desassembler_program();
 extern void copy_data_to_ptrpanel(int Data_type);
+extern void check_high_light();
+CString high_light_string;
 HWND mParent_Hwnd;
+
+bool show_upper;
+DWORD prg_text_color;
+DWORD prg_label_color;
+DWORD prg_command_color;
+DWORD prg_function_color;
+CString prg_character_font;
+bool prg_color_change;
 
 IMPLEMENT_DYNAMIC(CBacnetProgramEdit, CDialogEx)
 
@@ -66,6 +79,8 @@ BEGIN_MESSAGE_MAP(CBacnetProgramEdit, CDialogEx)
 	ON_EN_SETFOCUS(IDC_RICHEDIT2_PROGRAM, &CBacnetProgramEdit::OnEnSetfocusRichedit2Program)
 	ON_COMMAND(ID_REFRESH, &CBacnetProgramEdit::OnRefresh)
 	ON_WM_HELPINFO()
+	ON_COMMAND(ID_PROGRAM_IDE_SETTINGS, &CBacnetProgramEdit::OnProgramIdeSettings)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -129,15 +144,10 @@ void CBacnetProgramEdit::Initial_static()
 }
 extern char my_panel;
 
-BOOL CBacnetProgramEdit::OnInitDialog()
-{
-	CDialogEx::OnInitDialog();
-	((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Unreg_Hotkey();
-	// TODO:  Add extra initialization here
-	m_edit_changed = false;
-	my_panel = bac_gloab_panel; //Set the panel number
-	GetDlgItem(IDC_RICHEDIT2_PROGRAM)->SetFocus();
 
+
+void CBacnetProgramEdit::SetRicheditFont(long nStartchar,long nEndchar,DWORD nColor)
+{
 	CHARFORMAT cf;
 	ZeroMemory(&cf, sizeof(CHARFORMAT));
 	cf.cbSize = sizeof(CHARFORMAT);
@@ -152,15 +162,97 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	cf.dwEffects&=~CFE_UNDERLINE;
 	//cf.dwEffects|=~CFE_UNDERLINE; //斜体，取消用cf.dwEffects&=~CFE_UNDERLINE;
 	cf.dwMask|=CFM_COLOR;
-	cf.crTextColor = RGB(0,0,255); //设置颜色
+	cf.crTextColor = nColor;//RGB(0,0,255); //设置颜色
 	cf.dwMask|=CFM_SIZE;
-	cf.yHeight =300; //设置高度
+	cf.yHeight =250; //设置高度
 	cf.dwMask|=CFM_FACE;
 	//_tcscpy(cf.szFaceName ,_T("SimSun-ExtB"));
 	//_tcscpy(cf.szFaceName ,_T("Times New Roman"));
 	//	strcpy(cf.szFaceName ,_T("隶书")); //设置字体
-	_tcscpy(cf.szFaceName ,_T("Arial"));
+	_tcscpy(cf.szFaceName , prg_character_font);
+	//_tcscpy(cf.szFaceName ,_T("NSimSun"));
+	//
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(nStartchar,nEndchar);
+	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSelectionCharFormat(cf);
+
+}
+
+
+void CBacnetProgramEdit::GetColor()
+{
+	prg_text_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Text Color"),DEFAULT_PRG_TEXT_COLOR,g_cstring_ini_path);
+	prg_label_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Label Color"),DEFAULT_PRG_LABEL_COLOR,g_cstring_ini_path);
+	prg_command_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Command Color"),DEFAULT_PRG_COMMAND_COLOR,g_cstring_ini_path);
+	prg_function_color = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Function Color"),DEFAULT_PRG_FUNCTION_COLOR,g_cstring_ini_path);
+	show_upper = (DWORD)GetPrivateProfileInt(_T("Program_IDE_Color"),_T("Upper Case"),1,g_cstring_ini_path);
+	GetPrivateProfileString(_T("Program_IDE_Color"),_T("Text Font"),_T("Arial"),prg_character_font.GetBuffer(MAX_PATH),MAX_PATH,g_cstring_ini_path);
+	prg_character_font.ReleaseBuffer();
 	
+	bool found_font = false;
+	for (int i=0;i< (sizeof(Program_Fonts) / sizeof(Program_Fonts[0])) ; i++ )
+	{
+		if(prg_character_font.CompareNoCase(Program_Fonts[i]) == 0 )
+		{
+			found_font = true;
+			break;
+		}
+	}
+
+	if(!found_font)
+	{
+		prg_character_font.Format(_T("Arial"));
+		WritePrivateProfileString(_T("Program_IDE_Color"),_T("Text Font"),_T("Arial"),g_cstring_ini_path);
+	}
+}
+
+BOOL CBacnetProgramEdit::OnInitDialog()
+{
+
+	CDialogEx::OnInitDialog();
+	CString ShowProgramText;
+	CString temp_label;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(program_list_line).label,(int)strlen((char *)m_Program_data.at(program_list_line).label)+1, 
+		temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+	temp_label.ReleaseBuffer();	
+	if(temp_label.IsEmpty())
+	{
+		temp_label.Format(_T("PRG%d"),program_list_line + 1);
+	}
+
+	ShowProgramText.Format(_T("Panel :  %u      Program  :  %u      Name  :  "),Station_NUM,program_list_line + 1 );
+	ShowProgramText = ShowProgramText + temp_label;
+	SetWindowText(ShowProgramText);
+	((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Unreg_Hotkey();
+	prg_character_font.Empty();
+	// TODO:  Add extra initialization here
+	m_edit_changed = false;
+	my_panel = bac_gloab_panel; //Set the panel number
+	AnalysisString.Empty();
+	GetDlgItem(IDC_RICHEDIT2_PROGRAM)->SetFocus();
+	GetColor();
+	CHARFORMAT cf;
+	ZeroMemory(&cf, sizeof(CHARFORMAT));
+	cf.cbSize = sizeof(CHARFORMAT);
+	cf.dwMask|=CFM_BOLD;
+
+	cf.dwEffects&=~CFE_BOLD;
+	//cf.dwEffects|=~CFE_BOLD; //粗体，取消用cf.dwEffects&=~CFE_BOLD;
+	cf.dwMask|=CFM_ITALIC;
+	cf.dwEffects&=~CFE_ITALIC;
+	//cf.dwEffects|=~CFE_ITALIC; //斜体，取消用cf.dwEffects&=~CFE_ITALIC;
+	cf.dwMask|=CFM_UNDERLINE;
+	cf.dwEffects&=~CFE_UNDERLINE;
+	//cf.dwEffects|=~CFE_UNDERLINE; //斜体，取消用cf.dwEffects&=~CFE_UNDERLINE;
+	cf.dwMask|=CFM_COLOR;
+	cf.crTextColor = prg_text_color;//RGB(0,0,255); //设置颜色
+	cf.dwMask|=CFM_SIZE;
+	cf.yHeight =250; //设置高度
+	cf.dwMask|=CFM_FACE;
+	//_tcscpy(cf.szFaceName ,_T("SimSun-ExtB"));
+	//_tcscpy(cf.szFaceName ,_T("Times New Roman"));
+	//	strcpy(cf.szFaceName ,_T("隶书")); //设置字体
+	_tcscpy(cf.szFaceName , prg_character_font);
+	//_tcscpy(cf.szFaceName ,_T("NSimSun"));
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSelectionCharFormat(cf);
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetDefaultCharFormat(cf); 
 
@@ -180,6 +272,7 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	Init_table_bank();
 
 	mParent_Hwnd = g_hwnd_now;
+	prg_color_change = false;
 
 	m_program_edit_hwnd = this->m_hWnd;
 	g_hwnd_now = m_program_edit_hwnd;
@@ -187,6 +280,8 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	copy_data_to_ptrpanel(TYPE_ALL);
 	memset(my_display,0,sizeof(my_display));
 	PostMessage(WM_REFRESH_BAC_PROGRAM_RICHEDIT,NULL,NULL);
+
+	//SetTimer(1,60000,NULL);
 	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -212,11 +307,22 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	::MultiByteToWideChar( CP_ACP,  0,my_display,-1,temp.GetBuffer(unicodeLen),unicodeLen ); 
 	temp.ReleaseBuffer();
 	CString temp1 = temp;
-	temp1.MakeUpper();
+	if(show_upper)
+	{
+		temp1.MakeUpper();
+	}
+	else
+		temp1.MakeLower();
+
+	temp1.Replace(_T("\r\n"),_T("  \r\n"));
+	temp1.Replace(_T("\("),_T(" \( "));
+	temp1.Replace(_T("\)"),_T(" \) "));
 
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(temp1);
 	m_edit_changed = false;
 	program_string = temp1;
+	UpdateDataProgramText();
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(-1,-1);
 	return 0;
 }
 
@@ -366,14 +472,14 @@ void CBacnetProgramEdit::OnSend()
 						{
 							//MessageBox(_T("Operation success!"),_T("Information"),MB_OK);
 							//return;
-							goto	part_success;
+							goto	program_part_success;
 						}
 					}
 					b_program_status = false;
 					MessageBox(_T("Write Program Code Timeout!"));
 					return;
 
-part_success:
+program_part_success:
 					continue;
 				}
 			}
@@ -418,7 +524,7 @@ part_success:
 
 		MessageBox(_T("Errors,program NOT Sent!"));
 	}
-
+	UpdateDataProgramText();
 }
 
 
@@ -451,6 +557,8 @@ void CBacnetProgramEdit::OnClear()
 void CBacnetProgramEdit::OnLoadfile()
 {
 	// TODO: Add your command handler code here
+
+
 	CString FilePath;
 	CString ReadBuffer;
 
@@ -498,6 +606,15 @@ void CBacnetProgramEdit::OnSavefile()
 	{
 		CString Write_Buffer;
 		CString FilePath;
+		FilePath=dlg.GetPathName();
+		CFileFind temp_find;
+		if(temp_find.FindFile(FilePath))
+		{
+			DeleteFile(FilePath);
+		}
+
+
+
 		GetDlgItemText(IDC_RICHEDIT2_PROGRAM,Write_Buffer);
 		//char *readytowrite = 
 		char*     readytowrite;
@@ -507,7 +624,7 @@ void CBacnetProgramEdit::OnSavefile()
 		memset( ( void* )readytowrite, 0, sizeof( char ) * ( iTextLen + 1 ) );
 		::WideCharToMultiByte( CP_ACP,0,Write_Buffer,-1,readytowrite,iTextLen,NULL,NULL );
 
-		FilePath=dlg.GetPathName();
+		
 
 		CFile file(FilePath,CFile::modeCreate |CFile::modeReadWrite |CFile::modeNoTruncate);
 		file.SeekToEnd();
@@ -619,3 +736,97 @@ BOOL CBacnetProgramEdit::OnHelpInfo(HELPINFO* pHelpInfo)
 	}
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }
+
+void CBacnetProgramEdit::OnProgramIdeSettings()
+{
+	// TODO: Add your command handler code here
+	CBacnetProgramSetting ProgramSettingdlg;
+	ProgramSettingdlg.DoModal();
+	if(prg_color_change)
+	{
+		AnalysisString.Empty();
+		UpdateDataProgramText();
+		prg_color_change = false;
+		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(0, 0); //操作完成后还原现场;
+	}
+
+}
+
+
+void CBacnetProgramEdit::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+	UpdateDataProgramText();
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+void CBacnetProgramEdit::UpdateDataProgramText()
+{
+	CString Edit_Buffer;
+	GetDlgItemText(IDC_RICHEDIT2_PROGRAM,Edit_Buffer);
+	if(AnalysisString.CompareNoCase(Edit_Buffer) != 0)
+	{
+		AnalysisString = Edit_Buffer;
+		TRACE(_T("AnalysisString\r\n"));
+		CString tempcs;
+		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
+		tempcs.MakeUpper();
+		high_light_string = tempcs;
+		check_high_light();
+
+
+		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->HideSelection(TRUE,FALSE);
+		SetRicheditFont(0,-1,prg_text_color);
+
+		long temp_sel_str = 0;
+		long temp_sel_end = 0;
+		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(temp_sel_str, temp_sel_end); //记住刷新前用户选择的部分;
+
+		for (int i=0;i<m_prg_char_color.size();i++)
+		{
+			SetRicheditFont(m_prg_char_color.at(i).startpos,m_prg_char_color.at(i).endpos,m_prg_char_color.at(i).ncolor);
+		}
+		//if(temp_sel_str!= temp_sel_end)
+			((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(temp_sel_end, temp_sel_end); //操作完成后还原现场;
+
+		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->HideSelection(FALSE,FALSE);
+	}
+	else
+	{
+		TRACE(_T("The same\r\n"));
+	}
+
+
+	SetBackFont();
+	return;
+}
+
+void CBacnetProgramEdit::SetBackFont()
+{
+	CHARFORMAT cf;
+	ZeroMemory(&cf, sizeof(CHARFORMAT));
+	cf.cbSize = sizeof(CHARFORMAT);
+	cf.dwMask|=CFM_BOLD;
+
+	cf.dwEffects&=~CFE_BOLD;
+	//cf.dwEffects|=~CFE_BOLD; //粗体，取消用cf.dwEffects&=~CFE_BOLD;
+	cf.dwMask|=CFM_ITALIC;
+	cf.dwEffects&=~CFE_ITALIC;
+	//cf.dwEffects|=~CFE_ITALIC; //斜体，取消用cf.dwEffects&=~CFE_ITALIC;
+	cf.dwMask|=CFM_UNDERLINE;
+	cf.dwEffects&=~CFE_UNDERLINE;
+	//cf.dwEffects|=~CFE_UNDERLINE; //斜体，取消用cf.dwEffects&=~CFE_UNDERLINE;
+	cf.dwMask|=CFM_COLOR;
+	cf.crTextColor = prg_text_color;//RGB(0,0,255); //设置颜色
+	cf.dwMask|=CFM_SIZE;
+	cf.yHeight =250; //设置高度
+	cf.dwMask|=CFM_FACE;
+	//_tcscpy(cf.szFaceName ,_T("SimSun-ExtB"));
+	//_tcscpy(cf.szFaceName ,_T("Times New Roman"));
+	//	strcpy(cf.szFaceName ,_T("隶书")); //设置字体
+	_tcscpy(cf.szFaceName , prg_character_font);
+	//_tcscpy(cf.szFaceName ,_T("NSimSun"));
+	//((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSelectionCharFormat(cf);
+	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetDefaultCharFormat(cf); 
+
+};

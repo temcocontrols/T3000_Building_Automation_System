@@ -8,7 +8,7 @@ CPointItem::CPointItem(void)
 	m_point.y=0;
 	m_index = 0;
 	m_pNextItem =NULL;
-
+	m_link_to_next = true;
 //	m_CPU_Loading = GetCPUpercent();
 }
 

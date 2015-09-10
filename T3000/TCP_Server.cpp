@@ -373,7 +373,10 @@ void CALLBACK Listen(SOCKET s, int ServerPort, const char *ClientIP)
 		str_panelnumber.Format(_T("%u"),m_bac_scan_result_data.at(0).panel_number);
 		product_class_id.Format(_T("%d"),m_bac_scan_result_data.at(0).product_type);
 		strmodbusid.Format(_T("%d"),m_bac_scan_result_data.at(0).modbus_addr);
-		strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol)   values('"+pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','"+str_serialid+"','floor1','room1','"+str_screen_name+"','"+product_class_id+"','"+strmodbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hinstance+"','"+str_panelnumber+"','"+str_n_port+"','0','5')"));
+		strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Custom)   values('"
+        +pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','"+str_serialid+"','floor1','room1','"
+        +str_screen_name+"','"+product_class_id+"','"+strmodbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"
+        +str_hinstance+"','"+str_panelnumber+"','"+str_n_port+"','0','5','0')"));
 		bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 
 		 

@@ -47,6 +47,7 @@ protected:
 public:
 	 
 	afx_msg void OnEnKillfocustempBacklight();
+    afx_msg void OnEnKillfocusMaxScaleAQ();
 	afx_msg void OnEnChangeBacklight();
 	//afx_msg void OnEnKillfocusBackLightTime();
  
@@ -325,6 +326,7 @@ public:
 	afx_msg void OnNMClickList2_AQ(NMHDR *pNMHDR, LRESULT *pResult);
 
 	afx_msg void OnNMClickList_User(NMHDR *pNMHDR, LRESULT *pResult);
+    CEdit m_max_scale_aq_edit;
 };		
 
 

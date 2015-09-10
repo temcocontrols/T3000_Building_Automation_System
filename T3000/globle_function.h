@@ -114,9 +114,6 @@ int GetProgramData_Blocking(uint32_t deviceid,uint8_t start_instance,uint8_t end
 int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
 
-int GetPrivateSubData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
-int GetPrivateSubData(uint16_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,uint16_t entitysize);
-
 int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint16_t ntotal_seg,uint16_t nseg_index,MonitorUpdateData* up_data);
 int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance );
 int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
@@ -124,6 +121,7 @@ int WriteProgramData_Blocking(uint32_t deviceid,uint8_t n_command,uint8_t start_
 int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t nstop_index);
 int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag);
 bool Check_Label_Exsit(LPCTSTR m_new_label);
+bool Check_FullLabel_Exsit(LPCTSTR m_new_fulllabel);
 void local_handler_conf_private_trans_ack(
 	uint8_t * service_request,
 	uint16_t service_len,
@@ -195,6 +193,7 @@ void TraverseFolder( const CString& strDir,std::vector<CString>& vecFile);
 void LoadTstat_InputData();
 void LoadInputData_CS3000();
 CString GetTextFromReg(unsigned short reg);
+CString GetTextFromReg_Buffer(unsigned short reg,unsigned short *Buffer);
 void LoadTstat_OutputData();
 void LoadOutputData_CS3000();
 
@@ -203,5 +202,9 @@ void  LoadRegistersGraphicMode();
 void  LoadRegistersGraphicMode_AQ();
 void  LoadRegistersGraphicMode_HUMTEMPSENSOR();
 void  LoadRegistersGraphicMode_CO2485();
-
+BOOL  ReadLineFromHexFile(CFile& file, char* pBuffer);
+int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
+int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
+BOOL HexFileValidation(const CString& strFileName);
+BOOL BinFileValidation(const CString& strFileName);
 #endif

@@ -13,9 +13,9 @@
 #include "globle_function.h"
 #include "gloab_define.h"
 
-extern int Station_NUM;
+//extern int Station_NUM;
 // BacnetController dialog
-Str_controller_point m_temp_controller_data[BAC_CONTROLLER_COUNT];
+
 
 extern int pointtotext_for_controller(char *buf,Point_T3000 *point);
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
@@ -120,26 +120,30 @@ BOOL BacnetController::PreTranslateMessage(MSG* pMsg)
 
 void BacnetController::Initial_List()
 {
+	m_controller_list.ShowWindow(SW_HIDE);
+	m_controller_list.DeleteAllItems();
+	while ( m_controller_list.DeleteColumn (0)) ;
+
 	m_controller_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	m_controller_list.SetExtendedStyle(m_controller_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_controller_list.InsertColumn(CONTROLLER_NUM, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-	m_controller_list.InsertColumn(CONTROLLER_INPUT, _T("Input"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_INPUTVALUE, _T("Value"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_INPUTUNITS, _T("Units"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_AUTO_MANUAL, _T("A/M"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_OUTPUT, _T("Output"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_SETPOINT, _T("Setpoint"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_SETVALUE, _T("Set Value"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_SETPOINTUNITS, _T("Units"), 70, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_ACTION, _T("Action"), 70, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_PROPORTIONAL, _T("Proportional"), 70, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_RESET, _T("Reset"), 70, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_RATE, _T("Rate"), 70, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_BIAS, _T("Bias"), 70, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_controller_list.InsertColumn(CONTROLLER_SAMPLE_TIME, _T("Sample Time"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_NUM, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_controller_list.InsertColumn(CONTROLLER_INPUT, _T("Input"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_INPUTVALUE, _T("Value"), 60, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_INPUTUNITS, _T("Units"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_AUTO_MANUAL, _T("A/M"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_OUTPUT, _T("Output"), 100, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_SETPOINT, _T("Setpoint"), 60, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_SETVALUE, _T("Set Value"), 60, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_SETPOINTUNITS, _T("Units"), 70, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_ACTION, _T("Action"), 50, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_PROPORTIONAL, _T("Prop"), 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_RESET, _T("Int"), 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_RATE, _T("Der"), 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_controller_list.InsertColumn(CONTROLLER_BIAS, _T("Bias"), 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	
 	
 	m_controller_dlg_hwnd = this->m_hWnd;
-	g_hwnd_now = m_controller_dlg_hwnd;
+	//g_hwnd_now = m_controller_dlg_hwnd;
 
 	CRect list_rect,win_rect;
 	m_controller_list.GetWindowRect(list_rect);
@@ -155,16 +159,12 @@ void BacnetController::Initial_List()
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
 		CString temp_des;
 		CString temp_units;
+
+		if(i>=controller_item_limit_count)
+			break;
+
 		temp_item.Format(_T("%d"),i+1);
 		m_controller_list.InsertItem(i,temp_item);
-		//if(ListCtrlEx::ComboBox == m_controller_list.GetColumnType(CONTROLLER_AUTO_MANUAL))
-		//{
-		//	ListCtrlEx::CStrList strlist;
-		//	strlist.push_back(_T("Auto"));
-		//	strlist.push_back(_T("Manual"));
-		//	m_controller_list.SetCellStringList(i, CONTROLLER_AUTO_MANUAL, strlist);
-		//}
-		//m_controller_list.SetCellEnabled(i,CONTROLLER_INPUTVALUE,0);
 		m_controller_list.SetCellEnabled(i,CONTROLLER_INPUTUNITS,0);
 		m_controller_list.SetCellEnabled(i,CONTROLLER_SETPOINTUNITS,0);
 
@@ -177,6 +177,8 @@ void BacnetController::Initial_List()
 				m_controller_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
 		}
 	}
+	m_controller_list.InitListData();
+		m_controller_list.ShowWindow(SW_SHOW);
 }
 
 LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
@@ -194,10 +196,10 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 	else
 	{
 #if 1
-		if(m_controller_list.IsDataNewer((char *)&m_controller_data.at(0),sizeof(Str_controller_point) * BAC_CONTROLLER_COUNT))
+		if(m_controller_list.IsDataNewer((char *)&m_controller_data.at(0),sizeof(Str_controller_point) * BAC_PID_COUNT))
 		{
 			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
-			m_controller_list.SetListData((char *)&m_controller_data.at(0),sizeof(Str_controller_point) * BAC_CONTROLLER_COUNT);
+			m_controller_list.SetListData((char *)&m_controller_data.at(0),sizeof(Str_controller_point) * BAC_PID_COUNT);
 		}
 		else
 		{
@@ -210,6 +212,8 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 
 	for (int i=0;i<(int)m_controller_data.size();i++)
 	{
+		if(i>=controller_item_limit_count)
+			break;
 
 		if(isFreshOne)
 		{
@@ -217,92 +221,78 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 		}
 
 		temp_des2.Empty();
-		if(m_controller_data.at(i).input.number< BAC_INPUT_ITEM_COUNT)
-		{	
-			if(m_controller_data.at(i).input.point_type != 2 )	//如果不是Input
-			{
-				temp_des2.Empty();
-				temp_in_unit.Empty();
-			}
-			else//
-			{
-			MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(m_controller_data.at(i).input.number ).label, 
-				(int)strlen((char *)m_Input_data.at(m_controller_data.at(i).input.number ).label)+1, 
-				temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
-			temp_des2.ReleaseBuffer();	
 
+		if(2 == m_controller_data.at(i).input.point_type)
+		{
+			if(m_controller_data.at(i).input.number< BAC_INPUT_ITEM_COUNT)
+			{	
+					MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(m_controller_data.at(i).input.number ).label, 
+						(int)strlen((char *)m_Input_data.at(m_controller_data.at(i).input.number ).label)+1, 
+						temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
+					temp_des2.ReleaseBuffer();	
+
+
+					if(temp_des2.GetLength()>9)
+						temp_des2.Format(_T("%d-IN%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number);
+					if(temp_des2.IsEmpty())
+						temp_des2.Format(_T("%d-IN%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number);
+
+					//temp_des3.Format(_T("%d"),m_Input_data.at(m_controller_data.at(i).input.number - 1).value);	
+					CString cstemp_value;
+					float temp_float_value;
+					temp_float_value = ((float)m_controller_data.at(i).input_value) / 1000;
+
+					cstemp_value.Format(_T("%.1f"),temp_float_value);
+					m_controller_list.SetItemText(i,CONTROLLER_INPUTVALUE,cstemp_value);
+
+
+					//********************************************************************************************************
+					// bind the the input units.
+					int x = m_controller_data.at(i).input.number;
+					if(m_Input_data.at(x).digital_analog == BAC_UNITS_ANALOG)
+					{
+						m_controller_list.SetItemText(i,CONTROLLER_INPUTUNITS,Input_List_Analog_Units[m_Input_data.at(x).range]);
+					}
 			
-			if(temp_des2.GetLength()>9)
-				temp_des2.Format(_T("%d-IN%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number);
-			if(temp_des2.IsEmpty())
-				temp_des2.Format(_T("%d-IN%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number);
-
-			//temp_des3.Format(_T("%d"),m_Input_data.at(m_controller_data.at(i).input.number - 1).value);	
-			CString cstemp_value;
-			float temp_float_value;
-			temp_float_value = ((float)m_controller_data.at(i).input_value) / 1000;
-
-			cstemp_value.Format(_T("%.1f"),temp_float_value);
-			m_controller_list.SetItemText(i,CONTROLLER_INPUTVALUE,cstemp_value);
-
-
-			//********************************************************************************************************
-			// bind the the input units.
-			int x = m_controller_data.at(i).input.number;
-			if(m_Input_data.at(x).digital_analog == BAC_UNITS_ANALOG)
-			{
-				//m_input_list.SetItemText(i,INPUT_RANGE,Input_Analog_Units_Array[m_Input_data.at(i).range]);
-				m_controller_list.SetItemText(i,CONTROLLER_INPUTUNITS,Input_List_Analog_Units[m_Input_data.at(x).range]);
-
-
-				//CString temp_value;
-				//temp_value.Format(_T("%d"),m_Input_data.at(i).value);
-				//m_input_list.SetItemText(i,INPUT_VALUE,temp_value);
-
-				//temp_cal.Format(_T("%d"),(m_Input_data.at(i).calibration));
-				//m_input_list.SetItemText(i,INPUT_CAL,temp_cal);
-			}
-			//Digital 的暂时不考虑;
-			//else if(m_Input_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
-			//{
-
-			//	m_input_list.SetItemText(i,INPUT_CAL,_T(""));
-			//	m_input_list.SetItemText(i,INPUT_RANGE,Digital_Units_Array[m_Input_data.at(i).range]);
-			//	m_input_list.SetItemText(i,INPUT_UNITE,_T(""));
-
-			//	if((m_Input_data.at(i).range>=12)&&(m_Input_data.at(i).range<=22))
-			//	{
-			//		CString temp1;
-			//		CStringArray temparray;
-			//		temp1 = Digital_Units_Array[m_Input_data.at(i).range - 11];//11 is the sizeof the array
-			//		SplitCStringA(temparray,temp1,_T("/"));
-			//		if((temparray.GetSize()==2)&&(!temparray.GetAt(1).IsEmpty()))
-			//		{
-			//			m_input_list.SetItemText(i,INPUT_VALUE,temparray.GetAt(1));
-			//		}
-			//		m_input_list.SetItemText(i,INPUT_RANGE,temp1);
-			//	}
-			//	else if((m_Input_data.at(i).range>=1)&&(m_Input_data.at(i).range<=11))
-			//	{
-			//		CString temp1;
-			//		CStringArray temparray;
-			//		temp1 = Digital_Units_Array[m_Input_data.at(i).range];
-			//		SplitCStringA(temparray,temp1,_T("/"));
-			//		if((temparray.GetSize()==2)&&(!temparray.GetAt(0).IsEmpty()))
-			//		{
-			//			m_input_list.SetItemText(i,INPUT_VALUE,temparray.GetAt(0));
-			//		}
-			//		m_input_list.SetItemText(i,INPUT_RANGE,temp1);
-			//	}
-			//	else
-			//	{
-			//		m_input_list.SetItemText(i,INPUT_UNITE,Input_List_Analog_Units[0]);
-			//	}
-			//}
-			//********************************************************************************************************
-
 			}
 		}
+		else if(3 == m_controller_data.at(i).input.point_type)
+		{
+			if(m_controller_data.at(i).input.number< BAC_VARIABLE_ITEM_COUNT)
+			{	
+					MultiByteToWideChar( CP_ACP, 0, (char *)m_Variable_data.at(m_controller_data.at(i).input.number ).label, 
+						(int)strlen((char *)m_Variable_data.at(m_controller_data.at(i).input.number ).label)+1, 
+						temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
+					temp_des2.ReleaseBuffer();	
+
+
+
+					if(temp_des2.GetLength()>9)
+						temp_des2.Format(_T("%d-VAR%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number);
+					if(temp_des2.IsEmpty())
+						temp_des2.Format(_T("%d-VAR%d"),m_controller_data.at(i).input.panel,m_controller_data.at(i).input.number);
+
+					//temp_des3.Format(_T("%d"),m_Input_data.at(m_controller_data.at(i).input.number - 1).value);	
+					CString cstemp_value;
+					float temp_float_value;
+					temp_float_value = ((float)m_controller_data.at(i).input_value) / 1000;
+
+					cstemp_value.Format(_T("%.1f"),temp_float_value);
+					m_controller_list.SetItemText(i,CONTROLLER_INPUTVALUE,cstemp_value);
+
+
+					//********************************************************************************************************
+					// bind the the input units.
+					int x = m_controller_data.at(i).input.number;
+					if(m_Variable_data.at(x).digital_analog == BAC_UNITS_ANALOG)
+					{
+						if(m_Variable_data.at(x).range <= sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))
+							m_controller_list.SetItemText(i,CONTROLLER_INPUTUNITS,Variable_Analog_Units_Array[m_Variable_data.at(x).range]);
+					}
+			
+			}
+		}
+		
 		m_controller_list.SetItemText(i,CONTROLLER_INPUT,temp_des2);
 
 		float persend_data;
@@ -311,9 +301,9 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 		temp_output_value.Format(_T("%.1f%%"),persend_data);
 		m_controller_list.SetItemText(i,CONTROLLER_OUTPUT,temp_output_value);
 
-		CString temp_sample_time;
-		temp_sample_time.Format(_T("%u"),m_controller_data.at(i).sample_time);
-		m_controller_list.SetItemText(i,CONTROLLER_SAMPLE_TIME,temp_sample_time);
+		//CString temp_sample_time;
+		//temp_sample_time.Format(_T("%u"),m_controller_data.at(i).sample_time);
+		//m_controller_list.SetItemText(i,CONTROLLER_SAMPLE_TIME,temp_sample_time);
 		//temp_des2.Format(_T("%d"),m_controller_data.at(i).input_value);
 		//m_controller_list.SetItemText(i,CONTROLLER_INPUTVALUE,temp_des2);
 
@@ -658,7 +648,7 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 		CString cs_temp = m_controller_list.GetItemText(Changed_Item,Changed_SubItem);
 		if(cs_temp.IsEmpty() == false)
 		{
-
+			cs_temp.MakeUpper();
 
 			char cTemp1[255];
 			char temp_input[250];
@@ -696,30 +686,56 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 				if(temp_number > 0);	//因为Input2  的number 是1;
 					temp_number = temp_number - 1;
 				temp_point_type = temp_point_type + 1;
-				if(temp_point_type != 2)
+				if(2 == temp_point_type)
+				{
+					m_controller_data.at(Changed_Item).input.number = temp_number;
+					m_controller_data.at(Changed_Item).input.panel = temp_panel;//bac_gloab_panel;
+					m_controller_data.at(Changed_Item).input.point_type = temp_point_type;//1 means input point
+
+					CString temp_des3;
+					if(temp_number < BAC_INPUT_ITEM_COUNT)
+					{
+						//temp_des3.Format(_T("%d"),m_Input_data.at(temp_number - 1).value);
+
+						CString cstemp_value;
+						float temp_float_value;
+						temp_float_value = ((float)m_Input_data.at(temp_number).value) / 1000;
+						temp_des3.Format(_T("%.1f"),temp_float_value);
+
+
+						m_controller_data.at(Changed_Item).input_value = m_Input_data.at(temp_number).value;	
+
+						m_controller_list.SetItemText(Changed_Item,CONTROLLER_INPUTVALUE,temp_des3);
+					}
+				}
+				else if(3 == temp_point_type)
+				{
+					m_controller_data.at(Changed_Item).input.number = temp_number;
+					m_controller_data.at(Changed_Item).input.panel = temp_panel;//bac_gloab_panel;
+					m_controller_data.at(Changed_Item).input.point_type = temp_point_type;//1 means input point
+
+					CString temp_des3;
+					if(temp_number < BAC_VARIABLE_ITEM_COUNT)
+					{
+						//temp_des3.Format(_T("%d"),m_Input_data.at(temp_number - 1).value);
+
+						CString cstemp_value;
+						float temp_float_value;
+						temp_float_value = ((float)m_Variable_data.at(temp_number).value) / 1000;
+						temp_des3.Format(_T("%.1f"),temp_float_value);
+
+
+						m_controller_data.at(Changed_Item).input_value = m_Variable_data.at(temp_number).value;	
+
+						m_controller_list.SetItemText(Changed_Item,CONTROLLER_INPUTVALUE,temp_des3);
+					}
+				}
+				else
 				{
 					m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
 					return 0;
 				}
-				m_controller_data.at(Changed_Item).input.number = temp_number;
-				m_controller_data.at(Changed_Item).input.panel = temp_panel;//bac_gloab_panel;
-				m_controller_data.at(Changed_Item).input.point_type = temp_point_type;//1 means input point
 
-				CString temp_des3;
-				if(temp_number < BAC_INPUT_ITEM_COUNT)
-				{
-					//temp_des3.Format(_T("%d"),m_Input_data.at(temp_number - 1).value);
-
-					CString cstemp_value;
-					float temp_float_value;
-					temp_float_value = ((float)m_Input_data.at(temp_number).value) / 1000;
-					temp_des3.Format(_T("%.1f"),temp_float_value);
-
-
-					m_controller_data.at(Changed_Item).input_value = m_Input_data.at(temp_number).value;	
-
-					m_controller_list.SetItemText(Changed_Item,CONTROLLER_INPUTVALUE,temp_des3);
-				}
 
 			}
 			else
@@ -783,6 +799,13 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 		}
 	}
 
+	if(Changed_SubItem == CONTROLLER_OUTPUT)
+	{
+		CString temp_cs = m_controller_list.GetItemText(Changed_Item,Changed_SubItem);
+
+		int temp_int = (int)(_wtof(temp_cs) * 1000);
+		m_controller_data.at(Changed_Item).value = temp_int;
+	}
 
 	if(Changed_SubItem == CONTROLLER_SETPOINT)
 	{
@@ -862,6 +885,13 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 			m_controller_list.SetItemText(Changed_Item,CONTROLLER_SETVALUE,temp_des3);
 
 		}
+		else
+		{
+			CString temp_show_ret;
+			temp_show_ret = _T("\"") + cs_temp + _T("\"") + _T(" is a invalid label or keyword .");
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_show_ret);
+			m_controller_list.SetItemText(Changed_Item,CONTROLLER_SETPOINT,_T(""));
+		}
 	}
 
 	if(Changed_SubItem == CONTROLLER_PROPORTIONAL)
@@ -923,20 +953,6 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 		}
 	}
 
-	if(Changed_SubItem == CONTROLLER_SAMPLE_TIME)
-	{
-		//int temp_value = _wtoi(New_CString);
-		int temp_value = (int)(_wtoi(New_CString));
-		if((temp_value > 255) || (temp_value < 0))
-		{
-			MessageBox(_T("Please input a effective value"),_T("Information"),MB_OK |MB_ICONINFORMATION);
-			m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
-			return 0;
-		}
-		
-
-		m_controller_data.at(Changed_Item).sample_time = temp_value;
-	}
 
 
 	cmp_ret = memcmp(&m_temp_controller_data[Changed_Item],&m_controller_data.at(Changed_Item),sizeof(Str_controller_point));
@@ -944,7 +960,7 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 	{
 		m_controller_list.SetItemBkColor(Changed_Item,Changed_SubItem,LIST_ITEM_CHANGED_BKCOLOR);
 		temp_task_info.Format(_T("Write Controllers List Item%d .Changed to \"%s\" "),Changed_Item + 1,New_CString);
-		Post_Write_Message(g_bac_instance,WRITECONTROLLER_T3000,Changed_Item,Changed_Item,sizeof(Str_controller_point),m_controller_dlg_hwnd ,temp_task_info,Changed_Item,Changed_SubItem);
+		Post_Write_Message(g_bac_instance,WRITEPID_T3000,Changed_Item,Changed_Item,sizeof(Str_controller_point),m_controller_dlg_hwnd ,temp_task_info,Changed_Item,Changed_SubItem);
 
 	}
 
@@ -1003,12 +1019,18 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 			m_controller_data.at(lRow).auto_manual = 1;
 			m_controller_list.SetItemText(lRow,CONTROLLER_AUTO_MANUAL,_T("Manual"));
 			New_CString = _T("Manual");
+
+			m_controller_list.SetCellEnabled(lRow,CONTROLLER_OUTPUT,1);
+
+
 		}
 		else
 		{
 			m_controller_data.at(lRow).auto_manual = 0;
 			m_controller_list.SetItemText(lRow,CONTROLLER_AUTO_MANUAL,_T("Auto"));
 			New_CString = _T("Auto");
+			m_controller_list.SetCellEnabled(lRow,CONTROLLER_OUTPUT,0);
+
 		}
 	}
 	else
@@ -1030,7 +1052,7 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		m_controller_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
 		temp_task_info.Format(_T("Write Controller List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
-		Post_Write_Message(g_bac_instance,WRITECONTROLLER_T3000,(int8_t)lRow,(int8_t)lRow,sizeof(Str_controller_point),m_controller_dlg_hwnd,temp_task_info,lRow,lCol);
+		Post_Write_Message(g_bac_instance,WRITEPID_T3000,(int8_t)lRow,(int8_t)lRow,sizeof(Str_controller_point),m_controller_dlg_hwnd,temp_task_info,lRow,lCol);
 
 	}
 
@@ -1042,11 +1064,15 @@ void BacnetController::OnNMClickListController(NMHDR *pNMHDR, LRESULT *pResult)
 void BacnetController::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+	if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+	{
+		PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+	}
+	else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 	{
 	//PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
 	if(bac_select_device_online)
-		Post_Refresh_Message(g_bac_instance,READCONTROLLER_T3000,0,BAC_CONTROLLER_COUNT - 1,sizeof(Str_controller_point),BAC_CONTROLLER_GROUP);
+		Post_Refresh_Message(g_bac_instance,READCONTROLLER_T3000,0,BAC_PID_COUNT - 1,sizeof(Str_controller_point),BAC_PID_GROUP);
 	}
 	CDialogEx::OnTimer(nIDEvent);
 }
@@ -1068,6 +1094,37 @@ void BacnetController::OnCancel()
 	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,DELETE_WINDOW_MSG,0);
 	//CDialogEx::OnCancel();
 }
+
+
+int GetPidValue(int index,CString &Auto_M,CString &persend_data)
+{
+	CStringArray temparray;
+	CString temp1;
+	if(index >= BAC_PID_COUNT)
+	{
+		Auto_M.Empty();
+		return -1;
+	}
+	int i = index;
+
+	if(m_controller_data.at(i).auto_manual == 1)
+	{
+		Auto_M = _T("M");
+	}
+	else
+	{
+		Auto_M.Empty();
+	}
+
+	float temp_persend_data;
+	temp_persend_data = ((float)m_controller_data.at(i).value)/ 1000;
+	//CString temp_output_value;
+	persend_data.Format(_T("%.1f%%"),temp_persend_data);
+
+	return 1;
+}
+
+
 
 
 BOOL BacnetController::OnHelpInfo(HELPINFO* pHelpInfo)

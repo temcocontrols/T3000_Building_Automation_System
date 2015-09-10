@@ -15,7 +15,7 @@
 #include "AnnualRout_InsertDia.h"
 // BacnetAnnualRoutine dialog
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
-Str_annual_routine_point m_temp_annual_data[BAC_ANNUAL_ROUTINES_COUNT];
+
 IMPLEMENT_DYNAMIC(BacnetAnnualRoutine, CDialogEx)
 
 BacnetAnnualRoutine::BacnetAnnualRoutine(CWnd* pParent /*=NULL*/)
@@ -135,13 +135,17 @@ BOOL BacnetAnnualRoutine::OnInitDialog()
 
 void BacnetAnnualRoutine::Initial_List()
 {
+	m_annualr_list.ShowWindow(SW_HIDE);
+	m_annualr_list.DeleteAllItems();
+	while ( m_annualr_list.DeleteColumn (0)) ;
+
 	m_annualr_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	m_annualr_list.SetExtendedStyle(m_annualr_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_NUM, _T("NUM"), 60, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_FULL_LABEL, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_AUTO_MANUAL, _T("Auto/Manual"), 90, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_VALUE, _T("Value"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_LABLE, _T("Label"), 90, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_FULL_LABEL, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_AUTO_MANUAL, _T("Auto/Manual"), 90, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_VALUE, _T("Value"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_annualr_list.InsertColumn(ANNUAL_ROUTINE_LABLE, _T("Label"), 90, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_annual_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_annual_dlg_hwnd;
 
@@ -187,8 +191,9 @@ void BacnetAnnualRoutine::Initial_List()
 		}
 
 	}
+	m_annualr_list.InitListData();
 	m_annualr_list.SetCellChecked(0,0,1);// default will choose the first one
-
+	m_annualr_list.ShowWindow(SW_SHOW);
 }
 
 
@@ -271,7 +276,7 @@ void BacnetAnnualRoutine::OnNMClickListBacAnnuleList(NMHDR *pNMHDR, LRESULT *pRe
 	{
 		m_annualr_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
 		temp_task_info.Format(_T("Write Annual Routine List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
-		Post_Write_Message(g_bac_instance,WRITEANNUALROUTINE_T3000,lRow,lRow,sizeof(Str_annual_routine_point),m_annual_dlg_hwnd ,temp_task_info,lRow,lCol);
+		Post_Write_Message(g_bac_instance,WRITEHOLIDAY_T3000,lRow,lRow,sizeof(Str_annual_routine_point),m_annual_dlg_hwnd ,temp_task_info,lRow,lCol);
 	}
 
 	
@@ -286,10 +291,10 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_List(WPARAM wParam,LPARAM lPar
 	}
 	else
 	{
-		if(m_annualr_list.IsDataNewer((char *)&m_Annual_data.at(0),sizeof(Str_annual_routine_point) * BAC_ANNUAL_ROUTINES_COUNT))
+		if(m_annualr_list.IsDataNewer((char *)&m_Annual_data.at(0),sizeof(Str_annual_routine_point) * BAC_HOLIDAY_COUNT))
 		{
 			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
-			m_annualr_list.SetListData((char *)&m_Annual_data.at(0),sizeof(Str_annual_routine_point) * BAC_ANNUAL_ROUTINES_COUNT);
+			m_annualr_list.SetListData((char *)&m_Annual_data.at(0),sizeof(Str_annual_routine_point) * BAC_HOLIDAY_COUNT);
 		}
 		else
 		{
@@ -372,6 +377,7 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 		}
 		if(Check_Label_Exsit(cs_temp))
 		{
+			PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,Changed_Item,REFRESH_ON_ITEM);
 			return 0;
 		}
 
@@ -390,7 +396,11 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 			PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 			return 0;
 		}
-
+		if(Check_FullLabel_Exsit(cs_temp))
+		{
+			PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0;
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -428,7 +438,7 @@ LRESULT BacnetAnnualRoutine::Fresh_Annual_Routine_Item(WPARAM wParam,LPARAM lPar
 	{
 		m_annualr_list.SetItemBkColor(Changed_Item,Changed_SubItem,LIST_ITEM_CHANGED_BKCOLOR);
 	temp_task_info.Format(_T("Write Annual Routine List Item%d .Changed to \"%s\" "),Changed_Item + 1,New_CString);
-	Post_Write_Message(g_bac_instance,WRITEANNUALROUTINE_T3000,Changed_Item,Changed_Item,sizeof(Str_annual_routine_point),m_annual_dlg_hwnd ,temp_task_info,Changed_Item,Changed_SubItem);
+	Post_Write_Message(g_bac_instance,WRITEHOLIDAY_T3000,Changed_Item,Changed_Item,sizeof(Str_annual_routine_point),m_annual_dlg_hwnd ,temp_task_info,Changed_Item,Changed_SubItem);
 	}
 	return 0;
 }
@@ -440,7 +450,7 @@ void BacnetAnnualRoutine::OnTimer(UINT_PTR nIDEvent)
 	{
 	PostMessage(WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
 	if(bac_select_device_online)
-		Post_Refresh_Message(g_bac_instance,READANNUALROUTINE_T3000,0,BAC_ANNUAL_ROUTINES_COUNT - 1,sizeof(Str_annual_routine_point),BAC_ANNUAL_GROUP);
+		Post_Refresh_Message(g_bac_instance,READANNUALROUTINE_T3000,0,BAC_HOLIDAY_COUNT - 1,sizeof(Str_annual_routine_point),BAC_HOLIDAY_GROUP);
 	}
 	CDialogEx::OnTimer(nIDEvent);
 }
@@ -489,4 +499,43 @@ BOOL BacnetAnnualRoutine::OnHelpInfo(HELPINFO* pHelpInfo)
 	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
+}
+
+int GetHolidayLabel(int index,CString &ret_label)
+{
+	if(index >= BAC_HOLIDAY_COUNT)
+	{
+		ret_label.Empty();
+		return -1;
+	}
+	int i = index;
+	CString temp_des2;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_Annual_data.at(i).label, (int)strlen((char *)m_Annual_data.at(i).label)+1, 
+		ret_label.GetBuffer(MAX_PATH), MAX_PATH );
+	ret_label.ReleaseBuffer();
+
+	if(ret_label.IsEmpty())
+	{
+		ret_label.Format(_T("HOL%d"),index+1);
+	}
+
+	return 1;
+}
+
+int GetHolidayFullLabel(int index,CString &ret_full_label)
+{
+	if(index >= BAC_HOLIDAY_COUNT)
+	{
+		ret_full_label.Empty();
+		return -1;
+	}
+	int i = index;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_Annual_data.at(i).description, (int)strlen((char *)m_Annual_data.at(i).description)+1, 
+		ret_full_label.GetBuffer(MAX_PATH), MAX_PATH );
+	ret_full_label.ReleaseBuffer();
+	if(ret_full_label.IsEmpty())
+	{
+		ret_full_label.Format(_T("HOL%d"),index+1);
+	}
+	return 1;
 }

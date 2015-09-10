@@ -6,7 +6,7 @@
 #include "ImageTreeCtrl.h"
 
 #include "MainFrm.h"
-
+#include "globle_function.h"
 // CImageTreeCtrl
 enum ECmdHandler {
 	ID_RENAME = 1,
@@ -16,7 +16,8 @@ enum ECmdHandler {
 	ID_ADD_ROOT,
 	ID_SORT_LEVEL,
 	ID_SORT_LEVELANDBELOW,
-
+	ID_SORT_BY_CONNECTION,
+	ID_SORT_BY_FLOOR,
 	ID_MAX_CMD
 };
 
@@ -27,7 +28,88 @@ enum ERightDragHandler {
 
 	ID_MAX_DRH
 };
+ DWORD WINAPI _Background_Write_Name(LPVOID pParam){
+  CImageTreeCtrl* dlg=(CImageTreeCtrl*)(pParam);
+     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+     for (int i=0;i< pFrame->m_product.size();i++){
+         if (dlg->m_hSelItem == pFrame->m_product.at(i).product_item)
+         {  
+              CString strIPAddress;
+              int IPPort=0;
+              int ComPort=0;
+              int brandrate = 0;
+              int ModbusID=0;
+             CString strSql,temp_serial;
+            int sn=pFrame->m_product.at(i).serial_number;
+            temp_serial.Format(_T("%d"),sn);
+            int  int_product_type = pFrame->m_product.at(i).product_class_id;
+            
+            if (int_product_type == PM_TSTAT6)
+            {
+                int communicationType = pFrame->m_product.at(i).protocol;  
+                ModbusID = pFrame->m_product.at(i).product_id;
+                SetCommunicationType(communicationType);
+                if (communicationType==0)
+                {
+                    
+                    ComPort =  pFrame->m_product.at(i).ncomport;
+                    brandrate = pFrame->m_product.at(i).baudrate;
+                   
+                    if (open_com(ComPort))
+                    {
+                        Change_BaudRate(brandrate);
+                        
+                        char cTemp1[16];
+                        memset(cTemp1,0,16);
+                        WideCharToMultiByte( CP_ACP, 0, dlg->m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
+                        unsigned char Databuffer[16];
+                        memcpy_s(Databuffer,16,cTemp1,16);
+                        if (Write_Multi(ModbusID,Databuffer,715,16,10)>0)
+                        {
+                             WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("0"),g_achive_device_name_path);
+                        }
+                        
+                        
+                        close_com();
 
+                    }
+                } 
+                else
+                {
+                    strIPAddress = pFrame->m_product.at(i).BuildingInfo.strIp;
+                    IPPort = _wtoi(pFrame->m_product.at(i).BuildingInfo.strIpPort);
+                    if (Open_Socket2(strIPAddress,IPPort))
+                    {
+                        if(dlg->m_name_new.GetLength()> 17)	//长度不能大于结构体定义的长度;
+                        {
+                            dlg->m_name_new.Delete(16,dlg->m_name_new.GetLength()-16);
+                        }
+
+                        char cTemp1[16];
+                        memset(cTemp1,0,16);
+                        WideCharToMultiByte( CP_ACP, 0, dlg->m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
+                        unsigned char Databuffer[16];
+                        memcpy_s(Databuffer,16,cTemp1,16);
+                        if (Write_Multi(ModbusID,Databuffer,715,16,10)>0)
+                        {
+                             
+                                 
+                                WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("0"),g_achive_device_name_path);
+                           
+                        }
+                    }
+                      
+                }
+
+                
+            } 
+
+            break;
+         }
+         }
+
+         return 1;
+ }
 IMPLEMENT_DYNAMIC(CImageTreeCtrl, CTreeCtrl)
 CImageTreeCtrl::CImageTreeCtrl()
 {
@@ -36,7 +118,7 @@ CImageTreeCtrl::CImageTreeCtrl()
 	m_nRoomItemData = 2000;
 	m_nDeviceItemData = 3000;
 	m_Keymap[VK_F2][false][false] = &CImageTreeCtrl::DoEditLabel;
-
+    m_Keymap[VK_DELETE][false][false] = &CImageTreeCtrl::DoDeleteItem;
 	//m_Keymap[VK_INSERT][true ][false] = &CImageTreeCtrl::DoInsertChild;
 	//m_Keymap[VK_INSERT][false][true ] = &CImageTreeCtrl::DoInsertRoot;
 	//m_Keymap[VK_INSERT][false][false] = &CImageTreeCtrl::DoInsertSibling;
@@ -48,9 +130,14 @@ CImageTreeCtrl::CImageTreeCtrl()
 	//m_Commandmap[ID_ADD_CHILD]          = &CImageTreeCtrl::DoInsertChild;
 	//m_Commandmap[ID_ADD_ROOT]           = &CImageTreeCtrl::DoInsertRoot;
 	//m_Commandmap[ID_ADD_SIBLING]        = &CImageTreeCtrl::DoInsertSibling;
-	//m_Commandmap[ID_DELETE]             = &CImageTreeCtrl::DoDeleteItem;
+	m_Commandmap[ID_DELETE]             = &CImageTreeCtrl::DoDeleteItem;
 	//m_Commandmap[ID_SORT_LEVEL]         = &CImageTreeCtrl::DoSortCurrentLevel;
 	//m_Commandmap[ID_SORT_LEVELANDBELOW] = &CImageTreeCtrl::DoSortCurrentLevelAndBelow;
+
+	m_Commandmap[ID_SORT_BY_CONNECTION]		     = &CImageTreeCtrl::SortByConnection;
+	m_Commandmap[ID_SORT_BY_FLOOR]		        = &CImageTreeCtrl::SortByFloor;
+
+
 	old_hItem = NULL;
 	m_serial_number = 0;
 }
@@ -79,12 +166,41 @@ void CImageTreeCtrl::OnContextCmd(UINT id) {
 	}
 	ASSERT(false);
 }
-bool CImageTreeCtrl::DoEditLabel(HTREEITEM hItem) {
-m_hSelItem=hItem;
+bool CImageTreeCtrl::DoEditLabel(HTREEITEM hItem) 
+{
+	m_hSelItem=hItem;
 	return hItem ? (EditLabel(hItem) != 0) : false;
 }
-BOOL CImageTreeCtrl::UpdateDataToDB(){
-	CADO ado;
+
+bool CImageTreeCtrl::SortByConnection(HTREEITEM hItem) 
+{
+	if(product_sort_way != SORT_BY_CONNECTION)
+	{
+		WritePrivateProfileStringW(_T("Setting"),_T("ProductSort"),_T("1"),g_cstring_ini_path);
+		product_sort_way = SORT_BY_CONNECTION;
+		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
+	}
+
+	return true;
+}
+
+bool CImageTreeCtrl::SortByFloor(HTREEITEM hItem) 
+{
+	if(product_sort_way != SORT_BY_BUILDING_FLOOR)
+	{
+		WritePrivateProfileStringW(_T("Setting"),_T("ProductSort"),_T("2"),g_cstring_ini_path);
+		product_sort_way = SORT_BY_BUILDING_FLOOR;
+		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
+	}
+	return true;
+}
+
+BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
+	
+    
+    CADO ado;
 	ado.OnInitADOConn();
 
 	CBADO bado;
@@ -265,73 +381,121 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 			}
 		case 3:		//Device Name Leaf
 			{
-				//Subnet
-				HTREEITEM root=GetRootItem();
-				CString subnetname=GetItemText(root);
-				//Room
-				HTREEITEM parentnode=GetParentItem(m_hSelItem);
-				CString Roomname=GetItemText(parentnode);
-				//Floor
-				HTREEITEM floornode=GetParentItem(parentnode);
-				CString Floorname=GetItemText(floornode);
-// 				strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' and Product_name='%s' order by Building_Name"),subnetname,Floorname,Roomname,m_name_new);
-// 				m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-// 
-// 				while(VARIANT_FALSE==m_pRs->EndOfFile)
-// 				{	   	 str_temp.Empty();
-// 				str_temp=m_pRs->GetCollect("Product_name");
-// 				if (str_temp.Compare(m_name_new)==0)
-// 				{	   is_exist=TRUE;
-// 				break;
-// 				}			
-// 				m_pRs->MoveNext();
-// 				}
-// 
-// 				m_pRs->Close();	
+             #if 1
+                if (m_name_old.CompareNoCase(m_name_new)==0)
+                {
+                    return FALSE;
+                }
+                CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+                for (int i=0;i< pFrame->m_product.size();i++){
+                    if (m_hSelItem == pFrame->m_product.at(i).product_item)
+                    {     
 
-				//if (is_exist)
-				//{
-				//	return FALSE;
-				//}
-				//else
-				{
-					
-					strSql.Format(_T("select * from ALL_NODE where Building_Name='%s' and Floor_name='%s' and Room_name='%s' and Product_name='%s' order by Building_Name"),subnetname,Floorname,Roomname,m_name_old);
-					//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-					bado.m_pRecordset=bado.OpenRecordset(strSql);
-					while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
-					{
-						CString temp_serial;
-						CString temp_product_type;
-						int int_product_type;
-						temp_serial = bado.m_pRecordset->GetCollect("Serial_ID");
-						//if(temp_variant.vt!=VT_NULL)
-						//	temp_serial=temp_variant;
-						//else
-						//	temp_serial=_T("");
-
-						temp_product_type = bado.m_pRecordset->GetCollect("Product_class_ID");
-						//if(temp_variant.vt!=VT_NULL)
-						//	temp_product_type=temp_variant;
-						//else
-						//	temp_product_type=_T("");
-
-						int_product_type = _wtoi(temp_product_type);
-						if((int_product_type == PM_MINIPANEL) || (int_product_type == PM_CM5))
-						{
-							WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
-							WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
-						}
+                        CString strIPAddress;
+                        int IPPort=0;
+                        int ComPort=0;
+                        int brandrate = 0;
+                        int ModbusID=0;
+                        CString strSql,temp_serial;
+                        int sn=pFrame->m_product.at(i).serial_number;
+                        temp_serial.Format(_T("%d"),sn);
+                        int  int_product_type = pFrame->m_product.at(i).product_class_id;
 
 
+                        if((int_product_type == PM_MINIPANEL) || (int_product_type == PM_CM5) )//||(int_product_type == PM_TSTAT6)
+                        {
+                            WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
+                            WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
+                        }
+                       
+                        if (FALSE)    //
+                        {
+                            int communicationType = pFrame->m_product.at(i).protocol;  
+                            SetCommunicationType(communicationType); 
+							ModbusID = pFrame->m_product.at(i).product_id;
+                            if (communicationType==0)
+                            {
+                                ComPort =  pFrame->m_product.at(i).ncomport;
+                                brandrate = pFrame->m_product.at(i).baudrate;
+                               
 
-						strSql.Format(_T("update ALL_NODE set Product_name='%s' where Product_name='%s' and Serial_ID='%s'"),m_name_new,m_name_old,temp_serial);
-						bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
-						bado.m_pRecordset->MoveNext();
-					}
-					//m_pRs->Close();
-					 bado.CloseRecordset();
-				}
+                                if (open_com(ComPort))
+                                {
+                                    Change_BaudRate(brandrate);
+                                    if(m_name_new.GetLength()> 17)	//长度不能大于结构体定义的长度;
+                                    {
+                                        m_name_new.Delete(16,m_name_new.GetLength()-16);
+                                    }
+
+                                    char cTemp1[16];
+                                    memset(cTemp1,0,16);
+                                    WideCharToMultiByte( CP_ACP, 0, m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
+                                    unsigned char Databuffer[16];
+                                    memcpy_s(Databuffer,16,cTemp1,16);
+                                    if (Write_Multi(ModbusID,Databuffer,715,16,10)<0)
+                                    {
+                                        if( int_product_type == PM_TSTAT6) 
+                                        {
+                                            WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
+                                            WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
+                                        }
+                                    }
+
+
+                                    close_com();
+
+                                }
+                            } 
+                            else
+                            {
+                                strIPAddress = pFrame->m_product.at(i).BuildingInfo.strIp;
+                                IPPort = _wtoi(pFrame->m_product.at(i).BuildingInfo.strIpPort);
+                                if (Open_Socket2(strIPAddress,IPPort))
+                                {
+                                    if(m_name_new.GetLength()> 17)	//长度不能大于结构体定义的长度;
+                                    {
+                                        m_name_new.Delete(16,m_name_new.GetLength()-16);
+                                    }
+
+                                    char cTemp1[16];
+                                    memset(cTemp1,0,16);
+                                    WideCharToMultiByte( CP_ACP, 0, m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
+                                    unsigned char Databuffer[16];
+                                    memcpy_s(Databuffer,16,cTemp1,16);
+                                    if (Write_Multi(ModbusID,Databuffer,715,16,10)<0)
+                                    {
+                                        if( int_product_type == PM_TSTAT6) 
+                                        {
+                                            WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
+                                            WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
+                                        }
+                                    }
+                                }                              
+
+                            }
+                        }            
+                        CBADO bado;
+                        bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+                        bado.OnInitADOConn(); 
+                        strSql.Format(_T("update ALL_NODE set Product_name='%s' where Product_name='%s' and Serial_ID='%s'"),m_name_new,m_name_old,temp_serial);
+                        bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                        bado.CloseConn();
+                        
+                        if (int_product_type == PM_TSTAT6)
+                        {
+                            if(m_name_new.GetLength()> 16)	//长度不能大于结构体定义的长度;
+                            {
+                                m_name_new.Delete(16,m_name_new.GetLength()-16);
+                            }
+                            WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
+                            WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
+                            CreateThread(NULL,NULL,_Background_Write_Name,this,NULL,0); 
+                        }
+
+                        return TRUE;
+                    }
+                }
+            #endif
 
 				break;
 			}
@@ -351,6 +515,188 @@ BOOL CImageTreeCtrl::UpdateDataToDB(){
 	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
 
 	return TRUE;
+}
+BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
+       if (m_level==0)
+       {
+           return UpdateDataToDB_Floor();
+       }
+       if (m_name_old.CompareNoCase(m_name_new)==0)
+       {
+          return FALSE;
+       }
+    CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    for (int i=0;i< pFrame->m_product.size();i++){
+      if (m_hSelItem == pFrame->m_product.at(i).product_item)
+      {     
+          
+              CString strIPAddress;
+              int IPPort=0;
+              int ComPort=0;
+              int brandrate = 0;
+              int ModbusID=0;
+             CString strSql,temp_serial;
+            int sn=pFrame->m_product.at(i).serial_number;
+            temp_serial.Format(_T("%d"),sn);
+            int  int_product_type = pFrame->m_product.at(i).product_class_id;
+
+            /* if( int_product_type == PM_TSTAT6) 
+            {
+            WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
+            WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
+            }
+            return TRUE;*/
+            if((int_product_type == PM_MINIPANEL) || (int_product_type == PM_CM5) )//  ||(int_product_type == PM_TSTAT6 )
+            {
+                WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
+                WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
+            }
+            
+             // int_product_type == PM_TSTAT6
+            if (FALSE)
+            {
+                int communicationType = pFrame->m_product.at(i).protocol;  
+                ModbusID = pFrame->m_product.at(i).product_id;
+                SetCommunicationType(communicationType);
+                if (communicationType==0)
+                {
+                    
+                    ComPort =  pFrame->m_product.at(i).ncomport;
+                    brandrate = pFrame->m_product.at(i).baudrate;
+                   
+                    if (open_com(ComPort))
+                    {
+                        Change_BaudRate(brandrate);
+                        
+                        char cTemp1[16];
+                        memset(cTemp1,0,16);
+                        WideCharToMultiByte( CP_ACP, 0, m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
+                        unsigned char Databuffer[16];
+                        memcpy_s(Databuffer,16,cTemp1,16);
+                        if (Write_Multi(ModbusID,Databuffer,715,16,10)<0)
+                        {
+                            
+                        }
+                        
+                        
+                        close_com();
+
+                    }
+                } 
+                else
+                {
+                    strIPAddress = pFrame->m_product.at(i).BuildingInfo.strIp;
+                    IPPort = _wtoi(pFrame->m_product.at(i).BuildingInfo.strIpPort);
+                    if (Open_Socket2(strIPAddress,IPPort))
+                    {
+                        if(m_name_new.GetLength()> 17)	//长度不能大于结构体定义的长度;
+                        {
+                            m_name_new.Delete(16,m_name_new.GetLength()-16);
+                        }
+
+                        char cTemp1[16];
+                        memset(cTemp1,0,16);
+                        WideCharToMultiByte( CP_ACP, 0, m_name_new.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
+                        unsigned char Databuffer[16];
+                        memcpy_s(Databuffer,16,cTemp1,16);
+                        if (Write_Multi(ModbusID,Databuffer,715,16,10)<0)
+                        {
+                            if( int_product_type == PM_TSTAT6) 
+                            {
+                                WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
+                                WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
+                            }
+                        }
+                    }
+                      
+                }
+            }
+            CBADO bado;
+            bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+            bado.OnInitADOConn(); 
+            strSql.Format(_T("update ALL_NODE set Product_name='%s' where Product_name='%s' and Serial_ID='%s'"),m_name_new,m_name_old,temp_serial);
+            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+            bado.CloseConn();
+
+            if( int_product_type == PM_TSTAT6) 
+            {
+
+                if(m_name_new.GetLength()> 16)	//长度不能大于结构体定义的长度;
+                {
+                    m_name_new.Delete(16,m_name_new.GetLength()-16);
+                }
+                WritePrivateProfileStringW(temp_serial,_T("NewName"),m_name_new,g_achive_device_name_path);
+                WritePrivateProfileStringW(temp_serial,_T("WriteFlag"),_T("1"),g_achive_device_name_path);
+                CreateThread(NULL,NULL,_Background_Write_Name,this,NULL,0);
+            }
+            return TRUE;
+      }
+    }
+    
+    return FALSE; 
+}
+bool CImageTreeCtrl::DoDeleteItem(HTREEITEM hItem)
+{
+         m_level=get_item_level(hItem);
+         m_name_old=GetItemText(hItem);
+    CBADO bado;
+    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+    bado.OnInitADOConn(); 
+
+
+    ::CoInitialize(NULL);
+    try 
+    {
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        //获取数据库名称及路径
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //连接数据库
+
+        CString strSql;   BOOL is_exist=FALSE;	  CString str_temp;
+        if(m_level >= 2)
+        {
+            HTREEITEM root=GetRootItem();
+            CString subnetname=GetItemText(root);
+            //Room
+            HTREEITEM parentnode=GetParentItem(hItem);
+            CString Roomname=GetItemText(parentnode);
+            //Floor
+            HTREEITEM floornode=GetParentItem(parentnode);
+            CString Floorname=GetItemText(floornode);
+             
+            
+
+                strSql.Format(_T("select * from ALL_NODE where  Product_name='%s' order by Building_Name"),m_name_old);
+                //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+                bado.m_pRecordset=bado.OpenRecordset(strSql);
+                while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+                {
+                    CString temp_serial;
+                  
+                    temp_serial = bado.m_pRecordset->GetCollect("Serial_ID");
+                
+                    strSql.Format(_T("delete * from ALL_NODE  where  Serial_ID='%s'"),temp_serial);
+                    bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                    bado.m_pRecordset->MoveNext();
+                }
+                
+                bado.CloseRecordset();
+              
+        }
+        
+        }
+        catch(_com_error e)
+        {
+             
+            bado.CloseConn();
+            return FALSE;
+            //m_pCon->Close();
+        }
+        //m_pCon->Close();  
+        bado.CloseConn();
+        CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+        ::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
+    return true;
 }
 // CImageTreeCtrl 消息处理程序
 bool CImageTreeCtrl::HandleKeyDown(WPARAM wParam, LPARAM lParam) {
@@ -423,10 +769,18 @@ void CImageTreeCtrl::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 		 return;
 	    }
 	    
-		if (UpdateDataToDB())
-		{
-		// item.pszText=m_name_new.GetBuffer();
-		} 
+         if (product_sort_way == SORT_BY_BUILDING_FLOOR )
+        {  
+            if(!UpdateDataToDB_Floor()){
+                item.pszText=m_name_old.GetBuffer();
+            }
+        }
+        else if (product_sort_way ==SORT_BY_CONNECTION)
+        {
+             if(!UpdateDataToDB_Connect()){
+               item.pszText=m_name_old.GetBuffer();
+             }
+        } 
 		else
 		{
 		item.pszText=m_name_old.GetBuffer();
@@ -1101,6 +1455,26 @@ void CImageTreeCtrl::OnKillFocus(CWnd* pNewWnd)
 }
 
 
+
+void CImageTreeCtrl::DisplayContextOtherMenu(CPoint & point) {
+		CPoint pt(point);
+		ScreenToClient(&pt);
+		UINT flags;
+		HTREEITEM hItem = HitTest(pt, &flags);
+		bool bOnItem = (flags & TVHT_ONITEM) != 0;
+
+
+		CMenu menu;
+		VERIFY(menu.CreatePopupMenu());
+
+		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_CONNECTION, _T("Sort By Connection")));
+		VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
+		
+
+		if(menu.GetMenuItemCount() > 0)
+			menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
+}
+
 void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
 	CPoint pt(point);
 	ScreenToClient(&pt);
@@ -1126,9 +1500,15 @@ void CImageTreeCtrl::DisplayContextMenu(CPoint & point) {
 
 	CMenu menu;
 	VERIFY(menu.CreatePopupMenu());
-	if(bOnItem) {
+	if(bOnItem) 
+	{
 		if(CanEditLabel(hItem))
+		{
 			VERIFY(menu.AppendMenu(MF_STRING, ID_RENAME, _T("Rename\tF2")));
+            VERIFY(menu.AppendMenu(MF_STRING, ID_DELETE, _T("Delete\tDel")));
+			VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_CONNECTION, _T("Sort By Connection")));
+			VERIFY(menu.AppendMenu(MF_STRING, ID_SORT_BY_FLOOR, _T("Sort By Floor")));
+		}
 // 		if(CanDeleteItem(hItem))
 // 			VERIFY(menu.AppendMenu(MF_STRING, ID_DELETE, _T("Delete\tDEL")));
 	}
@@ -1154,9 +1534,18 @@ void CImageTreeCtrl::OnRclick(NMHDR* pNMHDR, LRESULT* pResult)
 	GetCursorPos(&point);
 	ScreenToClient(&point);
 	HTREEITEM hItem = HitTest(point, &flags);
-	if(hItem && (flags & TVHT_ONITEM) && !(flags & TVHT_ONITEMRIGHT))
-		SelectItem(hItem);
-	ClientToScreen(&point);
-	DisplayContextMenu(point);
+	if(hItem != NULL)
+	{
+		if(hItem && (flags & TVHT_ONITEM) && !(flags & TVHT_ONITEMRIGHT))
+			SelectItem(hItem);
+		ClientToScreen(&point);
+		DisplayContextMenu(point);
+	}
+	else
+	{
+		ClientToScreen(&point);
+		DisplayContextOtherMenu(point);
+	}
+
 }
 #pragma endregion

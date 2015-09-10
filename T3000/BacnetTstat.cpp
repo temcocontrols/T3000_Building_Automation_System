@@ -117,7 +117,7 @@ void CBacnetTstat::Initial_List()
 	
 	//m_tstat_list.InsertColumn(TSTAT_SERIAL_NUM, _T("Serial Number"), 70, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_tstat_dlg_hwnd = this->m_hWnd;
-	g_hwnd_now = m_tstat_dlg_hwnd;
+	//g_hwnd_now = m_tstat_dlg_hwnd;
 
 
 	m_tstat_list.DeleteAllItems();

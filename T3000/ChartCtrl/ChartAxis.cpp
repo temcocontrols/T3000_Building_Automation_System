@@ -501,7 +501,7 @@ long CChartAxis::ValueToScreen(double Value) const
 		else
 			retVal =  m_StartPos - Offset;
 	}
-	else if (m_bDiscrete)
+	else if (!m_bDiscrete)
         retVal = ValueToScreenStandard(Value);
 	else
 		retVal = ValueToScreenDiscrete(Value);

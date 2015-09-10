@@ -104,7 +104,9 @@ public:
 	void Fresh();
 	void Fresh_T3000View();
 	void FreshCtrl();
-	
+
+     int get_real_fan_select();
+	 int set_real_fan_select();
 	// 这个函数是为了与之前的版本兼容
 	// 使用新的Slider，但是寄存器逻辑使用原来的
 	void InitSliderBars2();
@@ -114,7 +116,8 @@ public:
 	void Fresh_Out();
 	void Initial_Max_Min();
 	void FreshIOGridTable();
-
+    void FreshIOGridTable_Tstat6();
+    int GetRoundMM(BOOL is_max,int num1,int num2,float rate);
 
 
 
@@ -130,7 +133,7 @@ public:
 	afx_msg void OnBnClickedCoolRadio();
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-	 
+	BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult); 
 	 
  
 
@@ -172,7 +175,7 @@ public:
 	CMsflexgrid m_Input_Grid;
 
 	CTabCtrl m_SetPtTabCtrl;
-
+    
 
 // slider
 	//CFlexSlideWnd m_pFswOffice;
@@ -186,12 +189,13 @@ public:
 	CFSBContainer*  m_pDaySingleSP;
 
  //	CFSBContainer*  m_pTemperSP;
+     CFSBContainer*  m_pSlider_Test_TwoSP;
 
 	CAutoRichEditCtrl m_TempInfoEdit;
 	CAutoRichEditCtrl m_dayInfoEdit;
 	CAutoRichEditCtrl m_nightInfoEdit;
 	CAutoRichEditCtrl m_nightHeatInfoEdit;
-
+     
 	CStatic m_SetptStatic;
 	
  
@@ -204,7 +208,9 @@ public:
 	CStatic m_DaySPStatic;
 	CStatic m_DayHeatStatic;
 
-
+    int m_new_deadband;
+    int m_old_deadband;
+    int m_slider_Type; 
 	afx_msg void OnBnClickedGrapgicbutton();
 	afx_msg void OnBnClickedParameterbtn();
 	//	afx_msg void OnBnClickedOutputbtn();
@@ -224,7 +230,7 @@ public:
 	afx_msg void OnBnClickedOccupacheck();
 	afx_msg void OnCbnSelchangeFanspeedcombo();
 	LRESULT OnFreshView(WPARAM wParam, LPARAM lParam);
-	static void EnableToolTips(BOOL bEnable);
+//	static void EnableToolTips(BOOL bEnable);
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -250,6 +256,7 @@ public:
 	void HandleSliderSetPos(BOOL bRight);
 	BOOL				m_bSliderSetPosWarning;
 	void InitFlexSliderBars_tstat6();//tsat6
+    void SetFlexSliderBars_tstat6();
 	void OnFlexSlideCallBackFortstat6();
 	void TemperatureSlider();
  
@@ -284,9 +291,14 @@ public:
 //	 afx_msg void OnBnClickedButtonZigbeeReboot();
 	 afx_msg LRESULT  ResumeMessageCallBackForT3000View(WPARAM wParam, LPARAM lParam);
 	 afx_msg LRESULT  ReadDataCallBack(WPARAM wParam, LPARAM lParam);
+    // BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 	 int DayMax;
 	 int DayMin;
      CStaticEx m_isp;
+     CToolTipCtrl m_tooltips;
+     afx_msg void OnEnKillfocusDayEdit();
+     
+     //afx_msg void OnBnClickedTestSlider();
 };
 
 #ifndef _DEBUG  // debug version in T3000View.cpp

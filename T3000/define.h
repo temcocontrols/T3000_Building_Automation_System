@@ -46,7 +46,7 @@
 #define DISABLE_COLOR_CELL RGB(140,140,140)
 #define SETPOINT_SPECIAL_VERSION	50
 #define MsgT3000ViewFresh 5000
-
+#define  MESSAGE_SLIDER 5001
 //the product model of product declare
 //#define NET_WORK_CONT_PRODUCT_MODEL					100
 #define	LED_PRODUCT_MODEL							25

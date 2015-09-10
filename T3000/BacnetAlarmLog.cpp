@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "globle_function.h"
 
-Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
+
 
 // CBacnetAlarmLog dialog
 
@@ -123,15 +123,19 @@ BOOL CBacnetAlarmLog::PreTranslateMessage(MSG* pMsg)
 
 void CBacnetAlarmLog::Initial_List()
 {
+	m_alarmlog_list.ShowWindow(SW_HIDE);
+	m_alarmlog_list.DeleteAllItems();
+	while ( m_alarmlog_list.DeleteColumn (0)) ;
+
 	m_alarmlog_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	m_alarmlog_list.SetExtendedStyle(m_alarmlog_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_alarmlog_list.InsertColumn(ALARMLOG_NUM, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-	m_alarmlog_list.InsertColumn(ALARMLOG_PANEL, _T("Panel"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_alarmlog_list.InsertColumn(ALARMLOG_MESSAGE, _T("Message"), 300, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_alarmlog_list.InsertColumn(ALARMLOG_TIME, _T("Time"), 180, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_alarmlog_list.InsertColumn(ALARMLOG_ACK, _T("Acknowlege"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_alarmlog_list.InsertColumn(ALARMLOG_RES, _T("Res"), 70, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_alarmlog_list.InsertColumn(ALARMLOG_DEL, _T("Delete"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_alarmlog_list.InsertColumn(ALARMLOG_NUM, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_alarmlog_list.InsertColumn(ALARMLOG_PANEL, _T("Panel"), 50, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_alarmlog_list.InsertColumn(ALARMLOG_MESSAGE, _T("Message"), 300, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_alarmlog_list.InsertColumn(ALARMLOG_TIME, _T("Time"), 180, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_alarmlog_list.InsertColumn(ALARMLOG_ACK, _T("Acknowlege"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_alarmlog_list.InsertColumn(ALARMLOG_RES, _T("Res"), 70, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_alarmlog_list.InsertColumn(ALARMLOG_DEL, _T("Delete"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 
 	m_alarmlog_dlg_hwnd = this->m_hWnd;
 	g_hwnd_now = m_alarmlog_dlg_hwnd;
@@ -164,6 +168,7 @@ void CBacnetAlarmLog::Initial_List()
 				m_alarmlog_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
 		}
 	}
+	m_alarmlog_list.ShowWindow(SW_SHOW);
 }
 
 LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)

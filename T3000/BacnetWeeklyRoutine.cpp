@@ -15,7 +15,7 @@
 #include "BacnetRange.h"
 #include "BacnetScheduleTime.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
-Str_weekly_routine_point m_temp_weekly_data[BAC_WEEKLY_ROUTINES_COUNT];
+
 // BacnetWeeklyRoutine dialog
 
 IMPLEMENT_DYNAMIC(BacnetWeeklyRoutine, CDialogEx)
@@ -151,19 +151,23 @@ BOOL BacnetWeeklyRoutine::OnInitDialog()
 
 void BacnetWeeklyRoutine::Initial_List()
 {
+	m_weeklyr_list.ShowWindow(SW_HIDE);
+	m_weeklyr_list.DeleteAllItems();
+	while ( m_weeklyr_list.DeleteColumn (0)) ;
+
 	m_weeklyr_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	m_weeklyr_list.SetExtendedStyle(m_weeklyr_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_NUM, _T("NUM"), 60, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_FULL_LABLE, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_AUTO_MANUAL, _T("Auto/Manual"), 90, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_OUTPUT, _T("Output"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_HOLIDAY1, _T("Holiday1"), 90, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_STATE1, _T("State1"), 70, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_HOLIDAY2, _T("Holiday2"), 90, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_STATE2, _T("State2"), 70, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_LABEL, _T("Label"), 90, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_NUM, _T("NUM"), 60, ListCtrlEx::CheckBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_FULL_LABLE, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_AUTO_MANUAL, _T("Auto/Manual"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_OUTPUT, _T("Output"), 80, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_HOLIDAY1, _T("Holiday1"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_STATE1, _T("State1"), 70, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_HOLIDAY2, _T("Holiday2"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_STATE2, _T("State2"), 70, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_weeklyr_list.InsertColumn(WEEKLY_ROUTINE_LABEL, _T("Label"), 90, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_weekly_dlg_hwnd = this->m_hWnd;
-	g_hwnd_now = m_weekly_dlg_hwnd;
+	//g_hwnd_now = m_weekly_dlg_hwnd;
 
 
 	CRect list_rect,win_rect;
@@ -234,8 +238,9 @@ void BacnetWeeklyRoutine::Initial_List()
 		}
 
 	}
+	m_weeklyr_list.InitListData();
 	m_weeklyr_list.SetCellChecked(0,0,1);
-
+	m_weeklyr_list.ShowWindow(SW_SHOW);
 }
 
 LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lParam)
@@ -278,7 +283,11 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 			PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
 			return 0;
 		}
-
+		if(Check_FullLabel_Exsit(cs_temp))
+		{
+			PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0;
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -316,7 +325,7 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_Routine_Item(WPARAM wParam,LPARAM lPar
 	{
 			m_weeklyr_list.SetItemBkColor(Changed_Item,Changed_SubItem,LIST_ITEM_CHANGED_BKCOLOR);
 	temp_task_info.Format(_T("Write Weekly Routine List Item%d .Changed to \"%s\" "),Changed_Item + 1,New_CString);
-	Post_Write_Message(g_bac_instance,WRITEWEEKLYROUTINE_T3000,Changed_Item,Changed_Item,sizeof(Str_weekly_routine_point),m_weekly_dlg_hwnd ,temp_task_info,Changed_Item,Changed_SubItem);
+	Post_Write_Message(g_bac_instance,WRITESCHEDULE_T3000,Changed_Item,Changed_Item,sizeof(Str_weekly_routine_point),m_weekly_dlg_hwnd ,temp_task_info,Changed_Item,Changed_SubItem);
 	}
 	return 0;
 }
@@ -332,10 +341,10 @@ LRESULT BacnetWeeklyRoutine::Fresh_Weekly_List(WPARAM wParam,LPARAM lParam)
 	}
 	else
 	{
-		if(m_weeklyr_list.IsDataNewer((char *)&m_Weekly_data.at(0),sizeof(Str_weekly_routine_point) * BAC_WEEKLY_ROUTINES_COUNT))
+		if(m_weeklyr_list.IsDataNewer((char *)&m_Weekly_data.at(0),sizeof(Str_weekly_routine_point) * BAC_SCHEDULE_COUNT))
 		{
 			//避免list 刷新时闪烁;在没有数据变动的情况下不刷新List;
-			m_weeklyr_list.SetListData((char *)&m_Weekly_data.at(0),sizeof(Str_weekly_routine_point) * BAC_WEEKLY_ROUTINES_COUNT);
+			m_weeklyr_list.SetListData((char *)&m_Weekly_data.at(0),sizeof(Str_weekly_routine_point) * BAC_SCHEDULE_COUNT);
 		}
 		else
 		{
@@ -464,7 +473,7 @@ void BacnetWeeklyRoutine::OnTimer(UINT_PTR nIDEvent)
 	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
-	Post_Refresh_Message(g_bac_instance,READWEEKLYROUTINE_T3000,0,BAC_WEEKLY_ROUTINES_COUNT - 1,sizeof(Str_weekly_routine_point), BAC_WEEKLY_GROUP);
+	Post_Refresh_Message(g_bac_instance,READWEEKLYROUTINE_T3000,0,BAC_SCHEDULE_COUNT - 1,sizeof(Str_weekly_routine_point), BAC_SCHEDULE_GROUP);
 	}
 	CDialogEx::OnTimer(nIDEvent);
 }
@@ -504,3 +513,44 @@ BOOL BacnetWeeklyRoutine::OnHelpInfo(HELPINFO* pHelpInfo)
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }
+
+
+int GetScheduleLabel(int index,CString &ret_label)
+{
+	if(index >= BAC_SCHEDULE_COUNT)
+	{
+		ret_label.Empty();
+		return -1;
+	}
+	int i = index;
+	CString temp_des2;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_Weekly_data.at(i).label, (int)strlen((char *)m_Weekly_data.at(i).label)+1, 
+		ret_label.GetBuffer(MAX_PATH), MAX_PATH );
+	ret_label.ReleaseBuffer();
+
+	if(ret_label.IsEmpty())
+	{
+		ret_label.Format(_T("SCH%d"),index+1);
+	}
+
+	return 1;
+}
+
+int GetScheduleFullLabel(int index,CString &ret_full_label)
+{
+	if(index >= BAC_SCHEDULE_COUNT)
+	{
+		ret_full_label.Empty();
+		return -1;
+	}
+	int i = index;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_Weekly_data.at(i).description, (int)strlen((char *)m_Weekly_data.at(i).description)+1, 
+		ret_full_label.GetBuffer(MAX_PATH), MAX_PATH );
+	ret_full_label.ReleaseBuffer();
+	if(ret_full_label.IsEmpty())
+	{
+		ret_full_label.Format(_T("SCH%d"),index+1);
+	}
+	return 1;
+}
+

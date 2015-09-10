@@ -82,6 +82,9 @@ public:
 	HICON default_on_icon;
 	HICON default_off_icon;
 
+	HICON lock_icon;
+	HICON unlock_icon;
+
 	int m_paint_right_limit ;
 	int m_paint_botton_limit ;
 	CString m_building_image_folder;
@@ -90,3 +93,8 @@ public:
 //	afx_msg void OnRButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 };
+
+#define LOCK_ICON_SIZE_X 48
+#define LOCK_ICON_SIZE_Y 48
+
+

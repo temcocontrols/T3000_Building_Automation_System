@@ -203,8 +203,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 
 		m_wndToolBar.ResetAll();
-
-
+               
+                 
 	 
 
 	return 0;
@@ -471,9 +471,9 @@ void CMainFrame::OnDestroy()
 		close_com();
 	}
 	 
-	if(m_MultiRead_handle != NULL)
-		TerminateThread(m_MultiRead_handle, 0);
-	m_MultiRead_handle=NULL;
+    if(m_MultiRead_handle != NULL)
+        TerminateThread(m_MultiRead_handle, 0);
+    m_MultiRead_handle=NULL;
 	CMDIFrameWndEx::OnDestroy();
 }
 
@@ -834,28 +834,28 @@ void CMainFrame::OnViewRegistervalueanalyzer()
 {
 
 	//OnConnectionConnect32776();
-	//if (g_Draw_dlg==NULL)
-	//{
-	//	 
-	//	 		g_Draw_dlg=new CRegisterValueAnalyzerDlg;
-	//	 		g_Draw_dlg->Create(IDD_DIALOG_CHART,this);
-	//	 		g_Draw_dlg->ShowWindow(SW_SHOW);
-	//			::PostMessage(g_Draw_dlg->m_hWnd,MY_FRESH_DRAW_GRAPHIC,0,0);
-	//} 
- //    else{
+    if (g_Draw_dlg==NULL)
+    {
 
-	//	 if(g_Draw_dlg->IsWindowVisible())
-	//	 {
+        g_Draw_dlg=new CRegisterValueAnalyzerDlg;
+        g_Draw_dlg->Create(IDD_DIALOG_CHART,this);
+        g_Draw_dlg->ShowWindow(SW_SHOW);
+       //::PostMessage(g_Draw_dlg->m_hWnd,MY_FRESH_DRAW_GRAPHIC,0,0);
+    } 
+    else{
 
-	//	 }
+        if(g_Draw_dlg->IsWindowVisible())
+        {
 
-	//	 else
-	//	 {
-	//		 g_is_show_Data_Traffic_Window=TRUE;
-	//		 g_Draw_dlg->ShowWindow(SW_SHOW);
-	//		 ::PostMessage(g_Draw_dlg->m_hWnd,MY_FRESH_DRAW_GRAPHIC,0,0);
-	//	 }
-	// }
+        }
+
+        else
+        {
+            g_is_show_Data_Traffic_Window=TRUE;
+            g_Draw_dlg->ShowWindow(SW_SHOW);
+            //::PostMessage(g_Draw_dlg->m_hWnd,MY_FRESH_DRAW_GRAPHIC,0,0);
+        }
+    }
 }
 void CMainFrame::OnUpdateStatusBar(CCmdUI *pCmdUI){
 	pCmdUI->Enable(TRUE);

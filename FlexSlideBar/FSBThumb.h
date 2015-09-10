@@ -43,7 +43,8 @@ public:
 	void MoveThumb(const CPoint& ptNewPosition);
 
 	BOOL IsPtOnThumb(const CPoint& pt);
-
+     
+    void SetMixValue(int min);
 protected:
 	BOOL							m_bHorizontal;
 	int								m_nPosX;				// 象素的位置
@@ -52,11 +53,13 @@ protected:
 	int								m_nHeight;
 	int								m_nWidth;
 	CRect							m_rc;
-	COLORREF					m_clr;
+	COLORREF					    m_clr;
 	
 	BOOL							m_bIsDragging;
 	FSB_THUMBSHAPE		m_shape;
 		
 	int								m_nPosition;			// 刻度的位置
+    
+    int m_min;
 
 };

@@ -13,12 +13,18 @@ public:
 	CImageTreeCtrl();
 	virtual ~CImageTreeCtrl();
 	virtual void	DisplayContextMenu(CPoint & point);
+	void    DisplayContextOtherMenu(CPoint & point);
 /*	virtual void	ExtendContextMenu(CMenu & menu);*/
 	afx_msg void	OnContextCmd(UINT uID);
+
+	virtual bool SortByConnection(HTREEITEM hItem)  ;
+	virtual bool SortByFloor(HTREEITEM hItem)  ;
+     virtual bool    DoDeleteItem(HTREEITEM);
 protected:
 	DECLARE_MESSAGE_MAP()
 	virtual bool	HandleKeyDown(WPARAM wParam, LPARAM lParam);
 	virtual bool	DoEditLabel(HTREEITEM);
+    
 protected:
 typedef bool (CImageTreeCtrl::*method)(HTREEITEM);
 enum EDropHint {
@@ -39,7 +45,8 @@ typedef std::map<UINT, method>				cmdmap_t;
 keymap_t	m_Keymap;
 cmdmap_t	m_Commandmap;
 public:
-BOOL UpdateDataToDB();
+BOOL UpdateDataToDB_Floor();
+BOOL UpdateDataToDB_Connect();
 bool CanInsertItem(HTREEITEM hItem);
 bool CanDeleteItem(HTREEITEM hItem);
 	virtual bool	CanEditLabel(HTREEITEM hItem);
@@ -70,7 +77,7 @@ bool CanDeleteItem(HTREEITEM hItem);
 	HTREEITEM InsertDeviceItem(LPTVINSERTSTRUCT lpInsertStruct);
 
 	//void FillBkGroudColor(HTREEITEM& hSelItem);
-private:
+public:
 	int m_nSubnetItemData;
 	int m_nFloorItemData;
 	int m_nRoomItemData;

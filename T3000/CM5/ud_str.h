@@ -72,9 +72,9 @@ typedef enum {
 		 WRITEOUTPUT_T3000         = 100+ENUM_OUT+1,  /* write outputs          */
 		 WRITEINPUT_T3000          = 100+ENUM_IN+1,   /* write inputs           */
 		 WRITEVARIABLE_T3000       = 100+ENUM_VAR+1,        /* write variables  */
-		 WRITECONTROLLER_T3000     = 100+ENUM_CON+1,        /* write controllers*/
-		 WRITEWEEKLYROUTINE_T3000  = 100+ENUM_WRT+1,         /* write weekly routines*/
-		 WRITEANNUALROUTINE_T3000  = 100+ENUM_AR+1,         /* write annual routines*/
+		 WRITEPID_T3000     = 100+ENUM_CON+1,        /* write controllers*/
+		 WRITESCHEDULE_T3000  = 100+ENUM_WRT+1,         /* write weekly routines*/
+		 WRITEHOLIDAY_T3000  = 100+ENUM_AR+1,         /* write annual routines*/
 		 WRITEPROGRAM_T3000        = 100+ENUM_PRG+1,        /* write programs       */
 		 WRITETABLE_T3000          = 100+ENUM_TBL+1,        /* write tables         */
      	 WRITETOTALIZER_T3000      = 100+ENUM_TZ+1,         /* write totalizers     */
@@ -97,7 +97,7 @@ typedef enum {
 		 LOADPROGRAM_COMMAND       = 31,
 		 DEFAULT_PRG_COMMAND       = 32, 
 
-		 SUB_READ_COMMAND = 34,
+
 
 		 ALARM_NOTIFY_COMMAND       = 51,
 		 SEND_INFO_COMMAND          = 52,
@@ -109,6 +109,7 @@ typedef enum {
 
 		 READ_AT_COMMAND			= 90,	//450 length
 		 READ_GRPHIC_LABEL_COMMAND  = 91,
+		 READ_MISC					= 96,
 		 READ_REMOTE_DEVICE_DB		= 97,
 		 READ_SETTING_COMMAND		= 98,
 		  GETSERIALNUMBERINFO       = 99,
@@ -130,7 +131,8 @@ typedef enum {
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
 		 WRITE_SETTING_COMMAND		= 198,
-		 WRITE_SUB_ID_BY_HAND = 199
+		 WRITE_SUB_ID_BY_HAND = 199,
+		 DELETE_MONITOR_DATABASE = 200
 } CommandRequest;	  
 
 
@@ -192,8 +194,8 @@ typedef struct
 	uint8_t sub_id;  /* (1 uint8_t ; if analog then low)*/
 	uint8_t sub_product; /* (1 uint8_t ; if analog then high)*/
 	uint8_t sub_number;
-	uint8_t delay_timer;      /* (2 bytes;  seconds,minutes)*/
-
+	//uint8_t delay_timer;      /* (2 bytes;  seconds,minutes)*/
+	uint8_t pwm_period;
 } Str_out_point;  /* 21+9+4+2+2+2 = 40 */
 
 
@@ -714,6 +716,10 @@ typedef union
 		unsigned int n_serial_number;
 
 		 UN_Time update_dyndns; 
+
+		 uint16_t mstp_network_number;
+		 uint8_t BBMD_EN;
+		 uint8_t sd_exist;  // 1 -no    2- yes
 	}reg;
 }Str_Setting_Info;
 
@@ -911,6 +917,20 @@ typedef struct	//用来存储data log 的结构;
 	uint16_t mark;  // 0d 0a  end mark
 
 }Str_mon_element; // 18
+
+
+typedef union
+{
+	uint8_t all[400];
+	struct 
+	{  
+		unsigned char flag[2]; //check if not 0x55ff ,means it's the old version ,ignore it.
+		unsigned int monitor_analog_block_num[12];
+		unsigned int monitor_digital_block_num[12];
+
+	}reg;
+}Str_MISC;
+
 
 
 #pragma pack(pop)//恢复对齐状态 

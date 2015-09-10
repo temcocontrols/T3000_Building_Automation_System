@@ -9,7 +9,7 @@
 
 
 CString Range_Units[14] = {
-	_T("RAW DATA"),
+	_T("-"),
 	_T("TYPE2 10K C"),
 	_T("TYPE2 10K F"),
 	_T("0-100%"),
@@ -97,7 +97,7 @@ void CT3RangeDlg::Initial_window(){
 	m_show_unit.ShowWindow(TRUE);
 	temp_cs.Format(_T("%d"),m_input_Analog_select);
 	((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetWindowTextW(temp_cs);
-	for (int i=IDC_RADIO_T_0;i<=IDC_RADIO_T_13;i++)
+	for (int i=IDC_RADIO_T_0;i<IDC_STATIC_SPLIT_WINDOW;i++)
 	{
 		((CButton *)GetDlgItem(i))->SetCheck(0);
 	}

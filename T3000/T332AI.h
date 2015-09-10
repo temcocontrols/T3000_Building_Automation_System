@@ -39,6 +39,7 @@ public:
 	 
 	int m_curcol;
 	int m_currow;
+   
 private:
 	int	SN_LOW	;
 	int	SN_HI	;
@@ -160,6 +161,8 @@ public:
 	CComboBox m_comboxRange;
 	afx_msg void OnCbnSelchangeRangecombo();
 	afx_msg void OnBnClickedButtonReset();
+//    afx_msg void OnCbnSelchangeDelay();
+    afx_msg void OnEnKillfocusEditResponseDelay();
 };
 
 

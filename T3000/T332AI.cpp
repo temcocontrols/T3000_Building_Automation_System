@@ -29,6 +29,7 @@ void T332AI::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MSFLEXGRID_INPUT, m_msflexgrid_input);
 	DDX_Control(pDX, IDC_EDIT_NAME, m_inNameEdt);
 	DDX_Control(pDX, IDC_RANGECOMBO, m_comboxRange);
+    
 }
 
 BEGIN_MESSAGE_MAP(T332AI, CFormView)
@@ -36,6 +37,8 @@ BEGIN_MESSAGE_MAP(T332AI, CFormView)
 	ON_MESSAGE(WM_HOTKEY,&T332AI::OnHotKey)//快捷键消息映射手动加入
 	ON_CBN_SELCHANGE(IDC_RANGECOMBO, &T332AI::OnCbnSelchangeRangecombo)
 	ON_BN_CLICKED(IDC_BUTTON_RESET, &T332AI::OnBnClickedButtonReset)
+//    ON_CBN_SELCHANGE(IDC_DELAY, &T332AI::OnCbnSelchangeDelay)
+ON_EN_KILLFOCUS(IDC_EDIT_RESPONSE_DELAY, &T332AI::OnEnKillfocusEditResponseDelay)
 END_MESSAGE_MAP()
 
 
@@ -345,6 +348,8 @@ void T332AI::InitialDialog(){
 	GetDlgItem(IDC_EDIT_T3HARDWARE)->SetWindowText(strTemp);
 	strTemp.Format(_T("%d"),product_register_value[PIC_VER_NUMBER]);
 	GetDlgItem(IDC_EDIT_T3PICVERSION)->SetWindowText(strTemp);
+    strTemp.Format(_T("%d"),product_register_value[RESPONSE_DELAY]);
+    GetDlgItem(IDC_EDIT_RESPONSE_DELAY)->SetWindowText(strTemp);
 	// Input
 	CString strresult;
 	int regValue;
@@ -413,7 +418,7 @@ void T332AI::InitialDialog(){
 		m_msflexgrid_input.put_TextMatrix(i,1,strresult);
 
 
-		regValue=product_register_value[INPUT1+i-1];
+		regValue=(short)product_register_value[INPUT1+i-1];
 		//regValue=(short)product_register_value[INPUT1_PULSE_COUNT_LOW+2*(i-1)];
 
 		if (0==product_register_value[Range1+i-1])
@@ -731,4 +736,22 @@ void T332AI::OnBnClickedButtonReset()
 			InitialDialog();
 		}
 	}
+}
+
+
+ 
+
+
+void T332AI::OnEnKillfocusEditResponseDelay()
+{
+    CString strValue;
+    GetDlgItem(IDC_EDIT_RESPONSE_DELAY)->GetWindowText(strValue);
+    int IntValue;
+    IntValue = _wtoi(strValue);
+    int ret = write_one(g_tstat_id,RESPONSE_DELAY,IntValue);
+    if (ret>0)
+    {
+        product_register_value[RESPONSE_DELAY] = IntValue;
+    }
+    InitialDialog();
 }

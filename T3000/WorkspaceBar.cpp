@@ -43,6 +43,8 @@ BEGIN_MESSAGE_MAP(CWorkspaceBar, CDockablePane)
 	ON_NOTIFY(TVN_ENDLABELEDIT, ID_SHELLTREE, OnTvnEndlabeleditTree)
 	ON_NOTIFY(TVN_BEGINLABELEDIT, ID_SHELLTREE, OnTvnBeginlabeleditTree)
 	ON_NOTIFY(NM_CLICK, ID_SHELLTREE, OnNMClickTree)
+	ON_NOTIFY(TVN_SELCHANGED, ID_SHELLTREE, OnNMSelectChanged_Tree)
+
 	//ON_NOTIFY(TVN_SELCHANGED,ID_SHELLTREE,OnKYDOWNClickTree)
 	ON_WM_NCHITTEST()
 	ON_WM_LBUTTONDOWN()
@@ -511,6 +513,17 @@ void CWorkspaceBar::OnNMClickTree(NMHDR *pNMHDR, LRESULT *pResult)
 	pMainFrame->OnHTreeItemClick(pNMHDR,pResult);
 
 }
+
+void CWorkspaceBar::OnNMSelectChanged_Tree(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	// TODO: Add your control notification handler code here
+
+	CMainFrame* pMainFrame= (CMainFrame*)AfxGetMainWnd();
+	pMainFrame->OnHTreeMessageSeletedChanged(pNMHDR,pResult);
+
+}
+
+
 
 //void CWorkspaceBar::OnKYDOWNClickTree(NMHDR *pNMHDR, LRESULT *pResult)
 //{

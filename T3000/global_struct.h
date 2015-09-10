@@ -117,5 +117,23 @@ struct Tstat_Output_Struct{
 	Reg_Infor  ONOFF_Delay;
 	Reg_Infor  Signal_Type;
 };
+typedef struct
+{
+    char company[5];
+    char product_name[10];
+    unsigned char software_low;
+    unsigned char software_high;
+    char reserved[3];
+}Bin_Info;
+
+enum
+{
+    READ_SUCCESS = 0,
+    FILE_NOT_FIND = 1,
+    OPEN_FILE_ERROR = 2,
+    BIN_FILE_LENGTH_ERROR = 3,
+    BAD_HEX_FILE = 4,
+    NO_VERSION_INFO = 5
+};
  
 

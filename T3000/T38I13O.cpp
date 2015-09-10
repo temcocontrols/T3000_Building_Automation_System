@@ -65,23 +65,24 @@ T38I13O::~T38I13O()
 
 void T38I13O::DoDataExchange(CDataExchange* pDX)
 {
-	CFormView::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_MSFLEXGRID_INPUT, m_msflexgrid_input);
-	DDX_Control(pDX, IDC_MSFLEXGRID_OUTPUT, m_msflexgrid_output);
-	DDX_Control(pDX, IDC_RANGECOMBO, m_comboxRange);
-	DDX_Control(pDX, IDC_EDIT_NAME, m_inNameEdt);
-	DDX_Control(pDX, IDC_BRANDRATE, m_brandratebombox);
-	DDX_Control(pDX, IDC_DELAY, m_delaycombox);
+    CFormView::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_MSFLEXGRID_INPUT, m_msflexgrid_input);
+    DDX_Control(pDX, IDC_MSFLEXGRID_OUTPUT, m_msflexgrid_output);
+    DDX_Control(pDX, IDC_RANGECOMBO, m_comboxRange);
+    DDX_Control(pDX, IDC_EDIT_NAME, m_inNameEdt);
+    DDX_Control(pDX, IDC_BRANDRATE, m_brandratebombox);
+    //  DDX_Control(pDX, IDC_DELAY, m_delaycombox);
 }
 
 BEGIN_MESSAGE_MAP(T38I13O, CFormView)
 	ON_CBN_SELCHANGE(IDC_RANGECOMBO, &T38I13O::OnCbnSelchangeRangecombo)
 	ON_EN_KILLFOCUS(IDC_EDIT_NAME, &T38I13O::OnEnKillfocusEditName)
 	ON_CBN_SELCHANGE(IDC_BRANDRATE, &T38I13O::OnCbnSelchangeBrandrate)
-	ON_CBN_SELCHANGE(IDC_DELAY, &T38I13O::OnCbnSelchangeDelay)
+//	ON_CBN_SELCHANGE(IDC_DELAY, &T38I13O::OnCbnSelchangeDelay)
 	ON_WM_TIMER()
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_BUTTON_RESET, &T38I13O::OnBnClickedButtonReset)
+    ON_EN_KILLFOCUS(IDC_EDIT_RESPONSE_DELAY, &T38I13O::OnEnKillfocusEditResponseDelay)
 END_MESSAGE_MAP()
 
 
@@ -90,7 +91,7 @@ END_MESSAGE_MAP()
 #ifdef _DEBUG
 void T38I13O::AssertValid() const
 {
-	CFormView::AssertValid();
+    CFormView::AssertValid();
 }
 
 #ifndef _WIN32_WCE
@@ -566,7 +567,9 @@ GetDlgItem(IDC_EDIT_T3HARDWARE)->SetWindowText(strTemp);
 strTemp.Format(_T("%d"),product_register_value[PIC_VER_NUMBER]);
 GetDlgItem(IDC_EDIT_T3PICVERSION)->SetWindowText(strTemp);
 m_brandratebombox.SetCurSel(product_register_value[BAUDRATE]);
-m_delaycombox.SetCurSel(product_register_value[RESPONSE_DELAY]);
+//m_delaycombox.SetCurSel(product_register_value[RESPONSE_DELAY]);
+strTemp.Format(_T("%d"),product_register_value[RESPONSE_DELAY]);
+GetDlgItem(IDC_EDIT_RESPONSE_DELAY)->SetWindowText(strTemp);
 // Input
 CString strresult;
 int regValue;
@@ -1250,22 +1253,22 @@ void T38I13O::OnCbnSelchangeBrandrate()
 }
 
 
-void T38I13O::OnCbnSelchangeDelay()
-{
-	 int item=m_delaycombox.GetCurSel();
-	 int ret=write_one(g_tstat_id,RESPONSE_DELAY,item);
-	 if (ret>0)
-	 {
-	 product_register_value[RESPONSE_DELAY]=item;
-	 } 
-	 else
-	 {
-	 AfxMessageBox(_T("Write Error"));
-	 }
-
-	 m_delaycombox.SetCurSel(product_register_value[RESPONSE_DELAY]);
-
-}
+//void T38I13O::OnCbnSelchangeDelay()
+//{
+//	 int item=m_delaycombox.GetCurSel();
+//	 int ret=write_one(g_tstat_id,RESPONSE_DELAY,item);
+//	 if (ret>0)
+//	 {
+//	 product_register_value[RESPONSE_DELAY]=item;
+//	 } 
+//	 else
+//	 {
+//	 AfxMessageBox(_T("Write Error"));
+//	 }
+//
+//	 m_delaycombox.SetCurSel(product_register_value[RESPONSE_DELAY]);
+//
+//}
 
 
 void T38I13O::OnTimer(UINT_PTR nIDEvent)
@@ -1768,4 +1771,19 @@ void T38I13O::OnBnClickedButtonReset()
 		//  write_one(g_tstat_id,299,1);
 		write_one(g_tstat_id,300,1);
 	}
+}
+
+
+void T38I13O::OnEnKillfocusEditResponseDelay()
+{
+    CString strValue;
+    GetDlgItem(IDC_EDIT_RESPONSE_DELAY)->GetWindowText(strValue);
+    int IntValue;
+    IntValue = _wtoi(strValue);
+    int ret = write_one(g_tstat_id,RESPONSE_DELAY,IntValue);
+    if (ret>0)
+    {
+        product_register_value[RESPONSE_DELAY] = IntValue;
+    }
+    InitialDialog();
 }

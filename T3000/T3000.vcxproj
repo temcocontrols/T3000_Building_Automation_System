@@ -141,11 +141,11 @@
     <ClCompile Include="BacnetEditLabel.cpp" />
     <ClCompile Include="BacnetGraphic.cpp" />
     <ClCompile Include="BacnetInput.cpp" />
-    <ClCompile Include="BacnetInputForTstat.cpp" />
     <ClCompile Include="BacnetMonitor.cpp" />
     <ClCompile Include="BacnetOutput.cpp" />
     <ClCompile Include="BacnetProgram.cpp" />
     <ClCompile Include="BacnetProgramEdit.cpp" />
+    <ClCompile Include="BacnetProgramSetting.cpp" />
     <ClCompile Include="BacnetRange.cpp" />
     <ClCompile Include="BacnetRemotePoint.cpp" />
     <ClCompile Include="BacnetScheduleTime.cpp" />
@@ -162,6 +162,7 @@
     <ClCompile Include="BacnetWeeklyRoutine.cpp" />
     <ClCompile Include="BADO\BADO.cpp" />
     <ClCompile Include="BatchSNDlg.cpp" />
+    <ClCompile Include="BoatMonitorViewer.cpp" />
     <ClCompile Include="BuildingConfigration.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
     <ClCompile Include="CalibartionHT.cpp" />
@@ -210,6 +211,8 @@
     <ClCompile Include="DllFunction.cpp" />
     <ClCompile Include="Dowmloadfile.cpp" />
     <ClCompile Include="DownloadSocket.cpp" />
+    <ClCompile Include="EnterValueDlg.cpp" />
+    <ClCompile Include="Enter_Value_BinaryDlg.cpp" />
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="Flash_Multy.cpp" />
     <ClCompile Include="GraphicMode.cpp" />
@@ -252,6 +255,7 @@
     <ClCompile Include="ParameterDlg.cpp" />
     <ClCompile Include="ping.cpp" />
     <ClCompile Include="PressureSensorForm.cpp" />
+    <ClCompile Include="ProductRegisterListView.cpp" />
     <ClCompile Include="PVDlg.cpp" />
     <ClCompile Include="RefreshTreeThread.cpp" />
     <ClCompile Include="RegisterViewerDlg.cpp" />
@@ -264,6 +268,7 @@
     <ClCompile Include="SetPtDayDlg.cpp" />
     <ClCompile Include="SetptGraphicBar.cpp" />
     <ClCompile Include="StaticDlg.cpp" />
+    <ClCompile Include="StatusbarCtrl.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -282,7 +287,6 @@
     <ClCompile Include="T38AI16O.cpp" />
     <ClCompile Include="T38AI8AO.cpp" />
     <ClCompile Include="T38I13O.cpp" />
-    <ClCompile Include="T38IOAView.cpp" />
     <ClCompile Include="T3ModulesOutputDlg.cpp" />
     <ClCompile Include="T3ModulesView.cpp" />
     <ClCompile Include="T3RangeDlg.cpp" />
@@ -291,13 +295,13 @@
     <ClCompile Include="TDelayForm.cpp" />
     <ClCompile Include="TemcoDataGrid.cpp" />
     <ClCompile Include="TempHumSensorForm.cpp" />
-    <ClCompile Include="TestMultiReadTraffic.cpp" />
     <ClCompile Include="Timer_Calibrate.cpp" />
     <ClCompile Include="TrendLogView.cpp" />
     <ClCompile Include="TrendLogWnd.cpp" />
     <ClCompile Include="TroubleShootDlg.cpp" />
+    <ClCompile Include="TStatInputView.cpp" />
+    <ClCompile Include="TStatOutputView.cpp" />
     <ClCompile Include="TstatRangeDlg.cpp" />
-    <ClCompile Include="TstatsCPP\BacnetOutputForTstat.cpp" />
     <ClCompile Include="TstatZigbeeLogic.cpp" />
     <ClCompile Include="TStat_Dev.cpp" />
     <ClCompile Include="TStat_Net.cpp" />
@@ -311,12 +315,12 @@
     <ClCompile Include="WhichOneToChooseDlg.cpp" />
     <ClCompile Include="WorkspaceBar.cpp" />
     <ClCompile Include="T3\DialogT3.cpp" />
-    <ClCompile Include="MiniPanel\DialgMiniPanel.cpp" />
     <ClCompile Include="ADO\ADO.cpp" />
     <ClCompile Include="CM5\SliderBoth.cpp" />
     <ClCompile Include="CM5\SliderBothBtn.cpp" />
     <ClCompile Include="AirQuality\AirQuality.cpp" />
     <ClCompile Include="singleslider\MacSliderCtrl.cpp" />
+    <ClCompile Include="WriteRegistersValueDlg.cpp" />
     <ClCompile Include="WriteSingleRegDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -344,6 +348,7 @@
     <None Include="res\bmp_bacnet.bmp" />
     <None Include="res\bmp_down.bmp" />
     <None Include="res\bmp_up.bmp" />
+    <None Include="res\building.bin" />
     <None Include="res\Building.bmp" />
     <None Include="res\Building.mdb" />
     <None Include="res\check.bmp" />
@@ -360,6 +365,7 @@
     <None Include="res\Input.ico" />
     <None Include="res\LCD Table Button.bmp" />
     <None Include="res\LED Table Button.bmp" />
+    <None Include="res\lock.ico" />
     <None Include="res\Login" />
     <None Include="res\Login.bmp" />
     <None Include="res\MDisable.bmp" />
@@ -403,6 +409,7 @@
     <None Include="res\Toolbar_V25049.bmp" />
     <None Include="res\ToolbarOwn.bmp" />
     <None Include="res\treenode.bmp" />
+    <None Include="res\unlock.ico" />
     <None Include="res\variable.ico" />
     <None Include="res\week.ico" />
     <None Include="UserImages.bmp" />
@@ -425,6 +432,7 @@
     <ClInclude Include="BacnetOutput.h" />
     <ClInclude Include="BacnetProgram.h" />
     <ClInclude Include="BacnetProgramEdit.h" />
+    <ClInclude Include="BacnetProgramSetting.h" />
     <ClInclude Include="BacnetRange.h" />
     <ClInclude Include="BacnetRemotePoint.h" />
     <ClInclude Include="BacnetScreenEdit.h" />
@@ -439,6 +447,7 @@
     <ClInclude Include="Bacnet_Include.h" />
     <ClInclude Include="BADO\BADO.h" />
     <ClInclude Include="BatchSNDlg.h" />
+    <ClInclude Include="BoatMonitorViewer.h" />
     <ClInclude Include="BuildingConfigration.h" />
     <ClInclude Include="CalibartionHT.h" />
     <ClInclude Include="ChartCtrl\ChartAxis.h" />
@@ -494,6 +503,8 @@
     <ClInclude Include="DllFunction.h" />
     <ClInclude Include="Dowmloadfile.h" />
     <ClInclude Include="DownloadSocket.h" />
+    <ClInclude Include="EnterValueDlg.h" />
+    <ClInclude Include="Enter_Value_BinaryDlg.h" />
     <ClInclude Include="fileRW.h" />
     <ClInclude Include="Flash_Multy.h" />
     <ClInclude Include="gloab_define.h" />
@@ -505,11 +516,13 @@
     <ClInclude Include="NewHumChamberView.h" />
     <ClInclude Include="ping.h" />
     <ClInclude Include="PressureSensorForm.h" />
+    <ClInclude Include="ProductRegisterListView.h" />
     <ClInclude Include="PVDlg.h" />
     <ClInclude Include="RegisterViewerDlg.h" />
     <ClInclude Include="RegisterWriteValueDlg.h" />
     <ClInclude Include="Scanwaydlg.h" />
     <ClInclude Include="StaticDlg.h" />
+    <ClInclude Include="StatusbarCtrl.h" />
     <ClInclude Include="T3000DefaultView.h" />
     <ClInclude Include="T3000UpdateDlg.h" />
     <ClInclude Include="T3000_Default_MainView.h" />
@@ -520,7 +533,6 @@
     <ClInclude Include="T38AI16O.h" />
     <ClInclude Include="T38AI8AO.h" />
     <ClInclude Include="T38I13O.h" />
-    <ClInclude Include="T38IOAView.h" />
     <ClInclude Include="T3ModulesOutputDlg.h" />
     <ClInclude Include="T3ModulesView.h" />
     <ClInclude Include="T3RangeDlg.h" />
@@ -529,9 +541,10 @@
     <ClInclude Include="TCP_Server.h" />
     <ClInclude Include="TemcoDataGrid.h" />
     <ClInclude Include="TempHumSensorForm.h" />
-    <ClInclude Include="TestMultiReadTraffic.h" />
     <ClInclude Include="TrendLogWnd.h" />
     <ClInclude Include="TroubleShootDlg.h" />
+    <ClInclude Include="TStatInputView.h" />
+    <ClInclude Include="TStatOutputView.h" />
     <ClInclude Include="TstatRangeDlg.h" />
     <ClInclude Include="TstatZigbeeLogic.h" />
     <ClInclude Include="WeeklySchedule.h" />
@@ -615,12 +628,12 @@
     <ClInclude Include="WhichOneToChooseDlg.h" />
     <ClInclude Include="WorkspaceBar.h" />
     <ClInclude Include="T3\DialogT3.h" />
-    <ClInclude Include="MiniPanel\DialgMiniPanel.h" />
     <ClInclude Include="ADO\ADO.h" />
     <ClInclude Include="CM5\DialogCM5.h" />
     <ClInclude Include="CM5\SliderBoth.h" />
     <ClInclude Include="CM5\SliderBothBtn.h" />
     <ClInclude Include="singleslider\MacSliderCtrl.h" />
+    <ClInclude Include="WriteRegistersValueDlg.h" />
     <ClInclude Include="WriteSingleRegDlg.h" />
   </ItemGroup>
   <ItemGroup>

@@ -11,11 +11,12 @@
 #include "globle_function.h"
 #include "gloab_define.h"
 #include "BacnetRange.h"
+#include "MainFrm.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
-Str_out_point m_temp_output_data[BAC_OUTPUT_ITEM_COUNT];
 
-int output_item_limit_count = BAC_OUTPUT_ITEM_COUNT;	//output list 要显示多少个output 的个数， 不是根据vector 的size 来判断大小;
+
+
 
 IMPLEMENT_DYNAMIC(CBacnetOutput, CDialogEx)
 
@@ -52,10 +53,7 @@ END_MESSAGE_MAP()
 
 LRESULT  CBacnetOutput::OutputMessageCallBack(WPARAM wParam, LPARAM lParam)
 {
-	if((g_protocol != PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP) && (g_protocol != PROTOCOL_BIP_TO_MSTP))
-	{
-		return OutputMessageCallBack_Tstat(wParam,lParam);
-	}
+ 
 	_MessageInvokeIDInfo *pInvoke =(_MessageInvokeIDInfo *)lParam;
 	bool msg_result=WRITE_FAIL;
 	msg_result = MKBOOL(wParam);
@@ -119,19 +117,7 @@ BOOL CBacnetOutput::OnInitDialog()
 
 void CBacnetOutput::Reload_Unit_Type()
 {
-	if (g_protocol == PROTOCOL_UNKNOW)
-	{
-		return;
-	}
-	if((g_protocol!=255)&&(m_latest_protocol!=g_protocol))
-	{
-		m_latest_protocol=g_protocol;
-		if((m_latest_protocol == PROTOCOL_BACNET_IP) || (m_latest_protocol == MODBUS_BACNET_MSTP) || (m_latest_protocol == PROTOCOL_BIP_TO_MSTP))
-		{
-			Initial_List();
-			TRACE("Fresh_List Mini \n");
-		} 
-	}
+	 
 
 	for (int i=0;i<(int)m_Output_data.size();i++)	//Initial All first.
 	{
@@ -270,19 +256,21 @@ void CBacnetOutput::Initial_List()
 
 	m_output_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	m_output_list.SetExtendedStyle(m_output_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_output_list.InsertColumn(OUTPUT_NUM, _T("Output"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-	m_output_list.InsertColumn(OUTPUT_FULL_LABLE, _T("Full Label"), 140, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_HW_SWITCH, _T("HOA Switch"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_RANGE, _T("Range"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_0_PERSENT, _T("0%"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_100_PERSENT, _T("100%"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_DECOM, _T("Status"), 70, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_LABLE, _T("Label"), 70, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_NUM, _T("Output"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_output_list.InsertColumn(OUTPUT_FULL_LABLE, _T("Full Label"), 140, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_HW_SWITCH, _T("HOA Switch"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_RANGE, _T("Range"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	//m_output_list.InsertColumn(OUTPUT_0_PERSENT, _T("0%"), 60, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	//m_output_list.InsertColumn(OUTPUT_100_PERSENT, _T("100%"), 60, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_PWM_PERIOD, _T("PWM Period"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	
+	m_output_list.InsertColumn(OUTPUT_DECOM, _T("Status"), 70, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_LABLE, _T("Label"), 70, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_dlg_hwnd = this->m_hWnd;
-	g_hwnd_now = m_output_dlg_hwnd;
+	//g_hwnd_now = m_output_dlg_hwnd;
 	
  
 	for (int i=0;i<(int)m_Output_data.size();i++)
@@ -295,7 +283,7 @@ void CBacnetOutput::Initial_List()
 		if(i>=output_item_limit_count)
 			break;
 
-		temp_item.Format(_T("%d"),i+1);
+		temp_item.Format(_T("OUT%d"),i+1);
 		m_output_list.InsertItem(i,temp_item);
 
 
@@ -328,6 +316,7 @@ void CBacnetOutput::Initial_List()
 		}
 
 	}
+	m_output_list.InitListData();
 	m_output_list.ShowWindow(SW_SHOW);
 }
 
@@ -339,34 +328,11 @@ void CBacnetOutput::OnBnClickedButtonOutputRead()
 		PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 }
 
-
+       // PostMessage(g_hwnd_now,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 
 LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 {
-	if (g_protocol == PROTOCOL_UNKNOW)
-	{
-		return 0;
-	}
-	if((g_protocol!=255)&&(m_latest_protocol!=g_protocol))
-	{
-		m_latest_protocol=g_protocol;
-		if ((m_latest_protocol==PROTOCOL_BACNET_IP) || (m_latest_protocol == MODBUS_BACNET_MSTP) || (m_latest_protocol == PROTOCOL_BIP_TO_MSTP))
-		{
-			Initial_List();
-			TRACE("Fresh_List Mini \n");
-		} 
-		else
-		{
-			Initial_ListFor_Tstat();
-			TRACE("Fresh_List Tstat \n");
-		}
-
-	}
-
-	if ((g_protocol != PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP) && (g_protocol != PROTOCOL_BIP_TO_MSTP))
-	{
-	  return Fresh_Output_List_Tstat(wParam,lParam) ;
-	}
+     
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
 	if(isFreshOne == REFRESH_ON_ITEM)
@@ -442,13 +408,13 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				if(m_Output_data.at(i).hw_switch_status == HW_SW_OFF)
 				{
 					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-OFF"));
-					m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
+					//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
 					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
 				}
 				else if(m_Output_data.at(i).hw_switch_status == HW_SW_HAND)
 				{
 					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-ON"));
-					m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
+					//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
 					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
 				}
 				else
@@ -458,12 +424,12 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 					if(m_Output_data.at(i).auto_manual==0)	//In output table if it is auto ,the value can't be edit by user
 					{
 						m_output_list.SetItemText(i,OUTPUT_AUTO_MANUAL,_T("Auto"));
-						m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
+						//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
 					}
 					else
 					{
 						m_output_list.SetItemText(i,OUTPUT_AUTO_MANUAL,_T("Manual"));
-						m_output_list.SetCellEnabled(i,OUTPUT_VALUE,1);
+						//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,1);
 					}
 				}
 			}
@@ -474,13 +440,13 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				if(m_Output_data.at(i).auto_manual==0)	//In output table if it is auto ,the value can't be edit by user
 				{
 					m_output_list.SetItemText(i,OUTPUT_AUTO_MANUAL,_T("Auto"));
-					m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
+					//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
 				}
 				else
 				{
 					m_Output_data.at(i).auto_manual = 1;
 					m_output_list.SetItemText(i,OUTPUT_AUTO_MANUAL,_T("Manual"));
-					m_output_list.SetCellEnabled(i,OUTPUT_VALUE,1);
+					//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,1);
 				}
 			}
 		}
@@ -490,13 +456,13 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			if(m_Output_data.at(i).auto_manual==0)	//In output table if it is auto ,the value can't be edit by user
 			{
 				m_output_list.SetItemText(i,OUTPUT_AUTO_MANUAL,_T("Auto"));
-				m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
+				//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
 			}
 			else
 			{
 				m_Output_data.at(i).auto_manual = 1;
 				m_output_list.SetItemText(i,OUTPUT_AUTO_MANUAL,_T("Manual"));
-				m_output_list.SetCellEnabled(i,OUTPUT_VALUE,1);
+				//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,1);
 			}
 		}
 
@@ -506,8 +472,8 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			m_output_list.SetCellEnabled(i,OUTPUT_UNITE,0);
 		if(m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG)
 		{
-			m_output_list.SetCellEnabled(i,OUTPUT_0_PERSENT,1);
-			m_output_list.SetCellEnabled(i,OUTPUT_100_PERSENT,1);
+			//m_output_list.SetCellEnabled(i,OUTPUT_0_PERSENT,1);
+			//m_output_list.SetCellEnabled(i,OUTPUT_100_PERSENT,1);
 
 			if(m_Output_data.at(i).range == 0)
 				m_output_list.SetItemText(i,OUTPUT_RANGE,_T("Unused"));
@@ -536,19 +502,27 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			cstemp_value.Format(_T("%.2f"),temp_float_value);
 			m_output_list.SetItemText(i,OUTPUT_VALUE,cstemp_value);
 #endif
-			m_output_list.SetItemText(i,OUTPUT_0_PERSENT,temp_low);
-			m_output_list.SetItemText(i,OUTPUT_100_PERSENT,temp_high);
+			//m_output_list.SetItemText(i,OUTPUT_0_PERSENT,temp_low);
+			//m_output_list.SetItemText(i,OUTPUT_100_PERSENT,temp_high);
 		}
 		else if(m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
 		{
-			m_output_list.SetCellEnabled(i,OUTPUT_0_PERSENT,0);
-			m_output_list.SetCellEnabled(i,OUTPUT_100_PERSENT,0);
-			m_output_list.SetItemText(i,OUTPUT_0_PERSENT,_T(""));
-			m_output_list.SetItemText(i,OUTPUT_100_PERSENT,_T(""));
+			//m_output_list.SetCellEnabled(i,OUTPUT_0_PERSENT,0);
+			//m_output_list.SetCellEnabled(i,OUTPUT_100_PERSENT,0);
+			//m_output_list.SetItemText(i,OUTPUT_0_PERSENT,_T(""));
+			//m_output_list.SetItemText(i,OUTPUT_100_PERSENT,_T(""));
 			/*m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[m_Output_data.at(i).range]);*/
 			m_output_list.SetItemText(i,OUTPUT_UNITE,_T(""));
 
-			if(m_Output_data.at(i).range<=22)
+			if(m_Output_data.at(i).range == 0)
+			{
+				CString temp_value2;
+				temp_value2.Format(_T("%.2f"),((float)m_Output_data.at(i).value) / 1000);
+				m_output_list.SetItemText(i,OUTPUT_VALUE,temp_value2);
+
+				m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[0]);
+			}
+			else if(m_Output_data.at(i).range<=22)
 				m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[m_Output_data.at(i).range]);
 			else if((m_Output_data.at(i).range >= 23) && (m_Output_data.at(i).range <= 30))
 			{
@@ -565,9 +539,9 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			else
 				m_output_list.SetItemText(i,OUTPUT_RANGE,Digital_Units_Array[m_Output_data.at(i).range]);
 #endif
-			if(m_Output_data.at(i).range>30)
+			if((m_Output_data.at(i).range>30) || (m_Output_data.at(i).range == 0))
 			{
-				m_output_list.SetItemText(i,OUTPUT_UNITE,Digital_Units_Array[0]);
+				//m_output_list.SetItemText(i,OUTPUT_UNITE,Digital_Units_Array[0]);
 			}
 			else
 			{
@@ -606,12 +580,14 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			temp_status.Empty();
 		m_output_list.SetItemText(i,OUTPUT_DECOM,temp_status);
 
+		CString temp_pwm_period;
+		temp_pwm_period.Format(_T("%u"),(unsigned char)m_Output_data.at(i).pwm_period);
+		m_output_list.SetItemText(i,OUTPUT_PWM_PERIOD,temp_pwm_period);
 
 		CString temp_des2;
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).label, (int)strlen((char *)m_Output_data.at(i).label)+1, 
 			temp_des2.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des2.ReleaseBuffer();
-
 		m_output_list.SetItemText(i,OUTPUT_LABLE,temp_des2);
 		if(isFreshOne)
 		{
@@ -626,10 +602,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 
 LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 {
-	if ((g_protocol != PROTOCOL_BACNET_IP) && (g_protocol != PROTOCOL_BIP_TO_MSTP) && (g_protocol != MODBUS_BACNET_MSTP))
-	{
-		return Fresh_Output_Item_Tstat(  wParam,  lParam) ;
-	}
+	 
 	int cmp_ret ;//compare if match it will 0;
 	int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
@@ -639,6 +612,19 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 	CString cstemp_value;
 	//先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
 	memcpy_s(&m_temp_output_data[Changed_Item],sizeof(Str_out_point),&m_Output_data.at(Changed_Item),sizeof(Str_out_point));
+
+	if(Changed_SubItem == OUTPUT_PWM_PERIOD)
+	{
+		CString temp_cs = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
+		int temp_int = (int)(_wtof(temp_cs));
+		if((temp_int<0) || (temp_int >=256))
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Data out of range!"));
+			PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0;
+		}
+		m_Output_data.at(Changed_Item).pwm_period = (unsigned char)temp_int;
+	}
 
 	if(Changed_SubItem == OUTPUT_LABLE)
 	{
@@ -671,6 +657,11 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 			PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			return 0;
 		}
+		if(Check_FullLabel_Exsit(cs_temp))
+		{
+			PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0;
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -682,12 +673,12 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		CString temp_cs = m_output_list.GetItemText(Changed_Item,Changed_SubItem);
 		if(temp_cs.CompareNoCase(_T("Auto"))==0)
 		{
-			m_output_list.SetCellEnabled(Changed_Item,OUTPUT_VALUE,0);
+			//m_output_list.SetCellEnabled(Changed_Item,OUTPUT_VALUE,0);
 			m_Output_data.at(Changed_Item).auto_manual = BAC_AUTO ;
 		}
 		else
 		{
-			m_output_list.SetCellEnabled(Changed_Item,OUTPUT_VALUE,1);
+			//m_output_list.SetCellEnabled(Changed_Item,OUTPUT_VALUE,1);
 			m_Output_data.at(Changed_Item).auto_manual = BAC_MANUAL ;
 		}
 	}
@@ -733,11 +724,7 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 
 void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	if((g_protocol != PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP) && (g_protocol != PROTOCOL_BIP_TO_MSTP))
-	{
-		OnNMClickListOutput_Tstat(pNMHDR,pResult)   ;
-		return ; 
-	}
+	 
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO: Add your control notification handler code here
 	long lRow,lCol;
@@ -749,6 +736,45 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 	lvinfo.pt=point;
 	lvinfo.flags=LVHT_ABOVE;
 	int nItem=m_output_list.SubItemHitTest(&lvinfo);
+
+	if((nItem!=-1) && (nItem < BAC_OUTPUT_ITEM_COUNT))
+	{
+		output_list_line = nItem;
+		if((m_Output_data.at(output_list_line).sub_id !=0) &&
+			(m_Output_data.at(output_list_line).sub_number !=0) &&
+			(m_Output_data.at(output_list_line).sub_product !=0))
+		{
+			unsigned char temp_pid = m_Input_data.at(input_list_line).sub_product;
+			if((temp_pid == PM_T3PT10) ||
+				(temp_pid == PM_T3IOA) ||
+				(temp_pid == PM_T332AI) ||
+				(temp_pid == PM_T38AI16O) ||
+				(temp_pid == PM_T38I13O) ||
+				(temp_pid == PM_T34AO) ||
+				(temp_pid == PM_T36CT))
+			{
+				m_output_item_info.ShowWindow(true);
+				CString temp_name;
+				temp_name = GetProductName(m_Output_data.at(output_list_line).sub_product);
+				CString show_info;
+				CString temp_id;
+				CString temp_number;
+				temp_id.Format(_T(" Sub ID: %d        "),m_Output_data.at(output_list_line).sub_id);
+				temp_number.Format(_T("Output%d"),m_Output_data.at(output_list_line).sub_number);
+				show_info = _T("Module:") + temp_name +_T("        ") + temp_id + temp_number;
+				m_output_item_info.SetWindowTextW(show_info);
+
+			}	
+			else
+			{
+				m_output_item_info.ShowWindow(false);
+			}
+		}
+		else
+		{
+			m_output_item_info.ShowWindow(false);
+		}
+	}
 
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
@@ -766,11 +792,16 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if(lCol == OUTPUT_VALUE)
 	{
+		if(m_Output_data.at(lRow).auto_manual == BAC_AUTO)	//If it is auto mode, disable to change the value.
+		{
+			m_output_list.Set_Edit(false);
+			return;
+		}
+
 		if(m_Output_data.at(lRow).digital_analog != BAC_UNITS_DIGITAL)
 			return;
 
-		if(m_Output_data.at(lRow).auto_manual == BAC_AUTO)	//If it is auto mode, disable to change the value.
-			return;
+
 
 		memcpy_s(&m_temp_output_data[lRow],sizeof(Str_out_point),&m_Output_data.at(lRow),sizeof(Str_out_point));
 
@@ -819,14 +850,14 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 		{
 			m_Output_data.at(lRow).auto_manual = 1;
 			m_output_list.SetItemText(lRow,OUTPUT_AUTO_MANUAL,_T("Manual"));
-			m_output_list.SetCellEnabled(lRow,OUTPUT_VALUE,TRUE);
+			//m_output_list.SetCellEnabled(lRow,OUTPUT_VALUE,TRUE);
 			New_CString = _T("Manual");
 		}
 		else
 		{
 			m_Output_data.at(lRow).auto_manual = 0;
 			m_output_list.SetItemText(lRow,OUTPUT_AUTO_MANUAL,_T("Auto"));
-			m_output_list.SetCellEnabled(lRow,OUTPUT_VALUE,FALSE);
+			//m_output_list.SetCellEnabled(lRow,OUTPUT_VALUE,FALSE);
 			New_CString = _T("Auto");
 		}
 	}
@@ -929,10 +960,10 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 					m_output_list.SetItemText(lRow,OUTPUT_UNITE,Output_Analog_Units_Show[bac_range_number_choose]);		
 					m_output_list.SetItemText(lRow,OUTPUT_RANGE,OutPut_List_Analog_Range[bac_range_number_choose]);	
 
-					m_output_list.SetItemText(lRow,OUTPUT_0_PERSENT,_T("0"));
-					m_output_list.SetCellEnabled(lRow,OUTPUT_0_PERSENT,1);
-					m_output_list.SetItemText(lRow,OUTPUT_100_PERSENT,_T("10"));
-					m_output_list.SetCellEnabled(lRow,OUTPUT_100_PERSENT,1);
+					//m_output_list.SetItemText(lRow,OUTPUT_0_PERSENT,_T("0"));
+					//m_output_list.SetCellEnabled(lRow,OUTPUT_0_PERSENT,1);
+					//m_output_list.SetItemText(lRow,OUTPUT_100_PERSENT,_T("10"));
+					//m_output_list.SetCellEnabled(lRow,OUTPUT_100_PERSENT,1);
 				 
 #if 0
 					CString cstemp_value;
@@ -950,10 +981,10 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 					m_Output_data.at(lRow).digital_analog =  BAC_UNITS_DIGITAL;
 					m_Output_data.at(lRow).range =  bac_range_number_choose;
 
-					m_output_list.SetItemText(lRow,OUTPUT_0_PERSENT,_T(""));
-					m_output_list.SetCellEnabled(lRow,OUTPUT_0_PERSENT,0);
-					m_output_list.SetItemText(lRow,OUTPUT_100_PERSENT,_T(""));
-					m_output_list.SetCellEnabled(lRow,OUTPUT_100_PERSENT,0);
+					//m_output_list.SetItemText(lRow,OUTPUT_0_PERSENT,_T(""));
+					//m_output_list.SetCellEnabled(lRow,OUTPUT_0_PERSENT,0);
+					//m_output_list.SetItemText(lRow,OUTPUT_100_PERSENT,_T(""));
+					//m_output_list.SetCellEnabled(lRow,OUTPUT_100_PERSENT,0);
 
 
 
@@ -1063,6 +1094,16 @@ BOOL CBacnetOutput::PreTranslateMessage(MSG* pMsg)
 		m_output_list.Get_clicked_mouse_position();
 		return TRUE;
 	}
+    CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+    if (pFrame->m_pDialogInfo->IsWindowVisible())
+    {
+        if (pMsg->message == WM_LBUTTONDOWN||pMsg->message == WM_RBUTTONDOWN)
+        {
+            //  pMain->m_pDialogInfo->ShowWindow(SW_HIDE);
+            ::PostMessage(MainFram_hwd,WM_LBUTTONDOWN,0,0);
+        }
+    }
+     
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 

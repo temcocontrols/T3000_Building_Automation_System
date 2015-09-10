@@ -86,7 +86,7 @@ void CCO2_View::DoDataExchange(CDataExchange* pDX)
     DDX_Text(pDX, IDC_EDIT_INTERNAL_TEMP, m_f_internal_temp);
     DDX_Text(pDX, IDC_EDIT_EXTERNAL_TEMP, m_f_external_temp);
     DDX_Control(pDX, IDC_COMBO_CO2_SENSOR_SEL, m_sensor_sel);
-    DDX_Control(pDX, IDC_LIST_CO2_EXTERNAL_SENSOR, m_co2_external_sensor_list);
+   // DDX_Control(pDX, IDC_LIST_CO2_EXTERNAL_SENSOR, m_co2_external_sensor_list);
     DDX_Text(pDX, IDC_EDIT_CO2_HUMIDITY, m_humidity_value);
     DDX_Control(pDX, IDC_CO2_DATETIMEPICKER1, m_co2_day_picker);
     DDX_Control(pDX, IDC_CO2_DATETIMEPICKER_TIME, m_co2_time_picker);
@@ -130,7 +130,7 @@ BEGIN_MESSAGE_MAP(CCO2_View, CFormView)
     ON_MESSAGE(WM_REFRESH_CO2_DLG, &CCO2_View::DealMessage)
     ON_EN_KILLFOCUS(IDC_CO2_ALARM_ON_TIME, &CCO2_View::OnEnKillfocusCo2AlarmOnTime)
     ON_EN_KILLFOCUS(IDC_CO2_ALARM_OFF_TIME, &CCO2_View::OnEnKillfocusCo2AlarmOffTime)
-    ON_BN_CLICKED(IDC_BTN_CO2_CLEAR_CAL, &CCO2_View::OnBnClickedBtnCo2ClearCal)
+   // ON_BN_CLICKED(IDC_BTN_CO2_CLEAR_CAL, &CCO2_View::OnBnClickedBtnCo2ClearCal)
     ON_BN_CLICKED(IDC_RADIO_HUMIDITY_HEAT_ENABLE, &CCO2_View::OnBnClickedRadioHumidityHeatEnable)
     ON_BN_CLICKED(IDC_RADIO_HUMIDITY_HEAT_DISABLE, &CCO2_View::OnBnClickedRadioHumidityHeatDisable)
     ON_EN_KILLFOCUS(IDC_EDIT_CO2_HUMIDITY, &CCO2_View::OnEnKillfocusEditCo2Humidity)
@@ -144,7 +144,7 @@ BEGIN_MESSAGE_MAP(CCO2_View, CFormView)
     ON_MESSAGE(WM_REFRESH_BAC_INPUT_LIST,Fresh_Lists)
     ON_NOTIFY(NM_CLICK, IDC_LIST_INPUT_AQ, &CCO2_View::OnNMClickList_Input)
     ON_NOTIFY(NM_CLICK, IDC_LIST_OUTPUT_AQ, &CCO2_View::OnNMClickList_Output)
-    ON_NOTIFY(NM_CLICK, IDC_LIST_CO2_EXTERNAL_SENSOR, &CCO2_View::OnNMClickList_CO2List)  //Fresh_Lists
+   // ON_NOTIFY(NM_CLICK, IDC_LIST_CO2_EXTERNAL_SENSOR, &CCO2_View::OnNMClickList_CO2List)  //Fresh_Lists
     ON_BN_CLICKED(IDC_GRAPIC, &CCO2_View::OnBnClickedGrapic)
 END_MESSAGE_MAP()
 
@@ -180,8 +180,18 @@ void CCO2_View::Fresh()
     m_upButton.ShowWindow(SW_HIDE);
 
     Initial_Registerlist();
-    
+    bitset<16> SensorBit(product_register_value[14]);
+    if (SensorBit[0])
+    {
+        m_product_type = 1;
+    }
+    else
+    {
+      m_product_type = 2; 
+    }
     SH_Window();
+    
+
     if (m_product_type == 1)
     {
         Fresh_CO2();
@@ -254,21 +264,38 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_CO2_ALARM_OFF_TIME)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_EDIT_CO2_BLOCK_TIME)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_LIST_CO2_EXTERNAL_SENSOR)->ShowWindow(SW_SHOW);
+     //   GetDlgItem(IDC_LIST_CO2_EXTERNAL_SENSOR)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_STATIC_CALIBRATION_OFFSET)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_CO2_ALARM_SETPOINT)->ShowWindow(SW_SHOW);
 
         GetDlgItem(IDC_STATIC_INPUT_SETTING)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_LIST_INPUT_AQ)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_LIST_OUTPUT_AQ)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_OUTPUT_SETTING)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_LIST_CO2_EXTERNAL_SENSOR)->ShowWindow(SW_HIDE);
+       // GetDlgItem(IDC_LIST_CO2_EXTERNAL_SENSOR)->ShowWindow(SW_HIDE);
+
+        GetDlgItem(IDC_STATIC_LAB_DATE)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_STATIC_TIME)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_CO2_DATETIMEPICKER_TIME)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_CO2_DATETIMEPICKER1)->ShowWindow(SW_SHOW);
+         GetDlgItem(IDC_BUTTON_CO2_SYNC_TIME)->ShowWindow(SW_SHOW);
     } 
     else
     {
+
+
+        GetDlgItem(IDC_STATIC_LAB_DATE)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_TIME)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_CO2_DATETIMEPICKER_TIME)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_CO2_DATETIMEPICKER1)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_BUTTON_CO2_SYNC_TIME)->ShowWindow(SW_HIDE);
+
+
         GetDlgItem(IDC_STATIC_INPUT_SETTING)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_LIST_INPUT_AQ)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_LIST_OUTPUT_AQ)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_STATIC_OUTPUT_SETTING)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_LIST_CO2_EXTERNAL_SENSOR)->ShowWindow(SW_SHOW);
+      //  GetDlgItem(IDC_LIST_CO2_EXTERNAL_SENSOR)->ShowWindow(SW_SHOW);
 
         GetDlgItem(IDC_STATIC_RELATIVE_HUMIDITY)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_EDIT_CO2_HUMIDITY)->ShowWindow(SW_HIDE);
@@ -304,14 +331,14 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_CO2_ALARM_OFF_TIME)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_EDIT_CO2_BLOCK_TIME)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_LIST_CO2_EXTERNAL_SENSOR)->ShowWindow(SW_HIDE);
+        // GetDlgItem(IDC_LIST_CO2_EXTERNAL_SENSOR)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_STATIC_CALIBRATION_OFFSET)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_CO2_ALARM_SETPOINT)->ShowWindow(SW_HIDE);
     }
 }
 
 void CCO2_View::Fresh_CO2(){
-
+      Initial_List();
     C02_SHOW_TEMP();
 
     m_humidity_value = (float)(product_register_value[CO2_485_MODBUS_HUMIDITY_RH])/10.0;
@@ -326,9 +353,9 @@ void CCO2_View::Fresh_CO2(){
     }
     CO2_Alarm_Set();
     //CO2_Grid_init();
-    //Initial_List();
+  
  
-    Fresh_External_List();
+   // Fresh_External_List();
 
 
     if(product_register_value[CO2_485_MODBUS_PASSWORD_ENABLE] == 1)
@@ -513,45 +540,45 @@ void CCO2_View::C02_SHOW_TEMP()
 }
 
 
-void CCO2_View::Initial_List()
-{
-    m_co2_external_sensor_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
-    m_co2_external_sensor_list.SetExtendedStyle(m_co2_external_sensor_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
+ void CCO2_View::Initial_List()
+ {
+//      m_co2_external_sensor_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
+//      m_co2_external_sensor_list.SetExtendedStyle(m_co2_external_sensor_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
+//  
+//      m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_NUM, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+//      m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_DEVICE_ID, _T("Device ID"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+//      m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_SERIAL_NUM, _T("Serial Number"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+//      m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_PPM, _T("External PPM"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+//      m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_PRE_ALARM_SP, _T("Prepare Alarm Setpoint"), 130, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+//      m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_ALARM_SP, _T("Alarm Setpoint"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+//      m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_CAL_OFFSET, _T("Calibrating Offset"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+//      //Fresh_External_List();
+//      g_hwnd_now = this->m_hWnd;
+     //m_input_dlg_hwnd = this->m_hWnd;
+     //g_hwnd_now = m_input_dlg_hwnd;
+     m_grid_input.put_Cols(6);
+     m_grid_input.put_Rows(4);
+     m_grid_input.put_TextMatrix(0,1,_T("Name"));
+     m_grid_input.put_TextMatrix(0,2,_T("Range"));
+     m_grid_input.put_TextMatrix(0,3,_T("A/M"));
+     m_grid_input.put_TextMatrix(0,4,_T("Value"));
+     m_grid_input.put_TextMatrix(0,5,_T("Calibration"));
+ 
+     m_grid_input.put_TextMatrix(1,0,_T("1"));
+     m_grid_input.put_TextMatrix(2,0,_T("2"));
+     m_grid_input.put_TextMatrix(3,0,_T("3"));
+ 
+ 
+     m_grid_input.put_TextMatrix(1,1,_T("Tempreture"));
+     m_grid_input.put_TextMatrix(2,1,_T("Hum"));
+     m_grid_input.put_TextMatrix(3,1,_T("CO2"));
+ 
+ 
+     m_grid_input.put_TextMatrix(2,2,_T("%"));
+     m_grid_input.put_TextMatrix(3,2,_T("ppm"));
+ }
 
-    m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_NUM, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-    m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_DEVICE_ID, _T("Device ID"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_SERIAL_NUM, _T("Serial Number"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_PPM, _T("External PPM"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_PRE_ALARM_SP, _T("Prepare Alarm Setpoint"), 130, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_ALARM_SP, _T("Alarm Setpoint"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_co2_external_sensor_list.InsertColumn(CO2_EXTERNAL_CAL_OFFSET, _T("Calibrating Offset"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    //Fresh_External_List();
-    g_hwnd_now = this->m_hWnd;
-    //m_input_dlg_hwnd = this->m_hWnd;
-    //g_hwnd_now = m_input_dlg_hwnd;
-    m_grid_input.put_Cols(6);
-    m_grid_input.put_Rows(4);
-    m_grid_input.put_TextMatrix(0,1,_T("Name"));
-    m_grid_input.put_TextMatrix(0,2,_T("Range"));
-    m_grid_input.put_TextMatrix(0,3,_T("A/M"));
-    m_grid_input.put_TextMatrix(0,4,_T("Value"));
-    m_grid_input.put_TextMatrix(0,5,_T("Calibration"));
-
-    m_grid_input.put_TextMatrix(1,0,_T("1"));
-    m_grid_input.put_TextMatrix(2,0,_T("2"));
-    m_grid_input.put_TextMatrix(3,0,_T("3"));
-
-
-    m_grid_input.put_TextMatrix(1,1,_T("Tempreture"));
-    m_grid_input.put_TextMatrix(2,1,_T("Hum"));
-    m_grid_input.put_TextMatrix(3,1,_T("CO2"));
-
-
-    m_grid_input.put_TextMatrix(2,2,_T("%"));
-    m_grid_input.put_TextMatrix(3,2,_T("ppm"));
-}
-
-
+//
 //377	1	Device number in the scan database, include the master unit itself.
 //378	1	Set 1 to clear the scan database
 //379..383	5	First device of the database, the display unit take it.
@@ -562,55 +589,55 @@ void CCO2_View::Initial_List()
 //170..219 The pre_alarm ppm set point of external co2 sensor. Support 50 external nodes.
 //220..269 The continuous_alarm ppm set point of external co2 sensor. Support 50 external nodes.
 //270..319 The ppm offset for calibrating the external co2 sensor ppm. Support 50 external nodes.
-void CCO2_View::Fresh_External_List()
-{
-    int i_temp_count;
-    m_co2_external_sensor_list.DeleteAllItems();
-    i_temp_count = product_register_value[CO2_485_MODBUS_SCAN_DB_CTR];
-    for (int i=1;i<i_temp_count;i++)
-    {
-        long temp_serialnumber =0;
-        int  temp_id =0;
-        CString temp_cs_num,temp_cs_id,temp_cs_serial,temp_cs_pre_alarm_sp,temp_cs_alarm_sp,temp_cs_cal_offset,temp_cs_ppm;
-        temp_cs_num.Format(_T("%d"),i);
-        m_co2_external_sensor_list.InsertItem(i-1,temp_cs_num);
-        temp_id = product_register_value[CO2_485_MODBUS_SCAN_START + i*CO2_SCAN_DB_SIZE];
-        temp_cs_id.Format(_T("%d"),temp_id);
-
-
-        temp_serialnumber = product_register_value[CO2_485_MODBUS_SCAN_START + i*CO2_SCAN_DB_SIZE +4]<<24 |
-            product_register_value[CO2_485_MODBUS_SCAN_START + i*CO2_SCAN_DB_SIZE +3]<<16 |
-            product_register_value[CO2_485_MODBUS_SCAN_START + i*CO2_SCAN_DB_SIZE +2]<<8  |
-            product_register_value[CO2_485_MODBUS_SCAN_START + i*CO2_SCAN_DB_SIZE +1];
-
-        temp_cs_serial.Format(_T("%d"),temp_serialnumber);
-
-
-        temp_cs_pre_alarm_sp.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXT_PRE_ALARM_SETPOINT_START +  i- 1]);
-        temp_cs_alarm_sp.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXT_ALARM_SETPOINT_START + i - 1]);
-        temp_cs_cal_offset.Format(_T("%d"),(short)product_register_value[CO2_485_MODBUS_EXT_CO2_OFFSET_START + i - 1]);
-
-        if(product_register_value[CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + i - 1] == 65535)
-        {
-            temp_cs_ppm.Format(_T("No Sensor"));
-            m_co2_external_sensor_list.SetCellEnabled(i-1,CO2_EXTERNAL_PPM,0);
-        }
-        else
-        {
-            temp_cs_ppm.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + i - 1]);
-            m_co2_external_sensor_list.SetCellEnabled(i-1,CO2_EXTERNAL_PPM,1);
-        }
-
-        m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_DEVICE_ID,temp_cs_id);
-        m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_SERIAL_NUM,temp_cs_serial);
-        m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_PPM,temp_cs_ppm);
-        m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_PRE_ALARM_SP,temp_cs_pre_alarm_sp);
-        m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_ALARM_SP,temp_cs_alarm_sp);
-        m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_CAL_OFFSET,temp_cs_cal_offset);
-    }
-
-
-}
+//  void CCO2_View::Fresh_External_List()
+//  {
+//      int i_temp_count;
+//      m_co2_external_sensor_list.DeleteAllItems();
+//      i_temp_count = product_register_value[CO2_485_MODBUS_SCAN_DB_CTR];
+//      for (int i=1;i<i_temp_count;i++)
+//      {
+//          long temp_serialnumber =0;
+//          int  temp_id =0;
+//          CString temp_cs_num,temp_cs_id,temp_cs_serial,temp_cs_pre_alarm_sp,temp_cs_alarm_sp,temp_cs_cal_offset,temp_cs_ppm;
+//          temp_cs_num.Format(_T("%d"),i);
+//          m_co2_external_sensor_list.InsertItem(i-1,temp_cs_num);
+//          temp_id = product_register_value[CO2_485_MODBUS_SCAN_START + i*CO2_SCAN_DB_SIZE];
+//          temp_cs_id.Format(_T("%d"),temp_id);
+//  
+//  
+//          temp_serialnumber = product_register_value[CO2_485_MODBUS_SCAN_START + i*CO2_SCAN_DB_SIZE +4]<<24 |
+//              product_register_value[CO2_485_MODBUS_SCAN_START + i*CO2_SCAN_DB_SIZE +3]<<16 |
+//              product_register_value[CO2_485_MODBUS_SCAN_START + i*CO2_SCAN_DB_SIZE +2]<<8  |
+//              product_register_value[CO2_485_MODBUS_SCAN_START + i*CO2_SCAN_DB_SIZE +1];
+//  
+//          temp_cs_serial.Format(_T("%d"),temp_serialnumber);
+//  
+//  
+//          temp_cs_pre_alarm_sp.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXT_PRE_ALARM_SETPOINT_START +  i- 1]);
+//          temp_cs_alarm_sp.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXT_ALARM_SETPOINT_START + i - 1]);
+//          temp_cs_cal_offset.Format(_T("%d"),(short)product_register_value[CO2_485_MODBUS_EXT_CO2_OFFSET_START + i - 1]);
+//  
+//          if(product_register_value[CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + i - 1] == 65535)
+//          {
+//              temp_cs_ppm.Format(_T("No Sensor"));
+//              m_co2_external_sensor_list.SetCellEnabled(i-1,CO2_EXTERNAL_PPM,0);
+//          }
+//          else
+//          {
+//              temp_cs_ppm.Format(_T("%d"),product_register_value[CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + i - 1]);
+//              m_co2_external_sensor_list.SetCellEnabled(i-1,CO2_EXTERNAL_PPM,1);
+//          }
+//  
+//          m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_DEVICE_ID,temp_cs_id);
+//          m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_SERIAL_NUM,temp_cs_serial);
+//          m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_PPM,temp_cs_ppm);
+//          m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_PRE_ALARM_SP,temp_cs_pre_alarm_sp);
+//          m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_ALARM_SP,temp_cs_alarm_sp);
+//          m_co2_external_sensor_list.SetItemText(i-1,CO2_EXTERNAL_CAL_OFFSET,temp_cs_cal_offset);
+//      }
+//  
+//  
+//  }
 
 void CCO2_View::CO2_Alarm_Set()
 {
@@ -1079,51 +1106,51 @@ void CCO2_View::OnCbnSelchangeCo2AlarmState()
             product_register_value[CO2_485_MODBUS_ALARM_AUTO_MANUAL],this->m_hWnd,IDC_CO2_ALARM_STATE,_T("Alarm State"));
     }
 }
-LRESULT CCO2_View::Save_List_Item(WPARAM wParam,LPARAM lParam)
-{
-    int Changed_Item = (int)wParam;
-    int Changed_SubItem = (int)lParam;
-    int temp_write_reg = 0;
-    int temp_reg_value = 0;
-    CString temp_list_cstring;
-    CString temp_cs_change_info;
-    temp_list_cstring = m_co2_external_sensor_list.GetItemText(Changed_Item,Changed_SubItem);
-    if(CheckString(temp_list_cstring)==false)
-        return 1;
-    temp_reg_value = _wtoi(temp_list_cstring);
-    if(Changed_SubItem == CO2_EXTERNAL_PPM)
-    {
-        temp_write_reg = CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + Changed_Item;
-        temp_cs_change_info.Format(_T("External PPM"));
-    }
-    else if(Changed_SubItem == CO2_EXTERNAL_PRE_ALARM_SP)
-    {
-        temp_write_reg = CO2_485_MODBUS_EXT_PRE_ALARM_SETPOINT_START + Changed_Item;
-        temp_cs_change_info.Format(_T("External Prepare Alarm Setpoint"));
-    }
-    else if(Changed_SubItem == CO2_EXTERNAL_ALARM_SP)
-    {
-        temp_write_reg = CO2_485_MODBUS_EXT_ALARM_SETPOINT_START + Changed_Item;
-        temp_cs_change_info.Format(_T("Alarm Setpoint"));	
-    }
-    else if(Changed_SubItem == CO2_EXTERNAL_CAL_OFFSET)
-    {
-        temp_write_reg = CO2_485_MODBUS_EXT_CO2_OFFSET_START + Changed_Item;
-        temp_cs_change_info.Format(_T("Calibrating Offset"));	
-    }
-    else
-    {
-        return -2;
-    }
-
-    if(temp_reg_value != product_register_value[temp_write_reg])
-    {
-        Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,temp_write_reg,temp_reg_value,
-            product_register_value[temp_write_reg],this->m_hWnd,IDC_LIST_CO2_EXTERNAL_SENSOR,temp_cs_change_info);
-    }
-
-    return 0;
-}
+// LRESULT CCO2_View::Save_List_Item(WPARAM wParam,LPARAM lParam)
+// {
+//     int Changed_Item = (int)wParam;
+//     int Changed_SubItem = (int)lParam;
+//     int temp_write_reg = 0;
+//     int temp_reg_value = 0;
+//     CString temp_list_cstring;
+//     CString temp_cs_change_info;
+//     temp_list_cstring = m_co2_external_sensor_list.GetItemText(Changed_Item,Changed_SubItem);
+//     if(CheckString(temp_list_cstring)==false)
+//         return 1;
+//     temp_reg_value = _wtoi(temp_list_cstring);
+//     if(Changed_SubItem == CO2_EXTERNAL_PPM)
+//     {
+//         temp_write_reg = CO2_485_MODBUS_EXTERNAL_CO2_PPM_START + Changed_Item;
+//         temp_cs_change_info.Format(_T("External PPM"));
+//     }
+//     else if(Changed_SubItem == CO2_EXTERNAL_PRE_ALARM_SP)
+//     {
+//         temp_write_reg = CO2_485_MODBUS_EXT_PRE_ALARM_SETPOINT_START + Changed_Item;
+//         temp_cs_change_info.Format(_T("External Prepare Alarm Setpoint"));
+//     }
+//     else if(Changed_SubItem == CO2_EXTERNAL_ALARM_SP)
+//     {
+//         temp_write_reg = CO2_485_MODBUS_EXT_ALARM_SETPOINT_START + Changed_Item;
+//         temp_cs_change_info.Format(_T("Alarm Setpoint"));	
+//     }
+//     else if(Changed_SubItem == CO2_EXTERNAL_CAL_OFFSET)
+//     {
+//         temp_write_reg = CO2_485_MODBUS_EXT_CO2_OFFSET_START + Changed_Item;
+//         temp_cs_change_info.Format(_T("Calibrating Offset"));	
+//     }
+//     else
+//     {
+//         return -2;
+//     }
+// 
+//     if(temp_reg_value != product_register_value[temp_write_reg])
+//     {
+//       //  Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,temp_write_reg,temp_reg_value,
+//        //     product_register_value[temp_write_reg],this->m_hWnd,IDC_LIST_CO2_EXTERNAL_SENSOR,temp_cs_change_info);
+//     }
+// 
+//     return 0;
+// }
 
 bool CheckString( CString str )
 {
@@ -1153,7 +1180,7 @@ bool CheckString( CString str )
 void CCO2_View::OnInitialUpdate()
 {
     CFormView::OnInitialUpdate();
-    Initial_List();
+    
     m_start_tip=TRUE;
     HICON hIcon = NULL; 
     //hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_INPUT);
@@ -1576,26 +1603,10 @@ void CCO2_View::OnEnKillfocusCo2AlarmOffTime()
     }
 }
 
-void CCO2_View::OnBnClickedBtnCo2ClearCal()
-{
-    // TODO: Add your control notification handler code here
-    int item_count = m_co2_external_sensor_list.GetItemCount();
-    for (int i=0;i<item_count;i++)
-    {
-        if(write_one(g_tstat_id,CO2_485_MODBUS_EXT_CO2_OFFSET_START + i,0,3)<0)
-        {
-            MessageBox(_T("Write register failure,Please try again!"));
-            Fresh_External_List();
-            return;
-        }
-        else
-        {
-            product_register_value[CO2_485_MODBUS_EXT_CO2_OFFSET_START + i] = 0;
-        }
-    }
-    OnBnClickedBtnCo2Refresh();
-    SetPaneString(1,_T("Clear External Calibration Offset Success!! "));
-}
+// void CCO2_View::OnBnClickedBtnCo2ClearCal()
+// {
+//  
+// }
 
 void CCO2_View::OnBnClickedRadioHumidityHeatEnable()
 {
@@ -2591,14 +2602,14 @@ void CCO2_View::Initial_OutputList(){
 
 
     int output_range=product_register_value[AddressValue];
-    if (output_range==1){
+    if (output_range==3){
         strTemp=_T("0-10v");
     }
     else if (output_range==2)
     {
         strTemp=_T("0-5v");
     }
-    else if (output_range==3)
+    else if (output_range==1)
     {
         strTemp=_T("4-20mA");
     }
@@ -2959,31 +2970,31 @@ void CCO2_View::OnNMClickList_Output(NMHDR *pNMHDR, LRESULT *pResult){
 
 
 }
-void CCO2_View::OnNMClickList_CO2List(NMHDR *pNMHDR, LRESULT *pResult){
-    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-
-    CString temp_cstring;
-    long lRow,lCol;
-    m_co2_external_sensor_list.Set_Edit(true);
-    DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
-    CPoint point( LOWORD(dwPos), HIWORD(dwPos));
-    m_co2_external_sensor_list.ScreenToClient(&point);
-    LVHITTESTINFO lvinfo;
-    lvinfo.pt=point;
-    lvinfo.flags=LVHT_ABOVE;
-    int nItem=m_co2_external_sensor_list.SubItemHitTest(&lvinfo);
-
-    lRow = lvinfo.iItem;
-    lCol = lvinfo.iSubItem;
-
-    if(lRow>m_co2_external_sensor_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
-        return;
-    if(lRow<0)
-        return;
-
-    m_list_type = 3; 
-
-}
+// void CCO2_View::OnNMClickList_CO2List(NMHDR *pNMHDR, LRESULT *pResult){
+//     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+// 
+//     CString temp_cstring;
+//     long lRow,lCol;
+//     m_co2_external_sensor_list.Set_Edit(true);
+//     DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+//     CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+//     m_co2_external_sensor_list.ScreenToClient(&point);
+//     LVHITTESTINFO lvinfo;
+//     lvinfo.pt=point;
+//     lvinfo.flags=LVHT_ABOVE;
+//     int nItem=m_co2_external_sensor_list.SubItemHitTest(&lvinfo);
+// 
+//     lRow = lvinfo.iItem;
+//     lCol = lvinfo.iSubItem;
+// 
+//     if(lRow>m_co2_external_sensor_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+//         return;
+//     if(lRow<0)
+//         return;
+// 
+//     m_list_type = 3; 
+// 
+// }
 
 LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
     CString strTemp;

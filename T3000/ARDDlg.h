@@ -4,7 +4,10 @@
 #include "afxwin.h"
 
 // CARDDlg dialog
-
+ struct Custom_Product_Node{
+    int Product_Type;
+    CString Product_Name;
+ };
 class CARDDlg : public CDialogEx
 {
 	DECLARE_DYNAMIC(CARDDlg)
@@ -37,4 +40,13 @@ public:
 
 // 	_ConnectionPtr				m_pCon;//for ado connection
 // 	_RecordsetPtr				m_pRs;//for ado 
+    int m_Serial_Number;
+    CString m_type_id;
+    CComboBox m_combox_productname;
+    vector<Custom_Product_Node> m_Custom_Product;
+    afx_msg void OnCbnDropdownComboProductName();
+    afx_msg void OnCbnSelchangeComboProductName();
+    afx_msg void OnEnKillfocusEditTypeId();
+//    afx_msg void OnEnKillfocusEditAddDeviceModbusId();
+    CComboBox m_minipanel_comport;
 };

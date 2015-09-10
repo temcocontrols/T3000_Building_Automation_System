@@ -8,7 +8,7 @@
 #include "afxdialogex.h"
 #include "MainFrm.h"
 #define WM_EDIT_CHANGE_VALUE WM_USER + 1115
-extern int Station_NUM;
+//extern int Station_NUM;
 extern int pointtotext(char *buf,Point_Net *point);
 // CBacnetEditLabel dialog
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
@@ -27,9 +27,19 @@ int GetVariableFullLabel(int index,CString &ret_full_label);
 //int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M);
 int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Auto_M,int &digital_value);
 
+int GetPidValue(int index,CString &Auto_M,CString &persend_data);
+
+int GetPrgFullLabel(int index,CString &ret_full_label);
+int GetPrgLabel(int index,CString &ret_label);
 
 int GetScreenLabel(int index,CString &ret_label);
 int GetScreenFullLabel(int index,CString &ret_full_label);
+
+int GetHolidayLabel(int index,CString &ret_label);
+int GetHolidayFullLabel(int index,CString &ret_full_label);
+
+int GetScheduleLabel(int index,CString &ret_label);
+int GetScheduleFullLabel(int index,CString &ret_full_label);
 
 IMPLEMENT_DYNAMIC(CBacnetEditLabel, CDialogEx)
 
@@ -265,6 +275,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 					m_edit_value.EnableWindow(true);
 					
 				}
+				m_AutoManual = show_temp;	
 				m_edit_auto_manual.SetWindowTextW(show_temp);
 			}
 			else if(ncommand == CHANGE_VALUE)
@@ -341,6 +352,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 					m_edit_value.EnableWindow(true);
 
 				}
+				m_AutoManual = show_temp;
 				m_edit_auto_manual.SetWindowTextW(show_temp);
 			}
 			else if(ncommand == CHANGE_VALUE)
@@ -412,6 +424,7 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 					m_edit_value.EnableWindow(true);
 
 				}
+				m_AutoManual = show_temp;
 				m_edit_auto_manual.SetWindowTextW(show_temp);
 			}
 			else if(ncommand == CHANGE_VALUE)
@@ -466,6 +479,103 @@ LRESULT CBacnetEditLabel::Change_Value(WPARAM wParam,LPARAM lParam)
 			CString temp_task_info;
 			temp_task_info.Format(_T("Write Variable List Item%d .Changed to \"%s\" "),label_info.nPoint_number,show_temp);
 			Post_Write_Message(g_bac_instance,WRITEVARIABLE_T3000,label_info.nPoint_number,label_info.nPoint_number,sizeof(Str_variable_point),m_edit_label ,temp_task_info);
+		}
+		break;
+	case 4: //SCHEDULE
+		{
+			if(ncommand == CHANGE_AUTO_MANUAL)
+			{
+				if(m_AutoManual.CompareNoCase(_T("Manual")) == 0)
+				{
+					m_Weekly_data.at(label_info.nPoint_number).auto_manual = 0;	//Auto = 0;
+					show_temp = _T("Auto");	
+					m_edit_value.EnableWindow(false);
+				}
+				else
+				{
+					m_Weekly_data.at(label_info.nPoint_number).auto_manual = 1;	//Manual = 1;
+					show_temp = _T("Manual");
+					m_edit_value.EnableWindow(false);
+
+				}
+				m_AutoManual = show_temp;
+				m_edit_auto_manual.SetWindowTextW(show_temp);
+
+				CString temp_task_info;
+				temp_task_info.Format(_T("Write Schedule List Item%d .Changed to \"%s\" "),label_info.nPoint_number,show_temp);
+				Post_Write_Message(g_bac_instance,WRITESCHEDULE_T3000,label_info.nPoint_number,label_info.nPoint_number,sizeof(Str_weekly_routine_point),m_edit_label ,temp_task_info);
+
+			}
+		}
+		break;
+	case 5: //HOLIDAY
+		{
+			if(ncommand == CHANGE_AUTO_MANUAL)
+			{
+				if(m_AutoManual.CompareNoCase(_T("Manual")) == 0)
+				{
+					m_Annual_data.at(label_info.nPoint_number).auto_manual = 0;	//Auto = 0;
+					show_temp = _T("Auto");	
+					m_edit_value.EnableWindow(false);
+				}
+				else
+				{
+					m_Annual_data.at(label_info.nPoint_number).auto_manual = 1;	//Manual = 1;
+					show_temp = _T("Manual");
+					m_edit_value.EnableWindow(false);
+
+				}
+				m_AutoManual = show_temp;
+				m_edit_auto_manual.SetWindowTextW(show_temp);
+
+				CString temp_task_info;
+				temp_task_info.Format(_T("Write Holiday List Item%d .Changed to \"%s\" "),label_info.nPoint_number,show_temp);
+				Post_Write_Message(g_bac_instance,WRITEHOLIDAY_T3000,label_info.nPoint_number,label_info.nPoint_number,sizeof(Str_annual_routine_point),m_edit_label ,temp_task_info);
+			}
+		}
+		break;
+	case 6: //Program
+		{
+			if(ncommand == CHANGE_AUTO_MANUAL)
+			{
+				if(m_AutoManual.CompareNoCase(_T("Manual")) == 0)
+				{
+					m_Program_data.at(label_info.nPoint_number).auto_manual = 0;	//Auto = 0;
+					show_temp = _T("Auto");	
+					m_edit_value.EnableWindow(false);
+				}
+				else
+				{
+					m_Program_data.at(label_info.nPoint_number).auto_manual = 1;	//Manual = 1;
+					show_temp = _T("Manual");
+					m_edit_value.EnableWindow(true);
+
+				}
+				m_AutoManual = show_temp;
+				m_edit_auto_manual.SetWindowTextW(show_temp);
+
+				CString temp_task_info;
+				temp_task_info.Format(_T("Write Program List Item%d .Changed to \"%s\" "),label_info.nPoint_number,show_temp);
+				Post_Write_Message(g_bac_instance,WRITEPROGRAM_T3000,label_info.nPoint_number,label_info.nPoint_number,sizeof(Str_program_point),m_edit_label ,temp_task_info);
+			}
+			else if(ncommand == CHANGE_VALUE)
+			{
+				if(m_Program_data.at(label_info.nPoint_number).on_off == 0)
+				{
+					m_Program_data.at(label_info.nPoint_number).on_off = 1;
+					show_temp = _T("ON");
+				}
+				else
+				{
+					m_Program_data.at(label_info.nPoint_number).on_off = 0;
+					show_temp = _T("OFF");
+				}
+				m_edit_value.SetWindowTextW(show_temp);
+
+				CString temp_task_info;
+				temp_task_info.Format(_T("Write Program List Item%d .Changed to \"%s\" "),label_info.nPoint_number,show_temp);
+				Post_Write_Message(g_bac_instance,WRITEPROGRAM_T3000,label_info.nPoint_number,label_info.nPoint_number,sizeof(Str_program_point),m_edit_label ,temp_task_info);
+			}
 		}
 		break;
 	default:
@@ -745,6 +855,159 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					}
 					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
 					m_edit_value.SetWindowTextW(m_value);
+				}
+			}
+			break;
+		case 3: // PID
+			{
+				if(temp_info.nPoint_number >= BAC_PID_COUNT)
+				{
+					PostMessage(WM_CLOSE,NULL,NULL);
+					return ;
+				}
+				else
+				{
+					m_original_name.Format(_T("%d-PID%d"),temp_info.nMain_Panel,temp_info.nPoint_number + 1);
+					m_label_name.Format(_T("PID%d"),temp_info.nMain_Panel,temp_info.nPoint_number + 1);
+					m_full_label_name = m_label_name;
+					m_static_point.SetWindowTextW(m_original_name);
+					m_static_label.SetWindowTextW(m_label_name);
+					m_static_full_label.SetWindowTextW(m_full_label_name);
+					GetPidValue(temp_info.nPoint_number,m_AutoManual,m_value);
+					if(m_AutoManual.CompareNoCase(_T("M")) == 0)
+					{			
+						m_AutoManual = _T("Manual");	
+						m_edit_value.EnableWindow(true);
+					}
+					else
+					{
+						m_AutoManual = _T("Auto");
+						m_edit_value.EnableWindow(false);
+					}
+					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
+					m_edit_value.SetWindowTextW(m_value);
+				}
+			}
+			break;
+		case 4: //SCHEDULE
+			{
+				if(temp_info.nPoint_number >= BAC_SCHEDULE_COUNT)
+				{
+					PostMessage(WM_CLOSE,NULL,NULL);
+					return ;
+				}
+				else
+				{
+					m_original_name.Format(_T("%d-SCH%d"),temp_info.nMain_Panel,temp_info.nPoint_number + 1);
+					GetScheduleLabel(temp_info.nPoint_number,m_label_name);
+					GetScheduleFullLabel(temp_info.nPoint_number,m_full_label_name);
+					m_static_point.SetWindowTextW(m_original_name);
+					m_static_label.SetWindowTextW(m_label_name);
+					m_static_full_label.SetWindowTextW(m_full_label_name);
+					m_edit_value.SetWindowTextW(m_original_name);
+					m_edit_value.EnableWindow(false);
+
+					if(m_Weekly_data.at(temp_info.nPoint_number).auto_manual == 0)
+					{
+						m_AutoManual = _T("Auto");
+						m_edit_value.EnableWindow(false);
+					}
+					else if(m_Weekly_data.at(temp_info.nPoint_number).auto_manual == 1)
+					{
+						m_AutoManual = _T("Manual");	
+						m_edit_value.EnableWindow(true);
+					}
+					else
+					{
+						m_Weekly_data.at(temp_info.nPoint_number).auto_manual = 1;  //如果 既不是0 又不是1 就初始化为1;
+						m_AutoManual = _T("Manual");	
+						m_edit_value.EnableWindow(true);
+					}
+					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
+
+				}
+				break;
+			}
+		case 5: //HOLIDAY
+			{
+				if(temp_info.nPoint_number >= BAC_HOLIDAY_COUNT)
+				{
+					PostMessage(WM_CLOSE,NULL,NULL);
+					return ;
+				}
+				else
+				{
+					m_original_name.Format(_T("%d-HOL%d"),temp_info.nMain_Panel,temp_info.nPoint_number + 1);
+					GetHolidayLabel(temp_info.nPoint_number,m_label_name);
+					GetHolidayFullLabel(temp_info.nPoint_number,m_full_label_name);
+					m_static_point.SetWindowTextW(m_original_name);
+					m_static_label.SetWindowTextW(m_label_name);
+					m_static_full_label.SetWindowTextW(m_full_label_name);
+					m_edit_value.SetWindowTextW(m_original_name);
+					m_edit_value.EnableWindow(false);
+
+					if(m_Annual_data.at(temp_info.nPoint_number).auto_manual == 0)
+					{
+						m_AutoManual = _T("Auto");
+						m_edit_value.EnableWindow(false);
+					}
+					else if(m_Annual_data.at(temp_info.nPoint_number).auto_manual == 1)
+					{
+						m_AutoManual = _T("Manual");	
+						m_edit_value.EnableWindow(true);
+					}
+					else
+					{
+						m_Annual_data.at(temp_info.nPoint_number).auto_manual = 1;  //如果 既不是0 又不是1 就初始化为1;
+						m_AutoManual = _T("Manual");	
+						m_edit_value.EnableWindow(true);
+					}
+					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
+
+				}
+
+			}
+			break;
+		case 6:
+			{
+				if(temp_info.nPoint_number >= BAC_PROGRAM_ITEM_COUNT)
+				{
+					PostMessage(WM_CLOSE,NULL,NULL);
+					return ;
+				}
+				else
+				{
+					m_original_name.Format(_T("%d-PRG%d"),temp_info.nMain_Panel,temp_info.nPoint_number + 1);
+					GetPrgLabel(temp_info.nPoint_number,m_label_name);
+					GetPrgFullLabel(temp_info.nPoint_number,m_full_label_name);
+
+					m_static_point.SetWindowTextW(m_original_name);
+					m_static_label.SetWindowTextW(m_label_name);
+					m_static_full_label.SetWindowTextW(m_full_label_name);
+
+					if(m_Program_data.at(temp_info.nPoint_number).auto_manual == 0)
+					{
+						m_AutoManual = _T("Auto");
+						m_edit_value.EnableWindow(false);
+					}
+					else
+					{
+						m_AutoManual = _T("Manual");	
+						m_edit_value.EnableWindow(true);
+					}
+
+					if(m_Program_data.at(temp_info.nPoint_number).on_off == 0)
+					{
+						m_value = _T("OFF");
+					}
+					else
+					{
+						m_value = _T("ON");
+					}
+
+					m_edit_auto_manual.SetWindowTextW(m_AutoManual);
+					m_edit_value.SetWindowTextW(m_value);
+
 				}
 			}
 			break;
@@ -1054,7 +1317,11 @@ void CBacnetEditLabel::OnStnClickedEditIconPath()
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 
 	image_fordor = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
-
+	CFileFind temp_find;
+	if(temp_find.FindFile(image_fordor) == 0)
+	{
+		CreateDirectory(image_fordor,NULL);
+	}
 
 	SetCurrentDirectoryW(image_fordor);
 	//选择图片,如果选的不在database目录下就copy一份过来;如果在的话就重命名，因为文件名长度不能超过10个字节;

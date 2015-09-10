@@ -877,7 +877,7 @@ bool string2digital(CString str,unsigned char & val ,bool & type )   // type fal
 	for(int i=0;i<7;i++)
 //	for(int i=0;i<5;i++)
 	{
-		if(!str.CompareNoCase(STRINGCONST[i]))        // equal
+		if(str.CompareNoCase(STRINGCONST[i]) == 0)        // equal
 		{
 			SN = i ;
 			break;
@@ -1976,48 +1976,48 @@ void var_write_Tstat67(wofstream & out)
 		MODBUS_UNIVERSAL_OUTPUT_HEAT1	,
 		MODBUS_UNIVERSAL_OUTPUT_HEAT2	,
 		MODBUS_UNIVERSAL_OUTPUT_HEAT3	,
-		MODBUS_FAN0_OPER_TABLE_COAST	,
-		MODBUS_FAN0_OPER_TABLE_COOL1	,
-		MODBUS_FAN0_OPER_TABLE_COOL2	,
-		MODBUS_FAN0_OPER_TABLE_COOL3	,
-		MODBUS_FAN0_OPER_TABLE_HEAT1	,
-		MODBUS_FAN0_OPER_TABLE_HEAT2	,
-		MODBUS_FAN0_OPER_TABLE_HEAT3	,
-		MODBUS_FAN1_OPER_TABLE_COAST	,
-		MODBUS_FAN1_OPER_TABLE_COOL1	,
-		MODBUS_FAN1_OPER_TABLE_COOL2	,
-		MODBUS_FAN1_OPER_TABLE_COOL3	,
-		MODBUS_FAN1_OPER_TABLE_HEAT1	,
-		MODBUS_FAN1_OPER_TABLE_HEAT2	,
-		MODBUS_FAN1_OPER_TABLE_HEAT3	,
-		MODBUS_FAN2_OPER_TABLE_COAST	,
-		MODBUS_FAN2_OPER_TABLE_COOL1	,
-		MODBUS_FAN2_OPER_TABLE_COOL2	,
-		MODBUS_FAN2_OPER_TABLE_COOL3	,
-		MODBUS_FAN2_OPER_TABLE_HEAT1	,
-		MODBUS_FAN2_OPER_TABLE_HEAT2	,
-		MODBUS_FAN2_OPER_TABLE_HEAT3	,
-		MODBUS_FAN3_OPER_TABLE_COAST	,
-		MODBUS_FAN3_OPER_TABLE_COOL1	,
-		MODBUS_FAN3_OPER_TABLE_COOL2	,
-		MODBUS_FAN3_OPER_TABLE_COOL3	,
-		MODBUS_FAN3_OPER_TABLE_HEAT1	,
-		MODBUS_FAN3_OPER_TABLE_HEAT2	,
-		MODBUS_FAN3_OPER_TABLE_HEAT3	,
-		MODBUS_FANAUT_OPER_TABLE_COAST	,
-		MODBUS_FANAUT_OPER_TABLE_COOL1	,
-		MODBUS_FANAUT_OPER_TABLE_COOL2	,
-		MODBUS_FANAUT_OPER_TABLE_COOL3	,
-		MODBUS_FANAUT_OPER_TABLE_HEAT1	,
-		MODBUS_FANAUT_OPER_TABLE_HEAT2	,
-		MODBUS_FANAUT_OPER_TABLE_HEAT3	,
-		MODBUS_VALVE_OPERATION_TABLE_BEGIN	,
-		MODBUS_VALVE_OPER_TABLE_COOL1	,
-		MODBUS_VALVE_OPER_TABLE_COOL2	,
-		MODBUS_VALVE_OPER_TABLE_COOL3	,
-		MODBUS_VALVE_OPER_TABLE_HEAT1	,
-		MODBUS_VALVE_OPER_TABLE_HEAT2	,
-		MODBUS_VALVE_OPER_TABLE_HEAT3	,
+        MODBUS_FAN0_OPER_TABLE_COAST	,
+        MODBUS_FAN0_OPER_TABLE_COOL1	,
+        MODBUS_FAN0_OPER_TABLE_COOL2	,
+        MODBUS_FAN0_OPER_TABLE_COOL3	,
+        MODBUS_FAN0_OPER_TABLE_HEAT1	,
+        MODBUS_FAN0_OPER_TABLE_HEAT2	,
+        MODBUS_FAN0_OPER_TABLE_HEAT3	,
+        MODBUS_FAN1_OPER_TABLE_COAST	,
+        MODBUS_FAN1_OPER_TABLE_COOL1	,
+        MODBUS_FAN1_OPER_TABLE_COOL2	,
+        MODBUS_FAN1_OPER_TABLE_COOL3	,
+        MODBUS_FAN1_OPER_TABLE_HEAT1	,
+        MODBUS_FAN1_OPER_TABLE_HEAT2	,
+        MODBUS_FAN1_OPER_TABLE_HEAT3	,
+        MODBUS_FAN2_OPER_TABLE_COAST	,
+        MODBUS_FAN2_OPER_TABLE_COOL1	,
+        MODBUS_FAN2_OPER_TABLE_COOL2	,
+        MODBUS_FAN2_OPER_TABLE_COOL3	,
+        MODBUS_FAN2_OPER_TABLE_HEAT1	,
+        MODBUS_FAN2_OPER_TABLE_HEAT2	,
+        MODBUS_FAN2_OPER_TABLE_HEAT3	,
+        MODBUS_FAN3_OPER_TABLE_COAST	,
+        MODBUS_FAN3_OPER_TABLE_COOL1	,
+        MODBUS_FAN3_OPER_TABLE_COOL2	,
+        MODBUS_FAN3_OPER_TABLE_COOL3	,
+        MODBUS_FAN3_OPER_TABLE_HEAT1	,
+        MODBUS_FAN3_OPER_TABLE_HEAT2	,
+        MODBUS_FAN3_OPER_TABLE_HEAT3	,
+        MODBUS_FANAUT_OPER_TABLE_COAST	,
+        MODBUS_FANAUT_OPER_TABLE_COOL1	,
+        MODBUS_FANAUT_OPER_TABLE_COOL2	,
+        MODBUS_FANAUT_OPER_TABLE_COOL3	,
+        MODBUS_FANAUT_OPER_TABLE_HEAT1	,
+        MODBUS_FANAUT_OPER_TABLE_HEAT2	,
+        MODBUS_FANAUT_OPER_TABLE_HEAT3	,
+        MODBUS_VALVE_OPERATION_TABLE_BEGIN	,
+        MODBUS_VALVE_OPER_TABLE_COOL1	,
+        MODBUS_VALVE_OPER_TABLE_COOL2	,
+        MODBUS_VALVE_OPER_TABLE_COOL3	,
+        MODBUS_VALVE_OPER_TABLE_HEAT1	,
+        MODBUS_VALVE_OPER_TABLE_HEAT2	,
+        MODBUS_VALVE_OPER_TABLE_HEAT3	,
 		MODBUS_HEAT_UNIVERSAL_TABLE	,
 		MODBUS_COOL_UNIVERSAL_TABLE	,
 		MODBUS_HEAT_ORIGINAL_TABLE	,
@@ -2759,6 +2759,10 @@ bool Check_Config_File(wifstream & inf){
 		if (find_sub_chars(buf,_T("Config File")))
 		{
 			inf.getline(buf,1024);//T3000 °æ±¾ºÅ
+            if (find_sub_chars(buf,GetProductName(product_register_value[7])))
+            {
+                ret=true; 
+            }
 			inf.getline(buf,1024);
 			if (find_sub_chars(buf,GetProductName(product_register_value[7])))
 			{
@@ -3560,14 +3564,9 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 			if(i<strText.GetLength())
 				p[i]=strText.GetAt(i);
 			else
-				p[i]=' ';
+				p[i]=0;
 		}
-		if (strText.GetLength()>8)
-		{
-			AfxMessageBox(_T(">8 chars"));
-		} 
-		else
-		{
+		 
 			if (Write_Multi(g_tstat_id,p,MODBUS_AI1_CHAR1+4*(lRow-2),8)>0)
 			{
 
@@ -3578,7 +3577,7 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 				//return;
 			}
 
-		}
+		 
 	}
 	try
 	{
@@ -7382,48 +7381,48 @@ _Twrite_to_file_a_line(out,_T("//Input Name Config"));//space
 		case 1:
 		{
 		str1=_T("Input1_Name: ");
-		str1+=g_strInName1;
+		str1+=m_tstat_input_data.at(1).InputName.StrValue;
 		_Twrite_to_file_a_line(out,str1);
 		}break;
 		case 2:
 			{
 				str1=_T("Input2_Name: ");
-				str1+=g_strInName2;
+				str1+=m_tstat_input_data.at(2).InputName.StrValue;
 
 				_Twrite_to_file_a_line(out,str1);
 			}break;
 		case 3:
 			{
 				str1=_T("Input3_Name: ");
-				str1+=g_strInName3;
+				str1+=m_tstat_input_data.at(3).InputName.StrValue;
 
 				_Twrite_to_file_a_line(out,str1);
 			}break;
 		case 4:
 			{
 				str1=_T("Input4_Name: ");
-				str1+=g_strInName4;
+				str1+=m_tstat_input_data.at(4).InputName.StrValue;
 
 				_Twrite_to_file_a_line(out,str1);
 			}break;
 		case 5:
 			{
 				str1=_T("Input5_Name: ");
-				str1+=g_strInName5;
+				str1+=m_tstat_input_data.at(5).InputName.StrValue;
 
 				_Twrite_to_file_a_line(out,str1);
 			}break;
 		case 6:
 			{
 				str1=_T("Input6_Name: ");
-				str1+=g_strInName6;
+				str1+=m_tstat_input_data.at(6).InputName.StrValue;
 
 				_Twrite_to_file_a_line(out,str1);
 			}break;
 		case 7:
 			{
 				str1=_T("Input7_Name: ");
-				str1+=g_strInName7;
+				str1+=m_tstat_input_data.at(7).InputName.StrValue;
 
 				_Twrite_to_file_a_line(out,str1);
 			}break;
@@ -7431,7 +7430,7 @@ _Twrite_to_file_a_line(out,_T("//Input Name Config"));//space
 		case 8:
 			{
 				str1=_T("Input8_Name: ");
-				str1+=g_strInName8;
+				str1+=m_tstat_input_data.at(8).InputName.StrValue;
 				_Twrite_to_file_a_line(out,str1);
 			}break;
 		 
@@ -7443,25 +7442,25 @@ _Twrite_to_file_a_line(out,_T("//Input Name Config"));//space
 
  _Twrite_to_file_a_line(out,_T("//Output Name Config"));//space
  str1=_T("Output1_Name: ");
- str1+=g_strOutName1;
+ str1+=m_tstat_output_data.at(0).OutputName.StrValue;
  _Twrite_to_file_a_line(out,str1);
  str1=_T("Output2_Name: ");
- str1+=g_strOutName2;
+ str1+=m_tstat_output_data.at(1).OutputName.StrValue;
  _Twrite_to_file_a_line(out,str1);
  str1=_T("Output3_Name: ");
- str1+=g_strOutName3;
+ str1+=m_tstat_output_data.at(2).OutputName.StrValue;
  _Twrite_to_file_a_line(out,str1);
  str1=_T("Output4_Name: ");
- str1+=g_strOutName4;
+ str1+=m_tstat_output_data.at(3).OutputName.StrValue;
  _Twrite_to_file_a_line(out,str1);
  str1=_T("Output5_Name: ");
- str1+=g_strOutName5;
+ str1+=m_tstat_output_data.at(4).OutputName.StrValue;
  _Twrite_to_file_a_line(out,str1);
  str1=_T("Output6_Name: ");
- str1+=g_strOutName6;
+ str1+=m_tstat_output_data.at(5).OutputName.StrValue;
  _Twrite_to_file_a_line(out,str1);
  str1=_T("Output7_Name: ");
- str1+=g_strOutName7;
+ str1+=m_tstat_output_data.at(6).OutputName.StrValue;
  _Twrite_to_file_a_line(out,str1);
 
  _Twrite_to_file_a_line(out,_T("//Input Output Range Config"));//space

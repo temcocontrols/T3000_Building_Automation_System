@@ -222,6 +222,7 @@ OUTPUT bool open_com(TS_UC m_com)
 
 
 
+
 OUTPUT void close_com()
 {
 	if(g_Commu_type==0)
@@ -668,7 +669,7 @@ OUTPUT bool Change_BaudRate(TS_US new_baudrate)
 {
 
     ///ÅäÖÃ´®¿Ú
-	if(new_baudrate!=9600 && new_baudrate!=19200)
+	if(new_baudrate!=9600 && new_baudrate!=19200 && new_baudrate!=57600)
 		return false;
 	if(baudrate_in_dll==new_baudrate)
 	{
@@ -1146,9 +1147,14 @@ OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_ad
 		data_to_write[6]=length*2;//128 is better ,if you send more than 128, the ron software will meet some trouble,because it is too long one times,can not finish on time;on time
 		for(int i=0;i<length;i++)
 			{
-                unsigned char UC_Value=to_write[i];
-				data_to_write[7+i*2] =UC_Value>>8&0xff;
-				data_to_write[7+i*2+1]=UC_Value& 0xff;
+//                 unsigned char UC_Value=to_write[i];
+//                 data_to_write[7+i*2] =UC_Value>>8&0xff;
+// 				data_to_write[7+i*2+1]=UC_Value& 0xff;
+
+
+                data_to_write[7+i*2] =to_write[i]  >> 8 & 0xff;
+                data_to_write[7+i*2+1]=to_write[i] & 0xff;
+
 			
 			}
  
@@ -4163,15 +4169,15 @@ OUTPUT int Read_One2(TS_UC device_var,TS_US address, bool bComm_Type)
 		}
 		if(address!=10)
 		{//old protocal
-			if(gval[0]==0 && gval[1]==0 && gval[2]==0 && gval[3]==0 && gval[4]==0 && gval[5]==0 && gval[6]==0 )
-				return -3;
-			if(gval[0]!=pval[0] || gval[1]!=pval[1] || gval[2]!=2 )
-				return -2;
-			crc=CRC16(gval,5);
-			if(gval[5]!=((crc>>8)&0xff))
-				return -2;
-			if(gval[6]!=(crc & 0xff))
-				return -2;	
+            if(gval[0]==0 && gval[1]==0 && gval[2]==0 && gval[3]==0 && gval[4]==0 && gval[5]==0 && gval[6]==0 )
+                return -3;
+            if(gval[0]!=pval[0] || gval[1]!=pval[1] || gval[2]!=2 )
+                return -2;
+            crc=CRC16(gval,5);
+            if(gval[5]!=((crc>>8)&0xff))
+                return -2;
+            if(gval[6]!=(crc & 0xff))
+                return -2;	
 		}
 		else
 		{
@@ -5373,8 +5379,6 @@ OUTPUT int read_multi2(TS_UC device_var,TS_US *put_data_into_here,TS_US start_ad
 
 OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 {	CString strlog;	
-    
-    
 	if(bComm_Type==0)
 	{
 		//the second time
@@ -5589,7 +5593,6 @@ OUTPUT int CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type)
 		}*/
 		return gval[2];
 	}
-
 	if(bComm_Type==1)
 	{
 		//the second time

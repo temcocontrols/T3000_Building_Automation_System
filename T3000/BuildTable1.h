@@ -23,41 +23,22 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedOk();
-	afx_msg void OnNMCustomdrawSlider1(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMCustomdrawSlider2(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMCustomdrawSlider3(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMCustomdrawSlider4(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMCustomdrawSlider5(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMCustomdrawSlider6(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMCustomdrawSlider7(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMCustomdrawSlider8(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMCustomdrawSlider9(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMCustomdrawSlider10(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMCustomdrawSlider11(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMReleasedcaptureSlider1(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMReleasedcaptureSlider2(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMReleasedcaptureSlider3(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMReleasedcaptureSlider4(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMReleasedcaptureSlider5(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMReleasedcaptureSlider6(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMReleasedcaptureSlider7(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMReleasedcaptureSlider8(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMReleasedcaptureSlider9(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMReleasedcaptureSlider10(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMReleasedcaptureSlider11(NMHDR *pNMHDR, LRESULT *pResult);
+//     afx_msg void OnNMCustomdrawSlider1(NMHDR *pNMHDR, LRESULT *pResult);
+//     afx_msg void OnNMCustomdrawSlider2(NMHDR *pNMHDR, LRESULT *pResult);
+//     afx_msg void OnNMCustomdrawSlider3(NMHDR *pNMHDR, LRESULT *pResult);
+//     afx_msg void OnNMCustomdrawSlider4(NMHDR *pNMHDR, LRESULT *pResult);
+//     afx_msg void OnNMCustomdrawSlider5(NMHDR *pNMHDR, LRESULT *pResult);
+//     afx_msg void OnNMCustomdrawSlider6(NMHDR *pNMHDR, LRESULT *pResult);
+//     afx_msg void OnNMCustomdrawSlider7(NMHDR *pNMHDR, LRESULT *pResult);
+//     afx_msg void OnNMCustomdrawSlider8(NMHDR *pNMHDR, LRESULT *pResult);
+//     afx_msg void OnNMCustomdrawSlider9(NMHDR *pNMHDR, LRESULT *pResult);
+//     afx_msg void OnNMCustomdrawSlider10(NMHDR *pNMHDR, LRESULT *pResult);
+//     afx_msg void OnNMCustomdrawSlider11(NMHDR *pNMHDR, LRESULT *pResult);
+	 
 	afx_msg void OnTimer(UINT nIDEvent);
 	afx_msg void OnDestroy();
 //	afx_msg void OnEnSetfocusEdit1();
-	afx_msg void OnEnSetfocusEdit8();
-	afx_msg void OnEnSetfocusEdit9();
-	afx_msg void OnEnSetfocusEdit13();
-	afx_msg void OnEnSetfocusEdit14();
-	afx_msg void OnEnSetfocusEdit15();
-	afx_msg void OnEnSetfocusEdit16();
-	afx_msg void OnEnSetfocusEdit17();
-	afx_msg void OnEnSetfocusEdit18();
-	afx_msg void OnEnSetfocusEdit19();
-	afx_msg void OnEnSetfocusEdit20();
+	 
 	//afx_msg void OnEnSetfocusEdit12();
 	afx_msg void OnEnChangeEdit1();
 	afx_msg void OnEnChangeEdit8();
@@ -83,8 +64,6 @@ public:
 	afx_msg void OnEnKillfocusEdit19();
 	afx_msg void OnEnKillfocusEdit20();
 	afx_msg void OnEnKillfocusEdit12();
-
-//	afx_msg void OnEnKillfocusEdit10();
 	afx_msg void OnEnChangeEdit10();
 	afx_msg void OnEnSetfocusEdit10();
 	afx_msg void OnBnClickedCancel();
@@ -96,13 +75,13 @@ public:
 	void refresh();
 	void SaveInfoDataToRegister();
 
-	void refresh_rule(float fMin,float fMax);
+
 
 	BOOL CheckDataisRight();
 	void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-	int init_rulePos(void);
 
-	CString GetUnit();
+
+	 
 
 private:
 	int m_nMax;
@@ -123,10 +102,11 @@ private:
 	int m_slider9_i;
 	int m_slider10_i;
 	int m_slider11_i;
+    int m_InputNo;          //false is table1,true is table2;
+    CString m_units_s;
 	CString m_max;
 	CString m_min;
-	int m_InputNo;//false is table1,true is table2;
-	CString m_units_s;
+	
 
 	CSliderCtrl m_slider1_ctrl;
 	CSliderCtrl m_slider2_ctrl;
