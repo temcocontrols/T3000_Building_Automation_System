@@ -11,10 +11,10 @@ typedef struct RegPoint{
 };
 typedef struct Registers_Infor
 {
-	vector<RegPoint> Reg_Point;
-	COLORREF Point_Color;
-	CString Reg_Name;
-	int address;
+    vector<RegPoint> Reg_Point;
+    COLORREF Point_Color;
+    CString Reg_Name;
+    int address;
 };
 
 

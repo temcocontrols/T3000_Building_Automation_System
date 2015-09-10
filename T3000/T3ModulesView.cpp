@@ -61,7 +61,91 @@ void CT3ModulesView::OnInitialUpdate()
 	CFormView::OnInitialUpdate();
 
 }
+CString CT3ModulesView::GetValue(int regValue,int RangeValue){
+    CString strresult;
+    if (0==RangeValue)
+    {
+        strresult.Format(_T("%d"),regValue);
 
+    } 
+    else if (1==RangeValue)
+    {
+        strresult.Format(_T("%.1f C"),(float)regValue/10.0);
+    }
+    else if (2==RangeValue)
+    {
+        strresult=_T("10K F");
+        strresult.Format(_T("%.1f F"),(float)regValue/10.0);
+    }
+    else if (3==RangeValue)
+    {
+
+        strresult.Format(_T("%.1f"),(float)regValue);
+        strresult+=_T("%");
+    }
+    else if (4==RangeValue)
+    {
+        //strresult.Format(_T("%.1f F"),(float)regValue/10.0);
+        if (regValue==0)
+        {
+            strresult=_T("OFF");
+        } 
+        else
+        {
+            strresult=_T("ON");
+        }
+    }
+    else if (5==RangeValue)
+    {
+        if (regValue==0)
+        {
+            strresult=_T("ON");
+        } 
+        else
+        {
+            strresult=_T("OFF");
+        }
+    }
+    else if (6==RangeValue)
+    {
+        strresult.Format(_T("%d"),regValue);
+    }
+    else if (7==RangeValue)
+    {
+        strresult.Format(_T("%d"),regValue);
+    }
+    else if (8==RangeValue)
+    {
+        //strresult=_T("TYPE3 10K C");
+        strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
+    }
+    else if (9==RangeValue)
+    {
+        /*strresult=_T("TYPE3 10K F");*/
+        strresult.Format(_T("%0.1f F"),(float)regValue/10.0);
+    }
+    else if (10==RangeValue)
+    {
+        strresult=_T("0");
+        //strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
+    }
+    else if (11==RangeValue)
+    {
+        //strresult=_T("0-5V");
+        strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
+    }
+    else if (12==RangeValue)
+    {
+        //strresult=_T("0-10V");
+        strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
+    }
+    else if (13==RangeValue)
+    {
+        //strresult=_T("0-20I");
+        strresult.Format(_T("%0.1f ma"),(float)regValue/1000.0);
+    }
+    return strresult;
+}
 void CT3ModulesView::Fresh(){
 
 	g_hwnd_now = this->m_hWnd;
@@ -114,98 +198,18 @@ void CT3ModulesView::Fresh(){
 		for(int i = 1;i<=10;i++)
 		{  
 			regValue=product_register_value[119+2*(i-1)]*65535+product_register_value[120+2*(i-1)];
-			if (0==product_register_value[200+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-
-			} 
-			else if (1==product_register_value[200+i-1])
-			{
-				strresult.Format(_T("%.1f C"),(float)regValue/10.0);
-			}
-			else if (2==product_register_value[200+i-1])
-			{
-				strresult=_T("10K F");
-				strresult.Format(_T("%.1f F"),(float)regValue/10.0);
-			}
-			else if (3==product_register_value[200+i-1])
-			{
-
-				strresult.Format(_T("%.1f"),(float)regValue);
-				strresult+=_T("%");
-			}
-			else if (4==product_register_value[200+i-1])
-			{
-				//strresult.Format(_T("%.1f F"),(float)regValue/10.0);
-				if (regValue==0)
-				{
-					strresult=_T("OFF");
-				} 
-				else
-				{
-					strresult=_T("ON");
-				}
-			}
-			else if (5==product_register_value[200+i-1])
-			{
-				if (regValue==0)
-				{
-					strresult=_T("ON");
-				} 
-				else
-				{
-					strresult=_T("OFF");
-				}
-			}
-			else if (6==product_register_value[200+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-			}
-			else if (7==product_register_value[200+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-			}
-			else if (8==product_register_value[200+i-1])
-			{
-				//strresult=_T("TYPE3 10K C");
-				strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
-			}
-			else if (9==product_register_value[200+i-1])
-			{
-				/*strresult=_T("TYPE3 10K F");*/
-				strresult.Format(_T("%0.1f F"),(float)regValue/10.0);
-			}
-			else if (10==product_register_value[200+i-1])
-			{
-				strresult=_T("0");
-				//strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
-			}
-			else if (11==product_register_value[200+i-1])
-			{
-				//strresult=_T("0-5V");
-				strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
-			}
-			else if (12==product_register_value[200+i-1])
-			{
-				//strresult=_T("0-10V");
-				strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
-			}
-			else if (13==product_register_value[200+i-1])
-			{
-				//strresult=_T("0-20I");
-				strresult.Format(_T("%0.1f ma"),(float)regValue/1000.0);
-			}
+			 int RangeValue    =   product_register_value[200+i-1];
 
 			m_T3_Input_List.SetItemText(i-1,1,strresult);
 			strresult.Format(_T("%4d/%4d/%4d  %2d:%2d"),product_register_value[139+3*(i-1)],product_register_value[140+3*(i-1)],product_register_value[141+3*(i-1)],product_register_value[142+3*(i-1)],product_register_value[143+3*(i-1)]);
-
+             strresult=GetValue(regValue,RangeValue);
 			m_T3_Input_List.SetItemText(i-1,2,strresult);
 			 
 		 
 
-			if (product_register_value[200+i-1]>=0&&product_register_value[200+i-1]<=13)
+			if (RangeValue>=0&&RangeValue<=13)
 			{
-				strresult = Range_Units[product_register_value[200+i-1]] ;
+				strresult = Range_Units[RangeValue] ;
 			}
 			m_T3_Input_List.SetItemText(i-1,3,strresult);
 			strresult.Format(_T("%d"),product_register_value[210+i-1]);
@@ -244,12 +248,12 @@ void CT3ModulesView::Fresh(){
 			,product_register_value[138+3*(i-1)]);
 
 			m_T3_Input_List.SetItemText(i-1,2,strresult);
-			strresult.Format(_T("%d"),product_register_value[183+i-1]);
- 
+		 
+                int RangeValue=product_register_value[183+i-1];
 
-			if (product_register_value[183+i-1]>=0&&product_register_value[183+i-1]<=13)
+			if (RangeValue>=0&&RangeValue<=13)
 			{
-				strresult = Range_Units[product_register_value[183+i-1]] ;
+				strresult = Range_Units[RangeValue] ;
 			}
 			  
 			m_T3_Input_List.SetItemText(i-1,3,strresult);
@@ -257,88 +261,8 @@ void CT3ModulesView::Fresh(){
 
 			regValue=(short)product_register_value[119+2*(i-1)];
 
-			if (0==product_register_value[183+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-
-			} 
-			else if (1==product_register_value[183+i-1])
-			{
-				strresult.Format(_T("%.1f C"),(float)regValue/10.0);
-			}
-			else if (2==product_register_value[183+i-1])
-			{
-				strresult=_T("10K F");
-				strresult.Format(_T("%.1f F"),(float)regValue/10.0);
-			}
-			else if (3==product_register_value[183+i-1])
-			{
-
-				strresult.Format(_T("%.1f"),(float)regValue);
-				strresult+=_T("%");
-			}
-			else if (4==product_register_value[183+i-1])
-			{
-				//strresult.Format(_T("%.1f F"),(float)regValue/10.0);
-				if (regValue==0)
-				{
-					strresult=_T("OFF");
-				} 
-				else
-				{
-					strresult=_T("ON");
-				}
-			}
-			else if (5==product_register_value[183+i-1])
-			{
-				if (regValue==0)
-				{
-					strresult=_T("ON");
-				} 
-				else
-				{
-					strresult=_T("OFF");
-				}
-			}
-			else if (6==product_register_value[183+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-			}
-			else if (7==product_register_value[183+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-			}
-			else if (8==product_register_value[183+i-1])
-			{
-				//strresult=_T("TYPE3 10K C");
-				strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
-			}
-			else if (9==product_register_value[183+i-1])
-			{
-				/*strresult=_T("TYPE3 10K F");*/
-				strresult.Format(_T("%0.1f F"),(float)regValue/10.0);
-			}
-			else if (10==product_register_value[183+i-1])
-			{
-				strresult=_T("0");
-				//strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
-			}
-			else if (11==product_register_value[183+i-1])
-			{
-				//strresult=_T("0-5V");
-				strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
-			}
-			else if (12==product_register_value[183+i-1])
-			{
-				//strresult=_T("0-10V");
-				strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
-			}
-			else if (13==product_register_value[183+i-1])
-			{
-				//strresult=_T("0-20I");
-				strresult.Format(_T("%0.1f ma"),(float)regValue/1000.0);
-			}
-
+			strresult=GetValue(regValue,RangeValue);
+             
 			m_T3_Input_List.SetItemText(i-1,1,strresult);
 
 
@@ -353,6 +277,38 @@ void CT3ModulesView::Fresh(){
 		}
 
 	}
+    else if (product_register_value[7]==PM_T38AI8AO6DO)
+    {
+        m_T3_Input_List.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
+        m_T3_Input_List.SetExtendedStyle(m_T3_Input_List.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));	
+        m_T3_Input_List.InsertColumn(0, _T("Label"), 50, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+        m_T3_Input_List.InsertColumn(1, _T("Value"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_T3_Input_List.InsertColumn(2, _T("Range"), 90, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_T3_Input_List.InsertColumn(3, _T("Filter"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+
+        for (int i=0;i<8;i++)
+        {
+            strTemp=Get_Table_Name(m_sn,_T("Input"),i+1);
+            m_T3_Input_List.InsertItem(i,strTemp);
+        }
+
+        CString strresult;
+        int regValue;
+        for(int i = 1;i<=8;i++)
+        {     
+        int RangeValue =   product_register_value[225+i-1]; 
+        if (RangeValue>=0&&RangeValue<=13)
+        {
+            strresult = Range_Units[RangeValue] ;
+        } 
+        m_T3_Input_List.SetItemText(i-1,2,strresult);
+        regValue=(short)product_register_value[116+i-1];
+        strresult = GetValue(regValue,RangeValue);
+        m_T3_Input_List.SetItemText(i-1,1,strresult);
+        strresult.Format(_T("%d"),product_register_value[200+i-1]);
+        m_T3_Input_List.SetItemText(i-1,3,strresult);
+        }
+    }
 	else if (product_register_value[7]==PM_T36CT)
 	{
 		m_T3_Input_List.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
@@ -375,106 +331,20 @@ void CT3ModulesView::Fresh(){
 		CString strresult;
 		int regValue;
 		for(int i = 1;i<=6;i++)
-		{  
-			regValue=product_register_value[108+i-1];
+        {    
+            int RangeValue=  product_register_value[126+i-1] ;
+            if (RangeValue>=0&&RangeValue<=13)
+            {
+                strresult = Range_Units[RangeValue] ;
+            }
+            m_T3_Input_List.SetItemText(i-1,2,strresult);
 
+            regValue=product_register_value[108+i-1];
+            strresult = GetValue(regValue,RangeValue);
+            m_T3_Input_List.SetItemText(i-1,1,strresult);
 
-			if (0==product_register_value[126+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-
-			} 
-			else if (1==product_register_value[126+i-1])
-			{
-				strresult.Format(_T("%.1f C"),(float)regValue/10.0);
-			}
-			else if (2==product_register_value[126+i-1])
-			{
-				strresult=_T("10K F");
-				strresult.Format(_T("%.1f F"),(float)regValue/10.0);
-			}
-			else if (3==product_register_value[126+i-1])
-			{
-
-				strresult.Format(_T("%.1f"),(float)regValue);
-				strresult+=_T("%");
-			}
-			else if (4==product_register_value[126+i-1])
-			{
-				//strresult.Format(_T("%.1f F"),(float)regValue/10.0);
-				if (regValue==0)
-				{
-					strresult=_T("OFF");
-				} 
-				else
-				{
-					strresult=_T("ON");
-				}
-			}
-			else if (5==product_register_value[126+i-1])
-			{
-				if (regValue==0)
-				{
-					strresult=_T("ON");
-				} 
-				else
-				{
-					strresult=_T("OFF");
-				}
-			}
-			else if (6==product_register_value[126+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-			}
-			else if (7==product_register_value[126+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-			}
-			else if (8==product_register_value[126+i-1])
-			{
-				//strresult=_T("TYPE3 10K C");
-				strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
-			}
-			else if (9==product_register_value[126+i-1])
-			{
-				/*strresult=_T("TYPE3 10K F");*/
-				strresult.Format(_T("%0.1f F"),(float)regValue/10.0);
-			}
-			else if (10==product_register_value[126+i-1])
-			{
-				strresult=_T("0");
-				//strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
-			}
-			else if (11==product_register_value[126+i-1])
-			{
-				//strresult=_T("0-5V");
-				strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
-			}
-			else if (12==product_register_value[126+i-1])
-			{
-				//strresult=_T("0-10V");
-				strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
-			}
-			else if (13==product_register_value[126+i-1])
-			{
-				//strresult=_T("0-20I");
-				strresult.Format(_T("%0.1f ma"),(float)regValue/1000.0);
-			}
-
-
-			m_T3_Input_List.SetItemText(i-1,1,strresult);
-
-			strresult.Format(_T("%d"),product_register_value[126+i-1]);
-		 
-
-			if (product_register_value[126+i-1]>=0&&product_register_value[126+i-1]<=13)
-			{
-				strresult = Range_Units[product_register_value[126+i-1]] ;
-			}
-			m_T3_Input_List.SetItemText(i-1,2,strresult);
-			strresult.Format(_T("%d"),product_register_value[142+i-1]);
-
-			m_T3_Input_List.SetItemText(i-1,3,strresult);
+            strresult.Format(_T("%d"),product_register_value[142+i-1]);
+            m_T3_Input_List.SetItemText(i-1,3,strresult);
 		}
 
 
@@ -600,105 +470,15 @@ void CT3ModulesView::Fresh(){
 		CString strresult;
 		int regValue;
 		for(int i = 1;i<=8;i++)
-		{  
+		{     int RangeValue =   product_register_value[118+i-1]; 
+            if (RangeValue>=0&&RangeValue<=13)
+            {
+                strresult = Range_Units[RangeValue] ;
+            } 
+             m_T3_Input_List.SetItemText(i-1,2,strresult);
 			regValue=(short)product_register_value[108+i-1];
-
-
-			if (0==product_register_value[118+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-
-			} 
-			else if (1==product_register_value[118+i-1])
-			{
-				strresult.Format(_T("%.1f C"),(float)regValue/10.0);
-			}
-			else if (2==product_register_value[118+i-1])
-			{
-				strresult=_T("10K F");
-				strresult.Format(_T("%.1f F"),(float)regValue/10.0);
-			}
-			else if (3==product_register_value[118+i-1])
-			{
-
-				strresult.Format(_T("%.1f"),(float)regValue);
-				strresult+=_T("%");
-			}
-			else if (4==product_register_value[118+i-1])
-			{
-				//strresult.Format(_T("%.1f F"),(float)regValue/10.0);
-				if (regValue==0)
-				{
-					strresult=_T("OFF");
-				} 
-				else
-				{
-					strresult=_T("ON");
-				}
-			}
-			else if (5==product_register_value[118+i-1])
-			{
-				if (regValue==0)
-				{
-					strresult=_T("ON");
-				} 
-				else
-				{
-					strresult=_T("OFF");
-				}
-			}
-			else if (6==product_register_value[118+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-			}
-			else if (7==product_register_value[118+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-			}
-			else if (8==product_register_value[118+i-1])
-			{
-				//strresult=_T("TYPE3 10K C");
-				strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
-			}
-			else if (9==product_register_value[118+i-1])
-			{
-				/*strresult=_T("TYPE3 10K F");*/
-				strresult.Format(_T("%0.1f F"),(float)regValue/10.0);
-			}
-			else if (10==product_register_value[118+i-1])
-			{
-				strresult=_T("0");
-				//strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
-			}
-			else if (11==product_register_value[118+i-1])
-			{
-				//strresult=_T("0-5V");
-				strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
-			}
-			else if (12==product_register_value[118+i-1])
-			{
-				//strresult=_T("0-10V");
-				strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
-			}
-			else if (13==product_register_value[118+i-1])
-			{
-				//strresult=_T("0-20I");
-				strresult.Format(_T("%0.1f ma"),(float)regValue/1000.0);
-			}
-
-
-
+			 strresult = GetValue(regValue,RangeValue);
 			m_T3_Input_List.SetItemText(i-1,1,strresult);
-
-			strresult.Format(_T("%d"),product_register_value[118+i-1]);
-			 
-			   int RangeValue =   product_register_value[118+i-1];
-			if (RangeValue>=0&&RangeValue<=13)
-			{
-				strresult = Range_Units[RangeValue] ;
-			}
-
-			m_T3_Input_List.SetItemText(i-1,2,strresult);
 			strresult.Format(_T("%d"),product_register_value[126+i-1]);
 			m_T3_Input_List.SetItemText(i-1,3,strresult);
 		}
@@ -724,7 +504,7 @@ void CT3ModulesView::Fresh(){
 
 
 			 
-			int RangeValue =   product_register_value[228+i-1];
+			int RangeValue = product_register_value[228+i-1];
 			if (RangeValue>=0&&RangeValue<=13)
 			{
 				strresult = Range_Units[RangeValue] ;
@@ -732,91 +512,11 @@ void CT3ModulesView::Fresh(){
 
 			m_T3_Input_List.SetItemText(i-1,2,strresult);
 
-			regValue=product_register_value[100+i-1];
+			regValue=(short)product_register_value[100+i-1];
 			//regValue=(short)product_register_value[INPUT1_PULSE_COUNT_LOW+2*(i-1)];
 
-			if (0==product_register_value[228+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-
-			} 
-			else if (1==product_register_value[228+i-1])
-			{
-				strresult.Format(_T("%.1f C"),(float)regValue/10.0);
-			}
-			else if (2==product_register_value[228+i-1])
-			{
-				strresult=_T("10K F");
-				strresult.Format(_T("%.1f F"),(float)regValue/10.0);
-			}
-			else if (3==product_register_value[228+i-1])
-			{
-
-				strresult.Format(_T("%.1f"),(float)regValue);
-				strresult+=_T("%");
-			}
-			else if (4==product_register_value[228+i-1])
-			{
-				//strresult.Format(_T("%.1f F"),(float)regValue/10.0);
-				if (regValue==0)
-				{
-					strresult=_T("OFF");
-				} 
-				else
-				{
-					strresult=_T("ON");
-				}
-			}
-			else if (5==product_register_value[228+i-1])
-			{
-				if (regValue==0)
-				{
-					strresult=_T("ON");
-				} 
-				else
-				{
-					strresult=_T("OFF");
-				}
-			}
-			else if (6==product_register_value[228+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-			}
-			else if (7==product_register_value[228+i-1])
-			{
-				strresult.Format(_T("%d"),regValue);
-			}
-			else if (8==product_register_value[228+i-1])
-			{
-				//strresult=_T("TYPE3 10K C");
-				strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
-			}
-			else if (9==product_register_value[228+i-1])
-			{
-				/*strresult=_T("TYPE3 10K F");*/
-				strresult.Format(_T("%0.1f F"),(float)regValue/10.0);
-			}
-			else if (10==product_register_value[228+i-1])
-			{
-				strresult=_T("0");
-				//strresult.Format(_T("%0.1f C"),(float)regValue/10.0);
-			}
-			else if (11==product_register_value[228+i-1])
-			{
-				//strresult=_T("0-5V");
-				strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
-			}
-			else if (12==product_register_value[228+i-1])
-			{
-				//strresult=_T("0-10V");
-				strresult.Format(_T("%0.1f V"),(float)regValue/1000.0);
-			}
-			else if (13==product_register_value[228+i-1])
-			{
-				//strresult=_T("0-20I");
-				strresult.Format(_T("%0.1f ma"),(float)regValue/1000.0);
-			}
-
+			
+             strresult = GetValue(regValue,RangeValue);
 			m_T3_Input_List.SetItemText(i-1,1,strresult);
 
 			strresult.Format(_T("%d"),product_register_value[260+i-1]);
@@ -827,8 +527,8 @@ void CT3ModulesView::Fresh(){
 	{
 		m_T3_Input_List.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 		m_T3_Input_List.SetExtendedStyle(m_T3_Input_List.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));	
-		m_T3_Input_List.InsertColumn(0, _T("Channel Number"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-		m_T3_Input_List.InsertColumn(1, _T("Channel Name"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+		m_T3_Input_List.InsertColumn(0, _T("Number"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+		m_T3_Input_List.InsertColumn(1, _T("Name"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 		m_T3_Input_List.InsertColumn(2, _T("Value"), 90, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 		m_T3_Input_List.InsertColumn(3, _T("Range"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 		m_T3_Input_List.InsertColumn(4, _T("Filter"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -971,12 +671,71 @@ void CT3ModulesView::Fresh(){
 			}
 		}
 	}
+    else if (product_register_value[7]==PM_T322AI)
+    {
+        m_T3_Input_List.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
+        m_T3_Input_List.SetExtendedStyle(m_T3_Input_List.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));	
+        m_T3_Input_List.InsertColumn(0, _T("Number"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+        m_T3_Input_List.InsertColumn(1, _T("Name"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_T3_Input_List.InsertColumn(2, _T("Value"), 90, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_T3_Input_List.InsertColumn(3, _T("Range"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_T3_Input_List.InsertColumn(4, _T("Filter"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+       // m_T3_Input_List.InsertColumn(5, _T("Offset"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        for (int i=0;i<22;i++)
+        {
+             strTemp.Format(_T("%d"),i+1);
+            m_T3_Input_List.InsertItem(i,strTemp);
+            strTemp=Get_Table_Name(m_sn,_T("Input"),i+1);
+            m_T3_Input_List.SetItemText(i,1,strTemp);
+        }
+        CString strresult;
+        int regValue;
+        for(int i = 1;i<=22;i++)
+        {  
+
+                                                           
+
+            int RangeValue =   product_register_value[225+i-1];
+            if (RangeValue>=0&&RangeValue<=13)
+            {
+                strresult = Range_Units[RangeValue] ;
+            }
+
+            m_T3_Input_List.SetItemText(i-1,3,strresult);
+             
+            if (i<=11)
+            {
+                if (RangeValue!=6)
+                {
+                    regValue=product_register_value[100+2*i-1];
+                } 
+                else
+                {   
+                    regValue=product_register_value[100+2*(i-1)]*256+product_register_value[100+2*i-1];
+                }
+            }
+            else
+            {
+                regValue=product_register_value[122+i-12];
+            }
+            
+           
+
+            strresult = GetValue(regValue,RangeValue);
+            m_T3_Input_List.SetItemText(i-1,2,strresult);
+
+            strresult.Format(_T("%d"),product_register_value[200+i-1]);
+            m_T3_Input_List.SetItemText(i-1,4,strresult);
+
+//             strresult.Format(_T("%d"),product_register_value[250+i-1]);
+//             m_T3_Input_List.SetItemText(i-1,5,strresult);
+        }
+    }
 	else 
 	{
 		AfxMessageBox(_T("This Product is not T3 Modules!")) ;
 	}
 	m_T3_Input_List.ShowWindow(SW_SHOW);
-
 }
 
 LRESULT CT3ModulesView::Fresh_Input_List(WPARAM wParam,LPARAM lParam){
@@ -990,7 +749,7 @@ LRESULT CT3ModulesView::Fresh_Input_List(WPARAM wParam,LPARAM lParam){
 		for (int i=0;i<10;i++)
 		{
 			strTemp=Get_Table_Name(m_sn,_T("Input"),i+1);
-			m_T3_Input_List.InsertItem(i,strTemp);
+			m_T3_Input_List.InsertItem(i,strTemp);    
 		}
 		CString strresult;
 		int regValue;
@@ -1013,7 +772,6 @@ LRESULT CT3ModulesView::Fresh_Input_List(WPARAM wParam,LPARAM lParam){
 			}
 			else if (3==product_register_value[200+i-1])
 			{
-
 				strresult.Format(_T("%.1f"),(float)regValue);
 				strresult+=_T("%");
 			}
@@ -1672,6 +1430,32 @@ LRESULT CT3ModulesView::Fresh_Input_List(WPARAM wParam,LPARAM lParam){
 			m_T3_Input_List.SetItemText(i-1,3,strresult);
 		}
 	}
+    else if (product_register_value[7]==PM_T38AI8AO6DO)
+    {
+
+        for (int i=0;i<8;i++)
+        {
+            strTemp=Get_Table_Name(m_sn,_T("Input"),i+1);
+            m_T3_Input_List.InsertItem(i,strTemp);
+        }
+
+        CString strresult;
+        int regValue;
+        for(int i = 1;i<=8;i++)
+        {     
+            int RangeValue =   product_register_value[225+i-1]; 
+            if (RangeValue>=0&&RangeValue<=13)
+            {
+                strresult = Range_Units[RangeValue] ;
+            } 
+            m_T3_Input_List.SetItemText(i-1,2,strresult);
+            regValue=(short)product_register_value[116+i-1];
+            strresult = GetValue(regValue,RangeValue);
+            m_T3_Input_List.SetItemText(i-1,1,strresult);
+            strresult.Format(_T("%d"),product_register_value[200+i-1]);
+            m_T3_Input_List.SetItemText(i-1,3,strresult);
+        }
+    }
 	else if (product_register_value[7]==PM_T332AI)
 	{
 
@@ -1926,7 +1710,56 @@ LRESULT CT3ModulesView::Fresh_Input_List(WPARAM wParam,LPARAM lParam){
 			}
 		}
 	}
-	else 
+    else if (product_register_value[7]==PM_T322AI)
+    {
+         
+        for (int i=0;i<22;i++)
+        {
+            strTemp.Format(_T("%d"),i+1);
+            m_T3_Input_List.InsertItem(i,strTemp);
+            strTemp=Get_Table_Name(m_sn,_T("Input"),i+1);
+            m_T3_Input_List.SetItemText(i,1,strTemp);
+        }
+     
+        CString strresult;
+        int regValue;
+        for(int i = 1;i<=22;i++)
+        {  
+
+
+
+            int RangeValue =   product_register_value[225+i-1];
+            if (RangeValue>=0&&RangeValue<=13)
+            {
+                strresult = Range_Units[RangeValue] ;
+            }
+
+            m_T3_Input_List.SetItemText(i-1,3,strresult);
+         
+            if (i<=11)
+            {
+                if (RangeValue!=6)
+                {
+                    regValue=product_register_value[100+2*i-1];
+                } 
+                else
+                {   
+                    regValue=product_register_value[100+2*(i-1)]*256+product_register_value[100+2*i-1];
+                }
+            }
+            else
+            {
+                regValue=product_register_value[122+i-12];
+            }
+
+            strresult = GetValue(regValue,RangeValue);
+            m_T3_Input_List.SetItemText(i-1,2,strresult);
+
+            strresult.Format(_T("%d"),product_register_value[200+i-1]);
+            m_T3_Input_List.SetItemText(i-1,4,strresult); 
+        }
+    }
+    else 
 	{
 		AfxMessageBox(_T("This Product is not T3 Modules!")) ;
 	}
@@ -1997,6 +1830,62 @@ LRESULT CT3ModulesView::Change_Input_Item(WPARAM wParam,LPARAM lParam){
 		}
 
 	}
+    if (product_register_value[7]==PM_T322AI){
+        if (lCol == 1)
+        {
+            Insert_Update_Table_Name(m_sn,_T("Input"),lRow+1,New_CString);
+        }
+        if (lCol == 2)	  //Value
+        {
+            int RangeValue=(short)product_register_value[225+lRow];
+            if (RangeValue>14||RangeValue<0)
+            {
+                RangeValue=0;
+            }
+            Value=Value*Get_Unit_Process(Range_Units[RangeValue]);
+
+            int low,high;
+
+            low=Value%65535;
+            high=Value/65535;
+
+            // int ret1=write_one(g_tstat_id,INPUT1_PULSE_COUNT_HIGHT+2*(m_currow-1),high);
+            //regValue=product_register_value[119+2*(i-1)]*65535+product_register_value[120+2*(i-1)];
+
+            int ret1=write_one(g_tstat_id,100+2*lRow,high);
+            int ret2=write_one(g_tstat_id,101+2*lRow,low);
+
+            if (ret1>0&&ret2>0)
+            {
+                product_register_value[100+2*lRow]=high;
+                product_register_value[101+2*lRow]=low;
+                PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+            }
+            else
+            {
+                AfxMessageBox(_T("Try again"));
+            } 
+        }
+
+        if (lCol == 4)	//Filter
+        {
+            int regvalue=product_register_value[200+lRow];
+            if (Value!=regvalue)
+            {
+                int ret1=write_one(g_tstat_id,200+lRow,Value);
+                if (ret1>0)
+                {
+                    product_register_value[200+lRow]=Value;
+                    PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+                }
+                else
+                {
+                    AfxMessageBox(_T("Try again"));
+                }
+            }
+        }
+
+    }
 	else if (product_register_value[7]==PM_T38I13O){
 
 	  if (lCol == 0)
@@ -2095,6 +1984,50 @@ LRESULT CT3ModulesView::Change_Input_Item(WPARAM wParam,LPARAM lParam){
 			}
 		}
 	}
+    else if (product_register_value[7]==PM_T38AI8AO6DO){
+        if (lCol == 0)
+        {
+            Insert_Update_Table_Name(m_sn,_T("Input"),lRow+1,New_CString);
+        }
+        if (lCol == 1)	  //Value
+        {
+            int RangeValue=(short)product_register_value[225+lRow];
+            if (RangeValue>14||RangeValue<0)
+            {
+                RangeValue=0;
+            }
+            Value=Value*Get_Unit_Process(Range_Units[RangeValue]);
+
+            int ret2=write_one(g_tstat_id,116+2*lRow,Value);
+            if (ret2>0)
+            {
+               
+                product_register_value[116+2*lRow]=Value;
+                PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+            }
+            else
+            {
+                AfxMessageBox(_T("Try again"));
+            } 
+        }
+        if (lCol == 3)	//Filter
+        {
+            int regvalue=product_register_value[200+lRow];
+            if (Value!=regvalue)
+            {
+                int ret1=write_one(g_tstat_id,200+lRow,Value);
+                if (ret1>0)
+                {
+                    product_register_value[200+lRow]=Value;
+                    PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+                }
+                else
+                {
+                    AfxMessageBox(_T("Try again"));
+                }
+            }
+        }
+    }
 	else if (product_register_value[7]==PM_T332AI){
 		if (lCol == 0)	//Label
 		{
@@ -2210,6 +2143,15 @@ void CT3ModulesView::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
 			Value_Length = 8;
 		}
 	}
+    else if (product_register_value[7]==PM_T38AI8AO6DO){
+        if (lCol == 2)
+        {
+            Is_Range = TRUE;
+            Range_Address = 225;
+            Value_Address = 116;
+            Value_Length = 8;
+        }
+    }
 	else if (product_register_value[7]==PM_T332AI){
 		if (lCol == 2)
 		{
@@ -2219,6 +2161,16 @@ void CT3ModulesView::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult){
 			Value_Length = 32;
 		}
 	}
+    else if (product_register_value[7]==PM_T322AI)
+    {
+        if (lCol == 3)
+        {
+            Is_Range = TRUE;
+            Range_Address = 225;
+            Value_Address = 100;
+            Value_Length = 44;
+        }
+    }
 	else if (product_register_value[7]==PM_T3PT10){
 
 	}

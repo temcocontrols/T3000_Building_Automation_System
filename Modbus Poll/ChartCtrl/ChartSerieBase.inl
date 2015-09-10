@@ -70,12 +70,12 @@ void CChartSerieBase<T>::AddPoint(const T& newPoint)
 template<class T>
 void CChartSerieBase<T>::AddPoints(T* pPoints, unsigned Count)
 {
-	m_vPoints.AddPoints(pPoints, Count);
-	RefreshAutoAxes(false);
+    m_vPoints.AddPoints(pPoints, Count);
+    RefreshAutoAxes(false);
 
-	CDC* pDC = m_pParentCtrl->GetDC();
-	Draw(pDC);
-	m_pParentCtrl->Invalidate();
+    CDC* pDC = m_pParentCtrl->GetDC();
+    Draw(pDC);
+    m_pParentCtrl->Invalidate();
 }
 
 template<class T>

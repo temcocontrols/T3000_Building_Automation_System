@@ -4,17 +4,23 @@
 
 // CT3ModulesOutputDlg dialog
 
-class CT3ModulesOutputDlg : public CDialogEx
+class CT3ModulesOutputDlg : public CFormView
 {
-	DECLARE_DYNAMIC(CT3ModulesOutputDlg)
+	DECLARE_DYNCREATE(CT3ModulesOutputDlg)
 
 public:
-	CT3ModulesOutputDlg(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CT3ModulesOutputDlg();
-
+	//CT3ModulesOutputDlg(CWnd* pParent = NULL);   // standard constructor
+	//virtual ~CT3ModulesOutputDlg();
+    CT3ModulesOutputDlg();           // protected constructor used by dynamic creation
+    virtual ~CT3ModulesOutputDlg();
 // Dialog Data
 	enum { IDD = IDD_DIALOG_T3_OUTPUTS };
-
+#ifdef _DEBUG
+    virtual void AssertValid() const;
+#ifndef _WIN32_WCE
+    virtual void Dump(CDumpContext& dc) const;
+#endif
+#endif
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 

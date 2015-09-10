@@ -574,7 +574,7 @@ void CIONameConfig::GetIOName()
 		}
 		else
 		{
-			g_strSensorName =_T("Internal Sensor");
+			g_strSensorName =_T("Internal Temp Sensor");
 			g_strInName1=_T("Input 1");
 			g_strInName2=_T("Input 2");
 			g_strInName3=_T("Input 3");

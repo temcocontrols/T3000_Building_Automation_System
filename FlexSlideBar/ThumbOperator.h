@@ -49,9 +49,10 @@ public:
 
 
 	virtual void SetParentWnd(CWnd* pParent);
+      void SetPosValue(int nMinPos, int nMidPos, int nMaxPos) ;
 
 protected:
-	FSB_STYLE			m_fbStyle;
+	FSB_STYLE			    m_fbStyle;
 
 	BOOL					m_bHorizontal;
 	CRect					m_rcChannel;
@@ -62,6 +63,9 @@ protected:
 
 	BOOL					m_bStartDraging;
 
-	CWnd*				m_pParent;
+	CWnd*				    m_pParent;
 
+    int m_nMinPos;
+    int m_nMidPos;
+    int m_nMaxPos;
 };

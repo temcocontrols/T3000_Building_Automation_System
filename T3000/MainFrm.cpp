@@ -43,6 +43,7 @@
 #include "BacnetTool.h"
 #include "BacnetAlarmWindow.h"
 #include "Dialog_Progess.h"
+#include "TStatOutputView.h"
 extern CDialog_Progess *WaitRead_Data_Dlg;
 //////////////////////////////
 //#include "isp/CDialogISPTOOL.h"
@@ -50,7 +51,7 @@ extern CDialog_Progess *WaitRead_Data_Dlg;
 #include "IONameConfig.h"
 
 #include "DialogCM5_BacNet.h"
-#include "TestMultiReadTraffic.h"
+ 
 #include "T38I13O.h"
 #include "T332AI.h"
 #include "gloab_define.h"
@@ -85,10 +86,16 @@ extern CBacnetUserlogin * User_Login_Window;
 #include "BacnetMonitor.h"
 #include "T3ModulesView.h"
 #include "T3000_Default_MainView.h"
+ #include "T3ModulesOutputDlg.h" 
+ #include "ProductRegisterListView.h"
+ #include "TStatInputView.h"
 
+ #include "BoatMonitorViewer.h"
+
+bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");				
 //	配置文件名称，用于保存用户设置
-
+extern bool b_statusbarthreadflag;
 extern tree_product	m_product_isp_auto_flash;
 #pragma region Fance Test
 //For Test
@@ -96,8 +103,7 @@ extern tree_product	m_product_isp_auto_flash;
 
 bool start_record_time = true;	//开启计时，如果用户一段时间无键盘和鼠标左键操作就开启自动刷新;
 unsigned long time_click = 0;
-/*CDialogEx *g_testmultiReadtraffic_dlg=NULL;*/
-//CTestMultiReadTraffic *g_testmultiReadtraffic_dlg=NULL;
+ 
 bool enable_show_debug_window = false; 
 BacnetWait *WaitWriteDlg=NULL;
 HANDLE hwait_write_thread = NULL;
@@ -105,7 +111,7 @@ _Refresh_Write_Info Write_Config_Info;
 HANDLE hStartEvent; // thread start event
 extern int isp_product_id;
 vector <MSG> My_Receive_msg;
-
+#define WM_CREATE_STATUSBAR WM_USER + 638
 #define  WM_REFRESH_TREEVIEW_MAP WM_USER + 2008
 HANDLE hDeal_thread;
 DWORD nThreadID_Do;
@@ -144,7 +150,7 @@ CCriticalSection MyCriticalSection;
 bool b_pause_refresh_tree = false;
 char local_network_ip[255];
 CString local_enthernet_ip;
-int m_MainHotKeyID[12] = 
+int m_MainHotKeyID[14] = 
 {
 	3001,
 	3002,
@@ -156,7 +162,9 @@ int m_MainHotKeyID[12] =
 	3008,
 	3009,
 	3010,
-	3011
+	3011,
+	3012,
+	3013
 };
 
 //End for Test
@@ -193,6 +201,8 @@ T3000RegAddress MyRegAddress;
 #define SCAN_TIMER 2
 #define MONITOR_MOUSE_KEYBOARD_TIMER 3
 #define SAVE_PRODYCT_STATUS  4
+
+#define MESSAGE_INFORMATION_DEAL 5
 
 const UINT WM_HTTPDOWNLOAD_THREAD_FINISHED = WM_APP + 100;
 CEvent g_killMultiReadEvent;
@@ -241,6 +251,7 @@ const UINT uiFirstUserToolBarId = AFX_IDW_CONTROLBAR_FIRST + 40;
 const UINT uiLastUserToolBarId = uiFirstUserToolBarId + iMaxUserToolbars - 1;
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
+	ON_NOTIFY_EX(TTN_NEEDTEXT,0,OnToolTipNotify)
 	ON_MESSAGE(WM_REFRESH_TREEVIEW_MAP, RefreshTreeViewMap)
 	ON_MESSAGE(WM_SCAN_PRODUCT, Message_Scan_Product)
 	ON_MESSAGE(MY_BAC_CONFIG_READ_RESULTS, ReadConfigFromDeviceMessageCallBack)
@@ -275,6 +286,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_RW_INFO, OnLabel)
 	ON_COMMAND(ID_BUILDING_INFO, OnLabe2)
 	ON_COMMAND(ID_PROTOCOL_INFO, OnLabe3)
+	
+	ON_MESSAGE(WM_CREATE_STATUSBAR,OnCreateStatusBarWindow)
 	ON_MESSAGE(WM_USER_FRESHSTATUSBAR,OnFreshStatusBar)
 	ON_MESSAGE(WM_ADDTREENODE, OnAddTreeNode)
 	ON_WM_TIMER()
@@ -368,6 +381,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
   //  ON_COMMAND(ID_TOOL_PRODUCTSREGISTERSMAINTENANCE, &CMainFrame::OnToolProductsregistersmaintenance)
   ON_COMMAND(ID_TOOL_REGISTERSMAINTENANCESYSTEM, &CMainFrame::OnToolRegistersmaintenancesystem)
   ON_COMMAND(ID_TOOL_FLASHSN, &CMainFrame::OnToolFlashsn)
+  ON_WM_MOVE()
   END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -389,7 +403,7 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 	BOOL bFirst=TRUE;
 	Read_Mutex=CreateMutex(NULL,TRUE,_T("Read_Multi_Reg")); 
 	ReleaseMutex(Read_Mutex); 
-	Sleep(30*1000);
+	/*Sleep(30*1000);*/
 	CString g_strT3000LogString;
 	//forbid  _ReadMultiRegisters  and _FreshTreeView access com port at the same time.
 	
@@ -398,23 +412,28 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 		if(::WaitForSingleObject(g_killMultiReadEvent,0)==WAIT_OBJECT_0)
 			break;		
 
-		g_bEnableRefreshTreeView = TRUE;
-		if(!bFirst)
-			Sleep(30000);
-		bFirst=FALSE;
-			g_bEnableRefreshTreeView = FALSE;
+        g_bEnableRefreshTreeView = TRUE;
+            if (pFrame->m_lastinterface !=19)
+            {
+                bFirst = FALSE;
+            }
+        if(!bFirst){
+            Sleep(10000);
+        
+        g_bEnableRefreshTreeView = FALSE;
 
-			if(g_bPauseMultiRead)
-			{
-				Sleep(10);
-				continue;
-			}
-		if(g_tstat_id_changed)
+        if(g_bPauseMultiRead)
         {
             Sleep(10);
             continue;
         }
-		if(g_tstat_id<0||g_tstat_id>=255)
+        if(g_tstat_id_changed)
+        {
+            Sleep(10);
+            continue;
+        }
+       
+        if(g_tstat_id<0||g_tstat_id>=255)
         {
             Sleep(10);
             continue;
@@ -433,13 +452,13 @@ UINT _ReadMultiRegisters(LPVOID pParam)
             Sleep(10);
             continue;
         }
-
+          }
 		if (!is_connect())
 		{
             Sleep(10);
 			continue;
 		}
-
+        bFirst=FALSE;
 		WaitForSingleObject(Read_Mutex,INFINITE); 
 		 
 		int nRet =read_one(g_tstat_id,6,2);
@@ -451,14 +470,15 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 		}
  
 		for(int i=0;i<17;i++) //Modify by Fance , tstat 6 has more register than 512;
-		 
 		{
 			if(g_tstat_id_changed)
 			{
+                Sleep(10);
 				continue;
 			}
 			if(g_bPauseMultiRead)
 			{
+                Sleep(10);
 				continue;
 			}
 			//register_critical_section.Lock();
@@ -487,15 +507,12 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 		{   
 		     if (!m_active_key_mouse)
 		     {
-			 ::PostMessage(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
+			 //::PostMessage(pFrame->m_pViews[DLG_T3000_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
 		     }
 			
 		}
 
-		//if(pFrame->m_pViews[DLG_CO2_VIEW]->m_hWnd!=NULL)
-		//{
-		//	::PostMessage(pFrame->m_pViews[DLG_CO2_VIEW]->m_hWnd,MsgT3000ViewFresh,0,0);
-		//}
+		 
 		
 	}
 
@@ -544,7 +561,7 @@ CMainFrame::CMainFrame()
 	m_hHttpFile = NULL;
 	 
 	m_bSafeToClose = TRUE;
-	//m_pThread = NULL;
+	m_pDialogInfo = NULL;
  
  
 }
@@ -576,7 +593,7 @@ void CMainFrame::InitViews()
 	m_pViews[DLG_TRENDLOG_VIEW]=(CView*) new CTrendLogView();
  	m_pViews[DLG_DIALOGCM5_VIEW]=  NULL; //(CView*) new CDialogCM5(); //CM5
  	m_pViews[DLG_DIALOGT3_VIEW]=(CView*) new CDialogT3();  //T3
-	m_pViews[DLG_DIALOGMINIPANEL_VIEW]=(CView*) new CDialgMiniPanel();//Mini Panel 
+	//m_pViews[DLG_DIALOGMINIPANEL_VIEW]=(CView*) new CDialgMiniPanel();//Mini Panel 
  	m_pViews[DLG_AIRQUALITY_VIEW]=(CView*) new CAirQuality;//AirQuality
 	m_pViews[DLG_LIGHTINGCONTROLLER_VIEW]=(CView*) new CLightingController;//Lightingcontroller
 	m_pViews[DLG_HUMCHAMBER]=(CView*) new CNewHumChamberView;
@@ -593,7 +610,11 @@ void CMainFrame::InitViews()
 	m_pViews[DLG_DIALOG_TEMP_HUMSENSOR]=(CView*)new CTempHumSensorForm;
 	m_pViews[DLG_DIALOG_DEFAULT_T3000_VIEW] = (CView * )new T3000_Default_MainView;
 	m_pViews[DLG_DIALOG_T3_INPUTS_VIEW] = (CView * )new CT3ModulesView;
-
+    m_pViews[DLG_DIALOG_T3_OUTPUTS_VIEW] = (CView * )new CT3ModulesOutputDlg;
+    m_pViews[DLG_DIALOG_CUSTOM_VIEW]  = (CView * )new CProductRegisterListView;
+    m_pViews[DLG_DIALOG_TSTAT_INPUT_VIEW]=(CView *)new CTStatInputView;
+    m_pViews[DLG_DIALOG_TSTAT_OUTPUT_VIEW]=(CView *)new CTStatOutputView;
+    m_pViews[DLG_DIALOG_BOATMONITOR] = (CView *)new CBoatMonitorViewer;
 	CDocument* pCurrentDoc = GetActiveDocument();
     CCreateContext newContext;
     newContext.m_pNewViewClass = NULL;
@@ -606,7 +627,7 @@ void CMainFrame::InitViews()
     
 	for (int nView =1; nView < NUMVIEWS; nView++)
     {
-		if(nView == DLG_DIALOGCM5_VIEW)
+		if(nView == DLG_DIALOGCM5_VIEW||nView == DLG_DIALOGMINIPANEL_VIEW)
 			continue;
         m_pViews[nView]->Create(NULL, NULL,
 				(AFX_WS_DEFAULT_VIEW & ~WS_VISIBLE),
@@ -639,8 +660,10 @@ void getLocalIp(void)
 	}
 }
 
+    
 
-
+#include "StatusbarCtrl.h"
+CMyStatusbarCtrl * statusbar = NULL;
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
@@ -665,9 +688,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	CMFCPopupMenu::SetForceMenuFocus(FALSE);
 	CMFCToolBar::SetSizes(CSize(32,32),CSize(32,32));
-	CMFCToolBar::SetMenuSizes(CSize(32,32),CSize(24,23));
+	CMFCToolBar::SetMenuSizes(CSize(32,32),CSize(24,24));
 
-
+	UINT uiToolbarHotID;
+	UINT uiToolbarColdID;
+	UINT uiMenuID;
+#if 0
 	UINT uiToolbarHotID = theApp.m_bHiColorIcons ? IDB_BITMAP_V25049 : 0;
 	UINT uiToolbarColdID = theApp.m_bHiColorIcons ? IDB_BITMAP_V25049 : 0;
     //theApp.m_bHiColorIcons=FALSE;
@@ -681,7 +707,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		TRACE0("Failed to create toolbar\n");
 		return -1;//fail to create
 	}
-
+#endif
 
 	uiToolbarHotID =  IDB_BITMAP7 ;
 	uiToolbarColdID = IDB_BITMAP7 ;
@@ -714,7 +740,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CString strToolBarName;
 	bNameValid = strToolBarName.LoadString(IDS_TOOLBAR_STANDARD);
 	ASSERT(bNameValid);
-	m_wndToolBar.SetWindowText(strToolBarName);
+	//m_wndToolBar.SetWindowText(strToolBarName);
 
 	
 	CString strCustomize;
@@ -733,17 +759,17 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	// TODO: Delete these five lines if you don't want the toolbar and menubar to be dockable
-	m_testtoolbar.EnableDocking(CBRS_ALIGN_ANY);	
+	//m_testtoolbar.EnableDocking(CBRS_ALIGN_ANY);	
 	
-	m_wndMenuBar.EnableDocking(CBRS_ALIGN_ANY);
-	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
+	//m_wndMenuBar.EnableDocking(CBRS_ALIGN_ANY);
+	//m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndWorkSpace.EnableDocking(CBRS_ALIGN_LEFT);
 
 	
 	EnableDocking(CBRS_ALIGN_ANY);	
 	
 	DockPane(&m_wndMenuBar);
-	DockPane(&m_wndToolBar);
+	//DockPane(&m_wndToolBar);
 	DockPane (&m_wndWorkSpace);
 	
 	DockPane(&m_testtoolbar);
@@ -773,6 +799,21 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	//  2011,7,4, 先判断是否第一次运行，是否要导入数据库。
 	//ImportDataBaseForFirstRun();
+    CString g_configfile_path =g_strExePth + g_strStartInterface_config;
+    g_selected_serialnumber=GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);
+     m_lastinterface=GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path);
+    // 	//WrPrivateProfileInt(_T("Setting"),_T("Interface"),19,g_configfile_path);
+         if (m_lastinterface != 19 && m_lastinterface!=24)
+         {
+             CString achive_file_path;
+             CString temp_serial;
+             temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
+             achive_file_path = g_achive_folder + _T("\\") + temp_serial;
+             Load_Product_Value_Cache(achive_file_path);
+             g_tstat_id = product_register_value[6];
+         }
+    
+
 
 	ScanTstatInDB();
 	DeleteConflictInDB();//用于处理数据库中重复的数据，这些数据有相同的序列号;
@@ -807,8 +848,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	ReadSlider();
 
 	BuildingComportConfig();//用于 更改 Config里面的 Comport项;
-
-
+      
 	
 //展开所有的项
 //	Treestatus();
@@ -831,64 +871,72 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	//Register热键   
 	#ifdef _DEBUG //debug版本   
-	int nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'G'); //热键 ctrl + S   
-	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey ALT + S failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'P'); //热键 ctrl + P  
-	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey ALT + P failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[2],MOD_ALT,'I'); //热键 ctrl + I   
+	int nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'I');
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + I failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[3],MOD_ALT,'O'); //热键 ctrl + O   
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'O'); 
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + O failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[4],MOD_ALT,'V'); //热键 ctrl + V  
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[2],MOD_ALT,'V'); 
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey ALT + V failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[5],MOD_ALT,'C'); //热键 ctrl + C   
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[3],MOD_ALT,'P'); 
 	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey ALT + C failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[6],MOD_ALT,'W'); //热键 ctrl + W   
+		AfxMessageBox(_T("RegisterHotKey ALT + P failure"));   
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[5],MOD_ALT,'L'); 
 	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey ALT + W failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[7],MOD_ALT,'A'); //热键 ctrl + A   
+		AfxMessageBox(_T("RegisterHotKey ALT + L failure"));  
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[6],MOD_ALT,'G'); 
 	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey ALT + A failure"));  
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[8],MOD_ALT,'M'); //热键 ctrl + M  
+		AfxMessageBox(_T("RegisterHotKey ALT + G failure"));  
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[7],MOD_ALT,'S'); 
 	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey ALT + G failure")); 
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[9],MOD_ALT,'L'); //热键 ctrl + L   
+		AfxMessageBox(_T("RegisterHotKey ALT + S failure"));  
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[8],MOD_ALT,'H'); 
 	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey ALT + L failure")); 
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[10],MOD_ALT,'U'); //热键 ctrl + L   
+		AfxMessageBox(_T("RegisterHotKey ALT + H failure")); 
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[9],MOD_ALT,'T'); 
 	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey ALT + U failure")); 
-	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[11],MOD_ALT,'S'); //热键 ctrl + S   
+		AfxMessageBox(_T("RegisterHotKey ALT + T failure")); 
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[10],MOD_ALT,'A'); 
 	if(!nRet)  
-		AfxMessageBox(_T("RegisterHotKey ALT + E failure")); 
+		AfxMessageBox(_T("RegisterHotKey ALT + A failure")); 
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[11],MOD_ALT,'C'); 
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + C failure")); 
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[4],MOD_ALT,'R'); 
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + R failure")); 
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[12],MOD_ALT,'B'); 
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + R failure")); 
+	nRet = RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[13],MOD_ALT,'D'); 
+	if(!nRet)  
+		AfxMessageBox(_T("RegisterHotKey ALT + R failure")); 
 
-	nRet = RegisterHotKey(GetSafeHwnd(),1111,MOD_SHIFT,'D'); //热键 ctrl + L   
+	nRet = RegisterHotKey(GetSafeHwnd(),1111,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'D'); //热键 ctrl + alt + shift + D  
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey MOD_SHIFT + D failure")); 
-	nRet = RegisterHotKey(GetSafeHwnd(),1112,MOD_SHIFT,'F'); //热键 ctrl + L   
+	nRet = RegisterHotKey(GetSafeHwnd(),1112,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'F'); //热键 ctrl + alt + shift + F 
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey MOD_SHIFT + F failure")); 
 	#else //release版本   
-	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'G'); 
-	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'P'); 
-	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[2],MOD_ALT,'I'); 
-	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[3],MOD_ALT,'O'); 
-	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[4],MOD_ALT,'V'); 
-	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[5],MOD_ALT,'C'); 
-	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[6],MOD_ALT,'W'); 
-	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[7],MOD_ALT,'A'); 
-	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[8],MOD_ALT,'M');
-	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[9],MOD_ALT,'L');
-	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[10],MOD_ALT,'U');
-	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[11],MOD_ALT,'S');
-	RegisterHotKey(GetSafeHwnd(),1111,MOD_SHIFT,'D');
-	RegisterHotKey(GetSafeHwnd(),1112,MOD_SHIFT,'F');
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[0],MOD_ALT,'I'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[1],MOD_ALT,'O'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[2],MOD_ALT,'V'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[3],MOD_ALT,'P'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[4],MOD_ALT,'R'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[5],MOD_ALT,'L'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[6],MOD_ALT,'G'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[7],MOD_ALT,'S'); 
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[8],MOD_ALT,'H');
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[9],MOD_ALT,'T');
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[10],MOD_ALT,'A');
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[11],MOD_ALT,'C');
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[12],MOD_ALT,'B');
+	RegisterHotKey(GetSafeHwnd(),m_MainHotKeyID[13],MOD_ALT,'D');
+	RegisterHotKey(GetSafeHwnd(),1111,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'D');
+	RegisterHotKey(GetSafeHwnd(),1112,(MOD_SHIFT | MOD_CONTROL | MOD_ALT),'F');
 	#endif  
 	for(int i=0;i<WINDOW_TAB_COUNT;i++)
 	{
@@ -904,7 +952,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CFileFind fFind;
 	if(fFind.FindFile(AutoFlashConfigPath))
 	{
-		DeleteFile(AutoFlashConfigPath);
+		DeleteFile(AutoFlashConfigPath);                                                 
 	}
 
 	MyRegAddress.MatchMoudleAddress();
@@ -936,15 +984,141 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		 CreateDirectory(m_sFileToDownloadInto,NULL);*/
 
 		// 需要执行线程中的操作时
-		m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
-		m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
+
+       if (m_lasttime_tree_node.protocol == Modbus_Serial)
+       {
+           open_com(m_lasttime_tree_node.ncomport);
+           SetCommunicationType(0);
+       }
+       else  if(m_lasttime_tree_node.protocol == Modbus_TCP)
+       {
+           Open_Socket2(m_lasttime_tree_node.BuildingInfo.strIp,_wtoi(m_lasttime_tree_node.BuildingInfo.strIpPort));
+           SetCommunicationType(1);
+       }
+        g_protocol =  m_lasttime_tree_node.protocol;
+
+        int ReadID = read_one(g_tstat_id,6,10);
+
+        if (ReadID > 0)
+        {
+            m_pTreeViewCrl->turn_item_image(m_lasttime_tree_node.product_item ,true);	
+            for (int i = 0;i<(int)m_product.size();i++)
+            {
+                if (m_product.at(i).product_item == m_lasttime_tree_node.product_item)
+                {
+                    
+                    m_product.at(i).status_last_time[0] = true;
+                    m_product.at(i).status_last_time[1] = true;
+                    m_product.at(i).status_last_time[2] = true; 
+                }
+                
+            }
+            
+        }
+        else
+        {
+            m_pTreeViewCrl->turn_item_image(m_lasttime_tree_node.product_item ,false);	
+            for (int i = 0;i<(int)m_product.size();i++)
+            {
+                if (m_product.at(i).product_item == m_lasttime_tree_node.product_item)
+                {
+
+                    m_product.at(i).status_last_time[0] = false;
+                    m_product.at(i).status_last_time[1] = false;
+                    m_product.at(i).status_last_time[2] = false; 
+                }
+
+            } 
+        }
+
+        if(m_pDialogInfo==NULL)
+        {
+            m_pDialogInfo = new CDialogInfo;
+            m_pDialogInfo->Create(IDD_DIALOG_INFO,this);
+            m_pDialogInfo->ShowWindow(SW_HIDE);
+            m_pDialogInfo->CenterWindow();
+            m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T(""));
+        }
+
+        m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
+        m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
+
+        #if 1
+        nFlag = product_register_value[7]; 
+        {
+            if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) )
+            {
+                product_type =T3000_6_ADDRESS;
+            }
+            else if((nFlag == PM_TSTATRUNAR)||(nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H)||(nFlag==PM_TSTAT5G))
+            {
+                product_type = T3000_5EH_LCD_ADDRESS;
+            }
+            else if((nFlag == PM_TSTAT5A) ||(nFlag == PM_TSTAT5B) ||
+                (nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F))
+            {
+                product_type =T3000_5ABCDFG_LED_ADDRESS;
+            }
+            else if (nFlag==PM_CS_SM_AC||nFlag==PM_CS_SM_DC||nFlag==PM_CS_RSM_AC||nFlag==PM_CS_RSM_DC)
+            {
+                product_type=CS3000;
+            }
+            else if (nFlag==PM_T322AI||nFlag==PM_T38AI8AO6DO||nFlag==PM_T3PT10||nFlag==PM_T3IOA||nFlag==PM_T332AI||nFlag== PM_T38AI16O||nFlag==PM_T38I13O||nFlag==PM_T34AO||nFlag==PM_T36CT||nFlag==PM_T3PERFORMANCE)
+            {
+                product_type=T3000_T3_MODULES;
+            }
+            else {
+                product_type=nFlag;
+            }
+
+            //Code and comments by Fance
+            //Use old_product_type to save the last value.
+            //if this value is change ,it will reload the register value.
+            //example:
+            //For tstats 5A : product_register_value[MODBUS_BAUDRATE]  ->  MODBUS_BAUDRATE = 185
+            //For tstats 6	  product_register_value[MODBUS_BAUDRATE]  ->  MODBUS_BAUDRATE = 110
+            if(old_product_type!=product_type)
+            {
+                old_product_type = product_type;
+                MyRegAddress.Change_Register_Table();
+            }
+
+        }
+         GetIONanme();
+        if (product_type==T3000_6_ADDRESS)
+        {
+            LoadTstat_InputData();
+            LoadTstat_OutputData();
+        }
+        //int const PM_CO2_NET = 32;
+        // int const PM_CO2_RS485 = 33;
+        else if (product_type==CS3000)
+        {
+            LoadInputData_CS3000();
+            LoadOutputData_CS3000(); 
+        }
+
+        else if (product_type == T3000_T3_MODULES)
+        {
+
+
+        }
+
+        #endif
 		//m_pThread =NULL;// AfxBeginThread(_DownloadThread, this, THREAD_PRIORITY_NORMAL, CREATE_SUSPENDED);
 // 		if (m_pThread == NULL)
 // 		{
 // 			TRACE(_T("Failed to create download thread, dialog is aborting\n"));
 // 
 // 		}
-
+		PostMessage(WM_CREATE_STATUSBAR,0,0);
+		CString image_fordor;
+		image_fordor = ApplicationFolder + _T("\\Database\\Buildings\\") + m_strCurMainBuildingName + _T("\\image");
+		CFileFind temp_find;
+		if(temp_find.FindFile(image_fordor) == 0)
+		{
+			CreateDirectory(image_fordor,NULL);
+		}
 
 	return 0;
 }
@@ -1123,6 +1297,10 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	GetCursorPos(&pt);
 	m_pTreeViewCrl->ScreenToClient(&pt);
 	hSelItem = m_pTreeViewCrl->HitTest(pt);
+	if(hSelItem == NULL)
+		return;
+	RECT r;
+
 
 	//////////////////////////////////////////////////////////////////////////
 	m_strCurSelNodeName = m_pTreeViewCrl->GetItemText(hSelItem);
@@ -1137,7 +1315,16 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	{
 		if(hSelItem==m_product.at(i).product_item )
 		{	
-			    g_strT3000LogString.Format(_T("Trying to connect to %s:%d"),GetProductName(m_product.at(i).product_class_id),m_product.at(i).serial_number);
+            CString Product_Custom = m_product.at(i).Custom;
+            m_current_tree_node = m_product.at(i);
+            if (Product_Custom.CompareNoCase(_T("1")) == 0)
+            {    
+                g_tstat_id = m_product.at(i).product_id;
+                g_selected_serialnumber = m_product.at(i).serial_number;
+                SwitchToPruductType(DLG_DIALOG_CUSTOM_VIEW);
+                return;
+            }
+			g_strT3000LogString.Format(_T("Trying to connect to %s:%d"),GetProductName(m_product.at(i).product_class_id),m_product.at(i).serial_number);
 			
 				 
 			CString* pstrInfo = new CString(g_strT3000LogString); 
@@ -1177,6 +1364,20 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
                 DoConnectToANode(hSelItem);
 
 			}
+            else if (m_product.at(i).product_class_id == PM_T322AI) //T3
+            {
+                g_tstat_id = m_product.at(i).product_id;
+                /*SwitchToPruductType(DLG_DIALOGT3_VIEW);*/
+                DoConnectToANode(hSelItem);
+
+            }
+            else if (m_product.at(i).product_class_id == PM_T38AI8AO6DO) //T3
+            {
+                g_tstat_id = m_product.at(i).product_id;
+                /*SwitchToPruductType(DLG_DIALOGT3_VIEW);*/
+                DoConnectToANode(hSelItem);
+
+            }
             else if (m_product.at(i).product_class_id == PM_T3PT10)
             {
                 g_tstat_id = m_product.at(i).product_id;
@@ -1261,6 +1462,16 @@ LRESULT CMainFrame::OnHTreeItemBeginlabeledit(NMHDR *pNMHDR, LRESULT *pResult)
 {
 
 	return 0;
+}
+
+void  CMainFrame::OnHTreeMessageSeletedChanged(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	//if(list_mouse_click)
+	//{
+	//	list_mouse_click = true;
+	//}
+	//OnHTreeItemSeletedChanged( pNMHDR, pResult);
+	//list_mouse_click = false;
 }
 
 void  CMainFrame::OnHTreeItemClick(NMHDR *pNMHDR, LRESULT *pResult)
@@ -1360,9 +1571,960 @@ void CMainFrame::DeleteConflictInDB()
 	if(find_conflict)
 		 PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
 }
+
+
+
+void CMainFrame::LoadProductFromDB()
+{
+	ClearBuilding();
+	CADO ado;
+	ado.OnInitADOConn();
+	m_product.clear();
+	CString strSql;
+	strSql.Format(_T("select * from Building where Default_SubBuilding=-1"));
+	ado.m_pRecordset=ado.OpenRecordset(strSql);
+	int count =ado.GetRecordCount(ado.m_pRecordset); 
+	_variant_t temp_variant;
+	if(count<=0)
+	{
+	    ado.CloseRecordset();
+		ado.CloseConn();
+		AfxMessageBox(_T("There is no default building, please select a building Firstly!"));
+		return;
+	}
+
+		m_strCurMainBuildingName=ado.m_pRecordset->GetCollect("Main_BuildingName");
+		CString cs_temp_protocol;
+		CString cs_temp_baudrate;
+		temp_variant=ado.m_pRecordset->GetCollect("Protocal");//
+		if(temp_variant.vt!=VT_NULL)
+			cs_temp_protocol=temp_variant;
+		else
+		{
+			cs_temp_protocol=_T("Auto");
+			strSql.Format(_T("update Building set Protocal='Auto' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
+			ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+		}
+
+		if(cs_temp_protocol.CompareNoCase(_T("Modbus 485")) == 0 )
+		{
+			current_building_protocol = P_MODBUS_485;
+		}
+		else if(cs_temp_protocol.CompareNoCase(_T("Modbus TCP")) == 0 )
+		{
+			current_building_protocol = P_MODBUS_TCP;
+		}
+		else if(cs_temp_protocol.CompareNoCase(_T("Bacnet MSTP")) == 0 )
+		{
+			current_building_protocol = P_BACNET_MSTP;
+		}
+		else if(cs_temp_protocol.CompareNoCase(_T("Bacnet IP")) == 0 )
+		{
+			current_building_protocol = P_REMOTE_DEVICE;
+		}
+		else
+		{
+			current_building_protocol = P_AUTO;
+		}
+
+		CString StrComport;
+		CString StrBaudrate;
+
+
+		CString StrIp;
+		if((current_building_protocol == P_MODBUS_485) || (current_building_protocol == P_BACNET_MSTP))
+		{
+
+
+			temp_variant=ado.m_pRecordset->GetCollect("Braudrate");//
+			if(temp_variant.vt!=VT_NULL)
+			{
+				cs_temp_baudrate = temp_variant;
+			}
+			else
+			{
+				cs_temp_protocol=_T("19200");
+				strSql.Format(_T("update Building set Braudrate='19200' where Main_BuildingName ='%s'"), m_strCurMainBuildingName);
+				ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			}
+
+			current_building_baudrate = _wtoi(cs_temp_baudrate);
+			if((current_building_baudrate!= 19200) && (current_building_baudrate != 9600) && (current_building_baudrate != 38400))
+			{
+				current_building_baudrate = 19200;
+			}
+
+			//current_building_comport
+			temp_variant = ado.m_pRecordset->GetCollect(_T("Com_Port"));
+			if(temp_variant.vt!=VT_NULL)
+			{
+				StrComport=temp_variant;
+				current_building_comport = _wtoi(StrComport.Mid(3));
+			}
+			else
+			{
+				current_building_comport=-1;
+			}
+
+		}
+		if (current_building_protocol == P_MODBUS_TCP || current_building_protocol == P_BACNET_IP || current_building_protocol == P_REMOTE_DEVICE)
+		{
+			temp_variant=ado.m_pRecordset->GetCollect("Ip_Address");//
+			if(temp_variant.vt!=VT_NULL)
+			{
+				StrIp = temp_variant;
+				m_str_curBuilding_Domain_IP = StrIp;
+			}
+			else
+			{
+				m_str_curBuilding_Domain_IP.Empty();
+			}
+
+		}
+		else
+			m_str_curBuilding_Domain_IP.Empty();
+		/*if(m_pRs->State)
+		m_pRs->Close();*/
+		ado.CloseRecordset();
+		m_subNetLst.clear();
+
+		strSql.Format(_T("select * from Building where Main_BuildingName ='%s'"),m_strCurMainBuildingName);
+		//m_pRs->Open(_variant_t(strSql),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
+		ado.m_pRecordset=ado.OpenRecordset(strSql);
+		m_nCurSubBuildingIndex=-1;
+		int nTemp=-1;
+		while(VARIANT_FALSE==ado.m_pRecordset->EndOfFile)
+		{
+			nTemp++;
+			int nDefault=0;
+			Building_info temBuildingInfo;
+			//memset(&temBuildingInfo,0,sizeof(temBuildingInfo));
+			temp_variant=ado.m_pRecordset->GetCollect("Building_Name");//
+			if(temp_variant.vt!=VT_NULL)
+				temBuildingInfo.strBuildingName=temp_variant;
+			else
+				temBuildingInfo.strBuildingName=_T("");
+
+
+
+			temp_variant=ado.m_pRecordset->GetCollect("Protocal");//
+			if(temp_variant.vt!=VT_NULL)
+				temBuildingInfo.strProtocol=temp_variant;
+			else
+				temBuildingInfo.strProtocol=_T("");
+
+			temp_variant=ado.m_pRecordset->GetCollect("Ip_Address");//
+			if(temp_variant.vt!=VT_NULL)
+				temBuildingInfo.strIp=temp_variant;
+			else
+				temBuildingInfo.strIp=_T("");
+
+
+			temp_variant=ado.m_pRecordset->GetCollect("Com_Port");//
+			if(temp_variant.vt!=VT_NULL)
+				temBuildingInfo.strComPort=temp_variant;
+			else
+				temBuildingInfo.strComPort=_T("");
+
+
+			temp_variant=ado.m_pRecordset->GetCollect("Ip_Port");//
+			if(temp_variant.vt!=VT_NULL)
+				temBuildingInfo.strIpPort=temp_variant;
+			else
+				temBuildingInfo.strIpPort=_T("");
+
+
+
+
+			temBuildingInfo.hCommunication=NULL;
+
+			temp_variant=ado.m_pRecordset->GetCollect("Main_BuildingName");//
+			if(temp_variant.vt!=VT_NULL)
+				temBuildingInfo.strMainBuildingname=temp_variant;
+			else
+				temBuildingInfo.strMainBuildingname=temp_variant;
+
+
+
+			temp_variant=ado.m_pRecordset->GetCollect("Braudrate");//
+			if(temp_variant.vt!=VT_NULL)
+				temBuildingInfo.strBaudRate=temp_variant;
+			else
+				temBuildingInfo.strBaudRate=_T("");
+
+
+
+			CString Building_DBpath;
+			nDefault=ado.m_pRecordset->GetCollect("Default_SubBuilding");
+			if(nDefault==-1)
+			{
+				m_nCurSubBuildingIndex=nTemp;
+			}
+			Building_DBpath=ado.m_pRecordset->GetCollect("Building_Path");
+
+			int index= Building_DBpath.Find(_T("Database"));
+			Building_DBpath.Delete(0,index);
+
+			g_strCurBuildingDatabasefilePath=GetExePath(true)+  Building_DBpath;
+
+
+
+			//nDefault=ado.m_pRecordset->GetCollect("Default_SubBuilding");
+			//if(nDefault==-1)
+			//{
+			//	m_nCurSubBuildingIndex=nTemp;
+			//}
+			//g_strCurBuildingDatabasefilePath=ado.m_pRecordset->GetCollect("Building_Path");
+
+			ado.m_pRecordset->MoveNext();
+			m_subNetLst.push_back(temBuildingInfo);
+		}
+		if(m_subNetLst.size()<=0)
+			AfxMessageBox(_T("There is no default building,please select a building First！"));
+
+		ado.CloseRecordset();
+
+		TV_INSERTSTRUCT tvInsert;////added
+
+		m_strCurSubBuldingName=m_subNetLst.at(m_nCurSubBuildingIndex).strBuildingName;
+
+		CString strBuilding=m_strCurSubBuldingName;//m_subNetLst.at(k).strBuildingName;
+
+		tvInsert.hParent = TVI_ROOT; // 指定父句柄
+		tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+		tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strBuilding;		
+		tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式	
+		TVINSERV_BUILDING
+			HTREEITEM hTreeSubbuilding=NULL;
+		hTreeSubbuilding=m_pTreeViewCrl->InsertSubnetItem(&tvInsert);//插入subbuilding。
+		// Expand the parent, if possible.
+		HTREEITEM hParent = m_pTreeViewCrl->GetParentItem(hTreeSubbuilding);
+		if (hParent != NULL)
+			m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
+
+
+
+		CBADO bado;
+		bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+		bado.OnInitADOConn(); 
+			HTREEITEM hlocalnetwork=NULL;
+		if((current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_AUTO))
+		{
+			CString strNetWrokName= _T("Local Network");
+			///*********tree***********************************
+			tvInsert.hParent = hTreeSubbuilding; // 指定父句柄
+			tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+		
+			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strNetWrokName;		
+			tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式	
+			TVINSERV_FLOOR
+			
+		
+			hlocalnetwork=m_pTreeViewCrl->InsertItem(&tvInsert);//返回楼层的句柄
+		}
+		HTREEITEM hrootserialport=NULL;
+		if((current_building_protocol == P_MODBUS_485) || (current_building_protocol == P_BACNET_MSTP) || (current_building_protocol == P_AUTO))
+		{
+			CString strSerialRootName= _T("Serial Port");
+			///*********tree***********************************
+			tvInsert.hParent = hTreeSubbuilding; // 指定父句柄
+			tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+		
+			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strSerialRootName;		
+			tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式	
+			TVINSERV_FLOOR
+			
+			
+			hrootserialport=m_pTreeViewCrl->InsertItem(&tvInsert);
+		}
+
+		if((current_building_protocol == P_REMOTE_DEVICE)|| (current_building_protocol == P_AUTO))
+		{
+			CString strRemoteNetworkName= _T("Remote Network Device");
+			///*********tree***********************************
+			tvInsert.hParent = hTreeSubbuilding; // 指定父句柄
+			tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+		
+			tvInsert.item.pszText = (LPTSTR)(LPCTSTR)strRemoteNetworkName;		
+			tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式	
+			TVINSERV_FLOOR
+			
+			HTREEITEM hrootremote=NULL;
+			hrootremote=m_pTreeViewCrl->InsertItem(&tvInsert);
+		}
+
+	
+		const int COM_SERIAL_PORT = 0; 
+		const int LOCAL_NETWORK_PORT = 1;
+		for (int z=0;z<3;z++)
+		{
+			int nTemp3;
+			CString PortName;
+			CString temp_show;
+			HTREEITEM hcomport=NULL;
+			if((current_building_protocol == P_MODBUS_485) || (current_building_protocol == P_BACNET_MSTP) || (current_building_protocol == P_AUTO))
+			{
+				if(z == COM_SERIAL_PORT)
+				{	
+					strSql.Format(_T("select DISTINCT Com_Port from ALL_NODE where Building_Name = '%s' ORDER BY Com_Port ASC"),strBuilding);
+					bado.m_pRecordset=bado.OpenRecordset(strSql);
+					nTemp3 = bado.GetRecordCount(bado.m_pRecordset);
+					while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)//所有楼层。
+					{
+						PortName= bado.m_pRecordset->GetCollect("Com_Port");
+						int comport_value = _wtoi(PortName);
+						if(comport_value > 50)
+						{
+							bado.m_pRecordset->MoveNext();
+							continue;
+						}
+
+						temp_show = _T("Com") + PortName;
+						tvInsert.hParent = hrootserialport; // 指定父句柄
+						tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+
+						tvInsert.item.pszText = (LPTSTR)(LPCTSTR)temp_show;		
+						tvInsert.hInsertAfter = TVI_LAST; // 项目插入方式	
+						TVINSERV_FLOOR
+
+
+							hcomport=m_pTreeViewCrl->InsertItem(&tvInsert);
+
+						_com_port_tree m_comport_temp;
+						m_comport_temp.building_item=hTreeSubbuilding;
+						m_comport_temp.serial_port_item =hrootserialport;
+						m_comport_temp.each_port_item = hcomport;
+						m_comport_temp.strComPortName=PortName;
+						m_comportlist.push_back(m_comport_temp);
+						bado.m_pRecordset->MoveNext();
+					}
+					bado.CloseRecordset();
+				}
+
+				m_pTreeViewCrl->Expand(hrootserialport, TVE_EXPAND);
+
+				int loop_count = 0;
+				if(z == COM_SERIAL_PORT)
+				{
+					loop_count = m_comportlist.size();
+				}
+				else if(z == LOCAL_NETWORK_PORT)
+				{
+					loop_count = 1;
+				}
+
+				for (int j=0;j<loop_count;j++)
+				{
+					CString temp_cs;
+					CString temp_parent_serialnum;
+					if(z == COM_SERIAL_PORT)
+					{
+						temp_cs = m_comportlist.at(j).strComPortName;
+						strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Com_Port = '%s'"),strBuilding,temp_cs);
+					}
+					else if(z == LOCAL_NETWORK_PORT)
+					{
+						strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s'"),strBuilding);
+					}
+					
+					bado.m_pRecordset=bado.OpenRecordset(strSql);
+					int temp_count = bado.GetRecordCount(bado.m_pRecordset);
+					if(temp_count > 0)
+					{
+						while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)//次Com port 下面的所有 设备;
+						{
+							if(z == LOCAL_NETWORK_PORT)
+							{
+								PortName= bado.m_pRecordset->GetCollect("Com_Port");
+								int comport_value = _wtoi(PortName);
+								if(comport_value <= 50)
+								{
+									bado.m_pRecordset->MoveNext();
+									continue;
+								}
+							}
+
+							temp_variant=bado.m_pRecordset->GetCollect("Parent_SerialNum");
+							if(temp_variant.vt!=VT_NULL)
+								temp_parent_serialnum=temp_variant;
+							else
+								temp_parent_serialnum=_T("");
+							unsigned int temp_int_serial;
+							temp_int_serial = (unsigned int)_wtoi(temp_parent_serialnum);
+							if((!temp_parent_serialnum.IsEmpty()) && (temp_int_serial != 0))	//说明有父节点;先插入父节点
+							{
+								bado.m_pRecordset->MoveNext();
+								continue;
+							}
+
+							CString strProdcut=bado.m_pRecordset->GetCollect("Product_name");
+							if(z == COM_SERIAL_PORT)
+							{
+								tvInsert.hParent = m_comportlist.at(j).each_port_item ; // 指定父句柄
+							}
+							else if(z == LOCAL_NETWORK_PORT)
+							{
+								tvInsert.hParent = hlocalnetwork;// 指定父句柄 为本地网络;
+							}
+							tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+							tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;	
+							//TRACE(strProdcut);
+							tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式						
+							int temp_product_class_id=bado.m_pRecordset->GetCollect("Product_class_ID");
+							if(temp_product_class_id==PM_NC) 
+								TVINSERV_NET_WORK
+							else if(temp_product_class_id==LED_PRODUCT_MODEL)
+							TVINSERV_LED
+							else if(temp_product_class_id==PM_SOLAR)
+							TVINSERV_SOLAR	
+							else if (temp_product_class_id == PM_CM5 ) //CM5		
+							TVINSERV_CMFIVE	
+							else if (temp_product_class_id == PM_T3PT10||
+							temp_product_class_id == PM_T3IOA||
+							temp_product_class_id == PM_T332AI||
+							temp_product_class_id ==  PM_T38AI16O||
+							temp_product_class_id == PM_T38I13O||
+							temp_product_class_id == PM_T34AO||
+							temp_product_class_id == PM_T36CT||
+                            temp_product_class_id == PM_T322AI||
+                            temp_product_class_id == PM_T38AI8AO6DO) //T3
+							TVINSERV_NET_WORK
+							else if (temp_product_class_id ==PM_MINIPANEL )//Mini Panel
+							TVINSERV_MINIPANEL
+							else if (temp_product_class_id == PM_AirQuality) //AirQuality
+							TVINSERV_TSTAT6
+							else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
+							TVINSERV_LC          //tree0412
+							else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
+							TVINSERV_LED //tree0412
+							else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i)
+							TVINSERV_TSTAT6
+							else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR))
+							TVINSERV_CO2
+							else if (temp_product_class_id == PM_CS_SM_AC||temp_product_class_id == PM_CS_SM_DC||temp_product_class_id == PM_CS_RSM_AC||temp_product_class_id == PM_CS_RSM_DC)
+							{
+								TVINSERV_CS3000
+							}
+							else
+
+								TVINSERV_TSTAT
+
+								HTREEITEM hProductItem=m_pTreeViewCrl->InsertItem(&tvInsert);
+
+							HTREEITEM hParent = m_pTreeViewCrl->GetParentItem(hProductItem);
+							if (hParent != NULL)
+								m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
+
+							tree_product m_product_temp;
+							m_product_temp.product_item  =hProductItem;
+
+							temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
+							if(temp_variant.vt!=VT_NULL)
+								strSql=temp_variant;
+							else
+								strSql=_T("");
+
+							long temp_serial_id = (long)(_wtoi64(strSql));
+							unsigned int correct_id = (DWORD)(_wtoi64(strSql));
+							//用于将以前数据库中的 负的序列号 修改为正的;Add by Fance
+							if(temp_serial_id < 0)
+							{
+								CString wrong_serial_id;
+								wrong_serial_id = strSql;
+								CString correct_serial_id;
+								CString str_temp;
+								correct_serial_id.Format(_T("%u"),correct_id);
+								try
+								{
+									str_temp.Format(_T("update ALL_NODE set Serial_ID ='%s' where Serial_ID = '%s'"),correct_serial_id, wrong_serial_id);
+									bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
+								}
+								catch(_com_error *e)
+								{
+									AfxMessageBox(e->ErrorMessage());
+								}
+							}
+							m_product_temp.serial_number= correct_id;
+
+							temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
+							if(temp_variant.vt!=VT_NULL)
+								strSql=temp_variant;
+							else
+								strSql=_T("");
+							m_product_temp.product_id=_wtoi(strSql);
+
+							temp_variant=bado.m_pRecordset->GetCollect("NetworkCard_Address");//
+							if(temp_variant.vt!=VT_NULL)
+								strSql=temp_variant;
+							else
+								strSql=_T("");
+							m_product_temp.NetworkCard_Address=strSql;
+							temp_variant=bado.m_pRecordset->GetCollect("Product_class_ID");//
+							if(temp_variant.vt!=VT_NULL)
+								strSql=temp_variant;
+							else
+								strSql=_T("");
+							m_product_temp.product_class_id=_wtoi(strSql);
+							temp_variant=bado.m_pRecordset->GetCollect("Hardware_Ver");//
+							if(temp_variant.vt!=VT_NULL)
+								strSql=temp_variant;
+							else
+								strSql=_T("");
+							m_product_temp.hardware_version=(float)_wtof(strSql);
+
+							temp_variant=bado.m_pRecordset->GetCollect("Software_Ver");//
+							if(temp_variant.vt!=VT_NULL)
+								strSql=temp_variant;
+							else
+								strSql=_T("");
+							m_product_temp.software_version=(float)_wtof(strSql);
+
+							temp_variant=bado.m_pRecordset->GetCollect("EPsize");//
+							if(temp_variant.vt!=VT_NULL)
+								strSql=temp_variant;
+							else
+								strSql=_T("");
+							m_product_temp.nEPsize=(int)_wtol(strSql);
+
+							temp_variant=bado.m_pRecordset->GetCollect("Protocol");//
+							if(temp_variant.vt!=VT_NULL)
+								strSql=temp_variant;
+							else
+								strSql=_T("");
+							m_product_temp.protocol = (int)_wtoi(strSql);
+
+							temp_variant=bado.m_pRecordset->GetCollect("Bautrate");//
+							if(temp_variant.vt!=VT_NULL)
+								strSql=temp_variant;
+							else
+								strSql=_T("");
+							if(_wtoi(strSql) !=0)
+								m_product_temp.baudrate = _wtoi(strSql);
+							else
+								m_product_temp.baudrate = 19200;
+							if(m_product_temp.protocol == PROTOCOL_BACNET_IP)
+							{
+								char cTemp1[255];
+								memset(cTemp1,0,255);
+								WideCharToMultiByte( CP_ACP, 0, strSql.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+								DWORD dwIP = inet_addr(cTemp1); 
+
+								m_product_temp.baudrate=dwIP;//_wtoi(strTemp);
+							}
+							else
+								m_product_temp.baudrate=_wtoi(strSql);
+							if (m_product_temp.product_class_id == PM_NC)
+							{
+								m_product_temp.baudrate = 19200;
+							}
+							////
+							temp_variant=bado.m_pRecordset->GetCollect("Online_Status");//
+							if(temp_variant.vt!=VT_NULL)
+							{
+								m_product_temp.status = temp_variant;
+								m_product_temp.status_last_time[0] = m_product_temp.status;
+								m_product_temp.status_last_time[1] = false;
+								m_product_temp.status_last_time[2] = false;
+							}
+							else
+							{
+								m_product_temp.status = false;
+								m_product_temp.status_last_time[0] = false;
+								m_product_temp.status_last_time[1] = false;
+								m_product_temp.status_last_time[2] = false;
+							}
+                            temp_variant=bado.m_pRecordset->GetCollect("Custom");//
+                            if(temp_variant.vt!=VT_NULL)
+                                m_product_temp.Custom=temp_variant;
+                            else
+                                m_product_temp.Custom=_T("");
+                            
+							temp_variant=bado.m_pRecordset->GetCollect("Product_name");//
+							if(temp_variant.vt!=VT_NULL)
+							{
+								m_product_temp.NameShowOnTree = temp_variant;
+							}
+							else
+							{
+								m_product_temp.NameShowOnTree = _T("");
+
+							}
+
+
+							m_product_temp.BuildingInfo=m_subNetLst.at(m_nCurSubBuildingIndex);
+							//20120423	
+							if(((strSql.CompareNoCase(_T("19200")) == 0)) || (strSql.CompareNoCase(_T("9600")) == 0) || ((strSql.CompareNoCase(_T("38400")) == 0)))
+							{
+								m_product_temp.BuildingInfo.strIp.Empty();
+								m_product_temp.BuildingInfo.strBaudRate = strSql;
+							}
+							else
+							{
+								m_product_temp.BuildingInfo.strIp = strSql;
+							}
+
+							temp_variant=bado.m_pRecordset->GetCollect("Com_Port");//
+							if(temp_variant.vt!=VT_NULL)
+							{
+								strSql=temp_variant;
+								m_product_temp.ncomport = _wtoi(strSql);
+							}
+							else
+							{
+								strSql=_T("");
+								m_product_temp.ncomport = 0;
+							}
+							m_product_temp.BuildingInfo.strIpPort = _T("10000");
+							temp_variant=bado.m_pRecordset->GetCollect("Background_imgID");
+							if(temp_variant.vt!=VT_NULL)
+								m_product_temp.strImgPathName=temp_variant;
+							else
+								m_product_temp.strImgPathName=_T("");
+
+
+							temp_variant=bado.m_pRecordset->GetCollect("Parent_SerialNum");
+							if(temp_variant.vt!=VT_NULL)
+							{
+								CString temp_value1;
+								temp_value1 = temp_variant;
+								m_product_temp.note_parent_serial_number=(unsigned int)_wtoi(temp_value1);
+							}
+							else
+								m_product_temp.note_parent_serial_number=0;
+
+							
+
+							temp_variant=bado.m_pRecordset->GetCollect("Panal_Number");
+							if(temp_variant.vt!=VT_NULL)
+							{
+								CString temp_value1;
+								temp_value1 = temp_variant;
+								m_product_temp.panel_number=(unsigned char)_wtoi(temp_value1);
+							}
+							else
+								m_product_temp.panel_number=0;
+
+							temp_variant=bado.m_pRecordset->GetCollect("Object_Instance");
+							if(temp_variant.vt!=VT_NULL)
+							{
+								CString temp_value1;
+								temp_value1 = temp_variant;
+								m_product_temp.object_instance=(unsigned int)_wtoi(temp_value1);
+							}
+							else
+								m_product_temp.object_instance=0;
+
+
+							m_product.push_back(m_product_temp);
+							bado.m_pRecordset->MoveNext();
+
+						}
+					}
+					bado.CloseRecordset();
+
+					if(z == COM_SERIAL_PORT)
+					{
+						strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Com_Port = '%s' and Parent_SerialNum <> '0' and Parent_SerialNum <> ''"),strBuilding,temp_cs);
+					}
+					else if(z == LOCAL_NETWORK_PORT)
+					{
+						strSql.Format(_T("select * from ALL_NODE where Building_Name = '%s' and Parent_SerialNum <> '0' and Parent_SerialNum <> ''"),strBuilding);
+					}
+					
+					bado.m_pRecordset=bado.OpenRecordset(strSql);
+					int temp_child_note_count = bado.GetRecordCount(bado.m_pRecordset);
+					if(temp_child_note_count > 0)//就说明这个节点下面有 挂在父节点下面的;
+					{
+						while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+						{
+							CString cs_parents_serial_number;
+							unsigned int uint_p_serial_number;
+							cs_parents_serial_number=bado.m_pRecordset->GetCollect("Parent_SerialNum");
+							uint_p_serial_number = _wtoi(cs_parents_serial_number);
+							bool find_parents = false;
+							HTREEITEM parents_item;
+							for (int z=0;z<m_product.size();z++)
+							{
+								if(uint_p_serial_number == m_product.at(z).serial_number)
+								{
+									find_parents = true;
+									parents_item = m_product.at(z).product_item;
+									break;
+								}
+							}
+
+							if(find_parents)
+							{
+								CString strProdcut=bado.m_pRecordset->GetCollect("Product_name");
+								tvInsert.hParent = parents_item ; // 指定父句柄
+								tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
+								tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;	
+								//TRACE(strProdcut);
+								tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式	
+
+
+								int temp_product_class_id=bado.m_pRecordset->GetCollect("Product_class_ID");
+								if(temp_product_class_id==PM_NC) 
+									TVINSERV_NET_WORK
+								else if(temp_product_class_id==LED_PRODUCT_MODEL)
+								TVINSERV_LED
+								else if(temp_product_class_id==PM_SOLAR)
+								TVINSERV_SOLAR	
+								else if (temp_product_class_id == PM_CM5 ) //CM5		
+								TVINSERV_CMFIVE	
+								else if (temp_product_class_id == PM_T3PT10||
+								temp_product_class_id == PM_T3IOA||
+								temp_product_class_id == PM_T332AI||
+								temp_product_class_id ==  PM_T38AI16O||
+								temp_product_class_id == PM_T38I13O||
+								temp_product_class_id == PM_T34AO||
+                                temp_product_class_id == PM_T36CT|| 
+                                temp_product_class_id == PM_T322AI||
+                                temp_product_class_id == PM_T38AI8AO6DO) //T3
+								TVINSERV_NET_WORK
+								else if (temp_product_class_id ==PM_MINIPANEL )//Mini Panel
+								TVINSERV_MINIPANEL
+								else if (temp_product_class_id == PM_AirQuality) //AirQuality
+								TVINSERV_TSTAT6
+								else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
+								TVINSERV_LC          //tree0412
+								else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
+								TVINSERV_LED //tree0412
+								else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i)
+								TVINSERV_TSTAT6
+								else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR))
+								TVINSERV_CO2
+								else if (temp_product_class_id == PM_CS_SM_AC||temp_product_class_id == PM_CS_SM_DC||temp_product_class_id == PM_CS_RSM_AC||temp_product_class_id == PM_CS_RSM_DC)
+								{
+									TVINSERV_CS3000
+								}
+								else
+
+									TVINSERV_TSTAT
+
+									HTREEITEM hSubItem=m_pTreeViewCrl->InsertItem(&tvInsert);
+
+								HTREEITEM hParent = m_pTreeViewCrl->GetParentItem(hSubItem);
+								if (hParent != NULL)
+									m_pTreeViewCrl->Expand(hParent, TVE_EXPAND);
+
+								tree_product m_product_temp;
+								m_product_temp.product_item  =hSubItem;
+
+								temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
+								if(temp_variant.vt!=VT_NULL)
+									strSql=temp_variant;
+								else
+									strSql=_T("");
+
+								long temp_serial_id = (long)(_wtoi64(strSql));
+								unsigned int correct_id = (DWORD)(_wtoi64(strSql));
+								//用于将以前数据库中的 负的序列号 修改为正的;Add by Fance
+								if(temp_serial_id < 0)
+								{
+									CString wrong_serial_id;
+									wrong_serial_id = strSql;
+									CString correct_serial_id;
+									CString str_temp;
+									correct_serial_id.Format(_T("%u"),correct_id);
+									try
+									{
+										str_temp.Format(_T("update ALL_NODE set Serial_ID ='%s' where Serial_ID = '%s'"),correct_serial_id, wrong_serial_id);
+										bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);
+									}
+									catch(_com_error *e)
+									{
+										AfxMessageBox(e->ErrorMessage());
+									}
+								}
+								m_product_temp.serial_number= correct_id;
+
+								temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
+								if(temp_variant.vt!=VT_NULL)
+									strSql=temp_variant;
+								else
+									strSql=_T("");
+								m_product_temp.product_id=_wtoi(strSql);
+                                temp_variant=bado.m_pRecordset->GetCollect("Custom");//
+                                if(temp_variant.vt!=VT_NULL)
+                                    strSql=temp_variant;
+                                else
+                                    strSql=_T("");
+                                m_product_temp.Custom=strSql;
+								temp_variant=bado.m_pRecordset->GetCollect("NetworkCard_Address");//
+								if(temp_variant.vt!=VT_NULL)
+									strSql=temp_variant;
+								else
+									strSql=_T("");
+								m_product_temp.NetworkCard_Address=strSql;
+								temp_variant=bado.m_pRecordset->GetCollect("Product_class_ID");//
+								if(temp_variant.vt!=VT_NULL)
+									strSql=temp_variant;
+								else
+									strSql=_T("");
+								m_product_temp.product_class_id=_wtoi(strSql);
+								temp_variant=bado.m_pRecordset->GetCollect("Hardware_Ver");//
+								if(temp_variant.vt!=VT_NULL)
+									strSql=temp_variant;
+								else
+									strSql=_T("");
+								m_product_temp.hardware_version=(float)_wtof(strSql);
+
+								temp_variant=bado.m_pRecordset->GetCollect("Software_Ver");//
+								if(temp_variant.vt!=VT_NULL)
+									strSql=temp_variant;
+								else
+									strSql=_T("");
+								m_product_temp.software_version=(float)_wtof(strSql);
+
+								temp_variant=bado.m_pRecordset->GetCollect("EPsize");//
+								if(temp_variant.vt!=VT_NULL)
+									strSql=temp_variant;
+								else
+									strSql=_T("");
+								m_product_temp.nEPsize=(int)_wtol(strSql);
+
+								temp_variant=bado.m_pRecordset->GetCollect("Protocol");//
+								if(temp_variant.vt!=VT_NULL)
+									strSql=temp_variant;
+								else
+									strSql=_T("");
+								m_product_temp.protocol = (int)_wtoi(strSql);
+
+								temp_variant=bado.m_pRecordset->GetCollect("Bautrate");//
+								if(temp_variant.vt!=VT_NULL)
+									strSql=temp_variant;
+								else
+									strSql=_T("");
+								if(_wtoi(strSql) !=0)
+									m_product_temp.baudrate = _wtoi(strSql);
+								else
+									m_product_temp.baudrate = 19200;
+								if(m_product_temp.protocol == PROTOCOL_BACNET_IP)
+								{
+									char cTemp1[255];
+									memset(cTemp1,0,255);
+									WideCharToMultiByte( CP_ACP, 0, strSql.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+									DWORD dwIP = inet_addr(cTemp1); 
+
+									m_product_temp.baudrate=dwIP;//_wtoi(strTemp);
+								}
+								else
+									m_product_temp.baudrate=_wtoi(strSql);
+								if (m_product_temp.product_class_id == PM_NC)
+								{
+									m_product_temp.baudrate = 19200;
+								}
+								////
+								temp_variant=bado.m_pRecordset->GetCollect("Online_Status");//
+								if(temp_variant.vt!=VT_NULL)
+								{
+									m_product_temp.status = temp_variant;
+									m_product_temp.status_last_time[0] = m_product_temp.status;
+									m_product_temp.status_last_time[1] = false;
+									m_product_temp.status_last_time[2] = false;
+								}
+								else
+								{
+									m_product_temp.status = false;
+									m_product_temp.status_last_time[0] = false;
+									m_product_temp.status_last_time[1] = false;
+									m_product_temp.status_last_time[2] = false;
+								}
+
+								temp_variant=bado.m_pRecordset->GetCollect("Product_name");//
+								if(temp_variant.vt!=VT_NULL)
+								{
+									m_product_temp.NameShowOnTree = temp_variant;
+								}
+								else
+								{
+									m_product_temp.NameShowOnTree = _T("");
+
+								}
+
+
+								m_product_temp.BuildingInfo=m_subNetLst.at(m_nCurSubBuildingIndex);
+								//20120423	
+								if(((strSql.CompareNoCase(_T("19200")) == 0)) || (strSql.CompareNoCase(_T("9600")) == 0) || ((strSql.CompareNoCase(_T("38400")) == 0)))
+								{
+									m_product_temp.BuildingInfo.strIp.Empty();
+									m_product_temp.BuildingInfo.strBaudRate = strSql;
+								}
+								else
+								{
+									m_product_temp.BuildingInfo.strIp = strSql;
+								}
+
+								temp_variant=bado.m_pRecordset->GetCollect("Com_Port");//
+								if(temp_variant.vt!=VT_NULL)
+								{
+									strSql=temp_variant;
+									m_product_temp.ncomport = _wtoi(strSql);
+								}
+								else
+								{
+									strSql=_T("");
+									m_product_temp.ncomport = 0;
+								}
+								m_product_temp.BuildingInfo.strIpPort = _T("10000");
+								temp_variant=bado.m_pRecordset->GetCollect("Background_imgID");
+								if(temp_variant.vt!=VT_NULL)
+									m_product_temp.strImgPathName=temp_variant;
+								else
+									m_product_temp.strImgPathName=_T("");
+
+								temp_variant=bado.m_pRecordset->GetCollect("Parent_SerialNum");
+								if(temp_variant.vt!=VT_NULL)
+								{
+									CString temp_value1;
+									temp_value1 = temp_variant;
+									m_product_temp.note_parent_serial_number=(unsigned int)_wtoi(temp_value1);
+								}
+								else
+									m_product_temp.note_parent_serial_number=0;
+
+								temp_variant=bado.m_pRecordset->GetCollect("Panal_Number");
+								if(temp_variant.vt!=VT_NULL)
+								{
+									CString temp_value1;
+									temp_value1 = temp_variant;
+									m_product_temp.panel_number=(unsigned char)_wtoi(temp_value1);
+								}
+								else
+									m_product_temp.panel_number=0;
+
+								temp_variant=bado.m_pRecordset->GetCollect("Object_Instance");
+								if(temp_variant.vt!=VT_NULL)
+								{
+									CString temp_value1;
+									temp_value1 = temp_variant;
+									m_product_temp.object_instance=(unsigned int)_wtoi(temp_value1);
+								}
+								else
+									m_product_temp.object_instance=0;
+
+								m_product.push_back(m_product_temp);
+
+							}
+							bado.m_pRecordset->MoveNext();
+						}
+					}
+					bado.CloseRecordset();
+				}
+			}
+		}
+			m_pTreeViewCrl->Expand(hTreeSubbuilding, TVE_EXPAND);
+}
 // scan Tstats in database
 void CMainFrame::ScanTstatInDB(void)
 {
+	if(product_sort_way == SORT_BY_CONNECTION)
+	{
+		LoadProductFromDB();
+		PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);
+		return;
+	}
 CADO ado;
 ado.OnInitADOConn();
 try
@@ -1561,13 +2723,18 @@ try
 			temBuildingInfo.strBaudRate=_T("");
 
 
+            CString Building_DBpath;
 		nDefault=ado.m_pRecordset->GetCollect("Default_SubBuilding");
 		if(nDefault==-1)
 		{
 			m_nCurSubBuildingIndex=nTemp;
 		}
-		g_strCurBuildingDatabasefilePath=ado.m_pRecordset->GetCollect("Building_Path");
-		
+		 Building_DBpath=ado.m_pRecordset->GetCollect("Building_Path");
+          
+         int index= Building_DBpath.Find(_T("Database"));
+         Building_DBpath.Delete(0,index);
+
+		 g_strCurBuildingDatabasefilePath=GetExePath(true)+  Building_DBpath;
 		ado.m_pRecordset->MoveNext();
 		m_subNetLst.push_back(temBuildingInfo);
 	}
@@ -1606,13 +2773,12 @@ try
 		{
 		//	m_subNetLst.at(k).hbuilding_item=hTreeSubbuilding;
 		}
-		CBADO bado;
-		bado.SetDBPath(g_strCurBuildingDatabasefilePath);
-		bado.OnInitADOConn(); 
+        CBADO bado;
+        bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+        bado.OnInitADOConn(); 
 	//	m_pRs->Close();
 		////begin floor nodes///////////////////////////////////////////////////////////////
-	
-		
+
 		if((current_building_protocol == P_MODBUS_485) || (current_building_protocol == P_BACNET_MSTP)){
 			strSql.Format(_T("select DISTINCT Floor_name from ALL_NODE where Building_Name = '%s' and Com_Port = '%d' and Protocol = '%d'"),strBuilding,current_building_comport,current_building_protocol);
 		}
@@ -1766,7 +2932,7 @@ try
 				tvInsert.hParent = tmproomLst.at(i).room_item ; // 指定父句柄
 				tvInsert.item.mask = ITEM_MASK; // 指定TV_ITEM结构对象
 				tvInsert.item.pszText =(LPTSTR)(LPCTSTR) strProdcut;	
-				TRACE(strProdcut);
+				//TRACE(strProdcut);
 				tvInsert.hInsertAfter =TVI_SORT;// TVI_LAST; // 项目插入方式						
 				int temp_product_class_id=bado.m_pRecordset->GetCollect("Product_class_ID");
 				
@@ -1794,14 +2960,16 @@ try
 						 temp_product_class_id ==  PM_T38AI16O||
 						 temp_product_class_id == PM_T38I13O||
 						 temp_product_class_id == PM_T34AO||
-						 temp_product_class_id == PM_T36CT) //T3
+                         temp_product_class_id == PM_T36CT|| 
+                         temp_product_class_id == PM_T322AI||
+                         temp_product_class_id == PM_T38AI8AO6DO) //T3
 					TVINSERV_NET_WORK
 				//else if (temp_product_class_id ==PM_T3IOA )//T3-8AI8AO
 				//	TVINSERV_NET_WORK
 				else if (temp_product_class_id ==PM_MINIPANEL )//Mini Panel
 					TVINSERV_MINIPANEL
 				else if (temp_product_class_id == PM_AirQuality) //AirQuality
-					TVINSERV_NET_WORK
+					TVINSERV_TSTAT6
 				else if (temp_product_class_id == PM_LightingController)//Lightingcontroller
 					//TVINSERV_NET_WORK  //tree0412
 					TVINSERV_LC          //tree0412
@@ -1809,7 +2977,7 @@ try
 					TVINSERV_LED //tree0412
 				else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i)
 					TVINSERV_TSTAT6
-				else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485))
+				else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR))
 					TVINSERV_CO2
 // 					PM_CS_SM_AC 
 // 					PM_CS_SM_DC 
@@ -1821,7 +2989,7 @@ try
 				}
 				else
 				
-					TVINSERV_TSTAT
+				TVINSERV_TSTAT
 #endif
 
 
@@ -1845,7 +3013,8 @@ try
 					strSql=temp_variant;
 				else
 					strSql=_T("");
-
+                    
+                    
 				long temp_serial_id = (long)(_wtoi64(strSql));
 				unsigned int correct_id = (DWORD)(_wtoi64(strSql));
 
@@ -2014,6 +3183,50 @@ try
 				else
 			    	m_product_temp.strImgPathName=_T("");
 
+                temp_variant=bado.m_pRecordset->GetCollect("Custom");
+                if(temp_variant.vt!=VT_NULL)
+                    m_product_temp.Custom=temp_variant;
+                else
+                    m_product_temp.Custom=_T("");
+
+                if (g_selected_serialnumber == m_product_temp.serial_number)
+                {
+                    m_lasttime_tree_node  =  m_product_temp;
+                    m_pTreeViewCrl->SetSelectItem(m_product_temp.product_item);//在线的时候才将颜色变红;
+                    m_pTreeViewCrl->SetSelectSerialNumber(m_product_temp.serial_number);
+                     m_current_tree_node =   m_product_temp;
+                    /*g_selected_serialnumber = m_product.at(i).serial_number;*/
+                }
+
+				temp_variant=bado.m_pRecordset->GetCollect("Parent_SerialNum");
+				if(temp_variant.vt!=VT_NULL)
+				{
+					CString temp_value1;
+					temp_value1 = temp_variant;
+					m_product_temp.note_parent_serial_number=(unsigned int)_wtoi(temp_value1);
+				}
+				else
+					m_product_temp.note_parent_serial_number=0;
+
+				temp_variant=bado.m_pRecordset->GetCollect("Panal_Number");
+				if(temp_variant.vt!=VT_NULL)
+				{
+					CString temp_value1;
+					temp_value1 = temp_variant;
+					m_product_temp.panel_number=(unsigned char)_wtoi(temp_value1);
+				}
+				else
+					m_product_temp.panel_number=0;
+
+				temp_variant=bado.m_pRecordset->GetCollect("Object_Instance");
+				if(temp_variant.vt!=VT_NULL)
+				{
+					CString temp_value1;
+					temp_value1 = temp_variant;
+					m_product_temp.object_instance=(unsigned int)_wtoi(temp_value1);
+				}
+				else
+					m_product_temp.object_instance=0;
 
 				m_product.push_back(m_product_temp);
 				bado.m_pRecordset->MoveNext();
@@ -2142,24 +3355,7 @@ void CMainFrame::OnBatchFlashHex()
 	g_bPauseMultiRead = temp_status;
 
 	return;
-#if 0
-	g_bEnableRefreshTreeView = FALSE;
-	if(g_BurnHexLevel==1)
-	{
-		CAfxMessageDialog dlg;
-		CString strPromption;
-		strPromption.LoadString(IDS_STRNOPRIVILEGE3);
-		dlg.SetPromtionTxt(strPromption);
-		dlg.DoModal();
-		return;
-	}
 
-	g_bPauseMultiRead=TRUE;
-	CGridFlashDlg Dlg;
-	Dlg.DoModal();
-	g_bPauseMultiRead=FALSE;
-	g_bEnableRefreshTreeView = TRUE;
-#endif
 }
 
 void CMainFrame::OnConnect()
@@ -2480,6 +3676,7 @@ BOOL CMainFrame::ConnectSubBuilding(Building_info build_info)
 
 BOOL CMainFrame::ConnectDevice(tree_product tree_node)
 {
+    BOOL bRet =FALSE;
 	CString strInfo;
 	if(m_hCurCommunication!=NULL)	
 	{
@@ -2566,6 +3763,7 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
 				g_CommunicationType=1;
 				SetCommunicationType(g_CommunicationType);
 				bool b=Open_Socket2(StringIP,m_nIpPort);
+                bRet =b;
 				CString strInfo;
 				if(b)
 				{	strInfo.Format((_T("Open IP:%s:%d successful")),tree_node.BuildingInfo.strIp,m_nIpPort);//prompt info;
@@ -2634,15 +3832,16 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
 			g_CommunicationType=1;
 			SetCommunicationType(g_CommunicationType);
 			bool b=Open_Socket2(tree_node.BuildingInfo.strIp,m_nIpPort);
+            bRet =b;
 			CString strTips;
 			strTips.Format(_T("Try to connect %s ,Port:%d"),tree_node.BuildingInfo.strIp,m_nIpPort);
-			write_T3000_log_file(strTips); 
+			//write_T3000_log_file(strTips); 
 			CString strInfo;
 		//	strInfo.Format((_T("Open IP:%s successful")),build_info.str3Ip);//prompt info;
 		//	SetPaneString(1,strInfo);
 			if(b)
 			{	strInfo.Format((_T("Open IP:%s:%d successful")),tree_node.BuildingInfo.strIp,m_nIpPort);//prompt info;
-			    write_T3000_log_file(strInfo);
+			   // write_T3000_log_file(strInfo);
 				SetPaneString(1,strInfo);
 				CString	g_configfile_path=g_strExePth+_T("T3000_config.ini");
 				CFileFind fFind;
@@ -2672,7 +3871,7 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
 			{
 				strInfo.Format((_T("Open IP:%s failure")),tree_node.BuildingInfo.strIp);//prompt info;
 				SetPaneString(1,strInfo);
-				write_T3000_log_file(strInfo);
+				//write_T3000_log_file(strInfo);
 				//ValidOpenFailure(build_info.strIp,n1, n2,n3,n4); // 检查失败的原因，并给出详细的提示信息
 				return FALSE;
 			}
@@ -2682,10 +3881,10 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
 
 	g_CommunicationType = 0;
 	SetCommunicationType(g_CommunicationType);
-	CString strComport = tree_node.BuildingInfo.strComPort;
+	/*CString strComport = tree_node.BuildingInfo.strComPort;
 	CString strComNum = strComport.Mid(3);
-	int nCom = _wtoi(strComNum);
-
+	int nCom = _wtoi(strComNum);*/
+    int nCom = tree_node.ncomport;
 	open_com(nCom);//open*************************************
 	if(!is_connect())
 	{
@@ -2694,7 +3893,7 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
 		strInfo.Format(_T("COM %d : Not available "), nCom);
 		SetPaneString(1,strInfo);
 		AfxMessageBox(strInfo);
-		return FALSE;
+		 bRet =FALSE;
 	}
 	else
 	{
@@ -2736,9 +3935,37 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
 		}
 
 
-		return TRUE;
-	}	
-	return FALSE;
+		bRet = TRUE;
+	}
+     bRet = is_connect();
+    
+    
+    if (!bRet)
+    {
+        CheckConnectFailure(tree_node.BuildingInfo.strIp);
+       
+       
+        
+        m_nStyle=2;
+        m_pTreeViewCrl->turn_item_image(tree_node.product_item ,false);//Can't connect to the device , it will show disconnection;
+        tree_node.status_last_time[0] = false;
+        tree_node.status_last_time[1] = false;
+        tree_node.status_last_time[2] = false;
+         
+        return bRet;
+    }
+    else
+    {
+        m_nStyle=1;
+        m_CurSubBuldingInfo=tree_node.BuildingInfo;
+         m_pTreeViewCrl->turn_item_image(tree_node.product_item ,true);
+      
+        m_pTreeViewCrl->SetSelectItem(tree_node.product_item );//在线的时候才将颜色变红;
+        m_pTreeViewCrl->SetSelectSerialNumber(tree_node.serial_number);
+        g_selected_serialnumber = tree_node.serial_number;
+         
+    }	
+	return bRet;
 }
 void CMainFrame::CheckConnectFailure(const CString& strIP) // 检查失败的原因，并给出详细的提示信息
 {
@@ -2827,9 +4054,9 @@ void CMainFrame::OnAddBuildingConfig()
 	
 	//ScanTstatInDB();
 	b_pause_refresh_tree = temp_value;
-	//PostMessage(WM_REFRESH_TREEVIEW_MAP,0,0);
+	 
 	PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
-//	Treestatus();//展开树列表
+ 
 }
 
 void CMainFrame::OnScanDevice()
@@ -2879,27 +4106,13 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		if(m_bScanFinished)
 		{
 			CString strTemp;
-			//strTemp.Format(_T("Scan finished,found %d node(s)"),m_pScanner->m_szTstatScandRet.size()+m_pScanner->m_szNCScanRet.size());
-			//strTemp.Format(_T("Scan finished!"),m_pScanner->m_szTstatScandRet.size()+m_pScanner->m_szNCScanRet.size());
-			//SetPaneString(1,strTemp);
 			g_bPauseMultiRead=FALSE;
 			KillTimer(SCAN_TIMER);
 			m_wndWorkSpace.m_TreeCtrl.Invalidate();			
-// 			CString strTemp;
-// 			//strTemp.Format(_T("Scan finised,found %d node(s)"),m_binary_search_product_background_thread.size());// oldscan
-// 			strTemp.Format(_T("Scan finished,found %d node(s)"),m_pScanner->m_szTstatScandRet.size()+m_pScanner->m_szNCScanRet.size());
-// 			SetPaneString(1,strTemp);
-// 			g_bPauseMultiRead=FALSE;
-// 			KillTimer(SCAN_TIMER);
-// 			m_wndWorkSpace.m_TreeCtrl.Invalidate();			
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Scan finished!"));		
 		}
 		else
 		{
-//				strTemp.Format(_T("Scanning now,please wait,found %d node(s)"),m_binary_search_product_background_thread.size());// oldscan
-// 				CString strTemp;
-// 				strTemp.Format(_T("ID %d to %d"),g_nStartID,g_nEndID);
-// 				CString strTemp2;
-// 				strTemp2.Format(_T("Scanning %s, %s. Please wait."), g_strScanInfoPrompt, strTemp);
 			CString strTemp;
 			if (g_nStartID == -1) // 用这个来区分是scan TStat 还是scan NC
 			{
@@ -2913,26 +4126,8 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			CString strTip;
 			strTip.Format(_T("Scanning %s, %s. Please wait."), g_strScanInfoPrompt, strTemp);
 
-		 
-
 			CString* pstrInfo = new CString(strTip); 
 			::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
-
-			 
-			//if(!m_bScanALL)
-			//	SetPaneString(1,strTip);
-#if 0
-			if(m_pScanner->m_szTstatScandRet.size() > 0)
-			{
-				CString strStat = _T("Online.");
-				SetPaneString(2, strStat);
-			}
-			else
-			{
-				CString strStat = _T("Offline.");
-				SetPaneString(2, strStat);
-			}			
-#endif
 		}
 	}
 
@@ -2994,7 +4189,7 @@ void CMainFrame::ClearBuilding()
 	//
 	int n=m_buildingLst.size();
 	m_pTreeViewCrl->DeleteAllItems();
-
+	m_comportlist.clear();
 //	m_subNetLst.clear();
 	m_floorLst.clear();
 	m_roomLst.clear();
@@ -3041,18 +4236,19 @@ void CMainFrame::SwitchToPruductType(int nIndex)
 here:
 	g_bPauseMultiRead = FALSE;//恢复主线程的刷新
 
-// 	CString g_configfile_path =g_strExePth + g_strStartInterface_config;
-// 	//WrPrivateProfileInt(_T("Setting"),_T("Interface"),19,g_configfile_path);
-// 	CString strInfo;
-// 	strInfo.Format(_T("%d"),m_nCurView);
-// 	WritePrivateProfileStringW(_T("T3000_START"),_T("Interface"),strInfo,g_configfile_path);
-// 	strInfo.Format(_T("%d"),g_selected_serialnumber);
-// 	WritePrivateProfileStringW(_T("T3000_START"),_T("SerialNumber"),strInfo,g_configfile_path);
-// 	CString achive_file_path;
-// 	CString temp_serial;
-// 	temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
-// 	achive_file_path = g_achive_folder + _T("\\") + temp_serial;
-// 	Load_Product_Value_Cache(achive_file_path);
+    CString g_configfile_path =g_strExePth + g_strStartInterface_config;
+    // 	//WrPrivateProfileInt(_T("Setting"),_T("Interface"),19,g_configfile_path);
+    CString strInfo;
+    strInfo.Format(_T("%d"),m_nCurView);
+    WritePrivateProfileStringW(_T("T3000_START"),_T("Interface"),strInfo,g_configfile_path);
+    strInfo.Format(_T("%d"),g_selected_serialnumber);
+    WritePrivateProfileStringW(_T("T3000_START"),_T("SerialNumber"),strInfo,g_configfile_path);
+    /* CString achive_file_path;
+    CString temp_serial;
+    temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
+    achive_file_path = g_achive_folder + _T("\\") + temp_serial;
+    Load_Product_Value_Cache(achive_file_path);
+    g_tstat_id = product_register_value[6];*/
 
 	switch(nIndex)
 	{
@@ -3075,8 +4271,6 @@ here:
 
 			int nSerialNum=get_serialnumber();
 			((CGraphicView*)m_pViews[m_nCurView])->InitGraphic(nSerialNum,g_tstat_id);
-
-
 		}
 		break;
 	case DLG_TRENDLOG_VIEW:
@@ -3096,11 +4290,12 @@ here:
 			((CDialogT3*)m_pViews[m_nCurView])->Fresh();
 		}
 		break;
-
 	case DLG_DIALOGMINIPANEL_VIEW://Mini Panel
 		{
 			m_nCurView = DLG_DIALOGMINIPANEL_VIEW;
-		((CDialgMiniPanel*)m_pViews[m_nCurView])->Fresh();
+		//((CDialgMiniPanel*)m_pViews[m_nCurView])->Fresh();
+        //This is old MiniPanel ,basing on the modbus protocol.
+
 		}
 		break;
 	case DLG_AIRQUALITY_VIEW://AirQuality
@@ -3117,8 +4312,8 @@ here:
 		break;
 	case DLG_HUMCHAMBER:
 	{
-	     m_nCurView=DLG_HUMCHAMBER;
-		((CNewHumChamberView*)m_pViews[m_nCurView])->Fresh();
+        m_nCurView=DLG_HUMCHAMBER;
+        ((CNewHumChamberView*)m_pViews[m_nCurView])->Fresh();
 	}
 	break;
     case  DLG_CO2_VIEW:
@@ -3189,10 +4384,36 @@ here:
 		m_nCurView=DLG_DIALOG_T3_INPUTS_VIEW;
 		((CT3ModulesView*)m_pViews[m_nCurView])->Fresh();
 	} break;
-	}
-	//here
+    case DLG_DIALOG_T3_OUTPUTS_VIEW:
+    {
+        m_nCurView = DLG_DIALOG_T3_OUTPUTS_VIEW;
+        ((CT3ModulesOutputDlg*)m_pViews[m_nCurView])->Fresh();
+    } break;
+    case DLG_DIALOG_CUSTOM_VIEW:
+        {
+            m_nCurView = DLG_DIALOG_CUSTOM_VIEW;
+            ((CProductRegisterListView*)m_pViews[m_nCurView])->Fresh();
+        } break;
+    case DLG_DIALOG_TSTAT_INPUT_VIEW:
+    {
+          m_nCurView = DLG_DIALOG_TSTAT_INPUT_VIEW;
+         ((CTStatInputView*)m_pViews[m_nCurView])->Fresh();
+    }   break;
+    case DLG_DIALOG_TSTAT_OUTPUT_VIEW:
+    {
+        m_nCurView = DLG_DIALOG_TSTAT_OUTPUT_VIEW;
+        ((CTStatOutputView*)m_pViews[m_nCurView])->Fresh();
+    }
+    break;
+    case DLG_DIALOG_BOATMONITOR:
+	{
+        m_nCurView = DLG_DIALOG_BOATMONITOR;
+        ((CBoatMonitorViewer*)m_pViews[m_nCurView])->Fresh();  
+    }
+    break;
+    //here
 }
-
+    }
 void CMainFrame::SetPaneConnectionPrompt(CString strInfo)
 {
 	SetPaneString(2,strInfo);
@@ -3381,6 +4602,7 @@ void CMainFrame::OnLabe3()
 
 void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
 {
+#if 0
 	for (int i=0;i<BAC_INPUT_GROUP;i++)
 	{
 
@@ -3456,7 +4678,7 @@ void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
 		Write_Config_Info.Write_Programcode_Info[i].timeout_count = 0;
 	}
 
-	for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
+	for (int i=0;i<BAC_PID_GROUP;i++)
 	{
 
 		Write_Config_Info.Write_Controller_Info[i].command = 0;
@@ -3486,7 +4708,7 @@ void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
 		Write_Config_Info.Write_Screen_Info[i].timeout_count = 0;
 	}
 
-	for (int i=0;i<BAC_WEEKLY_GROUP;i++)
+	for (int i=0;i<BAC_SCHEDULE_GROUP;i++)
 	{
 
 		Write_Config_Info.Write_Weekly_Info[i].command = 0;
@@ -3501,7 +4723,7 @@ void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
 		Write_Config_Info.Write_Weekly_Info[i].timeout_count = 0;
 	}
 
-	for (int i=0;i<BAC_ANNUAL_GROUP;i++)
+	for (int i=0;i<BAC_HOLIDAY_GROUP;i++)
 	{
 
 		Write_Config_Info.Write_Annual_Info[i].command = 0;
@@ -3531,7 +4753,7 @@ void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
 		Write_Config_Info.Write_Monitor_Info[i].timeout_count = 0;
 	}
 
-	for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
+	for (int i=0;i<BAC_SCHEDULECODE_GOUP;i++)
 	{
 
 		Write_Config_Info.Write_Weeklycode_Info[i].command = 0;
@@ -3546,7 +4768,7 @@ void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
 		Write_Config_Info.Write_Weeklycode_Info[i].timeout_count = 0;
 	}
 
-	for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
+	for (int i=0;i<BAC_HOLIDAYCODE_GROUP;i++)
 	{
 
 		Write_Config_Info.Write_Annualcode_Info[i].command = 0;
@@ -3560,26 +4782,8 @@ void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
 		//bac_input_read_results = 0;
 		Write_Config_Info.Write_Annualcode_Info[i].timeout_count = 0;
 	}
+#endif
 
-	WaitWriteDlg = NULL;
-	if(WaitWriteDlg==NULL)
-	{
-		
-		WaitWriteDlg = new BacnetWait(BAC_WAIT_READ_CONFIG_WRITE_DEVICE);
-		WaitWriteDlg->Create(IDD_DIALOG_BACNET_WAIT,this);
-		WaitWriteDlg->ShowWindow(SW_SHOW);
-
-		RECT RECT_SET1;
-		::GetWindowRect(BacNet_hwd,&RECT_SET1);
-		//ClientToScreen(&RECT_SET1);
-		WaitWriteDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 19,800,20,1);
-
-
-		//ClientToScreen(&RECT_SET1);
-		//WaitWriteDlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 19,800,20);
-	}
-
-	//::PostMessage(BacNet_hwd,WM_SEND_OVER,0,0);
 	if(hwait_write_thread==NULL)
 	{
 		hwait_write_thread =CreateThread(NULL,NULL,Send_Set_Config_Command_Thread,this,NULL, NULL);
@@ -3619,349 +4823,252 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 	int end_temp_instance = 0;
 
 	int resend_count;
+	CString Mession_ret;
+
+	int write_total_count = BAC_INPUT_GROUP +
+		BAC_OUTPUT_GROUP +	
+		BAC_PROGRAM_GROUP +		
+		BAC_VARIABLE_GROUP +
+		BAC_PID_GROUP +
+		BAC_PROGRAMCODE_GROUP +
+		BAC_SCREEN_GROUP +
+		BAC_MONITOR_GROUP +
+		BAC_SCHEDULE_GROUP +
+		BAC_HOLIDAY_GROUP +
+		BAC_SCHEDULECODE_GOUP +
+		BAC_HOLIDAYCODE_GROUP;
+
+
+	int write_all_step = 1000 / write_total_count;
+	int write_success_count = 0;
+	int write_pos = 0;
+
 	for (int i=0;i<BAC_INPUT_GROUP;i++)
 	{
-			resend_count = 0;
-			do 
-			{
-				resend_count ++;
-				if(resend_count>RESEND_COUNT)
-					goto mywriteend;
-
-				end_temp_instance = BAC_READ_INPUT_REMAINDER + (BAC_READ_INPUT_GROUP_NUMBER)*i ;
-				if(end_temp_instance >= BAC_INPUT_ITEM_COUNT)
-					end_temp_instance = BAC_INPUT_ITEM_COUNT - 1;
-				//g_invoke_id = GetPrivateData(g_bac_instance,READINPUT_T3000,(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_in_point));
-
-
-				g_invoke_id =WritePrivateData(g_bac_instance,WRITEINPUT_T3000,(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);
-				//g_invoke_id =WritePrivateData(g_bac_instance,WRITEINPUT_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i);
-				
-				Sleep(SEND_COMMAND_DELAY_TIME);
-			} while (g_invoke_id<0);
-
-			Write_Config_Info.Write_Input_Info[i].command = WRITEINPUT_T3000;
-			Write_Config_Info.Write_Input_Info[i].device_id = g_bac_instance;
-			Write_Config_Info.Write_Input_Info[i].start_instance = (BAC_READ_INPUT_GROUP_NUMBER)*i;
-			Write_Config_Info.Write_Input_Info[i].end_instance = end_temp_instance;
-			Write_Config_Info.Write_Input_Info[i].invoke_id = g_invoke_id;
-
-
-			CString temp_cs;
-			temp_cs.Format(_T("Task ID = %d. Write Input List Item From %d to %d "),g_invoke_id,
-				Write_Config_Info.Write_Input_Info[i].start_instance,
-				Write_Config_Info.Write_Input_Info[i].end_instance);
-			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
-
+		end_temp_instance = BAC_READ_INPUT_REMAINDER + (BAC_READ_INPUT_GROUP_NUMBER)*i ;
+		if(end_temp_instance >= BAC_INPUT_ITEM_COUNT)
+			end_temp_instance = BAC_INPUT_ITEM_COUNT - 1;
+		if(Write_Private_Data_Blocking(WRITEINPUT_T3000,(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance) > 0)
+		{
+			Mession_ret.Format(_T("Write input form %d to %d success."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			write_success_count ++ ;
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		}
+		else
+		{
+			Mession_ret.Format(_T("Write input form %d to %d timeout."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			goto write_end_thread;
+		}
+		g_progress_persent = write_success_count * 100 /write_total_count;
 	}
 
 
 	for (int i=0;i<BAC_OUTPUT_GROUP;i++)
 	{
-		resend_count = 0;
-		do 
+		end_temp_instance = BAC_READ_OUTPUT_REMAINDER + (BAC_READ_OUTPUT_GROUP_NUMBER)*i ;
+		if(end_temp_instance >= BAC_OUTPUT_ITEM_COUNT)
+			end_temp_instance = BAC_OUTPUT_ITEM_COUNT - 1;
+		if(Write_Private_Data_Blocking(WRITEOUTPUT_T3000,(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance) > 0)
 		{
-			resend_count ++;
-			if(resend_count>RESEND_COUNT)
-				goto mywriteend;
-			end_temp_instance = BAC_READ_OUTPUT_REMAINDER + (BAC_READ_OUTPUT_GROUP_NUMBER)*i ;
-			if(end_temp_instance >= BAC_OUTPUT_ITEM_COUNT)
-				end_temp_instance = BAC_OUTPUT_ITEM_COUNT - 1;
-
-			g_invoke_id =WritePrivateData(g_bac_instance,WRITEOUTPUT_T3000,(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);
-			//g_invoke_id = GetPrivateData(g_bac_instance,READINPUT_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,sizeof(Str_in_point));
+			Mession_ret.Format(_T("Write output form %d to %d success."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			write_success_count ++ ;
 			Sleep(SEND_COMMAND_DELAY_TIME);
-		} while (g_invoke_id<0);
-
-		Write_Config_Info.Write_Output_Info[i].command = WRITEOUTPUT_T3000;
-		Write_Config_Info.Write_Output_Info[i].device_id = g_bac_instance;
-		Write_Config_Info.Write_Output_Info[i].start_instance = (BAC_READ_OUTPUT_GROUP_NUMBER)*i;
-		Write_Config_Info.Write_Output_Info[i].end_instance = end_temp_instance;
-		Write_Config_Info.Write_Output_Info[i].invoke_id = g_invoke_id;
-
-
-		CString temp_cs;
-		temp_cs.Format(_T("Task ID = %d. Write Output List Item From %d to %d "),g_invoke_id,
-			Write_Config_Info.Write_Output_Info[i].start_instance,
-			Write_Config_Info.Write_Output_Info[i].end_instance);
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
-
+		}
+		else
+		{
+			Mession_ret.Format(_T("Write output form %d to %d timeout."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			goto write_end_thread;
+		}
+		g_progress_persent = write_success_count * 100 /write_total_count;
 	}
 
 	for (int i=0;i<BAC_VARIABLE_GROUP;i++)
 	{
-		resend_count = 0;
-		do 
+		end_temp_instance = BAC_READ_VARIABLE_REMAINDER + (BAC_READ_VARIABLE_GROUP_NUMBER)*i ;
+		if(end_temp_instance >= BAC_VARIABLE_ITEM_COUNT)
+			end_temp_instance = BAC_VARIABLE_ITEM_COUNT - 1;
+		if(Write_Private_Data_Blocking(WRITEVARIABLE_T3000,(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance) > 0)
 		{
-			resend_count ++;
-			if(resend_count>RESEND_COUNT)
-				goto mywriteend;
-			end_temp_instance = BAC_READ_VARIABLE_REMAINDER + (BAC_READ_VARIABLE_GROUP_NUMBER)*i ;
-			if(end_temp_instance >= BAC_VARIABLE_ITEM_COUNT)
-				end_temp_instance = BAC_VARIABLE_ITEM_COUNT - 1;
-
-			g_invoke_id =WritePrivateData(g_bac_instance,WRITEVARIABLE_T3000,(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);
-			//g_invoke_id = GetPrivateData(g_bac_instance,READINPUT_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,sizeof(Str_in_point));
+			Mession_ret.Format(_T("Write variable form %d to %d success."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			write_success_count ++ ;
 			Sleep(SEND_COMMAND_DELAY_TIME);
-		} while (g_invoke_id<0);
-
-		Write_Config_Info.Write_Variable_Info[i].command = WRITEVARIABLE_T3000;
-		Write_Config_Info.Write_Variable_Info[i].device_id = g_bac_instance;
-		Write_Config_Info.Write_Variable_Info[i].start_instance = (BAC_READ_VARIABLE_GROUP_NUMBER)*i;
-		Write_Config_Info.Write_Variable_Info[i].end_instance = end_temp_instance;
-		Write_Config_Info.Write_Variable_Info[i].invoke_id = g_invoke_id;
-
-
-		CString temp_cs;
-		temp_cs.Format(_T("Task ID = %d. Write Variable List Item From %d to %d "),g_invoke_id,
-			Write_Config_Info.Write_Variable_Info[i].start_instance,
-			Write_Config_Info.Write_Variable_Info[i].end_instance);
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
-
+		}
+		else
+		{
+			Mession_ret.Format(_T("Write variable form %d to %d timeout."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			goto write_end_thread;
+		}
+		g_progress_persent = write_success_count * 100 /write_total_count;
 	}
 
 	for (int i=0;i<BAC_PROGRAM_GROUP;i++)
 	{
-		resend_count = 0;
-		do 
+		end_temp_instance = BAC_READ_PROGRAM_REMAINDER + (BAC_READ_PROGRAM_GROUP_NUMBER)*i ;
+		if(end_temp_instance >= BAC_PROGRAM_ITEM_COUNT)
+			end_temp_instance = BAC_PROGRAM_ITEM_COUNT - 1;
+		if(Write_Private_Data_Blocking(WRITEPROGRAM_T3000,(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance) > 0)
 		{
-			resend_count ++;
-			if(resend_count>RESEND_COUNT)
-				goto mywriteend;
-			end_temp_instance = BAC_READ_PROGRAM_REMAINDER + (BAC_READ_PROGRAM_GROUP_NUMBER)*i ;
-			if(end_temp_instance >= BAC_PROGRAM_ITEM_COUNT)
-				end_temp_instance = BAC_PROGRAM_ITEM_COUNT - 1;
-
-			g_invoke_id =WritePrivateData(g_bac_instance,WRITEPROGRAM_T3000,(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);
-			//g_invoke_id = GetPrivateData(g_bac_instance,READINPUT_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,sizeof(Str_in_point));
+			Mession_ret.Format(_T("Write program form %d to %d success."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			write_success_count ++ ;
 			Sleep(SEND_COMMAND_DELAY_TIME);
-		} while (g_invoke_id<0);
-
-		Write_Config_Info.Write_Program_Info[i].command = WRITEPROGRAM_T3000;
-		Write_Config_Info.Write_Program_Info[i].device_id = g_bac_instance;
-		Write_Config_Info.Write_Program_Info[i].start_instance = (BAC_READ_PROGRAM_GROUP_NUMBER)*i;
-		Write_Config_Info.Write_Program_Info[i].end_instance = end_temp_instance;
-		Write_Config_Info.Write_Program_Info[i].invoke_id = g_invoke_id;
-
-
-		CString temp_cs;
-		temp_cs.Format(_T("Task ID = %d. Write Program List Item From %d to %d "),g_invoke_id,
-			Write_Config_Info.Write_Program_Info[i].start_instance,
-			Write_Config_Info.Write_Program_Info[i].end_instance);
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
-
+		}
+		else
+		{
+			Mession_ret.Format(_T("Write program form %d to %d timeout."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			goto write_end_thread;
+		}
+		g_progress_persent = write_success_count * 100 /write_total_count;
 	}
 
 
-	for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
+	for (int i=0;i<BAC_SCHEDULECODE_GOUP;i++)
 	{
-		resend_count = 0;
-		do 
+		if(Write_Private_Data_Blocking(WRITETIMESCHEDULE_T3000,i,i) > 0)
 		{
-			resend_count ++;
-			if(resend_count>RESEND_COUNT)
-				goto mywriteend;
-			g_invoke_id =WritePrivateData(g_bac_instance,WRITETIMESCHEDULE_T3000,i,i);
+			Mession_ret.Format(_T("Write schedule form %d to %d success."),i,i);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			write_success_count ++ ;
 			Sleep(SEND_COMMAND_DELAY_TIME);
-		} while (g_invoke_id<0);
-
-		Write_Config_Info.Write_Weeklycode_Info[i].command = WRITETIMESCHEDULE_T3000;
-		Write_Config_Info.Write_Weeklycode_Info[i].device_id = g_bac_instance;
-		Write_Config_Info.Write_Weeklycode_Info[i].start_instance = i;
-		Write_Config_Info.Write_Weeklycode_Info[i].end_instance =i;
-		Write_Config_Info.Write_Weeklycode_Info[i].invoke_id = g_invoke_id;
-
-
-		CString temp_cs;
-		temp_cs.Format(_T("Task ID = %d. Write weekly schedule time From %d to %d "),g_invoke_id,
-			Write_Config_Info.Write_Weeklycode_Info[i].start_instance,
-			Write_Config_Info.Write_Weeklycode_Info[i].end_instance);
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
-
+		}
+		else
+		{
+			Mession_ret.Format(_T("Write schedule form %d to %d timeout."),i,i);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			goto write_end_thread;
+		}
+		g_progress_persent = write_success_count * 100 /write_total_count;
 	}
 
-	for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
+	for (int i=0;i<BAC_HOLIDAYCODE_GROUP;i++)
 	{
-		resend_count = 0;
-		do 
+		if(Write_Private_Data_Blocking(WRITEANNUALSCHEDULE_T3000,i,i) > 0)
 		{
-			resend_count ++;
-			if(resend_count>RESEND_COUNT)
-				goto mywriteend;
-			g_invoke_id =WritePrivateData(g_bac_instance,WRITEANNUALSCHEDULE_T3000,i,i);
+			Mession_ret.Format(_T("Write holiday form %d to %d success."),i,i);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			write_success_count ++ ;
 			Sleep(SEND_COMMAND_DELAY_TIME);
-		} while (g_invoke_id<0);
-
-		Write_Config_Info.Write_Annualcode_Info[i].command = WRITEANNUALSCHEDULE_T3000;
-		Write_Config_Info.Write_Annualcode_Info[i].device_id = g_bac_instance;
-		Write_Config_Info.Write_Annualcode_Info[i].start_instance = i;
-		Write_Config_Info.Write_Annualcode_Info[i].end_instance =i;
-		Write_Config_Info.Write_Annualcode_Info[i].invoke_id = g_invoke_id;
-
-
-		CString temp_cs;
-		temp_cs.Format(_T("Task ID = %d. Write ANNUAL DAY time From %d to %d "),g_invoke_id,
-			Write_Config_Info.Write_Annualcode_Info[i].start_instance,
-			Write_Config_Info.Write_Annualcode_Info[i].end_instance);
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
-
+		}
+		else
+		{
+			Mession_ret.Format(_T("Write holiday form %d to %d timeout."),i,i);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			goto write_end_thread;
+		}
+		g_progress_persent = write_success_count * 100 /write_total_count;
 	}
 
-	for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
+	for (int i=0;i<BAC_PID_GROUP;i++)
 	{
-		resend_count = 0;
-		do 
+		end_temp_instance = BAC_READ_PID_REMAINDER + (BAC_READ_PID_GROUP_NUMBER)*i ;
+		if(end_temp_instance >= BAC_PID_COUNT)
+			end_temp_instance = BAC_PID_COUNT - 1;
+		if(Write_Private_Data_Blocking(WRITEPID_T3000,(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance) > 0)
 		{
-			resend_count ++;
-			if(resend_count>RESEND_COUNT)
-				goto mywriteend;
-			end_temp_instance = BAC_READ_CONTROLLER_REMAINDER + (BAC_READ_CONTROLLER_GROUP_NUMBER)*i ;
-			if(end_temp_instance >= BAC_CONTROLLER_COUNT)
-				end_temp_instance = BAC_CONTROLLER_COUNT - 1;
-
-			g_invoke_id =WritePrivateData(g_bac_instance,WRITECONTROLLER_T3000,(BAC_READ_CONTROLLER_GROUP_NUMBER)*i,end_temp_instance);
-			//g_invoke_id = GetPrivateData(g_bac_instance,READINPUT_T3000,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,sizeof(Str_in_point));
+			Mession_ret.Format(_T("Write PID form %d to %d success."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			write_success_count ++ ;
 			Sleep(SEND_COMMAND_DELAY_TIME);
-		} while (g_invoke_id<0);
-
-		Write_Config_Info.Write_Controller_Info[i].command = WRITECONTROLLER_T3000;
-		Write_Config_Info.Write_Controller_Info[i].device_id = g_bac_instance;
-		Write_Config_Info.Write_Controller_Info[i].start_instance = (BAC_READ_CONTROLLER_GROUP_NUMBER)*i;
-		Write_Config_Info.Write_Controller_Info[i].end_instance = end_temp_instance;
-		Write_Config_Info.Write_Controller_Info[i].invoke_id = g_invoke_id;
-
-
-		CString temp_cs;
-		temp_cs.Format(_T("Task ID = %d. Write Controller List Item From %d to %d "),g_invoke_id,
-			Write_Config_Info.Write_Controller_Info[i].start_instance,
-			Write_Config_Info.Write_Controller_Info[i].end_instance);
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
-
+		}
+		else
+		{
+			Mession_ret.Format(_T("Write PID form %d to %d timeout."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			goto write_end_thread;
+		}
+		g_progress_persent = write_success_count * 100 /write_total_count;
 	}
 
 	for (int i=0;i<BAC_SCREEN_GROUP;i++)
 	{
-		resend_count = 0;
-		do 
+		end_temp_instance = BAC_READ_SCREEN_REMAINDER + (BAC_READ_SCREEN_GROUP_NUMBER)*i ;
+		if(end_temp_instance >= BAC_SCREEN_COUNT)
+			end_temp_instance = BAC_SCREEN_COUNT - 1;
+		if(Write_Private_Data_Blocking(WRITESCREEN_T3000,(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance) > 0)
 		{
-			resend_count ++;
-			if(resend_count>RESEND_COUNT)
-				goto mywriteend;
-			end_temp_instance = BAC_READ_SCREEN_REMAINDER + (BAC_READ_SCREEN_GROUP_NUMBER)*i ;
-			if(end_temp_instance >= BAC_SCREEN_COUNT)
-				end_temp_instance = BAC_SCREEN_COUNT - 1;
-
-			g_invoke_id =WritePrivateData(g_bac_instance,WRITESCREEN_T3000,(BAC_READ_SCREEN_GROUP_NUMBER)*i, end_temp_instance);
+			Mession_ret.Format(_T("Write screen form %d to %d success."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			write_success_count ++ ;
 			Sleep(SEND_COMMAND_DELAY_TIME);
-		} while (g_invoke_id<0);
-
-		Write_Config_Info.Write_Screen_Info[i].command = WRITESCREEN_T3000;
-		Write_Config_Info.Write_Screen_Info[i].device_id = g_bac_instance;
-		Write_Config_Info.Write_Screen_Info[i].start_instance = (BAC_READ_SCREEN_GROUP_NUMBER)*i;
-		Write_Config_Info.Write_Screen_Info[i].end_instance = end_temp_instance;
-		Write_Config_Info.Write_Screen_Info[i].invoke_id = g_invoke_id;
-
-
-		CString temp_cs;
-		temp_cs.Format(_T("Task ID = %d. Write Screen List Item From %d to %d "),g_invoke_id,
-			Write_Config_Info.Write_Screen_Info[i].start_instance,
-			Write_Config_Info.Write_Screen_Info[i].end_instance);
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
-
+		}
+		else
+		{
+			Mession_ret.Format(_T("Write screen form %d to %d timeout."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			goto write_end_thread;
+		}
+		g_progress_persent = write_success_count * 100 /write_total_count;
 	}
 
-	for (int i=0;i<BAC_ANNUAL_GROUP;i++)
+	for (int i=0;i<BAC_HOLIDAY_GROUP;i++)
 	{
-		resend_count = 0;
-		do 
+		end_temp_instance = BAC_READ_HOLIDAY_REMAINDER + (BAC_READ_HOLIDAY_GROUP_NUMBER)*i ;
+		if(end_temp_instance >= BAC_HOLIDAY_COUNT)
+			end_temp_instance = BAC_HOLIDAY_COUNT - 1;
+		if(Write_Private_Data_Blocking(WRITEHOLIDAY_T3000,(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance) > 0)
 		{
-			resend_count ++;
-			if(resend_count>RESEND_COUNT)
-				goto mywriteend;
-			end_temp_instance = BAC_READ_ANNUAL_ROUTINES_REMAINDER + (BAC_READ_ANNUAL_ROUTINES_GROUP_NUMBER)*i ;
-			if(end_temp_instance >= BAC_ANNUAL_ROUTINES_COUNT)
-				end_temp_instance = BAC_ANNUAL_ROUTINES_COUNT - 1;
-
-			g_invoke_id =WritePrivateData(g_bac_instance,WRITEANNUALROUTINE_T3000,(BAC_READ_ANNUAL_ROUTINES_GROUP_NUMBER)*i,end_temp_instance);
+			Mession_ret.Format(_T("Write holiday form %d to %d success."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			write_success_count ++ ;
 			Sleep(SEND_COMMAND_DELAY_TIME);
-		} while (g_invoke_id<0);
-
-		Write_Config_Info.Write_Annual_Info[i].command = WRITEANNUALROUTINE_T3000;
-		Write_Config_Info.Write_Annual_Info[i].device_id = g_bac_instance;
-		Write_Config_Info.Write_Annual_Info[i].start_instance = (BAC_READ_ANNUAL_ROUTINES_GROUP_NUMBER)*i;
-		Write_Config_Info.Write_Annual_Info[i].end_instance =end_temp_instance;
-		Write_Config_Info.Write_Annual_Info[i].invoke_id = g_invoke_id;
-
-
-		CString temp_cs;
-		temp_cs.Format(_T("Task ID = %d. Write Annual List Item From %d to %d "),g_invoke_id,
-			Write_Config_Info.Write_Annual_Info[i].start_instance,
-			Write_Config_Info.Write_Annual_Info[i].end_instance);
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
-
+		}
+		else
+		{
+			Mession_ret.Format(_T("Write holiday form %d to %d timeout."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			goto write_end_thread;
+		}
+		g_progress_persent = write_success_count * 100 /write_total_count;
 	}
 
-	for (int i=0;i<BAC_WEEKLY_GROUP;i++)
+	for (int i=0;i<BAC_SCHEDULE_GROUP;i++)
 	{
-		resend_count = 0;
-		do 
+		end_temp_instance = BAC_READ_SCHEDULE_REMAINDER + (BAC_READ_SCHEDULE_GROUP_NUMBER)*i ;
+		if(end_temp_instance >= BAC_SCHEDULE_COUNT)
+			end_temp_instance = BAC_SCHEDULE_COUNT - 1;
+		if(Write_Private_Data_Blocking(WRITESCHEDULE_T3000,(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance) > 0)
 		{
-			resend_count ++;
-			if(resend_count>RESEND_COUNT)
-				goto mywriteend;
-			end_temp_instance = BAC_READ_WEEKLY_ROUTINES_REMAINDER + (BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER)*i ;
-			if(end_temp_instance >= BAC_WEEKLY_ROUTINES_COUNT)
-				end_temp_instance = BAC_WEEKLY_ROUTINES_COUNT - 1;
-
-			g_invoke_id =WritePrivateData(g_bac_instance,WRITEWEEKLYROUTINE_T3000,(BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER)*i,end_temp_instance);
+			Mession_ret.Format(_T("Write schedule form %d to %d success."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			write_success_count ++ ;
 			Sleep(SEND_COMMAND_DELAY_TIME);
-		} while (g_invoke_id<0);
-
-		Write_Config_Info.Write_Weekly_Info[i].command = WRITEWEEKLYROUTINE_T3000;
-		Write_Config_Info.Write_Weekly_Info[i].device_id = g_bac_instance;
-		Write_Config_Info.Write_Weekly_Info[i].start_instance = (BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER)*i;
-		Write_Config_Info.Write_Weekly_Info[i].end_instance = end_temp_instance;
-		Write_Config_Info.Write_Weekly_Info[i].invoke_id = g_invoke_id;
-
-
-		CString temp_cs;
-		temp_cs.Format(_T("Task ID = %d. Write Weekly List Item From %d to %d "),g_invoke_id,
-			Write_Config_Info.Write_Weekly_Info[i].start_instance,
-			Write_Config_Info.Write_Weekly_Info[i].end_instance);
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
-
+		}
+		else
+		{
+			Mession_ret.Format(_T("Write schedule form %d to %d timeout."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			goto write_end_thread;
+		}
+		g_progress_persent = write_success_count * 100 /write_total_count;
 	}
 
 
 	for (int i=0;i<BAC_MONITOR_GROUP;i++)
 	{
-		resend_count = 0;
-		do 
+		end_temp_instance = BAC_READ_MONOTOR_REMAINDER + (BAC_READ_MONITOR_GROUP_NUMBER)*i ;
+		if(end_temp_instance >= BAC_MONITOR_COUNT)
+			end_temp_instance = BAC_MONITOR_COUNT - 1;
+		if(Write_Private_Data_Blocking(WRITEMONITOR_T3000,(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance) > 0)
 		{
-			resend_count ++;
-			if(resend_count>RESEND_COUNT)
-				goto mywriteend;
-			end_temp_instance = BAC_READ_MONOTOR_REMAINDER + (BAC_READ_MONITOR_GROUP_NUMBER)*i ;
-			if(end_temp_instance >= BAC_MONITOR_COUNT)
-				end_temp_instance = BAC_MONITOR_COUNT - 1;
-
-			g_invoke_id =WritePrivateData(g_bac_instance,WRITEMONITOR_T3000,(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
+			Mession_ret.Format(_T("Write monitor form %d to %d success."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			write_success_count ++ ;
 			Sleep(SEND_COMMAND_DELAY_TIME);
-		} while (g_invoke_id<0);
-
-		Write_Config_Info.Write_Monitor_Info[i].command = WRITEWEEKLYROUTINE_T3000;
-		Write_Config_Info.Write_Monitor_Info[i].device_id = g_bac_instance;
-		Write_Config_Info.Write_Monitor_Info[i].start_instance = (BAC_READ_MONITOR_GROUP_NUMBER)*i;
-		Write_Config_Info.Write_Monitor_Info[i].end_instance = end_temp_instance;
-		Write_Config_Info.Write_Monitor_Info[i].invoke_id = g_invoke_id;
-
-
-		CString temp_cs;
-		temp_cs.Format(_T("Task ID = %d. Write Monitor List Item From %d to %d "),g_invoke_id,
-			Write_Config_Info.Write_Monitor_Info[i].start_instance,
-			Write_Config_Info.Write_Monitor_Info[i].end_instance);
-		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs);
-
+		}
+		else
+		{
+			Mession_ret.Format(_T("Write monitor form %d to %d timeout."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);	
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			goto write_end_thread;
+		}
+		g_progress_persent = write_success_count * 100 /write_total_count;
 	}
 
 
@@ -3977,51 +5084,37 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 		bool b_program_status = true;
 		for (int j=0;j<npart;j++)
 		{
-			int send_status = true;
-			int resend_count = 0;
-			int temp_invoke_id = -1;
-			do 
-			{
-				resend_count ++;
-				if(resend_count>5)
+
+				if(WriteProgramData_Blocking(g_bac_instance,WRITEPROGRAMCODE_T3000,i,i,j)> 0)
 				{
-					goto mywriteend;
+					Mession_ret.Format(_T("Write program %d part %d success."),i,j+1);	
+					SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+					Sleep(SEND_COMMAND_DELAY_TIME);
+					continue;
 				}
-				temp_invoke_id =  WriteProgramData(g_bac_instance,WRITEPROGRAMCODE_T3000,i,i,j);
-
-				Sleep(SEND_COMMAND_DELAY_TIME);
-			} while (temp_invoke_id<0);
-
-			if(send_status)
-			{
-				for (int i=0;i<2000;i++)
+				else
 				{
-					Sleep(1);
-					if(tsm_invoke_id_free(temp_invoke_id))
-					{
-						goto	write_prg_part_success;
-					}
+					Mession_ret.Format(_T("Write program %d part %d timeout."),i,j+1);	
+					SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+					goto write_end_thread;
 				}
-				Write_Config_Info.Write_Programcode_Info[i].task_result = BAC_RESULTS_FAIL;
-				goto mywriteend;
-
-write_prg_part_success:
-				continue;
-			}
 		}
-		Write_Config_Info.Write_Programcode_Info[i].task_result = BAC_RESULTS_OK;
+		write_success_count ++ ;
+		g_progress_persent = write_success_count * 100 /write_total_count;
 	}
 
+	Mession_ret.Format(_T("Write config file success."));	
+	SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+	g_progress_persent = 100;
 
 	read_write_bacnet_config = false;
 	hwait_write_thread = NULL;
 	return 0;
-mywriteend:
-
-	AfxMessageBox(_T("Write config file Timeout!Please try it again!"));
-	::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,0,0);
+write_end_thread:
+	g_progress_persent = 0;
+	read_write_bacnet_config = false;
 	hwait_write_thread = NULL;
-	return 0;
+	return 2;
 }
 
 LRESULT  CMainFrame::ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM lParam)
@@ -4090,7 +5183,7 @@ LRESULT  CMainFrame::AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam)
 		//}
 
 
-		for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
+		for (int i=0;i<BAC_PID_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Controller_Info[i].invoke_id)
 				Write_Config_Info.Write_Controller_Info[i].task_result = true;
@@ -4102,23 +5195,23 @@ LRESULT  CMainFrame::AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam)
 				Write_Config_Info.Write_Screen_Info[i].task_result = true;
 		}
 
-		for (int i=0;i<BAC_WEEKLY_GROUP;i++)
+		for (int i=0;i<BAC_SCHEDULE_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Weekly_Info[i].invoke_id)
 				Write_Config_Info.Write_Weekly_Info[i].task_result = true;
 		}
-		for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
+		for (int i=0;i<BAC_SCHEDULECODE_GOUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Weeklycode_Info[i].invoke_id)
 				Write_Config_Info.Write_Weeklycode_Info[i].task_result = true;
 		}
 
-		for (int i=0;i<BAC_ANNUAL_GROUP;i++)
+		for (int i=0;i<BAC_HOLIDAY_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Annual_Info[i].invoke_id)
 				Write_Config_Info.Write_Annual_Info[i].task_result = true;
 		}
-		for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
+		for (int i=0;i<BAC_HOLIDAYCODE_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Annualcode_Info[i].invoke_id)
 				Write_Config_Info.Write_Annualcode_Info[i].task_result = true;
@@ -4169,7 +5262,7 @@ LRESULT  CMainFrame::AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam)
 		//		Write_Config_Info.Write_Programcode_Info[i].task_result = false;
 		//}
 
-		for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
+		for (int i=0;i<BAC_PID_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Controller_Info[i].invoke_id)
 				Write_Config_Info.Write_Controller_Info[i].task_result = false;
@@ -4181,24 +5274,24 @@ LRESULT  CMainFrame::AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam)
 				Write_Config_Info.Write_Screen_Info[i].task_result = false;
 		}
 
-		for (int i=0;i<BAC_WEEKLY_GROUP;i++)
+		for (int i=0;i<BAC_SCHEDULE_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Weekly_Info[i].invoke_id)
 				Write_Config_Info.Write_Weekly_Info[i].task_result = false;
 		}
-		for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
+		for (int i=0;i<BAC_SCHEDULECODE_GOUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Weeklycode_Info[i].invoke_id)
 				Write_Config_Info.Write_Weeklycode_Info[i].task_result = false;
 		}
 
-		for (int i=0;i<BAC_ANNUAL_GROUP;i++)
+		for (int i=0;i<BAC_HOLIDAY_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Annual_Info[i].invoke_id)
 				Write_Config_Info.Write_Annual_Info[i].task_result = false;
 		}
 
-		for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
+		for (int i=0;i<BAC_HOLIDAYCODE_GROUP;i++)
 		{
 			if(pInvoke->Invoke_ID==Write_Config_Info.Write_Annualcode_Info[i].invoke_id)
 				Write_Config_Info.Write_Annualcode_Info[i].task_result = false;
@@ -4222,10 +5315,9 @@ LRESULT  CMainFrame::AllWriteMessageCallBack(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-
 void CMainFrame::SaveConfigFile()
 {
-	if(g_protocol == PROTOCOL_BACNET_IP)
+	if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == MODBUS_BACNET_MSTP))
 	{
 		MainFram_hwd = this->m_hWnd;
 
@@ -4234,9 +5326,24 @@ void CMainFrame::SaveConfigFile()
 		{
 
 			SaveConfigFilePath=dlg.GetPathName();
+			CFileFind cfindtempfile;
+			if(cfindtempfile.FindFile(SaveConfigFilePath))
+			{
+				DeleteFile(SaveConfigFilePath);
+			}
+
 			//协议时bacnet ，用户点击 File save时 先调用线程读取所有需要存的资料；在发送消息回来 调用SaveBacnetConfigFile;
 			//::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_SVAE_CONFIG);
-			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,TYPE_SVAE_CONFIG,NULL);
+
+			if(g_protocol == PROTOCOL_BACNET_IP)
+			{
+				::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,TYPE_SVAE_CONFIG,NULL);
+			}
+			else
+			{
+				Create_Thread_Read_Item(TYPE_ALL);
+			}
+			
 			
 		}
 		else
@@ -4276,18 +5383,18 @@ void CMainFrame::SaveConfigFile()
 	{
 		strTips.Format(_T("Config file \" %s \" is saving, please waiting..."), strFilename);
 		SetPaneString(1, strTips);
-		if (product_register_value[7]==100)
-		{
-		save_schedule_2_file((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
-		}
-		else
-		{
-		save_schedule_2_file_LC((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
-		}
-		
+        if (product_register_value[7]==100)
+        {
+            save_schedule_2_file((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
+        }
+        else      
+        {
+            save_schedule_2_file_LC((LPTSTR)(LPCTSTR)strFilename,g_tstat_id);
+        }
 
-		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
-		SetPaneString(1, strTips);
+
+        strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
+        SetPaneString(1, strTips);
 	}
 	else if (product_register_value[7]==PM_T3PT10||
 	product_register_value[7]==PM_T3IOA||
@@ -4296,7 +5403,9 @@ void CMainFrame::SaveConfigFile()
 	product_register_value[7]==PM_T38I13O||
 	product_register_value[7]==PM_T3PERFORMANCE||
 	product_register_value[7]==PM_T34AO||
-	product_register_value[7]==PM_T36CT 
+    product_register_value[7]==PM_T36CT || 
+     product_register_value[7] == PM_T322AI||
+     product_register_value[7] == PM_T38AI8AO6DO
 	        )
 	{
 		strTips.Format(_T("Config file \" %s \" is saving, please waiting..."), strFilename);
@@ -4353,6 +5462,21 @@ void CMainFrame::SaveConfigFile()
 	EndWaitCursor();
 	g_bEnableRefreshTreeView = TRUE;
 }
+
+LRESULT CMainFrame::OnCreateStatusBarWindow(WPARAM wParam, LPARAM lParam)
+{
+
+	b_statusbarthreadflag = true; // enable refresh status bar status;
+	statusbar =new CMyStatusbarCtrl;
+	statusbar->Create(IDD_DIALOG_STATUSBAR,this);	
+	statusbar->ShowWindow(SW_SHOW);
+	CRect temprec;
+	m_wndStatusBar.GetWindowRect(&temprec);
+	statusbar->SetWindowPos(this,temprec.left,temprec.top,temprec.Width(),temprec.Height(),SWP_NOACTIVATE | SWP_SHOWWINDOW );
+	b_create_status = true;
+	return 1;
+}
+
 
 LRESULT CMainFrame::OnFreshStatusBar(WPARAM wParam, LPARAM lParam)
 {
@@ -4426,7 +5550,7 @@ void CMainFrame::OnDestroy()
 // 			pDialogInfo->ShowWindow(SW_SHOW);
 // 			pDialogInfo->CenterWindow();
 // 			pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Processing Information,please wait..."));
-// 		}
+// 		    }
 
 
 
@@ -4436,7 +5560,7 @@ void CMainFrame::OnDestroy()
 	int temp =1;
 
 	UpdataSlider(temp);
-
+	b_statusbarthreadflag = FALSE; //close the status bar thread;
 	g_bEnableRefreshTreeView = FALSE;
 	HTREEITEM htiSel = m_pTreeViewCrl->GetSelectedItem();
 	//SaveTreeNodeRecordToReg(htiSel);
@@ -4455,7 +5579,11 @@ void CMainFrame::OnDestroy()
 		Add_Label_Window = NULL;
 	}
 
-
+	if(statusbar != NULL)
+	{
+		delete statusbar;
+		statusbar = NULL;
+	}
 
 	if(DebugWindow !=NULL)
 	{
@@ -4463,7 +5591,7 @@ void CMainFrame::OnDestroy()
 		DebugWindow = NULL;
 	}
 	
-	for (int i=0;i<12;i++)
+	for (int i=0;i<14;i++)
 	{
 		UnregisterHotKey(GetSafeHwnd(), m_MainHotKeyID[i]);   
 	}
@@ -4550,11 +5678,11 @@ void CMainFrame::OnDestroy()
 	close_T3000_log_file();
 	
 
-// 	if (pDialogInfo!=NULL)
-// 	{
-// 		delete pDialogInfo;
-// 		pDialogInfo = NULL;
-// 	}
+    if (m_pDialogInfo!=NULL)
+    {
+        delete m_pDialogInfo;
+        m_pDialogInfo = NULL;
+    }
 #endif
 
 
@@ -4659,7 +5787,7 @@ void CMainFrame::GetIONanme()
 		bado.OnInitADOConn(); 
 
 			CString strSerial;
-			strSerial.Format(_T("%d"),g_serialNum);
+			strSerial.Format(_T("%d"),g_selected_serialnumber);
 			strSerial.Trim();
 			CString strsql;
 			strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
@@ -4797,7 +5925,7 @@ void CMainFrame::GetIONanme()
 			}
 			else
 			{
-				g_strSensorName =_T("Internal Sensor");
+				g_strSensorName =_T("Internal Temp Sensor");
 				g_strInName1=_T("Input 1");
 				g_strInName2=_T("Input 2");
 				g_strInName3=_T("Input 3");
@@ -4837,18 +5965,21 @@ void CMainFrame::GetIONanme()
 
 
 }
+ 
 void CMainFrame::OnHelp()
 {
 	//CString strHelp=g_strExePth+_T("The Instruction of T3000 .txt");
 	//::HtmlHelp(NULL, strHelp, HH_DISPLAY_TOPIC, 0);
 	//ShellExecute(NULL, _T("open"), strHelp, NULL, NULL, SW_SHOWNORMAL);
-	HWND hWnd;
+	//HWND hWnd;
 
 // 	if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 // 	else
-		hWnd =  ::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-
+	//	hWnd =  ::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
 	//return (hWnd != NULL);
+
+//      CGraphicModelDlg dlg;
+//      dlg.DoModal();
 
 }
 void CMainFrame::OnImportDatase()
@@ -4859,7 +5990,17 @@ void CMainFrame::OnImportDatase()
 }
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
-{
+{   
+    
+    if (m_pDialogInfo->IsWindowVisible())
+    {
+        if (pMsg->message == WM_LBUTTONDOWN||pMsg->message == WM_RBUTTONDOWN)
+        {
+            m_pDialogInfo->ShowWindow(SW_HIDE);
+        }
+    } 
+      
+    
 	if (pMsg->message == WM_LBUTTONDOWN && pMsg->hwnd == m_wndStatusBar.GetSafeHwnd())
 	{
 		CRect rect;  
@@ -4883,7 +6024,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 	}
 	if((pMsg->message == WM_KEYDOWN ) || (pMsg->message == WM_LBUTTONDOWN) || (pMsg->message == WM_LBUTTONUP))
 	{
-
+         
 		no_mouse_keyboard_event_enable_refresh = false;
 		time_click = time(NULL);
 	}
@@ -4943,6 +6084,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 
 	}
 
+   
 	return CFrameWndEx::PreTranslateMessage(pMsg);
 }
 void CMainFrame::ReFresh()
@@ -4953,9 +6095,9 @@ void CMainFrame::ReFresh()
 		 return;
 	}
 	register_critical_section.Lock();
-	for(int i=0;i<10;i++) //Modify by Fance , tstat 6 has more register than 512;
+	for(int i=0;i<12;i++) //Modify by Fance , tstat 6 has more register than 512;
 	{
-		Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);		
+		Read_Multi(g_tstat_id,&multi_register_value[i*100],i*100,100);		
 	}
 	register_critical_section.Unlock();
 	//Modify by Fance
@@ -5082,13 +6224,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 	//pDlg->MoveWindow(100,100,500,1000);
 	pDlg->ShowProgress(0,0);
 	//显示对话框窗口
-	
+	g_llerrCount = g_llTxCount = g_llRxCount = 0;//click tree, clear all count;
 
 	//::SetWindowPos(pDlg->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 	RECT RECT_SET1;
 	GetClientRect(&RECT_SET1);
 	pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20,1);
-	pDlg->ShowWindow(SW_SHOW);
+	pDlg->ShowWindow(SW_HIDE);
 	//20120420
 	float flagsoftwareversion;
 	//HTREEITEM hSelItem=m_pTreeViewCrl->GetSelectedItem();
@@ -5102,9 +6244,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 	{
 		if(hSelItem==m_product.at(i).product_item )
 		{
-			 
+			
+            int Scan_Product_ID=m_product.at(i).product_class_id; 
 			g_strT3000LogString.Format(_T("Trying to connect to %s:%d"),GetProductName(m_product.at(i).product_class_id),m_product.at(i).serial_number);
-			write_T3000_log_file(g_strT3000LogString);
+			//write_T3000_log_file(g_strT3000LogString);
 			CString* pstrInfo = new CString(g_strT3000LogString); 
 			::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
 
@@ -5114,121 +6257,195 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			product_Node=m_product.at(i);
 			selected_product_index = i;//记录目前选中的是哪一个 产品;用于后面自动更新firmware;
 			selected_tree_item = hTreeItem;
+			Statuspanel.Empty();
+			if(product_Node.note_parent_serial_number == 0)
+			{
+				Statuspanel.Format(_T("%u"),product_Node.panel_number);
+			}
+			else
+			{
+				for (int z=0;z<m_product.size();z++)
+				{
+					if(product_Node.note_parent_serial_number == m_product.at(z).serial_number)
+					{
+						Statuspanel.Format(_T("%u-%u"),m_product.at(z).panel_number,product_Node.product_id);
+					}
+				}
+			}
 
 			//if(1)//GSM  模块
-			if((m_product.at(i).protocol != PROTOCOL_GSM) && (m_product.at(i).protocol != PROTOCOL_REMOTE_IP))
-			if(!m_product.at(i).BuildingInfo.strIp.IsEmpty())
-			{
- 
- 				CScanDlg scandlg;
-				
- 				if (!scandlg.TestPing(m_product.at(i).BuildingInfo.strIp))
- 				{
- 					//去掉进度条
- 					pDlg->ShowWindow(SW_HIDE);
- 					if(pDlg)
- 						delete pDlg;//20120220
- 					pDlg = NULL;
- 
- 
- 
-  				//	if (!scandlg.CheckTheSameSubnet(m_product.at(i).BuildingInfo.strIp))
-  				//	{
-  				//		CString StrTips;
-  				//		StrTips.Format(_T("The net device is not in the same subnet.\nDo you want to try to make them in the same subnet?"));
-  				//		int ret = AfxMessageBox(StrTips,MB_YESNOCANCEL ,3);
-  				//		if ( ret == IDYES)
-  				//		{
-  				//			scandlg.Set_IsScan(FALSE);
-  				//			scandlg.SetNode(product_Node);
-  				//			scandlg.DoModal();
-  				//		}
-  
-  				//	}
-  				//	else
- 					//{
-                          BOOL is_OK = FALSE;
- 						//TroubleShoot(m_product.at(i));
-						  
-  						if(m_product.at(i).status_last_time[0] == true)
-  						{
-							//if(m_product.at(i).NetworkCard_Address.CompareNoCase(m_product.at(i).BuildingInfo.strIp))
-							if(CheckTheSameSubnet(m_product.at(i).NetworkCard_Address,m_product.at(i).BuildingInfo.strIp) == false)
-							{
-								CTroubleShootDlg dlg;
-								dlg.SetNode(m_product.at(i));
-								if (dlg.DoModal()==IDOK)
-								{
+			if((m_product.at(i).protocol != PROTOCOL_GSM) && (m_product.at(i).protocol != PROTOCOL_REMOTE_IP)&&(m_product.at(i).protocol!=MODBUS_RS485))
+            {
+                if(!m_product.at(i).BuildingInfo.strIp.IsEmpty())
+                {
 
-									is_OK=dlg.is_ok;
-									// 								scandlg.Set_IsScan(FALSE);
-									// 								scandlg.SetNode(product_Node);
-									// 								scandlg.DoModal();
-								}
-							}
-							else
-							{
-								m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
-								m_product.at(i).status_last_time[0] = false;
-								m_product.at(i).status_last_time[1] = false;
-								m_product.at(i).status_last_time[2] = false;
-								m_product.at(i).status = false;
-								MessageBox(_T("Device is offline!"));	//Ping 不通 ， 还在一个网段 ， 还显示在线; 其实不在线;
-								return;
-							}
+                    CScanDlg scandlg;
 
- 						}
- 						else
- 						{
- 							MessageBox(_T("Device is offline!"));
- 							return;
-						}
-						if (!is_OK)
-						{
-							CString strTitle;
-							strTitle.Format(_T("Can't connect to %s,Ping %s -> Noresponse"),m_product.at(i).BuildingInfo.strIp,m_product.at(i).BuildingInfo.strIp);
-							m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
-							m_product.at(i).status_last_time[0] = false;
-							m_product.at(i).status_last_time[1] = false;
-							m_product.at(i).status_last_time[2] = false;
-							m_product.at(i).status = false;
-							MessageBox(strTitle);
-							return;
-						}
-						else
-						{
-						 
-							m_pTreeViewCrl->turn_item_image(hSelItem ,TRUE);//Can't connect to the device , it will show disconnection;
-							m_product.at(i).status_last_time[0] = TRUE;
-							m_product.at(i).status_last_time[1] = false;
-							m_product.at(i).status_last_time[2] = false;
-							m_product.at(i).status = false;
-							  
-						}
- 						
- 					
- 
- 
- 					return;
- 				}
- 				else
- 				{
-					::PostMessage(MainFram_hwd,MY_RX_TX_COUNT,1,0);
- 					CString IP=m_product.at(i).BuildingInfo.strIp;
- 					int Port=m_product.at(i).ncomport;
- 					SetCommunicationType(1);
- 					if (!Open_Socket2(IP,Port))
- 					{
+                    if (!scandlg.TestPing(m_product.at(i).BuildingInfo.strIp))
+                    {
+                        //去掉进度条
+                        pDlg->ShowWindow(SW_HIDE);
+                        if(pDlg)
+                            delete pDlg;//20120220
+                        pDlg = NULL;
 
-                      MessageBox(_T("Connect failed!Please try again!"));
- 					}
- 					else
- 					{
- 						close_com();
- 					}
- 				}
 
-			}
+
+                        //	if (!scandlg.CheckTheSameSubnet(m_product.at(i).BuildingInfo.strIp))
+                        //	{
+                        //		CString StrTips;
+                        //		StrTips.Format(_T("The net device is not in the same subnet.\nDo you want to try to make them in the same subnet?"));
+                        //		int ret = AfxMessageBox(StrTips,MB_YESNOCANCEL ,3);
+                        //		if ( ret == IDYES)
+                        //		{
+                        //			scandlg.Set_IsScan(FALSE);
+                        //			scandlg.SetNode(product_Node);
+                        //			scandlg.DoModal();
+                        //		}
+
+                        //	}
+                        //	else
+                        //{
+                        BOOL is_OK = FALSE;
+                        //TroubleShoot(m_product.at(i));
+
+                        if(m_product.at(i).status_last_time[0] == true)
+                        {
+                            //if(m_product.at(i).NetworkCard_Address.CompareNoCase(m_product.at(i).BuildingInfo.strIp))
+                            if(CheckTheSameSubnet(m_product.at(i).NetworkCard_Address,m_product.at(i).BuildingInfo.strIp) == false)
+                            {
+                                CTroubleShootDlg dlg;
+                                dlg.SetNode(m_product.at(i));
+                                if (dlg.DoModal()==IDOK)
+                                {
+
+                                    is_OK=dlg.is_ok;
+                                    // 								scandlg.Set_IsScan(FALSE);
+                                    // 								scandlg.SetNode(product_Node);
+                                    // 								scandlg.DoModal();
+                                }
+                            }
+                            else
+                            {
+								g_llTxCount ++;
+								g_llerrCount ++;
+								bac_select_device_online = false;
+                                m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
+                                m_product.at(i).status_last_time[0] = false;
+                                m_product.at(i).status_last_time[1] = false;
+                                m_product.at(i).status_last_time[2] = false;
+                                m_product.at(i).status = false;
+                                //MessageBox(_T("Device is offline!"));	//Ping 不通 ， 还在一个网段 ， 还显示在线; 其实不在线;
+
+                                if (!m_pDialogInfo->IsWindowVisible())
+                                {
+                                    m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is offline!"));
+                                    m_pDialogInfo->ShowWindow(SW_SHOW);
+                                }
+                                /*  while(m_pDialogInfo->IsWindowVisible()){
+                                Sleep(50);
+                                continue;
+                                }*/
+                                return;
+                            }
+
+                        }
+                        else
+                        {
+							g_llTxCount ++;
+							g_llerrCount ++;
+							bac_select_device_online = false;
+                            m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
+                            m_product.at(i).status_last_time[0] = false;
+                            m_product.at(i).status_last_time[1] = false;
+                            m_product.at(i).status_last_time[2] = false;
+                            m_product.at(i).status = false;
+                            //MessageBox(_T("Device is offline!"));
+                            if (!m_pDialogInfo->IsWindowVisible())
+                            {
+                                m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is offline!"));
+                                m_pDialogInfo->ShowWindow(SW_SHOW);
+                            }
+                            //                             while(m_pDialogInfo->IsWindowVisible()){
+                            //                                 Sleep(50);
+                            //                                 continue;
+                            //                             }
+                            return;
+                        }
+                        if (!is_OK)
+                        {
+                            CString strTitle;
+                            strTitle.Format(_T("Can't connect to %s,Ping %s -> Noresponse"),m_product.at(i).BuildingInfo.strIp,m_product.at(i).BuildingInfo.strIp);
+                            m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
+                            m_product.at(i).status_last_time[0] = false;
+                            m_product.at(i).status_last_time[1] = false;
+                            m_product.at(i).status_last_time[2] = false;
+                            m_product.at(i).status = false;
+							g_llTxCount ++;
+							g_llerrCount ++;
+							bac_select_device_online = false;
+                            //MessageBox(strTitle);
+                            if (!m_pDialogInfo->IsWindowVisible())
+                            {
+                                m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(strTitle);
+                                m_pDialogInfo->ShowWindow(SW_SHOW);
+                            }
+                            //                             while(m_pDialogInfo->IsWindowVisible()){
+                            //                                 Sleep(50);
+                            //                                 continue;
+                            //                             }
+                            return;
+                        }
+                        else
+                        {
+							g_llTxCount ++;
+							g_llRxCount ++;
+							bac_select_device_online = true;
+                            m_pTreeViewCrl->turn_item_image(hSelItem ,TRUE);//Can't connect to the device , it will show disconnection;
+                            m_product.at(i).status_last_time[0] = TRUE;
+                            m_product.at(i).status_last_time[1] = false;
+                            m_product.at(i).status_last_time[2] = false;
+                            m_product.at(i).status = false;
+
+                        }
+
+
+
+
+                        return;
+                    }
+                    else
+                    {
+                        ::PostMessage(MainFram_hwd,MY_RX_TX_COUNT,1,0);
+                        CString IP=m_product.at(i).BuildingInfo.strIp;
+                        int Port=m_product.at(i).ncomport;
+                        SetCommunicationType(1);
+                        if (!Open_Socket2(IP,Port))
+                        {
+							g_llTxCount ++;
+							g_llerrCount ++;
+							bac_select_device_online = false;
+                            // MessageBox(_T("Connect failed!Please try again!"));
+                            if (!m_pDialogInfo->IsWindowVisible())
+                            {
+                                m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Connect failed!Please try again!"));
+                                m_pDialogInfo->ShowWindow(SW_SHOW);
+                            }
+                            //                         while(m_pDialogInfo->IsWindowVisible()){
+                            //                             Sleep(50);
+                            //                             continue;
+                            //                         }
+
+                        }
+                        else
+                        {
+                            close_com();
+                        }
+                    }
+
+                }
+            }
+            
 	 
 	         g_serialNum = product_Node.serial_number;
 			if((product_Node.product_class_id == PM_CM5) || (product_Node.product_class_id == PM_MINIPANEL))	//如果是CM5或者MINIPANEL 才有 bacnet协议;
@@ -5269,9 +6486,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					CString temp_csa;
 					temp_csa =  product_Node.BuildingInfo.strComPort;
 					temp_csa = temp_csa.Right(temp_csa.GetLength() - 3);
-					g_bac_instance = m_product.at(i).hardware_version;
+					g_bac_instance = m_product.at(i).object_instance;
 					g_selected_serialnumber = m_product.at(i).serial_number;
-					g_mac = m_product.at(i).software_version;
+					g_mac = m_product.at(i).panel_number;
 					bac_gloab_panel = g_mac;
 					g_gloab_bac_comport = m_product.at(i).ncomport;
 					//g_gloab_bac_comport =_wtoi(temp_csa);
@@ -5424,6 +6641,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
 					m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
 					g_selected_serialnumber = m_product.at(i).serial_number;
+					g_bPauseMultiRead = true;
 					return;
 				//}
 			}
@@ -5451,17 +6669,17 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				register_critical_section.Lock();
 				g_tstat_id_changed=TRUE;
 				strTemp.Format(_T("Lock\n"));
-				TRACE(strTemp);
+				//TRACE(strTemp);
 				g_tstat_id=product_Node.product_id;
 				register_critical_section.Unlock();
 				strTemp.Format(_T("UnLock\n"));
-				TRACE(strTemp);
+				//TRACE(strTemp);
 		    }
 			
 			
 			//***************************************
 			strTemp.Format(_T("SelectID=%d\n"),product_Node.product_id);
-			TRACE(strTemp);
+			//TRACE(strTemp);
 			nSelectID=product_Node.product_id;
 			nSelectSerialNumber=product_Node.serial_number;
 			flagsoftwareversion = product_Node.software_version;
@@ -5479,6 +6697,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				(product_Node.BuildingInfo.strIp.CompareNoCase(_T("9600")) ==0)	||
 				(product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||
 				(product_Node.BuildingInfo.strIp.CompareNoCase(_T("38400"))==0) ||
+                (product_Node.BuildingInfo.strIp.CompareNoCase(_T("57600"))==0) ||
 				(product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
 			{
 
@@ -5488,58 +6707,30 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					strTemp.Format(_T("Connect\n"));
 					TRACE(strTemp);
 					BOOL bRet = ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
-					
-					if (!bRet)
-					{
-						CheckConnectFailure(product_Node.BuildingInfo.strIp);
-						pDlg->ShowWindow(SW_HIDE);//20120220
-						delete pDlg;//20120220
-						pDlg = NULL;
-						m_nStyle=2;
-						m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
-						m_product.at(i).status_last_time[0] = false;
-						m_product.at(i).status_last_time[1] = false;
-						m_product.at(i).status_last_time[2] = false;
-						strTemp.Format(_T("Connect  Fail\n"));
-						TRACE(strTemp);
-						return;
-					}
-					else
-					{
-						m_nStyle=1;
-						m_CurSubBuldingInfo=product_Node.BuildingInfo;
-						g_CommunicationType=1;
-						SetCommunicationType(1);
-						m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
-						m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
-						g_selected_serialnumber = m_product.at(i).serial_number;
-						strTemp.Format(_T("Connect  OK\n"));
-						TRACE(strTemp);
-					}
 
-					int ID1,ID2;
-					SetLastCommunicationType(1);
-					unsigned short read_data[10];
-
-					strTemp.Format(_T("Begain Read\n"));
-					TRACE(strTemp);
-					g_bPauseMultiRead = TRUE;
-					int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,3);
-					strTemp.Format(_T("nMultyRet=%d\n"),nmultyRet);
-					TRACE(strTemp);
-
-					if (nmultyRet>0)
-				    {
-					  ID1=read_data[6];
-				    }
-					nmultyRet=Read_Multi(255,&read_data[0],0,10,3);
-
-					strTemp.Format(_T("nMultyRet=%d\n"),nmultyRet);
-					TRACE(strTemp);
-					if (nmultyRet>0)
-					{
-						ID2=read_data[6];
-					}
+                 
+                    SetLastCommunicationType(1);
+//                     unsigned short read_data[10];
+// 
+//                     strTemp.Format(_T("Begain Read\n"));
+//                     TRACE(strTemp);
+//                     g_bPauseMultiRead = TRUE;
+//                     int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,3);
+//                     strTemp.Format(_T("nMultyRet=%d\n"),nmultyRet);
+//                     TRACE(strTemp);
+// 
+//                     if (nmultyRet>0)
+//                     {
+//                         ID1=read_data[6];
+//                     }
+//                     nmultyRet=Read_Multi(255,&read_data[0],0,10,3);
+// 
+//                     strTemp.Format(_T("nMultyRet=%d\n"),nmultyRet);
+//                     TRACE(strTemp);
+//                     if (nmultyRet>0)
+//                     {
+//                         ID2=read_data[6];
+//                     }
 
 //ISPTool Config
 					#if 1 			 
@@ -5554,13 +6745,13 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				CString subID;*/
 			//	id.Format(_T("%d"),)
 				 
-				 ip=product_Node.BuildingInfo.strIp;
+				 /*ip=product_Node.BuildingInfo.strIp;
 				 ipport=product_Node.BuildingInfo.strIpPort;
 				 if (ID1!=ID2)
 				 {
 				   subID.Format(_T("%d"),g_tstat_id);
 				   subnote.Format(_T("1"));
-				 }
+				 }*/
 
 				// CString ProductHexBinName,StrTemp;
 				// CString StrBinHexPath,StrULRPath;
@@ -5616,7 +6807,16 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					if(nComPort == 0 )
 					{
 						 //nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
-						 AfxMessageBox(_T("Comport is 0,Error"));
+						// AfxMessageBox(_T("Comport is 0,Error"));
+                         if (!m_pDialogInfo->IsWindowVisible())
+                         {
+                             m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Comport is 0,Error"));
+                             m_pDialogInfo->ShowWindow(SW_SHOW);
+                         }	
+//                          while(m_pDialogInfo->IsWindowVisible()){
+//                              Sleep(50);
+//                              continue;
+//                          }
 						 if (pDlg !=NULL)
 						 {
 							 pDlg->ShowWindow(SW_HIDE);
@@ -5629,7 +6829,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					SetCommunicationType(0);
 					if (is_connect())
 					{
-					close_com();
+					   close_com();
 					}
 					Sleep(1000);  
 					BOOL  bret = open_com(nComPort);
@@ -5640,7 +6840,16 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					if (!bret)
 					{
 						strTemp.Format(_T("Open COM%d  Failed,Try again!"),nComPort);
-						AfxMessageBox(strTemp);			
+						//AfxMessageBox(strTemp);
+                        if (!m_pDialogInfo->IsWindowVisible())
+                        {
+                            m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(strTemp);
+                            m_pDialogInfo->ShowWindow(SW_SHOW);
+                        }	
+//                         while(m_pDialogInfo->IsWindowVisible()){
+//                             Sleep(50);
+//                             continue;
+//                         }		
 						if (pDlg !=NULL)
 						{
 							pDlg->ShowWindow(SW_HIDE);
@@ -5698,10 +6907,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 							/*WritePrivateProfileStringW(_T("Setting"),_T("IP Address"),_T("127.0.0.1"),g_configfile_path);
 							strInfo.Format(_T("%d"),m_nIpPort);
 							WritePrivateProfileStringW(_T("Setting"),_T("IP Port"),strInfo,g_configfile_path);
-
 							WritePrivateProfileStringW(_T("Setting"),_T("Response Timeout"),_T("1000"),g_configfile_path);
 							WritePrivateProfileStringW(_T("Setting"),_T("Delay Between Time"),_T("1000"),g_configfile_path);
-
 							WritePrivateProfileStringW(_T("Setting"),_T("Connect Timeout"),_T("3000"),g_configfile_path);*/
 						}
 
@@ -5724,23 +6931,23 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				CString subID;*/
 
 
-						CString ProductHexBinName,StrTemp;
-						CString StrBinHexPath,StrULRPath;
-						GetProductFPTAndLocalPath(product_Node.product_class_id,StrULRPath,ProductHexBinName);
-						StrBinHexPath = g_strExePth;
-						StrBinHexPath+=_T("firmware\\");
+						//CString ProductHexBinName,StrTemp;
+						//CString StrBinHexPath,StrULRPath;
+						//GetProductFPTAndLocalPath(product_Node.product_class_id,StrULRPath,ProductHexBinName);
+						//StrBinHexPath = g_strExePth;
+						//StrBinHexPath+=_T("firmware\\");
 
-						StrTemp.Format(_T("%s\\"),GetProductName(product_Node.product_class_id));
-						StrBinHexPath+=StrTemp;
-						StrBinHexPath+=ProductHexBinName;
+						//StrTemp.Format(_T("%s\\"),GetProductName(product_Node.product_class_id));
+						//StrBinHexPath+=StrTemp;
+						//StrBinHexPath+=ProductHexBinName;
 
-						HANDLE hFind;//
-						WIN32_FIND_DATA wfd;//
-						hFind = FindFirstFile(StrBinHexPath, &wfd);//
-						if ((hFind!=INVALID_HANDLE_VALUE)&&(!StrULRPath.IsEmpty()))//说明当前目录下无t3000.mdb
-						{
-							filename=StrBinHexPath;
-						}
+						//HANDLE hFind;//
+						//WIN32_FIND_DATA wfd;//
+						//hFind = FindFirstFile(StrBinHexPath, &wfd);//
+						//if ((hFind!=INVALID_HANDLE_VALUE)&&(!StrULRPath.IsEmpty()))//说明当前目录下无t3000.mdb
+						//{
+						//	filename=StrBinHexPath;
+						//}
 
 
 			 	id.Format(_T("%d"),g_tstat_id);
@@ -5758,9 +6965,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					subnote,
 					subID);
 #endif
-
-
-
 					}
 				}
 			}
@@ -5775,17 +6979,26 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				//m_nbaudrat=_wtoi(product_Node.BuildingInfo.strBaudRate);
 				g_protocol=MODBUS_RS485;
 				m_nbaudrat= product_Node.baudrate;
-				if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200) && (m_nbaudrat != 38400))
+				if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200) && (m_nbaudrat != 38400)&& (m_nbaudrat != 57600))
 					m_nbaudrat = 19200;
 				Change_BaudRate(m_nbaudrat);
 
 			 
-				register_critical_section.Lock();
-				int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,3);
-				register_critical_section.Unlock();
+                register_critical_section.Lock();
+                int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,3);
+                register_critical_section.Unlock();
 				if(nmultyRet <0)
 				{
-					AfxMessageBox(_T("Your comport is open ,but T3000 can't read your device."));//\nDatabase->Building config Database			
+					//AfxMessageBox(_T("Your comport is open ,but T3000 can't read your device."));//\nDatabase->Building config Database
+                    if (!m_pDialogInfo->IsWindowVisible())
+                    {
+                        m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Your comport is open ,but maybe your device is offline!"));
+                        m_pDialogInfo->ShowWindow(SW_SHOW);
+                    }
+//                     while(m_pDialogInfo->IsWindowVisible()){
+//                         Sleep(50);
+//                         continue;
+//                     }			
 					if (pDlg !=NULL)
 					{
 						pDlg->ShowWindow(SW_HIDE);
@@ -5865,7 +7078,16 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,5);
 				if(nmultyRet <0)
 				{
-					AfxMessageBox(_T("Device is offline,Please check the connection!"));//\nDatabase->Building config Database			
+					//AfxMessageBox(_T("Device is offline,Please check the connection!"));//\nDatabase->Building config Database
+                    if (!m_pDialogInfo->IsWindowVisible())
+                    {
+                        m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Device is offline,Please check the connection!"));
+                        m_pDialogInfo->ShowWindow(SW_SHOW);
+                    }	
+//                     while(m_pDialogInfo->IsWindowVisible()){
+//                         Sleep(50);
+//                         continue;
+//                     }			
 					if (pDlg !=NULL)
 					{
 						pDlg->ShowWindow(SW_HIDE);
@@ -5885,20 +7107,29 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					{
 						CString tempcs;
 						tempcs.Format(_T("Product ID is invalid .Product id is %d \r\n"),Device_Type);
+                        if (!m_pDialogInfo->IsWindowVisible())
+                        {
+                            m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(tempcs);
+                            m_pDialogInfo->ShowWindow(SW_SHOW);
+                        }	
+//                         while(m_pDialogInfo->IsWindowVisible()){
+//                             Sleep(50);
+//                             continue;
+//                         }
 						if (pDlg !=NULL)
 						{
 							pDlg->ShowWindow(SW_HIDE);
 							delete pDlg;
 							pDlg=NULL;
 						}
-						MessageBox(tempcs);
+						//MessageBox(tempcs);
 
 						return;
 
 					}
 					if(nSerialNumber>=0)
 					{
-						//if(nSerialNumber==nSelectSerialNumber)
+//if(nSerialNumber==nSelectSerialNumber)
 							bOnLine=TRUE;
 // 						else
 // 						{
@@ -5913,7 +7144,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			if(bOnLine)
 			{ 
 				//SetPaneConnectionPrompt(_T("Online!"));
-				pDlg->ShowWindow(SW_SHOW);
+				pDlg->ShowWindow(SW_HIDE);
+                m_pTreeViewCrl->SetSelectItem(hTreeItem);//在线的时候才将颜色变红;
+                m_pTreeViewCrl->SetSelectSerialNumber(product_Node.serial_number);
+                g_selected_serialnumber = m_product.at(i).serial_number;
 				m_pTreeViewCrl->turn_item_image(hSelItem ,true);
 				m_nStyle=1;
 			}
@@ -5947,7 +7181,11 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			//Device_Type=read_one(g_tstat_id,7,10);
 			CString achive_file_path;
 			CString temp_serial;
-			temp_serial.Format(_T("%d.prg"),nSerialNumber);
+			temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
+            if (Device_Type == 0)
+            {
+            Device_Type=Scan_Product_ID;
+            }
 			achive_file_path = g_achive_folder + _T("\\") + temp_serial;
 			if(/*Load_Product_Value_Cache(achive_file_path) < 0*/1 ){
 			if (Device_Type==100)
@@ -5973,7 +7211,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						if (pDlg!=NULL)
 						{
 							progress=float((it+1)*(100/12));
-							pDlg->ShowProgress(int(progress),(int)progress);
+							//pDlg->ShowProgress(int(progress),(int)progress);
+							g_progress_persent = progress;
 						} 
 					}							
 					it++;
@@ -5983,7 +7222,17 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
 				if (it<12)
 				{	
-					AfxMessageBox(_T("Reading abnormal \n Try again!"));
+					//AfxMessageBox(_T("Reading abnormal \n Try again!"));
+                    if (!m_pDialogInfo->IsWindowVisible())
+                    {
+                        m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Reading abnormal \n Try again!"));
+                        m_pDialogInfo->ShowWindow(SW_SHOW);
+                    }	
+//                     while(m_pDialogInfo->IsWindowVisible()){
+//                         Sleep(50);
+//                         continue;
+//                     }
+
 					pDlg->ShowWindow(SW_HIDE);
 					if(pDlg!=NULL)
 						delete pDlg;
@@ -6026,7 +7275,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 						if (pDlg!=NULL)
 						{
 							progress=float((it+1)*(100/(9*power_value)));
-							pDlg->ShowProgress(int(progress),int(progress));
+							//pDlg->ShowProgress(int(progress),int(progress));
+							g_progress_persent = progress;
 						} 
 					}							
 					it++;
@@ -6034,6 +7284,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				}
 				g_tstat_id_changed=FALSE;
 				register_critical_section.Unlock();
+
 #if 0
 				for(i=0;i<(13*power_value);i++)	//暂定为0 ，因为TSTAT6 目前为600多
 				{
@@ -6059,6 +7310,75 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				 memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
 			
 				 nFlag = Device_Type; 
+                if ((nFlag == PM_TSTAT6||nFlag == PM_TSTAT7) && product_register_value[714] == 0x56)
+                {  
+                    CString TstatName,TstatDBName;
+                   
+                    CBADO bado;
+                    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+                    bado.OnInitADOConn(); 
+                    CString strSerial;
+                    strSerial.Format(_T("%d"),get_serialnumber());
+                   
+                  #if 1 // 点击的时候把新的Tstat6的名字写到Tstat6的寄存器中
+                 CString temp_serial_number;
+                 CString newname;
+                 CString strSql;
+                  
+
+                 
+                 temp_serial_number.Format(_T("%u"),g_selected_serialnumber);
+
+                 int temp_write_flag = GetPrivateProfileInt(temp_serial_number,_T("WriteFlag"),0,g_achive_device_name_path);
+                 if (temp_write_flag == 1)
+                 {
+                      GetPrivateProfileStringW(temp_serial_number,_T("NewName"),_T(""),newname.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
+                     if(newname.GetLength()> 16)	//长度不能大于结构体定义的长度;
+                     {
+                         newname.Delete(16,newname.GetLength()-16);
+                     }
+                     char cTemp1[16];
+                     memset(cTemp1,0,16);
+                     WideCharToMultiByte( CP_ACP, 0, newname.GetBuffer(), -1, cTemp1, 16, NULL, NULL ); 
+                     unsigned char Databuffer[16];
+                     memcpy_s(Databuffer,16,cTemp1,16);
+                     if (Write_Multi(g_tstat_id,Databuffer,715,16,3)>0)
+                     {
+                         for (int i=0;i<16;i++)
+                         {
+                             product_register_value[715+i]=Databuffer[i];
+                         }
+                       
+                       
+                        
+                         
+                         strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),newname,strSerial);
+                         bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                        
+                         WritePrivateProfileStringW(temp_serial_number,_T("WriteFlag"),L"0",g_achive_device_name_path);
+                         PostMessage(WM_MYMSG_REFRESHBUILDING,0,0); 
+                     }
+                 }
+
+
+                 strSql.Format(_T("select * from  ALL_NODE  where Serial_ID='%s'"),strSerial);
+                 bado.m_pRecordset = bado.OpenRecordset(strSql);
+                 if (!bado.m_pRecordset->EndOfFile)
+                 {
+                     TstatDBName = bado.m_pRecordset->GetCollect(_T("Product_name"));
+                 }
+                 bado.CloseRecordset();
+                  TstatName.Format(_T("%s%s"),GetTextFromReg(715),GetTextFromReg(719));
+                  if (TstatName.CompareNoCase(TstatDBName)!=0)
+                  {
+                      strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),TstatName,strSerial);
+                      bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                      PostMessage(WM_MYMSG_REFRESHBUILDING,0,0); 
+                  }
+                 bado.CloseConn();
+                 #endif
+                }
+                
 				 {
 					 if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) )
 					 {
@@ -6077,7 +7397,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					 {
 						 product_type=CS3000;
 					 }
-					 else if (nFlag==PM_T3PT10||nFlag==PM_T3IOA||nFlag==PM_T332AI||nFlag== PM_T38AI16O||nFlag==PM_T38I13O||nFlag==PM_T34AO||nFlag==PM_T36CT||nFlag==PM_T3PERFORMANCE)
+					 else if (nFlag==PM_T3PT10||nFlag==PM_T3IOA||nFlag==PM_T332AI||nFlag== PM_T38AI16O||nFlag==PM_T38I13O||
+                             nFlag==PM_T34AO||nFlag==PM_T36CT||nFlag==PM_T3PERFORMANCE||
+                             nFlag == PM_T322AI||
+                             nFlag == PM_T38AI8AO6DO)
 					 {
 						 product_type=T3000_T3_MODULES;
 					 }
@@ -6098,6 +7421,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					 }
 					 
 				 }
+
+                
+
 				 GetIONanme();
 				 if (product_type==T3000_6_ADDRESS)
 				 {
@@ -6121,7 +7447,16 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				 
 				if (it<9)
 				{	
-					AfxMessageBox(_T("Reading abnormal \n Try again!"));
+					//AfxMessageBox(_T("Reading abnormal \n Try again!"));
+                    if (!m_pDialogInfo->IsWindowVisible())
+                    {
+                        m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Reading abnormal \n Try again!"));
+                        m_pDialogInfo->ShowWindow(SW_SHOW);
+                    }	
+//                     while(m_pDialogInfo->IsWindowVisible()){
+//                         Sleep(50);
+//                         continue;
+//                     }
 					pDlg->ShowWindow(SW_HIDE);
 					if(pDlg!=NULL)
 						delete pDlg;
@@ -6140,7 +7475,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				}
 				
 			}
-             // Save_Product_Value_Cache(achive_file_path);
+           Save_Product_Value_Cache(achive_file_path);
            }
 		   else{
 			   pDlg->ShowProgress(100,100);
@@ -6251,7 +7586,16 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			if(nFlag >65530)
 			{
 
-				AfxMessageBox(_T("Reading product model abnormal \n Try again!"));
+				//AfxMessageBox(_T("Reading product model abnormal \n Try again!"));
+                if (!m_pDialogInfo->IsWindowVisible())
+                {
+                    m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Reading abnormal \n Try again!"));
+                    m_pDialogInfo->ShowWindow(SW_SHOW);
+                }	
+//                 while(m_pDialogInfo->IsWindowVisible()){
+//                     Sleep(50);
+//                     continue;
+//                 }
 				if (pDlg !=NULL)
 				{
 					pDlg->ShowWindow(SW_HIDE);
@@ -6279,7 +7623,6 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
               
                 SwitchToPruductType(DLG_DIALOGT38AI8AO);
             }
-
             else if (nFlag== PM_T38I13O)
             {
                  
@@ -6322,7 +7665,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				 g_HumChamberThread=TRUE;
 				SwitchToPruductType(DLG_HUMCHAMBER);
 			}
-			else if(nFlag == PM_CO2_RS485)//(nFlag == PM_CO2_NET)||
+			else if(nFlag == PM_CO2_RS485||nFlag == PM_PRESSURE_SENSOR)//(nFlag == PM_CO2_NET)||
 			{
 				SwitchToPruductType(DLG_CO2_VIEW);
 			}
@@ -6333,76 +7676,45 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			
 			else if (nFlag==PM_PRESSURE)
 			{
-			 SwitchToPruductType(DLG_DIALOG_PRESSURE_SENSOR);
+			    SwitchToPruductType(DLG_DIALOG_PRESSURE_SENSOR);
 			}
 			else if (nFlag==PM_AirQuality||nFlag==PM_HUM_R||nFlag==PM_HUMTEMPSENSOR)
 			{
-			SwitchToPruductType(DLG_AIRQUALITY_VIEW);
+			    SwitchToPruductType(DLG_AIRQUALITY_VIEW);
 			}
 			else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i)
 			{
-			//DLG_T3000_VIEW
-			 SwitchToPruductType(DLG_T3000_VIEW);
-			 bacnet_view_number = TYPE_TSTAT;
-			//SwitchToPruductType(DLG_BACNET_VIEW);
- 		//	if(pDialog[WINDOW_INPUT] != NULL)
- 		//	{
- 		//		if(pDialog[WINDOW_INPUT]->IsWindowVisible() == false)
- 		//		{
- 		//			for (int i=0;i<WINDOW_TAB_COUNT;i++)
- 		//			{
- 		//				pDialog[i]->ShowWindow(SW_HIDE);
- 		//			}
- 		//			pDialog[WINDOW_INPUT]->ShowWindow(SW_SHOW);
- 		//		}
- 		//		//((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
- 		//		((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_INPUT);
- 		//		Input_Window->m_input_list.SetFocus();
- 
- 		//		bacnet_view_number = TYPE_INPUT;
- 		//		g_hwnd_now = m_input_dlg_hwnd;
- 
- 		//	}
-			////::PostMessage(g_hwnd_now,WM_INITIAL_BAC_INPUT_LIST,0,0);
-			//  ::PostMessage(g_hwnd_now,WM_REFRESH_BAC_INPUT_LIST,0,0);
+			
+                CString g_configfile_path =g_strExePth + g_strStartInterface_config;
+               int m_lastinterface=GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path);
+              if (DLG_T3000_VIEW!= m_lastinterface&&DLG_DIALOG_TSTAT_INPUT_VIEW!=m_lastinterface&&DLG_DIALOG_TSTAT_OUTPUT_VIEW!=m_lastinterface)
+              {
+                 m_lastinterface=DLG_T3000_VIEW ;
+              }
+              
+               
+			   SwitchToPruductType(m_lastinterface);
 			}
 			else if (nFlag==PM_CS_SM_AC||nFlag==PM_CS_SM_DC||nFlag==PM_CS_RSM_AC||nFlag==PM_CS_RSM_DC)
 			{
-// 				SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);	
-// 				bacnet_view_number = TYPE_TSTAT;
 
-					SwitchToPruductType(DLG_BACNET_VIEW);
-					if(pDialog[WINDOW_INPUT] != NULL)
-					{
-						if(pDialog[WINDOW_INPUT]->IsWindowVisible() == false)
-						{
-							for (int i=0;i<WINDOW_TAB_COUNT;i++)
-							{
-								pDialog[i]->ShowWindow(SW_HIDE);
-							}
-							pDialog[WINDOW_INPUT]->ShowWindow(SW_SHOW);
-						}
-						//((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
-						((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_INPUT);
-						Input_Window->m_input_list.SetFocus();
-						bacnet_view_number = TYPE_INPUT;
-						g_hwnd_now = m_input_dlg_hwnd;
-
-					}
-				 
-				  ::PostMessage(g_hwnd_now,WM_REFRESH_BAC_INPUT_LIST,0,0);
+                 SwitchToPruductType(DLG_DIALOG_TSTAT_INPUT_VIEW);
 			}
-			else if(nFlag<PM_NC)	
+            else if (nFlag == PM_T322AI || nFlag == CS3000 || nFlag == PM_T38AI8AO6DO)
+             {
+                bacnet_view_number = TYPE_TSTAT;
+                SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
+            }
+            else if(nFlag<PM_NC)	
 			{	
 
 				//Use product_type to change the address map
 				//if product module is TSTAT6 or TSTAT7 use T3000_6_ADDRESS. T3000_6_ADDRESS is a register table in t3000.mdb  T3000_Register_Address_By_Name
 				//else if product module is PM_TSTAT5E PM_TSTAT5H use T3000_5EH_LCD_ADDRESS
 				//else if product module is TSTAT5 ABCDFG USE T3000_5ABCDFG_LED_ADDRESS
-				//Fance_
 				if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) )
 				{
-					product_type =T3000_6_ADDRESS;
+					product_type = T3000_6_ADDRESS;
 				}
 				else if((nFlag == PM_TSTATRUNAR)||(nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H)||(nFlag==PM_TSTAT5G))
 				{
@@ -6424,95 +7736,19 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 					old_product_type = product_type;
 					MyRegAddress.Change_Register_Table();
 				}
-				//20120426
-				/*
-				if ((nFlag == PM_TSTAT6)||(nFlag == PM_TSTAT7)||(nFlag == PM_TSTAT5i))
-				{
-					//multi_register_value[]列表交换。
-					//读取TXT
-					if (FistWdb)
-					{
-						Updata_db_tstat6(nFlag);
-						FistWdb = FALSE;
-					}
- 					if ((nFlag == PM_TSTAT6&& flagsoftwareversion >35.5)||(nFlag == PM_TSTAT7)||(nFlag == PM_TSTAT5i))
- 					{
- 						memset(tempchange,0,sizeof(tempchange));
- 						memset(newtstat6,0,sizeof(newtstat6));
- 						memcpy(newtstat6,multi_register_value,sizeof(newtstat6));
- 
- 						if (FlagSerialNumber== 0)
- 						{
- 							FlagSerialNumber = nSelectSerialNumber;
- 							int inum = 345;
- 							for (int i =0;i<6;i++)
- 							{
- 								tstat6flex[i]=newtstat6[inum]/10;
- 								inum++;
- 							}
- 
- 							inum = 352;
- 							for (int i =6;i<10;i++)
- 							{
- 								tstat6flex[i]=newtstat6[inum]/10;
- 								inum++;
- 							}
- 							tstat6flex[10] =newtstat6[365];
- 							tstat6flex[11] =newtstat6[366];
- 						}
- 						else if (FlagSerialNumber!=nSelectSerialNumber)
- 						{
- 							int inum = 345;
- 							for (int i =0;i<6;i++)
- 							{
- 								tstat6flex[i]=newtstat6[inum];
- 								inum++;
- 							}
- 
- 							inum = 352;
- 							for (int i =6;i<10;i++)
- 							{
- 								tstat6flex[i]=newtstat6[inum];
- 								inum++;
- 							}
- 							tstat6flex[10] =newtstat6[365];
- 							tstat6flex[11] =newtstat6[366];
- 
- 							//	 365	1	Low byte	W/R	MAX_SETPOINT, Setpoint high, the highest setpoint a user will be able to set from the keypad.
- 							//	 366	1	Low byte	W/R	MIN_SETPOINT, Setpoint Low, the lowest setpoint a user will be able to set from the keypad. 
- 
- 						}
- 
- 
- 						int index = 0;
- 
- 						for (int i = 0;i<512;i++)
- 						{
- 							index = reg_tstat6[i];
- 							tempchange[index] = multi_register_value[i];
- 						}
- 
- 
- 
- 						memcpy(multi_register_value,tempchange,sizeof(multi_register_value));
- 					}
- 
- 				}
- 				else
- 				{
- 					memset(newtstat6,0,sizeof(newtstat6));
- 				}
-				*/
-				 
-				 
-					SwitchToPruductType(DLG_T3000_VIEW);
+				SwitchToPruductType(DLG_T3000_VIEW);
 			 
 				
 				bacnet_view_number = TYPE_TSTAT;
 
 			}		
 			
-		}
+
+            if (Scan_Product_ID == 210)
+            {
+                 SwitchToPruductType(DLG_DIALOG_BOATMONITOR);
+            }
+		}    
 	}
    ado.CloseConn();
 
@@ -6524,33 +7760,33 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 //  Added by zgq;2010-11-29;添加初始化TreeCtrl，希望在程序初始化完成后
 //  TreeCtrl能够反应设备的连接状况。
 //  方法：遍历TreeCtrl，分别去连接每一个Node，并根据状态修改其显示
-void CMainFrame::InitTreeNodeConn()
-{
-	// find the currently selected item
-	HTREEITEM hCurSel = m_pTreeViewCrl->GetNextItem(TVI_ROOT, TVGN_ROOT);
-
-	// report it to the user
-	if (hCurSel == NULL)
-	{
-		AfxMessageBox(_T("There is no selected item"));
-	}
-	else
-	{
-		CString str;
-		str.Format(_T("The currently selected item is \"%s\""),(LPCTSTR)m_pTreeViewCrl->GetItemText(hCurSel));
-		//AfxMessageBox((LPCTSTR)str);
-	}
-	
-	vector<HTREEITEM> szTreeItems;
-	szTreeItems.push_back(hCurSel);
-	GetAllTreeItems(hCurSel, szTreeItems );
-
-	for( UINT i = 0 ; i < szTreeItems.size(); i++)
-	{
-		HTREEITEM hItem = szTreeItems[i];
-		DoConnectToANode(hItem);
-	}
-}
+// void CMainFrame::InitTreeNodeConn()
+// {
+// 	// find the currently selected item
+// 	HTREEITEM hCurSel = m_pTreeViewCrl->GetNextItem(TVI_ROOT, TVGN_ROOT);
+// 
+// 	// report it to the user
+// 	if (hCurSel == NULL)
+// 	{
+// 		AfxMessageBox(_T("There is no selected item"));
+// 	}
+// 	else
+// 	{
+// 		CString str;
+// 		str.Format(_T("The currently selected item is \"%s\""),(LPCTSTR)m_pTreeViewCrl->GetItemText(hCurSel));
+// 		//AfxMessageBox((LPCTSTR)str);
+// 	}
+// 	
+// 	vector<HTREEITEM> szTreeItems;
+// 	szTreeItems.push_back(hCurSel);
+// 	GetAllTreeItems(hCurSel, szTreeItems );
+// 
+// 	for( UINT i = 0 ; i < szTreeItems.size(); i++)
+// 	{
+// 		HTREEITEM hItem = szTreeItems[i];
+// 		DoConnectToANode(hItem);
+// 	}
+// }
 
 
 void CMainFrame::GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItems  )
@@ -6563,12 +7799,12 @@ void CMainFrame::GetAllTreeItems( HTREEITEM hItem, vector<HTREEITEM>& szTreeItem
 	}
 	
 	{
-		hTemp = m_pTreeViewCrl->GetNextItem(hItem, TVGN_CHILD);
-		if (hTemp != NULL)
-		{
-			szTreeItems.push_back(hTemp);
-			GetAllTreeItems(hTemp, szTreeItems);
-		}	
+        hTemp = m_pTreeViewCrl->GetNextItem(hItem, TVGN_CHILD);
+        if (hTemp != NULL)
+        {
+            szTreeItems.push_back(hTemp);
+            GetAllTreeItems(hTemp, szTreeItems);
+        }	
 	}	
 }
 
@@ -6588,7 +7824,7 @@ BOOL CMainFrame::CheckDeviceStatus(int refresh_com)
 
 		BOOL bOnLine=FALSE;
 		UINT nSerialNumber=0;
-		int nID;
+ 
 		bool temp_online = false;
 		tree_product tp = m_product.at(i);
 		if(m_strCurSubBuldingName.CompareNoCase(tp.BuildingInfo.strBuildingName)==0)
@@ -6788,13 +8024,10 @@ end_condition :
 					}
 				}
 		}
-
 			m_product.at(i).status_last_time[2] = m_product.at(i).status_last_time[1] ;
 			m_product.at(i).status_last_time[1] = m_product.at(i).status_last_time[0] ;
 			m_product.at(i).status_last_time[0] = temp_online ;	
 			m_product.at(i).status = m_product.at(i).status_last_time[0] || m_product.at(i).status_last_time[1] || m_product.at(i).status_last_time[2];
-
-
 	}
 
 
@@ -6820,17 +8053,26 @@ end_condition :
 				break;
 			}
 		}
-		CString str_hw_instance;
-		CString str_sw_panel_number;
-		str_hw_instance.Format(_T("%u"),m_refresh_net_device_data.at(y).object_instance);
-		str_sw_panel_number.Format(_T("%u"),m_refresh_net_device_data.at(y).panal_number);
+		CString str_object_instance;
+		CString str_panel_number;
+		CString str_hw_version;
+		CString str_fw_version;
+		str_hw_version.Format(_T("%u"),m_refresh_net_device_data.at(y).hw_version);
+		str_fw_version.Format(_T("%u"),m_refresh_net_device_data.at(y).sw_version);
+
+		str_object_instance.Format(_T("%u"),m_refresh_net_device_data.at(y).object_instance);
+		str_panel_number.Format(_T("%u"),m_refresh_net_device_data.at(y).panal_number);
 		if(db_exsit)	//数据库存在，就查看是否要更新;
 		{
 				if((m_refresh_net_device_data.at(y).ip_address.CompareNoCase(m_product.at(n_index).BuildingInfo.strIp) != 0) ||
 				   (m_refresh_net_device_data.at(y).NetCard_Address.CompareNoCase(m_product.at(n_index).NetworkCard_Address) != 0) ||
 					(m_refresh_net_device_data.at(y).nport != m_product.at(n_index).ncomport) ||
 					(m_refresh_net_device_data.at(y).modbusID != m_product.at(n_index).product_id) ||
-					((m_product.at(n_index).protocol != MODBUS_TCPIP) && (m_product.at(n_index).protocol != PROTOCOL_BACNET_IP) && (m_product.at(n_index).protocol != PROTOCOL_BIP_TO_MSTP)    ))
+					(m_refresh_net_device_data.at(y).parent_serial_number != m_product.at(n_index).note_parent_serial_number) ||
+					((m_product.at(n_index).protocol != MODBUS_TCPIP) && (m_product.at(n_index).protocol != PROTOCOL_BACNET_IP) && (m_product.at(n_index).protocol != PROTOCOL_BIP_TO_MSTP)) ||
+					((m_refresh_net_device_data.at(y).panal_number != m_product.at(n_index).panel_number) && (m_refresh_net_device_data.at(y).panal_number != 0)) ||
+					((m_refresh_net_device_data.at(y).object_instance != m_product.at(n_index).object_instance) && (m_refresh_net_device_data.at(y).object_instance != 0)) || 
+					((m_refresh_net_device_data.at(y).show_label_name.CompareNoCase(m_product.at(n_index).NameShowOnTree) != 0)&& (!m_refresh_net_device_data.at(y).show_label_name.IsEmpty())))
 				{
 					 
 					find_new_device = 1;
@@ -6841,48 +8083,71 @@ end_condition :
 					CString str_modbus_id;
 					CString str_Product_name_view;
 					CString NetwordCard_Address;
+					CString str_parents_serial;
 					str_ip_address_exist = m_refresh_net_device_data.at(y).ip_address;
 					str_n_port.Format(_T("%d"),m_refresh_net_device_data.at(y).nport);
 
 					str_serialid.Format(_T("%u"),m_refresh_net_device_data.at(y).nSerial);
 					str_modbus_id.Format(_T("%d"),m_refresh_net_device_data.at(y).modbusID);
 					NetwordCard_Address=m_refresh_net_device_data.at(y).NetCard_Address;
+
+					if(m_refresh_net_device_data.at(y).parent_serial_number != 0)
+					{
+						str_parents_serial.Format(_T("%u"),m_refresh_net_device_data.at(y).parent_serial_number);
+					}
+					else
+					{
+						str_parents_serial = _T("0");
+					}
+
 					try
 					{
 						CString temp_pname;
 						CString temp_modbusid;
 						temp_modbusid.Format(_T("%d"),m_refresh_net_device_data.at(y).modbusID);
 						temp_pname = GetProductName(m_refresh_net_device_data.at(y).product_id);
-						str_Product_name_view = temp_pname + _T(":") + str_serialid + _T("-") + temp_modbusid + _T("-") + str_ip_address_exist;
-
-						if(m_refresh_net_device_data.at(y).ip_address.CompareNoCase(m_product.at(n_index).BuildingInfo.strIp) != 0)
+						if(m_refresh_net_device_data.at(y).show_label_name.IsEmpty())
 						{
-							if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0))
-							{
-								CString temp_pro;
-								temp_pro.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
-								strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Hardware_Ver = '%s' , Software_Ver = '%s' , Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1 where Serial_ID = '%s'"),NetwordCard_Address,str_hw_instance,str_sw_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,temp_pro,str_Product_name_view,str_serialid);
-							}
-							else
-								strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s',  Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='1',Product_name = '%s',Online_Status = 1 where Serial_ID = '%s'"),NetwordCard_Address,str_ip_address_exist,str_n_port,str_modbus_id,str_Product_name_view,str_serialid);
-							find_new_device = true;
+						  str_Product_name_view = temp_pname + _T(":") + str_serialid + _T("-") + temp_modbusid + _T("-") + str_ip_address_exist;
+						}
+						else if(m_refresh_net_device_data.at(y).product_id == PM_TSTAT7)	//TSTAT7 不支持写 label名字;
+						{
+							str_Product_name_view = temp_pname + _T(":") + str_serialid + _T("-") + temp_modbusid + _T("-") + str_ip_address_exist;
 						}
 						else
 						{
-							if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0))
+							str_Product_name_view = m_refresh_net_device_data.at(y).show_label_name;
+						}
+					
+						bool is_bacnet_device = false;
+						if((m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL) || (m_refresh_net_device_data.at(y).product_id == PM_CM5))
+							is_bacnet_device = true;
+
+						//if(m_refresh_net_device_data.at(y).ip_address.CompareNoCase(m_product.at(n_index).BuildingInfo.strIp) != 0)
+						//{
+							if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device && (m_refresh_net_device_data.at(y).parent_serial_number != 0))
 							{
-								CString temp_pro1;
-								temp_pro1.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
-								strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Hardware_Ver = '%s' , Software_Ver = '%s' , Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1 where Serial_ID = '%s'"),NetwordCard_Address,str_hw_instance,str_sw_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,temp_pro1,str_Product_name_view,str_serialid);
+								//str_Product_name_view = str_Product_name_view ;
+								CString temp_pro;
+								temp_pro.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
+								strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Object_Instance = '%s' , Panal_Number = '%s' , Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1 ,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,str_object_instance,str_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,temp_pro,str_Product_name_view,str_parents_serial,str_serialid);
 							}
 							else
-								strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s',  Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='1',Online_Status = 1 where Serial_ID = '%s'"),NetwordCard_Address,str_ip_address_exist,str_n_port,str_modbus_id,str_serialid);
-						}
+								strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Object_Instance = '%s' , Panal_Number = '%s' ,  Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='1',Product_name = '%s',Online_Status = 1,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,str_object_instance,str_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,str_Product_name_view,str_parents_serial,str_serialid);
+							find_new_device = true;
+						//}
+						//else
+						//{
+						//	if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device)
+						//	{
+						//		CString temp_pro1;
+						//		temp_pro1.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
+						//		strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Object_Instance = '%s' , Panal_Number = '%s' , Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,str_object_instance,str_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,temp_pro1,str_Product_name_view,str_parents_serial,str_serialid);
+						//	}
+						//	else
+						//		strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s',  Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='1',Online_Status = 1,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,str_ip_address_exist,str_n_port,str_modbus_id,str_parents_serial,str_serialid);
+						//}
 						    bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
-						//strSql.Format(_T("update ALL_NODE set Com_Port ='%s' where Serial_ID = '%s'"),str_n_port,str_serialid);
-						//m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
-						//strSql.Format(_T("update ALL_NODE set Product_ID ='%s' where Serial_ID = '%s'"),str_modbus_id,str_serialid);
-						//m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
 					}
 					catch(_com_error *e)
 					{
@@ -6906,7 +8171,8 @@ end_condition :
 			CString modbusid;
 			CString product_class_id;
 			CString NetwordCard_Address;
-
+			CString str_parents_serial;
+            CString is_custom;
 			/*m_pCon.CreateInstance(_T("ADODB.Connection"));
 			m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);*/
 
@@ -6917,22 +8183,49 @@ end_condition :
 
 			str_serialid.Format(_T("%u"),m_refresh_net_device_data.at(y).nSerial);
 			product_class_id.Format(_T("%d"),m_refresh_net_device_data.at(y).product_id);
+            if (m_refresh_net_device_data.at(y).product_id > 200)
+            {
+                is_custom = _T("1");
+            }
+            else
+            {
+              is_custom = _T("0");  
+            }
 			product_name = GetProductName(m_refresh_net_device_data.at(y).product_id);
 			if(product_name.IsEmpty())
-				continue;
+				{
+                    if (m_refresh_net_device_data.at(y).product_id<200)
+                    {
+                     continue;
+                    }
+                     product_name = m_refresh_net_device_data.at(y).show_label_name;
+                }
+                
+            
+			if(m_refresh_net_device_data.at(y).parent_serial_number != 0)
+			{
+				str_parents_serial.Format(_T("%u"),m_refresh_net_device_data.at(y).parent_serial_number);
+			}
+			else
+			{
+				str_parents_serial = _T("0");
+			}
 			find_new_device = true;
 			product_name = product_name + _T(":") + str_serialid + _T("-") + modbusid + _T("-") + str_ip_address;
 			NetwordCard_Address=m_refresh_net_device_data.at(y).NetCard_Address;
 			//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,NetworkCard_Address,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Online_Status)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','"+NetwordCard_Address+"','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','0','0','"+str_n_port+"','0','1')"));
-			if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0))
+			bool is_bacnet_device = false;
+			if((m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL) || (m_refresh_net_device_data.at(y).product_id == PM_CM5))
+				is_bacnet_device = true;
+			if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device && (m_refresh_net_device_data.at(y).parent_serial_number != 0))
 			{
-				product_name = product_name + _T("-Subclass");
+				product_name = product_name ;
 				CString temp_pro2;
 				temp_pro2.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
-				strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_instance+"','"+str_sw_panel_number+"','"+str_n_port+"','0','"+temp_pro2+"','1')"));
+				strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','0','"+temp_pro2+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
 			}
 			else
-				strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Online_Status)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','0','0','"+str_n_port+"','0','1')"));
+				strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','0','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
 
 			 try
 			{
@@ -6959,7 +8252,8 @@ LRESULT  CMainFrame::RefreshTreeViewMap(WPARAM wParam, LPARAM lParam)
 	for(UINT i=0;i<m_product.size();i++)
 	{
  		tree_product tp = m_product.at(i);
-		if(tp.status>0)  // 如果online，更新显示图片
+		if(tp.status>0)  
+        // 如果online，更新显示图片
 		{
 			if(selected_product_index == i)
 			{
@@ -7038,6 +8332,11 @@ UINT _FreshTreeView(LPVOID pParam )
 		{
 			Sleep(4000);
 		}
+        if(g_bPauseMultiRead)
+        {
+            Sleep(10);
+            continue;
+        }
 		pMain->m_frist_start = false;
 		while(1)
 		{
@@ -7159,7 +8458,7 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam,LPARAM lParam)
 		Monitor_Window->Unreg_Hotkey();
 	}
 	//判断响应了什么热键   
-	if( MOD_ALT == fuModifiers && 'S' == uVirtKey )  //Screen
+	if( MOD_ALT == fuModifiers && 'G' == uVirtKey )  //Screen
 	{  
 		OnControlScreens();
 		//AfxMessageBox(_T("你按下了组合键 alt + m"));    
@@ -7180,35 +8479,47 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam,LPARAM lParam)
 	{
 		OnControlVariables();
 	}
-	else if(MOD_ALT == fuModifiers && 'C' == uVirtKey)//Controllers
+	else if(MOD_ALT == fuModifiers && 'L' == uVirtKey)
 	{
 		OnControlControllers();
 	}
-	else if(MOD_ALT == fuModifiers && 'W' == uVirtKey)//Weekly routines
+	else if(MOD_ALT == fuModifiers && 'S' == uVirtKey)
 	{
 		OnControlWeekly();
 	}
-	else if(MOD_ALT == fuModifiers && 'A' == uVirtKey)//Annual Routines
+	else if(MOD_ALT == fuModifiers && 'H' == uVirtKey)
 	{
 		OnControlAnnualroutines();
 	}
-	else if(MOD_ALT == fuModifiers && 'G' == uVirtKey)//Annual Routines
+	else if(MOD_ALT == fuModifiers && 'T' == uVirtKey)
 	{
 		OnControlMonitors();
 	}
-	else if(MOD_ALT == fuModifiers && 'L' == uVirtKey)//Annual Routines
+	else if(MOD_ALT == fuModifiers && 'A' == uVirtKey)
 	{
 		OnControlAlarmLog();
 	}
-	else if(MOD_ALT == fuModifiers && 'U' == uVirtKey)//Annual Routines
+	else if(MOD_ALT == fuModifiers && 'U' == uVirtKey)
 	{
 		OnControlCustomerunits();
 	}
-	else if(MOD_SHIFT == fuModifiers && 'D' == uVirtKey)//Annual Routines
+	else if(MOD_ALT == fuModifiers && 'C' == uVirtKey)
+	{
+		OnControlSettings();
+	}
+	else if(MOD_ALT == fuModifiers && 'B' == uVirtKey)
+	{
+		OnAddBuildingConfig();
+	}
+	else if(MOD_ALT == fuModifiers && 'D' == uVirtKey)
+	{
+		OnScanDevice();
+	}
+	else if((MOD_SHIFT | MOD_CONTROL | MOD_ALT) == fuModifiers && 'D' == uVirtKey)//Annual Routines
 	{
 		enable_show_debug_window = true;
 	}
-	else if(MOD_SHIFT == fuModifiers && 'F' == uVirtKey)//Annual Routines
+	else if((MOD_SHIFT | MOD_CONTROL | MOD_ALT) == fuModifiers && 'F' == uVirtKey)//Annual Routines
 	{
 		if(enable_show_debug_window)
 			ShowDebugWindow();
@@ -8125,7 +9436,7 @@ myend:
 //const int WRITE_ONE_FAIL_LIST =2 ;
 //const int WRITE_MULTI_SUCCESS_LIST =3 ;
 //const int WRITE_MULTI_FAIL_LIST =4 ;
-
+      
 //Code by Fance
 //Use background thread deal all data
 DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
@@ -8206,26 +9517,26 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 							{   
 								if (My_Write_Struct->mRow>=1&&My_Write_Struct->mRow<=8)
 								{							
-									int m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
-									CBADO ado;
-									ado.SetDBPath(g_strCurBuildingDatabasefilePath);
-									ado.OnInitADOConn();
-									CString sql;
-									sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),My_Write_Struct->mRow,m_sn);
-									ado.m_pRecordset=ado.OpenRecordset(sql);
+									//int m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
+									//CBADO ado;
+									//ado.SetDBPath(g_strCurBuildingDatabasefilePath);
+									//ado.OnInitADOConn();
+									//CString sql;
+									//sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),My_Write_Struct->mRow,m_sn);
+									//ado.m_pRecordset=ado.OpenRecordset(sql);
 
-									if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
-									{
-										sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),My_Write_Struct->db_value,My_Write_Struct->mRow,m_sn);
-										ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-									}
-									else
-									{
-										sql.Format(_T("Insert into Value_Range ( SN,CInputNo,CRange) values('%d','%d','%d')"),m_sn,My_Write_Struct->mRow,My_Write_Struct->db_value);
-										ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-									}
-									ado.CloseRecordset();
-									ado.CloseConn();
+									//if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+									//{
+									//	sql.Format(_T("update Value_Range set CRange = %d where CInputNo=%d and SN=%d "),My_Write_Struct->db_value,My_Write_Struct->mRow,m_sn);
+									//	ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+									//}
+									//else
+									//{
+									//	sql.Format(_T("Insert into Value_Range ( SN,CInputNo,CRange) values('%d','%d','%d')"),m_sn,My_Write_Struct->mRow,My_Write_Struct->db_value);
+									//	ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+									//}
+									//ado.CloseRecordset();
+									//ado.CloseConn();
 								}
 
 
@@ -8288,27 +9599,30 @@ DWORD WINAPI  CMainFrame::Translate_My_Message(LPVOID lpVoid)
 						::PostMessage(My_Write_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_MULTI_FAIL_LIST,(LPARAM)My_Write_Struct);
 					}
 					else
-					{    UNION_INPUT_NAME inputname;
-					    
-						 inputname.char_name[0]=My_Write_Struct->RegValue[1];
-						 inputname.char_name[1]=My_Write_Struct->RegValue[0];
+                    {    
+                    UNION_INPUT_NAME inputname;
 
-						 inputname.char_name[2]=My_Write_Struct->RegValue[3];
-						 inputname.char_name[3]=My_Write_Struct->RegValue[2];
+                    inputname.char_name[0]=My_Write_Struct->RegValue[1];
+                    inputname.char_name[1]=My_Write_Struct->RegValue[0];
 
-						 inputname.char_name[4]=My_Write_Struct->RegValue[5];
-						 inputname.char_name[5]=My_Write_Struct->RegValue[4];
+                    inputname.char_name[2]=My_Write_Struct->RegValue[3];
+                    inputname.char_name[3]=My_Write_Struct->RegValue[2];
 
-						 inputname.char_name[6]=My_Write_Struct->RegValue[7];
-						 inputname.char_name[7]=My_Write_Struct->RegValue[6];
+                    inputname.char_name[4]=My_Write_Struct->RegValue[5];
+                    inputname.char_name[5]=My_Write_Struct->RegValue[4];
+
+                    inputname.char_name[6]=My_Write_Struct->RegValue[7];
+                    inputname.char_name[7]=My_Write_Struct->RegValue[6];
 
 
-						for (int i=0;i<4;i++)
-						{
-							product_register_value[My_Write_Struct->Start_Address+i]=inputname.reg_value[i];
-						}
-						LoadTstat_InputData();
-						::PostMessage(My_Write_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_MULTI_SUCCESS_LIST,(LPARAM)My_Write_Struct);
+                    for (int i=0;i<4;i++)
+                    {
+                        product_register_value[My_Write_Struct->Start_Address+i]=inputname.reg_value[i];
+                    }
+
+                    
+                    
+                    ::PostMessage(My_Write_Struct->hwnd,MY_RESUME_DATA,(WPARAM)WRITE_MULTI_SUCCESS_LIST,(LPARAM)My_Write_Struct); 
 					}
 				}
 				break;
@@ -8394,9 +9708,9 @@ loop1:
 								//	connect_invoke_id = g_invoke_id;
 								//	connect_replay = true;
 								//}
-								CString temp_cs_show;
-								temp_cs_show.Format(_T("Task ID = %d. %s "),g_invoke_id,My_WriteList_Struct->Write_Info);
-								Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd,temp_cs_show,My_WriteList_Struct->ItemInfo.nRow,My_WriteList_Struct->ItemInfo.nCol);
+								//CString temp_cs_show;
+								//temp_cs_show.Empty();
+								Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd,My_WriteList_Struct->Write_Info,My_WriteList_Struct->ItemInfo.nRow,My_WriteList_Struct->ItemInfo.nCol);
 							}
 								//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,My_WriteList_Struct->hWnd);
 							Sleep(SEND_COMMAND_DELAY_TIME);
@@ -8405,8 +9719,8 @@ loop1:
 						My_WriteList_Struct->start_instance = temp_end_value + 1;
 					} while (temp_end_value<My_WriteList_Struct->end_instance);
 					
-					if(My_WriteList_Struct)		//删除 new 的东西;
-						delete My_WriteList_Struct;
+					//if(My_WriteList_Struct)		//删除 new 的东西;
+					//	delete My_WriteList_Struct;
 
 					
 				}
@@ -8475,10 +9789,14 @@ loop1:
 									else if((unsigned char)My_WriteList_Struct->command == READWEEKLYROUTINE_T3000)
 									{
 										int end_temp_instance = 0;
-										end_temp_instance = BAC_READ_WEEKLY_ROUTINES_REMAINDER + (BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER*i) ;
-										if(end_temp_instance >= BAC_WEEKLY_ROUTINES_COUNT)
-											end_temp_instance = BAC_WEEKLY_ROUTINES_COUNT - 1;
-										g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,(BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER)*i,end_temp_instance,My_WriteList_Struct->entitysize);
+										end_temp_instance = BAC_READ_SCHEDULE_REMAINDER + (BAC_READ_SCHEDULE_GROUP_NUMBER*i) ;
+										if(end_temp_instance >= BAC_SCHEDULE_COUNT)
+											end_temp_instance = BAC_SCHEDULE_COUNT - 1;
+										g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance,My_WriteList_Struct->entitysize);
+									}
+									else if((unsigned char)My_WriteList_Struct->command == READ_MISC)
+									{
+										g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,0,0,My_WriteList_Struct->entitysize);
 									}
 									else
 									g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,My_WriteList_Struct->entitysize);
@@ -8679,7 +9997,6 @@ void CMainFrame::OnViewCommunicatetraffic()
 void CMainFrame::OnControlInputs()
 {
 	// TODO: Add your command handler code here
- 
 
 	if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
 	{
@@ -8708,6 +10025,10 @@ void CMainFrame::OnControlInputs()
 
 		}
 
+		if(ScreenEdit_Window)
+		{
+			::SendMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
+		}
 
 
 		((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Unreg_Hotkey();
@@ -8732,34 +10053,15 @@ void CMainFrame::OnControlInputs()
 	}
 	else
 	{   
-		if (!is_connect())
+	if (!is_connect())
 	{
 	AfxMessageBox(_T("NO Connection,Please connect your device,fristly!"));
 	return;
 	}   
 	if (product_type==CS3000||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7)
 	{
-		SwitchToPruductType(DLG_BACNET_VIEW);
-		if(pDialog[WINDOW_INPUT] != NULL)
-		{
-			if(pDialog[WINDOW_INPUT]->IsWindowVisible() == false)
-			{
-				for (int i=0;i<WINDOW_TAB_COUNT;i++)
-				{
-					pDialog[i]->ShowWindow(SW_HIDE);
-				}
-				pDialog[WINDOW_INPUT]->ShowWindow(SW_SHOW);
-			}
-			//((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
-			((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_INPUT);
-			Input_Window->m_input_list.SetFocus();
-
-			bacnet_view_number = TYPE_INPUT;
-			g_hwnd_now = m_input_dlg_hwnd;
-
-		}
-		//::PostMessage(g_hwnd_now,WM_INITIAL_BAC_INPUT_LIST,0,0);
-		::PostMessage(g_hwnd_now,WM_REFRESH_BAC_INPUT_LIST,0,0);
+		 
+        SwitchToPruductType(DLG_DIALOG_TSTAT_INPUT_VIEW);
 	}
 	else if (product_type == T3000_T3_MODULES )
 	{
@@ -8787,6 +10089,10 @@ void CMainFrame::OnControlPrograms()
 			MessageBox(_T("Please use the administrator to access data!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
 			return;
 		}
+		if(ScreenEdit_Window)
+		{
+			::SendMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
+		}
 
 		if(pDialog[WINDOW_PROGRAM] != NULL)
 		{
@@ -8810,6 +10116,8 @@ void CMainFrame::OnControlPrograms()
 			bacnet_view_number = TYPE_PROGRAM;
 			g_hwnd_now = m_pragram_dlg_hwnd;
 		}
+
+
 		if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 		{
 			Create_Thread_Read_Item(TYPE_PROGRAM);
@@ -8860,6 +10168,10 @@ void CMainFrame::OnControlOutputs()
 			bacnet_view_number = TYPE_OUTPUT;
 			g_hwnd_now = m_output_dlg_hwnd;
 		}
+		if(ScreenEdit_Window)
+		{
+			::SendMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
+		}
 
 		((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Unreg_Hotkey();
 		((BacnetScreen*)pDialog[WINDOW_SCREEN])->Unreg_Hotkey();
@@ -8884,27 +10196,15 @@ void CMainFrame::OnControlOutputs()
 
 		if (product_type==T3000_6_ADDRESS||product_register_value[7]==PM_CS_RSM_AC||product_register_value[7]==PM_CS_RSM_DC)
 		{
-	     SwitchToPruductType(DLG_BACNET_VIEW);
-		 
-			 if(pDialog[WINDOW_OUTPUT] != NULL)
-			 {
-				 if(pDialog[WINDOW_OUTPUT]->IsWindowVisible() == false)
-				 {
-					 for (int i=0;i<WINDOW_TAB_COUNT;i++)
-					 {
-						 pDialog[i]->ShowWindow(SW_HIDE);
-					 }
-					 pDialog[WINDOW_OUTPUT]->ShowWindow(SW_SHOW);
-				 }
-				 //((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetFocus();
-				 ((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_OUTPUT);
-				 Output_Window->m_output_list.SetFocus();
-				 bacnet_view_number = TYPE_OUTPUT;
-				 g_hwnd_now = m_output_dlg_hwnd;
-			 }
-		   ::PostMessage(g_hwnd_now,WM_REFRESH_BAC_OUTPUT_LIST,0,0);
-		   }
-		else{
+	       SwitchToPruductType(DLG_DIALOG_TSTAT_OUTPUT_VIEW);
+           bacnet_view_number = TYPE_OUTPUT;
+	    }
+        else if (product_type == T3000_T3_MODULES )
+        {
+            SwitchToPruductType(DLG_DIALOG_T3_OUTPUTS_VIEW);
+            bacnet_view_number = TYPE_OUTPUT;
+        }
+        else{
 			MessageBox(_T("This function don't support this product!\r\n"));
 		}
 		//MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
@@ -8939,6 +10239,10 @@ void CMainFrame::OnControlVariables()
 			Variable_Window->m_variable_list.SetFocus();
 			bacnet_view_number = TYPE_VARIABLE;
 			g_hwnd_now = m_variable_dlg_hwnd;
+		}
+		if(ScreenEdit_Window)
+		{
+			::SendMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
 		}
 
 		((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Unreg_Hotkey();
@@ -8980,7 +10284,10 @@ void CMainFrame::OnControlWeekly()
 			MessageBox(_T("Please use the administrator to access data!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
 			return;
 		}
-
+		if(ScreenEdit_Window)
+		{
+			::SendMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
+		}
 		if(pDialog[WINDOW_WEEKLY] != NULL)
 		{
 			Program_Window->Unreg_Hotkey();
@@ -9038,7 +10345,10 @@ void CMainFrame::OnControlAnnualroutines()
 			MessageBox(_T("Please use the administrator to access data!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
 			return;
 		}
-
+		if(ScreenEdit_Window)
+		{
+			::SendMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
+		}
 		if(pDialog[WINDOW_ANNUAL] != NULL)
 		{
 			Program_Window->Unreg_Hotkey();
@@ -9079,8 +10389,7 @@ void CMainFrame::OnControlAnnualroutines()
 
 		if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
 		{
-// 			CParameterDlg dlg(this,GetProductName(product_register_value[7]));
-// 			dlg.DoModal();
+ 
 			g_bPauseMultiRead = TRUE;
 			CTStatScheduleDlg dlg;
 			dlg.DoModal();
@@ -9117,6 +10426,10 @@ void CMainFrame::OnControlSettings()
 			((CDialogCM5_BacNet*)m_pViews[DLG_BACNET_VIEW])->m_bac_main_tab.SetCurSel(WINDOW_SETTING);
 			bacnet_view_number = TYPE_SETTING;
 			g_hwnd_now = m_setting_dlg_hwnd;
+		}
+		if(ScreenEdit_Window)
+		{
+			::SendMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
 		}
 		((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Unreg_Hotkey();
 		((BacnetScreen*)pDialog[WINDOW_SCREEN])->Unreg_Hotkey();
@@ -9211,7 +10524,10 @@ void CMainFrame::OnControlControllers()
 			bacnet_view_number = TYPE_CONTROLLER;
 			g_hwnd_now = m_controller_dlg_hwnd;
 		}
-
+		if(ScreenEdit_Window)
+		{
+			::SendMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
+		}
 		((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Unreg_Hotkey();
 		((BacnetScreen*)pDialog[WINDOW_SCREEN])->Unreg_Hotkey();
 		((BacnetWeeklyRoutine*)pDialog[WINDOW_WEEKLY])->Unreg_Hotkey();
@@ -9276,6 +10592,10 @@ void CMainFrame::OnControlScreens()
 			Screen_Window->Reg_Hotkey();
 			bacnet_view_number = TYPE_SCREENS;
 			g_hwnd_now = m_screen_dlg_hwnd;
+		}
+		if(ScreenEdit_Window)
+		{
+			::SendMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
 		}
 		if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 		{
@@ -9355,6 +10675,10 @@ void CMainFrame::OnControlMonitors()
 			MessageBox(_T("Please use the administrator to access data!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);	
 			return;
 		}
+		if(ScreenEdit_Window)
+		{
+			::SendMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
+		}
 		if(pDialog[WINDOW_MONITOR] != NULL)
 		{
 			Program_Window->Unreg_Hotkey();
@@ -9378,8 +10702,13 @@ void CMainFrame::OnControlMonitors()
 			g_hwnd_now = m_monitor_dlg_hwnd;
 		}
 
+
+
 		if(bac_select_device_online)
+		{
 			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_MONITOR);
+			Post_Refresh_Message(g_bac_instance,READ_MISC,0,0,sizeof(Str_MISC),1);
+		}
 		//else
 		//	MessageBox(_T("Device is Offline ,Please Check the connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);		
 	}
@@ -9404,7 +10733,7 @@ void CMainFrame::OnToolRegisterviewer()
 	dlg.DoModal();
 }
 
-
+#include "CM5/mygdiplus.h"
 void CMainFrame::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
@@ -9426,6 +10755,15 @@ void CMainFrame::OnPaint()
 	{
 		::PostMessage(m_alarmwindow_dlg_hwnd,MY_REDRAW_WINDOW,NULL,NULL);
 	}
+	if(b_create_status)
+	{
+		CRect temprec;
+		m_wndStatusBar.GetWindowRect(&temprec);
+
+		statusbar->SetWindowPos(&wndTop,temprec.left,temprec.top,temprec.Width(),temprec.Height(),SWP_NOACTIVATE | SWP_SHOWWINDOW );
+	}
+
+
 	// TODO: Add your message handler code here
 	// Do not call CFrameWndEx::OnPaint() for painting messages
 }
@@ -9461,6 +10799,11 @@ void CMainFrame::OnControlAlarmLog()
 			bacnet_view_number = TYPE_ALARMLOG;
 			g_hwnd_now = m_alarmlog_dlg_hwnd;
 		}
+		if(ScreenEdit_Window)
+		{
+			::SendMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
+		}
+
 		((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Unreg_Hotkey();
 		((BacnetScreen*)pDialog[WINDOW_SCREEN])->Unreg_Hotkey();
 		((BacnetWeeklyRoutine*)pDialog[WINDOW_WEEKLY])->Unreg_Hotkey();
@@ -9668,7 +11011,10 @@ void CMainFrame::OnControlTstat()
 			//bacnet_view_number = TYPE_TSTAT;
 			//g_hwnd_now = m_tstat_dlg_hwnd;
 		}
-
+		if(ScreenEdit_Window)
+		{
+			::SendMessage(m_screen_dlg_hwnd,WM_SCREENEDIT_CLOSE,NULL,NULL);
+		}
 		((CBacnetProgram*)pDialog[WINDOW_PROGRAM])->Unreg_Hotkey();
 		((BacnetScreen*)pDialog[WINDOW_SCREEN])->Unreg_Hotkey();
 		((BacnetWeeklyRoutine*)pDialog[WINDOW_WEEKLY])->Unreg_Hotkey();
@@ -9689,7 +11035,7 @@ void CMainFrame::OnControlTstat()
 				 bacnet_view_number = TYPE_TSTAT;
 				 SwitchToPruductType(DLG_T3000_VIEW);
 		     }
-		     else if (product_type == CS3000)
+		     else if (product_type == CS3000||product_register_value[7]==PM_T322AI||product_register_value[7]==PM_T38AI8AO6DO)
 		     {
 			    bacnet_view_number = TYPE_TSTAT;
 				SwitchToPruductType(DLG_DIALOG_DEFAULT_T3000_VIEW);
@@ -9733,9 +11079,11 @@ void CMainFrame::OnControlTstat()
 			 {
 				 SwitchToPruductType(DLG_DIALOGT38AI8AO);
 			 }
+
 			 else
 		     {
-				 MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
+                
+				  MessageBox(_T("This function only support bacnet protocol!\r\nPlease select a bacnet product first."));
 			 }
 			 
 	}
@@ -10598,7 +11946,7 @@ CString strProductName;
 		}
 		break;
 	case PM_HUMTEMPSENSOR:
-		strProductName="Hum Temp Sensor";
+		strProductName="TstatHUM";
 		{
 			FtpPath=_T("");
 			ProductFileName=_T("Tstat6.HEX");
@@ -10840,7 +12188,7 @@ void CMainFrame::GetProductFirmwareFTPDirectory(int ProductModel,CString &FtpPat
 		}
 		break;
 	case PM_HUMTEMPSENSOR:
-		strProductName="Hum Temp Sensor";
+		strProductName="TstatHUM";
 		{
 			FtpPath=_T("");
 			ProductFileName=_T("Tstat6.HEX");
@@ -11017,9 +12365,14 @@ void CMainFrame::OnUpdateControlInputs(CCmdUI *pCmdUI)
 {
 	// TODO: Add your command update UI handler code here
 	  pCmdUI->SetCheck(bacnet_view_number == TYPE_INPUT);
+
+//       if(pCmdUI->m_pMenu != NULL)   
+//       {  
+//           pCmdUI->SetText(L"TEST INPUT");  
+//       }  
+
 }
-
-
+ 
 void CMainFrame::OnUpdateControlOutputs(CCmdUI *pCmdUI)
 {
 	// TODO: Add your command update UI handler code here
@@ -11096,7 +12449,7 @@ void CMainFrame::Create_Thread_Read_Item(int n_item)
 	RECT RECT_SET1;
 	::GetWindowRect(BacNet_hwd,&RECT_SET1);
 	WaitRead_Data_Dlg->MoveWindow(RECT_SET1.left + 50,RECT_SET1.bottom - 19,800,20,1);
-	WaitRead_Data_Dlg->ShowWindow(SW_SHOW);
+	WaitRead_Data_Dlg->ShowWindow(SW_HIDE);
 	g_bac_read_type = n_item;
 	if(click_read_thread==NULL)
 	{
@@ -12544,6 +13897,121 @@ void CMainFrame::OnToolRegistersmaintenancesystem()
        ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
 }
 
+
+BOOL CMainFrame::OnToolTipNotify(UINT id,NMHDR *Pnmhdr,LRESULT *pResult)
+{      
+	TOOLTIPTEXT *pTTT = (TOOLTIPTEXT *) Pnmhdr;
+       
+	UINT_PTR nID = Pnmhdr->idFrom - 1;
+  
+    if (Pnmhdr->hwndFrom == m_testtoolbar.Get_Tip_HWND())  
+    {
+        CMFCToolBarButton *pBtn = m_testtoolbar.GetButton(nID);
+        if (pBtn)
+        {
+            if(pBtn->m_nID ==  ID_CONTROL_INPUTS)
+            {
+                pTTT->lpszText = _T("Inputs [ Alt-I ]\r\nSensors and feedback points wired to the controller");
+            }
+            else if(pBtn->m_nID ==  ID_CONTROL_OUTPUTS)
+            {
+                pTTT->lpszText = _T("Outputs [ Alt-O ]\r\nValves, relays and actuators wired to the controller");
+            }
+            else if(pBtn->m_nID ==  ID_CONTROL_VARIABLES)
+            {
+                pTTT->lpszText = _T("Variables [ Alt-V ]\r\nSetpoints, counters, timers and other system defined items");
+            }
+            else if(pBtn->m_nID ==  ID_CONTROL_PROGRAMS)
+            {
+                pTTT->lpszText = _T("Programs [ Alt-P ]\r\nSystem logic and sequencing");
+            }
+            else if(pBtn->m_nID ==  ID_CONTROL_CONTROLLERS)
+            {
+                pTTT->lpszText = _T("PID Loops [ Alt-L ]\r\nProportional-Integral-Derivative feedback control loops");
+            }
+            else if(pBtn->m_nID ==  ID_CONTROL_SCREENS)
+            {
+                pTTT->lpszText = _T("Graphics [ Alt-G ]\r\nFloor plans, system diagrams, graphical displays");
+            }
+            else if(pBtn->m_nID ==  ID_CONTROL_WEEKLY)
+            {
+                pTTT->lpszText = _T("Schedules [ Alt-S ]\r\nDaily on and off events for the week");
+            }
+            else if(pBtn->m_nID ==  ID_CONTROL_ANNUALROUTINES)
+            {
+                pTTT->lpszText = _T("Holidays [ Alt-H ]\r\nHolidays and days with special schedules during the year");
+            }
+            else if(pBtn->m_nID ==  ID_CONTROL_MONITORS)
+            {
+                pTTT->lpszText = _T("Trend Logs [ Alt-T ]\r\nGraphs and historical data");
+            }
+            else if(pBtn->m_nID ==  ID_CONTROL_ALARM_LOG)
+            {
+                pTTT->lpszText = _T("Alarms [ Alt-A ]\r\nCurrent and past alarm events");
+            }
+            else if(pBtn->m_nID ==  ID_CONTROL_TSTAT)
+            {
+                pTTT->lpszText = _T("Network Points[ Alt-N ]\r\nNetwork points from other nodes used by the controller");
+            }
+            else if(pBtn->m_nID ==  ID_CONTROL_SETTINGS)
+            {
+                pTTT->lpszText = _T("Configuration [ Alt-C ]\r\nSetup and advanced parameters");
+            }
+            else if(pBtn->m_nID ==  ID_SCAN)
+            {
+                pTTT->lpszText = _T("Discover [Alt-D]\r\nDiscover new devices on the LAN, com ports and USB");
+            }
+            else if(pBtn->m_nID ==  ID_BUILDINGCONFIGDB)
+            {
+                pTTT->lpszText = _T("Buildings [Alt-B]\r\nDatabase of all buildings, connect to a different site or go offline to set up a new one");
+            }
+
+            pTTT->hinst = AfxGetResourceHandle();
+        } 
+    }
+	    
+		return true;
+
+}
+
+
+ 
+ 
+
+
+
+INT_PTR CMainFrame::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	return CFrameWndEx::OnToolHitTest(point, pTI);
+
+
+	CString adoStr;
+	static CString strText;  
+	INT_PTR hInt = CFrameWndEx::OnToolHitTest(point,pTI);//先调用基类函数,再修改串.   ;
+	strText = pTI->lpszText;  
+
+	if(pTI->uId == ID_CONTROL_INPUTS )  
+	{  
+		adoStr = _T("test111");
+
+	}  
+	strText = adoStr + strText; //重新组合成: New(Ctrl+N)形式.   
+
+	//基类中会释放这个指针pTI->lpszText,但是由于我们要修改这个串,   
+	//所以原来的空间不一定够,所以要释放掉原来的,并重新申请,   
+	int len = strText.GetLength()*sizeof(TCHAR);  
+	TCHAR *pBuf =(TCHAR*)malloc(len+10);  
+	memset(pBuf,0,len+10);  
+	_tcscpy_s(pBuf,strText.GetLength()+2,strText);  
+	free(pTI->lpszText);   
+	pTI->lpszText = pBuf;  
+
+	return hInt;  
+
+}
+
 #include "BatchSNDlg.h"
 void CMainFrame::OnToolFlashsn()
 {
@@ -12551,4 +14019,20 @@ void CMainFrame::OnToolFlashsn()
    CBatchSNDlg dlg;
    dlg.DoModal();
    g_bPauseMultiRead =FALSE; 
+}
+
+
+void CMainFrame::OnMove(int x, int y)
+{
+    CFrameWndEx::OnMove(x, y);
+
+    // TODO: Add your message handler code here
+    if(b_create_status)
+    {
+        CRect temprec;
+        m_wndStatusBar.GetWindowRect(&temprec);
+		if((temprec.top >0) && (temprec.bottom >0) && (temprec.left >0) && (temprec.right > 0))
+		 statusbar->SetWindowPos(&wndTop,temprec.left,temprec.top,temprec.Width(),temprec.Height(),SWP_NOACTIVATE | SWP_SHOWWINDOW );
+	
+    }
 }

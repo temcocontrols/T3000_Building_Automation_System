@@ -189,14 +189,15 @@ public:
 	void ClickMsflexgridOutput();
 	afx_msg void OnEnKillfocusEditName();
 	CComboBox m_brandratebombox;
-	CComboBox m_delaycombox;
+//	CComboBox m_delaycombox;
 	afx_msg void OnCbnSelchangeBrandrate();
-	afx_msg void OnCbnSelchangeDelay();
+//	afx_msg void OnCbnSelchangeDelay();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnDestroy();
 //	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedButtonReset();
+    afx_msg void OnEnKillfocusEditResponseDelay();
 };
 
 

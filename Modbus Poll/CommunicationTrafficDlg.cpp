@@ -78,11 +78,10 @@ void CCommunicationTrafficDlg::OnSize(UINT nType, int cx, int cy)
 		// m_MsDataGrid.SetWindowPos(this,ViewRect.top,ViewRect.left,ViewRect.Width(),ViewRect.Height(),SWP_SHOWWINDOW|SWP_NOZORDER);
 		if (m_DataList.GetSafeHwnd())
 		{
-			m_DataList.MoveWindow(CRect(0,20,ViewRect.Width(),ViewRect.Height()),TRUE);
+			m_DataList.MoveWindow(CRect(0,40,ViewRect.Width(),ViewRect.Height()),TRUE);
 		}
 
 	}
-	// TODO: Add your message handler code here
 }
 
 
@@ -90,12 +89,10 @@ afx_msg LRESULT CCommunicationTrafficDlg::OnTrafficDataWindow(WPARAM wParam, LPA
 {
 	if(m_is_pause||!g_online)
 		return 0;
- 
-	
 	CString temp_cs;
 	temp_cs.Format(_T("%s"),(wchar_t *)wParam);
-	m_DataList.AddString(temp_cs);
-	m_DataList.SetTopIndex(m_DataList.GetCount() - 1);
+    m_DataList.AddString(temp_cs);
+    m_DataList.SetTopIndex(m_DataList.GetCount() - 1);
 	return 0;
 }
 

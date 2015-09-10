@@ -12,13 +12,65 @@
 
 #include "WriteSingleRegDlg.h"
 #include "DllFunction.h"
- #include "excel9.h"
+#include "excel9.h"
 
+int use_minipanel_controller = 0; //是否用Minipanel 来控制  校准的箱子;  //1:enable         2: disable
  
-UINT _Read_Testo(LPVOID pParam){
+CString HUM_Minipanel_IP;
+int HUM_Minipanel_port;
+int HUM_Minipanel_modbus_id;
+
+unsigned int HUM_WRITE_REG1;
+unsigned int HUM_WRITE_REG2;
+
+CString save_data_ini_file_path;
+unsigned char save_date_into_ini = 0;
+UINT _Read_Testo(LPVOID pParam)
+{
 	CNewHumChamberView* pdlg=(CNewHumChamberView*)(pParam);
-	while(TRUE){
-	if (pdlg->IsWindowVisible())
+	GetPrivateProfileString(_T("Hum_Setting"),_T("MODBUS_IP"),_T("192.168.0.113"),HUM_Minipanel_IP.GetBuffer(MAX_PATH),MAX_PATH,g_cstring_ini_path);
+	HUM_Minipanel_IP.ReleaseBuffer();
+	HUM_Minipanel_port = GetPrivateProfileInt(_T("Hum_Setting"),_T("MODBUS_Port"),0,g_cstring_ini_path);
+	HUM_Minipanel_modbus_id = GetPrivateProfileInt(_T("Hum_Setting"),_T("MODBUS_ID"),0,g_cstring_ini_path);
+	
+	HUM_WRITE_REG1 = GetPrivateProfileInt(_T("Hum_Setting"),_T("MODBUS_ADDRESS1"),0,g_cstring_ini_path);
+	HUM_WRITE_REG2 = GetPrivateProfileInt(_T("Hum_Setting"),_T("MODBUS_ADDRESS2"),0,g_cstring_ini_path);
+	use_minipanel_controller = GetPrivateProfileInt(_T("Hum_Setting"),_T("ENABLE_MINIPANEL_FUC"),0,g_cstring_ini_path);
+
+	save_date_into_ini =  GetPrivateProfileInt(_T("Hum_Setting"),_T("ENABLE_SAVE_DATE_INTO_INI"),0,g_cstring_ini_path);
+	GetPrivateProfileString(_T("Hum_Setting"),_T("INI_File_Path"),_T(""),save_data_ini_file_path.GetBuffer(MAX_PATH),MAX_PATH,g_cstring_ini_path);
+	save_data_ini_file_path.ReleaseBuffer();
+
+	if(save_data_ini_file_path.IsEmpty())
+	{
+		WritePrivateProfileStringW(_T("Hum_Setting"),_T("INI_File_Path"),_T("D:\\Test.ini"),g_cstring_ini_path);
+		save_data_ini_file_path = _T("D:\\Test.ini");
+	}
+
+	if((save_date_into_ini != 1) && (save_date_into_ini != 2))
+	{
+		WritePrivateProfileStringW(_T("Hum_Setting"),_T("ENABLE_SAVE_DATE_INTO_INI"),_T("2"),g_cstring_ini_path);
+		save_date_into_ini = 2;//disable
+	}
+	if((HUM_Minipanel_port == 0) || (HUM_Minipanel_modbus_id == 0) || (HUM_WRITE_REG1 == 0) || (HUM_WRITE_REG2 == 0) || (use_minipanel_controller == 0))
+	{
+		WritePrivateProfileStringW(_T("Hum_Setting"),_T("MODBUS_Port"),_T("10000"),g_cstring_ini_path);
+		WritePrivateProfileStringW(_T("Hum_Setting"),_T("MODBUS_ID"),_T("254"),g_cstring_ini_path);
+		WritePrivateProfileStringW(_T("Hum_Setting"),_T("MODBUS_IP"),_T("192.168.0.113"),g_cstring_ini_path);
+
+		WritePrivateProfileStringW(_T("Hum_Setting"),_T("MODBUS_ADDRESS1"),_T("7048"),g_cstring_ini_path);
+		WritePrivateProfileStringW(_T("Hum_Setting"),_T("MODBUS_ADDRESS2"),_T("7049"),g_cstring_ini_path);
+
+		WritePrivateProfileStringW(_T("Hum_Setting"),_T("ENABLE_MINIPANEL_FUC"),_T("2"),g_cstring_ini_path);
+
+		HUM_WRITE_REG1 = 7048;
+		HUM_WRITE_REG2 = 7049;
+		HUM_Minipanel_port = 10000;
+		HUM_Minipanel_modbus_id = 254;
+		use_minipanel_controller = 2;
+	}
+
+	while(TRUE)
 	{
 		if (pdlg->m_isstart)
 		{
@@ -30,9 +82,16 @@ UINT _Read_Testo(LPVOID pParam){
 			Sleep(1000);
 		}
 	}
-		
+	//else
+   // {
+        if (pdlg->g_Draw_dlg!=NULL)
+        {
+            delete pdlg->g_Draw_dlg;
+            pdlg->g_Draw_dlg=NULL;
+        }
+  //  }	
 
-	}
+
 }
 UINT NEW_HUM_CHAMBER_UpdateThread(LPVOID pParam)
 {		CNewHumChamberView* pDlg = (CNewHumChamberView*)(pParam);
@@ -48,7 +107,7 @@ UINT NEW_HUM_CHAMBER_UpdateThread(LPVOID pParam)
 		if (pDlg->IsWindowVisible())
 		{
 
-		  
+		    g_bPauseMultiRead = FALSE;
 
 			if (product_register_value[pDlg->MODBUS_SENSOR_TYPE]!=2)
 			{
@@ -67,6 +126,15 @@ UINT NEW_HUM_CHAMBER_UpdateThread(LPVOID pParam)
  			 Sleep(800);
 
 		}
+		else
+		{
+			g_bPauseMultiRead = TRUE;
+            if (pDlg->g_Draw_dlg!=NULL)
+            {
+                delete pDlg->g_Draw_dlg;
+                pDlg->g_Draw_dlg=NULL;
+            }
+		}
 		
 	/*	pDlg->Fresh_Hum_Temp();*/
 	}
@@ -77,16 +145,18 @@ IMPLEMENT_DYNCREATE(CNewHumChamberView, CFormView)
 
 CNewHumChamberView::CNewHumChamberView()
 	: CFormView(CNewHumChamberView::IDD)
+    , m_frequence_seconds(1)
 {
 m_isstart=false;
 m_pFreshMultiRegisters=NULL;
 m_times=0;
+g_Time_Offset = 0;
 is_Show_Write_singleDLG=FALSE;
  m_Start=FALSE;
  hFirstThread=NULL;
  m_Write_times=0;
  m_tstatID=g_tstat_id;
- 
+ g_Draw_dlg=NULL;
  m_current_Co2_sensorpoint=0;
 }
 
@@ -96,108 +166,109 @@ CNewHumChamberView::~CNewHumChamberView()
 
 void CNewHumChamberView::DoDataExchange(CDataExchange* pDX)
 {
-	CFormView::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_CHECK_1, m_check1);
-	DDX_Control(pDX, IDC_CHECK_2, m_check2);
-	DDX_Control(pDX, IDC_CHECK_3, m_check3);
-	DDX_Control(pDX, IDC_CHECK_4, m_check4);
-	DDX_Control(pDX, IDC_CHECK_5, m_check5);
-	DDX_Control(pDX, IDC_CHECK_6, m_check6);
-	DDX_Control(pDX, IDC_CHECK_7, m_check7);
-	DDX_Control(pDX, IDC_CHECK_8, m_check8);
-	DDX_Control(pDX, IDC_CHECK_9, m_check9);
-	DDX_Control(pDX, IDC_CHECK_10, m_check10);
-	//  DDX_Control(pDX, IDC_CO20, m_edit_co20);
-	DDX_Control(pDX, IDC_CO21, m_edit_co21);
-	//  DDX_Control(pDX, IDC_CO22, m_m_edit_co22);
-	DDX_Control(pDX, IDC_CO23, m_edit_co23);
-	DDX_Control(pDX, IDC_CO24, m_edit_co24);
-	DDX_Control(pDX, IDC_CO25, m_edit_co25);
-	DDX_Control(pDX, IDC_CO26, m_edit_co26);
-	DDX_Control(pDX, IDC_CO27, m_edit_co27);
-	DDX_Control(pDX, IDC_CO28, m_edit_co28);
-	DDX_Control(pDX, IDC_CO29, m_edit_co29);
-	DDX_Control(pDX, IDC_CO20, m_edit_co210);
-	DDX_Control(pDX, IDC_CO22, m_edit_co22);
-	DDX_Control(pDX, IDC_COMBO_TYPE, m_combox_type);
-	DDX_Control(pDX, IDC_COMBO_USB_TESTO, m_combox_testo);
-	DDX_Control(pDX, IDC_EDIT_CO2, m_edit_co2);
-	DDX_Control(pDX, IDC_EDIT_PRESURE, m_edit_presure);
-	DDX_Control(pDX, IDC_EDIT_TEMP, m_edit_temp);
-	DDX_Control(pDX, IDC_EDIT4_HUM, m_edit_hum);
-	DDX_Control(pDX, IDC_FREQ1, m_edit_freq1);
-	DDX_Control(pDX, IDC_FREQ10, m_edit_freq10);
-	DDX_Control(pDX, IDC_FREQ2, m_edit_freq2);
-	DDX_Control(pDX, IDC_FREQ3, m_edit_freq3);
-	DDX_Control(pDX, IDC_FREQ4, m_edit_freq4);
-	DDX_Control(pDX, IDC_FREQ5, m_edit_freq5);
-	DDX_Control(pDX, IDC_FREQ6, m_edit_freq6);
-	DDX_Control(pDX, IDC_FREQ7, m_edit_freq7);
-	DDX_Control(pDX, IDC_FREQ8, m_edit_freq8);
-	DDX_Control(pDX, IDC_FREQ9, m_edit_freq9);
-	DDX_Control(pDX, IDC_HUM1, m_edit_hum1);
-	DDX_Control(pDX, IDC_HUM10, m_edit_hum10);
-	DDX_Control(pDX, IDC_HUM2, m_edit_hum2);
-	DDX_Control(pDX, IDC_HUM3, m_edit_hum3);
-	DDX_Control(pDX, IDC_HUM4, m_edit_hum4);
-	DDX_Control(pDX, IDC_HUM5, m_edit_hum5);
-	DDX_Control(pDX, IDC_HUM6, m_edit_hum6);
-	DDX_Control(pDX, IDC_HUM7, m_edit_hum7);
-	DDX_Control(pDX, IDC_HUM8, m_edit_hum8);
-	DDX_Control(pDX, IDC_HUM9, m_edit_hum9);
-	DDX_Control(pDX, IDC_MASTER_ID, m_edit_master_id);
-	DDX_Control(pDX, IDC_NUM_ERROR_SENSOR, m_edit_error_sensors);
-	DDX_Control(pDX, IDC_NUM_SENSOR, m_edit_num_sensor);
-	DDX_Control(pDX, IDC_RH1, m_edit_rh1);
-	DDX_Control(pDX, IDC_RH10,m_edit_rh10);
-	DDX_Control(pDX, IDC_RH2, m_edit_rh2);
-	DDX_Control(pDX, IDC_RH3, m_edit_rh3);
-	DDX_Control(pDX, IDC_RH4, m_edit_rh4);
-	DDX_Control(pDX, IDC_RH5, m_edit_rh5);
-	DDX_Control(pDX, IDC_RH6, m_edit_rh6);
-	DDX_Control(pDX, IDC_RH7, m_edit_rh7);
-	DDX_Control(pDX, IDC_RH8, m_edit_rh8);
-	DDX_Control(pDX, IDC_RH9, m_edit_rh9);
-	DDX_Control(pDX, IDC_TEMP_LEFT1, m_edit_time_left1);
-	DDX_Control(pDX, IDC_TEMP_LEFT10, m_edit_time_left10);
-	DDX_Control(pDX, IDC_TEMP_LEFT2, m_edit_time_left2);
-	DDX_Control(pDX, IDC_TEMP_LEFT3, m_edit_time_left3);
-	DDX_Control(pDX, IDC_TEMP_LEFT4, m_edit_time_left4);
-	DDX_Control(pDX, IDC_TEMP_LEFT5, m_edit_time_left5);
-	DDX_Control(pDX, IDC_TEMP_LEFT6, m_edit_time_left6);
-	DDX_Control(pDX, IDC_TEMP_LEFT7, m_edit_time_left7);
-	DDX_Control(pDX, IDC_TEMP_LEFT8, m_edit_time_left8);
-	DDX_Control(pDX, IDC_TEMP_LEFT9, m_edit_time_left9);
-	DDX_Control(pDX, IDC_TEMP1, m_edit_temp1);
-	DDX_Control(pDX, IDC_TEMP10, m_edit_temp10);
-	DDX_Control(pDX, IDC_TEMP2, m_edit_temp2);
-	DDX_Control(pDX, IDC_TEMP3, m_edit_temp3);
-	DDX_Control(pDX, IDC_TEMP4, m_edit_temp4);
-	DDX_Control(pDX, IDC_TEMP5, m_edit_temp5);
-	DDX_Control(pDX, IDC_TEMP6, m_edit_temp6);
-	DDX_Control(pDX, IDC_TEMP7, m_edit_temp7);
-	DDX_Control(pDX, IDC_TEMP8, m_edit_temp8);
-	DDX_Control(pDX, IDC_TEMP9, m_edit_temp9);
-	DDX_Control(pDX, IDC_TIME1, m_edit_time1);
-	DDX_Control(pDX, IDC_TIME10, m_edit_time10);
-	DDX_Control(pDX, IDC_TIME2, m_edit_time2);
-	DDX_Control(pDX, IDC_TIME3, m_edit_time3);
-	DDX_Control(pDX, IDC_TIME4, m_edit_time4);
-	DDX_Control(pDX, IDC_TIME5, m_edit_time5);
-	DDX_Control(pDX, IDC_TIME6, m_edit_time6);
-	DDX_Control(pDX, IDC_TIME7, m_edit_time7);
-	DDX_Control(pDX, IDC_TIME8, m_edit_time8);
-	DDX_Control(pDX, IDC_TIME9, m_edit_time9);
-	DDX_Control(pDX, IDC_MSFLEXGRID_INPUT3, m_msflexgrid);
-	DDX_Control(pDX, IDC_STATIC_CUR_SENSOR, m_cur_sensor);
-	DDX_Control(pDX, IDC_STATIC_TIMES, m_libel_times);
-	DDX_Control(pDX, IDC_SKIP, m_CheckSkip);
-	DDX_Control(pDX, IDC_BATCH_FLASH, m_batch_btn);
-	DDX_Control(pDX, IDC_START, m_StartBtn);
-	DDX_Control(pDX, IDC_STOP, m_StopBtn);
-	DDX_Control(pDX, IDC_CONTINUE, m_ContinueBtn);
-	DDX_Control(pDX, IDC_STATIC_TESTSTATUS, m_Static_TestStatus);
-	DDX_Control(pDX, IDC_COMBO_SETTING_CO2, m_combox_co2_setting);
+    CFormView::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_CHECK_1, m_check1);
+    DDX_Control(pDX, IDC_CHECK_2, m_check2);
+    DDX_Control(pDX, IDC_CHECK_3, m_check3);
+    DDX_Control(pDX, IDC_CHECK_4, m_check4);
+    DDX_Control(pDX, IDC_CHECK_5, m_check5);
+    DDX_Control(pDX, IDC_CHECK_6, m_check6);
+    DDX_Control(pDX, IDC_CHECK_7, m_check7);
+    DDX_Control(pDX, IDC_CHECK_8, m_check8);
+    DDX_Control(pDX, IDC_CHECK_9, m_check9);
+    DDX_Control(pDX, IDC_CHECK_10, m_check10);
+    //  DDX_Control(pDX, IDC_CO20, m_edit_co20);
+    DDX_Control(pDX, IDC_CO21, m_edit_co21);
+    //  DDX_Control(pDX, IDC_CO22, m_m_edit_co22);
+    DDX_Control(pDX, IDC_CO23, m_edit_co23);
+    DDX_Control(pDX, IDC_CO24, m_edit_co24);
+    DDX_Control(pDX, IDC_CO25, m_edit_co25);
+    DDX_Control(pDX, IDC_CO26, m_edit_co26);
+    DDX_Control(pDX, IDC_CO27, m_edit_co27);
+    DDX_Control(pDX, IDC_CO28, m_edit_co28);
+    DDX_Control(pDX, IDC_CO29, m_edit_co29);
+    DDX_Control(pDX, IDC_CO20, m_edit_co210);
+    DDX_Control(pDX, IDC_CO22, m_edit_co22);
+    DDX_Control(pDX, IDC_COMBO_TYPE, m_combox_type);
+    DDX_Control(pDX, IDC_COMBO_USB_TESTO, m_combox_testo);
+    DDX_Control(pDX, IDC_EDIT_CO2, m_edit_co2);
+    DDX_Control(pDX, IDC_EDIT_PRESURE, m_edit_presure);
+    DDX_Control(pDX, IDC_EDIT_TEMP, m_edit_temp);
+    DDX_Control(pDX, IDC_EDIT4_HUM, m_edit_hum);
+    DDX_Control(pDX, IDC_FREQ1, m_edit_freq1);
+    DDX_Control(pDX, IDC_FREQ10, m_edit_freq10);
+    DDX_Control(pDX, IDC_FREQ2, m_edit_freq2);
+    DDX_Control(pDX, IDC_FREQ3, m_edit_freq3);
+    DDX_Control(pDX, IDC_FREQ4, m_edit_freq4);
+    DDX_Control(pDX, IDC_FREQ5, m_edit_freq5);
+    DDX_Control(pDX, IDC_FREQ6, m_edit_freq6);
+    DDX_Control(pDX, IDC_FREQ7, m_edit_freq7);
+    DDX_Control(pDX, IDC_FREQ8, m_edit_freq8);
+    DDX_Control(pDX, IDC_FREQ9, m_edit_freq9);
+    DDX_Control(pDX, IDC_HUM1, m_edit_hum1);
+    DDX_Control(pDX, IDC_HUM10, m_edit_hum10);
+    DDX_Control(pDX, IDC_HUM2, m_edit_hum2);
+    DDX_Control(pDX, IDC_HUM3, m_edit_hum3);
+    DDX_Control(pDX, IDC_HUM4, m_edit_hum4);
+    DDX_Control(pDX, IDC_HUM5, m_edit_hum5);
+    DDX_Control(pDX, IDC_HUM6, m_edit_hum6);
+    DDX_Control(pDX, IDC_HUM7, m_edit_hum7);
+    DDX_Control(pDX, IDC_HUM8, m_edit_hum8);
+    DDX_Control(pDX, IDC_HUM9, m_edit_hum9);
+    DDX_Control(pDX, IDC_MASTER_ID, m_edit_master_id);
+    DDX_Control(pDX, IDC_NUM_ERROR_SENSOR, m_edit_error_sensors);
+    DDX_Control(pDX, IDC_NUM_SENSOR, m_edit_num_sensor);
+    DDX_Control(pDX, IDC_RH1, m_edit_rh1);
+    DDX_Control(pDX, IDC_RH10,m_edit_rh10);
+    DDX_Control(pDX, IDC_RH2, m_edit_rh2);
+    DDX_Control(pDX, IDC_RH3, m_edit_rh3);
+    DDX_Control(pDX, IDC_RH4, m_edit_rh4);
+    DDX_Control(pDX, IDC_RH5, m_edit_rh5);
+    DDX_Control(pDX, IDC_RH6, m_edit_rh6);
+    DDX_Control(pDX, IDC_RH7, m_edit_rh7);
+    DDX_Control(pDX, IDC_RH8, m_edit_rh8);
+    DDX_Control(pDX, IDC_RH9, m_edit_rh9);
+    DDX_Control(pDX, IDC_TEMP_LEFT1, m_edit_time_left1);
+    DDX_Control(pDX, IDC_TEMP_LEFT10, m_edit_time_left10);
+    DDX_Control(pDX, IDC_TEMP_LEFT2, m_edit_time_left2);
+    DDX_Control(pDX, IDC_TEMP_LEFT3, m_edit_time_left3);
+    DDX_Control(pDX, IDC_TEMP_LEFT4, m_edit_time_left4);
+    DDX_Control(pDX, IDC_TEMP_LEFT5, m_edit_time_left5);
+    DDX_Control(pDX, IDC_TEMP_LEFT6, m_edit_time_left6);
+    DDX_Control(pDX, IDC_TEMP_LEFT7, m_edit_time_left7);
+    DDX_Control(pDX, IDC_TEMP_LEFT8, m_edit_time_left8);
+    DDX_Control(pDX, IDC_TEMP_LEFT9, m_edit_time_left9);
+    DDX_Control(pDX, IDC_TEMP1, m_edit_temp1);
+    DDX_Control(pDX, IDC_TEMP10, m_edit_temp10);
+    DDX_Control(pDX, IDC_TEMP2, m_edit_temp2);
+    DDX_Control(pDX, IDC_TEMP3, m_edit_temp3);
+    DDX_Control(pDX, IDC_TEMP4, m_edit_temp4);
+    DDX_Control(pDX, IDC_TEMP5, m_edit_temp5);
+    DDX_Control(pDX, IDC_TEMP6, m_edit_temp6);
+    DDX_Control(pDX, IDC_TEMP7, m_edit_temp7);
+    DDX_Control(pDX, IDC_TEMP8, m_edit_temp8);
+    DDX_Control(pDX, IDC_TEMP9, m_edit_temp9);
+    DDX_Control(pDX, IDC_TIME1, m_edit_time1);
+    DDX_Control(pDX, IDC_TIME10, m_edit_time10);
+    DDX_Control(pDX, IDC_TIME2, m_edit_time2);
+    DDX_Control(pDX, IDC_TIME3, m_edit_time3);
+    DDX_Control(pDX, IDC_TIME4, m_edit_time4);
+    DDX_Control(pDX, IDC_TIME5, m_edit_time5);
+    DDX_Control(pDX, IDC_TIME6, m_edit_time6);
+    DDX_Control(pDX, IDC_TIME7, m_edit_time7);
+    DDX_Control(pDX, IDC_TIME8, m_edit_time8);
+    DDX_Control(pDX, IDC_TIME9, m_edit_time9);
+    DDX_Control(pDX, IDC_MSFLEXGRID_INPUT3, m_msflexgrid);
+    DDX_Control(pDX, IDC_STATIC_CUR_SENSOR, m_cur_sensor);
+    DDX_Control(pDX, IDC_STATIC_TIMES, m_libel_times);
+    DDX_Control(pDX, IDC_SKIP, m_CheckSkip);
+    DDX_Control(pDX, IDC_BATCH_FLASH, m_batch_btn);
+    DDX_Control(pDX, IDC_START, m_StartBtn);
+    DDX_Control(pDX, IDC_STOP, m_StopBtn);
+    DDX_Control(pDX, IDC_CONTINUE, m_ContinueBtn);
+    DDX_Control(pDX, IDC_STATIC_TESTSTATUS, m_Static_TestStatus);
+    DDX_Control(pDX, IDC_COMBO_SETTING_CO2, m_combox_co2_setting);
+    DDX_Text(pDX, IDC_EDIT_FREQUENCE, m_frequence_seconds);
 }
 
 BEGIN_MESSAGE_MAP(CNewHumChamberView, CFormView)
@@ -289,6 +360,8 @@ ON_EN_SETFOCUS(IDC_EDIT_HUMPOINT, &CNewHumChamberView::OnEnSetfocusEditHumpoint)
 ON_EN_SETFOCUS(IDC_EDIT_CO2POINT, &CNewHumChamberView::OnEnSetfocusEditCo2point)
 ON_CBN_SELCHANGE(IDC_COMBO_SETTING_CO2, &CNewHumChamberView::OnCbnSelchangeComboSettingCo2)
 ON_WM_TIMER()
+ON_BN_CLICKED(IDC_CALIBRATION_POINT_REPORT2, &CNewHumChamberView::OnBnClickedCalibrationPointReport2)
+ON_BN_CLICKED(IDC_BUTTON_TESTO_GRAPHIC, &CNewHumChamberView::OnBnClickedButtonTestoGraphic)
 END_MESSAGE_MAP()
 
 
@@ -309,14 +382,16 @@ void CNewHumChamberView::Dump(CDumpContext& dc) const
 #endif //_DEBUG
  
 void CNewHumChamberView::Fresh(){
-
+	g_bPauseMultiRead = TRUE;
 	 m_tstatID=g_tstat_id;
-
-
+        
+ Read_Multi(m_tstatID,m_SN,876,55);
+ Read_Multi(m_tstatID,&m_SN[55],876+55,55);
 Initial_RegisterList();
 m_msflexgrid.ShowWindow(TRUE);
 CStringArray EnumUSB;
 CString temp;
+
 
 Enum_USB_Device(EnumUSB);
 m_combox_testo.ResetContent();
@@ -2544,6 +2619,7 @@ void CNewHumChamberView::Fresh_CalibartionPoints(){
 
 
 }
+
 void CNewHumChamberView::Sensor_Reading_Table(){
 int IntTemp=product_register_value[MODBUS_SENSOR_TOTAL];
 if (IntTemp>=1&&IntTemp<=104)
@@ -2556,9 +2632,9 @@ if (IntTemp>=1&&IntTemp<=104)
 
 		 temp.Format(_T("%d"),i);
 		 m_msflexgrid.put_TextMatrix(i,0,temp);
-		 if (product_register_value[MODBUS_SENSOR1_SN+i-1]!=65535)
+		 if (m_SN[MODBUS_SENSOR1_SN+i-1-MODBUS_SENSOR1_SN]!=65535)
 		 {
-			 temp.Format(_T("%d"),product_register_value[978+i-1]);
+			 temp.Format(_T("%d"),m_SN[MODBUS_SENSOR1_SN+i-1-MODBUS_SENSOR1_SN]);
 			 m_msflexgrid.put_TextMatrix(i,1,temp);
 		 } 
 
@@ -2768,6 +2844,7 @@ void CNewHumChamberView::ClickMsflexgridInput3()
 
 void CNewHumChamberView::OnBnClickedButtonStart()
 {
+    UpdateData();
 	if (m_isstart)
 	{
 
@@ -2777,6 +2854,16 @@ void CNewHumChamberView::OnBnClickedButtonStart()
 		GetDlgItem(IDC_COMBO_USB_TESTO)->EnableWindow(TRUE);
 	}
 	else{
+
+        /*   g_vectRegisters.clear();
+        Registers_Infor Reg_Infor_Temp;
+        Reg_Infor_Temp.Point_Color = RGB(0,0,255);
+        Reg_Infor_Temp.Reg_Name = _T("Temperature");
+        g_vectRegisters.push_back(Reg_Infor_Temp); 
+        Reg_Infor_Temp.Point_Color = RGB(255,0,0);
+        Reg_Infor_Temp.Reg_Name = _T("Humidity");
+        g_vectRegisters.push_back(Reg_Infor_Temp); */
+
 		start();
 		if (m_isstart)
 		{
@@ -2797,7 +2884,13 @@ void CNewHumChamberView::start(){
 		m_isstart=false;
 		return;
 	}
-
+	int ret_n = Open_Socket2(_T("192.168.0.113"),10000);
+	if(ret_n < 0)
+	{
+		AfxMessageBox(_T("Can't connect to Minipanel"));
+		m_isstart=false;
+		return;
+	}
 	for (int i=0;i<4;i++)
 	{
 		m_value[i] = 0;
@@ -2809,8 +2902,9 @@ void CNewHumChamberView::start(){
 	}
 	
 }
-
+extern bool has_change_connect_ip;
 void CNewHumChamberView::read_testo(){
+   // Sleep(1000);
 	for (int i=0;i<4;i++)
 	{
 		m_value[i] = 0;
@@ -2825,12 +2919,61 @@ void CNewHumChamberView::read_testo(){
 	temp_value[3]=(unsigned short)m_value[1];
 	temp_value[1]=(unsigned short)(m_value[3]*10);
 	temp_value[2]=(unsigned short)(m_value[2]*10);
+
+
+	if(save_date_into_ini == 1)  // 1 enable  2 disable
+	{
+		for (int z=0;z<4;z++)
+		{
+			CString key_word_temp;CString temp_value_cstring;
+			key_word_temp.Format(_T("VALUE_%d"),z);
+			temp_value_cstring.Format(_T("%u"),temp_value[z]);
+			WritePrivateProfileStringW(_T("EnhancedRegister"),key_word_temp,temp_value_cstring,save_data_ini_file_path);
+		}
+		
+		
+	}
+
+    CString   strlog;
+    strlog.Format(_T("PPM %0.1f  ,CO2 = %0.1f   ,Temp = %0.1f     ,Hum =  %0.1f"),m_value[0],m_value[1],m_value[3],m_value[2]);
+    write_T3000_log_file(strlog); 
+
+	if(use_minipanel_controller == 1)	//1:enable         2: disable
+	{
+		if(has_change_connect_ip)
+		{
+			int ret_n = Open_Socket2(HUM_Minipanel_IP,HUM_Minipanel_port);
+			if(ret_n > 0)
+			{
+				has_change_connect_ip = false;
+				int last_com_type = GetLastCommunicationType();
+				SetCommunicationType(1);
+				int ret1 = write_one(HUM_Minipanel_modbus_id,HUM_WRITE_REG1,temp_value[1]);
+				ret1 = write_one(HUM_Minipanel_modbus_id,HUM_WRITE_REG2,temp_value[2]);
+				SetCommunicationType(last_com_type);
+			}
+		}
+		else
+		{
+			int last_com_type = GetLastCommunicationType();
+			SetCommunicationType(1);
+			int ret1 = write_one(HUM_Minipanel_modbus_id,HUM_WRITE_REG1,temp_value[1]);
+			ret1 = write_one(HUM_Minipanel_modbus_id,HUM_WRITE_REG2,temp_value[2]);
+			if(ret1 < 0)
+			{
+				Open_Socket2(HUM_Minipanel_IP,HUM_Minipanel_port);
+			}
+			SetCommunicationType(last_com_type);
+		}
+	}
+
+
 	m_times+=1;
 	if (is_connect())
 	{
  /*	register_critical_section.Lock();*/
- 	/*Sleep(10000);*/
- 	/*int ret = 1;*/
+ /*Sleep(10000);*/
+ /*int ret = 1;*/
 	g_tstat_id=m_tstatID;
  	int ret=Write_Multi_org_short(m_tstatID,temp_value,MODBUS_TESTO_CO2,4);
  	/*register_critical_section.Unlock();*/
@@ -2840,7 +2983,7 @@ void CNewHumChamberView::read_testo(){
  	}
 	} 
 	 
-	Sleep(1000);
+	//Sleep(1000);
 
 	
 }
@@ -2887,7 +3030,7 @@ LRESULT CNewHumChamberView::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
 
 void CNewHumChamberView::OnDestroy()
 {
-
+	g_bPauseMultiRead = FALSE;
  
 	if (hFirstThread!=NULL)
 	{
@@ -3833,8 +3976,9 @@ void CNewHumChamberView::DblClickMsflexgridInput3()
 			AfxMessageBox(_T("Time Out!"));
 			return;
 			}
-			ret=Read_Multi(m_tstatID,&product_register_value[MODBUS_HUMCOUNT1_H ],MODBUS_HUMCOUNT1_H ,20);
-			if (ret<0)
+			ret=Read_Multi(m_tstatID,&product_register_value[MODBUS_HUMCOUNT1_H],MODBUS_HUMCOUNT1_H ,20);
+			
+            if (ret<0)
 			{
 				AfxMessageBox(_T("Reading Fail"));
 			}
@@ -4003,164 +4147,6 @@ void CNewHumChamberView::WriteSerialNumber(unsigned long SN){
 	file.Close();
 }
 
-void CNewHumChamberView::OnBnClickedCalibrationPointReport()
-{
-	CString strFilter;
-	CString strFilename;
-	float curtemp,curhum,sensortemp,sensorhum;
-   /* strFilter =_T( "Text File|*.csv|All File|*.*|");
-    CFileDialog dlg(false,_T("*.xls"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
-    if (dlg.DoModal() != IDOK)
-        return;
-    strFilename=dlg.GetPathName();*/
-    _Application app;    
-    Workbooks books;
-    _Workbook book;
-    Worksheets sheets;
-    _Worksheet sheet;
-    Range range;
-    Range rgMyRge1, rgMyRge2; 	
-    COleVariant covTrue((short)TRUE), covFalse((short)FALSE), covOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
-    Sleep(2000);
- 
-  
-
-     	if (!app.CreateDispatch(_T("Excel.Application"),NULL)) 
-     	{ 
-     		AfxMessageBox(_T("Create Excel false!")); 
-     		 return;
-     	} 
-    //遍历所有行  
-        strFilename=g_strExePth+_T("Certificate of Calibration.xls");
-
-        books.AttachDispatch(app.GetWorkbooks()); 
-        book.AttachDispatch(books.Add(_variant_t(strFilename)));
-
-        sheets.AttachDispatch(book.GetWorksheets());	
-        sheet.AttachDispatch(sheets.GetItem(_variant_t("Sheet1")));
-
-        range.AttachDispatch(sheet.GetCells()); 
-        CString SerialDate;
-        CTime time = CTime::GetCurrentTime();
-        //11行 1列
-        SerialDate.Format(_T("Calibration Date:"),time.GetYear(),time.GetMonth(),time.GetDay());
-        range.SetItem(_variant_t((long)(11)),_variant_t((long)(1)),_variant_t(SerialDate));
-        //11行 1列
-        SerialDate.Format(_T("%d-%d-%d"),time.GetYear(),time.GetMonth(),time.GetDay());
-        range.SetItem(_variant_t((long)(11)),_variant_t((long)(5)),_variant_t(SerialDate));
-        //13行 1列
-        SerialDate.Format(_T("Certificate Date:"),time.GetYear(),time.GetMonth(),time.GetDay());
-        range.SetItem(_variant_t((long)(13)),_variant_t((long)(1)),_variant_t(SerialDate));
-        SerialDate.Format(_T("%d-%d-%d"),time.GetYear(),time.GetMonth(),time.GetDay());
-        range.SetItem(_variant_t((long)(13)),_variant_t((long)(5)),_variant_t(SerialDate));
-
-       range.AttachDispatch(sheet.GetCells());
-       CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
-       pDlg->Create(IDD_DIALOG10_Progress, this);
-       pDlg->ShowProgress(0,0);
-       pDlg->ShowWindow(SW_SHOW);
-       RECT RECT_SET1;
-       GetClientRect(&RECT_SET1);
-       pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20);
-       CurrentCol=1;
-       CurrentRow=27;
-        for (int i=0;i<product_register_value[MODBUS_SENSOR_TOTAL]-1;i++)
-        {
-            float progress;
-            if (pDlg!=NULL)
-            {
-                progress=float((i+1)*(100/(2*product_register_value[MODBUS_SENSOR_TOTAL])));
-                pDlg->ShowProgress(int(progress),(int)progress);
-            } 
-
-            rgMyRge1.AttachDispatch(range.GetItem(COleVariant((long)CurrentRow+1+i), COleVariant((long)CurrentRow+1+i)).pdispVal, TRUE);
-            rgMyRge1.AttachDispatch(rgMyRge1.GetEntireRow(), TRUE);
-
-            rgMyRge2.AttachDispatch(range.GetItem(COleVariant((long)CurrentRow+i), COleVariant((long)1+i)).pdispVal, TRUE);
-            rgMyRge2.AttachDispatch(rgMyRge2.GetEntireRow(), TRUE);
-
-            rgMyRge2.Copy(covOptional);
-            rgMyRge1.Insert(COleVariant((long)CurrentRow+1+i));
-        }
-    CString rowContent;  
-    CurrentCol=1;
-    CurrentRow=27;
- 
-
-    
-    CString Rowtemp;
-    for (int i=1;i<=product_register_value[MODBUS_SENSOR_TOTAL];i++)
-    {   
-
-         float progress;
-        if (pDlg!=NULL)
-        {
-          //  progress=float((i+1)*(100/product_register_value[NumSensors.Start_ID]));
-
-            progress=float((product_register_value[MODBUS_SENSOR_TOTAL]+i+1)*(100/(2*product_register_value[MODBUS_SENSOR_TOTAL])));
-
-            pDlg->ShowProgress(int(progress),(int)progress);
-        } 
-
-        if (product_register_value[MODBUS_SENSOR1_STATE +i-1]!=1)
-        {
-        continue;
-        }
-
-   
-      
-        rowContent.Format(_T("%d"),product_register_value[978+i-1]);
-        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(1)),_variant_t(rowContent));
-        //Current Temp
-        
-        //rowContent.Format(_T("%0.1f"),curtemp);
-        //range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(2)),_variant_t(rowContent));
-        // //Current Hum
-        //rowContent.Format(_T("%0.1f"),curhum);
-        //range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(3)),_variant_t(rowContent));
-		float curtemp,curhum,sensortemp,sensorhum;
-		curtemp=(float)product_register_value[MODBUS_SENSOR_HUM]/10.0;
-		curhum= (float)product_register_value[MODBUS_SENSOR_TEMP]/10.0;
-
-        sensortemp=(float)product_register_value[MODBUS_SENSOR1_TEMP+2*(i-1)]/10.0;
-        rowContent.Format(_T("%0.1f"),sensortemp);
-        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(4)),_variant_t(rowContent)); 
-
-		sensorhum=(float)product_register_value[MODBUS_SENSOR1_HUM+2*(i-1)]/10.0;
-        rowContent.Format(_T("%0.1f"),(sensorhum));
-        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(5)),_variant_t(rowContent));
-        
-        rowContent.Format(_T("%0.1f"),(curtemp-sensortemp));
-        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(6)),_variant_t(rowContent));
-
-        rowContent.Format(_T("%0.1f"),(curhum-sensorhum));
-        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(7)),_variant_t(rowContent));
-
-        rowContent=_T("Pass");
-         range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(8)),_variant_t(rowContent));
-         
-        ++CurrentRow;
-
-    } 
-    
-
-   pDlg->ShowWindow(SW_HIDE);
-    if(pDlg!=NULL)
-    {delete pDlg;
-    pDlg=NULL;}
-
-    AfxMessageBox(_T("Export Completely"));
-
- 
-
-    app.SetVisible(true); 
-    range.ReleaseDispatch(); 
-    sheet.ReleaseDispatch(); 
-    sheets.ReleaseDispatch(); 
-    book.ReleaseDispatch(); 
-    books.ReleaseDispatch();
-    app.ReleaseDispatch(); 
-}
 
 
 void CNewHumChamberView::OnBnClickedStart()
@@ -4240,7 +4226,7 @@ CString temp;
 void CNewHumChamberView::OnCbnSelchangeComboType()
 { 
 	  int sel=m_combox_type.GetCurSel();
-	  int ret=write_one(g_tstat_id,MODBUS_SENSOR_TYPE,sel);
+	  int ret=write_one(m_tstatID,MODBUS_SENSOR_TYPE,sel);
 	  if (ret>0)
 	  {
 	  product_register_value[MODBUS_SENSOR_TYPE]=sel;
@@ -4830,7 +4816,7 @@ void CNewHumChamberView::OnCbnSelchangeComboSettingCo2()
 	{
 	return;
 	}
-	int ret=write_one(g_tstat_id,MODBUS_CAL_STEPS,sel);
+	int ret=write_one(m_tstatID,MODBUS_CAL_STEPS,sel);
 
 }
 void CNewHumChamberView::Fresh_CO2_Time(){
@@ -4904,4 +4890,340 @@ void CNewHumChamberView::OnTimer(UINT_PTR nIDEvent)
 // 	}
 
 	CFormView::OnTimer(nIDEvent);
+}
+
+void CNewHumChamberView::OnBnClickedCalibrationPointReport()
+{
+	CString strFilter;
+	CString strFilename;
+	//float curtemp,curhum,sensortemp,sensorhum;
+   /* strFilter =_T( "Text File|*.csv|All File|*.*|");
+    CFileDialog dlg(false,_T("*.xls"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
+    if (dlg.DoModal() != IDOK)
+        return;
+    strFilename=dlg.GetPathName();*/
+    _Application app;    
+    Workbooks books;
+    _Workbook book;
+    Worksheets sheets;
+    _Worksheet sheet;
+    Range range;
+    Range rgMyRge1, rgMyRge2; 	
+    COleVariant covTrue((short)TRUE), covFalse((short)FALSE), covOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
+    Sleep(2000);
+ 
+  
+
+     	if (!app.CreateDispatch(_T("Excel.Application"),NULL)) 
+     	{ 
+     		AfxMessageBox(_T("Create Excel false!")); 
+     		 return;
+     	} 
+    //遍历所有行  
+        strFilename=g_strExePth+_T("Certificate of Calibration.xls");
+
+        books.AttachDispatch(app.GetWorkbooks()); 
+        book.AttachDispatch(books.Add(_variant_t(strFilename)));
+
+        sheets.AttachDispatch(book.GetWorksheets());	
+        sheet.AttachDispatch(sheets.GetItem(_variant_t("Sheet1")));
+
+        range.AttachDispatch(sheet.GetCells()); 
+        CString SerialDate;
+        CTime time = CTime::GetCurrentTime();
+        //11行 1列
+        SerialDate.Format(_T("Calibration Date:"),time.GetYear(),time.GetMonth(),time.GetDay());
+        range.SetItem(_variant_t((long)(11)),_variant_t((long)(1)),_variant_t(SerialDate));
+        //11行 1列
+        SerialDate.Format(_T("%d-%d-%d"),time.GetYear(),time.GetMonth(),time.GetDay());
+        range.SetItem(_variant_t((long)(11)),_variant_t((long)(5)),_variant_t(SerialDate));
+        //13行 1列
+        SerialDate.Format(_T("Certificate Date:"),time.GetYear(),time.GetMonth(),time.GetDay());
+        range.SetItem(_variant_t((long)(13)),_variant_t((long)(1)),_variant_t(SerialDate));
+        SerialDate.Format(_T("%d-%d-%d"),time.GetYear(),time.GetMonth(),time.GetDay());
+        range.SetItem(_variant_t((long)(13)),_variant_t((long)(5)),_variant_t(SerialDate));
+
+       range.AttachDispatch(sheet.GetCells());
+       CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
+       pDlg->Create(IDD_DIALOG10_Progress, this);
+       pDlg->ShowProgress(0,0);
+       pDlg->ShowWindow(SW_SHOW);
+       RECT RECT_SET1;
+       GetClientRect(&RECT_SET1);
+       pDlg->MoveWindow(RECT_SET1.left+400,RECT_SET1.bottom-19,RECT_SET1.right/2+20,20);
+       CurrentCol=1;
+       CurrentRow=27;
+        for (int i=0;i<product_register_value[MODBUS_SENSOR_TOTAL]-1;i++)
+        {
+            float progress;
+            if (pDlg!=NULL)
+            {
+                progress=float((i+1)*(100/(2*product_register_value[MODBUS_SENSOR_TOTAL])));
+                pDlg->ShowProgress(int(progress),(int)progress);
+            } 
+
+            rgMyRge1.AttachDispatch(range.GetItem(COleVariant((long)CurrentRow+1+i), COleVariant((long)CurrentRow+1+i)).pdispVal, TRUE);
+            rgMyRge1.AttachDispatch(rgMyRge1.GetEntireRow(), TRUE);
+
+            rgMyRge2.AttachDispatch(range.GetItem(COleVariant((long)CurrentRow+i), COleVariant((long)1+i)).pdispVal, TRUE);
+            rgMyRge2.AttachDispatch(rgMyRge2.GetEntireRow(), TRUE);
+
+            rgMyRge2.Copy(covOptional);
+            rgMyRge1.Insert(COleVariant((long)CurrentRow+1+i));
+        }
+    CString rowContent;  
+    CurrentCol=1;
+    CurrentRow=27;
+ 
+
+    
+    CString Rowtemp;
+    for (int i=1;i<=product_register_value[MODBUS_SENSOR_TOTAL];i++)
+    {   
+
+         float progress;
+        if (pDlg!=NULL)
+        {
+          //  progress=float((i+1)*(100/product_register_value[NumSensors.Start_ID]));
+
+            progress=float((product_register_value[MODBUS_SENSOR_TOTAL]+i+1)*(100/(2*product_register_value[MODBUS_SENSOR_TOTAL])));
+
+            pDlg->ShowProgress(int(progress),(int)progress);
+        } 
+
+        if (product_register_value[MODBUS_SENSOR1_STATE +i-1]!=1)
+        {
+        continue;
+        }
+
+   
+      
+        rowContent.Format(_T("%d"),m_SN[i-1]);
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(1)),_variant_t(rowContent));
+        //Current Temp
+        
+        //rowContent.Format(_T("%0.1f"),curtemp);
+        //range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(2)),_variant_t(rowContent));
+        // //Current Hum
+        //rowContent.Format(_T("%0.1f"),curhum);
+        //range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(3)),_variant_t(rowContent));
+		float curtemp,curhum,sensortemp,sensorhum;
+		curtemp=(float)product_register_value[MODBUS_SENSOR_HUM]/10.0;
+		curhum= (float)product_register_value[MODBUS_SENSOR_TEMP]/10.0;
+
+        sensortemp=(float)product_register_value[MODBUS_SENSOR1_TEMP+2*(i-1)]/10.0;
+        rowContent.Format(_T("%0.1f"),sensortemp);
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(4)),_variant_t(rowContent)); 
+
+		sensorhum=(float)product_register_value[MODBUS_SENSOR1_HUM+2*(i-1)]/10.0;
+        rowContent.Format(_T("%0.1f"),(sensorhum));
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(5)),_variant_t(rowContent));
+        
+        rowContent.Format(_T("%0.1f"),(curtemp-sensortemp));
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(6)),_variant_t(rowContent));
+
+        rowContent.Format(_T("%0.1f"),(curhum-sensorhum));
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(7)),_variant_t(rowContent));
+
+        rowContent=_T("Pass");
+         range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(8)),_variant_t(rowContent));
+         
+        ++CurrentRow;
+
+    } 
+    
+
+   pDlg->ShowWindow(SW_HIDE);
+    if(pDlg!=NULL)
+    {delete pDlg;
+    pDlg=NULL;}
+
+    AfxMessageBox(_T("Export Completely"));
+
+ 
+
+    app.SetVisible(true); 
+    range.ReleaseDispatch(); 
+    sheet.ReleaseDispatch(); 
+    sheets.ReleaseDispatch(); 
+    book.ReleaseDispatch(); 
+    books.ReleaseDispatch();
+    app.ReleaseDispatch(); 
+}
+
+void CNewHumChamberView::OnBnClickedCalibrationPointReport2()
+{
+    CString  Product_Head_File_Name;
+    CString strFilter;
+    CString strFilename;
+    CString strTemp;
+    CString RegisterName;
+    CString RegisterID;
+    CString logstr;
+    _variant_t  temp_variant;
+    _Application app;    
+    Workbooks books;
+    _Workbook book;
+    Worksheets sheets;
+    _Worksheet sheet;
+    Range range;
+    Range rgMyRge1, rgMyRge2; 	
+    COleVariant covTrue((short)TRUE), covFalse((short)FALSE), covOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
+
+    int CurrentRow;
+
+
+    if (!app.CreateDispatch(_T("Excel.Application"),NULL)) 
+    { 
+        AfxMessageBox(_T("Create Excel false!")); 
+        return;
+    } 
+    //遍历所有行  
+    strFilename=g_strExePth+_T("Calibration Sensor Report.xls");
+
+    books.AttachDispatch(app.GetWorkbooks()); 
+    book.AttachDispatch(books.Add(_variant_t(strFilename)));
+
+    sheets.AttachDispatch(book.GetWorksheets());	
+    sheet.AttachDispatch(sheets.GetItem(_variant_t("Sheet1")));
+
+    range.AttachDispatch(sheet.GetCells()); 
+    CString ContentData;
+    CTime time = CTime::GetCurrentTime();
+
+    ContentData.Format(_T("Calibration Date"));
+    range.SetItem(_variant_t((long)(1)),_variant_t((long)(1)),_variant_t(ContentData));
+
+    ContentData.Format(_T("%d-%d-%d"),time.GetYear(),time.GetMonth(),time.GetDay());
+    range.SetItem(_variant_t((long)(1)),_variant_t((long)(3)),_variant_t(ContentData));
+
+    range.AttachDispatch(sheet.GetCells());
+
+
+    int realrow = 0; 
+    for (int i=0;i<(int)product_register_value[MODBUS_SENSOR_TOTAL];i++)
+    {  
+        if (product_register_value[MODBUS_SENSOR1_STATE +i]!=1)
+        {
+            continue;
+        }
+        realrow++;
+       /* int ret = write_one(g_tstat_id,MODBUS_SENSOR_NUM,i+1);*/
+
+		 int ret =write_one(m_tstatID,MODBUS_REFRESH_SENSOR,0);
+			 
+			  /*if (ret<0)
+			  {
+				  AfxMessageBox(_T("Write Fail"));
+				  return;
+			  }*/
+			
+			  ret=write_one(m_tstatID,MODBUS_SENSOR_NUM,i+1);
+			
+			/*if (ret<0)
+			{
+				AfxMessageBox(_T("Write Fail"));
+				return;
+			}*/
+			product_register_value[MODBUS_SENSOR_NUM]=i+1;
+ 
+            int times=10;
+			/*Sleep(2000);*/
+			int  flash=Read_One(m_tstatID,MODBUS_REFRESH_SENSOR);
+			while ((flash!=1)&&(times>0))
+			{
+			    flash=Read_One(m_tstatID,MODBUS_REFRESH_SENSOR);
+				if (flash==1)
+				{
+				 break;
+				}
+				Sleep(500);
+				--times;
+			}
+			/*if (flash!=1)
+			{
+			AfxMessageBox(_T("Time Out!"));
+			return;
+			}*/
+
+        Sleep(200);
+        CurrentRow = 3 + 7*(realrow-1);
+        ContentData = _T("Serial Number");
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(1)),_variant_t(ContentData)); 
+        ContentData.Format(_T("%d"),m_SN[i]);
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(2)),_variant_t(ContentData));
+       
+        unsigned short databuffer[10];
+          ret = Read_Multi(m_tstatID,&databuffer[0],527,10,5);
+         if (ret<0)
+         {   Sleep(1000);
+             Read_Multi(m_tstatID,&databuffer[0],527,10,5);
+         }
+        ContentData = _T("Points");
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(3)),_variant_t(ContentData));
+        ContentData.Format(_T("%d"),databuffer[531 - 527]);
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(4)),_variant_t(ContentData)); 
+
+        ContentData = _T("Frequency");
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(5)),_variant_t(ContentData));
+        ContentData.Format(_T("%d"),databuffer[530 - 527]);
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(6)),_variant_t(ContentData));
+
+        ++CurrentRow;
+        ContentData = _T("Temperature");
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(1)),_variant_t(ContentData));
+        ContentData.Format(_T("%0.1f"),((float)((short)databuffer[529 - 527]))/10);
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(2)),_variant_t(ContentData));
+
+        ContentData = _T("Humidity");
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(3)),_variant_t(ContentData));
+        ContentData.Format(_T("%0.1f"),((float)((short)databuffer[528 - 527]))/10);
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(4)),_variant_t(ContentData));
+
+         ret=Read_Multi(m_tstatID,&product_register_value[MODBUS_HUMCOUNT1_H],MODBUS_HUMCOUNT1_H ,20);
+         if (ret<0)
+         {
+          ret=Read_Multi(m_tstatID,&product_register_value[MODBUS_HUMCOUNT1_H],MODBUS_HUMCOUNT1_H ,20);
+         }
+          
+        
+        ++CurrentRow;
+        ContentData = _T("RH");
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(1)),_variant_t(ContentData));
+
+        for (int j = 0;j<10;j++)
+        {
+            ContentData.Format(_T("%0.1f"),((float)((short)product_register_value[MODBUS_HUMRH1_H  + 2*j]))/10);
+            range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(2+j)),_variant_t(ContentData));
+        }
+        ++CurrentRow;
+        ContentData = _T("Frequency");
+        range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(1)),_variant_t(ContentData));
+        for (int j = 0;j<10;j++)
+        {
+            ContentData.Format(_T("%d"),(short)product_register_value[ MODBUS_HUMCOUNT1_H+ 2*j]);
+            range.SetItem(_variant_t((long)(CurrentRow)),_variant_t((long)(2+j)),_variant_t(ContentData));
+        } 
+
+
+    }
+
+
+
+    AfxMessageBox(_T("Export Completely"));
+
+    app.SetVisible(true); 
+    range.ReleaseDispatch(); 
+    sheet.ReleaseDispatch(); 
+    sheets.ReleaseDispatch(); 
+    book.ReleaseDispatch(); 
+    books.ReleaseDispatch();
+    app.ReleaseDispatch(); 
+}
+
+
+void CNewHumChamberView::OnBnClickedButtonTestoGraphic()
+{
+
+      
 }

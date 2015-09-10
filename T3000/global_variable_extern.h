@@ -139,8 +139,9 @@ extern CString g_strFan;
 
 extern BOOL g_bEnableRefreshTreeView;
 extern BOOL g_bPauseRefreshTree;
-extern int g_llTxCount;
-extern int g_llRxCount;
+extern unsigned int g_llTxCount;
+extern unsigned int g_llRxCount;
+extern int g_llerrCount ;
 extern BOOL g_unint;
 
 int const PM_TSTAT5B = 1;
@@ -185,6 +186,11 @@ int const PM_CS_RSM_DC = 39;
 int const PM_PRESSURE = 40;
 int const PM_PM5E = 41;
 int const PM_HUM_R=42;
+
+int const PM_T322AI=43;
+int const PM_T38AI8AO6DO=44;
+int const PM_PRESSURE_SENSOR=45;
+
 int const PM_CM5 = 50;
 int const PM_TSTAT6_HUM_Chamber=64;
 int const PM_NC = 100;
@@ -1024,6 +1030,7 @@ extern HWND      m_add_label;
 extern HWND      m_edit_label;
 extern HWND      m_at_command_hwnd;
 extern HWND      m_remote_point_hwnd;
+extern HWND		m_statusbar_hwnd ;
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
@@ -1051,14 +1058,14 @@ extern vector <Client_Info> m_tcp_connect_info;
 extern vector <Str_label_point> m_graphic_label_data;	//图片里面的Label的信息要存在设备里面;
 extern vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
 extern Str_Setting_Info Device_Basic_Setting;
+extern Str_MISC Device_Misc_Data;
 extern char m_at_write_buf[100];
 extern char m_at_read_buf[450];
 
 extern Monitor_Block m_monitor_block;
 extern Str_Monitor_data_header m_monitor_head;
 extern int Monitor_Input__Data[14][1000];
-extern Monitor_Input_Info my_input_info[14];
-extern unsigned char weeklt_time_schedule[BAC_WEEKLY_ROUTINES_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
+extern unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
 extern unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//暂定2000;
 extern int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 extern int Max_Scale_value;
@@ -1126,7 +1133,7 @@ extern vector <Tstat_Input_Struct> m_tstat_input_data;
 
 extern vector <Tstat_Output_Struct> m_tstat_output_data;
 extern CString analog_range[11];
-extern CString analog_range_TSTAT6[12];
+extern CString analog_range_TSTAT6[13];
 extern CString INPUT_FUNS[8];
 extern CString Interlock[6];
 extern CString ONTPUT_FUNS[];
@@ -1159,14 +1166,38 @@ extern int current_building_ipport;
 
 extern int m_user_level;
 
+extern CString Statuspanel;   //在状态栏显示panel 2-3;
+
 extern CString CS3000_INPUT_RANGE[4];
 extern BOOL g_NEED_MULTI_READ;
 extern CString STRING_SWITCH_STATUS[3];
 
 extern vector<Registers_Infor> g_vectRegisters;
-
+extern CString g_cstring_ini_path;
+extern unsigned char product_sort_way;		//0 default   1 by connection      2 bu floor
 extern BOOL g_fresh_Graphic;
-
+extern bool b_stop_read_grp_label;		//如果读到空的grp label 就不要继续读下一个了;
 extern Global_Calibration_Module   g_calibration_module_data;
+ extern CDialog *g_Draw_dlg;
+extern unsigned int g_progress_persent ;	//用来记录全局状态栏该显示的 进度 百分比;
+extern int input_item_limit_count;	//input list 要显示多少个input 的个数， 不是根据vector 的size 来判断大小;
+extern int output_item_limit_count;	//output list 要显示多少个output 的个数， 不是根据vector 的size 来判断大小;
+extern int variable_item_limit_count;	//variable list 要显示多少个variable 的个数， 不是根据vector 的size 来判断大小;
+extern int program_item_limit_count ;
+extern int controller_item_limit_count ;
+extern int screen_item_limit_count ;
 
+extern Str_out_point m_temp_output_data[BAC_OUTPUT_ITEM_COUNT];
+extern Str_in_point m_temp_Input_data[BAC_INPUT_ITEM_COUNT];
+extern Str_variable_point m_temp_variable_data[BAC_VARIABLE_ITEM_COUNT];
+extern Str_program_point m_temp_program_data[BAC_PROGRAM_ITEM_COUNT];
+extern Str_controller_point m_temp_controller_data[BAC_PID_COUNT];
+extern Control_group_point m_temp_screen_data[BAC_SCREEN_COUNT];
+extern Str_weekly_routine_point m_temp_weekly_data[BAC_SCHEDULE_COUNT];
+extern Str_annual_routine_point m_temp_annual_data[BAC_HOLIDAY_COUNT];
+extern Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
+extern Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
+
+extern char monitor_database_flag[24];   //用于标记哪些Database需要删除的 ，1 为删除;
+extern int Station_NUM;
 #pragma endregion For_bacnet

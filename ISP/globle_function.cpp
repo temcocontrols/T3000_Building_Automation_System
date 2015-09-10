@@ -442,6 +442,9 @@ CString GetProductName(int ModelID)
 	case  PM_CO2_RS485:
 		strProductName = "CO2";
 		break;
+    case  PM_PRESSURE_SENSOR:
+        strProductName = "Pressure";
+        break;
 	case  PM_CO2_NODE:
 		strProductName = "CO2 Node";
 		break;

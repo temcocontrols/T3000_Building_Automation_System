@@ -63,6 +63,7 @@ public:
 
 	void DrawerPoint();
 	void Fresh();
+   
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
  
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);

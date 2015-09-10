@@ -37,6 +37,9 @@ public:
 	void Reg_Hotkey();
 	void Unreg_Hotkey();
 	afx_msg void OnBnClickedInsert();
+	static	DWORD WINAPI  ReadScreenThreadfun(LPVOID lpVoid);
+	bool read_screen_label();
+	afx_msg void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult);
 //	afx_msg void OnDestroy();
 };
 
@@ -45,8 +48,8 @@ const int SCREEN_NUM			= 0;
 const int SCREEN_DESCRIPTION	= 1;
 const int SCREEN_LABEL			= 2;
 const int SCREEN_PIC_FILE		= 3;
-const int SCREEN_MODE			= 4;
-const int SCREEN_REFRESH		= 5;
+//const int SCREEN_MODE			= 4;
+const int SCREEN_REFRESH		= 4;
 
-const int SCREEN_COL_NUMBER = 6;
+const int SCREEN_COL_NUMBER = 5;
 

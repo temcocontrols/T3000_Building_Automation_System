@@ -106,7 +106,7 @@ void CBacnetSetting::OnBnClickedButtonBacTest()
 	} while (g_invoke_id<0);
 
 	CString temp_cs_show;
-	temp_cs_show.Format(_T("Task ID = %d. Read time "),g_invoke_id);
+	temp_cs_show.Format(_T("Read time "));
 	Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
 
 	//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
@@ -512,25 +512,39 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 
 			}
 
-			if(bacnet_device_type == PRODUCT_CM5)
+			if(Device_Basic_Setting.reg.sd_exist == 1)
 			{
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->EnableWindow(FALSE);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->EnableWindow(FALSE);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->EnableWindow(FALSE);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->SetWindowTextW(Device_Serial_Port_Status[SUB_MODBUS]);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->SetWindowTextW(Device_Serial_Port_Status[MAIN_MODBUS]);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->SetWindowTextW(Device_Serial_Port_Status[NOUSE]);
-
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->EnableWindow(false);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->EnableWindow(false);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->EnableWindow(false);
+				((CStatic *)GetDlgItem(IDC_STATIC_BAC_SETTING_SD_CARD))->SetWindowTextW(_T("No SD Card"));
 			}
-			else if((bacnet_device_type == BIG_MINIPANEL) || (bacnet_device_type == SMALL_MINIPANEL) || (bacnet_device_type == TINY_MINIPANEL))
+			else if(Device_Basic_Setting.reg.sd_exist == 2)
+			{
+				((CStatic *)GetDlgItem(IDC_STATIC_BAC_SETTING_SD_CARD))->SetWindowTextW(_T("Normal"));
+			}
+			else
+			{
+				((CStatic *)GetDlgItem(IDC_STATIC_BAC_SETTING_SD_CARD))->SetWindowTextW(_T("unknown"));
+			}
+
+			//if(bacnet_device_type == PRODUCT_CM5)
+			//{
+			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->EnableWindow(TRUE);
+			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->EnableWindow(TRUE);
+			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->EnableWindow(TRUE);
+			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM0))->SetWindowTextW(Device_Serial_Port_Status[SUB_MODBUS]);
+			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->SetWindowTextW(Device_Serial_Port_Status[MAIN_MODBUS]);
+			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM2))->SetWindowTextW(Device_Serial_Port_Status[NOUSE]);
+
+			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->EnableWindow(TRUE);
+			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->EnableWindow(TRUE);
+			//	((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->EnableWindow(TRUE);
+			//}
+			//else 
+			if((bacnet_device_type == BIG_MINIPANEL) || (bacnet_device_type == SMALL_MINIPANEL) || (bacnet_device_type == TINY_MINIPANEL) || (bacnet_device_type == PRODUCT_CM5))
 			{
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->ResetContent();
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[NOUSE]);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[MAIN_PTP]);
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[MAIN_ZIG]);
+				//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[MAIN_PTP]);
+				//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[MAIN_ZIG]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[SUB_MODBUS]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_COM1))->AddString(Device_Serial_Port_Status[SUB_GSM]);
 
@@ -569,8 +583,9 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->AddString(Baudrate_Array[UART_9600]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE0))->AddString(Baudrate_Array[UART_19200]);
 
-				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->AddString(Baudrate_Array[UART_9600]);
+				//((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->AddString(Baudrate_Array[UART_9600]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->AddString(Baudrate_Array[UART_19200]);
+				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE1))->EnableWindow(FALSE);
 				for (int x=0;x<sizeof(Baudrate_Array)/sizeof(Baudrate_Array[0]);x++)
 				{
 					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_BAUDRATE2))->AddString(Baudrate_Array[x]);
@@ -634,6 +649,21 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			{
 				GetDlgItem(IDC_BUTTON_SETTING_USER_LIST)->ShowWindow(false);
 			}
+			CString temp_object;
+			CString temp_mac_address;
+			CString temp_mstp_network;
+			CString temp_bip_network;
+			temp_object.Format(_T("%u"),g_bac_instance);
+			temp_mac_address.Format(_T("%02x-%02x-%02x-%02x-%02x-%02x"),Device_Basic_Setting.reg.mac_addr[0],Device_Basic_Setting.reg.mac_addr[1],Device_Basic_Setting.reg.mac_addr[2],
+															Device_Basic_Setting.reg.mac_addr[3],Device_Basic_Setting.reg.mac_addr[4],Device_Basic_Setting.reg.mac_addr[5]);
+			temp_mac_address.MakeUpper();
+			temp_mstp_network.Format(_T("%u"),Device_Basic_Setting.reg.mstp_network_number);
+			temp_bip_network.Format(_T("%u"),Device_Basic_Setting.reg.network_number);
+			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_OBJ_INSTANCE))->SetWindowTextW(temp_object);
+			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MAC_ADDRESS))->SetWindowTextW(temp_mac_address);
+			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MSTP_NETWORK))->SetWindowTextW(temp_mstp_network);
+			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_BIP_NETWORK2))->SetWindowTextW(temp_bip_network);
+
 		}
 		break;
 	case TIME_COMMAND:
@@ -875,7 +905,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate1()
 	{
 		if(temp_string.CompareNoCase(Baudrate_Array[i]) == 0 )
 		{
-			Device_Basic_Setting.reg.com_baudrate0 = i;
+			Device_Basic_Setting.reg.com_baudrate1 = i;
 			break;
 		}
 	}
@@ -895,7 +925,7 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingBaudrate2()
 	{
 		if(temp_string.CompareNoCase(Baudrate_Array[i]) == 0 )
 		{
-			Device_Basic_Setting.reg.com_baudrate0 = i;
+			Device_Basic_Setting.reg.com_baudrate2 = i;
 			break;
 		}
 	}

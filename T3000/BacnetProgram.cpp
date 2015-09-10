@@ -14,8 +14,12 @@
 
 #include "gloab_define.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
-Str_program_point m_temp_program_data[BAC_PROGRAM_ITEM_COUNT];
 
+
+#include "Dialog_Progess.h"
+#include "DialogCM5_BacNet.h"
+extern CDialog_Progess *WaitRead_Data_Dlg;
+#include "MainFrm.h"
 // CBacnetProgram dialog
 
 IMPLEMENT_DYNAMIC(CBacnetProgram, CDialogEx)
@@ -42,13 +46,12 @@ BEGIN_MESSAGE_MAP(CBacnetProgram, CDialogEx)
 	ON_MESSAGE(WM_HOTKEY,&CBacnetProgram::OnHotKey)//快捷键消息映射手动加入
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Program_Item)
 	ON_MESSAGE(WM_REFRESH_BAC_PROGRAM_LIST,Fresh_Program_List)
-	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_READ, &CBacnetProgram::OnBnClickedButtonProgramRead)
-	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_APPLY, &CBacnetProgram::OnBnClickedButtonProgramApply)
 	ON_BN_CLICKED(IDC_BUTTON_PROGRAM_EDIT, &CBacnetProgram::OnBnClickedButtonProgramEdit)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_PROGRAM, &CBacnetProgram::OnNMClickListProgram)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
 	ON_WM_HELPINFO()
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST_PROGRAM, &CBacnetProgram::OnNMDblclkListProgram)
 END_MESSAGE_MAP()
 
 
@@ -108,10 +111,6 @@ BOOL CBacnetProgram::OnInitDialog()
 	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 	// TODO:  Add extra initialization here
 
-	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_REFRESH);
-	((CButton *)GetDlgItem(IDC_BUTTON_PROGRAM_READ))->SetIcon(hIcon);	
-	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_OK);
-	((CButton *)GetDlgItem(IDC_BUTTON_PROGRAM_APPLY))->SetIcon(hIcon);
 
 	//RegisterHotKey(GetSafeHwnd(),KEY_INSERT,NULL,VK_INSERT);//Insert键
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
@@ -131,18 +130,22 @@ void CBacnetProgram::Unreg_Hotkey()
 
 void CBacnetProgram::Initial_List()
 {
+	m_program_list.ShowWindow(SW_HIDE);
+	m_program_list.DeleteAllItems();
+	while ( m_program_list.DeleteColumn (0)) ;
+
 	m_program_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	//m_program_list.SetExtendedStyle(m_program_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_program_list.SetExtendedStyle(m_program_list.GetExtendedStyle() |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_program_list.InsertColumn(0, _T("Program"), 80, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-	m_program_list.InsertColumn(1, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_program_list.InsertColumn(2, _T("Status"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_program_list.InsertColumn(3, _T("Auto/Manual"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_program_list.InsertColumn(4, _T("Size"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_program_list.InsertColumn(5, _T("Run Status"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_program_list.InsertColumn(6, _T("Label"), 100, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_program_list.InsertColumn(0, _T("Program"), 80, ListCtrlEx::CheckBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_program_list.InsertColumn(1, _T("Full Label"), 150, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_program_list.InsertColumn(2, _T("Status"), 100, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_program_list.InsertColumn(3, _T("Auto/Manual"), 100, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_program_list.InsertColumn(4, _T("Size"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_program_list.InsertColumn(5, _T("Run Status"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_program_list.InsertColumn(6, _T("Label"), 100, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_pragram_dlg_hwnd = this->m_hWnd;
-	g_hwnd_now = m_pragram_dlg_hwnd;
+	//g_hwnd_now = m_pragram_dlg_hwnd;
 
 	CRect list_rect,win_rect;
 	m_program_list.GetWindowRect(list_rect);
@@ -157,6 +160,11 @@ void CBacnetProgram::Initial_List()
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
 		CString temp_des;
 		CString temp_units;
+
+		if(i>=program_item_limit_count)
+			break;
+
+
 		temp_item.Format(_T("%d"),i+1);
 		m_program_list.InsertItem(i,temp_item);
 		m_program_list.SetCellEnabled(i,0,0);
@@ -186,17 +194,12 @@ void CBacnetProgram::Initial_List()
 		}
 
 	}
-
+	m_program_list.InitListData();
 	m_program_list.SetCellChecked(0,0,1);
+	m_program_list.ShowWindow(SW_SHOW);
 }
 
 
-void CBacnetProgram::OnBnClickedButtonProgramRead()
-{
-	// TODO: Add your control notification handler code here
-	Post_Refresh_Message(g_bac_instance,READPROGRAM_T3000,0,BAC_PROGRAM_ITEM_COUNT - 1,sizeof(Str_program_point),BAC_PROGRAM_GROUP);
-	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
-}
 
 LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 {
@@ -240,6 +243,11 @@ LRESULT CBacnetProgram::Fresh_Program_Item(WPARAM wParam,LPARAM lParam)
 		{
 			MessageBox(_T("Length can not higher than 20"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 			PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+			return 0;
+		}
+		if(Check_FullLabel_Exsit(cs_temp))
+		{
+			PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,Changed_Item,REFRESH_ON_ITEM);
 			return 0;
 		}
 		char cTemp1[255];
@@ -316,6 +324,9 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 		CString temp_des;
 		CString temp_units;
 		
+		if(i>=program_item_limit_count)
+			break;
+
 		if(isFreshOne)
 		{
 			i = Fresh_Item;
@@ -334,9 +345,15 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 			m_program_list.SetItemText(i,PROGRAM_AUTO_MANUAL,_T("Manual"));
 
 		if(m_Program_data.at(i).on_off==0)
+		{
+			m_program_list.SetItemTextColor(i,PROGRAM_STATUS,RGB(255,0,0),false);
 			m_program_list.SetItemText(i,PROGRAM_STATUS,ProgramStatus[1]);
+		}
 		else
+		{
+			m_program_list.SetItemTextColor(i,PROGRAM_STATUS,RGB(0,0,255),false);
 			m_program_list.SetItemText(i,PROGRAM_STATUS,ProgramStatus[0]);
+		}
 
 		temp_value.Format(_T("%d"),m_Program_data.at(i).bytes);
 		m_program_list.SetItemText(i,PROGRAM_SIZE_LIST,temp_value);
@@ -368,52 +385,7 @@ LRESULT CBacnetProgram::Fresh_Program_List(WPARAM wParam,LPARAM lParam)
 }
 
 
-void CBacnetProgram::OnBnClickedButtonProgramApply()
-{
-	// TODO: Add your control notification handler code here
-	for (int i=0;i<(int)m_Program_data.size();i++)
-	{
-		CString cs_temp=m_program_list.GetItemText(i,PROGRAM_FULL_LABLE);
-		char cTemp[255];
-		memset(cTemp,0,255);
-		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp, 255, NULL, NULL );
-		memcpy_s(m_Program_data.at(i).description,STR_PROGRAM_DESCRIPTION_LENGTH,cTemp,STR_PROGRAM_DESCRIPTION_LENGTH);
 
-		cs_temp=m_program_list.GetItemText(i,PROGRAM_STATUS);
-		if(cs_temp.CompareNoCase(_T("OFF"))==0)
-		{
-			m_Program_data.at(i).on_off=0;
-		}
-		else
-		{
-			m_Program_data.at(i).on_off=1;
-		}
-
-		cs_temp=m_program_list.GetItemText(i,PROGRAM_AUTO_MANUAL);
-		if(cs_temp.CompareNoCase(_T("Auto"))==0)
-		{
-			m_Program_data.at(i).auto_manual=0;
-		}
-		else
-		{
-			m_Program_data.at(i).auto_manual=1;
-		}
-
-		cs_temp=m_program_list.GetItemText(i,PROGRAM_LABEL);
-		char cTemp1[255];
-		memset(cTemp1,0,255);
-		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-		memcpy_s(m_Program_data.at(i).label,STR_PROGRAM_LABEL_LENGTH,cTemp1,STR_PROGRAM_LABEL_LENGTH);
-
-
-	}
-	Post_Write_Message(g_bac_instance,WRITEPROGRAM_T3000,0,15,sizeof(Str_program_point),BacNet_hwd);
-
-}
-#include "Dialog_Progess.h"
-#include "DialogCM5_BacNet.h"
-extern CDialog_Progess *WaitRead_Data_Dlg;
-#include "MainFrm.h"
 void CBacnetProgram::OnBnClickedButtonProgramEdit()
 {
 	// TODO: Add your control notification handler code here
@@ -425,6 +397,9 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 			break;
 		}
 	}
+	CString temp_show_info;
+	temp_show_info.Format(_T("Reading program code %d ..."),program_list_line + 1);
+	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_show_info); 
 	if(g_protocol == PROTOCOL_BIP_TO_MSTP)
 	{
 		//CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
@@ -449,7 +424,7 @@ void CBacnetProgram::OnBnClickedButtonProgramEdit()
 		int m_persent = 0;
 		int m_total_count = 1;
 		bac_read_which_list = BAC_READ_PROGRAMCODE_LIST;
-		for (int i=0;i<1;i++)
+		for (int i=0;i<4;i++)
 		{
 			int ret_variable;
 			ret_variable = GetProgramData_Blocking(g_bac_instance,program_list_line,program_list_line,i);
@@ -546,7 +521,11 @@ void CBacnetProgram::OnCancel()
 void CBacnetProgram::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+	if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+	{
+		PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+	}
+	else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 	if(bac_select_device_online)
@@ -596,4 +575,44 @@ BOOL CBacnetProgram::OnHelpInfo(HELPINFO* pHelpInfo)
 	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
+}
+
+int GetPrgLabel(int index,CString &ret_label)
+{
+	if(index >= BAC_PROGRAM_ITEM_COUNT)
+	{
+		ret_label.Empty();
+		return -1;
+	}
+	int i = index;
+	CString temp_des2;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).label, (int)strlen((char *)m_Program_data.at(i).label)+1, 
+		ret_label.GetBuffer(MAX_PATH), MAX_PATH );
+	ret_label.ReleaseBuffer();
+
+	return 1;
+}
+
+
+int GetPrgFullLabel(int index,CString &ret_full_label)
+{
+	if(index >= BAC_PROGRAM_ITEM_COUNT)
+	{
+		ret_full_label.Empty();
+		return -1;
+	}
+	int i = index;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_Program_data.at(i).description, (int)strlen((char *)m_Program_data.at(i).description)+1, 
+		ret_full_label.GetBuffer(MAX_PATH), MAX_PATH );
+	ret_full_label.ReleaseBuffer();
+	return 1;
+}
+
+
+void CBacnetProgram::OnNMDblclkListProgram(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: Add your control notification handler code here
+	OnBnClickedButtonProgramEdit();
+	*pResult = 0;
 }

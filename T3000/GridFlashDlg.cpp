@@ -434,6 +434,9 @@
 				case  PM_CO2_RS485:
 					stemp = "CO2";
 					break;
+                case  PM_PRESSURE_SENSOR:
+                    stemp = "Pressure";
+                    break;
 				case  PM_CO2_NODE:
 					stemp = "CO2 Node";
 					break;
@@ -465,6 +468,12 @@
 				case PM_T36CT :
 					stemp="T3-6CT";
 					break;
+                case PM_T322AI:
+                    stemp="T3-22AI";
+                    break;
+                case PM_T38AI8AO6DO:
+                    stemp="T3-8AI8AO6DO";
+                    break;
 				default:
 					stemp="TStat";
 					break;

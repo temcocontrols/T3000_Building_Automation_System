@@ -55,11 +55,6 @@ BEGIN_MESSAGE_MAP(CFlexSlideWnd, CStatic)
 	ON_WM_LBUTTONUP()
 END_MESSAGE_MAP()
 
-
-
-
-
-
 void CFlexSlideWnd::SetParentWnd(CWnd* pParent, CFSBContainer* pContainer)
 {
 	ASSERT(pParent);
@@ -67,7 +62,6 @@ void CFlexSlideWnd::SetParentWnd(CWnd* pParent, CFSBContainer* pContainer)
 	m_pParent = pParent;
 	m_pContainer = pContainer;
 }
-
 
 void CFlexSlideWnd::SetFSBStyle(FSB_STYLE fsbStyle)
 {
@@ -104,13 +98,10 @@ void CFlexSlideWnd::SetFSBStyle(FSB_STYLE fsbStyle)
 	m_pThumbOpter->SetFSBStyle(fsbStyle);
 }
 
-
-
 CFSBChannel* CFlexSlideWnd::GetFSBChannel()
 {
 	return &m_fsbChannel;
 }
-
 
 FSB_STYLE CFlexSlideWnd::GetFSBStyle()
 {
@@ -130,7 +121,6 @@ void CFlexSlideWnd::SetFlexSlideBarRect(CRect& rc)
 //	MoveWindow(&rc);
 	m_rc = rc;
 }
-
 
 // 设置channel的宽度，不得大于控件宽度，不小于1个象素
 // channel 长度应该依据控件长度来计算获得
@@ -154,7 +144,6 @@ void CFlexSlideWnd::SetChannelWidth(int nChannelWidth)
 	m_pThumbOpter->SetChannelRect(rcChannel);
 
 }
-
 
 int CFlexSlideWnd::GetChannelWidth()
 {
@@ -432,8 +421,6 @@ void CFlexSlideWnd::SendCallBackMsg()
 	m_pContainer->SendCallBackMsg();
 }
 
-
-
 void CFlexSlideWnd::Draw(CDC* pDC)
 {
 	//	pDC = GetDC();
@@ -462,7 +449,6 @@ void CFlexSlideWnd::Draw(CDC* pDC)
 
 	//pDC->LineTo(100,100);
 }
-
 
 const int TICMARK_LENGTH = 15;
 const int TICMARK_LENGTH_MID = 4;
@@ -666,7 +652,7 @@ BOOL CFlexSlideWnd::SetPos(int nMinPos, int nMidPos, int nMaxPos)
 	m_pThumbOpter->SetThumbPosition(0, nMinPos-m_nMin);
 	m_pThumbOpter->SetThumbPosition(1, nMidPos-m_nMin);
 	m_pThumbOpter->SetThumbPosition(2, nMaxPos-m_nMin);
-	
+	 Invalidate(TRUE);
 	return TRUE;
 }
 
@@ -699,9 +685,9 @@ BOOL CFlexSlideWnd::SetPos_tstat6_2pos( int nMinPos, int nMidPos, int nMaxPos )
 		return FALSE;
 
 	}
-	
+	m_pThumbOpter->SetPosValue(nMinPos,nMidPos,nMaxPos);
 	m_pThumbOpter->SetThumbPosition(0, nMinPos-m_nMin);
-//	m_pThumbOpter->SetThumbPosition(1, nMidPos-m_nMin);
+ 	//m_pThumbOpter->SetThumbPosition(1, nMidPos-m_nMin);
 //	m_pThumbOpter->SetThumbPosition(2, nMaxPos-m_nMin);
 	m_pThumbOpter->SetThumbPosition(1, nMaxPos-m_nMin);
 	Invalidate(TRUE);
@@ -717,8 +703,6 @@ BOOL CFlexSlideWnd::SetPos_tstat6_3pos( int nMinPos, int nMidPos, int nMaxPos )
 
 	if (!(nMinPos < nMidPos && nMidPos < nMaxPos))//tstat6
 	{
-// 		CString strTips = _T("Set Point can't be set properly. Please confirm your set point value!");
-// 		AfxMessageBox(strTips);
 		return FALSE;
 
 	}

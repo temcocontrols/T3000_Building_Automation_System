@@ -693,23 +693,32 @@ void CModbusPollView::Fresh_Data(){
 		}
 	}
 
-	for (vector<Registers_Infor>::iterator it=g_vectRegisters.begin();it!=g_vectRegisters.end();)
-	{
-		RegPoint pt ;
-		if (it->Reg_Point.size()==0)
-		{
-			pt.Time_offset=1;
-			pt.Value_offset=(unsigned short )m_DataBuffer[it->address];
-		}
-		else
-		{
-			pt.Time_offset=it->Reg_Point[it->Reg_Point.size()-1].Time_offset+1;
-
-			pt.Value_offset=(unsigned short )m_DataBuffer[it->address];
-		}
-		it->Reg_Point.push_back(pt);
-		++it;
-	}
+   
+      
+     if(g_Draw_dlg!=NULL)  //&& g_Draw_dlg->IsWindowVisible()
+     {
+        
+         for (vector<Registers_Infor>::iterator it=g_vectRegisters.begin();it!=g_vectRegisters.end();)
+         {
+             RegPoint pt ;
+             pt.Time_offset=g_Time_Offset;
+             pt.Value_offset=(unsigned short )m_DataBuffer[it->address-m_address];
+             it->Reg_Point.push_back(pt);
+             ++it;
+         }
+         g_Time_Offset+=5;
+         if (g_Time_Offset%10==0)
+         {
+            ::PostMessage(g_Draw_dlg->m_hWnd,MY_FRESH_DRAW_GRAPHIC,0,0);
+            Sleep(200);   //响应绘图
+         } 
+       
+     }
+     else
+     {
+        
+     }
+    
 /////////////////记录数据 Txt 
 	if (!m_logText)
 	{
@@ -1492,19 +1501,27 @@ void CModbusPollView::OnEditAdd()
 	int Index;
 	if(m_Hide_Alias_Columns!=0)//都是数值的
 	{
-		Index=(m_Current_Col-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
-	 
+		//Index=(m_Current_Col-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
+        if (m_Current_Col%2!=0)
+        {
+            return;
+        }
+        else
+        {
+
+            Index=(m_Current_Col/2-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
+        }
 	}
 	else//含义名字的
 	{
-		if (m_Current_Col%2!=0)
+		if (m_Current_Col%3!=0)
 		{
-			 
+			    return;
 		}
 		else
 		{
 			 
-			Index=(m_Current_Col/2-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
+			Index=(m_Current_Col/3-1)*(m_MsDataGrid.get_Rows()-1)+(m_Current_Row-1);
 		}
 
 	 

@@ -22,14 +22,13 @@
 // CInputSetDlg dialog
 
 #define ANALOG_RANG_NUMBER 12
-
  
 // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
 // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KF Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
 //CString analog_range[ANALOG_RANG_NUMBER]={_T("UNUSED"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor1"),_T("Off/On"),_T("Custom Sensor2"),_T("Occupied/Unoccupied"),_T("Unoccupied/Occupied"),_T("Open/Close"),_T("Close/Open")};
 //CString INPUT_FUNS[8]={_T("Normal"),_T("Freeze Protect"),_T("Occupancy Sensor"),_T("Sweep Off"),_T("Clock"),_T("Changeover Mode"),_T("Outside Temp"),_T("Airflow")};
-
 //CString g_str5ERange2[5]={_T("Raw"),_T("Thermistor"),_T("On/Off"),_T("Off/On"),_T("%")};
+
 IMPLEMENT_DYNAMIC(CInputSetDlg, CDialog)
 
 CInputSetDlg::CInputSetDlg(CWnd* pParent /*=NULL*/)
@@ -165,7 +164,7 @@ DWORD WINAPI CInputSetDlg::StartRefresh(LPVOID lpVoid)
 	pParent->b_is_fresh = true;
 	for( i=0;i<17;i++)
 	{
-		Read_Multi(g_tstat_id,&product_register_value[i*64],i*64,64);
+		Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
 	}
 	register_critical_section.Unlock();
 	memset(product_register_value,0,sizeof(product_register_value));
@@ -3088,25 +3087,14 @@ void CInputSetDlg::OnEnKillfocusInputnameedit()
 			if(i<strText.GetLength())
 				p[i]=strText.GetAt(i);
 			else
-				p[i]=' ';
+				p[i]=0;
 		}
-		if (strText.GetLength()>8)
-		{
-			AfxMessageBox(_T(">8 chars"));
-		} 
-		else
-		{
-			if (Write_Multi(g_tstat_id,p,MODBUS_AI1_CHAR1+4*(lRow-2),8)>0)
-			{
+		 
+			 Write_Multi(g_tstat_id,p,MODBUS_AI1_CHAR1+4*(lRow-2),8);
+			 
+			 
 
-			} 
-			else
-			{
-				AfxMessageBox(_T("Error"));
-				return;
-			}
-
-		}
+		 
 	}
 
 	try

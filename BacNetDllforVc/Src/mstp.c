@@ -157,6 +157,7 @@ static inline void printf_master(
 /* larger values for this timeout, not to exceed 300 milliseconds.) */
 #ifndef Treply_timeout
 #define Treply_timeout 295
+//#define Treply_timeout 255 //lib default 295
 #endif
 
 /* The minimum time without a DataAvailable or ReceiveError event that a */
@@ -399,7 +400,8 @@ void MSTP_Receive_Frame_FSM(
                         /* BadCRC */
                         /* indicate that an error has occurred during
                            the reception of a frame */
-                        mstp_port->ReceivedInvalidFrame = true;
+                    //    mstp_port->ReceivedInvalidFrame = true;
+						OutputDebugString(L"ReceivedInvalidFrame \r\n");
                         printf_receive_error
                             ("MSTP: Rx Header: BadCRC [%02X]\n",
                             mstp_port->DataRegister);
@@ -1006,8 +1008,8 @@ bool MSTP_Master_Node_FSM(
                 }
                 mstp_port->ReceivedValidFrame = false;
             } //Fance
-			//else if ((mstp_port->SilenceTimer((void *) mstp_port) > Tusage_timeout) ||(mstp_port->ReceivedInvalidFrame == true)) 
-			else if ((mstp_port->SilenceTimer((void *) mstp_port) > 20) ||(mstp_port->ReceivedInvalidFrame == true)) 
+			else if ((mstp_port->SilenceTimer((void *) mstp_port) > Tusage_timeout) ||(mstp_port->ReceivedInvalidFrame == true)) 
+			//else if ((mstp_port->SilenceTimer((void *) mstp_port) > 20) ||(mstp_port->ReceivedInvalidFrame == true)) 
 			{
 				//Set_MSTP_Connect_Status(false);//Fance
                 if (mstp_port->SoleMaster == true) 
@@ -1114,13 +1116,13 @@ bool MSTP_Master_Node_FSM(
     }
     if (mstp_port->master_state != master_state) {
         /* change of state detected - so print the details for debugging */
-        printf_master
-            ("MSTP: TS=%02X[%02X] NS=%02X[%02X] PS=%02X[%02X] EC=%u TC=%u ST=%u %s\n",
-            mstp_port->This_Station, next_this_station,
-            mstp_port->Next_Station, next_next_station,
-            mstp_port->Poll_Station, next_poll_station, mstp_port->EventCount,
-            mstp_port->TokenCount, mstp_port->SilenceTimer((void *) mstp_port),
-            mstptext_master_state(mstp_port->master_state));
+        //printf_master
+        //    ("MSTP: TS=%02X[%02X] NS=%02X[%02X] PS=%02X[%02X] EC=%u TC=%u ST=%u %s\n",
+        //    mstp_port->This_Station, next_this_station,
+        //    mstp_port->Next_Station, next_next_station,
+        //    mstp_port->Poll_Station, next_poll_station, mstp_port->EventCount,
+        //    mstp_port->TokenCount, mstp_port->SilenceTimer((void *) mstp_port),
+        //    mstptext_master_state(mstp_port->master_state));
     }
 
     return transition_now;

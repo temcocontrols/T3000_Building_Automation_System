@@ -202,7 +202,17 @@ int g_NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi,
 
 void SetPaneString(int nIndext,CString str)
 {
+	if(nIndext != BAC_SHOW_MISSION_RESULTS)
+		return;
+	if(str.IsEmpty())
+		return;
 
+	char * temp_cs = new char[255];
+
+	WideCharToMultiByte( CP_ACP, 0, str.GetBuffer(), -1, temp_cs, 255, NULL, NULL );	
+	PostMessage(m_statusbar_hwnd,WM_SHOW_STATUS_TEXT,(WPARAM)temp_cs,NULL);
+	
+	return;
 	CMFCStatusBar * pStatusBar=NULL;
 	if(AfxGetMainWnd()->GetActiveWindow()==NULL)//if this function is called by a thread ,return 
 		return;
@@ -231,7 +241,7 @@ int Write_Multi(unsigned char device_var,unsigned char *to_write,unsigned short 
 	}
 	if (j>0)
 	{
-		g_strT3000LogString.Format(_T("Multi Write ID=%d,start address=%d,length=%d,Status=OK"),device_var,start_address,length,data.GetBuffer());
+		g_strT3000LogString.Format(_T("Multi Write ID=%d,start address=%d,length=%d"),device_var,start_address,length,data.GetBuffer());
 		CString* pstrInfo = new CString(g_strT3000LogString); 
 		::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
 	}
@@ -379,7 +389,7 @@ int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsig
 	}
 	if (ret>0)
 	{
-		g_strT3000LogString.Format(_T("Multi Read ID=%d,start address=%d,length=%d,Status=OK"),device_var,start_address,length,data.GetBuffer());
+		g_strT3000LogString.Format(_T("Multi Read ID=%d,start address=%d,length=%d"),device_var,start_address,length,data.GetBuffer());
 		CString* pstrInfo = new CString(g_strT3000LogString); 
 		::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
 
@@ -794,119 +804,6 @@ CString GetTempUnit(int nRange, int nPIDNO)
 		}
 	}	
 	return strTemp;
-
-	//CString strTemp=_T("");
-	//
-	//if(nRange<0) // 使用默认的温度单位
-	//{
-	//	UINT uint_temp=GetOEMCP();//get system is for chinese or english
-	//	if(uint_temp!=936 && uint_temp!=950)
-	//	{
-	//		if(multi_register_value[121]==0)
-	//		{
-	//			strTemp.Format(_T("%cC"),176);
-	//		}
-	//		else
-	//		{
-	//			strTemp.Format(_T("%cF"),176);
-	//		}
-	//	}
-	//	else
-	//	{
-	//		//Chinese.
-	//		if(multi_register_value[121]==0)
-	//		{
-	//			strTemp=_T("°C");
-	//		}
-	//		else
-	//		{
-	//			strTemp=_T("°F");
-	//		}
-	//	}
-	//	return strTemp;
-	//}
-
-	//if(nRange==0)		// Raw value, no unit
-	//	strTemp=_T("");
-	//else if(nRange==1)
-	//{//
-	//	UINT uint_temp=GetOEMCP();//get system is for chinese or english
-	//	if(uint_temp!=936 && uint_temp!=950)
-	//	{
-	//		if(multi_register_value[121]==0)
-	//		{
-	//			strTemp.Format(_T("%cC"),176);
-	//		}
-	//		else
-	//		{
-	//			strTemp.Format(_T("%cF"),176);
-	//		}
-	//	}
-	//	else
-	//	{
-	//		//chinese.
-	//		if(multi_register_value[121]==0)
-	//		{
-	//			strTemp=_T("°C");
-	//		}
-	//		else
-	//		{
-	//			strTemp=_T("°F");
-	//		}
-	//	}
-	//	return strTemp;
-	//}
-	//else if(nRange==2)
-	//{//
-	//	strTemp=_T("%");
-	//}
-	//else if(nRange==3)
-	//{//ON/OFF
-	//	strTemp=_T("");
-	//}
-	//else if(nRange==4)
-	//{//Customer Sersor
-	//	if(nPIDNO==1)
-	//	{
-	//		int m_271=multi_register_value[271];
-	//		int m_272=multi_register_value[272];
-	//		if(m_271>>8=='0')
-	//		{
-	//			if((m_271 & 0xFF) =='0')
-	//			{
-	//				if(m_272>>8=='0')
-	//					strTemp.Format(_T("%c"),m_272 & 0xFF);
-	//				else
-	//					strTemp.Format(_T("%c%c"),m_272>>8,m_272 & 0xFF);
-	//			}
-	//			else
-	//				strTemp.Format(_T("%c%c%c"),m_271 & 0xFF,m_272>>8,m_272 & 0xFF);
-	//		}
-	//		else
-	//			strTemp.Format(_T("%c%c%c%c"),m_271>>8,m_271 & 0xFF,m_272>>8,m_272 & 0xFF);
-	//	}
-	//	else if(nPIDNO==2)
-	//	{
-	//		int m_273=multi_register_value[273];
-	//		int m_274=multi_register_value[274];
-	//		if(m_273>>8=='0')
-	//		{
-	//			if((m_273 & 0xFF)=='0')
-	//			{
-	//				if(m_274>>8=='0')
-	//					strTemp.Format(_T("%c"),m_274 & 0xFF);
-	//				else
-	//					strTemp.Format(_T("%c%c"),m_274>>8,m_274 & 0xFF);
-	//			}
-	//			else
-	//				strTemp.Format(_T("%c%c%c"),m_273 & 0xFF,m_274>>8,m_274 & 0xFF);
-	//		}		
-	//		else
-	//			strTemp.Format(_T("%c%c%c%c"),m_273>>8,m_273 & 0xFF,m_274>>8,m_274 & 0xFF);
-
-	//	}
-	//}	
-	//return strTemp;
 }
 
 CString get_product_class_name_by_model_ID(int nModelID)
@@ -1223,30 +1120,10 @@ int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,
 	char * temp_buffer = SendBuffer;
 
 	Str_user_data_header private_data_chunk;
-	Str_sub_user_data_header private_sub_data_chunk;
+	//Str_sub_user_data_header private_sub_data_chunk;
 	int HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
 		unsigned char * n_temp_point = program_code[start_instance];
-	if(g_protocol == PROTOCOL_BIP_TO_MSTP)
-	{
-		HEADER_LENGTH = PRIVATE_SUB_HEAD_LENGTH;
-		private_sub_data_chunk.total_length=PRIVATE_SUB_HEAD_LENGTH +   (end_instance - start_instance + 1)*400;
-		private_sub_data_chunk.command = SUB_WRITE_COMMAND;
-		private_sub_data_chunk.point_start_instance=start_instance;
-		private_sub_data_chunk.point_end_instance=end_instance;
-		private_sub_data_chunk.entitysize=entitysize;
 
-		private_sub_data_chunk.device_id = g_sub_instace ;//123;// g_sub_instace;
-		private_sub_data_chunk.subcmd = command;
-		private_sub_data_chunk.reserved[0] = 0;
-		private_sub_data_chunk.reserved[1] = 0;
-		Set_transfer_length(private_sub_data_chunk.total_length);
-		memcpy_s(SendBuffer,PRIVATE_SUB_HEAD_LENGTH ,&private_sub_data_chunk,PRIVATE_SUB_HEAD_LENGTH );
-		n_temp_point = n_temp_point + npackage*400;
-		memcpy_s(SendBuffer + PRIVATE_SUB_HEAD_LENGTH,400,n_temp_point,400);
-		Set_transfer_length(private_sub_data_chunk.total_length);
-	}
-	else
-	{
 		HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
 		private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + (end_instance - start_instance + 1)*400;
 		private_data_chunk.command = command;
@@ -1258,37 +1135,6 @@ int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,
 		n_temp_point = n_temp_point + npackage*400;
 		memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,400,n_temp_point,400);
 		Set_transfer_length(private_data_chunk.total_length);
-	}
-
-
-#if 0
-	Str_user_data_header private_data_chunk;
-	private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + (end_instance - start_instance + 1)*400;
-	private_data_chunk.command = command;
-	private_data_chunk.point_start_instance = start_instance;
-	private_data_chunk.point_end_instance = end_instance;
-	private_data_chunk.entitysize=entitysize;
-
-
-
-
-
-
-
-	CString n_temp_print;
-	n_temp_print.Format(_T("Tx : "));
-	CString temp_char;
-	char * temp_print = SendBuffer;
-	for (int i = 0; i< 400 ; i++)
-	{
-		temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
-		temp_char.MakeUpper();
-		temp_print ++;
-		n_temp_print = n_temp_print + temp_char + _T(" ");
-	}
-	DFTrace(n_temp_print);
-#endif
-
 	
 	status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&SendBuffer, &data_value);
 	//ct_test(pTest, status == true);
@@ -1367,10 +1213,10 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case  WRITEOUTPUT_T3000:
 		entitysize = sizeof(Str_out_point);
 		break;
-	case WRITEWEEKLYROUTINE_T3000:
+	case WRITESCHEDULE_T3000:
 		entitysize = sizeof(Str_weekly_routine_point);
 		break;
-	case WRITEANNUALROUTINE_T3000:
+	case WRITEHOLIDAY_T3000:
 		entitysize = sizeof(Str_annual_routine_point);
 		break;
 	case WRITETIMESCHEDULE_T3000:
@@ -1385,7 +1231,7 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case WRITE_SETTING_COMMAND:
 		entitysize = sizeof(Str_Setting_Info);
 		break;
-	case WRITECONTROLLER_T3000:
+	case WRITEPID_T3000:
 		entitysize = sizeof(Str_controller_point);
 		break;
 	case WRITESCREEN_T3000:
@@ -1404,11 +1250,14 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case WRITE_SUB_ID_BY_HAND:
 		entitysize = 254;
 		break;
+	case DELETE_MONITOR_DATABASE:
+		entitysize = 24;
+		break;
 	default:
 		{
 			//AfxMessageBox(_T("Entitysize length error!"));
 			TRACE(_T("Entitysize length error!"));
-			break;
+			return 0;
 		}
 
 	}
@@ -1417,26 +1266,9 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	char * temp_buffer = SendBuffer;
 
 	Str_user_data_header private_data_chunk;
-	Str_sub_user_data_header private_sub_data_chunk;
+	//Str_sub_user_data_header private_sub_data_chunk;
 	int HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
-	if(g_protocol == PROTOCOL_BIP_TO_MSTP)
-	{
-		HEADER_LENGTH = PRIVATE_SUB_HEAD_LENGTH;
-		private_sub_data_chunk.total_length=PRIVATE_SUB_HEAD_LENGTH + (end_instance - start_instance + 1)*entitysize;
-		private_sub_data_chunk.command = SUB_WRITE_COMMAND;
-		private_sub_data_chunk.point_start_instance=start_instance;
-		private_sub_data_chunk.point_end_instance=end_instance;
-		private_sub_data_chunk.entitysize=entitysize;
 
-		private_sub_data_chunk.device_id = g_sub_instace ;//123;// g_sub_instace;
-		private_sub_data_chunk.subcmd = command;
-		private_sub_data_chunk.reserved[0] = 0;
-		private_sub_data_chunk.reserved[1] = 0;
-		Set_transfer_length(private_sub_data_chunk.total_length);
-		memcpy_s(SendBuffer,PRIVATE_SUB_HEAD_LENGTH ,&private_sub_data_chunk,PRIVATE_SUB_HEAD_LENGTH );
-	}
-	else
-	{
 		HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
 		private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + (end_instance - start_instance + 1)*entitysize;
 		private_data_chunk.command = command;
@@ -1445,17 +1277,6 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 		private_data_chunk.entitysize=entitysize;
 		Set_transfer_length(private_data_chunk.total_length);
 		memcpy_s(SendBuffer,PRIVATE_HEAD_LENGTH ,&private_data_chunk,PRIVATE_HEAD_LENGTH );
-	}
-
-
-
-
-
-
-
-
-
-	
 
 	switch(command)
 	{
@@ -1531,7 +1352,7 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 			memcpy_s(SendBuffer + i*sizeof(Str_out_point) + HEADER_LENGTH,sizeof(Str_out_point),&m_Output_data.at(i + start_instance),sizeof(Str_out_point));
 		}
 		break;
-	case WRITEWEEKLYROUTINE_T3000:
+	case WRITESCHEDULE_T3000:
 		for (int i=0;i<(end_instance-start_instance + 1);i++)
 		{
 			memcpy_s(SendBuffer + i*sizeof(Str_weekly_routine_point) + HEADER_LENGTH,sizeof(Str_weekly_routine_point),&m_Weekly_data.at(i + start_instance),sizeof(Str_weekly_routine_point));
@@ -1549,7 +1370,7 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 		}
 		
 		break;
-	case  WRITEANNUALROUTINE_T3000:
+	case  WRITEHOLIDAY_T3000:
 		for (int i=0;i<(end_instance-start_instance + 1);i++)
 		{
 			memcpy_s(SendBuffer + i*sizeof(Str_annual_routine_point) + HEADER_LENGTH,sizeof(Str_annual_routine_point),&m_Annual_data.at(i + start_instance),sizeof(Str_annual_routine_point));
@@ -1573,7 +1394,7 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 			DFTrace(test_serial_number);
 		}
 		break;
-	case WRITECONTROLLER_T3000:
+	case WRITEPID_T3000:
 		for (int i=0;i<(end_instance-start_instance + 1);i++)
 		{
 			memcpy_s(SendBuffer + i*sizeof(Str_controller_point) + HEADER_LENGTH,sizeof(Str_controller_point),&m_controller_data.at(i + start_instance),sizeof(Str_controller_point));
@@ -1604,6 +1425,9 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	case  WRITE_SUB_ID_BY_HAND:
 		memcpy_s(SendBuffer + HEADER_LENGTH,254,bacnet_add_id,254);
 		break;
+	case  DELETE_MONITOR_DATABASE:
+		memcpy_s(SendBuffer + HEADER_LENGTH,24,monitor_database_flag,24);
+		break;
 	default:
 		{
 			AfxMessageBox(_T("Command not match!Please Check it!"));
@@ -1611,10 +1435,6 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 		}
 		break;
 	}
-
-
-	//Set_transfer_length(private_data_chunk.total_length);
-	//transfer_len=6;
 
 	status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&SendBuffer, &data_value);
 	//ct_test(pTest, status == true);
@@ -1626,6 +1446,7 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
 	status = address_get_by_device(deviceid, &max_apdu, &dest);
 	if (status) 
 	{
+		g_llTxCount++;
 		return Send_ConfirmedPrivateTransfer(&dest,&private_data);
 	}
 	return -2;
@@ -1683,7 +1504,7 @@ int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t ns
 	int temp_invoke_id = -1;
 	int send_status = true;
 	int	resend_count = 0;
-	for (int z=0;z<3;z++)
+	for (int z=0;z<5;z++)
 	{
 		do 
 		{
@@ -1704,6 +1525,7 @@ int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t ns
 				Sleep(1);
 				if(tsm_invoke_id_free(temp_invoke_id))
 				{
+					g_llRxCount++;
 					return 1;
 				}
 				else
@@ -1754,48 +1576,16 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
 	char * temp_buffer = SendBuffer;
 
 	Str_user_data_header private_data_chunk;
-	Str_sub_user_data_header private_sub_data_chunk;
-
 	int HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
-	if(g_protocol == PROTOCOL_BIP_TO_MSTP)
-	{
-		private_sub_data_chunk.total_length=PRIVATE_SUB_HEAD_LENGTH;
-		private_sub_data_chunk.command = SUB_READ_COMMAND;
-		private_sub_data_chunk.point_start_instance=start_instance;
-		private_sub_data_chunk.point_end_instance=end_instance;
-		private_sub_data_chunk.entitysize=entitysize;
 
-		private_sub_data_chunk.device_id = g_sub_instace ;//123;// g_sub_instace;
-		private_sub_data_chunk.subcmd = command;
-		private_sub_data_chunk.reserved[0] = 0;
-		private_sub_data_chunk.reserved[1] = 0;
-		Set_transfer_length(PRIVATE_SUB_HEAD_LENGTH);
-		status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&private_sub_data_chunk, &data_value);
-	}
-	else
-	{
-		HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
-		private_data_chunk.total_length=PRIVATE_HEAD_LENGTH;
-		private_data_chunk.command = command;
-		private_data_chunk.point_start_instance=start_instance;
-		private_data_chunk.point_end_instance=end_instance;
-		private_data_chunk.entitysize=entitysize;
-		Set_transfer_length(PRIVATE_HEAD_LENGTH);
-		status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&private_data_chunk, &data_value);
-	}
-
-
-
-#if 0
-	Str_user_data_header private_data_chunk;
+	HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
 	private_data_chunk.total_length=PRIVATE_HEAD_LENGTH;
 	private_data_chunk.command = command;
 	private_data_chunk.point_start_instance=start_instance;
 	private_data_chunk.point_end_instance=end_instance;
 	private_data_chunk.entitysize=entitysize;
 	Set_transfer_length(PRIVATE_HEAD_LENGTH);
-#endif
-
+	status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&private_data_chunk, &data_value);
 
 	private_data_len =	bacapp_encode_application_data(&test_value[0], &data_value);
 	private_data.serviceParameters = &test_value[0];
@@ -1807,6 +1597,7 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
 	status = address_get_by_device(deviceid, &max_apdu, &dest);
 	if (status) 
 	{	
+		g_llTxCount++;
 		return Send_ConfirmedPrivateTransfer(&dest,&private_data);
 	}
 	else
@@ -1814,120 +1605,6 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
 }
 
 
-
-
-//通过阻塞的方式获取data.
-//一直查询任务是否成功返回.
-int GetPrivateSubData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize)
-{
-	int temp_invoke_id = -1;
-	int send_status = true;
-	int	resend_count = 0;
-	for (int z=0;z<10;z++)
-	{
-		do 
-		{
-			resend_count ++;
-			if(resend_count>10)
-			{
-				send_status = false;
-				break;
-			}
-			temp_invoke_id =  GetPrivateData(
-				deviceid,
-				command,
-				start_instance,
-				end_instance,
-				entitysize);		
-
-			Sleep(SEND_COMMAND_DELAY_TIME);
-		} while (temp_invoke_id<0);
-		if(send_status)
-		{
-			for (int i=0;i<100;i++)
-			{
-				Sleep(10);
-				if(tsm_invoke_id_free(temp_invoke_id))
-				{
-					return 1;
-				}
-				else
-					continue;
-			}
-		}
-	}
-	return -1;
-}
-
-
-
-
-/************************************************************************/
-/*
-Author: Fance
-Get Bacnet Private Data
-<param name="deviceid">Bacnet Device ID
-<param name="command">Bacnet command
-<param name="start_instance">start point
-<param name="end_instance">end point
-<param name="entitysize">Block size of read
-*/
-/************************************************************************/
-int GetPrivateSubData(uint16_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,uint16_t entitysize)
-{
-	// TODO: Add your control notification handler code here
-
-	uint8_t apdu[480] = { 0 };
-	uint8_t test_value[480] = { 0 };
-	int apdu_len = 0;
-	int private_data_len = 0;	
-	unsigned max_apdu = 0;
-	BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
-	//	BACNET_APPLICATION_DATA_VALUE test_data_value = { 0 };
-	BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
-	//	BACNET_PRIVATE_TRANSFER_DATA test_data = { 0 };
-	bool status = false;
-
-	private_data.vendorID = BACNET_VENDOR_ID;
-	private_data.serviceNumber = 1;
-
-
-
-	Str_sub_user_data_header private_data_chunk;
-	private_data_chunk.total_length=PRIVATE_SUB_HEAD_LENGTH;
-	private_data_chunk.command = SUB_READ_COMMAND;
-	private_data_chunk.point_start_instance=start_instance;
-	private_data_chunk.point_end_instance=end_instance;
-	private_data_chunk.entitysize=entitysize;
-
-	private_data_chunk.device_id = g_sub_instace ;//123;// g_sub_instace;
-	private_data_chunk.subcmd = command;
-	private_data_chunk.reserved[0] = 0;
-	private_data_chunk.reserved[1] = 0;
-	Set_transfer_length(PRIVATE_SUB_HEAD_LENGTH);
-
-
-
-
-
-	status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&private_data_chunk, &data_value);
-	private_data_len =	bacapp_encode_application_data(&test_value[0], &data_value);
-	private_data.serviceParameters = &test_value[0];
-	private_data.serviceParametersLen = private_data_len;
-
-	BACNET_ADDRESS dest = { 0 };
-
-	status = address_get_by_device(g_bac_instance, &max_apdu, &dest);
-	//status = address_get_by_device(deviceid, &max_apdu, &dest);
-	if (status) 
-	{
-		return Send_ConfirmedPrivateTransfer(&dest,&private_data);
-	}
-	else
-		return -2;
-
-
-}
 
 
 /************************************************************************/
@@ -1962,42 +1639,18 @@ int GetProgramData(uint32_t deviceid,uint8_t start_instance,uint8_t end_instance
 	entitysize = entitysize | (npackgae << 9);	//将entitysize 的 高7位用来给program code ，用来记录是第几包;
 
 	Str_user_data_header private_data_chunk;
-	Str_sub_user_data_header private_sub_data_chunk;
+	//Str_sub_user_data_header private_sub_data_chunk;
 
 	int HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
 
-	if(g_protocol == PROTOCOL_BIP_TO_MSTP)
-	{
-		private_sub_data_chunk.total_length=PRIVATE_SUB_HEAD_LENGTH;
-		private_sub_data_chunk.command = SUB_READ_COMMAND;
-		private_sub_data_chunk.point_start_instance=start_instance;
-		private_sub_data_chunk.point_end_instance=end_instance;
-		private_sub_data_chunk.entitysize=entitysize;
+	private_data_chunk.total_length=PRIVATE_HEAD_LENGTH;
+	private_data_chunk.command = READPROGRAMCODE_T3000;
+	private_data_chunk.point_start_instance=start_instance;
+	private_data_chunk.point_end_instance=end_instance;
+	private_data_chunk.entitysize=	entitysize;
+	Set_transfer_length(PRIVATE_HEAD_LENGTH);
+	status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&private_data_chunk, &data_value);
 
-		private_sub_data_chunk.device_id = g_sub_instace ;//123;// g_sub_instace;
-		private_sub_data_chunk.subcmd = READPROGRAMCODE_T3000;
-		private_sub_data_chunk.reserved[0] = 0;
-		private_sub_data_chunk.reserved[1] = 0;
-		Set_transfer_length(PRIVATE_SUB_HEAD_LENGTH);
-		status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&private_sub_data_chunk, &data_value);
-	}
-	else
-	{
-		private_data_chunk.total_length=PRIVATE_HEAD_LENGTH;
-		private_data_chunk.command = READPROGRAMCODE_T3000;
-		private_data_chunk.point_start_instance=start_instance;
-		private_data_chunk.point_end_instance=end_instance;
-		private_data_chunk.entitysize=	entitysize;
-		Set_transfer_length(PRIVATE_HEAD_LENGTH);
-		status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&private_data_chunk, &data_value);
-	}
-
-
-
-
-
-	
-	//ct_test(pTest, status == true);
 	private_data_len =	bacapp_encode_application_data(&test_value[0], &data_value);
 	private_data.serviceParameters = &test_value[0];
 	private_data.serviceParametersLen = private_data_len;
@@ -2118,6 +1771,7 @@ int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t nt
 	status = address_get_by_device(deviceid, &max_apdu, &dest);
 	if (status) 
 	{
+		g_llTxCount ++;
 		return Send_ConfirmedPrivateTransfer(&dest,&private_data);
 		//return g_invoke_id;
 	}
@@ -2126,6 +1780,88 @@ int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t nt
 
 }
 
+
+
+/***************************************************
+**
+** Compare all the labels , if new label already exist ,return true. Not exist return false.
+** Add by Fance
+****************************************************/
+bool Check_FullLabel_Exsit(LPCTSTR m_new_fulllabel)
+{
+	CString new_string;
+	new_string = m_new_fulllabel;
+	if(new_string.IsEmpty())
+		return false;
+	char cTemp1[255];
+	memset(cTemp1,0,255);
+	WideCharToMultiByte( CP_ACP, 0, new_string.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+
+	for (int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
+	{
+		if(strcmp(cTemp1,(char *)m_Input_data.at(i).description) == 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,new_string + _T(" already exist !"));
+			return true;
+		}
+	}
+
+	for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+	{
+		if(strcmp(cTemp1,(char *)m_Output_data.at(i).description) == 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,new_string + _T(" already exist !"));
+			return true;
+		}
+	}
+
+	for (int i=0;i<BAC_VARIABLE_ITEM_COUNT;i++)
+	{
+		if(strcmp(cTemp1,(char *)m_Variable_data.at(i).description) == 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,new_string + _T(" already exist !"));
+			return true;
+		}
+	}
+
+	for (int i=0;i<BAC_PROGRAM_ITEM_COUNT;i++)
+	{
+		if(strcmp(cTemp1,(char *)m_Program_data.at(i).description) == 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,new_string + _T(" already exist !"));
+			return true;
+		}
+	}
+
+	for (int i=0;i<BAC_SCREEN_COUNT;i++)
+	{
+		if(strcmp(cTemp1,(char *)m_screen_data.at(i).description) == 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,new_string + _T(" already exist !"));
+			return true;
+		}
+	}
+
+	for (int i=0;i<BAC_SCHEDULE_COUNT;i++)
+	{
+		if(strcmp(cTemp1,(char *)m_Weekly_data.at(i).description) == 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,new_string + _T(" already exist !"));
+			return true;
+		}
+	}
+
+	for (int i=0;i<BAC_HOLIDAY_COUNT;i++)
+	{
+		if(strcmp(cTemp1,(char *)m_Annual_data.at(i).description) == 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,new_string + _T(" already exist !"));
+			return true;
+		}
+	}
+
+	return false;
+}
 
 
 /***************************************************
@@ -2188,7 +1924,7 @@ bool Check_Label_Exsit(LPCTSTR m_new_label)
 		}
 	}
 
-	for (int i=0;i<BAC_WEEKLY_ROUTINES_COUNT;i++)
+	for (int i=0;i<BAC_SCHEDULE_COUNT;i++)
 	{
 		if(strcmp(cTemp1,(char *)m_Weekly_data.at(i).label) == 0)
 		{
@@ -2197,7 +1933,7 @@ bool Check_Label_Exsit(LPCTSTR m_new_label)
 		}
 	}
 
-	for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
+	for (int i=0;i<BAC_HOLIDAY_COUNT;i++)
 	{
 		if(strcmp(cTemp1,(char *)m_Annual_data.at(i).label) == 0)
 		{
@@ -2261,8 +1997,8 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 	//    &uiErrorCode);
 	decode_octet_string(&data->serviceParameters[iLen], len_value_type,&Temp_CS);
 
-
-redecode_part:
+	g_llRxCount++;
+//redecode_part:
 	command_type = Temp_CS.value[2];
 
 
@@ -2272,21 +2008,6 @@ redecode_part:
 	///////////////////////////////
 	switch(command_type)
 	{
-	case SUB_READ_COMMAND:
-		{
-			
-			memset(temp_buf,0,500);
-			memcpy_s(temp_buf,len_value_type,Temp_CS.value,len_value_type);
-			memcpy_s(Temp_CS.value,PRIVATE_HEAD_LENGTH,temp_buf,PRIVATE_HEAD_LENGTH);
-			Temp_CS.value[2] = Temp_CS.value[9];
-			memcpy_s(Temp_CS.value + PRIVATE_HEAD_LENGTH,len_value_type - PRIVATE_SUB_HEAD_LENGTH ,temp_buf + PRIVATE_SUB_HEAD_LENGTH,len_value_type - PRIVATE_SUB_HEAD_LENGTH );
-
-			len_value_type = len_value_type + PRIVATE_HEAD_LENGTH - PRIVATE_SUB_HEAD_LENGTH;
-			//TRACE(_T("goto redecode_part\r\n"));
-			goto redecode_part;
-			Sleep(1);
-		}
-		break;
 	case READ_REMOTE_POINT:
 		{
 			if((len_value_type - PRIVATE_HEAD_LENGTH)%(sizeof(Str_remote_point))!=0)
@@ -2345,6 +2066,12 @@ redecode_part:
 			{
 				m_graphic_label_data.at(i).reg.label_status = *(my_temp_point++);
 				temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				if((temp_struct_value == 0) || (m_graphic_label_data.at(i).reg.label_status == NO_UNSED_LABEL))
+				{
+					b_stop_read_grp_label = true;
+					return -1;
+				}
+				b_stop_read_grp_label = false;
 				m_graphic_label_data.at(i).reg.nSerialNum = temp_struct_value;
 				my_temp_point = my_temp_point + 4;
 				m_graphic_label_data.at(i).reg.nScreen_index = *(my_temp_point++);
@@ -2486,9 +2213,7 @@ redecode_part:
 				m_Output_data.at(i).sub_number = *(my_temp_point++);
 				
 				//temp_out.delay_timer = *(my_temp_point++);  Output 这个Delay time先不管 清0
-				m_Output_data.at(i).delay_timer = 0;
-				my_temp_point = my_temp_point + 1;
-
+				m_Output_data.at(i).pwm_period = *(my_temp_point++); 
 				//m_Output_data.push_back(temp_out);
 			}
 			return READOUTPUT_T3000;
@@ -2647,9 +2372,9 @@ redecode_part:
 			end_instance = *my_temp_point;
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
-			if(end_instance == (BAC_WEEKLY_ROUTINES_COUNT - 1))
+			if(end_instance == (BAC_SCHEDULE_COUNT - 1))
 				end_flag = true;
-			if(start_instance >= BAC_WEEKLY_ROUTINES_COUNT)
+			if(start_instance >= BAC_SCHEDULE_COUNT)
 				return -1;//超过长度了;
 
 			for (i=start_instance;i<=end_instance;i++)
@@ -2692,9 +2417,9 @@ redecode_part:
 		end_instance = *my_temp_point;
 		my_temp_point++;
 		my_temp_point = my_temp_point + 2;
-		if(end_instance == (BAC_ANNUAL_ROUTINES_COUNT - 1))
+		if(end_instance == (BAC_HOLIDAY_COUNT - 1))
 			end_flag = true;
-		if(start_instance >= BAC_ANNUAL_ROUTINES_COUNT)
+		if(start_instance >= BAC_HOLIDAY_COUNT)
 			return -1;//超过长度了;
 
 		for (i=start_instance;i<=end_instance;i++)
@@ -2983,10 +2708,10 @@ redecode_part:
 			my_temp_point++;
 			my_temp_point = my_temp_point + 2;
 
-			if(start_instance >= BAC_CONTROLLER_COUNT)
+			if(start_instance >= BAC_PID_COUNT)
 				return -1;//超过长度了;
 
-			if(end_instance == (BAC_CONTROLLER_COUNT - 1))
+			if(end_instance == (BAC_PID_COUNT - 1))
 				end_flag = true;
 
 			for (i=start_instance;i<=end_instance;i++)
@@ -3125,11 +2850,7 @@ redecode_part:
 				m_monitor_data.at(i).max_time_length = *(my_temp_point++);
 				m_monitor_data.at(i).num_inputs = *(my_temp_point++);
 				m_monitor_data.at(i).an_inputs = *(my_temp_point++);
-				//m_monitor_data.at(i).unit = *(my_temp_point++);
-				//m_monitor_data.at(i).wrap_flag = *(my_temp_point++);
 				m_monitor_data.at(i).status= *(my_temp_point++);
-				//m_monitor_data.at(i).reset_flag= *(my_temp_point++);
-				//m_monitor_data.at(i).double_flag= *(my_temp_point++);
 				m_monitor_data.at(i).next_sample_time = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 				my_temp_point = my_temp_point + 4;
 			}
@@ -3217,6 +2938,28 @@ redecode_part:
 		}
 		return READALARM_T3000;
 		break;
+	case READ_MISC:
+		{
+			block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
+			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+			if(block_length!=sizeof(Str_MISC))
+				return -1;
+			Device_Misc_Data.reg.flag[0] = *(my_temp_point++);
+			Device_Misc_Data.reg.flag[1] = *(my_temp_point++);
+			if((Device_Misc_Data.reg.flag[0]!= 0x55) || (Device_Misc_Data.reg.flag[1] != 0xff))
+				return -1;
+			for (int z=0;z<12;z++)
+			{
+				Device_Misc_Data.reg.monitor_analog_block_num[z] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point  +  4;
+			}
+			for (int z=0;z<12;z++)
+			{
+				Device_Misc_Data.reg.monitor_digital_block_num[z] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point  +  4;
+			}
+		}
+		break;
 	case READ_SETTING_COMMAND:
 		{
 			block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
@@ -3299,6 +3042,10 @@ redecode_part:
 			memcpy_s(&Device_Basic_Setting.reg.update_dyndns,UN_TIME_LENGTH,my_temp_point,UN_TIME_LENGTH);
 			my_temp_point = my_temp_point + UN_TIME_LENGTH;
 
+			Device_Basic_Setting.reg.mstp_network_number = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
+			my_temp_point = my_temp_point + 2;
+			Device_Basic_Setting.reg.BBMD_EN = *(my_temp_point++);
+			Device_Basic_Setting.reg.sd_exist = *(my_temp_point++);
 			return READ_SETTING_COMMAND;
 		}
 		break;
@@ -3546,7 +3293,11 @@ void local_handler_conf_private_trans_ack(
 	int receive_data_type;
 	bool each_end_flag = false;
 	receive_data_type = CM5ProcessPTA(&data,each_end_flag);
-
+	if(receive_data_type < 0)
+	{
+		g_llerrCount ++;
+		return;
+	}
 	switch(receive_data_type)
 	{
 	case READ_REMOTE_POINT:
@@ -3566,14 +3317,18 @@ void local_handler_conf_private_trans_ack(
 	case READINPUT_T3000:
 		if(each_end_flag)
 		{
-			::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+			if(pDialog[WINDOW_INPUT]->IsWindowVisible())
+				::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+			else
+				TRACE(_T("Input window not visiable ,don't refresh\r\n"));
 		}
 		copy_data_to_ptrpanel(TYPE_INPUT);
 		break;
 	case READPROGRAM_T3000:
 		if(each_end_flag)
 		{
-			::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+			if(pDialog[WINDOW_PROGRAM]->IsWindowVisible())
+				::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
 		}
 		copy_data_to_ptrpanel(TYPE_ALL);
 		break;
@@ -3581,12 +3336,18 @@ void local_handler_conf_private_trans_ack(
 		break;
 	case READVARIABLE_T3000:
 		if(each_end_flag)
-			::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+		{
+			if(pDialog[WINDOW_VARIABLE]->IsWindowVisible())
+				::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+		}
 		copy_data_to_ptrpanel(TYPE_VARIABLE);
 		break;
 	case READOUTPUT_T3000:
 		if(each_end_flag)
+		{
+			if(pDialog[WINDOW_OUTPUT]->IsWindowVisible())
 			::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+		}
 		copy_data_to_ptrpanel(TYPE_OUTPUT);
 		break;
 	case READWEEKLYROUTINE_T3000:
@@ -3639,6 +3400,16 @@ void local_handler_conf_private_trans_ack(
 		break;
 	default:
 		break;
+	}
+
+	if((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG))
+	{
+			CString temp_file;
+			CString temp_serial;
+			temp_serial.Format(_T("%u.prg"),g_selected_serialnumber);
+			temp_file = g_achive_folder + _T("\\") + temp_serial;
+			SaveBacnetConfigFile_Cache(temp_file);
+			//TRACE(_T("Save config file cache\r\n"));
 	}
 
 	return;
@@ -3722,7 +3493,7 @@ CString GetProductName(int ModelID)
 		strProductName="TStat5i";
 		break;
 	case PM_HUMTEMPSENSOR:
-		strProductName="Hum Temp Sensor";
+		strProductName="TstatHUM";
 		break;
 	case PM_AirQuality:
 		strProductName="Air Quality";
@@ -3749,6 +3520,9 @@ CString GetProductName(int ModelID)
 	case  PM_CO2_RS485:
 		strProductName = "CO2";
 		break;
+    case  PM_PRESSURE_SENSOR:
+        strProductName = "Pressure";
+        break;
 	case  PM_CO2_NODE:
 		strProductName = "CO2 Node";
 		break;
@@ -3790,6 +3564,12 @@ CString GetProductName(int ModelID)
 	case PM_HUM_R:
 		strProductName="HUM-R";
 		break;
+    case PM_T322AI:
+        strProductName="T3-22AI";
+        break;
+    case PM_T38AI8AO6DO:
+        strProductName="T3-8AI8AO6DO";
+        break;
 	default:
 		strProductName="";
 		break;
@@ -4054,15 +3834,9 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 	//	bac_cs_mac.Format(_T("%d"),vendor_id);
 
 	bac_cs_device_id.Format(_T("%d"),device_id);
-
-
-	//	bac_cs_vendor_id.Format(_T("%d"),vendor_id);
-	//g_bac_instance =device_id;
-	//g_mac = _wtoi(bac_cs_mac);
-
 	TRACE(_T("Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac + _T("\r\n"));
 
-	g_Print = _T("Globle Who is Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac;
+	//g_Print = _T("Globle Who is Find ") + bac_cs_device_id +_T("  ") + bac_cs_mac;
 	//DFTrace(g_Print);
 	_Bac_Scan_Com_Info temp_1;
 	temp_1.device_id = device_id;
@@ -4262,22 +4036,13 @@ DWORD WINAPI   MSTP_Receive(LPVOID lpVoid)
 	g_mstp_flag=true;
 	while(g_mstp_flag)
 	{
-		//datalink_set("bip");
-
-		//pdu_len = datalink_receive(&src,&Rx_Buf[0],MAX_MPDU,INFINITE);
 		pdu_len = datalink_receive(&src,&Rx_Buf[0],MAX_MPDU,INFINITE);
-
-		//	pdu_len =  bip_receive(&src,&Rx_Buf[0],MAX_MPDU, INFINITE);
-		//pdu_len = dlmstp_receive(&src, &Rx_Buf[0], MAX_MPDU, INFINITE);
 		if(pdu_len==0)
 		{
 			Sleep(1);
 			continue;
 		}
 		npdu_handler(&src, &Rx_Buf[0], pdu_len);
-		//CString TEMP1;
-		//TEMP1.Format("%s",Rx_Buf);
-		//	AfxMessageBox(TEMP1);
 	}
 	return 0;
 }
@@ -4759,7 +4524,7 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 {
 	int nLen=buffer[2]+buffer[3]*256;
 	//int n =sizeof(char)+sizeof(unsigned char)+sizeof( unsigned short)*9;
-	unsigned short usDataPackage[30]={0};
+	unsigned short usDataPackage[400]={0};
 	if(nLen>=0)
 	{
 		refresh_net_device temp;
@@ -4769,17 +4534,25 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 		int nproduct_id = usDataPackage[4];
 		CString nproduct_name = GetProductName(nproduct_id);
 		if(nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
-			return m_refresh_net_device_data.size();
-
+          {
+            if (nproduct_id<200)
+            {
+                return m_refresh_net_device_data.size();
+            }
+			
+           }
 		CString nip_address;
 		nip_address.Format(_T("%d.%d.%d.%d"),usDataPackage[6],usDataPackage[7],usDataPackage[8],usDataPackage[9]);
 
 		int nport = usDataPackage[10];
+
+
 		int nsw_version = usDataPackage[11];
 		int nhw_version = usDataPackage[12];
 
 		int modbusID=usDataPackage[5];
 		//TRACE(_T("Serial = %u     ID = %d\r\n"),nSerial,modbusID);
+        
 		g_Print.Format(_T("Refresh list :Serial = %u     ID = %d ,ip = %s  , Product name : %s"),nSerial,modbusID,nip_address ,nproduct_name);
 		DFTrace(g_Print);
 		temp.nport = nport;
@@ -4791,8 +4564,16 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 		temp.nSerial = nSerial;
 		temp.NetCard_Address=local_enthernet_ip;
 
-		temp.object_instance = usDataPackage[11];
-		temp.panal_number = usDataPackage[12];
+		temp.sw_version = usDataPackage[11];
+		temp.hw_version = usDataPackage[12];
+		temp.parent_serial_number = usDataPackage[13] + usDataPackage[14]*65536;
+		unsigned char temp_obj[2];
+		unsigned char temp_panel[2];
+		memcpy(temp_obj,&usDataPackage[15],2);
+		memcpy(temp_panel,&usDataPackage[16],2);
+		temp.object_instance = temp_obj[0]*256 + temp_obj[1];
+		temp.panal_number = temp_panel[0];
+	//	temp.object_instance = usDataPackage[15] >>8 + (usDataPackage[15]&0x00ff)<<8;
 		bool find_exsit = false;
 
 		for (int i=0;i<(int)m_refresh_net_device_data.size();i++)
@@ -4808,6 +4589,53 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 		{
 			m_refresh_net_device_data.push_back(temp);
 		}
+
+
+		char * temp_point = NULL;
+		refresh_net_label_info temp_label;
+		temp_point = (char *)&usDataPackage[16]  + 1;
+		if(( (unsigned char)temp_point[0] != 0xff) && ((unsigned char)temp_point[1] != 0xff) && ((unsigned char)temp_point[0] != 0x00))
+		{
+			memcpy(temp_label.label_name,&temp_point[0],20);
+			temp_point = temp_point + 20;
+			CString cs_temp_label;
+			MultiByteToWideChar( CP_ACP, 0, (char *)temp_label.label_name, (int)strlen((char *)temp_label.label_name)+1, 
+				cs_temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+			cs_temp_label.ReleaseBuffer();
+			if(cs_temp_label.GetLength() > 20)
+				cs_temp_label = cs_temp_label.Left(20);
+			temp_label.serial_number = (unsigned int)nSerial;
+			CString temp_serial_number;
+			temp_serial_number.Format(_T("%u"),temp_label.serial_number);
+			int need_to_write_into_device = GetPrivateProfileInt(temp_serial_number,_T("WriteFlag"),0,g_achive_device_name_path);
+			if(need_to_write_into_device == 0)
+			{
+				bool found_device = false;
+				bool found_device_new_name = false;
+				for (int i=0;i<m_refresh_net_device_data.size();i++)
+				{
+					if(temp_label.serial_number == m_refresh_net_device_data.at(i).nSerial)
+					{
+						if(cs_temp_label.CompareNoCase( m_refresh_net_device_data.at(i).show_label_name) == 0)
+						{
+							found_device_new_name = false;
+						}
+						else
+						{
+							m_refresh_net_device_data.at(i).show_label_name = cs_temp_label;
+							found_device_new_name = true;
+						}
+						break;
+					}
+				}
+			}
+		}
+
+
+
+
+
+
 	}
 
 
@@ -5205,7 +5033,56 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 								AddNetDeviceForRefreshList(buffer, nRet, h_siBind);
 							}
 						}	
-						g_llTxCount++;
+#if 0
+						else if(buffer[0]  == RESPONSE_LABEL)
+						{
+							g_llTxCount++;
+							g_llRxCount++;
+							char * temp_point = NULL;
+							refresh_net_label_info temp_label;
+							temp_point = (char *)&buffer[1];
+							if((buffer[1] == 0xff) || (buffer[2] == 0xff) || (buffer[1] == 0x00))
+								continue;
+							if(nRet >= 25)
+							{
+								memcpy(temp_label.label_name,&buffer[1],20);
+								temp_point = temp_point + 20;
+								CString cs_temp_label;
+								MultiByteToWideChar( CP_ACP, 0, (char *)temp_label.label_name, (int)strlen((char *)temp_label.label_name)+1, 
+									cs_temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+								cs_temp_label.ReleaseBuffer();
+								if(cs_temp_label.GetLength() > 20)
+									cs_temp_label = cs_temp_label.Left(20);
+								temp_label.serial_number = ((unsigned char)temp_point[3])<<24 | ((unsigned char)temp_point[2]<<16) | ((unsigned char)temp_point[1])<<8 | ((unsigned char)temp_point[0]);
+								CString temp_serial_number;
+								temp_serial_number.Format(_T("%u"),temp_label.serial_number);
+								int need_to_write_into_device = GetPrivateProfileInt(temp_serial_number,_T("WriteFlag"),0,g_achive_device_name_path);
+								if(need_to_write_into_device == 0)
+								{
+									bool found_device = false;
+									bool found_device_new_name = false;
+									for (int i=0;i<m_refresh_net_device_data.size();i++)
+									{
+										if(temp_label.serial_number == m_refresh_net_device_data.at(i).nSerial)
+										{
+											if(cs_temp_label.CompareNoCase( m_refresh_net_device_data.at(i).show_label_name) == 0)
+											{
+												found_device_new_name = false;
+											}
+											else
+											{
+												m_refresh_net_device_data.at(i).show_label_name = cs_temp_label;
+												found_device_new_name = true;
+											}
+											break;
+										}
+									}
+								}
+
+							}
+						}
+						//g_llTxCount++;//不合理
+#endif
 					}
 					else
 					{
@@ -5228,7 +5105,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
 			{
 				g_ScnnedNum = 0;
 				bTimeOut = TRUE;
-				g_llTxCount++;
+				//g_llTxCount++;//不合理
 			}
 		}//end of while
 END_SCAN:
@@ -5246,42 +5123,7 @@ END_SCAN:
 
 			BOOL bDontLinger = FALSE;
 			setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
-#if 0
-			//SOCKADDR_IN bcast;
-			h_bcast.sin_family=AF_INET;
-			//bcast.sin_addr.s_addr=nBroadCastIP;
-			h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
-			h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
-#endif
 
-
-
-
-
-
-
-
-#if 0
-			local_enthernet_ip.Empty();
-			GetHostAdaptersInfo(local_enthernet_ip);
-			if(!local_enthernet_ip.IsEmpty())
-			{
-
-				WideCharToMultiByte( CP_ACP, 0, local_enthernet_ip.GetBuffer(), -1, local_network_ip, 255, NULL, NULL );
-				h_siBind.sin_family=AF_INET;
-				h_siBind.sin_addr.s_addr =  inet_addr(local_network_ip);
-				//h_siBind.sin_addr.s_addr=INADDR_ANY;
-				h_siBind.sin_port= htons(57619);
-				::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
-			}
-#endif
-#if 0
-			//SOCKADDR_IN siBind;
-			h_siBind.sin_family=AF_INET;
-			h_siBind.sin_addr.s_addr=INADDR_ANY;
-			h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
-			::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
-#endif
 		}
 
 		if( AfxGetMainWnd()->GetActiveWindow() != NULL ) {
@@ -5297,15 +5139,6 @@ END_SCAN:
 		}
 
 	}
-
-
-	//pScanner->m_bNetScanFinish = TRUE; // 超时结束
-
-	//g_strScanInfoPrompt = _T("NC by TCP");
-	//strlog=_T("UDP scan finished,Time: ")+Get_NowTime()+_T("\n");
-	//NET_WriteLogFile(strlog);
-	//pScanner->m_eScanNCEnd->SetEvent();
-
 	if (g_Vector_Subnet.size()==0)
 	{
 		SetPaneString(3,_T("No Network Card is installed in your PC"));
@@ -5329,16 +5162,6 @@ void Send_WhoIs_remote_ip(CString ipaddress_temp)
 		ipaddress  = ipaddress_temp;
 	}
 
-#if 0
-	SOCKET h_temp_sokcet=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
-	BOOL bBroadcast=TRUE;
-	::setsockopt(h_temp_sokcet,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
-	int iMode=1;
-	ioctlsocket(h_temp_sokcet,FIONBIO, (u_long FAR*) &iMode);
-
-	BOOL bDontLinger = FALSE;
-	setsockopt( h_temp_sokcet, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
-#endif
 	//SOCKADDR_IN bcast;.
 	char temp_ip_address[20];
 	WideCharToMultiByte( CP_ACP, 0, ipaddress.GetBuffer(), -1, temp_ip_address, 255, NULL, NULL );
@@ -5350,25 +5173,6 @@ void Send_WhoIs_remote_ip(CString ipaddress_temp)
 	h_bcast_temp.sin_addr.s_addr=temp_ip;
 	//h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
 	h_bcast_temp.sin_port=htons(BACNETIP_PORT);
-
-
-#if 0
-	SOCKADDR_IN h_siBind_test;
-	h_siBind_test.sin_family=AF_INET;
-	h_siBind_test.sin_addr.s_addr=INADDR_ANY;
-	h_siBind_test.sin_port=htons(BACNETIP_PORT);
-#endif
-	//	::bind(h_temp_sokcet, (sockaddr*)&h_siBind,sizeof(h_siBind));
-
-	//	USES_CONVERSION;   
-
-
-	//int bind_ret =::bind(h_temp_sokcet, (sockaddr*)&h_siBind_test,sizeof(h_siBind_test));
-	//if(bind_ret<0)
-	//{
-	//	AfxMessageBox(_T("Locol port 47808 is not valiable"));
-
-	//}
 
 
 	const DWORD END_FLAG = 0x00000000;
@@ -5423,12 +5227,6 @@ void Send_WhoIs_remote_ip(CString ipaddress_temp)
 
 int Open_MonitorDataBase(CString DataSource)
 {
-	//m_pCon.CreateInstance(_T("ADODB.Connection"));
-	//m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-	//strSql.Format(_T("update ALL_NODE set Hardware_Ver ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),hw_instance,str_serialid,str_baudrate);
-	//m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
-	//strSql.Format(_T("update ALL_NODE set Software_Ver ='%s' where Serial_ID = '%s' and Bautrate = '%s'"),sw_mac,str_serialid,str_baudrate);
-	//m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
 	CString locol_path;
 	CString m_mdb_path_t3000;
 	CString m_application_path;
@@ -5507,11 +5305,12 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 #endif
 
 		int ntemp_version = GetPrivateProfileInt(_T("Setting"),_T("Version"),0,FilePath);
-		//if(ntemp_version != 1)
-		//{
-		//	DeleteFile(new_file);
-		//	return -1;
-		//}
+		if(ntemp_version != 2)
+		{
+			DeleteFile(new_file);
+			SetPaneString(BAC_SHOW_MISSION_RESULTS ,_T("You config file is the old version."));
+			return -1;
+		}
 
 		//			CString FilePath;
 		//		FilePath=dlg.GetPathName();
@@ -5586,7 +5385,7 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 				m_Output_data.at(i).sub_id = (unsigned char)GetPrivateProfileInt(temp_section,_T("M_Del_Low"),0,FilePath);
 				m_Output_data.at(i).sub_product = (unsigned char)GetPrivateProfileInt(temp_section,_T("S_Del_High"),0,FilePath);
 				m_Output_data.at(i).sub_number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Sub__number"),0,FilePath);
-				m_Output_data.at(i).delay_timer = (unsigned char)GetPrivateProfileInt(temp_section,_T("Delay_Timer"),0,FilePath);
+				m_Output_data.at(i).pwm_period = (unsigned char)GetPrivateProfileInt(temp_section,_T("Delay_Timer"),0,FilePath);
 			}
 
 		for (int i=0;i<BAC_VARIABLE_ITEM_COUNT;i++)
@@ -5646,7 +5445,7 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 			m_Program_data.at(i).unused = (unsigned char)GetPrivateProfileInt(temp_section,_T("Unused"),0,FilePath);
 		}
 
-		for (int i=0;i<BAC_CONTROLLER_COUNT;i++)
+		for (int i=0;i<BAC_PID_COUNT;i++)
 		{
 			CString temp_section,temp_des,temp_csc;
 			temp_section.Format(_T("Controller%d"),i);
@@ -5699,14 +5498,6 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 				}
 			}
 
-			//for (int x=0;x<9;x++)
-			//{
-			//	for (int y=0;y<8;y++)
-			//	{
-			//		m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_minutes = *(my_temp_point ++);
-			//		m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[y][x].time_hours = *(my_temp_point ++);
-			//	}
-			//}
 
 		}
 
@@ -5759,6 +5550,14 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 			}
 			else
 			{
+				for (int x=0;x<(temp_program_code.GetLength()/2);x++)
+				{
+					CString temp_value;
+					temp_value = temp_program_code.Left(2);
+					temp_program_code = temp_program_code.Right(temp_program_code.GetLength()-2);
+					program_code[i][x] = Str_to_Byte(temp_value);
+				}
+#if 0
 				if(temp_program_code.GetLength() == 2*program_code_length[i])
 				{
 					for (int x=0;x<program_code_length[i];x++)
@@ -5769,6 +5568,7 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 						program_code[i][x] = Str_to_Byte(temp_value);
 					}
 				}
+#endif
 			}
 
 
@@ -5807,7 +5607,7 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 				m_screen_data.at(i).ycur_grp = GetPrivateProfileInt(temp_section,_T("Ycur_grp"),0,FilePath);
 			}
 
-		for (int i=0;i<BAC_WEEKLY_ROUTINES_COUNT;i++)
+		for (int i=0;i<BAC_SCHEDULE_COUNT;i++)
 		{
 			CString temp_section,temp_des,temp_csc;
 			temp_section.Format(_T("Weekly_Routines%d"),i);
@@ -5842,7 +5642,7 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 			m_Weekly_data.at(i).override_2.point_type = GetPrivateProfileInt(temp_section,_T("Override_2_Point_Type"),0,FilePath);
 		}
 
-		for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
+		for (int i=0;i<BAC_HOLIDAY_COUNT;i++)
 		{
 			CString temp_section,temp_des,temp_csc;
 			temp_section.Format(_T("Annual_Routines%d"),i);
@@ -5934,8 +5734,16 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 		DeleteFile(new_file);
 		if(write_to_device)	//如果是客户手动load 就让客户选择路径，不是手动load就说明是读缓存;
 		{
-			CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-			pFrame->Show_Wait_Dialog_And_SendConfigMessage();
+			if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+			{
+
+			}
+			else
+			{
+				CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+				pFrame->Show_Wait_Dialog_And_SendConfigMessage();
+			}
+
 		}
 		else
 		{
@@ -5978,7 +5786,7 @@ int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
 		char * temp_point = pBuf;
 
 #endif
-		if(temp_point[0] != 3)
+		if(temp_point[0] != 4)
 			return -1;
 		temp_point = temp_point + 1;
 		for (int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
@@ -6005,7 +5813,7 @@ int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
 			temp_point = temp_point + sizeof(Str_program_point);
 		}
 
-		for (int i=0;i<BAC_CONTROLLER_COUNT;i++)
+		for (int i=0;i<BAC_PID_COUNT;i++)
 		{
 			memcpy(&m_controller_data.at(i),temp_point,sizeof(Str_controller_point));
 			temp_point = temp_point + sizeof(Str_controller_point);
@@ -6018,13 +5826,13 @@ int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
 		}
 
 
-		for (int i=0;i<BAC_WEEKLY_ROUTINES_COUNT;i++)
+		for (int i=0;i<BAC_SCHEDULE_COUNT;i++)
 		{
 			memcpy(&m_Weekly_data.at(i) ,temp_point,sizeof(Str_weekly_routine_point));
 			temp_point = temp_point + sizeof(Str_weekly_routine_point);
 		}
 
-		for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
+		for (int i=0;i<BAC_HOLIDAY_COUNT;i++)
 		{
 			memcpy(&m_Annual_data.at(i) ,temp_point,sizeof(Str_annual_routine_point));
 			temp_point = temp_point + sizeof(Str_annual_routine_point);
@@ -6042,7 +5850,7 @@ int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
 			temp_point = temp_point + WEEKLY_SCHEDULE_SIZE;
 		}
 
-		for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
+		for (int i=0;i<BAC_HOLIDAY_COUNT;i++)
 		{
 			memcpy(g_DayState[i] ,temp_point,ANNUAL_CODE_SIZE);
 			temp_point = temp_point + ANNUAL_CODE_SIZE;
@@ -6128,7 +5936,7 @@ void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath)
 		memset(temp_buffer ,0,50000);
 		//FilePath = SaveConfigFilePath.Left( config_file_length -  right_suffix);
 		//FilePath = FilePath + _T("ini");
-		temp_buffer[0] = 3;
+		temp_buffer[0] = 4;
 		temp_point = temp_buffer + 1;
 		for (int i=0;i<BAC_INPUT_ITEM_COUNT;i++)
 		{
@@ -6154,7 +5962,7 @@ void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath)
 			temp_point = temp_point + sizeof(Str_program_point);
 		}
 
-		for (int i=0;i<BAC_CONTROLLER_COUNT;i++)
+		for (int i=0;i<BAC_PID_COUNT;i++)
 		{
 			memcpy(temp_point,&m_controller_data.at(i),sizeof(Str_controller_point));
 			temp_point = temp_point + sizeof(Str_controller_point);
@@ -6167,13 +5975,13 @@ void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath)
 		}
 
 
-		for (int i=0;i<BAC_WEEKLY_ROUTINES_COUNT;i++)
+		for (int i=0;i<BAC_SCHEDULE_COUNT;i++)
 		{
 			memcpy(temp_point ,&m_Weekly_data.at(i),sizeof(Str_weekly_routine_point));
 			temp_point = temp_point + sizeof(Str_weekly_routine_point);
 		}
 
-		for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
+		for (int i=0;i<BAC_HOLIDAY_COUNT;i++)
 		{
 			memcpy(temp_point ,&m_Annual_data.at(i),sizeof(Str_annual_routine_point));
 			temp_point = temp_point + sizeof(Str_annual_routine_point);
@@ -6191,7 +5999,7 @@ void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath)
 			temp_point = temp_point + WEEKLY_SCHEDULE_SIZE;
 		}
 
-		for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
+		for (int i=0;i<BAC_HOLIDAY_COUNT;i++)
 		{
 			memcpy(temp_point ,g_DayState[i],ANNUAL_CODE_SIZE);
 			temp_point = temp_point + ANNUAL_CODE_SIZE;
@@ -6335,7 +6143,7 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
 			WritePrivateProfileStringW(temp_section,_T("S_Del_High"),temp_csc,FilePath);
 			temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).sub_number);
 			WritePrivateProfileStringW(temp_section,_T("Sub__number"),temp_csc,FilePath);
-			temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).delay_timer);
+			temp_csc.Format(_T("%u"),(unsigned char)m_Output_data.at(i).pwm_period);
 			WritePrivateProfileStringW(temp_section,_T("Delay_Timer"),temp_csc,FilePath);
 		}
 
@@ -6400,7 +6208,7 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
 
 		}
 
-		for (int i=0;i<BAC_CONTROLLER_COUNT;i++)
+		for (int i=0;i<BAC_PID_COUNT;i++)
 		{
 			CString temp_section,temp_des,temp_csc;
 			temp_section.Format(_T("Controller%d"),i);
@@ -6480,7 +6288,7 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
 		}
 
 
-		for (int i=0;i<BAC_WEEKLY_ROUTINES_COUNT;i++)
+		for (int i=0;i<BAC_SCHEDULE_COUNT;i++)
 		{
 			CString temp_input,temp_des,temp_csc;
 			temp_input.Format(_T("Weekly_Routines%d"),i);
@@ -6524,7 +6332,7 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
 
 		}
 
-		for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
+		for (int i=0;i<BAC_HOLIDAY_COUNT;i++)
 		{
 			CString temp_input,temp_des,temp_csc;
 			temp_input.Format(_T("Annual_Routines%d"),i);
@@ -6619,7 +6427,7 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
 			WritePrivateProfileStringW(tempsection,_T("Data"),temp_code,FilePath);
 		}
 
-		for (int i=0;i<BAC_ANNUAL_ROUTINES_COUNT;i++)
+		for (int i=0;i<BAC_HOLIDAY_COUNT;i++)
 		{
 			unsigned char * temp_point = NULL;
 			temp_point = g_DayState[i];
@@ -6705,103 +6513,6 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
 		if(pBuf)
 			delete pBuf;
 		DeleteFile(FilePath);
-
-#if 0
-		m_pCon.CreateInstance(_T("ADODB.Connection"));
-		m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-
-		CString temp_serial;
-		temp_serial.Format(_T("%u"),g_selected_serialnumber);
-
-		if(m_pRs->State)
-			m_pRs->Close(); 
-
-		CString strSql;
-		strSql.Format(_T("select * from Product_Data where Serial_ID = '%s'"),temp_serial);
-		m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-		int count = m_pRs->GetRecordCount();
-		_variant_t temp_variant;
-		if(count<=0)
-		{
-			//需要插入;
-
-
-
-			strSql.Format(_T("insert into Product_Data(Serial_ID)  values('%s')"),temp_serial);		
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
-
-		}
-
-		if(m_pRs->State)
-			m_pRs->Close(); 
-
-
-		CFile Filetxt;//用来读取位图文件
-		DWORD FileLen=0;//位图的长度
-		char* FileBuff;//用于存放位图信息
-
-		if(!Filetxt.Open(SaveConfigFilePath,CFile::modeRead))//打开文件
-		{
-			//MessageBox(NULL,"打开文本信息失败!",NULL, MB_OK);
-			return ;
-		}
-		FileLen=Filetxt.GetLength();//得到位图的长度
-		FileBuff=new char[FileLen+1];//给位图文件申请内在空间
-		DWORD DwPic=Filetxt.GetLength();
-		memset(FileBuff,0,FileLen+1);//初始化位图文件的空间
-		if(!FileBuff)//判断位图空间是否申请成功
-		{
-			return ;
-		}
-		if(Filetxt.Read(FileBuff,FileLen)!=FileLen)//读取文本信息，存入到FileBuff中去
-		{
-			return ;
-		}
-		char* pBuff= FileBuff;
-		VARIANT varPic;//该对象用于存放位图信息
-		SAFEARRAY *safeArray;//定义一个SAFEARRAY结构对象
-		SAFEARRAYBOUND rgsabound[1];//此结构体用来定义SAFEARRAY的边界，详情见MSDN
-		if(pBuff)//判断位图文件是否为空
-		{
-			rgsabound[0].lLbound=0;//定义下界
-			rgsabound[0].cElements=DwPic;//定义上限
-			safeArray=SafeArrayCreate(VT_UI1,1,rgsabound);// 使用SafeArrayCreate在堆上创建一维数组
-			for(long i=0;i<(long)DwPic;i++)
-			{
-				SafeArrayPutElement(safeArray,&i,pBuff++);//传值
-			}
-			varPic.vt=VT_ARRAY|VT_UI1;//把值给VARIANT对象
-			varPic.parray=safeArray; //把值给VARIANT对象
-		}
-
-
-		HRESULT hr;
-		hr=m_pRs.CreateInstance(_T("ADODB.Recordset"));
-
-		if(FAILED(hr))
-		{
-			AfxMessageBox(_T("Load msado.dll erro"));
-			return ;
-		}
-
-
-
-
-		strSql.Format(_T("select * from Product_Data where Serial_ID = '%s'"),temp_serial);
-		m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
-		while(VARIANT_FALSE == m_pRs->EndOfFile)
-		{
-			m_pRs->GetFields()->GetItem("Register_Data")->put_Value(varPic);
-			break;
-		}
-		m_pRs->Update();
-
-
-		if(m_pRs->State)
-			m_pRs->Close();
-#endif
-
-
 
 	}
 }
@@ -6892,50 +6603,7 @@ DWORD WinExecAndWait( LPCTSTR lpszAppPath,LPCTSTR lpParameters,LPCTSTR lpszDirec
 
 	return dwExitCode;
 }
-//void KillProcess(CString sExeName)
-//{
-//	HANDLE hSnapShot = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0);
-//	if(hSnapShot == 0)
-//		return;
-//	PROCESSENTRY32 thePE;
-//	thePE.dwSize = sizeof(PROCESSENTRY32);
-//
-//	//遍历正在运行的第一个系统进程
-//
-//	bool Status = Process32First(hSnapShot,&thePE);
-//	bool bHaveFlag = false;
-//	DWORD ProcessID = 0;
-//
-//	while(Status)
-//	{
-//		//遍历正在运行的下一个系统进程 
-//		Status = Process32Next(hSnapShot,&thePE); 
-//		//找到相应的进程 **.exe
-//
-//		// if(0 == wcscmp(thePE.szExeFile,L""))
-//		CString sFindName = thePE.szExeFile;
-//		CString sTemp = sExeName.Mid(0,sFindName.GetLength());
-//
-//		if(sFindName == sTemp)
-//		{
-//			bHaveFlag = true;
-//			ProcessID = thePE.th32ProcessID;
-//
-//			//结束指定的进程 ProcessID
-//			if(!TerminateProcess(OpenProcess (PROCESS_TERMINATE||PROCESS_QUERY_INFORMATION,false,ProcessID),0))
-//			{
-//				// AfxMessageBox(L"无法终止指定的进程！",MB_ICONWARNING||MB_OK);
-//				WriteSysLog("无法终止进程:"+sExeName);
-//			}
-//			else
-//			{
-//				WriteSysLog("成功结束进程:"+sExeName);
-//				break;
-//			}
-//		}
-//	}
-//	CloseHandle(hSnapShot);
-//}
+
 
 
 
@@ -7359,6 +7027,8 @@ void Save_Product_Value_Cache(CString &SaveFilePath){
 	}
 	oar.Close();
 	savefile.Close();
+    LoadTstat_InputData();
+    LoadTstat_OutputData();
 }
 int Load_Product_Value_Cache(LPCTSTR tem_read_path){
 	CString FilePath;
@@ -7374,9 +7044,11 @@ int Load_Product_Value_Cache(LPCTSTR tem_read_path){
 	for (int i=0;i<1024;i++)
 	{
 		iar>>product_register_value[i];
+        //iar>>multi_register_value[i];
 	}
 	iar.Close();
 	iFile.Close();
+    memcpy_s(multi_register_value,sizeof(multi_register_value),product_register_value,sizeof(product_register_value));
 #endif
 }
 //////////////////////////////////////////////////////////////////////////
@@ -7392,13 +7064,13 @@ int Load_Product_Value_Cache(LPCTSTR tem_read_path){
 //
 //////////////////////////////////////////////////////////////////////////
 void LoadTstat_InputData(){
-
+          m_tstat_input_data.clear();
 	int m_cvalue=0;
 	int m_crange=0;
 	long m_sn=0;
 	CString strAuto=_T("Auto");
 	CString strman=_T("Manual");
-	m_tstat_input_data.clear();
+	//m_tstat_input_data.clear();
 	Tstat_Input_Struct temp_tstat_input;
 	CString strTemp;
 	m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
@@ -7407,119 +7079,197 @@ void LoadTstat_InputData(){
 	if((Product_Type!=PM_TSTAT6)&&(Product_Type!=PM_TSTAT5i)&&(Product_Type!=PM_TSTAT7)){
 		return;
 	}
-#if 1//  g_strSensorName
-	strTemp.Format(_T("%.1f"),product_register_value[MODBUS_INTERNAL_THERMISTOR]/10.0);//216
-	temp_tstat_input.InputName.StrValue=g_strSensorName;
-	temp_tstat_input.Value.StrValue=strTemp;
-	temp_tstat_input.Value.regAddress=MODBUS_INTERNAL_THERMISTOR;
-	temp_tstat_input.Value.RegValue=product_register_value[MODBUS_INTERNAL_THERMISTOR];
-	CString strUnit=GetTempUnit();
-	temp_tstat_input.Unit.StrValue=strUnit;
-	temp_tstat_input.AM.regAddress=695;
-	temp_tstat_input.AM.RegValue=product_register_value[695];
-	if (product_register_value[695]!=0)
-	{
-		temp_tstat_input.AM.StrValue=strman;
-		//m_FlexGrid.put_TextMatrix(1,AM_FIELD,_T("Manual"));
-	} 
-	else
-	{temp_tstat_input.AM.StrValue=strAuto;
-	//m_FlexGrid.put_TextMatrix(1,AM_FIELD,_T("Auto"));
-	}
-	temp_tstat_input.Range.StrValue=strUnit;
-	temp_tstat_input.Range.regAddress=MODBUS_DEGC_OR_F;
-	temp_tstat_input.Range.RegValue=product_register_value[MODBUS_DEGC_OR_F];
-	temp_tstat_input.Function.StrValue=NO_APPLICATION;
-	//temp_tstat_input.Filter.StrValue=NO_APPLICATION;
-	temp_tstat_input.Filter.regAddress=142;
-	temp_tstat_input.Filter.RegValue=product_register_value[142];
-	temp_tstat_input.Filter.StrValue.Format(_T("%d"),product_register_value[142]);
-
-	temp_tstat_input.CustomTable.StrValue=NO_APPLICATION;
-	m_tstat_input_data.push_back(temp_tstat_input);
-#endif
+    CString strUnit=GetTempUnit();
 
 #if 1//初始化InputName
 	strTemp=GetTextFromReg(MODBUS_AI1_CHAR1);
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
 	if (!strTemp.IsEmpty())
 	{
-		g_strInName1=strTemp;
-		strTemp.Empty();
+		g_strInName1.Format(_T("AI1:%s"),strTemp);
+		
 	}
+    else
+    {
+        g_strInName1=_T("AI1:Input1"); 
+        strTemp=_T("Input1");
+    }
+    
 	temp_tstat_input.InputName.regAddress=MODBUS_AI1_CHAR1;
-	temp_tstat_input.InputName.StrValue=g_strInName1;
+	temp_tstat_input.InputName.StrValue=strTemp;
 	m_tstat_input_data.push_back(temp_tstat_input);
+
+     strTemp.Empty();
 
 	strTemp=GetTextFromReg(MODBUS_AI2_CHAR1);
-	if (!strTemp.IsEmpty())
-	{
-		g_strInName2=strTemp;
-		strTemp.Empty();
-	}
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+
+    if (!strTemp.IsEmpty())
+    {
+        g_strInName2.Format(_T("AI2:%s"),strTemp);
+       
+    }
+    else
+    {
+        g_strInName2=_T("AI2:Input2"); 
+        strTemp =  _T("Input2");
+    }
+
 	temp_tstat_input.InputName.regAddress=MODBUS_AI2_CHAR1;
-	temp_tstat_input.InputName.StrValue=g_strInName2;
+	temp_tstat_input.InputName.StrValue=strTemp;
 	m_tstat_input_data.push_back(temp_tstat_input);
+      strTemp.Empty();
 
 	strTemp=GetTextFromReg(MODBUS_AI3_CHAR1);
-	if (!strTemp.IsEmpty())
-	{
-		g_strInName3=strTemp;
-		strTemp.Empty();
-	}
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+
+    if (!strTemp.IsEmpty())
+    {
+        g_strInName3.Format(_T("AI3:%s"),strTemp);
+        
+    }
+    else
+    {
+        g_strInName3=_T("AI3:Input3"); 
+        strTemp =_T("Input3");
+    }
+
 	temp_tstat_input.InputName.regAddress=MODBUS_AI3_CHAR1;
-	temp_tstat_input.InputName.StrValue=g_strInName3;
+	temp_tstat_input.InputName.StrValue=strTemp;
 	m_tstat_input_data.push_back(temp_tstat_input);
-
+    strTemp.Empty();
 	strTemp=GetTextFromReg(MODBUS_AI4_CHAR1);
-	if (!strTemp.IsEmpty())
-	{
-		g_strInName4=strTemp;
-		strTemp.Empty();
-	}
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+ 
+    if (!strTemp.IsEmpty())
+    {
+        g_strInName4.Format(_T("AI4:%s"),strTemp);
+        
+    }
+    else
+    {
+        g_strInName4=_T("AI4:Input4");
+        strTemp =_T("Input4");
+    }
+
 	temp_tstat_input.InputName.regAddress=MODBUS_AI4_CHAR1;
-	temp_tstat_input.InputName.StrValue=g_strInName4;
+	temp_tstat_input.InputName.StrValue=strTemp;
 	m_tstat_input_data.push_back(temp_tstat_input);
-
+      strTemp.Empty();
 	strTemp=GetTextFromReg(MODBUS_AI5_CHAR1);
-	if (!strTemp.IsEmpty())
-	{
-		g_strInName5=strTemp;
-		strTemp.Empty();
-	}
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+	 
+
+    if (!strTemp.IsEmpty())
+    {
+        g_strInName5.Format(_T("AI5:%s"),strTemp);
+      
+    }
+    else
+    {
+        g_strInName5=_T("AI5:Input5"); 
+        strTemp   =_T("Input5");
+    }
+
 	temp_tstat_input.InputName.regAddress=MODBUS_AI5_CHAR1;
-	temp_tstat_input.InputName.StrValue=g_strInName5;
+	temp_tstat_input.InputName.StrValue=strTemp;
 	m_tstat_input_data.push_back(temp_tstat_input);
-
+       strTemp.Empty();
 	strTemp=GetTextFromReg(MODBUS_AI6_CHAR1);
-	if (!strTemp.IsEmpty())
-	{
-		g_strInName6=strTemp;
-		strTemp.Empty();
-	}
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+ 
+
+    if (!strTemp.IsEmpty())
+    {
+        g_strInName6.Format(_T("AI6:%s"),strTemp);
+        
+    }
+    else
+    {
+        g_strInName6=_T("AI6:Input6");
+        strTemp = _T("Input6"); 
+    }
+
 	temp_tstat_input.InputName.regAddress=MODBUS_AI6_CHAR1;
-	temp_tstat_input.InputName.StrValue=g_strInName6;
+	temp_tstat_input.InputName.StrValue=strTemp;
 	m_tstat_input_data.push_back(temp_tstat_input);
-
+       strTemp.Empty();
 	strTemp=GetTextFromReg(MODBUS_AI7_CHAR1);
-	if (!strTemp.IsEmpty())
-	{
-		g_strInName7=strTemp;
-		strTemp.Empty();
-	}
-	temp_tstat_input.InputName.regAddress=MODBUS_AI7_CHAR1;
-	temp_tstat_input.InputName.StrValue=g_strInName7;
-	m_tstat_input_data.push_back(temp_tstat_input);
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+ 
+    if (!strTemp.IsEmpty())
+    {
+        g_strInName7.Format(_T("AI7:%s"),strTemp);
+        
+    }
+    else
+    {
+        g_strInName7=_T("AI7:Input7"); 
+       strTemp =_T("Input7"); 
+    }
+    temp_tstat_input.InputName.regAddress=MODBUS_AI7_CHAR1;
+    temp_tstat_input.InputName.StrValue=strTemp;
+    m_tstat_input_data.push_back(temp_tstat_input);
+    strTemp.Empty();
+    strTemp=GetTextFromReg(MODBUS_AI8_CHAR1);
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
 
-	strTemp=GetTextFromReg(MODBUS_AI8_CHAR1);
-	if (!strTemp.IsEmpty())
-	{
-		g_strInName8=strTemp;
-		strTemp.Empty();
-	}
+    if (!strTemp.IsEmpty())
+    {
+        g_strInName8.Format(_T("AI8:%s"),strTemp);
+        
+    }
+    else
+    {
+        g_strInName8=_T("AI8:Input8"); 
+        strTemp = _T("Input8");
+    }
 	temp_tstat_input.InputName.regAddress=MODBUS_AI8_CHAR1;
-	temp_tstat_input.InputName.StrValue=g_strInName8;
+	temp_tstat_input.InputName.StrValue=strTemp;
 	m_tstat_input_data.push_back(temp_tstat_input);
 
+#if 1//  g_strSensorName
+    strTemp.Format(_T("%.1f"),product_register_value[MODBUS_INTERNAL_THERMISTOR]/10.0);//216
+    temp_tstat_input.InputName.StrValue=g_strSensorName;
+    temp_tstat_input.Value.StrValue=strTemp;
+    temp_tstat_input.Value.regAddress=MODBUS_INTERNAL_THERMISTOR;
+    temp_tstat_input.Value.RegValue=product_register_value[MODBUS_INTERNAL_THERMISTOR];
+
+    temp_tstat_input.Unit.StrValue=strUnit;
+    temp_tstat_input.AM.regAddress=695;
+    temp_tstat_input.AM.RegValue=product_register_value[695];
+    if (product_register_value[695]!=0)
+    {
+        temp_tstat_input.AM.StrValue=strman;
+        //m_FlexGrid.put_TextMatrix(1,AM_FIELD,_T("Manual"));
+    } 
+    else
+    {temp_tstat_input.AM.StrValue=strAuto;
+    //m_FlexGrid.put_TextMatrix(1,AM_FIELD,_T("Auto"));
+    }
+    strUnit=GetTempUnit();
+    temp_tstat_input.Range.StrValue=strUnit;
+    temp_tstat_input.Range.regAddress=MODBUS_DEGC_OR_F;
+    temp_tstat_input.Range.RegValue=product_register_value[MODBUS_DEGC_OR_F];
+    temp_tstat_input.Function.StrValue=NO_APPLICATION;
+    //temp_tstat_input.Filter.StrValue=NO_APPLICATION;
+    temp_tstat_input.Filter.regAddress=142;
+    temp_tstat_input.Filter.RegValue=product_register_value[142];
+    temp_tstat_input.Filter.StrValue.Format(_T("%d"),product_register_value[142]);
+
+    temp_tstat_input.CustomTable.StrValue=NO_APPLICATION;
+    m_tstat_input_data.push_back(temp_tstat_input);
+
+#endif
+            strTemp.Empty();
 	temp_tstat_input.InputName.StrValue=g_strInHumName;
 	m_tstat_input_data.push_back(temp_tstat_input);
 
@@ -7528,13 +7278,15 @@ void LoadTstat_InputData(){
 
 	temp_tstat_input.InputName.StrValue=g_strLightingSensor;
 	m_tstat_input_data.push_back(temp_tstat_input);
+
+
 #endif
 
 #if 1   //初始化其他的input的其他值
 	int nValue=0;
 
 	float fValue=0;
-	for (int i=2;i<=9;i++)
+	for (int i=1;i<=8;i++)
 	{
 
 		// m_tstat_input_data.at(i-1).CustomTable.StrValue=NO_APPLICATION;
@@ -7542,7 +7294,7 @@ void LoadTstat_InputData(){
 		//Auto Manual
 		nValue=product_register_value[MODBUS_INPUT_MANU_ENABLE];//309    141
 		BYTE bFilter=0x01;
-		bFilter = bFilter<< (i-2);
+		bFilter = bFilter<< (i-1);
 		m_tstat_input_data.at(i-1).AM.regAddress=MODBUS_INPUT_MANU_ENABLE;
 		m_tstat_input_data.at(i-1).AM.RegValue=nValue;
 		if((nValue & bFilter))
@@ -7561,7 +7313,8 @@ void LoadTstat_InputData(){
 		//Range
 		m_crange=0;
 
-		nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];	//189
+		nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-1];	//189
+        nValue &= 0x7F;//去掉最高位
 		if(nValue>=0)
 		{
 			strTemp=analog_range_TSTAT6[nValue]; 
@@ -7569,8 +7322,8 @@ void LoadTstat_InputData(){
 		m_crange=nValue;
 
 		m_tstat_input_data.at(i-1).Range.StrValue=strTemp;
-		m_tstat_input_data.at(i-1).Range.RegValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];
-		m_tstat_input_data.at(i-1).Range.regAddress=MODBUS_ANALOG1_RANGE+i-2;
+		m_tstat_input_data.at(i-1).Range.RegValue=product_register_value[MODBUS_ANALOG1_RANGE+i-1];
+		m_tstat_input_data.at(i-1).Range.regAddress=MODBUS_ANALOG1_RANGE+i-1;
 		// nValue=product_register_value[MODBUS_ANALOG1_RANGE+i-2];
 		//Custom
 		if(m_crange==4)
@@ -7586,8 +7339,8 @@ void LoadTstat_InputData(){
 			m_tstat_input_data.at(i-1).CustomTable.StrValue=NO_APPLICATION;
 		}
 		//Function
-		nValue=product_register_value[MODBUS_ANALOG1_FUNCTION+i-2];		//298   167
-		m_tstat_input_data.at(i-1).Function.regAddress=MODBUS_ANALOG1_FUNCTION+i-2;
+		nValue=product_register_value[MODBUS_ANALOG1_FUNCTION+i-1];		//298   167
+		m_tstat_input_data.at(i-1).Function.regAddress=MODBUS_ANALOG1_FUNCTION+i-1;
 		m_tstat_input_data.at(i-1).Function.RegValue=nValue;
 		strTemp=INPUT_FUNS[0];
 		m_tstat_input_data.at(i-1).Function.StrValue=strTemp;
@@ -7599,14 +7352,14 @@ void LoadTstat_InputData(){
 
 		if(m_crange==1)	//359  122
 		{				
-			fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-2]/10.0);	//367   131
+			fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-1]/10.0);	//367   131
 			strTemp.Format(_T("%.1f"),fValue);	
 		}
 		else if (m_crange==3||m_crange==5||m_crange==7||m_crange==8||m_crange==9||m_crange==10)
 		{			   
 			if (m_crange==9||m_crange==10)
 			{
-				int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
+				int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-1]); //367  131
 				if (nValue == 0)
 				{
 					strTemp = _T("Closed");
@@ -7619,7 +7372,7 @@ void LoadTstat_InputData(){
 			else if (m_crange==7||m_crange==8)
 			{
 
-				int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
+				int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-1]); //367  131
 				if (nValue == 0)
 				{
 					strTemp = _T("Unoccupied");
@@ -7633,7 +7386,7 @@ void LoadTstat_InputData(){
 			else
 			{
 
-				int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-2]); //367  131
+				int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+i-1]); //367  131
 				if (nValue == 0)
 				{
 					strTemp = _T("Off");
@@ -7647,18 +7400,18 @@ void LoadTstat_InputData(){
 		} 	
 		else if (m_crange==4||m_crange==6)  // custom sensor	359 122
 		{					
-			fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-2]/10.0);	//367  131
+			fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-1]/10.0);	//367  131
 			strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
 
 		}
 		else if(m_crange==2)	//359 122
 		{
-			nValue=product_register_value[MODBUS_ANALOG_INPUT1+i-2];		//367  131
+			nValue=product_register_value[MODBUS_ANALOG_INPUT1+i-1];		//367  131
 			strTemp.Format(_T("%0.1f"),  (float)nValue);
 		}
 		else
 		{
-			strTemp.Format(_T("%d"),product_register_value[MODBUS_ANALOG_INPUT1+i-2]);
+			strTemp.Format(_T("%d"),product_register_value[MODBUS_ANALOG_INPUT1+i-1]);
 		}	
 
 
@@ -7667,8 +7420,8 @@ void LoadTstat_InputData(){
 		m_tstat_input_data.at(i-1).Unit.StrValue=strValueUnit;
 
 
-		m_tstat_input_data.at(i-1).Value.regAddress=MODBUS_ANALOG_INPUT1+i-2;
-		m_tstat_input_data.at(i-1).Value.RegValue=product_register_value[MODBUS_ANALOG_INPUT1+i-2];
+		m_tstat_input_data.at(i-1).Value.regAddress=MODBUS_ANALOG_INPUT1+i-1;
+		m_tstat_input_data.at(i-1).Value.RegValue=product_register_value[MODBUS_ANALOG_INPUT1+i-1];
 		m_tstat_input_data.at(i-1).Value.StrValue=strTemp;
 	}
 
@@ -7799,6 +7552,10 @@ void LoadTstat_InputData(){
 	m_tstat_input_data.at(11).Value.regAddress=MODBUS_VALUE_SENSOR;
 	m_tstat_input_data.at(11).Value.RegValue=product_register_value[MODBUS_VALUE_SENSOR];
 	m_tstat_input_data.at(11).Value.StrValue=strTemp;
+
+
+
+
 }
 
 void LoadInputData_CS3000(){
@@ -7895,8 +7652,47 @@ CString GetTextFromReg(unsigned short reg)
 
 	return str_temp;
 }
+CString GetTextFromReg_Buffer(unsigned short reg,unsigned short *Buffer){
+    CString str_temp=_T("");
+    unsigned short temp_buffer[4];
+    unsigned short temp_buffer_Char[THE_CHAR_LENGTH];
+    unsigned char p[THE_CHAR_LENGTH+1]={'\0'};
+
+    temp_buffer[0]=Buffer[reg];
+    temp_buffer[1]=Buffer[reg+1];
+    temp_buffer[2]=Buffer[reg+2];
+    temp_buffer[3]=Buffer[reg+3];
+
+
+    if (temp_buffer[0]==0||temp_buffer[0]==65535)
+    {
+        return str_temp;
+    }
+    unsigned short Hi_Char,Low_Char;
+
+    for (int i=0;i<4;i++)
+    {
+        Hi_Char=temp_buffer[i];
+        Hi_Char=Hi_Char&0xff00;
+        Hi_Char=Hi_Char>>8;
+        Low_Char=temp_buffer[i];
+        Low_Char=Low_Char&0x00ff;
+        temp_buffer_Char[2*i]=Hi_Char;
+        temp_buffer_Char[2*i+1]=Low_Char;
+    } 
+
+    for (int i=0;i<THE_CHAR_LENGTH;i++)
+    {
+        p[i] =(unsigned char)temp_buffer_Char[i];
+    }
+    str_temp.Format(_T("%c%c%c%c%c%c%c%c"),p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);	
+
+
+    return str_temp;
+}
 #define  OUTPUT_NUMBER 7
 void LoadTstat_OutputData(){
+      
 	m_tstat_output_data.clear();
 	int nVAlue;int nValue=0;
 	int m_crange=0;
@@ -7905,21 +7701,127 @@ void LoadTstat_OutputData(){
 		return;
 	}
 	int m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
-	float m_version = get_curtstat_version();
+	
+    float m_version = get_curtstat_version();
+    CString strTemp;
+    //initial output1-output7
+    strTemp=_T("");
+    strTemp=GetTextFromReg(MODBUS_OUTPUT1_CHAR1);
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+    if (!strTemp.IsEmpty())
+    {
+        g_strOutName1=strTemp;
+
+    }
+    else
+    {
+        g_strOutName1=_T("Output1"); 
+    }
+    strTemp=_T("");
+    strTemp=GetTextFromReg(MODBUS_OUTPUT2_CHAR1);
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+    if (!strTemp.IsEmpty())
+    {
+        g_strOutName2=strTemp;
+
+    }
+    else
+    {
+        g_strOutName2=_T("Output2"); 
+    }
+    strTemp=_T("");
+    strTemp=GetTextFromReg(MODBUS_OUTPUT3_CHAR1);
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+    if (!strTemp.IsEmpty())
+    {
+        g_strOutName3=strTemp;
+
+    }
+    else
+    {
+        g_strOutName3=_T("Output3"); 
+    }
+
+    strTemp=_T("");
+    strTemp=GetTextFromReg(MODBUS_OUTPUT4_CHAR1);
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+    if (!strTemp.IsEmpty())
+    {
+        g_strOutName4=strTemp;
+
+    }
+    else
+    {
+        g_strOutName4=_T("Output4"); 
+    }
+
+    strTemp=_T("");
+    strTemp=GetTextFromReg(MODBUS_OUTPUT5_CHAR1);
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+    if (!strTemp.IsEmpty())
+    {
+        g_strOutName5=strTemp;
+
+    }
+    else
+    {
+        g_strOutName5=_T("Output5"); 
+    }
+
+    strTemp=_T("");
+    strTemp=GetTextFromReg(MODBUS_OUTPUT6_CHAR1);
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+    if (!strTemp.IsEmpty())
+    {
+        g_strOutName6=strTemp;
+
+    }
+    else
+    {
+        g_strOutName6=_T("Output6"); 
+    }
+
+    strTemp=_T("");
+    strTemp=GetTextFromReg(MODBUS_OUTPUT7_CHAR1);
+    strTemp.TrimLeft();
+    strTemp.TrimRight();
+    if (!strTemp.IsEmpty())
+    {
+        g_strOutName7=strTemp;
+
+    }
+    else
+    {
+        g_strOutName7=_T("Output7"); 
+    }
+
 	Tstat_Output_Struct out_struct_temp;
 	out_struct_temp.OutputName.StrValue=g_strOutName1;
+    out_struct_temp.OutputName.regAddress=MODBUS_OUTPUT1_CHAR1;
 	m_tstat_output_data.push_back(out_struct_temp);
 	out_struct_temp.OutputName.StrValue=g_strOutName2;
+    out_struct_temp.OutputName.regAddress= MODBUS_OUTPUT2_CHAR1;
 	m_tstat_output_data.push_back(out_struct_temp);
 	out_struct_temp.OutputName.StrValue=g_strOutName3;
+    out_struct_temp.OutputName.regAddress= MODBUS_OUTPUT3_CHAR1 ;
 	m_tstat_output_data.push_back(out_struct_temp);
 	out_struct_temp.OutputName.StrValue=g_strOutName4;
+    out_struct_temp.OutputName.regAddress= MODBUS_OUTPUT4_CHAR1;
 	m_tstat_output_data.push_back(out_struct_temp);
 	out_struct_temp.OutputName.StrValue=g_strOutName5;
+    out_struct_temp.OutputName.regAddress=MODBUS_OUTPUT5_CHAR1;
 	m_tstat_output_data.push_back(out_struct_temp);
 	out_struct_temp.OutputName.StrValue=g_strOutName6;
+    out_struct_temp.OutputName.regAddress= MODBUS_OUTPUT6_CHAR1  ;
 	m_tstat_output_data.push_back(out_struct_temp);
 	out_struct_temp.OutputName.StrValue=g_strOutName7;
+    out_struct_temp.OutputName.regAddress=MODBUS_OUTPUT7_CHAR1  ;
 	m_tstat_output_data.push_back(out_struct_temp);
 	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7)
 	{	 
@@ -7932,7 +7834,7 @@ void LoadTstat_OutputData(){
 			m_tstat_output_data.at(i).Signal_Type.RegValue = NO_REGISTER_VALUE;
 		}
 	}
-	CString strTemp;
+	 
 	//108  209 Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.  Fan.
 	nVAlue = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS]; //t5=108   t6=209;
 	int nRange=0;
@@ -8324,227 +8226,6 @@ void LoadTstat_OutputData(){
 
 	}
 
-#if 0
-	if(m_nModeType==17||m_nModeType==18)
-	{
-		//out4:
-		int nRang=0;//product_register_value[283];
-		nRang= product_register_value[MODBUS_OUTPUT1_FUNCTION];//328  266
-		int nValue1;//=product_register_value[108];
-
-		nValue1 = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS];//108   209
-		if(nRang==0)
-		{
-			if(nValue1 &( 1<<4))
-				strTemp=_T("ON");
-			else
-				strTemp=_T("OFF");
-		}
-		else
-		{
-			strTemp.Format(_T("%d%%"),product_register_value[MODBUS_PWM_OUT4]);//348  598
-		}
-		m_FlexGrid.put_TextMatrix(4,VALUE_OUTFIELD,strTemp);
-		//2.5.0.94
-		if(m_nModeType == 18)
-		{
-			if(product_register_value[MODBUS_MODE_OUTPUT4])  //283   205
-			{
-				if(nValue1 &( 1<<3))
-					strTemp=_T("ON");
-				else
-					strTemp=_T("OFF");
-			}
-			else
-			{
-				strTemp.Format(_T("%d%%"),product_register_value[MODBUS_PWM_OUT4]);//348  598
-			}
-		}
-		//AM
-		if((int)(nAMVAlue & 8))
-		{
-			strTemp=_T("Manual");
-			m_FlexGrid.put_Col(VALUE_OUTFIELD);
-			m_FlexGrid.put_Row(4);
-			m_FlexGrid.put_CellBackColor(RGB(255,255,255));
-		}
-		else
-		{
-			strTemp=_T("Auto");
-			m_FlexGrid.put_Col(VALUE_OUTFIELD);
-			m_FlexGrid.put_Row(4);
-			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
-		}
-		m_FlexGrid.put_TextMatrix(4,AM_OUTFIELD,strTemp);
-		strTemp.Empty();
-		//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
-
-		nRange = product_register_value[MODBUS_MODE_OUTPUT4]; //283  205
-
-		if(nRange>=0&&nRange<=2)
-		{
-			strTemp=OUTPUT_RANGE5[nRange];
-		}
-
-
-		m_FlexGrid.put_TextMatrix(4,RANG_OUTFIELD,strTemp);
-
-		strTemp.Empty();
-		if (m_version<32.2)
-		{
-			//328	266	1	Low byte	W/R	"Output1 Function setting:
-			//	0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
-
-			short nFun=0;//product_register_value[328];
-			nFun = product_register_value[MODBUS_OUTPUT1_FUNCTION];
-			int nMask;
-			nMask=nFun&0x4;
-			if (nMask>0)
-			{
-				strTemp=ONTPUT_FUNS[1];
-			}
-			else
-			{
-				strTemp=ONTPUT_FUNS[0];
-			}
-			m_FlexGrid.put_TextMatrix(4,FUN_OUTFIELD,strTemp);
-		}
-		else
-		{
-			int indext=-1;
-			//336	269	1	Low byte	W/R	Output4 function setting (see above)
-
-			//indext=product_register_value[336];//2.5.0.96
-			indext=product_register_value[283];//2.5.0.98		//Fance_?_   //269 对应 336 这里为什么 要变为 283;
-
-
-			if(indext>=0&&indext<=4)
-				strTemp=ONTPUT_FUNS[indext];
-
-
-			m_FlexGrid.put_TextMatrix(4,FUN_OUTFIELD,strTemp);
-		}
-
-		//out5:
-		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
-
-		////337	270	1	Low byte	W/R	Output5 function setting (see above)
-
-		nRang=product_register_value[337];			//Fance_?_ 不明白 为什么 tstat5 要用337=MODBUS_OUTPUT5_FUNCTION 而tstat 要用206=MODBUS_MODE_OUTPUT5;
-
-		//108	209	1	Low byte	W/R	Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.
-
-		nValue1 = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS];//108   209
-		if (product_register_value[7]==18)
-		{
-			//2.5.0.94
-			if(product_register_value[MODBUS_MODE_OUTPUT5]==0)// 284   206
-			{
-				if(nValue1 &( 1<<4))//2.5.0.94
-					strTemp=_T("ON");
-				else
-					strTemp=_T("OFF");
-			}
-			else
-			{
-				strTemp.Format(_T("%d%%"),product_register_value[MODBUS_PWM_OUT5]);//349  599 //Fance_?
-			}
-			m_FlexGrid.put_TextMatrix(5,VALUE_OUTFIELD,strTemp);
-			//2.5.0.94
-		}else
-		{
-			nRang = product_register_value[MODBUS_MODE_OUTPUT5];// 284   206
-			//	nRang=product_register_value[284];
-			if(nRang==0)
-			{
-				if(nValue1 &( 1<<3))
-					//if(nValue1 &( 1<<4))//2.5.0.94
-					strTemp=_T("ON");
-				else
-					strTemp=_T("OFF");
-			}
-			else
-			{
-				strTemp.Format(_T("%d%%"),product_register_value[MODBUS_PWM_OUT5]);//找不到  349 599
-			}
-			m_FlexGrid.put_TextMatrix(5,VALUE_OUTFIELD,strTemp);
-
-		}
-		//AM
-		if((int)(nAMVAlue & 16))
-		{
-			strTemp=_T("Manual");
-			m_FlexGrid.put_Col(VALUE_OUTFIELD);
-			m_FlexGrid.put_Row(5);
-			m_FlexGrid.put_CellBackColor(RGB(255,255,255));
-		}
-		else
-		{
-			strTemp=_T("Auto");
-			m_FlexGrid.put_Col(VALUE_OUTFIELD);
-			m_FlexGrid.put_Row(5);
-			m_FlexGrid.put_CellBackColor(DISABLE_COLOR_CELL);
-		}
-		m_FlexGrid.put_TextMatrix(5,AM_OUTFIELD,strTemp);
-		strTemp.Empty();
-
-		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
-
-
-
-		nRange = product_register_value[MODBUS_MODE_OUTPUT5];  //284  206
-
-		if(nRange>=0&&nRange<=2)
-		{
-			strTemp=OUTPUT_RANGE5[nRange];
-		}
-
-
-		m_FlexGrid.put_TextMatrix(5,RANG_OUTFIELD,strTemp);
-		strTemp.Empty();
-		if (m_version<32.2)
-		{
-			//328	266	1	Low byte	W/R	"Output1 Function setting:
-			//	0=normal, default. 1 = rotation (old disabled feature) 2 = lighting control, one keypad button can be assigned to toggle a relay on & off "
-
-			short nFun;//=product_register_value[328];
-			nFun = product_register_value[MODBUS_OUTPUT1_FUNCTION]; // 328  266;
-
-			int nMask;
-			nMask=nFun&0x8;
-			if (nMask>0)
-			{
-				strTemp=ONTPUT_FUNS[1];
-			}
-			else
-			{
-				strTemp=ONTPUT_FUNS[0];
-			}
-			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
-		}
-		else
-		{
-			//337	270	1	Low byte	W/R	Output5 function setting (see above)
-
-			int indext=-1;
-
-
-			//indext=product_register_value[337];//2.5.0.96
-			indext=product_register_value[284];//2.5.0.98			//Fance_?_  为什么要不对应;
-
-
-			if(indext>=0&&indext<=4)
-				strTemp=ONTPUT_FUNS[indext];
-			//if (indext >=2)//2.5.0.98
-			//{
-			//	strTemp=ONTPUT_FUNS[0];
-			//}
-			m_FlexGrid.put_TextMatrix(5,FUN_OUTFIELD,strTemp);
-		}
-	}
-#endif
-
-
 
 	if ((m_nModeType==1||m_nModeType==3||m_nModeType==2)||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PRESSURE
 		||m_nModeType==18||m_nModeType==6||m_nModeType==PM_TSTAT5i||m_nModeType==7)//5ADEG
@@ -8803,77 +8484,52 @@ void LoadTstat_OutputData(){
 				m_tstat_output_data.at(6).Value.RegValue=nValue;
 
 				strTemp.Empty();
-				if(nRange==0)
-				{
-
-					if(nValue==0)
-						strTemp=_T("Off");
-					else
-						strTemp=_T("On");
-				}
-				else
-				{
+// 				if(nRange==0)
+// 				{
+// 
+// 					if(nValue==0)
+// 						strTemp=_T("Off");
+// 					else
+// 						strTemp=_T("On");
+//  				}
+//  				else
+ 				{
 					//strTemp.Format(_T("%.1f"),nValue/100.0);
 					float nvalue=0.0;
 
-					// 					if ((product_register_value[7] == 6)||(product_register_value[7] == 7)||(product_register_value[7] == PM_TSTAT5i))
-					// 					{
-					// 						if(nRange==1)//0-10v
-					// 						{
-					// 							//nvalue=product_register_value[102]/100 /10.0 * 100%;
-					// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/10.0f;//103 211
-					// 						}
-					// 						if(nRange==2)//0-5v
-					// 						{
-					// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/5.0f;
-					// 						}
-					// 						if(nRange==3)//2-10v
-					// 						{
-					// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/8.0f;
-					// 						}
-					// 						if(nRange==4)//10-0v
-					// 						{
-					// 							nvalue=(10-product_register_value[MODBUS_HEATING_VALVE]/100.0f)/10.0f *100;
-					// 						}
-					// 						if (nRange==17)
-					// 						{
-					// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/10.0f;//103 211
-					// 						}
-					// 					}
-					// 					else
-					// 					{
-					if(nRange==1)//0-10v
+                    if(nRange==0)
+                    {
+
+                        if(nValue==0)
+                            strTemp=_T("Off");
+                        else
+                            strTemp=_T("On");
+                       
+                        m_tstat_output_data.at(6).Unit.StrValue =NO_APPLICATION;
+                    } 
+					else if(nRange==1)//0-10v
 					{
 						//nvalue=product_register_value[102]/100 /10.0 * 100%;
 						nvalue=product_register_value[MODBUS_HEATING_VALVE]/10.0f;
-						// 						}
-						// 						if(nRange==2)//0-5v
-						// 						{
-						// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/5.0f;
-						// 						}
-						// 						if(nRange==3)//2-10v
-						// 						{
-						// 							nvalue=product_register_value[MODBUS_HEATING_VALVE]/8.0f;
-						// 						}
-						// 						if(nRange==4)//10-0v
-						// 						{
-						// 							nvalue=(10-product_register_value[MODBUS_HEATING_VALVE]/100.0f)/10.0f *100;
-						// 						}
-						// 					}
-						strTemp.Format(_T("%.1f%%"),nvalue);
+				 
+						strTemp.Format(_T("%0.1f%%"),nvalue);
+                        m_tstat_output_data.at(6).Unit.StrValue = _T("%");
 					}
+                    else
+                    {
+                        strTemp.Format(_T("%d"),product_register_value[MODBUS_HEATING_VALVE]);
+                         m_tstat_output_data.at(6).Unit.StrValue = _T("%");
+                    }
 
 					m_tstat_output_data.at(6).Value.StrValue=strTemp;
-					m_tstat_output_data.at(6).Unit.StrValue = _T("%");
+					
 					if((int)(nAMVAlue & 64))
 					{
 						strTemp=_T("Manual");
-
 					}
 					else
 					{
 						strTemp=_T("Auto");
-
 					}
 					m_tstat_output_data.at(6).AM.regAddress=MODBUS_OUTPUT_MANU_ENABLE;
 					m_tstat_output_data.at(6).AM.RegValue=nAMVAlue;
@@ -9021,7 +8677,7 @@ void LoadTstat_OutputData(){
 				//m_FlexGrid.put_TextMatrix(6,SIGUAL_TYPE,strTemp);
 				strTemp=_T("UNUSED");
 				ST=product_register_value[208];
-				if (ST>=5)
+				if (ST>=5&&ST<=16)
 				{
 					strTemp=OUTPUT_ANRANGE[ST];
 				}
@@ -9045,6 +8701,23 @@ void LoadTstat_OutputData(){
 
 		}
 	}
+
+      bitset<16> Output_AM(nAMVAlue);
+
+      for (int i = 0 ;i<(int)m_tstat_output_data.size();i++)
+      {
+         if (Output_AM[i])
+         {
+             strTemp=_T("Manual");
+         }
+         else
+         {
+             strTemp=_T("Auto");
+         } 
+         m_tstat_output_data.at(i).AM.StrValue=strTemp;
+         m_tstat_output_data.at(i).AM.RegValue=nAMVAlue;
+         m_tstat_output_data.at(i).AM.regAddress =MODBUS_OUTPUT_MANU_ENABLE; 
+      }
 
 }
 
@@ -9163,4 +8836,296 @@ void LoadRegistersGraphicMode_CO2485(){
     g_calibration_module_data.Factory_Fre.StrValue=_T("AD");
 	g_calibration_module_data.Factory_Hum.regAddress  =717;
     g_calibration_module_data.Factory_Hum.StrValue =_T("Pressure");
+}
+BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
+{
+    //当hex文件中每一行的文件超过了256个字符的时候，我们就认为这个hex文件出现了问题
+    int linecharnum=0;
+    char c;
+    int nRet = file.Read(&c, 1);
+
+    while(nRet != 0)
+    {
+        ++linecharnum;
+        *pBuffer++ = c;
+        //TRACE(_T("\n%c"),c);
+        if (c == 0x0d) // 回车
+        {
+            file.Read(&c, 1);  // 读一个换行
+            *pBuffer++ = c;
+            TRACE(_T("%s"),pBuffer);
+            return TRUE;
+        }
+        if (linecharnum<256)
+        {
+            file.Read(&c, 1);
+        }
+        else
+        {
+            /*if(!auto_flash_mode)*/
+                //AfxMessageBox(_T("The Hex File is broken"));
+            return FALSE;
+        }
+
+    }
+    //TRACE(_T("%s"),pBuffer);
+    return FALSE;
+}
+int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
+{
+	CFileFind fFind;
+	if(!fFind.FindFile(filepath))
+		return FILE_NOT_FIND;
+
+	//pBuf = new char[0x20000];
+		
+	CString strGetData;
+	int nBufCount = 0;
+//*****************inspect the file*********************
+
+
+	DWORD dwHiAddr = 0; // 高位地址
+	char readbuffer[256];
+	ZeroMemory(readbuffer, 256);
+	unsigned	char m_DeviceInfor[20];
+	memset(m_DeviceInfor,0,20);
+	CFile hexfile;
+	if(hexfile.Open(filepath,CFile::modeRead))
+	{
+		unsigned int nLineNum=0;
+
+
+		ZeroMemory(readbuffer, 256);
+		hexfile.Seek(0, CFile::begin);
+		while(ReadLineFromHexFile(hexfile, readbuffer))
+		{
+				nLineNum++;						//the line number that the wrong hex file;
+                CString bufferlen;
+                CString bufferaddress;         
+                bufferlen.Format(_T("%c%c"),readbuffer[1],readbuffer[2]);
+                bufferaddress.Format(_T("%c%c%c%c"),readbuffer[3],readbuffer[4],readbuffer[5],readbuffer[6]);
+                if (bufferaddress.CompareNoCase(_T("0100"))!=0)
+                {
+                continue;
+                }
+				unsigned char get_hex[128]={0};
+				//get hex data,it is get from the line char
+				//the number is (i-1)
+				//int nLen = strGetData.GetLength();
+				for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
+				{
+					readbuffer[i]=readbuffer[i+1];
+				}
+
+				int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
+				if(strlen(readbuffer)%2==0)
+				turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int 
+				else
+				{
+					return BAD_HEX_FILE;
+				}
+				turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex 
+				if(get_hex[3]==1)	//for to seektobegin() function,because to end of the file
+					break;
+// 				if(!DoHEXCRC( get_hex, nLen/2))
+// 				{
+// 					return BAD_HEX_FILE;
+// 				}
+				 char TempChar[32];
+				for (int i=0;i<31;i++)
+				{
+					TempChar[i]=get_hex[i+4];
+				}
+				TempChar[31]='\0';
+ 
+				 
+                 CString Product_String;
+ 				 MultiByteToWideChar( CP_ACP, 0, (char *)TempChar, 
+ 					 (int)strlen(TempChar)+1, 
+ 					 Product_String.GetBuffer(MAX_PATH), MAX_PATH );
+ 				 Product_String.ReleaseBuffer();		
+ 				 Product_String.MakeUpper();
+
+
+
+				 if(Product_String.Find(_T("CO2")) !=-1)
+				 {
+					  ret_bin_Info.company[0]='T';
+					  ret_bin_Info.company[1]='E';
+					  ret_bin_Info.company[2]='M';
+					  ret_bin_Info.company[3]='C';
+					  ret_bin_Info.company[4]='O';
+					  ret_bin_Info.product_name[0]='C';
+					  ret_bin_Info.product_name[1]='O';
+					  ret_bin_Info.product_name[2]='2';
+					  ret_bin_Info.product_name[3]=0;
+					  ret_bin_Info.product_name[4]=0;
+					  ret_bin_Info.product_name[5]=0;
+					  ret_bin_Info.product_name[6]=0;
+					  ret_bin_Info.product_name[7]=0;
+					  ret_bin_Info.product_name[8]=0;
+					  ret_bin_Info.product_name[9]=0;
+
+					  ret_bin_Info.software_high=TempChar[5];
+					   ret_bin_Info.software_low=TempChar[4];
+					  
+					  return READ_SUCCESS;
+				 }
+
+
+
+				int temp;
+				char temp_buf[64];
+				memset(temp_buf,0,64);
+                
+				if (bufferlen.CompareNoCase(_T("20"))==0)
+				{
+					for (int i=0;i<64;i++)
+					{
+						temp_buf[i]=readbuffer[i+8];
+					}
+				} 
+
+				if (bufferlen.CompareNoCase(_T("10"))==0)
+				{
+					for (int i=0;i<32;i++)
+					{
+						temp_buf[i]=readbuffer[i+8];
+					}
+					hexfile.Seek(0, CFile::begin);
+					while(ReadLineFromHexFile(hexfile, readbuffer))
+					{
+						bufferlen.Format(_T("%c%c"),readbuffer[1],readbuffer[2]);
+						bufferaddress.Format(_T("%c%c%c%c"),readbuffer[3],readbuffer[4],readbuffer[5],readbuffer[6]);
+						if (bufferaddress.CompareNoCase(_T("0110"))!=0)
+						{
+							continue;
+						}
+						for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
+						{
+							readbuffer[i]=readbuffer[i+1];
+						}
+						int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
+						if(strlen(readbuffer)%2==0)
+							turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int 
+						else
+						{
+							return BAD_HEX_FILE;
+						}
+						turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex 
+
+						int bufferlength=_wtoi(bufferlen);
+
+						int i=32;
+						for (int j=0;j<2*bufferlength;j++)
+						{
+							temp_buf[i]=readbuffer[j+8];
+							i++;
+						}
+
+					}
+
+				}
+			 
+
+					for (int i=0;i<20;i++)
+					{   
+						temp=temp_buf[2*i]*16+temp_buf[2*i+1];
+						m_DeviceInfor[i]=temp;
+					}
+					memcpy_s(&ret_bin_Info,20,m_DeviceInfor,20);
+
+					if(strlen(ret_bin_Info.product_name) > 200)
+						return NO_VERSION_INFO;
+
+					char temocolog[6];
+					memcpy_s(temocolog,5,ret_bin_Info.company,5);
+					temocolog[5] = 0;
+
+					CString Temco_logo;
+					MultiByteToWideChar( CP_ACP, 0, (char *)temocolog, 
+						(int)strlen(temocolog)+1, 
+						Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
+					Temco_logo.ReleaseBuffer();		
+					Temco_logo.MakeUpper();
+					if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0)
+					{
+						return NO_VERSION_INFO;
+					}
+
+
+					ret_bin_Info.software_low = m_DeviceInfor[15];
+					ret_bin_Info.software_high =m_DeviceInfor[16];
+					return READ_SUCCESS;
+			 
+
+
+		}
+	}
+}
+int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
+{
+	CFileFind fFind;
+	if(!fFind.FindFile(filepath))
+		return FILE_NOT_FIND;
+
+
+	CFile binFile;
+	if(binFile.Open(filepath,CFile::modeRead))
+	{
+		const int BUF_LEN = 1024;
+		int linenum=1;
+		unsigned char pBuf[BUF_LEN] = {'\0'};
+		int nRet = 0;
+		int nCount = 0;
+		binFile.Seek(0, CFile::begin);
+		while( (nRet = binFile.Read(pBuf, BUF_LEN)) != 0 )
+		{
+			if(nRet<(0x100 + sizeof(Bin_Info)))
+				return BIN_FILE_LENGTH_ERROR;
+			memcpy(&ret_bin_Info,&pBuf[0x100],sizeof(Bin_Info));
+			if(strlen(ret_bin_Info.product_name) > 200)
+				return NO_VERSION_INFO;
+			char temocolog[6];
+			memcpy_s(temocolog,5,ret_bin_Info.company,5);
+			temocolog[5] = 0;
+
+			CString Temco_logo;
+			MultiByteToWideChar( CP_ACP, 0, (char *)temocolog, 
+				(int)strlen(temocolog)+1, 
+				Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
+			Temco_logo.ReleaseBuffer();		
+			Temco_logo.MakeUpper();
+			if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0)
+			{
+				return NO_VERSION_INFO;
+			}
+
+
+			return READ_SUCCESS;
+		}
+	}
+	return OPEN_FILE_ERROR;
+
+}
+BOOL HexFileValidation(const CString& strFileName)
+{	
+    const CString strConst = _T("hex");
+    CString strSuffix = strFileName.Right(3);
+    if (strSuffix.CompareNoCase(strConst) != 0)
+    {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+BOOL BinFileValidation(const CString& strFileName)	
+{
+    const CString strConst = _T("bin");
+    CString strSuffix = strFileName.Right(3);
+    if (strSuffix.CompareNoCase(strConst) != 0 )
+    {
+        return FALSE;
+    }
+    return TRUE;
 }

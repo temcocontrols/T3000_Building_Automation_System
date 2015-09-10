@@ -185,7 +185,7 @@ bool CADO::IsHaveTable( CADO ado, CString strTableName )
 	while(!(ado.m_pRecordset-> EndOfFile))//指针是否已经指向最后一条记录？ 
 	{ 
 		_bstr_t   table_name   =   ado.m_pRecordset-> Fields-> GetItem(_T("TABLE_NAME"))-> Value;//得到表的名称 
-
+        
 		if(strTableName   ==   (LPCSTR)  table_name)//表名判断是否相同？ 
 		{ 
 			bIsHaveNo   =   TRUE;//有表了 

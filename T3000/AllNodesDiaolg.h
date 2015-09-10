@@ -1,7 +1,7 @@
 #pragma once
 #include "msflexgrid1.h"
 #include "afxwin.h"
-
+#include "DialogInfo.h"
 // CAllNodesDiaolg dialog
 
 class CAllNodesDiaolg : public CDialog
@@ -56,4 +56,8 @@ public:
 	afx_msg void OnEnSetfocusTextedit();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnBnClickedArd();
+    afx_msg void OnBnClickedDelbuttonOffline();
+     
+    CDialogInfo *m_pDialogInfo;
+
 };

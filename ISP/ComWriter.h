@@ -49,7 +49,7 @@ public:
 	// 开始写串口
 	int BeginWirteByCom();
 	int WirteExtendHexFileByCom();
-
+    int WirteExtendHexFileByCom_RAM();
 	void WriteFinish(int nFlashFlag);
 	//***************************Release Func*********************//
   //  void Show_Device_Information(int comport ,int ID);
@@ -74,7 +74,7 @@ Bin_Info m_hexinfor;
 		CWnd*			m_pParentWnd;
 		TS_UC*			m_pFileBuffer;
 		int					m_nBufLen;
-
+        BOOL Is_Ram;
 		int					m_nComPort;
 		 
 		int					m_nBautrate;			// 波特率

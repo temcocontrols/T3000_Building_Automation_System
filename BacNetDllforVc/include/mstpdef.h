@@ -99,9 +99,9 @@ typedef enum {
 #define Npoll 50
 
 /* The number of retries on sending Token: 1. */
-//#define Nretry_token 1
+#define Nretry_token 1
 //Fance_BAC_TEST
-#define Nretry_token 10
+//#define Nretry_token 10
 /* The maximum idle time a sending node may allow to elapse between octets */
 /* of a frame the node is transmitting: 20 bit times. */
 #define Tframe_gap 20

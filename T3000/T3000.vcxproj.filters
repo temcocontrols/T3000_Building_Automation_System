@@ -8,9 +8,6 @@
     <Filter Include="T3">
       <UniqueIdentifier>{04864613-5791-4496-a45f-a558636f058f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MiniPanel">
-      <UniqueIdentifier>{921ad1c6-5ab3-4d8f-9226-9819ea946b0e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="CADO">
       <UniqueIdentifier>{b1d039be-af63-4fdd-a8cf-e8638bd8a25e}</UniqueIdentifier>
     </Filter>
@@ -35,9 +32,6 @@
     </Filter>
     <Filter Include="Bacnet\CM5_H">
       <UniqueIdentifier>{f1c0a87b-351f-4535-a9ab-10e2bb3a8940}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Bacnet\Tstat_Input">
-      <UniqueIdentifier>{c79cf686-7d67-4908-905b-2e3a96aabb31}</UniqueIdentifier>
     </Filter>
     <Filter Include="ChartCtrl">
       <UniqueIdentifier>{27e725d7-6589-49bc-8746-034b8bae4c5a}</UniqueIdentifier>
@@ -258,9 +252,6 @@
     <ClCompile Include="T3\DialogT3.cpp">
       <Filter>T3</Filter>
     </ClCompile>
-    <ClCompile Include="MiniPanel\DialgMiniPanel.cpp">
-      <Filter>MiniPanel</Filter>
-    </ClCompile>
     <ClCompile Include="ADO\ADO.cpp">
       <Filter>CADO</Filter>
     </ClCompile>
@@ -345,9 +336,6 @@
     <ClCompile Include="BacnetWait.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
-    <ClCompile Include="TestMultiReadTraffic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CustomSTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -365,9 +353,6 @@
     </ClCompile>
     <ClCompile Include="BacnetScheduleTime.cpp">
       <Filter>Bacnet</Filter>
-    </ClCompile>
-    <ClCompile Include="T38IOAView.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WriteSingleRegDlg.cpp">
       <Filter>Source Files</Filter>
@@ -540,14 +525,8 @@
     <ClCompile Include="BacnetRemotePoint.cpp">
       <Filter>Bacnet</Filter>
     </ClCompile>
-    <ClCompile Include="BacnetInputForTstat.cpp">
-      <Filter>Bacnet\Tstat_Input</Filter>
-    </ClCompile>
     <ClCompile Include="TstatRangeDlg.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TstatsCPP\BacnetOutputForTstat.cpp">
-      <Filter>Bacnet\Tstat_Input</Filter>
     </ClCompile>
     <ClCompile Include="T3000_Default_MainView.cpp">
       <Filter>Source Files</Filter>
@@ -633,7 +612,34 @@
     <ClCompile Include="T3ModulesOutputDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StatusbarCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="BatchSNDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProductRegisterListView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WriteRegistersValueDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EnterValueDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Enter_Value_BinaryDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TStatInputView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TStatOutputView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetProgramSetting.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BoatMonitorViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -888,6 +894,15 @@
     <None Include="ChartCtrl\ChartSerieBase.inl">
       <Filter>ChartCtrl</Filter>
     </None>
+    <None Include="res\building.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\lock.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\unlock.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1133,9 +1148,6 @@
     <ClInclude Include="T3\DialogT3.h">
       <Filter>T3</Filter>
     </ClInclude>
-    <ClInclude Include="MiniPanel\DialgMiniPanel.h">
-      <Filter>MiniPanel</Filter>
-    </ClInclude>
     <ClInclude Include="ADO\ADO.h">
       <Filter>CADO</Filter>
     </ClInclude>
@@ -1241,16 +1253,10 @@
     <ClInclude Include="gloab_define.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TestMultiReadTraffic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CustomSTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AirflowSettingDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="T38IOAView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WriteSingleRegDlg.h">
@@ -1526,7 +1532,34 @@
     <ClInclude Include="T3ModulesOutputDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="StatusbarCtrl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="BatchSNDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProductRegisterListView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WriteRegistersValueDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnterValueDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Enter_Value_BinaryDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TStatInputView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TStatOutputView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetProgramSetting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BoatMonitorViewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

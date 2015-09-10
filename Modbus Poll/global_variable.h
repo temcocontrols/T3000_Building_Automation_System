@@ -24,5 +24,6 @@ BOOL g_is_show_Data_Traffic_Window=FALSE;
 long g_Tx_Rx;
 vector<Registers_Infor> g_vectRegisters;
 UINT g_Color_Index=0;
+UINT g_Time_Offset = 0;
 //BOOL g_apply=TRUE;
 //BOOL g_rwonce=FALSE;

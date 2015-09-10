@@ -45,8 +45,20 @@ BOOL CBADO::OnInitADOConn()
 	hFind = FindFirstFile(m_dbfilepath, &wfd);//
 	if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
 	{
-	StrTips.Format(_T("%s\n The datebase file disappeared.T3000 help you create a default datebase of your current building."),m_dbfilepath);
-	AfxMessageBox(StrTips);
+// 	StrTips.Format(_T("%s\n The datebase file disappeared.T3000 help you create a default datebase of your current building."),m_dbfilepath);
+// 	AfxMessageBox(StrTips);
+	CStringArray  ArrayFileName;
+	SplitCStringA(ArrayFileName,m_dbfilepath,L"\\");
+	CString filename=L"";
+	for (int i=0;i<ArrayFileName.GetSize()-1;i++)
+	{
+		filename+=ArrayFileName[i];
+		filename+=L"\\";
+	}
+	CreateDirectory(filename,NULL);
+	m_dbImgeFolder=filename+_T("image");
+	CreateDirectory(m_dbImgeFolder,NULL);
+
 	hFind = FindFirstFile(m_dbfilepath, &wfd);//
 	if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下没有building数据库的话，就创建一个
 	{
@@ -62,6 +74,9 @@ BOOL CBADO::OnInitADOConn()
 		file.Close();    
 		::UnlockResource(hGlobal);   
 		::FreeResource(hGlobal);
+
+
+		 
 	}//
 	FindClose(hFind);
 
@@ -76,16 +91,16 @@ BOOL CBADO::OnInitADOConn()
 
 		m_ConnectString=(CString)FOR_DATABASE_CONNECT+m_dbfilepath;
 
-		CStringArray  ArrayFileName;
-		SplitCStringA(ArrayFileName,m_dbfilepath,L"\\");
-		CString filename=L"";
-		for (int i=0;i<ArrayFileName.GetSize()-1;i++)
-		{
-			filename+=ArrayFileName[i];
-			filename+=L"\\";
-		}
-		m_dbImgeFolder=filename+_T("image");
-		CreateDirectory(m_dbImgeFolder,NULL);
+// 		CStringArray  ArrayFileName;
+// 		SplitCStringA(ArrayFileName,m_dbfilepath,L"\\");
+// 		CString filename=L"";
+// 		for (int i=0;i<ArrayFileName.GetSize()-1;i++)
+// 		{
+// 			filename+=ArrayFileName[i];
+// 			filename+=L"\\";
+// 		}
+// 		m_dbImgeFolder=filename+_T("image");
+// 		CreateDirectory(m_dbImgeFolder,NULL);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 						//连接数据库
@@ -126,10 +141,6 @@ _RecordsetPtr& CBADO::OpenRecordset( CString sql )
 
 void CBADO::CloseRecordset()
 {
-// 	if (m_pRecordset->GetState() == adStateOpen)
-// 	{
-// 		m_pRecordset->Close();
-// 	}
 	if (m_pRecordset->State)
 	{
 	  m_pRecordset->Close();
@@ -212,6 +223,7 @@ bool CBADO::IsHaveTable( CBADO ado, CString strTableName )
 	{ 
 		_bstr_t   table_name   =   ado.m_pRecordset-> Fields-> GetItem(_T("TABLE_NAME"))-> Value;//得到表的名称 
 
+   
 		if(strTableName   ==   (LPCSTR)  table_name)//表名判断是否相同？ 
 		{ 
 			bIsHaveNo   =   TRUE;//有表了 
@@ -222,7 +234,8 @@ bool CBADO::IsHaveTable( CBADO ado, CString strTableName )
 	} 
 
 
-	if(bIsHaveNo   ==   FALSE)//无表给出提示，并返回FALSE 
+	if(bIsHaveNo   ==   FALSE)
+    //无表给出提示，并返回FALSE 
 	{ 
 		//strMsg.Format(_T( "数据库中没有查到下的表：:   %s。\n请先确认数据库的有效性！ "),   strTableName); 
 		//MessageBox(NULL,   strMsg,   _T( "数据库表没有查到！ "),   MB_OK   |   MB_ICONWARNING); 
@@ -234,4 +247,9 @@ bool CBADO::IsHaveTable( CBADO ado, CString strTableName )
 		return   TRUE; 
 	}
 
+}
+
+void CBADO::RenameTable(CString TableName_Old,CString TableName_New)
+{
+    
 }

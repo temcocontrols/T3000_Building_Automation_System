@@ -50,6 +50,10 @@ protected:
 	afx_msg void OnTvnEndlabeleditTree(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTvnBeginlabeleditTree(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMClickTree(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMSelectChanged_Tree(NMHDR *pNMHDR, LRESULT *pResult);
+
+
+	
 	//afx_msg void OnKYDOWNClickTree(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnFolderBrowerBtn();
 	DECLARE_MESSAGE_MAP()

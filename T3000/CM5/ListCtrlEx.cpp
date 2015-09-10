@@ -162,7 +162,11 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				return ;
 			}
 			else
+			{
+				if(BacNet_hwd!=NULL)
+					::PostMessage(BacNet_hwd,WM_CHANGE_NEXT_PANEL_MESSAGE,LIST_UP,0);
 				return ;
+			}
 
 		}
 		else if(nChar == VK_RIGHT)
@@ -206,7 +210,12 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				return ;
 			}
 			else
+			{
+				if(BacNet_hwd!=NULL)
+					::PostMessage(BacNet_hwd,WM_CHANGE_NEXT_PANEL_MESSAGE,LIST_DOWN,0);
 				return ;
+			}
+
 
 
 		}
@@ -701,6 +710,10 @@ void CListCtrlEx::Get_Selected_Item(int &my_select_raw,int &my_select_col)
 	my_select_col = m_select_col;
 }
 
+void CListCtrlEx::InitListData()
+{
+	memset(m_data,0,30000);
+}
 
 void CListCtrlEx::SetListData(char *mydata,int data_length)
 {

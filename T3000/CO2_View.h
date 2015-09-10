@@ -80,6 +80,7 @@ public:
 
 
 
+
 	int m_nCurRow;
 	int m_nCurCol;
 
@@ -88,8 +89,8 @@ public:
 	void CO2_Alarm_Set();
 	void CO2_Grid_init();
 	void C02_SHOW_TEMP();
-	void Initial_List();
-	void Fresh_External_List();
+	 void Initial_List();
+	 
 	void Check_DayTime();
 	void Check_HourTime();
 	void Show_PassWord();
@@ -127,8 +128,8 @@ public:
 	afx_msg void OnBnClickedRadioAlarmManual();
 	afx_msg void OnBnClickedRadioAlarmAuto();
 	afx_msg void OnCbnSelchangeCo2AlarmState();
-	afx_msg LRESULT Save_List_Item(WPARAM wParam,LPARAM lParam);
-	ListCtrlEx::CListCtrlEx m_co2_external_sensor_list;
+	//afx_msg LRESULT Save_List_Item(WPARAM wParam,LPARAM lParam);
+	//ListCtrlEx::CListCtrlEx m_co2_external_sensor_list;
 	virtual void OnInitialUpdate();
 	float m_humidity_value;
 	CDateTimeCtrl m_co2_day_picker;
@@ -151,16 +152,15 @@ public:
 	static DWORD WINAPI StartRefresh(LPVOID lpVoid);
 	afx_msg void OnEnKillfocusCo2AlarmOnTime();
 	afx_msg void OnEnKillfocusCo2AlarmOffTime();
-	afx_msg void OnBnClickedBtnCo2ClearCal();
+	//afx_msg void OnBnClickedBtnCo2ClearCal();
 	afx_msg void OnBnClickedRadioHumidityHeatEnable();
 	afx_msg void OnBnClickedRadioHumidityHeatDisable();
     void Initial_Registerlist();
 
-
 	int m_message_down;
 	int m_message_up;
 
-	int m_value;
+	int m_value;       
 	int m_address;
 	int m_times;
 

@@ -50,7 +50,7 @@ public:
 	CToolBar m_wndToolBar;
 	virtual BOOL OnInitDialog();
 	void InitialToolBar();
-	void MyPaint_Mem(HDC my_hdc);
+	void Draw_Graphic(HDC my_hdc);
 	void Create_Line_Point();
 	void SetXaxisTime(unsigned long nstarttime,unsigned long nendtime);
 	void SetXaxisStartTime(unsigned long nstarttime);//只设置开始时间，x的结束时间由 m_time_selected 去计算;
@@ -88,7 +88,7 @@ public:
 	int GetYaxisScale();
 	int Get_Time_Scale();
 	int Search_data_from_db();
-	void Delete_Ram_Data();
+
 	void Reset_X_Time_Parameter();
 	void Get_Input_Unit();
 	void Reset_X_Y_Parameter();
@@ -146,7 +146,7 @@ public:
 	
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 };
-
+	void Delete_Ram_Data();
 //const int _6_min = 1;
 //const int _1_hour = 2;
 //const int _4_hour = 3;

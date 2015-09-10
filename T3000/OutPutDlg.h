@@ -31,6 +31,7 @@ public:
 	void FreshGrid_PID3();
 	void put_fan_variable();
 	int get_real_fan_select();
+    int set_real_fan_select();
 	void OnWrite(int bflexgrid1_or_2,int col,int row);
 	DECLARE_EVENTSINK_MAP()
 	void ClickMsflexgrid1();
@@ -117,4 +118,19 @@ public:
 	afx_msg void OnEnKillfocusPid3Heatstageedit();
 	afx_msg void OnEnKillfocusPid3coolstageedit();
 	
+    afx_msg void OnEnKillfocusEditFanOffName();
+    afx_msg void OnEnKillfocusEditFanOnName();
+    afx_msg void OnEnKillfocusEditFanLowName();
+    afx_msg void OnEnKillfocusEditFanMidName();
+    afx_msg void OnEnKillfocusEditFanAutoName();
+    afx_msg void OnEnKillfocusEditFanHeatName();
+    afx_msg void OnEnKillfocusEditFanCoolName();
+    BOOL Write_Model_Name(CString Name,int Address);
+    CEdit m_edit_auto;
+    CEdit m_edit_cool;
+    CEdit m_edit_heat;
+    CEdit m_edit_off;
+    CEdit m_edit_model1;
+    CEdit m_edit_model2;
+    CEdit m_edit_model3;
 };

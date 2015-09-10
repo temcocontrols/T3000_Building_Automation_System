@@ -661,7 +661,8 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 				//*/
 				
 				//if(Read_One2(devLo,10, bForTStat)==-2)
-				Sleep(20);//////////////////////////////////for running is better
+				Sleep(20);
+                //////////////////////////////////for running is better
 				char c_temp_arr[100]={'\0'};
 				if(Read_One2(devLo,10, bForTStat)!=-2)//one times
 				{	
@@ -1372,13 +1373,27 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 		DWORD nSerial=usDataPackage[0]+usDataPackage[1]*256+usDataPackage[2]*256*256+usDataPackage[3]*256*256*256;
 		int nProductID=usDataPackage[4];
-		int modbusID=usDataPackage[5];
+		  int modbusID=usDataPackage[5];
 		CString strTemp;
 		strTemp.Format(_T("%d.%d.%d.%d"),usDataPackage[6],usDataPackage[7],usDataPackage[8],usDataPackage[9]);
 		CString strIP=strTemp;
 		int nPort=(usDataPackage[10]);
 
-	
+	  /*  BOOL net_open = Open_Socket2(strIP,nPort);
+         SetCommunicationType(1);
+         if (net_open)
+         {
+            unsigned short DataBuffer[10];
+            int ret = Read_Multi(modbusID,DataBuffer,0,10);
+            if (ret>0)
+            {
+                float softwareversion = ((float)(DataBuffer[4]+DataBuffer[5]*256))/10;
+                pT->SetSoftwareVersion(softwareversion);
+                pT->SetHardwareVersion(DataBuffer[8]);
+            }
+
+         }
+         close_com();*/
 
 		pT->SetSerialID(nSerial);
 		pT->SetDevID(modbusID);
@@ -1389,7 +1404,7 @@ int CTStatScanner::AddNCToList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 		LPSTR szIP = inet_ntoa(siBind.sin_addr);
 		pT->SetIPAddr((char*)szIP);
 		pT->SetNetworkCardAddress(local_enthernet_ip);
-
+        
 		_NetDeviceInfo* pni = new _NetDeviceInfo;
 		pni->m_pNet = pT;		
 		bool found_exsit = false;
@@ -1445,8 +1460,6 @@ UINT _ScanTstatThread2(LPVOID pParam)
 
 		if(pScan->m_bStopScan)
 		{ 
-			
-
 			break;
 		}
 		CString strComPort = pScan->m_szComs[i];
@@ -1472,6 +1485,10 @@ UINT _ScanTstatThread2(LPVOID pParam)
 					pScan->SetBaudRate(_T("38400"));
 					 
 					bool bRet = Change_BaudRate(pScan->m_nBaudrate);
+                    if (!bRet)
+                    {
+                        continue;
+                    }
 					strlog.Empty();
 					strlog.Format(_T("Change BaudRate:%d"),pScan->m_nBaudrate);
 					 //write_T3000_log_file(strlog);
@@ -1497,7 +1514,7 @@ UINT _ScanTstatThread2(LPVOID pParam)
 					str.Format(_T("Cannot open the COM%d\n"), n);
 					//WriteLogFile(str);
 					//SetPaneString(2, str);
-					int n =0 ;
+					//int n =0 ;
 				}
 				continue;
 			}
@@ -1620,7 +1637,63 @@ UINT _ScanTstatThread2(LPVOID pParam)
 		}
 		
 		
+        scan_item = 1;
+    /*    for (int k=0;k<m_scan_info.size();k++)
+        {
+            if((n == m_scan_info.at(k).scan_com_port) && (57600 ==  m_scan_info.at(k).scan_baudrate))
+            {
+                scan_item = k;
+                break;
+            }
+        }*/
+         scan_item = -1;
+        if(scan_item != -1)
+        {
+           // if(!m_scan_info.at(scan_item).scan_skip)
+           // {
+                if(pScan->OpenCom(n))
+                {
+                    pScan->SetComPort(n);
+                    pScan->SetBaudRate(_T("57600"));
+                    bool bRet = Change_BaudRate(57600);
 
+                    ASSERT(bRet);
+                    g_strScanInfoPrompt.Format(_T("COM%d"), n);
+                    //It's unnecessary to check one device. annulled by Fance. 
+                    //We encountered such a situation that ,some device scan commond is not works well,if it only exsit on the modbus.
+                    //it can be scan,but if other device also on modbus line , it will can't scan.
+                    //So ,in order to check device works well, delete this code can help developer test our product.
+                    //	BOOL bReadone = pScan->ReadOneCheckOnline(n);
+                    //	if (!bReadone)//comscan oldcode
+                    //{
+                    //	pScan->background_binarysearch(n);				
+                    //}		
+
+                    m_scan_info.at(scan_item).scan_status = SCAN_STATUS_RUNNING;
+                    pScan->background_binarysearch(n);	//lsc comscan new cold
+                    close_com();
+                    m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FINISHED;
+                    memset(m_scan_info.at(scan_item).scan_notes,0,250);
+                    memcpy(m_scan_info.at(scan_item).scan_notes,"Scan finished",strlen("Scan finished"));
+                    Sleep(500);
+                    TRACE(_T("Success open the COM%d\n"), n);
+
+                }
+                else
+                {
+                    m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FAILED;
+                    memset(m_scan_info.at(scan_item).scan_notes,0,250);
+                    memcpy(m_scan_info.at(scan_item).scan_notes,"Cannot open the COM Port",strlen("Cannot open the COM Port"));
+                    // 不能打开串口X，提示信息
+                    TRACE(_T("Cannot open the COM%d\n"), n);
+                    CString str;
+                    str.Format(_T("Cannot open the COM%d\n"), n);
+                    // 			WriteLogFile(str);
+                    //SetPaneString(2, str);
+                    int n =0 ;
+                }
+            //}
+        }
 
 
 	}
@@ -1833,7 +1906,8 @@ int CTStatScanner::GetAllNodeFromDataBase()
 	//m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
 	 bado.m_pRecordset=bado.OpenRecordset(temp_str);
 	//return m_pRs->get_RecordCount();
-
+ /*   m_szComNodes.clear();
+    m_szNetNodes.clear();*/
 	int nTemp = 0;
 	while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 	{
@@ -2183,16 +2257,16 @@ void CTStatScanner::CompareNetToComConflict(){
 					 nNetID,nNetSerialNo,nNetModel);
 				 ComInfor.Format(_T("Com Device:Com Port=%s Device Name=%s ID=%d Serial No=%d Model NO=%d"),StrCom.GetBuffer(),ComDeviceName.GetBuffer(),
 					 nComID,nComSerialNo,nComModelNo);
-				 CWhichOneToChooseDlg dlg;
-				 dlg.m_Bool_Check_Net=1;
-				 dlg.m_Bool_Check_Com=0;
-				 dlg.m_StrNet=NetInfor;
-				 dlg.m_StrCom=ComInfor;
-				 if (dlg.DoModal()==IDOK)
-				 {
- 					 if (!dlg.m_Bool_Check_Net)//不添加Net
- 					 {
- 						  for (vector<_NetDeviceInfo*>::iterator it=m_szNCScanRet.begin();it!=m_szNCScanRet.end();++it)
+// 				 CWhichOneToChooseDlg dlg;
+// 				 dlg.m_Bool_Check_Net=1;
+// 				 dlg.m_Bool_Check_Com=0;
+// 				 dlg.m_StrNet=NetInfor;
+// 				 dlg.m_StrCom=ComInfor;
+// 				 if (dlg.DoModal()==IDOK)
+// 				 {
+//  					 if (!dlg.m_Bool_Check_Net)//不添加Net
+//  					 {
+ 						/*  for (vector<_NetDeviceInfo*>::iterator it=m_szNCScanRet.begin();it!=m_szNCScanRet.end();++it)
  						  {
 							  
 							  if ((nNetSerialNo==(*it)->m_pNet->GetSerialID())&&(nNetModel=(*it)->m_pNet->GetProductType())&&(nNetID==(*it)->m_pNet->GetDevID()))
@@ -2200,9 +2274,9 @@ void CTStatScanner::CompareNetToComConflict(){
 								  m_szNCScanRet.erase(it);
 								  break;
 							  }
- 						  }
-						  if (!dlg.m_Bool_Check_Com)
-						  {
+ 						  }*/
+// 						  if (!dlg.m_Bool_Check_Com)
+// 						  {
 							  for (vector<_ComDeviceInfo*>::iterator it=m_szTstatScandRet.begin();it!=m_szTstatScandRet.end();++it)
 							  {
 								  if ((nComSerialNo==(*it)->m_pDev->GetSerialID())&&(nComModelNo=(*it)->m_pDev->GetProductType())&&(nComID==(*it)->m_pDev->GetDevID()))
@@ -2211,9 +2285,9 @@ void CTStatScanner::CompareNetToComConflict(){
 									  break;
 								  }
 							  }
-						  }
- 					 } 
- 					 else if (!dlg.m_Bool_Check_Com)
+						 /* }*/
+ 					/// } 
+ 					 /*else if (!dlg.m_Bool_Check_Com)
  					 {
 						 for (vector<_ComDeviceInfo*>::iterator it=m_szTstatScandRet.begin();it!=m_szTstatScandRet.end();++it)
 						 {
@@ -2223,9 +2297,9 @@ void CTStatScanner::CompareNetToComConflict(){
 								 break;
 							 }
 						 }
- 					 }
+ 					 }*/
  					  
-				 } 
+				// } 
 				
 
 			} 
@@ -2433,8 +2507,6 @@ void CTStatScanner::AddNewNetToDB()
 						//{
 							try
 							{
-
-
 								bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 							}
 							catch(_com_error *e)
@@ -2483,12 +2555,6 @@ void CTStatScanner::AddNewNetToDB()
 void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
 {
 	ASSERT(pInfo);
-// 	_ConnectionPtr t_pCon;//for ado connection
-//  	t_pCon.CreateInstance(_T("ADODB.Connection"));
-//  	t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-
-
-	// Modbus ID
 	CString strID;
 	int nID = pInfo->m_pNet->GetDevID();	
 	strID.Format(_T("%d"),  nID);
@@ -2507,11 +2573,7 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
 
 	CString strBackground_bmp=_T("T3000_Default_Building_PIC.bmp");
 
-	CString strHWV;
-	strHWV.Format(_T("%0.1f"), pInfo->m_pNet->GetHardwareVersion());
-
-	CString strSWV;
-	strSWV.Format(_T("%0.1f"), pInfo->m_pNet->GetSoftwareVersion());
+    
 
 // 	CString strCom;
 // 	strCom.Format(_T("COM%d"), pInfo->m_pNet->GetComPort());
@@ -2530,8 +2592,43 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
 
 	CString strPort;
 	strPort.Format(_T("%d"), pInfo->m_pNet->GetIPPort());
-	//m_port = strPort;//scan
+	   float softrev = 0.0;
+       float hardrev = 0.0;
+        if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7)
+        {
+            BOOL Is_Open=Open_Socket2(strIP,pInfo->m_pNet->GetIPPort());
+            if (Is_Open)
+            {
+                SetCommunicationType(1);
+                unsigned short DataBuffer[10] ;
+                int ret = Read_Multi(nID,DataBuffer,0,10);
+                if (ret>0)
+                {
+                    
+                        softrev = ((float)(DataBuffer[5]*256+ DataBuffer[4]))/10;
+                      
+                        hardrev =   DataBuffer[8];
 
+                       int ret=Read_Multi(nID,DataBuffer,714,10);
+                     
+                     if (DataBuffer[0]==0x56)
+                     {
+                       /*  strProductName.Format(_T("%s%s"),GetTextFromReg(715),GetTextFromReg(719));*/
+                         strProductName.Format(_T("%s%s"),GetTextFromReg_Buffer(1,DataBuffer),GetTextFromReg_Buffer(5,DataBuffer));
+                     }
+
+                }
+                close_com();
+            }
+        }
+          
+     
+       
+      CString strHWV;
+    strHWV.Format(_T("%0.1f"), hardrev);
+
+    CString strSWV;
+    strSWV.Format(_T("%0.1f"), softrev); 
 	CString NetwordCard_Address;
 	NetwordCard_Address=pInfo->m_pNet->GetNetworkCardAddress();
 
@@ -2542,12 +2639,14 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
 	if(pInfo->m_pNet->GetProtocol()== PROTOCOL_BACNET_IP)//如果是bacnetip 需要往数据库里保存 协议 3 就是bacnetip;
 	{
 		CString temp_pro = _T("3");
-		strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status)					  values('"+m_strBuildingName+"','"+m_strSubNet+"','"+NetwordCard_Address+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"','"+temp_pro+"',1)"));
+		strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Custom,Online_Status)					  values('"
+        +m_strBuildingName+"','"+m_strSubNet+"','"+NetwordCard_Address+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"','"+temp_pro+"','0',1)"));
 	}
 	else
 	{
 		CString temp_pro = _T("1");// protocol type 1 is modbus tcp
-		strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status)					  values('"+m_strBuildingName+"','"+m_strSubNet+"','"+NetwordCard_Address+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"','"+temp_pro+"',1)"));
+		strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Custom,Online_Status)					  values('"
+        +m_strBuildingName+"','"+m_strSubNet+"','"+NetwordCard_Address+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"','"+temp_pro+"','0',1)"));
 	}
 	//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize)					  values('"+m_strBuildingName+"','"+m_strSubNet+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"')"));
 //new nc//  strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize, Mainnet_info) values('"+m_strBuildingName+"','"+m_strSubNet+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEpSize+"','"+strMainnetInfo+"')"));
@@ -2625,29 +2724,48 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 	  strBaudRate=pInfo->m_tstatip;
 	  strCom=pInfo->m_tstatport;
 	}
-	
+    if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7)
+    {       BOOL Is_Open=FALSE;
+        if (pInfo->m_pDev->m_nComPort==-1)
+        {
+          /*  strBaudRate=pInfo->m_tstatip;
+            strCom=pInfo->m_tstatport;*/
+            Is_Open=Open_Socket2(pInfo->m_tstatip,_wtoi(pInfo->m_tstatport));
+            SetCommunicationType(1);
+        }
+        else
+        {
+            Is_Open = open_com(pInfo->m_pDev->m_nComPort) ;
+            Change_BaudRate(nBaudRate) ;
+            SetCommunicationType(0);
+        }
+   
+        if (Is_Open)
+        {
+           
+            unsigned short DataBuffer[10] ;
+            
+
+                
+
+                int ret=Read_Multi(nID,DataBuffer,714,10);
+                 if (ret>0)
+                 {
+                     if (DataBuffer[0]==0x56)
+                     {
+                         strProductName.Format(_T("%s%s"),GetTextFromReg_Buffer(1,DataBuffer),GetTextFromReg_Buffer(5,DataBuffer));
+                     }
+                 }
+               
+
+           
+            close_com();
+        }
+    }
 	 
 	CString strMainetInfo = pInfo->m_pDev->m_mainnet_info.GetMainnetInfo();
 	 
-	//strBaudRate
-	//strCom
-
-//20120424
-// 	CString strIP;
-// 	in_addr ia;
-// 	ia.S_un.S_addr = pInfo->m_pNet->GetIPAddr();
-// 	strIP = CString(inet_ntoa(ia));	
-// 
-// 	CString strPort;
-// 	strPort.Format(_T("%d"), pInfo->m_pNet->GetIPPort());
-//20120424
-
-//	CString strSubNetName = GetTstatSubnetName(strCom);
-// 	pInfo->m_pDev->SetSubnetName(strSubNetName);
-	
- 
-// 	CString strMBuildingName = GetTstatMBuildingName(strCom);
-// 	pInfo->m_pDev->SetBuildingName(strMBuildingName);
+	 
 try
 {
 
@@ -2656,7 +2774,8 @@ try
 	strEpSize.Format(_T("%d"), pInfo->m_pDev->GetEPSize());
 
 
-	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Online_Status,Protocol) values('"+m_strBuildingName+"','"+m_strSubNet+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+"','"+strEpSize+"',1,0)"));
+	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Online_Status,Protocol,Custom) values('"
+    +m_strBuildingName+"','"+m_strSubNet+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+"','"+strEpSize+"',1,0,'0')"));
 	//new nc// strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize, Mainnet_info) values('"+m_strBuildingName+"','"+m_strSubNet+"','"+strSerialID+"','"+m_strFloorName+"','"+m_strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+"','"+strEpSize+"','"+strMainnetInfo+"')"));
 	bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 }
@@ -2817,11 +2936,22 @@ CString CTStatScanner::GetNetDevSubnetName(const CString& strIP)
 
 void CTStatScanner::SetBaudRate(const CString& strBaudrate)
 {
-	m_nBaudrate = _wtoi(strBaudrate);
-	if (m_nBaudrate != 9600 && m_nBaudrate != 19200 && m_nBaudrate != 38400)
+	m_nBaudrate = 0;//_wtoi(strBaudrate);
+	/*if (m_nBaudrate != 9600 && m_nBaudrate != 19200 && m_nBaudrate != 38400)
 	{
 		m_nBaudrate = 19200;
-	}
+	}*/
+    for (int i=0;i<5;i++)
+    {
+        if (strBaudrate.CompareNoCase(Building_Baudrate[i])==0)
+        {
+            m_nBaudrate = _wtoi(strBaudrate);
+        }
+    }
+     if (m_nBaudrate == 0)
+     {
+        m_nBaudrate = 19200;
+     }
 }
 
 
@@ -3430,6 +3560,10 @@ void CTStatScanner::Initial_Scan_Info()
 		memset(temp_scan_info.scan_notes,0,250);
 		m_scan_info.push_back(temp_scan_info);
 		m_scan_info_buffer.push_back(temp_scan_info);
+
+
+
+
 	}
 
 
@@ -4039,17 +4173,15 @@ void CTStatScanner::WaitScan()
 
 void CTStatScanner::writetxt()
 {
+    if(m_pFile->Open(g_strExePth.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate ))
+    {
+        for (UINT i = 0; i <10; i++)
+        {
+            m_pFile->WriteString(_T("dd"));	
+        }	
 
-	if(m_pFile->Open(g_strExePth.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate ))
-	{
-		for (UINT i = 0; i <10; i++)
-		{
-			m_pFile->WriteString(_T("dd"));	
-		}	
-
-		m_pFile->Close();
-	}
-
+        m_pFile->Close();
+    }
 }
 BOOL CTStatScanner::ScanBacnetIPDevice()
 {
@@ -4277,7 +4409,8 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 			m_protocol_temp.Format(_T("%u"),P_REMOTE_DEVICE);
 			
 			
-			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status) values('"+pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurMainBuildingName+"','"+device_serial_number+"','floor1','room1','"+priduct_name+"','"+device_type+"','"+device_modbus_address+"','""','"+device_ip_address+"','""','"+device_instance_id+"','"+device_panel_number+"','"+device_modbus_port+"','0','"+m_protocol_temp+"','1')"));
+			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Custom) values('"
+            +pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurMainBuildingName+"','"+device_serial_number+"','floor1','room1','"+priduct_name+"','"+device_type+"','"+device_modbus_address+"','""','"+device_ip_address+"','""','"+device_instance_id+"','"+device_panel_number+"','"+device_modbus_port+"','0','"+m_protocol_temp+"','1','0')"));
 			//new nc//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Mainnet_info) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
 			try
 			{
@@ -4367,7 +4500,8 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
 			CString m_protocol_temp;
 			m_protocol_temp.Format(_T("%u"),P_REMOTE_DEVICE);
 			CString strSql;
-			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status) values('"+pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurMainBuildingName+"','"+device_serial_number+"','floor1','room1','"+priduct_name+"','"+device_type+"','"+device_modbus_address+"','""','"+device_ip_address+"','""','""','""','"+device_port+"','0','"+m_protocol_temp+"','1')"));
+			strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Custom) values('"
+            +pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurMainBuildingName+"','"+device_serial_number+"','floor1','room1','"+priduct_name+"','"+device_type+"','"+device_modbus_address+"','""','"+device_ip_address+"','""','""','""','"+device_port+"','0','"+m_protocol_temp+"','1','0')"));
 			//new nc//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Mainnet_info) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
 			try
 			{
@@ -4595,7 +4729,8 @@ UINT _ScanBacnetMSTPThread(LPVOID pParam)
 		}
 		else
 		{
-			str_temp.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status)   values('"+pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','""','"+temp_serial_number+"','floor1','room1','"+temp_view_name+"','"+temp_product_id_string+"','"+temp_modbusid+"','""','"+temp_baud+"','Default_Building_PIC.bmp','"+temp_object_instance+"','"+temp_panel_number+"','"+temp_port_string+"','0','"+temp_protocol+"','1')"));
+			str_temp.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Custom)   values('"
+            +pFrame->m_strCurMainBuildingName+"','"+pFrame->m_strCurSubBuldingName+"','""','"+temp_serial_number+"','floor1','room1','"+temp_view_name+"','"+temp_product_id_string+"','"+temp_modbusid+"','""','"+temp_baud+"','Default_Building_PIC.bmp','"+temp_object_instance+"','"+temp_panel_number+"','"+temp_port_string+"','0','"+temp_protocol+"','1','0')"));
 
 		}
 		 bado.m_pConnection->Execute(str_temp.GetString(),NULL,adCmdText);

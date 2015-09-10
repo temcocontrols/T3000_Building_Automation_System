@@ -1,8 +1,9 @@
 #pragma once
 
+
 #include "gloab_define.h"
 #include "global_struct.h"
-
+ 
 #define MY_MBPOLL_REG_DIALOG_MSG (WM_USER + 557)
 #define MY_MBPOLL_WRITE_REG_MSG (WM_USER + 558)
 
@@ -23,5 +24,6 @@ extern BOOL g_is_show_Data_Traffic_Window;
 extern   long g_Tx_Rx;
 extern vector<Registers_Infor> g_vectRegisters;
 extern UINT g_Color_Index;
+extern UINT g_Time_Offset;
 //extern BOOL g_apply;
 //extern BOOL g_rwonce;

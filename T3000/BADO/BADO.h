@@ -27,6 +27,7 @@ public:
 	void Createtable(CString strSQL);//自动创建表
 	bool IsHaveTable(CBADO ado, CString strTableName);//判断表是否存在
 	void DeleteDB();
+    void RenameTable(CString TableName_Old,CString TableName_New);
 };
 
 

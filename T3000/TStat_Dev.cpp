@@ -184,6 +184,9 @@ CString CTStat_Dev::GetProductName()
 	case  PM_CO2_RS485:
 		strProductName = "CO2";
 		break;
+    case  PM_PRESSURE_SENSOR:
+        strProductName = "Pressure";
+        break;
 	case  PM_CO2_NODE:
 		strProductName = "CO2 Node";
 		break;
@@ -212,6 +215,12 @@ CString CTStat_Dev::GetProductName()
 	case PM_T34AO :
 		strProductName="T3-4AO";
 			break;
+    case PM_T322AI:
+        strProductName="T3-22AI";
+        break;
+    case PM_T38AI8AO6DO:
+        strProductName="T3-8AI8AO6DO";
+        break;
 	case PM_T36CT :
 		strProductName="T3-6CT";
 			break;
@@ -225,7 +234,7 @@ CString CTStat_Dev::GetProductName()
 	    strProductName="Pressure Sensor";
 		break;
 	case PM_HUMTEMPSENSOR:
-		strProductName="Hum Temp Sensor";
+		strProductName="TstatHUM";
 		break;
 	case PM_CS_SM_AC:
 		strProductName="CS-SM-AC";

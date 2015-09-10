@@ -215,7 +215,8 @@ static void RS485_Configure_Status(
     //ctNew.ReadIntervalTimeout = MAXDWORD;
 	ctNew.ReadIntervalTimeout = MAXDWORD;
     ctNew.ReadTotalTimeoutMultiplier = MAXDWORD;
-    ctNew.ReadTotalTimeoutConstant = 10;//Fance
+   // ctNew.ReadTotalTimeoutConstant = 10;//Fance default 1000
+	ctNew.ReadTotalTimeoutConstant = 10;//Fance
 	ctNew.WriteTotalTimeoutMultiplier = 0;
 	ctNew.WriteTotalTimeoutConstant = 0;
 
@@ -495,11 +496,11 @@ void RS485_Check_UART_Data(
         /* check for data */
         if (!ReadFile(RS485_Handle, lpBuf, sizeof(lpBuf), &dwRead, NULL)) {
             if (GetLastError() != ERROR_IO_PENDING) {
-				int tempa = GetLastError();
+			//	int tempa = GetLastError();
                 mstp_port->ReceiveError = TRUE;
 			//	PurgeComm(RS485_Handle, PURGE_TXABORT| PURGE_RXABORT|PURGE_TXCLEAR|PURGE_RXCLEAR);//每次读都清空一次，多次调用后会触发错误,重叠模式
-				RS485_Cleanup();
-				 RS485_Initialize();
+			//	RS485_Cleanup();//Fance 添加，原来没有
+			//	 RS485_Initialize();//Fance 添加，原来没有
             }
         } else {
             if (dwRead) {

@@ -41,6 +41,9 @@ public:
 	HICON hIcon;
 	void Set_Input_Range_And_count();
 	afx_msg void OnBnClickedBtnMonitorGraphic();
+	void OnBnClickedBtnMonitorDeleteAll();
+	void OnBnClickedBtnMonitorDeleteSelected();
+
 	afx_msg void OnBnClickedBtnMonitorRefresh();
 	afx_msg void OnBnClickedButtonMonitorTest();
 //	afx_msg void OnNMKillfocusListMonitor(NMHDR *pNMHDR, LRESULT *pResult);
@@ -68,11 +71,13 @@ bool read_monitordata(int digtal_or_analog = 1);
 const int MONITOR_NUM = 0;
 const int MONITOR_LABEL = 1;
 const int MONITOR_INTERVAL = 2;
-const int MONITOR_LENGTH = 3;
-//const int MONITOR_UNITS = 4 ;
-const int MONITOR_STATUS = 4 ;
+const int MONITOR_LOG_TIME = 3;
+const int MONITOR_UNITS = 4;
+const int MONITOR_STATUS = 5 ;
+const int MONITOR_ANALOG_PACKAGE = 6;
+const int MONITOR_DIGITAL_PACKAGE = 7;
 
-const int MONITOR_COL_NUMBER = 14;
+const int MONITOR_COL_NUMBER = 8;
 
 const CString CS_DAYS = _T("Days");
 const CString CS_HOURS = _T("Hours");

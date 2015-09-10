@@ -19,6 +19,12 @@
 #pragma warning(disable:4305)
 #pragma warning(disable:4244)
 
+
+extern DWORD prg_text_color;
+extern DWORD prg_label_color;
+extern DWORD prg_command_color;
+extern DWORD prg_function_color;
+
 extern int program_code_length[BAC_PROGRAM_ITEM_COUNT];
 extern int program_list_line ;
 
@@ -736,7 +742,7 @@ public:
 	byte								       table_bank[MAX_TBL_BANK];
 	byte								       lock[MAX_INFO_TYPE];
 	//fance In_aux							       in_aux[MAX_INS];
-	//fance Con_aux							       con_aux[MAX_CONS];
+	//fance Con_aux							       con_aux[MAX_PIDS];
 	Info_Table					       info[19];
 	//	Str_grp_element				group_elements[MAX_ELEM];
 	Str_out_point   				   outputs[MAX_OUTS];
@@ -744,13 +750,13 @@ public:
 	//	char                       in_control[MAX_INS];
 	Str_variable_point			   vars[MAX_VARS];
 	//	char                       var_control[MAX_VARS];
-	Str_controller_point 		   controllers[MAX_CONS];
+	Str_controller_point 		   controllers[MAX_PIDS];
 	Str_monitor_point				   analog_mon[MAX_ANALM];
 	Str_monitor_work_data      monitor_work_data[MAX_ANALM];
-	Str_weekly_routine_point   weekly_routines[MAX_WR];
-	Wr_one_day                 wr_times[MAX_WR][9];
-	Str_annual_routine_point	 annual_routines[MAX_AR];
-	byte                       ar_dates[MAX_AR][46];
+	Str_weekly_routine_point   weekly_routines[MAX_SCHS];
+	Wr_one_day                 wr_times[MAX_SCHS][9];
+	Str_annual_routine_point	 annual_routines[MAX_HOLS];
+	byte                       ar_dates[MAX_HOLS][46];
 	Str_program_point	 			   programs[MAX_PRGS];
 	byte 			     				     *program_codes[MAX_PRGS];   //  pointer to code
 	Control_group_point	 		   control_groups[MAX_GRPS];
@@ -1011,6 +1017,7 @@ struct func_table {
 } func_table[] = {
  "ABS",ABS,
  "AVG",AVG,
+ "COM1",COM_1,
  "CONPROP", CONPROP,
  "CONRATE", CONRATE,
  "CONRESET", CONRESET,
@@ -2270,7 +2277,7 @@ int get_token(void)
 				}
 			}        /* end of relaional statement check */
 
-			if ( strchr("+-*^/%=;()[]'," , *prog))
+			if ( strchr("+-*^/%&|=;()[]'," , *prog))
 			{    /* delimiter*/
 				*temp = *prog ;
 				prog++ ;
@@ -2868,7 +2875,7 @@ void parse_exp3( float *value )
 	register char op ;
 
 	parse_exp4(value) ;
-	while((op = *token ) == '*' || op == '/' || op == '%') 
+	while((op = *token ) == '*' || op == '/' || op == '%' || op == '&' || op == '|') 
 	{
 		get_token() ;
 		parse_exp4(value) ;
@@ -2968,6 +2975,14 @@ void parse_atom( float  *value )
 			 buf_v[index_buf-1].op[index_op++]=ftok;
 		 return;
 	 }
+
+	 //Fance Add if there are some more white text , ignore it.
+	 while( iswhite( *prog) && *prog) 
+	 {
+		 ++prog ;
+		 /* 	fprintf(pmes, "Prog %c\n", *prog ) ; */
+	 }
+
 	 if(*prog=='(')
 	 {
 		 if((ftok=look_up_func(token))==0)
@@ -3083,6 +3098,7 @@ void parse_atom( float  *value )
 				 case AVG:
 				 case MAX:
 				 case MIN:
+				 case COM_1:
 							  {
 								 char eoiold = eoi;
 								 eoi = NL;
@@ -5755,6 +5771,8 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				 case '/':	 cod_line[Byte++]=DIV;break;
 				 case '%':	 cod_line[Byte++]=MOD;break;
 				 case '^':	 cod_line[Byte++]=POW;break;
+				 case '&':   cod_line[Byte++]=BIT_AND;break;
+				 case '|':   cod_line[Byte++]=BIT_OR;break;
 				 case LT:
 				 case LE:
 				 case GT:
@@ -5858,6 +5876,7 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 				 case AVG:
 				 case MAX:
 				 case MIN:
+				 case COM_1:
 								cod_line[Byte++]=op[i++];
 								cod_line[Byte++]=op[i];
 								break;
@@ -6633,7 +6652,8 @@ int pointtotext_for_controller(char *buf,Point_T3000 *point)
 		strcat(buf,"-");
 #endif
 	//strcat(buf,lin);
-
+	if(point_type>19)
+		return 0;
 
 	//	ptr_panel.info[point_type-1].name = "VAR";
 	strcat(buf,ptr_panel.info[point_type].name);	
@@ -6713,6 +6733,15 @@ int pointtotext(char *buf,Point_Net *point)
 	ptr_panel.info[0].name = "OUT";
 	ptr_panel.info[1].name = "IN";
 	ptr_panel.info[2].name = "VAR";
+
+	if((point->panel == point->sub_panel) && (point->panel == Station_NUM))
+	{
+		//老毛不愿意 看到minipanel 显示为1-1-var10   如果panel是1的情况 直接显示var10 或者它的label;
+		strcat(buf,ptr_panel.info[point_type].name);//Fance
+		strcat(buf,itoa(num+1,x,10));
+		return 0;
+	}
+
 
 	strcat(buf,itoa(panel,x,10));
 	//strcat(buf,itoa(panel+1,x,10));//2015-03-03修改，从此panel number 不在减一;
@@ -6811,9 +6840,17 @@ int	desexpr(void)
 							 par=0;
 							 break;
 		case MOD:
-							 strcpy(oper," % ");
-							 par=0;
-							 break;
+							strcpy(oper," % ");
+							par=0;
+							break;
+		case BIT_AND:
+							strcpy(oper," & ");
+							par=0;
+							break;
+		case BIT_OR:
+							strcpy(oper," | ");
+							par=0;
+							break;
 		case XOR:
 							 strcpy(oper," XOR ");
 							 par=0;
@@ -6943,6 +6980,7 @@ int	desexpr(void)
 									 }
 					//		 #endif
 								break;
+				 case COM_1:
 				 case AVG:
 				 case MAX:
 				 case MIN:
@@ -6956,7 +6994,7 @@ int	desexpr(void)
 				 case WR_OFF:
 				         {
 								par=0;
-								if (*(code-1)==AVG || *(code-1)==MIN || *(code-1)==MAX )
+								if (*(code-1)==AVG || *(code-1)==MIN || *(code-1)==MAX  || *(code-1)==COM_1)
 								{
 										 i = *(code-1);
 										 n = *code++;
@@ -7075,6 +7113,8 @@ int	desexpr(void)
 		case LE:
 		case EQ:
 		case NE:
+		case BIT_AND:
+		case BIT_OR:
 							{
 							 opar=stack_par[--ind_par];
 							 if ((*(code-1)==MUL || *(code-1)==DIV || *(code-1)==MOD || *(code-1)==MINUS) && opar)
@@ -7140,9 +7180,9 @@ void Init_table_bank()
 
 
 	ptr_panel.table_bank[VAR]       = BAC_VARIABLE_ITEM_COUNT;
-	ptr_panel.table_bank[CON]       = BAC_CONTROLLER_COUNT;
-	ptr_panel.table_bank[WR]        = BAC_WEEKLY_ROUTINES_COUNT;
-	ptr_panel.table_bank[AR]        = BAC_ANNUAL_ROUTINES_COUNT;
+	ptr_panel.table_bank[CON]       = BAC_PID_COUNT;
+	ptr_panel.table_bank[WR]        = BAC_SCHEDULE_COUNT;
+	ptr_panel.table_bank[AR]        = BAC_HOLIDAY_COUNT;
 	ptr_panel.table_bank[PRG]       = BAC_PROGRAM_ITEM_COUNT;
 	ptr_panel.table_bank[TBL]       = MAX_TABS;
 	ptr_panel.table_bank[DMON]      = MAX_DIGM;
@@ -7188,20 +7228,20 @@ void init_info_table( void )
 			case CON:
 				ptr_panel.info[i].address = (char *)ptr_panel.controllers;
 				ptr_panel.info[i].str_size = sizeof( Str_controller_point );
-				ptr_panel.info[i].name = "CON";
-				ptr_panel.info[i].max_points = MAX_CONS;
+				ptr_panel.info[i].name = "PID";
+				ptr_panel.info[i].max_points = MAX_PIDS;
 				break;
 			case WR:
 				ptr_panel.info[i].address = (char *)ptr_panel.weekly_routines;
 				ptr_panel.info[i].str_size = sizeof( Str_weekly_routine_point );
-				ptr_panel.info[i].name = "WR";
-				ptr_panel.info[i].max_points = MAX_WR;
+				ptr_panel.info[i].name = "SCH";
+				ptr_panel.info[i].max_points = MAX_SCHS;
 				break;
 			case AR:
 				ptr_panel.info[i].address = (char *)ptr_panel.annual_routines;
 				ptr_panel.info[i].str_size = sizeof( Str_annual_routine_point );
-				ptr_panel.info[i].name = "AR";
-				ptr_panel.info[i].max_points = MAX_AR;
+				ptr_panel.info[i].name = "HOL";
+				ptr_panel.info[i].max_points = MAX_HOLS;
 				break;
 			case PRG:
 				ptr_panel.info[i].address = (char *)ptr_panel.programs;
@@ -7399,6 +7439,234 @@ void copy_data_to_ptrpanel(int Data_type)
 		break;
 	}
 
+}
+#define  FUNCTION_TABEL  0
+#define  COMMAND_TABEL 1
+void check_each_point(char *richeditchar,int item_count ,int ntype);
+void check_function_table(char *richeditchar ,int ntype);
+void SplitCStringA(CStringArray &saArray, CString sSource, CString sToken);
+extern vector <Str_char_pos_color> m_prg_char_color;	//用于highlight 关键字用;
+extern CString high_light_string;
+void check_high_light()
+{
+	char temp_char[4000];
+	memset(temp_char,0,4000);
+
+	if(high_light_string.IsEmpty())
+		return;
+
+	high_light_string.Replace(_T("\r\n"),_T("\n"));
+	//CStringArray mytemp_array;
+	//SplitCStringA(mytemp_array,high_light_string,_T("\r\n"));
+	//CString new_high_light_str;
+	//new_high_light_str.Empty();
+	//for (int i=0;i<mytemp_array.GetSize();i++)
+	//{
+	//	new_high_light_str = new_high_light_str + mytemp_array.GetAt(i);
+	//}
+
+	WideCharToMultiByte( CP_ACP, 0, high_light_string.GetBuffer(), -1, temp_char, 4000, NULL, NULL );
+	m_prg_char_color.clear();
+
+	check_each_point(temp_char,BAC_INPUT_ITEM_COUNT,IN);
+	check_each_point(temp_char,BAC_OUTPUT_ITEM_COUNT,OUT);
+	check_each_point(temp_char,BAC_VARIABLE_ITEM_COUNT,VAR);
+	check_each_point(temp_char,BAC_PID_COUNT,CON);
+	check_each_point(temp_char,BAC_PROGRAM_ITEM_COUNT,PRG);
+	check_each_point(temp_char,BAC_SCREEN_COUNT,GRP);
+	check_each_point(temp_char,BAC_SCHEDULE_COUNT,WR);
+	check_each_point(temp_char,BAC_HOLIDAY_COUNT,AR);
+	check_function_table(temp_char,FUNCTION_TABEL);
+	check_function_table(temp_char,COMMAND_TABEL);
+
+}
+
+void check_function_table(char *richeditchar ,int ntype)
+{
+	Str_char_pos_color temp_pos_color;
+	char * char_source = NULL;
+	char temp_label[20];
+
+	int loop_size = 0;
+	if(ntype == FUNCTION_TABEL)
+	{
+		for (int i=0; strlen(func_table[i].func_name)!= 0 ; i++ )
+		{
+			loop_size = i;
+		}
+	}
+	else if(ntype == COMMAND_TABEL)
+	{
+		for (int i=0; strlen(table[i].command)!= 0; i++ )
+		{
+			loop_size = i;
+		}
+	}
+	else
+		return;
+
+	for(int i = 0 ; i<loop_size+1 ; i++ )
+	{
+		char_source = richeditchar;
+		long start_pos = 0;
+		long end_pos = 0;
+		DWORD char_color;// = RGB(0,255,255);
+		char* find_char_pos = NULL;
+		unsigned short look_str_length = 0;
+		memset(temp_label,0,20);
+		temp_label[0] = 0x20;
+		if(ntype == FUNCTION_TABEL)
+		{
+			strcat_s(temp_label,20,func_table[i].func_name);
+			char_color =prg_function_color;//  RGB(0,255,255);
+		}
+		else if(ntype == COMMAND_TABEL)
+		{
+			strcat_s(temp_label,20,table[i].command);
+			char_color =prg_command_color;// RGB(255,0,255);
+		}
+		else
+			return;
+			
+		//strcat_s(temp_label,20," ");
+
+		look_str_length = strlen(temp_label);
+		if(look_str_length == 1)
+		{
+			continue;
+		}
+		do 
+		{
+			find_char_pos = strstr(char_source,temp_label);
+			if(find_char_pos != NULL)
+			{
+				temp_pos_color.startpos = find_char_pos - richeditchar ;
+				temp_pos_color.endpos = temp_pos_color.startpos + look_str_length ;
+				if(ntype == FUNCTION_TABEL)
+				{
+					temp_pos_color.key_type = KEY_FUNCTION;
+				}
+				else if(ntype == COMMAND_TABEL)
+				{
+					temp_pos_color.key_type = KEY_COMMAND;
+				}
+
+				temp_pos_color.ncolor = char_color;
+				m_prg_char_color.push_back(temp_pos_color);
+				char_source = find_char_pos + look_str_length;
+			}
+		} while (find_char_pos != NULL);
+
+	}
+
+}
+
+void check_each_point(char *richeditchar,int item_count ,int ntype)
+{
+	Str_char_pos_color temp_pos_color;
+	char * char_source = NULL;
+	char temp_label[20];
+	char item_value[10];
+	for (int i=1; i< item_count + 1;i++)
+	{
+		char_source = richeditchar;
+		long start_pos = 0;
+		long end_pos = 0;
+		DWORD char_color = prg_label_color;//RGB(255,0,0);
+
+
+		char* find_char_pos = NULL;
+		unsigned short look_str_length = 0;
+		memset(item_value,0,10);
+		memset(temp_label,0,20);
+		temp_label[0] = 0x20;
+		strcat_s(temp_label,20,ptr_panel.info[ntype].name);
+		itoa(i,item_value,10);
+		strcat_s(temp_label,20,item_value);
+		strcat_s(temp_label,20," ");
+
+
+		//CString temp_cs;
+		//temp_cs.Format(_T(" %s%d "),ptr_panel.info[IN].name,i);
+		look_str_length = strlen(temp_label);
+		do 
+		{
+			find_char_pos = strstr(char_source,temp_label);
+			if(find_char_pos != NULL)
+			{
+				temp_pos_color.startpos = find_char_pos - richeditchar ;
+				temp_pos_color.endpos = temp_pos_color.startpos + look_str_length ;
+				temp_pos_color.key_type = KEY_INPUT;
+				temp_pos_color.ncolor = char_color;
+				m_prg_char_color.push_back(temp_pos_color);
+				char_source = find_char_pos + look_str_length;
+			}
+		} while (find_char_pos != NULL);
+
+		unsigned char length_temp = 0;
+		char temp_label_char[50];
+		char temp_get_label[50];
+		memset(temp_get_label,0,50);
+		switch(ntype)
+		{
+		case IN:
+			strcpy_s(temp_get_label,50,m_Input_data.at(i-1).label);
+			break;
+		case OUT:
+			strcpy_s(temp_get_label,50,m_Output_data.at(i-1).label);
+			break;
+		case VAR:
+			strcpy_s(temp_get_label,50,m_Variable_data.at(i-1).label);
+			break;
+		case CON:
+			continue;
+			break;
+		case WR:
+			strcpy_s(temp_get_label,50,m_Weekly_data.at(i-1).label);
+			break;
+		case AR:
+			strcpy_s(temp_get_label,50,m_Annual_data.at(i-1).label);
+			break;
+		case PRG:
+			strcpy_s(temp_get_label,50,m_Program_data.at(i-1).label);
+			break;
+		case GRP:
+			strcpy_s(temp_get_label,50,m_screen_data.at(i-1).label);
+			break;
+		default:
+			return;
+		}
+		length_temp = strlen(temp_get_label);
+		if((length_temp == 0 ) || (length_temp >= STR_IN_LABEL))
+		{
+			continue;
+		}
+		else
+		{
+			memset(temp_label_char,0,50);
+			char_source = richeditchar;
+			temp_label_char[0] = 0x20;
+			strcat_s(temp_label_char,50,temp_get_label);
+			strcat_s(temp_label_char,50," ");
+			look_str_length = strlen(temp_label_char);
+			do 
+			{
+				find_char_pos = strstr(char_source,temp_label_char);
+				if(find_char_pos != NULL)
+				{
+					temp_pos_color.startpos = find_char_pos - richeditchar ;
+					temp_pos_color.endpos = temp_pos_color.startpos + look_str_length ;
+					temp_pos_color.key_type = KEY_INPUT;
+					temp_pos_color.ncolor = char_color;
+					m_prg_char_color.push_back(temp_pos_color);
+					char_source = find_char_pos + look_str_length;
+				}
+			} while (find_char_pos != NULL);
+
+		}
+
+
+	}
 }
 
 

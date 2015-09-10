@@ -1,6 +1,13 @@
 #pragma once
 #include "RelayLabel.h"
 
+const int SORT_UNKNOW = 0;
+const int SORT_BY_CONNECTION = 1;
+const int SORT_BY_BUILDING_FLOOR = 2;
+
+const int LIST_UP = 1;
+const int LIST_DOWN = 2;
+
 const int NO_COMMAND = 0;
 const int START_AUTO_FLASH_COMMAND = 1;
 const int FLASH_SUCCESS = 2;
@@ -57,6 +64,26 @@ typedef struct
 	unsigned short fw_version;
 	unsigned char CRC;
 }Download_File_Return;
+
+const int KEY_INPUT = 1;
+const int KEY_OUTPUT = 2;
+const int KEY_VARIABLE = 3;
+const int KEY_PROGRAM = 4;
+const int KEY_PID = 5;
+const int KEY_SCH = 6;
+const int KEY_HOL = 7;
+const int KEY_SCREEN = 8;
+const int KEY_MONITOR = 9;
+const int KEY_FUNCTION = 10;
+const int KEY_COMMAND = 11;
+
+typedef struct  
+{
+	long startpos;
+	long endpos;
+	DWORD ncolor;
+	unsigned int key_type;
+}Str_char_pos_color;
 
 typedef struct 
 {
@@ -122,6 +149,10 @@ const int DOWNLOAD_MD5_CHECK_PASS = 21;
 #define  EDIT_LABEL_MESSAGE		WM_USER + 1229
 #define  ADD_LABEL_MESSAGE		WM_USER + 1230
 #define	 MY_REDRAW_WINDOW		WM_USER + 1231
+
+#define WM_CHANGE_NEXT_PANEL_MESSAGE WM_USER + 972
+#define WM_SHOW_STATUS_TEXT		 WM_USER + 973
+#define WM_SHOW_STATUS_PROGRESS WM_USER + 974
 #define WM_FRESH_CM_LIST		WM_USER + 975
 #define WM_FRESH_SETTING_UI		WM_USER + 976
 #define  WM_SHOW_PROGRESS		WM_USER + 977
@@ -131,7 +162,7 @@ const int DOWNLOAD_MD5_CHECK_PASS = 21;
 #define SHOW_ERROR_MESSAGE
 
 #define  MY_FRESH_DRAW_GRAPHIC      WM_USER + 2003
-
+#define  MY_FRESH_TESTO_GRAPHIC      WM_USER + 2004
 #define  WM_LIST_MONITOR_CHANGED WM_USER+ 976
 #define  WM_LIST_MONITOR_INPUT_CHANGED WM_USER+ 977
 #define WM_SCREENEDIT_CLOSE WM_USER + 1232
@@ -143,6 +174,7 @@ const int UDP_BROADCAST_PORT =1234;
 const int RECV_RESPONSE_PORT = 4321;
 #define UPD_BROADCAST_QRY_MSG 100
 #define RESPONSE_MSG          UPD_BROADCAST_QRY_MSG+1
+#define RESPONSE_LABEL		  0x6A
 
 const int MODBUS_RS485 = 0;
 const int MODBUS_TCPIP = 1;
@@ -269,9 +301,9 @@ const int BAC_READ_INPUT_GROUP_NUMBER = 10;
 const int BAC_READ_OUTPUT_GROUP_NUMBER = 10;
 const int BAC_READ_VARIABLE_GROUP_NUMBER = 10;
 const int BAC_READ_PROGRAM_GROUP_NUMBER = 10;
-const int BAC_READ_CONTROLLER_GROUP_NUMBER = 10;
-const int BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER = 10;
-const int BAC_READ_ANNUAL_ROUTINES_GROUP_NUMBER = 8;
+const int BAC_READ_PID_GROUP_NUMBER = 10;
+const int BAC_READ_SCHEDULE_GROUP_NUMBER = 10;
+const int BAC_READ_HOLIDAY_GROUP_NUMBER = 8;
 
 const int BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER = 8;
 
@@ -289,9 +321,9 @@ const int BAC_READ_INPUT_REMAINDER = BAC_READ_INPUT_GROUP_NUMBER - 1;
 const int BAC_READ_OUTPUT_REMAINDER = BAC_READ_OUTPUT_GROUP_NUMBER - 1;
 const int BAC_READ_VARIABLE_REMAINDER = BAC_READ_VARIABLE_GROUP_NUMBER - 1;
 const int BAC_READ_PROGRAM_REMAINDER = BAC_READ_PROGRAM_GROUP_NUMBER - 1;
-const int BAC_READ_CONTROLLER_REMAINDER = BAC_READ_CONTROLLER_GROUP_NUMBER - 1;
-const int BAC_READ_WEEKLY_ROUTINES_REMAINDER = BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER - 1;
-const int BAC_READ_ANNUAL_ROUTINES_REMAINDER = BAC_READ_ANNUAL_ROUTINES_GROUP_NUMBER - 1;
+const int BAC_READ_PID_REMAINDER = BAC_READ_PID_GROUP_NUMBER - 1;
+const int BAC_READ_SCHEDULE_REMAINDER = BAC_READ_SCHEDULE_GROUP_NUMBER - 1;
+const int BAC_READ_HOLIDAY_REMAINDER = BAC_READ_HOLIDAY_GROUP_NUMBER - 1;
 const int BAC_READ_USER_LOGIN_INFO_REMAINDER = BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER - 1;
 
 const int BAC_READ_CUSTOMER_UNITS_REMAINDER = BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER - 1;;
@@ -309,14 +341,14 @@ const int BAC_VARIABLE_ITEM_COUNT = 128; // sizeof(Str_variable_point);			//39
 const int BAC_PROGRAM_ITEM_COUNT = 16;	//sizeof(Str_program_point);				//37
 const int BAC_PROGRAMCODE_ITEM_COUNT = 16;
 
-const int BAC_CONTROLLER_COUNT = 16;
+const int BAC_PID_COUNT = 16;
 const int BAC_SCREEN_COUNT = 16;
 
-const int BAC_WEEKLY_ROUTINES_COUNT = 16;
-const int BAC_WEEKLYCODE_ROUTINES_COUNT = 16;
+const int BAC_SCHEDULE_COUNT = 8;
+const int BAC_WEEKLYCODE_ROUTINES_COUNT = 8;
 
-const int BAC_ANNUAL_ROUTINES_COUNT = 8;
-const int BAC_ANNUAL_CODE_COUNT = 8;
+const int BAC_HOLIDAY_COUNT = 4;
+const int BAC_ANNUAL_CODE_COUNT = 4;
 
 const int BAC_MONITOR_COUNT = 12;
 const int BAC_ALARMLOG_COUNT = 16;
@@ -344,14 +376,14 @@ const int BAC_VARIABLE_GROUP = (BAC_VARIABLE_ITEM_COUNT + BAC_READ_VARIABLE_GROU
 const int BAC_PROGRAM_GROUP = (BAC_PROGRAM_ITEM_COUNT + BAC_READ_PROGRAM_GROUP_NUMBER - 1) / BAC_READ_PROGRAM_GROUP_NUMBER;
 const int BAC_PROGRAMCODE_GROUP = BAC_PROGRAMCODE_ITEM_COUNT;
 
-const int BAC_CONTROLLER_GROUP = (BAC_CONTROLLER_COUNT + BAC_READ_CONTROLLER_GROUP_NUMBER - 1) / BAC_READ_CONTROLLER_GROUP_NUMBER;
+const int BAC_PID_GROUP = (BAC_PID_COUNT + BAC_READ_PID_GROUP_NUMBER - 1) / BAC_READ_PID_GROUP_NUMBER;
 
-const int BAC_WEEKLY_GROUP = (BAC_WEEKLY_ROUTINES_COUNT + BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER - 1) / BAC_READ_WEEKLY_ROUTINES_GROUP_NUMBER;
-const int BAC_WEEKLYCODE_GOUP = BAC_WEEKLYCODE_ROUTINES_COUNT;
-const int BAC_ANNUAL_GROUP = (BAC_ANNUAL_ROUTINES_COUNT + BAC_READ_ANNUAL_ROUTINES_GROUP_NUMBER - 1) / BAC_READ_ANNUAL_ROUTINES_GROUP_NUMBER;
+const int BAC_SCHEDULE_GROUP = (BAC_SCHEDULE_COUNT + BAC_READ_SCHEDULE_GROUP_NUMBER - 1) / BAC_READ_SCHEDULE_GROUP_NUMBER;
+const int BAC_SCHEDULECODE_GOUP = BAC_WEEKLYCODE_ROUTINES_COUNT;
+const int BAC_HOLIDAY_GROUP = (BAC_HOLIDAY_COUNT + BAC_READ_HOLIDAY_GROUP_NUMBER - 1) / BAC_READ_HOLIDAY_GROUP_NUMBER;
 const int BAC_TIME_COMMAND_GROUP = 1;
 const int BAC_BASIC_SETTING_GROUP = 1;
-const int BAC_ANNUALCODE_GROUP = BAC_ANNUAL_CODE_COUNT;
+const int BAC_HOLIDAYCODE_GROUP = BAC_ANNUAL_CODE_COUNT;
 const int BAC_SCREEN_GROUP = (BAC_SCREEN_COUNT + BAC_READ_SCREEN_GROUP_NUMBER -1) / BAC_READ_SCREEN_GROUP_NUMBER;
 const int BAC_MONITOR_GROUP = (BAC_MONITOR_COUNT + BAC_READ_MONITOR_GROUP_NUMBER - 1) / BAC_READ_MONITOR_GROUP_NUMBER;
 const int BAC_CONNECT_WITH_DEVICE_GROUP = 1;
@@ -449,7 +481,15 @@ struct refresh_net_device
 	float hw_version;
 	unsigned short object_instance;
 	unsigned char panal_number;
+	DWORD parent_serial_number;
 	CString NetCard_Address;
+	CString show_label_name;
+};
+
+struct refresh_net_label_info
+{
+	char label_name[20];
+	unsigned int serial_number;
 };
 
 struct _Refresh_Info 
@@ -459,12 +499,12 @@ struct _Refresh_Info
 	_Resend_Read_Info Read_Output_Info[BAC_OUTPUT_GROUP];
 	_Resend_Read_Info Read_Program_Info[BAC_PROGRAM_GROUP];
 	_Resend_Read_Info Read_Programcode_Info[BAC_PROGRAMCODE_GROUP];
-	_Resend_Read_Info Read_Weekly_Info[BAC_WEEKLY_GROUP];
-	_Resend_Read_Info Read_Weeklycode_Info[BAC_WEEKLYCODE_GOUP];
-	_Resend_Read_Info Read_Annual_Info[BAC_ANNUAL_GROUP];
-	_Resend_Read_Info Read_Annualcode_Info[BAC_ANNUALCODE_GROUP];
+	_Resend_Read_Info Read_Weekly_Info[BAC_SCHEDULE_GROUP];
+	_Resend_Read_Info Read_Weeklycode_Info[BAC_SCHEDULECODE_GOUP];
+	_Resend_Read_Info Read_Annual_Info[BAC_HOLIDAY_GROUP];
+	_Resend_Read_Info Read_Annualcode_Info[BAC_HOLIDAYCODE_GROUP];
 	_Resend_Read_Info Read_Time_Command[BAC_TIME_COMMAND_GROUP];
-	_Resend_Read_Info Read_Controller_Info[BAC_CONTROLLER_GROUP];
+	_Resend_Read_Info Read_Controller_Info[BAC_PID_GROUP];
 	_Resend_Read_Info Read_Screen_Info[BAC_SCREEN_GROUP];
 	_Resend_Read_Info Read_Monitor_Info[BAC_MONITOR_GROUP];
 	_Resend_Read_Info Read_Connect_With_Device[BAC_CONNECT_WITH_DEVICE_GROUP];
@@ -484,12 +524,12 @@ struct _Refresh_Write_Info
 	_Resend_Read_Info Write_Output_Info[BAC_OUTPUT_GROUP];
 	_Resend_Read_Info Write_Program_Info[BAC_PROGRAM_GROUP];
 	_Resend_Read_Info Write_Programcode_Info[BAC_PROGRAMCODE_GROUP];
-	_Resend_Read_Info Write_Weekly_Info[BAC_WEEKLY_GROUP];
-	_Resend_Read_Info Write_Weeklycode_Info[BAC_WEEKLYCODE_GOUP];
-	_Resend_Read_Info Write_Annual_Info[BAC_ANNUAL_GROUP];
-	_Resend_Read_Info Write_Annualcode_Info[BAC_ANNUALCODE_GROUP];
+	_Resend_Read_Info Write_Weekly_Info[BAC_SCHEDULE_GROUP];
+	_Resend_Read_Info Write_Weeklycode_Info[BAC_SCHEDULECODE_GOUP];
+	_Resend_Read_Info Write_Annual_Info[BAC_HOLIDAY_GROUP];
+	_Resend_Read_Info Write_Annualcode_Info[BAC_HOLIDAYCODE_GROUP];
 	_Resend_Read_Info Write_Time_Command[BAC_TIME_COMMAND_GROUP];
-	_Resend_Read_Info Write_Controller_Info[BAC_CONTROLLER_GROUP];
+	_Resend_Read_Info Write_Controller_Info[BAC_PID_GROUP];
 	_Resend_Read_Info Write_Screen_Info[BAC_SCREEN_GROUP];
 	_Resend_Read_Info Write_Monitor_Info[BAC_MONITOR_GROUP];
 };
@@ -564,7 +604,7 @@ const CString Yes_No[] =
 
 const CString Digital_Units_Array[] = 
 {
-	_T(""),
+	_T("Unused"),
 	_T("Off/On"),
 	_T("Close/Open"),
 	_T("Stop/Start"),
@@ -653,7 +693,7 @@ const CString Input_List_Analog_Units[] =
 
 const CString Input_Analog_Units_Array[] =
 {
-	 _T(""),
+	 _T("Unused"),
 	 _T("Y3K -40 to 150"),
 	 _T("Y3K -40 to 300"),
 	 _T("10K -40 to 120"),
@@ -777,7 +817,7 @@ const CString Device_Serial_Port_Status[] =
 
 const CString Variable_Analog_Units_Array[] = 
 {
-	_T(""),
+	_T("Unused"),
 	_T("Deg.C"),
 	_T("Deg.F"),
 	_T("Feet per Min"),
@@ -1107,8 +1147,48 @@ const CString Building_Protocol[] =
 const CString Building_Baudrate[] =
 {
 	_T("9600"),
-	_T("19200")
+	_T("19200"),
+    _T("38400"),
+    _T("56000"),
+    _T("57600")
 };
+
+#define  DEFAULT_PRG_TEXT_COLOR		RGB(0,0,255)
+#define  DEFAULT_PRG_LABEL_COLOR		RGB(0,0,130)
+#define  DEFAULT_PRG_COMMAND_COLOR		RGB(0,0,130)
+#define  DEFAULT_PRG_FUNCTION_COLOR		RGB(0,0,130)
+
+
+const CString Program_Fonts[] = 
+{
+	_T("Default"),
+	_T("Arial"),
+	_T("NSimSun"),
+	_T("Arial Black"),
+	_T("Colonna MT"),
+	_T("GulimChe"),
+	_T("SimSun-ExtB"),
+	_T("Times New Roman"),
+	_T("Dotum"),
+	_T("DotumChe"),
+	_T("Gulim"),
+	_T("GulimChe"),
+	_T("Malgun Gothic"),
+	_T("Meiryo"),
+	_T("Microsoft JhengHei"),
+	_T("MingLiU"),
+	_T("Arial Narrow")
+};
+
+const CString JumperStatus[]=
+{
+	_T("Unused"),
+	_T("4-20 ma"),
+	_T("0-5 V"),
+	_T("0-10 V"),
+	_T("Thermistor")
+};
+
 
 const int T3_REG_TOTAL_COUNT = 292;
 

@@ -179,9 +179,7 @@ BOOL CRegisterValueAnalyzerDlg::OnInitDialog()
 	{
 		m_ChartCtrl.MoveWindow(CRect(120,0,ViewRect.Width(),ViewRect.Height()),TRUE);
 	}
-	//m_BackColor=RGB(255,255,255);
-	//m_ChartCtrl.SetBackColor(m_BackColor);
-//	m_ChartCtrl.RefreshCtrl();
+
 
 	DrawerPoint();
 	SetTimer(DATATIME_TIMER,2000,NULL);
@@ -685,7 +683,7 @@ void CRegisterValueAnalyzerDlg::DrawerPoint(){
 }
 
 void CRegisterValueAnalyzerDlg::Fresh(){
-	int Type=0;
+	int Type=1;
 	CChartXYSerie* pSeries[127] = {NULL};
 	for (int i=0;i<g_vectRegisters.size();i++)
 	{
@@ -793,12 +791,7 @@ void CRegisterValueAnalyzerDlg::Fresh(){
 			}
 			break;
 		}
-
-
-
-
-
-
+  
 		TChartString Name=g_vectRegisters[i].Reg_Name.GetBuffer(0);
 		
 		//pSeries[i]->SetName(Name);
@@ -809,29 +802,28 @@ void CRegisterValueAnalyzerDlg::Fresh(){
 		double* XValues = new double[NumberPoints];
 		double* YValues = new double[NumberPoints];
 
-		 
-
-	    
-
 		for (int j=0;j<NumberPoints;j++)
 		{
 			RegPoint tempPoint=g_vectRegisters[i].Reg_Point[j];
 			XValues[j] =tempPoint.Time_offset;
 			YValues[j] =tempPoint.Value_offset;
 		}
-		pSeries[i]->SetPoints(XValues,YValues,NumberPoints);
+		pSeries[i]->AddPoints(XValues,YValues,NumberPoints);
+        g_vectRegisters.at(i).Reg_Point.clear();
+        /* vector<RegPoint> temp;
+         temp =  g_vectRegisters.at(i).Reg_Point;
+         g_vectRegisters.at(i).Reg_Point.swap(temp);*/
 
-
+        g_vectRegisters.at(i).Reg_Point.shrink_to_fit();
 		delete[] XValues;
 		delete[] YValues;
 		m_ChartCtrl.RefreshCtrl();
-		//int index = m_SeriesList.AddString(Name.c_str());
-		//m_SeriesList.SetItemData(index, pSeries->GetSerieId());
+		 
 
 	}
 
 }
-
+ 
 void CRegisterValueAnalyzerDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default

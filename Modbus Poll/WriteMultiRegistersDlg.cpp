@@ -363,8 +363,6 @@ unsigned char rev_back_rawData[300],send_data[100];
 	 unsigned short Ret_Value;
 	 for(int i=0;i<m_quantity;i++){
 		 Data_Buffer[i]=Get_Data_Unsigned(i);
- 		 
-		// Data_Buffer_Short[i]=Ret_Value;
 	 }
  	 register_critical_section.Lock();
  	 int ret=write_multi_Short_log(m_slave_id,Data_Buffer,m_address,m_quantity,&send_data[0],&rev_back_rawData[0],&Send_length,&Rev_length);

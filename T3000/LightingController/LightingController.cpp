@@ -8,6 +8,10 @@
 #include "..\LightingController\LightingController.h"
 #include "..\MainFrm.h"
 #include "..\LCOutNameConfig.h"
+#include "schedule.h"
+#include "..\Config_Routines.h"
+#include "..\Weekly_Routines.h"
+#include "..\Annual_Routines.h"
 static BOOL ifLCdb = TRUE;
 static BOOL ifUpdatedb = TRUE;
 

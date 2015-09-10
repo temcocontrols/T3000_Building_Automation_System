@@ -663,7 +663,7 @@ void CRegisterViewerDlg::Show_ColorData(){
 	}
 	for (int i=startAdd;i<endAdd;i++)
 	{
-		if ((m_VecregisterData[i].Operation.CompareNoCase(_T("R"))==0)&&(m_VecregisterData[i].Operation.CompareNoCase(_T("/W"))!=0))
+		if ((m_VecregisterData[i].Operation.CompareNoCase(_T("R"))==0)&&(m_VecregisterData[i].Operation.CompareNoCase(_T("R/W"))!=0))
 		{
 			for (int j=0;j<m_registerlistGrid.get_Cols();j++)
 			{

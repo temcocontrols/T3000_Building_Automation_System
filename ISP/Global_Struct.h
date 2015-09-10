@@ -51,7 +51,7 @@ const TCHAR c_strFlashMethodCom[] = _T("COM");
 
 
 
-const DWORD c_nHexFileBufLen = 0xFFFF;   // hex 最大64k
+const DWORD c_nHexFileBufLen = 0x7FFFF;   // hex 最大64k
 const DWORD c_nBinFileBufLen = 0x7FFFF;  // bin 文件最大512k
 
 
@@ -528,6 +528,7 @@ int const PM_RUNNAR=15;
 int const PM_CO2_NET = 32;
 int const PM_CO2_RS485 = 33;
 int const PM_CO2_NODE = 34;
+int const PM_PRESSURE_SENSOR=45;
 const TCHAR c_strProductModelFileName[] = _T("ProductModel.cfg");				//	Product Model 配置文件名称
 
 

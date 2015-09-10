@@ -149,6 +149,7 @@ namespace ListCtrlEx
 		void				Support_Keyboard(bool b_support);
 		void                Set_Edit(bool b_edit);
 		BOOL				Get_Edit();
+		void				InitListData();
 		void				SetListData(char *mydata,int data_length);
 		BOOL				IsDataNewer(char *datapoint,int data_length);
 		void				Set_Selected_Item(int nRAW,int nCol);

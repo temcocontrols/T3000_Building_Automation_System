@@ -272,7 +272,7 @@ void CScanDbWaitDlg::Initial_List()
 	//m_scan_com_list.InsertColumn(SCAN_BAUDRATE, _T("Baudrate"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_scan_com_list.InsertColumn(SCAN_SKIP, _T("Skip"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_scan_com_list.InsertColumn(SCAN_STATUS, _T("Status"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_scan_com_list.InsertColumn(SCAN_FOUND, _T("Found"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_scan_com_list.InsertColumn(SCAN_FOUND, _T("Reply"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_scan_com_list.InsertColumn(SCAN_NOTES, _T("Notes"), 280, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 
 	m_scan_dlg_hwnd = this->m_hWnd;

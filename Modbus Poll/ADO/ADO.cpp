@@ -70,13 +70,11 @@ BOOL CADO::OnInitADOConn()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 						//连接数据库
-						//
-						
-		//write_T3000_log_file(_T("Try to connect T3000 DB"));
+
+
 		m_pConnection.CreateInstance("ADODB.Connection");
 	 
 		m_pConnection->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-		
 	}
 	catch(_com_error e)
 	{

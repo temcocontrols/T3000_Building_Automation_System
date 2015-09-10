@@ -13,7 +13,8 @@
 #include "MainFrm.h"
 #include "BacnetScreenEdit.h"
 CBacnetScreenEdit * ScreenEdit_Window = NULL;
-Control_group_point m_temp_screen_data[BAC_SCREEN_COUNT];
+
+HANDLE h_read_screenlabel_thread = NULL;
 IMPLEMENT_DYNAMIC(BacnetScreen, CDialogEx)
 
 BacnetScreen::BacnetScreen(CWnd* pParent /*=NULL*/)
@@ -43,12 +44,73 @@ BEGIN_MESSAGE_MAP(BacnetScreen, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_GRAPHIC_INSERT, &BacnetScreen::OnBnClickedInsert)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST_SCREEN, &BacnetScreen::OnNMDblclkListScreen)
 //	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
 // BacnetScreen message handlers
 
+DWORD WINAPI  BacnetScreen::ReadScreenThreadfun(LPVOID lpVoid)
+{
+	//Write_Config_Info
+	BacnetScreen *pParent = (BacnetScreen *)lpVoid;
+
+	//if(read_monitordata(BAC_UNITS_ANALOG))
+	//{
+	//	if(read_monitordata(BAC_UNITS_DIGITAL))
+	//		pParent->PostMessage(WM_MONITOR_USER_MESSAGE,MONITOR_MESSAGE_CREATE,0);
+	//}
+	if(pParent->read_screen_label())
+	{
+		bac_read_which_list = BAC_READ_GRAPHIC_LABEL_INFO;
+		bac_graphic_label_read_results = true;
+		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,NULL,NULL);
+	}
+	h_read_screenlabel_thread = NULL;
+	return 0;
+
+
+}
+
+bool BacnetScreen::read_screen_label()
+{
+	//一直读到 下一个全是0 的 无效label;
+	for (int i=0;i<BAC_GRPHIC_LABEL_GROUP;i++)
+	{
+		int end_temp_instance = 0;
+		int ret_n;
+		end_temp_instance = BAC_READ_GRPHIC_LABEL_REMAINDER + (BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i ;
+		if(end_temp_instance >= BAC_GRPHIC_LABEL_COUNT)
+			end_temp_instance = BAC_GRPHIC_LABEL_COUNT - 1;
+		CString n_temp_result;
+		ret_n = GetPrivateData_Blocking(g_bac_instance,READ_GRPHIC_LABEL_COMMAND,(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_label_point));
+		if(ret_n)
+		{
+			n_temp_result.Format(_T("Read Graphic Label From %d to %d success."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,n_temp_result);
+			Sleep(10);
+			if(b_stop_read_grp_label)
+			{
+				n_temp_result.Format(_T("Read Graphic Label complete."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,n_temp_result);
+				Sleep(10);
+				break;
+			}
+		}
+		else
+		{
+			n_temp_result.Format(_T("Read Graphic Label From %d to %d failed."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,n_temp_result);
+			return false;
+		}
+
+		
+	}
+
+
+	return true;
+}
 
 LRESULT  BacnetScreen::ScreenCallBack(WPARAM wParam, LPARAM lParam)
 {
@@ -130,33 +192,19 @@ LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 		}
 
 
-
-		if(need_read_bacnet_graphic_label_flag)
+		if(h_read_screenlabel_thread==NULL)
 		{
-			::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,MENU_CLICK,TYPE_READ_GRAPHIC_LABEL_INFO);
+			h_read_screenlabel_thread =CreateThread(NULL,NULL,ReadScreenThreadfun,this,NULL, NULL);
 		}
-		else
-		{
-			Unreg_Hotkey();
-			if(ScreenEdit_Window != NULL)
-			{
-				delete ScreenEdit_Window;
-				ScreenEdit_Window = NULL;
-			}
-			ScreenEdit_Window = new CBacnetScreenEdit;
-			ScreenEdit_Window->Create(IDD_DIALOG_BACNET_SCREENS_EDIT,this);	
-			ScreenEdit_Window->ShowWindow(SW_SHOW);
-		}
-		
 
 
-
-
-
+		return 0;
 		// TODO: Add your command handler code here
 	}
 	return 0;
 }
+
+
 
 BOOL BacnetScreen::OnInitDialog()
 {
@@ -183,19 +231,21 @@ void BacnetScreen::OnOK()
 
 void BacnetScreen::Initial_List()
 {
-
+	m_screen_list.ShowWindow(SW_HIDE);
+	m_screen_list.DeleteAllItems();
+	while ( m_screen_list.DeleteColumn (0)) ;
 
 	m_screen_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	m_screen_list.SetExtendedStyle(m_screen_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_screen_list.InsertColumn(SCREEN_NUM, _T("Graphic"), 60, ListCtrlEx::CheckBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-	m_screen_list.InsertColumn(SCREEN_DESCRIPTION, _T("Full Label"), 180, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_screen_list.InsertColumn(SCREEN_LABEL, _T("Label"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_screen_list.InsertColumn(SCREEN_PIC_FILE, _T("Picture File"), 140, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_screen_list.InsertColumn(SCREEN_MODE, _T("Mode"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_screen_list.InsertColumn(SCREEN_REFRESH, _T("Refresh Rate"), 110, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_screen_list.InsertColumn(SCREEN_NUM, _T("Graphic"), 60, ListCtrlEx::CheckBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_screen_list.InsertColumn(SCREEN_DESCRIPTION, _T("Full Label"), 180, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_screen_list.InsertColumn(SCREEN_LABEL, _T("Label"), 120, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_screen_list.InsertColumn(SCREEN_PIC_FILE, _T("Picture File"), 140, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	//m_screen_list.InsertColumn(SCREEN_MODE, _T("Mode"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_screen_list.InsertColumn(SCREEN_REFRESH, _T("Refresh Rate"), 110, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 
 	m_screen_dlg_hwnd = this->m_hWnd;
-	g_hwnd_now = m_screen_dlg_hwnd;
+	//g_hwnd_now = m_screen_dlg_hwnd;
 	
 	CRect list_rect,win_rect;
 	m_screen_list.GetWindowRect(list_rect);
@@ -211,6 +261,10 @@ void BacnetScreen::Initial_List()
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
 		CString temp_des;
 		CString temp_units;
+
+		if(i>=screen_item_limit_count)
+			break;
+
 		temp_item.Format(_T("%d"),i+1);
 		m_screen_list.InsertItem(i,temp_item);
 		m_screen_list.SetCellEnabled(i,SCREEN_NUM,0);
@@ -226,6 +280,8 @@ void BacnetScreen::Initial_List()
 		}
 
 	}
+	m_screen_list.InitListData();
+	m_screen_list.ShowWindow(SW_SHOW);
 }
 
 LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
@@ -253,6 +309,9 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
 	{
 		CString temp_des,temp_label,temp_pic_file;
 
+		if(i>=screen_item_limit_count)
+			break;
+
 		if(isFreshOne)
 		{
 			i = Fresh_Item;
@@ -277,7 +336,7 @@ LRESULT BacnetScreen::Fresh_Screen_List(WPARAM wParam,LPARAM lParam)
 
 		m_screen_list.SetItemText(i,SCREEN_PIC_FILE,temp_pic_file);
 
-		m_screen_list.SetItemText(i,SCREEN_MODE,_T("Graphic"));
+		//m_screen_list.SetItemText(i,SCREEN_MODE,_T("Graphic"));
 		CString cs_refresh_time;
 		cs_refresh_time.Format(_T("%d"),m_screen_data.at(i).update);
 		m_screen_list.SetItemText(i,SCREEN_REFRESH,cs_refresh_time);
@@ -309,7 +368,11 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 			return 0;
 		}
-
+		if(Check_FullLabel_Exsit(cs_temp))
+		{
+			PostMessage(WM_REFRESH_BAC_SCREEN_LIST,Changed_Item,REFRESH_ON_ITEM);
+			return 0;
+		}
 		char cTemp1[255];
 		memset(cTemp1,0,255);
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
@@ -416,6 +479,26 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 
 		image_fordor = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
 		
+		WIN32_FIND_DATA fd;
+		BOOL ret = FALSE;
+		HANDLE hFind = FindFirstFile(image_fordor, &fd);
+		if ((hFind != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+		{
+			//目录存在
+			ret = TRUE;
+		}
+		else
+		{
+			SECURITY_ATTRIBUTES attrib;
+			attrib.bInheritHandle = FALSE;
+			attrib.lpSecurityDescriptor = NULL;
+			attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
+
+			CreateDirectory( image_fordor, &attrib);
+		}
+
+
+
 		SetCurrentDirectoryW(image_fordor);
 		//选择图片,如果选的不在database目录下就copy一份过来;如果在的话就重命名，因为文件名长度不能超过10个字节;
 		CString strFilter = _T("jpg file;bmp file;png file|*.jpg;*.bmp;*.png|all File|*.*||");
@@ -506,7 +589,11 @@ void BacnetScreen::OnCancel()
 void BacnetScreen::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
+	if(g_protocol == PROTOCOL_BIP_TO_MSTP)
+	{
+		PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
+	}
+	else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 	{
 	PostMessage(WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
 	if(bac_select_device_online)
@@ -570,6 +657,30 @@ int GetScreenFullLabel(int index,CString &ret_full_label)
 
 	return 1;
 }
+
+
+
+void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: Add your control notification handler code here
+	for (int i=0;i<m_screen_list.GetItemCount();++i)
+	{
+		if(m_screen_list.GetCellChecked(i,0))
+		{
+			screen_list_line = i;
+			break;
+		}
+	}
+
+
+	if(h_read_screenlabel_thread==NULL)
+	{
+		h_read_screenlabel_thread =CreateThread(NULL,NULL,ReadScreenThreadfun,this,NULL, NULL);
+	}
+	*pResult = 0;
+}
+
 
 
 

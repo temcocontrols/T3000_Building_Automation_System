@@ -76,14 +76,10 @@ BOOL BacnetWait::OnInitDialog()
 	//m_static.bkColor(RGB(0,255,255));
 	m_wait_persent.setFont(18,12,NULL,_T("Arial"));
 	
-	this->ShowWindow(SW_SHOW);
+	this->ShowWindow(SW_HIDE);
 
 	// TODO:  Add extra initialization here
-	if(m_wait_type == BAC_WAIT_READ_CONFIG_WRITE_DEVICE)	//1 is now write config
-	{
-		SetTimer(4,200,NULL);
-	}
-	else if((m_wait_type == BAC_WAIT_NORMAL_READ ) || (m_wait_type == BAC_WAIT_READ_DATA_WRITE_CONFIG))	//Read one of the list or read all list;
+    if((m_wait_type == BAC_WAIT_NORMAL_READ ) || (m_wait_type == BAC_WAIT_READ_DATA_WRITE_CONFIG))	//Read one of the list or read all list;
 	{
 		SetTimer(1,200,NULL);
 		SetTimer(5,120000,NULL);
@@ -135,6 +131,7 @@ BOOL BacnetWait::PreTranslateMessage(MSG* pMsg)
 
 void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 {
+	this->ShowWindow(SW_HIDE);
 	bool cotinue_waite = false;
 	bool write_cotinue_waite = false;
 	CString temp_pos;
@@ -158,147 +155,20 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 
 
-	if(m_wait_type == BAC_WAIT_READ_CONFIG_WRITE_DEVICE)//如果是写config;将config文件的data写入device;
-	{
-		int write_total_count = BAC_INPUT_GROUP +
-			BAC_OUTPUT_GROUP +	
-			BAC_PROGRAM_GROUP +		
-			BAC_VARIABLE_GROUP +
-			BAC_CONTROLLER_GROUP +
-			BAC_PROGRAMCODE_GROUP +
-			BAC_SCREEN_GROUP +
-			BAC_MONITOR_GROUP +
-			BAC_WEEKLY_GROUP +
-			BAC_ANNUAL_GROUP +
-			BAC_WEEKLYCODE_GOUP +
-			BAC_ANNUALCODE_GROUP;
-		int write_all_step = 1000 / write_total_count;
-		int write_success_count = 0;
-		int write_pos = 0;
-
-		for (int i=0;i<BAC_INPUT_GROUP;i++)
-		{
-				if(Write_Config_Info.Write_Input_Info[i].task_result == BAC_RESULTS_OK)
-				{
-					write_success_count ++;
-					write_pos = write_pos +write_all_step;
-				}
-		}
-		for (int i=0;i<BAC_OUTPUT_GROUP;i++)
-		{
-			if(Write_Config_Info.Write_Output_Info[i].task_result == BAC_RESULTS_OK)
-			{
-				write_success_count ++;
-				write_pos = write_pos +write_all_step;
-			}
-		}
-		for (int i=0;i<BAC_VARIABLE_GROUP;i++)
-		{
-			if(Write_Config_Info.Write_Variable_Info[i].task_result == BAC_RESULTS_OK)
-			{
-				write_success_count ++;
-				write_pos = write_pos +write_all_step;
-			}
-		}
-		for (int i=0;i<BAC_PROGRAM_GROUP;i++)
-		{
-			if(Write_Config_Info.Write_Program_Info[i].task_result == BAC_RESULTS_OK)
-			{
-				write_success_count ++;
-				write_pos = write_pos +write_all_step;
-			}
-		}
-		for (int i=0;i<BAC_PROGRAMCODE_GROUP;i++)
-		{
-			if(Write_Config_Info.Write_Programcode_Info[i].task_result == BAC_RESULTS_OK)
-			{
-				write_success_count ++;
-				write_pos = write_pos +write_all_step;
-			}
-		}
-		for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
-		{
-			if(Write_Config_Info.Write_Controller_Info[i].task_result == BAC_RESULTS_OK)
-			{
-				write_success_count ++;
-				write_pos = write_pos +write_all_step;
-			}
-		}
-		for (int i=0;i<BAC_SCREEN_GROUP;i++)
-		{
-			if(Write_Config_Info.Write_Screen_Info[i].task_result == BAC_RESULTS_OK)
-			{
-				write_success_count ++;
-				write_pos = write_pos +write_all_step;
-			}
-		}
-
-		for (int i=0;i<BAC_MONITOR_GROUP;i++)
-		{
-			if(Write_Config_Info.Write_Monitor_Info[i].task_result == BAC_RESULTS_OK)
-			{
-				write_success_count ++;
-				write_pos = write_pos +write_all_step;
-			}
-		}
-		
-		for (int i=0;i<BAC_WEEKLY_GROUP;i++)
-		{
-			if(Write_Config_Info.Write_Weekly_Info[i].task_result == BAC_RESULTS_OK)
-			{
-				write_success_count ++;
-				write_pos = write_pos +write_all_step;
-			}
-		}
-
-		for (int i=0;i<BAC_ANNUAL_GROUP;i++)
-		{
-			if(Write_Config_Info.Write_Annual_Info[i].task_result == BAC_RESULTS_OK)
-			{
-				write_success_count ++;
-				write_pos = write_pos +write_all_step;
-			}
-		}
-
-		for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
-		{
-			if(Write_Config_Info.Write_Weeklycode_Info[i].task_result == BAC_RESULTS_OK)
-			{
-				write_success_count ++;
-				write_pos = write_pos +write_all_step;
-			}
-		}
-
-		for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
-		{
-			if(Write_Config_Info.Write_Annualcode_Info[i].task_result == BAC_RESULTS_OK)
-			{
-				write_success_count ++;
-				write_pos = write_pos +write_all_step;
-			}
-		}
-
-		write_pos = write_pos /10;
-		if(write_pos>100)
-			write_pos=100;
-		m_wait_progress.SetPos(write_pos);
-		temp_pos.Format(_T("%d%%"),write_pos);
-
-	}
-	else if(m_wait_type == BAC_WAIT_READ_DATA_WRITE_CONFIG)	//这里是 读取config 所要的 资料;
+	if(m_wait_type == BAC_WAIT_READ_DATA_WRITE_CONFIG)	//这里是 读取config 所要的 资料;
 	{
 		int read_config_total_count = BAC_INPUT_GROUP +
 									  BAC_OUTPUT_GROUP +
 									  BAC_PROGRAM_GROUP +
 									  BAC_VARIABLE_GROUP +
-									  BAC_CONTROLLER_GROUP +
+									  BAC_PID_GROUP +
 									  BAC_PROGRAMCODE_GROUP +
 									  BAC_SCREEN_GROUP +
-									  BAC_WEEKLY_GROUP +
-									  BAC_ANNUAL_GROUP +
+									  BAC_SCHEDULE_GROUP +
+									  BAC_HOLIDAY_GROUP +
 									  BAC_MONITOR_GROUP +
-									  BAC_WEEKLYCODE_GOUP +
-									  BAC_ANNUALCODE_GROUP;//这里还有很多要加;
+									  BAC_SCHEDULECODE_GOUP +
+									  BAC_HOLIDAYCODE_GROUP;//这里还有很多要加;
 									  BAC_BASIC_SETTING_GROUP;
 		int read_config_all_step = 1000 / read_config_total_count;
 		int read_config_success_count =0;
@@ -326,7 +196,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 
-		for (int i=0;i<BAC_ANNUALCODE_GROUP;i++ )
+		for (int i=0;i<BAC_HOLIDAYCODE_GROUP;i++ )
 		{
 			if(bac_read_which_list ==BAC_READ_SVAE_CONFIG)
 			{
@@ -387,7 +257,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 
-		for (int i=0;i<BAC_CONTROLLER_GROUP ;i++ )
+		for (int i=0;i<BAC_PID_GROUP ;i++ )
 		{
 			if(bac_read_which_list ==BAC_READ_SVAE_CONFIG)
 			{
@@ -411,7 +281,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 
-		for (int i=0;i<BAC_WEEKLY_GROUP ;i++ )
+		for (int i=0;i<BAC_SCHEDULE_GROUP ;i++ )
 		{
 			if(bac_read_which_list ==BAC_READ_SVAE_CONFIG)
 			{
@@ -423,7 +293,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 
-		for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++ )
+		for (int i=0;i<BAC_SCHEDULECODE_GOUP;i++ )
 		{
 			if(bac_read_which_list ==BAC_READ_SVAE_CONFIG)
 			{
@@ -436,7 +306,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		}
 
 
-		for (int i=0;i<BAC_ANNUAL_GROUP ;i++ )
+		for (int i=0;i<BAC_HOLIDAY_GROUP ;i++ )
 		{
 			if(bac_read_which_list ==BAC_READ_SVAE_CONFIG)
 			{
@@ -461,10 +331,11 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		}
 
 		read_config_pos = read_config_pos /10;
-		if(read_config_pos>100)
+		if(read_config_pos>=99)
 			read_config_pos=100;
 		m_wait_progress.SetPos(read_config_pos);
 		temp_pos.Format(_T("%d%%"),read_config_pos);
+		g_progress_persent = read_config_pos;
 
 	}
 	else if(m_wait_type == BAC_WAIT_NORMAL_READ)//这里是点击的时候读，只要INput output var program 和time;
@@ -474,9 +345,9 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			BAC_PROGRAM_GROUP +		
 			BAC_VARIABLE_GROUP +
 			BAC_TIME_COMMAND_GROUP +
-			BAC_WEEKLY_GROUP +
-			BAC_ANNUAL_GROUP +
-			BAC_CONTROLLER_GROUP +
+			BAC_SCHEDULE_GROUP +
+			BAC_HOLIDAY_GROUP +
+			BAC_PID_GROUP +
 			BAC_SCREEN_GROUP +
 			BAC_MONITOR_GROUP;// +
 			//BAC_TSTAT_GROUP; 
@@ -488,10 +359,10 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		int output_step = 1000 / BAC_OUTPUT_GROUP;
 		int program_step = 1000 / BAC_PROGRAM_GROUP;
 		int variable_step = 1000 / BAC_VARIABLE_GROUP;
-		int weekly_step  = 1000/ BAC_WEEKLY_GROUP;
-		int annual_step = 1000 / BAC_ANNUAL_GROUP;
+		int weekly_step  = 1000/ BAC_SCHEDULE_GROUP;
+		int annual_step = 1000 / BAC_HOLIDAY_GROUP;
 		int time_command_step = 1000 / BAC_TIME_COMMAND_GROUP;
-		int controller_step = 1000 / BAC_CONTROLLER_GROUP;
+		int controller_step = 1000 / BAC_PID_GROUP;
 		int screen_step = 1000 / BAC_SCREEN_GROUP;
 		int monitor_step = 1000 /BAC_MONITOR_GROUP;
 		int alarmlog_step = 1000 /BAC_ALARMLOG_GROUP;
@@ -599,7 +470,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 
-		for (int i=0;i<BAC_WEEKLY_GROUP;i++ )
+		for (int i=0;i<BAC_SCHEDULE_GROUP;i++ )
 		{
 			if(bac_read_which_list ==BAC_READ_ALL_LIST)
 			{
@@ -619,7 +490,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 
-		for (int i=0;i<BAC_ANNUAL_GROUP;i++ )
+		for (int i=0;i<BAC_HOLIDAY_GROUP;i++ )
 		{
 			if(bac_read_which_list ==BAC_READ_ALL_LIST)
 			{
@@ -743,7 +614,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 
-		for (int i=0;i<BAC_CONTROLLER_GROUP ;i++ )
+		for (int i=0;i<BAC_PID_GROUP ;i++ )
 		{
 			if(bac_read_which_list ==BAC_READ_ALL_LIST)
 			{
@@ -804,19 +675,21 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		}
 
 		pos = pos /10;
-	//	TRACE(_T("%d\r\n"),pos);
-		if(pos>100)
+		//TRACE(_T("%d\r\n"),pos);
+		if(pos>=98)
 			pos=100;
 		m_wait_progress.SetPos(pos);
 		temp_pos.Format(_T("%d%%"),pos);
-
+		g_progress_persent = pos;
 		if(bac_read_which_list != BAC_READ_ALL_LIST)
 		{
+			g_progress_persent = 0;
 			this->ShowWindow(SW_HIDE);
 		}
 		if(bac_read_which_list == BAC_READ_GRAPHIC_LABEL_INFO)	// 如果是第一次 读 图片里面的label,就慢慢读,并且显示 进度条.
 		{
-			this->ShowWindow(SW_SHOW);
+			g_progress_persent = pos;
+			//this->ShowWindow(SW_SHOW);
 		}
 
 	}
@@ -881,7 +754,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Label_Graphic_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 						CString temp_cs_show;
-						temp_cs_show.Format(_T("Task ID = %d. Read graphic label "),g_invoke_id);
+						temp_cs_show.Format(_T("Read graphic label "));
 						Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 					}
 				}
@@ -940,7 +813,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Customer_unit_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 						CString temp_cs_show;
-						temp_cs_show.Format(_T("Task ID = %d. Read Customer units "),g_invoke_id);
+						temp_cs_show.Format(_T("Read Customer units "));
 						Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 					}
 				}
@@ -998,7 +871,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_UserLogin[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 						CString temp_cs_show;
-						temp_cs_show.Format(_T("Task ID = %d. Read Tstats list "),g_invoke_id);
+						temp_cs_show.Format(_T("Read Tstats list "));
 						Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 					}
 				}
@@ -1056,7 +929,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_Monitor_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read Monitor list "),g_invoke_id);
+					temp_cs_show.Format(_T("Read Monitor list "));
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 
 
@@ -1123,7 +996,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_Screen_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read Screen list "),g_invoke_id);
+					temp_cs_show.Format(_T("Read Screen list "));
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 
 
@@ -1136,7 +1009,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 
-		for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
+		for (int i=0;i<BAC_PID_GROUP;i++)
 		{
 			if((bac_read_which_list == BAC_READ_CONTROLLER_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG) || (bac_read_which_list == BAC_READ_ALL_LIST))
 			{
@@ -1190,7 +1063,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_Controller_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read Controller list "),g_invoke_id);
+					temp_cs_show.Format(_T("Read Controller list "),g_invoke_id);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 
 
@@ -1256,7 +1129,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_Time_Command[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read device time "),g_invoke_id);
+					temp_cs_show.Format(_T("Read device time "),g_invoke_id);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 
 
@@ -1324,7 +1197,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_BasicSetting_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
 					Bacnet_Refresh_Info.Read_BasicSetting_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read basic setting "),g_invoke_id);
+					temp_cs_show.Format(_T("Read basic setting "),g_invoke_id);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 
 
@@ -1339,7 +1212,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 
 
-		for (int i=0;i<BAC_ANNUAL_GROUP;i++)
+		for (int i=0;i<BAC_HOLIDAY_GROUP;i++)
 		{
 			if((bac_read_which_list == BAC_READ_ANNUAL_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST)|| (bac_read_which_list == TYPE_SVAE_CONFIG))
 			{
@@ -1394,7 +1267,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_Annual_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read annual routine from item %d to %d "),g_invoke_id,
+					temp_cs_show.Format(_T("Read annual routine from item %d to %d "),g_invoke_id,
 						Bacnet_Refresh_Info.Read_Annual_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Annual_Info[i].end_instance);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
@@ -1410,7 +1283,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 
-		for (int i=0;i<BAC_WEEKLY_GROUP;i++)
+		for (int i=0;i<BAC_SCHEDULE_GROUP;i++)
 		{
 			if((bac_read_which_list == BAC_READ_WEEKLY_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST)|| (bac_read_which_list == TYPE_SVAE_CONFIG))
 			{
@@ -1465,7 +1338,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 
 
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read weekly routine from item %d to %d "),g_invoke_id,
+					temp_cs_show.Format(_T("Read weekly routine from item %d to %d "),
 						Bacnet_Refresh_Info.Read_Weekly_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Weekly_Info[i].end_instance);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
@@ -1532,7 +1405,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_Program_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 					
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read program list from item %d to %d "),g_invoke_id,
+					temp_cs_show.Format(_T("Read program list from item %d to %d "),
 						Bacnet_Refresh_Info.Read_Program_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Program_Info[i].end_instance);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
@@ -1600,7 +1473,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_AlarmLog_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read Alarm Log %d "),g_invoke_id,
+					temp_cs_show.Format(_T("Read Alarm Log %d "),
 						Bacnet_Refresh_Info.Read_AlarmLog_Info[i].start_instance);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
 
@@ -1685,7 +1558,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 				CString temp_cs_show;
-				temp_cs_show.Format(_T("Task ID = %d. Read weekly schedule time list from item %d to %d "),g_invoke_id,
+				temp_cs_show.Format(_T("Read schedule time list from item %d to %d "),
 					Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].start_instance,
 					Bacnet_Refresh_Info.Read_Weeklycode_Info[weekly_list_line].end_instance);
 				Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
@@ -1702,7 +1575,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		}
 		else if((bac_read_which_list == TYPE_SVAE_CONFIG))
 		{
-			for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
+			for (int i=0;i<BAC_SCHEDULECODE_GOUP;i++)
 			{
 				if(Bacnet_Refresh_Info.Read_Weeklycode_Info[i].task_result == BAC_RESULTS_UNKONW)
 				{
@@ -1751,7 +1624,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_Weeklycode_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read weekly shcedule time list from item %d to %d "),g_invoke_id,
+					temp_cs_show.Format(_T("Read Schedule time list from item %d to %d "),
 						Bacnet_Refresh_Info.Read_Weeklycode_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Weeklycode_Info[i].end_instance);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
@@ -1813,7 +1686,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 				Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 				CString temp_cs_show;
-				temp_cs_show.Format(_T("Task ID = %d. Read annual day time list from item %d to %d "),g_invoke_id,
+				temp_cs_show.Format(_T("Read Holiday list from item %d to %d "),
 					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].start_instance,
 					Bacnet_Refresh_Info.Read_Annualcode_Info[annual_list_line].end_instance);
 				Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
@@ -1830,7 +1703,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 		}
 		else if((bac_read_which_list == TYPE_SVAE_CONFIG))
 		{
-			for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
+			for (int i=0;i<BAC_HOLIDAYCODE_GROUP;i++)
 			{
 				if(Bacnet_Refresh_Info.Read_Annualcode_Info[i].task_result == BAC_RESULTS_UNKONW)
 				{
@@ -1879,7 +1752,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_Annualcode_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read annual day time list from item %d to %d "),g_invoke_id,
+					temp_cs_show.Format(_T("Read Holiday list from item %d to %d "),
 						Bacnet_Refresh_Info.Read_Annualcode_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Annualcode_Info[i].end_instance);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
@@ -1948,7 +1821,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					Bacnet_Refresh_Info.Read_Input_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 					
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read input list from item %d to %d "),g_invoke_id,
+					temp_cs_show.Format(_T("Read input list from item %d to %d "),
 						Bacnet_Refresh_Info.Read_Input_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Input_Info[i].end_instance);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
@@ -2018,7 +1891,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 					
 					
 					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Read output list from item %d to %d "),g_invoke_id,
+					temp_cs_show.Format(_T("Read output list from item %d to %d "),
 						Bacnet_Refresh_Info.Read_Output_Info[i].start_instance,
 						Bacnet_Refresh_Info.Read_Output_Info[i].end_instance);
 					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
@@ -2084,7 +1957,7 @@ void BacnetWait::OnTimer(UINT_PTR nIDEvent)
 						Bacnet_Refresh_Info.Read_Variable_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
 						Bacnet_Refresh_Info.Read_Variable_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
 						CString temp_cs_show;
-						temp_cs_show.Format(_T("Task ID = %d. Read variable list from item %d to %d "),g_invoke_id,
+						temp_cs_show.Format(_T("Read variable list from item %d to %d "),
 							Bacnet_Refresh_Info.Read_Variable_Info[i].start_instance,
 							Bacnet_Refresh_Info.Read_Variable_Info[i].end_instance);
 						Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs_show);
@@ -2149,778 +2022,6 @@ endthis:
 			}
 			PostMessage(WM_CLOSE,NULL,NULL);
 			//OnCancel();
-		}
-		break;
-	case 4:
-		{
-			for (int i=0;i<BAC_INPUT_GROUP;i++)
-			{
-					if(Write_Config_Info.Write_Input_Info[i].task_result == BAC_RESULTS_UNKONW)
-					{
-						if(Write_Config_Info.Write_Input_Info[i].invoke_id > 0)
-						{
-							Write_Config_Info.Write_Input_Info[i].timeout_count ++;
-						}
-						if(Write_Config_Info.Write_Input_Info[i].timeout_count > 20)
-						{
-							Write_Config_Info.Write_Input_Info[i].task_result = BAC_RESULTS_FAIL;
-							Write_Config_Info.Write_Input_Info[i].timeout_count = 0;
-							continue;
-						}
-						m_wait_detail.SetWindowTextW(tempcs);
-						write_cotinue_waite = true;
-						break;
-
-						//if(Write_Config_Info.Write_Input_Info[i].invoke_id > 0)
-						//{
-						//	Write_Config_Info.Write_Input_Info[i].timeout_count ++;
-						//}
-
-						//if((Write_Config_Info.Write_Input_Info[i].timeout_count > 20) ||
-						//	((Write_Config_Info.Write_Input_Info[i].invoke_id <=0) && (Write_Config_Info.Write_Input_Info[i].has_resend_yes_or_no>0) ))
-						//{
-						//	Write_Config_Info.Write_Input_Info[i].task_result = BAC_RESULTS_FAIL;
-						//	Write_Config_Info.Write_Input_Info[i].timeout_count = 0;
-						//	//continue;
-						//}
-						//m_wait_detail.SetWindowTextW(tempcs);
-						//goto write_endthis;
-					}
-					else if(Write_Config_Info.Write_Input_Info[i].task_result == BAC_RESULTS_FAIL)
-					{
-						Write_Config_Info.Write_Input_Info[i].resend_count ++ ;
-						write_cotinue_waite = true;
-						//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
-						if((Write_Config_Info.Write_Input_Info[i].resend_count>RESEND_COUNT) || (Write_Config_Info.Write_Input_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
-						{
-							m_wait_detail.SetWindowTextW(_T("Write input Table Time Out!"));
-							KillTimer(4);
-							SetTimer(2,2000,NULL);
-							::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
-							goto write_endthis;
-						}
-						//if(Write_Config_Info.Write_Input_Info[i].device_id ==0)
-						//	Sleep(1);
-						//TRACE(_T("INPUT ID = %d ,command =%d\r\n"),Write_Config_Info.Write_Input_Info[i].device_id,Write_Config_Info.Write_Input_Info[i].command);
-						g_invoke_id = WritePrivateData(	Write_Config_Info.Write_Input_Info[i].device_id,Write_Config_Info.Write_Input_Info[i].command,
-														Write_Config_Info.Write_Input_Info[i].start_instance,Write_Config_Info.Write_Input_Info[i].end_instance);
-						if(g_invoke_id<0)	//如果没有获取到 就继续循环;
-						{
-							Sleep(50);
-							continue;
-						}
-						Write_Config_Info.Write_Input_Info[i].has_resend_yes_or_no ++;
-						Write_Config_Info.Write_Input_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-						Write_Config_Info.Write_Input_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
-
-						CString temp_cs_show;
-						temp_cs_show.Format(_T("Task ID = %d. Write input list from item %d to %d "),g_invoke_id,
-							Write_Config_Info.Write_Input_Info[i].start_instance,
-							Write_Config_Info.Write_Input_Info[i].end_instance);
-						Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
-
-						//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-						//TRACE(_T("Write input list Resend start = %d , Resend end = %d\r\n"),
-						//	Write_Config_Info.Write_Input_Info[i].start_instance,
-						//	Write_Config_Info.Write_Input_Info[i].end_instance);
-					}
-			}
-
-			for (int i=0;i<BAC_OUTPUT_GROUP;i++)
-			{
-				if(Write_Config_Info.Write_Output_Info[i].task_result == BAC_RESULTS_UNKONW)
-				{
-					if(Write_Config_Info.Write_Output_Info[i].invoke_id > 0)
-					{
-						Write_Config_Info.Write_Output_Info[i].timeout_count ++;
-					}
-					if(Write_Config_Info.Write_Output_Info[i].timeout_count > 20)
-					{
-						Write_Config_Info.Write_Output_Info[i].task_result = BAC_RESULTS_FAIL;
-						Write_Config_Info.Write_Output_Info[i].timeout_count = 0;
-						continue;
-					}
-					m_wait_detail.SetWindowTextW(tempcs);
-					write_cotinue_waite = true;
-					break;
-					//if(Write_Config_Info.Write_Output_Info[i].invoke_id > 0)
-					//{
-					//	Write_Config_Info.Write_Output_Info[i].timeout_count ++;
-					//}
-					//if((Write_Config_Info.Write_Output_Info[i].timeout_count > 20) ||
-					//	((Write_Config_Info.Write_Output_Info[i].invoke_id <=0) &&((Write_Config_Info.Write_Output_Info[i].has_resend_yes_or_no >0)) ))
-					//{
-					//	Write_Config_Info.Write_Output_Info[i].task_result = BAC_RESULTS_FAIL;
-					//	Write_Config_Info.Write_Output_Info[i].timeout_count = 0;
-					//	//continue;
-					//}
-					//m_wait_detail.SetWindowTextW(tempcs);
-					//goto write_endthis;
-				}
-				else if(Write_Config_Info.Write_Output_Info[i].task_result == BAC_RESULTS_FAIL)
-				{
-					write_cotinue_waite = true;
-					Write_Config_Info.Write_Output_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
-					if((Write_Config_Info.Write_Output_Info[i].resend_count>RESEND_COUNT) 
-						|| (Write_Config_Info.Write_Output_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
-					{
-						m_wait_detail.SetWindowTextW(_T("Write output Table Time Out!"));
-						KillTimer(4);
-						SetTimer(2,2000,NULL);
-						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
-						goto write_endthis;
-					}
-					//TRACE(_T("OUTPUT ID = %d ,command =%d\r\n"),Write_Config_Info.Write_Output_Info[i].device_id,Write_Config_Info.Write_Output_Info[i].command);
-					g_invoke_id = WritePrivateData(
-						Write_Config_Info.Write_Output_Info[i].device_id,
-						Write_Config_Info.Write_Output_Info[i].command,
-						Write_Config_Info.Write_Output_Info[i].start_instance,
-						Write_Config_Info.Write_Output_Info[i].end_instance);
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
-					{
-						Sleep(50);
-						continue;
-					}
-					Write_Config_Info.Write_Output_Info[i].has_resend_yes_or_no ++;
-					Write_Config_Info.Write_Output_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Write_Config_Info.Write_Output_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
-
-					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Write output list from item %d to %d "),g_invoke_id,
-						Write_Config_Info.Write_Output_Info[i].start_instance,
-						Write_Config_Info.Write_Output_Info[i].end_instance);
-					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
-
-					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					//TRACE(_T(" Write output list Resend start = %d , Resend end = %d\r\n"),
-					//	Write_Config_Info.Write_Output_Info[i].start_instance,
-					//	Write_Config_Info.Write_Output_Info[i].end_instance);
-				}
-			}
-
-			for (int i=0;i<BAC_VARIABLE_GROUP;i++)
-			{
-				if(Write_Config_Info.Write_Variable_Info[i].task_result == BAC_RESULTS_UNKONW)
-				{
-					if(Write_Config_Info.Write_Variable_Info[i].invoke_id > 0)
-					{
-						Write_Config_Info.Write_Variable_Info[i].timeout_count ++;
-					}
-					if(Write_Config_Info.Write_Variable_Info[i].timeout_count > 20)
-					{
-						Write_Config_Info.Write_Variable_Info[i].task_result = BAC_RESULTS_FAIL;
-						Write_Config_Info.Write_Variable_Info[i].timeout_count = 0;
-						continue;
-					}
-					m_wait_detail.SetWindowTextW(tempcs);
-					write_cotinue_waite = true;
-					break;
-					//if(Write_Config_Info.Write_Variable_Info[i].invoke_id > 0)
-					//{
-					//	Write_Config_Info.Write_Variable_Info[i].timeout_count ++;
-					//}
-					//if((Write_Config_Info.Write_Variable_Info[i].timeout_count > 20) ||
-					//	((Write_Config_Info.Write_Variable_Info[i].invoke_id <=0) &&((Write_Config_Info.Write_Variable_Info[i].has_resend_yes_or_no >0))))
-					//{
-					//	Write_Config_Info.Write_Variable_Info[i].task_result = BAC_RESULTS_FAIL;
-					//	Write_Config_Info.Write_Variable_Info[i].timeout_count = 0;
-					//	//continue;
-					//}
-					//m_wait_detail.SetWindowTextW(tempcs);
-					//goto write_endthis;
-				}
-				else if(Write_Config_Info.Write_Variable_Info[i].task_result == BAC_RESULTS_FAIL)
-				{
-					write_cotinue_waite = true;
-					Write_Config_Info.Write_Input_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
-					if((Write_Config_Info.Write_Variable_Info[i].resend_count>RESEND_COUNT) 
-						|| (Write_Config_Info.Write_Variable_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
-					{
-						m_wait_detail.SetWindowTextW(_T("Write variable Table Time Out!"));
-						KillTimer(4);
-						SetTimer(2,2000,NULL);
-						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
-						goto write_endthis;
-					}
-					g_invoke_id = WritePrivateData(
-						Write_Config_Info.Write_Variable_Info[i].device_id,
-						Write_Config_Info.Write_Variable_Info[i].command,
-						Write_Config_Info.Write_Variable_Info[i].start_instance,
-						Write_Config_Info.Write_Variable_Info[i].end_instance);
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
-					{
-						Sleep(50);
-						continue;
-					}
-					Write_Config_Info.Write_Variable_Info[i].has_resend_yes_or_no ++;
-					Write_Config_Info.Write_Variable_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Write_Config_Info.Write_Variable_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
-
-					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Write variable list from item %d to %d "),g_invoke_id,
-						Write_Config_Info.Write_Variable_Info[i].start_instance,
-						Write_Config_Info.Write_Variable_Info[i].end_instance);
-					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
-
-					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					//TRACE(_T("Write variable list Resend start = %d , Resend end = %d\r\n"),
-					//	Write_Config_Info.Write_Variable_Info[i].start_instance,
-					//	Write_Config_Info.Write_Variable_Info[i].end_instance);
-				}
-			}
-
-			for (int i=0;i<BAC_PROGRAM_GROUP;i++)
-			{
-				if(Write_Config_Info.Write_Program_Info[i].task_result == BAC_RESULTS_UNKONW)
-				{
-					if(Write_Config_Info.Write_Program_Info[i].invoke_id > 0)
-					{
-						Write_Config_Info.Write_Program_Info[i].timeout_count ++;
-					}
-					if(Write_Config_Info.Write_Program_Info[i].timeout_count > 20)
-					{
-						Write_Config_Info.Write_Program_Info[i].task_result = BAC_RESULTS_FAIL;
-						Write_Config_Info.Write_Program_Info[i].timeout_count = 0;
-						continue;
-					}
-					m_wait_detail.SetWindowTextW(tempcs);
-					write_cotinue_waite = true;
-					break;
-					//if(Write_Config_Info.Write_Program_Info[i].invoke_id > 0)
-					//{
-					//	Write_Config_Info.Write_Program_Info[i].timeout_count ++;
-					//}
-					//if((Write_Config_Info.Write_Program_Info[i].timeout_count > 20) ||
-					//	((Write_Config_Info.Write_Program_Info[i].invoke_id <=0) && ((Write_Config_Info.Write_Program_Info[i].has_resend_yes_or_no>0))))
-					//{
-					//	Write_Config_Info.Write_Program_Info[i].task_result = BAC_RESULTS_FAIL;
-					//	Write_Config_Info.Write_Program_Info[i].timeout_count = 0;
-					//	//continue;
-					//}
-					//m_wait_detail.SetWindowTextW(tempcs);
-					//goto write_endthis;
-				}
-				else if(Write_Config_Info.Write_Program_Info[i].task_result == BAC_RESULTS_FAIL)
-				{
-					write_cotinue_waite = true;
-					Write_Config_Info.Write_Program_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
-					if((Write_Config_Info.Write_Program_Info[i].resend_count>RESEND_COUNT) 
-						|| (Write_Config_Info.Write_Program_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
-					{
-						m_wait_detail.SetWindowTextW(_T("Write program Table Time Out!"));
-						KillTimer(4);
-						SetTimer(2,2000,NULL);
-						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
-						goto write_endthis;
-					}
-					g_invoke_id = WritePrivateData(
-						Write_Config_Info.Write_Program_Info[i].device_id,
-						Write_Config_Info.Write_Program_Info[i].command,
-						Write_Config_Info.Write_Program_Info[i].start_instance,
-						Write_Config_Info.Write_Program_Info[i].end_instance);
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
-					{
-						Sleep(50);
-						continue;
-					}
-					Write_Config_Info.Write_Program_Info[i].has_resend_yes_or_no ++;
-					Write_Config_Info.Write_Program_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Write_Config_Info.Write_Program_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
-
-					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Write program list from item %d to %d "),g_invoke_id,
-						Write_Config_Info.Write_Program_Info[i].start_instance,
-						Write_Config_Info.Write_Program_Info[i].end_instance);
-					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
-
-					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					//TRACE(_T("Write program Table Resend start = %d , Resend end = %d\r\n"),
-					//	Write_Config_Info.Write_Program_Info[i].start_instance,
-					//	Write_Config_Info.Write_Program_Info[i].end_instance);
-				}
-			}
-
-
-			for (int i=0;i<BAC_PROGRAMCODE_GROUP;i++)
-			{
-				if(Write_Config_Info.Write_Programcode_Info[i].task_result == BAC_RESULTS_UNKONW)
-				{
-					m_wait_detail.SetWindowTextW(tempcs);
-					write_cotinue_waite = true;
-					break;
-				}
-				else if(Write_Config_Info.Write_Programcode_Info[i].task_result == BAC_RESULTS_FAIL)
-				{
-						m_wait_detail.SetWindowTextW(_T("Write program code Time Out!"));
-						KillTimer(4);
-						SetTimer(2,2000,NULL);
-						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
-						goto write_endthis;
-				}
-			}
-
-
-
-			for (int i=0;i<BAC_CONTROLLER_GROUP;i++)
-			{
-				if(Write_Config_Info.Write_Controller_Info[i].task_result == BAC_RESULTS_UNKONW)
-				{
-					if(Write_Config_Info.Write_Controller_Info[i].invoke_id > 0)
-					{
-						Write_Config_Info.Write_Controller_Info[i].timeout_count ++;
-					}
-					if(Write_Config_Info.Write_Controller_Info[i].timeout_count > 20)
-					{
-						Write_Config_Info.Write_Controller_Info[i].task_result = BAC_RESULTS_FAIL;
-						Write_Config_Info.Write_Controller_Info[i].timeout_count = 0;
-						continue;
-					}
-					m_wait_detail.SetWindowTextW(tempcs);
-					write_cotinue_waite = true;
-					break;
-					//if(Write_Config_Info.Write_Controller_Info[i].invoke_id > 0)
-					//{
-					//	Write_Config_Info.Write_Controller_Info[i].timeout_count ++;
-					//}
-					//if((Write_Config_Info.Write_Controller_Info[i].timeout_count > 20) ||
-					//	((Write_Config_Info.Write_Controller_Info[i].invoke_id <=0)&& ((Write_Config_Info.Write_Controller_Info[i].has_resend_yes_or_no>0)) ))
-					//{
-					//	Write_Config_Info.Write_Controller_Info[i].task_result = BAC_RESULTS_FAIL;
-					//	Write_Config_Info.Write_Controller_Info[i].timeout_count = 0;
-					//	//continue;
-					//}
-					//m_wait_detail.SetWindowTextW(tempcs);
-					//goto write_endthis;
-				}
-				else if(Write_Config_Info.Write_Controller_Info[i].task_result == BAC_RESULTS_FAIL)
-				{
-					write_cotinue_waite = true;
-					Write_Config_Info.Write_Controller_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
-					if((Write_Config_Info.Write_Controller_Info[i].resend_count>RESEND_COUNT) 
-						|| (Write_Config_Info.Write_Controller_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
-					{
-						m_wait_detail.SetWindowTextW(_T("Write controller Table Time Out!"));
-						KillTimer(4);
-						SetTimer(2,2000,NULL);
-						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
-						goto write_endthis;
-					}
-					g_invoke_id = WritePrivateData(
-						Write_Config_Info.Write_Controller_Info[i].device_id,
-						Write_Config_Info.Write_Controller_Info[i].command,
-						Write_Config_Info.Write_Controller_Info[i].start_instance,
-						Write_Config_Info.Write_Controller_Info[i].end_instance);
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
-					{
-						Sleep(50);
-						continue;
-					}
-					Write_Config_Info.Write_Controller_Info[i].has_resend_yes_or_no ++;
-					Write_Config_Info.Write_Controller_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Write_Config_Info.Write_Controller_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
-
-					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Write controller list from item %d to %d "),g_invoke_id,
-						Write_Config_Info.Write_Controller_Info[i].start_instance,
-						Write_Config_Info.Write_Controller_Info[i].end_instance);
-					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
-
-					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					//TRACE(_T("Write controller list Resend start = %d , Resend end = %d\r\n"),
-					//	Write_Config_Info.Write_Controller_Info[i].start_instance,
-					//	Write_Config_Info.Write_Controller_Info[i].end_instance);
-				}
-			}
-
-
-			for (int i=0;i<BAC_SCREEN_GROUP;i++)
-			{
-				if(Write_Config_Info.Write_Screen_Info[i].task_result == BAC_RESULTS_UNKONW)
-				{
-					if(Write_Config_Info.Write_Screen_Info[i].invoke_id > 0)
-					{
-						Write_Config_Info.Write_Screen_Info[i].timeout_count ++;
-					}
-					if(Write_Config_Info.Write_Screen_Info[i].timeout_count > 20)
-					{
-						Write_Config_Info.Write_Screen_Info[i].task_result = BAC_RESULTS_FAIL;
-						Write_Config_Info.Write_Screen_Info[i].timeout_count = 0;
-						continue;
-					}
-					m_wait_detail.SetWindowTextW(tempcs);
-					write_cotinue_waite = true;
-					break;
-					//if(Write_Config_Info.Write_Screen_Info[i].invoke_id > 0)
-					//{
-					//	Write_Config_Info.Write_Screen_Info[i].timeout_count ++;
-					//}
-					//if((Write_Config_Info.Write_Screen_Info[i].timeout_count > 20) ||
-					//	((Write_Config_Info.Write_Screen_Info[i].invoke_id <=0) &&((Write_Config_Info.Write_Screen_Info[i].has_resend_yes_or_no >0)) ))
-					//{
-					//	Write_Config_Info.Write_Screen_Info[i].task_result = BAC_RESULTS_FAIL;
-					//	Write_Config_Info.Write_Screen_Info[i].timeout_count = 0;
-					//	//continue;
-					//}
-					//m_wait_detail.SetWindowTextW(tempcs);
-					//goto write_endthis;
-				}
-				else if(Write_Config_Info.Write_Screen_Info[i].task_result == BAC_RESULTS_FAIL)
-				{
-					write_cotinue_waite = true;
-					Write_Config_Info.Write_Screen_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
-					if((Write_Config_Info.Write_Screen_Info[i].resend_count>RESEND_COUNT) 
-						|| (Write_Config_Info.Write_Screen_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
-					{
-						m_wait_detail.SetWindowTextW(_T("Write Screen Table Time Out!"));
-						KillTimer(4);
-						SetTimer(2,2000,NULL);
-						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
-						goto write_endthis;
-					}
-					//TRACE(_T("OUTPUT ID = %d ,command =%d\r\n"),Write_Config_Info.Write_Output_Info[i].device_id,Write_Config_Info.Write_Output_Info[i].command);
-					g_invoke_id = WritePrivateData(
-						Write_Config_Info.Write_Screen_Info[i].device_id,
-						Write_Config_Info.Write_Screen_Info[i].command,
-						Write_Config_Info.Write_Screen_Info[i].start_instance,
-						Write_Config_Info.Write_Screen_Info[i].end_instance);
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
-					{
-						Sleep(50);
-						continue;
-					}
-					Write_Config_Info.Write_Screen_Info[i].has_resend_yes_or_no ++;
-					Write_Config_Info.Write_Screen_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Write_Config_Info.Write_Screen_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
-
-					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Write Screen list from item %d to %d "),g_invoke_id,
-						Write_Config_Info.Write_Screen_Info[i].start_instance,
-						Write_Config_Info.Write_Screen_Info[i].end_instance);
-					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
-
-					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					//TRACE(_T(" Write screen list Resend start = %d , Resend end = %d\r\n"),
-					//	Write_Config_Info.Write_Screen_Info[i].start_instance,
-					//	Write_Config_Info.Write_Screen_Info[i].end_instance);
-				}
-			}
-
-			for (int i=0;i<BAC_MONITOR_GROUP;i++)
-			{
-				if(Write_Config_Info.Write_Monitor_Info[i].task_result == BAC_RESULTS_UNKONW)
-				{
-					if(Write_Config_Info.Write_Monitor_Info[i].invoke_id > 0)
-					{
-						Write_Config_Info.Write_Monitor_Info[i].timeout_count ++;
-					}
-					if(Write_Config_Info.Write_Monitor_Info[i].timeout_count > 20)
-					{
-						Write_Config_Info.Write_Monitor_Info[i].task_result = BAC_RESULTS_FAIL;
-						Write_Config_Info.Write_Monitor_Info[i].timeout_count = 0;
-						continue;
-					}
-					m_wait_detail.SetWindowTextW(tempcs);
-					write_cotinue_waite = true;
-					break;
-				}
-				else if(Write_Config_Info.Write_Monitor_Info[i].task_result == BAC_RESULTS_FAIL)
-				{
-					write_cotinue_waite = true;
-					Write_Config_Info.Write_Monitor_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
-					if((Write_Config_Info.Write_Monitor_Info[i].resend_count>RESEND_COUNT) 
-						|| (Write_Config_Info.Write_Monitor_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
-					{
-						m_wait_detail.SetWindowTextW(_T("Write Monitor Table Time Out!"));
-						KillTimer(4);
-						SetTimer(2,2000,NULL);
-						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
-						goto write_endthis;
-					}
-					//TRACE(_T("OUTPUT ID = %d ,command =%d\r\n"),Write_Config_Info.Write_Output_Info[i].device_id,Write_Config_Info.Write_Output_Info[i].command);
-					g_invoke_id = WritePrivateData(
-						Write_Config_Info.Write_Monitor_Info[i].device_id,
-						Write_Config_Info.Write_Monitor_Info[i].command,
-						Write_Config_Info.Write_Monitor_Info[i].start_instance,
-						Write_Config_Info.Write_Monitor_Info[i].end_instance);
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
-					{
-						Sleep(50);
-						continue;
-					}
-					Write_Config_Info.Write_Monitor_Info[i].has_resend_yes_or_no ++;
-					Write_Config_Info.Write_Monitor_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Write_Config_Info.Write_Monitor_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
-
-					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Write Monitor list from item %d to %d "),g_invoke_id,
-						Write_Config_Info.Write_Screen_Info[i].start_instance,
-						Write_Config_Info.Write_Screen_Info[i].end_instance);
-					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
-
-					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					//TRACE(_T(" Write monitor list Resend start = %d , Resend end = %d\r\n"),
-					//	Write_Config_Info.Write_Monitor_Info[i].start_instance,
-					//	Write_Config_Info.Write_Monitor_Info[i].end_instance);
-				}
-			}
-
-			for (int i=0;i<BAC_WEEKLY_GROUP;i++)
-			{
-				if(Write_Config_Info.Write_Weekly_Info[i].task_result == BAC_RESULTS_UNKONW)
-				{
-					if(Write_Config_Info.Write_Weekly_Info[i].invoke_id > 0)
-					{
-						Write_Config_Info.Write_Weekly_Info[i].timeout_count ++;
-					}
-					if(Write_Config_Info.Write_Weekly_Info[i].timeout_count > 20)
-					{
-						Write_Config_Info.Write_Weekly_Info[i].task_result = BAC_RESULTS_FAIL;
-						Write_Config_Info.Write_Weekly_Info[i].timeout_count = 0;
-						continue;
-					}
-					m_wait_detail.SetWindowTextW(tempcs);
-					write_cotinue_waite = true;
-					break;
-				}
-				else if(Write_Config_Info.Write_Weekly_Info[i].task_result == BAC_RESULTS_FAIL)
-				{
-					write_cotinue_waite = true;
-					Write_Config_Info.Write_Weekly_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
-					if((Write_Config_Info.Write_Weekly_Info[i].resend_count>RESEND_COUNT) 
-						|| (Write_Config_Info.Write_Weekly_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
-					{
-						m_wait_detail.SetWindowTextW(_T("Write Weekly routines Table Time Out!"));
-						KillTimer(4);
-						SetTimer(2,2000,NULL);
-						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
-						goto write_endthis;
-					}
-					//TRACE(_T("OUTPUT ID = %d ,command =%d\r\n"),Write_Config_Info.Write_Output_Info[i].device_id,Write_Config_Info.Write_Output_Info[i].command);
-					g_invoke_id = WritePrivateData(
-						Write_Config_Info.Write_Weekly_Info[i].device_id,
-						Write_Config_Info.Write_Weekly_Info[i].command,
-						Write_Config_Info.Write_Weekly_Info[i].start_instance,
-						Write_Config_Info.Write_Weekly_Info[i].end_instance);
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
-					{
-						Sleep(50);
-						continue;
-					}
-					Write_Config_Info.Write_Weekly_Info[i].has_resend_yes_or_no ++;
-					Write_Config_Info.Write_Weekly_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Write_Config_Info.Write_Weekly_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
-
-					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Write weekly routines list from item %d to %d "),g_invoke_id,
-						Write_Config_Info.Write_Weekly_Info[i].start_instance,
-						Write_Config_Info.Write_Weekly_Info[i].end_instance);
-					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
-
-					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					//TRACE(_T(" Write weekly routines Resend start = %d , Resend end = %d\r\n"),
-					//	Write_Config_Info.Write_Weekly_Info[i].start_instance,
-					//	Write_Config_Info.Write_Weekly_Info[i].end_instance);
-				}
-			}
-
-			for (int i=0;i<BAC_WEEKLYCODE_GOUP;i++)
-			{
-				if(Write_Config_Info.Write_Weeklycode_Info[i].task_result == BAC_RESULTS_UNKONW)
-				{
-					if(Write_Config_Info.Write_Weeklycode_Info[i].invoke_id > 0)
-					{
-						Write_Config_Info.Write_Weeklycode_Info[i].timeout_count ++;
-					}
-					if(Write_Config_Info.Write_Weeklycode_Info[i].timeout_count > 20)
-					{
-						Write_Config_Info.Write_Weeklycode_Info[i].task_result = BAC_RESULTS_FAIL;
-						Write_Config_Info.Write_Weeklycode_Info[i].timeout_count = 0;
-						continue;
-					}
-					m_wait_detail.SetWindowTextW(tempcs);
-					write_cotinue_waite = true;
-					break;
-				}
-				else if(Write_Config_Info.Write_Weeklycode_Info[i].task_result == BAC_RESULTS_FAIL)
-				{
-					write_cotinue_waite = true;
-					Write_Config_Info.Write_Weeklycode_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
-					if((Write_Config_Info.Write_Weeklycode_Info[i].resend_count>RESEND_COUNT) 
-						|| (Write_Config_Info.Write_Weeklycode_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
-					{
-						m_wait_detail.SetWindowTextW(_T("Write weekly shcedule time Time Out!"));
-						KillTimer(4);
-						SetTimer(2,2000,NULL);
-						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
-						goto write_endthis;
-					}
-					g_invoke_id = WritePrivateData(
-						Write_Config_Info.Write_Weeklycode_Info[i].device_id,
-						Write_Config_Info.Write_Weeklycode_Info[i].command,
-						Write_Config_Info.Write_Weeklycode_Info[i].start_instance,
-						Write_Config_Info.Write_Weeklycode_Info[i].end_instance);
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
-					{
-						Sleep(50);
-						continue;
-					}
-					Write_Config_Info.Write_Weeklycode_Info[i].has_resend_yes_or_no ++;
-					Write_Config_Info.Write_Weeklycode_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Write_Config_Info.Write_Weeklycode_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
-
-					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Write weekly schedule time from item %d to %d "),g_invoke_id,
-						Write_Config_Info.Write_Weeklycode_Info[i].start_instance,
-						Write_Config_Info.Write_Weeklycode_Info[i].end_instance);
-					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
-
-					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					//TRACE(_T("weekly schedule time Resend start = %d , Resend end = %d\r\n"),
-					//	Write_Config_Info.Write_Weeklycode_Info[i].start_instance,
-					//	Write_Config_Info.Write_Weeklycode_Info[i].end_instance);
-				}
-			}
-
-			for (int i=0;i<BAC_ANNUALCODE_GROUP;i++)
-			{
-				if(Write_Config_Info.Write_Annualcode_Info[i].task_result == BAC_RESULTS_UNKONW)
-				{
-					if(Write_Config_Info.Write_Annualcode_Info[i].invoke_id > 0)
-					{
-						Write_Config_Info.Write_Annualcode_Info[i].timeout_count ++;
-					}
-					if(Write_Config_Info.Write_Annualcode_Info[i].timeout_count > 20)
-					{
-						Write_Config_Info.Write_Annualcode_Info[i].task_result = BAC_RESULTS_FAIL;
-						Write_Config_Info.Write_Annualcode_Info[i].timeout_count = 0;
-						continue;
-					}
-					m_wait_detail.SetWindowTextW(tempcs);
-					write_cotinue_waite = true;
-					break;
-				}
-				else if(Write_Config_Info.Write_Annualcode_Info[i].task_result == BAC_RESULTS_FAIL)
-				{
-					write_cotinue_waite = true;
-					Write_Config_Info.Write_Annualcode_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
-					if((Write_Config_Info.Write_Annualcode_Info[i].resend_count>RESEND_COUNT) 
-						|| (Write_Config_Info.Write_Annualcode_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
-					{
-						m_wait_detail.SetWindowTextW(_T("Write weekly shcedule time Time Out!"));
-						KillTimer(4);
-						SetTimer(2,2000,NULL);
-						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
-						goto write_endthis;
-					}
-					g_invoke_id = WritePrivateData(
-						Write_Config_Info.Write_Annualcode_Info[i].device_id,
-						Write_Config_Info.Write_Annualcode_Info[i].command,
-						Write_Config_Info.Write_Annualcode_Info[i].start_instance,
-						Write_Config_Info.Write_Annualcode_Info[i].end_instance);
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
-					{
-						Sleep(50);
-						continue;
-					}
-					Write_Config_Info.Write_Annualcode_Info[i].has_resend_yes_or_no ++;
-					Write_Config_Info.Write_Annualcode_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Write_Config_Info.Write_Annualcode_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
-
-					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Write annual day time from item %d to %d "),g_invoke_id,
-						Write_Config_Info.Write_Annualcode_Info[i].start_instance,
-						Write_Config_Info.Write_Annualcode_Info[i].end_instance);
-					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
-
-					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					//TRACE(_T("annual day time Resend start = %d , Resend end = %d\r\n"),
-					//	Write_Config_Info.Write_Annualcode_Info[i].start_instance,
-					//	Write_Config_Info.Write_Annualcode_Info[i].end_instance);
-				}
-			}
-
-			for (int i=0;i<BAC_ANNUAL_GROUP;i++)
-			{
-				if(Write_Config_Info.Write_Annual_Info[i].task_result == BAC_RESULTS_UNKONW)
-				{
-					if(Write_Config_Info.Write_Annual_Info[i].invoke_id > 0)
-					{
-						Write_Config_Info.Write_Annual_Info[i].timeout_count ++;
-					}
-					if(Write_Config_Info.Write_Annual_Info[i].timeout_count > 20)
-					{
-						Write_Config_Info.Write_Annual_Info[i].task_result = BAC_RESULTS_FAIL;
-						Write_Config_Info.Write_Annual_Info[i].timeout_count = 0;
-						continue;
-					}
-					m_wait_detail.SetWindowTextW(tempcs);
-					write_cotinue_waite = true;
-					break;
-				}
-				else if(Write_Config_Info.Write_Annual_Info[i].task_result == BAC_RESULTS_FAIL)
-				{
-					write_cotinue_waite = true;
-					Write_Config_Info.Write_Annual_Info[i].resend_count ++ ;
-					//只要发送10次超时，或者判断已经发送了，并且还是返回失败 就显示超时;
-					if((Write_Config_Info.Write_Annual_Info[i].resend_count>RESEND_COUNT) 
-						|| (Write_Config_Info.Write_Annual_Info[i].has_resend_yes_or_no > FAIL_RESEND_COUNT))
-					{
-						m_wait_detail.SetWindowTextW(_T("Write Annual routines Table Time Out!"));
-						KillTimer(4);
-						SetTimer(2,2000,NULL);
-						::PostMessage(MainFram_hwd,WM_DELETE_NEW_MESSAGE_DLG,1,0);
-						goto write_endthis;
-					}
-					//TRACE(_T("OUTPUT ID = %d ,command =%d\r\n"),Write_Config_Info.Write_Output_Info[i].device_id,Write_Config_Info.Write_Output_Info[i].command);
-					g_invoke_id = WritePrivateData(
-						Write_Config_Info.Write_Annual_Info[i].device_id,
-						Write_Config_Info.Write_Annual_Info[i].command,
-						Write_Config_Info.Write_Annual_Info[i].start_instance,
-						Write_Config_Info.Write_Annual_Info[i].end_instance);
-					if(g_invoke_id<0)	//如果没有获取到 就继续循环;
-					{
-						Sleep(50);
-						continue;
-					}
-					Write_Config_Info.Write_Annual_Info[i].has_resend_yes_or_no ++;
-					Write_Config_Info.Write_Annual_Info[i].task_result = BAC_RESULTS_UNKONW;//并且将 反馈的状态 设置为未知;
-					Write_Config_Info.Write_Annual_Info[i].invoke_id = g_invoke_id;	//重新记录下重发的 ID 号;
-
-					CString temp_cs_show;
-					temp_cs_show.Format(_T("Task ID = %d. Write annual routines list from item %d to %d "),g_invoke_id,
-						Write_Config_Info.Write_Annual_Info[i].start_instance,
-						Write_Config_Info.Write_Annual_Info[i].end_instance);
-					Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,MainFram_hwd,temp_cs_show);
-
-					//Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd);
-					//TRACE(_T(" Write annual routines list Resend start = %d , Resend end = %d\r\n"),
-					//	Write_Config_Info.Write_Annual_Info[i].start_instance,
-					//	Write_Config_Info.Write_Annual_Info[i].end_instance);
-				}
-			}
-			if(write_cotinue_waite == true)
-				goto write_endthis;
-			m_wait_progress.SetPos(100);
-			m_wait_persent.SetWindowTextW(_T("100%"));
-			m_wait_detail.SetWindowTextW(_T("Write descriptors success!"));
-			KillTimer(4);
-			SetTimer(2,2000,NULL);
-			break;
-
-
-write_endthis:
-			this->ShowWindow(SW_SHOW);
-			Sleep(1);
-
 		}
 		break;
 	case 5:

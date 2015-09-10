@@ -51,7 +51,7 @@ public:
 	LRESULT BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Show_Progress(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Show_Panel_String(WPARAM wParam,LPARAM lParam);
-	
+	afx_msg LRESULT Change_Next_Panel(WPARAM wParam,LPARAM lParam);
 //	afx_msg void OnBnClickedButton1();
 
 
@@ -83,7 +83,7 @@ public:
 //static void Init_Service_Handlers(void);
 DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid);
 DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid);
-
+DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid);
 
 
 

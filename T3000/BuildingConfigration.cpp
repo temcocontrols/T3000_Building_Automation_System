@@ -37,7 +37,6 @@ void CBuildingConfigration::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BUILDING_BUTTON_DELETE, m_deleteBuildingButton);
 }
 
-
 BEGIN_MESSAGE_MAP(CBuildingConfigration, CDialogEx)
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_Building_Config_Item)	
 	ON_BN_CLICKED(IDC_BUILDING_BUTTON_ADD, &CBuildingConfigration::OnBnClickedBuildingButtonAdd)
@@ -58,21 +57,19 @@ END_MESSAGE_MAP()
 BOOL CBuildingConfigration::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+	Deal_BuildingPath();
 	m_building_pCon.CreateInstance(_T("ADODB.Connection"));
 	m_building_pRs.CreateInstance(_T("ADODB.Recordset"));
 	m_building_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 	GetSerialComPortNumber1(m_szBuildingComs);
 
-
-
 	m_building_config_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	//m_building_config_list.SetExtendedStyle(m_building_config_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_building_config_list.SetExtendedStyle(m_building_config_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_building_config_list.InsertColumn(BC_ITEM, _T(""), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-	m_building_config_list.InsertColumn(BC_MAINNAME, _T("Main Building"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	//m_building_config_list.InsertColumn(BC_SUBNAME, _T("Sub Net"), 0, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_building_config_list.InsertColumn(BC_MAINNAME, _T("Building"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_building_config_list.InsertColumn(BC_PROTOCOL, _T("Protocol"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-	m_building_config_list.InsertColumn(BC_IPADDRESS, _T("IP Address / Domain"), 150, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_building_config_list.InsertColumn(BC_IPADDRESS, _T("IP / Domain / Tel#"), 150, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_building_config_list.InsertColumn(BC_IPPORT, _T("IP Port"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_building_config_list.InsertColumn(BC_COMPORT, _T("COM Port"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 	m_building_config_list.InsertColumn(BC_BAUDRATE, _T("Baud Rate"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -115,7 +112,7 @@ BOOL CBuildingConfigration::PreTranslateMessage(MSG* pMsg)
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
-
+ 
 
 void CBuildingConfigration::Initial_Building_List()
 {
@@ -123,6 +120,12 @@ void CBuildingConfigration::Initial_Building_List()
     CBADO bado;
 	LoadBuildingConfigDB();
 	TraverseFolder(g_strBuildingFolder,m_vecdbfile);
+    for (int i=0;i<(int)m_vecdbfile.size();i++)
+    {
+        int index=m_vecdbfile.at(i).Find(_T("Database"));
+        m_vecdbfile.at(i).Delete(0,index);
+       
+    }
 	Building_Config BCTemp;
 	CStringArray ArrayFileName;
 	BOOL Is_The_Same=TRUE;
@@ -159,7 +162,7 @@ void CBuildingConfigration::Initial_Building_List()
 			   continue;
 			}
 			#if 1 //校驗一下看看是否是Building的Database
-			bado.SetDBPath(m_vecdbfile.at(i));
+			bado.SetDBPath(GetExePath(true)+m_vecdbfile.at(i));
 			bado.OnInitADOConn();
 			if (!bado.IsHaveTable(bado,_T("ALL_NODE")))
 			{
@@ -393,26 +396,26 @@ void CBuildingConfigration::Initial_Building_List()
 			m_building_config_list.SetCellStringList(i, BC_COMPORT, strlist);		
 		}
 
-		for (int x=0;x<BC_COL_NUMBER;x++)
-		{
-			if((i%2)==0)
-				m_building_config_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
-			else
-				m_building_config_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
-		}
+// 		for (int x=0;x<BC_COL_NUMBER;x++)
+// 		{
+// 			if((i%2)==0)
+// 				m_building_config_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
+// 			else
+// 				m_building_config_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
+// 		}
 	}
 
 	int last_new_item = (int)m_BuildNameLst.size();
 	CString temp_cs;
 	temp_cs.Format(_T("%d"),last_new_item + 1);
 	m_building_config_list.InsertItem(last_new_item,_T(""));
-	for (int x=0;x<BC_COL_NUMBER;x++)
-	{
-		if((last_new_item%2)==0)
-			m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR);
-		else
-			m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
-	}
+// 	for (int x=0;x<BC_COL_NUMBER;x++)
+// 	{
+// 		if((last_new_item%2)==0)
+// 			m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR);
+// 		else
+// 			m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
+// 	}
 
 	if(ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_PROTOCOL))
 	{
@@ -558,26 +561,26 @@ void CBuildingConfigration::Fresh_List_Row(){
 			m_building_config_list.SetCellStringList(i, BC_COMPORT, strlist);		
 		}
 
-		for (int x=0;x<BC_COL_NUMBER;x++)
-		{
-			if((i%2)==0)
-				m_building_config_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
-			else
-				m_building_config_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
-		}
+// 		for (int x=0;x<BC_COL_NUMBER;x++)
+// 		{
+// 			if((i%2)==0)
+// 				m_building_config_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR);
+// 			else
+// 				m_building_config_list.SetItemBkColor(i,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
+// 		}
 	}
 
 	int last_new_item = (int)m_BuildNameLst.size();
 	CString temp_cs;
 	temp_cs.Format(_T("%d"),last_new_item + 1);
 	m_building_config_list.InsertItem(last_new_item,_T(""));
-	for (int x=0;x<BC_COL_NUMBER;x++)
-	{
-		if((last_new_item%2)==0)
-			m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR);
-		else
-			m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
-	}
+// 	for (int x=0;x<BC_COL_NUMBER;x++)
+// 	{
+// 		if((last_new_item%2)==0)
+// 			m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR);
+// 		else
+// 			m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
+// 	}
 
 	if(ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_PROTOCOL))
 	{
@@ -689,7 +692,8 @@ void CBuildingConfigration::Update_Building(){
 	try
 	{
 		CString strSql;
-		strSql.Format(_T("update Building set Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s' where Building_Path='%s'  "),BuildingTemp.Protocol,BuildingTemp.IPAddress_Domain,BuildingTemp.IP_Port,BuildingTemp.Comport,BuildingTemp.BaudRate,BuildingTemp.BuildingPath);
+		strSql.Format(_T("update Building set Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s' where Building_Path='%s'  "),
+		BuildingTemp.Protocol,BuildingTemp.IPAddress_Domain,BuildingTemp.IP_Port,BuildingTemp.Comport,BuildingTemp.BaudRate,BuildingTemp.BuildingPath);
 		ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 		 
 	}
@@ -703,6 +707,39 @@ void CBuildingConfigration::Update_Building(){
 
 	  //Fresh_List();
 	//PostMessage(WM_FRESH_DB,0,0);
+}
+void CBuildingConfigration::Deal_BuildingPath(){
+	CADO ado;
+	ado.OnInitADOConn();
+	CString strSql;
+	strSql=_T("select * from Building");
+	ado.m_pRecordset = ado.OpenRecordset(strSql);
+	_variant_t temp_variant;
+	CString pathfull;
+	CString pathnew;
+	try
+	{
+		while(VARIANT_FALSE==ado.m_pRecordset->EndOfFile)
+		{
+			temp_variant=ado.m_pRecordset->GetCollect("Building_Path");//
+			if(temp_variant.vt!=VT_NULL)
+				pathfull=temp_variant;
+			else
+				pathfull.Empty();
+			pathnew=pathfull;
+			int index=pathnew.Find(_T("Database"));
+			pathnew.Delete(0,index);	
+
+			strSql.Format(_T("update Building set Building_Path='%s' where Building_Path='%s'"),pathnew,pathfull);
+			ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			ado.m_pRecordset->MoveNext();	
+		}
+	}
+	catch (...)
+	{
+		AfxMessageBox(_T("Failed"));
+	}
+	ado.CloseConn();
 }
 LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM lParam)
 {
@@ -724,7 +761,13 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 	}
 	if(Changed_SubItem == BC_MAINNAME)
 	{    
-	    LoadBuildingConfigDB();
+        CString IP = m_building_config_list.GetItemText(m_changedRow,BC_IPADDRESS);
+        CString Port = m_building_config_list.GetItemText(m_changedRow,BC_IPPORT);
+        CString ComPort = m_building_config_list.GetItemText(m_changedRow,BC_COMPORT);
+        CString Baudrate = m_building_config_list.GetItemText(m_changedRow,BC_BAUDRATE);
+        CString Protocol = m_building_config_list.GetItemText(m_curRow,BC_PROTOCOL);
+
+	     LoadBuildingConfigDB();
 	     BOOL Is_Changed=FALSE;
 	     CString path=m_building_config_list.GetItemText(Changed_Item,BC_BUILDINGPATH);
 		 if (path.IsEmpty())
@@ -781,11 +824,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 						   {
 						       ado.m_pRecordset->MoveLast();
 
-							   sql.Format(_T("delete * from Building_ALL where Building_Name = '%s' "),cs_temp.GetBuffer());
-							   ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-
-
-							   sql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),cs_temp.GetBuffer(),0);
+							   sql.Format(_T("update Building_ALL set Building_Name = '%s' where Building_Name = '%s' "),cs_temp.GetBuffer(),m_select_text.GetBuffer());
 							   ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
 
 							   sql.Format(_T("update Building set Main_BuildingName = '%s' ,Building_Name = '%s'  where  Building_Path = '%s' "),cs_temp.GetBuffer(),cs_temp.GetBuffer(),path.GetBuffer());
@@ -813,7 +852,8 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 			   CBADO bado;
 			   //修改Building的数据库,也要更新,明天接着做吧..哈哈....完蛋
 #if 1 //校驗一下看看是否是Building的Database
-			   bado.SetDBPath(path);
+               CString BuildingPath = GetExePath(true)+ path; 
+			   bado.SetDBPath(BuildingPath);
 			   bado.OnInitADOConn();
 			   if (!bado.IsHaveTable(bado,_T("ALL_NODE")))
 			   {
@@ -903,16 +943,29 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 				 ::UnlockResource(hGlobal);   
 				 ::FreeResource(hGlobal);
 			 }//
-
-			 BCTemp.b_selected=FALSE;
-			 BCTemp.Sub_NetName=cs_temp;
-			 BCTemp.MainBuildingName=cs_temp;
-			 BCTemp.BuildingPath=filebuildingPath;
-			 BCTemp.Protocol=_T("Auto");
-			 BCTemp.IPAddress_Domain = NO_APPLICATION;
-			 BCTemp.IP_Port = NO_APPLICATION;
-			 BCTemp.Comport = NO_APPLICATION;
-			 BCTemp.BaudRate = NO_APPLICATION;
+             int index=filebuildingPath.Find(_T("Database"));
+             filebuildingPath.Delete(0,index);
+         
+             BCTemp.b_selected=FALSE;
+             BCTemp.Sub_NetName=cs_temp;
+             BCTemp.MainBuildingName=cs_temp;
+             BCTemp.BuildingPath=filebuildingPath;
+             if(Protocol.CompareNoCase(_T("Auto"))==0||Protocol.IsEmpty())
+             {
+                 BCTemp.Protocol=_T("Auto");
+                 BCTemp.IPAddress_Domain = NO_APPLICATION;
+                 BCTemp.IP_Port = NO_APPLICATION;
+                 BCTemp.Comport = NO_APPLICATION;
+                 BCTemp.BaudRate = NO_APPLICATION;
+             }
+             else
+             {
+                 BCTemp.Protocol=Protocol;
+                 BCTemp.IPAddress_Domain = IP;
+                 BCTemp.IP_Port = Port;
+                 BCTemp.Comport =ComPort ;
+                 BCTemp.BaudRate = Baudrate;
+             } 
 			 
 			 Is_The_Same=FALSE;
 #if 1
@@ -946,7 +999,12 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 						 sql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),BCTemp.MainBuildingName.GetBuffer(),0);
 						 ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
 
-						 sql.Format(_T("Insert into Building(Main_BuildingName,Building_Name,Protocal,Default_SubBuilding,Building_Path) values('%s','%s','%s','%d','%s')"),BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),BCTemp.Protocol.GetBuffer(),0,BCTemp.BuildingPath.GetBuffer());
+						 sql.Format(_T("Insert into Building(Main_BuildingName,Building_Name,Protocal,Default_SubBuilding,Building_Path,Com_Port,Ip_Address,IP_Port,Braudrate) values('%s','%s','%s','%d','%s' ,'%s','%s','%s','%s')"),
+                         BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),BCTemp.Protocol.GetBuffer(),0,BCTemp.BuildingPath.GetBuffer(),
+                         BCTemp.Comport,
+                         BCTemp.IPAddress_Domain,
+                         BCTemp.IP_Port,
+                         BCTemp.BaudRate);
 						 ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
 					 }
 					 else
@@ -979,13 +1037,13 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 				 CString temp_cs;
 				 temp_cs.Format(_T("%d"),last_new_item + 1);
 				 m_building_config_list.InsertItem(last_new_item,_T(""));
-				 for (int x=0;x<BC_COL_NUMBER;x++)
-				 {
-					 if((last_new_item%2)==0)
-						 m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR);
-					 else
-						 m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
-				 }
+// 				 for (int x=0;x<BC_COL_NUMBER;x++)
+// 				 {
+// 					 if((last_new_item%2)==0)
+// 						 m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR);
+// 					 else
+// 						 m_building_config_list.SetItemBkColor(last_new_item,x,LIST_ITEM_DEFAULT_BKCOLOR_GRAY);		
+// 				 }
 
 				 if(ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_PROTOCOL))
 				 {
@@ -1031,13 +1089,13 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 			
 				
   			 m_building_config_list.SetItemText(Changed_Item,BC_BUILDINGPATH,filebuildingPath);
-  			 m_building_config_list.SetItemText(Changed_Item,BC_PROTOCOL,_T("Auto"));
+  			 m_building_config_list.SetItemText(Changed_Item,BC_PROTOCOL,BCTemp.Protocol);
 
 
-			 m_building_config_list.SetItemText(Changed_Item,BC_IPADDRESS,NO_APPLICATION);
-			 m_building_config_list.SetItemText(Changed_Item,BC_IPPORT,NO_APPLICATION);
-			 m_building_config_list.SetItemText(Changed_Item,BC_COMPORT,NO_APPLICATION);
-			 m_building_config_list.SetItemText(Changed_Item,BC_BAUDRATE,NO_APPLICATION);
+			 m_building_config_list.SetItemText(Changed_Item,BC_IPADDRESS,BCTemp.IPAddress_Domain);
+			 m_building_config_list.SetItemText(Changed_Item,BC_IPPORT,BCTemp.IP_Port);
+			 m_building_config_list.SetItemText(Changed_Item,BC_COMPORT,BCTemp.Comport);
+			 m_building_config_list.SetItemText(Changed_Item,BC_BAUDRATE,BCTemp.BaudRate);
 
 			 m_building_config_list.SetCellEnabled(Changed_Item,BC_IPADDRESS,0);
 			 m_building_config_list.SetCellEnabled(Changed_Item,BC_IPPORT,0);
@@ -1058,10 +1116,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 		CString ComPort = m_building_config_list.GetItemText(m_changedRow,BC_COMPORT);
 		CString Baudrate = m_building_config_list.GetItemText(m_changedRow,BC_BAUDRATE);
 
-		if (dbpath.IsEmpty())
-		{
-			return 0;
-		}
+		
 	    int protocol_index=-1;
 		for (int z=0;z<(sizeof(Building_Protocol)/sizeof(Building_Protocol[0]));z++)
 		{
@@ -1090,17 +1145,24 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 			m_building_config_list.SetItemText(m_changedRow,BC_BAUDRATE,NO_APPLICATION);
 
 		}
-		//else if( (protocol_index == P_MODBUS_TCP) ||(protocol_index == P_BACNET_IP) ||	(protocol_index == P_REMOTE_DEVICE))
-		else if( protocol_index == INDEX_REMOTE_DEVICE)
+		 else if( (protocol_index == P_MODBUS_TCP) ||(protocol_index == P_BACNET_IP) ||	(protocol_index == INDEX_REMOTE_DEVICE))
+	//	else if( protocol_index == INDEX_REMOTE_DEVICE)
 		{
 			m_building_config_list.SetCellEnabled(Changed_Item,BC_IPADDRESS,1);
 			m_building_config_list.SetCellEnabled(Changed_Item,BC_IPPORT,1);
 
 			m_building_config_list.SetCellEnabled(Changed_Item,BC_COMPORT,0);
 			m_building_config_list.SetCellEnabled(Changed_Item,BC_BAUDRATE,0);
-
-			GetPrivateProfileString(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),_T("192.168.0.3"),IP.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
-			GetPrivateProfileString(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_Port"),_T("10000"),Port.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
+            if (!dbpath.IsEmpty())
+            {
+                GetPrivateProfileString(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_IP"),_T("192.168.0.3"),IP.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
+                GetPrivateProfileString(m_BuildNameLst.at(Changed_Item).MainBuildingName,_T("Remote_Port"),_T("10000"),Port.GetBuffer(MAX_PATH),MAX_PATH,g_achive_device_name_path);
+            }
+			else
+            {
+                  IP = _T("192.168.0.3");
+                  Port = _T("10000");
+            }
 
 			m_building_config_list.SetItemText(m_changedRow,BC_COMPORT,NO_APPLICATION);
 			m_building_config_list.SetItemText(m_changedRow,BC_BAUDRATE,NO_APPLICATION);
@@ -1132,7 +1194,19 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 				m_building_config_list.SetItemText(m_changedRow,BC_BAUDRATE,Baudrate);
 			}
 		}
-		   Update_Building();
+
+        if (!dbpath.IsEmpty())
+        {
+
+             Update_Building();
+           // return 0;
+        }
+        else
+        {
+          return 0;
+        }
+
+		  
 	 
 
 	}
@@ -1150,7 +1224,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 
 		Update_Building();
 	}
-	else if(Changed_SubItem == BC_IPPORT)
+	else if(Changed_SubItem == BC_IPPORT)                                                                                                                                                
 	{
 		if (dbpath.IsEmpty())
 		{
@@ -1266,7 +1340,9 @@ void CBuildingConfigration::LoadBuildingConfigDB()
 			temp_building.BuildingPath=temp_variant;
 		else
 			temp_building.BuildingPath.Empty();
-
+        int index=temp_building.BuildingPath.Find(_T("Database"));
+        temp_building.BuildingPath.Delete(0,index);
+          
 		m_BuildNameLst.push_back(temp_building);
 
 		m_building_pRs->MoveNext();//
@@ -1673,6 +1749,9 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
 			
 			
 			 BCTemp.BuildingPath=strDestFileName;
+             int index= BCTemp.BuildingPath.Find(_T("Database"));
+              BCTemp.BuildingPath.Delete(0,index);
+             
 			 BCTemp.b_selected=FALSE;
 
 			 m_building_config_list.SetItemText(lRow,lCol,strDestFileName);
@@ -1705,15 +1784,18 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
 				 }
 				 if (!Is_The_Same)
 				 {
-					 sql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),BCTemp.MainBuildingName.GetBuffer(),0);
+					 sql.Format(_T("Insert into Building_ALL(Building_Name,Default_Build) values('%s','%d')"),
+                     BCTemp.MainBuildingName.GetBuffer(),0);
 					 ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
 
-					 sql.Format(_T("Insert into Building(Main_BuildingName,Building_Name,Default_SubBuilding,Building_Path) values('%s','%s','%d','%s')"),BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),0,BCTemp.BuildingPath.GetBuffer());
+					 sql.Format(_T("Insert into Building(Main_BuildingName,Building_Name,Default_SubBuilding,Building_Path) values('%s','%s','%d','%s')"),
+                     BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),0,BCTemp.BuildingPath.GetBuffer());
 					 ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
 				 }
 				 else
 				 {
-					 sql.Format(_T("update Building set Building_Path = '%s' ,Building_Name = '%s'  where  Main_BuildingName = '%s' "),BCTemp.BuildingPath.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer());
+					 sql.Format(_T("update Building set Building_Path = '%s' ,Building_Name = '%s'  where  Main_BuildingName = '%s' "),
+                     BCTemp.BuildingPath.GetBuffer(),BCTemp.MainBuildingName.GetBuffer(),BCTemp.MainBuildingName.GetBuffer());
 
 					 ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
 
@@ -1751,49 +1833,49 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
 	}
 	else if(lCol== BC_PROTOCOL)
 	{
-		if ((m_BuildNameLst.size()-1)<lRow)
-		{
-		    m_building_config_list.Set_Edit(FALSE);
-			return;
-		}
+// 		if ((m_BuildNameLst.size()-1)<lRow)
+// 		{
+// 		    m_building_config_list.Set_Edit(FALSE);
+// 			return;
+// 		}
 
 	}
 	else if(lCol == BC_IPADDRESS)
 	{   
 	    
 	    
-		if ((m_BuildNameLst.size()-1)<lRow)
-		{
-			m_building_config_list.Set_Edit(FALSE);
-			return;
-		}
+// 		if ((m_BuildNameLst.size()-1)<lRow)
+// 		{
+// 			m_building_config_list.Set_Edit(FALSE);
+// 			return;
+// 		}
 
 	}
 	else if(lCol == BC_IPPORT)
 	{
-		if ((m_BuildNameLst.size()-1)<lRow)
-		{
-			m_building_config_list.Set_Edit(FALSE);
-			return;
-		}
+// 		if ((m_BuildNameLst.size()-1)<lRow)
+// 		{
+// 			m_building_config_list.Set_Edit(FALSE);
+// 			return;
+// 		}
 
 	}
 	else if(lCol == BC_COMPORT)
 	{
-		if ((m_BuildNameLst.size()-1)<lRow)
-		{
-			m_building_config_list.Set_Edit(FALSE);
-			return;
-		}
+// 		if ((m_BuildNameLst.size()-1)<lRow)
+// 		{
+// 			m_building_config_list.Set_Edit(FALSE);
+// 			return;
+// 		}
 
 	}
 	else if(lCol == BC_BAUDRATE)
 	{
-		if ((m_BuildNameLst.size()-1)<lRow)
-		{
-			m_building_config_list.Set_Edit(FALSE);
-			return;
-		}
+// 		if ((m_BuildNameLst.size()-1)<lRow)
+// 		{
+// 			m_building_config_list.Set_Edit(FALSE);
+// 			return;
+// 		}
 
 	}
 	 
@@ -1973,10 +2055,13 @@ void CBuildingConfigration::OnBuildingconfigDelete()
 		AfxMessageBox(_T("Operator Failed"));
 	}
 	ado.CloseConn();
-	CStringArray  ArrayFileName;
-	SplitCStringA(ArrayFileName,buildingPath,L"\\");
-	m_BuildNameLst.clear();
-	filename=L"";
+    CString PathTemp;
+    PathTemp=GetExePath(true)+buildingPath;
+    buildingPath=PathTemp;
+    CStringArray  ArrayFileName;
+    SplitCStringA(ArrayFileName,buildingPath,L"\\");
+    m_BuildNameLst.clear();
+    filename=L"";
 	for (int i=0;i<ArrayFileName.GetSize()-1;i++)
 	{
 		filename+=ArrayFileName[i];
@@ -1985,6 +2070,37 @@ void CBuildingConfigration::OnBuildingconfigDelete()
 	   //DeleteFile(buildingPath);
 	   DeleteDirectory(filename);
 	   m_building_config_list.DeleteItem(m_curRow);
+       /*    LoadBuildingConfigDB();
+       Initial_Building_List();*/
+       if(ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_PROTOCOL))
+       {
+           ListCtrlEx::CStrList strlist;
+           for (int j=0;j<(int)sizeof(Building_Protocol)/sizeof(Building_Protocol[0]);j++)
+           {
+               strlist.push_back(Building_Protocol[j]);
+           }
+           m_building_config_list.SetCellStringList(m_curRow, BC_PROTOCOL, strlist);		
+       }
+
+       if(ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_BAUDRATE))
+       {
+           ListCtrlEx::CStrList strlist;
+           for (int j=0;j<(int)sizeof(Building_Baudrate)/sizeof(Building_Baudrate[0]);j++)
+           {
+               strlist.push_back(Building_Baudrate[j]);
+           }
+           m_building_config_list.SetCellStringList(m_curRow, BC_BAUDRATE, strlist);		
+       }
+
+       if(ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_COMPORT))
+       {
+           ListCtrlEx::CStrList strlist;
+           for (int j=0;j<m_szBuildingComs.size();j++)
+           {
+               strlist.push_back(m_szBuildingComs.at(j));
+           }
+           m_building_config_list.SetCellStringList(m_curRow, BC_COMPORT, strlist);		
+       }
 	   m_bChanged=TRUE;
 	 // Fresh_List();
 	//Initial_Building_List();

@@ -275,7 +275,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 		GetDlgItem(IDC_MONTHCALENDAR1)->MoveWindow(10,10,680,700);
 
 		m_schedule_day_dlg_hwnd = this->m_hWnd;
-		g_hwnd_now = m_schedule_day_dlg_hwnd;
+		//g_hwnd_now = m_schedule_day_dlg_hwnd;
 
 		SYSTEMTIME StartTime1;
 		StartTime1.wYear = 2015;
@@ -308,7 +308,7 @@ BOOL AnnualRout_InsertDia::OnInitDialog()
 		if(g_invoke_id>=0)
 		{
 			CString temp_cs_show;
-			temp_cs_show.Format(_T("Task ID = %d. Read annual routine schedule Item %d "),g_invoke_id,annual_list_line);
+			temp_cs_show.Format(_T("Read annual routine schedule Item %d "),annual_list_line);
 
 			Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 		}

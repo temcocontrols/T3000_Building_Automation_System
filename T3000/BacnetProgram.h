@@ -16,7 +16,6 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	HICON hIcon;
 	DECLARE_MESSAGE_MAP()
 
 public:
@@ -24,10 +23,8 @@ public:
 	virtual BOOL OnInitDialog();
 
 	void Initial_List();
-	afx_msg void OnBnClickedButtonProgramRead();
 	afx_msg LRESULT Fresh_Program_List(WPARAM wParam,LPARAM lParam);
 	LRESULT ProgramMessageCallBack(WPARAM wParam, LPARAM lParam);
-	afx_msg void OnBnClickedButtonProgramApply();
 //	afx_msg LRESULT  ProgramResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedButtonProgramEdit();
 //	afx_msg void OnLvnItemchangedListProgram(NMHDR *pNMHDR, LRESULT *pResult);
@@ -44,6 +41,7 @@ public:
 	void Reg_Hotkey();
 	void Unreg_Hotkey();
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	afx_msg void OnNMDblclkListProgram(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 	const int PROGRAM_NUM = 0;

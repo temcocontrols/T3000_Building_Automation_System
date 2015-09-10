@@ -82,11 +82,12 @@ void T38AI8AO::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(T38AI8AO, CFormView)
 	ON_CBN_SELCHANGE(IDC_BRANDRATE, &T38AI8AO::OnCbnSelchangeBrandrate)
-	ON_CBN_SELCHANGE(IDC_DELAY, &T38AI8AO::OnCbnSelchangeDelay)
+//	ON_CBN_SELCHANGE(IDC_DELAY, &T38AI8AO::OnCbnSelchangeDelay)
 	ON_EN_KILLFOCUS(IDC_EDIT_NAME, &T38AI8AO::OnEnKillfocusEditName)
 	ON_CBN_SELCHANGE(IDC_RANGECOMBO, &T38AI8AO::OnCbnSelchangeRangecombo)
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_BUTTON_RESET, &T38AI8AO::OnBnClickedButtonReset)
+    ON_EN_KILLFOCUS(IDC_EDIT_RESPONSE_DELAY, &T38AI8AO::OnEnKillfocusEditResponseDelay)
 END_MESSAGE_MAP()
 
 
@@ -322,7 +323,9 @@ void T38AI8AO::InitialDialog(){
 	strTemp.Format(_T("%d"),product_register_value[PIC_VER_NUMBER]);
 	 GetDlgItem(IDC_88PIC)->SetWindowText(strTemp); 
 	 m_brandratebombox.SetCurSel(product_register_value[BAUDRATE]);
-	 m_delaycombox.SetCurSel(product_register_value[RESPONSE_DELAY]);
+	 //m_delaycombox.SetCurSel(product_register_value[RESPONSE_DELAY]);
+     strTemp.Format(_T("%d"),product_register_value[RESPONSE_DELAY]);
+     GetDlgItem(IDC_EDIT_RESPONSE_DELAY)->SetWindowText(strTemp);
 	// Input
 	CString strresult;
 	int regValue;
@@ -565,24 +568,24 @@ void T38AI8AO::OnCbnSelchangeBrandrate()
 }
 
 
-void T38AI8AO::OnCbnSelchangeDelay()
-{bPauseMultiRead=TRUE;
-	int sel=m_delaycombox.GetCurSel();
-	if (product_register_value[RESPONSE_DELAY]!=sel)
-	{
-		int ret=write_one(g_tstat_id,RESPONSE_DELAY,sel);
-		if (ret>0)
-		{
-			product_register_value[RESPONSE_DELAY]=sel;
-			InitialDialog();
-		}
-		else
-		{
-			AfxMessageBox(_T("Fail"));
-		}
-	} 
-	bPauseMultiRead=FALSE;
-}
+//void T38AI8AO::OnCbnSelchangeDelay()
+//{bPauseMultiRead=TRUE;
+//	int sel=m_delaycombox.GetCurSel();
+//	if (product_register_value[RESPONSE_DELAY]!=sel)
+//	{
+//		int ret=write_one(g_tstat_id,RESPONSE_DELAY,sel);
+//		if (ret>0)
+//		{
+//			product_register_value[RESPONSE_DELAY]=sel;
+//			InitialDialog();
+//		}
+//		else
+//		{
+//			AfxMessageBox(_T("Fail"));
+//		}
+//	} 
+//	bPauseMultiRead=FALSE;
+//}
 BEGIN_EVENTSINK_MAP(T38AI8AO, CFormView)
 	ON_EVENT(T38AI8AO, IDC_MSFLEXGRID_INPUT, DISPID_CLICK, T38AI8AO::ClickMsflexgridInput, VTS_NONE)
 	ON_EVENT(T38AI8AO, IDC_MSFLEXGRID_OUTPUT, DISPID_CLICK, T38AI8AO::ClickMsflexgridOutput, VTS_NONE)
@@ -844,4 +847,19 @@ void T38AI8AO::OnBnClickedButtonReset()
 			InitialDialog();
 		}
 	}
+}
+
+
+void T38AI8AO::OnEnKillfocusEditResponseDelay()
+{
+    CString strValue;
+    GetDlgItem(IDC_EDIT_RESPONSE_DELAY)->GetWindowText(strValue);
+    int IntValue;
+    IntValue = _wtoi(strValue);
+    int ret = write_one(g_tstat_id,RESPONSE_DELAY,IntValue);
+    if (ret>0)
+    {
+        product_register_value[RESPONSE_DELAY] = IntValue;
+    }
+    InitialDialog();
 }

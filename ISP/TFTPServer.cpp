@@ -10,7 +10,7 @@
 ////using  std::vector;			//命名空间
 //#include "define.h"
 #pragma  comment(lib,"Iphlpapi.lib")
-
+static bool need_show_device_ip = true;
 UINT _StartSeverFunc(LPVOID pParam);
 extern bool auto_flash_mode;	//用于自动烧写，不要弹框;
 char sendbuf[45];
@@ -477,6 +477,8 @@ bool TFTPServer::IP_is_Local()
 {
 
 	DWORD dwIP = GetLocalIP();
+	if(dwIP == 0)
+		return 1;
 	BYTE byIP[4];
 	for (int i = 0, ic = 3; i < 4; i++,ic--)
 	{
@@ -591,7 +593,7 @@ BOOL TFTPServer::StartServer()
 	int nRet  =0;
 
 	CString strTips;
-
+	need_show_device_ip = true;
 	
 	
 	int nSendNum = m_nDataBufLen;
@@ -645,7 +647,7 @@ BOOL TFTPServer::StartServer()
 
 					SendFlashCommand();
 
-					#if 0 
+					#if 0
 					nRet = RecvBOOTP();
 					if (nRet==-1)
 					{
@@ -728,9 +730,19 @@ BOOL TFTPServer::StartServer()
 			break;
 		case ISP_SEND_DHCP_COMMAND_HAS_LANIP:
 			has_enter_dhcp_has_lanip_block =true;
+			if(need_show_device_ip)
+			{
+				need_show_device_ip = false;
+				strTips.Format(_T("The Device IP is %d.%d.%d.%d"),Byte_ISP_Device_IP[0],Byte_ISP_Device_IP[1],Byte_ISP_Device_IP[2],Byte_ISP_Device_IP[3]);
+				OutPutsStatusInfo(strTips, FALSE);
+				OutPutsStatusInfo(_T(""), FALSE);
+			}
+
 			if((device_jump_from_runtime == true)&&(has_wait_device_into_bootloader == false))
 			{
 				has_wait_device_into_bootloader = true;
+
+
 				OutPutsStatusInfo(_T(""), FALSE);
 				for (int i=0;i<7;i++)
 				{
@@ -753,11 +765,11 @@ BOOL TFTPServer::StartServer()
                 m_StrRev.Format(_T("%C%C%C%C"),Rev[0],Rev[1],Rev[2],Rev[3]);
                 m_StrRev.TrimLeft();
                 m_StrRev.TrimRight();
-// 				if (m_StrFileProductName.Find(m_StrProductName)==-1)
-// 				{
-// 					nRet=0;
-// 					goto StopServer;
-// 				}
+ 				/*if (m_StrFileProductName.Find(m_StrProductName)==-1)
+ 				{
+                    nRet=0;
+                    goto StopServer;
+ 				}*/
 
 
 			}
@@ -810,7 +822,7 @@ BOOL TFTPServer::StartServer()
 	}
 StopServer:
 	WriteFinish(nRet);
-	if (nRet == 1)
+	if(nRet == 1)
 	{
 		if(!Use_Old_protocol)
 		{

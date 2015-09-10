@@ -52,7 +52,7 @@ BOOL CBacnetScheduleTime::OnInitDialog()
 	if(g_invoke_id>=0)
 	{
 		CString temp_cs_show;
-		temp_cs_show.Format(_T("Task ID = %d. Read weekly schedule time from item %d "),g_invoke_id,weekly_list_line);
+		temp_cs_show.Format(_T("Read weekly schedule time from item %d "),weekly_list_line);
 		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,this->m_hWnd,temp_cs_show);
 	}
 #endif

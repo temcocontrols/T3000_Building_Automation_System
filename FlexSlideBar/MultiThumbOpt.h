@@ -48,7 +48,7 @@ public:
 	// non virtual function
 	// 设置Thumb的个数
 	void SetThumbNum(int nThumbNum);
-
+    
 protected:
 
 	// 获得一个Thumb可以移动到的边界值(刻度单位)，即它的相邻的两个Thumb的刻度位置（Position）。（不能重合）
@@ -61,12 +61,15 @@ protected:
 	void MoveToPosition(int nIndex, int nPosition);
 	int SearchThumbPosition(const CPoint& pt);
 	void ReCalcChannelRect();
+    
 protected:
 	
-	vector<int>*							m_szTicMarks;  // 位置与象素对应的数组
+	vector<int>*					m_szTicMarks;  // 位置与象素对应的数组
 
 	vector<CFSBThumb*>				m_szThumb;
 
-	int											m_nFocusThumb;
-	
+	int								m_nFocusThumb;
+   /* int m_nMinPos;
+    int m_nMidPos;
+    int m_nMaxPos;*/
 };
