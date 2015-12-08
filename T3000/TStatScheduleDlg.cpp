@@ -483,7 +483,7 @@ void CTStatScheduleDlg::InitRegisterTable()
 {
 	m_szRegTable.clear();
 
-	if (multi_register_value[7] == PM_TSTAT6 || multi_register_value[7] == PM_TSTAT7|| multi_register_value[7] == PM_TSTAT5i ) // TStat 6
+	if (multi_register_value[7] == PM_TSTAT6 || multi_register_value[7] == PM_TSTAT7||(product_register_value[7] == PM_TSTAT8)|| multi_register_value[7] == PM_TSTAT5i ) // TStat 6
 	{
 		for (int i = 0 ; i < 16; i++)
 		{

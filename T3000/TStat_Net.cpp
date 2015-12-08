@@ -202,6 +202,124 @@ CString CTStat_Net::GetProductName()
 	case PM_CS_RSM_DC:
 		strProductName="CS-RSM-DC";
 		break;
+    case PM_T3PT10 :
+        strProductName="T3-PT10";
+        break;
+    case PM_T3IOA :
+        strProductName="T3-8IOA";
+        break;
+    case PM_T332AI :
+        strProductName="T3-32AI";
+        break;
+    case  PM_T38AI16O :
+        strProductName="T3-8AI160";
+        break;
+    case PM_T38I13O :
+        strProductName="T3-8I13O";
+        break;
+    case PM_T3PERFORMANCE :
+        strProductName="T3-Performance";
+        break;
+    case PM_T34AO :
+        strProductName="T3-4AO";
+        break;
+    case PM_T322AI:
+        strProductName="T3-22AI";
+        break;
+    case PM_T38AI8AO6DO:
+        strProductName="T3-8AI8AO6DO";
+        break;
+    case PM_T36CT :
+        strProductName="T3-6CT";
+        break;
+   
+    case PM_AirQuality:
+        strProductName="Air Quality";
+        break;
+    case PM_PRESSURE:
+        strProductName="Pressure Sensor";
+        break;
+    case PM_HUMTEMPSENSOR:
+        strProductName="TstatHUM";
+        break;
+    case PM_HUM_R:
+        strProductName="HUM-R";
+        break;
+    case PM_TSTAT5A:
+        strProductName="TStat5A";
+        break;
+    case PM_TSTAT5B:
+        strProductName="TStat5B";
+        break;
+    case PM_TSTAT5B2:
+        strProductName="TStat5B2";
+        break;
+    case PM_TSTAT5C:
+        strProductName="TStat5C";
+        break;
+    case PM_TSTAT5D:
+        strProductName="TStat5D";
+        break;
+    case PM_TSTAT5E:
+        strProductName="TStat5E";
+        break;
+    case PM_PM5E:
+        strProductName="PM5E";
+        break;
+   
+    case PM_TSTAT5F:
+        strProductName="TStat5F";
+        break;
+    case PM_TSTAT5G:
+        strProductName="TStat5G";
+        break;
+    case PM_TSTAT5H:
+        strProductName="TStat5H";
+        break;
+    case PM_TSTAT6:
+        strProductName="TStat6";
+        break;
+    case PM_TSTAT5i:
+        strProductName="TStat5i";
+        break;
+    case PM_TSTAT8:
+        strProductName="TStat8";
+        break;
+    case PM_TSTAT7:
+        strProductName="TStat7";
+        break;
+ 
+ 
+        //20120424
+  
+   
+    case  PM_CO2_RS485:
+        strProductName = "CO2";
+        break;
+    case  PM_PRESSURE_SENSOR:
+        strProductName = "Pressure";
+        break;
+
+    case  PM_CO2_NODE:
+        strProductName = "CO2 Node";
+        break;
+    case PM_TSTAT6_HUM_Chamber:
+        strProductName =g_strHumChamber;
+        break;
+
+   
+ 
+   
+   
+ 
+ 
+ 
+ 
+ 
+  
+  
+ 
+    
 	default:
 		strProductName="WIFI";
 

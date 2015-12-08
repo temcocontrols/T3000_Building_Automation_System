@@ -59,6 +59,7 @@ OUTPUT int Write_One_log(TS_UC device_var,TS_US address,TS_US val,unsigned char 
 OUTPUT int read_multi_log(TS_UC device_var,TS_US *put_data_into_here,TS_US start_address,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 OUTPUT int write_multi_log(TS_UC device_var,TS_UC *to_write,TS_US start_address,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 OUTPUT int write_multi_Short_log(TS_UC device_var,TS_US *to_write,TS_US start_address,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here,int* sendDataLength, int* recvDataLength);
+
 CStdioFile*					m_pFile;
 CString						m_strFileINI;
 CString m_strScanNetfilename;
@@ -82,6 +83,6 @@ OUTPUT int MINI_CheckTstatOnline2_a(TS_UC devLo,TS_UC devHi, bool bComm_Type,int
 //--------------------------------
 OUTPUT void SetCommunicationType(int nType);
 OUTPUT int GetCommunicationType(void);
-
-
+OUTPUT void SetResponseTime(TS_US Time);
+OUTPUT int SendData(TS_US *to_write,TS_US length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here,int* sendDataLength, int* recvDataLength,BOOL CHECK_CRC) ;
 #endif

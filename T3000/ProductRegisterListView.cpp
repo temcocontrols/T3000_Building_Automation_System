@@ -249,7 +249,7 @@ void CProductRegisterListView::OnSize(UINT nType, int cx, int cy)
 void CProductRegisterListView::Fresh(void)
 {
     close_com();
-     g_bPauseMultiRead = TRUE;
+    g_bPauseMultiRead = TRUE;
     m_upButton.SetImage(IDB_UPBMP);
     m_downButton.SetImage(IDB_DOWNBMP);
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);

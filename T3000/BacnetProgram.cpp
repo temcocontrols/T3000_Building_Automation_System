@@ -20,6 +20,7 @@ extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure t
 #include "DialogCM5_BacNet.h"
 extern CDialog_Progess *WaitRead_Data_Dlg;
 #include "MainFrm.h"
+
 // CBacnetProgram dialog
 
 IMPLEMENT_DYNAMIC(CBacnetProgram, CDialogEx)
@@ -560,7 +561,7 @@ BOOL CBacnetProgram::PreTranslateMessage(MSG* pMsg)
 
 BOOL CBacnetProgram::OnHelpInfo(HELPINFO* pHelpInfo)
 {  
-	if (g_protocol==PROTOCOL_BACNET_IP){
+	//if (g_protocol==PROTOCOL_BACNET_IP){
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 
@@ -569,10 +570,10 @@ BOOL CBacnetProgram::OnHelpInfo(HELPINFO* pHelpInfo)
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 
 			HH_HELP_CONTEXT, IDH_TOPIC_PROGRAMS);
 		return (hWnd != NULL);
-	}
-	else{
-		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-	}
+// 	}
+// 	else{
+// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+// 	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }
@@ -607,6 +608,8 @@ int GetPrgFullLabel(int index,CString &ret_full_label)
 	ret_full_label.ReleaseBuffer();
 	return 1;
 }
+
+
 
 
 void CBacnetProgram::OnNMDblclkListProgram(NMHDR *pNMHDR, LRESULT *pResult)

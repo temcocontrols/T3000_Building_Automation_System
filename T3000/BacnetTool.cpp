@@ -6,6 +6,8 @@
 #include "BacnetTool.h"
 #include "afxdialogex.h"
 #include "globle_function.h"
+#include "BacnetToolReadProperty.h"
+
 bool read_property_cancel = true;
 int object_instance = 0;
 int object_identifier =0;
@@ -500,7 +502,7 @@ void Localhandler_read_property_ack_tool(
 
 
 
-#include "BacnetToolReadProperty.h"
+
 void CBacnetTool::OnBnClickedButtonBacToolTest2()
 {
 	// TODO: Add your control notification handler code here

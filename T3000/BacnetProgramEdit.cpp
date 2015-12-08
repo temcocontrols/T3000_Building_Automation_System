@@ -12,6 +12,9 @@
 #include "globle_function.h"
 #include "gloab_define.h"
 #include "BacnetProgramSetting.h"
+#include "BacnetProgramDebug.h"
+extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
+CBacnetProgramDebug * Program_Debug_Window = NULL;
 extern int error;
 extern char *pmes;
 //extern int Station_NUM;
@@ -44,6 +47,9 @@ DWORD prg_command_color;
 DWORD prg_function_color;
 CString prg_character_font;
 bool prg_color_change;
+
+extern unsigned int point_number;
+extern unsigned int point_type;
 
 IMPLEMENT_DYNAMIC(CBacnetProgramEdit, CDialogEx)
 
@@ -119,6 +125,7 @@ LRESULT CBacnetProgramEdit::OnHotKey(WPARAM wParam,LPARAM lParam)
 		OnRefresh();
 		Run_once_mutex = false;
 	}
+
 	return 0;
 }
 
@@ -489,6 +496,48 @@ program_part_success:
 		{
 			CString temp_string;
 			temp_string.Format(_T("Resource Compile succeeded.\r\nTotal size 2000 bytes.\r\nAlready used %d"),bac_program_size);
+
+
+			
+			CTime temp_time = CTime::GetCurrentTime();
+			CString str_g_serialNum;
+			CString str_txt_file = g_achive_folder_temp_txt ;
+			str_g_serialNum.Format(_T("%u_prg%d"),g_serialNum,program_list_line + 1);
+			CString temp_time_format = temp_time.Format(_T("%y_%m_%d %H_%M_%S"));
+			str_txt_file = str_txt_file + _T("\\") + str_g_serialNum + _T("    ") + temp_time_format + _T(".txt");
+			CString Write_Buffer;
+			CString FilePath;
+			FilePath=str_txt_file;
+			CFileFind temp_find;
+
+
+			GetDlgItemText(IDC_RICHEDIT2_PROGRAM,Write_Buffer);
+			CString temp_write_buf;
+			temp_write_buf = Write_Buffer;
+			temp_write_buf.Trim();
+			if((temp_write_buf.GetLength() != 0) && (program_string.CompareNoCase(Write_Buffer) != 0))
+			{
+				char*     readytowrite;
+				int    iTextLen;
+				iTextLen = WideCharToMultiByte( CP_ACP,0,Write_Buffer,-1,NULL,0,NULL,NULL );
+				readytowrite = new char[iTextLen + 1];
+				memset( ( void* )readytowrite, 0, sizeof( char ) * ( iTextLen + 1 ) );
+				::WideCharToMultiByte( CP_ACP,0,Write_Buffer,-1,readytowrite,iTextLen,NULL,NULL );
+
+
+
+				CFile file(FilePath,CFile::modeCreate |CFile::modeReadWrite |CFile::modeNoTruncate);
+				file.SeekToEnd();
+				int write_length = strlen(readytowrite);
+				file.Write(readytowrite,write_length + 1);
+				file.Flush();
+				file.Close();
+				delete[] readytowrite;
+			}
+
+
+
+
 			MessageBox(temp_string);
 		}
 
@@ -723,17 +772,17 @@ dlg_part_success:
 BOOL CBacnetProgramEdit::OnHelpInfo(HELPINFO* pHelpInfo)
 {
 	// TODO: Add your message handler code here and/or call default
-	if (g_protocol==PROTOCOL_BACNET_IP){
+	//if (g_protocol==PROTOCOL_BACNET_IP){
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle,theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		else
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile,HH_HELP_CONTEXT, IDH_TOPIC_EXPORT_TO_BITMAPS);
 		return (hWnd != NULL);
-	}
-	else{
-		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-	}
+// 	}
+// 	else{
+// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+// 	}
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }
 
@@ -748,6 +797,82 @@ void CBacnetProgramEdit::OnProgramIdeSettings()
 		UpdateDataProgramText();
 		prg_color_change = false;
 		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(0, 0); //操作完成后还原现场;
+	}
+
+}
+
+void CBacnetProgramEdit::Bacnet_Show_Debug()
+{
+	CString Select_string;
+	Select_string = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSelText();
+	Select_string.Trim();
+
+	if(Select_string.GetLength() == 0 )
+	{
+		MessageBox(_T("No Character selected .Please select label"),_T("Notice"),MB_OK);
+		return;
+	}
+
+	if(Select_string.GetLength() > 10 )
+	{
+		return;
+	}
+
+	
+
+
+	char temp_point[20];
+	memset(temp_point,0,20);
+	WideCharToMultiByte( CP_ACP, 0, Select_string.GetBuffer(), -1, temp_point, 20, NULL, NULL );
+
+	int temp_number=-1;
+	byte temp_value_type = -1;
+	byte temp_point_type=-1;
+	int temp_panel = -1;
+	int temp_net = -1;
+	int k=0;
+	unsigned char sub_panel = -1;
+	char * tempcs=NULL;
+	tempcs = ispoint_ex(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,sub_panel,Station_NUM,&k);
+	if(tempcs == NULL)
+		return ;
+	point_number = temp_number - 1;
+	point_type = temp_point_type;
+
+	switch(point_type)
+	{
+	case 0:
+		{
+			if(point_number >= BAC_OUTPUT_ITEM_COUNT)
+				break;
+		}
+	case 1:
+		{
+			if(point_number >= BAC_INPUT_ITEM_COUNT)
+				break;
+		}
+	case 2:
+		{
+			if(point_number >= BAC_VARIABLE_ITEM_COUNT)
+				break;
+
+			if(Program_Debug_Window != NULL)
+			{
+				delete Program_Debug_Window;
+				Program_Debug_Window = NULL;
+			}
+			if(Program_Debug_Window ==NULL)
+			{
+				Program_Debug_Window = new CBacnetProgramDebug;
+				Program_Debug_Window->Create(IDD_DIALOG_BACNET_PROGRAM_DEBUG, this);
+			}
+			Program_Debug_Window->Initial_List(point_type);
+			Program_Debug_Window->SetWindowTextW(Select_string);
+			Program_Debug_Window->ShowWindow(TRUE);
+		}
+		break;
+	default:
+		break;
 	}
 
 }
@@ -830,3 +955,19 @@ void CBacnetProgramEdit::SetBackFont()
 	((CRichEditCtrl*)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetDefaultCharFormat(cf); 
 
 };
+
+
+BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_INSERT) 
+	{
+		Run_once_mutex = true;
+		Bacnet_Show_Debug();
+		Run_once_mutex = false;
+		return TRUE;
+	}
+
+
+	return CDialogEx::PreTranslateMessage(pMsg);
+}

@@ -33,14 +33,15 @@ public:
 	enum XASIX_TIME
 	{ 
 		TIME_ONE_MINUTE = 1 ,
-		TIME_TEN_MINUTE = 2 ,
-		TIME_ONE_HOUR = 3	,
-		TIME_FOUR_HOUR = 4	,
-		TIME_TWELVE_HOUR = 5,
-		TIME_ONE_DAY = 6	,
-		TIME_FOUR_DAY = 7	
+		TIME_FIVE_MINUTE = 2,
+		TIME_TEN_MINUTE = 3 ,
+		TIME_ONE_HOUR = 4	,
+		TIME_FOUR_HOUR = 5	,
+		TIME_TWELVE_HOUR = 6,
+		TIME_ONE_DAY = 7	,
+		TIME_FOUR_DAY = 8	
 	};
-
+#define TIME_USER_DEFINE   100
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -54,7 +55,7 @@ public:
 	void Create_Line_Point();
 	void SetXaxisTime(unsigned long nstarttime,unsigned long nendtime);
 	void SetXaxisStartTime(unsigned long nstarttime);//只设置开始时间，x的结束时间由 m_time_selected 去计算;
-	void SetYaxisValue(int nlowvalue,int nhighvalue);
+	void SetYaxisValue(float nlowvalue,float nhighvalue);
 	void SetXaxisScale(int nxscale);
 	void SetYaxisScale(int nyscale);//设置X Y轴有几个刻度;
 	void SetAnalogOrignPoint(PointF npoint);
@@ -74,7 +75,7 @@ public:
 	bool TimeValueToPoint(unsigned long ntime , int nvalue ,PointF &returnpoint);
 	bool DigitalTimeValueToPoint(unsigned long ntime , int nvalue ,PointF &returnpoint);
 
-	void InitialParameter(int base_time,int y_min_value = 0,int y_max_value = 100000);
+	void InitialParameter(int base_time,float y_min_value = 0,float y_max_value = 100000);
 	//void InitialParameter(int base_time);
 	void GetAnalogOrignPoint(PointF &returnpoint);
 	void GetDigitalOrignPoint(PointF &returnpoint);
@@ -89,7 +90,6 @@ public:
 	int Get_Time_Scale();
 	int Search_data_from_db();
 
-	void Reset_X_Time_Parameter();
 	void Get_Input_Unit();
 	void Reset_X_Y_Parameter();
 public:
@@ -97,8 +97,8 @@ public:
 	bool StaticShow[15];
 	long m_starttime;
 	long m_endtime;
-	int m_lowvalue;
-	int m_highvalue;
+	float m_lowvalue;
+	float m_highvalue;
 	int m_xscale;
 	int m_yscale;
 	PointF m_analogorignpoint;
@@ -112,7 +112,7 @@ public:
 	int m_Digital_Y_HIGHT;
 protected:
 	int x_axis_total_time ;//x轴 总共 目前的时间;
-	int y_axis_total_value;//y轴 总共 目前最大值 减最小值;
+	float y_axis_total_value;//y轴 总共 目前最大值 减最小值;
 BOOL InitDC();
 
 
@@ -145,6 +145,8 @@ public:
 	afx_msg void OnZoomout();
 	
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	afx_msg void OnTimebaseCustomerdefine();
+	afx_msg void OnTimebase5minutes();
 };
 	void Delete_Ram_Data();
 //const int _6_min = 1;

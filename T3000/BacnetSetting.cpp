@@ -38,6 +38,7 @@ void CBacnetSetting::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_DYNDNS_PASSWORD, m_dyndns_password);
 	DDX_Control(pDX, IDC_EDIT_DYNDNS_DOMAIN, m_dyndns_domain);
 	DDX_Control(pDX, IDC_EDIT_TIME_UPDATE, m_edit_ddns_update_time);
+	DDX_Control(pDX, IDC_EDIT_SETTING_PORT, m_edit_port);
 }
 
 
@@ -79,6 +80,8 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_DDNS_SERVER, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingDdnsServer)
 	ON_EN_KILLFOCUS(IDC_EDIT_TIME_UPDATE, &CBacnetSetting::OnEnKillfocusEditTimeUpdate)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_TIME_ZONE, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeZone)
+	ON_BN_CLICKED(IDC_CHECK_SETTING_PAP, &CBacnetSetting::OnBnClickedCheckSettingPap)
+	ON_EN_KILLFOCUS(IDC_EDIT_SETTING_PORT, &CBacnetSetting::OnEnKillfocusEditSettingPort)
 END_MESSAGE_MAP()
 
 
@@ -326,6 +329,29 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(true);
 				((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(true);
 				((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(true);
+			}
+
+
+			//版本大于38.6 的才有在setting 里面改port 的功能
+			if(Device_Basic_Setting.reg.pro_info.firmware0_rev_main * 10 +Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 386)
+			{
+				CString temp_port;
+				temp_port.Format(_T("%u"),Device_Basic_Setting.reg.modbus_port);
+				m_edit_port.EnableWindow(true);
+				m_edit_port.SetWindowTextW(temp_port);
+			}
+			else
+			{
+				m_edit_port.EnableWindow(false);
+			}
+
+			if(Device_Basic_Setting.reg.en_plug_n_play == 1)
+			{
+				((CButton *)GetDlgItem(IDC_CHECK_SETTING_PAP))->SetCheck(true);
+			}
+			else
+			{
+				((CButton *)GetDlgItem(IDC_CHECK_SETTING_PAP))->SetCheck(false);
 			}
 
 			if(Device_Basic_Setting.reg.en_dyndns == 0)
@@ -623,7 +649,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 
 			if((Device_Basic_Setting.reg.mini_type == BIG_MINIPANEL) || 
 				(Device_Basic_Setting.reg.mini_type == SMALL_MINIPANEL) ||
-				(Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL))
+				(Device_Basic_Setting.reg.mini_type == TINY_MINIPANEL) || 
+				(Device_Basic_Setting.reg.mini_type == PRODUCT_CM5))
 			{
 				temp_hw_version.Format(_T("%d"),Device_Basic_Setting.reg.pro_info.harware_rev);
 				temp_pic_version.Format(_T("%d"),Device_Basic_Setting.reg.pro_info.frimware1_rev);
@@ -731,7 +758,8 @@ BOOL CBacnetSetting::PreTranslateMessage(MSG* pMsg)
 			(temp_focus_id == IDC_EDIT_DYNDNS_USER_NAME) ||
 			(temp_focus_id == IDC_EDIT_DYNDNS_PASSWORD) ||
 			(temp_focus_id == IDC_EDIT_DYNDNS_DOMAIN) ||
-			(temp_focus_id == IDC_EDIT_TIME_UPDATE))
+			(temp_focus_id == IDC_EDIT_TIME_UPDATE) ||
+			(temp_focus_id == IDC_EDIT_SETTING_PORT))
 		{
 			GetDlgItem(IDC_BUTTON_BAC_TEST)->SetFocus();
 		}
@@ -1344,4 +1372,52 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeZone()
 	temp_task_info = temp_task_info + temp_string;
 	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
 
+}
+
+
+void CBacnetSetting::OnBnClickedCheckSettingPap()
+{
+	// TODO: Add your control notification handler code here
+		CString temp_task_info;
+		if(Device_Basic_Setting.reg.en_plug_n_play != 1)
+		{
+			Device_Basic_Setting.reg.en_plug_n_play = 1;
+			temp_task_info.Format(_T("Enable Plug And Play "));
+		}
+		else
+		{
+			Device_Basic_Setting.reg.en_plug_n_play = 0;
+			temp_task_info.Format(_T("Disable Plug And Play "));
+		}
+
+		Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
+}
+
+
+void CBacnetSetting::OnEnKillfocusEditSettingPort()
+{
+	// TODO: Add your control notification handler code here
+	CString temp_cstring;
+	m_edit_port.GetWindowTextW(temp_cstring);
+	int temp_port = _wtoi(temp_cstring);
+	if((temp_port >0) && (temp_port <65535) && (temp_port != Device_Basic_Setting.reg.modbus_port))
+	{
+		CString temp_warning;
+		temp_warning.Format(_T("Do you really want to change the modbus port to %u ?"),temp_port);
+		if(IDYES == MessageBox(temp_warning,_T("Notoce"),MB_YESNO))
+		{
+			unsigned short old_port = Device_Basic_Setting.reg.modbus_port;	//写之前先保存起来；写失败 恢复原值;
+			Device_Basic_Setting.reg.modbus_port = (unsigned short)temp_port;
+			if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) <= 0)
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change port failed!"));
+				Device_Basic_Setting.reg.modbus_port = old_port;
+				PostMessage(WM_FRESH_CM_LIST,READ_SETTING_COMMAND,NULL);
+			}
+			else
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change port success!"));
+			}
+		}
+	}
 }

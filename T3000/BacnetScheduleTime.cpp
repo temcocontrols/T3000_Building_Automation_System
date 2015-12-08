@@ -37,6 +37,7 @@ BEGIN_MESSAGE_MAP(CBacnetScheduleTime, CDialogEx)
 		ON_NOTIFY(NM_KILLFOCUS, IDC_DATETIMEPICKER1_SCHEDUAL, &CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual)
 		ON_WM_TIMER()
 		ON_WM_CLOSE()
+		ON_BN_CLICKED(IDC_BUTTON_SCHEDULE_COPY_BTN, &CBacnetScheduleTime::OnBnClickedCopyMon_Fri)
 END_MESSAGE_MAP()
 
 
@@ -293,6 +294,26 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
 
 	*pResult = 0;
 }
+
+void CBacnetScheduleTime::OnBnClickedCopyMon_Fri()
+{
+	for (int i=1;i<5;i++)
+	{
+		for (int j=0;j<8;j++)
+		{
+			m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[j][i].time_hours = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[j][0].time_hours;
+			m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[j][i].time_minutes = m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[j][0].time_minutes;
+		}
+	}
+	PostMessage(WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
+
+	CString temp_task_info;
+	temp_task_info.Format(_T("Write Schedule Time "));
+	Post_Write_Message(g_bac_instance,WRITETIMESCHEDULE_T3000,weekly_list_line,weekly_list_line,WEEKLY_SCHEDULE_SIZE,BacNet_hwd,temp_task_info);
+
+
+}
+
 
 
 void CBacnetScheduleTime::OnTimer(UINT_PTR nIDEvent)

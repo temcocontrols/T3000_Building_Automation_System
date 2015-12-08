@@ -58,7 +58,7 @@ typedef enum {
 		 READPROGRAMCODE_T3000     = 16,           /* read program code   */
 		 READGROUPELEMENTS_T3000   = 19,           /* read group elements */
 		 READPOINTINFOTABLE_T3000  = 24,           /* read pointinfo table*/
-		 UPDATEMEMMONITOR_T3000    = 23,           /* read monitor updates*/
+		
 		 READMONITORDATA_T3000     = 22,           /* read monitor data   */
 		 READINDIVIDUALPOINT_T3000 = 20,           /* read individual point*/
 		 READGROUPELEMENT_T3000    = 25,           /* read point info      */
@@ -66,6 +66,7 @@ typedef enum {
 		 CLEARPANEL_T3000          = 28,           /* clear panel          */
 		 SEND_ALARM_COMMAND        = 32,
 		 READTSTAT_T3000		   = 33,
+		 READANALOG_CUS_TABLE_T3000    = 34,           /* read monitor updates*/
 		 READ_REMOTE_POINT         = 40,
 
 
@@ -125,8 +126,7 @@ typedef enum {
 		 READSTATUSWRITEFLASH_COMMAND = 120,
 		 RESTARTMINI_COMMAND       = 121,
 		 WRITEPRGFLASH_COMMAND     = 122,
-		 OPENSCREEN_COMMAND        = 123,
-		 SUB_WRITE_COMMAND	       = 134,
+		 WRITEANALOG_CUS_TABLE_T3000	       = 134,
 		 WRITE_REMOTE_POINT         = 140,
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
@@ -720,6 +720,7 @@ typedef union
 		 uint16_t mstp_network_number;
 		 uint8_t BBMD_EN;
 		 uint8_t sd_exist;  // 1 -no    2- yes
+		 unsigned short modbus_port;
 	}reg;
 }Str_Setting_Info;
 
@@ -911,7 +912,7 @@ typedef struct
 typedef struct	//用来存储data log 的结构;
 {
 	uint8_t index;   // monitor
-	int32_t time;
+	unsigned int time;
 	Point_Net point;
 	int32_t value;
 	uint16_t mark;  // 0d 0a  end mark
@@ -930,6 +931,22 @@ typedef union
 
 	}reg;
 }Str_MISC;
+
+
+typedef struct
+{
+	unsigned short value;         /* (2 bytes; ) */
+	int unit;         /* (4 bytes; ) */
+
+} Tbl_point;     /* (size = 6 bytes); */
+
+typedef struct
+{
+	char table_name[9];
+	Tbl_point  dat[16];
+
+} Str_table_point;
+
 
 
 

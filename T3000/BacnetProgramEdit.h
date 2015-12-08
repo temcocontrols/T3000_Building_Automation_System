@@ -47,10 +47,12 @@ public:
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	void SetRicheditFont(long nStartchar,long nEndchar,DWORD nColor);
 	afx_msg void OnProgramIdeSettings();
+	void Bacnet_Show_Debug();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	void UpdateDataProgramText();
 	void GetColor();
 	void SetBackFont();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 

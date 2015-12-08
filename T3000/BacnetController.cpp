@@ -1130,7 +1130,7 @@ int GetPidValue(int index,CString &Auto_M,CString &persend_data)
 BOOL BacnetController::OnHelpInfo(HELPINFO* pHelpInfo)
 { 
 
-	if (g_protocol==PROTOCOL_BACNET_IP){
+	//if (g_protocol==PROTOCOL_BACNET_IP){
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 			
@@ -1139,10 +1139,10 @@ BOOL BacnetController::OnHelpInfo(HELPINFO* pHelpInfo)
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
 			HH_HELP_CONTEXT, IDH_TOPIC_PID);
 		return (hWnd != NULL);
-	}
-	else{
-		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-	}
+// 	}
+// 	else{
+// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+// 	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

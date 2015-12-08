@@ -515,7 +515,7 @@ void T332AI::Fresh()
 	float progress;
 	if (is_connect())
 	{  
-		CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
+		/*CDialog_Progess* pDlg = new CDialog_Progess(this,1,100);
 		pDlg->Create(IDD_DIALOG10_Progress, this);
 		pDlg->ShowProgress(0,0);
 		pDlg->ShowWindow(SW_SHOW);
@@ -535,7 +535,7 @@ void T332AI::Fresh()
 		pDlg->ShowWindow(SW_HIDE);
 		if(pDlg!=NULL)
 		{delete pDlg;
-		pDlg=NULL;}
+		pDlg=NULL;}*/
 
 		Initial_RegisterList();
 		InitialDialog();
@@ -752,6 +752,30 @@ void T332AI::OnEnKillfocusEditResponseDelay()
     if (ret>0)
     {
         product_register_value[RESPONSE_DELAY] = IntValue;
+        AfxMessageBox (_T("OK"));
+    }
+    else
+    {
+        AfxMessageBox (_T("Failure!"));
     }
     InitialDialog();
+}
+
+
+BOOL T332AI::PreTranslateMessage(MSG* pMsg)
+{
+    // TODO: Add your specialized code here and/or call the base class
+    if(pMsg->message == WM_KEYDOWN  )
+    {
+        if(pMsg->wParam == VK_RETURN)
+        {
+            CWnd *temp_focus=GetFocus();	//Maurice require ,click enter and the cursor still in this edit or combobox.
+            GetDlgItem(IDC_EDIT1_TEST)->SetFocus();
+            temp_focus->SetFocus();
+
+            return 1;
+        }
+    }
+
+    return CFormView::PreTranslateMessage(pMsg);
 }

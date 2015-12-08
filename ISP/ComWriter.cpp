@@ -1442,23 +1442,22 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
     }
     ii=0;
     do{
-        if(ii<RETRY_TIMES)
-        {
-            if(-2==Write_One(m_ID,12,section))
-                ii++;
-
-        }
+ 
+         if(Write_One(m_ID,12,section)<0)
+         {       ii++;
+         }
         else
         {
-            return -8;//error -8
+              ii=0;
+              break;
         }
-    }while(ii);
+    }while(ii<RETRY_TIMES);
     if (ii >= RETRY_TIMES)
     {
         CString str;
         str.Format(_T("Write 12 = %d Failed"),section);
         AfxMessageBox(str);
-        return 0;
+        return -8;
 
     }
     //	while(ii<=the_max_register_number_parameter)
@@ -1479,42 +1478,50 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
         srtInfo.Format(_T("|ID %d: Programming lines %d to %d.(%d%%)"),m_ID,the_max_register_number_parameter_Finished+ii,the_max_register_number_parameter_Finished+ii+128,persentfinished);
         pWriter->OutPutsStatusInfo(srtInfo, TRUE);
         do{
-            if(itemp<RETRY_TIMES) 
-            {
+         /*   if(itemp<RETRY_TIMES) 
+            {*/
                 //ii+0x8000
-                if(-2==write_multi(m_ID,&register_data[ii],ii,128))//to write multiple 128 bytes
-                    itemp++;
-
-            }
-            else
-            {
-                //srtInfo.Format(_T("Communication was interrupted.Tryiny connect agina!"));
-                //pWriter->OutPutsStatusInfo(srtInfo, TRUE);
-                Sleep(5000);//如果 5次失败，则 等待5s后在开始继续续传2次。
-
-                if(itemp<RETRY_TIMES+3)
-                {
-                    if(-2==write_multi(m_ID,&register_data[ii],ii,128))//to write multiple 128 bytes
-                        itemp++;
-
-                }
+                if(write_multi(m_ID,&register_data[ii],ii,128)<0)//to write multiple 128 bytes
+                  {itemp++;  }
                 else
                 {
-                    //AfxMessageBox("update was interrupted!\nPlease verify connection.");
-                    //close_com();
-                    return -8;//the com connection is wrong! error -8
+                    itemp=0;
+                    break;
                 }
+               
 
-            }
-        }
-        while(itemp);
+       /*     }*/
+           
+            
+        }while(itemp<RETRY_TIMES);
+
+
+       
+            //srtInfo.Format(_T("Communication was interrupted.Tryiny connect agina!"));
+            //pWriter->OutPutsStatusInfo(srtInfo, TRUE);
+//             Sleep(5000);//如果 5次失败，则 等待5s后在开始继续续传2次。
+// 
+//             if(itemp<RETRY_TIMES+3)
+//             {
+//                 if(write_multi(m_ID,&register_data[ii],ii,128)<0)//to write multiple 128 bytes
+//                     itemp++;
+// 
+//             }
+//             else
+//             {
+// 
+//                 return -8; 
+//             }
+
+        
+
 
         if (itemp >= RETRY_TIMES)
         {
             CString str;
             str.Format(_T("Write Flash ID = %d To = 128*%d "),m_ID,ii);
             AfxMessageBox(str);
-            return 0;
+            return -8; 
 
         }
 
@@ -1698,14 +1705,14 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 			   int nnn_ret = 0;
 			   do 
 			   {
-				   nnn_ret  = read_one(pWriter->m_szMdbIDs[i],11);
-				   if(nnn_ret > 1)
-					   break;
-				   Sleep(1000);
-				   re_count ++;
-				   if(re_count == 15)
-					   break;
-			   } while (nnn_ret > 1);
+                   nnn_ret  = read_one(pWriter->m_szMdbIDs[i],11);
+                   if(nnn_ret > 1)
+                       break;
+                   Sleep(1000);
+                   re_count ++;
+                   if(re_count == 15)
+                       break;
+               } while (nnn_ret > 1);
 
 			  // Sleep(2000);
 			   int ModelID= read_one(pWriter->m_szMdbIDs[i],7,5);
@@ -2166,17 +2173,46 @@ int CComWriter::BeginWirteByTCP()
 {
 	ASSERT(m_szMdbIDs.size() > 0);
 
-//	if (m_nHexFileType == 0)	//Marked by Fance
-//	{
+ 	if (m_nHexFileType == 2&&Is_Ram)	//Marked by Fance
+    {
+        if(GetCommunicationType()==1)
+        {
+            if(Open_Socket2(m_strIPAddr, m_nIPPort)==false)
+            {
+                CString srtInfo = _T("|Error : Network init failed.");
+                MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
+                //AddStringToOutPuts(_T("Error :The com port is occupied!"));	
+                OutPutsStatusInfo(srtInfo, FALSE);
+                WriteFinish(0);
+                return 0;
+            }
+            else
+            {
+                CString strTemp;
+                //strTemp.Format(_T("COM%d"), m_nComPort);
+                CString strTips = _T("|Connect to ") +  m_strIPAddr + _T(" successful.");
+                OutPutsStatusInfo(strTips, FALSE);
+                // AddStringToOutPuts(strTips);
+                SetCommunicationType(1);
+            }
+        }
+        CString strTips = _T("|Programming device...");
+        OutPutsStatusInfo(strTips);
+        //AddStringToOutPuts(strTips);
+        m_pWorkThread=AfxBeginThread(flashThread_ForExtendFormatHexfile_RAM, this); //create thread,read information
+        ASSERT(m_pWorkThread);	
+    }
+    else
+ 	{
 	
 		//AddStringToOutPuts(strTips);
 
 
 		//m_pWorkThread=AfxBeginThread(run_back_ground_flash_thread, this); //create thread,read information	
-	m_pWorkThread=AfxBeginThread(Flash_Modebus_Device, this); //create thread,read information	
+	   m_pWorkThread=AfxBeginThread(Flash_Modebus_Device, this); //create thread,read information	
 		ASSERT(m_pWorkThread);
-//	}
-
+ 	}
+    
 	return 1;
 }
 
@@ -2207,12 +2243,12 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 		  // pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]);
            int nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
             
-            nRet = Read_One(pWriter->m_szMdbIDs[i],11);
+          /*  nRet = Read_One(pWriter->m_szMdbIDs[i],11);
 				  if (nRet <= 0)
 				  {
 						AfxMessageBox(_T("Fail to enter ISP Mode!"));
 						goto end_isp_flash;
-				  }
+				  }*/
            int m_ID=pWriter->m_szMdbIDs[i];
 			   
 			Sleep(2000);
@@ -2541,14 +2577,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 	   }
 
    #endif
-   
 
-
-		
-		
-		
-		
-		
 		if(nFlashRet > 0) // flash 成功
 		{
 			CString strText;

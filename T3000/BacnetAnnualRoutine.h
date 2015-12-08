@@ -35,7 +35,7 @@ public:
 	virtual void OnCancel();
 	void Reg_Hotkey();
 	void Unreg_Hotkey();
-
+	afx_msg void OnNMDblclkListAnnuleList(NMHDR *pNMHDR, LRESULT *pResult);
 
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	//afx_msg LRESULT AnnualResumeMessageCallBack(WPARAM wParam, LPARAM lParam);

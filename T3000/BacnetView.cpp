@@ -1,10 +1,37 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2015 - 11 - 04
+1.Monitor no sd disk , save the data as temp data.
+
+2015 - 10 - 28
+1. Fix the second monitor doesn't work.
+
+2015 - 10 - 26
+1. Add a feature ,when saving the program file , also save the "txt" file into the temp folder 
+
+2015 - 10 - 22
+1. Fix graphic trend log ,value  .
+
+2015 - 10 - 21
+1. Improve Graphic Y axis value . automatic change the float value and position .
+2. Add Analog input range -> High speed count;
+
+2015 - 10 - 20
+1. Add customer analog range when choose the input range.
+2. Customer can delete trend log data.
+3. Read monitor data can refresh data.
+4. Schedules add a button for copy Monday-Friday data.
+
+2015 - 09 - 14
+1. Fix DI Package and AI
+
 2015 - 09 - 10
 1. Fix NewHumChamber can't write mini panel reg normally.
 2. Show AI package and DI package number in monitor list.
 3. Delete the mode "Graphic / Text" in screen list.
+4. Add lock icon in screen edit window.When lock enabled , we can't move the label.
+   Also double click label can edit the label.
 
 2015 - 09 -09
 Update by Fance
@@ -591,10 +618,10 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 				if(bac_read_all_results)
 				{
 					g_progress_persent = 100;
-					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data success!"));
+					SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data : OK!"));
 					CString temp_file;
 					CString temp_serial;
-					temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
+					temp_serial.Format(_T("%u.prg"),g_selected_serialnumber);
 					temp_file = g_achive_folder + _T("\\") + temp_serial;
 					//SaveBacnetConfigFile(temp_file);
 					SaveBacnetConfigFile_Cache(temp_file);
@@ -1637,6 +1664,12 @@ void CDialogCM5_BacNet::Initial_All_Point()
 		Str_remote_point temp_remote_point;
 		memset(&temp_remote_point,0,sizeof(Str_remote_point));
 		m_remote_point_data.push_back(temp_remote_point);
+	}
+	for (int i=0;i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT;i++)
+	{
+		Str_table_point temp_table_point;
+		memset(&temp_table_point,0,sizeof(Str_table_point));
+		m_analog_custmer_range.push_back(temp_table_point);
 	}
 }
 //__declspec(dllexport) HANDLE	Get_RS485_Handle();
@@ -2745,7 +2778,7 @@ DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid)
 	if(g_bac_read_type == TYPE_ALL)
 	{
 		CString *temp_cstring = new CString;
-		temp_cstring->Format(_T("Read data success!\r\n"));
+		temp_cstring->Format(_T("Read data : OK!\r\n"));
 		PostMessage(BacNet_hwd,WM_SHOW_PANELSTRING,0,(LPARAM)(temp_cstring));
 
 		::PostMessageW(MainFram_hwd,MY_BAC_CONFIG_READ_RESULTS,1,NULL);
@@ -3998,7 +4031,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				{
 					CString temp_file;
 					CString temp_serial;
-					temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
+					temp_serial.Format(_T("%u.prg"),g_selected_serialnumber);
 					temp_file = g_achive_folder + _T("\\") + temp_serial;
 					//SaveBacnetConfigFile(temp_file);
 					SaveBacnetConfigFile_Cache(temp_file);
@@ -4384,7 +4417,7 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			CString temp_device_panel_name;
 			MultiByteToWideChar( CP_ACP, 0, Device_Basic_Setting.reg.panel_name, (int)strlen(Device_Basic_Setting.reg.panel_name)+1,temp_device_panel_name.GetBuffer(MAX_PATH), MAX_PATH );
 			temp_device_panel_name.ReleaseBuffer();
-			if(!temp_device_panel_name.IsEmpty())
+			if((!temp_device_panel_name.IsEmpty()) && (temp_device_panel_name.GetLength() <20))
 			{
 				if(temp_device_panel_name.CompareNoCase(pFrame->m_product.at(selected_product_index).NameShowOnTree) != 0)
 				{

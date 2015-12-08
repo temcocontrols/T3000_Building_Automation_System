@@ -681,8 +681,8 @@ BOOL TFTPServer::StartServer()
 				SetDHCP_Data();
 
 				
-				if(IP_is_Local())//如果是本地的 就用广播的 方式 发送 DHCP
-				{
+				//if(IP_is_Local())//如果是本地的 就用广播的 方式 发送 DHCP
+				//{
 					dhcp_package_is_broadcast = true;
 					BOOL bBroadcast=TRUE;
 					//::sendto(dhcpSock,(char*)pBuffer, nDhcpLen,0,(sockaddr*)&siBroadCast,sizeof(siBroadCast));
@@ -690,8 +690,8 @@ BOOL TFTPServer::StartServer()
 					int send_count = SendUDP_Flash_Socket.SendTo(sendbuf,sizeof(sendbuf),FLASH_UDP_PORT,_T("255.255.255.255"),0);
 					if(send_count <= 0)
 						AfxMessageBox(_T("Send command failed!"));
-				}
-				else
+				//}
+				//else
 				SendUDP_Flash_Socket.SendTo(sendbuf,sizeof(sendbuf),FLASH_UDP_PORT,ISP_Device_IP,0);
 
 				

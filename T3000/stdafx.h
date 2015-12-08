@@ -147,7 +147,7 @@ INPUT int Read_One_log(unsigned char device_var,unsigned short address,unsigned 
 INPUT int Write_One_log(unsigned char device_var,unsigned short address,unsigned short val,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 INPUT int read_multi_log(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
 INPUT int write_multi_log(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
-
+INPUT void SetResponseTime(unsigned short Time);
 //INPUT HANDLE Open_Testo_USB();
 /*INPUT int ReadTestoDeviceData(float reveivevalue[]);*/
 //INPUT SOCKET GetSocketHandle();
@@ -190,6 +190,7 @@ using namespace std;  // Ensure that the namespace is set to std
 #define		WM_REFRESH_BAC_USER_NAME_LIST				WM_USER + 220
 #define		WM_REFRESH_BAC_AT_COMMAND					WM_USER + 221
 #define		WM_REFRESH_BAC_REMOTE_POINT_LIST					WM_USER + 222
+#define		WM_REFRESH_BAC_ANALOGCUSRANGE_LIST					WM_USER + 223
 //#pragma warning(disable:4244)
 //#pragma warning(disable:4018)
 //#pragma warning(disable:4800)

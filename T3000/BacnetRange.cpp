@@ -6,9 +6,13 @@
 #include "BacnetRange.h"
 #include "afxdialogex.h"
 #include "gloab_define.h"
+#include "BacnetAnalogCusRang.h"
+#include "globle_function.h"
+CBacnetAnalogCusRang * bac_analog_window = NULL;
 
 int old_bac_range_number_choose = 0;
 int initial_dialog = 0;
+bool move_window_to_right = true; //点击table 后创建出来的窗体移动到右边去;
 // BacnetRange dialog
 
 IMPLEMENT_DYNAMIC(BacnetRange, CDialogEx)
@@ -63,6 +67,14 @@ BOOL BacnetRange::OnInitDialog()
 	m_show_unit.setFont(24,12,NULL,_T("Arial"));
 	Initial_static();
 	// TODO:  Add extra initialization here
+
+	//bac_analog_window = new CBacnetAnalogCusRang;
+	//bac_analog_window->Create(IDD_DIALOG_BACNET_RANGES_ANALOG_DEF, this);
+	//bac_analog_window->ShowWindow(SW_SHOW);
+
+
+
+
 
 	((CEdit *)GetDlgItem(IDC_EDIT_RANGE_SELECT))->SetFocus();
 	Timer2_handle();
@@ -169,7 +181,7 @@ void BacnetRange::Initial_static()
 		{
 				//GetDlgItem(i)->ShowWindow(true);
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，并调整位置;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left - 420,c1.top + 310,0,0,SWP_NOZORDER|SWP_NOSIZE);
 
@@ -180,7 +192,7 @@ void BacnetRange::Initial_static()
 		{
 			//GetDlgItem(i)->ShowWindow(false);
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，并调整位置;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 25,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
@@ -189,14 +201,14 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，并调整位置;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 25,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
 		}
 
 		CRect c1; 
-		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   //获取控件的位置 ，并调整位置;
 		ScreenToClient(c1);  
 		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->SetWindowPos(NULL,c1.left + 27,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->ShowWindow(true);
@@ -212,7 +224,14 @@ void BacnetRange::Initial_static()
 			//GetDlgItem(i)->ShowWindow(0);
 			GetDlgItem(i)->ShowWindow(false);
 		}
-		GetDlgItem(IDC_RADIO81)->ShowWindow(false);
+
+		for (int i=IDC_RADIO81;i<=IDC_RADIO87;i++)
+		{
+			//GetDlgItem(i)->ShowWindow(0);
+			GetDlgItem(i)->ShowWindow(false);
+
+		}
+
 		
 
 		CRect c3;
@@ -265,7 +284,7 @@ void BacnetRange::Initial_static()
 		{
 			//GetDlgItem(i)->ShowWindow(true);
 			CRect c2; 
-			GetDlgItem(i)->GetWindowRect(c2);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(i)->GetWindowRect(c2);   //获取控件的位置 ，并调整位置;
 			ScreenToClient(c2);  
 			GetDlgItem(i)->SetWindowPos(NULL,c2.left - 400,c2.top - 50,0,0,SWP_NOZORDER|SWP_NOSIZE);
 
@@ -276,7 +295,7 @@ void BacnetRange::Initial_static()
 		{
 			//GetDlgItem(i)->ShowWindow(0);
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，并调整位置;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top ,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
@@ -284,13 +303,13 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)	//Digital Customer
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，并调整位置;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top ,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
 		}
 		CRect c1; 
-		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   //获取控件的位置 ，并调整位置;
 		ScreenToClient(c1);  
 		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->SetWindowPos(NULL,c1.left + 50,c1.top ,0,0,SWP_NOZORDER|SWP_NOSIZE);
 		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->ShowWindow(true);
@@ -306,7 +325,14 @@ void BacnetRange::Initial_static()
 			//GetDlgItem(i)->ShowWindow(0);
 			GetDlgItem(i)->ShowWindow(false);
 		}
-		GetDlgItem(IDC_RADIO81)->ShowWindow(false);
+
+		for (int i=IDC_RADIO81;i<=IDC_RADIO87;i++)
+		{
+			//GetDlgItem(i)->ShowWindow(0);
+			GetDlgItem(i)->ShowWindow(false);
+
+		}
+
 
 
 		CRect c3;
@@ -361,7 +387,7 @@ void BacnetRange::Initial_static()
 		{
 			GetDlgItem(i)->ShowWindow(0);
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，并调整位置;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			((CButton *)GetDlgItem(i))->ShowWindow(1);
@@ -371,14 +397,14 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO73;i<=IDC_RADIO80;i++)
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，并调整位置;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			GetDlgItem(i)->ShowWindow(true);
 		}
 
 		CRect c1; 
-		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->GetWindowRect(c1);   //获取控件的位置 ，并调整位置;
 		ScreenToClient(c1);  
 		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 		GetDlgItem(IDC_STATIC_CUSTOMER_GROUP)->ShowWindow(true);
@@ -391,16 +417,16 @@ void BacnetRange::Initial_static()
 		for (int i=IDC_RADIO54;i<=IDC_RADIO72;i++)
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，并调整位置;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 
 			((CButton *)GetDlgItem(i))->ShowWindow(1);
 		}
-		for (int i=IDC_RADIO81;i<=IDC_RADIO81;i++)
+		for (int i=IDC_RADIO81;i<=IDC_RADIO87;i++)
 		{
 			CRect c1; 
-			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(i)->GetWindowRect(c1);   //获取控件的位置 ，并调整位置;
 			ScreenToClient(c1);  
 			GetDlgItem(i)->SetWindowPos(NULL,c1.left + 50,c1.top,0,0,SWP_NOZORDER|SWP_NOSIZE);
 
@@ -424,7 +450,7 @@ void BacnetRange::Initial_static()
 		GetDlgItem(IDC_STATIC_INPUT_ANALOG_UNITS)->ShowWindow(true);//input
 		//new player,
 		//MoveWindow(Temp_Rect.left,Temp_Rect.top,490,480);
-		MoveWindow(Temp_Rect.left,Temp_Rect.top,580,800);
+		MoveWindow(Temp_Rect.left,Temp_Rect.top,700,800);
 	}
 
 
@@ -526,6 +552,26 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 		{
+			CRect TempRect;
+			GetWindowRect(TempRect);
+			//TRACE(_T("X = %d , y = %d , %d ,%d \r\n") ,TempRect.left,TempRect.top,TempRect.right,TempRect.bottom);
+			//ClientToScreen(TempRect);
+			//TRACE(_T("  = %d ,   = %d , %d ,%d \r\n") ,TempRect.left,TempRect.top,TempRect.right,TempRect.bottom);
+
+			if(bac_analog_window !=NULL)
+			{
+				if(bac_analog_window->m_hWnd !=NULL)
+				{
+					if(move_window_to_right)
+					{
+						bac_analog_window->SetWindowPos(NULL,TempRect.right,TempRect.top,0,0,SWP_NOZORDER|SWP_NOSIZE |SWP_NOACTIVATE);
+						move_window_to_right = false;
+					}
+				}
+			}
+
+
+
 
 			int nfocusid = 0;
 			
@@ -537,7 +583,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 				break;
 
 		
-			if(((nfocusid >= IDC_RADIO54) && (nfocusid <= IDC_RADIO72)) || ((nfocusid == IDC_RADIO81)))
+			if(((nfocusid >= IDC_RADIO54) && (nfocusid <= IDC_RADIO72)) || ((nfocusid >= IDC_RADIO81) && (nfocusid <= IDC_RADIO87)))
 			{
 				bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;
 				click_radio = true;
@@ -624,6 +670,80 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 				{
 					m_input_Analog_select = 19;
 				}
+				if(((CButton *)GetDlgItem(IDC_RADIO82))->GetCheck())
+				{
+					m_input_Analog_select = 20;
+				}
+				if(((CButton *)GetDlgItem(IDC_RADIO83))->GetCheck())
+				{
+					m_input_Analog_select = 21;
+				}
+				if(((CButton *)GetDlgItem(IDC_RADIO84))->GetCheck())
+				{
+					m_input_Analog_select = 22;
+				}
+				if(((CButton *)GetDlgItem(IDC_RADIO85))->GetCheck())
+				{
+					m_input_Analog_select = 23;
+				}
+				if(((CButton *)GetDlgItem(IDC_RADIO86))->GetCheck())
+				{
+					m_input_Analog_select = 24;
+				}
+				if(((CButton *)GetDlgItem(IDC_RADIO87))->GetCheck())
+				{
+					m_input_Analog_select = 25;
+				}
+
+				if((m_input_Analog_select == 20)||
+					(m_input_Analog_select == 21)||
+					(m_input_Analog_select == 22)||
+					(m_input_Analog_select == 23)||
+					(m_input_Analog_select == 24))
+				{
+					static int temp_static_value = 0;
+					if((bac_analog_window == NULL) || (bac_analog_window->m_hWnd == NULL))
+					{
+						bac_analog_window = new CBacnetAnalogCusRang;
+						bac_analog_window->Create(IDD_DIALOG_BACNET_RANGES_ANALOG_DEF, this);
+
+						CRect TempRect1;
+						GetWindowRect(TempRect1);
+						bac_analog_window->SetWindowPos(NULL,TempRect1.right,TempRect1.top,0,0,SWP_NOZORDER|SWP_NOSIZE |SWP_NOACTIVATE);
+
+						bac_analog_window->ShowWindow(SW_SHOW);
+						TRACE(_T("Create Analog window\r\n"));
+
+						int temp_value = 0;
+						temp_value = m_input_Analog_select - 20;
+						analog_range_tbl_line = temp_value;
+						Post_Refresh_Message(g_bac_instance,READANALOG_CUS_TABLE_T3000,temp_value,temp_value,sizeof(Str_table_point),1);
+						temp_static_value = m_input_Analog_select;
+						move_window_to_right = true;
+					}
+					else
+					{
+						if(temp_static_value!= m_input_Analog_select)
+						{
+							int temp_value = 0;
+							temp_value = m_input_Analog_select - 20;
+							analog_range_tbl_line = temp_value;
+							Post_Refresh_Message(g_bac_instance,READANALOG_CUS_TABLE_T3000,temp_value,temp_value,sizeof(Str_table_point),1);
+							temp_static_value = m_input_Analog_select;
+						}
+					}
+
+				}
+				else
+				{
+					if(bac_analog_window!=NULL)
+					{
+						TRACE(_T("Delete Analog window\r\n"));
+						::PostMessage(bac_analog_window->m_hWnd,WM_CLOSE,NULL,NULL);
+						bac_analog_window = NULL;
+					}
+
+				}
 			}
 
 			if(initial_dialog == 3)
@@ -661,7 +781,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						}
 
 							CRect c4;
-							GetDlgItem(IDC_RADIO1 + m_analog_select)->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+							GetDlgItem(IDC_RADIO1 + m_analog_select)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 							ScreenToClient(c4);  
 							m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -693,10 +813,13 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							temp_cs_number.Format(_T("%d"),m_input_Analog_select + 30);
 							GetDlgItem(IDC_EDIT_RANGE_SELECT)->SetWindowTextW(temp_cs_number);
 						}
-						if(m_input_Analog_select==19)
+						//if(m_input_Analog_select==19)
+						if((m_input_Analog_select>=19) && (m_input_Analog_select<=25))
 						{
+							int temp_value;
+							temp_value = m_input_Analog_select - 19;
 							CRect c4;
-							GetDlgItem(IDC_RADIO81)->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+							GetDlgItem(IDC_RADIO81 + temp_value)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 							ScreenToClient(c4);  
 							m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -704,7 +827,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						else
 						{
 							CRect c4;
-							GetDlgItem(IDC_RADIO54 + m_input_Analog_select)->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+							GetDlgItem(IDC_RADIO54 + m_input_Analog_select)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 							ScreenToClient(c4);  
 							m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -740,7 +863,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						}
 
 						CRect c4;
-						GetDlgItem(IDC_RADIO47 + m_output_Analog_select)->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+						GetDlgItem(IDC_RADIO47 + m_output_Analog_select)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 						ScreenToClient(c4);  
 						m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 						m_rang_pic.Invalidate(TRUE);
@@ -766,7 +889,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							bac_range_number_choose = m_digital_select - 11 + 22;
 
 							CRect c6;
-							GetDlgItem(IDC_RADIO73 + bac_range_number_choose - 23)->GetWindowRect(c6);   //获取控件的位置 ，饼调整位置;
+							GetDlgItem(IDC_RADIO73 + bac_range_number_choose - 23)->GetWindowRect(c6);   //获取控件的位置 ，并调整位置;
 							ScreenToClient(c6);  
 							m_rang_pic.SetWindowPos(NULL,c6.left - 40,c6.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -777,7 +900,7 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							bac_range_number_choose = m_digital_select;
 
 							CRect c6;
-							GetDlgItem(IDC_RADIO35 + bac_range_number_choose)->GetWindowRect(c6);   //获取控件的位置 ，饼调整位置;
+							GetDlgItem(IDC_RADIO35 + bac_range_number_choose)->GetWindowRect(c6);   //获取控件的位置 ，并调整位置;
 							ScreenToClient(c6);  
 							m_rang_pic.SetWindowPos(NULL,c6.left - 40,c6.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 							m_rang_pic.Invalidate(TRUE);
@@ -814,7 +937,11 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 							((CButton *)GetDlgItem(i))->SetCheck(false);
 						}
 
-						((CButton *)GetDlgItem(IDC_RADIO81))->SetCheck(false);
+						for (int i=IDC_RADIO81;i<=IDC_RADIO87;i++)
+						{
+							((CButton *)GetDlgItem(i))->SetCheck(false);
+						}
+						
 					}
 
 					if(initial_dialog == 3)
@@ -867,7 +994,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value;
 				CRect c4;
-				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -885,7 +1012,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value - 11;
 				CRect c4;
-				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -904,7 +1031,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value - 11;
 				CRect c4;
-				GetDlgItem(IDC_RADIO73 + sel_value - 23 )->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+				GetDlgItem(IDC_RADIO73 + sel_value - 23 )->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -932,7 +1059,7 @@ void BacnetRange::Timer2_handle()
 			}
 			m_analog_select = sel_value - 30 ;
 			CRect c4;
-			GetDlgItem(IDC_RADIO1 + m_analog_select )->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(IDC_RADIO1 + m_analog_select )->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 			ScreenToClient(c4);  
 			m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			m_rang_pic.Invalidate(TRUE);
@@ -963,7 +1090,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value;
 				CRect c4;
-				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -984,7 +1111,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value - 11;
 				CRect c4;
-				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1003,7 +1130,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value - 11;
 				CRect c4;
-				GetDlgItem(IDC_RADIO73 + sel_value - 23 )->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+				GetDlgItem(IDC_RADIO73 + sel_value - 23 )->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1032,7 +1159,7 @@ void BacnetRange::Timer2_handle()
 			}
 			m_output_Analog_select = sel_value - 30 ;
 			CRect c4;
-			GetDlgItem(IDC_RADIO47 + m_output_Analog_select )->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+			GetDlgItem(IDC_RADIO47 + m_output_Analog_select )->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 			ScreenToClient(c4);  
 			m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 			m_rang_pic.Invalidate(TRUE);
@@ -1058,13 +1185,17 @@ void BacnetRange::Timer2_handle()
 			{
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
-			((CButton *)GetDlgItem(IDC_RADIO81))->SetCheck(false);
+			for (int i=IDC_RADIO81;i<=IDC_RADIO87;i++)
+			{
+				((CButton *)GetDlgItem(i))->SetCheck(false);
+			}
+			
 			m_input_Analog_select = 0;
 			if(sel_value<=11)
 			{
 				m_digital_select = sel_value;
 				CRect c4;
-				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1082,7 +1213,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value - 11;
 				CRect c4;
-				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+				GetDlgItem(IDC_RADIO35 + m_digital_select)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1100,7 +1231,7 @@ void BacnetRange::Timer2_handle()
 			{
 				m_digital_select = sel_value - 11;
 				CRect c4;
-				GetDlgItem(IDC_RADIO73 + sel_value - 23 )->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+				GetDlgItem(IDC_RADIO73 + sel_value - 23 )->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1117,7 +1248,7 @@ void BacnetRange::Timer2_handle()
 
 			}
 		}
-		else if(sel_value <= 49)
+		else if(sel_value <= 55)
 		{
 			bac_ranges_type = INPUT_RANGE_ANALOG_TYPE;
 			for (int i=IDC_RADIO35;i<=IDC_RADIO46;i++)
@@ -1133,7 +1264,25 @@ void BacnetRange::Timer2_handle()
 			if(sel_value == 49)
 			{
 				CRect c4;
-				GetDlgItem(IDC_RADIO81)->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+				GetDlgItem(IDC_RADIO81)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
+				ScreenToClient(c4);  
+				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
+				m_rang_pic.Invalidate(TRUE);
+			}
+			else if(sel_value == 55)
+			{
+				CRect c4;
+				GetDlgItem(IDC_RADIO87)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
+				ScreenToClient(c4);  
+				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
+				m_rang_pic.Invalidate(TRUE);
+			}
+			else if((sel_value >= 50) && (sel_value <= 54))
+			{
+				int temp_delt = 0;
+				temp_delt = sel_value - 50;
+				CRect c4;
+				GetDlgItem(IDC_RADIO82 + temp_delt)->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1141,7 +1290,7 @@ void BacnetRange::Timer2_handle()
 			else
 			{
 				CRect c4;
-				GetDlgItem(IDC_RADIO54 + m_input_Analog_select )->GetWindowRect(c4);   //获取控件的位置 ，饼调整位置;
+				GetDlgItem(IDC_RADIO54 + m_input_Analog_select )->GetWindowRect(c4);   //获取控件的位置 ，并调整位置;
 				ScreenToClient(c4);  
 				m_rang_pic.SetWindowPos(NULL,c4.left - 40,c4.top - 4,0,0,SWP_NOZORDER|SWP_NOSIZE);
 				m_rang_pic.Invalidate(TRUE);
@@ -1152,14 +1301,24 @@ void BacnetRange::Timer2_handle()
 			{
 				((CButton *)GetDlgItem(i))->SetCheck(false);
 			}
-			((CButton *)GetDlgItem(IDC_RADIO81))->SetCheck(false);
+			for (int i=IDC_RADIO81;i<=IDC_RADIO87;i++)
+			{
+				((CButton *)GetDlgItem(i))->SetCheck(false);
+			}
+			
 			if(sel_value == 49)
 			{
 				((CButton *)GetDlgItem(IDC_RADIO81))->SetCheck(true);
 			}
+			else if((sel_value >=50) && (sel_value <=55))
+			{
+				int delta_temp = 0;
+				delta_temp = sel_value - 50;
+				((CButton *)GetDlgItem(IDC_RADIO82 + delta_temp))->SetCheck(true);
+			}
 			else
 			{
-			((CButton *)GetDlgItem(IDC_RADIO54 + m_input_Analog_select))->SetCheck(true);
+				((CButton *)GetDlgItem(IDC_RADIO54 + m_input_Analog_select))->SetCheck(true);
 			}
 
 		}

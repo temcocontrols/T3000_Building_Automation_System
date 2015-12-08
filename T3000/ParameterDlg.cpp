@@ -43,7 +43,7 @@ CString INPUT_SETTING[NUM_INPUT_SETTING]={
 	_T("Avg Temperature"),
 	_T("Internal Hum"),
 	_T("AI1"),_T("AI2"),_T("AI3"),_T("AI4"),_T("AI5"),_T("AI6"),_T("AI7"),_T("AI8"),
-	_T("CO2 Sensor"),_T("HUM Sensor"),_T("Airflow Sensor"),
+	_T("HUM Sensor"),_T("CO2 Sensor"),_T("Airflow Sensor"),
 	_T("Avg AI1ToAI2"),_T("Avg AI1ToAI3"),_T("Avg AI1ToAI4")
 };
 #define NUM_INPUT_SETTING_T7 13
@@ -492,7 +492,7 @@ BOOL CParameterDlg::OnInitDialog()
        
      }
     
-	if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6)
+	if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
 	{
 		m_InputSelect1.ResetContent();
 		m_inputSelect2.ResetContent();
@@ -734,7 +734,7 @@ BOOL CParameterDlg::OnInitDialog()
 		GetDlgItem(IDC_ZIGBEE_TSTATS_TABLE)->ShowWindow(SW_HIDE);
 	}
 #endif
-	if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
 	{
 		GetDlgItem(IDC_INPUTSBUTTON)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_OutPutsBUTTON)->ShowWindow(SW_HIDE);		 
@@ -819,7 +819,7 @@ void CParameterDlg::InitPID2ComboBox()
 
 	                                                                               //    ||product_register_value[7]==PM_TSTAT7
 		
-		if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6)
+		if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
 		{
 			m_InputSelect1.ResetContent();
 			m_inputSelect2.ResetContent();
@@ -1744,7 +1744,7 @@ void CParameterDlg::OnCbnSelchangeEapplication()
 
 	float m_fFirmwareVersion=get_curtstat_version();
 
-	if (product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT6|| product_register_value[7] == PM_TSTAT5i)
+	if (product_register_value[7] == PM_TSTAT7 || product_register_value[7] == PM_TSTAT6|| product_register_value[7] == PM_TSTAT5i|| product_register_value[7] == PM_TSTAT8)
 	{
 		short nOccupied = product_register_value[184];  // Day setpoint option  
 		BOOL bOccupied = nOccupied & 0x0001;
@@ -1761,7 +1761,7 @@ void CParameterDlg::OnCbnSelchangeEapplication()
 		nRet = write_one(g_tstat_id,reg_tststold[125],m_application_ctrl.GetCurSel()); //tstat6 350 
 
 	}
-	else if(((product_register_value[7]==PM_TSTAT5E)||(product_register_value[7]==PM_TSTATRUNAR)) && (m_fFirmwareVersion >= 35.4))//0912
+	else if(((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E)||(product_register_value[7]==PM_TSTATRUNAR)) && (m_fFirmwareVersion >= 35.4))//0912
 	{
 		write_one(g_tstat_id,423 ,m_application_ctrl.GetCurSel()); // 
 		nRet=write_one(g_tstat_id,125 ,m_application_ctrl.GetCurSel()); // 
@@ -1980,22 +1980,22 @@ void CParameterDlg::OnEnKillfocusSetvalue2()
 
 	CString strText;
 	m_pid_setptEdt2.GetWindowText(strText);
-	int nValue=_wtoi(strText);
+	float nValue=_wtof(strText);
 
-
-	if(product_register_value[MODBUS_UNIVERSAL_SET]==(nValue*10))	//Add this to judge weather this value need to change.
+    int IValue =    nValue*10;
+	if(product_register_value[MODBUS_UNIVERSAL_SET]==IValue)	//Add this to judge weather this value need to change.
 		return;
 
 	//Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,MODBUS_UNIVERSAL_SET,nValue*10,
 	//	product_register_value[MODBUS_UNIVERSAL_SET],this->m_hWnd,IDC_SETVALUE2,_T("UNIVERSAL SET"));
 
-	int ret=write_one(g_tstat_id,MODBUS_UNIVERSAL_SET,nValue*10);
+	int ret=write_one(g_tstat_id,MODBUS_UNIVERSAL_SET,IValue);
 	if (ret>0)
 	{
-	     product_register_value[MODBUS_UNIVERSAL_SET]=(nValue*10);
+	     product_register_value[MODBUS_UNIVERSAL_SET]=IValue;
 	     strText.Format(_T("%0.1f"),product_register_value[MODBUS_UNIVERSAL_SET]/10);
 	     CString strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG_IN1], 1);
-	     strText+=strUnit;
+	     //strText+=strUnit;
 	     m_pid_setptEdt2.SetWindowText(strText);
 	} 
 	else
@@ -2169,7 +2169,7 @@ void CParameterDlg::OnEnKillfocusSpset1()
 			strText.Format(_T("%d"),(short)product_register_value[MODBUS_MIN_SETPOINT]);
 		}
 
-		if ((product_register_value[7] == PM_TSTAT7)||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i))
+		if ((product_register_value[7] == PM_TSTAT7)||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8))
 		{
 			if(product_register_value[MODBUS_DAY_SETPOINT]==short(nOrig*10))
 			{
@@ -2187,7 +2187,7 @@ void CParameterDlg::OnEnKillfocusSpset1()
 			}
 			product_register_value[MODBUS_DAY_SETPOINT] = short(nOrig*10);
 		}
-		else if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR))
+		else if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))
 		{
 			int nRet = write_one(g_tstat_id, 135, short(nOrig));	//Fance comments: because the version which below 34.9 is too low ,135 register I Don't know it's real meaning. 
 		}
@@ -2286,7 +2286,7 @@ void CParameterDlg::OnEnKillfocusEcooldeadband1()
 	int nValue= (int)(_wtof(strText)*10);
 
 	g_bPauseMultiRead = TRUE;
-	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
+	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8))
 	{
 		if(nValue == product_register_value[MODBUS_DAY_COOLING_DEADBAND])	//346
 			return;
@@ -2339,7 +2339,7 @@ void CParameterDlg::OnEnKillfocusEcoolingiterm1()
 	int nValue= (int)(_wtof(strText.GetBuffer())*10.0);
 	 
 	g_bPauseMultiRead = TRUE;
-	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
+	if((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8))
 	{
 		if(nValue == product_register_value[MODBUS_DAY_HEATING_DEADBAND])	//347
 			return;
@@ -2549,7 +2549,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 
 
 	g_bPauseMultiRead = TRUE;	
-	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 	{
 		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,345,short(fValue*10),
 			product_register_value[345],this->m_hWnd,IDC_SETVALUE1,_T("SETPOINT"));*/
@@ -2571,7 +2571,7 @@ void CParameterDlg::OnEnKillfocusSetvalue1()
 
 
 	}
-	else if(product_register_value[7] == PM_TSTAT5G || product_register_value[7] == PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR))  // 只有5E使用135
+	else if(product_register_value[7] == PM_TSTAT5G || product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))  // 只有5E使用135
 	{
 		//short nVal = short(fValue);
 		/*Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,135,short(fValue),
@@ -2896,9 +2896,9 @@ Read_SliderData();
 }
 CString CParameterDlg::GetInputValue(int InputNo){//这个是行号，如果是Input的话，要在这个基础上加1
 //所以InputNO=InputNo+1;
-InputNo+=1;
-float fValue;short nValue;
-CString strTemp;
+    InputNo+=1;
+    float fValue;short nValue;
+    CString strTemp;
 	CString strValueUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2], InputNo-1); //5e=359   122
 	{
 		if(product_register_value[MODBUS_ANALOG1_RANGE+InputNo-2]==1)	//359  122
@@ -2939,6 +2939,9 @@ CString strTemp;
 		}						
 		return strTemp;
 	}
+
+
+   
 }
 
 //Add by Fance ,use this function to replace the  Reflash() and Reflash6();
@@ -2970,7 +2973,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		}
 		 
 #if 1
-		if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR))
+		if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT8||product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))
 		{
 			GetDlgItem(IDC_TRENDLOGVIEW)->SetWindowText(_T("LCD"));
 		}
@@ -3224,7 +3227,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	m_inputvalue1.SetWindowText(strTemp+strUnit);
 
 
-	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i))
+	if ((product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT7)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT8))
 	{
 
 	m_combox_pir_endisable.ResetContent();
@@ -3235,94 +3238,94 @@ void CParameterDlg::Reflesh_ParameterDlg()
 #if 1
 
 
-		 if(product_register_value[382]==5) // input1
+	if(product_register_value[382]>=5&&product_register_value[382]<=14) // input1
 	{	
 
-		strTemp=GetInputValue(1);
+		strTemp=m_tstat_input_data.at(product_register_value[382]-5).Value.StrValue + m_tstat_input_data.at(product_register_value[382]-5).Unit.StrValue;
 		m_inputvalue1.SetWindowText(strTemp);
 	}
-	else if(product_register_value[382]==6) // input2 //m_inputvalue1
-	{
+	//else if(product_register_value[382]==6) // input2 //m_inputvalue1
+	//{
 
-		strTemp=GetInputValue(2);
-		m_inputvalue1.SetWindowText(strTemp);
-	}
-	else if(product_register_value[382]==7) // input2 //m_inputvalue1
-	{
+	//	strTemp=GetInputValue(2);
+	//	m_inputvalue1.SetWindowText(strTemp);
+	//}
+	//else if(product_register_value[382]==7) // input2 //m_inputvalue1
+	//{
 
-		strTemp=GetInputValue(3);
-		m_inputvalue1.SetWindowText(strTemp);
-	}
-	else if(product_register_value[382]==8) // input2 //m_inputvalue1
-	{
+	//	strTemp=GetInputValue(3);
+	//	m_inputvalue1.SetWindowText(strTemp);
+	//}
+	//else if(product_register_value[382]==8) // input2 //m_inputvalue1
+	//{
 
-		strTemp=GetInputValue(4);
-		m_inputvalue1.SetWindowText(strTemp);
-	}
-	else if(product_register_value[382]==9) // input2 //m_inputvalue1
-	{
+	//	strTemp=GetInputValue(4);
+	//	m_inputvalue1.SetWindowText(strTemp);
+	//}
+	//else if(product_register_value[382]==9) // input2 //m_inputvalue1
+	//{
 
-		strTemp=GetInputValue(5);
-		m_inputvalue1.SetWindowText(strTemp);
-	}
-	else if(product_register_value[382]==10) // input2 //m_inputvalue1
-	{
+	//	strTemp=GetInputValue(5);
+	//	m_inputvalue1.SetWindowText(strTemp);
+	//}
+	//else if(product_register_value[382]==10) // input2 //m_inputvalue1
+	//{
 
-		strTemp=GetInputValue(6);
-		m_inputvalue1.SetWindowText(strTemp);
-	}
-	else if(product_register_value[382]==11) // input2 //m_inputvalue1
-	{
+	//	strTemp=GetInputValue(6);
+	//	m_inputvalue1.SetWindowText(strTemp);
+	//}
+	//else if(product_register_value[382]==11) // input2 //m_inputvalue1
+	//{
 
-		strTemp=GetInputValue(7);
-		m_inputvalue1.SetWindowText(strTemp);
-	}
-	else if(product_register_value[382]==12) // input2 //m_inputvalue1
-	{
+	//	strTemp=GetInputValue(7);
+	//	m_inputvalue1.SetWindowText(strTemp);
+	//}
+	//else if(product_register_value[382]==12) // input2 //m_inputvalue1
+	//{
 
-		strTemp=GetInputValue(8);
-		m_inputvalue1.SetWindowText(strTemp);
-	}
-	else if (product_register_value[382]==13)//Humidity
-	{		CString temp;
-	strUnit=_T("%");
-	if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
-	{
+	//	strTemp=GetInputValue(8);
+	//	m_inputvalue1.SetWindowText(strTemp);
+	//}
+	//else if (product_register_value[382]==13)//Humidity
+	//{		CString temp;
+	//strUnit=_T("%");
+	//if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
+	//{
 
-		temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
+	//	temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
 
-	}
-	else
-	{
-		temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
-	}
-
-
-	m_inputvalue1.SetWindowText(temp+strUnit); 
+	//}
+	//else
+	//{
+	//	temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
+	//}
 
 
-	}
-	else if (product_register_value[382]==14)//Co2
-	{ CString temp;
-	strUnit=_T("ppm");
-	if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
-	{
-
-		temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
-		temp=temp+strUnit;
-
-	}
-	else
-	{
-
-		temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
-		temp=temp+strUnit;
-	}
-
-	m_inputvalue1.SetWindowText(temp);
+	//m_inputvalue1.SetWindowText(temp+strUnit); 
 
 
-	}
+	//}
+	//else if (product_register_value[382]==14)//Co2
+	//{ CString temp;
+	//strUnit=_T("ppm");
+	//if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
+	//{
+
+	//	temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
+	//	temp=temp+strUnit;
+
+	//}
+	//else
+	//{
+
+	//	temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
+	//	temp=temp+strUnit;
+	//}
+
+	//m_inputvalue1.SetWindowText(temp);
+
+
+	//}
 	else
 	{
 		//m_inputvalue1.SetWindowText(_T("UNUSED"));
@@ -3340,95 +3343,101 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		int nValue=0;
 	   CString strUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+product_register_value[383]-1], product_register_value[383]);
 		
-			 if(product_register_value[383]==5) // input1
-		{	
-			 
-			strTemp=GetInputValue(1);
-			m_inputValue2.SetWindowText(strTemp);
-		}
-		else if(product_register_value[383]==6) // input2 //m_inputvalue1
-		{
-			
-			strTemp=GetInputValue(2);
-			m_inputValue2.SetWindowText(strTemp);
-		}
-		else if(product_register_value[383]==7) // input2 //m_inputvalue1
-		{
-			
-			strTemp=GetInputValue(3);
-			m_inputValue2.SetWindowText(strTemp);
-		}
-		else if(product_register_value[383]==8) // input2 //m_inputvalue1
-		{
-			
-			strTemp=GetInputValue(4);
-			m_inputValue2.SetWindowText(strTemp);
-		}
-		else if(product_register_value[383]==9) // input2 //m_inputvalue1
-		{
-		
-			strTemp=GetInputValue(5);
-			m_inputValue2.SetWindowText(strTemp);
-		}
-		else if(product_register_value[383]==10) // input2 //m_inputvalue1
-		{
-		
-			strTemp=GetInputValue(6);
-			m_inputValue2.SetWindowText(strTemp);
-		}
-		else if(product_register_value[383]==11) // input2 //m_inputvalue1
-		{
-		
-			strTemp=GetInputValue(7);
-			m_inputValue2.SetWindowText(strTemp);
-		}
-		else if(product_register_value[383]==12) // input2 //m_inputvalue1
-		{
-			
-			strTemp=GetInputValue(8);
-			m_inputValue2.SetWindowText(strTemp);
-		}
-		else if (product_register_value[383]==13)//Humidity
-		{		CString temp;
-		strUnit=_T("%");
-		if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
-		{
+		//if(product_register_value[383]==5) // input1
+		//{	
+		//	 
+		//	strTemp=GetInputValue(1);
+		//	m_inputValue2.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[383]==6) // input2 //m_inputvalue1
+		//{
+		//	
+		//	strTemp=GetInputValue(2);
+		//	m_inputValue2.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[383]==7) // input2 //m_inputvalue1
+		//{
+		//	
+		//	strTemp=GetInputValue(3);
+		//	m_inputValue2.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[383]==8) // input2 //m_inputvalue1
+		//{
+		//	
+		//	strTemp=GetInputValue(4);
+		//	m_inputValue2.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[383]==9) // input2 //m_inputvalue1
+		//{
+		//
+		//	strTemp=GetInputValue(5);
+		//	m_inputValue2.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[383]==10) // input2 //m_inputvalue1
+		//{
+		//
+		//	strTemp=GetInputValue(6);
+		//	m_inputValue2.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[383]==11) // input2 //m_inputvalue1
+		//{
+		//
+		//	strTemp=GetInputValue(7);
+		//	m_inputValue2.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[383]==12) // input2 //m_inputvalue1
+		//{
+		//	
+		//	strTemp=GetInputValue(8);
+		//	m_inputValue2.SetWindowText(strTemp);
+		//}
+		//else if (product_register_value[383]==13)//Humidity
+		//{		CString temp;
+		//strUnit=_T("%");
+		//if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
+		//{
 
-			temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
+		//	temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
 
-		}
-		else
-		{
-			temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
-		}
-
-
-		m_inputValue2.SetWindowText(temp+strUnit); 
+		//}
+		//else
+		//{
+		//	temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
+		//}
 
 
-		}
-		else if (product_register_value[383]==14)//Co2
-		{ CString temp;
-		strUnit=_T("ppm");
-		if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
-		{
-
-			temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
-			temp=temp+strUnit;
-
-		}
-		else
-		{
-
-			temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
-			temp=temp+strUnit;
-		}
-
-		m_inputValue2.SetWindowText(temp);
+		//m_inputValue2.SetWindowText(temp+strUnit); 
 
 
-		}
-		else
+		//}
+		//else if (product_register_value[383]==14)//Co2
+		//{ CString temp;
+		//strUnit=_T("ppm");
+		//if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
+		//{
+
+		//	temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
+		//	temp=temp+strUnit;
+
+		//}
+		//else
+		//{
+
+		//	temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
+		//	temp=temp+strUnit;
+		//}
+
+		//m_inputValue2.SetWindowText(temp);
+
+
+		//}
+       if(product_register_value[383]>=5&&product_register_value[383]<=14) // input1
+       {	
+
+           strTemp=m_tstat_input_data.at(product_register_value[383]-5).Value.StrValue + m_tstat_input_data.at(product_register_value[383]-5).Unit.StrValue;
+           m_inputValue2.SetWindowText(strTemp);
+       }
+        else
 		{
 			//m_inputValue2.SetWindowText(_T("UNUSED"));
 
@@ -3645,7 +3654,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	float m_fFirmwareVersion=get_curtstat_version();//0912
-	if (product_register_value[7] == PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR))//0912
+	if (product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))//0912
 	{
 		short nOccupied = product_register_value[184];  // Day setpoint option  
 		BOOL bOccupied = nOccupied & 0x0001;
@@ -3747,7 +3756,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 	if(product_type!=T3000_6_ADDRESS)
 	{
-		if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR)||
+		if(m_version<34.9 || product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)||
 			(product_register_value[7] == PM_TSTAT5G))   //
 		{
 			strTemp.Format(_T("%d"),(int)product_register_value[MODBUS_COOLING_SETPOINT]);//135
@@ -3758,7 +3767,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		}	
 
 		m_dayOccEdt1.SetWindowText(strTemp+GetTempUnit());
-		if (product_register_value[7] == PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR)||
+		if (product_register_value[7] == PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)||
 			(product_register_value[7] == PM_TSTAT5G))//0911
 		{
 			strUnit=GetTempUnit();
@@ -3902,7 +3911,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
         GetDlgItem(IDC_EDIT_TSTAT_NAME)->ShowWindow(SW_HIDE);
     }
 
-    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+    if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i))
 	{
         
         
@@ -4056,7 +4065,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 	 
-	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
+	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8))
 	{
 	   
 
@@ -4115,7 +4124,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 
 
 		int RegAddress=-1;
-		if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
 		{
 			RegAddress=650;
 		}
@@ -4163,7 +4172,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 		m_heatspN=((float)(short)product_register_value[MODBUS_NIGHT_HEATING_SETPOINT])/10;
 	}
     //CenterWindow(this);
-    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i)
+    if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8))
     {
         //WINDOWPLACEMENT wp;
         //GetWindowPlacement(&wp);
@@ -4610,7 +4619,7 @@ void CParameterDlg::OnCbnSelchangeInputselect3Pid3()
 // 		TempValue=sel+4;
 // 	}
 	int RegAddress=-1;
-	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
 	{
 		RegAddress=650;
 	}
@@ -4669,11 +4678,13 @@ void CParameterDlg::ShowPID3(){
  float m_fFirmwareVersion=get_curtstat_version();
 	if (product_register_value[7]==PM_TSTAT6||
 		//product_register_value[7]==PM_TSTAT7||
-		product_register_value[7]==PM_TSTAT5i||
-		product_register_value[7]==PM_TSTAT5E||
-		(product_register_value[7]==PM_TSTATRUNAR)||
-		((product_register_value[7]==PM_TSTAT5G)
-		&&(m_fFirmwareVersion>=37.5))
+        product_register_value[7]==PM_TSTAT5i||
+        product_register_value[7] == PM_TSTAT8||
+        product_register_value[7]==PM_TSTAT5E||
+        product_register_value[7] == PM_PM5E||
+        (product_register_value[7]==PM_TSTATRUNAR)||
+        ((product_register_value[7]==PM_TSTAT5G)
+        &&(m_fFirmwareVersion>=37.5))
 		)
 	{
 		GetDlgItem(IDC_STATIC_PID3_LOOP3)->ShowWindow(TRUE);
@@ -4715,7 +4726,7 @@ void CParameterDlg::ShowPID3(){
 		temp+=strUnit;
 		GetDlgItem(IDC_ECOOLINGITERM3_PID3)->SetWindowText(temp);
 		int RegAddress=-1;
-		if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
 		{
 		      RegAddress=650;
 		}
@@ -4740,7 +4751,7 @@ void CParameterDlg::ShowPID3(){
 		 
 	    
 		 RegAddress=-1;
-		if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
 		{
 			RegAddress=650;
 		}
@@ -4749,94 +4760,100 @@ void CParameterDlg::ShowPID3(){
 			RegAddress=MODBUS_SUPPLY_TEMP_SELECT;
 		}
 
-		if(product_register_value[RegAddress]==5) // input1
-		{	
+		//if(product_register_value[RegAddress]==5) // input1
+		//{	
 
-			strTemp=GetInputValue(1);
-			m_inputValue3.SetWindowText(strTemp);
-		}
-		else if(product_register_value[RegAddress]==6) // input2 //m_inputvalue1
-		{
+		//	strTemp=GetInputValue(1);
+		//	m_inputValue3.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[RegAddress]==6) // input2 //m_inputvalue1
+		//{
 
-			strTemp=GetInputValue(2);
-			m_inputValue3.SetWindowText(strTemp);
-		}
-		else if(product_register_value[RegAddress]==7) // input2 //m_inputvalue1
-		{
+		//	strTemp=GetInputValue(2);
+		//	m_inputValue3.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[RegAddress]==7) // input2 //m_inputvalue1
+		//{
 
-			strTemp=GetInputValue(3);
-			m_inputValue3.SetWindowText(strTemp);
-		}
-		else if(product_register_value[RegAddress]==8) // input2 //m_inputvalue1
-		{
+		//	strTemp=GetInputValue(3);
+		//	m_inputValue3.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[RegAddress]==8) // input2 //m_inputvalue1
+		//{
 
-			strTemp=GetInputValue(4);
-			m_inputValue3.SetWindowText(strTemp);
-		}
-		else if(product_register_value[RegAddress]==9) // input2 //m_inputvalue1
-		{
+		//	strTemp=GetInputValue(4);
+		//	m_inputValue3.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[RegAddress]==9) // input2 //m_inputvalue1
+		//{
 
-			strTemp=GetInputValue(5);
-			m_inputValue3.SetWindowText(strTemp);
-		}
-		else if(product_register_value[RegAddress]==10) // input2 //m_inputvalue1
-		{
+		//	strTemp=GetInputValue(5);
+		//	m_inputValue3.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[RegAddress]==10) // input2 //m_inputvalue1
+		//{
 
-			strTemp=GetInputValue(6);
-			m_inputValue3.SetWindowText(strTemp);
-		}
-		else if(product_register_value[RegAddress]==11) // input2 //m_inputvalue1
-		{
+		//	strTemp=GetInputValue(6);
+		//	m_inputValue3.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[RegAddress]==11) // input2 //m_inputvalue1
+		//{
 
-			strTemp=GetInputValue(7);
-			m_inputValue3.SetWindowText(strTemp);
-		}
-		else if(product_register_value[RegAddress]==12) // input2 //m_inputvalue1
-		{
+		//	strTemp=GetInputValue(7);
+		//	m_inputValue3.SetWindowText(strTemp);
+		//}
+		//else if(product_register_value[RegAddress]==12) // input2 //m_inputvalue1
+		//{
 
-			strTemp=GetInputValue(8);
-			m_inputValue3.SetWindowText(strTemp);
-		}
-		else if (product_register_value[RegAddress]==13)//Humidity
-		{		CString temp;
-		strUnit=_T("%");
-		if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
-		{
+		//	strTemp=GetInputValue(8);
+		//	m_inputValue3.SetWindowText(strTemp);
+		//}
+		//else if (product_register_value[RegAddress]==13)//Humidity
+		//{		CString temp;
+		//strUnit=_T("%");
+		//if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
+		//{
 
-			temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
+		//	temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10));
 
-		}
-		else
-		{
-			temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
-		}
-
-
-		m_inputValue3.SetWindowText(temp+strUnit); 
-
-		}
-		else if (product_register_value[RegAddress]==14)//Co2
-		{ CString temp;
-		strUnit=_T("ppm");
-		if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
-		{
-
-			temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
-			temp=temp+strUnit;
-
-		}
-		else
-		{
-
-			temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
-			temp=temp+strUnit;
-		}
-
-		m_inputValue3.SetWindowText(temp);
+		//}
+		//else
+		//{
+		//	temp.Format(_T("%0.1f"),(float)(product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10));
+		//}
 
 
-		}
-		else
+		//m_inputValue3.SetWindowText(temp+strUnit); 
+
+		//}
+		//else if (product_register_value[RegAddress]==14)//Co2
+		//{ CString temp;
+		//strUnit=_T("ppm");
+		//if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
+		//{
+
+		//	temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
+		//	temp=temp+strUnit;
+
+		//}
+		//else
+		//{
+
+		//	temp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
+		//	temp=temp+strUnit;
+		//}
+
+		//m_inputValue3.SetWindowText(temp);
+
+
+		//}
+        if(product_register_value[RegAddress]>=5&&product_register_value[RegAddress]<=14) // input1
+        {	
+
+            strTemp=m_tstat_input_data.at(product_register_value[RegAddress]-5).Value.StrValue + m_tstat_input_data.at(product_register_value[RegAddress]-5).Unit.StrValue;
+            m_inputValue3.SetWindowText(strTemp);
+        }
+        else
 		{
 			//m_inputvalue1.SetWindowText(_T("UNUSED"));
 			strTemp.Format(_T("%0.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);	//121
@@ -4844,7 +4861,7 @@ void CParameterDlg::ShowPID3(){
 		}
 
 
-		if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		if (product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8)||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
 		{
 
 			temp.Format(_T("%.1f"),((float)(short)product_register_value[705])/10);
@@ -5002,7 +5019,7 @@ float Val=_wtof(temp)*10;
 
 int RegValue=(int)Val;
 int RegAddress;
-	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
 	{
 
 	
@@ -5042,7 +5059,7 @@ void CParameterDlg::OnEnKillfocusOutput3Pid3()
 	int Val=_wtoi(temp);
 	int RegValue=(int)Val;
 	int RegAddress;
-	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
 	{
 		RegAddress=664;
 	}
@@ -5083,7 +5100,7 @@ void CParameterDlg::OnEnKillfocusEcoolingpterm3Pid3()
 
 	int RegValue=(int)Val;
 	int RegAddress;
-	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
 	{
 		RegAddress=660;
 	}
@@ -5109,7 +5126,7 @@ void CParameterDlg::OnEnKillfocusEdit52Pid3()
     float Val=_wtof(temp)*10;
 	int RegValue=(int)Val;
 	int RegAddress;
-	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
 	{
 		RegAddress=661;
 	}
@@ -5136,7 +5153,7 @@ void CParameterDlg::OnEnKillfocusEditPid2offsetpoint6()
 	float Val=_wtof(temp)*10;
 	int RegValue=(int)Val;
 	int RegAddress;
-	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+	if (product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
 	{
 		RegAddress=706;	
 	if (RegValue==product_register_value[RegAddress])
@@ -5578,7 +5595,7 @@ void CParameterDlg::OnBnClickedLock()
 
 void CParameterDlg::OnBnClickedTrendlogview()
 {
-	if ((product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT7))
+	if ((product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR)||(product_register_value[7]==PM_TSTAT5G))||(product_register_value[7]==PM_TSTAT6)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7]==PM_TSTAT5i)||(product_register_value[7]==PM_TSTAT7))
 	{
 		CDisplayConfig display_cfg;
 		display_cfg.DoModal();

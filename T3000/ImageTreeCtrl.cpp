@@ -44,7 +44,7 @@ enum ERightDragHandler {
             temp_serial.Format(_T("%d"),sn);
             int  int_product_type = pFrame->m_product.at(i).product_class_id;
             
-            if (int_product_type == PM_TSTAT6)
+            if (int_product_type == PM_TSTAT6||int_product_type == PM_TSTAT7)
             {
                 int communicationType = pFrame->m_product.at(i).protocol;  
                 ModbusID = pFrame->m_product.at(i).product_id;
@@ -481,7 +481,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
                         bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
                         bado.CloseConn();
                         
-                        if (int_product_type == PM_TSTAT6)
+                        if (int_product_type == PM_TSTAT6 || int_product_type == PM_TSTAT7)
                         {
                             if(m_name_new.GetLength()> 16)	//长度不能大于结构体定义的长度;
                             {
@@ -618,7 +618,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
             bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
             bado.CloseConn();
 
-            if( int_product_type == PM_TSTAT6) 
+            if( int_product_type == PM_TSTAT6 || int_product_type == PM_TSTAT7) 
             {
 
                 if(m_name_new.GetLength()> 16)	//长度不能大于结构体定义的长度;
@@ -1070,6 +1070,7 @@ void CImageTreeCtrl::turn_item_image(HTREEITEM hItem,bool state)
 	case 12:
 	case 14:
 	case 16:
+    case PM_PM5E:
 	case 18:
 	case 20:
 		if(state == false)
@@ -1135,6 +1136,7 @@ BOOL CImageTreeCtrl::is_connection_by_image(int nImage,int nSelectedImage)
 	case 12:
 	case 14:
 	case 16:
+    case PM_PM5E:
 		return true;
 	case 7:
 	case 9:

@@ -20,6 +20,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedOk();
+    BOOL CheckInputData(CString strText);
+    unsigned short CStringToHex(CString Text);
+    unsigned short HexCharToInt(char ch);
 	CButton m_addlist_btn;
 	CButton m_copy_btn;
 	CButton m_openlist_btn;

@@ -1,4 +1,5 @@
 #pragma once
+#include "afxwin.h"
 
 
 
@@ -29,6 +30,15 @@ public:
 	virtual void OnInitialUpdate();
 	void Fresh();
 	afx_msg void OnBnClickedEditId();
+    afx_msg void OnBnClickedButtonGoToInput();
+    CComboBox m_ip_model;
+    CIPAddressCtrl m_ipaddress;
+    CIPAddressCtrl m_Subnet_Mask;
+    CIPAddressCtrl m_GatewayAddress;
+    CEdit m_Edit_MacAddress;
+    CEdit m_ListenPort;
+    afx_msg void OnBnClickedApplybutton();
+    afx_msg void OnCbnSelchangeIpmodelCombo();
 };
 
 

@@ -1722,15 +1722,15 @@ void CModbusPollView::Initial_RegName(){
 		ado.m_pRecordset=ado.OpenRecordset(sql);
 		if (!ado.m_pRecordset->EndOfFile)
 		{
-			temp_var=ado.m_pRecordset->GetCollect(_T("TableName"));
-			if (temp_var.vt!=VT_NULL)
-			{
-				TableName=temp_var;
-			}
-			else
-			{
-				TableName=_T("");
-			}
+            temp_var=ado.m_pRecordset->GetCollect(_T("TableName"));
+            if (temp_var.vt!=VT_NULL)
+            {
+                TableName=temp_var;
+            }
+            else
+            {
+                TableName=_T("");
+            }
 			m_cur_TableName=TableName;
 			temp_var=ado.m_pRecordset->GetCollect(_T("Col_RegName"));
 			if (temp_var.vt!=VT_NULL)
@@ -2008,10 +2008,11 @@ void CModbusPollView::OnEditChangemodelname()
 	m_ischangeModelName=TRUE;
 }
 
-
+ #include "TestCenter.h"
 void CModbusPollView::OnFunctionsTestcenter()
 {
-	 
+    TestCenter dlg;
+    dlg.DoModal (); 
 }
 
 

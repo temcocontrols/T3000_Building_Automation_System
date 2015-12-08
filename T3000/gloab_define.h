@@ -359,6 +359,7 @@ const int BAC_SCHEDULE_TIME_COUNT = 8;
 const int BAC_TIME_COMMAND_COUNT = 1;
 const int BAC_BASIC_SETTING_COUNT = 1;
 const int BAC_USER_LOGIN_COUNT = 8;
+const int BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT = 5;
 
 const int BAC_CONNECT_WITH_DEVICE_COUNT = 1;
 
@@ -579,6 +580,8 @@ struct Data_Time_Match
 	unsigned long loggingtime;
 };
 
+
+
 const int UNITS_TYPE_ANALOG = 0;
 const int UNITS_TYPE_DIGITAL = 1;
 const int UNITS_TYPE_CUSTOM = 2;
@@ -689,6 +692,12 @@ const CString Input_List_Analog_Units[] =
 	 _T("%(0-5V)"),
 	 _T("%(4-20ma)"),
 	 _T("Volts"),
+	 _T(""),
+	 _T(""),
+	 _T(""),
+	 _T(""),
+	 _T(""),
+	 _T("counts")
 };
 
 const CString Input_Analog_Units_Array[] =
@@ -713,6 +722,12 @@ const CString Input_Analog_Units_Array[] =
 	 _T("0 to 100"),
 	 _T("0 to 100"),
 	  _T("0.0 to 10.0"),
+	  _T("Table 1"),
+	  _T("Table 2"),
+	  _T("Table 3"),
+	  _T("Table 4"),
+	  _T("Table 5"),
+	  _T("High Speed Count")
 };
 
 const CString Output_Analog_Units_Array[] = 
@@ -944,7 +959,7 @@ const CString Baudrate_Array[] =
 	_T("9600"),
 	_T("19200"),
 	_T("38400"),
-	_T("57600"),
+	_T("76800"),
 	_T("115200"),
 	_T("921600"),
 };
@@ -1183,7 +1198,7 @@ const CString Program_Fonts[] =
 const CString JumperStatus[]=
 {
 	_T("Unused"),
-	_T("4-20 ma"),
+	_T("4-20 ma / 0-24 V"),
 	_T("0-5 V"),
 	_T("0-10 V"),
 	_T("Thermistor")
@@ -1192,3 +1207,164 @@ const CString JumperStatus[]=
 
 const int T3_REG_TOTAL_COUNT = 292;
 
+const unsigned char MONITOR_READ_TIMEOUT = 0;
+const unsigned char MONITOR_READ_SUCCESS = 1;
+const unsigned char MONITOR_READ_NO_DATA = 2;
+
+#pragma region VARIABLE_DEFINE
+
+const int VARIABLE_NUM = 0;
+const int VARIABLE_FULL_LABLE = 1;
+const int VARIABLE_AUTO_MANUAL = 2;
+const int VARIABLE_VALUE = 3;
+const int VARIABLE_UNITE = 4;
+const int VARIABLE_LABLE = 5;
+const int VARIABLE_COL_NUMBER = 6;
+
+#pragma endregion VARIABLE_DEFINE
+
+
+#pragma region INPUT_DEFINE
+
+const int INPUT_NUM = 0;
+const int INPUT_FULL_LABLE = 1;
+const int INPUT_AUTO_MANUAL = 2;
+const int INPUT_VALUE = 3;
+const int INPUT_UNITE = 4;
+const int INPUT_RANGE = 5;
+const int INPUT_CAL = 6;
+const int INPUT_CAL_OPERATION = 7;
+const int INPUT_FITLER = 8;
+const int INPUT_DECOM = 9;
+const int INPUT_JUMPER = 10;
+const int INPUT_LABLE = 11;
+const int INPUT_COL_NUMBER = 12;
+
+
+
+
+const int TSTAT_INPUT_FITLER = 7;
+const int TSTAT_INPUT_FUNCTION = 8;
+const int TSTAT_INPUT_CUST_FIELD = 9;
+
+const int TSTAT_INPUT_COL_NUMBER = 10;
+
+const CString Input_Range_Array[7] = 
+{
+	_T("Not Used"),
+	_T("10K(-40->120)"),
+	_T("I 4->20ma"),
+	_T("V 0->10V"),
+	_T("V 0->5V"),
+	_T("V 0->24AC"),
+	_T("TST Normal"),
+};
+
+const CString Input_Filter_Array[8] =
+{
+	_T("1"),
+	_T("2"),
+	_T("4"),
+	_T("8"),
+	_T("16"),
+	_T("32"),
+	_T("64"),
+	_T("128")
+};
+
+
+
+
+const CString Input_Unit[42]=
+{
+	_T("Not Used"), 
+	_T("¡æ"),
+	_T("¨H"), 
+	_T("FPM"), 
+	_T("Pa"), 
+	_T("KPa"), 
+	_T("psi"), 
+	_T("in_w"), 
+	_T("Watts"), 
+	_T("KW"), 
+	_T("KWH"),
+	_T("Volt"), 
+	_T("KV"), 
+	_T("Amps"), 
+	_T("mA"), 
+	_T("CFM"), 
+	_T("Sec"), 
+	_T("Min"), 
+	_T("Hours"), 
+	_T("Days"), 
+	_T("time_unit"), 
+	_T("ohms"),
+	_T("procent"), 
+	_T("RH"), 
+	_T("ppm"), 
+	_T("counts"), 
+	_T("Open"), 
+	_T("CFH"), 
+	_T("GPM"), 
+	_T("GPH"), 
+	_T("GAL"), 
+	_T("CF"), 
+	_T("BTU"), 
+	_T("CMH"),
+	_T("custom1"), 
+	_T("custom2"), 
+	_T("custom3"), 
+	_T("custom4"), 
+	_T("custom5"), 
+	_T("custom6"), 
+	_T("custom7"), 
+	_T("custom8")
+};
+
+const CString Input_Unit_Digit[2]=
+{ 
+	_T("Not Used"),
+	_T("ON/OFF")
+} ;
+
+
+
+const CString Decom_Array[3] =
+{
+	_T("Normal"),
+	_T("Open"),
+	_T("Short")
+};
+
+
+
+#pragma endregion INPUT_DEFINE
+
+
+#pragma region OUTPUT_DEFINE
+
+const int OUTPUT_NUM = 0;
+const int OUTPUT_FULL_LABLE = 1;
+const int OUTPUT_AUTO_MANUAL = 2;
+const int OUTPUT_VALUE = 3;
+const int OUTPUT_UNITE = 4;
+const int OUTPUT_RANGE = 5;
+const int OUTPUT_PWM_PERIOD = 6;
+const int OUTPUT_DECOM = 7;
+const int OUTPUT_LABLE = 8;
+const int OUTPUT_HW_SWITCH = 9;
+const int OUTPUT_COL_NUMBER = 10;
+
+const CString Output_Decom_Array[2] =
+{
+	_T("OK"),
+	_T("-"),
+};
+
+typedef enum
+{
+	HW_SW_OFF = 0,
+	HW_SW_AUTO = 1,
+	HW_SW_HAND = 2
+}HW_SWITCH_ENUM;
+#pragma endregion OUTPUT_DEFINE

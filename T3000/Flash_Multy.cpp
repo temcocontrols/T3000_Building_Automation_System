@@ -913,11 +913,11 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
 		 //nFlag = read_one(now_tstat_id,7,6);
            Read_Multi(now_tstat_id,product_register_value,0,10);
            nFlag = product_register_value[7];
-		 if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7) || (nFlag == PM_TSTAT5i))
+		 if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT8) || (nFlag == PM_TSTAT5i))
 		 {
 			 product_type =T3000_6_ADDRESS;
 		 }
-		 else if((nFlag == PM_TSTAT5E)||(product_register_value[7]==PM_TSTATRUNAR) || (nFlag == PM_TSTAT5H)||(nFlag == PM_TSTAT5G))
+		 else if((nFlag == PM_TSTAT5E||nFlag == PM_PM5E)||(product_register_value[7]==PM_TSTATRUNAR) || (nFlag == PM_TSTAT5H)||(nFlag == PM_TSTAT5G))
 		 {
 			 product_type = T3000_5EH_LCD_ADDRESS;
 		 }
@@ -976,34 +976,16 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
 				
 				 load_file_2_schedule_NC((LPTSTR)(LPCTSTR)config_file_path, now_tstat_id, log_file);
 				}
+                else if (product_type == PM_CO2_NODE)
+                {
+                   LoadFile2Tstat_T3(temppp,(LPTSTR)(LPCTSTR)config_file_path,&log_file); 
+                }
 				else
 				{
 				LoadFile2Tstat(temppp,(LPTSTR)(LPCTSTR)config_file_path,&log_file);
 				}
 			}
-// 			if(find_load_file_error(temppp))
-// 			{
-// 				CString for_showing_text;
-// 				for_showing_text.Format(_T("ID :%d Load found Error"),now_tstat_id);
-// 				change_showing_text_variable(for_showing_text);
-// // 				pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_LOADEVENT,_T(""));
-// // 				failure_number++;	
-// // 				pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_STATUS,_T("Error"));
-// 			}
-// 			else
-// 			{
-// 				CString for_showing_text;
-// 				for_showing_text.Format(_T("ID :%d Load Success"),now_tstat_id);
-// 				log_file.WriteString(for_showing_text);
-// // 				change_showing_text_variable(for_showing_text);
-// // 				pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_ENABLE,_T("False"));
-// // 				pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_STATUS,_T("OK"));
-// 
-// 				
-// 		
-// 			}
-			//const int CHANGE_THE_ITEM_COLOR_MORE_GREEN = 5; //4>烧写成功&&配置文件，成功,
-			//const int CHANGE_THE_ITEM_COLOR_LESS_RED = 6;//5>配置文件，失败
+ 
 			     if (g_Vector_Write_Error.size()>0)
                  {
 				  flash_device.at(i).nresult=CHANGE_THE_ITEM_COLOR_LESS_RED;
@@ -1367,8 +1349,8 @@ LRESULT CFlash_Multy::MultyFlashMessage(WPARAM wParam,LPARAM lParam)
 	        m_flash_multy_list.SetItemTextColor(sub_parameter,-1,CONFIG_COLOR_CONFIG_FLASH_GOOD);
 	        m_flash_multy_list.SetItemText(sub_parameter,FLASH_RESULTS,_T("Sucessful"));
 	        m_flash_multy_list.SetItemText(sub_parameter,FLASH_CONFIG_RESULTS,_T("Sucessful"));
-            StrSql.Format(_T("Update BatchFlashResult Set ConfigResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter).strSN));
-            bado.OpenRecordset(StrSql);
+//             StrSql.Format(_T("Update BatchFlashResult Set ConfigResult = 3 Where SN = %d "),_wtoi(flash_device.at(sub_parameter-1).strSN));
+//             bado.OpenRecordset(StrSql);
 	}
 	break;
 	case CHANGE_THE_ITEM_COLOR_LESS_RED:{

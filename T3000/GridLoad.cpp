@@ -150,11 +150,11 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 		int nFlag=0;
 		nFlag = read_one(now_tstat_id,7,6);
 
-		if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7) || (nFlag == PM_TSTAT5i))
+		if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7) || (nFlag == PM_TSTAT5i)|| (nFlag == PM_TSTAT8))
 		{
 			product_type =T3000_6_ADDRESS;
 		}
-		else if((nFlag == PM_TSTAT5E)||(product_register_value[7]==PM_TSTATRUNAR) || (nFlag == PM_TSTAT5H)||(nFlag == PM_TSTAT5G))
+		else if((nFlag == PM_TSTAT5E||nFlag == PM_PM5E)||(product_register_value[7]==PM_TSTATRUNAR) || (nFlag == PM_TSTAT5H)||(nFlag == PM_TSTAT5G))
 		{
 			product_type = T3000_5EH_LCD_ADDRESS;
 		}
@@ -485,6 +485,9 @@ BOOL CGridLoad::OnInitDialog()
 		case PM_TSTAT5E:
 			strTemp="TStat5E";
 			break;
+        case PM_PM5E:
+            strTemp="PM5E";
+            break;
 		case PM_TSTATRUNAR:
 			strTemp="TStatRunar";
 			break; 
@@ -501,9 +504,12 @@ BOOL CGridLoad::OnInitDialog()
 			strTemp="TStat6";
 			break;
         case PM_TSTAT5i:
-            strTemp="TStat6";
+            strTemp="TStat5i";
             break;
-		case PM_TSTAT7:
+        case PM_TSTAT8:
+            strTemp="TStat8";
+            break;
+        case PM_TSTAT7:
 			strTemp="TStat7";
 			break;
 		case PM_NC:
@@ -1218,6 +1224,9 @@ void CGridLoad::LoadDeviceToGrid()
 		case PM_TSTAT5E:
 			strTemp="TStat5E";
 			break;
+        case PM_PM5E:
+            strTemp="PM5E";
+            break;
 		case PM_TSTATRUNAR:
 			strTemp="TStatRunar";
 			break;
@@ -1235,6 +1244,9 @@ void CGridLoad::LoadDeviceToGrid()
 			break;
         case PM_TSTAT5i:
             strTemp="TStat5i";
+            break;
+        case PM_TSTAT8:
+            strTemp="TStat8";
             break;
 		case PM_TSTAT7:
 			strTemp="TStat7";
@@ -1258,6 +1270,7 @@ void CGridLoad::LoadDeviceToGrid()
         case  PM_PRESSURE_SENSOR:
             strTemp = "Pressure";
             break;
+       
 		case  PM_CO2_NODE:
 			strTemp = "CO2 Node";
 			break;

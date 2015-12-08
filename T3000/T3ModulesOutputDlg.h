@@ -34,4 +34,5 @@ afx_msg void OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pResult);
 public:
     int m_sn;
     ListCtrlEx::CListCtrlEx m_outputlist;
+    HANDLE hFirstThread;
 };

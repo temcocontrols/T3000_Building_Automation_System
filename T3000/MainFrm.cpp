@@ -86,11 +86,11 @@ extern CBacnetUserlogin * User_Login_Window;
 #include "BacnetMonitor.h"
 #include "T3ModulesView.h"
 #include "T3000_Default_MainView.h"
- #include "T3ModulesOutputDlg.h" 
- #include "ProductRegisterListView.h"
- #include "TStatInputView.h"
+#include "T3ModulesOutputDlg.h" 
+#include "ProductRegisterListView.h"
+#include "TStatInputView.h"
 
- #include "BoatMonitorViewer.h"
+#include "BoatMonitorViewer.h"
 
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");				
@@ -499,7 +499,7 @@ UINT _ReadMultiRegisters(LPVOID pParam)
 
 		CString achive_file_path;
 		CString temp_serial;
-		temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
+		temp_serial.Format(_T("%u.prg"),g_selected_serialnumber);
 		achive_file_path = g_achive_folder + _T("\\") + temp_serial;
 
 		Save_Product_Value_Cache(achive_file_path);
@@ -807,7 +807,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
          {
              CString achive_file_path;
              CString temp_serial;
-             temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
+             temp_serial.Format(_T("%u.prg"),g_selected_serialnumber);
              achive_file_path = g_achive_folder + _T("\\") + temp_serial;
              Load_Product_Value_Cache(achive_file_path);
              g_tstat_id = product_register_value[6];
@@ -1046,11 +1046,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         #if 1
         nFlag = product_register_value[7]; 
         {
-            if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) )
+            if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i)|| (nFlag == PM_TSTAT8) )
             {
                 product_type =T3000_6_ADDRESS;
             }
-            else if((nFlag == PM_TSTATRUNAR)||(nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H)||(nFlag==PM_TSTAT5G))
+            else if((nFlag == PM_TSTATRUNAR)||(nFlag == PM_TSTAT5E||nFlag == PM_PM5E) || (nFlag == PM_TSTAT5H)||(nFlag==PM_TSTAT5G))
             {
                 product_type = T3000_5EH_LCD_ADDRESS;
             }
@@ -1315,15 +1315,26 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	{
 		if(hSelItem==m_product.at(i).product_item )
 		{	
+          /*  int const PM_CS_SM_AC = 36;
+            int const PM_CS_SM_DC = 37;
+            int const PM_CS_RSM_AC = 38;
+            int const PM_CS_RSM_DC = 39;*/
+
             CString Product_Custom = m_product.at(i).Custom;
             m_current_tree_node = m_product.at(i);
-            if (Product_Custom.CompareNoCase(_T("1")) == 0)
+            if (Product_Custom.CompareNoCase(_T("1")) == 0 ||
+                m_current_tree_node.product_class_id == PM_CS_SM_AC|| 
+                m_current_tree_node.product_class_id == PM_CS_SM_DC||
+                m_current_tree_node.product_class_id == PM_CS_RSM_AC||
+                m_current_tree_node.product_class_id == PM_CS_RSM_DC
+                )
             {    
                 g_tstat_id = m_product.at(i).product_id;
                 g_selected_serialnumber = m_product.at(i).serial_number;
                 SwitchToPruductType(DLG_DIALOG_CUSTOM_VIEW);
                 return;
             }
+
 			g_strT3000LogString.Format(_T("Trying to connect to %s:%d"),GetProductName(m_product.at(i).product_class_id),m_product.at(i).serial_number);
 			
 				 
@@ -1997,7 +2008,7 @@ void CMainFrame::LoadProductFromDB()
 							TVINSERV_LC          //tree0412
 							else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
 							TVINSERV_LED //tree0412
-							else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i)
+							else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8)
 							TVINSERV_TSTAT6
 							else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR))
 							TVINSERV_CO2
@@ -2290,7 +2301,7 @@ void CMainFrame::LoadProductFromDB()
 								TVINSERV_LC          //tree0412
 								else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
 								TVINSERV_LED //tree0412
-								else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i)
+								else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8)
 								TVINSERV_TSTAT6
 								else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR))
 								TVINSERV_CO2
@@ -2975,7 +2986,7 @@ try
 					TVINSERV_LC          //tree0412
 				else if (temp_product_class_id == PM_TSTAT7)//TSTAT7 &TSTAT6 //tree0412
 					TVINSERV_LED //tree0412
-				else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i)
+				else if(temp_product_class_id == PM_TSTAT6||temp_product_class_id == PM_TSTAT7||temp_product_class_id == PM_TSTAT5i||temp_product_class_id == PM_TSTAT8)
 					TVINSERV_TSTAT6
 				else if((temp_product_class_id == PM_CO2_NET) || (temp_product_class_id == PM_CO2_RS485)||(temp_product_class_id == PM_PRESSURE_SENSOR))
 					TVINSERV_CO2
@@ -3293,8 +3304,8 @@ void CMainFrame::OnLoadConfigFile()
 
 	int nCurID=g_tstat_id;
 	g_bPauseMultiRead=TRUE;
-	CGridLoad Dlg;
-	Dlg.DoModal();
+// 	CGridLoad Dlg;
+// 	Dlg.DoModal();
 	g_tstat_id=nCurID;
 	ReFresh();
 	g_bPauseMultiRead=FALSE;
@@ -4241,7 +4252,7 @@ here:
     CString strInfo;
     strInfo.Format(_T("%d"),m_nCurView);
     WritePrivateProfileStringW(_T("T3000_START"),_T("Interface"),strInfo,g_configfile_path);
-    strInfo.Format(_T("%d"),g_selected_serialnumber);
+    strInfo.Format(_T("%u"),g_selected_serialnumber);
     WritePrivateProfileStringW(_T("T3000_START"),_T("SerialNumber"),strInfo,g_configfile_path);
     /* CString achive_file_path;
     CString temp_serial;
@@ -4317,6 +4328,12 @@ here:
 	}
 	break;
     case  DLG_CO2_VIEW:
+        {
+            m_nCurView = DLG_CO2_VIEW;
+            ((CCO2_View*)m_pViews[m_nCurView])->Fresh();
+        }
+        break;
+    case  PM_CO2_NODE:
         {
             m_nCurView = DLG_CO2_VIEW;
             ((CCO2_View*)m_pViews[m_nCurView])->Fresh();
@@ -4563,6 +4580,7 @@ CString CMainFrame::GetDeviceClassName(int nClassID)
 	case 17: strClassName=g_strTstat5f;break;
 	case 18:strClassName=g_strTstat5g;break;
 	case 16:strClassName=g_strTstat5e;break;
+    case PM_PM5E:strClassName=g_strTstat5e;break;
 	case 19:strClassName=g_strTstat5h;break;
 	case 7:strClassName=g_strTstat7;break;
 	case 6:strClassName=g_strTstat6;break;
@@ -5416,7 +5434,7 @@ void CMainFrame::SaveConfigFile()
 		strTips.Format(_T("Config file \" %s \" saved successful."), strFilename);
 		SetPaneString(1, strTips);
 	}
-	else if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+	else if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 	{
 
 		int index = 0;
@@ -5433,12 +5451,18 @@ void CMainFrame::SaveConfigFile()
 		SetPaneString(3, strTips);
 		//AfxMessageBox(strTips);
 	}
-	else//save tstat config file:
-	{//?????
-		nret=write_one(g_tstat_id,MODBUS_FAN_GRIDPOINT,4);
+	else if (product_register_value[7] == PM_CO2_NODE)
+	{
+        Save2File_ForCO2Node((LPTSTR)(LPCTSTR)strFilename);
+	}
+    else
+    //save tstat config file:
+	{
+    //?????
+	/*	nret=write_one(g_tstat_id,MODBUS_FAN_GRIDPOINT,4);
 		nret=write_one(g_tstat_id,MODBUS_MODE_GRIDPOINT,0);
 		nret=write_one(g_tstat_id,MODBUS_HOLD_GRIDPOINT,0);
-		nret=write_one(g_tstat_id,MODBUS_CONFIGURATION,0);
+		nret=write_one(g_tstat_id,MODBUS_CONFIGURATION,0);*/
 		//int nSpecialValue=read_one(g_tstat_id,326);
 
 		//if(nSpecialValue==1)
@@ -5787,7 +5811,7 @@ void CMainFrame::GetIONanme()
 		bado.OnInitADOConn(); 
 
 			CString strSerial;
-			strSerial.Format(_T("%d"),g_selected_serialnumber);
+			strSerial.Format(_T("%u"),g_selected_serialnumber);
 			strSerial.Trim();
 			CString strsql;
 			strsql.Format(_T("select * from IONAME where SERIAL_ID = '%s'"),strSerial);
@@ -5971,11 +5995,11 @@ void CMainFrame::OnHelp()
 	//CString strHelp=g_strExePth+_T("The Instruction of T3000 .txt");
 	//::HtmlHelp(NULL, strHelp, HH_DISPLAY_TOPIC, 0);
 	//ShellExecute(NULL, _T("open"), strHelp, NULL, NULL, SW_SHOWNORMAL);
-	//HWND hWnd;
+	 HWND hWnd;
 
-// 	if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
-// 	else
-	//	hWnd =  ::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+//  	if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+//  	else
+		hWnd =  ::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
 	//return (hWnd != NULL);
 
 //      CGraphicModelDlg dlg;
@@ -7075,7 +7099,10 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{
 				SetLastCommunicationType(1);
 				g_protocol=MODBUS_TCPIP;
+               // SetResponseTime (2000);   For Kaiyin's TstatHUM
 				int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,5);
+                 
+                 //
 				if(nmultyRet <0)
 				{
 					//AfxMessageBox(_T("Device is offline,Please check the connection!"));//\nDatabase->Building config Database
@@ -7181,7 +7208,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			//Device_Type=read_one(g_tstat_id,7,10);
 			CString achive_file_path;
 			CString temp_serial;
-			temp_serial.Format(_T("%d.prg"),g_selected_serialnumber);
+			temp_serial.Format(_T("%u.prg"),g_selected_serialnumber);
             if (Device_Type == 0)
             {
             Device_Type=Scan_Product_ID;
@@ -7254,62 +7281,139 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{
 				int Use_zigee = 0;
 				int power_value = 1;
-				if(Device_Type == PM_TSTAT6||Device_Type == PM_TSTAT7||Device_Type == PM_TSTAT5i)
+                int length = 10;
+                nFlag = Device_Type; 
+                 int it = 0;
+                    if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) || (nFlag == PM_TSTAT8))
+                    {
+                        product_type =T3000_6_ADDRESS;
+                    }
+                    else if((nFlag == PM_TSTATRUNAR)||(nFlag == PM_TSTAT5E||nFlag == PM_PM5E) || (nFlag == PM_TSTAT5H)||(nFlag==PM_TSTAT5G))
+                    {
+                        product_type = T3000_5EH_LCD_ADDRESS;
+                    }
+                    else if((nFlag == PM_TSTAT5A) ||(nFlag == PM_TSTAT5B) ||
+                        (nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F))
+                    {
+                        product_type =T3000_5ABCDFG_LED_ADDRESS;
+                    }
+                    else if (nFlag==PM_CS_SM_AC||nFlag==PM_CS_SM_DC||nFlag==PM_CS_RSM_AC||nFlag==PM_CS_RSM_DC)
+                    {
+                        product_type=CS3000;
+                    }
+                    else if (nFlag==PM_T3PT10||nFlag==PM_T3IOA||nFlag==PM_T332AI||nFlag== PM_T38AI16O||nFlag==PM_T38I13O||
+                        nFlag==PM_T34AO||nFlag==PM_T36CT||nFlag==PM_T3PERFORMANCE||
+                        nFlag == PM_T322AI||
+                        nFlag == PM_T38AI8AO6DO)
+                    {
+                        product_type=T3000_T3_MODULES;
+                    }
+                    else {
+                        product_type=nFlag;
+                    }
+
+                    
+
+             
+
+
+				if(product_type == T3000_6_ADDRESS)
 				{ 
 						power_value = 1;
-				}
-				register_critical_section.Lock();
-				int i;
-				int it = 0;
-				float progress;
-				for(i=0;i<(9*power_value);i++)	//暂定为0 ，因为TSTAT6 目前为600多
-				{
-					int itemp = 0;
-					itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(100/power_value)],i*(100/power_value),100/power_value,5);
-					if(itemp < 0)
-					{
-						break;
-					}
-					else						
-					{
-						if (pDlg!=NULL)
-						{
-							progress=float((it+1)*(100/(9*power_value)));
-							//pDlg->ShowProgress(int(progress),int(progress));
-							g_progress_persent = progress;
-						} 
-					}							
-					it++;
-					Sleep(20 * power_value);
-				}
-				g_tstat_id_changed=FALSE;
-				register_critical_section.Unlock();
+                        register_critical_section.Lock();
+                        int i;
+                         it =0;
+                        float progress;
+                        for(i=0;i<(length*power_value);i++)	//暂定为0 ，因为TSTAT6 目前为600多
+                        {
+                            int itemp = 0;
+                            itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(100/power_value)],i*(100/power_value),100/power_value,5);
+                            if(itemp < 0)
+                            {
+                                break;
+                            }
+                            else						
+                            {
+                                if (pDlg!=NULL)
+                                {
+                                    progress=float((it+1)*(100/(9*power_value)));
+                                    //pDlg->ShowProgress(int(progress),int(progress));
+                                    g_progress_persent = progress;
+                                } 
+                            }							
+                            it++;
+                            Sleep(20 * power_value);
+                        }
+                        g_tstat_id_changed=FALSE;
+                        register_critical_section.Unlock();
 
-#if 0
-				for(i=0;i<(13*power_value);i++)	//暂定为0 ，因为TSTAT6 目前为600多
-				{
-					int itemp = 0;
-					itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(64/power_value)],i*(64/power_value),64/power_value,5);
-					if(itemp < 0)
-					{
-						break;
-					}
-					else						
-					{
-						if (pDlg!=NULL)
-						{
-							progress=float((it+1)*(100/(13*power_value)));
-							pDlg->ShowProgress(int(progress),int(progress));
-						} 
-					}							
-					it++;
-					Sleep(50 * power_value);
 				}
-#endif
+				else if (product_type == T3000_T3_MODULES)
+				{
+                    length =4;
+                    power_value = 1;
+                    register_critical_section.Lock();
+                    int i;
+                    it =0;
+                    float progress;
+                    for(i=0;i<(length*power_value);i++)	//暂定为0 ，因为TSTAT6 目前为600多
+                    {
+                        int itemp = 0;
+                        itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(100/power_value)],i*(100/power_value),100/power_value,5);
+                        if(itemp < 0)
+                        {
+                            break;
+                        }
+                        else						
+                        {
+                            if (pDlg!=NULL)
+                            {
+                                progress=float((it+1)*(100/(length*power_value)));
+                                //pDlg->ShowProgress(int(progress),int(progress));
+                                g_progress_persent = progress;
+                            } 
+                        }							
+                        it++;
+                        Sleep(20 * power_value);
+                    }
+                    g_tstat_id_changed=FALSE;
+                    register_critical_section.Unlock();
+				}
+                else
+                {
+                    power_value = 1;
+                    length = 9;
+                    register_critical_section.Lock();
+                    int i;
+                    float progress;
+                    for(i=0;i<(length*power_value);i++)	//暂定为0 ，因为TSTAT6 目前为600多
+                    {
+                        int itemp = 0;
+                        itemp = Read_Multi(g_tstat_id,&multi_register_value[i*(100/power_value)],i*(100/power_value),100/power_value,5);
+                        if(itemp < 0)
+                        {
+                            break;
+                        }
+                        else						
+                        {
+                            if (pDlg!=NULL)
+                            {
+                                progress=float((it+1)*(100/(9*power_value)));
+                                //pDlg->ShowProgress(int(progress),int(progress));
+                                g_progress_persent = progress;
+                            } 
+                        }							
+                        it++;
+                        Sleep(20 * power_value);
+                    }
+                    g_tstat_id_changed=FALSE;
+                    register_critical_section.Unlock();
+                }
+ 
 				
 				 memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
 			
-				 nFlag = Device_Type; 
+			
                 if ((nFlag == PM_TSTAT6||nFlag == PM_TSTAT7) && product_register_value[714] == 0x56)
                 {  
                     CString TstatName,TstatDBName;
@@ -7379,48 +7483,17 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                  #endif
                 }
                 
-				 {
-					 if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) )
-					 {
-						 product_type =T3000_6_ADDRESS;
-					 }
-					 else if((nFlag == PM_TSTATRUNAR)||(nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H)||(nFlag==PM_TSTAT5G))
-					 {
-						 product_type = T3000_5EH_LCD_ADDRESS;
-					 }
-					 else if((nFlag == PM_TSTAT5A) ||(nFlag == PM_TSTAT5B) ||
-						 (nFlag ==PM_TSTAT5C ) || (nFlag == PM_TSTAT5D) || (nFlag == PM_TSTAT5F))
-					 {
-						 product_type =T3000_5ABCDFG_LED_ADDRESS;
-					 }
-					 else if (nFlag==PM_CS_SM_AC||nFlag==PM_CS_SM_DC||nFlag==PM_CS_RSM_AC||nFlag==PM_CS_RSM_DC)
-					 {
-						 product_type=CS3000;
-					 }
-					 else if (nFlag==PM_T3PT10||nFlag==PM_T3IOA||nFlag==PM_T332AI||nFlag== PM_T38AI16O||nFlag==PM_T38I13O||
-                             nFlag==PM_T34AO||nFlag==PM_T36CT||nFlag==PM_T3PERFORMANCE||
-                             nFlag == PM_T322AI||
-                             nFlag == PM_T38AI8AO6DO)
-					 {
-						 product_type=T3000_T3_MODULES;
-					 }
-					 else {
-					 product_type=nFlag;
-					 }
-					 
-					 //Code and comments by Fance
-					 //Use old_product_type to save the last value.
-					 //if this value is change ,it will reload the register value.
-					 //example:
-					 //For tstats 5A : product_register_value[MODBUS_BAUDRATE]  ->  MODBUS_BAUDRATE = 185
-					 //For tstats 6	  product_register_value[MODBUS_BAUDRATE]  ->  MODBUS_BAUDRATE = 110
-					 if(old_product_type!=product_type)
-					 {
-						 old_product_type = product_type;
-						 MyRegAddress.Change_Register_Table();
-					 }
-					 
-				 }
+                //Code and comments by Fance
+                //Use old_product_type to save the last value.
+                //if this value is change ,it will reload the register value.
+                //example:
+                //For tstats 5A : product_register_value[MODBUS_BAUDRATE]  ->  MODBUS_BAUDRATE = 185
+                //For tstats 6	  product_register_value[MODBUS_BAUDRATE]  ->  MODBUS_BAUDRATE = 110
+                if(old_product_type!=product_type)
+                {
+                    old_product_type = product_type;
+                    MyRegAddress.Change_Register_Table();
+                }
 
                 
 
@@ -7445,7 +7518,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				 }
 				 /*bac_net_initial_once = false;*/
 				 
-				if (it<9)
+				if (it<length)
 				{	
 					//AfxMessageBox(_T("Reading abnormal \n Try again!"));
                     if (!m_pDialogInfo->IsWindowVisible())
@@ -7665,7 +7738,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				 g_HumChamberThread=TRUE;
 				SwitchToPruductType(DLG_HUMCHAMBER);
 			}
-			else if(nFlag == PM_CO2_RS485||nFlag == PM_PRESSURE_SENSOR)//(nFlag == PM_CO2_NET)||
+			else if(nFlag == PM_CO2_RS485||nFlag == PM_PRESSURE_SENSOR||nFlag == PM_CO2_NODE)//(nFlag == PM_CO2_NET)||
 			{
 				SwitchToPruductType(DLG_CO2_VIEW);
 			}
@@ -7682,7 +7755,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 			{
 			    SwitchToPruductType(DLG_AIRQUALITY_VIEW);
 			}
-			else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i)
+			else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i||nFlag==PM_TSTAT8)
 			{
 			
                 CString g_configfile_path =g_strExePth + g_strStartInterface_config;
@@ -7712,11 +7785,11 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 				//if product module is TSTAT6 or TSTAT7 use T3000_6_ADDRESS. T3000_6_ADDRESS is a register table in t3000.mdb  T3000_Register_Address_By_Name
 				//else if product module is PM_TSTAT5E PM_TSTAT5H use T3000_5EH_LCD_ADDRESS
 				//else if product module is TSTAT5 ABCDFG USE T3000_5ABCDFG_LED_ADDRESS
-				if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) )
+				if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) || (nFlag == PM_TSTAT8))
 				{
 					product_type = T3000_6_ADDRESS;
 				}
-				else if((nFlag == PM_TSTATRUNAR)||(nFlag == PM_TSTAT5E) || (nFlag == PM_TSTAT5H)||(nFlag==PM_TSTAT5G))
+				else if((nFlag == PM_TSTATRUNAR)||(nFlag == PM_TSTAT5E||nFlag == PM_PM5E) || (nFlag == PM_TSTAT5H)||(nFlag==PM_TSTAT5G))
 				{
 					product_type = T3000_5EH_LCD_ADDRESS;
 				}
@@ -8110,10 +8183,10 @@ end_condition :
 						{
 						  str_Product_name_view = temp_pname + _T(":") + str_serialid + _T("-") + temp_modbusid + _T("-") + str_ip_address_exist;
 						}
-						else if(m_refresh_net_device_data.at(y).product_id == PM_TSTAT7)	//TSTAT7 不支持写 label名字;
-						{
-							str_Product_name_view = temp_pname + _T(":") + str_serialid + _T("-") + temp_modbusid + _T("-") + str_ip_address_exist;
-						}
+						//else if(m_refresh_net_device_data.at(y).product_id == PM_TSTAT7)	//TSTAT7 不支持写 label名字;
+						//{
+						//	str_Product_name_view = temp_pname + _T(":") + str_serialid + _T("-") + temp_modbusid + _T("-") + str_ip_address_exist;
+						//}
 						else
 						{
 							str_Product_name_view = m_refresh_net_device_data.at(y).show_label_name;
@@ -9093,7 +9166,7 @@ void CMainFrame::JudgeTstat6dbExist( CString strtable,CString strsql )
 void CMainFrame::Updata_db_tstat6( unsigned short imodel )
 {
 	CString strtable;
-	if (imodel == PM_TSTAT6||imodel == PM_TSTAT5i)
+	if (imodel == PM_TSTAT6||imodel == PM_TSTAT5i||imodel == PM_TSTAT8)
 		 strtable = _T("Tstat6");
 //     if (imodel == PM_TSTAT5i)
 //         strtable = _T("Tstat5i");
@@ -9798,6 +9871,10 @@ loop1:
 									{
 										g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,0,0,My_WriteList_Struct->entitysize);
 									}
+									else if((unsigned char)My_WriteList_Struct->command == READANALOG_CUS_TABLE_T3000)
+									{
+										g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,My_WriteList_Struct->start_instance,My_WriteList_Struct->end_instance,My_WriteList_Struct->entitysize);
+									}
 									else
 									g_invoke_id = GetPrivateData(My_WriteList_Struct->deviceid,My_WriteList_Struct->command,(BAC_READ_GROUP_NUMBER)*i,3+(BAC_READ_GROUP_NUMBER)*i,My_WriteList_Struct->entitysize);
 									Sleep(SEND_COMMAND_DELAY_TIME);
@@ -10058,7 +10135,7 @@ void CMainFrame::OnControlInputs()
 	AfxMessageBox(_T("NO Connection,Please connect your device,fristly!"));
 	return;
 	}   
-	if (product_type==CS3000||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7)
+	if (product_type==CS3000||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
 	{
 		 
         SwitchToPruductType(DLG_DIALOG_TSTAT_INPUT_VIEW);
@@ -10387,7 +10464,7 @@ void CMainFrame::OnControlAnnualroutines()
 	else
 	{
 
-		if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
 		{
  
 			g_bPauseMultiRead = TRUE;
@@ -10448,7 +10525,7 @@ void CMainFrame::OnControlSettings()
 	}
 	else
 	{
-		if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
 		{
 			CParameterDlg dlg(this,GetProductName(product_register_value[7]));
 			dlg.DoModal();
@@ -10611,7 +10688,7 @@ void CMainFrame::OnControlScreens()
 	}
 	else
 	{    
-		if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7)
+		if(product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
 		{
 	     SwitchToGraphicView();
 		 }

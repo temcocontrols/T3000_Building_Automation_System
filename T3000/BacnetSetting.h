@@ -85,6 +85,9 @@ public:
 	afx_msg void OnCbnSelchangeComboBacnetSettingDdnsServer();
 	afx_msg void OnEnKillfocusEditTimeUpdate();
 	afx_msg void OnCbnSelchangeComboBacnetSettingTimeZone();
+	afx_msg void OnBnClickedCheckSettingPap();
+	CEdit m_edit_port;
+	afx_msg void OnEnKillfocusEditSettingPort();
 };
 
 

@@ -89,6 +89,7 @@ public:
 	void CO2_Alarm_Set();
 	void CO2_Grid_init();
 	void C02_SHOW_TEMP();
+    void Node_SHOW_TEMP();
 	 void Initial_List();
 	 
 	void Check_DayTime();
@@ -351,6 +352,8 @@ public:
     ListCtrlEx::CListCtrlEx m_output_list;
     void Initial_InputList();
     void Initial_OutputList();
+    void Initial_Node_InputList();
+    void Initial_Node_OutputList();
     afx_msg void OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult);
     afx_msg void OnNMClickList_Output(NMHDR *pNMHDR, LRESULT *pResult);
     afx_msg void OnNMClickList_CO2List(NMHDR *pNMHDR, LRESULT *pResult);
@@ -362,6 +365,8 @@ public:
     int m_list_type ;
 
     afx_msg void OnBnClickedGrapic();
+    afx_msg void OnBnClickedTempSensor();
+    afx_msg void OnBnClickedHumSensor();
 };
 const int CO2_EXTERNAL_NUM = 0;
 const int CO2_EXTERNAL_DEVICE_ID = 1;

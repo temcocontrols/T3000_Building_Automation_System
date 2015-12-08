@@ -112,7 +112,7 @@ BOOL COutputSetDlg::OnInitDialog()
 	m_Interlockcombo.ShowWindow(SW_HIDE);//tsta5
 	//m_FlexGrid.put_Cols(TOTAL_OUTCOLS);//tsta5
 	m_FlexGrid.put_Cols(9);	//原来是7 后来加了ON/OFF Time Set,ON/OFFTime left,OFF/ON Time Set OFF/ON Time left 
-	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7)
+	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||(product_register_value[7] == PM_TSTAT8))
 	{
 		m_FlexGrid.put_Cols(10);
 		m_FlexGrid.put_TextMatrix(0,SIGUAL_TYPE,_T("Signal Type"));
@@ -229,8 +229,11 @@ void COutputSetDlg::Fresh_Grid()
 	case PM_TSTAT5D:m_outRows=8;break;
 	case PM_TSTAT6:
     case PM_TSTAT5i:
+    case PM_TSTAT8:
 	case PM_TSTAT7:
 	case 16:m_outRows=8;break;
+
+    case PM_PM5E:m_outRows=8;break;
 	case 17:m_outRows=6;break;
 	case 18:m_outRows=8;break;
 	case 19:m_outRows=8;break;
@@ -288,7 +291,7 @@ void COutputSetDlg::Fresh_Grid()
 		//strTemp=_T("On/Off");
 		nRange=product_register_value[MODBUS_MODE_OUTPUT1+i-1];
 		 
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT8)||(product_register_value[7] == PM_TSTAT5i))
 		{
 			CBADO ado;
 			ado.SetDBPath(g_strCurBuildingDatabasefilePath);
@@ -468,8 +471,8 @@ void COutputSetDlg::Fresh_Grid()
 
 //----------------------------------------------------------------------------------
 
-	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16 
-		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)//||m_nModeType==17||m_nModeType==18)
+	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16 ||m_nModeType==PM_PM5E
+		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT8||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)//||m_nModeType==17||m_nModeType==18)
 	{
 		// just for row4 ///////////////////////////////////////////////////////////////
 		if((int)(nAMVAlue & 8))
@@ -497,7 +500,7 @@ void COutputSetDlg::Fresh_Grid()
 		 
 		{
 			nRange = product_register_value[MODBUS_MODE_OUTPUT4];//283  205
-			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 			{
  				CBADO ado;
 				ado.SetDBPath(g_strCurBuildingDatabasefilePath);
@@ -652,7 +655,7 @@ void COutputSetDlg::Fresh_Grid()
 		//nRange=product_register_value[284];
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 		{
 			CBADO ado;
 			ado.SetDBPath(g_strCurBuildingDatabasefilePath);
@@ -835,7 +838,7 @@ void COutputSetDlg::Fresh_Grid()
 		//283	205	1	Low byte	W/R	Determine the output4 mode. 0, ON/OFF mode; 1, floating valve for cooling; 2, lighting control; 3, PWM 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT4]; //283  205
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 		{if(nRange>=0&&nRange<=3)
 		{
 			strTemp=OUTPUT_RANGE45[nRange];
@@ -875,7 +878,7 @@ void COutputSetDlg::Fresh_Grid()
 		{
 			int indext=-1;
 			//336	269	1	Low byte	W/R	Output4 function setting (see above)
-			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 			{
 				indext=product_register_value[269];
 			}else
@@ -895,7 +898,7 @@ void COutputSetDlg::Fresh_Grid()
 		//284	206	1	Low byte	W/R	Determine the output5 mode. 0, ON/OFF mode; 1, floating valve for heating; 2, lighting control; 3, PWM
 
 		////337	270	1	Low byte	W/R	Output5 function setting (see above)
-        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+        if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
         {
 			nRang=product_register_value[206];
 		}else
@@ -905,7 +908,7 @@ void COutputSetDlg::Fresh_Grid()
 		//108	209	1	Low byte	W/R	Output1 tot 5, bit 0 thru 4 = relay 1 thru 5.
 
 		nValue1 = product_register_value[MODBUS_DIGITAL_OUTPUT_STATUS];//108   209
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 		{
 			if(nRang==0)
 			{
@@ -979,7 +982,7 @@ void COutputSetDlg::Fresh_Grid()
 
 
 		nRange = product_register_value[MODBUS_MODE_OUTPUT5];  //284  206
-		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+		if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 		{
 			if(nRange>=0&&nRange<=3)
 			{
@@ -1021,7 +1024,7 @@ void COutputSetDlg::Fresh_Grid()
 			//337	270	1	Low byte	W/R	Output5 function setting (see above)
 
 			int indext=-1;
-			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 			{
 				indext=product_register_value[270];
 			}else
@@ -1041,8 +1044,8 @@ void COutputSetDlg::Fresh_Grid()
 		}
 	}
 	//row45/67 ANALOG
-	if ((m_nModeType==1||m_nModeType==3||m_nModeType==2)||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PRESSURE
-		||m_nModeType==18||m_nModeType==6||m_nModeType==PM_TSTAT5i||m_nModeType==7)//5ADEG
+	if ((m_nModeType==1||m_nModeType==3||m_nModeType==2)||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E||m_nModeType==PM_PRESSURE
+		||m_nModeType==18||m_nModeType==6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==7)//5ADEG
 	{
 		//186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
 		//102	210	2	Full	W/R(write only when manual output6 enable)	Output6 ,Analog output1, a number from 0-1000 representing 0% (closed) to 100% (open). When Range = On/Off mode, On=1000, Off=0.
@@ -1228,7 +1231,7 @@ else
 			{
 				float nvalue=0.0;
 				//if (product_register_value[7] == 6)
-				if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+				if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 				{
 					//AfxMessageBox(_T("It's impossible to enter this place!"));
 					if(nRange==1)//0-10v
@@ -1336,7 +1339,7 @@ else
 					//strTemp.Format(_T("%.1f"),nValue/100.0);
 					float nvalue=0.0;
 					 
-					if ((product_register_value[7] == 6)||(product_register_value[7] == 7)||(product_register_value[7] == PM_TSTAT5i))
+					if ((product_register_value[7] == 6)||(product_register_value[7] == 7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 					{
 						if(nRange==1)//0-10v
 						{
@@ -1442,7 +1445,7 @@ else
 	CString strlock;
 	int stradd;// = 286;
 	//if (product_register_value[7] == 6)
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 	{
 		stradd =MODBUS_INTERLOCK_OUTPUT1; //245;
 		for (int i = 0;i<7;i++)
@@ -1474,7 +1477,7 @@ else
 	
 	//Delay
 	
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 	{  CString strdelay;
 	for (int row=0;row<7;row++)
 	{
@@ -1511,7 +1514,7 @@ else
 	}
 	
 	
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)){
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8)){
 	nAMVAlue = product_register_value[MODBUS_OUTPUT_MANU_ENABLE];
 	for (int row=1;row<=5;row++)
 	{
@@ -1555,7 +1558,7 @@ else
 	}
 
 	///////////////////////////////////////重现写Range//////////////////////////
-	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7)
+	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT5i||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT8)
 	{
 		for (int row=1;row<6;row++)
 		{
@@ -4867,7 +4870,7 @@ else
 //}
 
 BEGIN_EVENTSINK_MAP(COutputSetDlg, CDialog)
-	//ON_EVENT(COutputSetDlg, IDC_MSFLEXGRID1, DISPID_CLICK, COutputSetDlg::ClickMsflexgrid1, VTS_NONE)
+	ON_EVENT(COutputSetDlg, IDC_MSFLEXGRID1, DISPID_CLICK, COutputSetDlg::ClickMsflexgrid1, VTS_NONE)
 END_EVENTSINK_MAP()
 
 void COutputSetDlg::ClickMsflexgrid1()
@@ -4881,7 +4884,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 	*/
 
  #if 1//Tstat67
-	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+	if ((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 	{
 	m_FlexGrid.SetFocus();
 	long lRow,lCol;
@@ -5046,7 +5049,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 			//	for(int i=0;i<2;i++)
 			 
 
-			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+			if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 			{
 				for(int i=0;i<7;i++)//2.5.0.98
 				{
@@ -5258,7 +5261,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 			
 			/////////////////////////////////////////////////////////////////////////////////
 			// below added by zgq;
-			if(m_nModeType==16 && lRow==4)
+			if((m_nModeType==16||m_nModeType==PM_PM5E) && lRow==4)
 			{
 				int nTempValue = product_register_value[310];
 				if(!(nTempValue & 0x08))	 // A/M，如选择Auto，不动，否则看Range
@@ -5278,7 +5281,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 				}
 			}
 
-			if((product_register_value[7]==PM_TSTAT5D||product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR) ||
+			if((product_register_value[7]==PM_TSTAT5D||product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR) ||
 				(product_register_value[7] == PM_TSTAT5G)) && lRow>5)
 			{
 				int nTempValue = product_register_value[310];
@@ -5411,7 +5414,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 
 
 	
-			if((m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_PRESSURE)&&lRow==6)
+			if((m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E||m_nModeType==18||m_nModeType==PM_PRESSURE)&&lRow==6)
 			{
 				if((m_nModeType==17||m_nModeType==18)&&lRow==4)
 			{
@@ -5457,7 +5460,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 				}
 			}
 			
-			if((m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_PRESSURE)&&lRow==7)
+			if((m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E||m_nModeType==18||m_nModeType==PM_PRESSURE)&&lRow==7)
 			{
 				if(product_register_value[187]==0)//ON/oFF
 					m_OutValueEdt.ShowWindow(SW_HIDE);	
@@ -5596,7 +5599,7 @@ void COutputSetDlg::ClickMsflexgrid1()
 					return;
 			}
 		}
-		else if (product_register_value[7]==PM_TSTAT5E||(product_register_value[7]==PM_TSTATRUNAR))
+		else if (product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E||(product_register_value[7]==PM_TSTATRUNAR))
 		{
 			if (m_nCurRow<=5)
 			{
@@ -5888,8 +5891,8 @@ void COutputSetDlg::OnCbnSelchangeOvaluecombo()
 	}
 
 	//BCDE;
-	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16
-		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_PRESSURE) 
+	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16  ||m_nModeType==PM_PM5E
+		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==PM_PRESSURE) 
 	{
 		if(m_nCurRow==4&&m_nCurCol==VALUE_OUTFIELD)
 		{
@@ -6043,7 +6046,7 @@ void COutputSetDlg::OnCbnSelchangeOvaluecombo()
 
 	//DEG:out6/out7:
 	//186	207	1	Low byte	W/R	Analog Output1 range - 0=On/Off, 1=0-10V, 2=0-5V, 3=2-10V, 4= 10-0V 
-	if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i
+	if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8
 		||m_nModeType==PM_TSTAT7 ||m_nModeType==PM_PRESSURE)
 	{
 		if(m_nCurRow==6&&m_nCurCol==VALUE_OUTFIELD)
@@ -6154,8 +6157,8 @@ void COutputSetDlg::OnCbnSelchangeOamcombo()
 	//end of first 3 rows.
 
 	//4,5
-	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16||m_nModeType==17
-		||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_PRESSURE)
+	if(m_nModeType==1||m_nModeType==4||m_nModeType==12||m_nModeType==16||m_nModeType==PM_PM5E||m_nModeType==17
+		||m_nModeType==18||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==PM_PRESSURE)
 	{
 		if(m_nCurRow==4&&AM_OUTFIELD==m_nCurCol)
 		{
@@ -6227,8 +6230,8 @@ void COutputSetDlg::OnCbnSelchangeOamcombo()
 	}
 
 	//6.7
-	if(m_nModeType==12||m_nModeType==16||m_nModeType==18
-		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_PRESSURE)
+	if(m_nModeType==12||m_nModeType==16||m_nModeType==18||m_nModeType==PM_PM5E
+		||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT7||m_nModeType==PM_TSTAT5i||m_nModeType==PM_TSTAT8||m_nModeType==PM_PRESSURE)
 	{
 		if(m_nCurRow==6&&AM_OUTFIELD==m_nCurCol)
 		{
@@ -7194,7 +7197,7 @@ void COutputSetDlg::OnCbnSelchangeOfuncombo()
 void COutputSetDlg::OnEnKillfocusValueedit()
 {
 	BeginWaitCursor();
-	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i))
+	if((product_register_value[7] == PM_TSTAT6)||(product_register_value[7] == PM_TSTAT7)||(product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT8))
 	{
 		CString strText;
 		m_OutValueEdt.GetWindowText(strText);
@@ -7347,7 +7350,7 @@ void COutputSetDlg::OnEnKillfocusValueedit()
 			}
 
 		}
-		if(m_nModeType==12||(m_nModeType==16)||(m_nModeType==18)||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i
+		if(m_nModeType==12||(m_nModeType==16||m_nModeType==PM_PM5E)||(m_nModeType==18)||m_nModeType==PM_TSTAT6||m_nModeType==PM_TSTAT5i ||m_nModeType==PM_TSTAT8
 			||m_nModeType==PM_TSTAT7||m_nModeType==PM_PRESSURE)
 		{
 			//  commented by zgq;2010-12-06; 写入的值应当为实际设置电压值×100。

@@ -163,7 +163,7 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 			}
 			else
 			{
-				if(BacNet_hwd!=NULL)
+				if((BacNet_hwd!=NULL) && ((g_hwnd_now == m_input_dlg_hwnd) || (g_hwnd_now == m_output_dlg_hwnd) || (g_hwnd_now == m_pragram_dlg_hwnd) || (g_hwnd_now == m_variable_dlg_hwnd)))
 					::PostMessage(BacNet_hwd,WM_CHANGE_NEXT_PANEL_MESSAGE,LIST_UP,0);
 				return ;
 			}
@@ -211,8 +211,9 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 			}
 			else
 			{
-				if(BacNet_hwd!=NULL)
+				if((BacNet_hwd!=NULL) && ((g_hwnd_now == m_input_dlg_hwnd) || (g_hwnd_now == m_output_dlg_hwnd) || (g_hwnd_now == m_pragram_dlg_hwnd) || (g_hwnd_now == m_variable_dlg_hwnd)))
 					::PostMessage(BacNet_hwd,WM_CHANGE_NEXT_PANEL_MESSAGE,LIST_DOWN,0);
+				
 				return ;
 			}
 

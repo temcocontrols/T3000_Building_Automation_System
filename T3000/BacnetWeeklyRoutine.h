@@ -33,6 +33,7 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedButtonWeeklyScheduleEdit();
+	afx_msg void OnNMDblclkListWeeklySchedule(NMHDR *pNMHDR, LRESULT *pResult);
 	virtual void OnCancel();
 	void Reg_Hotkey();
 	void Unreg_Hotkey();

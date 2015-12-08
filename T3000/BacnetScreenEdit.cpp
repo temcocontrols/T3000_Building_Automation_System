@@ -948,6 +948,14 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 				temp1.entitysize = sizeof(Str_variable_point);
 				m_graphic_refresh_data.push_back(temp1);
 			}
+			else if(bac_label.nPoint_type == 3)
+			{
+				if(temp1.value_item >= BAC_PID_COUNT)
+					continue;
+				temp1.command = READCONTROLLER_T3000;
+				temp1.entitysize = sizeof(Str_controller_point);
+				m_graphic_refresh_data.push_back(temp1);
+			}
 
 		}
 		else if((bac_label.nMain_Panel == Station_NUM) && (bac_label.nSub_Panel != 0))
@@ -1298,7 +1306,7 @@ void CBacnetScreenEdit::OnPaint()
 					dev_reg = high_3bit * 256 + m_remote_point_data.at(i).point.number;
 
 					unsigned char nFlag = m_remote_point_data.at(i).product_id;
-					if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i) )
+					if((nFlag == PM_TSTAT6) || (nFlag == PM_TSTAT7)|| (nFlag == PM_TSTAT5i)|| (nFlag == PM_TSTAT8) )
 					{
 						MultiByteToWideChar( CP_ACP, 0, (char *)TSTAT_6_ADDRESS[dev_reg].AddressName,(int)strlen((char *)TSTAT_6_ADDRESS[dev_reg].AddressName)+1, temp_description.GetBuffer(MAX_PATH), MAX_PATH );
 						temp_description.ReleaseBuffer();	

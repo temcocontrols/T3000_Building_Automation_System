@@ -46,6 +46,7 @@ BEGIN_MESSAGE_MAP(BacnetAnnualRoutine, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_ANNUAL_EDIT, &BacnetAnnualRoutine::OnBnClickedButtonAnnualEdit)
 //	ON_MESSAGE(MY_RESUME_DATA, AnnualResumeMessageCallBack)
 	ON_WM_HELPINFO()
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST_BAC_ANNULE_LIST, &BacnetAnnualRoutine::OnNMDblclkListAnnuleList)
 END_MESSAGE_MAP()
 
 
@@ -481,10 +482,20 @@ void BacnetAnnualRoutine::Unreg_Hotkey()
 	UnregisterHotKey(GetSafeHwnd(),KEY_INSERT);
 }
 
+
+void BacnetAnnualRoutine::OnNMDblclkListAnnuleList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: Add your control notification handler code here
+	OnBnClickedButtonAnnualEdit();
+	*pResult = 0;
+}
+
+
 BOOL BacnetAnnualRoutine::OnHelpInfo(HELPINFO* pHelpInfo)
 { 
 
-	if (g_protocol==PROTOCOL_BACNET_IP){
+	//if (g_protocol==PROTOCOL_BACNET_IP){
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 			
@@ -493,10 +504,10 @@ BOOL BacnetAnnualRoutine::OnHelpInfo(HELPINFO* pHelpInfo)
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
 			HH_HELP_CONTEXT, IDH_TOPIC_HOLIDAY_SCHEDULES);
 		return (hWnd != NULL);
-	}
-	else{
-		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-	}
+// 	}
+// 	else{
+// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+// 	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

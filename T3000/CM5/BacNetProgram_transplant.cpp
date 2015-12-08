@@ -2858,7 +2858,7 @@ void parse_exp2( float *value )
 	register char op ;
 
 	parse_exp3(value) ;
-	while((op = *token ) == '+' || op == '-') 
+	while((unsigned char)(op = *token ) == '+' || op == '-') 
 	{
 		get_token() ;
 		parse_exp3(value) ;

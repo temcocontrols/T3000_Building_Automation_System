@@ -89,12 +89,12 @@ public:
  
 
 
-	void InitChartCtrl();
-	void DrawerPoint();
-	void UpdatePoint();
+// 	void InitChartCtrl();
+// 	void DrawerPoint();
+// 	void UpdatePoint();
 				   
 	void Fresh_Input_Output();
-	CChartXYSerie* pSeries[127];
+ 
 	unsigned short Default_Value[30];
 public:
 	bool m_fresh_data;

@@ -44,11 +44,4 @@ public:
 };
 
 
-const int VARIABLE_NUM = 0;
-const int VARIABLE_FULL_LABLE = 1;
-const int VARIABLE_AUTO_MANUAL = 2;
-const int VARIABLE_VALUE = 3;
-const int VARIABLE_UNITE = 4;
-const int VARIABLE_LABLE = 5;
 
-const int VARIABLE_COL_NUMBER = 6;

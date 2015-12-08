@@ -186,7 +186,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 // 	CMFCToolBar::SetBasicCommands(lstBasicCommands);
 
   	  //m_wndStatusBar.SetPaneInfo(0,ID_SEPARATOR,SBPS_NOBORDERS,   300);
-  	  m_wndStatusBar.SetPaneInfo(1,IDS_CONNECTION,SBPS_NOBORDERS,   300);
+  	    m_wndStatusBar.SetPaneInfo(1,IDS_CONNECTION,SBPS_NOBORDERS,   300);
 	 // m_wndStatusBar.SetPaneInfo(1,ID_BUILDING_INFO,SBPS_NOBORDERS, 300);
 	     //OnConnectionQuickconnectf5();
 	    AfxBeginThread(_ReadMultiRegisters,this);
@@ -225,12 +225,12 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 #ifdef _DEBUG
 void CMainFrame::AssertValid() const
 {
-	CMDIFrameWndEx::AssertValid();
+    CMDIFrameWndEx::AssertValid();
 }
 
 void CMainFrame::Dump(CDumpContext& dc) const
 {
-	CMDIFrameWndEx::Dump(dc);
+    CMDIFrameWndEx::Dump(dc);
 }
 #endif //_DEBUG
 
@@ -393,7 +393,9 @@ void CMainFrame::OnConnectionConnect32776()
 
 		m_ipaddress=connectionsetup.m_ipaddress;
 		m_port=connectionsetup.m_ipport;
-		m_timeout=connectionsetup.m_response_timeout;
+		m_responsetimeout=connectionsetup.m_response_timeout;
+        m_connecttimeout = connectionsetup.m_connect_timeout;
+        m_between_time = connectionsetup.m_between_time;
 		SetCommunicationType(m_communication_type);
 		if (m_communication_type==0)
 		{
@@ -434,7 +436,8 @@ void CMainFrame::OnConnectionConnect32776()
 			strpannel.Format(_T("IP%s :%d"),m_ipaddress,m_port);
 			SetPaneString(1,strpannel);
 		}
-
+        
+        SetResponseTime (m_responsetimeout);
 	}
 	else
 	{
@@ -504,7 +507,8 @@ void CMainFrame::Read_Config(){
 	m_comport=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("COM_Port"),1,g_configfile_path);
 	GetPrivateProfileString(_T("MBPOLL_Setting"),_T("IP Address"),_T("127.0.0.1"),m_ipaddress.GetBuffer(MAX_PATH),MAX_PATH,g_configfile_path);
 	m_port=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("IP Port"),6001,g_configfile_path);
-	m_timeout=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Connect Timeout"),1000,g_configfile_path); 
+	m_connecttimeout=GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Connect Timeout"),1000,g_configfile_path);
+    m_responsetimeout =GetPrivateProfileInt(_T("MBPOLL_Setting"),_T("Response Timeout"),1000,g_configfile_path);
 }
 void CMainFrame::OnConnectionQuickconnectf5()
 {
@@ -561,6 +565,8 @@ void CMainFrame::OnConnectionQuickconnectf5()
 		m_isconnect=TRUE;
 		g_online=TRUE;
 	}
+
+    SetResponseTime (m_responsetimeout);
 }
 
 
@@ -861,10 +867,11 @@ void CMainFrame::OnUpdateStatusBar(CCmdUI *pCmdUI){
 	pCmdUI->Enable(TRUE);
 
 }
-
+ #include "TestCenter.h"
 void CMainFrame::OnFunctionsTestcenter()
 {
-	
+	  TestCenter dlg;
+      dlg.DoModal ();
 }
 
 

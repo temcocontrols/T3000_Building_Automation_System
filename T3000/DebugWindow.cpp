@@ -25,6 +25,8 @@ void CDebugWindow::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST_DEBUG, m_debug_listbox);
+	DDX_Control(pDX, IDC_DATETIMEPICKER_DEBUG_TIME_DAY, m__day);
+	DDX_Control(pDX, IDC_DATETIMEPICKER_DEBUG_TIME_SECOND, m__time);
 }
 
 
@@ -37,6 +39,8 @@ ON_BN_CLICKED(IDC_BUTTON_DEBUG_PAUSE, &CDebugWindow::OnBnClickedButtonDebugPause
 ON_WM_SIZE()
 ON_BN_CLICKED(IDC_BUTTON_DEBUG_SAVE, &CDebugWindow::OnBnClickedButtonDebugSave)
 ON_WM_DESTROY()
+ON_BN_CLICKED(IDC_BUTTON_DEBUG_NUM_TO_TIME, &CDebugWindow::OnBnClickedButtonDebugNumToTime)
+ON_BN_CLICKED(IDC_BUTTON_DEBUG_TIME_TO_NUM, &CDebugWindow::OnBnClickedButtonDebugTimeToNum)
 END_MESSAGE_MAP()
 
 
@@ -58,8 +62,8 @@ BOOL CDebugWindow::OnInitDialog()
 		MYFUNC    fun    =    NULL;      //取¨?得Ì?SetLayeredWindowAttributes函¡¥数ºy指?针?     
 		fun=(MYFUNC)GetProcAddress(hInst,    "SetLayeredWindowAttributes");      
 		if(fun)
-			fun(this->GetSafeHwnd(),0,180,LWA_ALPHA);   //0,1,2,3,4,   
-		FreeLibrary(hInst);  
+			fun(this->GetSafeHwnd(),0,188,LWA_ALPHA);   //0,1,2,3,4,   
+		 FreeLibrary(hInst); 
 	} 
 	h_debug_window = this->m_hWnd;
 
@@ -89,7 +93,7 @@ BOOL CDebugWindow::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-
+//隐藏调试窗口;
 void CDebugWindow::OnClose()
 {
 	// TODO: Add your message handler code here and/or call default
@@ -134,7 +138,7 @@ void CDebugWindow::OnBnClickedButtonDebugClearall()
 	m_debug_listbox.ResetContent();
 }
 
-
+//pause or resume the message , post from other window. just for debug .
 void CDebugWindow::OnBnClickedButtonDebugPause()
 {
 	// TODO: Add your control notification handler code here
@@ -211,4 +215,60 @@ void CDebugWindow::OnDestroy()
 		delete m_plogFile;
 		m_plogFile=NULL;
 	}
+}
+
+
+void CDebugWindow::OnBnClickedButtonDebugNumToTime()
+{
+	// TODO: Add your control notification handler code here
+	CString temp_cs;
+	GetDlgItemText(IDC_EDIT_DEBUG_TIME_NUMBER,temp_cs.GetBuffer(MAX_PATH),MAX_PATH);
+	temp_cs.ReleaseBuffer();
+	unsigned long long_time = _wtoi64(temp_cs);
+
+	CTime time_scaletime;
+	time_t scale_time  = long_time;
+	time_scaletime = scale_time;
+
+	CTime	TimeTemp;
+	int temp_year;
+	int temp_mon;
+	int temp_day;
+	int temp_hour;
+	int temp_min;
+	int temp_sec;
+	temp_year = time_scaletime.GetYear();
+	temp_mon = time_scaletime.GetMonth();
+	temp_day = time_scaletime.GetDay();
+	temp_hour = time_scaletime.GetHour();
+	temp_min = time_scaletime.GetMinute();
+	temp_sec = time_scaletime.GetSecond();
+	TimeTemp = CTime(temp_year,temp_mon,temp_day,temp_hour,temp_min,temp_sec);
+
+	m__day.SetTime(&TimeTemp);
+	m__time.SetTime(&TimeTemp);
+
+}
+
+
+void CDebugWindow::OnBnClickedButtonDebugTimeToNum()
+{
+	// TODO: Add your control notification handler code here
+	CTime temp_start_day;
+	CTime temp_start_time;
+	m__day.GetTime(temp_start_day);
+	m__time.GetTime(temp_start_time);
+	int start_year = temp_start_day.GetYear();
+	int start_month = temp_start_day.GetMonth();
+	int start_day = temp_start_day.GetDay();
+	int start_hour = temp_start_time.GetHour();
+	int start_minute = temp_start_time.GetMinute();
+	int start_sec = temp_start_time.GetSecond();
+
+	CTime temp_start(start_year,start_month,start_day,start_hour,start_minute,start_sec);
+
+	unsigned long end_long_time = temp_start.GetTime();
+	CString temp_time_num;
+	temp_time_num.Format(_T("%u"),end_long_time);
+	SetDlgItemTextW(IDC_EDIT_DEBUG_TIME_NUMBER,temp_time_num);
 }

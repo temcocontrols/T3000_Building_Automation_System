@@ -524,10 +524,11 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 		BOOL bFindSameID=false;
 		int nPos=-1;
 //		temp.baudrate=m_baudrate2;
-		unsigned short SerialNum[9];
+//      ¼æÈÝÐ¡Ò¶µÄPressure
+		unsigned short SerialNum[10];
 		memset(SerialNum,0,sizeof(SerialNum));
 		int nRet=0;
-		nRet=read_multi2(a,&SerialNum[0],0,9,bForTStat);
+		nRet=read_multi2(a,&SerialNum[0],0,10,bForTStat);
 		SHOW_TX_RX
 		if(nRet>0)
 		{
@@ -606,6 +607,10 @@ void CTStatScanner::binarySearchforComDevice(int nComPort, bool bForTStat, BYTE 
 			
 			// product type
 			//pTemp->ReadOneReg(8);
+            // 
+//              if (SerialNum[7] == PM_CO2_RS485 && )
+//              {
+//              }
 			pTemp->SetProductType(SerialNum[7]);
 
 			// hardware_version
@@ -1497,7 +1502,15 @@ UINT _ScanTstatThread2(LPVOID pParam)
 					strlog.Empty();
 					strlog.Format(_T("Success to Open the COM%d"),n);
 					////write_T3000_log_file(strlog); 
-
+                    scan_item = -1;
+                    for (int j=0;j<m_scan_info.size();j++)
+                    {
+                        if((n == m_scan_info.at(j).scan_com_port) && (19200 ==  m_scan_info.at(j).scan_baudrate))
+                        {
+                            scan_item = j;
+                            break;
+                        }
+                    }
 					pScan->background_binarysearch(n);	//lsc comscan new cold
 					close_com();
 					strlog=_T("Close com port");

@@ -26,7 +26,7 @@ IMPLEMENT_DYNAMIC(CBacnetInput, CDialogEx)
 CBacnetInput::CBacnetInput(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetInput::IDD, pParent)
 {
-m_latest_protocol=g_protocol;
+  //  m_latest_protocol=3;
 
 }
 
@@ -237,8 +237,8 @@ void CBacnetInput::Initial_List()
 	m_input_list.InsertColumn(INPUT_CAL, _T("Calibration"), 70, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_CAL_OPERATION, _T("Sign"), 50, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_FITLER, _T("Filter"), 60, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_input_list.InsertColumn(INPUT_DECOM, _T("Status"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_input_list.InsertColumn(INPUT_JUMPER, _T("Jumper"), 70, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_DECOM, _T("Status"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_JUMPER, _T("Jumper"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_LABLE, _T("Label"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_dlg_hwnd = this->m_hWnd;
 	//g_hwnd_now = m_input_dlg_hwnd;
@@ -541,6 +541,13 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 			m_input_list.SetCellEnabled(i,INPUT_CAL,1);
 
+			if(m_Input_data.at(i).range <  (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
+				m_input_list.SetItemText(i,INPUT_UNITE,Input_List_Analog_Units[m_Input_data.at(i).range]);
+			else if(m_Input_data.at(i).range < (sizeof(Input_Analog_Units_Array)/sizeof(Input_Analog_Units_Array[0])))
+				m_input_list.SetItemText(i,INPUT_UNITE,_T(""));
+			else
+				m_input_list.SetItemText(i,INPUT_RANGE,_T("Unused"));
+
 			if(m_Input_data.at(i).range == 0)
 				m_input_list.SetItemText(i,INPUT_RANGE,_T("Unused"));
 			else if(m_Input_data.at(i).range <  (sizeof(Input_Analog_Units_Array)/sizeof(Input_Analog_Units_Array[0])))
@@ -548,10 +555,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			else
 				m_input_list.SetItemText(i,INPUT_RANGE,_T("Out of range"));
 
-			if(m_Input_data.at(i).range <  (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
-				m_input_list.SetItemText(i,INPUT_UNITE,Input_List_Analog_Units[m_Input_data.at(i).range]);
-			else
-				m_input_list.SetItemText(i,INPUT_RANGE,_T("Unused"));
+
 			
 
 
@@ -988,7 +992,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				m_Input_data.at(lRow).range =  bac_range_number_choose;
 				m_input_list.SetItemText(lRow,INPUT_RANGE,Input_Analog_Units_Array[bac_range_number_choose]);		
 				m_input_list.SetItemText(lRow,INPUT_UNITE,Input_List_Analog_Units[bac_range_number_choose]);	
-
+				New_CString = Input_Analog_Units_Array[bac_range_number_choose];
 				unsigned short temp_cal_value;
 				temp_cal_value = (m_Input_data.at(lRow).calibration_h << 8 ) + m_Input_data.at(lRow).calibration_l;
 
@@ -1286,16 +1290,15 @@ BOOL CBacnetInput::OnHelpInfo(HELPINFO* pHelpInfo)
 {
 	// TODO: Add your message handler code here and/or call default
 	 
-	 if (m_latest_protocol==PROTOCOL_BACNET_IP){
+	/* if (m_latest_protocol==PROTOCOL_BACNET_IP){*/
 		 HWND hWnd;
-
 		 if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		 else
 			 hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_INPUTS);
 			 return (hWnd != NULL);
-		}
-	else{
-	::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-	}
+// 		}
+// 	else{
+// 	::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+// 	}
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

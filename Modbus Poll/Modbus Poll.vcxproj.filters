@@ -262,6 +262,9 @@
     <ClInclude Include="TestCenter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DataMonitorDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Modbus Poll.cpp">
@@ -397,6 +400,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TestCenter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DataMonitorDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

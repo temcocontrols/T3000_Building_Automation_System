@@ -1,5 +1,6 @@
 #pragma once
 #include "afxwin.h"
+#include "afxdtctl.h"
 
 
 // CDebugWindow dialog
@@ -36,4 +37,8 @@ public:
 	CString Logfile_path;
 	CStdioFile*		 m_plogFile;
 	afx_msg void OnDestroy();
+	afx_msg void OnBnClickedButtonDebugNumToTime();
+	afx_msg void OnBnClickedButtonDebugTimeToNum();
+	CDateTimeCtrl m__day;
+	CDateTimeCtrl m__time;
 };

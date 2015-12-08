@@ -33,6 +33,7 @@ public:
 	afx_msg LRESULT Fresh_Monitor_Input_Item(WPARAM wParam,LPARAM lParam);
 	afx_msg	LRESULT Fresh_Monitor_Item(WPARAM wParam,LPARAM lParam);
 	afx_msg void OnNMClickListMonitor(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMDblclkListMonitor(NMHDR *pNMHDR, LRESULT *pResult);
 	CDateTimeCtrl m_monitor_time_picker;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnNMKillfocusDatetimepickerMonitor(NMHDR *pNMHDR, LRESULT *pResult);
@@ -43,6 +44,7 @@ public:
 	afx_msg void OnBnClickedBtnMonitorGraphic();
 	void OnBnClickedBtnMonitorDeleteAll();
 	void OnBnClickedBtnMonitorDeleteSelected();
+	void OnBnClickedBtnMonitorDeleteLocal();
 
 	afx_msg void OnBnClickedBtnMonitorRefresh();
 	afx_msg void OnBnClickedButtonMonitorTest();
@@ -66,7 +68,7 @@ public:
 
 };
 
-bool read_monitordata(int digtal_or_analog = 1);
+unsigned char read_monitordata(int digtal_or_analog = 1);
 
 const int MONITOR_NUM = 0;
 const int MONITOR_LABEL = 1;
@@ -74,10 +76,10 @@ const int MONITOR_INTERVAL = 2;
 const int MONITOR_LOG_TIME = 3;
 const int MONITOR_UNITS = 4;
 const int MONITOR_STATUS = 5 ;
-const int MONITOR_ANALOG_PACKAGE = 6;
-const int MONITOR_DIGITAL_PACKAGE = 7;
+const int MONITOR_DATA_SIZE = 6;
+//const int MONITOR_DIGITAL_PACKAGE = 7;
 
-const int MONITOR_COL_NUMBER = 8;
+const int MONITOR_COL_NUMBER = 7;
 
 const CString CS_DAYS = _T("Days");
 const CString CS_HOURS = _T("Hours");

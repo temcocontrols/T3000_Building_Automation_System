@@ -26,7 +26,8 @@ static int old_monitor_line = -1;
 extern BacnetWait *WaitDlg;
 HANDLE h_read_monitordata_thread = NULL;
 Str_MISC Device_Misc_Data_Old;
-bool read_monitor_sd_ret = false;
+unsigned char read_monitor_sd_ret = false;
+
 
 IMPLEMENT_DYNAMIC(CBacnetMonitor, CDialogEx)
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
@@ -56,6 +57,7 @@ BEGIN_MESSAGE_MAP(CBacnetMonitor, CDialogEx)
 	ON_MESSAGE(WM_REFRESH_BAC_MONITOR_INPUT_LIST,Fresh_Monitor_Input_List)
 	ON_MESSAGE(WM_LIST_ITEM_CHANGED,Fresh_MCallBack_Item)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_MONITOR, &CBacnetMonitor::OnNMClickListMonitor)
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST_MONITOR, &CBacnetMonitor::OnNMDblclkListMonitor)
 	ON_MESSAGE(WM_LIST_MONITOR_CHANGED,Fresh_Monitor_Item)
 	ON_MESSAGE(WM_LIST_MONITOR_INPUT_CHANGED,Fresh_Monitor_Input_Item)
 	ON_WM_TIMER()
@@ -63,6 +65,7 @@ BEGIN_MESSAGE_MAP(CBacnetMonitor, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_MONITOR_GRAPHIC, &CBacnetMonitor::OnBnClickedBtnMonitorGraphic)
 	ON_BN_CLICKED(IDC_BUTTON_MONITOR_DEL_ALL, &CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll)
 	ON_BN_CLICKED(IDC_BUTTON_MONITOR_DEL_SEL, &CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected)
+	ON_BN_CLICKED(IDC_BUTTON_MONITOR_DEL_LOCAL, &CBacnetMonitor::OnBnClickedBtnMonitorDeleteLocal)
 	ON_NOTIFY(NM_SETFOCUS, IDC_LIST_MONITOR, &CBacnetMonitor::OnNMSetfocusListMonitor)
 	ON_NOTIFY(NM_SETFOCUS, IDC_LIST_MONITOR_INPUT, &CBacnetMonitor::OnNMSetfocusListMonitorInput)
 	ON_WM_CLOSE()
@@ -158,29 +161,6 @@ BOOL CBacnetMonitor::OnInitDialog()
 	hIcon   = AfxGetApp()->LoadIcon(IDI_ICON_REFRESH);
 
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
-	
-	//HRESULT hr_con = m_monitor_pCon.CreateInstance(_T("ADODB.Connection"));
-	//m_monitor_pRec.CreateInstance(_T("ADODB.Recordset"));
-
-	//HRESULT hr_rs=m_monitor_pRec.CreateInstance(_T("ADODB.Recordset"));
-	//if(FAILED(hr_con))
-	//{
-	//	AfxMessageBox(_T("Load msado12.dll erro"));
-	//	return FALSE;
-	//}
-
-	//if(FAILED(hr_rs))
-	//{
-	//	AfxMessageBox(_T("Load msado12.dll erro"));
-	//	return FALSE;
-	//}
-
-
-
-	
-
-
-//	m_monitor_pCon->Open(g_monitor_db_path.GetString(),_T(""),_T(""),adModeUnknown);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -243,13 +223,13 @@ void CBacnetMonitor::Initial_List()
 	//m_monitor_list.SetExtendedStyle(m_monitor_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_monitor_list.SetExtendedStyle(m_monitor_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_monitor_list.InsertColumn(MONITOR_NUM, _T("NUM"), 50, ListCtrlEx::CheckBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
-	m_monitor_list.InsertColumn(MONITOR_LABEL, _T("Label"), 120, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_monitor_list.InsertColumn(MONITOR_LABEL, _T("Label"), 140, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_monitor_list.InsertColumn(MONITOR_INTERVAL, _T("Interval"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_monitor_list.InsertColumn(MONITOR_LOG_TIME, _T("Log Time"), 70, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_monitor_list.InsertColumn(MONITOR_LOG_TIME, _T("Log Time"), 90, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_monitor_list.InsertColumn(MONITOR_UNITS, _T("Unit"), 70, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_monitor_list.InsertColumn(MONITOR_STATUS, _T("Status"), 90, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_monitor_list.InsertColumn(MONITOR_ANALOG_PACKAGE, _T("AI Package"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_monitor_list.InsertColumn(MONITOR_DIGITAL_PACKAGE, _T("DI Package"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_monitor_list.InsertColumn(MONITOR_DATA_SIZE, _T("Data Size (KB)"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	//m_monitor_list.InsertColumn(MONITOR_DIGITAL_PACKAGE, _T("DI Package"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 
 	m_monitor_dlg_hwnd = this->m_hWnd;
 	//g_hwnd_now = m_monitor_dlg_hwnd;
@@ -339,7 +319,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 		//}
 		if(((temp_panel == 0) || (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == 0)) ||(lowbyte_point_type > ENUM_AR_DATA))
 		{
-			m_monitor_data.at(monitor_list_line).inputs[i].network = 0;	//发现panel 是0  就说明这个数据是无效的,先设置为初始化值;
+			m_monitor_data.at(monitor_list_line).inputs[i].network = 0;	//发 现panel 是0  就说明这个数据是无效的,先设置为初始化值;
 			m_monitor_data.at(monitor_list_line).inputs[i].number = 0;
 			m_monitor_data.at(monitor_list_line).inputs[i].panel = 0;
 			m_monitor_data.at(monitor_list_line).inputs[i].point_type = 0;
@@ -764,6 +744,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_List(WPARAM wParam,LPARAM lParam)
 		CString temp_units;
 		CString temp_analog_package;
 		CString temp_digital_package;
+		CString temp_data_szie;
 		char temp_char[50];
 
 		if(isFreshOne)
@@ -815,24 +796,36 @@ LRESULT CBacnetMonitor::Fresh_Monitor_List(WPARAM wParam,LPARAM lParam)
 		if(m_monitor_data.at(i).status == 1)
 		{
 			m_monitor_list.SetItemText(i,MONITOR_STATUS,_T("ON"));
+			m_monitor_list.SetItemTextColor(i,MONITOR_STATUS,RGB(0,0,255),false);
 		}
 		else if(m_monitor_data.at(i).status == 0)
 		{
 			m_monitor_list.SetItemText(i,MONITOR_STATUS,_T("OFF"));
+			m_monitor_list.SetItemTextColor(i,MONITOR_STATUS,RGB(255,0,0),false);
 		}
+
+
+
+
+
+
 		if((Device_Misc_Data.reg.flag[0] != 0x55) || (Device_Misc_Data.reg.flag[1] != 0xff))
 		{
 			temp_analog_package = _T("0");
 			temp_digital_package = _T("0");
+			temp_data_szie =  _T("0");
 		}
 		else
 		{
 			temp_analog_package.Format(_T("%u"),Device_Misc_Data.reg.monitor_analog_block_num[i]);
 			temp_digital_package.Format(_T("%u"),Device_Misc_Data.reg.monitor_digital_block_num[i]);
+
+			temp_data_szie.Format(_T("%.1f"),((float)((unsigned long)Device_Misc_Data.reg.monitor_analog_block_num[i] + (unsigned long)Device_Misc_Data.reg.monitor_digital_block_num[i]))*400/1000);
 		}
 
-		m_monitor_list.SetItemText(i,MONITOR_ANALOG_PACKAGE,temp_analog_package);
-		m_monitor_list.SetItemText(i,MONITOR_DIGITAL_PACKAGE,temp_digital_package);
+		m_monitor_list.SetItemText(i,MONITOR_DATA_SIZE,temp_data_szie);
+		//m_monitor_list.SetItemText(i,MONITOR_DATA_SIZE,temp_analog_package);
+		//m_monitor_list.SetItemText(i,MONITOR_DIGITAL_PACKAGE,temp_digital_package);
 
 		if(isFreshOne)
 		{
@@ -865,6 +858,16 @@ LRESULT CBacnetMonitor::Fresh_MCallBack_Item(WPARAM wParam,LPARAM lParam)
 
 	return 0;
 }
+
+
+void CBacnetMonitor::OnNMDblclkListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: Add your control notification handler code here
+	OnBnClickedBtnMonitorGraphic();
+	*pResult = 0;
+}
+
 
 
 void CBacnetMonitor::OnNMClickListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
@@ -912,12 +915,14 @@ void CBacnetMonitor::OnNMClickListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 		m_monitor_list.Set_Edit(false);
 		if(m_monitor_data.at(lRow).status == 0)
 		{
+			m_monitor_list.SetItemTextColor(lRow,MONITOR_STATUS,RGB(0,0,255),false);
 			m_monitor_data.at(lRow).status = 1;
 			m_monitor_list.SetItemText(lRow,MONITOR_STATUS,_T("ON"));
 			temp_task_info.Format(_T("Write Monitor List Item%d .Changed to \"ON\" "),lRow + 1);
 		}
 		else
 		{
+			m_monitor_list.SetItemTextColor(lRow,MONITOR_STATUS,RGB(255,0,0),false);
 			m_monitor_data.at(lRow).status = 0;
 			m_monitor_list.SetItemText(lRow,MONITOR_STATUS,_T("OFF"));
 			temp_task_info.Format(_T("Write Monitor List Item%d .Changed to \"OFF\" "),lRow + 1);
@@ -1087,6 +1092,14 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 
 	if(h_read_monitordata_thread==NULL)
 	{
+		CString strSql;
+		CBADO monitor_bado;
+		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
+		monitor_bado.OnInitADOConn(); 
+		strSql.Format(_T("delete * from MonitorData where Temp_Data=1"),g_selected_serialnumber,monitor_list_line);
+		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+		monitor_bado.CloseConn();
+
 		h_read_monitordata_thread =CreateThread(NULL,NULL,Readmonitorthreadfun,this,NULL, NULL);
 	}
 
@@ -1136,6 +1149,29 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll()
 	}
 }
 
+//IDC_BUTTON_MONITOR_DEL_LOCAL
+void CBacnetMonitor::OnBnClickedBtnMonitorDeleteLocal()
+{
+	CString temp_cs;
+	temp_cs.Format(_T("Do you want delete local data saved in T3000?"),monitor_list_line + 1);
+	if(IDYES != MessageBox(temp_cs,_T("Warning"),MB_YESNO))
+		return;
+
+	CString temp_serial;
+	temp_serial.Format(_T("%u"),g_selected_serialnumber);
+	WritePrivateProfileString(temp_serial,NULL,NULL,g_cstring_ini_path);
+
+
+
+	CString strSql;
+	CBADO monitor_bado;
+	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
+	monitor_bado.OnInitADOConn(); 
+	strSql.Format(_T("delete * from MonitorData where SerialNumber=%u "),g_selected_serialnumber);
+	monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+	monitor_bado.CloseConn();
+	MessageBox(_T("Delete Monitor Data : OK !"));
+}
 void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 {
 //monitor_list_line
@@ -1148,8 +1184,8 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 	if(monitor_list_line < (size_flag/2) )
 	{
 		memset(monitor_database_flag ,0,24);
-		monitor_database_flag[monitor_list_line] = 1;
-		monitor_database_flag[monitor_list_line + 12] = 1;
+		monitor_database_flag[2* monitor_list_line] = 1;
+		monitor_database_flag[2 *monitor_list_line + 1] = 1;
 
 		if(Write_Private_Data_Blocking(DELETE_MONITOR_DATABASE,0,0) > 0)
 		{
@@ -1191,7 +1227,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 
 
 
-bool read_monitordata(int digtal_or_analog)
+unsigned char read_monitordata(int digtal_or_analog)
 {
 	timestart = time(NULL);
 	MonitorUpdateData temp;
@@ -1255,7 +1291,7 @@ bool read_monitordata(int digtal_or_analog)
 		{
 			g_progress_persent = 0;
 			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read monitor data timeout!"));
-			return false;
+			return MONITOR_READ_TIMEOUT;
 		}
 	}
 
@@ -1272,15 +1308,17 @@ bool read_monitordata(int digtal_or_analog)
 	int temp_index = GetPrivateProfileInt(temp_serial,temp_monitor_index,-1,temp_db_ini_folder) + 1;
 
 	if(m_monitor_head.total_seg == 0)
-		return false;
+		return MONITOR_READ_NO_DATA;
 
-	for (int read_index= temp_index ;read_index<m_monitor_head.total_seg;read_index++)
+	for (int read_index= temp_index ;read_index<=m_monitor_head.total_seg;read_index++)
 	{
 		cs_my_temp.Format(_T("Read Data %d / %d"),read_index - temp_index,m_monitor_head.total_seg - temp_index);
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,cs_my_temp);
 
 		//WaitDlg->Set_Show_String(cs_my_temp);
-		int pos = ((read_index - temp_index) * 100 ) / (m_monitor_head.total_seg - temp_index);
+		int pos = 100;
+		if(m_monitor_head.total_seg != temp_index)
+		 pos = ((read_index - temp_index) * 100 ) / (m_monitor_head.total_seg - temp_index);
 		if(pos > 100)
 			pos = 100;
 
@@ -1289,6 +1327,9 @@ bool read_monitordata(int digtal_or_analog)
 		for (int i=0;i<5;i++)
 		{
 			recieve_flag = false;
+			CString temp_cs1;
+			temp_cs1.Format(_T("Read index = %x , Digital_Analog = %d"),read_index,digtal_or_analog);
+			DFTrace(temp_cs1);
 			ret = GetMonitorBlockData(g_bac_instance,READMONITORDATA_T3000,monitor_list_line,digtal_or_analog,m_monitor_head.total_seg,read_index,&temp);	
 			if(ret < 0)
 			{
@@ -1312,7 +1353,7 @@ bool read_monitordata(int digtal_or_analog)
 			{
 				g_progress_persent = 0;
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read monitor data timeout!"));
-				return false;
+				return MONITOR_READ_TIMEOUT;
 			}
 		}
 		if(recieve_flag)
@@ -1327,6 +1368,7 @@ bool read_monitordata(int digtal_or_analog)
 		}
 
 	}
+	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read monitor data : OK!"));
 	g_progress_persent = 100;
 	return true;
 }
@@ -1338,19 +1380,28 @@ DWORD WINAPI  CBacnetMonitor::Readmonitorthreadfun(LPVOID lpVoid)
 	//Write_Config_Info
 	CBacnetMonitor *pParent = (CBacnetMonitor *)lpVoid;
 	read_monitor_sd_ret = false;
-	bool analog_ret = false;
-	bool digital_ret = false;
-	if(read_monitordata(BAC_UNITS_ANALOG))
+	unsigned char analog_ret = false;
+	unsigned char digital_ret = false;
+	analog_ret = read_monitordata(BAC_UNITS_ANALOG) ;
+
+	
+
+	digital_ret =  read_monitordata(BAC_UNITS_DIGITAL) ;
+
+
+	if((analog_ret == MONITOR_READ_TIMEOUT) || (digital_ret == MONITOR_READ_TIMEOUT))
 	{
-		analog_ret = true;
+		read_monitor_sd_ret = MONITOR_READ_TIMEOUT;
+	}
+	else if((analog_ret == MONITOR_READ_NO_DATA) && (digital_ret == MONITOR_READ_NO_DATA))
+	{
+		read_monitor_sd_ret = MONITOR_READ_NO_DATA;
+	}
+	else
+	{
+		read_monitor_sd_ret = MONITOR_READ_SUCCESS;
 	}
 
-	if(read_monitordata(BAC_UNITS_DIGITAL))
-	{
-		digital_ret = true;
-	}
-
-	read_monitor_sd_ret = digital_ret || analog_ret;
 
 	pParent->PostMessage(WM_MONITOR_USER_MESSAGE,MONITOR_MESSAGE_CREATE,0);
 
@@ -1462,18 +1513,18 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 
 	temp_print = my_temp_point;
 
-	//CString n_temp_print;
-	//n_temp_print.Format(_T("Monitor Rx (%03d): "),nlength);
-	//CString temp_char;
-	//for (int i = 0; i< nlength ; i++)
-	//{
-	//	temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
-	//	temp_char.MakeUpper();
-	//	temp_print ++;
-	//	n_temp_print = n_temp_print + temp_char + _T(" ");
-	//}
-	//DFTrace(n_temp_print);
+	CString n_temp_print;
+	n_temp_print.Format(_T("Monitor Rx (%03d): "),nlength);
+	CString temp_char;
 
+	int temp_flag = 0;
+	int temp_sd_exsit = 0;
+	
+	//如果不存在SD卡 就认为接到的都是临时数据;
+	if(Device_Basic_Setting.reg.sd_exist == 2)
+		temp_sd_exsit = 1;
+	else
+		temp_sd_exsit = 0;
 
 	bool analog_data = true;//1为Analog;
 
@@ -1490,6 +1541,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	m_monitor_head.conm_args.most_recent_time = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
 	my_temp_point = my_temp_point + 4;
 	m_monitor_head.special = *(my_temp_point++);
+	
 	//m_monitor_head.total_seg = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
 	//my_temp_point = my_temp_point + 2;
 	m_monitor_head.seg_index = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0]; 
@@ -1514,6 +1566,12 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		temp_monitor_index.Format(_T("Digital_Index_%d"),monitor_list_line);
 	temp_serial.Format(_T("%u"),g_selected_serialnumber);
 	int temp_index = GetPrivateProfileInt(temp_serial,temp_monitor_index,-1,temp_db_ini_folder);
+
+	if(m_monitor_head.seg_index == 0)
+	{
+		Sleep(1);
+	}
+
 	if(temp_index >= m_monitor_head.seg_index)
 		return 1;
 	if(temp_index >= m_monitor_head.total_seg)	//如果数据库里面的 index 已经比设备里面的 多，就说明已经读过了;不需要再往数据库里面存了;
@@ -1554,21 +1612,89 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 			continue;
 		if(temp_data.mark != 0x0A0D)	//0d0a
 			continue;
-		if(temp_data.time == 0) //说明后面是无用的数据;填充的是0
+		if((temp_data.time == 0) ) //说明后面是无用的数据;填充的是0
 			continue;
+		if((temp_data.time < 1420041600)  || (temp_data.time > 2524575600))	//时间范围 2015-1-1  ->2049-12-30  ，不在此时间的数据无效;
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Data time error!!"));
+			continue;
+		}
 
 		CString temp_type;
 		temp_type.Format(_T("%u_%u_%u_%u_%u"),temp_data.point.number,temp_data.point.point_type,temp_data.point.panel,temp_data.point.sub_panel,temp_data.point.network);
-	
+
+		CString temp_value_test;
+		temp_value_test.Format(_T("%d"),temp_data.value);
+		
+		//if(temp_type.CompareNoCase(_T("8_3_5_5_1")) == 0)
+		//{
+		//	TRACE(temp_type + _T("  ") + temp_value_test + _T("\r\n"));
+		//	for (int i = 0; i< nlength ; i++)
+		//	{
+		//		temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
+		//		temp_char.MakeUpper();
+		//		temp_print ++;
+		//		n_temp_print = n_temp_print + temp_char + _T(" ");
+		//	}
+		//	TRACE(n_temp_print);
+		//	//DFTrace(n_temp_print);
+		//}
+		
+		if(m_monitor_head.special == 1)
+		{
+			temp_flag = 1;
+		}
+		else
+		{
+			if(temp_sd_exsit)
+				temp_flag = 0;
+			else
+				temp_flag = 1;
+		}
+
+		CString display_time;
+
+		CTime time_scaletime;
+		time_t scale_time  = temp_data.time;
+		time_scaletime = scale_time;
+		display_time.Empty();
+		display_time=time_scaletime.Format("%y_%m_%d %H:%M:%S");
+
 		CString strSql;
-		strSql.Format(_T("insert into MonitorData values(%i,%i,'%s',%i,%i,%i)"),g_selected_serialnumber,screen_list_line,temp_type,temp_data.value,temp_data.time , analog_data);
+		strSql.Format(_T("insert into MonitorData values(%u,%u,'%s',%d,%u,%u,%u,'%s')"),g_selected_serialnumber,monitor_list_line,temp_type,temp_data.value,temp_data.time , analog_data ,temp_flag,display_time);
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 
+		//DFTrace(display_time);
+
 	}
-	CString temp_write_index;
-	temp_write_index.Format(_T("%d"),m_monitor_head.seg_index);
-	WritePrivateProfileStringW(temp_serial,temp_monitor_index,temp_write_index,temp_db_ini_folder);
+	bool delete_temp_db_data = false;
+
+	if((m_monitor_head.special != 1) && (m_monitor_head.seg_index != 0))
+	{
+		CString temp_write_index;
+		temp_write_index.Format(_T("%d"),m_monitor_head.seg_index);
+		WritePrivateProfileStringW(temp_serial,temp_monitor_index,temp_write_index,temp_db_ini_folder);
+		delete_temp_db_data = true;
+		//DFTrace(temp_write_index);
+	}
+
 	monitor_bado.CloseConn();
+
+	if(delete_temp_db_data)
+	{
+		CString strSql;
+		CBADO monitor_bado;
+		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
+		monitor_bado.OnInitADOConn(); 
+		if(analog_data)
+			strSql.Format(_T("delete * from MonitorData where Temp_Data=1 and Analog_Digital=1"),g_selected_serialnumber,monitor_list_line);
+		else
+			strSql.Format(_T("delete * from MonitorData where Temp_Data=1 and Analog_Digital=0"),g_selected_serialnumber,monitor_list_line);
+		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+		monitor_bado.CloseConn();
+
+		//DFTrace(_T("Delete temp db data"));
+	}
 
 
 
@@ -1589,17 +1715,17 @@ LRESULT CBacnetMonitor::OnHotKey(WPARAM wParam,LPARAM lParam)
 BOOL CBacnetMonitor::OnHelpInfo(HELPINFO* pHelpInfo)
 { 
 
-	if (g_protocol==PROTOCOL_BACNET_IP){
+	//if (g_protocol==PROTOCOL_BACNET_IP){
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle,theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		else
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile,HH_HELP_CONTEXT, IDH_TOPIC_7_DATA);
 		return (hWnd != NULL);
-	}
-	else{
-		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-	}
+// 	}
+// 	else{
+// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+// 	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

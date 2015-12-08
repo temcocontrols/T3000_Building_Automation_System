@@ -311,7 +311,7 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 		
 	}
 
-	if(nModel==16)//E
+	if(nModel==16||nModel==PM_PM5E)//E
 	{
 		if(nStatus>=0&&nStatus<8)
 		{	strTemp.Empty();
@@ -351,7 +351,7 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 		
 	}
 	
-	if (nModel==PM_TSTAT6||nModel==PM_TSTAT7||nModel==PM_TSTAT5i)
+	if (nModel==PM_TSTAT6||nModel==PM_TSTAT7||nModel==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8))
 	{
 	   if (nStatus==0)
 	   {
@@ -567,7 +567,7 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 	//==========================================================================
 	//ABCDEFG,noH
 
-	if(nModel==2||nModel==1||nModel==4||nModel==12||nModel==16||nModel==17||nModel==18||nModel==3)
+	if(nModel==2||nModel==1||nModel==4||nModel==12||nModel==16||nModel==PM_PM5E||nModel==17||nModel==18||nModel==3)
 	{
 		for(int i=1;i<=3;i++)
 		{
@@ -589,7 +589,7 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 
 	////----------------------------------------------------------------------
 	//4,5
-	if(nModel==1||nModel==4||nModel==12||nModel==16)//B,C,D,E
+	if(nModel==1||nModel==4||nModel==12||nModel==16||nModel==PM_PM5E)//B,C,D,E
 	{
 		if(nStatus==3)
 		{
@@ -617,7 +617,7 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 
 		//:DEG 6. 7
 		int nRange=product_register_value[186];
-		if(nModel==12||nModel==16||nModel==18)
+		if(nModel==12||nModel==16||nModel==PM_PM5E||nModel==18)
 		{
 			if(nStatus==5)
 			{

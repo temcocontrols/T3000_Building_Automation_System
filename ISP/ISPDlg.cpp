@@ -1636,6 +1636,9 @@ void CISPDlg::OnFlashSubID()
 		  CString ipaddress;
 		  m_ipAddress.GetWindowText(ipaddress);
 		m_pTCPFlasher->SetIPAddr(ipaddress);
+
+       
+
 		CString strIPPort;
 		 
 		 
@@ -1666,6 +1669,15 @@ void CISPDlg::OnFlashSubID()
 		//m_szHexFileFlags
 
 		m_pTCPFlasher->m_hexbinfilepath=m_strFlashFileName;
+
+        /*m_pComWriter = new CComWriter;
+        m_pComWriter->SetModbusID(m_szMdbIDs);
+        m_pComWriter->SetHexInfor(temp1);
+        m_pComWriter->SetHexFileType(pHexFile->GetHexFileFormatType());
+        m_pComWriter->Is_Ram=pHexFile->Is_RAM_HEXType();
+        m_pComWriter->m_hexbinfilepath = m_strHexFileName;*/
+
+        m_pTCPFlasher->Is_Ram = pHexFile->Is_RAM_HEXType ();
 		m_pTCPFlasher->BeginWirteByTCP();
 		 EnableFlash(FALSE);	
 	}

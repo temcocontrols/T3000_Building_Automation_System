@@ -197,14 +197,15 @@ BOOL CTstatRangeDlg::PreTranslateMessage(MSG* pMsg)
 		{
 			if(GetFocus()==GetDlgItem(IDC_EDIT_RANGE_SELECT))
 			{
-				CWnd *temp_focus=GetFocus();	//Maurice require ,click enter and the cursor still in this edit or combobox.
+				CWnd *temp_focus=GetFocus();	
+                //Maurice require ,click enter and the cursor still in this edit or combobox.
 				GetDlgItem(IDC_EDIT1_TEST)->SetFocus();
 				temp_focus->SetFocus();
 			}
-             else{
-                 this->GetFocus()->GetNextWindow()->SetFocus();
-                 return true;
-             }
+//              else{
+//                  this->GetFocus()->GetNextWindow()->SetFocus();
+//                  return true;
+//              }
 
 
 			return 1;
@@ -471,6 +472,18 @@ void CTstatRangeDlg::OnBnClickedOk()
          write_one(g_tstat_id, MODBUS_TABLE1_HALFFIVE,m_slider10_i*10);
          write_one(g_tstat_id, MODBUS_TABLE1_FIVE,m_slider11_i*10);
 
+         product_register_value[MODBUS_TABLE1_ZERO]      =      m_slider1_i*10 ;
+         product_register_value[MODBUS_TABLE1_HALFONE]   =      m_slider2_i*10 ;
+         product_register_value[MODBUS_TABLE1_ONE]       =      m_slider3_i*10 ;
+         product_register_value[MODBUS_TABLE1_HALFTWO]   =      m_slider4_i*10 ;
+         product_register_value[MODBUS_TABLE1_TWO]       =      m_slider5_i*10 ;
+         product_register_value[MODBUS_TABLE1_HALFTHREE] =      m_slider6_i*10 ;
+         product_register_value[MODBUS_TABLE1_THREE]     =      m_slider7_i*10 ;
+         product_register_value[MODBUS_TABLE1_HALFFOUR]  =      m_slider8_i*10 ;
+         product_register_value[MODBUS_TABLE1_FOUR]      =      m_slider9_i*10 ;
+         product_register_value[MODBUS_TABLE1_HALFFIVE]  =      m_slider10_i*10 ;
+         product_register_value[MODBUS_TABLE1_FIVE]      =      m_slider11_i*10 ;
+
          //}
 
 
@@ -490,6 +503,19 @@ void CTstatRangeDlg::OnBnClickedOk()
          write_one(g_tstat_id, MODBUS_TABLE2_FOUR,m_slider9_i*10);
          write_one(g_tstat_id, MODBUS_TABLE2_HALFFIVE,m_slider10_i*10);
          write_one(g_tstat_id, MODBUS_TABLE2_FIVE,m_slider11_i*10);
+
+
+         product_register_value[MODBUS_TABLE2_ZERO]      =      m_slider1_i*10 ;
+         product_register_value[MODBUS_TABLE2_HALFONE]   =      m_slider2_i*10 ;
+         product_register_value[MODBUS_TABLE2_ONE]       =      m_slider3_i*10 ;
+         product_register_value[MODBUS_TABLE2_HALFTWO]   =      m_slider4_i*10 ;
+         product_register_value[MODBUS_TABLE2_TWO]       =      m_slider5_i*10 ;
+         product_register_value[MODBUS_TABLE2_HALFTHREE] =      m_slider6_i*10 ;
+         product_register_value[MODBUS_TABLE2_THREE]     =      m_slider7_i*10 ;
+         product_register_value[MODBUS_TABLE2_HALFFOUR]  =      m_slider8_i*10 ;
+         product_register_value[MODBUS_TABLE2_FOUR]      =      m_slider9_i*10 ;
+         product_register_value[MODBUS_TABLE2_HALFFIVE]  =      m_slider10_i*10 ;
+         product_register_value[MODBUS_TABLE2_FIVE]      =      m_slider11_i*10 ;
 
          //}
 
@@ -1361,7 +1387,7 @@ void CTstatRangeDlg::OnEnKillfocusEdit19()
 
 void CTstatRangeDlg::OnEnKillfocusEdit20()
 {
-	// TODO: 在此添加控件通知处理程序代码
+// TODO: 在此添加控件通知处理程序代码
 // 	if (m_version>=CUSTOM_TABLE_FLOAT_VERSION)
 // 	{
 // 		float ftemp;
@@ -1481,8 +1507,8 @@ void CTstatRangeDlg::refresh()
 
 
 
-    GetDlgItem(IDC_EDIT10)->SetWindowText(m_max);
-    GetDlgItem(IDC_EDIT11)->SetWindowText(m_min);
+   /* GetDlgItem(IDC_EDIT10)->SetWindowText(m_max);
+    GetDlgItem(IDC_EDIT11)->SetWindowText(m_min);*/
 
     CStatic * pstatic2 = (CStatic *)GetDlgItem(IDC_STATIC2);
     CStatic * pstatic3 = (CStatic *)GetDlgItem(IDC_STATIC3);

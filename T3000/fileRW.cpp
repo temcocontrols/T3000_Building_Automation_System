@@ -19,6 +19,7 @@
 
 #define TSTAT25_VAR_NUM 90
 #define TSTAT24_VAR_NUM 32
+#define CO2NODE_VAR_NUM 15
 #define NET_WORK_CONTROLLER_NUM 24
 #define TSTAT26_VAR_NUM 163
 #define TSTAT26_VAR_NUM_TSTAT67 393
@@ -31,6 +32,9 @@ using namespace std;
 int tstat24_register_var[TSTAT24_VAR_NUM]={	118,121,128,109,110,	111,112,113,114,115,
 											116,117,119,120,122,	123,124,125,126,127,
 											186,187,131,132,133,	135,136,137,182,183};
+int CO2NODE_register_var[CO2NODE_VAR_NUM]={	109,110,111,112,113,	123,124,125,127,128,
+    129,130,131,132,133};
+
 int tstat25_register_var[TSTAT25_VAR_NUM]={	118,121,185,128,111,	112,114,115,119,120,
 											122,123,124,125,126,	127,129,186,187,131,
 											132,133,135,136,137,	182,183,202,203,201,
@@ -869,6 +873,26 @@ _TCHAR * TSTATVAR_CONST_67[] = {                  //attention:该数组中的值，不要
 	_T("	 PID3 OFF OUTPUT HEAT2 	")	,
 	_T("	 PID3 OFF OUTPUT HEAT3 	")		
 };
+_TCHAR * CO2NODEVAR_CONST_25[] = {                  //attention:该数组中的值，不要有完全包含的出现
+    _T("CO2 Calibration Offset"),		
+    _T("Delta Value"),                   
+    _T("Filter Times"),                    
+    _T("Fair Alarm PPM Setpoint"),  //128             
+    _T("Poor Alarm PPM Setpoint"),                 
+
+    _T("Offset Thermistor Sensor ") ,     
+    _T("Select Temperatre Direct To Analog Output"),		          
+    _T("Temperature Unit "),
+    _T("Analog Output Mode"),        
+    _T("The Min Value Temperature Output"),        
+
+    _T("The Max Value Temperature Output"),                    
+    _T("The Min Value Humidity Output"),      
+    _T("The Max Value Humidity Output"),      
+    _T("The Min Value CO2 Output"),                 
+    _T("The Max Value CO2 Output")            
+
+}  ;
 _TCHAR *STRINGCONST[] ={_T("Off"),_T("On"),_T("Closed"),_T("Open"),_T("0-100"),_T("50-100"),_T("0-50")};
 
 bool string2digital(CString str,unsigned char & val ,bool & type )   // type false = digital ,true = analog
@@ -1449,7 +1473,7 @@ void delay_time_write(wofstream & out)
 {   //write the delay
 	//used by save2file functiojn
 	int rows;
-	if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT5i))
+	if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT7)||(product_register_value[7]== PM_TSTAT8))
 	{
 	  rows=7;
 	}
@@ -1500,7 +1524,7 @@ void delay_time_write_Tstat67(wofstream & out)
 {   //write the delay
 	//used by save2file functiojn
 	int rows;
-	if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT5i))
+	if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT7)||(product_register_value[7]== PM_TSTAT8))
 	{
 		rows=7;
 	}
@@ -1804,7 +1828,8 @@ void var_write(wofstream & out)
 			}
 		}
 	} 
-	else
+	
+    else
 	{
 		 
 		if(version<26)
@@ -1831,6 +1856,25 @@ void var_write(wofstream & out)
 		}
 	}
 		
+
+
+}
+void var_write_CO2_NODE(wofstream & out)
+{
+
+    //used by save2file functiojn
+    CString str1;
+   
+  
+            for(int i=0;i<CO2NODE_VAR_NUM;i++)
+            {			
+                str1.Format(_T("%d,\t%d,\t%s"),CO2NODE_register_var[i], product_register_value[CO2NODE_register_var[i]],CO2NODEVAR_CONST_25[i]);
+                _Twrite_to_file_a_line(out,str1);
+                if((i%5)==4)
+                    _Twrite_to_file_a_line(out,_T(" "));//a space line
+            }
+ 
+
 
 
 }
@@ -2483,11 +2527,12 @@ void Save2File_ForTwoFiles(TCHAR* fn)
 	
 	//////////////////////////////////////////////////////////////////////////
 	var_write(out);	
-   save_write_input_output(out);
+//   save_write_input_output(out);
 	//_Twrite_to_file_a_line(out,_T("OK!"));//space
+    _Twrite_to_file_a_line(out,_T("//END CONFIG 1 ********************************// "));//space
 	return;
 
-	_Twrite_to_file_a_line(out,_T("//END CONFIG 1 ********************************// "));//space
+	
 	int nvalue=0;
 
 
@@ -2595,7 +2640,39 @@ void Save2File_ForTwoFiles(TCHAR* fn)
 #endif
 
 }
+void Save2File_ForCO2Node(TCHAR* fn)
+{
+	CString strTips;
+	 
 
+	 
+	 
+	#if 1
+	 
+	//////////////////////////////////////////////////////////////////////////
+
+	wofstream out;
+	out.open(fn,ios_base::out) ;
+	
+	_Twrite_to_file_a_line(out,_T("Config File"));//added the header marker.
+
+	//int nModelID = read_one(g_tstat_id, 7);
+	CString strProductClassName = GetProductName(product_register_value[7]);
+	strProductClassName = _T("Model : ") + strProductClassName;
+	_Twrite_to_file_a_line(out, strProductClassName);//added the model
+    _Twrite_to_file_a_line(out,_T("//BEGIN CONFIG 1 ********************************//\n "));//space
+    _Twrite_to_file_a_line(out,_T("Reg No,Reg Value,Reg Name\n"));
+
+	var_write_CO2_NODE(out);	
+
+	_Twrite_to_file_a_line(out,_T("//END CONFIG 1 ********************************// "));//space
+ 
+		return;
+ 
+#endif
+
+}
+ 
 void change_showing_text_variable(CString str)
 {
 #if 0
@@ -3163,7 +3240,7 @@ void get_delay_setting_line_value(TCHAR *buf,int array[7])
 
 void get_delay_setting(wifstream & inf,int value_setting[14])
 {    int rows=5;
-    if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT5i))
+    if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT7)||(product_register_value[7]== PM_TSTAT8))
         rows=7;
 	TCHAR buf[1024];
 	while(!inf.eof())
@@ -3354,7 +3431,6 @@ void get_write_var_line_T3(TCHAR *buf,float tstat_version,CStdioFile *p_log_file
 
 }
 
-
 void get_var_write_var_T3(wifstream & inf,float tstat_version,CStdioFile *p_log_file)
 {
 	TCHAR buf[1024];	
@@ -3370,6 +3446,61 @@ void get_var_write_var_T3(wifstream & inf,float tstat_version,CStdioFile *p_log_
 	}
 
 }
+
+//void get_write_var_line_CO2NODE(TCHAR *buf,float tstat_version,CStdioFile *p_log_file)
+//{
+//    CString for_showing_text;
+//    Reg_Infor Reg_Infor_Temp;
+//    if(_wtoi(buf)==0)
+//        return ;
+//    TCHAR *temp=buf;
+//    temp=wcsstr(temp,_T(","));
+//    temp++;	
+//    int register_id=_wtoi(buf);
+//    int register_value=_wtoi(temp);
+//    int j=-1;
+//    if (register_id<100)
+//    {
+//        return;
+//    }
+//
+//    j=write_one(now_tstat_id,register_id,register_value);	
+//    Reg_Infor_Temp.regAddress=register_id;
+//
+//    Reg_Infor_Temp.RegValue=register_value;
+//    if(p_log_file!=NULL)
+//    {
+//        for_showing_text.Format(_T("register ID:%d,VALUE:%d write "),register_id,register_value);
+//        if(j>0)
+//            for_showing_text=for_showing_text+_T("OK\r\n");
+//        else
+//        {
+//            g_Vector_Write_Error.push_back(Reg_Infor_Temp);
+//            //for_showing_text=for_showing_text+_T("Error******************\r\n");
+//        }
+//        change_showing_text_variable(for_showing_text);
+//        p_log_file->WriteString(for_showing_text);
+//    }
+//
+//
+//}
+//
+//
+//void get_var_write_var_CO2NODE(wifstream & inf,float tstat_version,CStdioFile *p_log_file)
+//{
+//    TCHAR buf[1024];	
+//    while(!inf.eof())
+//    {
+//        inf.getline(buf,1024);
+//
+//        if(find_sub_chars(buf,_T("END CONFIG")))
+//            break;
+//
+//
+//        get_write_var_line_CO2NODE(buf,tstat_version,p_log_file);//get a line ,one register value,
+//    }
+//
+//}
 
 
 void write_input_output_var(wifstream & inf,float tstat_version,CStdioFile *p_log_file,load_file_every_step *p_log_file_one_time)
@@ -3554,7 +3685,7 @@ void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,
 	if(strText.CompareNoCase(strInName)==0)
 		return;
 		int Model_ID=read_one(now_tstat_id,7,5);
-	if ((Model_ID==PM_TSTAT5G)||(Model_ID==PM_TSTAT5E)||(Model_ID==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(Model_ID==PM_TSTAT7))
+	if ((Model_ID==PM_TSTAT5G)||(Model_ID==PM_TSTAT5E)||(Model_ID==PM_PM5E)||(Model_ID==PM_TSTAT6)||(product_register_value[7]==PM_TSTAT5i)||(Model_ID==PM_TSTAT7)||(Model_ID==PM_TSTAT8))
 	{
 		strText.TrimRight();
 		strText.TrimLeft();
@@ -4424,7 +4555,7 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 
 		if(wcscmp(buf,_T("//   DELAY TIMES"))==0)
 		{   int rows;
-		    if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT5i))
+		    if ((product_register_value[7] == PM_TSTAT5i)||(product_register_value[7] == PM_TSTAT6)||(product_register_value[7]== PM_TSTAT7)||(product_register_value[7]== PM_TSTAT8))
 		    {
 			rows=7;
 		    }
@@ -5233,7 +5364,37 @@ void LoadT3Modules(load_file_every_step &load_file_one_time,CHAR* fn,CStdioFile*
 ////LoadFile2Tstat_twofile(load_file_one_time,fn,p_log_file);
 
 }
+void LoadCO2NODE(load_file_every_step &load_file_one_time,CHAR* fn,CStdioFile*p_log_file)
+{
+    //int nSpecialValue=read_one(now_tstat_id,326);
+    //write_one(g_tstat_id,324,0);
+    //every step is false
 
+    CString for_showing_text;
+    float tstat_version;
+    tstat_version=get_tstat_version(now_tstat_id);///////////////////get version
+    wifstream inf;//file
+    inf.open(fn,ios_base::in);
+
+    for_showing_text=_T("Begin.....");
+    TCHAR buf[1024];
+
+    while(!inf.eof())
+    {
+        inf.getline(buf,1024);
+        if(wcscmp(buf,_T("Reg No		Reg Value		Reg Name"))==0)
+        {
+            get_var_write_var_T3(inf,tstat_version,p_log_file);//////a line //////////// a line
+
+            if(p_log_file!=NULL)
+                p_log_file->WriteString(_T("\r\n"));
+        }
+    }	
+    inf.close();
+   // Sleep(5000);
+    ////LoadFile2Tstat_twofile(load_file_one_time,fn,p_log_file);
+
+}
 
 void save_schedule_2_file(TCHAR* fn,int schedule_id)
 {
@@ -7339,11 +7500,21 @@ _Twrite_to_file_a_line(out,_T("//Input Name Config"));//space
             m_outRows=8;
             m_inRows=12;
         }break;
-	case PM_TSTAT5E:
-		{
-			m_outRows=8;
-			m_inRows=11;
-		}break;
+    case PM_TSTAT8:
+        {
+            m_outRows=8;
+            m_inRows=12;
+        }break;
+    case PM_TSTAT5E:
+        {
+            m_outRows=8;
+            m_inRows=11;
+        }break;
+    case PM_PM5E:
+        {
+            m_outRows=8;
+            m_inRows=11;
+        }break;
 	case 17:
 		{
 			m_outRows=6;

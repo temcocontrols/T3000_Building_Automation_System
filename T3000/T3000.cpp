@@ -32,21 +32,16 @@ BEGIN_MESSAGE_MAP(CT3000App, CWinAppEx)
 	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
 	ON_COMMAND(ID_FILE_SAVE_CONFIG, &CWinAppEx::OnFileOpen)
 	ON_COMMAND(ID_VERSIONHISTORY,OnVersionInfo)
-END_MESSAGE_MAP()	
+END_MESSAGE_MAP()
+	
 // CT3000App construction 
 CT3000App::CT3000App()
 {
-//	try
-///	{
+ 
 		m_bHiColorIcons = TRUE;
-		CurrentT3000Version=_T("    2015.09.10");
-//	}
-// 	catch (...)
-// 	{
-// 		
-// 		AfxMessageBox(_T("1111"));
-// 	}
-m_lastinterface=19;
+		CurrentT3000Version=_T("    2015.12.8");
+ 
+         m_lastinterface=19;
 }
 // The one and only CT3000App object
 CT3000App theApp;
@@ -1282,7 +1277,7 @@ BOOL CT3000App::InitInstance()
 
 	g_achive_device_name_path = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("temp\\") + _T("device_name.ini") ;
 	g_achive_folder = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("temp");
-
+	g_achive_folder_temp_txt = g_achive_folder + _T("\\") + _T("prg_txt_file");
 	g_cstring_ini_path = g_achive_folder + _T("\\MonitorIndex.ini");
 	product_sort_way  = GetPrivateProfileInt(_T("Setting"),_T("ProductSort"),0,g_cstring_ini_path);
 	if(product_sort_way == 0)
@@ -1314,6 +1309,27 @@ BOOL CT3000App::InitInstance()
 		CreateDirectory( g_achive_folder, &attrib);
 	}
 
+	ret = FALSE;
+	hFind_folder = FindFirstFile(g_achive_folder_temp_txt, &fd);
+	if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+	{
+		//目录存在
+		ret = TRUE;
+
+	}
+	FindClose(hFind_folder);
+	if(ret == false)
+	{
+		SECURITY_ATTRIBUTES attrib;
+		attrib.bInheritHandle = FALSE;
+		attrib.lpSecurityDescriptor = NULL;
+		attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
+
+		CreateDirectory( g_achive_folder_temp_txt, &attrib);
+	}
+
+
+	
 
 	g_strOrigDatabaseFilePath=g_strExePth+_T("T3000.mdb");//
 	g_strDatabasefilepath+=_T("Database\\T3000.mdb");//
@@ -1369,6 +1385,44 @@ BOOL CT3000App::InitInstance()
 		::FreeResource(hGlobal);
 	}  //
 	FindClose(hFind_Monitor);//
+
+	int versionno = 0;
+	//CADO tempado;
+	//BOOL Ret=tempado.OnInitADOConn();
+	CBADO tempado;
+	tempado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
+	tempado.OnInitADOConn(); 
+
+
+	if (tempado.IsHaveTable(tempado,_T("Version")))//有Version表
+	{
+		CString sql=_T("Select * from Version");
+		tempado.m_pRecordset=tempado.OpenRecordset(sql);
+		tempado.m_pRecordset->MoveFirst();
+		while (!tempado.m_pRecordset->EndOfFile)
+		{
+			versionno=tempado.m_pRecordset->GetCollect(_T("VersionNO"));
+			tempado.m_pRecordset->MoveNext();
+		}
+		tempado.CloseRecordset();
+
+
+	} 
+
+	if (versionno < 20150922)
+	{
+		CString StrSql;
+		StrSql=_T("ALTER TABLE MonitorData ADD COLUMN Temp_Data Integer");
+		tempado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
+		StrSql=_T("ALTER TABLE MonitorData ADD COLUMN DisplayTime varchar(255)");
+		tempado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
+		
+
+		StrSql=_T("INSERT INTO Version VALUES(20150922,'Add Temp and Time')");
+		tempado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
+	}
+	tempado.CloseConn(); 
+
 
 
 	
@@ -1434,7 +1488,7 @@ BOOL CT3000App::InitInstance()
  
 	 //先不考虑升级的情况
 	 #if 1
-	BOOL Ret=JudgeDB();
+	int Ret=JudgeDB();
 	if (!Ret)
 	{
         FilePath=g_strExePth+_T("Database\\t3000.mdb");

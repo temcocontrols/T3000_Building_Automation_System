@@ -23,7 +23,7 @@ IMPLEMENT_DYNAMIC(CBacnetOutput, CDialogEx)
 CBacnetOutput::CBacnetOutput(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CBacnetOutput::IDD, pParent)
 {
-  m_latest_protocol=-1;
+  //m_latest_protocol=3;
 }
 
 CBacnetOutput::~CBacnetOutput()
@@ -1251,17 +1251,17 @@ int GetOutputValue(int index ,CString &ret_cstring,CString &ret_unit,CString &Au
 BOOL CBacnetOutput::OnHelpInfo(HELPINFO* pHelpInfo)
 {
 	// TODO: Add your message handler code here and/or call default
-	if((m_latest_protocol == PROTOCOL_BACNET_IP) || (m_latest_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
-	{
+// 	if((m_latest_protocol == PROTOCOL_BACNET_IP) || (m_latest_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
+// 	{
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		else
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OUTPUTS);
 		return (hWnd != NULL);
-	}
-	else{
-		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-	}
+// 	}
+// 	else{
+// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+// 	}
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

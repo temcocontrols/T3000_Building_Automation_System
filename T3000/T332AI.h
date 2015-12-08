@@ -163,6 +163,7 @@ public:
 	afx_msg void OnBnClickedButtonReset();
 //    afx_msg void OnCbnSelchangeDelay();
     afx_msg void OnEnKillfocusEditResponseDelay();
+    virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 

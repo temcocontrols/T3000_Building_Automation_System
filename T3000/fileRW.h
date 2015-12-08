@@ -41,6 +41,7 @@ void WriteAddress(wofstream & out) ;
 void Save2File(const char* fn);
 //void Save2File_ForTwoFiles(const char* fn);
 void Save2File_ForTwoFiles(TCHAR* fn);
+void Save2File_ForCO2Node(TCHAR* fn);
 
 void Save2File_ForTwoFilesTSTAT67(TCHAR* fn);//((LPTSTR)(LPCTSTR)strFilename);
 void change_showing_text_variable(CString str);
@@ -50,6 +51,8 @@ void LoadFile2Tstat(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFil
 void LoadFile2Tstat_T3(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFile*p_log_file=NULL);
 void LoadT3Modules(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFile*p_log_file=NULL);
 void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFile*p_log_file=NULL);
+void LoadCO2NODE(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioFile*p_log_file=NULL);
+
 bool find_load_file_error(load_file_every_step temppp);
 CString Show_load_file_result_message(load_file_every_step temppp,bool show_message_dialog=true);
 void Show_load_file_error_message(load_file_every_step temppp,int section,CFile *p_log_file);
@@ -128,6 +131,7 @@ void delay_time_write_Tstat67(wofstream & out);
 void lookup_table_write(wofstream & out);
 void lookup_table_write_Tstat67(wofstream & out);
 void var_write(wofstream & out);
+void var_write_CO2_NODE(wofstream & out);
 void var_write_Tstat67(wofstream & out);
 void save_write_input_output(wofstream & out);
 void write_input_output_var(wifstream & inf,float tstat_version,CStdioFile *p_log_file=NULL,load_file_every_step *p_log_file_one_time=NULL); 
@@ -147,6 +151,10 @@ void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file=NU
 void get_var_write_var(wifstream & inf,float tstat_version,CStdioFile *p_log_file=NULL,load_file_every_step *p_log_file_one_time=NULL);//for var setting
 void get_var_write_var_T3(wifstream & inf,float tstat_version,CStdioFile *p_log_file=NULL);//for var setting
 void get_write_var_line_T3(TCHAR *buf,float tstat_version,CStdioFile *p_log_file=NULL);
+
+//void get_var_write_var_CO2NODE(wifstream & inf,float tstat_version,CStdioFile *p_log_file=NULL);//for var setting
+//void get_write_var_line_CO2NODE(TCHAR *buf,float tstat_version,CStdioFile *p_log_file=NULL);
+
 
 void get_write_var_line_input_output(TCHAR *buf,float tstat_version,int inputno,CStdioFile *p_log_file=NULL,load_file_every_step *p_log_file_one_time=NULL);
 void get_write_var_line_output(TCHAR *buf,float tstat_version,int outputno,CStdioFile *p_log_file=NULL,load_file_every_step *p_log_file_one_time=NULL);

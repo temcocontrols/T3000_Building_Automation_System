@@ -337,17 +337,16 @@ void CGraphicMode::OnBnClickedUser(){
 
 
 
-		int ret=write_one(g_tstat_id,g_calibration_module_data.User_Table_Selection.regAddress,1);
-		if (ret>0)
-		{
-			product_register_value[g_calibration_module_data.User_Table_Selection.regAddress] = 1;
-
-		}
-		else
-		{
-			AfxMessageBox(_T("Setting Fail!"));
-		}
-		ShowChecks();
+        int ret=write_one(g_tstat_id,g_calibration_module_data.User_Table_Selection.regAddress,1);
+        if (ret>0)
+        {
+            product_register_value[g_calibration_module_data.User_Table_Selection.regAddress] = 1;
+        }
+        else
+        {
+            AfxMessageBox(_T("Setting Fail!"));
+        }
+        ShowChecks();
 	 
 
 }
@@ -377,10 +376,18 @@ void CGraphicMode::InitChartCtrl(){
 	CChartStandardAxis* pBottomAxis = 
 		m_ChartCtrl.CreateStandardAxis(CChartCtrl::BottomAxis);
 	pBottomAxis->SetMinMax(m_xMin-100, m_xMax+100);
+    pBottomAxis->GetLabel ()->SetText (L"Frequency/Hz") ;
+    // pBottomAxis->GetLabel ()->SetFont (30,L"Arial") ;
+    /*pAxis->GetLabel()->SetText(szBuffer);*/
+   
 
+    
+         
 	CChartStandardAxis* pLeftAxis =
 		m_ChartCtrl.CreateStandardAxis(CChartCtrl::LeftAxis);
 	pLeftAxis->SetMinMax(m_yMin-20, m_yMax+20);
+    pLeftAxis->GetLabel ()->SetText (L"Humidity/%");
+   // pLeftAxis->GetLabel ()->SetFont (30,L"Arial") ;
 	//pLeftAxis->SetMinMax(0, 1000);
 	CChartStandardAxis* pTopAxis =
 		m_ChartCtrl.CreateStandardAxis(CChartCtrl::TopAxis);
@@ -391,6 +398,8 @@ void CGraphicMode::InitChartCtrl(){
 	pRightAxis->SetMinMax(m_yMin-20, m_yMax+20);
 	//pRightAxis->SetMinMax(0, 1000);
 	m_ChartCtrl.GetLegend()->SetVisible(true);
+    m_ChartCtrl.GetTopAxis ()->SetVisible (false);
+    m_ChartCtrl.GetRightAxis ()->SetVisible (false);
 	m_ChartCtrl.RefreshCtrl();
 }
 
@@ -686,8 +695,7 @@ void CGraphicMode::DrawerPoint(){
 		delete[] XValues;
 		delete[] YValues;
 		m_ChartCtrl.RefreshCtrl();
-
-
+ 
 	}
 }
 void CGraphicMode::Fresh_Graphic(){
@@ -1103,7 +1111,7 @@ void CGraphicMode::Initial_FactoryList(){
 
 void CGraphicMode::OnBnClickedCheckUser()
 {
-   OnBnClickedUser();  
+    OnBnClickedUser();  
 }
 
 void CGraphicMode::OnBnClickedCheckDefault()

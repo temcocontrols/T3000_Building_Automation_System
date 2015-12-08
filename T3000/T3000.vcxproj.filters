@@ -642,6 +642,15 @@
     <ClCompile Include="BoatMonitorViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BacnetGraphicSetting.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetAnalogCusRang.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="BacnetProgramDebug.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1560,6 +1569,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BoatMonitorViewer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetGraphicSetting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetAnalogCusRang.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BacnetProgramDebug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

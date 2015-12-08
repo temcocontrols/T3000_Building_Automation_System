@@ -144,9 +144,12 @@ CString CTStat_Dev::GetProductName()
 	case PM_TSTAT5D:
 		strProductName="TStat5D";
 		break;
-	case PM_TSTAT5E:
-		strProductName="TStat5E";
-		break;
+    case PM_TSTAT5E:
+        strProductName="TStat5E";
+        break;
+    case PM_PM5E:
+        strProductName="PM5E";
+        break;
 	case PM_TSTATRUNAR:
 		strProductName="TStatRunar";
 		break;
@@ -164,7 +167,10 @@ CString CTStat_Dev::GetProductName()
         break;
     case PM_TSTAT5i:
         strProductName="TStat5i";
-		break;
+        break;
+    case PM_TSTAT8:
+        strProductName="TStat8";
+        break;
 	case PM_TSTAT7:
 		strProductName="TStat7";
 		break;
@@ -187,6 +193,7 @@ CString CTStat_Dev::GetProductName()
     case  PM_PRESSURE_SENSOR:
         strProductName = "Pressure";
         break;
+  
 	case  PM_CO2_NODE:
 		strProductName = "CO2 Node";
 		break;

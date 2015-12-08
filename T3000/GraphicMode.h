@@ -4,7 +4,7 @@
 #include "ChartCtrl/ChartLineSerie.h"
 #include "afxcmn.h"
 
- #include "CM5/ListCtrlEx.h"
+#include "CM5/ListCtrlEx.h"
 // CGraphicMode dialog
 
 class CGraphicMode : public CDialogEx

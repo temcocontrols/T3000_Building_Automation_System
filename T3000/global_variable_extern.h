@@ -62,6 +62,7 @@ extern  CString g_strImagePathName;
 extern	CString	g_strDatabasefilepath;
 extern	CString g_strExePth;
 extern  CString g_achive_folder;
+extern  CString g_achive_folder_temp_txt;
 extern  CString g_achive_device_name_path;
 extern  CString g_strImgeFolder;
 extern  CString g_strBuildingFolder;
@@ -150,7 +151,8 @@ int const PM_TSTAT5B2 = 3;
 int const PM_TSTAT5C = 4;
 int const PM_TSTAT6 = 6;
 int const PM_TSTAT7 = 7;
-int const PM_TSTAT5i=8;
+int const PM_TSTAT5i= 8;
+int const PM_TSTAT8 = 9 ;
 int const PM_TSTAT5D = 12;
 int const PM_AirQuality = 13;
 int const PM_HUMTEMPSENSOR = 14;
@@ -190,9 +192,12 @@ int const PM_HUM_R=42;
 int const PM_T322AI=43;
 int const PM_T38AI8AO6DO=44;
 int const PM_PRESSURE_SENSOR=45;
+ 
+
 
 int const PM_CM5 = 50;
 int const PM_TSTAT6_HUM_Chamber=64;
+
 int const PM_NC = 100;
 int const PM_LightingController = 103;
 
@@ -1000,6 +1005,7 @@ extern int weekly_list_line ;
 extern int annual_list_line ;
 extern int screen_list_line ;
 extern int monitor_list_line;
+extern int analog_range_tbl_line;
 extern Time_block_mini Device_time;
 
 extern HWND      g_hwnd_now;
@@ -1014,23 +1020,25 @@ extern HWND      m_schedule_time_dlg_hwnd;
 extern HWND      m_schedule_day_dlg_hwnd;
 extern HWND      m_controller_dlg_hwnd;
 extern HWND      m_screen_dlg_hwnd;
-extern HWND		m_screenedit_dlg_hwnd;
-extern HWND	  m_monitor_dlg_hwnd;
-extern HWND	  m_alarmlog_dlg_hwnd;
+extern HWND		 m_screenedit_dlg_hwnd;
+extern HWND	     m_monitor_dlg_hwnd;
+extern HWND	     m_alarmlog_dlg_hwnd;
 extern HWND      m_alarmwindow_dlg_hwnd;
 extern HWND      m_tstat_dlg_hwnd;
 extern HWND      m_setting_dlg_hwnd;
 extern HWND      m_flash_multy_hwnd;
 extern HWND      m_customer_digital_range_dlg_hwnd;
 extern HWND      m_scan_dlg_hwnd;
-extern HWND	  m_tcp_server_hwnd;
+extern HWND	     m_tcp_server_hwnd;
 extern HWND      m_user_login_hwnd;
 extern HWND      m_user_config_hwnd;
 extern HWND      m_add_label;
 extern HWND      m_edit_label;
 extern HWND      m_at_command_hwnd;
 extern HWND      m_remote_point_hwnd;
+extern HWND		 m_program_debug_list_hwnd;
 extern HWND		m_statusbar_hwnd ;
+extern HWND		analog_cus_range_dlg;
 extern vector <Str_out_point> m_Output_data;
 extern vector <Str_in_point>  m_Input_data;
 extern vector <Str_program_point>  m_Program_data;
@@ -1050,6 +1058,7 @@ extern vector <Str_TstatInfo_point> m_Tstat_data;
 extern vector <Str_Remote_TstDB> m_remote_device_db;
 extern vector <Str_Units_element> m_customer_unit_data;
 extern vector <Str_userlogin_point> m_user_login_data;
+extern vector <Str_table_point> m_analog_custmer_range;
 
 extern vector <GSM_connection_info> m_gsm_connect_info;
 extern vector <Scan_Info> m_scan_info;

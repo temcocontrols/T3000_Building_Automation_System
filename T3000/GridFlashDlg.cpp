@@ -395,9 +395,12 @@
 				case PM_TSTAT5D:
 					stemp="TStat5D";
 					break;
-				case PM_TSTAT5E:
-					stemp="TStat5E";
-					break;
+                case PM_TSTAT5E:
+                    stemp="TStat5E";
+                    break;
+                case PM_PM5E:
+                    stemp="PM5E";
+                    break;
 				case PM_TSTATRUNAR:
 				    stemp="TStatRunar";
 					break;
@@ -415,6 +418,9 @@
 					break;
                 case PM_TSTAT5i:
                     stemp="TStat5i";
+                    break;
+                case PM_TSTAT8:
+                    stemp="TStat8";
                     break;
 				case PM_TSTAT7:
 					stemp="TStat7";
@@ -437,6 +443,7 @@
                 case  PM_PRESSURE_SENSOR:
                     stemp = "Pressure";
                     break;
+               
 				case  PM_CO2_NODE:
 					stemp = "CO2 Node";
 					break;

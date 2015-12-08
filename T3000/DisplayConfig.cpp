@@ -25,7 +25,7 @@ CDisplayConfig::~CDisplayConfig()
 BOOL CDisplayConfig::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-    if (product_register_value[7]==PM_TSTAT5E)
+    if (product_register_value[7]==PM_TSTAT5E||product_register_value[7] == PM_PM5E)
     {
         MODBUS_LINE1_CHAR1=MODBUS_UI_LINE1_CHAR1;
         MODBUS_LINE2_CHAR1=MODBUS_UI_LINE2_CHAR1;
@@ -54,6 +54,7 @@ void CDisplayConfig::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_PROCESS, m_progress);
 	DDX_Control(pDX, IDC_CHECK_ICON_AUTO, m_am_check);
     DDX_Control(pDX, IDC_CHECK_ICON_MANUAL, m_man_check);
+    DDX_Control (pDX,IDC_CHECK_ICON_OUTPUT,m_output_check);
 	DDX_Control(pDX, IDC_CHECK2, m_check2);
 	DDX_Control(pDX, IDC_CHECK3, m_check3);
 	DDX_Control(pDX, IDC_CHECK4, m_check4);
@@ -61,6 +62,8 @@ void CDisplayConfig::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK6, m_check6);
 	DDX_Control(pDX, IDC_CHECK7, m_check7);
 	DDX_Control(pDX, IDC_CHECK8, m_check8);
+
+
 }
 BEGIN_MESSAGE_MAP(CDisplayConfig, CDialog)
 	ON_BN_CLICKED(IDOK, &CDisplayConfig::OnBnClickedOk)
@@ -102,6 +105,21 @@ ON_BN_CLICKED(IDC_CHECK7, &CDisplayConfig::OnBnClickedCheck7)
 ON_BN_CLICKED(IDC_CHECK8, &CDisplayConfig::OnBnClickedCheck8)
 ON_EN_KILLFOCUS(IDC_LINE_1, &CDisplayConfig::OnEnKillfocusLine1)
 ON_EN_KILLFOCUS(IDC_LINE_2, &CDisplayConfig::OnEnKillfocusLine2)
+ON_BN_CLICKED(IDC_CHECK_ICON_OUTPUT, &CDisplayConfig::OnBnClickedCheckIconOutput)
+ON_BN_CLICKED(IDC_CHECK_H0, &CDisplayConfig::OnBnClickedCheckH0)
+ON_BN_CLICKED(IDC_CHECK_C0, &CDisplayConfig::OnClickedCheckC0)
+ON_BN_CLICKED(IDC_CHECK_C1, &CDisplayConfig::OnClickedCheckC1)
+ON_BN_CLICKED(IDC_CHECK_C2, &CDisplayConfig::OnClickedCheckC2)
+ON_BN_CLICKED(IDC_CHECK_C3, &CDisplayConfig::OnClickedCheckC3)
+ON_BN_CLICKED(IDC_CHECK_C4, &CDisplayConfig::OnClickedCheckC4)
+ON_BN_CLICKED(IDC_CHECK_C5, &CDisplayConfig::OnClickedCheckC5)
+ON_BN_CLICKED(IDC_CHECK_C6, &CDisplayConfig::OnClickedCheckC6)
+ON_BN_CLICKED(IDC_CHECK_H1, &CDisplayConfig::OnClickedCheckH1)
+ON_BN_CLICKED(IDC_CHECK_H2, &CDisplayConfig::OnClickedCheckH2)
+ON_BN_CLICKED(IDC_CHECK_H3, &CDisplayConfig::OnClickedCheckH3)
+ON_BN_CLICKED(IDC_CHECK_H4, &CDisplayConfig::OnClickedCheckH4)
+ON_BN_CLICKED(IDC_CHECK_H5, &CDisplayConfig::OnClickedCheckH5)
+ON_BN_CLICKED(IDC_CHECK_H6, &CDisplayConfig::OnClickedCheckH6)
 END_MESSAGE_MAP()
 
 
@@ -1131,6 +1149,7 @@ void CDisplayConfig::Fresh_Checks(){
 	{
 	  m_am_check.SetCheck(1);
       m_man_check.SetCheck(0);
+      m_output_check.SetCheck (0);
 	  GetDlgItem(IDC_CHECK2)->EnableWindow(FALSE);
 	  GetDlgItem(IDC_CHECK3)->EnableWindow(FALSE);
 	  GetDlgItem(IDC_CHECK4)->EnableWindow(FALSE);
@@ -1139,11 +1158,27 @@ void CDisplayConfig::Fresh_Checks(){
 	  GetDlgItem(IDC_CHECK7)->EnableWindow(FALSE);
 	  GetDlgItem(IDC_CHECK8)->EnableWindow(FALSE);
 	  
+      GetDlgItem(IDC_CHECK_H0)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_H1)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_H2)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_H3)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_H4)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_H5)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_H6)->EnableWindow(FALSE);
+
+      GetDlgItem(IDC_CHECK_C0)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_C1)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_C2)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_C3)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_C4)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_C5)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_C6)->EnableWindow(FALSE);
 	}
-	else
+	else if(AM == 1)
 	{
-	  m_am_check.SetCheck(0);
+	   m_am_check.SetCheck(0);
        m_man_check.SetCheck(1);
+       m_output_check.SetCheck (0);
 	  GetDlgItem(IDC_CHECK2)->EnableWindow(TRUE);
 	  GetDlgItem(IDC_CHECK3)->EnableWindow(TRUE);
 	  GetDlgItem(IDC_CHECK4)->EnableWindow(TRUE);
@@ -1153,8 +1188,53 @@ void CDisplayConfig::Fresh_Checks(){
 	  GetDlgItem(IDC_CHECK8)->EnableWindow(TRUE);
 
 
+      GetDlgItem(IDC_CHECK_H0)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_H1)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_H2)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_H3)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_H4)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_H5)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_H6)->EnableWindow(FALSE);
+
+      GetDlgItem(IDC_CHECK_C0)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_C1)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_C2)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_C3)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_C4)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_C5)->EnableWindow(FALSE);
+      GetDlgItem(IDC_CHECK_C6)->EnableWindow(FALSE);
+
 	}
-	bitset<16> IconValue(product_register_value[729]);
+	else{
+        m_am_check.SetCheck(0);
+        m_man_check.SetCheck(0);
+        m_output_check.SetCheck (1);
+        GetDlgItem(IDC_CHECK2)->EnableWindow(FALSE);
+        GetDlgItem(IDC_CHECK3)->EnableWindow(FALSE);
+        GetDlgItem(IDC_CHECK4)->EnableWindow(FALSE);
+        GetDlgItem(IDC_CHECK5)->EnableWindow(FALSE);
+        GetDlgItem(IDC_CHECK6)->EnableWindow(FALSE);
+        GetDlgItem(IDC_CHECK7)->EnableWindow(FALSE);
+        GetDlgItem(IDC_CHECK8)->EnableWindow(FALSE);
+
+
+        GetDlgItem(IDC_CHECK_H0)->EnableWindow(TRUE);
+        GetDlgItem(IDC_CHECK_H1)->EnableWindow(TRUE);
+        GetDlgItem(IDC_CHECK_H2)->EnableWindow(TRUE);
+        GetDlgItem(IDC_CHECK_H3)->EnableWindow(TRUE);
+        GetDlgItem(IDC_CHECK_H4)->EnableWindow(TRUE);
+        GetDlgItem(IDC_CHECK_H5)->EnableWindow(TRUE);
+        GetDlgItem(IDC_CHECK_H6)->EnableWindow(TRUE);
+
+        GetDlgItem(IDC_CHECK_C0)->EnableWindow(TRUE);
+        GetDlgItem(IDC_CHECK_C1)->EnableWindow(TRUE);
+        GetDlgItem(IDC_CHECK_C2)->EnableWindow(TRUE);
+        GetDlgItem(IDC_CHECK_C3)->EnableWindow(TRUE);
+        GetDlgItem(IDC_CHECK_C4)->EnableWindow(TRUE);
+        GetDlgItem(IDC_CHECK_C5)->EnableWindow(TRUE);
+        GetDlgItem(IDC_CHECK_C6)->EnableWindow(TRUE);
+    }
+    bitset<16> IconValue(product_register_value[729]);
 	m_check2.SetCheck(IconValue[0]);
 	m_check3.SetCheck(IconValue[1]);
 	m_check4.SetCheck(IconValue[2]);
@@ -1162,47 +1242,26 @@ void CDisplayConfig::Fresh_Checks(){
 	m_check6.SetCheck(IconValue[4]);
 	m_check7.SetCheck(IconValue[5]);
 	m_check8.SetCheck(IconValue[6]);
+
+    bitset<16> IcoHeat(product_register_value[765]);
+    ((CButton*)GetDlgItem(IDC_CHECK_H0))->SetCheck (IcoHeat[0]);
+    ((CButton*)GetDlgItem(IDC_CHECK_H1))->SetCheck (IcoHeat[1]);
+    ((CButton*)GetDlgItem(IDC_CHECK_H2))->SetCheck (IcoHeat[2]);
+    ((CButton*)GetDlgItem(IDC_CHECK_H3))->SetCheck (IcoHeat[3]);
+    ((CButton*)GetDlgItem(IDC_CHECK_H4))->SetCheck (IcoHeat[4]);
+    ((CButton*)GetDlgItem(IDC_CHECK_H5))->SetCheck (IcoHeat[5]);
+    ((CButton*)GetDlgItem(IDC_CHECK_H6))->SetCheck (IcoHeat[6]);
+    bitset<16> IcoCool(product_register_value[766]);
+    ((CButton*)GetDlgItem(IDC_CHECK_C0))->SetCheck (IcoCool[0]);
+    ((CButton*)GetDlgItem(IDC_CHECK_C1))->SetCheck (IcoCool[1]);
+    ((CButton*)GetDlgItem(IDC_CHECK_C2))->SetCheck (IcoCool[2]);
+    ((CButton*)GetDlgItem(IDC_CHECK_C3))->SetCheck (IcoCool[3]);
+    ((CButton*)GetDlgItem(IDC_CHECK_C4))->SetCheck (IcoCool[4]);
+    ((CButton*)GetDlgItem(IDC_CHECK_C5))->SetCheck (IcoCool[5]);
+    ((CButton*)GetDlgItem(IDC_CHECK_C6))->SetCheck (IcoCool[6]);
 }
 
-void CDisplayConfig::OnBnClickedCheckIconAm()
-{
-    int AM=product_register_value[728];
-    if (AM==1)
-    {
-        int ret=write_one(g_tstat_id,728,0);
-        if (ret>0)
-        {
-            product_register_value[728]=0;
-        }
-        else
-        {
-            AfxMessageBox(_T("Try again"));
-        }
-        Fresh_Checks();
-    } 
-	 
-	
-	
-}
-void CDisplayConfig::OnBnClickedCheckIconMan()
-{
-    int AM=product_register_value[728];
-    if (AM==0)
-    {
-        int ret=write_one(g_tstat_id,728,1);
-        if (ret>0)
-        {
-            product_register_value[728]=1;
-        }
-        else
-        {
-            AfxMessageBox(_T("Try again"));
-        }
-        Fresh_Checks();
-    } 
 
-    
-}
 void CDisplayConfig::Write_Setting(){
 	bitset<16> IconValue(product_register_value[729]);
 	IconValue.set(0,m_check2.GetCheck());
@@ -1276,4 +1335,192 @@ void CDisplayConfig::OnEnKillfocusLine1()
 void CDisplayConfig::OnEnKillfocusLine2()
 {
     OnBnClickedSaveLine2();
+}
+void CDisplayConfig::OnBnClickedCheckIconAm()
+{
+    int AM=product_register_value[728];
+    if (AM==1||AM==2)
+    {
+        int ret=write_one(g_tstat_id,728,0);
+        if (ret>0)
+        {
+            product_register_value[728]=0;
+        }
+        else
+        {
+            AfxMessageBox(_T("Try again"));
+        }
+        Fresh_Checks();
+    } 
+}
+void CDisplayConfig::OnBnClickedCheckIconMan()
+{
+    int AM=product_register_value[728];
+    if (AM==0||AM==2)
+    {
+        int ret=write_one(g_tstat_id,728,1);
+        if (ret>0)
+        {
+            product_register_value[728]=1;
+        }
+        else
+        {
+            AfxMessageBox(_T("Try again"));
+        }
+        Fresh_Checks();
+    }   
+}
+
+void CDisplayConfig::OnBnClickedCheckIconOutput()
+{
+    int AM=product_register_value[728];
+    if (AM==0||AM==1)
+    {
+        int ret=write_one(g_tstat_id,728,2);
+        if (ret>0)
+        {
+            product_register_value[728]=2;
+        }
+        else
+        {
+            AfxMessageBox(_T("Try again"));
+        }
+        Fresh_Checks();
+    } 
+}
+
+
+void CDisplayConfig::OnBnClickedCheckH0()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H0))->SetCheck (1);
+    ((CButton*)GetDlgItem(IDC_CHECK_C0))->SetCheck (0);
+     SaveOutputSetting();   
+}
+void CDisplayConfig::SaveOutputSetting ()
+{
+    bitset<16> IcoHeat(product_register_value[765]);
+    IcoHeat[0]=((CButton*)GetDlgItem(IDC_CHECK_H0))->GetCheck ();
+    IcoHeat[1]=((CButton*)GetDlgItem(IDC_CHECK_H1))->GetCheck ();
+    IcoHeat[2]=((CButton*)GetDlgItem(IDC_CHECK_H2))->GetCheck ();
+    IcoHeat[3]=((CButton*)GetDlgItem(IDC_CHECK_H3))->GetCheck ();
+    IcoHeat[4]=((CButton*)GetDlgItem(IDC_CHECK_H4))->GetCheck ();
+    IcoHeat[5]=((CButton*)GetDlgItem(IDC_CHECK_H5))->GetCheck ();
+    IcoHeat[6]=((CButton*)GetDlgItem(IDC_CHECK_H6))->GetCheck ();
+
+    bitset<16> IcoCool(product_register_value[766]);
+    IcoCool[0]=((CButton*)GetDlgItem(IDC_CHECK_C0))->GetCheck ();
+    IcoCool[1]=((CButton*)GetDlgItem(IDC_CHECK_C1))->GetCheck ();
+    IcoCool[2]=((CButton*)GetDlgItem(IDC_CHECK_C2))->GetCheck ();
+    IcoCool[3]=((CButton*)GetDlgItem(IDC_CHECK_C3))->GetCheck ();
+    IcoCool[4]=((CButton*)GetDlgItem(IDC_CHECK_C4))->GetCheck ();
+    IcoCool[5]=((CButton*)GetDlgItem(IDC_CHECK_C5))->GetCheck ();
+    IcoCool[6]=((CButton*)GetDlgItem(IDC_CHECK_C6))->GetCheck ();
+
+    write_one (g_tstat_id,765,IcoHeat.to_ulong ());
+    write_one (g_tstat_id,766,IcoCool.to_ulong ());
+
+}
+
+
+void CDisplayConfig::OnClickedCheckC0()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H0))->SetCheck (0);
+    ((CButton*)GetDlgItem(IDC_CHECK_C0))->SetCheck (1);
+    SaveOutputSetting();
+}
+
+
+void CDisplayConfig::OnClickedCheckC1()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H1))->SetCheck (0);
+    ((CButton*)GetDlgItem(IDC_CHECK_C1))->SetCheck (1);
+    SaveOutputSetting();
+}
+
+
+void CDisplayConfig::OnClickedCheckC2()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H2))->SetCheck (0);
+    ((CButton*)GetDlgItem(IDC_CHECK_C2))->SetCheck (1);
+    SaveOutputSetting();
+}
+
+
+void CDisplayConfig::OnClickedCheckC3()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H3))->SetCheck (0);
+    ((CButton*)GetDlgItem(IDC_CHECK_C3))->SetCheck (1);
+    SaveOutputSetting();
+}
+
+
+void CDisplayConfig::OnClickedCheckC4()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H4))->SetCheck (0);
+    ((CButton*)GetDlgItem(IDC_CHECK_C4))->SetCheck (1);
+    SaveOutputSetting();
+}
+
+
+void CDisplayConfig::OnClickedCheckC5()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H5))->SetCheck (0);
+    ((CButton*)GetDlgItem(IDC_CHECK_C5))->SetCheck (1);
+    SaveOutputSetting();
+}
+
+
+void CDisplayConfig::OnClickedCheckC6()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H6))->SetCheck (0);
+    ((CButton*)GetDlgItem(IDC_CHECK_C6))->SetCheck (1);
+    SaveOutputSetting();
+}
+
+
+void CDisplayConfig::OnClickedCheckH1()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H1))->SetCheck (1);
+    ((CButton*)GetDlgItem(IDC_CHECK_C1))->SetCheck (0);
+    SaveOutputSetting(); 
+}
+
+
+void CDisplayConfig::OnClickedCheckH2()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H2))->SetCheck (1);
+    ((CButton*)GetDlgItem(IDC_CHECK_C2))->SetCheck (0);
+    SaveOutputSetting(); 
+}
+
+
+void CDisplayConfig::OnClickedCheckH3()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H3))->SetCheck (1);
+    ((CButton*)GetDlgItem(IDC_CHECK_C3))->SetCheck (0);
+    SaveOutputSetting(); 
+}
+
+
+void CDisplayConfig::OnClickedCheckH4()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H4))->SetCheck (1);
+    ((CButton*)GetDlgItem(IDC_CHECK_C4))->SetCheck (0);
+    SaveOutputSetting(); 
+}
+
+
+void CDisplayConfig::OnClickedCheckH5()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H5))->SetCheck (1);
+    ((CButton*)GetDlgItem(IDC_CHECK_C5))->SetCheck (0);
+    SaveOutputSetting(); 
+}
+
+
+void CDisplayConfig::OnClickedCheckH6()
+{
+    ((CButton*)GetDlgItem(IDC_CHECK_H6))->SetCheck (1);
+    ((CButton*)GetDlgItem(IDC_CHECK_C6))->SetCheck (0);
+    SaveOutputSetting(); 
 }

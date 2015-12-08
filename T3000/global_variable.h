@@ -56,6 +56,7 @@ CString g_strExePth=_T("");
 CString g_strImgeFolder=_T("");
 CString g_strBuildingFolder=_T("");
 CString g_achive_folder=_T("");
+CString g_achive_folder_temp_txt = _T("");
 CString g_achive_device_name_path = _T("");
 CString g_achive_monitor_datatbase_path = _T("");
 
@@ -1893,7 +1894,7 @@ int weekly_list_line ;
 int annual_list_line ;
 int screen_list_line ;
 int monitor_list_line;
-
+int analog_range_tbl_line;
 
 HWND      g_hwnd_now;
 HWND      m_input_dlg_hwnd;
@@ -1924,6 +1925,9 @@ HWND      m_add_label = NULL;
 HWND      m_edit_label = NULL;
 HWND      m_at_command_hwnd = NULL;
 HWND      m_remote_point_hwnd = NULL;
+HWND	  m_program_debug_list_hwnd = NULL;
+
+HWND analog_cus_range_dlg=NULL;
 
 HWND	  m_statusbar_hwnd = NULL;
 vector <Str_out_point> m_Output_data;
@@ -1946,6 +1950,7 @@ vector <Str_userlogin_point> m_user_login_data;
 vector <Client_Info> m_tcp_connect_info;
 vector <Str_label_point> m_graphic_label_data;	//图片里面的Label的信息要存在设备里面;
 vector <Str_remote_point> m_remote_point_data;  //Mini panel 里面Tstat 远端点的 值;
+vector <Str_table_point> m_analog_custmer_range;
 
 Time_block_mini Device_time;
 Str_Setting_Info Device_Basic_Setting;
@@ -2038,8 +2043,8 @@ vector<Reg_Infor> g_Vector_Write_Error;
 bool need_read_bacnet_graphic_label_flag = true;	//用于防止重复读取 graphic label ;只有切换设备的时候才需要再次读取;
 bool read_write_bacnet_config = false;	//读写Bacnet config 的时候禁止刷新 List;
 
- vector <Tstat_Input_Struct> m_tstat_input_data;
- vector <Tstat_Output_Struct> m_tstat_output_data;
+vector <Tstat_Input_Struct> m_tstat_input_data;
+vector <Tstat_Output_Struct> m_tstat_output_data;
 
  // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
  // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KF Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
