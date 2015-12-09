@@ -277,7 +277,9 @@ int m_inRows;
 			case 12:m_inRows=5;break; // 5D ͬ TStat7
 			case PM_TSTAT6:	m_inRows=12;break;
 			case PM_TSTAT5i:	m_inRows=12;break;
+            case PM_TSTAT8:	m_inRows=12;break;
 			case 16:m_inRows=10;break; // 5E
+            case PM_PM5E:m_inRows=10;break; // 5E
 			case 17:m_inRows=5;break; // 5F
 			case 18:m_inRows=5;break; // 5G
 			case 19:m_inRows=9;break; // 5H

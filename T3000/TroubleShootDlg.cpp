@@ -172,6 +172,17 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 // 	for (int i=0;i<allsubnets.size();i++)
 // 	{
         m_edit_newip.GetWindowTextW(strnewipadress);
+
+         for (int i = 0;i<g_Vector_Subnet.size ();i++)
+         {
+             if (CheckTheSameSubnet(g_Vector_Subnet.at(i).StrIP,strnewipadress))
+             {
+                 strnewgateway = g_Vector_Subnet.at(i).StrGetway;
+                 strnewsubnet = g_Vector_Subnet.at(i).StrMask;
+                 break;
+             }
+         }
+
 		//GetNewIP(strnewipadress,allsubnets[i].StrIP);
 		if (strnewipadress.Find(_T("0.0.0"))!=-1)//¶Ô0.0.0.0µÄ¹ýÂËµô
 		{

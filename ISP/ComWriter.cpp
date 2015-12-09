@@ -168,7 +168,7 @@ BOOL CComWriter::WriteCommandtoReset()
 	int ModelID= read_one(m_szMdbIDs[0],7,5);
 	if (ModelID>0)
 	{
-		if (ModelID==6||ModelID==7)//Tstat6,7检测芯片大小，其余用串口烧写的都不检测
+		if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7检测芯片大小，其余用串口烧写的都不检测
 		{
 			int Chipsize=read_one(m_szMdbIDs[0],11,5);
 
@@ -374,7 +374,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
 			int ModelID= temp_read_reg[7];
 			if (ModelID>0)
 			{
-				if (ModelID==6||ModelID==7)//Tstat6,7检测芯片大小，其余用串口烧写的都不检测
+				if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7检测芯片大小，其余用串口烧写的都不检测
 				{				
 					Chipsize_6 = temp_read_reg[11];
 
@@ -455,7 +455,7 @@ UINT Flash_Modebus_Device(LPVOID pParam)
 			int Chipsize = 0;
          //  pWriter->OutPutsStatusInfo(_T("The device can't match with the hex"));
            #if 1		//复位
-			if (ModelID==6||ModelID==7)
+			if (ModelID==6||ModelID==7||ModelID==8)
 				Chipsize = Chipsize_6;
 			else
 				Chipsize = temp_read_reg[11];
@@ -1718,7 +1718,7 @@ UINT flashThread_ForExtendFormatHexfile(LPVOID pParam)
 			   int ModelID= read_one(pWriter->m_szMdbIDs[i],7,5);
 			   if (ModelID>0)
 			   {
-				   if (ModelID==6||ModelID==7)//Tstat6,7检测芯片大小，其余用串口烧写的都不检测
+				   if (ModelID==6||ModelID==7||ModelID==8)//Tstat6,7检测芯片大小，其余用串口烧写的都不检测
 				   {
 					   int Chipsize=read_one(pWriter->m_szMdbIDs[i],11,5);
 					   if(Chipsize < 0)
