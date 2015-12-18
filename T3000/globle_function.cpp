@@ -1252,59 +1252,79 @@ int WriteProgramData_Blocking(uint32_t deviceid,uint8_t n_command,uint8_t start_
 //
 int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage)
 {
-    unsigned char command = (unsigned char)n_command;
+	unsigned char command = (unsigned char)n_command;
 
-    unsigned short entitysize=0;
-    uint8_t apdu[480] = { 0 };
-    uint8_t test_value[480] = { 0 };
-    int private_data_len = 0;
-    BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
-    BACNET_APPLICATION_DATA_VALUE test_data_value = { 0 };
-    BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
-    BACNET_PRIVATE_TRANSFER_DATA test_data = { 0 };
-    bool status = false;
+	unsigned short entitysize=0;
+	uint8_t apdu[480] = { 0 };
+	uint8_t test_value[480] = { 0 };
+	int private_data_len = 0;	
+	BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
+	BACNET_APPLICATION_DATA_VALUE test_data_value = { 0 };
+	BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
+	BACNET_PRIVATE_TRANSFER_DATA test_data = { 0 };
+	bool status = false;
 
-    private_data.vendorID = BACNET_VENDOR_ID;
-    private_data.serviceNumber = 1;
+	private_data.vendorID = BACNET_VENDOR_ID;
+	private_data.serviceNumber = 1;
 
-    unsigned max_apdu = 0;
-    entitysize = 400;
-    entitysize = entitysize | (npackage << 9);	//将entitysize 的 高7位用来给program code ，用来记录是第几包;
+	unsigned max_apdu = 0;
+	entitysize = 400;
+	entitysize = entitysize | (npackage << 9);	//将entitysize 的 高7位用来给program code ，用来记录是第几包;
 
-    char SendBuffer[1000];
-    memset(SendBuffer,0,1000);
-    char * temp_buffer = SendBuffer;
+	char SendBuffer[1000];
+	memset(SendBuffer,0,1000);
+	char * temp_buffer = SendBuffer;
 
-    Str_user_data_header private_data_chunk;
-    //Str_sub_user_data_header private_sub_data_chunk;
-    int HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
-    unsigned char * n_temp_point = program_code[start_instance];
+	Str_user_data_header private_data_chunk;
+	//Str_sub_user_data_header private_sub_data_chunk;
+	int HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
+		unsigned char * n_temp_point = program_code[start_instance];
 
-    HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
-    private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + (end_instance - start_instance + 1)*400;
-    private_data_chunk.command = command;
-    private_data_chunk.point_start_instance = start_instance;
-    private_data_chunk.point_end_instance = end_instance;
-    private_data_chunk.entitysize=entitysize;
-    Set_transfer_length(private_data_chunk.total_length);
-    memcpy_s(SendBuffer,PRIVATE_HEAD_LENGTH ,&private_data_chunk,PRIVATE_HEAD_LENGTH );
-    n_temp_point = n_temp_point + npackage*400;
-    memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,400,n_temp_point,400);
-    Set_transfer_length(private_data_chunk.total_length);
 
-    status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&SendBuffer, &data_value);
-    //ct_test(pTest, status == true);
-    private_data_len =	bacapp_encode_application_data(&test_value[0], &data_value);
-    private_data.serviceParameters = &test_value[0];
-    private_data.serviceParametersLen = private_data_len;
+		HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
+		private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + (end_instance - start_instance + 1)*400;
+		private_data_chunk.command = command;
+		private_data_chunk.point_start_instance = start_instance;
+		private_data_chunk.point_end_instance = end_instance;
+		private_data_chunk.entitysize=entitysize;
+		Set_transfer_length(private_data_chunk.total_length);
+		memcpy_s(SendBuffer,PRIVATE_HEAD_LENGTH ,&private_data_chunk,PRIVATE_HEAD_LENGTH );
+		n_temp_point = n_temp_point + npackage*400;
+		memcpy_s(SendBuffer + PRIVATE_HEAD_LENGTH,400,n_temp_point,400);
+		Set_transfer_length(private_data_chunk.total_length);
+	
 
-    BACNET_ADDRESS dest = { 0 };
-    status = address_get_by_device(deviceid, &max_apdu, &dest);
-    if (status)
-    {
-        return Send_ConfirmedPrivateTransfer(&dest,&private_data);
-    }
-    return -2;
+		if(debug_item_show == DEBUG_SHOW_PROGRAM_DATA_ONLY)
+		{
+			CString temp_char;
+			CString n_temp_print;
+			char * temp_point;
+			temp_point = SendBuffer;
+			n_temp_print.Format(_T("prg_%d  pack_%d  write:"),start_instance,npackage);
+			for (int i = 0; i< private_data_chunk.total_length ; i++)
+			{
+				temp_char.Format(_T("%02x"),(unsigned char)*temp_point);
+				temp_char.MakeUpper();
+				temp_point ++;
+				n_temp_print = n_temp_print + temp_char + _T(" ");
+			}
+			DFTrace(n_temp_print);
+		}
+
+
+	status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&SendBuffer, &data_value);
+	//ct_test(pTest, status == true);
+	private_data_len =	bacapp_encode_application_data(&test_value[0], &data_value);
+	private_data.serviceParameters = &test_value[0];
+	private_data.serviceParametersLen = private_data_len;
+
+	BACNET_ADDRESS dest = { 0 };
+	status = address_get_by_device(deviceid, &max_apdu, &dest);
+	if (status) 
+	{
+		return Send_ConfirmedPrivateTransfer(&dest,&private_data);
+	}
+	return -2;
 }
 
 /***************************************************
@@ -1665,44 +1685,46 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
 ** Write Bacnet private data to device
 ** Add by Fance
 ****************************************************/
-int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t nstop_index)
+int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t nstop_index,unsigned int write_object_list)
 {
-    int temp_invoke_id = -1;
-    int send_status = true;
-    int	resend_count = 0;
-    for (int z=0; z<5; z++)
-    {
-        do
-        {
-            resend_count ++;
-            if(resend_count>5)
-            {
-                send_status = false;
-                break;
-            }
-            temp_invoke_id = WritePrivateData(g_bac_instance,ncommand,nstart_index,nstop_index);
+	int temp_invoke_id = -1;
+	int send_status = true;
+	int	resend_count = 0;
+	for (int z=0;z<5;z++)
+	{
+		do 
+		{
+			resend_count ++;
+			if(resend_count>5)
+			{
+				send_status = false;
+				break;
+			}
+			if(write_object_list == 0)
+				temp_invoke_id = WritePrivateData(g_bac_instance,ncommand,nstart_index,nstop_index);
+			else
+				temp_invoke_id = WritePrivateData(write_object_list,ncommand,nstart_index,nstop_index);
 
-            Sleep(SEND_COMMAND_DELAY_TIME);
-        }
-        while (temp_invoke_id<0);
-        if(send_status)
-        {
-            for (int i=0; i<3000; i++)
-            {
-                Sleep(1);
-                if(tsm_invoke_id_free(temp_invoke_id))
-                {
-                    g_llRxCount++;
-                    return 1;
-                }
-                else
-                    continue;
-            }
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		} while (temp_invoke_id<0);
+		if(send_status)
+		{
+			for (int i=0;i<3000;i++)
+			{
+				Sleep(1);
+				if(tsm_invoke_id_free(temp_invoke_id))
+				{
+					g_llRxCount++;
+					return 1;
+				}
+				else
+					continue;
+			}
+			
 
-
-        }
-    }
-    return -1;
+		}
+	}
+	return -1;
 
 }
 
@@ -2125,10 +2147,10 @@ bool Check_Label_Exsit(LPCTSTR m_new_label)
 /***************************************************
 **
 ** Receive Bacnet private data from device , and handle the data.
-** Add by Fance
+** Code by Fance
 ****************************************************/
 
-int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
+int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
 {
     int i;
     int block_length;
@@ -2773,34 +2795,42 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
         int code_length = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
         //my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
 
-        if(package == 0)
-        {
-            program_code_length[start_instance] = ((unsigned char)my_temp_point[1])*256 + (unsigned char)my_temp_point[0];
-            if(program_code_length[start_instance] > 2000)
-                program_code_length[start_instance] = 0;
-            TRACE(_T("program_code_length%d = %d   [1] = %d [0] = %d \r\n"),start_instance,program_code_length[start_instance],(unsigned char)my_temp_point[1],(unsigned char)my_temp_point[0]);
-        }
-        else if(package == 4)
-            end_flag = true;
-        memset(mycode + package*400 ,0,400);
+			if(package == 0)
+			{
+				program_code_length[start_instance] = ((unsigned char)my_temp_point[1])*256 + (unsigned char)my_temp_point[0];
+				if(program_code_length[start_instance] > 2000)
+					program_code_length[start_instance] = 0;
+				//TRACE(_T("program_code_length%d = %d   [1] = %d [0] = %d \r\n"),start_instance,program_code_length[start_instance],(unsigned char)my_temp_point[1],(unsigned char)my_temp_point[0]);
+			}
+			else if(package == 4)
+				end_flag = true;
+			memset(mycode + package*400 ,0,400);
 
-        memcpy_s(mycode + package*400 ,400 ,my_temp_point,400);
-        unsigned char * temp_point = (program_code[start_instance]) + package*400;
-        memcpy_s((program_code[start_instance]) + package*400,400,my_temp_point,400);
-        //program_code_length[start_instance] = 400;
+			memcpy_s(mycode + package*400 ,400 ,my_temp_point,400);
+			unsigned char * temp_point = (program_code[start_instance]) + package*400;
+			memcpy_s((program_code[start_instance]) + package*400,400,my_temp_point,400);
+			//program_code_length[start_instance] = 400;
 
-        CString n_temp_print;
-        n_temp_print.Format(_T("Rx : "));
-        CString temp_char;
-        char * temp_print = (char *)Temp_CS.value;
-        for (int i = 0; i< len_value_type ; i++)
-        {
-            temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
-            temp_char.MakeUpper();
-            temp_print ++;
-            n_temp_print = n_temp_print + temp_char + _T(" ");
-        }
-        DFTrace(n_temp_print);
+
+			if(debug_item_show == DEBUG_SHOW_PROGRAM_DATA_ONLY)
+			{
+				CString temp_char;
+				CString n_temp_print;
+				char * temp_point;
+				temp_point = (char *)Temp_CS.value;
+				n_temp_print.Format(_T("prg_%d  pack_%d  receive:"),start_instance,package);
+				for (int i = 0; i< len_value_type ; i++)
+				{
+					temp_char.Format(_T("%02x"),(unsigned char)*temp_point);
+					temp_char.MakeUpper();
+					temp_point ++;
+					n_temp_print = n_temp_print + temp_char + _T(" ");
+				}
+				DFTrace(n_temp_print);
+			}
+
+
+
 
 
         return READPROGRAMCODE_T3000;
@@ -3136,41 +3166,47 @@ int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag)
             m_alarmlog_data.at(start_instance).prg =  *(my_temp_point++);
 
 
-            m_alarmlog_data.at(start_instance).alarm_panel =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where1 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where2 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where3 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where4 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where5 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where_state1 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where_state2 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where_state3 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where_state4 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where_state5 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).change_flag =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).original =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).no =  *(my_temp_point++);
-        }
-    }
-    return READALARM_T3000;
-    break;
-    case READ_MISC:
-    {
-        block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
-        my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
-        if(block_length!=sizeof(Str_MISC))
-            return -1;
-        Device_Misc_Data.reg.flag[0] = *(my_temp_point++);
-        Device_Misc_Data.reg.flag[1] = *(my_temp_point++);
-        if((Device_Misc_Data.reg.flag[0]!= 0x55) || (Device_Misc_Data.reg.flag[1] != 0xff))
-            return -1;
-        for (int z=0; z<12; z++)
-        {
-            Device_Misc_Data.reg.monitor_analog_block_num[z] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-            my_temp_point = my_temp_point  +  4;
-            Device_Misc_Data.reg.monitor_digital_block_num[z] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-            my_temp_point = my_temp_point  +  4;
-        }
+				m_alarmlog_data.at(start_instance).alarm_panel =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).where1 =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).where2 =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).where3 =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).where4 =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).where5 =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).where_state1 =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).where_state2 =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).where_state3 =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).where_state4 =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).where_state5 =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).change_flag =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).original =  *(my_temp_point++);
+				m_alarmlog_data.at(start_instance).no =  *(my_temp_point++);
+			}
+		}
+		return READALARM_T3000;
+		break;
+	case READ_MISC:
+		{
+			block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
+			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+			if(block_length!=sizeof(Str_MISC))
+				return -1;
+			Device_Misc_Data.reg.flag[0] = *(my_temp_point++);
+			Device_Misc_Data.reg.flag[1] = *(my_temp_point++);
+			if((Device_Misc_Data.reg.flag[0]!= 0x55) || (Device_Misc_Data.reg.flag[1] != 0xff))
+				return -1;
+			for (int z=0;z<12;z++)
+			{
+				Device_Misc_Data.reg.monitor_analog_block_num[z] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point  +  4;
+				Device_Misc_Data.reg.monitor_digital_block_num[z] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point  +  4;
+			}
+
+			for (int j=0;j<12;j++)
+			{
+				Device_Misc_Data.reg.operation_time[j] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point  +  4;
+			}
 
     }
     break;
@@ -3501,130 +3537,129 @@ void local_handler_conf_private_trans_ack(
 #endif
 
     len = ptransfer_decode_service_request(service_request, service_len, &data);        /* Same decode for ack as for service request! */
-    if (len < 0)
-    {
-        return;
+    if (len < 0) {
+		return;
 #if PRINT_ENABLED
         printf("cpta: Bad Encoding!\n");
 #endif
-    }
-    int receive_data_type;
-    bool each_end_flag = false;
-    receive_data_type = CM5ProcessPTA(&data,each_end_flag);
-    if(receive_data_type < 0)
-    {
-        g_llerrCount ++;
-        return;
-    }
-    switch(receive_data_type)
-    {
-    case READ_REMOTE_POINT:
-    {
-        if(each_end_flag)
-        {
-            if(pDialog[WINDOW_REMOTE_POINT]->IsWindowEnabled())
-                ::PostMessage(m_remote_point_hwnd,WM_REFRESH_BAC_REMOTE_POINT_LIST,NULL,NULL);
-        }
-    }
-    break;
-    case READANALOG_CUS_TABLE_T3000:
-    {
-        if(analog_cus_range_dlg!=NULL)
-            ::PostMessage(analog_cus_range_dlg,WM_REFRESH_BAC_ANALOGCUSRANGE_LIST,NULL,NULL);
-    }
-    break;
-    case READ_AT_COMMAND:
-    {
-        ::PostMessage(m_at_command_hwnd,WM_REFRESH_BAC_AT_COMMAND,NULL,NULL);
-    }
-    break;
-    case READINPUT_T3000:
-        if(each_end_flag)
-        {
-            if(pDialog[WINDOW_INPUT]->IsWindowVisible())
-                ::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-            else
-                TRACE(_T("Input window not visiable ,don't refresh\r\n"));
-        }
-        copy_data_to_ptrpanel(TYPE_INPUT);
-        break;
-    case READPROGRAM_T3000:
-        if(each_end_flag)
-        {
-            if(pDialog[WINDOW_PROGRAM]->IsWindowVisible())
-                ::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
-        }
-        copy_data_to_ptrpanel(TYPE_ALL);
-        break;
-    case READPROGRAMCODE_T3000:
-        break;
-    case READVARIABLE_T3000:
-        if(each_end_flag)
-        {
-            if(pDialog[WINDOW_VARIABLE]->IsWindowVisible())
-                ::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
-        }
-        copy_data_to_ptrpanel(TYPE_VARIABLE);
-        break;
-    case READOUTPUT_T3000:
-        if(each_end_flag)
-        {
-            if(pDialog[WINDOW_OUTPUT]->IsWindowVisible())
-                ::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
-        }
-        copy_data_to_ptrpanel(TYPE_OUTPUT);
-        break;
-    case READWEEKLYROUTINE_T3000:
-        if(each_end_flag)
-            ::PostMessage(m_weekly_dlg_hwnd,WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
-        copy_data_to_ptrpanel(TYPE_WEEKLY);
-        break;
-    case READANNUALROUTINE_T3000:
-        ::PostMessage(m_annual_dlg_hwnd,WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
-        copy_data_to_ptrpanel(TYPE_ANNUAL);
-        break;
-    case READTIMESCHEDULE_T3000:
-        ::PostMessage(m_schedule_time_dlg_hwnd,WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
-        break;
-    case TIME_COMMAND:
-        ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,TIME_COMMAND,NULL);
-        break;
-    case READANNUALSCHEDULE_T3000:
-        ::PostMessage(m_schedule_day_dlg_hwnd,WM_REFRESH_BAC_DAY_CAL,NULL,NULL);
-        break;
-    case READCONTROLLER_T3000:
-        if(each_end_flag)
-            ::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
-        copy_data_to_ptrpanel(TYPE_ALL);
-        break;
-    case READSCREEN_T3000:
-        if(each_end_flag)
-            ::PostMessage(m_screen_dlg_hwnd,WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
-        copy_data_to_ptrpanel(TYPE_ALL);
-        break;
-    case READALARM_T3000:
-        if(each_end_flag)
-            ::PostMessage(m_alarmlog_dlg_hwnd,WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
-        break;
-    case READ_SETTING_COMMAND:
-        ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
-        break;
-    case READTSTAT_T3000:
-        //if(each_end_flag)
-        //	::PostMessage(m_tstat_dlg_hwnd,WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
-        break;
-    case READMONITOR_T3000:
-    {
-        if(each_end_flag)
-        {
-            ::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
-            ::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
-        }
-    }
-    break;
-    default:
-        break;
-    }
+	}
+	int receive_data_type;
+	bool each_end_flag = false;
+	receive_data_type = Bacnet_PrivateData_Handle(&data,each_end_flag);
+	if(receive_data_type < 0)
+	{
+		g_llerrCount ++;
+		return;
+	}
+	switch(receive_data_type)
+	{
+	case READ_REMOTE_POINT:
+		{
+			if(each_end_flag)
+			{
+				if(pDialog[WINDOW_REMOTE_POINT]->IsWindowEnabled())
+					::PostMessage(m_remote_point_hwnd,WM_REFRESH_BAC_REMOTE_POINT_LIST,NULL,NULL);
+			}
+		}
+		break;
+	case READANALOG_CUS_TABLE_T3000:
+		{
+			if(analog_cus_range_dlg!=NULL)
+				::PostMessage(analog_cus_range_dlg,WM_REFRESH_BAC_ANALOGCUSRANGE_LIST,NULL,NULL);	
+		}
+		break;
+	case READ_AT_COMMAND:
+		{
+			::PostMessage(m_at_command_hwnd,WM_REFRESH_BAC_AT_COMMAND,NULL,NULL);
+		}
+		break;
+	case READINPUT_T3000:
+		if(each_end_flag)
+		{
+			if(pDialog[WINDOW_INPUT]->IsWindowVisible())
+				::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+			else
+				TRACE(_T("Input window not visiable ,don't refresh\r\n"));
+		}
+		copy_data_to_ptrpanel(TYPE_INPUT);
+		break;
+	case READPROGRAM_T3000:
+		if(each_end_flag)
+		{
+			if(pDialog[WINDOW_PROGRAM]->IsWindowVisible())
+				::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+		}
+		copy_data_to_ptrpanel(TYPE_ALL);
+		break;
+	case READPROGRAMCODE_T3000:
+		break;
+	case READVARIABLE_T3000:
+		if(each_end_flag)
+		{
+			if(pDialog[WINDOW_VARIABLE]->IsWindowVisible())
+				::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+		}
+		copy_data_to_ptrpanel(TYPE_VARIABLE);
+		break;
+	case READOUTPUT_T3000:
+		if(each_end_flag)
+		{
+			if(pDialog[WINDOW_OUTPUT]->IsWindowVisible())
+			::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+		}
+		copy_data_to_ptrpanel(TYPE_OUTPUT);
+		break;
+	case READWEEKLYROUTINE_T3000:
+		if(each_end_flag)
+			::PostMessage(m_weekly_dlg_hwnd,WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
+		copy_data_to_ptrpanel(TYPE_WEEKLY);
+		break;
+	case READANNUALROUTINE_T3000:
+		::PostMessage(m_annual_dlg_hwnd,WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
+		copy_data_to_ptrpanel(TYPE_ANNUAL);
+		break;
+	case READTIMESCHEDULE_T3000:
+		::PostMessage(m_schedule_time_dlg_hwnd,WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
+		break;
+	case TIME_COMMAND:
+		::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,TIME_COMMAND,NULL);
+		break;
+	case READANNUALSCHEDULE_T3000:
+		::PostMessage(m_schedule_day_dlg_hwnd,WM_REFRESH_BAC_DAY_CAL,NULL,NULL);
+		break;
+	case READCONTROLLER_T3000:
+		if(each_end_flag)
+			::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+		copy_data_to_ptrpanel(TYPE_ALL);
+		break;
+	case READSCREEN_T3000:
+		if(each_end_flag)
+			::PostMessage(m_screen_dlg_hwnd,WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
+		copy_data_to_ptrpanel(TYPE_ALL);
+		break;
+	case READALARM_T3000:
+		if(each_end_flag)
+			::PostMessage(m_alarmlog_dlg_hwnd,WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
+		break;
+	case READ_SETTING_COMMAND:
+		::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);	
+		break;
+	case READTSTAT_T3000:
+		//if(each_end_flag)
+		//	::PostMessage(m_tstat_dlg_hwnd,WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
+		break;
+	case READMONITOR_T3000:
+		{
+			if(each_end_flag)
+			{
+				::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
+				::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
+			}
+		}
+		break;
+	default:
+		break;
+	}
 
     if((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG))
     {
@@ -4877,17 +4912,26 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         temp.nSerial = nSerial;
         temp.NetCard_Address=local_enthernet_ip;
 
-        temp.sw_version = usDataPackage[11];
-        temp.hw_version = usDataPackage[12];
-        temp.parent_serial_number = usDataPackage[13] + usDataPackage[14]*65536;
-        unsigned char temp_obj[2];
-        unsigned char temp_panel[2];
-        memcpy(temp_obj,&usDataPackage[15],2);
-        memcpy(temp_panel,&usDataPackage[16],2);
-        temp.object_instance = temp_obj[0]*256 + temp_obj[1];
-        temp.panal_number = temp_panel[0];
-        //	temp.object_instance = usDataPackage[15] >>8 + (usDataPackage[15]&0x00ff)<<8;
-        bool find_exsit = false;
+		temp.sw_version = usDataPackage[11];
+		temp.hw_version = usDataPackage[12];
+		temp.parent_serial_number = usDataPackage[13] + usDataPackage[14]*65536;
+		unsigned char temp_obj[2];
+		unsigned char temp_panel[2];
+		memcpy(temp_obj,&usDataPackage[15],2);
+		memcpy(temp_panel,&usDataPackage[16],2);
+		temp.object_instance = temp_obj[0]*256 + temp_obj[1];
+		temp.panal_number = temp_panel[0];
+	//	temp.object_instance = usDataPackage[15] >>8 + (usDataPackage[15]&0x00ff)<<8;
+
+		if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
+		{
+			g_Print.Format(_T("Serial = %u     ID = %d ,ip = %s  , Product name : %s ,obj = %u ,panel = %u"),nSerial,modbusID,nip_address ,nproduct_name,temp.object_instance,temp.panal_number);
+			DFTrace(g_Print);
+		}
+
+
+
+		bool find_exsit = false;
 
         for (int i=0; i<(int)m_refresh_net_device_data.size(); i++)
         {
@@ -5864,20 +5908,21 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
             GetPrivateProfileStringW(temp_section,part_section,_T(""),temp_program_code.GetBuffer(4000),4000,FilePath);
             temp_program_code.ReleaseBuffer();
 
-            if(ntemp_version < 2)	//如果是加载的旧版本的 配置档,code 就清零;
-            {
-                program_code_length[i] = 0;
-                memset(program_code[i],0,2000);
-            }
-            else
-            {
-                for (int x=0; x<(temp_program_code.GetLength()/2); x++)
-                {
-                    CString temp_value;
-                    temp_value = temp_program_code.Left(2);
-                    temp_program_code = temp_program_code.Right(temp_program_code.GetLength()-2);
-                    program_code[i][x] = Str_to_Byte(temp_value);
-                }
+			if(ntemp_version < 2)	//如果是加载的旧版本的 配置档,code 就清零;
+			{
+				program_code_length[i] = 0;
+				memset(program_code[i],0,2000);
+			}
+			else
+			{
+				int temp_count = temp_program_code.GetLength()/2;
+				for (int x=0;x<temp_count;x++)
+				{
+					CString temp_value;
+					temp_value = temp_program_code.Left(2);
+					temp_program_code = temp_program_code.Right(temp_program_code.GetLength()-2);
+					program_code[i][x] = Str_to_Byte(temp_value);
+				}
 #if 0
                 if(temp_program_code.GetLength() == 2*program_code_length[i])
                 {
@@ -7648,8 +7693,8 @@ void LoadTstat_InputData()
             m_tstat_input_data.at(i-1).AM.StrValue=strAuto;
         }
         //Filter
-        strTemp.Format(_T("%d"),product_register_value[142+i]);
-        m_tstat_input_data.at(i-1).Filter.regAddress=142+i;
+        strTemp.Format(_T("%d"),product_register_value[141+i]);
+        m_tstat_input_data.at(i-1).Filter.regAddress=141+i;
         m_tstat_input_data.at(i-1).Filter.StrValue=strTemp;
 
         //Range
@@ -9152,7 +9197,7 @@ void LoadRegistersGraphicMode()
 void LoadRegistersGraphicMode_AQ()
 {
     g_calibration_module_data.Current_Frequency.regAddress = 305;
-    g_calibration_module_data.Current_Frequency.StrValue = _T("Frequency");
+    g_calibration_module_data.Current_Frequency.StrValue = _T('Frequency');
     g_calibration_module_data.User_Table_Selection.regAddress=309;
     g_calibration_module_data.User_Table_Point_Number.regAddress= 307;
     g_calibration_module_data.User_Offset.regAddress = 106;
@@ -9171,7 +9216,7 @@ void LoadRegistersGraphicMode_AQ()
 void LoadRegistersGraphicMode_HUMTEMPSENSOR()
 {
     g_calibration_module_data.Current_Frequency.regAddress = 374;
-    g_calibration_module_data.Current_Frequency.StrValue = _T("Frequency");
+    g_calibration_module_data.Current_Frequency.StrValue = _T('Frequency');
     g_calibration_module_data.User_Table_Selection.regAddress=454;
     g_calibration_module_data.User_Table_Point_Number.regAddress=455;
     g_calibration_module_data.User_Offset.regAddress = 451;

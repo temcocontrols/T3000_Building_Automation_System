@@ -131,6 +131,7 @@ typedef enum {
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
 		 WRITE_SETTING_COMMAND		= 198,
+		 WRITE_MISC                  = 196,
 		 WRITE_SUB_ID_BY_HAND = 199,
 		 DELETE_MONITOR_DATABASE = 200
 } CommandRequest;	  
@@ -928,7 +929,7 @@ typedef union
 		unsigned char flag[2]; //check if not 0x55ff ,means it's the old version ,ignore it.
 		unsigned int monitor_analog_block_num[12];
 		unsigned int monitor_digital_block_num[12];
-
+		unsigned int operation_time[12];
 	}reg;
 }Str_MISC;
 

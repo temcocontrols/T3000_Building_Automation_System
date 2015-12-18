@@ -430,7 +430,7 @@ CString GetProductName(int ModelID)
 	case PM_AirQuality:
 		strProductName = _T("AirQuality");	  //
 		break;
-	case PM_HUM:
+	case PM_HUMTEMPSENSOR:
 		strProductName = _T("TstatHUM");	  //
 		break;
 	case PM_HUM_R:

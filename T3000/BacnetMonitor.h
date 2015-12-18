@@ -65,7 +65,7 @@ public:
 	_RecordsetPtr m_monitor_pRec;
 
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
-
+	void Check_New_DB();
 };
 
 unsigned char read_monitordata(int digtal_or_analog = 1);

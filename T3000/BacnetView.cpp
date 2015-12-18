@@ -1,6 +1,40 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2015 - 12 - 10
+1. Bacnet Screen  ,上下左右移动.
+2. Screen 选择图片的时候 由单机改为双击.
+
+2015 - 12 - 08 
+1. Program IDE 大写小强制控制键盘输入
+2. 更改 Program IDE color 的 default value.
+3. Add new toolbar .Home.
+4. Program 超过 2000个字节时不在溢出.给出超出提示;
+5. Trend log 在有大部分数据要读时，优先只读最近的数据。然后在后台读取剩余的;
+6. Trend log 在后台加范围 ， 用于过滤不合理的值;
+
+
+2015 - 11 - 17
+1. 修复 program IDE debug window , 因 切换时间控件的焦点引起的 值不正确的BUG;
+2. 在graphic window 最小化时 再次点击show graphic 时 ，会自动最大化;
+
+
+2015 - 11 - 16
+1. 修复 在graphic 中 不选中部分input 的时候 ，在切换X轴的时间 不响应此动作的bug.
+
+2015 - 11 - 12
+1. Fix trend log analog value graphic line mess.
+
+2015 - 11 - 11
+1. Program IDE show error message ,if input some error label.
+2. Program IDE warning color finished.
+
+2015 - 11 - 09
+1. Fix bugs Screen edit write one label to another device.
+
+2015 - 11 - 04
+Merge with Alex .
+
 2015 - 11 - 04
 1.Monitor no sd disk , save the data as temp data.
 
@@ -1738,17 +1772,7 @@ void CDialogCM5_BacNet::Fresh()
 		//SetTimer(3,1000,NULL); //Check whether need  show Alarm dialog.
 		return;
 	}
-	//else if(pFrame->m_product.at(selected_product_index).protocol == PROTOCOL_BIP_TO_MSTP)
-	//{
-	//	g_gloab_bac_comport = 0;
-	//	set_datalink_protocol(2);
-	//	Initial_bac(g_gloab_bac_comport);
-	//	SetTimer(2,60000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
-	//	SetTimer(3,1000,NULL); //Check whether need  show Alarm dialog.
-	//	BacNet_hwd = this->m_hWnd;
-	//	::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
-	//	return;
-	//}
+
 	bip_setgsm(false);
 	Gsm_communication = false;
 	static bool initial_once_ip = false;
@@ -1812,11 +1836,17 @@ void CDialogCM5_BacNet::Fresh()
 		{
 			g_llTxCount ++;
 			g_llRxCount ++;
+			
+			if(pFrame->m_product.at(selected_product_index).status == false)
+			{
+				//int ret_write = Write_One(g_tstat_id,33,151);	33write 151 is to reset the minipanel ethenet.
+				//TRACE(_T("Write_One(g_tstat_id,33,151) == %d\r\n"),ret_write);
+			}
 			bac_select_device_online = true;
 			TRACE(_T("Reconnected ~~~~~~~~\r\n"));
 			break;
 		}
-		else
+		else 
 		{
 			g_llTxCount ++;
 			g_llerrCount ++;

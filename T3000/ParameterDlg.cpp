@@ -3897,7 +3897,7 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	GetDlgItem(IDC_EDIT_DEAD_MASTER)->SetWindowText(str);
 	//////////////////////////////////////////////////////////////////////////
 	/*if ((strparamode.CompareNoCase(_T("Tstat6")) == 0)||(strparamode.CompareNoCase(_T("Tstat7")) == 0))*/
-    if (product_register_value[714]==0x56&&(product_register_value[7] == PM_TSTAT6||product_register_value[7] == PM_TSTAT7))
+    if (product_register_value[714]==0x56&&(product_register_value[7] == PM_TSTAT6||product_register_value[7] == PM_TSTAT7||product_register_value[7] == PM_HUMTEMPSENSOR||product_register_value[7] ==PM_AirQuality||product_register_value[7] ==PM_HUM_R))
     {
         GetDlgItem(IDC_STATIC_NAME_TSTAT)->ShowWindow(TRUE);
         GetDlgItem(IDC_EDIT_TSTAT_NAME)->ShowWindow(TRUE);
@@ -4067,8 +4067,6 @@ void CParameterDlg::Reflesh_ParameterDlg()
 	 
 	if (product_register_value[7]==PM_TSTAT6||product_register_value[7]==PM_TSTAT7||product_register_value[7]==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8))
 	{
-	   
-
 // 		if (product_register_value[MODBUS_TEMP_SELECT]<3)	//382
 // 		{
 // 			m_InputSelect1.SetCurSel(0);
@@ -4092,7 +4090,6 @@ void CParameterDlg::Reflesh_ParameterDlg()
 // 		{
 // 			m_inputSelect2.SetCurSel(product_register_value[MODBUS_INPUT1_SELECT]);	//383
 // 		}
-
 
 	    int TempSel=product_register_value[MODBUS_TEMP_SELECT];
                     if (TempSel<2)

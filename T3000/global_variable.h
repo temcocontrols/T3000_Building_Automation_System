@@ -57,6 +57,7 @@ CString g_strImgeFolder=_T("");
 CString g_strBuildingFolder=_T("");
 CString g_achive_folder=_T("");
 CString g_achive_folder_temp_txt = _T("");
+CString g_achive_folder_temp_db = _T("");
 CString g_achive_device_name_path = _T("");
 CString g_achive_monitor_datatbase_path = _T("");
 
@@ -2043,8 +2044,8 @@ vector<Reg_Infor> g_Vector_Write_Error;
 bool need_read_bacnet_graphic_label_flag = true;	//用于防止重复读取 graphic label ;只有切换设备的时候才需要再次读取;
 bool read_write_bacnet_config = false;	//读写Bacnet config 的时候禁止刷新 List;
 
-vector <Tstat_Input_Struct> m_tstat_input_data;
-vector <Tstat_Output_Struct> m_tstat_output_data;
+ vector <Tstat_Input_Struct> m_tstat_input_data;
+ vector <Tstat_Output_Struct> m_tstat_output_data;
 
  // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KC Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
  // CString analog_range[ANALOG_RANG_NUMBER]={_T("Raw"),_T("10KF Therm"),_T("0-100%"),_T("On/Off"),_T("Custom Sensor"),_T("Off/On")};
@@ -2137,5 +2138,15 @@ Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
 Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
 
 char monitor_database_flag[24];   //用于标记哪些Database需要删除的 ，1 为删除;
+int debug_item_show = 0;
+bool monitor_ignore_enable = false;
+int monitor_ignore_max_value = 0;
+int monitor_ignore_min_value = 0;
+int persent_array_count = 0;
+unsigned int old_tx_count = 0;
+
+int flag_auto_scroll = 0; // 如果客户有指定显示X轴的某些事件 此 变量会为 1;否则显示最新数据;
+int graphic_last_scale_type = 0 ; //用于存储上次 有效的 X轴的 刻度;
+unsigned int graphic_last_time_value =0 ; //x轴上次查看的时间; 
 
 #pragma endregion For_bacnet

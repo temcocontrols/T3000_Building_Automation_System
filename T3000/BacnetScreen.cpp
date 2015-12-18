@@ -92,7 +92,7 @@ bool BacnetScreen::read_screen_label()
 			Sleep(10);
 			if(b_stop_read_grp_label)
 			{
-				n_temp_result.Format(_T("Read Graphic Label complete."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+				n_temp_result.Format(_T("Reading GRP%d: complete"),screen_list_line + 1);
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,n_temp_result);
 				Sleep(10);
 				break;
@@ -152,6 +152,7 @@ BOOL BacnetScreen::PreTranslateMessage(MSG* pMsg)
 	// TODO: Add your specialized code here and/or call the base class
 	if(pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN) 
 	{
+
 		CRect list_rect,win_rect;
 		m_screen_list.GetWindowRect(list_rect);
 		ScreenToClient(&list_rect);
@@ -378,8 +379,7 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 		memcpy_s(m_screen_data.at(Changed_Item).description,STR_SCREEN_DESCRIPTION_LENGTH,cTemp1,STR_SCREEN_DESCRIPTION_LENGTH);
 	}
-
-	if(Changed_SubItem == SCREEN_LABEL)
+	else if(Changed_SubItem == SCREEN_LABEL)
 	{
 		CString cs_temp = m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
 		if(cs_temp.GetLength()>= STR_SCREEN_LABLE_LENGTH)	//长度不能大于结构体定义的长度;
@@ -399,8 +399,32 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 		WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 		memcpy_s(m_screen_data.at(Changed_Item).label,STR_SCREEN_LABLE_LENGTH,cTemp1,STR_SCREEN_LABLE_LENGTH);
 	}
+	else if(Changed_SubItem == SCREEN_PIC_FILE)
+	{
+		//CString cs_temp = m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
+		//CFileFind temp_find;
+		//bool find_full_name = false;
+		//bool find_relatice_path = false;
+		//find_full_name = temp_find.FindFile(cs_temp);
+		//if(find_full_name)
+		//{
 
-	if (Changed_SubItem == SCREEN_REFRESH)
+		//}
+		//else
+		//{
+		//	CString folder_temp_file;
+		//	folder_temp_file = g_strBuildingFolder + _T("\\image\\") + cs_temp;
+		//	CFileFind find_relatice_file;
+		//	find_relatice_path = find_relatice_file.FindFile(folder_temp_file);
+		//	if(find_relatice_path == false)
+		//	{
+		//		MessageBox(_T("Please input an valid path or double click to select file."));
+		//		m_screen_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
+		//		return 0;
+		//	}
+		//}
+	}
+	else if (Changed_SubItem == SCREEN_REFRESH)
 	{
 		int temp_value;
 		if((New_CString.GetLength()>=4) || (_wtoi(New_CString)>255))
@@ -429,7 +453,7 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 
 
 
-void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
+void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO: Add your control notification handler code here
@@ -467,7 +491,7 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if(lCol == SCREEN_PIC_FILE)
 	{
-
+		TRACE(_T("Double"));
 		CString FilePath;
 		CString image_fordor;
 		CString ApplicationFolder;
@@ -550,9 +574,25 @@ void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 	}
 	else
-		return;
+	{
+		for (int i=0;i<m_screen_list.GetItemCount();++i)
+		{
+			if(m_screen_list.GetCellChecked(i,0))
+			{
+				screen_list_line = i;
+				break;
+			}
+		}
 
-	m_screen_list.Set_Edit(false);
+
+		if(h_read_screenlabel_thread==NULL)
+		{
+			h_read_screenlabel_thread =CreateThread(NULL,NULL,ReadScreenThreadfun,this,NULL, NULL);
+		}
+		return;
+	}
+
+	//m_screen_list.Set_Edit(false);
 
 	int cmp_ret = memcmp(&m_temp_screen_data[lRow],&m_screen_data.at(lRow),sizeof(Control_group_point));
 	if(cmp_ret!=0)
@@ -660,23 +700,76 @@ int GetScreenFullLabel(int index,CString &ret_full_label)
 
 
 
-void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
+void BacnetScreen::OnNMClickListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+	*pResult = 0;
+
 	// TODO: Add your control notification handler code here
-	for (int i=0;i<m_screen_list.GetItemCount();++i)
-	{
-		if(m_screen_list.GetCellChecked(i,0))
+	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+	m_screen_list.ScreenToClient(&point);
+	LVHITTESTINFO lvinfo;
+	lvinfo.pt=point;
+	lvinfo.flags=LVHT_ABOVE;
+	int nItem=m_screen_list.SubItemHitTest(&lvinfo);
+	if(nItem!=-1)
+	{ 
+		m_screen_list.SetCellChecked(nItem,0,1);
+		screen_list_line = nItem;
+		for (int i=0;i<m_screen_list.GetItemCount();++i)
 		{
-			screen_list_line = i;
-			break;
+			if(i == nItem)
+				continue;
+			m_screen_list.SetCellChecked(i,0,FALSE);
 		}
 	}
+	int lRow = 0;
+	int lCol = 0;
+	lRow = lvinfo.iItem;
+	lCol = lvinfo.iSubItem;
 
 
-	if(h_read_screenlabel_thread==NULL)
+
+	return;
+	if(lRow>m_screen_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的;
+		return;
+	if(lRow<0)
+		return;
+	m_screen_list.Set_Edit(true);
+	CString New_CString;
+	CString temp_task_info;
+
+	if(lCol == SCREEN_PIC_FILE)
 	{
-		h_read_screenlabel_thread =CreateThread(NULL,NULL,ReadScreenThreadfun,this,NULL, NULL);
+		TRACE(_T("click"));
+		//CString cs_temp = m_screen_list.GetItemText(lRow,lCol);
+		//CFileFind temp_find;
+		//bool find_full_name = false;
+		//bool find_relatice_path = false;
+		//find_full_name = temp_find.FindFile(cs_temp);
+		//if(find_full_name)
+		//{
+
+		//}
+		//else
+		//{
+		//	CString folder_temp_file;
+		//	folder_temp_file = g_strBuildingFolder + _T("\\image\\") + cs_temp;
+		//	CFileFind find_relatice_file;
+		//	find_relatice_path = find_relatice_file.FindFile(folder_temp_file);
+		//	if(find_relatice_path == false)
+		//	{
+		//		MessageBox(_T("Please input an valid path or double click to select file."));
+		//		m_screen_list.SetItemText(lRow,lCol,_T(""));
+
+		//	}
+		//}
+	}
+	else
+	{
+		m_screen_list.Set_Edit(false);
 	}
 	*pResult = 0;
 }

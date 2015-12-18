@@ -2607,7 +2607,7 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
 	strPort.Format(_T("%d"), pInfo->m_pNet->GetIPPort());
 	   float softrev = 0.0;
        float hardrev = 0.0;
-        if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7)
+        if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R)
         {
             BOOL Is_Open=Open_Socket2(strIP,pInfo->m_pNet->GetIPPort());
             if (Is_Open)
@@ -2737,7 +2737,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 	  strBaudRate=pInfo->m_tstatip;
 	  strCom=pInfo->m_tstatport;
 	}
-    if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7)
+    if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R)
     {       BOOL Is_Open=FALSE;
         if (pInfo->m_pDev->m_nComPort==-1)
         {

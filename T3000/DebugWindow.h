@@ -41,4 +41,8 @@ public:
 	afx_msg void OnBnClickedButtonDebugTimeToNum();
 	CDateTimeCtrl m__day;
 	CDateTimeCtrl m__time;
+	CComboBox m_debug_window_combo_show;
+	afx_msg void OnCbnSelchangeComboDebugChoose();
 };
+
+

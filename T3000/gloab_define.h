@@ -77,6 +77,8 @@ const int KEY_MONITOR = 9;
 const int KEY_FUNCTION = 10;
 const int KEY_COMMAND = 11;
 
+const int KEY_ERROR_LABEL = 255;
+
 typedef struct  
 {
 	long startpos;
@@ -212,6 +214,7 @@ const int TYPE_SVAE_CONFIG = 254;
 const int TYPE_ALL = 255;
 const int TYPE_CONNECT_WITH_DEVICE = 253;
 const int TYPE_IN_OUT_VAR = 252;
+const int TYPE_MAIN = 0;
 const int TYPE_INPUT = 1;
 const int TYPE_OUTPUT = 2;
 const int TYPE_PROGRAM = 3;
@@ -783,32 +786,32 @@ const signed short Time_Zone_Value[] =
 
 const CString Time_Zone_Name[] =
 {
-	_T("UTC - 12:00"),
-	_T("UTC - 11:00"),
-	_T("UTC - 10:00"),
-	_T("UTC - 09:00"),
-	_T("UTC - 08:00"),
-	_T("UTC - 07:00"),
-	_T("UTC - 06:00"),
-	_T("UTC - 05:00"),
-	_T("UTC - 04:00"),
-	_T("UTC - 03:00"),
-	_T("UTC - 02:00"),
-	_T("UTC - 01:00"),
-	_T("UTC"),
-	_T("UTC + 01:00"),
-	_T("UTC + 02:00"),
-	_T("UTC + 03:00"),
-	_T("UTC + 04:00"),
-	_T("UTC + 05:00"),
-	_T("UTC + 06:00"),
-	_T("UTC + 07:00"),
-	_T("UTC + 08:00"),
-	_T("UTC + 09:00"),
-	_T("UTC + 10:00"),
-	_T("UTC + 11:00"),
-	_T("UTC + 12:00"),
-	_T("UTC + 13:00")
+	_T("(UTC - 12:00) , Yankee Time Zone"),
+	_T("(UTC - 11:00) , X-ray Time Zone"),
+	_T("(UTC - 10:00) , Cook Island , Hawaii-Aleutian Standard Time"),
+	_T("(UTC - 09:00) , Alaska Standard Time , Gambier Time"),
+	_T("(UTC - 08:00) , Pacific Standard Time , Tiempo del Pac¨ªfico"),
+	_T("(UTC - 07:00) , Mountain Standard Time , Pacific Daylight Time"),
+	_T("(UTC - 06:00) , Central Standard Time , Galapagos Time"),
+	_T("(UTC - 05:00) , Colombia Time , Cuba Standard Time"),
+	_T("(UTC - 04:00) , Atlantic Standard Time , Bolivia Time"),
+	_T("(UTC - 03:00) , Atlantic Daylight Time , Amazon Summer Time"),
+	_T("(UTC - 02:00) , Fernando de Noronha Time , Oscar Time Zone"),
+	_T("(UTC - 01:00) , Azores Time , Cape Verde Time"),
+	_T("(UTC) , Azores Summer Time"),
+	_T("(UTC + 01:00) , Alpha Time Zone"),
+	_T("(UTC + 02:00) , Central Africa Time , Central European Summer Time"),
+	_T("(UTC + 03:00) , Charlie Time Zone , Eastern Africa Time"),
+	_T("(UTC + 04:00) , Armenia Time , Azerbaijan Time"),
+	_T("(UTC + 05:00) , Armenia Summer Time , Aqtobe Time"),
+	_T("(UTC + 06:00) , Bangladesh Standard Time , Bhutan Time"),
+	_T("(UTC + 07:00) , Christmas Island Time , Davis Time"),
+	_T("(UTC + 08:00) , China Standard Time , Hotel Time Zone"),
+	_T("(UTC + 09:00) , Australian Western Daylight Time"),
+	_T("(UTC + 10:00) , Chamorro Standard Time , Kilo Time Zone"),
+	_T("(UTC + 11:00) , Eastern Daylight Time , Lima Time Zone"),
+	_T("(UTC + 12:00) , Anadyr Time , Fiji Time , Gilbert Island Time"),
+	_T("(UTC + 13:00) , New Zealand Daylight Time")
 };
 
 const CString DDNS_Server_Name[] =
@@ -1168,10 +1171,11 @@ const CString Building_Baudrate[] =
     _T("57600")
 };
 
-#define  DEFAULT_PRG_TEXT_COLOR		RGB(0,0,255)
-#define  DEFAULT_PRG_LABEL_COLOR		RGB(0,0,130)
+#define  DEFAULT_PRG_TEXT_COLOR			RGB(0,0,255)
+#define  DEFAULT_PRG_LABEL_COLOR		RGB(84,193,255)
 #define  DEFAULT_PRG_COMMAND_COLOR		RGB(0,0,130)
-#define  DEFAULT_PRG_FUNCTION_COLOR		RGB(0,0,130)
+#define  DEFAULT_PRG_FUNCTION_COLOR		RGB(4,135,255)
+#define  DEFAULT_PRG_ERROR_LABEL_COLOR	RGB(255,0,0)
 
 
 const CString Program_Fonts[] = 
@@ -1368,3 +1372,19 @@ typedef enum
 	HW_SW_HAND = 2
 }HW_SWITCH_ENUM;
 #pragma endregion OUTPUT_DEFINE
+
+
+const CString Debug_Combo_Choose[] =
+{
+	_T("Show Nothing"),
+	_T("Show All"),
+	_T("Only Scan"),
+	_T("Only Monotor Data"),
+	_T("Only Program Code")
+};
+
+const int DEBUG_SHOW_NOTHING = 0;
+const int DEBUG_SHOW_ALL = 1;
+const int DEBUG_SHOW_SCAN_ONLY = 2;
+const int DEBUG_SHOW_MONITOR_DATA_ONLY = 3;
+const int DEBUG_SHOW_PROGRAM_DATA_ONLY = 4;

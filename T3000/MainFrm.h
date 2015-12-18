@@ -439,7 +439,7 @@ protected:
 public:
 	CString					m_strPingIP;	
 	void ShowDebugWindow();
-	
+	afx_msg void OnControlMain();
 	afx_msg void OnControlInputs();
 	afx_msg void OnControlPrograms();
 	afx_msg void OnControlOutputs();
@@ -515,6 +515,7 @@ public:
 	void GetProductFirmwareFTPDirectory(int ProductModel,CString &FtpPath,CString &ProductFileName);
 	afx_msg void OnToolDetectonlineproducts();
 	afx_msg void OnControlSettings();
+	afx_msg void OnUpdateControlMain(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateControlInputs(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateControlOutputs(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateControlVariables(CCmdUI *pCmdUI);
@@ -536,5 +537,7 @@ public:
 		afx_msg BOOL  OnToolTipNotify(UINT id,NMHDR *Pnmhdr,LRESULT *pResult);
 		virtual INT_PTR OnToolHitTest(CPoint point, TOOLINFO* pTI) const;
         afx_msg void OnMove(int x, int y);
+
+    //    BOOL CheckNameFromDevice(CString NameFromDevice);
   // virtual void GetMessageString(UINT nID, CString& rMessage);
 };

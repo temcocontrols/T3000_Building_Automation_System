@@ -44,7 +44,7 @@ enum ERightDragHandler {
             temp_serial.Format(_T("%d"),sn);
             int  int_product_type = pFrame->m_product.at(i).product_class_id;
             
-            if (int_product_type == PM_TSTAT6||int_product_type == PM_TSTAT7)
+            if (int_product_type == PM_TSTAT6||int_product_type == PM_TSTAT7||int_product_type == PM_HUMTEMPSENSOR||int_product_type ==PM_AirQuality||int_product_type ==PM_HUM_R)
             {
                 int communicationType = pFrame->m_product.at(i).protocol;  
                 ModbusID = pFrame->m_product.at(i).product_id;

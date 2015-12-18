@@ -600,17 +600,19 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
-			m_controller_list.SetItemText(i,CONTROLLER_BIAS,_T(""));
+			m_controller_data.at(i).bias = 0;
+			m_controller_list.SetItemText(i,CONTROLLER_BIAS,_T("0"));
 		}
 
-		if(m_controller_data.at(i).bias<=2)
+		if(m_controller_data.at(i).rate<=2)
 		{
 			temp_des3.Format(_T("%d"),m_controller_data.at(i).rate);
 			m_controller_list.SetItemText(i,CONTROLLER_RATE,temp_des3);
 		}
 		else
 		{
-			m_controller_list.SetItemText(i,CONTROLLER_RATE,_T(""));
+			m_controller_data.at(i).rate = 0;
+			m_controller_list.SetItemText(i,CONTROLLER_RATE,_T("0"));
 		}
 
 		if(isFreshOne)
@@ -1130,7 +1132,7 @@ int GetPidValue(int index,CString &Auto_M,CString &persend_data)
 BOOL BacnetController::OnHelpInfo(HELPINFO* pHelpInfo)
 { 
 
-	//if (g_protocol==PROTOCOL_BACNET_IP){
+	if (g_protocol==PROTOCOL_BACNET_IP){
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 			
@@ -1139,10 +1141,10 @@ BOOL BacnetController::OnHelpInfo(HELPINFO* pHelpInfo)
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
 			HH_HELP_CONTEXT, IDH_TOPIC_PID);
 		return (hWnd != NULL);
-// 	}
-// 	else{
-// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-// 	}
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

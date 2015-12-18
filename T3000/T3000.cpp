@@ -39,9 +39,14 @@ CT3000App::CT3000App()
 {
  
 		m_bHiColorIcons = TRUE;
-		CurrentT3000Version=_T("    2015.12.8");
- 
-         m_lastinterface=19;
+		CurrentT3000Version=_T("    2015.12.18");
+//	}
+// 	catch (...)
+// 	{
+// 		
+// 		AfxMessageBox(_T("1111"));
+// 	}
+m_lastinterface=19;
 }
 // The one and only CT3000App object
 CT3000App theApp;
@@ -1278,6 +1283,7 @@ BOOL CT3000App::InitInstance()
 	g_achive_device_name_path = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("temp\\") + _T("device_name.ini") ;
 	g_achive_folder = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("temp");
 	g_achive_folder_temp_txt = g_achive_folder + _T("\\") + _T("prg_txt_file");
+	g_achive_folder_temp_db = g_achive_folder + _T("\\") + _T("MonitorDatabaseFolder");
 	g_cstring_ini_path = g_achive_folder + _T("\\MonitorIndex.ini");
 	product_sort_way  = GetPrivateProfileInt(_T("Setting"),_T("ProductSort"),0,g_cstring_ini_path);
 	if(product_sort_way == 0)
@@ -1285,6 +1291,22 @@ BOOL CT3000App::InitInstance()
 		WritePrivateProfileStringW(_T("Setting"),_T("ProductSort"),_T("1"),g_cstring_ini_path);
 		product_sort_way = SORT_BY_CONNECTION;
 	}
+
+	monitor_ignore_enable = GetPrivateProfileInt(_T("Setting"),_T("EnableMonitorValueIgnore"),0,g_cstring_ini_path);
+	if(monitor_ignore_enable == 0)
+	{
+		WritePrivateProfileString(_T("Setting"),_T("EnableMonitorValueIgnore"),_T("0"),g_cstring_ini_path);
+		WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMax"),_T("10000000"),g_cstring_ini_path);
+		WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMin"),_T("-100000"),g_cstring_ini_path);
+	}
+	else if(monitor_ignore_enable == 1)
+	{
+		monitor_ignore_max_value = GetPrivateProfileInt(_T("Setting"),_T("MonitorValueIgnoreMax"),1000000,g_cstring_ini_path);
+		monitor_ignore_min_value = GetPrivateProfileInt(_T("Setting"),_T("MonitorValueIgnoreMin"),-100000,g_cstring_ini_path);
+	}
+
+	
+
 
 	g_achive_monitor_datatbase_path = g_achive_folder;
 	g_achive_monitor_datatbase_path = g_achive_monitor_datatbase_path + _T("\\MonitorData.mdb");
@@ -1326,6 +1348,26 @@ BOOL CT3000App::InitInstance()
 		attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
 
 		CreateDirectory( g_achive_folder_temp_txt, &attrib);
+	}
+
+
+	ret = FALSE;
+	hFind_folder = FindFirstFile(g_achive_folder_temp_db, &fd);
+	if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+	{
+		//Ä¿Â¼´æÔÚ
+		ret = TRUE;
+
+	}
+	FindClose(hFind_folder);
+	if(ret == false)
+	{
+		SECURITY_ATTRIBUTES attrib;
+		attrib.bInheritHandle = FALSE;
+		attrib.lpSecurityDescriptor = NULL;
+		attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
+
+		CreateDirectory( g_achive_folder_temp_db, &attrib);
 	}
 
 
