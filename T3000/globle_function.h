@@ -118,8 +118,8 @@ int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t nt
 int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance );
 int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
 int WriteProgramData_Blocking(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
-int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t nstop_index);
-int CM5ProcessPTA(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag);
+int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t nstop_index,unsigned int write_object_list = 0);
+int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_flag);
 bool Check_Label_Exsit(LPCTSTR m_new_label);
 bool Check_FullLabel_Exsit(LPCTSTR m_new_fulllabel);
 void local_handler_conf_private_trans_ack(

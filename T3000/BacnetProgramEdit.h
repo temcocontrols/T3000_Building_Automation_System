@@ -52,7 +52,10 @@ public:
 	void UpdateDataProgramText();
 	void GetColor();
 	void SetBackFont();
+	void Syntax_analysis();
+	void Delete_Repeat_Char_Vec();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+
 };
 
 

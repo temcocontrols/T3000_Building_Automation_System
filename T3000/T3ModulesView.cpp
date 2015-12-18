@@ -183,7 +183,7 @@ void CT3ModulesView::Fresh()
     m_T3_Input_List.ShowWindow(SW_HIDE);
     m_T3_Input_List.DeleteAllItems();
     while ( m_T3_Input_List.DeleteColumn (0)) ;
-         if (product_register_value[7]==PM_T34AO)
+    if (product_register_value[7]==PM_T34AO)
     {
         m_T3_Input_List.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
         m_T3_Input_List.SetExtendedStyle(m_T3_Input_List.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
@@ -201,7 +201,27 @@ void CT3ModulesView::Fresh()
         }
 
 
-       
+        //==================================================Input============================================================
+        //T3-4AO
+        //address: input 119~138  INPUT1-10 119(high word) 120(low word)
+        //address:Switch
+        //Range Setting for each input  200
+        /*
+        m_comboxRange.AddString(_T("RAW DATA"));
+        m_comboxRange.AddString(_T("10K C"));
+        m_comboxRange.AddString(_T("10K F"));
+        m_comboxRange.AddString(_T("0-100%"));
+        m_comboxRange.AddString(_T("ON/OFF"));
+        m_comboxRange.AddString(_T("OFF/ON"));
+        m_comboxRange.AddString(_T("Pulse Input"));
+        m_comboxRange.AddString(_T("Lighting Control"));
+        m_comboxRange.AddString(_T("TYPE3 10K C"));
+        m_comboxRange.AddString(_T("TYPE3 10K F"));
+        m_comboxRange.AddString(_T("NO USE"));
+        m_comboxRange.AddString(_T("0-5V"));
+        m_comboxRange.AddString(_T("0-10V"));
+        m_comboxRange.AddString(_T("0-20I"));
+        */
         CString strresult;
         int regValue;
         for(int i = 1; i<=10; i++)
@@ -323,7 +343,6 @@ void CT3ModulesView::Fresh()
             }
             strresult = GetValue(regValue,RangeValue);
             m_T3_Input_List.SetItemText(i-1,1,strresult);
-
             strresult.Format(_T("%d"),product_register_value[200+i-1]);
             m_T3_Input_List.SetItemText(i-1,3,strresult);
         }
@@ -752,7 +771,6 @@ void CT3ModulesView::Fresh()
             m_T3_Input_List.SetItemText(i-1,5,strresult);
         }
     }
-
     else
     {
         AfxMessageBox(_T("This Product is not T3 Modules!")) ;

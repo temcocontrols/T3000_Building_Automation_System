@@ -495,7 +495,7 @@ void BacnetAnnualRoutine::OnNMDblclkListAnnuleList(NMHDR *pNMHDR, LRESULT *pResu
 BOOL BacnetAnnualRoutine::OnHelpInfo(HELPINFO* pHelpInfo)
 { 
 
-	//if (g_protocol==PROTOCOL_BACNET_IP){
+	if (g_protocol==PROTOCOL_BACNET_IP){
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 			
@@ -504,10 +504,10 @@ BOOL BacnetAnnualRoutine::OnHelpInfo(HELPINFO* pHelpInfo)
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
 			HH_HELP_CONTEXT, IDH_TOPIC_HOLIDAY_SCHEDULES);
 		return (hWnd != NULL);
-// 	}
-// 	else{
-// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-// 	}
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

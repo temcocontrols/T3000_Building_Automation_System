@@ -39,7 +39,8 @@ public:
 		TIME_FOUR_HOUR = 5	,
 		TIME_TWELVE_HOUR = 6,
 		TIME_ONE_DAY = 7	,
-		TIME_FOUR_DAY = 8	
+		TIME_FOUR_DAY = 8	,
+		TIME_THIRTY_MINUTE = 9
 	};
 #define TIME_USER_DEFINE   100
 
@@ -134,7 +135,7 @@ public:
 	virtual void PostNcDestroy();
 	afx_msg void OnTimebase1hour();
 	afx_msg void OnTimebase1day();
-	afx_msg void OnTimebase1minites();
+	//afx_msg void OnTimebase1minites();
 	afx_msg void OnTimebase10minutes();
 	afx_msg void OnTimebase12hours();
 	afx_msg void OnTimebase4hours();
@@ -147,6 +148,7 @@ public:
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	afx_msg void OnTimebaseCustomerdefine();
 	afx_msg void OnTimebase5minutes();
+	afx_msg void OnTimebase30minutes();
 };
 	void Delete_Ram_Data();
 //const int _6_min = 1;

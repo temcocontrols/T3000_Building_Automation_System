@@ -361,22 +361,91 @@ void CMyStatusbarCtrl::DrawStatusBar(HDC my_hdc)
 			g_llerrCount = g_llTxCount - g_llRxCount;
 		}
 	}
+	if(g_llTxCount > old_tx_count)	//每发送一次才进来一次;
+	{
+		old_tx_count = g_llTxCount;
+		if(persent_array_count < 100)
+		{
+			Tx_array[persent_array_count] = g_llTxCount;
+			Rx_array[persent_array_count] = g_llRxCount;
+			if(Rx_array[persent_array_count] > Rx_array[0])
+			{
+				m_health_persent = ((Rx_array[persent_array_count] - Rx_array[0])*100) / (Tx_array[persent_array_count] - Tx_array[0]) ;
+				if(m_health_persent > 100)
+					m_health_persent = 100;
+			}
+			else
+				m_health_persent = 0;
+			persent_array_count ++ ;
+		}
+		else
+		{
+			unsigned int temp_tx_value = 0;
+			unsigned int temp_rx_value = 0;
+			for (int z=0;z<99;z++)
+			{
+				Tx_array[z] = Tx_array[z + 1];
+				Rx_array[z] = Rx_array[z + 1];
+			}
+
+			Tx_array[99] = g_llTxCount;
+			Rx_array[99] = g_llRxCount;
+			if(Rx_array[99] > Rx_array[0])
+			{
+				m_health_persent = ((Rx_array[99] - Rx_array[0])*100) / (Tx_array[99] - Tx_array[0]) ;
+				if(m_health_persent > 100)
+					m_health_persent = 100;
+			}
+			else
+				m_health_persent = 0;
+		}
+	}
+
+
+
 	temp_value.Format(_T("%u"),g_llerrCount);
 	mygraphics->DrawString(temp_value, -1, &character_font, staticpointF,&Font_brush);
 
+	CString cs_health_persent;
+	cs_health_persent.Format(_T("%d%%"),m_health_persent);
 
+	if(!bac_select_device_online)
+	{
+		m_health_persent = 0;
+		cs_health_persent = _T("0%");
+	}
+	if(m_health_persent == 0)
+	{
+		mygraphics->FillRectangle(HealthRedBrush,health_start_pos + STATUS_HEALTH_CHARACTER_WIDTH + 1,1,health_width - STATUS_HEALTH_CHARACTER_WIDTH - 2,window_height - 2);
+		staticpointF.X = health_start_pos + STATUS_HEALTH_VALUE_OFFSET;
+		//mygraphics->DrawString(_T("0%"),-1, &character_font,staticpointF,&Font_brush);
+		mygraphics->DrawString(cs_health_persent,-1, &character_font,staticpointF,&Font_brush);
+	}
+	else
+	{
+		int persent_value = 0;
+		persent_value = (health_width - STATUS_HEALTH_CHARACTER_WIDTH - 2) * (((float)m_health_persent) / 100);
+		mygraphics->FillRectangle(HealthGreenBrush,health_start_pos + STATUS_HEALTH_CHARACTER_WIDTH + 1,1,persent_value,window_height - 2);
+		staticpointF.X = health_start_pos + STATUS_HEALTH_VALUE_OFFSET;
+		mygraphics->DrawString(cs_health_persent,-1, &character_font,staticpointF,&Font_brush);
+	}
+
+#if 0
 	if(bac_select_device_online)
 	{
 		mygraphics->FillRectangle(HealthGreenBrush,health_start_pos + STATUS_HEALTH_CHARACTER_WIDTH + 1,1,health_width - STATUS_HEALTH_CHARACTER_WIDTH - 2,window_height - 2);
 		staticpointF.X = health_start_pos + STATUS_HEALTH_VALUE_OFFSET;
-		mygraphics->DrawString(_T("100%"),-1, &character_font,staticpointF,&Font_brush);
+		//mygraphics->DrawString(_T("100%"),-1, &character_font,staticpointF,&Font_brush);
+		mygraphics->DrawString(cs_health_persent,-1, &character_font,staticpointF,&Font_brush);
 	}
 	else
 	{
 		mygraphics->FillRectangle(HealthRedBrush,health_start_pos + STATUS_HEALTH_CHARACTER_WIDTH + 1,1,health_width - STATUS_HEALTH_CHARACTER_WIDTH - 2,window_height - 2);
 		staticpointF.X = health_start_pos + STATUS_HEALTH_VALUE_OFFSET;
-		mygraphics->DrawString(_T("0%"),-1, &character_font,staticpointF,&Font_brush);
+		//mygraphics->DrawString(_T("0%"),-1, &character_font,staticpointF,&Font_brush);
+		mygraphics->DrawString(cs_health_persent,-1, &character_font,staticpointF,&Font_brush);
 	}
+#endif
 
 	staticpointF.X = health_start_pos + 1;
 	mygraphics->DrawString(_T("Health"), -1, &character_font, staticpointF,&Font_brush);

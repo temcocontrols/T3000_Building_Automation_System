@@ -47,6 +47,10 @@ int GetHolidayFullLabel(int index,CString &ret_full_label);
 
 int GetScheduleLabel(int index,CString &ret_label);
 int GetScheduleFullLabel(int index,CString &ret_full_label);
+
+
+unsigned int control_object_instance = 0;
+
 // CBacnetScreenEdit dialog
 // CGraphicView
 #define XStart 0
@@ -58,7 +62,7 @@ vector <int> screnn_sequence;
 
 bool show_not_exsit_dlg = true;
 bool screen_lock_label = false;
-
+int screen_show_nopic = 1;
 //extern int Station_NUM;
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
 extern char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network,unsigned char & sub_panel, byte panel , int *netpresent);
@@ -204,7 +208,10 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 	//tempcs = ispoint(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,Station_NUM,&k);
 	tempcs = ispoint_ex(temp_point,&temp_number,&temp_value_type,&temp_point_type,&temp_panel,&temp_net,0,sub_panel,Station_NUM,&k);
 	if(tempcs == NULL)
+	{
+		MessageBox(_T("Invalid Label , Please input a label such as 'IN8' , 'Mainpanel-Subpanel-OUT9', 'Mainpanel:Subpanel:OUT9' ,'VAR100'.\r\nFor more information , please reference the user manual."));
 		return 0;
+	}
 
 	if(temp_number != 0)	//Vector 里面是 0开始 , 这里如果是INPUT1  那值为1  直接减一 存起来 用;
 		temp_number = temp_number - 1;
@@ -228,7 +235,9 @@ LRESULT  CBacnetScreenEdit::Add_label_Handle(WPARAM wParam, LPARAM lParam)
 
 	if(temp_panel != Station_NUM)	//目前不支持读其他Minipanel的东西;
 		return 0;
-	if((sub_panel ==0) && (sub_panel >254))
+	/*if((sub_panel ==0) && (sub_panel >254))
+		return 0;*/
+	if(sub_panel >254)
 		return 0;
 	temp_point_type = temp_point_type + 1;
 	AddLabel(temp_point_type ,temp_number,Station_NUM,sub_panel,nLeft,nTop);
@@ -367,6 +376,8 @@ BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 
 	if(pMsg->message == WM_KEYDOWN)
 	{
+		CPoint mypoint;
+		GetCursorPos(&mypoint);
 		if(pMsg->wParam == VK_NEXT)
 		{
 			::GetWindowRect(BacNet_hwd,&mynew_rect);	//获取 view的窗体大小;
@@ -396,6 +407,42 @@ BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 				InitGraphic(g_serialNum,g_bac_instance,screen_list_line);
 			}
 
+		}
+		else if(pMsg->wParam == VK_UP)
+		{
+			if(mypoint.y>1)
+				mypoint.y=mypoint.y-1;
+			else
+				mypoint.y = 0;
+			SetCursorPos(mypoint.x,mypoint.y);
+			ScreenToClient(&mypoint);
+		}
+		else if(pMsg->wParam == VK_DOWN)
+		{
+			if(mypoint.y<m_cyScreen - 1)
+				mypoint.y = mypoint.y + 1;
+			else
+				mypoint.y = m_cyScreen;
+			SetCursorPos(mypoint.x,mypoint.y);
+			ScreenToClient(&mypoint);
+		}
+		else if(pMsg->wParam == VK_LEFT)
+		{
+			if(mypoint.x>1)
+				mypoint.x = mypoint.x - 1;
+			else
+				mypoint.x = 0;
+			SetCursorPos(mypoint.x,mypoint.y);
+			ScreenToClient(&mypoint);
+		}
+		else if(pMsg->wParam == VK_RIGHT)
+		{
+			if(mypoint.x<m_cxScreen)
+				mypoint.x = mypoint.x + 1;
+			else
+				mypoint = m_cxScreen;
+			SetCursorPos(mypoint.x,mypoint.y);
+			ScreenToClient(&mypoint);
 		}
 	}
 
@@ -606,6 +653,11 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	screen_lock_label  =(bool)GetPrivateProfileInt(_T("Setting"),_T("LockScreenLabel"),0,g_cstring_ini_path);
+
+	//show no pic 如果是0的话就不在显示没有图片.
+	screen_show_nopic  =(bool)GetPrivateProfileInt(_T("Setting"),_T("ScreenLabelShowNoPic"),1,g_cstring_ini_path);
+	
+
 	m_full_screen_mode = false;
 	m_enable_send_remote_point = false;
 	m_building_image_folder.Empty();
@@ -614,6 +666,7 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
 	ApplicationFolder.ReleaseBuffer();
 	//image_fordor = ApplicationFolder + _T("\\Database\\image");
+
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 
 	m_building_image_folder = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
@@ -670,16 +723,6 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[3],MOD_SHIFT,VK_RIGHT);
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey SHIFT + RIGHT failure"));  
-	//nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[4],NULL,VK_UP);
-	//if(!nRet)  
-	//	AfxMessageBox(_T("RegisterHotKey  UP failure"));  
-	//nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[5],NULL,VK_DOWN);
-	//if(!nRet)  
-	//	AfxMessageBox(_T("RegisterHotKey  DOWN failure"));  
-	//nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[6],NULL,VK_LEFT);
-	//if(!nRet)  
-	//	AfxMessageBox(_T("RegisterHotKey  LEDT failure"));  
-	//nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[7],NULL,VK_RIGHT);
 	if(!nRet)  
 		AfxMessageBox(_T("RegisterHotKey  RIGHT failure"));  
 	nRet = RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[8],MOD_SHIFT,'M');
@@ -690,10 +733,6 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[1],MOD_SHIFT,VK_DOWN); 
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[2],MOD_SHIFT,VK_LEFT); 
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[3],MOD_SHIFT,VK_RIGHT); 
-	//RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[4],NULL,VK_UP); 
-	//RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[5],NULL,VK_DOWN); 
-	//RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[6],NULL,VK_LEFT); 
-	//RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[7],NULL,VK_RIGHT); 
 	RegisterHotKey(GetSafeHwnd(),m_screenHotKeyID[8],MOD_SHIFT,'M'); 
 #endif  
 
@@ -710,7 +749,7 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 		SetTimer(3,5000,NULL);
 		show_not_exsit_dlg = true; //如果图片不存在，就在开始前几秒显示 不存在的 信息;
 	}
-
+	control_object_instance = g_bac_instance;
 	Invalidate(1);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -871,6 +910,7 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 		//TRACE(_T("\r\nX_MAX = %u  Y_MAX = %u\r\n"),m_paint_right_limit,m_paint_botton_limit);
 		//TRACE(_T("x_persent = %u  y_persent = %u\r\n"),temp_x_persent,temp_y_persent);
 		//TRACE(_T("nPoint_x = %u nPoint_y = %u\r\n"),bac_label.nPoint_x,bac_label.nPoint_y);
+		//TRACE(_T("temp_variant value"));
 		bac_label.nclrTxt = m_pRs->GetCollect("Text_Color");
 		bac_label.nDisplay_Type = m_pRs->GetCollect("Display_Type");
 
@@ -975,7 +1015,7 @@ void CBacnetScreenEdit::ReloadLabelsFromDB()
 void CBacnetScreenEdit::PainNoImageInfo(CDC* pDC)
 {
 	const int iOffset = 20;
-	CString strInfo=_T("No image has been configed for current device, please config one first. ");
+	CString strInfo=_T("No image associated with this graphic screen.Click to not  see it again. ");
 
 	CFont* pFontOld = (CFont*) pDC->SelectStockObject (DEFAULT_GUI_FONT);
 	ASSERT (pFontOld != NULL);
@@ -986,6 +1026,7 @@ void CBacnetScreenEdit::PainNoImageInfo(CDC* pDC)
 
 	CRect rectText = rectClient;
 	rectText.DeflateRect (iOffset, iOffset);
+
 	pDC->DrawText (strInfo, rectText, DT_CALCRECT | DT_WORDBREAK);
 
 	rectText.OffsetRect (	(rectClient.Width () - rectText.Width () - 2 * iOffset) / 2,
@@ -1175,8 +1216,10 @@ void CBacnetScreenEdit::OnPaint()
 
 	if(!m_bImgExist)
 	{
-		if(show_not_exsit_dlg)
-			PainNoImageInfo(&memDC.GetDC());
+		if((show_not_exsit_dlg) && (screen_show_nopic == 1))
+		{
+				PainNoImageInfo(&memDC.GetDC());
+		}
 		else
 		{
 			memDC.GetDC().FillSolidRect(&rcClient,RGB(238,245,250));
@@ -1296,8 +1339,12 @@ void CBacnetScreenEdit::OnPaint()
 					(m_remote_point_data.at(i).point.point_type == temp_point.point_type + 1) &&
 					(m_remote_point_data.at(i).point.number == temp_point.number))
 				{
-
-					cs_value.Format(_T("%d"),(m_remote_point_data.at(i).point_value));
+					if(m_remote_point_data.at(i).device_online == 0)
+					{
+						cs_value.Format(_T("%s   N/A"),temp_des,(m_remote_point_data.at(i).point_value));
+					}
+					else
+						cs_value.Format(_T("%d"),(m_remote_point_data.at(i).point_value));
 					found_index = true;
 					CString temp_description;
 					unsigned short dev_reg = 0;
@@ -2012,7 +2059,7 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 		CString temp_icon_name;
 		int temp_x_persent;
 		int temp_y_persent;
-		bac_label.nSerialNum = m_pRs->GetCollect("Serial_Num");;
+		bac_label.nSerialNum = m_pRs->GetCollect("Serial_Num");
 		bac_label.nScreen_index = m_pRs->GetCollect("Screen_Index");//;
 
 		bac_label.nLabel_index=m_pRs->GetCollect("Label_Index");//
@@ -2102,7 +2149,7 @@ bool CBacnetScreenEdit::UpdateDeviceLabelFlash()
 		int cmp_ret = memcmp(&m_temp_graphic_label_data[i*BAC_READ_GRPHIC_LABEL_GROUP_NUMBER],&m_graphic_label_data.at(i*BAC_READ_GRPHIC_LABEL_GROUP_NUMBER),sizeof(Str_label_point) * BAC_READ_GRPHIC_LABEL_GROUP_NUMBER);
 		if(cmp_ret!=0)
 		{
-			ret_return = Write_Private_Data_Blocking(WRITE_GRPHIC_LABEL_COMMAND,i*BAC_READ_GRPHIC_LABEL_GROUP_NUMBER , BAC_READ_GRPHIC_LABEL_GROUP_NUMBER*(i +1)  - 1);
+			ret_return = Write_Private_Data_Blocking(WRITE_GRPHIC_LABEL_COMMAND,i*BAC_READ_GRPHIC_LABEL_GROUP_NUMBER , BAC_READ_GRPHIC_LABEL_GROUP_NUMBER*(i +1)  - 1,control_object_instance);
 			if(ret_return < 0)
 				return false;
 		}
@@ -2207,6 +2254,15 @@ void CBacnetScreenEdit::OnTimer(UINT_PTR nIDEvent)
 		{
 			show_not_exsit_dlg = false;
 			KillTimer(3);
+			if(screen_show_nopic == 1)
+			{
+				if(IDYES == MessageBox(_T("No image associated with this graphic screen.Click 'YES' to not see it again"),_T("Message"),MB_YESNOCANCEL))
+				{
+					WritePrivateProfileStringW(_T("Setting"),_T("ScreenLabelShowNoPic"),_T("0"),g_cstring_ini_path);
+					screen_show_nopic = 0;
+				}
+			}
+
 		}
 		break;
 	}

@@ -173,7 +173,11 @@ void CBacnetAlarmLog::Initial_List()
 
 LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 {
-
+	bac_show_alarm_window = 0;
+	for (int i=0;i<(int)m_alarmlog_data.size();i++)
+	{
+		bac_show_alarm_window = m_alarmlog_data.at(i).alarm || bac_show_alarm_window;
+	}
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
 	if(isFreshOne == REFRESH_ON_ITEM)
@@ -334,7 +338,7 @@ void CBacnetAlarmLog::OnCancel()
 BOOL CBacnetAlarmLog::OnHelpInfo(HELPINFO* pHelpInfo)
 { 
 
-	/*if (g_protocol==PROTOCOL_BACNET_IP){*/
+	if (g_protocol==PROTOCOL_BACNET_IP){
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 			
@@ -343,10 +347,10 @@ BOOL CBacnetAlarmLog::OnHelpInfo(HELPINFO* pHelpInfo)
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
 			HH_HELP_CONTEXT, IDH_TOPIC_7_DATA);
 		return (hWnd != NULL);
-// 	}
-// 	else{
-// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-// 	}
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

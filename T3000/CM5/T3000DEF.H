@@ -114,7 +114,8 @@
 #define MAX_MONSET             1
 //#define MAX_USERS
 //#define MAX_DST
-#define PROGRAM_SIZE       14336       // 14K
+#define PROGRAM_SIZE         2000       
+//#define PROGRAM_SIZE       14336       // 14K
 #define PROGRAM_SIZE_MINI   8000
 #define ALARM_MESSAGE_SIZE    58
 

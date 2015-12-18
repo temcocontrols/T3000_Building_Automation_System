@@ -1246,6 +1246,7 @@ int Encode_Program ( /*GEdit *ppedit*/)
 	eol=0;
 //	t=0;
 //	n_local=n_global=0;
+	error = -1;
 	ncod/*=error*/=n_var=n_var1=for_count=then_else=ind_cod_line=next_then_else=0;//Fance marked error
 	next_else_else=ret_value=index_vars_table=lline=index_buf=index_op=type_eval=0;
 	index_wait=index_go_to=index_dalarm=ind_renum=0;
@@ -1481,6 +1482,8 @@ if(error!=-1)
 
 
 		my_lengthcode = code - mycode;
+		if(my_lengthcode > 2000)
+			error = 1;
 		//program_code_length[program_list_line] = my_lengthcode;
 		//program_code_length[program_list_line] = 400;
 
@@ -2821,7 +2824,8 @@ void sntx_err(int err, int err_true )
 	 "warning: point out of service",
 	 "Output number is too large",
 	 "Input number is too large",
-	 "Variable number is too large"
+	 "Variable number is too large",
+	 "Program code larger than 2000"
 	} ;
 	if(!pmes) return;
 	if(pmes < mesbuf + ( 1024 - 100 ) )
@@ -3423,6 +3427,7 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 	if(netpresent) *netpresent = 0;
 	*num_net = network;
 	if(strlen(token)==0) return 0;
+#if 0   //Mark by Fance  点暂时用来当main 和sub的分隔符，不用在network;
 	if ((q=strchr(token,'.'))!=NULL)
 	{
 		memcpy(pc,token,min( (int)(q-token),10));
@@ -3433,7 +3438,8 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 		if(netpresent)
 			*netpresent = *num_net;
 	}
-	if ((q=strchr(token,'-'))!=NULL)
+#endif
+	if (((q=strchr(token,'-'))!=NULL) || ((q=strchr(token,'.'))!=NULL))
 	{
 		memcpy(pc,token,min( (int)(q-token),10));
 		pc[min((int)(q-token),10)]=0;
@@ -3443,7 +3449,17 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 		{
 			q++;
 			fance_tok = q;
-			if ((q=strchr(q,'-'))!=NULL)
+			if ((q=strchr(fance_tok,'-'))!=NULL)  //妈的，老毛不要第二个 杠 ， 又得改;
+			{
+				memcpy(fance_sub_pc,fance_tok,min( (int)(q-fance_tok),10));
+				fance_sub_pc[min((int)(q-fance_tok),10)]=0;
+
+				q++;
+				*num_panel = atoi(pc);
+
+				sub_panel = atoi(fance_sub_pc);
+			}
+			else if ((q=strchr(fance_tok,'.'))!=NULL)  //妈的，要改成用冒号来当分隔符，想一出是一出;
 			{
 				memcpy(fance_sub_pc,fance_tok,min( (int)(q-fance_tok),10));
 				fance_sub_pc[min((int)(q-fance_tok),10)]=0;
@@ -3572,9 +3588,9 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 						//if(*num_panel<10 || *num_point<100)
 						//	strcat(buf,"-");
 						if(*num_panel<10 || *num_point< (8*256))
-							strcat(buf,"-");
+							strcat(buf,".");
 						strcat(buf,fance_sub_pc);
-						strcat(buf,"-");
+						strcat(buf,".");
 						strcat(buf,pc);
 						strcat(buf,p);
 						if((*num_panel !=Station_NUM ) || (sub_panel != Station_NUM))
@@ -4257,7 +4273,10 @@ void prescan2(void)
 	p = prog ;
 
 	get_token() ;
-	while( (unsigned char)tok!=FINISHED)  {
+	while( (unsigned char)tok!=FINISHED)  
+	{
+		if(error != -1)
+			break;
 //	for(i=0;i<100;i++)
 //				cod_line[i]=0;
 		if (token_type == FINISHED)
@@ -5541,7 +5560,12 @@ case ASSIGNARRAY_2:
   code += len_cod_linie;
  }
  else
+ {
+	 sntx_err(TOTAL_2000_BREAK); //编码长度超过2000个字节 返回提示信息;
+	 error = TOTAL_2000_BREAK;
+	 return;
   ncod = PROGRAM_SIZE;
+ }
 }
 
 void put_line_num( int line_value )
@@ -6645,6 +6669,11 @@ int pointtotext_for_controller(char *buf,Point_T3000 *point)
 		buf[0]=0;
 		return 1;
 	}
+	if(point_type > 16)
+	{
+		buf[0]=0;
+		return 1;
+	}
 	strcpy(buf,"");
 #ifdef Fance_Enable
 	strcpy(buf,itoa(panel+1,x,10));
@@ -6674,6 +6703,13 @@ int pointtotext(char *buf,Point_T3000 *point)
 		buf[0]=0;
 		return 1;
 	}
+
+	if(point_type > 16)
+	{
+		buf[0]=0;
+		return 1;
+	}
+
 	strcpy(buf,"");
 #ifdef Fance_Enable
 	strcpy(buf,itoa(panel+1,x,10));

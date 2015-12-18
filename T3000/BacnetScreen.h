@@ -41,6 +41,7 @@ public:
 	bool read_screen_label();
 	afx_msg void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult);
 //	afx_msg void OnDestroy();
+
 };
 
 

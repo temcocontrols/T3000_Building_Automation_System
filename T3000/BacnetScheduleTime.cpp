@@ -277,8 +277,31 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
 	m_schedual_time_picker.GetTime(temp_time);
 	chour = temp_time.GetHour();
 	cmin = temp_time.GetMinute();
+
+
+
+
+	if(m_row > 0)
+	{
+		int is_larger = false;
+		for (int i=0;i<m_row;i++)
+		{
+			if((chour*60 + cmin) <= (m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][m_col - 1].time_hours)*60 +  m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][m_col - 1].time_minutes )
+			{
+				m_schedual_time_picker.ShowWindow(SW_HIDE);
+				MessageBox(_T("The time is not increasing!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+				return;
+			}
+		}
+
+
+	}
+
 	m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[m_row][m_col - 1].time_hours = chour;
 	m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[m_row][m_col - 1].time_minutes = cmin;
+
+
+
 	if((chour == 0) &&(cmin	==0))
 	{
 		temp_cs.Empty();

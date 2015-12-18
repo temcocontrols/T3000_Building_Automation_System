@@ -2041,7 +2041,10 @@ void CBacnetProgramDebug::OnTimer(UINT_PTR nIDEvent)
 void CBacnetProgramDebug::OnNMKillfocusDatetimepickerPrgVariable(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	// TODO: Add your control notification handler code here
-
+	if(!m_prg_debug_variable_time_picker.IsWindowVisible())
+		return;
+	if(m_Variable_data.at(point_number).range != 20)
+		return;
 	CTime temp_time;CString temp_cs;
 	int chour,cmin;
 	m_prg_debug_variable_time_picker.GetTime(temp_time);

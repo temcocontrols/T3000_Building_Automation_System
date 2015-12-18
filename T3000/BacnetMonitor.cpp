@@ -27,7 +27,8 @@ extern BacnetWait *WaitDlg;
 HANDLE h_read_monitordata_thread = NULL;
 Str_MISC Device_Misc_Data_Old;
 unsigned char read_monitor_sd_ret = false;
-
+bool read_temp_local_tem_package = true; //开始点的时候只读最后10包并保存为临时数据;
+//extern volatile HANDLE Monitor_DB_Mutex;
 
 IMPLEMENT_DYNAMIC(CBacnetMonitor, CDialogEx)
 extern char *ispoint(char *token,int *num_point,byte *var_type, byte *point_type, int *num_panel, int *num_net, int network, byte panel, int *netpresent);
@@ -90,6 +91,10 @@ LRESULT CBacnetMonitor::Graphic_Window_Own_Message(WPARAM wParam, LPARAM lParam)
 			GraphicWindow = new CBacnetGraphic;
 			GraphicWindow->Create(IDD_DIALOG_BACNET_GRAPHIC, this);
 			GraphicWindow->ShowWindow(SW_SHOW);
+		}
+		else
+		{
+			::PostMessage(GraphicWindow->m_hWnd,WM_SYSCOMMAND,SC_RESTORE,0);
 		}
 		
 		break;
@@ -315,7 +320,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 		//if(temp_point_type > ENUM_AR_DATA)
 		//{
 		//	m_monitor_input_list.SetItemText(i,1,_T(""));
-		//	continue;
+		//	continue;be habituated to
 		//}
 		if(((temp_panel == 0) || (m_monitor_data.at(monitor_list_line).inputs[i].sub_panel == 0)) ||(lowbyte_point_type > ENUM_AR_DATA))
 		{
@@ -1068,11 +1073,72 @@ void CBacnetMonitor::OnNMKillfocusDatetimepickerMonitor(NMHDR *pNMHDR, LRESULT *
 
 }
 
+void CBacnetMonitor::Check_New_DB()
+{
+	CTime tm;
+	tm=CTime::GetCurrentTime();//获取系统日期
+	int month_of_day = 0;
+	month_of_day = tm.GetDay();
+	//CString temp_cs_week;
+	//temp_cs_week.Format(_T("%u"),(month_of_day  /7) + 1);
+	CString cs_serial_number;
+	cs_serial_number.Format(_T("\\%u"),g_selected_serialnumber);
+
+	CString temp_folder;
+	temp_folder= g_achive_folder_temp_db + cs_serial_number;
+	int ret = FALSE;
+	WIN32_FIND_DATA fd;
+	HANDLE hFind_folder;
+	hFind_folder = FindFirstFile(temp_folder, &fd);
+	if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+	{
+		//目录存在
+		ret = TRUE;
+
+	}
+	FindClose(hFind_folder);
+	if(ret == false)
+	{
+		SECURITY_ATTRIBUTES attrib;
+		attrib.bInheritHandle = FALSE;
+		attrib.lpSecurityDescriptor = NULL;
+		attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
+
+		CreateDirectory( temp_folder, &attrib);
+	}
+
+
+
+	CString mdb_name;
+	mdb_name.Format(_T("\\%u_%u_%u_monitor%u.mdb"),g_selected_serialnumber,tm.GetYear(),tm.GetMonth(),monitor_list_line);
+	g_achive_monitor_datatbase_path = temp_folder + mdb_name;
+
+
+	CString FilePath_Monitor;
+	HANDLE hFind_Monitor;//
+	WIN32_FIND_DATA wfd_monitor;//
+	hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
+	if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.mdb
+	{
+		//没有找到就创建一个默认的数据库
+		FilePath_Monitor= g_achive_monitor_datatbase_path;
+		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB1), _T("MONITOR_DB"));   
+		HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+		LPVOID lpExe = LockResource(hGlobal);   
+		CFile file;
+		if(file.Open(FilePath_Monitor, CFile::modeCreate | CFile::modeWrite))    
+			file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+		file.Close();    
+		::UnlockResource(hGlobal);   
+		::FreeResource(hGlobal);
+	}  //
+	FindClose(hFind_Monitor);//
+}
 
 void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 {
 	// TODO: Add your control notification handler code here
-
+	Check_New_DB();
 	for (int i=0;i<14;i++)
 	{
 		InputLable[i] =	m_monitor_input_list.GetItemText(i,1);	
@@ -1092,6 +1158,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 
 	if(h_read_monitordata_thread==NULL)
 	{
+		
 		CString strSql;
 		CBADO monitor_bado;
 		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
@@ -1099,6 +1166,8 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 		strSql.Format(_T("delete * from MonitorData where Temp_Data=1"),g_selected_serialnumber,monitor_list_line);
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 		monitor_bado.CloseConn();
+
+		//WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMax"),_T("10000000"),g_cstring_ini_path);
 
 		h_read_monitordata_thread =CreateThread(NULL,NULL,Readmonitorthreadfun,this,NULL, NULL);
 	}
@@ -1131,7 +1200,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteAll()
 		CBADO monitor_bado;
 		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
 		monitor_bado.OnInitADOConn(); 
-		strSql.Format(_T("delete * from MonitorData where SerialNumber=%u "),g_selected_serialnumber);
+		strSql=_T("delete * from MonitorData");
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 		monitor_bado.CloseConn();
 
@@ -1167,7 +1236,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteLocal()
 	CBADO monitor_bado;
 	monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
 	monitor_bado.OnInitADOConn(); 
-	strSql.Format(_T("delete * from MonitorData where SerialNumber=%u "),g_selected_serialnumber);
+	strSql=_T("delete * from MonitorData");
 	monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 	monitor_bado.CloseConn();
 	MessageBox(_T("Delete Monitor Data : OK !"));
@@ -1201,7 +1270,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 			CBADO monitor_bado;
 			monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
 			monitor_bado.OnInitADOConn(); 
-			strSql.Format(_T("delete * from MonitorData where SerialNumber=%u and Monitor_Index=%u"),g_selected_serialnumber,monitor_list_line);
+			strSql=_T("delete * from MonitorData");
 			monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 			monitor_bado.CloseConn();
 
@@ -1310,7 +1379,23 @@ unsigned char read_monitordata(int digtal_or_analog)
 	if(m_monitor_head.total_seg == 0)
 		return MONITOR_READ_NO_DATA;
 
-	for (int read_index= temp_index ;read_index<=m_monitor_head.total_seg;read_index++)
+	if(temp_index > m_monitor_head.total_seg)
+		return true;
+
+	int temp_value = 0;
+	if(read_temp_local_tem_package)
+	{
+		if((temp_index > 10) && (temp_index < m_monitor_head.total_seg - 10))
+			temp_value = m_monitor_head.total_seg - 10;
+		else
+			temp_value = temp_index;
+	}
+	else
+	{
+		temp_value = temp_index;
+	}
+
+	for (int read_index= temp_value ;read_index<=m_monitor_head.total_seg;read_index++)
 	{
 		cs_my_temp.Format(_T("Read Data %d / %d"),read_index - temp_index,m_monitor_head.total_seg - temp_index);
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,cs_my_temp);
@@ -1375,6 +1460,7 @@ unsigned char read_monitordata(int digtal_or_analog)
 
 
 
+
 DWORD WINAPI  CBacnetMonitor::Readmonitorthreadfun(LPVOID lpVoid)
 {
 	//Write_Config_Info
@@ -1382,6 +1468,7 @@ DWORD WINAPI  CBacnetMonitor::Readmonitorthreadfun(LPVOID lpVoid)
 	read_monitor_sd_ret = false;
 	unsigned char analog_ret = false;
 	unsigned char digital_ret = false;
+	read_temp_local_tem_package = true;
 	analog_ret = read_monitordata(BAC_UNITS_ANALOG) ;
 
 	
@@ -1401,7 +1488,7 @@ DWORD WINAPI  CBacnetMonitor::Readmonitorthreadfun(LPVOID lpVoid)
 	{
 		read_monitor_sd_ret = MONITOR_READ_SUCCESS;
 	}
-
+	read_temp_local_tem_package = false;
 
 	pParent->PostMessage(WM_MONITOR_USER_MESSAGE,MONITOR_MESSAGE_CREATE,0);
 
@@ -1517,10 +1604,14 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	n_temp_print.Format(_T("Monitor Rx (%03d): "),nlength);
 	CString temp_char;
 
+
+
+
+
 	int temp_flag = 0;
 	int temp_sd_exsit = 0;
 	
-	//如果不存在SD卡 就认为接到的都是临时数据;
+	//如果不存在SD卡 就认为接到的都是临时数据;麻痹后面临时数据也要存起来，当宝似的;导致Access 数据库超过50万笔数据检索都要10秒;
 	if(Device_Basic_Setting.reg.sd_exist == 2)
 		temp_sd_exsit = 1;
 	else
@@ -1547,6 +1638,21 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	m_monitor_head.seg_index = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0]; 
 	my_temp_point = my_temp_point + 2;
 
+	//在调试界面中打印出接收到得字符;
+	if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)) && (m_monitor_head.special == 0))
+	{
+		for (int i = 0; i< nlength ; i++)
+		{
+			temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
+			temp_char.MakeUpper();
+			temp_print ++;
+			n_temp_print = n_temp_print + temp_char + _T(" ");
+			if(i==19)
+				n_temp_print = n_temp_print + _T("---");
+		}
+		DFTrace(n_temp_print);
+	}
+
 	if(nlength!= 420)	//每包必发420个字节;
 		return 0;
 	if(m_monitor_head.type == BAC_UNITS_ANALOG)
@@ -1566,11 +1672,11 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		temp_monitor_index.Format(_T("Digital_Index_%d"),monitor_list_line);
 	temp_serial.Format(_T("%u"),g_selected_serialnumber);
 	int temp_index = GetPrivateProfileInt(temp_serial,temp_monitor_index,-1,temp_db_ini_folder);
-
-	if(m_monitor_head.seg_index == 0)
+	if(temp_index == -1)
 	{
-		Sleep(1);
+		WritePrivateProfileStringW(temp_serial,temp_monitor_index,_T("0"),temp_db_ini_folder);
 	}
+
 
 	if(temp_index >= m_monitor_head.seg_index)
 		return 1;
@@ -1586,14 +1692,9 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		Str_mon_element temp_data;
 		temp_data.index = *(my_temp_point++); 
 		temp_data.time = ((unsigned char)my_temp_point[0])<<24 | ((unsigned char)my_temp_point[1]<<16) | ((unsigned char)my_temp_point[2])<<8 | ((unsigned char)my_temp_point[3]);
+
 		//{
-		//	CString strTime;
-		//	time_t scale_time ;
-		//	CTime time_scaletime;
-		//	scale_time = temp_data.time ;
-		//	time_scaletime = scale_time;
-		//	strTime = time_scaletime.Format("  %m/%d %H:%M:%S\r\n");
-		//	TRACE(strTime);
+
 		//}
 		my_temp_point = my_temp_point + 4;
 		temp_data.point.number = *(my_temp_point++); 
@@ -1614,43 +1715,77 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 			continue;
 		if((temp_data.time == 0) ) //说明后面是无用的数据;填充的是0
 			continue;
-		if((temp_data.time < 1420041600)  || (temp_data.time > 2524575600))	//时间范围 2015-1-1  ->2049-12-30  ，不在此时间的数据无效;
+		if(temp_data.point.point_type > 10)
+			continue;
+		if(temp_data.point.panel != Station_NUM)	//如果数据point 不是本panel 估计就是传错了值;
+			continue;
+		if((temp_data.time < 1420041600)  || (temp_data.time > 1735660800))	//时间范围 2015-1-1  ->2049-12-30  ，不在此时间的数据无效;
 		{
-			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Data time error!!"));
+			//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Data time error!!"));
+			//TRACE(strTime);
 			continue;
 		}
 
+
+
+		CString Label_Des;
 		CString temp_type;
 		temp_type.Format(_T("%u_%u_%u_%u_%u"),temp_data.point.number,temp_data.point.point_type,temp_data.point.panel,temp_data.point.sub_panel,temp_data.point.network);
+		CString temp_type_word;
+		if(temp_data.point.point_type == 1)
+		{
+			temp_type_word = _T("OUT");
+		}
+		else if(temp_data.point.point_type == 2)
+		{
+			temp_type_word = _T("IN");
+		}
+		else if(temp_data.point.point_type == 3)
+		{
+			if((temp_data.point.panel == temp_data.point.sub_panel) && (temp_data.point.panel == Station_NUM))
+			temp_type_word = _T("VAR");
+			else
+			temp_type_word = _T("REG");
+		}
+		else
+		{
+			temp_type_word = _T("NA");
+		}
+		if((temp_data.point.panel == temp_data.point.sub_panel) && (temp_data.point.panel == Station_NUM))
+		{
+			Label_Des.Format(_T("%s%u"),temp_type_word,temp_data.point.number+1);
+		}
+		else
+			Label_Des.Format(_T("%u-%u-%s%u"),temp_data.point.panel,temp_data.point.sub_panel,temp_type_word,temp_data.point.number+1);
+
 
 		CString temp_value_test;
 		temp_value_test.Format(_T("%d"),temp_data.value);
-		
-		//if(temp_type.CompareNoCase(_T("8_3_5_5_1")) == 0)
-		//{
-		//	TRACE(temp_type + _T("  ") + temp_value_test + _T("\r\n"));
-		//	for (int i = 0; i< nlength ; i++)
-		//	{
-		//		temp_char.Format(_T("%02x"),(unsigned char)*temp_print);
-		//		temp_char.MakeUpper();
-		//		temp_print ++;
-		//		n_temp_print = n_temp_print + temp_char + _T(" ");
-		//	}
-		//	TRACE(n_temp_print);
-		//	//DFTrace(n_temp_print);
-		//}
-		
+			
 		if(m_monitor_head.special == 1)
 		{
 			temp_flag = 1;
 		}
 		else
 		{
-			if(temp_sd_exsit)
+
 				temp_flag = 0;
-			else
-				temp_flag = 1;
+
+				//CString strTime;
+				//time_t scale_time2 ;
+				//CTime time_scaletime1;
+				//scale_time2 = temp_data.time ;
+				//time_scaletime1 = scale_time2;
+				//strTime = time_scaletime1.Format("  %m/%d %H:%M:%S  ");
+				//strTime = strTime + temp_value_test;
+				//CString ret_ret_ret;
+				//ret_ret_ret.Format(_T("%s  %d\r\n"),strTime,temp_flag);
+
+				//TRACE(ret_ret_ret);
 		}
+
+
+
 
 		CString display_time;
 
@@ -1658,13 +1793,18 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		time_t scale_time  = temp_data.time;
 		time_scaletime = scale_time;
 		display_time.Empty();
-		display_time=time_scaletime.Format("%y_%m_%d %H:%M:%S");
+		display_time=time_scaletime.Format("%y-%m-%d %H:%M:%S");
+
+		//COleDateTime updateTime;
+		//updateTime = scale_time;
+		//updateTime.Format(_T("%Y-%m-%d %H:%M:%S"));
 
 		CString strSql;
-		strSql.Format(_T("insert into MonitorData values(%u,%u,'%s',%d,%u,%u,%u,'%s')"),g_selected_serialnumber,monitor_list_line,temp_type,temp_data.value,temp_data.time , analog_data ,temp_flag,display_time);
+		strSql.Format(_T("insert into MonitorData values('%s',%d,%u,%u,%u,#%s#,'%s')"),temp_type,temp_data.value,temp_data.time , analog_data ,temp_flag,display_time,Label_Des);
+		//strSql.Format(_T("insert into MonitorData values('%s',%d,%u,%u,%u,'%s','%s')"),temp_type,temp_data.value,temp_data.time , analog_data ,temp_flag,display_time,Label_Des);
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 
-		//DFTrace(display_time);
+		
 
 	}
 	bool delete_temp_db_data = false;
@@ -1673,7 +1813,14 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	{
 		CString temp_write_index;
 		temp_write_index.Format(_T("%d"),m_monitor_head.seg_index);
-		WritePrivateProfileStringW(temp_serial,temp_monitor_index,temp_write_index,temp_db_ini_folder);
+		if((temp_index + 1) == m_monitor_head.seg_index )
+		{
+			if(read_temp_local_tem_package == false)
+			{
+				if(temp_sd_exsit)
+					WritePrivateProfileStringW(temp_serial,temp_monitor_index,temp_write_index,temp_db_ini_folder);
+			}
+		}
 		delete_temp_db_data = true;
 		//DFTrace(temp_write_index);
 	}
@@ -1682,18 +1829,23 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 
 	if(delete_temp_db_data)
 	{
+		//WaitForSingleObject(Monitor_DB_Mutex,INFINITE); 
+
+
+
 		CString strSql;
 		CBADO monitor_bado;
 		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
 		monitor_bado.OnInitADOConn(); 
 		if(analog_data)
-			strSql.Format(_T("delete * from MonitorData where Temp_Data=1 and Analog_Digital=1"),g_selected_serialnumber,monitor_list_line);
+			strSql.Format(_T("delete * from MonitorData where Temp_Data=1 and Analog_Digital=1"));
 		else
-			strSql.Format(_T("delete * from MonitorData where Temp_Data=1 and Analog_Digital=0"),g_selected_serialnumber,monitor_list_line);
+			strSql.Format(_T("delete * from MonitorData where Temp_Data=1 and Analog_Digital=0"));
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 		monitor_bado.CloseConn();
 
-		//DFTrace(_T("Delete temp db data"));
+		//ReleaseMutex(Monitor_DB_Mutex);
+
 	}
 
 

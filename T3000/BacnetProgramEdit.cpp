@@ -19,6 +19,7 @@ extern int error;
 extern char *pmes;
 //extern int Station_NUM;
 //extern int program_list_line;
+vector <Str_char_pos_color> m_prg_label_error_color;	//用于highlight 关键字用;
 vector <Str_char_pos_color> m_prg_char_color;	//用于highlight 关键字用;
 vector <Str_char_pos_color> buffer_prg_char_color; //用于防止频繁更新界面引起的闪烁问题;
 // CBacnetProgramEdit dialog
@@ -195,6 +196,9 @@ void CBacnetProgramEdit::GetColor()
 	GetPrivateProfileString(_T("Program_IDE_Color"),_T("Text Font"),_T("Arial"),prg_character_font.GetBuffer(MAX_PATH),MAX_PATH,g_cstring_ini_path);
 	prg_character_font.ReleaseBuffer();
 	
+
+
+
 	bool found_font = false;
 	for (int i=0;i< (sizeof(Program_Fonts) / sizeof(Program_Fonts[0])) ; i++ )
 	{
@@ -288,7 +292,15 @@ BOOL CBacnetProgramEdit::OnInitDialog()
 	memset(my_display,0,sizeof(my_display));
 	PostMessage(WM_REFRESH_BAC_PROGRAM_RICHEDIT,NULL,NULL);
 
-	//SetTimer(1,60000,NULL);
+	if(show_upper)
+	{
+		BYTE Keystatus[256] = {0};
+		GetKeyboardState(Keystatus);
+		Keystatus[VK_CAPITAL] = 1;
+		SetKeyboardState(Keystatus);
+		PostMessage(WM_KEYDOWN,VK_CAPITAL,0);
+	}
+
 	return FALSE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -321,10 +333,12 @@ LRESULT CBacnetProgramEdit::Fresh_Program_RichEdit(WPARAM wParam,LPARAM lParam)
 	else
 		temp1.MakeLower();
 
-	temp1.Replace(_T("\r\n"),_T("  \r\n"));
+	temp1.Replace(_T("\r\n"),_T(" \r\n"));
 	temp1.Replace(_T("\("),_T(" \( "));
 	temp1.Replace(_T("\)"),_T(" \) "));
-
+	temp1.Replace(_T("  "),_T(" "));
+	temp1.Replace(_T("  "),_T(" "));
+	temp1.Replace(_T("  "),_T(" "));
 	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(temp1);
 	m_edit_changed = false;
 	program_string = temp1;
@@ -382,7 +396,131 @@ LRESULT  CBacnetProgramEdit::ProgramResumeMessageCallBack(WPARAM wParam, LPARAM 
 		delete pInvoke;
 	return 0;
 }
+void CBacnetProgramEdit::Delete_Repeat_Char_Vec()
+{
 
+}
+// syntax  call  encode function  if some error ,show the error text with red color .
+void CBacnetProgramEdit::Syntax_analysis()
+{
+	int value_test = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetScrollPos(SB_VERT);
+	//TRACE(_T("SB_VERT = %d\r\n"),value_test);
+	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->ShowScrollBar(SB_BOTH,0);
+
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetReadOnly(TRUE);
+	memset(program_code[program_list_line],0,2000);
+
+	renumvar = 1;
+	error = -1; //Default no error;
+	CString tempcs;
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
+
+	tempcs.MakeUpper();
+
+
+	int    iTextLen;
+	iTextLen = WideCharToMultiByte( CP_ACP,0,tempcs,-1,NULL,0,NULL,NULL );
+	memset( ( void* )editbuf, 0, sizeof( char ) * ( iTextLen + 1 ) );
+	::WideCharToMultiByte( CP_ACP,0,tempcs,-1,editbuf,iTextLen,NULL,NULL );
+	Encode_Program();
+
+	long temp_sel_str = 0;
+	long temp_sel_end = 0;
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(temp_sel_str, temp_sel_end); //记住刷新前用户选择的部分;
+	//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->ShowScrollBar(SB_VERT,FALSE);
+	UpdateDataProgramText();
+	
+	m_prg_label_error_color.clear();
+
+
+	if(error!= -1)
+	{
+		m_information_window.ResetContent();
+		CString cstring_error;
+
+		int len = strlen(mesbuf);
+		int  unicodeLen = ::MultiByteToWideChar( CP_ACP,0, mesbuf,-1,NULL,0 ); 
+		::MultiByteToWideChar( CP_ACP,  0,mesbuf,-1,cstring_error.GetBuffer(2000),unicodeLen );  
+		cstring_error.ReleaseBuffer();
+
+		CStringArray  Error_info;  
+		SplitCStringA(Error_info,cstring_error,_T("\r\n"));//Split the CString with "\r\n" and then add to the list.(Fance)
+		m_information_window.ResetContent();
+		tempcs.Replace(_T("\r\n"),_T("\n"));
+		for (int i=0;i<(int)Error_info.GetSize();i++)
+		{
+			m_information_window.InsertString(i,Error_info.GetAt(i));
+			CString temp_error_info;
+			temp_error_info = Error_info.GetAt(i);
+			
+			if(temp_error_info.Find(_T("not a variable")) >= 0 )
+			{
+				CStringArray temp_array;
+				CString ret_error_cstring;
+				SplitCStringA(temp_array,temp_error_info,_T(":"));
+				if(temp_array.GetSize() == 2)
+				{
+					ret_error_cstring = temp_array.GetAt(1);
+					ret_error_cstring.Trim();
+					ret_error_cstring.MakeUpper();
+					int char_length = ret_error_cstring.GetLength();
+					int	find_char_pos = tempcs.Find(ret_error_cstring);
+					int temp_start_pos = find_char_pos;
+					int temp_stop_pos = find_char_pos + char_length;
+
+					Str_char_pos_color temp_pos_color;
+					temp_pos_color.startpos = temp_start_pos;
+					temp_pos_color.endpos = temp_stop_pos;
+					temp_pos_color.ncolor =	DEFAULT_PRG_ERROR_LABEL_COLOR;
+					temp_pos_color.key_type = KEY_ERROR_LABEL;
+					m_prg_label_error_color.push_back(temp_pos_color);
+				}
+				else
+					continue;
+
+			}
+
+		}
+	}
+	else
+		m_information_window.ResetContent();
+
+
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->HideSelection(TRUE,FALSE);
+	//SetRicheditFont(0,-1,prg_text_color);
+
+
+
+	for (int i=0;i<m_prg_label_error_color.size();i++)
+	{
+		SetRicheditFont(m_prg_label_error_color.at(i).startpos,m_prg_label_error_color.at(i).endpos,m_prg_label_error_color.at(i).ncolor);
+	}
+	SetRicheditFont(0,0,prg_text_color);
+	//if(temp_sel_str!= temp_sel_end)
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(temp_sel_end, temp_sel_end); //操作完成后还原现场;
+
+
+
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->HideSelection(FALSE,FALSE);
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetReadOnly(FALSE);
+
+		//int nFirstVisible = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetFirstVisibleLine();
+		//if (nFirstVisible > 0)
+		//{
+		//	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->LineScroll(nFirstVisible, 0);
+		//}
+		// ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetScrollPos(SB_VERT,nVertPos,1);
+		//((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->ShowScrollBar(SB_VERT);
+
+
+		value_test = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetScrollPos (SB_VERT,value_test,1);
+
+
+
+
+	//Invalidate(0);
+	//not a variable
+}
 
 void CBacnetProgramEdit::OnSend()
 {
@@ -772,17 +910,17 @@ dlg_part_success:
 BOOL CBacnetProgramEdit::OnHelpInfo(HELPINFO* pHelpInfo)
 {
 	// TODO: Add your message handler code here and/or call default
-	//if (g_protocol==PROTOCOL_BACNET_IP){
+	if (g_protocol==PROTOCOL_BACNET_IP){
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle,theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		else
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile,HH_HELP_CONTEXT, IDH_TOPIC_EXPORT_TO_BITMAPS);
 		return (hWnd != NULL);
-// 	}
-// 	else{
-// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-// 	}
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }
 
@@ -791,13 +929,25 @@ void CBacnetProgramEdit::OnProgramIdeSettings()
 	// TODO: Add your command handler code here
 	CBacnetProgramSetting ProgramSettingdlg;
 	ProgramSettingdlg.DoModal();
-	if(prg_color_change)
+	CString tempcs;
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
+	if(show_upper)
 	{
-		AnalysisString.Empty();
-		UpdateDataProgramText();
-		prg_color_change = false;
-		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(0, 0); //操作完成后还原现场;
+		tempcs.MakeUpper();
 	}
+	else
+	{
+		tempcs.MakeLower();
+	}
+	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetWindowTextW(tempcs);
+	Syntax_analysis();
+	//if(prg_color_change)
+	//{
+	//	AnalysisString.Empty();
+	//	UpdateDataProgramText();
+	//	prg_color_change = false;
+	//	((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(0, 0); //操作完成后还原现场;
+	//}
 
 }
 
@@ -809,8 +959,66 @@ void CBacnetProgramEdit::Bacnet_Show_Debug()
 
 	if(Select_string.GetLength() == 0 )
 	{
-		MessageBox(_T("No Character selected .Please select label"),_T("Notice"),MB_OK);
-		return;
+		long sel_start = 0;
+		long sel_end = 0;
+		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(sel_start,sel_end);
+
+		long caculate_start = 0;
+		long caculate_end = 0;
+
+		long temp_start = sel_start;
+		long temp_end = sel_end;
+
+		CString temp_txt;
+		if(temp_start > 0)
+		{
+			temp_start --;
+			do 
+			{
+				int sel_number_charactor;
+				sel_number_charactor = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetTextRange(temp_start,temp_end,temp_txt);
+				if((temp_txt.CompareNoCase(_T(" ")) == 0) || (sel_number_charactor == 0)) //说明继续往前 没意义了，都是空格和前面的;
+				{
+					caculate_start = temp_start + 1;
+					break;
+				}
+				temp_start --;
+				temp_end --;
+			} while (temp_start > 0);
+		}
+
+		temp_start = sel_start;
+		temp_end = sel_end;
+
+		if(temp_end > 0)
+		{
+			temp_end ++;
+			do 
+			{
+				int sel_number_charactor;
+				sel_number_charactor = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetTextRange(temp_start,temp_end,temp_txt);
+				if((temp_txt.CompareNoCase(_T(" ")) == 0) || (sel_number_charactor == 0)) //说明继续往前 没意义了，都是空格和前面的;
+				{
+					caculate_end = temp_end - 1;
+					break;
+				}
+				temp_start ++;
+				temp_end ++;
+			} while (temp_start > 0);
+		}
+
+		if(caculate_end > caculate_start)
+		{
+			((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetTextRange(caculate_start,caculate_end,temp_txt);
+			((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(caculate_start,caculate_end);
+			temp_txt.Trim();
+			Select_string = temp_txt;
+		}
+		else
+			return;
+
+
+	//	MessageBox(_T("No Character selected .Please select label"),_T("Notice"),MB_OK);
 	}
 
 	if(Select_string.GetLength() > 10 )
@@ -877,11 +1085,18 @@ void CBacnetProgramEdit::Bacnet_Show_Debug()
 
 }
 
+bool need_syntax = false;
 
 void CBacnetProgramEdit::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	UpdateDataProgramText();
+	if(need_syntax)
+	{
+		KillTimer(1);
+		Syntax_analysis();
+		need_syntax = false;
+		
+	}
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -892,26 +1107,29 @@ void CBacnetProgramEdit::UpdateDataProgramText()
 	if(AnalysisString.CompareNoCase(Edit_Buffer) != 0)
 	{
 		AnalysisString = Edit_Buffer;
-		TRACE(_T("AnalysisString\r\n"));
 		CString tempcs;
 		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetWindowTextW(tempcs);
 		tempcs.MakeUpper();
 		high_light_string = tempcs;
 		check_high_light();
 
+		long temp_sel_str = 0;
+		long temp_sel_end = 0;
+		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(temp_sel_str, temp_sel_end); //记住刷新前用户选择的部分;
 
 		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->HideSelection(TRUE,FALSE);
 		SetRicheditFont(0,-1,prg_text_color);
 
-		long temp_sel_str = 0;
-		long temp_sel_end = 0;
-		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetSel(temp_sel_str, temp_sel_end); //记住刷新前用户选择的部分;
+		//int value_test = ((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->GetScrollPos(SB_VERT);
+		//TRACE(_T("SB_VERT = %d\r\n"),value_test);
 
 		for (int i=0;i<m_prg_char_color.size();i++)
 		{
 			SetRicheditFont(m_prg_char_color.at(i).startpos,m_prg_char_color.at(i).endpos,m_prg_char_color.at(i).ncolor);
 		}
-		//if(temp_sel_str!= temp_sel_end)
+
+		//SetRicheditFont(0,0,prg_text_color);111111111
+
 			((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->SetSel(temp_sel_end, temp_sel_end); //操作完成后还原现场;
 
 		((CRichEditCtrl *)GetDlgItem(IDC_RICHEDIT2_PROGRAM))->HideSelection(FALSE,FALSE);
@@ -967,7 +1185,47 @@ BOOL CBacnetProgramEdit::PreTranslateMessage(MSG* pMsg)
 		Run_once_mutex = false;
 		return TRUE;
 	}
+	else if(pMsg->message == WM_KEYDOWN)
+	{
+		if(GetFocus())
+		{
+			if(IDC_RICHEDIT2_PROGRAM == GetFocus()->GetDlgCtrlID())
+			{
+				if(show_upper)
+				{
+					BYTE Keystatus[256] = {0};
+					GetKeyboardState(Keystatus);
+					Keystatus[VK_CAPITAL] = 1;
+					SetKeyboardState(Keystatus);
+					//PostMessage(WM_KEYDOWN,VK_CAPITAL,0);
+				}
+				else
+				{
+					BYTE Keystatus[256] = {0};
+					GetKeyboardState(Keystatus);
+					Keystatus[VK_CAPITAL] = 0;
+					SetKeyboardState(Keystatus);
+					//PostMessage(WM_KEYDOWN,VK_CAPITAL,0);
+				}
+
+				static int prg_key_count = 1 ;
+				if(prg_key_count ++ % 2 == 0)
+				{
+					need_syntax = true;
+					SetTimer(1,3000,NULL);
+					prg_key_count = 1;
+				}
+
+			}
+
+		}
+
+		
+	}
 
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
+
+
+

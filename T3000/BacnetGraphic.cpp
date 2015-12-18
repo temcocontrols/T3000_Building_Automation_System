@@ -63,7 +63,7 @@ int start_wait_init = 0;	//用于控制显示刷新的变量;
 extern CBacnetGraphic * GraphicWindow;
 //CRect Static_Num_Rect[15];
 bool flag_continue_thread = true;
-bool flag_auto_scroll = true;
+
 HWND myhWnd;
 RECT myRect;
 HANDLE mythread =NULL;
@@ -75,6 +75,8 @@ HDC gloab_hdc;
 int scale_type;
 DWORD WINAPI MyThreadPro(LPVOID lPvoid);
 DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid);
+
+int point_error_2 = 0;
 
 IMPLEMENT_DYNAMIC(CBacnetGraphic, CDialogEx)
 
@@ -112,7 +114,7 @@ ON_WM_LBUTTONDOWN()
 ON_WM_HELPINFO()
 ON_COMMAND(ID_TIMEBASE_1HOUR, &CBacnetGraphic::OnTimebase1hour)
 ON_COMMAND(ID_TIMEBASE_1DAY, &CBacnetGraphic::OnTimebase1day)
-ON_COMMAND(ID_TIMEBASE_1MINITES, &CBacnetGraphic::OnTimebase1minites)
+//ON_COMMAND(ID_TIMEBASE_1MINITES, &CBacnetGraphic::OnTimebase1minites)
 ON_COMMAND(ID_TIMEBASE_10MINUTES, &CBacnetGraphic::OnTimebase10minutes)
 ON_COMMAND(ID_TIMEBASE_12HOURS, &CBacnetGraphic::OnTimebase12hours)
 ON_COMMAND(ID_TIMEBASE_4HOURS, &CBacnetGraphic::OnTimebase4hours)
@@ -123,6 +125,7 @@ ON_COMMAND(ID_ZOOMIN, &CBacnetGraphic::OnZoomin)
 ON_COMMAND(ID_ZOOMOUT, &CBacnetGraphic::OnZoomout)
 ON_COMMAND(ID_TIMEBASE_CUSTOMERDEFINE, &CBacnetGraphic::OnTimebaseCustomerdefine)
 ON_COMMAND(ID_TIMEBASE_5MINUTES, &CBacnetGraphic::OnTimebase5minutes)
+ON_COMMAND(ID_TIMEBASE_30MINUTES, &CBacnetGraphic::OnTimebase30minutes)
 END_MESSAGE_MAP()
 
 
@@ -186,7 +189,39 @@ BOOL CBacnetGraphic::OnInitDialog()
 	b_has_create_point = false;
 	flag_continue_thread = true;
 	scale_type = TIME_ONE_HOUR;
-	m_time_monitor_now = time(NULL);
+
+	flag_auto_scroll  = GetPrivateProfileInt(_T("Setting"),_T("GraphicAutoScroll"),0,g_cstring_ini_path);
+	
+
+	//从配置文件中获得上次所选的刻度;
+	graphic_last_scale_type = GetPrivateProfileInt(_T("Setting"),_T("GraphicScaleType"),-1,g_cstring_ini_path);
+	if(graphic_last_scale_type == -1)
+	{
+		CString temp_cs1;
+		temp_cs1.Format(_T("%d"),TIME_ONE_HOUR);
+		WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
+
+	}
+	scale_type = graphic_last_scale_type;
+
+	if(flag_auto_scroll)	//如果不是自动滚动，就要获取上次的 时间;
+	{
+		m_time_monitor_now = time(NULL);
+	}
+	else
+	{
+		 graphic_last_time_value = GetPrivateProfileInt(_T("Setting"),_T("Graphic_last_time_value"),-1,g_cstring_ini_path);
+		 if(graphic_last_time_value == -1)
+		 {
+			 m_time_monitor_now = time(NULL);
+		 }
+		 else
+			m_time_monitor_now = graphic_last_time_value;
+	}
+	
+
+
+	
 
 #ifndef _DEBUG
 	::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
@@ -210,7 +245,7 @@ BOOL CBacnetGraphic::OnInitDialog()
 	Get_Input_Unit();
 	for(int i=0;i<14;i++)
 		StaticShow[i] = true;	//初始化时都让显示,显示第一次的时候这些值会被自动的修改;
-	InitialParameter(TIME_ONE_HOUR);
+	InitialParameter(scale_type);
 	if(mythread == NULL)
 	{
 		mythread=CreateThread(NULL,NULL,MyThreadPro,this,NULL,NULL);
@@ -249,6 +284,9 @@ BOOL CBacnetGraphic::OnInitDialog()
 
 
 	
+	draw_graphic_finished = false;
+	Delete_Ram_Data();
+	b_has_create_point = false;
 
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -307,6 +345,8 @@ int CBacnetGraphic::Search_data_from_db()
 
 	for (int i=0;i<temp_number_of_inputs;i++)
 	{
+		if(StaticShow[i] == false)	//如果没有选中，就不要检索这部分的数据库;
+			continue;
 		CString cs_temp_input_index;
 		unsigned int temp_record_count = 0;
 		int temp_input_number = 0;
@@ -326,13 +366,14 @@ int CBacnetGraphic::Search_data_from_db()
 			analog_data_min_value[i] = 0x7fffffff;
 			CString strSql;
 			//strSql.Format(_T("select * from MonitorData where Input_Index = '%s' and SerialNumber = %i and Monitor_Index = %i and Analog_Digital = 1 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,temp_serial_number,temp_monitor_index,temp_time_start,temp_time_end);	
-			strSql.Format(_T("select * from MonitorData where Input_Index = '%s' and SerialNumber = %i and Monitor_Index = %i and Analog_Digital = 1 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,temp_serial_number,temp_monitor_index,m_starttime,m_endtime);	
+			strSql.Format(_T("select * from MonitorData where Input_Index = '%s'  and Analog_Digital = 1 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,m_starttime,m_endtime);	
 			monitor_bado.m_pRecordset=monitor_bado.OpenRecordset(strSql);
 			temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
 			if(temp_record_count <= 0)
 			{
 				analog_data_max_value[i] = 100000;
 				analog_data_min_value[i] = 0;
+				monitor_bado.CloseRecordset();//Ffff add
 				continue;
 			}
 			analog_data_point[i] = new Data_Time_Match[temp_record_count];
@@ -365,6 +406,16 @@ int CBacnetGraphic::Search_data_from_db()
 
 				analog_data_point[i][temp_count].loggingtime = logging_time;
 				analog_data_point[i][temp_count].analogdata = monitor_value;
+
+				if(monitor_ignore_enable)
+				{
+					if((analog_data_point[i][temp_count].analogdata < monitor_ignore_min_value) || (analog_data_point[i][temp_count].analogdata > monitor_ignore_max_value))
+					{
+						monitor_bado.m_pRecordset->MoveNext();
+						continue;
+					}
+				}
+
 				if(analog_data_point[i][temp_count].analogdata > analog_data_max_value[i])	//取 最大值和最小值;
 					analog_data_max_value[i] = analog_data_point[i][temp_count].analogdata;
 				if(analog_data_point[i][temp_count].analogdata < analog_data_min_value[i])
@@ -380,7 +431,7 @@ int CBacnetGraphic::Search_data_from_db()
 		{
 			CString strSql;
 			//strSql.Format(_T("select * from MonitorData where Input_Index = '%s' and SerialNumber = %i and Monitor_Index = %i and Analog_Digital = 0 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,temp_serial_number,temp_monitor_index,temp_time_start,temp_time_end);	
-			strSql.Format(_T("select * from MonitorData where Input_Index = '%s' and SerialNumber = %i and Monitor_Index = %i and Analog_Digital = 0 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,temp_serial_number,temp_monitor_index,m_starttime,m_endtime);	
+			strSql.Format(_T("select * from MonitorData where Input_Index = '%s'  and Analog_Digital = 0 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,m_starttime,m_endtime);	
 			monitor_bado.m_pRecordset=monitor_bado.OpenRecordset(strSql);
 			temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
 			if(temp_record_count <= 0)
@@ -448,7 +499,7 @@ void CBacnetGraphic::Create_Line_Point()
 	}
 
 
-
+	point_error_2 = 0;
 	for (int x = 0 ;x<get_data_count;x++)
 	{
 		if(x < monitor_analog_count)
@@ -463,13 +514,37 @@ void CBacnetGraphic::Create_Line_Point()
 				PointF mytemppoint(0,0);
 				if(analog_data_point[x] == NULL)
 					return;
-				TimeValueToPoint(analog_data_point[x][i].loggingtime,analog_data_point[x][i].analogdata,mytemppoint);
-				//TRACE(_T("X = %d , Y = %d \r\n"),(int)mytemppoint.X,(int)mytemppoint.Y);
+				if(x<14)
+				{
+					if(StaticShow[x] == false)
+						break;
+				}
+				else
+					return;
+
+				if(TimeValueToPoint(analog_data_point[x][i].loggingtime,analog_data_point[x][i].analogdata,mytemppoint) == false)
+				{
+					point_error_2 = 1;
+					break;
+				}
+
+				//CString strTime;
+				//time_t scale_time ;
+				//CTime time_scaletime;
+				//scale_time = analog_data_point[x][i].loggingtime ;
+				//time_scaletime = scale_time;
+				//strTime = time_scaletime.Format("  %m/%d %H:%M:%S");
+
+				//TRACE(_T("X = %d , Y = %d Time = %s\r\n"),(int)mytemppoint.X,(int)mytemppoint.Y,strTime);
 
 				MyPoint Mypoint={0,0};
 				Mypoint.x = mytemppoint.X;
 				Mypoint.y = mytemppoint.Y;
 				pTempItem->SetPoint(Mypoint);
+				//if(i == (analog_data_count[x]-1))
+				//{
+				//	pTempItem->m_link_to_next = false;
+				//}
 				if(pPrevItem != NULL)
 				{
 					pPrevItem->SetNext(pTempItem);
@@ -524,6 +599,17 @@ void CBacnetGraphic::Create_Line_Point()
 
 	}
 
+	if(point_error_2 == 1)
+	{
+		draw_graphic_finished = false;
+		b_has_create_point = false;
+	}
+	else
+	{
+		b_has_create_point = true;
+		draw_graphic_finished = true;
+	}
+
 	return;
 }
 
@@ -544,11 +630,7 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
 	while(flag_continue_thread)
 	{
 		bool refresh_ret = false;
-		if(flag_auto_scroll == false)
-		{
-			Sleep(100);
-			continue;
-		}
+
 		if(read_monitordata(BAC_UNITS_ANALOG))
 		{
 			refresh_ret = true;
@@ -562,6 +644,12 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
 		if(!refresh_ret)
 		{
 			Sleep(5000);
+			continue;
+		}
+
+		if(flag_auto_scroll == false)
+		{
+			Sleep(10000);
 			continue;
 		}
 
@@ -581,7 +669,7 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
 		mparent->SetXaxisStartTime(temp_timestart);
 		draw_graphic_finished = false;
 
-		Delete_Ram_Data();
+		//Delete_Ram_Data();
 
 		b_has_create_point = false;
 
@@ -599,7 +687,7 @@ DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid)
 	return 0 ;
 }
 	
-
+//volatile HANDLE Monitor_DB_Mutex=NULL;
 volatile HANDLE Point_Mutex=NULL;
 DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 {
@@ -612,6 +700,10 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 
 	Point_Mutex=CreateMutex(NULL,TRUE,_T("Point_Mutex_Control")); 
 	ReleaseMutex(Point_Mutex); 
+
+	//Monitor_DB_Mutex=CreateMutex(NULL,TRUE,_T("Monitor_DB_Control")); 
+	//ReleaseMutex(Monitor_DB_Mutex); 
+
 	while(flag_continue_thread)
 	{
 		if(start_wait_init < 5)
@@ -619,13 +711,50 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid)
 		
 		if(!b_has_create_point)
 		{
-			mparent->Reset_X_Y_Parameter();
-			mparent->Search_data_from_db();
+			for (int i=0;i< INPUT_NUMBER ;i++)
+			{
+				if(analog_data_point[i] !=NULL)
+				{
+					delete analog_data_point[i];
+					analog_data_point[i] = NULL;
+				}
+				if(digital_data_point[i] !=NULL)
+				{
+					delete digital_data_point[i];
+					digital_data_point[i] = NULL;
+				}
+				digital_data_count[i] = 0;
+				analog_data_count[i] = 0;
+			}
+			for (int i=0;i<INPUT_NUMBER;i++)
+			{
+				if(m_pFirstItem[i] != NULL)
+				{
 
+					while(m_pFirstItem[i]->GetNext() !=NULL)
+					{
+						CPointItem * temp_item = m_pFirstItem[i]->GetNext();
+						delete m_pFirstItem[i];
+						m_pFirstItem[i] = temp_item;
+					}
+
+				}
+				m_pFirstItem[i] = NULL ;
+			}
+
+			mparent->Reset_X_Y_Parameter();
+			//WaitForSingleObject(Monitor_DB_Mutex,INFINITE); 
+			long t1=GetTickCount();//程序段开始前取得系统运行时间(ms);
+			mparent->Search_data_from_db();
+			long t2=GetTickCount();//程序段结束后取得系统运行时间(ms);
+			CString str_temp;
+			str_temp.Format(_T("time:%dms\r\n"),t2-t1);//前后之差即 程序运行时间;
+			TRACE(str_temp);
+			//ReleaseMutex(Monitor_DB_Mutex);
 
 			mparent->Create_Line_Point();	//新建需要绘制的点;一直到下次开始刷新 或者定时器刷新时在去获取点;
-			b_has_create_point = true;
-			draw_graphic_finished = true;
+			//b_has_create_point = true;
+			//draw_graphic_finished = true;
 		}
 		WaitForSingleObject(Point_Mutex,INFINITE); 
 		mparent->Draw_Graphic(hMemDC);
@@ -853,7 +982,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		CTime time_scaletime;
 		scale_time = m_starttime +  i*(x_axis_total_time / m_xscale);
 		time_scaletime = scale_time;
-		if((m_time_selected <= TIME_ONE_HOUR) && (m_time_selected >= TIME_ONE_MINUTE))
+		if((m_time_selected <= TIME_ONE_HOUR) && (m_time_selected >= TIME_FIVE_MINUTE))
 			strTime = time_scaletime.Format("  %m/%d \r\n%H:%M:%S");
 		else
 			strTime = time_scaletime.Format("%m/%d %H:%M");
@@ -1054,6 +1183,9 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 void CBacnetGraphic::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
+	KillTimer(2);
+	b_has_create_point = false;
+	draw_graphic_finished = false;
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -1120,12 +1252,14 @@ void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 			else
 				StaticShow[i] = true;
 
-			if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-			{
-				return;
-			}
-			draw_graphic_finished = false;
-			Delete_Ram_Data();
+			SetTimer(2,5000,NULL);
+			//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+			//{
+			//	return;
+			//}
+			//b_has_create_point = false;
+			//draw_graphic_finished = false;
+			//Delete_Ram_Data();
 
 
 			break;
@@ -1139,9 +1273,19 @@ void CBacnetGraphic::OnLButtonDown(UINT nFlags, CPoint point)
 		(point.y < 684+ 20))
 	{
 		if(flag_auto_scroll)
+		{
+			WritePrivateProfileStringW(_T("Setting"),_T("GraphicAutoScroll"),_T("0"),g_cstring_ini_path);
 			flag_auto_scroll = false;
+			CString cs_temp_value;
+			cs_temp_value.Format(_T("%d"),m_time_monitor_now);
+			WritePrivateProfileStringW(_T("Setting"),_T("Graphic_last_time_value"),cs_temp_value,g_cstring_ini_path);
+
+		}
 		else
+		{
+			WritePrivateProfileStringW(_T("Setting"),_T("GraphicAutoScroll"),_T("1"),g_cstring_ini_path);
 			flag_auto_scroll = true;
+		}
 	}
 
 	CDialogEx::OnLButtonDown(nFlags, point);
@@ -1161,10 +1305,15 @@ void CBacnetGraphic::SetXaxisStartTime(unsigned long nstarttime)
 
 void CBacnetGraphic::SetYaxisValue(float nlowvalue,float nhighvalue)
 {
-	if(nhighvalue <= nlowvalue)
+	if(nhighvalue < nlowvalue)
 	{
 		nhighvalue = 100;
 		nlowvalue = 0;
+	}
+	else if(nhighvalue == nlowvalue)
+	{
+		nhighvalue = nhighvalue + 1;
+		nlowvalue = nlowvalue - 1;
 	}
 	m_lowvalue = nlowvalue;
 	m_highvalue = nhighvalue;
@@ -1264,6 +1413,11 @@ void CBacnetGraphic::CalcOnePixelTime()
 			x_axis_total_time = 600;
 		}
 		break;
+	case TIME_THIRTY_MINUTE:
+		{
+			x_axis_total_time = 1800;
+		}
+		break;
 	case TIME_ONE_HOUR:
 		{
 			x_axis_total_time = 3600;
@@ -1343,8 +1497,8 @@ bool CBacnetGraphic::TimeValueToPoint(unsigned long ntime , int nvalue ,PointF &
 	if((delta_time <0) ||(delta_time > x_axis_total_time))
 	{
 		
-		returnpoint.X = last_used_point.X;
-		returnpoint.Y = last_used_point.Y;
+		//returnpoint.X = last_used_point.X;
+		//returnpoint.Y = last_used_point.Y;
 		return false;
 	}
 	
@@ -1353,8 +1507,8 @@ bool CBacnetGraphic::TimeValueToPoint(unsigned long ntime , int nvalue ,PointF &
 	float delta_value = temp_nvalue - m_lowvalue;
 	if((delta_value < 0) ||(delta_value > y_axis_total_value))
 	{
-		returnpoint.X = last_used_point.X;
-		returnpoint.Y = last_used_point.Y;
+		//returnpoint.X = last_used_point.X;
+		//returnpoint.Y = last_used_point.Y;
 		return false;
 	}
 
@@ -1410,6 +1564,15 @@ int CBacnetGraphic::Get_YAxis_Length()
 void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_max_value)
 {
 	bool contain_digital = false;
+
+	if(flag_auto_scroll == false)
+	{
+		CString cs_temp_value;
+		cs_temp_value.Format(_T("%d"),m_time_monitor_now);
+		WritePrivateProfileStringW(_T("Setting"),_T("Graphic_last_time_value"),cs_temp_value,g_cstring_ini_path);
+	}
+
+
 	for (int i=monitor_analog_count;i<get_data_count;i++)
 	{
 		if(StaticShow[i])
@@ -1444,6 +1607,7 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 	float temp_max = y_max_value /1000 ;
 		if(y_min_value == 0)
 			temp_min = 0;
+
 #if 0
 	int temp_min = y_min_value /1000 ;
 	int temp_max = y_max_value /1000 ;
@@ -1564,6 +1728,7 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 
 	SetXaxisStartTime(timestart);
 
+
 }
 
 
@@ -1641,13 +1806,21 @@ void Delete_Ram_Data()
 void CBacnetGraphic::OnTimebase1hour()
 {
 	// TODO: Add your command handler code here
-	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	{
-		return;
-	}
-	draw_graphic_finished = false;
+//	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+//	{
+//		return;
+//	}
+
+	CString temp_cs1;
+	temp_cs1.Format(_T("%d"),TIME_ONE_HOUR);
+	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
+
+
+	flag_auto_scroll = false;
 	m_time_selected = TIME_ONE_HOUR;
-	Delete_Ram_Data();
+	draw_graphic_finished = false;
+	//Delete_Ram_Data();
+	b_has_create_point = false;
 
 	
 }
@@ -1656,85 +1829,120 @@ void CBacnetGraphic::OnTimebase1hour()
 void CBacnetGraphic::OnTimebase1day()
 {
 	// TODO: Add your command handler code here
-	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	{
-		return;
-	}
+	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+	//{
+	//	return;
+	//}
+
+	CString temp_cs1;
+	temp_cs1.Format(_T("%d"),TIME_ONE_DAY);
+	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
+
+
+	flag_auto_scroll = false;
 	m_time_selected = TIME_ONE_DAY;
 	draw_graphic_finished = false;
-	
-	//InitialParameter(TIME_ONE_DAY);
-	Delete_Ram_Data();
+	//Delete_Ram_Data();
+	b_has_create_point = false;
 }
 
-
+#if 0
 void CBacnetGraphic::OnTimebase1minites()
 {
 	// TODO: Add your command handler code here
-	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	{
-		return;
-	}
-	draw_graphic_finished = false;
+	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+	//{
+	//	return;
+	//}
+
 	m_time_selected = TIME_ONE_MINUTE;
-	//InitialParameter(TIME_ONE_MINUTE);
-	Delete_Ram_Data();
+	draw_graphic_finished = false;
+	//Delete_Ram_Data();
+	b_has_create_point = false;
 }
+#endif
 
 
 void CBacnetGraphic::OnTimebase10minutes()
 {
 	// TODO: Add your command handler code here
-	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	{
-		return;
-	}
-	draw_graphic_finished = false;
+	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+	//{
+	//	return;
+	//}
+
+	CString temp_cs1;
+	temp_cs1.Format(_T("%d"),TIME_TEN_MINUTE);
+	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
+
+
 	m_time_selected = TIME_TEN_MINUTE;
-	//InitialParameter(TIME_TEN_MINUTE);
-	Delete_Ram_Data();
+
+
+
+	draw_graphic_finished = false;
+	//Delete_Ram_Data();
+	b_has_create_point = false;
+
+
 }
 
 
 void CBacnetGraphic::OnTimebase12hours()
 {
 	// TODO: Add your command handler code here
-	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	{
-		return;
-	}
-	draw_graphic_finished = false;
+	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+	//{
+	//	return;
+	//}
+	CString temp_cs1;
+	temp_cs1.Format(_T("%d"),TIME_TWELVE_HOUR);
+	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
+
+
+	flag_auto_scroll = false;
 	m_time_selected = TIME_TWELVE_HOUR;
-	//InitialParameter(TIME_TWELVE_HOUR);
-	Delete_Ram_Data();
+	draw_graphic_finished = false;
+	//Delete_Ram_Data();
+	b_has_create_point = false;
 }
 
 
 void CBacnetGraphic::OnTimebase4hours()
 {
 	// TODO: Add your command handler code here
-	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	{
-		return;
-	}
-	draw_graphic_finished = false;
+//	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+//	{
+//		return;
+//	}
+	CString temp_cs1;
+	temp_cs1.Format(_T("%d"),TIME_FOUR_HOUR);
+	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
+
+	flag_auto_scroll = false;
 	m_time_selected = TIME_FOUR_HOUR;
-	//InitialParameter(TIME_FOUR_HOUR);
-	Delete_Ram_Data();
+	draw_graphic_finished = false;
+	//Delete_Ram_Data();
+	b_has_create_point = false;
 }
 
 
 void CBacnetGraphic::OnTimebase4days()
 {
 	// TODO: Add your command handler code here
-	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	{
-		return;
-	}
-	draw_graphic_finished = false;
+	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+	//{
+	//	return;
+	//}
+	CString temp_cs1;
+	temp_cs1.Format(_T("%d"),TIME_FOUR_DAY);
+	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
+
+	flag_auto_scroll = false;
 	m_time_selected = TIME_FOUR_DAY;
-	//InitialParameter(TIME_FOUR_DAY);
-	Delete_Ram_Data();
+	draw_graphic_finished = false;
+	//Delete_Ram_Data();
+	b_has_create_point = false;
 }
 void CBacnetGraphic::Reset_X_Y_Parameter()
 {
@@ -1771,6 +1979,11 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 	case TIME_TEN_MINUTE:
 		{
 			InitialParameter(TIME_TEN_MINUTE,total_y_min_value,total_y_max_value);
+		}
+		break;
+	case TIME_THIRTY_MINUTE:
+		{
+			InitialParameter(TIME_THIRTY_MINUTE,total_y_min_value,total_y_max_value);
 		}
 		break;
 	case TIME_ONE_HOUR:
@@ -1815,10 +2028,10 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 void CBacnetGraphic::OnGraphicLeft()
 {
 	// TODO: Add your command handler code here
-	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	{
-		return;
-	}
+	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+	//{
+	//	return;
+	//}
 	draw_graphic_finished = false;
 
 	if(m_time_selected == TIME_USER_DEFINE)
@@ -1834,7 +2047,9 @@ void CBacnetGraphic::OnGraphicLeft()
 	}
 
 
-		Delete_Ram_Data();
+	draw_graphic_finished = false;
+	//Delete_Ram_Data();
+	b_has_create_point = false;
 
 }
 
@@ -1842,10 +2057,10 @@ void CBacnetGraphic::OnGraphicLeft()
 void CBacnetGraphic::OnGraphicRight()
 {
 	// TODO: Add your command handler code here
-	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	{
-		return;
-	}
+	//if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+	//{
+	//	return;
+	//}
 	draw_graphic_finished = false;
 
 	if(m_time_selected == TIME_USER_DEFINE)
@@ -1861,7 +2076,10 @@ void CBacnetGraphic::OnGraphicRight()
 	}
 
 
-		Delete_Ram_Data();
+
+		draw_graphic_finished = false;
+		//Delete_Ram_Data();
+		b_has_create_point = false;
 }
 
 
@@ -1873,15 +2091,19 @@ void CBacnetGraphic::OnZoomin()
 		return;
 	}
 	draw_graphic_finished = false;
-	if(m_time_selected > TIME_ONE_MINUTE)
+	if(m_time_selected > TIME_FIVE_MINUTE)
 	{
 		m_time_selected = m_time_selected - 1;
 		Delete_Ram_Data();
+		draw_graphic_finished = false;
+		b_has_create_point = false;
 	}
 	else
 	{
 		m_time_selected = 1;
+		draw_graphic_finished = false;
 		Delete_Ram_Data();
+		b_has_create_point = false;
 	}
 
 }
@@ -1898,12 +2120,16 @@ void CBacnetGraphic::OnZoomout()
 	if(m_time_selected < TIME_FOUR_DAY)
 	{
 		m_time_selected = m_time_selected + 1;
+		draw_graphic_finished = false;
 		Delete_Ram_Data();
+		b_has_create_point = false;
 	}
 	else
 	{
 		m_time_selected = TIME_FOUR_DAY;
+		draw_graphic_finished = false;
 		Delete_Ram_Data();
+		b_has_create_point = false;
 	}
 }
 
@@ -1957,7 +2183,7 @@ void CBacnetGraphic::Get_Input_Unit()
 BOOL CBacnetGraphic::OnHelpInfo(HELPINFO* pHelpInfo)
 { 
 
-	//if (g_protocol==PROTOCOL_BACNET_IP){
+	if (g_protocol==PROTOCOL_BACNET_IP){
 		HWND hWnd;
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 
@@ -1966,10 +2192,10 @@ BOOL CBacnetGraphic::OnHelpInfo(HELPINFO* pHelpInfo)
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 
 			HH_HELP_CONTEXT, IDH_TOPIC_GRAPHIC_SCREENS);
 		return (hWnd != NULL);
-// 	}
-// 	else{
-// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-// 	}
+	}
+	else{
+		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	}
 
 	return CDialogEx::OnHelpInfo(pHelpInfo);
 }
@@ -1993,7 +2219,9 @@ void CBacnetGraphic::OnTimebaseCustomerdefine()
 		draw_graphic_finished = false;
 		m_time_selected = TIME_USER_DEFINE;
 		m_time_monitor_now = customer_end_time;
+		draw_graphic_finished = false;
 		Delete_Ram_Data();
+		b_has_create_point = false;
 	}
 }
 
@@ -2001,12 +2229,27 @@ void CBacnetGraphic::OnTimebaseCustomerdefine()
 void CBacnetGraphic::OnTimebase5minutes()
 {
 	// TODO: Add your command handler code here
-	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
-	{
-		return;
-	}
-	draw_graphic_finished = false;
+//	if(draw_graphic_finished == false)	//避免客户 频繁切换数据;
+//	{
+//		return;
+//	}
+
 	m_time_selected = TIME_FIVE_MINUTE;
-	//InitialParameter(TIME_TEN_MINUTE);
-	Delete_Ram_Data();
+	draw_graphic_finished = false;
+//	Delete_Ram_Data();
+	b_has_create_point = false;
+}
+
+
+void CBacnetGraphic::OnTimebase30minutes()
+{
+	// TODO: Add your command handler code here
+	CString temp_cs1;
+	temp_cs1.Format(_T("%d"),TIME_THIRTY_MINUTE);
+	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
+
+	m_time_selected = TIME_THIRTY_MINUTE;
+	draw_graphic_finished = false;
+	b_has_create_point = false;
+	
 }

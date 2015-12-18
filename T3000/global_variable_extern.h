@@ -63,6 +63,7 @@ extern	CString	g_strDatabasefilepath;
 extern	CString g_strExePth;
 extern  CString g_achive_folder;
 extern  CString g_achive_folder_temp_txt;
+extern  CString g_achive_folder_temp_db;
 extern  CString g_achive_device_name_path;
 extern  CString g_strImgeFolder;
 extern  CString g_strBuildingFolder;
@@ -1207,6 +1208,17 @@ extern Str_annual_routine_point m_temp_annual_data[BAC_HOLIDAY_COUNT];
 extern Str_monitor_point m_temp_monitor_data[BAC_MONITOR_COUNT];
 extern Alarm_point	 m_temp_alarmlog_data[BAC_ALARMLOG_COUNT];
 
+extern int debug_item_show;
+
 extern char monitor_database_flag[24];   //用于标记哪些Database需要删除的 ，1 为删除;
 extern int Station_NUM;
+extern bool monitor_ignore_enable ;
+extern int monitor_ignore_max_value ;
+extern int monitor_ignore_min_value ;
+extern int persent_array_count;
+extern	unsigned int old_tx_count;
+
+extern int flag_auto_scroll ; // 如果客户有指定显示X轴的某些事件 此 变量会为 1;否则显示最新数据;
+extern int graphic_last_scale_type ; //用于存储上次 有效的 X轴的 刻度;
+extern unsigned int graphic_last_time_value; //x轴上次查看的时间;
 #pragma endregion For_bacnet

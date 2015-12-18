@@ -27,6 +27,7 @@ void CDebugWindow::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST_DEBUG, m_debug_listbox);
 	DDX_Control(pDX, IDC_DATETIMEPICKER_DEBUG_TIME_DAY, m__day);
 	DDX_Control(pDX, IDC_DATETIMEPICKER_DEBUG_TIME_SECOND, m__time);
+	DDX_Control(pDX, IDC_COMBO_DEBUG_CHOOSE, m_debug_window_combo_show);
 }
 
 
@@ -41,6 +42,7 @@ ON_BN_CLICKED(IDC_BUTTON_DEBUG_SAVE, &CDebugWindow::OnBnClickedButtonDebugSave)
 ON_WM_DESTROY()
 ON_BN_CLICKED(IDC_BUTTON_DEBUG_NUM_TO_TIME, &CDebugWindow::OnBnClickedButtonDebugNumToTime)
 ON_BN_CLICKED(IDC_BUTTON_DEBUG_TIME_TO_NUM, &CDebugWindow::OnBnClickedButtonDebugTimeToNum)
+ON_CBN_SELCHANGE(IDC_COMBO_DEBUG_CHOOSE, &CDebugWindow::OnCbnSelchangeComboDebugChoose)
 END_MESSAGE_MAP()
 
 
@@ -67,6 +69,15 @@ BOOL CDebugWindow::OnInitDialog()
 	} 
 	h_debug_window = this->m_hWnd;
 
+	//m_debug_window_combo_show
+	m_debug_window_combo_show.ResetContent();
+
+	for (int i=0;i<sizeof(Debug_Combo_Choose)/sizeof(Debug_Combo_Choose[0]);i++)
+	{
+		m_debug_window_combo_show.AddString(Debug_Combo_Choose[i]);
+	}
+	m_debug_window_combo_show.SetWindowTextW(Debug_Combo_Choose[0]);
+	debug_item_show = DEBUG_SHOW_NOTHING;
 	((CSliderCtrl *)GetDlgItem(IDC_SLIDER_DEBUG))->SetRange(100,255);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -271,4 +282,21 @@ void CDebugWindow::OnBnClickedButtonDebugTimeToNum()
 	CString temp_time_num;
 	temp_time_num.Format(_T("%u"),end_long_time);
 	SetDlgItemTextW(IDC_EDIT_DEBUG_TIME_NUMBER,temp_time_num);
+}
+
+
+void CDebugWindow::OnCbnSelchangeComboDebugChoose()
+{
+	// TODO: Add your control notification handler code here
+	CString temp_string;
+	int nSel = m_debug_window_combo_show.GetCurSel();	
+	m_debug_window_combo_show.GetLBText(nSel,temp_string);
+	for(int i=0;i<sizeof(Debug_Combo_Choose)/sizeof(Debug_Combo_Choose[0]);i++)
+	{
+		if(temp_string.CompareNoCase(Debug_Combo_Choose[i]) == 0 )
+		{
+			debug_item_show = i;
+			break;
+		}
+	}
 }
