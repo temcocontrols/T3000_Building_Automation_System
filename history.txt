@@ -1,3 +1,13 @@
+Ver 2015.12.25
+1> Support   "9600", "19200", "38400","57600","115200"     
+
+
+Ver 2015.12.23
+1>Changed "Scan Function"
+     If one device has two type communications,just use the ethernet 
+     update the device information in the background.
+2>Something have finxed about BACnet.
+
 Ver 2015.12.18
 1>Changed HUMTEMPSENSOR to HUM ,Model number is 14.
 2>Freshing the data in the background,HUM,AQ,HUM_R

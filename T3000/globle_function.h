@@ -140,7 +140,7 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
 	 BACNET_ADDRESS * src,
 	 BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
   void local_rp_ack_print_data(	BACNET_READ_PROPERTY_DATA * data);
- bool Initial_bac(int comport = 0);
+ bool Initial_bac(int comport = 0,CString bind_local_ip = _T(""));
   bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket);
   unsigned char Str_to_Byte(CString need_conver);
   void Init_Service_Handlers(void);

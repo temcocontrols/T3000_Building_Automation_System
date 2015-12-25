@@ -1041,6 +1041,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         m_pDialogInfo->ShowWindow(SW_HIDE);
         m_pDialogInfo->CenterWindow();
         m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T(""));
+
+
+
+
     }
 
     m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
@@ -4512,7 +4516,7 @@ void CMainFrame::Scan_Product()
     ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
 
     g_strT3000LogString=_T("Scan begin Time: ");
-    g_strT3000LogString+=strTime+_T("\n");;
+    g_strT3000LogString+=strTime+_T("\n");
     //write_T3000_log_file(g_strT3000LogString);
     //NET_WriteLogFile(g_strT3000LogString);
     pstrInfo = new CString(g_strT3000LogString);
@@ -4590,6 +4594,10 @@ void CMainFrame::Scan_Product()
     //m_bScanFinished = FALSE;
     delete m_pWaitScanDlg;
     m_pWaitScanDlg = NULL;
+
+
+
+     PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
 //*/
 }
 
@@ -8253,10 +8261,6 @@ end_condition :
                     {
                         str_Product_name_view = temp_pname + _T(":") + str_serialid + _T("-") + temp_modbusid + _T("-") + str_ip_address_exist;
                     }
-                    //else if(m_refresh_net_device_data.at(y).product_id == PM_TSTAT7)	//TSTAT7 不支持写 label名字;
-                    //{
-                    //	str_Product_name_view = temp_pname + _T(":") + str_serialid + _T("-") + temp_modbusid + _T("-") + str_ip_address_exist;
-                    //}
                     else
                     {
                         str_Product_name_view = m_refresh_net_device_data.at(y).show_label_name;
@@ -8266,11 +8270,8 @@ end_condition :
                     if((m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL) || (m_refresh_net_device_data.at(y).product_id == PM_CM5))
                         is_bacnet_device = true;
 
-                    //if(m_refresh_net_device_data.at(y).ip_address.CompareNoCase(m_product.at(n_index).BuildingInfo.strIp) != 0)
-                    //{
                     if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device && (m_refresh_net_device_data.at(y).parent_serial_number != 0))
                     {
-                        //str_Product_name_view = str_Product_name_view ;
                         CString temp_pro;
                         temp_pro.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
                         strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Object_Instance = '%s' , Panal_Number = '%s' , Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1 ,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,str_object_instance,str_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,temp_pro,str_Product_name_view,str_parents_serial,str_serialid);
@@ -8278,18 +8279,7 @@ end_condition :
                     else
                         strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Object_Instance = '%s' , Panal_Number = '%s' ,  Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='1',Product_name = '%s',Online_Status = 1,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,str_object_instance,str_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,str_Product_name_view,str_parents_serial,str_serialid);
                     find_new_device = true;
-                    //}
-                    //else
-                    //{
-                    //	if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device)
-                    //	{
-                    //		CString temp_pro1;
-                    //		temp_pro1.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
-                    //		strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Object_Instance = '%s' , Panal_Number = '%s' , Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,str_object_instance,str_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,temp_pro1,str_Product_name_view,str_parents_serial,str_serialid);
-                    //	}
-                    //	else
-                    //		strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s',  Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='1',Online_Status = 1,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,str_ip_address_exist,str_n_port,str_modbus_id,str_parents_serial,str_serialid);
-                    //}
+
                     bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
                 }
                 catch(_com_error *e)
@@ -8334,7 +8324,15 @@ end_condition :
             {
                 is_custom = _T("0");
             }
-            product_name = GetProductName(m_refresh_net_device_data.at(y).product_id);
+			if(m_refresh_net_device_data.at(y).show_label_name.IsEmpty())
+			{
+				 product_name = GetProductName(m_refresh_net_device_data.at(y).product_id);
+			}
+			else
+			{
+				product_name = m_refresh_net_device_data.at(y).show_label_name;
+			}
+           
             if(product_name.IsEmpty())
             {
                 if (m_refresh_net_device_data.at(y).product_id<200)
@@ -8354,7 +8352,7 @@ end_condition :
                 str_parents_serial = _T("0");
             }
             find_new_device = true;
-            product_name = product_name + _T(":") + str_serialid + _T("-") + modbusid + _T("-") + str_ip_address;
+           // product_name = product_name + _T(":") + str_serialid + _T("-") + modbusid + _T("-") + str_ip_address;
             NetwordCard_Address=m_refresh_net_device_data.at(y).NetCard_Address;
             //strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,NetworkCard_Address,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Online_Status)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','"+NetwordCard_Address+"','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','0','0','"+str_n_port+"','0','1')"));
             bool is_bacnet_device = false;
@@ -8362,7 +8360,7 @@ end_condition :
                 is_bacnet_device = true;
             if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device && (m_refresh_net_device_data.at(y).parent_serial_number != 0))
             {
-                product_name = product_name ;
+                //product_name = product_name ;
                 CString temp_pro2;
                 temp_pro2.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
                 strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','0','"+temp_pro2+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
@@ -8464,8 +8462,6 @@ void CMainFrame::DoFreshAll()
 
 UINT _FreshTreeView(LPVOID pParam )
 {
-
-
     CString g_strT3000LogString;
     CMainFrame* pMain = (CMainFrame*)pParam;
     int int_refresh_com = 0;

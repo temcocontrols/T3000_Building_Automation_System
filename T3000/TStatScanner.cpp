@@ -6,6 +6,7 @@
 #include "ScanDbWaitDlg.h"
 #include "hangeIDDlg.h"
 #include "MainFrm.h"
+#include "define.h"
 #include "bip.h"
  #include "rs485.h" // For call Get_RS485_Handle() function
 #include "WhichOneToChooseDlg.h"
@@ -1772,9 +1773,9 @@ void CTStatScanner::SendScanEndMsg()
 		
 		CompareNetToComConflict();
 
-
+        AddNewTStatToDB();
 		AddNewNetToDB();
-		AddNewTStatToDB();
+		
 
 
 		
@@ -1815,42 +1816,14 @@ void CTStatScanner::SendScanEndMsg()
 
 
 			m_pParent->PostMessage(WM_ADDTREENODE);
+           
 			SetCommunicationType(1);
 			close_com();
 			SetCommunicationType(0);
 			close_com();
   		
 		}
-// 	else
-// 	{
-// 		
-// 		try
-// 		{
-// 
-// 			CScanDlg dlg;
-// 			dlg.SetScanner(this);
-// 			//dlg.AddComDeviceToGrid(m_szTsatScandRet);
-// 			dlg.DoModal();
-// 			if(IsWindow(dlg.m_hWnd))
-// 			{
-// 				WaitForSingleObject(dlg.m_hWnd, 200);  // 为了线程安全。
-// 			}
-// 
-// 		}
-// 		catch (...)
-// 		{
-// 
-// 		}
-// 		
-// 	}
-   // below is nc scan handle
-	// 找到nc与数据库的冲突
-//	else
-	//{
-// 		FindNetConflict();
-// 		ResolveNetConflict();
-// 		AddNewNetToDB();
-	/*}*/
+ 
 
 
 	
@@ -2433,37 +2406,24 @@ void CTStatScanner::AddNewTStatToDB()
 	{
 		bIsNew = TRUE;
 		int nSID = m_szTstatScandRet[i]->m_pDev->GetSerialID();
-// 		m_szTstatScandRet[i]->m_pDev->SetBuildingName(m_strBuildingName);
-// 		m_szTstatScandRet[i]->m_pDev->SetSubnetName(m_strSubNet);
-// 		m_szTstatScandRet[i]->m_pDev->SetFloorName(m_strFloorName);
-// 		m_szTstatScandRet[i]->m_pDev->SetRoomName(m_strRoomName);
-		for (UINT j = 0; j < m_szComNodes.size(); j++)
-		{
-			int nNodeSID = m_szComNodes[j]->GetSerialID();
-			if (nSID == nNodeSID)
-			{
-				bIsNew = FALSE;
-				break;
-			}
-		}
+        //删掉 存在的序列号
+        try
+        {
 
-		//if((m_szTstatScandRet[i]->m_pDev->GetProductType() == 50) || (m_szTstatScandRet[i]->m_pDev->GetProductType() == 35))
-		//{
-		//	for (UINT j = 0; j < m_szNetNodes.size(); j++)
-		//	{
-		//		int nNodeSID = m_szNetNodes[j]->GetSerialID();
-		//		if (nSID == nNodeSID)
-		//		{
-		//			bIsNew = FALSE;
-		//			break;
-		//		}
-		//	}
+            CString strSql;
+        
+            strSql.Format(_T("Delete * From  ALL_NODE Where Serial_ID = '%d' "),nSID);
+            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+        }
+        catch (...)
+        {
 
-		//}
-		if (bIsNew == TRUE)
-		{
+        }
+
+ 
+            
 			WriteOneDevInfoToDB(m_szTstatScandRet[i]);
-		}
+ 
 	}
 }
 
@@ -2490,78 +2450,76 @@ void CTStatScanner::AddNewNetToDB()
 		if(!IsNetDevice(temp_cs))
 			continue;
 
-		for (UINT j = 0; j < m_szNetNodes.size(); j++)
-		{
-			unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
-			//Comment by Fance
-			//if the scan device is CM5 or minipanel, this products has 3 protocol, BacnetIP modbus485 modbus tcp;
-			//So when scan bacnet ip and midbus tcp ,the or replay to t3000,
-			//So I display the device in two format,judge to 2 decvice;
-			if((pInfo->m_pNet->GetProductType() == PM_CM5) || (pInfo->m_pNet->GetProductType() == PM_MINIPANEL))
-			{
-				unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
-				int nNodeProtocol = m_szNetNodes[j]->GetProtocol();
-				if (nSID == nNodeSID)
-				{
-					if(nSProtocol == nNodeProtocol)
-					{
-						bIsNew = FALSE;
-						break;
-					}
-					else
-					{
-						CString strSql;
-						CString strText;
-						strText.Format(_T("%u"),nNodeSID);
-						strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"),strText);
-						CString strTemp;
-						strTemp.Format(_T("Are you sure to delete thise item"));
-						//if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
-						//{
-							try
-							{
-								bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
-							}
-							catch(_com_error *e)
-							{
-								AfxMessageBox(e->ErrorMessage());
-							}
-						//}
-							bIsNew = TRUE;
-							break;
-					}
-				}
-			}
-			else
-			{
-				if (nSID == nNodeSID)
-				{
-					bIsNew = FALSE;
-					break;
-				}
-			}
-		}
-#if 0
-		if((pInfo->m_pNet->GetProductType() == 50) || (pInfo->m_pNet->GetProductType() == 35))
-		{
-			for (UINT j = 0; j < m_szComNodes.size(); j++)
-			{
-				int nNodeSID = m_szComNodes[j]->GetSerialID();
-				int nNodeProtocol = m_szComNodes[j]->GetProtocol();
-				if ((nSID == nNodeSID)&&(nSProtocol = nNodeProtocol))
-				{
-					bIsNew = FALSE;
-					break;
-				}
-			}
+        for (UINT j = 0; j < m_szNetNodes.size(); j++)
+        {
+            unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
+            //Comment by Fance
+            //if the scan device is CM5 or minipanel, this products has 3 protocol, BacnetIP modbus485 modbus tcp;
+            //So when scan bacnet ip and midbus tcp ,the or replay to t3000,
+            //So I display the device in two format,judge to 2 decvice;
+            if((pInfo->m_pNet->GetProductType() == PM_CM5) || (pInfo->m_pNet->GetProductType() == PM_MINIPANEL))
+            {
+                unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
+                int nNodeProtocol = m_szNetNodes[j]->GetProtocol();
+                if (nSID == nNodeSID)
+                {
+                    if(nSProtocol == nNodeProtocol)
+                    {
+                        bIsNew = FALSE;
+                        break;
+                    }
+                    else
+                    {
+                        CString strSql;
+                        CString strText;
+                        strText.Format(_T("%u"),nNodeSID);
+                        strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"),strText);
+                        CString strTemp;
+                        strTemp.Format(_T("Are you sure to delete thise item"));
+                        //if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
+                        //{
+                        try
+                        {
+                            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+                        }
+                        catch(_com_error *e)
+                        {
+                            AfxMessageBox(e->ErrorMessage());
+                        }
+                        //}
+                        bIsNew = TRUE;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if (nSID == nNodeSID)
+                {
+                    bIsNew = FALSE;
+                    break;
+                }
+            }
+        }
 
-		}
-#endif
+  
 
-		if (bIsNew == TRUE)
-		{
-			WriteOneNetInfoToDB(pInfo);
-		}
+        try
+        {
+
+            CString strSql;
+
+            strSql.Format(_T("Delete * From  ALL_NODE Where Serial_ID = '%d' "),nSID);
+            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+        }
+        catch (...)
+        {
+
+        }
+ 
+     
+	   WriteOneNetInfoToDB(pInfo);
+ 
 	}
 }
 
@@ -3533,46 +3491,79 @@ void CTStatScanner::Initial_Scan_Info()
 		temp_cs = temp_serialport.at(i).Right(temp_serialport.at(i).GetLength() - 3);
 		temp_port = _wtoi(temp_cs);
 
+        int  intBaudate;
 
-		temp_scan_info.scan_list_item = i*2 + 1;
-		temp_scan_info.scan_baudrate = 9600;
-		temp_scan_info.scan_com_port = temp_port;
-		temp_scan_info.scan_mode = SCAN_BY_SERIAL_PORT;
-		if((current_building_protocol == P_AUTO) || ((current_building_protocol == P_MODBUS_485)&& (current_building_baudrate == 9600) ))
-		{
-			temp_scan_info.scan_skip = false;
-			temp_scan_info.scan_status = SCAN_STATUS_WAIT;
-		}
-		else
-		{
-			temp_scan_info.scan_skip = true;
-			temp_scan_info.scan_status = SCAN_STATUS_SKIP;
-		}
-		temp_scan_info.scan_found = 0;
-		memset(temp_scan_info.scan_notes,0,250);
-		m_scan_info.push_back(temp_scan_info);
-		m_scan_info_buffer.push_back(temp_scan_info);
+        for(int baudrate = 0; baudrate<NUMBER_BAUDRATE; baudrate++)
+        {
+//             scan_mode = temp_serialport.at(i) +_T("        ") + c_strBaudate[baudrate];
+//             m_scan_com_list.InsertItem(i*2+baudrate+1,scan_mode);
+//             //m_scan_com_list.SetItemText(i*2,SCAN_BAUDRATE,_T("9600"));
+//             m_scan_com_list.SetItemText(i*2 +baudrate+1,SCAN_SKIP,_T("No"));
+//             m_scan_com_list.SetItemText(i*2 +baudrate+1,SCAN_STATUS,_T("Wait"));
+//             m_scan_com_list.SetItemText(i*2 +baudrate+1,SCAN_FOUND,_T("0"));
+             intBaudate = _wtoi (c_strBaudate[baudrate]);
+              
+            temp_scan_info.scan_list_item = i*2 + baudrate+1;
+            temp_scan_info.scan_baudrate = intBaudate;
+            temp_scan_info.scan_com_port = temp_port;
+            temp_scan_info.scan_mode = SCAN_BY_SERIAL_PORT;
+            if((current_building_protocol == P_AUTO) || ((current_building_protocol == P_MODBUS_485)&& (current_building_baudrate == 9600) ))
+            {
+                temp_scan_info.scan_skip = false;
+                temp_scan_info.scan_status = SCAN_STATUS_WAIT;
+            }
+            else
+            {
+                temp_scan_info.scan_skip = true;
+                temp_scan_info.scan_status = SCAN_STATUS_SKIP;
+            }
+            temp_scan_info.scan_found = 0;
+            memset(temp_scan_info.scan_notes,0,250);
+            m_scan_info.push_back(temp_scan_info);
+            m_scan_info_buffer.push_back(temp_scan_info);
+            
+        }
 
 
-		temp_scan_info.scan_list_item = i*2 + 2;
-		temp_scan_info.scan_baudrate = 19200;
-		temp_scan_info.scan_com_port = temp_port;
-		temp_scan_info.scan_mode = SCAN_BY_SERIAL_PORT;
-		if((current_building_protocol == P_AUTO) || ((current_building_protocol == P_MODBUS_485)&& (current_building_baudrate == 19200) ))
-		{
-			temp_scan_info.scan_skip = false;
-			temp_scan_info.scan_status = SCAN_STATUS_WAIT;
-		}
-		else
-		{
-			temp_scan_info.scan_skip = true;
-			temp_scan_info.scan_status = SCAN_STATUS_SKIP;
-		}
+// 		temp_scan_info.scan_list_item = i*2 + 1;
+// 		temp_scan_info.scan_baudrate = 9600;
+// 		temp_scan_info.scan_com_port = temp_port;
+// 		temp_scan_info.scan_mode = SCAN_BY_SERIAL_PORT;
+// 		if((current_building_protocol == P_AUTO) || ((current_building_protocol == P_MODBUS_485)&& (current_building_baudrate == 9600) ))
+// 		{
+// 			temp_scan_info.scan_skip = false;
+// 			temp_scan_info.scan_status = SCAN_STATUS_WAIT;
+// 		}
+// 		else
+// 		{
+// 			temp_scan_info.scan_skip = true;
+// 			temp_scan_info.scan_status = SCAN_STATUS_SKIP;
+// 		}
+// 		temp_scan_info.scan_found = 0;
+// 		memset(temp_scan_info.scan_notes,0,250);
+// 		m_scan_info.push_back(temp_scan_info);
+// 		m_scan_info_buffer.push_back(temp_scan_info);
 
-		temp_scan_info.scan_found = 0;
-		memset(temp_scan_info.scan_notes,0,250);
-		m_scan_info.push_back(temp_scan_info);
-		m_scan_info_buffer.push_back(temp_scan_info);
+
+// 		temp_scan_info.scan_list_item = i*2 + 2;
+// 		temp_scan_info.scan_baudrate = 19200;
+// 		temp_scan_info.scan_com_port = temp_port;
+// 		temp_scan_info.scan_mode = SCAN_BY_SERIAL_PORT;
+// 		if((current_building_protocol == P_AUTO) || ((current_building_protocol == P_MODBUS_485)&& (current_building_baudrate == 19200) ))
+// 		{
+// 			temp_scan_info.scan_skip = false;
+// 			temp_scan_info.scan_status = SCAN_STATUS_WAIT;
+// 		}
+// 		else
+// 		{
+// 			temp_scan_info.scan_skip = true;
+// 			temp_scan_info.scan_status = SCAN_STATUS_SKIP;
+// 		}
+// 
+// 		temp_scan_info.scan_found = 0;
+// 		memset(temp_scan_info.scan_notes,0,250);
+// 		m_scan_info.push_back(temp_scan_info);
+// 		m_scan_info_buffer.push_back(temp_scan_info);
 
 
 
@@ -4176,7 +4167,7 @@ BOOL CTStatScanner::IsNetDevice(const CString& strDevType)
 		return TRUE;
 	}
 
-	return FALSE;
+	return TRUE;
 }
 
 void CTStatScanner::WaitScan()

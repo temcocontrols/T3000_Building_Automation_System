@@ -227,6 +227,10 @@ void CBacnetSetting::OnBnClickedBtnBacIPAuto()
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->EnableWindow(FALSE);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->EnableWindow(FALSE);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->EnableWindow(FALSE);
+
+	CString temp_task_info;
+	temp_task_info.Format(_T("Change  DHCP auto "));
+	Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
 }
 
 void CBacnetSetting::OnBnClickedBtnBacIPStatic()
@@ -245,19 +249,19 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_IP))->GetAddress(address1,address2,address3,address4);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_SUBNET))->GetAddress(subnet1,subnet2,subnet3,subnet4);
 	((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_BAC_GATEWAY))->GetAddress(gatway1,gatway2,gatway3,gatway4);
-	if((Device_Basic_Setting.reg.ip_addr[0] != address1) ||
-		(Device_Basic_Setting.reg.ip_addr[1] != address2) ||
-		(Device_Basic_Setting.reg.ip_addr[2] != address3) ||
-		(Device_Basic_Setting.reg.ip_addr[3] != address4) ||
-		(Device_Basic_Setting.reg.subnet[0] != subnet1) ||
-		(Device_Basic_Setting.reg.subnet[1] != subnet2) ||
-		(Device_Basic_Setting.reg.subnet[2] != subnet3) ||
-		(Device_Basic_Setting.reg.subnet[3] != subnet4) ||
-		(Device_Basic_Setting.reg.gate_addr[0] != gatway1) ||
-		(Device_Basic_Setting.reg.gate_addr[1] != gatway2) ||
-		(Device_Basic_Setting.reg.gate_addr[2] != gatway3) ||
-		(Device_Basic_Setting.reg.gate_addr[3] != gatway4) )
-	{
+	//if((Device_Basic_Setting.reg.ip_addr[0] != address1) ||
+	//	(Device_Basic_Setting.reg.ip_addr[1] != address2) ||
+	//	(Device_Basic_Setting.reg.ip_addr[2] != address3) ||
+	//	(Device_Basic_Setting.reg.ip_addr[3] != address4) ||
+	//	(Device_Basic_Setting.reg.subnet[0] != subnet1) ||
+	//	(Device_Basic_Setting.reg.subnet[1] != subnet2) ||
+	//	(Device_Basic_Setting.reg.subnet[2] != subnet3) ||
+	//	(Device_Basic_Setting.reg.subnet[3] != subnet4) ||
+	//	(Device_Basic_Setting.reg.gate_addr[0] != gatway1) ||
+	//	(Device_Basic_Setting.reg.gate_addr[1] != gatway2) ||
+	//	(Device_Basic_Setting.reg.gate_addr[2] != gatway3) ||
+	//	(Device_Basic_Setting.reg.gate_addr[3] != gatway4) )
+	//{
 		Device_Basic_Setting.reg.ip_addr[0] = address1;
 		Device_Basic_Setting.reg.ip_addr[1] = address2;
 		Device_Basic_Setting.reg.ip_addr[2] = address3;
@@ -279,7 +283,7 @@ void CBacnetSetting::OnBnClickedBtnBacIPChange()
 		CString temp_task_info;
 		temp_task_info.Format(_T("Change IP Address Information "));
 		Post_Write_Message(g_bac_instance,(int8_t)WRITE_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info),this->m_hWnd,temp_task_info);
-	}
+	//}
 
 }
 

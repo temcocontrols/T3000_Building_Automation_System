@@ -3206,8 +3206,12 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 			{
 				Device_Misc_Data.reg.operation_time[j] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
 				my_temp_point = my_temp_point  +  4;
+				if((Device_Misc_Data.reg.operation_time[j]< 1450774486) || (Device_Misc_Data.reg.operation_time[j] > 1505939286))
+				{
+					Device_Misc_Data.reg.operation_time[j] = 0;
+				}
 			}
-
+			Sleep(1);
     }
     break;
     case READ_SETTING_COMMAND:
@@ -4142,7 +4146,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 SOCKET my_sokect;
 extern void  init_info_table( void );
 extern void Init_table_bank();
-bool Initial_bac(int comport)
+bool Initial_bac(int comport,CString bind_local_ip)
 {
 
     BACNET_ADDRESS src =
@@ -4175,7 +4179,16 @@ bool Initial_bac(int comport)
     if(comport == 0)	//
     {
 #endif
-        int ret_1 = Open_bacnetSocket2(_T("192.168.0.130"),BACNETIP_PORT,my_sokect);
+		int ret_1 ;
+		if(bind_local_ip.IsEmpty())
+		{
+			ret_1= Open_bacnetSocket2(_T(""),BACNETIP_PORT,my_sokect);
+		}
+		else
+		{
+			ret_1= Open_bacnetSocket2(bind_local_ip,BACNETIP_PORT,my_sokect);
+		}
+        
         if(ret_1 < 0)
             return false;
         //	Open_Socket2(_T("127.0.0.1"),6002);
@@ -4203,7 +4216,24 @@ bool Initial_bac(int comport)
         memset(cTemp1,0,255);
         WideCharToMultiByte( CP_ACP, 0, cs_myip.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 
-#if 1
+
+		if(bind_local_ip.IsEmpty())
+		{
+			static in_addr BIP_Address;
+			BIP_Address.S_un.S_addr =  inet_addr(cTemp1);
+			bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
+		}
+		else
+		{
+			static in_addr BIP_Address;
+			char temp_ip_1[100];
+			memset(temp_ip_1,0,100);
+			WideCharToMultiByte( CP_ACP, 0, bind_local_ip.GetBuffer(), -1, temp_ip_1, 255, NULL, NULL );
+			BIP_Address.S_un.S_addr =  inet_addr(temp_ip_1);
+			bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
+		}
+
+#if 0
         static in_addr BIP_Address;
         BIP_Address.S_un.S_addr =  inet_addr(cTemp1);
         bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
@@ -4626,11 +4656,30 @@ bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
     sockaddr_in servAddr;
     servAddr.sin_family = AF_INET;
     servAddr.sin_port = htons(nPort);
+
+
+	if(strIPAdress.IsEmpty())
+	{
+		 servAddr.sin_addr.s_addr = INADDR_ANY;
+	}
+	else
+	{
+		char temp_ip_address[100];
+		memset(temp_ip_address,0,100);
+		WideCharToMultiByte( CP_ACP, 0, strIPAdress.GetBuffer(), -1, temp_ip_address, 255, NULL, NULL );
+		servAddr.sin_addr.s_addr =  inet_addr(temp_ip_address);
+	}
+
+
+
+
+	//这个地方不加限制后，及时是多网卡广播也没有什么问题.
+#if 0
     if(local_enthernet_ip.IsEmpty())
         servAddr.sin_addr.s_addr = INADDR_ANY;
     else
         servAddr.sin_addr.s_addr =  inet_addr(local_network_ip);
-
+#endif
     USES_CONVERSION;
 
 
@@ -4648,7 +4697,8 @@ bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
 
     //servAddr.sin_addr.S_un.S_addr =inet_addr("192.168.0.28");
     //	servAddr.sin_addr.S_un.S_addr =inet_addr((LPSTR)(LPCTSTR)strIPAdress);
-    servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
+  //servAddr.sin_addr.S_un.S_addr = INADDR_ANY;// 
+	//	servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
     //	u_long ul=1;
     //	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
 
