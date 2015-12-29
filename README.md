@@ -27,6 +27,8 @@ maurice (at) temcocontrols (dot) com
 
 ![t3_series_800](https://github.com/temco-sophie/T3000_Building_Automation_System/blob/master/image/t3_series_800.jpg)
 
+![T3000_wiring_series_800](https://github.com/temco-sophie/T3000_Building_Automation_System/blob/master/image/T3000_wiring_series_800.jpg)
+
 
 Have a look at our website and products!!!     
 
