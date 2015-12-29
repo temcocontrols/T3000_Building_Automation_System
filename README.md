@@ -36,4 +36,4 @@ maurice (at) temcocontrols (dot) com
 
 Have a look at our website and products!!!     
 
-**[https://www.temcocontrols.com/products/controllers/t3000-bacnet-controller.htm](https://www.temcocontrols.com/products/controllers/t3000-bacnet-controller.htm)**
+[https://www.temcocontrols.com/products/controllers/t3000-bacnet-controller.htm](https://www.temcocontrols.com/products/controllers/t3000-bacnet-controller.htm)
