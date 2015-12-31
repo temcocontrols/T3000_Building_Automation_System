@@ -763,7 +763,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
                 pwrite_info->Changed_Name.Format(_T("%s,From %s to Manual"),m_tstat_input_data.at(lRow).InputName.StrValue,m_tstat_input_data.at(lRow).AM.StrValue);
                 pwrite_info->address=m_tstat_input_data.at(lRow).AM.regAddress;   
-                RegValue[lRow]=true;
+                RegValue[lRow-1]=true;
                 pwrite_info->new_value=(short)RegValue.to_ulong();
 
             } 
@@ -771,7 +771,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
             {
                 pwrite_info->Changed_Name.Format(_T("%s,From %s to Auto"),m_tstat_input_data.at(lRow).InputName.StrValue,m_tstat_input_data.at(lRow).AM.StrValue);
                 pwrite_info->address=m_tstat_input_data.at(lRow).AM.regAddress;
-                RegValue[lRow]=FALSE;
+                RegValue[lRow-1]=FALSE;
                 pwrite_info->new_value=(short)RegValue.to_ulong();
             }   
         }

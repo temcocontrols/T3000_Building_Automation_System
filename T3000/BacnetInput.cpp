@@ -738,7 +738,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		input_list_line = nItem;
 		if((m_Input_data.at(input_list_line).sub_id !=0) &&
-			(m_Input_data.at(input_list_line).sub_number !=0) &&
+			//(m_Input_data.at(input_list_line).sub_number !=0) &&
 			(m_Input_data.at(input_list_line).sub_product !=0))
 		{
 			unsigned char temp_pid = m_Input_data.at(input_list_line).sub_product;
@@ -757,7 +757,7 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 				CString temp_id;
 				CString temp_number;
 				temp_id.Format(_T(" Sub ID: %d        "),m_Input_data.at(input_list_line).sub_id);
-				temp_number.Format(_T("Input%d"),m_Input_data.at(input_list_line).sub_number);
+				temp_number.Format(_T("Input%d"),m_Input_data.at(input_list_line).sub_number + 1);
 				show_info = _T("Module:") + temp_name +_T("        ") + temp_id + temp_number;
 				m_input_item_info.SetWindowTextW(show_info);
 

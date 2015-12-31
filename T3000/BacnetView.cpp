@@ -1,6 +1,10 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2015 - 12 - 29
+Update by Fance
+1. 修复Input output 中关于 T3 扩展 无法正常显示的Bug.
+
 2015 - 12 - 21 
 Update by Fance
 1. 修复不同网卡下面 无法正常访问的问题.
@@ -3340,14 +3344,14 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				resend_count ++;
 				if(resend_count>RESEND_COUNT)
 					goto myend;
-				g_invoke_id = GetPrivateData(g_bac_instance,READUNIT_T3000,(BAC_READ_GROUP_NUMBER)*i,
+				g_invoke_id = GetPrivateData(g_bac_instance,READUNIT_T3000,(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,
 					3+(BAC_READ_GROUP_NUMBER)*i,sizeof(Str_Units_element));
 				Sleep(SEND_COMMAND_DELAY_TIME);	
 			} while (g_invoke_id<0);
 			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].command = READUNIT_T3000;
 			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].device_id = g_bac_instance;
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].start_instance = (BAC_READ_GROUP_NUMBER)*i;
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].end_instance =3+(BAC_READ_GROUP_NUMBER)*i;
+			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].start_instance = (BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i;
+			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].end_instance =BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER+(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i;
 			//Bacnet_Refresh_Info.Read_Monitor_Info[i].end_instance =2+(BAC_READ_GROUP_NUMBER)*i;
 			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].invoke_id = g_invoke_id;
 			CString temp_cs;

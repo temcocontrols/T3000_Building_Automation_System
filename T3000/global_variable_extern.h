@@ -1221,5 +1221,4 @@ extern	unsigned int old_tx_count;
 extern int flag_auto_scroll ; // 如果客户有指定显示X轴的某些事件 此 变量会为 1;否则显示最新数据;
 extern int graphic_last_scale_type ; //用于存储上次 有效的 X轴的 刻度;
 extern unsigned int graphic_last_time_value; //x轴上次查看的时间;
-extern const CString c_strBaudate[NUMBER_BAUDRATE];
 #pragma endregion For_bacnet

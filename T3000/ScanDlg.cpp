@@ -1056,7 +1056,7 @@ void CScanDlg::InitScanGrid()
 			m_flexGrid.put_ColAlignment(i,4);
 		}
 
-		m_flexGrid.put_ColWidth(0,1000);	//type
+		m_flexGrid.put_ColWidth(0,2000);	//type
 		m_flexGrid.put_ColWidth(1,0);		//building
 		m_flexGrid.put_ColWidth(2,0);		//floor
 		m_flexGrid.put_ColWidth(3,0);		//room
@@ -1091,7 +1091,7 @@ void CScanDlg::InitScanGrid()
 			m_flexGrid.put_ColAlignment(i,4);
 		}
 
-		m_flexGrid.put_ColWidth(0,1000);	//type
+		m_flexGrid.put_ColWidth(0,2000);	//type
 		m_flexGrid.put_ColWidth(1,800);		//building
 		m_flexGrid.put_ColWidth(2,800);		//floor
 		m_flexGrid.put_ColWidth(3,800);		//room

@@ -500,8 +500,10 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 		ApplicationFolder.ReleaseBuffer();
 		//image_fordor = ApplicationFolder + _T("\\Database\\image");
 		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-
-		image_fordor = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+		CString temp_now_building_name= g_strCurBuildingDatabasefilePath;
+		PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
+		temp_now_building_name.ReleaseBuffer();
+		image_fordor = temp_now_building_name  + _T("\\image");
 		
 		WIN32_FIND_DATA fd;
 		BOOL ret = FALSE;

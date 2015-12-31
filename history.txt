@@ -1,378 +1,3 @@
-Ver 2015.12.25
-1> Support   "9600", "19200", "38400","57600","115200"     
-
-
-Ver 2015.12.23
-1>Changed "Scan Function"
-     If one device has two type communications,just use the ethernet 
-     update the device information in the background.
-2>Something have finxed about BACnet.
-
-Ver 2015.12.18
-1>Changed HUMTEMPSENSOR to HUM ,Model number is 14.
-2>Freshing the data in the background,HUM,AQ,HUM_R
-3>Fixed the help system.
-4>Changed Alarm log .
-5>HUM,AQ,HUM_R can support the name discription.
-6>Updated T3Modules,for inputs,outputs
-7>ISPTool can detect the baudrate of device,automatically.
-8>Updated the UI of T3000. 
-Ver 2015.11.20
-1> Fixed the bug ,when minipanel is in the ispmodel and between its ip and pc's ip are in the different      
-subnet.
-   The isptool will show a message ,let user change the ip of minipanel. 
-Ver 2015.11.3
-1> Fixed the bug that when loading the config file of Tstat5F ,T3000 will crash
-2> Added The HUM units ,the register 453 for the hum's filter
-3> Supported T3-22AI 
-4> Supported T3-8AI8AO6DO
-5> Fixed the bug that can't flash ,The LCD display"WARNING E2_error"
-6> Added the dead master for T3 to the GUI
-7> Added the range "0-5V" "0-10V" for Tstat6
-8> Fixed the bug that Tstat's range show a message "Encountered an improper argument"
-9> Added the pwm table of the off model for tstat7
-10> Fixed the bug that PM5E can't communicate with T3000
-
-Ver 2015.10.14
-1> Building configuration is easier to use.
-2> Custom Table is changed  
-
-
-Ver 2015.8.18
-new features:
-1.Supported to change the name of device in the Product Tree (By Connection)
-2.For customer's device,if connecting to Minipanel ,T3000 will tell minipanel the device's information.
-3.The definition of Fan Mode Names can be supported for Tstat6
-4.When renaming a node of the tree view ,T3000 will write the name to the device,if the device can support 
-to define the name .
-
-
-some changes:
-1.#Modes/Speeds the items from "1,2,3" to "3,4,5"
-
-Ver 2015.8.3
-1> Added the feature:The name of Tstat6 can be changed in the tree view and Setting page .
-2> When Scanning ,The name of Tstat6 will be shown in the tree view.
-
-
-Ver 2015.7.30
-1> ISPTool can support "Arm"
-2> Fixed the bug when minimize the window ,can't restore the window.
-3> No Image information only show in the first 5 seconds.
-4> Trend logs if data interval larger than the value we sampling don't connect the two point.
-5>  Keyword changed
-	PID			CON ->   PID  *Change*
-	SCHEDULE		WR  ->   SCH  *Change*
-	HOLIDAY			AR  ->   HOL  *Change*
-	GROUP			GRP ->   GRP
-
-ver 2015.7.28
-1> Customer can define the name of Fan,including "Heat Only" "Cool Only"
-2> The names of output table are stored in the Tstat6
-
-ver 2015.7.27
-1> ISPTool:Ethernet update
-2> Fixed the bug:Changing the Building name ,T3000 can't show the correct message!
-
-ver 2015.7.16
-1> default picture can be replaced by another one .
-ver 2015.7.10
-1> new interface UI supported.
-2> new code merged together.
-3> "UNUSED" is replaced by "-"
-4> T3000 will go back to the last screen 
-5> while reading one device ,if there is a cache data ,use the data ,and then read the new data in the 
-backgrand .
-6> updated Sliders
-	1)Auto scale
-        2)The min and max values will get the rounding down instead of up.
-	3)in dual setpoint mode ,hide the "setpoint"
-	4)in single setpoint mode ,show the heating and cooling setpoints.
-	  user can't edit heat or cool in single setpoint mode . setpoint can be edited.
-	5)deadband will be get smaller and smaller or biger and biger by increaments.
-7> updated "Load firmware for many devices"
-	1)show the status of all devices :online or offline
-	2)show the version of the device and the firmware ,if the software version is the latest version 
-,don't update it again.
-	3)when selecting a hex or bin file ,click the button of "Apply",the file path will match with the 
-correct device .
-	4)when opening the dialog ,it wll initial the statuses of all devices ,including the "Is online" 
-"Software Version" "Firmware Version"
-	5)Checking the configuration file ,automatically.
-8> Deleted the Custom Table in the output table ,and then move it to the range.
-9> Changed the "Internal Sensor" to "Internal Temp Sensor" in the input table.
-10> Swap the cooling & heating setpoints .
-11> when a device is offline ,don't need to click ok ,just show a message ,click anywhere ,it will disappear.
-
-2015.7.9
-1>When click bacnet products , it connect faster than before .
-2>Graphic labels of the buidling don't need read all of them.The communication of this part is faster then 
-before.
-3>Change the status bar ,redraw the status.The status bar is more useful then before.
-4>Bacnet program IDE. Add operate '&' and "|"  feature. eg: 10  VAR1 = 17 & 14.Customer wants program 
-to controls the TSTAT register by bit.
-5>Auto update data in graphic view.Auto scroll.
-6>Fix the bug when sort the products , the status of the products is incorrect when sort by connection;
-7>Add more information in configuration user interface.Add "Network number" "MAC address" and so on.
-8>In bacnet list ,In item zero press key "UP" or key "DOWN",it will jump to the next panel(Premise the next 
-panel is online).
-9>Sort product view list by right click , and choose the menu .
-10>Icons changed, hotkey changed.
-11>Add feature BIP to MSTP . User can access the thermostat connect to the controller.
-12>All bacnet list , colume header set character left side. 
-
-
-
-ver 2015.7.7
-1>support 57600 for T3
-2>updated the default for AirQuality
-3>Fixed PID Tables (Auto/Off ,the register id is wrong )
-4>Monitor the register ID, and then show the graphic
-5>Fixed the building configuration
-6>Fixed the input and the output in the main page
-*************************************************************************************
-ver 2015.6.26
-1.Updated CO2's Range .1:40-20mA 2:0-5v 3:0-10v 
-2.Deleted Temco Logo.
-*************************************************************************************
-ver 2015.6.15
-1.Fixed the bug,Batch flash ,T3000 can't restore the result,correctly.
-
-*************************************************************************************
-ver 2015.6.12
-1.Added some features for "Batch flash firmares and configure files " ,in order to continue from the status 
-of last time.
-2.Added Data Fileds to flag which products are custom products,which ones are temco,in database
-3.Added Table to store the records from batch flash .
-4.Added Table to store the register information from custom devices.
-7.Updated the function of  Delete All Nodes,Only Delete the temco's products ,doesn't delete the custom 
-product.
-  If only the user select the custom product,T3000 can delete it .
-7.Updated the style of saving the building database path in T3000 database,using the relative path to 
-replace the full path.
-7.Updated HumChamber :generated the report from T3000
-8.Shift+D ,Shift+F:the two hot keys work
-9.Updated the input range of Tstat ,use '-' to replace 'UNUSED'
-10.Fixed the error of installation in windows 8 :"Unable to save file:C:\windows\Downloaded Instations\..." 
-11.Added the funcationality of supporting the customer's device that have modbus protocol in T3000,such 
-as "Power meter"
-   Any property datas that t3000 needed are inputed by user.
-
-*************************************************************************************
-
-*************************************************************************************
-ver 2015.5.29
-1. Bacnet IP gateway operations to MSTP added, still some work to be done. 
-2. Network discovery can find MSTP devices which are connected to the Mini Panel MSTP subnet. 
-3. Bacnet Input and Output add a user label for all the expansion I/O on the external T3 modules on the 
-subnet. 
-4. Connection to remote buildings, now user can properly configure the domain name for each building
-               works using dynamic IP updating such as dyndns.org and port forwarding at the remote building. 
-
-6. Batch Flash Humidity Sensors in tstat6 during calibration. 
-7. Add some read/write features for the various settings related to the baromettric sensor of the C02 
-sensor.    
-
-8. Add some read/write features for the the T3 expansion modules, more parameters & settings can be 
-edited. 
-
-
-*************************************************************************************
-ver 2015.5.25
-1. CO2 sensors have a barometric pressure sensor, added this sensor to the UI
-2. Changed T3 inputs and outputs, use a common grid similar for all products
-3. ISP Mode bug, if a device is in firmware update mode, while T3000 is starting, T300 can crash. Fixed. 
-4. Added Products Registers List Maintainance System, all registers are in a database. T3000 user,
-   with appropriate priveledges, can add/edit the register database and add new devices. 
-
-
-
-*************************************************************************************
-ver 2015.4.15
-1>> update the register list of tstat6
-2>> update the t3000 help
-3>> update the tstat5 LCD for loop1.
-
-*************************************************************************************
-ver 2015.4.10
-
-1>> Fix Monitor inputs can't show normally.
-2>> Change the point type of ScreenEdit window.
-3>> Screen window now can use left double click to full screen or cancel it.
-4>> Program full label disappear when write then last item's full label.
-5>> Fixed the bug that T3000 can't run ,due to the Chinese Access .
-6>> Fixed the bug that The cursor will circle,when clicking the devices ,many times.
-
-*************************************************************************************
-ver 2015.4.7
-1>>  Add the "10k Type2" and "10k Type3" for Tstat6 ,Tstat7 ,Tstat5I
-2>>  Add the button of factory reset in the T3 module .
-*************************************************************************************
-ver 2015.4.3
-1>>  Add the prompt in T3 ,when clicking the factory reset.
-*************************************************************************************
-ver 2015.4.2
-1>>  Fixed the label in screen window can't show normally in the first few seconds. 
-2>>  When add or edit label in screen window ,it will write data into minipanel right now.Before we write 
-into device when exit the window. 
-3>>  Fixed the  monitor input list crash when user change focus to other application. 
-4>>  Error handle with the label point . Before "VAR-3" "3--VAR" will make the t3000 crash.
-
-*************************************************************************************
-ver 2015.3.31
-1>>  Add the help document of Minipanel ,if the user don't know how to do ,just pressing "F1"
-2>>  Add the CS3000 to T3000 .
-3>>  Fixed the bug of isptool that isptool can't return ,when the device don't response
-4>>  Add the feature that can export the registers list of all devices from T3000 
-*************************************************************************************
-
-*************************************************************************************
-ver 2015.3.26
-1. Modify the building configuration user interface , user can add remote ip or domain.
-2. Add feature scan remote ip address.
-3. Add feature monitor analog and digital signal.
-4. Program code now it can bigger than 400 bytes.
-5. Add Dyndns feature , user can fill in username and password to management.
-6. Add time zone feature , for sync time.
-*************************************************************************************
-ver 2015.2.7
-1. Add feature remote point.
-2. Scan function changed , if user select Modubus 485 and COM1,it will only scan this port;
-3. Other changed,....
-*************************************************************************************
-ver 2014.12.24
-1.>support many buildings
-*************************************************************************************
-
-ver 2014.12.24
-1.>support many buildings
-*************************************************************************************
-ver 2014.11.28
-1. Add feature Graphic.Add point ,edit point ,delete point. Add Icon .
-2. Add feature User Login.bmp.
-3. Optimize the scan feature.
-*************************************************************************************
-ver 2014.11.11
-1>ISPTool start from T3000,it don't need to fill the parameters ,t3000 will fill them automatically. 
-2>T3000 will zigbee information in the skin of Tstat6
-*************************************************************************************
-ver 2014.10.17
-1>Fix the bug,when updating databse ,t3000 will crash 
-2>updated the AQ,HUM-R
-3>HumChamber Updated ,using testo
-*************************************************************************************
-ver 2014.10.11
-1>Fix the bug,when updating databse ,t3000 will crash 
-2>updated the AQ,HUM-R
-3>Pressure Sensor can be supported in t3000 and modbus poll.
-4>A new device can be added to T3000's DB by Temco Modbus Poll.
-*************************************************************************************
-Ver 2014.9.26,date Released:2014-9-26
-*************************************************************************************
-1>Fixed many buildings in T3000,if user select other buildings or subnets ,t3000 can't show the 
-information of the building or the subnet  
-2>Fixed some bugs ,T3000 crash.
-
-Ver 2014.9.10,date Released:2014-9-10
-*************************************************************************************
-1>Updated the CustomProductTable compatible with all the units that support the Modbus protocol  
-2>Added the funcationality of 'Read/Write Once'
-3>Updated the Sequency 
-4>The model no must show in the scan result.
-6>Tstat-runar can be supported.
-7>Fixed the part of graphic ,which can support tstat6,7,5i
-8>Fixed the automatical scan in background,if user change the node of the network,the net device can't 
-show correctly.
-
-*************************************************************************************
-Ver 2014.9.4,date Released:2014-9-4
-*************************************************************************************
-1>Added the CustomProductTable for customer's device in modbus poll.
-2>Updated the Isp firmware updating tool to better detect model nmuber in hex or bin 
-  and help users to select the proper firmware for a given device
-3>Updated Hum Series sensors.
-4>Added one colomn for the register address in modbus poll.That's to say,there are three
-  colomn "Register Name","Rgister Address","Register Value".
-5>Updated the monitor of the register value in isptool.users can monitor the registers' value  and write into 
- the text or Excel.
- 
-Ver 2014.6.19,date Released:2014-6-19
-*************************************************************************************
-1>Fix the ipport of tstat (when the tstat is connected to the minipanel,tstat can't show the same ipport with 
-minipanel)
-*************************************************************************************
-
-Ver 2014.6.18,date Released:2014-6-18
-*************************************************************************************
-1>when the net device is in the different subnet ,T3000 can change the ip of device
-2>A/M can be fit in the all inputs
-3>when t3000 can find the db engine ,t3000 will go to the temco's website to download. 
-*************************************************************************************
-
-Ver 2014.6.17,date Released:2014-6-17
-*************************************************************************************
-1.Control Basic Editor: When finshed editing and the users' program has been sent successfully, there is no 
-need to show the exit Y/N confirmation dialog. Just exit right out with the 'Esc' key. 
-2.Control Basic Editor: Update the error messages after each send of the program. 
-3.Device Discovery: Fixed misc bugs related to auto discovery of bacnet devices and changes in the IP 
-address. Sync the changes properly with the database. 
-4.Online status of the nodes and the lower connection status bar now synchronized better. 
-5.When user changes the bacnent "Auto/Manual" field the "value" column will refresh instantly, before it 
-was slow.
-6. Match number of inputs of the controller to the hardware model, ie if it has 16 inptus T3000 will show 
-only 16 inputs for the LB model, 32inputs for the LB model and so on. 
-7. Change the multi flash update interface, TBD : Auto flash and support pause and resume.
-8. Multi-flash update tool can now correctly handle 64k and 128k thermostats. 
-9. Add feature that user can access the remote bacnet device by internet at a remote IP address. 
-10. Add the bacnet interface to show the device software version , hardware version ,bootloader 
-version,and other information.
-*************************************************************************************
-
-Ver 2014.6.13,date Released:2014-6-13
-*************************************************************************************
-1>Fill the register name  from db,automatically
-2>when temco's device is  connected ,temco's mbpoll can connect to the
-device and to show  the register list in the temco's modbus poll
-3>When Scanning ,Tx and Rx can show the data
-4>delete "Deep Scan",now Click scan ,t3000 scan all the temco's devices
-*************************************************************************************
-
-Ver 2014.6.10,date Released:2014-6-10
-*************************************************************************************
-1 Modbus Poll can connect temco's device automatically,if user have been connected the device.
-2 Updated the config file about Tstat6 
-3 Fixed some bugs about VAV functions
-*************************************************************************************
-
-Ver 2014.6.6,date Released:2014-6-6
-*************************************************************************************
-1 Fixed VAV function(previous verion can't fit tstat6)
-2 Changed "Close" to "Closed" 
-3 All ranges have added "Open/close" "close/open" "on/off" "off/on"(value is the same ,show is different)
-4 Fixed some features about user experience in the temco modbus poll
-*************************************************************************************
-
-Ver 2014.2.5,date Released:2014-4-30
-*************************************************************************************
-1 Fixed the cooling db ,sp will show ,when cooling stages are more than 0.
-   the heating db,sp will be the same.
-*************************************************************************************
-Ver 2014.2.4,date Released:2014-4-26
-*************************************************************************************
-1 Fixed Output table on Tstat 5A, analog outputs
-2 Fixed in system programming routine in T3000 and isptool, handles hex files with lines more than 256 
-chars properly now.
-3 Fixed If NC or other Devices connect by com port and ethernet ,T3000 will find two the same device ,and 
-then let users select which one the user want to add to the database of T3000
-4 Fixed differ the states of connection and disconnection.
-
-Ver 2014.2.3,date Released:2014-4-4
-*************************************************************************************
-1>Fixed some bugs about LightingController(Input-mapping,group-mapping ,write address error) 
-2>Fixed Tstat's schedule(Occupied ,Unoccupied)
-3>Supported "Tstat 5i"
-4>Added "T3000 Help System"(from now ,users can press "F1",and then get help)
-
 Ver 2014.2.2,date Released:2014-3-21
 *************************************************************************************
 1>Fixed In Main Page,The day Slider and the night Slide ,they are easy to use.
@@ -395,8 +20,7 @@ Ver 2014.1.4,date Released:
 1>Combined LED Table and 'Display Name' into one button called "Dsiplay". 
 2>Fixed some errors in the configuration of Tstat5E LCD display 
 3>Added Co2 alarming system ,added master CO2 sensor and a subnet of CO2 sensor nodes  
-4>Added T3-PT10 to the user interface ,allows configuaring of calibration ,filter and other parameters of 
-the T3-Pt10
+4>Added T3-PT10 to the user interface ,allows configuaring of calibration ,filter and other parameters of the T3-Pt10
 
 Ver 2014.1.3,date Released:2014-2-17
 *************************************************************************************
@@ -486,7 +110,7 @@ Ver 2013.20,date released:2013-9-22
 1>to show NC's MAC Address
 2>Change ISPTool some tips
 "Hex file matches the chip. "
-"Hex file doesn’t match the chip. "
+"Hex file doesn¡¯t match the chip. "
 "Begin Time" -> Change to "Start time"
 *************************************************************************************
 
@@ -513,12 +137,10 @@ Ver 2013.17,date released:2013-8-30
 2>Update T3-Module (T3-32AI,T3-8I13O) 
 3>Support T3 serials products.
 For Bacnet:
-1.Add programming context,when user use bacnet to program code,if codes contains error,it will prompt 
-the user which line occurs error.
+1.Add programming context,when user use bacnet to program code,if codes contains error,it will prompt the user which line occurs error.
 2.Add static text to show how many free memory the program has,and how many it has used.
 3.Add range choose dialog.
-4.Add "load descriptors" function like old T3000 do.(Read all date program needed,like "Programs" "Inputs" 
-"Outputs" and so on)
+4.Add "load descriptors" function like old T3000 do.(Read all date program needed,like "Programs" "Inputs" "Outputs" and so on)
 5.Add wait show dialog,to show the "load descriptors" progress step! 
 *************************************************************************************
 
@@ -624,12 +246,9 @@ Ver2.6.0.1,date released:  2013-5-6
 Ver2.6.0.0,date released:  2013/4/19
 *************************************************************************************
 <1>fix a bug which the boud rate changed to 9600 accidentally.
-<2>Add T3000RegAddress. Changed the architecture of the register table.Create two register table in 
-t3000.mdb which include all TSTAT product register list.The T3000.exe will load this value by runtime, 
-instead of compiling.
+<2>Add T3000RegAddress. Changed the architecture of the register table.Create two register table in t3000.mdb which include all TSTAT product register list.The T3000.exe will load this value by runtime, instead of compiling.
 <3>Modify sevral error in ParameterDlg ,the changed can also support tstat6 and tstat7
-<4>Make the program run more smoothly when user click refresh in OutPutDlg and  InputSetDlg ,it will no 
-longer appear noresponse.
+<4>Make the program run more smoothly when user click refresh in OutPutDlg and  InputSetDlg ,it will no longer appear noresponse.
 <5>Change InputTable set dialog .It can change the Input name and then save to DB.
 <6>Add HumChamber dialog.
 <7>Merge function  "Refresh" and "Refresh6" in ParameterDlg.
@@ -668,7 +287,7 @@ ver2.5.0.106, date released: 2013/1/18
 <4>Add the "Freeze Function" in the Advanced Setup
 <5>remove the column of Rotation in output table.
 <6>Fix "Save as.." the register list of The Tstat5E and 5C
-<7>“Database”, the Exit botton and Delete botton 
+<7>¡°Database¡±, the Exit botton and Delete botton 
 <8>Fix the out table 
 <9>Change "NC Config"->"Apply" botton.
 <10> Change the setting of "Fan Model" 
@@ -681,8 +300,8 @@ ver2.5.0.104, date released: 2013/1/5
 *************************************************************************************
 <1>Fix the error that input1 can input value, in the Advanced Model line "Input value" 
 <2>Add the reminder of PID2 Off Setpoint "Input value" 
-   if >=100 “out of range” ,if can’t fail to write to the 275 register ,
-   ”please try again.”If write sucessfully,”Write ok”
+   if >=100 ¡°out of range¡± ,if can¡¯t fail to write to the 275 register ,
+   ¡±please try again.¡±If write sucessfully,¡±Write ok¡±
 <3>Keep the steps both Heating Set Point and the set Bars in the first page.
  
 *************************************************************************************
@@ -768,7 +387,7 @@ ver2.5.0.93, date released:2012-10-15
 
 ver2.5.0.92, date released:2012-10-8
 *************************************************************************************
-(1)fixed "value for “PID2 off set point” shows wrong and not auto updated"for TSTAT5G
+(1)fixed "value for ¡°PID2 off set point¡± shows wrong and not auto updated"for TSTAT5G
 (2)fixed Output Table-Out6 and Out7 
 *************************************************************************************
 
@@ -794,7 +413,7 @@ ver2.5.0.89, date released:2012-9-14
 *************************************************************************************
 Update TSTAT5G
 Update item:
-(1)Input value” for Loop2.
+(1)Input value¡± for Loop2.
 (2)fixed deadband and night setpoint.
 *************************************************************************************
 

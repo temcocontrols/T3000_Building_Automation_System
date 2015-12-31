@@ -1,23 +1,45 @@
-
+# Next For T3000 ignore
 /T3000 Output
-/T3000/UpgradeLog.XML
-/T3000/UpgradeLog2.XML
-/T3000/ipch
-/ISP/Debug
-/ISP/ipch
-/RegisterMonitor/ipch
-/RegisterMonitor/ipch
-/RegisterMonitor/ipch
-/T3000/res/Thumbs.db
-/ISP/_UpgradeReport_Files
-/Modbus Poll/Release
-/Modbus Poll/Debug
-/Modbus Poll/ChartCtrl/.svn
-/T3000Update/Debug
-/T3000Update/Debug
-/tst/unit_test/Debug
+/*/Debug
+*.db
+/*/Release
+/*/Debug
+/*/.svn
 *.sdf
-/Modbus Poll/Release
 *.opensdf
-/ipch
-/ipch/t3000-bb8c8716
+*/ipch
+
+*.Opt
+*.__i
+*.obj
+*.lnp
+*.did
+*.csdsig
+~*
+*.lsp
+SpecctraWithinLayout.*
+*.SBR
+*.s51
+*.r51
+*.bom
+*.MAP
+*.build_log.htm
+*.uvopt
+*._ia
+*.plg
+*.jrl
+*.dbk
+*.tmp
+*.bak
+*.ls1
+*.lis
+*.SRC
+*.log
+*.DSNlck
+*.M51
+*.lock
+*.SYM
+*.err
+*.OLBlck
+*.MNL
+*.MAX
