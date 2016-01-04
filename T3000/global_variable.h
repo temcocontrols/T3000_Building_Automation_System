@@ -2148,5 +2148,12 @@ unsigned int old_tx_count = 0;
 int flag_auto_scroll = 0; // 如果客户有指定显示X轴的某些事件 此 变量会为 1;否则显示最新数据;
 int graphic_last_scale_type = 0 ; //用于存储上次 有效的 X轴的 刻度;
 unsigned int graphic_last_time_value =0 ; //x轴上次查看的时间; 
-
+const CString c_strBaudate[NUMBER_BAUDRATE] =
+{
+    L"9600",
+    L"19200",
+    L"38400",
+    L"57600",
+    L"115200"
+};
 #pragma endregion For_bacnet

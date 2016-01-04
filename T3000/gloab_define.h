@@ -1171,8 +1171,8 @@ const CString Building_Baudrate[] =
 	_T("9600"),
 	_T("19200"),
     _T("38400"),
-    _T("56000"),
-    _T("57600")
+    _T("57600"),
+    _T("115200")
 };
 
 #define  DEFAULT_PRG_TEXT_COLOR			RGB(0,0,255)
@@ -1392,3 +1392,4 @@ const int DEBUG_SHOW_ALL = 1;
 const int DEBUG_SHOW_SCAN_ONLY = 2;
 const int DEBUG_SHOW_MONITOR_DATA_ONLY = 3;
 const int DEBUG_SHOW_PROGRAM_DATA_ONLY = 4;
+#define NUMBER_BAUDRATE 5

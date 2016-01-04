@@ -13,7 +13,7 @@ OUTPUT bool open_com(int m_com);
 OUTPUT void close_com();
 OUTPUT bool is_connect();
 OUTPUT int CheckTstatOnline(TS_UC devLo=1,TS_UC devHi=254);
-OUTPUT bool Change_BaudRate(TS_US new_baudrate);
+OUTPUT bool Change_BaudRate(int new_baudrate);
 OUTPUT bool SetComm_Timeouts(LPCOMMTIMEOUTS lpCommTimeouts);
 OUTPUT int CheckTstatOnline2(TS_UC devLo,TS_UC devHi);
 

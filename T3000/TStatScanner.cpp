@@ -6,6 +6,7 @@
 #include "ScanDbWaitDlg.h"
 #include "hangeIDDlg.h"
 #include "MainFrm.h"
+#include "define.h"
 #include "bip.h"
  #include "rs485.h" // For call Get_RS485_Handle() function
 #include "WhichOneToChooseDlg.h"
@@ -1468,70 +1469,70 @@ UINT _ScanTstatThread2(LPVOID pParam)
 			break;
 		}
 		CString strComPort = pScan->m_szComs[i];
-		TRACE(_T("Scanning @ ") + strComPort + _T("\n"));
-		if(!USB_Serial.IsEmpty())
-		{
-		  //  SetPaneString(1,_T("USB Serial"));
-			if(USB_Serial.CompareNoCase(strComPort) == 0 )
-			{
-				CString strlog=_T("Scanning SUB Serial @")+strComPort+_T(" ")+Get_NowTime()+_T("\n");
-			    //write_T3000_log_file(strlog);
+		//TRACE(_T("Scanning @ ") + strComPort + _T("\n"));
+		//if(!USB_Serial.IsEmpty())
+		//{
+		//  //  SetPaneString(1,_T("USB Serial"));
+		//	if(USB_Serial.CompareNoCase(strComPort) == 0 )
+		//	{
+		//		CString strlog=_T("Scanning SUB Serial @")+strComPort+_T(" ")+Get_NowTime()+_T("\n");
+		//	    //write_T3000_log_file(strlog);
 
-				CString tc = strComPort.Mid(3);
+		//		CString tc = strComPort.Mid(3);
 
-				int n = _wtoi(tc);
-				// 		char c[2];
-				// 		_itoa_s(n, c, 10);
-				// 		c[0] = '7';
+		//		int n = _wtoi(tc);
+		//		// 		char c[2];
+		//		// 		_itoa_s(n, c, 10);
+		//		// 		c[0] = '7';
 
-				if(pScan->OpenCom(n))
-				{
-					pScan->SetComPort(n);
-					pScan->SetBaudRate(_T("38400"));
-					 
-					bool bRet = Change_BaudRate(pScan->m_nBaudrate);
-                    if (!bRet)
-                    {
-                        continue;
-                    }
-					strlog.Empty();
-					strlog.Format(_T("Change BaudRate:%d"),pScan->m_nBaudrate);
-					 //write_T3000_log_file(strlog);
-					ASSERT(bRet);
-					g_strScanInfoPrompt.Format(_T("COM%d"), n);
-					strlog.Empty();
-					strlog.Format(_T("Success to Open the COM%d"),n);
-					////write_T3000_log_file(strlog); 
-                    scan_item = -1;
-                    for (int j=0;j<m_scan_info.size();j++)
-                    {
-                        if((n == m_scan_info.at(j).scan_com_port) && (19200 ==  m_scan_info.at(j).scan_baudrate))
-                        {
-                            scan_item = j;
-                            break;
-                        }
-                    }
-					pScan->background_binarysearch(n);	//lsc comscan new cold
-					close_com();
-					strlog=_T("Close com port");
-					//write_T3000_log_file(strlog);
-					Sleep(500);
-					TRACE(_T("Success open the COM%d\n"), n);
+		//		if(pScan->OpenCom(n))
+		//		{
+		//			pScan->SetComPort(n);
+		//			pScan->SetBaudRate(_T("38400"));
+		//			 
+		//			bool bRet = Change_BaudRate(pScan->m_nBaudrate);
+  //                  if (!bRet)
+  //                  {
+  //                      continue;
+  //                  }
+		//			strlog.Empty();
+		//			strlog.Format(_T("Change BaudRate:%d"),pScan->m_nBaudrate);
+		//			 //write_T3000_log_file(strlog);
+		//			ASSERT(bRet);
+		//			g_strScanInfoPrompt.Format(_T("COM%d"), n);
+		//			strlog.Empty();
+		//			strlog.Format(_T("Success to Open the COM%d"),n);
+		//			////write_T3000_log_file(strlog); 
+  //                  scan_item = -1;
+  //                  for (int j=0;j<m_scan_info.size();j++)
+  //                  {
+  //                      if((n == m_scan_info.at(j).scan_com_port) && (19200 ==  m_scan_info.at(j).scan_baudrate))
+  //                      {
+  //                          scan_item = j;
+  //                          break;
+  //                      }
+  //                  }
+		//			pScan->background_binarysearch(n);	//lsc comscan new cold
+		//			close_com();
+		//			strlog=_T("Close com port");
+		//			//write_T3000_log_file(strlog);
+		//			Sleep(500);
+		//			TRACE(_T("Success open the COM%d\n"), n);
 
-				}
-				else
-				{
-					// 不能打开串口X，提示信息
-					TRACE(_T("Cannot open the COM%d\n"), n);
-					CString str;
-					str.Format(_T("Cannot open the COM%d\n"), n);
-					//WriteLogFile(str);
-					//SetPaneString(2, str);
-					//int n =0 ;
-				}
-				continue;
-			}
-		}
+		//		}
+		//		else
+		//		{
+		//			// 不能打开串口X，提示信息
+		//			TRACE(_T("Cannot open the COM%d\n"), n);
+		//			CString str;
+		//			str.Format(_T("Cannot open the COM%d\n"), n);
+		//			//WriteLogFile(str);
+		//			//SetPaneString(2, str);
+		//			//int n =0 ;
+		//		}
+		//		continue;
+		//	}
+		//}
 		
 
 		CString tc = strComPort.Mid(3);
@@ -1539,118 +1540,123 @@ UINT _ScanTstatThread2(LPVOID pParam)
 		int n = _wtoi(tc);
 
 		
-		scan_item = -1;
+		
 		for (int j=0;j<m_scan_info.size();j++)
 		{
-			if((n == m_scan_info.at(j).scan_com_port) && (19200 ==  m_scan_info.at(j).scan_baudrate))
-			{
+             scan_item = -1;
+			if(n == m_scan_info.at(j).scan_com_port)
+			{     //&& (19200 ==  m_scan_info.at(j).scan_baudrate)
 				scan_item = j;
-				break;
+				//break;
 			}
+
+            if(scan_item != -1)
+            {
+                if(!m_scan_info.at(scan_item).scan_skip)
+                {
+                    if(pScan->OpenCom(n))
+                    {
+
+
+                        pScan->SetComPort(n);
+                        bool bRet = Change_BaudRate(m_scan_info.at(j).scan_baudrate);
+                        CString strBraudrate;
+                        strBraudrate.Format (_T("%d"),m_scan_info.at(j).scan_baudrate);
+                        pScan->SetBaudRate(strBraudrate);
+                        scan_baudrate = m_scan_info.at(j).scan_baudrate;
+
+                        ASSERT(bRet);
+
+
+                        m_scan_info.at(scan_item).scan_status = SCAN_STATUS_RUNNING;
+                        pScan->background_binarysearch(n);	//lsc comscan new cold
+                        close_com();
+                        m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FINISHED;
+                        memcpy(m_scan_info.at(scan_item).scan_notes,"Scan finished",strlen("Scan finished"));
+                        memset(m_scan_info.at(scan_item).scan_notes,0,250);
+                        memcpy(m_scan_info.at(scan_item).scan_notes,"Scan finished",strlen("Scan finished"));
+                        Sleep(500);
+                        TRACE(_T("Success open the COM%d\n"), n);
+
+                    }
+                    else
+                    {
+                        m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FAILED;
+                        memset(m_scan_info.at(scan_item).scan_notes,0,250);
+                        memcpy(m_scan_info.at(scan_item).scan_notes,"Cannot open the COM Port",strlen("Cannot open the COM Port"));
+                        // 不能打开串口X，提示信息
+                        TRACE(_T("Cannot open the COM%d\n"), n);
+                        CString str;
+                        str.Format(_T("Cannot open the COM%d\n"), n);
+
+                    }
+                }
+            }
 		}
 
-		if(scan_item != -1)
-		{
-			if(!m_scan_info.at(scan_item).scan_skip)
-			{
-				if(pScan->OpenCom(n))
-				{
-
-
-					pScan->SetComPort(n);
-					bool bRet = Change_BaudRate(19200);
-					pScan->SetBaudRate(_T("19200"));
-					scan_baudrate = 19200;
-
-					ASSERT(bRet);
-
-
-					m_scan_info.at(scan_item).scan_status = SCAN_STATUS_RUNNING;
-					pScan->background_binarysearch(n);	//lsc comscan new cold
-					close_com();
-					m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FINISHED;
-					memcpy(m_scan_info.at(scan_item).scan_notes,"Scan finished",strlen("Scan finished"));
-					memset(m_scan_info.at(scan_item).scan_notes,0,250);
-					memcpy(m_scan_info.at(scan_item).scan_notes,"Scan finished",strlen("Scan finished"));
-					Sleep(500);
-					TRACE(_T("Success open the COM%d\n"), n);
-
-				}
-				else
-				{
-					m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FAILED;
-					memset(m_scan_info.at(scan_item).scan_notes,0,250);
-					memcpy(m_scan_info.at(scan_item).scan_notes,"Cannot open the COM Port",strlen("Cannot open the COM Port"));
-					// 不能打开串口X，提示信息
-					TRACE(_T("Cannot open the COM%d\n"), n);
-					CString str;
-					str.Format(_T("Cannot open the COM%d\n"), n);
-
-				}
-			}
-		}
 		
+		   close_com();
 
-		scan_item = -1;
-		for (int k=0;k<m_scan_info.size();k++)
-		{
-			if((n == m_scan_info.at(k).scan_com_port) && (9600 ==  m_scan_info.at(k).scan_baudrate))
-			{
-				scan_item = k;
-				break;
-			}
-		}
+		//scan_item = -1;
+		//for (int k=0;k<m_scan_info.size();k++)
+		//{
+		//	if((n == m_scan_info.at(k).scan_com_port) && (9600 ==  m_scan_info.at(k).scan_baudrate))
+		//	{
+		//		scan_item = k;
+		//		break;
+		//	}
+		//}
 
-		if(scan_item != -1)
-		{
-			if(!m_scan_info.at(scan_item).scan_skip)
-			{
-				if(pScan->OpenCom(n))
-				{
-					pScan->SetComPort(n);
-					pScan->SetBaudRate(_T("9600"));
-					bool bRet = Change_BaudRate(9600);
+		//if(scan_item != -1)
+		//{
+		//	if(!m_scan_info.at(scan_item).scan_skip)
+		//	{
+		//		if(pScan->OpenCom(n))
+		//		{
+		//			pScan->SetComPort(n);
+		//			pScan->SetBaudRate(_T("9600"));
+		//			bool bRet = Change_BaudRate(9600);
 
-					ASSERT(bRet);
-					g_strScanInfoPrompt.Format(_T("COM%d"), n);
-					//It's unnecessary to check one device. annulled by Fance. 
-					//We encountered such a situation that ,some device scan commond is not works well,if it only exsit on the modbus.
-					//it can be scan,but if other device also on modbus line , it will can't scan.
-					//So ,in order to check device works well, delete this code can help developer test our product.
-					//	BOOL bReadone = pScan->ReadOneCheckOnline(n);
-					//	if (!bReadone)//comscan oldcode
-					//{
-					//	pScan->background_binarysearch(n);				
-					//}		
+		//			ASSERT(bRet);
+		//			g_strScanInfoPrompt.Format(_T("COM%d"), n);
+		//			//It's unnecessary to check one device. annulled by Fance. 
+		//			//We encountered such a situation that ,some device scan commond is not works well,if it only exsit on the modbus.
+		//			//it can be scan,but if other device also on modbus line , it will can't scan.
+		//			//So ,in order to check device works well, delete this code can help developer test our product.
+		//			//	BOOL bReadone = pScan->ReadOneCheckOnline(n);
+		//			//	if (!bReadone)//comscan oldcode
+		//			//{
+		//			//	pScan->background_binarysearch(n);				
+		//			//}		
 
-					m_scan_info.at(scan_item).scan_status = SCAN_STATUS_RUNNING;
-					pScan->background_binarysearch(n);	//lsc comscan new cold
-					close_com();
-					m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FINISHED;
-					memset(m_scan_info.at(scan_item).scan_notes,0,250);
-					memcpy(m_scan_info.at(scan_item).scan_notes,"Scan finished",strlen("Scan finished"));
-					Sleep(500);
-					TRACE(_T("Success open the COM%d\n"), n);
+		//			m_scan_info.at(scan_item).scan_status = SCAN_STATUS_RUNNING;
+		//			pScan->background_binarysearch(n);	//lsc comscan new cold
+		//			close_com();
+		//			m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FINISHED;
+		//			memset(m_scan_info.at(scan_item).scan_notes,0,250);
+		//			memcpy(m_scan_info.at(scan_item).scan_notes,"Scan finished",strlen("Scan finished"));
+		//			Sleep(500);
+		//			TRACE(_T("Success open the COM%d\n"), n);
 
-				}
-				else
-				{
-					m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FAILED;
-					memset(m_scan_info.at(scan_item).scan_notes,0,250);
-					memcpy(m_scan_info.at(scan_item).scan_notes,"Cannot open the COM Port",strlen("Cannot open the COM Port"));
-					// 不能打开串口X，提示信息
-					TRACE(_T("Cannot open the COM%d\n"), n);
-					CString str;
-					str.Format(_T("Cannot open the COM%d\n"), n);
-					// 			WriteLogFile(str);
-					//SetPaneString(2, str);
-					int n =0 ;
-				}
-			}
-		}
+		//		}
+		//		else
+		//		{
+		//			m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FAILED;
+		//			memset(m_scan_info.at(scan_item).scan_notes,0,250);
+		//			memcpy(m_scan_info.at(scan_item).scan_notes,"Cannot open the COM Port",strlen("Cannot open the COM Port"));
+		//			// 不能打开串口X，提示信息
+		//			TRACE(_T("Cannot open the COM%d\n"), n);
+		//			CString str;
+		//			str.Format(_T("Cannot open the COM%d\n"), n);
+		//			// 			WriteLogFile(str);
+		//			//SetPaneString(2, str);
+		//			int n =0 ;
+		//		}
+		//	}
+		//}
 		
 		
-        scan_item = 1;
+   //     scan_item = 1;
     /*    for (int k=0;k<m_scan_info.size();k++)
         {
             if((n == m_scan_info.at(k).scan_com_port) && (57600 ==  m_scan_info.at(k).scan_baudrate))
@@ -1659,54 +1665,54 @@ UINT _ScanTstatThread2(LPVOID pParam)
                 break;
             }
         }*/
-         scan_item = -1;
-        if(scan_item != -1)
-        {
-           // if(!m_scan_info.at(scan_item).scan_skip)
-           // {
-                if(pScan->OpenCom(n))
-                {
-                    pScan->SetComPort(n);
-                    pScan->SetBaudRate(_T("57600"));
-                    bool bRet = Change_BaudRate(57600);
-
-                    ASSERT(bRet);
-                    g_strScanInfoPrompt.Format(_T("COM%d"), n);
-                    //It's unnecessary to check one device. annulled by Fance. 
-                    //We encountered such a situation that ,some device scan commond is not works well,if it only exsit on the modbus.
-                    //it can be scan,but if other device also on modbus line , it will can't scan.
-                    //So ,in order to check device works well, delete this code can help developer test our product.
-                    //	BOOL bReadone = pScan->ReadOneCheckOnline(n);
-                    //	if (!bReadone)//comscan oldcode
-                    //{
-                    //	pScan->background_binarysearch(n);				
-                    //}		
-
-                    m_scan_info.at(scan_item).scan_status = SCAN_STATUS_RUNNING;
-                    pScan->background_binarysearch(n);	//lsc comscan new cold
-                    close_com();
-                    m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FINISHED;
-                    memset(m_scan_info.at(scan_item).scan_notes,0,250);
-                    memcpy(m_scan_info.at(scan_item).scan_notes,"Scan finished",strlen("Scan finished"));
-                    Sleep(500);
-                    TRACE(_T("Success open the COM%d\n"), n);
-
-                }
-                else
-                {
-                    m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FAILED;
-                    memset(m_scan_info.at(scan_item).scan_notes,0,250);
-                    memcpy(m_scan_info.at(scan_item).scan_notes,"Cannot open the COM Port",strlen("Cannot open the COM Port"));
-                    // 不能打开串口X，提示信息
-                    TRACE(_T("Cannot open the COM%d\n"), n);
-                    CString str;
-                    str.Format(_T("Cannot open the COM%d\n"), n);
-                    // 			WriteLogFile(str);
-                    //SetPaneString(2, str);
-                    int n =0 ;
-                }
-            //}
-        }
+//          scan_item = -1;
+//         if(scan_item != -1)
+//         {
+//            // if(!m_scan_info.at(scan_item).scan_skip)
+//            // {
+//                 if(pScan->OpenCom(n))
+//                 {
+//                     pScan->SetComPort(n);
+//                     pScan->SetBaudRate(_T("57600"));
+//                     bool bRet = Change_BaudRate(57600);
+// 
+//                     ASSERT(bRet);
+//                     g_strScanInfoPrompt.Format(_T("COM%d"), n);
+//                     //It's unnecessary to check one device. annulled by Fance. 
+//                     //We encountered such a situation that ,some device scan commond is not works well,if it only exsit on the modbus.
+//                     //it can be scan,but if other device also on modbus line , it will can't scan.
+//                     //So ,in order to check device works well, delete this code can help developer test our product.
+//                     //	BOOL bReadone = pScan->ReadOneCheckOnline(n);
+//                     //	if (!bReadone)//comscan oldcode
+//                     //{
+//                     //	pScan->background_binarysearch(n);				
+//                     //}		
+// 
+//                     m_scan_info.at(scan_item).scan_status = SCAN_STATUS_RUNNING;
+//                     pScan->background_binarysearch(n);	//lsc comscan new cold
+//                     close_com();
+//                     m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FINISHED;
+//                     memset(m_scan_info.at(scan_item).scan_notes,0,250);
+//                     memcpy(m_scan_info.at(scan_item).scan_notes,"Scan finished",strlen("Scan finished"));
+//                     Sleep(500);
+//                     TRACE(_T("Success open the COM%d\n"), n);
+// 
+//                 }
+//                 else
+//                 {
+//                     m_scan_info.at(scan_item).scan_status = SCAN_STATUS_FAILED;
+//                     memset(m_scan_info.at(scan_item).scan_notes,0,250);
+//                     memcpy(m_scan_info.at(scan_item).scan_notes,"Cannot open the COM Port",strlen("Cannot open the COM Port"));
+//                     // 不能打开串口X，提示信息
+//                     TRACE(_T("Cannot open the COM%d\n"), n);
+//                     CString str;
+//                     str.Format(_T("Cannot open the COM%d\n"), n);
+//                     // 			WriteLogFile(str);
+//                     //SetPaneString(2, str);
+//                     int n =0 ;
+//                 }
+//             //}
+//         }
 
 
 	}
@@ -1772,9 +1778,9 @@ void CTStatScanner::SendScanEndMsg()
 		
 		CompareNetToComConflict();
 
-
+        AddNewTStatToDB();
 		AddNewNetToDB();
-		AddNewTStatToDB();
+		
 
 
 		
@@ -1815,42 +1821,14 @@ void CTStatScanner::SendScanEndMsg()
 
 
 			m_pParent->PostMessage(WM_ADDTREENODE);
+           
 			SetCommunicationType(1);
 			close_com();
 			SetCommunicationType(0);
 			close_com();
   		
 		}
-// 	else
-// 	{
-// 		
-// 		try
-// 		{
-// 
-// 			CScanDlg dlg;
-// 			dlg.SetScanner(this);
-// 			//dlg.AddComDeviceToGrid(m_szTsatScandRet);
-// 			dlg.DoModal();
-// 			if(IsWindow(dlg.m_hWnd))
-// 			{
-// 				WaitForSingleObject(dlg.m_hWnd, 200);  // 为了线程安全。
-// 			}
-// 
-// 		}
-// 		catch (...)
-// 		{
-// 
-// 		}
-// 		
-// 	}
-   // below is nc scan handle
-	// 找到nc与数据库的冲突
-//	else
-	//{
-// 		FindNetConflict();
-// 		ResolveNetConflict();
-// 		AddNewNetToDB();
-	/*}*/
+ 
 
 
 	
@@ -2433,37 +2411,24 @@ void CTStatScanner::AddNewTStatToDB()
 	{
 		bIsNew = TRUE;
 		int nSID = m_szTstatScandRet[i]->m_pDev->GetSerialID();
-// 		m_szTstatScandRet[i]->m_pDev->SetBuildingName(m_strBuildingName);
-// 		m_szTstatScandRet[i]->m_pDev->SetSubnetName(m_strSubNet);
-// 		m_szTstatScandRet[i]->m_pDev->SetFloorName(m_strFloorName);
-// 		m_szTstatScandRet[i]->m_pDev->SetRoomName(m_strRoomName);
-		for (UINT j = 0; j < m_szComNodes.size(); j++)
-		{
-			int nNodeSID = m_szComNodes[j]->GetSerialID();
-			if (nSID == nNodeSID)
-			{
-				bIsNew = FALSE;
-				break;
-			}
-		}
+        //删掉 存在的序列号
+        try
+        {
 
-		//if((m_szTstatScandRet[i]->m_pDev->GetProductType() == 50) || (m_szTstatScandRet[i]->m_pDev->GetProductType() == 35))
-		//{
-		//	for (UINT j = 0; j < m_szNetNodes.size(); j++)
-		//	{
-		//		int nNodeSID = m_szNetNodes[j]->GetSerialID();
-		//		if (nSID == nNodeSID)
-		//		{
-		//			bIsNew = FALSE;
-		//			break;
-		//		}
-		//	}
+            CString strSql;
+        
+            strSql.Format(_T("Delete * From  ALL_NODE Where Serial_ID = '%d' "),nSID);
+            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+        }
+        catch (...)
+        {
 
-		//}
-		if (bIsNew == TRUE)
-		{
+        }
+
+ 
+            
 			WriteOneDevInfoToDB(m_szTstatScandRet[i]);
-		}
+ 
 	}
 }
 
@@ -2490,78 +2455,76 @@ void CTStatScanner::AddNewNetToDB()
 		if(!IsNetDevice(temp_cs))
 			continue;
 
-		for (UINT j = 0; j < m_szNetNodes.size(); j++)
-		{
-			unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
-			//Comment by Fance
-			//if the scan device is CM5 or minipanel, this products has 3 protocol, BacnetIP modbus485 modbus tcp;
-			//So when scan bacnet ip and midbus tcp ,the or replay to t3000,
-			//So I display the device in two format,judge to 2 decvice;
-			if((pInfo->m_pNet->GetProductType() == PM_CM5) || (pInfo->m_pNet->GetProductType() == PM_MINIPANEL))
-			{
-				unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
-				int nNodeProtocol = m_szNetNodes[j]->GetProtocol();
-				if (nSID == nNodeSID)
-				{
-					if(nSProtocol == nNodeProtocol)
-					{
-						bIsNew = FALSE;
-						break;
-					}
-					else
-					{
-						CString strSql;
-						CString strText;
-						strText.Format(_T("%u"),nNodeSID);
-						strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"),strText);
-						CString strTemp;
-						strTemp.Format(_T("Are you sure to delete thise item"));
-						//if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
-						//{
-							try
-							{
-								bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
-							}
-							catch(_com_error *e)
-							{
-								AfxMessageBox(e->ErrorMessage());
-							}
-						//}
-							bIsNew = TRUE;
-							break;
-					}
-				}
-			}
-			else
-			{
-				if (nSID == nNodeSID)
-				{
-					bIsNew = FALSE;
-					break;
-				}
-			}
-		}
-#if 0
-		if((pInfo->m_pNet->GetProductType() == 50) || (pInfo->m_pNet->GetProductType() == 35))
-		{
-			for (UINT j = 0; j < m_szComNodes.size(); j++)
-			{
-				int nNodeSID = m_szComNodes[j]->GetSerialID();
-				int nNodeProtocol = m_szComNodes[j]->GetProtocol();
-				if ((nSID == nNodeSID)&&(nSProtocol = nNodeProtocol))
-				{
-					bIsNew = FALSE;
-					break;
-				}
-			}
+//         for (UINT j = 0; j < m_szNetNodes.size(); j++)
+//         {
+//             unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
+//             //Comment by Fance
+//             //if the scan device is CM5 or minipanel, this products has 3 protocol, BacnetIP modbus485 modbus tcp;
+//             //So when scan bacnet ip and midbus tcp ,the or replay to t3000,
+//             //So I display the device in two format,judge to 2 decvice;
+//             if((pInfo->m_pNet->GetProductType() == PM_CM5) || (pInfo->m_pNet->GetProductType() == PM_MINIPANEL))
+//             {
+//                 unsigned int nNodeSID = m_szNetNodes[j]->GetSerialID();
+//                 int nNodeProtocol = m_szNetNodes[j]->GetProtocol();
+//                 if (nSID == nNodeSID)
+//                 {
+//                     if(nSProtocol == nNodeProtocol)
+//                     {
+//                         bIsNew = FALSE;
+//                         break;
+//                     }
+//                     else
+//                     {
+//                         CString strSql;
+//                         CString strText;
+//                         strText.Format(_T("%u"),nNodeSID);
+//                         strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"),strText);
+//                         CString strTemp;
+//                         strTemp.Format(_T("Are you sure to delete thise item"));
+//                         //if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
+//                         //{
+//                         try
+//                         {
+//                             bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+//                         }
+//                         catch(_com_error *e)
+//                         {
+//                             AfxMessageBox(e->ErrorMessage());
+//                         }
+//                         //}
+//                         bIsNew = TRUE;
+//                         break;
+//                     }
+//                 }
+//             }
+//             else
+//             {
+//                 if (nSID == nNodeSID)
+//                 {
+//                     bIsNew = FALSE;
+//                     break;
+//                 }
+//             }
+//         }
 
-		}
-#endif
+  
 
-		if (bIsNew == TRUE)
-		{
-			WriteOneNetInfoToDB(pInfo);
-		}
+        try
+        {
+
+            CString strSql;
+
+            strSql.Format(_T("Delete * From  ALL_NODE Where Serial_ID = '%d' "),nSID);
+            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+        }
+        catch (...)
+        {
+
+        }
+ 
+     
+	   WriteOneNetInfoToDB(pInfo);
+ 
 	}
 }
 
@@ -2607,33 +2570,33 @@ void CTStatScanner::WriteOneNetInfoToDB( _NetDeviceInfo* pInfo)
 	strPort.Format(_T("%d"), pInfo->m_pNet->GetIPPort());
 	   float softrev = 0.0;
        float hardrev = 0.0;
-        if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R)
-        {
-            BOOL Is_Open=Open_Socket2(strIP,pInfo->m_pNet->GetIPPort());
-            if (Is_Open)
-            {
-                SetCommunicationType(1);
-                unsigned short DataBuffer[10] ;
-                int ret = Read_Multi(nID,DataBuffer,0,10);
-                if (ret>0)
-                {
-                    
-                        softrev = ((float)(DataBuffer[5]*256+ DataBuffer[4]))/10;
-                      
-                        hardrev =   DataBuffer[8];
+        //if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R)
+        //{
+        //    BOOL Is_Open=Open_Socket2(strIP,pInfo->m_pNet->GetIPPort());
+        //    if (Is_Open)
+        //    {
+        //        SetCommunicationType(1);
+        //        unsigned short DataBuffer[10] ;
+        //        int ret = Read_Multi(nID,DataBuffer,0,10);
+        //        if (ret>0)
+        //        {
+        //            
+        //                softrev = ((float)(DataBuffer[5]*256+ DataBuffer[4]))/10;
+        //              
+        //                hardrev =   DataBuffer[8];
 
-                       int ret=Read_Multi(nID,DataBuffer,714,10);
-                     
-                     if (DataBuffer[0]==0x56)
-                     {
-                       /*  strProductName.Format(_T("%s%s"),GetTextFromReg(715),GetTextFromReg(719));*/
-                         strProductName.Format(_T("%s%s"),GetTextFromReg_Buffer(1,DataBuffer),GetTextFromReg_Buffer(5,DataBuffer));
-                     }
+        //               int ret=Read_Multi(nID,DataBuffer,714,10);
+        //             
+        //             if (DataBuffer[0]==0x56)
+        //             {
+        //               /*  strProductName.Format(_T("%s%s"),GetTextFromReg(715),GetTextFromReg(719));*/
+        //                 strProductName.Format(_T("%s%s"),GetTextFromReg_Buffer(1,DataBuffer),GetTextFromReg_Buffer(5,DataBuffer));
+        //             }
 
-                }
-                close_com();
-            }
-        }
+        //        }
+        //        close_com();
+        //    }
+        //}
           
      
        
@@ -2737,7 +2700,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
 	  strBaudRate=pInfo->m_tstatip;
 	  strCom=pInfo->m_tstatport;
 	}
-    if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R)
+    if (nClassID == PM_TSTAT6||nClassID == PM_TSTAT7||nClassID == PM_TSTAT8||nClassID == PM_TSTAT5i||nClassID == PM_HUMTEMPSENSOR||nClassID ==PM_AirQuality||nClassID ==PM_HUM_R)
     {       BOOL Is_Open=FALSE;
         if (pInfo->m_pDev->m_nComPort==-1)
         {
@@ -2767,6 +2730,7 @@ void CTStatScanner::WriteOneDevInfoToDB( _ComDeviceInfo* pInfo)
                      if (DataBuffer[0]==0x56)
                      {
                          strProductName.Format(_T("%s%s"),GetTextFromReg_Buffer(1,DataBuffer),GetTextFromReg_Buffer(5,DataBuffer));
+
                      }
                  }
                
@@ -3533,46 +3497,79 @@ void CTStatScanner::Initial_Scan_Info()
 		temp_cs = temp_serialport.at(i).Right(temp_serialport.at(i).GetLength() - 3);
 		temp_port = _wtoi(temp_cs);
 
+        int  intBaudate;
 
-		temp_scan_info.scan_list_item = i*2 + 1;
-		temp_scan_info.scan_baudrate = 9600;
-		temp_scan_info.scan_com_port = temp_port;
-		temp_scan_info.scan_mode = SCAN_BY_SERIAL_PORT;
-		if((current_building_protocol == P_AUTO) || ((current_building_protocol == P_MODBUS_485)&& (current_building_baudrate == 9600) ))
-		{
-			temp_scan_info.scan_skip = false;
-			temp_scan_info.scan_status = SCAN_STATUS_WAIT;
-		}
-		else
-		{
-			temp_scan_info.scan_skip = true;
-			temp_scan_info.scan_status = SCAN_STATUS_SKIP;
-		}
-		temp_scan_info.scan_found = 0;
-		memset(temp_scan_info.scan_notes,0,250);
-		m_scan_info.push_back(temp_scan_info);
-		m_scan_info_buffer.push_back(temp_scan_info);
+        for(int baudrate = 0; baudrate<NUMBER_BAUDRATE; baudrate++)
+        {
+//             scan_mode = temp_serialport.at(i) +_T("        ") + c_strBaudate[baudrate];
+//             m_scan_com_list.InsertItem(i*2+baudrate+1,scan_mode);
+//             //m_scan_com_list.SetItemText(i*2,SCAN_BAUDRATE,_T("9600"));
+//             m_scan_com_list.SetItemText(i*2 +baudrate+1,SCAN_SKIP,_T("No"));
+//             m_scan_com_list.SetItemText(i*2 +baudrate+1,SCAN_STATUS,_T("Wait"));
+//             m_scan_com_list.SetItemText(i*2 +baudrate+1,SCAN_FOUND,_T("0"));
+             intBaudate = _wtoi (c_strBaudate[baudrate]);
+              
+            temp_scan_info.scan_list_item = i*2 + baudrate+1;
+            temp_scan_info.scan_baudrate = intBaudate;
+            temp_scan_info.scan_com_port = temp_port;
+            temp_scan_info.scan_mode = SCAN_BY_SERIAL_PORT;
+            if((current_building_protocol == P_AUTO) || ((current_building_protocol == P_MODBUS_485)&& (current_building_baudrate == 9600) ))
+            {
+                temp_scan_info.scan_skip = false;
+                temp_scan_info.scan_status = SCAN_STATUS_WAIT;
+            }
+            else
+            {
+                temp_scan_info.scan_skip = true;
+                temp_scan_info.scan_status = SCAN_STATUS_SKIP;
+            }
+            temp_scan_info.scan_found = 0;
+            memset(temp_scan_info.scan_notes,0,250);
+            m_scan_info.push_back(temp_scan_info);
+            m_scan_info_buffer.push_back(temp_scan_info);
+            
+        }
 
 
-		temp_scan_info.scan_list_item = i*2 + 2;
-		temp_scan_info.scan_baudrate = 19200;
-		temp_scan_info.scan_com_port = temp_port;
-		temp_scan_info.scan_mode = SCAN_BY_SERIAL_PORT;
-		if((current_building_protocol == P_AUTO) || ((current_building_protocol == P_MODBUS_485)&& (current_building_baudrate == 19200) ))
-		{
-			temp_scan_info.scan_skip = false;
-			temp_scan_info.scan_status = SCAN_STATUS_WAIT;
-		}
-		else
-		{
-			temp_scan_info.scan_skip = true;
-			temp_scan_info.scan_status = SCAN_STATUS_SKIP;
-		}
+// 		temp_scan_info.scan_list_item = i*2 + 1;
+// 		temp_scan_info.scan_baudrate = 9600;
+// 		temp_scan_info.scan_com_port = temp_port;
+// 		temp_scan_info.scan_mode = SCAN_BY_SERIAL_PORT;
+// 		if((current_building_protocol == P_AUTO) || ((current_building_protocol == P_MODBUS_485)&& (current_building_baudrate == 9600) ))
+// 		{
+// 			temp_scan_info.scan_skip = false;
+// 			temp_scan_info.scan_status = SCAN_STATUS_WAIT;
+// 		}
+// 		else
+// 		{
+// 			temp_scan_info.scan_skip = true;
+// 			temp_scan_info.scan_status = SCAN_STATUS_SKIP;
+// 		}
+// 		temp_scan_info.scan_found = 0;
+// 		memset(temp_scan_info.scan_notes,0,250);
+// 		m_scan_info.push_back(temp_scan_info);
+// 		m_scan_info_buffer.push_back(temp_scan_info);
 
-		temp_scan_info.scan_found = 0;
-		memset(temp_scan_info.scan_notes,0,250);
-		m_scan_info.push_back(temp_scan_info);
-		m_scan_info_buffer.push_back(temp_scan_info);
+
+// 		temp_scan_info.scan_list_item = i*2 + 2;
+// 		temp_scan_info.scan_baudrate = 19200;
+// 		temp_scan_info.scan_com_port = temp_port;
+// 		temp_scan_info.scan_mode = SCAN_BY_SERIAL_PORT;
+// 		if((current_building_protocol == P_AUTO) || ((current_building_protocol == P_MODBUS_485)&& (current_building_baudrate == 19200) ))
+// 		{
+// 			temp_scan_info.scan_skip = false;
+// 			temp_scan_info.scan_status = SCAN_STATUS_WAIT;
+// 		}
+// 		else
+// 		{
+// 			temp_scan_info.scan_skip = true;
+// 			temp_scan_info.scan_status = SCAN_STATUS_SKIP;
+// 		}
+// 
+// 		temp_scan_info.scan_found = 0;
+// 		memset(temp_scan_info.scan_notes,0,250);
+// 		m_scan_info.push_back(temp_scan_info);
+// 		m_scan_info_buffer.push_back(temp_scan_info);
 
 
 
@@ -3580,8 +3577,8 @@ void CTStatScanner::Initial_Scan_Info()
 	}
 
 
-	scan_bacnet_ip_item = ncount*2 + 1;
-	temp_scan_info.scan_list_item = ncount*2 + 1;
+	scan_bacnet_ip_item = ncount*NUMBER_BAUDRATE + 1;
+	temp_scan_info.scan_list_item = ncount*NUMBER_BAUDRATE + 1;
 
 	temp_scan_info.scan_com_port = 0;
 	temp_scan_info.scan_mode = SCAN_BY_MSTP;
@@ -3604,8 +3601,8 @@ void CTStatScanner::Initial_Scan_Info()
 	m_scan_info_buffer.push_back(temp_scan_info);
 
 
-	scan_remote_ip_item =  ncount*2 + 2;
-	temp_scan_info.scan_list_item = ncount*2 + 2;
+	scan_remote_ip_item =  ncount*NUMBER_BAUDRATE + 2;
+	temp_scan_info.scan_list_item = ncount*NUMBER_BAUDRATE + 2;
 
 	temp_scan_info.scan_com_port = 0;
 	temp_scan_info.scan_mode = SCAN_BY_REMOTE_IP;
@@ -3643,13 +3640,7 @@ void CTStatScanner::ScanAll()
 	ScanNetworkDevice();
 
 
-	//if (m_eScanComEnd->m_hObject)
-	//{
-	//	m_eScanComEnd->SetEvent();
-	//	m_com_scan_end = true;
-	//}
-	//m_eScanNCEnd->SetEvent();
-	//m_eScanOldNCEnd->SetEvent();
+	 
 	ScanBacnetIPDevice();
 	
 	ScanRemoteIPDevice();
@@ -3739,7 +3730,7 @@ UINT _WaitScanThread(PVOID pParam)
 					  g_strScanInfoPrompt = _T("TStat connected with NC");
 					  CString* pstrInfo = new CString(g_strScanInfoPrompt); 
 					  ::SendMessage(MainFram_hwd,WM_SHOW_PANNELINFOR,WPARAM(pstrInfo),LPARAM(3));
-					pScanner->ScanTstatFromNCForAuto();	
+					//pScanner->ScanTstatFromNCForAuto();	
 				  }
 			  }
 
@@ -4176,7 +4167,7 @@ BOOL CTStatScanner::IsNetDevice(const CString& strDevType)
 		return TRUE;
 	}
 
-	return FALSE;
+	return TRUE;
 }
 
 void CTStatScanner::WaitScan()

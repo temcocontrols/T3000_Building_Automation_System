@@ -741,10 +741,10 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		output_list_line = nItem;
 		if((m_Output_data.at(output_list_line).sub_id !=0) &&
-			//(m_Output_data.at(output_list_line).sub_number !=0) &&
+			(m_Output_data.at(output_list_line).sub_number !=0) &&
 			(m_Output_data.at(output_list_line).sub_product !=0))
 		{
-			unsigned char temp_pid = m_Output_data.at(output_list_line).sub_product;
+			unsigned char temp_pid = m_Input_data.at(input_list_line).sub_product;
 			if((temp_pid == PM_T3PT10) ||
 				(temp_pid == PM_T3IOA) ||
 				(temp_pid == PM_T332AI) ||
@@ -760,7 +760,7 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 				CString temp_id;
 				CString temp_number;
 				temp_id.Format(_T(" Sub ID: %d        "),m_Output_data.at(output_list_line).sub_id);
-				temp_number.Format(_T("Output%d"),m_Output_data.at(output_list_line).sub_number+1);
+				temp_number.Format(_T("Output%d"),m_Output_data.at(output_list_line).sub_number);
 				show_info = _T("Module:") + temp_name +_T("        ") + temp_id + temp_number;
 				m_output_item_info.SetWindowTextW(show_info);
 

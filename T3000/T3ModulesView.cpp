@@ -2219,7 +2219,13 @@ void CT3ModulesView::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult)
     }
     else if (product_register_value[7]==PM_T36CT)
     {
-
+        if (lCol == 2)
+        {
+            Is_Range = TRUE;
+            Range_Address = 126;
+            Value_Address = 108;
+            Value_Length = 8;
+        }
     }
     else if (product_register_value[7]==PM_T3IOA)
     {

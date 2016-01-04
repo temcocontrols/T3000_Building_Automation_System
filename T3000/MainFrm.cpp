@@ -4685,9 +4685,9 @@ void CMainFrame::OnLabe3()
 }
 
 void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
+{    
+if(hwait_write_thread==NULL)    
 {
-    if(hwait_write_thread==NULL)
-    {
         hwait_write_thread =CreateThread(NULL,NULL,Send_Set_Config_Command_Thread,this,NULL, NULL);
     }
 }
@@ -7178,7 +7178,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         (product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||
                         (product_Node.BuildingInfo.strIp.CompareNoCase(_T("38400"))==0) ||
                         (product_Node.BuildingInfo.strIp.CompareNoCase(_T("57600"))==0) ||
-                        (product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
+                        (product_Node.BuildingInfo.strIp.CompareNoCase(_T("115200"))) == 0))
             {
 
                 if(product_Node.BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0)
@@ -7460,7 +7460,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 //m_nbaudrat=_wtoi(product_Node.BuildingInfo.strBaudRate);
                 g_protocol=MODBUS_RS485;
                 m_nbaudrat= product_Node.baudrate;
-                if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200) && (m_nbaudrat != 38400)&& (m_nbaudrat != 57600))
+                if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200) && (m_nbaudrat != 38400)&& (m_nbaudrat != 57600)&& (m_nbaudrat != 115200))
                     m_nbaudrat = 19200;
                 Change_BaudRate(m_nbaudrat);
 
@@ -7873,7 +7873,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
 
 
-                    if ((nFlag == PM_TSTAT6||nFlag == PM_TSTAT7||nFlag == PM_HUMTEMPSENSOR||nFlag ==PM_AirQuality||nFlag ==PM_HUM_R) && product_register_value[714] == 0x56)
+                    if ((nFlag == PM_TSTAT6||nFlag == PM_TSTAT7||nFlag == PM_TSTAT8||nFlag == PM_TSTAT5i
+                                           ||nFlag == PM_HUMTEMPSENSOR||nFlag ==PM_AirQuality||nFlag ==PM_HUM_R) && product_register_value[714] == 0x56)
                     {
                         CString TstatName,TstatDBName;
 
@@ -7931,12 +7932,27 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             TstatDBName = bado.m_pRecordset->GetCollect(_T("Product_name"));
                         }
                         bado.CloseRecordset();
+                        CString StrDefaultName;
+                        if (TstatDBName.IsEmpty ())
+                        {
+                            StrDefaultName.Format (_T("%s-%s"),GetProductName (product_register_value[7]),temp_serial_number);
+                        }
                         TstatName.Format(_T("%s%s"),GetTextFromReg(715),GetTextFromReg(719));
-                        if (TstatName.CompareNoCase(TstatDBName)!=0)
+                        if (TstatName.IsEmpty ())
+                        {
+                            StrDefaultName.Format (_T("%s-%s"),GetProductName (product_register_value[7]),temp_serial_number);
+                        }
+                        if (TstatName.CompareNoCase(TstatDBName)!=0&&(!TstatName.IsEmpty ()))
                         {
                             strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),TstatName,strSerial);
                             bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
                             PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
+                        }
+                        else if (TstatName.IsEmpty ()&&TstatDBName.IsEmpty ())
+                        {
+                            strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),StrDefaultName,strSerial);
+                            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                            PostMessage(WM_MYMSG_REFRESHBUILDING,0,0); 
                         }
                         bado.CloseConn();
 #endif
@@ -8846,8 +8862,6 @@ void CMainFrame::DoFreshAll()
 
 UINT _FreshTreeView(LPVOID pParam )
 {
-
-
     CString g_strT3000LogString;
     CMainFrame* pMain = (CMainFrame*)pParam;
     int int_refresh_com = 0;

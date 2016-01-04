@@ -84,6 +84,7 @@
 #define IDC_STATIC_HEX_BOOT             1055
 #define IDC_EDIT2                       1056
 #define IDC_FLASH_USER_ID               1056
+#define IDC_COMBO1                      1057
 #define IDC_BUTTON_SETTING_OK           6001
 #define IDC_EDIT_SETTING_TIMEOUT        6021
 #define IDC_BUTTON2                     6050
@@ -106,7 +107,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
 #define _APS_NEXT_COMMAND_VALUE         32781
-#define _APS_NEXT_CONTROL_VALUE         1057
+#define _APS_NEXT_CONTROL_VALUE         1058
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

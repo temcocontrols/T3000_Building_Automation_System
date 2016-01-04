@@ -39,7 +39,7 @@ CT3000App::CT3000App()
 {
  
 		m_bHiColorIcons = TRUE;
-		CurrentT3000Version=_T("    2015.12.31 Temp version");
+		CurrentT3000Version=_T("    2016.01.4");
 //	}
 // 	catch (...)
 // 	{

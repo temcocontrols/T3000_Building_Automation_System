@@ -78,6 +78,7 @@ Bin_Info m_hexinfor;
 		int					m_nComPort;
 		 
 		int					m_nBautrate;			// 波特率
+        int                 m_index_Baudrate;
 		CString m_hexbinfilepath;
 		CWinThread*	m_pWorkThread;
 		vector<int>		m_szMdbIDs;			// 所有的需要flash的Modbus ID

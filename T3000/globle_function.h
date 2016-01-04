@@ -207,4 +207,5 @@ int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
 int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
 BOOL HexFileValidation(const CString& strFileName);
 BOOL BinFileValidation(const CString& strFileName);
+
 #endif
