@@ -1,0 +1,10 @@
+D:\Sangam\visual studios\2nd\Enthalpy_calculation\Enthalpy_calculation\bin\Debug\Enthalpy_calculation.exe.config
+D:\Sangam\visual studios\2nd\Enthalpy_calculation\Enthalpy_calculation\bin\Debug\Enthalpy_calculation.exe
+D:\Sangam\visual studios\2nd\Enthalpy_calculation\Enthalpy_calculation\bin\Debug\Enthalpy_calculation.pdb
+D:\Sangam\visual studios\2nd\Enthalpy_calculation\Enthalpy_calculation\obj\Debug\Enthalpy_calculation.Form1.resources
+D:\Sangam\visual studios\2nd\Enthalpy_calculation\Enthalpy_calculation\obj\Debug\Enthalpy_calculation.Properties.Resources.resources
+D:\Sangam\visual studios\2nd\Enthalpy_calculation\Enthalpy_calculation\obj\Debug\Enthalpy_calculation.csproj.GenerateResource.Cache
+D:\Sangam\visual studios\2nd\Enthalpy_calculation\Enthalpy_calculation\obj\Debug\Enthalpy_calculation.exe
+D:\Sangam\visual studios\2nd\Enthalpy_calculation\Enthalpy_calculation\obj\Debug\Enthalpy_calculation.pdb
+D:\Sangam\visual studios\2nd\Enthalpy_calculation\Enthalpy_calculation\bin\Debug\Database1.sdf
+D:\Sangam\visual studios\2nd\Enthalpy_calculation\Enthalpy_calculation\obj\Debug\Enthalpy_calculation.csprojResolveAssemblyReference.cache
