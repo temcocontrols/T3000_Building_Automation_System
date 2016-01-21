@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace sum
+namespace WFA_psychometric_chart
 {
     static class Program
     {
