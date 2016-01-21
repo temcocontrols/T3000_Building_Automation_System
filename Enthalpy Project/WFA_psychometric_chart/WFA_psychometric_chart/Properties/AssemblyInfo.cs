@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("sum")]
+[assembly: AssemblyTitle("WFA_psychometric_chart")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("sum")]
+[assembly: AssemblyProduct("WFA_psychometric_chart")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("841b7841-216c-47e1-8ff1-f2797f0cfac3")]
+[assembly: Guid("630bc1e2-9e59-480a-a10a-a358eee272c5")]
 
 // Version information for an assembly consists of the following four values:
 //

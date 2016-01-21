@@ -1,9 +1,0 @@
-D:\Sangam\visual studios\2nd\sum\sum\bin\Debug\sum.exe.config
-D:\Sangam\visual studios\2nd\sum\sum\bin\Debug\sum.exe
-D:\Sangam\visual studios\2nd\sum\sum\bin\Debug\sum.pdb
-D:\Sangam\visual studios\2nd\sum\sum\obj\Debug\sum.Form1.resources
-D:\Sangam\visual studios\2nd\sum\sum\obj\Debug\sum.Properties.Resources.resources
-D:\Sangam\visual studios\2nd\sum\sum\obj\Debug\sum.csproj.GenerateResource.Cache
-D:\Sangam\visual studios\2nd\sum\sum\obj\Debug\sum.exe
-D:\Sangam\visual studios\2nd\sum\sum\obj\Debug\sum.pdb
-D:\Sangam\visual studios\2nd\sum\sum\obj\Debug\sum.csprojResolveAssemblyReference.cache
