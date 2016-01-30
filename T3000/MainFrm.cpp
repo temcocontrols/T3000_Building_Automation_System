@@ -1669,10 +1669,10 @@ void CMainFrame::LoadProductFromDB()
         }
 
         current_building_baudrate = _wtoi(cs_temp_baudrate);
-        if((current_building_baudrate!= 19200) && (current_building_baudrate != 9600) && (current_building_baudrate != 38400))
-        {
-            current_building_baudrate = 19200;
-        }
+//         if((current_building_baudrate!= 19200) && (current_building_baudrate != 9600) && (current_building_baudrate != 38400))
+//         {
+//             current_building_baudrate = 19200;
+//         }
 
         //current_building_comport
         temp_variant = ado.m_pRecordset->GetCollect(_T("Com_Port"));
@@ -7873,8 +7873,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
 
 
-                    if ((nFlag == PM_TSTAT6||nFlag == PM_TSTAT7||nFlag == PM_TSTAT8||nFlag == PM_TSTAT5i
-                                           ||nFlag == PM_HUMTEMPSENSOR||nFlag ==PM_AirQuality||nFlag ==PM_HUM_R) && product_register_value[714] == 0x56)
+                    if  ( product_register_value[714] == 0x56)
                     {
                         CString TstatName,TstatDBName;
 
@@ -12600,7 +12599,7 @@ void CMainFrame::GetProductFPTAndLocalPath(int ProductModel,CString &FtpPath,CSt
         }
         break;
     case PM_T3IOA :
-        strProductName="T3-8IOA";
+        strProductName="T3-8O";
         {
             FtpPath=_T("");
             ProductFileName=_T("Tstat6.HEX");
@@ -12843,7 +12842,7 @@ void CMainFrame::GetProductFirmwareFTPDirectory(int ProductModel,CString &FtpPat
         }
         break;
     case PM_T3IOA :
-        strProductName="T3-8IOA";
+        strProductName="T3-8O";
         {
             FtpPath=_T("");
             ProductFileName=_T("Tstat6.HEX");

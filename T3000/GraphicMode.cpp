@@ -179,6 +179,13 @@ void CGraphicMode::CalculateChartData(){
 	   }
    }
 
+   Start_Address =  g_calibration_module_data.User_Offset.regAddress;
+   Ret = Read_Multi (g_tstat_id,Temp_Value,Start_Address,1);
+   if (Ret >0 )
+   {
+        g_calibration_module_data.User_Offset.RegValue = Temp_Value[0];
+   }
+    
 #if 1
    dataline = 0;
    temp.Reg_Name=_T("Factory Table Line");
@@ -217,7 +224,7 @@ void CGraphicMode::CalculateChartData(){
    temp.Point_Color = RGB(255,0,0);
 #endif
    int User_Calibration_Point = product_register_value[g_calibration_module_data.User_Table_Point_Number.regAddress];
-   if (User_Calibration_Point == 1)
+   if (User_Calibration_Point == 1||(product_register_value[g_calibration_module_data.User_Table_Selection.regAddress] == 1&&User_Calibration_Point == 0))
    {
 	   for (int row = 0;row < User_Calibration_Point ; row++)
 	   {
@@ -242,7 +249,7 @@ void CGraphicMode::CalculateChartData(){
 	   }
         g_calibration_module_data.Graphic_Data.push_back(temp);
    }
-   else if (User_Calibration_Point == 0)
+   else if (User_Calibration_Point == 0&&product_register_value[g_calibration_module_data.User_Table_Selection.regAddress] == 0)
    {
 		
    }
@@ -389,17 +396,17 @@ void CGraphicMode::InitChartCtrl(){
     pLeftAxis->GetLabel ()->SetText (L"Humidity/%");
    // pLeftAxis->GetLabel ()->SetFont (30,L"Arial") ;
 	//pLeftAxis->SetMinMax(0, 1000);
-	CChartStandardAxis* pTopAxis =
-		m_ChartCtrl.CreateStandardAxis(CChartCtrl::TopAxis);
-	pTopAxis->SetMinMax(m_xMin-100, m_xMax+100);
+ 	CChartStandardAxis* pTopAxis =
+ 		m_ChartCtrl.CreateStandardAxis(CChartCtrl::TopAxis);
+ 	pTopAxis->SetMinMax(m_xMin-100, m_xMax+100);
 
-	CChartStandardAxis* pRightAxis =
-		m_ChartCtrl.CreateStandardAxis(CChartCtrl::RightAxis);
-	pRightAxis->SetMinMax(m_yMin-20, m_yMax+20);
+ 	CChartStandardAxis* pRightAxis =
+ 		m_ChartCtrl.CreateStandardAxis(CChartCtrl::RightAxis);
+ 	pRightAxis->SetMinMax(m_yMin-20, m_yMax+20);
 	//pRightAxis->SetMinMax(0, 1000);
 	m_ChartCtrl.GetLegend()->SetVisible(true);
-    m_ChartCtrl.GetTopAxis ()->SetVisible (false);
-    m_ChartCtrl.GetRightAxis ()->SetVisible (false);
+     m_ChartCtrl.GetTopAxis ()->SetVisible (false);
+     m_ChartCtrl.GetRightAxis ()->SetVisible (false);
 	m_ChartCtrl.RefreshCtrl();
 }
 
@@ -1030,7 +1037,7 @@ void CGraphicMode::Initial_UserList(){
 	CString index;
 	for (int i=0;i< rows;i++)
 	{
-		index.Format(_T("%d"),i);
+		index.Format(_T("%d"),i+1);
 		m_user_list.InsertItem(i,index);
 	}
 	for (int row=0;row<rows;row++)
@@ -1080,7 +1087,7 @@ void CGraphicMode::Initial_FactoryList(){
 	CString index;
 	for (int i=0;i< rows;i++)
 	{
-		index.Format(_T("%d"),i);
+		index.Format(_T("%d"),i+1);
 		m_factory_list.InsertItem(i,index);
 	}
 
@@ -1112,11 +1119,17 @@ void CGraphicMode::Initial_FactoryList(){
 void CGraphicMode::OnBnClickedCheckUser()
 {
     OnBnClickedUser();  
+    CalculateChartData();
+    //DrawerPoint ();
+    Fresh_Graphic ();
 }
 
 void CGraphicMode::OnBnClickedCheckDefault()
 {
     OnBnClickedDefault();
+    CalculateChartData();
+    Fresh_Graphic ();
+   // DrawerPoint ();
 }
 
 void CGraphicMode::OnBnClickedUserTableAdd()
@@ -1228,7 +1241,7 @@ LRESULT CGraphicMode::Change_Input_Item(WPARAM wParam,LPARAM lParam){
                 }
                 CalculateChartData();
                 //Initial_UserList();
-                 PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0); 
+                PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0); 
                 Fresh_Graphic();
     }
     return 0;
@@ -1254,7 +1267,7 @@ LRESULT CGraphicMode::Fresh_Input_List(WPARAM wParam,LPARAM lParam){
     CString index;
     for (int i=0;i< rows;i++)
     {
-        index.Format(_T("%d"),i);
+        index.Format(_T("%d"),i+1);
         m_user_list.InsertItem(i,index);
     }
     for (int row=0;row<rows;row++)

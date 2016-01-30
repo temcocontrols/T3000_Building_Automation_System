@@ -9,7 +9,7 @@ public:
 
 	void SetComport(int nComport);
 	void SetIPPort(int nIPPort);
-
+      void SetBrandrate(int nBaudrate);
 	void SetIPAddress(CString dwIPAddr);
 	void SetFlashTpye(int nFlashType);
     void SetMBID(int ID);
@@ -30,6 +30,7 @@ protected:
 		unsigned short nfirwareversion,
 		unsigned short	nhardwareversion, 
 		CString nusername);
+         int     m_nBraudrate;
 	void FlashTstatSN();
 	void FlashNCSN();
 public:

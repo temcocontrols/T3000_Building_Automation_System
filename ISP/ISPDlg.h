@@ -265,4 +265,5 @@ public:
 	void CheckAutoFlash();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
     CComboBox m_combox_baudrate;
+    afx_msg void OnMenuFlashsn();
 };

@@ -44,7 +44,8 @@ const int ArrayBaudate[BAUDRATENUMBER] = {
     19200,
     38400,
     57600,
-    115200};
+    115200
+    };
 OUTPUT void SetLastSuccessBaudrate(int nbaudrate)
 {
     successful_baudrate = nbaudrate;

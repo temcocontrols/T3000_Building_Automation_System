@@ -24,6 +24,7 @@
 //int g_CommunicationType;
 unsigned int the_max_register_number_parameter_Count=0;
 unsigned int the_max_register_number_parameter_Finished=0;
+CString c_strSNRecordFileName = _T("Z:\\Serial_Records\\serial_records.txt");
 bool auto_flash_mode = false;
 CString AutoFlashConfigPath;
 CString g_strExePath;
@@ -250,6 +251,7 @@ BEGIN_MESSAGE_MAP(CISPDlg, CDialog)
     ON_COMMAND(ID_MENU_SETTING, &CISPDlg::OnMenuSetting)
     ON_COMMAND(ID_MENU_CHECKHEX, &CISPDlg::OnMenuCheckhex)
     ON_WM_TIMER()
+    ON_COMMAND(ID_MENU_FLASHSN, &CISPDlg::OnMenuFlashsn)
 END_MESSAGE_MAP()
 
 
@@ -581,7 +583,7 @@ void CISPDlg::InitISPUI()
 
         GetWindowPlacement(&wp);
 
-        wp.rcNormalPosition.bottom += 0;
+        wp.rcNormalPosition.bottom +=100;
 
         SetWindowPlacement(&wp);
 
@@ -597,7 +599,7 @@ void CISPDlg::InitISPUI()
         pWnd->GetWindowRect(&rc);
         //ScreenToClient(&rc);
 
-        wp.rcNormalPosition.bottom = rc.bottom ;//- 20;
+        wp.rcNormalPosition.bottom = rc.bottom -10;//- 20;
         SetWindowPlacement(&wp);
 
         GetDlgItem(IDC_STATIC_SEPERATOR)->ShowWindow(SW_HIDE);
@@ -607,14 +609,14 @@ void CISPDlg::InitISPUI()
 
 void CISPDlg::initFlashSN()
 {
-
+ 
     if (!m_bShowSN)
     {
         GetDlgItem(IDC_BUTTON_FLASH)->SetWindowText(_T("FLASH"));
     }
     else
     {
-        GetDlgItem(IDC_BUTTON_FLASH)->SetWindowText(_T("FLASH"));
+        GetDlgItem(IDC_BUTTON_FLASH)->SetWindowText(_T("FLASH SN"));
     }
     InitISPUI();
 
@@ -1321,13 +1323,21 @@ BOOL CISPDlg::FlashTstat(void)
     int TempID=0;
     int times=0;
     CString temp;
-    if (m_strHexFileName.IsEmpty())
+    if (m_bShowSN)
     {
         // PostMessage(WM_FLASH_FINISH, 0, LPARAM(1));
         // int	nRet =PostMessage(m_pParentWnd->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(nFlashFlag));
 
         FlashSN();
         return FALSE;
+    }
+    if (GetCommunicationType () == 0)
+    {
+        if (!DetectBraudrate ())
+        {
+            UpdateStatusInfo(_T("Detecting your Braudrate ,Failed"), FALSE);
+            return FALSE; 
+        }
     }
     if(!FileValidation(m_strHexFileName))
     {
@@ -2541,17 +2551,29 @@ void CISPDlg::OnBnClickedShowHex()
 
 void CISPDlg::OnBnClickedFlashSn()
 {
-    initFlashSN();
+  //  initFlashSN();
 }
 
 void CISPDlg::FlashSN()
 {
+
+    if (GetCommunicationType () == 0)
+    {
+        if (!DetectBraudrate ())
+        {
+           UpdateStatusInfo(_T("Detecting your Braudrate ,Failed"), FALSE);
+            return; 
+        }
+    }
+    UpdateStatusInfo(_T("Detecting your Braudrate ,Finished"), FALSE);
     CFlashSN* pFlashSN = new CFlashSN;
     int nComport = GetComPortNo();
 
     pFlashSN->SetComport(nComport);
     pFlashSN->SetFlashTpye(0);
-
+       CString strBraudrate;
+    GetDlgItem (IDC_EDIT_BAUDRATE)->GetWindowTextW(strBraudrate);
+    pFlashSN->SetBrandrate (_wtoi (strBraudrate));
     if(!GetModbusID(m_szMdbIDs))
     {
         AfxMessageBox(_T("Please input a slave ID "));
@@ -2698,16 +2720,19 @@ BOOL CISPDlg::DetectBraudrate ()
     }
 
     int comport = GetComPortNo ();
+     CString strBraudrate,strTips;
     if (open_com (comport))
     {
 
         //m_combox_baudrate.GetCurSel ();
-        CString strBraudrate,strTips;
+       
         m_combox_baudrate.GetWindowTextW(strBraudrate);
         int intBraudreate =_wtoi(strBraudrate);
         strTips.Format (_T("Detecting your current Braudrate:%s"),strBraudrate);
         UpdateStatusInfo(strTips, FALSE);
-        Change_BaudRate (intBraudreate);
+      BOOL Ret=  Change_BaudRate (intBraudreate);
+      
+      ASSERT(Ret) ;
         Sleep (500);
 
         if (read_one (m_szMdbIDs[0],6)>0)
@@ -2723,7 +2748,8 @@ BOOL CISPDlg::DetectBraudrate ()
         for (int braudrate = 0; braudrate<NUMBER_BAUDRATE; braudrate++)
         {
             int intBraudreate =_wtoi(c_strBaudate[braudrate]);
-            Change_BaudRate (intBraudreate);
+           Ret= Change_BaudRate (intBraudreate);
+           ASSERT(Ret) ;
             Sleep (500);
 
             if (read_one (m_szMdbIDs[0],6)>0)
@@ -2742,9 +2768,29 @@ BOOL CISPDlg::DetectBraudrate ()
                 UpdateStatusInfo(strTips, FALSE);
             }
         }
-
+        strTips.Format (_T("Detecting your current Braudrate: Finished"));
+        UpdateStatusInfo(strTips, FALSE);
+        close_com ();
     }
+
+    strTips.Format (_T("Detecting your Braudrate: Failed"));
+    UpdateStatusInfo(strTips, FALSE);
+
     return FALSE;
 
 
+}
+
+void CISPDlg::OnMenuFlashsn()
+{
+
+    if (m_bShowSN)
+    {
+        m_bShowSN=FALSE;
+    }
+    else
+    {
+        m_bShowSN=TRUE;
+    }
+      initFlashSN();
 }

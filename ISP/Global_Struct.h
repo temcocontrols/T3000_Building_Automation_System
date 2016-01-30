@@ -17,7 +17,7 @@ const TCHAR c_strCfgFileName[] = _T("config.txt");				//	≈‰÷√Œƒº˛√˚≥∆£¨”√”⁄±£¥Ê”
 const TCHAR c_strLogoFileName[] = _T("ISPLogo.jpg");			// logo picture file name
 
  
-const CString c_strSNRecordFileName = _T("Z:\\Serial_Records\\serial_records.txt");
+
 //////////////////////////////////////////////////////////////////////////
 // for setting file
 const TCHAR c_strCfgTstatSection[] = _T("[Tstat]");

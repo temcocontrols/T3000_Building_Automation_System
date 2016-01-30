@@ -1145,7 +1145,6 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 
 
     }
-
     else if(Changed_SubItem == BC_PROTOCOL)
     {
         CString IP = m_building_config_list.GetItemText(m_changedRow,BC_IPADDRESS);

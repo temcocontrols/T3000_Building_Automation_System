@@ -1707,8 +1707,6 @@ void CComWriter::OutPutsStatusInfo(const CString& strInfo, BOOL bReplace)
 // 参数就是flash线程的返回值
 void CComWriter::WriteFinish(int nFlashFlag)
 {
-
-
     int	nRet =PostMessage(m_pParentWnd->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(nFlashFlag));
 }
 
@@ -2390,13 +2388,47 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
         strID.Format(_T("|Current Programming device ID is : %d"), pWriter->m_szMdbIDs[i]);
         pWriter->OutPutsStatusInfo(strID);
 
-        int nRet = Write_One (pWriter->m_szMdbIDs[i],15,4); //把主程序波特率切换到 115200
+        int  nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
+             Sleep (500);
+        nRet = Read_One(pWriter->m_szMdbIDs[i],11);
+        if (nRet <= 0)
+        {
+            AfxMessageBox(_T("Fail to enter ISP Mode!"));
+            goto end_isp_flash;
+        }
 
+        if (nRet >=41)//支持多个波特率切换的
+        {
+           if (GetCommunicationType () == 0)
+           {
+               nRet = Write_One (pWriter->m_szMdbIDs[i],15,4); //把主程序波特率切换到 115200
+               
+               if(open_com(pWriter->m_nComPort)==false)
+               {
+                   //CString srtInfo = _T("|Error :The com port is occupied!");
+                   //MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
+                   //AddStringToOutPuts(_T("Error :The com port is occupied!"));
+                 //  OutPutsStatusInfo(srtInfo, FALSE);
+                   return 0;
+               }
+               else
+               {
+                   //CString strTemp;
+                 //  strTemp.Format(_T("COM%d"), m_nComPort);
+                 //  CString strTips = _T("|Open ") +  strTemp + _T(" successful.");
+                   //OutPutsStatusInfo(strTips, FALSE);
+                   // AddStringToOutPuts(strTips);
+                   Change_BaudRate (115200);
 
-        Change_BaudRate (115200);
+               }
+              // Change_BaudRate (115200);
+           }
+           
+        }
+
         Sleep (500);
         // pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]);
-          nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
+        //  nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
 
         /*  nRet = Read_One(pWriter->m_szMdbIDs[i],11);
         	  if (nRet <= 0)

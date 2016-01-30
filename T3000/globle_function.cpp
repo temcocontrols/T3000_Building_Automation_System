@@ -3823,7 +3823,7 @@ CString GetProductName(int ModelID)
         strProductName="T3-PT10";
         break;
     case PM_T3IOA :
-        strProductName="T3-8IOA";
+        strProductName="T3-8O";
         break;
     case PM_T332AI :
         strProductName="T3-32AI";
@@ -3853,7 +3853,7 @@ CString GetProductName(int ModelID)
         strProductName="HUM-R";
         break;
     case PM_T322AI:
-        strProductName="T3-22AI";
+        strProductName="T3-22I";
         break;
     case PM_T38AI8AO6DO:
         strProductName="T3-8AI8AO6DO";
@@ -8244,9 +8244,6 @@ void LoadTstat_InputData()
     m_tstat_input_data.at(11).Value.RegValue=product_register_value[MODBUS_VALUE_SENSOR];
     m_tstat_input_data.at(11).Value.StrValue=strTemp;
 
-
-
-
 }
 
 void LoadInputData_CS3000()
@@ -9501,11 +9498,11 @@ void LoadRegistersGraphicMode()
 void LoadRegistersGraphicMode_AQ()
 {
     g_calibration_module_data.Current_Frequency.regAddress = 305;
-    g_calibration_module_data.Current_Frequency.StrValue = _T('Frequency');
+    g_calibration_module_data.Current_Frequency.StrValue = _T("Frequency");
     g_calibration_module_data.User_Table_Selection.regAddress=309;
     g_calibration_module_data.User_Table_Point_Number.regAddress= 307;
     g_calibration_module_data.User_Offset.regAddress = 106;
-    g_calibration_module_data.User_Offset.RegValue = product_register_value[106]-500;
+    g_calibration_module_data.User_Offset.RegValue = (short)product_register_value[106];
     g_calibration_module_data.User_Fre.regAddress	=312	 ;
     g_calibration_module_data.User_Fre.StrValue=_T("Frequency");
     g_calibration_module_data.User_Hum.regAddress	=313;
@@ -9520,7 +9517,7 @@ void LoadRegistersGraphicMode_AQ()
 void LoadRegistersGraphicMode_HUMTEMPSENSOR()
 {
     g_calibration_module_data.Current_Frequency.regAddress = 374;
-    g_calibration_module_data.Current_Frequency.StrValue = _T('Frequency');
+    g_calibration_module_data.Current_Frequency.StrValue = _T("Frequency");
     g_calibration_module_data.User_Table_Selection.regAddress=454;
     g_calibration_module_data.User_Table_Point_Number.regAddress=455;
     g_calibration_module_data.User_Offset.regAddress = 451;

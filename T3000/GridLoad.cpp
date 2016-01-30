@@ -542,7 +542,7 @@ BOOL CGridLoad::OnInitDialog()
 			strTemp="T3-PT10";
 			break;
 		case PM_T3IOA :
-			strTemp="T3-8IOA";
+			strTemp="T3-8O";
 			break;
 		case PM_T332AI :
 			strTemp="T3-32AI";
@@ -563,7 +563,7 @@ BOOL CGridLoad::OnInitDialog()
 			strTemp="T3-6CT";
 			break;
         case PM_T322AI:
-            strTemp="T3-22AI";
+            strTemp="T3-22I";
             break;
         case PM_T38AI8AO6DO:
             strTemp="T3-8AI8AO6DO";
@@ -1282,7 +1282,7 @@ void CGridLoad::LoadDeviceToGrid()
 			strTemp="T3-PT10";
 			break;
 		case PM_T3IOA :
-			strTemp="T3-8IOA";
+			strTemp="T3-8O";
 			break;
 		case PM_T332AI :
 			strTemp="T3-32AI";
@@ -1303,7 +1303,7 @@ void CGridLoad::LoadDeviceToGrid()
 			strTemp="T3-6CT";
 			break;
         case PM_T322AI:
-            strTemp="T3-22AI";
+            strTemp="T3-22I";
             break;
         case PM_T38AI8AO6DO:
             strTemp="T3-8AI8AO6DO";
