@@ -6,6 +6,8 @@
 #include "StatusbarCtrl.h"
 #include "afxdialogex.h"
 
+
+
 HDC status_gloab_hdc;
 HDC status_hMemDC;
 HBITMAP status_hBmp;	//ÓÃÓÚË«»º³å;

@@ -115,7 +115,7 @@ int GetPrivateData(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize);
 
 int GetMonitorBlockData(uint32_t deviceid,int8_t command,int8_t nIndex,int8_t ntype_ad, uint16_t ntotal_seg,uint16_t nseg_index,MonitorUpdateData* up_data);
-int WritePrivateData(uint32_t deviceid,int8_t command,int8_t start_instance,int8_t end_instance );
+int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char start_instance,unsigned char end_instance);
 int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
 int WriteProgramData_Blocking(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage);
 int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t nstop_index,unsigned int write_object_list = 0);
@@ -140,7 +140,7 @@ char * intervaltotextfull(char *textbuf, long seconds , unsigned minutes , unsig
 	 BACNET_ADDRESS * src,
 	 BACNET_CONFIRMED_SERVICE_ACK_DATA * service_data);
   void local_rp_ack_print_data(	BACNET_READ_PROPERTY_DATA * data);
- bool Initial_bac(int comport = 0);
+ bool Initial_bac(int comport = 0,CString bind_local_ip = _T(""));
   bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket);
   unsigned char Str_to_Byte(CString need_conver);
   void Init_Service_Handlers(void);
@@ -207,4 +207,5 @@ int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
 int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
 BOOL HexFileValidation(const CString& strFileName);
 BOOL BinFileValidation(const CString& strFileName);
+
 #endif

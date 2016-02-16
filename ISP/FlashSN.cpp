@@ -4,6 +4,7 @@
 #include <fstream>
 
 extern CString Auto_flash_SN_connect_IP;
+extern CString    c_strSNRecordFileName;
 CFlashSN::CFlashSN(void)
 {
 	m_nComPort = 1;
@@ -348,8 +349,8 @@ bool CFlashSN::Connect_To_Server(CString strIPAdress,short nPort)
 
 unsigned long CFlashSN::GetNewSerialNumber()
 {
-	Get_SerialNumber_From_Server(_T("192.168.0.222"),31234,_T("TSTAT_Dufan"),6,555,666,_T("Dufan for Test"));
-	return 0;
+	//Get_SerialNumber_From_Server(_T("192.168.0.222"),31234,_T("TSTAT_Dufan"),6,555,666,_T("Dufan for Test"));
+	//return 0;
 	int nSerialNumber;		
 	CStdioFile file;
 			
@@ -376,21 +377,24 @@ unsigned long CFlashSN::GetNewSerialNumber()
 void CFlashSN::SetMBID(int ID){
 m_nMBID=ID;
 }
-
+void CFlashSN::SetBrandrate (int nBraudrate)
+{
+    m_nBraudrate = nBraudrate;
+}
 
 void CFlashSN::FlashTstatSN()
 {
-	m_nSerialNumber=Get_SerialNumber_From_Server(Auto_flash_SN_connect_IP,31234,m_strProductModel,m_nProductModel,m_nsoftversion,m_nHardWareVersion,m_username);
+	//m_nSerialNumber=Get_SerialNumber_From_Server(Auto_flash_SN_connect_IP,31234,m_strProductModel,m_nProductModel,m_nsoftversion,m_nHardWareVersion,m_username);
 
-	//m_nSerialNumber=GetNewSerialNumber();// get last serialnumber of the file
+	m_nSerialNumber=GetNewSerialNumber();// get last serialnumber of the file
 	if(m_nSerialNumber<=0)//can't fine the serialnumber file on z drive
 	{
 		AfxMessageBox(_T("WARNING : Get serial number from server failed."));
 		return;
 	}
-	CString serial_id;
-	serial_id.Format(_T("Get Serial number from server : %u"),m_nSerialNumber);
-	AfxMessageBox(serial_id);
+// 	CString serial_id;
+// 	serial_id.Format(_T("Get Serial number from server : %u"),m_nSerialNumber);
+// 	AfxMessageBox(serial_id);
 
 	unsigned int loword,hiword;
 	loword=m_nSerialNumber & 0xffff;
@@ -416,6 +420,7 @@ void CFlashSN::FlashTstatSN()
 
        /* if (nSerialNumber!=0)
         {*/
+        Change_BaudRate (m_nBraudrate);
         if (m_nProductModel!=102)
         {
             Write_One(m_nMBID,16,142);
@@ -435,7 +440,7 @@ void CFlashSN::FlashTstatSN()
 			nSWVersion /=10;
 		}//tstat_version		
 
-		if(nSWVersion >= 25)
+		//if(nSWVersion >= 25)
 		{
 			Write_One(m_nMBID,7,m_nProductModel);//write product_model register
 			Write_One(m_nMBID,8,m_nHardWareVersion);//write hardware_rev register
@@ -659,6 +664,7 @@ void CFlashSN::FlashNCSN()
 #pragma endregion Save_SerialNumber
 			
 	   close_com;
+
 	}
 
 }

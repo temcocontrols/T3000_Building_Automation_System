@@ -1282,7 +1282,7 @@ int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,
 
 
 		HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
-		private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + (end_instance - start_instance + 1)*400;
+		private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + ((unsigned char)end_instance - (unsigned char)start_instance + 1)*400;
 		private_data_chunk.command = command;
 		private_data_chunk.point_start_instance = start_instance;
 		private_data_chunk.point_end_instance = end_instance;
@@ -1318,13 +1318,13 @@ int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,
 	private_data.serviceParameters = &test_value[0];
 	private_data.serviceParametersLen = private_data_len;
 
-	BACNET_ADDRESS dest = { 0 };
-	status = address_get_by_device(deviceid, &max_apdu, &dest);
-	if (status) 
-	{
-		return Send_ConfirmedPrivateTransfer(&dest,&private_data);
-	}
-	return -2;
+    BACNET_ADDRESS dest = { 0 };
+    status = address_get_by_device(deviceid, &max_apdu, &dest);
+    if (status)
+    {
+        return Send_ConfirmedPrivateTransfer(&dest,&private_data);
+    }
+    return -2;
 }
 
 /***************************************************
@@ -1332,7 +1332,7 @@ int WriteProgramData(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,
 ** Write Bacnet private data to device
 ** Add by Fance
 ****************************************************/
-int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,int8_t end_instance)
+int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char start_instance,unsigned char end_instance)
 {
     // TODO: Add your control notification handler code here
 
@@ -1432,6 +1432,9 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
     case WRITEANALOG_CUS_TABLE_T3000:
         entitysize = sizeof(Str_table_point);
         break;
+	case WRITE_MISC:
+		entitysize = sizeof(Str_MISC);
+		break;
     default:
     {
         //AfxMessageBox(_T("Entitysize length error!"));
@@ -1449,7 +1452,7 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
     int HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
 
     HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
-    private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + (end_instance - start_instance + 1)*entitysize;
+    private_data_chunk.total_length = PRIVATE_HEAD_LENGTH + ((unsigned char)end_instance - (unsigned char)start_instance + 1)*entitysize;
     private_data_chunk.command = command;
     private_data_chunk.point_start_instance = start_instance;
     private_data_chunk.point_end_instance = end_instance;
@@ -1613,6 +1616,11 @@ int WritePrivateData(uint32_t deviceid,int8_t n_command,int8_t start_instance,in
             memcpy_s(SendBuffer + i*sizeof(Str_table_point) + HEADER_LENGTH,sizeof(Str_table_point),&m_analog_custmer_range.at(i + start_instance),sizeof(Str_table_point));
         }
         break;
+	case  WRITE_MISC:
+		{
+			 memcpy_s(SendBuffer +   HEADER_LENGTH,sizeof(Str_MISC),&Device_Misc_Data,sizeof(Str_MISC));
+		}
+		break;
     default:
     {
         AfxMessageBox(_T("Command not match!Please Check it!"));
@@ -1722,9 +1730,9 @@ int Write_Private_Data_Blocking(uint8_t ncommand,uint8_t nstart_index,uint8_t ns
 			}
 			
 
-		}
-	}
-	return -1;
+        }
+    }
+    return -1;
 
 }
 
@@ -2255,7 +2263,8 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
         for (i=start_instance; i<=end_instance; i++)
         {
             m_graphic_label_data.at(i).reg.label_status = *(my_temp_point++);
-            temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+            //temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				temp_struct_value = g_serialNum;
             if((temp_struct_value == 0) || (m_graphic_label_data.at(i).reg.label_status == NO_UNSED_LABEL))
             {
                 b_stop_read_grp_label = true;
@@ -2269,6 +2278,15 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
             my_temp_point = my_temp_point + 2;
             m_graphic_label_data.at(i).reg.nMain_Panel = *(my_temp_point++);
             m_graphic_label_data.at(i).reg.nSub_Panel = *(my_temp_point++);
+
+			//下面的做法不合理，懒得改了，留给后面维护的人;  从一个panel 的prg 导入另一个panel 的prg  他们的 panel number 不同 会出现很多问题;
+			if(m_graphic_label_data.at(i).reg.nMain_Panel == m_graphic_label_data.at(i).reg.nSub_Panel)
+			{
+				if(m_graphic_label_data.at(i).reg.nMain_Panel != Station_NUM)
+				{
+					m_graphic_label_data.at(i).reg.nMain_Panel = m_graphic_label_data.at(i).reg.nSub_Panel = Station_NUM;
+				}
+			}
             m_graphic_label_data.at(i).reg.nPoint_type = *(my_temp_point++);
             m_graphic_label_data.at(i).reg.nPoint_number = *(my_temp_point++);
             m_graphic_label_data.at(i).reg.nPoint_x = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
@@ -2795,39 +2813,39 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
         int code_length = ((unsigned char)my_temp_point[1]<<8) | ((unsigned char)my_temp_point[0]);
         //my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
 
-			if(package == 0)
-			{
-				program_code_length[start_instance] = ((unsigned char)my_temp_point[1])*256 + (unsigned char)my_temp_point[0];
-				if(program_code_length[start_instance] > 2000)
-					program_code_length[start_instance] = 0;
-				//TRACE(_T("program_code_length%d = %d   [1] = %d [0] = %d \r\n"),start_instance,program_code_length[start_instance],(unsigned char)my_temp_point[1],(unsigned char)my_temp_point[0]);
-			}
-			else if(package == 4)
-				end_flag = true;
-			memset(mycode + package*400 ,0,400);
+        if(package == 0)
+        {
+            program_code_length[start_instance] = ((unsigned char)my_temp_point[1])*256 + (unsigned char)my_temp_point[0];
+            if(program_code_length[start_instance] > 2000)
+                program_code_length[start_instance] = 0;
+            //TRACE(_T("program_code_length%d = %d   [1] = %d [0] = %d \r\n"),start_instance,program_code_length[start_instance],(unsigned char)my_temp_point[1],(unsigned char)my_temp_point[0]);
+        }
+        else if(package == 4)
+            end_flag = true;
+        memset(mycode + package*400 ,0,400);
 
-			memcpy_s(mycode + package*400 ,400 ,my_temp_point,400);
-			unsigned char * temp_point = (program_code[start_instance]) + package*400;
-			memcpy_s((program_code[start_instance]) + package*400,400,my_temp_point,400);
-			//program_code_length[start_instance] = 400;
+        memcpy_s(mycode + package*400 ,400 ,my_temp_point,400);
+        unsigned char * temp_point = (program_code[start_instance]) + package*400;
+        memcpy_s((program_code[start_instance]) + package*400,400,my_temp_point,400);
+        //program_code_length[start_instance] = 400;
 
 
-			if(debug_item_show == DEBUG_SHOW_PROGRAM_DATA_ONLY)
-			{
-				CString temp_char;
-				CString n_temp_print;
-				char * temp_point;
-				temp_point = (char *)Temp_CS.value;
-				n_temp_print.Format(_T("prg_%d  pack_%d  receive:"),start_instance,package);
-				for (int i = 0; i< len_value_type ; i++)
-				{
-					temp_char.Format(_T("%02x"),(unsigned char)*temp_point);
-					temp_char.MakeUpper();
-					temp_point ++;
-					n_temp_print = n_temp_print + temp_char + _T(" ");
-				}
-				DFTrace(n_temp_print);
-			}
+        if(debug_item_show == DEBUG_SHOW_PROGRAM_DATA_ONLY)
+        {
+            CString temp_char;
+            CString n_temp_print;
+            char * temp_point;
+            temp_point = (char *)Temp_CS.value;
+            n_temp_print.Format(_T("prg_%d  pack_%d  receive:"),start_instance,package);
+            for (int i = 0; i< len_value_type ; i++)
+            {
+                temp_char.Format(_T("%02x"),(unsigned char)*temp_point);
+                temp_char.MakeUpper();
+                temp_point ++;
+                n_temp_print = n_temp_print + temp_char + _T(" ");
+            }
+            DFTrace(n_temp_print);
+        }
 
 
 
@@ -3166,48 +3184,52 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
             m_alarmlog_data.at(start_instance).prg =  *(my_temp_point++);
 
 
-				m_alarmlog_data.at(start_instance).alarm_panel =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).where1 =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).where2 =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).where3 =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).where4 =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).where5 =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).where_state1 =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).where_state2 =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).where_state3 =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).where_state4 =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).where_state5 =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).change_flag =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).original =  *(my_temp_point++);
-				m_alarmlog_data.at(start_instance).no =  *(my_temp_point++);
-			}
-		}
-		return READALARM_T3000;
-		break;
-	case READ_MISC:
-		{
-			block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
-			my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
-			if(block_length!=sizeof(Str_MISC))
-				return -1;
-			Device_Misc_Data.reg.flag[0] = *(my_temp_point++);
-			Device_Misc_Data.reg.flag[1] = *(my_temp_point++);
-			if((Device_Misc_Data.reg.flag[0]!= 0x55) || (Device_Misc_Data.reg.flag[1] != 0xff))
-				return -1;
-			for (int z=0;z<12;z++)
-			{
-				Device_Misc_Data.reg.monitor_analog_block_num[z] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-				my_temp_point = my_temp_point  +  4;
-				Device_Misc_Data.reg.monitor_digital_block_num[z] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-				my_temp_point = my_temp_point  +  4;
-			}
+            m_alarmlog_data.at(start_instance).alarm_panel =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).where1 =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).where2 =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).where3 =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).where4 =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).where5 =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).where_state1 =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).where_state2 =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).where_state3 =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).where_state4 =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).where_state5 =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).change_flag =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).original =  *(my_temp_point++);
+            m_alarmlog_data.at(start_instance).no =  *(my_temp_point++);
+        }
+    }
+    return READALARM_T3000;
+    break;
+    case READ_MISC:
+    {
+        block_length = len_value_type - PRIVATE_HEAD_LENGTH;//Program code length  =  total -  head;
+        my_temp_point = (char *)Temp_CS.value + PRIVATE_HEAD_LENGTH;
+        if(block_length!=sizeof(Str_MISC))
+            return -1;
+        Device_Misc_Data.reg.flag[0] = *(my_temp_point++);
+        Device_Misc_Data.reg.flag[1] = *(my_temp_point++);
+        if((Device_Misc_Data.reg.flag[0]!= 0x55) || (Device_Misc_Data.reg.flag[1] != 0xff))
+            return -1;
+        for (int z=0; z<12; z++)
+        {
+            Device_Misc_Data.reg.monitor_analog_block_num[z] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point  +  4;
+            Device_Misc_Data.reg.monitor_digital_block_num[z] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point  +  4;
+        }
 
-			for (int j=0;j<12;j++)
-			{
-				Device_Misc_Data.reg.operation_time[j] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-				my_temp_point = my_temp_point  +  4;
-			}
-
+        for (int j=0; j<12; j++)
+        {
+            Device_Misc_Data.reg.operation_time[j] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+            my_temp_point = my_temp_point  +  4;
+            if((Device_Misc_Data.reg.operation_time[j]< 1450774486) || (Device_Misc_Data.reg.operation_time[j] > 1505939286))
+            {
+                Device_Misc_Data.reg.operation_time[j] = 0;
+            }
+        }
+        Sleep(1);
     }
     break;
     case READ_SETTING_COMMAND:
@@ -3542,124 +3564,124 @@ void local_handler_conf_private_trans_ack(
 #if PRINT_ENABLED
         printf("cpta: Bad Encoding!\n");
 #endif
-	}
-	int receive_data_type;
-	bool each_end_flag = false;
-	receive_data_type = Bacnet_PrivateData_Handle(&data,each_end_flag);
-	if(receive_data_type < 0)
-	{
-		g_llerrCount ++;
-		return;
-	}
-	switch(receive_data_type)
-	{
-	case READ_REMOTE_POINT:
-		{
-			if(each_end_flag)
-			{
-				if(pDialog[WINDOW_REMOTE_POINT]->IsWindowEnabled())
-					::PostMessage(m_remote_point_hwnd,WM_REFRESH_BAC_REMOTE_POINT_LIST,NULL,NULL);
-			}
-		}
-		break;
-	case READANALOG_CUS_TABLE_T3000:
-		{
-			if(analog_cus_range_dlg!=NULL)
-				::PostMessage(analog_cus_range_dlg,WM_REFRESH_BAC_ANALOGCUSRANGE_LIST,NULL,NULL);	
-		}
-		break;
-	case READ_AT_COMMAND:
-		{
-			::PostMessage(m_at_command_hwnd,WM_REFRESH_BAC_AT_COMMAND,NULL,NULL);
-		}
-		break;
-	case READINPUT_T3000:
-		if(each_end_flag)
-		{
-			if(pDialog[WINDOW_INPUT]->IsWindowVisible())
-				::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-			else
-				TRACE(_T("Input window not visiable ,don't refresh\r\n"));
-		}
-		copy_data_to_ptrpanel(TYPE_INPUT);
-		break;
-	case READPROGRAM_T3000:
-		if(each_end_flag)
-		{
-			if(pDialog[WINDOW_PROGRAM]->IsWindowVisible())
-				::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
-		}
-		copy_data_to_ptrpanel(TYPE_ALL);
-		break;
-	case READPROGRAMCODE_T3000:
-		break;
-	case READVARIABLE_T3000:
-		if(each_end_flag)
-		{
-			if(pDialog[WINDOW_VARIABLE]->IsWindowVisible())
-				::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
-		}
-		copy_data_to_ptrpanel(TYPE_VARIABLE);
-		break;
-	case READOUTPUT_T3000:
-		if(each_end_flag)
-		{
-			if(pDialog[WINDOW_OUTPUT]->IsWindowVisible())
-			::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
-		}
-		copy_data_to_ptrpanel(TYPE_OUTPUT);
-		break;
-	case READWEEKLYROUTINE_T3000:
-		if(each_end_flag)
-			::PostMessage(m_weekly_dlg_hwnd,WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
-		copy_data_to_ptrpanel(TYPE_WEEKLY);
-		break;
-	case READANNUALROUTINE_T3000:
-		::PostMessage(m_annual_dlg_hwnd,WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
-		copy_data_to_ptrpanel(TYPE_ANNUAL);
-		break;
-	case READTIMESCHEDULE_T3000:
-		::PostMessage(m_schedule_time_dlg_hwnd,WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
-		break;
-	case TIME_COMMAND:
-		::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,TIME_COMMAND,NULL);
-		break;
-	case READANNUALSCHEDULE_T3000:
-		::PostMessage(m_schedule_day_dlg_hwnd,WM_REFRESH_BAC_DAY_CAL,NULL,NULL);
-		break;
-	case READCONTROLLER_T3000:
-		if(each_end_flag)
-			::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
-		copy_data_to_ptrpanel(TYPE_ALL);
-		break;
-	case READSCREEN_T3000:
-		if(each_end_flag)
-			::PostMessage(m_screen_dlg_hwnd,WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
-		copy_data_to_ptrpanel(TYPE_ALL);
-		break;
-	case READALARM_T3000:
-		if(each_end_flag)
-			::PostMessage(m_alarmlog_dlg_hwnd,WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
-		break;
-	case READ_SETTING_COMMAND:
-		::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);	
-		break;
-	case READTSTAT_T3000:
-		//if(each_end_flag)
-		//	::PostMessage(m_tstat_dlg_hwnd,WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
-		break;
-	case READMONITOR_T3000:
-		{
-			if(each_end_flag)
-			{
-				::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
-				::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
-			}
-		}
-		break;
-	default:
-		break;
-	}
+    }
+    int receive_data_type;
+    bool each_end_flag = false;
+    receive_data_type = Bacnet_PrivateData_Handle(&data,each_end_flag);
+    if(receive_data_type < 0)
+    {
+        g_llerrCount ++;
+        return;
+    }
+    switch(receive_data_type)
+    {
+    case READ_REMOTE_POINT:
+    {
+        if(each_end_flag)
+        {
+            if(pDialog[WINDOW_REMOTE_POINT]->IsWindowEnabled())
+                ::PostMessage(m_remote_point_hwnd,WM_REFRESH_BAC_REMOTE_POINT_LIST,NULL,NULL);
+        }
+    }
+    break;
+    case READANALOG_CUS_TABLE_T3000:
+    {
+        if(analog_cus_range_dlg!=NULL)
+            ::PostMessage(analog_cus_range_dlg,WM_REFRESH_BAC_ANALOGCUSRANGE_LIST,NULL,NULL);
+    }
+    break;
+    case READ_AT_COMMAND:
+    {
+        ::PostMessage(m_at_command_hwnd,WM_REFRESH_BAC_AT_COMMAND,NULL,NULL);
+    }
+    break;
+    case READINPUT_T3000:
+        if(each_end_flag)
+        {
+            if(pDialog[WINDOW_INPUT]->IsWindowVisible())
+                ::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+            else
+                TRACE(_T("Input window not visiable ,don't refresh\r\n"));
+        }
+        copy_data_to_ptrpanel(TYPE_INPUT);
+        break;
+    case READPROGRAM_T3000:
+        if(each_end_flag)
+        {
+            if(pDialog[WINDOW_PROGRAM]->IsWindowVisible())
+                ::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+        }
+        copy_data_to_ptrpanel(TYPE_ALL);
+        break;
+    case READPROGRAMCODE_T3000:
+        break;
+    case READVARIABLE_T3000:
+        if(each_end_flag)
+        {
+            if(pDialog[WINDOW_VARIABLE]->IsWindowVisible())
+                ::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+        }
+        copy_data_to_ptrpanel(TYPE_VARIABLE);
+        break;
+    case READOUTPUT_T3000:
+        if(each_end_flag)
+        {
+            if(pDialog[WINDOW_OUTPUT]->IsWindowVisible())
+                ::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+        }
+        copy_data_to_ptrpanel(TYPE_OUTPUT);
+        break;
+    case READWEEKLYROUTINE_T3000:
+        if(each_end_flag)
+            ::PostMessage(m_weekly_dlg_hwnd,WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
+        copy_data_to_ptrpanel(TYPE_WEEKLY);
+        break;
+    case READANNUALROUTINE_T3000:
+        ::PostMessage(m_annual_dlg_hwnd,WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
+        copy_data_to_ptrpanel(TYPE_ANNUAL);
+        break;
+    case READTIMESCHEDULE_T3000:
+        ::PostMessage(m_schedule_time_dlg_hwnd,WM_REFRESH_BAC_SCHEDULE_LIST,NULL,NULL);
+        break;
+    case TIME_COMMAND:
+        ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,TIME_COMMAND,NULL);
+        break;
+    case READANNUALSCHEDULE_T3000:
+        ::PostMessage(m_schedule_day_dlg_hwnd,WM_REFRESH_BAC_DAY_CAL,NULL,NULL);
+        break;
+    case READCONTROLLER_T3000:
+        if(each_end_flag)
+            ::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+        copy_data_to_ptrpanel(TYPE_ALL);
+        break;
+    case READSCREEN_T3000:
+        if(each_end_flag)
+            ::PostMessage(m_screen_dlg_hwnd,WM_REFRESH_BAC_SCREEN_LIST,NULL,NULL);
+        copy_data_to_ptrpanel(TYPE_ALL);
+        break;
+    case READALARM_T3000:
+        if(each_end_flag)
+            ::PostMessage(m_alarmlog_dlg_hwnd,WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
+        break;
+    case READ_SETTING_COMMAND:
+        ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
+        break;
+    case READTSTAT_T3000:
+        //if(each_end_flag)
+        //	::PostMessage(m_tstat_dlg_hwnd,WM_REFRESH_BAC_TSTAT_LIST,NULL,NULL);
+        break;
+    case READMONITOR_T3000:
+    {
+        if(each_end_flag)
+        {
+            ::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
+            ::PostMessage(m_monitor_dlg_hwnd,WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
+        }
+    }
+    break;
+    default:
+        break;
+    }
 
     if((each_end_flag) && (bac_read_which_list != BAC_READ_ALL_LIST) && (bac_read_which_list != BAC_READ_SVAE_CONFIG))
     {
@@ -3788,7 +3810,7 @@ CString GetProductName(int ModelID)
     case  PM_PRESSURE_SENSOR:
         strProductName = "Pressure";
         break;
-     
+
     case  PM_CO2_NODE:
         strProductName = "CO2 Node";
         break;
@@ -3801,7 +3823,7 @@ CString GetProductName(int ModelID)
         strProductName="T3-PT10";
         break;
     case PM_T3IOA :
-        strProductName="T3-8IOA";
+        strProductName="T3-8O";
         break;
     case PM_T332AI :
         strProductName="T3-32AI";
@@ -3831,7 +3853,7 @@ CString GetProductName(int ModelID)
         strProductName="HUM-R";
         break;
     case PM_T322AI:
-        strProductName="T3-22AI";
+        strProductName="T3-22I";
         break;
     case PM_T38AI8AO6DO:
         strProductName="T3-8AI8AO6DO";
@@ -4142,7 +4164,7 @@ void LocalIAmHandler(	uint8_t * service_request,	uint16_t service_len,	BACNET_AD
 SOCKET my_sokect;
 extern void  init_info_table( void );
 extern void Init_table_bank();
-bool Initial_bac(int comport)
+bool Initial_bac(int comport,CString bind_local_ip)
 {
 
     BACNET_ADDRESS src =
@@ -4175,7 +4197,16 @@ bool Initial_bac(int comport)
     if(comport == 0)	//
     {
 #endif
-        int ret_1 = Open_bacnetSocket2(_T("192.168.0.130"),BACNETIP_PORT,my_sokect);
+        int ret_1 ;
+        if(bind_local_ip.IsEmpty())
+        {
+            ret_1= Open_bacnetSocket2(_T(""),BACNETIP_PORT,my_sokect);
+        }
+        else
+        {
+            ret_1= Open_bacnetSocket2(bind_local_ip,BACNETIP_PORT,my_sokect);
+        }
+
         if(ret_1 < 0)
             return false;
         //	Open_Socket2(_T("127.0.0.1"),6002);
@@ -4203,7 +4234,24 @@ bool Initial_bac(int comport)
         memset(cTemp1,0,255);
         WideCharToMultiByte( CP_ACP, 0, cs_myip.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
 
-#if 1
+
+        if(bind_local_ip.IsEmpty())
+        {
+            static in_addr BIP_Address;
+            BIP_Address.S_un.S_addr =  inet_addr(cTemp1);
+            bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
+        }
+        else
+        {
+            static in_addr BIP_Address;
+            char temp_ip_1[100];
+            memset(temp_ip_1,0,100);
+            WideCharToMultiByte( CP_ACP, 0, bind_local_ip.GetBuffer(), -1, temp_ip_1, 255, NULL, NULL );
+            BIP_Address.S_un.S_addr =  inet_addr(temp_ip_1);
+            bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
+        }
+
+#if 0
         static in_addr BIP_Address;
         BIP_Address.S_un.S_addr =  inet_addr(cTemp1);
         bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
@@ -4626,11 +4674,30 @@ bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
     sockaddr_in servAddr;
     servAddr.sin_family = AF_INET;
     servAddr.sin_port = htons(nPort);
+
+
+    if(strIPAdress.IsEmpty())
+    {
+        servAddr.sin_addr.s_addr = INADDR_ANY;
+    }
+    else
+    {
+        char temp_ip_address[100];
+        memset(temp_ip_address,0,100);
+        WideCharToMultiByte( CP_ACP, 0, strIPAdress.GetBuffer(), -1, temp_ip_address, 255, NULL, NULL );
+        servAddr.sin_addr.s_addr =  inet_addr(temp_ip_address);
+    }
+
+
+
+
+    //这个地方不加限制后，及时是多网卡广播也没有什么问题.
+#if 0
     if(local_enthernet_ip.IsEmpty())
         servAddr.sin_addr.s_addr = INADDR_ANY;
     else
         servAddr.sin_addr.s_addr =  inet_addr(local_network_ip);
-
+#endif
     USES_CONVERSION;
 
 
@@ -4648,7 +4715,8 @@ bool Open_bacnetSocket2(CString strIPAdress,short nPort,SOCKET &mysocket)
 
     //servAddr.sin_addr.S_un.S_addr =inet_addr("192.168.0.28");
     //	servAddr.sin_addr.S_un.S_addr =inet_addr((LPSTR)(LPCTSTR)strIPAdress);
-    servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
+    //servAddr.sin_addr.S_un.S_addr = INADDR_ANY;//
+    //	servAddr.sin_addr.S_un.S_addr = (inet_addr(W2A(strIPAdress)));
     //	u_long ul=1;
     //	ioctlsocket(m_hSocket,FIONBIO,(u_long*)&ul);
 
@@ -4912,26 +4980,26 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
         temp.nSerial = nSerial;
         temp.NetCard_Address=local_enthernet_ip;
 
-		temp.sw_version = usDataPackage[11];
-		temp.hw_version = usDataPackage[12];
-		temp.parent_serial_number = usDataPackage[13] + usDataPackage[14]*65536;
-		unsigned char temp_obj[2];
-		unsigned char temp_panel[2];
-		memcpy(temp_obj,&usDataPackage[15],2);
-		memcpy(temp_panel,&usDataPackage[16],2);
-		temp.object_instance = temp_obj[0]*256 + temp_obj[1];
-		temp.panal_number = temp_panel[0];
-	//	temp.object_instance = usDataPackage[15] >>8 + (usDataPackage[15]&0x00ff)<<8;
+        temp.sw_version = usDataPackage[11];
+        temp.hw_version = usDataPackage[12];
+        temp.parent_serial_number = usDataPackage[13] + usDataPackage[14]*65536;
+        unsigned char temp_obj[2];
+        unsigned char temp_panel[2];
+        memcpy(temp_obj,&usDataPackage[15],2);
+        memcpy(temp_panel,&usDataPackage[16],2);
+        temp.object_instance = temp_obj[0]*256 + temp_obj[1];
+        temp.panal_number = temp_panel[0];
+        //	temp.object_instance = usDataPackage[15] >>8 + (usDataPackage[15]&0x00ff)<<8;
 
-		if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
-		{
-			g_Print.Format(_T("Serial = %u     ID = %d ,ip = %s  , Product name : %s ,obj = %u ,panel = %u"),nSerial,modbusID,nip_address ,nproduct_name,temp.object_instance,temp.panal_number);
-			DFTrace(g_Print);
-		}
+        if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
+        {
+            g_Print.Format(_T("Serial = %u     ID = %d ,ip = %s  , Product name : %s ,obj = %u ,panel = %u"),nSerial,modbusID,nip_address ,nproduct_name,temp.object_instance,temp.panal_number);
+            DFTrace(g_Print);
+        }
 
 
 
-		bool find_exsit = false;
+        bool find_exsit = false;
 
         for (int i=0; i<(int)m_refresh_net_device_data.size(); i++)
         {
@@ -5670,88 +5738,91 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 #endif
 
         int ntemp_version = GetPrivateProfileInt(_T("Setting"),_T("Version"),0,FilePath);
-        if(ntemp_version != 2)
+        if(ntemp_version < 2)
         {
             DeleteFile(new_file);
             SetPaneString(BAC_SHOW_MISSION_RESULTS ,_T("You config file is the old version."));
             return -1;
         }
+		//Version 3 加入了 BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT    BAC_GRPHIC_LABEL_COUNT    BAC_USER_LOGIN_COUNT    BAC_CUSTOMER_UNITS_COUNT
 
         //			CString FilePath;
         //		FilePath=dlg.GetPathName();
-        for (int i=0; i<BAC_INPUT_ITEM_COUNT; i++)
-        {
-            CString temp_input,temp_des,temp_csc;
-            temp_input.Format(_T("Input%d"),i);
+		if((ntemp_version == 2) || (ntemp_version == 3))
+		{
+			for (int i=0; i<BAC_INPUT_ITEM_COUNT; i++)
+			{
+				CString temp_input,temp_des,temp_csc;
+				temp_input.Format(_T("Input%d"),i);
 
-            CString cs_temp;
-            char cTemp1[255];
-            GetPrivateProfileStringW(temp_input,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-            cs_temp.ReleaseBuffer();
-            memset(cTemp1,0,255);
-            WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-            memcpy_s(m_Input_data.at(i).description,STR_IN_DESCRIPTION_LENGTH,cTemp1,STR_IN_DESCRIPTION_LENGTH);
+				CString cs_temp;
+				char cTemp1[255];
+				GetPrivateProfileStringW(temp_input,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Input_data.at(i).description,STR_IN_DESCRIPTION_LENGTH,cTemp1,STR_IN_DESCRIPTION_LENGTH);
 
-            cs_temp.Empty();
-            GetPrivateProfileStringW(temp_input,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-            cs_temp.ReleaseBuffer();
-            memset(cTemp1,0,255);
-            WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-            memcpy_s(m_Input_data.at(i).label,STR_IN_LABEL,cTemp1,STR_IN_LABEL);
+				cs_temp.Empty();
+				GetPrivateProfileStringW(temp_input,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Input_data.at(i).label,STR_IN_LABEL,cTemp1,STR_IN_LABEL);
 
-            m_Input_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_input,_T("Auto_Manual"),0,FilePath);
-            m_Input_data.at(i).value = GetPrivateProfileInt(temp_input,_T("Value"),0,FilePath);
+				m_Input_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_input,_T("Auto_Manual"),0,FilePath);
+				m_Input_data.at(i).value = GetPrivateProfileInt(temp_input,_T("Value"),0,FilePath);
 
-            m_Input_data.at(i).filter = (unsigned char)GetPrivateProfileInt(temp_input,_T("Filter"),0,FilePath);
-            m_Input_data.at(i).decom = (unsigned char)GetPrivateProfileInt(temp_input,_T("Decom"),0,FilePath);
-            m_Input_data.at(i).sub_id = (unsigned char)GetPrivateProfileInt(temp_input,_T("Sen_On"),0,FilePath);
+				m_Input_data.at(i).filter = (unsigned char)GetPrivateProfileInt(temp_input,_T("Filter"),0,FilePath);
+				m_Input_data.at(i).decom = (unsigned char)GetPrivateProfileInt(temp_input,_T("Decom"),0,FilePath);
+				m_Input_data.at(i).sub_id = (unsigned char)GetPrivateProfileInt(temp_input,_T("Sen_On"),0,FilePath);
 
-            m_Input_data.at(i).sub_product = (unsigned char)GetPrivateProfileInt(temp_input,_T("Sen_Off"),0,FilePath);
-            m_Input_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_input,_T("Control"),0,FilePath);
-            m_Input_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_input,_T("Digital_Analog"),0,FilePath);
+				m_Input_data.at(i).sub_product = (unsigned char)GetPrivateProfileInt(temp_input,_T("Sen_Off"),0,FilePath);
+				m_Input_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_input,_T("Control"),0,FilePath);
+				m_Input_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_input,_T("Digital_Analog"),0,FilePath);
 
-            m_Input_data.at(i).calibration_sign = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration_Sign"),0,FilePath);
-            m_Input_data.at(i).sub_number = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration_Increment"),0,FilePath);
-            m_Input_data.at(i).calibration_h = (unsigned char)GetPrivateProfileInt(temp_input,_T("Unused"),0,FilePath);
+				m_Input_data.at(i).calibration_sign = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration_Sign"),0,FilePath);
+				m_Input_data.at(i).sub_number = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration_Increment"),0,FilePath);
+				m_Input_data.at(i).calibration_h = (unsigned char)GetPrivateProfileInt(temp_input,_T("Unused"),0,FilePath);
 
-            m_Input_data.at(i).calibration_l = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration"),0,FilePath);
-            m_Input_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_input,_T("Range"),0,FilePath);
+				m_Input_data.at(i).calibration_l = (unsigned char)GetPrivateProfileInt(temp_input,_T("Calibration"),0,FilePath);
+				m_Input_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_input,_T("Range"),0,FilePath);
 
-        }
+			}
 
-        for (int i=0; i<BAC_OUTPUT_ITEM_COUNT; i++)
-        {
-            CString temp_section,temp_des,temp_csc;
-            temp_section.Format(_T("Output%d"),i);
-            CString cs_temp;
-            char cTemp1[255];
-            GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-            cs_temp.ReleaseBuffer();
-            memset(cTemp1,0,255);
-            WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-            memcpy_s(m_Output_data.at(i).description,STR_OUT_DESCRIPTION_LENGTH,cTemp1,STR_OUT_DESCRIPTION_LENGTH);
+			for (int i=0; i<BAC_OUTPUT_ITEM_COUNT; i++)
+			{
+				CString temp_section,temp_des,temp_csc;
+				temp_section.Format(_T("Output%d"),i);
+				CString cs_temp;
+				char cTemp1[255];
+				GetPrivateProfileStringW(temp_section,_T("Description"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Output_data.at(i).description,STR_OUT_DESCRIPTION_LENGTH,cTemp1,STR_OUT_DESCRIPTION_LENGTH);
 
-            cs_temp.Empty();
-            GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
-            cs_temp.ReleaseBuffer();
-            memset(cTemp1,0,255);
-            WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
-            memcpy_s(m_Output_data.at(i).label,STR_OUT_LABEL,cTemp1,STR_OUT_LABEL);
+				cs_temp.Empty();
+				GetPrivateProfileStringW(temp_section,_T("Label"),_T(""),cs_temp.GetBuffer(MAX_PATH),255,FilePath);
+				cs_temp.ReleaseBuffer();
+				memset(cTemp1,0,255);
+				WideCharToMultiByte( CP_ACP, 0, cs_temp.GetBuffer(), -1, cTemp1, 255, NULL, NULL );
+				memcpy_s(m_Output_data.at(i).label,STR_OUT_LABEL,cTemp1,STR_OUT_LABEL);
 
-            m_Output_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
-            m_Output_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
+				m_Output_data.at(i).auto_manual = (unsigned char)GetPrivateProfileInt(temp_section,_T("Auto_Manual"),0,FilePath);
+				m_Output_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
 
-            m_Output_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Analog"),0,FilePath);
-            m_Output_data.at(i).hw_switch_status = (unsigned char)GetPrivateProfileInt(temp_section,_T("hw_switch_status"),0,FilePath);
-            m_Output_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Control"),0,FilePath);
-            m_Output_data.at(i).digital_control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Control"),0,FilePath);
-            m_Output_data.at(i).decom = (unsigned char)GetPrivateProfileInt(temp_section,_T("Decom"),0,FilePath);
-            m_Output_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_section,_T("Range"),0,FilePath);
-            m_Output_data.at(i).sub_id = (unsigned char)GetPrivateProfileInt(temp_section,_T("M_Del_Low"),0,FilePath);
-            m_Output_data.at(i).sub_product = (unsigned char)GetPrivateProfileInt(temp_section,_T("S_Del_High"),0,FilePath);
-            m_Output_data.at(i).sub_number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Sub__number"),0,FilePath);
-            m_Output_data.at(i).pwm_period = (unsigned char)GetPrivateProfileInt(temp_section,_T("Delay_Timer"),0,FilePath);
-        }
+				m_Output_data.at(i).digital_analog = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Analog"),0,FilePath);
+				m_Output_data.at(i).hw_switch_status = (unsigned char)GetPrivateProfileInt(temp_section,_T("hw_switch_status"),0,FilePath);
+				m_Output_data.at(i).control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Control"),0,FilePath);
+				m_Output_data.at(i).digital_control = (unsigned char)GetPrivateProfileInt(temp_section,_T("Digital_Control"),0,FilePath);
+				m_Output_data.at(i).decom = (unsigned char)GetPrivateProfileInt(temp_section,_T("Decom"),0,FilePath);
+				m_Output_data.at(i).range = (unsigned char)GetPrivateProfileInt(temp_section,_T("Range"),0,FilePath);
+				m_Output_data.at(i).sub_id = (unsigned char)GetPrivateProfileInt(temp_section,_T("M_Del_Low"),0,FilePath);
+				m_Output_data.at(i).sub_product = (unsigned char)GetPrivateProfileInt(temp_section,_T("S_Del_High"),0,FilePath);
+				m_Output_data.at(i).sub_number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Sub__number"),0,FilePath);
+				m_Output_data.at(i).pwm_period = (unsigned char)GetPrivateProfileInt(temp_section,_T("Delay_Timer"),0,FilePath);
+			}
 
         for (int i=0; i<BAC_VARIABLE_ITEM_COUNT; i++)
         {
@@ -5908,21 +5979,21 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
             GetPrivateProfileStringW(temp_section,part_section,_T(""),temp_program_code.GetBuffer(4000),4000,FilePath);
             temp_program_code.ReleaseBuffer();
 
-			if(ntemp_version < 2)	//如果是加载的旧版本的 配置档,code 就清零;
-			{
-				program_code_length[i] = 0;
-				memset(program_code[i],0,2000);
-			}
-			else
-			{
-				int temp_count = temp_program_code.GetLength()/2;
-				for (int x=0;x<temp_count;x++)
-				{
-					CString temp_value;
-					temp_value = temp_program_code.Left(2);
-					temp_program_code = temp_program_code.Right(temp_program_code.GetLength()-2);
-					program_code[i][x] = Str_to_Byte(temp_value);
-				}
+            if(ntemp_version < 2)	//如果是加载的旧版本的 配置档,code 就清零;
+            {
+                program_code_length[i] = 0;
+                memset(program_code[i],0,2000);
+            }
+            else
+            {
+                int temp_count = temp_program_code.GetLength()/2;
+                for (int x=0; x<temp_count; x++)
+                {
+                    CString temp_value;
+                    temp_value = temp_program_code.Left(2);
+                    temp_program_code = temp_program_code.Right(temp_program_code.GetLength()-2);
+                    program_code[i][x] = Str_to_Byte(temp_value);
+                }
 #if 0
                 if(temp_program_code.GetLength() == 2*program_code_length[i])
                 {
@@ -6052,18 +6123,27 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
             GetPrivateProfileStringW(temp_section,_T("Inputs"),_T(""),temp_input_code1.GetBuffer(MAX_PATH),255,FilePath);
             temp_input_code1.ReleaseBuffer();
 
-            CString temp_input = temp_input_code1;
-            if(temp_input.GetLength()!= (sizeof(Point_Net)*MAX_POINTS_IN_MONITOR) )
-                continue;	//如果这一个的长度不正确 就继续下一个;忽略这个;
-            unsigned char temp_in_array[sizeof(Point_Net)*MAX_POINTS_IN_MONITOR];
-            for (int x=0; x<(sizeof(Point_Net)*MAX_POINTS_IN_MONITOR); x++)
-            {
-                CString temp_value;
-                temp_value = temp_input.Left(2);
-                temp_input = temp_input.Right(temp_input.GetLength()-2);
-                temp_in_array[x] = Str_to_Byte(temp_value);
-            }
-            memcpy_s(&m_monitor_data.at(i).inputs[0],sizeof(Point_Net)*MAX_POINTS_IN_MONITOR,temp_in_array,sizeof(Point_Net)*MAX_POINTS_IN_MONITOR);//copy 70
+				CString temp_input = temp_input_code1;
+				int temp_input_test_value;
+				int struct_test_value;
+				temp_input_test_value = temp_input.GetLength() / 2;
+				struct_test_value = sizeof(Point_Net)*MAX_POINTS_IN_MONITOR;
+				if(temp_input_test_value != struct_test_value )
+				{
+					if(IDYES == AfxMessageBox(_T("Prg is too old.Continue") ,MB_YESNO))
+						continue;	//如果这一个的长度不正确 就继续下一个;忽略这个;
+					else
+						return 0;
+				}
+				unsigned char temp_in_array[sizeof(Point_Net)*MAX_POINTS_IN_MONITOR];
+				for (int x=0; x<(sizeof(Point_Net)*MAX_POINTS_IN_MONITOR); x++)
+				{
+					CString temp_value;
+					temp_value = temp_input.Left(2);
+					temp_input = temp_input.Right(temp_input.GetLength()-2);
+					temp_in_array[x] = Str_to_Byte(temp_value);
+				}
+				memcpy_s(&m_monitor_data.at(i).inputs[0],sizeof(Point_Net)*MAX_POINTS_IN_MONITOR,temp_in_array,sizeof(Point_Net)*MAX_POINTS_IN_MONITOR);//copy 70
 
             CString temp_range_code1;
             GetPrivateProfileStringW(temp_section,_T("Range"),_T(""),temp_range_code1.GetBuffer(MAX_PATH),255,FilePath);
@@ -6095,8 +6175,131 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
             //m_monitor_data.at(i).reset_flag = GetPrivateProfileInt(temp_section,_T("Reset_Flag"),0,FilePath);
             //m_monitor_data.at(i).double_flag = GetPrivateProfileInt(temp_section,_T("Double_flag"),0,FilePath);
 
-        }
+			}
+		}
+		if(ntemp_version == 3) // 第三版中新加入的;
+		{
+			for (int i=0; i<BAC_GRPHIC_LABEL_COUNT; i++)
+			{
+				CString temp_section;
+				CString temp_code;
+				unsigned char * temp_point = NULL;
+				char temp_buffer[400];
+				memset(temp_buffer,0,400);
+				temp_section.Format(_T("LabelData_%d"),i);
 
+				CString temp_grplable_code;
+				GetPrivateProfileStringW(_T("GraphicLabel"),temp_section,_T(""),temp_grplable_code.GetBuffer(4000),4000,FilePath);
+				temp_grplable_code.ReleaseBuffer();
+
+				int temp_count = temp_grplable_code.GetLength()/2;
+				if(temp_count != sizeof(Str_label_point))
+				{
+					AfxMessageBox(_T("Load prg file error."));
+					return 1;
+				}
+				for (int x=0;x<temp_count;x++)
+				{
+					CString temp_value;
+					temp_value = temp_grplable_code.Left(2);
+					temp_grplable_code = temp_grplable_code.Right(temp_grplable_code.GetLength()-2);
+					temp_buffer[x] = Str_to_Byte(temp_value);
+				}
+				memcpy(&m_graphic_label_data.at(i),temp_buffer,sizeof(Str_label_point));
+			}
+
+
+			for (int i=0; i<BAC_USER_LOGIN_COUNT; i++)
+			{
+				CString temp_section;
+				CString temp_code;
+				unsigned char * temp_point = NULL;
+				char temp_buffer[400];
+				memset(temp_buffer,0,400);
+				temp_section.Format(_T("Userlogin_%d"),i);
+
+				CString temp_login_code;
+				GetPrivateProfileStringW(_T("LoginData"),temp_section,_T(""),temp_login_code.GetBuffer(4000),4000,FilePath);
+				temp_login_code.ReleaseBuffer();
+
+				int temp_count = temp_login_code.GetLength()/2;
+				if(temp_count != sizeof(Str_userlogin_point))
+				{
+					AfxMessageBox(_T("Load prg file error."));
+					return 1;
+				}
+				for (int x=0;x<temp_count;x++)
+				{
+					CString temp_value;
+					temp_value = temp_login_code.Left(2);
+					temp_login_code = temp_login_code.Right(temp_login_code.GetLength()-2);
+					temp_buffer[x] = Str_to_Byte(temp_value);
+				}
+				memcpy(&m_user_login_data.at(i),temp_buffer,sizeof(Str_userlogin_point));
+			}
+
+
+			for (int i=0; i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
+			{
+				CString temp_section;
+				CString temp_code;
+				unsigned char * temp_point = NULL;
+				char temp_buffer[400];
+				memset(temp_buffer,0,400);
+				temp_section.Format(_T("AlalogTable_%d"),i);
+
+				CString temp_analog_unit_code;
+				GetPrivateProfileStringW(_T("AlalogCusTable"),temp_section,_T(""),temp_analog_unit_code.GetBuffer(4000),4000,FilePath);
+				temp_analog_unit_code.ReleaseBuffer();
+
+				int temp_count = temp_analog_unit_code.GetLength()/2;
+				if(temp_count != sizeof(Str_table_point))
+				{
+					AfxMessageBox(_T("Load prg file error."));
+					return 1;
+				}
+				for (int x=0;x<temp_count;x++)
+				{
+					CString temp_value;
+					temp_value = temp_analog_unit_code.Left(2);
+					temp_analog_unit_code = temp_analog_unit_code.Right(temp_analog_unit_code.GetLength()-2);
+					temp_buffer[x] = Str_to_Byte(temp_value);
+				}
+				memcpy(&m_analog_custmer_range.at(i),temp_buffer,sizeof(Str_table_point));
+			}			
+			
+			for (int i=0; i<BAC_CUSTOMER_UNITS_COUNT; i++)
+			{
+				CString temp_section;
+				CString temp_code;
+				unsigned char * temp_point = NULL;
+				char temp_buffer[400];
+				memset(temp_buffer,0,400);
+				temp_section.Format(_T("UnitData_%d"),i);
+
+				CString temp_digital_unit_code;
+				GetPrivateProfileStringW(_T("Cust_Digital_Unit"),temp_section,_T(""),temp_digital_unit_code.GetBuffer(4000),4000,FilePath);
+				temp_digital_unit_code.ReleaseBuffer();
+
+				int temp_count = temp_digital_unit_code.GetLength()/2;
+				if(temp_count != sizeof(Str_Units_element))
+				{
+					AfxMessageBox(_T("Load prg file error."));
+					return 1;
+				}
+				for (int x=0;x<temp_count;x++)
+				{
+					CString temp_value;
+					temp_value = temp_digital_unit_code.Left(2);
+					temp_digital_unit_code = temp_digital_unit_code.Right(temp_digital_unit_code.GetLength()-2);
+					temp_buffer[x] = Str_to_Byte(temp_value);
+				}
+				memcpy(&m_customer_unit_data.at(i),temp_buffer,sizeof(Str_Units_element));
+			}
+
+
+
+		}
         DeleteFile(new_file);
         if(write_to_device)	//如果是客户手动load 就让客户选择路径，不是手动load就说明是读缓存;
         {
@@ -6107,6 +6310,7 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
             else
             {
                 CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+				pFrame->m_prg_version = ntemp_version;
                 pFrame->Show_Wait_Dialog_And_SendConfigMessage();
             }
 
@@ -6426,8 +6630,8 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
         FilePath = SaveConfigFilePath.Left( config_file_length -  right_suffix);
         FilePath = FilePath + _T("ini");
 
-        WritePrivateProfileStringW(_T("Setting"),_T("Version"),_T("2"),FilePath);
-
+        WritePrivateProfileStringW(_T("Setting"),_T("Version"),_T("3"),FilePath);
+		//Version 3 加入了 BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT    BAC_GRPHIC_LABEL_COUNT    BAC_USER_LOGIN_COUNT    BAC_CUSTOMER_UNITS_COUNT
         for (int i=0; i<BAC_INPUT_ITEM_COUNT; i++)
         {
             CString temp_input,temp_des,temp_csc;
@@ -6653,6 +6857,102 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
             WritePrivateProfileStringW(temp_section,_T("Ycur_grp"),temp_csc,FilePath);
         }
 
+#pragma region Version_3_Add
+
+		for (int i=0; i<BAC_GRPHIC_LABEL_COUNT; i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			CString temp_label_code;
+			temp_section.Format(_T("LabelData_%d"),i);
+
+			char temp_buffer[400];
+			memset(temp_buffer,0,400);
+			memcpy(temp_buffer,&m_graphic_label_data.at(i),sizeof(Str_label_point));
+
+			int temp_value = sizeof(Str_label_point);
+			temp_label_code.Empty();
+			for (int j=0; j<temp_value; j++)
+			{
+				temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_buffer + j)));
+				temp_csc.MakeUpper();
+				temp_label_code = temp_label_code + temp_csc;
+			}
+
+			WritePrivateProfileStringW(_T("GraphicLabel"),temp_section,temp_label_code,FilePath);
+		}
+
+		for (int i=0; i<BAC_USER_LOGIN_COUNT; i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			CString temp_userlogin_code;
+			temp_section.Format(_T("Userlogin_%d"),i);
+
+			char login_buffer[400];
+			memset(login_buffer,0,400);
+			memcpy(login_buffer,&m_user_login_data.at(i),sizeof(Str_userlogin_point));
+
+
+			temp_userlogin_code.Empty();
+			for (int j=0; j<sizeof(Str_userlogin_point); j++)
+			{
+				temp_csc.Format(_T("%02x"),(unsigned char)(*(login_buffer + j)));
+				temp_csc.MakeUpper();
+				temp_userlogin_code = temp_userlogin_code + temp_csc;
+			}
+
+			WritePrivateProfileStringW(_T("LoginData"),temp_section,temp_userlogin_code,FilePath);
+		}
+
+
+
+		for (int i=0; i<BAC_CUSTOMER_UNITS_COUNT; i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			CString temp_units_code;
+			temp_section.Format(_T("UnitData_%d"),i);
+
+			char temp_buffer[400];
+			memset(temp_buffer,0,400);
+			memcpy(temp_buffer,&m_customer_unit_data.at(i),sizeof(Str_Units_element));
+
+
+			temp_units_code.Empty();
+			for (int j=0; j<sizeof(Str_Units_element); j++)
+			{
+				temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_buffer + j)));
+				temp_csc.MakeUpper();
+				temp_units_code = temp_units_code + temp_csc;
+			}
+
+			WritePrivateProfileStringW(_T("Cust_Digital_Unit"),temp_section,temp_units_code,FilePath);
+		}
+
+		for (int i=0; i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
+		{
+			CString temp_section,temp_des,temp_csc;
+			CString temp_alalog_table_code;
+			temp_section.Format(_T("AlalogTable_%d"),i);
+
+			char temp_buffer[400];
+			memset(temp_buffer,0,400);
+			memcpy(temp_buffer,&m_analog_custmer_range.at(i),sizeof(Str_table_point));
+
+
+			temp_alalog_table_code.Empty();
+			for (int j=0; j<sizeof(Str_table_point); j++)
+			{
+				temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_buffer + j)));
+				temp_csc.MakeUpper();
+				temp_alalog_table_code = temp_alalog_table_code + temp_csc;
+			}
+
+			WritePrivateProfileStringW(_T("AlalogCusTable"),temp_section,temp_alalog_table_code,FilePath);
+		}
+
+#pragma endregion Version_3_Add
+		
+
+
 
         for (int i=0; i<BAC_SCHEDULE_COUNT; i++)
         {
@@ -6739,7 +7039,7 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
                 temp_point = &m_monitor_data.at(i).inputs[j].number;
                 for (int k=0; k<(int)sizeof(Point_Net); k++)
                 {
-                    temp_csc.Format(_T("%02x"),*(temp_point + k));
+                    temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_point + k)));
                     temp_csc.MakeUpper();
                     temp_inputs = temp_inputs + temp_csc;
                 }
@@ -6786,7 +7086,7 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
             tempsection.Format(_T("WeeklyRoutinesData_%d"),i);
             for (int j=0; j<WEEKLY_SCHEDULE_SIZE; j++)
             {
-                temp_csc.Format(_T("%02x"),*(temp_point + j));
+                temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_point + j)));
                 temp_csc.MakeUpper();
                 temp_code = temp_code + temp_csc;
             }
@@ -6801,7 +7101,7 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
             tempsection.Format(_T("AnnualRoutinesData_%d"),i);
             for (int j=0; j<ANNUAL_CODE_SIZE; j++)
             {
-                temp_csc.Format(_T("%02x"),*(temp_point + j));
+                temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_point + j)));
                 temp_csc.MakeUpper();
                 temp_code = temp_code + temp_csc;
             }
@@ -6831,7 +7131,7 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
             temp_code.Empty();
             for (int j=0; j<program_code_length[i]; j++)
             {
-                temp_csc.Format(_T("%02x"),*(temp_point + j));
+                temp_csc.Format(_T("%02x"),(unsigned char)(*(temp_point + j)));
                 temp_csc.MakeUpper();
                 temp_code = temp_code + temp_csc;
             }
@@ -6840,6 +7140,10 @@ void SaveBacnetConfigFile(CString &SaveConfigFilePath)
             WritePrivateProfileStringW(temp_section,part_section,temp_code,FilePath);
 
         }
+
+
+
+
 
         CFile myfile(FilePath,CFile::modeRead);
         char *pBuf;
@@ -7939,9 +8243,6 @@ void LoadTstat_InputData()
     m_tstat_input_data.at(11).Value.regAddress=MODBUS_VALUE_SENSOR;
     m_tstat_input_data.at(11).Value.RegValue=product_register_value[MODBUS_VALUE_SENSOR];
     m_tstat_input_data.at(11).Value.StrValue=strTemp;
-
-
-
 
 }
 
@@ -9197,11 +9498,11 @@ void LoadRegistersGraphicMode()
 void LoadRegistersGraphicMode_AQ()
 {
     g_calibration_module_data.Current_Frequency.regAddress = 305;
-    g_calibration_module_data.Current_Frequency.StrValue = _T('Frequency');
+    g_calibration_module_data.Current_Frequency.StrValue = _T("Frequency");
     g_calibration_module_data.User_Table_Selection.regAddress=309;
     g_calibration_module_data.User_Table_Point_Number.regAddress= 307;
     g_calibration_module_data.User_Offset.regAddress = 106;
-    g_calibration_module_data.User_Offset.RegValue = product_register_value[106]-500;
+    g_calibration_module_data.User_Offset.RegValue = (short)product_register_value[106];
     g_calibration_module_data.User_Fre.regAddress	=312	 ;
     g_calibration_module_data.User_Fre.StrValue=_T("Frequency");
     g_calibration_module_data.User_Hum.regAddress	=313;
@@ -9216,7 +9517,7 @@ void LoadRegistersGraphicMode_AQ()
 void LoadRegistersGraphicMode_HUMTEMPSENSOR()
 {
     g_calibration_module_data.Current_Frequency.regAddress = 374;
-    g_calibration_module_data.Current_Frequency.StrValue = _T('Frequency');
+    g_calibration_module_data.Current_Frequency.StrValue = _T("Frequency");
     g_calibration_module_data.User_Table_Selection.regAddress=454;
     g_calibration_module_data.User_Table_Point_Number.regAddress=455;
     g_calibration_module_data.User_Offset.regAddress = 451;

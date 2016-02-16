@@ -123,7 +123,7 @@ protected:	// private method
 	void GetFlashParameter();
 
 	/*void InitISPUI();*/
-
+  BOOL  DetectBraudrate ()    ;
 	
 
 	void SaveFlashSNParamToFile();
@@ -264,4 +264,6 @@ public:
 	afx_msg void OnMenuCheckhex();
 	void CheckAutoFlash();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+    CComboBox m_combox_baudrate;
+    afx_msg void OnMenuFlashsn();
 };

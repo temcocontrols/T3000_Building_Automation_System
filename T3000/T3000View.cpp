@@ -821,7 +821,7 @@ void CT3000View::Fresh()
     {
         m_isp.ShowWindow(FALSE);
     }
-    if (product_register_value[714]==0x56&&(product_register_value[7] == PM_TSTAT6||product_register_value[7] == PM_TSTAT7||product_register_value[7] == PM_HUMTEMPSENSOR||product_register_value[7] ==PM_AirQuality||product_register_value[7] ==PM_HUM_R))
+    if (product_register_value[714]==0x56)
     {
         GetDlgItem(IDC_STATIC_NAME_TSTAT)->ShowWindow(TRUE);
         GetDlgItem(IDC_EDIT_TSTAT_NAME)->ShowWindow(TRUE);

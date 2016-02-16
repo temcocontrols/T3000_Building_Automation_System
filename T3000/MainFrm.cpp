@@ -107,6 +107,7 @@ unsigned long time_click = 0;
 bool enable_show_debug_window = false;
 BacnetWait *WaitWriteDlg=NULL;
 HANDLE hwait_write_thread = NULL;
+HANDLE hwait_read_thread = NULL;
 _Refresh_Write_Info Write_Config_Info;
 HANDLE hStartEvent; // thread start event
 extern int isp_product_id;
@@ -1041,6 +1042,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         m_pDialogInfo->ShowWindow(SW_HIDE);
         m_pDialogInfo->CenterWindow();
         m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T(""));
+
+
+
+
     }
 
     m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
@@ -1664,10 +1669,10 @@ void CMainFrame::LoadProductFromDB()
         }
 
         current_building_baudrate = _wtoi(cs_temp_baudrate);
-        if((current_building_baudrate!= 19200) && (current_building_baudrate != 9600) && (current_building_baudrate != 38400))
-        {
-            current_building_baudrate = 19200;
-        }
+//         if((current_building_baudrate!= 19200) && (current_building_baudrate != 9600) && (current_building_baudrate != 38400))
+//         {
+//             current_building_baudrate = 19200;
+//         }
 
         //current_building_comport
         temp_variant = ado.m_pRecordset->GetCollect(_T("Com_Port"));
@@ -4680,194 +4685,21 @@ void CMainFrame::OnLabe3()
 }
 
 void CMainFrame::Show_Wait_Dialog_And_SendConfigMessage()
+{    
+if(hwait_write_thread==NULL)    
 {
-#if 0
-    for (int i=0; i<BAC_INPUT_GROUP; i++)
-    {
-
-        Write_Config_Info.Write_Input_Info[i].command = 0;
-        Write_Config_Info.Write_Input_Info[i].device_id = 0;
-        Write_Config_Info.Write_Input_Info[i].start_instance =0;
-        Write_Config_Info.Write_Input_Info[i].end_instance =0;
-        Write_Config_Info.Write_Input_Info[i].has_resend_yes_or_no = 0;
-        Write_Config_Info.Write_Input_Info[i].resend_count = 0;
-        Write_Config_Info.Write_Input_Info[i].task_result = BAC_RESULTS_UNKONW;
-        Write_Config_Info.Write_Input_Info[i].invoke_id = -1;
-        //bac_input_read_results = 0;
-        Write_Config_Info.Write_Input_Info[i].timeout_count = 0;
-    }
-
-    for (int i=0; i<BAC_OUTPUT_GROUP; i++)
-    {
-
-        Write_Config_Info.Write_Output_Info[i].command = 0;
-        Write_Config_Info.Write_Output_Info[i].device_id = 0;
-        Write_Config_Info.Write_Output_Info[i].start_instance =0;
-        Write_Config_Info.Write_Output_Info[i].end_instance =0;
-        Write_Config_Info.Write_Output_Info[i].has_resend_yes_or_no = 0;
-        Write_Config_Info.Write_Output_Info[i].resend_count = 0;
-        Write_Config_Info.Write_Output_Info[i].task_result = BAC_RESULTS_UNKONW;
-        Write_Config_Info.Write_Output_Info[i].invoke_id = -1;
-        //bac_input_read_results = 0;
-        Write_Config_Info.Write_Output_Info[i].timeout_count = 0;
-    }
-
-    for (int i=0; i<BAC_VARIABLE_GROUP; i++)
-    {
-
-        Write_Config_Info.Write_Variable_Info[i].command = 0;
-        Write_Config_Info.Write_Variable_Info[i].device_id = 0;
-        Write_Config_Info.Write_Variable_Info[i].start_instance =0;
-        Write_Config_Info.Write_Variable_Info[i].end_instance =0;
-        Write_Config_Info.Write_Variable_Info[i].has_resend_yes_or_no = 0;
-        Write_Config_Info.Write_Variable_Info[i].resend_count = 0;
-        Write_Config_Info.Write_Variable_Info[i].task_result = BAC_RESULTS_UNKONW;
-        Write_Config_Info.Write_Variable_Info[i].invoke_id = -1;
-        //bac_input_read_results = 0;
-        Write_Config_Info.Write_Variable_Info[i].timeout_count = 0;
-    }
-
-    for (int i=0; i<BAC_PROGRAM_GROUP; i++)
-    {
-
-        Write_Config_Info.Write_Program_Info[i].command = 0;
-        Write_Config_Info.Write_Program_Info[i].device_id = 0;
-        Write_Config_Info.Write_Program_Info[i].start_instance =0;
-        Write_Config_Info.Write_Program_Info[i].end_instance =0;
-        Write_Config_Info.Write_Program_Info[i].has_resend_yes_or_no = 0;
-        Write_Config_Info.Write_Program_Info[i].resend_count = 0;
-        Write_Config_Info.Write_Program_Info[i].task_result = BAC_RESULTS_UNKONW;
-        Write_Config_Info.Write_Program_Info[i].invoke_id = -1;
-        //bac_input_read_results = 0;
-        Write_Config_Info.Write_Program_Info[i].timeout_count = 0;
-    }
-
-    for (int i=0; i<BAC_PROGRAMCODE_GROUP; i++)
-    {
-
-        Write_Config_Info.Write_Programcode_Info[i].command = 0;
-        Write_Config_Info.Write_Programcode_Info[i].device_id = 0;
-        Write_Config_Info.Write_Programcode_Info[i].start_instance =0;
-        Write_Config_Info.Write_Programcode_Info[i].end_instance =0;
-        Write_Config_Info.Write_Programcode_Info[i].has_resend_yes_or_no = 0;
-        Write_Config_Info.Write_Programcode_Info[i].resend_count = 0;
-        Write_Config_Info.Write_Programcode_Info[i].task_result = BAC_RESULTS_UNKONW;
-        Write_Config_Info.Write_Programcode_Info[i].invoke_id = -1;
-        //bac_input_read_results = 0;
-        Write_Config_Info.Write_Programcode_Info[i].timeout_count = 0;
-    }
-
-    for (int i=0; i<BAC_PID_GROUP; i++)
-    {
-
-        Write_Config_Info.Write_Controller_Info[i].command = 0;
-        Write_Config_Info.Write_Controller_Info[i].device_id = 0;
-        Write_Config_Info.Write_Controller_Info[i].start_instance =0;
-        Write_Config_Info.Write_Controller_Info[i].end_instance =0;
-        Write_Config_Info.Write_Controller_Info[i].has_resend_yes_or_no = 0;
-        Write_Config_Info.Write_Controller_Info[i].resend_count = 0;
-        Write_Config_Info.Write_Controller_Info[i].task_result = BAC_RESULTS_UNKONW;
-        Write_Config_Info.Write_Controller_Info[i].invoke_id = -1;
-        //bac_input_read_results = 0;
-        Write_Config_Info.Write_Controller_Info[i].timeout_count = 0;
-    }
-
-    for (int i=0; i<BAC_SCREEN_GROUP; i++)
-    {
-
-        Write_Config_Info.Write_Screen_Info[i].command = 0;
-        Write_Config_Info.Write_Screen_Info[i].device_id = 0;
-        Write_Config_Info.Write_Screen_Info[i].start_instance =0;
-        Write_Config_Info.Write_Screen_Info[i].end_instance =0;
-        Write_Config_Info.Write_Screen_Info[i].has_resend_yes_or_no = 0;
-        Write_Config_Info.Write_Screen_Info[i].resend_count = 0;
-        Write_Config_Info.Write_Screen_Info[i].task_result = BAC_RESULTS_UNKONW;
-        Write_Config_Info.Write_Screen_Info[i].invoke_id = -1;
-        //bac_input_read_results = 0;
-        Write_Config_Info.Write_Screen_Info[i].timeout_count = 0;
-    }
-
-    for (int i=0; i<BAC_SCHEDULE_GROUP; i++)
-    {
-
-        Write_Config_Info.Write_Weekly_Info[i].command = 0;
-        Write_Config_Info.Write_Weekly_Info[i].device_id = 0;
-        Write_Config_Info.Write_Weekly_Info[i].start_instance =0;
-        Write_Config_Info.Write_Weekly_Info[i].end_instance =0;
-        Write_Config_Info.Write_Weekly_Info[i].has_resend_yes_or_no = 0;
-        Write_Config_Info.Write_Weekly_Info[i].resend_count = 0;
-        Write_Config_Info.Write_Weekly_Info[i].task_result = BAC_RESULTS_UNKONW;
-        Write_Config_Info.Write_Weekly_Info[i].invoke_id = -1;
-        //bac_input_read_results = 0;
-        Write_Config_Info.Write_Weekly_Info[i].timeout_count = 0;
-    }
-
-    for (int i=0; i<BAC_HOLIDAY_GROUP; i++)
-    {
-
-        Write_Config_Info.Write_Annual_Info[i].command = 0;
-        Write_Config_Info.Write_Annual_Info[i].device_id = 0;
-        Write_Config_Info.Write_Annual_Info[i].start_instance =0;
-        Write_Config_Info.Write_Annual_Info[i].end_instance =0;
-        Write_Config_Info.Write_Annual_Info[i].has_resend_yes_or_no = 0;
-        Write_Config_Info.Write_Annual_Info[i].resend_count = 0;
-        Write_Config_Info.Write_Annual_Info[i].task_result = BAC_RESULTS_UNKONW;
-        Write_Config_Info.Write_Annual_Info[i].invoke_id = -1;
-        //bac_input_read_results = 0;
-        Write_Config_Info.Write_Annual_Info[i].timeout_count = 0;
-    }
-
-    for (int i=0; i<BAC_MONITOR_GROUP; i++)
-    {
-
-        Write_Config_Info.Write_Monitor_Info[i].command = 0;
-        Write_Config_Info.Write_Monitor_Info[i].device_id = 0;
-        Write_Config_Info.Write_Monitor_Info[i].start_instance =0;
-        Write_Config_Info.Write_Monitor_Info[i].end_instance =0;
-        Write_Config_Info.Write_Monitor_Info[i].has_resend_yes_or_no = 0;
-        Write_Config_Info.Write_Monitor_Info[i].resend_count = 0;
-        Write_Config_Info.Write_Monitor_Info[i].task_result = BAC_RESULTS_UNKONW;
-        Write_Config_Info.Write_Monitor_Info[i].invoke_id = -1;
-        //bac_input_read_results = 0;
-        Write_Config_Info.Write_Monitor_Info[i].timeout_count = 0;
-    }
-
-    for (int i=0; i<BAC_SCHEDULECODE_GOUP; i++)
-    {
-
-        Write_Config_Info.Write_Weeklycode_Info[i].command = 0;
-        Write_Config_Info.Write_Weeklycode_Info[i].device_id = 0;
-        Write_Config_Info.Write_Weeklycode_Info[i].start_instance =0;
-        Write_Config_Info.Write_Weeklycode_Info[i].end_instance =0;
-        Write_Config_Info.Write_Weeklycode_Info[i].has_resend_yes_or_no = 0;
-        Write_Config_Info.Write_Weeklycode_Info[i].resend_count = 0;
-        Write_Config_Info.Write_Weeklycode_Info[i].task_result = BAC_RESULTS_UNKONW;
-        Write_Config_Info.Write_Weeklycode_Info[i].invoke_id = -1;
-        //bac_input_read_results = 0;
-        Write_Config_Info.Write_Weeklycode_Info[i].timeout_count = 0;
-    }
-
-    for (int i=0; i<BAC_HOLIDAYCODE_GROUP; i++)
-    {
-
-        Write_Config_Info.Write_Annualcode_Info[i].command = 0;
-        Write_Config_Info.Write_Annualcode_Info[i].device_id = 0;
-        Write_Config_Info.Write_Annualcode_Info[i].start_instance =0;
-        Write_Config_Info.Write_Annualcode_Info[i].end_instance =0;
-        Write_Config_Info.Write_Annualcode_Info[i].has_resend_yes_or_no = 0;
-        Write_Config_Info.Write_Annualcode_Info[i].resend_count = 0;
-        Write_Config_Info.Write_Annualcode_Info[i].task_result = BAC_RESULTS_UNKONW;
-        Write_Config_Info.Write_Annualcode_Info[i].invoke_id = -1;
-        //bac_input_read_results = 0;
-        Write_Config_Info.Write_Annualcode_Info[i].timeout_count = 0;
-    }
-#endif
-
-    if(hwait_write_thread==NULL)
-    {
         hwait_write_thread =CreateThread(NULL,NULL,Send_Set_Config_Command_Thread,this,NULL, NULL);
     }
 }
+
+void CMainFrame::Show_Wait_Dialog_And_ReadBacnet()
+{
+	if(hwait_read_thread==NULL)
+	{
+		hwait_read_thread =CreateThread(NULL,NULL,Read_Bacnet_Thread,this,NULL, NULL);
+	}
+}
+
 
 LRESULT CMainFrame::Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam)
 {
@@ -4892,30 +4724,492 @@ LRESULT CMainFrame::Delete_Write_New_Dlg(WPARAM wParam,LPARAM lParam)
 }
 
 
+DWORD WINAPI  CMainFrame::Read_Bacnet_Thread(LPVOID lpVoid)
+{
+	 CMainFrame *pParent = (CMainFrame *)lpVoid;
+	 int end_temp_instance = 0;
+	  CString Mession_ret;
+	   read_write_bacnet_config = true;
+	  int read_total_count = BAC_INPUT_GROUP +
+		  BAC_OUTPUT_GROUP +
+		  BAC_PROGRAM_GROUP +
+		  BAC_VARIABLE_GROUP +
+		  BAC_PID_GROUP +
+		  BAC_PROGRAMCODE_GROUP +
+		  BAC_SCREEN_GROUP +
+		  BAC_MONITOR_GROUP +
+		  BAC_SCHEDULE_GROUP +
+		  BAC_HOLIDAY_GROUP +
+		  BAC_SCHEDULECODE_GOUP +
+		  BAC_HOLIDAYCODE_GROUP +
+		  BAC_GRPHIC_LABEL_GROUP + 
+		  BAC_CUSTOMER_UNIT_GROUP +
+		  BAC_USER_LOGIN_GROUP +
+		  BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT +
+		  BAC_PROGRAM_ITEM_COUNT*5;//乘以5 是因为每个program都有5包，共2000个字节要读;
+
+
+	  int read_all_step = 1000 / read_total_count;
+	  int read_success_count = 0;
+	  int write_pos = 0;
+
+
+	 for (int i=0; i<BAC_INPUT_GROUP; i++)
+	 {
+		 end_temp_instance = BAC_READ_INPUT_REMAINDER + (BAC_READ_INPUT_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_INPUT_ITEM_COUNT)
+			 end_temp_instance = BAC_INPUT_ITEM_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READINPUT_T3000,(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_in_point)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read input form %d to %d success."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read input form %d to %d timeout."),(BAC_READ_INPUT_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+	 for (int i=0; i<BAC_OUTPUT_GROUP; i++)
+	 {
+		 end_temp_instance = BAC_READ_OUTPUT_REMAINDER + (BAC_READ_OUTPUT_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_OUTPUT_ITEM_COUNT)
+			 end_temp_instance = BAC_OUTPUT_ITEM_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READOUTPUT_T3000,(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_out_point)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read output form %d to %d success."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read input form %d to %d timeout."),(BAC_READ_OUTPUT_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+	 for (int i=0; i<BAC_VARIABLE_GROUP; i++)
+	 {
+		 end_temp_instance = BAC_READ_VARIABLE_REMAINDER + (BAC_READ_VARIABLE_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_VARIABLE_ITEM_COUNT)
+			 end_temp_instance = BAC_VARIABLE_ITEM_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READVARIABLE_T3000,(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_variable_point)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read variable form %d to %d success."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read variable form %d to %d timeout."),(BAC_READ_VARIABLE_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+
+	 for (int i=0; i<BAC_PROGRAM_GROUP; i++)
+	 {
+		 end_temp_instance = BAC_READ_PROGRAM_REMAINDER + (BAC_READ_PROGRAM_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_PROGRAM_ITEM_COUNT)
+			 end_temp_instance = BAC_PROGRAM_ITEM_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READPROGRAM_T3000,(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_program_point)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read program form %d to %d success."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read program form %d to %d timeout."),(BAC_READ_PROGRAM_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+	 for (int i=0; i<BAC_SCHEDULECODE_GOUP; i++)
+	 {
+		 if(GetPrivateData_Blocking(g_bac_instance,READTIMESCHEDULE_T3000,i,i,WEEKLY_SCHEDULE_SIZE) > 0)
+		 {
+			 Mession_ret.Format(_T("Read schedule form %d to %d success."),i,i);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read schedule form %d to %d timeout."),i,i);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+	 for (int i=0; i<BAC_HOLIDAYCODE_GROUP; i++)
+	 {
+		 if(GetPrivateData_Blocking(g_bac_instance,READANNUALSCHEDULE_T3000,i,i, 48) > 0)
+		 {
+			 Mession_ret.Format(_T("Read holiday form %d to %d success."),i,i);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read holiday form %d to %d timeout."),i,i);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+
+	 for (int i=0; i<BAC_PID_GROUP; i++)
+	 {
+		 end_temp_instance = BAC_READ_PID_REMAINDER + (BAC_READ_PID_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_PID_COUNT)
+			 end_temp_instance = BAC_PID_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READCONTROLLER_T3000,(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_controller_point)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read PID form %d to %d success."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read PID form %d to %d timeout."),(BAC_READ_PID_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+
+	 for (int i=0; i<BAC_SCREEN_GROUP; i++)
+	 {
+		 end_temp_instance = BAC_READ_SCREEN_REMAINDER + (BAC_READ_SCREEN_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_SCREEN_COUNT)
+			 end_temp_instance = BAC_SCREEN_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READSCREEN_T3000,(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance,sizeof(Control_group_point)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read screen form %d to %d success."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read screen form %d to %d timeout."),(BAC_READ_SCREEN_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+
+	 for (int i=0; i<BAC_HOLIDAY_GROUP; i++)
+	 {
+		 end_temp_instance = BAC_READ_HOLIDAY_REMAINDER + (BAC_READ_HOLIDAY_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_HOLIDAY_COUNT)
+			 end_temp_instance = BAC_HOLIDAY_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READANNUALROUTINE_T3000,(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_annual_routine_point)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read holiday list form %d to %d success."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read holiday list form %d to %d timeout."),(BAC_READ_HOLIDAY_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+
+
+	 for (int i=0; i<BAC_SCHEDULE_GROUP; i++)
+	 {
+		 end_temp_instance = BAC_READ_SCHEDULE_REMAINDER + (BAC_READ_SCHEDULE_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_SCHEDULE_COUNT)
+			 end_temp_instance = BAC_SCHEDULE_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READWEEKLYROUTINE_T3000,(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_weekly_routine_point)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read schedule list form %d to %d success."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read schedule list form %d to %d timeout."),(BAC_READ_SCHEDULE_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+
+	 for (int i=0; i<BAC_MONITOR_GROUP; i++)
+	 {
+		 end_temp_instance = BAC_READ_MONOTOR_REMAINDER + (BAC_READ_MONITOR_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_MONITOR_COUNT)
+			 end_temp_instance = BAC_MONITOR_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READMONITOR_T3000,(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_monitor_point)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read monitor list form %d to %d success."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read monitor list form %d to %d timeout."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+
+	 for (int i=0; i<BAC_CUSTOMER_UNIT_GROUP; i++)
+	 {
+		 end_temp_instance = BAC_READ_CUSTOMER_UNITS_REMAINDER + (BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_CUSTOMER_UNITS_COUNT)
+			 end_temp_instance = BAC_CUSTOMER_UNITS_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READUNIT_T3000,(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_Units_element)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read customer unit form %d to %d success."),(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read customer unit form %d to %d timeout."),(BAC_READ_MONITOR_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+
+
+	 for (int i=0; i<BAC_USER_LOGIN_GROUP; i++)
+	 {
+		 end_temp_instance = BAC_READ_USER_LOGIN_INFO_REMAINDER + (BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_USER_LOGIN_COUNT)
+			 end_temp_instance = BAC_USER_LOGIN_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READUSER_T3000,(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_userlogin_point)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read user login table form %d to %d success."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read user login table form %d to %d timeout."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+
+	 for (int i=0; i<BAC_GRPHIC_LABEL_GROUP; i++)
+	 {
+		 end_temp_instance = BAC_READ_GRPHIC_LABEL_REMAINDER + (BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_GRPHIC_LABEL_COUNT)
+			 end_temp_instance = BAC_GRPHIC_LABEL_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READ_GRPHIC_LABEL_COMMAND,(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_label_point)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read screen data form %d to %d success."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read screen data table form %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+
+	 //for (int i=0; i<BAC_CUSTOMER_UNIT_GROUP; i++)
+	 //{
+		// end_temp_instance = BAC_READ_CUSTOMER_UNITS_REMAINDER + (BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i ;
+		// if(end_temp_instance >= BAC_GRPHIC_LABEL_COUNT)
+		//	 end_temp_instance = BAC_GRPHIC_LABEL_COUNT - 1;
+		// if(GetPrivateData_Blocking(g_bac_instance,READUNIT_T3000,(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_Units_element)) > 0)
+		// {
+		//	 Mession_ret.Format(_T("Read screen data form %d to %d success."),(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance);
+		//	 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+		//	 read_success_count ++ ;
+		//	 Sleep(SEND_COMMAND_DELAY_TIME);
+		// }
+		// else
+		// {
+		//	 Mession_ret.Format(_T("Read screen data table form %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+		//	 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+		//	 goto read_end_thread;
+		// }
+		// g_progress_persent = read_success_count * 100 /read_total_count;
+	 //}
+
+
+	 for (int i=0; i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
+	 {
+		 
+		 end_temp_instance = BAC_ALALOG_CUSTMER_RANGE_TABLE_REMAINDER + (BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i ;
+		 if(end_temp_instance >= BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT)
+			 end_temp_instance = BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT - 1;
+		 if(GetPrivateData_Blocking(g_bac_instance,READANALOG_CUS_TABLE_T3000,(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance,sizeof(Str_table_point)) > 0)
+		 {
+			 Mession_ret.Format(_T("Read Analog custmer table form %d to %d success."),(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 read_success_count ++ ;
+			 Sleep(SEND_COMMAND_DELAY_TIME);
+		 }
+		 else
+		 {
+			 Mession_ret.Format(_T("Read Analog custmer table form %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			 goto read_end_thread;
+		 }
+		 g_progress_persent = read_success_count * 100 /read_total_count;
+	 }
+
+
+
+	 for (int z=0;z<BAC_PROGRAM_ITEM_COUNT;z++)
+	 {
+		 memset(program_code[z],0,2000);		 //清零;
+		 for (int x=0;x<5;x++)
+		 {
+			 int send_status = true;
+			 int resend_count = 0;
+			 int temp_invoke_id = -1;
+			 do 
+			 {
+				 resend_count ++;
+				 if(resend_count>RESEND_COUNT)
+					 goto read_end_thread;
+				 temp_invoke_id = GetProgramData(g_bac_instance,z,z,x);
+				 Sleep(SEND_COMMAND_DELAY_TIME);
+			 } while (temp_invoke_id<0);
+
+
+			 if(send_status)
+			 {
+				 for (int i=0;i<3000;i++)
+				 {
+					 Sleep(1);
+					 if(tsm_invoke_id_free(temp_invoke_id))
+					 {
+						  read_success_count ++ ;
+						 goto	read_program_part_success;
+					 }
+				 }
+				 Mession_ret.Format(_T("Read program code %d part %d timeout."),z,x);
+				 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+				 goto read_end_thread;
+
+
+			 }
+			 read_program_part_success:
+
+			  g_progress_persent = read_success_count * 100 /read_total_count;
+			  Mession_ret.Format(_T("Read program code %d part %d success."),z,x);
+			  SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+			  continue;
+		 }
+	 }
+	 read_write_bacnet_config = false;
+	 hwait_read_thread = NULL;
+	 SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data success!"));
+	 ::PostMessageW(MainFram_hwd,MY_BAC_CONFIG_READ_RESULTS,1,NULL);
+	 g_progress_persent = 100;
+
+	 return 2;
+read_end_thread:
+	 g_progress_persent = 0;
+	 read_write_bacnet_config = false;
+	 hwait_read_thread = NULL;
+	 Mession_ret.Format(_T("Read data Timeout,Please Try again."));
+	 SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+	 AfxMessageBox(_T("Read data Timeout,Please Try again."));
+	 return 1;
+
+}
 
 DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
 {
     //Write_Config_Info
     CMainFrame *pParent = (CMainFrame *)lpVoid;
-
+	int temp_prg_version = 0;
+	temp_prg_version = pParent->m_prg_version;
     read_write_bacnet_config = true;
     int end_temp_instance = 0;
 
     int resend_count;
     CString Mession_ret;
 
-    int write_total_count = BAC_INPUT_GROUP +
-                            BAC_OUTPUT_GROUP +
-                            BAC_PROGRAM_GROUP +
-                            BAC_VARIABLE_GROUP +
-                            BAC_PID_GROUP +
-                            BAC_PROGRAMCODE_GROUP +
-                            BAC_SCREEN_GROUP +
-                            BAC_MONITOR_GROUP +
-                            BAC_SCHEDULE_GROUP +
-                            BAC_HOLIDAY_GROUP +
-                            BAC_SCHEDULECODE_GOUP +
-                            BAC_HOLIDAYCODE_GROUP;
+    int write_total_count;
+	if(temp_prg_version == 2)
+	{
+		write_total_count = BAC_INPUT_GROUP +
+			BAC_OUTPUT_GROUP +
+			BAC_PROGRAM_GROUP +
+			BAC_VARIABLE_GROUP +
+			BAC_PID_GROUP +
+			BAC_PROGRAMCODE_GROUP +
+			BAC_SCREEN_GROUP +
+			BAC_MONITOR_GROUP +
+			BAC_SCHEDULE_GROUP +
+			BAC_HOLIDAY_GROUP +
+			BAC_SCHEDULECODE_GOUP +
+			BAC_HOLIDAYCODE_GROUP;
+	}
+	else if(temp_prg_version == 3)
+	{
+		write_total_count =  BAC_INPUT_GROUP +
+			BAC_OUTPUT_GROUP +
+			BAC_PROGRAM_GROUP +
+			BAC_VARIABLE_GROUP +
+			BAC_PID_GROUP +
+			BAC_PROGRAMCODE_GROUP +
+			BAC_SCREEN_GROUP +
+			BAC_MONITOR_GROUP +
+			BAC_SCHEDULE_GROUP +
+			BAC_HOLIDAY_GROUP +
+			BAC_SCHEDULECODE_GOUP +
+			BAC_HOLIDAYCODE_GROUP +
+			BAC_GRPHIC_LABEL_GROUP + 
+			BAC_CUSTOMER_UNIT_GROUP +
+			BAC_USER_LOGIN_GROUP +
+			BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT ;//+
+			//BAC_PROGRAM_ITEM_COUNT*5;//乘以5 是因为每个program都有5包，共2000个字节要读;
+	}
+
 
 
     int write_all_step = 1000 / write_total_count;
@@ -5182,6 +5476,102 @@ DWORD WINAPI  CMainFrame::Send_Set_Config_Command_Thread(LPVOID lpVoid)
         g_progress_persent = write_success_count * 100 /write_total_count;
     }
 
+
+	if(temp_prg_version == 3)
+	{
+		for (int i=0; i<BAC_CUSTOMER_UNIT_GROUP; i++)
+		{
+			end_temp_instance = BAC_READ_CUSTOMER_UNITS_REMAINDER + (BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i ;
+			if(end_temp_instance >= BAC_CUSTOMER_UNITS_COUNT)
+				end_temp_instance = BAC_CUSTOMER_UNITS_COUNT - 1;
+			if(Write_Private_Data_Blocking(WRITEUNIT_T3000,(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance) > 0)
+			{
+				Mession_ret.Format(_T("Write Customer unit form %d to %d success."),(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+				write_success_count ++ ;
+				Sleep(SEND_COMMAND_DELAY_TIME);
+			}
+			else
+			{
+				Mession_ret.Format(_T("Write Customer unit form %d to %d timeout."),(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+				goto write_end_thread;
+			}
+			g_progress_persent = write_success_count * 100 /write_total_count;
+		}
+
+
+	
+		for (int i=0; i<BAC_GRPHIC_LABEL_GROUP; i++)
+		{
+			end_temp_instance = BAC_READ_GRPHIC_LABEL_REMAINDER + (BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i ;
+			if(end_temp_instance >= BAC_GRPHIC_LABEL_COUNT)
+				end_temp_instance = BAC_GRPHIC_LABEL_COUNT - 1;
+			if(Write_Private_Data_Blocking(WRITE_GRPHIC_LABEL_COMMAND,(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance) > 0)
+			{
+				Mession_ret.Format(_T("Write graphic lable form %d to %d success."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+				write_success_count ++ ;
+				Sleep(SEND_COMMAND_DELAY_TIME);
+			}
+			else
+			{
+				Mession_ret.Format(_T("Write graphic lable form %d to %d timeout."),(BAC_READ_GRPHIC_LABEL_GROUP_NUMBER)*i,end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+				goto write_end_thread;
+			}
+			g_progress_persent = write_success_count * 100 /write_total_count;
+		}
+
+
+		for (int i=0; i<BAC_USER_LOGIN_GROUP; i++)
+		{
+			end_temp_instance = BAC_READ_USER_LOGIN_INFO_REMAINDER + (BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i ;
+			if(end_temp_instance >= BAC_USER_LOGIN_COUNT)
+				end_temp_instance = BAC_USER_LOGIN_COUNT - 1;
+			if(Write_Private_Data_Blocking(WRITEUSER_T3000,(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance) > 0)
+			{
+				Mession_ret.Format(_T("Write user login info form %d to %d success."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+				write_success_count ++ ;
+				Sleep(SEND_COMMAND_DELAY_TIME);
+			}
+			else
+			{
+				Mession_ret.Format(_T("Write user login info form %d to %d timeout."),(BAC_READ_USER_LOGIN_INFO_GROUP_NUMBER)*i,end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+				goto write_end_thread;
+			}
+			g_progress_persent = write_success_count * 100 /write_total_count;
+		}
+
+
+
+
+		for (int i=0; i<BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT; i++)
+		{
+			end_temp_instance = BAC_ALALOG_CUSTMER_RANGE_TABLE_REMAINDER + (BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i ;
+			if(end_temp_instance >= BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT)
+				end_temp_instance = BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT - 1;
+			if(Write_Private_Data_Blocking(WRITEANALOG_CUS_TABLE_T3000,(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance) > 0)
+			{
+				Mession_ret.Format(_T("Write Analog custmer table form %d to %d success."),(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+				write_success_count ++ ;
+				Sleep(SEND_COMMAND_DELAY_TIME);
+			}
+			else
+			{
+				Mession_ret.Format(_T("Write Analog custmer table form %d to %d timeout."),(BAC_ALALOG_CUSTMER_RANGE_TABLE_GROUP_NUMBER)*i,end_temp_instance);
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
+				goto write_end_thread;
+			}
+			g_progress_persent = write_success_count * 100 /write_total_count;
+		}
+
+
+	}
+
     Mession_ret.Format(_T("Write config file success."));
     SetPaneString(BAC_SHOW_MISSION_RESULTS,Mession_ret);
     g_progress_persent = 100;
@@ -5206,6 +5596,7 @@ LRESULT  CMainFrame::ReadConfigFromDeviceMessageCallBack(WPARAM wParam, LPARAM l
     if(msg_result)
     {
         SaveBacnetConfigFile(SaveConfigFilePath);
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Save config file success!"));
     }
     return 0;
 }
@@ -5419,7 +5810,8 @@ void CMainFrame::SaveConfigFile()
 
             if(g_protocol == PROTOCOL_BACNET_IP)
             {
-                ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,TYPE_SVAE_CONFIG,NULL);
+               // ::PostMessage(BacNet_hwd,WM_FRESH_CM_LIST,TYPE_SVAE_CONFIG,NULL);
+				Show_Wait_Dialog_And_ReadBacnet();
             }
             else
             {
@@ -6786,7 +7178,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         (product_Node.BuildingInfo.strIp.CompareNoCase(_T("19200"))==0) ||
                         (product_Node.BuildingInfo.strIp.CompareNoCase(_T("38400"))==0) ||
                         (product_Node.BuildingInfo.strIp.CompareNoCase(_T("57600"))==0) ||
-                        (product_Node.BuildingInfo.strIp.CompareNoCase(_T(""))) == 0))
+                        (product_Node.BuildingInfo.strIp.CompareNoCase(_T("115200"))) == 0))
             {
 
                 if(product_Node.BuildingInfo.hCommunication==NULL||m_strCurSubBuldingName.CompareNoCase(product_Node.BuildingInfo.strBuildingName)!=0)
@@ -7068,7 +7460,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 //m_nbaudrat=_wtoi(product_Node.BuildingInfo.strBaudRate);
                 g_protocol=MODBUS_RS485;
                 m_nbaudrat= product_Node.baudrate;
-                if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200) && (m_nbaudrat != 38400)&& (m_nbaudrat != 57600))
+                if ((m_nbaudrat !=9600 ) && (m_nbaudrat !=19200) && (m_nbaudrat != 38400)&& (m_nbaudrat != 57600)&& (m_nbaudrat != 115200))
                     m_nbaudrat = 19200;
                 Change_BaudRate(m_nbaudrat);
 
@@ -7481,7 +7873,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     memcpy_s(product_register_value,sizeof(product_register_value),multi_register_value,sizeof(multi_register_value));
 
 
-                    if ((nFlag == PM_TSTAT6||nFlag == PM_TSTAT7||nFlag == PM_HUMTEMPSENSOR||nFlag ==PM_AirQuality||nFlag ==PM_HUM_R) && product_register_value[714] == 0x56)
+                    if  ( product_register_value[714] == 0x56)
                     {
                         CString TstatName,TstatDBName;
 
@@ -7539,12 +7931,27 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             TstatDBName = bado.m_pRecordset->GetCollect(_T("Product_name"));
                         }
                         bado.CloseRecordset();
+                        CString StrDefaultName;
+                        if (TstatDBName.IsEmpty ())
+                        {
+                            StrDefaultName.Format (_T("%s-%s"),GetProductName (product_register_value[7]),temp_serial_number);
+                        }
                         TstatName.Format(_T("%s%s"),GetTextFromReg(715),GetTextFromReg(719));
-                        if (TstatName.CompareNoCase(TstatDBName)!=0)
+                        if (TstatName.IsEmpty ())
+                        {
+                            StrDefaultName.Format (_T("%s-%s"),GetProductName (product_register_value[7]),temp_serial_number);
+                        }
+                        if (TstatName.CompareNoCase(TstatDBName)!=0&&(!TstatName.IsEmpty ()))
                         {
                             strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),TstatName,strSerial);
                             bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
                             PostMessage(WM_MYMSG_REFRESHBUILDING,0,0);
+                        }
+                        else if (TstatName.IsEmpty ()&&TstatDBName.IsEmpty ())
+                        {
+                            strSql.Format(_T("update ALL_NODE set Product_name='%s' where Serial_ID='%s'"),StrDefaultName,strSerial);
+                            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+                            PostMessage(WM_MYMSG_REFRESHBUILDING,0,0); 
                         }
                         bado.CloseConn();
 #endif
@@ -8253,10 +8660,6 @@ end_condition :
                     {
                         str_Product_name_view = temp_pname + _T(":") + str_serialid + _T("-") + temp_modbusid + _T("-") + str_ip_address_exist;
                     }
-                    //else if(m_refresh_net_device_data.at(y).product_id == PM_TSTAT7)	//TSTAT7 不支持写 label名字;
-                    //{
-                    //	str_Product_name_view = temp_pname + _T(":") + str_serialid + _T("-") + temp_modbusid + _T("-") + str_ip_address_exist;
-                    //}
                     else
                     {
                         str_Product_name_view = m_refresh_net_device_data.at(y).show_label_name;
@@ -8266,11 +8669,8 @@ end_condition :
                     if((m_refresh_net_device_data.at(y).product_id == PM_MINIPANEL) || (m_refresh_net_device_data.at(y).product_id == PM_CM5))
                         is_bacnet_device = true;
 
-                    //if(m_refresh_net_device_data.at(y).ip_address.CompareNoCase(m_product.at(n_index).BuildingInfo.strIp) != 0)
-                    //{
                     if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device && (m_refresh_net_device_data.at(y).parent_serial_number != 0))
                     {
-                        //str_Product_name_view = str_Product_name_view ;
                         CString temp_pro;
                         temp_pro.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
                         strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Object_Instance = '%s' , Panal_Number = '%s' , Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1 ,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,str_object_instance,str_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,temp_pro,str_Product_name_view,str_parents_serial,str_serialid);
@@ -8278,18 +8678,7 @@ end_condition :
                     else
                         strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Object_Instance = '%s' , Panal_Number = '%s' ,  Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='1',Product_name = '%s',Online_Status = 1,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,str_object_instance,str_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,str_Product_name_view,str_parents_serial,str_serialid);
                     find_new_device = true;
-                    //}
-                    //else
-                    //{
-                    //	if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device)
-                    //	{
-                    //		CString temp_pro1;
-                    //		temp_pro1.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
-                    //		strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s', Object_Instance = '%s' , Panal_Number = '%s' , Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='%s',Product_name = '%s',Online_Status = 1,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,str_object_instance,str_panel_number,str_ip_address_exist,str_n_port,str_modbus_id,temp_pro1,str_Product_name_view,str_parents_serial,str_serialid);
-                    //	}
-                    //	else
-                    //		strSql.Format(_T("update ALL_NODE set NetworkCard_Address='%s',  Bautrate ='%s',Com_Port ='%s',Product_ID ='%s', Protocol ='1',Online_Status = 1,Parent_SerialNum = '%s' where Serial_ID = '%s'"),NetwordCard_Address,str_ip_address_exist,str_n_port,str_modbus_id,str_parents_serial,str_serialid);
-                    //}
+
                     bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
                 }
                 catch(_com_error *e)
@@ -8334,7 +8723,15 @@ end_condition :
             {
                 is_custom = _T("0");
             }
-            product_name = GetProductName(m_refresh_net_device_data.at(y).product_id);
+			if(m_refresh_net_device_data.at(y).show_label_name.IsEmpty())
+			{
+				 product_name = GetProductName(m_refresh_net_device_data.at(y).product_id);
+			}
+			else
+			{
+				product_name = m_refresh_net_device_data.at(y).show_label_name;
+			}
+           
             if(product_name.IsEmpty())
             {
                 if (m_refresh_net_device_data.at(y).product_id<200)
@@ -8354,7 +8751,7 @@ end_condition :
                 str_parents_serial = _T("0");
             }
             find_new_device = true;
-            product_name = product_name + _T(":") + str_serialid + _T("-") + modbusid + _T("-") + str_ip_address;
+           // product_name = product_name + _T(":") + str_serialid + _T("-") + modbusid + _T("-") + str_ip_address;
             NetwordCard_Address=m_refresh_net_device_data.at(y).NetCard_Address;
             //strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,NetworkCard_Address,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Online_Status)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','"+NetwordCard_Address+"','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','0','0','"+str_n_port+"','0','1')"));
             bool is_bacnet_device = false;
@@ -8362,7 +8759,7 @@ end_condition :
                 is_bacnet_device = true;
             if((m_refresh_net_device_data.at(y).object_instance != 0) && (m_refresh_net_device_data.at(y).panal_number != 0) && is_bacnet_device && (m_refresh_net_device_data.at(y).parent_serial_number != 0))
             {
-                product_name = product_name ;
+                //product_name = product_name ;
                 CString temp_pro2;
                 temp_pro2.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
                 strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,NetworkCard_Address,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Protocol,Online_Status,Parent_SerialNum,Panal_Number,Object_Instance,Custom)   values('"+m_strCurMainBuildingName+"','"+m_strCurSubBuldingName+"','"+NetwordCard_Address+"','"+str_serialid+"','floor1','room1','"+product_name+"','"+product_class_id+"','"+modbusid+"','""','"+str_ip_address+"','T3000_Default_Building_PIC.bmp','"+str_hw_version+"','"+str_fw_version+"','"+str_n_port+"','0','"+temp_pro2+"','1','"+str_parents_serial +"' ,'"+str_panel_number +"' ,'"+str_object_instance +"' ,'"+is_custom +"' )"));
@@ -8464,8 +8861,6 @@ void CMainFrame::DoFreshAll()
 
 UINT _FreshTreeView(LPVOID pParam )
 {
-
-
     CString g_strT3000LogString;
     CMainFrame* pMain = (CMainFrame*)pParam;
     int int_refresh_com = 0;
@@ -12204,7 +12599,7 @@ void CMainFrame::GetProductFPTAndLocalPath(int ProductModel,CString &FtpPath,CSt
         }
         break;
     case PM_T3IOA :
-        strProductName="T3-8IOA";
+        strProductName="T3-8O";
         {
             FtpPath=_T("");
             ProductFileName=_T("Tstat6.HEX");
@@ -12447,7 +12842,7 @@ void CMainFrame::GetProductFirmwareFTPDirectory(int ProductModel,CString &FtpPat
         }
         break;
     case PM_T3IOA :
-        strProductName="T3-8IOA";
+        strProductName="T3-8O";
         {
             FtpPath=_T("");
             ProductFileName=_T("Tstat6.HEX");

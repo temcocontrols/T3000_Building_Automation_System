@@ -37,6 +37,7 @@ private:
 int m_sn;
 HANDLE hFirstThread;
 public:
+BOOL m_ThreadStop;
     afx_msg void OnDestroy();
 };
 

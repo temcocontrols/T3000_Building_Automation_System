@@ -1163,7 +1163,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 		CBADO monitor_bado;
 		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
 		monitor_bado.OnInitADOConn(); 
-		strSql.Format(_T("delete * from MonitorData where Temp_Data=1"),g_selected_serialnumber,monitor_list_line);
+		strSql.Format(_T("delete * from MonitorData where Flag=1"),g_selected_serialnumber,monitor_list_line);
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 		monitor_bado.CloseConn();
 
@@ -1280,6 +1280,21 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 
 
 
+			CString temp_cs_modify_index;
+			temp_cs_modify_index.Format(_T("Monitor_%d"),monitor_list_line);
+
+			//每次读完Monitor的 值 记录下读写的时间,和Minipanel 比对 ,若minipanel 有进行删减的动作
+			CString temp_db_ini_folder;
+			temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
+
+			CTime temp_start = CTime::GetCurrentTime();
+			unsigned long end_long_time = temp_start.GetTime();
+			CString temp_time_num;
+			temp_time_num.Format(_T("%u"),end_long_time);
+			WritePrivateProfileStringW(temp_serial,temp_cs_modify_index,temp_time_num,temp_db_ini_folder);
+			//下面还要加写的动作;
+
+
 			Device_Misc_Data.reg.monitor_analog_block_num[monitor_list_line] = 0;
 			Device_Misc_Data.reg.monitor_digital_block_num[monitor_list_line] = 0;
 			PostMessage(WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
@@ -1385,7 +1400,7 @@ unsigned char read_monitordata(int digtal_or_analog)
 	int temp_value = 0;
 	if(read_temp_local_tem_package)
 	{
-		if((temp_index > 10) && (temp_index < m_monitor_head.total_seg - 10))
+		if((m_monitor_head.total_seg > 10) && (temp_index < m_monitor_head.total_seg - 10))
 			temp_value = m_monitor_head.total_seg - 10;
 		else
 			temp_value = temp_index;
@@ -1678,7 +1693,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	}
 
 
-	if(temp_index >= m_monitor_head.seg_index)
+	if((temp_index >= m_monitor_head.seg_index) && (temp_index != 0))
 		return 1;
 	if(temp_index >= m_monitor_head.total_seg)	//如果数据库里面的 index 已经比设备里面的 多，就说明已经读过了;不需要再往数据库里面存了;
 		return 1;
@@ -1800,7 +1815,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		//updateTime.Format(_T("%Y-%m-%d %H:%M:%S"));
 
 		CString strSql;
-		strSql.Format(_T("insert into MonitorData values('%s',%d,%u,%u,%u,#%s#,'%s')"),temp_type,temp_data.value,temp_data.time , analog_data ,temp_flag,display_time,Label_Des);
+		strSql.Format(_T("insert into MonitorData values('%s',#%s#,%d,%u,%u,%u,'%s')"),temp_type,display_time,temp_data.time,temp_data.value,  analog_data ,temp_flag,Label_Des);
 		//strSql.Format(_T("insert into MonitorData values('%s',%d,%u,%u,%u,'%s','%s')"),temp_type,temp_data.value,temp_data.time , analog_data ,temp_flag,display_time,Label_Des);
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 
@@ -1818,12 +1833,20 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 			if(read_temp_local_tem_package == false)
 			{
 				if(temp_sd_exsit)
+				{
 					WritePrivateProfileStringW(temp_serial,temp_monitor_index,temp_write_index,temp_db_ini_folder);
+				}
 			}
+		}
+		else if(m_monitor_head.seg_index == 1)
+		{
+			if(temp_sd_exsit)
+				WritePrivateProfileStringW(temp_serial,temp_monitor_index,temp_write_index,temp_db_ini_folder);
 		}
 		delete_temp_db_data = true;
 		//DFTrace(temp_write_index);
 	}
+
 
 	monitor_bado.CloseConn();
 
@@ -1838,9 +1861,9 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
 		monitor_bado.OnInitADOConn(); 
 		if(analog_data)
-			strSql.Format(_T("delete * from MonitorData where Temp_Data=1 and Analog_Digital=1"));
+			strSql.Format(_T("delete * from MonitorData where Flag=1 and Analog_Digital=1"));
 		else
-			strSql.Format(_T("delete * from MonitorData where Temp_Data=1 and Analog_Digital=0"));
+			strSql.Format(_T("delete * from MonitorData where Flag=1 and Analog_Digital=0"));
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 		monitor_bado.CloseConn();
 

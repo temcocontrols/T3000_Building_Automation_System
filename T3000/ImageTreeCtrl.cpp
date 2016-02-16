@@ -44,7 +44,7 @@ enum ERightDragHandler {
             temp_serial.Format(_T("%d"),sn);
             int  int_product_type = pFrame->m_product.at(i).product_class_id;
             
-            if (int_product_type == PM_TSTAT6||int_product_type == PM_TSTAT7||int_product_type == PM_HUMTEMPSENSOR||int_product_type ==PM_AirQuality||int_product_type ==PM_HUM_R)
+            if (product_register_value[714] == 0x56)
             {
                 int communicationType = pFrame->m_product.at(i).protocol;  
                 ModbusID = pFrame->m_product.at(i).product_id;
@@ -481,7 +481,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Floor(){
                         bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
                         bado.CloseConn();
                         
-                        if (int_product_type == PM_TSTAT6 || int_product_type == PM_TSTAT7)
+                        if (product_register_value[714]==0x56)
                         {
                             if(m_name_new.GetLength()> 16)	//长度不能大于结构体定义的长度;
                             {
@@ -618,7 +618,7 @@ BOOL CImageTreeCtrl::UpdateDataToDB_Connect(){
             bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
             bado.CloseConn();
 
-            if( int_product_type == PM_TSTAT6 || int_product_type == PM_TSTAT7) 
+            if( product_register_value[714] == 0x56) 
             {
 
                 if(m_name_new.GetLength()> 16)	//长度不能大于结构体定义的长度;

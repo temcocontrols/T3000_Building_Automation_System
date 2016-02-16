@@ -39,7 +39,13 @@ int successful_com_port = 0;
 CStdioFile* g_fileScanLog = NULL;
 CStdioFile* g_fileScanNetLog=NULL;
 
-
+const int ArrayBaudate[BAUDRATENUMBER] = {
+    9600,
+    19200,
+    38400,
+    57600,
+    115200
+    };
 OUTPUT void SetLastSuccessBaudrate(int nbaudrate)
 {
     successful_baudrate = nbaudrate;
@@ -676,47 +682,58 @@ OUTPUT int CheckTstatOnline(TS_UC devLo,TS_UC devHi)
     //the warning not all control paths return a value will be disappeared.
     return the_return_value;
 }
-OUTPUT bool Change_BaudRate(TS_US new_baudrate)
+ 
+OUTPUT bool Change_BaudRate(int new_baudrate)
 {
 
     ///ÅäÖÃ´®¿Ú
-    if(new_baudrate!=9600 && new_baudrate!=19200 && new_baudrate!=57600)
-        return false;
-    if(baudrate_in_dll==new_baudrate)
+    //if(new_baudrate!=9600 && new_baudrate!=19200)
+    //	return false;
+    BOOL iscorrect= FALSE;
+    for (int i = 0;i< BAUDRATENUMBER;i++)
     {
-        return true;
+        if (new_baudrate == ArrayBaudate[i])
+        {
+            iscorrect = TRUE;
+            break;
+        }
     }
+    if (!iscorrect)
+    {
+        return FALSE;
+    }
+    if(baudrate_in_dll==new_baudrate)
+        return true;
     else
         baudrate_in_dll=new_baudrate;
-    DCB  PortDCB;
-    PortDCB.DCBlength = sizeof(DCB);
+    DCB  PortDCB;    
+    PortDCB.DCBlength = sizeof(DCB); 
     // Ä¬ÈÏ´®¿Ú²ÎÊý
     int i=0;
     bool successful=false;//true==do it success;false==do it failure
-    for(i=0; i<10; i++)
+    for(i=0;i<10;i++)
         if(GetCommState(m_hSerial, &PortDCB))
         {
             successful=true;
             break;
         }
-    if(successful==false)
-        return false;
-    //not to change the baudate
-    PortDCB.BaudRate = new_baudrate; // baud//attention ,if it is wrong,can't write the com
-    PortDCB.ByteSize = 8;     // Number of bits/byte, 4-8
-    PortDCB.Parity = NOPARITY;
-    PortDCB.StopBits = ONESTOPBIT;
-    successful=false;
-    for(i=0; i<10; i++)
-        if(SetCommState(m_hSerial, &PortDCB))
-        {
-            ///L"ÅäÖÃ´®¿ÚÊ§°Ü";
-            successful=true;
-            break;
-        }
-    return(successful);
+        if(successful==false)
+            return false;
+        //not to change the baudate
+        PortDCB.BaudRate = new_baudrate; // baud//attention ,if it is wrong,can't write the com
+        PortDCB.ByteSize = 8;     // Number of bits/byte, 4-8 
+        PortDCB.Parity = NOPARITY; 
+        PortDCB.StopBits = ONESTOPBIT;  
+        successful=false;
+        for(i=0;i<10;i++)
+            if(SetCommState(m_hSerial, &PortDCB))
+            {
+                ///L"ÅäÖÃ´®¿ÚÊ§°Ü";
+                successful=true;
+                break;
+            }
+            return(successful);
 }
-
 OUTPUT bool SetComm_Timeouts(LPCOMMTIMEOUTS lpCommTimeouts)
 {
     return MKBOOL(SetCommTimeouts(m_hSerial,lpCommTimeouts));

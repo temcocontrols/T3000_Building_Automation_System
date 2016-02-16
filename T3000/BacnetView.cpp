@@ -1,6 +1,17 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2015 - 12 - 29
+Update by Fance
+1. 修复Input output 中关于 T3 扩展 无法正常显示的Bug.
+
+2015 - 12 - 21 
+Update by Fance
+1. 修复不同网卡下面 无法正常访问的问题.
+2. 修复刷新树形产品时，先显示默认label，在显示真实label的问题;
+3. 开启时检测防火墙是否打开，若打开了，提示客户关闭防火墙.
+4.  Fix Bacnet Setting 中IP Auto 写入问题; 
+
 2015 - 12 - 10
 1. Bacnet Screen  ,上下左右移动.
 2. Screen 选择图片的时候 由单机改为双击.
@@ -456,7 +467,7 @@ Update by Fance
 int g_gloab_bac_comport = 1;
 CString temp_device_id,temp_mac,temp_vendor_id;
 HANDLE hwait_thread;
-
+CString Re_Initial_Bac_Socket_IP;
 BacnetWait *WaitDlg=NULL;
 //extern int Station_NUM;
 BacnetScreen *Screen_Window = NULL;
@@ -1188,7 +1199,7 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			//MessageBox(_T("Test2"));
 
 			SetTimer(4,500,NULL);
-			click_resend_time = 6;
+			click_resend_time = 10;
 		}
 		break;
 	case CONNECT_TO_MODBUS_FAILED:
@@ -1782,7 +1793,9 @@ void CDialogCM5_BacNet::Fresh()
 		
 		g_gloab_bac_comport = 0;
 		set_datalink_protocol(2);
-		if(Initial_bac(g_gloab_bac_comport))
+
+		Re_Initial_Bac_Socket_IP = pFrame->m_product.at(selected_product_index).NetworkCard_Address;
+		if(Initial_bac(g_gloab_bac_comport,pFrame->m_product.at(selected_product_index).NetworkCard_Address))
 		{
 			initial_once_ip = true;
 		}
@@ -1793,7 +1806,29 @@ void CDialogCM5_BacNet::Fresh()
 	}
 	else
 	{
+		if(pFrame->m_product.at(selected_product_index).NetworkCard_Address.CompareNoCase(Re_Initial_Bac_Socket_IP) != 0)
+		{
+			closesocket(my_sokect);
+			int ret_1 = Open_bacnetSocket2(pFrame->m_product.at(selected_product_index).NetworkCard_Address,BACNETIP_PORT,my_sokect);
+			if(ret_1 >= 0)
+			{
+				Re_Initial_Bac_Socket_IP = pFrame->m_product.at(selected_product_index).NetworkCard_Address;
+			}
+		}
+
 		bip_set_socket(my_sokect);
+		  bip_set_port(49338);
+		in_addr BIP_Address;
+		char temp_ip_2[100];
+		memset(temp_ip_2,0,100);
+		WideCharToMultiByte( CP_ACP, 0, pFrame->m_product.at(selected_product_index).NetworkCard_Address, -1, temp_ip_2, 255, NULL, NULL );
+		BIP_Address.S_un.S_addr =  inet_addr(temp_ip_2);
+		bip_set_addr((uint32_t)BIP_Address.S_un.S_addr);
+
+
+
+		if(g_bac_instance>0)
+			Send_WhoIs_Global(-1, -1);
 	}
 
 	//
@@ -3309,14 +3344,14 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 				resend_count ++;
 				if(resend_count>RESEND_COUNT)
 					goto myend;
-				g_invoke_id = GetPrivateData(g_bac_instance,READUNIT_T3000,(BAC_READ_GROUP_NUMBER)*i,
+				g_invoke_id = GetPrivateData(g_bac_instance,READUNIT_T3000,(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i,
 					3+(BAC_READ_GROUP_NUMBER)*i,sizeof(Str_Units_element));
 				Sleep(SEND_COMMAND_DELAY_TIME);	
 			} while (g_invoke_id<0);
 			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].command = READUNIT_T3000;
 			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].device_id = g_bac_instance;
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].start_instance = (BAC_READ_GROUP_NUMBER)*i;
-			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].end_instance =3+(BAC_READ_GROUP_NUMBER)*i;
+			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].start_instance = (BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i;
+			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].end_instance =BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER+(BAC_READ_CUSTOMER_UNITS_GROUP_NUMBER)*i;
 			//Bacnet_Refresh_Info.Read_Monitor_Info[i].end_instance =2+(BAC_READ_GROUP_NUMBER)*i;
 			Bacnet_Refresh_Info.Read_Customer_unit_Info[i].invoke_id = g_invoke_id;
 			CString temp_cs;
@@ -4109,6 +4144,10 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 				}
 			}
 
+			if(click_resend_time == 9)
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Please waiting ...."));
+			}
 
 			if(find_exsit)
 			{
@@ -4201,14 +4240,14 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 					{
 						//如果 TCP能连接上， 而没有回复UDP的包，就用TCP 发送软复位命令给板子;
 						SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No who is command response!"));
-						int nret = write_one(g_tstat_id,33,111);
+						int nret = write_one(g_tstat_id,33,111,1);
 						if(nret > 0)
 						{
-							DFTrace(_T("Write 33 reg 111 success"));
+							SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reset the network , please wait!"));
 						}
 						else
 						{
-							DFTrace(_T("Write 33 reg 111 fail"));
+							SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reset the network failed. please try to connect again!"));
 						}
 						click_resend_time = 10;
 						already_retry = true;
@@ -4223,6 +4262,24 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 						pFrame->m_product.at(selected_product_index).status_last_time[0] = false;
 						pFrame->m_product.at(selected_product_index).status_last_time[1] = false;
 						pFrame->m_product.at(selected_product_index).status_last_time[2] = false;
+
+						HKEY hkey;
+						char sz[256];
+						DWORD dwtype, sl = 256;
+
+						RegOpenKeyEx(HKEY_LOCAL_MACHINE,	_T("SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile"),	NULL, KEY_READ, &hkey);
+						RegQueryValueEx(hkey, _T("EnableFirewall"), NULL, &dwtype, (LPBYTE)sz, &sl);
+						DWORD dw_firewall;
+						dw_firewall = sz[0] + sz[1] * 256 + sz[2] * 256*256 + sz[3] * 256*256*256;
+						if(dw_firewall != 0 )
+						{
+							//AfxMessageBox(_T("Please turn off your firewall .If not , some broadcast communication may fail."));
+							pFrame->m_pDialogInfo->ShowWindow(SW_SHOW);
+							pFrame->m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T("Please turn off your firewall or add 'T3000.exe' to firewall exception list.\r\nIf not , some broadcast communication may fail."));
+						}
+
+						RegCloseKey(hkey);
+
 					}
 
 					

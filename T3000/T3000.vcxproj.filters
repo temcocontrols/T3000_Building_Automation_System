@@ -528,9 +528,6 @@
     <ClCompile Include="TstatRangeDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="T3000_Default_MainView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ChartCtrl\ChartAxis.cpp">
       <Filter>ChartCtrl</Filter>
     </ClCompile>
@@ -650,6 +647,12 @@
     </ClCompile>
     <ClCompile Include="BacnetProgramDebug.cpp">
       <Filter>Bacnet</Filter>
+    </ClCompile>
+    <ClCompile Include="T3000_Default_MainView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileOperations.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1578,6 +1581,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetProgramDebug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

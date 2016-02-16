@@ -305,7 +305,9 @@ public:
 	//void	SaveBacnetConfigFile();
 	//void	LoadBacnetConfigFile();
 	void  Show_Wait_Dialog_And_SendConfigMessage();
+	void  Show_Wait_Dialog_And_ReadBacnet();
 	static DWORD WINAPI  Send_Set_Config_Command_Thread(LPVOID lpVoid);
+	static DWORD WINAPI  Read_Bacnet_Thread(LPVOID lpVoid);
 	void OnMBP();
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();
@@ -491,7 +493,7 @@ public:
 	HINTERNET     m_hInternetSession;
 	HINTERNET     m_hHttpConnection;
 	HINTERNET     m_hHttpFile;
- 
+	int           m_prg_version;
 	BOOL          m_bSafeToClose;
 	CFile         m_FileToWrite;
 	//CWinThread*   m_pThread;
