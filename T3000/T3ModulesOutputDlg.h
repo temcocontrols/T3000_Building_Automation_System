@@ -35,4 +35,8 @@ public:
     int m_sn;
     ListCtrlEx::CListCtrlEx m_outputlist;
     HANDLE hFirstThread;
+    afx_msg void OnNMDblclkListT3outputs(NMHDR *pNMHDR, LRESULT *pResult);
+
+    BOOL m_isstop;
+    virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

@@ -366,7 +366,7 @@ int CBacnetGraphic::Search_data_from_db()
 			analog_data_min_value[i] = 0x7fffffff;
 			CString strSql;
 			//strSql.Format(_T("select * from MonitorData where Input_Index = '%s' and SerialNumber = %i and Monitor_Index = %i and Analog_Digital = 1 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,temp_serial_number,temp_monitor_index,temp_time_start,temp_time_end);	
-			strSql.Format(_T("select * from MonitorData where Input_Index = '%s'  and Analog_Digital = 1 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,m_starttime,m_endtime);	
+			strSql.Format(_T("select * from MonitorData where Index_ = '%s'   and Time_Since1970 >= %i and Time_Since1970 <= %i and Analog_Digital = -1 ORDER BY Time_Since1970 ASC"),cs_temp_input_index,m_starttime,m_endtime);	
 			monitor_bado.m_pRecordset=monitor_bado.OpenRecordset(strSql);
 			temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
 			if(temp_record_count <= 0)
@@ -384,7 +384,7 @@ int CBacnetGraphic::Search_data_from_db()
 			int monitor_value = 0;
 			while(VARIANT_FALSE==monitor_bado.m_pRecordset->EndOfFile)
 			{
-				temp_variant=monitor_bado.m_pRecordset->GetCollect("Record_Time");//
+				temp_variant=monitor_bado.m_pRecordset->GetCollect("Time_Since1970");//
 				if(temp_variant.vt!=VT_NULL)
 					logging_time = temp_variant;
 				else
@@ -394,7 +394,7 @@ int CBacnetGraphic::Search_data_from_db()
 					continue;
 				}
 
-				temp_variant=monitor_bado.m_pRecordset->GetCollect("Monitor_Value");//
+				temp_variant=monitor_bado.m_pRecordset->GetCollect("Value_");//
 				if(temp_variant.vt!=VT_NULL)
 					monitor_value = temp_variant;
 				else
@@ -431,7 +431,7 @@ int CBacnetGraphic::Search_data_from_db()
 		{
 			CString strSql;
 			//strSql.Format(_T("select * from MonitorData where Input_Index = '%s' and SerialNumber = %i and Monitor_Index = %i and Analog_Digital = 0 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,temp_serial_number,temp_monitor_index,temp_time_start,temp_time_end);	
-			strSql.Format(_T("select * from MonitorData where Input_Index = '%s'  and Analog_Digital = 0 and Record_Time >= %i and Record_Time <= %i ORDER BY Record_Time ASC"),cs_temp_input_index,m_starttime,m_endtime);	
+			strSql.Format(_T("select * from MonitorData where Index_ = '%s'  and Analog_Digital = 0 and Time_Since1970 >= %i and Time_Since1970 <= %i ORDER BY Time_Since1970 ASC"),cs_temp_input_index,m_starttime,m_endtime);	
 			monitor_bado.m_pRecordset=monitor_bado.OpenRecordset(strSql);
 			temp_record_count = monitor_bado.GetRecordCount(monitor_bado.m_pRecordset);
 			if(temp_record_count <= 0)
@@ -447,7 +447,7 @@ int CBacnetGraphic::Search_data_from_db()
 			int monitor_value = 0;
 			while(VARIANT_FALSE==monitor_bado.m_pRecordset->EndOfFile)
 			{
-				temp_variant=monitor_bado.m_pRecordset->GetCollect("Record_Time");//
+				temp_variant=monitor_bado.m_pRecordset->GetCollect("Time_Since1970");//
 				if(temp_variant.vt!=VT_NULL)
 					logging_time = temp_variant;
 				else
@@ -457,7 +457,7 @@ int CBacnetGraphic::Search_data_from_db()
 					continue;
 				}
 
-				temp_variant=monitor_bado.m_pRecordset->GetCollect("Monitor_Value");//
+				temp_variant=monitor_bado.m_pRecordset->GetCollect("Value_");//
 				if(temp_variant.vt!=VT_NULL)
 					monitor_value = temp_variant;
 				else

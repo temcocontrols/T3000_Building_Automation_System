@@ -667,9 +667,16 @@ BOOL CBacnetScreenEdit::OnInitDialog()
 	ApplicationFolder.ReleaseBuffer();
 	//image_fordor = ApplicationFolder + _T("\\Database\\image");
 
+
+	CString temp_now_building_name= g_strCurBuildingDatabasefilePath;
+	PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
+	temp_now_building_name.ReleaseBuffer();
+	m_building_image_folder = temp_now_building_name  + _T("\\image");
+
+
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 
-	m_building_image_folder = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
+	//m_building_image_folder = ApplicationFolder + _T("\\Database\\Buildings\\") + pFrame->m_strCurMainBuildingName + _T("\\image");
 
 	m_pCon.CreateInstance(_T("ADODB.Connection"));
 	m_pRs.CreateInstance(_T("ADODB.Recordset"));

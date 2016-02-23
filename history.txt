@@ -1,3 +1,20 @@
+Ver 2016.1.4
+1> Building Configuration is updated(if the building name have changed ,the name of db will be changed ,automatically.)
+2> Fixed the value of AQ
+3> When updating the firmware ,it must match the firmware file with the device .
+      If they can't match ,ISPTool will go on .
+4> When Scanning ,T3000 will show the information of scanning including the comport and ethernet.   
+
+Ver 2015.12.25
+1> Support   "9600", "19200", "38400","57600","115200"     
+
+
+Ver 2015.12.23
+1>Changed "Scan Function"
+     If one device has two type communications,just use the ethernet 
+     update the device information in the background.
+2>Something have finxed about BACnet.
+
 Ver 2015.12.18
 1>Changed HUMTEMPSENSOR to HUM ,Model number is 14.
 2>Freshing the data in the background,HUM,AQ,HUM_R
@@ -8,8 +25,7 @@ Ver 2015.12.18
 7>ISPTool can detect the baudrate of device,automatically.
 8>Updated the UI of T3000. 
 Ver 2015.11.20
-1> Fixed the bug ,when minipanel is in the ispmodel and between its ip and pc's ip are in the different      
-subnet.
+1> Fixed the bug ,when minipanel is in the ispmodel and between its ip and pc's ip are in the different      subnet.
    The isptool will show a message ,let user change the ip of minipanel. 
 Ver 2015.11.3
 1> Fixed the bug that when loading the config file of Tstat5F ,T3000 will crash
@@ -33,8 +49,7 @@ new features:
 1.Supported to change the name of device in the Product Tree (By Connection)
 2.For customer's device,if connecting to Minipanel ,T3000 will tell minipanel the device's information.
 3.The definition of Fan Mode Names can be supported for Tstat6
-4.When renaming a node of the tree view ,T3000 will write the name to the device,if the device can support 
-to define the name .
+4.When renaming a node of the tree view ,T3000 will write the name to the device,if the device can support to define the name .
 
 
 some changes:
@@ -71,8 +86,7 @@ ver 2015.7.10
 2> new code merged together.
 3> "UNUSED" is replaced by "-"
 4> T3000 will go back to the last screen 
-5> while reading one device ,if there is a cache data ,use the data ,and then read the new data in the 
-backgrand .
+5> while reading one device ,if there is a cache data ,use the data ,and then read the new data in the backgrand .
 6> updated Sliders
 	1)Auto scale
         2)The min and max values will get the rounding down instead of up.
@@ -82,12 +96,9 @@ backgrand .
 	5)deadband will be get smaller and smaller or biger and biger by increaments.
 7> updated "Load firmware for many devices"
 	1)show the status of all devices :online or offline
-	2)show the version of the device and the firmware ,if the software version is the latest version 
-,don't update it again.
-	3)when selecting a hex or bin file ,click the button of "Apply",the file path will match with the 
-correct device .
-	4)when opening the dialog ,it wll initial the statuses of all devices ,including the "Is online" 
-"Software Version" "Firmware Version"
+	2)show the version of the device and the firmware ,if the software version is the latest version ,don't update it again.
+	3)when selecting a hex or bin file ,click the button of "Apply",the file path will match with the correct device .
+	4)when opening the dialog ,it wll initial the statuses of all devices ,including the "Is online" "Software Version" "Firmware Version"
 	5)Checking the configuration file ,automatically.
 8> Deleted the Custom Table in the output table ,and then move it to the range.
 9> Changed the "Internal Sensor" to "Internal Temp Sensor" in the input table.
@@ -96,16 +107,13 @@ correct device .
 
 2015.7.9
 1>When click bacnet products , it connect faster than before .
-2>Graphic labels of the buidling don't need read all of them.The communication of this part is faster then 
-before.
+2>Graphic labels of the buidling don't need read all of them.The communication of this part is faster then before.
 3>Change the status bar ,redraw the status.The status bar is more useful then before.
-4>Bacnet program IDE. Add operate '&' and "|"  feature. eg: 10  VAR1 = 17 & 14.Customer wants program 
-to controls the TSTAT register by bit.
+4>Bacnet program IDE. Add operate '&' and "|"  feature. eg: 10  VAR1 = 17 & 14.Customer wants program to controls the TSTAT register by bit.
 5>Auto update data in graphic view.Auto scroll.
 6>Fix the bug when sort the products , the status of the products is incorrect when sort by connection;
 7>Add more information in configuration user interface.Add "Network number" "MAC address" and so on.
-8>In bacnet list ,In item zero press key "UP" or key "DOWN",it will jump to the next panel(Premise the next 
-panel is online).
+8>In bacnet list ,In item zero press key "UP" or key "DOWN",it will jump to the next panel(Premise the next panel is online).
 9>Sort product view list by right click , and choose the menu .
 10>Icons changed, hotkey changed.
 11>Add feature BIP to MSTP . User can access the thermostat connect to the controller.
@@ -130,22 +138,18 @@ ver 2015.6.15
 
 *************************************************************************************
 ver 2015.6.12
-1.Added some features for "Batch flash firmares and configure files " ,in order to continue from the status 
-of last time.
+1.Added some features for "Batch flash firmares and configure files " ,in order to continue from the status of last time.
 2.Added Data Fileds to flag which products are custom products,which ones are temco,in database
 3.Added Table to store the records from batch flash .
 4.Added Table to store the register information from custom devices.
-7.Updated the function of  Delete All Nodes,Only Delete the temco's products ,doesn't delete the custom 
-product.
+7.Updated the function of  Delete All Nodes,Only Delete the temco's products ,doesn't delete the custom product.
   If only the user select the custom product,T3000 can delete it .
-7.Updated the style of saving the building database path in T3000 database,using the relative path to 
-replace the full path.
+7.Updated the style of saving the building database path in T3000 database,using the relative path to replace the full path.
 7.Updated HumChamber :generated the report from T3000
 8.Shift+D ,Shift+F:the two hot keys work
 9.Updated the input range of Tstat ,use '-' to replace 'UNUSED'
 10.Fixed the error of installation in windows 8 :"Unable to save file:C:\windows\Downloaded Instations\..." 
-11.Added the funcationality of supporting the customer's device that have modbus protocol in T3000,such 
-as "Power meter"
+11.Added the funcationality of supporting the customer's device that have modbus protocol in T3000,such as "Power meter"
    Any property datas that t3000 needed are inputed by user.
 
 *************************************************************************************
@@ -154,17 +158,14 @@ as "Power meter"
 ver 2015.5.29
 1. Bacnet IP gateway operations to MSTP added, still some work to be done. 
 2. Network discovery can find MSTP devices which are connected to the Mini Panel MSTP subnet. 
-3. Bacnet Input and Output add a user label for all the expansion I/O on the external T3 modules on the 
-subnet. 
+3. Bacnet Input and Output add a user label for all the expansion I/O on the external T3 modules on the subnet. 
 4. Connection to remote buildings, now user can properly configure the domain name for each building
                works using dynamic IP updating such as dyndns.org and port forwarding at the remote building. 
 
 6. Batch Flash Humidity Sensors in tstat6 during calibration. 
-7. Add some read/write features for the various settings related to the baromettric sensor of the C02 
-sensor.    
+7. Add some read/write features for the various settings related to the baromettric sensor of the C02 sensor.    
 
-8. Add some read/write features for the the T3 expansion modules, more parameters & settings can be 
-edited. 
+8. Add some read/write features for the the T3 expansion modules, more parameters & settings can be edited. 
 
 
 *************************************************************************************
@@ -203,8 +204,7 @@ ver 2015.4.3
 *************************************************************************************
 ver 2015.4.2
 1>>  Fixed the label in screen window can't show normally in the first few seconds. 
-2>>  When add or edit label in screen window ,it will write data into minipanel right now.Before we write 
-into device when exit the window. 
+2>>  When add or edit label in screen window ,it will write data into minipanel right now.Before we write into device when exit the window. 
 3>>  Fixed the  monitor input list crash when user change focus to other application. 
 4>>  Error handle with the label point . Before "VAR-3" "3--VAR" will make the t3000 crash.
 
@@ -259,8 +259,7 @@ ver 2014.10.11
 *************************************************************************************
 Ver 2014.9.26,date Released:2014-9-26
 *************************************************************************************
-1>Fixed many buildings in T3000,if user select other buildings or subnets ,t3000 can't show the 
-information of the building or the subnet  
+1>Fixed many buildings in T3000,if user select other buildings or subnets ,t3000 can't show the information of the building or the subnet  
 2>Fixed some bugs ,T3000 crash.
 
 Ver 2014.9.10,date Released:2014-9-10
@@ -271,8 +270,7 @@ Ver 2014.9.10,date Released:2014-9-10
 4>The model no must show in the scan result.
 6>Tstat-runar can be supported.
 7>Fixed the part of graphic ,which can support tstat6,7,5i
-8>Fixed the automatical scan in background,if user change the node of the network,the net device can't 
-show correctly.
+8>Fixed the automatical scan in background,if user change the node of the network,the net device can't show correctly.
 
 *************************************************************************************
 Ver 2014.9.4,date Released:2014-9-4
@@ -283,13 +281,11 @@ Ver 2014.9.4,date Released:2014-9-4
 3>Updated Hum Series sensors.
 4>Added one colomn for the register address in modbus poll.That's to say,there are three
   colomn "Register Name","Rgister Address","Register Value".
-5>Updated the monitor of the register value in isptool.users can monitor the registers' value  and write into 
- the text or Excel.
+5>Updated the monitor of the register value in isptool.users can monitor the registers' value  and write into  the text or Excel.
  
 Ver 2014.6.19,date Released:2014-6-19
 *************************************************************************************
-1>Fix the ipport of tstat (when the tstat is connected to the minipanel,tstat can't show the same ipport with 
-minipanel)
+1>Fix the ipport of tstat (when the tstat is connected to the minipanel,tstat can't show the same ipport with minipanel)
 *************************************************************************************
 
 Ver 2014.6.18,date Released:2014-6-18
@@ -301,21 +297,16 @@ Ver 2014.6.18,date Released:2014-6-18
 
 Ver 2014.6.17,date Released:2014-6-17
 *************************************************************************************
-1.Control Basic Editor: When finshed editing and the users' program has been sent successfully, there is no 
-need to show the exit Y/N confirmation dialog. Just exit right out with the 'Esc' key. 
+1.Control Basic Editor: When finshed editing and the users' program has been sent successfully, there is no need to show the exit Y/N confirmation dialog. Just exit right out with the 'Esc' key. 
 2.Control Basic Editor: Update the error messages after each send of the program. 
-3.Device Discovery: Fixed misc bugs related to auto discovery of bacnet devices and changes in the IP 
-address. Sync the changes properly with the database. 
+3.Device Discovery: Fixed misc bugs related to auto discovery of bacnet devices and changes in the IP address. Sync the changes properly with the database. 
 4.Online status of the nodes and the lower connection status bar now synchronized better. 
-5.When user changes the bacnent "Auto/Manual" field the "value" column will refresh instantly, before it 
-was slow.
-6. Match number of inputs of the controller to the hardware model, ie if it has 16 inptus T3000 will show 
-only 16 inputs for the LB model, 32inputs for the LB model and so on. 
+5.When user changes the bacnent "Auto/Manual" field the "value" column will refresh instantly, before it was slow.
+6. Match number of inputs of the controller to the hardware model, ie if it has 16 inptus T3000 will show only 16 inputs for the LB model, 32inputs for the LB model and so on. 
 7. Change the multi flash update interface, TBD : Auto flash and support pause and resume.
 8. Multi-flash update tool can now correctly handle 64k and 128k thermostats. 
 9. Add feature that user can access the remote bacnet device by internet at a remote IP address. 
-10. Add the bacnet interface to show the device software version , hardware version ,bootloader 
-version,and other information.
+10. Add the bacnet interface to show the device software version , hardware version ,bootloader version,and other information.
 *************************************************************************************
 
 Ver 2014.6.13,date Released:2014-6-13
@@ -350,10 +341,8 @@ Ver 2014.2.5,date Released:2014-4-30
 Ver 2014.2.4,date Released:2014-4-26
 *************************************************************************************
 1 Fixed Output table on Tstat 5A, analog outputs
-2 Fixed in system programming routine in T3000 and isptool, handles hex files with lines more than 256 
-chars properly now.
-3 Fixed If NC or other Devices connect by com port and ethernet ,T3000 will find two the same device ,and 
-then let users select which one the user want to add to the database of T3000
+2 Fixed in system programming routine in T3000 and isptool, handles hex files with lines more than 256 chars properly now.
+3 Fixed If NC or other Devices connect by com port and ethernet ,T3000 will find two the same device ,and then let users select which one the user want to add to the database of T3000
 4 Fixed differ the states of connection and disconnection.
 
 Ver 2014.2.3,date Released:2014-4-4
@@ -385,8 +374,7 @@ Ver 2014.1.4,date Released:
 1>Combined LED Table and 'Display Name' into one button called "Dsiplay". 
 2>Fixed some errors in the configuration of Tstat5E LCD display 
 3>Added Co2 alarming system ,added master CO2 sensor and a subnet of CO2 sensor nodes  
-4>Added T3-PT10 to the user interface ,allows configuaring of calibration ,filter and other parameters of 
-the T3-Pt10
+4>Added T3-PT10 to the user interface ,allows configuaring of calibration ,filter and other parameters of the T3-Pt10
 
 Ver 2014.1.3,date Released:2014-2-17
 *************************************************************************************
@@ -476,7 +464,7 @@ Ver 2013.20,date released:2013-9-22
 1>to show NC's MAC Address
 2>Change ISPTool some tips
 "Hex file matches the chip. "
-"Hex file doesnít match the chip. "
+"Hex file doesn‚Äôt match the chip. "
 "Begin Time" -> Change to "Start time"
 *************************************************************************************
 
@@ -503,12 +491,10 @@ Ver 2013.17,date released:2013-8-30
 2>Update T3-Module (T3-32AI,T3-8I13O) 
 3>Support T3 serials products.
 For Bacnet:
-1.Add programming context,when user use bacnet to program code,if codes contains error,it will prompt 
-the user which line occurs error.
+1.Add programming context,when user use bacnet to program code,if codes contains error,it will prompt the user which line occurs error.
 2.Add static text to show how many free memory the program has,and how many it has used.
 3.Add range choose dialog.
-4.Add "load descriptors" function like old T3000 do.(Read all date program needed,like "Programs" "Inputs" 
-"Outputs" and so on)
+4.Add "load descriptors" function like old T3000 do.(Read all date program needed,like "Programs" "Inputs" "Outputs" and so on)
 5.Add wait show dialog,to show the "load descriptors" progress step! 
 *************************************************************************************
 
@@ -614,12 +600,9 @@ Ver2.6.0.1,date released:  2013-5-6
 Ver2.6.0.0,date released:  2013/4/19
 *************************************************************************************
 <1>fix a bug which the boud rate changed to 9600 accidentally.
-<2>Add T3000RegAddress. Changed the architecture of the register table.Create two register table in 
-t3000.mdb which include all TSTAT product register list.The T3000.exe will load this value by runtime, 
-instead of compiling.
+<2>Add T3000RegAddress. Changed the architecture of the register table.Create two register table in t3000.mdb which include all TSTAT product register list.The T3000.exe will load this value by runtime, instead of compiling.
 <3>Modify sevral error in ParameterDlg ,the changed can also support tstat6 and tstat7
-<4>Make the program run more smoothly when user click refresh in OutPutDlg and  InputSetDlg ,it will no 
-longer appear noresponse.
+<4>Make the program run more smoothly when user click refresh in OutPutDlg and  InputSetDlg ,it will no longer appear noresponse.
 <5>Change InputTable set dialog .It can change the Input name and then save to DB.
 <6>Add HumChamber dialog.
 <7>Merge function  "Refresh" and "Refresh6" in ParameterDlg.
@@ -658,7 +641,7 @@ ver2.5.0.106, date released: 2013/1/18
 <4>Add the "Freeze Function" in the Advanced Setup
 <5>remove the column of Rotation in output table.
 <6>Fix "Save as.." the register list of The Tstat5E and 5C
-<7>ìDatabaseî, the Exit botton and Delete botton 
+<7>‚ÄúDatabase‚Äù, the Exit botton and Delete botton 
 <8>Fix the out table 
 <9>Change "NC Config"->"Apply" botton.
 <10> Change the setting of "Fan Model" 
@@ -671,8 +654,8 @@ ver2.5.0.104, date released: 2013/1/5
 *************************************************************************************
 <1>Fix the error that input1 can input value, in the Advanced Model line "Input value" 
 <2>Add the reminder of PID2 Off Setpoint "Input value" 
-   if >=100 ìout of rangeî ,if canít fail to write to the 275 register ,
-   îplease try again.îIf write sucessfully,îWrite okî
+   if >=100 ‚Äúout of range‚Äù ,if can‚Äôt fail to write to the 275 register ,
+   ‚Äùplease try again.‚ÄùIf write sucessfully,‚ÄùWrite ok‚Äù
 <3>Keep the steps both Heating Set Point and the set Bars in the first page.
  
 *************************************************************************************
@@ -758,7 +741,7 @@ ver2.5.0.93, date released:2012-10-15
 
 ver2.5.0.92, date released:2012-10-8
 *************************************************************************************
-(1)fixed "value for ìPID2 off set pointî shows wrong and not auto updated"for TSTAT5G
+(1)fixed "value for ‚ÄúPID2 off set point‚Äù shows wrong and not auto updated"for TSTAT5G
 (2)fixed Output Table-Out6 and Out7 
 *************************************************************************************
 
@@ -784,7 +767,7 @@ ver2.5.0.89, date released:2012-9-14
 *************************************************************************************
 Update TSTAT5G
 Update item:
-(1)Input valueî for Loop2.
+(1)Input value‚Äù for Loop2.
 (2)fixed deadband and night setpoint.
 *************************************************************************************
 

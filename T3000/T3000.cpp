@@ -39,7 +39,7 @@ CT3000App::CT3000App()
 {
  
 		m_bHiColorIcons = TRUE;
-		CurrentT3000Version=_T("    2015.12.18");
+		CurrentT3000Version=_T("    2016.01.4");
 //	}
 // 	catch (...)
 // 	{
@@ -1527,6 +1527,25 @@ BOOL CT3000App::InitInstance()
 
     #endif
 	
+
+	//HKEY hkey;
+	//char sz[256];
+	//DWORD dwtype, sl = 256;
+
+	//RegOpenKeyEx(HKEY_LOCAL_MACHINE,	_T("SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile"),	NULL, KEY_READ, &hkey);
+	//RegQueryValueEx(hkey, _T("EnableFirewall"), NULL, &dwtype, (LPBYTE)sz, &sl);
+	//DWORD dw_firewall;
+	//dw_firewall = sz[0] + sz[1] * 256 + sz[2] * 256*256 + sz[3] * 256*256*256;
+	//if(dw_firewall != 0 )
+	//{
+	//	AfxMessageBox(_T("Please turn off your firewall .If not , some broadcast communication may fail."));
+	//}
+	//
+	//RegCloseKey(hkey);
+
+
+
+
  
 	 //先不考虑升级的情况
 	 #if 1

@@ -216,6 +216,7 @@
     <ClCompile Include="DownloadSocket.cpp" />
     <ClCompile Include="EnterValueDlg.cpp" />
     <ClCompile Include="Enter_Value_BinaryDlg.cpp" />
+    <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="fileRW.cpp" />
     <ClCompile Include="Flash_Multy.cpp" />
     <ClCompile Include="GraphicMode.cpp" />
@@ -511,6 +512,7 @@
     <ClInclude Include="DownloadSocket.h" />
     <ClInclude Include="EnterValueDlg.h" />
     <ClInclude Include="Enter_Value_BinaryDlg.h" />
+    <ClInclude Include="FileOperations.h" />
     <ClInclude Include="fileRW.h" />
     <ClInclude Include="Flash_Multy.h" />
     <ClInclude Include="gloab_define.h" />

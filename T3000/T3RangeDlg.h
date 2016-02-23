@@ -31,6 +31,6 @@ public:
 	void Initial_window();
 	afx_msg void OnBnClickedClick_Radio();
 	 
- 
+    int m_speed_count;
 	afx_msg void OnEnKillfocusEditRangeSelect();
 };

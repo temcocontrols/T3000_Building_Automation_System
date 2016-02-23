@@ -8,12 +8,14 @@
 #include "T3RTDView.h"
 #include "T3RangeDlg.h"
 
-extern CString Range_Units[14];
+extern CString Range_Units[15];
+
 // CT3ModulesView
 DWORD WINAPI _ReadMultiRegisters_T3_Input(LPVOID pParam)
 {
     CT3ModulesView* pFrame=(CT3ModulesView*)(pParam);
     CString g_strT3000LogString;
+    int heatbeat  = 0;
     while(pFrame->IsWindowVisible ())
     {
         if (!is_connect())
@@ -21,11 +23,27 @@ DWORD WINAPI _ReadMultiRegisters_T3_Input(LPVOID pParam)
             Sleep(1000);
             continue;
         }
-        for(int i=0;i<4;i++) 
+        if (pFrame->m_ThreadStop)
+        {
+            heatbeat ++;
+            Sleep(6000);
+            if (heatbeat >10)
+            {
+                pFrame->m_ThreadStop = FALSE;
+                heatbeat =0;
+            }
+            continue;
+
+        }
+        for(int i=0; i<4; i++)
         {
             int multy_ret = 0;
+            if (pFrame->m_ThreadStop)
+            {
+                break;
+            }
             multy_ret = Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100);
-            
+
             Sleep(100);
             if(multy_ret<0)
                 break;
@@ -40,7 +58,8 @@ IMPLEMENT_DYNCREATE(CT3ModulesView, CFormView)
 CT3ModulesView::CT3ModulesView()
     : CFormView(CT3ModulesView::IDD)
 {
-     hFirstThread = NULL;
+    hFirstThread = NULL;
+    m_ThreadStop = FALSE;
 }
 
 CT3ModulesView::~CT3ModulesView()
@@ -736,23 +755,39 @@ void CT3ModulesView::Fresh()
 
 
             int RangeValue =   product_register_value[225+i-1];
-            if (RangeValue>=0&&RangeValue<=13)
+            int RangeValue1=RangeValue;
+            if (i<=11)
             {
-                strresult = Range_Units[RangeValue] ;
+                if (RangeValue1 == 6)
+                {
+                    RangeValue1 = 14;
+                }
+                if (RangeValue1>=0&&RangeValue1<=14)
+                {
+                    strresult = Range_Units[RangeValue1] ;
+                }
             }
+            else
+            {
+                if (RangeValue1>=0&&RangeValue1<=14)
+                {
+                    strresult = Range_Units[RangeValue1] ;
+                }
+            }
+
 
             m_T3_Input_List.SetItemText(i-1,3,strresult);
 
 //             if (i<=11)
 //             {
-                if (RangeValue!=6)
-                {
-                    regValue=product_register_value[100+2*i-1];
-                }
-                else
-                {
-                    regValue=product_register_value[100+2*(i-1)]*65536+product_register_value[100+2*i-1];
-                }
+            if (RangeValue!=6)
+            {
+                regValue=product_register_value[100+2*i-1];
+            }
+            else
+            {
+                regValue=product_register_value[100+2*(i-1)]*65536+product_register_value[100+2*i-1];
+            }
 //             }
 //             else
 //             {
@@ -1788,13 +1823,29 @@ LRESULT CT3ModulesView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 
             int RangeValue =   product_register_value[225+i-1];
-            if (RangeValue>=0&&RangeValue<=13)
+            int RangeValue1 = RangeValue;
+            if (i<=11)
             {
-                strresult = Range_Units[RangeValue] ;
+                if (RangeValue1 == 6)
+                {
+                    RangeValue1 =14;
+                }
+                if (RangeValue1>=0&&RangeValue1<=14)
+                {
+                    strresult = Range_Units[RangeValue1] ;
+                }
+            }
+            else
+            {
+                if (RangeValue1>=0&&RangeValue1<=14)
+                {
+                    strresult = Range_Units[RangeValue1] ;
+                }
             }
 
-            m_T3_Input_List.SetItemText(i-1,3,strresult);
 
+            m_T3_Input_List.SetItemText(i-1,3,strresult);
+              
             if (RangeValue!=6)
             {
                 regValue=product_register_value[100+2*i-1];
@@ -2190,12 +2241,15 @@ void CT3ModulesView::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult)
     int Value_Length = 0;
     lRow = lvinfo.iItem;
     lCol = lvinfo.iSubItem;
-
+    
     if(lRow>m_T3_Input_List.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
         return;
     if(lRow<0)
         return;
+    int speedcount = 0;
+    m_ThreadStop = TRUE;
 
+   
     if (product_register_value[7]==PM_T34AO)
     {
         if (lCol == 3)
@@ -2219,7 +2273,13 @@ void CT3ModulesView::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult)
     }
     else if (product_register_value[7]==PM_T36CT)
     {
-
+        if (lCol == 2)
+        {
+            Is_Range = TRUE;
+            Range_Address = 126;
+            Value_Address = 108;
+            Value_Length = 8;
+        }
     }
     else if (product_register_value[7]==PM_T3IOA)
     {
@@ -2260,6 +2320,11 @@ void CT3ModulesView::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult)
             Value_Address = 100;
             Value_Length = 44;
         }
+        if (lRow<=10)
+        {
+            speedcount =1;
+        }
+
     }
     else if (product_register_value[7]==PM_T3PT10)
     {
@@ -2270,15 +2335,23 @@ void CT3ModulesView::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult)
 
     }
 
-
     if (Is_Range)
     {
+
         CT3RangeDlg rangedlg;
+        rangedlg.m_speed_count = speedcount;
         rangedlg.m_current_range =product_register_value[Range_Address+lRow];
+        if (rangedlg.m_current_range == 6 && speedcount==1)
+        {
+            rangedlg.m_current_range = 14;
+        }
         if (IDOK==rangedlg.DoModal())
         {
             int range=rangedlg.m_current_range;
-
+            if (speedcount == 1&&range==14)
+            {
+                range = 6;
+            }
             if (range>=0&&range<=13)
             {
                 int ret=write_one(g_tstat_id,Range_Address+lRow,range);
@@ -2296,13 +2369,9 @@ void CT3ModulesView::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CT3ModulesView::OnDestroy()
 {
-     
-     
+    if(hFirstThread != NULL)
+        TerminateThread(hFirstThread, 0);
+    hFirstThread=NULL;
 
-
-        if(hFirstThread != NULL)
-            TerminateThread(hFirstThread, 0);
-        hFirstThread=NULL;
-
-        CFormView::OnDestroy();
+    CFormView::OnDestroy();
 }

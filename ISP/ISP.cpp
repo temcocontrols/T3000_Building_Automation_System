@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ISP.h"
 #include "ISPDlg.h"
+#include "Global_Struct.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -32,7 +33,7 @@ CISPApp::CISPApp()
 
 CISPApp theApp;
 
-
+extern CString    c_strSNRecordFileName;
 
 // CISPApp initialization
 
@@ -66,7 +67,7 @@ BOOL CISPApp::InitInstance()
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
-
+    c_strSNRecordFileName = GetExePath (true)+ L"serial_records.txt";
 	CISPDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();

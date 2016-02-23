@@ -63,7 +63,7 @@ INPUT void close_com();
 INPUT bool is_connect();
 //INPUT bool open_com_for_Command(unsigned char m_com);
 INPUT bool Open_Socket2(CString strIPAdress,short nPort);
-INPUT bool Change_BaudRate(TS_US new_baudrate);
+INPUT bool Change_BaudRate(int new_baudrate);
 INPUT void SetCommunicationType(int nType);
 INPUT int GetCommunicationType();
 

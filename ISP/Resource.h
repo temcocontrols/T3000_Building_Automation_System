@@ -99,14 +99,15 @@
 #define ID_MENU_EXIT32778               32778
 #define ID_MENU_SETTING                 32779
 #define ID_MENU_CHECKHEX                32780
+#define ID_MENU_FLASHSN                 32781
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
-#define _APS_NEXT_COMMAND_VALUE         32781
-#define _APS_NEXT_CONTROL_VALUE         1057
+#define _APS_NEXT_COMMAND_VALUE         32782
+#define _APS_NEXT_CONTROL_VALUE         1058
 #define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

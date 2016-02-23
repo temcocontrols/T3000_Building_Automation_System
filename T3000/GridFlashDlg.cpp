@@ -377,7 +377,7 @@
 					//case PM_ZIGBEE:			stemp=_T("ZigBee");break;
 					//case T3_32I_PRODUCT_MODEL:stemp=_T("T3-32I");break;
 					//case T3_8I_16O_PRODUCT_MODEL:stemp=_T("T3-8I-16O");break;
-					//case PM_T3IOA:stemp=_T("T3-8IOA");break;
+					//case PM_T3IOA:stemp=_T("T3-8O");break;
 					//case PM_T38AIOD:stemp=_T("T3-8IOD");break;
 					//default:stemp=_T("Others");break;
 				case PM_TSTAT5A:
@@ -455,7 +455,7 @@
 					stemp="T3-PT10";
 					break;
 				case PM_T3IOA :
-					stemp="T3-8IOA";
+					stemp="T3-8O";
 					break;
 				case PM_T332AI :
 					stemp="T3-32AI";
@@ -476,7 +476,7 @@
 					stemp="T3-6CT";
 					break;
                 case PM_T322AI:
-                    stemp="T3-22AI";
+                    stemp="T3-22I";
                     break;
                 case PM_T38AI8AO6DO:
                     stemp="T3-8AI8AO6DO";
@@ -636,7 +636,7 @@
 				m_grid_flash.at(iitemp).device =LED_PRODUCT_MODEL;//Others
 			else if(str_temp==_T("T3-PT10"))
 				m_grid_flash.at(iitemp).device =PM_T3PT10;//Others
-			else if(str_temp==_T("T3-8IOA"))
+			else if(str_temp==_T("T3-8O"))
 				m_grid_flash.at(iitemp).device =PM_T3IOA;//Others
 			else if(str_temp==_T("T3-8I16O"))
 				m_grid_flash.at(iitemp).device =T3_8I_16O_PRODUCT_MODEL;//Others
