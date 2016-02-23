@@ -15,6 +15,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Data.OleDb;
 using System.Xml.Linq;
+using System.Timers;
+
+
+
 namespace WFA_psychometric_chart
 {
     public partial class Form1 : Form
@@ -39,6 +43,10 @@ namespace WFA_psychometric_chart
         ArrayList temp_AL = new ArrayList();
         ArrayList hum_AL = new ArrayList();
 
+        //this is for updateing the values constantly
+        ArrayList temp2_AL = new ArrayList();
+        ArrayList hum2_AL = 
+            new ArrayList();
 
 
 
@@ -876,7 +884,10 @@ namespace WFA_psychometric_chart
         private void button6_Click(object sender, EventArgs e)
         {
 
-
+            
+            //resetting arrarylist..         
+            temp_AL.Clear();
+            hum_AL.Clear();
             //We are using JSON.NET library to parse the json file and get the data form it..
 
             if (tb_lat.Text != null && tb_long.Text != null)
@@ -889,9 +900,12 @@ namespace WFA_psychometric_chart
                         // var json = await httpClient.GetStringAsync(api_url);
                         double lat_val = Double.Parse(tb_lat.Text);
                         double lng_val = Double.Parse(tb_long.Text);
-                        string api_url = "http://api.openweathermap.org/data/2.5/station/find?lat='" + lat_val + "'&lon='" + lng_val + "'&APPID=615afd606af791f572a1f92b27a68bcd";
+                        string api_url = "http://api.openweathermap.org/data/2.5/station/find?lat=" + lat_val + "&lon=" + lng_val + "&APPID=615afd606af791f572a1f92b27a68bcd";
                         var data = wc.DownloadString(api_url);
                         //lets outpur this data for testing ...
+
+                        //MessageBox.Show("url = " + api_url);
+
                         MessageBox.Show("Data = " + data);
 
                         //now lets parse the data using JSON.NET library..
@@ -905,29 +919,57 @@ namespace WFA_psychometric_chart
 
 
                             var jArray = JArray.Parse(data);
-                           // var jobject = JObject.Parse(data);
+                            //testings....
+                          //  MessageBox.Show("jarray = " + jArray);
+                            //try
+                            //{
+                            //    System.IO.File.WriteAllText(@"C:\Users\nischal\Desktop\WriteText.txt", jArray.ToString());
+                            //}
+                            //catch (Exception ex)
+                            //{
+                            //    MessageBox.Show(ex.Message);
+                            //}
+                                
+                                
+                                // var jobject = JObject.Parse(data);
                             //var jToken = jObject.GetValue("main");
 
                             //string temperature = (string)jObject["list"][0]["main"]["temp"].ToString();
                             //MessageBox.Show("temperature pulled = " + temperature);
                             // ferehnite to degre conversion is required as openweathermap.org provide temperature in kelvin as default and our system uses in deg.
-                            int z = 0;
-                            foreach (JObject result in jArray.Children<JObject>())
+                           // int z = 0;
+                            //foreach (var result in jArray[0].Children<JObject>())
+                            foreach (var result in jArray.Children<JObject>())
                             {
                                 try
                                 {
 
-                                    string tem = result["last"]["main"]["temp"].ToString();
+                                    if ((result["last"]["main"]["temp"] != null) && (result["last"]["main"]["humidity"] != null))
+                                    {
+                                        string tem = result["last"]["main"]["temp"].ToString();
 
-                                    MessageBox.Show("tem = " + tem);
-                                    double kelvin = double.Parse(tem);
-                                    double degree = Math.Round(kelvin - 273.15);
-                                    temp_AL.Add((int)degree);
 
-                                    string tem2 = result["last"]["main"]["humidity"].ToString();
-                                    //lets divide the humidity by 100 to convert it to decimal value...
-                                    double hum = double.Parse(tem2);
-                                    hum_AL.Add(hum);
+
+                                        MessageBox.Show("tem = " + tem);
+                                        double kelvin = double.Parse(tem);
+                                        double degree = Math.Round(kelvin - 273.15);
+                                        temp_AL.Add((int)degree);
+
+
+                                        //for humidity part
+                                        string tem2 = result["last"]["main"]["humidity"].ToString();
+                                        //lets divide the humidity by 100 to convert it to decimal value...
+                                        double hum = double.Parse(tem2);
+                                        MessageBox.Show("hum = " + hum);
+                                        hum_AL.Add(hum);
+
+
+
+                                    }
+                                    //string tem2 = result["last"]["main"]["humidity"].ToString();
+                                    ////lets divide the humidity by 100 to convert it to decimal value...
+                                    //double hum = double.Parse(tem2);
+                                    //hum_AL.Add(hum);
 
                                 }
                                 catch (Exception ex)
@@ -936,36 +978,42 @@ namespace WFA_psychometric_chart
                                 }
                             }
 
-                            //foreach (var result2 in jArray)
-
+                            //foreach (var result2 in jArray.Children<JObject>())
                             //{
-                            //     try
+                            //    try
                             //    {
 
 
-                            //        string tem2 = result2["last"]["main"]["humidity"].ToString();
-                            //    //lets divide the humidity by 100 to convert it to decimal value...
-                            //    double hum = double.Parse(tem2);
-                            //    hum_AL.Add(hum);
+                            //        if (result2["last"]["main"]["humidity"] != null)
+                            //        {
+
+                            //            string tem2 = result2["last"]["main"]["humidity"].ToString();
+                            //            //lets divide the humidity by 100 to convert it to decimal value...
+                            //            double hum = double.Parse(tem2);
+                            //            MessageBox.Show("hum = " + hum);
+                            //            hum_AL.Add(hum);
+                            //        }
                             //    }
-                            //     catch (Exception ex)
-                            //     {
-                            //         MessageBox.Show("bbk message2  = " + ex.Message);
-                            //     }
+                            //    catch (Exception ex)
+                            //    {
+                            //        MessageBox.Show("bbk message2  = " + ex.Message);
+                            //    }
                             //}
 
                             //now lets test these
                             string test = null;
                             string test2 = null;
-
+                            
                             for (int i = 0; i < temp_AL.Count; i++)
                             {
                                 test += temp_AL[i] + " , \t";
                                 test2 += hum_AL[i] + ", \t";
 
                             }
-                            MessageBox.Show("temperature pulled = " + test);
-                            MessageBox.Show("humidity pulled = " + test2);
+                            MessageBox.Show("temperature pulled t = " + test);
+                            MessageBox.Show("humidity pulled h = " + test2);
+                            test = null;
+                            test2 = null;
                         }
                         catch (Exception ex)
                         {
@@ -1211,30 +1259,7 @@ namespace WFA_psychometric_chart
             }
         }
 
-        //public double GetCoordinatesLat(string addresspoint)
-        //{
-        //    using (var client = new WebClient())
-        //    {
-        //        string seachurl = "http://maps.googleapis.com/maps/api/geocode/xml?address='" + Uri.EscapeDataString(addresspoint) + "'&sensor=false";
-        //        string[] geocodeInfo = client.DownloadString(seachurl).Split(',');
-        //        return (Convert.ToDouble(geocodeInfo[2]));
-        //    }
-        //}
-
-        ///// <summary>
-        ///// returns longitude 
-        ///// </summary>
-        ///// <param name="addresspoint"></param>
-        ///// <returns></returns>
-        //public double GetCoordinatesLng(string addresspoint)
-        //{
-        //    using (var client = new WebClient())
-        //    {
-        //        string seachurl = "http://maps.googleapis.com/maps/api/geocode/xml?address='" + Uri.EscapeDataString(addresspoint)+ "'&sensor=false";
-        //        string[] geocodeInfo = client.DownloadString(seachurl).Split(',');
-        //        return (Convert.ToDouble(geocodeInfo[3]));
-        //    }
-        //}
+     
         private void button7_Click(object sender, EventArgs e)
         {
             try
@@ -1280,6 +1305,168 @@ namespace WFA_psychometric_chart
             {
                 MessageBox.Show(ex.Message);
             }
+
+        }
+
+        private void newFeaturesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //when ever the new feature is clicked new window form has to be opened...
+            Form2 f2 = new Form2();
+            f2.Show();
+            
+
+
+        }
+
+
+        private void UpdateDataConstantly()
+        {
+            //resetting arrarylist..         
+            temp2_AL.Clear();
+            hum2_AL.Clear();
+            //We are using JSON.NET library to parse the json file and get the data form it..
+
+            if (tb_lat.Text != null && tb_long.Text != null)
+            {
+                try
+                {
+
+                    using (var wc = new WebClient())
+                    {
+                        // var json = await httpClient.GetStringAsync(api_url);
+                        //pulling the saved data form text file....
+                        string path = AppDomain.CurrentDomain.BaseDirectory + @"long_lat_value.txt";
+                        string[] lines = System.IO.File.ReadAllLines(path);
+
+
+                        double lat_val = Double.Parse(lines[0]);
+                        double lng_val = Double.Parse(lines[1]);
+                        string api_url = "http://api.openweathermap.org/data/2.5/station/find?lat=" + lat_val + "&lon=" + lng_val + "&APPID=615afd606af791f572a1f92b27a68bcd";
+                        var data = wc.DownloadString(api_url);                    
+                       // MessageBox.Show("Data = " + data);                
+                        try
+                        {
+                            var jArray = JArray.Parse(data);                     
+                            foreach (var result in jArray.Children<JObject>())
+                            {
+                                try
+                                {
+
+                                    if ((result["last"]["main"]["temp"] != null) && (result["last"]["main"]["humidity"] != null))
+                                    {
+                                        string tem = result["last"]["main"]["temp"].ToString();
+
+
+
+                                       // MessageBox.Show("tem = " + tem);
+                                        double kelvin = double.Parse(tem);
+                                        double degree = Math.Round(kelvin - 273.15);
+                                        temp_AL.Add((int)degree);
+
+
+                                        //for humidity part
+                                        string tem2 = result["last"]["main"]["humidity"].ToString();
+                                        //lets divide the humidity by 100 to convert it to decimal value...
+                                        double hum = double.Parse(tem2);
+                                        //MessageBox.Show("hum = " + hum);
+                                        hum_AL.Add(hum);
+
+
+
+                                    }
+                               
+                                }
+                                catch (Exception ex)
+                                {
+                                    MessageBox.Show("bbk message = " + ex.Message);
+                                }
+                            }
+
+                            //now lets test these
+                            //string test = null;
+                            //string test2 = null;
+
+                            //for (int i = 0; i < temp_AL.Count; i++)
+                            //{
+                            //    test += temp_AL[i] + " , \t";
+                            //    test2 += hum_AL[i] + ", \t";
+
+                            //}
+                            //MessageBox.Show("temperature pulled t = " + test);
+                            //MessageBox.Show("humidity pulled h = " + test2);
+                            //test = null;
+                          //  test2 = null;
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("exception = " + ex.Message);
+                        }
+                        //now lets load the map if not loaded if loaded dont need to load the map..
+                        try
+                        {
+                            if (map_loaded == 0)
+                            {
+                                //not loaded so load..
+                                button1.PerformClick();
+                            }
+
+                            //testing..
+                            string s = null;
+
+                            for (int i = 0; i < temp_AL.Count; i++)
+                            {
+                                //calling the plot function to plot the values...
+                                double DBT = double.Parse(temp_AL[i].ToString());
+                                double RH = (double)double.Parse(hum_AL[i].ToString()) / 100;
+                            //    s += "(DBT = " + DBT + ",HR= " + RH + ") \n";
+                                //plot_by_DBT_HR(t, h);//div by 100 because 34% = 34/100 so..
+                                plot_by_DBT_HR(DBT, RH);
+                            }
+
+                          //  MessageBox.Show("val = " + s);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+            }//close of if...
+
+
+        }
+        private System.Windows.Forms.Timer timer1;
+        public void InitTimer()
+        {
+            timer1 = new System.Windows.Forms.Timer();
+            timer1.Tick += new EventHandler(timer1_Tick);
+            timer1.Interval = 1000*60; // in miliseconds //2min * 30 = 60 min minute ie every 1 hour
+            timer1.Start();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            MessageBox.Show("pulling...");
+            UpdateDataConstantly();
+            MessageBox.Show("pulled...");
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            //this code basically makes the upadating part constantly...
+            //it calls the function UpdateDataConstantly()
+            //Timer timer = new Timer(1000);
+            //timer.Elapsed += async (sender, e) => await HandleTimer();
+            //timer.Start();
+            //this function basically calls every  5 minuest...
+            InitTimer();
+           // MessageBox.Show("success");
 
         }
 
