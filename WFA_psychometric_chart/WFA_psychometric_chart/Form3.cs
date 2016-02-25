@@ -10,13 +10,12 @@ using System.Windows.Forms;
 using System.Data.OleDb;
 using System.Net;
 using System.Xml.Linq;
+using System.Xml;
 
 namespace WFA_psychometric_chart
 {
     public partial class Form3 : Form
     {
-        //OleDbCommand cmd = new OleDbCommand();
-        //OleDbConnection con = new OleDbConnection();
 
         public Form3()
         {
@@ -184,7 +183,9 @@ namespace WFA_psychometric_chart
 
             try
             {
-                string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+                //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";        
                 using (OleDbConnection connection = new OleDbConnection(connString))
                 {
                     connection.Open();
@@ -222,10 +223,10 @@ namespace WFA_psychometric_chart
         {
 
             //lets pull the vales offline values stored in db...
-
-
-         string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-        using (OleDbConnection connection = new OleDbConnection(connString))
+            string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+            string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";        
+            using (OleDbConnection connection = new OleDbConnection(connString))
            {
         connection.Open();
         OleDbDataReader reader = null;
@@ -241,15 +242,269 @@ namespace WFA_psychometric_chart
             tb_street.Text = reader["street"].ToString();
             tb_ZIP.Text = reader["ZIP"].ToString();
 
-
-
         }    
    }
 
 
 
 
-}//close of void btn6
+}
+
+     
+
+        private void btn_update_now_Click(object sender, EventArgs e)
+        {
+            /*
+             steps:
+             * 0.pull the lat and long value stored in the database
+             * 1.pull the data form web 
+             * 2.Parse the xml data
+             * 3.insert data
+             * 4.display data
+             */
+            double lat_val=0.0000;
+            double lng_val=0.0000;
+            //lets declare some variable to store the value...
+            string city_name_pulled="";
+            string country_name_pulled="";
+            string last_update_pulled="";
+            string temp_pulled="";
+            string hum_pulled="";
+            string pressure_pulled="";
+            string wind_speed_pulled="";
+            string direction_pulled="";
+            string lat_pulled="";
+            string long_pulled="";
+            
+
+
+            try
+            {
+                
+                //lets pull the vales offline values stored in db...
+                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+                string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                using (OleDbConnection connection = new OleDbConnection(connString))
+                {
+                    connection.Open();
+                    OleDbDataReader reader = null;
+                    OleDbCommand command = new OleDbCommand("SELECT * from tbl_geo_location_value ", connection);
+                    //command.Parameters.AddWithValue("@1", userName)
+                    reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        
+                        lat_val = double.Parse(reader["latitude"].ToString());
+                        lng_val = double.Parse(reader["longitude"].ToString());
+
+                    }
+                    connection.Close();
+                }
+
+                using (var wc = new WebClient())
+                {
+                    // var json = await httpClient.GetStringAsync(api_url);
+
+
+                    //MessageBox.Show("lat = " + lat_val + "lng = " + lng_val);
+                    string api_url = "http://api.openweathermap.org/data/2.5/weather?mode=xml&lat="+lat_val+"&lon="+lng_val+"&appid=615afd606af791f572a1f92b27a68bcd";
+                    var data = wc.DownloadString(api_url);
+                    //MessageBox.Show("string apic return =" + data);
+                    string xml_string = data.ToString();
+                    //xml parsing...
+                    XmlDocument xml = new XmlDocument();
+                    xml.LoadXml(xml_string);
+                    
+                    XmlNodeList elem_city = xml.GetElementsByTagName("city");                   
+                    foreach (XmlNode x in elem_city)
+                    {
+                        city_name_pulled = x.Attributes["name"].Value;
+                        MessageBox.Show("city name = " + city_name_pulled);
+                    }
+                    //for temperature
+                    XmlNodeList temp_list = xml.GetElementsByTagName("temperature");                   
+                    foreach (XmlNode x in temp_list)
+                    {
+                        temp_pulled = x.Attributes["value"].Value;
+                        MessageBox.Show("temp  = " + temp_pulled);
+                    }
+                    //for humidity
+                    XmlNodeList hum_list = xml.GetElementsByTagName("humidity");                    
+                    foreach (XmlNode x in hum_list)
+                    {
+                        hum_pulled = x.Attributes["value"].Value;
+                        MessageBox.Show("hum  = " + hum_pulled);
+                    }
+                    //for pressure..
+                    XmlNodeList pressure_list = xml.GetElementsByTagName("pressure");                    
+                    foreach (XmlNode x in pressure_list)
+                    {
+                        pressure_pulled = x.Attributes["value"].Value;
+                        MessageBox.Show("press = " + pressure_pulled);
+                    }
+                    //for wind 
+
+                    XmlNodeList wind_list = xml.GetElementsByTagName("speed");
+                    foreach (XmlNode x in wind_list)
+                    {
+                        wind_speed_pulled = x.Attributes["value"].Value;
+                        MessageBox.Show("wind speed = " + wind_speed_pulled);
+                    }
+                    //for direction..
+                    XmlNodeList direction_list = xml.GetElementsByTagName("direction");
+                    foreach (XmlNode x in direction_list)
+                    {
+                        direction_pulled = x.Attributes["name"].Value;
+                        MessageBox.Show("direction name = " + direction_pulled);
+                    }
+                    //for lat and long of station...
+                    XmlNodeList coord_list = xml.GetElementsByTagName("coord");
+                    foreach (XmlNode x in coord_list)
+                    {
+                        lat_pulled = x.Attributes["lat"].Value;
+                        long_pulled = x.Attributes["lon"].Value;
+
+                        MessageBox.Show("lat = " + lat_pulled +"long" +long_pulled);
+                    }
+                    //for last date update time 
+                    XmlNodeList last_update_list = xml.GetElementsByTagName("lastupdate");
+                    foreach (XmlNode x in last_update_list)
+                    {
+                        last_update_pulled = x.Attributes["value"].Value;
+                        MessageBox.Show("last update date = " + last_update_pulled);
+                    }
+                    
+                    //for country..
+                    XmlNodeList country_list = xml.GetElementsByTagName("country");
+                    foreach (XmlNode x in country_list)
+                    {
+                        country_name_pulled = x.InnerText;
+                        MessageBox.Show("country name = " + country_name_pulled);
+                    }
+
+                    //step3. insert the values pulled into a database..
+
+                    //fist calculate lets calculate the distance...
+                    /*
+                        dlon = lon2 - lon1
+                        dlat = lat2 - lat1
+                        a = (sin(dlat/2))^2 + cos(lat1) * cos(lat2) * (sin(dlon/2))^2
+                        c = 2 * atan2( sqrt(a), sqrt(1-a) )
+                        d = R * c (where R is the radius of the Earth) 
+                     */
+                    string loc_value="";
+                    double d=0.0000;
+                    double temp_adjust = double.Parse(temp_pulled.ToString()) - 273.15;
+                    try{
+
+                    double R = 6371.0;//radius of earth in Km
+                    double dlon = double.Parse(long_pulled.ToString()) - lng_val;
+                    double dlat=  double.Parse(lat_pulled.ToString()) -lat_val;
+                    double a = Math.Pow((Math.Sin(dlat / 2)), 2) + Math.Cos(lat_val) * Math.Cos(double.Parse(lat_pulled.ToString())) * Math.Pow((Math.Sin(dlon / 2)), 2);
+                    double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+                           d = R * c;//This is the distance
+                          loc_value = country_name_pulled + "," + city_name_pulled;
+                    using (OleDbConnection connection = new OleDbConnection(connString))
+                {
+                    connection.Open();
+                    string sql_string = "update tbl_weather_related_values set  location=@location_value,distance_from_building=@distance_value,last_update_date=@last_value,temp=@temp_value,humidity=@hum_value,bar_pressure=@pressure_value,wind=@wind_value,direction=@direction_value   where ID = 1;";
+                    OleDbCommand command = new OleDbCommand(sql_string, connection);
+                    command.CommandType = CommandType.Text;
+                    command.Parameters.AddWithValue("@location_value", loc_value.ToString());
+                    command.Parameters.AddWithValue("@distance_value", d.ToString());
+                    command.Parameters.AddWithValue("@last_value", last_update_pulled.ToString());
+                    command.Parameters.AddWithValue("@temp_value", temp_adjust.ToString());
+                    command.Parameters.AddWithValue("@hum_value",hum_pulled.ToString());
+                    command.Parameters.AddWithValue("@pressure_value", pressure_pulled.ToString());
+                    command.Parameters.AddWithValue("@wind_value",wind_speed_pulled.ToString());
+                    command.Parameters.AddWithValue("@direction_value", direction_pulled.ToString());
+
+                    command.ExecuteNonQuery();
+                    //MessageBox.Show("sql string = " + sql_string);
+                    //MessageBox.Show("value updated successfully!");
+                   connection.Close();
+                
+                
+            }//close o using..
+                    }catch(Exception ex){
+                        MessageBox.Show(ex.Message);
+                    }
+
+                    //step 4:display the value..
+                    tb_location.Text = loc_value;
+                    tb_last_updated.Text = last_update_pulled;
+                    tb_distance_from_build.Text = d.ToString();
+                    tb_cw_temp.Text = temp_adjust.ToString();
+                    tb_cw_hum.Text = hum_pulled.ToString();
+                    tb_cw_barometer_value.Text = pressure_pulled;
+                    tb_cw_wind.Text = wind_speed_pulled.ToString();
+                    tb_cw_direction.Text = direction_pulled.ToString();
+
+                    
+
+
+                    MessageBox.Show("end");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+
+
+
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {   
+            //storing the value in the database...
+
+            if((tb_longitude.Text != "") && (tb_latitude.Text != ""))
+            try
+            {
+                string lat_value = tb_latitude.Text;
+                string long_value = tb_longitude.Text;
+                MessageBox.Show("lat= " + lat_value + " lng= " + long_value);
+                //string elev_value = tb_elev.Text;
+                //lets pull the vales offline values stored in db...
+                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";                
+                string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                using (OleDbConnection connection = new OleDbConnection(connString))
+                {
+                    connection.Open();
+                    string sql_string = "update tbl_geo_location_value set   latitude=@latitude_value,longitude=@longitude_value where ID = 1;";
+                    OleDbCommand command = new OleDbCommand(sql_string, connection);
+                    command.CommandType = CommandType.Text;
+                    command.Parameters.AddWithValue("@latitude_value", lat_value);
+                    command.Parameters.AddWithValue("@longitude_value", long_value);
+                    command.ExecuteNonQuery();
+                    //MessageBox.Show("sql string = " + sql_string);
+                    MessageBox.Show("value updated successfully!");
+                   
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //This will help to insert the values...
+
+            Form4_insert_data f4 = new Form4_insert_data();
+            f4.Show();
+
+
+        }//close of void update_value_now
 
 
 
