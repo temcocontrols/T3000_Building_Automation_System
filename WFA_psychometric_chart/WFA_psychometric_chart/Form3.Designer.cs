@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.button5 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
@@ -41,8 +42,8 @@
             this.tb_state = new System.Windows.Forms.TextBox();
             this.tb_country = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -89,6 +90,7 @@
             this.tb_cw_temp = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label32 = new System.Windows.Forms.Label();
             this.btn_update_now = new System.Windows.Forms.Button();
             this.btn_pull_offline_data = new System.Windows.Forms.Button();
             this.label17 = new System.Windows.Forms.Label();
@@ -97,7 +99,7 @@
             this.label16 = new System.Windows.Forms.Label();
             this.tb_location = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.label32 = new System.Windows.Forms.Label();
+            this.label33 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -108,6 +110,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.button5);
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.button6);
             this.groupBox1.Controls.Add(this.button3);
@@ -120,8 +123,8 @@
             this.groupBox1.Controls.Add(this.tb_state);
             this.groupBox1.Controls.Add(this.tb_country);
             this.groupBox1.Controls.Add(this.label8);
-            this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.label3);
@@ -134,6 +137,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Building Location";
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(701, 91);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(94, 23);
+            this.button5.TabIndex = 19;
+            this.button5.Text = "Save geo value";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(601, 35);
@@ -142,6 +155,7 @@
             this.button1.TabIndex = 18;
             this.button1.Text = "Insert Data";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button6
             // 
@@ -172,14 +186,14 @@
             // 
             // tb_latitude
             // 
-            this.tb_latitude.Location = new System.Drawing.Point(406, 68);
+            this.tb_latitude.Location = new System.Drawing.Point(406, 42);
             this.tb_latitude.Name = "tb_latitude";
             this.tb_latitude.Size = new System.Drawing.Size(189, 20);
             this.tb_latitude.TabIndex = 14;
             // 
             // tb_longitude
             // 
-            this.tb_longitude.Location = new System.Drawing.Point(406, 42);
+            this.tb_longitude.Location = new System.Drawing.Point(406, 68);
             this.tb_longitude.Name = "tb_longitude";
             this.tb_longitude.Size = new System.Drawing.Size(189, 20);
             this.tb_longitude.TabIndex = 13;
@@ -228,23 +242,23 @@
             this.label8.TabIndex = 7;
             this.label8.Text = "Elev :";
             // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(313, 75);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(51, 13);
-            this.label7.TabIndex = 6;
-            this.label7.Text = "Latitude :";
-            // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(304, 45);
+            this.label6.Location = new System.Drawing.Point(316, 70);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(60, 13);
             this.label6.TabIndex = 5;
             this.label6.Text = "Longitude :";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(316, 45);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(51, 13);
+            this.label7.TabIndex = 6;
+            this.label7.Text = "Latitude :";
             // 
             // label5
             // 
@@ -449,7 +463,7 @@
             this.groupBox6.Controls.Add(this.btn_help);
             this.groupBox6.Controls.Add(this.cb_hum_self_calib);
             this.groupBox6.Controls.Add(this.label27);
-            this.groupBox6.Location = new System.Drawing.Point(30, 225);
+            this.groupBox6.Location = new System.Drawing.Point(30, 213);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(631, 117);
             this.groupBox6.TabIndex = 1;
@@ -551,6 +565,7 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.label33);
             this.groupBox5.Controls.Add(this.tb_cw_direction);
             this.groupBox5.Controls.Add(this.label25);
             this.groupBox5.Controls.Add(this.tb_cw_wind);
@@ -566,7 +581,7 @@
             this.groupBox5.Controls.Add(this.label18);
             this.groupBox5.Location = new System.Drawing.Point(30, 135);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(631, 84);
+            this.groupBox5.Size = new System.Drawing.Size(631, 72);
             this.groupBox5.TabIndex = 1;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Current Weather";
@@ -574,7 +589,7 @@
             // tb_cw_direction
             // 
             this.tb_cw_direction.Enabled = false;
-            this.tb_cw_direction.Location = new System.Drawing.Point(280, 48);
+            this.tb_cw_direction.Location = new System.Drawing.Point(280, 45);
             this.tb_cw_direction.Name = "tb_cw_direction";
             this.tb_cw_direction.Size = new System.Drawing.Size(78, 20);
             this.tb_cw_direction.TabIndex = 30;
@@ -582,7 +597,7 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(219, 51);
+            this.label25.Location = new System.Drawing.Point(219, 48);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(55, 13);
             this.label25.TabIndex = 29;
@@ -701,20 +716,30 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Weather Station";
             // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(515, 52);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(22, 13);
+            this.label32.TabIndex = 25;
+            this.label32.Text = "Km";
+            // 
             // btn_update_now
             // 
             this.btn_update_now.Enabled = false;
-            this.btn_update_now.Location = new System.Drawing.Point(376, 47);
+            this.btn_update_now.Location = new System.Drawing.Point(391, 16);
             this.btn_update_now.Name = "btn_update_now";
             this.btn_update_now.Size = new System.Drawing.Size(102, 23);
             this.btn_update_now.TabIndex = 24;
             this.btn_update_now.Text = "Update Now";
             this.btn_update_now.UseVisualStyleBackColor = true;
+            this.btn_update_now.Click += new System.EventHandler(this.btn_update_now_Click);
             // 
             // btn_pull_offline_data
             // 
             this.btn_pull_offline_data.Enabled = false;
-            this.btn_pull_offline_data.Location = new System.Drawing.Point(242, 47);
+            this.btn_pull_offline_data.Location = new System.Drawing.Point(256, 16);
             this.btn_pull_offline_data.Name = "btn_pull_offline_data";
             this.btn_pull_offline_data.Size = new System.Drawing.Size(102, 23);
             this.btn_pull_offline_data.TabIndex = 23;
@@ -742,7 +767,7 @@
             // tb_distance_from_build
             // 
             this.tb_distance_from_build.Enabled = false;
-            this.tb_distance_from_build.Location = new System.Drawing.Point(369, 26);
+            this.tb_distance_from_build.Location = new System.Drawing.Point(370, 49);
             this.tb_distance_from_build.Name = "tb_distance_from_build";
             this.tb_distance_from_build.Size = new System.Drawing.Size(139, 20);
             this.tb_distance_from_build.TabIndex = 20;
@@ -750,7 +775,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(242, 26);
+            this.label16.Location = new System.Drawing.Point(242, 52);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(121, 13);
             this.label16.TabIndex = 19;
@@ -773,14 +798,14 @@
             this.label15.TabIndex = 4;
             this.label15.Text = "Location :";
             // 
-            // label32
+            // label33
             // 
-            this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(511, 30);
-            this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(22, 13);
-            this.label32.TabIndex = 25;
-            this.label32.Text = "Km";
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(169, 48);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(37, 13);
+            this.label33.TabIndex = 31;
+            this.label33.Text = "m/sec";
             // 
             // Form3
             // 
@@ -880,5 +905,7 @@
         private System.Windows.Forms.Button btn_update_now;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Label label33;
     }
 }

@@ -106,13 +106,20 @@ namespace WFA_psychometric_chart
             string line1;
             //String[][] point_value= new String[][];
            // string path1 = "C:\\Users\\nischal\\Desktop\\t_pg.txt";
-
+            /*
             var pat_test = System.Environment.
                              GetFolderPath(
                                  Environment.SpecialFolder.Desktop
                              );
            // MessageBox.Show("the path = " + pat_test);
             string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
+            */
+            string dir = System.IO.Path.GetDirectoryName(
+  System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+            string file = dir + @"\t_pg.txt";
+            string path1 = file;
+
            // string path;
            // path = System.IO.Path.GetDirectoryName(
            //    System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
@@ -275,14 +282,17 @@ namespace WFA_psychometric_chart
             string line2;
             //String[][] point_value= new String[][];
             //string path2 = "C:\\Users\\nischal\\Desktop\\t_pg1.txt";
-
+            /*
             var pat_test2 = System.Environment.
                             GetFolderPath(
                                 Environment.SpecialFolder.Desktop
                             );
             //MessageBox.Show("the path = " + pat_test);
             string path2 = System.IO.Path.Combine(pat_test, "t_pg1.txt");
-          
+            */
+            
+            string file1 = dir + @"\t_pg1.txt";
+            string path2 = file1;
             using (System.IO.StreamReader st = new System.IO.StreamReader(path2))
             {
                 //int i = 0;
@@ -444,7 +454,13 @@ namespace WFA_psychometric_chart
         {
             radioButton1.Checked = true;
 
-            con.ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+            string dir = System.IO.Path.GetDirectoryName(
+  System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+            //string file = dir + @"\TestDir\TestFile.txt";
+
+            //con.ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+            con.ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source="+dir+@"\T3000.mdb;Persist Security Info=True";
             cmd.Connection = con;
 
             
@@ -561,12 +577,18 @@ namespace WFA_psychometric_chart
             
             string line1;
             //string path1 = "C:\\Users\\nischal\\Desktop\\t_pg.txt";
-            var pat_test = System.Environment.
+           /* var pat_test = System.Environment.
                             GetFolderPath(
                                 Environment.SpecialFolder.Desktop
                             );
            // MessageBox.Show("the path = " + pat_test);
             string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
+            */
+            string dir = System.IO.Path.GetDirectoryName(
+  System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+            string file = dir + @"\t_pg.txt";
+            string path1 = file;
           
             using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
             {
@@ -1113,7 +1135,7 @@ namespace WFA_psychometric_chart
                     ArrayList temperature_value = new ArrayList();
                     ArrayList pg_value_from_txtfile = new ArrayList();
 
-
+                    /*
                     string line1;
                   //  string path1 = "C:\\Users\\nischal\\Desktop\\t_pg.txt";
                     var pat_test = System.Environment.
@@ -1122,7 +1144,14 @@ namespace WFA_psychometric_chart
                             );
                    // MessageBox.Show("the path = " + pat_test);
                     string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
-          
+          */
+                    string dir = System.IO.Path.GetDirectoryName(
+  System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+                    string file = dir + @"\t_pg.txt";
+                    string path1 = file;
+                    string line1;
+
                     using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
                     {
 
