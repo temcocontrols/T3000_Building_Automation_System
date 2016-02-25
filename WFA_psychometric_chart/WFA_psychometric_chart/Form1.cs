@@ -1411,7 +1411,7 @@ namespace WFA_psychometric_chart
                             }
 
                             //testing..
-                            string s = null;
+                           // string s = null;
 
                             for (int i = 0; i < temp_AL.Count; i++)
                             {
@@ -1460,13 +1460,18 @@ namespace WFA_psychometric_chart
         private void button9_Click(object sender, EventArgs e)
         {
             //this code basically makes the upadating part constantly...
-            //it calls the function UpdateDataConstantly()
-            //Timer timer = new Timer(1000);
-            //timer.Elapsed += async (sender, e) => await HandleTimer();
-            //timer.Start();
-            //this function basically calls every  5 minuest...
+            //it calls the function UpdateDataConstantly()           
+            //this function basically calls every  50 minuest...
             InitTimer();
-           // MessageBox.Show("success");
+            MessageBox.Show("success");
+
+        }
+
+        private void weatherServicesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form3 f3 = new Form3();
+            f3.Show();
+
 
         }
 
