@@ -52,8 +52,9 @@ namespace WFA_psychometric_chart
                     using (OleDbConnection connection = new OleDbConnection(connString))
                     {
                         connection.Open();
-                        string sql_string = "update tbl_building_location set   country=@country_value,state=@state_value,city=@city_value,street=@street_value,ZIP=@zip_value where ID = 1;";
-                        OleDbCommand command = new OleDbCommand(sql_string, connection);
+                        //string sql_string = "update tbl_building_location set   country=@country_value,state=@state_value,city=@city_value,street=@street_value,ZIP=@zip_value where ID = 1;";
+                        string sql_query = "INSERT INTO tbl_building_location(country,state,city,street,zip) VALUES(@country_value,@state_value,@city_value,@street_value,@zip_value)";
+                        OleDbCommand command = new OleDbCommand(sql_query, connection);
                         command.CommandType = CommandType.Text;
                         command.Parameters.AddWithValue("@country_value", country);
                         command.Parameters.AddWithValue("@state_value", state);
@@ -77,10 +78,17 @@ namespace WFA_psychometric_chart
 
 
 
-            }
+            }//close of else..
+
+           
 
 
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }//close of private method
 
   
 

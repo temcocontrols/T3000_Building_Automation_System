@@ -30,7 +30,6 @@
         {
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series36 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series37 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series38 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series39 = new System.Windows.Forms.DataVisualization.Charting.Series();
@@ -65,6 +64,8 @@
             System.Windows.Forms.DataVisualization.Charting.Series series68 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series69 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series70 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series71 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series72 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.button1 = new System.Windows.Forms.Button();
@@ -125,11 +126,6 @@
             this.tb_city_name = new System.Windows.Forms.TextBox();
             this.button8 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
-            this.label18 = new System.Windows.Forms.Label();
-            this.label17 = new System.Windows.Forms.Label();
-            this.button5 = new System.Windows.Forms.Button();
-            this.tb_dew_point = new System.Windows.Forms.TextBox();
-            this.tb_enthalpy = new System.Windows.Forms.TextBox();
             this.button4 = new System.Windows.Forms.Button();
             this.txt_enthalpy = new System.Windows.Forms.TextBox();
             this.txt_DBT = new System.Windows.Forms.TextBox();
@@ -176,113 +172,115 @@
             this.chart1.Legends.Add(legend2);
             this.chart1.Location = new System.Drawing.Point(517, 24);
             this.chart1.Name = "chart1";
-            series36.ChartArea = "ChartArea1";
-            series36.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series36.Legend = "Legend1";
-            series36.Name = "Series1";
             series37.ChartArea = "ChartArea1";
+            series37.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             series37.Legend = "Legend1";
-            series37.Name = "Series2";
+            series37.Name = "Series1";
             series38.ChartArea = "ChartArea1";
             series38.Legend = "Legend1";
-            series38.Name = "Series3";
+            series38.Name = "Series2";
             series39.ChartArea = "ChartArea1";
             series39.Legend = "Legend1";
-            series39.Name = "Series4";
+            series39.Name = "Series3";
             series40.ChartArea = "ChartArea1";
             series40.Legend = "Legend1";
-            series40.Name = "Series5";
+            series40.Name = "Series4";
             series41.ChartArea = "ChartArea1";
             series41.Legend = "Legend1";
-            series41.Name = "Series6";
+            series41.Name = "Series5";
             series42.ChartArea = "ChartArea1";
             series42.Legend = "Legend1";
-            series42.Name = "Series7";
+            series42.Name = "Series6";
             series43.ChartArea = "ChartArea1";
             series43.Legend = "Legend1";
-            series43.Name = "Series8";
+            series43.Name = "Series7";
             series44.ChartArea = "ChartArea1";
             series44.Legend = "Legend1";
-            series44.Name = "Line0";
+            series44.Name = "Series8";
             series45.ChartArea = "ChartArea1";
             series45.Legend = "Legend1";
-            series45.Name = "Line1";
+            series45.Name = "Line0";
             series46.ChartArea = "ChartArea1";
             series46.Legend = "Legend1";
-            series46.Name = "Line2";
+            series46.Name = "Line1";
             series47.ChartArea = "ChartArea1";
             series47.Legend = "Legend1";
-            series47.Name = "Line3";
+            series47.Name = "Line2";
             series48.ChartArea = "ChartArea1";
             series48.Legend = "Legend1";
-            series48.Name = "Line4";
+            series48.Name = "Line3";
             series49.ChartArea = "ChartArea1";
             series49.Legend = "Legend1";
-            series49.Name = "Line5";
+            series49.Name = "Line4";
             series50.ChartArea = "ChartArea1";
             series50.Legend = "Legend1";
-            series50.Name = "Line6";
+            series50.Name = "Line5";
             series51.ChartArea = "ChartArea1";
             series51.Legend = "Legend1";
-            series51.Name = "Line_r0";
+            series51.Name = "Line6";
             series52.ChartArea = "ChartArea1";
             series52.Legend = "Legend1";
-            series52.Name = "Line_r1";
+            series52.Name = "Line_r0";
             series53.ChartArea = "ChartArea1";
             series53.Legend = "Legend1";
-            series53.Name = "Line_r2";
+            series53.Name = "Line_r1";
             series54.ChartArea = "ChartArea1";
             series54.Legend = "Legend1";
-            series54.Name = "Line_r3";
+            series54.Name = "Line_r2";
             series55.ChartArea = "ChartArea1";
             series55.Legend = "Legend1";
-            series55.Name = "Line_r4";
+            series55.Name = "Line_r3";
             series56.ChartArea = "ChartArea1";
             series56.Legend = "Legend1";
-            series56.Name = "Line_r5";
+            series56.Name = "Line_r4";
             series57.ChartArea = "ChartArea1";
             series57.Legend = "Legend1";
-            series57.Name = "Line_b10";
+            series57.Name = "Line_r5";
             series58.ChartArea = "ChartArea1";
             series58.Legend = "Legend1";
-            series58.Name = "Line_b20";
+            series58.Name = "Line_b10";
             series59.ChartArea = "ChartArea1";
             series59.Legend = "Legend1";
-            series59.Name = "Line_b30";
+            series59.Name = "Line_b20";
             series60.ChartArea = "ChartArea1";
             series60.Legend = "Legend1";
-            series60.Name = "Line_b40";
+            series60.Name = "Line_b30";
             series61.ChartArea = "ChartArea1";
             series61.Legend = "Legend1";
-            series61.Name = "Line_b50";
+            series61.Name = "Line_b40";
             series62.ChartArea = "ChartArea1";
             series62.Legend = "Legend1";
-            series62.Name = "Line_b60";
+            series62.Name = "Line_b50";
             series63.ChartArea = "ChartArea1";
             series63.Legend = "Legend1";
-            series63.Name = "Line_b70";
+            series63.Name = "Line_b60";
             series64.ChartArea = "ChartArea1";
             series64.Legend = "Legend1";
-            series64.Name = "Line_b80";
+            series64.Name = "Line_b70";
             series65.ChartArea = "ChartArea1";
             series65.Legend = "Legend1";
-            series65.Name = "Line_b90";
+            series65.Name = "Line_b80";
             series66.ChartArea = "ChartArea1";
             series66.Legend = "Legend1";
-            series66.Name = "Line_b100";
+            series66.Name = "Line_b90";
             series67.ChartArea = "ChartArea1";
             series67.Legend = "Legend1";
-            series67.Name = "Line_b110";
+            series67.Name = "Line_b100";
             series68.ChartArea = "ChartArea1";
             series68.Legend = "Legend1";
-            series68.Name = "Line_b_straight";
+            series68.Name = "Line_b110";
             series69.ChartArea = "ChartArea1";
             series69.Legend = "Legend1";
-            series69.Name = "SeriesDBT_HR";
+            series69.Name = "Line_b_straight";
             series70.ChartArea = "ChartArea1";
             series70.Legend = "Legend1";
-            series70.Name = "SeriesDBT_enthalpy";
-            this.chart1.Series.Add(series36);
+            series70.Name = "SeriesDBT_HR";
+            series71.ChartArea = "ChartArea1";
+            series71.Legend = "Legend1";
+            series71.Name = "SeriesDBT_enthalpy";
+            series72.ChartArea = "ChartArea1";
+            series72.Legend = "Legend1";
+            series72.Name = "Series_enthalpy_dew_point";
             this.chart1.Series.Add(series37);
             this.chart1.Series.Add(series38);
             this.chart1.Series.Add(series39);
@@ -317,6 +315,8 @@
             this.chart1.Series.Add(series68);
             this.chart1.Series.Add(series69);
             this.chart1.Series.Add(series70);
+            this.chart1.Series.Add(series71);
+            this.chart1.Series.Add(series72);
             this.chart1.Size = new System.Drawing.Size(772, 483);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
@@ -759,11 +759,6 @@
             // 
             this.groupBox3.Controls.Add(this.button9);
             this.groupBox3.Controls.Add(this.groupBox5);
-            this.groupBox3.Controls.Add(this.label18);
-            this.groupBox3.Controls.Add(this.label17);
-            this.groupBox3.Controls.Add(this.button5);
-            this.groupBox3.Controls.Add(this.tb_dew_point);
-            this.groupBox3.Controls.Add(this.tb_enthalpy);
             this.groupBox3.Controls.Add(this.button4);
             this.groupBox3.Controls.Add(this.txt_enthalpy);
             this.groupBox3.Controls.Add(this.txt_DBT);
@@ -785,7 +780,7 @@
             // 
             // button9
             // 
-            this.button9.Location = new System.Drawing.Point(1024, 134);
+            this.button9.Location = new System.Drawing.Point(859, 118);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(147, 22);
             this.button9.TabIndex = 29;
@@ -804,9 +799,9 @@
             this.groupBox5.Controls.Add(this.tb_city_name);
             this.groupBox5.Controls.Add(this.button8);
             this.groupBox5.Controls.Add(this.button6);
-            this.groupBox5.Location = new System.Drawing.Point(699, 19);
+            this.groupBox5.Location = new System.Drawing.Point(534, 11);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(319, 157);
+            this.groupBox5.Size = new System.Drawing.Size(319, 129);
             this.groupBox5.TabIndex = 28;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Chose city";
@@ -871,7 +866,7 @@
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(150, 115);
+            this.button8.Location = new System.Drawing.Point(150, 105);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(133, 22);
             this.button8.TabIndex = 33;
@@ -881,55 +876,13 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(0, 115);
+            this.button6.Location = new System.Drawing.Point(0, 105);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(133, 22);
             this.button6.TabIndex = 27;
             this.button6.Text = "plot the value on Graph ";
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(509, 72);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(56, 13);
-            this.label18.TabIndex = 24;
-            this.label18.Text = "dew point ";
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(509, 26);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(47, 13);
-            this.label17.TabIndex = 23;
-            this.label17.Text = "enthalpy";
-            // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(562, 91);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(131, 22);
-            this.button5.TabIndex = 22;
-            this.button5.Text = "plot the value on Graph ";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
-            // 
-            // tb_dew_point
-            // 
-            this.tb_dew_point.Location = new System.Drawing.Point(580, 65);
-            this.tb_dew_point.Name = "tb_dew_point";
-            this.tb_dew_point.Size = new System.Drawing.Size(100, 20);
-            this.tb_dew_point.TabIndex = 21;
-            // 
-            // tb_enthalpy
-            // 
-            this.tb_enthalpy.Location = new System.Drawing.Point(580, 23);
-            this.tb_enthalpy.Name = "tb_enthalpy";
-            this.tb_enthalpy.Size = new System.Drawing.Size(100, 20);
-            this.tb_enthalpy.TabIndex = 20;
             // 
             // button4
             // 
@@ -939,7 +892,7 @@
             this.button4.TabIndex = 19;
             this.button4.Text = "plot the value on Graph ";
             this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.button4.Click += new System.EventHandler(this.button4_Click_1);
             // 
             // txt_enthalpy
             // 
@@ -1131,7 +1084,6 @@
             this.menuStrip1.Size = new System.Drawing.Size(1301, 24);
             this.menuStrip1.TabIndex = 17;
             this.menuStrip1.Text = "menuStrip1";
-
             // 
             // optionToolStripMenuItem
             // 
@@ -1242,16 +1194,8 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.TextBox txt_enthalpy;
-        private System.Windows.Forms.TextBox txt_DBT;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label15;
-        private System.Windows.Forms.Label label18;
-        private System.Windows.Forms.Label label17;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.TextBox tb_dew_point;
-        private System.Windows.Forms.TextBox tb_enthalpy;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Label lb_y_cord;
@@ -1282,6 +1226,9 @@
         private System.Windows.Forms.ToolStripMenuItem newFeaturesToolStripMenuItem;
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.ToolStripMenuItem weatherServicesToolStripMenuItem;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.TextBox txt_enthalpy;
+        private System.Windows.Forms.TextBox txt_DBT;
     }
 }
 
