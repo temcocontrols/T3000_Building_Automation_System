@@ -3522,11 +3522,22 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 		memcpy(pc,q,p-q);
 		pc[p-q]=0;
 		for(k=OUT;k<=AR_Y;k++)
+		{
 			if(k!=DMON)
-				//if (!strcmp(pc,my_info_panel[k].name))
-				//	break;
+			{
 				if (!strcmp(pc,ptr_panel.info[k].name))
 					break;
+				else if(strcmp(pc,"REG") == 0)
+				{
+					k = VAR;
+					break;
+				}
+			}
+		}
+			
+				//if (!strcmp(pc,my_info_panel[k].name))
+				//	break;
+
 		if (k<=AR_Y)
 		{
 			if (p==NULL) 
@@ -3582,7 +3593,21 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 #if 1
 						itoa(*num_panel,&buf[strlen(buf)],10);
 						*num_point=atoi(p);
-						unsigned char high_3bit = ((*num_point) & 0xff00) >> 3;
+						unsigned char high_3bit =  0;
+						if(*num_point % 0x100 == 0)
+						{
+							if(*num_point == 0x100)
+								high_3bit = 0;
+							else if(*num_point == 0x200)
+								high_3bit = 0x20;
+							else if(*num_point == 0x300)
+								high_3bit = 0x40;
+							else if(*num_point == 0x400)
+								high_3bit = 0x80;
+						}
+							
+						else
+							high_3bit = ((*num_point) & 0xff00) >> 3;
 						*point_type = k;
 						*point_type = *point_type | high_3bit;
 						//if(*num_panel<10 || *num_point<100)
@@ -5724,8 +5749,13 @@ int pcodvar(int cod,int v,char *var,float fvar,char *op,int Byte)
 							cod_line[Byte++]=REMOTE_POINT_PRG;
 							point.number     = (unsigned char)((vars_table[cur_index].num_point-1) & 0x00ff);
 
-							unsigned char high_3bit = ((vars_table[cur_index].num_point-1) & 0xff00) >> 3;
+							unsigned char high_3bit = 0;
+							if(vars_table[cur_index].num_point > 0)
+								high_3bit = ((vars_table[cur_index].num_point-1) & 0xff00) >> 3;
+							else
+							{
 
+							}
 							//*point_type = *point_type | high_3bit;
 
 
@@ -6784,11 +6814,14 @@ int pointtotext(char *buf,Point_Net *point)
 	//if(panel+1<10 || num+1 < 100)
 	//	strcat(buf,"-");
 	if(panel+1<10 || num+1 < (8*256))
-		strcat(buf,"-");
+		strcat(buf,".");
 	strcat(buf,itoa(sub_panel,x,10));
-	strcat(buf,"-");
+	strcat(buf,".");
 		//strcat(token,ptr_panel.info[point_type-1].name);	//Fance
-	strcat(buf,ptr_panel.info[point_type].name);//Fance
+	if((point->panel != point->sub_panel) && (point_type == VAR))
+		strcat(buf,"REG");//Fance	曰了狗了 ，3-25-VAR100  非要支持  3-25-REG100.
+	else
+		strcat(buf,ptr_panel.info[point_type].name);//Fance
 	strcat(buf,itoa(num+1,x,10));
 	return 0;
 }

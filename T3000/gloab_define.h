@@ -724,7 +724,7 @@ const CString Input_Analog_Units_Array[] =
 	 _T("0.0 to 100"),
 	 _T("0.0 to 20"),
 	 _T("0.0 to 20"),
-	 _T("0.0 to 2^22"),
+	 _T("Speed Count"),
 	 _T("0.0 to 3000"),
 	 _T("0 to 100"),
 	 _T("0 to 100"),
@@ -734,7 +734,7 @@ const CString Input_Analog_Units_Array[] =
 	  _T("Table 3"),
 	  _T("Table 4"),
 	  _T("Table 5"),
-	  _T("High Speed Count")
+	  _T("Speed Count")
 };
 
 const CString Output_Analog_Units_Array[] = 
@@ -1384,12 +1384,36 @@ const CString Debug_Combo_Choose[] =
 	_T("Show All"),
 	_T("Only Scan"),
 	_T("Only Monotor Data"),
-	_T("Only Program Code")
+	_T("Only Program Code"),
+	_T("Screen Pictrue Data")
 };
+
+const CString System_Log[] =
+{
+	_T("SUB_TX"),
+	_T("SUB_RX"),
+	_T("ZIG/GSM_TX"),
+	_T("ZIG/GSM_RX"),
+	_T("MAIN_TX"),
+	_T("MAIN_RX"),
+	_T("BOOT")
+};
+
+
 
 const int DEBUG_SHOW_NOTHING = 0;
 const int DEBUG_SHOW_ALL = 1;
 const int DEBUG_SHOW_SCAN_ONLY = 2;
 const int DEBUG_SHOW_MONITOR_DATA_ONLY = 3;
 const int DEBUG_SHOW_PROGRAM_DATA_ONLY = 4;
+const int DEBUG_SHOW_WRITE_PIC_DATA_ONLY = 5;
 #define NUMBER_BAUDRATE 5
+typedef struct
+{
+	char crc_cal[4];
+	unsigned int total_packet;
+	unsigned int pic_file_size;
+	char md5_32byte[33];
+	char file_name[11];
+
+}pic_sd_struct;

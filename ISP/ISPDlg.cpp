@@ -1731,10 +1731,10 @@ Choose NET,Flash NC,LCBy net
 */
 void CISPDlg::FlashByEthernet()
 {
-    if (!Show_Flash_DeviceInfor_NET())
+ /*   if (!Show_Flash_DeviceInfor_NET())
     {
          return ;
-    }
+    }*/
     if (m_pTFTPServer)
     {
         delete m_pTFTPServer;
@@ -2043,7 +2043,6 @@ void CISPDlg::FlashByCom()
     //temp.Format(_T("Chip Size=%d"),chip_size);
     //UpdateStatusInfo(temp,FALSE);
 
-
     m_pFileBuffer = new char[c_nHexFileBufLen];
     memset(m_pFileBuffer, 0xFF, c_nHexFileBufLen);
     int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
@@ -2070,6 +2069,7 @@ void CISPDlg::FlashByCom()
         GetDlgItem(IDC_EDIT_BAUDRATE)->GetWindowText(strBaudrate);
         int nBautrate = _wtoi (strBaudrate.GetBuffer());
         m_pComWriter->SetBautrate(nBautrate);
+         m_pComWriter->m_index_Baudrate = m_combox_baudrate.GetCurSel ();
         int nPort = GetComPortNo();
         m_pComWriter->SetParentWnd(this);
 

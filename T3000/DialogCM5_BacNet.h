@@ -84,6 +84,7 @@ public:
 DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid);
 DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid);
 DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid);
+DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid);
 
 
 

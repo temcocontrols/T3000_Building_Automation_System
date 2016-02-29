@@ -15,6 +15,9 @@
 */
 
 
+
+
+
 #include "stdafx.h"
 #include "T3000.h"
 #include "BacnetGraphic.h"
@@ -77,6 +80,38 @@ DWORD WINAPI MyThreadPro(LPVOID lPvoid);
 DWORD WINAPI UpdateDataThreadPro(LPVOID lPvoid);
 
 int point_error_2 = 0;
+
+
+//#define  MY_COLOR_BACKGRAND SolidBrush(Color(255,192,192,192))
+//#define  MY_COLOR_AUTOSCROLL			Color(255,255,255,0)
+//#define  MY_COLOR_ON_OFF				Color(255,255,0,0)
+//#define  MY_COLOR_14LABLE_BGD			Color(255,255,255,255)
+//#define  MY_COLOR_14BGD					Color(255,187,187,187)
+//#define  MY_COLOR_14_WRITE_BORD  Color(255,255,255,255)
+//#define  MY_COLOR_14_BLACK_BORD  Color(255,0,0,0)
+//#define  MY_COLOR_PEN					Color(255,0,0,0)
+//#define  MY_COLOR_TIME_PEN				Color(255, 225, 225, 225)
+//#define  MY_COLOR_PEN_RECTANGLE_BORD    Color(255,0,255,255)
+//#define  MY_COLOR_PEN_INLINE_PEN        Color(255,220,220,220)
+//#define  MY_COLOR_UNIT_PEN              Color(255,255,255,255)
+
+#define  MY_COLOR_BACKGRAND				Color(255,192,192,192)
+#define  MY_COLOR_AUTOSCROLL			Color(255,255,255,0)
+#define  MY_COLOR_ON_OFF				Color(255,255,0,0)
+#define  MY_COLOR_14LABLE_BGD			Color(255,255,255,255)
+#define  MY_COLOR_14BGD					Color(255,187,187,187)
+#define  MY_COLOR_14_WRITE_BORD			Color(255,255,255,255)
+#define  MY_COLOR_14_BLACK_BORD			Color(255,0,0,0)
+#define  MY_COLOR_PEN					Color(255,0,0,0)
+#define  MY_COLOR_TIME_PEN				Color(255, 25, 25, 25)
+#define  MY_COLOR_PEN_RECTANGLE_BORD    Color(255,0,0,0)
+#define  MY_COLOR_PEN_INLINE_PEN        Color(255,20,20,20)
+#define  MY_COLOR_UNIT_PEN              Color(255,0,0,0)
+
+
+
+
+
 
 IMPLEMENT_DYNAMIC(CBacnetGraphic, CDialogEx)
 
@@ -548,10 +583,11 @@ void CBacnetGraphic::Create_Line_Point()
 				if(pPrevItem != NULL)
 				{
 					pPrevItem->SetNext(pTempItem);
-					if(analog_data_point[x][i].loggingtime - analog_data_point[x][i - 1].loggingtime > 5*time_interval_point)
-					{
-						pPrevItem->m_link_to_next = false;
-					}
+					//切尔西说 模拟量的 值 也要改为 有变化的时候记录， 所以所有的点都需要自动连接至下一个点;  2016 02 25
+					//if(analog_data_point[x][i].loggingtime - analog_data_point[x][i - 1].loggingtime > 5*time_interval_point)
+					//{
+					//	pPrevItem->m_link_to_next = false;
+					//}
 				}
 				pPrevItem = pTempItem;
 
@@ -795,12 +831,12 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 	SolidBrush *BlackBrush;
 	
+	
+	myRectangle_pen = new Pen(MY_COLOR_PEN_RECTANGLE_BORD);
+	my_inline_pen = new Pen(MY_COLOR_PEN_INLINE_PEN);
 
-	myRectangle_pen = new Pen(Color(255,0,255,255));
-	my_inline_pen = new Pen(Color(255,220,220,220));
-
-	static_write_bord = new  Pen(Color(255,255,255,255),2.0f);
-	static_black_bord = new  Pen(Color(255,0,0,0),2.0f);
+	static_write_bord = new  Pen(MY_COLOR_14_WRITE_BORD,2.0f);
+	static_black_bord = new  Pen(MY_COLOR_14_BLACK_BORD,2.0f);
 	static_auto_scroll_pen = new  Pen(Color(255,255,255,255),4.0f);
 
 	REAL dashValues[2] = {3, 7};
@@ -811,7 +847,8 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	CurePen = new Pen(Graphic_Color[1],2.0f);
 	PointF      pointF(0, 0);
 
-	BlackBrush =new SolidBrush(Color(255,0,0,0));
+	//BlackBrush =new SolidBrush(Color(255,0,0,0));老毛希望背景色改为灰色.
+	BlackBrush =new  SolidBrush(MY_COLOR_BACKGRAND) ;
 
 	
 	mygraphics->FillRectangle(BlackBrush,0,0,window_width,window_hight);
@@ -820,21 +857,21 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 	SolidBrush *Static_blackground_Brush;
 	Pen *mystaticRectangle_pen;
-	mystaticRectangle_pen = new Pen(Color(255,0,0,0),2.0f);
-	Static_blackground_Brush =new SolidBrush(Color(255,187,187,187));	//This part is draw the 14 label and it's background;
+	mystaticRectangle_pen = new Pen(MY_COLOR_PEN,2.0f);
+	Static_blackground_Brush =new SolidBrush(MY_COLOR_14BGD);	//This part is draw the 14 label and it's background;
 	mygraphics->FillRectangle(Static_blackground_Brush,0,window_hight - 145,window_width,135);
 	mygraphics->DrawRectangle(mystaticRectangle_pen,2,window_hight - 135,window_width-15,135 -55);
 
 
 	FontFamily  ScrollfontFamily(_T("Arial"));
 
-	SolidBrush  Font_brush_temp(Color(255,255,255,0));
-	SolidBrush  Font_brush_on_off(Color(255,255,0,0));
+	SolidBrush  Font_brush_temp(MY_COLOR_AUTOSCROLL);
+	SolidBrush  Font_brush_on_off(MY_COLOR_ON_OFF);
 	Gdiplus::Font  Scroll_font(&ScrollfontFamily, 18, FontStyleRegular, UnitPixel);
 
 
 	SolidBrush *Static_scroll_blackground_Brush;
-	Static_scroll_blackground_Brush =new SolidBrush(Color(255,255,255,255));	//This part is draw the 14 label and it's background;
+	Static_scroll_blackground_Brush =new SolidBrush(MY_COLOR_14LABLE_BGD);	//This part is draw the 14 label and it's background;
 
 	PointF      scrollpointF(0, 0);
 	mygraphics->FillRectangle(Static_scroll_blackground_Brush,120,684,50,20);
@@ -957,7 +994,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 
 
-	SolidBrush  time_brush(Color(255, 225, 225, 225));
+	SolidBrush  time_brush(MY_COLOR_TIME_PEN);
 	//FontFamily  fontFamily(_T("Times New Roman"));
 	FontFamily  fontFamily(_T("Arial"));
 	
@@ -992,7 +1029,7 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		mygraphics->DrawString(strTime, -1, &time_font, pointF, &time_brush);
 	}
 
-	SolidBrush  unit_brush(Color(255,255,255,255));
+	SolidBrush  unit_brush(MY_COLOR_UNIT_PEN);
 	//FontFamily  UnitfontFamily(_T("Times New Roman"));
 	FontFamily  UnitfontFamily(_T("Arial"));
 	Gdiplus::Font        unitfont(&UnitfontFamily, 18, FontStyleRegular, UnitPixel);
@@ -1596,128 +1633,33 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 		SetDigital_Y_Hight(150);
 	}
 	SetXaxisScale(6);
-	SetYaxisScale(4);
+	SetYaxisScale(5);
 	SetAnalogOrignPoint(PointF(200,30));
 	SetDigitalOrignPoint(PointF(200,560));
 	Set_Time_Scale(base_time);
 
 
 
+
+
+	if((int)(y_max_value) % 5 != 0)
+	{
+		y_max_value = y_max_value + (5 -(int)y_max_value % 5);
+	}
+
+
+
+	if((int)(y_min_value) % 5 != 0)
+	{
+		y_min_value = y_min_value - (int)y_min_value % 5;
+	}
+
 	float temp_min = y_min_value /1000 ;
 	float temp_max = y_max_value /1000 ;
 		if(y_min_value == 0)
 			temp_min = 0;
 
-#if 0
-	int temp_min = y_min_value /1000 ;
-	int temp_max = y_max_value /1000 ;
 
-	if((temp_min<10) && (temp_min >= 0))
-		temp_min = 0;
-	else if((temp_min > -10) && (temp_min < 0))
-	{
-		temp_min = -10;
-	}
-	else if((temp_min >= -100) && (temp_min <= -10))
-	{
-		temp_min = temp_min / 10 - 1;
-		temp_min = temp_min * 10;
-	}
-	else if((temp_min >= -1000) && (temp_min <= -100))
-	{
-		temp_min = temp_min / 100 - 1;
-		temp_min = temp_min * 100;
-	}
-	else if((temp_min >= -10000) && (temp_min <= -1000))
-	{
-		temp_min = temp_min / 1000 - 1;
-		temp_min = temp_min * 1000;
-	}
-	else if((temp_min >= -100000) && (temp_min <= -10000))
-	{
-		temp_min = temp_min / 10000 - 1;
-		temp_min = temp_min * 10000;
-	}
-	else if((temp_min>=10) && (temp_min <= 100))
-	{
-		temp_min = temp_min / 10;
-		temp_min = temp_min * 10;
-	}
-	else if((temp_min>=100) && (temp_min <= 1000))
-	{
-		temp_min = temp_min / 100;
-		temp_min = temp_min * 100;
-	}
-	else if((temp_min>=1000) && (temp_min <= 10000))
-	{
-		temp_min = temp_min / 1000;
-		temp_min = temp_min * 1000;
-	}
-	else if((temp_min>=10000) && (temp_min <= 100000))
-	{
-		temp_min = temp_min / 10000;
-		temp_min = temp_min * 10000;
-	}
-	else if((temp_min>=100000) && (temp_min <= 1000000))
-	{
-		temp_min = temp_min / 100000;
-		temp_min = temp_min * 100000;
-	}
-
-
-	if((temp_max < 10) && (temp_max >=0))
-		temp_max = 10;
-	else if((temp_max >=10) && (temp_max <= 100))
-	{
-		temp_max = temp_max / 10 + 1;
-		temp_max = temp_max * 10;
-	}
-	else if((temp_max >=100) && (temp_max <= 1000))
-	{
-		temp_max = temp_max / 100 + 1;
-		temp_max = temp_max * 100;
-	}
-	else if((temp_max >=1000) && (temp_max <= 10000))
-	{
-		temp_max = temp_max / 1000 + 1;
-		temp_max = temp_max * 1000;
-	}
-	else if((temp_max >=10000) && (temp_max <= 100000))
-	{
-		temp_max = temp_max / 10000 + 1;
-		temp_max = temp_max * 10000;
-	}
-	else if((temp_max >=100000) && (temp_max <= 1000000))
-	{
-		temp_max = temp_max / 100000 + 1;
-		temp_max = temp_max * 100000;
-	}
-	else if((temp_max>=-10) && (temp_max <= - 100))
-	{
-		temp_max = temp_max / 10 ;
-		temp_max = temp_max * 10;
-	}
-	else if((temp_max>=-100) && (temp_max <= - 1000))
-	{
-		temp_max = temp_max / 100 ;
-		temp_max = temp_max * 100;
-	}
-	else if((temp_max>=-1000) && (temp_max <= - 10000))
-	{
-		temp_max = temp_max / 1000 ;
-		temp_max = temp_max * 1000;
-	}
-	else if((temp_max>=-10000) && (temp_max <= - 100000))
-	{
-		temp_max = temp_max / 10000 ;
-		temp_max = temp_max * 10000;
-	}
-	else if((temp_max>=-100000) && (temp_max <= - 1000000))
-	{
-		temp_max = temp_max / 100000 ;
-		temp_max = temp_max * 100000;
-	}
-#endif
 
 	SetYaxisValue( temp_min ,temp_max );//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //	SetYaxisValue( (y_min_value* 8)/10000 , (y_max_value * 12)/10000);//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1964,6 +1906,9 @@ void CBacnetGraphic::Reset_X_Y_Parameter()
 		//int total_y_max_value = 0;
 		//int total_y_min_value = 0;
 	}
+
+
+
 	switch(m_time_selected)
 	{
 	case TIME_ONE_MINUTE :

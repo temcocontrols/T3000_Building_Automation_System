@@ -38,9 +38,15 @@ public:
 	void Unreg_Hotkey();
 	afx_msg void OnBnClickedInsert();
 	static	DWORD WINAPI  ReadScreenThreadfun(LPVOID lpVoid);
+	static DWORD WINAPI  WritePictureThread(LPVOID lpVoid);
+	static DWORD WINAPI  GetPictureThread(LPVOID lpVoid);
 	bool read_screen_label();
 	afx_msg void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult);
+	//int WritePicFileFunction(CString ChooseFilePath,unsigned char screen_index);
+	int   WritePicFileFunction(CString ChooseFilePath,unsigned char screen_index,CString pic_filename);
+	int GetPicFileFunction(unsigned char screen_index ,CString temp_image_folder);
 //	afx_msg void OnDestroy();
+	CString pic_filename;
 
 };
 

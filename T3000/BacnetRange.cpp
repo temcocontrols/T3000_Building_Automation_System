@@ -432,6 +432,21 @@ void BacnetRange::Initial_static()
 
 			((CButton *)GetDlgItem(i))->ShowWindow(1);
 		}
+		// Big  input27 - 32  small 11 - 16  tiny 6 - 11 range 里面有高速脉冲.  其他的 设置此range 都是低速脉冲;
+		if((bacnet_device_type == BIG_MINIPANEL) && (input_list_line >=26) && (input_list_line <=31))
+		{
+			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. High Speed Count"));
+		}
+		else if((bacnet_device_type == SMALL_MINIPANEL) && (input_list_line >=10) && (input_list_line <=16))
+		{
+			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. High Speed Count"));
+		}
+		else if((bacnet_device_type == TINY_MINIPANEL) && (input_list_line >=5) && (input_list_line <=11))
+		{
+			GetDlgItem(IDC_RADIO87)->SetWindowText(_T("55. High Speed Count"));
+		}
+		else
+			GetDlgItem(IDC_RADIO87)->EnableWindow(FALSE);
 
 		GetDlgItem(IDC_RADIO54)->ShowWindow(false);
 

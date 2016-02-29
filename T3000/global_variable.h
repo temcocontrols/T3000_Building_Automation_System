@@ -1966,6 +1966,8 @@ vector <Scan_Info> m_scan_info;
 vector <Scan_Info> m_scan_info_buffer;
 Monitor_Block m_monitor_block;
 Str_Monitor_data_header m_monitor_head;//用来接收monitor 的头，里面有需要接收的总包和目前是第几包;
+char picture_data_buffer[400]; //用来存每包 pic 的数据.
+Str_picture_header m_picture_head; //传图片的 头，结构其实是和 monitor same.
 int Monitor_Input__Data[14][1000];	
 
 

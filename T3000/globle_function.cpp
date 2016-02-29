@@ -1201,6 +1201,49 @@ extern int my_lengthcode;
 
 
 
+int WriteBacnetPictureData_Blocking(uint32_t deviceid,uint8_t index , unsigned short transfer_packet, unsigned short total_packet,unsigned char * senddata)
+{
+
+	for (int z=0; z<3; z++)
+	{
+		int temp_invoke_id = -1;
+		int send_status = true;
+		int	resend_count = 0;
+
+		do
+		{
+			resend_count ++;
+			if(resend_count>5)
+			{
+				send_status = false;
+				break;
+			}
+			temp_invoke_id = WriteBacnetPictureData(deviceid,index,transfer_packet,total_packet,senddata);
+
+			Sleep(SEND_COMMAND_DELAY_TIME);
+		}
+		while (temp_invoke_id<0);
+		if(send_status)
+		{
+			for (int i=0; i<4000; i++)
+			{
+				Sleep(1);
+				if(tsm_invoke_id_free(temp_invoke_id))
+				{
+					return 1;
+				}
+				else
+					continue;
+			}
+
+
+		}
+	}
+	return -1;
+
+	
+}
+
 
 /***************************************************
 **
@@ -1209,11 +1252,12 @@ extern int my_lengthcode;
 ****************************************************/
 int WriteProgramData_Blocking(uint32_t deviceid,uint8_t n_command,uint8_t start_instance,uint8_t end_instance ,uint8_t npackage)
 {
-    int temp_invoke_id = -1;
-    int send_status = true;
-    int	resend_count = 0;
+
     for (int z=0; z<3; z++)
     {
+		int temp_invoke_id = -1;
+		int send_status = true;
+		int	resend_count = 0;
         do
         {
             resend_count ++;
@@ -1647,15 +1691,18 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
 
 int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_instance,uint8_t end_instance,int16_t entitysize)
 {
-    int temp_invoke_id = -1;
+
     int send_status = true;
-    int	resend_count = 0;
-    for (int z=0; z<5; z++)
+    
+    for (int z=0; z<10; z++)
     {
+		int temp_invoke_id = -1;
+		int	resend_count = 0;
+		send_status = true;
         do
         {
             resend_count ++;
-            if(resend_count>5)
+            if(resend_count>10)
             {
                 send_status = false;
                 break;
@@ -1666,10 +1713,15 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
                                   start_instance,
                                   end_instance,
                                   entitysize);
-
-            Sleep(SEND_COMMAND_DELAY_TIME);
+			if(temp_invoke_id < 0)
+				Sleep(2000);
+			else
+				send_status = true;
+			//else
+			//	Sleep(SEND_COMMAND_DELAY_TIME);
         }
         while (temp_invoke_id<0);
+		TRACE(_T("Get Block Data z = %d\r\n"),z);
         if(send_status)
         {
             for (int i=0; i<300; i++)
@@ -3220,16 +3272,51 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
             my_temp_point = my_temp_point  +  4;
         }
 
-        for (int j=0; j<12; j++)
-        {
-            Device_Misc_Data.reg.operation_time[j] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-            my_temp_point = my_temp_point  +  4;
-            if((Device_Misc_Data.reg.operation_time[j]< 1450774486) || (Device_Misc_Data.reg.operation_time[j] > 1505939286))
-            {
-                Device_Misc_Data.reg.operation_time[j] = 0;
-            }
-        }
-        Sleep(1);
+			for (int j=0;j<12;j++)
+			{
+				Device_Misc_Data.reg.operation_time[j] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point  +  4;
+				if((Device_Misc_Data.reg.operation_time[j]< 1450774486) || (Device_Misc_Data.reg.operation_time[j] > 1505939286))
+				{
+					Device_Misc_Data.reg.operation_time[j] = 0;
+				}
+			}
+
+			Device_Misc_Data.reg.flag1 = *(my_temp_point++);
+			if(Device_Misc_Data.reg.flag1 != 0x55)
+			{
+				return -1;
+			}
+			for (int z=0;z<3;z++)
+			{
+				Device_Misc_Data.reg.com_rx[z] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point  +  4;
+			}
+
+			for (int z=0;z<3;z++)
+			{
+				Device_Misc_Data.reg.com_tx[z] = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point  +  4;
+			}
+
+			for (int z=0;z<3;z++)
+			{
+				Device_Misc_Data.reg.collision[z] = ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point  +  2;
+			}
+
+			for (int z=0;z<3;z++)
+			{
+				Device_Misc_Data.reg.packet_error[z] = ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point  +  2;
+			}
+
+			for (int z=0;z<3;z++)
+			{
+				Device_Misc_Data.reg.timeout[z] = ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+				my_temp_point = my_temp_point  +  2;
+			}
+			
     }
     break;
     case READ_SETTING_COMMAND:
@@ -3510,8 +3597,63 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 
     }
     break;
+	case READPIC_T3000:
+		{
+			handle_read_pic_data_ex((char *)Temp_CS.value,len_value_type);
+			return READMONITORDATA_T3000;
+		}
+		break;
     }
     return 1;
+}
+
+int handle_read_pic_data_ex(char *npoint,int nlength)
+{
+
+
+
+	char * my_temp_point = npoint;
+	char * temp_print = npoint;
+
+	m_picture_head.total_seg = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
+	my_temp_point = my_temp_point + 3;
+	m_picture_head.index = *(my_temp_point++);
+	my_temp_point = my_temp_point + 14;
+	m_picture_head.seg_index = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
+	my_temp_point = my_temp_point + 2;
+
+
+
+
+
+	if(nlength == 420)
+	{
+		memcpy(picture_data_buffer,my_temp_point,400);
+
+		if(debug_item_show == DEBUG_SHOW_WRITE_PIC_DATA_ONLY)
+		{
+			CString temp_char;
+			CString n_temp_print;
+			char * temp_point;
+			temp_point = npoint;
+			n_temp_print.Format(_T("picture_%d  pack %d %d  read_:"),m_picture_head.index,m_picture_head.seg_index,m_picture_head.total_seg);
+			for (int i = 0; i< 420 ; i++)
+			{
+				temp_char.Format(_T("%02x"),(unsigned char)*temp_point);
+				temp_char.MakeUpper();
+				temp_point ++;
+				n_temp_print = n_temp_print + temp_char + _T(" ");
+
+				if(i==19)
+					n_temp_print = n_temp_print + _T(" Data: ");
+			}
+			DFTrace(n_temp_print);
+		}
+
+
+		return 1;
+	}
+	return 0;
 }
 
 void new_temp_analog_data_block(unsigned char nmonitor_count,unsigned int receive_length)
@@ -3858,6 +4000,23 @@ CString GetProductName(int ModelID)
     case PM_T38AI8AO6DO:
         strProductName="T3-8AI8AO6DO";
         break;
+
+
+     
+    case PM_CS_SM_AC:
+        strProductName="CS-SM-AC";
+        break;
+    case PM_CS_SM_DC:
+        strProductName="CS-SM-DC";
+        break;
+    case PM_CS_RSM_AC:
+        strProductName="CS-RSM-AC";
+        break;
+    case PM_CS_RSM_DC:
+        strProductName="CS-RSM-DC";
+        break;
+  
+
     default:
         strProductName="";
         break;
@@ -5062,8 +5221,6 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 
 
     }
-
-
     return m_refresh_net_device_data.size();
 }
 
@@ -7714,8 +7871,9 @@ void Save_Product_Value_Cache(CString &SaveFilePath)
     }
     oar.Close();
     savefile.Close();
-    LoadTstat_InputData();
-    LoadTstat_OutputData();
+//     LoadTstat_InputData();
+//     LoadTstat_OutputData();
+    
 }
 int Load_Product_Value_Cache(LPCTSTR tem_read_path)
 {
@@ -8431,7 +8589,6 @@ void LoadTstat_OutputData()
     if (!strTemp.IsEmpty())
     {
         g_strOutName3=strTemp;
-
     }
     else
     {
@@ -9831,6 +9988,199 @@ BOOL HexFileValidation(const CString& strFileName)
 
     return TRUE;
 }
+
+
+
+int GetPictureBlockData_Blocking(uint32_t deviceid,int8_t nIndex, uint16_t ntotal_seg,uint16_t nseg_index)
+{
+
+	int send_status = true;
+
+	for (int z=0; z<10; z++)
+	{
+		int temp_invoke_id = -1;
+		int	resend_count = 0;
+		send_status = true;
+		do
+		{
+			resend_count ++;
+			if(resend_count>10)
+			{
+				send_status = false;
+				break;
+			}
+			temp_invoke_id =  GetPictureBlockData(
+				deviceid,
+				nIndex,
+				ntotal_seg,
+				nseg_index);
+			if(temp_invoke_id < 0)
+				Sleep(2000);
+			else
+				send_status = true;
+			//else
+			//	Sleep(SEND_COMMAND_DELAY_TIME);
+		}
+		while (temp_invoke_id<0);
+		TRACE(_T("Get Block Data z = %d\r\n"),z);
+		if(send_status)
+		{
+			for (int i=0; i<300; i++)
+			{
+				Sleep(10);
+				if(tsm_invoke_id_free(temp_invoke_id))
+				{
+					return 1;
+				}
+				else
+					continue;
+			}
+		}
+	}
+	return -1;
+}
+
+
+
+/************************************************************************/
+/*
+Author: Fance Du
+Get Bacnet picture Private Data
+*/
+/************************************************************************/
+int GetPictureBlockData(uint32_t deviceid,int8_t nIndex, uint16_t ntotal_seg,uint16_t nseg_index)
+{
+	// TODO: Add your control notification handler code here
+
+	uint8_t apdu[480] = { 0 };
+	uint8_t test_value[480] = { 0 };
+	int apdu_len = 0;
+	int private_data_len = 0;
+	unsigned max_apdu = 0;
+	BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
+	//	BACNET_APPLICATION_DATA_VALUE test_data_value = { 0 };
+	BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
+	//	BACNET_PRIVATE_TRANSFER_DATA test_data = { 0 };
+	bool status = false;
+
+	private_data.vendorID = BACNET_VENDOR_ID;
+	private_data.serviceNumber = 1;
+
+	Str_picture_header private_data_chunk;
+	//private_data_chunk.total_length = 0;
+	private_data_chunk.total_seg = ntotal_seg;
+	private_data_chunk.command = READPIC_T3000;
+	private_data_chunk.index = nIndex;
+	memset(private_data_chunk.unused,0,14);
+	private_data_chunk.seg_index = nseg_index;
+
+
+
+	Set_transfer_length(PRIVATE_MONITOR_HEAD_LENGTH);
+
+
+	status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&private_data_chunk, &data_value);
+	//ct_test(pTest, status == true);
+	private_data_len =	bacapp_encode_application_data(&test_value[0], &data_value);
+	private_data.serviceParameters = &test_value[0];
+	private_data.serviceParametersLen = private_data_len;
+
+	BACNET_ADDRESS dest = { 0 };
+	status = address_get_by_device(deviceid, &max_apdu, &dest);
+	if (status)
+	{
+		g_llTxCount ++;
+		return Send_ConfirmedPrivateTransfer(&dest,&private_data);
+		//return g_invoke_id;
+	}
+	else
+		return -2;
+
+}
+
+
+
+int WriteBacnetPictureData(uint32_t deviceid,uint8_t index , unsigned short transfer_packet, unsigned short total_packet,unsigned char * senddata)
+{
+	unsigned char command = WRITEPIC_T3000;
+
+	unsigned short entitysize=0;
+	uint8_t apdu[480] = { 0 };
+	uint8_t test_value[480] = { 0 };
+	int private_data_len = 0;	
+	BACNET_APPLICATION_DATA_VALUE data_value = { 0 };
+	BACNET_APPLICATION_DATA_VALUE test_data_value = { 0 };
+	BACNET_PRIVATE_TRANSFER_DATA private_data = { 0 };
+	BACNET_PRIVATE_TRANSFER_DATA test_data = { 0 };
+	bool status = false;
+
+	private_data.vendorID = BACNET_VENDOR_ID;
+	private_data.serviceNumber = 1;
+
+	unsigned max_apdu = 0;
+	entitysize = 400;
+
+	char SendBuffer[1000];
+	memset(SendBuffer,0,1000);
+	char * temp_buffer = SendBuffer;
+
+	Str_picture_header private_data_chunk;
+	//Str_sub_user_data_header private_sub_data_chunk;
+
+	int HEADER_LENGTH = PRIVATE_HEAD_LENGTH;
+	unsigned char * n_temp_point = senddata;
+
+
+	HEADER_LENGTH = 20;
+	private_data_chunk.total_seg = total_packet;
+	private_data_chunk.command = command;
+	private_data_chunk.index = index;
+
+	memset(private_data_chunk.unused,0,14);
+	private_data_chunk.seg_index = transfer_packet;
+
+	Set_transfer_length(420); 
+	memcpy_s(SendBuffer,20 ,&private_data_chunk,20 );
+
+	memcpy_s(SendBuffer + 20,400,n_temp_point,400);
+
+
+	
+	if(debug_item_show == DEBUG_SHOW_WRITE_PIC_DATA_ONLY)
+	{
+		CString temp_char;
+		CString n_temp_print;
+		char * temp_point;
+		temp_point = SendBuffer;
+		n_temp_print.Format(_T("picture_%d  pack %d %d  write:"),index,transfer_packet,total_packet);
+		for (int i = 0; i< 420 ; i++)
+		{
+			temp_char.Format(_T("%02x"),(unsigned char)*temp_point);
+			temp_char.MakeUpper();
+			temp_point ++;
+			n_temp_print = n_temp_print + temp_char + _T(" ");
+		}
+		DFTrace(n_temp_print);
+	}
+
+
+	status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&SendBuffer, &data_value);
+	//ct_test(pTest, status == true);
+	private_data_len =	bacapp_encode_application_data(&test_value[0], &data_value);
+	private_data.serviceParameters = &test_value[0];
+	private_data.serviceParametersLen = private_data_len;
+
+	BACNET_ADDRESS dest = { 0 };
+	status = address_get_by_device(deviceid, &max_apdu, &dest);
+	if (status) 
+	{
+		return Send_ConfirmedPrivateTransfer(&dest,&private_data);
+	}
+	return -2;
+}
+
+
+
 BOOL BinFileValidation(const CString& strFileName)
 {
     const CString strConst = _T("bin");

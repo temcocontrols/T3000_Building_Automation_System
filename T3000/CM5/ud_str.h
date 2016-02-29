@@ -110,6 +110,7 @@ typedef enum {
 
 		 READ_AT_COMMAND			= 90,	//450 length
 		 READ_GRPHIC_LABEL_COMMAND  = 91,
+		 READPIC_T3000				= 95,
 		 READ_MISC					= 96,
 		 READ_REMOTE_DEVICE_DB		= 97,
 		 READ_SETTING_COMMAND		= 98,
@@ -131,6 +132,7 @@ typedef enum {
 		 WRITE_AT_COMMAND			= 190,	//100 length
 		 WRITE_GRPHIC_LABEL_COMMAND  = 191,
 		 WRITE_SETTING_COMMAND		= 198,
+		 WRITEPIC_T3000        = 195,
 		 WRITE_MISC                  = 196,
 		 WRITE_SUB_ID_BY_HAND = 199,
 		 DELETE_MONITOR_DATABASE = 200
@@ -930,6 +932,14 @@ typedef union
 		unsigned int monitor_analog_block_num[12];
 		unsigned int monitor_digital_block_num[12];
 		unsigned int operation_time[12];
+
+		unsigned char flag1; // network health  0x55
+		unsigned int com_rx[3];
+		unsigned int com_tx[3]; 
+		unsigned short collision[3];  // id collision
+		unsigned short packet_error[3];  // bautrate not match
+		unsigned short timeout[3];
+
 	}reg;
 }Str_MISC;
 
@@ -947,6 +957,18 @@ typedef struct
 	Tbl_point  dat[16];
 
 } Str_table_point;
+
+
+typedef struct
+{
+	uint16_t total_seg;
+	uint8_t		command;
+	uint8_t index;
+	char unused[14];
+	uint16_t seg_index;
+}Str_picture_header;
+
+
 
 
 

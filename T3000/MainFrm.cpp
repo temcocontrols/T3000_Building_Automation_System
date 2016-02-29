@@ -91,7 +91,7 @@ extern CBacnetUserlogin * User_Login_Window;
 #include "TStatInputView.h"
 
 #include "BoatMonitorViewer.h"
-
+#include "Class/md5.h"
 bool b_create_status = false;
 const TCHAR c_strCfgFileName[] = _T("config.txt");
 //	配置文件名称，用于保存用户设置
@@ -385,7 +385,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_COMMAND(ID_TOOL_REGISTERSMAINTENANCESYSTEM, &CMainFrame::OnToolRegistersmaintenancesystem)
     ON_COMMAND(ID_TOOL_FLASHSN, &CMainFrame::OnToolFlashsn)
     ON_WM_MOVE()
-END_MESSAGE_MAP()
+    ON_COMMAND(ID_TOOL_BOOTLOADER, &CMainFrame::OnToolBootloader)
+    END_MESSAGE_MAP()
 
 static UINT indicators[] =
 {
@@ -1000,8 +1001,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         SetCommunicationType(1);
     }
     g_protocol =  m_lasttime_tree_node.protocol;
-
-    int ReadID = read_one(g_tstat_id,6,10);
+	int ReadID = 0;
+	if(g_tstat_id != 0)
+		ReadID  = read_one(g_tstat_id,6,10);
 
     if (ReadID > 0)
     {
@@ -1331,11 +1333,11 @@ void CMainFrame::OnHTreeItemSeletedChanged(NMHDR* pNMHDR, LRESULT* pResult)
 
             CString Product_Custom = m_product.at(i).Custom;
             m_current_tree_node = m_product.at(i);
-            if (Product_Custom.CompareNoCase(_T("1")) == 0 ||
+            if (Product_Custom.CompareNoCase(_T("1")) == 0/* ||
                     m_current_tree_node.product_class_id == PM_CS_SM_AC||
                     m_current_tree_node.product_class_id == PM_CS_SM_DC||
                     m_current_tree_node.product_class_id == PM_CS_RSM_AC||
-                    m_current_tree_node.product_class_id == PM_CS_RSM_DC
+                    m_current_tree_node.product_class_id == PM_CS_RSM_DC*/
                )
             {
                 g_tstat_id = m_product.at(i).product_id;
@@ -1597,6 +1599,7 @@ void CMainFrame::DeleteConflictInDB()
 void CMainFrame::LoadProductFromDB()
 {
     ClearBuilding();
+	m_pTreeViewCrl->DeleteAllItems();
     CADO ado;
     ado.OnInitADOConn();
     m_product.clear();
@@ -1657,6 +1660,7 @@ void CMainFrame::LoadProductFromDB()
 
 
         temp_variant=ado.m_pRecordset->GetCollect("Braudrate");//
+
         if(temp_variant.vt!=VT_NULL)
         {
             cs_temp_baudrate = temp_variant;
@@ -1669,12 +1673,7 @@ void CMainFrame::LoadProductFromDB()
         }
 
         current_building_baudrate = _wtoi(cs_temp_baudrate);
-//         if((current_building_baudrate!= 19200) && (current_building_baudrate != 9600) && (current_building_baudrate != 38400))
-//         {
-//             current_building_baudrate = 19200;
-//         }
-
-        //current_building_comport
+ 
         temp_variant = ado.m_pRecordset->GetCollect(_T("Com_Port"));
         if(temp_variant.vt!=VT_NULL)
         {
@@ -1928,7 +1927,7 @@ void CMainFrame::LoadProductFromDB()
             {
                 loop_count = m_comportlist.size();
             }
-            else if(z == LOCAL_NETWORK_PORT)
+            else if((z == LOCAL_NETWORK_PORT) && ((current_building_protocol == P_AUTO) || (current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_BACNET_IP)))
             {
                 loop_count = 1;
             }
@@ -5607,7 +5606,7 @@ LRESULT CMainFrame::Refresh_RX_TX_Count(WPARAM wParam, LPARAM lParam)
     {
         Set_Communication_Count(1,g_bac_instance);//成功，计数+1
 
-        m_pTreeViewCrl->turn_item_image(selected_tree_item ,true);
+        //m_pTreeViewCrl->turn_item_image(selected_tree_item ,true); //2016 02 24 MARK Fance
         //SetPaneConnectionPrompt(_T("Online"));
     }
     else
@@ -6914,6 +6913,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                             //                             Sleep(50);
                             //                             continue;
                             //                         }
+							 m_pTreeViewCrl->turn_item_image(hSelItem ,false);//Can't connect to the device , it will show disconnection;
+							m_product.at(i).status_last_time[0] = false;
+							m_product.at(i).status_last_time[1] = false;
+							m_product.at(i).status_last_time[2] = false;
+							 m_product.at(i).status = false;
+							return;
 
                         }
                         else
@@ -8234,15 +8239,12 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             }
             else if (nFlag==PM_TSTAT6||nFlag==PM_TSTAT7||nFlag==PM_TSTAT5i||nFlag==PM_TSTAT8)
             {
-
                 CString g_configfile_path =g_strExePth + g_strStartInterface_config;
                 int m_lastinterface=GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path);
                 if (DLG_T3000_VIEW!= m_lastinterface&&DLG_DIALOG_TSTAT_INPUT_VIEW!=m_lastinterface&&DLG_DIALOG_TSTAT_OUTPUT_VIEW!=m_lastinterface)
                 {
                     m_lastinterface=DLG_T3000_VIEW ;
                 }
-
-
                 SwitchToPruductType(m_lastinterface);
             }
             else if (nFlag==PM_CS_SM_AC||nFlag==PM_CS_SM_DC||nFlag==PM_CS_RSM_AC||nFlag==PM_CS_RSM_DC)
@@ -8288,12 +8290,9 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 }
                 SwitchToPruductType(DLG_T3000_VIEW);
 
-
                 bacnet_view_number = TYPE_TSTAT;
 
             }
-
-
             if (Scan_Product_ID == 210)
             {
                 SwitchToPruductType(DLG_DIALOG_BOATMONITOR);
@@ -8861,6 +8860,7 @@ void CMainFrame::DoFreshAll()
 
 UINT _FreshTreeView(LPVOID pParam )
 {
+    
     CString g_strT3000LogString;
     CMainFrame* pMain = (CMainFrame*)pParam;
     int int_refresh_com = 0;
@@ -14630,4 +14630,11 @@ void CMainFrame::OnMove(int x, int y)
             statusbar->SetWindowPos(&wndTop,temprec.left,temprec.top,temprec.Width(),temprec.Height(),SWP_NOACTIVATE | SWP_SHOWWINDOW );
 
     }
+}
+
+#include "BootFinderDlg.h"
+void CMainFrame::OnToolBootloader()
+{
+      CBootFinderDlg dlg;
+      dlg.DoModal ();
 }

@@ -17,6 +17,9 @@ struct Registers_Infor
 	CString Reg_Name;
 	int address;
 };
+
+
+
 //////////////////////////////////////////////////////////////////////////
 // for setting file
 const TCHAR c_strCfgTstatSection[] = _T("[Tstat]");

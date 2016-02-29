@@ -18,7 +18,7 @@
 #include "afxinet.h"
 #include "T3000DefaultView.h"
 #include "bado/BADO.h"
-const int g_versionNO=20150605;
+const int g_versionNO=20160225;
 //CString const CurrentT3000Version=_T("2014.12.24");
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -39,7 +39,7 @@ CT3000App::CT3000App()
 {
  
 		m_bHiColorIcons = TRUE;
-		CurrentT3000Version=_T("    2016.01.4");
+		CurrentT3000Version=_T("    2016.02.25");
 //	}
 // 	catch (...)
 // 	{
@@ -205,7 +205,7 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
      Builing_DBPath.Delete(0,index);
 
      g_strCurBuildingDatabasefilePath = GetExePath(true)+ Builing_DBPath;
-     if ((g_versionNO>versionno)&&(versionno<=20141116))                 //版本过低
+     if ((g_versionNO>versionno)/*&&(versionno<=20141116)*/)                 //版本过低
      {
          //SetPaneString(0,_T("The version of DB is lower,Updating....."));
          _variant_t temp_var;
@@ -854,229 +854,229 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 
 
      }
-     else if ((g_versionNO>versionno)&&(versionno>20141116 && versionno <20150415))
-     {
-
-         _variant_t temp_var;
-         _ConnectionPtr srcConTmp;
-         _RecordsetPtr srcRsTemp;
-         srcConTmp.CreateInstance("ADODB.Connection");
-         srcRsTemp.CreateInstance("ADODB.Recordset");
-         srcConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);//打开数据库
-         //这里是All_NODE
-
-         //Building_ALL
-         if (Is_haveTable(_T("Building_ALL")))
-         {
-#if 1
-
-             srcRsTemp->Open(_T("select * from Building_ALL"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             Building_ALL Building_ALL_Temp;
-             while(!srcRsTemp->EndOfFile){
-                 Building_ALL_Temp.Building_Name=srcRsTemp->GetCollect(_T("Building_Name"));
-                 Building_ALL_Temp.Address=srcRsTemp->GetCollect(_T("Address"));
-                 Building_ALL_Temp.Telephone=srcRsTemp->GetCollect(_T("Telephone"));
-                 Building_ALL_Temp.Default_Building=srcRsTemp->GetCollect(_T("Default_Build"));
-                 m_Building_ALL.push_back(Building_ALL_Temp);
-                 srcRsTemp->MoveNext();
-             }
-             srcRsTemp->Close();
-#endif
-         }
-         CString StrTemp;
-
-         //Building
-         if (Is_haveTable(_T("Building")))
-         {
-#if 1
-             srcRsTemp->Open(_T("select * from Building"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             Building Building_Temp;
-             while(!srcRsTemp->EndOfFile){
-
-                 Building_Temp.Braudrate=srcRsTemp->GetCollect(_T("Braudrate"));
-                 Building_Temp.Building_Name=srcRsTemp->GetCollect(_T("Building_Name"));
-                 Building_Temp.Com_Port=srcRsTemp->GetCollect(_T("Com_Port"));
-                 Building_Temp.Default_SubBuilding=srcRsTemp->GetCollect(_T("Default_SubBuilding"));
-                 Building_Temp.Ip_Address=srcRsTemp->GetCollect(_T("Ip_Address"));
-                 Building_Temp.Ip_Port=srcRsTemp->GetCollect(_T("Ip_Port"));
-                 Building_Temp.Main_BuildingName=srcRsTemp->GetCollect(_T("Main_BuildingName"));
-                 Building_Temp.Protocal=srcRsTemp->GetCollect(_T("Protocal"));
-                 StrTemp=srcRsTemp->GetCollect(_T("Building_Path"));
-                 int index= StrTemp.Find(_T("Database"));
-                 StrTemp.Delete(0,index);
-
-                 Building_Temp.Building_Path=StrTemp;  
-                 m_Building.push_back(Building_Temp);
-                 srcRsTemp->MoveNext();
-             }
-             srcRsTemp->Close();
-#endif
-         }
-
-
-         //CustomProductTable
-         if (Is_haveTable(_T("CustomProductTable")))
-         {
-#if 1
-             srcRsTemp->Open(_T("select * from CustomProductTable"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
-             CustomProductTable CustomProductTable_Temp;
-             while(!srcRsTemp->EndOfFile){
-                 CustomProductTable_Temp.ModelNo=srcRsTemp->GetCollect(_T("ModelNo"));
-                 CustomProductTable_Temp.Reg_Description=srcRsTemp->GetCollect(_T("Reg_Description"));
-                 CustomProductTable_Temp.Reg_ID=srcRsTemp->GetCollect(_T("Reg_ID"));
-
-                 m_CustomProductTable.push_back(CustomProductTable_Temp);
-                 srcRsTemp->MoveNext();
-             }
-             srcRsTemp->Close();
-#endif
-         }
-
-         if (srcConTmp->State)
-         {srcConTmp->Close();
-         }
-
-
-         CString filePath=g_strExePth+_T("Database\\T3000.mdb");
-         DeleteFile(filePath);
-
-
-
-         HANDLE hFind;//
-         WIN32_FIND_DATA wfd;//
-         hFind = FindFirstFile(filePath, &wfd);//
-         if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
-         {
-             //CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
-             //没有找到就创建一个默认的数据库
-             filePath=g_strExePth+_T("Database\\T3000.mdb");
-             HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DB2), _T("T3000_DB"));   
-             HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
-
-
-             LPVOID lpExe = LockResource(hGlobal);   
-             CFile file;
-             if(file.Open(filePath, CFile::modeCreate | CFile::modeWrite))    
-                 file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
-             file.Close();    
-             ::UnlockResource(hGlobal);   
-             ::FreeResource(hGlobal);
-         }//
-         CString strsql;
-         srcConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-
-         try
-         {
-
-
-             //Building_ALL
-#if 1
-             srcConTmp->Execute(_T("delete * from Building_ALL"),NULL,adCmdText);	
-             srcRsTemp->Open(_T("select * from Building_ALL"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-             try{
-                 for (int i=0;i<m_Building_ALL.size();i++)
-                 {
-                     srcRsTemp->AddNew();
-                     srcRsTemp->PutCollect("Building_Name",m_Building_ALL[i].Building_Name);
-                     srcRsTemp->PutCollect("Default_Build",m_Building_ALL[i].Default_Building);
-                     srcRsTemp->PutCollect("Telephone",m_Building_ALL[i].Telephone);
-                     srcRsTemp->PutCollect("Address",m_Building_ALL[i].Address);
-
-
-                     srcRsTemp->Update();
-                 }
-             }
-             catch(_com_error &e){
-                 AfxMessageBox(e.Description());
-             }
-             srcRsTemp->Close();
-#endif
-
-             //Building
-#if 1
-             srcConTmp->Execute(_T("delete * from Building"),NULL,adCmdText);
-             srcRsTemp->Open(_T("select * from Building"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-             try{
-                 for (int i=0;i<m_Building.size();i++)
-                 {
-                     srcRsTemp->AddNew();
-                     srcRsTemp->PutCollect("Main_BuildingName",m_Building[i].Main_BuildingName);
-                     srcRsTemp->PutCollect("Building_Name",m_Building[i].Main_BuildingName);
-                     srcRsTemp->PutCollect("Protocal",m_Building[i].Protocal);
-                     srcRsTemp->PutCollect("Com_Port",m_Building[i].Com_Port);
-                     srcRsTemp->PutCollect("Ip_Address",m_Building[i].Ip_Address);
-                     srcRsTemp->PutCollect("Ip_Port",m_Building[i].Ip_Port);
-                     srcRsTemp->PutCollect("Braudrate",m_Building[i].Braudrate);
-                     srcRsTemp->PutCollect("Default_SubBuilding",m_Building[i].Default_SubBuilding);
-                     srcRsTemp->PutCollect("Building_Path",m_Building[i].Building_Path);
-                     srcRsTemp->Update();
-                 }
-             }
-             catch(_com_error &e){
-                 AfxMessageBox(e.Description());
-             }
-             srcRsTemp->Close();
-#endif
-
-             //CustomProductTable
-#if 1
-             srcConTmp->Execute(_T("delete * from CustomProductTable"),NULL,adCmdText);
-             srcRsTemp->Open(_T("select * from CustomProductTable"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
-             try{
-                 for (int i=0;i<m_CustomProductTable.size();i++)
-                 {
-                     srcRsTemp->AddNew();
-                     srcRsTemp->PutCollect("ModelNo",m_CustomProductTable[i].ModelNo);
-                     srcRsTemp->PutCollect("Reg_Description",m_CustomProductTable[i].Reg_Description);
-                     srcRsTemp->PutCollect("Reg_ID",m_CustomProductTable[i].Reg_ID);
-                     srcRsTemp->Update();
-                 }
-             }
-             catch(_com_error &e){
-                 AfxMessageBox(e.Description());
-             }
-             srcRsTemp->Close();
-
-#endif
-
-
-         }
-         catch(_com_error *e)
-         {
-             AfxMessageBox(e->ErrorMessage());
-         }
-
-
-
-         if (srcConTmp->State)
-         {srcConTmp->Close();
-         }
-         srcConTmp=NULL;
-
-
-
-
-
-     }
-     else {
-
-         CADO updateADO;
-         updateADO.OnInitADOConn();
-
-         if (versionno <=20150415)
-         {
-             StrSql=_T("ALTER TABLE CustomProductTable ADD COLUMN Para_Type varchar(255),Counts_Number Integer,Property varchar(255)");
-             updateADO.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-             StrSql=_T("INSERT INTO Version VALUES(20150605,'更新CustomProductTable')");
-             updateADO.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-         }
-         /*if (versionno <=20150605)
-         {
-            StrSql= _T("Insert Table ProductsTypeRegisterTables Values(20,'T3_RegisterList','T3-8I13O','RegID','T3-8I13O')");
-         }*/
-         updateADO.CloseConn(); 
-
-     }
+//     else if ((g_versionNO>versionno)&&(versionno>20141116 && versionno <20150415))
+//     {
+//
+//         _variant_t temp_var;
+//         _ConnectionPtr srcConTmp;
+//         _RecordsetPtr srcRsTemp;
+//         srcConTmp.CreateInstance("ADODB.Connection");
+//         srcRsTemp.CreateInstance("ADODB.Recordset");
+//         srcConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);//打开数据库
+//         //这里是All_NODE
+//
+//         //Building_ALL
+//         if (Is_haveTable(_T("Building_ALL")))
+//         {
+//#if 1
+//
+//             srcRsTemp->Open(_T("select * from Building_ALL"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
+//             Building_ALL Building_ALL_Temp;
+//             while(!srcRsTemp->EndOfFile){
+//                 Building_ALL_Temp.Building_Name=srcRsTemp->GetCollect(_T("Building_Name"));
+//                 Building_ALL_Temp.Address=srcRsTemp->GetCollect(_T("Address"));
+//                 Building_ALL_Temp.Telephone=srcRsTemp->GetCollect(_T("Telephone"));
+//                 Building_ALL_Temp.Default_Building=srcRsTemp->GetCollect(_T("Default_Build"));
+//                 m_Building_ALL.push_back(Building_ALL_Temp);
+//                 srcRsTemp->MoveNext();
+//             }
+//             srcRsTemp->Close();
+//#endif
+//         }
+//         CString StrTemp;
+//
+//         //Building
+//         if (Is_haveTable(_T("Building")))
+//         {
+//#if 1
+//             srcRsTemp->Open(_T("select * from Building"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
+//             Building Building_Temp;
+//             while(!srcRsTemp->EndOfFile){
+//
+//                 Building_Temp.Braudrate=srcRsTemp->GetCollect(_T("Braudrate"));
+//                 Building_Temp.Building_Name=srcRsTemp->GetCollect(_T("Building_Name"));
+//                 Building_Temp.Com_Port=srcRsTemp->GetCollect(_T("Com_Port"));
+//                 Building_Temp.Default_SubBuilding=srcRsTemp->GetCollect(_T("Default_SubBuilding"));
+//                 Building_Temp.Ip_Address=srcRsTemp->GetCollect(_T("Ip_Address"));
+//                 Building_Temp.Ip_Port=srcRsTemp->GetCollect(_T("Ip_Port"));
+//                 Building_Temp.Main_BuildingName=srcRsTemp->GetCollect(_T("Main_BuildingName"));
+//                 Building_Temp.Protocal=srcRsTemp->GetCollect(_T("Protocal"));
+//                 StrTemp=srcRsTemp->GetCollect(_T("Building_Path"));
+//                 int index= StrTemp.Find(_T("Database"));
+//                 StrTemp.Delete(0,index);
+//
+//                 Building_Temp.Building_Path=StrTemp;  
+//                 m_Building.push_back(Building_Temp);
+//                 srcRsTemp->MoveNext();
+//             }
+//             srcRsTemp->Close();
+//#endif
+//         }
+//
+//
+//         //CustomProductTable
+//         if (Is_haveTable(_T("CustomProductTable")))
+//         {
+//#if 1
+//             srcRsTemp->Open(_T("select * from CustomProductTable"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);		
+//             CustomProductTable CustomProductTable_Temp;
+//             while(!srcRsTemp->EndOfFile){
+//                 CustomProductTable_Temp.ModelNo=srcRsTemp->GetCollect(_T("ModelNo"));
+//                 CustomProductTable_Temp.Reg_Description=srcRsTemp->GetCollect(_T("Reg_Description"));
+//                 CustomProductTable_Temp.Reg_ID=srcRsTemp->GetCollect(_T("Reg_ID"));
+//
+//                 m_CustomProductTable.push_back(CustomProductTable_Temp);
+//                 srcRsTemp->MoveNext();
+//             }
+//             srcRsTemp->Close();
+//#endif
+//         }
+//
+//         if (srcConTmp->State)
+//         {srcConTmp->Close();
+//         }
+//
+//
+//         CString filePath=g_strExePth+_T("Database\\T3000.mdb");
+//         DeleteFile(filePath);
+//
+//
+//
+//         HANDLE hFind;//
+//         WIN32_FIND_DATA wfd;//
+//         hFind = FindFirstFile(filePath, &wfd);//
+//         if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
+//         {
+//             //CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
+//             //没有找到就创建一个默认的数据库
+//             filePath=g_strExePth+_T("Database\\T3000.mdb");
+//             HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DB2), _T("T3000_DB"));   
+//             HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+//
+//
+//             LPVOID lpExe = LockResource(hGlobal);   
+//             CFile file;
+//             if(file.Open(filePath, CFile::modeCreate | CFile::modeWrite))    
+//                 file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+//             file.Close();    
+//             ::UnlockResource(hGlobal);   
+//             ::FreeResource(hGlobal);
+//         }//
+//         CString strsql;
+//         srcConTmp->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+//
+//         try
+//         {
+//
+//
+//             //Building_ALL
+//#if 1
+//             srcConTmp->Execute(_T("delete * from Building_ALL"),NULL,adCmdText);	
+//             srcRsTemp->Open(_T("select * from Building_ALL"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
+//             try{
+//                 for (int i=0;i<m_Building_ALL.size();i++)
+//                 {
+//                     srcRsTemp->AddNew();
+//                     srcRsTemp->PutCollect("Building_Name",m_Building_ALL[i].Building_Name);
+//                     srcRsTemp->PutCollect("Default_Build",m_Building_ALL[i].Default_Building);
+//                     srcRsTemp->PutCollect("Telephone",m_Building_ALL[i].Telephone);
+//                     srcRsTemp->PutCollect("Address",m_Building_ALL[i].Address);
+//
+//
+//                     srcRsTemp->Update();
+//                 }
+//             }
+//             catch(_com_error &e){
+//                 AfxMessageBox(e.Description());
+//             }
+//             srcRsTemp->Close();
+//#endif
+//
+//             //Building
+//#if 1
+//             srcConTmp->Execute(_T("delete * from Building"),NULL,adCmdText);
+//             srcRsTemp->Open(_T("select * from Building"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
+//             try{
+//                 for (int i=0;i<m_Building.size();i++)
+//                 {
+//                     srcRsTemp->AddNew();
+//                     srcRsTemp->PutCollect("Main_BuildingName",m_Building[i].Main_BuildingName);
+//                     srcRsTemp->PutCollect("Building_Name",m_Building[i].Main_BuildingName);
+//                     srcRsTemp->PutCollect("Protocal",m_Building[i].Protocal);
+//                     srcRsTemp->PutCollect("Com_Port",m_Building[i].Com_Port);
+//                     srcRsTemp->PutCollect("Ip_Address",m_Building[i].Ip_Address);
+//                     srcRsTemp->PutCollect("Ip_Port",m_Building[i].Ip_Port);
+//                     srcRsTemp->PutCollect("Braudrate",m_Building[i].Braudrate);
+//                     srcRsTemp->PutCollect("Default_SubBuilding",m_Building[i].Default_SubBuilding);
+//                     srcRsTemp->PutCollect("Building_Path",m_Building[i].Building_Path);
+//                     srcRsTemp->Update();
+//                 }
+//             }
+//             catch(_com_error &e){
+//                 AfxMessageBox(e.Description());
+//             }
+//             srcRsTemp->Close();
+//#endif
+//
+//             //CustomProductTable
+//#if 1
+//             srcConTmp->Execute(_T("delete * from CustomProductTable"),NULL,adCmdText);
+//             srcRsTemp->Open(_T("select * from CustomProductTable"),_variant_t((IDispatch *)srcConTmp,true),adOpenStatic,adLockOptimistic,adCmdText);
+//             try{
+//                 for (int i=0;i<m_CustomProductTable.size();i++)
+//                 {
+//                     srcRsTemp->AddNew();
+//                     srcRsTemp->PutCollect("ModelNo",m_CustomProductTable[i].ModelNo);
+//                     srcRsTemp->PutCollect("Reg_Description",m_CustomProductTable[i].Reg_Description);
+//                     srcRsTemp->PutCollect("Reg_ID",m_CustomProductTable[i].Reg_ID);
+//                     srcRsTemp->Update();
+//                 }
+//             }
+//             catch(_com_error &e){
+//                 AfxMessageBox(e.Description());
+//             }
+//             srcRsTemp->Close();
+//
+//#endif
+//
+//
+//         }
+//         catch(_com_error *e)
+//         {
+//             AfxMessageBox(e->ErrorMessage());
+//         }
+//
+//
+//
+//         if (srcConTmp->State)
+//         {srcConTmp->Close();
+//         }
+//         srcConTmp=NULL;
+//
+//
+//
+//
+//
+//     }
+//     else {
+//
+//         CADO updateADO;
+//         updateADO.OnInitADOConn();
+//
+//         if (versionno <=20150415)
+//         {
+//             StrSql=_T("ALTER TABLE CustomProductTable ADD COLUMN Para_Type varchar(255),Counts_Number Integer,Property varchar(255)");
+//             updateADO.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
+//             StrSql=_T("INSERT INTO Version VALUES(20150605,'更新CustomProductTable')");
+//             updateADO.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
+//         }
+//         /*if (versionno <=20150605)
+//         {
+//            StrSql= _T("Insert Table ProductsTypeRegisterTables Values(20,'T3_RegisterList','T3-8I13O','RegID','T3-8I13O')");
+//         }*/
+//         updateADO.CloseConn(); 
+//
+//     }
 
      int BuildingVersion;
      CBADO bado;
@@ -1088,7 +1088,7 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
          bado.m_pRecordset->MoveNext();
      }
 
-     if(BuildingVersion <=20150105){
+     if(BuildingVersion <20150105){
          StrSql=_T("ALTER TABLE ALL_NODE ADD COLUMN Custom varchar(255)"); 
          bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
          StrSql=_T("Update ALL_NODE Set Custom = '0' ");
@@ -1098,7 +1098,7 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
          StrSql=_T("INSERT INTO Version VALUES(20150605,'更新ALL_NODE,创建BatchFlashResult')");
          bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
      }
-     if (BuildingVersion <=20150605)
+     if (BuildingVersion <20150605)
      {
          StrSql=_T("ALTER TABLE ALL_NODE ADD COLUMN Parent_SerialNum varchar(255)"); 
          bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
@@ -1124,7 +1124,9 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
          StrSql=_T("INSERT INTO Version VALUES(20150623,'更新ALL_NODE ,添加Panal_Number,Object_Instance')");
          bado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);  
      }
-
+     if (BuildingVersion <=20160219)
+     {
+     }
      bado.CloseConn();
      return TRUE;
  }
