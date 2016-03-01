@@ -652,14 +652,28 @@ namespace WFA_psychometric_chart
             double y_axis = wg_calc;
 // now lets plot on graph...
             //chart1.Series.Add("SeriesDBT_HR"+index);//dont need this we have declared this is chart control
-            chart1.Series["SeriesDBT_HR"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            chart1.Series["SeriesDBT_HR"].Color = Color.FromArgb(0, 0, 255);//blue
-            chart1.Series["SeriesDBT_HR"].MarkerSize=7;
+            Series series1 = new Series("My Series"+index);
+            chart1.Series.Add(series1);
+
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series1.Color = Color.FromArgb(0, 0, 255);//blue
+            series1.MarkerSize = 7;
+            string label = "DBT=" + DBT + ",HR=" + HR;
+            series1.Label = label;
             //chart1.Series["SeriesDBT_HR" + index].;
-            chart1.Series["SeriesDBT_HR"].Points.AddXY(x_axis, y_axis);
+            series1.Points.AddXY(x_axis, y_axis);
+            
+            
+            //chart1.Series[series1].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            //chart1.Series[series1].Color = Color.FromArgb(0, 0, 255);//blue
+            //chart1.Series["SeriesDBT_HR"].MarkerSize=7;
+            //string s =   "DBT=" + DBT + ",HR=" + HR;
+            ////chart1.Series["SeriesDBT_HR" + index].;
+            //chart1.Series["SeriesDBT_HR"].Points.AddXY(x_axis, y_axis);
+            
 
 
-            //index++;
+            index++;
             if (index == 15)
             {
                 index = 0;
@@ -695,44 +709,46 @@ namespace WFA_psychometric_chart
 
 
         }
-        public int plot_by_DBT_Enthalpy(double dbt,double enthalpy)
+        //this was for ploting dbt and enthalpy which we dont require now...
+        public int plot_by_DBT_Enthalpy(double dbt, double enthalpy)
         {
             //this is DBT 
             double x_axis = dbt;
             double h = enthalpy;
-  //          MessageBox.Show("h = " + h+" T = "+dbt);
-  
+            //          MessageBox.Show("h = " + h+" T = "+dbt);
+
             //lets fit this value in the curve...
             double x1 = (h - 12.5) / 3.5;
-    //        MessageBox.Show("X1= " + x1);
+            //        MessageBox.Show("X1= " + x1);
             double y1 = x1 + 5;//this is given temp..
-      //      MessageBox.Show("y1= " + y1);
+            //      MessageBox.Show("y1= " + y1);
             double x2 = h;
             double y2 = 0;
 
-        //    MessageBox.Show("x2= " + x2+" y2  = "+y2);
+            //    MessageBox.Show("x2= " + x2+" y2  = "+y2);
 
             double x = dbt;
             double y = y1 + (((y2 - y1) * (x - x1) / (x2 - x1)));
 
             double y_axis = y;
 
-         //   MessageBox.Show("y = " + y);
-
-
-            
-              //chart1.Series.Add("SeriesDBT_enthalpy" + index);//this is already delceared in chart control so we dont need it
-                chart1.Series["SeriesDBT_enthalpy"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-                chart1.Series["SeriesDBT_enthalpy"].Color = Color.Blue;
-                chart1.Series["SeriesDBT_enthalpy"].MarkerSize = 15 ;
-                //chart1.Series["SeriesDBT_HR" + index].;
-                chart1.Series["SeriesDBT_enthalpy"].Points.AddXY(x_axis, y_axis);
-
-                //index++;
+            //   MessageBox.Show("y = " + y);
 
 
 
-                return 0;
+            chart1.Series.Add("SeriesDBT_enthalpy" + index);//this is already delceared in chart control so we dont need it
+            chart1.Series["SeriesDBT_enthalpy" + index].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            chart1.Series["SeriesDBT_enthalpy" + index].Color = Color.Blue;
+            chart1.Series["SeriesDBT_enthalpy" + index].MarkerSize = 15;
+            chart1.Series["SeriesDBT_enthalpy" + index].Label = "DBT = " + dbt + "degC ,enthalpy = " + enthalpy;
+            //chart1.Series["SeriesDBT_HR" + index].;
+            chart1.Series["SeriesDBT_enthalpy" + index].Points.AddXY(x_axis, y_axis);
+
+            index++;
+
+
+
+            return 0;
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -829,7 +845,7 @@ namespace WFA_psychometric_chart
             /*
              from dew point calc . Pws and then put that into the value of mixing ratio..
              */
-
+/*
             Patm = 1013;
             A = 6.116441;
             m = 7.591386;
@@ -856,19 +872,20 @@ namespace WFA_psychometric_chart
             chart1.Series["Series_DP_enthalpy" + index].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
             chart1.Series["Series_DP_enthalpy" + index].Color = Color.Blue;
             chart1.Series["Series_DP_enthalpy" + index].MarkerSize = 5;
+            chart1.Series["Series_DP_enthalpy" + index].Label = "enthalpy =" + enthalpy + "dew point =" + dew_point;
             //chart1.Series["SeriesDBT_HR" + index].;
             chart1.Series["Series_DP_enthalpy" + index].Points.AddXY(x_axis, y_axis);
 
             index++;
 
 
-
+            */
             return 0;
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-
+            /*
 
             double enthalpy = 0.000000;
             double dew_point = 0.000000;
@@ -885,7 +902,7 @@ namespace WFA_psychometric_chart
 
             plot_by_enthalpy_dew_point(enthalpy, dew_point);
 
-
+            */
 
         }
         public int plot_by_WBT_humidity(double WBT,double humidity){
@@ -1502,6 +1519,24 @@ namespace WFA_psychometric_chart
             f3.Show();
 
 
+        }
+
+        private void button4_Click_1(object sender, EventArgs e)
+        {
+            double DBT = 0.000000;
+            double enthalpy = 0.000000;
+            try
+            {
+                DBT = Double.Parse(txt_DBT.Text.Trim());
+                enthalpy = Double.Parse(txt_enthalpy.Text.Trim());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            //calling the function here...
+            plot_by_DBT_Enthalpy(DBT, enthalpy);
         }
 
 
