@@ -29,9 +29,12 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label34 = new System.Windows.Forms.Label();
+            this.cb1_select_data = new System.Windows.Forms.ComboBox();
             this.tb_elev = new System.Windows.Forms.TextBox();
             this.tb_latitude = new System.Windows.Forms.TextBox();
             this.tb_longitude = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.tb_ZIP = new System.Windows.Forms.TextBox();
             this.tb_street = new System.Windows.Forms.TextBox();
             this.tb_city = new System.Windows.Forms.TextBox();
@@ -45,10 +48,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.button4 = new System.Windows.Forms.Button();
             this.label14 = new System.Windows.Forms.Label();
@@ -62,12 +61,12 @@
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.cb1_select_data = new System.Windows.Forms.ComboBox();
             this.cb_enable_disable = new System.Windows.Forms.CheckBox();
             this.label26 = new System.Windows.Forms.Label();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.label35 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.btn_set_value = new System.Windows.Forms.Button();
-            this.label31 = new System.Windows.Forms.Label();
             this.tb_current_offset = new System.Windows.Forms.TextBox();
             this.label30 = new System.Windows.Forms.Label();
             this.label29 = new System.Windows.Forms.Label();
@@ -92,6 +91,7 @@
             this.tb_cw_temp = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.btn_update_constantly = new System.Windows.Forms.Button();
             this.label32 = new System.Windows.Forms.Label();
             this.btn_update_now = new System.Windows.Forms.Button();
             this.btn_pull_offline_data = new System.Windows.Forms.Button();
@@ -101,9 +101,7 @@
             this.label16 = new System.Windows.Forms.Label();
             this.tb_location = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.label34 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
-            this.btn_update_constantly = new System.Windows.Forms.Button();
+            this.label31 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -114,19 +112,15 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.button2);
             this.groupBox1.Controls.Add(this.label34);
             this.groupBox1.Controls.Add(this.cb1_select_data);
             this.groupBox1.Controls.Add(this.tb_elev);
-            this.groupBox1.Controls.Add(this.button5);
             this.groupBox1.Controls.Add(this.tb_latitude);
             this.groupBox1.Controls.Add(this.tb_longitude);
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.tb_ZIP);
             this.groupBox1.Controls.Add(this.tb_street);
-            this.groupBox1.Controls.Add(this.button6);
             this.groupBox1.Controls.Add(this.tb_city);
-            this.groupBox1.Controls.Add(this.button3);
             this.groupBox1.Controls.Add(this.tb_state);
             this.groupBox1.Controls.Add(this.tb_country);
             this.groupBox1.Controls.Add(this.label8);
@@ -144,11 +138,31 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Building Location";
             // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(17, 29);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(92, 13);
+            this.label34.TabIndex = 21;
+            this.label34.Text = "Select a location :";
+            // 
+            // cb1_select_data
+            // 
+            this.cb1_select_data.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cb1_select_data.FormattingEnabled = true;
+            this.cb1_select_data.IntegralHeight = false;
+            this.cb1_select_data.Location = new System.Drawing.Point(15, 45);
+            this.cb1_select_data.Name = "cb1_select_data";
+            this.cb1_select_data.Size = new System.Drawing.Size(194, 21);
+            this.cb1_select_data.TabIndex = 20;
+            this.cb1_select_data.SelectedIndexChanged += new System.EventHandler(this.cb_event_on_index_change);
+            // 
             // tb_elev
             // 
-            this.tb_elev.Enabled = false;
             this.tb_elev.Location = new System.Drawing.Point(606, 109);
             this.tb_elev.Name = "tb_elev";
+            this.tb_elev.ReadOnly = true;
             this.tb_elev.Size = new System.Drawing.Size(189, 20);
             this.tb_elev.TabIndex = 15;
             // 
@@ -156,6 +170,7 @@
             // 
             this.tb_latitude.Location = new System.Drawing.Point(606, 59);
             this.tb_latitude.Name = "tb_latitude";
+            this.tb_latitude.ReadOnly = true;
             this.tb_latitude.Size = new System.Drawing.Size(189, 20);
             this.tb_latitude.TabIndex = 14;
             // 
@@ -163,13 +178,25 @@
             // 
             this.tb_longitude.Location = new System.Drawing.Point(606, 85);
             this.tb_longitude.Name = "tb_longitude";
+            this.tb_longitude.ReadOnly = true;
             this.tb_longitude.Size = new System.Drawing.Size(189, 20);
             this.tb_longitude.TabIndex = 13;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(50, 81);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(94, 23);
+            this.button1.TabIndex = 18;
+            this.button1.Text = "Insert new data";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // tb_ZIP
             // 
             this.tb_ZIP.Location = new System.Drawing.Point(606, 36);
             this.tb_ZIP.Name = "tb_ZIP";
+            this.tb_ZIP.ReadOnly = true;
             this.tb_ZIP.Size = new System.Drawing.Size(189, 20);
             this.tb_ZIP.TabIndex = 12;
             // 
@@ -177,6 +204,7 @@
             // 
             this.tb_street.Location = new System.Drawing.Point(302, 108);
             this.tb_street.Name = "tb_street";
+            this.tb_street.ReadOnly = true;
             this.tb_street.Size = new System.Drawing.Size(189, 20);
             this.tb_street.TabIndex = 11;
             // 
@@ -184,6 +212,7 @@
             // 
             this.tb_city.Location = new System.Drawing.Point(302, 84);
             this.tb_city.Name = "tb_city";
+            this.tb_city.ReadOnly = true;
             this.tb_city.Size = new System.Drawing.Size(189, 20);
             this.tb_city.TabIndex = 10;
             // 
@@ -191,6 +220,7 @@
             // 
             this.tb_state.Location = new System.Drawing.Point(302, 59);
             this.tb_state.Name = "tb_state";
+            this.tb_state.ReadOnly = true;
             this.tb_state.Size = new System.Drawing.Size(189, 20);
             this.tb_state.TabIndex = 9;
             // 
@@ -198,6 +228,7 @@
             // 
             this.tb_country.Location = new System.Drawing.Point(302, 36);
             this.tb_country.Name = "tb_country";
+            this.tb_country.ReadOnly = true;
             this.tb_country.Size = new System.Drawing.Size(189, 20);
             this.tb_country.TabIndex = 8;
             // 
@@ -272,46 +303,6 @@
             this.label1.Size = new System.Drawing.Size(49, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "Country :";
-            // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(15, 102);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(94, 23);
-            this.button5.TabIndex = 19;
-            this.button5.Text = "Save geo value";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(115, 102);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(94, 23);
-            this.button1.TabIndex = 18;
-            this.button1.Text = "Insert new data";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // button6
-            // 
-            this.button6.Location = new System.Drawing.Point(15, 72);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(94, 23);
-            this.button6.TabIndex = 17;
-            this.button6.Text = "Get stored data";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click);
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(115, 73);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(94, 23);
-            this.button3.TabIndex = 16;
-            this.button3.Text = "Get geo value";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // groupBox2
             // 
@@ -439,14 +430,6 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Remote Weather Station Services";
             // 
-            // cb1_select_data
-            // 
-            this.cb1_select_data.FormattingEnabled = true;
-            this.cb1_select_data.Location = new System.Drawing.Point(15, 45);
-            this.cb1_select_data.Name = "cb1_select_data";
-            this.cb1_select_data.Size = new System.Drawing.Size(194, 21);
-            this.cb1_select_data.TabIndex = 20;
-            // 
             // cb_enable_disable
             // 
             this.cb_enable_disable.AutoSize = true;
@@ -469,8 +452,10 @@
             // 
             // groupBox6
             // 
-            this.groupBox6.Controls.Add(this.btn_set_value);
             this.groupBox6.Controls.Add(this.label31);
+            this.groupBox6.Controls.Add(this.label35);
+            this.groupBox6.Controls.Add(this.textBox1);
+            this.groupBox6.Controls.Add(this.btn_set_value);
             this.groupBox6.Controls.Add(this.tb_current_offset);
             this.groupBox6.Controls.Add(this.label30);
             this.groupBox6.Controls.Add(this.label29);
@@ -481,15 +466,33 @@
             this.groupBox6.Controls.Add(this.label27);
             this.groupBox6.Location = new System.Drawing.Point(30, 213);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(631, 117);
+            this.groupBox6.Size = new System.Drawing.Size(631, 143);
             this.groupBox6.TabIndex = 1;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Humidity Self Calibration";
             // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Location = new System.Drawing.Point(367, 83);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(15, 13);
+            this.label35.TabIndex = 33;
+            this.label35.Text = "%";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Enabled = false;
+            this.textBox1.Location = new System.Drawing.Point(280, 80);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.Size = new System.Drawing.Size(78, 20);
+            this.textBox1.TabIndex = 32;
+            // 
             // btn_set_value
             // 
             this.btn_set_value.Enabled = false;
-            this.btn_set_value.Location = new System.Drawing.Point(406, 77);
+            this.btn_set_value.Location = new System.Drawing.Point(385, 103);
             this.btn_set_value.Name = "btn_set_value";
             this.btn_set_value.Size = new System.Drawing.Size(102, 23);
             this.btn_set_value.TabIndex = 31;
@@ -497,31 +500,23 @@
             this.btn_set_value.UseVisualStyleBackColor = true;
             this.btn_set_value.Click += new System.EventHandler(this.btn_set_value_Click);
             // 
-            // label31
-            // 
-            this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(367, 87);
-            this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(15, 13);
-            this.label31.TabIndex = 30;
-            this.label31.Text = "%";
-            // 
             // tb_current_offset
             // 
             this.tb_current_offset.Enabled = false;
-            this.tb_current_offset.Location = new System.Drawing.Point(280, 84);
+            this.tb_current_offset.Location = new System.Drawing.Point(280, 105);
             this.tb_current_offset.Name = "tb_current_offset";
+            this.tb_current_offset.ReadOnly = true;
             this.tb_current_offset.Size = new System.Drawing.Size(78, 20);
             this.tb_current_offset.TabIndex = 29;
             // 
             // label30
             // 
             this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(25, 91);
+            this.label30.Location = new System.Drawing.Point(25, 113);
             this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(102, 13);
+            this.label30.Size = new System.Drawing.Size(131, 13);
             this.label30.TabIndex = 28;
-            this.label30.Text = "Total current offset :";
+            this.label30.Text = "Total current offset value :";
             // 
             // label29
             // 
@@ -618,6 +613,7 @@
             this.tb_cw_direction.Enabled = false;
             this.tb_cw_direction.Location = new System.Drawing.Point(280, 45);
             this.tb_cw_direction.Name = "tb_cw_direction";
+            this.tb_cw_direction.ReadOnly = true;
             this.tb_cw_direction.Size = new System.Drawing.Size(78, 20);
             this.tb_cw_direction.TabIndex = 30;
             // 
@@ -635,6 +631,7 @@
             this.tb_cw_wind.Enabled = false;
             this.tb_cw_wind.Location = new System.Drawing.Point(85, 45);
             this.tb_cw_wind.Name = "tb_cw_wind";
+            this.tb_cw_wind.ReadOnly = true;
             this.tb_cw_wind.Size = new System.Drawing.Size(78, 20);
             this.tb_cw_wind.TabIndex = 28;
             // 
@@ -679,6 +676,7 @@
             this.tb_cw_barometer_value.Enabled = false;
             this.tb_cw_barometer_value.Location = new System.Drawing.Point(487, 19);
             this.tb_cw_barometer_value.Name = "tb_cw_barometer_value";
+            this.tb_cw_barometer_value.ReadOnly = true;
             this.tb_cw_barometer_value.Size = new System.Drawing.Size(78, 20);
             this.tb_cw_barometer_value.TabIndex = 23;
             // 
@@ -696,6 +694,7 @@
             this.tb_cw_hum.Enabled = false;
             this.tb_cw_hum.Location = new System.Drawing.Point(280, 19);
             this.tb_cw_hum.Name = "tb_cw_hum";
+            this.tb_cw_hum.ReadOnly = true;
             this.tb_cw_hum.Size = new System.Drawing.Size(78, 20);
             this.tb_cw_hum.TabIndex = 21;
             // 
@@ -713,6 +712,7 @@
             this.tb_cw_temp.Enabled = false;
             this.tb_cw_temp.Location = new System.Drawing.Point(85, 19);
             this.tb_cw_temp.Name = "tb_cw_temp";
+            this.tb_cw_temp.ReadOnly = true;
             this.tb_cw_temp.Size = new System.Drawing.Size(78, 20);
             this.tb_cw_temp.TabIndex = 19;
             // 
@@ -744,6 +744,17 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Weather Station";
             // 
+            // btn_update_constantly
+            // 
+            this.btn_update_constantly.Enabled = false;
+            this.btn_update_constantly.Location = new System.Drawing.Point(478, 16);
+            this.btn_update_constantly.Name = "btn_update_constantly";
+            this.btn_update_constantly.Size = new System.Drawing.Size(102, 23);
+            this.btn_update_constantly.TabIndex = 26;
+            this.btn_update_constantly.Text = "Update constantly";
+            this.btn_update_constantly.UseVisualStyleBackColor = true;
+            this.btn_update_constantly.Click += new System.EventHandler(this.button7_Click);
+            // 
             // label32
             // 
             this.label32.AutoSize = true;
@@ -771,7 +782,7 @@
             this.btn_pull_offline_data.Name = "btn_pull_offline_data";
             this.btn_pull_offline_data.Size = new System.Drawing.Size(102, 23);
             this.btn_pull_offline_data.TabIndex = 23;
-            this.btn_pull_offline_data.Text = "Pull offline data";
+            this.btn_pull_offline_data.Text = "Get stored data";
             this.btn_pull_offline_data.UseVisualStyleBackColor = true;
             this.btn_pull_offline_data.Click += new System.EventHandler(this.btn_pull_offline_data_Click);
             // 
@@ -789,6 +800,7 @@
             this.tb_last_updated.Enabled = false;
             this.tb_last_updated.Location = new System.Drawing.Point(97, 49);
             this.tb_last_updated.Name = "tb_last_updated";
+            this.tb_last_updated.ReadOnly = true;
             this.tb_last_updated.Size = new System.Drawing.Size(139, 20);
             this.tb_last_updated.TabIndex = 21;
             // 
@@ -797,6 +809,7 @@
             this.tb_distance_from_build.Enabled = false;
             this.tb_distance_from_build.Location = new System.Drawing.Point(370, 49);
             this.tb_distance_from_build.Name = "tb_distance_from_build";
+            this.tb_distance_from_build.ReadOnly = true;
             this.tb_distance_from_build.Size = new System.Drawing.Size(139, 20);
             this.tb_distance_from_build.TabIndex = 20;
             // 
@@ -814,6 +827,7 @@
             this.tb_location.Enabled = false;
             this.tb_location.Location = new System.Drawing.Point(97, 23);
             this.tb_location.Name = "tb_location";
+            this.tb_location.ReadOnly = true;
             this.tb_location.Size = new System.Drawing.Size(139, 20);
             this.tb_location.TabIndex = 18;
             // 
@@ -826,35 +840,14 @@
             this.label15.TabIndex = 4;
             this.label15.Text = "Location :";
             // 
-            // label34
+            // label31
             // 
-            this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(17, 29);
-            this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(92, 13);
-            this.label34.TabIndex = 21;
-            this.label34.Text = "Select a location :";
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(109, 19);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(94, 23);
-            this.button2.TabIndex = 22;
-            this.button2.Text = "Refresh list";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // btn_update_constantly
-            // 
-            this.btn_update_constantly.Enabled = false;
-            this.btn_update_constantly.Location = new System.Drawing.Point(478, 16);
-            this.btn_update_constantly.Name = "btn_update_constantly";
-            this.btn_update_constantly.Size = new System.Drawing.Size(102, 23);
-            this.btn_update_constantly.TabIndex = 26;
-            this.btn_update_constantly.Text = "Update constantly";
-            this.btn_update_constantly.UseVisualStyleBackColor = true;
-            this.btn_update_constantly.Click += new System.EventHandler(this.button7_Click);
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(27, 87);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(86, 13);
+            this.label31.TabIndex = 34;
+            this.label31.Text = "current offset % :";
             // 
             // Form3
             // 
@@ -947,20 +940,18 @@
         private System.Windows.Forms.CheckBox cb_hum_self_calib;
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.Label label30;
-        private System.Windows.Forms.Label label31;
         private System.Windows.Forms.TextBox tb_current_offset;
-        private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button btn_set_value;
-        private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button btn_update_now;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label32;
-        private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.ComboBox cb1_select_data;
         private System.Windows.Forms.Label label34;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button btn_update_constantly;
+        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label31;
     }
 }

@@ -11,6 +11,7 @@ using System.Data.OleDb;
 using System.Net;
 using System.Xml.Linq;
 using System.Xml;
+using System.Collections;
 
 namespace WFA_psychometric_chart
 {
@@ -24,67 +25,67 @@ namespace WFA_psychometric_chart
 
         
         int index_selected = 0;
-        private void button3_Click(object sender, EventArgs e)
-        {
-            //this will pull the following things from database..
-            /*
-             1.country,state,city,street,latitude,longitude,elev,zip
-             */
-            string country = tb_country.Text;
-            string state = tb_state.Text;
-            string city = tb_city.Text;
-            string street = tb_street.Text;
+        //private void button3_Click(object sender, EventArgs e)
+        //{
+        //    //this will pull the following things from database..
+        //    /*
+        //     1.country,state,city,street,latitude,longitude,elev,zip
+        //     */
+        //    string country = tb_country.Text;
+        //    string state = tb_state.Text;
+        //    string city = tb_city.Text;
+        //    string street = tb_street.Text;
 
-            if (country != "" && city != "")
-            {
-                string join_string = "";
-                if (state != "" && street != "")
-                {
-                    join_string = country + "," + state + "," + city + "," + street;
-                }
-                else
-                {
-                    join_string = country + "," + city;
-                }
+        //    if (country != "" && city != "")
+        //    {
+        //        string join_string = "";
+        //        if (state != "" && street != "")
+        //        {
+        //            join_string = country + "," + state + "," + city + "," + street;
+        //        }
+        //        else
+        //        {
+        //            join_string = country + "," + city;
+        //        }
 
-                //geo location code goes here..
-                try
-                {
+        //        //geo location code goes here..
+        //        try
+        //        {
 
-                    var address = join_string;
-                    var requestUri = string.Format("http://maps.googleapis.com/maps/api/geocode/xml?address={0}&sensor=false", Uri.EscapeDataString(address));
+        //            var address = join_string;
+        //            var requestUri = string.Format("http://maps.googleapis.com/maps/api/geocode/xml?address={0}&sensor=false", Uri.EscapeDataString(address));
 
-                    var request = WebRequest.Create(requestUri);
-                    var response = request.GetResponse();
+        //            var request = WebRequest.Create(requestUri);
+        //            var response = request.GetResponse();
 
-                    var xdoc = XDocument.Load(response.GetResponseStream());
+        //            var xdoc = XDocument.Load(response.GetResponseStream());
 
-                    var result = xdoc.Element("GeocodeResponse").Element("result");                   
-                    var locationElement = result.Element("geometry").Element("location");
-                    var lat = locationElement.Element("lat");
-                    var lng = locationElement.Element("lng");
-                    double lat2 = Double.Parse(lat.Value);
-                    double lng2 = Double.Parse(lng.Value);
-                    tb_latitude.Text = lat2.ToString();
-                    tb_longitude.Text = lng2.ToString();
+        //            var result = xdoc.Element("GeocodeResponse").Element("result");                   
+        //            var locationElement = result.Element("geometry").Element("location");
+        //            var lat = locationElement.Element("lat");
+        //            var lng = locationElement.Element("lng");
+        //            double lat2 = Double.Parse(lat.Value);
+        //            double lng2 = Double.Parse(lng.Value);
+        //            tb_latitude.Text = lat2.ToString();
+        //            tb_longitude.Text = lng2.ToString();
                      
 
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show(ex.Message);
+        //        }
 
 
 
 
 
 
-            }//close of if...
+        //    }//close of if...
 
 
 
-        }
+        //}
 
         private void button4_Click(object sender, EventArgs e)
         {
@@ -189,34 +190,48 @@ namespace WFA_psychometric_chart
              * 2.display it in the text box             
              */
 
+
             try
             {
-                //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";        
-                using (OleDbConnection connection = new OleDbConnection(connString))
+
+                if (tb_latitude.Text == "" && tb_longitude.Text == "")
                 {
-                    connection.Open();
-                    OleDbDataReader reader = null;
-                    OleDbCommand command = new OleDbCommand("SELECT * from tbl_weather_related_values where ID=@id", connection);
-                    command.Parameters.AddWithValue("@id", index_selected);
-                    reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        //ListboxItems.Add(reader[1].ToString()+","+reader[2].ToString());
-                        tb_location.Text = reader["location"].ToString();
-                        tb_distance_from_build.Text = reader["distance_from_building"].ToString();
-                        tb_last_updated.Text = reader["last_update_date"].ToString();
-                        tb_cw_temp.Text = reader["temp"].ToString();
-                        tb_cw_hum.Text = reader["humidity"].ToString();
-                        tb_cw_barometer_value.Text = reader["bar_pressure"].ToString();
-                        tb_cw_wind.Text = reader["wind"].ToString();
-                        tb_cw_direction.Text = reader["direction"].ToString();
 
-
-                    }
+                    string error_string = "Please select a location ";
+                    MessageBox.Show(error_string, "error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    // MessageBox.Show("Please perform the follwing step first.\n 1.select a location \n 2.pull stored building data \n 3. get geo value(we need geo value)");
                 }
+                else
+                {
 
+
+
+                    //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+                    string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                    using (OleDbConnection connection = new OleDbConnection(connString))
+                    {
+                        connection.Open();
+                        OleDbDataReader reader = null;
+                        OleDbCommand command = new OleDbCommand("SELECT * from tbl_weather_related_values where ID=@id", connection);
+                        command.Parameters.AddWithValue("@id", index_selected);
+                        reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            //ListboxItems.Add(reader[1].ToString()+","+reader[2].ToString());
+                            tb_location.Text = reader["location"].ToString();
+                            tb_distance_from_build.Text = reader["distance_from_building"].ToString();
+                            tb_last_updated.Text = reader["last_update_date"].ToString();
+                            tb_cw_temp.Text = reader["temp"].ToString();
+                            tb_cw_hum.Text = reader["humidity"].ToString();
+                            tb_cw_barometer_value.Text = reader["bar_pressure"].ToString();
+                            tb_cw_wind.Text = reader["wind"].ToString();
+                            tb_cw_direction.Text = reader["direction"].ToString();
+
+
+                        }
+                    }
+                }//close of else block..
 
             }
             catch (Exception ex)
@@ -227,51 +242,62 @@ namespace WFA_psychometric_chart
 
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void get_stored_data()
         {
             //try
             //{
-                if (cb1_select_data.SelectedIndex > -1)
-                {
-                    //lets get the index parameter form the table...
-                    index_selected = cb1_select_data.SelectedIndex + 1; //
-                    MessageBox.Show("index = " + index_selected);
+            if (cb1_select_data.SelectedIndex > -1)
+            {
+                //lets get the index parameter form the table...
+                index_selected = cb1_select_data.SelectedIndex + 1; //
+                //MessageBox.Show("index = " + index_selected);
 
-                    //lets pull the vales offline values stored in db...
-                    string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                    //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-                    string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-                    using (OleDbConnection connection = new OleDbConnection(connString))
+                //lets pull the vales offline values stored in db...
+                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+                string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                using (OleDbConnection connection = new OleDbConnection(connString))
+                {
+                    connection.Open();
+                    OleDbDataReader reader = null;
+                    string queryString = "SELECT * from tbl_building_location WHERE ID=@index";
+                    OleDbCommand command = new OleDbCommand(queryString, connection);
+                    //command.Parameters.AddWithValue("@index", index);
+                    command.Parameters.Add(new OleDbParameter("@index", OleDbType.Integer)).Value = index_selected;
+                    reader = command.ExecuteReader();
+                    while (reader.Read())
                     {
-                        connection.Open();
-                        OleDbDataReader reader = null;
-                        string queryString = "SELECT * from tbl_building_location WHERE ID=@index";
-                        OleDbCommand command = new OleDbCommand(queryString, connection);
-                        //command.Parameters.AddWithValue("@index", index);
-                        command.Parameters.Add(new OleDbParameter("@index", OleDbType.Integer)).Value = index_selected;
-                        reader = command.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            //ListboxItems.Add(reader[1].ToString()+","+reader[2].ToString());
-                            tb_country.Text = reader["country"].ToString();
-                            tb_state.Text = reader["state"].ToString();
-                            tb_city.Text = reader["city"].ToString();
-                            tb_street.Text = reader["street"].ToString();
-                            tb_ZIP.Text = reader["ZIP"].ToString();
+                        //ListboxItems.Add(reader[1].ToString()+","+reader[2].ToString());
+                        tb_country.Text = reader["country"].ToString();
+                        tb_state.Text = reader["state"].ToString();
+                        tb_city.Text = reader["city"].ToString();
+                        tb_street.Text = reader["street"].ToString();
+                        tb_ZIP.Text = reader["ZIP"].ToString();
+                        tb_latitude.Text = reader["latitude"].ToString();
+                        tb_longitude.Text = reader["longitude"].ToString();
+                        tb_elev.Text = reader["elevation"].ToString();
 
-                        }
                     }
-                }//close of if statement
-                else
-                {
-                    MessageBox.Show("Please select an item.\n If you dont have a location then please insert first.");
                 }
-        
+            }//close of if statement
+            else
+            {
+                MessageBox.Show("Please select an item.\n If you dont have a location then please insert first.");
+            }
+
             //catch (Exception ex)
             //{
             //    MessageBox.Show(ex.Message);
             //}
+
         }
+
+
+
+        //private void button6_Click(object sender, EventArgs e)
+        //{
+        //    get_stored_data();
+        //}
 
 
       
@@ -314,7 +340,7 @@ namespace WFA_psychometric_chart
                 if (tb_latitude.Text == "" && tb_longitude.Text == "")
                 {
 
-                    string error_string = "Please perform the follwing step first.\n 1.select a location \n 2.pull stored building data \n 3. get geo value(we need geo value)";
+                    string error_string = "Please select a location ";
                     MessageBox.Show(error_string, "error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                    // MessageBox.Show("Please perform the follwing step first.\n 1.select a location \n 2.pull stored building data \n 3. get geo value(we need geo value)");
                 }
@@ -323,7 +349,7 @@ namespace WFA_psychometric_chart
                 lat_val = Double.Parse(tb_latitude.Text);
                 lng_val = Double.Parse(tb_longitude.Text);
                 //display lat lng...
-                MessageBox.Show("lat= "+lat_val+" lng = "+lng_val);
+                //MessageBox.Show("lat= "+lat_val+" lng = "+lng_val);
                 using (var wc = new WebClient())
                 {
                     // var json = await httpClient.GetStringAsync(api_url);
@@ -342,7 +368,7 @@ namespace WFA_psychometric_chart
                     foreach (XmlNode x in elem_city)
                     {
                         city_name_pulled = x.Attributes["name"].Value;
-                        MessageBox.Show("city name = " + city_name_pulled);
+                       // MessageBox.Show("city name = " + city_name_pulled);
                     }
                     //for temperature
                     XmlNodeList temp_list = xml.GetElementsByTagName("temperature");                   
@@ -356,14 +382,14 @@ namespace WFA_psychometric_chart
                     foreach (XmlNode x in hum_list)
                     {
                         hum_pulled = x.Attributes["value"].Value;
-                        MessageBox.Show("hum  = " + hum_pulled);
+                        //MessageBox.Show("hum  = " + hum_pulled);
                     }
                     //for pressure..
                     XmlNodeList pressure_list = xml.GetElementsByTagName("pressure");                    
                     foreach (XmlNode x in pressure_list)
                     {
                         pressure_pulled = x.Attributes["value"].Value;
-                        MessageBox.Show("press = " + pressure_pulled);
+                        //MessageBox.Show("press = " + pressure_pulled);
                     }
                     //for wind 
 
@@ -371,14 +397,14 @@ namespace WFA_psychometric_chart
                     foreach (XmlNode x in wind_list)
                     {
                         wind_speed_pulled = x.Attributes["value"].Value;
-                        MessageBox.Show("wind speed = " + wind_speed_pulled);
+                     //   MessageBox.Show("wind speed = " + wind_speed_pulled);
                     }
                     //for direction..
                     XmlNodeList direction_list = xml.GetElementsByTagName("direction");
                     foreach (XmlNode x in direction_list)
                     {
                         direction_pulled = x.Attributes["name"].Value;
-                        MessageBox.Show("direction name = " + direction_pulled);
+                       // MessageBox.Show("direction name = " + direction_pulled);
                     }
                     //for lat and long of station...
                     XmlNodeList coord_list = xml.GetElementsByTagName("coord");
@@ -387,14 +413,14 @@ namespace WFA_psychometric_chart
                         lat_pulled = x.Attributes["lat"].Value;
                         long_pulled = x.Attributes["lon"].Value;
 
-                        MessageBox.Show("lat = " + lat_pulled +"long" +long_pulled);
+                       // MessageBox.Show("lat = " + lat_pulled +"long" +long_pulled);
                     }
                     //for last date update time 
                     XmlNodeList last_update_list = xml.GetElementsByTagName("lastupdate");
                     foreach (XmlNode x in last_update_list)
                     {
                         last_update_pulled = x.Attributes["value"].Value;
-                        MessageBox.Show("last update date = " + last_update_pulled);
+                       // MessageBox.Show("last update date = " + last_update_pulled);
                     }
                     
                     //for country..
@@ -402,7 +428,7 @@ namespace WFA_psychometric_chart
                     foreach (XmlNode x in country_list)
                     {
                         country_name_pulled = x.InnerText;
-                        MessageBox.Show("country name = " + country_name_pulled);
+                      //  MessageBox.Show("country name = " + country_name_pulled);
                     }
 
                     //step3. insert the values pulled into a database..
@@ -510,7 +536,7 @@ namespace WFA_psychometric_chart
                     
 
 
-                    MessageBox.Show("end");
+                    MessageBox.Show("success !");
                 }
 
                 }//close of else...block for tb_latitude and tb_longitude..
@@ -527,60 +553,60 @@ namespace WFA_psychometric_chart
         
         }
 
-        private void button5_Click(object sender, EventArgs e)
-        {   
-            //storing the value in the database...
-            if (index_selected > 0)
-            {
+        //private void button5_Click(object sender, EventArgs e)
+        //{   
+        //    //storing the value in the database...
+        //    if (index_selected > 0)
+        //    {
              
    
-            if((tb_longitude.Text != "") && (tb_latitude.Text != ""))
-            try
-            {
-                string lat_value = tb_latitude.Text;
-                string long_value = tb_longitude.Text;
-                MessageBox.Show("lat= " + lat_value + " lng= " + long_value);
-                //string elev_value = tb_elev.Text;
-                //lets pull the vales offline values stored in db...
-                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";                
-                string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-                using (OleDbConnection connection = new OleDbConnection(connString))
-                {
-                    connection.Open();
-                    string sql_string = "update tbl_building_location set   latitude=@latitude_value,longitude=@longitude_value where ID = @index_selected;";
-                    OleDbCommand command = new OleDbCommand(sql_string, connection);
-                    command.CommandType = CommandType.Text;
-                    command.Parameters.AddWithValue("@latitude_value", lat_value);
-                    command.Parameters.AddWithValue("@longitude_value", long_value);
-                    command.Parameters.AddWithValue("@index_selected", index_selected);
+        //    if((tb_longitude.Text != "") && (tb_latitude.Text != ""))
+        //    try
+        //    {
+        //        string lat_value = tb_latitude.Text;
+        //        string long_value = tb_longitude.Text;
+        //        MessageBox.Show("lat= " + lat_value + " lng= " + long_value);
+        //        //string elev_value = tb_elev.Text;
+        //        //lets pull the vales offline values stored in db...
+        //        string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        //        //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";                
+        //        string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+        //        using (OleDbConnection connection = new OleDbConnection(connString))
+        //        {
+        //            connection.Open();
+        //            string sql_string = "update tbl_building_location set   latitude=@latitude_value,longitude=@longitude_value where ID = @index_selected;";
+        //            OleDbCommand command = new OleDbCommand(sql_string, connection);
+        //            command.CommandType = CommandType.Text;
+        //            command.Parameters.AddWithValue("@latitude_value", lat_value);
+        //            command.Parameters.AddWithValue("@longitude_value", long_value);
+        //            command.Parameters.AddWithValue("@index_selected", index_selected);
 
-                    command.ExecuteNonQuery();
-                    //MessageBox.Show("sql string = " + sql_string);
-                    MessageBox.Show("value updated successfully!");
+        //            command.ExecuteNonQuery();
+        //            //MessageBox.Show("sql string = " + sql_string);
+        //            MessageBox.Show("value updated successfully!");
                    
-                }
+        //        }
                 
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }
 
-            }
-            else
-            {
-                //print error..
-                MessageBox.Show("Please pull the store data first..");
-            }
+        //    }
+        //    else
+        //    {
+        //        //print error..
+        //        MessageBox.Show("Please pull the store data first..");
+        //    }
 
-        }
+        //}
 
         private void button1_Click(object sender, EventArgs e)
         {
             //This will help to insert the values...
 
-            Form4_insert_data f4 = new Form4_insert_data();
+            Form4_insert_data f4 = new Form4_insert_data(this);
             f4.Show();
 
 
@@ -589,33 +615,41 @@ namespace WFA_psychometric_chart
         public void fill_combobox()
         {
             cb1_select_data.Items.Clear();
+            ArrayList stored_location = new ArrayList();
             //while loading it should populate the field...
             //lets pull the vales offline values stored in db...
             string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
             string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-            using (OleDbConnection connection = new OleDbConnection(connString))
-            {
+           // MessageBox.Show("connection string = " + connString);
+
+
+            OleDbConnection connection = new OleDbConnection(connString);
                 connection.Open();
                 OleDbDataReader reader = null;
-                OleDbCommand command = new OleDbCommand("SELECT * from tbl_building_location", connection);
+                OleDbCommand comm = new OleDbCommand("SELECT * from tbl_building_location", connection);
                 //command.Parameters.AddWithValue("@1", userName)
-                reader = command.ExecuteReader();
+                reader = comm.ExecuteReader();
                 while (reader.Read())
                 {
-                    //ListboxItems.Add(reader[1].ToString()+","+reader[2].ToString());
-                    //tb_country.Text = reader["country"].ToString();
-                    //tb_state.Text = reader["state"].ToString();
-                    //tb_city.Text = reader["city"].ToString();
-                    //tb_street.Text = reader["street"].ToString();
-                    //tb_ZIP.Text = reader["ZIP"].ToString();
-
-                    string selecte_location = reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
-                    cb1_select_data.Items.Add(selecte_location);
+                   
+                    string selecte_location = reader["id"].ToString()+","+reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
+                    stored_location.Add(selecte_location);
                 }
+                string s = "";
+                for (int i = 0; i < stored_location.Count; i++)
+                {
+                    cb1_select_data.Items.Add(stored_location[i]);
+                    s += stored_location[i] + " , \n";
+                }
+                MessageBox.Show("stored place = " + s);
+                comm.Dispose();    
+            reader.Dispose();    
+            connection.Close();
+
+            
 
 
-            }
 
         }
 
@@ -625,10 +659,10 @@ namespace WFA_psychometric_chart
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            fill_combobox();
-        }
+        //private void button2_Click(object sender, EventArgs e)
+        //{
+        //    fill_combobox();
+        //}
 
         public void update_data_constantly()
         {
@@ -880,10 +914,10 @@ namespace WFA_psychometric_chart
 
         }
 
-        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer timer1= new System.Windows.Forms.Timer();
         public void InitTimer()
         {
-            timer1 = new System.Windows.Forms.Timer();
+            //timer1 = new System.Windows.Forms.Timer();
             timer1.Tick += new EventHandler(timer1_Tick);
             timer1.Interval = 1000 * 60; // in miliseconds //2min * 30 = 60 min minute ie every 1 hour
             timer1.Start();
@@ -904,7 +938,7 @@ namespace WFA_psychometric_chart
             //this function basically calls every  50 minuest...
             if (tb_latitude.Text == "" && tb_longitude.Text == "")
             {
-                string error_string = "Please perform the follwing step first.\n 1.select a location \n 2.pull stored building data \n 3. get geo value(we need geo value)";
+                string error_string = "Please select a location first !";
                 MessageBox.Show(error_string,"error",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
             }
             else
@@ -983,10 +1017,10 @@ namespace WFA_psychometric_chart
             }
         }
 
-        private System.Windows.Forms.Timer timer2;
+        private System.Windows.Forms.Timer timer2 = new System.Windows.Forms.Timer();
         public void InitTimer2()
         {
-            timer2 = new System.Windows.Forms.Timer();
+            //timer2 = new System.Windows.Forms.Timer();
             timer2.Tick += new EventHandler(timer2_Tick);
             timer2.Interval = 1000 * 3; // in miliseconds //2min * 30 = 60 min minute ie every 1 hour
            
@@ -1037,9 +1071,18 @@ namespace WFA_psychometric_chart
         private void Form3_ClosingForm(object sender, FormClosingEventArgs e)
         {
             timer2.Dispose();
+            timer1.Dispose();
             this.Dispose();
         }
 
+        private void cb_event_on_index_change(object sender, EventArgs e)
+        {
+            //fill_combobox();
+
+            index_selected = cb1_select_data.SelectedIndex + 1; //
+            get_stored_data();
+
+        }
 
       
     }

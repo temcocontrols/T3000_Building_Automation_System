@@ -49,18 +49,18 @@ namespace WFA_psychometric_chart
             new ArrayList();
 
 
-
-        private void button1_Click(object sender, EventArgs e)
+        public void plot_new_graph()
         {
+
             /*
-             steps:
-             * 1.set x and y axis in graph
-             * 2.plot red lines
-             * 3.plot green lines
-             * 4.plot wet bult curve red line.
-             * 5.
-             * 
-             */
+ steps:
+ * 1.set x and y axis in graph
+ * 2.plot red lines
+ * 3.plot green lines
+ * 4.plot wet bult curve red line.
+ * 5.
+ * 
+ */
 
             //lets reset the chart1 value.
             //chart1 = null;
@@ -105,7 +105,7 @@ namespace WFA_psychometric_chart
             //now lets read from the text file...
             string line1;
             //String[][] point_value= new String[][];
-           // string path1 = "C:\\Users\\nischal\\Desktop\\t_pg.txt";
+            // string path1 = "C:\\Users\\nischal\\Desktop\\t_pg.txt";
             /*
             var pat_test = System.Environment.
                              GetFolderPath(
@@ -120,12 +120,12 @@ namespace WFA_psychometric_chart
             string file = dir + @"\t_pg.txt";
             string path1 = file;
 
-           // string path;
-           // path = System.IO.Path.GetDirectoryName(
-           //    System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
-            
-           // MessageBox.Show(path);
-           //string  path1 = path + "\\t_pg.txt";
+            // string path;
+            // path = System.IO.Path.GetDirectoryName(
+            //    System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
+
+            // MessageBox.Show(path);
+            //string  path1 = path + "\\t_pg.txt";
             //MessageBox.Show(path1);
             using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
             {
@@ -134,35 +134,35 @@ namespace WFA_psychometric_chart
                 while ((line1 = st.ReadLine()) != null)
                 {
                     //line.Skip(1);
-                    
-                    
+
+
                     string[] value = line1.Split(',');
                     try
                     {
-                    double temp1 = Double.Parse(value[0]);
+                        double temp1 = Double.Parse(value[0]);
                         double temp2 = Double.Parse(value[1].Trim());
-                         //now lets add to temperature and pg array..
-                         t.Add(temp1);
-                         pg.Add(temp2);
+                        //now lets add to temperature and pg array..
+                        t.Add(temp1);
+                        pg.Add(temp2);
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show(ex.ToString());
                     }
-                   
+
 
                 }//close of while
-               
+
             }//close of using
 
             //now lets test the value..
-            string s="";
+            string s = "";
             for (int i = 0; i < t.Count; i++)
             {
-                s += t[i].ToString() + ","+pg[i].ToString()+"\n" ;
+                s += t[i].ToString() + "," + pg[i].ToString() + "\n";
             }
 
-           // MessageBox.Show(""+s);
+            // MessageBox.Show(""+s);
 
             //now we have the data lets do some ploting...
             double patm = 101.235;//constant..we will make it take as input later...
@@ -174,26 +174,26 @@ namespace WFA_psychometric_chart
             //here pg_value contains pg which is in arraylist ..            
             //double pg_value=0; 
 
-            double wg_calc=0; // = 622 * a_value / (patm - pg_value);
+            double wg_calc = 0; // = 622 * a_value / (patm - pg_value);
             //now calculation begins..
-            double x=0;
+            double x = 0;
             for (int i = 0; i < t.Count; i++)
             {
-               double pg_value = Double.Parse(pg[i].ToString());
+                double pg_value = Double.Parse(pg[i].ToString());
                 wg_calc = 622 * pg_value / (patm - pg_value);
-                x = double.Parse( t[i].ToString());
+                x = double.Parse(t[i].ToString());
                 double y = wg_calc;
                 chart1.Series["Series1"].Points.AddXY(x, y);
-                
-              
+
+
             }//close of for
 
-          /*  TextAnnotation text_wet_bulb_temp = new TextAnnotation();
-            text_wet_bulb_temp.Name = " Wet bulb temp";
-            text_wet_bulb_temp.X = 2;
-            text_wet_bulb_temp.Y = 1;
-            chart1.Annotations.Add(text_wet_bulb_temp);
-            */
+            /*  TextAnnotation text_wet_bulb_temp = new TextAnnotation();
+              text_wet_bulb_temp.Name = " Wet bulb temp";
+              text_wet_bulb_temp.X = 2;
+              text_wet_bulb_temp.Y = 1;
+              chart1.Annotations.Add(text_wet_bulb_temp);
+              */
 
             chart1.Series["Series1"].Points[16].Label = "Wet bulb temp";
             chart1.Series["Series1"].Points[16].LabelBackColor = Color.Red;
@@ -208,28 +208,28 @@ namespace WFA_psychometric_chart
             int ival = 2;
             for (phi = 0.1; phi <= 0.4; phi += 0.1)
             {
-            //   chart1.Series["Series1"].Color = Color.Blue;
-            string s1 = "";
-            
-            for (int i = 0; i < t.Count; i++)
+                //   chart1.Series["Series1"].Color = Color.Blue;
+                string s1 = "";
+
+                for (int i = 0; i < t.Count; i++)
                 {
-                    
+
                     double pg_value = Double.Parse(pg[i].ToString());
-                    wg_calc = (622 *phi* pg_value / (patm - phi*pg_value));
+                    wg_calc = (622 * phi * pg_value / (patm - phi * pg_value));
                     //double x = Double.Parse(t[i].ToString());
                     double y = wg_calc;
                     x2 = double.Parse(t[i].ToString());
-                    chart1.Series["Series"+ival].Points.AddXY(x2, y);
-                    s1 += x2+","+ y +";";
+                    chart1.Series["Series" + ival].Points.AddXY(x2, y);
+                    s1 += x2 + "," + y + ";";
 
-                    
+
                     //index++;
                 }//close of for
                 //MessageBox.Show(s1);
                 ival++;
                 //this is to print 10%,20,30,40% 
-                int c=int.Parse((phi*10+1).ToString());
-                chart1.Series["Series"+c].Points[45].Label = phi * 100 + "%";
+                int c = int.Parse((phi * 10 + 1).ToString());
+                chart1.Series["Series" + c].Points[45].Label = phi * 100 + "%";
                 //chart1.Series["Series"+c].Points[46].LabelBackColor = Color.Blue;
 
             }
@@ -290,7 +290,7 @@ namespace WFA_psychometric_chart
             //MessageBox.Show("the path = " + pat_test);
             string path2 = System.IO.Path.Combine(pat_test, "t_pg1.txt");
             */
-            
+
             string file1 = dir + @"\t_pg1.txt";
             string path2 = file1;
             using (System.IO.StreamReader st = new System.IO.StreamReader(path2))
@@ -325,7 +325,7 @@ namespace WFA_psychometric_chart
             ArrayList wg1 = new ArrayList();//saturation specific humidity...
             for (int i = 0; i < pg1.Count; i++)
             {
-                double tempval =double.Parse(pg1[i].ToString());
+                double tempval = double.Parse(pg1[i].ToString());
                 double tempwg1 = 622 * tempval / (patm - tempval);
                 wg1.Add(tempwg1);
             }
@@ -337,7 +337,7 @@ namespace WFA_psychometric_chart
             {
                 double temppg1 = double.Parse(pg1[i].ToString());
                 double tempt1 = double.Parse(t1[i].ToString());
-                double temp = rair * (tempt1+273) / (patm - temppg1);
+                double temp = rair * (tempt1 + 273) / (patm - temppg1);
                 vol.Add(temp);
             }
 
@@ -348,21 +348,21 @@ namespace WFA_psychometric_chart
             {
                 double tempvol = double.Parse(vol[i].ToString());
 
-                double temp = patm * tempvol/ rair - 273;
+                double temp = patm * tempvol / rair - 273;
                 tv0.Add(temp);
             }
 
             //now lets plot..
-           double xtemp = 0.79;
+            double xtemp = 0.79;
             for (int i = 0; i < 7; i++)
             {
                 //chart1.Series.Add("Line"+i);//this series is added statically from chart control so no need to add dynamically 
                 chart1.Series["Line" + i].Color = Color.Green;
-                chart1.Series["Line"+i].Points.Add(new DataPoint(double.Parse(t1[i].ToString()), double.Parse(wg1[i].ToString())));
+                chart1.Series["Line" + i].Points.Add(new DataPoint(double.Parse(t1[i].ToString()), double.Parse(wg1[i].ToString())));
                 chart1.Series["Line" + i].Points.Add(new DataPoint(double.Parse(tv0[i].ToString()), 0));
-                chart1.Series["Line"+i].ChartType = SeriesChartType.Line;
+                chart1.Series["Line" + i].ChartType = SeriesChartType.Line;
                 chart1.Series["Line" + i].Points[1].Label = xtemp + "";
-                xtemp =xtemp+ 0.02;
+                xtemp = xtemp + 0.02;
 
             }
 
@@ -378,10 +378,10 @@ namespace WFA_psychometric_chart
                 double tempval1 = double.Parse(t1[i].ToString());
                 double tempval2 = double.Parse(wg1[i].ToString());
 
-                double temp = tempval1 + 2.5*tempval2;
+                double temp = tempval1 + 2.5 * tempval2;
                 h.Add(temp);
             }
-            
+
             //temperature at zero humidity..
             ArrayList t0 = new ArrayList();
             t0 = h;
@@ -403,27 +403,28 @@ namespace WFA_psychometric_chart
             //toward next part...
             // enthalpy axis and enthalpy lines (black)
             //testing values of h ,t1,t0
-            string hv =" ";
-            string t0v ="";
-            string t1v="";
-            for(int i=0;i<h.Count;i++){
+            string hv = " ";
+            string t0v = "";
+            string t1v = "";
+            for (int i = 0; i < h.Count; i++)
+            {
                 hv += " " + h[i] + "; ";
-                t0v += " "+ t0[i] +";";
+                t0v += " " + t0[i] + ";";
                 t1v += " " + t1[i] + ";";
 
             }
             //MessageBox.Show("h=  " + hv + " \n t0 =" + t0v + " \n t1 = " + t1v);
 
             int t_plot1 = 10;
-            for (int hval=10 ; hval <= 110; hval += 10)
+            for (int hval = 10; hval <= 110; hval += 10)
             {
                 //% temperature on enthalpy axis
-                double t1_temp = ( hval - 12.5) / 3.5;//this is t1;
+                double t1_temp = (hval - 12.5) / 3.5;//this is t1;
                 double w1_temp = t1_temp + 5;//% specific humidity on enthalpy axis
                 int t0val = hval;//t0
                 //chart1.Series.Add("Line_b" + hval);//this series is added statically from chart control so no need to add dynamically 
                 chart1.Series["Line_b" + hval].Color = Color.Black;
-                chart1.Series["Line_b" + hval].Points.Add(new DataPoint(t0val,0));
+                chart1.Series["Line_b" + hval].Points.Add(new DataPoint(t0val, 0));
                 chart1.Series["Line_b" + hval].Points.Add(new DataPoint(t1_temp, w1_temp));
                 chart1.Series["Line_b" + hval].ChartType = SeriesChartType.Line;
                 chart1.Series["Line_b" + hval].Points[1].Label = t_plot1 + "";
@@ -449,9 +450,20 @@ namespace WFA_psychometric_chart
 
         }
 
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            plot_new_graph();
+
+        }
+
         
         private void Form1_Load(object sender, EventArgs e)
         {
+             //lets plot the graph as soon as the form loads.
+            plot_new_graph();
+
+            //this is other part.
             radioButton1.Checked = true;
 
             string dir = System.IO.Path.GetDirectoryName(
@@ -466,26 +478,26 @@ namespace WFA_psychometric_chart
             
         }
 
-        private void radioButton2_CheckedChanged(object sender, EventArgs e)
-        {
-            //The units will be changed here for EU unit this change
+        //private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        //{
+        //    //The units will be changed here for EU unit this change
 
-            if (radioButton2.Checked == true)
-            {
-                //MessageBox.Show("You have pressed 2");
+        //    if (radioButton2.Checked == true)
+        //    {
+        //        //MessageBox.Show("You have pressed 2");
 
-                unit_temp.Text = "Deg.F";
-                unit_humidity.Text = "%";
-               // unit_ap.Text = "";
-
-
-
-
-            }
+        //        unit_temp.Text = "Deg.F";
+        //        unit_humidity.Text = "%";
+        //       // unit_ap.Text = "";
 
 
 
-        }
+
+        //    }
+
+
+
+        //}
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
@@ -503,6 +515,16 @@ namespace WFA_psychometric_chart
 
             try
             {
+
+
+
+
+                //lets grab from the textbox input.
+                temperature = Double.Parse(textBox1.Text.Trim());
+                humidity = Double.Parse(textBox2.Text.Trim());
+
+
+
                 Patm = 1013;
                 A = 6.116441;
                 m = 7.591386;
@@ -515,11 +537,6 @@ namespace WFA_psychometric_chart
                 textBox6.Text = m.ToString();
                 textBox7.Text = Tn.ToString();
                 textBox9.Text = B.ToString();
-
-
-                //lets grab from the textbox input.
-                temperature = Double.Parse(textBox1.Text.Trim());
-                humidity = Double.Parse(textBox2.Text.Trim());
 
                 //calculating 1.dew point..
                 TDewpoint = 243.04 * (Math.Log(humidity / 100) + ((17.625 * temperature) / (243.04 + temperature))) / (17.625 - Math.Log(humidity / 100) - ((17.625 * temperature) / (243.04 + temperature)));
@@ -540,6 +557,16 @@ namespace WFA_psychometric_chart
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                textBox1.Text = "";
+                textBox2.Text = "";
+                //lets set the values..
+                textBox3.Text = "";
+                textBox5.Text = "";
+                textBox6.Text = "";
+                textBox7.Text = "";
+                textBox9.Text = "";
+
+
             }
 
             //for the EU unit just check if EU unit was selected of not if selected then convert
@@ -558,11 +585,29 @@ namespace WFA_psychometric_chart
 
         /*This is the function that plots the graph 
          */
+        public void plot_on_graph_values(double dbt,double hr,double xval,double yval)
+        {
+            Series series1 = new Series("My Series" + index);
+            chart1.Series.Add(series1);
+
+            series1.ChartType = SeriesChartType.Point;
+            series1.Color = Color.FromArgb(0, 0, 255);//blue
+            series1.MarkerSize = 7;
+            string label = "DBT=" + dbt + ",HR=" + hr;
+            series1.Label = label;
+            //chart1.Series["SeriesDBT_HR" + index].;
+            series1.Points.AddXY(xval, yval);
+            
+            //series1.Enabled = true;
+
+        }
+
         public int plot_by_DBT_HR(double DBT, double HR)
         {
             /*           
              *We need to cal x-asis which is given by DBT 
              */
+           // MessageBox.Show("reached here dbt=" + DBT + ", hr = " + HR);
             int x_axis = (int)DBT;
 
             //here the HR is  relative humidity like 20%,30% etc os phi = 0.3 for 30%
@@ -584,9 +629,7 @@ namespace WFA_psychometric_chart
            // MessageBox.Show("the path = " + pat_test);
             string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
             */
-            string dir = System.IO.Path.GetDirectoryName(
-  System.Reflection.Assembly.GetExecutingAssembly().Location);
-
+            string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             string file = dir + @"\t_pg.txt";
             string path1 = file;
           
@@ -652,63 +695,58 @@ namespace WFA_psychometric_chart
             double y_axis = wg_calc;
 // now lets plot on graph...
             //chart1.Series.Add("SeriesDBT_HR"+index);//dont need this we have declared this is chart control
-            Series series1 = new Series("My Series"+index);
-            chart1.Series.Add(series1);
+            //MessageBox.Show("reached near chart");
+            //Series series1 = new Series("My Series"+index);
+            //chart1.Series.Add(series1);
 
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series1.Color = Color.FromArgb(0, 0, 255);//blue
-            series1.MarkerSize = 7;
-            string label = "DBT=" + DBT + ",HR=" + HR;
-            series1.Label = label;
-            //chart1.Series["SeriesDBT_HR" + index].;
-            series1.Points.AddXY(x_axis, y_axis);
-            
-            
-            //chart1.Series[series1].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            //chart1.Series[series1].Color = Color.FromArgb(0, 0, 255);//blue
-            //chart1.Series["SeriesDBT_HR"].MarkerSize=7;
-            //string s =   "DBT=" + DBT + ",HR=" + HR;
+            //series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            //series1.Color = Color.FromArgb(0, 0, 255);//blue
+            //series1.MarkerSize = 7;
+            //string label = "DBT=" + DBT + ",HR=" + HR;
+            //series1.Label = label;
             ////chart1.Series["SeriesDBT_HR" + index].;
-            //chart1.Series["SeriesDBT_HR"].Points.AddXY(x_axis, y_axis);
+            //series1.Points.AddXY(x_axis, y_axis);
+
+            plot_on_graph_values(DBT, HR, x_axis, y_axis);
+           
+            //MessageBox.Show("reached series print" +series1.ToString());
             
-
-
             index++;
-            if (index == 15)
-            {
-                index = 0;
-            }
+            //if (index == 400)
+            //{
+            //    index = 0;
+            //}
 
 
                 return 0;
         }
 
-        private void button3_Click(object sender, EventArgs e)
-        {
-            /*
-             This basically calls a function which takes two parameters 
-             * 1.DBT
-             * 2.Relative humidity as inputs and plots those vales in the graph 
-             * Inputs will be taken in the text file              
-             */
-            double DBT = 0.000000;
-            double RH = 0.000000;
-            try
-            {
-                 DBT = Double.Parse(DBT_input.Text.Trim());
-                 RH = Double.Parse(humidity_input.Text.Trim())/100;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-           // MessageBox.Show("DBT = " + DBT + " , HR = " + RH);
+        //private void button3_Click(object sender, EventArgs e)
+        //{
+        //    /*
+        //     This basically calls a function which takes two parameters 
+        //     * 1.DBT
+        //     * 2.Relative humidity as inputs and plots those vales in the graph 
+        //     * Inputs will be taken in the text file              
+        //     */
+        //    double DBT = 0.000000;
+        //    double RH = 0.000000;
+        //    try
+        //    {
+        //         DBT = Double.Parse(DBT_input.Text.Trim());
+        //         RH = Double.Parse(humidity_input.Text.Trim())/100;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }
+        //   // MessageBox.Show("DBT = " + DBT + " , HR = " + RH);
 
-            plot_by_DBT_HR(DBT, RH);
+        //    plot_by_DBT_HR(DBT, RH);
 
 
 
-        }
+        //}
         //this was for ploting dbt and enthalpy which we dont require now...
         public int plot_by_DBT_Enthalpy(double dbt, double enthalpy)
         {
@@ -751,27 +789,27 @@ namespace WFA_psychometric_chart
             return 0;
         }
 
-        private void button4_Click(object sender, EventArgs e)
-        {
-            //this is the plot of the DBT and enthalpy...
-            //also has function to do this.
-            double DBT = 0.000000;
-            double enthalpy = 0.000000;
-            try
-            {
-                DBT = Double.Parse(txt_DBT.Text.Trim());
-                enthalpy = Double.Parse(txt_enthalpy.Text.Trim());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+        //private void button4_Click(object sender, EventArgs e)
+        //{
+        //    //this is the plot of the DBT and enthalpy...
+        //    //also has function to do this.
+        //    double DBT = 0.000000;
+        //    double enthalpy = 0.000000;
+        //    try
+        //    {
+        //        DBT = Double.Parse(txt_DBT.Text.Trim());
+        //        enthalpy = Double.Parse(txt_enthalpy.Text.Trim());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }
 
-            //calling the function here...
-            plot_by_DBT_Enthalpy(DBT, enthalpy);
+        //    //calling the function here...
+        //    plot_by_DBT_Enthalpy(DBT, enthalpy);
 
 
-        }
+        //}
         public int plot_by_enthalpy_dew_point(double enthalpy,double dew_point)
         {
 
@@ -989,7 +1027,7 @@ namespace WFA_psychometric_chart
 
 
 
-                                        MessageBox.Show("tem = " + tem);
+                                       // MessageBox.Show("tem = " + tem);
                                         double kelvin = double.Parse(tem);
                                         double degree = Math.Round(kelvin - 273.15);
                                         temp_AL.Add((int)degree);
@@ -999,7 +1037,7 @@ namespace WFA_psychometric_chart
                                         string tem2 = result["last"]["main"]["humidity"].ToString();
                                         //lets divide the humidity by 100 to convert it to decimal value...
                                         double hum = double.Parse(tem2);
-                                        MessageBox.Show("hum = " + hum);
+                                       // MessageBox.Show("hum = " + hum);
                                         hum_AL.Add(hum);
 
 
@@ -1080,7 +1118,8 @@ namespace WFA_psychometric_chart
                                 plot_by_DBT_HR(DBT, RH);
                             }
 
-                            MessageBox.Show("val = " + s);
+                           // MessageBox.Show("val = " + s);
+                            btn_insert_values.Enabled = true;
                         }
                         catch (Exception ex)
                         {
@@ -1285,7 +1324,7 @@ namespace WFA_psychometric_chart
 
             }//close of if
 
-
+            btn_insert_values.Enabled = false;
 
         }
 
@@ -1323,15 +1362,15 @@ namespace WFA_psychometric_chart
                         var xdoc = XDocument.Load(response.GetResponseStream());
 
                         var result = xdoc.Element("GeocodeResponse").Element("result");
-                        MessageBox.Show(result.ToString());
+                      //  MessageBox.Show(result.ToString());
                         var locationElement = result.Element("geometry").Element("location");
                         var lat = locationElement.Element("lat");
                         var lng = locationElement.Element("lng");
                         double lat2 = Double.Parse(lat.Value);
                         double lng2 = Double.Parse(lng.Value);
 
-                        MessageBox.Show(lat.ToString());
-                        MessageBox.Show(lat2.ToString());
+                       // MessageBox.Show(lat.ToString());
+                       // MessageBox.Show(lat2.ToString());
                        // double lat_val = double.Parse(lat.ToString());
                        // double long_val = double.Parse(lng.ToString());
                   
@@ -1344,7 +1383,12 @@ namespace WFA_psychometric_chart
              //tb_lat.Text = lat.ToString();
              //tb_long.Text = lng.ToString();
 
-
+                        btn_plot_values.Enabled = true;
+                        btn_update_constantly.Enabled = true;
+                }
+                else
+                {
+                    MessageBox.Show("Please enter a valid location (country,city)");
                 }
             }
             catch (Exception ex)
@@ -1498,9 +1542,9 @@ namespace WFA_psychometric_chart
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            MessageBox.Show("pulling...");
+           // MessageBox.Show("pulling...");
             UpdateDataConstantly();
-            MessageBox.Show("pulled...");
+           // MessageBox.Show("pulled...");
         }
 
         private void button9_Click(object sender, EventArgs e)
@@ -1509,7 +1553,7 @@ namespace WFA_psychometric_chart
             //it calls the function UpdateDataConstantly()           
             //this function basically calls every  50 minuest...
             InitTimer();
-            MessageBox.Show("success");
+            //MessageBox.Show("success");
 
         }
 
@@ -1521,22 +1565,30 @@ namespace WFA_psychometric_chart
 
         }
 
-        private void button4_Click_1(object sender, EventArgs e)
-        {
-            double DBT = 0.000000;
-            double enthalpy = 0.000000;
-            try
-            {
-                DBT = Double.Parse(txt_DBT.Text.Trim());
-                enthalpy = Double.Parse(txt_enthalpy.Text.Trim());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+        //private void button4_Click_1(object sender, EventArgs e)
+        //{
+        //    double DBT = 0.000000;
+        //    double enthalpy = 0.000000;
+        //    try
+        //    {
+        //        DBT = Double.Parse(txt_DBT.Text.Trim());
+        //        enthalpy = Double.Parse(txt_enthalpy.Text.Trim());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }
 
-            //calling the function here...
-            plot_by_DBT_Enthalpy(DBT, enthalpy);
+        //    //calling the function here...
+        //    plot_by_DBT_Enthalpy(DBT, enthalpy);
+        //}
+
+        private void humiditySensorCalibrationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application_Form4 ap_f4 = new Application_Form4(this);
+            ap_f4.Show();
+
+
         }
 
 
