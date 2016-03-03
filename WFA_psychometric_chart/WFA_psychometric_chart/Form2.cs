@@ -60,12 +60,14 @@ namespace WFA_psychometric_chart
                     //tb_lat.Text = lat.ToString();
                     //tb_long.Text = lng.ToString();
 
-
+                    btn_set_value.Enabled = true;
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                btn_set_value.Enabled = false;
+                tb_city.Text = "";
             }
 
 
