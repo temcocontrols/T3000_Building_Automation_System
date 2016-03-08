@@ -61,11 +61,16 @@
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.tb_station_distance = new System.Windows.Forms.TextBox();
+            this.label37 = new System.Windows.Forms.Label();
+            this.label36 = new System.Windows.Forms.Label();
+            this.cb_station_names = new System.Windows.Forms.ComboBox();
             this.cb_enable_disable = new System.Windows.Forms.CheckBox();
             this.label26 = new System.Windows.Forms.Label();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.label31 = new System.Windows.Forms.Label();
             this.label35 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.tb_current_offset_percent = new System.Windows.Forms.TextBox();
             this.btn_set_value = new System.Windows.Forms.Button();
             this.tb_current_offset = new System.Windows.Forms.TextBox();
             this.label30 = new System.Windows.Forms.Label();
@@ -76,6 +81,8 @@
             this.cb_hum_self_calib = new System.Windows.Forms.CheckBox();
             this.label27 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.tb_station_name = new System.Windows.Forms.TextBox();
+            this.label38 = new System.Windows.Forms.Label();
             this.label33 = new System.Windows.Forms.Label();
             this.tb_cw_direction = new System.Windows.Forms.TextBox();
             this.label25 = new System.Windows.Forms.Label();
@@ -101,7 +108,7 @@
             this.label16 = new System.Windows.Forms.Label();
             this.tb_location = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.label31 = new System.Windows.Forms.Label();
+            this.label39 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -328,9 +335,9 @@
             // 
             this.button4.Location = new System.Drawing.Point(482, 58);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(94, 23);
+            this.button4.Size = new System.Drawing.Size(113, 23);
             this.button4.TabIndex = 22;
-            this.button4.Text = "Get Value";
+            this.button4.Text = "Get data from sensor";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
@@ -418,6 +425,10 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.tb_station_distance);
+            this.groupBox3.Controls.Add(this.label37);
+            this.groupBox3.Controls.Add(this.label36);
+            this.groupBox3.Controls.Add(this.cb_station_names);
             this.groupBox3.Controls.Add(this.cb_enable_disable);
             this.groupBox3.Controls.Add(this.label26);
             this.groupBox3.Controls.Add(this.groupBox6);
@@ -430,9 +441,48 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Remote Weather Station Services";
             // 
+            // tb_station_distance
+            // 
+            this.tb_station_distance.Enabled = false;
+            this.tb_station_distance.Location = new System.Drawing.Point(619, 24);
+            this.tb_station_distance.Name = "tb_station_distance";
+            this.tb_station_distance.ReadOnly = true;
+            this.tb_station_distance.Size = new System.Drawing.Size(78, 20);
+            this.tb_station_distance.TabIndex = 24;
+            // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Location = new System.Drawing.Point(524, 29);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(89, 13);
+            this.label37.TabIndex = 9;
+            this.label37.Text = "Station distance :";
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(307, 29);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(75, 13);
+            this.label36.TabIndex = 8;
+            this.label36.Text = "Station name :";
+            // 
+            // cb_station_names
+            // 
+            this.cb_station_names.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cb_station_names.Enabled = false;
+            this.cb_station_names.FormattingEnabled = true;
+            this.cb_station_names.Location = new System.Drawing.Point(394, 24);
+            this.cb_station_names.Name = "cb_station_names";
+            this.cb_station_names.Size = new System.Drawing.Size(121, 21);
+            this.cb_station_names.TabIndex = 7;
+            this.cb_station_names.SelectedIndexChanged += new System.EventHandler(this.on_select_index_change_event);
+            // 
             // cb_enable_disable
             // 
             this.cb_enable_disable.AutoSize = true;
+            this.cb_enable_disable.Enabled = false;
             this.cb_enable_disable.Location = new System.Drawing.Point(127, 25);
             this.cb_enable_disable.Name = "cb_enable_disable";
             this.cb_enable_disable.Size = new System.Drawing.Size(137, 17);
@@ -452,9 +502,10 @@
             // 
             // groupBox6
             // 
+            this.groupBox6.Controls.Add(this.label39);
             this.groupBox6.Controls.Add(this.label31);
             this.groupBox6.Controls.Add(this.label35);
-            this.groupBox6.Controls.Add(this.textBox1);
+            this.groupBox6.Controls.Add(this.tb_current_offset_percent);
             this.groupBox6.Controls.Add(this.btn_set_value);
             this.groupBox6.Controls.Add(this.tb_current_offset);
             this.groupBox6.Controls.Add(this.label30);
@@ -471,6 +522,15 @@
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Humidity Self Calibration";
             // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(27, 87);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(86, 13);
+            this.label31.TabIndex = 34;
+            this.label31.Text = "current offset % :";
+            // 
             // label35
             // 
             this.label35.AutoSize = true;
@@ -480,14 +540,14 @@
             this.label35.TabIndex = 33;
             this.label35.Text = "%";
             // 
-            // textBox1
+            // tb_current_offset_percent
             // 
-            this.textBox1.Enabled = false;
-            this.textBox1.Location = new System.Drawing.Point(280, 80);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(78, 20);
-            this.textBox1.TabIndex = 32;
+            this.tb_current_offset_percent.Enabled = false;
+            this.tb_current_offset_percent.Location = new System.Drawing.Point(280, 80);
+            this.tb_current_offset_percent.Name = "tb_current_offset_percent";
+            this.tb_current_offset_percent.ReadOnly = true;
+            this.tb_current_offset_percent.Size = new System.Drawing.Size(78, 20);
+            this.tb_current_offset_percent.TabIndex = 32;
             // 
             // btn_set_value
             // 
@@ -496,7 +556,7 @@
             this.btn_set_value.Name = "btn_set_value";
             this.btn_set_value.Size = new System.Drawing.Size(102, 23);
             this.btn_set_value.TabIndex = 31;
-            this.btn_set_value.Text = "Set Value";
+            this.btn_set_value.Text = "Calibrate";
             this.btn_set_value.UseVisualStyleBackColor = true;
             this.btn_set_value.Click += new System.EventHandler(this.btn_set_value_Click);
             // 
@@ -514,9 +574,9 @@
             this.label30.AutoSize = true;
             this.label30.Location = new System.Drawing.Point(25, 113);
             this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(131, 13);
+            this.label30.Size = new System.Drawing.Size(93, 13);
             this.label30.TabIndex = 28;
-            this.label30.Text = "Total current offset value :";
+            this.label30.Text = "New offset value :";
             // 
             // label29
             // 
@@ -578,6 +638,8 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.tb_station_name);
+            this.groupBox5.Controls.Add(this.label38);
             this.groupBox5.Controls.Add(this.label33);
             this.groupBox5.Controls.Add(this.tb_cw_direction);
             this.groupBox5.Controls.Add(this.label25);
@@ -598,6 +660,24 @@
             this.groupBox5.TabIndex = 1;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Current Weather";
+            // 
+            // tb_station_name
+            // 
+            this.tb_station_name.Enabled = false;
+            this.tb_station_name.Location = new System.Drawing.Point(487, 45);
+            this.tb_station_name.Name = "tb_station_name";
+            this.tb_station_name.ReadOnly = true;
+            this.tb_station_name.Size = new System.Drawing.Size(78, 20);
+            this.tb_station_name.TabIndex = 33;
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Location = new System.Drawing.Point(406, 48);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(75, 13);
+            this.label38.TabIndex = 32;
+            this.label38.Text = "Station name :";
             // 
             // label33
             // 
@@ -747,7 +827,7 @@
             // btn_update_constantly
             // 
             this.btn_update_constantly.Enabled = false;
-            this.btn_update_constantly.Location = new System.Drawing.Point(478, 16);
+            this.btn_update_constantly.Location = new System.Drawing.Point(472, 16);
             this.btn_update_constantly.Name = "btn_update_constantly";
             this.btn_update_constantly.Size = new System.Drawing.Size(102, 23);
             this.btn_update_constantly.TabIndex = 26;
@@ -767,7 +847,7 @@
             // btn_update_now
             // 
             this.btn_update_now.Enabled = false;
-            this.btn_update_now.Location = new System.Drawing.Point(370, 16);
+            this.btn_update_now.Location = new System.Drawing.Point(364, 16);
             this.btn_update_now.Name = "btn_update_now";
             this.btn_update_now.Size = new System.Drawing.Size(102, 23);
             this.btn_update_now.TabIndex = 24;
@@ -840,14 +920,14 @@
             this.label15.TabIndex = 4;
             this.label15.Text = "Location :";
             // 
-            // label31
+            // label39
             // 
-            this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(27, 87);
-            this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(86, 13);
-            this.label31.TabIndex = 34;
-            this.label31.Text = "current offset % :";
+            this.label39.AutoSize = true;
+            this.label39.Location = new System.Drawing.Point(388, 57);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(81, 13);
+            this.label39.TabIndex = 35;
+            this.label39.Text = "Between (0-2%)";
             // 
             // Form3
             // 
@@ -951,7 +1031,14 @@
         private System.Windows.Forms.Label label34;
         private System.Windows.Forms.Button btn_update_constantly;
         private System.Windows.Forms.Label label35;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox tb_current_offset_percent;
         private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.TextBox tb_station_distance;
+        private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.ComboBox cb_station_names;
+        private System.Windows.Forms.TextBox tb_station_name;
+        private System.Windows.Forms.Label label38;
+        private System.Windows.Forms.Label label39;
     }
 }
