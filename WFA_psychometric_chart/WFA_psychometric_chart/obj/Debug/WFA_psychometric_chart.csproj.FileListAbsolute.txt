@@ -54,6 +54,6 @@ C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug
 C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csproj.GenerateResource.Cache
 C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.resources
 C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.resources
-C:\Users\RajuPC\Dropbox\Psychometric Chart\updated 3rd march\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.exe.config
-C:\Users\RajuPC\Dropbox\Psychometric Chart\updated 3rd march\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.exe
-C:\Users\RajuPC\Dropbox\Psychometric Chart\updated 3rd march\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.pdb
+C:\Users\RajuPC\Dropbox\Psychometric Chart\new code 6th march\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.exe.config
+C:\Users\RajuPC\Dropbox\Psychometric Chart\new code 6th march\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.exe
+C:\Users\RajuPC\Dropbox\Psychometric Chart\new code 6th march\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.pdb
