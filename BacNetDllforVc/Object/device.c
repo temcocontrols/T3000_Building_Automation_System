@@ -69,11 +69,11 @@
 #endif /* defined(BACFILE) */
 
 
-#if defined(__BORLANDC__)
+//#if defined(__BORLANDC__)
 /* seems to not be defined in time.h as specified by The Open Group */
 /* difference from UTC and local standard time  */
 long int timezone;
-#endif
+//#endif
 
 /* local forward (semi-private) and external prototypes */
 int Device_Read_Property_Local(

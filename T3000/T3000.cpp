@@ -18,7 +18,7 @@
 #include "afxinet.h"
 #include "T3000DefaultView.h"
 #include "bado/BADO.h"
-const int g_versionNO=20160225;
+const int g_versionNO= 20160219;
 //CString const CurrentT3000Version=_T("2014.12.24");
 #ifdef _DEBUG
 #define new DEBUG_NEW

@@ -6,6 +6,7 @@
 *.pdb
 *.sdf
 *.opensdf
+*.opendb
 **/ipch/
 **/Release/
 **/*.bin
