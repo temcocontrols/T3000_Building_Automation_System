@@ -63,7 +63,7 @@ description2 Annual_Routines::read_addr(unsigned char addr2)
 	unsigned short temp_buffer[AR_DESCRIPTION_SIZE];
 	memset(&temp_buffer[0],0,sizeof(temp_buffer));
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		Read_Multi(254,temp_buffer,5228+addr2*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
+		Read_Multi(g_tstat_id,temp_buffer,ANNUAL_ROUTINE_DESCRIPTION+addr2*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
 	else
 		Read_Multi(g_tstat_id,temp_buffer,MODBUS_AR_DESCRIP_FIRST+addr2*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
 	int i=0;
@@ -72,7 +72,7 @@ description2 Annual_Routines::read_addr(unsigned char addr2)
 	p=(char *)&temp_description;///////////////*****pointer   attention
 	for(i=0;i<AR_DESCRIPTION_SIZE;i++)
 	{
-		(*p)=temp_buffer[i];
+		(*p)=(char)temp_buffer[i];
 		p++;
 	}
 	return temp_description;
@@ -134,7 +134,7 @@ void Annual_Routines::clear_addr(unsigned char addr2)
 		*(p++)=0xFF;
 	p=(unsigned char *) &temp_descri;
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		Write_Multi(254,p,5228+(addr2-1)*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
+		Write_Multi(g_tstat_id,p,ANNUAL_ROUTINE_DESCRIPTION+(addr2-1)*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
 	else
 		Write_Multi(g_tstat_id,p,MODBUS_AR_DESCRIP_FIRST+(addr2-1)*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
 }
@@ -173,7 +173,7 @@ void Annual_Routines::write_addr(unsigned char addr2)
 	unsigned char *p;
 	p=(unsigned char *) &temp_descri;
 	if(m_strtype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		Write_Multi(254,p,5228+(addr2-1)*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
+		Write_Multi(g_tstat_id,p,ANNUAL_ROUTINE_DESCRIPTION+(addr2-1)*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
 	else
 		Write_Multi(g_tstat_id,p,MODBUS_AR_DESCRIP_FIRST+(addr2-1)*AR_DESCRIPTION_SIZE,AR_DESCRIPTION_SIZE);
 	NET_WORK_SLEEP_BETWEEN_WRITE_READ

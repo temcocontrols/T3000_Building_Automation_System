@@ -142,19 +142,24 @@ void CUserAcessSetDlg::InserProductToUserSetDB()
 		m_pRsTemp->MoveNext();
 	}
 
-	m_pCon.CreateInstance("ADODB.Connection");
+	/*m_pCon.CreateInstance("ADODB.Connection");
 	m_pRs.CreateInstance("ADODB.Recordset");
-	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);*/
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
 	VERYPRODCT veryProduct;
 	//strSql=_T("select * from ALL_NODE where ");///MainBuilding_Name
 	strSql.Format(_T("select * from ALL_NODE where MainBuilding_Name='%s' and Building_Name='%s'"),m_strMainBuilding,m_strSubNetName);
 
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
+//	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
+	 bado.m_pRecordset=bado.OpenRecordset(strSql);
 	m_VeryProdctLst.clear();
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 	{
 		//veryProduct.strMainBuildingName=m_pRs->GetCollect("MainBuilding_Name");//
-		temp_variant=m_pRs->GetCollect("MainBuilding_Name");//
+		temp_variant=bado.m_pRecordset->GetCollect("MainBuilding_Name");//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
@@ -162,7 +167,7 @@ void CUserAcessSetDlg::InserProductToUserSetDB()
 		veryProduct.strMainBuildingName=strTemp;
 		
 		//veryProduct.strBuildingName=m_pRs->GetCollect("Building_Name");//
-		temp_variant=m_pRs->GetCollect("Building_Name");//
+		temp_variant=bado.m_pRecordset->GetCollect("Building_Name");//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
@@ -170,7 +175,7 @@ void CUserAcessSetDlg::InserProductToUserSetDB()
 		veryProduct.strBuildingName=strTemp;
 
 	//	veryProduct.nSerialNumber=m_pRs->GetCollect("Serial_ID");
-		temp_variant=m_pRs->GetCollect("Serial_ID");//
+		temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
@@ -178,7 +183,7 @@ void CUserAcessSetDlg::InserProductToUserSetDB()
 		veryProduct.nSerialNumber=_wtol(strTemp);
 
 		//veryProduct.ProductID=m_pRs->GetCollect("Product_ID");
-		temp_variant=m_pRs->GetCollect("Product_ID");//
+		temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
@@ -186,7 +191,7 @@ void CUserAcessSetDlg::InserProductToUserSetDB()
 		veryProduct.ProductID=_wtoi(strTemp);
 
 		//veryProduct.product_class_id=m_pRs->GetCollect("Product_class_ID");
-		temp_variant=m_pRs->GetCollect("Product_class_ID");//
+		temp_variant=bado.m_pRecordset->GetCollect("Product_class_ID");//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
@@ -194,7 +199,7 @@ void CUserAcessSetDlg::InserProductToUserSetDB()
 		veryProduct.product_class_id=_wtoi(strTemp);
 
 		//veryProduct.strFloorName=m_pRs->GetCollect("Floor_name");
-		temp_variant=m_pRs->GetCollect("Floor_name");//
+		temp_variant=bado.m_pRecordset->GetCollect("Floor_name");//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
@@ -202,14 +207,14 @@ void CUserAcessSetDlg::InserProductToUserSetDB()
 		veryProduct.strFloorName=strTemp;
 
 	//	veryProduct.strRoomName=m_pRs->GetCollect("Room_name");
-		temp_variant=m_pRs->GetCollect("Room_name");//
+		temp_variant=bado.m_pRecordset->GetCollect("Room_name");//
 		if(temp_variant.vt!=VT_NULL)
 			strTemp=temp_variant;
 		else
 			strTemp=_T("");
 		veryProduct.strRoomName=strTemp;
 		m_VeryProdctLst.push_back(veryProduct);
-		m_pRs->MoveNext();
+		bado.m_pRecordset->MoveNext();
 	}
 	int nVerySerialNum;
 	int nUserlevelSerial;
@@ -271,14 +276,14 @@ void CUserAcessSetDlg::InserProductToUserSetDB()
 		
 	}
 	if(m_pRs->State) 
-		m_pRs->Close(); 
+	m_pRs->Close(); 
 	if(m_pCon->State)
-		m_pCon->Close(); 
+	m_pCon->Close(); 
 
 	if(m_pRsTemp->State) 
-		m_pRsTemp->Close(); 
+	m_pRsTemp->Close(); 
 	if(m_pConTmp->State)
-		m_pConTmp->Close(); 
+	m_pConTmp->Close(); 
 
 }
 void CUserAcessSetDlg::OnCbnSelchangeCombo1()

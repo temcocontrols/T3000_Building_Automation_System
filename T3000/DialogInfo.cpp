@@ -30,4 +30,15 @@ BEGIN_MESSAGE_MAP(CDialogInfo, CDialog)
 END_MESSAGE_MAP()
 
 
-// CDialogInfo message handlers
+BOOL CDialogInfo::PreTranslateMessage(MSG* pMsg)
+{
+    // TODO: Add your specialized code here and/or call the base class
+    if (IsWindowVisible())
+    {
+        if (pMsg->message == WM_LBUTTONDOWN||pMsg->message == WM_RBUTTONDOWN)
+        {
+            ShowWindow(SW_HIDE);
+        }
+    } 
+    return CDialog::PreTranslateMessage(pMsg);
+}

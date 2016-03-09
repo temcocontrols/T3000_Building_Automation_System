@@ -4,6 +4,7 @@
 // but are changed infrequently
 
 #pragma once
+#define _SECURE_SCL 0
 
 #ifndef _SECURE_ATL
 #define _SECURE_ATL 1
@@ -16,6 +17,12 @@
 #define _BIND_TO_CURRENT_VCLIBS_VERSION 1
 
 
+#define CUSTOM_TABLE_FLOAT_VERSION 50.1
+#define SETPOINT_SPECIAL_VERSION	50
+#define  WM_REFRESH_BAC_INPUT_LIST WM_USER + 201
+#define  WM_REFRESH_BAC_PROGRAM_LIST WM_USER + 203
+
+#define  WM_LIST_ITEM_CHANGED WM_USER + 202
 #include "targetver.h"
 
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
@@ -29,7 +36,13 @@
 
 #include <afxdisp.h>        // MFC Automation classes
 
-
+#include <afxwin.h>     // MFC core and standard components
+#include <afxext.h>     // MFC extensions
+#include <afxcmn.h>			// MFC support for Windows Common Controls
+#include <afxinet.h>    // MFC Internet support
+#include <afxmt.h>      // MFC multithreading support
+#include <bitset>
+//#define  test_ptp
 
 #ifndef _AFX_NO_OLE_SUPPORT
 #include <afxdtctl.h>           // MFC support for Internet Explorer 4 Common Controls
@@ -57,57 +70,139 @@ using namespace Gdiplus;
 #pragma  comment(lib,"HtmlHelp.lib")
 #pragma  comment(lib,"Iphlpapi.lib")
 
+ 
+#include "HtmlHelp.h"
+
+#include "T3000_Help_Map.h"
+
+//#pragma  comment(lib,"ISP.lib")
+//#pragma  comment(lib,"RegisterMonitor.lib")
 #import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 //**********************************link to dll*********************
 #define INPUT extern "C" __declspec(dllimport)
-
 #pragma comment(lib, "WS2_32")
 #pragma comment(lib,"ModbusDllforVc")
 #pragma comment(lib,"FlexSlideBar")
 //#pragma comment(lib,"ISP")
- 
+#pragma comment(lib,"BACnet_Stack_Library" )
 //INPUT void  show_ISPDlg();
-INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
-INPUT int Read_One(unsigned char device_var,unsigned short address);
-INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
-INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+//INPUT void  show_RegisterMonitorDlg(); 
+INPUT int write_multi_Short(unsigned char device_var,unsigned short *to_write,unsigned short start_address,int length);
 //INPUT bool open_com(unsigned char m_com);
+
+
+INPUT int Write_One_tap(unsigned char device_var,unsigned short address,unsigned short value);
+INPUT int Read_One_tap(unsigned char device_var,unsigned short address);
+INPUT int write_multi_tap(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
+INPUT int read_multi_tap(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+
 INPUT bool open_com(int m_com);
 INPUT void close_com();
 INPUT bool is_connect();
 INPUT int CheckTstatOnline(unsigned char devLo=1,unsigned char devHi=254);
-INPUT bool Change_BaudRate(unsigned short new_baurate);
+INPUT bool Change_BaudRate(int new_baurate);
 INPUT bool SetComm_Timeouts(LPCOMMTIMEOUTS lpCommTimeouts);
 INPUT void SetComnicationHandle(int nType,HANDLE hCommunication);
-INPUT bool Open_Socket(CString strIPAdress);
 INPUT void SetCommunicationType(int nType);
 INPUT int NetController_CheckTstatOnline(unsigned char devLo=1,unsigned char devHi=254);
 INPUT bool Open_Socket2(CString strIPAdress,short nPort);
+
+INPUT void SetLastSuccessBaudrate(int nbaudrate);
+INPUT void SetLastOpenedComport(int ncom_port);
+INPUT void SetLastCommunicationType(int n_commnication_type);
+INPUT int GetLastSuccessBaudrate();
+INPUT int GetLastOpenedComport();
+INPUT int GetLastCommunicationType();
+INPUT int GetCommunicationType();
 INPUT HANDLE GetCommunicationHandle();
 //////////////////////////////////////////////////////////////////////////
 INPUT int NetController_CheckTstatOnline_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
-INPUT int NetController_CheckTstatOnline2_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
+//INPUT int NetController_CheckTstatOnline2_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
 INPUT int CheckTstatOnline_a(unsigned char  devLo,unsigned char devHi, bool bComm_Type);
-INPUT int CheckTstatOnline2_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
+//INPUT int CheckTstatOnline2_a(unsigned char  devLo,unsigned char  devHi, bool bComm_Type);
+INPUT int MINI_CheckTstatOnline_a(unsigned char devLo,unsigned char devHi, bool bComm_Type,int NET_COM=1);
+//INPUT int MINI_CheckTstatOnline2_a(unsigned char devLo,unsigned char devHi, bool bComm_Type,int NET_COM=1);
 
 INPUT int Read_One2(unsigned char  device_var,unsigned short  address, bool bComm_Type);
 INPUT int Write_One2(unsigned char  device_var,unsigned short  address,unsigned short  value, bool bComm_Type);
 //OUTPUT int write_multi(TS_UC device_var,TS_UC *to_write,TS_US start_address,int length);
 INPUT int read_multi2(unsigned char device_var,unsigned short  *put_data_into_here,unsigned short  start_address,int length, bool bComm_Type);
-INPUT void closefile();//scan
-INPUT void writefile( CString strip,CString strport);//scan
-INPUT void Createfile();//scan
+
+INPUT void close_T3000_log_file();//scan
+INPUT void write_T3000_log_file( CString StrTips);//scan
+INPUT void Create_T3000_log_file();//scan
+
+INPUT CString Get_NowTime();
 
 
+//INPUT void NET_WriteLogFile(CString strlog);
+//INPUT void //NET_CloseLogFile();
+
+INPUT int Write_One(unsigned char device_var,unsigned short address,unsigned short value);
+INPUT int Read_One(unsigned char device_var,unsigned short address);
+INPUT int write_multi(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length);
+//INPUT int read_multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length);
+
+INPUT int Read_One_log(unsigned char device_var,unsigned short address,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+INPUT int Write_One_log(unsigned char device_var,unsigned short address,unsigned short val,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+INPUT int read_multi_log(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+INPUT int write_multi_log(unsigned char device_var,unsigned char *to_write,unsigned short start_address,int length,unsigned char *put_senddate_into_here,unsigned char *put_revdata_into_here, int* sendDataLength, int* recvDataLength);
+INPUT void SetResponseTime(unsigned short Time);
+//INPUT HANDLE Open_Testo_USB();
+/*INPUT int ReadTestoDeviceData(float reveivevalue[]);*/
 //INPUT SOCKET GetSocketHandle();
+#include <stdint.h>
+//INPUT bool Device_Set_Object_Instance_Number(
+//	uint32_t object_id);
+//
+//INPUT   void address_init(void);
+//INPUT	int Get_transfer_length();
+//INPUT	void Set_transfer_length(int data);
+//INPUT   bool tsm_invoke_id_free(uint8_t invokeID);
 
-#include "modbus.h"
+
+//#include "modbus.h"
 #include <vector>  // STL vector header. There is no ".h"
 #include <afxdhtml.h>
 using namespace std;  // Ensure that the namespace is set to std
 
-#define CUSTOM_TABLE_FLOAT_VERSION 50.1
-#define SETPOINT_SPECIAL_VERSION	50
+#define		CUSTOM_TABLE_FLOAT_VERSION					50.1
+#define		SETPOINT_SPECIAL_VERSION					50
+#define		WM_REFRESH_BAC_INPUT_LIST					WM_USER + 201
+
+#define		WM_REFRESH_BAC_PROGRAM_LIST					WM_USER + 203
+#define		WM_REFRESH_BAC_PROGRAM_RICHEDIT				WM_USER + 204
+#define		WM_REFRESH_BAC_VARIABLE_LIST				WM_USER + 205
+#define		WM_REFRESH_BAC_OUTPUT_LIST					WM_USER + 206
+#define		WM_REFRESH_BAC_WEEKLY_LIST					WM_USER + 207
+#define		WM_REFRESH_BAC_ANNUAL_LIST					WM_USER + 208
+#define		WM_REFRESH_BAC_SCHEDULE_LIST				WM_USER + 209
+#define		WM_REFRESH_BAC_DAY_CAL						WM_USER + 210
+#define		WM_REFRESH_BAC_CONTROLLER_LIST				WM_USER + 211
+#define		WM_REFRESH_BAC_SCREEN_LIST					WM_USER + 212
+#define		WM_REFRESH_BAC_MONITOR_LIST					WM_USER + 213
+#define		WM_REFRESH_BAC_MONITOR_INPUT_LIST			WM_USER + 214
+#define		WM_REFRESH_BAC_ALARMLOG_LIST				WM_USER + 215
+#define		WM_REFRESH_BAC_TSTAT_LIST					WM_USER + 216
+#define     WM_DOWNLOADFILE_MESSAGE						WM_USER + 217
+#define     WM_MULTY_FLASH_MESSAGE						WM_USER + 218
+#define		WM_REFRESH_BAC_CUSTOMER_DIGITAL_RANGE_LIST	WM_USER + 219
+#define		WM_REFRESH_BAC_USER_NAME_LIST				WM_USER + 220
+#define		WM_REFRESH_BAC_AT_COMMAND					WM_USER + 221
+#define		WM_REFRESH_BAC_REMOTE_POINT_LIST					WM_USER + 222
+#define		WM_REFRESH_BAC_ANALOGCUSRANGE_LIST					WM_USER + 223
+//#pragma warning(disable:4244)
+//#pragma warning(disable:4018)
+//#pragma warning(disable:4800)
+//#pragma warning(disable:4101)
+//#pragma warning(disable:4554)
+//#pragma warning(disable:4305)
+//#pragma warning(disable:4005)
+
+
+#pragma warning(disable:4146)	//Add by Fance
+//warning C4146: unary minus operator applied to unsigned type, result still unsigned
+//The MSDN suggested that we can ignore it;
 
 typedef struct _STATUSBARINFO
 {
@@ -116,239 +211,86 @@ typedef struct _STATUSBARINFO
 }status_info;
 #include "fileRW.h"
 
+#include "T3000RegAddress.h"
 
 
+#define MKBOOL(_VALUE) ((_VALUE) != 0)		//Add by Fance .Use this macro to solve the warning warning C4800: 'BOOL' : forcing value to bool 'true' or 'false'
+
+
+#define MY_WRITE_ONE				WM_USER	+ 100
+#define MY_READ_ONE					WM_USER	+ 101
+#define MY_INVOKE_ID				WM_USER + 102
+#define MY_BAC_WRITE_LIST			WM_USER + 103
+#define MY_BAC_REFRESH_LIST			WM_USER + 104
+#define MY_BAC_REFRESH_ONE			WM_USER + 105
+
+#define MY_WRITE_ONE_LIST				WM_USER	+ 106
+#define MY_WRITE_MULTI_LIST				WM_USER	+ 107
+
+#define MY_CLOSE WM_USER+110
+
+#define MY_RESUME_DATA  WM_USER + 300
+#define MY_READ_DATA_CALLBACK WM_USER+301
+#define MY_RX_TX_COUNT WM_USER + 302
+#define WM_ADD_DEBUG_CSTRING WM_USER + 303
+#define  WM_SCAN_PRODUCT WM_USER+2014
+#define  WM_SHOW_PANNELINFOR WM_USER + 2222
+
+typedef struct _MessageWriteOneInfo
+{
+	unsigned char device_id;
+	unsigned short address;
+	short new_value;
+	short old_value;
+	HWND hwnd;
+	UINT CTRL_ID;
+	CString Changed_Name;
+
+}MessageWriteOneInfo;
+
+typedef struct _MessageWriteOneInfo_List
+{
+    int list_type;
+	unsigned char device_id;
+	unsigned short address;
+	short new_value;
+	short db_value;
+	HWND hwnd;
+	int mRow;
+	int mCol;
+	CString Changed_Name;
+}MessageWriteOneInfo_List;
+
+typedef struct _MessageWriteMultiInfo_List
+{
+	unsigned char device_id;
+	unsigned short Start_Address;
+	unsigned char RegValue[8];
+	HWND hwnd;
+	int mRow;
+	int mCol;
+	CString Changed_Name;
+}MessageWriteMultiInfo_List;
+
+
+typedef struct _MessageReadOneInfo
+{
+	unsigned char device_id;
+	unsigned short address;
+	short new_value;
+	HWND hwnd;
+}MessageReadOneInfo;
+
+typedef struct _MessageInvokeIDInfo
+{
+	int Invoke_ID;
+	HWND hwnd;
+	CString task_info;
+	int mRow;
+	int mCol;
+}MessageInvokeODInfo;
+
+#define  CPING_USE_ICMP 1
+//#include "Bacnet_Include.h"
 //#define _DEBUG
 //*********************************link to dll***************************
-
-
-//#ifdef ISPDLG_H
-//
-//class _declspec(dllexport) CISPDlg: public CDialog ,public CFlashBase //导出类circle
-//
-//#else
-//
-//class _declspec(dllimport)CISPDlg: public CDialog ,public CFlashBase //导入类circle
-//#endif
-//{
-//// Construction
-//public:
-//	CISPDlg(CWnd* pParent = NULL);	// standard constructor
-//	  virtual ~CISPDlg();
-//// Dialog Data
-//	enum { IDD = IDD_ISP_DIALOG };
-//
-//	protected:
-//	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
-//
-//
-//// Implementation
-//protected:
-//	HICON m_hIcon;
-//
-//	// Generated message map functions
-//	virtual BOOL OnInitDialog();
-//	virtual BOOL PreTranslateMessage(MSG* pMsg);
-//	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-//	afx_msg void OnPaint();
-//	afx_msg HCURSOR OnQueryDragIcon();
-//	DWORD GetIPAddress();
-//public:
-//	//选择flash文件
-//	afx_msg void OnBnClickedButtonSelfile();
-//	//flash button click
-//	afx_msg void OnBnClickedButtonFlash();
-//	afx_msg void OnBnClickedButtonCancel();
-//	afx_msg void OnBnClickedCheckSelcom();
-//	afx_msg void OnBnClickedCheckSelnet();
-//	afx_msg LRESULT OnAddStatusInfo(WPARAM wParam, LPARAM lParam);
-//	afx_msg LRESULT OnReplaceStatusInfo(WPARAM wParam, LPARAM lParam);
-//	afx_msg LRESULT OnFlashFinish(WPARAM wParam, LPARAM lParam);
-//	afx_msg void OnBnClickedButtonFindnc();
-//	afx_msg void OnClose();
-//	afx_msg void OnBnClickedRadioFlhfirmware();
-//	afx_msg void OnBnClickedRadioFlhbtldr();
-//	
-//	//afx_msg void OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
-//	DECLARE_MESSAGE_MAP()
-//
-//public:
-//	//////////////////////////////////////////////////////////////////////////
-//	// public method
-//	////////////////////////////////////////////////////////////////////////////
-//	// 参数 BOOL, =TRUE replace the current line, =FALSE add a new line
-//	void UpdateStatusInfo(const CString& strInfo, BOOL bReplace=FALSE);
-//	CString GetIPFromHostName(CString& strHostName);
-//	void SetFlashFileName(const CString& strFileName);
-//	CString GetFlashFileName();
-//
-//	void EnableFlash(BOOL bEnable);
-//
-//	int GetCurSelTabPage();
-//	CString GetCurSelPageStr();
-//
-//	void Show_Flash_DeviceInfor(int ID);
-//	void Show_Flash_DeviceInfor_NET();
-//	CString Get_NET_Infor(CString strIPAdress,short nPort);
-//	//void SetCurTabSel(int nSel);
-//
-//	//////////////////////////////////////////////////////////////////////////
-//	// for flash sn
-//	BOOL GetFlashSNParam(int& nHWVerison, CString& strProductModel);
-//	
-//	void OnTestPing(const CString& strIP);
-//	//According to Model Name,return the hex file prefix of the Device Model Name
-//	CString GetFilePrefix_FromDB(const CString& ModeName);
-//	int   Judge_Model_Version();
-//public: 
-//	// public member
-//	//CIPAddressCtrl m_IPAddr;
-//	/*提示信息控件*/
-//	CToolTipCtrl *m_ToolTip;
-// 
-//protected:	// private method
-//	/*void InitTabCtrl();*/
-//	// initialize some control by read config file.
-// 
-//	// show splash window for several second 
-//	void ShowSplashWnd(int nMillisecond);
-//	// write parameter to config file
-//	void SaveParamToConfigFile();
-//
-//	void GetFlashParameter();
-//
-//	/*void InitISPUI();*/
-//
-//	
-//
-//	void SaveFlashSNParamToFile();
-//	unsigned int  Judge_Flash_Type();
-//	 CString GetFileName_FromFilePath();
-//	/*
-//	Author Alex
-//	Date:2012-10-25
-//	For TSTAT
-//	*/
-//	BOOL			FileValidation(const CString& strFileName);
-//	BOOL			ValidMdbIDString();
-//	void			FlashByCom();
-//	int				GetModbusID(vector<int>& szMdbIDs);
-//	int				GetComPortNo();
-//
-//	void FlashByEthernet();
-//	//
-//	void FlashSN();
-//	int m_serialNo;
-//  void 	OnlyFlashsn();
-//
-//protected:	// private member
-//
-//	//int					m_nFlashTypeFlag;			// =0 flash by com;  =1 flash by ethernet;
-//	//CString			m_strInstallPath;				// 老毛要的，其实没用
-//	CString			m_strFlashMethod;			// flash的方式
-//	CString			m_strLogoFileName;			// logo文件名，包含路径
-//	CString 		m_strLogFileName;           //log file name
-//	vector<int>		m_szMdbIDs;					// 记录所有输入的Modbus ID
-//	CListBox			m_lbStatusInfo;
-//	NC_FLASH_TYPE		m_ftFlashType;
-//	CComWriter*	m_pComWriter;				// 用串口flash的类的指针，在使用时才实例化，用完后立即释放
-//	
-//	TFTPServer*	m_pTFTPServer;				// 使用网络，TFTP协议flash，使用时实例化
-//	CComWriter*		m_pTCPFlasher;//使用网络接口来flash subid
-//	//CTstatFlashDlg			m_DlgTstatFlash;
-//	//CNCFlashDlg			m_DlgNCFlash;
-//	//CLightCtrlFlashDlg		m_DlgLightCtrlFlash;
-//public:
-//	//CTabCtrl					m_tab;
-//	CString					m_strHexFileName;			// hex文件名，包含路径，要烧录的文件，实际上也可能是bin文件
-//	CConfigFileHandler		m_cfgFileHandler;	
-//	CString					m_strCfgFilePath;				// cfg配置文件名，包含路径
-//
-//	int							m_nTabSel;
-//	
-//	BOOL						m_bShowSN;					// 是否显示隐藏的界面。
-//
-//	BOOL                        m_bFlashSN;
-//	BOOL                        m_bOnlyFlashSN;
-//	map<int, CString>	m_mapModel;
-//
-//	CString					m_strPingIP;	
-//	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
-//	 
-//	afx_msg void OnBnClickedCom();
-//	afx_msg void OnBnClickedNet();
-//	void COM_NET_Set_ReadOnly();
-//	//是否点击了刷新子ID的按钮，点击了，标志位TRUE
-//	void set_SUBID();
-//	//void Set_Device_FHInfor();	//FirmVersion,HardVersion
-//    void InitISPUI();
-//	void initFlashSN();
-//private:
-//	CEdit id;
-//	CComboBox m_ComPort;
-//	CIPAddressCtrl m_ipAddress;
-//	CEdit m_ipPort;
-//	CButton m_Check_SubID;
-//	CEdit m_SubID;
-//	// 文件缓冲区，用来存放读取的文件的内容，flash完后应当delete，使用时再new
-//	char*					m_pFileBuf;	//FOR SUBID					
-//	    //这个变量来控制控件是否可用的判断条件 
-//	    //COM_INPUT=TRUE 那就是选择COM的状态
-//		BOOL 						COM_INPUT;
-//		//这个变量是控制 通过IP刷新连到NC或者LC下面的设备的
-//		//TRUE的话，用户需要输入
-//		BOOL						FLASH_SUBID;
-//	   	/*	 Flash_Type
-//		1:TStat-by com 
-//		2.NC 
-//		3.TStat By NC 
-//		4.LC-Main Board 
-//		5.LC-input Board
-//		6.LC-output Board
-//		*/
-//		unsigned int  Flash_Type;	 
-//
-//	 	//为写入日志文件  系统文件类
-//		CStdioFile*		 m_plogFile;
-//		//这个变量是数据库的路径
-//		CString	m_strDatabasefilepath;
-//public:
-//	//点击click-box 的空间的触发事件
-//	afx_msg void OnBnClickedCheckFlashSubid();
-//	//初始化Combox控件
-//	void InitCombox(void);
-//	//这个函数为COM_TStat的总函数
-//	//当用户点击COM_FLASH的时候，
-//	BOOL FlashTstat(void);
-//	BOOL FlashNC_LC(void);
-//	BOOL FlashSubID(void);
-//	void OnFlashSubID(void);
-//	BOOL ValidMdbIDStringSUBID();
-//	int	  GetModbusIDSUBID (vector<int>& szMdbIDs);
-//	CString m_ID; //initial the ID text
-//	afx_msg void OnBnClickedButtonPing2();
-//private:
-//	CButton m_Btn_ping;
-//
-//public:
-//	CString m_ModelName;
-//	CString m_FirmVer;
-//	CString m_HardVer;
-//	 
-// 
-//	short m_IPPort;
-//	 
-//	afx_msg void OnMainClear();
-//	afx_msg void OnSaveLogInfo();
-//	afx_msg void OnBnClickedClearLog();
-//	afx_msg void OnBnClickedSaveLog();
-//	afx_msg void OnLbnSelchangeListInfo();
-//	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
-//
-//	afx_msg void OnMenuApp();
-//	afx_msg void OnMenuAbout();
-//	CString m_website;
-//	afx_msg void OnBnClickedRadio1();
-//	afx_msg void OnBnClickedRadio2();
-//	afx_msg void OnMenuVersion();
-//};

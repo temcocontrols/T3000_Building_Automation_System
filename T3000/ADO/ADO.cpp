@@ -1,11 +1,25 @@
 #include "StdAfx.h"
 #include "../ado/ADO.h"
+// #ifdef _DEBUG
+// #ifndef _WIN64
 #define FOR_DATABASE_CONNECT					_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=")
+// #else
+// #pragma comment(lib,"json/json_mtd_x64.lib")
+// #define FOR_DATABASE_CONNECT					_T("Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider;Data Source=")
+// #endif
+// #else
+// #ifndef _WIN64 
+// #define FOR_DATABASE_CONNECT					_T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=")
+// #else
+// #define FOR_DATABASE_CONNECT					_T("Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider;Data Source=")
+// #endif
+// #endif
 
+//Provider=Microsoft Office 12.0 Access Database Engine OLE DB Provider
+//#define FOR_DATABASE_CONNECT					_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=")
 CADO::CADO(void)
 {
 	g_strDatabasefilepath = _T("");
-
 	g_strOrigDatabaseFilePath=_T("");
 	g_strDatabasefilepath=_T("");
 	g_strExePth=_T("");
@@ -15,8 +29,11 @@ CADO::CADO(void)
 CADO::~CADO(void)
 {
 }
-
-void CADO::OnInitADOConn()
+void CADO::DeleteDB(){
+CString filePath=g_strExePth+_T("Database\\T3000.mdb");
+DeleteFile(filePath);
+}
+BOOL CADO::OnInitADOConn()
 {
 	::CoInitialize(NULL);
 	try 
@@ -33,12 +50,12 @@ void CADO::OnInitADOConn()
 		g_strDatabasefilepath+=_T("Database\\t3000.mdb");
 
 
-		 	HANDLE hFind;
+		HANDLE hFind;
 		WIN32_FIND_DATA wfd;
 		hFind = FindFirstFile(g_strDatabasefilepath, &wfd);
 		if (hFind==INVALID_HANDLE_VALUE)
 		{
-		CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);
+			CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);
 		}
 		else
 		{
@@ -49,22 +66,23 @@ void CADO::OnInitADOConn()
 
 		g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;
 		g_strImgeFolder=g_strExePth+_T("Database\\image\\");
-		CreateDirectory(g_strImgeFolder,NULL); 
+		CreateDirectory(g_strImgeFolder,NULL);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 						//连接数据库
 
 
 		m_pConnection.CreateInstance("ADODB.Connection");
-		/*_bstr_t strConnect = "DRIVER={Microsoft Access Driver (*.mdb)};\
-                              uid=;pwd=;DBQ=t3000.mdb;";*/
+	 
 		m_pConnection->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
 	}
 	catch(_com_error e)
-	{   //e.Description()
-		AfxMessageBox(_T("Can't Find T3000 DataBase\nSystem Close"));
+	{
+		//AfxMessageBox(e.Description());
+        return FALSE;
 	}
 
+    return TRUE;
 
 }
 
@@ -96,7 +114,10 @@ void CADO::CloseRecordset()
 
 void CADO::CloseConn()
 {
-	m_pConnection->Close();
+	if (m_pConnection->State)
+	{m_pConnection->Close();
+	}
+	m_pConnection=NULL;
 	::CoUninitialize();
 
 
@@ -142,7 +163,7 @@ void CADO::Createtable( CString strSQL )
 *   Functions           -   IsHaveTable(_ConnectionPtr   pConnection,   CString   strTableName) 
 *   Parameter:         -   pConnection：数据库对象； 
 -   strTableName：数据库中是否有此表？ 
-*   Return   Value:   -   bool。FALSE：无表，TRUE：有表 
+*   Return   Value:   -  ，TRUE bool。FALSE：无表：有表 
 *   Description:     -   从数据库中查表看是否有要打开的表[strTableName]，有无表，给出提示返回FALSE； 
 -   因而在应用此函数时，只需决定是否要继续进行，不需再给出提示。 
 *   Author:               -   lishancai 
@@ -164,7 +185,7 @@ bool CADO::IsHaveTable( CADO ado, CString strTableName )
 	while(!(ado.m_pRecordset-> EndOfFile))//指针是否已经指向最后一条记录？ 
 	{ 
 		_bstr_t   table_name   =   ado.m_pRecordset-> Fields-> GetItem(_T("TABLE_NAME"))-> Value;//得到表的名称 
-
+        
 		if(strTableName   ==   (LPCSTR)  table_name)//表名判断是否相同？ 
 		{ 
 			bIsHaveNo   =   TRUE;//有表了 

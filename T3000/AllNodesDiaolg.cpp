@@ -5,6 +5,7 @@
 #include "T3000.h"
 #include "MainFrm.h"
 #include "AllNodesDiaolg.h"
+#include "ARDDlg.h"
 
 
 // CAllNodesDiaolg dialog
@@ -28,12 +29,13 @@ IMPLEMENT_DYNAMIC(CAllNodesDiaolg, CDialog)
 CAllNodesDiaolg::CAllNodesDiaolg(CWnd* pParent /*=NULL*/)
 	: CDialog(CAllNodesDiaolg::IDD, pParent)
 {
+
 	m_bChanged=FALSE;
+    m_pDialogInfo = NULL;
 }
 
 CAllNodesDiaolg::~CAllNodesDiaolg()
 {
-
 }
 
 void CAllNodesDiaolg::DoDataExchange(CDataExchange* pDX)
@@ -60,28 +62,20 @@ BEGIN_MESSAGE_MAP(CAllNodesDiaolg, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO1, &CAllNodesDiaolg::OnCbnSelchangeCombo1)
 	ON_EN_KILLFOCUS(IDC_TEXTEDIT, &CAllNodesDiaolg::OnEnKillfocusTextedit)
 	ON_EN_SETFOCUS(IDC_TEXTEDIT, &CAllNodesDiaolg::OnEnSetfocusTextedit)
+	ON_BN_CLICKED(IDC_ARD, &CAllNodesDiaolg::OnBnClickedArd)
+    ON_BN_CLICKED(IDC_DELBUTTON_OFFLINE, &CAllNodesDiaolg::OnBnClickedDelbuttonOffline)
 END_MESSAGE_MAP()
 
 
 // CAllNodesDiaolg message handlers
-/*
-OnInitDialog();
-这个函数用来初始化数据库中的界面的
 
-*/
 BOOL CAllNodesDiaolg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	//设置输入文本隐藏，Combox隐藏起来
 	m_InputTextEdt.ShowWindow(SW_HIDE);
 	m_productCombox.ShowWindow(SW_HIDE);
 	//GetDlgItem(IDC_ADDBUTTON)->ShowWindow(SW_HIDE);
-/*
-获取CMainFrame 指针
-获得指针后就可以获取成员变量的数据
-m_subNetLst=vector 
-用来保存子节点的信息
-*/
+
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
 	m_strMainBuildingName= pFrame->m_strCurMainBuildingName;
 	m_strSubNetName= pFrame->m_strCurSubBuldingName;
@@ -96,14 +90,11 @@ m_subNetLst=vector
 
 	m_SubLstCombox.ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
-	//初始化数据库的链接+记录集组件
-	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	
+// 	m_pCon.CreateInstance(_T("ADODB.Connection"));
+// 	m_pRs.CreateInstance(_T("ADODB.Recordset"));
+// 	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 
-	//下载数据从数据库中
-	//ReloadAddBuildingDB
-	//包括了初始化控件
 	ReloadAddBuildingDB();
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
@@ -117,213 +108,24 @@ void CAllNodesDiaolg::OnBnClickedOk()
 
 }
 
-void CAllNodesDiaolg::ReloadAddBuildingDB()
-{
-	m_FlexGrid.Clear();
-	
-	m_FlexGrid.put_TextMatrix(0,0,_T(""));
-	m_FlexGrid.put_ColWidth(0,400);
 
-	m_FlexGrid.put_TextMatrix(0,AN_MAINNAME,_T("Main Building"));
-	m_FlexGrid.put_ColWidth(AN_MAINNAME,800);
-
-	m_FlexGrid.put_TextMatrix(0,AN_NAME,_T("Sub Net"));
-	m_FlexGrid.put_ColWidth(AN_NAME,800);
-
-	m_FlexGrid.put_TextMatrix(0,AN_SerialID,_T("Serial ID"));
-	m_FlexGrid.put_ColWidth(AN_SerialID,800);
-
-	m_FlexGrid.put_TextMatrix(0,AN_FLOORNAME,_T("Floor"));
-	m_FlexGrid.put_ColWidth(AN_FLOORNAME,800);
-
-	m_FlexGrid.put_TextMatrix(0,AN_ROOMNAME,_T("Room"));
-	m_FlexGrid.put_ColWidth(AN_ROOMNAME,800);
-
-	m_FlexGrid.put_TextMatrix(0,AN_PRUDUCTNAME,_T("Product Name"));
-	m_FlexGrid.put_ColWidth(AN_PRUDUCTNAME,1300);
-
-	m_FlexGrid.put_TextMatrix(0,AN_PRODUCTTYPE,_T("Product ID"));
-	m_FlexGrid.put_ColWidth(AN_PRODUCTTYPE,1300);
-
-	m_FlexGrid.put_TextMatrix(0,AN_PRODUCTID,_T("Address"));
-	m_FlexGrid.put_ColWidth(AN_PRODUCTID,700);
-
-	m_FlexGrid.put_TextMatrix(0,AN_SCREENID,_T("Screen ID"));
-	m_FlexGrid.put_ColWidth(AN_SCREENID,2000);
-
-	m_FlexGrid.put_TextMatrix(0,AN_BAUDRATE,_T("Baud Rate"));
-	m_FlexGrid.put_ColWidth(AN_BAUDRATE,1300);
-
-	m_FlexGrid.put_TextMatrix(0,AN_GRAPHICID,_T("Graphic Name"));
-	m_FlexGrid.put_ColWidth(AN_GRAPHICID,1800);
-
-	m_FlexGrid.put_TextMatrix(0,AN_HDVERSION,_T("HardW_Ver"));
-	m_FlexGrid.put_ColWidth(AN_HDVERSION,1300);
-
-	m_FlexGrid.put_TextMatrix(0,AN_SWVERSION,_T("SoftW_Ver"));
-	m_FlexGrid.put_ColWidth(AN_SWVERSION,1300);
-	m_FlexGrid.put_TextMatrix(0,AN_EPSIZE,_T("EPSize"));
-	m_FlexGrid.put_ColWidth(AN_EPSIZE,800);
-
-	CString strSql;
-	strSql.Format(_T("select * from ALL_NODE where MainBuilding_Name = '%s' ORDER BY Product_ID ASC"),m_strMainBuildingName);
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);			
-	m_FlexGrid.put_Rows(m_pRs->RecordCount+2);	
-	int temp_row=0;
-	CString str_temp;
-	str_temp.Empty();
-	_variant_t temp_variant;
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
-	{	
-	
-		//m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTTYPE,m_strID);
-
-		++temp_row;
-		CString strIndex; strIndex.Format(_T("%d"), temp_row);
-		m_FlexGrid.put_TextMatrix(temp_row,0,strIndex);
-
-		m_FlexGrid.put_TextMatrix(temp_row,AN_MAINNAME,m_strMainBuildingName);
-		m_strSubNetName=m_pRs->GetCollect("Building_Name");//
-		m_FlexGrid.put_TextMatrix(temp_row,AN_NAME,m_strSubNetName);
-		temp_variant=m_pRs->GetCollect("Serial_ID");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
-		m_FlexGrid.put_TextMatrix(temp_row,AN_SerialID,m_strID);
-	
-		temp_variant=m_pRs->GetCollect("Floor_name");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
-		m_FlexGrid.put_TextMatrix(temp_row,AN_FLOORNAME,m_strID);
-
-		temp_variant=m_pRs->GetCollect("Room_name");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
-		m_FlexGrid.put_TextMatrix(temp_row,AN_ROOMNAME,m_strID);
-		
-			temp_variant=m_pRs->GetCollect("Product_name");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
-		m_FlexGrid.put_TextMatrix(temp_row,AN_PRUDUCTNAME,m_strID);
-
-		temp_variant=m_pRs->GetCollect("Product_class_ID");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
-		m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTTYPE,m_strID);
-		
-		temp_variant=m_pRs->GetCollect("Product_ID");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
-		m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTID,m_strID);
-
-		temp_variant=m_pRs->GetCollect("Screen_Name");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
-		m_FlexGrid.put_TextMatrix(temp_row,AN_SCREENID,m_strID);
-
-
-
-		temp_variant=m_pRs->GetCollect("Bautrate");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
-		m_FlexGrid.put_TextMatrix(temp_row,AN_BAUDRATE,m_strID);
-
-		temp_variant=m_pRs->GetCollect("Background_imgID");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
-		m_FlexGrid.put_TextMatrix(temp_row,AN_GRAPHICID,m_strID);
-		
-
-		temp_variant=m_pRs->GetCollect("Hardware_Ver");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
-		m_FlexGrid.put_TextMatrix(temp_row,AN_HDVERSION,m_strID);
-		
-
-		temp_variant=m_pRs->GetCollect("Software_Ver");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
-		m_FlexGrid.put_TextMatrix(temp_row,AN_SWVERSION,m_strID);
-
-		temp_variant=m_pRs->GetCollect("EPsize");//
-		if(temp_variant.vt!=VT_NULL)
-			m_strID=temp_variant;
-		else
-			m_strID=_T("");
-		m_FlexGrid.put_TextMatrix(temp_row,AN_EPSIZE,m_strID);
-		m_pRs->MoveNext();
-	}
-	m_pRs->Close();
-}
 void CAllNodesDiaolg::SetBuildingMainName(CString strBuildName)
 {
 	m_strMainBuildingName=strBuildName;
 }
 
 
-void CAllNodesDiaolg::OnBnClickedDelbutton()
-{
-#if 1
-	if(m_nCurRow==0||m_nCurRow==m_FlexGrid.get_Rows()-1)
-	{
-		AfxMessageBox(_T("Please select a item first!"));
-		return;
-	}
-	CString strText;
-	strText=m_FlexGrid.get_TextMatrix(m_nCurRow,AN_SerialID);
-	if(strText.IsEmpty())
-	{
-		AfxMessageBox(_T("No item Selected!"));
-	}
-	CString strSql;
-	strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"),strText);
-	CString strTemp;
-	strTemp.Format(_T("Are you sure to delete thise item"));
-	if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
-	{
-		try
-		{
 
-
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
-		}
-		catch(_com_error *e)
-		{
-			AfxMessageBox(e->ErrorMessage());
-		}
-	}
-	ReloadAddBuildingDB();
-	m_bChanged=TRUE;
-#endif
-	
-
-}
 
 void CAllNodesDiaolg::OnBnClickedDelallbutton()
 {
+
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
 	CString strSql;
-	strSql=_T("delete * from ALL_NODE ");
+	strSql=_T("delete * from ALL_NODE where Custom is null or Custom = '0'");
 	CString strTemp;
 	strTemp.Format(_T("Are you sure to delete all the sub node(s)"));
 	if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
@@ -332,26 +134,27 @@ void CAllNodesDiaolg::OnBnClickedDelallbutton()
 		{
 
 
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 		}
 		catch(_com_error *e)
 		{
 			AfxMessageBox(e->ErrorMessage());
 		}
 	}
+	bado.CloseConn();
 	ReloadAddBuildingDB();
 	m_bChanged=TRUE;
 }
 
 void CAllNodesDiaolg::OnBnClickedExitbutton()
 {
-#if 1
 	CAllNodesDiaolg::OnCancel();
-
-	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
-#endif
 	
+	if (m_bChanged)
+	{
+		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
+	}
 }
 
 void CAllNodesDiaolg::OnBnClickedCancel()
@@ -447,6 +250,9 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 			CopyFile(strImgFilePathName,strDestFileName,FALSE);
 			m_FlexGrid.put_TextMatrix(m_nCurRow,m_nCurCol,strImgFileName);
 			//update recorder;
+			CBADO bado;
+			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+			bado.OnInitADOConn(); 
 
 			if(m_nCurRow<m_FlexGrid.get_Rows())
 			{
@@ -459,7 +265,7 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 
 				CString strSql;
 				strSql.Format(_T("update ALL_NODE set Background_imgID ='%s' where Serial_ID = '%s' "/*and Building_Name = '%s'*/),strImgFileName,strSerial/*,m_strSubNetName*/);
-				m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+				bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 				m_bChanged=TRUE;
 				g_strImagePathName=strImgFileName;			
 				}
@@ -467,7 +273,8 @@ void CAllNodesDiaolg::ClickMsflexgrid1()
 				{
 					AfxMessageBox(e->ErrorMessage());
 				}
-				}
+			}
+			bado.CloseConn();
 		}
 	}
 }
@@ -481,6 +288,7 @@ void CAllNodesDiaolg::OnCbnSelchangeCombo1()
 		m_SubLstCombox.GetLBText(nIdext,strSelect);
 		m_strSubNetName=strSelect;
 		ReloadAddBuildingDB();
+        m_bChanged=TRUE;
 	}
 }
 
@@ -494,7 +302,11 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 	m_InputTextEdt.ShowWindow(SW_HIDE);
 	CString strName;
 	m_InputTextEdt.GetWindowText(strName);
-	
+
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
 	if (m_nCurRow < m_FlexGrid.get_Rows()-1)
 	{
 		if(m_nCurCol==AN_PRUDUCTNAME)
@@ -508,7 +320,7 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 
 
 			strSql.Format(_T("update ALL_NODE set Product_name ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
 			}
 			catch(_com_error *e)
 			{
@@ -522,17 +334,19 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 			if(strSerial.IsEmpty())
 				return;
 			CString strSql;
+			bado.OnInitADOConn(); 
 			try
 			{
 
 
 			strSql.Format(_T("update ALL_NODE set Room_name ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);	
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 			}
 			catch(_com_error *e)
 			{
 				AfxMessageBox(e->ErrorMessage());
 			}
+			  bado.CloseConn();
 			ReloadAddBuildingDB();
 		}
 		if(m_nCurCol==AN_FLOORNAME)
@@ -547,13 +361,13 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 			CString strSql;
 
 			strSql.Format(_T("update ALL_NODE set Floor_name ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
-			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);		
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
 			}
 			catch(_com_error *e)
 			{
 				AfxMessageBox(e->ErrorMessage());
 			}
-
+			  bado.CloseConn();
 			ReloadAddBuildingDB();
 		}
 	}
@@ -565,6 +379,7 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 		}
 
 	}
+ 
 }
 
 void CAllNodesDiaolg::OnEnSetfocusTextedit()
@@ -589,9 +404,7 @@ void CAllNodesDiaolg::OnBnClickedAddbutton()
 	// TODO: Add your control notification handler code here
 	//AfxMessageBox(_T("Not realized!"));
 
-/*alex*/
-#if 1
-CString strSql;
+	CString strSql;
 	int nMaxRowIndext=m_FlexGrid.get_Rows()-1;
 
 	//CString strSBuildingNameTemp;
@@ -718,7 +531,10 @@ CString strSql;
 	}
 
 	CString strCom = _T("0");
-	
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+
 	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"')"));
 	//new nc//strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize,Mainnet_info) values('"+strMainBuildName+"','"+strSubBuildingName +"','"+strSID+"','"+strFloorName+"','"+strRoomName+"','"+strProName+"','"+strProType+"','"+strProID+"','"+strScreenID+"','"+strBaudrate+"','"+strGraphicID+"','"+strHdVersion+"','"+strStVersion+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
 	try
@@ -728,15 +544,384 @@ CString strSql;
 
 	TRACE(strSql);
 	
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 	}
 	catch(_com_error *e)
 	{
 		AfxMessageBox(e->ErrorMessage());
 	}
+	bado.CloseConn();
 	ReloadAddBuildingDB();
-#endif
-	
 
 
+}
+
+void CAllNodesDiaolg::OnBnClickedArd()
+{
+	 CARDDlg dlg;
+	if (dlg.DoModal()==IDOK)
+	{
+     OnInitDialog();
+     m_bChanged=TRUE;
+	} 
+	 
+	  
+}
+
+void CAllNodesDiaolg::ReloadAddBuildingDB()
+{
+    m_FlexGrid.Clear();
+
+    m_FlexGrid.put_TextMatrix(0,0,_T(""));
+    m_FlexGrid.put_ColWidth(0,400);
+
+    m_FlexGrid.put_TextMatrix(0,AN_MAINNAME,_T("Main Building"));
+    m_FlexGrid.put_ColWidth(AN_MAINNAME,800);
+
+    m_FlexGrid.put_TextMatrix(0,AN_NAME,_T("Sub Net"));
+    m_FlexGrid.put_ColWidth(AN_NAME,800);
+
+    m_FlexGrid.put_TextMatrix(0,AN_SerialID,_T("Serial ID"));
+    m_FlexGrid.put_ColWidth(AN_SerialID,800);
+
+    m_FlexGrid.put_TextMatrix(0,AN_FLOORNAME,_T("Floor"));
+    m_FlexGrid.put_ColWidth(AN_FLOORNAME,800);
+
+    m_FlexGrid.put_TextMatrix(0,AN_ROOMNAME,_T("Room"));
+    m_FlexGrid.put_ColWidth(AN_ROOMNAME,800);
+
+    m_FlexGrid.put_TextMatrix(0,AN_PRUDUCTNAME,_T("Product Name"));
+    m_FlexGrid.put_ColWidth(AN_PRUDUCTNAME,1300);
+
+    m_FlexGrid.put_TextMatrix(0,AN_PRODUCTTYPE,_T("Product ID"));
+    m_FlexGrid.put_ColWidth(AN_PRODUCTTYPE,1300);
+
+    m_FlexGrid.put_TextMatrix(0,AN_PRODUCTID,_T("Address"));
+    m_FlexGrid.put_ColWidth(AN_PRODUCTID,700);
+
+    m_FlexGrid.put_TextMatrix(0,AN_SCREENID,_T("Screen ID"));
+    m_FlexGrid.put_ColWidth(AN_SCREENID,2000);
+
+    m_FlexGrid.put_TextMatrix(0,AN_BAUDRATE,_T("Baud Rate"));
+    m_FlexGrid.put_ColWidth(AN_BAUDRATE,1300);
+
+    m_FlexGrid.put_TextMatrix(0,AN_GRAPHICID,_T("Graphic Name"));
+    m_FlexGrid.put_ColWidth(AN_GRAPHICID,1800);
+
+    m_FlexGrid.put_TextMatrix(0,AN_HDVERSION,_T("HardW_Ver"));
+    m_FlexGrid.put_ColWidth(AN_HDVERSION,1300);
+
+    m_FlexGrid.put_TextMatrix(0,AN_SWVERSION,_T("SoftW_Ver"));
+    m_FlexGrid.put_ColWidth(AN_SWVERSION,1300);
+    m_FlexGrid.put_TextMatrix(0,AN_EPSIZE,_T("EPSize"));
+    m_FlexGrid.put_ColWidth(AN_EPSIZE,800);
+
+    CBADO bado;
+    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+    bado.OnInitADOConn(); 
+
+    CString strSql;
+    strSql.Format(_T("select * from ALL_NODE where MainBuilding_Name = '%s' ORDER BY Product_ID ASC"),m_strMainBuildingName);
+    //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);		
+    bado.m_pRecordset=bado.OpenRecordset(strSql);	
+    int recordcount= bado.GetRecordCount(bado.m_pRecordset);
+    m_FlexGrid.put_Rows(recordcount+2);	
+    int temp_row=0;
+    CString str_temp;
+    str_temp.Empty();
+    _variant_t temp_variant;
+    while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+    {	
+
+        //m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTTYPE,m_strID);
+
+        ++temp_row;
+        CString strIndex; strIndex.Format(_T("%d"), temp_row);
+        m_FlexGrid.put_TextMatrix(temp_row,0,strIndex);
+
+        m_FlexGrid.put_TextMatrix(temp_row,AN_MAINNAME,m_strMainBuildingName);
+        m_strSubNetName=bado.m_pRecordset->GetCollect("Building_Name");//
+        m_FlexGrid.put_TextMatrix(temp_row,AN_NAME,m_strSubNetName);
+        temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
+        if(temp_variant.vt!=VT_NULL)
+            m_strID=temp_variant;
+        else
+            m_strID=_T("");
+        m_FlexGrid.put_TextMatrix(temp_row,AN_SerialID,m_strID);
+
+        temp_variant=bado.m_pRecordset->GetCollect("Floor_name");//
+        if(temp_variant.vt!=VT_NULL)
+            m_strID=temp_variant;
+        else
+            m_strID=_T("");
+        m_FlexGrid.put_TextMatrix(temp_row,AN_FLOORNAME,m_strID);
+
+        temp_variant=bado.m_pRecordset->GetCollect("Room_name");//
+        if(temp_variant.vt!=VT_NULL)
+            m_strID=temp_variant;
+        else
+            m_strID=_T("");
+        m_FlexGrid.put_TextMatrix(temp_row,AN_ROOMNAME,m_strID);
+
+        temp_variant=bado.m_pRecordset->GetCollect("Product_name");//
+        if(temp_variant.vt!=VT_NULL)
+            m_strID=temp_variant;
+        else
+            m_strID=_T("");
+        m_FlexGrid.put_TextMatrix(temp_row,AN_PRUDUCTNAME,m_strID);
+
+        temp_variant=bado.m_pRecordset->GetCollect("Product_class_ID");//
+        if(temp_variant.vt!=VT_NULL)
+            m_strID=temp_variant;
+        else
+            m_strID=_T("");
+        m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTTYPE,m_strID);
+
+        temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
+        if(temp_variant.vt!=VT_NULL)
+            m_strID=temp_variant;
+        else
+            m_strID=_T("");
+        m_FlexGrid.put_TextMatrix(temp_row,AN_PRODUCTID,m_strID);
+
+        temp_variant=bado.m_pRecordset->GetCollect("Screen_Name");//
+        if(temp_variant.vt!=VT_NULL)
+            m_strID=temp_variant;
+        else
+            m_strID=_T("");
+        m_FlexGrid.put_TextMatrix(temp_row,AN_SCREENID,m_strID);
+
+
+
+        temp_variant=bado.m_pRecordset->GetCollect("Bautrate");//
+        if(temp_variant.vt!=VT_NULL)
+            m_strID=temp_variant;
+        else
+            m_strID=_T("");
+        m_FlexGrid.put_TextMatrix(temp_row,AN_BAUDRATE,m_strID);
+
+        temp_variant=bado.m_pRecordset->GetCollect("Background_imgID");//
+        if(temp_variant.vt!=VT_NULL)
+            m_strID=temp_variant;
+        else
+            m_strID=_T("");
+        m_FlexGrid.put_TextMatrix(temp_row,AN_GRAPHICID,m_strID);
+
+
+        temp_variant=bado.m_pRecordset->GetCollect("Hardware_Ver");//
+        if(temp_variant.vt!=VT_NULL)
+            m_strID=temp_variant;
+        else
+            m_strID=_T("");
+        m_FlexGrid.put_TextMatrix(temp_row,AN_HDVERSION,m_strID);
+
+
+        temp_variant=bado.m_pRecordset->GetCollect("Software_Ver");//
+        if(temp_variant.vt!=VT_NULL)
+            m_strID=temp_variant;
+        else
+            m_strID=_T("");
+        m_FlexGrid.put_TextMatrix(temp_row,AN_SWVERSION,m_strID);
+
+        temp_variant=bado.m_pRecordset->GetCollect("EPsize");//
+        if(temp_variant.vt!=VT_NULL)
+            m_strID=temp_variant;
+        else
+            m_strID=_T("");
+        m_FlexGrid.put_TextMatrix(temp_row,AN_EPSIZE,m_strID);
+        bado.m_pRecordset->MoveNext();
+    }
+    //m_pRs->Close();
+    bado.CloseRecordset();
+    bado.CloseConn();
+}
+void CAllNodesDiaolg::OnBnClickedDelbutton()
+{
+    if(m_nCurRow==0||m_nCurRow==m_FlexGrid.get_Rows()-1)
+    {
+        AfxMessageBox(_T("Please select a item first!"));
+        return;
+    }
+    CString strText;
+    strText=m_FlexGrid.get_TextMatrix(m_nCurRow,AN_SerialID);
+    if(strText.IsEmpty())
+    {
+        AfxMessageBox(_T("No item Selected!"));
+    }
+    CBADO bado;
+    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+    bado.OnInitADOConn(); 
+
+    CString strhw_version;
+    strhw_version = m_FlexGrid.get_TextMatrix(m_nCurRow,AN_HDVERSION);
+    CString strSql;
+    strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s' and Hardware_Ver = '%s'"),strText,strhw_version);
+    CString strTemp;
+    strTemp.Format(_T("Are you sure to delete thise item"));
+    if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
+    {
+        try
+        {
+
+
+            bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+        }
+        catch(_com_error *e)
+        {
+            AfxMessageBox(e->ErrorMessage());
+        }
+    }
+    bado.CloseConn();
+    ReloadAddBuildingDB();
+    m_bChanged=TRUE;
+
+}
+void CAllNodesDiaolg::OnBnClickedDelbuttonOffline()
+{
+
+
+    if(m_pDialogInfo==NULL)
+    {
+        m_pDialogInfo = new CDialogInfo;
+        m_pDialogInfo->Create(IDD_DIALOG_INFO,this);
+        m_pDialogInfo->ShowWindow(SW_SHOW); 
+        m_pDialogInfo->CenterWindow();
+        m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(_T(""));
+    }
+
+    CBADO bado;
+    bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+    bado.OnInitADOConn(); 
+    CString strSql;
+    strSql.Format(_T("select * from ALL_NODE where MainBuilding_Name = '%s' ORDER BY Product_ID ASC"),m_strMainBuildingName);
+    //m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);		
+    bado.m_pRecordset=bado.OpenRecordset(strSql);	
+    int recordcount= bado.GetRecordCount(bado.m_pRecordset);
+    //m_FlexGrid.put_Rows(recordcount+2);	
+    int temp_row=0;
+    CString str_temp;
+    str_temp.Empty();
+    _variant_t temp_variant;
+    CString Serial_Number;
+    CString Protocol;
+    CString Bautrate;
+    CString Com_Port;
+    CString Product_ID;
+     BOOL Is_Online = FALSE;
+
+    while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+    {
+        temp_variant=bado.m_pRecordset->GetCollect("Protocol");//
+        if(temp_variant.vt!=VT_NULL)
+            Protocol=temp_variant;
+        else
+            Protocol=_T("");
+
+        temp_variant=bado.m_pRecordset->GetCollect("Serial_ID");//
+        if(temp_variant.vt!=VT_NULL)
+            Serial_Number=temp_variant;
+        else
+            Serial_Number=_T("");
+            str_temp.Format(_T("Checking Serial Number:%s"),Serial_Number);
+        if (m_pDialogInfo->IsWindowVisible())
+        {
+            m_pDialogInfo->GetDlgItem(IDC_STATIC_INFO)->SetWindowText(str_temp);
+           /* m_pDialogInfo->ShowWindow(SW_SHOW);*/
+        }
+
+        temp_variant=bado.m_pRecordset->GetCollect("Com_Port");//
+        if(temp_variant.vt!=VT_NULL)
+            Com_Port=temp_variant;
+        else
+            Com_Port=_T(""); 
+
+        temp_variant=bado.m_pRecordset->GetCollect("Bautrate");//
+        if(temp_variant.vt!=VT_NULL)
+            Bautrate=temp_variant;
+        else
+            Bautrate=_T("");
+
+        temp_variant=bado.m_pRecordset->GetCollect("Product_ID");//
+        if(temp_variant.vt!=VT_NULL)
+            Product_ID=temp_variant;
+        else
+            Product_ID=_T("");
+
+             close_com();
+
+           int modbusid = _wtoi(Product_ID);
+
+            if (Protocol.CompareNoCase(L"0")==0)
+            {
+                 int comport = _wtoi(Com_Port);
+                 int brandrate = _wtoi(Bautrate);
+                 
+                if(open_com(comport))
+                {
+                    Change_BaudRate(brandrate);
+                      
+                      SetCommunicationType(0);
+                    
+                    int ret = read_one(modbusid,7);
+                    if (ret>0)
+                    {
+                      Is_Online = TRUE;  
+                    }
+                    else
+                    {
+                       Is_Online = FALSE;
+                    }
+                }     
+                       
+            }
+            else
+            {
+                int port = _wtoi(Com_Port);
+                if (Open_Socket2(Bautrate,port))
+                {
+                    SetCommunicationType(1);
+                    int ret = read_one(modbusid,7);
+                    if (ret>0)
+                    {
+                        Is_Online = TRUE;  
+                    }
+                    else
+                    {
+                        Is_Online = FALSE;
+                    } 
+                }
+                  
+            }
+
+            if (!Is_Online)
+            {
+                   strSql.Format(_T("delete * from ALL_NODE where Serial_ID ='%s'"),Serial_Number);
+                   try
+                   {
+
+
+                       bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
+                   }
+                   catch(_com_error *e)
+                   {
+                       AfxMessageBox(e->ErrorMessage());
+                   }
+                    m_bChanged=TRUE;
+            }
+
+            bado.m_pRecordset->MoveNext();	
+    }
+
+    bado.CloseRecordset();
+    bado.CloseConn();
+
+
+    ReloadAddBuildingDB();
+
+
+    if (m_pDialogInfo!=NULL)
+    {
+        delete m_pDialogInfo;
+        m_pDialogInfo = NULL;
+    }
 }

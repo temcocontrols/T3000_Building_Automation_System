@@ -5,13 +5,7 @@
 #include "T3000.h"
 #include "LabelEditDlg.h"
 
-#define START_ID 20000
-// CLabelEditDlg dialog
-#define INPUT_NUMBER 4
-#define OUTPUT_NUMBER 7
-//CString m_input[INPUT_NUMBER]={_T("Internal"),_T("Analog 1"),_T("Analog 2"),_T("Digital 1")};
-CString m_input[INPUT_NUMBER]={_T("Internal Sensor"),_T("Input2"),_T("Input3"),_T("Input4")};
-CString m_output[OUTPUT_NUMBER]={_T("Relay 1"),_T("Relay 2"),_T("Relay 3"),_T("Relay 4"),_T("Relay 5"),_T("Analog 1"),_T("Analog 2")};
+
 
 IMPLEMENT_DYNAMIC(CLabelEditDlg, CDialog)
 
@@ -22,10 +16,14 @@ CLabelEditDlg::CLabelEditDlg(CWnd* pParent /*=NULL*/)
 	m_clrTxt=RGB(0,0,0);
 	m_bkColor=RGB(224, 232, 246);
 	m_strScreenName=_T("");
+	m_bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	m_bado.OnInitADOConn();
 }
 
 CLabelEditDlg::~CLabelEditDlg()
 {
+   
+   m_bado.CloseConn();
 }
 
 void CLabelEditDlg::DoDataExchange(CDataExchange* pDX)
@@ -80,9 +78,33 @@ BOOL CLabelEditDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+
+	/*  m_input[INPUT_NUMBER]={g_strSensorName,g_strInName1,g_strInName2,g_strInName3,g_strInName4,g_strInName5,g_strInName6,g_strInName7,g_strInName8,g_strInHumName,g_strInCO2};
+
+	  m_output[OUTPUT_NUMBER]={_T("Relay 1"),_T("Relay 2"),_T("Relay 3"),_T("Relay 4"),_T("Relay 5"),_T("Analog 1"),_T("Analog 2")};*/
+
+	m_input[0]=g_strSensorName;
+	m_input[1]=g_strInName1;
+	m_input[2]=g_strInName2;
+	m_input[3]=g_strInName3;
+	m_input[4]=g_strInName4;
+	m_input[5]=g_strInName5;
+	m_input[6]=g_strInName6;
+	m_input[7]=g_strInName7;
+    m_input[8]=g_strInName8;
+    m_input[9]=g_strInHumName;
+    m_input[10]=g_strInCO2;
+	m_output[0]=_T("Relay 1");
+	m_output[1]=_T("Relay 2");
+	m_output[2]=_T("Relay 3");
+	m_output[3]=_T("Relay 4");
+	m_output[4]=_T("Relay 5");
+	m_output[5]=_T("Analog 1");
+	m_output[6]=_T("RAnalog 2");
+	 
+	//m_pCon.CreateInstance(_T("ADODB.Connection"));
+	//m_pRs.CreateInstance(_T("ADODB.Recordset"));
+	//m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 	
 	
 	/*
@@ -108,6 +130,7 @@ BOOL CLabelEditDlg::OnInitDialog()
 	if(m_input_or_output>=0&&m_input_or_output<=2)
 		m_IOCombox.SetCurSel(m_input_or_output);
 	OnCbnSelchangeIocombox();
+	m_statusComBox.SetCurSel(m_nstatus);
 	m_textClorBtn.EnableAutomaticButton(_T("Automatic"),m_clrTxt);
 	m_textClorBtn.EnableOtherButton(_T("Other"));
 	m_textClorBtn.SetColor((COLORREF)-1);
@@ -131,6 +154,7 @@ BOOL CLabelEditDlg::OnInitDialog()
 
 	}
 	*/
+	UpdateData(0);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -157,15 +181,14 @@ void CLabelEditDlg::SaveEditValue()
 {
 	try
 	{
-
 	CString strSql;
 	CString strclrTxt;
 	CString strclrBk;
 	strclrTxt.Format(_T("%u"),m_clrTxt);
 	strclrBk.Format(_T("%u"),m_bkColor);
-	strSql.Format(_T("update Screen_Label set Width=%i,Height=%i,Status=%i, Tips='%s',Input_or_Output=%i,Text_Color='%s',Back_Color='%s' where Serial_Num =%i and Tstat_id=%i and  Cstatic_id=%i"),
-		m_nwidth,m_nheight,m_nstatus,_T(""),m_input_or_output,strclrTxt,strclrBk,m_nSerialNum,m_id,m_nControlID);
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	strSql.Format(_T("update Screen_Label set Width=%i,Height=%i,Status=%i,Input_or_Output=%i,Text_Color='%s',Back_Color='%s' where Serial_Num =%i and Tstat_id=%i and  Cstatic_id=%i and Tips='%s'"),
+	m_nwidth,m_nheight,m_nstatus,m_input_or_output,strclrTxt,strclrBk,m_nSerialNum,m_id,m_nControlID,m_strScreenName);
+	m_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 	}
 	catch(_com_error *e)
 	{
@@ -179,16 +202,17 @@ void CLabelEditDlg::AddLabel()
 	{
 
 	CString strSql;
-	strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i"),m_nSerialNum,m_id);
-	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+	strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i and Tips='%s'"),m_nSerialNum,m_id,m_strScreenName);
+	//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+	m_bado.m_pRecordset=m_bado.OpenRecordset(strSql);
 	CString strtemp;
 	strtemp.Empty();
 	_variant_t temp_variant;
 	int nTemp;
 	int nContyrolID=START_ID;
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	while(VARIANT_FALSE==m_bado.m_pRecordset->EndOfFile)
 	{//find the ControlID;
-		temp_variant=m_pRs->GetCollect("Cstatic_id");//
+		temp_variant=m_bado.m_pRecordset->GetCollect("Cstatic_id");//
 		if(temp_variant.vt!=VT_NULL)
 			strtemp=temp_variant;
 		else
@@ -198,10 +222,9 @@ void CLabelEditDlg::AddLabel()
 			nContyrolID=nContyrolID+1;
 		else
 			break;
-		m_pRs->MoveNext();
+		m_bado.m_pRecordset->MoveNext();
 	}
-	if(m_pRs->State) 
-		m_pRs->Close();
+	 m_bado.CloseRecordset();
 
 
 	CString strclrTxt;
@@ -209,7 +232,7 @@ void CLabelEditDlg::AddLabel()
 	strclrTxt.Format(_T("%u"),m_clrTxt);
 	strclrBk.Format(_T("%u"),m_bkColor);
 	strSql.Format(_T("insert into Screen_Label values(%i,%i,%i,%i,%i,%i,%i,%i,'%s',%i,'%s','%s')"),nContyrolID,m_nSerialNum,50,50,m_nheight,m_nwidth,m_id,m_nstatus,m_strScreenName,m_input_or_output,strclrTxt,strclrBk);
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	m_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 
 
 	}
@@ -230,50 +253,120 @@ void CLabelEditDlg::SaveToDb()
 		//edit current label ;//update
 		SaveEditValue();
 	}
-	if(m_pCon->State)
-	m_pCon->Close();
+	 
 }
 
 void CLabelEditDlg::OnCbnSelchangeIocombox()
 {
-	m_statusComBox.ResetContent();
+//	m_statusComBox.ResetContent();
+int m_inRows;
 	m_input_or_output=m_IOCombox.GetCurSel();
-	if(m_input_or_output==0)
+	if(bac_cm5_graphic == false)	//如果不是CM5 
 	{
-		GetDlgItem(IDC_REG_STATIC)->SetWindowText(_T("Input"));
-		for(int i=0;i<INPUT_NUMBER;i++)
+		if(m_input_or_output==0)
 		{
-			m_statusComBox.AddString(m_input[i]);
+			int m_nModel=product_register_value[MODBUS_PRODUCT_MODEL];
+			switch (m_nModel)
+			{
+			case 3:m_inRows=4;break; // 5B
+			case 2:
+			case 1:m_inRows=3;break; // 5A
+			case 4:m_inRows=5;break; // 5C
+			case PM_TSTAT7:m_inRows=12;break;
+			case PM_PRESSURE:
+			case 12:m_inRows=5;break; // 5D 同 TStat7
+			case PM_TSTAT6:	m_inRows=12;break;
+			case PM_TSTAT5i:	m_inRows=12;break;
+            case PM_TSTAT8:	m_inRows=12;break;
+			case 16:m_inRows=10;break; // 5E
+            case PM_PM5E:m_inRows=10;break; // 5E
+			case 17:m_inRows=5;break; // 5F
+			case 18:m_inRows=5;break; // 5G
+			case 19:m_inRows=9;break; // 5H
+			default:
+				break;
+			}
+			--m_inRows;//去掉一行
+
+
+			GetDlgItem(IDC_REG_STATIC)->SetWindowText(_T("Input"));
+			for(int i=0;i<m_inRows;i++)
+			{
+				m_statusComBox.AddString(m_input[i]);
+			}
+			if(m_nstatus>=0&&m_nstatus<=11)
+				m_statusComBox.SetCurSel(m_nstatus);
+			m_regEdit.ShowWindow(SW_HIDE);
+			m_statusComBox.ShowWindow(SW_SHOW);
 		}
-		if(m_nstatus>=0&&m_nstatus<=7)
-			m_statusComBox.SetCurSel(m_nstatus);
-		m_regEdit.ShowWindow(SW_HIDE);
-		m_statusComBox.ShowWindow(SW_SHOW);
-	}
-	if(m_input_or_output==1)
-	{
-		
-		for(int i=0;i<OUTPUT_NUMBER;i++)
+		if(m_input_or_output==1)
 		{
-			m_statusComBox.AddString(m_output[i]);
+
+			for(int i=0;i<OUTPUT_NUMBER;i++)
+			{
+				m_statusComBox.AddString(m_output[i]);
+			}
+			//	m_status_ctrl.SetCurSel(0);
+			GetDlgItem(IDC_REG_STATIC)->SetWindowText(_T("Output"));
+			if(m_nstatus>=0&&m_nstatus<=7)
+				m_statusComBox.SetCurSel(m_nstatus);
+
+			m_regEdit.ShowWindow(SW_HIDE);
+			m_statusComBox.ShowWindow(SW_SHOW);
 		}
-	//	m_status_ctrl.SetCurSel(0);
-		GetDlgItem(IDC_REG_STATIC)->SetWindowText(_T("Output"));
-		if(m_nstatus>=0&&m_nstatus<=7)
-			m_statusComBox.SetCurSel(m_nstatus);
-			
-		m_regEdit.ShowWindow(SW_HIDE);
-		m_statusComBox.ShowWindow(SW_SHOW);
+		if(m_input_or_output==2)
+		{
+			CString strTemp;
+			strTemp.Format(_T("%d"),m_nstatus);
+
+			m_regEdit.SetWindowText(strTemp);
+			m_regEdit.ShowWindow(SW_SHOW);
+			m_statusComBox.ShowWindow(SW_HIDE);
+		}
 	}
-	if(m_input_or_output==2)
+	else//是Bacnet 协议;
 	{
-		CString strTemp;
-		strTemp.Format(_T("%d"),m_nstatus);
-		
-		m_regEdit.SetWindowText(strTemp);
-		m_regEdit.ShowWindow(SW_SHOW);
-		m_statusComBox.ShowWindow(SW_HIDE);
+		if(m_input_or_output==0)
+		{
+			m_statusComBox.ResetContent();
+			for (int i=1;i<=BAC_INPUT_ITEM_COUNT;i++)
+			{
+				CString temp1;
+				temp1.Format(_T("Input%d"),i);
+				m_statusComBox.AddString(temp1);
+			}
+			m_regEdit.ShowWindow(SW_HIDE);
+			m_statusComBox.ShowWindow(SW_SHOW);
+		}
+		else if(m_input_or_output == 1)
+		{
+			m_statusComBox.ResetContent();
+			for (int i=1;i<=BAC_OUTPUT_ITEM_COUNT;i++)
+			{
+				CString temp1;
+				temp1.Format(_T("Output%d"),i);
+				m_statusComBox.AddString(temp1);
+			}
+			m_regEdit.ShowWindow(SW_HIDE);
+			m_statusComBox.ShowWindow(SW_SHOW);
+		}
+		else if(m_input_or_output == 2)
+		{
+			m_statusComBox.ResetContent();
+			for (int i=1;i<=BAC_VARIABLE_ITEM_COUNT;i++)
+			{
+				CString temp1;
+				temp1.Format(_T("Variable%d"),i);
+				m_statusComBox.AddString(temp1);
+			}
+			m_regEdit.ShowWindow(SW_HIDE);
+			m_statusComBox.ShowWindow(SW_SHOW);
+		}
+
+
 	}
+	m_statusComBox.Invalidate(1);
+//	UpdateData(false);
 
 }
 
@@ -299,6 +392,7 @@ void CLabelEditDlg::OnEnKillfocusWidthedit()
 	if(strText.IsEmpty())
 		return;
 	m_nwidth=_wtoi(strText);
+	
 }
 
 void CLabelEditDlg::OnEnKillfocusHeightedit()

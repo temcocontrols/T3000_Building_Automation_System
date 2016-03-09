@@ -226,7 +226,8 @@ void CManageAccountDlg::OnEnKillfocusValueedit()
 		if(m_nCurCol==1)
 		{
 			CString strTemp;
-			for(UINT i=0;i++;i<m_AccountLst.size())
+			for(UINT i=0;i<m_AccountLst.size();i++)		//modify by fance.
+			//for(UINT i=0;i++;i<m_AccountLst.size())
 			{
 				strTemp=m_AccountLst.at(i).strName;
 				if(strText.CompareNoCase(strTemp)==0)

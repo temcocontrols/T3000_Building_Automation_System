@@ -7,12 +7,42 @@
 #include "..\T3000.h"
 #include "..\LightingController\LightingController.h"
 #include "..\MainFrm.h"
-
+#include "..\LCOutNameConfig.h"
+#include "schedule.h"
+#include "..\Config_Routines.h"
+#include "..\Weekly_Routines.h"
+#include "..\Annual_Routines.h"
 static BOOL ifLCdb = TRUE;
 static BOOL ifUpdatedb = TRUE;
 
-#define  IDC_BUTTON_Configure 7001
+//#define  IDC_BUTTON_Configure 7001
+UINT _Read_LightingStatus(LPVOID pParam){
+CLightingController* pFrame=(CLightingController*)(pParam);
+while(TRUE){
 
+if (pFrame)
+{
+	if (!is_connect())
+	{
+		Sleep(5000);
+		continue;
+	}
+	Sleep(2000);
+	int  Status1=read_one(g_tstat_id,14600);
+	int  Status2=read_one(g_tstat_id,14601);
+	for (int i=0;i<16;i++)
+	{
+		pFrame->m_light[i]=(Status1>>i) &0x01;
+	}
+	for (int i=16;i<32;i++)
+	{
+		pFrame->m_light[i]=(Status2>>(i-16)) &0x01;
+	}
+}
+break;
+}
+return 1;
+}
 
 
 
@@ -44,11 +74,13 @@ CLightingController::CLightingController()
 	,comnum(0)
 	, m_nListenPort(6001)
 {
-
+m_GridNo=-1;
+LC_Thread=NULL;
 }
 
 CLightingController::~CLightingController()
 {
+
 }
 
 void CLightingController::DoDataExchange(CDataExchange* pDX)
@@ -86,16 +118,24 @@ void CLightingController::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_ListeningPort, m_listenPortEdit);
 
 	DDX_Control(pDX, IDC_COMBO_IPModel, m_ipModelComBox);
+	DDX_Control(pDX, IDC_COMBO_TIMESERVERLIST2, m_timeserver);
+	DDX_Control(pDX, IDC_MAC_ADDRESS, m_macaddress);
+
+	DDX_Control(pDX, IDC_MSFLEXGRID4, m_inputs_grid);
+	DDX_Control(pDX, IDC_COMBO5, m_combox_controler);
+	DDX_Control(pDX,IDC_SAVEDELAYTIME,m_savedelaytime);
 }
 
 BEGIN_MESSAGE_MAP(CLightingController, CFormView)
 	ON_WM_TIMER()
+	ON_WM_DESTROY()
 	ON_LBN_DBLCLK(IDC_LIST_INPUT, &CLightingController::OnLbnDblclkListInput)
 	ON_LBN_SELCHANGE(IDC_LIST_INPUT, &CLightingController::OnLbnSelchangeListInput)
 	ON_WM_CONTEXTMENU()
-
+	ON_WM_CTLCOLOR()
 	ON_CBN_SELCHANGE(IDC_COMBO1, &CLightingController::OnCbnSelchangeCombo1)
 	ON_EN_KILLFOCUS(IDC_EDIT_MODIFYNAME, &CLightingController::OnEnKillfocusEditModifyname)
+	ON_EN_KILLFOCUS(IDC_SAVEDELAYTIME, &CLightingController::OnEnKillfocusEditTimeSaveDelay)
 	ON_COMMAND(ID_SETMAPPING_ADDOUTPUTBAROD, &CLightingController::OnSetmappingAddoutputbarod)
 	ON_COMMAND(ID_SETMAPPING_PREVIOUS, &CLightingController::OnSetmappingPrevious)
 	ON_COMMAND(ID_SETMAPPING_NEXT, &CLightingController::OnSetmappingNext)
@@ -106,8 +146,10 @@ BEGIN_MESSAGE_MAP(CLightingController, CFormView)
 	ON_BN_CLICKED(IDC_BUTTON_LightingControlAnnualS, &CLightingController::OnBnClickedButtonLightingcontorlAnnuals)
 	ON_BN_CLICKED(IDC_BUTTON_LightingControlGroupS, &CLightingController::OnBnClickedButtonLightingcontorlGroups)
 	ON_BN_CLICKED(IDC_BUTTON_Syncwithpc, &CLightingController::OnBnClickedButtonLightingcontorlSyncwithPC)
+	ON_BN_CLICKED(IDC_SAVEALL, &CLightingController::OnBnClickedButtonSaveAll)
 
 
+	ON_BN_CLICKED(IDC_CONFIGLC_OUTPUTNAME, &CLightingController::OnBnClickedButtonConfigureOutputName)
 	ON_BN_CLICKED(IDC_BUTTON_ADD, &CLightingController::OnBnClickedButtonAdd)
 	ON_MESSAGE(WM_WRITE_MESSAGE,OnWriteMessage)
 	ON_BN_CLICKED(IDC_BUTTON_APPLY, &CLightingController::OnBnClickedButtonApply)
@@ -116,6 +158,15 @@ BEGIN_MESSAGE_MAP(CLightingController, CFormView)
 		 
 	ON_BN_CLICKED(IDC_CHECKEnableEdit, &CLightingController::OnBnClickedCheckEnableEdit)
 	ON_BN_CLICKED(IDC_BUTTON_Configure, &CLightingController::OnBnClickedButtonConfigure)
+
+
+	ON_CBN_SELCHANGE(IDC_COMBO5, &CLightingController::OnCbnSelchangeValuecombo)
+
+
+    ON_BN_CLICKED(IDC_SAVE, &CLightingController::OnSave)
+    ON_BN_CLICKED(IDC_REFRESH, &CLightingController::OnRefresh)
+    ON_BN_CLICKED(IDC_RESET, &CLightingController::OnReset)
+  //  ON_BN_CLICKED(IDC_BUTTON_ADD, &CLightingController::OnBnClickedButtonAdd)
 //	ON_BN_CLICKED(IDC_BUTTON_Configureswitch, &CLightingController::OnBnClickedButtonConfigureswitch)
 END_MESSAGE_MAP()
 
@@ -142,7 +193,9 @@ void CLightingController::Dump(CDumpContext& dc) const
 void CLightingController::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
-
+	for(int i=0;i<32;i++){
+	m_light[i]=FALSE;
+	}
 	CString strtmp;
 	for(int i = 1;i<=200;i++)
 	{
@@ -150,13 +203,13 @@ void CLightingController::OnInitialUpdate()
 		m_comboboxpanel.AddString(strtmp);
 
 	}
-	for (int i = 1;i<=300;i++)
+	for (int i = 1;i<=20;i++)
 	{
 		strtmp.Format(_T("%d"),i);
 		m_comboboxouputboard.AddString(strtmp);
 
 	}
-	for (int i = 1;i<=32;i++)
+	for (int i = 1;i<=24;i++)
 	{
 		strtmp.Format(_T("%d"),i);
 		m_comboboxoutput.AddString(strtmp);
@@ -178,344 +231,87 @@ void CLightingController::OnInitialUpdate()
 // 	n1 = clock();
 	//显示横标题
 	m_msflexgrid1to96.put_TextMatrix(0,0,_T("Panels"));
-	m_msflexgrid1to96.put_TextMatrix(0,1,_T("Outputs"));
+	m_msflexgrid1to96.put_TextMatrix(0,1,_T("Card_ID"));
 	m_msflexgrid1to96.put_TextMatrix(0,2,_T("No."));
 	m_msflexgrid1to96.put_TextMatrix(0,3,_T("OutputName"));
-// 	m_msflexgrid1to96.put_TextMatrix(0,4,_T("Status"));
-// 	m_msflexgrid1to96.put_TextMatrix(0,5,_T("OutputName"));
-// 	m_msflexgrid1to96.put_TextMatrix(0,6,_T("Status"));
-// 	m_msflexgrid1to96.put_TextMatrix(0,8,_T("No"));
-// 	m_msflexgrid1to96.put_TextMatrix(0,9,_T("OutputName"));
-// 	m_msflexgrid1to96.put_TextMatrix(0,10,_T("Status"));
-
-
-
 
 	//设置列宽	
-	m_msflexgrid1to96.put_ColWidth(0,700);
+	/*m_msflexgrid1to96.put_ColWidth(0,0);*/
 	m_msflexgrid1to96.put_ColWidth(1,700);
 	m_msflexgrid1to96.put_ColWidth(2,500);
  	m_msflexgrid1to96.put_ColWidth(3,1500);
-//	m_msflexgrid1to96.put_ColWidth(4,1000);
-// 
-// 	m_msflexgrid1to96.put_ColWidth(4,500);
-// 	m_msflexgrid1to96.put_ColWidth(5,1200);
-// 	m_msflexgrid1to96.put_ColWidth(6,800);
-// 
-// 	m_msflexgrid1to96.put_ColWidth(7,200);
-// 
-// 	m_msflexgrid1to96.put_ColWidth(8,500);
-// 	m_msflexgrid1to96.put_ColWidth(9,1200);
-// 	m_msflexgrid1to96.put_ColWidth(10,800);
-//	m_msflexgrid1to96.AddItem(_T("add"),(COleVariant)(6401L));
 
-
-
-
-	//居中显示
 
 	for (int col=0;col<4;col++)//11
 	{ 
-		m_msflexgrid1to96.put_ColAlignment(col,4);//第二个参数数是功能码，就是表示文字居中显示而已，没别的意思
+		m_msflexgrid1to96.put_ColAlignment(col,4);
+		//第二个参数数是功能码，就是表示文字居中显示而已，没别的意思
 	}
 
-
-
-
-// 	long start,end(0);
-// 	start  = clock();
-// 	Automationflexrow();
-// 	end = clock();
-// 	long resuls = end-start;//resuls ==2680ms
-
-
-#if 0
-	//彩色显示
-	for(int i=1;i<32;i++)		//排数量
-	{
-
-		for(int k=0;k<4;k++)	//列数量
-		{
-			if (i%2==1)
-			{
-				m_msflexgrid1to96.put_Row(i);m_msflexgrid1to96.put_Col(k);m_msflexgrid1to96.put_CellBackColor(RGB(255,255,255));
-			}
-			else
-			{
-				m_msflexgrid1to96.put_Row(i);m_msflexgrid1to96.put_Col(k);m_msflexgrid1to96.put_CellBackColor(COLOR_CELL);
-			}
-		}
-	}
-
-
-
-	//灰色显示
-// 	for (int i=1;i<=6400;i++)
-// 	{  
-// 		m_msflexgrid1to96.put_Row(i);
-// 		m_msflexgrid1to96.put_Col(3);
-// 		m_msflexgrid1to96.put_CellBackColor(RGB(212,208,200));	   //灰色
-// 		m_msflexgrid1to96.put_Col(7);
-// 		m_msflexgrid1to96.put_CellBackColor(RGB(212,208,200));	   //灰色
-// 	}
-
-	//显示纵标题
-	CString str;
-	for(int i=1;i<32;i++)
-	{
-
-		str.Format(_T("%d"),i);
-
-		m_msflexgrid1to96.put_TextMatrix(i,2,str);	
-// 		m_msflexgrid1to96.put_TextMatrix(i,4,str);
-// 		m_msflexgrid1to96.put_TextMatrix(i,8,str);
-
- 		str = _T("Output ")+str;
-		m_msflexgrid1to96.put_TextMatrix(i,3,str);
-// 		m_msflexgrid1to96.put_TextMatrix(i,5,str);
-// 		m_msflexgrid1to96.put_TextMatrix(i,9,str);
-
- //		m_msflexgrid1to96.put_TextMatrix(i,4,_T("OFF"));	
-// 		m_msflexgrid1to96.put_TextMatrix(i,6,_T("OFF"));
-// 		m_msflexgrid1to96.put_TextMatrix(i,10,_T("OFF"));
-
-	}
-// 	n2 = clock();
-// 	long n3 = (n2 - n1);
-// 	CString strn3;
-// 	strn3.Format(_T("用时%d"),n3);
-// 	AfxMessageBox(strn3);
-
-
-
-
-
-
-
-
-
-// 	void put_MergeCol(long index, BOOL newValue)
-// 	{
-// 		static BYTE parms[] = VTS_I4 VTS_BOOL ;
-// 		InvokeHelper(0x3c, DISPATCH_PROPERTYPUT, VT_EMPTY, NULL, parms, index, newValue);
-// 	}
-
-/*	m_msflexgrid1to96.put_MergeCells(2);*/
-
-
-// 	void put_MergeCol(long index, BOOL newValue)
-// 	{
-// 		static BYTE parms[] = VTS_I4 VTS_BOOL ;
-// 		InvokeHelper(0x3c, DISPATCH_PROPERTYPUT, VT_EMPTY, NULL, parms, index, newValue);
-// 	}
-
-	
-
-// 	void put_MergeCells(long newValue)
-// 	{
-// 		static BYTE parms[] = VTS_I4 ;
-// 		InvokeHelper(0x30, DISPATCH_PROPERTYPUT, VT_EMPTY, NULL, parms, newValue);
-// 	}
-
-// 	m_msflexgrid1to96.put_Row(1);
-// 	m_msflexgrid1to96.put_Col(3);
-// 	//m_msflexgrid1to96.put_MergeCells(2);
-// 	m_msflexgrid1to96.put_MergeCol(1,2);
-
-
-//  	for (int i= 0;i<=3;i++)
-//  		m_msflexgrid1to96.put_TextMatrix(5,i,_T("output 1"));
-// 
-// 		m_msflexgrid1to96.put_MergeCells(2);
-//      	m_msflexgrid1to96.put_MergeRow(2,TRUE);
-//   		//m_msflexgrid1to96.put_MergeCol(3,TRUE);	
-
-
-// 	for (int i = 0;i<4;i++)
-// 		m_msflexgrid1to96.put_TextMatrix(5,i,_T("合计"));
-// 	m_msflexgrid1to96.put_MergeCells(2);
-// 	m_msflexgrid1to96.put_MergeRow(5,TRUE);
-
-	//m_msflexgrid1to96.put_FixedRows(0); 
-	m_msflexgrid1to96.put_MergeCells(1); //表按任意方式进行组合单元格内容
-
-//void put_WordWrap(BOOL newValue)
-
-
-
-	m_msflexgrid1to96.put_WordWrap(TRUE);//允许换行 和下面\n对应一起使用才有效果
-	//m_msflexgrid1to96.put_WordWrap(TRUE);
-	for (int i = 1;i<32;i++)
-	{
-		m_msflexgrid1to96.put_TextMatrix(i,0,_T("panel\n1"));
-		m_msflexgrid1to96.put_TextMatrix(i,1,_T("output\n1"));
-	}
-//		m_msflexgrid1to96.put_MergeCells(1);
-		m_msflexgrid1to96.put_MergeCol(0,TRUE);//其中第一人参数0，表示的是第几列.不是表示需要合并的行数
-
-		m_msflexgrid1to96.put_MergeCol(1,TRUE);
-	//	m_msflexgrid1to96.put_MergeCol(2,TRUE);
-	//	m_msflexgrid1to96.put_FixedCols(1);
 
 
 
 #endif
 
 
-//用代码进行自动的增加单元格内容
-// 	int index = 3;
-// 	long NUM;
-// 	for (int i = 1;i<index*32;i++)
-// 	{
-// 		NUM = i+32; 
-// 		m_msflexgrid1to96.AddItem(_T("1"),(COleVariant)NUM);
-// 		//	m_msflexgrid1to96.AddItem(_T("add"),(COleVariant)(6401L));
-// 	}
+//Inputs 
+#if 1
+	//设置排/行数量
+	m_inputs_grid.put_Cols(3);//这句一定要有，如果下面再增加显示一外，而这里不变还是5，则会出错
+	m_inputs_grid.put_Rows(25);//包括标题栏
 
 
+	// 	long n1,n2(0);
+	// 	n1 = clock();
+	//显示横标题
+	m_inputs_grid.put_TextMatrix(0,0,_T("Inputs"));
+	m_inputs_grid.put_TextMatrix(0,1,_T("Status"));
+	m_inputs_grid.put_TextMatrix(0,2,_T("Auto/Manual"));
+	 
+
+	//设置列宽	
+	m_inputs_grid.put_ColWidth(0,1500);
+	m_inputs_grid.put_ColWidth(1,700);
+	m_inputs_grid.put_ColWidth(2,1500);
+ 
 
 
-
-
-//	CString   str; 
-// 	m_msflexgrid1to96.put_Cols(3); 
-// 	m_msflexgrid1to96.put_Rows(1); 
-// 	m_msflexgrid1to96.put_FixedRows(0); 
-// 	m_msflexgrid1to96.put_MergeCells(1); 
-// 	//m_flexGrid.SetCol(0); 
-// 	//m_flexGrid.SetRow(0); 
-// 	m_msflexgrid1to96.put_ColWidth(0,1750); 
-// 	str   =   "Region\tName\tEmployee "; 
-// 	_variant_t   var; 
-// 	var.vt   =   VT_I4; 
-// 	var.intVal   =   0; 
-// 	m_msflexgrid1to96.AddItem(str,(VARIANT)var); 
-// 	str   =   "Northwest\tBats\tBats "; 
-// 	var.intVal   =   1; 
-// 	m_msflexgrid1to96.AddItem(str,(VARIANT)var); 
-// 	str   =   "Northwest\tWhahoos\ttest1 "; 
-// 	var.intVal   =   2; 
-// 	m_msflexgrid1to96.AddItem(str,(VARIANT)var); 
-// 	str   =   "Northwest\tWhahoos\ttest2 "; 
-// 	var.intVal   =   3; 
-// 	m_msflexgrid1to96.AddItem(str,(VARIANT)var); 
-// 	str   =   "Northwest\tSharks\ttest3 "; 
-// 	var.intVal   =   4; 
-// 	m_msflexgrid1to96.AddItem(str,(VARIANT)var); 
-// 
-// 	m_msflexgrid1to96.put_MergeCol(0,TRUE); 
-// 	m_msflexgrid1to96.put_MergeCol(1,TRUE); 
-// 
-// 	m_msflexgrid1to96.put_MergeRow(0,TRUE); 
-// 	m_msflexgrid1to96.put_MergeRow(1,TRUE); 
-// 	m_msflexgrid1to96.put_FixedCols(1); 
-// 	m_msflexgrid1to96.put_FixedRows(1);
-
-
-#if 0
-
-// 	m_msflexgrid1to96.put_Cols(3); 
-// 	m_msflexgrid1to96.put_Rows(1); 
- 	m_msflexgrid1to96.put_FixedRows(0); 
- 	m_msflexgrid1to96.put_MergeCells(1); 
-//	m_msflexgrid1to96.put_ColWidth(0,1750);
-
-
-	str   =   "Region\tName\tEmployee "; 
-	_variant_t   var; 
-	var.vt   =   VT_I4; 
-	var.intVal   =   0; 
-	m_msflexgrid1to96.AddItem(str,(VARIANT)var); 
-	str   =   "Northwest\tBats\tBats "; 
-	var.intVal   =   1; 
-	m_msflexgrid1to96.AddItem(str,(VARIANT)var); 
-	str   =   "Northwest\tWhahoos\ttest1 "; 
-	var.intVal   =   2; 
-	m_msflexgrid1to96.AddItem(str,(VARIANT)var); 
-	str   =   "Northwest\tWhahoos\ttest2 "; 
-	var.intVal   =   3; 
-	m_msflexgrid1to96.AddItem(str,(VARIANT)var); 
-	str   =   "Northwest\tSharks\ttest3 "; 
-	var.intVal   =   4; 
-	m_msflexgrid1to96.AddItem(str,(VARIANT)var); 
-
-	m_msflexgrid1to96.put_MergeCol(0,TRUE); 
-	m_msflexgrid1to96.put_MergeCol(1,TRUE); 
-
-	m_msflexgrid1to96.put_MergeRow(0,TRUE); 
-	m_msflexgrid1to96.put_MergeRow(1,TRUE);
-
-	m_msflexgrid1to96.put_FixedCols(1); 
-	m_msflexgrid1to96.put_FixedRows(1);
+	for (int col=0;col<3;col++)//11
+	{ 
+		m_inputs_grid.put_ColAlignment(col,4);//第二个参数数是功能码，就是表示文字居中显示而已，没别的意思
+	}
 #endif
 
-
-
-#endif
 }
+void CLightingController::Fresh_ListBox(){
+    unsigned short sys_data[4];
+    CString str_input;
+	Read_Multi(g_tstat_id,&sys_data[0],0,4);
+	m_sn=sys_data[0]+sys_data[1]*256+sys_data[2]*256*256+sys_data[3]*256*256*256;
+    m_ListBox.ResetContent();
+	for(int i=0;i<24;i++)
+	{
 
+		str_input=Get_Table_Name(m_sn,_T("Input"),i+1);
+		m_ListBox.InsertString(i,str_input);
+	}
+}
 void CLightingController::Fresh()
 {
-// 	g_tstat_id =100;
-// 	open_com(2);
-	//关闭T3000主线程
 	CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 	pMain->m_pFreshMultiRegisters->SuspendThread();
 	pMain->m_pRefreshThread->SuspendThread();
 
 	//m_inaddress = 255;//界面上Address的值,在这里除显示没任何意义
 	UpdateData(FALSE);
+	
 	if(ifLCdb)//T3000启动仅执行一次
 	{
-		CString temptable = _T("LightingController");
-		CString tempsql = _T("create table LightingController(Address Number Primary Key,Data text)");//
-		checkDB(temptable,tempsql);
 
-		temptable = _T("LightingController_Name");
-	    tempsql = _T("create table LightingController_Name(Address Number,Type text,ID_No text,OutputName text,Status text)");//No text
-		checkDB(temptable,tempsql);
 
-	//	ReadDB();//读取存入硬件的寄存器的值
-//		ReadDB_OutNameStatus();//读取输出名称
-
-		//初始化映射关系界面参数
-		CString strtemp;
-		for (int i=0;i<24;i++)
-		{
-			strtemp.Format(_T("Input%d"),i+1);
-			//m_ListBox.AddString(strtemp);
-			m_ListBox.InsertString(i,strtemp);
-		}
-		//m_ListBox.SetCurSel(0);
-	
-//初始化Output值存入数组
-		memset(m_ArrayOutput,0,sizeof(m_ArrayOutput));
-//		InitializeArray(m_ArrayOutput);
-//初始化ComboBox映射关系选择项
 		m_strcomboBox = _T("Input-Output-Map");
-	
-
-
-
-
 		m_comboBox.SetCurSel(1);//input 1 group 0
 		m_ListBox.SetCurSel(0);//列表默认项设为第一项
-
-		//读取串口号
-// 		BOOL Bret = GetSerialComm(m_szComm);
-// 		if (!Bret)
-// 			AfxMessageBox(_T("There is no serial port!"));
-		
-		if (g_CommunicationType == 0)//如果是网络通信则不去读com口  g_CommunicationType = 0串口，而=1是网络通信
-		{
-			readSerial();//读取串口号
-			if (comnum == 0)
-			{
-				AfxMessageBox(_T("Serial Port not available"));
-			}
-		}
-
-
 		m_CStrModel = _T("Lighting Controller");
 		GetDlgItem(IDC_EDIT5)->SetWindowText(m_CStrModel);
 		
@@ -523,115 +319,190 @@ void CLightingController::Fresh()
 	}
 
 
-// 	for (int i = 0;i<m_szComm.size();i++)
-// 	{
-// 		comnum = _wtoi(m_szComm[i].Mid(3));	
-// 		bool ret = open_com(comnum);
-// 		if (ret)
-// 			break;
-// 		else if ((!ret)&&(i==m_szComm.size()-1))
-// 			AfxMessageBox(_T("Port not available"));
-// 
-// 	}
-
-	
+	Fresh_ListBox();
 	SetPaneString(2,_T("Online!"));
 
 	m_comboboxoutput.SetCurSel(0);
 	m_comboboxouputboard.SetCurSel(0);
 	m_comboboxpanel.SetCurSel(0);
-
-	//打开IP
-
-
-
-
-
-
-	//UpdateData(FALSE);
-
-//	ShowLighContDlg();
-
-	//AfxGetMainWnd()->ShowWindow(SW_MAXIMIZE);//最大化显示界面
-
-	//HICON hIcon = AfxGetApp()->LoadIcon(IDR_T3000TYPE);
-	//ASSERT(hIcon);
-	//AfxGetMainWnd()->SendMessage(WM_SETICON,TRUE,(LPARAM)hIcon);//消息，就是并不会立即执行
-
-	//AfxGetMainWnd()->SetWindowText(_T("LC"));//改变窗口标题
-	m_ipModelComBox.SetCurSel(0);
-	OnBnClickedCheckEnableEdit();
-	m_ip_addressCtrl.SetAddress((BYTE)192,(BYTE)168,(BYTE)0,(BYTE)3);
-	m_subnet_addressCtrl.SetAddress((BYTE)255,(BYTE)255,(BYTE)255,(BYTE)0);
-	m_gateway_addressCtrl.SetAddress((BYTE)192,(BYTE)168,(BYTE)0,(BYTE)4);
-
-	
-#if 0//原NC
-	GetDlgItem(IDC_SERIALSTATIC)->SetFocus();
-	m_IDaddress=multi_register_value[6];
-	m_nSerialNum=get_serialnumber();
-	//m_firmwareVersion=get_curtstat_version();
-	GetFirmwareVersion();
-	m_nbldVersion = multi_register_value[14];
-	CEdit* pEdit = (CEdit*)GetDlgItem(IDC_EDIT_BLDVERSION);
-	CString strBldVer; strBldVer.Format(_T("%d"), m_nbldVersion);
-	pEdit->SetWindowText(strBldVer);
-	if (m_nbldVersion < _OLD_NC_VERSION && !m_bWarningBldVersion && m_nSerialNum != 0) // 序列号不等于0防止掉线时版本寄存器为0弹这个消息
-	{	
-		m_bWarningBldVersion = TRUE;
-		CString strBldVer;
-		strBldVer.Format(_T("NC(ID: %d) boot loader's current version is %d, it's too low, please upgrade it."), m_nSerialNum, m_nbldVersion);
-		AfxMessageBox(strBldVer);
-
-	}
-	m_hardware_version=multi_register_value[8];
-
-
-	if(multi_register_value[1]<10)
-		m_strDate.Format(_T("%d%d-%d-%d"),multi_register_value[200],multi_register_value[201],multi_register_value[202],multi_register_value[204]);
-	else
-		m_strDate.Format(_T("%d%d-%d-%d"),multi_register_value[0],multi_register_value[201],multi_register_value[202],multi_register_value[204]);
-
-
-	m_strTime.Format(_T("%02d:%02d"),multi_register_value[205],multi_register_value[206]);
-
-
-	m_ip_addressCtrl.SetAddress((BYTE)multi_register_value[107],(BYTE)multi_register_value[108],(BYTE)multi_register_value[109],(BYTE)multi_register_value[110]);
-	m_subnet_addressCtrl.SetAddress((BYTE)multi_register_value[111],(BYTE)multi_register_value[112],(BYTE)multi_register_value[113],(BYTE)multi_register_value[114]);
-	m_gateway_addressCtrl.SetAddress((BYTE)multi_register_value[115],(BYTE)multi_register_value[116],(BYTE)multi_register_value[117],(BYTE)multi_register_value[118]);
-	OnBnClickedCheck1();
-
-	if(multi_register_value[12]==0)
+	 if (!is_connect())
 	{
-		m_baudRateCombox.SetCurSel(0);
+	SetPaneString(1,_T("NO CONNECTION"));
 	}
+	Fresh_System();
+	Fresh_Inputs();
+	//OnLbnSelchangeListInput();
 
-	if(multi_register_value[12]==1)
-	{
-		m_baudRateCombox.SetCurSel(1);
-	}
+    int  Status1=read_one(g_tstat_id,14600);
+    int  Status2=read_one(g_tstat_id,14601);
+    for (int i=0;i<16;i++)
+    {
+        m_light[i]=(Status1>>i) &0x01;
+    }
+    for (int i=16;i<32;i++)
+    {
+        m_light[i]=(Status2>>(i-16)) &0x01;
+    }
 
-
-	if(multi_register_value[106]==0)
-	{
-		m_ipModelComBox.SetCurSel(0);
-	}
-	if(multi_register_value[106]==1)
-	{
-		m_ipModelComBox.SetCurSel(1);
-	}
-
-
-
-	m_nListenPort=multi_register_value[120];
-
-	UpdateData(false);
-#endif
-
+    AfxBeginThread(_Read_LightingStatus,this);
 	SetTimer(LIGHTINGCONTROLLERTIMER,1000,NULL);
 
 }
+void CLightingController::Read_Input_Group_Mapping(BOOL Input_Group)
+{
+	unsigned short Output_Units_Data[60];
+	Mapping_Struct temp;
+	int OutputNameAddress=0;
+	m_group_output_mapping.clear();
+	m_input_output_mapping.clear();
+	if (Input_Group)
+	{
+       
+		for (int swith=0;swith<24;swith++)
+		{
+			Read_Multi(g_tstat_id,Output_Units_Data,300+60*swith,60);
+			temp.Address=swith+1;
+			for (int out=0;out<20;out++)
+			{
+				temp.Card_ID=Output_Units_Data[3*out];
+				for (int OutputAddress=1;OutputAddress<=32;OutputAddress++)
+				{     
+					int RegisterValue;
+					int Position;
+					if (OutputAddress<=16)
+					{
+						RegisterValue=Output_Units_Data[3*out+1];
+						Position=OutputAddress;
+					}
+					else
+					{
+						RegisterValue=Output_Units_Data[3*out+2];
+						Position=OutputAddress-16;
+					}
+					if(Get_Bit_FromRegister(RegisterValue,Position))//如果是1的话，那么就加入到Mapping中去
+					{
+						temp.OuputNo=OutputAddress;
+						temp.OutputNameAddress=OutputNameAddress;
+						OutputNameAddress++;
+						m_input_output_mapping.push_back(temp);
+					}
+				}
+			}
 
+		}
+	} 
+	else
+	{
+		for (int swith=0;swith<40;swith++)
+		{
+			Read_Multi(g_tstat_id,Output_Units_Data,1740+60*swith,60);
+			temp.Address=swith+1;
+			for (int out=0;out<20;out++)
+			{
+				temp.Card_ID=Output_Units_Data[3*out];
+				for (int OutputAddress=1;OutputAddress<=32;OutputAddress++)
+				{     
+					int RegisterValue;
+					int Position;
+					if (OutputAddress<=16)
+					{
+						RegisterValue=Output_Units_Data[3*out+1];
+						Position=OutputAddress;
+					}
+					else
+					{
+						RegisterValue=Output_Units_Data[3*out+2];
+						Position=OutputAddress-16;
+					}
+					if(Get_Bit_FromRegister(RegisterValue,Position))//如果是1的话，那么就加入到Mapping中去
+					{
+						temp.OuputNo=OutputAddress;
+						temp.OutputNameAddress=OutputNameAddress;
+						OutputNameAddress++;
+						m_group_output_mapping.push_back(temp);
+					}
+				}
+			}
+		}
+	}
+
+
+
+
+
+
+	 
+}
+void CLightingController::Fresh_Inputs(){
+CString temp;
+
+ 
+	unsigned short temp_MB[24],temp_AM[24];
+   Read_Multi(g_tstat_id,&temp_MB[0],INPUT_MB,24);
+   Read_Multi(g_tstat_id,&temp_AM[0],INPUT_AM,24);
+  for (int row=1;row<=24;row++)
+  {
+   temp=Get_Table_Name(m_sn,_T("Input"),row);
+   m_inputs_grid.put_TextMatrix(row,0,temp);
+
+   if (temp_MB[row-1]!=0)
+   {
+	   temp=_T("ON");
+   } 
+   else
+   {
+	   temp=_T("OFF");
+   }
+   m_inputs_grid.put_TextMatrix(row,1,temp);
+
+  if (temp_AM[row-1]!=0)
+  {
+    temp=_T("MAN");
+  } 
+  else
+  {
+    temp=_T("AUTO");
+  }
+   m_inputs_grid.put_TextMatrix(row,2,temp);
+  }
+
+
+}
+void CLightingController::Fresh_System(){
+unsigned short sys_data[100];
+CString strtemp;
+Read_Multi(g_tstat_id,&sys_data[0],0,20);
+strtemp.Format(_T("%d"),sys_data[6]);
+GetDlgItem(IDC_EDIT1)->SetWindowTextW(strtemp);//Address ID
+
+strtemp.Format(_T("%d"),sys_data[0]+sys_data[1]*256+sys_data[2]*256*256+sys_data[3]*256*256*256);
+
+GetDlgItem(IDC_EDIT3)->SetWindowTextW(strtemp);//Serial NO
+strtemp.Format(_T("%d"),sys_data[8]);
+GetDlgItem(IDC_EDIT4)->SetWindowTextW(strtemp);//Hardware
+ 
+ 
+float firmware=((float) sys_data[4])/100.0+(float)sys_data[5];
+strtemp.Format(_T("%0.2f"),firmware);
+GetDlgItem(IDC_EDIT2)->SetWindowTextW(strtemp);
+
+m_timeserver.SetCurSel(0);
+m_timeserver.EnableWindow(FALSE);
+
+
+Read_Multi(g_tstat_id,&sys_data[0],100,21);
+strtemp.Format(_T("%02X-%02X-%02X-%02X-%02X-%02X"),sys_data[0],sys_data[1],sys_data[102],sys_data[3],sys_data[4],sys_data[5]);
+m_macaddress.SetWindowText(strtemp);
+m_ipModelComBox.SetCurSel(sys_data[6]);
+m_ip_addressCtrl.SetAddress((BYTE)sys_data[7],(BYTE)sys_data[8],(BYTE)sys_data[9],(BYTE)sys_data[10]);
+m_subnet_addressCtrl.SetAddress((BYTE)sys_data[11],(BYTE)sys_data[12],(BYTE)sys_data[13],(BYTE)sys_data[14]);
+m_gateway_addressCtrl.SetAddress((BYTE)sys_data[15],(BYTE)sys_data[16],(BYTE)sys_data[17],(BYTE)sys_data[18]);
+strtemp.Format(_T("%d"),sys_data[20]);
+m_listenPortEdit.SetWindowText(strtemp);
+OnBnClickedCheckEnableEdit();
+strtemp.Format(_T("%d"),read_one(g_tstat_id,92));
+m_savedelaytime.SetWindowText(strtemp);
+}
 void CLightingController::ShowLighContDlg()
 {
 	m_CStrModel = _T("Lighting Controller");
@@ -679,10 +550,6 @@ void CLightingController::OnTimer(UINT_PTR nIDEvent)
 	CMainFrame*pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
 	CView* pNewView = pMain->m_pViews[8];
 	CView* pActiveView = pMain->GetActiveView();
-
-
-
-
 	static int counter = 59,counter2 = 600*1000;
 	counter++;
 	counter2++;
@@ -709,62 +576,27 @@ void CLightingController::OnTimer(UINT_PTR nIDEvent)
 
 
 
-
-	if (LIGHTINGCONTROLLERTIMER == nIDEvent)//counter == 60
-	{	
-// 		CTime now;
-// 		now = CTime::GetCurrentTime();
-// 		m_datetime = now.Format(_T("%A,%B,%d,%Y  %H:%M:%S"));
-		
-// 		int iret = Read_Multi(254,lightingController_time,4600,8,3);
-// 		if(iret>0)
-// 		{
-// 			m_date.SetDate(lightingController_time[0]*100+lightingController_time[1],lightingController_time[2],lightingController_time[4]);
-// 			m_time.SetTime(lightingController_time[5],lightingController_time[6],lightingController_time[7]);
-// 		}
-
-	//	m_comboBox.SetCurSel(m_comboBox.GetCurSel());
-// 		m_date.GetCurrentTime();
-// 		m_time.GetCurrentTime();
-			//UpdateData(FALSE);
-	}
+ 
 
 
 
-	////////////////
-	if(counter%1000*1000 == 0)
-	{
-		int iret = Read_Multi(254,lightingController_time,4600,8,3);
-		if(iret>0)
-		{
-			m_date.SetDate(lightingController_time[0]*100+lightingController_time[1],lightingController_time[2],lightingController_time[4]);
-			m_time.SetTime(lightingController_time[5],lightingController_time[6],lightingController_time[7]);
-			//UpdateData(FALSE);
-		}
-	}
+	//////////////////
+	//if(counter%1000*1000 == 0)
+	//{
+	//	int iret = Read_Multi(254,lightingController_time,4140,8,3);
+	//	if(iret>0)
+	//	{
+	//		m_date.SetDate(lightingController_time[0]*100+lightingController_time[1],lightingController_time[2],lightingController_time[4]);
+	//		m_time.SetTime(lightingController_time[5],lightingController_time[6],lightingController_time[7]);
+	//		//UpdateData(FALSE);
+	//	}
+	//}
 
-	////////////////
-
-
-
-	if (counter%counter2 == 0)
-	{
-		if (prodtopcData())
-		{
-			ShowLighContDlg();
-			SetPaneString(1,_T("Online!"));
-
-			if (ifUpdatedb)
-			{
-				UpdateDBALL();
-				ifUpdatedb = FALSE;
-				counter2 = 60*2;
-
-			}
+	//////////////////
 
 
-		}
-	}
+
+	
 
 
 
@@ -782,7 +614,7 @@ KillTimer(LIGHTINGCONTROLLERTIMER);
 #if 1
 //读取串口号，从数据库
 
-open_com(comnum);
+//open_com(comnum);
 
 int sumret = 0;
 BOOL flag = FALSE;
@@ -832,220 +664,9 @@ SetTimer(LIGHTINGCONTROLLERTIMER,1000,NULL);
 return flag;
 }
 
-BOOL CLightingController::checkDB( CString DBname,CString strSQL )
-{
-	CADO m_ado;
-	m_ado.OnInitADOConn();
 
 
-		//判断数据库是否存在
-
-		bool m_judge = m_ado.IsHaveTable(m_ado,DBname);
-		//不存在 创建数据库表
-
-		if(DBname.CompareNoCase(_T("LightingController")) == 0)
-		{
-
-			if (!m_judge) 
-			{	
-				m_ado.m_pRecordset = m_ado.OpenRecordset(strSQL);
-				//初始化表
-				if(DBname.CompareNoCase(_T("LightingController")) == 0)
-				{
-
-					CString sql = _T("select * from LightingController");
-					m_ado.m_pRecordset = m_ado.OpenRecordset(sql);
-					if (m_ado.m_pRecordset->EndOfFile)
-					{
-
-						for(int i = 0;i<400;i++)
-						{
-							try 
-							{
-								m_ado.m_pRecordset->AddNew();
-								m_ado.m_pRecordset->PutCollect("Address",(_bstr_t)(i+1));
-								m_ado.m_pRecordset->PutCollect("Data",(_bstr_t)"1");
-								m_ado.m_pRecordset->Update();
-
-							}
-
-
-							catch(...)
-							{
-								return FALSE;
-
-							}
-						}
-						m_ado.CloseRecordset();
-					}
-				}
-
-			}
-		}else if(DBname.CompareNoCase(_T("LightingController_Name")) == 0)
-		{
-			if(!m_judge)
-			{
-				m_ado.m_pRecordset = m_ado.OpenRecordset(strSQL);
-				CString StrOutputName,StrStatus = _T("OFF");
-				CString sql = _T("select * from LightingController_Name");
-				m_ado.m_pRecordset = m_ado.OpenRecordset(sql);
-#if 1
-				if (m_ado.m_pRecordset->EndOfFile)
-				{
-					long start(0),end(0);
-					start = clock();
-					//初始化input-output-mapping
-					CString CSTYPE;
-					CString strtype = _T("Input");
-					BOOL flg = TRUE;
-					int maxin = 24;
-					for (int i =1;i<=maxin;i++)
-					{	
-						CSTYPE.Format(_T("%s%d"),strtype,i);
-						for (int j = 1;j<=20;j++)
-						{	
-							for(int k = 1;k<=32;k++)
-							{
-								StrOutputName.Format(_T("Output%d"),k);
-								try 
-								{
-									m_ado.m_pRecordset->AddNew();
-									m_ado.m_pRecordset->PutCollect("Address",(_bstr_t)j);
-									m_ado.m_pRecordset->PutCollect("Type",(_bstr_t)CSTYPE);
-									m_ado.m_pRecordset->PutCollect("ID_No",(_bstr_t)k);
-									m_ado.m_pRecordset->PutCollect("OutputName",(_bstr_t)StrOutputName);
-									m_ado.m_pRecordset->PutCollect("Status",(_bstr_t)StrStatus);
-									m_ado.m_pRecordset->Update();
-
-								}
-
-
-								catch(...)
-								{
-									return FALSE;
-
-								}
-							}
-						}
-// 						if(i == 24&&flg)//这样要慢将近15ms
-// 						{
-// 							i = 0;
-// 							strtype = _T("GroupMap");
-// 							flg = FALSE;
-// 							maxin = 20;
-// 
-// 						}
-
-					}
-
-#if 1
-
-					for (int i =1;i<=20;i++)
-					{	
-						CSTYPE.Format(_T("Group%d"),i);
-						for (int j = 1;j<=20;j++)
-						{	
-							for(int k = 1;k<=32;k++)
-							{
-								StrOutputName.Format(_T("Output%d"),k);
-								try 
-								{
-									m_ado.m_pRecordset->AddNew();
-									m_ado.m_pRecordset->PutCollect("Address",(_bstr_t)j);
-									m_ado.m_pRecordset->PutCollect("Type",(_bstr_t)CSTYPE);
-									m_ado.m_pRecordset->PutCollect("ID_No",(_bstr_t)k);
-									m_ado.m_pRecordset->PutCollect("OutputName",(_bstr_t)StrOutputName);
-									m_ado.m_pRecordset->PutCollect("Status",(_bstr_t)StrStatus);
-									m_ado.m_pRecordset->Update();
-
-								}
-
-
-								catch(...)
-								{
-									return FALSE;
-
-								}
-							}
-						}
-
-					}
-#endif
-					end = clock();
-					long resul = (end-start);
-					CString strshow;
-					strshow.Format(_T("initl DB spend\n%d seconds"),resul);
-		//			AfxMessageBox(strshow);
-
-					m_ado.CloseRecordset();
-				}
-#endif
-
-			}
-
-
-		}
-
-		m_ado.CloseConn();
-
-
-	return TRUE;
-}
-
-BOOL CLightingController::ReadDB()
-{
-
-	CADO m_ado;
-	m_ado.OnInitADOConn();
-
-	CString SQL = _T("select * from LightingController"); 
-	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
-	int num =0;
-	_variant_t vartemp;
-	veclightingcontroller.clear();
-	while(!m_ado.m_pRecordset->EndOfFile)
-	{
-		m_veclightingcontroller.iaddress =m_ado.m_pRecordset->GetCollect(_T("Address"));
-
-
-		vartemp =m_ado.m_pRecordset->GetCollect(_T("Data"));
-		if (vartemp.vt==VT_NULL)
-			m_veclightingcontroller.CStvalue =_T("");
-		else
-			m_veclightingcontroller.CStvalue =vartemp;
-
-
-		m_ado.m_pRecordset->MoveNext();
-
-		veclightingcontroller.push_back(m_veclightingcontroller);
-	}
-
-	//读取本电脑当前正在使用的串口。
-#if 1//会出问题，就是如果在数据存的这个串口与电脑的串口号不对应，则本类永远无法有正确数据采集？
-	CString CSTcompot;
-	BOOL BOdefault;
-	SQL = _T("select * from Building");
-	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
-	while(!m_ado.m_pRecordset->EndOfFile)
-	{
-		CSTcompot =(_variant_t)m_ado.m_pRecordset->GetCollect(_T("Com_Port"));
-		BOdefault =(_variant_t)m_ado.m_pRecordset->GetCollect(_T("Default_SubBuilding"));//TRUE = -1即非0，FALSE就是0
-		m_ado.m_pRecordset->MoveNext();
-
-		if (BOdefault)
-		{
-			comnum = _wtoi(CSTcompot.Mid(3));
-		}
-
-	}
-
-#endif
-
-	m_ado.CloseRecordset();
-	m_ado.CloseConn();
-	return TRUE;
-}
-
+ 
 BOOL CLightingController::UpdateDBALL()
 {
 	TRACE(_T("Updatedatabase()start!\n"));
@@ -1112,9 +733,6 @@ BOOL CLightingController::UpdateDBALL()
 	return TRUE;
 }
 
-
-
-
 void CLightingController::OnLbnDblclkListInput()
 {
 	int Index = m_ListBox.GetCurSel();
@@ -1134,205 +752,137 @@ void CLightingController::OnLbnDblclkListInput()
 
 
 }
+///////Alex/Fresh_Ouputs 表///////////////////////////////////////////////////////////////////////////
+#if 0
+void CLightingController::OnLbnSelchangeListInput()
+{   	
+	CString strtmp,strtmp1;
+
+	GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp);
+	if (strtmp.CompareNoCase(_T("Input-Output-Map")) == 0)//确认是input还是group
+	{    
+		Read_Input_Group_Mapping(TRUE);
+
+		Fresh_OutputGrid(TRUE);
+	}
+	else
+	{
+		Read_Input_Group_Mapping(FALSE);
+		Fresh_OutputGrid(FALSE);	
+	}
+}
+#endif
+
+#if 1
 
 void CLightingController::OnLbnSelchangeListInput()
 {
 	//m_msflexgrid1to96.AddItem(_T("d"),1);RemoveItem(1);减少一行//Refresh();//Clear();
-
 	int startaddr;//input1=200;group1=2600
 	m_msflexgrid1to96.Clear();
 	m_msflexgrid1to96.put_TextMatrix(0,0,_T("Panels"));
-	m_msflexgrid1to96.put_TextMatrix(0,1,_T("Outputs"));
+	m_msflexgrid1to96.put_TextMatrix(0,1,_T("Card_ID"));
 	m_msflexgrid1to96.put_TextMatrix(0,2,_T("No."));
 	m_msflexgrid1to96.put_TextMatrix(0,3,_T("OutputName"));
-
-
-
 	int itmp = m_ListBox.GetCurSel();//获取编号
 	//判断是组还是输入
-	CString strtmp,strtmp1;
+	CString strtmp,strtmp_PanelName;
 	GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp);
 	if (strtmp.CompareNoCase(_T("Input-Output-Map")) == 0)//确认是input还是group
 	{
-		strtmp1.Format(_T("input%d"),itmp+1);
-		startaddr = 300+itmp*100;
+		strtmp_PanelName=Get_Table_Name(m_sn,_T("Input"),itmp+1);
+		startaddr = 300+itmp*60;
 	}
 	else
 	{
-		strtmp1.Format(_T("group%d"),itmp+1);
-		startaddr = 2700+itmp*100;
+		strtmp_PanelName=Get_Table_Name(m_sn,_T("Group"),itmp+1);
+		startaddr = 1740+itmp*60;
 	}
 
 	m_vecaddoutputs.clear();
+    m_mapaddoutputs.clear();
 	map<CString,vecaddoutputs>::iterator iter;//查找组中的元素
-	iter = m_mapaddoutputs.find(strtmp1);
-	if (iter != m_mapaddoutputs.end())
+	iter = m_mapaddoutputs.find(strtmp_PanelName);
+	int card,output;
+ 
 	{
-		m_vecaddoutputs = iter->second;
-
-		//将选择的数据显示在flexgrid控件上
-		int elementnum =m_vecaddoutputs.size();
-		for (int i =1;i<=elementnum;i++)
-		{
-			m_msflexgrid1to96.put_TextMatrix(i,0,m_vecaddoutputs.at(i-1).strpanel);
-			//m_vecaddoutputs.at(i-1).stroutputboard = m_vecaddoutputs.at(i-1).strpanel+ _T("--\nout") + m_vecaddoutputs.at(i-1).stroutputboard;
-			m_msflexgrid1to96.put_TextMatrix(i,1,m_vecaddoutputs.at(i-1).stroutputboard);
-			m_msflexgrid1to96.put_TextMatrix(i,2,m_vecaddoutputs.at(i-1).stroutputno);
-			m_vecaddoutputs.at(i-1).stroutputname =  _T("output")+m_vecaddoutputs.at(i-1).stroutputno;
-			m_msflexgrid1to96.put_TextMatrix(i,3,m_vecaddoutputs.at(i-1).stroutputname);
-
-		}
-	}
-	else//去读取硬件
-
-	{
-
-
-#if 1 //测试LightingController批量读。
+ //测试LightingController批量读。
 		if (g_CommunicationType == 0)
 			open_com(comnum);
 		memset(SerialNum,0,sizeof(SerialNum));
-
-// 		int num = 0;//确定硬件件中input-output-map中有已设置了多少组（总共24组）
-// 
-// 		for (int i = 200;i<2400;)
-// 		{
-// 			int tmp = read_one(g_tstat_id,i);
-// 			if( tmp == 255)
-// 			{
-// 				num+=1;
-// 				break;		
-// 			}
-// 			num+=1;			
-// 			i+=100;
-// 		}
-// 
-// 		//根据已知多少有多少组是设置好的后再去读取。
-// 		int flg = 0; 
-// 		for (int i =0;i<100;i++)
-// 		{
-
-		
-			register_critical_section.Lock();
-			//AfxMessageBox(_T("start read 100 register"));
-		 int 	flg = Read_Multi(g_tstat_id,SerialNum,startaddr,100);
+		register_critical_section.Lock();
+		//AfxMessageBox(_T("start read 100 register"));
+		int 	flg = Read_Multi(g_tstat_id,SerialNum,startaddr,60);
 		//int 	flg = Read_Multi(100,SerialNum,startaddr,100);
-		 register_critical_section.Unlock();
-		 CString st;
-		 st.Format(_T("%d"),flg);
-		// AfxMessageBox(_T("start read 100 register return%d"),flg);
-
-			
-//		}
- 		if (flg>0)
- 		{
- 		//	AfxMessageBox(_T("Read successful！"));
- 	
-
-// 			int i  = m_vecaddoutputs.size()+1;
-// 			m_msflexgrid1to96.put_TextMatrix(i,0,strpanel);
-// 			int ctoitmp = _ttoi(stroutputboard);
-// 			if (ctoitmp<10)
-// 				stroutputboard.Format(_T("00%d"),ctoitmp);
-// 			else if (ctoitmp<100)
-// 				stroutputboard.Format(_T("0%d"),ctoitmp);
-// 
-// 			stroutputboard = strpanel+ _T("--out\n") + stroutputboard;
-// 			m_msflexgrid1to96.put_TextMatrix(i,1,stroutputboard);
-// 			m_msflexgrid1to96.put_TextMatrix(i,2,stroutput);
-// 			stroutputname =  _T("output")+stroutput;
-// 			m_msflexgrid1to96.put_TextMatrix(i,3,stroutputname);
-
-
-
+		register_critical_section.Unlock();
+		CString st;
+		st.Format(_T("%d"),flg);
+		//		}
+		if (flg>0)
+		{
 			m_vecaddoutputs.clear();
 			CString strpanel,stroutputboard,stroutput,stroutputname;
 
 			//将选择的数据保存在内存中vector:: m_vecaddoutputs
 			int outsum=0;
 
-			for(int i =0;i<100;)
+			for(int i =0;i<60;)
 			{
 				if (SerialNum[i] != 255&& SerialNum[i] !=0&&SerialNum[i]!=65535)
 					outsum++;
-				i+=5;
-					
-
+				i+=3;
 			}
 			BYTE Byte = 1;
 			int flag = 0;
-		//	for(int j=0:j<outsum;j++)
+			//	for(int j=0:j<outsum;j++)
 			WORD wtmp;
 			for(int j = 0;j<outsum;j++)
 			{
-				strpanel.Format(_T("%d"),1);
-				stroutputboard.Format(_T("1--out\n%d"),j+1);
-
+				strpanel.Format(_T("%d"),itmp+1);
+				strpanel=strtmp_PanelName;
+				stroutputboard.Format(_T("Card%d"),j+1);
+				
 				for (int i =1;i<=32;i++)
 				{
 
-					if(i <=8)
+					if(i <=16)
 					{
-						wtmp = SerialNum[j*5+1];
+						wtmp = SerialNum[j*3+1];
 						flag = (Byte<<(i-1))&wtmp;
 						if (flag != 0)
 						{
 							stroutput.Format(_T("%d"),i);
-							stroutputname.Format(_T("output%d"),i);
+							stroutputname=get_OutputName(j+1,i);
+							if (stroutputname.IsEmpty())
+							{
+							 stroutputname.Format(_T("Output%d"),i);
+							}
 							m_structaddoutputs.stroutputno = stroutput;
 							m_structaddoutputs.stroutputboard = stroutputboard;
 							m_structaddoutputs.strpanel = strpanel;
 							m_structaddoutputs.stroutputname = stroutputname;
 							m_vecaddoutputs.push_back(m_structaddoutputs);
-							
-						}
-
-					
-					}else if (i<=16&&i>8)
-					{
-					
-						wtmp = SerialNum[j*5+2];
-						flag = (Byte<<(i-9))&wtmp;
-						if (flag != 0)
-						{
-							stroutput.Format(_T("%d"),i);
-							stroutputname.Format(_T("output%d"),i);
-								m_structaddoutputs.stroutputno = stroutput;
-							m_structaddoutputs.stroutputboard = stroutputboard;
-							m_structaddoutputs.strpanel = strpanel;
-							m_structaddoutputs.stroutputname = stroutputname;
-							m_vecaddoutputs.push_back(m_structaddoutputs);
 
 						}
 
-					}else if (i<=24&&i>16)
+
+					}
+					else
 					{
-					
-					
-						wtmp = SerialNum[j*5+3];
+
+
+						wtmp = SerialNum[j*3+2];
 						flag = (Byte<<(i-17))&wtmp;
 						if (flag != 0)
 						{
 							stroutput.Format(_T("%d"),i);
-							stroutputname.Format(_T("output%d"),i);
-								m_structaddoutputs.stroutputno = stroutput;
-							m_structaddoutputs.stroutputboard = stroutputboard;
-							m_structaddoutputs.strpanel = strpanel;
-							m_structaddoutputs.stroutputname = stroutputname;
-							m_vecaddoutputs.push_back(m_structaddoutputs);
-
-						}
-
-					}else if (i<=32&&i>24)
-					{
-				
-						wtmp = SerialNum[j*5+4];
-						flag = (Byte<<(i-25))&wtmp;
-						if (flag != 0)
-						{
-							stroutput.Format(_T("%d"),i);
-							stroutputname.Format(_T("output%d"),i);
-								m_structaddoutputs.stroutputno = stroutput;
+							//stroutputname.Format(_T("Output%d"),i);
+							stroutputname=get_OutputName(j+1,i);
+							if (stroutputname.IsEmpty())
+							{
+								stroutputname.Format(_T("Output%d"),i);
+							}
+							m_structaddoutputs.stroutputno = stroutput;
 							m_structaddoutputs.stroutputboard = stroutputboard;
 							m_structaddoutputs.strpanel = strpanel;
 							m_structaddoutputs.stroutputname = stroutputname;
@@ -1341,12 +891,17 @@ void CLightingController::OnLbnSelchangeListInput()
 						}
 
 					}
+					
+
 
 				}
+				
+
+
 
 			}
 
-			m_mapaddoutputs.insert(map<CString,vecaddoutputs>::value_type(strtmp1,m_vecaddoutputs));
+			m_mapaddoutputs.insert(map<CString,vecaddoutputs>::value_type(strtmp_PanelName,m_vecaddoutputs));
 
 
 			//AfxMessageBox(_T("show value"));
@@ -1362,15 +917,15 @@ void CLightingController::OnLbnSelchangeListInput()
 			for (int i =1;i<=elementnum;i++)
 			{
 				m_msflexgrid1to96.put_TextMatrix(i,0,m_vecaddoutputs.at(i-1).strpanel);
-				//m_vecaddoutputs.at(i-1).stroutputboard = m_vecaddoutputs.at(i-1).strpanel+ _T("--\nout") + m_vecaddoutputs.at(i-1).stroutputboard;
+				
 				m_msflexgrid1to96.put_TextMatrix(i,1,m_vecaddoutputs.at(i-1).stroutputboard);
 				m_msflexgrid1to96.put_TextMatrix(i,2,m_vecaddoutputs.at(i-1).stroutputno);
-				m_vecaddoutputs.at(i-1).stroutputname =  _T("output")+m_vecaddoutputs.at(i-1).stroutputno;
+				//m_vecaddoutputs.at(i-1).stroutputname =get_OutputName() // _T("output")+m_vecaddoutputs.at(i-1).stroutputno;
 				m_msflexgrid1to96.put_TextMatrix(i,3,m_vecaddoutputs.at(i-1).stroutputname);
 
 			}
 
-	}
+		}
 
 
 
@@ -1380,53 +935,80 @@ void CLightingController::OnLbnSelchangeListInput()
 
 
 	}
-#endif
-	
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if 0
-//	m_msflexgrid1to96.put_Row(200*32);
-	vector<ONS>vectemp;
-	ONS ons;
-	for (int i = 1;i<=200*32;i++)
-	{
-		ons.Name = _T("Name");
-		ons.Status = _T("OFF");
-		vectemp.push_back(ons);
-	}
-	for (int i = 1;i<=200*32;i++)
-	{	
-		m_msflexgrid1to96.put_TextMatrix(i,1,vectemp.at(i-1).Name);
-		m_msflexgrid1to96.put_TextMatrix(i,2,vectemp.at(i-1).Status);
-	}
-#if 0
-	for (int i = 33;i<65;i++)
-	{	
-		m_msflexgrid1to96.put_TextMatrix(i-32,5,vectemp.at(i-1).Name);
-		m_msflexgrid1to96.put_TextMatrix(i-32,6,vectemp.at(i-1).Status);
-	}
-	for (int i = 65;i<97;i++)
-	{	
-		m_msflexgrid1to96.put_TextMatrix(i-64,9,vectemp.at(i-1).Name);
-		m_msflexgrid1to96.put_TextMatrix(i-64,10,vectemp.at(i-1).Status);
-	}
-#endif
-#endif
 
 }
+
+#endif
+void CLightingController::Fresh_OutputGrid(BOOL Input_Group){
+	int startaddr;
+
+	m_msflexgrid1to96.Clear();
+	m_msflexgrid1to96.put_TextMatrix(0,0,_T("Panels"));
+	m_msflexgrid1to96.put_TextMatrix(0,1,_T("Card_ID"));
+	m_msflexgrid1to96.put_TextMatrix(0,2,_T("No."));
+	m_msflexgrid1to96.put_TextMatrix(0,3,_T("OutputName"));
+	int itmp = m_ListBox.GetCurSel();//获取编号
+	itmp+=1;
+	CString strtmp,strtmp1;
+
+	GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp);
+	vector<Mapping_Struct>::iterator iter;
+
+	m_msflexgrid1to96.put_WordWrap(TRUE);//允许换行 和下面\n对应一起使用才有效果	
+	m_msflexgrid1to96.put_MergeCells(1); //表按任意方式进行组合单元格内容	
+
+	m_msflexgrid1to96.put_MergeCol(0,TRUE);//其中第一人参数0，表示的是第几列.不是表示需要合并的行数
+	m_msflexgrid1to96.put_MergeCol(1,TRUE);
+if(Input_Group){
+     
+	int i=1;  
+	for (iter=m_input_output_mapping.begin();iter!=m_input_output_mapping.end();iter++)
+	{
+		if (iter->Address==itmp)
+		{
+			m_msflexgrid1to96.put_TextMatrix(i,0,Get_Table_Name(m_sn,_T("Input"),itmp));
+			strtmp.Format(_T("Card%d"),iter->Card_ID);
+			m_msflexgrid1to96.put_TextMatrix(i,1,strtmp);
+			strtmp.Format(_T("%d"),iter->OuputNo);
+			m_msflexgrid1to96.put_TextMatrix(i,2,strtmp);
+			strtmp=Read_OutputName(iter->OutputNameAddress);
+			if (strtmp.IsEmpty())
+			{
+				strtmp.Format(_T("Output%d"),iter->OuputNo);
+			} 
+			m_msflexgrid1to96.put_TextMatrix(i,3,strtmp);
+
+
+			i++;
+		}
+
+	}
+}
+else
+{
+	int i=1;  
+	for (iter=m_group_output_mapping.begin();iter!=m_group_output_mapping.end();iter++)
+	{
+		if (iter->Address==itmp)
+		{
+			m_msflexgrid1to96.put_TextMatrix(i,0,Get_Table_Name(m_sn,_T("Group"),itmp));
+			strtmp.Format(_T("Card%d"),iter->Address);
+			m_msflexgrid1to96.put_TextMatrix(i,1,strtmp);
+			strtmp.Format(_T("%d"),iter->OuputNo);
+			m_msflexgrid1to96.put_TextMatrix(i,2,strtmp);
+			strtmp=Read_OutputName(iter->OutputNameAddress);
+			if (strtmp.IsEmpty())
+			{
+				strtmp.Format(_T("Output%d"),iter->OuputNo);
+			} 
+			m_msflexgrid1to96.put_TextMatrix(i,3,strtmp);
+		}
+		i++;
+	}
+}
+}
+
 
 void CLightingController::OnContextMenu(CWnd* pWnd, CPoint point)
 {
@@ -1444,10 +1026,6 @@ void CLightingController::OnContextMenu(CWnd* pWnd, CPoint point)
 	m_popmenu.DestroyMenu();
 #endif
 }
-
-
-
-
 
 WORD* CLightingController::ConvertOutput()
 {
@@ -1616,6 +1194,8 @@ BOOL CLightingController::InitializeArray( BOOL*ARRAY )
 	return TRUE;
 
 }
+
+//////选择--Input-output-mapping 或者是 group-output -mapping/////////////////
 void CLightingController::OnCbnSelchangeCombo1()
 {
 	int Index = m_comboBox.GetCurSel();
@@ -1624,28 +1204,38 @@ void CLightingController::OnCbnSelchangeCombo1()
 		m_ListBox.ResetContent();
 		//更新input-output-map 组合框
 		CString strtemp;
-		for (int i=0;i<24;i++)
+		/*for (int i=0;i<24;i++)
 		{
 			strtemp.Format(_T("Input%d"),i+1);
+			m_ListBox.InsertString(i,strtemp);
+		}*/
+
+		for(int i=0;i<24;i++)
+		{
+
+			strtemp=Get_Table_Name(m_sn,_T("Input"),i+1);
 			m_ListBox.InsertString(i,strtemp);
 		}
 		m_ListBox.SetCurSel(0);
 		m_strcomboBox = _T("Input-Output-Map");
 
 
-		//更新Group-output-map output列表
+	
 
 
-	}else
+	}
+	else
 	{
 		m_ListBox.ResetContent();
 		//更新Group-output-map 组合框
 		CString strtemp;
-		for (int i=0;i<20;i++)
+		for (int i=0;i<40;i++)
 		{
-			strtemp.Format(_T("Group%d"),i+1);
+			//strtemp.Format(_T("Group%d"),i+1);
+			strtemp=Get_Table_Name(m_sn,_T("Group"),i+1);
 			m_ListBox.InsertString(i,strtemp);
 		}
+		 
 		m_ListBox.SetCurSel(0);
 		m_strcomboBox = _T("Group-Output-Map");
 		//更新input-output-map output列表
@@ -1655,71 +1245,125 @@ void CLightingController::OnCbnSelchangeCombo1()
 	}
 
 }
+
 BEGIN_EVENTSINK_MAP(CLightingController, CFormView)
 	ON_EVENT(CLightingController, IDC_MSFLEXGRID1, DISPID_CLICK, CLightingController::ClickMsflexgrid1, VTS_NONE)
+	ON_EVENT(CLightingController, IDC_MSFLEXGRID4, DISPID_CLICK, CLightingController::ClickMsflexgrid4, VTS_NONE)
 	ON_EVENT(CLightingController, IDC_MSFLEXGRID1, DISPID_DBLCLICK, CLightingController::DblClickMsflexgrid1, VTS_NONE)
 END_EVENTSINK_MAP()
-
+//Output table
 void CLightingController::ClickMsflexgrid1()
 {
+    m_input_output=1;
+ 
+	m_combox_controler.ShowWindow(SW_HIDE);
+	m_editName.ShowWindow(SW_HIDE);
+	 
 	long  temprow = m_msflexgrid1to96.get_Row();
 	long  tempcol = m_msflexgrid1to96.get_Col();
 
-//将光标选中的之前的单元格背景色复位
-// 	if((row != 0||col != 0)&& col !=3 && col !=7)
-// 	{
-// 
-// 		if (row%2 == 1)
-// 		{
-// 			m_msflexgrid1to96.put_Row(row);m_msflexgrid1to96.put_Col(col);m_msflexgrid1to96.put_CellBackColor(RGB(255,255,255));//单数行
-// 		}else
-// 		{
-// 			m_msflexgrid1to96.put_Row(row);m_msflexgrid1to96.put_Col(col);m_msflexgrid1to96.put_CellBackColor(COLOR_CELL);//双数行 执行此代码后，get_Row将返回这一行
-// 		}
-// 	}
 
-	if((row != 0||col != 0)&& col !=3)
-	m_msflexgrid1to96.put_Row(row);m_msflexgrid1to96.put_Col(col);m_msflexgrid1to96.put_CellBackColor(COLOR_CELL);
+	 if((row != 0||col != 0)&& col !=3)
+		 m_msflexgrid1to96.put_Row(row);
+		m_msflexgrid1to96.put_Col(col);
+		m_msflexgrid1to96.put_CellBackColor(COLOR_CELL); 
 
-//将新选中的单元格设置新的背景色
-	row = temprow;
-	col = tempcol;
+	//将新选中的单元格设置新的背景色
+	m_nCurRow = temprow;
+	m_nCurCol = tempcol;
 
 
- //	if (tempcol !=3&&tempcol !=7)
+	//	if (tempcol !=3&&tempcol !=7)
 	if(tempcol !=3)
- 	{
-		m_msflexgrid1to96.put_Row(temprow);m_msflexgrid1to96.put_Col(tempcol);
- 		m_msflexgrid1to96.put_CellBackColor(RGB(100,100,150));
- 	}
-
-
-//使用edition控件形式显示
-
-//     BOOL flg = FALSE;
-// 	switch(tempcol)
-// 	{
-// 	case 1:
-// 		if(m_outputsum  >=1)
-// 			flg = TRUE;
-// 
-// 		break;
-// 	case 5:
-// 		if(m_outputsum >=2)
-// 			flg = TRUE;
-// 		break;
-// 	case 9:
-// 		if(m_outputsum >=3)
-// 			flg = TRUE;
-// 	}
-
-//	if(tempcol == 1||tempcol == 5||tempcol == 9)
-//	if(flg)
-#if 0
-	if(tempcol == 3)
 	{
+		m_msflexgrid1to96.put_Row(temprow);
+		m_msflexgrid1to96.put_Col(tempcol);
+		m_msflexgrid1to96.put_CellBackColor(RGB(100,100,150));
+	}
+	#if 0
+	long lCol=m_msflexgrid1to96.get_ColSel();         //获取点击的行号
+	long lRow=m_msflexgrid1to96.get_RowSel();      //获取点击的列号
+	if(lRow>m_msflexgrid1to96.get_Rows() || lRow==0)              //判断点击是否有效
+		return;
+
+	CRect rect;
+	m_msflexgrid1to96.GetWindowRect(&rect);                 //获取FlexGrid控件的窗口矩形
+	ScreenToClient(&rect);                                    //转换为客户区矩形
+	CDC* pDC=GetDC();
+	//MSFlexGrid 控件的函数的长度单位是“缇(twips)”，需要将其转化为像素，1440 缇 = 1 英寸
+	//计算象素点和缇的转换比例
+	int nTwipsPerDotX=1440/pDC->GetDeviceCaps(LOGPIXELSX);
+	int nTwipsPerDotY=1440/pDC->GetDeviceCaps(LOGPIXELSY);
+	//计算选中格的左上角的坐标（象素为单位）
+	long y = m_msflexgrid1to96.get_RowPos(lRow)/nTwipsPerDotY;
+	long x = m_msflexgrid1to96.get_ColPos(lCol)/nTwipsPerDotX;
+ 
+	int left=m_msflexgrid1to96.get_CellLeft()/nTwipsPerDotY-1;
+	int top=m_msflexgrid1to96.get_CellTop()/nTwipsPerDotX-1;
+	//long w= m_msflexgrid1to96.get_ColWidth(lCol);
+	//long h= m_msflexgrid1to96.get_RowHeight(lRow);
+	/*m_msflexgrid1to96.get_CellWidth()*/
+	//计算选中格的尺寸（象素为单位）。加1是实际调试中，发现加1后效果更好
+	long width = m_msflexgrid1to96.get_ColWidth(lCol)/nTwipsPerDotX+1;
+	long height = m_msflexgrid1to96.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	//形成选中个所在的矩形区域
+	CRect rc(x,y,x+width,y+height);
+	//转换成相对对话框的坐标
+	rc.OffsetRect(rect.left,rect.top);
+
+	CString strValue=m_msflexgrid1to96.get_TextMatrix(lRow,lCol);       //获取单元格内容
+
+	m_editName.ShowWindow(SW_SHOW);                  //显示控件
+	m_editName.MoveWindow(rc);                            //改变大小并移到选中格位置
+	m_editName.SetWindowText(strValue);                   //显示文本
+	m_editName.SetFocus();   
+	
+                              //获取焦点
+#endif
+#if 0
+/*
+	if(tempcol == 2)
+	{
+
 		CRect rect;
 		m_msflexgrid1to96.GetWindowRect(rect); //
+		ScreenToClient(rect); //
+		CDC* pDC =GetDC();
+
+ 
+		long y=m_msflexgrid1to96.get_RowPos(temprow);
+		long x=m_msflexgrid1to96.get_ColPos(tempcol);
+		long width=m_msflexgrid1to96.get_ColWidth(tempcol);
+		long height=m_msflexgrid1to96.get_RowHeight(temprow);
+		CRect rcCell(x,y,x+width,y+height);
+		rcCell.OffsetRect(rect.left+1,rect.top+1);
+		ReleaseDC(pDC);
+
+		CString strValue = m_msflexgrid1to96.get_TextMatrix(temprow,tempcol);
+		m_oldname=strValue;
+		m_nCurRow=temprow;
+		m_nCurCol=tempcol;
+
+		if(tempcol == 2)
+		{		
+			m_editName.MoveWindow(&rcCell,1);
+			m_editName.ShowWindow(SW_SHOW);	
+			m_editName.SetWindowText(strValue);	
+			m_editName.SetFocus();
+			m_editName.SetCapture();//使随后的鼠标输入都被发送到这个CWnd 
+			int nLenth=strValue.GetLength();	
+			m_editName.SetSel(nLenth,nLenth); 
+		}	
+
+	}
+	*/
+	if(tempcol == 3)
+	{
+	   
+	   
+		CRect rect;
+		m_msflexgrid1to96.GetWindowRect(rect); //
+
 		ScreenToClient(rect); //
 		CDC* pDC =GetDC();
 
@@ -1737,8 +1381,10 @@ void CLightingController::ClickMsflexgrid1()
 		rcCell.OffsetRect(rect.left+1,rect.top+1);
 		ReleaseDC(pDC);
 		CString strValue = m_msflexgrid1to96.get_TextMatrix(temprow,tempcol);
-
-	//	if(tempcol == 1||tempcol == 5||tempcol == 9)	
+		m_oldname=strValue;
+		m_nCurRow=temprow;
+		m_nCurCol=tempcol;
+		 
 		if(tempcol == 3)
 		{		
 			m_editName.MoveWindow(&rcCell,1);
@@ -1748,16 +1394,91 @@ void CLightingController::ClickMsflexgrid1()
 			m_editName.SetCapture();//使随后的鼠标输入都被发送到这个CWnd 
 			int nLenth=strValue.GetLength();	
 			m_editName.SetSel(nLenth,nLenth); 
-
 		}	
 
 	}
 #endif
+}
+
+//Alex Add input table
+void CLightingController::ClickMsflexgrid4()
+{
+    m_input_output=2;
+    m_GridNo=1;
+	long lRow,lCol;
+	lRow = m_inputs_grid.get_RowSel();//获取点击的行号	
+	lCol = m_inputs_grid.get_ColSel(); //获取点击的列号
 	
+	if(lRow==0)
+		return;
+	CRect rect;
+	m_inputs_grid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形	
+	// MSFlexGrid控件的函数的长度单位是"缇(twips)"，
+	//需要将其转化为像素，1440缇= 1英寸
+	CDC* pDC =GetDC();
+	//计算象素点和缇的转换比例
+	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
+	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//计算选中格的左上角的坐标(象素为单位)
+	long y = m_inputs_grid.get_RowPos(lRow)/nTwipsPerDotY;
+	long x = m_inputs_grid.get_ColPos(lCol)/nTwipsPerDotX;
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	long width = m_inputs_grid.get_ColWidth(lCol)/nTwipsPerDotX+1;
+	long height = m_inputs_grid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	//形成选中个所在的矩形区域
+	CRect rc(x,y,x+width,y+height);
+	//转换成相对对话框的坐标
+	rc.OffsetRect(rect.left+1,rect.top+1);
+	//获取选中格的文本信息	
+	CString strValue = m_inputs_grid.get_TextMatrix(lRow,lCol);
+	m_oldname=strValue;
+	m_nCurRow=lRow;
+	m_nCurCol=lCol;
+	m_combox_controler.ShowWindow(SW_HIDE);
+	m_editName.ShowWindow(SW_HIDE);
+	if(lCol==0)
+	{
+		m_editName.ShowWindow(SW_SHOW);
+		m_editName.SetWindowText(strValue); //显示文本
+
+		m_editName.SetFocus();
+		int nLenth=strValue.GetLength();
+
+		m_editName.SetFocus(); //获取焦点
+		m_editName.MoveWindow(rc); //移动到选中格的位置，覆盖
+		return;
+	}
+	if (lCol==1)
+	{
+	   m_combox_controler.ResetContent();
+	   m_combox_controler.InsertString(0,_T("OFF"));
+	   m_combox_controler.InsertString(1,_T("ON"));
+	   m_combox_controler.MoveWindow(rc); //移动到选中格的位置，覆盖
+	   m_combox_controler.ShowWindow(SW_SHOW);
+	   m_combox_controler.BringWindowToTop();
+	   m_combox_controler.SelectString(-1,strValue);
+	   m_combox_controler.SetFocus(); //获取焦点
+	}
+
+	if (lCol==2)
+	{
+		m_combox_controler.ResetContent();
+		m_combox_controler.InsertString(0,_T("AUTO"));
+		m_combox_controler.InsertString(1,_T("MAN"));
+		m_combox_controler.MoveWindow(rc); //移动到选中格的位置，覆盖
+		m_combox_controler.ShowWindow(SW_SHOW);
+		m_combox_controler.BringWindowToTop();
+		m_combox_controler.SelectString(-1,strValue);
+		m_combox_controler.SetFocus(); //获取焦点
+	}
+
+
 }
 
 void CLightingController::DblClickMsflexgrid1()
 {
+#if 0
 	BOOL flg = FALSE;
 	long Getrow = m_msflexgrid1to96.get_RowSel();
 	long Getcol = m_msflexgrid1to96.get_ColSel();
@@ -1767,17 +1488,17 @@ void CLightingController::DblClickMsflexgrid1()
 	case 2:
 		if(m_outputsum  >=1)
 			flg = TRUE;
-			
+
 		break;
 	case 6:
 		if(m_outputsum >=2)
 			flg = TRUE;
-			break;
+		break;
 	case 10:
 		if(m_outputsum >=3)
 			flg = TRUE;
 	}
-//	if (Getcol == 2||Getcol == 6||Getcol == 10)
+	//	if (Getcol == 2||Getcol == 6||Getcol == 10)
 	if(flg)
 	{	
 		if (CStr.CompareNoCase(_T("ON")) == 0)
@@ -1798,7 +1519,7 @@ void CLightingController::DblClickMsflexgrid1()
 			}
 #endif
 
-			
+
 		}
 		else
 		{
@@ -1823,153 +1544,88 @@ void CLightingController::DblClickMsflexgrid1()
 		m_msflexgrid1to96.put_CellForeColor(RGB(255,0,0));
 	}
 
+#endif
+
 
 }
-
+//Alex 修改 用来改变InputName OutputName
 void CLightingController::OnEnKillfocusEditModifyname()
-{
-#if 0
- 	long lRow = m_msflexgrid1to96.get_RowSel();	
- 	long lCol = m_msflexgrid1to96.get_ColSel(); 
-
-
-	CString strText,strTextOld;
-	strTextOld = m_msflexgrid1to96.get_TextMatrix(lRow,lCol);
-
-	m_editName.GetWindowText(strText); 
-	m_editName.ShowWindow(SW_HIDE);  
-
-	if(strText.CompareNoCase(strTextOld) != 0)
+{ 
+	m_editName.GetWindowText(m_newname);
+	if (m_input_output==2)
 	{
-		m_msflexgrid1to96.put_TextMatrix(lRow,lCol,strText);
-		m_msflexgrid1to96.put_CellForeColor(RGB(255,0,0));
-#if 0
-		switch (lCol)
+		m_inputs_grid.put_TextMatrix(m_nCurRow,m_nCurCol,m_newname);
+		if (m_oldname.CompareNoCase(m_newname)==0)
 		{
-		case 1:
-			m_vecONS.at(lRow-1).Name = strText;
-			break;
-		case 5:
-			m_vecONS.at(lRow+32-1).Name = strText;
-			break;
-		case 9:
-			m_vecONS.at(lRow+64-1).Name = strText;
-			break;
+			return;//只要是相同的，都不进行改变
+		} 
+		else
+		{
+			unsigned char lable_buffer[GROUP_LABLE_SIZE]={0};
+			for (int k=0;k<m_newname.GetLength();k++)
+			{
+				if (k>=10)
+					break;
+				lable_buffer[k]=(char)m_newname.GetAt(k);
+			}
+			Write_Multi(g_tstat_id,lable_buffer,INPUT_DESCRIPTION+(m_nCurRow-1)*GROUP_LABLE_SIZE,GROUP_LABLE_SIZE);
+			Insert_Update_Table_Name(m_sn,_T("Input"),m_nCurRow,m_newname);  
+			Fresh_Inputs();
 		}
-#endif
-
 	}
 
-	CRect rcCell(0,0,1,1);
-	m_editName.MoveWindow(&rcCell,1);
-#endif
+	m_editName.ShowWindow(SW_HIDE);
+	
 }
-
-void CLightingController::ReadDB_OutNameStatus()
+CString CLightingController::Read_OutputName(int Address){
+if (Address>480)
 {
-	CADO m_ado;
-	m_ado.OnInitADOConn();
-
-	CString SQL = _T("select * from LightingController_Name"); 
-	m_ado.m_pRecordset = m_ado.OpenRecordset(SQL);
-	int num =0;
-	_variant_t vartemp;
-	m_vecONS.clear();
-	while(!m_ado.m_pRecordset->EndOfFile)
-	{
-		vartemp =m_ado.m_pRecordset->GetCollect(_T("Name"));
-		if (vartemp.vt==VT_NULL)
-			m_structONS.Name =_T("");
-		else
-			m_structONS.Name =vartemp;
-		vartemp = m_ado.m_pRecordset->GetCollect(_T("Status"));
-		if (vartemp.vt == VT_NULL)
-			m_structONS.Status = _T("");
-		else
-			m_structONS.Status = vartemp;
-
-
-		m_ado.m_pRecordset->MoveNext();
-
-		m_vecONS.push_back(m_structONS);
-	}
-
-	m_ado.CloseRecordset();
-	m_ado.CloseConn();
+return _T("");
 }
-
-void CLightingController::SaveDB_OutNameStatus()
+CString OutputName;
+unsigned short Lable[10];
+unsigned char  Char_Lable[10];
+Read_Multi(g_tstat_id,Lable,9336+Address*10,10);
+if(Lable[0]==255)
 {
-	//存入数据库中
-	CADO saveADO;
-	saveADO.OnInitADOConn();
-	CString sql = _T("select * from LightingController_Name");
-	saveADO.m_pRecordset = saveADO.OpenRecordset(sql);
-	if (!saveADO.m_pRecordset->EndOfFile)
+	for(int itt=0;itt<10;itt++)
+		Lable[itt]=0;
+}
+for(int itt=0;itt<10;itt++)
+{
+	if (Lable[itt]!=255)
 	{
-		saveADO.m_pRecordset->MoveFirst();
-
-		for(int i = 1;i<96;i++)
-		{
-			try 
-			{
-
-				//saveADO.m_pRecordset->PutCollect("Address",(_bstr_t)veclightingcontroller.at(i).iaddress);
-				saveADO.m_pRecordset->PutCollect("Name",(_bstr_t)m_vecONS.at(i-1).Name);
-				saveADO.m_pRecordset->PutCollect("Status",(_bstr_t)m_vecONS.at(i-1).Status);
-
-
-				saveADO.m_pRecordset->Update();
-				saveADO.m_pRecordset->MoveNext();
-			}
-
-
-			catch(...)
-			{
-				SetPaneString(1,_T("Write dababase false!"));
-				//return FALSE;
-			}
-		}
+		Char_Lable[itt]=Lable[itt];
 	}
 	else
 	{
-		for(int i = 0;i<400;i++)
-		{
-			try 
-			{
 
-				saveADO.m_pRecordset->AddNew();
-				saveADO.m_pRecordset->PutCollect("Address",(_bstr_t)veclightingcontroller.at(i).iaddress);
-				saveADO.m_pRecordset->PutCollect("Data",(_bstr_t)veclightingcontroller.at(i).CStvalue);
-
-				saveADO.m_pRecordset->Update();
-
-			}
-
-
-			catch(...)
-			{
-				SetPaneString(1,_T("Write dababase false!"));
-				//return FALSE;
-			}
-		}
-
+	break;
 	}
-
-	saveADO.CloseRecordset();
-	saveADO.CloseConn(); 
-
+}
+OutputName=(CString)Char_Lable;
+return OutputName;
+}
+void CLightingController::OnEnKillfocusEditTimeSaveDelay(){
+	CString delaytime;
+	m_savedelaytime.GetWindowText(delaytime);
+	write_one(g_tstat_id,92,_wtoi(delaytime));
 }
 
 
-
+#if 1
+//屏蔽
+ 
+ 
+ 
+//屏蔽
 void CLightingController::OnSetmappingAddoutputbarod()
 {
-#if 0
+#if 1
 
 	m_msflexgrid1to96.AllowUserResizeSettings;
 	CLightingSet dlg;
-	
+
 	CString stroutput1,stroutput2,stroutput3,stroutpusum;
 
 	//dlg.m_mapoutputaddress.clear();
@@ -1984,68 +1640,7 @@ void CLightingController::OnSetmappingAddoutputbarod()
 	//更新界面，显示输出板的数量
 	MAP_OUT_ADDRESS::iterator itera;
 	itera = m_mapoutputaddress.begin();
-#if 0
-	switch(m_outputsum)
-	{
-	case 0:
-		stroutpusum.Format(_T("Output Board: 0/0"));
-		stroutput1.Format(_T(""));
-		stroutput2.Format(_T(""));
-		stroutput3.Format(_T(""));
-
-		break;
-	case 1:
-		stroutpusum.Format(_T("Output Board: 1/%d"),m_outputsum);
-		stroutput1.Format(_T("Output Board %d Address:   %s"),itera->first,itera->second);
-		stroutput2.Format(_T(""));
-		stroutput3.Format(_T(""));
-		break;
-	case 2:
-		stroutpusum.Format(_T("Output Board: 2/%d"),m_outputsum);
-		stroutput1.Format(_T("Output Board %d Address:   %s"),itera->first,itera->second);
-		itera++;
-		stroutput2.Format(_T("Output Board %d Address:   %s"),itera->first,itera->second);
-		stroutput3.Format(_T(""));
-		break;
-	case 3:
-		stroutpusum.Format(_T("Output Board: 3/%d"),m_outputsum);
-		stroutput1.Format(_T("Output Board %d Address:   %s"),itera->first,itera->second);
-		itera++;
-		stroutput2.Format(_T("Output Board %d Address:   %s"),itera->first,itera->second);
-		itera++;
-		stroutput3.Format(_T("Output Board %d Address:   %s"),itera->first,itera->second);
-		break;
-// 	default:
-// 		stroutpusum.Format(_T("Output Board: 3/%d"),m_outputsum);
-// 		stroutput1.Format(_T("Output Board %d Address:   %s"),itera->first,itera->second);
-// 		itera++;
-// 		stroutput2.Format(_T("Output Board %d Address:   %s"),itera->first,itera->second);
-// 		itera++;
-// 		stroutput3.Format(_T("Output Board %d Address:   %s"),itera->first,itera->second);
-// 		break;
-	}
-	m_msflexgridTitle.put_TextMatrix(0,0,stroutput1);
-	m_msflexgridTitle.put_TextMatrix(0,2,stroutput2);
-	m_msflexgridTitle.put_TextMatrix(0,4,stroutput3);
-	m_msflexgridTitle.put_TextMatrix(0,5,stroutpusum);
-	
-
-// 	m_msflexgridTitle.put_TextMatrix(0,0,_T(" Output Board 1 Address:   210"));
-// 	m_msflexgridTitle.put_TextMatrix(0,2,_T(" Output Board 2 Address:   211"));
-// 	m_msflexgridTitle.put_TextMatrix(0,4,_T(" Output Board 3 Address:   212"));
-// 	m_msflexgridTitle.put_TextMatrix(0,5,_T(" Output Board: 3/3"));
-
-
-
-	//确定输出板地址
-//	int outputaddr = 100;
-// 	m_vecaddrinout.clear();
-// 	for (int i = 0;i<2;i++)
-// 	{
-// 		m_vecaddrinout.push_back(outputaddr);
-// 		outputaddr+=50;
-// 	} 	
-#endif
+ 
 
 	CString strinputgroup,strmaptype;
 	int indexmap = m_comboBox.GetCurSel();//input索引是1
@@ -2068,95 +1663,27 @@ void CLightingController::OnSetmappingAddoutputbarod()
 
 #endif
 }
-
+//屏蔽
 void CLightingController::OnSetmappingPrevious()//delete
 {
-
-// 	//flexcontrol参数设置
-// 	m_msflexgrid1to96.put_WordWrap(TRUE);//允许换行 和下面\n对应一起使用才有效果	
-// 	m_msflexgrid1to96.put_MergeCells(1); //表按任意方式进行组合单元格内容	
-// 
-// 	m_msflexgrid1to96.put_MergeCol(0,TRUE);//其中第一人参数0，表示的是第几列.不是表示需要合并的行数
-// 	m_msflexgrid1to96.put_MergeCol(1,TRUE);
-// 
-// 
-// 
-// 	//获取panel,outputboard,output组合框所选择的当前值；
-// 	CString strpanel,stroutputboard,stroutput,stroutputname;
-// 	GetDlgItem(IDC_COMBO_panel)->GetWindowText(strpanel);
-// 	GetDlgItem(IDC_COMBO_outputboard)->GetWindowText(stroutputboard);
-// 	GetDlgItem(IDC_COMBO_output)->GetWindowText(stroutput);
-// 
-// 
-// 	//将选择的数据显示在flexgrid控件上
-// 
-// 	int itmp_ = m_ListBox.GetCurSel();//获取编号
-// 	//判断是组还是输入
-// 	CString strtmp_,strtmp1_;
-// 	GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp_);
-// 	if (strtmp_.CompareNoCase(_T("Input-Output-Map")) == 0)//确认是input还是group
-// 		strtmp1_.Format(_T("input%d"),itmp_+1);
-// 	else
-// 		strtmp1_.Format(_T("group%d"),itmp_+1);
-// 
-// 	m_vecaddoutputs.clear();
-// 	map<CString,vecaddoutputs>::iterator iter_;//查找组中的元素
-// 	iter_ = m_mapaddoutputs.find(strtmp1_);
-// 	if (iter_ != m_mapaddoutputs.end())
-// 		m_vecaddoutputs = iter_->second;
-// 
-// 
-// 
-// 
-// 	int i  = m_vecaddoutputs.size()+1;
-// 	m_msflexgrid1to96.put_TextMatrix(i,0,strpanel);
-// 	int ctoitmp = _ttoi(stroutputboard);
-// 	if (ctoitmp<10)
-// 		stroutputboard.Format(_T("00%d"),ctoitmp);
-// 	else if (ctoitmp<100)
-// 		stroutputboard.Format(_T("0%d"),ctoitmp);
-// 
-// 	stroutputboard = strpanel+ _T("--out\n") + stroutputboard;
-// 	m_msflexgrid1to96.put_TextMatrix(i,1,stroutputboard);
-// 	m_msflexgrid1to96.put_TextMatrix(i,2,stroutput);
-// 	stroutputname =  _T("output")+stroutput;
-// 	m_msflexgrid1to96.put_TextMatrix(i,3,stroutputname);
-// 
-// 
-// 
-// 	//将选择的数据保存在内存中vector:: m_vecaddoutputs
-// 	m_structaddoutputs.stroutputno = stroutput;
-// 	m_structaddoutputs.stroutputboard = stroutputboard;
-// 	m_structaddoutputs.strpanel = strpanel;
-// 	m_structaddoutputs.stroutputname = stroutputname;
-// 	m_vecaddoutputs.push_back(m_structaddoutputs);
-
-
-
-
-
+#if 1
 	int itmp = m_ListBox.GetCurSel();
-	// 	//m_ListBox.SelectString(itmp,strtmp);
-	// 	strtmp.Format(_T(""))
-	//	GetDlgItem(IDC_LIST_INPUT)->GetWindowText(strtmp);
-
-
 	//判断是组还是输入
 	CString strtmp,strtmp1;
 	GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp);
 	if (strtmp.CompareNoCase(_T("Input-Output-Map")) == 0)
-		strtmp1.Format(_T("input%d"),itmp+1);
+		//strtmp1.Format(_T("Input%d"),itmp+1);
+        strtmp1=Get_Table_Name(m_sn,_T("Input"),itmp+1);
 	else
-		strtmp1.Format(_T("group%d"),itmp+1);
+		//strtmp1.Format(_T("group%d"),itmp+1);
+        strtmp1=Get_Table_Name(m_sn,_T("Group"),itmp+1);
 
-	//m_mapaddoutputs.clear();
 	map<CString,vecaddoutputs>::iterator iter;
 	iter = m_mapaddoutputs.find(strtmp1);
 	if (iter != m_mapaddoutputs.end())
 	{
 		m_mapaddoutputs.erase(iter);
 		m_vecaddoutputs.clear();
-
 
 		m_msflexgrid1to96.Clear();
 		m_msflexgrid1to96.put_TextMatrix(0,0,_T("Panels"));
@@ -2165,172 +1692,197 @@ void CLightingController::OnSetmappingPrevious()//delete
 		m_msflexgrid1to96.put_TextMatrix(0,3,_T("OutputName"));
 	}
 
+#endif
+
 
 
 
 }
-
+//屏蔽
 void CLightingController::OnSetmappingNext() //现改成 Set As default 给硬件发送 1,给91寄存器
 {
-
-
-
-
+#if 0
 	if (g_CommunicationType == 0)
 		open_com(comnum);
-
-
-
-
-
- 	int ret =0;
+	int ret =0;
 	ret = write_one(g_tstat_id,91,1);
 	//ret = write_one(100,200,4);
 	if(ret>0)
 		AfxMessageBox(_T("Setting successful"));
 	else
 		AfxMessageBox(_T("Setting fail"));
-
-	//PostMessage(WM_WRITE_MESSAGE,91,1);
-	//SendMessage(WM_WRITE_MESSAGE,91,1);
-// 	ret = write_one(g_tstat_id,91,1);
-// 	if(ret>0)
-// 		AfxMessageBox(_T("Setting successful"));
-// 	else
-// 		AfxMessageBox(_T("Setting fail"));
-
-
-
-
-// 	CString strfixgridcol;//=_T(" 123");
-// 	m_mapoutputparam;
-// 	if(m_outputsum >3) 
-// 	{
-	//strfixgridcol = m_msflexgridTitle.get_TextMatrix(0,0);
-// 	CString str = _T(" 123");
-//		char ch =  str.GetAt(3);
- 	//	char chr = strfixgridcol.GetAt(13);//左边第一个空格不计算,第一个从0开始算起
-// 
-// 			" Output Board 1 Address:   210")
-		//获得指定位置字符：char a = str1.GetAt(3);
-//		int Address;
-// 		// Address = (int)chr;//如果chr = '1'那么Address = 49;
-// 	//	sscanf(&chr,"%d",&Address);
-// 	}
-//显示下一页
+#endif
 
 }
 
-
-
-
 void CLightingController::OnSetmappingRead()//read from lightingcontroller  to pc
 {
+    //m_msflexgrid1to96.AddItem(_T("d"),1);RemoveItem(1);减少一行//Refresh();//Clear();
+    int startaddr;//input1=200;group1=2600
+    m_msflexgrid1to96.Clear();
+    m_msflexgrid1to96.put_TextMatrix(0,0,_T("Panels"));
+    m_msflexgrid1to96.put_TextMatrix(0,1,_T("Card_ID"));
+    m_msflexgrid1to96.put_TextMatrix(0,2,_T("No."));
+    m_msflexgrid1to96.put_TextMatrix(0,3,_T("OutputName"));
+    int itmp = m_ListBox.GetCurSel();//获取编号
+    //判断是组还是输入
+    CString strtmp,strtmp_PanelName;
+    GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp);
+    if (strtmp.CompareNoCase(_T("Input-Output-Map")) == 0)//确认是input还是group
+    {
+        strtmp_PanelName=Get_Table_Name(m_sn,_T("Input"),itmp+1);
+        startaddr = 300+itmp*60;
+    }
+    else
+    {
+        strtmp_PanelName=Get_Table_Name(m_sn,_T("Group"),itmp+1);
+        startaddr = 1740+itmp*60;
+    }
 
-	//200…2559	2400	Register 200 to 2731 use for input-output-mappings. The data length is (100) in Write Multiple and the maximum input is 24.
+    m_vecaddoutputs.clear();
+    map<CString,vecaddoutputs>::iterator iter;//查找组中的元素
+    iter = m_mapaddoutputs.find(strtmp_PanelName);
+    int card,output;
 
-	//2600…4599	2000	Register 2732 to 4691 use for group-output-mapping. The data length is (100) in Write Multiple and the maximum input is 20.
-
-
-
-#if 0 //测试LightingController批量读。
-	open_com(comnum);
-	memset(SerialNum,0,sizeof(SerialNum));
-	
-	int num = 0;//确定硬件件中input-output-map中有已设置了多少组（总共24组）
-
-	for (int i = 200;i<2400;)
-	{
-		int tmp = read_one(g_tstat_id,i);
-		if( tmp == 255)
-		{
-			num+=1;
-			break;		
-		}
-		num+=1;			
-		i+=100;
-	}
-
-	//根据已知多少有多少组是设置好的后再去读取。
-	int flg = 0; 
-	for (int i =0;i<num;i++)
-	{
-
-		register_critical_section.Lock();
-		flg = Read_Multi(254,&SerialNum[i*100],200+i*100,100);
-		register_critical_section.Unlock();
-	}
-	if (flg>0)
-	{
-		AfxMessageBox(_T("Read successful！"));
-	}
-
-#if 0
-	CString strpanel,stroutputboard,stroutput,stroutputname;
-	stroutput.Format(_T("%d"),SerialNum[0])
-	//将选择的数据保存在内存中vector:: m_vecaddoutputs
-	m_structaddoutputs.stroutputno = stroutput;
-	m_structaddoutputs.stroutputboard = stroutputboard;
-	m_structaddoutputs.strpanel = strpanel;
-	m_structaddoutputs.stroutputname = stroutputname;
-	m_vecaddoutputs.push_back(m_structaddoutputs);
+    {
+        //测试LightingController批量读。
+        if (g_CommunicationType == 0)
+            open_com(comnum);
+        memset(SerialNum,0,sizeof(SerialNum));
+        register_critical_section.Lock();
+        //AfxMessageBox(_T("start read 100 register"));
+        int 	flg = Read_Multi(g_tstat_id,SerialNum,startaddr,60);
+        //int 	flg = Read_Multi(100,SerialNum,startaddr,100);
+        register_critical_section.Unlock();
+        CString st;
+        st.Format(_T("%d"),flg);
 
 
 
+        //		}
+        if (flg>0)
+        {
+            m_vecaddoutputs.clear();
+            CString strpanel,stroutputboard,stroutput,stroutputname;
+
+            //将选择的数据保存在内存中vector:: m_vecaddoutputs
+            int outsum=0;
+
+            for(int i =0;i<60;)
+            {
+                if (SerialNum[i] != 255&& SerialNum[i] !=0&&SerialNum[i]!=65535)
+                    outsum++;
+                i+=3;
+            }
+            BYTE Byte = 1;
+            int flag = 0;
+            //	for(int j=0:j<outsum;j++)
+            WORD wtmp;
+            for(int j = 0;j<outsum;j++)
+            {
+                strpanel.Format(_T("%d"),itmp+1);
+                strpanel=strtmp_PanelName;
+                stroutputboard.Format(_T("Card%d"),j+1);
+
+                for (int i =1;i<=32;i++)
+                {
+
+                    if(i <=16)
+                    {
+                        wtmp = SerialNum[j*3+1];
+                        flag = (Byte<<(i-1))&wtmp;
+                        if (flag != 0)
+                        {
+                            stroutput.Format(_T("%d"),i);
+                            stroutputname=get_OutputName(j+1,i);
+                            if (stroutputname.IsEmpty())
+                            {
+                                stroutputname.Format(_T("Output%d"),i);
+                            }
+                            m_structaddoutputs.stroutputno = stroutput;
+                            m_structaddoutputs.stroutputboard = stroutputboard;
+                            m_structaddoutputs.strpanel = strpanel;
+                            m_structaddoutputs.stroutputname = stroutputname;
+                            m_vecaddoutputs.push_back(m_structaddoutputs);
+
+                        }
 
 
-	int itmp = m_ListBox.GetCurSel();
-	// 	//m_ListBox.SelectString(itmp,strtmp);
-	// 	strtmp.Format(_T(""))
-	//	GetDlgItem(IDC_LIST_INPUT)->GetWindowText(strtmp);
+                    }
+                    else
+                    {
 
 
-	//判断是组还是输入
-	CString strtmp,strtmp1;
-	GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp);
-	if (strtmp.CompareNoCase(_T("Input-Output-Map")) == 0)
-		strtmp1.Format(_T("input%d"),itmp+1);
-	else
-		strtmp1.Format(_T("group%d"),itmp+1);
+                        wtmp = SerialNum[j*3+2];
+                        flag = (Byte<<(i-17))&wtmp;
+                        if (flag != 0)
+                        {
+                            stroutput.Format(_T("%d"),i);
+                            //stroutputname.Format(_T("Output%d"),i);
+                            stroutputname=get_OutputName(j+1,i);
+                            if (stroutputname.IsEmpty())
+                            {
+                                stroutputname.Format(_T("Output%d"),i);
+                            }
+                            m_structaddoutputs.stroutputno = stroutput;
+                            m_structaddoutputs.stroutputboard = stroutputboard;
+                            m_structaddoutputs.strpanel = strpanel;
+                            m_structaddoutputs.stroutputname = stroutputname;
+                            m_vecaddoutputs.push_back(m_structaddoutputs);
 
-	//m_mapaddoutputs.clear();
-	map<CString,vecaddoutputs>::iterator iter;
-	iter = m_mapaddoutputs.find(strtmp1);
-	if (iter != m_mapaddoutputs.end())
-		m_mapaddoutputs.erase(iter);
+                        }
 
-	m_mapaddoutputs.insert(map<CString,vecaddoutputs>::value_type(strtmp1,m_vecaddoutputs));
-
-
-#endif
-
-
-
-	//int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times)
-// 	register_critical_section.Lock();
-// 	Read_Multi(g_tstat_id,&multi_register_value[i*64],i*64,64);
-// 	register_critical_section.Unlock();
-// 	for (int i =0;i<24;i++)
-// 	{
-// 
-// 	register_critical_section.Lock();
-// 	flg = Read_Multi(254,&SerialNum[i*100],200+i*100,100);
-// 	register_critical_section.Unlock();
-// 	}
-// 	if (1)//flg==
-// 	{
-// 		AfxMessageBox(_T("Read successful！"));
-// 	}
-#endif
+                    }
 
 
 
+                }
+
+
+
+
+            }
+
+            m_mapaddoutputs.insert(map<CString,vecaddoutputs>::value_type(strtmp_PanelName,m_vecaddoutputs));
+
+
+            //AfxMessageBox(_T("show value"));
+
+
+            m_msflexgrid1to96.put_WordWrap(TRUE);//允许换行 和下面\n对应一起使用才有效果	
+            m_msflexgrid1to96.put_MergeCells(1); //表按任意方式进行组合单元格内容	
+
+            m_msflexgrid1to96.put_MergeCol(0,TRUE);//其中第一人参数0，表示的是第几列.不是表示需要合并的行数
+            m_msflexgrid1to96.put_MergeCol(1,TRUE);
+
+            int elementnum =m_vecaddoutputs.size();
+            for (int i =1;i<=elementnum;i++)
+            {
+                m_msflexgrid1to96.put_TextMatrix(i,0,m_vecaddoutputs.at(i-1).strpanel);
+
+                m_msflexgrid1to96.put_TextMatrix(i,1,m_vecaddoutputs.at(i-1).stroutputboard);
+                m_msflexgrid1to96.put_TextMatrix(i,2,m_vecaddoutputs.at(i-1).stroutputno);
+                //m_vecaddoutputs.at(i-1).stroutputname =get_OutputName() // _T("output")+m_vecaddoutputs.at(i-1).stroutputno;
+                m_msflexgrid1to96.put_TextMatrix(i,3,m_vecaddoutputs.at(i-1).stroutputname);
+
+            }
+
+        }
+
+
+
+
+
+
+
+
+    }
 
 }
 
 void CLightingController::OnSetmapSettingsave()
 {
-#if 0
+#if 1
 #if 1
 	int inporgro = m_comboBox.GetCurSel();//input索引是1
 	int num_No =m_ListBox.GetCurSel();//input1 = 0,input2....32
@@ -2346,7 +1898,7 @@ void CLightingController::OnSetmapSettingsave()
 			col = 1;
 			istart
 
-			break;
+				break;
 		case 2:
 			col = 5;
 			break;
@@ -2383,6 +1935,8 @@ void CLightingController::OnSetmapSettingsave()
 #endif
 #endif
 }
+#endif
+
 
 void CLightingController::OnSetmappingSand()
 {
@@ -2395,19 +1949,17 @@ void CLightingController::OnSetmappingSand()
 	else
 		r = TRUE;
 
-	if (r)
+if (r)
 	{
-		
-
-//	CString s;
-//	s.Format(_T("com%d is ok"),comnum);
-//	AfxMessageBox(s);
-	//要发送的数据
-	BYTE SendData[100];
-	//int x = sizeof(SendData);
+	unsigned  short SendData[60];
+ 
+		//int x = sizeof(SendData);
 	memset(SendData,0,sizeof(SendData));
 
 
+    for(int i=0;i<20;i++){
+     SendData[3*i]=i+1;
+    }
 	CString straddress,strmap;//strmap:映射类型
 
 	//找到要发送的项
@@ -2416,15 +1968,15 @@ void CLightingController::OnSetmappingSand()
 	CString strtmp,strtmp1;
 	GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp);
 	int indexmap;
-	if (strtmp.CompareNoCase(_T("Input-Output-Map")) == 0)//确认是input还是group
+	if (strtmp.CompareNoCase(_T("Input-Output-Map"))== 0)//确认是input还是group
 	{
-		strtmp1.Format(_T("input%d"),itmp+1);
+		strtmp1=Get_Table_Name(m_sn,_T("Input"),itmp+1);/*.Format(_T("input%d"),itmp+1)*/
 		indexmap =1;
 
 	}
 	else
 	{
-		strtmp1.Format(_T("group%d"),itmp+1);
+		strtmp1=Get_Table_Name(m_sn,_T("Group"),itmp+1);
 		indexmap = 0;
 	}
 
@@ -2435,15 +1987,7 @@ void CLightingController::OnSetmappingSand()
 		if (iter->first != _T("") )
 		{
 		m_vecaddoutputs = iter->second;
-
- 	vecaddoutputs::iterator itervec;
-// 	CString ioutputno;
-// 	itervec = find(iter->second.begin(),iter->second.end(),iter->second.at(1).stroutputboard);
-// 		if (itervec !=iter->second.end())
-// 		{
-// 			ioutputno = iter->second.at(1).stroutputno;
-// 		}
-
+ 	    vecaddoutputs::iterator itervec;
 	vector<int> vecout;
 	map<int,vector<int>> mapboardoutput;
 	mapboardoutput.clear();
@@ -2454,12 +1998,11 @@ void CLightingController::OnSetmappingSand()
 	for (int i = 0;i<outsum;i++)
 	{
 		CBoard = m_vecaddoutputs.at(i).stroutputboard;
-		iboard = _ttoi(CBoard.Right(3));
+		CBoard.Delete(0,4);
+		iboard = _ttoi(CBoard);
 		COutput = m_vecaddoutputs.at(i).stroutputno;
 		ioutput = _ttoi(COutput);
 		vecout.push_back(ioutput);
-
-
 		itermap = mapboardoutput.find(iboard);
 		if (itermap != mapboardoutput.end())
 			mapboardoutput.erase(itermap);
@@ -2481,554 +2024,60 @@ void CLightingController::OnSetmappingSand()
 	
 		for (unsigned int j=0;j<itermapp->second.size();j++)
 		{
-			ITEMP =itermapp->second.at(j);
-			SendData[index] = itermapp->first;
-				if(ITEMP <=8)
+			  ITEMP =itermapp->second.at(j);
+			    index= itermapp->first-1;
+				if(ITEMP <=16)
 				{
-					SendData[index+1] = (Byte<<(ITEMP-1))|SendData[index+1];
-					//SendData[index+1] = Byte|SendData[index+1];
-				}else if (ITEMP<=16&&ITEMP>8)
-				{
-					int intmp=ITEMP-9;
-					SendData[index+2] = (Byte<<intmp)|SendData[index+2];
-				}else if (ITEMP<=24&&ITEMP>16)
+					SendData[3*index+1] = (Byte<<(ITEMP-1))|SendData[3*index+1];
+					 
+				}
+				else 
 				{
 					int intmp=ITEMP-17;
-					SendData[index+3] = (Byte<<intmp)|SendData[index+3];
-				}else if (ITEMP<=32&&ITEMP>24)
-				{
-					int intmp=ITEMP-25;
-					SendData[index+4] = (Byte<<intmp)|SendData[index+4];
+					SendData[3*index+2] = (Byte<<intmp)|SendData[3*index+2];
 				}
+			
 				
 		}
-		index = index+5;
+		//index = index+3;
 
 	}
-
-
-	memset(&SendData[index],255,sizeof(SendData)-index);
-	}else
-	memset(&SendData,255,sizeof(SendData));
-
-}else
-	{
-		memset(&SendData,255,sizeof(SendData));
+	
+	}
 
 }
+
 
 
 
 	//发送函数
 	int ret = 0;
 	int sendmodbus =0;
-	sendmodbus=itmp*100;//itmp就是索引
+	sendmodbus=itmp*60;//itmp就是索引
 	switch(indexmap)//input = 1/group/indexnum    //1...24(input1 = 0,input2....24)/1..20
 	{
 	case 1://input map 200…2559 2400 Register 200 to 2731 use for input-output-mappings. The data length is (100) in Write Multiple and the maximum input is 24.
 		sendmodbus+=300;
 		break;
 	case 0://group map
-		sendmodbus+=2700;
+		sendmodbus+=1740;
 		break;
 	}
-
-
-	ret = Write_Multi(g_tstat_id,SendData,sendmodbus,100);
+	ret = Write_Multi_short(g_tstat_id,SendData,sendmodbus,60);
 	//ret = Write_Multi(100,SendData,sendmodbus,100);
-
+	      
 	//发送结果提示
 	if (ret == 1)
 		AfxMessageBox(_T("Send successful!"));
 
 	else
 		AfxMessageBox(_T("Send failed!"));	
-
-// 	CString t;
-// 	t.Format(_T("%d"),ret);
-// 	AfxMessageBox(t);
-
-
-
-
-
-
-
-
-
-#if 0
-// 	int indexmap = m_comboBox.GetCurSel();
-// 	if(indexmap == 1)
-// 		strmap = _T("input");
-// 	else
-// 		strmap = _T("group");
-// 
-// 	int indexnum = m_ListBox.GetCurSel();
-// 
-// 
-// 	straddress.Format(_T("%s%d"),strmap,indexnum+1);
-
-
-	//读取输出板地址
-	//typedef std::map<CString,MAP_OUT_ADDRESS> MAP_INT_OUT;
-	MAP_INT_OUT::iterator iterfindoutsum;
-	//	在往map里面插入了数据，我们怎么知道当前已经插入了多少数据呢，可以用size函数，用法如下：Int nSize = mapStudent.size();
-	iterfindoutsum = m_mapinout.find(straddress);
-	if(iterfindoutsum != m_mapinout.end())
-	{
-		//MAP_OUT_ADDRESS::iterator iteraddress = iteraddress->second;//Error	5	error C2440: 'initializing' : cannot convert from 'CString' to 'std::_Tree<_Traits>::iterator'	指针和变量混淆
-
-		CString strtmp = iterfindoutsum->first;
-		MAP_OUT_ADDRESS maptmp = iterfindoutsum->second;
-		outsum = maptmp.size();
-
-		CString mapaddress;
-		int inmoveaddr = 0;
-		int j = 0;
-		memset(SendData,0,sizeof(SendData));
-		for (int i =1;i<=outsum;i++)
-		{
-			j = inmoveaddr+(i - 1)*5;
-			CString str = maptmp[i];
-			mapaddress.Format(_T("%s %s"),straddress,str);
-			MAP_OUT_PARAM::iterator iterparam;
-			iterparam = m_mapoutputparam.find(mapaddress);
-			if (iterparam != m_mapoutputparam.end())
-			{
-				VECTOR_OUT_PARAM vectmp = iterparam->second;
-
-				// 				 (2)    按制定符号分割字符：
-				// 
-				// 					 int pos=str.Find(strchar);//查找字符，如果没找到，则返回0，找到则返回字符的位置,参数可以是字符也可以是字符串
-				// 
-				// 				 while(pos>0){
-				// 
-				// 					 str1=str.Left(pos);//取左,参数为字符串的个数
-				// 
-				// 					 str=str.Right(str.GetLength-pos-1);//取右，参数同上
-				// 
-				// 					 tmp.Format(“%s\r\n”,str1);//字符串中\r\n代表回车化行符
-				// 
-				// 					 strres+=tmp;
-				// 
-				// 					 pos=str.Find(strchar);
-				// 
-				// 				 }
-
-				SendData[j] = _ttoi(str);//第一位放地址
-				int endnum = vectmp.size();//一个MODBUS的32位数据长度,以下数据将用sendData数组5个内存长度。
-				for (int i =0;i<endnum;i++)
-				{
-					CString str = vectmp.at(i).outstatus;
-					BYTE Byte;
-					if (str.CompareNoCase(_T("ON")) == 0)
-						Byte = 1;
-					else
-						Byte =0;
-
-					if(i <8)
-					{
-						SendData[j+1] = (Byte<<i)|SendData[j+1];
-					}else if (i<16&&i>=8)
-					{
-						int intmp=i-8;
-						SendData[j+2] = (Byte<<intmp)|SendData[j+2];
-					}else if (i<24&&i>=16)
-					{
-						int intmp=i-16;
-						SendData[j+3] = (Byte<<intmp)|SendData[j+3];
-					}else if (i<32&&i>=24)
-					{
-						int intmp=i-24;
-						SendData[j+4] = (Byte<<intmp)|SendData[j+4];
-					}
-
-
-				}
-
-			}
-		}
-
-	}
-
-
-	//读取输出板参数
-	//typedef std::map<CString,VECTOR_OUT_PARAM> MAP_OUT_PARAM;
-	//MAP_OUT_PARAM::iterator iterparam;
-
-
-	//m_mapoutputparam;
-
-
-
-	// 	for (int i = 0;i<100;i++)
-	// 	{
-	// 		if (m_vecONS.at(i).Status.CompareNoCase(_T("ON")) == 0)
-	// 		{
-	// 			SendData[i+2] = 1;
-	// 			SendData[1]+=1;
-	// 		}else
-	// 		{
-	// 			SendData[i+2] = 0;
-	// 		}
-	// 	}
-
-	//发送函数
-	int ret = 0;
-	int sendmodbus =0;
-	sendmodbus=indexnum*100;
-	switch(indexmap)//input = 1/group/indexnum    //1...24(input1 = 0,input2....24)/1..20
-	{
-	case 1://input map 200…2559 2400 Register 200 to 2731 use for input-output-mappings. The data length is (100) in Write Multiple and the maximum input is 24.
-		sendmodbus+=200;
-		break;
-	case 0://group map
-		sendmodbus+=2600;
-		break;
-	}
-
-
-	ret = Write_Multi(g_tstat_id,SendData,sendmodbus,100);
-
-	//发送结果提示
-	if (ret == 1)
-		AfxMessageBox(_T("Send successful!"));
-
-	else
-		AfxMessageBox(_T("Send failed!"));	
-
-	//存于数据库中
-	//	SaveDB_OutNameStatus();
-#endif
-
-//	200…2559	2400	Register 200 to 2731 use for input-output-mappings. The data length is (100) in Write Multiple and the maximum input is 24.
-//假设发送input1-ouput1、2、3;Adress(1个BYTE)-output4-output3-..output1(0-8bit) 共20组共100BYTE
-#if 0
-	open_com(comnum);
-	//要发送的数据
-	BYTE SendData[100];
-	//memset(SendData,0,sizeof(SendData));
-
-	CString straddress,strmap;//strmap:映射类型
-	int outsum;//输出板总数
-	int indexmap = m_comboBox.GetCurSel();
-	if(indexmap == 1)
-		strmap = _T("input");
-		else
-		strmap = _T("group");
-
-	int indexnum = m_ListBox.GetCurSel();
-
-	
-	straddress.Format(_T("%s%d"),strmap,indexnum+1);
-
-
-	//读取输出板地址
-	//typedef std::map<CString,MAP_OUT_ADDRESS> MAP_INT_OUT;
-	MAP_INT_OUT::iterator iterfindoutsum;
-//	在往map里面插入了数据，我们怎么知道当前已经插入了多少数据呢，可以用size函数，用法如下：Int nSize = mapStudent.size();
-	iterfindoutsum = m_mapinout.find(straddress);
-	if(iterfindoutsum != m_mapinout.end())
-	{
-		//MAP_OUT_ADDRESS::iterator iteraddress = iteraddress->second;//Error	5	error C2440: 'initializing' : cannot convert from 'CString' to 'std::_Tree<_Traits>::iterator'	指针和变量混淆
-
-		CString strtmp = iterfindoutsum->first;
-		MAP_OUT_ADDRESS maptmp = iterfindoutsum->second;
-		outsum = maptmp.size();
-
-		CString mapaddress;
-		int inmoveaddr = 0;
-		int j = 0;
-		 memset(SendData,0,sizeof(SendData));
-		for (int i =1;i<=outsum;i++)
-		{
-			j = inmoveaddr+(i - 1)*5;
-			CString str = maptmp[i];
-			 mapaddress.Format(_T("%s %s"),straddress,str);
-			 MAP_OUT_PARAM::iterator iterparam;
-			 iterparam = m_mapoutputparam.find(mapaddress);
-			 if (iterparam != m_mapoutputparam.end())
-			 {
-				 VECTOR_OUT_PARAM vectmp = iterparam->second;
-				
-// 				 (2)    按制定符号分割字符：
-// 
-// 					 int pos=str.Find(strchar);//查找字符，如果没找到，则返回0，找到则返回字符的位置,参数可以是字符也可以是字符串
-// 
-// 				 while(pos>0){
-// 
-// 					 str1=str.Left(pos);//取左,参数为字符串的个数
-// 
-// 					 str=str.Right(str.GetLength-pos-1);//取右，参数同上
-// 
-// 					 tmp.Format(“%s\r\n”,str1);//字符串中\r\n代表回车化行符
-// 
-// 					 strres+=tmp;
-// 
-// 					 pos=str.Find(strchar);
-// 
-// 				 }
-
-				 SendData[j] = _ttoi(str);//第一位放地址
-				 int endnum = vectmp.size();//一个MODBUS的32位数据长度,以下数据将用sendData数组5个内存长度。
-				 for (int i =0;i<endnum;i++)
-				 {
-					 CString str = vectmp.at(i).outstatus;
-					 BYTE Byte;
-					 if (str.CompareNoCase(_T("ON")) == 0)
-						 Byte = 1;
-					 else
-						 Byte =0;
-					
-					if(i <8)
-					{
-					 SendData[j+1] = (Byte<<i)|SendData[j+1];
-					}else if (i<16&&i>=8)
-					{
-						int intmp=i-8;
-						SendData[j+2] = (Byte<<intmp)|SendData[j+2];
-					}else if (i<24&&i>=16)
-					{
-						int intmp=i-16;
-						SendData[j+3] = (Byte<<intmp)|SendData[j+3];
-					}else if (i<32&&i>=24)
-					{
-						int intmp=i-24;
-						SendData[j+4] = (Byte<<intmp)|SendData[j+4];
-					}
-
-
-				 }
-
-			 }
-		}
-			
-	}
-
-
-	//读取输出板参数
-	//typedef std::map<CString,VECTOR_OUT_PARAM> MAP_OUT_PARAM;
-	//MAP_OUT_PARAM::iterator iterparam;
-
-
-	//m_mapoutputparam;
-
-
-
-// 	for (int i = 0;i<100;i++)
-// 	{
-// 		if (m_vecONS.at(i).Status.CompareNoCase(_T("ON")) == 0)
-// 		{
-// 			SendData[i+2] = 1;
-// 			SendData[1]+=1;
-// 		}else
-// 		{
-// 			SendData[i+2] = 0;
-// 		}
-// 	}
-
-	//发送函数
-	int ret = 0;
-	int sendmodbus =0;
-	sendmodbus=indexnum*100;
-	switch(indexmap)//input = 1/group/indexnum    //1...24(input1 = 0,input2....24)/1..20
-	{
-	case 1://input map 200…2559 2400 Register 200 to 2731 use for input-output-mappings. The data length is (100) in Write Multiple and the maximum input is 24.
-		sendmodbus+=200;
-		break;
-	case 0://group map
-		sendmodbus+=2600;
-		break;
-	}
-	
-
-	ret = Write_Multi(g_tstat_id,SendData,sendmodbus,100);
-
-	//发送结果提示
-	if (ret == 1)
-		AfxMessageBox(_T("Send successful!"));
-
-	else
-		AfxMessageBox(_T("Send failed!"));	
-
-	//存于数据库中
-//	SaveDB_OutNameStatus();
-
-#endif
-
-#if 0
-open_com(comnum);
-//要发送的数据
-BYTE SendData[98];
-memset(SendData,0,sizeof(SendData));
-
-for (int i = 0;i<96;i++)
-{
-	if (m_vecONS.at(i).Status.CompareNoCase(_T("ON")) == 0)
-	{
-		SendData[i+2] = 1;
-		SendData[1]+=1;
-	}else
-	{
-		SendData[i+2] = 0;
-	}
-}
-
-//发送函数
-int ret = 0;
-ret = Write_Multi(g_tstat_id,SendData,200,98);
-
-//发送结果提示
-if (ret == 1)
-AfxMessageBox(_T("Send successful!"));
-
-else
-AfxMessageBox(_T("Send failed!"));	
-
-//存于数据库中
-SaveDB_OutNameStatus();
-#endif
-
-#if 0
-SaveDB_OutNameStatus();
-
-InitializeArray(m_ArrayOutput);
-
-open_com(comnum);
-
-//将界面用户选择转换成WORD数据
-WORD *SendData;
-SendData = ConvertOutput();
-
-//查找要发送的地址，从输入名称中可找到
-int Curindex = m_ListBox.GetCurSel();
-unsigned short StartAddress;
-switch(Curindex)
-{
-case 0:
-	StartAddress = 200;
-	break;
-case 1:
-	break;
-default:
-	break;
-}
-
-//发送数据给产品
-int RETWRITE = 0;
-for (int i = 0;i<3;i++)
-{
-	RETWRITE = write_one(g_tstat_id,StartAddress,SendData[i]);
-
-	StartAddress++;
-}
-if(RETWRITE == 1)
-{
-	AfxMessageBox(_T("Set successful!"));
-
-	//发送如果成功则将所发送的数据写入数据库
-	// 		if(UpdateDBPART(200,202,SendData))
-	// 			AfxMessageBox(_T("Write DB successful!"));
 }
 else
 {
-	AfxMessageBox(_T("Set failed!"));
-}
-#endif
-
-#if 0
-BYTE chartemp[12];//注：unsigned char 8bit 0~255
-for (int i=0;i<12;i++)
-{
-	chartemp[i] = 0;
-}
-open_com(comnum);
-int flag;
-//flag = write_multi(254,chartemp,4700,12);
-
-flag = write_one(254,4700,0);
-#endif
-
-
-#if 0
-open_com(comnum);
-int ret = Read_Multi(254,LightCregister,1380,64,2);
-
-#endif
-
-
-
-
-#if 0 //测试LightingController写，注批量写。已测试OK
-open_com(comnum);
-unsigned char addr2 = 'a';
-
-CString str_temp;
-description temp_descri;
-memset(&temp_descri,50,sizeof(description));
-
-unsigned char *p;
-p=(unsigned char *) &temp_descri;
-int flg = Write_Multi(254,p,4520,WR_DESCRIPTION_SIZE);
-if (flg==1)
-{
-	AfxMessageBox(_T("写入成功！"));
+AfxMessageBox(_T("serial Port open fail"));
 }
 
-#endif
-
-#if 0 //测试LightingController写，注批量读。
-open_com(comnum);
-unsigned short SerialNum[100];
-
-
-//int Read_Multi(unsigned char device_var,unsigned short *put_data_into_here,unsigned short start_address,int length,int retry_times)
-register_critical_section.Lock();
-int flg = Read_Multi(254,&SerialNum[0],100,100);
-register_critical_section.Unlock();
-if (flg==1)
-{
-	AfxMessageBox(_T("写入成功！"));
-}
-
-#endif
-
-
-
-
-
-//test_0K 
-// 	unsigned short StartAddress = 200;
-// 	open_com(comnum);
-// 	unsigned char Chartemp[6];//注：unsigned char 8bit 0~255
-// 	for (int i=0;i<6;i++)
-// 	{
-// 		Chartemp[i] = 1;
-// 	}
-// 	open_com(comnum);
-// 	for (int i = 0;i<6;i++)
-// 	{
-// 	int flg = write_one(g_tstat_id,StartAddress,100);
-// 		StartAddress++;
-// 
-// 	}
-
-
-
-//test_no multi write flg =1,但是硬件则没有真正写入Chartemp的值，在T3产品也测试过出现同样问题 ,NC产品还没测试 
-//不用测试了，是因为产品硬件没有开辟这么多内存空间来存放这些字符导致的，schedule则可以一次性多写，YF。
-
-// 	BYTE chartemp[12];//注：unsigned char 8bit 0~255
-// 	for (int i=0;i<12;i++)
-// 	{
-// 		chartemp[i] = 10;
-// 	}
-// 	open_com(comnum);
-// 	int flag;
-// 	flag = write_multi(254,chartemp,200,12);
-}else
-
-AfxMessageBox(_T("serial 2 open fail"));
 
 }
 
@@ -3091,8 +2140,8 @@ void CLightingController::OnBnClickedButtonLightingcontorlGroups()
 void CLightingController::OnBnClickedButtonLightingcontorlSyncwithPC()
 {
 	if (g_CommunicationType == 0)
-		open_com(comnum);
-	UpdateData();
+     open_com(comnum);
+	 UpdateData();
 	BYTE t_time[8]={0};
 	WORD temp_us=0;
 	CTime time = CTime::GetCurrentTime();
@@ -3127,7 +2176,11 @@ void CLightingController::OnBnClickedButtonLightingcontorlSyncwithPC()
 	
 
 }
+void CLightingController::OnBnClickedButtonSaveAll(){
+write_one(g_tstat_id,91,1);
+AfxMessageBox(_T("Save Successfully"));
 
+}
 void CLightingController::Automationflexrow()
 {
 
@@ -3184,6 +2237,20 @@ void CLightingController::Automationflexrow()
 		}
 
 }
+void CLightingController::OnRefresh()
+{	
+OnSetmappingRead();
+}
+void CLightingController::OnSave()
+{	
+OnSetmappingSand();
+}
+void CLightingController::OnReset()
+{	
+OnSetmappingPrevious();
+}
+//Add
+#if 1
 void CLightingController::OnBnClickedButtonAdd()
 {	
 
@@ -3194,12 +2261,12 @@ void CLightingController::OnBnClickedButtonAdd()
 
 	m_msflexgrid1to96.put_MergeCol(0,TRUE);//其中第一人参数0，表示的是第几列.不是表示需要合并的行数
 	m_msflexgrid1to96.put_MergeCol(1,TRUE);
-	
+
 
 
 	//获取panel,outputboard,output组合框所选择的当前值；
 	CString strpanel,stroutputboard,stroutput,stroutputname;
-	GetDlgItem(IDC_COMBO_panel)->GetWindowText(strpanel);
+	 
 	GetDlgItem(IDC_COMBO_outputboard)->GetWindowText(stroutputboard);
 	GetDlgItem(IDC_COMBO_output)->GetWindowText(stroutput);
 
@@ -3211,62 +2278,58 @@ void CLightingController::OnBnClickedButtonAdd()
 	CString strtmp_,strtmp1_;
 	GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp_);
 	if (strtmp_.CompareNoCase(_T("Input-Output-Map")) == 0)//确认是input还是group
-		strtmp1_.Format(_T("input%d"),itmp_+1);
+		strtmp1_=Get_Table_Name(m_sn,_T("Input"),itmp_+1);
 	else
-		strtmp1_.Format(_T("group%d"),itmp_+1);
+		strtmp1_=Get_Table_Name(m_sn,_T("Group"),itmp_+1);
 
 	m_vecaddoutputs.clear();
 	map<CString,vecaddoutputs>::iterator iter_;//查找组中的元素
 	iter_ = m_mapaddoutputs.find(strtmp1_);
 	if (iter_ != m_mapaddoutputs.end())
 		m_vecaddoutputs = iter_->second;
+		strpanel=strtmp1_;
 
-
-
-
+	int ctoitmp = _ttoi(stroutputboard);
+		stroutputboard.Format(_T("Card%d"),ctoitmp);
+	 	stroutputname =  _T("Output")+stroutput;
+		BOOL is_exsit=FALSE;
+		vector<structaddoutputs>::iterator struct_iter;
+		for(struct_iter=m_vecaddoutputs.begin();struct_iter!=m_vecaddoutputs.end();struct_iter++)
+		{
+		  if (struct_iter->stroutputno==stroutput&&struct_iter->strpanel==strpanel&&struct_iter->stroutputboard==stroutputboard)
+		  {
+		  is_exsit=TRUE;
+		  } 
+		}
+if (is_exsit)
+{
 	int i  = m_vecaddoutputs.size()+1;
 	m_msflexgrid1to96.put_TextMatrix(i,0,strpanel);
-	int ctoitmp = _ttoi(stroutputboard);
-	if (ctoitmp<10)
-		stroutputboard.Format(_T("00%d"),ctoitmp);
-	else if (ctoitmp<100)
-		stroutputboard.Format(_T("0%d"),ctoitmp);
-	
-	stroutputboard = strpanel+ _T("--out\n") + stroutputboard;
 	m_msflexgrid1to96.put_TextMatrix(i,1,stroutputboard);
 	m_msflexgrid1to96.put_TextMatrix(i,2,stroutput);
-	stroutputname =  _T("output")+stroutput;
 	m_msflexgrid1to96.put_TextMatrix(i,3,stroutputname);
-	
 
-
-	//将选择的数据保存在内存中vector:: m_vecaddoutputs
 	m_structaddoutputs.stroutputno = stroutput;
 	m_structaddoutputs.stroutputboard = stroutputboard;
 	m_structaddoutputs.strpanel = strpanel;
 	m_structaddoutputs.stroutputname = stroutputname;
+
 	m_vecaddoutputs.push_back(m_structaddoutputs);
 
-	
-
-
-
- 	int itmp = m_ListBox.GetCurSel();
-// 	//m_ListBox.SelectString(itmp,strtmp);
-// 	strtmp.Format(_T(""))
-//	GetDlgItem(IDC_LIST_INPUT)->GetWindowText(strtmp);
 
 
 
 
+	int itmp = m_ListBox.GetCurSel();
 
 	//判断是组还是输入
 	CString strtmp,strtmp1;
 	GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp);
 	if (strtmp.CompareNoCase(_T("Input-Output-Map")) == 0)
-		strtmp1.Format(_T("input%d"),itmp+1);
+
+		strtmp1=Get_Table_Name(m_sn,_T("Input"),itmp_+1);
 	else
-		strtmp1.Format(_T("group%d"),itmp+1);
+		strtmp1=Get_Table_Name(m_sn,_T("Group"),itmp_+1);
 
 	//m_mapaddoutputs.clear();
 	map<CString,vecaddoutputs>::iterator iter;
@@ -3284,6 +2347,55 @@ void CLightingController::OnBnClickedButtonAdd()
 		GetDlgItem(IDC_COMBO_output)->SetWindowText(stroutput);
 	}
 }
+else
+{
+ //  	AfxMessageBox(_T("Don't Add,again!"));
+    int i  = m_vecaddoutputs.size()+1;
+    m_msflexgrid1to96.put_TextMatrix(i,0,strpanel);
+    m_msflexgrid1to96.put_TextMatrix(i,1,stroutputboard);
+    m_msflexgrid1to96.put_TextMatrix(i,2,stroutput);
+    m_msflexgrid1to96.put_TextMatrix(i,3,stroutputname);
+
+    m_structaddoutputs.stroutputno = stroutput;
+    m_structaddoutputs.stroutputboard = stroutputboard;
+    m_structaddoutputs.strpanel = strpanel;
+    m_structaddoutputs.stroutputname = stroutputname;
+
+    m_vecaddoutputs.push_back(m_structaddoutputs);
+
+
+
+
+
+    int itmp = m_ListBox.GetCurSel();
+
+    //判断是组还是输入
+    CString strtmp,strtmp1;
+    GetDlgItem(IDC_COMBO1)->GetWindowText(strtmp);
+    if (strtmp.CompareNoCase(_T("Input-Output-Map")) == 0)
+
+        strtmp1=Get_Table_Name(m_sn,_T("Input"),itmp_+1);
+    else
+        strtmp1=Get_Table_Name(m_sn,_T("Group"),itmp_+1);
+
+    //m_mapaddoutputs.clear();
+    map<CString,vecaddoutputs>::iterator iter;
+    iter = m_mapaddoutputs.find(strtmp1);
+    if (iter != m_mapaddoutputs.end())
+        m_mapaddoutputs.erase(iter);
+
+    m_mapaddoutputs.insert(map<CString,vecaddoutputs>::value_type(strtmp1,m_vecaddoutputs));
+
+    outputno = _ttoi(stroutput);
+    if (outputno != 32)
+    {
+        outputno+=1;
+        stroutput.Format(_T("%d"),outputno);
+        GetDlgItem(IDC_COMBO_output)->SetWindowText(stroutput);
+    }
+}
+}
+#endif
 
 BOOL CLightingController::GetSerialComm( vector<CString>& szComm )
 {
@@ -3338,7 +2450,7 @@ BOOL CLightingController::GetSerialComm( vector<CString>& szComm )
 LRESULT CLightingController::OnWriteMessage( WPARAM wParam,LPARAM lParam)
 {
 	int ret =0;
-	ret = write_one(254,wParam,(short)lParam);
+	ret = write_one(g_tstat_id,wParam,(short)lParam);
 	if(ret>0)
 		AfxMessageBox(_T("Setting successful"));
 	else
@@ -3585,7 +2697,8 @@ void CLightingController::OnBnClickedButtonResetToFactory()
 {
 	if(g_NetWorkLevel==1)
 		return;
-	write_one(g_tstat_id,130,0);
+	//write_one(g_tstat_id,130,0);
+    write_one(g_tstat_id,15,85);
 	Sleep(5000);//Sleep because network controller is busy now 
 
 }
@@ -3613,12 +2726,566 @@ void CLightingController::OnBnClickedCheckEnableEdit()
 
 void CLightingController::OnBnClickedButtonConfigure()
 {
+	Cconfigure dlg;
+	dlg.DoModal();
+}
+
+ 
+
+//改变颜色
+
+HBRUSH CLightingController::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CFormView::OnCtlColor(pDC, pWnd, nCtlColor);
+
+
+	switch(pWnd->GetDlgCtrlID())
+	{
+	case IDC_STATUS1:
+	{
+		if (m_light[0])
+		{
+			pDC->SetTextColor(RGB(0,255,255));
+			pDC->SetBkColor(RGB(0,255,255));
+			pDC->SetBkMode(TRANSPARENT);
+
+
+			HBRUSH B = CreateSolidBrush(RGB(0,255,255));
+			return (HBRUSH)B;
+		} 
+		else
+		{
+			pDC->SetTextColor(RGB(130,130,130));
+			pDC->SetBkColor(RGB(130,130,130));
+			pDC->SetBkMode(TRANSPARENT);
+
+
+			HBRUSH B =  CreateSolidBrush(RGB(130,130,130));
+			return (HBRUSH)B;
+		}
+
+		
+	}
+	case IDC_STATUS2:
+		{
+			if (m_light[1])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));
+					return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));
+					return (HBRUSH)B;
+			}
+
+		
+		}
+	case IDC_STATUS3:
+		{
+			if (m_light[2])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));
+				return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));
+				return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS4:
+		{
+			if (m_light[3])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS5:
+		{
+			if (m_light[4])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS6:
+		{
+			if (m_light[5])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS7:
+		{
+			if (m_light[6])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS8:
+		{
+			if (m_light[7])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS9:
+		{
+			if (m_light[8])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS10:
+		{
+			if (m_light[9])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS11:
+		{
+			if (m_light[10])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS12:
+		{
+			if (m_light[11])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS13:
+		{
+			if (m_light[12])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS14:
+		{
+			if (m_light[13])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS15:
+		{
+			if (m_light[14])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS16:
+		{
+			if (m_light[15])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS17:
+		{
+			if (m_light[16])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS18:
+		{
+			if (m_light[17])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS19:
+		{
+			if (m_light[18])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+	case IDC_STATUS20:
+		{
+			if (m_light[19])
+			{
+				pDC->SetTextColor(RGB(0,255,255));
+				pDC->SetBkColor(RGB(0,255,255));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(0,255,255));
+				 
+				return (HBRUSH)B;
+			} 
+			else
+			{
+				pDC->SetTextColor(RGB(130,130,130));
+				pDC->SetBkColor(RGB(130,130,130));
+				pDC->SetBkMode(TRANSPARENT);
+
+
+				HBRUSH B = CreateSolidBrush(RGB(130,130,130));return (HBRUSH)B;
+			}
+
+			
+		}
+
+ 
+	default:
+		return CFormView::OnCtlColor(pDC,pWnd, nCtlColor);
+	}
 
 }
 
-void CLightingController::OnBnClickedButtonConfigureswitch()
+//选择A/M
+void CLightingController::OnCbnSelchangeValuecombo()
 {
-	// TODO: Add your control notification handler code here	
-	Cconfigure dlg;
-	dlg.DoModal();
+	int nItem=0;
+	nItem=m_combox_controler.GetCurSel();
+    if (m_nCurCol==2)
+    {
+	  write_one(g_tstat_id,INPUT_AM+(m_nCurRow-1),nItem);
+    }
+	if (m_nCurCol==1)
+	{
+	  write_one(g_tstat_id,INPUT_MB+(m_nCurRow-1),nItem);
+	}
+	Fresh_Inputs();
+
+	 
+}
+
+void CLightingController::OnDestroy(){
+	if (LC_Thread)
+	{
+		PostThreadMessage(LC_Thread->m_nThreadID,  WM_QUIT,0,0);
+		if (WaitForSingleObject(LC_Thread->m_hThread, 1000) != WAIT_OBJECT_0)
+
+			if (WaitForSingleObject(LC_Thread->m_hThread, 100) == WAIT_OBJECT_0)
+			{
+			}
+			else
+			{
+				TerminateThread(LC_Thread->m_hThread, 0);
+			}
+	}
+CFormView::OnDestroy();
+}
+
+void CLightingController::OnBnClickedButtonConfigureOutputName(){
+CLCOutNameConfig dlg(m_sn);
+dlg.DoModal();
+}
+
+CString CLightingController::get_OutputName(int card,int output){
+	CString sql ,outputname;
+// CADO ado;
+// 	ado.OnInitADOConn();
+//  
+// 	sql.Format(_T("Select * from LCNameConfigure where SN=%d and  Card=%d and Output=%d"),m_sn,card,output);
+// 	ado.m_pRecordset=ado.OpenRecordset(sql);
+// 	 
+//  
+// 	if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+// 	{
+// 	  outputname=ado.m_pRecordset->GetCollect(_T("OutputName"));
+// 	}
+// 	else
+// 	{
+	 
+		unsigned short temp_buffer_out[INPUT_DESCRIPTION_LENGTH]={0};
+		unsigned char temp_charbuffer_out[INPUT_DESCRIPTION_LENGTH];
+		 
+		 
+			Read_Multi(g_tstat_id,temp_buffer_out,OUTPUT_DESCRIPTION+((card-1)*24+(output-1))*INPUT_DESCRIPTION_LENGTH,INPUT_DESCRIPTION_LENGTH);
+			if(temp_buffer_out[0]==255)
+			{
+				for(int itt=0;itt<INPUT_DESCRIPTION_LENGTH;itt++)
+					temp_buffer_out[itt]=0;
+			}
+			for(int itt=0;itt<INPUT_DESCRIPTION_LENGTH;itt++)
+			{temp_charbuffer_out[itt] =(unsigned char) temp_buffer_out[itt];}
+			outputname=(CString)temp_charbuffer_out;
+/*	}*/
+	return outputname;
 }

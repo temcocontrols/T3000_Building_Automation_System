@@ -4,6 +4,8 @@
 CFSBContainer::CFSBContainer(void)
 {
 	m_pFSWnd = new CFlexSlideWnd;
+
+    
 }
 
 
@@ -129,10 +131,7 @@ BOOL CFSBContainer::CreateFlexSlideBar(
 						)
 {
 	return m_pFSWnd->CreateFlexSlideBar(bHorizontal,	style,	nChannelWidth, nThumbWidth, tbShape );
-}
-
-
-//Sets the minimum and maximum positions for a slider. 
+} 
 void CFSBContainer::SetRange(int nMax, int nMin)
 {
 	m_pFSWnd->SetRange(nMax, nMin);
@@ -144,12 +143,7 @@ void CFSBContainer::GetRange(int& nMin, int& nMax)const
 	m_pFSWnd->GetRange(nMin, nMax);
 }
 
-// Sets the current position of the slider. 
-// nMinPos 是最小的值，MidPos是中等值，Max是最大的值
-BOOL CFSBContainer::SetPos(int nMinPos, int nMidPos, int nMaxPos)
-{
-	return m_pFSWnd->SetPos(nMinPos, nMidPos, nMaxPos);
-}
+
 
 
 // Retrieves the current position of the slider. 
@@ -206,10 +200,15 @@ void CFSBContainer::ShowWindow(int nFlag)
 
 BOOL CFSBContainer::SetPos_tstat6_2pos( int nMinPos, int nMidPos, int nMaxPos )
 {
-
+  
 	return m_pFSWnd->SetPos_tstat6_2pos(nMinPos, nMidPos, nMaxPos);
 }
-
+// Sets the current position of the slider. 
+// nMinPos 是最小的值，MidPos是中等值，Max是最大的值
+BOOL CFSBContainer::SetPos(int nMinPos, int nMidPos, int nMaxPos)
+{
+    return m_pFSWnd->SetPos(nMinPos, nMidPos, nMaxPos);
+}
 BOOL CFSBContainer::SetPos_tstat6_3pos( int nMinPos, int nMidPos, int nMaxPos )
 {
 	return m_pFSWnd->SetPos_tstat6_3pos(nMinPos, nMidPos, nMaxPos);

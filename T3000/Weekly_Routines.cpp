@@ -73,7 +73,7 @@ description Weekly_Routines::read_addr(unsigned char addr2)
 	unsigned short temp_buffer[WR_DESCRIPTION_SIZE];
 	memset(&temp_buffer,0,sizeof(temp_buffer));
 	if (m_strproducttype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		 Read_Multi(254,temp_buffer,4608+addr2*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
+		Read_Multi(g_tstat_id,temp_buffer,4276+addr2*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
 	else
 		Read_Multi(g_tstat_id,temp_buffer,MODBUS_WR_DESCRIP_FIRST+addr2*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
 
@@ -81,7 +81,7 @@ description Weekly_Routines::read_addr(unsigned char addr2)
 	char *p;
 	p=(char *)&temp_description;///////////////*****pointer   attention
 	for(i=0;i<WR_DESCRIPTION_SIZE;i++)
-		(*(p++))=temp_buffer[i];
+		(*(p++))=(char)temp_buffer[i];
 	return temp_description;
 }
 void Weekly_Routines::put_row_col(description temp,unsigned char t_addr)
@@ -167,7 +167,7 @@ void Weekly_Routines::clear_addr(unsigned char addr2)
 		*(p++)=0xFF;
 	p=(unsigned char *) &temp_descri;
 	if(m_strproducttype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		Write_Multi(254,p,4608+(addr2-1)*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
+		Write_Multi(g_tstat_id,p,4276+(addr2-1)*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
 	else
 		Write_Multi(g_tstat_id,p,MODBUS_WR_DESCRIP_FIRST+(addr2-1)*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
 }
@@ -223,7 +223,7 @@ void Weekly_Routines::write_addr(unsigned char addr2)
 	unsigned char *p;
 	p=(unsigned char *) &temp_descri;
 	if(m_strproducttype.CompareNoCase(_T("Lightingcontroller")) == 0)
-		Write_Multi(254,p,4608+(addr2-1)*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
+		Write_Multi(g_tstat_id,p,4276+(addr2-1)*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
 	else
 		Write_Multi(g_tstat_id,p,MODBUS_WR_DESCRIP_FIRST+(addr2-1)*WR_DESCRIPTION_SIZE,WR_DESCRIPTION_SIZE);
 	NET_WORK_SLEEP_BETWEEN_WRITE_READ
@@ -260,19 +260,13 @@ void Weekly_Routines::load_grid()
 		m_FlexGrid.put_CellBackColor(FLEXGRID_CELL_GRAY_COLOR);
 	}
 	m_FlexGrid.put_ColWidth(0,400);
-	//if(read_one(g_tstat_id,7)!=PM_NC)
-	//	return ;
-// 	if(read_one(g_tstat_id,7)!=PM_NC)
-// 		return ;
+
 	description temp_description;
 	for(unsigned char i=1;i<=GRID_ROW_NUMBER;i++)
 	{//////////////////////////////////////////////////get information from network
-// 		CString strInfo;
-// 		strInfo.Format(_T("load_grid():read_addr(i-1):%d"),i);			
-// 		SetPaneString(2, strInfo);
+
 		temp_description=read_addr(i-1);
-// 		strInfo.Format(_T("load_grid():put_row_col:%d"),i);			
-// 		SetPaneString(2, strInfo);
+
 		put_row_col(temp_description,i);
 	}
 }

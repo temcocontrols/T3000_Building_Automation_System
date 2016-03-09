@@ -9,6 +9,9 @@
 #include "../global_variable_extern.h"
 
 #include "../MainFrm.h"
+#include "afxcmn.h"
+#include "../msflexgrid1.h"
+
 
 
 
@@ -16,7 +19,7 @@
 #define FLEXGRID_CELL_GRAY_COLOR				13421772	
 
 #define  DATATIME_TIMER 1
-
+#define THE_INPUT_OUTPUT_LENGTH 14
 typedef struct Subnetwork						
 {						
 	CString	m_coolingSet;				
@@ -28,8 +31,14 @@ typedef struct Subnetwork
 	CString	m_nightHeating;				
 	CString	m_nightCooling;				
 	int	m_tstatProduct;				
-	CString m_modbusaddr;					
+	CString m_modbusaddr;
+	int  m_Occupied;
+	CString  m_overridevalue;
+	CString m_SerialNumber; 
+	CString	m_nightHeatingDB;				
+	CString	m_nightCoolingDB;						
 }subnetwork;
+
 
 
 
@@ -40,6 +49,7 @@ class CDialogCM5 : public CFormView
 	DECLARE_DYNCREATE(CDialogCM5)
 
 protected:
+int m_type;
 public:
 	CDialogCM5();           // protected constructor used by dynamic creation
 	virtual ~CDialogCM5();
@@ -82,25 +92,47 @@ public:
 	CString m_static_datetime;
 	CString m_combo2_cstring;
 
+	CString m_tempGridString;
+	HANDLE CM5_OutputThread;
+	BOOL b_is_fresh;
 public://events
 	afx_msg void OnBnClickedButtonSyncwithpc();
+	afx_msg void OnBnClickedButtonSaveConfig();
 	afx_msg void OnBnClickedButtonweeklyschedule();
+	afx_msg void OnBnClickedButtonRefreshAll();
 	afx_msg void OnBnClickedButtonannualschedule();
 	afx_msg void OnBnClickedButtonidschedule();
+	afx_msg void OnBnClickedButtonCheckDemo();
 	afx_msg void OnBnClickedButtoninputtype();
 	afx_msg void OnEnKillfocusEditInput();
 	afx_msg void OnEnKillfocusEditoutput();
+	afx_msg void OnClose();
+	afx_msg void OnEnKillfocusEditNum();
+	afx_msg void OnEnKillfocusEditInterval();
+	afx_msg void OnEnKillfocusEditDTS1();
+	afx_msg void OnEnKillfocusEditDTS2();
+	afx_msg void OnEnKillfocusEditDTS3();
+	afx_msg void OnEnKillfocusEditDTS4();
+	afx_msg void OnEnKillfocusEditDTS5();
+	afx_msg void OnEnKillfocusEditDTS6();
+	afx_msg void OnEnKillfocusEditDTS7();
+	afx_msg void OnEnKillfocusEditDTS8();
+	afx_msg void OnEnKillfocusEditDTS9();
+	afx_msg void OnEnKillfocusEditDTS10();
+	afx_msg LRESULT DealWithMessage(WPARAM wParam,LPARAM lParam);
 public://messages override
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	virtual void OnInitialUpdate();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-
+	CString GetTextReg(unsigned short reg,BOOL IsRead);
+	 BOOL  Get_Data_Bit(UINT Data, int n,int N);//获取一个第八位数据，s:system:进制，n;num:这个数是几位的，第N位是1还是0
 
 public:
 	void Fresh();
 	void ShowDialogData();
-	BOOL& GetData();
-
+	
+	int Get_RegID(int lRow);
+	void Show_DisplayEdit(int num);
 public:
 
 	vector<subnetwork>_subnetwork;
@@ -116,14 +148,44 @@ private:
 	DECLARE_EVENTSINK_MAP()
 	void ClickInputMsflexgrid();
 	void DblClickInputMsflexgrid();
+
 	void ClickOutputMsflexgrid();
 	void DblClickOutputMsflexgrid();
-	void AddDatabase(CString m_database,CString m_no,CString m_name);
-	CString ReadDatabase(CString m_database,CString m_no);
-	void UpdateDatabase(CString m_database,CString m_num,CString m_name);
-
-	void JudgeTableExist(CString strtable,CString strsql);
-	
+	void DBClickInputMsflexgrid2();
+	void ClickSubTstatgrid();
+	void ClickInputMsflexgrid2();
+	void DblClickInputMsflexgrid2()	;
+	void OnCbnSelchangeCombx();
+	void OnCbnSelchangeType();
+	void UpdateGrid();
+public:
+	CString m_bootloaderversion;
+	CComboBox m_Baudrate;
+	CComboBox m_ipModelComBox;
+	CIPAddressCtrl m_ip_addressCtrl;
+	CIPAddressCtrl m_subnet_addressCtrl;
+	CIPAddressCtrl m_gateway_addressCtrl;
+	CString m_nListenPort;
+	CEdit m_Mac_Address;
+private:
+	CButton m_checkdemo;
+public:
+	CComboBox m_combox_enable;
+	int m_Display_Num;
+	int m_Interval;
+	int m_dts1;
+	int m_dts2;
+	int m_dts3;
+	int m_dts4;
+	int m_dts5;
+	int m_dts6;
+	int m_dts7;
+	int m_dts8;
+	int m_dts9;
+	int m_dts10;
+	CProgressCtrl m_progressctrl;
+	CMsflexgrid m_subtstatgrid;
+	CMsflexgrid m_DIGrid;
 };
 
 

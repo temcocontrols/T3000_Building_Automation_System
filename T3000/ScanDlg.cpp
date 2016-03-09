@@ -6,15 +6,12 @@
 #include "ScanDlg.h"
 #include "GridButton.h"
 #include "TStatScanner.h"
-// #include "TStatBase.h"
-// #include "TStat_Net.h"
-// #include "TStat_Dev.h"
-
-//#define WM_SCANFINISH WM_USER + 1100
-// CScanDlg dialog
-
-
-
+#include "MainFrm.h"
+#include "bado/BADO.h"
+#define STATUS_FAILED 0xFFFF 
+#define DEF_PACKET_SIZE    32
+#define DEF_PACKET_NUMBER  4    /* 发送数据报的个数 */
+#define MAX_PACKET 1024 
 
 // scan dialog 中表格的列的定义
 #define SCAN_TABLE_TYPE					0
@@ -30,7 +27,7 @@
 // #define SCAN_TABLE_FIXCONFLICT		9
 ///#define SCAN_TABLE_BAUDRATE			6
 #define SCAN_TABLE_PROTOCOL			8
-
+#define NEW_IPADRESS 9
 
 
 IMPLEMENT_DYNAMIC(CScanDlg, CDialog)
@@ -42,6 +39,7 @@ CScanDlg::CScanDlg(CWnd* pParent /*=NULL*/)
 	m_pScanner = NULL;
 	m_szGridEditPos.cx = -1;
 	m_szGridEditPos.cy = -1;
+	m_IsScan=TRUE;
 }
 
 CScanDlg::~CScanDlg()
@@ -68,6 +66,8 @@ BEGIN_MESSAGE_MAP(CScanDlg, CDialog)
 	ON_MESSAGE(WM_ADDNETSCAN, 	OnAddNetScanRet)
 
 	ON_WM_CLOSE()
+	ON_EN_KILLFOCUS(IDC_EDIT_GRIDEDIT, &CScanDlg::OnEnKillfocusEditGridedit)
+
 END_MESSAGE_MAP()
 
 
@@ -81,22 +81,956 @@ void CScanDlg::OnBnClickedButtonExit()
 	Release();
 	CDialog::OnOK();
 }
+//CString &StrIP,CString &StrMask,CString &StrGetway
+void CScanDlg::GetIPMaskGetWay(CString &StrIP,CString &StrMask,CString &StrGetway){
+	PIP_ADAPTER_INFO pAdapterInfo; 
+	PIP_ADAPTER_INFO pAdapter = NULL; 
+	DWORD dwRetVal = 0; 
+	ULONG ulOutBufLen; 
+	pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO)); 
+	ulOutBufLen = sizeof(IP_ADAPTER_INFO); 
+	 ;
+	// 第一次调用GetAdapterInfo获取ulOutBufLen大小 
+	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
+	{ 
+		free(pAdapterInfo); 
+		pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen); 
+	} 
 
+	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) == NO_ERROR) { 
+		pAdapter = pAdapterInfo; 
+		while (pAdapter) 
+		{ 
+			 if(pAdapter->Type == MIB_IF_TYPE_ETHERNET){
+			 				MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
+			 					StrIP.GetBuffer(MAX_PATH), MAX_PATH );
+			 					StrIP.ReleaseBuffer();
+			 				//StrIP.Format(_T("%s"),pAdapter->IpAddressList.IpAddress.String); 
+			 				MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1, 
+			 					StrMask.GetBuffer(MAX_PATH), MAX_PATH );
+			 					StrMask.ReleaseBuffer();
+			 
+			 				//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
+			 
+			 				MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
+			 					StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
+			 					StrGetway.ReleaseBuffer();
+			 				if (StrMask.CompareNoCase(_T("0.0.0.0"))!=0)
+			 				{
+			 					break;
+			 				}
+						}
+		else if (pAdapter->Type == IF_TYPE_IEEE80211){
+							MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
+							StrIP.GetBuffer(MAX_PATH), MAX_PATH );
+							StrIP.ReleaseBuffer();
+			//StrIP.Format(_T("%s"),pAdapter->IpAddressList.IpAddress.String); 
+							MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1, 
+							StrMask.GetBuffer(MAX_PATH), MAX_PATH );
+							StrMask.ReleaseBuffer();
+
+			//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
+
+							MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
+							StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
+							StrGetway.ReleaseBuffer();
+			 				if (StrMask.CompareNoCase(_T("0.0.0.0"))!=0)
+			 				{
+			 					break;
+			 				}
+					}
+
+			/*StrGetway.Format(_T("%s"), pAdapter->GatewayList.IpAddress.String); */
+						pAdapter = pAdapter->Next; 
+		} 
+	} 
+	else 
+	{ 
+
+	} 
+}
+
+
+void CScanDlg::GetIPMaskGetWay(vector<ALL_LOCAL_SUBNET_NODE>& Vector_Subnet){
+	PIP_ADAPTER_INFO pAdapterInfo; 
+	PIP_ADAPTER_INFO pAdapter = NULL; 
+	DWORD dwRetVal = 0; 
+	ULONG ulOutBufLen; 
+	pAdapterInfo=(PIP_ADAPTER_INFO)malloc(sizeof(IP_ADAPTER_INFO)); 
+	ulOutBufLen = sizeof(IP_ADAPTER_INFO); 
+	ALL_LOCAL_SUBNET_NODE  Temp_Node;
+	// 第一次调用GetAdapterInfo获取ulOutBufLen大小 
+	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
+	{ 
+		free(pAdapterInfo); 
+		pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen); 
+	} 
+
+	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) == NO_ERROR) { 
+		pAdapter = pAdapterInfo; 
+		while (pAdapter) 
+		{ 
+// 			if(pAdapter->Type == MIB_IF_TYPE_ETHERNET)
+// 			{
+// 				MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
+// 					StrIP.GetBuffer(MAX_PATH), MAX_PATH );
+// 				StrIP.ReleaseBuffer();
+// 				//StrIP.Format(_T("%s"),pAdapter->IpAddressList.IpAddress.String); 
+// 				MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1, 
+// 					StrMask.GetBuffer(MAX_PATH), MAX_PATH );
+// 				StrMask.ReleaseBuffer();
+// 
+// 				//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
+// 
+// 				MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
+// 					StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
+// 				StrGetway.ReleaseBuffer();
+// 				if (StrMask.CompareNoCase(_T("0.0.0.0"))!=0)
+// 				{
+// 					break;
+// 				}
+// 
+// 			}
+// 			else if (pAdapter->Type == IF_TYPE_IEEE80211)
+// 			{
+				MultiByteToWideChar( CP_ACP, 0, pAdapter->IpAddressList.IpAddress.String, (int)strlen((char *)pAdapter->IpAddressList.IpAddress.String)+1, 
+					Temp_Node.StrIP.GetBuffer(MAX_PATH), MAX_PATH );
+				    Temp_Node.StrIP.ReleaseBuffer();
+				//StrIP.Format(_T("%s"),pAdapter->IpAddressList.IpAddress.String); 
+				MultiByteToWideChar( CP_ACP, 0,pAdapter->IpAddressList.IpMask.String, (int)strlen((char *)pAdapter->IpAddressList.IpMask.String)+1, 
+					Temp_Node.StrMask.GetBuffer(MAX_PATH), MAX_PATH );
+				    Temp_Node.StrMask.ReleaseBuffer();
+
+				//StrMask.Format(_T("%s"), pAdapter->IpAddressList.IpMask.String); 
+
+				MultiByteToWideChar( CP_ACP, 0,pAdapter->GatewayList.IpAddress.String, (int)strlen((char *)pAdapter->GatewayList.IpAddress.String)+1, 
+					Temp_Node.StrGetway.GetBuffer(MAX_PATH), MAX_PATH );
+				    Temp_Node.StrGetway.ReleaseBuffer();
+
+				    Temp_Node.NetworkCardType=pAdapter->Type;
+ 
+	           Vector_Subnet.push_back(Temp_Node);
+			/*StrGetway.Format(_T("%s"), pAdapter->GatewayList.IpAddress.String); */
+			pAdapter = pAdapter->Next; 
+		} 
+	} 
+	else 
+	{ 
+
+	} 
+}
 BOOL CScanDlg::OnInitDialog()
 {	
 	CDialog::OnInitDialog();	
-
-	ASSERT(m_pScanner);	
+	//CString m_strlocalipaddress;
+	//CString m_strlocalsubnet;
+	//CString m_strlocalgateway;
+	GetIPMaskGetWay(m_strlocalipaddress,m_strlocalsubnet,m_strlocalgateway);
+	
 	InitScanGrid();	
 //	Sleep(3000);
-	AddComDeviceToGrid(m_pScanner->m_szTstatScandRet);
-	AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
+	if (m_IsScan)
+	{
+		AddComDeviceToGrid(m_pScanner->m_szTstatScandRet);
+		AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
+	}
+	else
+	{
+		CString anewip;
+		if (GetNewIP(anewip))
+		{
+			FLEX_GRID_PUT_COLOR_STR(1,NEW_IPADRESS,anewip); 
+		}
+	     
+		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_ADDRESS,m_net_product_node.BuildingInfo.strIp); 
+
+		CString strType =GetProductName(m_net_product_node.product_class_id);		
+		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_TYPE,strType); 
+		CString strSerailID;
+		unsigned int nSID =m_net_product_node.serial_number;
+		strSerailID.Format(_T("%u"), nSID);
+		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_SERIALID,strSerailID);
+		
+		 		 
+		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_COMPORT,m_net_product_node.BuildingInfo.strIpPort); 
+
+// 		CString strBuilding =m_net_product_node.BuildingInfo.strBuildingName;		
+// 		FLEX_GRID_PUT_COLOR_STR(1,SCAN_TABLE_BUILDING,strBuilding); 
+
+		/*CString strFloor = m_net_product_node.BuildingInfo.;
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_FLOOR,strFloor); 
+
+		CString strRoom = pNetInfo->m_pNet->GetRoomName();
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_ROOM,strRoom); 
+
+		CString strSubnet = pNetInfo->m_pNet->GetSubnetName();
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_SUBNET,strSubnet); 
+
+		CString strSerailID;
+		int nSID = pNetInfo->m_pNet->GetSerialID();
+		strSerailID.Format(_T("%d"), nSID);
+		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_SERIALID,strSerailID); */
+		/////
+
+		/////
+// 		CString strPort;
+// 		int nPort = pNetInfo->m_pNet->GetIPPort();
+// 		strPort.Format(_T("%d"), nPort);
+// 		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_COMPORT,strPort); 
+// 		////
+// 		CString strProtocol;		
+// 		if(pNetInfo->m_pNet->GetProtocol() == 3)
+// 		{
+// 			strProtocol.Format(_T("BacnetIP"));
+// 		}
+// 		else
+// 			strProtocol.Format(_T("TCP/IP"));
+// 		FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_PROTOCOL,strProtocol); 
+		 
+
+	}
 
 
 
 	return TRUE;
 }
-					
+
+BOOL CScanDlg::GetNewIP(CString &newIP){
+	USES_CONVERSION;
+	IN_ADDR sa;
+	//----------------------
+	for (int i=0;i<allsubnets.size();i++)
+	{
+// 		szIP=W2A(allsubnets[i].StrIP);
+// 		dwIP=inet_addr(szIP);
+// 		sa.S_un.S_addr=dwIP;
+// 
+// 		if ( ia.S_un.S_un_b.s_b1 == sa.S_un.S_un_b.s_b1 &&
+// 			ia.S_un.S_un_b.s_b2 == sa.S_un.S_un_b.s_b2 &&
+// 			ia.S_un.S_un_b.s_b3 == sa.S_un.S_un_b.s_b3 
+// 			)
+// 		{
+// 			ret=TRUE;
+// 			break;
+// 		}
+//         if((allsubnets[i].NetworkCardType!=)&&(allsubnets[i].StrIP.Find(_T("0.0."))==-1))
+//         {
+//         }
+        
+	}
+
+
+	 LPCSTR szIP=W2A(m_strlocalipaddress);
+	 DWORD dwIP=inet_addr(szIP);
+	
+	sa.S_un.S_addr=dwIP;
+
+
+	for (int i=2;i<255;i++)
+	{
+		CString anewip;
+		anewip.Format(_T("%d.%d.%d.%d"), sa.S_un.S_un_b.s_b1,sa.S_un.S_un_b.s_b2,sa.S_un.S_un_b.s_b3,i);
+
+		if (!TestPing(anewip))
+		{
+			newIP=anewip;
+			return TRUE;
+		}
+		
+
+	}
+	return FALSE;
+}
+
+BOOL CScanDlg::GetNewIP(CString &newIP,CString BaseIP){
+	USES_CONVERSION;
+	IN_ADDR sa;
+ 
+
+
+	LPCSTR szIP=W2A(BaseIP);
+	DWORD dwIP=inet_addr(szIP);
+
+	sa.S_un.S_addr=dwIP;
+
+
+	for (int i=2;i<255;i++)
+	{
+		CString anewip;
+		anewip.Format(_T("%d.%d.%d.%d"), sa.S_un.S_un_b.s_b1,sa.S_un.S_un_b.s_b2,sa.S_un.S_un_b.s_b3,i);
+
+		if (!TestPing(anewip))
+		{
+			newIP=anewip;
+			return TRUE;
+		}
+
+
+	}
+	return FALSE;
+}
+
+#include "ping.h"
+BOOL CScanDlg::TestPing(const CString& strIP)
+{	
+ #ifdef CPING_USE_ICMP
+CPing p1;
+CPingReply pr1;
+if (p1.Ping1((LPCTSTR)strIP, pr1))
+{
+// 	hostent* phostent = gethostbyaddr((char *)&pr1.Address.S_un.S_addr, 4, PF_INET);
+// 	printf("%d.%d.%d.%d [%s], replied in RTT:%dms\n", 
+// 		pr1.Address.S_un.S_un_b.s_b1, pr1.Address.S_un.S_un_b.s_b2, pr1.Address.S_un.S_un_b.s_b3, 
+// 		pr1.Address.S_un.S_un_b.s_b4, phostent->h_name, pr1.RTT);
+return TRUE;
+}
+else
+{
+ return FALSE;
+}
+#endif	
+
+
+// #ifdef CPING_USE_WINSOCK2
+// {
+// 	CPing p2;
+// 	CPingReply pr2;
+// 	if (p2.Ping2((LPCTSTR)strIP, pr2))
+// 	{
+// // 		hostent* phostent = gethostbyaddr((char *)&pr2.Address.S_un.S_addr, 4, PF_INET);
+// 		printf("%d.%d.%d.%d [%s], replied in RTT:%dms\n", 
+// 			pr2.Address.S_un.S_un_b.s_b1, pr2.Address.S_un.S_un_b.s_b2, pr2.Address.S_un.S_un_b.s_b3, 
+// 			pr2.Address.S_un.S_un_b.s_b4, phostent->h_name, pr2.RTT);
+// return TRUE;
+// 	}
+// 	else
+// 		 return FALSE;
+// }
+// #end
+
+// 	USES_CONVERSION;   
+// 	LPSTR szIP=W2A(strIP); 
+// 	WSADATA wsaData; 
+// 	SOCKET sockRaw; 
+// 	struct sockaddr_in dest,from; 
+// 	struct hostent * hp; 
+// 	int bread,datasize,times; 
+// 	int fromlen = sizeof(from); 
+// 	int timeout = 300;
+// 	int statistic = 0;  /* 用于统计结果 */  
+// 	char *dest_ip; 
+// 	char *icmp_data; 
+// 	char *recvbuf; 
+// 	unsigned int addr=0; 
+// 	USHORT seq_no = 0; 
+// 	if (WSAStartup(MAKEWORD(2,1),&wsaData) != 0)
+// 	{  
+// 		return FALSE;
+// 	} 
+//  
+// 
+// 	sockRaw = WSASocket(AF_INET,SOCK_RAW,IPPROTO_ICMP,NULL, 0,WSA_FLAG_OVERLAPPED);
+// 	//
+// 	//注：为了使用发送接收超时设置(即设置SO_RCVTIMEO, SO_SNDTIMEO)，
+// 	//    必须将标志位设为WSA_FLAG_OVERLAPPED !
+// 	// 
+// 	if (sockRaw == INVALID_SOCKET) 
+// 	{  
+// 		return FALSE;
+// 	} 
+// 	BOOL bDontLinger = FALSE;
+// 	setsockopt(sockRaw,SOL_SOCKET,SO_DONTLINGER,(const char* )&bDontLinger, sizeof( BOOL ) );
+// 	bread = setsockopt(sockRaw,SOL_SOCKET,SO_RCVTIMEO,(char*)&timeout, sizeof(timeout)); 
+// 	
+// 	if(bread == SOCKET_ERROR) 
+// 	{ 
+// 		//ExitProcess(STATUS_FAILED); 
+// 		return FALSE;
+// 	} 
+// 	
+// 
+// 	 bDontLinger = FALSE;
+// 	        setsockopt(sockRaw,SOL_SOCKET,SO_DONTLINGER,(const char* )&bDontLinger, sizeof( BOOL ) );
+// 
+// 	bread = setsockopt(sockRaw,SOL_SOCKET,SO_SNDTIMEO,(char*)&timeout, sizeof(timeout)); 
+// 	if(bread == SOCKET_ERROR) 
+// 	{ 
+// 		return FALSE;
+// 	} 
+// memset(&dest,0,sizeof(dest)); 
+// 	hp = gethostbyname(szIP); 
+// 	if (!hp)
+// 	{ 
+// 		addr = inet_addr(szIP); 
+// 	} 
+// 	if ((!hp) && (addr == INADDR_NONE) ) 
+// 	{ 
+// 		return FALSE;
+// 	} 
+// 
+// 	if (hp != NULL) 
+// 		memcpy(&(dest.sin_addr),hp->h_addr,hp->h_length); 
+// 	else 
+// 		dest.sin_addr.s_addr = addr; 
+// 	if (hp) 
+// 		dest.sin_family = hp->h_addrtype; 
+// 	else 
+// 		dest.sin_family = AF_INET; 
+// 	dest_ip = inet_ntoa(dest.sin_addr); 
+// 		times=DEF_PACKET_NUMBER;
+// 		datasize = DEF_PACKET_SIZE; 
+// 
+// 	datasize += sizeof(IcmpHeader); 
+// 	icmp_data = (char*)xmalloc(MAX_PACKET); 
+// 	recvbuf = (char*)xmalloc(MAX_PACKET); 
+// 	if (!icmp_data) 
+// 	{ 
+// 		return FALSE;
+// 	} 
+// 
+// 	memset(icmp_data,0,MAX_PACKET); 
+//  
+// 	FillIcmpData(icmp_data,datasize);
+// 	
+// 	
+// 	
+// 		int bwrote; 
+// 		((IcmpHeader*)icmp_data)->i_cksum = 0; 
+// 		((IcmpHeader*)icmp_data)->timestamp = GetTickCount(); 
+// 		((IcmpHeader*)icmp_data)->i_seq = seq_no++; 
+// 		((IcmpHeader*)icmp_data)->i_cksum = Checksum((USHORT*)icmp_data,datasize);
+// 		bwrote = sendto(sockRaw,icmp_data,datasize,0,(struct sockaddr*)&dest,sizeof(dest)); 
+// 		if (bwrote == SOCKET_ERROR)
+// 		{ 
+// 			if (WSAGetLastError() == WSAETIMEDOUT) 
+// 			{ 
+// 				//printf("Request timed out.\n"); 
+// 				CString str;
+// 				str.Format(_T("Request timed out.\n"));
+// 				//SendEchoMessage(str);
+// 				 
+// 			} 
+// 			//fprintf(stderr,"sendto failed: %d\n",WSAGetLastError()); 
+// 			//ExitProcess(STATUS_FAILED); 
+// 			CString str;
+// 			str.Format(_T("sendto failed: %d\n"),WSAGetLastError());
+// 			//SendEchoMessage(str);
+// 			return FALSE;
+// 		} 
+// 
+// 		if (bwrote < datasize ) 
+// 		{ 
+// 			//fprintf(stdout,"Wrote %d bytes\n",bwrote);
+// 			CString str;
+// 			str.Format(_T("Wrote %d bytes\n"),bwrote);
+// 			//SendEchoMessage(str);
+// 		} 
+// 
+// 		bread = recvfrom(sockRaw,recvbuf,MAX_PACKET,0,(struct sockaddr*)&from,&fromlen); 
+// 		if (bread == SOCKET_ERROR)
+// 		{ 
+// 			if (WSAGetLastError() == WSAETIMEDOUT) 
+// 			{ 
+// 				//printf("Request timed out.\n"); 
+// 				CString str;
+// 				str.Format(_T("Request timed out.\n"));
+// 				//SendEchoMessage(str);
+// 				 
+// 			} 
+// 
+// 			//fprintf(stderr,"recvfrom failed: %d\n",WSAGetLastError()); 
+// 			//ExitProcess(STATUS_FAILED); 
+// 			CString str;
+// 			str.Format(_T("recvfrom failed: %d\n"),WSAGetLastError());
+// 			//SendEchoMessage(str);
+// 			return FALSE;
+// 		} 
+// 
+// 		if(!DecodeResp(recvbuf,bread,&from))
+// 		{
+// 			xfree(icmp_data);
+// 			xfree(recvbuf);
+// 			WSACleanup();
+// 			return TRUE;
+// 		}
+// 		
+// 	
+// 		xfree(icmp_data);
+// 		xfree(recvbuf);
+// 		WSACleanup();
+// 	return 0; 
+}
+
+int CScanDlg::DecodeResp(char *buf, int bytes,struct sockaddr_in *from)
+{ 
+	IpHeader *iphdr; 
+	IcmpHeader *icmphdr; 
+	unsigned short iphdrlen; 
+	iphdr = (IpHeader *)buf; 
+	iphdrlen = (iphdr->h_len) * 4 ; // number of 32-bit words *4 = bytes 
+	if (bytes < iphdrlen + ICMP_MIN) 
+	{ 
+		//printf("Too few bytes from %s\n",inet_ntoa(from->sin_addr)); 
+		CString str;
+		str.Format(_T("Too few bytes from %s\n"),inet_ntoa(from->sin_addr));
+		 
+	} 
+	icmphdr = (IcmpHeader*)(buf + iphdrlen); 
+	if (icmphdr->i_type != ICMP_ECHOREPLY) 
+	{ 
+		//fprintf(stderr,"non-echo type %d recvd\n",icmphdr->i_type); 
+		CString str;
+		str.Format(_T("non-echo type %d recvd\n"),  icmphdr->i_type);
+		 
+		return 1; 
+	} 
+	if (icmphdr->i_id != (USHORT)GetCurrentProcessId()) 
+	{ 
+		//fprintf(stderr,"someone else's packet!\n"); 
+		CString str =(_T("someone else's packet!\n")); 
+	 
+		return 1; 
+	} 
+
+	// 	printf("%d bytes from %s:",bytes, inet_ntoa(from->sin_addr)); 
+	 
+	// SendEchoMessage(str);
+	// 	printf(" icmp_seq = %d. ",icmphdr->i_seq); 
+	// 	 CString str1;
+	// 	 str1.Format(_T("icmp_seq=%d "), icmphdr->i_seq); 
+
+
+	// SendEchoMessage(str1);
+
+	// 	printf(" time: %d ms ",GetTickCount()-icmphdr->timestamp); 
+ 
+
+ 
+
+	// 	printf("\n");
+
+	//CString 
+	return 0; 
+} 
+USHORT CScanDlg::Checksum(USHORT *buffer, int size) 
+{ 
+	unsigned long cksum=0; 
+	while(size >1) 
+	{ 
+		cksum+=*buffer++; 
+		size -=sizeof(USHORT); 
+	} 
+	if(size) 
+	{ 
+		cksum += *(UCHAR*)buffer; 
+	} 
+	cksum = (cksum >> 16) + (cksum & 0xffff); 
+	cksum += (cksum >>16); 
+	return (USHORT)(~cksum); 
+} 
+void CScanDlg::FillIcmpData(char * icmp_data, int datasize)
+{ 
+	IcmpHeader *icmp_hdr; 
+	char *datapart; 
+	icmp_hdr = (IcmpHeader*)icmp_data; 
+	icmp_hdr->i_type = ICMP_ECHO; 
+	icmp_hdr->i_code = 0; 
+	icmp_hdr->i_id = (USHORT)GetCurrentProcessId(); 
+	icmp_hdr->i_cksum = 0; 
+	icmp_hdr->i_seq = 0; 
+	datapart = icmp_data + sizeof(IcmpHeader); 
+
+	memset(datapart, 'E', datasize - sizeof(IcmpHeader)); 
+} 
+BOOL CScanDlg::CheckTheSameSubnet(CString strIP){
+    BOOL ret=FALSE;
+	USES_CONVERSION;
+	LPCSTR szIP = W2A(strIP);
+	DWORD dwIP = inet_addr(szIP);
+	IN_ADDR ia,sa;
+	ia.S_un.S_addr = dwIP;
+
+	allsubnets.clear();
+	GetIPMaskGetWay(allsubnets);
+	for (int i=0;i<allsubnets.size();i++)
+	{
+		szIP=W2A(allsubnets[i].StrIP);
+		dwIP=inet_addr(szIP);
+		sa.S_un.S_addr=dwIP;
+
+		if ( ia.S_un.S_un_b.s_b1 == sa.S_un.S_un_b.s_b1 &&
+			ia.S_un.S_un_b.s_b2 == sa.S_un.S_un_b.s_b2 &&
+			ia.S_un.S_un_b.s_b3 == sa.S_un.S_un_b.s_b3 
+			)
+		{
+			ret=TRUE;
+			break;
+		}
+
+	}
+	
+	return ret;
+
+}	
+
+
+extern volatile HANDLE Read_Mutex;
+void CScanDlg::OnBnClickedButtonScanall()
+{
+    allsubnets.clear();
+	GetIPMaskGetWay(allsubnets);
+	
+	WaitForSingleObject(Read_Mutex,INFINITE);//Add by Fance .这里要等待Main Scan 那里弄完了 在去扫;
+	ReleaseMutex(Read_Mutex);
+
+	SOCKET sListen=NULL;
+	CString strlog;
+	int nRet = 0;
+	short nmsgType=UPD_BROADCAST_QRY_MSG;
+	const DWORD END_FLAG = 0x00000000;
+	TIMEVAL time;
+	time.tv_sec =3;
+	time.tv_usec = 1000;
+	fd_set fdSocket;
+	BYTE buffer[512] = {0};
+	BYTE pSendBuf[1024];
+	ZeroMemory(pSendBuf, 255);
+	pSendBuf[0] = 0x66;
+	memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
+	int nSendLen = 17;
+	int time_out=0;
+	int row_flags=m_flexGrid.get_Rows()-1;
+	CString stroldipaddress,strnewipadress,strlocalipaddress,strnewsubnet,strnewgateway;
+	GetIPMaskGetWay(strlocalipaddress,strnewsubnet,strnewgateway);
+	while(row_flags>=1)  // 超时结束
+	{
+		USES_CONVERSION;
+		//strnewipadress=m_flexGrid.get_TextMatrix(row_flags,NEW_IPADRESS);
+		stroldipaddress=m_flexGrid.get_TextMatrix(row_flags,SCAN_TABLE_ADDRESS);
+		ChangeNetDeviceIP(stroldipaddress,row_flags);
+		--row_flags;
+// 		if (strnewipadress.GetLength()==0)
+// 		{
+// 			continue;
+// 		}
+// 		LPCSTR szIP = W2A(stroldipaddress);
+// 		DWORD dwIP = inet_addr(szIP);
+// 		IN_ADDR ia;
+// 		ia.S_un.S_addr = dwIP;
+// 		//////////////////Old IP////////////////////////////////////
+// 		pSendBuf[1]=ia.S_un.S_un_b.s_b1;
+// 		pSendBuf[2]=ia.S_un.S_un_b.s_b2;
+// 		pSendBuf[3]=ia.S_un.S_un_b.s_b3;
+// 		pSendBuf[4]=ia.S_un.S_un_b.s_b4;
+// 		///////////////////New IP///////////////////////////////////////////
+// 		szIP = W2A(strnewipadress);
+// 		dwIP = inet_addr(szIP);
+// 		ia.S_un.S_addr = dwIP;
+// 		///////////////////////////////////////////////////////////
+// 		pSendBuf[5]=ia.S_un.S_un_b.s_b1;
+// 		pSendBuf[6]=ia.S_un.S_un_b.s_b2;
+// 		pSendBuf[7]=ia.S_un.S_un_b.s_b3;
+// 		pSendBuf[8]=ia.S_un.S_un_b.s_b4;
+// 		////////////////////////////////////////////////////////////////////
+// 		szIP = W2A(strnewsubnet);
+// 		dwIP = inet_addr(szIP);
+// 		ia.S_un.S_addr = dwIP;
+// 		pSendBuf[9]=ia.S_un.S_un_b.s_b1;
+// 		pSendBuf[10]=ia.S_un.S_un_b.s_b2;
+// 		pSendBuf[11]=ia.S_un.S_un_b.s_b3;
+// 		pSendBuf[12]=ia.S_un.S_un_b.s_b4;
+// 		////////////////////////////////////////////////////////////////////
+// 		szIP = W2A(strnewgateway);
+// 		dwIP = inet_addr(szIP);
+// 		ia.S_un.S_addr = dwIP;
+// 		pSendBuf[13]=ia.S_un.S_un_b.s_b1;
+// 		pSendBuf[14]=ia.S_un.S_un_b.s_b2;
+// 		pSendBuf[15]=ia.S_un.S_un_b.s_b3;
+// 		pSendBuf[16]=ia.S_un.S_un_b.s_b4;
+// 
+// 		FD_ZERO(&fdSocket);	
+// 		FD_SET(h_Broad, &fdSocket);
+// 		nRet = ::sendto(h_Broad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast,sizeof(h_bcast));
+// 		if (nRet == SOCKET_ERROR)
+// 		{
+// 			int  nError = WSAGetLastError();
+// 			goto END_SCAN;
+// 			return ;
+// 		}
+// 		int nLen = sizeof(h_siBind);
+// 		//while(pScanner->IsComScanRunning())
+// 
+// 		fd_set fdRead = fdSocket;
+// 		int nSelRet = ::select(0, &fdRead, NULL, NULL, &time);
+// 		if (nSelRet == SOCKET_ERROR)
+// 		{
+// 			int nError = WSAGetLastError();
+// 			goto END_SCAN;
+// 			return  ;
+// 		}
+// 
+// 		if(nSelRet > 0)
+// 		{
+// 			ZeroMemory(buffer, 512);
+// 
+// 			int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
+// 			//			int nRet = ::recvfrom(hBroad,(char*)&buffer[0], nsize, 0, (sockaddr*)&addrRemote, &nLen);
+// 			BYTE szIPAddr[4] = {0};
+// 			if(nRet > 0)
+// 			{		
+// 				FD_ZERO(&fdSocket);
+// 				if(buffer[0]==0x67)//收到正确的回复了
+// 				{	
+// 					for (int i=0;i<10;i++)
+// 					{
+// 						COLORREF ref=RGB(255,255,255); 
+// 						m_flexGrid.put_Row(row_flags+1);
+// 						m_flexGrid.put_Col(i);
+// 						m_flexGrid.put_CellBackColor(ref);
+// 					}
+// 					m_flexGrid.put_TextMatrix(row_flags+1,SCAN_TABLE_ADDRESS,strnewipadress);
+// 					SaveNewIPAddress(strnewipadress,stroldipaddress);
+// 					AfxMessageBox(_T("Change the ip successfully!"));
+// 				}	
+// 
+// 			}
+// 		}	
+// 		else
+// 		{
+// 
+// 
+// 
+// 		}
+	}
+	if (m_IsScan)
+	{
+		m_pScanner->m_bCheckSubnetFinish=TRUE;
+	}
+
+	// 	OnClose();
+// END_SCAN:
+// 
+// 	closesocket(h_Broad);
+// 	h_Broad=NULL;
+// 	{
+// 
+// 		//SOCKET soAck =::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+// 		h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+// 		BOOL bBroadcast=TRUE;
+// 		::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+// 		int iMode=1;
+// 		ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+// 
+// 		BOOL bDontLinger = FALSE;
+// 		setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+// 
+// 		//SOCKADDR_IN bcast;
+// 		h_bcast.sin_family=AF_INET;
+// 		//bcast.sin_addr.s_addr=nBroadCastIP;
+// 		h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+// 		h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+// 
+// 		//SOCKADDR_IN siBind;
+// 		h_siBind.sin_family=AF_INET;
+// 		h_siBind.sin_addr.s_addr=INADDR_ANY;
+// 		h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+// 		::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+// 
+// 	}
+
+
+
+	//############################
+
+	//	return 1;
+
+
+}
+
+
+BOOL CScanDlg::ChangeNetDeviceIP(CString strIP,int row_flags ){
+BOOL ret=FALSE;
+SOCKET sListen=NULL;
+CString strlog;
+int nRet = 0;
+short nmsgType=UPD_BROADCAST_QRY_MSG;
+const DWORD END_FLAG = 0x00000000;
+TIMEVAL time;
+time.tv_sec =3;
+time.tv_usec = 1000;
+fd_set fdSocket;
+BYTE buffer[512] = {0};
+BYTE pSendBuf[1024];
+ZeroMemory(pSendBuf, 255);
+pSendBuf[0] = 0x66;
+memcpy(pSendBuf + 1, (BYTE*)&END_FLAG, 4);
+int nSendLen = 17;
+int time_out=0;
+USES_CONVERSION;
+CString stroldipaddress,strnewipadress,strlocalipaddress,strnewsubnet,strnewgateway;
+stroldipaddress=strIP;
+
+
+	for (int i=0;i<allsubnets.size();i++)
+	{
+		GetNewIP(strnewipadress,allsubnets[i].StrIP);
+		if (strnewipadress.Find(_T("0.0.0"))!=-1)//对0.0.0.0的过滤掉
+		{
+			continue;
+		}
+
+		LPCSTR szIP = W2A(stroldipaddress);
+		DWORD dwIP = inet_addr(szIP);
+		IN_ADDR ia;
+		ia.S_un.S_addr = dwIP;
+		//////////////////Old IP////////////////////////////////////
+		pSendBuf[1]=ia.S_un.S_un_b.s_b1;
+		pSendBuf[2]=ia.S_un.S_un_b.s_b2;
+		pSendBuf[3]=ia.S_un.S_un_b.s_b3;
+		pSendBuf[4]=ia.S_un.S_un_b.s_b4;
+		///////////////////New IP///////////////////////////////////////////
+		szIP = W2A(strnewipadress);
+		dwIP = inet_addr(szIP);
+		ia.S_un.S_addr = dwIP;
+		///////////////////////////////////////////////////////////
+		pSendBuf[5]=ia.S_un.S_un_b.s_b1;
+		pSendBuf[6]=ia.S_un.S_un_b.s_b2;
+		pSendBuf[7]=ia.S_un.S_un_b.s_b3;
+		pSendBuf[8]=ia.S_un.S_un_b.s_b4;
+		////////////////////////////////////////////////////////////////////
+		szIP = W2A(strnewsubnet);
+		dwIP = inet_addr(szIP);
+		ia.S_un.S_addr = dwIP;
+		pSendBuf[9]=ia.S_un.S_un_b.s_b1;
+		pSendBuf[10]=ia.S_un.S_un_b.s_b2;
+		pSendBuf[11]=ia.S_un.S_un_b.s_b3;
+		pSendBuf[12]=ia.S_un.S_un_b.s_b4;
+		////////////////////////////////////////////////////////////////////
+		szIP = W2A(strnewgateway);
+		dwIP = inet_addr(szIP);
+		ia.S_un.S_addr = dwIP;
+		pSendBuf[13]=ia.S_un.S_un_b.s_b1;
+		pSendBuf[14]=ia.S_un.S_un_b.s_b2;
+		pSendBuf[15]=ia.S_un.S_un_b.s_b3;
+		pSendBuf[16]=ia.S_un.S_un_b.s_b4;
+
+		FD_ZERO(&fdSocket);	
+		FD_SET(h_Broad, &fdSocket);
+		nRet = ::sendto(h_Broad,(char*)pSendBuf,nSendLen,0,(sockaddr*)&h_bcast,sizeof(h_bcast));
+		if (nRet == SOCKET_ERROR)
+		{
+			int  nError = WSAGetLastError();
+			goto END_SCAN;
+			return FALSE ;
+		}
+		int nLen = sizeof(h_siBind);
+		//while(pScanner->IsComScanRunning())
+
+		fd_set fdRead = fdSocket;
+		int nSelRet = ::select(0, &fdRead, NULL, NULL, &time);
+		if (nSelRet == SOCKET_ERROR)
+		{
+			int nError = WSAGetLastError();
+			goto END_SCAN;
+			return FALSE ;
+		}
+
+		if(nSelRet > 0)
+		{
+			ZeroMemory(buffer, 512);
+
+			int nRet = ::recvfrom(h_Broad,(char*)buffer, 512, 0, (sockaddr*)&h_siBind, &nLen);
+			//			int nRet = ::recvfrom(hBroad,(char*)&buffer[0], nsize, 0, (sockaddr*)&addrRemote, &nLen);
+			BYTE szIPAddr[4] = {0};
+			if(nRet > 0)
+			{		
+				FD_ZERO(&fdSocket);
+				if(buffer[0]==0x67)//收到正确的回复了
+				{	
+
+				    Sleep(8000);
+					//if (!TestPing(strnewipadress))
+					//{
+					//   stroldipaddress=strnewipadress;
+					//	continue;
+					//}
+					SetCommunicationType(1);
+					 if (!Open_Socket2(strnewipadress,_wtoi(m_net_product_node.BuildingInfo.strIpPort)))
+					 {
+						 stroldipaddress=strnewipadress;
+						 continue;
+					 }
+					 else
+					 {
+						 close_com();
+					 }
+
+					for (int i=0;i<10;i++)
+					{
+						COLORREF ref=RGB(255,255,255); 
+						m_flexGrid.put_Row(row_flags);
+						m_flexGrid.put_Col(i);
+						m_flexGrid.put_CellBackColor(ref);
+					}
+					m_flexGrid.put_TextMatrix(row_flags,NEW_IPADRESS,strnewipadress);
+					SaveNewIPAddress(strnewipadress,stroldipaddress);
+					//AfxMessageBox(_T("Change the ip successfully!"));
+					ret=TRUE;
+					break;
+				}	
+
+			}
+			else
+			{
+				if (!TestPing(strnewipadress))
+				{
+					stroldipaddress=strnewipadress;
+					continue;
+				}
+			}
+		}	
+		else
+		{
+
+
+
+		}
+
+
+	}
+
+	return ret;
+END_SCAN:
+
+	closesocket(h_Broad);
+	h_Broad=NULL;
+	{
+
+		//SOCKET soAck =::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+		h_Broad=::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+		BOOL bBroadcast=TRUE;
+		::setsockopt(h_Broad,SOL_SOCKET,SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL));
+		int iMode=1;
+		ioctlsocket(h_Broad,FIONBIO, (u_long FAR*) &iMode);
+
+		BOOL bDontLinger = FALSE;
+		setsockopt( h_Broad, SOL_SOCKET, SO_DONTLINGER, ( const char* )&bDontLinger, sizeof( BOOL ) );
+
+		//SOCKADDR_IN bcast;
+		h_bcast.sin_family=AF_INET;
+		//bcast.sin_addr.s_addr=nBroadCastIP;
+		h_bcast.sin_addr.s_addr=INADDR_BROADCAST;
+		h_bcast.sin_port=htons(UDP_BROADCAST_PORT);
+
+		//SOCKADDR_IN siBind;
+		h_siBind.sin_family=AF_INET;
+		h_siBind.sin_addr.s_addr=INADDR_ANY;
+		h_siBind.sin_port=htons(RECV_RESPONSE_PORT);
+		::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
+
+	}
+	return ret; 
+}			
 void CScanDlg::InitScanGrid()
 {
 	//m_flexGrid.put_TextMatrix(0,0,_T("NO."));
@@ -109,30 +1043,83 @@ void CScanDlg::InitScanGrid()
 	m_flexGrid.put_TextMatrix(0,6,_T("Address"));
 	m_flexGrid.put_TextMatrix(0,7,_T("Port"));
 	m_flexGrid.put_TextMatrix(0,8,_T("Protocol"));
+	
+	if (!m_IsScan)
+	{
+		m_flexGrid.put_Cols(10);
+		m_flexGrid.put_TextMatrix(0,9,_T("Assign New Ip"));
+		GetDlgItem(IDC_BUTTON_SCANALL)->ShowWindow(SW_SHOW);
+
+
+		for(int i = 0; i < 9; i++)
+		{
+			m_flexGrid.put_ColAlignment(i,4);
+		}
+
+		m_flexGrid.put_ColWidth(0,2000);	//type
+		m_flexGrid.put_ColWidth(1,0);		//building
+		m_flexGrid.put_ColWidth(2,0);		//floor
+		m_flexGrid.put_ColWidth(3,0);		//room
+		m_flexGrid.put_ColWidth(4,0);		//subnet
+
+		m_flexGrid.put_ColWidth(5,1000);		//serial#
+		m_flexGrid.put_ColWidth(6,1400);	//Address
+		m_flexGrid.put_ColWidth(7,800);		//Port
+		m_flexGrid.put_ColWidth(8,0);	//protocol
+		m_flexGrid.put_ColWidth(9,1200);
+
+
+	}
+	else
+	{
+		ASSERT(m_pScanner);	
+		if (!m_pScanner->m_thesamesubnet)
+		{
+			m_flexGrid.put_Cols(10);
+			
+			m_flexGrid.put_TextMatrix(0,9,_T("Assign New Ip"));
+			GetDlgItem(IDC_BUTTON_SCANALL)->ShowWindow(SW_SHOW);
+			
+		}
+		else
+		{
+			GetDlgItem(IDC_BUTTON_SCANALL)->ShowWindow(SW_HIDE);
+		}
+
+		for(int i = 0; i < 9; i++)
+		{
+			m_flexGrid.put_ColAlignment(i,4);
+		}
+
+		m_flexGrid.put_ColWidth(0,2000);	//type
+		m_flexGrid.put_ColWidth(1,800);		//building
+		m_flexGrid.put_ColWidth(2,800);		//floor
+		m_flexGrid.put_ColWidth(3,800);		//room
+		m_flexGrid.put_ColWidth(4,800);		//subnet
+
+		m_flexGrid.put_ColWidth(5,1000);		//serial#
+		m_flexGrid.put_ColWidth(6,1400);	//Address
+		m_flexGrid.put_ColWidth(7,800);		//Port
+		m_flexGrid.put_ColWidth(8,1200);	//protocol
+
+	}
 	// 	m_flexGrid.put_TextMatrix(0,8,_T("Confilct"));
 	// 	m_flexGrid.put_TextMatrix(0,9,_T("Fix Conflict"));
 
-	for(int i = 0; i < 9; i++)
-	{
-		m_flexGrid.put_ColAlignment(i,4);
-	}
-
-	m_flexGrid.put_ColWidth(0,1000);	//type
-	m_flexGrid.put_ColWidth(1,800);		//building
-	m_flexGrid.put_ColWidth(2,800);		//floor
-	m_flexGrid.put_ColWidth(3,800);		//room
-	m_flexGrid.put_ColWidth(4,800);		//subnet
-
-	m_flexGrid.put_ColWidth(5,1000);		//serial#
-	m_flexGrid.put_ColWidth(6,1400);	//Address
-	m_flexGrid.put_ColWidth(7,800);		//Port
-	m_flexGrid.put_ColWidth(8,1200);	//protocol
+	
 
 // 	m_flexGrid.put_ColWidth(8,600);		//if conflict
 // 	m_flexGrid.put_ColWidth(9,800);		//fix
 	
 }
-
+void CScanDlg::FLEX_GRID_PUT_COLOR_STR(int row,int col,CString str) 
+{
+    COLORREF ref=RGB(178,227,137);
+	m_flexGrid.put_TextMatrix(row,col,str);
+	m_flexGrid.put_Row(row);
+	m_flexGrid.put_Col(col);
+	m_flexGrid.put_CellBackColor(ref);
+}
 void CScanDlg::AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList)
 {
 	//EnterCriticalSection(&m_csGrid);
@@ -144,12 +1131,58 @@ void CScanDlg::AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList)
 	for (UINT i = 0; i < szList.size(); i++)
 	{
 		_NetDeviceInfo* pNetInfo = szList[i];
-		
-		//////////////////////////////////////////////////////////////////////////
-		//CString strNO;
-		//strNO.Format(_T("%d"), i);
-		//m_flexGrid.put_TextMatrix(i+1,0,strNO); 
+		DWORD dwIP =pNetInfo->m_pNet->GetIPAddr();	
+		in_addr ad;
+		ad.S_un.S_addr = dwIP;
+		CString strAddr(inet_ntoa(ad));
+		BOOL thesamesubnet=CheckTheSameSubnet(strAddr);
+		if (!thesamesubnet)
+		{   
+			CString anewip;
+			if (GetNewIP(anewip))
+			{
+				FLEX_GRID_PUT_COLOR_STR(i+nRSize,NEW_IPADRESS,anewip); 
+			}
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_ADDRESS,strAddr); 
+			CString strType = pNetInfo->m_pNet->GetProductName();		
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_TYPE,strType); 
 
+			CString strBuilding = pNetInfo->m_pNet->GetBuildingName();		
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_BUILDING,strBuilding); 
+
+			CString strFloor = pNetInfo->m_pNet->GetFloorName();
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_FLOOR,strFloor); 
+
+			CString strRoom = pNetInfo->m_pNet->GetRoomName();
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_ROOM,strRoom); 
+
+			CString strSubnet = pNetInfo->m_pNet->GetSubnetName();
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_SUBNET,strSubnet); 
+
+			CString strSerailID;
+			int nSID = pNetInfo->m_pNet->GetSerialID();
+			strSerailID.Format(_T("%d"), nSID);
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_SERIALID,strSerailID); 
+			/////
+
+			/////
+			CString strPort;
+			int nPort = pNetInfo->m_pNet->GetIPPort();
+			strPort.Format(_T("%d"), nPort);
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_COMPORT,strPort); 
+			////
+			CString strProtocol;		
+			if(pNetInfo->m_pNet->GetProtocol() == 3)
+			{
+				strProtocol.Format(_T("BacnetIP"));
+			}
+			else
+				strProtocol.Format(_T("TCP/IP"));
+			FLEX_GRID_PUT_COLOR_STR(i+nRSize,SCAN_TABLE_PROTOCOL,strProtocol); 
+			return;
+		} 
+		 
+		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_ADDRESS,strAddr); 
 		CString strType = pNetInfo->m_pNet->GetProductName();		
 		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_TYPE,strType); 
 
@@ -170,11 +1203,11 @@ void CScanDlg::AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList)
 		strSerailID.Format(_T("%d"), nSID);
 		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_SERIALID,strSerailID); 
 		/////
-		DWORD dwIP =pNetInfo->m_pNet->GetIPAddr();				
-		in_addr ad;
+		 dwIP =pNetInfo->m_pNet->GetIPAddr();				
+		
 		ad.S_un.S_addr = dwIP;
-		CString strAddr(inet_ntoa(ad));
-		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_ADDRESS,strAddr); 
+		CString Addr(inet_ntoa(ad));
+		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_ADDRESS,Addr); 
 		/////
 		CString strPort;
 		int nPort = pNetInfo->m_pNet->GetIPPort();
@@ -182,6 +1215,11 @@ void CScanDlg::AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList)
 		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_COMPORT,strPort); 
 		////
 		CString strProtocol;		
+		if(pNetInfo->m_pNet->GetProtocol() == 3)
+		{
+			strProtocol.Format(_T("BacnetIP"));
+		}
+		else
 		strProtocol.Format(_T("TCP/IP"));
 		m_flexGrid.put_TextMatrix(i+nRSize,SCAN_TABLE_PROTOCOL,strProtocol); 
 		////
@@ -190,42 +1228,101 @@ void CScanDlg::AddNetDeviceToGrid(vector<_NetDeviceInfo*>& szList)
 
 	//LeaveCriticalSection(&m_csGrid);
 }
+void CScanDlg::ChangeIPAddress(CString newip,CString oldip){
+	USES_CONVERSION;
+for (UINT i=0;i<m_pScanner->m_szNCScanRet.size();i++)
+{
+	_NetDeviceInfo* pNetInfo = m_pScanner->m_szNCScanRet[i];
+	DWORD dwIP =pNetInfo->m_pNet->GetIPAddr();	
+	in_addr ad;
+	ad.S_un.S_addr = dwIP;
+	CString strAddr(inet_ntoa(ad));
+	if (strAddr.CompareNoCase(oldip)==0)
+	{
+		dwIP=inet_addr(W2A(newip));
+		m_pScanner->m_szNCScanRet[i]->m_pNet->SetIPAddr(dwIP);
+	}
+}
+}
+void CScanDlg::SaveNewIPAddress(CString newip,CString oldip){
+// 	_ConnectionPtr m_pCon;
+// 	_RecordsetPtr m_pRs;
+// 	::CoInitialize(NULL);
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
+	try 
+	{
+		CString strSql;
+		////////////////////////////////////////////////////////////////////////////////////////////
+		//获取数据库名称及路径
+		/////////////////////////////////////////////////////////////////////////////////////////////////
+		//连接数据库
+// 		m_pCon.CreateInstance("ADODB.Connection");
+// 		m_pRs.CreateInstance(_T("ADODB.Recordset"));
+		//m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+		strSql.Format(_T("select * from ALL_NODE where Bautrate='%s' "),oldip);
+		//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+		bado.m_pRecordset=bado.OpenRecordset(strSql);
+		while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
+		{
+			strSql.Format(_T("update ALL_NODE set Bautrate='%s' where Bautrate='%s'"),newip,oldip);
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			m_pRs->MoveNext();
+		}
+		//m_pRs->Close();
+		bado.CloseRecordset();
 
+		CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
+	}
+	catch(_com_error e)
+	{
+		/* AfxMessageBox(e.Description());*/
+		//MessageBox(m_name_new+_T("  has been here\n Please change another name!"));
 
+		 
+		//m_pCon->Close();
+	}
+	//m_pCon->Close(); 
+	bado.CloseConn();
+}
 int CScanDlg::GetAllNodeFromDataBase()
 {
 	//_ConnectionPtr m_pCon;//for ado connection
 	//_RecordsetPtr m_pRs;//for ado 
 
-	m_pCon.CreateInstance("ADODB.Connection");
-	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-	m_pRs.CreateInstance("ADODB.Recordset");
-
+// 	m_pCon.CreateInstance("ADODB.Connection");
+// 	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+// 	m_pRs.CreateInstance("ADODB.Recordset");
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn();
 	_variant_t temp_variant;
 	CString strTemp;
 
 	CString temp_str=_T("select * from ALL_NODE");
-	m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
-
+//	m_pRs->Open(_variant_t(temp_str),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
+    bado.m_pRecordset=bado.OpenRecordset(temp_str);
 	//return m_pRs->get_RecordCount();
 
 	int nTemp = 0;
-	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	while(VARIANT_FALSE==bado.m_pRecordset->EndOfFile)
 	{
 		nTemp++;
 		int nDefault=0;
-		CString strDevType = m_pRs->GetCollect("Product_class_ID");
+		CString strDevType = bado.m_pRecordset->GetCollect("Product_class_ID");
 
 		CTStatBase* pNode = NULL;
 		if (strDevType.CompareNoCase(_T("100")) == 0)	 //100 =  NC
 		{
 			pNode = new CTStat_Net;
 			// IP Addr
-			CString strIP = m_pRs->GetCollect("Product_ID");
+			CString strIP = bado.m_pRecordset->GetCollect("Product_ID");
 			//((CTStat_Net*)(pNode))->SetIPAddr(strIP);
 			
 			// Port
-			CString strPort = m_pRs->GetCollect("Bautrate");
+			CString strPort = bado.m_pRecordset->GetCollect("Bautrate");
 			((CTStat_Net*)(pNode))->SetIPAddr(_wtoi(strPort));
 
 			m_szNetNodes.push_back(((CTStat_Net*)(pNode)));
@@ -234,59 +1331,65 @@ int CScanDlg::GetAllNodeFromDataBase()
 		{
 			pNode = new CTStat_Dev;
 			// BaudRate
-			CString strBaudRate = m_pRs->GetCollect("Bautrate");
+			CString strBaudRate = bado.m_pRecordset->GetCollect("Bautrate");
 			((CTStat_Dev*)(pNode))->SetBaudRate(_wtoi(strBaudRate));
 
 			m_szComNodes.push_back(((CTStat_Dev*)(pNode)));
 
-			CString strComPort = m_pRs->GetCollect("Com_Port");
+			CString strComPort = bado.m_pRecordset->GetCollect("Com_Port");
 			strComPort = strComPort.Mid(3);
 			((CTStat_Dev*)(pNode))->SetComPort(_wtoi(strComPort));
 
-			CString strEPSize = m_pRs->GetCollect("EPsize");
+			CString strEPSize = bado.m_pRecordset->GetCollect("EPsize");
 			((CTStat_Dev*)(pNode))->SetEPSize(int(_wtoi(strEPSize)));
 
 		}
 		pNode->SetProductType(_wtoi(strDevType));
 
-		pNode->SetBuildingName(m_pRs->GetCollect("MainBuilding_Name"));
-		pNode->SetSubnetName(m_pRs->GetCollect("Building_Name"));
+		pNode->SetBuildingName(bado.m_pRecordset->GetCollect("MainBuilding_Name"));
+		pNode->SetSubnetName(bado.m_pRecordset->GetCollect("Building_Name"));
 
-		pNode->SetFloorName(m_pRs->GetCollect("Floor_Name"));
-		pNode->SetRoomName(m_pRs->GetCollect("Room_Name"));
+		pNode->SetFloorName(bado.m_pRecordset->GetCollect("Floor_Name"));
+		pNode->SetRoomName(bado.m_pRecordset->GetCollect("Room_Name"));
 
-		CString strID = m_pRs->GetCollect("Product_ID");		
+		CString strID = bado.m_pRecordset->GetCollect("Product_ID");		
 		pNode->SetDevID(_wtoi(strID));
 		
-		CString strHwv = m_pRs->GetCollect("Hardware_Ver");
+		CString strHwv = bado.m_pRecordset->GetCollect("Hardware_Ver");
 		pNode->SetHardwareVersion(float(_wtof(strHwv)));
-		CString strSwv = m_pRs->GetCollect("Software_Ver");
+		CString strSwv = bado.m_pRecordset->GetCollect("Software_Ver");
 		pNode->SetSoftwareVersion(float(_wtof(strSwv)));
 	
 
 
 
 
-		CString strSerialID = m_pRs->GetCollect("Serial_ID");		
+		CString strSerialID = bado.m_pRecordset->GetCollect("Serial_ID");		
 		(pNode)->SetSerialID(_wtoi(strSerialID));
 		
-		m_pRs->MoveNext();		
+		bado.m_pRecordset->MoveNext();		
 	}
+	bado.CloseRecordset();
+	bado.CloseConn();
 	return m_szNetNodes.size() + m_szComNodes.size();
 }
 
-
-
+void CScanDlg::SetNode(tree_product product_Node){
+m_net_product_node=product_Node;
+}
+void CScanDlg::Set_IsScan(BOOL Is_Scan){
+	m_IsScan=Is_Scan;
+}
 
 LRESULT CScanDlg::OnAddComScanRet(WPARAM wParam, LPARAM lParam)
 {
-	// AddComDeviceToGrid(m_pScanner->m_szTsatScandRet);
+	//AddComDeviceToGrid(m_pScanner->m_szTsatScandRet);
 	return 1;
 }
 
 LRESULT CScanDlg::OnAddNetScanRet(WPARAM wParam, LPARAM lParam)
 {
-	// AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
+	//AddNetDeviceToGrid(m_pScanner->m_szNCScanRet);
 	return 1;
 }
 
@@ -347,6 +1450,13 @@ void CScanDlg::OpenDefaultCom()
 {	
 	CString strSql;
 	strSql.Format(_T("select * from Building order by Main_BuildingName"));
+	//_RecordsetPtr pRs;
+	//_ConnectionPtr pCon;
+	
+	//pCon.CreateInstance("ADODB.Connection");
+	//pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+	//pRs.CreateInstance("ADODB.Recordset");
+
 	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);			
 	_variant_t temp_variant;
 	CString strDefaultCom = 0;		
@@ -414,9 +1524,29 @@ void CScanDlg::OnClose()
 	// TODO: Add your message handler code here and/or call default
 
 	//RecoveryID();
-	Release();
+	if (!m_IsScan)
+	{
+		CDialog::OnClose();
+		return;
+	}
+	if (!m_pScanner->m_bCheckSubnetFinish)
+	{
+		int ret1 = AfxMessageBox(_T("Are you sure to exit?The devices are exited,which are in the different subnet.please apply all new net ips."),MB_YESNOCANCEL,3); 
+		if (ret1 == IDYES)
+		{
+			Release();
 
-	CDialog::OnClose();
+			CDialog::OnClose(); 
+		}
+	}
+	else
+	{
+		Release();
+
+		CDialog::OnClose();
+	}
+	
+	
 }
 
 
@@ -505,6 +1635,46 @@ END_EVENTSINK_MAP()
 
 void CScanDlg::ClickMsflexgrid1()
 {
+
+#if 1
+	long lRow,lCol;
+	lRow = m_flexGrid.get_RowSel();//获取点击的行号	
+	lCol = m_flexGrid.get_ColSel(); //获取点击的列号
+	TRACE(_T("Click input grid!\n"));
+	m_currow=lRow;
+	m_curcol=lCol;
+	CRect rect;
+	m_flexGrid.GetWindowRect(rect); //获取表格控件的窗口矩形
+	ScreenToClient(rect); //转换为客户区矩形	
+	CDC* pDC =GetDC();
+
+	int nTwipsPerDotX = 1440 / pDC->GetDeviceCaps(LOGPIXELSX) ;
+	int nTwipsPerDotY = 1440 / pDC->GetDeviceCaps(LOGPIXELSY) ;
+	//计算选中格的左上角的坐标(象素为单位)
+	long y = m_flexGrid.get_RowPos(lRow)/nTwipsPerDotY;
+	long x = m_flexGrid.get_ColPos(lCol)/nTwipsPerDotX;
+	//计算选中格的尺寸(象素为单位)。加1是实际调试中，发现加1后效果更好
+	long width = m_flexGrid.get_ColWidth(lCol)/nTwipsPerDotX+1;
+	long height = m_flexGrid.get_RowHeight(lRow)/nTwipsPerDotY+1;
+	//形成选中个所在的矩形区域
+	CRect rcCell(x,y,x+width,y+height);
+	//转换成相对对话框的坐标
+	rcCell.OffsetRect(rect.left+1,rect.top+1);
+	ReleaseDC(pDC);
+	CString strValue = m_flexGrid.get_TextMatrix(lRow,lCol);
+	if (lCol==9)
+	{
+		m_editGrid.MoveWindow(&rcCell,1);
+		m_editGrid.ShowWindow(SW_SHOW);
+		m_editGrid.SetWindowText(strValue);
+		m_editGrid.SetFocus();
+		m_editGrid.SetCapture();//LSC
+		int nLenth=m_editGrid.GetLineCount();//m_editGrid.GetLength();
+		m_editGrid.SetSel(nLenth,nLenth); //全选//
+		return;
+		
+	}
+#endif
 	CSize szTemp;
 	CalcClickPos(szTemp);// 计算点中的位置
 	if (szTemp == m_szGridEditPos)
@@ -601,16 +1771,12 @@ void CScanDlg::CalcClickPos(CSize& size)
 	size.cx=lRow;
 	size.cy = lCol;
 }
-
-
 void CScanDlg::DestroyFlexEdit()
 {
 	m_editGrid.ShowWindow(SW_HIDE);	
 	CString strText;
 	m_editGrid.GetWindowText(strText);		
 }
-
-
 // 将数据库里的值取出放到内存
 // 将内存的值将被写入数据库
 //
@@ -663,17 +1829,21 @@ void CScanDlg::SaveAllNodeToDB()
 	GetDataFromGrid();	
 	CombineDBandScanRet();
 
-	m_pCon.CreateInstance("ADODB.Connection");
-	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+// 	m_pCon.CreateInstance("ADODB.Connection");
+// 	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
 
 	// 先删除数据库 // maurice说不要删
+
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
 
 	try
 	{
 
 	CString strSql;
 	strSql.Format(_T("delete * from ALL_NODE"));
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 
 	}
 	catch(_com_error *e)
@@ -706,10 +1876,9 @@ void CScanDlg::SaveAllNodeToDB()
 		WriteOneNetInfoToDB(pNetInfo);
 	}
 
-
-	m_pCon->Close();
+	bado.CloseConn();
+	//m_pCon->Close();
 }
-
 
 // 合并数据库和scan结果，以便存入数据库
 // 如果Serial ID相同的，则以grid的数据为准
@@ -770,11 +1939,13 @@ void CScanDlg::CombineDBandScanRet()
 }
 
 
-
+//程序設計
 void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 {
 	ASSERT(pDev);
-	
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
 	CString strBuildingName = pDev->GetBuildingName();
 
 	CString strFloorName = pDev->GetFloorName();
@@ -788,13 +1959,13 @@ void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 	CString strProductName = pDev->GetProductName();
 
 	CString strSerialID;
-	strSerialID.Format(_T("%d"), pDev->GetSerialID());
+	strSerialID.Format(_T("%u"), pDev->GetSerialID());
 
 
 
 	 int nClassID = pDev->GetProductType();
 	CString strClassID;
-	strClassID.Format(_T("%d"), nClassID);
+	strClassID.Format(_T("%u"), nClassID);
 
 	int nBaudRate = pDev->GetBaudRate();
 	CString strBaudRate;
@@ -803,7 +1974,7 @@ void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 	CString strScreenName;
 	strScreenName.Format(_T("Screen(S:%d--%d)"), pDev->GetSerialID(), pDev->GetDevID() );
 
-	CString strBackground_bmp=_T("Clicking here to add a image...");
+	CString strBackground_bmp=_T("T3000_Default_Building_PIC.bmp");
 
 	CString strHWV;
 	strHWV.Format(_T("%.1f"), pDev->GetHardwareVersion());
@@ -824,14 +1995,16 @@ void CScanDlg::WriteOneDevInfoToDB( CTStat_Dev* pDev)
 	try
 	{
 
-	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+"','"+strEpSize+"')"));
+	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,Custom,EPsize) values('"
+    +strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+_T(",'0'")+"','"+strEpSize+"')"));
 	//new nc // strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strBaudRate+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strCom+"','"+strEPSize+"','"+strMainnetInfo+"')"));
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 	}
 	catch(_com_error *e)
 	{
 		AfxMessageBox(e->ErrorMessage());
 	}
+	bado.CloseConn();
 }
 
 void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
@@ -840,6 +2013,9 @@ void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
 // 	_ConnectionPtr t_pCon;//for ado connection
 // 	t_pCon.CreateInstance(_T("ADODB.Connection"));
 // 	t_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	CBADO bado;
+	bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+	bado.OnInitADOConn(); 
 
 	CString strBuildingName = pNet->GetBuildingName();
 
@@ -855,16 +2031,16 @@ void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
 	CString strProductName = pNet->GetProductName();
 
 	CString strSerialID;
-	strSerialID.Format(_T("%d"), pNet->GetSerialID());
+	strSerialID.Format(_T("%u"), pNet->GetSerialID());
 
 	int nClassID = pNet->GetProductType();
 	CString strClassID;
-	strClassID.Format(_T("%d"), nClassID);
+	strClassID.Format(_T("%u"), nClassID);
 
 	CString strScreenName;
 	strScreenName.Format(_T("Screen(S:%d--%d)"), pNet->GetSerialID(), pNet->GetDevID() );
 
-	CString strBackground_bmp=_T("Clicking here to add a image...");
+	CString strBackground_bmp=_T("T3000_Default_Building_PIC.bmp");
 
 	CString strHWV;
 	strHWV.Format(_T("%0.1f"), pNet->GetHardwareVersion());
@@ -894,18 +2070,19 @@ void CScanDlg::WriteOneNetInfoToDB( CTStat_Net* pNet)
 	CString strEPSize = _T("0");
 	
 
-	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"')"));
+	strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,Custom,EPsize) values('"
+    +strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+_T(",'0'")+strEPSize+"')"));
 	//new nc // strSql.Format(_T("insert into ALL_NODE (MainBuilding_Name,Building_Name,Serial_ID,Floor_name,Room_name,Product_name,Product_class_ID,Product_ID,Screen_Name,Bautrate,Background_imgID,Hardware_Ver,Software_Ver,Com_Port,EPsize) values('"+strBuildingName+"','"+strSubNetName+"','"+strSerialID+"','"+strFloorName+"','"+strRoomName+"','"+strProductName+"','"+strClassID+"','"+strID+"','"+strScreenName+"','"+strIP+"','"+strBackground_bmp+"','"+strHWV+"','"+strSWV+"','"+strPort+"','"+strEPSize+"','"+strMainnetInfo+"')"));
 	try
 	{
 
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
 	}
 	catch(_com_error *e)
 	{
 		AfxMessageBox(e->ErrorMessage());
 	}
-
+  bado.CloseConn();
 }
 
 
@@ -958,7 +2135,7 @@ void CScanDlg::AddComDeviceToGrid(vector<_ComDeviceInfo*>& szList)
 
 		CString strSerialID;
 		int nSID = pDevInfo->m_pDev->GetSerialID();
-		strSerialID.Format(_T("%d"), nSID);
+		strSerialID.Format(_T("%u"), nSID);
 		m_flexGrid.put_TextMatrix(i+nSize,SCAN_TABLE_SERIALID,strSerialID); 
 		///// ID
 		int nID = 0;
@@ -1006,6 +2183,9 @@ void CScanDlg::AddComDeviceToGrid(vector<_ComDeviceInfo*>& szList)
 		m_flexGrid.put_TextMatrix(i+nSize,SCAN_TABLE_COMPORT,strPort); 
 		//// protocol
 		CString strProtocol;		
+		if(pDevInfo->m_pDev->GetProtocol() == 2)
+		strProtocol.Format(_T("Bacnet MSTP"));
+			else
 		strProtocol.Format(_T("Modbus 485"));
 		m_flexGrid.put_TextMatrix(i+nSize,SCAN_TABLE_PROTOCOL,strProtocol); 
 		//// 
@@ -1024,7 +2204,7 @@ CTStatBase* CScanDlg::FindDeviceByRowNum( int nRow )
 	int nRows = m_flexGrid.get_Rows();
 
 	CString strSID = m_flexGrid.get_TextMatrix(nRow, SCAN_TABLE_SERIALID);
-	int nSID = _wtoi(strSID);
+	unsigned int nSID = _wtoi64(strSID);
 
 
 	for (UINT i = 0 ; i < m_pScanner->m_szTstatScandRet.size(); i++)
@@ -1053,11 +2233,10 @@ CTStatBase* CScanDlg::FindDeviceByRowNum( int nRow )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // below the code disposed
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CScanDlg::OnBnClickedButtonScanall()
-{
-//	DoScanAllDevice();
-}
 
+
+
+ 
 void CScanDlg::OnBnClickedButtonAuto()
 {
 	//AutoFixComConflict();
@@ -1069,3 +2248,16 @@ void CScanDlg::OnBnClickedButtonManual()
 //	AfxMessageBox(_T("111"), MB_OK);
 }
 
+
+
+void CScanDlg::OnEnKillfocusEditGridedit()
+{
+  if (m_curcol==9)
+  {
+	  CString strValue;
+	  m_editGrid.GetWindowText(strValue);
+	  m_flexGrid.put_TextMatrix(m_currow,m_curcol,strValue);
+	  m_editGrid.ShowWindow(SW_HIDE);
+  }
+
+}

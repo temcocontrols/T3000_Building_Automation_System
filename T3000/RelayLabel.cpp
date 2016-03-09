@@ -6,7 +6,8 @@
 #include "RelayLabel.h"
 #include "globle_function.h"
 #include "global_variable_extern.h"
-
+#include "ado/ADO.h"
+#include "bado/BADO.h"
 
 // CRelayLabel
 
@@ -67,31 +68,89 @@ void CRelayLabel::OnPaint()
 	dc.DrawText(m_strValueText,&rcClient,DT_CENTER|DT_VCENTER|DT_SINGLELINE);
 
 }
+void CRelayLabel::SetLabelInfo_General(int ndeviceid,int type,int nStatus,COLORREF textClr,COLORREF bkClr)
+{
+	m_bkClr = bkClr;
+	m_bTxtClr = textClr;
+	if(type == 0)
+	{
+		DispalyInputValue_General(nStatus,textClr,bkClr);
+	}
+	else if(type == 1)
+	{
+		DispalyOutputValue_General(nStatus,textClr,bkClr);
+	}
+	else if(type == 2)
+	{
+		DispalyVariableValue_General(nStatus,textClr,bkClr);
+	}
+}
 
-void CRelayLabel:: SetLabelInfo(int TstatID,int input_or_output,int nStatus,COLORREF textClr,COLORREF bkClr)
+void CRelayLabel:: SetLabelInfo(int TstatID,int input_or_output,int nItem,COLORREF textClr,COLORREF bkClr)
 {
 	m_bkClr=bkClr;
 	m_bTxtClr=textClr;
 	if(input_or_output==0)//input
 	{
-		DispalyInputValue(nStatus,textClr,bkClr);
+		DispalyInputValue(nItem,textClr,bkClr);
 	}
 	if(input_or_output==1)//output
 	{
-		DispalyOutputValue(nStatus,textClr,bkClr);
+		DispalyOutputValue(nItem,textClr,bkClr);
 
 	}
 	if(input_or_output==2)//customed
 	{
-		DispalyRigesterValue(nStatus,textClr,bkClr);
+		DispalyRigesterValue(nItem,textClr,bkClr);
 
 	}
+}
+
+void CRelayLabel::DispalyInputValue_General(int nStatus,COLORREF textClr,COLORREF bkClr)
+{
+	//m_Input_data.at(nStatus - 1)
+		CString temp_unite;
+		CString temp_value;
+		int i = nStatus ;
+
+		if(m_Input_data.at(i).digital_analog == BAC_UNITS_ANALOG)
+		{
+			temp_unite = Input_List_Analog_Units[m_Input_data.at(i).range];		
+			temp_value.Format(_T("%d"),m_Input_data.at(i).value / 1000);
+			m_strValueText = temp_value + _T(" ") + temp_unite;
+		}
+		else if(m_Input_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+		{
+			CString Show_Digital;
+			if((m_Input_data.at(i).range>22) || (m_Input_data.at(i).range == 0))
+			{
+				Show_Digital = Digital_Units_Array[0];
+			}
+			else
+			{
+				CString temp1;
+				CStringArray temparray;
+
+				temp1 = Digital_Units_Array[m_Input_data.at(i).range];
+				SplitCStringA(temparray,temp1,_T("/"));
+				if((temparray.GetSize()==2))
+				{
+					if(m_Input_data.at(i).control == 0)
+						Show_Digital = temparray.GetAt(0);
+					else
+						Show_Digital = temparray.GetAt(1);
+				}
+			}
+			m_strValueText = Show_Digital;
+		}
+
+		
 }
 
 void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 {
 
-	int nModel=multi_register_value[MODBUS_PRODUCT_MODEL];
+	int nModel=product_register_value[MODBUS_PRODUCT_MODEL];
 	CString strUnit=GetTempUnit();
 	CString strTemp;
 	strTemp.Empty();
@@ -99,13 +158,12 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 	{
 		
 	
-		strTemp.Format(_T("%.1f"),multi_register_value[101]/10.0);
+		strTemp.Format(_T("%.1f"),product_register_value[101]/10.0);
 		strTemp=strTemp+strUnit;
 
 		if(nStatus==0)
 		{
-			//m_Input_Grid.put_TextMatrix(1,1,strTemp);
-			//this->SetWindowText(strTemp);
+			
 			m_strValueText=strTemp;	
 	
 			return;
@@ -115,27 +173,78 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 		if(nStatus==1)
 		{
 			strTemp.Empty();
-			if(multi_register_value[188]==4||multi_register_value[188]==1)
+			if(product_register_value[MODBUS_ANALOG_IN1]==4||product_register_value[MODBUS_ANALOG_IN1]==1)
 			{
-				strTemp.Format(_T("%.1f"),(float)multi_register_value[180]/10);
+				strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_0]/10);
 				strTemp=strTemp+strUnit;
 			}
-			if (multi_register_value[188]==0||multi_register_value[188]==2)
+			if (product_register_value[MODBUS_ANALOG_IN1]==0||product_register_value[MODBUS_ANALOG_IN1]==2)
 			{
-				strTemp.Format(_T("%d"),multi_register_value[180]);
+				strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_0]);
 			}
-			if(multi_register_value[188]==3)
+			if((product_register_value[MODBUS_ANALOG_IN1]==3)||(product_register_value[MODBUS_ANALOG_IN1]==5))
 			{
-				if(multi_register_value[180]==1)
+				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==1)
 					strTemp=_T("On");
-				if(multi_register_value[180]==0)
+				if(product_register_value[MODBUS_EXTERNAL_SENSOR_0]==0)
 					strTemp=_T("Off");
 			}
-			//SetWindowText(strTemp);
 			m_strValueText=strTemp;	
 			return;
-			
+		}
+		if (nStatus==2)
+		{
+			strTemp.Empty();
+			if(product_register_value[MODBUS_ANALOG_IN2]==4||product_register_value[MODBUS_ANALOG_IN2]==1)
+			{
+				strTemp.Format(_T("%.1f"),(float)product_register_value[MODBUS_EXTERNAL_SENSOR_1]/10);
+				strTemp=strTemp+strUnit;
+			}
+			if (product_register_value[MODBUS_ANALOG_IN2]==0||product_register_value[MODBUS_ANALOG_IN2]==2)
+			{
+				strTemp.Format(_T("%d"),product_register_value[MODBUS_EXTERNAL_SENSOR_1]);
+			}
+			if((product_register_value[MODBUS_ANALOG_IN2]==3)||(product_register_value[MODBUS_ANALOG_IN2]==5))
+			{
+				if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==1)
+					strTemp=_T("On");
+				if(product_register_value[MODBUS_EXTERNAL_SENSOR_1]==0)
+					strTemp=_T("Off");
+			}
+			m_strValueText=strTemp;	
+			return;
+		}
+		if (nStatus==3)
+		{
+			if (product_register_value[MODBUS_DIGITAL_IN1]==0)//190
+			{
+				 
+				if (product_register_value[311]==1)
+				{
+					strTemp=_T("On");
+				}
+				else
+				{
+					strTemp=_T("Off");
+				}
 
+
+			}
+			if (product_register_value[MODBUS_DIGITAL_IN1]==1)//190
+			{
+				 
+				if (product_register_value[311]==0)
+				{
+					strTemp=_T("Off");
+
+				}else
+				{
+					strTemp=_T("On");
+				}
+
+			}
+			m_strValueText=strTemp;	
+			return;
 		}
 		
 	}
@@ -147,20 +256,20 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 		if(nStatus==2)//input 3
 		{
 			strTemp.Empty();
-			if(multi_register_value[189]==4||multi_register_value[189]==1)
+			if(product_register_value[189]==4||product_register_value[189]==1)
 			{
-				strTemp.Format(_T("%.1f"),(float)multi_register_value[181]/10);	
+				strTemp.Format(_T("%.1f"),(float)product_register_value[181]/10);	
 				strTemp=strTemp+strUnit;
 			}
-			if (multi_register_value[189]==0||multi_register_value[189]==2)
+			if (product_register_value[189]==0||product_register_value[189]==2)
 			{
-				strTemp.Format(_T("%d"),multi_register_value[181]);
+				strTemp.Format(_T("%d"),product_register_value[181]);
 			}
-			if(multi_register_value[189]==3)
+			if(product_register_value[189]==3)
 			{
-				if(multi_register_value[181]==1)
+				if(product_register_value[181]==1)
 					strTemp=_T("On");
-				if(multi_register_value[181]==0)
+				if(product_register_value[181]==0)
 					strTemp=_T("Off");
 			}	
 			//SetWindowText(strTemp);
@@ -172,9 +281,9 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 		if(nStatus==3)
 		{
 			strTemp.Empty();
-			if (multi_register_value[190]==0)
+			if (product_register_value[190]==0)
 			{
-				if (multi_register_value[311]==0)
+				if (product_register_value[311]==0)
 				{
 					strTemp=_T("Off");
 				}else
@@ -182,9 +291,9 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 					strTemp=_T("On");
 				}
 			}
-			if (multi_register_value[190]==1)
+			if (product_register_value[190]==1)
 			{
-				if (multi_register_value[311]==1)
+				if (product_register_value[311]==1)
 				{
 					strTemp=_T("Off");
 
@@ -201,10 +310,8 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 		
 		
 	}
-	
-	
 
-	if(nModel==16)//E
+	if(nModel==16||nModel==PM_PM5E)//E
 	{
 		if(nStatus>=0&&nStatus<8)
 		{	strTemp.Empty();
@@ -212,14 +319,14 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 			{
 				int nValue;
 			
-				if(multi_register_value[359+nStatus]==1)
+				if(product_register_value[359+nStatus]==1)
 				{
-					nValue=multi_register_value[367+nStatus]/10.0;
+					nValue=(int)(product_register_value[367+nStatus]/10.0);
 					strTemp.Format(_T("%.1f"),nValue);
 				}
 				else
 				{
-					strTemp.Format(_T("%d"),multi_register_value[367+nStatus]);
+					strTemp.Format(_T("%d"),product_register_value[367+nStatus]);
 				}
 				m_strValueText=strTemp;	
 				return;
@@ -228,14 +335,14 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 			else
 			{
 				int nValue;
-				if(multi_register_value[341+nStatus]==1)
+				if(product_register_value[341+nStatus]==1)
 				{
-					nValue=multi_register_value[349+nStatus]/10.0;
+					nValue=(int)(product_register_value[349+nStatus]/10.0);
 					strTemp.Format(_T("%.1f"),nValue);
 				}
 				else
 				{
-					strTemp.Format(_T("%d"),multi_register_value[349+nStatus]);
+					strTemp.Format(_T("%d"),product_register_value[349+nStatus]);
 				}
 				m_strValueText=strTemp;	
 				return;
@@ -243,25 +350,224 @@ void CRelayLabel::DispalyInputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 		}
 		
 	}
-	/*
-	if(nModel==19)//H
+	
+	if (nModel==PM_TSTAT6||nModel==PM_TSTAT7||nModel==PM_TSTAT5i||(product_register_value[7] == PM_TSTAT8))
 	{
+	   if (nStatus==0)
+	   {
+		   CString strUnit=GetTempUnit();
+		   strTemp.Format(_T("%.1f"),product_register_value[MODBUS_TEMPRATURE_CHIP]/10.0);  //121
+		   m_strValueText=strTemp+strUnit;
+	   }
+	   else if (nStatus>=1&&nStatus<=8)
+	   {
+	      
+		  int  m_crange=0;
+		   int m_sn=m_sn=product_register_value[0]+product_register_value[1]*256+product_register_value[2]*256*256+product_register_value[3]*256*256*256;
+		   CBADO ado;
+		   ado.SetDBPath(g_strCurBuildingDatabasefilePath);
+		   ado.OnInitADOConn();
+		   if (ado.IsHaveTable(ado,_T("Value_Range")))//有Version表
+		   {
+			   CString sql;
+			   sql.Format(_T("Select * from Value_Range where CInputNo=%d and SN=%d"),nStatus,m_sn);
+			   ado.m_pRecordset=ado.OpenRecordset(sql);
+			   if (!ado.m_pRecordset->EndOfFile)//有表但是没有对应序列号的值
+			   {    
+				   ado.m_pRecordset->MoveFirst();
+				   while (!ado.m_pRecordset->EndOfFile)
+				   {
+					   m_crange=ado.m_pRecordset->GetCollect(_T("CRange"));
+					   ado.m_pRecordset->MoveNext();
+				   }
+				    
+			   } 
+			   else
+			   {
+				   m_crange=product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1];	//189
+				   
+			   }
+			   ado.CloseRecordset();
+		   }
+		   else
+		   {
+			   m_crange=product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1];
+		   }
+		   ado.CloseConn();
+
+		    CString strValueUnit=GetTempUnit(product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1], 1);
+		   int nValue;
+		   float fValue;
+		   if(product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1]==1)	//359  122
+		   {				
+			   fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1]/10.0);	//367   131
+			   strTemp.Format(_T("%.1f"),fValue);	
+
+			   strTemp +=strValueUnit;
+		   }
+		   else if(product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1]==3 || product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1]==5) // On/Off or Off/On ==1 On ==0 Off   359  122
+		   {						
+			   if (m_crange==9||m_crange==10)
+			   {
+				   int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1]); //367  131
+				   if (nValue == 0)
+				   {
+					   strTemp = _T("Closed");
+				   }
+				   else
+				   {
+					   strTemp = _T("Open");
+				   }	
+			   }
+			   else if (m_crange==7||m_crange==8)
+			   {
+
+				   int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1]); //367  131
+				   if (nValue == 0)
+				   {
+					   strTemp = _T("Unoccupied");
+				   }
+				   else
+				   {
+					   strTemp = _T("Occupied");
+				   }	
+
+			   }
+			   else
+			   {
+
+				   int nValue=(product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1]); //367  131
+				   if (nValue == 0)
+				   {
+					   strTemp = _T("Off");
+				   }
+				   else
+				   {
+					   strTemp = _T("On");
+				   }	
+
+			   }					
+		   }
+		   else if (product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1]==4 )  // custom sensor	359 122
+		   {					
+			   fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1]/10.0);	//367  131
+			   strTemp.Format(_T("%.1f"), (float)fValue/10.0);	
+			   strTemp +=strValueUnit;
+		   }
+		   else if(product_register_value[MODBUS_ANALOG1_RANGE+nStatus-1]==2)	//359 122
+		   {
+			   nValue=product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1];		//367  131
+			   strTemp.Format(_T("%0.1f%%"),  (float)nValue);
+		   }
+		   else
+		   {
+			   strTemp.Format(_T("%d"),product_register_value[MODBUS_ANALOG_INPUT1+nStatus-1]);//lsc
+		   }	
+           m_strValueText=strTemp;
+	   }
+	   else if (nStatus==9)
+	   {
+	      
+		   if((product_register_value[20]&2)==2)
+		   {
+			   if (product_register_value[MODBUS_TSTAT6_HUM_AM]==0)
+			   {
+				   strTemp.Format(_T("%0.1f%%"),(float)product_register_value[MODBUS_TSTAT6_HUM_AVALUE]/10.0);    
+			   }
+			   else
+			   {
+				   strTemp.Format(_T("%0.1f%%"),(float)product_register_value[MODBUS_TSTAT6_HUM_MVALUE]/10);
+			   }
+		   }
+		   else
+		   {
+			   strTemp=_T("NULL");
+		   }
+		   m_strValueText=strTemp;
+	   }
+	   else if (nStatus==10)
+	   {
+		   if((product_register_value[20]&4)==4)
+		   {
+			   if (product_register_value[MODBUS_TSTAT6_CO2_AM]==0)
+			   {    
+			    strUnit=_T("ppm");
+			   
+			   strTemp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_AVALUE]);
+			   strTemp+=strUnit;
+			   
+			   }
+			   else
+			   {
+				   
+				   strTemp.Format(_T("%d"),product_register_value[MODBUS_TSTAT6_CO2_MVALUE]);
+				   strTemp+=strUnit;
+				   
+			   }
+			   
+		   }
+		   else
+		   {
+			   strTemp=_T("NULL");  
+		   }
+
+		   	m_strValueText=strTemp;
+	   }
+	  
 
 	}
-	*/
-//	ReleaseDC(pDC);
+}
+
+void CRelayLabel::DispalyOutputValue_General(int nStatus,COLORREF textClr,COLORREF bkClr)
+{
+	CString temp_unite;
+	CString temp_value;
+	int i = nStatus ;
+
+	if(m_Output_data.at(i).digital_analog == BAC_UNITS_ANALOG)
+	{
+		temp_unite = OutPut_List_Analog_Units[m_Output_data.at(i).range];
+		temp_value.Format(_T("%d"),m_Output_data.at(i).value / 1000);
+		m_strValueText = temp_value + _T(" ") + temp_unite;
+	}
+	else if(m_Output_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+	{
+		CString Show_Digital;
+		if((m_Output_data.at(i).range>22) || (m_Output_data.at(i).range == 0))
+		{
+			Show_Digital = Digital_Units_Array[0];
+		}
+		else
+		{
+			CString temp1;
+			CStringArray temparray;
+
+			temp1 = Digital_Units_Array[m_Output_data.at(i).range];
+			SplitCStringA(temparray,temp1,_T("/"));
+			if((temparray.GetSize()==2))
+			{
+				if(m_Output_data.at(i).control == 0)
+					Show_Digital =temparray.GetAt(0);
+				else
+					Show_Digital =temparray.GetAt(1);
+			}
+		}
+
+		m_strValueText = Show_Digital;
+	}
+	
 }
 
 void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 {
-	int nModel=multi_register_value[MODBUS_PRODUCT_MODEL];
+	int nModel=product_register_value[MODBUS_PRODUCT_MODEL];
 	CString strTemp;
-	int itemp=multi_register_value[108];
+	int itemp=product_register_value[108];
 
 	//==========================================================================
 	//ABCDEFG,noH
 
-	if(nModel==2||nModel==1||nModel==4||nModel==12||nModel==16||nModel==17||nModel==18||nModel==3)
+	if(nModel==2||nModel==1||nModel==4||nModel==12||nModel==16||nModel==PM_PM5E||nModel==17||nModel==18||nModel==3)
 	{
 		for(int i=1;i<=3;i++)
 		{
@@ -283,7 +589,7 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 
 	////----------------------------------------------------------------------
 	//4,5
-	if(nModel==1||nModel==4||nModel==12||nModel==16)//B,C,D,E
+	if(nModel==1||nModel==4||nModel==12||nModel==16||nModel==PM_PM5E)//B,C,D,E
 	{
 		if(nStatus==3)
 		{
@@ -310,14 +616,14 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 	}
 
 		//:DEG 6. 7
-		int nRange=multi_register_value[186];
-		if(nModel==12||nModel==16||nModel==18)
+		int nRange=product_register_value[186];
+		if(nModel==12||nModel==16||nModel==PM_PM5E||nModel==18)
 		{
 			if(nStatus==5)
 			{
 				if(nRange==0)
 				{
-					itemp=multi_register_value[102];
+					itemp=product_register_value[102];
 					if(itemp==0)
 						strTemp=_T("Off");
 					if(itemp==1)
@@ -325,25 +631,25 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 				}
 				else
 				{
-					//strTemp.Format(_T("%.1f"),multi_register_value[102]/100.0);
-						//strTemp.Format(_T("%.1f"),multi_register_value[102]/100.0);
+					//strTemp.Format(_T("%.1f"),product_register_value[102]/100.0);
+						//strTemp.Format(_T("%.1f"),product_register_value[102]/100.0);
 					float nvalue=0.0;
 					if(nRange==1)//0-10v
 					{
-						//nvalue=multi_register_value[102]/100 /10.0 * 100%;
-						nvalue=multi_register_value[102]/10.0;
+						//nvalue=product_register_value[102]/100 /10.0 * 100%;
+						nvalue=(float)(product_register_value[102]/10.0);
 					}
 					if(nRange==2)//0-5v
 					{
-						nvalue=multi_register_value[102]/5.0;
+						nvalue=(float)(product_register_value[102]/5.0);
 					}
 					if(nRange==3)//2-10v
 					{
-						nvalue=multi_register_value[102]/8.0;
+						nvalue=(float)(product_register_value[102]/8.0);
 					}
 					if(nRange==4)//10-0v
 					{
-						nvalue=(10-multi_register_value[102]/100.0)/10.0 *100;
+						nvalue=(float)((10-product_register_value[102]/100.0)/10.0 *100);
 					}
 					strTemp.Format(_T("%.1f%%"),nvalue);
 				}
@@ -353,10 +659,10 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 			
 			if(nStatus==6)
 			{
-				nRange=multi_register_value[187];
+				nRange=product_register_value[187];
 				if(nRange==0)
 				{
-					itemp=multi_register_value[103];
+					itemp=product_register_value[103];
 					if(itemp==0)
 						strTemp=_T("Off");
 					if(itemp==1)
@@ -364,24 +670,24 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 				}
 				else
 				{
-					//strTemp.Format(_T("%.1f"),multi_register_value[103]/100.0);
+					//strTemp.Format(_T("%.1f"),product_register_value[103]/100.0);
 						float nvalue=0.0;
 						if(nRange==1)//0-10v
 						{
-							//nvalue=multi_register_value[102]/100 /10.0 * 100%;
-							nvalue=multi_register_value[103]/10.0;
+							//nvalue=product_register_value[102]/100 /10.0 * 100%;
+							nvalue=(float)(product_register_value[103]/10.0);
 						}
 						if(nRange==2)//0-5v
 						{
-							nvalue=multi_register_value[103]/5.0;
+							nvalue=(float)(product_register_value[103]/5.0);
 						}
 						if(nRange==3)//2-10v
 						{
-							nvalue=multi_register_value[103]/8.0;
+							nvalue=(float)(product_register_value[103]/8.0);
 						}
 						if(nRange==4)//10-0v
 						{
-							nvalue=(10-multi_register_value[103]/100.0)/10.0 *100;
+							nvalue=(float)((10-product_register_value[103]/100.0)/10.0 *100);
 						}
 						strTemp.Format(_T("%.1f%%"),nvalue);
 
@@ -398,10 +704,10 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 		{
 			if(nStatus==3)
 			{
-				nRange=multi_register_value[186];
+				nRange=product_register_value[186];
 				if(nRange==0)
 				{
-					itemp=multi_register_value[102];
+					itemp=product_register_value[102];
 					if(itemp==0)
 						strTemp=_T("Off");
 					if(itemp==1)
@@ -409,25 +715,25 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 				}
 				else
 				{
-					//strTemp.Format(_T("%.1f"),multi_register_value[102]/100.0);
-						//strTemp.Format(_T("%.1f"),multi_register_value[102]/100.0);
+					//strTemp.Format(_T("%.1f"),product_register_value[102]/100.0);
+						//strTemp.Format(_T("%.1f"),product_register_value[102]/100.0);
 					float nvalue=0.0;
 					if(nRange==1)//0-10v
 					{
-						//nvalue=multi_register_value[102]/100 /10.0 * 100%;
-						nvalue=multi_register_value[102]/10.0;
+						//nvalue=product_register_value[102]/100 /10.0 * 100%;
+						nvalue=(float)(product_register_value[102]/10.0);
 					}
 					if(nRange==2)//0-5v
 					{
-						nvalue=multi_register_value[102]/5.0;
+						nvalue=(float)(product_register_value[102]/5.0);
 					}
 					if(nRange==3)//2-10v
 					{
-						nvalue=multi_register_value[102]/8.0;
+						nvalue=(float)(product_register_value[102]/8.0);
 					}
 					if(nRange==4)//10-0v
 					{
-						nvalue=(10-multi_register_value[102]/100.0)/10.0 *100;
+						nvalue=(float)((10-product_register_value[102]/100.0)/10.0 *100);
 					}
 					strTemp.Format(_T("%.1f%%"),nvalue);
 				
@@ -438,10 +744,10 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 		
 			if(nStatus==4)
 			{
-				nRange=multi_register_value[187];
+				nRange=product_register_value[187];
 				if(nRange==0)
 				{
-					itemp=multi_register_value[103];
+					itemp=product_register_value[103];
 					if(itemp==0)
 						strTemp=_T("Off");
 					if(itemp==1)
@@ -449,24 +755,24 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 				}
 				else
 				{
-					//strTemp.Format(_T("%.1f"),multi_register_value[103]/100.0);
+					//strTemp.Format(_T("%.1f"),product_register_value[103]/100.0);
 						float nvalue=0.0;
 					if(nRange==1)//0-10v
 					{
-						//nvalue=multi_register_value[102]/100 /10.0 * 100%;
-						nvalue=multi_register_value[103]/10.0;
+						//nvalue=product_register_value[102]/100 /10.0 * 100%;
+						nvalue=(float)(product_register_value[103]/10.0);
 					}
 					if(nRange==2)//0-5v
 					{
-						nvalue=multi_register_value[103]/5.0;
+						nvalue=(float)(product_register_value[103]/5.0);
 					}
 					if(nRange==3)//2-10v
 					{
-						nvalue=multi_register_value[103]/8.0;
+						nvalue=(float)(product_register_value[103]/8.0);
 					}
 					if(nRange==4)//10-0v
 					{
-						nvalue=(10-multi_register_value[103]/100.0)/10.0 *100;
+						nvalue=(float)((10-product_register_value[103]/100.0)/10.0 *100);
 					}
 					strTemp.Format(_T("%.1f%%"),nvalue);
 				}
@@ -480,8 +786,8 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 		{
 			if(nStatus==3)
 			{
-				int itemp=multi_register_value[108];
-				if(multi_register_value[283]==0)
+				int itemp=product_register_value[108];
+				if(product_register_value[283]==0)
 				{
 					if(itemp &( 1<<3))
 							strTemp=_T("On");
@@ -491,7 +797,7 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 				}
 				else
 				{
-					strTemp.Format(_T("%d%%"),multi_register_value[348]);
+					strTemp.Format(_T("%d%%"),product_register_value[348]);
 
 				}
 				m_strValueText=strTemp;		
@@ -501,8 +807,8 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 
 			if(nStatus==4)
 			{
-				int itemp=multi_register_value[108];
-				if(multi_register_value[284]==0)
+				int itemp=product_register_value[108];
+				if(product_register_value[284]==0)
 				{
 					if(itemp &( 1<<4))
 							strTemp=_T("On");
@@ -512,7 +818,7 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 				}
 				else
 				{
-					strTemp.Format(_T("%d%%"),multi_register_value[349]);
+					strTemp.Format(_T("%d%%"),product_register_value[349]);
 
 				}
 				m_strValueText=strTemp;		
@@ -547,6 +853,66 @@ void CRelayLabel::DispalyOutputValue(int nStatus,COLORREF textClr,COLORREF bkClr
 	*/
 
 }
+
+void CRelayLabel::DispalyVariableValue_General(int nStatus,COLORREF textClr,COLORREF bkClr)
+{
+	CString temp_unite;
+	CString temp_value;
+	int i = nStatus ;
+	CString temp1;
+	if(m_Variable_data.at(i).digital_analog == BAC_UNITS_DIGITAL)
+	{
+
+		if((m_Variable_data.at(i).range>22) || (m_Variable_data.at(i).range == 0))
+		{
+			temp1 = Digital_Units_Array[0];
+		}
+		else
+		{	
+			CStringArray temparray;
+
+			temp1 = Digital_Units_Array[m_Variable_data.at(i).range];
+			SplitCStringA(temparray,temp1,_T("/"));
+			if((temparray.GetSize()==2))
+			{
+				if(m_Variable_data.at(i).control == 0)
+					temp1 = temparray.GetAt(0);
+				else
+					temp1 = temparray.GetAt(1);
+			}
+
+		}
+		m_strValueText = temp1;
+	}
+	else
+	{
+		if(m_Variable_data.at(i).range == 20)	//如果是时间;
+		{
+			//m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
+			char temp_char[50];
+			int time_seconds = m_Variable_data.at(i).value / 1000;
+			intervaltotext(temp_char,time_seconds,0,0);
+			CString temp_11;
+			MultiByteToWideChar( CP_ACP, 0, temp_char, strlen(temp_char) + 1, 
+				temp_11.GetBuffer(MAX_PATH), MAX_PATH );
+			temp_11.ReleaseBuffer();		
+			//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_11);
+			temp_value = temp_11;
+			//temp_value.Format(_T("%d"),m_Variable_data.at(i).value);
+			//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_value);
+		}
+		else if(m_Variable_data.at(i).range<=sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))
+		{
+			//m_variable_list.SetItemText(i,VARIABLE_UNITE,Variable_Analog_Units_Array[m_Variable_data.at(i).range]);
+			temp_unite = Variable_Analog_Units_Array[m_Variable_data.at(i).range];
+			temp_value.Format(_T("%d"),m_Variable_data.at(i).value / 1000);
+			//m_variable_list.SetItemText(i,VARIABLE_VALUE,temp_value);
+		}
+		m_strValueText = temp_value + _T(" ") + temp_unite;
+	}
+		
+}
+
 void CRelayLabel::DispalyRigesterValue(int nStatus,COLORREF textClr,COLORREF bkClr)
 {
 	//nStatus is rigister;
@@ -555,7 +921,7 @@ void CRelayLabel::DispalyRigesterValue(int nStatus,COLORREF textClr,COLORREF bkC
 
 	
 	CString strTemp;
-	strTemp.Format(_T("%d"),multi_register_value[nStatus]);
+	strTemp.Format(_T("%d"),product_register_value[nStatus]);
 	m_strValueText=strTemp;	
 
 }

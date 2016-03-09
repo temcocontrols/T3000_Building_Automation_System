@@ -94,6 +94,16 @@ void CTStat_Net::SetIPAddr(char* szIPAddr)
 	m_dwIPAddr = inet_addr(szIPAddr);
 }
 
+int CTStat_Net::GetProtocol() const
+{
+	return m_nprotocol;
+}
+void CTStat_Net::SetProtocol(int nProtocol)
+{
+	m_nprotocol = nProtocol;
+}
+
+
 // void CTStat_Net::SetIPAddr(const CString& strIPAddr)
 // {
 // 	
@@ -120,7 +130,12 @@ void CTStat_Net::SetBaudRate(int nBaudRate)
 	m_nBaudRate = nBaudRate;
 }
 
-
+void CTStat_Net::SetNetworkCardAddress(CString networkcardAddress){
+NetworkCard_Address=networkcardAddress;
+}
+CString CTStat_Net::GetNetworkCardAddress(){
+return NetworkCard_Address;
+}
 //----------------------------------------------------------------
 // 以下两个才需要去读写寄存器
 
@@ -163,7 +178,148 @@ CString CTStat_Net::GetProductName()
 	case PM_LightingController:
 		strProductName = "LC";
 		break;
-//20120424
+    case PM_CM5:
+	    strProductName="CM5_Ethernet";
+		break;
+	case PM_MINIPANEL:
+	    strProductName="MiniPanel";
+		break;
+    case PM_CO2_NET:
+        strProductName="CO2 Net";
+        break;
+	case PM_TSTATRUNAR:
+		strProductName="TStatRunar";
+		break;
+	case PM_CS_SM_AC:
+		strProductName="CS-SM-AC";
+		break;
+	case PM_CS_SM_DC:
+		strProductName="CS-SM-DC";
+		break;
+	case PM_CS_RSM_AC:
+		strProductName="CS-RSM-AC";
+		break;
+	case PM_CS_RSM_DC:
+		strProductName="CS-RSM-DC";
+		break;
+    case PM_T3PT10 :
+        strProductName="T3-PT10";
+        break;
+    case PM_T3IOA :
+        strProductName="T3-8O";
+        break;
+    case PM_T332AI :
+        strProductName="T3-32AI";
+        break;
+    case  PM_T38AI16O :
+        strProductName="T3-8AI160";
+        break;
+    case PM_T38I13O :
+        strProductName="T3-8I13O";
+        break;
+    case PM_T3PERFORMANCE :
+        strProductName="T3-Performance";
+        break;
+    case PM_T34AO :
+        strProductName="T3-4AO";
+        break;
+    case PM_T322AI:
+        strProductName="T3-22I";
+        break;
+    case PM_T38AI8AO6DO:
+        strProductName="T3-8AI8AO6DO";
+        break;
+    case PM_T36CT :
+        strProductName="T3-6CT";
+        break;
+   
+    case PM_AirQuality:
+        strProductName="Air Quality";
+        break;
+    case PM_PRESSURE:
+        strProductName="Pressure Sensor";
+        break;
+    case PM_HUMTEMPSENSOR:
+        strProductName="TstatHUM";
+        break;
+    case PM_HUM_R:
+        strProductName="HUM-R";
+        break;
+    case PM_TSTAT5A:
+        strProductName="TStat5A";
+        break;
+    case PM_TSTAT5B:
+        strProductName="TStat5B";
+        break;
+    case PM_TSTAT5B2:
+        strProductName="TStat5B2";
+        break;
+    case PM_TSTAT5C:
+        strProductName="TStat5C";
+        break;
+    case PM_TSTAT5D:
+        strProductName="TStat5D";
+        break;
+    case PM_TSTAT5E:
+        strProductName="TStat5E";
+        break;
+    case PM_PM5E:
+        strProductName="PM5E";
+        break;
+   
+    case PM_TSTAT5F:
+        strProductName="TStat5F";
+        break;
+    case PM_TSTAT5G:
+        strProductName="TStat5G";
+        break;
+    case PM_TSTAT5H:
+        strProductName="TStat5H";
+        break;
+    case PM_TSTAT6:
+        strProductName="TStat6";
+        break;
+    case PM_TSTAT5i:
+        strProductName="TStat5i";
+        break;
+    case PM_TSTAT8:
+        strProductName="TStat8";
+        break;
+    case PM_TSTAT7:
+        strProductName="TStat7";
+        break;
+ 
+ 
+        //20120424
+  
+   
+    case  PM_CO2_RS485:
+        strProductName = "CO2";
+        break;
+    case  PM_PRESSURE_SENSOR:
+        strProductName = "Pressure";
+        break;
+
+    case  PM_CO2_NODE:
+        strProductName = "CO2 Node";
+        break;
+    case PM_TSTAT6_HUM_Chamber:
+        strProductName =g_strHumChamber;
+        break;
+
+   
+ 
+   
+   
+ 
+ 
+ 
+ 
+ 
+  
+  
+ 
+    
 	default:
 		strProductName="WIFI";
 
@@ -175,9 +331,23 @@ CString CTStat_Net::GetProductName()
 	strID.Format(_T("%u"), m_dwSerialID);//20120424  //scan 系列号总多出l
 
 	CString strDevID;
-	strDevID.Format(_T("%d"), m_nDevID);
+	//if(m_nprotocol == PROTOCOL_BACNET_IP)//如果是bacnet ip
+	//{
+	//	strDevID.Format(_T("%d"), (int)m_fHardware_version);
+	//}
+	//else
+		strDevID.Format(_T("%d"), m_nDevID);
 
-	strProductName = strProductName+_T(":")+strID+_T("--")+strDevID;
+	CString temp_ipaddr;
+	temp_ipaddr = GetIPAddrStr();
+
+
+
+	strProductName = strProductName+_T(":")+strID+_T("-")+strDevID + _T("-") + temp_ipaddr  ;
+
+
+	//product_name = GetProductName(m_refresh_net_device_data.at(y).product_id);
+	//product_name = product_name + _T(":") + str_serialid + _T("-") + modbusid + _T("-") + str_ip_address;
 
 	return strProductName;
 

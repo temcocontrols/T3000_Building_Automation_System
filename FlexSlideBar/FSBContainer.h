@@ -95,7 +95,4 @@ private:
 
 	CFlexSlideWnd*      m_pFSWnd;
 	int m_sort;
-
-
-
 };

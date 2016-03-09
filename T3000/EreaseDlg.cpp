@@ -5,6 +5,8 @@
 #include "T3000.h"
 #include "EreaseDlg.h"
 #include "globle_function.h"
+#include "ado/ADO.h"
+#include "MainFrm.h"
 
 // CEreaseDlg dialog
 
@@ -30,7 +32,6 @@ void CEreaseDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CEreaseDlg, CDialog)
 	ON_BN_CLICKED(ID_MYOK, &CEreaseDlg::OnBnClickedMyOk)
 	ON_EN_KILLFOCUS(IDC_EDIT1, &CEreaseDlg::OnEnKillfocusEdit1)
-	ON_BN_CLICKED(IDCANCEL, &CEreaseDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 
@@ -39,27 +40,103 @@ END_MESSAGE_MAP()
 void CEreaseDlg::OnBnClickedMyOk()
 {
 	// TODO: Add your control notification handler code here
-	if(AfxMessageBox(_T("Are you sure to erease the config parameters?"))==IDOK)
-	{
-		if(write_one(m_nTstatID,16,143)>0)
-			AfxMessageBox(_T("Ereased successfully!"));
-	}
-	else
-	{
-		return;
-	}
+// 	if(AfxMessageBox(_T("Are you sure to erease the config parameters?"))==IDOK)
+// 	{
+    /*if(write_one(m_nTstatID,16,143)>0)
+    	AfxMessageBox(_T("Ereased successfully!"));*/
+        if (!is_connect ())
+        {
+
+             AfxMessageBox(_T("Please connect your device ,using modbus protocol!"));
+             return ;
+        }
+     int protocol = GetCommunicationType ();
+     Read_Multi (g_tstat_id,product_register_value,0,10);
+    int times=5;
+    CString newid;
+    GetDlgItem(IDC_EDIT1)->GetWindowText(newid);
+    int serialno=get_serialnumber();
+    int ID=_wtoi(newid);
+    if (newid!=g_tstat_id)
+    {
+        int ret=write_one(g_tstat_id,6,ID);
+        while (times>=0&&ret<0)
+        {
+            Sleep(1000);
+            ret=write_one(g_tstat_id,6,ID);
+            --times;
+        }
+
+        if (ret>0)
+        {
+            CBADO bado;
+            bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+            bado.OnInitADOConn();
+            CString sql;
+            sql.Format(_T("select * from ALL_NODE where Serial_ID='%d' "),serialno);
+            bado.m_pRecordset = bado.OpenRecordset(sql);
+            int Recount=bado.GetRecordCount(bado.m_pRecordset);
+            if (Recount<=0)
+            {
+                CString strTips;
+                strTips.Format(_T("Serial No=%d No Exsits!"),serialno);
+                AfxMessageBox(strTips);
+                return;
+            }
+            bado.m_pRecordset->MoveFirst();
+            while(!bado.m_pRecordset->EndOfFile)
+            {
+                CString prodcut_name,product_id,screen_name;
+                prodcut_name.Format(_T("%s:%d--%d"),GetProductName(product_register_value[7]),serialno,ID);
+                product_id.Format(_T("%d"),ID);
+                screen_name.Format(_T("Screen(S:%d--%d)"),serialno,ID);
+
+				  try 
+				  {
+					  bado.m_pRecordset->PutCollect("Product_name",(_bstr_t)(prodcut_name));
+					  bado.m_pRecordset->PutCollect("Product_ID",(_bstr_t)(product_id));
+					  bado.m_pRecordset->PutCollect("Screen_Name",(_bstr_t)(screen_name));
+					  bado.m_pRecordset->Update();
+					  bado.m_pRecordset->MoveNext();
+
+				  }
+				  catch(...)
+				  {
+
+
+				  }
+				  g_tstat_id=ID;
+
+				  CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+				  ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
+			  }
+			  bado.CloseRecordset();
+			  bado.CloseConn();
+			} 
+			else
+			{
+			AfxMessageBox(_T("Fail,Please try again!"));
+			return;
+			}
+			} 
+			else
+			{
+			AfxMessageBox(_T("The same ID ,you input!"));
+			}
+			
+
+// 	}
+// 	else
+// 	{
+// 		return;
+// 	}
 	
 	OnOK();
 }
 
 BOOL CEreaseDlg::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: Add your specialized code here and/or call the base class
-	if(pMsg->wParam == VK_RETURN )
-	{ 
-		GetDlgItem(ID_MYOK)->SetFocus();
-		return true; 
-	} 
+ 
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
@@ -89,16 +166,7 @@ BOOL CEreaseDlg::OnInitDialog()
 	strText.Format(_T("%d"),m_nTstatID);
 	m_tstatIDEdit.SetWindowText(strText);
 
-
 	// TODO:  Add extra initialization here
-
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
-}
-
-
-void CEreaseDlg::OnBnClickedCancel()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	CDialog::OnCancel();
 }

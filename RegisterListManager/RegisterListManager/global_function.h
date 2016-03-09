@@ -1,0 +1,1 @@
+CString GetExePath(bool bHasSlash);

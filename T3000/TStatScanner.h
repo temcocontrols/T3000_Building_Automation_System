@@ -15,6 +15,7 @@
 #include "TStat_Net.h"
 #include "MainFrm.h"
 
+
 #define WM_ADDTREENODE WM_USER + 2000
 
 struct _ComDeviceInfo
@@ -90,7 +91,11 @@ public:
  	// 搜索串口设备
  	BOOL ScanComDevice();
 
+	BOOL ScanRemoteIPDevice(); //扫描 远程设备;
+	BOOL ScanBacnetIPDevice();//扫描 bacnet IP 设备;
+	BOOL ScanBacnetMstpDevice(); //扫描Bacnet MSTP 设备;
 	void SetComPort(int nCom);
+	BOOL CheckTheSameSubnet(CString strIP);
 public:
 	// 释放资源
 	void		Release();
@@ -100,12 +105,14 @@ public:
 	void		background_binarysearch(int nComPort);
 	// bForTstat = TRUE : scan tstat, = FALSE : scan NC
 	void		binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254);
-	//void        SequenceSearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254);
+	// bForTstat = TRUE : scan tstat, = FALSE : scan  MINI Pannel
+	//void		MINI_binarySearchforComDevice(int nComPort, bool bForTStat, BYTE devLo=1, BYTE devHi=254,int NET_COM=1);
+	void        OneByOneSearchforComDevice(int nComPort, bool bForTStat=FALSE, BYTE devLo=1, BYTE devHi=254);
 	// 校验
 	BOOL		binary_search_crc(int a);
 	// 搜索NC的函数
 	int _ScanNCFunc();
-	
+	BOOL m_thesamesubnet;
 	// 获得计算机上的所有串口,返回串口数量
 	//int GetAllComPort();
 
@@ -140,7 +147,9 @@ public:
 	//  把一个tstat写到数据库里 All_Nodes表
 	void WriteOneDevInfoToDB( _ComDeviceInfo* pInfo);
 	void WriteOneNetInfoToDB( _NetDeviceInfo* pInfo);
-
+	/////////////////////////////////////////////////////////////////////////
+	void CompareNetToComConflict();
+	/////////////////////////////////////////////////////////////////////////
 	void GetBuildingName();
 
 	BOOL IsAllScanFinished();
@@ -159,20 +168,20 @@ public:
 	void SetSubnetInfo(vector<Building_info>& szSubnets);
 	void SetBaudRate(const CString& strBaudrate);
 	
-	// 手动搜索TStat，
-	void ScanTstatFromNCForManual();
+	 
 	void BinaryScanNCByComPort(BYTE devLo = 1, BYTE devHi = 254);
 	void ScanTstatFromNCForAuto();
 	void GetTstatInfoFromID(int nTstatID);
 
+	void Initial_Scan_Info();
 	void ScanAll();
-	void WaitScan();
-	//scan
+	void WaitScan();//scan
 	int  m_scantype;
 	void CombineScanResult();
 
 	void ShowNetScanInfo(const CString& strInfo);
 	void ShowComScanInfo(const CString& strInfo);
+	void ShowBacnetComScanInfo(const CString& strInfo);
 
 	void  ReadNCTable(_NetDeviceInfo* pNCInfo);
 	
@@ -191,25 +200,47 @@ public:
 	vector<_ComDeviceInfo*>		m_szTstatScandRet;
 	vector<_NetDeviceInfo*>		m_szNCScanRet;
 	vector<_NetDeviceInfo*>		m_szNCScanRet2; // NC find by com port
-
+	vector<CString>				m_bacnetComs;
 	vector<CString>				m_szComs;
 	CEvent*							m_eScanComEnd;
+	//CEvent*							m_eScanComOneByOneEnd;
 	CEvent*							m_eScanNCEnd;
+	
+
 	CEvent*							m_eScanOldNCEnd;
+	CEvent*						m_eScanBacnetIpEnd;
+	CEvent*						m_eScanRemoteIPEnd;
+	//CEvent*						m_eScanBacnetMstpEnd;
 
 	BOOL								m_bStopScan;					// 强制结束SCAN，由用户选择exit时，停止两个搜索线程
 	BOOL								m_bNetScanFinish;			// 网络scan完成
+	BOOL m_isChecksubnet;
+	BOOL m_bCheckSubnetFinish;
 	int									m_nBaudrate;
 	int									m_nComPort;
 	CWnd*							m_pParent;	
+	//CWinThread*					m_pScanBacnetMstpThread;
+	CWinThread*					m_pScanRemoteIPThread;
+	CWinThread*					m_pScanBacnetIPThread;
+	CWinThread*					m_pScanNCThread;
+	CWinThread*                  m_pCheckSubnetThread;
+	CWinThread*					m_pScanTstatThread;
+	//CWinThread*					m_pScanTstatOneByOneThread;
+	//CWinThread*					m_pWaitScanThread;
+	bool						m_com_scan_end;
 
+	CString						m_strBuildingName;
+	CString						m_strSubNet;
+	CString						m_strFloorName;
+	CString						m_strRoomName;
 protected:
 	BOOL								m_bComScanRunning;		// 是否是Com scan, TRUE = scan com, FALSE = scan net
 	int									m_ScannedNum;
 
-	CWinThread*					m_pScanNCThread;
-	CWinThread*					m_pScanTstatThread;
-	CWinThread*					m_pWaitScanThread;
+
+
+
+
 
 	//vector<int>						m_szRepeatedID;
 	int									m_szRepeatedID[255];				// 记录重复ID，下标表示现在的ID，内容表示老ID。如果出现重复，那么该下标内容不为0。
@@ -226,13 +257,10 @@ protected:
 	
 
 
-	CString						m_strBuildingName;
-	CString						m_strSubNet;
-	CString						m_strFloorName;
-	CString						m_strRoomName;
+
 	//BOOL							m_bAllScanFinish;	
-	_ConnectionPtr					t_pCon;
-	
+//	_ConnectionPtr					t_pCon;
+	CBADO bado;
 	vector<Building_info>		m_szSubnetsInfo;
 	CString m_ip;
 	CString m_port;

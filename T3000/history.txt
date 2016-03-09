@@ -1,0 +1,415 @@
+Ver 2013.26,date released:2013-12-2
+*************************************************************************************
+1>to finish "T3-8I13O"
+*************************************************************************************
+
+Ver 2013.25,date released:2013-11-28
+*************************************************************************************
+1>to add "Occupied/Unoccupied" into Input Range 
+2>to export these items "Input_Name,Range ,Function"
+3>to add "Led Table"
+4>to add "LC"
+5>to fix "CM5" Multi-Read error
+6>to fix "subscript out of range" 
+7>Can edit the name of T3-Module
+*************************************************************************************
+
+Ver 2013.24,date released:2013-11-8
+*************************************************************************************
+1>to support "Save as..." and "Load"the config file of T3-Modules
+2>to support "Save as..." and "Load"the config file of LC
+3>to fix the problem of NC's IP that T3000 can not change ip by comport. 
+*************************************************************************************
+
+Ver 2013.23,date released:2013-10-30
+*************************************************************************************
+1>to update "VAV" Function
+2>to add the "Transducer" to outputset
+3>to add "VAV" registers to config file
+*************************************************************************************
+
+Ver 2013.22,date released:2013-10-15
+*************************************************************************************
+1>to add "VAV" Function
+*************************************************************************************
+
+Ver 2013.21,date released:2013-9-25
+*************************************************************************************
+1>to fix and update Tstat5G
+2>to update MiniPanel
+3>to fix MBPoll 
+4>to rebuild the slider control
+*************************************************************************************
+
+
+Ver 2013.20,date released:2013-9-22
+*************************************************************************************
+1>to show NC's MAC Address
+2>Change ISPTool some tips
+"Hex file matches the chip. "
+"Hex file doesn¡¯t match the chip. "
+"Begin Time" -> Change to "Start time"
+*************************************************************************************
+
+Ver 2013.19,date released:2013-9-13
+*************************************************************************************
+1>Change Tstat5G the same as Tstat5E
+2>Fix "Setpoint Value can not write"
+3>Fix "Heating Set Point "in night sepoint for loop1 is 1/10 value
+4>Fix "Set Heating DB for Day setpoint for Loop1"
+5>Fix "Cooling ,Heating DB for Loop2 are not saved to disk"
+*************************************************************************************
+
+Ver 2013.18,date released:2013-9-6
+*************************************************************************************
+1>Updata PID2
+2>Add MiniPanel
+3>Update Humchamber
+4>Rebuild Cumstom Sensor Table
+*************************************************************************************
+
+Ver 2013.17,date released:2013-8-30
+*************************************************************************************
+1>Add Tstat subnet into NC .
+2>Update T3-Module (T3-32AI,T3-8I13O) 
+3>Support T3 serials products.
+For Bacnet:
+1.Add programming context,when user use bacnet to program code,if codes contains error,it will prompt the user which line occurs error.
+2.Add static text to show how many free memory the program has,and how many it has used.
+3.Add range choose dialog.
+4.Add "load descriptors" function like old T3000 do.(Read all date program needed,like "Programs" "Inputs" "Outputs" and so on)
+5.Add wait show dialog,to show the "load descriptors" progress step! 
+*************************************************************************************
+
+Ver2.6.0.16,date released:2013-8-7
+*************************************************************************************
+1>Add VC++ installation package to installation file.
+2>Update T3-Module (T3-4AO). 
+3>Support T3 serials products.
+4>Fix  "lcd rotate enable" Add "None" Reg 564
+5>Fix "Custom table" Read Error.
+*************************************************************************************
+
+Ver2.6.0.15,date released:2013-8-5
+*************************************************************************************
+1>Add the Custom input names fucntion to The main page
+2>fix the input2,3 "Customer sensor Table"
+*************************************************************************************
+
+Ver2.6.0.14,date released:2013-8-1
+*************************************************************************************
+<1>fix Output PID2 OFF VALVE TABLE
+<2>Add T3 To T3000
+<3>Add the function of flashing Serial no 
+*************************************************************************************
+
+Ver2.6.0.13,date released:2013-7-26
+*************************************************************************************
+<1>fix Output PID2 Auto /OFF  FAN/VALVE
+<2>Add BACnet to T3000
+<3>Add MBPoll to T3000
+<4>Fix Fan Speed in output table
+*************************************************************************************
+
+Ver2.6.0.12,date released:2013-7-26
+*************************************************************************************
+<1>fix Output PID2 Auto /OFF  FAN/VALVE
+<2>Add Schedule ON/OFF
+*************************************************************************************
+
+
+Ver2.6.0.11,date released:2013-7-15
+*************************************************************************************
+<1>fix the Schedule of Tstat6/7
+<2>Add "RegisterMonitor" [Tool->RegisterMonitor] to T3000
+<3>fix the config file 
+<4>Update CM5
+*************************************************************************************
+
+
+Ver2.6.0.10,date released:2013-6-25
+*************************************************************************************
+<1>Use Multi-write to config NC 
+*************************************************************************************
+
+Ver2.6.0.9,date released:2013-6-15
+*************************************************************************************
+<1>add scan method One ID by One ID  
+*************************************************************************************
+
+Ver2.6.0.8,date released:2013-6-7
+*************************************************************************************
+<1>Add log file ,when user scan the device 
+<2>fix some bugs tstat slide 
+*************************************************************************************
+
+Ver2.6.0.7,date released:2013-5-27
+*************************************************************************************
+<1>Add the feature that user can change the tree node name by Pressing F2  
+*************************************************************************************
+
+Ver2.6.0.6,date released:2013-5-27
+*************************************************************************************
+<1>Add PID2 Fan OFF For Tstat5 
+<2>Fix Tstat 6 slide  
+*************************************************************************************
+
+Ver2.6.0.5,date released:
+*************************************************************************************
+<1>fix the bug that user can't import his db file or create default t3000.mdb 
+*************************************************************************************
+
+Ver2.6.0.4,date released:2013-5-17
+*************************************************************************************
+<1>Add the "Filter" in the Input  
+<2>Add the "Hum" and "Co2" to the Input 
+*************************************************************************************
+
+Ver2.6.0.3,date released: 2013-5-16
+*************************************************************************************
+<1>Support Baud 9600 and 19200
+*************************************************************************************
+Ver2.6.0.2,date released:  2013-5-10
+*************************************************************************************
+<1>Add DisplayConfig For Tstat5E,Tstat6,Tstat7
+<2>the choice of Loop1,Loop2 is changed ,the Value of them will be changed.
+<3>let the data keep sync and fresh in the backgrand
+<4>fix some crashes when freshing the UI data.
+************************************************************************************* 
+Ver2.6.0.1,date released:  2013-5-6
+*************************************************************************************
+<1>Fix the error of missing some DLLs. MFC100U.dll and MSCR100.dll 
+
+Ver2.6.0.0,date released:  2013/4/19
+*************************************************************************************
+<1>fix a bug which the boud rate changed to 9600 accidentally.
+<2>Add T3000RegAddress. Changed the architecture of the register table.Create two register table in t3000.mdb which include all TSTAT product register list.The T3000.exe will load this value by runtime, instead of compiling.
+<3>Modify sevral error in ParameterDlg ,the changed can also support tstat6 and tstat7
+<4>Make the program run more smoothly when user click refresh in OutPutDlg and  InputSetDlg ,it will no longer appear noresponse.
+<5>Change InputTable set dialog .It can change the Input name and then save to DB.
+<6>Add HumChamber dialog.
+<7>Merge function  "Refresh" and "Refresh6" in ParameterDlg.
+<8>Change the global variable read tstat buffer size from 512 to 1024.
+
+Ver2.5.0.109,date released:  2013/2/27
+*************************************************************************************
+<1>User can be allowed to resize the col ,row of every Table
+<2>Output 4-5 can work in the model of  ON/OFF PWM ,can't change in the model of Float
+<3>Output 6-7 can work in the model of  0-10/0-5
+*************************************************************************************
+Ver2.5.0.108,date released:  2013/2/27
+*************************************************************************************
+<1>the size of hex file match with the chip memory 
+<2>Extend the input table size
+  
+*************************************************************************************
+Ver2.5.0.107,date released:  2013/2/25
+*************************************************************************************
+<1>Fix the output1-3
+<2>The attibute of "Fan Mode" is readonly in the first page,which keep pace with"Mode"
+(Advanced->Outputs Table)
+<3>Fix Tstat5E&&Tstat5G config File.
+<4>Fix Heating Stages and Cooling Stages in the  the Outputs Table 
+<5>Add The MAC Address In the Net Controler and Change the defalt Device name 
+   from "Tstat5A" to "UNUSED" 
+<6>Fix some bugs in config file and output table
+<7>check the config file data ,and the function of loading the value of the registers  
+*************************************************************************************
+
+ver2.5.0.106, date released: 2013/1/18
+*************************************************************************************
+<1>Fix the "Loop1"->output Value and "Loop2"->output ,make them Read-only
+<2>Fix the "Tstat5E" input/output table.
+<3>Change The Function of "Scan" 
+<4>Add the "Freeze Function" in the Advanced Setup
+<5>remove the column of Rotation in output table.
+<6>Fix "Save as.." the register list of The Tstat5E and 5C
+<7>¡°Database¡±, the Exit botton and Delete botton 
+<8>Fix the out table 
+<9>Change "NC Config"->"Apply" botton.
+<10> Change the setting of "Fan Model" 
+*************************************************************************************
+ver2.5.0.105, date released:2013/1/8
+*************************************************************************************
+<1>Fix the "Loop2"->Input Value Read-only
+*************************************************************************************
+ver2.5.0.104, date released: 2013/1/5 
+*************************************************************************************
+<1>Fix the error that input1 can input value, in the Advanced Model line "Input value" 
+<2>Add the reminder of PID2 Off Setpoint "Input value" 
+   if >=100 ¡°out of range¡± ,if can¡¯t fail to write to the 275 register ,
+   ¡±please try again.¡±If write sucessfully,¡±Write ok¡±
+<3>Keep the steps both Heating Set Point and the set Bars in the first page.
+ 
+*************************************************************************************
+
+ver2.5.0.103, date released:2012/12/11 
+*************************************************************************************
+<1>Merge ISPTool into T3000.
+<2>Add "Tool->ISPToolForOne"
+<3>Add "Tool->ISPToolForMany"
+<4>fix the errro: Can't get a correct the E2 chip size from Tstat.
+<5>Add .net4.0 component in install package.
+*************************************************************************************
+
+ver2.5.0.102, date released:2012/12/1 
+*************************************************************************************
+<1>Fix Tstat6/7 config file read /write error .
+<2>Be able to Load the correct config file
+<3>write to the value of register ,according to the config file.
+<4>support windows xp/vista/win7
+*************************************************************************************
+
+ver2.5.0.101, date released:2012/12/1
+*************************************************************************************
+<1>Fix the Error about 102,101 and so on .
+<2>Don't limit the T3000 client time of users.
+<3>Fix the About Dialog Time.can link to the website of www.temcocontrols.com
+<4>Fix the Error about "Contact Software Developer,Please!"
+*************************************************************************************
+
+ver2.5.0.100, date released:2012-11-20
+*************************************************************************************
+updated T3000 issue
+
+*************************************************************************************
+
+ver2.5.0.99, date released:2012-11-05
+*************************************************************************************
+(1)updated NC scan function
+(2)fix the Dialog 'Parameter' 
+(3)changed output6&7 function 
+*************************************************************************************
+
+ver2.5.0.98, date released:2012-10-30
+*************************************************************************************
+(1)updated NC scan function
+(2)fixt Dialog 'Parameter' 
+(3)changed output4&5 for PWM function 
+*************************************************************************************
+
+ver2.5.0.97, date released:2012-10-29
+*************************************************************************************
+(1)fixt schedule function 
+(2)fixt temperature slider for tstat5G
+*************************************************************************************
+
+ver2.5.0.96, date released:2012-10-25
+*************************************************************************************
+(1)updated  outputs function
+(2)fixt temperature slider
+*************************************************************************************
+
+ver2.5.0.95, date released:2012-10-19
+*************************************************************************************
+(1)updated all for PID2 in AUTO mode in off mode
+(2)fixt temperature slider
+
+*************************************************************************************
+
+ver2.5.0.94, date released:2012-10-17
+*************************************************************************************
+(1)updated all for PID2 in AUTO mode
+(2)fixt output4&5 functions in Output Table
+(3)update tstat6 for Humidity
+*************************************************************************************
+
+
+ver2.5.0.93, date released:2012-10-15
+*************************************************************************************
+(1)fixt Output Table-Out6&7 for PID2 
+(2)fixt slider control
+*************************************************************************************
+
+
+ver2.5.0.92, date released:2012-10-8
+*************************************************************************************
+(1)fixed "value for ¡°PID2 off set point¡± shows wrong and not auto updated"for TSTAT5G
+(2)fixed Output Table-Out6 and Out7 
+*************************************************************************************
+
+
+ver2.5.0.91, date released:2012-9-28
+
+*************************************************************************************
+(1)fixed "Output 4 and 5"
+(2)fixed PID.
+*************************************************************************************
+
+
+ver2.5.0.90, date released:2012-9-19
+
+*************************************************************************************
+(1)Add ISPTOOL(TOOl->ISPTOOL)
+(2)fixed Version History.
+*************************************************************************************
+
+
+ver2.5.0.89, date released:2012-9-14
+
+*************************************************************************************
+Update TSTAT5G
+Update item:
+(1)Input value¡± for Loop2.
+(2)fixed deadband and night setpoint.
+*************************************************************************************
+
+
+ver2.5.0.88, date released:2012-9-13
+
+*************************************************************************************
+Update TSTAT5E and Tstat6 
+Update item:
+(1)tstat6&7,Slider control,cooling and heating exchange like TSTAT5E.
+(2)Output Grid Dialog box,enable the column 'Control'.
+(3)show value for Input value.
+*************************************************************************************
+
+
+ver2.5.0.87, date released:2012-9-12
+
+*************************************************************************************
+Parameter Dialog box add Maximization.
+*************************************************************************************
+
+
+ver2.5.0.86, date released:2012-9-10
+
+*************************************************************************************
+Fixed Input "value" for Loop1.
+*************************************************************************************
+
+
+ver2.5.0.85, date released:2012-9-5
+
+*************************************************************************************
+Update TSTAT5E 
+Slider control and others etc.
+*************************************************************************************
+
+
+ver2.5.0.84, date released:2012-8-20
+
+*************************************************************************************
+when user operation 'Building config Database' pop 'running time error!'
+*************************************************************************************
+
+
+ver2.5.0.83, date released:2012-8-15
+
+*************************************************************************************
+the file is just for CM5 and LC merged update
+*************************************************************************************
+
+
+
+ver2.5.0.82, date released:2012-8-10
+
+*************************************************************************************
+Update TSTAT5E
+enable for input3 to input8
+*************************************************************************************
+
+
+
+

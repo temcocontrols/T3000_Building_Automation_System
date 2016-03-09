@@ -13,7 +13,7 @@ public:
 	CParameterDlg(CWnd* pParent = NULL,CString str=_T(""));   // standard constructor
 	virtual ~CParameterDlg();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = IDD_PARAMETERDIALOG };
 
 protected:
@@ -31,15 +31,18 @@ public:
 	afx_msg void OnCbnSelchangeKeypadlockcombo();
 	afx_msg void OnCbnSelchangeDisplaycombo();
 	afx_msg void OnCbnSelchangeAutoonlycombo();
-	afx_msg void OnEnKillfocusIdaddressedit();
+ 	afx_msg void OnEnKillfocusIdaddressedit();
 	afx_msg void OnDestroy();
-	afx_msg void OnCbnKillfocusKeypadselect();
+
+	afx_msg void OnCbnSelchangekeypadcombo();
+
+	//afx_msg void OnCbnKillfocusKeypadselect();
 	afx_msg void OnEnKillfocusValuposedit();
 	afx_msg void OnCbnSelchangeSequencecombox();
 	afx_msg void OnCbnSelchangeHcchangecombo();
 	afx_msg void OnEnKillfocusPowsetpomitedit();
 	afx_msg void OnEnKillfocusStincreaedit();
-	afx_msg void OnEnKillfocusValveedit();
+//	afx_msg void OnEnKillfocusValveedit();
 	afx_msg void OnEnKillfocusDefSetpointEdt();
 	afx_msg void OnEnKillfocusSetpointctledit();
 	afx_msg void OnEnKillfocusCycleedit();
@@ -84,14 +87,20 @@ public:
 	afx_msg void OnCbnSelchangeOccupiedmodecombo();
 	virtual BOOL OnInitDialog();
 
+
+	afx_msg LRESULT  ResumeMessageCallBack(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT  ReadDataCallBack(WPARAM wParam, LPARAM lParam);
 	void Refresh();
-	 void Refresh6();
+	void Refresh6();
+	void Reflesh_ParameterDlg();
+	void Read_SliderData();
 	void InitPID2ComboBox();
-	void  UpdateCoolingandHeatingData();
+	void UpdateCoolingandHeatingData();
 public:
-//	unsigned short multi_register_value[513];
-	CWinThread* pParamBackFresh;
+	//	unsigned short multi_register_value[513];
+	HANDLE hFirstThread;
 public:
+ CMsflexgrid m_zigbee_tstat_table;
 	CEdit m_idAdressEdit;
 	CComboBox m_braudRateCombox;
 	CComboBox m_keySelectCombox;
@@ -99,7 +108,7 @@ public:
 	CComboBox m_displayCombox;
 	CComboBox m_keyLockCombox;
 	CComboBox m_SequenceCombox;
-	CComboBox m_autoOnlyCombox;
+	//CComboBox m_autoOnlyCombox;
 	CEdit m_valveEdit;
 	CEdit m_value_percentEdit;
 	CComboBox m_hcChangeCombox;
@@ -144,7 +153,7 @@ public:
 	CEdit m_HeadDEdt1;
 	CEdit m_HeadDEdt2;
 	CComboBox m_occupiedSetPointModeCmbox;
-
+	BOOL m_disable_hum,m_disable_CO2;
 	float m_version;
 	afx_msg void OnCbnSelchangeComboLcdscrn1();
 	afx_msg void OnCbnSelchangeComboLcdscrn2();
@@ -157,16 +166,16 @@ public:
 
 	afx_msg void OnCbnKillfocusCombo1();
 	afx_msg void OnCbnKillfocusCombo4();
-	int m_coolsp;
-	int m_cooldb;
-	int m_setpoint;
-	int m_heatdb;
-	int m_heatsp;
-	int m_coolspN;
-	int m_cooldbN;
-	int m_setpointN;
-	int m_heatdbN;
-	int m_heatspN;
+	float m_coolsp;
+	float m_cooldb;
+	float m_setpoint;
+	float m_heatdb;
+	float m_heatsp;
+	float m_coolspN;
+	float m_cooldbN;
+	float m_setpointN;
+	float m_heatdbN;
+	float m_heatspN;
 	afx_msg void OnEnKillfocusEditCspd();
 	afx_msg void OnEnKillfocusEditCdbdn();
 	afx_msg void OnEnKillfocusEdit31();
@@ -180,6 +189,65 @@ public:
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnEnKillfocusEditValuetraveltime();
 	afx_msg void OnEnKillfocusEditPid2offsetpoint();
-	afx_msg void OnEnChangeEdit26();
-	afx_msg void OnBnClickedFreezefunc();
+	//	afx_msg void OnKillFocus(CWnd* pNewWnd);
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+
+public:
+	CBrush m_brush;
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	void Fresh_Single_UI();
+	//	afx_msg void OnEnChangeEdit34();
+	afx_msg void OnCbnSelchangeStaticunint2();
+	CComboBox m_gUnit;
+	afx_msg void OnBnClickedCs1();
+	afx_msg void OnBnClickedCs2();
+
+	CString GetInputValue(int InputNo);
+	BOOL Get_Data_Bit(UINT Data,int n,int N);
+	void ShowPID3();
+	afx_msg void OnBnClickedAirflowSetting();
+	afx_msg void OnCbnSelchangeInputselect3Pid3();
+	CComboBox m_inputSelect3;
+	CEdit m_inputValue3;
+	afx_msg void OnEnKillfocusSetvalue3Pid3();
+	afx_msg void OnEnKillfocusOutput3Pid3();
+	afx_msg void OnEnKillfocusEcoolingpterm3Pid3();
+	afx_msg void OnEnKillfocusEdit52Pid3();
+	afx_msg void OnEnKillfocusSpset4Pid3();
+	afx_msg void OnEnKillfocusEsetpointhi2Pid3();
+	afx_msg void OnEnKillfocusEsetpointlo2Pid3();
+	afx_msg void OnEnKillfocusEcooldeadband3Pid3();
+	afx_msg void OnEnKillfocusEcoolingiterm3Pid3();
+	CEdit m_edit_backlighttime;
+	afx_msg void OnEnKillfocusEditBacklightTime();
+	afx_msg void OnBnClickedCheck2();
+	CButton m_check_occupiedenable;
+	CEdit m_occupied_timer;
+	afx_msg void OnEnKillfocusEditOccupiedTimer();
+	afx_msg void OnEnKillfocusEditDeadMaster();
+	CComboBox m_combox_pir_endisable;
+	CEdit m_sensitivity_editor;
+	afx_msg void OnCbnSelchangeComboEnableDis();
+	afx_msg void OnEnKillfocusEditSensitivty();
+	CComboBox m_combox_setpointdisplay;
+	afx_msg void OnCbnSelchangeComboSetpointdisplay();
+	CComboBox m_combox_zigbee;
+	CComboBox m_combox_channel;
+	afx_msg void OnCbnSelchangeComboZigbeetype();
+	afx_msg void OnCbnSelchangeComboChannel();
+	afx_msg void OnBnClickedButtonZigbeeReboot();
+	afx_msg void OnBnClickedBtnTopological();
+	afx_msg void OnEnKillfocusEditPid2offsetpoint6();
+	afx_msg void OnBnClickedUnlock();
+	afx_msg void OnBnClickedLock();
+	afx_msg void OnBnClickedTrendlogview();
+	afx_msg void OnCbnSelchangeCombo1();
+	afx_msg void OnCbnSelchangeCombo4();
+	CComboBox m_day_combox;
+	CComboBox m_night_combox;
+	afx_msg void OnEnKillfocusEditTranducerMax();
+	afx_msg void OnEnKillfocusEditTranducerMin();
+    afx_msg void OnEnKillfocusEditChangeOverTime();
+    afx_msg void OnEnKillfocusEditTstatName();
 };

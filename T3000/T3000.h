@@ -9,16 +9,9 @@
 
 #include "resource.h"       // main symbols
 #include "define.h"
-
+#include <vector>
 #include "global_variable_extern.h"
-/************************************************************************/
-/*Author:Alex 
-/*Date£º2012/11/26
-/*FileName:D:\T3000\T3000\T3000.H
-/*Functionality:                                                        */
-//this is globe variable
-/************************************************************************/
-
+#include "LanguageLocale.h"
 
 extern int g_MainScreenLevel;
 extern int g_ParamLevel;
@@ -33,16 +26,113 @@ extern int g_AllscreensetLevel;
 // CT3000App:
 // See T3000.cpp for the implementation of this class
 //
-/********************************************************************
-	created:	2012/11/26
-	created:	26:11:2012   18:11
-	filename: 	D:\T3000\T3000\T3000.h
-	file path:	D:\T3000\T3000
-	file base:	T3000
-	file ext:	h
-	author:		alex
-	function:  COwnMemDC
-*********************************************************************/
+
+struct ALL_NODE {
+	CString MainBuilding_Name;
+	CString Building_Name;
+	CString Serial_ID;
+	CString Floor_name;
+	CString Room_name;
+	CString Product_name;
+	CString Product_class_ID;
+	CString Product_ID;
+	CString Screen_Name;
+	CString Bautrate;
+	CString Background_imgID;
+	CString Hardware_Ver;
+	CString Software_Ver;
+	CString Com_Port;
+	CString EPsize;
+	CString Protocol;
+    CString Custom;
+};
+
+struct Building{
+_variant_t Main_BuildingName;
+_variant_t Building_Name;
+_variant_t Protocal;
+_variant_t Com_Port;
+_variant_t Ip_Address;
+_variant_t Ip_Port;
+_variant_t Braudrate;
+_variant_t Default_SubBuilding;
+_variant_t Building_Path;
+};
+struct Building_ALL{
+_variant_t Building_Name;
+_variant_t Default_Building;
+_variant_t Telephone;
+_variant_t Address;
+};
+
+struct CustomProductTable{
+_variant_t ModelNo;
+_variant_t Reg_Description;
+_variant_t Reg_ID;
+
+};
+
+
+
+struct IONAME{
+_variant_t SERIAL_ID;
+_variant_t INPUT1;
+_variant_t INPUT2;
+_variant_t INPUT3;
+_variant_t INPUT4;
+_variant_t INPUT5;
+_variant_t INPUT6;
+_variant_t INPUT7;
+_variant_t INPUT8;
+_variant_t INPUT9;
+_variant_t OUTPUT1;
+_variant_t OUTPUT2;
+_variant_t OUTPUT3;
+_variant_t OUTPUT4;
+_variant_t OUTPUT5;
+_variant_t OUTPUT6;
+_variant_t OUTPUT7;
+_variant_t SENSORNAME;
+};
+struct IONAME_Config{
+_variant_t InOutName;
+_variant_t Type;
+_variant_t Row;
+_variant_t SerialNo;
+};
+struct LCNameConfigure{
+_variant_t SN;
+_variant_t Card;
+_variant_t Output;
+_variant_t OutputName;
+};
+ 
+struct Product_Data{
+_variant_t Serial_ID;
+_variant_t Register_Data;
+};
+struct Screen_Label{
+_variant_t Cstatic_id;
+_variant_t Serial_Num;
+_variant_t Point_X ;
+_variant_t Point_Y;
+_variant_t Height;
+_variant_t Width;
+_variant_t Tstat_id;
+_variant_t Status;
+_variant_t Tips;
+_variant_t Input_or_Output;
+_variant_t Text_Color;
+_variant_t Back_Color;
+};
+struct Value_Range{
+_variant_t SN;
+_variant_t CInputNo;
+_variant_t CRange;
+};
+
+
+
 class COwnMemDC : public CDC {
 	private:
 		CBitmap m_bitmap; // Offscreen bitmap
@@ -107,14 +197,17 @@ class COwnMemDC : public CDC {
 		// Allow usage as a pointer
 		operator COwnMemDC*() {return this;}
 };
+
 class CT3000App : public CWinAppEx
 {
+
 public:
 	CT3000App();
+
 // Overrides
 public:
 	virtual BOOL InitInstance();
-
+	CLanguageLocale m_locale;
 // Implementation
 	UINT  m_nAppLook;
 	BOOL  m_bHiColorIcons;
@@ -133,7 +226,7 @@ public:
 	virtual int ExitInstance();
 	void CopyDirectory(CString strSrcPath,CString strDstPath);
 //	bool cm5_timer;	  //CM5
-
+    BOOL JudgeT3000Version();
 	BOOL haveRegister();
 	CString GetModulePath();
 	int GetSoftInstallDays();
@@ -141,9 +234,33 @@ public:
 	BOOL ReadNameber(CRegKey& key,CStringW valueName,DWORD& value);
 	void Judgestore();
 	void ReadREG();
+	int  GetLanguage();
+	void SetLanguage(DWORD Last);
 	DWORD m_maxClients;
 	DWORD password;
-	
+	BOOL JudgeDB();
+	void ImportData();
+    BOOL Is_haveTable(CString TableName);
+	vector<ALL_NODE> m_AllNodes;
+
+	vector<Building> m_Building;
+	vector<Building_ALL> m_Building_ALL;
+	vector<CustomProductTable>  m_CustomProductTable;
+	vector<IONAME> m_IONAME;
+	vector<IONAME_Config> m_IONAME_Config;
+	vector<LCNameConfigure> m_LCNameConfigure;
+	 
+	vector<Product_Data> m_Product_Data;
+	vector<Screen_Label> m_Screen_Label;
+
+	vector<Value_Range>m_Value_Range;
+
+	int m_lastinterface;
+
+
+public:
+	CString m_szAppPath;
+	CString m_szHelpFile;
 };
 
 extern CT3000App theApp;

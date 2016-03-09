@@ -55,11 +55,6 @@ BEGIN_MESSAGE_MAP(CFlexSlideWnd, CStatic)
 	ON_WM_LBUTTONUP()
 END_MESSAGE_MAP()
 
-
-
-
-
-
 void CFlexSlideWnd::SetParentWnd(CWnd* pParent, CFSBContainer* pContainer)
 {
 	ASSERT(pParent);
@@ -67,7 +62,6 @@ void CFlexSlideWnd::SetParentWnd(CWnd* pParent, CFSBContainer* pContainer)
 	m_pParent = pParent;
 	m_pContainer = pContainer;
 }
-
 
 void CFlexSlideWnd::SetFSBStyle(FSB_STYLE fsbStyle)
 {
@@ -91,10 +85,11 @@ void CFlexSlideWnd::SetFSBStyle(FSB_STYLE fsbStyle)
 			m_pThumbOpter = new CTripleLinkageOpt;
 			m_pThumbOpter->SetParentWnd(this);
 			break;
-// 		case FSB_STYLE_TRIPLETHUMB://lsc
-// 			m_pThumbOpter = new CTripleThumbOpt;
-// 			m_pThumbOpter->SetParentWnd(this);
-// 			break;
+		   //FSB_STYLE_TRIPLETHUMB
+//  		case FSB_STYLE_TRIPLETHUMB://lsc
+//  			m_pThumbOpter = new CTripleThumbOpt;
+//  			m_pThumbOpter->SetParentWnd(this);
+//  			break;
 			
 		default:
 			break;
@@ -103,13 +98,10 @@ void CFlexSlideWnd::SetFSBStyle(FSB_STYLE fsbStyle)
 	m_pThumbOpter->SetFSBStyle(fsbStyle);
 }
 
-
-
 CFSBChannel* CFlexSlideWnd::GetFSBChannel()
 {
 	return &m_fsbChannel;
 }
-
 
 FSB_STYLE CFlexSlideWnd::GetFSBStyle()
 {
@@ -129,7 +121,6 @@ void CFlexSlideWnd::SetFlexSlideBarRect(CRect& rc)
 //	MoveWindow(&rc);
 	m_rc = rc;
 }
-
 
 // 设置channel的宽度，不得大于控件宽度，不小于1个象素
 // channel 长度应该依据控件长度来计算获得
@@ -153,7 +144,6 @@ void CFlexSlideWnd::SetChannelWidth(int nChannelWidth)
 	m_pThumbOpter->SetChannelRect(rcChannel);
 
 }
-
 
 int CFlexSlideWnd::GetChannelWidth()
 {
@@ -400,8 +390,15 @@ int CFlexSlideWnd::CalcPixelNumOfTicLength()
 void CFlexSlideWnd::OnMouseMove(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	m_pThumbOpter->OnMouseMove(point);
-	Invalidate(TRUE);
+	if (nFlags)
+	{
+	    
+		m_pThumbOpter->OnMouseMove(point);
+		//Sleep(500);
+		Invalidate(TRUE);
+	}
+	
+	
 	//CStatic::OnMouseMove(nFlags, point);
 }
 
@@ -423,8 +420,6 @@ void CFlexSlideWnd::SendCallBackMsg()
 	//m_pParent->SendMessage(WM_USER_CALLBACK, WPARAM(this),0)	;
 	m_pContainer->SendCallBackMsg();
 }
-
-
 
 void CFlexSlideWnd::Draw(CDC* pDC)
 {
@@ -455,15 +450,16 @@ void CFlexSlideWnd::Draw(CDC* pDC)
 	//pDC->LineTo(100,100);
 }
 
-
-const int TICMARK_LENGTH = 5;
-const int TICMARK_DIST = 15;
+const int TICMARK_LENGTH = 15;
+const int TICMARK_LENGTH_MID = 4;
+const int TICMARK_DIST = 0;
 
 void CFlexSlideWnd::DrawTics(CDC* pDC)
 {	
-	CPen pen(PS_SOLID, 1, GetSysColor(COLOR_3DSHADOW));
+	//CPen pen(PS_SOLID, 1,RGB(0, 0, 0));
+		CPen pen(PS_SOLID, 1, GetSysColor(COLOR_3DSHADOW));
 	HGDIOBJ  pOldPen = pDC->SelectObject(pen);
-
+//GetSysColor(COLOR_3DSHADOW)
 	CRect rc = m_fsbChannel.GetRect();
 
 // 	pDC->MoveTo(rc.TopLeft());
@@ -537,10 +533,16 @@ void CFlexSlideWnd::DrawTics(CDC* pDC)
 	else
 	{
 		CPoint ptStart, ptEnd, ptStart2, ptEnd2;
+		CPoint ptStart_mid, ptEnd_mid, ptStart2_mid, ptEnd2_mid;
 		ptStart.y = rc.top;
 		ptStart.x = rc.left - TICMARK_DIST;
 		ptEnd.y = ptStart.y;
 		ptEnd.x = ptStart.x - TICMARK_LENGTH;
+
+		ptStart_mid.y = rc.top;
+		ptStart_mid.x = rc.left - TICMARK_DIST;
+		ptEnd_mid.y = ptStart_mid.y;
+		ptEnd_mid.x = ptStart_mid.x - TICMARK_LENGTH_MID;
 
 
 		ptStart2.x = rc.right + TICMARK_DIST;
@@ -548,48 +550,78 @@ void CFlexSlideWnd::DrawTics(CDC* pDC)
 		ptEnd2.x = ptStart2.x + TICMARK_LENGTH;
 		ptEnd2.y = ptStart2.y;
 
-		for (int i = 0; i <= abs(m_nMax-m_nMin); i++)
-		{		 
-			int nY = ptStart.y + m_szTics[i];
-	
-// 			pDC->MoveTo(ptStart.x, nY);//2.5.0.95显示在滑块两边的刻度条
-// 			pDC->LineTo(ptEnd.x, nY);//2.5.0.95
+		ptStart2_mid.x = rc.right + TICMARK_DIST;
+		ptStart2_mid.y = rc.top;
+		ptEnd2_mid.x = ptStart2_mid.x + TICMARK_LENGTH_MID;
+		ptEnd2_mid.y = ptStart2_mid.y;
 
-			//////////////////////////////////////////////////////////////////////////
-			int nY2 = ptStart2.y + m_szTics[i];
+ 
+		for (int i = 0; i <= abs(m_nMax-m_nMin); i++)
+		{	
+			if (i%10==0)
+			{
+				int nY = ptStart.y + m_szTics[i];
+
+
+				pDC->MoveTo(ptStart.x, nY);//2.5.0.95显示在滑块两边的刻度条
+				pDC->LineTo(ptEnd.x, nY);//2.5.0.95
+
+
+				//////////////////////////////////////////////////////////////////////////
+				int nY2 = ptStart2.y + m_szTics[i];
+
+				pDC->MoveTo(ptStart2.x, nY2);//2.5.0.95
+				pDC->LineTo(ptEnd2.x, nY2);//2.5.0.95
+			}
+ 			else if (i%10==5)
+ 			{
+ 
+ 				int nY = ptStart_mid.y + m_szTics[i];
+ 
+ 
+ 				pDC->MoveTo(ptStart_mid.x, nY);//2.5.0.95显示在滑块两边的刻度条
+ 				pDC->LineTo(ptEnd_mid.x, nY);//2.5.0.95
+ 
+ 
+ 				//////////////////////////////////////////////////////////////////////////
+ 				int nY2 = ptStart2_mid.y + m_szTics[i];
+ 
+ 				pDC->MoveTo(ptStart2_mid.x, nY2);//2.5.0.95
+ 				pDC->LineTo(ptEnd2_mid.x, nY2);//2.5.0.95
+ 
+ 
+ 			}
 			
- //			pDC->MoveTo(ptStart2.x, nY2);//2.5.0.95
- //			pDC->LineTo(ptEnd2.x, nY2);//2.5.0.95
+			
 		}
 
-// 		int nHeight= rc.Height();	
-// 		int nGap = nHeight/(m_nMax-m_nMin);
-// 
-// 		CPoint ptStart, ptEnd;
-// 		ptStart.x = rc.left - TICMARK_DIST;
-// 		ptStart.y = rc.top;
-// 		ptEnd.x = ptStart.x - TICMARK_LENGTH;
-// 		ptEnd.y = ptStart.y;
-// 		for(int i = 0; i <= (m_nMax-m_nMin); i++)
+//  		int nHeight= rc.Height();	
+//  		int nGap = nHeight/(m_nMax-m_nMin);
+//  
+//  		//CPoint ptStart, ptEnd;
+//  		ptStart.x = rc.left - TICMARK_DIST;
+//  		ptStart.y = rc.top;
+//  		ptEnd.x = ptStart.x - TICMARK_LENGTH;
+//  		ptEnd.y = ptStart.y;
+//  		for(int i = 0; i <= (m_nMax-m_nMin); i++)
 // 		{	
 // 			pDC->MoveTo(ptStart);
 // 			pDC->LineTo(ptEnd);
 // 			ptStart.y += nGap;
 // 			ptEnd.y = ptStart.y;	
 // 
-// 		}
-// 
-// 		ptStart.x = rc.left + TICMARK_DIST;
-// 		ptStart.y = rc.top;
-// 		ptEnd.x = ptStart.x + TICMARK_LENGTH;
-// 		ptEnd.y = ptStart.y;
-// 		for(int i = 0; i <= (m_nMax-m_nMin); i++)
-// 		{	
-// 			pDC->MoveTo(ptStart);
-// 			pDC->LineTo(ptEnd);
-// 			ptStart.y += nGap;
-// 			ptEnd.y = ptStart.y;
-// 
+//  		}
+ 
+//  		ptStart.x = rc.left + TICMARK_DIST;
+//  		ptStart.y = rc.top;
+//  		ptEnd.x = ptStart.x + TICMARK_LENGTH;
+//  		ptEnd.y = ptStart.y;
+//  		for(int i = 0; i <= (m_nMax-m_nMin); i++)
+//  		{	
+//  			pDC->MoveTo(ptStart);
+//  			pDC->LineTo(ptEnd);
+//  			ptStart.y += nGap;
+//  			ptEnd.y = ptStart.y;
 // 		}
 	}
 
@@ -607,7 +639,7 @@ BOOL CFlexSlideWnd::SetPos(int nMinPos, int nMidPos, int nMaxPos)
 // 
 // 	ASSERT(nMinPos-m_nMin >=0&& nMidPos-m_nMin >=0 && nMaxPos-m_nMin >= 0);
  
-	if (!(nMinPos < nMidPos && nMidPos < nMaxPos && nMinPos >= 0))//tstat6
+	if (!((nMinPos < nMidPos) && (nMidPos < nMaxPos)))//tstat6
 	{
 		//CString strTips = _T("Set Point can't be set properly. Please confirm your set point value!");
 		//AfxMessageBox(strTips);
@@ -620,7 +652,7 @@ BOOL CFlexSlideWnd::SetPos(int nMinPos, int nMidPos, int nMaxPos)
 	m_pThumbOpter->SetThumbPosition(0, nMinPos-m_nMin);
 	m_pThumbOpter->SetThumbPosition(1, nMidPos-m_nMin);
 	m_pThumbOpter->SetThumbPosition(2, nMaxPos-m_nMin);
-	
+	 Invalidate(TRUE);
 	return TRUE;
 }
 
@@ -633,43 +665,51 @@ int	CFlexSlideWnd::GetPos(vector<int>& szPos)
 
 BOOL CFlexSlideWnd::SetPos_tstat6_2pos( int nMinPos, int nMidPos, int nMaxPos )
 {
-	ASSERT(nMinPos < nMidPos && nMidPos < nMaxPos && nMinPos >= 0);//tstat6
+	if (nMinPos<m_nMin)
+	{
+		nMinPos=m_nMin;
+	}
+	if (nMaxPos>m_nMax)
+	{
+		nMaxPos=m_nMax;
+	}
+	ASSERT(nMinPos <= nMidPos && nMidPos <= nMaxPos );//tstat6
 	ASSERT(m_pThumbOpter);
 
 	ASSERT(nMinPos-m_nMin >=0&& nMidPos-m_nMin >=0 && nMaxPos-m_nMin >= 0);
 
-	if (!(nMinPos < nMidPos && nMidPos < nMaxPos && nMinPos >= 0))//tstat6
+	if (!(nMinPos <= nMidPos && nMidPos <= nMaxPos  ))//tstat6
 	{
-		CString strTips = _T("Set Point can't be set properly. Please confirm your set point value!");
-		AfxMessageBox(strTips);
+		//CString strTips = _T("Set Point can't be set properly. Please confirm your set point value!");
+		//AfxMessageBox(strTips);
 		return FALSE;
 
 	}
+	m_pThumbOpter->SetPosValue(nMinPos,nMidPos,nMaxPos);
 	m_pThumbOpter->SetThumbPosition(0, nMinPos-m_nMin);
-//	m_pThumbOpter->SetThumbPosition(1, nMidPos-m_nMin);
+ 	//m_pThumbOpter->SetThumbPosition(1, nMidPos-m_nMin);
 //	m_pThumbOpter->SetThumbPosition(2, nMaxPos-m_nMin);
 	m_pThumbOpter->SetThumbPosition(1, nMaxPos-m_nMin);
-
+	Invalidate(TRUE);
 	return TRUE;
 }
 
 BOOL CFlexSlideWnd::SetPos_tstat6_3pos( int nMinPos, int nMidPos, int nMaxPos )
 {
-	ASSERT(nMinPos < nMidPos && nMidPos < nMaxPos && nMinPos >= 0);//tstat6
+	ASSERT(nMinPos < nMidPos && nMidPos < nMaxPos);//tstat6
 	ASSERT(m_pThumbOpter);
 
 	ASSERT(nMinPos-m_nMin >=0&& nMidPos-m_nMin >=0 && nMaxPos-m_nMin >= 0);
 
-	if (!(nMinPos < nMidPos && nMidPos < nMaxPos && nMinPos >= 0))//tstat6
+	if (!(nMinPos < nMidPos && nMidPos < nMaxPos))//tstat6
 	{
-// 		CString strTips = _T("Set Point can't be set properly. Please confirm your set point value!");
-// 		AfxMessageBox(strTips);
 		return FALSE;
 
 	}
 	m_pThumbOpter->SetThumbPosition(0, nMinPos-m_nMin);
 	m_pThumbOpter->SetThumbPosition(1, nMidPos-m_nMin);
 	m_pThumbOpter->SetThumbPosition(2, nMaxPos-m_nMin);
-
+	Invalidate(TRUE);
+	//UpdateData(F)
 	return TRUE;
 }

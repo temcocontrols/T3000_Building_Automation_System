@@ -153,23 +153,22 @@ void CFSBThumb::DrawBarThumb(CDC* pDC)
 {
 
 }
-
-
+ 
+void CFSBThumb::SetMixValue(int min){
+    m_min = min;
+}
 void CFSBThumb::DrawRectThumb(CDC* pDC)
 {
 	CBrush brush(m_clr);
 	CBrush* pOldBrush = pDC->SelectObject(&brush);
-
-	// create and select a thick, black pen
-	//CPen penBlack;
-	//penBlack.CreatePen(PS_SOLID, 1, RGB(200, 200, 200));
-	//CPen* pOldPen = pDC->SelectObject(&penBlack);
-
 	pDC->Rectangle(m_rc);
 	//pDC->Draw3dRect(m_rc, RGB(255, 0, 0), RGB(0, 255, 0));
 	pDC->Draw3dRect(m_rc, GetSysColor(COLOR_3DHIGHLIGHT), GetSysColor(COLOR_3DSHADOW));
-
 	pDC->SelectObject(pOldBrush);
+  
+    //CString StrValue;
+    //StrValue.Format(_T("%0.1f"),((float)m_nPosition/10));
+    //pDC->DrawText(StrValue,m_rc,DT_CENTER|DT_VCENTER|DT_SINGLELINE);
 }
 
 void CFSBThumb::DrawCircleThumb(CDC* pDC)

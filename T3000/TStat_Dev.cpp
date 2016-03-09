@@ -62,6 +62,16 @@ int CTStat_Dev::GetComPort()const
 	return m_nComPort;
 }
 
+int CTStat_Dev::GetProtocol() const
+{
+	return m_nprotocol;
+}
+void CTStat_Dev::SetProtocol(int nProtocol)
+{
+	m_nprotocol = nProtocol;
+}
+
+
 void CTStat_Dev::SetComPort(int nComPort)
 {
 	m_nComPort = nComPort;
@@ -69,10 +79,7 @@ void CTStat_Dev::SetComPort(int nComPort)
 
 int CTStat_Dev::GetEPSize()const
 {
-	 return m_nEPSize;	
-	 
-
-
+	return m_nEPSize;	
 }
 
 void CTStat_Dev::SetEPSize(int nEPSize)
@@ -137,8 +144,14 @@ CString CTStat_Dev::GetProductName()
 	case PM_TSTAT5D:
 		strProductName="TStat5D";
 		break;
-	case PM_TSTAT5E:
-		strProductName="TStat5E";
+    case PM_TSTAT5E:
+        strProductName="TStat5E";
+        break;
+    case PM_PM5E:
+        strProductName="PM5E";
+        break;
+	case PM_TSTATRUNAR:
+		strProductName="TStatRunar";
 		break;
 	case PM_TSTAT5F:
 		strProductName="TStat5F";
@@ -151,7 +164,13 @@ CString CTStat_Dev::GetProductName()
 		break;
 	case PM_TSTAT6:
 		strProductName="TStat6";
-		break;
+        break;
+    case PM_TSTAT5i:
+        strProductName="TStat5i";
+        break;
+    case PM_TSTAT8:
+        strProductName="TStat8";
+        break;
 	case PM_TSTAT7:
 		strProductName="TStat7";
 		break;
@@ -164,6 +183,80 @@ CString CTStat_Dev::GetProductName()
 //20120424
 	case PM_LightingController:
 		strProductName = "LC";
+		break;
+	case  PM_CO2_NET:
+		strProductName = "CO2 Net";
+		break;
+	case  PM_CO2_RS485:
+		strProductName = "CO2";
+		break;
+    case  PM_PRESSURE_SENSOR:
+        strProductName = "Pressure";
+        break;
+  
+	case  PM_CO2_NODE:
+		strProductName = "CO2 Node";
+		break;
+	case PM_TSTAT6_HUM_Chamber:
+		strProductName =g_strHumChamber;
+		break;
+
+	case PM_T3PT10 :
+	     strProductName="T3-PT10";
+		 break;
+	case PM_T3IOA :
+		strProductName="T3-8O";
+			break;
+	case PM_T332AI :
+		strProductName="T3-32AI";
+			break;
+	case  PM_T38AI16O :
+		strProductName="T3-8AI160";
+			break;
+	case PM_T38I13O :
+		strProductName="T3-8I13O";
+			break;
+	case PM_T3PERFORMANCE :
+		strProductName="T3-Performance";
+			break;
+	case PM_T34AO :
+		strProductName="T3-4AO";
+			break;
+    case PM_T322AI:
+        strProductName="T3-22I";
+        break;
+    case PM_T38AI8AO6DO:
+        strProductName="T3-8AI8AO6DO";
+        break;
+	case PM_T36CT :
+		strProductName="T3-6CT";
+			break;
+	case PM_MINIPANEL:
+		strProductName="MiniPanel";
+		break;
+    case PM_AirQuality:
+        strProductName="Air Quality";
+        break;
+	case PM_PRESSURE:
+	    strProductName="Pressure Sensor";
+		break;
+	case PM_HUMTEMPSENSOR:
+		strProductName="TstatHUM";
+		break;
+	case PM_CS_SM_AC:
+		strProductName="CS-SM-AC";
+		break;
+	case PM_CS_SM_DC:
+		strProductName="CS-SM-DC";
+		break;
+	case PM_CS_RSM_AC:
+		strProductName="CS-RSM-AC";
+		break;
+	case PM_CS_RSM_DC:
+		strProductName="CS-RSM-DC";
+		break;
+	case PM_HUM_R:
+	    strProductName="HUM-R";
 		break;
 	default:
 		strProductName="TStat";

@@ -74,14 +74,14 @@ public:
 	afx_msg void OnEnSetfocusAddbuidingSetedit();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	BOOL ValidAddress(CString sAddress,UINT& n1,UINT& n2,UINT& n3,UINT& n4);
-	BOOL ValidAddress(CString sAddress);
+	//BOOL ValidAddress(CString sAddress);
 
 public:
 	void SetBuildingMainName(CString strBuildName);
 	void OnMainBuildingSelect();
 	void OnMainBuildingUnSelect();
 	void OnBuildingDelete();
-	BOOL GetIPbyHostName(CString strHostName,CString strIP);
+	BOOL GetIPbyHostName(CString strHostName,CString &strIP);
 protected:
 	virtual void PostNcDestroy();
 	BOOL IsValidCOM(const CString& strComPort);
@@ -102,7 +102,7 @@ public:
 	vector<CString> m_szComm;
 
 
-
+	BOOL m_Changed;
 	//////////////////////////////////////////////////////////////////////////
 	//	Added by zgq; 2010-11-29;
 	//  把按钮Exit和Save功能合并

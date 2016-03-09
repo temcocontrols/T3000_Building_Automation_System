@@ -86,7 +86,8 @@ BOOL CMultiThumbOpt::InitThumb(BOOL bHorizontal, int nThumbWidth, CRect& rcChann
 			ptCenter.y = m_szTicMarks->at(nPos)+m_rcChannel.top;
 		}
 
-		m_szThumb[i]->InitThumb(ptCenter, nPos, THUNMB_RECT_HEIGHT, nThumbWidth, m_bHorizontal);	
+		m_szThumb[i]->InitThumb(ptCenter, nPos, THUNMB_RECT_HEIGHT, nThumbWidth, m_bHorizontal);
+       // m_szThumb[i]->SetMixValue(m_nM)	
 	}
 	m_nFocusThumb = 0;
 
@@ -224,8 +225,8 @@ void CMultiThumbOpt::OnLButtonDown(const CPoint& point)
 	}
 	else
 	{
-		MovePage(point);
-		ReCalcChannelRect();
+// 		MovePage(point);
+// 		ReCalcChannelRect();
 	}
 }
 
@@ -311,17 +312,23 @@ void CMultiThumbOpt::MoveToPosition(int nIndex, int nPosition)
 
 void CMultiThumbOpt::OnMouseMove(const CPoint& point)
 {
-	CFSBThumb* pThumb = m_szThumb[m_nFocusThumb];
+	
 
 	if(m_bStartDraging) // begin to drag?
-	{
-	
-		CPoint ptPos = pThumb->GetPixPosition();
-		CPoint ptNewPS = ptPos;
-		int nMax, nMin;
-		GetThumbRange(pThumb->GetPosition(), nMin, nMax);
+	{    
+         CFSBThumb* pThumb = m_szThumb[m_nFocusThumb];
+	      ////Check DB
+         int nPos = SearchThumbPosition(point);
+        int nMax, nMin;
+         GetThumbRange(pThumb->GetPosition(), nMin, nMax);
+
+
+ 		CPoint ptPos = pThumb->GetPixPosition();
+ 		CPoint ptNewPS = ptPos;
+// 
+
 		
-		int nPixMin, nPixMax;
+        int nPixMin, nPixMax;
 		nPixMin = m_szTicMarks->at(nMin);
 		nPixMax = m_szTicMarks->at(nMax);
 
@@ -363,7 +370,28 @@ void CMultiThumbOpt::OnMouseMove(const CPoint& point)
 			}
 
 		}
-
+                 //if (nPos >= nMax)
+                 //{
+                 //    nPos = nMax;
+                 //}
+                 //if(nPos <= nMin)
+                 //{
+                 //    nPos = nMin;
+                 //}
+                 //if (m_nFocusThumb == 0)
+                 //{
+                 //    if (nPos>m_nMidPos)
+                 //    {
+                 //        return;
+                 //    }
+                 //}
+                 //if (m_nFocusThumb == 1)
+                 //{
+                 //    if (nPos<m_nMidPos)
+                 //    {
+                 //        return;
+                 //    }
+                 //}
 		pThumb->MoveThumb(ptNewPS);
 
 		ReCalcChannelRect();
@@ -437,12 +465,8 @@ void CMultiThumbOpt::OnLButtonUp(const CPoint& point)
 	if(m_bStartDraging)// begin to drag?
 	{
 		CFSBThumb* pThumb = m_szThumb[m_nFocusThumb];
-
 		m_bStartDraging = FALSE;
-		//ReleaseCapture();
-
 		int nPos = SearchThumbPosition(point);
-
 		int nMin, nMax;
 		GetThumbRange(m_nFocusThumb,  nMin, nMax);
 		if (nPos >= nMax)
@@ -458,8 +482,11 @@ void CMultiThumbOpt::OnLButtonUp(const CPoint& point)
 		MoveToPosition(m_nFocusThumb, nPos);
 
 		ReCalcChannelRect();
+
+
+		((CFlexSlideWnd*)m_pParent)->SendCallBackMsg();
 	}
-	((CFlexSlideWnd*)m_pParent)->SendCallBackMsg();
+	
 }
 
 
@@ -497,7 +524,7 @@ int CMultiThumbOpt::GetThumbPosition()
 
 void CMultiThumbOpt::SetThumbPosition(int nIndex, int nPosition)
 {	
-	if (nPosition >= m_szTicMarks->size())   // 超过刻度那么裁减掉
+	if (nPosition >= (int)m_szTicMarks->size())   // 超过刻度那么裁减掉
 	{
 		nPosition = m_szTicMarks->size()-1;
 	}

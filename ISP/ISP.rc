@@ -1,0 +1,446 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (Simplified, PRC) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\ISP.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""     // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\ISP.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG_TSTAT DIALOGEX 0, 0, 149, 150
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_MDBID,61,20,56,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_COM,61,38,56,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_BAUDRATE,61,57,56,14,ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "Use Com Port:",IDC_STATIC,5,7,139,132
+    LTEXT           "ID:",IDC_STATIC,13,21,14,9
+    LTEXT           "Com Port:",IDC_STATIC,13,38,39,9
+    LTEXT           "Baudrate:",IDC_STATIC,13,58,41,9
+END
+
+IDD_DIALOG_LIGHTCTRL DIALOGEX 0, 0, 149, 150
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_IPADDRESS_LC,"SysIPAddress32",WS_TABSTOP,49,20,86,14
+    EDITTEXT        IDC_EDIT_LCIPPORT,49,41,86,14,ES_AUTOHSCROLL
+    CONTROL         "Main controller",IDC_RADIO_MAIN,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,18,65,65,10
+    CONTROL         "Input board",IDC_RADIO_INPUT,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,81,54,10
+    CONTROL         "Output board",IDC_RADIO_OUTPUT,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,97,59,10
+    EDITTEXT        IDC_EDIT_MDBID,47,117,40,14,ES_AUTOHSCROLL
+    GROUPBOX        "Setting",IDC_STATIC,5,5,138,136
+    LTEXT           "IP Addr:",IDC_STATIC,11,22,28,8
+    LTEXT           "IP Port:",IDC_STATIC,11,44,26,8
+    LTEXT           "Mdb ID:",IDC_STATIC,15,119,27,8
+    LTEXT           "(for sub board)",IDC_STATIC,88,118,53,8
+    GROUPBOX        "",IDC_STATIC,12,58,123,54
+END
+
+IDD_DIALOG_NETCTRL DIALOGEX 0, 0, 149, 150
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_IPADDRESS_NC,"SysIPAddress32",WS_TABSTOP,48,19,86,14
+    EDITTEXT        IDC_EDIT_NCPORT,48,40,86,14,ES_AUTOHSCROLL
+    GROUPBOX        "Net Controller:",IDC_STATIC,7,10,139,139
+    LTEXT           "IP Addr:",IDC_STATIC,12,20,32,9
+    LTEXT           "IP Port:",IDC_STATIC,12,42,30,9
+    PUSHBUTTON      "PING",IDC_BUTTON_PING,47,123,50,14
+END
+
+IDD_DIALOG_SETTING DIALOGEX 0, 0, 198, 60
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "TCP Flash Timeout :",IDC_STATIC,15,11,71,12
+    EDITTEXT        IDC_EDIT_SETTING_TIMEOUT,90,8,54,14,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "(ms)",IDC_STATIC,153,11,15,8
+    PUSHBUTTON      "OK",IDC_BUTTON_SETTING_OK,31,32,50,14
+    PUSHBUTTON      "Cancel",IDC_BUTTON_SETTING_CANCEL,103,32,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_DIALOG_TSTAT, DIALOG
+    BEGIN
+        TOPMARGIN, 1
+    END
+
+    IDD_DIALOG_LIGHTCTRL, DIALOG
+    BEGIN
+    END
+
+    IDD_DIALOG_NETCTRL, DIALOG
+    BEGIN
+    END
+
+    IDD_DIALOG_SETTING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 191
+        BOTTOMMARGIN, 53
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU
+BEGIN
+    POPUP "Menu"
+    BEGIN
+        MENUITEM "&Clear_Log_Info",             ID_MAIN_CLEAR
+        MENUITEM "&Save_Log_Info",              ID_SAVE_LOG_INFO
+    END
+END
+
+IDR_ISPTOOL MENU
+BEGIN
+    POPUP "Menu"
+    BEGIN
+        MENUITEM "Setting",                     ID_MENU_SETTING
+        MENUITEM "Flash SN",                    ID_MENU_FLASHSN
+        MENUITEM "Check Hex/Bin File",          ID_MENU_CHECKHEX
+        MENUITEM "About_ISP_Tool",              ID_MENU_ABOUT
+        MENUITEM "EXIT_ISP_Tool",               ID_MENU_APP
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    ID_MENU_APP             "About ISPTool"
+    ID_MENU_ABOUT           "About ISPTool"
+END
+
+#endif    // Chinese (Simplified, PRC) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 254, 227
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About ISP"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "ISP Version 4.6.6",IDC_STATIC,37,193,56,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2005-2015",IDC_STATIC,101,193,129,8
+    DEFPUSHBUTTON   "OK",IDOK,197,206,50,14,WS_GROUP
+    CONTROL         "",IDC_LOGOPIC,"Static",SS_BLACKFRAME,7,7,240,180
+    ICON            IDR_MAINFRAME,IDC_STATIC,7,191,20,20
+END
+
+IDD_ISP_DIALOG DIALOGEX 0, 0, 307, 342
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "ISP Tool"
+MENU IDR_ISPTOOL
+FONT 9, "Tahoma", 400, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDIT_FILEPATH,50,243,206,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Select...",IDC_BUTTON_SELFILE,259,243,45,14
+    PUSHBUTTON      "FLASH",IDC_BUTTON_FLASH,121,259,81,24
+    LISTBOX         IDC_LIST_INFO,2,9,184,225,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    GROUPBOX        "Log Information:",IDC_STATIC,1,0,188,240,BS_CENTER
+    LTEXT           "File path:",IDC_STATIC_HEX_BOOT,2,244,43,8
+    EDITTEXT        IDC_EDIT_MDBID1,229,16,72,12,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_COM,229,29,72,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "ID:",IDC_STATIC,216,16,12,8
+    LTEXT           "Com Port:",IDC_STATIC,193,29,34,8
+    LTEXT           "Baudrate:",IDC_STATIC,193,43,33,8
+    GROUPBOX        "",IDC_STATIC_COM,191,9,112,46,BS_BITMAP | BS_FLAT | WS_DISABLED
+    CONTROL         "",IDC_IPADDRESS_NC,"SysIPAddress32",WS_TABSTOP,225,69,76,12
+    EDITTEXT        IDC_EDIT_NCPORT,225,84,76,12,ES_AUTOHSCROLL
+    LTEXT           "IP Addr:",IDC_STATIC,193,70,28,8
+    LTEXT           "IP Port:",IDC_STATIC,194,85,27,8
+    GROUPBOX        "",IDC_STATIC_NET,190,63,116,74,BS_LEFT | BS_FLAT
+    CONTROL         "COM FLASH",IDC_COM,"Button",BS_AUTORADIOBUTTON,192,3,114,10
+    CONTROL         "NET FLASH",IDC_NET,"Button",BS_AUTORADIOBUTTON,190,56,113,10
+    EDITTEXT        IDC_EDIT_MDBID2,207,123,97,12,ES_AUTOHSCROLL
+    CONTROL         "Flash SubNode By ID",IDC_CHECK_FLASH_SUBID,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,191,112,86,10
+    LTEXT           "ID:",IDC_STATIC,193,124,12,8
+    GROUPBOX        "Model Infor:",IDC_STATIC_INFO,190,138,116,43,BS_CENTER | BS_FLAT | NOT WS_VISIBLE
+    LTEXT           "Hardware Ver:",IDC_STATIC,194,168,48,8,NOT WS_VISIBLE
+    LTEXT           "Firmware Ver:",IDC_STATIC,195,157,47,8,NOT WS_VISIBLE
+    LTEXT           "Model  Name:",IDC_STATIC,195,147,47,8,NOT WS_VISIBLE
+    LTEXT           "Static Text",IDC_Model_Name,243,148,63,8,NOT WS_VISIBLE
+    LTEXT           "Static Text",IDC_Model_FIRMVER,243,159,63,8,NOT WS_VISIBLE
+    LTEXT           "Static Text",IDC_Model_HARDWAREVER,243,169,63,8,NOT WS_VISIBLE
+    PUSHBUTTON      "PING     IP    Address",IDC_BUTTON_PING2,193,97,109,14
+    CONTROL         "Clear_Log",IDC_CLEAR_LOG,"MfcButton",NOT WS_VISIBLE | WS_TABSTOP,260,58,46,11
+    CONTROL         "Save_Log",IDC_SAVE_LOG,"MfcButton",NOT WS_VISIBLE | WS_TABSTOP,235,57,46,11
+    PUSHBUTTON      "Show Hex",IDC_SHOW_HEX,256,260,37,14,NOT WS_VISIBLE
+    EDITTEXT        IDC_EDIT_HWVERSION,68,293,30,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    COMBOBOX        IDC_COMBO_PM,249,293,48,109,CBS_DROPDOWN | WS_VSCROLL
+    EDITTEXT        IDC_EDIT_SN,154,293,33,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    LTEXT           "Product Model:",IDC_STATIC,198,296,50,8
+    LTEXT           "Hardware Verison:",IDC_STATIC,8,296,58,8
+    LTEXT           "SerialNumber:",IDC_STATIC,108,296,46,8
+    CONTROL         "",IDC_STATIC_SEPERATOR,"Static",SS_BLACKFRAME,1,288,305,1
+    CONTROL         "Flash SN",IDC_FLASH_SN,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,257,274,42,10
+    LTEXT           "",IDC_HEX_SIZE,4,260,68,9,NOT WS_VISIBLE
+    LTEXT           "",IDC_BIN_INFORMATION,1,270,77,14,NOT WS_VISIBLE
+    GROUPBOX        "The File Infor:",IDC_STATIC_INFO2,190,181,116,53,BS_CENTER | BS_FLAT
+    LTEXT           "",IDC_Model_Name2,192,191,114,8
+    LTEXT           "",IDC_Model_FIRMVER2,192,205,114,8
+    LTEXT           "",IDC_Model_HARDWAREVER2,192,217,114,8
+    LTEXT           "Software Version:",IDC_STATIC,9,315,58,8,NOT WS_VISIBLE
+    EDITTEXT        IDC_EDIT_SWVERSION,67,311,40,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "User Name:",IDC_STATIC,199,314,41,8,NOT WS_VISIBLE
+    EDITTEXT        IDC_FLASH_USER_ID,248,312,55,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    COMBOBOX        IDC_EDIT_BAUDRATE,228,42,73,30,CBS_DROPDOWN | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 247
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 220
+    END
+
+    IDD_ISP_DIALOG, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 341
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 4,8,4,0
+ PRODUCTVERSION 4,8,4,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x21L
+#else
+ FILEFLAGS 0x20L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "FileVersion", "4.8.4.0"
+            VALUE "InternalName", "ISP.exe"
+            VALUE "LegalCopyright", "Copyright 1999-2014 (c).  All rights reserved."
+            VALUE "OriginalFilename", "ISP.exe"
+            VALUE "ProductName", "ISP Tool"
+            VALUE "ProductVersion", "4.8.4.0"
+            VALUE "SpecialBuild", "4.8.4"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_ISP_DIALOG DLGINIT
+BEGIN
+    IDC_CLEAR_LOG, 0x37c, 369, 0
+0x4d3c, 0x4346, 0x7542, 0x7474, 0x6e6f, 0x535f, 0x7974, 0x656c, 0x373e, 
+0x2f3c, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x7453, 0x6c79, 0x3e65, 
+0x4d3c, 0x4346, 0x7542, 0x7474, 0x6e6f, 0x415f, 0x7475, 0x736f, 0x7a69, 
+0x3e65, 0x4146, 0x534c, 0x3c45, 0x4d2f, 0x4346, 0x7542, 0x7474, 0x6e6f, 
+0x415f, 0x7475, 0x736f, 0x7a69, 0x3e65, 0x4d3c, 0x4346, 0x7542, 0x7474, 
+0x6e6f, 0x545f, 0x6f6f, 0x746c, 0x7069, 0x3c3e, 0x4d2f, 0x4346, 0x7542, 
+0x7474, 0x6e6f, 0x545f, 0x6f6f, 0x746c, 0x7069, 0x3c3e, 0x464d, 0x4243, 
+0x7475, 0x6f74, 0x5f6e, 0x7546, 0x6c6c, 0x6554, 0x7478, 0x6f54, 0x6c6f, 
+0x543e, 0x5552, 0x3c45, 0x4d2f, 0x4346, 0x7542, 0x7474, 0x6e6f, 0x465f, 
+0x6c75, 0x546c, 0x7865, 0x5474, 0x6f6f, 0x3e6c, 0x4d3c, 0x4346, 0x7542, 
+0x7474, 0x6e6f, 0x435f, 0x7275, 0x6f73, 0x5472, 0x7079, 0x3e65, 0x3131, 
+0x2f3c, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x7543, 0x7372, 0x726f, 
+0x7954, 0x6570, 0x3c3e, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x6d49, 
+0x6761, 0x5465, 0x7079, 0x3e65, 0x3c38, 0x4d2f, 0x4346, 0x7542, 0x7474, 
+0x6e6f, 0x495f, 0x616d, 0x6567, 0x7954, 0x6570, 0x3c3e, 0x464d, 0x4243, 
+0x7475, 0x6f74, 0x5f6e, 0x6d49, 0x6761, 0x4f65, 0x546e, 0x706f, 0x463e, 
+0x4c41, 0x4553, 0x2f3c, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x6d49, 
+0x6761, 0x4f65, 0x546e, 0x706f, 0x3c3e, 0x464d, 0x4243, 0x7475, 0x6f74, 
+0x5f6e, 0x6d49, 0x6761, 0x4f65, 0x526e, 0x6769, 0x7468, 0x463e, 0x4c41, 
+0x4553, 0x2f3c, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x6d49, 0x6761, 
+0x4f65, 0x526e, 0x6769, 0x7468, "\076" 
+    IDC_SAVE_LOG, 0x37c, 369, 0
+0x4d3c, 0x4346, 0x7542, 0x7474, 0x6e6f, 0x535f, 0x7974, 0x656c, 0x373e, 
+0x2f3c, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x7453, 0x6c79, 0x3e65, 
+0x4d3c, 0x4346, 0x7542, 0x7474, 0x6e6f, 0x415f, 0x7475, 0x736f, 0x7a69, 
+0x3e65, 0x4146, 0x534c, 0x3c45, 0x4d2f, 0x4346, 0x7542, 0x7474, 0x6e6f, 
+0x415f, 0x7475, 0x736f, 0x7a69, 0x3e65, 0x4d3c, 0x4346, 0x7542, 0x7474, 
+0x6e6f, 0x545f, 0x6f6f, 0x746c, 0x7069, 0x3c3e, 0x4d2f, 0x4346, 0x7542, 
+0x7474, 0x6e6f, 0x545f, 0x6f6f, 0x746c, 0x7069, 0x3c3e, 0x464d, 0x4243, 
+0x7475, 0x6f74, 0x5f6e, 0x7546, 0x6c6c, 0x6554, 0x7478, 0x6f54, 0x6c6f, 
+0x543e, 0x5552, 0x3c45, 0x4d2f, 0x4346, 0x7542, 0x7474, 0x6e6f, 0x465f, 
+0x6c75, 0x546c, 0x7865, 0x5474, 0x6f6f, 0x3e6c, 0x4d3c, 0x4346, 0x7542, 
+0x7474, 0x6e6f, 0x435f, 0x7275, 0x6f73, 0x5472, 0x7079, 0x3e65, 0x3131, 
+0x2f3c, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x7543, 0x7372, 0x726f, 
+0x7954, 0x6570, 0x3c3e, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x6d49, 
+0x6761, 0x5465, 0x7079, 0x3e65, 0x3c38, 0x4d2f, 0x4346, 0x7542, 0x7474, 
+0x6e6f, 0x495f, 0x616d, 0x6567, 0x7954, 0x6570, 0x3c3e, 0x464d, 0x4243, 
+0x7475, 0x6f74, 0x5f6e, 0x6d49, 0x6761, 0x4f65, 0x546e, 0x706f, 0x463e, 
+0x4c41, 0x4553, 0x2f3c, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x6d49, 
+0x6761, 0x4f65, 0x546e, 0x706f, 0x3c3e, 0x464d, 0x4243, 0x7475, 0x6f74, 
+0x5f6e, 0x6d49, 0x6761, 0x4f65, 0x526e, 0x6769, 0x7468, 0x463e, 0x4c41, 
+0x4553, 0x2f3c, 0x464d, 0x4243, 0x7475, 0x6f74, 0x5f6e, 0x6d49, 0x6761, 
+0x4f65, 0x526e, 0x6769, 0x7468, "\076" 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_ABOUTBOX            "&About NEWISP..."
+    IDS_STR_VIRSIONNUM      "Version 4.8.4"
+    IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\ISP.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"     // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

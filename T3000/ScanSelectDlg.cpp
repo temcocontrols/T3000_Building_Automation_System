@@ -163,7 +163,7 @@ BOOL CScanSelectDlg::OnInitDialog()
 	strTemp.LoadString(IDS_SAFESCANSTR);
 	GetDlgItem(IDC_RADIO2)->SetWindowText(strTemp);
 	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-	for(int i=0;i<pFrame->m_subNetLst.size();i++)
+	for(int i=0;i<(int)pFrame->m_subNetLst.size();i++)
 	{
 		m_strScanSubNetNameCobox.AddString(pFrame->m_subNetLst.at(i).strBuildingName);
 

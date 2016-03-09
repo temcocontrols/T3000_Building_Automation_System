@@ -1,7 +1,7 @@
 #pragma once
 #include "msflexgrid1.h"
 #include "afxwin.h"
-
+#include "DialogInfo.h"
 // CAllNodesDiaolg dialog
 
 class CAllNodesDiaolg : public CDialog
@@ -16,8 +16,8 @@ public:
 	enum { IDD = IDD_ALLNODESDIALOG };
 	BOOL m_bChanged;
 private:
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
+// 	_ConnectionPtr m_pCon;
+// 	_RecordsetPtr m_pRs;
 	int m_nCurRow;
 	int m_nCurCol;
 	CMsflexgrid m_FlexGrid;
@@ -55,4 +55,9 @@ public:
 	afx_msg void OnEnKillfocusTextedit();
 	afx_msg void OnEnSetfocusTextedit();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnBnClickedArd();
+    afx_msg void OnBnClickedDelbuttonOffline();
+     
+    CDialogInfo *m_pDialogInfo;
+
 };

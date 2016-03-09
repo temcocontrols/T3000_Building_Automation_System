@@ -53,6 +53,7 @@ CAddBuilding::CAddBuilding(CWnd* pParent /*=NULL*/)
 	m_nCurCol=-1;
 	pNCScanThread=NULL;
 	m_bRunningThread=FALSE;
+	m_Changed=FALSE;
 }
 
 CAddBuilding::~CAddBuilding()
@@ -236,9 +237,7 @@ BOOL CAddBuilding::OnInitDialog()
 	CDialog::OnInitDialog();
 	::InitializeCriticalSection(&g_Lock);
 
-	//GetSerialComm(m_szComm);
-	  GetSerialComPortNumber(m_szComm);
-	//GetSerialComPortNumber1(m_szComm);
+	GetSerialComPortNumber1(m_szComm);
 	CString strIPTest;
 //	GetIPbyHostName(_T("www.google.com"),strIPTest);
 	m_AddBuiding_SetComBox.ShowWindow(SW_HIDE);
@@ -353,12 +352,24 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 	if(0==lCol)
 	{
 		//ID_BUILDINGSEL_SELECT
-		CMenu menu;
-		menu.LoadMenu(IDR_BUILDINGSELE_MENU);
-		CMenu *pmenu=menu.GetSubMenu(0);
-		CPoint point;
-		GetCursorPos(&point);
-		pmenu->TrackPopupMenu(TPM_LEFTBUTTON | TPM_LEFTALIGN ,point.x,point.y,this);	
+
+		int rows = m_AddBuiding_FlexGrid.get_Rows();
+		if ((lRow == 0)||(lRow + 1 == rows))
+		{
+		return;
+		}
+		
+		if (lRow!=0)
+		{
+			CMenu menu;
+			menu.LoadMenu(IDR_BUILDINGSELE_MENU);
+			CMenu *pmenu=menu.GetSubMenu(0);
+			CPoint point;
+			GetCursorPos(&point);
+			pmenu->TrackPopupMenu(TPM_LEFTBUTTON | TPM_LEFTALIGN ,point.x,point.y,this);	
+		}
+		
+		
 
 	}
 	if(lCol==AB_MAINNAME)
@@ -399,7 +410,7 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 		m_AddBuiding_SetComBox.ResetContent();
 		m_AddBuiding_SetComBox.InsertString(0,_T("Modbus 485"));
 		m_AddBuiding_SetComBox.InsertString(1,_T("Modbus TCP"));
-		m_AddBuiding_SetComBox.InsertString(2,_T("Bacnet"));
+		m_AddBuiding_SetComBox.InsertString(2,_T("BacnetIP"));
 		m_AddBuiding_SetComBox.MoveWindow(&rcCell,1); //移动到选中格的位置
 		m_AddBuiding_SetComBox.BringWindowToTop();
 		m_AddBuiding_SetComBox.ShowWindow(SW_SHOW);//显示控件
@@ -408,15 +419,6 @@ void CAddBuilding::ClickAddbuildingMsflexgrid()
 	if(AB_COMPORT==lCol)
 	{
 		m_AddBuiding_SetComBox.ResetContent();
-// 		m_AddBuiding_SetComBox.AddString(_T("COM1"));
-// 		m_AddBuiding_SetComBox.AddString(_T("COM2"));
-// 		m_AddBuiding_SetComBox.AddString(_T("COM3"));
-// 		m_AddBuiding_SetComBox.AddString(_T("COM4"));
-// 		m_AddBuiding_SetComBox.AddString(_T("COM5"));
-// 		m_AddBuiding_SetComBox.AddString(_T("COM6"));
-// 		m_AddBuiding_SetComBox.AddString(_T("COM7"));
-// 		m_AddBuiding_SetComBox.AddString(_T("COM8"));
-// 		m_AddBuiding_SetComBox.AddString(_T("COM9"));
 		for (UINT i = 0; i < m_szComm.size(); i++)
 		{
 			m_AddBuiding_SetComBox.AddString(m_szComm[i]);
@@ -544,6 +546,8 @@ void CAddBuilding::ReloadAddBuildingDB()
 		if(m_strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
 		{
 			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_IPADDRESS,m_strIpAddress);
+
+
 		}
 		else
 		{   str_temp=NO_APPLICATION;//
@@ -557,10 +561,18 @@ void CAddBuilding::ReloadAddBuildingDB()
 		else
 			m_strIpPort=_T("");
 
+		temp_variant=m_pRs->GetCollect("Com_Port");
+		if(temp_variant.vt!=VT_NULL)
+			m_strComPort=temp_variant;
+		else
+			m_strComPort=_T("");
+
 		
 		if(m_strProtocol.CompareNoCase(_T("Modbus TCP"))==0)
 		{
 			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_IPPORT,m_strIpPort);
+
+
 		}
 		else
 		{   str_temp=NO_APPLICATION;//
@@ -569,12 +581,8 @@ void CAddBuilding::ReloadAddBuildingDB()
 		
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		temp_variant=m_pRs->GetCollect("Com_Port");
-		if(temp_variant.vt!=VT_NULL)
-			m_strComPort=temp_variant;
-		else
-			m_strComPort=_T("");
-		
+
+#if 0
 		if(m_strProtocol.CompareNoCase(_T("Modbus 485"))==0)
 		{
 			if(IsValidCOM(m_strComPort))
@@ -591,7 +599,15 @@ void CAddBuilding::ReloadAddBuildingDB()
 			str_temp=NO_APPLICATION;//
 			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_COMPORT,str_temp);
 		}
-		
+#endif
+		if(IsValidCOM(m_strComPort))
+		{
+			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_COMPORT,m_strComPort);
+		}
+		else if(m_szComm.size()>0)
+		{
+			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_COMPORT,m_szComm[0]);
+		}
 
 		//Baudrate
 		temp_variant=m_pRs->GetCollect("Braudrate");
@@ -599,7 +615,7 @@ void CAddBuilding::ReloadAddBuildingDB()
 			m_strBaudrat=temp_variant;
 		else
 			m_strBaudrat=_T("");
-		
+#if 0		
 		if(m_strProtocol.CompareNoCase(_T("Modbus 485"))==0)
 		{
 			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_BAUDRAT,m_strBaudrat);
@@ -609,8 +625,8 @@ void CAddBuilding::ReloadAddBuildingDB()
 			str_temp=NO_APPLICATION;//
 			m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_BAUDRAT,str_temp);
 		}
-
-		
+#endif
+		m_AddBuiding_FlexGrid.put_TextMatrix(temp_row,AB_BAUDRAT,m_strBaudrat);
 
 		m_pRs->MoveNext();//
 	}	
@@ -628,6 +644,9 @@ void CAddBuilding::ReloadAddBuildingDB()
 	if(m_pRs->State) 
 		m_pRs->Close(); 
 }
+
+
+
 void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 {
 #if 1
@@ -658,6 +677,71 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 			
 			if(m_nCurCol==AB_IPADDRESS)
 			{
+				CString strIP;
+				bool is_domain = false;
+				strIP = strText;
+				if(strIP.IsEmpty())
+					return;
+				CStringArray temparray;
+				SplitCStringA(temparray,strIP,_T("."));
+				if((temparray.GetSize()==4))	//有3个  . 4段
+				{
+					CString temp_0;
+					CString temp_1;
+					CString temp_2;
+					CString temp_3;
+					temp_0 = temparray.GetAt(0);
+					temp_1 = temparray.GetAt(1);
+					temp_2 = temparray.GetAt(2);
+					temp_3 = temparray.GetAt(3);
+
+					if((Is_Dig_Num(temp_0)) && (Is_Dig_Num(temp_1)) && (Is_Dig_Num(temp_2)) && (Is_Dig_Num(temp_3)))
+					{
+						if(::ValidAddress(strIP) == false)
+						{
+							MessageBox(_T("Warning!IP address error!"));
+							return;
+						}
+
+					}
+					else	//否则判断为 域名;
+					{
+						is_domain = true;
+					}
+				}
+				else	//判断为 域名;
+				{
+					is_domain = true;
+				}
+
+				if(is_domain)
+				{
+					CString temp_host_ip;
+					if(!GetIPbyHostName(strText,temp_host_ip))
+					{
+						AfxMessageBox(_T("Can not get a validate IP adreess from the domain name!"));
+						return;
+					}
+					strText = temp_host_ip;
+					//char temp_domain[200];
+					//WideCharToMultiByte( CP_ACP, 0, strIP.GetBuffer(), -1, temp_domain, 255, NULL, NULL );
+					//strIP.ReleaseBuffer();
+					//hostent* host = gethostbyname(temp_domain);
+					//if(host == NULL)
+					//{
+					//	if(IDYES == MessageBox(_T("The domain is unreachable .Continue?"),_T("Warning"),MB_YESNO))
+					//	{
+
+					//	}
+					//	else
+					//	{
+					//		return;
+					//	}
+					//}
+				}
+
+
+#if 0
 				if(!ValidAddress(strText))
 				{
 					if(strText.IsEmpty())
@@ -683,6 +767,7 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 				//{
 				//	return;
 				//}
+#endif
 				m_strIpAddress=strText;
 				m_AddBuiding_FlexGrid.put_TextMatrix(m_nCurRow,m_nCurCol,strText);
 			}
@@ -725,7 +810,7 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 			if(m_nCurCol==AB_IPADDRESS)
 			{
 		
-				if(!ValidAddress(strText))
+				if(!::ValidAddress(strText))
 				{
 					
 					//if(strText.CompareNoCase((CString)NO_APPLICATION)==0)
@@ -733,7 +818,7 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 
 					if(strText.IsEmpty())
 					{
-						AfxMessageBox(_T("Please input a validate IP adreess or domain name!"));
+						//AfxMessageBox(_T("Please input a validate IP adreess or domain name!"));
 						return;
 					}
 				
@@ -768,6 +853,8 @@ void CAddBuilding::OnEnKillfocusAddbuidingSetedit()
 		}
 	
 		m_AddBuiding_SetEditCtrl.ShowWindow(SW_HIDE);
+
+		OnBnClickedAddbuiding();
 #endif
 }
 
@@ -813,44 +900,41 @@ void CAddBuilding::Update_Recorder()
 {
 	try
 	{
-
-	CString strSql;
-	strSql.Format(_T("update Building set Main_BuildingName='%s',Building_Name='%s',Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s' where Building_Name='%s' and Main_BuildingName='%s'"),m_strMainBuildingName,m_strBuildingName,m_strProtocol,m_strIpAddress,m_strIpPort,m_strComPort,m_strBaudrat,m_strBuilding_Name2,m_strMainBuildingName2);
-	//m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);	
-	
-	m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-	if(m_nCurCol==AB_NAME)
-	{
-		m_strBuilding_Name2=m_strBuildingName;
-	}
-	if(m_pRs->State) 
-		m_pRs->Close();
-
+		CString strSql;
+		strSql.Format(_T("update Building set Main_BuildingName='%s',Building_Name='%s',Protocal='%s',Ip_Address='%s',Ip_Port='%s',Com_Port='%s',Braudrate='%s' where Building_Name='%s' and Main_BuildingName='%s'"),m_strMainBuildingName,m_strBuildingName,m_strProtocol,m_strIpAddress,m_strIpPort,m_strComPort,m_strBaudrat,m_strBuilding_Name2,m_strMainBuildingName2);
+		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		if(m_nCurCol==AB_NAME)
+		{
+			m_strBuilding_Name2=m_strBuildingName;
+		}
+		if(m_pRs->State) 
+			m_pRs->Close();
 	}
 	catch (...)
 	{
-
 	}
-
-
 	ReloadAddBuildingDB();
 }
 
 void CAddBuilding::OnBnClickedExit()
 {
 	// TODO: Add your control notification handler code here
-
+	m_Changed=TRUE;
+	   if (m_Changed)
+	   {
+		   CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+		   ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
+	   }
 	CDialog::OnOK();
 }
 void CAddBuilding::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
 
-		SaveAll();
-//   scan，常要特意选择一个COM，即使看到的是正确也要选一下，否则就说串口号不对
-// 	 CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
-// 	 pMain->Treestatus();
-//	 OnOK();
+		SaveAll();//scan，常要特意选择一个COM，即使看到的是正确也要选一下，否则就说串口号不对
+// 		CMainFrame* pMain = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+// 		pMain->Treestatus();
+//	OnOK();
 }
 void CAddBuilding::OnEnSetfocusAddbuidingSetedit()
 {
@@ -900,31 +984,7 @@ BOOL CAddBuilding::ValidAddress(CString sAddress,UINT& n1,UINT& n2,UINT& n3,UINT
 
 	return true;
 }
-BOOL CAddBuilding::ValidAddress(CString sAddress)
-{
-	int nPos;
-	UINT n1,n2,n3,n4;
-	CString sTemp=sAddress;
-	n1=_wtoi(sTemp);
-	nPos=sTemp.Find(_T("."));
-	if(nPos==-1) return false;
-	sTemp=sTemp.Mid(nPos+1);
 
-	n2=_wtoi(sTemp);
-	nPos=sTemp.Find(_T("."));
-	if(nPos==-1) return false;
-	sTemp=sTemp.Mid(nPos+1);
-	n3=_wtoi(sTemp);
-	nPos=sTemp.Find(_T("."));
-	if(nPos==-1) return false;
-	sTemp=sTemp.Mid(nPos+1);
-	n4=_wtoi(sTemp);
-	if(n1<0 ||n1>255) return false;
-	if(n2<0 ||n2>255) return false;
-	if(n3<0 ||n3>255) return false;
-	if(n4<0 ||n4>255) return false;
-	return TRUE;
-}
 
 void CAddBuilding::SetBuildingMainName(CString strBuildName)
 {
@@ -950,16 +1010,16 @@ catch (...)
 }
 void CAddBuilding::OnMainBuildingUnSelect()
 {
-try
-{
+	try
+	{
 
-	CString execute_str=_T("update Building set Default_SubBuilding = 0 where Default_SubBuilding = -1");
-	m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);	
-}
-catch (...)
-{
+		CString execute_str=_T("update Building set Default_SubBuilding = 0 where Default_SubBuilding = -1");
+		m_pCon->Execute(execute_str.GetString(),NULL,adCmdText);	
+	}
+	catch (...)
+	{
 
-}
+	}
 
 	ReloadAddBuildingDB();
 }
@@ -971,21 +1031,21 @@ void CAddBuilding::OnBuildingDelete()
 	}
 	CString strSql;
 	strSql.Format(_T("delete * from Building where Building_Name='%s' and Main_BuildingName='%s'"),m_strBuilding_Name2,m_strMainBuildingName);
-try
-{
-
-
-	CString strTemp;
-	strTemp.Format(_T("Are you sure to delete the building:'%s->%s'"),m_strMainBuildingName,m_strBuilding_Name2);
-	if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
+	try
 	{
-		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
-	}
-}
-catch (...)
-{
 
-}
+
+		CString strTemp;
+		strTemp.Format(_T("Are you sure to delete the building:'%s->%s'"),m_strMainBuildingName,m_strBuilding_Name2);
+		if(AfxMessageBox(strTemp,MB_OKCANCEL)==IDOK)
+		{
+			m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+		}
+	}
+	catch (...)
+	{
+
+	}
 	ReloadAddBuildingDB();
 
 }
@@ -1011,8 +1071,7 @@ void CAddBuilding::PostNcDestroy()
 
 	::DeleteCriticalSection(&g_Lock);
 	Sleep(150);
-	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-	::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
+	
 
 	CDialog::PostNcDestroy();
 }
@@ -1052,6 +1111,7 @@ void CAddBuilding::OnCbnSelendokAddbuidingSelectcombo()
 
 	}
 	m_AddBuiding_SetComBox.ShowWindow(SW_HIDE);
+	m_Changed=TRUE;
 //	AfxMessageBox(m_strBuilding_Name2);
 
 }
@@ -1074,7 +1134,7 @@ void CAddBuilding::OnEnKillfocusMainbuildedit()
 			strTemp=m_BuildNameLst.at(i).strMainBuildName;
 			if(strText.CompareNoCase(strTemp)==0&&m_strBuilding_Name2.CompareNoCase(m_BuildNameLst.at(i).strSubBuildName)==0)
 			{
-				AfxMessageBox(_T("The building Name has exist, please change another one."));
+				    AfxMessageBox(_T("The building Name has exist, please change another one."));
 					m_mainBuildEdt.ShowWindow(SW_HIDE);
 				return;
 			}
@@ -1102,6 +1162,7 @@ void CAddBuilding::OnEnKillfocusMainbuildedit()
 		}
 	}
 	m_mainBuildEdt.ShowWindow(SW_HIDE);
+
 }
 
 void CAddBuilding::OnEnSetfocusMainbuildedit()
@@ -1530,7 +1591,7 @@ void CAddBuilding::OnTimer(UINT_PTR nIDEvent)
 }
 
 
-BOOL CAddBuilding::GetIPbyHostName(CString strHostName,CString strIP)
+BOOL CAddBuilding::GetIPbyHostName(CString strHostName,CString &strIP)
 {
 	WSAData   wsdata; 
 	WORD wVersionRequested=MAKEWORD(2,0);   
@@ -1706,7 +1767,7 @@ void CAddBuilding::SaveAll()
 		strproduct_class_id.Format(_T("%d"),g_NCList.at(j).nProductID);
 		strproduct_id.Format(_T("%d"),g_NCList.at(j).modbusID);
 		strscreen_name.Format(_T("Sceen(S:%d--%d)"),g_NCList.at(j).nSerial,g_NCList.at(j).modbusID);
-		strbackground_bmp=_T("Clicking here to add a image...");
+		strbackground_bmp=_T("T3000_Default_Building_PIC.bmp");
 		strSerialnumber.Format(_T("%d"), g_NCList.at(j).nSerial);
 		strIPAddress=g_NCList.at(j).strIP;
 		strIPPortNum.Format(_T("%d"),g_NCList.at(j).nPort);
@@ -1805,7 +1866,7 @@ void CAddBuilding::OnBnClickedAddbuiding()
 	CString strMainBuildName=m_AddBuiding_FlexGrid.get_TextMatrix(nMaxRowIndext,AB_MAINNAME);
 	if(strMainBuildName.IsEmpty())
 	{
-		AfxMessageBox(_T("Input the building info in the last row of grid, the building and sub building NAME can not be empty."));
+		//AfxMessageBox(_T("Input the building info in the last row of grid, the building and sub building NAME can not be empty."));
 		return ;
 	}
 
@@ -1887,6 +1948,33 @@ void CAddBuilding::OnBnClickedAddbuiding()
 		strCOMPortBraud=_T("19200");
 	}
 
+	//----------------------Add by Fance 2013 04 23-------------------------------------------------------
+	//judge whether the building name you added is exist
+	//if not exist we need to add this building in table Building_ALL in t3000.mdb
+	//and then we can insert this building into table Building.if not ,it will crash when insert data into Building
+	//Because the table Building is associated with  Building_ALL 
+	strSql.Format(_T("Select * from Building_ALL where Building_Name = '%s'"),strMainBuildName);
+	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+	_variant_t temp_variant_name;
+	bool findMainBuilding=false;
+	if(VARIANT_FALSE==m_pRs->EndOfFile)		//If it's not empty , means the input Building has exist in Main Building.
+	{
+		findMainBuilding=true;
+	}
+
+	if(m_pRs->State)
+		m_pRs->Close();
+
+
+	if(!findMainBuilding)
+	{
+		strSql.Format(_T("insert into Building_ALL (Building_Name,Telephone,Address) values('"+strMainBuildName+"','"+ _T("") +"','"+_T("") +"')"));
+		m_pCon->Execute(strSql.GetString(),NULL,adCmdText);
+	}
+	//---------------------------------------------------------------------------------------------
+
+
+
 	try
 	{
 	BOOL bDefault =FALSE;
@@ -1898,4 +1986,7 @@ void CAddBuilding::OnBnClickedAddbuiding()
 		AfxMessageBox(e->ErrorMessage());
 	}
 	Update_Recorder();
+	m_Changed=TRUE;
+
+
 }

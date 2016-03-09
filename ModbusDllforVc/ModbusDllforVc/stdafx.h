@@ -40,3 +40,8 @@
 #include <afxmt.h>		
 #define OUTPUT extern "C" __declspec(dllexport)
 
+#define MKBOOL(_VALUE) ((_VALUE) != 0)		//Add by Fance .Use this macro to solve the warning warning C4800: 'BOOL' : forcing value to bool 'true' or 'false'
+
+#pragma warning(disable:4146)	//Add by Fance
+ //warning C4146: unary minus operator applied to unsigned type, result still unsigned
+//The MSDN suggested that we can ignore it;

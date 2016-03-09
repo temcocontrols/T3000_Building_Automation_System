@@ -31,18 +31,20 @@ public:
 	int GetEPSize()const;
 	void SetEPSize(int nEPSize);
 	
+	int GetProtocol() const;
+	void SetProtocol(int nProtocol);
+
 	CString GetProductName();
-	 
 // 	int GetAddrID()const;
 // 	void SetAddrID(int nID);
 
 	
-   BOOL CTStat_Dev::operator==(const CTStat_Dev& dev);
+	BOOL CTStat_Dev::operator==(const CTStat_Dev& dev);
 
 
 
-protected:
-	
+public:
+	int				m_nprotocol;				//协议
 	int				m_nBaudRate;				// 波特率
 	int				m_nComPort;				// 串口	
 	int				m_nEPSize;					// ??

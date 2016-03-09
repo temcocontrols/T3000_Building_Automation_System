@@ -1,8 +1,25 @@
 #pragma once
 #include "afxwin.h"
-
+#include "bado/BADO.h"
 
 // CLabelEditDlg dialog
+#define START_ID 20000
+// CLabelEditDlg dialog
+#define INPUT_NUMBER 11
+
+#define OUTPUT_NUMBER 7
+//CString m_input[INPUT_NUMBER]={_T("Internal"),_T("Analog 1"),_T("Analog 2"),_T("Digital 1")};
+//g_strSensorName
+//	g_strInName1);
+//g_strInName2);
+//g_strInName3);
+//g_strInName4);
+//g_strInName5);
+//g_strInName6);
+//g_strInName7);
+//g_strInName8); 
+//g_strInHumName)
+//	g_strInCO2);
 
 class CLabelEditDlg : public CDialog
 {
@@ -33,8 +50,9 @@ public:
 	void SaveToDb();
 private:
 	int m_nCommandType;//1:Add;2:Edit
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
+// 	_ConnectionPtr m_pCon;
+// 	_RecordsetPtr m_pRs;
+CBADO m_bado;
 public:
 	void SetInitValueForEdit(int id,int serialNum,CString strScreen,int idControl,int in_out_put=0,int nWidth=75,int nHeight=25,int nStatus=0,int clrText=RGB(0, 0, 0),int bkClr=RGB(224, 232, 246));
 	int m_nControlID;
@@ -60,4 +78,6 @@ public:
 	afx_msg void OnBnClickedExitbutton();
 	afx_msg void OnBnClickedBkclorbtn();
 	afx_msg void OnBnClickedTextbutton();
+	CString m_input[INPUT_NUMBER];
+	CString m_output[OUTPUT_NUMBER];
 };

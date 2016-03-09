@@ -62,12 +62,42 @@ void CGraphicView::AssertValid() const
 }
 #endif //_DEBUG
 
+
+
 void CGraphicView::InitGraphic(int nSerialNum,int nTstatID)
 {
 //	register_critical_section.Lock();
 //	memcpy((unsigned short*)&(multi_register_value[0]),(unsigned short*)&multi_register_value[0],sizeof(multi_register_value));
 //	register_critical_section.Unlock();
 	//m_strImgPathName=g_strImagePathName;
+	//if(bac_cm5_graphic == true)
+	//{
+	//	m_pCon.CreateInstance(_T("ADODB.Connection"));
+	//	m_pRs.CreateInstance(_T("ADODB.Recordset"));
+	//	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+	//	CString strSql;
+	//	//if(bac_cm5_graphic == false)
+	//	strSql.Format(_T("select * from All_NODE where Serial_Num = '%d'"),nSerialNum);
+	//	//else
+	//	//strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i"),g_bac_instance,g_mac);
+	//	//strSql.Format(_T("select * from Screen_Label where Tstat_id=%i"),m_nTstatID);
+	//	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
+	//	CString strtemp;
+	//	strtemp.Empty();
+
+	//	_variant_t temp_variant;
+	//	int nTemp;
+	//	CString strTemp;
+	//	while(VARIANT_FALSE==m_pRs->EndOfFile)
+	//	{	
+
+	//		strTemp=m_pRs->GetCollect("Background_imgID");//
+	//		g_strImagePathName=strTemp;
+	//		m_pRs->MoveNext();
+	//	}
+	//}
+
+
 	m_strImgPathName=g_strImgeFolder+g_strImagePathName;
 
 	WIN32_FIND_DATA fData;
@@ -101,6 +131,7 @@ void CGraphicView::InitGraphic(int nSerialNum,int nTstatID)
 	
 	ReloadLabelsFromDB();
 	this->SetFocus();
+	SetTimer(1,7000,NULL);//此定时器是用于刷新 Label的;
 }
 // CGraphicView message handlers
 
@@ -124,7 +155,7 @@ void CGraphicView::OnPaint()
 			graphics.DrawImage(&bitmap,XStart,YStart,bitmap.GetWidth(),bitmap.GetHeight());
 
 	}
-	for(int i=0;i<m_RelayLabelLst.size();i++)
+	for(int i=0;i<(int)m_RelayLabelLst.size();i++)
 	{
 		if(i==m_nFoucsIndext&& !m_LbtDown)
 		{
@@ -149,9 +180,10 @@ void CGraphicView::OnPaint()
 		label=m_RelayLabelLst.at(i);
 
 		//m_RelayLabelLst.at(i).plabelCtrl->SetLabelInfo(label.tstat_id,label.input_or_output,label.status,label.clrTxt,label.bkColor);
-
+		if(bac_cm5_graphic == false)
 		label.plabelCtrl->SetLabelInfo(label.tstat_id,label.input_or_output,label.status,label.clrTxt,label.bkColor);
-
+		else
+		label.plabelCtrl->SetLabelInfo_General(label.tstat_id,label.input_or_output,label.status,label.clrTxt,label.bkColor);
 	}
 	//m_Label.ShowWindow(SW_SHOW);
 
@@ -262,9 +294,22 @@ void CGraphicView::OnMouseMove(UINT nFlags, CPoint point)
 	}
 	CFormView::OnMouseMove(nFlags, point);
 }
+//int CGraphicView::HitTestEx(CPoint & point)
+//{
+//	for (int i=0;i<(int)m_RelayLabelLst.size();i++)
+//	{
+//		CRect rcItem;
+//		m_RelayLabelLst.at(i).plabelCtrl->GetWindowRect(&rcItem);
+//		ScreenToClient(&rcItem);
+//		if(rcItem.PtInRect(point))
+//		{
+//			return i;
+//		}
+//	}
+//}
 int CGraphicView::HitTestEx(CPoint & point)
 {
-	for(int i=0;i<m_RelayLabelLst.size();i++)
+	for(int i=0;i<(int)m_RelayLabelLst.size();i++)
 	{
 		CRect rcItem;
 		m_RelayLabelLst.at(i).plabelCtrl->GetWindowRect(&rcItem);
@@ -446,9 +491,10 @@ void CGraphicView::OnBnClickedApplybutton()
 }
 void CGraphicView::ClearAllLabels()
 {
+	m_graphic_refresh_data.clear();
 	if(g_GraphicModelevel==1)
 		return;
-	for(int i=0;i<m_RelayLabelLst.size();i++)
+	for(int i=0;i<(int)m_RelayLabelLst.size();i++)
 	{
 		if(m_RelayLabelLst.at(i).plabelCtrl!=NULL&&m_RelayLabelLst.at(i).plabelCtrl->m_hWnd!=NULL)
 		{
@@ -462,12 +508,15 @@ void CGraphicView::ClearAllLabels()
 void CGraphicView::ReloadLabelsFromDB()
 {
 	ClearAllLabels();
-
+	
 	m_pCon.CreateInstance(_T("ADODB.Connection"));
 	m_pRs.CreateInstance(_T("ADODB.Recordset"));
 	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
 	CString strSql;
+	//if(bac_cm5_graphic == false)
 	strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i"),m_nSerialNumber,m_nTstatID);
+	//else
+	//strSql.Format(_T("select * from Screen_Label where Serial_Num =%i and Tstat_id=%i"),g_bac_instance,g_mac);
 	//strSql.Format(_T("select * from Screen_Label where Tstat_id=%i"),m_nTstatID);
 	m_pRs->Open((_variant_t)strSql,_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);
 	CString strtemp;
@@ -476,6 +525,7 @@ void CGraphicView::ReloadLabelsFromDB()
 	_variant_t temp_variant;
 	int nTemp;
 	CString strTemp;
+	int nItem = 0;//用于记录有多少个需要刷新;
 	while(VARIANT_FALSE==m_pRs->EndOfFile)
 	{	
 		Label_information label;
@@ -545,7 +595,6 @@ void CGraphicView::ReloadLabelsFromDB()
 		}
 	//	label.bkColor=nTemp;
 		CRelayLabel* pLabel=new(CRelayLabel);
-
 		pLabel->Create(_T(""),WS_CHILD|WS_VISIBLE|SS_CENTER,CRect(XStart+label.point.x,YStart+label.point.y,XStart+label.point.x+label.width,YStart+label.point.y+label.height), this,label.cstatic_id);
 
 		//(int TstatID,int input_or_output,int nStatus,COLORREF textClr,COLORREF bkClr)
@@ -555,7 +604,29 @@ void CGraphicView::ReloadLabelsFromDB()
 		m_RelayLabelLst.push_back(label);
 
 		m_pRs->MoveNext();
-
+		_Graphic_Value_Info temp1;
+		m_graphic_refresh_data.push_back(temp1);
+		m_graphic_refresh_data.at(nItem).deviceid = label.tstat_id;
+		m_graphic_refresh_data.at(nItem).value_type = label.input_or_output;
+		m_graphic_refresh_data.at(nItem).value_item = label.status;
+		m_graphic_refresh_data.at(nItem).control_pt = pLabel;
+		if(label.input_or_output == 0)
+		{
+			m_graphic_refresh_data.at(nItem).command = READINPUT_T3000;
+			m_graphic_refresh_data.at(nItem).entitysize = sizeof(Str_in_point);
+		}
+		else if(label.input_or_output == 1)
+		{
+			m_graphic_refresh_data.at(nItem).command = READOUTPUT_T3000;
+			m_graphic_refresh_data.at(nItem).entitysize = sizeof(Str_out_point);
+		}
+		else if(label.input_or_output == 2)
+		{
+			m_graphic_refresh_data.at(nItem).command = READVARIABLE_T3000;
+			m_graphic_refresh_data.at(nItem).entitysize = sizeof(Str_variable_point);
+		}
+		m_graphic_refresh_data.at(nItem).hWnd = this->m_hWnd;
+		nItem ++;
 	}
 
 	if(m_pRs->State) 
@@ -602,7 +673,10 @@ void CGraphicView::OnInitialUpdate()
 
 void CGraphicView::OnBnClickedGobackbutton()
 {
+
 	((CMainFrame*)(theApp.m_pMainWnd))->SwitchToPruductType(0);
+
+
 }
 void CGraphicView::saveLabelInfo(int nItem)
 {
@@ -610,7 +684,7 @@ void CGraphicView::saveLabelInfo(int nItem)
 		return;
 	if(nItem<0)
 		return;
-	if(nItem>=m_RelayLabelLst.size())
+	if(nItem>=(int)m_RelayLabelLst.size())
 		return;
 	m_pCon.CreateInstance(_T("ADODB.Connection"));
 	m_pCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
@@ -661,11 +735,15 @@ void CGraphicView::OnBnClickedImgcnfigbutton()
 			}	
 			FindClose(hFile);
 
-			_ConnectionPtr tmpCon;
-			_RecordsetPtr tmppRs;
-			tmpCon.CreateInstance(_T("ADODB.Connection"));
-			tmppRs.CreateInstance(_T("ADODB.Recordset"));
-			tmpCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+// 			_ConnectionPtr tmpCon;
+// 			_RecordsetPtr tmppRs;
+// 			tmpCon.CreateInstance(_T("ADODB.Connection"));
+// 			tmppRs.CreateInstance(_T("ADODB.Recordset"));
+// 			tmpCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
+			CBADO bado;
+			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+			bado.OnInitADOConn(); 
+
 			try
 			{
 
@@ -674,11 +752,8 @@ void CGraphicView::OnBnClickedImgcnfigbutton()
 			strImgFileName=_T("");
 			CString strSql;
 			strSql.Format(_T("update ALL_NODE set Background_imgID ='%s' where Serial_ID = '%d'"),strImgFileName,m_nSerialNumber);
-			tmpCon->Execute(strSql.GetString(),NULL,adCmdText);
-			if(tmppRs->State) 
-				tmppRs->Close(); 
-			if(tmpCon->State)
-				tmpCon->Close();	
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			bado.CloseConn();
 			g_strImagePathName=strImgFileName;
 			m_strImgPathName=g_strImgeFolder+g_strImagePathName;
 			InitGraphic(m_nSerialNumber,m_nTstatID);
@@ -695,10 +770,21 @@ void CGraphicView::OnBnClickedImgcnfigbutton()
 	case ID_IMGCONFIG_AND:
 		
 		{
-		if(m_nSerialNumber<=0)
+		if(bac_cm5_graphic == false)
 		{
-			AfxMessageBox(_T("Unavailable a Tstat!"));
-			return;
+			if(m_nSerialNumber<=0)
+			{
+				AfxMessageBox(_T("Unavailable a Tstat!"));
+				return;
+			}
+		}
+		else
+		{
+			if((g_bac_instance<=0) || (g_mac<=0))
+			{
+				AfxMessageBox(_T("Unavailable CM5!"));
+				return;
+			}
 		}
 		CString strFilter = _T("bmp file|*.bmp|jpg file|*.jpg|png file|*.png|tif file|*.tif|all file|*.*||");
 		CFileDialog dlg(true,_T("Open image file"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
@@ -709,23 +795,18 @@ void CGraphicView::OnBnClickedImgcnfigbutton()
 			CString strDestFileName=g_strImgeFolder+strImgFileName;
 
 			CopyFile(strImgFilePathName,strDestFileName,FALSE);
-			_ConnectionPtr tmpCon;
-			_RecordsetPtr tmppRs;
-			tmpCon.CreateInstance(_T("ADODB.Connection"));
-			tmppRs.CreateInstance(_T("ADODB.Recordset"));
-			tmpCon->Open(g_strDatabasefilepath.GetString(),_T(""),_T(""),adModeUnknown);
-
+			 
+			CBADO bado;
+			bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+			bado.OnInitADOConn(); 
 			try
 			{
 
 			CString strSql;
 			strSql.Format(_T("update ALL_NODE set Background_imgID ='%s' where Serial_ID = '%d'"),strImgFileName,m_nSerialNumber);
-			tmpCon->Execute(strSql.GetString(),NULL,adCmdText);
-			if(tmppRs->State) 
-				tmppRs->Close(); 
-			if(tmpCon->State)
-				tmpCon->Close();
-
+			bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+			 
+			 bado.CloseConn();
 			}
 			catch(_com_error *e)
 			{
@@ -744,6 +825,51 @@ void CGraphicView::OnBnClickedImgcnfigbutton()
 void CGraphicView::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
+	switch(nIDEvent)
+	{
+	case 1:
+		if(bac_cm5_graphic == true)	//如果是CM5 的Bacnet的协议 ;原来TSTAT的 处理方法和过程不要动;
+		{
+			for (int i=0;i<(int)m_graphic_refresh_data.size();i++)
+			{
+				Post_Refresh_One_Message(m_graphic_refresh_data.at(i).deviceid,
+					m_graphic_refresh_data.at(i).command,
+					m_graphic_refresh_data.at(i).value_item,
+					m_graphic_refresh_data.at(i).value_item,
+					m_graphic_refresh_data.at(i).entitysize);
+				CString temp;
+				//	static int test_value;
+#if 0
+				if(m_graphic_refresh_data.at(i).value_type == 0)
+				{
+					//	test_value ++;
+					//	temp.Format(_T("%d"),test_value);
+					temp.Format(_T("%d"),m_Input_data.at(m_graphic_refresh_data.at(i).value_item).value);
+				}
+				else if(m_graphic_refresh_data.at(i).value_type == 1)
+				{
+					//test_value ++;
+					//	test_value ++;
+					//	temp.Format(_T("%d"),test_value);
+					temp.Format(_T("%d"),m_Output_data.at(m_graphic_refresh_data.at(i).value_item).value);
+				}
+				else if(m_graphic_refresh_data.at(i).value_type == 2)
+				{
+					//	test_value ++;
+					//	test_value ++;
+					//	test_value ++;
+					//	temp.Format(_T("%d"),test_value);
+					temp.Format(_T("%d"),m_Variable_data.at(m_graphic_refresh_data.at(i).value_item).value);
+				}
 
+				m_graphic_refresh_data.at(i).control_pt->m_strValueText = temp;	//在Label上 设置显示的 值;
+#endif
+				m_graphic_refresh_data.at(i).control_pt->Invalidate();
+				//	m_graphic_refresh_data.at(i).control_pt->i
+			}
+
+		}
+		break;
+	}
 	CFormView::OnTimer(nIDEvent);
 }

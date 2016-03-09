@@ -69,6 +69,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="setupapi.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\..\T3000 Output\debug&quot;"
 				UACExecutionLevel="2"
 				GenerateDebugInformation="true"
 				GenerateMapFile="true"
@@ -155,6 +156,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="setupapi.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\..\T3000 Output\release&quot;"
 				UACExecutionLevel="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -252,19 +254,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\EnumSerial.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\EreaseDlg.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\excel9.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\extern_function.cpp"
 				>
 			</File>
 			<File
@@ -297,6 +291,10 @@
 			</File>
 			<File
 				RelativePath=".\hangeIDDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HumChamber.cpp"
 				>
 			</File>
 			<File
@@ -449,6 +447,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\T3000RegAddress.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\T3000TableView.cpp"
 				>
 			</File>
@@ -591,19 +593,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\EnumSerial.h"
-				>
-			</File>
-			<File
 				RelativePath=".\EreaseDlg.h"
 				>
 			</File>
 			<File
 				RelativePath=".\excel9.h"
-				>
-			</File>
-			<File
-				RelativePath=".\extern_function.h"
 				>
 			</File>
 			<File
@@ -644,6 +638,10 @@
 			</File>
 			<File
 				RelativePath=".\hangeIDDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HumChamber.h"
 				>
 			</File>
 			<File
@@ -792,6 +790,10 @@
 			</File>
 			<File
 				RelativePath=".\T3000Doc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\T3000RegAddress.h"
 				>
 			</File>
 			<File

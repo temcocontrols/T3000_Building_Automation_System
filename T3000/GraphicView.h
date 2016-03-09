@@ -53,6 +53,9 @@ public:
 	CString m_strScreenName;
 	int m_nSerialNumber;
 	int m_nTstatID;
+	int m_InstanceID;
+	unsigned short m_Mac;
+
 	CRelayLabel m_Label;
 
 	BOOL m_bImgExist;
@@ -69,6 +72,7 @@ public:
 	CMFCMenuButton m_delMenuBtn;
 public:
 	void InitGraphic(int nSerialNum,int nTstatID);
+	void InitGraphic(int nInstanceID,unsigned short nMac);
 	void PainNoImageInfo(CDC* pDC);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	int HitTestEx(CPoint & point);
