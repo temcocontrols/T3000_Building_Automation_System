@@ -1074,6 +1074,8 @@ extern char m_at_read_buf[450];
 
 extern Monitor_Block m_monitor_block;
 extern Str_Monitor_data_header m_monitor_head;
+extern char picture_data_buffer[400]; //用来存每包 pic 的数据.
+extern Str_picture_header m_picture_head; //传图片的 头，结构其实是和 monitor same.
 extern int Monitor_Input__Data[14][1000];
 extern unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
 extern unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//暂定2000;

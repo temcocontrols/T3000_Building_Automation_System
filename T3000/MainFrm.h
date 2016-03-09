@@ -542,4 +542,5 @@ public:
 
     //    BOOL CheckNameFromDevice(CString NameFromDevice);
   // virtual void GetMessageString(UINT nID, CString& rMessage);
+        afx_msg void OnToolBootloader();
 };

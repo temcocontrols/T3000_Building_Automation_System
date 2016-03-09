@@ -353,13 +353,13 @@ BOOL CHexFileParser::ReadExtLinearHexFile(CFile& hexfile, char* pBuf, int nBufLe
 {
 	//CArchive ar(&m_hex_file,CArchive::load);
 	//ASSERT(nBufLen >= 0xFFFF);
-	if (pBuf)
+	/*if (pBuf)
 	{
 		delete[] pBuf;
 		pBuf = NULL;
 	}
 
-	pBuf = new char[c_nHexFileBufLen];
+	pBuf = new char[c_nHexFileBufLen];*/
 		
 	CString strGetData;
 	int nBufCount = 0;

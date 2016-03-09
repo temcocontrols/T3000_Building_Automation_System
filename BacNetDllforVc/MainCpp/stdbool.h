@@ -14,11 +14,11 @@
    the values 0 and 1. */
 /* We choose 8 bit to match C++ */
 /* It must also promote to integer */
-typedef int8_t _Bool;
+typedef int8_t __Bool;
 #endif
 
 /* ISO C Standard: 7.16 Boolean type */
-#define bool _Bool
+#define bool __Bool
 #define true 1
 #define false 0
 #define __bool_true_false_are_defined 1

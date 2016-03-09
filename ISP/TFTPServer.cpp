@@ -625,15 +625,15 @@ BOOL TFTPServer::StartServer()
 
 	bool Use_Old_protocol=false;
 
-	if(!InitSocket())
-	{
-		CString strTips = _T("Initializing network failed...");
-		OutPutsStatusInfo(strTips, FALSE);
-		AfxMessageBox(strTips, MB_OK);
-		ReleaseAll();
-		//goto StopServer;
-		return 0;
-	}
+	//if(!InitSocket())
+	//{
+	//	CString strTips = _T("Initializing network failed...");
+	//	OutPutsStatusInfo(strTips, FALSE);
+	//	AfxMessageBox(strTips, MB_OK);
+	//	ReleaseAll();
+	//	//goto StopServer;
+	//	return 0;
+	//}
 
 
 	//bool hassendonce=false;//这个需要 EVAN改 现在只是零时的 只发一遍广播，发多遍广播 会回复5个byte的 错误。
@@ -645,39 +645,15 @@ BOOL TFTPServer::StartServer()
 			if((mode_send_flash_try_time++)<10)
 			{
 
-					SendFlashCommand();
+				//	SendFlashCommand();
 
-					#if 0
-					nRet = RecvBOOTP();
-					if (nRet==-1)
-					{
-						CString strTips = _T("Network connection interrupted. Please try again!");
-						OutPutsStatusInfo(strTips, FALSE);
-						AfxMessageBox(strTips, MB_OK);
-						ReleaseAll();
-						//goto StopServer;
-						return 0;
-					}
-					else if(nRet ==  1)
-					{
-						CString strTips = _T("Recv the BOOTP Request pack.");
-						nRet=StartServer_Old_Protocol();
-						Use_Old_protocol = true;
-						goto StopServer;
-					}
-					else
-					{
-						int n = 0;
-						strTips.Format(_T("Use old protocol send flash command.Remain(%d)"),5-mode_send_flash_try_time);
-						OutPutsStatusInfo(strTips, TRUE);
-					}
-					#endif
-				int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
-				//TRACE(_T("%d"),send_ret);
-				if(send_ret<0)	//如果发送失败 就尝试 再次进行TCP连接
-				{
-					TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
-				}
+					 
+				//int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
+				////TRACE(_T("%d"),send_ret);
+				//if(send_ret<0)	//如果发送失败 就尝试 再次进行TCP连接
+				//{
+				//	TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
+				//}
 				SetDHCP_Data();
 
 				
@@ -741,8 +717,6 @@ BOOL TFTPServer::StartServer()
 			if((device_jump_from_runtime == true)&&(has_wait_device_into_bootloader == false))
 			{
 				has_wait_device_into_bootloader = true;
-
-
 				OutPutsStatusInfo(_T(""), FALSE);
 				for (int i=0;i<7;i++)
 				{
@@ -776,11 +750,11 @@ BOOL TFTPServer::StartServer()
 			SetDHCP_Data();
 			if(mode_has_lanip_try_time++<5)
 			{
-				BOOL bBroadcast=false;
-				SendUDP_Flash_Socket.SetSockOpt(SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL),SOL_SOCKET);
-				SendUDP_Flash_Socket.SendTo(sendbuf,sizeof(sendbuf),FLASH_UDP_PORT,ISP_Device_IP,0);
-				strTips.Format(_T("Send DHCP Package!!(Remain time:%d)"),6-mode_has_lanip_try_time);
-				OutPutsStatusInfo(strTips, TRUE);
+                BOOL bBroadcast=false;
+                SendUDP_Flash_Socket.SetSockOpt(SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL),SOL_SOCKET);
+                SendUDP_Flash_Socket.SendTo(sendbuf,sizeof(sendbuf),FLASH_UDP_PORT,ISP_Device_IP,0);
+                strTips.Format(_T("Send DHCP Package!!(Remain time:%d)"),6-mode_has_lanip_try_time);
+                OutPutsStatusInfo(strTips, TRUE);
 			}
 			else
 			{

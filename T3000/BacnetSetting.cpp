@@ -8,6 +8,7 @@
 #include "globle_function.h"
 #include "Bacnetaddintodb.h"
 #include "BacnetATCommand.h"
+#include "BacnetSettingHealth.h"
 #include "MainFrm.h"
 // CBacnetSetting dialog
 extern bool cancle_send ;
@@ -82,6 +83,7 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO_BACNET_SETTING_TIME_ZONE, &CBacnetSetting::OnCbnSelchangeComboBacnetSettingTimeZone)
 	ON_BN_CLICKED(IDC_CHECK_SETTING_PAP, &CBacnetSetting::OnBnClickedCheckSettingPap)
 	ON_EN_KILLFOCUS(IDC_EDIT_SETTING_PORT, &CBacnetSetting::OnEnKillfocusEditSettingPort)
+	ON_BN_CLICKED(IDC_BUTTON_HEALTH, &CBacnetSetting::OnBnClickedButtonHealth)
 END_MESSAGE_MAP()
 
 
@@ -1424,4 +1426,13 @@ void CBacnetSetting::OnEnKillfocusEditSettingPort()
 			}
 		}
 	}
+}
+
+
+void CBacnetSetting::OnBnClickedButtonHealth()
+{
+	// TODO: Add your control notification handler code here
+	GetPrivateData_Blocking(g_bac_instance,READ_MISC,0,0,sizeof(Str_MISC));
+	CBacnetSettingHealth Health_Dlg;
+	Health_Dlg.DoModal();
 }

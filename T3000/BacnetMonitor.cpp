@@ -299,7 +299,17 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 	int temp_input_count = 0;
 	int temp_analog_count = 0;
 	char q[30];
-
+	if(monitor_list_line == BAC_MONITOR_COUNT - 1)
+	{
+		m_monitor_input_list.SetItemText(0,1,System_Log[0]);
+		m_monitor_input_list.SetItemText(1,1,System_Log[1]);
+		m_monitor_input_list.SetItemText(2,1,System_Log[2]);
+		m_monitor_input_list.SetItemText(3,1,System_Log[3]);
+		m_monitor_input_list.SetItemText(4,1,System_Log[4]);
+		m_monitor_input_list.SetItemText(5,1,System_Log[5]);
+		m_monitor_input_list.SetItemText(6,1,System_Log[6]);
+		return 1;
+	}
 	for (int i=0;i<MAX_POINTS_IN_MONITOR;i++)
 	{
 		CString temp_des;
@@ -655,6 +665,7 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Item(WPARAM wParam,LPARAM lParam)
 	memcpy_s(&m_temp_monitor_data[Changed_Item],sizeof(Str_monitor_point),&m_monitor_data.at(Changed_Item),sizeof(Str_monitor_point));
 
 
+
 	if(Changed_SubItem == MONITOR_LABEL)
 	{
 		if(New_CString.GetLength()>= STR_MONITOR_LABEL_LENGTH)	//长度不能大于结构体定义的长度;
@@ -913,6 +924,19 @@ void CBacnetMonitor::OnNMClickListMonitor(NMHDR *pNMHDR, LRESULT *pResult)
 	if(lRow<0)
 		return;
 
+
+	if(lRow == BAC_MONITOR_COUNT - 1)
+	{
+		m_monitor_list.Set_Edit(false);
+		m_monitor_input_list.Set_Edit(false);
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Can't edit the last monitor , it is for trend log system value."));
+		return;
+	}
+	else
+	{
+		m_monitor_input_list.Set_Edit(true);
+	}
+
 	memcpy_s(&m_temp_monitor_data[lRow],sizeof(Str_monitor_point),&m_monitor_data.at(lRow),sizeof(Str_monitor_point));
 
 	if(lCol == MONITOR_STATUS)
@@ -1158,10 +1182,49 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 
 	if(h_read_monitordata_thread==NULL)
 	{
-		
+		int ret_misc = GetPrivateData_Blocking(g_bac_instance,READ_MISC,0,0,sizeof(Str_MISC));
+		if(ret_misc < 0)
+		{
+			MessageBox(_T("Read data failed! Please try again!"));
+			return;
+		}
+		CString temp_serial;
+		temp_serial.Format(_T("%u"),g_selected_serialnumber);
+
+		CString temp_cs_modify_index;
+		temp_cs_modify_index.Format(_T("Monitor_%d"),monitor_list_line);
+
+		CString temp_db_ini_folder;
+		temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
+
+		int temp_time_num;
+		temp_time_num = GetPrivateProfileInt(temp_serial,temp_cs_modify_index,0,temp_db_ini_folder);
+
+		if(temp_time_num < Device_Misc_Data.reg.operation_time[monitor_list_line])
+		{
+			//需要更新数据库;
+			if(IDYES == MessageBox(_T("Trend log data saved in SD disk has changed , Do you want synchronization."),_T("Notice"),MB_YESNOCANCEL | MB_ICONINFORMATION))
+			{
+				CString temp_operation_time;
+				CString temp_monitor_index;
+				CString temp_monitor_digital_index;
+				temp_monitor_index.Format(_T("Index_%d"),monitor_list_line);
+				temp_monitor_digital_index.Format(_T("Digital_Index_%d"),monitor_list_line);
+				temp_operation_time.Format(_T("%u"),Device_Misc_Data.reg.operation_time[monitor_list_line]);
+				WritePrivateProfileString(temp_serial,temp_cs_modify_index,temp_operation_time,temp_db_ini_folder);
+				WritePrivateProfileString(temp_serial,temp_monitor_index,NULL,g_cstring_ini_path);
+				WritePrivateProfileString(temp_serial,temp_monitor_digital_index,NULL,g_cstring_ini_path);
+			}
+		}
+
+
+
+
+
+
 		CString strSql;
 		CBADO monitor_bado;
-		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
+		monitor_bado.SetDBPath(g_achive_monitor_datatbase_path);	//删除里面的临时数据;
 		monitor_bado.OnInitADOConn(); 
 		strSql.Format(_T("delete * from MonitorData where Flag=1"),g_selected_serialnumber,monitor_list_line);
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
@@ -1293,13 +1356,22 @@ void CBacnetMonitor::OnBnClickedBtnMonitorDeleteSelected()
 			temp_time_num.Format(_T("%u"),end_long_time);
 			WritePrivateProfileStringW(temp_serial,temp_cs_modify_index,temp_time_num,temp_db_ini_folder);
 			//下面还要加写的动作;
+			Device_Misc_Data.reg.operation_time[monitor_list_line] = end_long_time;
 
 
 			Device_Misc_Data.reg.monitor_analog_block_num[monitor_list_line] = 0;
 			Device_Misc_Data.reg.monitor_digital_block_num[monitor_list_line] = 0;
-			PostMessage(WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
 
-			MessageBox(_T("Delete Monitor Data : OK !"));
+			if(Write_Private_Data_Blocking(WRITE_MISC,0,0) > 0 )
+			{
+				PostMessage(WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
+				MessageBox(_T("Delete Monitor Data : OK !"));
+			}
+			else
+			{
+				MessageBox(_T("Delete Monitor Data : Timeout !"));
+			}
+			
 		}
 		else
 		{
@@ -1691,6 +1763,10 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	{
 		WritePrivateProfileStringW(temp_serial,temp_monitor_index,_T("0"),temp_db_ini_folder);
 	}
+	else if((temp_sd_exsit == 0) && (temp_index > 0)) //如果 sd 卡还不存在;
+	{
+		WritePrivateProfileString(temp_serial,temp_monitor_index,NULL,temp_db_ini_folder);
+	}
 
 
 	if((temp_index >= m_monitor_head.seg_index) && (temp_index != 0))
@@ -1727,11 +1803,11 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		if(monitor_list_line != temp_data.index)
 			continue;
 		if(temp_data.mark != 0x0A0D)	//0d0a
-			continue;
+			break;
 		if((temp_data.time == 0) ) //说明后面是无用的数据;填充的是0
-			continue;
+			break;
 		if(temp_data.point.point_type > 10)
-			continue;
+			break;
 		if(temp_data.point.panel != Station_NUM)	//如果数据point 不是本panel 估计就是传错了值;
 			continue;
 		if((temp_data.time < 1420041600)  || (temp_data.time > 1735660800))	//时间范围 2015-1-1  ->2049-12-30  ，不在此时间的数据无效;
@@ -1815,7 +1891,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 		//updateTime.Format(_T("%Y-%m-%d %H:%M:%S"));
 
 		CString strSql;
-		strSql.Format(_T("insert into MonitorData values('%s',#%s#,%d,%u,%u,%u,'%s')"),temp_type,display_time,temp_data.time,temp_data.value,  analog_data ,temp_flag,Label_Des);
+		strSql.Format(_T("insert into MonitorData values('%s',#%s#,%u,%d,%u,%u,'%s')"),temp_type,display_time,temp_data.time,temp_data.value,  analog_data ,temp_flag,Label_Des);
 		//strSql.Format(_T("insert into MonitorData values('%s',%d,%u,%u,%u,'%s','%s')"),temp_type,temp_data.value,temp_data.time , analog_data ,temp_flag,display_time,Label_Des);
 		monitor_bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);	
 

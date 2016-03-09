@@ -1,6 +1,33 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2016 - 02 - 24
+Update by Fance
+1.修复当点击产品时，产品树 状态显示不正常的问题;
+
+2016 - 1 -11
+Update by Fance
+1. T3需要加Modbus 寄存器 还要和minipanel 界面一样,要求先 加Minipanel 的 寄存器 ，建立一个数据库和T3对应起来.
+2. 改改改 ，艹 ， 困的要死.
+
+2016 - 1 - 8
+Update by Fance
+1. Setting 里面增加 health ，新的窗口显示各个TX RX的 value.
+2. 增加一个 结构，和monitor 一样 ，用于在grp 里面存储 图片;
+
+2016 - 1 - 5
+Update by Fance
+1. Input external show T3 加入两个新的T3 模块的产品号.
+
+2016 - 1 - 5
+Update by Fance
+1.  Big  input27 - 32  small 11 - 16  tiny 6 - 11 range 里面有高速脉冲.  其他的 设置此range 都是低速脉冲;
+	Add Analog input range -> Low speed count;
+
+2016 - 1 - 4
+Update by Fance
+1. 吐槽下一月份 每个周六都要上班 ，操蛋.
+
 2015 - 12 - 29
 Update by Fance
 1. 修复Input output 中关于 T3 扩展 无法正常显示的Bug.
@@ -501,6 +528,7 @@ int bacnet_view_number = TYPE_INPUT;
 extern CString SaveConfigFilePath; //用来将资料存放至数据库，临时文件的存放目录;
 extern SOCKET my_sokect;
 extern bool show_user_list_window ;
+HANDLE connect_mstp_thread = NULL; // 当点击MSTP的设备时开启 连接的线程;
 //#define WM_SEND_OVER     WM_USER + 1287
 // int m_Input_data_length;
 extern void  init_info_table( void );
@@ -1777,9 +1805,16 @@ void CDialogCM5_BacNet::Fresh()
 	}
 	else if(pFrame->m_product.at(selected_product_index).protocol == MODBUS_BACNET_MSTP)
 	{
+		BacNet_hwd = this->m_hWnd;
+		if(connect_mstp_thread == NULL)
+			connect_mstp_thread =CreateThread(NULL,NULL,Mstp_Connect_Thread,this,NULL, NULL);
+		return;
 		set_datalink_protocol(2);
 		Initial_bac(g_gloab_bac_comport);
-		//SetTimer(2,10000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
+		if(g_bac_instance>0)
+			Send_WhoIs_Global(-1, -1);
+		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
+		SetTimer(2,20000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 		//SetTimer(3,1000,NULL); //Check whether need  show Alarm dialog.
 		return;
 	}
@@ -4823,6 +4858,64 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 	if(old_selected_item!= selected)
 		old_selected_item = selected;
 	*pResult = 0;
+}
+
+DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
+{
+	set_datalink_protocol(2);
+	Initial_bac(g_gloab_bac_comport);
+
+	bool find_exsit = false;
+	for (int i=0;i<10;i++)
+	{
+		if(g_bac_instance<=0)
+		{
+			connect_mstp_thread = NULL;
+			return 0;
+		}
+		Send_WhoIs_Global(-1, -1);
+		Sleep(1500);
+
+		for (int i=0;i<(int)m_bac_scan_com_data.size();i++)
+		{
+			if(m_bac_scan_com_data.at(i).device_id == g_bac_instance)
+			{
+				find_exsit = true;
+				break;
+			}
+		}
+
+		if(find_exsit)
+			break;
+		else
+		{
+			CString temp_cs_2;
+			temp_cs_2.Format(_T("Wait for response.(%ds)"),10-i);
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs_2);
+		}
+	}
+
+	if(find_exsit == false)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No Who is response!"));
+		connect_mstp_thread = NULL;
+		return 0;
+	}
+	else
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Receive bacnet 'who is ' command!"));
+	}
+	//CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	//pFrame->Show_Wait_Dialog_And_ReadBacnet();
+
+	if(GetPrivateData_Blocking(g_bac_instance,READ_SETTING_COMMAND,0,0,sizeof(Str_Setting_Info)) > 0)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read data success!"));
+	}
+
+	
+	connect_mstp_thread = NULL;
+	return 1;
 }
 
 

@@ -1765,6 +1765,7 @@ int CComWriter::WirteExtendHexFileByCom_RAM()
     if(open_com(m_nComPort)==false)
     {
         CString srtInfo = _T("|Error :The com port is occupied!");
+       
         //MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
         //AddStringToOutPuts(_T("Error :The com port is occupied!"));
         OutPutsStatusInfo(srtInfo, FALSE);
@@ -1776,6 +1777,7 @@ int CComWriter::WirteExtendHexFileByCom_RAM()
         strTemp.Format(_T("COM%d"), m_nComPort);
         CString strTips = _T("|Open ") +  strTemp + _T(" successful.");
         OutPutsStatusInfo(strTips, FALSE);
+         Change_BaudRate (m_nBautrate);
         // AddStringToOutPuts(strTips);
 
     }
@@ -2798,8 +2800,11 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
         }
         while(ii);
 #endif
-
-        Write_One (pWriter->m_szMdbIDs[i],15,pWriter->m_index_Baudrate); //切回当前的波特率
+        if (pWriter->m_index_Baudrate>0)
+        {
+           Write_One (pWriter->m_szMdbIDs[i],15,pWriter->m_index_Baudrate); //切回当前的波特率
+        }
+      
 
     }
 

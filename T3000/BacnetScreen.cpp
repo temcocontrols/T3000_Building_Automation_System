@@ -12,9 +12,13 @@
 #include "gloab_define.h"
 #include "MainFrm.h"
 #include "BacnetScreenEdit.h"
+#include "Class/md5.h"
 CBacnetScreenEdit * ScreenEdit_Window = NULL;
 
 HANDLE h_read_screenlabel_thread = NULL;
+HANDLE h_write_pic_thread = NULL;
+HANDLE h_get_pic_thread = NULL;
+CString Change_File_Path;
 IMPLEMENT_DYNAMIC(BacnetScreen, CDialogEx)
 
 BacnetScreen::BacnetScreen(CWnd* pParent /*=NULL*/)
@@ -47,6 +51,32 @@ BEGIN_MESSAGE_MAP(BacnetScreen, CDialogEx)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_SCREEN, &BacnetScreen::OnNMDblclkListScreen)
 //	ON_WM_DESTROY()
 END_MESSAGE_MAP()
+
+
+DWORD WINAPI  BacnetScreen::WritePictureThread(LPVOID lpVoid)
+{
+	BacnetScreen *pParent = (BacnetScreen *)lpVoid;
+	pParent->WritePicFileFunction(Change_File_Path,screen_list_line,pParent->pic_filename);
+	h_write_pic_thread = NULL;
+	return 0;
+}
+
+
+DWORD WINAPI  BacnetScreen::GetPictureThread(LPVOID lpVoid)
+{
+	BacnetScreen *pParent = (BacnetScreen *)lpVoid;
+
+	CString temp_image_fordor;
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	CString temp_now_building_name= g_strCurBuildingDatabasefilePath;
+	PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
+	temp_now_building_name.ReleaseBuffer();
+	temp_image_fordor = temp_now_building_name  + _T("\\image");
+
+	pParent->GetPicFileFunction(screen_list_line,temp_image_fordor);
+	h_get_pic_thread = NULL;
+	return 0;
+}
 
 
 // BacnetScreen message handlers
@@ -191,6 +221,15 @@ LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 				break;
 			}
 		}
+
+
+
+		if(h_get_pic_thread==NULL)
+		{
+			if(Device_Basic_Setting.reg.sd_exist)
+				h_get_pic_thread =CreateThread(NULL,NULL,GetPictureThread,this,NULL, NULL);
+		}
+
 
 
 		if(h_read_screenlabel_thread==NULL)
@@ -362,6 +401,8 @@ LRESULT BacnetScreen::Fresh_Screen_Item(WPARAM wParam,LPARAM lParam)
 
 	if(Changed_SubItem == SCREEN_DESCRIPTION)
 	{
+
+
 		CString cs_temp = m_screen_list.GetItemText(Changed_Item,Changed_SubItem);
 		if(cs_temp.GetLength()>= STR_SCREEN_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
 		{
@@ -457,6 +498,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO: Add your control notification handler code here
+	int device_obj_instance = g_bac_instance;
 	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
 	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
 	m_screen_list.ScreenToClient(&point);
@@ -556,6 +598,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 			CString new_file_path;
 			new_file_path = image_fordor + _T("\\") + FileName;
+			Change_File_Path = new_file_path;
 			if(temp1.CompareNoCase(image_fordor) != 0)//如果就在当前目录就不用copy过来了;
 			{
 				CopyFile(FilePath,new_file_path,false);
@@ -573,6 +616,14 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 
 			m_screen_list.SetItemText(lRow,SCREEN_PIC_FILE,FileName);
 			New_CString = FileName;
+			pic_filename = FileName;
+
+			if(h_write_pic_thread==NULL)
+			{
+				if(Device_Basic_Setting.reg.sd_exist)
+					h_write_pic_thread =CreateThread(NULL,NULL,WritePictureThread,this,NULL, NULL);
+			}
+
 		}
 	}
 	else
@@ -586,11 +637,17 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 		}
 
+		if(h_get_pic_thread==NULL)
+		{
+			if(Device_Basic_Setting.reg.sd_exist)
+				h_get_pic_thread =CreateThread(NULL,NULL,GetPictureThread,this,NULL, NULL);
+		}
 
 		if(h_read_screenlabel_thread==NULL)
 		{
 			h_read_screenlabel_thread =CreateThread(NULL,NULL,ReadScreenThreadfun,this,NULL, NULL);
 		}
+		*pResult = 0;
 		return;
 	}
 
@@ -601,7 +658,7 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		m_screen_list.SetItemBkColor(lRow,lCol,LIST_ITEM_CHANGED_BKCOLOR);
 		temp_task_info.Format(_T("Write Screen List Item%d .Changed to \"%s\" "),lRow + 1,New_CString);
-		Post_Write_Message(g_bac_instance,WRITESCREEN_T3000,lRow,lRow,sizeof(Control_group_point),m_screen_dlg_hwnd ,temp_task_info,lRow,lCol);
+		Post_Write_Message(device_obj_instance,WRITESCREEN_T3000,lRow,lRow,sizeof(Control_group_point),m_screen_dlg_hwnd ,temp_task_info,lRow,lCol);
 
 	}
 
@@ -699,6 +756,406 @@ int GetScreenFullLabel(int index,CString &ret_full_label)
 
 	return 1;
 }
+
+
+int BacnetScreen::WritePicFileFunction(CString ChooseFilePath,unsigned char screen_index,CString pic_filename)
+{
+
+	//TRACE(_T("Test"));
+	//CString ChooseFilePath;
+	//CFileDialog dlg(true,_T("*.*"),_T(" "),OFN_HIDEREADONLY ,_T("Pic files (*.*)|*.*||"),NULL,0);
+	//if(IDOK!=dlg.DoModal())
+	//	return ;
+	//ChooseFilePath=dlg.GetPathName();
+	//MD5是一个32bit的值 按字符存的;
+
+
+
+
+#pragma region read file buffer
+	pic_sd_struct temp_pic;
+	memset(&temp_pic,0,sizeof(pic_sd_struct));
+	CFile Filetxt;//用来读取位图文件
+	DWORD FileLen=0;//位图的长度
+	char* FileBuff;//用于存放位图信息
+
+	//unsigned int pic_file_size = 0;
+	string temp_md5 = MD5(ifstream( ChooseFilePath )).toString();
+	CString MD5_value;
+	MD5_value = temp_md5.c_str();
+	CString temp_show;
+	temp_show.Format(_T("The File MD5 is :"));
+
+
+	if(!Filetxt.Open(ChooseFilePath,CFile::modeRead))//打开文件
+	{
+		//MessageBox(NULL,"打开文本信息失败!",NULL, MB_OK);
+		return false;
+	}
+	FileLen=Filetxt.GetLength();//得到位图的长度
+	FileBuff=new char[FileLen+1];//给位图文件申请内在空间
+	DWORD DwPic=Filetxt.GetLength();
+	memset(FileBuff,0,FileLen+1);//初始化位图文件的空间
+	if(!FileBuff)//判断位图空间是否申请成功
+	{
+		return false;
+	}
+	if(Filetxt.Read(FileBuff,FileLen)!=FileLen)//读取文本信息，存入到FileBuff中去
+	{
+		return false;
+	}
+	temp_pic.pic_file_size = FileLen;
+	//unsigned int total_packet = 0;
+	unsigned int temp_filepack = 0;
+	unsigned int last_packet_data_size = 0;
+	if(FileLen % 400 == 0)
+	{
+		temp_filepack = FileLen / 400;
+		last_packet_data_size = 400;
+	}
+	else
+	{
+		temp_filepack =  FileLen / 400  + 1;
+		last_packet_data_size = FileLen % 400;
+	}
+
+	temp_pic.total_packet = temp_filepack + 1; //其中 1是 第一包的头 传 MD5值和 文件总包数.;
+
+	//char crc_cal[4];
+	temp_pic.crc_cal[0] = 0x55 ; temp_pic.crc_cal[1] = 0xff ;temp_pic.crc_cal[2] = 0x55 ;temp_pic.crc_cal[3] = 0xff ; //第一包里面用 前4个字节 0x55ff55ff来 区别旧版本 不回复的信息;
+	//char md5_32byte[33];
+	memset(temp_pic.md5_32byte,0,33);
+	WideCharToMultiByte( CP_ACP, 0, MD5_value.GetBuffer(), -1, temp_pic.md5_32byte, 255, NULL, NULL );
+
+	if(pic_filename.GetLength() >= 11)
+		pic_filename = pic_filename.Left(10);
+	WideCharToMultiByte( CP_ACP, 0, pic_filename.GetBuffer(), -1, temp_pic.file_name, 255, NULL, NULL );
+
+	char send_buffer[400];
+	memset(send_buffer,0 , 400);
+	CString temp_cs_show;
+	int device_obj_instance = g_bac_instance;
+	for (int z=0;z<temp_pic.total_packet;z++)
+	{
+		memset(send_buffer,0,400);
+		if(z == 0)
+		{
+			memcpy(send_buffer,&temp_pic,sizeof(pic_sd_struct));
+
+			//memcpy(send_buffer,temp_pic.crc_cal,4);
+			//memcpy(send_buffer+4,&temp_pic.total_packet,4);
+			//memcpy(send_buffer+8,&temp_pic.pic_file_size,4);		
+			//memcpy(send_buffer+12,temp_pic.md5_32byte,33);
+		}
+		else if(z < temp_pic.total_packet - 1)
+		{
+			memcpy(send_buffer,FileBuff + (z-1)*400,400);
+		}
+		else
+		{
+			memcpy(send_buffer,FileBuff + (z-1)*400,last_packet_data_size);
+		}
+		if(WriteBacnetPictureData_Blocking(device_obj_instance,screen_index,z,temp_pic.total_packet,(unsigned char *)send_buffer)< 0)
+		{
+			MessageBox(_T("Write picture file into SD disk timeout."));
+			return false;
+
+		}
+		g_progress_persent = z * 100 /temp_pic.total_packet;
+		
+		temp_cs_show.Format(_T("Saving picture file into SD disk .(%u/%u)"),z*400,(temp_pic.total_packet)*400+last_packet_data_size);
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs_show);
+
+	}
+	g_progress_persent = 100;
+	temp_cs_show.Format(_T("Saving picture file into SD disk success."));
+	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs_show);
+	return true;
+#pragma endregion read file buffer
+
+}
+
+
+
+int BacnetScreen::GetPicFileFunction(unsigned char screen_index ,CString temp_image_folder)
+{
+
+	//TRACE(_T("Test"));
+	//CString ChooseFilePath;
+	//CFileDialog dlg(true,_T("*.*"),_T(" "),OFN_HIDEREADONLY ,_T("Pic files (*.*)|*.*||"),NULL,0);
+	//if(IDOK!=dlg.DoModal())
+	//	return ;
+	//ChooseFilePath=dlg.GetPathName();
+	//MD5是一个32bit的值 按字符存的;
+	pic_sd_struct temp_picture;
+	memset(&temp_picture,0,sizeof(pic_sd_struct));
+	//char md5_value[33];
+	//unsigned int total_packet = 0;
+	//unsigned int total_pic_size = 0;
+	unsigned int last_packet_size = 0;
+	//memset(md5_value,0,33);
+	memset(&m_picture_head,0,20);
+	memset(picture_data_buffer,0,400);
+	char * temp_point = picture_data_buffer;
+	int device_obj_instance = g_bac_instance;
+	if(GetPictureBlockData_Blocking(device_obj_instance,screen_index,0,0) > 0)
+	{
+		if((m_picture_head.seg_index != 0) || (m_picture_head.index != screen_list_line)  || (m_picture_head.total_seg != 0))
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Get picture file from SD card failed!"));
+			return 0;
+		}
+		else if(((unsigned char)temp_point[0]!= 0x55) || ((unsigned char)temp_point[1]!= 0xff) || ((unsigned char)temp_point[2]!= 0x55) ||((unsigned char)temp_point[3]!= 0xff))
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Get picture file from SD card failed!CRC error!"));
+			return 0;
+		}
+		temp_point = temp_point + 4;
+		temp_picture.total_packet = ((unsigned char)temp_point[3])<<24 | ((unsigned char)temp_point[2]<<16) | ((unsigned char)temp_point[1])<<8 | ((unsigned char)temp_point[0]);
+		temp_point = temp_point + 4;
+		temp_picture.pic_file_size = ((unsigned char)temp_point[3])<<24 | ((unsigned char)temp_point[2]<<16) | ((unsigned char)temp_point[1])<<8 | ((unsigned char)temp_point[0]);
+		temp_point = temp_point + 4;
+		memcpy(temp_picture.md5_32byte,temp_point,33);
+		temp_point = temp_point + 33;
+		memcpy(temp_picture.file_name,temp_point,11);
+	}
+	else
+	{
+		AfxMessageBox(_T("Read Data Timeout"));
+		return 0;
+	}
+
+	//比对MD5 与设备的是否一致;
+	CString temp_pic_md5_cs;
+	MultiByteToWideChar( CP_ACP, 0, temp_picture.md5_32byte, (int)strlen((char *)temp_picture.md5_32byte)+1, 
+		temp_pic_md5_cs.GetBuffer(MAX_PATH), MAX_PATH );
+	temp_pic_md5_cs.ReleaseBuffer();
+
+	CString temp_file_name;
+	MultiByteToWideChar( CP_ACP, 0, temp_picture.file_name, (int)strlen((char *)temp_picture.file_name)+1, 
+		temp_file_name.GetBuffer(MAX_PATH), MAX_PATH );
+	temp_file_name.ReleaseBuffer();
+
+
+
+	CString Picture_path;
+	CString PicFileTips;
+	CString temp_image_folde;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(screen_list_line).picture_file, (int)strlen((char *)m_screen_data.at(screen_list_line).picture_file)+1, 
+		PicFileTips.GetBuffer(MAX_PATH), MAX_PATH );
+	PicFileTips.ReleaseBuffer();
+
+	CString temp_now_building_name= g_strCurBuildingDatabasefilePath;
+	PathRemoveFileSpec(temp_now_building_name.GetBuffer(MAX_PATH));
+	temp_now_building_name.ReleaseBuffer();
+	temp_image_folde = temp_now_building_name  + _T("\\image");
+
+	Picture_path=temp_image_folde + _T("\\") + PicFileTips ;//_T("sample1.bmp");
+
+	CFileFind temp_find;
+	if(temp_find.FindFile(Picture_path))
+	{
+		string temp_md5 = MD5(ifstream( Picture_path )).toString();
+		CString MD5_value;
+		MD5_value = temp_md5.c_str();
+		if(MD5_value.CompareNoCase(temp_pic_md5_cs) == 0)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Picture already exsit in image folder!"));
+			return 0;
+		}
+		else
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Picture changed , ready to update!"));
+		}
+	}
+	else
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No picture found in image folder , ready to download!"));
+	}
+	
+	if(temp_picture.pic_file_size % 400 == 0)
+	{
+		last_packet_size = 400;
+	}
+	else
+	{
+		last_packet_size = temp_picture.pic_file_size % 400;
+	}
+
+
+	char *ReadBuff=new char[temp_picture.pic_file_size+1];//给位图文件申请内在空间;
+	if(ReadBuff == NULL)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("No enough memory!"));
+		return 0;
+	}
+	memset(ReadBuff,0,temp_picture.pic_file_size+1);
+
+
+
+	for (int i=1;i<temp_picture.total_packet;i++)
+	{
+		memset(picture_data_buffer,0,400);
+		if(GetPictureBlockData_Blocking(g_bac_instance,screen_index,i,i) > 0)
+		{
+			if(i!= (temp_picture.total_packet-1))
+				memcpy(ReadBuff + (i-1)*400,picture_data_buffer,400);
+			else
+				memcpy(ReadBuff + (i-1)*400,picture_data_buffer,last_packet_size);	//最后一包只copy 剩余的 字节;
+
+			CString temp_cs_complet;
+			temp_cs_complet.Format(_T("Read picture file %d / %d"), i*400  ,temp_picture.pic_file_size);
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs_complet);
+			g_progress_persent = i * 100 /temp_picture.total_packet;
+		}
+		else
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read picture file timeout , please try again"));
+		}
+	}
+
+	CString temp_cs_finished;
+	temp_cs_finished.Format(_T("Read picture file complete"));
+	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs_finished);
+	g_progress_persent = 100;
+#pragma region write_file_buffer22
+
+	HANDLE hFile;
+	CString write_file_path;
+	write_file_path = temp_image_folder + _T("\\") + temp_file_name;
+	
+	CFileFind temp_find_pic;
+	if(temp_find_pic.FindFile(write_file_path))
+	{
+		DeleteFile(write_file_path);
+	}
+
+
+	hFile=CreateFile(write_file_path,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+	DWORD dWrites;
+	WriteFile(hFile,ReadBuff,temp_picture.pic_file_size,&dWrites,NULL);
+	CloseHandle(hFile);  
+	if(ReadBuff)
+	{
+		delete ReadBuff;
+		ReadBuff = NULL;
+	}
+
+#pragma endregion write_file_buffer22
+
+
+	
+
+
+
+		return 1;
+#if 0
+#pragma region read file buffer
+	CFile Filetxt;//用来读取位图文件
+	DWORD FileLen=0;//位图的长度
+	char* FileBuff;//用于存放位图信息
+
+
+	string temp_md5 = MD5(ifstream( ChooseFilePath )).toString();
+	CString MD5_value;
+	MD5_value = temp_md5.c_str();
+	CString temp_show;
+	temp_show.Format(_T("The File MD5 is :"));
+
+
+	if(!Filetxt.Open(ChooseFilePath,CFile::modeRead))//打开文件
+	{
+		//MessageBox(NULL,"打开文本信息失败!",NULL, MB_OK);
+		return false;
+	}
+	FileLen=Filetxt.GetLength();//得到位图的长度
+	FileBuff=new char[FileLen+1];//给位图文件申请内在空间
+	DWORD DwPic=Filetxt.GetLength();
+	memset(FileBuff,0,FileLen+1);//初始化位图文件的空间
+	if(!FileBuff)//判断位图空间是否申请成功
+	{
+		return false;
+	}
+	if(Filetxt.Read(FileBuff,FileLen)!=FileLen)//读取文本信息，存入到FileBuff中去
+	{
+		return false;
+	}
+
+	//unsigned int total_packet = 0;
+	unsigned int temp_filepack = 0;
+	unsigned int last_packet_data_size = 0;
+	if(FileLen % 400 == 0)
+	{
+		temp_filepack = FileLen / 400;
+		last_packet_data_size = 400;
+	}
+	else
+	{
+		temp_filepack =  FileLen / 400  + 1;
+		last_packet_data_size = FileLen % 400;
+	}
+
+	total_packet = temp_filepack + 1; //其中 1是 第一包的头 传 MD5值和 文件总包数.;
+
+
+	char md5_32byte[33];
+	memset(md5_32byte,0,33);
+	WideCharToMultiByte( CP_ACP, 0, MD5_value.GetBuffer(), -1, md5_32byte, 255, NULL, NULL );
+
+	char send_buffer[400];
+	memset(send_buffer,0 , 400);
+	CString temp_cs_show;
+	for (int z=0;z<total_packet;z++)
+	{
+		memset(send_buffer,0,400);
+		if(z == 0)
+		{
+			memcpy(send_buffer,&total_packet,4);
+			memcpy(send_buffer+4,md5_32byte,32);
+		}
+		else if(z < total_packet -1)
+		{
+			memcpy(send_buffer,FileBuff + z*400,400);
+		}
+		else
+		{
+			memcpy(send_buffer,FileBuff + z*400,last_packet_data_size);
+		}
+		if(WriteBacnetPictureData_Blocking(g_bac_instance,screen_index,z,total_packet,(unsigned char *)send_buffer)< 0)
+		{
+			MessageBox(_T("Write pocture file into SD disk timeout."));
+			return false;
+
+		}
+		g_progress_persent = z * 100 /total_packet;
+
+		temp_cs_show.Format(_T("Saving picture file into SD disk .(%u/%u)"),z*400,total_packet*400+last_packet_data_size);
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs_show);
+
+	}
+	g_progress_persent = 100;
+	temp_cs_show.Format(_T("Saving picture file into SD disk success."));
+	SetPaneString(BAC_SHOW_MISSION_RESULTS,temp_cs_show);
+	return true;
+#pragma endregion read file buffer
+
+#endif
+	//#pragma region write_file_buffer22
+	//
+	//	HANDLE hFile;
+	//	hFile=CreateFile(_T("D:\\Test.ico"),GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+	//	DWORD dWrites;
+	//	WriteFile(hFile,FileBuff,FileLen,&dWrites,NULL);
+	//	CloseHandle(hFile);  
+	//	if(FileBuff)
+	//		delete FileBuff;
+	//
+	//#pragma endregion write_file_buffer22
+
+
+}
+
+
 
 
 

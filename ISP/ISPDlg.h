@@ -168,7 +168,7 @@ public:
 	
 	BOOL						m_bShowSN;					// 是否显示隐藏的界面。
    
-     
+    
 	map<int, CString>	m_mapModel;
 
 	CString					m_strPingIP;	

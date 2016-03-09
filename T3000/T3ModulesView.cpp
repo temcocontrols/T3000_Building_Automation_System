@@ -2328,7 +2328,8 @@ void CT3ModulesView::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult)
     }
     else if (product_register_value[7]==PM_T3PT10)
     {
-
+          m_T3_Input_List.Set_Edit(false);
+          return;
     }
     else
     {

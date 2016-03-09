@@ -18,6 +18,7 @@
     <ProjectGuid>{F7226464-C41C-4909-BF74-97328B72FFC8}</ProjectGuid>
     <RootNamespace>T3000</RootNamespace>
     <Keyword>MFCProj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -31,6 +32,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -52,6 +54,9 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\T3000 Output\T3000 object\release\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</EmbedManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LibraryPath>C:\Program Files (x86)\Windows Kits\8.0\Lib\win8\um\x86\htmlhelp.lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -78,11 +83,12 @@
     <Link>
       <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -155,6 +161,7 @@
     <ClCompile Include="BacnetScreen.cpp" />
     <ClCompile Include="BacnetScreenEdit.cpp" />
     <ClCompile Include="BacnetSetting.cpp" />
+    <ClCompile Include="BacnetSettingHealth.cpp" />
     <ClCompile Include="BacnetTool.cpp" />
     <ClCompile Include="BacnetToolReadProperty.cpp" />
     <ClCompile Include="BacnetTstat.cpp" />
@@ -166,6 +173,7 @@
     <ClCompile Include="BADO\BADO.cpp" />
     <ClCompile Include="BatchSNDlg.cpp" />
     <ClCompile Include="BoatMonitorViewer.cpp" />
+    <ClCompile Include="BootFinderDlg.cpp" />
     <ClCompile Include="BuildingConfigration.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
     <ClCompile Include="CalibartionHT.cpp" />
@@ -250,6 +258,7 @@
     <ClCompile Include="MannageBuidingDlg.cpp" />
     <ClCompile Include="monthview1.cpp" />
     <ClCompile Include="msflexgrid1.cpp" />
+    <ClCompile Include="MySocket.cpp" />
     <ClCompile Include="NetworkControllView.cpp" />
     <ClCompile Include="NewHumChamberView.cpp" />
     <ClCompile Include="OfficeStPtDlg.cpp" />
@@ -444,6 +453,7 @@
     <ClInclude Include="BacnetRemotePoint.h" />
     <ClInclude Include="BacnetScreenEdit.h" />
     <ClInclude Include="BacnetSetting.h" />
+    <ClInclude Include="BacnetSettingHealth.h" />
     <ClInclude Include="BacnetTool.h" />
     <ClInclude Include="BacnetToolReadProperty.h" />
     <ClInclude Include="BacnetTstat.h" />
@@ -455,6 +465,7 @@
     <ClInclude Include="BADO\BADO.h" />
     <ClInclude Include="BatchSNDlg.h" />
     <ClInclude Include="BoatMonitorViewer.h" />
+    <ClInclude Include="BootFinderDlg.h" />
     <ClInclude Include="BuildingConfigration.h" />
     <ClInclude Include="CalibartionHT.h" />
     <ClInclude Include="ChartCtrl\ChartAxis.h" />

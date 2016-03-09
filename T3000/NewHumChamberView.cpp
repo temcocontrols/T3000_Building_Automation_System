@@ -58,13 +58,13 @@ UINT _Read_Testo(LPVOID pParam)
 		WritePrivateProfileStringW(_T("Hum_Setting"),_T("MODBUS_ID"),_T("254"),g_cstring_ini_path);
 		WritePrivateProfileStringW(_T("Hum_Setting"),_T("MODBUS_IP"),_T("192.168.0.113"),g_cstring_ini_path);
 
-		WritePrivateProfileStringW(_T("Hum_Setting"),_T("MODBUS_ADDRESS1"),_T("7048"),g_cstring_ini_path);
-		WritePrivateProfileStringW(_T("Hum_Setting"),_T("MODBUS_ADDRESS2"),_T("7049"),g_cstring_ini_path);
+		WritePrivateProfileStringW(_T("Hum_Setting"),_T("MODBUS_ADDRESS1"),_T("8820"),g_cstring_ini_path);
+		WritePrivateProfileStringW(_T("Hum_Setting"),_T("MODBUS_ADDRESS2"),_T("8821"),g_cstring_ini_path);
 
 		WritePrivateProfileStringW(_T("Hum_Setting"),_T("ENABLE_MINIPANEL_FUC"),_T("2"),g_cstring_ini_path);
 
-		HUM_WRITE_REG1 = 8678;
-		HUM_WRITE_REG2 = 8679;
+		HUM_WRITE_REG1 = 8820;
+		HUM_WRITE_REG2 = 8821;
 		HUM_Minipanel_port = 10000;
 		HUM_Minipanel_modbus_id = 254;
 		use_minipanel_controller = 2;
@@ -2918,8 +2918,8 @@ void CNewHumChamberView::read_testo(){
 	temp_value[0] = temp_value[1]=temp_value[2]=temp_value[3]=0;
 	temp_value[0]=(unsigned short)m_value[0];
 	temp_value[3]=(unsigned short)m_value[1];
-	temp_value[1]=(unsigned short)(m_value[3]*10);
-	temp_value[2]=(unsigned short)(m_value[2]*10);
+	temp_value[1]=(unsigned short)(m_value[3]*10);  //Êª¶È
+	temp_value[2]=(unsigned short)(m_value[2]*10);	//ÎÂ¶È
 
 	if((m_value[2] > 100) || (m_value[2] < 0)  || (m_value[3] < -40) || (m_value[3] > 200) || (m_value[0] == 0) )
 	{

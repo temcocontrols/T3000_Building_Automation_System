@@ -163,6 +163,7 @@ void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath);
 int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path);
 int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path);
 int handle_read_monitordata_ex(char *npoint,int nlength);
+int handle_read_pic_data_ex(char *npoint,int nlength);
 bool IP_is_Local(LPCTSTR ip_address);
 bool Is_Bacnet_Device(unsigned short n_product_class_id);
 BOOL DirectoryExist(CString Path);
@@ -205,7 +206,11 @@ void  LoadRegistersGraphicMode_CO2485();
 BOOL  ReadLineFromHexFile(CFile& file, char* pBuffer);
 int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
 int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
+int WriteBacnetPictureData(uint32_t deviceid,uint8_t index ,unsigned short transfer_packet, unsigned short total_packet,unsigned char * senddata);
+int WriteBacnetPictureData_Blocking(uint32_t deviceid,uint8_t index , unsigned short transfer_packet, unsigned short total_packet,unsigned char * senddata);
+
+int GetPictureBlockData(uint32_t deviceid,int8_t nIndex, uint16_t ntotal_seg,uint16_t nseg_index);
+int GetPictureBlockData_Blocking(uint32_t deviceid,int8_t nIndex, uint16_t ntotal_seg,uint16_t nseg_index);
 BOOL HexFileValidation(const CString& strFileName);
 BOOL BinFileValidation(const CString& strFileName);
-
 #endif

@@ -741,17 +741,19 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		output_list_line = nItem;
 		if((m_Output_data.at(output_list_line).sub_id !=0) &&
-			(m_Output_data.at(output_list_line).sub_number !=0) &&
+			//(m_Output_data.at(output_list_line).sub_number !=0) &&
 			(m_Output_data.at(output_list_line).sub_product !=0))
 		{
-			unsigned char temp_pid = m_Input_data.at(input_list_line).sub_product;
+			unsigned char temp_pid = m_Output_data.at(output_list_line).sub_product;
 			if((temp_pid == PM_T3PT10) ||
 				(temp_pid == PM_T3IOA) ||
 				(temp_pid == PM_T332AI) ||
 				(temp_pid == PM_T38AI16O) ||
 				(temp_pid == PM_T38I13O) ||
 				(temp_pid == PM_T34AO) ||
-				(temp_pid == PM_T36CT))
+				(temp_pid == PM_T36CT) ||
+				(temp_pid == PM_T322AI) ||
+				(temp_pid == PM_T38AI8AO6DO))
 			{
 				m_output_item_info.ShowWindow(true);
 				CString temp_name;
@@ -759,8 +761,8 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 				CString show_info;
 				CString temp_id;
 				CString temp_number;
-				temp_id.Format(_T(" Sub ID: %d        "),m_Output_data.at(output_list_line).sub_id);
-				temp_number.Format(_T("Output%d"),m_Output_data.at(output_list_line).sub_number);
+				temp_id.Format(_T(" Sub ID: %u        "),(unsigned char)m_Output_data.at(output_list_line).sub_id);
+				temp_number.Format(_T("Output%d"),(unsigned char)m_Output_data.at(output_list_line).sub_number+1);
 				show_info = _T("Module:") + temp_name +_T("        ") + temp_id + temp_number;
 				m_output_item_info.SetWindowTextW(show_info);
 
