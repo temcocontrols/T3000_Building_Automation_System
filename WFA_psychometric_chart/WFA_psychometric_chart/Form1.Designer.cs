@@ -106,18 +106,6 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.button2 = new System.Windows.Forms.Button();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.btn_update_constantly = new System.Windows.Forms.Button();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.button7 = new System.Windows.Forms.Button();
-            this.label22 = new System.Windows.Forms.Label();
-            this.label20 = new System.Windows.Forms.Label();
-            this.tb_long = new System.Windows.Forms.TextBox();
-            this.tb_lat = new System.Windows.Forms.TextBox();
-            this.label19 = new System.Windows.Forms.Label();
-            this.tb_city_name = new System.Windows.Forms.TextBox();
-            this.btn_insert_values = new System.Windows.Forms.Button();
-            this.btn_plot_values = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.lb_y_cord = new System.Windows.Forms.Label();
             this.label29 = new System.Windows.Forms.Label();
@@ -135,15 +123,12 @@
             this.label21 = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.optionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.newFeaturesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.weatherServicesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.humiditySensorCalibrationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.realTimePlottingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -680,126 +665,6 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.btn_update_constantly);
-            this.groupBox3.Controls.Add(this.groupBox5);
-            this.groupBox3.Location = new System.Drawing.Point(12, 502);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(1277, 156);
-            this.groupBox3.TabIndex = 15;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Detail Plot Process";
-            // 
-            // btn_update_constantly
-            // 
-            this.btn_update_constantly.Enabled = false;
-            this.btn_update_constantly.Location = new System.Drawing.Point(384, 126);
-            this.btn_update_constantly.Name = "btn_update_constantly";
-            this.btn_update_constantly.Size = new System.Drawing.Size(147, 22);
-            this.btn_update_constantly.TabIndex = 29;
-            this.btn_update_constantly.Text = "Upadate Data Constantly";
-            this.btn_update_constantly.UseVisualStyleBackColor = true;
-            this.btn_update_constantly.Click += new System.EventHandler(this.button9_Click);
-            // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.button7);
-            this.groupBox5.Controls.Add(this.label22);
-            this.groupBox5.Controls.Add(this.label20);
-            this.groupBox5.Controls.Add(this.tb_long);
-            this.groupBox5.Controls.Add(this.tb_lat);
-            this.groupBox5.Controls.Add(this.label19);
-            this.groupBox5.Controls.Add(this.tb_city_name);
-            this.groupBox5.Controls.Add(this.btn_insert_values);
-            this.groupBox5.Controls.Add(this.btn_plot_values);
-            this.groupBox5.Location = new System.Drawing.Point(6, 21);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(345, 129);
-            this.groupBox5.TabIndex = 28;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Chose city";
-            // 
-            // button7
-            // 
-            this.button7.Location = new System.Drawing.Point(9, 67);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(92, 22);
-            this.button7.TabIndex = 29;
-            this.button7.Text = "Get Geo Value";
-            this.button7.UseVisualStyleBackColor = true;
-            this.button7.Click += new System.EventHandler(this.button7_Click);
-            // 
-            // label22
-            // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(116, 72);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(60, 13);
-            this.label22.TabIndex = 37;
-            this.label22.Text = "Longitude :";
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(111, 49);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(51, 13);
-            this.label20.TabIndex = 36;
-            this.label20.Text = "Latitude :";
-            // 
-            // tb_long
-            // 
-            this.tb_long.Location = new System.Drawing.Point(213, 71);
-            this.tb_long.Name = "tb_long";
-            this.tb_long.Size = new System.Drawing.Size(100, 20);
-            this.tb_long.TabIndex = 35;
-            // 
-            // tb_lat
-            // 
-            this.tb_lat.Location = new System.Drawing.Point(213, 45);
-            this.tb_lat.Name = "tb_lat";
-            this.tb_lat.Size = new System.Drawing.Size(100, 20);
-            this.tb_lat.TabIndex = 29;
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(6, 22);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(86, 13);
-            this.label19.TabIndex = 34;
-            this.label19.Text = "Enter city name :";
-            // 
-            // tb_city_name
-            // 
-            this.tb_city_name.Location = new System.Drawing.Point(104, 19);
-            this.tb_city_name.Name = "tb_city_name";
-            this.tb_city_name.Size = new System.Drawing.Size(209, 20);
-            this.tb_city_name.TabIndex = 29;
-            // 
-            // btn_insert_values
-            // 
-            this.btn_insert_values.Enabled = false;
-            this.btn_insert_values.Location = new System.Drawing.Point(180, 105);
-            this.btn_insert_values.Name = "btn_insert_values";
-            this.btn_insert_values.Size = new System.Drawing.Size(133, 22);
-            this.btn_insert_values.TabIndex = 33;
-            this.btn_insert_values.Text = "Insert in DB";
-            this.btn_insert_values.UseVisualStyleBackColor = true;
-            this.btn_insert_values.Click += new System.EventHandler(this.button8_Click);
-            // 
-            // btn_plot_values
-            // 
-            this.btn_plot_values.Enabled = false;
-            this.btn_plot_values.Location = new System.Drawing.Point(41, 105);
-            this.btn_plot_values.Name = "btn_plot_values";
-            this.btn_plot_values.Size = new System.Drawing.Size(133, 22);
-            this.btn_plot_values.TabIndex = 27;
-            this.btn_plot_values.Text = "plot on Graph ";
-            this.btn_plot_values.UseVisualStyleBackColor = true;
-            this.btn_plot_values.Click += new System.EventHandler(this.button6_Click);
-            // 
             // groupBox4
             // 
             this.groupBox4.Controls.Add(this.lb_y_cord);
@@ -962,20 +827,12 @@
             // optionToolStripMenuItem
             // 
             this.optionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newFeaturesToolStripMenuItem,
             this.weatherServicesToolStripMenuItem,
             this.humiditySensorCalibrationToolStripMenuItem,
             this.realTimePlottingToolStripMenuItem});
             this.optionToolStripMenuItem.Name = "optionToolStripMenuItem";
             this.optionToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.optionToolStripMenuItem.Text = "Option";
-            // 
-            // newFeaturesToolStripMenuItem
-            // 
-            this.newFeaturesToolStripMenuItem.Name = "newFeaturesToolStripMenuItem";
-            this.newFeaturesToolStripMenuItem.Size = new System.Drawing.Size(237, 22);
-            this.newFeaturesToolStripMenuItem.Text = "New Features";
-            this.newFeaturesToolStripMenuItem.Click += new System.EventHandler(this.newFeaturesToolStripMenuItem_Click);
             // 
             // weatherServicesToolStripMenuItem
             // 
@@ -1004,7 +861,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1301, 690);
             this.Controls.Add(this.groupBox4);
-            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -1021,9 +877,6 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
@@ -1074,8 +927,6 @@
         private System.Windows.Forms.Label unit_mol_mass_over_mol_wt;
         private System.Windows.Forms.Label unit_Pws;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Button btn_plot_values;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Label lb_y_cord;
         private System.Windows.Forms.Label label29;
@@ -1091,19 +942,8 @@
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.Label lb_dbt;
         private System.Windows.Forms.Label label21;
-        private System.Windows.Forms.GroupBox groupBox5;
-        private System.Windows.Forms.Button btn_insert_values;
-        private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.Label label22;
-        private System.Windows.Forms.Label label20;
-        private System.Windows.Forms.TextBox tb_long;
-        private System.Windows.Forms.TextBox tb_lat;
-        private System.Windows.Forms.Label label19;
-        private System.Windows.Forms.TextBox tb_city_name;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem optionToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem newFeaturesToolStripMenuItem;
-        private System.Windows.Forms.Button btn_update_constantly;
         private System.Windows.Forms.ToolStripMenuItem weatherServicesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem humiditySensorCalibrationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem realTimePlottingToolStripMenuItem;

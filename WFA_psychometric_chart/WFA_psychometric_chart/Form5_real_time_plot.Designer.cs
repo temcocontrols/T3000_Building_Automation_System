@@ -46,6 +46,7 @@
             this.cb2 = new System.Windows.Forms.CheckBox();
             this.cb1 = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.cb_check_all_days = new System.Windows.Forms.CheckBox();
             this.cb19 = new System.Windows.Forms.CheckBox();
             this.cb18 = new System.Windows.Forms.CheckBox();
             this.cb17 = new System.Windows.Forms.CheckBox();
@@ -79,9 +80,9 @@
             this.cb22 = new System.Windows.Forms.CheckBox();
             this.cb21 = new System.Windows.Forms.CheckBox();
             this.cb20 = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.lb_hours_selected = new System.Windows.Forms.Label();
             this.btn_plot = new System.Windows.Forms.Button();
+            this.cb1_select_data = new System.Windows.Forms.ComboBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -92,9 +93,9 @@
             // 
             this.groupBox1.Controls.Add(this.radioButton2);
             this.groupBox1.Controls.Add(this.radioButton1);
-            this.groupBox1.Location = new System.Drawing.Point(12, 12);
+            this.groupBox1.Location = new System.Drawing.Point(12, 63);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(311, 84);
+            this.groupBox1.Size = new System.Drawing.Size(290, 84);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Plot Style";
@@ -136,7 +137,7 @@
             this.groupBox2.Controls.Add(this.cb3);
             this.groupBox2.Controls.Add(this.cb2);
             this.groupBox2.Controls.Add(this.cb1);
-            this.groupBox2.Location = new System.Drawing.Point(12, 102);
+            this.groupBox2.Location = new System.Drawing.Point(12, 153);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(178, 244);
             this.groupBox2.TabIndex = 1;
@@ -163,6 +164,7 @@
             this.cb12.TabIndex = 11;
             this.cb12.Text = "December";
             this.cb12.UseVisualStyleBackColor = true;
+            this.cb12.CheckedChanged += new System.EventHandler(this.cb12_check_event);
             // 
             // cb11
             // 
@@ -173,6 +175,7 @@
             this.cb11.TabIndex = 10;
             this.cb11.Text = "November";
             this.cb11.UseVisualStyleBackColor = true;
+            this.cb11.CheckedChanged += new System.EventHandler(this.cb11_check_event);
             // 
             // cb10
             // 
@@ -183,6 +186,7 @@
             this.cb10.TabIndex = 9;
             this.cb10.Text = "October";
             this.cb10.UseVisualStyleBackColor = true;
+            this.cb10.CheckedChanged += new System.EventHandler(this.cb10_check_event);
             // 
             // cb9
             // 
@@ -193,6 +197,7 @@
             this.cb9.TabIndex = 8;
             this.cb9.Text = "September";
             this.cb9.UseVisualStyleBackColor = true;
+            this.cb9.CheckedChanged += new System.EventHandler(this.cb9_check_event);
             // 
             // cb8
             // 
@@ -203,6 +208,7 @@
             this.cb8.TabIndex = 7;
             this.cb8.Text = "August";
             this.cb8.UseVisualStyleBackColor = true;
+            this.cb8.CheckedChanged += new System.EventHandler(this.cb8_check_event);
             // 
             // cb7
             // 
@@ -213,6 +219,7 @@
             this.cb7.TabIndex = 6;
             this.cb7.Text = "July";
             this.cb7.UseVisualStyleBackColor = true;
+            this.cb7.CheckedChanged += new System.EventHandler(this.cb7_check_event);
             // 
             // cb6
             // 
@@ -223,6 +230,7 @@
             this.cb6.TabIndex = 5;
             this.cb6.Text = "June";
             this.cb6.UseVisualStyleBackColor = true;
+            this.cb6.CheckedChanged += new System.EventHandler(this.cb6_check_event);
             // 
             // cb5
             // 
@@ -233,6 +241,7 @@
             this.cb5.TabIndex = 4;
             this.cb5.Text = "May";
             this.cb5.UseVisualStyleBackColor = true;
+            this.cb5.CheckedChanged += new System.EventHandler(this.cb5_check_event);
             // 
             // cb4
             // 
@@ -243,6 +252,7 @@
             this.cb4.TabIndex = 3;
             this.cb4.Text = "April";
             this.cb4.UseVisualStyleBackColor = true;
+            this.cb4.CheckedChanged += new System.EventHandler(this.cb4_check_event);
             // 
             // cb3
             // 
@@ -253,6 +263,7 @@
             this.cb3.TabIndex = 2;
             this.cb3.Text = "March";
             this.cb3.UseVisualStyleBackColor = true;
+            this.cb3.CheckedChanged += new System.EventHandler(this.cb3_check_event);
             // 
             // cb2
             // 
@@ -263,6 +274,7 @@
             this.cb2.TabIndex = 1;
             this.cb2.Text = "February";
             this.cb2.UseVisualStyleBackColor = true;
+            this.cb2.CheckedChanged += new System.EventHandler(this.cb2_check_event);
             // 
             // cb1
             // 
@@ -273,9 +285,11 @@
             this.cb1.TabIndex = 0;
             this.cb1.Text = "January";
             this.cb1.UseVisualStyleBackColor = true;
+            this.cb1.CheckedChanged += new System.EventHandler(this.check1_event);
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.cb_check_all_days);
             this.groupBox3.Controls.Add(this.cb19);
             this.groupBox3.Controls.Add(this.cb18);
             this.groupBox3.Controls.Add(this.cb17);
@@ -283,12 +297,24 @@
             this.groupBox3.Controls.Add(this.cb15);
             this.groupBox3.Controls.Add(this.cb14);
             this.groupBox3.Controls.Add(this.cb13);
-            this.groupBox3.Location = new System.Drawing.Point(216, 102);
+            this.groupBox3.Enabled = false;
+            this.groupBox3.Location = new System.Drawing.Point(216, 153);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(166, 244);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Day plot";
+            // 
+            // cb_check_all_days
+            // 
+            this.cb_check_all_days.AutoSize = true;
+            this.cb_check_all_days.Location = new System.Drawing.Point(17, 204);
+            this.cb_check_all_days.Name = "cb_check_all_days";
+            this.cb_check_all_days.Size = new System.Drawing.Size(101, 17);
+            this.cb_check_all_days.TabIndex = 44;
+            this.cb_check_all_days.Text = "Check all boxes";
+            this.cb_check_all_days.UseVisualStyleBackColor = true;
+            this.cb_check_all_days.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // cb19
             // 
@@ -299,6 +325,7 @@
             this.cb19.TabIndex = 18;
             this.cb19.Text = "Saturday";
             this.cb19.UseVisualStyleBackColor = true;
+            this.cb19.CheckedChanged += new System.EventHandler(this.cb19_CheckedChanged);
             // 
             // cb18
             // 
@@ -309,6 +336,7 @@
             this.cb18.TabIndex = 17;
             this.cb18.Text = "Friday";
             this.cb18.UseVisualStyleBackColor = true;
+            this.cb18.CheckedChanged += new System.EventHandler(this.cb18_CheckedChanged);
             // 
             // cb17
             // 
@@ -319,6 +347,7 @@
             this.cb17.TabIndex = 16;
             this.cb17.Text = "Thrusday";
             this.cb17.UseVisualStyleBackColor = true;
+            this.cb17.CheckedChanged += new System.EventHandler(this.cb17_CheckedChanged);
             // 
             // cb16
             // 
@@ -329,6 +358,7 @@
             this.cb16.TabIndex = 15;
             this.cb16.Text = "Wednesday";
             this.cb16.UseVisualStyleBackColor = true;
+            this.cb16.CheckedChanged += new System.EventHandler(this.cb16_CheckedChanged);
             // 
             // cb15
             // 
@@ -339,6 +369,7 @@
             this.cb15.TabIndex = 14;
             this.cb15.Text = "Tuesday";
             this.cb15.UseVisualStyleBackColor = true;
+            this.cb15.CheckedChanged += new System.EventHandler(this.cb15_CheckedChanged);
             // 
             // cb14
             // 
@@ -349,6 +380,7 @@
             this.cb14.TabIndex = 13;
             this.cb14.Text = "Monday";
             this.cb14.UseVisualStyleBackColor = true;
+            this.cb14.CheckedChanged += new System.EventHandler(this.cb14_CheckedChanged);
             // 
             // cb13
             // 
@@ -359,6 +391,8 @@
             this.cb13.TabIndex = 12;
             this.cb13.Text = "Sunday";
             this.cb13.UseVisualStyleBackColor = true;
+            this.cb13.CheckedChanged += new System.EventHandler(this.cb13_check_event);
+            this.cb13.EnabledChanged += new System.EventHandler(this.cb13_check_event);
             // 
             // groupBox4
             // 
@@ -387,7 +421,8 @@
             this.groupBox4.Controls.Add(this.cb22);
             this.groupBox4.Controls.Add(this.cb21);
             this.groupBox4.Controls.Add(this.cb20);
-            this.groupBox4.Location = new System.Drawing.Point(405, 102);
+            this.groupBox4.Enabled = false;
+            this.groupBox4.Location = new System.Drawing.Point(405, 153);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(199, 244);
             this.groupBox4.TabIndex = 3;
@@ -645,29 +680,9 @@
             this.cb20.Text = "01";
             this.cb20.UseVisualStyleBackColor = true;
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Enabled = false;
-            this.label1.Location = new System.Drawing.Point(12, 353);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(81, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Hours selected:";
-            // 
-            // lb_hours_selected
-            // 
-            this.lb_hours_selected.AutoSize = true;
-            this.lb_hours_selected.Enabled = false;
-            this.lb_hours_selected.Location = new System.Drawing.Point(91, 353);
-            this.lb_hours_selected.Name = "lb_hours_selected";
-            this.lb_hours_selected.Size = new System.Drawing.Size(13, 13);
-            this.lb_hours_selected.TabIndex = 5;
-            this.lb_hours_selected.Text = "0";
-            // 
             // btn_plot
             // 
-            this.btn_plot.Location = new System.Drawing.Point(12, 392);
+            this.btn_plot.Location = new System.Drawing.Point(456, 429);
             this.btn_plot.Name = "btn_plot";
             this.btn_plot.Size = new System.Drawing.Size(99, 23);
             this.btn_plot.TabIndex = 6;
@@ -675,20 +690,40 @@
             this.btn_plot.UseVisualStyleBackColor = true;
             this.btn_plot.Click += new System.EventHandler(this.btn_plot_Click);
             // 
+            // cb1_select_data
+            // 
+            this.cb1_select_data.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cb1_select_data.FormattingEnabled = true;
+            this.cb1_select_data.Location = new System.Drawing.Point(103, 32);
+            this.cb1_select_data.Name = "cb1_select_data";
+            this.cb1_select_data.Size = new System.Drawing.Size(195, 21);
+            this.cb1_select_data.TabIndex = 7;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Enabled = false;
+            this.label2.Location = new System.Drawing.Point(16, 35);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(71, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Chose a city :";
+            // 
             // Form5_real_time_plot
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(651, 492);
+            this.ClientSize = new System.Drawing.Size(651, 512);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.cb1_select_data);
             this.Controls.Add(this.btn_plot);
-            this.Controls.Add(this.lb_hours_selected);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Name = "Form5_real_time_plot";
-            this.Text = "Real Time Plot";
+            this.Text = "  ";
+            this.Load += new System.EventHandler(this.Form5_real_time_plot_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -755,8 +790,9 @@
         private System.Windows.Forms.CheckBox cb21;
         private System.Windows.Forms.CheckBox cb20;
         private System.Windows.Forms.CheckBox cb_hour_check_all;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label lb_hours_selected;
         private System.Windows.Forms.Button btn_plot;
+        private System.Windows.Forms.ComboBox cb1_select_data;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox cb_check_all_days;
     }
 }
