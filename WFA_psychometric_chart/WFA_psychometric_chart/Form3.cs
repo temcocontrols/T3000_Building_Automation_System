@@ -687,6 +687,37 @@ namespace WFA_psychometric_chart
                         MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
                         command.ExecuteNonQuery();
                     }
+
+
+                    //here we need to add to another table ie tbl_data_store_temp_hum_one_year which stores all the data...
+                    //first lets seprate the data and time...
+                    string[] value = last_update_pulled.Split('T');
+                    string date = value[0].ToString();
+                    string time = value[1].ToString();
+                    string[] val = time.Split(':');
+                    string hour = val[0].ToString();
+                    string minute = val[1].ToString();
+
+
+                   // MessageBox.Show("date = " + date + " time = " + time);
+                    /*steps :
+                     1.insert the values in the given database.
+                     * 2.make sure it is in correct formate..
+                     */
+
+                    //insert...
+                    string sql_query = "insert into tbl_historical_data(date_current,hour_current,minute_current,temperature,humidity,station_name) VALUES(@date_current,@hour_current,@minute_current,@temp_value,@hum_value,@station_name)";
+                    OleDbCommand cmdx = new OleDbCommand(sql_query, connection);
+                    cmdx.CommandType = CommandType.Text;
+                    cmdx.Parameters.AddWithValue("@date_current", date.ToString());
+                    cmdx.Parameters.AddWithValue("@hour_current", hour.ToString());
+                    cmdx.Parameters.AddWithValue("@minute_current", minute.ToString());
+                    cmdx.Parameters.AddWithValue("@temp_value", temp_adjust.ToString());
+                    cmdx.Parameters.AddWithValue("@hum_value", hum_pulled.ToString());         
+                    cmdx.Parameters.AddWithValue("@station_name", cb_station_names.SelectedItem.ToString());                    
+                    cmdx.ExecuteNonQuery();
+
+                   //finally close the connection.
                    connection.Close();
                 
                 
@@ -1049,6 +1080,7 @@ namespace WFA_psychometric_chart
                                     //MessageBox.Show("sql string = " + sql_string);
                                     //MessageBox.Show("value updated successfully!");
 
+                                    
                                 }
                                 else
                                 {
@@ -1068,7 +1100,40 @@ namespace WFA_psychometric_chart
                                     //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
                                     command.ExecuteNonQuery();
                                 }
+
+                                //here we need to add to another table ie tbl_data_store_temp_hum_one_year which stores all the data...
+                                //first lets seprate the data and time...
+                                string[] value = last_update_pulled.Split('T');
+                                string date = value[0].ToString();
+                                string time = value[1].ToString();
+                                /*steps :
+                                 1.insert the values in the given database.
+                                 * 2.make sure it is in correct formate..
+                                 */
+
+                                //insert...
+                                string sql_query = "insert into tbl_data_stored_temp_hum_one_year(date_current,time_current,temperature,humidity,station_name) VALUES(@date_current,@time_current,@temp_value,@hum_value,@station_name)";
+                                OleDbCommand cmdx = new OleDbCommand(sql_query, connection);
+                                cmdx.CommandType = CommandType.Text;
+                                cmdx.Parameters.AddWithValue("@date_current", date.ToString());
+                                cmdx.Parameters.AddWithValue("@time_current", time.ToString());
+                                cmdx.Parameters.AddWithValue("@temp_value", temp_adjust.ToString());
+                                cmdx.Parameters.AddWithValue("@hum_value", hum_pulled.ToString());
+                                cmdx.Parameters.AddWithValue("@station_name", cb_station_names.SelectedItem.ToString());
+                                cmdx.ExecuteNonQuery();
+
+                                //finally close the connection.
+
+
+
+
+
                                 connection.Close();
+
+
+
+
+
 
 
                             }//close o using..
