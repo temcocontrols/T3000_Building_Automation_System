@@ -718,7 +718,6 @@ void CGraphicMode::Fresh_Graphic(){
     m_ChartCtrl.RefreshCtrl();
 
   	int Type=0;
-	 
 	//
 	for (int i=0;i< (int)g_calibration_module_data.Graphic_Data.size();i++)
 	{
@@ -863,19 +862,12 @@ void CGraphicMode::Fresh_Graphic(){
 
 
 	}
-
-
-	  Type=1;
-
+    Type=1;
 	//
 	for (int i=0;i< (int)g_calibration_module_data.Graphic_Data.size();i++)
 	{
 		bool bSecondHorizAxis =true;
 		bool bSecondVertAxis =true;
-
-
-
-
 		switch (Type)
 		{
 			// Line series

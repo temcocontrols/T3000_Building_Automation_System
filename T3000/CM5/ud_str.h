@@ -724,6 +724,7 @@ typedef union
 		 uint8_t BBMD_EN;
 		 uint8_t sd_exist;  // 1 -no    2- yes
 		 unsigned short modbus_port;
+		 unsigned char modbus_id;
 	}reg;
 }Str_Setting_Info;
 

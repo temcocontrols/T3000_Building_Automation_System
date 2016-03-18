@@ -18,8 +18,8 @@
 #include "afxinet.h"
 #include "T3000DefaultView.h"
 #include "bado/BADO.h"
-const int g_versionNO= 20160219;
-//CString const CurrentT3000Version=_T("2014.12.24");
+const int g_versionNO=20160219;
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -39,14 +39,14 @@ CT3000App::CT3000App()
 {
  
 		m_bHiColorIcons = TRUE;
-		CurrentT3000Version=_T("    2016.02.25");
+		CurrentT3000Version=_T("    2016.03.17");
 //	}
 // 	catch (...)
 // 	{
 // 		
 // 		AfxMessageBox(_T("1111"));
 // 	}
-m_lastinterface=19;
+        m_lastinterface=19;
 }
 // The one and only CT3000App object
 CT3000App theApp;
@@ -518,7 +518,7 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
              //CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
              //没有找到就创建一个默认的数据库
              filePath=g_strExePth+_T("Database\\T3000.mdb");
-             HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DB2), _T("T3000_DB"));   
+             HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_NEW_DB1), _T("T3000_NEW_DB"));   
              HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 
 
@@ -562,6 +562,7 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
                  }
              }
              catch(_com_error &e){
+				  AfxMessageBox(_T(" Error number 12"));
                  AfxMessageBox(e.Description());
              }
              srcRsTemp->Close();
@@ -591,7 +592,7 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
                      if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
                      {
 
-                         HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB), _T("BUILDING_DB"));   
+                         HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB2), _T("BUILDING_DB"));   
                          HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
 
 
@@ -627,6 +628,8 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
                  }
              }
              catch(_com_error &e){
+				
+					  AfxMessageBox(_T(" Error number 11"));
                  AfxMessageBox(e.Description());
              }
              srcRsTemp->Close();
@@ -637,6 +640,7 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
          }
          catch(_com_error *e)
          {
+			 AfxMessageBox(_T("Error_2"));
              AfxMessageBox(e->ErrorMessage());
          }
 
@@ -815,7 +819,9 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
                      bado.m_pRecordset->Update();
                  }
              }
-             catch(_com_error &e){
+             catch(_com_error &e)
+			 {
+				  AfxMessageBox(_T("Error number 3"));
                  AfxMessageBox(e.Description());
              }
              bado.CloseRecordset();
@@ -836,7 +842,9 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
                      bado.m_pRecordset->Update();
                  }
              }
-             catch(_com_error &e){
+             catch(_com_error &e)
+			 {
+				  AfxMessageBox(_T("Error number 4"));
                  AfxMessageBox(e.Description());
              }
              bado.CloseRecordset();
@@ -846,6 +854,7 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
          }
          catch(_com_error *e)
          {
+			  AfxMessageBox(_T("Error number 5"));
              AfxMessageBox(e->ErrorMessage());
          }
          bado.CloseConn();
@@ -1154,588 +1163,593 @@ return FALSE;
 }
 BOOL CT3000App::InitInstance()
 {
-//TODO: call AfxInitRichEdit2() to initialize richedit2 library.
+	//TODO: call AfxInitRichEdit2() to initialize richedit2 library.
 	try
 	{
-	// InitCommonControlsEx() is required on Windows XP if an application
-	// manifest specifies use of ComCtl32.dll version 6 or later to enable
-	// visual styles.  Otherwise, any window creation will fail.
- 	INITCOMMONCONTROLSEX InitCtrls;
-	InitCtrls.dwSize = sizeof(InitCtrls);
-	// Set this to include all the common control classes you want to use
-	// in your application.
-	InitCtrls.dwICC = ICC_WIN95_CLASSES;
-	InitCommonControlsEx(&InitCtrls);
+		// InitCommonControlsEx() is required on Windows XP if an application
+		// manifest specifies use of ComCtl32.dll version 6 or later to enable
+		// visual styles.  Otherwise, any window creation will fail.
+		INITCOMMONCONTROLSEX InitCtrls;
+		InitCtrls.dwSize = sizeof(InitCtrls);
+		// Set this to include all the common control classes you want to use
+		// in your application.
+		InitCtrls.dwICC = ICC_WIN95_CLASSES;
+		InitCommonControlsEx(&InitCtrls);
 
-	Create_T3000_log_file();
-	
-
-	BOOL First_Start=TRUE;
+		Create_T3000_log_file();
 
 
-	//CString CO2Timer;
-	//CO2Timer=GetProductFirmwareTimeFromTemcoWebsite(_T("http://temcocontrols.com/ftp/firmware/MINIPANEL/"),_T("minipanel.bin"));
-	//AfxMessageBox(CO2Timer);
-//  	CString ftp_T3000Version;
-//  	ftp_T3000Version=GetContentFromURL(_T("http://temcocontrols.com/ftp/firmware/CO2/CO2-W/"));
-//  	//AfxBeginThread(UpdateT3000Background,this);
-//  	CStringArray HtmlArray;
-//  	HtmlArray.RemoveAll();
-//  	SplitCStringA(HtmlArray,ftp_T3000Version,_T("<hr>"));
-//  	CString ImageString;
-//  	if (HtmlArray.GetSize()>1)
-//  	{
-//  	   ImageString=HtmlArray[1];
-//  	   HtmlArray.RemoveAll();
-//  	   SplitCStringA(HtmlArray,ImageString,_T("<img"));
-// 	   ImageString.Empty();
-//  	   for (int i=0;i<HtmlArray.GetSize();i++)
-//  	   {
-//  		   if (HtmlArray[i].Find(_T("CO2-W.hex"))!=-1)
-//  		   {
-//  			   ImageString=HtmlArray[i];
-//  			   break;
-//  		   }
-//  	   }
-// 	   CString VersionString;
-// 	   HtmlArray.RemoveAll();
-// 	   
-// 	   if(ImageString.GetLength()>1)
-// 	   {
-// 	      SplitCStringA(HtmlArray,ImageString,_T("</a>"));
-// 	   }
-// 	   if(HtmlArray.GetSize()>0)
-// 	   {
-// 	     ImageString=HtmlArray[1];
-// 	   }
-// 	   //               20-Nov-2014 00:36  152K
-// 	   ImageString.TrimLeft();
-// 	   ImageString.TrimRight();
-// 	   HtmlArray.RemoveAll();
-// 	   if(ImageString.GetLength()>1)
-// 	   {
-// 		   SplitCStringA(HtmlArray,ImageString,_T("  "));
-// 	   }
-// 	   if (HtmlArray.GetSize()>0)
-// 	   {
-// 	      VersionString=HtmlArray[0];
-// 	   }
-// 
-//  	 
-//  	}
-// 	
-	
-//	versionstring=ImageString.g(index_start);
-	CWinAppEx::InitInstance();
-	HRESULT hr;//
+		BOOL First_Start=TRUE;
 
 
-	if(!AfxInitRichEdit())
-	{
-		AfxMessageBox(IDS_INIT_RICHEDIT_ERROR);//
-		return FALSE;//
-	}
-	//AfxInitRichEdit2();
-	if(!AfxInitRichEdit2())
-	{
-		AfxMessageBox(IDS_INIT_RICHEDIT_ERROR);//
-		return FALSE;//
-	}
-	if (!AfxSocketInit())//
-	{
-		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);//
-		return FALSE;//
-	}
-	// Initialize OLE libraries
-	if (!AfxOleInit())
-	{
-		AfxMessageBox(IDP_OLE_INIT_FAILED);
-		return FALSE;
-	}
-	AfxEnableControlContainer();
-	CString T3000_Rev;
-//	T3000_Rev=getURLContext(_T("www.temcocontrols.com/ftp/software/T3000_Version.txt"));
+		//CString CO2Timer;
+		//CO2Timer=GetProductFirmwareTimeFromTemcoWebsite(_T("http://temcocontrols.com/ftp/firmware/MINIPANEL/"),_T("minipanel.bin"));
+		//AfxMessageBox(CO2Timer);
+		//  	CString ftp_T3000Version;
+		//  	ftp_T3000Version=GetContentFromURL(_T("http://temcocontrols.com/ftp/firmware/CO2/CO2-W/"));
+		//  	//AfxBeginThread(UpdateT3000Background,this);
+		//  	CStringArray HtmlArray;
+		//  	HtmlArray.RemoveAll();
+		//  	SplitCStringA(HtmlArray,ftp_T3000Version,_T("<hr>"));
+		//  	CString ImageString;
+		//  	if (HtmlArray.GetSize()>1)
+		//  	{
+		//  	   ImageString=HtmlArray[1];
+		//  	   HtmlArray.RemoveAll();
+		//  	   SplitCStringA(HtmlArray,ImageString,_T("<img"));
+		// 	   ImageString.Empty();
+		//  	   for (int i=0;i<HtmlArray.GetSize();i++)
+		//  	   {
+		//  		   if (HtmlArray[i].Find(_T("CO2-W.hex"))!=-1)
+		//  		   {
+		//  			   ImageString=HtmlArray[i];
+		//  			   break;
+		//  		   }
+		//  	   }
+		// 	   CString VersionString;
+		// 	   HtmlArray.RemoveAll();
+		// 	   
+		// 	   if(ImageString.GetLength()>1)
+		// 	   {
+		// 	      SplitCStringA(HtmlArray,ImageString,_T("</a>"));
+		// 	   }
+		// 	   if(HtmlArray.GetSize()>0)
+		// 	   {
+		// 	     ImageString=HtmlArray[1];
+		// 	   }
+		// 	   //               20-Nov-2014 00:36  152K
+		// 	   ImageString.TrimLeft();
+		// 	   ImageString.TrimRight();
+		// 	   HtmlArray.RemoveAll();
+		// 	   if(ImageString.GetLength()>1)
+		// 	   {
+		// 		   SplitCStringA(HtmlArray,ImageString,_T("  "));
+		// 	   }
+		// 	   if (HtmlArray.GetSize()>0)
+		// 	   {
+		// 	      VersionString=HtmlArray[0];
+		// 	   }
+		// 
+		//  	 
+		//  	}
+		// 	
 
-	CString ProgramName;
-	ProgramName=  _T("T3000AppRunOnce");
-	HANDLE hMutex=CreateMutex(NULL,TRUE,ProgramName); 
-	if(GetLastError()==ERROR_ALREADY_EXISTS)
-	{
-		//SetForegroundWindow(FindWindow(NULL,ProgramName));
-		exit(1);
-		return true;
-	}
+		//	versionstring=ImageString.g(index_start);
+		CWinAppEx::InitInstance();
+		HRESULT hr;//
+
+
+		if(!AfxInitRichEdit())
+		{
+			AfxMessageBox(IDS_INIT_RICHEDIT_ERROR);//
+			return FALSE;//
+		}
+		//AfxInitRichEdit2();
+		if(!AfxInitRichEdit2())
+		{
+			AfxMessageBox(IDS_INIT_RICHEDIT_ERROR);//
+			return FALSE;//
+		}
+		if (!AfxSocketInit())//
+		{
+			AfxMessageBox(IDP_SOCKETS_INIT_FAILED);//
+			return FALSE;//
+		}
+		// Initialize OLE libraries
+		if (!AfxOleInit())
+		{
+			AfxMessageBox(IDP_OLE_INIT_FAILED);
+			return FALSE;
+		}
+		AfxEnableControlContainer();
+		CString T3000_Rev;
+		//	T3000_Rev=getURLContext(_T("www.temcocontrols.com/ftp/software/T3000_Version.txt"));
+
+		CString ProgramName;
+		ProgramName=  _T("T3000AppRunOnce");
+		HANDLE hMutex=CreateMutex(NULL,TRUE,ProgramName); 
+		if(GetLastError()==ERROR_ALREADY_EXISTS)
+		{
+			//SetForegroundWindow(FindWindow(NULL,ProgramName));
+			exit(1);
+			return true;
+		}
 
 
 #if 1	
-	try
-	{
-
-	TCHAR exeFullPath[MAX_PATH+1]; //
-	GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
-	(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
-	g_strDatabasefilepath=exeFullPath;//
-	g_strExePth=g_strDatabasefilepath;//
-
-
-
-
-	CreateDirectory(g_strExePth+_T("Database"),NULL);//creat database folder;//
-
-	g_achive_device_name_path = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("temp\\") + _T("device_name.ini") ;
-	g_achive_folder = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("temp");
-	g_achive_folder_temp_txt = g_achive_folder + _T("\\") + _T("prg_txt_file");
-	g_achive_folder_temp_db = g_achive_folder + _T("\\") + _T("MonitorDatabaseFolder");
-	g_cstring_ini_path = g_achive_folder + _T("\\MonitorIndex.ini");
-	product_sort_way  = GetPrivateProfileInt(_T("Setting"),_T("ProductSort"),0,g_cstring_ini_path);
-	if(product_sort_way == 0)
-	{
-		WritePrivateProfileStringW(_T("Setting"),_T("ProductSort"),_T("1"),g_cstring_ini_path);
-		product_sort_way = SORT_BY_CONNECTION;
-	}
-
-	monitor_ignore_enable = GetPrivateProfileInt(_T("Setting"),_T("EnableMonitorValueIgnore"),0,g_cstring_ini_path);
-	if(monitor_ignore_enable == 0)
-	{
-		WritePrivateProfileString(_T("Setting"),_T("EnableMonitorValueIgnore"),_T("0"),g_cstring_ini_path);
-		WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMax"),_T("10000000"),g_cstring_ini_path);
-		WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMin"),_T("-100000"),g_cstring_ini_path);
-	}
-	else if(monitor_ignore_enable == 1)
-	{
-		monitor_ignore_max_value = GetPrivateProfileInt(_T("Setting"),_T("MonitorValueIgnoreMax"),1000000,g_cstring_ini_path);
-		monitor_ignore_min_value = GetPrivateProfileInt(_T("Setting"),_T("MonitorValueIgnoreMin"),-100000,g_cstring_ini_path);
-	}
-
-	
-
-
-	g_achive_monitor_datatbase_path = g_achive_folder;
-	g_achive_monitor_datatbase_path = g_achive_monitor_datatbase_path + _T("\\MonitorData.mdb");
-
-	WIN32_FIND_DATA fd;
-	BOOL ret = FALSE;
-	HANDLE hFind_folder = FindFirstFile(g_achive_folder, &fd);
-	if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-	{
-		//目录存在
-		ret = TRUE;
-
-	}
-	FindClose(hFind_folder);
-	if(ret == false)
-	{
-		SECURITY_ATTRIBUTES attrib;
-		attrib.bInheritHandle = FALSE;
-		attrib.lpSecurityDescriptor = NULL;
-		attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
-
-		CreateDirectory( g_achive_folder, &attrib);
-	}
-
-	ret = FALSE;
-	hFind_folder = FindFirstFile(g_achive_folder_temp_txt, &fd);
-	if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-	{
-		//目录存在
-		ret = TRUE;
-
-	}
-	FindClose(hFind_folder);
-	if(ret == false)
-	{
-		SECURITY_ATTRIBUTES attrib;
-		attrib.bInheritHandle = FALSE;
-		attrib.lpSecurityDescriptor = NULL;
-		attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
-
-		CreateDirectory( g_achive_folder_temp_txt, &attrib);
-	}
-
-
-	ret = FALSE;
-	hFind_folder = FindFirstFile(g_achive_folder_temp_db, &fd);
-	if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-	{
-		//目录存在
-		ret = TRUE;
-
-	}
-	FindClose(hFind_folder);
-	if(ret == false)
-	{
-		SECURITY_ATTRIBUTES attrib;
-		attrib.bInheritHandle = FALSE;
-		attrib.lpSecurityDescriptor = NULL;
-		attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
-
-		CreateDirectory( g_achive_folder_temp_db, &attrib);
-	}
-
-
-	
-
-	g_strOrigDatabaseFilePath=g_strExePth+_T("T3000.mdb");//
-	g_strDatabasefilepath+=_T("Database\\T3000.mdb");//
-
-
-
-	#if 1//如果沒有T3000 的情況下
-
-	CString FilePath;
-	HANDLE hFind;//
-	WIN32_FIND_DATA wfd;//
-	hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
-	if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
-	{
-		//CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
-		//没有找到就创建一个默认的数据库
-		FilePath=g_strExePth+_T("Database\\T3000.mdb");
-		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DB), _T("T3000_DB"));   
-		HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
-		LPVOID lpExe = LockResource(hGlobal);   
-		CFile file;
-		if(file.Open(FilePath, CFile::modeCreate | CFile::modeWrite))    
-			file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
-		file.Close();    
-		::UnlockResource(hGlobal);   
-		::FreeResource(hGlobal);
-		First_Start=TRUE;
-	}  //
-	else
-	{
-	First_Start=FALSE;
-	}
-	FindClose(hFind);//
-
-
-
-	CString FilePath_Monitor;
-	HANDLE hFind_Monitor;//
-	WIN32_FIND_DATA wfd_monitor;//
-	hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
-	if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.mdb
-	{
-		//没有找到就创建一个默认的数据库
-		FilePath_Monitor= g_achive_monitor_datatbase_path;
-		HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB1), _T("MONITOR_DB"));   
-		HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
-		LPVOID lpExe = LockResource(hGlobal);   
-		CFile file;
-		if(file.Open(FilePath_Monitor, CFile::modeCreate | CFile::modeWrite))    
-			file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
-		file.Close();    
-		::UnlockResource(hGlobal);   
-		::FreeResource(hGlobal);
-	}  //
-	FindClose(hFind_Monitor);//
-
-	int versionno = 0;
-	//CADO tempado;
-	//BOOL Ret=tempado.OnInitADOConn();
-	CBADO tempado;
-	tempado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
-	tempado.OnInitADOConn(); 
-
-
-	if (tempado.IsHaveTable(tempado,_T("Version")))//有Version表
-	{
-		CString sql=_T("Select * from Version");
-		tempado.m_pRecordset=tempado.OpenRecordset(sql);
-		tempado.m_pRecordset->MoveFirst();
-		while (!tempado.m_pRecordset->EndOfFile)
-		{
-			versionno=tempado.m_pRecordset->GetCollect(_T("VersionNO"));
-			tempado.m_pRecordset->MoveNext();
-		}
-		tempado.CloseRecordset();
-
-
-	} 
-
-	if (versionno < 20150922)
-	{
-		CString StrSql;
-		StrSql=_T("ALTER TABLE MonitorData ADD COLUMN Temp_Data Integer");
-		tempado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-		StrSql=_T("ALTER TABLE MonitorData ADD COLUMN DisplayTime varchar(255)");
-		tempado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-		
-
-		StrSql=_T("INSERT INTO Version VALUES(20150922,'Add Temp and Time')");
-		tempado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
-	}
-	tempado.CloseConn(); 
-
-
-
-	
-	g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;//
-	g_strImgeFolder=g_strExePth+_T("Database\\image\\");//
-	CreateDirectory(g_strImgeFolder,NULL);//
-	g_strBuildingFolder=g_strExePth+_T("Database\\Buildings\\");
-	CreateDirectory(g_strBuildingFolder,NULL);//
-
-
-	if (First_Start)
-	{
-		//创建Default_Building
-		CString filebuildingPath;//=g_strBuildingFolder+m_Building.at(i).Main_BuildingName+_T("\\"); 
-		filebuildingPath.Format(_T("%sDefault_Building\\"),g_strBuildingFolder);
-		CreateDirectory(g_strBuildingFolder,NULL);
-
-		CreateDirectory(filebuildingPath,NULL);
-
-		filebuildingPath+=(CString)"Default_Building";//_T(".mdb");
-		filebuildingPath+=_T(".mdb");
-
-		DeleteFile(filebuildingPath);
-		// 	 HANDLE hFind;//
-		// 	 WIN32_FIND_DATA wfd;//
-		//create building db file
-
-		hFind = FindFirstFile(filebuildingPath, &wfd);//
-		if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
+		try
 		{
 
-			HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB), _T("BUILDING_DB"));   
-			HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
-
-
-			LPVOID lpExe = LockResource(hGlobal);   
-			CFile file;
-			if(file.Open(filebuildingPath, CFile::modeCreate | CFile::modeWrite))    
-				file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
-			file.Close();    
-			::UnlockResource(hGlobal);   
-			::FreeResource(hGlobal);
-		}//
-		FindClose(hFind);
-        int index= filebuildingPath.Find(_T("Database"));
-        filebuildingPath.Delete(0,index);
-	 
-		CString sql;
-		CADO ado; 
-		ado.OnInitADOConn();
-
-		sql.Format(_T("update Building set Building_Path = '%s'  where  Main_BuildingName = 'Default_Building' "),filebuildingPath);
-
-		 ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
-
-		ado.CloseConn();
-	}
-
-
-
-    #endif
-	
-
-	//HKEY hkey;
-	//char sz[256];
-	//DWORD dwtype, sl = 256;
-
-	//RegOpenKeyEx(HKEY_LOCAL_MACHINE,	_T("SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile"),	NULL, KEY_READ, &hkey);
-	//RegQueryValueEx(hkey, _T("EnableFirewall"), NULL, &dwtype, (LPBYTE)sz, &sl);
-	//DWORD dw_firewall;
-	//dw_firewall = sz[0] + sz[1] * 256 + sz[2] * 256*256 + sz[3] * 256*256*256;
-	//if(dw_firewall != 0 )
-	//{
-	//	AfxMessageBox(_T("Please turn off your firewall .If not , some broadcast communication may fail."));
-	//}
-	//
-	//RegCloseKey(hkey);
+			TCHAR exeFullPath[MAX_PATH+1]; //
+			GetModuleFileName(NULL, exeFullPath, MAX_PATH); //
+			(_tcsrchr(exeFullPath, _T('\\')))[1] = 0;//
+			g_strDatabasefilepath=exeFullPath;//
+			g_strExePth=g_strDatabasefilepath;//
 
 
 
 
- 
-	 //先不考虑升级的情况
-	 #if 1
-	int Ret=JudgeDB();
-	if (!Ret)
-	{
-        FilePath=g_strExePth+_T("Database\\t3000.mdb");
-        DeleteFile(FilePath.GetBuffer());
-        HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_DB2), _T("T3000_DB"));   
-        HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+			CreateDirectory(g_strExePth+_T("Database"),NULL);//creat database folder;//
+
+			g_achive_device_name_path = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("temp\\") + _T("device_name.ini") ;
+			g_achive_folder = g_strDatabasefilepath + _T("Database") + _T("\\") + _T("temp");
+			g_achive_folder_temp_txt = g_achive_folder + _T("\\") + _T("prg_txt_file");
+			g_achive_folder_temp_db = g_achive_folder + _T("\\") + _T("MonitorDatabaseFolder");
+			g_cstring_ini_path = g_achive_folder + _T("\\MonitorIndex.ini");
+			product_sort_way  = GetPrivateProfileInt(_T("Setting"),_T("ProductSort"),0,g_cstring_ini_path);
+			if(product_sort_way == 0)
+			{
+				WritePrivateProfileStringW(_T("Setting"),_T("ProductSort"),_T("1"),g_cstring_ini_path);
+				product_sort_way = SORT_BY_CONNECTION;
+			}
+
+			monitor_ignore_enable = GetPrivateProfileInt(_T("Setting"),_T("EnableMonitorValueIgnore"),0,g_cstring_ini_path);
+			if(monitor_ignore_enable == 0)
+			{
+				WritePrivateProfileString(_T("Setting"),_T("EnableMonitorValueIgnore"),_T("0"),g_cstring_ini_path);
+				WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMax"),_T("10000000"),g_cstring_ini_path);
+				WritePrivateProfileString(_T("Setting"),_T("MonitorValueIgnoreMin"),_T("-100000"),g_cstring_ini_path);
+			}
+			else if(monitor_ignore_enable == 1)
+			{
+				monitor_ignore_max_value = GetPrivateProfileInt(_T("Setting"),_T("MonitorValueIgnoreMax"),1000000,g_cstring_ini_path);
+				monitor_ignore_min_value = GetPrivateProfileInt(_T("Setting"),_T("MonitorValueIgnoreMin"),-100000,g_cstring_ini_path);
+			}
 
 
-        LPVOID lpExe = LockResource(hGlobal);   
-        CFile file;
-        if(file.Open(FilePath, CFile::modeCreate | CFile::modeWrite))    
-            file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
-        file.Close();    
-        ::UnlockResource(hGlobal);   
-        ::FreeResource(hGlobal);
-		JudgeDB();
-
-	}
-	 
-	#endif
 
 
-    
-	 
+			g_achive_monitor_datatbase_path = g_achive_folder;
+			g_achive_monitor_datatbase_path = g_achive_monitor_datatbase_path + _T("\\MonitorData.mdb");
 
-	InitModeName();//
+			WIN32_FIND_DATA fd;
+			BOOL ret = FALSE;
+			HANDLE hFind_folder = FindFirstFile(g_achive_folder, &fd);
+			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			{
+				//目录存在
+				ret = TRUE;
 
- 
-	 
+			}
+			FindClose(hFind_folder);
+			if(ret == false)
+			{
+				SECURITY_ATTRIBUTES attrib;
+				attrib.bInheritHandle = FALSE;
+				attrib.lpSecurityDescriptor = NULL;
+				attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
 
+				CreateDirectory( g_achive_folder, &attrib);
+			}
+
+			ret = FALSE;
+			hFind_folder = FindFirstFile(g_achive_folder_temp_txt, &fd);
+			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			{
+				//目录存在
+				ret = TRUE;
+
+			}
+			FindClose(hFind_folder);
+			if(ret == false)
+			{
+				SECURITY_ATTRIBUTES attrib;
+				attrib.bInheritHandle = FALSE;
+				attrib.lpSecurityDescriptor = NULL;
+				attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
+
+				CreateDirectory( g_achive_folder_temp_txt, &attrib);
+			}
+
+
+			ret = FALSE;
+			hFind_folder = FindFirstFile(g_achive_folder_temp_db, &fd);
+			if ((hFind_folder != INVALID_HANDLE_VALUE) && (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			{
+				//目录存在
+				ret = TRUE;
+
+			}
+			FindClose(hFind_folder);
+			if(ret == false)
+			{
+				SECURITY_ATTRIBUTES attrib;
+				attrib.bInheritHandle = FALSE;
+				attrib.lpSecurityDescriptor = NULL;
+				attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
+
+				CreateDirectory( g_achive_folder_temp_db, &attrib);
+			}
+
+
+
+
+			g_strOrigDatabaseFilePath=g_strExePth+_T("T3000.mdb");//
+			g_strDatabasefilepath+=_T("Database\\T3000.mdb");//
+
+
+
+#if 1//如果沒有T3000 的情況下
+
+			CString FilePath;
+			HANDLE hFind;//
+			WIN32_FIND_DATA wfd;//
+			hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
+			if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
+			{
+				//CopyFile(g_strOrigDatabaseFilePath,g_strDatabasefilepath,FALSE);//
+				//没有找到就创建一个默认的数据库
+				FilePath=g_strExePth+_T("Database\\T3000.mdb");
+				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_NEW_DB1), _T("T3000_NEW_DB"));   
+				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+				LPVOID lpExe = LockResource(hGlobal);   
+				CFile file;
+				if(file.Open(FilePath, CFile::modeCreate | CFile::modeWrite))    
+					file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+				file.Close();    
+				::UnlockResource(hGlobal);   
+				::FreeResource(hGlobal);
+				First_Start=TRUE;
+			}  //
+			else
+			{
+				First_Start=FALSE;
+			}
+			FindClose(hFind);//
+
+
+
+			CString FilePath_Monitor;
+			HANDLE hFind_Monitor;//
+			WIN32_FIND_DATA wfd_monitor;//
+			hFind_Monitor = FindFirstFile(g_achive_monitor_datatbase_path, &wfd_monitor);//
+			if (hFind_Monitor==INVALID_HANDLE_VALUE)//说明当前目录下无MonitorData.mdb
+			{
+				//没有找到就创建一个默认的数据库
+				FilePath_Monitor= g_achive_monitor_datatbase_path;
+				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MONITOR_DB1), _T("MONITOR_DB"));   
+				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+				LPVOID lpExe = LockResource(hGlobal);   
+				CFile file;
+				if(file.Open(FilePath_Monitor, CFile::modeCreate | CFile::modeWrite))    
+					file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+				file.Close();    
+				::UnlockResource(hGlobal);   
+				::FreeResource(hGlobal);
+			}  //
+			FindClose(hFind_Monitor);//
+
+#if 0
+			int versionno_monitor = 0;
+			//CADO tempado;
+			//BOOL Ret=tempado.OnInitADOConn();
+			CBADO tempado;
+			tempado.SetDBPath(g_achive_monitor_datatbase_path);	//暂时不创建新数据库
+			tempado.OnInitADOConn(); 
+
+
+			if (tempado.IsHaveTable(tempado,_T("Version")))//有Version表
+			{
+				CString sql=_T("Select * from Version");
+				tempado.m_pRecordset=tempado.OpenRecordset(sql);
+				tempado.m_pRecordset->MoveFirst();
+				while (!tempado.m_pRecordset->EndOfFile)
+				{
+					versionno_monitor=tempado.m_pRecordset->GetCollect(_T("VersionNO"));
+					tempado.m_pRecordset->MoveNext();
+				}
+				tempado.CloseRecordset();
+
+
+			} 
+
+			if (versionno_monitor < 20150922)
+			{
+				CString StrSql;
+				StrSql=_T("ALTER TABLE MonitorData ADD COLUMN Temp_Data Integer");
+				tempado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
+				StrSql=_T("ALTER TABLE MonitorData ADD COLUMN DisplayTime varchar(255)");
+				tempado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
+
+
+				StrSql=_T("INSERT INTO Version VALUES(20150922,'Add Temp and Time')");
+				tempado.m_pConnection->Execute(StrSql.GetBuffer(),NULL,adCmdText);
+			}
+			tempado.CloseConn(); 
 #endif
 
-	// Standard initialization
-	// If you are not using these features and wish to reduce the size
-	// of your final executable, you should remove from the following
-	// the specific initialization routines you do not need
-	// Change the registry key under which our settings are stored
-	// TODO: You should modify this string to be something appropriate
-	// such as the name of your company or organization
-	SetRegistryKey(_T("Temco T3000 Application"));//
-    LoadStdProfileSettings();  // Load standard INI file options (including MRU)//
-	InitContextMenuManager();
-	InitKeyboardManager();
 
-	InitTooltipManager();
-	CMFCToolTipInfo ttParams;
-	ttParams.m_bVislManagerTheme = TRUE;
-	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
-		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams); 
-#if 1
-	hr=CoInitialize(NULL);//
-	if(FAILED(hr)) 	//
-	{
-		AfxMessageBox(_T("Error Initialize the COM Interface"));//
-		return FALSE;//
-	} 
+
+			g_strDatabasefilepath=(CString)FOR_DATABASE_CONNECT+g_strDatabasefilepath;//
+			g_strImgeFolder=g_strExePth+_T("Database\\image\\");//
+			CreateDirectory(g_strImgeFolder,NULL);//
+			g_strBuildingFolder=g_strExePth+_T("Database\\Buildings\\");
+			CreateDirectory(g_strBuildingFolder,NULL);//
+
+
+			if (First_Start)
+			{
+				//创建Default_Building
+				CString filebuildingPath;//=g_strBuildingFolder+m_Building.at(i).Main_BuildingName+_T("\\"); 
+				filebuildingPath.Format(_T("%sDefault_Building\\"),g_strBuildingFolder);
+				CreateDirectory(g_strBuildingFolder,NULL);
+
+				CreateDirectory(filebuildingPath,NULL);
+
+				filebuildingPath+=(CString)"Default_Building";//_T(".mdb");
+				filebuildingPath+=_T(".mdb");
+
+				DeleteFile(filebuildingPath);
+				// 	 HANDLE hFind;//
+				// 	 WIN32_FIND_DATA wfd;//
+				//create building db file
+
+				hFind = FindFirstFile(filebuildingPath, &wfd);//
+				if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
+				{
+
+					HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB2), _T("BUILDING_DB"));   
+					HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+
+
+					LPVOID lpExe = LockResource(hGlobal);   
+					CFile file;
+					if(file.Open(filebuildingPath, CFile::modeCreate | CFile::modeWrite))    
+						file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+					file.Close();    
+					::UnlockResource(hGlobal);   
+					::FreeResource(hGlobal);
+				}//
+				FindClose(hFind);
+				int index= filebuildingPath.Find(_T("Database"));
+				filebuildingPath.Delete(0,index);
+
+				CString sql;
+				CADO ado; 
+				ado.OnInitADOConn();
+
+				sql.Format(_T("update Building set Building_Path = '%s'  where  Main_BuildingName = 'Default_Building' "),filebuildingPath);
+
+				ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+
+				ado.CloseConn();
+			}
+
+
 
 #endif
 
 
-	}
-	catch (...)
-	{
-		CFileFind temp_find;
-		CString temp_123;
-		temp_123 = g_strExePth +  _T("Database\\T3000.mdb");
-		BOOL	nret = temp_find.FindFile(temp_123);
-		if(nret)
-		{
-			DeleteFile(temp_123);
+			//HKEY hkey;
+			//char sz[256];
+			//DWORD dwtype, sl = 256;
+
+			//RegOpenKeyEx(HKEY_LOCAL_MACHINE,	_T("SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile"),	NULL, KEY_READ, &hkey);
+			//RegQueryValueEx(hkey, _T("EnableFirewall"), NULL, &dwtype, (LPBYTE)sz, &sl);
+			//DWORD dw_firewall;
+			//dw_firewall = sz[0] + sz[1] * 256 + sz[2] * 256*256 + sz[3] * 256*256*256;
+			//if(dw_firewall != 0 )
+			//{
+			//	AfxMessageBox(_T("Please turn off your firewall .If not , some broadcast communication may fail."));
+			//}
+			//
+			//RegCloseKey(hkey);
+
+
+
+
+
+			//先不考虑升级的情况
+#if 1
+			int Ret=JudgeDB();
+			if (!Ret)
+			{
+				FilePath=g_strExePth+_T("Database\\t3000.mdb");
+				DeleteFile(FilePath.GetBuffer());
+				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_T3000_NEW_DB1), _T("T3000_NEW_DB"));   
+				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+
+
+				LPVOID lpExe = LockResource(hGlobal);   
+				CFile file;
+				if(file.Open(FilePath, CFile::modeCreate | CFile::modeWrite))    
+					file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+				file.Close();    
+				::UnlockResource(hGlobal);   
+				::FreeResource(hGlobal);
+				JudgeDB();
+
+			}
+
+#endif
+
+
+			//Sleep(1000);
+
+
+			InitModeName();//
+
+
+
+
+#endif
+
+			// Standard initialization
+			// If you are not using these features and wish to reduce the size
+			// of your final executable, you should remove from the following
+			// the specific initialization routines you do not need
+			// Change the registry key under which our settings are stored
+			// TODO: You should modify this string to be something appropriate
+			// such as the name of your company or organization
+			SetRegistryKey(_T("Temco T3000 Application"));//
+			LoadStdProfileSettings();  // Load standard INI file options (including MRU)//
+			InitContextMenuManager();
+			InitKeyboardManager();
+
+			InitTooltipManager();
+			CMFCToolTipInfo ttParams;
+			ttParams.m_bVislManagerTheme = TRUE;
+			theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
+				RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams); 
+#if 1
+			hr=CoInitialize(NULL);//
+			if(FAILED(hr)) 	//
+			{
+				AfxMessageBox(_T("Error Initialize the COM Interface"));//
+				return FALSE;//
+			} 
+
+#endif
+
+
 		}
-		AfxMessageBox(_T("Database operation to stop!"));
-		exit(0);
-	}
+		catch (...)
+		{
+			CFileFind temp_find;
+			CString temp_123;
+			temp_123 = g_strExePth +  _T("Database\\T3000.mdb");
+			BOOL	nret = temp_find.FindFile(temp_123);
+			if(nret)
+			{
+				DeleteFile(temp_123);
+			}
+			AfxMessageBox(_T("Database operation to stop!"));
+			exit(0);
+		}
 
-	CSingleDocTemplate* pDocTemplate;
-	pDocTemplate = new CSingleDocTemplate(
-		IDR_MAINFRAME,
-		RUNTIME_CLASS(CT3000Doc),
-		RUNTIME_CLASS(CMainFrame),       // main SDI frame window
-		RUNTIME_CLASS(CT3000View));
-		
-
-	if (!pDocTemplate)
-		return FALSE;
-
-	AddDocTemplate(pDocTemplate);
-	// Parse command line for standard shell commands, DDE, file open
-	CCommandLineInfo cmdInfo;	
-	ParseCommandLine(cmdInfo);
-
-	//cmdInfo.m_nShellCommand   =   CCommandLineInfo::FileNothing; //lsc
+		CSingleDocTemplate* pDocTemplate;
+		pDocTemplate = new CSingleDocTemplate(
+			IDR_MAINFRAME,
+			RUNTIME_CLASS(CT3000Doc),
+			RUNTIME_CLASS(CMainFrame),       // main SDI frame window
+			RUNTIME_CLASS(CT3000View));
 
 
-	// Dispatch commands specified on the command line.  Will return FALSE if
-	// app was launched with /RegServer, /Register, /Unregserver or /Unregister.
+		if (!pDocTemplate)
+			return FALSE;
 
-	if (!ProcessShellCommand(cmdInfo))
-		return FALSE;
- 
-	
-	GdiplusStartupInput gdiplusStartupInput;//
-	GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);//
+		AddDocTemplate(pDocTemplate);
+		// Parse command line for standard shell commands, DDE, file open
+		CCommandLineInfo cmdInfo;	
+		ParseCommandLine(cmdInfo);
+
+		//cmdInfo.m_nShellCommand   =   CCommandLineInfo::FileNothing; //lsc
+
+
+		// Dispatch commands specified on the command line.  Will return FALSE if
+		// app was launched with /RegServer, /Register, /Unregserver or /Unregister.
+
+		if (!ProcessShellCommand(cmdInfo))
+			return FALSE;
+
+
+		GdiplusStartupInput gdiplusStartupInput;//
+		GdiplusStartup(&g_gdiplusToken, &gdiplusStartupInput, NULL);//
 
 #if 1
-////////////////////////////////////////////////////////
-	_ConnectionPtr m_pCon;
-	_RecordsetPtr m_pRs;
-	m_pCon.CreateInstance(_T("ADODB.Connection"));
-	hr=m_pRs.CreateInstance(_T("ADODB.Recordset"));
-	if(FAILED(hr)) 	
-	{
-	    AfxMessageBox(_T("Load msado12.dll erro"));
-	      return FALSE;
-	}
-	m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
-	m_pRs->Open(_T("select * from Userlogin"),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);		
-	int nRecord=m_pRs->GetRecordCount();
-	if (nRecord<=0)
-	{
-		g_bPrivilegeMannage=FALSE;
-	}
-	else
-	{
-		int nUse;
-		_variant_t temp_variant;
-		temp_variant=m_pRs->GetCollect("USE_PASSWORD");//
-		if(temp_variant.vt!=VT_NULL)
-			nUse=temp_variant;
-		else
-			nUse=0;
-		if(nUse==-1)
+		////////////////////////////////////////////////////////
+		_ConnectionPtr m_pCon;
+		_RecordsetPtr m_pRs;
+		m_pCon.CreateInstance(_T("ADODB.Connection"));
+		hr=m_pRs.CreateInstance(_T("ADODB.Recordset"));
+		if(FAILED(hr)) 	
 		{
-			g_bPrivilegeMannage=TRUE;
+			AfxMessageBox(_T("Load msado12.dll erro"));
+			return FALSE;
 		}
-		else
+		m_pCon->Open(g_strDatabasefilepath.GetString(),"","",adModeUnknown);
+		m_pRs->Open(_T("select * from Userlogin"),_variant_t((IDispatch *)m_pCon,true),adOpenStatic,adLockOptimistic,adCmdText);		
+		int nRecord=m_pRs->GetRecordCount();
+		if (nRecord<=0)
 		{
 			g_bPrivilegeMannage=FALSE;
 		}
-	}
-	m_pRs->Close();
-	m_pCon->Close();
-
-
-
-	if (g_bPrivilegeMannage)
-	{//for just quick debug,only on this computer
-		if(!user_login())
+		else
 		{
-			AfxMessageBox(_T("Error password!"));	
-			return false;
+			int nUse;
+			_variant_t temp_variant;
+			temp_variant=m_pRs->GetCollect("USE_PASSWORD");//
+			if(temp_variant.vt!=VT_NULL)
+				nUse=temp_variant;
+			else
+				nUse=0;
+			if(nUse==-1)
+			{
+				g_bPrivilegeMannage=TRUE;
+			}
+			else
+			{
+				g_bPrivilegeMannage=FALSE;
+			}
 		}
-		
-	}
+		m_pRs->Close();
+		m_pCon->Close();
+
+
+
+		if (g_bPrivilegeMannage)
+		{//for just quick debug,only on this computer
+			if(!user_login())
+			{
+				AfxMessageBox(_T("Error password!"));	
+				return false;
+			}
+
+		}
 
 #endif
 
-  	((CMainFrame*)m_pMainWnd)->InitViews();//
-    CString strTile;
-    strTile.Format(_T("T3000 Building Automation System"));
-	strTile+=CurrentT3000Version;
-   	m_pMainWnd->SetWindowText(strTile);//
-  	m_pMainWnd->ShowWindow(SW_SHOW);
-  	m_pMainWnd->UpdateWindow();
-   // ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
+		((CMainFrame*)m_pMainWnd)->InitViews();//
+		CString strTile;
+		strTile.Format(_T("T3000 Building Automation System"));
+		strTile+=CurrentT3000Version;
+		m_pMainWnd->SetWindowText(strTile);//
+		m_pMainWnd->ShowWindow(SW_SHOW);
+		m_pMainWnd->UpdateWindow();
+		// ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
 
-	m_szAppPath  = g_strExePth;
-	m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
-	CString g_configfile_path =g_strExePth + g_strStartInterface_config;
-	m_lastinterface=GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path);
-	g_selected_serialnumber=GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);
-    if (m_lastinterface!=19&&m_lastinterface!=24)
-    {
-    ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(m_lastinterface);
-    }
-    else
-    {
-        ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(19);
-    }
+		m_szAppPath  = g_strExePth;
+		m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
+		CString g_configfile_path =g_strExePth + g_strStartInterface_config;
+		m_lastinterface= 19 ;//GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path); //由 杜帆 16-03-17屏蔽；进入不同的界面引起 T3000打开时报错。
+		g_selected_serialnumber=GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);
+		if (m_lastinterface!=19&&m_lastinterface!=24)
+		{
+			((CMainFrame*)m_pMainWnd)->SwitchToPruductType(m_lastinterface);
+		}
+		else
+		{
+			((CMainFrame*)m_pMainWnd)->SwitchToPruductType(19);
+		}
 
-	
+
 	}
 	catch (...)
 	{
+		//int error_value  = GetLastError();
+		//CString value_temp;
+		//value_temp.Format(_T("%d"),error_value);
+		//AfxMessageBox(value_temp);
 		CFileFind temp_find;
 		CString temp_123;
 		temp_123 = g_strExePth +  _T("Database\\T3000.mdb");
@@ -1744,53 +1758,53 @@ BOOL CT3000App::InitInstance()
 		{
 			DeleteFile(temp_123);
 		}
-	//	AfxMessageBox(_T("Double click 'REG_msado15.dll',Please!\nAt C:\\Program Files\\Temcocontrols\\T3000"));
+		//	AfxMessageBox(_T("Double click 'REG_msado15.dll',Please!\nAt C:\\Program Files\\Temcocontrols\\T3000"));
 
-// 		CString strFilter = _T("hex File;bin File|*.hex;*.bin|all File|*.*||");
-// 		CFileDialog dlg(true,_T("hex"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
-// 		dlg.DoModal();
+		// 		CString strFilter = _T("hex File;bin File|*.hex;*.bin|all File|*.*||");
+		// 		CFileDialog dlg(true,_T("hex"),NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
+		// 		dlg.DoModal();
 
-//		CFileDialog dlg(true,NULL,_T("C:\Program Files\Common Files\System\ado"));
+		//		CFileDialog dlg(true,NULL,_T("C:\Program Files\Common Files\System\ado"));
 		//dlg.lpstrInitialDir = "..\\hisdata";
 		//dlg.op
-////
-	//		OPENFILENAME
-
-		
-//		if (dlg.DoModal()==IDOK)
-//		{
-// 			path = dlg.GetPathName();
-// 			pLogFile = fopen("Log.txt", "wt+");   
-// 			fprintf(pLogFile, "%s", (LPCSTR)path); 
-// 			fclose(pLogFile);
-// 			pLogFile = NULL; 
-//		}
+		////
+		//		OPENFILENAME
 
 
-// 		CFileDialog fileDlg(TRUE,NULL,NULL,OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,
-// 			NULL,NULL);//_T("工作表(*.xls)|*.xls|文本文件(*.txt)|*.txt||")
-// 		fileDlg.m_ofn.lpstrInitialDir = _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat");
-// 		fileDlg.DoModal();
+		//		if (dlg.DoModal()==IDOK)
+		//		{
+		// 			path = dlg.GetPathName();
+		// 			pLogFile = fopen("Log.txt", "wt+");   
+		// 			fprintf(pLogFile, "%s", (LPCSTR)path); 
+		// 			fclose(pLogFile);
+		// 			pLogFile = NULL; 
+		//		}
+
+
+		// 		CFileDialog fileDlg(TRUE,NULL,NULL,OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,
+		// 			NULL,NULL);//_T("工作表(*.xls)|*.xls|文本文件(*.txt)|*.txt||")
+		// 		fileDlg.m_ofn.lpstrInitialDir = _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat");
+		// 		fileDlg.DoModal();
 
 
 
 		//::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\REG_msado15.dll.bat"), _T(""), _T(""), SW_SHOW);
 		//vcredist_x86.zip
-		
-	//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
+
+		//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
 		//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
-       // http://www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip
-       CString str_msado;
-       str_msado.Format(_T("%sREG_MSFLXGRD.bat"),g_strExePth.GetBuffer());
-        ::ShellExecute(NULL, _T("open"),str_msado.GetBuffer(), _T(""), _T(""), SW_SHOW);
-        //vcredist_x86.zip
+		// http://www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip
+		CString str_msado;
+		str_msado.Format(_T("%sREG_MSFLXGRD.bat"),g_strExePth.GetBuffer());
+		::ShellExecute(NULL, _T("open"),str_msado.GetBuffer(), _T(""), _T(""), SW_SHOW);
+		//vcredist_x86.zip
 
-        //	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
-        //这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
-        
+		//	::ShellExecute(NULL, _T("open"), _T("C:\\Program Files\\Temcocontrols\\T3000\\vcredist_x86.zip"), _T(""), _T(""), SW_SHOW);
+		//这个要先试试，当电脑没有安装这个文件时，如何捕获这个信息，然后再执行这个。
 
-       AfxMessageBox(_T("Database error! Please restart again ."));
-       ::ShellExecute(NULL, _T("open"), _T("www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip"), _T(""), _T(""), SW_SHOW);
+
+		AfxMessageBox(_T("Database error! Please restart again ."));
+		::ShellExecute(NULL, _T("open"), _T("www.temcocontrols.com/ftp/software/AccessDatabaseEngine.zip"), _T(""), _T(""), SW_SHOW);
 		//AfxMessageBox(_T("Open'T3000'Again,Please!"));
 
 

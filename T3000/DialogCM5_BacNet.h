@@ -53,7 +53,7 @@ public:
 	afx_msg LRESULT Show_Panel_String(WPARAM wParam,LPARAM lParam);
 	afx_msg LRESULT Change_Next_Panel(WPARAM wParam,LPARAM lParam);
 //	afx_msg void OnBnClickedButton1();
-
+	afx_msg LRESULT RS485_Read_Fun(WPARAM wParam,LPARAM lParam);
 
 
 
@@ -85,7 +85,8 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid);
 DWORD WINAPI  MSTP_Send_read_Command_Thread(LPVOID lpVoid);
 DWORD WINAPI  MSTP_Write_Command_Thread(LPVOID lpVoid);
 DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid);
-
+DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid);
+DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid);
 
 
 

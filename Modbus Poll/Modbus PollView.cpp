@@ -15,6 +15,7 @@
 #include "WriteSingle_BinaryDlg.h"
 #include "RegisterValueAnalyzerDlg.h"
 #include "ado/ADO.h"
+#include "WriteFunctionDlg.h"
  
 // #include "CApplication.h"
 // #include "CWorkbook.h"
@@ -55,6 +56,7 @@ ON_EN_KILLFOCUS(IDC_MODELNAME, &CModbusPollView::OnEnKillfocusModelname)
 ON_COMMAND(ID_EDIT_CHANGEMODELNAME, &CModbusPollView::OnEditChangemodelname)
 ON_COMMAND(ID_FUNCTIONS_TESTCENTER, &CModbusPollView::OnFunctionsTestcenter)
 ON_COMMAND(ID_SETUP_USEASDEFAULT, &CModbusPollView::OnSetupUseasdefault)
+ON_COMMAND(ID_FUNCTIONS_TESTWRITE, &CModbusPollView::OnFunctionsTestwrite)
 END_MESSAGE_MAP()
 
  
@@ -2070,4 +2072,12 @@ void CModbusPollView::OnSetupUseasdefault()
 	WritePrivateProfileStringW(_T("MBPOLL_VIEW_SETTING"),_T("ADDRESSINCELL"),StrTemp,g_configfile_path);
 	StrTemp.Format(_T("%d"),m_PLC_Addresses);
 	WritePrivateProfileStringW(_T("MBPOLL_VIEW_SETTING"),_T("PLCBASE1"),StrTemp,g_configfile_path);
+}
+
+
+void CModbusPollView::OnFunctionsTestwrite()
+{
+	CWriteFunctionDlg dlg;
+	dlg.m_device_id = m_Slave_ID;
+	dlg.DoModal();
 }

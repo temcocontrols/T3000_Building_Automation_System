@@ -838,7 +838,7 @@ CString GetTempUnit(int nRange, int nPIDNO)
 
     if(nRange==0)		// Raw value, no unit
         strTemp=_T("");
-    else if(nRange==1)
+    else if(nRange==1||nRange==11)
     {
         //
         UINT uint_temp=GetOEMCP();//get system is for chinese or english
@@ -1094,14 +1094,28 @@ BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,i
     pmy_write_info->hWnd = hWnd;
     pmy_write_info->ItemInfo.nRow = nRow;
     pmy_write_info->ItemInfo.nCol = nCol;
-    if(!PostThreadMessage(nThreadID,MY_BAC_WRITE_LIST,(WPARAM)pmy_write_info,NULL))//post thread msg
-    {
-        return FALSE;
-    }
-    else
-    {
-        return TRUE;
-    }
+	if(g_protocol == MODBUS_RS485)
+	{
+		if(!PostThreadMessage(nThreadID,MY_RS485_WRITE_LIST,(WPARAM)pmy_write_info,NULL))//post thread msg
+		{
+			return FALSE;
+		}
+		else
+		{
+			return TRUE;
+		}
+	}
+	else
+	{
+		if(!PostThreadMessage(nThreadID,MY_BAC_WRITE_LIST,(WPARAM)pmy_write_info,NULL))//post thread msg
+		{
+			return FALSE;
+		}
+		else
+		{
+			return TRUE;
+		}
+	}
 }
 
 //Add 20130516  by Fance
@@ -3407,6 +3421,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
         Device_Basic_Setting.reg.sd_exist = *(my_temp_point++);
         Device_Basic_Setting.reg.modbus_port = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
         my_temp_point = my_temp_point + 2;
+		Device_Basic_Setting.reg.modbus_id = *(my_temp_point++);
 
         return READ_SETTING_COMMAND;
     }
@@ -6488,6 +6503,75 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
     return 0;
 }
 
+int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path)
+{
+	CString FilePath;
+	FilePath.Format(_T("%s"),tem_read_path);
+	CFileFind temp_find;
+	if(!temp_find.FindFile(FilePath))
+		return -1;
+
+	CFile myfile(tem_read_path,CFile::modeRead);
+	char *pBuf;
+	DWORD dwFileLen;
+	dwFileLen=myfile.GetLength();
+	pBuf= new char[dwFileLen+1];
+	memset(pBuf,0,dwFileLen);
+	pBuf[dwFileLen]=0;
+	myfile.Read(pBuf,dwFileLen);     //MFC   CFile 类 很方便
+	myfile.Close();
+	//MessageBox(pBuf);
+	char * temp_point = pBuf;
+	if(temp_point[0] != 4)
+		return -1;
+	temp_point = temp_point + 1;
+
+	unsigned long temp_file_time;
+	memcpy(&temp_file_time,temp_point,4);
+
+	CTime temp_time_now = CTime::GetCurrentTime();
+	unsigned long temp_cur_long_time = temp_time_now.GetTime();
+
+	//如果485 的prg时间 是三天以前的  或者485文件的时间大于现在的时间，这个prg 文件 就不要了;
+	if((temp_cur_long_time - temp_file_time > 259200) || (temp_file_time > temp_cur_long_time))
+	{
+		return -1;
+	}
+	temp_point = temp_point + 4;
+
+	unsigned short temp_buffer[50000];
+	memset(temp_buffer ,0,50000*2);
+
+	memcpy(temp_buffer,temp_point,dwFileLen-5);
+	Sleep(1);
+}
+
+void Copy_Data_From_485_to_Bacnet(unsigned short *start_point)
+{
+	memcpy(&Device_Basic_Setting.reg,start_point,400); //Setting 的400个字节;
+
+	for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+	{
+		memcpy( &m_Output_data.at(i),start_point + 200 + i*23,sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+	}
+
+	for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
+	{
+		memcpy(&m_Input_data.at(j),start_point + 200 + 23*64 + j*23,sizeof(Str_in_point)); //Input 46 个字节 ;
+	}
+
+	//memcpy(&Device_Basic_Setting.reg,&read_data_buffer[0],400); //Setting 的400个字节;
+
+	//for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+	//{
+	//	memcpy( &m_Output_data.at(i),&read_data_buffer[200 + i*23],sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+	//}
+
+	//for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
+	//{
+	//	memcpy(&m_Input_data.at(j),&read_data_buffer[200 + 23*64 + j*23],sizeof(Str_in_point)); //Input 46 个字节 ;
+	//}
+}
 
 int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
 {
@@ -6628,6 +6712,64 @@ int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
 
     return 0;
 }
+
+//第一个字节 版本
+//然后是 4个字节的 时间 如果时间太久了 也需要重新获取;
+void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigned int bufferlength)
+{
+	CString FilePath;
+	CStringArray temp_array1;
+
+	SplitCStringA(temp_array1,SaveConfigFilePath,_T("."));
+	int temp_array_size=0;
+	temp_array_size = temp_array1.GetSize();
+	if(temp_array1.GetSize()<=1)
+	{
+		return;
+	}
+
+
+	int right_suffix = temp_array1.GetAt(temp_array_size - 1).GetLength();
+	int config_file_length = SaveConfigFilePath.GetLength();
+	if(config_file_length <= right_suffix)
+	{
+		return;
+	}
+	CFileFind tempfind;
+	if(tempfind.FindFile(SaveConfigFilePath))
+	{
+		DeleteFile(SaveConfigFilePath);
+	}
+	char temp_buffer[50000];
+	char * temp_point = NULL;
+	memset(temp_buffer ,0,50000);
+	//FilePath = SaveConfigFilePath.Left( config_file_length -  right_suffix);
+	//FilePath = FilePath + _T("ini");
+	temp_buffer[0] = 4;
+	temp_point = temp_buffer + 1;
+
+#pragma region get_time_area
+	CTime temp_save_prg_time = CTime::GetCurrentTime();
+	unsigned long prg_temp_long_time = temp_save_prg_time.GetTime();
+
+	memcpy(temp_buffer + 1,&prg_temp_long_time,4);
+
+#pragma endregion get_time_area
+
+	memcpy(temp_buffer + 5,npoint,bufferlength);
+	temp_point = temp_point + bufferlength;
+
+	DWORD dwFileLen;
+	dwFileLen = temp_point - temp_buffer;
+	HANDLE hFile;
+	hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+	DWORD dWrites;
+	WriteFile(hFile,temp_buffer,dwFileLen,&dWrites,NULL);
+	CloseHandle(hFile);
+
+
+}
+
 
 void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath)
 {
@@ -8199,9 +8341,9 @@ void LoadTstat_InputData()
             m_tstat_input_data.at(i-1).Function.StrValue=strTemp;
         }
 
-        if(m_crange==1)	//359  122
+        if(m_crange==1||m_crange == 11)	//359  122
         {
-            fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-1]/10.0);	//367   131
+            fValue=float((short)product_register_value[MODBUS_ANALOG_INPUT1+i-1])/10.0;	//367   131
             strTemp.Format(_T("%.1f"),fValue);
         }
         else if (m_crange==3||m_crange==5||m_crange==7||m_crange==8||m_crange==9||m_crange==10)
@@ -8249,7 +8391,7 @@ void LoadTstat_InputData()
         }
         else if (m_crange==4||m_crange==6)  // custom sensor	359 122
         {
-            fValue=float(product_register_value[MODBUS_ANALOG_INPUT1+i-1]/10.0);	//367  131
+            fValue=float((short)product_register_value[MODBUS_ANALOG_INPUT1+i-1])/10.0;	//367  131
             strTemp.Format(_T("%.1f"), (float)fValue);
 
         }

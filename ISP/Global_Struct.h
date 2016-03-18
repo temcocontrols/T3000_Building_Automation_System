@@ -535,7 +535,8 @@ const TCHAR c_strProductModelFileName[] = _T("ProductModel.cfg");				//	Product 
 
 const int c_nModelNum = 27;
 const CString g_ProductModel[c_nModelNum] = 
-{ _T("TStat5B=1"),
+{ 
+_T("TStat5B=1"),
 _T("TStat5A=2"),
 _T("TStat5B2=3"),
 _T("TStat5C=4"),
@@ -562,7 +563,6 @@ _T("CM5=50"),
 _T("NC=100"),
 _T("OR485=102"),
 _T("LC=120")
-
 };
 
 
@@ -572,12 +572,6 @@ const int FLASH_SUCCESS = 2;
 const int FAILED_NORESPONSED = 3;
 const int FAILED_UNKNOW_ERROR = 4;
 //const int
-
-
-
-
-
-
 
 ///////////////////////////////////////////////////////////////////////////
 // for flash sn settings file

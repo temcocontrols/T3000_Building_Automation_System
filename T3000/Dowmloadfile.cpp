@@ -54,6 +54,7 @@ BEGIN_MESSAGE_MAP(Dowmloadfile, CDialogEx)
 	ON_MESSAGE(WM_DOWNLOADFILE_MESSAGE,DownloadFileMessage)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_BUTTON1, &Dowmloadfile::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 HANDLE Downloadfile_Thread;
@@ -204,8 +205,8 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 
-		//HANDLE Call_ISP_Application = NULL;
-		//Call_ISP_Application =CreateThread(NULL,NULL,isp_thread,this,NULL, NULL);
+		HANDLE Call_ISP_Application = NULL;
+		Call_ISP_Application =CreateThread(NULL,NULL,isp_thread,this,NULL, NULL);
 		
 		
 	}
@@ -629,7 +630,7 @@ BOOL Dowmloadfile::OnInitDialog()
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->AddString(_T("Bootloader"));
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->AddString(_T("Main Firmware"));
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->SetCurSel(1);
-	((CEdit *)GetDlgItem(IDC_EDIT_SERVER_DOMAIN))->SetWindowText(_T("www.temcocontrols.poweredbyclear.com"));
+	((CEdit *)GetDlgItem(IDC_EDIT_SERVER_DOMAIN))->SetWindowText(_T("Temco Server"));
 		
 	wait_download_and_isp_finished = false;
 	CString temp_id;CString temp_name;
@@ -655,17 +656,49 @@ BOOL Dowmloadfile::OnInitDialog()
 		CreateDirectory(Folder_Path);
 	}
 
-	hostent* host = gethostbyname("www.temcocontrols.poweredbyclear.com");
-	if(host == NULL)
-	{
-		MessageBox(_T("Can't access Temco server.\r\n www.temcocontrols.poweredbyclear.com  \r\nPlease check your internet connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-		PostMessage(WM_CLOSE,NULL,NULL);
-		return TRUE;
-	}
-	char* pszIP  = (char *)inet_ntoa(*(struct in_addr *)(host->h_addr)); 
-//	IP_ADDRESS[0] = pszIP[0];
-	memcpy_s((char *)IP_ADDRESS_SERVER,20,pszIP,20);
 
+
+	CString temp_db_ini_folder;
+	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
+
+	int is_local_temco_net = false;
+	is_local_temco_net  = GetPrivateProfileInt(_T("Setting"),_T("LocalTemcoNet"),0,temp_db_ini_folder);
+	if(is_local_temco_net == false)
+	{
+		WritePrivateProfileStringW(_T("Setting"),_T("LocalTemcoNet"),_T("0"),temp_db_ini_folder);
+		WritePrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.136"),temp_db_ini_folder);
+	}
+
+	//hostent* host = gethostbyname("www.temcocontrols.poweredbyclear.com");  //这是以前的域名 
+	//hostent* host = gethostbyname("14i5f38013.iok.la");
+
+	if(is_local_temco_net == false)
+	{
+
+		hostent* host = gethostbyname("148t02f377.iok.la");
+		if(host == NULL)
+		{
+			MessageBox(_T("Connect Temco server failed.  \r\nPlease check your internet connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+			PostMessage(WM_CLOSE,NULL,NULL);
+			return TRUE;
+		}
+		char* pszIP  = (char *)inet_ntoa(*(struct in_addr *)(host->h_addr)); 
+		memcpy_s((char *)IP_ADDRESS_SERVER,20,pszIP,20);
+	}
+	else
+	{
+		CString temp_ip;
+		GetPrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.136"),temp_ip.GetBuffer(MAX_PATH),MAX_PATH,temp_db_ini_folder);
+		temp_ip.ReleaseBuffer();
+
+		char temp_char_ip[40];
+		memset(temp_char_ip,0,40);
+		WideCharToMultiByte( CP_ACP, 0, temp_ip.GetBuffer(), -1, temp_char_ip, 255, NULL, NULL );
+		memcpy_s((char *)IP_ADDRESS_SERVER,20,temp_char_ip,20);
+	}
+//#ifdef _DEBUG
+//	memcpy_s((char *)IP_ADDRESS_SERVER,20,"127.0.0.1",20);
+//#endif
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -696,8 +729,47 @@ void Dowmloadfile::OnBnClickedButtonStartDownload()
 	TCP_File_Socket.SetParentWindow(downloadfile_hwnd);
 
 
-
+	CString temp_db_ini_folder;
+	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
+	
+	int is_local_temco_net = false;
+	is_local_temco_net  = GetPrivateProfileInt(_T("Setting"),_T("LocalTemcoNet"),0,temp_db_ini_folder);
+	if(is_local_temco_net == false)
+	{
+		WritePrivateProfileStringW(_T("Setting"),_T("LocalTemcoNet"),_T("0"),temp_db_ini_folder);
+		WritePrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.136"),temp_db_ini_folder);
+	}
 	//TCP_File_Socket.Connect(_T("114.93.6.170"),31234);
+
+	//hostent* host = gethostbyname("14i5f38013.iok.la");
+
+	if(is_local_temco_net == false)
+	{
+		hostent* host = gethostbyname("148t02f377.iok.la");
+		if(host == NULL)
+		{
+			MessageBox(_T("Can't access Temco server.  \r\nPlease check your internet connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+			PostMessage(WM_CLOSE,NULL,NULL);
+			return ;
+		}
+		char* pszIP  = (char *)inet_ntoa(*(struct in_addr *)(host->h_addr)); 
+		memcpy_s((char *)IP_ADDRESS_SERVER,20,pszIP,20);
+	}
+	else
+	{
+		CString temp_ip;
+		GetPrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.136"),temp_ip.GetBuffer(MAX_PATH),MAX_PATH,temp_db_ini_folder);
+		temp_ip.ReleaseBuffer();
+
+		char temp_char_ip[40];
+		memset(temp_char_ip,0,40);
+		WideCharToMultiByte( CP_ACP, 0, temp_ip.GetBuffer(), -1, temp_char_ip, 255, NULL, NULL );
+		memcpy_s((char *)IP_ADDRESS_SERVER,20,temp_char_ip,20);
+	}
+
+//#ifdef _DEBUG
+//	memcpy_s((char *)IP_ADDRESS_SERVER,20,"127.0.0.1",20);
+//#endif
 
 
 
@@ -808,4 +880,31 @@ void Dowmloadfile::OnTimer(UINT_PTR nIDEvent)
 
 	}
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void Dowmloadfile::OnBnClickedButton1()
+{
+	// TODO: Add your control notification handler code here
+	CString temp_folder_path;
+	CString ApplicationFolder;
+	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+	PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
+	ApplicationFolder.ReleaseBuffer();
+
+	Folder_Path = ApplicationFolder + _T("\\Database\\Firmware");
+	temp_folder_path = Folder_Path + _T("\\DefaultFile.txt");
+	CFileFind cs_temp_find;
+	if(!cs_temp_find.FindFile(temp_folder_path))
+	{
+		CStdioFile*		 m_plogFile;
+		m_plogFile=new CStdioFile;
+		if(m_plogFile->Open(temp_folder_path.GetString(),CFile::modeReadWrite | CFile::shareDenyNone | CFile::modeCreate ))
+		{
+			Sleep(1);
+		}
+		m_plogFile->Close();
+	}
+	CString str = _T("/select, ") + temp_folder_path;     
+	ShellExecute( NULL, _T("open"), _T("explorer.exe"), str, NULL, SW_SHOWNORMAL );  
 }

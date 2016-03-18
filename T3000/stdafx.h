@@ -226,7 +226,7 @@ typedef struct _STATUSBARINFO
 
 #define MY_WRITE_ONE_LIST				WM_USER	+ 106
 #define MY_WRITE_MULTI_LIST				WM_USER	+ 107
-
+#define MY_RS485_WRITE_LIST          WM_USER	+ 108
 #define MY_CLOSE WM_USER+110
 
 #define MY_RESUME_DATA  WM_USER + 300

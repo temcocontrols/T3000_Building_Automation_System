@@ -1539,7 +1539,7 @@ BEGIN
     COMBOBOX        IDC_COMBO_BACNET_SETTING_TIME_ZONE,295,122,81,94,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Serial Number :",IDC_STATIC,20,344,50,8
     LTEXT           "Static",IDC_STATIC_SEETING_SERIAL_NUMBER,93,340,89,16,0,WS_EX_CLIENTEDGE
-    GROUPBOX        "Panel Information",IDC_STATIC,231,343,207,107
+    GROUPBOX        "Panel Information",IDC_STATIC,231,343,207,123
     LTEXT           "Object Instance :",IDC_STATIC,244,361,59,8
     LTEXT           "MAC Address :",IDC_STATIC,244,385,59,8
     LTEXT           "MS/TP Network :",IDC_STATIC,243,407,59,8
@@ -1554,6 +1554,8 @@ BEGIN
     LTEXT           "Port  :",IDC_STATIC_SETTING_NODES_LABEL_TITLE2,25,164,50,10
     EDITTEXT        IDC_EDIT_SETTING_PORT,91,161,50,15,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Network Health",IDC_BUTTON_HEALTH,144,456,59,17
+    LTEXT           "Modbus ID :",IDC_STATIC,243,448,59,8
+    EDITTEXT        IDC_EDIT_SETTING_MODBUS_ID,307,445,119,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
 END
 
 IDD_DIALOG_THE_SAME_DEVICE DIALOGEX 0, 0, 350, 54
@@ -1569,21 +1571,22 @@ BEGIN
     LTEXT           "Static",IDC_STATIC_NET,90,20,252,8
 END
 
-IDD_DIALOG_DOWNLOAD_FILE DIALOGEX 0, 0, 493, 264
+IDD_DIALOG_DOWNLOAD_FILE DIALOGEX 0, 0, 725, 336
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Download Firmware"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Download Server:",IDC_STATIC,12,14,77,11,NOT WS_VISIBLE
-    LISTBOX         IDC_LIST_DOWNLOAD_INFO,0,114,493,132,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Update bootloader or Firmware :",IDC_STATIC,10,36,106,8,NOT WS_VISIBLE
-    COMBOBOX        IDC_COMBO_UPDATE_TYPE,119,34,78,30,CBS_DROPDOWN | CBS_SORT | NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Start",IDC_BUTTON_START_DOWNLOAD,413,12,62,26
-    LTEXT           "Product ID :",IDC_STATIC,12,60,40,8
-    EDITTEXT        IDC_EDIT_PRODUCT_ID,89,58,62,14,ES_CENTER | ES_AUTOHSCROLL
-    LTEXT           "Product Name :",IDC_STATIC,12,77,67,8
-    EDITTEXT        IDC_EDIT_PRODUCT_NAME,89,75,60,14,ES_CENTER | ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_SERVER_DOMAIN,79,12,141,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_VISIBLE
+    LTEXT           "Download Server:",IDC_STATIC,277,68,77,11,NOT WS_VISIBLE
+    LISTBOX         IDC_LIST_DOWNLOAD_INFO,0,60,709,261,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Update bootloader or Firmware :",IDC_STATIC,275,90,106,8,NOT WS_VISIBLE
+    COMBOBOX        IDC_COMBO_UPDATE_TYPE,385,87,78,30,CBS_DROPDOWN | CBS_SORT | NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Download Fireware And Update",IDC_BUTTON_START_DOWNLOAD,572,9,132,22
+    LTEXT           "Product ID :",IDC_STATIC,12,15,40,8
+    EDITTEXT        IDC_EDIT_PRODUCT_ID,89,12,62,14,ES_CENTER | ES_AUTOHSCROLL
+    LTEXT           "Product Name :",IDC_STATIC,12,31,67,8
+    EDITTEXT        IDC_EDIT_PRODUCT_NAME,89,30,60,14,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SERVER_DOMAIN,345,66,141,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_VISIBLE
+    PUSHBUTTON      "Firmware File Folder",IDC_BUTTON1,469,9,74,22
 END
 
 IDD_DIALOG_MULTY_FLASH DIALOGEX 0, 0, 901, 375
@@ -2998,7 +3001,8 @@ BEGIN
 
     IDD_DIALOG_DOWNLOAD_FILE, DIALOG
     BEGIN
-        BOTTOMMARGIN, 225
+        RIGHTMARGIN, 718
+        BOTTOMMARGIN, 321
     END
 
     IDD_DIALOG_MULTY_FLASH, DIALOG
@@ -4517,24 +4521,24 @@ IDI_ICON_LABEL_UNLOCK   ICON                    "res\\unlock.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// T3000_DB
+// MONITOR_DB
 //
 
-IDR_T3000_DB            T3000_DB                "res\\T3000.mdb"
+IDR_MONITOR_DB1         MONITOR_DB              "res\\MonitorData.mdb"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // BUILDING_DB
 //
 
-IDR_BUILDING_DB         BUILDING_DB             "res\\Building.mdb"
+IDR_BUILDING_DB2        BUILDING_DB             "res\\Building.mdb"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// MONITOR_DB
+// T3000_NEW_DB
 //
 
-IDR_MONITOR_DB1         MONITOR_DB              "res\\MonitorData.mdb"
+IDR_T3000_NEW_DB1       T3000_NEW_DB            "res\\t3000.mdb"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -7723,6 +7727,7 @@ BEGIN
         MENUITEM "Contents",                    ID_HELP
         MENUITEM "Version History",             ID_VERSIONHISTORY
         MENUITEM "&About T3000...",             ID_APP_ABOUT
+        MENUITEM "Check Update",                ID_HELP_UPDATEFIRMWARE
     END
 END
 

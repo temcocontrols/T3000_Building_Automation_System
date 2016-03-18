@@ -224,11 +224,11 @@ LRESULT BacnetScreen::OnHotKey(WPARAM wParam,LPARAM lParam)
 
 
 
-		if(h_get_pic_thread==NULL)
-		{
-			if(Device_Basic_Setting.reg.sd_exist)
-				h_get_pic_thread =CreateThread(NULL,NULL,GetPictureThread,this,NULL, NULL);
-		}
+		//if(h_get_pic_thread==NULL)
+		//{
+		//	if(Device_Basic_Setting.reg.sd_exist)
+		//		h_get_pic_thread =CreateThread(NULL,NULL,GetPictureThread,this,NULL, NULL);
+		//}
 
 
 
@@ -618,11 +618,11 @@ void BacnetScreen::OnNMDblclkListScreen(NMHDR *pNMHDR, LRESULT *pResult)
 			New_CString = FileName;
 			pic_filename = FileName;
 
-			if(h_write_pic_thread==NULL)
-			{
-				if(Device_Basic_Setting.reg.sd_exist)
-					h_write_pic_thread =CreateThread(NULL,NULL,WritePictureThread,this,NULL, NULL);
-			}
+			//if(h_write_pic_thread==NULL)
+			//{
+			//	if(Device_Basic_Setting.reg.sd_exist)
+			//		h_write_pic_thread =CreateThread(NULL,NULL,WritePictureThread,this,NULL, NULL);
+			//}
 
 		}
 	}

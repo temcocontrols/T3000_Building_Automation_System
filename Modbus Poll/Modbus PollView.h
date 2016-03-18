@@ -180,6 +180,7 @@ public:
 	afx_msg void OnFunctionsTestcenter();
 /*	void MouseMoveMsflexgrid1(short Button, short Shift, long x, long y);*/
 	afx_msg void OnSetupUseasdefault();
+	afx_msg void OnFunctionsTestwrite();
 };
 
 #ifndef _DEBUG  // debug version in Modbus PollView.cpp

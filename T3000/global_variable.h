@@ -1837,8 +1837,8 @@ int	MODBUS_PID3_OFF_OUTPUT_HEAT2		=	-1	;
 int	MODBUS_PID3_OFF_OUTPUT_HEAT3		=	-1	;
 
 //used for record the selected product , if user want to update this product ,we need to check whether it is on line or not.
-int selected_product_index;
-HTREEITEM selected_tree_item;
+int selected_product_index = -1;
+HTREEITEM selected_tree_item = NULL;
 #pragma region For_bacnet
 
 

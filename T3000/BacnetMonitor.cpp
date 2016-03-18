@@ -1726,7 +1726,7 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	my_temp_point = my_temp_point + 2;
 
 	//在调试界面中打印出接收到得字符;
-	if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)) && (m_monitor_head.special == 0))
+	if(((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_MONITOR_DATA_ONLY)) /*&& (m_monitor_head.special == 0)*/)
 	{
 		for (int i = 0; i< nlength ; i++)
 		{

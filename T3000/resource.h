@@ -207,7 +207,6 @@
 #define IDD_REGISTER_VIEWER             502
 #define IDD_DIALOG_BACNET_MONITOR       503
 #define IDR_ACCELERATOR2                504
-#define IDR_T3000_DB1                   505
 #define IDD_DIALOG_THE_SAME_DEVICE      506
 #define IDD_DIALOG15                    508
 #define IDB_BITMAP_TEMCOLOGO            509
@@ -227,10 +226,7 @@
 #define IDB_BITMAP_BUILDING_DEFAULT     548
 #define IDB_BITMAP6                     549
 #define IDR_BUILDING_CONFIG             549
-#define IDR_BUILDING_DB1                550
-#define IDR_T3000_DB2                   555
-#define IDR_T3000_DB                    555
-#define IDR_BUILDING_DB                 556
+#define IDR_BUILDING_DB2                550
 #define IDD_DIALOG_TSTAT_RANGES         557
 #define IDD_DIALOG_MAIN_DEFAULT         558
 #define IDD_DIALOG_DEFAULT_MAIN_VIEW    560
@@ -264,6 +260,8 @@
 #define IDR_MONITOR_DB1                 595
 #define IDD_DIALOG_BACNET_SETTING_HEALTH 596
 #define IDD_DIALOG_BOOTFINDER           597
+#define IDR_BUILDING_DB                 600
+#define IDR_T3000_NEW_DB1               601
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -1975,12 +1973,19 @@
 #define IDC_EDIT_HUM_NAME               2160
 #define IDC_EDIT_BACNET_SCREEN_PIC_FILE 2161
 #define IDC_BUTTON_HEALTH               2161
+#define IDC_STATIC_IPTIPS               2161
 #define IDC_EDIT_RX_1                   2162
+#define IDC_STATIC_IPMODEL              2162
 #define IDC_EDIT_RX_2                   2163
+#define IDC_STATIC_IPADDRESS            2163
 #define IDC_EDIT_RX_3                   2164
+#define IDC_STATICSUBNETMASK            2164
 #define IDC_EDIT_TX_1                   2165
+#define IDC_STATICGATEWAYADDRESS        2165
 #define IDC_EDIT_TX_2                   2166
+#define IDC_STATIC_LISTENNINGPORT       2166
 #define IDC_EDIT_TX_3                   2167
+#define IDC_STATICMACADDRESS            2167
 #define IDC_EDIT_ID_COLLISION_1         2168
 #define IDC_EDIT_ID_COLLISION_2         2169
 #define IDC_EDIT_ID_COLLISION_3         2170
@@ -1990,13 +1995,6 @@
 #define IDC_EDIT_TIMEOUT_1              2174
 #define IDC_EDIT_TIMEOUT_2              2175
 #define IDC_EDIT_TIMEOUT_3              2176
-#define IDC_STATIC_IPTIPS               2161
-#define IDC_STATIC_IPMODEL              2162
-#define IDC_STATIC_IPADDRESS            2163
-#define IDC_STATICSUBNETMASK            2164
-#define IDC_STATICGATEWAYADDRESS        2165
-#define IDC_STATIC_LISTENNINGPORT       2166
-#define IDC_STATICMACADDRESS            2167
 #define IDC_HELP_HELP1                  3831
 #define IDC_STATIC_BAC_SETTING_SD_CARD  5817
 #define IDC_MFCCOLORBUTTON_FUNCTION     5818
@@ -2023,6 +2021,8 @@
 #define IDC_EDIT_SETTING_PANEL2         5834
 #define IDC_EDIT_SETTING_PORT           5834
 #define IDC_IPADDRESS_TEMCO_IP          5835
+#define IDC_EDIT_SETTING_BIP_NETWORK3   5835
+#define IDC_EDIT_SETTING_MODBUS_ID      5835
 #define IDC_BUTTON_START_DOWNLOAD       5836
 #define IDC_EDIT_PRODUCT_ID             5837
 #define IDC_EDIT_PRODUCT_ID2            5838
@@ -2395,6 +2395,7 @@
 #define ID_TIMEBASE_30MINUTES           34052
 #define ID_TOOL_BOOTLOADER              34052
 #define ID_CONTROL_MAIN                 34053
+#define ID_HELP_CHECKUPDATE             34053
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
 #define IDD_DIALOG_BACNET_OUTPUT        34907
@@ -2460,8 +2461,8 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        598
-#define _APS_NEXT_COMMAND_VALUE         34053
+#define _APS_NEXT_RESOURCE_VALUE        602
+#define _APS_NEXT_COMMAND_VALUE         34054
 #define _APS_NEXT_CONTROL_VALUE         2168
 #define _APS_NEXT_SYMED_VALUE           320
 #endif

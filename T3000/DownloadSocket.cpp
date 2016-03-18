@@ -57,7 +57,7 @@ void DownloadSocket::OnReceive(int nErrorCode)
 			}
 			totalpackage = ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
 			temp_point = temp_point + 2;
-			memcpy(download_filename,temp_point,20);
+			memcpy(download_filename,temp_point,40);
 			download_step = SEND_GET_MD5_VALUE;
 
 			malloc_download_memory_size = totalpackage  * TFTP_SEND_LENGTH;

@@ -645,15 +645,15 @@ BOOL TFTPServer::StartServer()
 			if((mode_send_flash_try_time++)<10)
 			{
 
-				//	SendFlashCommand();
+					SendFlashCommand();
 
 					 
-				//int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
-				////TRACE(_T("%d"),send_ret);
-				//if(send_ret<0)	//如果发送失败 就尝试 再次进行TCP连接
-				//{
-				//	TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
-				//}
+				int send_ret=TCP_Flash_CMD_Socket.SendTo(byCommand,sizeof(byCommand),m_nClientPort,ISP_Device_IP,0);
+				//TRACE(_T("%d"),send_ret);
+				if(send_ret<0)	//如果发送失败 就尝试 再次进行TCP连接
+				{
+					TCP_Flash_CMD_Socket.Connect(ISP_Device_IP,m_nClientPort);
+				}
 				SetDHCP_Data();
 
 				

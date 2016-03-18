@@ -4068,11 +4068,11 @@ void CNewHumChamberView::OnBnClickedBatchFlash()
 			if (product_register_value[RegAdd]==65535||product_register_value[RegAdd]==0)//无序列号,就才写入
 			{
 				SN=GetNewSerialNumber();
-
+                WriteSerialNumber(SN);
 				int ret=write_one(m_tstatID,RegAdd,SN,5);
 				if (ret>0)
 				{
-					WriteSerialNumber(SN);
+					
 					product_register_value[RegAdd]=SN;
 					temp1.Format(_T("%d"),product_register_value[RegAdd]);
 					m_msflexgrid.put_TextMatrix(i,1,temp1);
@@ -4089,10 +4089,11 @@ void CNewHumChamberView::OnBnClickedBatchFlash()
 		else
 		{
 			SN=GetNewSerialNumber();
+            WriteSerialNumber(SN);
 			int ret=write_one(m_tstatID,RegAdd,SN,5);
 			if (ret>0)
 			{
-				WriteSerialNumber(SN);
+				
 				product_register_value[RegAdd]=SN;
 				temp1.Format(_T("%d"),product_register_value[RegAdd]);
 				m_msflexgrid.put_TextMatrix(i,1,temp1);

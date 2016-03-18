@@ -168,8 +168,11 @@ static void dlmstp_receive_fsm_task(
     bool received_frame;
 
     (void) pArg;
-    (void) SetThreadPriority(GetCurrentThread(),
-        THREAD_PRIORITY_TIME_CRITICAL);
+    //(void) SetThreadPriority(GetCurrentThread(),
+    //    THREAD_PRIORITY_TIME_CRITICAL);	//ԭʼ
+	(void) SetThreadPriority(GetCurrentThread(),
+		THREAD_PRIORITY_NORMAL);
+	
     for (;;) {
         /* only do receive state machine while we don't have a frame */
         if ((MSTP_Port.ReceivedValidFrame == false) &&
@@ -195,8 +198,10 @@ static void dlmstp_master_fsm_task(
     DWORD dwMilliseconds = 0;
 
     (void) pArg;
-    (void) SetThreadPriority(GetCurrentThread(),
-        THREAD_PRIORITY_TIME_CRITICAL);
+    //(void) SetThreadPriority(GetCurrentThread(),
+    //    THREAD_PRIORITY_TIME_CRITICAL); //ԭʼ
+	(void) SetThreadPriority(GetCurrentThread(),
+		THREAD_PRIORITY_NORMAL);
     for (;;) {
         switch (MSTP_Port.master_state) {
             case MSTP_MASTER_STATE_IDLE:

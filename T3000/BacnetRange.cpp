@@ -726,6 +726,9 @@ void BacnetRange::OnTimer(UINT_PTR nIDEvent)
 						GetWindowRect(TempRect1);
 						bac_analog_window->SetWindowPos(NULL,TempRect1.right,TempRect1.top,0,0,SWP_NOZORDER|SWP_NOSIZE |SWP_NOACTIVATE);
 
+						CString temp_window_text;
+						temp_window_text.Format(_T("Customer Range Table %d"),m_input_Analog_select - 19);
+						bac_analog_window->SetWindowTextW(temp_window_text);
 						bac_analog_window->ShowWindow(SW_SHOW);
 						TRACE(_T("Create Analog window\r\n"));
 

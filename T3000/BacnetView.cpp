@@ -1,6 +1,29 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2016 - 03 - 17
+//Fix the bugs which make the program crash when start up.
+//原因是由 自动进入上一次的界面引起的;
+
+2016 - 03 - 16 
+//Merge Code.
+
+//minipanel 寄存器表
+//  9800	-	9999    200个寄存器   setting
+//  10000	-   11471   1472		  OUT
+//  11472   -   12943   1472		  IN
+1.在下载界面加入 固件文件夹。
+2.Download hex or bin  file name change to 40 bytes.
+
+2016 - 03 - 04
+Update by Fance
+1.ISP 修改显示 ISP 的 对话框 引起的 烧写网络 速度过快引起的 烧写中断的问题.
+
+
+2016 - 03 -01
+Update by Fance
+1.自动连接服务器下载Hex代码.
+
 2016 - 02 - 24
 Update by Fance
 1.修复当点击产品时，产品树 状态显示不正常的问题;
@@ -520,6 +543,7 @@ extern CBacnetAlarmWindow * AlarmWindow_Window;
 extern bool is_in_scan_mode;
 extern char mycode[2000];
 int click_resend_time = 0;//当点击的时候，要切换device时 发送whois的次数;
+
 // CDialogCM5_BacNet
 CString IP_ADDRESS;
 _Refresh_Info Bacnet_Refresh_Info;
@@ -529,6 +553,9 @@ extern CString SaveConfigFilePath; //用来将资料存放至数据库，临时�
 extern SOCKET my_sokect;
 extern bool show_user_list_window ;
 HANDLE connect_mstp_thread = NULL; // 当点击MSTP的设备时开启 连接的线程;
+HANDLE read_rs485_thread = NULL; // RS485的设备 通用;
+HANDLE read_each_485_fun_thread = NULL;
+	int n_read_list_flag = -1;
 //#define WM_SEND_OVER     WM_USER + 1287
 // int m_Input_data_length;
 extern void  init_info_table( void );
@@ -564,6 +591,7 @@ BEGIN_MESSAGE_MAP(CDialogCM5_BacNet, CFormView)
 	ON_MESSAGE(MY_RESUME_DATA, AllMessageCallBack)
 	ON_MESSAGE(WM_DELETE_NEW_MESSAGE_DLG,BacnetView_Message_Handle)	
 	ON_MESSAGE(WM_SHOW_PROGRESS,Show_Progress)
+	ON_MESSAGE(WM_RS485_MESSAGE,RS485_Read_Fun)
 	ON_MESSAGE(WM_SHOW_PANELSTRING,Show_Panel_String)
 	ON_MESSAGE(WM_CHANGE_NEXT_PANEL_MESSAGE,Change_Next_Panel)
 	ON_WM_TIMER()
@@ -1756,7 +1784,7 @@ void CDialogCM5_BacNet::Fresh()
         initial_once = false;
         Tab_Initial();
     }
-	if ((g_protocol!=PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP)  && (g_protocol != PROTOCOL_BIP_TO_MSTP))
+	if ((g_protocol!=PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP)  && (g_protocol != PROTOCOL_BIP_TO_MSTP) && (g_protocol != MODBUS_RS485))
 	{
 		return;
 	}
@@ -1816,6 +1844,13 @@ void CDialogCM5_BacNet::Fresh()
 		::PostMessage(BacNet_hwd,WM_DELETE_NEW_MESSAGE_DLG,START_BACNET_TIMER,0);
 		SetTimer(2,20000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 		//SetTimer(3,1000,NULL); //Check whether need  show Alarm dialog.
+		return;
+	}
+	else if((pFrame->m_product.at(selected_product_index).protocol == MODBUS_RS485) && (pFrame->m_product.at(selected_product_index).NetworkCard_Address.IsEmpty()))
+	{
+		BacNet_hwd = this->m_hWnd;
+		if(read_rs485_thread == NULL)
+			read_rs485_thread = CreateThread(NULL,NULL,RS485_Connect_Thread,this,NULL, NULL);
 		return;
 	}
 
@@ -4860,6 +4895,231 @@ void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult
 	*pResult = 0;
 }
 
+DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
+{
+	unsigned char  read_device_id = 0;
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	read_device_id =  pFrame->m_product.at(selected_product_index).product_id;
+	bool read_result = true;
+	unsigned short read_data_buffer[3200];
+	memset(read_data_buffer,0,sizeof(unsigned short)*3200);
+
+
+	int read_type = -1;
+
+	switch(n_read_list_flag)
+	{
+	case 0:   //OUT
+		{
+			//output 45 按46算  *64  + input 46  *64  需要读2944;
+			for(int i=0; i<15; i++)
+			{
+				//register_critical_section.Lock();
+				//int nStart = GetTickCount();
+				int itemp = 0;
+				itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],10000+i*100,100,4);
+				if(itemp < 0 )
+				{
+					read_result = false;
+					break; 
+				}
+				else
+				{
+					g_progress_persent = (i+1)*100 / 15;	
+				}
+				Sleep(100);
+			}
+			if(read_result)
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read Outputs OK!"));
+				for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+				{
+					memcpy( &m_Output_data.at(i),&read_data_buffer[i*23],sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+				}
+				if(Output_Window->IsWindowVisible())
+					::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+			}
+		}
+		break;
+	case 1:   //IN
+		{
+			//output 45 按46算  *64  + input 46  *64  需要读2944;
+			for(int i=0; i<15; i++)
+			{
+				//register_critical_section.Lock();
+				//int nStart = GetTickCount();
+				int itemp = 0;
+				itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],11472+i*100,100,4);
+				if(itemp < 0 )
+				{
+					read_result = false;
+					break; 
+				}
+				else
+				{
+					g_progress_persent = (i+1)*100 / 15;	
+				}
+				Sleep(100);
+			}
+			if(read_result)
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read Iutputs OK!"));
+
+				for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+				{
+					memcpy( &m_Input_data.at(i),&read_data_buffer[i*23],sizeof(Str_in_point));//因为Input 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+				}
+			
+				if(Input_Window->IsWindowVisible())
+					::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+			}
+			
+		}
+		break;
+	default:
+		break;
+	}
+
+	read_each_485_fun_thread = NULL;
+	return 0;
+}
+
+DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
+{
+	close_com();
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+
+	if((selected_product_index > pFrame->m_product.size()) || (pFrame->m_product.size() == 0))
+	{
+		read_rs485_thread = NULL;
+		return 2;
+	}
+
+	int n_comport = pFrame->m_product.at(selected_product_index).ncomport;
+	unsigned char  read_device_id = 0;
+	read_device_id =  pFrame->m_product.at(selected_product_index).product_id;
+	int m_nbaudrat;
+	m_nbaudrat = pFrame->m_product.at(selected_product_index).baudrate;
+	if((n_comport==0)|| (n_comport >50))
+	{
+		AfxMessageBox(_T("Serial Port error!"));
+		read_rs485_thread = NULL;
+		return 1;
+	}
+	bool bret;
+	bret =	open_com(n_comport);
+	if(bret == false)
+	{
+		AfxMessageBox(_T("Open serial port failed!"));
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Open serial port failed!"));
+		return 2;
+	}
+	 Change_BaudRate(m_nbaudrat);
+	 unsigned short read_data[100];
+	 int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,100,3);
+	 if(nmultyRet < 0)
+	 {
+		 SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read Register 0-100 timeout!"));
+		 read_rs485_thread = NULL;
+		 return 3;
+	 }
+	 Sleep(100);
+	 unsigned short temp_panel_number = 0 ;
+	 unsigned int   temp_object_instance = 0;
+	 bool temp_update =false;
+
+	 temp_panel_number = read_data[36];
+	 temp_object_instance = read_data[35];
+
+	 CString str_object_instance;
+	 CString str_panel_number;
+	 CString str_serialid;
+	 CString strSql;
+	 str_object_instance.Format(_T("%u"),temp_object_instance);
+	 str_panel_number.Format(_T("%u"),temp_panel_number);
+	 str_serialid.Format(_T("%u"), pFrame->m_product.at(selected_product_index).serial_number);
+	 if(read_data[MODBUS_PRODUCT_MODEL] == PM_MINIPANEL)
+	 {
+		 // 同步 本地数据库 的资料 ， panel number 和 实例号需与设备匹配;
+		 if((temp_panel_number != pFrame->m_product.at(selected_product_index).panel_number) || (temp_object_instance != pFrame->m_product.at(selected_product_index).object_instance))
+		 {
+			 CBADO bado;
+			 bado.SetDBPath(g_strCurBuildingDatabasefilePath);
+			 bado.OnInitADOConn();
+			 CString temp_pro;
+			 temp_pro.Format(_T("%u"),PROTOCOL_BIP_TO_MSTP);
+			 strSql.Format(_T("update ALL_NODE set  Object_Instance = '%s' , Panal_Number = '%s' ,Online_Status = 1  where Serial_ID = '%s'"),str_object_instance,str_panel_number,str_serialid);
+			 temp_update = true;
+			 bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
+		 }
+	 }
+
+	 /*
+	 从缓存中得到上次的数据，如果版本不对就重新读一遍.
+	 */
+
+	 CString achive_file_path;
+	 CString temp_serial;
+	 achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prg");
+
+
+	 if(LoadModbusConfigFile_Cache(achive_file_path)< 0)
+	 {
+
+		 bool read_result = true;
+		 unsigned int buffer_length = 3200;
+		 unsigned short read_data_buffer[3200];
+		 memset(read_data_buffer,0,sizeof(unsigned short)*3200);
+		 //output 45 按46算  *64  + input 46  *64  需要读2944;
+		 for(int i=0; i<32; i++)
+		 {
+			 //register_critical_section.Lock();
+			 //int nStart = GetTickCount();
+			 int itemp = 0;
+			 itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],9800+i*100,100,4);
+			 if(itemp < 0 )
+			 {
+				 read_result = false;
+				 break; 
+			 }
+			 else
+			 {
+				 g_progress_persent = (i+1)*100 / 32;	
+			 }
+			 Sleep(100);
+		 }
+		 if(read_result)
+		 {
+			 SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read Inputs and Outputs OK!"));
+		 }
+
+		 Copy_Data_From_485_to_Bacnet(&read_data_buffer[0]);
+
+		 //memcpy(&Device_Basic_Setting.reg,&read_data_buffer[0],400); //Setting 的400个字节;
+		 //for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+		 //{
+			// memcpy( &m_Output_data.at(i),&read_data_buffer[200 + i*23],sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+		 //}
+		 //for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
+		 //{
+			// memcpy(&m_Input_data.at(j),&read_data_buffer[200 + 23*64 + j*23],sizeof(Str_in_point)); //Input 46 个字节 ;
+		 //}
+
+		 SaveModbusConfigFile_Cache(achive_file_path,(char *)read_data_buffer,buffer_length*2);
+
+		 if(temp_update)
+			 ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
+	 }
+	 //PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
+
+
+
+
+
+	 read_rs485_thread = NULL;
+	return 0;
+}
+
 DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 {
 	set_datalink_protocol(2);
@@ -4916,6 +5176,39 @@ DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 	
 	connect_mstp_thread = NULL;
 	return 1;
+}
+
+
+LRESULT CDialogCM5_BacNet::RS485_Read_Fun(WPARAM wParam,LPARAM lParam)
+{
+	int n_persent = wParam;
+	//int n_read_list = lParam;
+	n_read_list_flag = lParam;
+	if(read_each_485_fun_thread == NULL)
+		read_each_485_fun_thread = CreateThread(NULL,NULL,RS485_Read_Each_List_Thread,this,NULL, NULL);
+	else
+	{
+		TerminateThread(read_each_485_fun_thread,NULL);
+		read_each_485_fun_thread = NULL;
+	}
+
+	//if(lParam)
+	//{
+	//	delete WaitRead_Data_Dlg;
+	//	WaitRead_Data_Dlg = 0;
+	//	//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read items time out!"));
+	//	return 0;
+	//}
+
+
+	//if(WaitRead_Data_Dlg!=NULL)
+	//{
+	//	if(n_persent > 100)
+	//		n_persent = 100;
+	//	WaitRead_Data_Dlg->ShowProgress(n_persent,n_persent);
+	//}
+
+	return 0;
 }
 
 

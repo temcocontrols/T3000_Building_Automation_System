@@ -686,16 +686,28 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			CString temp_mac_address;
 			CString temp_mstp_network;
 			CString temp_bip_network;
+			CString temp_modbus_id;
 			temp_object.Format(_T("%u"),g_bac_instance);
 			temp_mac_address.Format(_T("%02x-%02x-%02x-%02x-%02x-%02x"),Device_Basic_Setting.reg.mac_addr[0],Device_Basic_Setting.reg.mac_addr[1],Device_Basic_Setting.reg.mac_addr[2],
 															Device_Basic_Setting.reg.mac_addr[3],Device_Basic_Setting.reg.mac_addr[4],Device_Basic_Setting.reg.mac_addr[5]);
 			temp_mac_address.MakeUpper();
 			temp_mstp_network.Format(_T("%u"),Device_Basic_Setting.reg.mstp_network_number);
 			temp_bip_network.Format(_T("%u"),Device_Basic_Setting.reg.network_number);
+			if(Device_Basic_Setting.reg.modbus_id == 0)
+			{
+				temp_modbus_id.Empty();
+				((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MODBUS_ID))->EnableWindow(FALSE);
+			}
+			else
+			{
+				temp_modbus_id.Format(_T("%d"),Device_Basic_Setting.reg.modbus_id);
+				((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MODBUS_ID))->EnableWindow(TRUE);
+			}
 			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_OBJ_INSTANCE))->SetWindowTextW(temp_object);
 			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MAC_ADDRESS))->SetWindowTextW(temp_mac_address);
 			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MSTP_NETWORK))->SetWindowTextW(temp_mstp_network);
 			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_BIP_NETWORK2))->SetWindowTextW(temp_bip_network);
+			((CEdit *)GetDlgItem(IDC_EDIT_SETTING_MODBUS_ID))->SetWindowTextW(temp_modbus_id);
 
 		}
 		break;
@@ -1073,6 +1085,7 @@ void CBacnetSetting::OnEnKillfocusEditSettingPanel()
 			}
 			else
 			{
+				Station_NUM = temp_panel;
 				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change panel number success!"));
 			}
 		}

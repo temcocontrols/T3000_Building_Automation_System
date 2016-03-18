@@ -967,7 +967,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
             if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
             {
 
-                HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB), _T("BUILDING_DB"));
+                HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_BUILDING_DB2), _T("BUILDING_DB"));
                 HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);
 
 

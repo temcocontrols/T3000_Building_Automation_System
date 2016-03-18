@@ -540,6 +540,7 @@ BOOL CISPDlg::OnInitDialog()
 
         SetTimer(1,200,NULL);
     }
+	 GetDlgItem(IDC_EDIT_NCPORT)->SetWindowText(ipport);
 // 	 CWnd* pEditFilePath = (CWnd*)GetDlgItem(IDC_EDIT_FILEPATH);
 // 	 pEditFilePath->SetWindowText(filename);
 // 	 int ret=Judge_BinHexFile(filename);
@@ -939,17 +940,24 @@ afx_msg LRESULT CISPDlg::OnAddStatusInfo(WPARAM wParam, LPARAM lParam)
 
 afx_msg LRESULT CISPDlg::OnReplaceStatusInfo(WPARAM wParam, LPARAM lParam)
 {
+	static int test_loop_count = 0;
     CString strInfo = CString(LPTSTR(lParam));
     UpdateStatusInfo(strInfo, true);
     if(auto_flash_mode)
     {
-        WritePrivateProfileStringW(_T("LogInfo"),_T("Replace_Refresh"),_T("1"),AutoFlashConfigPath);
-        CString temp;
-        temp.Format(_T("%d"),Add_log_count);
-        WritePrivateProfileStringW(_T("LogInfo"),_T("ReplaceCount"),temp,AutoFlashConfigPath);
-        CString section;
-        section.Format(_T("ReplaceText%d"),Add_log_count);
-        WritePrivateProfileStringW(_T("LogInfo"),section,strInfo,AutoFlashConfigPath);
+		test_loop_count = (++test_loop_count)%5;
+
+		if(strInfo.Find(_T("100")) || (test_loop_count == 0))
+		{
+			WritePrivateProfileStringW(_T("LogInfo"),_T("Replace_Refresh"),_T("1"),AutoFlashConfigPath);
+			CString temp;
+			temp.Format(_T("%d"),Add_log_count);
+			WritePrivateProfileStringW(_T("LogInfo"),_T("ReplaceCount"),temp,AutoFlashConfigPath);
+			CString section;
+			section.Format(_T("ReplaceText%d"),Add_log_count);
+			WritePrivateProfileStringW(_T("LogInfo"),section,strInfo,AutoFlashConfigPath);
+		}
+
     }
     WCHAR* szTemp = (LPTSTR(lParam));
     delete[] szTemp;

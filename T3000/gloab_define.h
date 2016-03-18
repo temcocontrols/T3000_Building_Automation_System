@@ -60,7 +60,7 @@ typedef struct
 	unsigned short length;
 	unsigned char commad;
 	unsigned short send_package;
-	char download_filename[20];
+	char download_filename[40];
 	unsigned short fw_version;
 	unsigned char CRC;
 }Download_File_Return;
@@ -159,6 +159,7 @@ const int DOWNLOAD_MD5_CHECK_PASS = 21;
 #define WM_FRESH_SETTING_UI		WM_USER + 976
 #define  WM_SHOW_PROGRESS		WM_USER + 977
 #define  WM_SHOW_PANELSTRING		WM_USER + 978
+#define  WM_RS485_MESSAGE       WM_USER + 979
 #define WM_DELETE_NEW_MESSAGE_DLG WM_USER + 2001
 #define MY_BAC_CONFIG_READ_RESULTS  WM_USER + 2002
 #define SHOW_ERROR_MESSAGE

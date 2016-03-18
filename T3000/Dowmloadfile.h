@@ -36,6 +36,7 @@ public:
 	virtual void OnCancel();
 	BOOL IsNetDevice(int DevType);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedButton1();
 };
 
 
