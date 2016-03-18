@@ -79,6 +79,18 @@
     <Compile Include="Form4_insert_data.Designer.cs">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
     </Compile>
+    <Compile Include="Form5_real_time_plot.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form5_real_time_plot.Designer.cs">
+      <DependentUpon>Form5_real_time_plot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="form_app_timer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="form_app_timer.Designer.cs">
+      <DependentUpon>form_app_timer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Application_Form4.resx">
@@ -96,20 +108,27 @@
     <EmbeddedResource Include="Form4_insert_data.resx">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Form5_real_time_plot.resx">
+      <DependentUpon>Form5_real_time_plot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_app_timer.resx">
+      <DependentUpon>form_app_timer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -118,6 +137,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\d_arrow.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\u_arrow.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

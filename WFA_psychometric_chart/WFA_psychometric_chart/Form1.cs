@@ -52,15 +52,15 @@ namespace WFA_psychometric_chart
         public void plot_new_graph()
         {
 
-            /*
- steps:
- * 1.set x and y axis in graph
- * 2.plot red lines
- * 3.plot green lines
- * 4.plot wet bult curve red line.
- * 5.
- * 
- */
+                        /*
+             steps:
+             * 1.set x and y axis in graph
+             * 2.plot red lines
+             * 3.plot green lines
+             * 4.plot wet bult curve red line.
+             * 5.
+             * 
+             */
 
             //lets reset the chart1 value.
             //chart1 = null;
@@ -114,9 +114,7 @@ namespace WFA_psychometric_chart
            // MessageBox.Show("the path = " + pat_test);
             string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
             */
-            string dir = System.IO.Path.GetDirectoryName(
-  System.Reflection.Assembly.GetExecutingAssembly().Location);
-
+            string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             string file = dir + @"\t_pg.txt";
             string path1 = file;
 
@@ -187,18 +185,10 @@ namespace WFA_psychometric_chart
 
 
             }//close of for
-
-            /*  TextAnnotation text_wet_bulb_temp = new TextAnnotation();
-              text_wet_bulb_temp.Name = " Wet bulb temp";
-              text_wet_bulb_temp.X = 2;
-              text_wet_bulb_temp.Y = 1;
-              chart1.Annotations.Add(text_wet_bulb_temp);
-              */
-
+        
             chart1.Series["Series1"].Points[16].Label = "Wet bulb temp";
             chart1.Series["Series1"].Points[16].LabelBackColor = Color.Red;
             //chart1.Legends["wet_bulb_temp"].DockedToChartArea = "jjj";
-
 
             //now lets plot the blue curves...
             //WE NEED two for loop to plot values for 10% to 40%
@@ -961,7 +951,7 @@ namespace WFA_psychometric_chart
         private void button6_Click(object sender, EventArgs e)
         {
 
-            
+            /*
             //resetting arrarylist..         
             temp_AL.Clear();
             hum_AL.Clear();
@@ -1134,7 +1124,7 @@ namespace WFA_psychometric_chart
                 }
 
             }//close of if...
-
+            */
         }
 
         Point? prevPosition = null;
@@ -1324,7 +1314,7 @@ namespace WFA_psychometric_chart
 
             }//close of if
 
-            btn_insert_values.Enabled = false;
+            //btn_insert_values.Enabled = false;
 
         }
 
@@ -1347,6 +1337,7 @@ namespace WFA_psychometric_chart
      
         private void button7_Click(object sender, EventArgs e)
         {
+            /*
             try
             {
 
@@ -1395,7 +1386,7 @@ namespace WFA_psychometric_chart
             {
                 MessageBox.Show(ex.Message);
             }
-
+            */
         }
 
         private void newFeaturesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1411,6 +1402,7 @@ namespace WFA_psychometric_chart
 
         private void UpdateDataConstantly()
         {
+            /*
             //resetting arrarylist..         
             temp2_AL.Clear();
             hum2_AL.Clear();
@@ -1529,7 +1521,7 @@ namespace WFA_psychometric_chart
 
             }//close of if...
 
-
+            */
         }
         private System.Windows.Forms.Timer timer1;
         public void InitTimer()
@@ -1588,6 +1580,16 @@ namespace WFA_psychometric_chart
             Application_Form4 ap_f4 = new Application_Form4(this);
             ap_f4.Show();
 
+
+        }
+
+        private void realTimePlottingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // this is the part of real time plotting where we try to plot the different previous values ...
+            //Form5_real_time_plot f5 = new Form5_real_time_plot(this);
+            //f5.Show();
+            form_app_timer f5 = new form_app_timer(this);
+            f5.Show();
 
         }
 
