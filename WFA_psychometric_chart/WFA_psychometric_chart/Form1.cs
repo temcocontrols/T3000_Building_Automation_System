@@ -1586,9 +1586,10 @@ namespace WFA_psychometric_chart
         private void realTimePlottingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // this is the part of real time plotting where we try to plot the different previous values ...
-            Form5_real_time_plot f5 = new Form5_real_time_plot(this);
+            //Form5_real_time_plot f5 = new Form5_real_time_plot(this);
+            //f5.Show();
+            form_app_timer f5 = new form_app_timer(this);
             f5.Show();
-
 
         }
 
