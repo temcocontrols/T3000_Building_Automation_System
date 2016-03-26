@@ -78,7 +78,7 @@ BOOL CADO::OnInitADOConn()
 	}
 	catch(_com_error e)
 	{
-		AfxMessageBox(_T("Init ADO Database error!"));
+		//AfxMessageBox(e.Description());
         return FALSE;
 	}
 

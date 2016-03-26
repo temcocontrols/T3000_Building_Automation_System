@@ -7,6 +7,7 @@ extern unsigned short current_package;
 extern char download_filename[20];
 extern char receive_md5[20];
 extern int download_step ;
+extern unsigned int T3000_Version ; //T3000的版本号.
 int Receive_data_length = 0;
 
 extern int total_file_length;	
@@ -58,7 +59,21 @@ void DownloadSocket::OnReceive(int nErrorCode)
 			totalpackage = ((unsigned char)temp_point[1]<<8) | ((unsigned char)temp_point[0]);
 			temp_point = temp_point + 2;
 			memcpy(download_filename,temp_point,40);
-			download_step = SEND_GET_MD5_VALUE;
+			if(strstr(download_filename,"T3000_EXE")!=NULL)
+			{
+				unsigned int temp_version = 0;
+				temp_version= receive_buffer[48]*256 + receive_buffer[47];
+				if(temp_version > T3000_Version)
+					download_step = SEND_GET_MD5_VALUE;
+				else
+				{
+					PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_T3000_NO_UPDATE,NULL);
+					download_step = THREAD_IDLE;
+					break;
+				}
+			}
+			else
+				download_step = SEND_GET_MD5_VALUE;
 
 			malloc_download_memory_size = totalpackage  * TFTP_SEND_LENGTH;
 			receivefile_buffer =  new char[malloc_download_memory_size];
@@ -169,7 +184,7 @@ void DownloadSocket::OnConnect(int nErrorCode)
 	if(!nErrorCode)
 	{
 		SetDownloadResults(DOWNLOAD_RESULTS_UNKNOW);
-		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_CONNECT_SUCCESS,NULL);
+		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_CONNECT_SUCCESS,NULL);	//建立套接字,连接成功时就开始请求传输的文件;
 	}
 	else
 	{

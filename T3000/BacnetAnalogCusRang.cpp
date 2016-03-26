@@ -117,10 +117,32 @@ void CBacnetAnalogCusRang::Initial_List()
 	m_analog_cus_range_list.DeleteAllItems();
 	while ( m_analog_cus_range_list.DeleteColumn (0)) ;
 
+	int temp_jumper = 0;
+	CString Unit_temp;
+	temp_jumper = (m_Input_data.at(input_list_line).decom & 0xf0 ) >> 4;
+	if(temp_jumper == 1)
+	{
+		Unit_temp.Format(_T("Current (4-20ma)"));
+	}
+	else if(temp_jumper == 2)
+	{
+		Unit_temp.Format(_T("Voltage (0-5V)"));
+	}
+	else if(temp_jumper == 3)
+	{
+		Unit_temp.Format(_T("Voltage (0-10V)"));
+	}
+	else 
+	{
+		Unit_temp.Format(_T("Voltage"));
+	}
+
+
+
 	m_analog_cus_range_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	//m_analog_cus_range_list.SetExtendedStyle(m_analog_cus_range_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_analog_cus_range_list.SetExtendedStyle(m_analog_cus_range_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_analog_cus_range_list.InsertColumn(0, _T("Voltage"), 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_analog_cus_range_list.InsertColumn(0, Unit_temp, 50, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
 	m_analog_cus_range_list.InsertColumn(1, _T("Value"), 100, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 
 	temp_gloab_hwnd = g_hwnd_now;
@@ -133,7 +155,7 @@ void CBacnetAnalogCusRang::Initial_List()
 	::GetWindowRect(m_input_dlg_hwnd,win_rect);
 	m_analog_cus_range_list.Set_My_WindowRect(win_rect);
 	m_analog_cus_range_list.Set_My_ListRect(list_rect);
-
+	m_analog_cus_range_list.Support_Col_0_Edit(true);
 
 	//m_analog_cus_range_list.DeleteAllItems();
 	for (int i=0;i<11;i++)
@@ -210,8 +232,16 @@ LRESULT CBacnetAnalogCusRang::Fresh_AnalogCusRange_List(WPARAM wParam,LPARAM lPa
 	{
 		CString n_value_2byte;
 		CString n_unite_4byte;
-		n_value_2byte.Format(_T("%.1f"),((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[i].value)/10);
-		n_unite_4byte.Format(_T("%d"),m_analog_custmer_range.at(analog_range_tbl_line).dat[i].unit);
+		if((i!=0) && (m_analog_custmer_range.at(analog_range_tbl_line).dat[i].value == 0))
+		{
+			n_value_2byte.Format(_T("-"));
+			n_unite_4byte.Format(_T("-"));
+		}
+		else
+		{
+			n_value_2byte.Format(_T("%.1f"),((float)m_analog_custmer_range.at(analog_range_tbl_line).dat[i].value)/10);
+			n_unite_4byte.Format(_T("%d"),m_analog_custmer_range.at(analog_range_tbl_line).dat[i].unit);
+		}
 		m_analog_cus_range_list.SetItemText(i,0,n_value_2byte);
 		m_analog_cus_range_list.SetItemText(i,1,n_unite_4byte);
 
@@ -273,6 +303,21 @@ BOOL CBacnetAnalogCusRang::PreTranslateMessage(MSG* pMsg)
 	// TODO: Add your specialized code here and/or call the base class
 	if((pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_RETURN)  || (pMsg->message==WM_KEYDOWN && pMsg->wParam==VK_ESCAPE))
 	{
+		CWnd * window_focus =	GetFocus();
+		if(window_focus == NULL)
+			return CDialogEx::PreTranslateMessage(pMsg);
+		if((GetFocus()->GetDlgCtrlID() == IDD_DIALOG_BACNET_RANGE_LIST) && (pMsg->wParam==VK_RETURN))
+		{
+			CRect list_rect,win_rect;
+			m_analog_cus_range_list.GetWindowRect(list_rect);
+			ScreenToClient(&list_rect);
+			::GetWindowRect(analog_cus_range_dlg,win_rect);
+			m_analog_cus_range_list.Set_My_WindowRect(win_rect);
+			m_analog_cus_range_list.Set_My_ListRect(list_rect);
+
+			m_analog_cus_range_list.Get_clicked_mouse_position();
+			return TRUE;
+		}
 		return TRUE;
 	}
 

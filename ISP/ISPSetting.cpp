@@ -5,7 +5,7 @@
 #include "ISP.h"
 #include "ISPSetting.h"
 #include "afxdialogex.h"
-
+extern bool auto_flash_mode;
 extern unsigned int Remote_timeout;
 extern CString SettingPath;
 // CISPSetting dialog
@@ -46,7 +46,8 @@ void CISPSetting::OnBnClickedButtonSettingOk()
 	temp_value = _wtoi(temptimeout);
 	if(temp_value < 50)
 	{
-		MessageBox(_T("Please input a higher number"),_T("Information"),MB_OK | MB_INACTIVE);
+		if(!auto_flash_mode)
+			MessageBox(_T("Please input a higher number"),_T("Information"),MB_OK | MB_INACTIVE);
 		return;
 	}
 	else

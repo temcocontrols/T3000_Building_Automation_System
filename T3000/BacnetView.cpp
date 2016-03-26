@@ -1,6 +1,14 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2016 - 03 - 19
+Update by Fance
+1. 修复treeview 产品 状态显示的问题;
+
+2016 - 03 - 18
+Update by Fance
+1. 在bacnet setting界面 加入 modbus ID.
+
 2016 - 03 - 17
 //Fix the bugs which make the program crash when start up.
 //原因是由 自动进入上一次的界面引起的;
@@ -4914,8 +4922,6 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 			//output 45 按46算  *64  + input 46  *64  需要读2944;
 			for(int i=0; i<15; i++)
 			{
-				//register_critical_section.Lock();
-				//int nStart = GetTickCount();
 				int itemp = 0;
 				itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],10000+i*100,100,4);
 				if(itemp < 0 )
@@ -4936,6 +4942,15 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				{
 					memcpy( &m_Output_data.at(i),&read_data_buffer[i*23],sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
 				}
+
+				CString str_serialid;
+				str_serialid.Format(_T("%u"), pFrame->m_product.at(selected_product_index).serial_number);
+				CString achive_file_path;
+				CString temp_serial;
+				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prg");
+
+				SaveModbusConfigFile_Cache(achive_file_path,NULL,3200*2);
+
 				if(Output_Window->IsWindowVisible())
 					::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			}
@@ -4969,11 +4984,62 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				{
 					memcpy( &m_Input_data.at(i),&read_data_buffer[i*23],sizeof(Str_in_point));//因为Input 只有45个字节，两个byte放到1个 modbus的寄存器里面;
 				}
+
+				CString str_serialid;
+				str_serialid.Format(_T("%u"), pFrame->m_product.at(selected_product_index).serial_number);
+				CString achive_file_path;
+				CString temp_serial;
+				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prg");
+
+				SaveModbusConfigFile_Cache(achive_file_path,NULL,3200*2);
+
 			
 				if(Input_Window->IsWindowVisible())
 					::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 			}
 			
+		}
+		break;
+	case   READ_SETTING_COMMAND:
+		{
+			//Setting 400 个字节
+			for(int i=0; i<2; i++)
+			{
+				int itemp = 0;
+				itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],9800+i*100,100,4);
+				if(itemp < 0 )
+				{
+					read_result = false;
+					break; 
+				}
+				else
+				{
+					g_progress_persent = (i+1)*100 / 2;	
+				}
+				Sleep(100);
+			}
+
+			if(read_result)
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read Setting infomation OK!"));
+
+				memcpy(&Device_Basic_Setting.reg,read_data_buffer,400); //Setting 的400个字节;
+
+
+				CString str_serialid;
+				str_serialid.Format(_T("%u"), pFrame->m_product.at(selected_product_index).serial_number);
+				CString achive_file_path;
+				CString temp_serial;
+				achive_file_path = g_achive_folder + _T("\\") + _T("Modbus_") + str_serialid + _T(".prg");
+
+				SaveModbusConfigFile_Cache(achive_file_path,NULL,3200*2);
+
+
+				if(Setting_Window->IsWindowVisible())
+					 ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
+
+			}
+
 		}
 		break;
 	default:
@@ -5109,6 +5175,16 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 
 		 if(temp_update)
 			 ::PostMessage(pFrame->m_hWnd,WM_MYMSG_REFRESHBUILDING,0,0);
+	 }
+	 else
+	 {
+		 if(Input_Window->IsWindowVisible())
+			::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
+		 else if(Output_Window->IsWindowVisible())
+			::PostMessage(m_output_dlg_hwnd, WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+		 else if(Setting_Window->IsWindowVisible())
+			  ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
+
 	 }
 	 //PostMessage(WM_FRESH_CM_LIST,MENU_CLICK,TYPE_ALL);
 

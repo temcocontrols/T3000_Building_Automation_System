@@ -665,7 +665,10 @@ BOOL TFTPServer::StartServer()
 					SendUDP_Flash_Socket.SetSockOpt(SO_BROADCAST,(char*)&bBroadcast,sizeof(BOOL),SOL_SOCKET);
 					int send_count = SendUDP_Flash_Socket.SendTo(sendbuf,sizeof(sendbuf),FLASH_UDP_PORT,_T("255.255.255.255"),0);
 					if(send_count <= 0)
-						AfxMessageBox(_T("Send command failed!"));
+					{
+						if(!auto_flash_mode)
+							AfxMessageBox(_T("Send command failed!"));
+					}
 				//}
 				//else
 				SendUDP_Flash_Socket.SendTo(sendbuf,sizeof(sendbuf),FLASH_UDP_PORT,ISP_Device_IP,0);
@@ -1243,7 +1246,8 @@ int TFTPServer::SendFlashCommand()
 	nRet = bind(soFalsh, (SOCKADDR *) &siBind, sizeof(siBind));
 	if (nRet == SOCKET_ERROR)
 	{
-		AfxMessageBox(_T("Bind Socket Error,Port 4321 not available"));
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("Bind Socket Error,Port 4321 not available"));
 		closesocket(soFalsh);
 		return FALSE;
 	}
@@ -1310,8 +1314,8 @@ void TFTPServer::FlashByEthernet()
 		FormatMessage(	FORMAT_MESSAGE_ALLOCATE_BUFFER | 	FORMAT_MESSAGE_FROM_SYSTEM,	NULL,	error_msg,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),	(LPTSTR) &lpMsgBuf,	0, NULL );
 		wsprintf(szBuf,_T("failed with error %d: %s"), 	 error_msg, lpMsgBuf); 
-
-		AfxMessageBox(szBuf);
+		if(!auto_flash_mode)
+			AfxMessageBox(szBuf);
 		LocalFree(lpMsgBuf);
 
 		PostMessage(m_pDlg->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(0));
@@ -1336,7 +1340,8 @@ void TFTPServer::FlashByEthernet()
 		FormatMessage(	FORMAT_MESSAGE_ALLOCATE_BUFFER | 	FORMAT_MESSAGE_FROM_SYSTEM,	NULL,	error_msg,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),	(LPTSTR) &lpMsgBuf,	0, NULL );
 		wsprintf(szBuf,_T("failed with error %d: %s"), 	 error_msg, lpMsgBuf); 
-		AfxMessageBox(szBuf);
+		if(!auto_flash_mode)
+			AfxMessageBox(szBuf);
 		LocalFree(lpMsgBuf);
 
 		PostMessage(m_pDlg->m_hWnd, WM_FLASH_FINISH, 0, LPARAM(0));

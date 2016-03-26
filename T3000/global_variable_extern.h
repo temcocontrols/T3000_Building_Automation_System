@@ -1098,7 +1098,7 @@ extern bool g_bac_need_read_setting;  //Èç¹ûÊÇµÚÒ»´Îµã»÷ ĞèÒª¶ÁSettingÀïÃæµÄ Êı¾
 extern HANDLE click_read_thread;
 extern bool bac_net_initial_once;
 extern unsigned char my_ip[4];
-extern byte	g_DayState[8][48];
+extern byte	g_DayState[8][ANNUAL_CODE_SIZE];
 extern CDialog *pDialog[14];
 extern CDialog *DebugWindow;
 extern CDialog *Tcp_Server_Window;
@@ -1219,6 +1219,8 @@ extern int monitor_ignore_max_value ;
 extern int monitor_ignore_min_value ;
 extern int persent_array_count;
 extern	unsigned int old_tx_count;
+extern int flash_multi_auto ; //ÓÃÓÚ¿ØÖÆ ¶àÉÕµÄ  ×Ô¶¯¿ØÖÆ;
+extern unsigned int T3000_Version ; //T3000µÄ°æ±¾ºÅ.
 
 extern int flag_auto_scroll ; // Èç¹û¿Í»§ÓĞÖ¸¶¨ÏÔÊ¾XÖáµÄÄ³Ğ©ÊÂ¼ş ´Ë ±äÁ¿»áÎª 1;·ñÔòÏÔÊ¾×îĞÂÊı¾İ;
 extern int graphic_last_scale_type ; //ÓÃÓÚ´æ´¢ÉÏ´Î ÓĞĞ§µÄ XÖáµÄ ¿Ì¶È;

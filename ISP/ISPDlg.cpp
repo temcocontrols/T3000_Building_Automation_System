@@ -356,6 +356,7 @@ BOOL CISPDlg::OnInitDialog()
             //DeleteFile(AutoFlashConfigPath);
             //MessageBox(_T("ISP Tool will exit soon."));
             auto_flash_mode = false;
+			DeleteFile(AutoFlashConfigPath);
             // PostMessage(WM_CLOSE,NULL,NULL);
             // return TRUE;
             //删除文件并退出;
@@ -412,49 +413,7 @@ BOOL CISPDlg::OnInitDialog()
 
     ////////////////////////////////////////////////////////////////////////////
 
-    GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(_T("19200"));
-    GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
-    GetDlgItem(IDC_EDIT_MDBID1)->SetWindowText(id);
-    GetDlgItem(IDC_COMBO_COM)->SetWindowText(comport);
-    GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(BD);
-    m_ipAddress.SetWindowText(ip);
-    GetDlgItem(IDC_EDIT_NCPORT)->SetWindowText(ipport);
-    GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
 
-
-    /////////////////
-    if(flashmethod.Find(_T("COM"))!=0)
-    {
-
-        g_Commu_type=1;
-        COM_INPUT=FALSE;
-        ((CButton *)GetDlgItem(IDC_COM))->SetCheck(FALSE);
-        ((CButton *)GetDlgItem(IDC_NET))->SetCheck(TRUE);
-
-    }
-    else
-    {
-        COM_INPUT=TRUE;
-        g_Commu_type=0;
-
-        ((CButton *)GetDlgItem(IDC_COM))->SetCheck(TRUE);
-        ((CButton *)GetDlgItem(IDC_NET))->SetCheck(FALSE);
-
-
-    }
-    if(subnote.CompareNoCase(_T("1"))==0)
-    {
-        ((CButton *)GetDlgItem(IDC_CHECK_FLASH_SUBID))->SetCheck(1);
-        GetDlgItem(IDC_EDIT_MDBID2)->EnableWindow(1);
-        FLASH_SUBID = TRUE;
-    }
-    else
-    {
-        ((CButton *)GetDlgItem(IDC_CHECK_FLASH_SUBID))->SetCheck(0);
-        GetDlgItem(IDC_EDIT_MDBID2)->EnableWindow(0);
-        FLASH_SUBID = FALSE;
-    }
-    GetDlgItem(IDC_EDIT_MDBID2)->SetWindowText(subID);
     ////g_Commu_type=0;	//初始的为COM口烧写
     //((CButton *)GetDlgItem(IDC_COM))->SetCheck(TRUE);
     // COM_INPUT=TRUE;
@@ -541,6 +500,54 @@ BOOL CISPDlg::OnInitDialog()
         SetTimer(1,200,NULL);
     }
 	 GetDlgItem(IDC_EDIT_NCPORT)->SetWindowText(ipport);
+	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
+
+	 GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(_T("19200"));
+	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
+	 GetDlgItem(IDC_EDIT_MDBID1)->SetWindowText(id);
+	 GetDlgItem(IDC_COMBO_COM)->SetWindowText(comport);
+	 GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(BD);
+	 m_ipAddress.SetWindowText(ip);
+	 GetDlgItem(IDC_EDIT_NCPORT)->SetWindowText(ipport);
+	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
+
+
+	 /////////////////
+	 if(flashmethod.Find(_T("COM"))!=0)
+	 {
+
+		 g_Commu_type=1;
+		 COM_INPUT=FALSE;
+		 ((CButton *)GetDlgItem(IDC_COM))->SetCheck(FALSE);
+		 ((CButton *)GetDlgItem(IDC_NET))->SetCheck(TRUE);
+
+	 }
+	 else
+	 {
+		 COM_INPUT=TRUE;
+		 g_Commu_type=0;
+
+		 ((CButton *)GetDlgItem(IDC_COM))->SetCheck(TRUE);
+		 ((CButton *)GetDlgItem(IDC_NET))->SetCheck(FALSE);
+
+
+	 }
+	 if(subnote.CompareNoCase(_T("1"))==0)
+	 {
+		 ((CButton *)GetDlgItem(IDC_CHECK_FLASH_SUBID))->SetCheck(1);
+		 GetDlgItem(IDC_EDIT_MDBID2)->EnableWindow(1);
+		 FLASH_SUBID = TRUE;
+	 }
+	 else
+	 {
+		 ((CButton *)GetDlgItem(IDC_CHECK_FLASH_SUBID))->SetCheck(0);
+		 GetDlgItem(IDC_EDIT_MDBID2)->EnableWindow(0);
+		 FLASH_SUBID = FALSE;
+	 }
+	 GetDlgItem(IDC_EDIT_MDBID2)->SetWindowText(subID);
+
+
+
 // 	 CWnd* pEditFilePath = (CWnd*)GetDlgItem(IDC_EDIT_FILEPATH);
 // 	 pEditFilePath->SetWindowText(filename);
 // 	 int ret=Judge_BinHexFile(filename);
@@ -1617,7 +1624,8 @@ int CISPDlg::GetModbusIDSUBID(vector<int>& szMdbIDs)
                 CString strTips;
                 strTips.Format(_T("Error : Wrong Modbus ID : %d. Please input right ID."), nID);
                 UpdateStatusInfo(strTips, FALSE);
-                AfxMessageBox(strTips);
+				if(!auto_flash_mode)
+					AfxMessageBox(strTips);
                 return FALSE;
             }
             szMdbIDs.push_back(nID);
@@ -1725,7 +1733,8 @@ void CISPDlg::OnFlashSubID()
         UpdateStatusInfo(strTips1, FALSE);
         CString strTips2 =_T("Please reselect a right file.");
         UpdateStatusInfo(strTips2, FALSE);
-        AfxMessageBox(strTips1+strTips2, MB_OK);
+		if(!auto_flash_mode)
+			AfxMessageBox(strTips1+strTips2, MB_OK);
 
     }
 
@@ -1820,7 +1829,8 @@ int CISPDlg::Judge_BinHexFile(CString filepath)
         {
             CString strTips;
             strTips = _T("|please select a *.HEX or *.BIN file");
-            AfxMessageBox(strTips);
+			if(!auto_flash_mode)
+				AfxMessageBox(strTips);
             UpdateStatusInfo(strTips, FALSE);
             return 0;
         }
@@ -1845,7 +1855,8 @@ BOOL CISPDlg::FileValidation(const CString& strFileName)
     {
         CString strTips;
         strTips = _T("|To Update over Com port, please select a *.HEX file");
-        AfxMessageBox(strTips);
+		if(!auto_flash_mode)
+			 AfxMessageBox(strTips);
         UpdateStatusInfo(strTips, FALSE);
         return FALSE;
     }
@@ -1854,7 +1865,8 @@ BOOL CISPDlg::FileValidation(const CString& strFileName)
         CString strTips;
         //strTips.Format(_T("%s isn't a BIN file."), strFileName);
         strTips = _T("|To Updating over Ethernet, please select a *.BIN file");
-        AfxMessageBox(strTips);
+		if(!auto_flash_mode)	
+			AfxMessageBox(strTips);
         UpdateStatusInfo(strTips, FALSE);
         return FALSE;
     }
@@ -1873,7 +1885,8 @@ BOOL CISPDlg::ValidMdbIDString(void)
     GetDlgItem(IDC_EDIT_MDBID1)->GetWindowText(strModbusID);
     if (strModbusID==_T(""))
     {
-        AfxMessageBox(_T("Please input IDs"));
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("Please input IDs"));
         return FALSE;
     }
     else
@@ -2107,7 +2120,8 @@ void CISPDlg::FlashByCom()
         UpdateStatusInfo(strTips1, FALSE);
         CString strTips2 =_T("|Please reselect a right file.");
         UpdateStatusInfo(strTips2, FALSE);
-        AfxMessageBox(strTips1+strTips2, MB_OK);
+		if(!auto_flash_mode)
+			AfxMessageBox(strTips1+strTips2, MB_OK);
 
     }
     delete pHexFile;
@@ -2128,7 +2142,8 @@ void CISPDlg::OnBnClickedButtonPing2()
     GetDlgItem(IDC_IPADDRESS_NC)->GetWindowText(strIP);
     if (strIP.GetLength() <= 6)
     {
-        AfxMessageBox(_T("Please Input a right IP address."));
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("Please Input a right IP address."));
         return;
     }
     OnTestPing(strIP);
@@ -2231,7 +2246,8 @@ BOOL CISPDlg::Show_Flash_DeviceInfor_NET()
         {
             CString infor;
             infor.Format(_T("The Bin file is for %s,but your device is %s"),m_strProductName.GetBuffer(),m_ModelName.GetBuffer());
-            AfxMessageBox(infor);
+			if(!auto_flash_mode)
+				AfxMessageBox(infor);
             UpdateStatusInfo(infor,FALSE);
             return FALSE;
         }
@@ -2401,8 +2417,8 @@ CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
     }
     catch(_com_error e)
     {
-        AfxMessageBox(_T("数据库连接失败，确认数据库Demo.mdb是否在当前路径下!"));
-
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("数据库连接失败，确认数据库Demo.mdb是否在当前路径下!"));
     }
     _RecordsetPtr m_pRecordset;
     m_pRecordset.CreateInstance(__uuidof(Recordset));
@@ -2417,7 +2433,8 @@ CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
     }
     catch(_com_error *e)
     {
-        AfxMessageBox(e->ErrorMessage());
+		if(!auto_flash_mode)
+			AfxMessageBox(e->ErrorMessage());
     }
     _variant_t var;
     CString str_FilePrefix=_T("");
@@ -2441,7 +2458,8 @@ CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
     }
     catch(_com_error *e)
     {
-        AfxMessageBox(e->ErrorMessage());
+		if(!auto_flash_mode)
+			AfxMessageBox(e->ErrorMessage());
     }
     m_pRecordset->Close();
     m_pConnection->Close();
@@ -2584,7 +2602,8 @@ void CISPDlg::FlashSN()
     pFlashSN->SetBrandrate (_wtoi (strBraudrate));
     if(!GetModbusID(m_szMdbIDs))
     {
-        AfxMessageBox(_T("Please input a slave ID "));
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("Please input a slave ID "));
         return ;
     }
     int nHWVerison;

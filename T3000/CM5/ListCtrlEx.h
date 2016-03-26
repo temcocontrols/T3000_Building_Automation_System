@@ -146,6 +146,7 @@ namespace ListCtrlEx
 // operations
 	public:
 		void                Dont_DT_Left();
+		void				Support_Col_0_Edit(bool b_support);
 		void				Support_Keyboard(bool b_support);
 		void                Set_Edit(bool b_edit);
 		BOOL				Get_Edit();
@@ -265,6 +266,7 @@ namespace ListCtrlEx
 		bool            m_dt_left; //是否要左对齐;
 		bool			m_show_bk_color;//记录是否显示选中背景颜色;
 		bool			m_support_key;
+		bool			m_support_col0_edit;  //第0列是否允许编辑.默认是不许编辑;
 	protected:
 		struct _ColumnSort_t
 		{

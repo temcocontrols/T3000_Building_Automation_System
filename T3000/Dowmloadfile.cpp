@@ -9,6 +9,12 @@
 #include "MainFrm.h"
 #include "Class/md5.h"
 // Dowmloadfile dialog
+#define DOWNLOAD_AND_UPDATE  1
+#define DOWNLOAD_ONLY        2
+int download_and_update = 0;
+
+extern vector <Str_download_firmware_info> download_info_type;
+
 BYTE IP_ADDRESS_SERVER[20];
 int total_file_length = 0;	
 int Add_log_count = 1;	//用于读取改读多少count了;
@@ -20,7 +26,7 @@ tree_product	m_product_isp_auto_flash;
 char receive_buffer[4000];
 unsigned short totalpackage = 0;
 unsigned short current_package = 1;
-char download_filename[20];
+char download_filename[40];
 int download_step = SEND_DOWNLOAD_COMMAND;
 bool download_thread_flag = true;
 int wait_download_and_isp_finished = 0 ;
@@ -55,6 +61,8 @@ BEGIN_MESSAGE_MAP(Dowmloadfile, CDialogEx)
 	ON_WM_CLOSE()
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BUTTON1, &Dowmloadfile::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON_FILE_DOWNLOAD_ONLY, &Dowmloadfile::OnBnClickedButtonFileDownloadOnly)
+	ON_BN_CLICKED(IDC_BUTTON_UPDATE_T3000, &Dowmloadfile::OnBnClickedButtonUpdateT3000)
 END_MESSAGE_MAP()
 
 HANDLE Downloadfile_Thread;
@@ -86,6 +94,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		m_download_info.InsertString(m_download_info.GetCount(),retmessage);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 		GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
+		GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(true);
 		TCP_File_Socket.Close();
 	}
 	else if(ncommand == DOWNLOAD_CONNECT_FAILED)
@@ -98,6 +107,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 		TCP_File_Socket.Close();
 		GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
+		GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(true);
 	}
 	else if(ncommand == DOWNLOAD_CLOSE_SOCKET)
 	{
@@ -106,20 +116,66 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		if(TCP_File_Socket.GetDownloadResults() == DOWNLOAD_RESULTS_FAILED)
 		{
 			GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
+			GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(true);
 			return 0;
 		}
-		
+
 		CString ApplicationFolder;
 		GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
 		PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
 		ApplicationFolder.ReleaseBuffer();
 		ISPtool_path = ApplicationFolder + _T("\\ISP.exe");
-		
-		CString temp_isp_info;
-		
-
 
 		AutoFlashConfigPath = ApplicationFolder + _T("//AutoFlashFile.ini");
+
+		CString temp_isp_info;
+		CString exe_folder;
+		GetModuleFileName(NULL, exe_folder.GetBuffer(MAX_PATH), MAX_PATH);
+		PathRemoveFileSpec(exe_folder.GetBuffer(MAX_PATH));
+		exe_folder.ReleaseBuffer();
+
+		CString file_name;
+		MultiByteToWideChar( CP_ACP, 0, download_filename, (int)strlen((char *)download_filename)+1, file_name.GetBuffer(MAX_PATH), MAX_PATH );
+		file_name.ReleaseBuffer();
+		CString mypath =  exe_folder + _T("\\Database\\Firmware");
+		mypath = mypath + _T("\\") + file_name;
+		WritePrivateProfileStringW(_T("Data"),_T("FirmwarePath"),mypath,AutoFlashConfigPath);
+
+
+		temp_isp_info.Format(_T("FirmwarePath = "));
+		temp_isp_info = temp_isp_info + mypath;
+		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+		if(m_download_product_type == 199) //如果下载的是T3000;
+		{
+			//调用解压;
+		}
+		if(download_and_update == DOWNLOAD_ONLY)
+		{
+			if(flash_multi_auto)
+			{
+				//保存下载的位置,产品号 等信息;
+
+				for (int z=0;z<download_info_type.size();z++)
+				{
+					if(m_download_product_type == download_info_type.at(z).download_product_type)
+					{
+						WideCharToMultiByte( CP_ACP, 0, mypath.GetBuffer(), -1, download_info_type.at(z).firmware_file_path, 255, NULL, NULL );
+						break;
+					}
+				}
+				Sleep(1000);
+				PostMessage(WM_CLOSE,NULL,NULL);
+
+			}
+			GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
+			GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(true);
+			return 0;
+		}
+		
+
+
+
 		
 		bool is_net_device = (bool)IsNetDevice(m_product_isp_auto_flash.product_class_id);
 
@@ -183,27 +239,28 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			 else
 			 {
 				  WritePrivateProfileStringW(_T("Data"),_T("Subnote"),_T("0"),AutoFlashConfigPath);
-				  temp_isp_info.Format(_T("Device is not a subnote."));
-				  m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 			 }
+
+			 temp_isp_info.Format(_T("Please wait!ISP is running!"));
+			 m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 		}
-		CString exe_folder;
-		GetModuleFileName(NULL, exe_folder.GetBuffer(MAX_PATH), MAX_PATH);
-		PathRemoveFileSpec(exe_folder.GetBuffer(MAX_PATH));
-		exe_folder.ReleaseBuffer();
+		//CString exe_folder;
+		//GetModuleFileName(NULL, exe_folder.GetBuffer(MAX_PATH), MAX_PATH);
+		//PathRemoveFileSpec(exe_folder.GetBuffer(MAX_PATH));
+		//exe_folder.ReleaseBuffer();
 
-		CString file_name;
-		MultiByteToWideChar( CP_ACP, 0, download_filename, (int)strlen((char *)download_filename)+1, file_name.GetBuffer(MAX_PATH), MAX_PATH );
-		file_name.ReleaseBuffer();
-		CString mypath =  exe_folder + _T("\\Database\\Firmware");
-		mypath = mypath + _T("\\") + file_name;
-		WritePrivateProfileStringW(_T("Data"),_T("FirmwarePath"),mypath,AutoFlashConfigPath);
-		
+		//CString file_name;
+		//MultiByteToWideChar( CP_ACP, 0, download_filename, (int)strlen((char *)download_filename)+1, file_name.GetBuffer(MAX_PATH), MAX_PATH );
+		//file_name.ReleaseBuffer();
+		//CString mypath =  exe_folder + _T("\\Database\\Firmware");
+		//mypath = mypath + _T("\\") + file_name;
+		//WritePrivateProfileStringW(_T("Data"),_T("FirmwarePath"),mypath,AutoFlashConfigPath);
+		//
 
-		temp_isp_info.Format(_T("FirmwarePath = "));
-		temp_isp_info = temp_isp_info + mypath;
-		m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
-		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+		//temp_isp_info.Format(_T("FirmwarePath = "));
+		//temp_isp_info = temp_isp_info + mypath;
+		//m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
+		//m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 
 		HANDLE Call_ISP_Application = NULL;
 		Call_ISP_Application =CreateThread(NULL,NULL,isp_thread,this,NULL, NULL);
@@ -233,9 +290,9 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 
 		complete_message.Format(_T("Local file path : "));
 		complete_message = complete_message + Folder_Path;
-		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
+		//m_download_info.InsertString(m_download_info.GetCount(),complete_message);
 
-		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+		//m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 	}
 	else if(ncommand == DOWNLOAD_FILE_INFO)
 	{
@@ -246,6 +303,13 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		nfile_size.Format(_T("File size about %d Bytes "),malloc_download_memory_size);
 		CString show_message;
 		show_message = _T("File name  ") + nfile_name + _T("   .") + nfile_size;
+		m_download_info.InsertString(m_download_info.GetCount(),show_message);
+		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+	}
+	else if(ncommand == DOWNLOAD_T3000_NO_UPDATE)
+	{
+		CString show_message;
+		show_message = _T("You T3000 is up-to-date") ;
 		m_download_info.InsertString(m_download_info.GetCount(),show_message);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 	}
@@ -277,6 +341,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 	else if(ncommand == DOWNLOAD_RESULTS/*DOWNLOAD_RESULTS*/)
 	{
 		GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(true);
+		GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(true);
 		KillTimer(1);
 		int ret_results =  GetPrivateProfileInt(_T("Data"),_T("Command"),0,AutoFlashConfigPath);
 		CString ret_message;
@@ -323,22 +388,38 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		case NO_MD5_FILE_EXSIT:
 			{
 				show_error_message.Format(_T("TEMCO server doesn't contain the file you needed"));
+				if(flash_multi_auto)
+				{
+					PostMessage(WM_CLOSE,NULL,NULL);
+				}
 			}
 			break;
 		case DOWNLOAD_FILE_ERROR:
 			{
 				show_error_message.Format(_T("Download file from server failed!"));
+				if(flash_multi_auto)
+				{
+					PostMessage(WM_CLOSE,NULL,NULL);
+				}
 			}
 
 			break;
 		case HOST_BUSY:
 			{
 				show_error_message.Format(_T("Host busy,please try again later!"));
+				if(flash_multi_auto)
+				{
+					PostMessage(WM_CLOSE,NULL,NULL);
+				}
 			}
 			break;
 		case DOWNLOAD_MD5_FAILED:
 			{
 				show_error_message.Format(_T("Check MD5 value failed!Please retry again!"));
+				if(flash_multi_auto)
+				{
+					PostMessage(WM_CLOSE,NULL,NULL);
+				}
 			}
 			break;
 		case DOWNLOAD_MD5_CHECK_PASS:
@@ -356,6 +437,10 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		default:
 			{
 				show_error_message.Format(_T("Unknown error,please try again later!"));
+				if(flash_multi_auto)
+				{
+					PostMessage(WM_CLOSE,NULL,NULL);
+				}
 			}
 			break;
 
@@ -656,8 +741,11 @@ BOOL Dowmloadfile::OnInitDialog()
 		CreateDirectory(Folder_Path);
 	}
 
-
-
+	m_download_product_type = (unsigned char)m_product_isp_auto_flash.product_class_id;
+	if((m_download_product_type == 0) || (m_download_product_type >= 200))
+	{
+		PostMessage(WM_CLOSE,NULL,NULL);
+	}
 	CString temp_db_ini_folder;
 	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
 
@@ -699,6 +787,8 @@ BOOL Dowmloadfile::OnInitDialog()
 //#ifdef _DEBUG
 //	memcpy_s((char *)IP_ADDRESS_SERVER,20,"127.0.0.1",20);
 //#endif
+	if(flash_multi_auto)
+		SetTimer(2,200,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -716,9 +806,11 @@ BOOL Dowmloadfile::PreTranslateMessage(MSG* pMsg)
 }
 
 
-void Dowmloadfile::OnBnClickedButtonStartDownload()
+
+
+void Dowmloadfile::Start_Download()
 {
-	// TODO: Add your control notification handler code here
+	KillProcessFromName(_T("ISP.exe"));
 	SetTimer(1,200,NULL);
 	wait_download_and_isp_finished = false;
 	Add_log_count = 1;
@@ -731,7 +823,7 @@ void Dowmloadfile::OnBnClickedButtonStartDownload()
 
 	CString temp_db_ini_folder;
 	temp_db_ini_folder = g_achive_folder + _T("\\MonitorIndex.ini");
-	
+
 	int is_local_temco_net = false;
 	is_local_temco_net  = GetPrivateProfileInt(_T("Setting"),_T("LocalTemcoNet"),0,temp_db_ini_folder);
 	if(is_local_temco_net == false)
@@ -767,9 +859,9 @@ void Dowmloadfile::OnBnClickedButtonStartDownload()
 		memcpy_s((char *)IP_ADDRESS_SERVER,20,temp_char_ip,20);
 	}
 
-//#ifdef _DEBUG
-//	memcpy_s((char *)IP_ADDRESS_SERVER,20,"127.0.0.1",20);
-//#endif
+	//#ifdef _DEBUG
+	//	memcpy_s((char *)IP_ADDRESS_SERVER,20,"127.0.0.1",20);
+	//#endif
 
 
 
@@ -797,11 +889,11 @@ void Dowmloadfile::OnBnClickedButtonStartDownload()
 	TCP_File_Socket.GetLastError();
 	TCP_File_Socket.AsyncSelect(FD_READ |FD_CONNECT |FD_CLOSE);
 
-
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->EnableWindow(false);
 	//((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_TEMCO_IP))->SetAddress(IP_ADDRESS_SERVER);
 	//((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_TEMCO_IP))->EnableWindow(false);
 	GetDlgItem(IDC_BUTTON_START_DOWNLOAD)->EnableWindow(false);
+	GetDlgItem(IDC_BUTTON_FILE_DOWNLOAD_ONLY)->EnableWindow(false);
 }
 
 
@@ -846,39 +938,58 @@ void Dowmloadfile::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
 	int temp_count = 0;
-	temp_count = GetPrivateProfileInt(_T("LogInfo"),_T("AddCount"),0,AutoFlashConfigPath);
-	if(Add_log_count <= temp_count)
+	switch(nIDEvent)
 	{
-		CString temp_string;
-		CString section;
-		section.Format(_T("AddText%d"),Add_log_count);
-		GetPrivateProfileStringW(_T("LogInfo"),section,_T(""),temp_string.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
-		temp_string.ReleaseBuffer();
-		Add_log_count ++;
-		if(!temp_string.IsEmpty())
+	case 1:
 		{
-			m_download_info.InsertString(m_download_info.GetCount(),temp_string);
-			m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+			temp_count = GetPrivateProfileInt(_T("LogInfo"),_T("AddCount"),0,AutoFlashConfigPath);
+			if(Add_log_count <= temp_count)
+			{
+				CString temp_string;
+				CString section;
+				section.Format(_T("AddText%d"),Add_log_count);
+				GetPrivateProfileStringW(_T("LogInfo"),section,_T(""),temp_string.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				temp_string.ReleaseBuffer();
+				Add_log_count ++;
+				if(!temp_string.IsEmpty())
+				{
+					m_download_info.InsertString(m_download_info.GetCount(),temp_string);
+					m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+				}
+			}
+
+			int is_replace_refresh = GetPrivateProfileInt(_T("LogInfo"),_T("Replace_Refresh"),0,AutoFlashConfigPath);
+			if(is_replace_refresh)
+			{
+				int temp_replace_count = GetPrivateProfileInt(_T("LogInfo"),_T("ReplaceCount"),0,AutoFlashConfigPath);	
+				CString temp_section;
+				temp_section.Format(_T("ReplaceText%d"),temp_replace_count);
+				CString replace_string;
+				GetPrivateProfileStringW(_T("LogInfo"),temp_section,_T(""),replace_string.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
+				replace_string.ReleaseBuffer();
+				int nLineCount = m_download_info.GetCount();
+				m_download_info.DeleteString(nLineCount - 1);
+
+				m_download_info.InsertString(m_download_info.GetCount(),replace_string);
+				m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+				WritePrivateProfileStringW(_T("LogInfo"),_T("Replace_Refresh"),_T("0"),AutoFlashConfigPath);	
+
+			}
 		}
+		break;
+	case 2:
+		{
+			OnBnClickedButtonFileDownloadOnly();
+			KillTimer(2);
+		}
+		break;
+	default:
+		{
+
+		}
+		break;
 	}
 
-	int is_replace_refresh = GetPrivateProfileInt(_T("LogInfo"),_T("Replace_Refresh"),0,AutoFlashConfigPath);
-	if(is_replace_refresh)
-	{
-		int temp_replace_count = GetPrivateProfileInt(_T("LogInfo"),_T("ReplaceCount"),0,AutoFlashConfigPath);	
-		CString temp_section;
-		temp_section.Format(_T("ReplaceText%d"),temp_replace_count);
-		CString replace_string;
-		GetPrivateProfileStringW(_T("LogInfo"),temp_section,_T(""),replace_string.GetBuffer(MAX_PATH),MAX_PATH,AutoFlashConfigPath);
-		replace_string.ReleaseBuffer();
-		int nLineCount = m_download_info.GetCount();
-		m_download_info.DeleteString(nLineCount - 1);
-
-		m_download_info.InsertString(m_download_info.GetCount(),replace_string);
-		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
-		WritePrivateProfileStringW(_T("LogInfo"),_T("Replace_Refresh"),_T("0"),AutoFlashConfigPath);	
-
-	}
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -886,6 +997,8 @@ void Dowmloadfile::OnTimer(UINT_PTR nIDEvent)
 void Dowmloadfile::OnBnClickedButton1()
 {
 	// TODO: Add your control notification handler code here
+
+
 	CString temp_folder_path;
 	CString ApplicationFolder;
 	GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
@@ -907,4 +1020,28 @@ void Dowmloadfile::OnBnClickedButton1()
 	}
 	CString str = _T("/select, ") + temp_folder_path;     
 	ShellExecute( NULL, _T("open"), _T("explorer.exe"), str, NULL, SW_SHOWNORMAL );  
+}
+
+void Dowmloadfile::OnBnClickedButtonStartDownload()
+{
+	// TODO: Add your control notification handler code here
+	download_and_update = DOWNLOAD_AND_UPDATE;
+	Start_Download();
+}
+
+void Dowmloadfile::OnBnClickedButtonFileDownloadOnly()
+{
+	// TODO: Add your control notification handler code here
+	download_and_update = DOWNLOAD_ONLY;
+	Start_Download();
+}
+
+
+void Dowmloadfile::OnBnClickedButtonUpdateT3000()
+{
+	// TODO: Add your control notification handler code here
+	m_product_isp_auto_flash.product_class_id =  199;
+	download_and_update = DOWNLOAD_ONLY;
+	Start_Download();
+	return;
 }

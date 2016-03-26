@@ -60,6 +60,9 @@ extern CDialog_Progess *WaitRead_Data_Dlg;
 #include "BacnetAddLabel.h"
 extern CBacnetAddLabel * Add_Label_Window;
 extern CBacnetUserlogin * User_Login_Window;
+
+extern CString AutoFlashConfigPath;
+
 #include "T38AI8AO.h"
 #include "rs485.h" // For call Get_RS485_Handle() function
 #include "BacnetWait.h"
@@ -693,7 +696,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 
 
-
     CMFCPopupMenu::SetForceMenuFocus(FALSE);
     CMFCToolBar::SetSizes(CSize(32,32),CSize(32,32));
     CMFCToolBar::SetMenuSizes(CSize(32,32),CSize(24,24));
@@ -951,12 +953,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
         pDialog[i]=NULL;
     }
 
-    CString AutoFlashConfigPath;
-    CString ApplicationFolder;
-    GetModuleFileName(NULL, ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
-    PathRemoveFileSpec(ApplicationFolder.GetBuffer(MAX_PATH));
-    ApplicationFolder.ReleaseBuffer();
-    AutoFlashConfigPath = ApplicationFolder + _T("//AutoFlashFile.ini");
+	CString temp_ApplicationFolder;
+    GetModuleFileName(NULL, temp_ApplicationFolder.GetBuffer(MAX_PATH), MAX_PATH);
+    PathRemoveFileSpec(temp_ApplicationFolder.GetBuffer(MAX_PATH));
+    temp_ApplicationFolder.ReleaseBuffer();
+    AutoFlashConfigPath = temp_ApplicationFolder + _T("//AutoFlashFile.ini");
     CFileFind fFind;
     if(fFind.FindFile(AutoFlashConfigPath))
     {
@@ -1127,7 +1128,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 // 		}
     PostMessage(WM_CREATE_STATUSBAR,0,0);
     CString image_fordor;
-    image_fordor = ApplicationFolder + _T("\\Database\\Buildings\\") + m_strCurMainBuildingName + _T("\\image");
+    image_fordor = temp_ApplicationFolder + _T("\\Database\\Buildings\\") + m_strCurMainBuildingName + _T("\\image");
     CFileFind temp_find;
     if(temp_find.FindFile(image_fordor) == 0)
     {
@@ -8609,6 +8610,26 @@ end_condition :
             {
                 continue;
             }
+			else if(m_product.at(i).protocol == MODBUS_TCPIP)
+			{
+				temp_online = false;
+				//m_product.at(i).status = false;
+				for (int x=0; x<(int)m_refresh_net_device_data.size(); x++)
+				{
+					if(nSerialNumber == m_refresh_net_device_data.at(x).nSerial)
+					{
+						temp_online = true;
+						//m_product.at(i).status = true;
+						bOnLine = TRUE;
+						break;
+					}
+				}
+				m_product.at(i).status_last_time[2] = m_product.at(i).status_last_time[1] ;
+				m_product.at(i).status_last_time[1] = m_product.at(i).status_last_time[0] ;
+				m_product.at(i).status_last_time[0] = temp_online ;
+				m_product.at(i).status = m_product.at(i).status_last_time[0] || m_product.at(i).status_last_time[1] || m_product.at(i).status_last_time[2];
+				continue;
+			}
             else// if(m_product.at(i).protocol == MODBUS_TCPIP)
             {
 				continue;
@@ -10784,6 +10805,7 @@ void CMainFrame::OnControlInputs()
         }
 		else if(g_protocol == MODBUS_RS485)
 		{
+			::PostMessage(m_input_dlg_hwnd,WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,0,1);//第二个参数 In
 		}
         else
@@ -10933,6 +10955,7 @@ void CMainFrame::OnControlOutputs()
         }
 		else if(g_protocol == MODBUS_RS485)
 		{
+			::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,0,0);//第二个参数 OUT
 		}
         else
@@ -11157,7 +11180,10 @@ void CMainFrame::OnControlAnnualroutines()
 void CMainFrame::OnControlSettings()
 {
     // TODO: Add your command handler code here
-    if((g_protocol == PROTOCOL_BACNET_IP) || (g_protocol == PROTOCOL_BIP_TO_MSTP) || (g_protocol == MODBUS_BACNET_MSTP))
+    if((g_protocol == PROTOCOL_BACNET_IP) || 
+		(g_protocol == PROTOCOL_BIP_TO_MSTP) || 
+		(g_protocol == MODBUS_BACNET_MSTP) ||
+		((g_protocol == MODBUS_RS485 ) && (product_type == PM_MINIPANEL)) )
     {
         if((m_user_level ==	LOGIN_SUCCESS_GRAPHIC_MODE) ||
                 (m_user_level == LOGIN_SUCCESS_ROUTINE_MODE))
@@ -11194,6 +11220,10 @@ void CMainFrame::OnControlSettings()
         {
             Create_Thread_Read_Item(TYPE_SETTING);
         }
+		else if(g_protocol == MODBUS_RS485)
+		{
+			::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,0,READ_SETTING_COMMAND);//第二个参数 In
+		}
         else
         {
             if(bac_select_device_online)
@@ -14799,7 +14829,7 @@ void CMainFrame::OnHelpCheckupdate()
 	if(((selected_tree_item == NULL) || (selected_product_index == -1)))
 	{
 
-
+		m_product_isp_auto_flash.product_class_id =  199;
 	}
 
 

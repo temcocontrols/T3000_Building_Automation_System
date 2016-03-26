@@ -8,7 +8,7 @@
 #include "globle_function.h"
 #include "BinFileParser.h"
 #include "TFTPServer.h"
-
+extern bool auto_flash_mode;
 // CNCFlashDlg dialog
 
 IMPLEMENT_DYNAMIC(CNCFlashDlg, CDialog)
@@ -69,8 +69,8 @@ BOOL CNCFlashDlg::FileValidation(const CString& strFileName)
 			CString strTips;
 			//strTips.Format(_T("%s isn't a HEX file."), strFileName);
 			strTips = _T("To Update over Com port, please select a *.HEX file");
-
-			AfxMessageBox(strTips);
+			if(!auto_flash_mode)
+				AfxMessageBox(strTips);
 			UpdateStatusInfo(strTips, FALSE);
 			return FALSE;
 		}
@@ -79,7 +79,8 @@ BOOL CNCFlashDlg::FileValidation(const CString& strFileName)
 			CString strTips;
 			//strTips.Format(_T("%s isn't a BIN file."), strFileName);
 			strTips = _T("To Updating over Ethernet, please select a *.BIN file");
-			AfxMessageBox(strTips);
+			if(!auto_flash_mode)
+				AfxMessageBox(strTips);
 			UpdateStatusInfo(strTips, FALSE);
 			return FALSE;
 		}
@@ -218,7 +219,8 @@ void CNCFlashDlg::FlashByEthernet()
 		UpdateStatusInfo(strTips1, FALSE);
 		CString strTips2 =_T("Please reselect a right file.");
 		UpdateStatusInfo(strTips2, FALSE);
-		AfxMessageBox(strTips1+strTips2, MB_OK);
+		if(!auto_flash_mode)
+			AfxMessageBox(strTips1+strTips2, MB_OK);
 	}
 
 	delete pBinFile;
@@ -282,7 +284,8 @@ void CNCFlashDlg::OnBnClickedButtonPing()
 
 	if (strIP.GetLength() <= 6)
 	{
-		AfxMessageBox(_T("Please Input a right IP address."));
+		if(!auto_flash_mode)
+			AfxMessageBox(_T("Please Input a right IP address."));
 		return;
 	}
 	((CISPDlg*)GetParent())->OnTestPing(strIP);	

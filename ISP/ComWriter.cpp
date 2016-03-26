@@ -1484,6 +1484,7 @@ int flash_a_tstat(BYTE m_ID, unsigned int the_max_register_number_parameter, TS_
 
                 if(itemp<RETRY_TIMES+3)
                 {
+					Read_One(255,1);//作用是如果断开连接之后这个里面会自动 打开上次连接的端口的;
                     if(-2==write_multi(m_ID,&register_data[ii],ii,128))//to write multiple 128 bytes
                         itemp++;
                     else
@@ -1595,6 +1596,9 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
         CString srtInfo;
         srtInfo.Format(_T("|ID %d: Programming lines %d to %d.(%d%%)"),m_ID,the_max_register_number_parameter_Finished+ii,the_max_register_number_parameter_Finished+ii+128,persentfinished);
         pWriter->OutPutsStatusInfo(srtInfo, TRUE);
+
+        SetResponseTime(20);
+
         do
         {
             /*   if(itemp<RETRY_TIMES)
@@ -1617,7 +1621,7 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
         }
         while(itemp<RETRY_TIMES);
 
-
+        SetResponseTime(60);
 
         //srtInfo.Format(_T("Communication was interrupted.Tryiny connect agina!"));
         //pWriter->OutPutsStatusInfo(srtInfo, TRUE);
@@ -2391,42 +2395,42 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
         pWriter->OutPutsStatusInfo(strID);
 
         int  nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
-             Sleep (500);
-        nRet = Read_One(pWriter->m_szMdbIDs[i],11);
-        if (nRet <= 0)
-        {
-            AfxMessageBox(_T("Fail to enter ISP Mode!"));
-            goto end_isp_flash;
-        }
+             Sleep (2000);
+         nRet = Read_One(pWriter->m_szMdbIDs[i],11);
+         if (nRet <= 0)
+         {
+             AfxMessageBox(_T("Fail to enter ISP Mode!"));
+             goto end_isp_flash;
+         }
 
-        if (nRet >=41)//支持多个波特率切换的
-        {
-           if (GetCommunicationType () == 0)
-           {
-               nRet = Write_One (pWriter->m_szMdbIDs[i],15,4); //把主程序波特率切换到 115200
-               
-               if(open_com(pWriter->m_nComPort)==false)
-               {
-                   //CString srtInfo = _T("|Error :The com port is occupied!");
-                   //MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
-                   //AddStringToOutPuts(_T("Error :The com port is occupied!"));
-                 //  OutPutsStatusInfo(srtInfo, FALSE);
-                   return 0;
-               }
-               else
-               {
-                   //CString strTemp;
-                 //  strTemp.Format(_T("COM%d"), m_nComPort);
-                 //  CString strTips = _T("|Open ") +  strTemp + _T(" successful.");
-                   //OutPutsStatusInfo(strTips, FALSE);
-                   // AddStringToOutPuts(strTips);
-                   Change_BaudRate (115200);
-
-               }
-              // Change_BaudRate (115200);
-           }
-           
-        }
+         if (nRet >=41)//支持多个波特率切换的
+         {
+            if (GetCommunicationType () == 0)
+            {
+                nRet = Write_One (pWriter->m_szMdbIDs[i],15,4); //把主程序波特率切换到 115200
+                close_com ();
+                if(open_com(pWriter->m_nComPort)==false)
+                {
+                    //CString srtInfo = _T("|Error :The com port is occupied!");
+                    //MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
+                    //AddStringToOutPuts(_T("Error :The com port is occupied!"));
+                  //  OutPutsStatusInfo(srtInfo, FALSE);
+                    return 0;
+                }
+                else
+                {
+                 //CString strTemp;
+                  //  strTemp.Format(_T("COM%d"), m_nComPort);
+                  //  CString strTips = _T("|Open ") +  strTemp + _T(" successful.");
+                    //OutPutsStatusInfo(strTips, FALSE);
+                    // AddStringToOutPuts(strTips);
+                  bool is_ok =  Change_BaudRate (115200);
+ 
+                 }
+               // Change_BaudRate (115200);
+            }
+            
+         }
 
         Sleep (500);
         // pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]);
@@ -2800,10 +2804,32 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
         }
         while(ii);
 #endif
-        if (pWriter->m_index_Baudrate>0)
-        {
-           Write_One (pWriter->m_szMdbIDs[i],15,pWriter->m_index_Baudrate); //切回当前的波特率
-        }
+    Sleep (6000);
+//           int ISPVer = -1;
+//          ii = 0;
+//         do 
+//         {
+//            ISPVer = read_one (pWriter->m_szMdbIDs[i],11);
+//            Sleep (500);
+//            if (ISPVer == 0)
+//            {
+//                 break;
+//            }
+//            else
+//            {
+//               ++ii;
+//            }
+//             
+//         } while (ii>40);
+// 
+//         if (ISPVer==0)
+//         {
+            if (pWriter->m_index_Baudrate>=0)
+            {
+                Write_One (pWriter->m_szMdbIDs[i],15,pWriter->m_index_Baudrate); //切回当前的波特率
+            }
+    /*    }*/
+       
       
 
     }

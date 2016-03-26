@@ -376,8 +376,8 @@ void CLightingController::Read_Input_Group_Mapping(BOOL Input_Group)
 					}
 					else
 					{
-						RegisterValue=Output_Units_Data[3*out+2];
-						Position=OutputAddress-16;
+                        RegisterValue=Output_Units_Data[3*out+2];
+                        Position=OutputAddress-16;
 					}
 					if(Get_Bit_FromRegister(RegisterValue,Position))//如果是1的话，那么就加入到Mapping中去
 					{

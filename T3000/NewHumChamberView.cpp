@@ -2973,7 +2973,8 @@ void CNewHumChamberView::read_testo(){
 			//}
 
 
-			if((ret1 < 0) && (ret2 < 0) && (ret3 < 0) && (ret4 < 0))
+			//if((ret1 < 0) && (ret2 < 0) && (ret3 < 0) && (ret4 < 0))
+			if((ret1 < 0) && (ret2 < 0))
 			{
 				Open_Socket2(HUM_Minipanel_IP,HUM_Minipanel_port);
 			}

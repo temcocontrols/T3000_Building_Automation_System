@@ -37,6 +37,10 @@ public:
 	BOOL IsNetDevice(int DevType);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedButtonFileDownloadOnly();
+	void Start_Download();
+	unsigned char m_download_product_type;
+	afx_msg void OnBnClickedButtonUpdateT3000();
 };
 
 

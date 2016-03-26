@@ -22,7 +22,13 @@ typedef struct
     float software_rev;
     CString file_rev;
     bool need_flash;
+	unsigned char product_id;
 }Str_flash_device;
+
+
+
+
+
 
 class CFlash_Multy : public CDialogEx
 {
@@ -80,6 +86,8 @@ public:
     BOOL Product_Firmware_Check(CString ProductName,CString FirmwareFilePath);
     BOOL Configuration_File_Check(CString ProductName,CString ConfigurationFilePath);
     BOOL m_bool_flash_different_version;
+	afx_msg void OnBnClickedButtonUpdateFirmware();
+	void GetProductType();
 };
 
 const int FLASH_ITEM = 0;
@@ -97,8 +105,9 @@ const int FLASH_FILE_POSITION = 11;
 const int FLASH_CONFIG_FILE_POSITION = 12;
 const int FLASH_RESULTS = 13;
 const int FLASH_CONFIG_RESULTS = 14;
+const int FLASH_PRODUCT_ID = 15;
 
-const int FLASH_MAX_COUNT = 15;
+const int FLASH_MAX_COUNT = 16;
 
 
 

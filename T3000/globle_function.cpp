@@ -1617,7 +1617,7 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         }
         break;
     case WRITEANNUALSCHEDULE_T3000:
-        memcpy_s(SendBuffer + HEADER_LENGTH,48,&g_DayState[start_instance],48);
+        memcpy_s(SendBuffer + HEADER_LENGTH,ANNUAL_CODE_SIZE,&g_DayState[start_instance],ANNUAL_CODE_SIZE);
 
         //memcpy_s(g_DayState[annual_list_line],block_length,my_temp_point,block_length);
         break;
@@ -6543,7 +6543,22 @@ int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path)
 	memset(temp_buffer ,0,50000*2);
 
 	memcpy(temp_buffer,temp_point,dwFileLen-5);
-	Sleep(1);
+
+
+	memcpy(&Device_Basic_Setting.reg,temp_buffer,400); //Setting 的400个字节;
+
+	for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+	{
+		memcpy( &m_Output_data.at(i),temp_buffer + 200 + i*23,sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+	}
+
+	for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
+	{
+		memcpy(&m_Input_data.at(j),temp_buffer + 200 + 23*64 + j*23,sizeof(Str_in_point)); //Input 46 个字节 ;
+	}
+
+	return 1;
+
 }
 
 void Copy_Data_From_485_to_Bacnet(unsigned short *start_point)
@@ -6713,6 +6728,9 @@ int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
     return 0;
 }
 
+
+
+
 //第一个字节 版本
 //然后是 4个字节的 时间 如果时间太久了 也需要重新获取;
 void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigned int bufferlength)
@@ -6756,16 +6774,41 @@ void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigne
 
 #pragma endregion get_time_area
 
-	memcpy(temp_buffer + 5,npoint,bufferlength);
-	temp_point = temp_point + bufferlength;
-
 	DWORD dwFileLen;
-	dwFileLen = temp_point - temp_buffer;
 	HANDLE hFile;
-	hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
 	DWORD dWrites;
-	WriteFile(hFile,temp_buffer,dwFileLen,&dWrites,NULL);
-	CloseHandle(hFile);
+	if(npoint != NULL)
+	{
+		memcpy(temp_buffer + 5,npoint,bufferlength);
+		temp_point = temp_point + bufferlength;
+		dwFileLen = temp_point - temp_buffer;
+		hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+		WriteFile(hFile,temp_buffer,dwFileLen,&dWrites,NULL);
+		CloseHandle(hFile);
+	}
+	else //第二个参数 如果是Null 就是update;
+	{
+		char temp_update_buffer[50000];
+		memset(temp_update_buffer,0,50000);
+
+		memcpy(temp_update_buffer,&Device_Basic_Setting.reg,400); //Setting 的400个字节;
+		for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+		{
+			memcpy(temp_update_buffer + 400 + i*(23*2), &m_Output_data.at(i),sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+		}
+
+		for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
+		{
+			memcpy(temp_update_buffer + 400 + 23*2*64 + j*23*2,&m_Input_data.at(j),sizeof(Str_in_point)); //Input 46 个字节 ;
+		}
+		memcpy(temp_buffer + 5,temp_update_buffer,bufferlength);
+		temp_point = temp_point + bufferlength;
+		dwFileLen = bufferlength + 5;//这5个字节是 版本和时间 ;
+		hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+		WriteFile(hFile,temp_buffer,dwFileLen,&dWrites,NULL);
+		CloseHandle(hFile);
+	}
+
 
 
 }
@@ -10073,6 +10116,7 @@ int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 
         }
     }
+	 return NO_VERSION_INFO;
 }
 int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
 {

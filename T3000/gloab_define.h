@@ -1,6 +1,5 @@
 #pragma once
 #include "RelayLabel.h"
-
 const int SORT_UNKNOW = 0;
 const int SORT_BY_CONNECTION = 1;
 const int SORT_BY_BUILDING_FLOOR = 2;
@@ -139,7 +138,7 @@ const int DOWNLOAD_FILE_INFO = 8;
 const int DOWNLOAD_NOT_FIND_LOCAL = 9;
 const int DOWNLOAD_LOCAL_EXSIT = 10;
 const int DOWNLOAD_RESULTS = 11;
-
+const int DOWNLOAD_T3000_NO_UPDATE = 12;
 const int DOWNLOAD_MD5_FAILED = 20;
 const int DOWNLOAD_MD5_CHECK_PASS = 21;
 
@@ -422,7 +421,7 @@ const int SCHEDULE_TIME_HOLIDAY2 = 9;
 
 
 const int WEEKLY_SCHEDULE_SIZE = 144;
-const int ANNUAL_CODE_SIZE = 48;
+const int ANNUAL_CODE_SIZE = 46;
 struct _Bac_Scan_Com_Info
 {
 	int device_id;
@@ -1207,10 +1206,10 @@ const CString Program_Fonts[] =
 const CString JumperStatus[]=
 {
 	_T("Unused"),
-	_T("4-20 ma / 0-24 V"),
+	_T("4-20 ma"),//_T("4-20 ma / 0-24 V"),
 	_T("0-5 V"),
 	_T("0-10 V"),
-	_T("Thermistor")
+	_T("Thermistor Dry Contactor")
 };
 
 
@@ -1418,3 +1417,31 @@ typedef struct
 	char file_name[11];
 
 }pic_sd_struct;
+
+typedef struct
+{
+	unsigned char download_product_type;
+	char firmware_file_path[255];
+}Str_download_firmware_info;
+
+
+
+const int LENGTH_MODBUS_SETTING = 200;
+const int LENGTH_MODBUS_OUTPUT = (45 + 1)/2 *  BAC_OUTPUT_ITEM_COUNT ;//  23*64;
+const int LENGTH_MODBUS_INPUT = (46 + 1) / 2  * BAC_INPUT_ITEM_COUNT;	 // 23 * 64;
+const int LENGTH_MODBUS_VARIABLE = (39 + 1) / 2 * BAC_VARIABLE_ITEM_COUNT; // 20 * 128;
+const int LENGTH_MODBUS_PRG = (37 + 1) /2 * BAC_PROGRAM_ITEM_COUNT; // 19 * 16
+const int LENGTH_MODBUS_SCHEDULE = (42 + 1) / 2  * BAC_SCHEDULE_COUNT; // 21 * 8;
+const int LENGTH_MODBUS_HOLIDAY =  (33 + 1) / 2 * BAC_HOLIDAY_COUNT;   //17 * 4
+const int LENGTH_MODBUS_PRG_CODE = 400 * 5 / 2 * BAC_PROGRAMCODE_ITEM_COUNT ; // 1000 * 16;
+const int LENGTH_MODBUS_SCHEDULE_CODE = WEEKLY_SCHEDULE_SIZE / 2 * BAC_WEEKLYCODE_ROUTINES_COUNT ; // 72 * 8;
+const int LENGTH_MODBUS_HOLIDAY_CODE = ANNUAL_CODE_SIZE /2 ;
+
+
+//以下是 bacnet 寄存器 映射到modbus的位置;
+const int REG_SETTING_START_ADDRESS  = 9800;
+const int REG_OUTPUT_START_ADDRESS = REG_SETTING_START_ADDRESS + LENGTH_MODBUS_SETTING; //10000
+const int REG_INPUT_START_ADDRESS = REG_OUTPUT_START_ADDRESS + LENGTH_MODBUS_OUTPUT;	//11472
+const int REG_VARIABLE_START_ADDRESS  = REG_INPUT_START_ADDRESS + LENGTH_MODBUS_INPUT;	//12944
+const int REG_PRG_START_ADDRESS = REG_VARIABLE_START_ADDRESS + LENGTH_MODBUS_VARIABLE;  //15504
+const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG;		//15808

@@ -60,7 +60,7 @@ BOOL CBacnetAlarmLog::OnInitDialog()
 		AlarmWindow_Window->Create(IDD_DIALOG_BACNET_ALARM_WINDOW,this);	
 	}
 
-	AlarmWindow_Window->ShowWindow(SW_SHOW);
+	AlarmWindow_Window->ShowWindow(SW_HIDE);
 	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
 
 	return TRUE;  // return TRUE unless you set the focus to a control

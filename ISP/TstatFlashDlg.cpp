@@ -14,7 +14,7 @@
 #include "FlashSN.h"
 
 // CTstatFlashDlg dialog
-
+extern bool auto_flash_mode;
 extern CString g_strFlashInfo;
  
 
@@ -226,7 +226,8 @@ int CTstatFlashDlg::GetModbusID(vector<int>& szMdbIDs)
 				CString strTips;
 				strTips.Format(_T("Error : Wrong Modbus ID : %d. Please input right ID."), nID);
 				UpdateStatusInfo(strTips, FALSE);
-				AfxMessageBox(strTips);
+				if(!auto_flash_mode)
+					AfxMessageBox(strTips);
 				return FALSE;
 			}
 			szMdbIDs.push_back(nID);
@@ -375,8 +376,8 @@ BOOL CTstatFlashDlg::FileValidation(const CString& strFileName)
 		CString strTips;
 		//strTips.Format(_T("%s isn't a HEX file."), strFileName);
 		strTips = _T("To Update over Com port, please select a *.HEX file");
-
-		AfxMessageBox(strTips);
+		if(!auto_flash_mode)
+			AfxMessageBox(strTips);
 		UpdateStatusInfo(strTips, FALSE);
 		return FALSE;
 	}
@@ -385,7 +386,8 @@ BOOL CTstatFlashDlg::FileValidation(const CString& strFileName)
 		CString strTips;
 		//strTips.Format(_T("%s isn't a BIN file."), strFileName);
 		strTips = _T("To Updating over Ethernet, please select a *.BIN file");
-		AfxMessageBox(strTips);
+		if(!auto_flash_mode)
+			AfxMessageBox(strTips);
 		UpdateStatusInfo(strTips, FALSE);
 		return FALSE;
 	}
@@ -408,7 +410,8 @@ BOOL CTstatFlashDlg::ValidMdbIDString()
 			{
 				CString strTips =_T("Error: Modbus ID invalidation."); 
 				UpdateStatusInfo(strTips, FALSE);
-				AfxMessageBox(strTips);
+				if(!auto_flash_mode)
+					AfxMessageBox(strTips);
 				return FALSE;	
 			}			
 		}
@@ -481,7 +484,8 @@ void CTstatFlashDlg::FlashByCom()
 		UpdateStatusInfo(strTips1, FALSE);
 		CString strTips2 =_T("Please reselect a right file.");
 		UpdateStatusInfo(strTips2, FALSE);
-		AfxMessageBox(strTips1+strTips2, MB_OK);
+		if(!auto_flash_mode)
+			AfxMessageBox(strTips1+strTips2, MB_OK);
 
 	}
 	delete pHexFile;

@@ -1980,7 +1980,7 @@ int Total_SCALE;
 
 vector <_Graphic_Value_Info> m_graphic_refresh_data;
 
-byte	g_DayState[8][48];
+byte	g_DayState[8][ANNUAL_CODE_SIZE];
 unsigned char weeklt_time_schedule[BAC_SCHEDULE_COUNT][WEEKLY_SCHEDULE_SIZE + 1];
 unsigned char program_code[BAC_PROGRAM_ITEM_COUNT][2000];//暂定2000;
 int program_code_length[BAC_PROGRAM_ITEM_COUNT];
@@ -2146,6 +2146,9 @@ int monitor_ignore_max_value = 0;
 int monitor_ignore_min_value = 0;
 int persent_array_count = 0;
 unsigned int old_tx_count = 0;
+
+int flash_multi_auto = false; //用于控制 多烧的  自动控制;
+unsigned int T3000_Version ; //T3000的版本号.
 
 int flag_auto_scroll = 0; // 如果客户有指定显示X轴的某些事件 此 变量会为 1;否则显示最新数据;
 int graphic_last_scale_type = 0 ; //用于存储上次 有效的 X轴的 刻度;

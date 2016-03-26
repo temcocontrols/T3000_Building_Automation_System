@@ -78,6 +78,7 @@ CListCtrlEx::CListCtrlEx()
 	m_select_raw = 0;
 	m_select_col = 1;
 	m_dt_left = true;
+	m_support_col0_edit = false; //默认第0列 不允许编辑;
 }
 
 CListCtrlEx::~CListCtrlEx()
@@ -117,7 +118,7 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 		if(nChar == VK_LEFT)
 		{
-			if(m_select_col >1)//left第一列无效;
+			if((m_select_col >1) || ((m_support_col0_edit) && (m_select_col == 1)))//left第一列无效;
 			{
 				m_select_col = m_select_col - 1;
 
@@ -131,7 +132,6 @@ void ListCtrlEx::CListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				RedrawItems(m_select_raw,m_select_raw);
 				return ;
 			}
-
 		}
 		else if(nChar == VK_UP)
 		{
@@ -617,7 +617,13 @@ BOOL CListCtrlEx::GetCellRect(int iRow, int iCol, CRect &rect, int nArea)
 	return TRUE;
 }
 
-void	CListCtrlEx::Support_Keyboard(bool b_support)
+
+void CListCtrlEx::Support_Col_0_Edit(bool b_support)
+{
+	m_support_col0_edit = b_support;
+}
+
+void CListCtrlEx::Support_Keyboard(bool b_support)
 {
 	m_support_key = b_support;
 }
