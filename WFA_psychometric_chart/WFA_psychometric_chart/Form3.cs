@@ -14,6 +14,7 @@ using System.Xml;
 using System.Collections;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Data.SqlClient;
 
 
 namespace WFA_psychometric_chart
@@ -140,7 +141,7 @@ namespace WFA_psychometric_chart
                 tb_location.Enabled = true;
                 tb_distance_from_build.Enabled = true;
                 tb_last_updated.Enabled = true;
-                btn_pull_offline_data.Enabled = true;
+               // btn_pull_offline_data.Enabled = true;
                 //btn_update_now.Enabled = true;//this will be true when user selects a station 
                 tb_cw_barometer_value.Enabled = true;
                 tb_cw_direction.Enabled = true;
@@ -230,7 +231,7 @@ namespace WFA_psychometric_chart
                     tb_location.Enabled = false;
                     tb_distance_from_build.Enabled = false;
                     tb_last_updated.Enabled = false;
-                    btn_pull_offline_data.Enabled = false;
+                  //  btn_pull_offline_data.Enabled = false;
                     btn_update_now.Enabled = false;
                     tb_cw_barometer_value.Enabled = false;
                     tb_cw_direction.Enabled = false;
@@ -256,7 +257,7 @@ namespace WFA_psychometric_chart
                 tb_location.Enabled = false;
                 tb_distance_from_build.Enabled = false;
                 tb_last_updated.Enabled = false;
-                btn_pull_offline_data.Enabled = false;
+               // btn_pull_offline_data.Enabled = false;
                 btn_update_now.Enabled = false;
                 tb_cw_barometer_value.Enabled = false;
                 tb_cw_direction.Enabled = false;
@@ -300,8 +301,8 @@ namespace WFA_psychometric_chart
 
                 btn_help.Enabled = true;
                 tb_max_adjust.Enabled = true;
-                tb_current_offset.Enabled = true;
-                btn_set_value.Enabled = true;
+               // tb_current_offset.Enabled = true;
+                //btn_set_value.Enabled = true;
 
             }
             else
@@ -309,8 +310,8 @@ namespace WFA_psychometric_chart
 
                 btn_help.Enabled = false;
                 tb_max_adjust.Enabled = false;
-                tb_current_offset.Enabled = false;
-                btn_set_value.Enabled = false;
+               // tb_current_offset.Enabled = false;
+                //btn_set_value.Enabled = false;
             }
 
 
@@ -349,12 +350,14 @@ namespace WFA_psychometric_chart
 
                     //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
                     string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                    string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-                    using (OleDbConnection connection = new OleDbConnection(connString))
+                   // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                    string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+                   
+                    using (SqlConnection connection = new SqlConnection(connString))
                     {
                         connection.Open();
-                        OleDbDataReader reader = null;
-                        OleDbCommand command = new OleDbCommand("SELECT * from tbl_weather_related_values where ID=@id", connection);
+                        SqlDataReader reader = null;
+                        SqlCommand command = new SqlCommand("SELECT * from tbl_weather_related_values where ID=@id", connection);
                         command.Parameters.AddWithValue("@id", index_selected);
                         reader = command.ExecuteReader();
                         while (reader.Read())
@@ -386,7 +389,7 @@ namespace WFA_psychometric_chart
 
         private void btn_pull_offline_data_Click(object sender, EventArgs e)
         {
-            pull_stored_weather_data();
+            //pull_stored_weather_data();
         }
 
         private void get_stored_data()
@@ -402,15 +405,17 @@ namespace WFA_psychometric_chart
                 //lets pull the vales offline values stored in db...
                 string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-                string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-                using (OleDbConnection connection = new OleDbConnection(connString))
+                //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+                using (SqlConnection connection = new SqlConnection(connString))
                 {
                     connection.Open();
-                    OleDbDataReader reader = null;
+                    SqlDataReader reader = null;
                     string queryString = "SELECT * from tbl_building_location WHERE ID=@index";
-                    OleDbCommand command = new OleDbCommand(queryString, connection);
+                    SqlCommand command = new SqlCommand(queryString, connection);
                     //command.Parameters.AddWithValue("@index", index);
-                    command.Parameters.Add(new OleDbParameter("@index", OleDbType.Integer)).Value = index_selected;
+                    command.Parameters.Add(new SqlParameter("@index", OleDbType.Integer)).Value = index_selected;
                     reader = command.ExecuteReader();
                     while (reader.Read())
                     {
@@ -462,294 +467,304 @@ namespace WFA_psychometric_chart
              */
 
 
-            if (index_for_station_selected > -1) { 
-
-            double lat_val=0.0000;
-            double lng_val=0.0000;
-            //lets declare some variable to store the value...
-            string city_name_pulled="";
-            string country_name_pulled="";
-            string last_update_pulled="";
-            string temp_pulled="";
-            string hum_pulled="";
-            string pressure_pulled="";
-            string wind_speed_pulled="";
-            string direction_pulled="";
-            string lat_pulled="";
-            string long_pulled="";
-            
-
-
-            try
+            if (index_for_station_selected > -1)
             {
-                
-                //lets pull the vales offline values stored in db...
-                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-                string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
 
-                if (tb_latitude.Text == "" && tb_longitude.Text == "")
+                double lat_val = 0.0000;
+                double lng_val = 0.0000;
+                //lets declare some variable to store the value...
+                string city_name_pulled = "";
+                string country_name_pulled = "";
+                string last_update_pulled = "";
+                string temp_pulled = "";
+                string hum_pulled = "";
+                string pressure_pulled = "";
+                string wind_speed_pulled = "";
+                string direction_pulled = "";
+                string lat_pulled = "";
+                string long_pulled = "";
+
+
+
+                try
                 {
 
-                    string error_string = "Please select a location ";
-                    MessageBox.Show(error_string, "error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                   // MessageBox.Show("Please perform the follwing step first.\n 1.select a location \n 2.pull stored building data \n 3. get geo value(we need geo value)");
-                }
-                else {
+                    //lets pull the vales offline values stored in db...
+                    string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+                    /// string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                    string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
 
-                    lat_val = store_station_list[index_for_station_selected].lat;
-                    lng_val = store_station_list[index_for_station_selected].lng;
-                //display lat lng...
-                //MessageBox.Show("lat= "+lat_val+" lng = "+lng_val);
-                using (var wc = new WebClient())
-                {
-                    // var json = await httpClient.GetStringAsync(api_url);
-
-                   // double station_id = store_station_list[index_for_station_selected].id;
-                    //MessageBox.Show("lat = " + lat_val + "lng = " + lng_val);
-                    string api_url = "http://api.openweathermap.org/data/2.5/weather?mode=xml&lat="+lat_val+"&lon="+lng_val+"&appid=615afd606af791f572a1f92b27a68bcd";
-                    //string api_url = "http://api.openweathermap.org/data/2.5/station?id="+station_id+"&APPID=615afd606af791f572a1f92b27a68bcd";
-
-                    var data = wc.DownloadString(api_url);
-                    MessageBox.Show("string apic return =" + data);
-                    string xml_string = data.ToString();
-                   
-                    
-                    
-                    
-                    
-                    //xml parsing...
-                    XmlDocument xml = new XmlDocument();
-                    xml.LoadXml(xml_string);
-                    
-                    XmlNodeList elem_city = xml.GetElementsByTagName("city");                   
-                    foreach (XmlNode x in elem_city)
+                    if (tb_latitude.Text == "" && tb_longitude.Text == "")
                     {
-                        city_name_pulled = x.Attributes["name"].Value;
-                       // MessageBox.Show("city name = " + city_name_pulled);
-                    }
-                    //for temperature
-                    XmlNodeList temp_list = xml.GetElementsByTagName("temperature");                   
-                    foreach (XmlNode x in temp_list)
-                    {
-                        temp_pulled = x.Attributes["value"].Value;
-                        MessageBox.Show("temp  = " + temp_pulled);
-                    }
-                    //for humidity
-                    XmlNodeList hum_list = xml.GetElementsByTagName("humidity");                    
-                    foreach (XmlNode x in hum_list)
-                    {
-                        hum_pulled = x.Attributes["value"].Value;
-                        //MessageBox.Show("hum  = " + hum_pulled);
-                    }
-                    //for pressure..
-                    XmlNodeList pressure_list = xml.GetElementsByTagName("pressure");                    
-                    foreach (XmlNode x in pressure_list)
-                    {
-                        pressure_pulled = x.Attributes["value"].Value;
-                        //MessageBox.Show("press = " + pressure_pulled);
-                    }
-                    //for wind 
 
-                    XmlNodeList wind_list = xml.GetElementsByTagName("speed");
-                    foreach (XmlNode x in wind_list)
-                    {
-                        wind_speed_pulled = x.Attributes["value"].Value;
-                     //   MessageBox.Show("wind speed = " + wind_speed_pulled);
-                    }
-                    //for direction..
-                    XmlNodeList direction_list = xml.GetElementsByTagName("direction");
-                    foreach (XmlNode x in direction_list)
-                    {
-                        direction_pulled = x.Attributes["name"].Value;
-                       // MessageBox.Show("direction name = " + direction_pulled);
-                    }
-                    //for lat and long of station...
-                    XmlNodeList coord_list = xml.GetElementsByTagName("coord");
-                    foreach (XmlNode x in coord_list)
-                    {
-                        lat_pulled = x.Attributes["lat"].Value;
-                        long_pulled = x.Attributes["lon"].Value;
-
-                       // MessageBox.Show("lat = " + lat_pulled +"long" +long_pulled);
-                    }
-                    //for last date update time 
-                    XmlNodeList last_update_list = xml.GetElementsByTagName("lastupdate");
-                    foreach (XmlNode x in last_update_list)
-                    {
-                        last_update_pulled = x.Attributes["value"].Value;
-                       // MessageBox.Show("last update date = " + last_update_pulled);
-                    }
-                    
-                    //for country..
-                    XmlNodeList country_list = xml.GetElementsByTagName("country");
-                    foreach (XmlNode x in country_list)
-                    {
-                        country_name_pulled = x.InnerText;
-                      //  MessageBox.Show("country name = " + country_name_pulled);
-                    }
-
-
-                    //xml parsing closes but we need json parser..
-
-
-
-
-
-
-
-                    //step3. insert the values pulled into a database..
-
-                    //fist calculate lets calculate the distance...
-                    /*
-                        dlon = lon2 - lon1
-                        dlat = lat2 - lat1
-                        a = (sin(dlat/2))^2 + cos(lat1) * cos(lat2) * (sin(dlon/2))^2
-                        c = 2 * atan2( sqrt(a), sqrt(1-a) )
-                        d = R * c (where R is the radius of the Earth) 
-                     */
-                    string loc_value="";
-                    double d=0.0000;
-                    double temp_adjust = double.Parse(temp_pulled.ToString()) - 273.15;
-                    try{
-
-                    double R = 6371.0;//radius of earth in Km
-                    double dlon = double.Parse(long_pulled.ToString()) - lng_val;
-                    double dlat=  double.Parse(lat_pulled.ToString()) -lat_val;
-                    double a = Math.Pow((Math.Sin(dlat / 2)), 2) + Math.Cos(lat_val) * Math.Cos(double.Parse(lat_pulled.ToString())) * Math.Pow((Math.Sin(dlon / 2)), 2);
-                    double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-                           d = R * c;//This is the distance
-                          loc_value = country_name_pulled + "," + city_name_pulled;
-                        //lets check a simple thing if the index is pressent then update else insert the data...
-                        
-                        /*steps.. count the number of items in a column 
-                         1.if the count is less than the index_selected then update else insert
-                         */
-
-
-
-                    using (OleDbConnection connection = new OleDbConnection(connString))
-                {
-                    connection.Open();
-                    int count_col_table=0;
-                        //lets check the data first...
-                        //step1.
-                    string count_num_column = "select count(id) from tbl_weather_related_values ";
-                    OleDbCommand cmd1 = new OleDbCommand(count_num_column, connection);
-                    OleDbDataReader reader = cmd1.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        //lets get the value...
-                        count_col_table = Convert.ToInt32(reader[0].ToString());
-                    }
-                    MessageBox.Show("count_col_table  =" + count_col_table);
-                        //step2. condition
-                    if (count_col_table >= index_selected)
-                    {
-                        //update previous value
-
-                        string sql_string = "update tbl_weather_related_values set  location=@location_value,distance_from_building=@distance_value,last_update_date=@last_value,temp=@temp_value,humidity=@hum_value,bar_pressure=@pressure_value,wind=@wind_value,direction=@direction_value,station_name=@station_name   where ID = @index_selected;";
-                        OleDbCommand command = new OleDbCommand(sql_string, connection);
-                        command.CommandType = CommandType.Text;
-                        command.Parameters.AddWithValue("@location_value", loc_value.ToString());
-                        command.Parameters.AddWithValue("@distance_value", d.ToString());
-                        command.Parameters.AddWithValue("@last_value", last_update_pulled.ToString());
-                        command.Parameters.AddWithValue("@temp_value", temp_adjust.ToString());
-                        command.Parameters.AddWithValue("@hum_value", hum_pulled.ToString());
-                        command.Parameters.AddWithValue("@pressure_value", pressure_pulled.ToString());
-                        command.Parameters.AddWithValue("@wind_value", wind_speed_pulled.ToString());
-                        command.Parameters.AddWithValue("@direction_value", direction_pulled.ToString());
-                        command.Parameters.AddWithValue("@station_name", cb_station_names.SelectedItem.ToString());
-                        command.Parameters.AddWithValue("@index_selected", index_selected);                        
-                        MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
-                        MessageBox.Show("updating...");
-
-                        command.ExecuteNonQuery();
-                        //MessageBox.Show("sql string = " + sql_string);
-                        //MessageBox.Show("value updated successfully!");
-
+                        string error_string = "Please select a location ";
+                        MessageBox.Show(error_string, "error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        // MessageBox.Show("Please perform the follwing step first.\n 1.select a location \n 2.pull stored building data \n 3. get geo value(we need geo value)");
                     }
                     else
                     {
-                        //insert...
-                        string sql_string = "insert into tbl_weather_related_values(location,distance_from_building,last_update_date,temp,humidity,bar_pressure,wind,direction,station_name) VALUES(@location_value,@distance_value,@last_value,@temp_value,@hum_value,@pressure_value,@wind_value,@direction_value,@station_name)";
-                        OleDbCommand command = new OleDbCommand(sql_string, connection);
-                        command.CommandType = CommandType.Text;
-                        command.Parameters.AddWithValue("@location_value", loc_value.ToString());
-                        command.Parameters.AddWithValue("@distance_value", d.ToString());
-                        command.Parameters.AddWithValue("@last_value", last_update_pulled.ToString());
-                        command.Parameters.AddWithValue("@temp_value", temp_adjust.ToString());
-                        command.Parameters.AddWithValue("@hum_value", hum_pulled.ToString());
-                        command.Parameters.AddWithValue("@pressure_value", pressure_pulled.ToString());
-                        command.Parameters.AddWithValue("@wind_value", wind_speed_pulled.ToString());
-                        command.Parameters.AddWithValue("@direction_value", direction_pulled.ToString());
-                        command.Parameters.AddWithValue("@station_name", cb_station_names.SelectedItem.ToString());
-                        MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
-                        command.ExecuteNonQuery();
-                    }
+
+                        lat_val = store_station_list[index_for_station_selected].lat;
+                        lng_val = store_station_list[index_for_station_selected].lng;
+                        //display lat lng...
+                        //MessageBox.Show("lat= "+lat_val+" lng = "+lng_val);
+                        using (var wc = new WebClient())
+                        {
+                            // var json = await httpClient.GetStringAsync(api_url);
+
+                            // double station_id = store_station_list[index_for_station_selected].id;
+                            //MessageBox.Show("lat = " + lat_val + "lng = " + lng_val);
+                            string api_url = "http://api.openweathermap.org/data/2.5/weather?mode=xml&lat=" + lat_val + "&lon=" + lng_val + "&appid=615afd606af791f572a1f92b27a68bcd";
+                            //string api_url = "http://api.openweathermap.org/data/2.5/station?id="+station_id+"&APPID=615afd606af791f572a1f92b27a68bcd";
+
+                            var data = wc.DownloadString(api_url);
+                            MessageBox.Show("string apic return =" + data);
+                            string xml_string = data.ToString();
 
 
-                    //here we need to add to another table ie tbl_data_store_temp_hum_one_year which stores all the data...
-                    //first lets seprate the data and time...
-                    string[] value = last_update_pulled.Split('T');
-                    string date = value[0].ToString();
-                    string time = value[1].ToString();
-                    string[] val = time.Split(':');
-                    string hour = val[0].ToString();
-                    string minute = val[1].ToString();
 
 
-                   // MessageBox.Show("date = " + date + " time = " + time);
-                    /*steps :
-                     1.insert the values in the given database.
-                     * 2.make sure it is in correct formate..
-                     */
 
-                    //insert...
-                    string sql_query = "insert into tbl_historical_data(date_current,hour_current,minute_current,temperature,humidity,station_name) VALUES(@date_current,@hour_current,@minute_current,@temp_value,@hum_value,@station_name)";
-                    OleDbCommand cmdx = new OleDbCommand(sql_query, connection);
-                    cmdx.CommandType = CommandType.Text;
-                    cmdx.Parameters.AddWithValue("@date_current", date.ToString());
-                    cmdx.Parameters.AddWithValue("@hour_current", hour.ToString());
-                    cmdx.Parameters.AddWithValue("@minute_current", minute.ToString());
-                    cmdx.Parameters.AddWithValue("@temp_value", temp_adjust.ToString());
-                    cmdx.Parameters.AddWithValue("@hum_value", hum_pulled.ToString());         
-                    cmdx.Parameters.AddWithValue("@station_name", cb_station_names.SelectedItem.ToString());                    
-                    cmdx.ExecuteNonQuery();
+                            //xml parsing...
+                            XmlDocument xml = new XmlDocument();
+                            xml.LoadXml(xml_string);
 
-                   //finally close the connection.
-                   connection.Close();
-                
-                
-            }//close o using..
-                    }catch(Exception ex){
-                        MessageBox.Show(ex.Message);
-                    }
+                            XmlNodeList elem_city = xml.GetElementsByTagName("city");
+                            foreach (XmlNode x in elem_city)
+                            {
+                                city_name_pulled = x.Attributes["name"].Value;
+                                // MessageBox.Show("city name = " + city_name_pulled);
+                            }
+                            //for temperature
+                            XmlNodeList temp_list = xml.GetElementsByTagName("temperature");
+                            foreach (XmlNode x in temp_list)
+                            {
+                                temp_pulled = x.Attributes["value"].Value;
+                                MessageBox.Show("temp  = " + temp_pulled);
+                            }
+                            //for humidity
+                            XmlNodeList hum_list = xml.GetElementsByTagName("humidity");
+                            foreach (XmlNode x in hum_list)
+                            {
+                                hum_pulled = x.Attributes["value"].Value;
+                                //MessageBox.Show("hum  = " + hum_pulled);
+                            }
+                            //for pressure..
+                            XmlNodeList pressure_list = xml.GetElementsByTagName("pressure");
+                            foreach (XmlNode x in pressure_list)
+                            {
+                                pressure_pulled = x.Attributes["value"].Value;
+                                //MessageBox.Show("press = " + pressure_pulled);
+                            }
+                            //for wind 
 
-                    //step 4:display the value..
-                    //tb_location.Text = loc_value;
-                    //tb_last_updated.Text = last_update_pulled;
-                    //tb_distance_from_build.Text = d.ToString();
-                    //tb_cw_temp.Text = temp_adjust.ToString();
-                    //tb_cw_hum.Text = hum_pulled.ToString();
-                    //tb_cw_barometer_value.Text = pressure_pulled;
-                    //tb_cw_wind.Text = wind_speed_pulled.ToString();
-                    //tb_cw_direction.Text = direction_pulled.ToString();
-                    /* instead of reading the values lets pull the data...*/
-                    pull_stored_weather_data();
-                    
+                            XmlNodeList wind_list = xml.GetElementsByTagName("speed");
+                            foreach (XmlNode x in wind_list)
+                            {
+                                wind_speed_pulled = x.Attributes["value"].Value;
+                                //   MessageBox.Show("wind speed = " + wind_speed_pulled);
+                            }
+                            //for direction..
+                            XmlNodeList direction_list = xml.GetElementsByTagName("direction");
+                            foreach (XmlNode x in direction_list)
+                            {
+                                direction_pulled = x.Attributes["name"].Value;
+                                // MessageBox.Show("direction name = " + direction_pulled);
+                            }
+                            //for lat and long of station...
+                            XmlNodeList coord_list = xml.GetElementsByTagName("coord");
+                            foreach (XmlNode x in coord_list)
+                            {
+                                lat_pulled = x.Attributes["lat"].Value;
+                                long_pulled = x.Attributes["lon"].Value;
+
+                                // MessageBox.Show("lat = " + lat_pulled +"long" +long_pulled);
+                            }
+                            //for last date update time 
+                            XmlNodeList last_update_list = xml.GetElementsByTagName("lastupdate");
+                            foreach (XmlNode x in last_update_list)
+                            {
+                                last_update_pulled = x.Attributes["value"].Value;
+                                // MessageBox.Show("last update date = " + last_update_pulled);
+                            }
+
+                            //for country..
+                            XmlNodeList country_list = xml.GetElementsByTagName("country");
+                            foreach (XmlNode x in country_list)
+                            {
+                                country_name_pulled = x.InnerText;
+                                //  MessageBox.Show("country name = " + country_name_pulled);
+                            }
 
 
-                    MessageBox.Show("success !");
+                            //xml parsing closes but we need json parser..
+
+
+
+
+
+
+
+                            //step3. insert the values pulled into a database..
+
+                            //fist calculate lets calculate the distance...
+                            /*
+                                dlon = lon2 - lon1
+                                dlat = lat2 - lat1
+                                a = (sin(dlat/2))^2 + cos(lat1) * cos(lat2) * (sin(dlon/2))^2
+                                c = 2 * atan2( sqrt(a), sqrt(1-a) )
+                                d = R * c (where R is the radius of the Earth) 
+                             */
+                            string loc_value = "";
+                            double d = 0.0000;
+                            double temp_adjust = double.Parse(temp_pulled.ToString()) - 273.15;
+                            try
+                            {
+
+                                double R = 6371.0;//radius of earth in Km
+                                double dlon = double.Parse(long_pulled.ToString()) - lng_val;
+                                double dlat = double.Parse(lat_pulled.ToString()) - lat_val;
+                                double a = Math.Pow((Math.Sin(dlat / 2)), 2) + Math.Cos(lat_val) * Math.Cos(double.Parse(lat_pulled.ToString())) * Math.Pow((Math.Sin(dlon / 2)), 2);
+                                double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+                                d = R * c;//This is the distance
+                                loc_value = country_name_pulled + "," + city_name_pulled;
+                                //lets check a simple thing if the index is pressent then update else insert the data...
+
+                                /*steps.. count the number of items in a column 
+                                 1.if the count is less than the index_selected then update else insert
+                                 */
+
+
+
+                                using (SqlConnection connection = new SqlConnection(connString))
+                                {
+                                    connection.Open();
+                                    SqlDataReader reader = null;
+                                    int count_col_table = 0;
+                                    //lets check the data first...
+                                    //step1.
+                                    string count_num_column = "select count(id) from tbl_weather_related_values ";
+                                    SqlCommand cmd1 = new SqlCommand(count_num_column, connection);
+                                    reader = cmd1.ExecuteReader();
+                                    while (reader.Read())
+                                    {
+                                        //lets get the value...
+                                        count_col_table = Convert.ToInt32(reader[0].ToString());
+                                    }
+                                    MessageBox.Show("count_col_table  =" + count_col_table);
+                                    reader.Close();
+                                    //step2. condition
+                                    if (count_col_table >= index_selected)
+                                    {
+                                        //update previous value
+
+                                        string sql_string = "update tbl_weather_related_values set  location=@location_value,distance_from_building=@distance_value,last_update_date=@last_value,temp=@temp_value,humidity=@hum_value,bar_pressure=@pressure_value,wind=@wind_value,direction=@direction_value,station_name=@station_name   where ID = @index_selected;";
+                                        SqlCommand command = new SqlCommand(sql_string, connection);
+                                        command.CommandType = CommandType.Text;
+                                        command.Parameters.AddWithValue("@location_value", loc_value.ToString());
+                                        command.Parameters.AddWithValue("@distance_value", d.ToString());
+                                        command.Parameters.AddWithValue("@last_value", last_update_pulled.ToString());
+                                        command.Parameters.AddWithValue("@temp_value", temp_adjust.ToString());
+                                        command.Parameters.AddWithValue("@hum_value", hum_pulled.ToString());
+                                        command.Parameters.AddWithValue("@pressure_value", pressure_pulled.ToString());
+                                        command.Parameters.AddWithValue("@wind_value", wind_speed_pulled.ToString());
+                                        command.Parameters.AddWithValue("@direction_value", direction_pulled.ToString());
+                                        command.Parameters.AddWithValue("@station_name", cb_station_names.SelectedItem.ToString());
+                                        command.Parameters.AddWithValue("@index_selected", index_selected);
+                                        MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
+                                        MessageBox.Show("updating...");
+
+                                        command.ExecuteNonQuery();
+                                        //MessageBox.Show("sql string = " + sql_string);
+                                        //MessageBox.Show("value updated successfully!");
+
+                                    }
+                                    else
+                                    {
+                                        //insert...
+                                        string sql_string = "insert into tbl_weather_related_values(location,distance_from_building,last_update_date,temp,humidity,bar_pressure,wind,direction,station_name) VALUES(@location_value,@distance_value,@last_value,@temp_value,@hum_value,@pressure_value,@wind_value,@direction_value,@station_name)";
+                                        SqlCommand command = new SqlCommand(sql_string, connection);
+                                        command.CommandType = CommandType.Text;
+                                        command.Parameters.AddWithValue("@location_value", loc_value.ToString());
+                                        command.Parameters.AddWithValue("@distance_value", d.ToString());
+                                        command.Parameters.AddWithValue("@last_value", last_update_pulled.ToString());
+                                        command.Parameters.AddWithValue("@temp_value", temp_adjust.ToString());
+                                        command.Parameters.AddWithValue("@hum_value", hum_pulled.ToString());
+                                        command.Parameters.AddWithValue("@pressure_value", pressure_pulled.ToString());
+                                        command.Parameters.AddWithValue("@wind_value", wind_speed_pulled.ToString());
+                                        command.Parameters.AddWithValue("@direction_value", direction_pulled.ToString());
+                                        command.Parameters.AddWithValue("@station_name", cb_station_names.SelectedItem.ToString());
+                                        MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
+                                        command.ExecuteNonQuery();
+                                    }
+
+
+                                    //here we need to add to another table ie tbl_data_store_temp_hum_one_year which stores all the data...
+                                    //first lets seprate the data and time...
+                                    string[] value = last_update_pulled.Split('T');
+                                    string date = value[0].ToString();
+                                    string time = value[1].ToString();
+                                    string[] val = time.Split(':');
+                                    string hour = val[0].ToString();
+                                    string minute = val[1].ToString();
+
+
+                                    // MessageBox.Show("date = " + date + " time = " + time);
+                                    /*steps :
+                                     1.insert the values in the given database.
+                                     * 2.make sure it is in correct formate..
+                                     */
+
+                                    //insert...
+                                    MessageBox.Show("tempe= " +temp_adjust+ " hum = "+hum_pulled );
+                                    string sql_query = "insert into tbl_historical_data(ID,date_current,hour_current,minute_current,temperature,humidity,station_name) VALUES(@id_value,@date_current,@hour_current,@minute_current,@temp_value,@hum_value,@station_name)";
+                                    SqlCommand cmdx = new SqlCommand(sql_query, connection);
+                                    cmdx.CommandType = CommandType.Text;
+                                    cmdx.Parameters.AddWithValue("@id_value", index_selected);//this index selected identifies the location or building info...
+                                    cmdx.Parameters.AddWithValue("@date_current", date.ToString());
+                                    cmdx.Parameters.AddWithValue("@hour_current", hour.ToString());
+                                    cmdx.Parameters.AddWithValue("@minute_current", minute.ToString());
+                                    cmdx.Parameters.AddWithValue("@temp_value", temp_adjust.ToString());
+                                    cmdx.Parameters.AddWithValue("@hum_value", hum_pulled.ToString());
+                                    cmdx.Parameters.AddWithValue("@station_name", cb_station_names.SelectedItem.ToString());
+                                    cmdx.ExecuteNonQuery();
+
+                                    //finally close the connection.
+                                    connection.Close();
+
+
+                                }//close o using..
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message);
+                            }
+
+                            //step 4:display the value..
+                            //tb_location.Text = loc_value;
+                            //tb_last_updated.Text = last_update_pulled;
+                            //tb_distance_from_build.Text = d.ToString();
+                            //tb_cw_temp.Text = temp_adjust.ToString();
+                            //tb_cw_hum.Text = hum_pulled.ToString();
+                            //tb_cw_barometer_value.Text = pressure_pulled;
+                            //tb_cw_wind.Text = wind_speed_pulled.ToString();
+                            //tb_cw_direction.Text = direction_pulled.ToString();
+                            /* instead of reading the values lets pull the data...*/
+                            pull_stored_weather_data();
+
+
+
+                            MessageBox.Show("success !");
+                        }
+
+                    }//close of else...block for tb_latitude and tb_longitude..
+
                 }
-
-                }//close of else...block for tb_latitude and tb_longitude..
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
 
 
             }//close of index_for_station_selected>-1
@@ -761,55 +776,7 @@ namespace WFA_psychometric_chart
         
         }//close of btn private void..
 
-        //private void button5_Click(object sender, EventArgs e)
-        //{   
-        //    //storing the value in the database...
-        //    if (index_selected > 0)
-        //    {
-             
-   
-        //    if((tb_longitude.Text != "") && (tb_latitude.Text != ""))
-        //    try
-        //    {
-        //        string lat_value = tb_latitude.Text;
-        //        string long_value = tb_longitude.Text;
-        //        MessageBox.Show("lat= " + lat_value + " lng= " + long_value);
-        //        //string elev_value = tb_elev.Text;
-        //        //lets pull the vales offline values stored in db...
-        //        string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-        //        //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";                
-        //        string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-        //        using (OleDbConnection connection = new OleDbConnection(connString))
-        //        {
-        //            connection.Open();
-        //            string sql_string = "update tbl_building_location set   latitude=@latitude_value,longitude=@longitude_value where ID = @index_selected;";
-        //            OleDbCommand command = new OleDbCommand(sql_string, connection);
-        //            command.CommandType = CommandType.Text;
-        //            command.Parameters.AddWithValue("@latitude_value", lat_value);
-        //            command.Parameters.AddWithValue("@longitude_value", long_value);
-        //            command.Parameters.AddWithValue("@index_selected", index_selected);
-
-        //            command.ExecuteNonQuery();
-        //            //MessageBox.Show("sql string = " + sql_string);
-        //            MessageBox.Show("value updated successfully!");
-                   
-        //        }
-                
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message);
-        //    }
-
-        //    }
-        //    else
-        //    {
-        //        //print error..
-        //        MessageBox.Show("Please pull the store data first..");
-        //    }
-
-        //}
-
+       
         private void button1_Click(object sender, EventArgs e)
         {
             //This will help to insert the values...
@@ -828,14 +795,17 @@ namespace WFA_psychometric_chart
             //lets pull the vales offline values stored in db...
             string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-            string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-           // MessageBox.Show("connection string = " + connString);
+           // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+
+            string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+            // MessageBox.Show("connection string = " + connString);
 
 
-            OleDbConnection connection = new OleDbConnection(connString);
+            SqlConnection connection = new SqlConnection(connString);
                 connection.Open();
-                OleDbDataReader reader = null;
-                OleDbCommand comm = new OleDbCommand("SELECT * from tbl_building_location", connection);
+                SqlDataReader reader = null;
+                SqlCommand comm = new SqlCommand("SELECT * from tbl_building_location", connection);
                 //command.Parameters.AddWithValue("@1", userName)
                 reader = comm.ExecuteReader();
                 while (reader.Read())
@@ -906,7 +876,8 @@ namespace WFA_psychometric_chart
                 //lets pull the vales offline values stored in db...
                 string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-                string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+               // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
 
                 if (tb_latitude.Text == "" && tb_longitude.Text == "")
                 {
@@ -1040,28 +1011,29 @@ namespace WFA_psychometric_chart
 
 
 
-                            using (OleDbConnection connection = new OleDbConnection(connString))
+                            using (SqlConnection connection = new SqlConnection(connString))
                             {
                                 connection.Open();
                                 int count_col_table = 0;
                                 //lets check the data first...
                                 //step1.
                                 string count_num_column = "select count(id) from tbl_weather_related_values ";
-                                OleDbCommand cmd1 = new OleDbCommand(count_num_column, connection);
-                                OleDbDataReader reader = cmd1.ExecuteReader();
+                                SqlCommand cmd1 = new SqlCommand(count_num_column, connection);
+                                SqlDataReader reader = cmd1.ExecuteReader();
                                 while (reader.Read())
                                 {
                                     //lets get the value...
                                     count_col_table = Convert.ToInt32(reader[0].ToString());
                                 }
                                // MessageBox.Show("count_col_table  =" + count_col_table);
+                                reader.Close();
                                 //step2. condition
                                 if (count_col_table >= index_selected)
                                 {
                                     //update previous value
 
                                     string sql_string = "update tbl_weather_related_values set  location=@location_value,distance_from_building=@distance_value,last_update_date=@last_value,temp=@temp_value,humidity=@hum_value,bar_pressure=@pressure_value,wind=@wind_value,direction=@direction_value,station_name=@station_name   where ID = @index_selected;";
-                                    OleDbCommand command = new OleDbCommand(sql_string, connection);
+                                    SqlCommand command = new SqlCommand(sql_string, connection);
                                     command.CommandType = CommandType.Text;
                                     command.Parameters.AddWithValue("@location_value", loc_value.ToString());
                                     command.Parameters.AddWithValue("@distance_value", d.ToString());
@@ -1086,7 +1058,7 @@ namespace WFA_psychometric_chart
                                 {
                                     //insert...
                                     string sql_string = "insert into tbl_weather_related_values(location,distance_from_building,last_update_date,temp,humidity,bar_pressure,wind,direction,station_name) VALUES(@location_value,@distance_value,@last_value,@temp_value,@hum_value,@pressure_value,@wind_value,@direction_value,@station_name)";
-                                    OleDbCommand command = new OleDbCommand(sql_string, connection);
+                                    SqlCommand command = new SqlCommand(sql_string, connection);
                                     command.CommandType = CommandType.Text;
                                     command.Parameters.AddWithValue("@location_value", loc_value.ToString());
                                     command.Parameters.AddWithValue("@distance_value", d.ToString());
@@ -1113,7 +1085,7 @@ namespace WFA_psychometric_chart
 
                                 //insert...
                                 string sql_query = "insert into tbl_data_stored_temp_hum_one_year(date_current,time_current,temperature,humidity,station_name) VALUES(@date_current,@time_current,@temp_value,@hum_value,@station_name)";
-                                OleDbCommand cmdx = new OleDbCommand(sql_query, connection);
+                                SqlCommand cmdx = new SqlCommand(sql_query, connection);
                                 cmdx.CommandType = CommandType.Text;
                                 cmdx.Parameters.AddWithValue("@date_current", date.ToString());
                                 cmdx.Parameters.AddWithValue("@time_current", time.ToString());
@@ -1275,7 +1247,7 @@ namespace WFA_psychometric_chart
                             tb_current_offset_percent.Text = total_percentage_change.ToString();
                         }
 
-                        tb_current_offset.Text = sensor_hum.ToString();
+                       // tb_current_offset.Text = sensor_hum.ToString();
                         /*percentage..*/
                         //double percent = (current_weather_hum - sensor_hum) / current_weather_hum * 100;
                         //tb_current_offset_percent.Text = percent.ToString();
@@ -1318,9 +1290,9 @@ namespace WFA_psychometric_chart
             //MessageBox.Show("pulled...");
         }
 
-
-        private void btn_set_value_Click(object sender, EventArgs e)
+        public void self_calibrate()
         {
+
             try
             {
                 if (tb_hum_panel_value.Text != "")
@@ -1328,18 +1300,20 @@ namespace WFA_psychometric_chart
                     if (tb_cw_hum.Text != "")
                     {
                         if (tb_max_adjust.Text != "")
-                        { double x = double.Parse(tb_max_adjust.Text);
-                        if (x >= 0 && x <= 2) { 
-                            //temp_from_weather = double.Parse(tb_cw_temp.ToString());
-                            sensor_hum = Double.Parse(tb_hum_panel_value.Text);
-                            current_weather_hum = Double.Parse(tb_cw_hum.Text);
-                            InitTimer2();
-                        }
-                        else
                         {
-                            MessageBox.Show("Please enter value between 0-2%");
-                            tb_max_adjust.Text = "";
-                        }
+                            double x = double.Parse(tb_max_adjust.Text);
+                            if (x >= 0 && x <= 1)
+                            {
+                                //temp_from_weather = double.Parse(tb_cw_temp.ToString());
+                                sensor_hum = Double.Parse(tb_hum_panel_value.Text);
+                                current_weather_hum = Double.Parse(tb_cw_hum.Text);
+                                InitTimer2();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Please enter value between 0-1%");
+                                tb_max_adjust.Text = "";
+                            }
                         }
                         else
                         {
@@ -1363,6 +1337,11 @@ namespace WFA_psychometric_chart
             }
         }
 
+
+        private void btn_set_value_Click(object sender, EventArgs e)
+        {
+        }
+
         private void Form3_ClosingForm(object sender, FormClosingEventArgs e)
         {
             timer2.Dispose();
@@ -1381,7 +1360,7 @@ namespace WFA_psychometric_chart
             tb_location.Enabled = false;
             tb_distance_from_build.Enabled = false;
             tb_last_updated.Enabled = false;
-            btn_pull_offline_data.Enabled = false;
+           // btn_pull_offline_data.Enabled = false;
             btn_update_now.Enabled = false;
             tb_cw_barometer_value.Enabled = false;
             tb_cw_direction.Enabled = false;
@@ -1454,6 +1433,29 @@ namespace WFA_psychometric_chart
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+
+        }
+
+        private void tb_max_adjust_TextChanged(object sender, EventArgs e)
+        {
+           //this is where we are going to call the function ...
+            string a = tb_max_adjust.Text;
+            try
+            {
+                if (a.Length > 1)
+                {
+                    double x = double.Parse(a);
+                    self_calibrate();
+                }
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Please enter a valid number : "+ex.Message);
             }
 
         }

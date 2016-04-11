@@ -294,3 +294,4 @@ typedef struct _MessageInvokeIDInfo
 //#include "Bacnet_Include.h"
 //#define _DEBUG
 //*********************************link to dll***************************
+#include "MlString.h"

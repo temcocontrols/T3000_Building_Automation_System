@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "SelectLanguage.h"
 #include "T3000.h"
 #include "RefreshTreeThread.h"
 #include "MainFrm.h"
@@ -26,6 +27,10 @@ CRefreshTreeThread::~CRefreshTreeThread()
 
 BOOL CRefreshTreeThread::InitInstance()
 {
+    //Show the language select dialog
+    CSelectLanguage sl ;
+    sl.LoadSettingsAndShow() ;
+ 
 	// TODO:  perform and per-thread initialization here
 
    return TRUE;

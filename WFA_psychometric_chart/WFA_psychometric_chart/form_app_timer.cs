@@ -8,7 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Collections; 
+using System.Collections;
+using System.Data.SqlClient; 
 
 
 namespace WFA_psychometric_chart
@@ -80,7 +81,7 @@ namespace WFA_psychometric_chart
                 if (checkedListBox1.CheckedItems.Count > 0)
                 {
 
-                string t = null;
+                //string t = null;
 
                 
                 //lets check if the hour was changed or not...
@@ -105,9 +106,11 @@ namespace WFA_psychometric_chart
                   if (dtp2.Value > dtp1.Value) { 
 
                   string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                  string connString1 = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                //  string connString1 = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                //sql connection string is this..
+                      string connString1 = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
 
-                  using (OleDbConnection connection1 = new OleDbConnection(connString1))
+                      using (SqlConnection connection1 = new SqlConnection(connString1))
                   {
                       connection1.Open();
 
@@ -115,8 +118,8 @@ namespace WFA_psychometric_chart
 
                       //string sql_query = "Select * from tbl_data_stored_temp_hum_one_year WHERE date_current = " + day_list[i] + " , hour_current = " + hour_al[h] + " AND station_name = "+ station_name +" ; ";
                       //lets pass this string to a query which does the pulling part.
-                      OleDbDataReader reader1 = null;
-                      OleDbCommand command1 = new OleDbCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second", connection1);
+                      SqlDataReader reader1 = null;
+                      SqlCommand command1 = new SqlCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second", connection1);
                       command1.Parameters.AddWithValue("@date_first", dtp1.Value);
                       command1.Parameters.AddWithValue("@date_second", dtp2.Value);
                       //command1.Parameters.AddWithValue("@station_name", station_name);

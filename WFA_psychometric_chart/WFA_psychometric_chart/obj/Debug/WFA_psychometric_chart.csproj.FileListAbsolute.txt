@@ -48,14 +48,59 @@ C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug
 C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\Newtonsoft.Json.xml
 C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csprojResolveAssemblyReference.cache
 C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1.resources
-C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form2.resources
 C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.resources
 C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Properties.Resources.resources
 C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csproj.GenerateResource.Cache
 C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.resources
 C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.resources
-C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form5_real_time_plot.resources
 C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.resources
-C:\Users\RajuPC\Dropbox\Psychometric Chart\new updated march 18\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.exe.config
-C:\Users\RajuPC\Dropbox\Psychometric Chart\new updated march 18\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.exe
-C:\Users\RajuPC\Dropbox\Psychometric Chart\new updated march 18\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.pdb
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\en-US\WFA_psychometric_chart.resources.dll
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.en-US.resources
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1.en-US.resources
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.en-US.resources
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.en-US.resources
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.en-US.resources
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\en-US\WFA_psychometric_chart.resources.dll
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\zh-CHS\WFA_psychometric_chart.resources.dll
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.zh-CHS.resources
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1.zh-CHS.resources
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.zh-CHS.resources
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.zh-CHS.resources
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.zh-CHS.resources
+C:\Users\nischal\Desktop\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\zh-CHS\WFA_psychometric_chart.resources.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.exe.config
+C:\Users\RajuPC\Dropbox\Psychometric Chart\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.exe
+C:\Users\RajuPC\Dropbox\Psychometric Chart\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.pdb
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.exe.config
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.exe
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.pdb
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.exe
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.pdb
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\en-US\WFA_psychometric_chart.resources.dll
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\zh-CHS\WFA_psychometric_chart.resources.dll
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\Newtonsoft.Json.dll
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\Newtonsoft.Json.xml
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csprojResolveAssemblyReference.cache
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Properties.Resources.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.en-US.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.zh-CHS.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1.en-US.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1.zh-CHS.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.en-US.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.zh-CHS.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.en-US.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.zh-CHS.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.en-US.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.zh-CHS.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csproj.GenerateResource.Cache
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\en-US\WFA_psychometric_chart.resources.dll
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\zh-CHS\WFA_psychometric_chart.resources.dll
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_heat_map.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_export_data.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\Interop.Microsoft.Office.Core.dll
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csproj.ResolveComReference.cache

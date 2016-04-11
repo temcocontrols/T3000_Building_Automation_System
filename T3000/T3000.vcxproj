@@ -76,8 +76,8 @@
       <AdditionalIncludeDirectories>..\BacNetDllforVc\;..\BacNetDllforVc\MainCpp\;..\BacNetDllforVc\include\;..\BacNetDllforVc\object\;..\BacNetDllforVc\handler\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;AFX_RESOURCE_DLL;AFX_TARG_CHS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0804</Culture>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
@@ -110,8 +110,8 @@
       <AdditionalIncludeDirectories>..\BacNetDllforVc\;..\BacNetDllforVc\MainCpp\;..\BacNetDllforVc\include\;..\BacNetDllforVc\object\;..\BacNetDllforVc\handler\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;AFX_RESOURCE_DLL;AFX_TARG_CHS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0804</Culture>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
@@ -124,6 +124,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <ResourceCompile>
+      <PreprocessorDefinitions>AFX_RESOURCE_DLL;AFX_TARG_CHS</PreprocessorDefinitions>
+      <Culture>0x0804</Culture>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\ISP\MyPing.cpp" />
@@ -256,6 +262,7 @@
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="ManageAccountDlg.cpp" />
     <ClCompile Include="MannageBuidingDlg.cpp" />
+    <ClCompile Include="MlString.cpp" />
     <ClCompile Include="monthview1.cpp" />
     <ClCompile Include="msflexgrid1.cpp" />
     <ClCompile Include="MySocket.cpp" />
@@ -278,6 +285,7 @@
     <ClCompile Include="ScanDlg.cpp" />
     <ClCompile Include="ScanSelectDlg.cpp" />
     <ClCompile Include="Scanwaydlg.cpp" />
+    <ClCompile Include="SelectLanguage.cpp" />
     <ClCompile Include="SetPtDayDlg.cpp" />
     <ClCompile Include="SetptGraphicBar.cpp" />
     <ClCompile Include="StaticDlg.cpp" />
@@ -532,6 +540,7 @@
     <ClInclude Include="IONameConfig.h" />
     <ClInclude Include="LanguageLocale.h" />
     <ClInclude Include="LCOutNameConfig.h" />
+    <ClInclude Include="MlString.h" />
     <ClInclude Include="NewHumChamberView.h" />
     <ClInclude Include="ping.h" />
     <ClInclude Include="PressureSensorForm.h" />
@@ -540,6 +549,7 @@
     <ClInclude Include="RegisterViewerDlg.h" />
     <ClInclude Include="RegisterWriteValueDlg.h" />
     <ClInclude Include="Scanwaydlg.h" />
+    <ClInclude Include="SelectLanguage.h" />
     <ClInclude Include="StaticDlg.h" />
     <ClInclude Include="StatusbarCtrl.h" />
     <ClInclude Include="T3000DefaultView.h" />
@@ -657,6 +667,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="T3000_ml.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

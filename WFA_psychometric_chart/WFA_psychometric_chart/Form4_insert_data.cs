@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using System.IO;
-
+using System.Data.SqlClient;
 
 namespace WFA_psychometric_chart
 {
@@ -56,15 +56,18 @@ namespace WFA_psychometric_chart
                 try
                 {
                      //lets pull the vales offline values stored in db...
-                    string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                   // string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                     //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";                
-                    string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-                    using (OleDbConnection connection = new OleDbConnection(connString))
+                    //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                    string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+                    using (SqlConnection connection = new SqlConnection(connString))
                     {
+
                         connection.Open();
                         //string sql_string = "update tbl_building_location set   country=@country_value,state=@state_value,city=@city_value,street=@street_value,ZIP=@zip_value where ID = 1;";
                         string sql_query = "INSERT INTO tbl_building_location(country,state,city,street,zip,longitude,latitude,elevation) VALUES(@country_value,@state_value,@city_value,@street_value,@zip_value,@long_value,@lat_value,@elevation_value)";
-                        OleDbCommand command = new OleDbCommand(sql_query, connection);
+                         SqlCommand command = new SqlCommand(sql_query, connection);
                         command.CommandType = CommandType.Text;
                         command.Parameters.AddWithValue("@country_value", country);
                         command.Parameters.AddWithValue("@state_value", state);
@@ -224,8 +227,72 @@ namespace WFA_psychometric_chart
         private void button3_Click(object sender, EventArgs e)
         {
             //this is where online elevation and other facotrs are pulled..
-            pull_data_online();            
+            //pull_data_online();            
             
+
+        }
+
+        private void tb_country_text_change_event(object sender, EventArgs e)
+        {
+            string a = tb_country.Text;
+
+            if(a.Length<0){
+                //if the length is < 2 do nothing 
+
+            }
+            else if(a.Length>=0 && a.Length <= 2){
+                  tb_state.Enabled = false;
+                tb_city.Enabled = false;
+            }
+            else {
+                //otherwise activate other textbox..
+
+                tb_state.Enabled = true;
+                tb_city.Enabled = true;
+
+
+            }
+            
+
+
+
+        }
+
+        private void tb_city_text_change_event(object sender, EventArgs e)
+        {
+            string a = tb_city.Text;
+
+            if (a.Length < 0)
+            {
+                //if the length is < 2 do nothing 
+
+            }
+            else if (a.Length >= 0 && a.Length <= 2)
+            {
+                tb_street.Enabled = false;
+                tb_ZIP.Enabled = false;
+            }
+            else
+            {
+                //otherwise activate other textbox..
+
+                tb_street.Enabled = true;
+                tb_ZIP.Enabled = true;
+
+
+            }
+
+
+
+
+        }
+
+        private void tb_zip_textChange_event(object sender, EventArgs e)
+        {
+            //here we actually call the pulling function..
+            pull_data_online(); 
+
+
 
         }
 

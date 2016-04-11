@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form4_insert_data));
             this.tb_country = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -50,279 +51,181 @@
             this.tb_longitude = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
             this.tb_latitude = new System.Windows.Forms.TextBox();
-            this.btn_pull_online_data = new System.Windows.Forms.Button();
             this.label13 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // tb_country
             // 
-            this.tb_country.Location = new System.Drawing.Point(326, 71);
+            resources.ApplyResources(this.tb_country, "tb_country");
             this.tb_country.Name = "tb_country";
-            this.tb_country.Size = new System.Drawing.Size(200, 20);
-            this.tb_country.TabIndex = 0;
+            this.tb_country.TextChanged += new System.EventHandler(this.tb_country_text_change_event);
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(259, 77);
+            resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(49, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Country :";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(259, 103);
+            resources.ApplyResources(this.label2, "label2");
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(38, 13);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "State :";
             // 
             // tb_state
             // 
-            this.tb_state.Location = new System.Drawing.Point(326, 97);
+            resources.ApplyResources(this.tb_state, "tb_state");
             this.tb_state.Name = "tb_state";
-            this.tb_state.Size = new System.Drawing.Size(200, 20);
-            this.tb_state.TabIndex = 2;
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(259, 129);
+            resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(30, 13);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "City :";
             // 
             // tb_city
             // 
-            this.tb_city.Location = new System.Drawing.Point(326, 123);
+            resources.ApplyResources(this.tb_city, "tb_city");
             this.tb_city.Name = "tb_city";
-            this.tb_city.Size = new System.Drawing.Size(200, 20);
-            this.tb_city.TabIndex = 4;
+            this.tb_city.TextChanged += new System.EventHandler(this.tb_city_text_change_event);
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(259, 155);
+            resources.ApplyResources(this.label4, "label4");
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(41, 13);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "Street :";
             // 
             // tb_street
             // 
-            this.tb_street.Location = new System.Drawing.Point(326, 149);
+            resources.ApplyResources(this.tb_street, "tb_street");
             this.tb_street.Name = "tb_street";
-            this.tb_street.Size = new System.Drawing.Size(200, 20);
-            this.tb_street.TabIndex = 6;
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(259, 181);
+            resources.ApplyResources(this.label5, "label5");
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(30, 13);
-            this.label5.TabIndex = 9;
-            this.label5.Text = "ZIP :";
             // 
             // tb_ZIP
             // 
-            this.tb_ZIP.Location = new System.Drawing.Point(326, 175);
+            resources.ApplyResources(this.tb_ZIP, "tb_ZIP");
             this.tb_ZIP.Name = "tb_ZIP";
-            this.tb_ZIP.Size = new System.Drawing.Size(200, 20);
-            this.tb_ZIP.TabIndex = 8;
+            this.tb_ZIP.TextChanged += new System.EventHandler(this.tb_zip_textChange_event);
             // 
             // label6
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(539, 78);
+            resources.ApplyResources(this.label6, "label6");
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(11, 13);
-            this.label6.TabIndex = 10;
-            this.label6.Text = "*";
             // 
             // label7
             // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(539, 130);
+            resources.ApplyResources(this.label7, "label7");
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(11, 13);
-            this.label7.TabIndex = 11;
-            this.label7.Text = "*";
             // 
             // btn_insert_data
             // 
-            this.btn_insert_data.Enabled = false;
-            this.btn_insert_data.Location = new System.Drawing.Point(451, 312);
+            resources.ApplyResources(this.btn_insert_data, "btn_insert_data");
             this.btn_insert_data.Name = "btn_insert_data";
-            this.btn_insert_data.Size = new System.Drawing.Size(89, 23);
-            this.btn_insert_data.TabIndex = 12;
-            this.btn_insert_data.Text = "Insert Data";
             this.btn_insert_data.UseVisualStyleBackColor = true;
             this.btn_insert_data.Click += new System.EventHandler(this.button1_Click);
             // 
             // label8
             // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(599, 228);
+            resources.ApplyResources(this.label8, "label8");
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(11, 13);
-            this.label8.TabIndex = 13;
-            this.label8.Text = "*";
             // 
             // label9
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(616, 227);
+            resources.ApplyResources(this.label9, "label9");
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(85, 13);
-            this.label9.TabIndex = 14;
-            this.label9.Text = "= Required input";
             // 
             // tbn_cancel
             // 
-            this.tbn_cancel.Location = new System.Drawing.Point(262, 312);
+            resources.ApplyResources(this.tbn_cancel, "tbn_cancel");
             this.tbn_cancel.Name = "tbn_cancel";
-            this.tbn_cancel.Size = new System.Drawing.Size(89, 23);
-            this.tbn_cancel.TabIndex = 15;
-            this.tbn_cancel.Text = "Cancel";
             this.tbn_cancel.UseVisualStyleBackColor = true;
             this.tbn_cancel.Click += new System.EventHandler(this.button2_Click);
             // 
             // label10
             // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(259, 259);
+            resources.ApplyResources(this.label10, "label10");
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(57, 13);
-            this.label10.TabIndex = 21;
-            this.label10.Text = "Elevation :";
             // 
             // tb_elevation
             // 
-            this.tb_elevation.Location = new System.Drawing.Point(326, 253);
+            resources.ApplyResources(this.tb_elevation, "tb_elevation");
             this.tb_elevation.Name = "tb_elevation";
             this.tb_elevation.ReadOnly = true;
-            this.tb_elevation.Size = new System.Drawing.Size(200, 20);
-            this.tb_elevation.TabIndex = 20;
             // 
             // label11
             // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(259, 233);
+            resources.ApplyResources(this.label11, "label11");
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(60, 13);
-            this.label11.TabIndex = 19;
-            this.label11.Text = "Longitude :";
             // 
             // tb_longitude
             // 
-            this.tb_longitude.Location = new System.Drawing.Point(326, 227);
+            resources.ApplyResources(this.tb_longitude, "tb_longitude");
             this.tb_longitude.Name = "tb_longitude";
             this.tb_longitude.ReadOnly = true;
-            this.tb_longitude.Size = new System.Drawing.Size(200, 20);
-            this.tb_longitude.TabIndex = 18;
             // 
             // label12
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(259, 207);
+            resources.ApplyResources(this.label12, "label12");
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(51, 13);
-            this.label12.TabIndex = 17;
-            this.label12.Text = "Latitude :";
             // 
             // tb_latitude
             // 
-            this.tb_latitude.Location = new System.Drawing.Point(326, 201);
+            resources.ApplyResources(this.tb_latitude, "tb_latitude");
             this.tb_latitude.Name = "tb_latitude";
             this.tb_latitude.ReadOnly = true;
-            this.tb_latitude.Size = new System.Drawing.Size(200, 20);
-            this.tb_latitude.TabIndex = 16;
-            // 
-            // btn_pull_online_data
-            // 
-            this.btn_pull_online_data.Location = new System.Drawing.Point(356, 312);
-            this.btn_pull_online_data.Name = "btn_pull_online_data";
-            this.btn_pull_online_data.Size = new System.Drawing.Size(89, 23);
-            this.btn_pull_online_data.TabIndex = 22;
-            this.btn_pull_online_data.Text = "Pull online data";
-            this.btn_pull_online_data.UseVisualStyleBackColor = true;
-            this.btn_pull_online_data.Click += new System.EventHandler(this.button3_Click);
             // 
             // label13
             // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(539, 182);
+            resources.ApplyResources(this.label13, "label13");
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(11, 13);
-            this.label13.TabIndex = 23;
-            this.label13.Text = "*";
             // 
             // label14
             // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(539, 208);
+            resources.ApplyResources(this.label14, "label14");
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(15, 13);
-            this.label14.TabIndex = 24;
-            this.label14.Text = "**";
             // 
             // label15
             // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(539, 233);
+            resources.ApplyResources(this.label15, "label15");
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(15, 13);
-            this.label15.TabIndex = 25;
-            this.label15.Text = "**";
             // 
             // label16
             // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(539, 259);
+            resources.ApplyResources(this.label16, "label16");
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(15, 13);
-            this.label16.TabIndex = 26;
-            this.label16.Text = "**";
             // 
             // label17
             // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(595, 256);
+            resources.ApplyResources(this.label17, "label17");
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(15, 13);
-            this.label17.TabIndex = 27;
-            this.label17.Text = "**";
             // 
             // label18
             // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(616, 253);
+            resources.ApplyResources(this.label18, "label18");
             this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(95, 13);
-            this.label18.TabIndex = 28;
-            this.label18.Text = "= Filled by program";
+            // 
+            // label19
+            // 
+            resources.ApplyResources(this.label19, "label19");
+            this.label19.Name = "label19";
             // 
             // Form4_insert_data
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(859, 449);
+            this.Controls.Add(this.label19);
             this.Controls.Add(this.label18);
             this.Controls.Add(this.label17);
             this.Controls.Add(this.label16);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.label13);
-            this.Controls.Add(this.btn_pull_online_data);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.tb_elevation);
             this.Controls.Add(this.label11);
@@ -348,7 +251,6 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form4_insert_data";
-            this.Text = "Insert Data";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -378,12 +280,12 @@
         private System.Windows.Forms.TextBox tb_longitude;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.TextBox tb_latitude;
-        private System.Windows.Forms.Button btn_pull_online_data;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label19;
     }
 }

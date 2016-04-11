@@ -1,0 +1,4 @@
+1.first create a database name exactly as "db_psychrometric_porject"
+2.import the database files( it is in excel format )in the database using import widzard 
+3. Start the app and run it
+Bhoj bdr karki(2016-april-10th)

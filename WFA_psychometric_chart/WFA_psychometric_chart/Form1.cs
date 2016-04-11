@@ -16,6 +16,7 @@ using Newtonsoft.Json.Linq;
 using System.Data.OleDb;
 using System.Xml.Linq;
 using System.Timers;
+using System.Data.SqlClient;
 
 
 
@@ -23,9 +24,10 @@ namespace WFA_psychometric_chart
 {
     public partial class Form1 : Form
     {
-        OleDbCommand cmd = new OleDbCommand();
-        OleDbConnection con = new OleDbConnection();
-
+        //OleDbCommand cmd = new OleDbCommand();
+        //OleDbConnection con = new OleDbConnection();
+        SqlConnection con = new SqlConnection();
+        SqlCommand cmd = new SqlCommand();
         public Form1()
         {
             InitializeComponent();
@@ -456,38 +458,18 @@ namespace WFA_psychometric_chart
             //this is other part.
             radioButton1.Checked = true;
 
-            string dir = System.IO.Path.GetDirectoryName(
-  System.Reflection.Assembly.GetExecutingAssembly().Location);
-
+            string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             //string file = dir + @"\TestDir\TestFile.txt";
-
             //con.ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-            con.ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source="+dir+@"\T3000.mdb;Persist Security Info=True";
+           //change here..
+            
+            //con.ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source="+dir+@"\T3000.mdb;Persist Security Info=True";
+            //this is sql connnection string..
+            con.ConnectionString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
             cmd.Connection = con;
 
             
         }
-
-        //private void radioButton2_CheckedChanged(object sender, EventArgs e)
-        //{
-        //    //The units will be changed here for EU unit this change
-
-        //    if (radioButton2.Checked == true)
-        //    {
-        //        //MessageBox.Show("You have pressed 2");
-
-        //        unit_temp.Text = "Deg.F";
-        //        unit_humidity.Text = "%";
-        //       // unit_ap.Text = "";
-
-
-
-
-        //    }
-
-
-
-        //}
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
@@ -711,32 +693,7 @@ namespace WFA_psychometric_chart
                 return 0;
         }
 
-        //private void button3_Click(object sender, EventArgs e)
-        //{
-        //    /*
-        //     This basically calls a function which takes two parameters 
-        //     * 1.DBT
-        //     * 2.Relative humidity as inputs and plots those vales in the graph 
-        //     * Inputs will be taken in the text file              
-        //     */
-        //    double DBT = 0.000000;
-        //    double RH = 0.000000;
-        //    try
-        //    {
-        //         DBT = Double.Parse(DBT_input.Text.Trim());
-        //         RH = Double.Parse(humidity_input.Text.Trim())/100;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message);
-        //    }
-        //   // MessageBox.Show("DBT = " + DBT + " , HR = " + RH);
-
-        //    plot_by_DBT_HR(DBT, RH);
-
-
-
-        //}
+       
         //this was for ploting dbt and enthalpy which we dont require now...
         public int plot_by_DBT_Enthalpy(double dbt, double enthalpy)
         {
@@ -779,27 +736,7 @@ namespace WFA_psychometric_chart
             return 0;
         }
 
-        //private void button4_Click(object sender, EventArgs e)
-        //{
-        //    //this is the plot of the DBT and enthalpy...
-        //    //also has function to do this.
-        //    double DBT = 0.000000;
-        //    double enthalpy = 0.000000;
-        //    try
-        //    {
-        //        DBT = Double.Parse(txt_DBT.Text.Trim());
-        //        enthalpy = Double.Parse(txt_enthalpy.Text.Trim());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message);
-        //    }
-
-        //    //calling the function here...
-        //    plot_by_DBT_Enthalpy(DBT, enthalpy);
-
-
-        //}
+      
         public int plot_by_enthalpy_dew_point(double enthalpy,double dew_point)
         {
 
@@ -947,186 +884,6 @@ namespace WFA_psychometric_chart
             public string humidity { get; set; }
         }
        
-
-        private void button6_Click(object sender, EventArgs e)
-        {
-
-            /*
-            //resetting arrarylist..         
-            temp_AL.Clear();
-            hum_AL.Clear();
-            //We are using JSON.NET library to parse the json file and get the data form it..
-
-            if (tb_lat.Text != null && tb_long.Text != null)
-            {
-                try
-                {
-
-                    using (var wc = new WebClient())
-                    {
-                        // var json = await httpClient.GetStringAsync(api_url);
-                        double lat_val = Double.Parse(tb_lat.Text);
-                        double lng_val = Double.Parse(tb_long.Text);
-                        string api_url = "http://api.openweathermap.org/data/2.5/station/find?lat=" + lat_val + "&lon=" + lng_val + "&APPID=615afd606af791f572a1f92b27a68bcd";
-                        var data = wc.DownloadString(api_url);
-                        //lets outpur this data for testing ...
-
-                        //MessageBox.Show("url = " + api_url);
-
-                        MessageBox.Show("Data = " + data);
-
-                        //now lets parse the data using JSON.NET library..
-                        //this is delcared as global.
-                        //ArrayList temp_AL = new ArrayList();
-                        //ArrayList hum_AL = new ArrayList();
-                        try
-                        {
-
-
-
-
-                            var jArray = JArray.Parse(data);
-                            //testings....
-                          //  MessageBox.Show("jarray = " + jArray);
-                            //try
-                            //{
-                            //    System.IO.File.WriteAllText(@"C:\Users\nischal\Desktop\WriteText.txt", jArray.ToString());
-                            //}
-                            //catch (Exception ex)
-                            //{
-                            //    MessageBox.Show(ex.Message);
-                            //}
-                                
-                                
-                                // var jobject = JObject.Parse(data);
-                            //var jToken = jObject.GetValue("main");
-
-                            //string temperature = (string)jObject["list"][0]["main"]["temp"].ToString();
-                            //MessageBox.Show("temperature pulled = " + temperature);
-                            // ferehnite to degre conversion is required as openweathermap.org provide temperature in kelvin as default and our system uses in deg.
-                           // int z = 0;
-                            //foreach (var result in jArray[0].Children<JObject>())
-                            foreach (var result in jArray.Children<JObject>())
-                            {
-                                try
-                                {
-
-                                    if ((result["last"]["main"]["temp"] != null) && (result["last"]["main"]["humidity"] != null))
-                                    {
-                                        string tem = result["last"]["main"]["temp"].ToString();
-
-
-
-                                       // MessageBox.Show("tem = " + tem);
-                                        double kelvin = double.Parse(tem);
-                                        double degree = Math.Round(kelvin - 273.15);
-                                        temp_AL.Add((int)degree);
-
-
-                                        //for humidity part
-                                        string tem2 = result["last"]["main"]["humidity"].ToString();
-                                        //lets divide the humidity by 100 to convert it to decimal value...
-                                        double hum = double.Parse(tem2);
-                                       // MessageBox.Show("hum = " + hum);
-                                        hum_AL.Add(hum);
-
-
-
-                                    }
-                                    //string tem2 = result["last"]["main"]["humidity"].ToString();
-                                    ////lets divide the humidity by 100 to convert it to decimal value...
-                                    //double hum = double.Parse(tem2);
-                                    //hum_AL.Add(hum);
-
-                                }
-                                catch (Exception ex)
-                                {
-                                    MessageBox.Show("bbk message = " + ex.Message);
-                                }
-                            }
-
-                            //foreach (var result2 in jArray.Children<JObject>())
-                            //{
-                            //    try
-                            //    {
-
-
-                            //        if (result2["last"]["main"]["humidity"] != null)
-                            //        {
-
-                            //            string tem2 = result2["last"]["main"]["humidity"].ToString();
-                            //            //lets divide the humidity by 100 to convert it to decimal value...
-                            //            double hum = double.Parse(tem2);
-                            //            MessageBox.Show("hum = " + hum);
-                            //            hum_AL.Add(hum);
-                            //        }
-                            //    }
-                            //    catch (Exception ex)
-                            //    {
-                            //        MessageBox.Show("bbk message2  = " + ex.Message);
-                            //    }
-                            //}
-
-                            //now lets test these
-                            string test = null;
-                            string test2 = null;
-                            
-                            for (int i = 0; i < temp_AL.Count; i++)
-                            {
-                                test += temp_AL[i] + " , \t";
-                                test2 += hum_AL[i] + ", \t";
-
-                            }
-                            MessageBox.Show("temperature pulled t = " + test);
-                            MessageBox.Show("humidity pulled h = " + test2);
-                            test = null;
-                            test2 = null;
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show("exception = " + ex.Message);
-                        }
-                        //now lets load the map if not loaded if loaded dont need to load the map..
-                        try
-                        {
-                            if (map_loaded == 0)
-                            {
-                                //not loaded so load..
-                                button1.PerformClick();
-                            }
-
-                            //testing..
-                            string s = null;
-
-                            for (int i = 0; i < temp_AL.Count; i++)
-                            {
-                                //calling the plot function to plot the values...
-                                double DBT = double.Parse(temp_AL[i].ToString());
-                                double RH = (double)double.Parse(hum_AL[i].ToString()) / 100;
-                                s += "(DBT = " + DBT + ",HR= " + RH + ") \n";
-                                //plot_by_DBT_HR(t, h);//div by 100 because 34% = 34/100 so..
-                                plot_by_DBT_HR(DBT, RH);
-                            }
-
-                           // MessageBox.Show("val = " + s);
-                            btn_insert_values.Enabled = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message);
-                        }
-
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-
-            }//close of if...
-            */
-        }
-
         Point? prevPosition = null;
 
         private void chart1_MouseMove(object sender, MouseEventArgs e)
@@ -1191,9 +948,7 @@ namespace WFA_psychometric_chart
                    // MessageBox.Show("the path = " + pat_test);
                     string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
           */
-                    string dir = System.IO.Path.GetDirectoryName(
-  System.Reflection.Assembly.GetExecutingAssembly().Location);
-
+                    string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                     string file = dir + @"\t_pg.txt";
                     string path1 = file;
                     string line1;
@@ -1318,6 +1073,21 @@ namespace WFA_psychometric_chart
 
         }
 
+        private void heatMapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //lets add heat map form to the application ...
+            form_heat_map fm_hm = new form_heat_map();
+            fm_hm.Show();
+
+        }
+
+        private void exportDataToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            form_export_data formExportData = new form_export_data();
+            formExportData.Show();
+
+        }
+
         private void insert_in_db(string q)
         {
             try
@@ -1389,16 +1159,7 @@ namespace WFA_psychometric_chart
             */
         }
 
-        private void newFeaturesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            //when ever the new feature is clicked new window form has to be opened...
-            Form2 f2 = new Form2();
-            f2.Show();
-            
-
-
-        }
-
+      
 
         private void UpdateDataConstantly()
         {
