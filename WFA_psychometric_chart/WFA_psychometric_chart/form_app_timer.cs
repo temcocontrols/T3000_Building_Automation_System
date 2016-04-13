@@ -26,6 +26,9 @@ namespace WFA_psychometric_chart
         int first_enable = 0;
         int second_enable = 0;
         ArrayList new_checked_item_index = new ArrayList();
+
+        int index_selected;//this index is used for pulling location information 
+
         private void form_app_timer_Load(object sender, EventArgs e)
         {
             //btn_from_month_down.Text = char.ConvertFromUtf32(8595);
@@ -38,6 +41,59 @@ namespace WFA_psychometric_chart
             dtp2.MinDate = new DateTime(DateTime.Now.Year, 1, 1);
             dtp1.MaxDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
             dtp2.MaxDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+
+            //this method selects location pulls the location address 
+            PullLocationInformation();
+        }
+
+
+        private void PullLocationInformation()
+        {
+            try
+            {
+                /*This methods pulls the building location information..*/
+                cb1_select_data.Items.Clear();
+                ArrayList stored_location = new ArrayList();
+                //while loading it should populate the field...
+                //lets pull the vales offline values stored in db...
+                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+                // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+
+                string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+                // MessageBox.Show("connection string = " + connString);
+
+
+                SqlConnection connection = new SqlConnection(connString);
+                connection.Open();
+                SqlDataReader reader = null;
+                SqlCommand comm = new SqlCommand("SELECT * from tbl_building_location", connection);
+                //command.Parameters.AddWithValue("@1", userName)
+                reader = comm.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    string selecte_location = reader["id"].ToString() + "," + reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
+                    stored_location.Add(selecte_location);
+                }
+                string s = "";
+                for (int i = 0; i < stored_location.Count; i++)
+                {
+                    cb1_select_data.Items.Add(stored_location[i]);
+                    s += stored_location[i] + " , \n";
+                }
+                // MessageBox.Show("stored place = " + s);
+                comm.Dispose();
+                reader.Dispose();
+                connection.Close();
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -103,7 +159,12 @@ namespace WFA_psychometric_chart
                    
                 //lets do the plotting part here..
 
-                  if (dtp2.Value > dtp1.Value) { 
+                  if (dtp2.Value > dtp1.Value) {
+
+                  //-----------resetting to newly plotted graph---------//
+                  
+                   form1.plot_new_graph();//this is doen because we need to plot on new graph every time the values are pulled.
+                  //---------------resetting ends here-----------------//
 
                   string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 //  string connString1 = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
@@ -119,11 +180,12 @@ namespace WFA_psychometric_chart
                       //string sql_query = "Select * from tbl_data_stored_temp_hum_one_year WHERE date_current = " + day_list[i] + " , hour_current = " + hour_al[h] + " AND station_name = "+ station_name +" ; ";
                       //lets pass this string to a query which does the pulling part.
                       SqlDataReader reader1 = null;
-                      SqlCommand command1 = new SqlCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second", connection1);
-                      command1.Parameters.AddWithValue("@date_first", dtp1.Value);
-                      command1.Parameters.AddWithValue("@date_second", dtp2.Value);
-                      //command1.Parameters.AddWithValue("@station_name", station_name);
-                      reader1 = command1.ExecuteReader();
+                            SqlCommand command1 = new SqlCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second AND ID=@id_value", connection1);
+                            command1.Parameters.AddWithValue("@date_first", dtp1.Value);
+                            command1.Parameters.AddWithValue("@date_second", dtp2.Value);
+                            command1.Parameters.AddWithValue("@id_value", index_selected);
+                            //command1.Parameters.AddWithValue("@station_name", station_name);
+                            reader1 = command1.ExecuteReader();
                       while (reader1.Read())
                       {
                           //station_name = reader["station_name"].ToString();
@@ -255,8 +317,20 @@ namespace WFA_psychometric_chart
             }
         }//close of flb.selecteditem
 
+        private void cb1_select_data_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //on change index it will select the index value or better known as selected index.
+            try
+            {
+                index_selected = cb1_select_data.SelectedIndex + 1; //is used to identify the location and data associated with it.
+                gb_select_time_and_date.Enabled = true;
 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
-
+        }
     }
 }

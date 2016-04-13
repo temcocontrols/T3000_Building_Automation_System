@@ -637,6 +637,7 @@
             this.optionToolStripMenuItem});
             resources.ApplyResources(this.menuStrip1, "menuStrip1");
             this.menuStrip1.Name = "menuStrip1";
+
             // 
             // optionToolStripMenuItem
             // 

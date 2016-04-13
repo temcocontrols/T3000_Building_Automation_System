@@ -29,27 +29,26 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(form_app_timer));
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.cb1_select_data = new System.Windows.Forms.ComboBox();
             this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             this.label9 = new System.Windows.Forms.Label();
             this.dtp2 = new System.Windows.Forms.DateTimePicker();
             this.dtp1 = new System.Windows.Forms.DateTimePicker();
             this.label8 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.groupBox2.SuspendLayout();
+            this.gb_select_time_and_date = new System.Windows.Forms.GroupBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.gb_select_time_and_date.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
-            // groupBox2
+            // cb1_select_data
             // 
-            this.groupBox2.Controls.Add(this.checkedListBox1);
-            this.groupBox2.Controls.Add(this.label9);
-            this.groupBox2.Controls.Add(this.dtp2);
-            this.groupBox2.Controls.Add(this.dtp1);
-            this.groupBox2.Controls.Add(this.label8);
-            this.groupBox2.Controls.Add(this.label7);
-            resources.ApplyResources(this.groupBox2, "groupBox2");
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.TabStop = false;
+            this.cb1_select_data.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cb1_select_data.FormattingEnabled = true;
+            resources.ApplyResources(this.cb1_select_data, "cb1_select_data");
+            this.cb1_select_data.Name = "cb1_select_data";
+            this.cb1_select_data.SelectedIndexChanged += new System.EventHandler(this.cb1_select_data_SelectedIndexChanged);
             // 
             // checkedListBox1
             // 
@@ -115,27 +114,51 @@
             resources.ApplyResources(this.label7, "label7");
             this.label7.Name = "label7";
             // 
+            // gb_select_time_and_date
+            // 
+            this.gb_select_time_and_date.Controls.Add(this.checkedListBox1);
+            this.gb_select_time_and_date.Controls.Add(this.label7);
+            this.gb_select_time_and_date.Controls.Add(this.label8);
+            this.gb_select_time_and_date.Controls.Add(this.dtp1);
+            this.gb_select_time_and_date.Controls.Add(this.label9);
+            this.gb_select_time_and_date.Controls.Add(this.dtp2);
+            resources.ApplyResources(this.gb_select_time_and_date, "gb_select_time_and_date");
+            this.gb_select_time_and_date.Name = "gb_select_time_and_date";
+            this.gb_select_time_and_date.TabStop = false;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.cb1_select_data);
+            resources.ApplyResources(this.groupBox3, "groupBox3");
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.TabStop = false;
+            // 
             // form_app_timer
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox3);
+            this.Controls.Add(this.gb_select_time_and_date);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "form_app_timer";
             this.Load += new System.EventHandler(this.form_app_timer_Load);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
+            this.gb_select_time_and_date.ResumeLayout(false);
+            this.gb_select_time_and_date.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.DateTimePicker dtp1;
         private System.Windows.Forms.DateTimePicker dtp2;
         private System.Windows.Forms.CheckedListBox checkedListBox1;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.ComboBox cb1_select_data;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.GroupBox gb_select_time_and_date;
     }
 }

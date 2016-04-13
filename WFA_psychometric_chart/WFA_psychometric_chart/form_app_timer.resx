@@ -117,6 +117,32 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="cb1_select_data.IntegralHeight" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="cb1_select_data.Location" type="System.Drawing.Point, System.Drawing">
+    <value>16, 19</value>
+  </data>
+  <data name="cb1_select_data.Size" type="System.Drawing.Size, System.Drawing">
+    <value>194, 21</value>
+  </data>
+  <data name="cb1_select_data.TabIndex" type="System.Int32, mscorlib">
+    <value>25</value>
+  </data>
+  <data name="&gt;&gt;cb1_select_data.Name" xml:space="preserve">
+    <value>cb1_select_data</value>
+  </data>
+  <data name="&gt;&gt;cb1_select_data.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cb1_select_data.Parent" xml:space="preserve">
+    <value>groupBox3</value>
+  </data>
+  <data name="&gt;&gt;cb1_select_data.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <data name="checkedListBox1.Items" xml:space="preserve">
     <value>Select all</value>
   </data>
@@ -192,14 +218,12 @@
   <data name="checkedListBox1.Items24" xml:space="preserve">
     <value>24</value>
   </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="checkedListBox1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>144, 15</value>
+    <value>115, 19</value>
   </data>
   <data name="checkedListBox1.Size" type="System.Drawing.Size, System.Drawing">
     <value>98, 94</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="checkedListBox1.TabIndex" type="System.Int32, mscorlib">
     <value>24</value>
   </data>
@@ -210,7 +234,7 @@
     <value>System.Windows.Forms.CheckedListBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;checkedListBox1.Parent" xml:space="preserve">
-    <value>groupBox2</value>
+    <value>gb_select_time_and_date</value>
   </data>
   <data name="&gt;&gt;checkedListBox1.ZOrder" xml:space="preserve">
     <value>0</value>
@@ -219,16 +243,16 @@
     <value>True</value>
   </data>
   <data name="label9.Location" type="System.Drawing.Point, System.Drawing">
-    <value>58, 33</value>
+    <value>23, 39</value>
   </data>
   <data name="label9.Size" type="System.Drawing.Size, System.Drawing">
-    <value>61, 13</value>
+    <value>67, 13</value>
   </data>
   <data name="label9.TabIndex" type="System.Int32, mscorlib">
     <value>23</value>
   </data>
   <data name="label9.Text" xml:space="preserve">
-    <value>Select hour</value>
+    <value>Select hour :</value>
   </data>
   <data name="&gt;&gt;label9.Name" xml:space="preserve">
     <value>label9</value>
@@ -237,13 +261,13 @@
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;label9.Parent" xml:space="preserve">
-    <value>groupBox2</value>
+    <value>gb_select_time_and_date</value>
   </data>
   <data name="&gt;&gt;label9.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>4</value>
   </data>
   <data name="dtp2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>300, 115</value>
+    <value>115, 163</value>
   </data>
   <data name="dtp2.Size" type="System.Drawing.Size, System.Drawing">
     <value>200, 20</value>
@@ -258,16 +282,16 @@
     <value>System.Windows.Forms.DateTimePicker, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;dtp2.Parent" xml:space="preserve">
-    <value>groupBox2</value>
+    <value>gb_select_time_and_date</value>
   </data>
   <data name="&gt;&gt;dtp2.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>5</value>
   </data>
   <data name="dtp1.CustomFormat" xml:space="preserve">
     <value />
   </data>
   <data name="dtp1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>61, 115</value>
+    <value>115, 119</value>
   </data>
   <data name="dtp1.Size" type="System.Drawing.Size, System.Drawing">
     <value>200, 20</value>
@@ -282,7 +306,7 @@
     <value>System.Windows.Forms.DateTimePicker, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;dtp1.Parent" xml:space="preserve">
-    <value>groupBox2</value>
+    <value>gb_select_time_and_date</value>
   </data>
   <data name="&gt;&gt;dtp1.ZOrder" xml:space="preserve">
     <value>3</value>
@@ -291,7 +315,7 @@
     <value>True</value>
   </data>
   <data name="label8.Location" type="System.Drawing.Point, System.Drawing">
-    <value>268, 121</value>
+    <value>54, 169</value>
   </data>
   <data name="label8.Size" type="System.Drawing.Size, System.Drawing">
     <value>26, 13</value>
@@ -309,16 +333,16 @@
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;label8.Parent" xml:space="preserve">
-    <value>groupBox2</value>
+    <value>gb_select_time_and_date</value>
   </data>
   <data name="&gt;&gt;label8.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>2</value>
   </data>
   <data name="label7.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <data name="label7.Location" type="System.Drawing.Point, System.Drawing">
-    <value>19, 115</value>
+    <value>54, 119</value>
   </data>
   <data name="label7.Size" type="System.Drawing.Size, System.Drawing">
     <value>36, 13</value>
@@ -336,33 +360,60 @@
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;label7.Parent" xml:space="preserve">
-    <value>groupBox2</value>
+    <value>gb_select_time_and_date</value>
   </data>
   <data name="&gt;&gt;label7.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>1</value>
   </data>
-  <data name="groupBox2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 22</value>
+  <data name="gb_select_time_and_date.Enabled" type="System.Boolean, mscorlib">
+    <value>False</value>
   </data>
-  <data name="groupBox2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>542, 172</value>
+  <data name="gb_select_time_and_date.Location" type="System.Drawing.Point, System.Drawing">
+    <value>22, 75</value>
   </data>
-  <data name="groupBox2.TabIndex" type="System.Int32, mscorlib">
-    <value>20</value>
+  <data name="gb_select_time_and_date.Size" type="System.Drawing.Size, System.Drawing">
+    <value>324, 209</value>
   </data>
-  <data name="groupBox2.Text" xml:space="preserve">
+  <data name="gb_select_time_and_date.TabIndex" type="System.Int32, mscorlib">
+    <value>27</value>
+  </data>
+  <data name="gb_select_time_and_date.Text" xml:space="preserve">
     <value>Select time and date</value>
   </data>
-  <data name="&gt;&gt;groupBox2.Name" xml:space="preserve">
-    <value>groupBox2</value>
+  <data name="&gt;&gt;gb_select_time_and_date.Name" xml:space="preserve">
+    <value>gb_select_time_and_date</value>
   </data>
-  <data name="&gt;&gt;groupBox2.Type" xml:space="preserve">
+  <data name="&gt;&gt;gb_select_time_and_date.Type" xml:space="preserve">
     <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;groupBox2.Parent" xml:space="preserve">
+  <data name="&gt;&gt;gb_select_time_and_date.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;groupBox2.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;gb_select_time_and_date.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="groupBox3.Location" type="System.Drawing.Point, System.Drawing">
+    <value>22, 12</value>
+  </data>
+  <data name="groupBox3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>324, 57</value>
+  </data>
+  <data name="groupBox3.TabIndex" type="System.Int32, mscorlib">
+    <value>28</value>
+  </data>
+  <data name="groupBox3.Text" xml:space="preserve">
+    <value>Select a location</value>
+  </data>
+  <data name="&gt;&gt;groupBox3.Name" xml:space="preserve">
+    <value>groupBox3</value>
+  </data>
+  <data name="&gt;&gt;groupBox3.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;groupBox3.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;groupBox3.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -372,7 +423,7 @@
     <value>6, 13</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>591, 237</value>
+    <value>356, 304</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Historical data plot</value>

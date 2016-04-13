@@ -47,9 +47,8 @@ namespace WFA_psychometric_chart
 
         //this is for updateing the values constantly
         ArrayList temp2_AL = new ArrayList();
-        ArrayList hum2_AL = 
-            new ArrayList();
-
+        ArrayList hum2_AL =  new ArrayList();
+        Series series1xx = new Series("My Series values plot ");//this series is used by plot_on_graph_values() method...
 
         public void plot_new_graph()
         {
@@ -455,6 +454,10 @@ namespace WFA_psychometric_chart
              //lets plot the graph as soon as the form loads.
             plot_new_graph();
 
+
+            //this is for adding values dynamically as the program loads. used by plot_on_graph_values() method 
+            chart1.Series.Add(series1xx);
+
             //this is other part.
             radioButton1.Checked = true;
 
@@ -557,18 +560,19 @@ namespace WFA_psychometric_chart
 
         /*This is the function that plots the graph 
          */
+
+
         public void plot_on_graph_values(double dbt,double hr,double xval,double yval)
         {
-            Series series1 = new Series("My Series" + index);
-            chart1.Series.Add(series1);
+            
 
-            series1.ChartType = SeriesChartType.Point;
-            series1.Color = Color.FromArgb(0, 0, 255);//blue
-            series1.MarkerSize = 7;
+            series1xx.ChartType = SeriesChartType.Point;
+            series1xx.Color = Color.FromArgb(0, 0, 255);//blue
+            series1xx.MarkerSize = 7;
             string label = "DBT=" + dbt + ",HR=" + hr;
-            series1.Label = label;
+            series1xx.Label = label;
             //chart1.Series["SeriesDBT_HR" + index].;
-            series1.Points.AddXY(xval, yval);
+            series1xx.Points.AddXY(xval, yval);
             
             //series1.Enabled = true;
 
@@ -1087,6 +1091,8 @@ namespace WFA_psychometric_chart
             formExportData.Show();
 
         }
+
+       
 
         private void insert_in_db(string q)
         {

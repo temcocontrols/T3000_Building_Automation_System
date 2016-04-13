@@ -21,7 +21,7 @@ namespace WFA_psychometric_chart
             InitializeComponent();
         }
         int map_loaded = 0;
-        
+        int index_selected;//this is used for location services..
         private void form_heat_map_Load(object sender, EventArgs e)
         {
 
@@ -35,7 +35,58 @@ namespace WFA_psychometric_chart
             dtp_From.Value = new DateTime(DateTime.Now.Year, 1, 1);
             dtp_To.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
 
+            PullLocationInformation();//this is for loading location information
         }
+
+        private void PullLocationInformation()
+        {
+            try
+            {
+                /*This methods pulls the building location information..*/
+                cb1_select_data.Items.Clear();
+                ArrayList stored_location = new ArrayList();
+                //while loading it should populate the field...
+                //lets pull the vales offline values stored in db...
+                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+                // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+
+                string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+                // MessageBox.Show("connection string = " + connString);
+
+
+                SqlConnection connection = new SqlConnection(connString);
+                connection.Open();
+                SqlDataReader reader = null;
+                SqlCommand comm = new SqlCommand("SELECT * from tbl_building_location", connection);
+                //command.Parameters.AddWithValue("@1", userName)
+                reader = comm.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    string selecte_location = reader["id"].ToString() + "," + reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
+                    stored_location.Add(selecte_location);
+                }
+                string s = "";
+                for (int i = 0; i < stored_location.Count; i++)
+                {
+                    cb1_select_data.Items.Add(stored_location[i]);
+                    s += stored_location[i] + " , \n";
+                }
+                // MessageBox.Show("stored place = " + s);
+                comm.Dispose();
+                reader.Dispose();
+                connection.Close();
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
 
         public class data_type_hum_temp
         {
@@ -527,9 +578,10 @@ namespace WFA_psychometric_chart
                     //string sql_query = "Select * from tbl_data_stored_temp_hum_one_year WHERE date_current = " + day_list[i] + " , hour_current = " + hour_al[h] + " AND station_name = "+ station_name +" ; ";
                     //lets pass this string to a query which does the pulling part.
                     SqlDataReader reader1 = null;
-                    SqlCommand command1 = new SqlCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second", connection1);
+                    SqlCommand command1 = new SqlCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second AND ID=@id_value", connection1);
                     command1.Parameters.AddWithValue("@date_first", dtp_From.Value);
                     command1.Parameters.AddWithValue("@date_second", dtp_To.Value);
+                    command1.Parameters.AddWithValue("@id_value", index_selected);
                     //command1.Parameters.AddWithValue("@station_name", station_name);
                     reader1 = command1.ExecuteReader();
                     while (reader1.Read())
@@ -637,10 +689,63 @@ namespace WFA_psychometric_chart
                 MessageBox.Show("No data found in database !");
             }
 
+            if(max_value != min_value) { 
             marker();
+            }
+            else
+            {
+                //make indicator for same color
+                marker_for_same_min_max_value();
+            }
         }//closing of the buttton...
+
+         private void marker_for_same_min_max_value()
+        {
+            /*
+            Our previous marker formula has a draw back if max_value = min_value the difference 
+            between max_value- min_value=0 so which present problem 
+            this is solved by this marker assumin in such case the plot is of same color we do this part.
+            */
+
+
+            try
+            {
+                using (Graphics grp1 = this.CreateGraphics())
+                {
+                    double start = min_value;
+
+                    double value = start;
+                   // double temp_value = (max_value - min_value);
+                    //double increment = 0;
+                    //increment = temp_value / 50;
+
+
+                    //decimal val = (Decimal)((value - min_value) / (max_value - min_value));
+
+                    Pen pen1 = new Pen(Color.FromArgb(0, 255, 0));
+                    grp1.DrawRectangle(pen1, 870, 423, 15, 15);
+                    SolidBrush drawBrushGreen = new SolidBrush(Color.FromArgb(0,255,0));
+                    grp1.FillRectangle(drawBrushGreen, 870, 423, 15, 15);
+
+
+                    String drawString = value.ToString();
+                    // Create font and brush.
+                    Font drawFont = new Font("Arial", 7);
+                    SolidBrush drawBrush = new SolidBrush(Color.Black);
+                    // Create point for upper-left corner of drawing.
+                    PointF drawPoint = new PointF(842, 423);
+                    // Draw string to screen.
+                    grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
+                }
+
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            }
         private void marker()
         {
+            try { 
             using (Graphics grp1 = this.CreateGraphics()) { 
             double start = min_value;
 
@@ -652,7 +757,8 @@ namespace WFA_psychometric_chart
                 
             for(int i = 1; i <= 50; i++) {
                
-            decimal val = (Decimal)((value - min_value) / (max_value - min_value));
+            //decimal val = (Decimal)((value - min_value) / (max_value - min_value));
+            double val = (double)((value - min_value) / (max_value - min_value));
             int r = Convert.ToByte(255 * val);
             int g = Convert.ToByte(255 * (1 - val));
             int b = 0;
@@ -722,7 +828,10 @@ namespace WFA_psychometric_chart
                 }//close of for...
 
             }//close of using statement..
-
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         int index = 0;
@@ -784,29 +893,43 @@ namespace WFA_psychometric_chart
             //chart1.Series.Clear();
             //Series series1 = new Series("My Series" + index);
             //chart1.Series.Add(series1);
-
+            try { 
             
 
             series1.ChartType = SeriesChartType.Point;
-           
+                int r, g, b;
+
+                if(max_value != min_value) { 
+
             double value = dbt;
-            decimal val = (Decimal)((value - min_value) / (max_value - min_value));
-            int r = Convert.ToByte(255 * val);
-            int g = Convert.ToByte(255 * (1 - val));
-            int b = 0;
+            //decimal val = (Decimal)((value - min_value) / (max_value - min_value));
+            double val = (double)((value - min_value) / (max_value - min_value));
+             r = Convert.ToByte(255 * val);
+             g = Convert.ToByte(255 * (1 - val));
+             b = 0;
 
-            //MessageBox.Show("dbt =" + dbt + "\n xval =" + xval + "\n yval = " + yval+"\n rgb = "+r+","+g+",0");
+                    //MessageBox.Show("dbt =" + dbt + "\n xval =" + xval + "\n yval = " + yval+"\n rgb = "+r+","+g+",0");
 
-            
+                }
+                else
+                {
+                    //make all the colors same value..
+                    r = 0;
+                    g = 255;
+                    b = 0;
+                }
 
-            series1.MarkerSize = 15;
+                series1.MarkerSize = 15;
             //string label = "DBT=" + dbt + ",HR=" + hr;
             //series1.Label = label;
             //chart1.Series["SeriesDBT_HR" + index].;
             series1.Points.AddXY(xval, yval);
             series1.Points[index_series++].Color = Color.FromArgb(255, r, g, b);//blue
-            //series1.Enabled = true;
-
+                                                                                //series1.Enabled = true;
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void printMapToolStripMenuItem_Click(object sender, EventArgs e)
@@ -854,6 +977,23 @@ namespace WFA_psychometric_chart
                 MessageBox.Show(" Your chart image will be saved as " +fileName);
             }
             chart1.SaveImage(fileName,format);
+
+
+        }
+
+        private void cb1_select_data_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //on change index it will select the index value or better known as selected index.
+            try
+            {
+                index_selected = cb1_select_data.SelectedIndex + 1; //is used to identify the location and data associated with it.
+                gb_select_date.Enabled = true;
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
 
         }
