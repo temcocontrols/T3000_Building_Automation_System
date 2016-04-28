@@ -34,6 +34,11 @@ enum CFGFILE_VALPOS
 CConfigFileHandler::CConfigFileHandler(void)
 {
 	m_pFile = new CStdioFile;
+
+
+	 	m_configfile_path=GetExePath(true)+_T("T3000_config.ini");
+
+		m_ISPTool_Section = L"ISPTool_Setting";
 }
 
 CConfigFileHandler::~CConfigFileHandler(void)
@@ -141,6 +146,130 @@ BOOL CConfigFileHandler::CreateConfigFile(const CString& strFilePath)
 		}
 	}
 	m_pFile->Close();
+	return TRUE;
+
+}
+
+//Config ini
+BOOL CConfigFileHandler::CreateConfigFile()
+{
+	//ASSERT(strFilePath.GetLength() > 0);
+	//m_strFilePath = strFilePath;
+
+	//if (!m_pFile->Open(m_strFilePath.GetString(),CStdioFile::modeRead))
+	//{
+	//	if(m_pFile->Open(m_strFilePath.GetString(),CFile::modeCreate | CFile::modeReadWrite | CFile::modeNoTruncate ))
+	//	{
+	//		CString strHexFileName = _T("C:\\Program File\\");
+	//		CString strFlashMethod = _T("COM");
+	//		CString strFlashPage = _T("[Tstat]");
+	//		CString strModbusID = _T("255");
+	//		CString strComPort =  _T("COM1");
+	//		CString strBaudrate = _T("19200");
+	//		CString strNCFlashPage = _T("[NC]");
+	//		CString strNCFileName = _T("C:\\Program File\\");
+	//		CString strNCFlashMethod = _T("Ethernet");
+	//		CString strIP = _T("192.168.0.3");
+	//		CString strIPPort =  _T("6001");
+	//		CString strSub_not = _T("0");
+	//		CString strSub_ID = _T("254");
+	//		// 
+	//		m_pFile->WriteString( CString(c_strCfgTstatSection) + _T("\n"));	
+	//		m_pFile->WriteString( CString(c_strCfgDefaultInstalldirItem) + g_strExePath+ _T("\n"));	
+
+	//		// hex file path
+	//		CString strHexFilePath = strHexFileName + _T("\n");
+	//		m_pFile->WriteString( CString(c_strCfgLastFlashFileItem) + strHexFilePath);	
+	//		// method
+	//		m_pFile->WriteString(CString(c_strCfgLastFlashMethodItem) + strFlashMethod + _T("\n"));
+	//		// page
+	//		m_pFile->WriteString(CString(c_strCfgLastFlashTypePageItem) + strFlashPage + _T("\n"));					
+	//		// id
+	//		m_pFile->WriteString(CString(c_strCfgDefaultAddrItem) + strModbusID + _T("\n"));	
+	//		// com port
+	//		m_pFile->WriteString(CString(c_strCfgDefaultComItem) + strComPort + _T("\n"));	
+	//		// Baudrate
+	//		m_pFile->WriteString(CString(c_strCfgDefaultBaudrateItem) + strBaudrate + _T("\n"));	
+
+	//		// nc section
+	//		m_pFile->WriteString(strNCFlashPage+ _T("\n"));	
+	//		// nc file
+	//		m_pFile->WriteString(CString(c_strCfgLastFlashFileItem) + strNCFileName + _T("\n"));
+	//		// nc flash type
+	//		m_pFile->WriteString(CString(c_strCfgLastFlashTypePageItem) + strNCFlashMethod + _T("\n"));
+	//		// IP
+	//		m_pFile->WriteString(CString(c_strCfgDefaultIPItem) + strIP + _T("\n"));
+	//		// Port
+	//		m_pFile->WriteString( CString(c_strCfgDefaultIPPortItem) + strIPPort + _T("\n"));
+
+	//		// Lighting Controller
+	//		m_pFile->WriteString( CString(c_strCfgLightCtrlSection) + _T("\n"));	
+	//		// flash file
+	//		m_pFile->WriteString( CString(c_strCfgLastFlashFileItem) + strHexFilePath);	
+	//		// flash device type
+	//		m_pFile->WriteString( CString(c_strCfgLastFlashLCTypeItem) + CString(c_strCfgLastFlashLCTypeMain) + _T("\n"));	
+	//		// IP
+	//		m_pFile->WriteString(CString(c_strCfgDefaultIPItem) + strIP + _T("\n"));
+	//		// Port
+	//		m_pFile->WriteString( CString(c_strCfgDefaultIPPortItem) + strIPPort + _T("\n"));
+	//		// MDB ID
+	//		m_pFile->WriteString( CString(c_strCfgLastFlashMDBIDItem) + strModbusID + _T("\n"));
+
+	//		m_pFile->WriteString( CString(c_strCfgNote) + strSub_not + _T("\n"));
+	//		m_pFile->WriteString( CString(c_strCfgSubID) + strSub_ID + _T("\n"));
+
+	//	}
+	//	else
+	//	{
+	//		CString strTips = _T("├Cannot create a new config file. Please try again.");
+	//		((CISPDlg*)m_pParentWnd)->UpdateStatusInfo(strTips, FALSE);
+
+	//		m_pFile->Close();
+
+	//		return FALSE;
+	//	}
+	//}
+	//m_pFile->Close();
+	CString strHexFileName = _T("C:\\Program File\\");
+	CString strFlashMethod = _T("COM");
+	CString strFlashPage = _T("[Tstat]");
+	CString strModbusID = _T("255");
+	CString strComPort =  _T("COM1");
+	CString strBaudrate = _T("19200");
+	CString strNCFlashPage = _T("[NC]");
+	CString strNCFileName = _T("C:\\Program File\\");
+	CString strNCFlashMethod = _T("Ethernet");
+	CString strIP = _T("192.168.0.3");
+	CString strIPPort =  _T("6001");
+	CString strSub_not = _T("0");
+	CString strSub_ID = _T("254");
+					 CFileFind fFind;
+                    if(!fFind.FindFile(m_configfile_path))
+                    {
+						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgLastFlashFileItem),strHexFileName,m_configfile_path);
+						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgLastFlashMethodItem),strFlashMethod,m_configfile_path);
+						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultAddrItem),strModbusID,m_configfile_path);
+						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultComItem),strComPort,m_configfile_path);
+						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultIPItem),strIP,m_configfile_path);
+						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultIPPortItem),strIPPort,m_configfile_path);
+						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultBaudrateItem),strBaudrate,m_configfile_path);
+						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgNote),strSub_not,m_configfile_path);
+						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgSubID),strSub_ID,m_configfile_path);
+						 
+                    }
+// 					else
+// 					{
+// 						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgLastFlashFileItem),strHexFileName,m_configfile_path);
+// 						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgLastFlashMethodItem),strFlashMethod,m_configfile_path);
+// 						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultAddrItem),strModbusID,m_configfile_path);
+// 						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultComItem),strComPort,m_configfile_path);
+// 						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultIPItem),strIP,m_configfile_path);
+// 						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultIPPortItem),strIPPort,m_configfile_path);
+// 						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultBaudrateItem),strBaudrate,m_configfile_path);
+// 						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgNote),strSub_not,m_configfile_path);
+// 						WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgSubID),strSub_ID,m_configfile_path);
+// 					}
+                     
 	return TRUE;
 
 }
@@ -340,29 +469,38 @@ void CConfigFileHandler::WriteToCfgFile(
 	const CString& subnot,
 	const CString& subID)
 {
-	m_szCfgFile[CV_Installdir] = (CString(c_strCfgDefaultInstalldirItem) + g_strExePath);	
+//	m_szCfgFile[CV_Installdir] = (CString(c_strCfgDefaultInstalldirItem) + g_strExePath);	
+//
+//	// hex file path
+//	CString strHexFilePath = HexFileName;
+//	m_szCfgFile[CV_TstatLastFlashFile] = ( CString(c_strCfgLastFlashFileItem) + strHexFilePath);	
+//	// method
+//	m_szCfgFile[CV_TstatLastFlashMethod] =(CString(c_strCfgLastFlashMethodItem) + FlashMethod );		
+//	// flash page
+////	m_szCfgFile[CV_TstatLastFlashPage] =(CString(c_strCfgLastFlashTypePageItem) + strFlashTypePage);			
+//	// id
+//	m_szCfgFile[CV_TstatDeAddr] =(CString(c_strCfgDefaultAddrItem) + DeviceID );	
+//	// com port
+//	m_szCfgFile[CV_TstatDeCOM] =(CString(c_strCfgDefaultComItem) + COMPORT);	
+//	// Baudrate
+//	m_szCfgFile[CV_TstatDeBaudrate] =(CString(c_strCfgDefaultBaudrateItem) + Baudrate);
+//	m_szCfgFile[CV_NCDeIP] =(CString(c_strCfgDefaultIPItem) + IP);
+//	m_szCfgFile[CV_NCDeIPPort] =(CString(c_strCfgDefaultIPPortItem) + IPPort);
+//
+//	m_szCfgFile[CV_SubNot] =(CString(c_strCfgNote) +CString(subnot));
+//	m_szCfgFile[CV_Sub_ID] =(CString(c_strCfgSubID) +CString(subID));
 
-	// hex file path
-	CString strHexFilePath = HexFileName;
-	m_szCfgFile[CV_TstatLastFlashFile] = ( CString(c_strCfgLastFlashFileItem) + strHexFilePath);	
-	// method
-	m_szCfgFile[CV_TstatLastFlashMethod] =(CString(c_strCfgLastFlashMethodItem) + FlashMethod );		
-	// flash page
-//	m_szCfgFile[CV_TstatLastFlashPage] =(CString(c_strCfgLastFlashTypePageItem) + strFlashTypePage);			
-	// id
-	m_szCfgFile[CV_TstatDeAddr] =(CString(c_strCfgDefaultAddrItem) + DeviceID );	
-	// com port
-	m_szCfgFile[CV_TstatDeCOM] =(CString(c_strCfgDefaultComItem) + COMPORT);	
-	// Baudrate
-	m_szCfgFile[CV_TstatDeBaudrate] =(CString(c_strCfgDefaultBaudrateItem) + Baudrate);
-	m_szCfgFile[CV_NCDeIP] =(CString(c_strCfgDefaultIPItem) + IP);
-	m_szCfgFile[CV_NCDeIPPort] =(CString(c_strCfgDefaultIPPortItem) + IPPort);
-
-	m_szCfgFile[CV_SubNot] =(CString(c_strCfgNote) +CString(subnot));
-	m_szCfgFile[CV_Sub_ID] =(CString(c_strCfgSubID) +CString(subID));
-
-	WriteToCfgFile();
-
+	//WriteToCfgFile();
+	
+	WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgLastFlashFileItem),HexFileName,m_configfile_path);
+	WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgLastFlashMethodItem),FlashMethod,m_configfile_path);
+	WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultAddrItem),DeviceID,m_configfile_path);
+	WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultComItem),COMPORT,m_configfile_path);
+	WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultIPItem),IP,m_configfile_path);
+	WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultIPPortItem),IPPort,m_configfile_path);
+	WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultBaudrateItem),Baudrate,m_configfile_path);
+	WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgNote),subnot,m_configfile_path);
+	WritePrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgSubID),subID,m_configfile_path);
 }
 void CConfigFileHandler::ReadFromCfgFileForAll(
 	CString& HexFileName,
@@ -375,30 +513,49 @@ void CConfigFileHandler::ReadFromCfgFileForAll(
 	CString& subnote,
 	CString& subID)
 {
-	ASSERT(m_pFile);
+	//ASSERT(m_pFile);
 	  
-	ReadFromCfgFile();
-	HexFileName = m_szCfgFile[CV_TstatLastFlashFile];
-	FlashMethod = m_szCfgFile[CV_TstatLastFlashMethod];
-	DeviceID = m_szCfgFile[CV_TstatDeAddr];
-	COMPORT = m_szCfgFile[CV_TstatDeCOM];	
-	BD = m_szCfgFile[CV_TstatDeBaudrate];	
-	IP=m_szCfgFile[CV_NCDeIP];
-	IPPort=m_szCfgFile[CV_NCDeIPPort];
-	subnote = m_szCfgFile[CV_SubNot];
-	subID =  m_szCfgFile[CV_Sub_ID];
+	//ReadFromCfgFile();
+	GetPrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgLastFlashFileItem),L"",HexFileName.GetBuffer(MAX_PATH),MAX_PATH,m_configfile_path);
+	HexFileName.ReleaseBuffer();
+	GetPrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgLastFlashMethodItem),L"",FlashMethod.GetBuffer(MAX_PATH),MAX_PATH,m_configfile_path);
+	FlashMethod.ReleaseBuffer();
+	GetPrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultAddrItem),L"",DeviceID.GetBuffer(MAX_PATH),MAX_PATH,m_configfile_path);
+	DeviceID.ReleaseBuffer();
+	GetPrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultComItem),L"",COMPORT.GetBuffer(MAX_PATH),MAX_PATH,m_configfile_path);
+	COMPORT.ReleaseBuffer();
+	GetPrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultIPItem),L"",IP.GetBuffer(MAX_PATH),MAX_PATH,m_configfile_path);
+	IP.ReleaseBuffer();
+	GetPrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultIPPortItem),L"",IPPort.GetBuffer(MAX_PATH),MAX_PATH,m_configfile_path);
+	IPPort.ReleaseBuffer();
+	GetPrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgDefaultBaudrateItem),L"",BD.GetBuffer(MAX_PATH),MAX_PATH,m_configfile_path);
+	BD.ReleaseBuffer();
+	GetPrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgNote),L"",subnote.GetBuffer(MAX_PATH),MAX_PATH,m_configfile_path);
+	subnote.ReleaseBuffer();
+	GetPrivateProfileStringW(m_ISPTool_Section,CString(c_strCfgSubID),L"",subID.GetBuffer(MAX_PATH),MAX_PATH,m_configfile_path);
+	subID.ReleaseBuffer();
+
+// 	HexFileName = m_szCfgFile[CV_TstatLastFlashFile];
+// 	FlashMethod = m_szCfgFile[CV_TstatLastFlashMethod];
+// 	DeviceID = m_szCfgFile[CV_TstatDeAddr];
+// 	COMPORT = m_szCfgFile[CV_TstatDeCOM];	
+// 	BD = m_szCfgFile[CV_TstatDeBaudrate];	
+// 	IP=m_szCfgFile[CV_NCDeIP];
+// 	IPPort=m_szCfgFile[CV_NCDeIPPort];
+// 	subnote = m_szCfgFile[CV_SubNot];
+// 	subID =  m_szCfgFile[CV_Sub_ID];
 	// 取有效数据
-	TCHAR c = ':';
-	 
-	HexFileName=HexFileName.Mid(HexFileName.Find(c)+2);
-	FlashMethod=FlashMethod.Mid(FlashMethod.Find(c)+2);
-	DeviceID=DeviceID.Mid(DeviceID.Find(c)+2);
-	COMPORT=COMPORT.Mid(COMPORT.Find(c)+2);
-	BD=BD.Mid(BD.Find(c)+2);
-	IP=IP.Mid(IP.Find(c)+2);
-	IPPort=IPPort.Mid(IPPort.Find(c)+2);
-	subnote = subnote.Mid(subnote.Find(c)+2);
-	subID = subID.Mid(subID.Find(c)+2);
+	//TCHAR c = ':';
+	// 
+	//HexFileName=HexFileName.Mid(HexFileName.Find(c)+2);
+	//FlashMethod=FlashMethod.Mid(FlashMethod.Find(c)+2);
+	//DeviceID=DeviceID.Mid(DeviceID.Find(c)+2);
+	// COMPORT=COMPORT.Mid(2);
+	//BD=BD.Mid(BD.Find(c)+2);
+	//IP=IP.Mid(IP.Find(c)+2);
+	//IPPort=IPPort.Mid(IPPort.Find(c)+2);
+	//subnote = subnote.Mid(subnote.Find(c)+2);
+	//subID = subID.Mid(subID.Find(c)+2);
 }
 
 void CConfigFileHandler::WriteToCfgFile()

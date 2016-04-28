@@ -9404,6 +9404,10 @@ void LoadTstat_OutputData()
             nValue = product_register_value[MODBUS_COOLING_VALVE]; //102  210
             m_tstat_output_data.at(5).Value.regAddress=MODBUS_COOLING_VALVE;
             m_tstat_output_data.at(5).Value.RegValue=nValue;
+			if( m_tstat_output_data.at(5).Value.RegValue > 1000) //Add by Fance ,查理说out6 和7 不可能大于100%;
+			{
+				m_tstat_output_data.at(5).Value.RegValue = 1000;
+			}
             if(nRange==0)
             {
                 if(nValue==0)
@@ -9520,7 +9524,10 @@ void LoadTstat_OutputData()
                 nValue = product_register_value[MODBUS_HEATING_VALVE]; //102  210
                 m_tstat_output_data.at(6).Value.regAddress=MODBUS_HEATING_VALVE;
                 m_tstat_output_data.at(6).Value.RegValue=nValue;
-
+				if( m_tstat_output_data.at(6).Value.RegValue > 1000) //Add by Fance ,查理说out6 和7 不可能大于100%;
+				{
+					 m_tstat_output_data.at(6).Value.RegValue = 1000;
+				}
                 strTemp.Empty();
 // 				if(nRange==0)
 // 				{

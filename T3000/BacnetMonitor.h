@@ -70,16 +70,22 @@ public:
 
 unsigned char read_monitordata(int digtal_or_analog = 1);
 
+//const int MONITOR_NUM = 0;
+//const int MONITOR_LABEL = 1;
+//const int MONITOR_INTERVAL = 2;
+//const int MONITOR_LOG_TIME = 3;
+//const int MONITOR_UNITS = 4;
+//const int MONITOR_STATUS = 5 ;
+//const int MONITOR_DATA_SIZE = 6;
+//const int MONITOR_COL_NUMBER = 7;
+
 const int MONITOR_NUM = 0;
 const int MONITOR_LABEL = 1;
 const int MONITOR_INTERVAL = 2;
-const int MONITOR_LOG_TIME = 3;
-const int MONITOR_UNITS = 4;
-const int MONITOR_STATUS = 5 ;
-const int MONITOR_DATA_SIZE = 6;
-//const int MONITOR_DIGITAL_PACKAGE = 7;
+const int MONITOR_STATUS = 3 ;
+const int MONITOR_DATA_SIZE = 4;
+const int MONITOR_COL_NUMBER = 5;
 
-const int MONITOR_COL_NUMBER = 7;
 
 const CString CS_DAYS = _T("Days");
 const CString CS_HOURS = _T("Hours");

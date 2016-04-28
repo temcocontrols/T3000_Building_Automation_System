@@ -19,6 +19,8 @@ public:
 	virtual ~CConfigFileHandler(void);
 
 	BOOL CreateConfigFile(const CString& strFilePath);
+
+	BOOL CreateConfigFile();
 	void SetConfigFilePath(const CString& strFilePath);
 		
 	void WriteTStatPageConfig(
@@ -114,5 +116,7 @@ private:
 	CWnd*						m_pParentWnd;
 	vector<CString>			m_szCfgFile;
 	
+	CString m_configfile_path;
+	CString m_ISPTool_Section;
 
 };

@@ -128,7 +128,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 				//CString temp_units;
 
 
-				temp_item.Format(_T("OUT%d"),point_number+1);
+				temp_item.Format(_T("%u-OUT%d"),Station_NUM, point_number+1);
 				m_program_debug_list.InsertItem(0,temp_item);
 
 
@@ -193,7 +193,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 				//CString temp_units;
 
 
-				temp_item.Format(_T("IN%d"),point_number+1);
+				temp_item.Format(_T("%u-IN%d"),Station_NUM, point_number+1);
 				m_program_debug_list.InsertItem(0,temp_item);
 
 
@@ -242,7 +242,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 
 
 			CString temp_item;
-			temp_item.Format(_T("VAR%d"),point_number+1);
+			temp_item.Format(_T("%u-VAR%d"),Station_NUM, point_number+1);
 			m_program_debug_list.InsertItem(0,temp_item);
 
 			ListCtrlEx::CStrList strlist;

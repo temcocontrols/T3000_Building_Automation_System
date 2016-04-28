@@ -164,7 +164,7 @@ public:
 	int m_value;       
 	int m_address;
 	int m_times;
-
+	unsigned short ValueData[10];
 	bool m_fresh_Grid;
     private:
         int	CO2_485_MODBUS_SERIALNUMBER_LOWORD	;

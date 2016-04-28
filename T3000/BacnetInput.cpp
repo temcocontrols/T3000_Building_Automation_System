@@ -15,8 +15,8 @@
 #include "MainFrm.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
-
-
+static bool show_external =  false;
+CRect Input_rect;
 
 // CBacnetInput dialog
  
@@ -124,9 +124,9 @@ void CBacnetInput::Reload_Unit_Type()
 		if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
 		{
 			ListCtrlEx::CStrList strlist;
-			for (int i=0;i<(int)sizeof(Units_Type)/sizeof(Units_Type[0]);i++)
+			for (int j=0;j<(int)sizeof(Units_Type)/sizeof(Units_Type[0]);j++)
 			{
-				strlist.push_back(Units_Type[i]);
+				strlist.push_back(Units_Type[j]);
 			}
 			m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
 		}
@@ -240,11 +240,21 @@ void CBacnetInput::Initial_List()
 	m_input_list.InsertColumn(INPUT_DECOM, _T("Status"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_JUMPER, _T("Jumper"), 90, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_LABLE, _T("Label"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+
+	m_input_list.InsertColumn(INPUT_EXTERNAL, _T("External"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_PRODUCT, _T("Product Name"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_input_list.InsertColumn(INPUT_EXT_NUMBER, _T("Product Input"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+
+	show_external =  false;
+
 	m_input_dlg_hwnd = this->m_hWnd;
 	//g_hwnd_now = m_input_dlg_hwnd;
 
 	CRect list_rect,win_rect;
 	m_input_list.GetWindowRect(list_rect);
+
+	m_input_list.GetClientRect(Input_rect);
+
 	ScreenToClient(&list_rect);
 	::GetWindowRect(m_input_dlg_hwnd,win_rect);
 	m_input_list.Set_My_WindowRect(win_rect);
@@ -269,9 +279,9 @@ void CBacnetInput::Initial_List()
 		if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
 		{
 			ListCtrlEx::CStrList strlist;
-			for (int i=0;i<(int)sizeof(Units_Type)/sizeof(Units_Type[0]);i++)
+			for (int j=0;j<(int)sizeof(Units_Type)/sizeof(Units_Type[0]);j++)
 			{
-				strlist.push_back(Units_Type[i]);
+				strlist.push_back(Units_Type[j]);
 			}
 			m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
 		}
@@ -279,9 +289,9 @@ void CBacnetInput::Initial_List()
 		if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_JUMPER))
 		{
 			ListCtrlEx::CStrList strlist;
-			for (int i=0;i<(int)sizeof(JumperStatus)/sizeof(JumperStatus[0]);i++)
+			for (int j=0;j<(int)sizeof(JumperStatus)/sizeof(JumperStatus[0]);j++)
 			{
-				strlist.push_back(JumperStatus[i]);
+				strlist.push_back(JumperStatus[j]);
 			}
 			m_input_list.SetCellStringList(i, INPUT_JUMPER, strlist);		
 		}
@@ -404,7 +414,7 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	if(Changed_SubItem==INPUT_CAL)
 	{
 		CString cs_temp=m_input_list.GetItemText(Changed_Item,INPUT_CAL);
-		float temp_value = _wtof(cs_temp);
+		float temp_value = (float)_wtof(cs_temp);
 		int cal_value = (int)(temp_value * 10);
 		if((cal_value<0) || (cal_value >65535))
 		{
@@ -481,6 +491,49 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
+
+	
+
+	bool temp_need_show_external = false;
+	for (int z= 0 ;z < (int)m_Input_data.size();z++)
+	{
+		if((m_Input_data.at(z).sub_id !=0) &&
+			(m_Input_data.at(z).sub_product !=0))
+		{
+			temp_need_show_external = true;
+			break;
+		}
+		
+	}
+	if(show_external != temp_need_show_external)
+	{
+		show_external = temp_need_show_external;
+		if(temp_need_show_external)
+		{
+			CRect temp_rect;
+			temp_rect = Input_rect;
+			temp_rect.right = 1200;
+			temp_rect.top = temp_rect.top + 22;
+			m_input_list.MoveWindow(temp_rect);
+			m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
+			m_input_list.SetColumnWidth(INPUT_PRODUCT,80);
+			m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,80);
+		}
+		else
+		{
+			CRect temp_rect;
+			temp_rect = Input_rect;
+			temp_rect.right = 925;
+			temp_rect.top = temp_rect.top + 22;
+			m_input_list.MoveWindow(temp_rect);
+
+			m_input_list.SetColumnWidth(INPUT_EXTERNAL,0);
+			m_input_list.SetColumnWidth(INPUT_PRODUCT,0);
+			m_input_list.SetColumnWidth(INPUT_EXT_NUMBER,0);
+		}
+	}
+
+
 	if(isFreshOne == (int)REFRESH_ON_ITEM)
 	{
 		Fresh_Item = (int)wParam;
@@ -699,6 +752,52 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 			m_Input_data.at(i).decom = m_Input_data.at(i).decom & 0x0f;	 //如果最高位不是 有效值，清零;
 		}
 		m_input_list.SetItemText(i,INPUT_JUMPER,temp_status);
+
+
+
+#pragma region External info
+		if((m_Input_data.at(i).sub_id !=0) &&
+			//(m_Input_data.at(input_list_line).sub_number !=0) &&
+			(m_Input_data.at(i).sub_product !=0))
+		{
+			unsigned char temp_pid = m_Input_data.at(i).sub_product;
+			if((temp_pid == PM_T3PT10) ||
+				(temp_pid == PM_T3IOA) ||
+				(temp_pid == PM_T332AI) ||
+				(temp_pid == PM_T38AI16O) ||
+				(temp_pid == PM_T38I13O) ||
+				(temp_pid == PM_T34AO) ||
+				(temp_pid == PM_T322AI) ||
+				(temp_pid == PM_T38AI8AO6DO) ||
+				(temp_pid == PM_T36CT))
+			{
+				//m_input_item_info.ShowWindow(true);
+				CString temp_name;
+				temp_name = GetProductName(m_Input_data.at(i).sub_product);
+				CString show_info;
+				CString temp_id;
+				CString temp_number;
+				temp_number.Format(_T("Input%d"),(unsigned char)m_Input_data.at(i).sub_number + 1);
+				m_input_list.SetItemText(i,INPUT_EXTERNAL,_T("External"));
+				m_input_list.SetItemTextColor(i,INPUT_EXTERNAL,RGB(255,0,0),FALSE);
+				m_input_list.SetItemText(i,INPUT_PRODUCT,temp_name);
+				m_input_list.SetItemText(i,INPUT_EXT_NUMBER,temp_number);
+
+
+				//temp_id.Format(_T(" Sub ID: %u        "),(unsigned char)m_Input_data.at(input_list_line).sub_id);
+				//temp_number.Format(_T("Input%d"),(unsigned char)m_Input_data.at(input_list_line).sub_number + 1);
+				//show_info = _T("Module:") + temp_name +_T("        ") + temp_id + temp_number;
+				//m_input_item_info.SetWindowTextW(show_info);
+
+			}	
+			//else
+			//{
+			//	m_input_item_info.ShowWindow(false);
+			//}
+		}
+
+#pragma endregion External info
+
 
 		CString temp_des2;
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).label, (int)strlen((char *)m_Input_data.at(i).label)+1, 

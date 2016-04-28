@@ -227,13 +227,13 @@ void CBacnetMonitor::Initial_List()
 	m_monitor_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	//m_monitor_list.SetExtendedStyle(m_monitor_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_monitor_list.SetExtendedStyle(m_monitor_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_monitor_list.InsertColumn(MONITOR_NUM, _T("NUM"), 50, ListCtrlEx::CheckBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
-	m_monitor_list.InsertColumn(MONITOR_LABEL, _T("Label"), 140, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_monitor_list.InsertColumn(MONITOR_INTERVAL, _T("Interval"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_monitor_list.InsertColumn(MONITOR_LOG_TIME, _T("Log Time"), 90, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_monitor_list.InsertColumn(MONITOR_UNITS, _T("Unit"), 70, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_monitor_list.InsertColumn(MONITOR_STATUS, _T("Status"), 90, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_monitor_list.InsertColumn(MONITOR_DATA_SIZE, _T("Data Size (KB)"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_monitor_list.InsertColumn(MONITOR_NUM, _T("NUM"), 60, ListCtrlEx::CheckBox, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_monitor_list.InsertColumn(MONITOR_LABEL, _T("Label"), 160, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_monitor_list.InsertColumn(MONITOR_INTERVAL, _T("Interval"), 120, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	//m_monitor_list.InsertColumn(MONITOR_LOG_TIME, _T("Log Time"), 90, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	//m_monitor_list.InsertColumn(MONITOR_UNITS, _T("Unit"), 70, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_monitor_list.InsertColumn(MONITOR_STATUS, _T("Status"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_monitor_list.InsertColumn(MONITOR_DATA_SIZE, _T("Data Size (KB)"), 130, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	//m_monitor_list.InsertColumn(MONITOR_DIGITAL_PACKAGE, _T("DI Package"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 
 	m_monitor_dlg_hwnd = this->m_hWnd;
@@ -248,14 +248,14 @@ void CBacnetMonitor::Initial_List()
 		temp_item.Format(_T("%d"),i+1);
 		m_monitor_list.InsertItem(i,temp_item);
 		m_monitor_list.SetCellEnabled(i,0,0);//禁用num，只是用来显示;
-		if(ListCtrlEx::ComboBox == m_monitor_list.GetColumnType(MONITOR_UNITS))
-		{
-			ListCtrlEx::CStrList strlist;
-			strlist.push_back(_T("Minutes"));
-			strlist.push_back(_T("Hours"));
-			strlist.push_back(_T("Days"));
-			m_monitor_list.SetCellStringList(i, MONITOR_UNITS, strlist);
-		}
+		//if(ListCtrlEx::ComboBox == m_monitor_list.GetColumnType(MONITOR_UNITS))
+		//{
+		//	ListCtrlEx::CStrList strlist;
+		//	strlist.push_back(_T("Minutes"));
+		//	strlist.push_back(_T("Hours"));
+		//	strlist.push_back(_T("Days"));
+		//	m_monitor_list.SetCellStringList(i, MONITOR_UNITS, strlist);
+		//}
 
 		for (int x=0;x<MONITOR_COL_NUMBER;x++)
 		{
@@ -685,32 +685,32 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Item(WPARAM wParam,LPARAM lParam)
 		WideCharToMultiByte( CP_ACP, 0, New_CString, -1, cTemp1, 255, NULL, NULL );
 		memcpy_s(m_monitor_data.at(Changed_Item).label,STR_IN_LABEL,cTemp1,STR_IN_LABEL);
 	}
-	else if(Changed_SubItem == MONITOR_LOG_TIME)
-	{
-		int temp_value = _wtoi(New_CString);
-		if(temp_value>=64)
-		{
+	//else if(Changed_SubItem == MONITOR_LOG_TIME)
+	//{
+	//	int temp_value = _wtoi(New_CString);
+	//	if(temp_value>=64)
+	//	{
 
-			return 0;
-		}
-		m_monitor_data.at(Changed_Item).max_time_length = (((unsigned char)temp_value) & 0x3f) | (m_monitor_data.at(Changed_Item).max_time_length  & 0xc0)  ;
-	}
-	else if(Changed_SubItem == MONITOR_UNITS)
-	{
-		if(New_CString.CompareNoCase(_T("Days"))==0)
-		{
-			m_monitor_data.at(Changed_Item).max_time_length = m_monitor_data.at(Changed_Item).max_time_length | 0xC0 ;	// 高两位 存 时间单位 01秒  02分  03 时;
-		}
-		else if(New_CString.CompareNoCase(_T("Hours"))==0)
-		{
-			m_monitor_data.at(Changed_Item).max_time_length = (m_monitor_data.at(Changed_Item).max_time_length | 0x80) & 0xBF;
-		}
-		else if(New_CString.CompareNoCase(_T("Minutes"))==0)
-		{
-			m_monitor_data.at(Changed_Item).max_time_length = (m_monitor_data.at(Changed_Item).max_time_length | 0x40) & 0x7F ;
-			
-		}
-	}
+	//		return 0;
+	//	}
+	//	m_monitor_data.at(Changed_Item).max_time_length = (((unsigned char)temp_value) & 0x3f) | (m_monitor_data.at(Changed_Item).max_time_length  & 0xc0)  ;
+	//}
+	//else if(Changed_SubItem == MONITOR_UNITS)
+	//{
+	//	if(New_CString.CompareNoCase(_T("Days"))==0)
+	//	{
+	//		m_monitor_data.at(Changed_Item).max_time_length = m_monitor_data.at(Changed_Item).max_time_length | 0xC0 ;	// 高两位 存 时间单位 01秒  02分  03 时;
+	//	}
+	//	else if(New_CString.CompareNoCase(_T("Hours"))==0)
+	//	{
+	//		m_monitor_data.at(Changed_Item).max_time_length = (m_monitor_data.at(Changed_Item).max_time_length | 0x80) & 0xBF;
+	//	}
+	//	else if(New_CString.CompareNoCase(_T("Minutes"))==0)
+	//	{
+	//		m_monitor_data.at(Changed_Item).max_time_length = (m_monitor_data.at(Changed_Item).max_time_length | 0x40) & 0x7F ;
+	//		
+	//	}
+	//}
 
 
 	cmp_ret = memcmp(&m_temp_monitor_data[Changed_Item],&m_monitor_data.at(Changed_Item),sizeof(Str_monitor_point));
@@ -783,31 +783,31 @@ LRESULT CBacnetMonitor::Fresh_Monitor_List(WPARAM wParam,LPARAM lParam)
 		temp_time.ReleaseBuffer();
 		m_monitor_list.SetItemText(i,MONITOR_INTERVAL,temp_time);
 
-		unsigned char temp_log_time_value = 0;
-		temp_log_time_value = m_monitor_data.at(i).max_time_length & 0x3F;
-		temp_length.Format(_T("%d"),temp_log_time_value);
-		m_monitor_list.SetItemText(i,MONITOR_LOG_TIME,temp_length);
+		//unsigned char temp_log_time_value = 0;
+		//temp_log_time_value = m_monitor_data.at(i).max_time_length & 0x3F;
+		//temp_length.Format(_T("%d"),temp_log_time_value);
+		//m_monitor_list.SetItemText(i,MONITOR_LOG_TIME,temp_length);
 
-		unsigned char temp_char_unit = 0 ;
-		temp_char_unit = m_monitor_data.at(i).max_time_length >>6;
+		//unsigned char temp_char_unit = 0 ;
+		//temp_char_unit = m_monitor_data.at(i).max_time_length >>6;
 
-		if(temp_char_unit == 3)
-		{
-			m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Days"));
-		}
-		else if(temp_char_unit == 2)
-		{
-			m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Hours"));
-		}
-		else if(temp_char_unit == 1)
-		{
-			m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Minutes"));
-		}
-		else
-		{
-			m_monitor_data.at(i).max_time_length = (m_monitor_data.at(i).max_time_length | 0x40 ) & 0x7F;
-			m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Minutes"));
-		}
+		//if(temp_char_unit == 3)
+		//{
+		//	m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Days"));
+		//}
+		//else if(temp_char_unit == 2)
+		//{
+		//	m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Hours"));
+		//}
+		//else if(temp_char_unit == 1)
+		//{
+		//	m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Minutes"));
+		//}
+		//else
+		//{
+		//	m_monitor_data.at(i).max_time_length = (m_monitor_data.at(i).max_time_length | 0x40 ) & 0x7F;
+		//	m_monitor_list.SetItemText(i,MONITOR_UNITS,_T("Minutes"));
+		//}
 
 		if(m_monitor_data.at(i).status == 1)
 		{

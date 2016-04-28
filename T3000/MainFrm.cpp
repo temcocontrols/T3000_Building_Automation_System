@@ -1633,26 +1633,28 @@ void CMainFrame::LoadProductFromDB()
         ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
     }
 
-    if(cs_temp_protocol.CompareNoCase(_T("Modbus 485")) == 0 )
-    {
-        current_building_protocol = P_MODBUS_485;
-    }
-    else if(cs_temp_protocol.CompareNoCase(_T("Modbus TCP")) == 0 )
-    {
-        current_building_protocol = P_MODBUS_TCP;
-    }
-    else if(cs_temp_protocol.CompareNoCase(_T("Bacnet MSTP")) == 0 )
-    {
-        current_building_protocol = P_BACNET_MSTP;
-    }
-    else if(cs_temp_protocol.CompareNoCase(_T("Bacnet IP")) == 0 )
-    {
-        current_building_protocol = P_REMOTE_DEVICE;
-    }
-    else
-    {
-        current_building_protocol = P_AUTO;
-    }
+    //if(cs_temp_protocol.CompareNoCase(_T("Modbus 485")) == 0 )
+    //{
+    //    current_building_protocol = P_MODBUS_485;
+    //}
+    //else if(cs_temp_protocol.CompareNoCase(_T("Modbus TCP")) == 0 )
+    //{
+    //    current_building_protocol = P_MODBUS_TCP;
+    //}
+    //else if(cs_temp_protocol.CompareNoCase(_T("Bacnet MSTP")) == 0 )
+    //{
+    //    current_building_protocol = P_BACNET_MSTP;
+    //}
+    //else if(cs_temp_protocol.CompareNoCase(_T("Bacnet IP")) == 0 )
+    //{
+    //    current_building_protocol = P_REMOTE_DEVICE;
+    //}
+    //else
+    //{
+    //    current_building_protocol = P_AUTO;
+    //}
+	//简直是脑残，老毛.要求这样瞎几把改. //不管客户选什么鸡吧协议 ， 都要能扫到所有设备.那不就是TMD只有Auto 了吗？还选个P啊;
+	current_building_protocol = P_AUTO;
 
     CString StrComport;
     CString StrBaudrate;
@@ -2618,26 +2620,29 @@ void CMainFrame::ScanTstatInDB(void)
             ado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);
         }
 
-        if(cs_temp_protocol.CompareNoCase(_T("Modbus 485")) == 0 )
-        {
-            current_building_protocol = P_MODBUS_485;
-        }
-        else if(cs_temp_protocol.CompareNoCase(_T("Modbus TCP")) == 0 )
-        {
-            current_building_protocol = P_MODBUS_TCP;
-        }
-        else if(cs_temp_protocol.CompareNoCase(_T("Bacnet MSTP")) == 0 )
-        {
-            current_building_protocol = P_BACNET_MSTP;
-        }
-        else if(cs_temp_protocol.CompareNoCase(_T("Remote Device")) == 0 )
-        {
-            current_building_protocol = P_REMOTE_DEVICE;
-        }
-        else
-        {
-            current_building_protocol = P_AUTO;
-        }
+        //if(cs_temp_protocol.CompareNoCase(_T("Modbus 485")) == 0 )
+        //{
+        //    current_building_protocol = P_MODBUS_485;
+        //}
+        //else if(cs_temp_protocol.CompareNoCase(_T("Modbus TCP")) == 0 )
+        //{
+        //    current_building_protocol = P_MODBUS_TCP;
+        //}
+        //else if(cs_temp_protocol.CompareNoCase(_T("Bacnet MSTP")) == 0 )
+        //{
+        //    current_building_protocol = P_BACNET_MSTP;
+        //}
+        //else if(cs_temp_protocol.CompareNoCase(_T("Remote Device")) == 0 )
+        //{
+        //    current_building_protocol = P_REMOTE_DEVICE;
+        //}
+        //else
+        //{
+        //    current_building_protocol = P_AUTO;
+        //}
+				
+		current_building_protocol = P_AUTO;
+		//简直是脑残，老毛.要求这样瞎几把改. //不管客户选什么鸡吧协议 ， 都要能扫到所有设备.那不就是TMD只有Auto 了吗？还选个P啊;
 
 
         CString StrComport;
@@ -3457,7 +3462,6 @@ void CMainFrame::OnConnect()
                     if(!fFind.FindFile(g_configfile_path))
                     {
                         /*WritePrivateProfileStringW(_T("Setting"),_T("Connection Type"),_T("0"),g_configfile_path);
-
                         WritePrivateProfileStringW(_T("Setting"),_T("COM Port"),_T("COM1"),g_configfile_path);
                         WritePrivateProfileStringW(_T("Setting"),_T("COM_Port"),_T("1"),g_configfile_path);
                         WritePrivateProfileStringW(_T("Setting"),_T("Baudrate"),_T("19200"),g_configfile_path);*/
@@ -3958,7 +3962,8 @@ BOOL CMainFrame::ConnectDevice(tree_product tree_node)
     {
         strInfo.Format(_T("COM %d Connected: Yes"), nCom);
         SetPaneString(1,strInfo);
-        Change_BaudRate(default_com1_port_baudrate);
+        //Change_BaudRate(default_com1_port_baudrate);
+		 Change_BaudRate(tree_node.baudrate);
         CString	g_configfile_path=g_strExePth+_T("T3000_config.ini");
         CFileFind fFind;
         if(!fFind.FindFile(g_configfile_path))
@@ -7141,7 +7146,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                 }
 
                 ip=product_Node.BuildingInfo.strIp;
-                ipport=product_Node.BuildingInfo.strIpPort;
+                ipport.Format(_T("%d"),product_Node.ncomport);
                 m_cfgFileHandler.WriteToCfgFile(filename,
                                                 _T("Ethernet"),
                                                 id,
@@ -7236,67 +7241,14 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                     BOOL bRet = ConnectDevice(product_Node);//ConnectSubBuilding(product_Node.BuildingInfo);
 
 
-                    SetLastCommunicationType(1);
-//                     unsigned short read_data[10];
-//
-//                     strTemp.Format(_T("Begain Read\n"));
-//                     TRACE(strTemp);
-//                     g_bPauseMultiRead = TRUE;
-//                     int nmultyRet=Read_Multi(g_tstat_id,&read_data[0],0,10,3);
-//                     strTemp.Format(_T("nMultyRet=%d\n"),nmultyRet);
-//                     TRACE(strTemp);
-//
-//                     if (nmultyRet>0)
-//                     {
-//                         ID1=read_data[6];
-//                     }
-//                     nmultyRet=Read_Multi(255,&read_data[0],0,10,3);
-//
-//                     strTemp.Format(_T("nMultyRet=%d\n"),nmultyRet);
-//                     TRACE(strTemp);
-//                     if (nmultyRet>0)
-//                     {
-//                         ID2=read_data[6];
-//                     }
+                   // SetLastCommunicationType(1); //不可理解为什么要这么做，屏蔽 by 杜帆 06 03 31;
+
+
+
 
 //ISPTool Config
 #if 1
-                    /*	CString filename;
-                    CString flashmethod;
-                    CString id;
-                    CString comport;
-                    CString BD;
-                    CString ip;
-                    CString ipport;
-                    CString subnote;
-                    CString subID;*/
-                    //	id.Format(_T("%d"),)
-
-                    /*ip=product_Node.BuildingInfo.strIp;
-                    ipport=product_Node.BuildingInfo.strIpPort;
-                    if (ID1!=ID2)
-                    {
-                      subID.Format(_T("%d"),g_tstat_id);
-                      subnote.Format(_T("1"));
-                    }*/
-
-                    // CString ProductHexBinName,StrTemp;
-                    // CString StrBinHexPath,StrULRPath;
-                    // GetProductFPTAndLocalPath(product_Node.product_class_id,StrULRPath,ProductHexBinName);
-                    // StrBinHexPath = g_strExePth;
-                    //StrBinHexPath+=_T("firmware\\");
-
-                    // StrTemp.Format(_T("%s\\"),GetProductName(product_Node.product_class_id));
-                    //StrBinHexPath+=StrTemp;
-                    // StrBinHexPath+=ProductHexBinName;
-
-// 				 HANDLE hFind;//
-// 				 WIN32_FIND_DATA wfd;//
-// 				 hFind = FindFirstFile(StrBinHexPath, &wfd);//
-// 				 if ((hFind!=INVALID_HANDLE_VALUE)&&(!StrULRPath.IsEmpty()))//说明当前目录下无t3000.mdb
-// 				 {
-// 					 filename=StrBinHexPath;
-                    // }
+ 
 
 
                     m_cfgFileHandler.WriteToCfgFile(filename,
@@ -7316,16 +7268,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
             else
             {
                 g_protocol=MODBUS_RS485;
-// 				if (product_Node.BuildingInfo.strComPort.CompareNoCase(_T("N/A")) == 0)
-// 				{
-// 					AfxMessageBox(_T("Please select COM port"));//\nDatabase->Building config Database
-// 					CAddBuilding  Dlg;
-// 					if(Dlg.DoModal()==IDOK)
-// 					{
-// 					}
-//
-// 				}
-// 				else
+
                 {
                     //close_com();//关闭所有端口
                     //int nComPort = _wtoi(product_Node.BuildingInfo.strComPort.Mid(3));
@@ -7891,6 +7834,7 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                         length = 9;
                         register_critical_section.Lock();
                         int i;
+						it = 0;
                         float progress;
                         for(i=0; i<(length*power_value); i++)	//暂定为0 ，因为TSTAT6 目前为600多
                         {
@@ -9001,10 +8945,10 @@ UINT _FreshTreeView(LPVOID pParam )
             ReleaseMutex(Read_Mutex);
             continue;
         }
-        if((current_building_protocol == P_AUTO) || (current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_BACNET_IP))
-        {
+        //if((current_building_protocol == P_AUTO) || (current_building_protocol == P_MODBUS_TCP) || (current_building_protocol == P_BACNET_IP))
+        //{//简直是脑残，老毛.要求这样瞎几把改. //不管客户选什么鸡吧协议 ， 都要能扫到所有设备.那不就是TMD只有Auto 了吗？还选个P啊;
             RefreshNetWorkDeviceListByUDPFunc();
-        }
+        //}
 
         if(no_mouse_keyboard_event_enable_refresh == false)
         {

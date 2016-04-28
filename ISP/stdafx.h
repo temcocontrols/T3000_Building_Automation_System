@@ -66,8 +66,7 @@ INPUT bool Open_Socket2(CString strIPAdress,short nPort);
 INPUT bool Change_BaudRate(int new_baudrate);
 INPUT void SetCommunicationType(int nType);
 INPUT int GetCommunicationType();
-INPUT void SetResponseTime (TS_US Time);
-
+INPUT void SetResponseTime(unsigned short Time);
 
 #import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF","EndOfFile") rename("BOF","FirstOfFile")
 

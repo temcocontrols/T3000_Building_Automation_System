@@ -258,12 +258,12 @@ public:
 	afx_msg void OnBnClickedShowHex();
     afx_msg void OnBnClickedFlashSn();
 	afx_msg void OnMenuSetting();
-//    CString m_bin_inforamtion;
-//    CString m_strFirmwarepath;
-//    afx_msg void OnBnClickedButtonSelfile2();
+
 	afx_msg void OnMenuCheckhex();
 	void CheckAutoFlash();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
     CComboBox m_combox_baudrate;
     afx_msg void OnMenuFlashsn();
+
+	int m_isRAM;
 };

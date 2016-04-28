@@ -1028,8 +1028,8 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 	{
 		if(m_Variable_data.at(i).range>30)
 		{
-			ret_cstring.Empty();
-			return -1;
+			ret_cstring = _T("Range Error");
+			return RANGE_ERROR;
 		}
 		else
 		{
@@ -1042,8 +1042,8 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 			}
 			else
 			{
-				ret_cstring.Empty();
-				return -1;
+				ret_cstring = _T("Range Error");
+				return RANGE_ERROR;
 			}
 
 
@@ -1090,8 +1090,9 @@ int GetVariableValue(int index ,CString &ret_cstring,CString &ret_unit,CString &
 		}
 		else
 		{
+			ret_cstring = _T("Range Error");
 			ret_cstring.Empty();
-			return -1;
+			return RANGE_ERROR;
 		}
 	}
 

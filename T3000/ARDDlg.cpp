@@ -34,7 +34,7 @@ BOOL CARDDlg::OnInitDialog()
 	m_add_device_baudrate.InsertString(1,_T("19200"));
 	m_add_device_baudrate.SetCurSel(1);
 	m_add_device_modbus_id.SetWindowText(_T("255"));
-	m_ipaddress.SetWindowText(_T("97.77.120.35"));
+	m_ipaddress.SetWindowText(_T("127.0.0.1"));
 	m_porteditor.SetWindowText(_T("502"));
     m_minipanel_comport.SetCurSel(0);
 	((CButton *)GetDlgItem(IDC_RADIO_NET_DEVICE))->SetCheck(TRUE);//я║ио

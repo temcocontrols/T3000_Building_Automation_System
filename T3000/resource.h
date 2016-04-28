@@ -1993,6 +1993,7 @@
 #define IDC_EDIT_ID_COLLISION_3         2170
 #define IDC_BUTTON_UPDATE_T3000         2170
 #define IDC_EDIT_PACKET_ERROR_1         2171
+#define IDC_BTN_EDIT_CUSTOMER_RANGE     2171
 #define IDC_EDIT_PACKET_ERROR_2         2172
 #define IDC_EDIT_PACKET_ERROR_3         2173
 #define IDC_EDIT_TIMEOUT_1              2174
@@ -2167,6 +2168,8 @@
 #define IDC_RADIO85                     15578
 #define IDC_RADIO86                     15579
 #define IDC_RADIO87                     15580
+#define IDC_RADIO88                     15581
+#define IDC_RADIO_NEW200                15581
 #define ID_TIMEBASE_1HOUR               19485
 #define IDC_STATIC__LOGIN_NAME          32709
 #define IDC_STATIC_LOGIN_PASSWORD       32710
@@ -2465,7 +2468,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        602
 #define _APS_NEXT_COMMAND_VALUE         34054
-#define _APS_NEXT_CONTROL_VALUE         2171
+#define _APS_NEXT_CONTROL_VALUE         2172
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

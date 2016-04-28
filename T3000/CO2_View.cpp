@@ -206,6 +206,7 @@ void CCO2_View::Fresh()
 
     if (m_product_type == 1)
     {
+	    Read_Multi(g_tstat_id,ValueData,10000,10);
         Fresh_CO2();
     }
     else if(m_product_type == 2)
@@ -249,8 +250,11 @@ void CCO2_View::Fresh()
    
     
         GetDlgItem(IDC_BTN_CO2_REFRESH)->EnableWindow(FALSE);
-        if(RefreshThread==NULL)
-            RefreshThread = CreateThread(NULL,NULL,StartRefresh,this,NULL,NULL);
+
+		 
+
+//         if(RefreshThread==NULL)
+//             RefreshThread = CreateThread(NULL,NULL,StartRefresh,this,NULL,NULL);
  
 
 
@@ -290,8 +294,8 @@ void CCO2_View::SH_Window(){
         m_co2_hardwareversion=product_register_value[CO2_485_MODBUS_HARDWARE_REV];//8
         UpdateData(FALSE);
 
-        GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT2)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT3)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT2)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT3)->ShowWindow(SW_HIDE);
 
 
           GetDlgItem(IDC_CO2_BRAUDRATECOMBO)->ShowWindow(SW_SHOW);
@@ -318,7 +322,7 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_STATIC_PRE_ALARM_SETPOINT)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_CO2_PREPARE_ALARM_SETPOINT)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_STATIC_ALARM_SETPOINT)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_CO2_CALIBRATING_OFFSET)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_CO2_CALIBRATING_OFFSET)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_BTN_CO2_CLEAR_CAL)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_STATIC_ALARM_MENU)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_STATIC_ALON)->ShowWindow(SW_SHOW);
@@ -330,13 +334,13 @@ void CCO2_View::SH_Window(){
         GetDlgItem(IDC_EDIT_CO2_BLOCK_TIME)->ShowWindow(SW_SHOW);
         GetDlgItem(IDC_EDIT_CO2_BACKLIGHT_TIME)->ShowWindow(SW_SHOW);
 
-        GetDlgItem(IDC_STATIC_CALIBRATION_OFFSET)->ShowWindow(SW_SHOW);
+        GetDlgItem(IDC_STATIC_CALIBRATION_OFFSET)->ShowWindow(SW_HIDE);
         GetDlgItem(IDC_CO2_ALARM_SETPOINT)->ShowWindow(SW_SHOW);
 
-        GetDlgItem(IDC_STATIC_INPUT_SETTING)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_LIST_INPUT_AQ)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_LIST_OUTPUT_AQ)->ShowWindow(SW_HIDE);
-        GetDlgItem(IDC_STATIC_OUTPUT_SETTING)->ShowWindow(SW_HIDE);
+         GetDlgItem(IDC_STATIC_INPUT_SETTING)->ShowWindow(SW_HIDE);
+         GetDlgItem(IDC_LIST_INPUT_AQ)->ShowWindow(SW_HIDE);
+       // GetDlgItem(IDC_LIST_OUTPUT_AQ)->ShowWindow(SW_HIDE);
+      //  GetDlgItem(IDC_STATIC_OUTPUT_SETTING)->ShowWindow(SW_HIDE);
 
 
         GetDlgItem(IDC_STATIC_LAB_DATE)->ShowWindow(SW_SHOW);
@@ -485,8 +489,8 @@ void CCO2_View::SH_Window(){
 }
 
 void CCO2_View::Fresh_CO2(){
-      Initial_List();
-    C02_SHOW_TEMP();
+     Initial_List();
+     C02_SHOW_TEMP(); 
 
     m_humidity_value = (float)(product_register_value[CO2_485_MODBUS_HUMIDITY_RH])/10.0;
     if(m_humidity_value>100)
@@ -500,7 +504,8 @@ void CCO2_View::Fresh_CO2(){
     }
     CO2_Alarm_Set();
     //CO2_Grid_init();
-  
+	Initial_InputList();
+  Initial_OutputList();
  
    // Fresh_External_List();
 
@@ -612,8 +617,8 @@ void CCO2_View::C02_SHOW_TEMP()
 
     if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)		
     {
-        i_internal_temp = product_register_value[CO2_485_MODBUS_TEMPERATURE_C_INTERNAL];
-        i_external_temp = product_register_value[CO2_485_MODBUS_TEMPERATURE_C_EXTERNAL];
+		i_internal_temp = product_register_value[CO2_485_MODBUS_TEMPERATURE_C_INTERNAL];
+		i_external_temp = product_register_value[CO2_485_MODBUS_TEMPERATURE_C_EXTERNAL];
        
         strUnit=strTemp1;
     }
@@ -633,53 +638,57 @@ void CCO2_View::C02_SHOW_TEMP()
     CString  TempValue,StrAM;
     m_grid_input.put_TextMatrix(1,2,strUnit);
 
-    if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//内部
-    {
-        TempValue.Format(_T("%0.1f"),f_internal_temp);
-    }
-    else
-    {
-        TempValue.Format(_T("%0.1f"),f_external_temp);
-    }
-    m_grid_input.put_TextMatrix(1,4,TempValue);
+//      if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//内部
+//      {
+//          TempValue.Format(_T("%0.1f"),f_internal_temp);
+//      }
+//      else
+//      {
+//         TempValue.Format(_T("%0.1f"),f_external_temp);
+//      } 
+   
 
-    BOOL AM=Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],1);
-    if (AM)
-    {
-        StrAM=_T("Manual");
-    } 
-    else
-    {
-        StrAM=_T("Auto");
-    }
-    m_grid_input.put_TextMatrix(1,3,StrAM);
+	BOOL AM=Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],1);
+	if (AM)
+	{
+		StrAM=_T("Manual");
+		TempValue.Format(_T("%0.1f"),(float)((short)product_register_value[CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_TEM])/10);
+	} 
+	else
+	{
+		StrAM=_T("Auto");
+		TempValue.Format(_T("%0.1f"),f_external_temp);
+	}
+	m_grid_input.put_TextMatrix(1,3,StrAM);
+	m_grid_input.put_TextMatrix(1,4,TempValue);
+	AM=Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],2);
+	if (AM)
+	{
+		StrAM=_T("Manual");
+		TempValue.Format(_T("%0.1f"),(float)((short)product_register_value[CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_HUM])/10);
+	} 
+	else
+	{
+		StrAM=_T("Auto");
+		TempValue.Format(_T("%0.1f"),(float)(product_register_value[CO2_485_MODBUS_HUMIDITY_RH])/10.0);
+	}
+	m_grid_input.put_TextMatrix(2,3,StrAM);
+	m_grid_input.put_TextMatrix(2,4,TempValue);
+	AM=Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],3);
+	if (AM)
+	{
+		StrAM=_T("Manual");
+		TempValue.Format(_T("%d"),(short)product_register_value[CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_CO2]);
+	} 
+	else
+	{
+		StrAM=_T("Auto");
+		TempValue.Format(_T("%d"),product_register_value[CO2_485_MODBUS_INTERNAL_CO2_PPM]);	 
+	}
+	m_grid_input.put_TextMatrix(3,3,StrAM);
+	m_grid_input.put_TextMatrix(3,4,TempValue);
+   
 
-    AM=Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],2);
-    if (AM)
-    {
-        StrAM=_T("Manual");
-    } 
-    else
-    {
-        StrAM=_T("Auto");
-    }
-    m_grid_input.put_TextMatrix(2,3,StrAM);
-
-    AM=Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],3);
-    if (AM)
-    {
-        StrAM=_T("Manual");
-    } 
-    else
-    {
-        StrAM=_T("Auto");
-    }
-    m_grid_input.put_TextMatrix(3,3,StrAM);
-
-    strHUM.Format(_T("%0.1f"),(float)(product_register_value[CO2_485_MODBUS_HUMIDITY_RH])/10.0);
-    m_grid_input.put_TextMatrix(2,4,strHUM);
-    strCO2.Format(_T("%d"),product_register_value[CO2_485_MODBUS_INTERNAL_CO2_PPM]);
-    m_grid_input.put_TextMatrix(3,4,strCO2);
 }
 
 void CCO2_View::Node_SHOW_TEMP()
@@ -1170,8 +1179,8 @@ HBRUSH CCO2_View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
         if(/*nCtlColor==CTLCOLOR_EDIT &&*/pWnd->GetDlgCtrlID()==Change_Color_ID.at(i))//注意此处的（pWnd->），否则没效果
         {
             pDC->SetTextColor(RGB(0,0,0));
-            pDC->SetBkColor(RGB(255,0,0));//设置文本背景色
-            pDC->SetBkMode(TRANSPARENT);//设置背景透明
+            pDC->SetBkColor(RGB(255,0,0));	//设置文本背景色
+            pDC->SetBkMode(TRANSPARENT);	//设置背景透明
             hbr = (HBRUSH)m_brush;
         }
 
@@ -1633,7 +1642,12 @@ DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
     CCO2_View *pParent = (CCO2_View *)lpVoid;
 
     while(TRUE){
-
+	     
+		 if (g_bPauseRefreshTree)
+		 {
+			Sleep(1000);
+			continue;
+		 }
 
         if (pParent->m_product_type == 2)
         {
@@ -1758,6 +1772,7 @@ DWORD WINAPI CCO2_View::StartRefresh(LPVOID lpVoid)
             if(Read_Multi(g_tstat_id,&product_register_value[i*100],i*100,100)>0)
                 read_ret++;
         }
+		Read_Multi(g_tstat_id,pParent->ValueData,10000,10);
         register_critical_section.Unlock();
         if(!no_mouse_keyboard_event_enable_refresh) 
         {continue ;}
@@ -1862,7 +1877,7 @@ void CCO2_View::Initial_Registerlist(){
     {
         if (fv<3.0)
         {
-            AfxMessageBox(_T("Your Firmware is old,please update it!"));       
+            //AfxMessageBox(_T("Your Firmware is old,please update it!"));       
         }
 
     }
@@ -2298,7 +2313,7 @@ void CCO2_View::ClickMsflexgridInput()
     }
     if (lCol==4)
     {
-        if (Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],m_nCurRow))//Manual
+        if (/*Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],m_nCurRow)*/TRUE)//Manual
         {
 
             m_co2_temp_unit.ShowWindow(SW_HIDE);
@@ -2365,14 +2380,14 @@ void CCO2_View::OnEnKillfocusEditValueGrid()
         }
         else
         {
-            if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//内部
-            {
-                RegAdd=RegAdd_IN;
-            }
-            else
-            {
+//             if(product_register_value[CO2_485_MODBUS_TEMPERATURE_SENSOR_SELECT] == 0)//内部
+//             {
+//                 RegAdd=RegAdd_IN;
+//             }
+//             else
+//             {
                 RegAdd=RegAdd_Ex;
-            }
+          //  }
         }
         Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RegAdd,m_value,
             product_register_value[RegAdd],this->m_hWnd,IDC_EDIT_VALUE_GRID,_T("Calibrate Value"));
@@ -2383,11 +2398,13 @@ void CCO2_View::OnEnKillfocusEditValueGrid()
         unsigned short m_value=(unsigned short)(_wtof(TempValue)*10);
         if (Get_Bit_FromRegister(product_register_value[CO2_485_MODBUS_OUTPUT_AUTO_MANUAL],m_nCurRow))
         {
-            RegAdd_IN=CO2_485_MODBUS_HUMIDITY_RH;
+          
+
+			 RegAdd_IN=CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_HUM;	
         }
         else
         {
-            RegAdd_IN=CO2_485_MODBUS_OUTPUT_MANUAL_VALUE_HUM;	
+             RegAdd_IN=CO2_485_MODBUS_HUMIDITY_RH;
         }
         Post_Thread_Message(MY_WRITE_ONE,g_tstat_id,RegAdd_IN,m_value,
             product_register_value[RegAdd_IN],this->m_hWnd,IDC_EDIT_VALUE_GRID,_T("Calibrate Value"));
@@ -2408,9 +2425,9 @@ void CCO2_View::OnEnKillfocusEditValueGrid()
             product_register_value[RegAdd_IN],this->m_hWnd,IDC_EDIT_VALUE_GRID,_T("Calibrate Value"));
     }
 
-    C02_SHOW_TEMP();
+   // C02_SHOW_TEMP();
 
-
+	m_inValueEdit.ShowWindow(SW_HIDE);
 
 }
 
@@ -2699,29 +2716,41 @@ void CCO2_View::OnEnKillfocusIdCo2Edit()
 void CCO2_View::OnCbnSelchangeCo2Braudratecombo()
 {
     g_bPauseMultiRead = TRUE;
-
-    write_one(g_tstat_id, CO2_485_MODBUS_BAUDRATE, m_co2_braudRateCombox.GetCurSel());
-    //MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+	int temp_write_ret = 0;
+   temp_write_ret = write_one(g_tstat_id, CO2_485_MODBUS_BAUDRATE, m_co2_braudRateCombox.GetCurSel());
+   if(temp_write_ret < 0)	//暂时不判断这玩意，设备是自己先切波特率在回，导致回不过来. 
+   {
+	   MessageBox(_T("Write timeout."));
+	   return;
+   }
+   else
+   {
+	   SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change braudrate success!"));
+   }
+   // MessageBox(_T("Write Register Fail!Please try it again!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
     /*else
     product_register_value[CO2_485_MODBUS_BAUDRATE] = m_co2_braudRateCombox.GetCurSel();*/
     CString SqlText;
     if (m_co2_braudRateCombox.GetCurSel()==0)
     {
         SqlText.Format(_T("update ALL_NODE set Bautrate = '9600' where Serial_ID='%d'"),get_serialnumber());
-        // Change_BaudRate(9600);
+         Change_BaudRate(9600);
     } 
     else
     {
         SqlText.Format(_T("update ALL_NODE set Bautrate = '19200' where Serial_ID='%d'"),get_serialnumber());
-        // Change_BaudRate(19200);
+         Change_BaudRate(19200);
     }
     CBADO bado;
     bado.SetDBPath(g_strCurBuildingDatabasefilePath);
     bado.OnInitADOConn(); 
     bado.m_pConnection->Execute(SqlText.GetString(),NULL,adCmdText);
 
-    CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
-    pFrame->ScanTstatInDB();
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	::PostMessage(pFrame->m_hWnd, WM_MYMSG_REFRESHBUILDING,0,0);
+
+    
+   // pFrame->ScanTstatInDB();
     g_bPauseMultiRead = FALSE;
 }
 
@@ -2911,7 +2940,158 @@ void CCO2_View::Initial_InputList(){
 }
 
 void CCO2_View::Initial_OutputList(){
-if (m_product_type == 3)
+if (m_product_type == 1)
+{
+	int AddressValue = -1;
+	CString strTemp;
+	float flValue = 0;
+	m_output_list.DeleteAllItems();
+	while ( m_output_list.DeleteColumn (0)) ;
+
+	m_output_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
+	m_output_list.SetExtendedStyle(m_output_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));	
+	m_output_list.InsertColumn(0, _T("NUM"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+	m_output_list.InsertColumn(1, _T("Full Label"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    m_output_list.InsertColumn(2, _T("Value"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(3, _T("Range"), 45, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(4, _T("Min Out Scale"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(5, _T("Max Out Scale"), 85, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(6, _T("Unit"), 85, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	g_hwnd_now = this->m_hWnd;
+
+	m_output_list.InsertItem(0,_T("1"));
+	m_output_list.InsertItem(1,_T("2"));
+	m_output_list.InsertItem(2,_T("3"));
+
+	m_output_list.SetItemText(0,1,_T("Hum"));
+	m_output_list.SetItemText(1,1,_T("Tempreture"));
+	m_output_list.SetItemText(2,1,_T("CO2"));
+
+	AddressValue =284 ;
+	int output_range=product_register_value[AddressValue];
+	if (output_range==3){
+		strTemp=_T("0-10v");
+	}
+	else if (output_range==2)
+	{
+		strTemp=_T("0-5v");
+	}
+	else if (output_range==1)
+	{
+		strTemp=_T("4-20mA");
+	}
+	else
+	{
+		strTemp=_T("");
+	}
+	m_output_list.SetItemText(0,3,strTemp);
+	m_output_list.SetItemText(1,3,strTemp);
+	m_output_list.SetItemText(2,3,strTemp);
+	float FloatValue = 0;
+	
+	if (output_range == 1)
+	{
+		AddressValue =10003 ;
+		flValue = (((float)((short)ValueData[AddressValue-10000]))/1024)*25;
+		strTemp.Format (_T("%0.2f"),flValue);
+		m_output_list.SetItemText(0,2,strTemp);
+
+		AddressValue =10004 ;
+		flValue = (((float)((short)ValueData[AddressValue-10000]))/1024)*25;
+		strTemp.Format (_T("%0.2f"),flValue);
+		m_output_list.SetItemText(1,2,strTemp);
+
+		AddressValue =10005 ;
+		flValue = (((float)((short)ValueData[AddressValue-10000]))/1024)*25;
+		strTemp.Format (_T("%0.2f"),flValue);
+		m_output_list.SetItemText(2,2,strTemp);
+	} 
+	else
+	{
+		AddressValue =10000 ;
+		  FloatValue = (short)ValueData[AddressValue-10000];
+		flValue = (FloatValue/1024)*10;
+		strTemp.Format (_T("%0.2f"),flValue);
+		m_output_list.SetItemText(0,2,strTemp);
+
+		AddressValue =10001 ;
+		FloatValue = (short)ValueData[AddressValue-10000];
+		flValue = (FloatValue/1024)*10;
+		 
+		strTemp.Format (_T("%0.2f"),flValue);
+		m_output_list.SetItemText(1,2,strTemp);
+
+		AddressValue =10002 ;
+		FloatValue = (short)ValueData[AddressValue-10000];
+		flValue = (FloatValue/1024)*10;
+		strTemp.Format (_T("%0.2f"),flValue);
+		m_output_list.SetItemText(2,2,strTemp);
+	}
+
+	
+
+	
+
+	 
+	FloatValue = (short)product_register_value[287];
+	flValue = (FloatValue)/10;
+	strTemp.Format (_T("%0.1f"),flValue);
+	m_output_list.SetItemText(0,4,strTemp);
+
+	 
+
+	FloatValue = (short)product_register_value[288];
+	flValue = (FloatValue)/10;
+	strTemp.Format (_T("%0.1f"),flValue);
+	m_output_list.SetItemText(0,5,strTemp);
+	 
+
+	FloatValue = (short)product_register_value[285];
+	flValue = (FloatValue)/10;
+	strTemp.Format (_T("%0.1f"),flValue);
+
+	m_output_list.SetItemText(1,4,strTemp);
+	 
+
+	FloatValue = (short)product_register_value[286];
+	flValue = (FloatValue)/10;
+	strTemp.Format (_T("%0.1f"),flValue);
+
+	m_output_list.SetItemText(1,5,strTemp);
+
+	strTemp.Format (_T("%d"),product_register_value[289]);
+	m_output_list.SetItemText(2,4,strTemp);
+	strTemp.Format (_T("%d"),product_register_value[290]);
+	m_output_list.SetItemText(2,5,strTemp);
+
+
+
+	CString strTemp1,strTemp2,strUnit,strHUM,strCO2;
+	strTemp1.Format(_T("%cC"),176);
+	strTemp2.Format(_T("%cF"),176);
+
+	if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)		
+	{
+
+
+		strUnit=strTemp1;
+	}
+	else if((product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 1))
+	{
+
+
+		strUnit=strTemp2;
+	}
+	m_output_list.SetItemText(1,6,strUnit);
+	strTemp = L"%";
+
+	m_output_list.SetItemText(0,6,strTemp);
+
+	strTemp = L"ppm";
+	m_output_list.SetItemText(2,6,strTemp);
+	m_output_list.ShowWindow (SW_SHOW);
+}
+else if (m_product_type == 3)
 {
     int AddressValue = -1;
     CString strTemp;
@@ -3392,6 +3572,106 @@ LRESULT CCO2_View::Change_Item_List(WPARAM wParam,LPARAM lParam){
             }
 
         }
+		if (m_product_type == 1)
+		{
+			CString New_CString =  m_output_list.GetItemText(Changed_Item,Changed_SubItem);
+			int ItemValue = (int)(_wtof(New_CString)*10);
+			if (Changed_SubItem == 4)
+			{
+  				if (Changed_Item == 0)	
+ 				{
+				     RegAddress = 287;
+				     int RegValue = (short)product_register_value[RegAddress];
+				     if (RegValue!=ItemValue)
+				     {
+				     	int ret = write_one(g_tstat_id,RegAddress,ItemValue);
+				     	if (ret> 0)
+				     	{
+				     		product_register_value[RegAddress]=ItemValue;
+				     		PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+				     	}
+				     }
+				 } 
+
+				if (Changed_Item == 1)	
+				{
+					RegAddress = 285;
+					int RegValue = (short)product_register_value[RegAddress];
+					if (RegValue!=ItemValue)
+					{
+						int ret = write_one(g_tstat_id,RegAddress,ItemValue);
+						if (ret> 0)
+						{
+							product_register_value[RegAddress]=ItemValue;
+							PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+						}
+					}
+				}
+
+				if (Changed_Item == 2)	
+				{
+					RegAddress = 289;
+					int RegValue = (short)product_register_value[RegAddress];
+					ItemValue = ItemValue/10;
+					if (RegValue!=ItemValue)
+					{
+						int ret = write_one(g_tstat_id,RegAddress,ItemValue);
+						if (ret> 0)
+						{
+							product_register_value[RegAddress]=ItemValue;
+							PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+						}
+					}
+				}
+
+			}
+			if (Changed_SubItem == 5)
+			{
+				if (Changed_Item == 0)	   
+				{
+					RegAddress = 288;
+					int RegValue = (short)product_register_value[RegAddress];
+					if (RegValue!=ItemValue)
+					{
+						int ret = write_one(g_tstat_id,RegAddress,ItemValue);
+						if (ret> 0)
+						{
+							product_register_value[RegAddress]=ItemValue;
+							PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+						}
+					}
+				}   
+				if (Changed_Item == 1)	   
+				{
+					RegAddress = 286;
+					int RegValue = (short)product_register_value[RegAddress];
+					if (RegValue!=ItemValue)
+					{
+						int ret = write_one(g_tstat_id,RegAddress,ItemValue);
+						if (ret> 0)
+						{
+							product_register_value[RegAddress]=ItemValue;
+							PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+						}
+					}
+				}   
+				if (Changed_Item == 2)	   
+				{
+					RegAddress = 290;
+					int RegValue = (short)product_register_value[RegAddress];
+					ItemValue = ItemValue/10;
+					if (RegValue!=ItemValue)
+					{
+						int ret = write_one(g_tstat_id,RegAddress,ItemValue);
+						if (ret> 0)
+						{
+							product_register_value[RegAddress]=ItemValue;
+							PostMessage(WM_REFRESH_BAC_INPUT_LIST,0,0);
+						}
+					}
+				}   
+			}
+		}
         else
         {
             CString New_CString =  m_output_list.GetItemText(Changed_Item,Changed_SubItem);
@@ -3864,6 +4144,146 @@ LRESULT CCO2_View::Fresh_Lists(WPARAM wParam,LPARAM lParam){
 
             m_output_list.ShowWindow (SW_SHOW);
         } 
+
+		else if (m_product_type == 1)
+		{
+		   float flValue = 0;
+			
+			m_output_list.DeleteAllItems();
+
+			g_hwnd_now = this->m_hWnd;
+
+			m_output_list.InsertItem(0,_T("1"));
+			m_output_list.InsertItem(1,_T("2"));
+			m_output_list.InsertItem(2,_T("3"));
+
+			m_output_list.SetItemText(0,1,_T("Hum"));
+			m_output_list.SetItemText(1,1,_T("Tempreture"));
+			m_output_list.SetItemText(2,1,_T("CO2"));
+
+			AddressValue =284 ;
+			int output_range=product_register_value[AddressValue];
+			if (output_range==3){
+				strTemp=_T("0-10v");
+			}
+			else if (output_range==2)
+			{
+				strTemp=_T("0-5v");
+			}
+			else if (output_range==1)
+			{
+				strTemp=_T("4-20mA");
+			}
+			else
+			{
+				strTemp=_T("");
+			}
+			m_output_list.SetItemText(0,3,strTemp);
+			m_output_list.SetItemText(1,3,strTemp);
+			m_output_list.SetItemText(2,3,strTemp);
+			float FloatValue = 0;
+
+			if (output_range == 1)
+			{
+				AddressValue =10003 ;
+				flValue = (((float)((short)ValueData[AddressValue-10000]))/1024)*0.025;
+				strTemp.Format (_T("%0.2f"),flValue);
+				m_output_list.SetItemText(0,2,strTemp);
+
+				AddressValue =10004 ;
+				flValue = (((float)((short)ValueData[AddressValue-10000]))/1024)*0.025;
+				strTemp.Format (_T("%0.2f"),flValue);
+				m_output_list.SetItemText(1,2,strTemp);
+
+				AddressValue =10005 ;
+				flValue = (((float)((short)ValueData[AddressValue-10000]))/1024)*0.025;
+				strTemp.Format (_T("%0.2f"),flValue);
+				m_output_list.SetItemText(2,2,strTemp);
+			} 
+			else
+			{
+				AddressValue =10000 ;
+				FloatValue = (short)ValueData[AddressValue-10000];
+				flValue = (FloatValue/1024)*10;
+				strTemp.Format (_T("%0.2f"),flValue);
+				m_output_list.SetItemText(0,2,strTemp);
+
+				AddressValue =10001 ;
+				FloatValue = (short)ValueData[AddressValue-10000];
+				flValue = (FloatValue/1024)*10;
+
+				strTemp.Format (_T("%0.2f"),flValue);
+				m_output_list.SetItemText(1,2,strTemp);
+
+				AddressValue =10002 ;
+				FloatValue = (short)ValueData[AddressValue-10000];
+				flValue = (FloatValue/1024)*10;
+				strTemp.Format (_T("%0.2f"),flValue);
+				m_output_list.SetItemText(2,2,strTemp);
+			}
+
+
+
+
+
+
+			FloatValue = (short)product_register_value[287];
+			flValue = (FloatValue)/10;
+			strTemp.Format (_T("%0.1f"),flValue);
+			m_output_list.SetItemText(0,4,strTemp);
+
+
+
+			FloatValue = (short)product_register_value[288];
+			flValue = (FloatValue)/10;
+			strTemp.Format (_T("%0.1f"),flValue);
+			m_output_list.SetItemText(0,5,strTemp);
+
+
+			FloatValue = (short)product_register_value[285];
+			flValue = (FloatValue)/10;
+			strTemp.Format (_T("%0.1f"),flValue);
+
+			m_output_list.SetItemText(1,4,strTemp);
+
+
+			FloatValue = (short)product_register_value[286];
+			flValue = (FloatValue)/10;
+			strTemp.Format (_T("%0.1f"),flValue);
+
+			m_output_list.SetItemText(1,5,strTemp);
+
+			strTemp.Format (_T("%d"),product_register_value[289]);
+			m_output_list.SetItemText(2,4,strTemp);
+			strTemp.Format (_T("%d"),product_register_value[290]);
+			m_output_list.SetItemText(2,5,strTemp);
+
+
+
+			CString strTemp1,strTemp2,strUnit,strHUM,strCO2;
+			strTemp1.Format(_T("%cC"),176);
+			strTemp2.Format(_T("%cF"),176);
+
+			if(product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 0)		
+			{
+
+
+				strUnit=strTemp1;
+			}
+			else if((product_register_value[CO2_485_MODBUS_DEG_C_OR_F] == 1))
+			{
+
+
+				strUnit=strTemp2;
+			}
+			m_output_list.SetItemText(1,6,strUnit);
+			strTemp = L"%";
+
+			m_output_list.SetItemText(0,6,strTemp);
+
+			strTemp = L"ppm";
+			m_output_list.SetItemText(2,6,strTemp);
+		}
         else
         {
             int AddressValue = -1;

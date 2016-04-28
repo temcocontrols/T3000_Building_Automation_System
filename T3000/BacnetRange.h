@@ -39,6 +39,7 @@ public:
 	afx_msg void OnBnClickedCancel();
 	CStatic m_rang_pic;
 	void Timer2_handle();
+	afx_msg void OnBnClickedBtnEditCustomerRange();
 };
 
 const CString Range_Type[] =

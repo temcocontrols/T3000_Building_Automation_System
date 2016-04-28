@@ -426,12 +426,24 @@ LRESULT CTStatOutputView::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
         //}
 
         int Output_Value=(int)(_wtof(New_CString)*10);
+		if(Output_Value >1000)
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Please input value between 0 - 100 "));
+			PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
+			return 0;
+		}
         if (m_tstat_output_data.at(lRow).Value.RegValue==Output_Value)
         {
             m_output_list.Set_Edit(false);
             IS_SEND=FALSE;
             return 0; 
         }
+
+		IS_SEND=TRUE;
+		pwrite_info->Changed_Name.Format(_T("Value,From %u to %s"),m_tstat_output_data.at(lRow).Function.RegValue,New_CString);
+		pwrite_info->address=m_tstat_output_data.at(lRow).Value.regAddress;
+		pwrite_info->new_value=Output_Value;
+
 
     }
 

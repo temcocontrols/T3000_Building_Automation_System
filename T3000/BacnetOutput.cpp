@@ -14,8 +14,8 @@
 #include "MainFrm.h"
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
-
-
+CRect Output_rect;
+static bool show_output_external =  false;
 
 
 IMPLEMENT_DYNAMIC(CBacnetOutput, CDialogEx)
@@ -269,9 +269,15 @@ void CBacnetOutput::Initial_List()
 	
 	m_output_list.InsertColumn(OUTPUT_DECOM, _T("Status"), 70, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_LABLE, _T("Label"), 70, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+
+	m_output_list.InsertColumn(OUTPUT_EXTERNAL, _T("External"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_PRODUCT, _T("Product Name"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_EXT_NUMBER, _T("Product Output"), 0, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
+
+
 	m_output_dlg_hwnd = this->m_hWnd;
 	//g_hwnd_now = m_output_dlg_hwnd;
-	
+	m_output_list.GetClientRect(Output_rect);
  
 	for (int i=0;i<(int)m_Output_data.size();i++)
 	{
@@ -335,6 +341,47 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
      
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
+
+	bool temp_need_show_external = false;
+	for (int z= 0 ;z < (int)m_Output_data.size();z++)
+	{
+		if((m_Output_data.at(z).sub_id !=0) &&
+			(m_Output_data.at(z).sub_product !=0))
+		{
+			temp_need_show_external = true;
+			break;
+		}
+
+	}
+	if(show_output_external != temp_need_show_external)
+	{
+		show_output_external = temp_need_show_external;
+		if(temp_need_show_external)
+		{
+			CRect temp_rect;
+			temp_rect = Output_rect;
+			temp_rect.right = 1100;
+			temp_rect.top = temp_rect.top + 24;
+			m_output_list.MoveWindow(temp_rect);
+			m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,60);
+			m_output_list.SetColumnWidth(OUTPUT_PRODUCT,80);
+			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER,80);
+		}
+		else
+		{
+			CRect temp_rect;
+			temp_rect = Output_rect;
+			temp_rect.right = 900;
+			temp_rect.top = temp_rect.top + 24;
+			m_output_list.MoveWindow(temp_rect);
+
+			m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,0);
+			m_output_list.SetColumnWidth(OUTPUT_PRODUCT,0);
+			m_output_list.SetColumnWidth(OUTPUT_EXT_NUMBER,0);
+		}
+	}
+
+
 	if(isFreshOne == REFRESH_ON_ITEM)
 	{
 		Fresh_Item = (int)wParam;
@@ -571,6 +618,51 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				}
 			}
 		}
+
+
+
+
+#pragma region External info
+		if((m_Output_data.at(i).sub_id !=0) &&
+			//(m_Input_data.at(input_list_line).sub_number !=0) &&
+			(m_Output_data.at(i).sub_product !=0))
+		{
+			unsigned char temp_pid = m_Output_data.at(i).sub_product;
+			if((temp_pid == PM_T3PT10) ||
+				(temp_pid == PM_T3IOA) ||
+				(temp_pid == PM_T332AI) ||
+				(temp_pid == PM_T38AI16O) ||
+				(temp_pid == PM_T38I13O) ||
+				(temp_pid == PM_T34AO) ||
+				(temp_pid == PM_T322AI) ||
+				(temp_pid == PM_T38AI8AO6DO) ||
+				(temp_pid == PM_T36CT))
+			{
+				CString temp_name;
+				temp_name = GetProductName(m_Output_data.at(i).sub_product);
+				CString show_info;
+				CString temp_id;
+				CString temp_number;
+				temp_number.Format(_T("Output%d"),(unsigned char)m_Output_data.at(i).sub_number + 1);
+				m_output_list.SetItemText(i,OUTPUT_EXTERNAL,_T("External"));
+				m_output_list.SetItemTextColor(i,OUTPUT_EXTERNAL,RGB(255,0,0),FALSE);
+				m_output_list.SetItemText(i,OUTPUT_PRODUCT,temp_name);
+				m_output_list.SetItemText(i,OUTPUT_EXT_NUMBER,temp_number);
+
+
+				//temp_id.Format(_T(" Sub ID: %u        "),(unsigned char)m_Input_data.at(input_list_line).sub_id);
+				//temp_number.Format(_T("Input%d"),(unsigned char)m_Input_data.at(input_list_line).sub_number + 1);
+				//show_info = _T("Module:") + temp_name +_T("        ") + temp_id + temp_number;
+				//m_input_item_info.SetWindowTextW(show_info);
+
+			}	
+
+		}
+
+#pragma endregion External info
+
+
+
 
 		if(m_Output_data.at(i).decom==0)
 			temp_status.Format(Output_Decom_Array[0]);

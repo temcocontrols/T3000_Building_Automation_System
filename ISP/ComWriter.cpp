@@ -2134,7 +2134,7 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
 
     CString prodcutname=GetProductName(device_productID);
 
-    if(READ_SUCCESS != Get_HexFile_Information(m_hexbinfilepath.GetBuffer(),temp1))
+    if(READ_SUCCESS != Get_HexFile_Information(m_hexbinfilepath.GetBuffer(),temp1,0x100))
     {
         //AfxMessageBox(_T("The hex file dones't contains Temco logo,Can't flash into our products!"));
         strtips.Format(_T("The hex file doesn't contains Temco logo,Can't flash into our products!"));
@@ -2235,13 +2235,28 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
 
     CString prodcutname=GetProductName(Device_infor[7]);
 
-    if(READ_SUCCESS != Get_HexFile_Information(m_hexbinfilepath.GetBuffer(),temp1))
-    {
-        //AfxMessageBox(_T("The hex file dones't contains Temco logo,Can't flash into our products!"));
-        strtips.Format(_T("The hex file doesn't contains Temco logo,Can't flash into our products!"));
-        OutPutsStatusInfo(strtips,false);
-        return FALSE;
-    }
+	if (Is_Ram)
+	{
+		if(READ_SUCCESS != Get_HexFile_Information(m_hexbinfilepath.GetBuffer(),temp1,0x8200))
+		{
+			//AfxMessageBox(_T("The hex file dones't contains Temco logo,Can't flash into our products!"));
+			strtips.Format(_T("The hex file doesn't contains Temco logo,Can't flash into our products!"));
+			OutPutsStatusInfo(strtips,false);
+			return FALSE;
+		}
+	} 
+	else
+	{
+		if(READ_SUCCESS != Get_HexFile_Information(m_hexbinfilepath.GetBuffer(),temp1,0x100))
+		{
+			//AfxMessageBox(_T("The hex file dones't contains Temco logo,Can't flash into our products!"));
+			strtips.Format(_T("The hex file doesn't contains Temco logo,Can't flash into our products!"));
+			OutPutsStatusInfo(strtips,false);
+			return FALSE;
+		}
+	}
+
+    
 
 
 
@@ -2394,7 +2409,11 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
         strID.Format(_T("|Current Programming device ID is : %d"), pWriter->m_szMdbIDs[i]);
         pWriter->OutPutsStatusInfo(strID);
 
-        int  nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
+		BOOL Flag_HEX_BIN=FALSE;
+		if (pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]))
+		{
+
+	         int  nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
              Sleep (2000);
          nRet = Read_One(pWriter->m_szMdbIDs[i],11);
          if (nRet <= 0)
@@ -2411,43 +2430,25 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 close_com ();
                 if(open_com(pWriter->m_nComPort)==false)
                 {
-                    //CString srtInfo = _T("|Error :The com port is occupied!");
-                    //MessageBox(NULL, srtInfo, _T("ISP"), MB_OK);
-                    //AddStringToOutPuts(_T("Error :The com port is occupied!"));
-                  //  OutPutsStatusInfo(srtInfo, FALSE);
                     return 0;
                 }
                 else
                 {
-                 //CString strTemp;
-                  //  strTemp.Format(_T("COM%d"), m_nComPort);
-                  //  CString strTips = _T("|Open ") +  strTemp + _T(" successful.");
-                    //OutPutsStatusInfo(strTips, FALSE);
-                    // AddStringToOutPuts(strTips);
                   bool is_ok =  Change_BaudRate (115200);
- 
-                 }
+                }
                // Change_BaudRate (115200);
             }
             
          }
 
         Sleep (500);
-        // pWriter->UpdataDeviceInformation(pWriter->m_szMdbIDs[i]);
-        //  nRet = Write_One(pWriter->m_szMdbIDs[i],16,127);   // 进入ISP模式
-
-        /*  nRet = Read_One(pWriter->m_szMdbIDs[i],11);
-        	  if (nRet <= 0)
-        	  {
-        			AfxMessageBox(_T("Fail to enter ISP Mode!"));
-        			goto end_isp_flash;
-        	  }*/
+        
         int m_ID=pWriter->m_szMdbIDs[i];
 
         Sleep(2000);
 
-
-#if 1
+         
+         #if 1
         //*************inspect the flash that last flash position ***********************
         int ii=0;
         while(Read_One(m_ID,0xee10)<0) //the return value == -1 ,no connecting
@@ -2717,7 +2718,18 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             ii=0;//to the register 0000
         } // 读ee10 的处理结束
 
-#endif
+         #endif
+
+		}
+
+// 		if (!Flag_HEX_BIN)
+// 		{
+// 			continue;
+// 		}
+
+
+
+
 
         the_max_register_number_parameter_Count=pWriter->m_szHexFileFlags[pWriter->m_szHexFileFlags.size()-1];
 
@@ -2767,17 +2779,15 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                 }
                 pWriter->OutPutsStatusInfo(strTemp);
                 //AfxMessageBox(strTemp);
-                break;
+               // break;
+				goto end_isp_flash;
+				 
             }
             else
             {
                 nCount += nBufLen;
                 the_max_register_number_parameter_Finished=nCount;
-// 				   CString strText;
-// 				   strText.Format(_T("|ID %d: Programming section %d finished."), pWriter->m_szMdbIDs[i], p);
-// 				   pWriter->OutPutsStatusInfo(strText);
 
-                //AfxMessageBox(strText);
             }
 
             Sleep(500); //must if not ,have some wrong
@@ -2786,51 +2796,32 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
 
 
 #if 1
-        ii=0;
+       int ii=0;
         do
         {
-            if(ii<RETRY_TIMES)
-            {
-                if(-2==Write_One(m_ID,16,1))
-                    ii++;
+ 
+                if(-2==Write_One(pWriter->m_szMdbIDs[i],16,1))
+                  {  ii++;}
 
-            }
-            else
-            {
-                ii=0;
-                break;
-                //return -8;//error -8
-            }
+ 
+             else
+             {
+                 ii=0;
+                 break;
+                 //return -8;//error -8
+             }
         }
-        while(ii);
+        while(ii<RETRY_TIMES);
 #endif
     Sleep (6000);
-//           int ISPVer = -1;
-//          ii = 0;
-//         do 
-//         {
-//            ISPVer = read_one (pWriter->m_szMdbIDs[i],11);
-//            Sleep (500);
-//            if (ISPVer == 0)
-//            {
-//                 break;
-//            }
-//            else
-//            {
-//               ++ii;
-//            }
-//             
-//         } while (ii>40);
-// 
-//         if (ISPVer==0)
-//         {
+
+	if (GetCommunicationType () == 0)
+	{
             if (pWriter->m_index_Baudrate>=0)
             {
                 Write_One (pWriter->m_szMdbIDs[i],15,pWriter->m_index_Baudrate); //切回当前的波特率
             }
-    /*    }*/
-       
-      
+	}
 
     }
 

@@ -1178,14 +1178,20 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		
 		
 		
-		mygraphics->DrawLine(DrawLinePen[i],20,50 + i*30,60,50 + i*30);
+		mygraphics->DrawLine(DrawLinePen[i],20,50 + i*30,50,50 + i*30);
 
 
 		SolidBrush *   pen_unit_brush = new SolidBrush(Graphic_Color[i+1]);
-		pointF.X =  70;
+		pointF.X =  60;
 		pointF.Y =  40 + i*30;
 
-		mygraphics->DrawString(InputUnit[i], -1, &unitfont, pointF, pen_unit_brush);
+		CString temp_cs_label_unit;
+		temp_cs_label_unit = InputLable[i] + _T(" ") + InputUnit[i];// _T("AAAAAA");
+
+
+		//mygraphics->DrawString(InputUnit[i], -1, &unitfont, pointF, pen_unit_brush);
+		Gdiplus::Font        unitfont_label_unit(&UnitfontFamily, 14, FontStyleRegular, UnitPixel);
+		mygraphics->DrawString(temp_cs_label_unit, -1, &unitfont, pointF, pen_unit_brush);
 		delete pen_unit_brush;
 		pen_unit_brush = NULL;
 	}

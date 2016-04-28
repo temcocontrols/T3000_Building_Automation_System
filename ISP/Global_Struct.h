@@ -499,6 +499,8 @@ int const PM_TSTAT5C = 4; //
 int const PM_TSTAT6 = 6;  //
 int const PM_TSTAT7 = 7;	//
 int const PM_TSTAT5I = 8;  //
+int const PM_TSTAT8 = 9 ;
+
 int const PM_TSTAT5D = 12;//
 const int PM_TSTAT5E = 16;	//
 int const PM_TSTAT5F = 17;	//
@@ -507,7 +509,7 @@ int const PM_TSTAT5H = 19;	 //
 int const PM_T38AIOD= 20;  //
 int const PM_T3IOA = 21;  //
 int const PM_T332AI = 22; //
-int const  PM_T38AI16O = 23;
+int const PM_T38AI16O = 23;
 int const PM_ZIGBEE = 24;
 int const PM_FLEXDRIVER = 25;
 int const PM_T3PT10 = 26;

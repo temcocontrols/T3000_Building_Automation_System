@@ -130,7 +130,7 @@ CString CT3ModulesView::GetValue(int regValue,int RangeValue)
         strresult.Format(_T("%.1f"),(float)regValue);
         strresult+=_T("%");
     }
-    else if (4==RangeValue)
+    else if (4==RangeValue||5==RangeValue)
     {
         //strresult.Format(_T("%.1f F"),(float)regValue/10.0);
         if (regValue==0)
@@ -142,17 +142,17 @@ CString CT3ModulesView::GetValue(int regValue,int RangeValue)
             strresult=_T("ON");
         }
     }
-    else if (5==RangeValue)
-    {
-        if (regValue==0)
-        {
-            strresult=_T("ON");
-        }
-        else
-        {
-            strresult=_T("OFF");
-        }
-    }
+//     else if (5==RangeValue)
+//     {
+//         if (regValue==0)
+//         {
+//             strresult=_T("ON");
+//         }
+//         else
+//         {
+//             strresult=_T("OFF");
+//         }
+//     }
     else if (6==RangeValue)
     {
         strresult.Format(_T("%d"),regValue);
@@ -330,7 +330,7 @@ void CT3ModulesView::Fresh()
         m_T3_Input_List.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
         m_T3_Input_List.SetExtendedStyle(m_T3_Input_List.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
         m_T3_Input_List.InsertColumn(0, _T("Label"), 50, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-        m_T3_Input_List.InsertColumn(1, _T("Value"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_T3_Input_List.InsertColumn(1, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
         m_T3_Input_List.InsertColumn(2, _T("Range"), 90, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
         m_T3_Input_List.InsertColumn(3, _T("Filter"), 60, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 
@@ -352,14 +352,14 @@ void CT3ModulesView::Fresh()
             m_T3_Input_List.SetItemText(i-1,2,strresult);
 
             //regValue=(short)product_register_value[116+i-1];
-            if (RangeValue!=6)
-            {
-                regValue=product_register_value[116+2*i-1];
-            }
-            else
-            {
-                regValue=product_register_value[116+2*(i-1)]*65536+product_register_value[116+2*i-1];
-            }
+			if (RangeValue!=6)
+			{
+				regValue=product_register_value[116+2*i-1];
+			}
+			else
+			{
+				regValue=product_register_value[116+2*(i-1)]*65536+product_register_value[116+2*i-1];
+			}
             strresult = GetValue(regValue,RangeValue);
             m_T3_Input_List.SetItemText(i-1,1,strresult);
             strresult.Format(_T("%d"),product_register_value[200+i-1]);
@@ -2227,7 +2227,7 @@ void CT3ModulesView::OnNMClickList_Input(NMHDR *pNMHDR, LRESULT *pResult)
 
     CString temp_cstring;
     long lRow,lCol;
-    m_T3_Input_List.Set_Edit(true);
+    m_T3_Input_List.Set_Edit(false);
     DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
     CPoint point( LOWORD(dwPos), HIWORD(dwPos));
     m_T3_Input_List.ScreenToClient(&point);

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "globle_function.h"
 #include "MyPing.h"
+#include "HexFileParser.h"
 extern bool auto_flash_mode;
 int turn_hex_str_to_ten_num(char *source)
 {//can only turn two char(hex string) to int
@@ -376,6 +377,9 @@ CString GetProductName(int ModelID)
 	case PM_TSTAT7:
 		strProductName=_T("TStat7");   //
 		break;
+	case PM_TSTAT8:
+		strProductName=L"TStat8";
+		break;
 	case PM_NC:					//
 		strProductName=_T("NC");
 		break;
@@ -451,6 +455,7 @@ CString GetProductName(int ModelID)
 	case  PM_CO2_NODE:
 		strProductName = "CO2 Node";
 		break;
+	
 
 	default:
 		strProductName.Format(_T("Model ID:%d is out of control"),ModelID);
@@ -545,197 +550,248 @@ BOOL ReadLineFromHexFile(CFile& file, char* pBuffer)
 	return FALSE;
 }
 
-int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)
+int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info,int Address)
 {
-	CFileFind fFind;
-	if(!fFind.FindFile(filepath))
-		return FILE_NOT_FIND;
+//	CFileFind fFind;
+//	if(!fFind.FindFile(filepath))
+//		return FILE_NOT_FIND;
+//
+//	//pBuf = new char[0x20000];
+//		
+//	CString strGetData;
+//	int nBufCount = 0;
+////*****************inspect the file*********************
+//
+//
+//	DWORD dwHiAddr = 0; // 高位地址
+//	char readbuffer[256];
+//	ZeroMemory(readbuffer, 256);
+//	unsigned	char m_DeviceInfor[20];
+//	memset(m_DeviceInfor,0,20);
+//	CFile hexfile;
+//	if(hexfile.Open(filepath,CFile::modeRead))
+//	{
+//		unsigned int nLineNum=0;
+//
+//
+//		ZeroMemory(readbuffer, 256);
+//		hexfile.Seek(0, CFile::begin);
+//		while(ReadLineFromHexFile(hexfile, readbuffer))
+//		{
+//				nLineNum++;						//the line number that the wrong hex file;
+//                CString bufferlen;
+//                CString bufferaddress;         
+//                bufferlen.Format(_T("%c%c"),readbuffer[1],readbuffer[2]);
+//                bufferaddress.Format(_T("%c%c%c%c"),readbuffer[3],readbuffer[4],readbuffer[5],readbuffer[6]);
+//
+//				if (IS_RAM)
+//				{
+//					if (bufferaddress.CompareNoCase(_T("0200"))!=0)
+//					{
+//						continue;
+//					}
+//				} 
+//				else
+//				{
+//					if (bufferaddress.CompareNoCase(_T("0100"))!=0)
+//					{
+//						continue;
+//					}
+//				}
+//               
+//				unsigned char get_hex[128]={0};
+//				//get hex data,it is get from the line char
+//				//the number is (i-1)
+//				//int nLen = strGetData.GetLength();
+//				for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
+//				{
+//					readbuffer[i]=readbuffer[i+1];
+//				}
+//
+//				int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
+//				if(strlen(readbuffer)%2==0)
+//				turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int 
+//				else
+//				{
+//					return BAD_HEX_FILE;
+//				}
+//				turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex 
+//				if(get_hex[3]==1)	//for to seektobegin() function,because to end of the file
+//					break;
+//// 				if(!DoHEXCRC( get_hex, nLen/2))
+//// 				{
+//// 					return BAD_HEX_FILE;
+//// 				}
+//				 char TempChar[32];
+//				for (int i=0;i<31;i++)
+//				{
+//					TempChar[i]=get_hex[i+4];
+//				}
+//				TempChar[31]='\0';
+// 
+//				 
+//                 CString Product_String;
+// 				 MultiByteToWideChar( CP_ACP, 0, (char *)TempChar, 
+// 					 (int)strlen(TempChar)+1, 
+// 					 Product_String.GetBuffer(MAX_PATH), MAX_PATH );
+// 				 Product_String.ReleaseBuffer();		
+// 				 Product_String.MakeUpper();
+//
+//
+//
+//				 if(Product_String.Find(_T("CO2")) !=-1)
+//				 {
+//					  ret_bin_Info.company[0]='T';
+//					  ret_bin_Info.company[1]='E';
+//					  ret_bin_Info.company[2]='M';
+//					  ret_bin_Info.company[3]='C';
+//					  ret_bin_Info.company[4]='O';
+//					  ret_bin_Info.product_name[0]='C';
+//					  ret_bin_Info.product_name[1]='O';
+//					  ret_bin_Info.product_name[2]='2';
+//					  ret_bin_Info.product_name[3]=0;
+//					  ret_bin_Info.product_name[4]=0;
+//					  ret_bin_Info.product_name[5]=0;
+//					  ret_bin_Info.product_name[6]=0;
+//					  ret_bin_Info.product_name[7]=0;
+//					  ret_bin_Info.product_name[8]=0;
+//					  ret_bin_Info.product_name[9]=0;
+//
+//					  ret_bin_Info.software_high=TempChar[5];
+//					   ret_bin_Info.software_low=TempChar[4];
+//					  
+//					  return READ_SUCCESS;
+//				 }
+//
+//
+//
+//				int temp;
+//				char temp_buf[64];
+//				memset(temp_buf,0,64);
+//                
+//				if (bufferlen.CompareNoCase(_T("20"))==0)
+//				{
+//					for (int i=0;i<64;i++)
+//					{
+//						temp_buf[i]=readbuffer[i+8];
+//					}
+//				} 
+//
+//				if (bufferlen.CompareNoCase(_T("10"))==0)
+//				{
+//					for (int i=0;i<32;i++)
+//					{
+//						temp_buf[i]=readbuffer[i+8];
+//					}
+//					hexfile.Seek(0, CFile::begin);
+//					while(ReadLineFromHexFile(hexfile, readbuffer))
+//					{
+//						bufferlen.Format(_T("%c%c"),readbuffer[1],readbuffer[2]);
+//						bufferaddress.Format(_T("%c%c%c%c"),readbuffer[3],readbuffer[4],readbuffer[5],readbuffer[6]);
+//						if (bufferaddress.CompareNoCase(_T("0110"))!=0)
+//						{
+//							continue;
+//						}
+//						for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
+//						{
+//							readbuffer[i]=readbuffer[i+1];
+//						}
+//						int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
+//						if(strlen(readbuffer)%2==0)
+//							turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int 
+//						else
+//						{
+//							return BAD_HEX_FILE;
+//						}
+//						turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex 
+//
+//						int bufferlength=_wtoi(bufferlen);
+//
+//						int i=32;
+//						for (int j=0;j<2*bufferlength;j++)
+//						{
+//							temp_buf[i]=readbuffer[j+8];
+//							i++;
+//						}
+//
+//					}
+//
+//				}
+//			 
+//
+//					for (int i=0;i<20;i++)
+//					{   
+//						temp=temp_buf[2*i]*16+temp_buf[2*i+1];
+//						m_DeviceInfor[i]=temp;
+//					}
+//					memcpy_s(&ret_bin_Info,20,m_DeviceInfor,20);
+//
+//					if(strlen(ret_bin_Info.product_name) > 200)
+//						return NO_VERSION_INFO;
+//
+//					char temocolog[6];
+//					memcpy_s(temocolog,5,ret_bin_Info.company,5);
+//					temocolog[5] = 0;
+//
+//					CString Temco_logo;
+//					MultiByteToWideChar( CP_ACP, 0, (char *)temocolog, 
+//						(int)strlen(temocolog)+1, 
+//						Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
+//					Temco_logo.ReleaseBuffer();		
+//					Temco_logo.MakeUpper();
+//					if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0)
+//					{
+//						return NO_VERSION_INFO;
+//					}
+//
+//
+//					ret_bin_Info.software_low = m_DeviceInfor[15];
+//					ret_bin_Info.software_high =m_DeviceInfor[16];
+//					return READ_SUCCESS;
+//			 
+//
+//
+//		}
+//	}
 
-	//pBuf = new char[0x20000];
-		
-	CString strGetData;
-	int nBufCount = 0;
-//*****************inspect the file*********************
+char*			pFileBuffer;
+CHexFileParser* pHexFile = new CHexFileParser;
+pHexFile->SetFileName(filepath);
+pFileBuffer = new char[c_nHexFileBufLen];
+memset(pFileBuffer, 0xFF, c_nHexFileBufLen);
+int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
 
+memcpy(&ret_bin_Info,&pFileBuffer[Address],sizeof(Bin_Info));
 
-	DWORD dwHiAddr = 0; // 高位地址
-	char readbuffer[256];
-	ZeroMemory(readbuffer, 256);
-	unsigned	char m_DeviceInfor[20];
-	memset(m_DeviceInfor,0,20);
-	CFile hexfile;
-	if(hexfile.Open(filepath,CFile::modeRead))
-	{
-		unsigned int nLineNum=0;
-
-
-		ZeroMemory(readbuffer, 256);
-		hexfile.Seek(0, CFile::begin);
-		while(ReadLineFromHexFile(hexfile, readbuffer))
-		{
-				nLineNum++;						//the line number that the wrong hex file;
-                CString bufferlen;
-                CString bufferaddress;         
-                bufferlen.Format(_T("%c%c"),readbuffer[1],readbuffer[2]);
-                bufferaddress.Format(_T("%c%c%c%c"),readbuffer[3],readbuffer[4],readbuffer[5],readbuffer[6]);
-                if (bufferaddress.CompareNoCase(_T("0100"))!=0)
-                {
-                continue;
-                }
-				unsigned char get_hex[128]={0};
-				//get hex data,it is get from the line char
-				//the number is (i-1)
-				//int nLen = strGetData.GetLength();
-				for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
-				{
-					readbuffer[i]=readbuffer[i+1];
-				}
-
-				int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
-				if(strlen(readbuffer)%2==0)
-				turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int 
-				else
-				{
-					return BAD_HEX_FILE;
-				}
-				turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex 
-				if(get_hex[3]==1)	//for to seektobegin() function,because to end of the file
-					break;
-// 				if(!DoHEXCRC( get_hex, nLen/2))
-// 				{
-// 					return BAD_HEX_FILE;
-// 				}
-				 char TempChar[32];
-				for (int i=0;i<31;i++)
-				{
-					TempChar[i]=get_hex[i+4];
-				}
-				TempChar[31]='\0';
- 
-				 
-                 CString Product_String;
- 				 MultiByteToWideChar( CP_ACP, 0, (char *)TempChar, 
- 					 (int)strlen(TempChar)+1, 
- 					 Product_String.GetBuffer(MAX_PATH), MAX_PATH );
- 				 Product_String.ReleaseBuffer();		
- 				 Product_String.MakeUpper();
+if (pFileBuffer)
+{
+	delete []pFileBuffer;
+	pFileBuffer = NULL;
+}
+delete pFileBuffer;
 
 
 
-				 if(Product_String.Find(_T("CO2")) !=-1)
-				 {
-					  ret_bin_Info.company[0]='T';
-					  ret_bin_Info.company[1]='E';
-					  ret_bin_Info.company[2]='M';
-					  ret_bin_Info.company[3]='C';
-					  ret_bin_Info.company[4]='O';
-					  ret_bin_Info.product_name[0]='C';
-					  ret_bin_Info.product_name[1]='O';
-					  ret_bin_Info.product_name[2]='2';
-					  ret_bin_Info.product_name[3]=0;
-					  ret_bin_Info.product_name[4]=0;
-					  ret_bin_Info.product_name[5]=0;
-					  ret_bin_Info.product_name[6]=0;
-					  ret_bin_Info.product_name[7]=0;
-					  ret_bin_Info.product_name[8]=0;
-					  ret_bin_Info.product_name[9]=0;
+if(strlen(ret_bin_Info.product_name) > 200)
+	return NO_VERSION_INFO;
+char temocolog[6];
+memcpy_s(temocolog,5,ret_bin_Info.company,5);
+temocolog[5] = 0;
 
-					  ret_bin_Info.software_high=TempChar[5];
-					   ret_bin_Info.software_low=TempChar[4];
-					  
-					  return READ_SUCCESS;
-				 }
+CString Temco_logo;
+MultiByteToWideChar( CP_ACP, 0, (char *)temocolog, 
+	(int)strlen(temocolog)+1, 
+	Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
+Temco_logo.ReleaseBuffer();		
+Temco_logo.MakeUpper();
+if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0)
+{
+	return NO_VERSION_INFO;
+}
 
 
+return READ_SUCCESS;
 
-				int temp;
-				char temp_buf[64];
-				memset(temp_buf,0,64);
-                
-				if (bufferlen.CompareNoCase(_T("20"))==0)
-				{
-					for (int i=0;i<64;i++)
-					{
-						temp_buf[i]=readbuffer[i+8];
-					}
-				} 
-
-				if (bufferlen.CompareNoCase(_T("10"))==0)
-				{
-					for (int i=0;i<32;i++)
-					{
-						temp_buf[i]=readbuffer[i+8];
-					}
-					hexfile.Seek(0, CFile::begin);
-					while(ReadLineFromHexFile(hexfile, readbuffer))
-					{
-						bufferlen.Format(_T("%c%c"),readbuffer[1],readbuffer[2]);
-						bufferaddress.Format(_T("%c%c%c%c"),readbuffer[3],readbuffer[4],readbuffer[5],readbuffer[6]);
-						if (bufferaddress.CompareNoCase(_T("0110"))!=0)
-						{
-							continue;
-						}
-						for(UINT i=0; i<strlen(readbuffer); i++) // 去掉冒号
-						{
-							readbuffer[i]=readbuffer[i+1];
-						}
-						int nLen = strlen(readbuffer)-2; // 不算回车换行的长度
-						if(strlen(readbuffer)%2==0)
-							turn_hex_file_line_to_unsigned_char(readbuffer);//turn every char to int 
-						else
-						{
-							return BAD_HEX_FILE;
-						}
-						turn_int_to_unsigned_char(readbuffer,nLen,get_hex);//turn to hex 
-
-						int bufferlength=_wtoi(bufferlen);
-
-						int i=32;
-						for (int j=0;j<2*bufferlength;j++)
-						{
-							temp_buf[i]=readbuffer[j+8];
-							i++;
-						}
-
-					}
-
-				}
-			 
-
-					for (int i=0;i<20;i++)
-					{   
-						temp=temp_buf[2*i]*16+temp_buf[2*i+1];
-						m_DeviceInfor[i]=temp;
-					}
-					memcpy_s(&ret_bin_Info,20,m_DeviceInfor,20);
-
-					if(strlen(ret_bin_Info.product_name) > 200)
-						return NO_VERSION_INFO;
-
-					char temocolog[6];
-					memcpy_s(temocolog,5,ret_bin_Info.company,5);
-					temocolog[5] = 0;
-
-					CString Temco_logo;
-					MultiByteToWideChar( CP_ACP, 0, (char *)temocolog, 
-						(int)strlen(temocolog)+1, 
-						Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
-					Temco_logo.ReleaseBuffer();		
-					Temco_logo.MakeUpper();
-					if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0)
-					{
-						return NO_VERSION_INFO;
-					}
-
-
-					ret_bin_Info.software_low = m_DeviceInfor[15];
-					ret_bin_Info.software_high =m_DeviceInfor[16];
-					return READ_SUCCESS;
-			 
-
-
-		}
-	}
 }
 
 int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info)

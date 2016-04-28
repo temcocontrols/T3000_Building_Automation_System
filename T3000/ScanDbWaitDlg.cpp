@@ -327,7 +327,7 @@ void CScanDbWaitDlg::Initial_List()
 
 
     CString scan_mode;
-    scan_mode = _T("UDP broadcast scan");
+    scan_mode = _T("Ethernet Scan");
     m_scan_com_list.InsertItem(0,scan_mode);
     //m_scan_com_list.SetItemText(i*2,SCAN_BAUDRATE,_T("9600"));
     m_scan_com_list.SetItemText(0,SCAN_SKIP,_T("No"));
@@ -407,6 +407,8 @@ void CScanDbWaitDlg::Initial_List()
 
     for (int x=0; x<m_scan_info.size(); x++)
     {
+#if 0	//不扫描的东西  也不显示 skip.很多小白客户 不看手册 反应给老毛 。老毛一句话 Auto.脑残。
+
         if(m_scan_info.at(x).scan_skip)
         {
             m_scan_com_list.SetItemText(x,SCAN_SKIP,_T("Yes"));
@@ -420,6 +422,9 @@ void CScanDbWaitDlg::Initial_List()
         {
             m_scan_com_list.SetItemText(x,SCAN_SKIP,_T("No"));
         }
+#endif
+		m_scan_com_list.SetItemText(x,SCAN_SKIP,_T("No"));
+
     }
 
 

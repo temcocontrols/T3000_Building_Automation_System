@@ -1,6 +1,14 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2016 - 03 -30
+Update by Fance
+1. Monitor 删掉  时间限制 ，只要On 就开始记录.
+2. Range 在output 里添加一个 模拟的PWM range .
+3. Graphic 显示label 和单位 在左边的 树那里.
+4. Setting 里面略微调整界面.
+5. 所有协议只有Auto ，不管客户选什么协议都能搜到除了远程的和MSTP的设备.
+
 2016 - 03 - 19
 Update by Fance
 1. 修复treeview 产品 状态显示的问题;

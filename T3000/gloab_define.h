@@ -663,7 +663,8 @@ const CString OutPut_List_Analog_Range[] =
 	_T("0.0 -> 20"),
 	_T("0.0 -> 100"),
 	_T("0.0 -> 100"),
-	_T("0.0 -> 20")
+	_T("0.0 -> 20"),
+	_T("0.0 -> 100")
 };
 
 const CString OutPut_List_Analog_Units[] =
@@ -674,7 +675,8 @@ const CString OutPut_List_Analog_Units[] =
 	_T("psi"),
 	_T("%"),
 	_T("%Cls"),
-	_T("ma")
+	_T("ma"),
+	_T("%PWM")
 };
 
 const CString Input_List_Analog_Units[] =
@@ -745,7 +747,8 @@ const CString Output_Analog_Units_Array[] =
 	_T("0.0 -> 20   psi"),
 	_T("0.0 -> 100  %"),
 	_T("0.0 -> 100  %Cls"),
-	_T("0.0 -> 20   ma")
+	_T("0.0 -> 20   ma"),
+	_T("0.0 -> 100  PWM")
 };
 
 const CString Time_Server_Name[] =
@@ -1246,7 +1249,10 @@ const int INPUT_FITLER = 8;
 const int INPUT_DECOM = 9;
 const int INPUT_JUMPER = 10;
 const int INPUT_LABLE = 11;
-const int INPUT_COL_NUMBER = 12;
+const int INPUT_EXTERNAL = 12;
+const int INPUT_PRODUCT = 13;
+const int INPUT_EXT_NUMBER = 14;
+const int INPUT_COL_NUMBER = 15;
 
 
 
@@ -1361,7 +1367,11 @@ const int OUTPUT_PWM_PERIOD = 6;
 const int OUTPUT_DECOM = 7;
 const int OUTPUT_LABLE = 8;
 const int OUTPUT_HW_SWITCH = 9;
-const int OUTPUT_COL_NUMBER = 10;
+const int OUTPUT_EXTERNAL = 10;
+const int OUTPUT_PRODUCT = 11;
+const int OUTPUT_EXT_NUMBER = 12;
+
+const int OUTPUT_COL_NUMBER = 13;
 
 const CString Output_Decom_Array[2] =
 {
@@ -1445,3 +1455,7 @@ const int REG_INPUT_START_ADDRESS = REG_OUTPUT_START_ADDRESS + LENGTH_MODBUS_OUT
 const int REG_VARIABLE_START_ADDRESS  = REG_INPUT_START_ADDRESS + LENGTH_MODBUS_INPUT;	//12944
 const int REG_PRG_START_ADDRESS = REG_VARIABLE_START_ADDRESS + LENGTH_MODBUS_VARIABLE;  //15504
 const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG;		//15808
+
+
+
+#define  RANGE_ERROR   -2

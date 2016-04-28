@@ -26,7 +26,7 @@ CString GetSysTime();
 //eg："192.168.0.1" 用.分割，就成了四个字符串 192 168 0 1
 void ExtractString(CStringArray& arr, const CString strSrc, const CString sep = _T("\r\n"));
 int Get_Binfile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
-int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info);
+int Get_HexFile_Information(LPCTSTR filepath,Bin_Info &ret_bin_Info,int Address);
 
 BOOL ReadLineFromHexFile(CFile& file, char* pBuffer);
 BOOL DoHEXCRC( TS_UC* szBuf, int nLen);

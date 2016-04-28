@@ -78,7 +78,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		//unsigned char IPAddress[4];
 		//((CIPAddressCtrl *)GetDlgItem(IDC_IPADDRESS_TEMCO_IP))->GetAddress(IPAddress[0],IPAddress[1],IPAddress[2],IPAddress[3]);
 		CString retmessage;
-		retmessage.Format(_T("Connect to Temco server success!"));
+		retmessage.Format(_T("Connect to server success!"));
 		//m_download_info.AddString(retmessage);
 		m_download_info.InsertString(m_download_info.GetCount(),retmessage);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
@@ -89,7 +89,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 	else if(ncommand == DOWNLOAD_DISCONNEC)
 	{
 		CString retmessage;
-		retmessage.Format(_T("Disconnected with Temco server!"));
+		retmessage.Format(_T("Disconnected with server!"));
 		//m_download_info.AddString(retmessage);
 		m_download_info.InsertString(m_download_info.GetCount(),retmessage);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
@@ -101,7 +101,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 	{
 
 		CString retmessage;
-		retmessage.Format(_T("Connect to Temco server failed!Please try again!"));
+		retmessage.Format(_T("Connect to server failed!Please try again!"));
 		//m_download_info.AddString(retmessage);
 		m_download_info.InsertString(m_download_info.GetCount(),retmessage);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
@@ -316,7 +316,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 	else if(ncommand == DOWNLOAD_NOT_FIND_LOCAL)
 	{
 		CString complete_message;
-		complete_message.Format(_T("Local Firmware folder doen't exsit the file we needed.we will download it from server."));
+		complete_message.Format(_T("Local firmware file doesn¡¯t exist, downloading from server now."));
 		//m_download_info.AddString(complete_message);
 		m_download_info.InsertString(m_download_info.GetCount(),complete_message);
 		//m_download_info.SetTopIndex(m_download_info.GetCount()-1);

@@ -111,6 +111,10 @@ void CRegisterViewerDlg::LoadDataFromDB()
                 {
                     tempstruct.Register_Address=ado.m_pRecordset->GetCollect(_T("Register_Address"));
                     tempstruct.AddressName=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_AddressName"));
+					if (tempstruct.AddressName.CompareNoCase(L"MODBUS_INFO_BYTE") == 0)
+					{
+						tempstruct.AddressName = L"MODBUS_OCC_COMDELAY";
+					}
                     tempstruct.DataType=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_DATATYPE"));
                     tempstruct.length=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_LEN"));
                     temp_var=ado.m_pRecordset->GetCollect(_T("TSTAT5_LED_INSTRUCTION"));

@@ -172,10 +172,32 @@ void CT3ModulesOutputDlg::Fresh()
             {
                 m_outputlist.SetItemText(i-1,2,L"Off"); 
             }
-            if (SwitchValue[i-1] == 1)
+            else if (SwitchValue[i-1] == 1)
             {
                 m_outputlist.SetItemText(i-1,2,L"On"); 
             }
+			else
+			{
+				if (i<9)
+				{
+					if (product_register_value[100+i-1] == 0)
+					{
+						strTemp = _T("Off");
+					}
+					else
+					{
+						strTemp = _T("On");
+					}
+					
+				} 
+				else
+				{
+					strTemp.Format(_T("%d"),product_register_value[100+i-1]);
+				}
+
+				m_outputlist.SetItemText(i-1,2,strTemp);
+			}
+
         }
 
     }
@@ -229,7 +251,7 @@ void CT3ModulesOutputDlg::Fresh()
         m_outputlist.SetExtendedStyle(m_outputlist.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));
         m_outputlist.InsertColumn(0, _T("Label"), 180, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
         m_outputlist.InsertColumn(2, _T("Switch Status"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_outputlist.InsertColumn(1, _T("Value"), 90, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_outputlist.InsertColumn(1, _T("Value"), 90, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
 
         bitset<16> BitSwitchValue1(product_register_value[114]);
         bitset<16> BitSwitchValue2(product_register_value[115]);
@@ -242,42 +264,71 @@ void CT3ModulesOutputDlg::Fresh()
 
         for(int i=1; i<15; i++)
         {
-            if (i<9)
-            {
-                strTemp= Get_Table_Name(m_sn,_T("Analog_Output"),i);
-                m_outputlist.InsertItem(i,strTemp);
 
-            }
-            else
-            {
-                strTemp= Get_Table_Name(m_sn,_T("Digital_Output"),i);
-                m_outputlist.InsertItem(i,strTemp);
+           
 
-            }
-
-            // strTemp.Format(_T("%d"),product_register_value[100+i-1]);
-            if (product_register_value[100+i-1] == 0)
-            {
-                strTemp = _T("Off");
-            }
-            else
-            {
-                strTemp = _T("On");
-            }
-            m_outputlist.SetItemText(i-1,1,strTemp);
+			if (i<9)
+			{
+				strTemp= Get_Table_Name(m_sn,_T("Analog_Output"),i);
+				m_outputlist.InsertItem(i,strTemp);
 
 
-            m_outputlist.SetItemText(i-1,2,STRING_SWITCH_STATUS[SwitchValue[i-1]]);
+				if (SwitchValue[i-1] == 0)
+				{
+					m_outputlist.SetItemText(i-1,1,L"Off"); 
+				}
+				else if (SwitchValue[i-1] == 1)
+				{
+					m_outputlist.SetItemText(i-1,1,L"On"); 
+				}
+				else 
+				{
+// 					if (product_register_value[100+i-1] == 0)
+// 					{
+// 						strTemp = _T("Off");
+// 					}
+// 					else
+// 					{
+// 						strTemp = _T("On");
+// 					}
+					strTemp.Format(_T("%d"),product_register_value[100+i-1]);
+				}
 
+				m_outputlist.SetItemText(i-1,1,strTemp);
 
-            if (SwitchValue[i-1] == 0)
-            {
-                m_outputlist.SetItemText(i-1,1,L"Off"); 
-            }
-            if (SwitchValue[i-1] == 1)
-            {
-                m_outputlist.SetItemText(i-1,1,L"On"); 
-            }
+			}
+			else
+			{
+				strTemp= Get_Table_Name(m_sn,_T("Digital_Output"),i);
+				m_outputlist.InsertItem(i,strTemp);
+
+				if (SwitchValue[i-1] == 0)
+				{
+					m_outputlist.SetItemText(i-1,1,L"Off"); 
+				}
+				else if (SwitchValue[i-1] == 1)
+				{
+					m_outputlist.SetItemText(i-1,1,L"On"); 
+				}
+				else 
+				{
+					if (product_register_value[100+i-1] == 0)
+					{
+						strTemp = _T("Off");
+					}
+					else
+					{
+						strTemp = _T("On");
+					}
+				}
+				
+				m_outputlist.SetItemText(i-1,1,strTemp);
+			}
+
+		 
+			 m_outputlist.SetItemText(i-1,2,STRING_SWITCH_STATUS[SwitchValue[i-1]]);
+			
+            
 
         }
 
@@ -487,14 +538,35 @@ LRESULT CT3ModulesOutputDlg::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
             for(int i = 1; i<13; i++)
             {
                 m_outputlist.SetItemText(i-1,1,STRING_SWITCH_STATUS[SwitchValue[i-1]]);
-                if (SwitchValue[i-1] == 0)
-                {
-                    m_outputlist.SetItemText(i-1,2,L"Off"); 
-                }
-                if (SwitchValue[i-1] == 1)
-                {
-                    m_outputlist.SetItemText(i-1,2,L"On"); 
-                }
+				if (SwitchValue[i-1] == 0)
+				{
+					m_outputlist.SetItemText(i-1,2,L"Off"); 
+				}
+				else if (SwitchValue[i-1] == 1)
+				{
+					m_outputlist.SetItemText(i-1,2,L"On"); 
+				}
+				else
+				{
+					if (i<9)
+					{
+						if (product_register_value[100+i-1] == 0)
+						{
+							strTemp = _T("Off");
+						}
+						else
+						{
+							strTemp = _T("On");
+						}
+
+					} 
+					else
+					{
+						strTemp.Format(_T("%d"),product_register_value[100+i-1]);
+					}
+
+					m_outputlist.SetItemText(i-1,2,strTemp);
+				}
             }
         }
         else if (product_register_value[7] == PM_T3IOA)
@@ -647,41 +719,77 @@ LRESULT CT3ModulesOutputDlg::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
         }
         else if (product_register_value[7] == PM_T38AI8AO6DO)
         {
-            bitset<16> BitSwitchValue1(product_register_value[114]);
-            bitset<16> BitSwitchValue2(product_register_value[115]);
-            int SwitchValue[16];
-            for (int i=0; i<8; i++)
-            {
-                SwitchValue[i]=BitSwitchValue1[2*i]+BitSwitchValue1[2*i+1]*2;
-                SwitchValue[8+i]=BitSwitchValue2[2*i]+BitSwitchValue2[2*i+1]*2;
-            }
+			bitset<16> BitSwitchValue1(product_register_value[114]);
+			bitset<16> BitSwitchValue2(product_register_value[115]);
+			int SwitchValue[16];
+			for (int i=0; i<8; i++)
+			{
+				SwitchValue[i]=BitSwitchValue1[2*i]+BitSwitchValue1[2*i+1]*2;
+				SwitchValue[8+i]=BitSwitchValue2[2*i]+BitSwitchValue2[2*i+1]*2;
+			}
 
-            for(int i=1; i<15; i++)
-            {
-                if (i<9)
-                {
-                    strTemp= Get_Table_Name(m_sn,_T("Analog_Output"),i);
-                    m_outputlist.InsertItem(i,strTemp);
+			for(int i=1; i<15; i++)
+			{
 
-                }
-                else
-                {
-                    strTemp= Get_Table_Name(m_sn,_T("Digital_Output"),i);
-                    m_outputlist.InsertItem(i,strTemp);
+				
 
-                }
+				if (i<9)
+				{
+					strTemp= Get_Table_Name(m_sn,_T("Analog_Output"),i);
+					m_outputlist.InsertItem(i,strTemp);
 
-                strTemp.Format(_T("%d"),product_register_value[100+i-1]);
-                if (product_register_value[100+i-1] == 0)
-                {
-                    strTemp = _T("Off");
-                }
-                else
-                {
-                    strTemp = _T("On");
-                }
-                m_outputlist.SetItemText(i-1,1,strTemp);
 
+					if (SwitchValue[i-1] == 0)
+					{
+						m_outputlist.SetItemText(i-1,1,L"Off"); 
+					}
+					else if (SwitchValue[i-1] == 1)
+					{
+						m_outputlist.SetItemText(i-1,1,L"On"); 
+					}
+					else 
+					{
+						// 					if (product_register_value[100+i-1] == 0)
+						// 					{
+						// 						strTemp = _T("Off");
+						// 					}
+						// 					else
+						// 					{
+						// 						strTemp = _T("On");
+						// 					}
+						strTemp.Format(_T("%d"),product_register_value[100+i-1]);
+					}
+
+					m_outputlist.SetItemText(i-1,1,strTemp);
+
+				}
+				else
+				{
+					strTemp= Get_Table_Name(m_sn,_T("Digital_Output"),i);
+					m_outputlist.InsertItem(i,strTemp);
+
+					if (SwitchValue[i-1] == 0)
+					{
+						m_outputlist.SetItemText(i-1,1,L"Off"); 
+					}
+					else if (SwitchValue[i-1] == 1)
+					{
+						m_outputlist.SetItemText(i-1,1,L"On"); 
+					}
+					else 
+					{
+						if (product_register_value[100+i-1] == 0)
+						{
+							strTemp = _T("Off");
+						}
+						else
+						{
+							strTemp = _T("On");
+						}
+					}
+
+					m_outputlist.SetItemText(i-1,1,strTemp);
+				}
 
                 m_outputlist.SetItemText(i-1,2,STRING_SWITCH_STATUS[SwitchValue[i-1]]);
             }
@@ -703,7 +811,25 @@ LRESULT CT3ModulesOutputDlg::Change_Input_Item(WPARAM wParam,LPARAM lParam)
     CString strText = m_outputlist.GetItemText (lRow,lCol);
     if (product_register_value[7] == PM_T34AO)
     {
-
+		if (lCol == 2)
+		{
+			bitset<16> BitSwitchValue(product_register_value[116]);
+			int SwitchValue[12];
+			for (int i=0; i<4; i++)
+			{
+				SwitchValue[i]=BitSwitchValue[2*i]+BitSwitchValue[2*i+1]*2;
+			}
+			bitset<16> BitSwitchValue1(product_register_value[117]);
+			for (int i=4; i<8; i++)
+			{
+				SwitchValue[i]=BitSwitchValue1[2*(i-4)]+BitSwitchValue1[2*(i-4)+1]*2;
+			}
+			bitset<16> BitSwitchValue2(product_register_value[118]);
+			for (int i=8; i<12; i++)
+			{
+				SwitchValue[i]=BitSwitchValue2[2*(i-8)]+BitSwitchValue2[2*(i-8)+1]*2;
+			}
+		}
     }
     else if (product_register_value[7] == PM_T3IOA)
     {
@@ -734,11 +860,15 @@ LRESULT CT3ModulesOutputDlg::Change_Input_Item(WPARAM wParam,LPARAM lParam)
                 int OutputValue = _wtoi (strText);
                 if (OutputValue!=product_register_value[100+lRow])
                 {
-                    int ret = write_one (g_tstat_id,100+lRow,OutputValue,1);
-                    if (ret>0)
-                    {
-                        product_register_value[100+lRow] = OutputValue;
-                    }
+					if (lRow<8)
+					{
+						int ret = write_one (g_tstat_id,100+lRow,OutputValue,1);
+						if (ret>0)
+						{
+							product_register_value[100+lRow] = OutputValue;
+						}
+					}
+                    
                 }
 
                 PostMessage (WM_REFRESH_BAC_INPUT_LIST,0,0);
@@ -780,7 +910,7 @@ void CT3ModulesOutputDlg::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pResult)
     int Value_Length = 0;
     lRow = lvinfo.iItem;
     lCol = lvinfo.iSubItem;
-
+	m_isstop = TRUE;
     if(lRow>m_outputlist.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
     {
        
@@ -816,7 +946,7 @@ void CT3ModulesOutputDlg::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pResult)
         }
 
         if (lCol == 2)
-        {    m_isstop =TRUE;
+        {   // m_isstop =TRUE;
             m_outputlist.Set_Edit (false);
             if (SwitchValue[lRow] == 2)
             {
@@ -895,24 +1025,27 @@ void CT3ModulesOutputDlg::OnNMClickList_output(NMHDR *pNMHDR, LRESULT *pResult)
         {
             if (SwitchValue[lRow] == 2)
             {
-                if (product_register_value[100+lRow] == 0)
-                {
-                    int ret = write_one (g_tstat_id,100+lRow,1,1);
-                    if (ret > 0)
-                    {
-                        product_register_value[100+lRow] = 1;
-                        m_outputlist.SetItemText (lRow,lCol,L"On");
-                    }
-                }
-                else
-                {
-                    int ret =  write_one (g_tstat_id,100+lRow,0,1);
-                    if (ret > 0)
-                    {
-                        product_register_value[100+lRow] = 0;
-                        m_outputlist.SetItemText (lRow,lCol,L"Off");
-                    }
-                }
+				if (lRow>7)
+				{
+					if (product_register_value[100+lRow] == 0)
+					{
+						int ret = write_one (g_tstat_id,100+lRow,1,1);
+						if (ret > 0)
+						{
+							product_register_value[100+lRow] = 1;
+							m_outputlist.SetItemText (lRow,lCol,L"On");
+						}
+					}
+					else
+					{
+						int ret =  write_one (g_tstat_id,100+lRow,0,1);
+						if (ret > 0)
+						{
+							product_register_value[100+lRow] = 0;
+							m_outputlist.SetItemText (lRow,lCol,L"Off");
+						}
+					}
+				}
             }
         }
 

@@ -190,6 +190,12 @@ CISPDlg::~CISPDlg()
         delete m_pFileBuf;
     }
 
+	if (m_pFileBuffer)
+	{
+		delete[] m_pFileBuffer;
+		m_pFileBuffer = NULL;
+	}
+
 }
 
 void CISPDlg::DoDataExchange(CDataExchange* pDX)
@@ -318,22 +324,23 @@ BOOL CISPDlg::OnInitDialog()
 
     //从文件中读取配置参数
     m_cfgFileHandler.SetParentWnd(this);
-    m_cfgFileHandler.CreateConfigFile(g_strExePath + c_strCfgFileName);
+   // m_cfgFileHandler.CreateConfigFile(g_strExePath + c_strCfgFileName);
+      m_cfgFileHandler.CreateConfigFile();
     m_strCfgFilePath = g_strExePath + c_strCfgFileName;
 
 
 
-    m_cfgFileHandler.ReadFromCfgFileForAll(
-        filename,
-        flashmethod,
-        id,
-        comport,
-        BD,
-        ip,
-        ipport,
-        subnote,
-        subID
-    );
+	m_cfgFileHandler.ReadFromCfgFileForAll(
+		filename,
+		flashmethod,
+		id,
+		comport,
+		BD,
+		ip,
+		ipport,
+		subnote,
+		subID
+		);
 
 
     Remote_timeout = GetPrivateProfileInt(_T("Setting"),_T("REMOTE_TIMEOUT"),1000,SettingPath);
@@ -502,7 +509,7 @@ BOOL CISPDlg::OnInitDialog()
 	 GetDlgItem(IDC_EDIT_NCPORT)->SetWindowText(ipport);
 	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
 
-	 GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(_T("19200"));
+	// GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(_T("19200"));
 	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
 	 GetDlgItem(IDC_EDIT_MDBID1)->SetWindowText(id);
 	 GetDlgItem(IDC_COMBO_COM)->SetWindowText(comport);
@@ -723,33 +730,41 @@ void CISPDlg::OnBnClickedButtonSelfile()
 
     CWnd* pEditFilePath = (CWnd*)GetDlgItem(IDC_EDIT_FILEPATH);
     pEditFilePath->SetWindowText(m_strHexFileName);
-    int ret=Judge_BinHexFile(m_strHexFileName);
-    if (ret==0)
-    {
-        pEditFilePath->SetWindowText(_T(""));
-        return;
-    }
-    if (ret == 1)
-    {
-        char*			pFileBuffer;
-        CHexFileParser* pHexFile = new CHexFileParser;
-        pHexFile->SetFileName(m_strHexFileName);
-        pFileBuffer = new char[c_nHexFileBufLen];
-        memset(pFileBuffer, 0xFF, c_nHexFileBufLen);
-        int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
 
-        if (!pHexFile->Is_RAM_HEXType())
-        {
-            ShowHexBinInfor(ret);
-        }
+     int ret=Judge_BinHexFile(m_strHexFileName);
+     if (ret==0)
+     {
+         pEditFilePath->SetWindowText(_T(""));
+         return;
+     }
+     if (ret == 1)
+     {
+         char*			pFileBuffer;
+         CHexFileParser* pHexFile = new CHexFileParser;
+         pHexFile->SetFileName(m_strHexFileName);
+         pFileBuffer = new char[c_nHexFileBufLen];
+         memset(pFileBuffer, 0xFF, c_nHexFileBufLen);
+         int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
+ 
+		 if (!pHexFile->Is_RAM_HEXType())
+		 {
+			 m_isRAM = 0;
+			 ShowHexBinInfor(ret);
+		 }
 
-        if (pFileBuffer)
-        {
-            delete []pFileBuffer;
-            pFileBuffer = NULL;
-        }
-        delete pFileBuffer;
-    }
+		 if (pHexFile->Is_RAM_HEXType())
+		 {
+			 m_isRAM = 1;
+			 ShowHexBinInfor(ret);
+		 }
+ 
+         if (pFileBuffer)
+         {
+             delete []pFileBuffer;
+             pFileBuffer = NULL;
+         }
+         delete pFileBuffer;
+     }
 
 
 
@@ -781,7 +796,7 @@ void CISPDlg::SaveParamToConfigFile()
 
     // Baudrate
     CString strBaudrate = _T("19200");
-
+	GetDlgItem(IDC_EDIT_BAUDRATE)->GetWindowTextW(strBaudrate);
     //
     /*CString strFlashPage;
     strFlashPage = GetCurSelPageStr();*/
@@ -830,7 +845,7 @@ void CISPDlg::OnBnClickedButtonFlash()
 
 
         SetCommunicationType(1);
-
+		SaveParamToConfigFile();
         FlashNC_LC();
 
 
@@ -1515,23 +1530,25 @@ BOOL CISPDlg::FlashNC_LC(void)
     {
         return FALSE;
     }
-    if(BinFileValidation(m_strHexFileName))
-    {
-        CBinFileParser* pBinFile=new CBinFileParser;
-        pBinFile->SetBinFileName(m_strHexFileName);
-        m_pFileBuffer=new char[c_nBinFileBufLen];
-        memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
 
-        int nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
-        CString hexinfor=_T("The Bin For ");
-        hexinfor+=pBinFile->GetBinInfor();
-        CString strFilesize;
-        strFilesize.Format(_T("Bin size=%d Bs"),nDataSize);
-        GetDlgItem(IDC_HEX_SIZE)->SetWindowText(strFilesize);
-        m_strASIX=pBinFile->m_strASIX;
-        m_strProductName=pBinFile->m_strProductName;
-        GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
-    }
+//     if(BinFileValidation(m_strHexFileName))
+//     {
+//         CBinFileParser* pBinFile=new CBinFileParser;
+//         pBinFile->SetBinFileName(m_strHexFileName);
+//         m_pFileBuffer=new char[c_nBinFileBufLen];
+//         memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
+// 
+//         int nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
+//         CString hexinfor=_T("The Bin For ");
+//         hexinfor+=pBinFile->GetBinInfor();
+//         CString strFilesize;
+//         strFilesize.Format(_T("Bin size=%d Bs"),nDataSize);
+//         GetDlgItem(IDC_HEX_SIZE)->SetWindowText(strFilesize);
+//         m_strASIX=pBinFile->m_strASIX;
+//         m_strProductName=pBinFile->m_strProductName;
+//         GetDlgItem(IDC_BIN_INFORMATION)->SetWindowText(hexinfor);
+//     }
+
     if (g_Commu_type == 1)
     {
         FlashByEthernet();
@@ -1757,24 +1774,62 @@ void CISPDlg::FlashByEthernet()
         delete m_pTFTPServer;
         m_pTFTPServer = NULL;
     }
-    if (m_pFileBuffer)
-    {
-        delete[] m_pFileBuffer;
-        m_pFileBuffer = NULL;
-    }
-    Bin_Info bin_infor;
-    Get_Binfile_Information(m_strFlashFileName.GetBuffer(),bin_infor);
+	if (m_pFileBuffer)
+	{
+		delete[] m_pFileBuffer;
+		m_pFileBuffer = NULL;
+	}
+  //  Bin_Info bin_infor;
+//     Get_Binfile_Information(m_strFlashFileName.GetBuffer(),bin_infor);
+// 
+//     CBinFileParser* pBinFile = new CBinFileParser;
+//     pBinFile->SetBinFileName(m_strFlashFileName);
+//     m_pFileBuffer = new char[c_nBinFileBufLen];
+//     ZeroMemory(m_pFileBuffer, c_nBinFileBufLen);
+// int nDataSize = pBinFile->GetBinFileBuffer(m_pFileBuffer, c_nBinFileBufLen);
 
-  
+	int nDataSize = 0;
+
+	if(BinFileValidation(m_strHexFileName))
+	{
+		CBinFileParser* pBinFile=new CBinFileParser;
+		pBinFile->SetBinFileName(m_strHexFileName);
+		m_pFileBuffer=new char[c_nBinFileBufLen];
+		memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
+		nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
+		ShowHexBinInfor(2);
+		delete pBinFile;
+		pBinFile = NULL;
+	}
+	if(HexFileValidation (m_strHexFileName))
+	{
+		CHexFileParser* pHexFile = new CHexFileParser;
+		pHexFile->SetFileName(m_strHexFileName);
+
+		m_pFileBuffer = new char[c_nBinFileBufLen];
+		memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
+		nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nBinFileBufLen);//获取文件的buffer
 
 
+		if (!pHexFile->Is_RAM_HEXType())
+		{
+			m_isRAM = 0;
+			ShowHexBinInfor(1);
+		}
 
-    CBinFileParser* pBinFile = new CBinFileParser;
-    pBinFile->SetBinFileName(m_strFlashFileName);
-    m_pFileBuffer = new char[c_nBinFileBufLen];
-    ZeroMemory(m_pFileBuffer, c_nBinFileBufLen);
-    int nDataSize = pBinFile->GetBinFileBuffer(m_pFileBuffer, c_nBinFileBufLen);
+		if (pHexFile->Is_RAM_HEXType())
+		{
+			m_isRAM = 1;
+			ShowHexBinInfor(1);
+		}
 
+
+		delete pHexFile;
+		pHexFile = NULL;
+
+	
+	}
+	
     if(nDataSize > 0)
     {
         CString strTips = _T("|Firmware bin file verified okay.");
@@ -1794,7 +1849,7 @@ void CISPDlg::FlashByEthernet()
         m_pTFTPServer->SetFileName(m_strFlashFileName);
         m_pTFTPServer->Set_FileProductName(m_strProductName);
         m_pTFTPServer->SetDataSource((BYTE*)m_pFileBuffer, nDataSize);
-        m_pTFTPServer->Set_bininfor(bin_infor);
+        m_pTFTPServer->Set_bininfor(temp1);
 
         m_pTFTPServer->FlashByEthernet();
 
@@ -1809,7 +1864,7 @@ void CISPDlg::FlashByEthernet()
         //AfxMessageBox(strTips1+strTips2, MB_OK);
     }
 
-    delete pBinFile;
+//    delete pBinFile;
 }
 DWORD CISPDlg::GetIPAddress()
 {
@@ -1956,17 +2011,35 @@ void CISPDlg::ShowHexBinInfor(int hexbin)
 {
     if (hexbin==1)
     {
-        if(READ_SUCCESS != Get_HexFile_Information(m_strHexFileName.GetBuffer(),temp1))
-        {
-            if(!auto_flash_mode)
-            {
-                MessageBox(_T("@1 This firmware is an old version,Contact vendor for new firmware!\n@2 If you want to flash the old firmware ,Please use the old ISPTool_Rev4.7.0"));
-            }
-            CString temp;
-            temp.Format(_T("@1 This firmware is an old version,Contact vendor for new firmware!\n@2 If you want to flash the old firmware ,Please use the old ISPTool_Rev4.7.0"));
-            UpdateStatusInfo(temp,false);
-            return;
-        }
+		if (m_isRAM)
+		{
+			if(READ_SUCCESS != Get_HexFile_Information(m_strHexFileName.GetBuffer(),temp1,0x8200))
+			{
+				if(!auto_flash_mode)
+				{
+					MessageBox(_T("@1 This firmware is an old version,Contact vendor for new firmware!\n@2 If you want to flash the old firmware ,Please use the old ISPTool_Rev4.7.0"));
+				}
+				CString temp;
+				temp.Format(_T("@1 This firmware is an old version,Contact vendor for new firmware!\n@2 If you want to flash the old firmware ,Please use the old ISPTool_Rev4.7.0"));
+				UpdateStatusInfo(temp,false);
+				return;
+			}
+		} 
+		else
+		{
+			if(READ_SUCCESS != Get_HexFile_Information(m_strHexFileName.GetBuffer(),temp1,0x100))
+			{
+				if(!auto_flash_mode)
+				{
+					MessageBox(_T("@1 This firmware is an old version,Contact vendor for new firmware!\n@2 If you want to flash the old firmware ,Please use the old ISPTool_Rev4.7.0"));
+				}
+				CString temp;
+				temp.Format(_T("@1 This firmware is an old version,Contact vendor for new firmware!\n@2 If you want to flash the old firmware ,Please use the old ISPTool_Rev4.7.0"));
+				UpdateStatusInfo(temp,false);
+				return;
+			}
+		}
+        
     }
     if (hexbin==2)
     {
@@ -2069,10 +2142,10 @@ void CISPDlg::FlashByCom()
     int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
 
 
-    if (!pHexFile->Is_RAM_HEXType())
-    {
-        ShowHexBinInfor(1);
-    }
+//     if (!pHexFile->Is_RAM_HEXType())
+//     {
+//         ShowHexBinInfor(1);
+//     }
 
 
     if(nDataSize > 0)

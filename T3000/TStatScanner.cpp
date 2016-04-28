@@ -3476,7 +3476,7 @@ void CTStatScanner::Initial_Scan_Info()
 
         }
   
-
+#if 1
     scan_bacnet_ip_item = ncount*NUMBER_BAUDRATE + 1;
     temp_scan_info.scan_list_item = ncount*NUMBER_BAUDRATE + 1;
 
@@ -3524,6 +3524,7 @@ void CTStatScanner::Initial_Scan_Info()
     memset(temp_scan_info.scan_notes,0,250);
     m_scan_info.push_back(temp_scan_info);
     m_scan_info_buffer.push_back(temp_scan_info);
+#endif
 }
 void CTStatScanner::ScanAll()
 {

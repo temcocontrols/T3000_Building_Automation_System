@@ -100,6 +100,11 @@ BOOL CFlash_Multy::OnInitDialog()
     flash_device.clear();
     int ncount = m_flash_multy_list.GetItemCount();
 
+
+	 CString	g_configfile_path=g_strExePth+_T("T3000_config.ini");
+                     
+				  
+
     m_bTstatLoadFinished=FALSE;
     m_Start =TRUE;
     for (int i=0; i<ncount; i++)
@@ -108,23 +113,22 @@ BOOL CFlash_Multy::OnInitDialog()
         Str_flash_device temp;
         temp.nitem = i;
 
-
-        temp.strSN= m_flash_multy_list.GetItemText(i,FLASH_SERIAL_NUMBER);
-        temp.nID = m_flash_multy_list.GetItemText(i,FLASH_ID);
-        temp.ncomport = m_flash_multy_list.GetItemText(i,FLASH_COM_PORT);
-        temp.nIPaddress = m_flash_multy_list.GetItemText(i,FLASH_IPADDRESS);
-        temp.nipport = m_flash_multy_list.GetItemText(i,FLASH_IPPORT);
-        temp.devicename=m_flash_multy_list.GetItemText(i,FLASH_PRODUCT_NAME);
-        temp.product_id = _wtoi(m_flash_multy_list.GetItemText(i,FLASH_PRODUCT_ID));
-        CString temp_sub = m_flash_multy_list.GetItemText(i,FLASH_SUB_NOTE);
-        if(temp_sub.CompareNoCase(_T("YES")) == 0)
-        {
-            temp.b_is_sub = true;
-        }
-        else
-        {
-            temp.b_is_sub = false;
-        }
+		temp.strSN= m_flash_multy_list.GetItemText(i,FLASH_SERIAL_NUMBER);
+		temp.nID = m_flash_multy_list.GetItemText(i,FLASH_ID);
+		temp.ncomport = m_flash_multy_list.GetItemText(i,FLASH_COM_PORT);
+		temp.nIPaddress = m_flash_multy_list.GetItemText(i,FLASH_IPADDRESS);
+		temp.nipport = m_flash_multy_list.GetItemText(i,FLASH_IPPORT);
+		temp.devicename=m_flash_multy_list.GetItemText(i,FLASH_PRODUCT_NAME);
+		temp.product_id = _wtoi(m_flash_multy_list.GetItemText(i,FLASH_PRODUCT_ID));
+		CString temp_sub = m_flash_multy_list.GetItemText(i,FLASH_SUB_NOTE);
+		if(temp_sub.CompareNoCase(_T("YES")) == 0)
+		{
+			temp.b_is_sub = true;
+		}
+		else
+		{
+			temp.b_is_sub = false;
+		}
 
         temp.file_position = m_flash_multy_list.GetItemText(i,FLASH_FILE_POSITION);
         temp.config_file_position=m_flash_multy_list.GetItemText(i,FLASH_CONFIG_FILE_POSITION);
@@ -154,10 +158,10 @@ BOOL CFlash_Multy::OnInitDialog()
         flash_device.push_back(temp);
     }
 
-    if(Check_Online_Thread != NULL)
-        TerminateThread(Check_Online_Thread, 0);
-    Check_Online_Thread=NULL;
-    Check_Online_Thread =CreateThread(NULL,NULL,multy_check_online,this,NULL, NULL);
+//     if(Check_Online_Thread != NULL)
+//         TerminateThread(Check_Online_Thread, 0);
+//     Check_Online_Thread=NULL;
+//     Check_Online_Thread =CreateThread(NULL,NULL,multy_check_online,this,NULL, NULL);
     return TRUE;  // return TRUE unless you set the focus to a control
     // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -240,7 +244,7 @@ void CFlash_Multy::Initial_List()
 
     CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
     m_flash_multy_list.DeleteAllItems();
-
+	//when initial the dialog , Checkbox will be initialised from the configuration file T3000.ini
 
     for(int i=0; i<(int)pFrame->m_product.size(); i++)
     {
@@ -1684,13 +1688,13 @@ void CFlash_Multy::OnBnClickedButtonApplyWoAllSelect2()
 
 void CFlash_Multy::OnBnClickedResetAll()
 {
-    GetDlgItem(IDC_EDIT_MULTI_FILE_POSITION)->SetWindowText(_T(""));
-    GetDlgItem(IDC_EDIT_MULTI_FILE_POSITION2)->SetWindowText(_T(""));
+  //  GetDlgItem(IDC_EDIT_MULTI_FILE_POSITION)->SetWindowText(_T(""));
+    //GetDlgItem(IDC_EDIT_MULTI_FILE_POSITION2)->SetWindowText(_T(""));
     int ncount = m_flash_multy_list.GetItemCount();
     for (int i=0; i<ncount; i++)
     {
-        m_flash_multy_list.SetItemText(i,FLASH_FILE_POSITION,_T(""));
-        m_flash_multy_list.SetItemText(i,FLASH_CONFIG_FILE_POSITION,_T(""));
+        //m_flash_multy_list.SetItemText(i,FLASH_FILE_POSITION,_T(""));
+       // m_flash_multy_list.SetItemText(i,FLASH_CONFIG_FILE_POSITION,_T(""));
         m_flash_multy_list.SetItemText(i,FLASH_RESULTS,_T(""));
         m_flash_multy_list.SetItemText(i,FLASH_CONFIG_RESULTS,_T(""));
         m_flash_multy_list.SetItemTextColor(i,-1,FLASH_COLOR_DEFAULT);

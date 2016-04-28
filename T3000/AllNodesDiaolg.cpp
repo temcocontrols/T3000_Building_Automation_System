@@ -328,6 +328,25 @@ void CAllNodesDiaolg::OnEnKillfocusTextedit()
 			}
 			ReloadAddBuildingDB();
 		}
+		if(m_nCurCol==AN_PRODUCTTYPE)
+		{
+			CString strSerial=m_FlexGrid.get_TextMatrix(m_nCurRow,AN_SerialID);
+			if(strSerial.IsEmpty())
+				return;
+			CString strSql;
+			try
+			{
+
+
+				strSql.Format(_T("update ALL_NODE set Product_class_ID ='%s' where Serial_ID = '%s' and Building_Name = '%s'"),strName,strSerial,m_strSubNetName);
+				bado.m_pConnection->Execute(strSql.GetString(),NULL,adCmdText);		
+			}
+			catch(_com_error *e)
+			{
+				AfxMessageBox(e->ErrorMessage());
+			}
+			ReloadAddBuildingDB();
+		}
 		if(m_nCurCol==AN_ROOMNAME)
 		{
 			CString strSerial=m_FlexGrid.get_TextMatrix(m_nCurRow,AN_SerialID);

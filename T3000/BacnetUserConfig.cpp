@@ -282,7 +282,7 @@ LRESULT CBacnetUserConfig::Fresh_User_List(WPARAM wParam,LPARAM lParam)
 
 LRESULT CBacnetUserConfig::Fresh_User_Item(WPARAM wParam,LPARAM lParam)
 {
-	int cmp_ret ;//compare if match it will 0;
+	//int cmp_ret ;//compare if match it will 0;
 	int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
 
