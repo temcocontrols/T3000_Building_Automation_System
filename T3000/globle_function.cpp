@@ -1094,7 +1094,7 @@ BOOL Post_Write_Message(uint32_t deviceid,int8_t command,int8_t start_instance,i
     pmy_write_info->hWnd = hWnd;
     pmy_write_info->ItemInfo.nRow = nRow;
     pmy_write_info->ItemInfo.nCol = nCol;
-	if(g_protocol == MODBUS_RS485)
+	if((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP))
 	{
 		if(!PostThreadMessage(nThreadID,MY_RS485_WRITE_LIST,(WPARAM)pmy_write_info,NULL))//post thread msg
 		{
@@ -2266,6 +2266,23 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
     command_type = Temp_CS.value[2];
 
 
+	CString total_char_test;
+	if(debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)
+	{
+		char * temp_print_test = NULL;
+		temp_print_test = (char *)&Temp_CS.value;
+		for (int i = 0; i< len_value_type ; i++)
+		{
+			CString temp_char_test;
+			temp_char_test.Format(_T("%02x"),(unsigned char)*temp_print_test);
+			temp_char_test.MakeUpper();
+			temp_print_test ++;
+			total_char_test = total_char_test + temp_char_test + _T(" ");
+		}
+		DFTrace(total_char_test);
+	}
+
+
 
     unsigned int start_instance=0;
     unsigned int end_instance = 0;
@@ -2666,7 +2683,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
         if(start_instance >= BAC_ALALOG_CUSTMER_RANGE_TABLE_COUNT)
             return -1;//超过长度了;
 
-        for (i=start_instance; i<=end_instance; i++)
+        for (int i=start_instance; i<=end_instance; i++)
         {
             my_temp_point = my_temp_point + 9;
             for (int j=0; j<16; j++)
@@ -3205,66 +3222,67 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 
         if(start_instance >= BAC_ALARMLOG_COUNT)
             return -1;//超过长度了;
-        for (i=start_instance; i<=end_instance; i++)
+        for (int i=start_instance; i<=end_instance; i++)
         {
-            m_alarmlog_data.at(start_instance).point.number = *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).point.point_type = *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).point.panel = *(my_temp_point++);
+            m_alarmlog_data.at(i).point.number = *(my_temp_point++);
+            m_alarmlog_data.at(i).point.point_type = *(my_temp_point++);
+            m_alarmlog_data.at(i).point.panel = *(my_temp_point++);
             temp_struct_value = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
-            m_alarmlog_data.at(start_instance).point.network = temp_struct_value;
+            m_alarmlog_data.at(i).point.network = temp_struct_value;
             my_temp_point = my_temp_point + 2;
-            m_alarmlog_data.at(start_instance).modem = *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).printer = *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).alarm =  *(my_temp_point++);
+            m_alarmlog_data.at(i).modem = *(my_temp_point++);
+            m_alarmlog_data.at(i).printer = *(my_temp_point++);
+            m_alarmlog_data.at(i).alarm =  *(my_temp_point++);
 
             //if one of the alarm is not zero ,show the alarm window.
             bac_show_alarm_window = bac_show_alarm_window || m_alarmlog_data.at(start_instance).alarm;
 
-            m_alarmlog_data.at(start_instance).restored =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).acknowledged =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).ddelete =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).type =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).cond_type =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).level =  *(my_temp_point++);
+            m_alarmlog_data.at(i).restored =  *(my_temp_point++);
+            m_alarmlog_data.at(i).acknowledged =  *(my_temp_point++);
+            m_alarmlog_data.at(i).ddelete =  *(my_temp_point++);
+            m_alarmlog_data.at(i).type =  *(my_temp_point++);
+            m_alarmlog_data.at(i).cond_type =  *(my_temp_point++);
+            m_alarmlog_data.at(i).level =  *(my_temp_point++);
 
             temp_struct_value = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-            m_alarmlog_data.at(start_instance).alarm_time =(unsigned int) temp_struct_value;
+            m_alarmlog_data.at(i).alarm_time =(unsigned int) temp_struct_value;
             my_temp_point = my_temp_point + 4;
-            m_alarmlog_data.at(start_instance).alarm_count =  *(my_temp_point++);
+            m_alarmlog_data.at(i).alarm_count =  *(my_temp_point++);
 
 
             if(strlen(my_temp_point) > ALARM_MESSAGE_SIZE)
-                memset(m_alarmlog_data.at(start_instance).alarm_message,0,ALARM_MESSAGE_SIZE + 1);
+                memset(&m_alarmlog_data.at(i).alarm_message,0,ALARM_MESSAGE_SIZE + 1);
             else
-                memcpy_s( m_alarmlog_data.at(start_instance).alarm_message,ALARM_MESSAGE_SIZE + 1,my_temp_point,ALARM_MESSAGE_SIZE + 1);
+                memcpy_s( &m_alarmlog_data.at(i).alarm_message,ALARM_MESSAGE_SIZE + 1,my_temp_point,ALARM_MESSAGE_SIZE + 1);
             my_temp_point=my_temp_point + ALARM_MESSAGE_SIZE + 1;
 
             my_temp_point = my_temp_point + 5;//ignore char  none[5];
 
-            m_alarmlog_data.at(start_instance).panel_type =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).dest_panel_type =  *(my_temp_point++);
+            m_alarmlog_data.at(i).panel_type =  *(my_temp_point++);
+            m_alarmlog_data.at(i).dest_panel_type =  *(my_temp_point++);
 
             temp_struct_value = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
-            m_alarmlog_data.at(start_instance).alarm_id = (unsigned short)temp_struct_value;
+            m_alarmlog_data.at(i).alarm_id = (unsigned short)temp_struct_value;
             my_temp_point = my_temp_point + 2;
-            m_alarmlog_data.at(start_instance).prg =  *(my_temp_point++);
+            m_alarmlog_data.at(i).prg =  *(my_temp_point++);
 
 
-            m_alarmlog_data.at(start_instance).alarm_panel =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where1 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where2 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where3 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where4 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where5 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where_state1 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where_state2 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where_state3 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where_state4 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).where_state5 =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).change_flag =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).original =  *(my_temp_point++);
-            m_alarmlog_data.at(start_instance).no =  *(my_temp_point++);
+            m_alarmlog_data.at(i).alarm_panel =  *(my_temp_point++);
+            m_alarmlog_data.at(i).where1 =  *(my_temp_point++);
+            m_alarmlog_data.at(i).where2 =  *(my_temp_point++);
+            m_alarmlog_data.at(i).where3 =  *(my_temp_point++);
+            m_alarmlog_data.at(i).where4 =  *(my_temp_point++);
+            m_alarmlog_data.at(i).where5 =  *(my_temp_point++);
+            m_alarmlog_data.at(i).where_state1 =  *(my_temp_point++);
+            m_alarmlog_data.at(i).where_state2 =  *(my_temp_point++);
+            m_alarmlog_data.at(i).where_state3 =  *(my_temp_point++);
+            m_alarmlog_data.at(i).where_state4 =  *(my_temp_point++);
+            m_alarmlog_data.at(i).where_state5 =  *(my_temp_point++);
+            m_alarmlog_data.at(i).change_flag =  *(my_temp_point++);
+            m_alarmlog_data.at(i).original =  *(my_temp_point++);
+            m_alarmlog_data.at(i).no =  *(my_temp_point++);
         }
+		Sleep(1);
     }
     return READALARM_T3000;
     break;
@@ -3451,17 +3469,31 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
         for (int x=0; x<block_length; x++)
         {
             Str_Remote_TstDB temp;
-            m_remote_device_db.push_back(temp);
-            m_remote_device_db.at(x).sn = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
-            my_temp_point = my_temp_point + 4;
-            m_remote_device_db.at(x).product_type = *(my_temp_point++);
-            m_remote_device_db.at(x).modbus_id = *(my_temp_point++);
-            memcpy_s(m_remote_device_db.at(x).ip_addr,4,my_temp_point,4);
-            my_temp_point = my_temp_point + 4;
-            m_remote_device_db.at(x).port =  ((unsigned char)my_temp_point[0]<<8) | ((unsigned char)my_temp_point[1]);
-            my_temp_point = my_temp_point + 2;
-            memcpy_s(m_remote_device_db.at(x).reserved,10,my_temp_point,10);
-            my_temp_point = my_temp_point + 10;
+			temp.sn = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+			my_temp_point = my_temp_point + 4;
+			temp.product_type = *(my_temp_point++);
+			temp.modbus_id = *(my_temp_point++);
+			memcpy_s(temp.ip_addr,4,my_temp_point,4);
+			my_temp_point = my_temp_point + 4;
+			temp.port =  ((unsigned char)my_temp_point[0]<<8) | ((unsigned char)my_temp_point[1]);
+			my_temp_point = my_temp_point + 2;
+			memcpy_s(temp.reserved,10,my_temp_point,10);
+			my_temp_point = my_temp_point + 10;
+
+			if((temp.product_type == 0) || (temp.modbus_id == 0) || (temp.port == 0) || (temp.sn == 0 ))  //下面挂的不符合规则;
+				continue;
+            //m_remote_device_db.at(x).sn = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+            //my_temp_point = my_temp_point + 4;
+            //m_remote_device_db.at(x).product_type = *(my_temp_point++);
+            //m_remote_device_db.at(x).modbus_id = *(my_temp_point++);
+            //memcpy_s(m_remote_device_db.at(x).ip_addr,4,my_temp_point,4);
+            //my_temp_point = my_temp_point + 4;
+            //m_remote_device_db.at(x).port =  ((unsigned char)my_temp_point[0]<<8) | ((unsigned char)my_temp_point[1]);
+            //my_temp_point = my_temp_point + 2;
+            //memcpy_s(m_remote_device_db.at(x).reserved,10,my_temp_point,10);
+            //my_temp_point = my_temp_point + 10;
+
+			 m_remote_device_db.push_back(temp);
         }
     }
     break;
@@ -6060,11 +6092,15 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 
             m_controller_data.at(i).input.number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Number"),0,FilePath);
             m_controller_data.at(i).input.panel = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Panel"),0,FilePath);
+			if((m_controller_data.at(i).input.panel != Station_NUM) && (m_controller_data.at(i).input.panel != 0))	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
+				m_controller_data.at(i).input.panel = Station_NUM;
             m_controller_data.at(i).input.point_type = (unsigned char)GetPrivateProfileInt(temp_section,_T("Input_Point_Type"),0,FilePath);
             m_controller_data.at(i).input_value = GetPrivateProfileInt(temp_section,_T("Input_Value"),0,FilePath);
             m_controller_data.at(i).value = GetPrivateProfileInt(temp_section,_T("Value"),0,FilePath);
             m_controller_data.at(i).setpoint.number = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Number"),0,FilePath);
             m_controller_data.at(i).setpoint.panel = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Panel"),0,FilePath);
+			if((m_controller_data.at(i).setpoint.panel != Station_NUM) &&  (m_controller_data.at(i).setpoint.panel != 0) )	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
+				m_controller_data.at(i).setpoint.panel = Station_NUM;
             m_controller_data.at(i).setpoint.point_type = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Point_Type"),0,FilePath);
             m_controller_data.at(i).setpoint_value = (unsigned char)GetPrivateProfileInt(temp_section,_T("Setpoint_Value"),0,FilePath);
             m_controller_data.at(i).units = (unsigned char)GetPrivateProfileInt(temp_section,_T("Units"),0,FilePath);
@@ -6317,6 +6353,18 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
 				}
 				memcpy_s(&m_monitor_data.at(i).inputs[0],sizeof(Point_Net)*MAX_POINTS_IN_MONITOR,temp_in_array,sizeof(Point_Net)*MAX_POINTS_IN_MONITOR);//copy 70
 
+				for (int x=0;x<MAX_POINTS_IN_MONITOR;x++)
+				{
+					if(m_monitor_data.at(i).inputs[x].panel != Station_NUM)	 //在load prg 的时候 如果加载的panel != 自己的 就变成自己的
+					{
+						if((m_monitor_data.at(i).inputs[x].panel == m_monitor_data.at(i).inputs[x].sub_panel) && (m_monitor_data.at(i).inputs[x].panel != 0))
+						{
+							m_monitor_data.at(i).inputs[x].sub_panel = Station_NUM;
+							m_monitor_data.at(i).inputs[x].panel = Station_NUM;
+						}
+					}
+				}
+
             CString temp_range_code1;
             GetPrivateProfileStringW(temp_section,_T("Range"),_T(""),temp_range_code1.GetBuffer(MAX_PATH),255,FilePath);
             temp_range_code1.ReleaseBuffer();
@@ -6495,6 +6543,25 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
                 ::PostMessage(m_output_dlg_hwnd,WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
             else if(Variable_Window->IsWindowVisible())
                 ::PostMessage(m_variable_dlg_hwnd,WM_REFRESH_BAC_VARIABLE_LIST,NULL,NULL);
+			else if(WeeklyRoutine_Window->IsWindowVisible())
+				 ::PostMessage(m_weekly_dlg_hwnd,WM_REFRESH_BAC_WEEKLY_LIST,NULL,NULL);
+			else if(AnnualRoutine_Window->IsWindowVisible())
+				::PostMessage(m_annual_dlg_hwnd,WM_REFRESH_BAC_ANNUAL_LIST,NULL,NULL);
+			else if(Controller_Window->IsWindowVisible())
+				::PostMessage(m_controller_dlg_hwnd,WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+			else if(Monitor_Window->IsWindowVisible())
+			{
+				::PostMessage(m_monitor_dlg_hwnd, WM_REFRESH_BAC_MONITOR_LIST,NULL,NULL);
+				::PostMessage(m_monitor_dlg_hwnd, WM_REFRESH_BAC_MONITOR_INPUT_LIST,NULL,NULL);
+			}
+			else if(AlarmLog_Window->IsWindowVisible())
+				::PostMessage(m_alarmlog_dlg_hwnd, WM_REFRESH_BAC_ALARMLOG_LIST,NULL,NULL);
+			else if(Setting_Window->IsWindowVisible())
+				 ::PostMessage(m_setting_dlg_hwnd,WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);
+			else if(Program_Window->IsWindowEnabled())
+				::PostMessage(m_pragram_dlg_hwnd,WM_REFRESH_BAC_PROGRAM_LIST,NULL,NULL);
+				
+
         }
 
     }
@@ -6690,11 +6757,12 @@ int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
             memcpy(&m_graphic_label_data.at(i),temp_point ,sizeof(Str_label_point));
             temp_point = temp_point + sizeof(Str_label_point);
         }
-        copy_data_to_ptrpanel(TYPE_INPUT);
-        copy_data_to_ptrpanel(TYPE_VARIABLE);
-        copy_data_to_ptrpanel(TYPE_OUTPUT);
-        copy_data_to_ptrpanel(TYPE_WEEKLY);
-        copy_data_to_ptrpanel(TYPE_ANNUAL);
+		copy_data_to_ptrpanel(TYPE_ALL);
+        //copy_data_to_ptrpanel(TYPE_INPUT);
+        //copy_data_to_ptrpanel(TYPE_VARIABLE);
+        //copy_data_to_ptrpanel(TYPE_OUTPUT);
+        //copy_data_to_ptrpanel(TYPE_WEEKLY);
+        //copy_data_to_ptrpanel(TYPE_ANNUAL);
         if (pBuf)
         {
             delete pBuf;
@@ -10372,7 +10440,14 @@ int WriteBacnetPictureData(uint32_t deviceid,uint8_t index , unsigned short tran
 	return -2;
 }
 
-
+BOOL ShowBacnetView(unsigned char product_type)
+{
+	if((product_type == PM_MINIPANEL) || 
+		(product_type == PM_CM5) )
+		return true;
+	else
+		return false;
+}
 
 BOOL BinFileValidation(const CString& strFileName)
 {

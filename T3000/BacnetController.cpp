@@ -91,7 +91,7 @@ BOOL BacnetController::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	Initial_List();
 	PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
-	SetTimer(1,BAC_LIST_REFRESH_TIME,NULL);
+	SetTimer(1,CONTROLLOR_REFRESH_TIME,NULL);
 	// TODO:  Add extra initialization here
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -291,6 +291,11 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 					}
 			
 			}
+		}
+		else
+		{
+			m_controller_list.SetItemText(i,CONTROLLER_INPUTVALUE,_T(""));
+			m_controller_list.SetItemText(i,CONTROLLER_INPUTUNITS,_T(""));
 		}
 		
 		m_controller_list.SetItemText(i,CONTROLLER_INPUT,temp_des2);
@@ -604,9 +609,9 @@ LRESULT BacnetController::Fresh_Controller_List(WPARAM wParam,LPARAM lParam)
 			m_controller_list.SetItemText(i,CONTROLLER_BIAS,_T("0"));
 		}
 
-		if(m_controller_data.at(i).rate<=2)
+		if(m_controller_data.at(i).rate<=200)
 		{
-			temp_des3.Format(_T("%d"),m_controller_data.at(i).rate);
+			temp_des3.Format(_T("%.2f"),((float)m_controller_data.at(i).rate)/100);
 			m_controller_list.SetItemText(i,CONTROLLER_RATE,temp_des3);
 		}
 		else
@@ -929,14 +934,18 @@ LRESULT BacnetController::Fresh_Controller_Item(WPARAM wParam,LPARAM lParam)
 	{
 		int temp_rate=0;
 		CString cs_temp = m_controller_list.GetItemText(Changed_Item,Changed_SubItem);
-		if((cs_temp.GetLength()>1) || (_wtoi(cs_temp)>2) )
+
+		int i_value =  (int)(_wtof(cs_temp) * 100) ;
+
+		if((i_value > 200) || (i_value < 0))
+		//if((cs_temp.GetLength()>1) || (_wtoi(cs_temp)>2) )
 		{
-			MessageBox(_T("Please input a effective value"),_T("Information"),MB_OK |MB_ICONINFORMATION);
+			MessageBox(_T("Please input a effective value  0.00 - 2.00"),_T("Information"),MB_OK |MB_ICONINFORMATION);
 			m_controller_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
 		}
 		else
 		{
-			m_controller_data.at(Changed_Item).rate = _wtoi(cs_temp);
+			m_controller_data.at(Changed_Item).rate = i_value;
 		}
 	}
 
@@ -1072,9 +1081,11 @@ void BacnetController::OnTimer(UINT_PTR nIDEvent)
 	}
 	else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 	{
-	//PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
-	if(bac_select_device_online)
-		Post_Refresh_Message(g_bac_instance,READCONTROLLER_T3000,0,BAC_PID_COUNT - 1,sizeof(Str_controller_point),BAC_PID_GROUP);
+		if(bac_select_device_online)
+		{
+			PostMessage(WM_REFRESH_BAC_CONTROLLER_LIST,NULL,NULL);
+			Post_Refresh_Message(g_bac_instance,READCONTROLLER_T3000,0,BAC_PID_COUNT - 1,sizeof(Str_controller_point),BAC_PID_GROUP);
+		}
 	}
 	CDialogEx::OnTimer(nIDEvent);
 }

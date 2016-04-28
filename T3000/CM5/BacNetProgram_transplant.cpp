@@ -3641,7 +3641,14 @@ char *ispoint_ex(char *token,int *num_point,byte *var_type, byte *point_type, in
 		}
 	}
 	//return 0;
-	return(islabel(token,num_point,var_type,point_type,num_panel));//fance
+	char * temp_ret = NULL;
+	temp_ret = islabel(token,num_point,var_type,point_type,num_panel);
+	if(temp_ret != NULL)
+	{
+		sub_panel = panel;
+		return temp_ret;
+	}
+	//return(islabel(token,num_point,var_type,point_type,num_panel));//fance
 }
 
 
@@ -7609,6 +7616,35 @@ void check_function_table(char *richeditchar ,int ntype)
 			find_char_pos = strstr(char_source,temp_label);
 			if(find_char_pos != NULL)
 			{
+				//char * temp_point_start = find_char_pos;
+				//char * temp_point_end = NULL;
+
+				//while( *temp_point_start == " ")
+				//{
+				//	temp_point_start ++ ;
+				//}
+				//temp_point_start = temp_point_end;
+
+				//while((*(temp_point_end + 1) != " ") && (*(temp_point_end + 1) != 0x0d))
+				//{
+				//	temp_point_end ++ ;
+				//}
+
+				//int temp_length = 0;
+				//temp_length = temp_point_end - temp_point_start;
+
+				//if((temp_length > 0) && (temp_length <255))
+				//{
+
+				//	char temp_buffer[255];
+				//	memset(temp_buffer ,0 , 255);
+				//	memcpy_s(temp_buffer,temp_length,temp_point_start,temp_length);
+				//	ispoint_ex()
+				//}
+
+
+
+
 				temp_pos_color.startpos = find_char_pos - richeditchar ;
 				temp_pos_color.endpos = temp_pos_color.startpos + look_str_length ;
 				if(ntype == FUNCTION_TABEL)

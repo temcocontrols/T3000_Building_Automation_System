@@ -207,17 +207,40 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 		CString temp_item;
 		CString temp_message;
 		CString temp_panel;
+		CString temp_time;
 
-		temp_item.Format(_T("%d"),i+1);
-		temp_panel.Format(_T("%d"),(unsigned char)m_alarmlog_data.at(i).point.panel);
-		MultiByteToWideChar( CP_ACP, 0, (char *)m_alarmlog_data.at(i).alarm_message, (int)strlen((char *)m_alarmlog_data.at(i).alarm_message)+1, 
-			temp_message.GetBuffer(MAX_PATH), MAX_PATH );
-		temp_message.ReleaseBuffer();
+		if(m_alarmlog_data.at(i).alarm == 1)
+		{
+			temp_item.Format(_T("%d"),i+1);
+			temp_panel.Format(_T("%d"),(unsigned char)m_alarmlog_data.at(i).alarm_panel);
+			MultiByteToWideChar( CP_ACP, 0, (char *)m_alarmlog_data.at(i).alarm_message, (int)strlen((char *)m_alarmlog_data.at(i).alarm_message)+1, 
+				temp_message.GetBuffer(MAX_PATH), MAX_PATH );
+			temp_message.ReleaseBuffer();
+
+
+
+			time_t tempalarm_time ;
+			tempalarm_time = m_alarmlog_data.at(i).alarm_time;
+			CTime time_alarmtime;
+			time_alarmtime = tempalarm_time;
+			temp_time = time_alarmtime.Format("%y/%m/%d %H:%M:%S");
+
+		}
+		else
+		{
+			temp_time.Empty();
+			temp_panel.Empty();
+			temp_message.Empty();
+			temp_item.Empty();
+			m_alarmlog_list.SetItemText(i,ALARMLOG_DEL,_T(""));
+		}
+
 
 
 		m_alarmlog_list.SetItemText(i,ALARMLOG_NUM,temp_item);
-		m_alarmlog_list.SetItemText(i,ALARMLOG_MESSAGE,temp_panel);
+		m_alarmlog_list.SetItemText(i,ALARMLOG_PANEL,temp_panel);
 		m_alarmlog_list.SetItemText(i,ALARMLOG_MESSAGE,temp_message);
+		m_alarmlog_list.SetItemText(i,ALARMLOG_TIME,temp_time);
 
 		if(m_alarmlog_data.at(i).alarm == 1)
 		{

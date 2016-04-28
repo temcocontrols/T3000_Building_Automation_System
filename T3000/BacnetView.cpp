@@ -1,6 +1,42 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2016 - 04 - 25
+1. 修复ISP 烧写的时候提示 不匹配的bug . mark 住了 最早以前的  ISP 的 部分;
+
+2016 - 04 - 22
+1.支持旧版的T3 ，判断版本号 ，旧版就进入旧版的界面.
+2.解决扫描的时候 会判断读multy的线程 引起 后台不扫描的bug
+
+2016 - 04 - 21
+1. 支持在minipanel 界面显示
+2. 调整graphic 界面的 大小, 将14个 input label 位置调整至左边，支持更小分辨率的客户.
+
+2016 - 04 - 19
+1. 修复在program debug 界面下 按insert键后  新串口的 列错位的问题;
+2. 修复label 的第一个字符如果是数字 引起的 program里面 解析 认为是 远程的点的问题，导致 Var1 显示为1.0.var1
+3. 在debug 界面加入 bacnet 的 数据调试信息;
+
+
+2016 - 04 -14
+1. 修复alarmlog 私有的数据 赋值时 的bug.
+
+2016 - 04 -11
+1. Controller 的刷新时间改为4s 一次.
+
+2016 - 04 - 07
+Update by Fance
+1. Input 和Output 加入panel 两列 如果是扩展的就要写n-m.
+2. 小改动，trend log 右移后提示.
+
+2016 - 04 - 06
+Update by Fance
+1. Graphic 按照老毛的 要求  把下面14个改成双行的.
+2. 修复 unit 的问题，获取不到unit 的时候就从 其他data 那获取;
+3. 在load prg 之后 
+4. Output 扩展的最高位 区分是DO 还是AO
+5. HAND_AM 如果不是Auto output 就全部显示红色.
+
 2016 - 03 -30
 Update by Fance
 1. Monitor 删掉  时间限制 ，只要On 就开始记录.
@@ -570,8 +606,9 @@ extern SOCKET my_sokect;
 extern bool show_user_list_window ;
 HANDLE connect_mstp_thread = NULL; // 当点击MSTP的设备时开启 连接的线程;
 HANDLE read_rs485_thread = NULL; // RS485的设备 通用;
-HANDLE read_each_485_fun_thread = NULL;
-	int n_read_list_flag = -1;
+
+int n_read_product_type = 0;
+int n_read_list_flag = -1;
 //#define WM_SEND_OVER     WM_USER + 1287
 // int m_Input_data_length;
 extern void  init_info_table( void );
@@ -698,7 +735,7 @@ LRESULT CDialogCM5_BacNet::Change_Next_Panel(WPARAM wParam,LPARAM lParam)
 
 	if(next_index >= 0)
 	{
-		if(IDYES == MessageBox(_T("Do you want jump to the next panel ?"),_T("Notice"),MB_YESNO) )
+		//if(IDYES == MessageBox(_T("Do you want jump to the next panel ?"),_T("Notice"),MB_YESNO) )
 			pFrame->DoConnectToANode(pFrame->m_product.at(next_index).product_item);
 	}
 	else
@@ -1288,6 +1325,14 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 			Initial_Some_UI(n_lparam);
 		}
 		break;
+	case SHOW_DEVICE_STATUS:
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reading data..."));
+			bac_select_device_online = true;
+			g_llTxCount ++ ;
+			g_llRxCount ++;
+		}
+		break;
 	case SHOW_PROGRAM_IDE:
 		{
 			if(bac_read_which_list == BAC_READ_PROGRAMCODE_LIST)
@@ -1795,12 +1840,13 @@ bool has_change_connect_ip = true;
 //INPUT int test_function_return_value();
 void CDialogCM5_BacNet::Fresh()
 {
+	g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
     if(initial_once)
     {
         initial_once = false;
         Tab_Initial();
     }
-	if ((g_protocol!=PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP)  && (g_protocol != PROTOCOL_BIP_TO_MSTP) && (g_protocol != MODBUS_RS485))
+	if ((g_protocol!=PROTOCOL_BACNET_IP) && (g_protocol != MODBUS_BACNET_MSTP)  && (g_protocol != PROTOCOL_BIP_TO_MSTP) && (g_protocol != MODBUS_RS485) && (g_protocol != MODBUS_TCPIP))
 	{
 		return;
 	}
@@ -1867,6 +1913,13 @@ void CDialogCM5_BacNet::Fresh()
 		BacNet_hwd = this->m_hWnd;
 		if(read_rs485_thread == NULL)
 			read_rs485_thread = CreateThread(NULL,NULL,RS485_Connect_Thread,this,NULL, NULL);
+		return;
+	}
+	else if((pFrame->m_product.at(selected_product_index).protocol == MODBUS_TCPIP) && 
+		((pFrame->m_product.at(selected_product_index).product_class_id == T38AI8AO6DO) ||
+		 (pFrame->m_product.at(selected_product_index).product_class_id == PID_T322AI) ))
+	{
+		BacNet_hwd = this->m_hWnd;
 		return;
 	}
 
@@ -2003,6 +2056,10 @@ void CDialogCM5_BacNet::Fresh()
 
 			if(pFrame->m_product.at(selected_product_index).product_class_id == PM_CM5)
 				bacnet_device_type = PRODUCT_CM5;
+			else if(pFrame->m_product.at(selected_product_index).product_class_id == T38AI8AO6DO)
+				bacnet_device_type = T38AI8AO6DO;
+			else if(pFrame->m_product.at(selected_product_index).product_class_id == PID_T322AI)
+				bacnet_device_type = PID_T322AI;	
 			else
 			{
 				int ret = 0;
@@ -4170,6 +4227,7 @@ void CDialogCM5_BacNet::OnTimer(UINT_PTR nIDEvent)
 		{
 			if(this->IsWindowVisible())
 			{
+				g_bPauseMultiRead = true; // 只要在minipanel的界面 就暂停 读 寄存器的那个线程;
 				if(!Gsm_communication)
 					m_bac_scan_com_data.clear();
 				if(g_bac_instance>0)
@@ -4920,6 +4978,25 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 	unsigned short read_data_buffer[3200];
 	memset(read_data_buffer,0,sizeof(unsigned short)*3200);
 
+	int output_reg = 0;
+	int input_reg = 0;
+
+	if(n_read_product_type == T38AI8AO6DO)
+	{
+		output_reg = 4; // (6+8)*23 = 322
+		input_reg =  2; //  23 * 8 = 184
+	}
+	else if(n_read_product_type == PID_T322AI)
+	{
+		output_reg = 0; // (6+8)*23 = 322
+		input_reg =  6; //  23 * 22 = 506
+	}
+	else
+	{
+		output_reg = 15; //默认是读minipanel 的所有的寄存器 ;
+		input_reg = 15;
+	}
+	
 
 	int read_type = -1;
 
@@ -4928,7 +5005,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 	case 0:   //OUT
 		{
 			//output 45 按46算  *64  + input 46  *64  需要读2944;
-			for(int i=0; i<15; i++)
+			for(int i=0; i<output_reg; i++)
 			{
 				int itemp = 0;
 				itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],10000+i*100,100,4);
@@ -4939,7 +5016,12 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				}
 				else
 				{
-					g_progress_persent = (i+1)*100 / 15;	
+					if(!hide_485_progress)
+						g_progress_persent = (i+1)*100 / output_reg;	
+					else
+					{
+						SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reading Outputs..."));
+					}
 				}
 				Sleep(100);
 			}
@@ -4967,7 +5049,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 	case 1:   //IN
 		{
 			//output 45 按46算  *64  + input 46  *64  需要读2944;
-			for(int i=0; i<15; i++)
+			for(int i=0; i<input_reg; i++)
 			{
 				//register_critical_section.Lock();
 				//int nStart = GetTickCount();
@@ -4980,7 +5062,12 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				}
 				else
 				{
-					g_progress_persent = (i+1)*100 / 15;	
+					if(!hide_485_progress)
+						g_progress_persent = (i+1)*100 / input_reg;	
+					else
+					{
+						SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reading Inputs..."));
+					}
 				}
 				Sleep(100);
 			}
@@ -5022,7 +5109,8 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 				}
 				else
 				{
-					g_progress_persent = (i+1)*100 / 2;	
+					if(!hide_485_progress)
+						g_progress_persent = (i+1)*100 / 2;	
 				}
 				Sleep(100);
 			}
@@ -5053,7 +5141,7 @@ DWORD WINAPI RS485_Read_Each_List_Thread(LPVOID lpvoid)
 	default:
 		break;
 	}
-
+	hide_485_progress = false;
 	read_each_485_fun_thread = NULL;
 	return 0;
 }
@@ -5084,6 +5172,7 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 	bret =	open_com(n_comport);
 	if(bret == false)
 	{
+		 read_rs485_thread = NULL;
 		AfxMessageBox(_T("Open serial port failed!"));
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Open serial port failed!"));
 		return 2;
@@ -5097,6 +5186,11 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 		 read_rs485_thread = NULL;
 		 return 3;
 	 }
+	 g_llTxCount ++;
+	 g_llRxCount ++;
+
+	 SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reading data..."));
+
 	 Sleep(100);
 	 unsigned short temp_panel_number = 0 ;
 	 unsigned int   temp_object_instance = 0;
@@ -5186,6 +5280,10 @@ DWORD WINAPI RS485_Connect_Thread(LPVOID lpvoid)
 	 }
 	 else
 	 {
+		 g_llTxCount ++;
+		 g_llRxCount ++;
+
+		 SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reading data :OK"));
 		 if(Input_Window->IsWindowVisible())
 			::PostMessage(m_input_dlg_hwnd, WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
 		 else if(Output_Window->IsWindowVisible())
@@ -5265,33 +5363,17 @@ DWORD WINAPI  Mstp_Connect_Thread(LPVOID lpVoid)
 
 LRESULT CDialogCM5_BacNet::RS485_Read_Fun(WPARAM wParam,LPARAM lParam)
 {
-	int n_persent = wParam;
+	n_read_product_type = wParam;
 	//int n_read_list = lParam;
 	n_read_list_flag = lParam;
 	if(read_each_485_fun_thread == NULL)
 		read_each_485_fun_thread = CreateThread(NULL,NULL,RS485_Read_Each_List_Thread,this,NULL, NULL);
 	else
 	{
-		TerminateThread(read_each_485_fun_thread,NULL);
-		read_each_485_fun_thread = NULL;
+		//TerminateThread(read_each_485_fun_thread,NULL);
+		//read_each_485_fun_thread = NULL;
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Reading data .  Please wait!"));
 	}
-
-	//if(lParam)
-	//{
-	//	delete WaitRead_Data_Dlg;
-	//	WaitRead_Data_Dlg = 0;
-	//	//SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read items time out!"));
-	//	return 0;
-	//}
-
-
-	//if(WaitRead_Data_Dlg!=NULL)
-	//{
-	//	if(n_persent > 100)
-	//		n_persent = 100;
-	//	WaitRead_Data_Dlg->ShowProgress(n_persent,n_persent);
-	//}
-
 	return 0;
 }
 

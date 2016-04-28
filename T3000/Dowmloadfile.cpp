@@ -754,7 +754,7 @@ BOOL Dowmloadfile::OnInitDialog()
 	if(is_local_temco_net == false)
 	{
 		WritePrivateProfileStringW(_T("Setting"),_T("LocalTemcoNet"),_T("0"),temp_db_ini_folder);
-		WritePrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.136"),temp_db_ini_folder);
+		WritePrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.4"),temp_db_ini_folder);
 	}
 
 	//hostent* host = gethostbyname("www.temcocontrols.poweredbyclear.com");  //这是以前的域名 
@@ -763,7 +763,7 @@ BOOL Dowmloadfile::OnInitDialog()
 	if(is_local_temco_net == false)
 	{
 
-		hostent* host = gethostbyname("148t02f377.iok.la");
+		hostent* host = gethostbyname("newfirmware.com");
 		if(host == NULL)
 		{
 			MessageBox(_T("Connect Temco server failed.  \r\nPlease check your internet connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
@@ -772,11 +772,16 @@ BOOL Dowmloadfile::OnInitDialog()
 		}
 		char* pszIP  = (char *)inet_ntoa(*(struct in_addr *)(host->h_addr)); 
 		memcpy_s((char *)IP_ADDRESS_SERVER,20,pszIP,20);
+
+		CString temp_message;
+		temp_message.Format(_T("Internet access!"));
+		m_download_info.InsertString(m_download_info.GetCount(),temp_message);
+		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
 	}
 	else
 	{
 		CString temp_ip;
-		GetPrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.136"),temp_ip.GetBuffer(MAX_PATH),MAX_PATH,temp_db_ini_folder);
+		GetPrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.4"),temp_ip.GetBuffer(MAX_PATH),MAX_PATH,temp_db_ini_folder);
 		temp_ip.ReleaseBuffer();
 
 		char temp_char_ip[40];
@@ -829,7 +834,7 @@ void Dowmloadfile::Start_Download()
 	if(is_local_temco_net == false)
 	{
 		WritePrivateProfileStringW(_T("Setting"),_T("LocalTemcoNet"),_T("0"),temp_db_ini_folder);
-		WritePrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.136"),temp_db_ini_folder);
+		WritePrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.4"),temp_db_ini_folder);
 	}
 	//TCP_File_Socket.Connect(_T("114.93.6.170"),31234);
 
@@ -837,10 +842,10 @@ void Dowmloadfile::Start_Download()
 
 	if(is_local_temco_net == false)
 	{
-		hostent* host = gethostbyname("148t02f377.iok.la");
+		hostent* host = gethostbyname("newfirmware.com");
 		if(host == NULL)
 		{
-			MessageBox(_T("Can't access Temco server.  \r\nPlease check your internet connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+			MessageBox(_T("Can't access Firmware server.  \r\nPlease check your internet connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 			PostMessage(WM_CLOSE,NULL,NULL);
 			return ;
 		}
@@ -850,7 +855,7 @@ void Dowmloadfile::Start_Download()
 	else
 	{
 		CString temp_ip;
-		GetPrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.136"),temp_ip.GetBuffer(MAX_PATH),MAX_PATH,temp_db_ini_folder);
+		GetPrivateProfileStringW(_T("Setting"),_T("TemcoServerIP"),_T("192.168.0.4"),temp_ip.GetBuffer(MAX_PATH),MAX_PATH,temp_db_ini_folder);
 		temp_ip.ReleaseBuffer();
 
 		char temp_char_ip[40];

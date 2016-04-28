@@ -80,9 +80,9 @@ public:
 	// public method
 	////////////////////////////////////////////////////////////////////////////
 	// 参数 BOOL, =TRUE replace the current line, =FALSE add a new line
-	Bin_Info temp1;
+
 	void UpdateStatusInfo(const CString& strInfo, BOOL bReplace);
-	void ShowHexBinInfor(int hexbin);
+	 
 	void SetFlashFileName(const CString& strFileName);
 	CString GetFlashFileName();
 
@@ -111,7 +111,7 @@ public:
 	/*提示信息控件*/
 	CToolTipCtrl *m_ToolTip;
  
-protected:	// private method
+public:	// private method
 	/*void InitTabCtrl();*/
 	// initialize some control by read config file.
  
@@ -265,5 +265,9 @@ public:
     CComboBox m_combox_baudrate;
     afx_msg void OnMenuFlashsn();
 
+
+	BOOL m_FlashEnable;
 	int m_isRAM;
+	int m_FlashTimes;
+	int m_Brandrate;
 };

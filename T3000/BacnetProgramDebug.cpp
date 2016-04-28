@@ -101,7 +101,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 	m_program_debug_list.DeleteAllItems();
 	while ( m_program_debug_list.DeleteColumn (0)) ;
 	int width_length = 0;
-	CTime TimeTemp(2015,1,1,0,0,0);
+	CTime TimeTemp(2016,1,1,0,0,0);
 	m_prg_debug_variable_time_picker.SetFormat(_T("HH:mm"));
 	m_prg_debug_variable_time_picker.SetTime(&TimeTemp);
 	m_prg_debug_variable_time_picker.ShowWindow(SW_HIDE);
@@ -112,6 +112,8 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 			m_program_debug_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 			m_program_debug_list.SetExtendedStyle(m_program_debug_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 			m_program_debug_list.InsertColumn(OUTPUT_NUM, _T("Output"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+			m_program_debug_list.InsertColumn(OUTPUT_PANEL, _T("Panel"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+
 			m_program_debug_list.InsertColumn(OUTPUT_FULL_LABLE, _T("Full Label"), 140, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 			m_program_debug_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 			m_program_debug_list.InsertColumn(OUTPUT_HW_SWITCH, _T("HOA Switch"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
@@ -153,7 +155,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 				}
 
 
-				width_length = 60 + 140 + 80 + 80 + 80 + 80 + 100 + 80 + 70 + 70 + 50;
+				width_length = 60 + 140 + 80 + 80 + 80 + 80 + 100 + 80 + 70 + 70 + 50 + 70;
 				SetWindowPos(NULL,0,0,width_length,120,SWP_NOMOVE);
 				::SetWindowPos(m_program_debug_list.m_hWnd,NULL,0,0,width_length - 20,70,SWP_NOMOVE);
 				Fresh_Program_List(list_type);
@@ -163,9 +165,11 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 		break;
 	case 1://IN
 		{
+
 			m_program_debug_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 			m_program_debug_list.SetExtendedStyle(m_program_debug_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 			m_program_debug_list.InsertColumn(INPUT_NUM, _T("Input"), 50, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+			m_program_debug_list.InsertColumn(INPUT_PANEL, _T("Panel"), 50, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
 			m_program_debug_list.InsertColumn(INPUT_FULL_LABLE, _T("Full Label"), 100, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 			m_program_debug_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 			m_program_debug_list.InsertColumn(INPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
@@ -218,7 +222,7 @@ void CBacnetProgramDebug::Initial_List(unsigned int list_type)
 					m_program_debug_list.SetCellStringList(0, INPUT_JUMPER, strlist);		
 				}
 
-				width_length =50 + 100 + 80 + 80 + 80 + 100 + 70 + 50 + 60 + 60 + 90 + 80 + 50 ;
+				width_length =50 + 100 + 80 + 80 + 80 + 100 + 70 + 50 + 60 + 60 + 90 + 80 + 50 + 60;
 				SetWindowPos(NULL,0,0,width_length,120,SWP_NOMOVE);
 				::SetWindowPos(m_program_debug_list.m_hWnd,NULL,0,0,width_length - 20,70,SWP_NOMOVE);
 				Fresh_Program_List(list_type);
@@ -673,6 +677,50 @@ int CBacnetProgramDebug::Fresh_Program_List(unsigned int list_type)
 					temp_des2.ReleaseBuffer();
 
 					m_program_debug_list.SetItemText(0,INPUT_LABLE,temp_des2);
+
+
+
+#pragma region External_info
+					CString main_sub_panel;
+					if((m_Input_data.at(point_number).sub_id !=0) &&
+						//(m_Input_data.at(input_list_line).sub_number !=0) &&
+						(m_Input_data.at(point_number).sub_product !=0))
+					{
+						unsigned char temp_pid = m_Input_data.at(point_number).sub_product;
+						if((temp_pid == PM_T3PT10) ||
+							(temp_pid == PM_T3IOA) ||
+							(temp_pid == PM_T332AI) ||
+							(temp_pid == PM_T38AI16O) ||
+							(temp_pid == PM_T38I13O) ||
+							(temp_pid == PM_T34AO) ||
+							(temp_pid == PM_T322AI) ||
+							(temp_pid == PM_T38AI8AO6DO) ||
+							(temp_pid == PM_T36CT))
+						{
+							//m_input_item_info.ShowWindow(true);
+							CString temp_name;
+							temp_name = GetProductName(m_Input_data.at(point_number).sub_product);
+							CString show_info;
+							CString temp_id;
+							CString temp_number;
+
+							main_sub_panel.Format(_T("%d-%d"),(unsigned char)Station_NUM,(unsigned char)m_Input_data.at(point_number).sub_id);
+							m_program_debug_list.SetItemText(0,INPUT_PANEL,main_sub_panel);
+						}	
+						else
+						{
+							main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
+							m_program_debug_list.SetItemText(0,INPUT_PANEL,main_sub_panel);
+						}
+					}
+					else
+					{
+						main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
+						m_program_debug_list.SetItemText(0,INPUT_PANEL,main_sub_panel);
+					}
+
+#pragma endregion External_info
+
 				
 			}
 			break;

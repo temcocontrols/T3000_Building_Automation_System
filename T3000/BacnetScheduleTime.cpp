@@ -85,12 +85,20 @@ BOOL CBacnetScheduleTime::PreTranslateMessage(MSG* pMsg)
 			{
 				GetDlgItem(IDC_LIST_SCHEDULE_TIME)->SetFocus();
 			}
-
-
-
-			
 			return TRUE;
 		}
+		else if(pMsg->wParam == VK_DELETE)
+		{
+			if(GetFocus()->GetDlgCtrlID() == IDC_DATETIMEPICKER1_SCHEDUAL)
+			{
+				CTime TimeTemp(2016,1,1,0,0,0);
+				m_schedual_time_picker.SetFormat(_T("HH:mm"));
+				m_schedual_time_picker.SetTime(&TimeTemp);
+				GetDlgItem(IDC_LIST_SCHEDULE_TIME)->SetFocus();
+			}
+		}
+
+			
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -137,7 +145,7 @@ void CBacnetScheduleTime::Initial_List()
 		temp_item.Format(_T("OFF"),i+1);
 		m_schedule_time_list.InsertItem(i,temp_item);
 	}
-	CTime TimeTemp(2014,1,1,0,0,0);
+	CTime TimeTemp(2016,1,1,0,0,0);
 
 	m_schedual_time_picker.SetFormat(_T("HH:mm"));
 	m_schedual_time_picker.SetTime(&TimeTemp);
@@ -256,7 +264,7 @@ void CBacnetScheduleTime::OnNMClickListScheduleTime(NMHDR *pNMHDR, LRESULT *pRes
 	m_schedual_time_picker.BringWindowToTop();
 	m_schedual_time_picker.MoveWindow(myrect);
 
-	CTime TimeTemp(2014,1,1,temp_hour,temp_minute,0);
+	CTime TimeTemp(2016,1,1,temp_hour,temp_minute,0);
 
 	m_schedual_time_picker.SetFormat(_T("HH:mm"));
 	m_schedual_time_picker.SetTime(&TimeTemp);
@@ -289,8 +297,16 @@ void CBacnetScheduleTime::OnNMKillfocusDatetimepicker1Schedual(NMHDR *pNMHDR, LR
 			if((chour*60 + cmin) <= (m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][m_col - 1].time_hours)*60 +  m_Schedual_Time_data.at(weekly_list_line).Schedual_Day_Time[i][m_col - 1].time_minutes )
 			{
 				m_schedual_time_picker.ShowWindow(SW_HIDE);
-				MessageBox(_T("The time is not increasing!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
-				return;
+				if((chour == 0) && (cmin == 0))
+				{
+
+				}
+				else
+				{
+					MessageBox(_T("The time is not increasing!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+					return;
+				}
+
 			}
 		}
 

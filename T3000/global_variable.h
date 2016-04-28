@@ -2146,6 +2146,9 @@ int monitor_ignore_max_value = 0;
 int monitor_ignore_min_value = 0;
 int persent_array_count = 0;
 unsigned int old_tx_count = 0;
+HANDLE read_each_485_fun_thread = NULL;
+bool hide_485_progress = false;
+bool new_device_support_mini_ui = false;
 
 int flash_multi_auto = false; //用于控制 多烧的  自动控制;
 unsigned int T3000_Version ; //T3000的版本号.

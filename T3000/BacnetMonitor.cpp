@@ -1203,8 +1203,8 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 		if(temp_time_num < Device_Misc_Data.reg.operation_time[monitor_list_line])
 		{
 			//需要更新数据库;
-			if(IDYES == MessageBox(_T("Trend log data saved in SD disk has changed , Do you want synchronization."),_T("Notice"),MB_YESNOCANCEL | MB_ICONINFORMATION))
-			{
+			//if(IDYES == MessageBox(_T("Trend log data saved in SD disk has changed , Do you want synchronization."),_T("Notice"),MB_YESNOCANCEL | MB_ICONINFORMATION))
+			//{
 				CString temp_operation_time;
 				CString temp_monitor_index;
 				CString temp_monitor_digital_index;
@@ -1214,7 +1214,7 @@ void CBacnetMonitor::OnBnClickedBtnMonitorGraphic()
 				WritePrivateProfileString(temp_serial,temp_cs_modify_index,temp_operation_time,temp_db_ini_folder);
 				WritePrivateProfileString(temp_serial,temp_monitor_index,NULL,g_cstring_ini_path);
 				WritePrivateProfileString(temp_serial,temp_monitor_digital_index,NULL,g_cstring_ini_path);
-			}
+			//}
 		}
 
 
@@ -1472,8 +1472,8 @@ unsigned char read_monitordata(int digtal_or_analog)
 	int temp_value = 0;
 	if(read_temp_local_tem_package)
 	{
-		if((m_monitor_head.total_seg > 10) && (temp_index < m_monitor_head.total_seg - 10))
-			temp_value = m_monitor_head.total_seg - 10;
+		if((m_monitor_head.total_seg > TEMP_DATA_READ_COUNT) && (temp_index < m_monitor_head.total_seg - TEMP_DATA_READ_COUNT))
+			temp_value = m_monitor_head.total_seg - TEMP_DATA_READ_COUNT;
 		else
 			temp_value = temp_index;
 	}
@@ -1482,8 +1482,18 @@ unsigned char read_monitordata(int digtal_or_analog)
 		temp_value = temp_index;
 	}
 
+
+
 	for (int read_index= temp_value ;read_index<=m_monitor_head.total_seg;read_index++)
 	{
+		if(Device_Basic_Setting.reg.sd_exist != 2)
+		{
+			if(m_monitor_head.total_seg >= 2)
+			{
+			   break;
+			}
+		}
+
 		cs_my_temp.Format(_T("Read Data %d / %d"),read_index - temp_index,m_monitor_head.total_seg - temp_index);
 		SetPaneString(BAC_SHOW_MISSION_RESULTS,cs_my_temp);
 
@@ -1952,6 +1962,23 @@ int handle_read_monitordata_ex(char *npoint,int nlength)
 	return 1;
 
 }
+
+int GetAmonLabel(int index,CString &ret_label)
+{
+	if(index >= BAC_MONITOR_COUNT)
+	{
+		ret_label.Empty();
+		return -1;
+	}
+	int i = index;
+	CString temp_des2;
+	MultiByteToWideChar( CP_ACP, 0, (char *)m_monitor_data.at(i).label, (int)strlen((char *)m_monitor_data.at(i).label)+1, 
+		ret_label.GetBuffer(MAX_PATH), MAX_PATH );
+	ret_label.ReleaseBuffer();
+
+	return 1;
+}
+
 
 // CBacnetProgramEdit message handlers
 LRESULT CBacnetMonitor::OnHotKey(WPARAM wParam,LPARAM lParam)

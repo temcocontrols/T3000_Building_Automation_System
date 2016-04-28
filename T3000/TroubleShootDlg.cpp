@@ -38,10 +38,6 @@ CTroubleShootDlg::~CTroubleShootDlg()
 void CTroubleShootDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_STATIC_DEVICE_INFO, m_current_product);
-	DDX_Control(pDX, IDC_STATIC_SCANRESULT, m_scanresult);
-//	DDX_Control(pDX, IDC_STATIC_SCANRESULT2, m_connection_status);
-	DDX_Control(pDX, IDC_STATIC_THE_DEVICE_IP, m_str_device_ip);
 	DDX_Control(pDX, IDC_EDIT1, m_edit_newip);
 }
 
@@ -51,6 +47,7 @@ BEGIN_MESSAGE_MAP(CTroubleShootDlg, CDialogEx)
 //	ON_BN_CLICKED(IDC_BUTTON1, &CTroubleShootDlg::OnBnClickedButton1)
 //	ON_BN_CLICKED(IDC_BUTTON2, &CTroubleShootDlg::OnBnClickedButton2)
 //	ON_BN_CLICKED(IDC_BUTTON4, &CTroubleShootDlg::OnBnClickedButton4)
+ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
@@ -63,24 +60,12 @@ BOOL CTroubleShootDlg::OnInitDialog()
 	CString StrTemp;
 	StrTemp.Format(_T("Change %s's IP Address"),GetProductName(m_net_product_node.product_class_id));
 
-	m_current_product.SetWindowTextW(StrTemp);
-	m_current_product.textColor(RGB(255,0,0));
-	//m_current_product.bkColor(RGB(255,255,255));
-	m_current_product.setFont(30,10,NULL,_T("Arial"));
+
 
 	StrTemp.Format(_T("%s"),m_net_product_node.BuildingInfo.strIp);
-	m_str_device_ip.SetWindowTextW(StrTemp);
-	m_str_device_ip.textColor(RGB(255,0,0));
-	m_str_device_ip.bkColor(RGB(255,255,255));
-	m_str_device_ip.setFont(25,10,NULL,_T("Arial"));
+
 	
 
-	 
-	m_scanresult.SetWindowTextW(_T("¡ú"));
-	m_scanresult.textColor(RGB(255,0,0));
-	//m_static.bkColor(RGB(0,255,255));
-	 
-	m_scanresult.setFont(35,10,NULL,_T("Arial"));
 	
 
 	GetNewIP(StrTemp,m_net_product_node.NetworkCard_Address);
@@ -444,4 +429,92 @@ CDialog::OnOK();
 
 void CTroubleShootDlg::SetNode(tree_product product_Node){
 	m_net_product_node=product_Node;
+}
+
+#define  MY_COLOR_RED			Color(255,255,0,0)
+#define  MY_COLOR_BLACK_CHARACTER			Color(255,204,204,204)
+#define  BLACK_GROUND_START_X    10
+#define  BLACK_GROUND_START_Y    193
+#define  BLACK_GROUND_WIDTH      400
+#define  BLACK_GROUND_HEIGHT      40
+
+#define  BLACK_2_GROUND_START_X    (BLACK_GROUND_START_X  + BLACK_GROUND_WIDTH + 60)
+#define  BLACK_2_GROUND_START_Y    BLACK_GROUND_START_Y
+#define  BLACK_2_GROUND_WIDTH      180
+#define  BLACK_2_GROUND_HEIGHT      40
+
+#define BLACK_PC_GROUND_START_X		BLACK_GROUND_START_X
+#define BLACK_PC_GROUND_START_Y   ( BLACK_GROUND_START_Y + BLACK_GROUND_HEIGHT + 10 )
+#define BLACK_PC_GROUND_WIDTH      BLACK_GROUND_WIDTH
+#define BLACK_PC_GROUND_HEIGHT     BLACK_GROUND_HEIGHT
+
+void CTroubleShootDlg::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+	// TODO: Add your message handler code here
+	// Do not call CDialogEx::OnPaint() for painting messages
+	CMemDC memDC(dc,this);
+	CRect rcClient;
+	GetClientRect(&rcClient);
+	memDC.GetDC().FillSolidRect(&rcClient,RGB(230,230,230));
+	//Graphics graphics(memDC.GetDC());
+	SolidBrush *BlackBrush;
+	SolidBrush *CharacterBlackBrush;
+	
+	Graphics *mygraphics;
+	mygraphics = new Graphics(memDC.GetDC());
+	mygraphics->SetSmoothingMode(SmoothingModeAntiAlias);
+	BlackBrush =new  SolidBrush(MY_COLOR_RED) ;
+	CharacterBlackBrush = new SolidBrush(MY_COLOR_BLACK_CHARACTER);
+
+
+	mygraphics->FillRectangle(BlackBrush,0,0,rcClient.Width(),40);
+
+	FontFamily  CharacterfontFamily(_T("Arial"));
+	PointF     TitlepointF(0, 0);
+	SolidBrush  TitleCharacterColor(Color(255,255,255,255));
+	Gdiplus::Font  Scroll_font(&CharacterfontFamily, 28, FontStyleBold, UnitPixel);
+	TitlepointF.X = 150;
+	TitlepointF.Y = 5;
+	mygraphics->DrawString(_T("Different Subnets Detected!"), -1, &Scroll_font, TitlepointF,&TitleCharacterColor);
+
+	PointF      WarningMessagePoint(0, 0);
+	WarningMessagePoint.X = 25;
+	WarningMessagePoint.Y = 45;
+	SolidBrush  WarningMessageColor(Color(255,0,0,0));
+	Gdiplus::Font  WarningMessageFont(&CharacterfontFamily, 24, FontStyleRegular, UnitPixel);
+	mygraphics->DrawString(_T("The subnet of your PC and the device must match."), -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
+	WarningMessagePoint.X = 25;
+	WarningMessagePoint.Y = 75;
+	mygraphics->DrawString(_T("Would you like to change the IP address of the device"), -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
+	WarningMessagePoint.X = 25;
+	WarningMessagePoint.Y = 105;
+	mygraphics->DrawString(_T("to match the IP address of your PC?"), -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
+
+	WarningMessagePoint.X = 220;
+	WarningMessagePoint.Y = 160;
+	mygraphics->DrawString(_T("Current"), -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
+
+	WarningMessagePoint.X = 470;
+	WarningMessagePoint.Y = 160;
+	mygraphics->DrawString(_T("Proposed"), -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
+
+
+	mygraphics->FillRectangle(CharacterBlackBrush,BLACK_GROUND_START_X,BLACK_GROUND_START_Y,BLACK_GROUND_WIDTH,BLACK_GROUND_HEIGHT);
+	mygraphics->FillRectangle(CharacterBlackBrush,BLACK_2_GROUND_START_X,BLACK_2_GROUND_START_Y,BLACK_2_GROUND_WIDTH,BLACK_2_GROUND_HEIGHT);
+
+	CString StrTempOrgDeviceIP;
+	StrTempOrgDeviceIP.Format(_T("Device IP address:  %s"),m_net_product_node.BuildingInfo.strIp);
+	WarningMessagePoint.X = BLACK_GROUND_START_X + 5;
+	WarningMessagePoint.Y = BLACK_GROUND_START_Y + 5;
+	mygraphics->DrawString(StrTempOrgDeviceIP, -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
+
+	mygraphics->FillRectangle(CharacterBlackBrush,BLACK_PC_GROUND_START_X,BLACK_PC_GROUND_START_Y,BLACK_PC_GROUND_WIDTH,BLACK_PC_GROUND_HEIGHT);
+	CString StrTempPCIP;
+	StrTempPCIP.Format(_T("PC's IP address:     %s"),m_net_product_node.NetworkCard_Address);
+	WarningMessagePoint.X = BLACK_PC_GROUND_START_X + 5;
+	WarningMessagePoint.Y = BLACK_PC_GROUND_START_Y + 5;
+	mygraphics->DrawString(StrTempPCIP, -1, &WarningMessageFont, WarningMessagePoint,&WarningMessageColor);
+	//Bitmap bitmap(hBitmap_login,NULL);
+	//graphics.DrawImage(&bitmap,0 ,0,test_rect.Width(),test_rect.Height());
 }

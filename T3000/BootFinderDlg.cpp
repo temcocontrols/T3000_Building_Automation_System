@@ -24,10 +24,10 @@
 
    CString global_message =L"" ;
 
-DWORD WINAPI _DetectInBootloader(LPVOID pParam )
-{
-   
-     CBootFinderDlg *pdlg = (CBootFinderDlg *)pParam;
+   DWORD WINAPI _DetectInBootloader(LPVOID pParam )
+   {
+
+	   CBootFinderDlg *pdlg = (CBootFinderDlg *)pParam;
      
      CString strTips;
      int mode_send_flash_try_time = 0  ;

@@ -53,3 +53,5 @@ const int CONTROLLER_BIAS = 13;
 
 const int CONTROLLER_COL_NUMBER = 14;
 
+const int CONTROLLOR_REFRESH_TIME = 4000;
+

@@ -23,8 +23,8 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	CStaticEx m_current_product;
-	CStaticEx m_scanresult;
+
+
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedOk();
 //	afx_msg void OnBnClickedButton1();
@@ -51,7 +51,8 @@ public:
 //	afx_msg void OnBnClickedButton2();
 	CStaticEx m_connection_status;
 //	afx_msg void OnBnClickedButton4();
-	CStaticEx m_str_device_ip;
+
 	CStaticEx m_edit_newip;
 	BOOL  is_ok;
+	afx_msg void OnPaint();
 };

@@ -1221,6 +1221,9 @@ extern int persent_array_count;
 extern	unsigned int old_tx_count;
 extern int flash_multi_auto ; //用于控制 多烧的  自动控制;
 extern unsigned int T3000_Version ; //T3000的版本号.
+extern HANDLE read_each_485_fun_thread ;
+extern bool hide_485_progress ;
+extern bool new_device_support_mini_ui;
 
 extern int flag_auto_scroll ; // 如果客户有指定显示X轴的某些事件 此 变量会为 1;否则显示最新数据;
 extern int graphic_last_scale_type ; //用于存储上次 有效的 X轴的 刻度;

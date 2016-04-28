@@ -531,6 +531,9 @@ int const PM_CO2_NET = 32;
 int const PM_CO2_RS485 = 33;
 int const PM_CO2_NODE = 34;
 int const PM_PM5E = 41;
+int const PM_T322AI=43;
+int const PM_T38AI8AO6DO=44;
+
 int const PM_PRESSURE_SENSOR=45;
 const TCHAR c_strProductModelFileName[] = _T("ProductModel.cfg");				//	Product Model ≈‰÷√Œƒº˛√˚≥∆
 

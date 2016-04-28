@@ -48,6 +48,8 @@ int GetHolidayFullLabel(int index,CString &ret_full_label);
 int GetScheduleLabel(int index,CString &ret_label);
 int GetScheduleFullLabel(int index,CString &ret_full_label);
 
+int GetAmonLabel(int index,CString &ret_label);
+
 
 unsigned int control_object_instance = 0;
 
@@ -323,7 +325,8 @@ void CBacnetScreenEdit::OnBnClickedButtonScreenEditTest()
 	// TODO: Add your control notification handler code here
 }
 
-
+#include "BacnetMonitor.h"
+extern CBacnetMonitor *Monitor_Window ;
 BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
@@ -339,7 +342,7 @@ BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 
 	if((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN) && (m_bac_select_label>=0))
 	{
-		if(m_bac_label_vector.at(m_bac_select_label).nPoint_type == 10)//10 就是GRP
+		if(m_bac_label_vector.at(m_bac_select_label).nPoint_type == BAC_GRP)//10 就是GRP
 		{
 			screen_list_line = m_bac_label_vector.at(m_bac_select_label).nPoint_number;
 			if(screen_list_line<= BAC_SCREEN_COUNT - 1)
@@ -347,6 +350,15 @@ BOOL CBacnetScreenEdit::PreTranslateMessage(MSG* pMsg)
 				screnn_sequence.push_back(screen_list_line);
 				m_bac_select_label = -1;
 				InitGraphic(g_serialNum,g_bac_instance,screen_list_line);
+			}
+			return 0;
+		}
+		else if(m_bac_label_vector.at(m_bac_select_label).nPoint_type == BAC_AMON)
+		{
+			monitor_list_line = m_bac_label_vector.at(m_bac_select_label).nPoint_number;
+			if(monitor_list_line < BAC_MONITOR_COUNT)
+			{
+				Monitor_Window->OnBnClickedBtnMonitorGraphic();
 			}
 			return 0;
 		}
@@ -1412,7 +1424,7 @@ void CBacnetScreenEdit::OnPaint()
 			unsigned char temp_type = m_bac_label_vector.at(i).nPoint_type ;
 			switch(temp_type)
 			{
-			case 1://INPUT
+			case BAC_IN://INPUT
 				{
 					if(read_bac_index < BAC_INPUT_ITEM_COUNT)
 					{		
@@ -1428,7 +1440,7 @@ void CBacnetScreenEdit::OnPaint()
 					}
 				}
 				break;
-			case 0://OUTPUT
+			case BAC_OUT://OUTPUT
 				{
 					if(read_bac_index < BAC_OUTPUT_ITEM_COUNT)
 					{
@@ -1442,7 +1454,7 @@ void CBacnetScreenEdit::OnPaint()
 						label_invalid = true;
 				}
 				break;
-			case 2://VARIABLE
+			case BAC_VAR://VARIABLE
 				{
 					if(read_bac_index < BAC_VARIABLE_ITEM_COUNT)
 					{
@@ -1456,7 +1468,7 @@ void CBacnetScreenEdit::OnPaint()
 						label_invalid = true;
 				}
 				break;
-			case 3: //PID Controller
+			case BAC_PID: //PID Controller
 				{
 					if(read_bac_index < BAC_PID_COUNT)
 					{
@@ -1470,7 +1482,7 @@ void CBacnetScreenEdit::OnPaint()
 						label_invalid = true;
 				}
 				break;
-			case 4: //SCHEDULE
+			case BAC_SCH: //SCHEDULE
 				{
 					if(read_bac_index < BAC_HOLIDAY_COUNT)
 					{
@@ -1483,7 +1495,7 @@ void CBacnetScreenEdit::OnPaint()
 						label_invalid = true;
 				}
 				break;
-			case 5: //HOLIDAY
+			case BAC_HOL: //HOLIDAY
 				{
 					if(read_bac_index < BAC_HOLIDAY_COUNT)
 					{
@@ -1496,7 +1508,7 @@ void CBacnetScreenEdit::OnPaint()
 						label_invalid = true;
 				}
 				break;
-			case 6: //Program
+			case BAC_PRG: //Program
 				{
 					if(read_bac_index < BAC_PROGRAM_ITEM_COUNT)
 					{
@@ -1509,7 +1521,21 @@ void CBacnetScreenEdit::OnPaint()
 						label_invalid = true;
 				}
 				break;
-			case 10:
+			case BAC_AMON:
+				{
+					if(read_bac_index < BAC_MONITOR_COUNT)
+					{
+						int get_label_amon = GetAmonLabel(read_bac_index,cs_label);
+						cs_full_label = cs_label;
+						int get_full_label_amon = 0;
+						if((get_label_amon < 0) || (get_full_label_amon < 0))
+							label_invalid = true;
+					}
+					else
+						label_invalid = true;
+				}
+				break;
+			case BAC_GRP:
 				{
 					if(read_bac_index < BAC_SCREEN_COUNT)
 					{
@@ -1578,7 +1604,11 @@ void CBacnetScreenEdit::OnPaint()
 				}
 			}
 		}
-
+		cs_show_info = cs_show_info.Trim();
+		if(cs_show_info.IsEmpty())
+		{
+			cs_show_info = _T("Empty Label");
+		}
 		int x_point = 0;
 		int y_point = 0;
 		int right_point = 0;
@@ -1823,7 +1853,8 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 			Invalidate(1);
 			break;
 		}
-		else if((point.x > rect_x ) && (point.x < rect_x_right) && (point.y > rect_y) && (point.y < rect_y_botton))
+		
+		if((point.x > rect_x ) && (point.x < rect_x_right) && (point.y > rect_y) && (point.y < rect_y_botton) && (screen_lock_label == false))
 		{
 			m_bac_label_vector.at(i).nMouse_Status = LABEL_MOUSE_ON_LB_DOWN;
 			m_bac_select_label = i;
@@ -1835,9 +1866,23 @@ void CBacnetScreenEdit::OnLButtonDown(UINT nFlags, CPoint point)
 			Invalidate(1);
 			break;
 		}
-		else if((m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE) ||
+		else if((point.x > rect_x ) && (point.x < rect_x_right) && (point.y > rect_y) && (point.y < rect_y_botton) && (screen_lock_label == true))
+		{
+			if((m_bac_label_vector.at(i).nPoint_type == BAC_GRP) ||
+				(m_bac_label_vector.at(i).nPoint_type == BAC_AMON))
+			{
+				click_ret = true;
+				m_bac_select_label = i;
+				PostMessage(WM_KEYDOWN, VK_RETURN,1); 
+				Sleep(1);
+				PostMessage(WM_KEYUP, VK_RETURN, 1);    //释放
+				break;
+					
+			}
+		}
+		else if(((m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_VALUE) ||
 				 (m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_FULL_DESCRIPTION) ||
-				 (m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL))
+				 (m_bac_label_vector.at(i).nDisplay_Type == LABEL_ICON_LABEL)) && (screen_lock_label == false))
 		{
 			int temp_index = 0;
 			temp_index = m_bac_label_vector.at(i).nPoint_number;

@@ -1775,7 +1775,7 @@ void CTStatScanner::SendScanEndMsg()
 
     }
 
-
+	 is_in_scan_mode = false;
 
 
 }
@@ -2454,8 +2454,9 @@ void CTStatScanner::AddNewNetToDB()
 //             }
 //         }
 
-
-
+		//不加这句话能解决扫描后 名字会变掉
+		//但是加了 会出现 DB是空的时候  明明扫描到了 设备，却要等很长时间 靠后台扫描 才显示出来;
+#if 1
         try
         {
 
@@ -2471,7 +2472,7 @@ void CTStatScanner::AddNewNetToDB()
 
 
         WriteOneNetInfoToDB(pInfo);
-
+#endif
     }
 }
 
@@ -3506,18 +3507,18 @@ void CTStatScanner::Initial_Scan_Info()
 
     temp_scan_info.scan_com_port = 0;
     temp_scan_info.scan_mode = SCAN_BY_REMOTE_IP;
-    if(current_building_protocol == P_REMOTE_DEVICE)
-    {
+    //if(current_building_protocol == P_REMOTE_DEVICE)
+    //{
         temp_scan_info.scan_skip = false;
         temp_scan_info.scan_status = SCAN_STATUS_WAIT;
         temp_scan_info.scan_baudrate = current_building_baudrate;
-    }
-    else
-    {
-        temp_scan_info.scan_skip = true;
-        temp_scan_info.scan_status = SCAN_STATUS_SKIP;
-        temp_scan_info.scan_baudrate = 0;
-    }
+    //}
+    //else
+    //{
+    //    temp_scan_info.scan_skip = true;
+    //    temp_scan_info.scan_status = SCAN_STATUS_SKIP;
+    //    temp_scan_info.scan_baudrate = 0;
+    //}
 
     temp_scan_info.scan_found = 0;
 
@@ -4125,7 +4126,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
         {
             pScan->m_eScanRemoteIPEnd->SetEvent();
         }
-        is_in_scan_mode = false;
+
         return 1;
     }
     m_scan_info.at(scan_remote_ip_item).scan_status = SCAN_STATUS_RUNNING;
@@ -4298,7 +4299,7 @@ UINT _ScanRemote_IP_Thread(LPVOID pParam)
         temp_serial_number = m_bac_scan_result_data.at(i).serialnumber;
         device_type.Format(_T("%d"),m_bac_scan_result_data.at(i).product_type);
         device_name = GetProductName(m_bac_scan_result_data.at(i).product_type);
-        priduct_name = device_name + _T(":") + device_serial_number + _T("--") + device_modbus_address;
+        priduct_name = device_name + _T(":") + device_serial_number;
         bool find_exsit = false;
         int nitems = -1;
 

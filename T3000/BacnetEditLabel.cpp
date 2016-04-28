@@ -41,6 +41,8 @@ int GetHolidayFullLabel(int index,CString &ret_full_label);
 int GetScheduleLabel(int index,CString &ret_label);
 int GetScheduleFullLabel(int index,CString &ret_full_label);
 
+int GetAmonLabel(int index,CString &ret_label);
+
 IMPLEMENT_DYNAMIC(CBacnetEditLabel, CDialogEx)
 
 CBacnetEditLabel::CBacnetEditLabel(CWnd* pParent /*=NULL*/)
@@ -762,7 +764,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 	{
 		switch(temp_info.nPoint_type)
 		{
-		case 1: //input
+		case BAC_IN: //input
 			{
 				if(temp_info.nPoint_number >= BAC_INPUT_ITEM_COUNT)
 				{
@@ -794,7 +796,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 				}
 			}
 			break;
-		case 0: //output
+		case BAC_OUT: //output
 			{
 				if(temp_info.nPoint_number >= BAC_OUTPUT_ITEM_COUNT)
 				{
@@ -826,7 +828,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 				}
 			}
 			break;
-		case 2: //VARIABLE
+		case BAC_VAR: //VARIABLE
 			{
 				if(temp_info.nPoint_number >= BAC_VARIABLE_ITEM_COUNT)
 				{
@@ -858,7 +860,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 				}
 			}
 			break;
-		case 3: // PID
+		case BAC_PID: // PID
 			{
 				if(temp_info.nPoint_number >= BAC_PID_COUNT)
 				{
@@ -889,7 +891,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 				}
 			}
 			break;
-		case 4: //SCHEDULE
+		case BAC_SCH: //SCHEDULE
 			{
 				if(temp_info.nPoint_number >= BAC_SCHEDULE_COUNT)
 				{
@@ -928,7 +930,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 				}
 				break;
 			}
-		case 5: //HOLIDAY
+		case BAC_HOL: //HOLIDAY
 			{
 				if(temp_info.nPoint_number >= BAC_HOLIDAY_COUNT)
 				{
@@ -968,7 +970,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 
 			}
 			break;
-		case 6:
+		case BAC_PRG:
 			{
 				if(temp_info.nPoint_number >= BAC_PROGRAM_ITEM_COUNT)
 				{
@@ -1011,7 +1013,29 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 				}
 			}
 			break;
-		case 10:	//Screen  GRP
+		case BAC_AMON:
+			{
+				if(temp_info.nPoint_number >= BAC_MONITOR_COUNT)
+				{
+					PostMessage(WM_CLOSE,NULL,NULL);
+					return ;
+				}
+				else
+				{
+					m_original_name.Format(_T("%d-AMON%d"),temp_info.nMain_Panel,temp_info.nPoint_number + 1);
+					GetAmonLabel(temp_info.nPoint_number,m_label_name);
+					m_full_label_name.Empty();
+					
+					m_static_point.SetWindowTextW(m_original_name);
+					m_static_label.SetWindowTextW(m_label_name);
+					m_static_full_label.SetWindowTextW(m_full_label_name);
+					m_edit_value.SetWindowTextW(m_original_name);
+					m_edit_value.EnableWindow(false);
+				}
+
+			}
+			break;
+		case BAC_GRP:	//Screen  GRP
 			{
 				if(temp_info.nPoint_number >= BAC_SCREEN_COUNT)
 				{
@@ -1029,7 +1053,7 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					m_edit_value.SetWindowTextW(m_original_name);
 					m_edit_value.EnableWindow(false);
 					CString temp_icon_path_screen;
-					if(temp_info.nPoint_number < 16)
+					if(temp_info.nPoint_number < BAC_SCREEN_COUNT)
 					{
 						MultiByteToWideChar( CP_ACP, 0, (char *)m_screen_data.at(temp_info.nPoint_number).picture_file,(int)strlen((char *)m_screen_data.at(temp_info.nPoint_number).picture_file)+1, 
 							temp_icon_path_screen.GetBuffer(MAX_PATH), MAX_PATH );

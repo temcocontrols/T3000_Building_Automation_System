@@ -16,7 +16,7 @@ extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure t
 extern int initial_dialog;
 CRect Output_rect;
 static bool show_output_external =  false;
-
+int OUTPUT_LIMITE_ITEM_COUNT = 0;
 
 IMPLEMENT_DYNAMIC(CBacnetOutput, CDialogEx)
 
@@ -257,6 +257,7 @@ void CBacnetOutput::Initial_List()
 	m_output_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	m_output_list.SetExtendedStyle(m_output_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
 	m_output_list.InsertColumn(OUTPUT_NUM, _T("Output"), 60, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_output_list.InsertColumn(OUTPUT_PANEL, _T("Panel"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
 	m_output_list.InsertColumn(OUTPUT_FULL_LABLE, _T("Full Label"), 140, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_HW_SWITCH, _T("HOA Switch"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
@@ -265,7 +266,7 @@ void CBacnetOutput::Initial_List()
 	m_output_list.InsertColumn(OUTPUT_RANGE, _T("Range"), 100, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	//m_output_list.InsertColumn(OUTPUT_0_PERSENT, _T("0%"), 60, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	//m_output_list.InsertColumn(OUTPUT_100_PERSENT, _T("100%"), 60, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
-	m_output_list.InsertColumn(OUTPUT_PWM_PERIOD, _T("PWM Period"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
+	m_output_list.InsertColumn(OUTPUT_PWM_PERIOD, _T("PWM\r\n Period"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	
 	m_output_list.InsertColumn(OUTPUT_DECOM, _T("Status"), 70, ListCtrlEx::ComboBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_output_list.InsertColumn(OUTPUT_LABLE, _T("Label"), 70, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
@@ -342,9 +343,49 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
 
+	int digital_special_output_count = 0;
+	int analog_special_output_count = 0;
+	if(bacnet_device_type == BIG_MINIPANEL)
+	{
+		digital_special_output_count = BIG_MINIPANEL_OUT_D;
+		analog_special_output_count = BIG_MINIPANEL_OUT_A;
+	}
+	else if(bacnet_device_type == SMALL_MINIPANEL)
+	{
+		digital_special_output_count = SMALL_MINIPANEL_OUT_D;
+		analog_special_output_count = SMALL_MINIPANEL_OUT_A;
+	}
+	else if(bacnet_device_type == TINY_MINIPANEL)
+	{
+		digital_special_output_count = TINY_MINIPANEL_OUT_D;
+		analog_special_output_count = TINY_MINIPANEL_OUT_A;
+	}
+	else if(bacnet_device_type == T38AI8AO6DO)
+	{
+		digital_special_output_count = T38AI8AO6DO_OUT_D;
+		analog_special_output_count = T38AI8AO6DO_OUT_A;
+	}
+	else if(bacnet_device_type == PID_T322AI)
+	{
+		digital_special_output_count = T322AI_OUT_D;
+		analog_special_output_count = T322AI_OUT_A;
+	}
+	//if(pFrame->m_product.at(selected_product_index).product_class_id == T38AI8AO6DO)
+	if((bacnet_device_type == T38AI8AO6DO) ||
+		(bacnet_device_type == PID_T322AI))
+	{
+		OUTPUT_LIMITE_ITEM_COUNT = digital_special_output_count + analog_special_output_count;
+	}
+	else
+	{
+		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
+	}
+
 	bool temp_need_show_external = false;
 	for (int z= 0 ;z < (int)m_Output_data.size();z++)
 	{
+		if(z>= OUTPUT_LIMITE_ITEM_COUNT)
+			break;
 		if((m_Output_data.at(z).sub_id !=0) &&
 			(m_Output_data.at(z).sub_product !=0))
 		{
@@ -360,7 +401,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		{
 			CRect temp_rect;
 			temp_rect = Output_rect;
-			temp_rect.right = 1100;
+			temp_rect.right = 1150;
 			temp_rect.top = temp_rect.top + 24;
 			m_output_list.MoveWindow(temp_rect);
 			m_output_list.SetColumnWidth(OUTPUT_EXTERNAL,60);
@@ -371,7 +412,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		{
 			CRect temp_rect;
 			temp_rect = Output_rect;
-			temp_rect.right = 900;
+			temp_rect.right = 950;
 			temp_rect.top = temp_rect.top + 24;
 			m_output_list.MoveWindow(temp_rect);
 
@@ -417,6 +458,14 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		if(i>=output_item_limit_count)
 			break;
 
+		if(i>= OUTPUT_LIMITE_ITEM_COUNT)
+		{
+			for (int a=0;a<OUTPUT_COL_NUMBER; a++)
+			{
+				m_output_list.SetItemText(i,a,_T(""));
+			}
+			continue;
+		}
 		CString temp_item,temp_value,temp_cal,temp_filter,temp_status,temp_lable;
 		CString temp_des;
 		CString temp_units;
@@ -424,48 +473,67 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Output_data.at(i).description, (int)strlen((char *)m_Output_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
 		temp_des.ReleaseBuffer();
-
+		temp_item.Format(_T("OUT%d"),i+1);
+		m_output_list.SetItemText(i,OUTPUT_NUM,temp_item);
 		m_output_list.SetItemText(i,OUTPUT_FULL_LABLE,temp_des);
 
+		m_output_list.SetCellEnabled(i,OUTPUT_HW_SWITCH,0);
 
-		int digital_special_output_count = 0;
-		int analog_special_output_count = 0;
+
+		//int digital_special_output_count = 0;
+		//int analog_special_output_count = 0;
 
 		m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T(""));
 		//这样加实在是情非得已，老毛非得加一堆条件，还要smart;
-		if((bacnet_device_type == BIG_MINIPANEL) || ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL))
+		if((bacnet_device_type == BIG_MINIPANEL) || ((bacnet_device_type == SMALL_MINIPANEL)) || (bacnet_device_type == TINY_MINIPANEL) || 
+			(bacnet_device_type == T38AI8AO6DO) || (bacnet_device_type == PID_T322AI) )
 		{
-			if(bacnet_device_type == BIG_MINIPANEL)
-			{
-				digital_special_output_count = BIG_MINIPANEL_OUT_D;
-				analog_special_output_count = BIG_MINIPANEL_OUT_A;
-			}
-			else if(bacnet_device_type == SMALL_MINIPANEL)
-			{
-				digital_special_output_count = SMALL_MINIPANEL_OUT_D;
-				analog_special_output_count = SMALL_MINIPANEL_OUT_A;
-			}
-			else if(bacnet_device_type == TINY_MINIPANEL)
-			{
-				digital_special_output_count = TINY_MINIPANEL_OUT_D;
-				analog_special_output_count = TINY_MINIPANEL_OUT_A;
-			}
+			//if(bacnet_device_type == BIG_MINIPANEL)
+			//{
+			//	digital_special_output_count = BIG_MINIPANEL_OUT_D;
+			//	analog_special_output_count = BIG_MINIPANEL_OUT_A;
+			//}
+			//else if(bacnet_device_type == SMALL_MINIPANEL)
+			//{
+			//	digital_special_output_count = SMALL_MINIPANEL_OUT_D;
+			//	analog_special_output_count = SMALL_MINIPANEL_OUT_A;
+			//}
+			//else if(bacnet_device_type == TINY_MINIPANEL)
+			//{
+			//	digital_special_output_count = TINY_MINIPANEL_OUT_D;
+			//	analog_special_output_count = TINY_MINIPANEL_OUT_A;
+			//}
+			//else if(bacnet_device_type == T38AI8AO6DO)
+			//{
+			//	digital_special_output_count = T38AI8AO6DO_OUT_D;
+			//	analog_special_output_count = T38AI8AO6DO_OUT_A;
+			//}
+
 			if(i < (digital_special_output_count +analog_special_output_count) )
 			{
 				if(m_Output_data.at(i).hw_switch_status == HW_SW_OFF)
 				{
-					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-OFF"));
-					//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
+					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-OFF"));		
 					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
+
+					m_output_list.SetItemTextColor(i,-1,RGB(255,0,0),0);
 				}
 				else if(m_Output_data.at(i).hw_switch_status == HW_SW_HAND)
 				{
 					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("MAN-ON"));
-					//m_output_list.SetCellEnabled(i,OUTPUT_VALUE,0);
 					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,0);
+
+					m_output_list.SetItemTextColor(i,-1,RGB(255,0,0),0);
 				}
 				else
 				{
+					m_output_list.SetItemTextColor(i,-1,RGB(0,0,0),0);
+
+					//if((i%2)==0)	//恢复前景和 背景 颜色;
+					//	m_output_list.SetItemBkColor(i,-1,LIST_ITEM_DEFAULT_BKCOLOR,0);
+					//else
+					//	m_output_list.SetItemBkColor(i,-1,LIST_ITEM_DEFAULT_BKCOLOR_GRAY,0);
+
 					m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("AUTO"));
 					m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,1);
 					if(m_Output_data.at(i).auto_manual==0)	//In output table if it is auto ,the value can't be edit by user
@@ -482,6 +550,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 			}
 			else
 			{
+				m_output_list.SetItemTextColor(i,-1,RGB(0,0,0),0);
 				m_output_list.SetItemText(i,OUTPUT_HW_SWITCH,_T("AUTO"));
 				m_output_list.SetCellEnabled(i,OUTPUT_AUTO_MANUAL,1);
 				if(m_Output_data.at(i).auto_manual==0)	//In output table if it is auto ,the value can't be edit by user
@@ -620,7 +689,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		}
 
 
-
+			CString main_sub_panel;
 
 #pragma region External info
 		if((m_Output_data.at(i).sub_id !=0) &&
@@ -643,20 +712,49 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 				CString show_info;
 				CString temp_id;
 				CString temp_number;
-				temp_number.Format(_T("Output%d"),(unsigned char)m_Output_data.at(i).sub_number + 1);
+
+				bitset<8> mytest((unsigned char)m_Output_data.at(i).sub_number);
+				bool highest_bit;
+				highest_bit = mytest.test(7);
+
+				unsigned char temp_sub_number = 0;
+				mytest = mytest.set(7,0);
+				temp_sub_number = (unsigned char)mytest.to_ulong();
+
+
+				if(highest_bit)
+					temp_number.Format(_T("AO%d"),temp_sub_number + 1);
+				else
+					temp_number.Format(_T("DO%d"),temp_sub_number + 1);
+
+
+
+
+				
 				m_output_list.SetItemText(i,OUTPUT_EXTERNAL,_T("External"));
-				m_output_list.SetItemTextColor(i,OUTPUT_EXTERNAL,RGB(255,0,0),FALSE);
+				m_output_list.SetItemTextColor(i,OUTPUT_EXTERNAL,RGB(0,0,255),FALSE);
 				m_output_list.SetItemText(i,OUTPUT_PRODUCT,temp_name);
 				m_output_list.SetItemText(i,OUTPUT_EXT_NUMBER,temp_number);
 
-
+				main_sub_panel.Format(_T("%d-%d"),(unsigned char)Station_NUM,(unsigned char)m_Output_data.at(i).sub_id);
+				m_output_list.SetItemText(i,OUTPUT_PANEL,main_sub_panel);
 				//temp_id.Format(_T(" Sub ID: %u        "),(unsigned char)m_Input_data.at(input_list_line).sub_id);
 				//temp_number.Format(_T("Input%d"),(unsigned char)m_Input_data.at(input_list_line).sub_number + 1);
 				//show_info = _T("Module:") + temp_name +_T("        ") + temp_id + temp_number;
 				//m_input_item_info.SetWindowTextW(show_info);
 
 			}	
+			else
+			{
+				main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
+				m_output_list.SetItemText(i,OUTPUT_PANEL,main_sub_panel);
+			}
 
+		}
+		else
+		{
+			main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
+			m_output_list.SetItemText(i,OUTPUT_PANEL,main_sub_panel);
 		}
 
 #pragma endregion External info
@@ -687,6 +785,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		}
 	}
 	copy_data_to_ptrpanel(TYPE_OUTPUT);
+	Invalidate();
 	return 0;
 }
 
@@ -702,6 +801,14 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 	CString temp_task_info;
 	CString New_CString =  m_output_list.GetItemText(Changed_Item,Changed_SubItem);
 	CString cstemp_value;
+
+
+	if(Changed_Item>= OUTPUT_LIMITE_ITEM_COUNT)
+	{
+		m_output_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
+		return 0;
+	}
+
 	//先保存 原来的值，等结束的时候来比对，看是否有改变，有改变就进行写动作;
 	memcpy_s(&m_temp_output_data[Changed_Item],sizeof(Str_out_point),&m_Output_data.at(Changed_Item),sizeof(Str_out_point));
 
@@ -829,6 +936,8 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 	lvinfo.flags=LVHT_ABOVE;
 	int nItem=m_output_list.SubItemHitTest(&lvinfo);
 
+
+
 	if((nItem!=-1) && (nItem < BAC_OUTPUT_ITEM_COUNT))
 	{
 		output_list_line = nItem;
@@ -873,6 +982,8 @@ void CBacnetOutput::OnNMClickListOutput(NMHDR *pNMHDR, LRESULT *pResult)
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
+	if(lRow>= OUTPUT_LIMITE_ITEM_COUNT)
+		return;
 
 	if(lRow>m_output_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
 		return;
@@ -1153,8 +1264,16 @@ void CBacnetOutput::OnTimer(UINT_PTR nIDEvent)
 			else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 			{
 				PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
-				if(bac_select_device_online)
+				if((bac_select_device_online) && (g_protocol == PROTOCOL_BACNET_IP))
 					Post_Refresh_Message(g_bac_instance,READOUTPUT_T3000,0,BAC_OUTPUT_ITEM_COUNT - 1,sizeof(Str_out_point),BAC_OUTPUT_GROUP);
+				else if((bac_select_device_online) && ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP)))
+				{
+					if(read_each_485_fun_thread == NULL)
+					{
+						hide_485_progress = true;
+						::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_OUT);//第二个参数 OUT
+					}
+				}
 			}
 		}
 		break;

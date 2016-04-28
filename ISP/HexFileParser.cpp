@@ -4,6 +4,7 @@
 
 
 extern bool auto_flash_mode;
+ extern Bin_Info        global_fileInfor;
 CHexFileParser::CHexFileParser(void)
 {
     m_nHexFileType = HEXFILE_DATA;
@@ -53,7 +54,36 @@ int  CHexFileParser::GetHexFileBuffer(char* pBuf, int nLen)
 		}		
 	}
 
-	
+	if (m_IsRAM)
+	{
+		memcpy(&global_fileInfor,&pBuf[0x8200],sizeof(Bin_Info));
+	} 
+	else
+	{
+		memcpy(&global_fileInfor,&pBuf[0x100],sizeof(Bin_Info));
+	}
+	if(strlen(global_fileInfor.product_name) > 200)
+	nBufLen = -1;
+		//return NO_VERSION_INFO;
+	char temocolog[6];
+	memcpy_s(temocolog,5,global_fileInfor.company,5);
+	temocolog[5] = 0;
+
+	CString Temco_logo;
+	MultiByteToWideChar( CP_ACP, 0, (char *)temocolog, 
+		(int)strlen(temocolog)+1, 
+		Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
+	Temco_logo.ReleaseBuffer();		
+	Temco_logo.MakeUpper();
+	if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0)
+	{
+		//return NO_VERSION_INFO;
+		nBufLen = -1;
+	}
+
+
+	//return READ_SUCCESS;
+
 	return nBufLen;
 
 }

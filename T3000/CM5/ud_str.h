@@ -186,13 +186,13 @@ typedef struct
 
 	int32_t value;		       /* (4 bytes; int32_t) */
 
-	int8_t auto_manual;  /* (1 bit; 0=auto, 1=manual)*/
-	int8_t digital_analog;  /* (1 bit; 0=digital, 1=analog)*/
-	int8_t hw_switch_status;  // SW_OFF-0 SW_HAND-2 SW_AUTO-1 
-	int8_t control ;  /* (1 bit; 0=off, 1=on)*/
-	int8_t digital_control;  /* (1 bit)*/
-	int8_t decom;  /* (1 bit; 0=ok, 1=point decommissioned)*/
-	int8_t range;	/* (1 Byte ; output_range_equate)*/
+	uint8_t auto_manual;  /* (1 bit; 0=auto, 1=manual)*/
+	uint8_t digital_analog;  /* (1 bit; 0=digital, 1=analog)*/
+	uint8_t hw_switch_status;  // SW_OFF-0 SW_HAND-2 SW_AUTO-1 
+	uint8_t control ;  /* (1 bit; 0=off, 1=on)*/
+	uint8_t digital_control;  /* (1 bit)*/
+	uint8_t decom;  /* (1 bit; 0=ok, 1=point decommissioned)*/
+	uint8_t range;	/* (1 Byte ; output_range_equate)*/
 
 	uint8_t sub_id;  /* (1 uint8_t ; if analog then low)*/
 	uint8_t sub_product; /* (1 uint8_t ; if analog then high)*/
@@ -211,16 +211,16 @@ typedef  struct
 	//int8_t value[4]
 	int value;		     						/* (4 bytes; int32_t)*/
 	//int8_t value[4];
-	int8_t  filter;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
-	int8_t decom;/* (1 bit; 0=ok, 1=point decommissioned)*/
-	int8_t sub_id;/* (1 bit)*/
-	int8_t sub_product;  /* (1 bit)*/
-	int8_t control; /*  (1 bit; 0=OFF, 1=ON)*/
-	int8_t auto_manual; /* (1 bit; 0=auto, 1=manual)*/
-	int8_t digital_analog ; /* (1 bit; 1=analog, 0=digital)*/
-	int8_t calibration_sign; /* (1 bit; sign 0=positiv 1=negative )*/
-	int8_t sub_number; /* (1 bit;  0=0.1, 1=1.0)*/
-	int8_t calibration_h; /* (5 bits - spare )*/  //去掉了 unused 把 calibration改为了双字节
+	uint8_t  filter;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
+	uint8_t decom;/* (1 bit; 0=ok, 1=point decommissioned)*/
+	uint8_t sub_id;/* (1 bit)*/
+	uint8_t sub_product;  /* (1 bit)*/
+	uint8_t control; /*  (1 bit; 0=OFF, 1=ON)*/
+	uint8_t auto_manual; /* (1 bit; 0=auto, 1=manual)*/
+	uint8_t digital_analog ; /* (1 bit; 1=analog, 0=digital)*/
+	uint8_t calibration_sign; /* (1 bit; sign 0=positiv 1=negative )*/
+	uint8_t sub_number; /* (1 bit;  0=0.1, 1=1.0)*/
+	uint8_t calibration_h; /* (5 bits - spare )*/  //去掉了 unused 把 calibration改为了双字节
 #if 0
 	unsigned  filter:3;  /* (3 bits; 0=1,1=2,2=4,3=8,4=16,5=32, 6=64,7=128,)*/
 	unsigned decom	:1;  /* (1 bit; 0=ok, 1=point decommissioned)*/
@@ -236,7 +236,7 @@ typedef  struct
 //	uint8_t flag1;
 //	uint8_t flag2;
 
-	int8_t calibration_l;  /* (8 bits; -25.6 to 25.6 / -256 to 256 )*/
+	uint8_t calibration_l;  /* (8 bits; -25.6 to 25.6 / -256 to 256 )*/
 
 	uint8_t range;	      			/* (1 uint8_t ; input_range_equate)*/
 

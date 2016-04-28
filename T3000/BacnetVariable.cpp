@@ -617,7 +617,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		{
 			temp_hour = 0;
 			temp_minute = 0;
-			CTime TimeTemp(2014,1,1,temp_hour,temp_minute,0);
+			CTime TimeTemp(2016,1,1,temp_hour,temp_minute,0);
 			m_variable_time_picker.SetFormat(_T("HH:mm"));
 			m_variable_time_picker.SetTime(&TimeTemp);
 			m_variable_time_picker.SetFocus();
@@ -626,7 +626,7 @@ void CBacnetVariable::OnNMClickListVariable(NMHDR *pNMHDR, LRESULT *pResult)
 		{
 			temp_hour = _wtoi(TEMPCS.GetAt(0));
 			temp_minute = _wtoi(TEMPCS.GetAt(1));
-			CTime TimeTemp(2014,1,1,temp_hour,temp_minute,0);
+			CTime TimeTemp(2016,1,1,temp_hour,temp_minute,0);
 			m_variable_time_picker.SetFormat(_T("HH:mm"));
 			m_variable_time_picker.SetTime(&TimeTemp);
 			m_variable_time_picker.SetFocus();

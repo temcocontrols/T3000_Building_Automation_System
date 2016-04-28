@@ -100,9 +100,12 @@ public:
 		CString& subnote,
 		CString& subID);
 
+		int GetFlashTimes();
+
 protected:
 	void WriteToCfgFile();
 	BOOL ReadFromCfgFile();
+	
 protected:
 	BOOL CreatePMFile(CStdioFile& file , const CString& strPMFileName);
 	int ReadPMFile(CStdioFile& file,  map<int,CString>& szPMMap);

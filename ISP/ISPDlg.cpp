@@ -19,8 +19,9 @@
 
 
 #ifdef _DEBUG
-    #define new DEBUG_NEW
+#define new DEBUG_NEW
 #endif
+extern Bin_Info        global_fileInfor;
 //int g_CommunicationType;
 unsigned int the_max_register_number_parameter_Count=0;
 unsigned int the_max_register_number_parameter_Finished=0;
@@ -39,12 +40,15 @@ const int BOOTLOADER_FILE_SIZE = 16384;
 如果想改变dll中的g_Commu_type 通过函数 SetCommunicationType*/
 int g_Commu_type=0;
 UINT _PingThread(LPVOID pParam);
-
+ 
 unsigned int Remote_timeout = 1000;
 CString Auto_flash_SN_connect_IP;
 DWORD WINAPI GetFWFileProc(LPVOID lPvoid);
 
 #define NUMBER_BAUDRATE 5
+
+#define TEST_ISP_TIMER 10
+const int TEST_FINISHED_WAIT_TIME = 30;
 
 const CString c_strBaudate[NUMBER_BAUDRATE] =
 {
@@ -54,7 +58,8 @@ const CString c_strBaudate[NUMBER_BAUDRATE] =
     L"57600",
     L"115200"
 };
-class CAboutDlg : public CDialog {
+class CAboutDlg : public CDialog
+{
 public:
     CAboutDlg();
     virtual ~CAboutDlg(void);
@@ -162,7 +167,9 @@ CISPDlg::CISPDlg(CWnd* pParent /*=NULL*/)
     m_pTCPFlasher = NULL;
     m_pFileBuf = NULL;
 
+    m_FlashEnable = TRUE;
 
+ 
 }
 CISPDlg::~CISPDlg()
 {
@@ -190,12 +197,12 @@ CISPDlg::~CISPDlg()
         delete m_pFileBuf;
     }
 
-	if (m_pFileBuffer)
-	{
-		delete[] m_pFileBuffer;
-		m_pFileBuffer = NULL;
-	}
-
+    if (m_pFileBuffer)
+    {
+        delete[] m_pFileBuffer;
+        m_pFileBuffer = NULL;
+    }
+  
 }
 
 void CISPDlg::DoDataExchange(CDataExchange* pDX)
@@ -324,23 +331,23 @@ BOOL CISPDlg::OnInitDialog()
 
     //从文件中读取配置参数
     m_cfgFileHandler.SetParentWnd(this);
-   // m_cfgFileHandler.CreateConfigFile(g_strExePath + c_strCfgFileName);
-      m_cfgFileHandler.CreateConfigFile();
+    // m_cfgFileHandler.CreateConfigFile(g_strExePath + c_strCfgFileName);
+    m_cfgFileHandler.CreateConfigFile();
     m_strCfgFilePath = g_strExePath + c_strCfgFileName;
 
 
 
-	m_cfgFileHandler.ReadFromCfgFileForAll(
-		filename,
-		flashmethod,
-		id,
-		comport,
-		BD,
-		ip,
-		ipport,
-		subnote,
-		subID
-		);
+    m_cfgFileHandler.ReadFromCfgFileForAll(
+        filename,
+        flashmethod,
+        id,
+        comport,
+        BD,
+        ip,
+        ipport,
+        subnote,
+        subID
+    );
 
 
     Remote_timeout = GetPrivateProfileInt(_T("Setting"),_T("REMOTE_TIMEOUT"),1000,SettingPath);
@@ -363,7 +370,7 @@ BOOL CISPDlg::OnInitDialog()
             //DeleteFile(AutoFlashConfigPath);
             //MessageBox(_T("ISP Tool will exit soon."));
             auto_flash_mode = false;
-			DeleteFile(AutoFlashConfigPath);
+            DeleteFile(AutoFlashConfigPath);
             // PostMessage(WM_CLOSE,NULL,NULL);
             // return TRUE;
             //删除文件并退出;
@@ -423,9 +430,17 @@ BOOL CISPDlg::OnInitDialog()
 
     ////g_Commu_type=0;	//初始的为COM口烧写
     //((CButton *)GetDlgItem(IDC_COM))->SetCheck(TRUE);
-    // COM_INPUT=TRUE;
+    if (flashmethod.CompareNoCase(L"COM")==0)
+    {
+        COM_INPUT = TRUE;
+    }
+    else
+    {
+        COM_INPUT=FALSE;
+    }
 
-    COM_NET_Set_ReadOnly();
+
+   
     FLASH_SUBID=FALSE;
     //初始化COM口
     InitCombox();
@@ -506,54 +521,54 @@ BOOL CISPDlg::OnInitDialog()
 
         SetTimer(1,200,NULL);
     }
-	 GetDlgItem(IDC_EDIT_NCPORT)->SetWindowText(ipport);
-	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
+    GetDlgItem(IDC_EDIT_NCPORT)->SetWindowText(ipport);
+    GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
 
-	// GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(_T("19200"));
-	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
-	 GetDlgItem(IDC_EDIT_MDBID1)->SetWindowText(id);
-	 GetDlgItem(IDC_COMBO_COM)->SetWindowText(comport);
-	 GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(BD);
-	 m_ipAddress.SetWindowText(ip);
-	 GetDlgItem(IDC_EDIT_NCPORT)->SetWindowText(ipport);
-	 GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
-
-
-	 /////////////////
-	 if(flashmethod.Find(_T("COM"))!=0)
-	 {
-
-		 g_Commu_type=1;
-		 COM_INPUT=FALSE;
-		 ((CButton *)GetDlgItem(IDC_COM))->SetCheck(FALSE);
-		 ((CButton *)GetDlgItem(IDC_NET))->SetCheck(TRUE);
-
-	 }
-	 else
-	 {
-		 COM_INPUT=TRUE;
-		 g_Commu_type=0;
-
-		 ((CButton *)GetDlgItem(IDC_COM))->SetCheck(TRUE);
-		 ((CButton *)GetDlgItem(IDC_NET))->SetCheck(FALSE);
+    // GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(_T("19200"));
+    GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
+    GetDlgItem(IDC_EDIT_MDBID1)->SetWindowText(id);
+    GetDlgItem(IDC_COMBO_COM)->SetWindowText(comport);
+    GetDlgItem(IDC_EDIT_BAUDRATE)->SetWindowText(BD);
+    m_ipAddress.SetWindowText(ip);
+    GetDlgItem(IDC_EDIT_NCPORT)->SetWindowText(ipport);
+    GetDlgItem(IDC_EDIT_FILEPATH)->SetWindowText(filename);
 
 
-	 }
-	 if(subnote.CompareNoCase(_T("1"))==0)
-	 {
-		 ((CButton *)GetDlgItem(IDC_CHECK_FLASH_SUBID))->SetCheck(1);
-		 GetDlgItem(IDC_EDIT_MDBID2)->EnableWindow(1);
-		 FLASH_SUBID = TRUE;
-	 }
-	 else
-	 {
-		 ((CButton *)GetDlgItem(IDC_CHECK_FLASH_SUBID))->SetCheck(0);
-		 GetDlgItem(IDC_EDIT_MDBID2)->EnableWindow(0);
-		 FLASH_SUBID = FALSE;
-	 }
-	 GetDlgItem(IDC_EDIT_MDBID2)->SetWindowText(subID);
+    /////////////////
+    if(flashmethod.Find(_T("COM"))!=0)
+    {
+
+        g_Commu_type=1;
+        COM_INPUT=FALSE;
+        ((CButton *)GetDlgItem(IDC_COM))->SetCheck(FALSE);
+        ((CButton *)GetDlgItem(IDC_NET))->SetCheck(TRUE);
+
+    }
+    else
+    {
+        COM_INPUT=TRUE;
+        g_Commu_type=0;
+
+        ((CButton *)GetDlgItem(IDC_COM))->SetCheck(TRUE);
+        ((CButton *)GetDlgItem(IDC_NET))->SetCheck(FALSE);
 
 
+    }
+    if(subnote.CompareNoCase(_T("1"))==0)
+    {
+        ((CButton *)GetDlgItem(IDC_CHECK_FLASH_SUBID))->SetCheck(1);
+        GetDlgItem(IDC_EDIT_MDBID2)->EnableWindow(1);
+        FLASH_SUBID = TRUE;
+    }
+    else
+    {
+        ((CButton *)GetDlgItem(IDC_CHECK_FLASH_SUBID))->SetCheck(0);
+        GetDlgItem(IDC_EDIT_MDBID2)->EnableWindow(0);
+        FLASH_SUBID = FALSE;
+    }
+    GetDlgItem(IDC_EDIT_MDBID2)->SetWindowText(subID);
+
+	 COM_NET_Set_ReadOnly();
 
 // 	 CWnd* pEditFilePath = (CWnd*)GetDlgItem(IDC_EDIT_FILEPATH);
 // 	 pEditFilePath->SetWindowText(filename);
@@ -624,7 +639,7 @@ void CISPDlg::InitISPUI()
 
 void CISPDlg::initFlashSN()
 {
- 
+
     if (!m_bShowSN)
     {
         GetDlgItem(IDC_BUTTON_FLASH)->SetWindowText(_T("FLASH"));
@@ -731,40 +746,40 @@ void CISPDlg::OnBnClickedButtonSelfile()
     CWnd* pEditFilePath = (CWnd*)GetDlgItem(IDC_EDIT_FILEPATH);
     pEditFilePath->SetWindowText(m_strHexFileName);
 
-     int ret=Judge_BinHexFile(m_strHexFileName);
-     if (ret==0)
-     {
-         pEditFilePath->SetWindowText(_T(""));
-         return;
-     }
-     if (ret == 1)
-     {
-         char*			pFileBuffer;
-         CHexFileParser* pHexFile = new CHexFileParser;
-         pHexFile->SetFileName(m_strHexFileName);
-         pFileBuffer = new char[c_nHexFileBufLen];
-         memset(pFileBuffer, 0xFF, c_nHexFileBufLen);
-         int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
- 
-		 if (!pHexFile->Is_RAM_HEXType())
-		 {
-			 m_isRAM = 0;
-			 ShowHexBinInfor(ret);
-		 }
+    //int ret=Judge_BinHexFile(m_strHexFileName);
+    //if (ret==0)
+    //{
+    //    pEditFilePath->SetWindowText(_T(""));
+    //    return;
+    //}
+    //if (ret == 1)
+    //{
+    //    char*			pFileBuffer;
+    //    CHexFileParser* pHexFile = new CHexFileParser;
+    //    pHexFile->SetFileName(m_strHexFileName);
+    //    pFileBuffer = new char[c_nHexFileBufLen];
+    //    memset(pFileBuffer, 0xFF, c_nHexFileBufLen);
+    //    int nDataSize = pHexFile->GetHexFileBuffer(pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
 
-		 if (pHexFile->Is_RAM_HEXType())
-		 {
-			 m_isRAM = 1;
-			 ShowHexBinInfor(ret);
-		 }
- 
-         if (pFileBuffer)
-         {
-             delete []pFileBuffer;
-             pFileBuffer = NULL;
-         }
-         delete pFileBuffer;
-     }
+    //    if (!pHexFile->Is_RAM_HEXType())
+    //    {
+    //        m_isRAM = 0;
+    //        ShowHexBinInfor(ret);
+    //    }
+
+    //    if (pHexFile->Is_RAM_HEXType())
+    //    {
+    //        m_isRAM = 1;
+    //        ShowHexBinInfor(ret);
+    //    }
+
+    //    if (pFileBuffer)
+    //    {
+    //        delete []pFileBuffer;
+    //        pFileBuffer = NULL;
+    //    }
+    //    delete pFileBuffer;
+    //}
 
 
 
@@ -796,7 +811,7 @@ void CISPDlg::SaveParamToConfigFile()
 
     // Baudrate
     CString strBaudrate = _T("19200");
-	GetDlgItem(IDC_EDIT_BAUDRATE)->GetWindowTextW(strBaudrate);
+    GetDlgItem(IDC_EDIT_BAUDRATE)->GetWindowTextW(strBaudrate);
     //
     /*CString strFlashPage;
     strFlashPage = GetCurSelPageStr();*/
@@ -828,8 +843,11 @@ void CISPDlg::SaveParamToConfigFile()
 void CISPDlg::OnBnClickedButtonFlash()
 {
 
+
     UpdateData();
     SaveParamToConfigFile();	//保存用户输入的数据
+
+    m_FlashTimes = m_cfgFileHandler.GetFlashTimes();
 
 
     switch(Judge_Flash_Type())
@@ -845,7 +863,7 @@ void CISPDlg::OnBnClickedButtonFlash()
 
 
         SetCommunicationType(1);
-		SaveParamToConfigFile();
+        SaveParamToConfigFile();
         FlashNC_LC();
 
 
@@ -866,6 +884,8 @@ void CISPDlg::OnBnClickedButtonFlash()
     }
     }
 
+
+  
 
 }
 //这里要想办法判断插入电脑上的是何种设备
@@ -893,6 +913,9 @@ unsigned int CISPDlg::Judge_Flash_Type()
 
 
 }
+
+static int total_test_count = 0;
+static int total_success_count = 0;
 
 // NC 是使用tftp协议来进行flash的
 afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
@@ -922,8 +945,30 @@ afx_msg LRESULT CISPDlg::OnFlashFinish(WPARAM wParam, LPARAM lParam)
     {
         FlashSN();
     }
+	if (m_FlashTimes>0)
+	{
+		total_test_count ++ ;
+		if(nRet)
+		{
+			total_success_count ++;
+		}
+		CString test_info;
+		test_info.Format(_T("Test : %u  ,success : %u"),total_test_count,total_success_count);
 
-    if(auto_flash_mode)
+		int nCount = test_info.GetLength();
+		WCHAR* strNew = new WCHAR[nCount+1];
+		ZeroMemory(strNew, (nCount+1)*sizeof(WCHAR));
+		LPCTSTR str = LPCTSTR(test_info);
+		memcpy(strNew, str, nCount*sizeof(WCHAR));
+		PostMessage( WM_ADD_STATUSINFO, 0,LPARAM(strNew));
+
+		SetTimer(TEST_ISP_TIMER,1000,NULL);
+
+
+	}
+	
+    
+	if(auto_flash_mode)
     {
         auto_flash_mode = false;	//烧入已经完成，允许手动关闭;
         if(nRet)
@@ -962,23 +1007,23 @@ afx_msg LRESULT CISPDlg::OnAddStatusInfo(WPARAM wParam, LPARAM lParam)
 
 afx_msg LRESULT CISPDlg::OnReplaceStatusInfo(WPARAM wParam, LPARAM lParam)
 {
-	static int test_loop_count = 0;
+    static int test_loop_count = 0;
     CString strInfo = CString(LPTSTR(lParam));
     UpdateStatusInfo(strInfo, true);
     if(auto_flash_mode)
     {
-		test_loop_count = (++test_loop_count)%5;
+        test_loop_count = (++test_loop_count)%5;
 
-		if(strInfo.Find(_T("100")) || (test_loop_count == 0))
-		{
-			WritePrivateProfileStringW(_T("LogInfo"),_T("Replace_Refresh"),_T("1"),AutoFlashConfigPath);
-			CString temp;
-			temp.Format(_T("%d"),Add_log_count);
-			WritePrivateProfileStringW(_T("LogInfo"),_T("ReplaceCount"),temp,AutoFlashConfigPath);
-			CString section;
-			section.Format(_T("ReplaceText%d"),Add_log_count);
-			WritePrivateProfileStringW(_T("LogInfo"),section,strInfo,AutoFlashConfigPath);
-		}
+        if(strInfo.Find(_T("100")) || (test_loop_count == 0))
+        {
+            WritePrivateProfileStringW(_T("LogInfo"),_T("Replace_Refresh"),_T("1"),AutoFlashConfigPath);
+            CString temp;
+            temp.Format(_T("%d"),Add_log_count);
+            WritePrivateProfileStringW(_T("LogInfo"),_T("ReplaceCount"),temp,AutoFlashConfigPath);
+            CString section;
+            section.Format(_T("ReplaceText%d"),Add_log_count);
+            WritePrivateProfileStringW(_T("LogInfo"),section,strInfo,AutoFlashConfigPath);
+        }
 
     }
     WCHAR* szTemp = (LPTSTR(lParam));
@@ -1077,6 +1122,7 @@ CString CISPDlg::GetFlashFileName()
 }
 void CISPDlg::EnableFlash(BOOL bEnable)
 {
+    m_FlashEnable = bEnable;
     CWnd* pBtn = GetDlgItem(IDC_BUTTON_FLASH);
     pBtn->EnableWindow(bEnable);
     CWnd* pBtn1 = GetDlgItem(IDC_CLEAR_LOG);
@@ -1241,7 +1287,7 @@ void CISPDlg::COM_NET_Set_ReadOnly()
         m_SubID.EnableWindow(FALSE);
         m_Btn_ping.EnableWindow(FALSE);
         GetDlgItem(IDC_EDIT_MDBID2)->EnableWindow(FALSE);
-
+		GetDlgItem(IDC_EDIT_BAUDRATE)->EnableWindow(TRUE);
     }
     else
     {
@@ -1261,6 +1307,7 @@ void CISPDlg::COM_NET_Set_ReadOnly()
         {
             GetDlgItem(IDC_EDIT_MDBID2)->EnableWindow(0);
         }
+		GetDlgItem(IDC_EDIT_BAUDRATE)->EnableWindow(FALSE);
     }
 }
 //if Click check box ,it means that click button .
@@ -1366,7 +1413,7 @@ BOOL CISPDlg::FlashTstat(void)
         if (!DetectBraudrate ())
         {
             UpdateStatusInfo(_T("Detecting your Braudrate ,Failed"), FALSE);
-            return FALSE; 
+            return FALSE;
         }
     }
     if(!FileValidation(m_strHexFileName))
@@ -1387,6 +1434,7 @@ BOOL CISPDlg::FlashTstat(void)
             return FALSE;
         }
         BOOL flag=open_com(nPort);
+		Change_BaudRate (m_Brandrate);
         if (flag)
         {
             if (m_szMdbIDs.size()<=1)
@@ -1537,7 +1585,7 @@ BOOL CISPDlg::FlashNC_LC(void)
 //         pBinFile->SetBinFileName(m_strHexFileName);
 //         m_pFileBuffer=new char[c_nBinFileBufLen];
 //         memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
-// 
+//
 //         int nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
 //         CString hexinfor=_T("The Bin For ");
 //         hexinfor+=pBinFile->GetBinInfor();
@@ -1641,8 +1689,8 @@ int CISPDlg::GetModbusIDSUBID(vector<int>& szMdbIDs)
                 CString strTips;
                 strTips.Format(_T("Error : Wrong Modbus ID : %d. Please input right ID."), nID);
                 UpdateStatusInfo(strTips, FALSE);
-				if(!auto_flash_mode)
-					AfxMessageBox(strTips);
+                if(!auto_flash_mode)
+                    AfxMessageBox(strTips);
                 return FALSE;
             }
             szMdbIDs.push_back(nID);
@@ -1750,8 +1798,8 @@ void CISPDlg::OnFlashSubID()
         UpdateStatusInfo(strTips1, FALSE);
         CString strTips2 =_T("Please reselect a right file.");
         UpdateStatusInfo(strTips2, FALSE);
-		if(!auto_flash_mode)
-			AfxMessageBox(strTips1+strTips2, MB_OK);
+        if(!auto_flash_mode)
+            AfxMessageBox(strTips1+strTips2, MB_OK);
 
     }
 
@@ -1765,78 +1813,77 @@ Choose NET,Flash NC,LCBy net
 */
 void CISPDlg::FlashByEthernet()
 {
- /*   if (!Show_Flash_DeviceInfor_NET())
-    {
-         return ;
-    }*/
+    /*   if (!Show_Flash_DeviceInfor_NET())
+       {
+            return ;
+       }*/
     if (m_pTFTPServer)
     {
         delete m_pTFTPServer;
         m_pTFTPServer = NULL;
     }
-	if (m_pFileBuffer)
-	{
-		delete[] m_pFileBuffer;
-		m_pFileBuffer = NULL;
-	}
-  //  Bin_Info bin_infor;
+    if (m_pFileBuffer)
+    {
+        delete[] m_pFileBuffer;
+        m_pFileBuffer = NULL;
+    }
+    //  Bin_Info bin_infor;
 //     Get_Binfile_Information(m_strFlashFileName.GetBuffer(),bin_infor);
-// 
+//
 //     CBinFileParser* pBinFile = new CBinFileParser;
 //     pBinFile->SetBinFileName(m_strFlashFileName);
 //     m_pFileBuffer = new char[c_nBinFileBufLen];
 //     ZeroMemory(m_pFileBuffer, c_nBinFileBufLen);
 // int nDataSize = pBinFile->GetBinFileBuffer(m_pFileBuffer, c_nBinFileBufLen);
 
-	int nDataSize = 0;
+    int nDataSize = 0;
+	CString strTips2 =_T("Checking firmware file,please wait!");
+	UpdateStatusInfo(strTips2, FALSE);
 
-	if(BinFileValidation(m_strHexFileName))
-	{
-		CBinFileParser* pBinFile=new CBinFileParser;
-		pBinFile->SetBinFileName(m_strHexFileName);
-		m_pFileBuffer=new char[c_nBinFileBufLen];
-		memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
-		nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
-		ShowHexBinInfor(2);
-		delete pBinFile;
-		pBinFile = NULL;
-	}
-	if(HexFileValidation (m_strHexFileName))
-	{
-		CHexFileParser* pHexFile = new CHexFileParser;
-		pHexFile->SetFileName(m_strHexFileName);
+    if(BinFileValidation(m_strHexFileName))
+    {
+        CBinFileParser* pBinFile=new CBinFileParser;
+        pBinFile->SetBinFileName(m_strHexFileName);
+        m_pFileBuffer=new char[c_nBinFileBufLen];
+        memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
+        nDataSize=pBinFile->GetBinFileBuffer(m_pFileBuffer,c_nBinFileBufLen);
+      //  ShowHexBinInfor(2);
+        delete pBinFile;
+        pBinFile = NULL;
+    }
+    if(HexFileValidation (m_strHexFileName))
+    {
+        CHexFileParser* pHexFile = new CHexFileParser;
+        pHexFile->SetFileName(m_strHexFileName);
 
-		m_pFileBuffer = new char[c_nBinFileBufLen];
-		memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
-		nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nBinFileBufLen);//获取文件的buffer
-
-
-		if (!pHexFile->Is_RAM_HEXType())
-		{
-			m_isRAM = 0;
-			ShowHexBinInfor(1);
-		}
-
-		if (pHexFile->Is_RAM_HEXType())
-		{
-			m_isRAM = 1;
-			ShowHexBinInfor(1);
-		}
+        m_pFileBuffer = new char[c_nBinFileBufLen];
+        memset(m_pFileBuffer, 0xFF, c_nBinFileBufLen);
+        nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nBinFileBufLen);//获取文件的buffer
 
 
-		delete pHexFile;
-		pHexFile = NULL;
+//         if (!pHexFile->Is_RAM_HEXType())
+//         {
+//             m_isRAM = 0;
+//             ShowHexBinInfor(1);
+//         }
+// 
+//         if (pHexFile->Is_RAM_HEXType())
+//         {
+//             m_isRAM = 1;
+//             ShowHexBinInfor(1);
+//         }
 
-	
-	}
-	
+
+        delete pHexFile;
+        pHexFile = NULL;
+
+
+    }
+
     if(nDataSize > 0)
     {
         CString strTips = _T("|Firmware bin file verified okay.");
         UpdateStatusInfo(strTips, FALSE);
-
-
-
 
         m_pTFTPServer=new TFTPServer;
         DWORD dwIP = GetIPAddress();
@@ -1849,8 +1896,9 @@ void CISPDlg::FlashByEthernet()
         m_pTFTPServer->SetFileName(m_strFlashFileName);
         m_pTFTPServer->Set_FileProductName(m_strProductName);
         m_pTFTPServer->SetDataSource((BYTE*)m_pFileBuffer, nDataSize);
-        m_pTFTPServer->Set_bininfor(temp1);
 
+      //  m_pTFTPServer->Set_bininfor(temp1);
+        m_pTFTPServer->m_FlashTimes = m_FlashTimes;
         m_pTFTPServer->FlashByEthernet();
 
         EnableFlash(FALSE);
@@ -1884,8 +1932,8 @@ int CISPDlg::Judge_BinHexFile(CString filepath)
         {
             CString strTips;
             strTips = _T("|please select a *.HEX or *.BIN file");
-			if(!auto_flash_mode)
-				AfxMessageBox(strTips);
+            if(!auto_flash_mode)
+                AfxMessageBox(strTips);
             UpdateStatusInfo(strTips, FALSE);
             return 0;
         }
@@ -1906,27 +1954,38 @@ verify the hex or bin file
 */
 BOOL CISPDlg::FileValidation(const CString& strFileName)
 {
-    if (g_Commu_type==0 && !HexFileValidation(strFileName))
-    {
-        CString strTips;
-        strTips = _T("|To Update over Com port, please select a *.HEX file");
-		if(!auto_flash_mode)
-			 AfxMessageBox(strTips);
-        UpdateStatusInfo(strTips, FALSE);
-        return FALSE;
-    }
-    else if(g_Commu_type && !BinFileValidation(strFileName))
-    {
-        CString strTips;
-        //strTips.Format(_T("%s isn't a BIN file."), strFileName);
-        strTips = _T("|To Updating over Ethernet, please select a *.BIN file");
-		if(!auto_flash_mode)	
-			AfxMessageBox(strTips);
-        UpdateStatusInfo(strTips, FALSE);
-        return FALSE;
-    }
+    //  if (g_Commu_type==0 && !HexFileValidation(strFileName))
+    //  {
+    //      CString strTips;
+    //      strTips = _T("|To Update over Com port, please select a *.HEX file");
+    //if(!auto_flash_mode)
+    //	 AfxMessageBox(strTips);
+    //      UpdateStatusInfo(strTips, FALSE);
+    //      return FALSE;
+    //  }
+    //  else if(g_Commu_type && !BinFileValidation(strFileName))
+    //  {
+    //      CString strTips;
+    //      //strTips.Format(_T("%s isn't a BIN file."), strFileName);
+    //      strTips = _T("|To Updating over Ethernet, please select a *.BIN file");
+    //if(!auto_flash_mode)
+    //	AfxMessageBox(strTips);
+    //      UpdateStatusInfo(strTips, FALSE);
+    //      return FALSE;
+    //  }
 
-    return TRUE;
+    //  return TRUE;
+
+    if (HexFileValidation (strFileName)||BinFileValidation(strFileName))
+    {
+        return TRUE;
+    }
+    CString strTips;
+    //strTips.Format(_T("%s isn't a BIN file."), strFileName);
+    strTips = _T("Please select a *.Bin or *.Hex file");
+    //AfxMessageBox(strTips);
+    UpdateStatusInfo(strTips, FALSE);
+    return FALSE;
 }
 /*
 Author:	Alex
@@ -1940,8 +1999,8 @@ BOOL CISPDlg::ValidMdbIDString(void)
     GetDlgItem(IDC_EDIT_MDBID1)->GetWindowText(strModbusID);
     if (strModbusID==_T(""))
     {
-		if(!auto_flash_mode)
-			AfxMessageBox(_T("Please input IDs"));
+        if(!auto_flash_mode)
+            AfxMessageBox(_T("Please input IDs"));
         return FALSE;
     }
     else
@@ -2007,89 +2066,7 @@ int CISPDlg::GetModbusID(vector<int>& szMdbIDs)
 //0: not hex,not bin
 //1 hex
 //2 bin
-void CISPDlg::ShowHexBinInfor(int hexbin)
-{
-    if (hexbin==1)
-    {
-		if (m_isRAM)
-		{
-			if(READ_SUCCESS != Get_HexFile_Information(m_strHexFileName.GetBuffer(),temp1,0x8200))
-			{
-				if(!auto_flash_mode)
-				{
-					MessageBox(_T("@1 This firmware is an old version,Contact vendor for new firmware!\n@2 If you want to flash the old firmware ,Please use the old ISPTool_Rev4.7.0"));
-				}
-				CString temp;
-				temp.Format(_T("@1 This firmware is an old version,Contact vendor for new firmware!\n@2 If you want to flash the old firmware ,Please use the old ISPTool_Rev4.7.0"));
-				UpdateStatusInfo(temp,false);
-				return;
-			}
-		} 
-		else
-		{
-			if(READ_SUCCESS != Get_HexFile_Information(m_strHexFileName.GetBuffer(),temp1,0x100))
-			{
-				if(!auto_flash_mode)
-				{
-					MessageBox(_T("@1 This firmware is an old version,Contact vendor for new firmware!\n@2 If you want to flash the old firmware ,Please use the old ISPTool_Rev4.7.0"));
-				}
-				CString temp;
-				temp.Format(_T("@1 This firmware is an old version,Contact vendor for new firmware!\n@2 If you want to flash the old firmware ,Please use the old ISPTool_Rev4.7.0"));
-				UpdateStatusInfo(temp,false);
-				return;
-			}
-		}
-        
-    }
-    if (hexbin==2)
-    {
-        if(READ_SUCCESS != Get_Binfile_Information(m_strHexFileName.GetBuffer(),temp1))
-        {
-            if(!auto_flash_mode)
-            {
-                MessageBox(_T("Sorry,This firmware is an old version,Contact vendor for new firmware!"));
-            }
-            CString temp1;
-            temp1.Format(_T("Sorry,This firmware is an old version,Contact vendor for new firmware!"));
-            UpdateStatusInfo(temp1,false);
-            return;
-        }
-    }
-
-    CString temp;
-
-
-    MultiByteToWideChar( CP_ACP, 0, (char *)(temp1.product_name),
-                         (int)strlen(temp1.product_name)+1,
-                         temp.GetBuffer(MAX_PATH), MAX_PATH );
-    temp.ReleaseBuffer();
-
-
-    if (temp.CompareNoCase(_T("CO3"))==0)
-    {
-        temp1.product_name[2]='2';
-    }
-    UpdateStatusInfo(_T(">>>>>The File Information<<<<<"), FALSE);
-    temp.Format(_T("Company Name: "));
-    for (int i=0; i<5; i++)
-    {
-        temp.AppendFormat(_T("%c"),temp1.company[i]);
-    }
-    GetDlgItem(IDC_Model_Name2)->SetWindowText(temp);
-    UpdateStatusInfo(temp,FALSE);
-    temp.Format(_T("Product Name: "));
-    for (int i=0; i<10; i++)
-    {
-        temp.AppendFormat(_T("%c"),temp1.product_name[i]);
-    }
-    GetDlgItem(IDC_Model_FIRMVER2)->SetWindowText(temp);
-    UpdateStatusInfo(temp,FALSE);
-    float rev;
-    rev=((float)(temp1.software_high*256+temp1.software_low))/10;
-    temp.Format(_T("The Version: %0.1f"),rev);
-    GetDlgItem(IDC_Model_HARDWAREVER2)->SetWindowText(temp);
-    UpdateStatusInfo(temp,FALSE);
-}
+ 
 void CISPDlg::FlashByCom()
 {
     the_max_register_number_parameter_Count=0;
@@ -2141,13 +2118,6 @@ void CISPDlg::FlashByCom()
     memset(m_pFileBuffer, 0xFF, c_nHexFileBufLen);
     int nDataSize = pHexFile->GetHexFileBuffer(m_pFileBuffer, c_nHexFileBufLen);//获取文件的buffer
 
-
-//     if (!pHexFile->Is_RAM_HEXType())
-//     {
-//         ShowHexBinInfor(1);
-//     }
-
-
     if(nDataSize > 0)
     {
         CString strTips = _T("|Hex file verified okay.");
@@ -2155,7 +2125,7 @@ void CISPDlg::FlashByCom()
 
         m_pComWriter = new CComWriter;
         m_pComWriter->SetModbusID(m_szMdbIDs);
-        m_pComWriter->SetHexInfor(temp1);
+        m_pComWriter->SetHexInfor(global_fileInfor);
         m_pComWriter->SetHexFileType(pHexFile->GetHexFileFormatType());
         m_pComWriter->Is_Ram=pHexFile->Is_RAM_HEXType();
         m_pComWriter->m_hexbinfilepath = m_strHexFileName;
@@ -2163,7 +2133,16 @@ void CISPDlg::FlashByCom()
         GetDlgItem(IDC_EDIT_BAUDRATE)->GetWindowText(strBaudrate);
         int nBautrate = _wtoi (strBaudrate.GetBuffer());
         m_pComWriter->SetBautrate(nBautrate);
-         m_pComWriter->m_index_Baudrate = m_combox_baudrate.GetCurSel ();
+        int Baudrate_Index;
+        for (int i = 0; i<5; i++)
+        {
+            if (strBaudrate.CompareNoCase(c_strBaudate[i]) == 0)
+            {
+                Baudrate_Index = i;
+            }
+        }
+        m_pComWriter->m_index_Baudrate =Baudrate_Index; //m_combox_baudrate.GetCurSel ();
+        m_pComWriter-> m_FlashTimes = m_FlashTimes;
         int nPort = GetComPortNo();
         m_pComWriter->SetParentWnd(this);
 
@@ -2193,8 +2172,8 @@ void CISPDlg::FlashByCom()
         UpdateStatusInfo(strTips1, FALSE);
         CString strTips2 =_T("|Please reselect a right file.");
         UpdateStatusInfo(strTips2, FALSE);
-		if(!auto_flash_mode)
-			AfxMessageBox(strTips1+strTips2, MB_OK);
+        if(!auto_flash_mode)
+            AfxMessageBox(strTips1+strTips2, MB_OK);
 
     }
     delete pHexFile;
@@ -2215,12 +2194,12 @@ void CISPDlg::OnBnClickedButtonPing2()
     GetDlgItem(IDC_IPADDRESS_NC)->GetWindowText(strIP);
     if (strIP.GetLength() <= 6)
     {
-		if(!auto_flash_mode)
-			AfxMessageBox(_T("Please Input a right IP address."));
+        if(!auto_flash_mode)
+            AfxMessageBox(_T("Please Input a right IP address."));
         return;
     }
     OnTestPing(strIP);
-    Show_Flash_DeviceInfor_NET();
+    //Show_Flash_DeviceInfor_NET();
 
 }
 void Split_Cstring(CString Str,vector<CString>& ret_str,CString split_str)
@@ -2319,8 +2298,8 @@ BOOL CISPDlg::Show_Flash_DeviceInfor_NET()
         {
             CString infor;
             infor.Format(_T("The Bin file is for %s,but your device is %s"),m_strProductName.GetBuffer(),m_ModelName.GetBuffer());
-			if(!auto_flash_mode)
-				AfxMessageBox(infor);
+            if(!auto_flash_mode)
+                AfxMessageBox(infor);
             UpdateStatusInfo(infor,FALSE);
             return FALSE;
         }
@@ -2490,8 +2469,8 @@ CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
     }
     catch(_com_error e)
     {
-		if(!auto_flash_mode)
-			AfxMessageBox(_T("数据库连接失败，确认数据库Demo.mdb是否在当前路径下!"));
+        if(!auto_flash_mode)
+            AfxMessageBox(_T("数据库连接失败，确认数据库Demo.mdb是否在当前路径下!"));
     }
     _RecordsetPtr m_pRecordset;
     m_pRecordset.CreateInstance(__uuidof(Recordset));
@@ -2506,8 +2485,8 @@ CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
     }
     catch(_com_error *e)
     {
-		if(!auto_flash_mode)
-			AfxMessageBox(e->ErrorMessage());
+        if(!auto_flash_mode)
+            AfxMessageBox(e->ErrorMessage());
     }
     _variant_t var;
     CString str_FilePrefix=_T("");
@@ -2531,8 +2510,8 @@ CString CISPDlg::GetFilePrefix_FromDB(const CString& ModeName)
     }
     catch(_com_error *e)
     {
-		if(!auto_flash_mode)
-			AfxMessageBox(e->ErrorMessage());
+        if(!auto_flash_mode)
+            AfxMessageBox(e->ErrorMessage());
     }
     m_pRecordset->Close();
     m_pConnection->Close();
@@ -2650,7 +2629,7 @@ void CISPDlg::OnBnClickedShowHex()
 
 void CISPDlg::OnBnClickedFlashSn()
 {
-  //  initFlashSN();
+    //  initFlashSN();
 }
 
 void CISPDlg::FlashSN()
@@ -2660,8 +2639,8 @@ void CISPDlg::FlashSN()
     {
         if (!DetectBraudrate ())
         {
-           UpdateStatusInfo(_T("Detecting your Braudrate ,Failed"), FALSE);
-            return; 
+            UpdateStatusInfo(_T("Detecting your Braudrate ,Failed"), FALSE);
+            return;
         }
     }
     UpdateStatusInfo(_T("Detecting your Braudrate ,Finished"), FALSE);
@@ -2670,13 +2649,13 @@ void CISPDlg::FlashSN()
 
     pFlashSN->SetComport(nComport);
     pFlashSN->SetFlashTpye(0);
-       CString strBraudrate;
+    CString strBraudrate;
     GetDlgItem (IDC_EDIT_BAUDRATE)->GetWindowTextW(strBraudrate);
     pFlashSN->SetBrandrate (_wtoi (strBraudrate));
     if(!GetModbusID(m_szMdbIDs))
     {
-		if(!auto_flash_mode)
-			AfxMessageBox(_T("Please input a slave ID "));
+        if(!auto_flash_mode)
+            AfxMessageBox(_T("Please input a slave ID "));
         return ;
     }
     int nHWVerison;
@@ -2792,6 +2771,7 @@ void CISPDlg::OnMenuCheckhex()
 //	return 0;
 //}
 
+static int start_test_time = 30;
 
 void CISPDlg::OnTimer(UINT_PTR nIDEvent)
 {
@@ -2804,6 +2784,33 @@ void CISPDlg::OnTimer(UINT_PTR nIDEvent)
         OnBnClickedButtonFlash();
     }
     break;
+	case TEST_ISP_TIMER:
+	{
+		if(start_test_time == 0)
+		{
+			KillTimer(TEST_ISP_TIMER);
+			::PostMessage(GetDlgItem(IDC_BUTTON_FLASH)->m_hWnd,WM_LBUTTONDOWN,NULL,NULL);
+			::PostMessage(GetDlgItem(IDC_BUTTON_FLASH)->m_hWnd,WM_LBUTTONUP,NULL,NULL);
+			start_test_time = TEST_FINISHED_WAIT_TIME;
+			break;
+		}
+		CString test_info;
+		test_info.Format(_T("Next test will start after %d (s)"),start_test_time);
+
+
+		int nCount = test_info.GetLength();
+		WCHAR* strNew = new WCHAR[nCount+1];
+		ZeroMemory(strNew, (nCount+1)*sizeof(WCHAR));
+		LPCTSTR str = LPCTSTR(test_info);
+		memcpy(strNew, str, nCount*sizeof(WCHAR));
+		if(start_test_time == TEST_FINISHED_WAIT_TIME)
+		PostMessage( WM_ADD_STATUSINFO, 0,LPARAM(strNew));
+		else
+		PostMessage( WM_REPLACE_STATUSINFO, 0,LPARAM(strNew));
+		
+		start_test_time--;
+	}
+	break;
     }
     __super::OnTimer(nIDEvent);
 }
@@ -2820,19 +2827,20 @@ BOOL CISPDlg::DetectBraudrate ()
     }
 
     int comport = GetComPortNo ();
-     CString strBraudrate,strTips;
+    CString strBraudrate,strTips;
+	m_Brandrate = 19200;
     if (open_com (comport))
     {
 
         //m_combox_baudrate.GetCurSel ();
-       
+
         m_combox_baudrate.GetWindowTextW(strBraudrate);
         int intBraudreate =_wtoi(strBraudrate);
         strTips.Format (_T("Detecting your current Braudrate:%s"),strBraudrate);
         UpdateStatusInfo(strTips, FALSE);
-      BOOL Ret=  Change_BaudRate (intBraudreate);
-      
-      ASSERT(Ret) ;
+        BOOL Ret=  Change_BaudRate (intBraudreate);
+		m_Brandrate = intBraudreate;
+        ASSERT(Ret) ;
         Sleep (500);
 
         if (read_one (m_szMdbIDs[0],6)>0)
@@ -2848,8 +2856,9 @@ BOOL CISPDlg::DetectBraudrate ()
         for (int braudrate = 0; braudrate<NUMBER_BAUDRATE; braudrate++)
         {
             int intBraudreate =_wtoi(c_strBaudate[braudrate]);
-           Ret= Change_BaudRate (intBraudreate);
-           ASSERT(Ret) ;
+            Ret= Change_BaudRate (intBraudreate);
+			m_Brandrate = intBraudreate;
+            ASSERT(Ret) ;
             Sleep (500);
 
             if (read_one (m_szMdbIDs[0],6)>0)
@@ -2892,5 +2901,8 @@ void CISPDlg::OnMenuFlashsn()
     {
         m_bShowSN=TRUE;
     }
-      initFlashSN();
+    initFlashSN();
 }
+
+
+ 

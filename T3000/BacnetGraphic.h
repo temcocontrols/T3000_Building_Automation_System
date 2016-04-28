@@ -208,13 +208,18 @@ const int Y_HIGHT = 500;
 
 const int STATIC_INTERVAL = 200;	//14 个Lable 之间的间隔;
 const int STATIC_LABLE_WIDTH = 140; //每个Lable 的宽度;
-const int STATIC_LABLE_HIGHT = 25; //高度;
+//const int STATIC_LABLE_HIGHT = 25; //高度;
+const int STATIC_LABLE_HIGHT = 40; //高度;
 
 
 const int DIGITAL_X_ORIGIN = 200;	//draw the digital graphic in this range;
 const int DIGITAL_Y_ORIGIN = 560;
 const int DIGITAL_X_WIDTH  = 1200;
 const int DIGITAL_Y_HIGHT  = 150;
+
+
+#define LABEL_14_POSITION_TO_BUTTON  188
+#define LABEL_14_NAME_Y_POSITION  750
 
 
 

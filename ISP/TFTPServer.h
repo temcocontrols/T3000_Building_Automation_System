@@ -92,7 +92,7 @@ public:
 	bool Send_Tftp_File();
 
 	BOOL StartServer_Old_Protocol();
-	void Set_bininfor(Bin_Info temp);
+	 
 protected:
 	BYTE*			m_szDataBuf;			// 要发送到数据
 	int					m_nDataBufLen;
@@ -101,7 +101,7 @@ protected:
 	int					m_nBlkNum;			// 块号
 	
 	CString			m_strFileName;
-    Bin_Info        m_binInfor;
+   
 
 	SOCKET			m_sock;					// 接收tftp request socket, 绑定了69端口
 	SOCKET			m_soSend;				// 发送socket，发送tftp数据的
@@ -125,4 +125,6 @@ public:
     CString m_StrFileProductName;
     void Set_FileProductName(CString Name);
 	int total_retry;
+
+	int m_FlashTimes;
 };

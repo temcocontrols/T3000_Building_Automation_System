@@ -51,11 +51,7 @@ unsigned int customer_define_x_time = 3600;	// 客户定义的 x 的 长度;
 unsigned long customer_start_time = 0;
 unsigned long customer_end_time = 3600;
 bool use_customer_time = false;
-//MyPoint temppoint={0,0};
-//int nindex=0;
-//int Total_count=0;
-//const int line_interval = 30;
-//static int m_interval = 0;
+
 
 bool draw_graphic_finished = false;
 extern unsigned char read_monitor_sd_ret;
@@ -225,7 +221,7 @@ BOOL CBacnetGraphic::OnInitDialog()
 	flag_continue_thread = true;
 	scale_type = TIME_ONE_HOUR;
 
-	flag_auto_scroll  = GetPrivateProfileInt(_T("Setting"),_T("GraphicAutoScroll"),0,g_cstring_ini_path);
+	flag_auto_scroll  = 1;//  Default auto scroll.// GetPrivateProfileInt(_T("Setting"),_T("GraphicAutoScroll"),0,g_cstring_ini_path);
 	
 
 	//从配置文件中获得上次所选的刻度;
@@ -258,9 +254,9 @@ BOOL CBacnetGraphic::OnInitDialog()
 
 	
 
-#ifndef _DEBUG
+//#ifndef _DEBUG
 	::SetWindowPos(this->m_hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
-#endif
+//#endif
 	// TODO:  Add extra initialization here
 	MSG msg;
 	WNDCLASS wndClass;
@@ -525,8 +521,7 @@ int CBacnetGraphic::Search_data_from_db()
 //获取 或者 创建需要绘制的 点;
 void CBacnetGraphic::Create_Line_Point()
 {
-	//TimeValueToPoint
-	//analog_data_point[i]
+
 
 	for (int i =0 ;i<INPUT_NUMBER;i++)	//Initial all the first point;
 	{
@@ -859,8 +854,11 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	Pen *mystaticRectangle_pen;
 	mystaticRectangle_pen = new Pen(MY_COLOR_PEN,2.0f);
 	Static_blackground_Brush =new SolidBrush(MY_COLOR_14BGD);	//This part is draw the 14 label and it's background;
-	mygraphics->FillRectangle(Static_blackground_Brush,0,window_hight - 145,window_width,135);
-	mygraphics->DrawRectangle(mystaticRectangle_pen,2,window_hight - 135,window_width-15,135 -55);
+
+	//mygraphics->FillRectangle(Static_blackground_Brush,0,window_hight - 200,window_width,200);
+	//mygraphics->DrawRectangle(mystaticRectangle_pen,2,window_hight - 200,window_width-15,200 -55);
+	mygraphics->FillRectangle(Static_blackground_Brush,4,4,9 + STATIC_LABLE_WIDTH + 40,740);
+	mygraphics->DrawRectangle(mystaticRectangle_pen,6,4,9 + STATIC_LABLE_WIDTH + 40,740);
 
 
 	FontFamily  ScrollfontFamily(_T("Arial"));
@@ -872,14 +870,15 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 	SolidBrush *Static_scroll_blackground_Brush;
 	Static_scroll_blackground_Brush =new SolidBrush(MY_COLOR_14LABLE_BGD);	//This part is draw the 14 label and it's background;
+	mygraphics->FillRectangle(Static_scroll_blackground_Brush,120,714,50,20);
+
 
 	PointF      scrollpointF(0, 0);
-	mygraphics->FillRectangle(Static_scroll_blackground_Brush,120,684,50,20);
 	scrollpointF.X = 25;
-	scrollpointF.Y = 685;
+	scrollpointF.Y = 715;
 	mygraphics->DrawString(_T("Auto Scroll"), -1, &Scroll_font, scrollpointF,&Font_brush_temp);
 	scrollpointF.X = 122;
-	scrollpointF.Y = 684;
+	scrollpointF.Y = 714;
 	if(flag_auto_scroll)
 		mygraphics->DrawString(_T("ON"), -1, &Scroll_font, scrollpointF,&Font_brush_on_off);
 	else
@@ -888,21 +887,8 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 	delete Static_scroll_blackground_Brush;
 
 
-#if 0
-	SolidBrush *   pen_unit_brush = new SolidBrush(Graphic_Color[i+1]);
-	pointF.X =  70;
-	pointF.Y =  40 + i*30;
 
-	mygraphics->DrawString(InputUnit[i], -1, &unitfont, pointF, pen_unit_brush);
-	delete pen_unit_brush;
-	pen_unit_brush = NULL;
-#endif
-
-
-
-
-
-	//****************************************************************************************************
+			//****************************************************************************************************
 	//画下面的 1 到 E 的lable	;
 	//mystaticRectangle_pen = new Pen(Graphic_Color[0],2.0f);
 	for (int i=0;i<INPUT_NUMBER;i++)
@@ -916,51 +902,45 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		}
 		else
 			Static_blackground_Brush =new SolidBrush(Graphic_Color[i+1]);	//This part is draw the 14 label and it's background;
-		if(i<7)
-		{
-			RectPosition[i].left = 23 + STATIC_INTERVAL*i;
-			RectPosition[i].top = window_hight - 128;
-			RectPosition[i].right = 23 + STATIC_INTERVAL*i  + STATIC_LABLE_WIDTH;
-			RectPosition[i].bottom = window_hight - 128  + STATIC_LABLE_HIGHT;
-			mygraphics->FillRectangle(Static_blackground_Brush,23 + STATIC_INTERVAL*i,window_hight - 128,STATIC_LABLE_WIDTH,STATIC_LABLE_HIGHT);
-			mygraphics->DrawLine(static_write_bord,23 + STATIC_INTERVAL*i - 2,window_hight - 128 -2,23 + STATIC_INTERVAL*i  + STATIC_LABLE_WIDTH,window_hight - 128 -2);
-			mygraphics->DrawLine(static_write_bord,23 + STATIC_INTERVAL*i - 2,window_hight - 128 -2,23 + STATIC_INTERVAL*i - 2,window_hight - 128  + STATIC_LABLE_HIGHT);
-			mygraphics->DrawLine(static_black_bord,23 + STATIC_INTERVAL*i ,window_hight - 128  + STATIC_LABLE_HIGHT ,23 + STATIC_INTERVAL*i  + STATIC_LABLE_WIDTH,window_hight - 128  + STATIC_LABLE_HIGHT);
-			mygraphics->DrawLine(static_black_bord,23 + STATIC_INTERVAL*i  + STATIC_LABLE_WIDTH ,window_hight - 128,23 + STATIC_INTERVAL*i  + STATIC_LABLE_WIDTH,window_hight - 128  + STATIC_LABLE_HIGHT);
-		}
-		else
-		{
-			RectPosition[i].left = 23 + STATIC_INTERVAL*(i-7);
-			RectPosition[i].top = window_hight - 128 + 40;
-			RectPosition[i].right = 23 + STATIC_INTERVAL*(i-7)  + STATIC_LABLE_WIDTH;
-			RectPosition[i].bottom = window_hight - 128  + STATIC_LABLE_HIGHT + 40;
-			mygraphics->FillRectangle(Static_blackground_Brush,23 + STATIC_INTERVAL*(i-7),window_hight - 128 + 40,STATIC_LABLE_WIDTH,STATIC_LABLE_HIGHT);
-			mygraphics->DrawLine(static_write_bord,23 + STATIC_INTERVAL*(i-7) - 2,window_hight - 128 -2 + 40,23 + STATIC_INTERVAL*(i-7)  + STATIC_LABLE_WIDTH,window_hight - 128 -2 + 40);
-			mygraphics->DrawLine(static_write_bord,23 + STATIC_INTERVAL*(i-7) - 2,window_hight - 128 -2 + 40,23 + STATIC_INTERVAL*(i-7) - 2,window_hight - 128  + STATIC_LABLE_HIGHT + 40);
-			mygraphics->DrawLine(static_black_bord,23 + STATIC_INTERVAL*(i-7) ,window_hight - 128  + STATIC_LABLE_HIGHT + 40,23 + STATIC_INTERVAL*(i-7)  + STATIC_LABLE_WIDTH,window_hight - 128  + STATIC_LABLE_HIGHT + 40);
-			mygraphics->DrawLine(static_black_bord,23 + STATIC_INTERVAL*(i-7)  + STATIC_LABLE_WIDTH ,window_hight - 128 + 40,23 + STATIC_INTERVAL*(i-7)  + STATIC_LABLE_WIDTH,window_hight - 128  + STATIC_LABLE_HIGHT + 40);
-		}
-		
+
+		RectPosition[i].left = 15 ;
+		RectPosition[i].top = 15 + i* 50;
+		RectPosition[i].right = 15   + STATIC_LABLE_WIDTH;
+		RectPosition[i].bottom = 15 + i* 50  + STATIC_LABLE_HIGHT;
+		mygraphics->FillRectangle(Static_blackground_Brush,RectPosition[i].left,RectPosition[i].top,STATIC_LABLE_WIDTH,STATIC_LABLE_HIGHT);
+		mygraphics->DrawLine(static_write_bord,RectPosition[i].left - 2,  RectPosition[i].top -2   ,RectPosition[i].right     ,RectPosition[i].top -2);
+		mygraphics->DrawLine(static_write_bord,RectPosition[i].left - 2,  RectPosition[i].top -2   ,RectPosition[i].left - 2  ,RectPosition[i].bottom);
+		mygraphics->DrawLine(static_black_bord,RectPosition[i].left ,     RectPosition[i].bottom   ,RectPosition[i].right     ,RectPosition[i].bottom);
+		mygraphics->DrawLine(static_black_bord,RectPosition[i].right ,    RectPosition[i].top      ,RectPosition[i].right     ,RectPosition[i].bottom);
+
+
 
 		SolidBrush  Font_brush(STATIC_FONT_COLOR);
-		
+		FontFamily  UnitfontFamily(_T("Arial"));
 		//FontFamily  StaticfontFamily(_T("Times New Roman"));
 		FontFamily  StaticfontFamily(_T("Arial"));
 		
-		Gdiplus::Font        Input_font(&StaticfontFamily, 20, FontStyleRegular, UnitPixel);
+		Gdiplus::Font        Input_font(&StaticfontFamily, 14, FontStyleRegular, UnitPixel);
 		
 		PointF      staticpointF(0, 0);
-		if(i<7)
-		{
-		staticpointF.X = STATIC_LABLE_HIGHT + STATIC_INTERVAL*i;
-		staticpointF.Y = 742 ;
-		}
-		else
-		{
-			staticpointF.X = STATIC_LABLE_HIGHT + STATIC_INTERVAL*(i-7);
-			staticpointF.Y = 742 + 40 ;
-		}
+		SolidBrush *   pen_unit_brush = new SolidBrush(Graphic_Color[i+1]);
+		PointF      UnitpointF(0, 0);
+
+		staticpointF.X = RectPosition[i].left + 4;
+		staticpointF.Y = RectPosition[i].top + 4 ;
+		UnitpointF.X = RectPosition[i].left + 4;
+		UnitpointF.Y =  RectPosition[i].top + 4  + 18;
+
 		mygraphics->DrawString(temp_cs, -1, &Input_font, staticpointF,&Font_brush);
+
+		CString temp_cs_label_unit;
+		temp_cs_label_unit =  InputUnit[i];// _T("AAAAAA");
+
+		mygraphics->DrawString(temp_cs_label_unit, -1, &Input_font, UnitpointF, &Font_brush);
+		delete pen_unit_brush;
+		pen_unit_brush = NULL;
+
+
 
 
 		//************************************************************************************
@@ -970,18 +950,11 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		temp_item = temp_item.MakeUpper();
 
 		SolidBrush  static_item_brush(Graphic_Color[i+1]);
-		FontFamily  UnitfontFamily(_T("Arial"));
+		
 		Gdiplus::Font        unitfont(&UnitfontFamily, 22, FontStyleRegular, UnitPixel);
-		if((i+1)<8)
-		{
-			pointF.X = 25 + STATIC_INTERVAL*i + STATIC_LABLE_WIDTH + 5;
-			pointF.Y = 737;
-		}
-		else
-		{
-			pointF.X = 25 + STATIC_INTERVAL*(i-7) + STATIC_LABLE_WIDTH + 5;
-			pointF.Y = 737 + 40;
-		}
+		pointF.X = RectPosition[i].left + STATIC_LABLE_WIDTH + 5;
+		pointF.Y = RectPosition[i].top + 4;
+
 		mygraphics->DrawString(temp_item, -1, &unitfont, pointF, &static_item_brush);
 		//************************************************************************************
 		if(Static_blackground_Brush)
@@ -989,9 +962,6 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		Static_blackground_Brush = NULL;
 	}
 	//****************************************************************************************************
-
-
-
 
 
 	SolidBrush  time_brush(MY_COLOR_TIME_PEN);
@@ -1090,8 +1060,6 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		
 		pointF.Y =  (int)m_analogorignpoint.Y+ i*(m_Y_ASIX_HIGHT/m_yscale) - 8;
 		mygraphics->DrawString(Unit_value, -1, &unitfont, pointF, &unit_brush);
-		//swprintf_s(temp_char,200,L"%d",i*5);
-		//mygraphics->DrawString(temp_char, -1, &font, pointF, &brush);
 
 	}
 	//****************************************************************
@@ -1107,7 +1075,6 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		(int)m_digitalorignpoint.Y + 110);
 	//****************************************************************
 
-//	CPointItem *first_item=NULL,*second_item=NULL,*third_item=NULL;
 	CPointItem *first_item[INPUT_NUMBER];
 	CPointItem *second_item[INPUT_NUMBER];
 	Pen * DrawLinePen[INPUT_NUMBER];
@@ -1149,7 +1116,6 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 					second_item[i]=first_item[i]->GetNext();
 					if(second_item[i]==NULL)
 					{
-						//mygraphics->DrawLine(DrawLinePen[i],first_item[i]->GetPoint().x,first_item[i]->GetPoint().y,(int)m_digitalorignpoint.X + m_Digital_X_WIDTH,first_item[i]->GetPoint().y);
 						int temp_x = 0 ;
 						
 						if(first_item[i]->GetPoint().x + 20 < m_digitalorignpoint.X + m_Digital_X_WIDTH)
@@ -1171,29 +1137,9 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 
 					first_item[i] = second_item[i];
 				} while (first_item[i]!=NULL);
-				//while ((second_item[i]->GetNext())!=NULL);
 			}
 		}
 
-		
-		
-		
-		mygraphics->DrawLine(DrawLinePen[i],20,50 + i*30,50,50 + i*30);
-
-
-		SolidBrush *   pen_unit_brush = new SolidBrush(Graphic_Color[i+1]);
-		pointF.X =  60;
-		pointF.Y =  40 + i*30;
-
-		CString temp_cs_label_unit;
-		temp_cs_label_unit = InputLable[i] + _T(" ") + InputUnit[i];// _T("AAAAAA");
-
-
-		//mygraphics->DrawString(InputUnit[i], -1, &unitfont, pointF, pen_unit_brush);
-		Gdiplus::Font        unitfont_label_unit(&UnitfontFamily, 14, FontStyleRegular, UnitPixel);
-		mygraphics->DrawString(temp_cs_label_unit, -1, &unitfont, pointF, pen_unit_brush);
-		delete pen_unit_brush;
-		pen_unit_brush = NULL;
 	}
 
 
@@ -1640,8 +1586,8 @@ void CBacnetGraphic::InitialParameter(int base_time,float y_min_value,float y_ma
 	}
 	SetXaxisScale(6);
 	SetYaxisScale(5);
-	SetAnalogOrignPoint(PointF(200,30));
-	SetDigitalOrignPoint(PointF(200,560));
+	SetAnalogOrignPoint(PointF(250,30));
+	SetDigitalOrignPoint(PointF(250,560));
 	Set_Time_Scale(base_time);
 
 
@@ -1764,7 +1710,7 @@ void CBacnetGraphic::OnTimebase1hour()
 	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
 
 
-	flag_auto_scroll = false;
+	flag_auto_scroll = true;
 	m_time_selected = TIME_ONE_HOUR;
 	draw_graphic_finished = false;
 	//Delete_Ram_Data();
@@ -1867,7 +1813,7 @@ void CBacnetGraphic::OnTimebase4hours()
 	temp_cs1.Format(_T("%d"),TIME_FOUR_HOUR);
 	WritePrivateProfileString(_T("Setting"),_T("GraphicScaleType"),temp_cs1,g_cstring_ini_path);
 
-	flag_auto_scroll = false;
+	flag_auto_scroll = true;
 	m_time_selected = TIME_FOUR_HOUR;
 	draw_graphic_finished = false;
 	//Delete_Ram_Data();
@@ -2023,7 +1969,15 @@ void CBacnetGraphic::OnGraphicRight()
 	}
 	else
 	{
-		m_time_monitor_now =m_time_monitor_now +  x_axis_total_time;
+		CTime temp_time_now = CTime::GetCurrentTime();
+		unsigned long temp_cur_long_time = temp_time_now.GetTime();
+		if(temp_cur_long_time > (m_time_monitor_now + x_axis_total_time) )
+			m_time_monitor_now =m_time_monitor_now +  x_axis_total_time;
+		else
+		{
+			m_time_monitor_now = temp_cur_long_time;
+			MessageBox(_T("No more data!"));
+		}
 	}
 
 
@@ -2093,36 +2047,96 @@ void CBacnetGraphic::Get_Input_Unit()
 		 int temp_range = m_monitor_data.at(monitor_list_line).range[i];
 		if(i<analog_count)
 		{
-			 if( m_monitor_data.at(monitor_list_line).inputs[i].point_type == ENUM_OUT + 1)
-			 {
-				 if(temp_range < (sizeof(Output_Analog_Units_Show)/sizeof(Output_Analog_Units_Show[0])))
-					InputUnit[i] =	Output_Analog_Units_Show[temp_range];
-				 else
+
+
+				if( m_monitor_data.at(monitor_list_line).inputs[i].point_type == ENUM_OUT + 1)
+				{
+					if(temp_range == 0)
+					{
+						if(m_monitor_data.at(monitor_list_line).inputs[i].number < BAC_OUTPUT_ITEM_COUNT)
+						{
+							temp_range = m_Output_data.at(m_monitor_data.at(monitor_list_line).inputs[i].number).range;
+							if((temp_range < (sizeof(Output_Analog_Units_Show)/sizeof(Output_Analog_Units_Show[0]))) && (temp_range !=0))
+							{
+								InputUnit[i] =	Output_Analog_Units_Show[temp_range];
+							}
+							else
+							{
+								InputUnit[i].Empty();
+							}
+						}
+						else
+							InputUnit[i].Empty();
+					}
+					else if(temp_range < (sizeof(Output_Analog_Units_Show)/sizeof(Output_Analog_Units_Show[0])))
+						InputUnit[i] =	Output_Analog_Units_Show[temp_range];
+					else
+						InputUnit[i].Empty();
+				}
+				else if(m_monitor_data.at(monitor_list_line).inputs[i].point_type == ENUM_IN + 1)
+				{
+					if(temp_range == 0)
+					{
+						if(m_monitor_data.at(monitor_list_line).inputs[i].number < BAC_INPUT_ITEM_COUNT)
+						{
+							temp_range = m_Input_data.at(m_monitor_data.at(monitor_list_line).inputs[i].number).range;
+							if((temp_range < (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0]))) && (temp_range !=0))
+							{
+								InputUnit[i] =	Input_List_Analog_Units[temp_range];
+							}
+							else
+							{
+								InputUnit[i].Empty();
+							}
+						}
+						else
+							InputUnit[i].Empty();
+					}
+					else if(temp_range < (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
+						InputUnit[i] =	Input_List_Analog_Units[temp_range];
+					else
+						InputUnit[i].Empty();
+				}
+				else if(m_monitor_data.at(monitor_list_line).inputs[i].point_type == ENUM_VAR + 1)
+				{
+					if(temp_range == 0)
+					{
+						if(m_monitor_data.at(monitor_list_line).inputs[i].number < BAC_VARIABLE_ITEM_COUNT)
+						{
+							temp_range = m_Variable_data.at(m_monitor_data.at(monitor_list_line).inputs[i].number).range;
+							if((temp_range < (sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0]))) && (temp_range !=0))
+							{
+								InputUnit[i] =	Variable_Analog_Units_Array[temp_range];
+							}
+							else
+							{
+								InputUnit[i].Empty();
+							}
+						}
+						else
+							InputUnit[i].Empty();
+					}
+					else if(temp_range < (sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0])))
+						InputUnit[i] =	Variable_Analog_Units_Array[temp_range];
+					else
+						InputUnit[i].Empty();
+				}
+				else
+				{
 					InputUnit[i].Empty();
-			 }
-			 else if(m_monitor_data.at(monitor_list_line).inputs[i].point_type == ENUM_IN + 1)
-			 {
-				 if(temp_range < (sizeof(Input_List_Analog_Units)/sizeof(Input_List_Analog_Units[0])))
-					 InputUnit[i] =	Input_List_Analog_Units[temp_range];
-				 else
-					 InputUnit[i].Empty();
-			 }
-			 else if(m_monitor_data.at(monitor_list_line).inputs[i].point_type == ENUM_VAR + 1)
-			 {
-				 if(temp_range < (sizeof(Variable_Analog_Units_Array)/sizeof(Variable_Analog_Units_Array[0])))
-					 InputUnit[i] =	Variable_Analog_Units_Array[temp_range];
-				 else
-					 InputUnit[i].Empty();
-			 }
-			 else
-			 {
-				 InputUnit[i].Empty();
-			 }
+				}
+
+
 		}
 		else if((i>= analog_count) && (i<inputs_count))
 		{
 			if(temp_range < (sizeof(Digital_Units_Array)/sizeof(Digital_Units_Array[0])))
-				InputUnit[i] =	Digital_Units_Array[temp_range];
+			{
+				if(temp_range != 0)
+					InputUnit[i] =	Digital_Units_Array[temp_range];
+				else
+					InputUnit[i].Empty();
+			}
 			else
 				InputUnit[i].Empty();
 		}

@@ -36,14 +36,16 @@ public:
 	virtual void OnAccept(int nErrorCode);
 	virtual void OnReceive(int nErrorCode);
 	virtual void OnClose(int nErrorCode);
-	CString	m_hex_bin_filepath;
+	
+
+	//CString	m_hex_bin_filepath;
 protected:
 public:
 	virtual void OnConnect(int nErrorCode);
 private:
 	char receive_buf[4096];
 	int Receive_data_length;
-
+	
 };
 
 

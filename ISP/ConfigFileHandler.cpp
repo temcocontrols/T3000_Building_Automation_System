@@ -230,19 +230,19 @@ BOOL CConfigFileHandler::CreateConfigFile()
 	//	}
 	//}
 	//m_pFile->Close();
-	CString strHexFileName = _T("C:\\Program File\\");
-	CString strFlashMethod = _T("COM");
-	CString strFlashPage = _T("[Tstat]");
-	CString strModbusID = _T("255");
-	CString strComPort =  _T("COM1");
-	CString strBaudrate = _T("19200");
-	CString strNCFlashPage = _T("[NC]");
-	CString strNCFileName = _T("C:\\Program File\\");
-	CString strNCFlashMethod = _T("Ethernet");
-	CString strIP = _T("192.168.0.3");
-	CString strIPPort =  _T("6001");
-	CString strSub_not = _T("0");
-	CString strSub_ID = _T("254");
+				     CString strHexFileName = _T("C:\\Program File\\");
+				     CString strFlashMethod = _T("COM");
+				     CString strFlashPage = _T("[Tstat]");
+				     CString strModbusID = _T("255");
+				     CString strComPort =  _T("COM1");
+				     CString strBaudrate = _T("19200");
+				     CString strNCFlashPage = _T("[NC]");
+				     CString strNCFileName = _T("C:\\Program File\\");
+				     CString strNCFlashMethod = _T("Ethernet");
+				     CString strIP = _T("192.168.0.3");
+				     CString strIPPort =  _T("6001");
+				     CString strSub_not = _T("0");
+				     CString strSub_ID = _T("254");
 					 CFileFind fFind;
                     if(!fFind.FindFile(m_configfile_path))
                     {
@@ -558,6 +558,16 @@ void CConfigFileHandler::ReadFromCfgFileForAll(
 	//subID = subID.Mid(subID.Find(c)+2);
 }
 
+int CConfigFileHandler::GetFlashTimes()
+{
+	int FlashTimes = GetPrivateProfileInt(m_ISPTool_Section,CString(L"EnableTestFlash"),0,m_configfile_path);
+	if(FlashTimes == 0)
+	{
+		WritePrivateProfileStringW(m_ISPTool_Section,_T("EnableTestFlash"),_T("0"),m_configfile_path);
+	}
+
+	return FlashTimes;
+}
 void CConfigFileHandler::WriteToCfgFile()
 {
 	     setlocale(LC_CTYPE,("chs"));

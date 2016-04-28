@@ -455,7 +455,12 @@ CString GetProductName(int ModelID)
 	case  PM_CO2_NODE:
 		strProductName = "CO2 Node";
 		break;
-	
+	case PM_T322AI:
+		strProductName="T3-22I";
+		break;
+	case PM_T38AI8AO6DO:
+		strProductName="T38IO";
+		break;
 
 	default:
 		strProductName.Format(_T("Model ID:%d is out of control"),ModelID);

@@ -17,7 +17,7 @@ extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure t
 extern int initial_dialog;
 static bool show_external =  false;
 CRect Input_rect;
-
+int INPUT_LIMITE_ITEM_COUNT = 0;
 // CBacnetInput dialog
  
 
@@ -228,7 +228,8 @@ void CBacnetInput::Initial_List()
 	m_input_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
 	//m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle() |LVS_EX_FULLROWSELECT |LVS_EX_GRIDLINES);
 	m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-	m_input_list.InsertColumn(INPUT_NUM, _T("Input"), 50, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_input_list.InsertColumn(INPUT_NUM, _T("Input"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
+	m_input_list.InsertColumn(INPUT_PANEL, _T("Panel"), 40, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByDigit);
 	m_input_list.InsertColumn(INPUT_FULL_LABLE, _T("Full Label"), 100, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_LEFT, ListCtrlEx::SortByString);
 	m_input_list.InsertColumn(INPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_LEFT, ListCtrlEx::SortByString);
@@ -331,6 +332,12 @@ LRESULT CBacnetInput::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	int cmp_ret ;//compare if match it will 0;
 	int Changed_Item = (int)wParam;
 	int Changed_SubItem = (int)lParam;
+
+	if(Changed_Item>= INPUT_LIMITE_ITEM_COUNT)
+	{
+		m_input_list.SetItemText(Changed_Item,Changed_SubItem,_T(""));
+		return 0;
+	}
 
 	memcpy_s(&m_temp_Input_data[Changed_Item],sizeof(Str_in_point),&m_Input_data.at(Changed_Item),sizeof(Str_in_point));
 
@@ -492,11 +499,25 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 	int Fresh_Item;
 	int isFreshOne = (int)lParam;
 
-	
+	if(bacnet_device_type == T38AI8AO6DO)
+	{
+		INPUT_LIMITE_ITEM_COUNT = 8;
+	}
+	else if(bacnet_device_type == PID_T322AI)
+	{
+		INPUT_LIMITE_ITEM_COUNT = 22;
+	}
+	else
+	{
+		INPUT_LIMITE_ITEM_COUNT = BAC_INPUT_ITEM_COUNT;
+	}
+
 
 	bool temp_need_show_external = false;
 	for (int z= 0 ;z < (int)m_Input_data.size();z++)
 	{
+		if(z>= INPUT_LIMITE_ITEM_COUNT)
+			break;
 		if((m_Input_data.at(z).sub_id !=0) &&
 			(m_Input_data.at(z).sub_product !=0))
 		{
@@ -512,7 +533,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		{
 			CRect temp_rect;
 			temp_rect = Input_rect;
-			temp_rect.right = 1200;
+			temp_rect.right = 1250;
 			temp_rect.top = temp_rect.top + 22;
 			m_input_list.MoveWindow(temp_rect);
 			m_input_list.SetColumnWidth(INPUT_EXTERNAL,60);
@@ -523,7 +544,7 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		{
 			CRect temp_rect;
 			temp_rect = Input_rect;
-			temp_rect.right = 925;
+			temp_rect.right = 975;
 			temp_rect.top = temp_rect.top + 22;
 			m_input_list.MoveWindow(temp_rect);
 
@@ -572,6 +593,19 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 
 		if(i>=input_item_limit_count)
 			break;
+
+		if(i>= INPUT_LIMITE_ITEM_COUNT)
+		{
+			for (int a=0;a<INPUT_COL_NUMBER; a++)
+			{
+				m_input_list.SetItemText(i,a,_T(""));
+			}
+			continue;
+		}
+
+		temp_item.Format(_T("IN%d"),i+1);
+		m_input_list.SetItemText(i,INPUT_NUM,temp_item);
+
 
 		MultiByteToWideChar( CP_ACP, 0, (char *)m_Input_data.at(i).description, (int)strlen((char *)m_Input_data.at(i).description)+1, 
 			temp_des.GetBuffer(MAX_PATH), MAX_PATH );
@@ -754,6 +788,8 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 		m_input_list.SetItemText(i,INPUT_JUMPER,temp_status);
 
 
+		CString main_sub_panel;
+
 
 #pragma region External info
 		if((m_Input_data.at(i).sub_id !=0) &&
@@ -779,21 +815,28 @@ LRESULT CBacnetInput::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
 				CString temp_number;
 				temp_number.Format(_T("Input%d"),(unsigned char)m_Input_data.at(i).sub_number + 1);
 				m_input_list.SetItemText(i,INPUT_EXTERNAL,_T("External"));
-				m_input_list.SetItemTextColor(i,INPUT_EXTERNAL,RGB(255,0,0),FALSE);
+				m_input_list.SetItemTextColor(i,INPUT_EXTERNAL,RGB(0,0,255),FALSE);
 				m_input_list.SetItemText(i,INPUT_PRODUCT,temp_name);
 				m_input_list.SetItemText(i,INPUT_EXT_NUMBER,temp_number);
 
-
+				main_sub_panel.Format(_T("%d-%d"),(unsigned char)Station_NUM,(unsigned char)m_Input_data.at(i).sub_id);
+				m_input_list.SetItemText(i,INPUT_PANEL,main_sub_panel);
 				//temp_id.Format(_T(" Sub ID: %u        "),(unsigned char)m_Input_data.at(input_list_line).sub_id);
 				//temp_number.Format(_T("Input%d"),(unsigned char)m_Input_data.at(input_list_line).sub_number + 1);
 				//show_info = _T("Module:") + temp_name +_T("        ") + temp_id + temp_number;
 				//m_input_item_info.SetWindowTextW(show_info);
 
 			}	
-			//else
-			//{
-			//	m_input_item_info.ShowWindow(false);
-			//}
+			else
+			{
+				main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
+				m_input_list.SetItemText(i,OUTPUT_PANEL,main_sub_panel);
+			}
+		}
+		else
+		{
+			main_sub_panel.Format(_T("%d"),(unsigned char)Station_NUM);
+			m_input_list.SetItemText(i,INPUT_PANEL,main_sub_panel);
 		}
 
 #pragma endregion External info
@@ -876,6 +919,8 @@ void CBacnetInput::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	lRow = lvinfo.iItem;
 	lCol = lvinfo.iSubItem;
 
+	if(lRow>= INPUT_LIMITE_ITEM_COUNT)
+		return;
 
 	if(lRow>m_input_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的;
 		return;
@@ -1190,9 +1235,18 @@ void CBacnetInput::OnTimer(UINT_PTR nIDEvent)
 			else if((this->IsWindowVisible()) && (Gsm_communication == false) )	//GSM连接时不要刷新;
 			{
 				PostMessage(WM_REFRESH_BAC_INPUT_LIST,NULL,NULL);
-				if(bac_select_device_online)
+				if((bac_select_device_online)&& (g_protocol == PROTOCOL_BACNET_IP))
 					Post_Refresh_Message(g_bac_instance,READINPUT_T3000,0,BAC_INPUT_ITEM_COUNT - 1,sizeof(Str_in_point), BAC_INPUT_GROUP);
+				else if((bac_select_device_online) && ((g_protocol == MODBUS_RS485) || (g_protocol == MODBUS_TCPIP)))
+				{
+					if(read_each_485_fun_thread == NULL)
+					{
+						hide_485_progress = true;
+						::PostMessage(BacNet_hwd,WM_RS485_MESSAGE,bacnet_device_type,BAC_IN);//第二个参数 OUT
+					}
+				}
 			}
+
 		}
 		break;
 	case 2:	//在更改某一列之后要在读取此列的值，并刷新此列;

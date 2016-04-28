@@ -94,3 +94,5 @@ const CString CS_MINUTES =  _T("Minutes");
 const int MONITOR_MESSAGE_CREATE = 1;
 const int MONITOR_MESSAGE_DELETE = 2;
 
+#define  TEMP_DATA_READ_COUNT  1
+

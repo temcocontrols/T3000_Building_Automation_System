@@ -21,6 +21,8 @@
 #include "TFTPServer.h"
 #include "globle_function.h"
 #include "Global_Struct.h"
+
+extern Bin_Info        global_fileInfor;
 typedef struct _Product_IP_ID 
 {
 	CString ISP_Device_IP;
@@ -103,11 +105,6 @@ void MySocket::OnReceive(int nErrorCode)
 			{
 				memcpy_s(Byte_ISP_Device_IP,sizeof(Byte_ISP_Device_IP),receive_buf+11,4);//copy the first 11 byte and check
                 memcpy_s(Product_Name,sizeof(Product_Name),receive_buf+15,12);//copy the first 11 byte and check
-                
-
-				Bin_Info bin_infor;
-				Get_Binfile_Information(m_hex_bin_filepath.GetBuffer(),bin_infor);
-
 			    CString DeviceProductName ,FileProductName;
 				for (int i=0;i<12;i++)
 				{
@@ -115,38 +112,21 @@ void MySocket::OnReceive(int nErrorCode)
 				}
 				for (int i=0;i<10;i++)
 				{
-					FileProductName.AppendFormat(_T("%c"),bin_infor.product_name[i]);
+					FileProductName.AppendFormat(_T("%c"),global_fileInfor.product_name[i]);
 				}
-				if (DeviceProductName.Find(FileProductName)==-1)
+				FileProductName.Trim();
+				DeviceProductName.Trim();
+				if (DeviceProductName.CompareNoCase(FileProductName)!=0)
 				{
 					CString strTip;
 					strTip.Format(_T("Your device is %s,but your bin file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
-					//AfxMessageBox(strTip);
-				//	return;
+
+					CAsyncSocket::OnReceive(nErrorCode);
 				}
 
 				device_has_replay_lan_IP = true;
 				ISP_STEP =ISP_SEND_DHCP_COMMAND_HAS_LANIP;
                 
-			#ifdef use_multy
-				some_device_reply_the_broadcast =true;	
-				bool find_exist_product=false;
-				_Product_IP_ID tem_product_ipid;
-				tem_product_ipid.ISP_Device_IP.Format(_T("%d.%d.%d.%d"),(unsigned char)receive_buf[11],(unsigned char)receive_buf[12],(unsigned char)receive_buf[13],(unsigned char)receive_buf[14]);
-				for (int i=0;i<Product_Info.size();i++)
-				{
-					CString Temp1= Product_Info.at(i).ISP_Device_IP;
-					if(tem_product_ipid.ISP_Device_IP.CompareNoCase(Temp1)==0)
-					{
-						find_exist_product=true;
-						break;
-						//SAME
-					}
-				}
-				if(!find_exist_product)
-					Product_Info.push_back(tem_product_ipid);
-			#endif
-
 
 			}
 		}
@@ -160,6 +140,29 @@ void MySocket::OnReceive(int nErrorCode)
 			memcpy_s(temp_data,sizeof(temp_data),receive_buf,11);//copy the first 11 byte and check
 			if(!strcmp(temp_data,"ReceiveDHCP"))
 			{
+				memcpy_s(Byte_ISP_Device_IP,sizeof(Byte_ISP_Device_IP),receive_buf+11,4);//copy the first 11 byte and check
+				memcpy_s(Product_Name,sizeof(Product_Name),receive_buf+15,12);//copy the first 11 byte and check
+				CString DeviceProductName ,FileProductName;
+				for (int i=0;i<12;i++)
+				{
+					DeviceProductName.AppendFormat(_T("%c"),Product_Name[i]);
+				}
+				for (int i=0;i<10;i++)
+				{
+					FileProductName.AppendFormat(_T("%c"),global_fileInfor.product_name[i]);
+				}
+				FileProductName.Trim();
+				DeviceProductName.Trim();
+				if (DeviceProductName.CompareNoCase(FileProductName)!=0)
+				{
+					CString strTip;
+					strTip.Format(_T("Your device is %s,but your bin file is fit for %s"),DeviceProductName.GetBuffer(),FileProductName.GetBuffer());
+
+					CAsyncSocket::OnReceive(nErrorCode);
+				}
+
+
+
 				ISP_STEP =ISP_Send_TFTP_PAKAGE;
 			}
 		}

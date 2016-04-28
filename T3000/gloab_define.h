@@ -243,6 +243,7 @@ const int START_BACNET_TIMER = 201;
 const int CONNECT_TO_MODBUS_FAILED = 202;
 const int PASSWORD_OK_INITIAL_UI = 203;
 const int SHOW_PROGRAM_IDE = 204;
+const int SHOW_DEVICE_STATUS = 205;
 
 const int BAC_READ_ALL_LIST = 255;
 const int BAC_READ_SVAE_CONFIG = 254;
@@ -919,7 +920,9 @@ typedef enum
 	//IN				//OUT	
 	BIG_MINIPANEL = 1,			//32 A				//12D   12A
 	SMALL_MINIPANEL = 2,		//16 A				//6 D	4 A
-	TINY_MINIPANEL = 3,				
+	TINY_MINIPANEL = 3,	
+	PID_T322AI = 43,
+	T38AI8AO6DO = 44
 };
 
 const int BIG_MINIPANEL_IN_A = 32;
@@ -941,6 +944,12 @@ const int CM5_MINIPANEL_OUT_D = 10;
 
 const int TINY_MINIPANEL_OUT_D = 6;
 const int TINY_MINIPANEL_OUT_A = 2;
+
+const int T38AI8AO6DO_OUT_D = 6;
+const int T38AI8AO6DO_OUT_A = 8;
+
+const int T322AI_OUT_D = 0;
+const int T322AI_OUT_A = 0;
 
 enum
 {
@@ -1212,7 +1221,7 @@ const CString JumperStatus[]=
 	_T("4-20 ma"),//_T("4-20 ma / 0-24 V"),
 	_T("0-5 V"),
 	_T("0-10 V"),
-	_T("Thermistor Dry Contactor")
+	_T("Thermistor Dry Contact")
 };
 
 
@@ -1238,21 +1247,22 @@ const int VARIABLE_COL_NUMBER = 6;
 #pragma region INPUT_DEFINE
 
 const int INPUT_NUM = 0;
-const int INPUT_FULL_LABLE = 1;
-const int INPUT_AUTO_MANUAL = 2;
-const int INPUT_VALUE = 3;
-const int INPUT_UNITE = 4;
-const int INPUT_RANGE = 5;
-const int INPUT_CAL = 6;
-const int INPUT_CAL_OPERATION = 7;
-const int INPUT_FITLER = 8;
-const int INPUT_DECOM = 9;
-const int INPUT_JUMPER = 10;
-const int INPUT_LABLE = 11;
-const int INPUT_EXTERNAL = 12;
-const int INPUT_PRODUCT = 13;
-const int INPUT_EXT_NUMBER = 14;
-const int INPUT_COL_NUMBER = 15;
+const int INPUT_PANEL = 1;
+const int INPUT_FULL_LABLE = 2;
+const int INPUT_AUTO_MANUAL = 3;
+const int INPUT_VALUE = 4;
+const int INPUT_UNITE = 5;
+const int INPUT_RANGE = 6;
+const int INPUT_CAL = 7;
+const int INPUT_CAL_OPERATION = 8;
+const int INPUT_FITLER = 9;
+const int INPUT_DECOM = 10;
+const int INPUT_JUMPER = 11;
+const int INPUT_LABLE = 12;
+const int INPUT_EXTERNAL = 13;
+const int INPUT_PRODUCT = 14;
+const int INPUT_EXT_NUMBER = 15;
+const int INPUT_COL_NUMBER = 16;
 
 
 
@@ -1347,7 +1357,7 @@ const CString Decom_Array[3] =
 {
 	_T("Normal"),
 	_T("Open"),
-	_T("Short")
+	_T("Shorted")
 };
 
 
@@ -1358,20 +1368,20 @@ const CString Decom_Array[3] =
 #pragma region OUTPUT_DEFINE
 
 const int OUTPUT_NUM = 0;
-const int OUTPUT_FULL_LABLE = 1;
-const int OUTPUT_AUTO_MANUAL = 2;
-const int OUTPUT_VALUE = 3;
-const int OUTPUT_UNITE = 4;
-const int OUTPUT_RANGE = 5;
-const int OUTPUT_PWM_PERIOD = 6;
-const int OUTPUT_DECOM = 7;
-const int OUTPUT_LABLE = 8;
-const int OUTPUT_HW_SWITCH = 9;
-const int OUTPUT_EXTERNAL = 10;
-const int OUTPUT_PRODUCT = 11;
-const int OUTPUT_EXT_NUMBER = 12;
-
-const int OUTPUT_COL_NUMBER = 13;
+const int OUTPUT_PANEL = 1;
+const int OUTPUT_FULL_LABLE = 2;
+const int OUTPUT_AUTO_MANUAL = 3;
+const int OUTPUT_HW_SWITCH = 4;
+const int OUTPUT_VALUE = 5;
+const int OUTPUT_UNITE = 6;
+const int OUTPUT_RANGE = 7;
+const int OUTPUT_PWM_PERIOD = 8;
+const int OUTPUT_DECOM = 9;
+const int OUTPUT_LABLE = 10;
+const int OUTPUT_EXTERNAL = 11;
+const int OUTPUT_PRODUCT = 12;
+const int OUTPUT_EXT_NUMBER = 13;
+const int OUTPUT_COL_NUMBER = 14;
 
 const CString Output_Decom_Array[2] =
 {
@@ -1395,7 +1405,8 @@ const CString Debug_Combo_Choose[] =
 	_T("Only Scan"),
 	_T("Only Monotor Data"),
 	_T("Only Program Code"),
-	_T("Screen Pictrue Data")
+	_T("Screen Pictrue Data"),
+	_T("Bacnet Data")
 };
 
 const CString System_Log[] =
@@ -1417,6 +1428,7 @@ const int DEBUG_SHOW_SCAN_ONLY = 2;
 const int DEBUG_SHOW_MONITOR_DATA_ONLY = 3;
 const int DEBUG_SHOW_PROGRAM_DATA_ONLY = 4;
 const int DEBUG_SHOW_WRITE_PIC_DATA_ONLY = 5;
+const int DEBUG_SHOW_BACNET_ALL_DATA = 6;
 #define NUMBER_BAUDRATE 5
 typedef struct
 {
@@ -1459,3 +1471,24 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 
 
 #define  RANGE_ERROR   -2
+
+
+
+#define BAC_OUT 		 0
+#define BAC_IN  		 1
+#define BAC_VAR 		 2
+#define BAC_PID 		 3
+#define BAC_SCH 		 4
+#define BAC_HOL 		 5
+#define BAC_PRG 		 6
+#define BAC_TBL 	 	 7
+#define BAC_DMON 		 8
+#define BAC_AMON	    9
+#define BAC_GRP 	   10
+#define BAC_AY        11                  /* table to hold file names */
+#define BAC_ALARMM    12
+#define BAC_UNIT      13
+#define BAC_USER_NAME 14
+#define BAC_ALARMS    15
+#define BAC_WR_TIME   16
+#define BAC_AR_Y      17

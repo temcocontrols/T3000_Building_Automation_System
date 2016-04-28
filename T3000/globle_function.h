@@ -214,6 +214,7 @@ int WriteBacnetPictureData_Blocking(uint32_t deviceid,uint8_t index , unsigned s
 
 int GetPictureBlockData(uint32_t deviceid,int8_t nIndex, uint16_t ntotal_seg,uint16_t nseg_index);
 int GetPictureBlockData_Blocking(uint32_t deviceid,int8_t nIndex, uint16_t ntotal_seg,uint16_t nseg_index);
+BOOL ShowBacnetView(unsigned char product_type);
 BOOL HexFileValidation(const CString& strFileName);
 BOOL BinFileValidation(const CString& strFileName);
 #endif

@@ -190,7 +190,10 @@ UINT run_back_ground_load_thread(LPVOID pParam)
 			old_product_type = product_type;
 			M_RegAddress.Change_Register_Table();
 		}
-
+		if (product_register_value[7] == PM_TSTAT8)
+		{
+			MODBUS_BAUDRATE = 15;
+		}
 		if(now_tstat_id>0)
 		{
 			pDlg->m_FlexGrid.put_TextMatrix(iitemp+1,COL_CONNECTION,_T("On line"));
