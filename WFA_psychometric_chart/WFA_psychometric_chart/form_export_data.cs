@@ -11,7 +11,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.Office.Interop;
-using Excel=Microsoft.Office.Interop.Excel;
+using Excel = Microsoft.Office.Interop.Excel;
+using System.Reflection;
+using System.Data.SQLite;
 
 namespace WFA_psychometric_chart
 {
@@ -20,6 +22,7 @@ namespace WFA_psychometric_chart
         public form_export_data()
         {
             InitializeComponent();
+          this.Disposed += new System.EventHandler ( this.form_export_data_Disposed );
         }
         //this is done for storing the data collected form the database
         public class data_type_hum_temp
@@ -67,10 +70,13 @@ namespace WFA_psychometric_chart
         List<station_loc_data_type> stationInfo = new List<station_loc_data_type>();
 
         //this selected index is used to identify the particular location and data associated with that location
-        int index_selected;
+        int index_selected=0;
 
         //THIS IS  A CONNECTION STRING TO CONNECT TO DATABASE
-        string connString1 = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+       // string connString1 = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+        
+
 
 
         private void button1_Click(object sender, EventArgs e)
@@ -96,7 +102,6 @@ namespace WFA_psychometric_chart
 
               //  string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 //  string connString1 = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-                //sql connection string is this..
                 
                 HistoricalDataInfo();
 
@@ -123,7 +128,7 @@ namespace WFA_psychometric_chart
                     oSheet = (Excel.Worksheet)oBook.Worksheets.get_Item(1);
 
                     //printing the building information..
-                    oSheet.Cells[1, 1] = "Building Information";
+                    oSheet.Cells[1, 1] = WFA_psychometric_chart.Properties.Resources.Building_Information;
                     oSheet.Cells[2, 1] = "Country";
                     oSheet.Cells[2, 2] = building_info[0].country.ToString();
                     oSheet.Cells[3, 1] = "State";
@@ -249,7 +254,7 @@ namespace WFA_psychometric_chart
                     {
                         File.Delete(filePath);
                     }
-                    MessageBox.Show("Your file will be saved as " + filePath);
+                    MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Your_file_will_be_saved_as + filePath);
              }
 
             if (!File.Exists(filePath))
@@ -266,12 +271,12 @@ namespace WFA_psychometric_chart
             //    sb.AppendLine(string.Join(delimiter, output[index]));
             //File.AppendAllText(filePath, sb.ToString());
             StringBuilder sb = new StringBuilder();
-            string locationBuilding = "Building Information :,";
-            string locBuildingTopic = "country,state,city,street,zip,longitude,latitude,elecation,";
+            string locationBuilding = WFA_psychometric_chart.Properties.Resources.Building_Information0;
+            string locBuildingTopic = WFA_psychometric_chart.Properties.Resources.country_state_city_street_zip_;
             string locBuildingValues = building_info[0].country + "," + building_info[0].state + "," + building_info[0].city + "," + building_info[0].street + "," + building_info[0].zip + "," + building_info[0].longitude + "," + building_info[0].latitude + "," + building_info[0].elevation;
 
             string locationStation = "Station Information :";
-            string locStationTopic = "location,distance from building,last update date,temperature,humidity,bar pressure,wind,direction,station name,";
+            string locStationTopic = WFA_psychometric_chart.Properties.Resources.location_distance_from_buildin;
             string locStationValue = stationInfo[0].location+","+ stationInfo[0].distance_from_building+","+stationInfo[0].last_update_date + "," + stationInfo[0].temp + "," + stationInfo[0].humidity + "," + stationInfo[0].bar_pressure + "," + stationInfo[0].wind + "," + stationInfo[0].directioin + "," + stationInfo[0].station_name+",";
 
             sb.AppendLine(locationBuilding);
@@ -308,7 +313,7 @@ namespace WFA_psychometric_chart
             {
                 string filePath = ""; //"Your path of the location" + "filename.csv";
 
-                saveFD.Title = "Chose a path and file name";
+                saveFD.Title = WFA_psychometric_chart.Properties.Resources.Chose_a_path_and_file_name;
                 saveFD.InitialDirectory = "C:";
                 saveFD.Filter = "Text file|*.txt";
                 saveFD.FileName = "TextResultfile.txt";
@@ -331,12 +336,12 @@ namespace WFA_psychometric_chart
                     File.Create(filePath).Close();
                 }
                 StringBuilder sb = new StringBuilder();
-                string locationBuilding = "Building Information :,";
-                string locBuildingTopic = "country,state,city,street,zip,longitude,latitude,elecation,";
+                string locationBuilding = WFA_psychometric_chart.Properties.Resources.Building_Information0;
+                string locBuildingTopic = WFA_psychometric_chart.Properties.Resources.country_state_city_street_zip_;
                 string locBuildingValues = building_info[0].country + "," + building_info[0].state + "," + building_info[0].city + "," + building_info[0].street + "," + building_info[0].zip + "," + building_info[0].longitude + "," + building_info[0].latitude + "," + building_info[0].elevation;
 
-                string locationStation = "Station Information :";
-                string locStationTopic = "location,distance from building,last update date,temperature,humidity,bar pressure,wind,direction,station name,";
+                string locationStation = WFA_psychometric_chart.Properties.Resources.Station_Information;
+                string locStationTopic = WFA_psychometric_chart.Properties.Resources.location_distance_from_buildin;
                 string locStationValue = stationInfo[0].location + "," + stationInfo[0].distance_from_building + "," + stationInfo[0].last_update_date + "," + stationInfo[0].temp + "," + stationInfo[0].humidity + "," + stationInfo[0].bar_pressure + "," + stationInfo[0].wind + "," + stationInfo[0].directioin + "," + stationInfo[0].station_name + ",";
 
                 sb.AppendLine(locationBuilding);
@@ -347,8 +352,8 @@ namespace WFA_psychometric_chart
                 sb.AppendLine(locStationValue);
 
                 //now futher porcessing of the obtain data 
-                string historicalData = "Historical Data,";
-                string historicalTopic = "date,hour,minute,temperature,humidity,";
+                string historicalData = WFA_psychometric_chart.Properties.Resources.Historical_Data;
+                string historicalTopic = WFA_psychometric_chart.Properties.Resources.date_hour_minute_temperature_h;
                 sb.AppendLine(historicalData);
                 sb.AppendLine(historicalTopic);
 
@@ -371,7 +376,15 @@ namespace WFA_psychometric_chart
         public void HistoricalDataInfo()
         {
 
-            using (SqlConnection connection1 = new SqlConnection(connString1))
+            //--changing all the database to the sqlite database...
+            string databasePath11 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath11 + @"\db_psychrometric_project.s3db";
+
+            string connString1 = @"Data Source=" + databaseFile + ";Version=3;";
+
+
+
+            using (SQLiteConnection connection1 = new SQLiteConnection(connString1))
             {
                 connection1.Open();
 
@@ -379,8 +392,8 @@ namespace WFA_psychometric_chart
 
                 //string sql_query = "Select * from tbl_data_stored_temp_hum_one_year WHERE date_current = " + day_list[i] + " , hour_current = " + hour_al[h] + " AND station_name = "+ station_name +" ; ";
                 //lets pass this string to a query which does the pulling part.
-                SqlDataReader reader1 = null;
-                SqlCommand command1 = new SqlCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second AND ID=@id_value", connection1);
+                SQLiteDataReader reader1 = null;
+                SQLiteCommand command1 = new SQLiteCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second AND ID=@id_value", connection1);
                 command1.Parameters.AddWithValue("@date_first", dtp_From.Value);
                 command1.Parameters.AddWithValue("@date_second", dtp_To.Value);
                 command1.Parameters.AddWithValue("@id_value", index_selected);
@@ -409,23 +422,30 @@ namespace WFA_psychometric_chart
             {
                 s += hist_temp_hum_list[i].date + ", h =" + hist_temp_hum_list[i].hour + ",temp =" + hist_temp_hum_list[i].temp + ",station = " + hist_temp_hum_list[i].station_name + "\n";
             }
-            MessageBox.Show(s);
+            MessageBox.Show("value of s = "+s);
 
 
 
         }
         public void BuildingDataInfo()
         {
-            using (SqlConnection connection1 = new SqlConnection(connString1))
+
+            //--changing all the database to the sqlite database...
+            string databasePath11 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath11 + @"\db_psychrometric_project.s3db";
+
+            string connString1 = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection11 = new SQLiteConnection(connString1))
             {
-                connection1.Open();
+                connection11.Open();
 
 
 
                 //string sql_query = "Select * from tbl_data_stored_temp_hum_one_year WHERE date_current = " + day_list[i] + " , hour_current = " + hour_al[h] + " AND station_name = "+ station_name +" ; ";
                 //lets pass this string to a query which does the pulling part.
-                SqlDataReader reader1 = null;
-                SqlCommand command1 = new SqlCommand("Select * from tbl_building_location WHERE ID=@id_value", connection1);
+                SQLiteDataReader reader1 = null;
+                SQLiteCommand command1 = new SQLiteCommand("Select * from tbl_building_location WHERE ID=@id_value", connection11);
                 command1.Parameters.AddWithValue("@id_value", index_selected);
                 //command1.Parameters.AddWithValue("@station_name", station_name);
                 reader1 = command1.ExecuteReader();
@@ -461,7 +481,15 @@ namespace WFA_psychometric_chart
 
         private void StationDataInfo()
         {
-            using (SqlConnection connection1 = new SqlConnection(connString1))
+
+            //--station data info 
+            //--changing all the database to the sqlite database...
+            string databasePath11 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath11 + @"\db_psychrometric_project.s3db";
+
+            string connString1 = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection1 = new SQLiteConnection(connString1))
             {
                 connection1.Open();
 
@@ -469,8 +497,8 @@ namespace WFA_psychometric_chart
 
                 //string sql_query = "Select * from tbl_data_stored_temp_hum_one_year WHERE date_current = " + day_list[i] + " , hour_current = " + hour_al[h] + " AND station_name = "+ station_name +" ; ";
                 //lets pass this string to a query which does the pulling part.
-                SqlDataReader reader1 = null;
-                SqlCommand command1 = new SqlCommand("Select * from tbl_weather_related_values WHERE ID=@id_value", connection1);
+                SQLiteDataReader reader1 = null;
+                SQLiteCommand command1 = new SQLiteCommand("Select * from tbl_weather_related_values WHERE ID=@id_value", connection1);
                 command1.Parameters.AddWithValue("@id_value", index_selected);
                 //command1.Parameters.AddWithValue("@station_name", station_name);
                 reader1 = command1.ExecuteReader();
@@ -500,7 +528,7 @@ namespace WFA_psychometric_chart
             {
                 s += stationInfo[i].location + ", distance =" + stationInfo[i].distance_from_building + ",direc =" + stationInfo[i].directioin + "\n";
             }
-            MessageBox.Show(s);
+            MessageBox.Show("station info s value ="+s);
 
         }
 
@@ -520,46 +548,55 @@ namespace WFA_psychometric_chart
         }
         private void PullLocationInformation()
         {
-            try { 
-            /*This methods pulls the building location information..*/
-            cb1_select_data.Items.Clear();
-            ArrayList stored_location = new ArrayList();
-            //while loading it should populate the field...
-            //lets pull the vales offline values stored in db...
-            string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-            // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+            try {
+                /*This methods pulls the building location information..*/
+                cb1_select_data.Items.Clear();
+                ArrayList stored_location = new ArrayList();
+                //while loading it should populate the field...
+                //lets pull the vales offline values stored in db...
+                //              string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+                // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                // string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
 
-            string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+                //--changing all the database to the sqlite database...
+                string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
 
-            // MessageBox.Show("connection string = " + connString);
+                string connString = @"Data Source=" + databaseFile + ";Version=3;";
 
 
-            SqlConnection connection = new SqlConnection(connString);
-            connection.Open();
-            SqlDataReader reader = null;
-            SqlCommand comm = new SqlCommand("SELECT * from tbl_building_location", connection);
-            //command.Parameters.AddWithValue("@1", userName)
-            reader = comm.ExecuteReader();
-            while (reader.Read())
-            {
 
-                string selecte_location = reader["id"].ToString() + "," + reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
-                stored_location.Add(selecte_location);
+
+                // MessageBox.Show("connection string = " + connString);
+
+
+                SQLiteConnection connection = new SQLiteConnection(connString);
+                connection.Open();
+                SQLiteDataReader reader = null;
+                SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_building_location", connection);
+                //command.Parameters.AddWithValue("@1", userName)
+                reader = comm.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    string selecte_location = reader["id"].ToString() + "," + reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
+                    stored_location.Add(selecte_location);
+                }
+                string s = "";
+                for (int i = 0; i < stored_location.Count; i++)
+                {
+                    cb1_select_data.Items.Add(stored_location[i]);
+                    s += stored_location[i] + " , \n";
+                }
+                // MessageBox.Show("stored place = " + s);
+                comm.Dispose();
+                reader.Dispose();
+                connection.Close();
+
+
             }
-            string s = "";
-            for (int i = 0; i < stored_location.Count; i++)
-            {
-                cb1_select_data.Items.Add(stored_location[i]);
-                s += stored_location[i] + " , \n";
-            }
-            // MessageBox.Show("stored place = " + s);
-            comm.Dispose();
-            reader.Dispose();
-            connection.Close();
-
-
-            }catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -573,11 +610,17 @@ namespace WFA_psychometric_chart
             groupBox1.Enabled = true;
             groupBox2.Enabled = true;
             btnExtract.Enabled = true;
-            //MessageBox.Show("index selected = " + index_selected);
+            MessageBox.Show("index selected = " + index_selected);
             }catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }            
         }
+
+       
+
+      public void form_export_data_Disposed ( object sender, System.EventArgs e )
+      {
+      }
     }
 }

@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,6 +22,7 @@ namespace WFA_psychometric_chart
         public form_heat_map()
         {
             InitializeComponent();
+          this.Disposed += new System.EventHandler ( this.form_heat_map_Disposed );
         }
         int map_loaded = 0;
         int index_selected;//this is used for location services..
@@ -47,19 +51,28 @@ namespace WFA_psychometric_chart
                 ArrayList stored_location = new ArrayList();
                 //while loading it should populate the field...
                 //lets pull the vales offline values stored in db...
-                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                //              string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
                 // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
 
-                string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+                //                string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+                //--changing all the database to the sqlite database...
+                string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+
+
 
                 // MessageBox.Show("connection string = " + connString);
 
 
-                SqlConnection connection = new SqlConnection(connString);
+                SQLiteConnection connection = new SQLiteConnection(connString);
                 connection.Open();
-                SqlDataReader reader = null;
-                SqlCommand comm = new SqlCommand("SELECT * from tbl_building_location", connection);
+                SQLiteDataReader reader = null;
+                SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_building_location", connection);
                 //command.Parameters.AddWithValue("@1", userName)
                 reader = comm.ExecuteReader();
                 while (reader.Read())
@@ -161,7 +174,7 @@ namespace WFA_psychometric_chart
            // MessageBox.Show("the path = " + pat_test);
             string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
             */
-            string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string file = dir + @"\t_pg.txt";
             string path1 = file;
 
@@ -172,7 +185,7 @@ namespace WFA_psychometric_chart
             // MessageBox.Show(path);
             //string  path1 = path + "\\t_pg.txt";
             //MessageBox.Show(path1);
-            using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
+            using (StreamReader st = new StreamReader(path1))
             {
                 //int i = 0;
                 //string s = " ";
@@ -233,10 +246,7 @@ namespace WFA_psychometric_chart
 
             }//close of for
 
-            //chart1.Series["Series1"].Points[16].Label = "Wet bulb temp";
-            //chart1.Series["Series1"].Points[16].LabelBackColor = Color.Red;
-            //chart1.Legends["wet_bulb_temp"].DockedToChartArea = "jjj";
-
+   
             //now lets plot the blue curves...
             //WE NEED two for loop to plot values for 10% to 40%
             double phi = 0.1;
@@ -564,12 +574,21 @@ namespace WFA_psychometric_chart
             if (dtp_To.Value > dtp_From.Value)
             {
 
-                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+             //   string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 //  string connString1 = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
                 //sql connection string is this..
-                string connString1 = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+           //     string connString1 = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
 
-                using (SqlConnection connection1 = new SqlConnection(connString1))
+
+                //--changing all the database to the sqlite database...
+                string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                string connString1 = @"Data Source=" + databaseFile + ";Version=3;";
+
+
+
+                using (SQLiteConnection connection1 = new SQLiteConnection(connString1))
                 {
                     connection1.Open();
 
@@ -577,8 +596,8 @@ namespace WFA_psychometric_chart
 
                     //string sql_query = "Select * from tbl_data_stored_temp_hum_one_year WHERE date_current = " + day_list[i] + " , hour_current = " + hour_al[h] + " AND station_name = "+ station_name +" ; ";
                     //lets pass this string to a query which does the pulling part.
-                    SqlDataReader reader1 = null;
-                    SqlCommand command1 = new SqlCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second AND ID=@id_value", connection1);
+                    SQLiteDataReader reader1 = null;
+                    SQLiteCommand command1 = new SQLiteCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second AND ID=@id_value", connection1);
                     command1.Parameters.AddWithValue("@date_first", dtp_From.Value);
                     command1.Parameters.AddWithValue("@date_second", dtp_To.Value);
                     command1.Parameters.AddWithValue("@id_value", index_selected);
@@ -640,11 +659,11 @@ namespace WFA_psychometric_chart
 
                 string line1;
 
-                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string file = dir + @"\t_pg.txt";
                 string path1 = file;
 
-                using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
+                using (StreamReader st = new StreamReader(path1))
                 {
 
                     while ((line1 = st.ReadLine()) != null)
@@ -997,5 +1016,9 @@ namespace WFA_psychometric_chart
 
 
         }
+
+      public void form_heat_map_Disposed ( object sender, System.EventArgs e )
+      {
+      }
     }
 }

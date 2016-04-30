@@ -82,15 +82,12 @@ C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\Newtonsoft.Json.xml
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csprojResolveAssemblyReference.cache
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.resources
-C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1.resources
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.resources
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.resources
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.resources
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Properties.Resources.resources
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.en-US.resources
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.zh-CHS.resources
-C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1.en-US.resources
-C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1.zh-CHS.resources
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.en-US.resources
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.zh-CHS.resources
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.en-US.resources
@@ -104,3 +101,146 @@ C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_export_data.resources
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\Interop.Microsoft.Office.Core.dll
 C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csproj.ResolveComReference.cache
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_process_diagram.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1_main.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1_main.en-US.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1_main.zh-CHS.resources
+C:\Users\nischal\Desktop\latest march 21\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form_Input_For_Seriespoint.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.exe.config
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\Interop.Microsoft.Office.Core.dll
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csproj.ResolveComReference.cache
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.exe
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.pdb
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.exe
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.pdb
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\Newtonsoft.Json.dll
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\Newtonsoft.Json.xml
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csprojResolveAssemblyReference.cache
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1_main.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_export_data.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_heat_map.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form_Input_For_Seriespoint.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_process_diagram.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Properties.Resources.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csproj.GenerateResource.Cache
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\EntityFramework.dll
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\System.Data.SQLite.dll
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\System.Data.SQLite.EF6.dll
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\System.Data.SQLite.Linq.dll
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\EntityFramework.xml
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\System.Data.SQLite.xml
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\MultiLang.SelectLanguage.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\en-US\WFA_psychometric_chart.resources.dll
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\ko-KR\WFA_psychometric_chart.resources.dll
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.en-US.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.ko-KR.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1_main.en-US.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1_main.ko-KR.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.en-US.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.ko-KR.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.en-US.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.ko-KR.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.en-US.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.ko-KR.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_export_data.en-US.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_export_data.ko-KR.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_heat_map.en-US.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_heat_map.ko-KR.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form_Input_For_Seriespoint.en-US.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form_Input_For_Seriespoint.ko-KR.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_process_diagram.en-US.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_process_diagram.ko-KR.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Properties.Resources.en-US.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Properties.Resources.ko-KR.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\MultiLang.SelectLanguage.en-US.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\MultiLang.SelectLanguage.ko-KR.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\en-US\WFA_psychometric_chart.resources.dll
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\ko-KR\WFA_psychometric_chart.resources.dll
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\zh-CHS\WFA_psychometric_chart.resources.dll
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.zh-CHS.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1_main.zh-CHS.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.zh-CHS.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.zh-CHS.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.zh-CHS.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_export_data.zh-CHS.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_heat_map.zh-CHS.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form_Input_For_Seriespoint.zh-CHS.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_process_diagram.zh-CHS.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Properties.Resources.zh-CHS.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\MultiLang.SelectLanguage.zh-CHS.resources
+C:\Users\nischal\Desktop\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\zh-CHS\WFA_psychometric_chart.resources.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.exe.config
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\Interop.Microsoft.Office.Core.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csproj.ResolveComReference.cache
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.exe
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.pdb
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.exe
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\WFA_psychometric_chart.pdb
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\en-US\WFA_psychometric_chart.resources.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\ko-KR\WFA_psychometric_chart.resources.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\zh-CHS\WFA_psychometric_chart.resources.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\EntityFramework.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\Newtonsoft.Json.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\System.Data.SQLite.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\System.Data.SQLite.EF6.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\System.Data.SQLite.Linq.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\EntityFramework.xml
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\Newtonsoft.Json.xml
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\bin\Debug\System.Data.SQLite.xml
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csprojResolveAssemblyReference.cache
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1_main.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_export_data.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_heat_map.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form_Input_For_Seriespoint.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_process_diagram.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Properties.Resources.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\MultiLang.SelectLanguage.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.en-US.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.ko-KR.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Application_Form4.zh-CHS.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1_main.en-US.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1_main.ko-KR.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form1_main.zh-CHS.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.en-US.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.ko-KR.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form3.zh-CHS.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.en-US.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.ko-KR.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form4_insert_data.zh-CHS.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.en-US.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.ko-KR.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_app_timer.zh-CHS.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_export_data.en-US.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_export_data.ko-KR.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_export_data.zh-CHS.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_heat_map.en-US.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_heat_map.ko-KR.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_heat_map.zh-CHS.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form_Input_For_Seriespoint.en-US.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form_Input_For_Seriespoint.ko-KR.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Form_Input_For_Seriespoint.zh-CHS.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_process_diagram.en-US.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_process_diagram.ko-KR.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.form_process_diagram.zh-CHS.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Properties.Resources.en-US.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Properties.Resources.ko-KR.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.Properties.Resources.zh-CHS.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\MultiLang.SelectLanguage.en-US.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\MultiLang.SelectLanguage.ko-KR.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\MultiLang.SelectLanguage.zh-CHS.resources
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\WFA_psychometric_chart.csproj.GenerateResource.Cache
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\en-US\WFA_psychometric_chart.resources.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\ko-KR\WFA_psychometric_chart.resources.dll
+C:\Users\RajuPC\Dropbox\Psychometric Chart\psychrometric latest source code 2016 april 29\new psychoromectic project\WFA_psychometric_chart\WFA_psychometric_chart\obj\Debug\zh-CHS\WFA_psychometric_chart.resources.dll

@@ -23,7 +23,7 @@ namespace WFA_psychometric_chart
       frmLang.Dispose() ;
       frmLang = null ;
 
-            Application.Run(new Form1());
+            Application.Run(new Form1_main());
         }
     }
 }

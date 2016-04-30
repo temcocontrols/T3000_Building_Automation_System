@@ -193,10 +193,13 @@
     <value>9</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>form_app_timer</value>
+    <value>Historical data plot</value>
   </data>
-  <data name="groupBox2.Text" xml:space="preserve">
+  <data name="gb_select_time_and_date.Text" xml:space="preserve">
     <value>Select time and date</value>
+  </data>
+  <data name="groupBox3.Text" xml:space="preserve">
+    <value>Select a location</value>
   </data>
   <data name="label7.Text" xml:space="preserve">
     <value>From :</value>
@@ -205,6 +208,7 @@
     <value>To :</value>
   </data>
   <data name="label9.Text" xml:space="preserve">
-    <value>Select hour</value>
+    <value>Select hour :</value>
+    <comment>Previous text: Select hour</comment>
   </data>
 </root>

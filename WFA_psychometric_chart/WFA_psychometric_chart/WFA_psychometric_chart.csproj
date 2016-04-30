@@ -11,6 +11,8 @@
     <AssemblyName>WFA_psychometric_chart</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,12 +34,33 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.101.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.101.0\lib\net45\System.Data.SQLite.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.101.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.101.0\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.101.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.101.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -55,11 +78,11 @@
     <Compile Include="Application_Form4.Designer.cs">
       <DependentUpon>Application_Form4.cs</DependentUpon>
     </Compile>
-    <Compile Include="Form1.cs">
+    <Compile Include="Form1_main.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Form1_main.Designer.cs">
+      <DependentUpon>Form1_main.cs</DependentUpon>
     </Compile>
     <Compile Include="Form3.cs">
       <SubType>Form</SubType>
@@ -91,6 +114,18 @@
     <Compile Include="form_heat_map.Designer.cs">
       <DependentUpon>form_heat_map.cs</DependentUpon>
     </Compile>
+    <Compile Include="Form_Input_For_Seriespoint.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_Input_For_Seriespoint.Designer.cs">
+      <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
+    </Compile>
+    <Compile Include="form_process_diagram.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="form_process_diagram.Designer.cs">
+      <DependentUpon>form_process_diagram.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectLanguage.cs">
@@ -102,22 +137,31 @@
     <EmbeddedResource Include="Application_Form4.en-US.resx">
       <DependentUpon>Application_Form4.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Application_Form4.ko-KR.resx">
+      <DependentUpon>Application_Form4.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Application_Form4.resx">
       <DependentUpon>Application_Form4.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Application_Form4.zh-CHS.resx">
       <DependentUpon>Application_Form4.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form1.en-US.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Form1_main.en-US.resx">
+      <DependentUpon>Form1_main.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Form1_main.ko-KR.resx">
+      <DependentUpon>Form1_main.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form1.zh-CHS.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Form1_main.resx">
+      <DependentUpon>Form1_main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1_main.zh-CHS.resx">
+      <DependentUpon>Form1_main.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form3.en-US.resx">
+      <DependentUpon>Form3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form3.ko-KR.resx">
       <DependentUpon>Form3.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form3.resx">
@@ -129,6 +173,9 @@
     <EmbeddedResource Include="Form4_insert_data.en-US.resx">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Form4_insert_data.ko-KR.resx">
+      <DependentUpon>Form4_insert_data.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form4_insert_data.resx">
       <DependentUpon>Form4_insert_data.cs</DependentUpon>
     </EmbeddedResource>
@@ -138,22 +185,88 @@
     <EmbeddedResource Include="form_app_timer.en-US.resx">
       <DependentUpon>form_app_timer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="form_app_timer.ko-KR.resx">
+      <DependentUpon>form_app_timer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="form_app_timer.resx">
       <DependentUpon>form_app_timer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="form_app_timer.zh-CHS.resx">
       <DependentUpon>form_app_timer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="form_export_data.en-US.resx">
+      <DependentUpon>form_export_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_export_data.ko-KR.resx">
+      <DependentUpon>form_export_data.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="form_export_data.resx">
       <DependentUpon>form_export_data.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="form_export_data.zh-CHS.resx">
+      <DependentUpon>form_export_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_heat_map.en-US.resx">
+      <DependentUpon>form_heat_map.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_heat_map.ko-KR.resx">
+      <DependentUpon>form_heat_map.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="form_heat_map.resx">
       <DependentUpon>form_heat_map.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_heat_map.zh-CHS.resx">
+      <DependentUpon>form_heat_map.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Input_For_Seriespoint.en-US.resx">
+      <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Input_For_Seriespoint.ko-KR.resx">
+      <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Input_For_Seriespoint.resx">
+      <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_Input_For_Seriespoint.zh-CHS.resx">
+      <DependentUpon>Form_Input_For_Seriespoint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_process_diagram.en-US.resx">
+      <DependentUpon>form_process_diagram.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_process_diagram.ko-KR.resx">
+      <DependentUpon>form_process_diagram.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_process_diagram.resx">
+      <DependentUpon>form_process_diagram.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="form_process_diagram.zh-CHS.resx">
+      <DependentUpon>form_process_diagram.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.en-US.resx">
+      <DependentUpon>Resources.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.ko-KR.resx">
+      <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.zh-CHS.resx">
+      <DependentUpon>Resources.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectLanguage.en-US.resx">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectLanguage.ko-KR.resx">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectLanguage.resx">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectLanguage.zh-CHS.resx">
+      <DependentUpon>SelectLanguage.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -179,9 +292,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\u_arrow.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="WFA_psychometric_chart_ml.xml" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">
@@ -212,7 +322,17 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="WFA_psychometric_chart_ml.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

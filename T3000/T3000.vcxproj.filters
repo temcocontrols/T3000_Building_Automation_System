@@ -666,9 +666,6 @@
     <ClCompile Include="SelectLanguage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MlString.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1618,8 +1615,5 @@
     <ResourceCompile Include="T3000.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="T3000_ml.xml" />
   </ItemGroup>
 </Project>

@@ -120,8 +120,14 @@
   <data name="checkedListBox1.Items" xml:space="preserve">
     <value>全选</value>
   </data>
-  <data name="groupBox2.Text" xml:space="preserve">
+  <data name="$this.Text" xml:space="preserve">
+    <value>历史数据绘图区</value>
+  </data>
+  <data name="gb_select_time_and_date.Text" xml:space="preserve">
     <value>选择时间和日期</value>
+  </data>
+  <data name="groupBox3.Text" xml:space="preserve">
+    <value>选择一个位置</value>
   </data>
   <data name="label7.Text" xml:space="preserve">
     <value>从：</value>
@@ -130,6 +136,7 @@
     <value>自：</value>
   </data>
   <data name="label9.Text" xml:space="preserve">
-    <value>选择小时</value>
+    <value>选择小时 ︰</value>
+    <comment>Previous text: Select hour</comment>
   </data>
 </root>

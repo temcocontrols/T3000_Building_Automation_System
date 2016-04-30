@@ -262,7 +262,6 @@
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="ManageAccountDlg.cpp" />
     <ClCompile Include="MannageBuidingDlg.cpp" />
-    <ClCompile Include="MlString.cpp" />
     <ClCompile Include="monthview1.cpp" />
     <ClCompile Include="msflexgrid1.cpp" />
     <ClCompile Include="MySocket.cpp" />
@@ -667,9 +666,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="T3000.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="T3000_ml.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

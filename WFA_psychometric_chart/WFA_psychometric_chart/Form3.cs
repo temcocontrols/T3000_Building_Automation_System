@@ -15,7 +15,9 @@ using System.Collections;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Data.SqlClient;
-
+using System.IO;
+using System.Reflection;
+using System.Data.SQLite;
 
 namespace WFA_psychometric_chart
 {
@@ -25,6 +27,7 @@ namespace WFA_psychometric_chart
         public Form3()
         {
             InitializeComponent();
+          this.Disposed += new System.EventHandler ( this.Form3_Disposed );
         }
 
         
@@ -349,15 +352,24 @@ namespace WFA_psychometric_chart
 
 
                     //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-                    string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                   // string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                    // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-                    string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
-                   
-                    using (SqlConnection connection = new SqlConnection(connString))
+                   // string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+
+                    //--changing all the database to the sqlite database...
+                    string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                    string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+
+
+                    using (SQLiteConnection connection = new SQLiteConnection(connString))
                     {
                         connection.Open();
-                        SqlDataReader reader = null;
-                        SqlCommand command = new SqlCommand("SELECT * from tbl_weather_related_values where ID=@id", connection);
+                        SQLiteDataReader reader = null;
+                        SQLiteCommand command = new SQLiteCommand("SELECT * from tbl_weather_related_values where ID=@id", connection);
                         command.Parameters.AddWithValue("@id", index_selected);
                         reader = command.ExecuteReader();
                         while (reader.Read())
@@ -403,19 +415,29 @@ namespace WFA_psychometric_chart
                 //MessageBox.Show("index = " + index_selected);
 
                 //lets pull the vales offline values stored in db...
-                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+           //     string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
                 //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-                string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+            //    string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
 
-                using (SqlConnection connection = new SqlConnection(connString))
+
+                //--changing all the database to the sqlite database...
+                string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+
+
+                using (SQLiteConnection connection = new SQLiteConnection(connString))
                 {
                     connection.Open();
-                    SqlDataReader reader = null;
+                    SQLiteDataReader reader = null;
                     string queryString = "SELECT * from tbl_building_location WHERE ID=@index";
-                    SqlCommand command = new SqlCommand(queryString, connection);
+                    SQLiteCommand command = new SQLiteCommand(queryString, connection);
                     //command.Parameters.AddWithValue("@index", index);
-                    command.Parameters.Add(new SqlParameter("@index", OleDbType.Integer)).Value = index_selected;
+                    //command.Parameters.Add("@index",DbType.Int32).Value= index_selected;
+                    command.Parameters.AddWithValue("@index", index_selected);
                     reader = command.ExecuteReader();
                     while (reader.Read())
                     {
@@ -490,10 +512,17 @@ namespace WFA_psychometric_chart
                 {
 
                     //lets pull the vales offline values stored in db...
-                    string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    //string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                     //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
                     /// string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-                    string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+                    // string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+                    //--changing all the database to the sqlite database...
+                    string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                    string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
 
                     if (tb_latitude.Text == "" && tb_longitude.Text == "")
                     {
@@ -637,15 +666,17 @@ namespace WFA_psychometric_chart
 
 
 
-                                using (SqlConnection connection = new SqlConnection(connString))
+                                //--changing all the database from MSSQL to SQLite database
+
+                                using (SQLiteConnection connection = new SQLiteConnection(connString))
                                 {
                                     connection.Open();
-                                    SqlDataReader reader = null;
+                                    SQLiteDataReader reader = null;
                                     int count_col_table = 0;
                                     //lets check the data first...
                                     //step1.
                                     string count_num_column = "select count(id) from tbl_weather_related_values ";
-                                    SqlCommand cmd1 = new SqlCommand(count_num_column, connection);
+                                    SQLiteCommand cmd1 = new SQLiteCommand(count_num_column, connection);
                                     reader = cmd1.ExecuteReader();
                                     while (reader.Read())
                                     {
@@ -660,7 +691,7 @@ namespace WFA_psychometric_chart
                                         //update previous value
 
                                         string sql_string = "update tbl_weather_related_values set  location=@location_value,distance_from_building=@distance_value,last_update_date=@last_value,temp=@temp_value,humidity=@hum_value,bar_pressure=@pressure_value,wind=@wind_value,direction=@direction_value,station_name=@station_name   where ID = @index_selected;";
-                                        SqlCommand command = new SqlCommand(sql_string, connection);
+                                        SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                                         command.CommandType = CommandType.Text;
                                         command.Parameters.AddWithValue("@location_value", loc_value.ToString());
                                         command.Parameters.AddWithValue("@distance_value", d.ToString());
@@ -684,7 +715,7 @@ namespace WFA_psychometric_chart
                                     {
                                         //insert...
                                         string sql_string = "insert into tbl_weather_related_values(location,distance_from_building,last_update_date,temp,humidity,bar_pressure,wind,direction,station_name) VALUES(@location_value,@distance_value,@last_value,@temp_value,@hum_value,@pressure_value,@wind_value,@direction_value,@station_name)";
-                                        SqlCommand command = new SqlCommand(sql_string, connection);
+                                        SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                                         command.CommandType = CommandType.Text;
                                         command.Parameters.AddWithValue("@location_value", loc_value.ToString());
                                         command.Parameters.AddWithValue("@distance_value", d.ToString());
@@ -719,7 +750,7 @@ namespace WFA_psychometric_chart
                                     //insert...
                                     MessageBox.Show("tempe= " +temp_adjust+ " hum = "+hum_pulled );
                                     string sql_query = "insert into tbl_historical_data(ID,date_current,hour_current,minute_current,temperature,humidity,station_name) VALUES(@id_value,@date_current,@hour_current,@minute_current,@temp_value,@hum_value,@station_name)";
-                                    SqlCommand cmdx = new SqlCommand(sql_query, connection);
+                                    SQLiteCommand cmdx = new SQLiteCommand(sql_query, connection);
                                     cmdx.CommandType = CommandType.Text;
                                     cmdx.Parameters.AddWithValue("@id_value", index_selected);//this index selected identifies the location or building info...
                                     cmdx.Parameters.AddWithValue("@date_current", date.ToString());
@@ -793,19 +824,25 @@ namespace WFA_psychometric_chart
             ArrayList stored_location = new ArrayList();
             //while loading it should populate the field...
             //lets pull the vales offline values stored in db...
-            string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-           // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+            //string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
-            string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+            //string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+
+            //--changing all the database to the sqlite database...
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
 
             // MessageBox.Show("connection string = " + connString);
 
 
-            SqlConnection connection = new SqlConnection(connString);
+            SQLiteConnection connection = new SQLiteConnection(connString);
                 connection.Open();
-                SqlDataReader reader = null;
-                SqlCommand comm = new SqlCommand("SELECT * from tbl_building_location", connection);
+                SQLiteDataReader reader = null;
+                SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_building_location", connection);
                 //command.Parameters.AddWithValue("@1", userName)
                 reader = comm.ExecuteReader();
                 while (reader.Read())
@@ -874,10 +911,18 @@ namespace WFA_psychometric_chart
             {
 
                 //lets pull the vales offline values stored in db...
-                string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            //string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
                // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-                string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+            // string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+                //--changing all the database to the sqlite database...
+                string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+
 
                 if (tb_latitude.Text == "" && tb_longitude.Text == "")
                 {
@@ -1011,15 +1056,15 @@ namespace WFA_psychometric_chart
 
 
 
-                            using (SqlConnection connection = new SqlConnection(connString))
+                            using (SQLiteConnection connection = new SQLiteConnection(connString))
                             {
                                 connection.Open();
                                 int count_col_table = 0;
                                 //lets check the data first...
                                 //step1.
                                 string count_num_column = "select count(id) from tbl_weather_related_values ";
-                                SqlCommand cmd1 = new SqlCommand(count_num_column, connection);
-                                SqlDataReader reader = cmd1.ExecuteReader();
+                                SQLiteCommand cmd1 = new SQLiteCommand(count_num_column, connection);
+                                SQLiteDataReader reader = cmd1.ExecuteReader();
                                 while (reader.Read())
                                 {
                                     //lets get the value...
@@ -1033,7 +1078,7 @@ namespace WFA_psychometric_chart
                                     //update previous value
 
                                     string sql_string = "update tbl_weather_related_values set  location=@location_value,distance_from_building=@distance_value,last_update_date=@last_value,temp=@temp_value,humidity=@hum_value,bar_pressure=@pressure_value,wind=@wind_value,direction=@direction_value,station_name=@station_name   where ID = @index_selected;";
-                                    SqlCommand command = new SqlCommand(sql_string, connection);
+                                    SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                                     command.CommandType = CommandType.Text;
                                     command.Parameters.AddWithValue("@location_value", loc_value.ToString());
                                     command.Parameters.AddWithValue("@distance_value", d.ToString());
@@ -1058,7 +1103,7 @@ namespace WFA_psychometric_chart
                                 {
                                     //insert...
                                     string sql_string = "insert into tbl_weather_related_values(location,distance_from_building,last_update_date,temp,humidity,bar_pressure,wind,direction,station_name) VALUES(@location_value,@distance_value,@last_value,@temp_value,@hum_value,@pressure_value,@wind_value,@direction_value,@station_name)";
-                                    SqlCommand command = new SqlCommand(sql_string, connection);
+                                    SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                                     command.CommandType = CommandType.Text;
                                     command.Parameters.AddWithValue("@location_value", loc_value.ToString());
                                     command.Parameters.AddWithValue("@distance_value", d.ToString());
@@ -1085,7 +1130,7 @@ namespace WFA_psychometric_chart
 
                                 //insert...
                                 string sql_query = "insert into tbl_data_stored_temp_hum_one_year(date_current,time_current,temperature,humidity,station_name) VALUES(@date_current,@time_current,@temp_value,@hum_value,@station_name)";
-                                SqlCommand cmdx = new SqlCommand(sql_query, connection);
+                                SQLiteCommand cmdx = new SQLiteCommand(sql_query, connection);
                                 cmdx.CommandType = CommandType.Text;
                                 cmdx.Parameters.AddWithValue("@date_current", date.ToString());
                                 cmdx.Parameters.AddWithValue("@time_current", time.ToString());
@@ -1464,5 +1509,9 @@ namespace WFA_psychometric_chart
 
     
       
+
+      public void Form3_Disposed ( object sender, System.EventArgs e )
+      {
+      }
     }
 }
