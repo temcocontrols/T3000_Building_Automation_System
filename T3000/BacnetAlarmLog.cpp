@@ -368,7 +368,7 @@ BOOL CBacnetAlarmLog::OnHelpInfo(HELPINFO* pHelpInfo)
 			theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		else
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
-			HH_HELP_CONTEXT, IDH_TOPIC_7_DATA);
+			HH_HELP_CONTEXT, IDH_TOPIC_6_10_ALARM_LOG);
 		return (hWnd != NULL);
 	}
 	else{

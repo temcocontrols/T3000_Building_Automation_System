@@ -1,6 +1,10 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2016 - 04 - 28
+1. 修改 Program 中 WAIT 函数 ;
+2. 修复ISP  误烧写 .
+
 2016 - 04 - 25
 1. 修复ISP 烧写的时候提示 不匹配的bug . mark 住了 最早以前的  ISP 的 部分;
 
@@ -3092,22 +3096,7 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 	}
 
 
-	//for (int i=0;i<BAC_TSTAT_GROUP;i++)
-	//{
-	//	if((bac_read_which_list == BAC_READ_TSTAT_LIST) || (bac_read_which_list == BAC_READ_ALL_LIST))
-	//	{
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].command = 0;
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].device_id = 0;
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].start_instance =0;
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].end_instance = 0;
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].has_resend_yes_or_no = 0;
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].resend_count =0;
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].task_result = BAC_RESULTS_UNKONW;
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].invoke_id = -1;
-	//		bac_tstat_read_results = 0;
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].timeout_count = 0;
-	//	}
-	//}
+
 	for (int i=0; i<BAC_MONITOR_GROUP;i++)
 	{
 		if((bac_read_which_list == BAC_READ_MONITOR_LIST) || (bac_read_which_list == TYPE_SVAE_CONFIG)|| (bac_read_which_list ==BAC_READ_ALL_LIST))
@@ -3505,41 +3494,6 @@ DWORD WINAPI  Send_read_Command_Thread(LPVOID lpVoid)
 		}
 	}
 
-
-
-
-
-	//for (int i=0;i<BAC_TSTAT_GROUP;i++)
-	//{
-	//	if((bac_read_which_list == BAC_READ_TSTAT_LIST) || (bac_read_which_list ==BAC_READ_ALL_LIST))
-	//	{
-	//		resend_count = 0;
-	//		do 
-	//		{
-	//			resend_count ++;
-	//			if(resend_count>RESEND_COUNT)
-	//				goto myend;
-	//			end_temp_instance = BAC_READ_TSTAT_REMAINDER + (BAC_READ_TSTAT_GROUP_NUMBER)*i ;
-	//			if(end_temp_instance >= BAC_TSTAT_COUNT)
-	//				end_temp_instance = BAC_TSTAT_COUNT - 1;
-
-	//			g_invoke_id = GetPrivateData(g_bac_instance,READTSTAT_T3000,(BAC_READ_TSTAT_GROUP_NUMBER)*i,
-	//				end_temp_instance,sizeof(Str_TstatInfo_point));
-	//			Sleep(SEND_COMMAND_DELAY_TIME);	
-	//		} while (g_invoke_id<0);
-
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].command = READTSTAT_T3000;
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].device_id = g_bac_instance;
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].start_instance = (BAC_READ_TSTAT_GROUP_NUMBER)*i;
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].end_instance = end_temp_instance;
-	//		Bacnet_Refresh_Info.Read_Tstat_Info[i].invoke_id = g_invoke_id;
-	//		CString temp_cs;
-	//		temp_cs.Format(_T("Task ID = %d. Read Tstat From %d to %d "),g_invoke_id,
-	//			Bacnet_Refresh_Info.Read_Tstat_Info[i].start_instance,
-	//			Bacnet_Refresh_Info.Read_Tstat_Info[i].end_instance);
-	//		Post_Invoke_ID_Monitor_Thread(MY_INVOKE_ID,g_invoke_id,BacNet_hwd,temp_cs);
-	//	}
-	//}
 
 	for (int i=0;i<BAC_MONITOR_GROUP;i++)
 	{
@@ -4678,7 +4632,15 @@ void	CDialogCM5_BacNet::Initial_Some_UI(int ntype)
 			
 		}
 	}
-
+	if((!read_customer_unit) && pFrame->m_product.at(selected_product_index).protocol != MODBUS_RS485 && ((pFrame->m_product.at(selected_product_index).product_class_id ==PM_CM5 ) ||
+								  (pFrame->m_product.at(selected_product_index).product_class_id ==PM_MINIPANEL )	))
+	{
+		if(GetPrivateData_Blocking(g_bac_instance,READUNIT_T3000,0,BAC_CUSTOMER_UNITS_COUNT - 1,sizeof(Str_Units_element)) > 0)
+		{
+			read_customer_unit = true;
+		}
+	}
+	
 
 }
 void	CDialogCM5_BacNet::Set_Tab_Loaded_Parameter(int ntab)
@@ -4693,8 +4655,20 @@ void CDialogCM5_BacNet::Inital_Tab_Loaded_Parameter()
 	{
 		tab_loaded[i] = false;
 	}
-	read_customer_unit = false;
-	receive_customer_unit = false;
+	static unsigned int static_value_read = 0;
+	if(static_value_read == 0)
+	{
+		read_customer_unit = false;
+		receive_customer_unit = false;
+		static_value_read = g_selected_serialnumber ;
+	}
+	else if(static_value_read != g_selected_serialnumber) 
+	{
+		read_customer_unit = false;
+		receive_customer_unit = false;
+		static_value_read = g_selected_serialnumber;
+	}
+
 }
 
 void CDialogCM5_BacNet::OnTcnSelchangeBacMaintab(NMHDR *pNMHDR, LRESULT *pResult)

@@ -2155,7 +2155,7 @@ BOOL CBacnetGraphic::OnHelpInfo(HELPINFO* pHelpInfo)
 			theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		else
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 
-			HH_HELP_CONTEXT, IDH_TOPIC_GRAPHIC_SCREENS);
+			HH_HELP_CONTEXT, IDH_TOPIC_6_1_GRAPHIC_SCREENS);
 		return (hWnd != NULL);
 	}
 	else{

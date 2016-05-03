@@ -32,7 +32,7 @@ char *index_stack;
 char stack[150];
 
 extern char editbuf[25000];//For Bacnet Program use
-
+ static int time_count = 0; //Fance add for wait function.
 #define  TRUE 1
 #define  FALSE 0
 
@@ -1255,7 +1255,7 @@ int Encode_Program ( /*GEdit *ppedit*/)
 	ind_code=0;
 
 	memset(cod_line,0,sizeof(cod_line));//Fance
-
+	time_count = 0;
 
 	//  local_table[4000] , time_table[300]
 	local_table = new char[4000+300+sizeof(struct variable_table)*MAX_Var+
@@ -5562,10 +5562,14 @@ case ASSIGNARRAY_2:
 		 }
 		 if (DORU_SYSTEM)
 		 {
-			 cod_line[ind_cod_line++]=0;
-			 cod_line[ind_cod_line++]=0;
-			 cod_line[ind_cod_line++]=0;
-			 cod_line[ind_cod_line++]=0;
+			
+			 time_count ++;
+			 memcpy(&cod_line[ind_cod_line],&time_count,4);
+			 ind_cod_line = ind_cod_line + 4;
+			 //cod_line[ind_cod_line++]=0;
+			 //cod_line[ind_cod_line++]=0;
+			 //cod_line[ind_cod_line++]=0;
+			 //cod_line[ind_cod_line++]=0;
 		 }
 
 /*
@@ -6305,7 +6309,7 @@ unsigned char cod;//,xtemp[15];
 									break;
 			case ALARM_AT:
 			case PRINT_AT:
-									if (*code=='\xFF')
+									if ((unsigned char)*code=='\xFF')
 										 {
 											strcpy(buf,"ALL");
 											buf += 3;
@@ -6411,7 +6415,7 @@ unsigned char cod;//,xtemp[15];
 											line_array[ind_line_array++][1] = code-pcode+2;
 										 }
 */
-									if (*code==0xA1)
+									if ((unsigned char)*code==0xA1)
 										 {
 											unsigned long k;
 											memcpy(&k,++code,4);

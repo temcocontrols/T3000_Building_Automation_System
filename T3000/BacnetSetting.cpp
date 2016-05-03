@@ -84,6 +84,9 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_SETTING_PAP, &CBacnetSetting::OnBnClickedCheckSettingPap)
 	ON_EN_KILLFOCUS(IDC_EDIT_SETTING_PORT, &CBacnetSetting::OnEnKillfocusEditSettingPort)
 	ON_BN_CLICKED(IDC_BUTTON_HEALTH, &CBacnetSetting::OnBnClickedButtonHealth)
+
+	ON_WM_HELPINFO()
+
 END_MESSAGE_MAP()
 
 
@@ -759,7 +762,7 @@ BOOL CBacnetSetting::OnInitDialog()
 	hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_OK), IMAGE_ICON, 24, 24, 0); 
 	((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CHANGED))->SetIcon(hIcon);
 
-
+ 
 	
 	return false;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -1449,4 +1452,43 @@ void CBacnetSetting::OnBnClickedButtonHealth()
 	GetPrivateData_Blocking(g_bac_instance,READ_MISC,0,0,sizeof(Str_MISC));
 	CBacnetSettingHealth Health_Dlg;
 	Health_Dlg.DoModal();
+}
+
+
+//void CBacnetSetting::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
+//{
+//	// TODO: Add your specialized code here and/or call the base class
+//	if (g_protocol==PROTOCOL_BACNET_IP){
+//		HWND hWnd;
+//
+//		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 			
+//			theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+//		else
+//			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
+//			HH_HELP_CONTEXT, IDH_TOPIC_6_10_ALARM_LOG);
+//		return (hWnd != NULL);
+//	}
+//	else{
+//		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+//	}
+//	CDialogEx::HtmlHelp(dwData, nCmd);
+//}
+
+
+BOOL CBacnetSetting::OnHelpInfo(HELPINFO* pHelpInfo)
+{
+	// TODO: Add your message handler code here and/or call default
+	// 	if((m_latest_protocol == PROTOCOL_BACNET_IP) || (m_latest_protocol == MODBUS_BACNET_MSTP) || (g_protocol == PROTOCOL_BIP_TO_MSTP))
+	// 	{
+	HWND hWnd;
+
+	if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
+	else
+		hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_IP_SETTINGS);
+	return (hWnd != NULL);
+	// 	}
+	// 	else{
+	// 		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
+	// 	}
+	return CDialogEx::OnHelpInfo(pHelpInfo);
 }

@@ -1,9 +1,10 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
-MinimumVisualStudioVersion = 10.0.40219.1
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T3000", "T3000\T3000.vcxproj", "{F7226464-C41C-4909-BF74-97328B72FFC8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ECE89A1C-344C-4B1C-B6A7-6266F9BB607A} = {ECE89A1C-344C-4B1C-B6A7-6266F9BB607A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ISP", "ISP\ISP.vcxproj", "{ECE89A1C-344C-4B1C-B6A7-6266F9BB607A}"
 EndProject

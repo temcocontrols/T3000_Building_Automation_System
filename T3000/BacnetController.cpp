@@ -1150,7 +1150,7 @@ BOOL BacnetController::OnHelpInfo(HELPINFO* pHelpInfo)
 			theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		else
 			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
-			HH_HELP_CONTEXT, IDH_TOPIC_PID);
+			HH_HELP_CONTEXT, IDH_TOPIC_6_6_PID_LOOPS);
 		return (hWnd != NULL);
 	}
 	else{

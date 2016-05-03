@@ -2170,6 +2170,17 @@
 #define IDC_RADIO87                     15580
 #define IDC_RADIO88                     15581
 #define IDC_RADIO_NEW200                15581
+#define IDC_RADIO89                     15582
+#define IDC_RADIO90                     15583
+#define IDC_RADIO91                     15584
+#define IDC_RADIO92                     15585
+#define IDC_RADIO93                     15586
+#define IDC_RADIO94                     15587
+#define IDC_RADIO95                     15588
+#define IDC_RADIO96                     15589
+#define IDC_RADIO97                     15590
+#define IDC_RADIO98                     15591
+#define IDC_RADIO99                     15592
 #define ID_TIMEBASE_1HOUR               19485
 #define IDC_STATIC__LOGIN_NAME          32709
 #define IDC_STATIC_LOGIN_PASSWORD       32710

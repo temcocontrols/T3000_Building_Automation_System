@@ -721,9 +721,9 @@ BOOL TFTPServer::StartServer()
                 {
                     has_wait_device_into_bootloader = true;
                     OutPutsStatusInfo(_T(""), FALSE);
-                    for (int i=0; i<10; i++)
+                    for (int i=0; i<7; i++)
                     {
-                        strTips.Format(_T("Wait the device jump to bootloader.(%ds)"),10-i);
+                        strTips.Format(_T("Wait the device jump to bootloader.(%ds)"),7-i);
                         OutPutsStatusInfo(strTips, TRUE);
                         Sleep(1000);
                     }

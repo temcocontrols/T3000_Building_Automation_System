@@ -15,7 +15,7 @@
 extern void copy_data_to_ptrpanel(int Data_type);//Used for copy the structure to the ptrpanel.
 extern int initial_dialog;
 CRect Output_rect;
-static bool show_output_external =  false;
+static int show_output_external =  -1;
 int OUTPUT_LIMITE_ITEM_COUNT = 0;
 
 IMPLEMENT_DYNAMIC(CBacnetOutput, CDialogEx)
@@ -381,7 +381,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		OUTPUT_LIMITE_ITEM_COUNT = BAC_OUTPUT_ITEM_COUNT;
 	}
 
-	bool temp_need_show_external = false;
+	int temp_need_show_external = 0;
 	for (int z= 0 ;z < (int)m_Output_data.size();z++)
 	{
 		if(z>= OUTPUT_LIMITE_ITEM_COUNT)
@@ -389,7 +389,7 @@ LRESULT CBacnetOutput::Fresh_Output_List(WPARAM wParam,LPARAM lParam)
 		if((m_Output_data.at(z).sub_id !=0) &&
 			(m_Output_data.at(z).sub_product !=0))
 		{
-			temp_need_show_external = true;
+			temp_need_show_external = 1;
 			break;
 		}
 
@@ -1470,7 +1470,7 @@ BOOL CBacnetOutput::OnHelpInfo(HELPINFO* pHelpInfo)
 
 		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
 		else
-			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OUTPUTS);
+			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_6_4_OUTPUTS);
 		return (hWnd != NULL);
 // 	}
 // 	else{
