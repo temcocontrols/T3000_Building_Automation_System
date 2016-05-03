@@ -8,23 +8,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Collections; 
-
+using System.Collections;
+using System.Data.SqlClient;
+using System.IO;
+using System.Reflection;
+using System.Data.SQLite;
 
 namespace WFA_psychometric_chart
 {
     public partial class form_app_timer : Form
     {
-        private Form1 form1;
-        public form_app_timer(Form1 form1)
+        private Form1_main form1;
+        public form_app_timer(Form1_main form1)
         {
             this.form1 = form1;
             InitializeComponent();
+          this.Disposed += new System.EventHandler ( this.form_app_timer_Disposed );
         }
 
         int first_enable = 0;
         int second_enable = 0;
         ArrayList new_checked_item_index = new ArrayList();
+
+        int index_selected;//this index is used for pulling location information 
+
         private void form_app_timer_Load(object sender, EventArgs e)
         {
             //btn_from_month_down.Text = char.ConvertFromUtf32(8595);
@@ -37,6 +44,68 @@ namespace WFA_psychometric_chart
             dtp2.MinDate = new DateTime(DateTime.Now.Year, 1, 1);
             dtp1.MaxDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
             dtp2.MaxDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+
+            //this method selects location pulls the location address 
+            PullLocationInformation();
+        }
+
+
+        private void PullLocationInformation()
+        {
+            try
+            {
+                /*This methods pulls the building location information..*/
+                cb1_select_data.Items.Clear();
+                ArrayList stored_location = new ArrayList();
+                //while loading it should populate the field...
+                //lets pull the vales offline values stored in db...
+  //              string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
+                // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+
+//                string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+                //--changing all the database to the sqlite database...
+                string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+
+
+
+                // MessageBox.Show("connection string = " + connString);
+
+
+                SQLiteConnection connection = new SQLiteConnection(connString);
+                connection.Open();
+                SQLiteDataReader reader = null;
+                SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_building_location", connection);
+                //command.Parameters.AddWithValue("@1", userName)
+                reader = comm.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    string selecte_location = reader["id"].ToString() + "," + reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
+                    stored_location.Add(selecte_location);
+                }
+                string s = "";
+                for (int i = 0; i < stored_location.Count; i++)
+                {
+                    cb1_select_data.Items.Add(stored_location[i]);
+                    s += stored_location[i] + " , \n";
+                }
+                // MessageBox.Show("stored place = " + s);
+                comm.Dispose();
+                reader.Dispose();
+                connection.Close();
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -80,7 +149,7 @@ namespace WFA_psychometric_chart
                 if (checkedListBox1.CheckedItems.Count > 0)
                 {
 
-                string t = null;
+                //string t = null;
 
                 
                 //lets check if the hour was changed or not...
@@ -102,12 +171,29 @@ namespace WFA_psychometric_chart
                    
                 //lets do the plotting part here..
 
-                  if (dtp2.Value > dtp1.Value) { 
+                  if (dtp2.Value > dtp1.Value) {
 
-                  string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                  string connString1 = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                  //-----------resetting to newly plotted graph---------//
+                  
+                   form1.plot_new_graph();//this is doen because we need to plot on new graph every time the values are pulled.
+                  //---------------resetting ends here-----------------//
 
-                  using (OleDbConnection connection1 = new OleDbConnection(connString1))
+                //  string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                //  string connString1 = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                //sql connection string is this..
+                //      string connString1 = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+                        //--changing all the database to the sqlite database...
+                        string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                        string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                        string connString1 = @"Data Source=" + databaseFile + ";Version=3;";
+
+
+
+
+
+                        using (SQLiteConnection connection1 = new SQLiteConnection(connString1))
                   {
                       connection1.Open();
 
@@ -115,12 +201,13 @@ namespace WFA_psychometric_chart
 
                       //string sql_query = "Select * from tbl_data_stored_temp_hum_one_year WHERE date_current = " + day_list[i] + " , hour_current = " + hour_al[h] + " AND station_name = "+ station_name +" ; ";
                       //lets pass this string to a query which does the pulling part.
-                      OleDbDataReader reader1 = null;
-                      OleDbCommand command1 = new OleDbCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second", connection1);
-                      command1.Parameters.AddWithValue("@date_first", dtp1.Value);
-                      command1.Parameters.AddWithValue("@date_second", dtp2.Value);
-                      //command1.Parameters.AddWithValue("@station_name", station_name);
-                      reader1 = command1.ExecuteReader();
+                      SQLiteDataReader reader1 = null;
+                            SQLiteCommand command1 = new SQLiteCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second AND ID=@id_value", connection1);
+                            command1.Parameters.AddWithValue("@date_first", dtp1.Value);
+                            command1.Parameters.AddWithValue("@date_second", dtp2.Value);
+                            command1.Parameters.AddWithValue("@id_value", index_selected);
+                            //command1.Parameters.AddWithValue("@station_name", station_name);
+                            reader1 = command1.ExecuteReader();
                       while (reader1.Read())
                       {
                           //station_name = reader["station_name"].ToString();
@@ -165,7 +252,7 @@ namespace WFA_psychometric_chart
                           test += temp_hist_temp_hum_list[i].temp + " , hum=  " + temp_hist_temp_hum_list[i].hum + ",date=" + temp_hist_temp_hum_list[i].date + ",hour=" + temp_hist_temp_hum_list[i].hour + "\n";
 
                       }
-                      MessageBox.Show("after filtering the values of hour = \n" + test);
+                      MessageBox.Show(WFA_psychometric_chart.Properties.Resources.after_filtering_the_values_of_ + test);
                     //now lets plot it in the graph
                       for (int x = 0; x < temp_hist_temp_hum_list.Count; x++)
                       {
@@ -183,7 +270,7 @@ namespace WFA_psychometric_chart
                   }//close of comparision if
                   else
                   {
-                      MessageBox.Show("Please enter a valid dates,Date chosen in 'From' section should be smaller than that in 'To' section");
+                      MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_enter_a_valid_dates_Dat);
                   }
                 
                   
@@ -191,7 +278,7 @@ namespace WFA_psychometric_chart
                 }//close of if checkedItem>0
                 else
                 {
-                    MessageBox.Show("Please Select one or more hours first");
+                    MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_Select_one_or_more_hour);
                 }
 
             }//close of if
@@ -252,8 +339,24 @@ namespace WFA_psychometric_chart
             }
         }//close of flb.selecteditem
 
+        private void cb1_select_data_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //on change index it will select the index value or better known as selected index.
+            try
+            {
+                index_selected = cb1_select_data.SelectedIndex + 1; //is used to identify the location and data associated with it.
+                gb_select_time_and_date.Enabled = true;
 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
+        }
 
+      public void form_app_timer_Disposed ( object sender, System.EventArgs e )
+      {
+      }
     }
 }

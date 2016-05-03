@@ -529,36 +529,36 @@ void COutPutDlg::put_fan_variable()
 	{
 		p[1]=_T("Fan On");  
 	}
-	p[2]= GetTextFromReg(741);
+	p[2]= GetTextFromReg(745);
 
 	if (p[2].IsEmpty())
 	{
 		p[2]=_T("Fan Low");  
 	}
-	p[3]= GetTextFromReg(745);
+	p[3]= GetTextFromReg(749);
 
 	if (p[3].IsEmpty())
 	{
 		p[3]=_T("Fan Mid");  
 	}
-	p[4]= GetTextFromReg(749);
+	p[4]= GetTextFromReg(753);
 	if (p[4].IsEmpty())
 	{
 		p[4]=_T("Fan High");  
 	}
-	p[5]= GetTextFromReg(753);
+	p[5]= GetTextFromReg(757);
 
 	if (p[5].IsEmpty())
 	{
 		p[5]=_T("Fan Aut");  
 	}
-	p[6]= GetTextFromReg(757);
+	p[6]= GetTextFromReg(761);
 
 	if (p[6].IsEmpty())
 	{
 		p[6]=_T("Heat Only");  
 	}
-	p[7]= GetTextFromReg(761);
+	p[7]= GetTextFromReg(765);
 	if (p[7].IsEmpty())
 	{
 		p[7]=_T("Cool Only");  
@@ -573,13 +573,46 @@ void COutPutDlg::put_fan_variable()
 	{
 		strdemo = _T("1-4-0-1,");
 		SetPaneString(2,strdemo);
+		CString p[5]={_T("Fan Off"),_T("Fan Low"),_T("Fan Mid"),_T("Fan High"),_T("Fan Aut")};
+
+		p[0]= GetTextFromReg(737);
+
+		if (p[0].IsEmpty())
+		{
+			p[0]=_T("Fan Off");  
+		}
+		p[1]= GetTextFromReg(741);
+
+		if (p[1].IsEmpty())
+		{
+			p[1]=_T("Fan On");  
+		}
+		p[2]= GetTextFromReg(745);
+
+		if (p[2].IsEmpty())
+		{
+			p[2]=_T("Fan Low");  
+		}
+		p[3]= GetTextFromReg(749);
+
+		if (p[3].IsEmpty())
+		{
+			p[3]=_T("Fan Mid");  
+		}
+		p[4]= GetTextFromReg(753);
+		if (p[4].IsEmpty())
+		{
+			p[4]=_T("Fan High");  
+		}
+		 
+		m_fan.ResetContent();
 		//if(read_one(g_tstat_id,107)==1)////here can't use  function
 		if(product_register_value[107] == 1)////here can't use  function  如果去读，常会死在这里。
 		{
 			strdemo = _T("1-4-1,");
 			SetPaneString(2,strdemo);
 			m_fan.AddString(p[0]);
-			m_fan.AddString(p[5]);	
+			m_fan.AddString(p[4]);	
  
 			m_fan_mode_ctrl.EnableWindow(FALSE);
             
@@ -601,7 +634,7 @@ void COutPutDlg::put_fan_variable()
             switch(product_register_value[MODBUS_FAN_MODE]-1)		//122   105     m_fan.AddString(p[6]);m_fan.AddString(p[7] );
             {
             case 0:{
-            m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[5]);
+            m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[4]);
             GetDlgItem(IDC_STATIC_FAN_ON)->ShowWindow(SW_SHOW);
             GetDlgItem(IDC_EDIT_FAN_ON_NAME)->ShowWindow(SW_SHOW);
             GetDlgItem(IDC_STATIC_FAN_LOW)->ShowWindow(SW_HIDE);
@@ -610,7 +643,7 @@ void COutPutDlg::put_fan_variable()
             GetDlgItem(IDC_EDIT_FAN_MID_NAME)->ShowWindow(SW_HIDE);
             }break;
             case 1:{
-            m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);
+            m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[2]);m_fan.AddString(p[4]);
             GetDlgItem(IDC_STATIC_FAN_ON)->ShowWindow(SW_SHOW);
             GetDlgItem(IDC_EDIT_FAN_ON_NAME)->ShowWindow(SW_SHOW);
             GetDlgItem(IDC_STATIC_FAN_LOW)->ShowWindow(SW_SHOW);
@@ -618,7 +651,7 @@ void COutPutDlg::put_fan_variable()
             GetDlgItem(IDC_STATIC_MID)->ShowWindow(SW_HIDE);
             GetDlgItem(IDC_EDIT_FAN_MID_NAME)->ShowWindow(SW_HIDE);
             }break;
-            case 2:{m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);
+            case 2:{m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);
                 GetDlgItem(IDC_STATIC_FAN_ON)->ShowWindow(SW_SHOW);
                 GetDlgItem(IDC_EDIT_FAN_ON_NAME)->ShowWindow(SW_SHOW);
                 GetDlgItem(IDC_STATIC_FAN_LOW)->ShowWindow(SW_SHOW);
@@ -626,7 +659,7 @@ void COutPutDlg::put_fan_variable()
                 GetDlgItem(IDC_STATIC_MID)->ShowWindow(SW_SHOW);
                 GetDlgItem(IDC_EDIT_FAN_MID_NAME)->ShowWindow(SW_SHOW);
             }break;
-            default:{m_fan.AddString(p[0]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);m_fan.AddString(p[5]);
+            default:{m_fan.AddString(p[0]);m_fan.AddString(p[1]);m_fan.AddString(p[2]);m_fan.AddString(p[3]);m_fan.AddString(p[4]);
                 GetDlgItem(IDC_STATIC_FAN_ON)->ShowWindow(SW_SHOW);
                 GetDlgItem(IDC_EDIT_FAN_ON_NAME)->ShowWindow(SW_SHOW);
                 GetDlgItem(IDC_STATIC_FAN_LOW)->ShowWindow(SW_SHOW);
@@ -699,7 +732,7 @@ int COutPutDlg::get_real_fan_select()
         switch(fan_mode_i)
         {
         case 0:if(fan_i==0)fan_i= 0;else if(fan_i==1)fan_i= 1;else if(fan_i==2)fan_i= 4;else if(fan_i==3)fan_i= 5;else if(fan_i==4)fan_i= 6;break;
-        case 1:if(fan_i==0)fan_i= 0;else if(fan_i==1)fan_i= 1;else if(fan_i==2)fan_i= 3;else if(fan_i==3)fan_i= 4;else if(fan_i==4)fan_i= 5;else if(fan_i==5)fan_i= 6;break;
+        case 1:if(fan_i==0)fan_i= 0;else if(fan_i==1)fan_i= 1;else if(fan_i==2)fan_i= 2;else if(fan_i==3)fan_i= 4;else if(fan_i==4)fan_i= 5;else if(fan_i==5)fan_i= 6;break;
         case 2:if(fan_i==0)fan_i= 0;else if(fan_i==1)fan_i= 1;else if(fan_i==2)fan_i= 2;else if(fan_i==3)fan_i= 3;else if(fan_i==4)fan_i= 4;else if(fan_i==5)fan_i= 5;else if(fan_i==6)fan_i= 6;break;
         default:if(fan_i==0)fan_i= 0;else if(fan_i==1)fan_i= 1;else if(fan_i==2)fan_i= 2;else if(fan_i==3)fan_i= 3;else if(fan_i==4)fan_i= 4;else if(fan_i==5)fan_i= 5;else if(fan_i==6)fan_i= 6;break;	
         }
@@ -768,7 +801,7 @@ void COutPutDlg::OnCbnSelchangeCbfan()
 
             product_register_value[MODBUS_FAN_SPEED]=g_ifanStatus;
         } 
-	FreshGrids();
+	   FreshGrids();
 }
 
 void COutPutDlg::OnEnKillfocusPid1Heatstageedit()

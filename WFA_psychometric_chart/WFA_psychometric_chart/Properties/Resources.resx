@@ -117,8 +117,202 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="_10" xml:space="preserve">
+    <value>10</value>
+  </data>
+  <data name="_25" xml:space="preserve">
+    <value>25</value>
+  </data>
+  <data name="_40" xml:space="preserve">
+    <value>40</value>
+  </data>
+  <data name="_50" xml:space="preserve">
+    <value>50</value>
+  </data>
+  <data name="_75" xml:space="preserve">
+    <value>75</value>
+  </data>
+  <data name="_Internet_Connection_Available" xml:space="preserve">
+    <value>                Internet Connection Available</value>
+  </data>
+  <data name="_Internet_Connection_Lost" xml:space="preserve">
+    <value>                Internet Connection Lost:</value>
+  </data>
+  <data name="_Your_chart_image_will_be_save" xml:space="preserve">
+    <value> Your chart image will be saved as </value>
+  </data>
+  <data name="after_filtering_the_values_of_" xml:space="preserve">
+    <value>after filtering the values of hour = 
+</value>
+  </data>
+  <data name="Building_Information" xml:space="preserve">
+    <value>Building Information</value>
+  </data>
+  <data name="Building_Information0" xml:space="preserve">
+    <value>Building Information :,</value>
+  </data>
+  <data name="Chose_a_path_and_file_name" xml:space="preserve">
+    <value>Chose a path and file name</value>
+  </data>
+  <data name="country_state_city_street_zip_" xml:space="preserve">
+    <value>country,state,city,street,zip,longitude,latitude,elecation,</value>
+  </data>
+  <data name="date_hour_minute_temperature_h" xml:space="preserve">
+    <value>date,hour,minute,temperature,humidity,</value>
+  </data>
+  <data name="Enter_a_valid_refrence_humidit" xml:space="preserve">
+    <value>Enter a valid refrence humidity value in %</value>
+  </data>
+  <data name="Enter_a_valid_refrence_tempera" xml:space="preserve">
+    <value>Enter a valid refrence temperature value in degree celcius</value>
+  </data>
+  <data name="Enter_a_valid_temperature_valu" xml:space="preserve">
+    <value>Enter a valid temperature value in the input boxex in degree celcius</value>
+  </data>
+  <data name="Enter_city_name" xml:space="preserve">
+    <value>Enter city name!</value>
+  </data>
+  <data name="Enter_country_name" xml:space="preserve">
+    <value>Enter country name!</value>
+  </data>
+  <data name="enter_ZIP_number" xml:space="preserve">
+    <value>enter ZIP number</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Error_Detected" xml:space="preserve">
+    <value>Error Detected               </value>
+  </data>
+  <data name="Error_Ended" xml:space="preserve">
+    <value>Error Ended               </value>
+  </data>
+  <data name="error0" xml:space="preserve">
+    <value>error</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="Historical_Data" xml:space="preserve">
+    <value>Historical Data,</value>
+  </data>
+  <data name="Humidity_in" xml:space="preserve">
+    <value>Humidity(in %)</value>
+  </data>
+  <data name="In_this_section_you_select_the" xml:space="preserve">
+    <value>In this section you select the maximum adjustment factor per day.If the value is deviated you could set the value of max adjustment factore as 0.01 and it will adjust your humidity as  per the 0.01% value. The total current offset is used to show by how much percent the value is updated every day and the total changed from last set.</value>
+  </data>
+  <data name="location_distance_from_buildin" xml:space="preserve">
+    <value>location,distance from building,last update date,temperature,humidity,bar pressure,wind,direction,station name,</value>
+  </data>
+  <data name="No_data_found_in_database" xml:space="preserve">
+    <value>No data found in database !</value>
+  </data>
+  <data name="Please_enter_a_valid_adjustmen" xml:space="preserve">
+    <value>Please enter a valid adjustment number eg. 1% would be 0.01</value>
+  </data>
+  <data name="Please_enter_a_valid_dates_Dat" xml:space="preserve">
+    <value>Please enter a valid dates,Date chosen in 'From' section should be smaller than that in 'To' section</value>
+  </data>
+  <data name="Please_enter_a_valid_number" xml:space="preserve">
+    <value>Please enter a valid number : </value>
+  </data>
+  <data name="Please_enter_a_valid_zip_numbe" xml:space="preserve">
+    <value>Please enter a valid zip number</value>
+  </data>
+  <data name="Please_enter_a_value_for_adjus" xml:space="preserve">
+    <value>Please enter a value for adjustment factor</value>
+  </data>
+  <data name="Please_enter_value_between_0_1" xml:space="preserve">
+    <value>Please enter value between 0-1%</value>
+  </data>
+  <data name="Please_get_and_set_the_current" xml:space="preserve">
+    <value>Please get and set the current weather data</value>
+  </data>
+  <data name="Please_have_a_proper_value_sel" xml:space="preserve">
+    <value>Please have a proper value selected from sensor 
+ Perform get value for humidity from sensor</value>
+  </data>
+  <data name="Please_perform_the_follwing_st" xml:space="preserve">
+    <value>Please perform the follwing step first.
+ 1.select a location 
+ 2.pull stored building data 
+ 3. get geo value(we need geo value)</value>
+  </data>
+  <data name="Please_pull_the_current_weathe" xml:space="preserve">
+    <value>Please pull the current weather value first</value>
+  </data>
+  <data name="Please_select_a_location_first" xml:space="preserve">
+    <value>Please select a location first !</value>
+  </data>
+  <data name="Please_select_a_proper_region_" xml:space="preserve">
+    <value>Please select a proper region in the chart</value>
+  </data>
+  <data name="please_select_a_station_first" xml:space="preserve">
+    <value>please select a station first.</value>
+  </data>
+  <data name="Please_select_a_station_first_" xml:space="preserve">
+    <value>Please select a station first to pull data.</value>
+  </data>
+  <data name="Please_select_a_valid_date_To_" xml:space="preserve">
+    <value>Please select a valid date (To&gt;From)</value>
+  </data>
+  <data name="Please_select_correct_date_for" xml:space="preserve">
+    <value>Please select correct date format[From&lt;To]</value>
+  </data>
+  <data name="Please_Select_one_or_more_hour" xml:space="preserve">
+    <value>Please Select one or more hours first</value>
+  </data>
+  <data name="Please_set_the_value_from_sens" xml:space="preserve">
+    <value>Please set the value from sensor</value>
+  </data>
+  <data name="pulling" xml:space="preserve">
+    <value>pulling...</value>
+  </data>
+  <data name="Right_click_to_insert_a_new_no" xml:space="preserve">
+    <value>Right click to insert a new node. single click to select the items you want to move and hover over where you want to put it and click again it will fix there. If you want to make x-axis constant wile moving the node move the node by constantly clicking the Alt key.If you want to make y-axis constant while moving keep pressing the Shift key and move. You can insert different color nodes based on the color selected.</value>
+  </data>
+  <data name="Save_Excel_file_to" xml:space="preserve">
+    <value>Save Excel file to</value>
+  </data>
+  <data name="Select_language" xml:space="preserve">
+    <value>Select language</value>
+  </data>
+  <data name="Station_Information" xml:space="preserve">
+    <value>Station Information :</value>
+  </data>
+  <data name="Status_Updating_data" xml:space="preserve">
+    <value>Status : Updating data...</value>
+  </data>
+  <data name="success" xml:space="preserve">
+    <value>success</value>
+  </data>
+  <data name="Success_final" xml:space="preserve">
+    <value>Success final !</value>
+  </data>
+  <data name="Success0" xml:space="preserve">
+    <value>Success !</value>
+  </data>
+  <data name="The_language_change_will_take_" xml:space="preserve">
+    <value>The language change will take full effect the next time you start the program.</value>
+  </data>
+  <data name="The_settings_have_been_saved" xml:space="preserve">
+    <value>The settings have been saved.
+</value>
+  </data>
+  <data name="Time_Status_Time_Error_Status" xml:space="preserve">
+    <value>Time Status                  Time                            Error Status</value>
+  </data>
+  <data name="value_inserted_successfully" xml:space="preserve">
+    <value>value inserted successfully!</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Your_file_will_be_saved_as" xml:space="preserve">
+    <value>Your file will be saved as </value>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
- 
   <data name="d_arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\d_arrow.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

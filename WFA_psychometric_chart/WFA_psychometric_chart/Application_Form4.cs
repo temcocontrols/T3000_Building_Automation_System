@@ -13,12 +13,13 @@ namespace WFA_psychometric_chart
 {
     public partial class Application_Form4 : Form
     {
-        private Form1 form1;
-        public Application_Form4(Form1 form1)
+        private Form1_main form1;
+        public Application_Form4(Form1_main form1)
             //:this()
         {
             this.form1 = form1;//defined in top..
             InitializeComponent();
+          this.Disposed += new System.EventHandler ( this.Application_Form4_Disposed );
         }
 
         //public void ShowDialog(ref Chart chart1)
@@ -61,21 +62,21 @@ namespace WFA_psychometric_chart
              */
             if (tb_ref_temp_ten.Text == "" || tb_ref_temp_twentyfive.Text =="" || tb_ref_temp_fourty.Text=="")
             {
-                MessageBox.Show("Enter a valid refrence temperature value in degree celcius");
+                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Enter_a_valid_refrence_tempera);
             }
             else
             {
                 //do some operation.
                 if (tb_ref_hum_twentyfive.Text == "" || tb_ref_hum_fifty.Text == "" || tb_ref_hum_seventyfive.Text == "")
                 {
-                    MessageBox.Show("Enter a valid refrence humidity value in %");
+                    MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Enter_a_valid_refrence_humidit);
                 }
                 else
                 {
                     //do something...
                     //check for input boxex.
                     if(tb_one.Text=="" || tb_two.Text=="" ||tb_three.Text==""||tb_four.Text==""||tb_five.Text==""||tb_six.Text==""||tb_seven.Text==""||tb_eight.Text==""||tb_nine.Text==""){
-                    MessageBox.Show("Enter a valid temperature value in the input boxex in degree celcius");
+                    MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Enter_a_valid_temperature_valu);
                       } else{
                     //do something...
                           try
@@ -144,20 +145,20 @@ namespace WFA_psychometric_chart
              
             }
 
-            MessageBox.Show("success");
+            MessageBox.Show(WFA_psychometric_chart.Properties.Resources.success);
 
         }
 
         private void Application_Form4_Load(object sender, EventArgs e)
         {
             //lets set the default value first..
-            tb_ref_temp_ten.Text = "10".ToString();
-            tb_ref_temp_twentyfive.Text = "25".ToString();
-            tb_ref_temp_fourty.Text = "40".ToString();
-            tb_ref_hum_twentyfive.Text = "25".ToString();
-            tb_ref_hum_fifty.Text = "50".ToString();
-            tb_ref_hum_seventyfive.Text = "75".ToString();
-            label2.Text = "Humidity(in %)" + char.ConvertFromUtf32(8595);
+            tb_ref_temp_ten.Text = WFA_psychometric_chart.Properties.Resources._10.ToString();
+            tb_ref_temp_twentyfive.Text = WFA_psychometric_chart.Properties.Resources._25.ToString();
+            tb_ref_temp_fourty.Text = WFA_psychometric_chart.Properties.Resources._40.ToString();
+            tb_ref_hum_twentyfive.Text = WFA_psychometric_chart.Properties.Resources._25.ToString();
+            tb_ref_hum_fifty.Text = WFA_psychometric_chart.Properties.Resources._50.ToString();
+            tb_ref_hum_seventyfive.Text = WFA_psychometric_chart.Properties.Resources._75.ToString();
+            label2.Text = WFA_psychometric_chart.Properties.Resources.Humidity_in + char.ConvertFromUtf32(8595);
 
         }
 
@@ -174,6 +175,12 @@ namespace WFA_psychometric_chart
 
 
 
+
+      public void Application_Form4_Disposed ( object sender, System.EventArgs e )
+      {
+      }
+
+      
     }//close of application_Form4 class
 
     

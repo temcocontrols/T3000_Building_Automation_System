@@ -12,7 +12,9 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using System.IO;
-
+using System.Data.SqlClient;
+using System.Reflection;
+using System.Data.SQLite;
 
 namespace WFA_psychometric_chart
 {
@@ -23,22 +25,23 @@ namespace WFA_psychometric_chart
         {
             this.form3 = form3;
             InitializeComponent();
+          this.Disposed += new System.EventHandler ( this.Form4_insert_data_Disposed );
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             if (tb_country.Text == "")
             {
-                MessageBox.Show("Enter country name!");
+                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Enter_country_name);
 
             }
             else if (tb_city.Text == "")
             {
-                MessageBox.Show("Enter city name!");
+                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Enter_city_name);
             }
             else if (tb_ZIP.Text == "")
             {
-                MessageBox.Show("enter ZIP number");
+                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.enter_ZIP_number);
 
             }
             else
@@ -56,15 +59,26 @@ namespace WFA_psychometric_chart
                 try
                 {
                      //lets pull the vales offline values stored in db...
-                    string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                   // string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                     //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";                
-                    string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-                    using (OleDbConnection connection = new OleDbConnection(connString))
+                    //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                 //   string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+                    //--changing all the database to the sqlite database...
+                    string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                    string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+
+
+                    using (SQLiteConnection connection = new SQLiteConnection(connString))
                     {
+
                         connection.Open();
                         //string sql_string = "update tbl_building_location set   country=@country_value,state=@state_value,city=@city_value,street=@street_value,ZIP=@zip_value where ID = 1;";
                         string sql_query = "INSERT INTO tbl_building_location(country,state,city,street,zip,longitude,latitude,elevation) VALUES(@country_value,@state_value,@city_value,@street_value,@zip_value,@long_value,@lat_value,@elevation_value)";
-                        OleDbCommand command = new OleDbCommand(sql_query, connection);
+                         SQLiteCommand command = new SQLiteCommand(sql_query, connection);
                         command.CommandType = CommandType.Text;
                         command.Parameters.AddWithValue("@country_value", country);
                         command.Parameters.AddWithValue("@state_value", state);
@@ -77,7 +91,7 @@ namespace WFA_psychometric_chart
 
                         command.ExecuteNonQuery();
                         //MessageBox.Show("sql string = " + sql_string);
-                        MessageBox.Show("value inserted successfully!");
+                        MessageBox.Show(WFA_psychometric_chart.Properties.Resources.value_inserted_successfully);
                         btn_insert_data.Enabled = false;
                         tb_country.Text = "";
                         tb_city.Text = "";
@@ -215,7 +229,7 @@ namespace WFA_psychometric_chart
             }//close of if int try parse.
             else
             {
-                MessageBox.Show("Please enter a valid zip number");
+                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_enter_a_valid_zip_numbe);
             }
 
         }
@@ -224,16 +238,79 @@ namespace WFA_psychometric_chart
         private void button3_Click(object sender, EventArgs e)
         {
             //this is where online elevation and other facotrs are pulled..
-            pull_data_online();            
+            //pull_data_online();            
             
 
         }
 
+        private void tb_country_text_change_event(object sender, EventArgs e)
+        {
+            string a = tb_country.Text;
+
+            if(a.Length<0){
+                //if the length is < 2 do nothing 
+
+            }
+            else if(a.Length>=0 && a.Length <= 2){
+                  tb_state.Enabled = false;
+                tb_city.Enabled = false;
+            }
+            else {
+                //otherwise activate other textbox..
+
+                tb_state.Enabled = true;
+                tb_city.Enabled = true;
+
+
+            }
+            
+
+
+
+        }
+
+        private void tb_city_text_change_event(object sender, EventArgs e)
+        {
+            string a = tb_city.Text;
+
+            if (a.Length < 0)
+            {
+                //if the length is < 2 do nothing 
+
+            }
+            else if (a.Length >= 0 && a.Length <= 2)
+            {
+                tb_street.Enabled = false;
+                tb_ZIP.Enabled = false;
+            }
+            else
+            {
+                //otherwise activate other textbox..
+
+                tb_street.Enabled = true;
+                tb_ZIP.Enabled = true;
+
+
+            }
+
+
+
+
+        }
+
+        private void tb_zip_textChange_event(object sender, EventArgs e)
+        {
+            //here we actually call the pulling function..
+            pull_data_online(); 
+
+
+
+        }
+
        
-  
 
-        
-
-     
+      public void Form4_insert_data_Disposed ( object sender, System.EventArgs e )
+      {
+      }
     }
 }
