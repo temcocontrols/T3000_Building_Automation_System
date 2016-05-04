@@ -44,6 +44,6 @@ maurice (at) temcocontrols (dot) com
 
 ![T3000_screen_capture_13](http://www.4shared.com/download/kDjeOQpR/13_online.bmp)      
 
-Check out our website for support on this project and also great prices on sensors & buiding automation products. 
+Check out our website for support on this project and also great prices on sensors & building automation products. 
 www.temcocontrols.com
 
