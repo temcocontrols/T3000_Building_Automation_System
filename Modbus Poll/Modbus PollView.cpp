@@ -292,7 +292,7 @@ void CModbusPollView::Fresh_Data(){
 		-4:time out error
 		-5:crc error
 		*/
-		SetPaneString(1,g_StrConnection);
+		//SetPaneString(1,g_StrConnection);
 	if (!g_online)
 	{
 		m_connectionState.SetWindowText(L"NO CONNECTION");
