@@ -13,7 +13,7 @@ General Manager
 [Temco Controls](http://www.temcocontrols.com/)    
 maurice (at) temcocontrols (dot) com
 
-[T3000_Building_Automation_System Screen Capture_1](http://is200.imagesocket.com/images/2013/05/22/2613961-tt4c.jpg)
+[T3000_Building_Automation_System Screen Capture_1](https://github.com/temcocontrols/T3000_Building_Automation_System/blob/master/image/T3000%20network_800.jpg)
 
 
 [T3000_Building_Automation_System Screen Capture_Tstat](http://is200.imagesocket.com/images/2013/05/22/2613968-bkdu.jpg)
