@@ -13,18 +13,10 @@ General Manager
 [Temco Controls](http://www.temcocontrols.com/)    
 maurice (at) temcocontrols (dot) com
 
-[T3000_Building_Automation_System Screen Capture_1](https://github.com/temcocontrols/T3000_Building_Automation_System/blob/master/image/T3000%20network_800.jpg)
+![T3000](https://github.com/temcocontrols/T3000_Building_Automation_System/blob/master/image/T3000%20network_800.jpg)
 
 
-[T3000_Building_Automation_System Screen Capture_Tstat](http://is200.imagesocket.com/images/2013/05/22/2613968-bkdu.jpg)
-
-
-[T3000_Building_Automation_System Screen Capture_Tstat_Parameter](http://is100.imagesocket.com/images/2013/05/22/2613976-ddhj.jpg)
-
-
-[T3000_Building_Automation_System Screen Capture_NC](http://is200.imagesocket.com/images/2013/05/22/2613977-u9dw.jpg)
-
-![T3000_screen_capture_1](http://www.4shared.com/download/2HDba9or/1_online.bmp)     
+![T3000_screen_capture_1](https://github.com/temcocontrols/T3000_Building_Automation_System/blob/master/image/T3000%20network_800.jpg)     
 
 ![T3000_screen_capture_2](http://www.4shared.com/download/NF9J9Kxq/2_online.bmp)     
 
