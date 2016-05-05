@@ -10,6 +10,12 @@
 #include <windows.h>
 #include <io.h>
 #include "FileOperations.h"
+#include "BuildingConfigEditDlg.h"
+#include "SqliteLib/CppSQLite3.h"
+#include "globle_function.h"
+
+#include <ctime>
+#include <iostream>
 using namespace std;
 // CBuildingConfigration dialog
 #define WM_FRESH_DB  WM_USER + 1014
@@ -29,6 +35,8 @@ CBuildingConfigration::CBuildingConfigration(CWnd* pParent /*=NULL*/)
     : CDialogEx(CBuildingConfigration::IDD, pParent)
 {
     m_bChanged=FALSE;
+	CString temp = GetExePath(true) + L"db_psychrometric_project.s3db";
+	strcpy(m_sqlitepath,(CStringA)temp);
 }
 
 CBuildingConfigration::~CBuildingConfigration()
@@ -54,6 +62,7 @@ BEGIN_MESSAGE_MAP(CBuildingConfigration, CDialogEx)
     ON_COMMAND(ID_BUILDINGCONFIG_UNSELECT, &CBuildingConfigration::OnBuildingconfigUnselect)
     ON_COMMAND(ID_BUILDINGCONFIG_DELETE, &CBuildingConfigration::OnBuildingconfigDelete)
     ON_BN_CLICKED(IDOK, &CBuildingConfigration::OnBnClickedOk)
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST_BUILDING_CONFIG, &CBuildingConfigration::OnNMDblclkListBuildingConfig)
 END_MESSAGE_MAP()
 
 
@@ -756,12 +765,17 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
     CADO ado;
     int Changed_Item = (int)wParam;
     int Changed_SubItem = (int)lParam;
+	int sqlID;
     m_changedRow=Changed_Item;
     m_changedCol=Changed_SubItem;
     CString strTips;
     CString cs_temp = m_building_config_list.GetItemText(Changed_Item,Changed_SubItem);
     CString dbpath = m_building_config_list.GetItemText(Changed_Item,BC_BUILDINGPATH);
-
+	if (m_changedRow<m_BuildNameLst.size())
+	{
+	   sqlID = m_BuildNameLst.at(m_changedRow).ID;
+	}
+	 
     Building_Config BCTemp;
     BOOL Is_The_Same=TRUE;
     if (cs_temp.IsEmpty())
@@ -872,6 +886,21 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                 }
                 ado.CloseConn();
 
+
+				CppSQLite3DB SqliteDB;
+				SqliteDB.open(m_sqlitepath);
+
+				CString SqlTemp;
+				SqlTemp.Format(_T("Update tbl_building_location set BuildingName = '%s' Where ID = %d "),cs_temp,sqlID);
+				
+				char charqltext[256];
+				 
+				strcpy( charqltext, (CStringA)SqlTemp);
+				SqliteDB.execDML(charqltext);
+
+				 SqliteDB.close();
+			
+				
             }
             catch(_com_error *e)
             {
@@ -1007,6 +1036,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 #if 1
             try
             {
+				 
                 CADO ado;
                 ado.OnInitADOConn();
                 CString sql;
@@ -1043,6 +1073,7 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                                    BCTemp.IP_Port,
                                    BCTemp.BaudRate);
                         ado.m_pConnection->Execute(sql.GetString(),NULL,adCmdText);
+
                     }
                     else
                     {
@@ -1062,6 +1093,32 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 
                 }
                 ado.CloseConn();
+
+				ado.OnInitADOConn();
+				sql.Format(_T("Select * from Building where Building_Path='%s'"),BCTemp.BuildingPath);
+				ado.m_pRecordset=ado.OpenRecordset(sql);
+				if (!ado.m_pRecordset->EndOfFile)
+				{
+				  sqlID = ado.m_pRecordset->GetCollect("ID");
+				}
+				ado.CloseRecordset();
+				ado.CloseConn();
+
+				CppSQLite3DB SqliteDB;
+				SqliteDB.open(m_sqlitepath);
+
+				CString SqlTemp;
+				SqlTemp.Format(_T("insert into tbl_building_location(ID,BuildingName) Values(%d,'%s') "),sqlID,BCTemp.MainBuildingName);
+
+				char charqltext[256];
+				 
+				strcpy( charqltext, (CStringA)SqlTemp);
+				SqliteDB.execDML(charqltext);
+				SqliteDB.close();
+				 
+			 
+				BCTemp.ID = sqlID;
+
                 m_BuildNameLst.push_back(BCTemp);
                 /*	 int last_new_item = (int)m_BuildNameLst.size();
                 	 CString temp_cs;
@@ -1308,6 +1365,7 @@ void CBuildingConfigration::LoadBuildingConfigDB()
     CString str_temp;
     str_temp.Empty();
 
+	int id =1;
     _variant_t temp_variant;
     while(VARIANT_FALSE==m_building_pRs->EndOfFile)
     {
@@ -1324,11 +1382,23 @@ void CBuildingConfigration::LoadBuildingConfigDB()
         }
         _variant_t temp_variant;
 
+		
+
+
         temp_variant=m_building_pRs->GetCollect("Main_BuildingName");//
         if(temp_variant.vt!=VT_NULL)
             temp_building.MainBuildingName=temp_variant;
         else
             temp_building.MainBuildingName.Empty();
+
+		if (!temp_building.MainBuildingName.IsEmpty())
+		{
+			temp_variant=m_building_pRs->GetCollect("ID");//
+			if(temp_variant.vt!=VT_NULL)
+				temp_building.ID=temp_variant;
+			else
+				temp_building.ID=-1;
+		}
 
         temp_variant=m_building_pRs->GetCollect("Building_Name");//
         if(temp_variant.vt!=VT_NULL)
@@ -1380,6 +1450,43 @@ void CBuildingConfigration::LoadBuildingConfigDB()
         int index=temp_building.BuildingPath.Find(_T("Database"));
         temp_building.BuildingPath.Delete(0,index);
 
+
+		temp_variant=m_building_pRs->GetCollect("country");//
+		if(temp_variant.vt!=VT_NULL)
+			temp_building.country=temp_variant;
+		else
+			temp_building.country.Empty();
+
+		temp_variant=m_building_pRs->GetCollect("state");//
+		if(temp_variant.vt!=VT_NULL)
+			temp_building.state=temp_variant;
+		else
+			temp_building.state.Empty();
+
+		temp_variant=m_building_pRs->GetCollect("city");//
+		if(temp_variant.vt!=VT_NULL)
+			temp_building.city=temp_variant;
+		else
+			temp_building.city.Empty();
+
+
+		temp_variant=m_building_pRs->GetCollect("street");//
+		if(temp_variant.vt!=VT_NULL)
+			temp_building.street=temp_variant;
+		else
+			temp_building.street.Empty();
+
+		temp_variant=m_building_pRs->GetCollect("ZIP");//
+		if(temp_variant.vt!=VT_NULL)
+			temp_building.Zip=temp_variant;
+		else
+			temp_building.Zip=0;
+
+	 
+
+	 
+
+		 
         m_BuildNameLst.push_back(temp_building);
 
         m_building_pRs->MoveNext();//
@@ -1652,18 +1759,18 @@ void CBuildingConfigration::OnNMClickListBuildingConfig(NMHDR *pNMHDR, LRESULT *
     CString Building_Name=L"";
     CString DB_Building_Name=L"";
 
-    if (BC_ITEM==lCol)
-    {
-        m_changedCol=m_curCol;
-        m_changedRow=m_curRow;
-        CMenu menu;
-        menu.LoadMenu(IDR_BUILDING_CONFIG);
-        CMenu *pmenu=menu.GetSubMenu(0);
-        CPoint point;
-        GetCursorPos(&point);
-        pmenu->TrackPopupMenu(TPM_LEFTBUTTON | TPM_LEFTALIGN ,point.x,point.y,this);
-    }
-    else if (BC_BUILDINGPATH==lCol)//当点击选择一个数据库的时候，把Building的名字已经数据库的信息都获取过来
+    //if (BC_ITEM==lCol)
+    //{
+    //    m_changedCol=m_curCol;
+    //    m_changedRow=m_curRow;
+    //    CMenu menu;
+    //    menu.LoadMenu(IDR_BUILDING_CONFIG);
+    //    CMenu *pmenu=menu.GetSubMenu(0);
+    //    CPoint point;
+    //    GetCursorPos(&point);
+    //    pmenu->TrackPopupMenu(TPM_LEFTBUTTON | TPM_LEFTALIGN ,point.x,point.y,this);
+    //}
+     if (BC_BUILDINGPATH==lCol)//当点击选择一个数据库的时候，把Building的名字已经数据库的信息都获取过来
     {
         m_building_config_list.Set_Edit(FALSE);
 
@@ -1989,7 +2096,8 @@ void CBuildingConfigration::OnBuildingconfigSelect()
     {
         AfxMessageBox(_T("you have already Selected.\ndon't need to select ,again!"));
         return;
-    }
+	}
+	
     CADO ado;
     ado.OnInitADOConn();
     try
@@ -2165,4 +2273,133 @@ void CBuildingConfigration::OnBnClickedOk()
 {
     // TODO: Add your control notification handler code here
     //CDialogEx::OnOK();
+}
+
+
+void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT *pResult)
+{
+   LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: Add your control notification handler code here
+	CString temp_cstring;
+	long lRow,lCol;
+	m_building_config_list.Set_Edit(true);
+	DWORD dwPos=GetMessagePos();//Get which line is click by user.Set the check box, when user enter Insert it will jump to program dialog
+	CPoint point( LOWORD(dwPos), HIWORD(dwPos));
+	m_building_config_list.ScreenToClient(&point);
+	LVHITTESTINFO lvinfo;
+	lvinfo.pt=point;
+	lvinfo.flags=LVHT_ABOVE;
+	int nItem=m_building_config_list.SubItemHitTest(&lvinfo);
+
+	lRow = lvinfo.iItem;
+	lCol = lvinfo.iSubItem;
+	m_curCol=lCol;
+	m_curRow=lRow;
+	CString Strprotcol=m_building_config_list.GetItemText(lRow,BC_PROTOCOL);
+	BOOL Is_The_Same=TRUE;
+	m_select_text=m_building_config_list.GetItemText(lRow,lCol);
+	if(lRow>m_building_config_list.GetItemCount()) //如果点击区超过最大行号，则点击是无效的
+		return;
+	if(lRow<0)
+		return;
+     CBuildingConfigEditDlg dlg;
+	 dlg.m_currentBuilding = m_BuildNameLst.at(m_curRow);
+	 if (dlg.DoModal() == IDOK)
+	 {
+		 
+		m_BuildNameLst.at(m_curRow) = dlg.m_currentBuilding;
+		CADO m_database_operator;
+		 
+
+		try
+		{
+			_variant_t temp_var;
+			m_database_operator.OnInitADOConn();
+			CString strSql;
+			strSql.Format(_T("Select * from Building Where ID = %d "), m_BuildNameLst.at(m_curRow).ID);
+			m_database_operator.m_pRecordset = m_database_operator.OpenRecordset(strSql);
+
+			if(!m_database_operator.m_pRecordset->EndOfFile)
+			{
+
+
+				if(!m_BuildNameLst.at(m_curRow).city.IsEmpty())
+				{
+					m_database_operator.m_pRecordset->PutCollect("city", (_variant_t)m_BuildNameLst.at(m_curRow).city);
+				}
+				if(!m_BuildNameLst.at(m_curRow).country.IsEmpty())
+				{
+					m_database_operator.m_pRecordset->PutCollect("country", (_variant_t)m_BuildNameLst.at(m_curRow).country);
+				} 
+				if(!m_BuildNameLst.at(m_curRow).Elevation.IsEmpty())
+				{
+					m_database_operator.m_pRecordset->PutCollect("Elevation", (_variant_t)m_BuildNameLst.at(m_curRow).Elevation);
+				}
+				if(!m_BuildNameLst.at(m_curRow).Latitude.IsEmpty())
+				{
+					m_database_operator.m_pRecordset->PutCollect("Latitude", (_variant_t)m_BuildNameLst.at(m_curRow).Latitude);
+				}
+				if(!m_BuildNameLst.at(m_curRow).Longitude.IsEmpty())
+				{
+					m_database_operator.m_pRecordset->PutCollect("Longitude", (_variant_t)m_BuildNameLst.at(m_curRow).Longitude);
+				}
+				if(!m_BuildNameLst.at(m_curRow).state.IsEmpty())
+				{
+					m_database_operator.m_pRecordset->PutCollect("state", (_variant_t)m_BuildNameLst.at(m_curRow).state);
+				}
+				if(!m_BuildNameLst.at(m_curRow).street.IsEmpty())
+				{
+					m_database_operator.m_pRecordset->PutCollect("street", (_variant_t)m_BuildNameLst.at(m_curRow).street);
+				}
+				if(!m_BuildNameLst.at(m_curRow).Zip!=-1)
+				{
+					m_database_operator.m_pRecordset->PutCollect("Zip", (_variant_t)m_BuildNameLst.at(m_curRow).Zip);
+				}
+				m_database_operator.m_pRecordset->Update();
+			}
+
+			m_database_operator.CloseRecordset();
+			m_database_operator.CloseConn();
+
+			 
+			CppSQLite3DB SqliteDB;
+			SqliteDB.open(m_sqlitepath);
+			CString SqlText;
+			SqlText.Format(_T("Update tbl_building_location Set \
+			 country = '%s' ,\
+			 state = '%s' ,\
+			 city = '%s' ,\
+			 street = '%s' ,\
+			 longitude = '%s' ,\
+			 latitude = '%s' ,\
+			 elevation = '%s' \
+			 where ID = %d \
+			  "),
+			  m_BuildNameLst.at(m_curRow).country,
+			  m_BuildNameLst.at(m_curRow).state,
+			  m_BuildNameLst.at(m_curRow).city,
+			  m_BuildNameLst.at(m_curRow).street,
+			  m_BuildNameLst.at(m_curRow).Longitude,
+			  m_BuildNameLst.at(m_curRow).Latitude,
+			  m_BuildNameLst.at(m_curRow).Elevation,
+			  m_BuildNameLst.at(m_curRow).ID
+			  );
+			  char charqltext[256];
+			 
+			  strcpy( charqltext, (CStringA)SqlText);
+			  SqliteDB.execDML(charqltext);
+       SqliteDB.close();
+		 
+			AfxMessageBox(_T("Update Successfully"));
+
+		}
+		catch(CException* e)
+		{
+
+			e->GetErrorMessage(_T("Exception"), 0);
+		}
+	 }
+	  
+	  
+	*pResult = 0;
 }

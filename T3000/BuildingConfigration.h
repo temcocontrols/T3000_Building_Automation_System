@@ -9,8 +9,14 @@
 typedef struct Building_Config 
 {
 	bool b_selected;
+	int ID;
 	CString MainBuildingName;
 	CString Sub_NetName;
+	CString country;
+	CString state;
+	CString city;
+	CString street;
+	    int Zip;
 	CString Protocol;
 	CString IPAddress_Domain;
 	CString IP_Port;
@@ -18,6 +24,10 @@ typedef struct Building_Config
 	CString BaudRate;
 	unsigned int protocol_index;
 	CString BuildingPath;
+
+	CString Longitude;
+	CString Latitude ;
+	CString Elevation;
 };
 
 class CBuildingConfigration : public CDialogEx
@@ -66,9 +76,10 @@ public:
 	int m_changedCol;
 	BOOL m_bChanged;
 	CString m_select_text;
-
+	char m_sqlitepath[256];
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedOk();
+	afx_msg void OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 const int BC_ITEM = 0;

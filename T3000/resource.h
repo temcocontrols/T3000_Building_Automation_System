@@ -262,6 +262,7 @@
 #define IDD_DIALOG_BOOTFINDER           597
 #define IDR_BUILDING_DB                 600
 #define IDR_T3000_NEW_DB1               601
+#define IDD_DIALOG_BUILDING_CONFIG      602
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -292,6 +293,7 @@
 #define IDC_EDIT_END                    1027
 #define IDC_EDIT_TYPE                   1027
 #define IDC_EDIT_DELAY_ITEMS            1027
+#define IDC_EDIT_COUNTRYNAME            1027
 #define IDC_OUTPUT3_DELAY_OFF_EDIT      1028
 #define IDC_CUR_TEMP                    1028
 #define IDC_EDIT42                      1028
@@ -301,6 +303,7 @@
 #define IDC_EDIT_AR_FILTER              1028
 #define IDC_EDIT_TEMP                   1028
 #define IDC_EDIT_DATAFORMATS            1028
+#define IDC_EDIT_STATE                  1028
 #define IDC_BUTTON3                     1029
 #define IDC_DELAYTABBTN                 1029
 #define IDC_OUTPUT5_DELAY_OFF_EDIT      1029
@@ -308,31 +311,38 @@
 #define IDC_EDIT_PRESURE                1029
 #define IDC_CUR_HUM                     1029
 #define IDC_EDIT_PROPERTY               1029
+#define IDC_EDIT_CITY                   1029
 #define IDC_OUTPUT4_DELAY_OFF_EDIT      1030
 #define IDC_HUM1                        1030
 #define IDC_EDIT43                      1030
 #define IDC_DTS2                        1030
 #define IDC_EDIT_HUM                    1030
 #define IDC_EDIT_FUNCTIONS              1030
+#define IDC_EDIT_                       1030
+#define IDC_EDIT_STREET1                1030
 #define IDC_OUTPUTBTN                   1031
 #define IDC_NUM_SENSOR                  1031
 #define IDC_EDIT44                      1031
 #define IDC_DTS3                        1031
 #define IDC_EDIT_AQ                     1031
+#define IDC_EDIT_ZIP                    1031
 #define IDC_PARAMETERBTN                1032
 #define IDC_EDIT45                      1032
 #define IDC_DTS4                        1032
 #define IDC_RADIO_50                    1032
 #define IDC_CO21                        1032
 #define IDC_TEST_TEMP2                  1032
+#define IDC_EDIT_LAT                    1032
 #define IDC_LEDTABLEBTN                 1033
 #define IDC_EDIT46                      1033
 #define IDC_DTS5                        1033
 #define IDC_RADIO_100                   1033
+#define IDC_EDIT_LON                    1033
 #define IDC_EDIT47                      1034
 #define IDC_DTS6                        1034
 #define IDC_RADIO_FIT_TO_QTY            1034
 #define IDC_EDIT_FAN_ON_NAME            1034
+#define IDC_EDIT_ELE                    1034
 #define IDC_MODEL_EDIT                  1035
 #define IDC_EDIT48                      1035
 #define IDC_DTS7                        1035
@@ -1995,6 +2005,7 @@
 #define IDC_EDIT_PACKET_ERROR_1         2171
 #define IDC_BTN_EDIT_CUSTOMER_RANGE     2171
 #define IDC_EDIT_PACKET_ERROR_2         2172
+#define IDC_EDIT_BUILDINGNAME           2172
 #define IDC_EDIT_PACKET_ERROR_3         2173
 #define IDC_EDIT_TIMEOUT_1              2174
 #define IDC_EDIT_TIMEOUT_2              2175
@@ -2478,9 +2489,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        602
+#define _APS_NEXT_RESOURCE_VALUE        603
 #define _APS_NEXT_COMMAND_VALUE         34055
-#define _APS_NEXT_CONTROL_VALUE         2172
+#define _APS_NEXT_CONTROL_VALUE         2173
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif

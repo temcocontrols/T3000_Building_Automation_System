@@ -18,7 +18,7 @@
 #include "afxinet.h"
 #include "T3000DefaultView.h"
 #include "bado/BADO.h"
-const int g_versionNO=20160219;
+const int g_versionNO=20160505;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -39,7 +39,7 @@ CT3000App::CT3000App()
 {
  
 		m_bHiColorIcons = TRUE;
-		CurrentT3000Version=_T("    2016.04.29");
+		CurrentT3000Version=_T("    2016.05.05");
 		T3000_Version = 10429;
 //	}
 // 	catch (...)
