@@ -1674,8 +1674,8 @@ namespace WFA_psychometric_chart
         {
             //upon this click the form should pop up
 
-            Form_Input_For_Seriespoint form_point_input = new Form_Input_For_Seriespoint(this);
-            form_point_input.Show();
+           // Form_Input_For_Seriespoint form_point_input = new Form_Input_For_Seriespoint(this);
+           // form_point_input.Show();
 
 
         }

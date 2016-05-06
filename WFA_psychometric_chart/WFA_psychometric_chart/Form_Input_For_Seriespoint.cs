@@ -12,8 +12,8 @@ namespace WFA_psychometric_chart
 {
     public partial class Form_Input_For_Seriespoint : Form
     {
-        private form_process_diagram F1;
-        public Form_Input_For_Seriespoint(form_process_diagram fm_p_d)
+        private Form1_main F1;
+        public Form_Input_For_Seriespoint(Form1_main fm_p_d)
         {
             this.F1 = fm_p_d;
             InitializeComponent();

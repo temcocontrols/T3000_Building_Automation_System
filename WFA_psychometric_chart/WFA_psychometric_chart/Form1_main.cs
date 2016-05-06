@@ -1,25 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using System.Windows.Forms.DataVisualization;
 using System.Collections;
-using System.Net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Data.OleDb;
-using System.Xml.Linq;
-using System.Timers;
 using System.Data.SqlClient;
 using System.IO;
 using System.Data.SQLite;
 using System.Reflection;
+using System.Collections.Generic;
+using System.Drawing.Imaging;
 
 namespace WFA_psychometric_chart
 {
@@ -32,7 +21,7 @@ namespace WFA_psychometric_chart
         public Form1_main()
         {
             InitializeComponent();
-          this.Disposed += new System.EventHandler ( this.Form1_main_Disposed );
+          //this.Disposed += new System.EventHandler ( this.Form1_main_Disposed );
         }
         //lets define the constanst..
         double temperature, humidity, Patm, TDewpoint, A, m, Tn, B, Pws, X, h;
@@ -51,7 +40,7 @@ namespace WFA_psychometric_chart
         ArrayList temp2_AL = new ArrayList();
         ArrayList hum2_AL =  new ArrayList();
         Series series1xx = new Series("My Series values plot ");//this series is used by plot_on_graph_values() method...
-
+        Series seriesLineIndicator = new Series("LineIndicator");//--This line indicator is temporary show the line in the chart for Node Movement.
         public void plot_new_graph()
         {
 
@@ -117,7 +106,7 @@ namespace WFA_psychometric_chart
            // MessageBox.Show("the path = " + pat_test);
             string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
             */
-            string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string file = dir + @"\t_pg.txt";
             string path1 = file;
 
@@ -128,7 +117,7 @@ namespace WFA_psychometric_chart
             // MessageBox.Show(path);
             //string  path1 = path + "\\t_pg.txt";
             //MessageBox.Show(path1);
-            using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
+            using (StreamReader st = new StreamReader(path1))
             {
                 //int i = 0;
                 //string s = " ";
@@ -459,11 +448,13 @@ namespace WFA_psychometric_chart
             button1.Text = "Refresh Graph";
             //this is for adding values dynamically as the program loads. used by plot_on_graph_values() method 
             chart1.Series.Add(series1xx);
-
+            //--This is added for the process diagram part...
+            chart1.Series.Add(series1);
+            chart1.Series.Add(seriesLineIndicator);//--This line indicator is for show temporary line for movement...
             //this is other part.
             //radioButton1.Checked = true;
 
-            string dir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             //string file = dir + @"\TestDir\TestFile.txt";
             //con.ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
             //change here..
@@ -983,16 +974,16 @@ namespace WFA_psychometric_chart
                    //              pos.X, pos.Y - 15);
 
                     //now printing the x and y coordinate to label..
-                    lb_x_cord.Text = xVal.ToString();
-                    lb_y_cord.Text = yVal.ToString();
+                  //  lb_x_cord.Text = Math.Round(xVal,4).ToString();
+                   // lb_y_cord.Text = Math.Round(yVal,4).ToString();
 
 
                     //now lets move on to making other part 
                     /*1.find dbt value => this is x axis value 
                      * 2.find sp.ratio value => this is yaxis value
                      */
-                    lb_dbt.Text = xVal.ToString();
-                    lb_humidity_ratio.Text = yVal.ToString();
+                    lb_dbt.Text =Math.Round(xVal,4).ToString();
+                    lb_humidity_ratio.Text = Math.Round(yVal,4).ToString();
 
 
                     //now lets move towards printing the relative humidity at that position and dew point and enthalpy also wbt
@@ -1022,12 +1013,12 @@ namespace WFA_psychometric_chart
                    // MessageBox.Show("the path = " + pat_test);
                     string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
           */
-                    string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     string file = dir + @"\t_pg.txt";
                     string path1 = file;
                     string line1;
 
-                    using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
+                    using (StreamReader st = new StreamReader(path1))
                     {
 
                         while ((line1 = st.ReadLine()) != null)
@@ -1073,14 +1064,14 @@ namespace WFA_psychometric_chart
                    phi = w * patm / (622 * corres_pg_value + w * corres_pg_value);//this phi gives the relative humidty..
                    phi = phi * 100;//changing into percent..
                     //now display in label...
-                    lb_RH.Text = phi.ToString();
+                    lb_RH.Text = Math.Round(phi,4).ToString();
 
                     //now lets calculate the dew point...
                     double humidity = phi;
                     double temperature1 = xVal;
                    double TD = 243.04 * (Math.Log(humidity / 100) + ((17.625 * temperature1) / (243.04 + temperature1))) / (17.625 - Math.Log(humidity / 100) - ((17.625 * temperature1) / (243.04 + temperature1)));
                     //now lets print this value..
-                   lb_DP.Text = TD.ToString();
+                   lb_DP.Text = Math.Round(TD,4).ToString();
 
 
                     //now lets move towards enthalpy...
@@ -1097,25 +1088,384 @@ namespace WFA_psychometric_chart
 
                    h = temperature * (1.01 + (0.00189 * X)) + 2.5 * X;
                     //now lets display this value ..
-                   lb_enthalpy.Text = h.ToString();
+                   lb_enthalpy.Text = Math.Round(h,4).ToString();
 
                 }
             }
 
+
+
+            //--Lets add a function for the process diagram drawing..
+
+            ProcessDiagramMouseMoveFunction(e);//--This does the adding and removing part
+
         }
 
-        //private void button7_Click(object sender, EventArgs e)
-        //{
+        private void ProcessDiagramMouseMoveFunction(MouseEventArgs e)
+        {
+            //--This function helps to draw a mouse move event..
 
 
-        //    //this method helps to pull the names fo country and city in the combobox
-        //    cb_country.Items.Add("USA");
-        //    cb_country.Items.Add("Russia");
-        //    cb_country.Items.Add("Nepal");
+            //--This is done to prevent mouse event e.x called before chart is loaded other wise the program will crash
+            if (!chart1.IsAccessible && load == 0)
+            {
+                load = 1;
+                return;
+
+            }
+
+            //this event occurs and compares the values in the list first and identifies if the values
+            //can be compared.
+            //if( ((chart1.ChartAreas[0].Position.X + chart1.ChartAreas[0])>e.X && chart1.ChartAreas[0].Position.X < e.X  ) && ((chart1.ChartAreas[0].Position.Y + ) > e.X && chart1.ChartAreas[0].Position.Y < e.Y)  ){           
+            //if((chart1.ChartAreas[0].Position.X<e.X && chart1.ChartAreas[0].Position.Y<e.Y)&& ((chart1.ChartAreas[0].Position.Width + chart1.ChartAreas[0].Position.X) > e.X && (chart1.ChartAreas[0].Position.Height + chart1.ChartAreas[0].Position.Y) > e.Y))
+            //label1.Text = e.X.ToString();
+            //label2.Text = e.Y.ToString();
+            if ((e.X > chart1.ChartAreas[0].Position.X && e.Y > chart1.ChartAreas[0].Position.Y) && (e.X < chart1.Width && e.Y <chart1.Height))
+            {
+
+                try
+                {
+
+                    //Point position = e.Location;
+                    double xValue = chart1.ChartAreas[0].AxisX.PixelPositionToValue(e.X);
+                    double yValue = chart1.ChartAreas[0].AxisY.PixelPositionToValue(e.Y);
+                   // label1.Text = xValue.ToString();
+                    //label2.Text = yValue.ToString();
+
+                    xAxis1 = xValue;
+                    yAxis1 = yValue;
+                    //Console.Write("xval = " + xValue + "yvalue = " + yValue);
+                    if (menuStripAllValues.Count > 0)
+                    {
+                        //foreach(var values in menuStripAllValues)
+
+                        for (int i = 0; i < menuStripAllValues.Count; i++)
+                        {
+
+                            if ((xValue > menuStripAllValues[i].xVal - 0.25 && xValue < menuStripAllValues[i].xVal + 0.25) && (yValue > menuStripAllValues[i].yVal - 0.25 && yValue < menuStripAllValues[i].yVal + 0.25))
+                            {
+
+                                idSelected = menuStripAllValues[i].id;
+                                if (Cursor != Cursors.Cross)
+                                {
+                                    Cursor = Cursors.Hand;
+                                }
+                                //this.Cursor = Cursors.Hand;
+                                //now this works so lets move forward.
+                                readyForMouseClick = 1;//enable on click event
+                                                       //   DoDragDrop(chart1.Series["My Series"].Points, DragDropEffects.Move);
 
 
-        //    button7.Enabled = false;
-        //}
+                                //this.DragEnter += new DragEventHandler(newDrag_DragEnter);
+                                //this.MouseMove += new MouseEventHandler(newDrag_MouseMove);
+
+
+
+
+                                break;//this break is for if found the value no longer loop increases the perfomances..
+                            }
+                            else
+                            {
+                                if (Cursor != Cursors.Cross)
+                                {
+                                    this.Cursor = Cursors.Arrow;
+                                    readyForMouseClick = 0;//dissable on click event.
+
+                                }
+
+                            }
+                        }
+                    }//close of if menuStripAllValue>0
+
+
+
+
+                    if (mouseClickAction == 1)
+                    {
+
+                        if (Control.ModifierKeys == Keys.Alt)
+                        {
+                            //--This alter key is for moving along constant x-axis ...
+                            // MessageBox.Show(" alt is pressed for x axis constant");
+
+                            ////--Lets clear the indicator point first.
+                            //seriesLineIndicator.Points.Clear();
+
+                            ////--Thie indicator should be shown 
+                            //if(menuStripAllValues.Count > 0)
+                            //{
+                            //    //--Then only show the line indicator...
+                            //    double xOne = menuStripAllValues[idSelected].xVal;
+                            //    double yOne = yValue;
+                            //    double xTwo = menuStripAllValues[idSelected - 1].xVal;
+                            //    double yTwo = menuStripAllValues[idSelected - 1].yVal;
+                            //    //--Then only show the line indicator...
+                            //    IndicatorLineForNodeMovement(idSelected, xOne, yOne, xTwo, yTwo);
+                            //}
+
+
+                            //--This is the begining of the actual code
+
+
+                            //menuStripAllValues[idSelected].xVal = xAxis1;
+                            menuStripAllValues[idSelected].yVal = yAxis1;
+
+                            // label5.Text = "click past x =" + menuStripAllValues[idSelected].xVal + " y " + menuStripAllValues[idSelected].yVal;
+
+                            series1.Points.Clear();
+                            for (int i = 1; i <= menuStripAllValues.Count - 1; i++)//-- this -1 is done because for three points we have two line series..
+                            {
+                                chart1.Series.Remove(chart1.Series["LineSeries" + i]);
+                            }
+                            //--this is redraw functionality
+                            //foreach(var values in menuStripAllValues)
+                            for (int x = 0; x < menuStripAllValues.Count; x++)
+                            {
+                                string labelValue;
+                                if (menuStripAllValues[x].showItemText == "Label")
+                                {
+                                    labelValue = menuStripAllValues[x].label;
+                                }
+                                else if (menuStripAllValues[x].showItemText == "Name")
+                                {
+                                    labelValue = menuStripAllValues[x].name;
+                                }
+                                else
+                                {
+                                    labelValue = menuStripAllValues[x].source;
+                                }
+
+
+                                ReDrawPoints(series1, menuStripAllValues[x].xVal, menuStripAllValues[x].yVal, menuStripAllValues[x].colorValue, menuStripAllValues[x].source, menuStripAllValues[x].name, menuStripAllValues[x].label, labelValue);
+                                incrementIndex++;
+
+                            }
+                            //--resetting incrementIndex
+                            incrementIndex = 0;
+                            for (int x = 0; x < menuStripAllValues.Count; x++)
+                            {
+
+                                ReDrawLines(menuStripAllValues[x].id, menuStripAllValues[x].xVal, menuStripAllValues[x].yVal, menuStripAllValues[x].colorValue);
+                                incrementIndex++;
+
+                            }
+
+
+
+                            chart1.Invalidate();
+                            incrementIndex = 0;//reset the values again..
+
+
+
+
+
+
+
+                        }
+                        else if (Control.ModifierKeys == Keys.Shift)
+                        {
+                            //--This ctrl key is for moving along the y-  axis...
+
+                            ////--Lets clear the indicator point first.
+                            //seriesLineIndicator.Points.Clear();
+
+                            ////--Thie indicator should be shown 
+                            //if (menuStripAllValues.Count > 0)
+                            //{
+                            //    double xOne = xValue;
+                            //    double yOne = menuStripAllValues[idSelected].yVal;
+                            //    double xTwo = menuStripAllValues[idSelected - 1].xVal;
+                            //    double yTwo = menuStripAllValues[idSelected - 1].yVal;
+                            //    //--Then only show the line indicator...
+                            //    IndicatorLineForNodeMovement(idSelected, xOne, yOne,xTwo,yTwo);
+
+                            //}
+
+
+
+                            //--THis function basically evolve when the shift key is pressed and mouse move.
+                            // MessageBox.Show("shift  is pressed for y  axis constant");
+
+                            menuStripAllValues[idSelected].xVal = xAxis1;
+                            //menuStripAllValues[idSelected].yVal = yAxis1;
+
+                            //label5.Text = "click past x =" + menuStripAllValues[idSelected].xVal + " y " + menuStripAllValues[idSelected].yVal;
+
+                            series1.Points.Clear();
+                            for (int i = 1; i <= menuStripAllValues.Count - 1; i++)//-- this -1 is done because for three points we have two line series..
+                            {
+                                chart1.Series.Remove(chart1.Series["LineSeries" + i]);
+                            }
+                            //--this is redraw functionality
+                            //foreach(var values in menuStripAllValues)
+                            for (int x = 0; x < menuStripAllValues.Count; x++)
+                            {
+                                string labelValue;
+                                if (menuStripAllValues[x].showItemText == "Label")
+                                {
+                                    labelValue = menuStripAllValues[x].label;
+                                }
+                                else if (menuStripAllValues[x].showItemText == "Name")
+                                {
+                                    labelValue = menuStripAllValues[x].name;
+                                }
+                                else
+                                {
+                                    labelValue = menuStripAllValues[x].source;
+                                }
+
+
+                                ReDrawPoints(series1, menuStripAllValues[x].xVal, menuStripAllValues[x].yVal, menuStripAllValues[x].colorValue, menuStripAllValues[x].source, menuStripAllValues[x].name, menuStripAllValues[x].label, labelValue);
+                                incrementIndex++;
+
+                            }
+                            //--resetting incrementIndex
+                            incrementIndex = 0;
+                            for (int x = 0; x < menuStripAllValues.Count; x++)
+                            {
+
+                                ReDrawLines(menuStripAllValues[x].id, menuStripAllValues[x].xVal, menuStripAllValues[x].yVal, menuStripAllValues[x].colorValue);
+                                incrementIndex++;
+
+                            }
+
+
+
+                            chart1.Invalidate();
+                            incrementIndex = 0;//reset the values again..
+
+
+
+
+
+                        }
+                        else
+                        {
+
+                            //--Show indicator
+
+                            ////--Lets clear the indicator point first.
+                            //seriesLineIndicator.Points.Clear();
+
+                            ////--Thie indicator should be shown 
+                            //if (menuStripAllValues.Count > 0)//--If there is more than two node
+                            //{
+                            //    //--Then only show the line indicator...
+                            //    double xOne = xValue;
+                            //    double yOne =yValue;
+                            //    double xTwo = menuStripAllValues[idSelected - 1].xVal;
+                            //    double yTwo = menuStripAllValues[idSelected - 1].yVal;
+                            //    //--Then only show the line indicator...
+                            //    IndicatorLineForNodeMovement(idSelected, xOne, yOne, xTwo, yTwo);
+
+                            //}
+
+
+
+                            menuStripAllValues[idSelected].xVal = xAxis1;
+                            menuStripAllValues[idSelected].yVal = yAxis1;
+
+                            //label5.Text = "click past x =" + menuStripAllValues[idSelected].xVal + " y " + menuStripAllValues[idSelected].yVal;
+
+                            series1.Points.Clear();
+                            for (int i = 1; i <= menuStripAllValues.Count - 1; i++)//-- this -1 is done because for three points we have two line series..
+                            {
+                                chart1.Series.Remove(chart1.Series["LineSeries" + i]);
+                            }
+                            //--this is redraw functionality
+                            //foreach(var values in menuStripAllValues)
+                            for (int x = 0; x < menuStripAllValues.Count; x++)
+                            {
+                                string labelValue;
+                                if (menuStripAllValues[x].showItemText == "Label")
+                                {
+                                    labelValue = menuStripAllValues[x].label;
+                                }
+                                else if (menuStripAllValues[x].showItemText == "Name")
+                                {
+                                    labelValue = menuStripAllValues[x].name;
+                                }
+                                else
+                                {
+                                    labelValue = menuStripAllValues[x].source;
+                                }
+
+
+                                ReDrawPoints(series1, menuStripAllValues[x].xVal, menuStripAllValues[x].yVal, menuStripAllValues[x].colorValue, menuStripAllValues[x].source, menuStripAllValues[x].name, menuStripAllValues[x].label, labelValue);
+                                incrementIndex++;
+
+                            }
+                            //--resetting incrementIndex
+                            incrementIndex = 0;
+                            for (int x = 0; x < menuStripAllValues.Count; x++)
+                            {
+
+                                ReDrawLines(menuStripAllValues[x].id, menuStripAllValues[x].xVal, menuStripAllValues[x].yVal, menuStripAllValues[x].colorValue);
+                                incrementIndex++;
+
+                            }
+
+
+
+                            chart1.Invalidate();
+                            incrementIndex = 0;//reset the values again..
+
+
+
+
+                        }//closing of key else part
+                    }
+
+
+                    /*
+                     }ca
+
+                     */
+
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+            }//close of if chart1.ChartAreas[0]
+
+
+
+
+
+
+
+
+
+        }
+
+        //--This is for the indicator showing part but it not implemented right now.
+        private void IndicatorLineForNodeMovement(int idSelected, double x11, double y11,double x22,double y22)
+        {
+            //--This function basically reorders the chart controls when the alter key is pressed.
+            //--To use this function we need to clear the seriesLineIndicator every time we call it...
+
+            double x1 = x11;
+            double y1 = y11;
+            double x2 = x22;
+            double y2 = y22;
+
+
+            seriesLineIndicator.ChartType = SeriesChartType.FastLine;
+            seriesLineIndicator.MarkerSize = 10;
+            seriesLineIndicator.MarkerColor = Color.FromArgb(0, 255, 0);//--Light blue color....
+            //seriesLineIndicator.BorderWidth = 3;
+            //seriesLineIndicator.BorderDashStyle = ChartDashStyle.Dash;
+            
+
+            seriesLineIndicator.Points.Add(x1, y1);
+            seriesLineIndicator.Points.Add(x2, y2);
+
+
+        }
+
 
         private void button8_Click(object sender, EventArgs e)
         {
@@ -1150,7 +1500,7 @@ namespace WFA_psychometric_chart
         private void heatMapToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //lets add heat map form to the application ...
-            form_heat_map fm_hm = new form_heat_map();
+            form_heat_map fm_hm = new form_heat_map(this);//--This is done because we are making the form1_main change the values to main form ie form1_main
             fm_hm.Show();
 
         }
@@ -1406,24 +1756,247 @@ namespace WFA_psychometric_chart
 
         }
 
-        //private void button4_Click_1(object sender, EventArgs e)
-        //{
-        //    double DBT = 0.000000;
-        //    double enthalpy = 0.000000;
-        //    try
-        //    {
-        //        DBT = Double.Parse(txt_DBT.Text.Trim());
-        //        enthalpy = Double.Parse(txt_enthalpy.Text.Trim());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message);
-        //    }
+        private void insertNodeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //upon this click the form should pop up
 
-        //    //calling the function here...
-        //    plot_by_DBT_Enthalpy(DBT, enthalpy);
-        //}
+            Form_Input_For_Seriespoint form_point_input = new Form_Input_For_Seriespoint(this);
+            form_point_input.Show();
 
+        }
+        Series series1 = new Series("My Series");
+
+        int setItemSelectedID = 0;
+
+        int oneTimeClick = 1;
+        //int twoTimeClick = 0;
+        //int incrementIndex = 0;
+        int mouseClickAction = 0;
+
+        int idSelected = 0;
+        int readyForMouseClick = 0;//this event will be true only when the cursor is in hand mode..
+
+        bool arrowOn = false;
+
+
+        double xAxis1;
+        double yAxis1;
+
+        int load = 0;//false
+        private void chart1_MouseClick(object sender, MouseEventArgs e)
+        {
+            //--If mouse right click is perform this will be performed...
+
+            //this is used to select the partciular id values..
+
+
+            if (readyForMouseClick == 1)
+            {
+
+                if (oneTimeClick == 1)
+                {
+                    setItemSelectedID = idSelected;
+                  //  MessageBox.Show("Node grabbed - id=" + setItemSelectedID);
+                    Cursor = Cursors.Cross;
+                    oneTimeClick = 0;
+                    //MessageBox.Show("one time click");
+
+                    mouseClickAction = 1;
+
+
+
+                }
+
+                else
+                {
+                    mouseClickAction = 0;
+                    //two time click 
+                    oneTimeClick = 1;//again reset to oneTimeClick
+                    Cursor = Cursors.Arrow;
+                    //MessageBox.Show("Node released by second click");
+
+
+
+                    if (Control.ModifierKeys == Keys.Alt)
+                    {
+                        //--This alter key is for moving along constant x-axis ...
+                        //MessageBox.Show(" alt is pressed for x axis constant");
+
+
+                        //menuStripAllValues[idSelected].xVal = xAxis1;
+                        menuStripAllValues[idSelected].yVal = yAxis1;
+
+                        //label5.Text = "click past x =" + menuStripAllValues[idSelected].xVal + " y " + menuStripAllValues[idSelected].yVal;
+
+                        series1.Points.Clear();
+                        for (int i = 1; i <= menuStripAllValues.Count - 1; i++)//-- this -1 is done because for three points we have two line series..
+                        {
+                            chart1.Series.Remove(chart1.Series["LineSeries" + i]);
+                        }
+                        //--this is redraw functionality
+                        //foreach(var values in menuStripAllValues)
+                        for (int x = 0; x < menuStripAllValues.Count; x++)
+                        {
+                            string labelValue;
+                            if (menuStripAllValues[x].showItemText == "Label")
+                            {
+                                labelValue = menuStripAllValues[x].label;
+                            }
+                            else if (menuStripAllValues[x].showItemText == "Name")
+                            {
+                                labelValue = menuStripAllValues[x].name;
+                            }
+                            else
+                            {
+                                labelValue = menuStripAllValues[x].source;
+                            }
+
+
+                            ReDrawPoints(series1, menuStripAllValues[x].xVal, menuStripAllValues[x].yVal, menuStripAllValues[x].colorValue, menuStripAllValues[x].source, menuStripAllValues[x].name, menuStripAllValues[x].label, labelValue);
+                            incrementIndex++;
+
+                        }
+                        //--resetting incrementIndex
+                        incrementIndex = 0;
+                        for (int x = 0; x < menuStripAllValues.Count; x++)
+                        {
+
+                            ReDrawLines(menuStripAllValues[x].id, menuStripAllValues[x].xVal, menuStripAllValues[x].yVal, menuStripAllValues[x].colorValue);
+                            incrementIndex++;
+
+                        }
+
+
+
+                        chart1.Invalidate();
+                        incrementIndex = 0;//reset the values again..
+
+
+
+
+
+                    }
+                    else if (Control.ModifierKeys == Keys.Shift)
+                    {
+                        //--This ctrl key is for moving along the y-  axis...
+
+                        //MessageBox.Show("shift  is pressed for y  axis constant");
+
+                        menuStripAllValues[idSelected].xVal = xAxis1;
+                        //menuStripAllValues[idSelected].yVal = yAxis1;
+
+                        //label5.Text = "click past x =" + menuStripAllValues[idSelected].xVal + " y " + menuStripAllValues[idSelected].yVal;
+
+                        series1.Points.Clear();
+                        for (int i = 1; i <= menuStripAllValues.Count - 1; i++)//-- this -1 is done because for three points we have two line series..
+                        {
+                            chart1.Series.Remove(chart1.Series["LineSeries" + i]);
+                        }
+                        //--this is redraw functionality
+                        //foreach(var values in menuStripAllValues)
+                        for (int x = 0; x < menuStripAllValues.Count; x++)
+                        {
+                            string labelValue;
+                            if (menuStripAllValues[x].showItemText == "Label")
+                            {
+                                labelValue = menuStripAllValues[x].label;
+                            }
+                            else if (menuStripAllValues[x].showItemText == "Name")
+                            {
+                                labelValue = menuStripAllValues[x].name;
+                            }
+                            else
+                            {
+                                labelValue = menuStripAllValues[x].source;
+                            }
+
+
+                            ReDrawPoints(series1, menuStripAllValues[x].xVal, menuStripAllValues[x].yVal, menuStripAllValues[x].colorValue, menuStripAllValues[x].source, menuStripAllValues[x].name, menuStripAllValues[x].label, labelValue);
+                            incrementIndex++;
+
+                        }
+                        //--resetting incrementIndex
+                        incrementIndex = 0;
+                        for (int x = 0; x < menuStripAllValues.Count; x++)
+                        {
+
+                            ReDrawLines(menuStripAllValues[x].id, menuStripAllValues[x].xVal, menuStripAllValues[x].yVal, menuStripAllValues[x].colorValue);
+                            incrementIndex++;
+
+                        }
+
+
+
+                        chart1.Invalidate();
+                        incrementIndex = 0;//reset the values again..
+
+
+
+
+                    }
+                    else
+                    {
+
+                        menuStripAllValues[idSelected].xVal = xAxis1;
+                        menuStripAllValues[idSelected].yVal = yAxis1;
+
+                        //label5.Text = "click past x =" + menuStripAllValues[idSelected].xVal + " y " + menuStripAllValues[idSelected].yVal;
+
+                        series1.Points.Clear();
+                        for (int i = 1; i <= menuStripAllValues.Count - 1; i++)//-- this -1 is done because for three points we have two line series..
+                        {
+                            chart1.Series.Remove(chart1.Series["LineSeries" + i]);
+                        }
+                        //--this is redraw functionality
+                        //foreach(var values in menuStripAllValues)
+                        for (int x = 0; x < menuStripAllValues.Count; x++)
+                        {
+                            string labelValue;
+                            if (menuStripAllValues[x].showItemText == "Label")
+                            {
+                                labelValue = menuStripAllValues[x].label;
+                            }
+                            else if (menuStripAllValues[x].showItemText == "Name")
+                            {
+                                labelValue = menuStripAllValues[x].name;
+                            }
+                            else
+                            {
+                                labelValue = menuStripAllValues[x].source;
+                            }
+
+
+                            ReDrawPoints(series1, menuStripAllValues[x].xVal, menuStripAllValues[x].yVal, menuStripAllValues[x].colorValue, menuStripAllValues[x].source, menuStripAllValues[x].name, menuStripAllValues[x].label, labelValue);
+                            incrementIndex++;
+
+                        }
+                        //--resetting incrementIndex
+                        incrementIndex = 0;
+                        for (int x = 0; x < menuStripAllValues.Count; x++)
+                        {
+
+                            ReDrawLines(menuStripAllValues[x].id, menuStripAllValues[x].xVal, menuStripAllValues[x].yVal, menuStripAllValues[x].colorValue);
+                            incrementIndex++;
+
+                        }
+
+
+
+                        chart1.Invalidate();
+                        incrementIndex = 0;//reset the values again..
+                    }//closing of key else part
+                }//closing of second click
+
+
+
+            }//closing of else block
+
+
+
+
+        }
+
+        
         private void humiditySensorCalibrationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application_Form4 ap_f4 = new Application_Form4(this);
@@ -1446,17 +2019,1179 @@ namespace WFA_psychometric_chart
 
 
 
-
-          public void Form1_main_Disposed ( object sender, System.EventArgs e )
-          {
-          }
-        }//close of btn4
-
-       
+        int incrementIndex = 0;//--Defining the index
 
 
+        //--this class is used for storing temporary the values of id xCoord,yCoord,source,name,label,color 
+        //--so that a line could be plotted in it and we can do some processing as well 
+        private class TempDataType
+        {
+            public int id { get; set; } //--for identifying which point is selected..
 
-       
+            public double xVal { get; set; }//--this is the values that represent the point in a chart
+            public double yVal { get; set; }
 
-    
+            public string source { get; set; }
+            public string name { get; set; }
+            public string label { get; set; }
+            public Color colorValue { get; set; }
+
+            public string showItemText { get; set; }
+        }
+
+        List<TempDataType> menuStripAllValues = new List<TempDataType>();
+
+
+        public void ReDrawPoints(Series s1, double x, double y, Color c, string source1, string name1, string label1x, string labelValueText)
+        {
+
+            //s1.ChartType = SeriesChartType.Point;
+            string s = "source : " + source1 + "\n Name : " + name1 + "\nLable : " + label1x;
+            s1.Points.AddXY(x, y);
+            chart1.Series["My Series"].Points[incrementIndex].ToolTip = s;
+            chart1.Series["My Series"].Points[incrementIndex].Label = labelValueText;
+            s1.Points[incrementIndex].Color = c;
+        }
+
+
+
+        double humidityCalculated = 0;
+        double enthalpyCalculated = 0;
+        public void ReDrawLines(double id, double x, double y, Color c)
+        {
+
+            if (incrementIndex > 0)
+            {
+                double startHumidity1 = 0;
+                double startEnthalpy1 = 0;
+                double endHumidity1 = 0;//--this is for the start and end humidity print in the tooltip
+                double endEnthalpy1 = 0;
+                //now lets plot lines between tow points...
+                Series newSeries = new Series("LineSeries" + incrementIndex);
+                newSeries.MarkerSize = 15;
+                //newSeries.MarkerStyle = MarkerStyle.Triangle;
+                newSeries.ChartType = SeriesChartType.Line;
+                //newSeries.ToolTip = 
+                newSeries.Color = menuStripAllValues[incrementIndex].colorValue;
+                //--this sets the initial values of humidity and enthalpy
+                CalculateHumidityEnthalpy((double)menuStripAllValues[incrementIndex - 1].xVal, (double)menuStripAllValues[incrementIndex - 1].yVal);
+                startHumidity1 = Math.Round(humidityCalculated, 2);
+                startEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+                //--This calculates the end humidity and the enthalpy values..
+                CalculateHumidityEnthalpy((double)menuStripAllValues[incrementIndex].xVal, (double)menuStripAllValues[incrementIndex].yVal);
+                endHumidity1 = Math.Round(humidityCalculated, 2);
+                endEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+                double enthalpyChange = endEnthalpy1 - startEnthalpy1;
+
+                string sequenceDetected = menuStripAllValues[incrementIndex - 1].name + " to " + menuStripAllValues[incrementIndex].name;
+
+                string tooltipString = "Sequence :  " + sequenceDetected + " \n" + "                 start             end \n" + "Temp         :" + Math.Round(menuStripAllValues[incrementIndex - 1].xVal, 2) + "               " + Math.Round(menuStripAllValues[incrementIndex].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + "\nEnthalpy : " + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
+
+
+
+                newSeries.ToolTip = tooltipString;
+                //newSeries.MarkerStyle = MarkerStyle.Circle;
+                //newSeries.Points.AddXY(menuStripAllValues[index - 1].xVal, menuStripAllValues[index].xVal, menuStripAllValues[index - 1].yVal, menuStripAllValues[index].yVal);
+                newSeries.Points.Add(new DataPoint(menuStripAllValues[incrementIndex - 1].xVal, menuStripAllValues[incrementIndex - 1].yVal));
+                newSeries.Points.Add(new DataPoint(menuStripAllValues[incrementIndex].xVal, menuStripAllValues[incrementIndex].yVal));
+                chart1.Series.Add(newSeries);
+            }
+
+
+
+
+        }
+
+        private void CalculateHumidityEnthalpy(double xVal, double yVal)
+        {
+            //now lets move towards printing the relative humidity at that position and dew point and enthalpy also wbt
+            //first Relative humidity...
+            //first we need to see equation w = 622*phi*pg./(patm-phi*pg);
+            /*
+             we need to calc phi value given by ycord/30 as the max value is 30..
+             * second pg which is calculated by temperature pulled from the text file we need to fist 
+             * calculate the round up value of x coord to an integer...
+             */
+
+            //this part is not correct yet we need to do this again....
+
+            double phi = 0.00000;
+            //double y_axis = yVal;
+            //now for pg..
+            ArrayList temperature_value = new ArrayList();
+            ArrayList pg_value_from_txtfile = new ArrayList();
+
+            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string file = dir + @"\t_pg.txt";
+            string path1 = file;
+            string line1;
+
+            using (StreamReader st = new StreamReader(path1))
+            {
+
+                while ((line1 = st.ReadLine()) != null)
+                {
+
+                    string[] value = line1.Split(',');
+                    try
+                    {
+                        double temp1 = Double.Parse(value[0]);
+                        double temp2 = Double.Parse(value[1]);
+                        //now lets add to temperature and pg array..                     
+                        temperature_value.Add(temp1);
+                        pg_value_from_txtfile.Add(temp2);
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString());
+                    }
+
+
+                }//close of while
+
+            }//close of using
+
+            double temperature = Math.Round(xVal);
+            double corres_pg_value = 0.000000;
+            for (int i = 0; i < temperature_value.Count; i++)
+            {
+                if (temperature == Double.Parse(temperature_value[i].ToString()))
+                {
+                    corres_pg_value = Double.Parse(pg_value_from_txtfile[i].ToString());
+
+                    break;
+                }
+            }//close of for
+
+            double patm = 101.325;//this is constant...
+                                  // double w = 622*phi*corres_pg_value/(patm-phi*corres_pg_value);
+                                  //double w1 = 622*phi*pg/(patm-phi*pg);
+            double w = yVal;
+            phi = w * patm / (622 * corres_pg_value + w * corres_pg_value);//this phi gives the relative humidty..
+            phi = phi * 100;//changing into percent..
+                            //now display in label...
+            humidityCalculated = phi;//--This is the Relative humidity calculated value
+
+            //now lets calculate the dew point...
+            double humidity = phi;
+            double temperature1 = xVal;
+            double TD = 243.04 * (Math.Log(humidity / 100) + ((17.625 * temperature1) / (243.04 + temperature1))) / (17.625 - Math.Log(humidity / 100) - ((17.625 * temperature1) / (243.04 + temperature1)));
+            //now lets print this value..
+            //        lb_DP.Text = TD.ToString();
+
+
+            //now lets move towards enthalpy...
+
+            double Patm = 1013;
+            double A = 6.116441;
+            double m = 7.591386;
+            double Tn = 240.7263;
+            double B = 621.9907;
+
+            double Pws = A * Math.Pow(10, (m * TD) / (TD + Tn));
+
+            double X = B * Pws / (Patm - Pws);
+
+            double h = temperature * (1.01 + (0.00189 * X)) + 2.5 * X;
+            //now lets display this value ..
+            enthalpyCalculated = h;//--this is the enthalpy calculated value 
+
+        }
+
+
+
+
+        //--this is used by set data button
+        int countNumberOfPoints = 0;
+        int xCoord = 0;
+
+        private void chart1_MouseDown(object sender, MouseEventArgs e)
+        {
+
+
+            if (e.Button == MouseButtons.Right)//on right mouse button is clicked.
+            {
+                //we need to show context menu strip
+                //contextMenuStrip1.Show(MousePosition);//--This is dissabled
+                CMSinsertNode.Show(MousePosition);//-- this mouse position is used to show the menustrip in mouse pointer
+                //MessageBox.Show("Right pressed");    
+                //this is calculated based on this location the graphics will be plotted..
+                xCoord = e.Location.X;
+                yCoord = e.Location.Y;
+
+            }
+
+        }
+
+        int yCoord = 0;
+        double humidityValue;
+        double temperatureValue;
+
+        string tbSource;
+        string tbName;
+        string tbLabel;
+        Color colorValue;
+        string comboboxItemText;
+
+        public void SetNode(string source, string name, string label, Color c1, string comboboxItemText1)
+        {
+
+            tbSource = source;
+            tbName = name;
+            tbLabel = label;
+            colorValue = c1;
+            comboboxItemText = comboboxItemText1;
+            //lets do the processing 
+            //lets count how many items were inserted
+            countNumberOfPoints += 1;
+            //lets get the coordinates to plot on the graph..
+            //this will be set on right click..not here
+
+
+            //lets process the data 
+            /*
+            calculating the humidity and temperature value form the coordinates..
+            */
+            HumTempCalcByCoordinate();
+            //MessageBox.Show("Temp= " + temperatureValue + ",hum = " + humidityValue);
+
+            //now lets plot the values only when the humidity is <= 100 and temp >0  and < 50
+            if ((humidityValue > 0 && humidityValue <= 100) && (temperatureValue >= 0 && temperatureValue <= 50))
+            {
+                //now lets plot the values....
+
+                plot_by_DBT_HR_process_diagram((double)(int)temperatureValue, (double)humidityValue / 100);
+
+
+
+
+            }
+            else
+            {
+                MessageBox.Show(Properties.Resources.Please_select_a_proper_region_);
+            }
+
+
+
+
+
+        }
+
+
+        public void HumTempCalcByCoordinate()
+        {
+            //this is not working properly why i dont know...
+
+
+            var results = chart1.HitTest(xCoord, yCoord, false, ChartElementType.PlottingArea);
+            foreach (var result in results)
+            {
+                if (result.ChartElementType == ChartElementType.PlottingArea)
+                {
+                    // double xVal = xCoord - chart1.ChartAreas[0].Position.X ;
+                    //double yVal = yCoord-chart1.ChartAreas[0].Position.Y;
+
+                    var xVal = result.ChartArea.AxisX.PixelPositionToValue(xCoord);
+                    var yVal = result.ChartArea.AxisY.PixelPositionToValue(yCoord);
+
+
+                    /*
+                     we need to calc phi value given by ycord/30 as the max value is 30..
+                     * second pg which is calculated by temperature pulled from the text file we need to fist 
+                     * calculate the round up value of x coord to an integer...
+                     */
+
+                    //this part is not correct yet we need to do this again....
+
+                    double phi = 0.00000;
+                    //double y_axis = yVal;
+                    //now for pg..
+                    ArrayList temperature_value = new ArrayList();
+                    ArrayList pg_value_from_txtfile = new ArrayList();
+
+                    string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string file = dir + @"\t_pg.txt";
+                    string path1 = file;
+                    string line1;
+
+                    using (StreamReader st = new StreamReader(path1))
+                    {
+
+                        while ((line1 = st.ReadLine()) != null)
+                        {
+
+                            string[] value = line1.Split(',');
+                            try
+                            {
+                                double temp1 = Double.Parse(value[0]);
+                                double temp2 = Double.Parse(value[1]);
+                                //now lets add to temperature and pg array..                     
+                                temperature_value.Add(temp1);
+                                pg_value_from_txtfile.Add(temp2);
+
+
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.ToString());
+                            }
+
+
+                        }//close of while
+
+                    }//close of using
+
+                    double temperature = (double)Math.Round((double)xVal);
+                    double corres_pg_value = 0.000000;
+                    for (int i = 0; i < temperature_value.Count; i++)
+                    {
+                        if (temperature == Double.Parse(temperature_value[i].ToString()))
+                        {
+                            corres_pg_value = Double.Parse(pg_value_from_txtfile[i].ToString());
+
+                            break;
+                        }
+                    }//close of for
+
+                    double patm = 101.325;//this is constant...
+                                          // double w = 622*phi*corres_pg_value/(patm-phi*corres_pg_value);
+                                          //double w1 = 622*phi*pg/(patm-phi*pg);
+                    double w = yVal;
+                    phi = w * patm / (622 * corres_pg_value + w * corres_pg_value);//this phi gives the relative humidty..
+                    phi = phi * 100;//changing into percent..
+                                    //now display in label...
+                                    //lb_RH.Text = phi.ToString();
+
+                    //now lets calculate the dew point...
+                    double humidity = phi;
+                    double temperature1 = xVal;
+
+                    humidityValue = humidity;
+                    temperatureValue = temperature1;
+                }
+            }
+        }
+
+
+
+
+
+        //this series is used for plotting on the graph
+        //Series series1 = new Series("My series");
+        int index_series = 0;
+        //int index = 0;
+        public int plot_by_DBT_HR_process_diagram(double DBT, double HR)
+        {
+            /*           
+             *We need to cal x-asis which is given by DBT 
+             */
+            // MessageBox.Show("reached here dbt=" + DBT + ", hr = " + HR);
+            int x_axis = (int)DBT;
+
+            //here the HR is  relative humidity like 20%,30% etc os phi = 0.3 for 30%
+            double phi = HR;
+            //we need to calculate the y-axis value 
+            /*For y axis the value has to be pulled from the t_pg text file....
+             */
+            //lets create two arraylist to add those and store it in the arraylist
+            ArrayList temperature_value = new ArrayList();
+            ArrayList pg_value_from_txtfile = new ArrayList();
+
+
+            string line1;
+            string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string file = dir + @"\t_pg.txt";
+            string path1 = file;
+
+            using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
+            {
+
+                while ((line1 = st.ReadLine()) != null)
+                {
+
+                    string[] value = line1.Split(',');
+                    try
+                    {
+                        double temp1 = Double.Parse(value[0]);
+                        double temp2 = Double.Parse(value[1]);
+                        //now lets add to temperature and pg array..                     
+                        temperature_value.Add(temp1);
+                        pg_value_from_txtfile.Add(temp2);
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString());
+                    }
+
+
+                }//close of while
+
+            }//close of using
+
+            double patm = 101.235;//constant..we will make it take as input later...
+            //double rair = 0.287;//rideburg constant i guess
+            double wg_calc = 0;
+            double pg_value = 0.000000;
+            //now for corresponding DBT lets calculate constant value pg..
+            try
+            {
+                for (int i = 0; i < temperature_value.Count; i++)
+                {
+                    ///x-axis contains the DBT
+                    if (DBT == Double.Parse(temperature_value[i].ToString()))
+                    {
+                        //if matched find the corresponding pg_value
+                        pg_value = Double.Parse(pg_value_from_txtfile[i].ToString());
+                        break;//break out of loop.
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            //now calc the y axis.
+            //wg_calc =  622 * pg_value / (patm - pg_value);
+            wg_calc = (622 * phi * pg_value / (patm - phi * pg_value));
+            //MessageBox.Show("pg_value=" + pg_value + ",wg_calc" + wg_calc);
+            double y_axis = wg_calc;
+
+            plot_on_graph_values_process_diagram(DBT, HR, x_axis, y_axis);
+
+            //MessageBox.Show("reached series print" +series1.ToString());
+
+            // index++;
+
+            return 0;
+        }
+
+
+
+
+        public void plot_on_graph_values_process_diagram(double dbt, double hr, double xval, double yval)
+        {
+            //chart1.Series.Clear();
+
+
+            try
+            {
+
+
+                series1.ChartType = SeriesChartType.Point;
+                //int r, g, b;
+
+                series1.MarkerSize = 20;
+                series1.MarkerStyle = MarkerStyle.Circle;
+                //string label = "DBT=" + dbt + ",HR=" + hr;
+                //series1.Label = label;
+                //chart1.Series["SeriesDBT_HR" + index].;
+                //series1.Points[0].Color = colorValue;//blue
+                // MessageBox.Show("finally added xvalue = " + xval + " yvalue = " + yval);
+                series1.Points.AddXY(xval, yval);
+                string s = "source : " + tbSource + "\n Name : " + tbName + "\nLable : " + tbLabel;
+                series1.Points[index].Color = colorValue;
+                series1.Points[index].ToolTip = s;
+
+                string labelStringValue = null;
+                //labeling part
+                if (comboboxItemText == "Label")
+                {
+                    //label is selected
+                    labelStringValue = tbLabel;
+                }
+                else if (comboboxItemText == "Name")
+                {
+                    //Name is selected
+                    labelStringValue = tbName;
+
+                }
+                else
+                {
+                    //Source is selected
+                    labelStringValue = tbSource;
+                }
+
+                series1.Points[index].Label = labelStringValue;
+
+                //  MessageBox.Show("value xval =" + xval + ",yval = " + yval);
+                //series1.Points[index_series++].Color = colorValue;//blue
+                //    MessageBox.Show("end re");
+                //index_series++;
+                //series1.Enabled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            //now lets move on to storing those values and futher porcessing it...
+
+            //the value is added...
+            menuStripAllValues.Add(new TempDataType
+            {
+                id = index,
+                xVal = xval,
+                yVal = yval,
+                source = tbSource,
+                name = tbName,
+                label = tbLabel,
+                colorValue = colorValue,
+                showItemText = comboboxItemText
+
+            });
+
+
+            //the liine plot part is only done when ther is two points or more
+            if (index > 0)
+            {
+
+                double startHumidity1 = 0;
+                double startEnthalpy1 = 0;
+                double endHumidity1 = 0;//--this is for the start and end humidity print in the tooltip
+                double endEnthalpy1 = 0;
+
+                //now lets plot lines between tow points...
+                Series newSeries = new Series("LineSeries" + index);
+
+                //newSeries.MarkerStyle = MarkerStyle.Triangle;
+                newSeries.ChartType = SeriesChartType.Line;
+
+                //newSeries.MarkerStyle = MarkerStyle.Circle;
+                newSeries.MarkerSize.Equals(15);
+                newSeries.Color = menuStripAllValues[index].colorValue;
+
+                //--this sets the initial values of humidity and enthalpy
+                CalculateHumidityEnthalpy((double)menuStripAllValues[index - 1].xVal, (double)menuStripAllValues[index - 1].yVal);
+                startHumidity1 = Math.Round(humidityCalculated, 2);//--Fro showing only up to 2 dec. eg."34.52"
+                startEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+                //--This calculates the end humidity and the enthalpy values..
+                CalculateHumidityEnthalpy((double)menuStripAllValues[index].xVal, (double)menuStripAllValues[index].yVal);
+                endHumidity1 = Math.Round(humidityCalculated, 2);
+                endEnthalpy1 = Math.Round(enthalpyCalculated, 2);
+                double enthalpyChange = endEnthalpy1 - startEnthalpy1;
+
+                string sequenceDetected = menuStripAllValues[index - 1].name + " to " + menuStripAllValues[index].name;
+
+
+                string tooltipString = "Sequence :  " + sequenceDetected + " \n" + "                 start             end \n" + "Temp         :" + Math.Round(menuStripAllValues[index - 1].xVal, 2) + "               " + Math.Round(menuStripAllValues[index].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + "\nEnthalpy : " + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
+                newSeries.ToolTip = tooltipString;
+                //newSeries.MarkerStyle = MarkerStyle.Circle;
+                //newSeries.Points.AddXY(menuStripAllValues[index - 1].xVal, menuStripAllValues[index].xVal, menuStripAllValues[index - 1].yVal, menuStripAllValues[index].yVal);
+                newSeries.Points.Add(new DataPoint(menuStripAllValues[index - 1].xVal, menuStripAllValues[index - 1].yVal));
+                newSeries.Points.Add(new DataPoint(menuStripAllValues[index].xVal, menuStripAllValues[index].yVal));
+                chart1.Series.Add(newSeries);
+            }
+
+
+
+            index++;
+
+
+        }//close of buttons
+
+
+
+
+        //------Heat Map-------------------///
+
+
+
+        public class data_type_hum_temp
+        {
+            public double temp { get; set; }
+            public double hum { get; set; }
+        }
+        List<data_type_hum_temp> hist_temp_hum_list = new List<data_type_hum_temp>();
+
+
+        double min_value = 0;
+        double max_value = 0;
+
+        //lets create two arraylist to add those and store it in the arraylist
+        ArrayList temperature_value = new ArrayList();
+        ArrayList pg_value_from_txtfile = new ArrayList();
+
+        Series series1_heat_map = null;
+        int load_map_checker = 0;//checks weather to load a map or not
+
+        private void label21_MouseHover(object sender, EventArgs e)
+        {
+            //label21.Tag = "Dry bulb temperature";
+            toolTip1.SetToolTip(label21, "Dry Bulb Temperauter");
+        }
+
+        private void label23_MouseHover(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(label23, "Specific Humidity");
+        }
+
+        private void label24_MouseHover(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(label24, "Relative Humidity");
+        }
+
+        private void label25_MouseHover(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(label25, "Dew Point Temperature");
+        }
+
+        private void label26_MouseHover(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(label26, "Enthalpy");
+        }
+
+        private void label5_H_unit_MouseHover(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(label5_H_unit, "Kilo Joule per K.G");
+        }
+
+        private void label2_DBT_units_MouseHover(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(label2_DBT_units, "Degree Celcius");
+
+        }
+
+        private void label3_Sp_H_unit_MouseHover(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(label3_Sp_H_unit, "ratio of mass of water vapur to mass of dry air(K.G(w)/K.G(dry_air))");
+        }
+
+        private void label4_RH_unit_MouseHover(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(label4_RH_unit, "Percent");
+        }
+
+        private void label6_DP_Unit_MouseHover(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(label6_DP_Unit, "Degree Celcius");
+        }
+
+        private void printToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            printHeatMap();
+        }
+
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            saveAsImageHeatMap();
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void helpPsychometricChartToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string file = dir + @"\PsychometricHelp.chm";
+            Help.ShowHelp(this, file);
+
+        }
+
+        int index_series_heat_map = 0;//this index is used by  plot_on_graph_values method
+
+        int SeriesCount = 0;
+        public void heat_map_button_click(int index_selected_heat_map,DateTime from1,DateTime to1)
+        {
+
+            if (SeriesCount > 0)
+            { 
+            chart1.Series.Remove(series1_heat_map);//--Removing the series that already exist...
+            }
+            SeriesCount = 1;
+
+            //--lest reset soem values..
+            hist_temp_hum_list.Clear();
+
+            series1_heat_map = new Series("My Series_heat_map");//changed form "My Series"
+
+
+            //this  is going to plot the heat map...
+            /*Steps:
+            1.Get the database values..
+            2.filter those values ..
+            3.plot those values in the map..       
+            */
+            DateTime from = from1;//dtp_From.Value;
+            DateTime to = to1;/// dtp_To.Value;
+
+            //2.database connection ..
+
+            if (to > from)
+            {
+
+                //   string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                //  string connString1 = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                //sql connection string is this..
+                //     string connString1 = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+
+                //--changing all the database to the sqlite database...
+                string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                string connString1 = @"Data Source=" + databaseFile + ";Version=3;";
+
+
+
+                using (SQLiteConnection connection1 = new SQLiteConnection(connString1))
+                {
+                    connection1.Open();
+
+
+
+                    //string sql_query = "Select * from tbl_data_stored_temp_hum_one_year WHERE date_current = " + day_list[i] + " , hour_current = " + hour_al[h] + " AND station_name = "+ station_name +" ; ";
+                    //lets pass this string to a query which does the pulling part.
+                    SQLiteDataReader reader1 = null;
+                    SQLiteCommand command1 = new SQLiteCommand("Select * from tbl_historical_data WHERE date_current BETWEEN @date_first AND @date_second AND ID=@id_value", connection1);
+                    command1.Parameters.AddWithValue("@date_first", from);
+                    command1.Parameters.AddWithValue("@date_second", to);
+                    command1.Parameters.AddWithValue("@id_value", index_selected_heat_map);//--This index selected is required to see which location is seleccted
+                    //command1.Parameters.AddWithValue("@station_name", station_name);
+                    reader1 = command1.ExecuteReader();
+                    while (reader1.Read())
+                    {
+                        //station_name = reader["station_name"].ToString();
+                        hist_temp_hum_list.Add(
+                            new data_type_hum_temp
+                            {
+                                temp = double.Parse(reader1["temperature"].ToString()),
+                                hum = double.Parse(reader1["humidity"].ToString())
+
+                            });
+                    }//close of while loop       
+                     // connection1.Close();
+                }//close of database using statement 
+            }//closing of if statement
+            else
+            {
+                MessageBox.Show(Properties.Resources.Please_select_correct_date_for);
+            }
+
+
+            //this will only be done when the data is returned
+
+            if (hist_temp_hum_list.Count > 0)
+            {
+                MessageBox.Show("value counted " + hist_temp_hum_list.Count);
+                //after we have the data we do the actual part of heat map plotting...
+                //setting up maximum and minimum value to use in color value calculation..
+
+                ArrayList temporary_val_temp = new ArrayList();
+                max_value = hist_temp_hum_list[0].temp;
+                min_value = hist_temp_hum_list[0].temp;
+                for (int i = 1; i < hist_temp_hum_list.Count; i++)//this is done because we are counting from 1 index no error 
+                {                                                  //as we are comparing the first index value with all the vlues in the index  
+
+                    if (max_value < hist_temp_hum_list[i].temp)
+                    {
+                        max_value = hist_temp_hum_list[i].temp;
+                    }
+                    if (min_value > hist_temp_hum_list[i].temp)
+                    {
+                        min_value = hist_temp_hum_list[i].temp;
+                    }
+
+                }
+
+
+
+                //min_value = hist_temp_hum_list.Min<data_type_hum_temp>().temp;
+
+                //MessageBox.Show("max = " + max_value + " ,min = " + min_value);//--printng of min value
+                //callin gthe method.
+                //lets increase th performance first... this below code if from plot_by_dbt_hr
+
+
+
+                string line1;
+
+                string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string file = dir + @"\t_pg.txt";
+                string path1 = file;
+
+                using (StreamReader st = new StreamReader(path1))
+                {
+
+                    while ((line1 = st.ReadLine()) != null)
+                    {
+
+                        string[] value = line1.Split(',');
+                        try
+                        {
+                            double temp1 = Double.Parse(value[0]);
+                            double temp2 = Double.Parse(value[1]);
+                            //now lets add to temperature and pg array..                     
+                            temperature_value.Add(temp1);
+                            pg_value_from_txtfile.Add(temp2);
+
+
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.ToString());
+                        }
+
+
+                    }//close of while
+
+                }//close of using
+
+                //this series is used to add to the 
+                chart1.Series.Add(series1_heat_map);
+
+
+
+                for (int i = 0; i < hist_temp_hum_list.Count; i++)
+                {
+                    plot_by_DBT_HR_heat_map(hist_temp_hum_list[i].temp, hist_temp_hum_list[i].hum / 100);
+
+                }
+
+                MessageBox.Show(Properties.Resources.Success_final);
+            }//close of if
+            else
+            {
+                MessageBox.Show(Properties.Resources.No_data_found_in_database);
+            }
+
+            if (max_value != min_value)
+            {
+                marker();
+            }
+            else
+            {
+                //make indicator for same color
+                marker_for_same_min_max_value();
+            }
+
+
+
+
+
+        }
+
+        private void marker_for_same_min_max_value()
+        {
+            /*
+            Our previous marker formula has a draw back if max_value = min_value the difference 
+            between max_value- min_value=0 so which present problem 
+            this is solved by this marker assumin in such case the plot is of same color we do this part.
+            */
+
+            
+            try
+            {
+                using (Graphics grp1 = this.CreateGraphics())
+                {
+                    
+                    double start = min_value;
+
+                    double value = start;
+                    // double temp_value = (max_value - min_value);
+                    //double increment = 0;
+                    //increment = temp_value / 50;
+
+
+                    //decimal val = (Decimal)((value - min_value) / (max_value - min_value));
+
+                    Pen pen1 = new Pen(Color.FromArgb(0, 255, 0));
+                    grp1.DrawRectangle(pen1, 958, 537, 15, 15);
+                    SolidBrush drawBrushGreen = new SolidBrush(Color.FromArgb(0, 255, 0));
+                    grp1.FillRectangle(drawBrushGreen, 958, 537, 15, 15);
+
+
+                    String drawString = Math.Round(value,0).ToString();
+                    // Create font and brush.
+                    Font drawFont = new Font("Arial", 7);
+                    SolidBrush drawBrush = new SolidBrush(Color.Black);
+                    // Create point for upper-left corner of drawing.
+                    PointF drawPoint = new PointF(958-12, 520);//--537->520
+                    // Draw string to screen.
+                    grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void marker()
+        {
+            try
+            {
+                using (Graphics grp1 = this.CreateGraphics())
+                {
+                    double start = min_value;
+
+                    double value = start;
+                    double temp_value = (max_value - min_value);
+                    double increment = 0;
+                    increment = temp_value / 50;
+
+
+                    for (int i = 1; i <= 50; i++)
+                    {
+
+                        //decimal val = (Decimal)((value - min_value) / (max_value - min_value));
+                        double val = (double)((value - min_value) / (max_value - min_value));
+                        int r = Convert.ToByte(255 * val);
+                        int g = Convert.ToByte(255 * (1 - val));
+                        int b = 0;
+                        Pen pen1 = new Pen(Color.FromArgb(r, g, b));
+                        grp1.DrawLine(pen1, 958, 520 - i, 973, 520 - i);//--changed
+
+                        if (i == 0)
+                        {
+                            String drawString = Math.Round(value, 0).ToString();
+                            // Create font and brush.
+                            Font drawFont = new Font("Arial", 7);
+                            SolidBrush drawBrush = new SolidBrush(Color.Black);
+                            // Create point for upper-left corner of drawing.
+                            PointF drawPoint = new PointF(958-12, 520 - i); //--change
+                            // Draw string to screen.
+                            grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
+                        }
+                        else if (i == 13)
+                        {
+                            String drawString = Math.Round(value, 0).ToString();
+                            // Create font and brush.
+                            Font drawFont = new Font("Arial", 7);
+                            SolidBrush drawBrush = new SolidBrush(Color.Black);
+                            // Create point for upper-left corner of drawing.
+                            PointF drawPoint = new PointF(958-12, 520 - i);
+                            // Draw string to screen.
+                            grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
+                        }
+                        else if (i == 25)
+                        {
+
+                            String drawString = Math.Round(value, 0).ToString();
+                            // Create font and brush.
+                            Font drawFont = new Font("Arial", 7);
+                            SolidBrush drawBrush = new SolidBrush(Color.Black);
+                            // Create point for upper-left corner of drawing.
+                            PointF drawPoint = new PointF(958-12, 520 - i);
+                            // Draw string to screen.
+                            grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
+                        }
+                        else if (i == 35)
+                        {
+
+                            String drawString = Math.Round(value, 0).ToString();
+                            // Create font and brush.
+                            Font drawFont = new Font("Arial", 7);
+                            SolidBrush drawBrush = new SolidBrush(Color.Black);
+                            // Create point for upper-left corner of drawing.
+                            PointF drawPoint = new PointF(958-12, 520 - i);
+                            // Draw string to screen.
+                            grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
+                        }
+                        else if (i == 50)
+                        {
+
+                            String drawString = Math.Round(value, 0).ToString();
+                            // Create font and brush.
+                            Font drawFont = new Font("Arial", 7);
+                            SolidBrush drawBrush = new SolidBrush(Color.Black);
+                            // Create point for upper-left corner of drawing.
+                            PointF drawPoint = new PointF(958-12, 520 - i);
+                            // Draw string to screen.
+                            grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
+                        }
+
+                        value += increment;
+                    }//close of for...
+
+                }//close of using statement..
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
+
+        int index_heat_map = 0;
+        public int plot_by_DBT_HR_heat_map(double DBT, double HR)
+        {
+            /*           
+             *We need to cal x-asis which is given by DBT 
+             */
+            // MessageBox.Show("reached here dbt=" + DBT + ", hr = " + HR);
+            int x_axis = (int)DBT;
+
+            //here the HR is  relative humidity like 20%,30% etc os phi = 0.3 for 30%
+            double phi = HR;
+            //we need to calculate the y-axis value 
+            /*For y axis the value has to be pulled from the t_pg text file....
+             */
+
+
+            double patm = 101.235;//constant..we will make it take as input later...
+            //double rair = 0.287;//rideburg constant i guess
+            double wg_calc = 0;
+            double pg_value = 0.000000;
+            //now for corresponding DBT lets calculate constant value pg..
+            try
+            {
+                for (int i = 0; i < temperature_value.Count; i++)
+                {
+                    ///x-axis contains the DBT
+                    if (DBT == Double.Parse(temperature_value[i].ToString()))
+                    {
+                        //if matched find the corresponding pg_value
+                        pg_value = Double.Parse(pg_value_from_txtfile[i].ToString());
+                        break;//break out of loop.
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            //now calc the y axis.
+            //wg_calc =  622 * pg_value / (patm - pg_value);
+            wg_calc = (622 * phi * pg_value / (patm - phi * pg_value));
+            double y_axis = wg_calc;
+
+            plot_on_graph_values_heat_map(DBT, HR, x_axis, y_axis);
+
+            //MessageBox.Show("reached series print" +series1.ToString());
+
+            index_heat_map++;
+
+
+            return 0;
+        }
+
+
+        public void plot_on_graph_values_heat_map(double dbt, double hr, double xval, double yval)
+        {
+            //chart1.Series.Clear();
+            //Series series1 = new Series("My Series" + index);
+            //chart1.Series.Add(series1);
+            try
+            {
+
+
+                series1.ChartType = SeriesChartType.Point;
+                int r, g, b;
+
+                if (max_value != min_value)
+                {
+
+                    double value = dbt;
+                    //decimal val = (Decimal)((value - min_value) / (max_value - min_value));
+                    double val = (double)((value - min_value) / (max_value - min_value));
+                    r = Convert.ToByte(255 * val);
+                    g = Convert.ToByte(255 * (1 - val));
+                    b = 0;
+
+                    //MessageBox.Show("dbt =" + dbt + "\n xval =" + xval + "\n yval = " + yval+"\n rgb = "+r+","+g+",0");
+
+                }
+                else
+                {
+                    //make all the colors same value..
+                    r = 0;
+                    g = 255;
+                    b = 0;
+                }
+
+                series1.MarkerSize = 15;
+                //string label = "DBT=" + dbt + ",HR=" + hr;
+                //series1.Label = label;
+                //chart1.Series["SeriesDBT_HR" + index].;
+                series1.Points.AddXY(xval, yval);
+                series1.Points[index_series_heat_map++].Color = Color.FromArgb(255, r, g, b);//blue
+                                                                                    //series1.Enabled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
+
+
+
+        public void printHeatMap()
+        {
+
+            try
+            {
+                //this when click prints the chart.
+                // Chart chart1 = form1.chart1;
+                System.Drawing.Printing.PrintDocument pd = new System.Drawing.Printing.PrintDocument();
+                chart1.Printing.PrintPaint(chart1.CreateGraphics(), chart1.DisplayRectangle);
+                PrintDialog pdi = new PrintDialog();
+                pdi.Document = pd;
+                if (pdi.ShowDialog() == DialogResult.OK)
+                    pdi.Document.Print();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+
+
+        }
+
+        public void saveAsImageHeatMap()
+        {
+            string fileName = "";
+            saveFD.InitialDirectory = "C:";
+            saveFD.FileName = "ChartImage";
+            saveFD.Filter = "PNG(.png) |*.png|Bitmap(.bmp) |*.bmp|JPEG |*.jpeg";
+            ImageFormat format = ImageFormat.Png;
+            if (saveFD.ShowDialog() == DialogResult.OK)
+            {
+                fileName = saveFD.FileName;
+                string ext = System.IO.Path.GetExtension(saveFD.FileName);
+                switch (ext)
+                {
+                    case ".bmp":
+                        format = ImageFormat.Bmp;
+                        break;
+                    case ".jpeg":
+                        format = ImageFormat.Jpeg;
+                        break;
+                }
+
+               chart1.SaveImage(fileName, format);
+            }
+            //else
+            //{
+            //    fileName = "ChartImage.png";
+            //    MessageBox.Show(Properties.Resources._Your_chart_image_will_be_save + fileName);
+            //}
+
+
+        }
+
+
+
+
+
+
+    }//close of btn4
+
+
+
+
+
+
+
+
 }

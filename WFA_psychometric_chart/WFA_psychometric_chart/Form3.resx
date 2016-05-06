@@ -292,7 +292,7 @@
     <value>18</value>
   </data>
   <data name="button1.Text" xml:space="preserve">
-    <value>Insert new location</value>
+    <value>Add new location</value>
   </data>
   <data name="&gt;&gt;button1.Name" xml:space="preserve">
     <value>button1</value>

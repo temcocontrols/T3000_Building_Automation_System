@@ -98,6 +98,9 @@
             this.tb_cw_temp = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.lbConnectionIssue = new System.Windows.Forms.Label();
+            this.btnShowLogFile = new System.Windows.Forms.Button();
+            this.label41 = new System.Windows.Forms.Label();
             this.label30 = new System.Windows.Forms.Label();
             this.label32 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
@@ -106,9 +109,6 @@
             this.label16 = new System.Windows.Forms.Label();
             this.tb_location = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.label41 = new System.Windows.Forms.Label();
-            this.btnShowLogFile = new System.Windows.Forms.Button();
-            this.lbConnectionIssue = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -578,6 +578,23 @@
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.TabStop = false;
             // 
+            // lbConnectionIssue
+            // 
+            resources.ApplyResources(this.lbConnectionIssue, "lbConnectionIssue");
+            this.lbConnectionIssue.Name = "lbConnectionIssue";
+            // 
+            // btnShowLogFile
+            // 
+            resources.ApplyResources(this.btnShowLogFile, "btnShowLogFile");
+            this.btnShowLogFile.Name = "btnShowLogFile";
+            this.btnShowLogFile.UseVisualStyleBackColor = true;
+            this.btnShowLogFile.Click += new System.EventHandler(this.btnShowLogFile_Click);
+            // 
+            // label41
+            // 
+            resources.ApplyResources(this.label41, "label41");
+            this.label41.Name = "label41";
+            // 
             // label30
             // 
             resources.ApplyResources(this.label30, "label30");
@@ -620,23 +637,6 @@
             // 
             resources.ApplyResources(this.label15, "label15");
             this.label15.Name = "label15";
-            // 
-            // label41
-            // 
-            resources.ApplyResources(this.label41, "label41");
-            this.label41.Name = "label41";
-            // 
-            // btnShowLogFile
-            // 
-            resources.ApplyResources(this.btnShowLogFile, "btnShowLogFile");
-            this.btnShowLogFile.Name = "btnShowLogFile";
-            this.btnShowLogFile.UseVisualStyleBackColor = true;
-            this.btnShowLogFile.Click += new System.EventHandler(this.btnShowLogFile_Click);
-            // 
-            // lbConnectionIssue
-            // 
-            resources.ApplyResources(this.lbConnectionIssue, "lbConnectionIssue");
-            this.lbConnectionIssue.Name = "lbConnectionIssue";
             // 
             // Form3
             // 
