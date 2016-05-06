@@ -13,28 +13,18 @@ General Manager
 [Temco Controls](http://www.temcocontrols.com/)    
 maurice (at) temcocontrols (dot) com
 
-![T3000](https://github.com/temcocontrols/T3000_Building_Automation_System/blob/master/image/T3000%20network_800.jpg)
+![T3000](https://github.com/temcocontrols/T3000_Building_Automation_System/blob/master/image/t3000_image%20-%20%E5%89%AF%E6%9C%AC.gif)
 
 
 ![T3000_screen_capture_1](https://github.com/temcocontrols/T3000_Building_Automation_System/blob/master/image/T3000%20network_800.jpg)     
 
-![T3000_screen_capture_2](http://www.4shared.com/download/NF9J9Kxq/2_online.bmp)     
+![T3000_screen_capture_2](https://github.com/temcocontrols/T3000_Building_Automation_System/blob/master/image/T3000_building_system_800.jpg)     
 
-![T3000_screen_capture_3](http://www.4shared.com/download/lADm6SHp/3_online.bmp)     
+![T3000_screen_capture_3](https://github.com/temcocontrols/T3000_Building_Automation_System/blob/master/image/T3000_wiring_series_800%20-%20%E5%89%AF%E6%9C%AC.jpg)     
 
-![T3000_screen_capture_4](http://www.4shared.com/download/ZQNKCZh4/4_online.bmp)     
+![T3000_screen_capture_4](https://github.com/temcocontrols/T3000_Building_Automation_System/blob/master/image/t3_series_800.jpg)     
 
-![T3000_screen_capture_5](http://www.4shared.com/download/HxPi2ZG-/5_online.bmp)     
 
-![T3000_screen_capture_6](http://www.4shared.com/download/e5UYnrBu/6_online.bmp)     
-
-![T3000_screen_capture_7](http://www.4shared.com/download/Zrxsrpt1/7_online.bmp)     
-
-![T3000_screen_capture_11](http://www.4shared.com/download/vu8fHhq5/11_online.bmp)     
-
-![T3000_screen_capture_12](http://www.4shared.com/download/JtrqZSYn/12_online.bmp)     
-
-![T3000_screen_capture_13](http://www.4shared.com/download/kDjeOQpR/13_online.bmp)      
 
 Check out our website for support on this project and also great prices on sensors & building automation products. 
 www.temcocontrols.com
