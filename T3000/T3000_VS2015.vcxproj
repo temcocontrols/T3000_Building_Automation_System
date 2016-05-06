@@ -83,7 +83,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <AdditionalDependencies>setupapi.lib;SqliteLib\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output_VS2015\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -177,6 +177,7 @@
     <ClCompile Include="BatchSNDlg.cpp" />
     <ClCompile Include="BoatMonitorViewer.cpp" />
     <ClCompile Include="BootFinderDlg.cpp" />
+    <ClCompile Include="BuildingConfigEditDlg.cpp" />
     <ClCompile Include="BuildingConfigration.cpp" />
     <ClCompile Include="BuildTable1.cpp" />
     <ClCompile Include="CalibartionHT.cpp" />
@@ -283,6 +284,7 @@
     <ClCompile Include="Scanwaydlg.cpp" />
     <ClCompile Include="SetPtDayDlg.cpp" />
     <ClCompile Include="SetptGraphicBar.cpp" />
+    <ClCompile Include="SqliteLib\CppSQLite3.cpp" />
     <ClCompile Include="StaticDlg.cpp" />
     <ClCompile Include="StatusbarCtrl.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -469,6 +471,7 @@
     <ClInclude Include="BatchSNDlg.h" />
     <ClInclude Include="BoatMonitorViewer.h" />
     <ClInclude Include="BootFinderDlg.h" />
+    <ClInclude Include="BuildingConfigEditDlg.h" />
     <ClInclude Include="BuildingConfigration.h" />
     <ClInclude Include="CalibartionHT.h" />
     <ClInclude Include="ChartCtrl\ChartAxis.h" />
@@ -543,6 +546,7 @@
     <ClInclude Include="RegisterViewerDlg.h" />
     <ClInclude Include="RegisterWriteValueDlg.h" />
     <ClInclude Include="Scanwaydlg.h" />
+    <ClInclude Include="SqliteLib\CppSQLite3.h" />
     <ClInclude Include="StaticDlg.h" />
     <ClInclude Include="StatusbarCtrl.h" />
     <ClInclude Include="T3000DefaultView.h" />

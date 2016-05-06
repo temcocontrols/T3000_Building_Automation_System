@@ -886,6 +886,8 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
                 }
                 ado.CloseConn();
 
+				m_BuildNameLst.at(m_curRow).MainBuildingName = cs_temp;
+				m_BuildNameLst.at(m_curRow).Sub_NetName = cs_temp;
 
 				CppSQLite3DB SqliteDB;
 				SqliteDB.open(m_sqlitepath);
@@ -2173,6 +2175,7 @@ void CBuildingConfigration::OnBuildingconfigDelete()
 
     m_strMainBuildingName=m_building_config_list.GetItemText(m_curRow,BC_MAINNAME);
     m_select=m_building_config_list.GetItemText(m_curRow,m_curCol);
+	int sqlID  = m_BuildNameLst.at(m_curRow).ID;
     CString buildingPath=m_building_config_list.GetItemText(m_curRow,BC_BUILDINGPATH);
     if(m_curRow>=(m_building_config_list.GetRowCount()-1) || m_curRow <0 )
     {
@@ -2219,7 +2222,7 @@ void CBuildingConfigration::OnBuildingconfigDelete()
     //DeleteFile(buildingPath);
     DeleteDirectory(filename);
     m_building_config_list.DeleteItem(m_curRow);
-    /*    LoadBuildingConfigDB();
+    /*LoadBuildingConfigDB();
     Initial_Building_List();*/
     if(ListCtrlEx::ComboBox == m_building_config_list.GetColumnType(BC_PROTOCOL))
     {
@@ -2250,6 +2253,23 @@ void CBuildingConfigration::OnBuildingconfigDelete()
         }
         m_building_config_list.SetCellStringList(m_curRow, BC_COMPORT, strlist);
     }
+
+
+
+	CppSQLite3DB SqliteDB;
+	SqliteDB.open(m_sqlitepath);
+
+	CString SqlTemp;
+	SqlTemp.Format(_T("delete from tbl_building_location Where ID = %d "),sqlID);
+
+	char charqltext[256];
+
+	strcpy( charqltext, (CStringA)SqlTemp);
+	SqliteDB.execDML(charqltext);
+
+	SqliteDB.close();
+
+
     m_bChanged=TRUE;
     // Fresh_List();
     //Initial_Building_List();

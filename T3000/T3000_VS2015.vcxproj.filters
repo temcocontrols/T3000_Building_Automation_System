@@ -40,6 +40,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="SqliteLib">
+      <UniqueIdentifier>{5b523b63-55f8-442b-9977-7f36185400c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AddBuilding.cpp">
@@ -661,6 +664,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MySocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SqliteLib\CppSQLite3.cpp">
+      <Filter>SqliteLib</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildingConfigEditDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1600,6 +1609,12 @@
     </ClInclude>
     <ClInclude Include="BacnetSettingHealth.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SqliteLib\CppSQLite3.h">
+      <Filter>SqliteLib</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildingConfigEditDlg.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
