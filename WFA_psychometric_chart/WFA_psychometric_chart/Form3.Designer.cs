@@ -30,6 +30,8 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form3));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lb_building_name = new System.Windows.Forms.Label();
+            this.label42 = new System.Windows.Forms.Label();
             this.label40 = new System.Windows.Forms.Label();
             this.label34 = new System.Windows.Forms.Label();
             this.cb1_select_data = new System.Windows.Forms.ComboBox();
@@ -98,6 +100,9 @@
             this.tb_cw_temp = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.lbConnectionIssue = new System.Windows.Forms.Label();
+            this.btnShowLogFile = new System.Windows.Forms.Button();
+            this.label41 = new System.Windows.Forms.Label();
             this.label30 = new System.Windows.Forms.Label();
             this.label32 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
@@ -106,9 +111,6 @@
             this.label16 = new System.Windows.Forms.Label();
             this.tb_location = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.label41 = new System.Windows.Forms.Label();
-            this.btnShowLogFile = new System.Windows.Forms.Button();
-            this.lbConnectionIssue = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -119,6 +121,9 @@
             // 
             // groupBox1
             // 
+            resources.ApplyResources(this.groupBox1, "groupBox1");
+            this.groupBox1.Controls.Add(this.lb_building_name);
+            this.groupBox1.Controls.Add(this.label42);
             this.groupBox1.Controls.Add(this.label40);
             this.groupBox1.Controls.Add(this.label34);
             this.groupBox1.Controls.Add(this.cb1_select_data);
@@ -139,9 +144,18 @@
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
-            resources.ApplyResources(this.groupBox1, "groupBox1");
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.TabStop = false;
+            // 
+            // lb_building_name
+            // 
+            resources.ApplyResources(this.lb_building_name, "lb_building_name");
+            this.lb_building_name.Name = "lb_building_name";
+            // 
+            // label42
+            // 
+            resources.ApplyResources(this.label42, "label42");
+            this.label42.Name = "label42";
             // 
             // label40
             // 
@@ -258,6 +272,7 @@
             // 
             // groupBox2
             // 
+            resources.ApplyResources(this.groupBox2, "groupBox2");
             this.groupBox2.Controls.Add(this.button4);
             this.groupBox2.Controls.Add(this.label14);
             this.groupBox2.Controls.Add(this.label13);
@@ -269,7 +284,6 @@
             this.groupBox2.Controls.Add(this.label11);
             this.groupBox2.Controls.Add(this.label10);
             this.groupBox2.Controls.Add(this.label9);
-            resources.ApplyResources(this.groupBox2, "groupBox2");
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.TabStop = false;
             // 
@@ -332,6 +346,7 @@
             // 
             // groupBox3
             // 
+            resources.ApplyResources(this.groupBox3, "groupBox3");
             this.groupBox3.Controls.Add(this.tb_station_distance);
             this.groupBox3.Controls.Add(this.label37);
             this.groupBox3.Controls.Add(this.label36);
@@ -341,7 +356,6 @@
             this.groupBox3.Controls.Add(this.groupBox6);
             this.groupBox3.Controls.Add(this.groupBox5);
             this.groupBox3.Controls.Add(this.groupBox4);
-            resources.ApplyResources(this.groupBox3, "groupBox3");
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.TabStop = false;
             // 
@@ -578,6 +592,23 @@
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.TabStop = false;
             // 
+            // lbConnectionIssue
+            // 
+            resources.ApplyResources(this.lbConnectionIssue, "lbConnectionIssue");
+            this.lbConnectionIssue.Name = "lbConnectionIssue";
+            // 
+            // btnShowLogFile
+            // 
+            resources.ApplyResources(this.btnShowLogFile, "btnShowLogFile");
+            this.btnShowLogFile.Name = "btnShowLogFile";
+            this.btnShowLogFile.UseVisualStyleBackColor = true;
+            this.btnShowLogFile.Click += new System.EventHandler(this.btnShowLogFile_Click);
+            // 
+            // label41
+            // 
+            resources.ApplyResources(this.label41, "label41");
+            this.label41.Name = "label41";
+            // 
             // label30
             // 
             resources.ApplyResources(this.label30, "label30");
@@ -621,23 +652,6 @@
             resources.ApplyResources(this.label15, "label15");
             this.label15.Name = "label15";
             // 
-            // label41
-            // 
-            resources.ApplyResources(this.label41, "label41");
-            this.label41.Name = "label41";
-            // 
-            // btnShowLogFile
-            // 
-            resources.ApplyResources(this.btnShowLogFile, "btnShowLogFile");
-            this.btnShowLogFile.Name = "btnShowLogFile";
-            this.btnShowLogFile.UseVisualStyleBackColor = true;
-            this.btnShowLogFile.Click += new System.EventHandler(this.btnShowLogFile_Click);
-            // 
-            // lbConnectionIssue
-            // 
-            resources.ApplyResources(this.lbConnectionIssue, "lbConnectionIssue");
-            this.lbConnectionIssue.Name = "lbConnectionIssue";
-            // 
             // Form3
             // 
             resources.ApplyResources(this, "$this");
@@ -645,6 +659,7 @@
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
+            this.MaximizeBox = false;
             this.Name = "Form3";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form3_ClosingForm);
             this.Load += new System.EventHandler(this.Form3_Load);
@@ -746,5 +761,7 @@
         private System.Windows.Forms.Button btnShowLogFile;
         private System.Windows.Forms.Label label41;
         private System.Windows.Forms.Label lbConnectionIssue;
+        private System.Windows.Forms.Label lb_building_name;
+        private System.Windows.Forms.Label label42;
     }
 }

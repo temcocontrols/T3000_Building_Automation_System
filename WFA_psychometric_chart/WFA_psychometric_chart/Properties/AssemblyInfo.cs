@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("WFA_psychometric_chart")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Psychometric Tool")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("WFA_psychometric_chart")]

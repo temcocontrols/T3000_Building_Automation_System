@@ -117,15 +117,81 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="groupBox1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="label40.AutoSize" type="System.Boolean, mscorlib">
+  <data name="lb_building_name.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="lb_building_name.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Arial, 8.25pt, style=Bold</value>
+  </data>
+  <data name="lb_building_name.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lb_building_name.Location" type="System.Drawing.Point, System.Drawing">
+    <value>422, 16</value>
+  </data>
+  <data name="lb_building_name.Size" type="System.Drawing.Size, System.Drawing">
+    <value>16, 14</value>
+  </data>
+  <data name="lb_building_name.TabIndex" type="System.Int32, mscorlib">
+    <value>24</value>
+  </data>
+  <data name="lb_building_name.Text" xml:space="preserve">
+    <value>...</value>
+  </data>
+  <data name="&gt;&gt;lb_building_name.Name" xml:space="preserve">
+    <value>lb_building_name</value>
+  </data>
+  <data name="&gt;&gt;lb_building_name.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lb_building_name.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;lb_building_name.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="label42.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label42.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="label42.Location" type="System.Drawing.Point, System.Drawing">
+    <value>337, 16</value>
+  </data>
+  <data name="label42.Size" type="System.Drawing.Size, System.Drawing">
+    <value>80, 14</value>
+  </data>
+  <data name="label42.TabIndex" type="System.Int32, mscorlib">
+    <value>23</value>
+  </data>
+  <data name="label42.Text" xml:space="preserve">
+    <value>Building Name :</value>
+  </data>
+  <data name="&gt;&gt;label42.Name" xml:space="preserve">
+    <value>label42</value>
+  </data>
+  <data name="&gt;&gt;label42.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label42.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;label42.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="label40.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
   <data name="label40.Location" type="System.Drawing.Point, System.Drawing">
     <value>796, 125</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="label40.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 0, 2, 0</value>
   </data>
@@ -148,7 +214,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label40.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>2</value>
   </data>
   <data name="label34.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -178,7 +244,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label34.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>3</value>
   </data>
   <data name="cb1_select_data.IntegralHeight" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -205,7 +271,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;cb1_select_data.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>4</value>
   </data>
   <data name="tb_elev.Location" type="System.Drawing.Point, System.Drawing">
     <value>606, 118</value>
@@ -229,7 +295,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;tb_elev.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>5</value>
   </data>
   <data name="tb_latitude.Location" type="System.Drawing.Point, System.Drawing">
     <value>606, 63</value>
@@ -253,7 +319,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;tb_latitude.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>6</value>
   </data>
   <data name="tb_longitude.Location" type="System.Drawing.Point, System.Drawing">
     <value>606, 91</value>
@@ -277,7 +343,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;tb_longitude.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>7</value>
   </data>
   <data name="button1.Location" type="System.Drawing.Point, System.Drawing">
     <value>50, 87</value>
@@ -292,7 +358,7 @@
     <value>18</value>
   </data>
   <data name="button1.Text" xml:space="preserve">
-    <value>Insert new location</value>
+    <value>Add new location</value>
   </data>
   <data name="&gt;&gt;button1.Name" xml:space="preserve">
     <value>button1</value>
@@ -304,7 +370,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;button1.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>8</value>
   </data>
   <data name="tb_ZIP.Location" type="System.Drawing.Point, System.Drawing">
     <value>606, 39</value>
@@ -328,7 +394,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;tb_ZIP.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>9</value>
   </data>
   <data name="tb_street.Location" type="System.Drawing.Point, System.Drawing">
     <value>302, 117</value>
@@ -352,7 +418,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;tb_street.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>10</value>
   </data>
   <data name="tb_city.Location" type="System.Drawing.Point, System.Drawing">
     <value>302, 91</value>
@@ -376,7 +442,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;tb_city.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>11</value>
   </data>
   <data name="tb_state.Location" type="System.Drawing.Point, System.Drawing">
     <value>302, 63</value>
@@ -400,7 +466,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;tb_state.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>12</value>
   </data>
   <data name="tb_country.Location" type="System.Drawing.Point, System.Drawing">
     <value>302, 39</value>
@@ -424,7 +490,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;tb_country.ZOrder" xml:space="preserve">
-    <value>11</value>
+    <value>13</value>
   </data>
   <data name="label8.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -454,7 +520,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label8.ZOrder" xml:space="preserve">
-    <value>12</value>
+    <value>14</value>
   </data>
   <data name="label6.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -484,7 +550,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label6.ZOrder" xml:space="preserve">
-    <value>13</value>
+    <value>15</value>
   </data>
   <data name="label7.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -514,7 +580,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label7.ZOrder" xml:space="preserve">
-    <value>14</value>
+    <value>16</value>
   </data>
   <data name="label5.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -544,7 +610,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label5.ZOrder" xml:space="preserve">
-    <value>15</value>
+    <value>17</value>
   </data>
   <data name="label4.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -574,7 +640,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label4.ZOrder" xml:space="preserve">
-    <value>16</value>
+    <value>18</value>
   </data>
   <data name="label3.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -604,7 +670,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label3.ZOrder" xml:space="preserve">
-    <value>17</value>
+    <value>19</value>
   </data>
   <data name="label2.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -634,7 +700,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label2.ZOrder" xml:space="preserve">
-    <value>18</value>
+    <value>20</value>
   </data>
   <data name="label1.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -664,7 +730,7 @@
     <value>groupBox1</value>
   </data>
   <data name="&gt;&gt;label1.ZOrder" xml:space="preserve">
-    <value>19</value>
+    <value>21</value>
   </data>
   <data name="groupBox1.Location" type="System.Drawing.Point, System.Drawing">
     <value>38, 13</value>
@@ -695,6 +761,9 @@
   </data>
   <data name="&gt;&gt;groupBox1.ZOrder" xml:space="preserve">
     <value>2</value>
+  </data>
+  <data name="groupBox2.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
   </data>
   <data name="button4.Location" type="System.Drawing.Point, System.Drawing">
     <value>482, 63</value>
@@ -1028,6 +1097,9 @@
   </data>
   <data name="&gt;&gt;groupBox2.ZOrder" xml:space="preserve">
     <value>1</value>
+  </data>
+  <data name="groupBox3.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
   </data>
   <data name="tb_station_distance.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -2423,6 +2495,9 @@
   </data>
   <data name="$this.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 3, 2, 3</value>
+  </data>
+  <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
+    <value>CenterScreen</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Weather Services</value>

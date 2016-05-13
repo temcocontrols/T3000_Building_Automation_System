@@ -144,6 +144,9 @@
   <data name="label2.Text" xml:space="preserve">
     <value>状态 ︰</value>
   </data>
+  <data name="label20.Text" xml:space="preserve">
+    <value />
+  </data>
   <data name="label3.Text" xml:space="preserve">
     <value>城市 ︰</value>
   </data>

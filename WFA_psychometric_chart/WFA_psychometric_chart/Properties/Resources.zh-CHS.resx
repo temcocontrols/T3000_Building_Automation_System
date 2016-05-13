@@ -170,7 +170,7 @@
     <value>检测到错误</value>
   </data>
   <data name="Error_Ended" xml:space="preserve">
-    <value>错误结束</value>
+    <value>建筑名称 ：</value>
   </data>
   <data name="error0" xml:space="preserve">
     <value>错误</value>
@@ -253,6 +253,9 @@
   </data>
   <data name="pulling" xml:space="preserve">
     <value>拉......</value>
+  </data>
+  <data name="Refresh_Graph" xml:space="preserve">
+    <value>刷新图表</value>
   </data>
   <data name="Right_click_to_insert_a_new_no" xml:space="preserve">
     <value>右键单击要插入新的节点。单击就可以选择你想要移动，并将鼠标悬停在要把它，请再次单击它的项目会那里修复。如果你想要使 x 轴保持恒定欺骗不断按 Alt 键移动节点移动节点。如果你想要使 y 轴常数移动时保持按 Shift 键并移动。您可以插入不同颜色节点基于选定的颜色。</value>

@@ -61,7 +61,7 @@
             this.textBox6 = new System.Windows.Forms.TextBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.textBox4 = new System.Windows.Forms.TextBox();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.tb_atm_pressure = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
@@ -106,10 +106,10 @@
             this.groupBox1.Controls.Add(this.textBox6);
             this.groupBox1.Controls.Add(this.textBox5);
             this.groupBox1.Controls.Add(this.textBox4);
-            this.groupBox1.Controls.Add(this.textBox3);
+            this.groupBox1.Controls.Add(this.tb_atm_pressure);
             this.groupBox1.Controls.Add(this.textBox2);
             this.groupBox1.Controls.Add(this.textBox1);
-            this.groupBox1.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.groupBox1.ForeColor = System.Drawing.Color.DarkSlateGray;
             resources.ApplyResources(this.groupBox1, "groupBox1");
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.TabStop = false;
@@ -172,20 +172,24 @@
             // label11
             // 
             resources.ApplyResources(this.label11, "label11");
+            this.label11.ForeColor = System.Drawing.Color.DarkSlateGray;
             this.label11.Name = "label11";
             // 
             // label10
             // 
             resources.ApplyResources(this.label10, "label10");
+            this.label10.ForeColor = System.Drawing.Color.DarkSlateGray;
             this.label10.Name = "label10";
             // 
             // label9
             // 
+            this.label9.ForeColor = System.Drawing.Color.DarkSlateGray;
             resources.ApplyResources(this.label9, "label9");
             this.label9.Name = "label9";
             // 
             // label8
             // 
+            this.label8.ForeColor = System.Drawing.Color.DarkSlateGray;
             resources.ApplyResources(this.label8, "label8");
             this.label8.Name = "label8";
             // 
@@ -272,11 +276,10 @@
             this.textBox4.Name = "textBox4";
             this.textBox4.ReadOnly = true;
             // 
-            // textBox3
+            // tb_atm_pressure
             // 
-            resources.ApplyResources(this.textBox3, "textBox3");
-            this.textBox3.Name = "textBox3";
-            this.textBox3.ReadOnly = true;
+            resources.ApplyResources(this.tb_atm_pressure, "tb_atm_pressure");
+            this.tb_atm_pressure.Name = "tb_atm_pressure";
             // 
             // textBox2
             // 
@@ -337,7 +340,7 @@
         private System.Windows.Forms.TextBox textBox6;
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.TextBox textBox4;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox tb_atm_pressure;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TextBox textBox1;
     }

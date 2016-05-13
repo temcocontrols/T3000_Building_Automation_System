@@ -1062,28 +1062,31 @@
   <data name="&gt;&gt;textBox4.ZOrder" xml:space="preserve">
     <value>29</value>
   </data>
-  <data name="textBox3.Location" type="System.Drawing.Point, System.Drawing">
+  <data name="tb_atm_pressure.Location" type="System.Drawing.Point, System.Drawing">
     <value>146, 91</value>
   </data>
-  <data name="textBox3.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+  <data name="tb_atm_pressure.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>2, 3, 2, 3</value>
   </data>
-  <data name="textBox3.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="tb_atm_pressure.Size" type="System.Drawing.Size, System.Drawing">
     <value>100, 20</value>
   </data>
-  <data name="textBox3.TabIndex" type="System.Int32, mscorlib">
+  <data name="tb_atm_pressure.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
-  <data name="&gt;&gt;textBox3.Name" xml:space="preserve">
-    <value>textBox3</value>
+  <data name="tb_atm_pressure.Text" xml:space="preserve">
+    <value>1013</value>
   </data>
-  <data name="&gt;&gt;textBox3.Type" xml:space="preserve">
+  <data name="&gt;&gt;tb_atm_pressure.Name" xml:space="preserve">
+    <value>tb_atm_pressure</value>
+  </data>
+  <data name="&gt;&gt;tb_atm_pressure.Type" xml:space="preserve">
     <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;textBox3.Parent" xml:space="preserve">
+  <data name="&gt;&gt;tb_atm_pressure.Parent" xml:space="preserve">
     <value>groupBox1</value>
   </data>
-  <data name="&gt;&gt;textBox3.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;tb_atm_pressure.ZOrder" xml:space="preserve">
     <value>30</value>
   </data>
   <data name="textBox2.Location" type="System.Drawing.Point, System.Drawing">

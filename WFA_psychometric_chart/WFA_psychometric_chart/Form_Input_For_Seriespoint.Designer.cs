@@ -42,6 +42,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnSetNode
@@ -115,10 +116,16 @@
             resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
             // 
+            // label6
+            // 
+            resources.ApplyResources(this.label6, "label6");
+            this.label6.Name = "label6";
+            // 
             // Form_Input_For_Seriespoint
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.btnSetNode);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.comboBox1);
@@ -154,5 +161,6 @@
         private System.Windows.Forms.TextBox tbSource;
         private System.Windows.Forms.TextBox tbName;
         private System.Windows.Forms.TextBox tbLabel;
+        private System.Windows.Forms.Label label6;
     }
 }

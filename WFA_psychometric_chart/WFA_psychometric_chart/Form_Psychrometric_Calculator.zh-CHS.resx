@@ -117,11 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="button2.Text" xml:space="preserve">
-    <value>计算</value>
-  </data>
   <data name="$this.Text" xml:space="preserve">
     <value>干湿球计算器</value>
+  </data>
+  <data name="button2.Text" xml:space="preserve">
+    <value>计算</value>
   </data>
   <data name="groupBox1.Text" xml:space="preserve">
     <value>计算</value>

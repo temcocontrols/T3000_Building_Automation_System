@@ -161,6 +161,15 @@ namespace WFA_psychometric_chart.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Building Name can not be empty..
+        /// </summary>
+        internal static string Building_Name_can_not_be_empty {
+            get {
+                return ResourceManager.GetString("Building_Name_can_not_be_empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Chose a path and file name.
         /// </summary>
         internal static string Chose_a_path_and_file_name {
@@ -513,6 +522,15 @@ namespace WFA_psychometric_chart.Properties {
         internal static string pulling {
             get {
                 return ResourceManager.GetString("pulling", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh Graph.
+        /// </summary>
+        internal static string Refresh_Graph {
+            get {
+                return ResourceManager.GetString("Refresh_Graph", resourceCulture);
             }
         }
         

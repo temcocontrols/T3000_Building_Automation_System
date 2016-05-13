@@ -122,13 +122,18 @@
   </data>
   <data name="button1.Text" xml:space="preserve">
     <value>刷新图表</value>
-    <comment>Previous text: Plot new graph</comment>
   </data>
   <data name="chart1.Text" xml:space="preserve">
     <value>图表 1</value>
   </data>
+  <data name="exitToolStripMenuItem.Text" xml:space="preserve">
+    <value>退出</value>
+  </data>
   <data name="exportDataToolStripMenuItem.Text" xml:space="preserve">
     <value>导出数据</value>
+  </data>
+  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
+    <value>文件</value>
   </data>
   <data name="groupBox4.Text" xml:space="preserve">
     <value>不同的参数值</value>
@@ -136,29 +141,42 @@
   <data name="heatMapToolStripMenuItem.Text" xml:space="preserve">
     <value>热图</value>
   </data>
+  <data name="helpPsychometricChartToolStripMenuItem.Text" xml:space="preserve">
+    <value>焓湿图</value>
+  </data>
+  <data name="helpToolStripMenuItem.Text" xml:space="preserve">
+    <value>帮助</value>
+  </data>
   <data name="humiditySensorCalibrationToolStripMenuItem.Text" xml:space="preserve">
     <value>湿度室的校准方法</value>
   </data>
+  <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
+    <value>插入节点</value>
+  </data>
+  <data name="label2_DBT_units.Text" xml:space="preserve">
+    <value>℃</value>
+  </data>
   <data name="label21.Text" xml:space="preserve">
     <value>DBT:</value>
+    <comment>Previous text: DBT :</comment>
   </data>
   <data name="label23.Text" xml:space="preserve">
     <value>某地 H:</value>
   </data>
   <data name="label24.Text" xml:space="preserve">
     <value>相对湿度 ︰</value>
+    <comment>Previous text: RH :</comment>
   </data>
   <data name="label25.Text" xml:space="preserve">
     <value>DP:</value>
+    <comment>Previous text: DP :</comment>
   </data>
   <data name="label26.Text" xml:space="preserve">
     <value>H:</value>
+    <comment>Previous text: H :</comment>
   </data>
-  <data name="label27.Text" xml:space="preserve">
-    <value>X-线 ︰</value>
-  </data>
-  <data name="label29.Text" xml:space="preserve">
-    <value>Y-线 ︰</value>
+  <data name="label6_DP_Unit.Text" xml:space="preserve">
+    <value>℃</value>
   </data>
   <data name="lb_dbt.Text" xml:space="preserve">
     <value>则为 null</value>
@@ -175,26 +193,24 @@
   <data name="lb_RH.Text" xml:space="preserve">
     <value>则为 null</value>
   </data>
-  <data name="lb_x_cord.Text" xml:space="preserve">
-    <value>则为 null</value>
-  </data>
-  <data name="lb_y_cord.Text" xml:space="preserve">
-    <value>则为 null</value>
-  </data>
   <data name="menuStrip1.Text" xml:space="preserve">
     <value>menustrip1</value>
   </data>
   <data name="optionToolStripMenuItem.Text" xml:space="preserve">
     <value>选项</value>
   </data>
-  <data name="processDiagramToolStripMenuItem.Text" xml:space="preserve">
-    <value>流程图</value>
+  <data name="printToolStripMenuItem.Text" xml:space="preserve">
+    <value>打印</value>
   </data>
   <data name="psychrometricCalculatorToolStripMenuItem.Text" xml:space="preserve">
     <value>干湿球计算器</value>
+    <comment>Previous text: Psychrometric Calculator</comment>
   </data>
   <data name="realTimePlottingToolStripMenuItem.Text" xml:space="preserve">
     <value>实时绘制</value>
+  </data>
+  <data name="saveAsToolStripMenuItem.Text" xml:space="preserve">
+    <value>另存为</value>
   </data>
   <data name="weatherServicesToolStripMenuItem.Text" xml:space="preserve">
     <value>天气服务</value>

@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="$this.Text" xml:space="preserve">
-    <value>날씨 서비스</value>
-  </data>
   <data name="btn_help.Text" xml:space="preserve">
     <value>도움말</value>
   </data>
@@ -128,6 +125,7 @@
   </data>
   <data name="button1.Text" xml:space="preserve">
     <value>새 위치 삽입</value>
+    <comment>Previous text: Insert new location</comment>
   </data>
   <data name="button4.Text" xml:space="preserve">
     <value>지금 업데이트</value>
@@ -137,6 +135,9 @@
   </data>
   <data name="cb_hum_self_calib.Text" xml:space="preserve">
     <value>[서비스 있도록 틱]</value>
+  </data>
+  <data name="$this.Text" xml:space="preserve">
+    <value>날씨 서비스</value>
   </data>
   <data name="groupBox1.Text" xml:space="preserve">
     <value>건물 위치</value>
@@ -245,6 +246,9 @@
   </data>
   <data name="label41.Text" xml:space="preserve">
     <value>연결 오류 문제? </value>
+  </data>
+  <data name="label42.Text" xml:space="preserve">
+    <value>건물 이름 :</value>
   </data>
   <data name="label5.Text" xml:space="preserve">
     <value>우편 번호:</value>

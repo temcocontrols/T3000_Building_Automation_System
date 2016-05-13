@@ -167,7 +167,6 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>56</StringID>
-    <Comment>Previous text: Plot new graph</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>57</StringID>
@@ -246,18 +245,22 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>82</StringID>
+    <Comment>Previous text: H :</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>83</StringID>
+    <Comment>Previous text: DP :</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>84</StringID>
+    <Comment>Previous text: RH :</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>85</StringID>
   </GeneralIds>
   <GeneralIds>
     <StringID>86</StringID>
+    <Comment>Previous text: DBT :</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>87</StringID>
@@ -282,6 +285,7 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>94</StringID>
+    <Comment>Previous text: Insert new location</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>95</StringID>
@@ -723,6 +727,53 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>241</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>242</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>243</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>244</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>245</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>246</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>247</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>248</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>249</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>250</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>251</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>252</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>253</StringID>
+    <Comment>Previous text: Building Name:</Comment>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>254</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>255</StringID>
+    <Comment>Previous text: Psychrometric Calculator</Comment>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>256</StringID>
   </GeneralIds>
   <Languages>
     <LanguageID>1033</LanguageID>
@@ -1231,19 +1282,19 @@
   <GeneralTexts>
     <StringID>82</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>H :</LanguageText>
+    <LanguageText>H       :</LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>83</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>DP :</LanguageText>
+    <LanguageText>DP     :</LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>84</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>RH :</LanguageText>
+    <LanguageText>RH     :</LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
@@ -1255,7 +1306,7 @@
   <GeneralTexts>
     <StringID>86</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>DBT :</LanguageText>
+    <LanguageText>DBT   :</LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
@@ -1303,7 +1354,7 @@
   <GeneralTexts>
     <StringID>94</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>Insert new location</LanguageText>
+    <LanguageText>Add new location</LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
@@ -2684,7 +2735,7 @@
     <StringID>86</StringID>
     <LanguageID>4</LanguageID>
     <LanguageText>DBT:</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>85</StringID>
@@ -2696,19 +2747,19 @@
     <StringID>84</StringID>
     <LanguageID>4</LanguageID>
     <LanguageText>相对湿度 ︰</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>83</StringID>
     <LanguageID>4</LanguageID>
     <LanguageText>DP:</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>82</StringID>
     <LanguageID>4</LanguageID>
     <LanguageText>H:</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>81</StringID>
@@ -2756,7 +2807,7 @@
     <StringID>94</StringID>
     <LanguageID>4</LanguageID>
     <LanguageText>插入新的位置</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>97</StringID>
@@ -3200,8 +3251,8 @@
   <GeneralTexts>
     <StringID>232</StringID>
     <LanguageID>4</LanguageID>
-    <LanguageText>错误结束</LanguageText>
-    <Status>5</Status>
+    <LanguageText>建筑名称 ：</LanguageText>
+    <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>233</StringID>
@@ -3842,7 +3893,7 @@
     <StringID>86</StringID>
     <LanguageID>1042</LanguageID>
     <LanguageText>DBT:</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>85</StringID>
@@ -3854,19 +3905,19 @@
     <StringID>84</StringID>
     <LanguageID>1042</LanguageID>
     <LanguageText>RH:</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>83</StringID>
     <LanguageID>1042</LanguageID>
     <LanguageText>DP는:</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>82</StringID>
     <LanguageID>1042</LanguageID>
     <LanguageText>H:</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>81</StringID>
@@ -3902,7 +3953,7 @@
     <StringID>94</StringID>
     <LanguageID>1042</LanguageID>
     <LanguageText>새 위치 삽입</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>97</StringID>
@@ -4521,6 +4572,192 @@
     <LanguageID>1042</LanguageID>
     <LanguageText>성공!</LanguageText>
     <Status>5</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>242</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Click to change color</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>243</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>1013</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>244</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>KJ/kg</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>245</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Unitless</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>246</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Units(SI)</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>247</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Print</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>248</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Save As</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>249</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Exit</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>250</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>File</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>251</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Psychometric chart</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>252</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Building Name :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>253</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Building Name :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>254</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>...</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>255</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>干湿球计算器</LanguageText>
+    <Status>7</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>255</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Psychometric Calculator</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>255</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>심리 계산기</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>249</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>退出</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>249</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>끝내기</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>250</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>文件</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>250</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>파일</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>247</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>打印</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>247</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>인쇄</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>248</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>另存为</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>248</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>다른 이름으로 저장</LanguageText>
+    <Status>3</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>256</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Building Name can not be empty.</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>251</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>焓湿图</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>252</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText />
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>251</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>심리 차트</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>252</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>건물 이름 :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>253</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>建筑名称 ：</LanguageText>
+    <Status>7</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>253</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>건물 이름 :</LanguageText>
+    <Status>7</Status>
   </GeneralTexts>
   <Properties>
     <Component>Form4_insert_data.cs</Component>
@@ -7396,7 +7633,7 @@
   <Properties>
     <Component>Form1_main.cs</Component>
     <Name>psychrometricCalculatorToolStripMenuItem.Text</Name>
-    <StringID>203</StringID>
+    <StringID>255</StringID>
     <Selected>true</Selected>
     <ResourceName>psychrometricCalculatorToolStripMenuItem.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -7921,6 +8158,190 @@
     <ResourceName>value_inserted_successfully</ResourceName>
     <Hidden>false</Hidden>
   </Properties>
+  <Properties>
+    <Component>Form_Input_For_Seriespoint.cs</Component>
+    <Name>label6.Text</Name>
+    <StringID>242</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label6.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_Psychrometric_Calculator.cs</Component>
+    <Name>tb_atm_pressure.Text</Name>
+    <StringID>243</StringID>
+    <Selected>true</Selected>
+    <ResourceName>tb_atm_pressure.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_Psychrometric_Calculator.cs</Component>
+    <Name>$this.Text</Name>
+    <StringID>203</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>label5_H_unit.Text</Name>
+    <StringID>244</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label5_H_unit.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>label6_DP_Unit.Text</Name>
+    <StringID>64</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label6_DP_Unit.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>label4_RH_unit.Text</Name>
+    <StringID>21</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label4_RH_unit.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>label3_Sp_H_unit.Text</Name>
+    <StringID>245</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label3_Sp_H_unit.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>label2_DBT_units.Text</Name>
+    <StringID>64</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label2_DBT_units.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>label1_units.Text</Name>
+    <StringID>246</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label1_units.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>printToolStripMenuItem.Text</Name>
+    <StringID>247</StringID>
+    <Selected>true</Selected>
+    <ResourceName>printToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>saveAsToolStripMenuItem.Text</Name>
+    <StringID>248</StringID>
+    <Selected>true</Selected>
+    <ResourceName>saveAsToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>exitToolStripMenuItem.Text</Name>
+    <StringID>249</StringID>
+    <Selected>true</Selected>
+    <ResourceName>exitToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>fileToolStripMenuItem.Text</Name>
+    <StringID>250</StringID>
+    <Selected>true</Selected>
+    <ResourceName>fileToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>helpPsychometricChartToolStripMenuItem.Text</Name>
+    <StringID>251</StringID>
+    <Selected>true</Selected>
+    <ResourceName>helpPsychometricChartToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>helpToolStripMenuItem.Text</Name>
+    <StringID>111</StringID>
+    <Selected>true</Selected>
+    <ResourceName>helpToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>insertNodeToolStripMenuItem.Text</Name>
+    <StringID>151</StringID>
+    <Selected>true</Selected>
+    <ResourceName>insertNodeToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form4_insert_data.cs</Component>
+    <Name>label20.Text</Name>
+    <StringID>252</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label20.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form4_insert_data.cs</Component>
+    <Name>label21.Text</Name>
+    <StringID>3</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label21.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_Psychrometric_Calculator.cs</Component>
+    <Name>tb_atm_pressure.Lines[0]</Name>
+    <StringID>243</StringID>
+    <Selected>true</Selected>
+    <ResourceName>tb_atm_pressure.Lines[0]</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form3.cs</Component>
+    <Name>label42.Text</Name>
+    <StringID>253</StringID>
+    <Selected>true</Selected>
+    <ResourceName>label42.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form3.cs</Component>
+    <Name>lb_building_name.Text</Name>
+    <StringID>254</StringID>
+    <Selected>true</Selected>
+    <ResourceName>lb_building_name.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Building_Name_can_not_be_empty</Name>
+    <StringID>256</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Building_Name_can_not_be_empty</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Refresh_Graph</Name>
+    <StringID>56</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Refresh_Graph</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
   <GeneralAttributes>
     <Name>XmlDatabaseVersion</Name>
     <TextValue>1</TextValue>
@@ -7928,7 +8349,7 @@
   </GeneralAttributes>
   <GeneralAttributes>
     <Name>StatusHash</Name>
-    <TextValue>VNzuDK+Bn9VWAMPlnVojKeppLUk=</TextValue>
+    <TextValue>sYpP/jN5sI0bv8M+nqAskeD/E2s=</TextValue>
     <NumValue>0</NumValue>
   </GeneralAttributes>
   <GeneralAttributes>

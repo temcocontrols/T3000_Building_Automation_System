@@ -30,7 +30,12 @@ namespace WFA_psychometric_chart
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (tb_country.Text == "")
+
+            if(tb_BuildingName.Text == "")
+            {
+                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Building_Name_can_not_be_empty);
+            }
+            else if (tb_country.Text == "")
             {
                 MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Enter_country_name);
 
@@ -46,6 +51,7 @@ namespace WFA_psychometric_chart
             }
             else
             {
+                string buildingName = tb_BuildingName.Text;
                 string country = tb_country.Text;
                 string city = tb_city.Text;
                 string state = tb_state.Text;
@@ -77,7 +83,7 @@ namespace WFA_psychometric_chart
 
                         connection.Open();
                         //string sql_string = "update tbl_building_location set   country=@country_value,state=@state_value,city=@city_value,street=@street_value,ZIP=@zip_value where ID = 1;";
-                        string sql_query = "INSERT INTO tbl_building_location(country,state,city,street,zip,longitude,latitude,elevation) VALUES(@country_value,@state_value,@city_value,@street_value,@zip_value,@long_value,@lat_value,@elevation_value)";
+                        string sql_query = "INSERT INTO tbl_building_location(country,state,city,street,zip,longitude,latitude,elevation,BuildingName) VALUES(@country_value,@state_value,@city_value,@street_value,@zip_value,@long_value,@lat_value,@elevation_value,@building_name)";
                          SQLiteCommand command = new SQLiteCommand(sql_query, connection);
                         command.CommandType = CommandType.Text;
                         command.Parameters.AddWithValue("@country_value", country);
@@ -88,7 +94,7 @@ namespace WFA_psychometric_chart
                         command.Parameters.AddWithValue("@long_value", lng);
                         command.Parameters.AddWithValue("@lat_value", lat);
                         command.Parameters.AddWithValue("@elevation_value", elevation);
-
+                        command.Parameters.AddWithValue("@building_name", buildingName);
                         command.ExecuteNonQuery();
                         //MessageBox.Show("sql string = " + sql_string);
                         MessageBox.Show(WFA_psychometric_chart.Properties.Resources.value_inserted_successfully);

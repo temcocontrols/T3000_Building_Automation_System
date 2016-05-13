@@ -151,6 +151,9 @@
   <data name="Building_Information0" xml:space="preserve">
     <value>Building Information :,</value>
   </data>
+  <data name="Building_Name_can_not_be_empty" xml:space="preserve">
+    <value>Building Name can not be empty.</value>
+  </data>
   <data name="Chose_a_path_and_file_name" xml:space="preserve">
     <value>Chose a path and file name</value>
   </data>
@@ -268,6 +271,9 @@
   </data>
   <data name="pulling" xml:space="preserve">
     <value>pulling...</value>
+  </data>
+  <data name="Refresh_Graph" xml:space="preserve">
+    <value>Refresh Graph</value>
   </data>
   <data name="Right_click_to_insert_a_new_no" xml:space="preserve">
     <value>Right click to insert a new node. single click to select the items you want to move and hover over where you want to put it and click again it will fix there. If you want to make x-axis constant wile moving the node move the node by constantly clicking the Alt key.If you want to make y-axis constant while moving keep pressing the Shift key and move. You can insert different color nodes based on the color selected.</value>

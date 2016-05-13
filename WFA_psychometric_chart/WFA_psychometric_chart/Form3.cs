@@ -470,6 +470,7 @@ namespace WFA_psychometric_chart
                         tb_latitude.Text = reader["latitude"].ToString();
                         tb_longitude.Text = reader["longitude"].ToString();
                         tb_elev.Text = reader["elevation"].ToString();
+                        lb_building_name.Text = reader["BuildingName"].ToString();
 
                     }
                 }
@@ -1681,5 +1682,6 @@ namespace WFA_psychometric_chart
             }
 
         }
+          
     }
 }

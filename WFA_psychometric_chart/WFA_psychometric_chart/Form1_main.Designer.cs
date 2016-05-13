@@ -28,9 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1_main));
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1_main));
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
@@ -71,10 +72,12 @@
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.lb_y_cord = new System.Windows.Forms.Label();
-            this.label29 = new System.Windows.Forms.Label();
-            this.lb_x_cord = new System.Windows.Forms.Label();
-            this.label27 = new System.Windows.Forms.Label();
+            this.label5_H_unit = new System.Windows.Forms.Label();
+            this.label6_DP_Unit = new System.Windows.Forms.Label();
+            this.label4_RH_unit = new System.Windows.Forms.Label();
+            this.label3_Sp_H_unit = new System.Windows.Forms.Label();
+            this.label2_DBT_units = new System.Windows.Forms.Label();
+            this.label1_units = new System.Windows.Forms.Label();
             this.lb_enthalpy = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
             this.lb_DP = new System.Windows.Forms.Label();
@@ -91,16 +94,27 @@
             this.realTimePlottingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.heatMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.processDiagramToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.psychrometricCalculatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpPsychometricChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CMSinsertNode = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.insertNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveFD = new System.Windows.Forms.SaveFileDialog();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            this.CMSinsertNode.SuspendLayout();
             this.SuspendLayout();
             // 
             // chart1
             // 
+            resources.ApplyResources(this.chart1, "chart1");
             chartArea1.AxisX.LabelAutoFitMinFontSize = 5;
             chartArea1.AxisY.LabelAutoFitMinFontSize = 5;
             chartArea1.CursorX.Interval = 5D;
@@ -110,7 +124,6 @@
             legend1.Enabled = false;
             legend1.Name = "Legend1";
             this.chart1.Legends.Add(legend1);
-            resources.ApplyResources(this.chart1, "chart1");
             this.chart1.Name = "chart1";
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
@@ -259,6 +272,8 @@
             this.chart1.Series.Add(series36);
             title1.Name = "Psychometric chart";
             this.chart1.Titles.Add(title1);
+            this.chart1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseClick);
+            this.chart1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseDown);
             this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
             // 
             // button1
@@ -270,10 +285,12 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.lb_y_cord);
-            this.groupBox4.Controls.Add(this.label29);
-            this.groupBox4.Controls.Add(this.lb_x_cord);
-            this.groupBox4.Controls.Add(this.label27);
+            this.groupBox4.Controls.Add(this.label5_H_unit);
+            this.groupBox4.Controls.Add(this.label6_DP_Unit);
+            this.groupBox4.Controls.Add(this.label4_RH_unit);
+            this.groupBox4.Controls.Add(this.label3_Sp_H_unit);
+            this.groupBox4.Controls.Add(this.label2_DBT_units);
+            this.groupBox4.Controls.Add(this.label1_units);
             this.groupBox4.Controls.Add(this.lb_enthalpy);
             this.groupBox4.Controls.Add(this.label26);
             this.groupBox4.Controls.Add(this.lb_DP);
@@ -288,25 +305,40 @@
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.TabStop = false;
             // 
-            // lb_y_cord
+            // label5_H_unit
             // 
-            resources.ApplyResources(this.lb_y_cord, "lb_y_cord");
-            this.lb_y_cord.Name = "lb_y_cord";
+            resources.ApplyResources(this.label5_H_unit, "label5_H_unit");
+            this.label5_H_unit.Name = "label5_H_unit";
+            this.label5_H_unit.MouseHover += new System.EventHandler(this.label5_H_unit_MouseHover);
             // 
-            // label29
+            // label6_DP_Unit
             // 
-            resources.ApplyResources(this.label29, "label29");
-            this.label29.Name = "label29";
+            resources.ApplyResources(this.label6_DP_Unit, "label6_DP_Unit");
+            this.label6_DP_Unit.Name = "label6_DP_Unit";
+            this.label6_DP_Unit.MouseHover += new System.EventHandler(this.label6_DP_Unit_MouseHover);
             // 
-            // lb_x_cord
+            // label4_RH_unit
             // 
-            resources.ApplyResources(this.lb_x_cord, "lb_x_cord");
-            this.lb_x_cord.Name = "lb_x_cord";
+            resources.ApplyResources(this.label4_RH_unit, "label4_RH_unit");
+            this.label4_RH_unit.Name = "label4_RH_unit";
+            this.label4_RH_unit.MouseHover += new System.EventHandler(this.label4_RH_unit_MouseHover);
             // 
-            // label27
+            // label3_Sp_H_unit
             // 
-            resources.ApplyResources(this.label27, "label27");
-            this.label27.Name = "label27";
+            resources.ApplyResources(this.label3_Sp_H_unit, "label3_Sp_H_unit");
+            this.label3_Sp_H_unit.Name = "label3_Sp_H_unit";
+            this.label3_Sp_H_unit.MouseHover += new System.EventHandler(this.label3_Sp_H_unit_MouseHover);
+            // 
+            // label2_DBT_units
+            // 
+            resources.ApplyResources(this.label2_DBT_units, "label2_DBT_units");
+            this.label2_DBT_units.Name = "label2_DBT_units";
+            this.label2_DBT_units.MouseHover += new System.EventHandler(this.label2_DBT_units_MouseHover);
+            // 
+            // label1_units
+            // 
+            resources.ApplyResources(this.label1_units, "label1_units");
+            this.label1_units.Name = "label1_units";
             // 
             // lb_enthalpy
             // 
@@ -317,6 +349,7 @@
             // 
             resources.ApplyResources(this.label26, "label26");
             this.label26.Name = "label26";
+            this.label26.MouseHover += new System.EventHandler(this.label26_MouseHover);
             // 
             // lb_DP
             // 
@@ -327,6 +360,7 @@
             // 
             resources.ApplyResources(this.label25, "label25");
             this.label25.Name = "label25";
+            this.label25.MouseHover += new System.EventHandler(this.label25_MouseHover);
             // 
             // lb_RH
             // 
@@ -337,6 +371,7 @@
             // 
             resources.ApplyResources(this.label24, "label24");
             this.label24.Name = "label24";
+            this.label24.MouseHover += new System.EventHandler(this.label24_MouseHover);
             // 
             // lb_humidity_ratio
             // 
@@ -347,6 +382,7 @@
             // 
             resources.ApplyResources(this.label23, "label23");
             this.label23.Name = "label23";
+            this.label23.MouseHover += new System.EventHandler(this.label23_MouseHover);
             // 
             // lb_dbt
             // 
@@ -357,6 +393,7 @@
             // 
             resources.ApplyResources(this.label21, "label21");
             this.label21.Name = "label21";
+            this.label21.MouseHover += new System.EventHandler(this.label21_MouseHover);
             // 
             // optionToolStripMenuItem
             // 
@@ -366,7 +403,6 @@
             this.realTimePlottingToolStripMenuItem,
             this.heatMapToolStripMenuItem,
             this.exportDataToolStripMenuItem,
-            this.processDiagramToolStripMenuItem,
             this.psychrometricCalculatorToolStripMenuItem});
             this.optionToolStripMenuItem.Name = "optionToolStripMenuItem";
             resources.ApplyResources(this.optionToolStripMenuItem, "optionToolStripMenuItem");
@@ -401,12 +437,6 @@
             resources.ApplyResources(this.exportDataToolStripMenuItem, "exportDataToolStripMenuItem");
             this.exportDataToolStripMenuItem.Click += new System.EventHandler(this.exportDataToolStripMenuItem_Click);
             // 
-            // processDiagramToolStripMenuItem
-            // 
-            this.processDiagramToolStripMenuItem.Name = "processDiagramToolStripMenuItem";
-            resources.ApplyResources(this.processDiagramToolStripMenuItem, "processDiagramToolStripMenuItem");
-            this.processDiagramToolStripMenuItem.Click += new System.EventHandler(this.processDiagramToolStripMenuItem_Click);
-            // 
             // psychrometricCalculatorToolStripMenuItem
             // 
             this.psychrometricCalculatorToolStripMenuItem.Name = "psychrometricCalculatorToolStripMenuItem";
@@ -416,9 +446,64 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.optionToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.optionToolStripMenuItem,
+            this.helpToolStripMenuItem});
             resources.ApplyResources(this.menuStrip1, "menuStrip1");
             this.menuStrip1.Name = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.printToolStripMenuItem,
+            this.saveAsToolStripMenuItem,
+            this.exitToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
+            // 
+            // printToolStripMenuItem
+            // 
+            this.printToolStripMenuItem.Name = "printToolStripMenuItem";
+            resources.ApplyResources(this.printToolStripMenuItem, "printToolStripMenuItem");
+            this.printToolStripMenuItem.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
+            // 
+            // saveAsToolStripMenuItem
+            // 
+            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            resources.ApplyResources(this.saveAsToolStripMenuItem, "saveAsToolStripMenuItem");
+            this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            resources.ApplyResources(this.exitToolStripMenuItem, "exitToolStripMenuItem");
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.helpPsychometricChartToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            resources.ApplyResources(this.helpToolStripMenuItem, "helpToolStripMenuItem");
+            // 
+            // helpPsychometricChartToolStripMenuItem
+            // 
+            this.helpPsychometricChartToolStripMenuItem.Name = "helpPsychometricChartToolStripMenuItem";
+            resources.ApplyResources(this.helpPsychometricChartToolStripMenuItem, "helpPsychometricChartToolStripMenuItem");
+            this.helpPsychometricChartToolStripMenuItem.Click += new System.EventHandler(this.helpPsychometricChartToolStripMenuItem_Click);
+            // 
+            // CMSinsertNode
+            // 
+            this.CMSinsertNode.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.insertNodeToolStripMenuItem});
+            this.CMSinsertNode.Name = "contextMenuStrip2";
+            resources.ApplyResources(this.CMSinsertNode, "CMSinsertNode");
+            // 
+            // insertNodeToolStripMenuItem
+            // 
+            this.insertNodeToolStripMenuItem.Name = "insertNodeToolStripMenuItem";
+            resources.ApplyResources(this.insertNodeToolStripMenuItem, "insertNodeToolStripMenuItem");
+            this.insertNodeToolStripMenuItem.Click += new System.EventHandler(this.insertNodeToolStripMenuItem_Click);
             // 
             // Form1_main
             // 
@@ -431,26 +516,22 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1_main";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.CMSinsertNode.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.Label lb_y_cord;
-        private System.Windows.Forms.Label label29;
-        private System.Windows.Forms.Label lb_x_cord;
-        private System.Windows.Forms.Label label27;
         private System.Windows.Forms.Label lb_enthalpy;
         private System.Windows.Forms.Label label26;
         private System.Windows.Forms.Label lb_DP;
@@ -467,9 +548,25 @@
         private System.Windows.Forms.ToolStripMenuItem realTimePlottingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem heatMapToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportDataToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem processDiagramToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem psychrometricCalculatorToolStripMenuItem;
         private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ContextMenuStrip CMSinsertNode;
+        private System.Windows.Forms.ToolStripMenuItem insertNodeToolStripMenuItem;
+        private System.Windows.Forms.SaveFileDialog saveFD;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Label label5_H_unit;
+        private System.Windows.Forms.Label label6_DP_Unit;
+        private System.Windows.Forms.Label label4_RH_unit;
+        private System.Windows.Forms.Label label3_Sp_H_unit;
+        private System.Windows.Forms.Label label2_DBT_units;
+        private System.Windows.Forms.Label label1_units;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem printToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem helpPsychometricChartToolStripMenuItem;
     }
 }
 

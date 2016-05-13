@@ -254,6 +254,9 @@
   <data name="pulling" xml:space="preserve">
     <value>당기...</value>
   </data>
+  <data name="Refresh_Graph" xml:space="preserve">
+    <value>그래프 새로 고침</value>
+  </data>
   <data name="Right_click_to_insert_a_new_no" xml:space="preserve">
     <value>오른쪽 클릭 새 노드를 삽입 합니다. 단일 클릭 하 여 선택 원하는 항목을 이동 하 고 그것을 넣어 하 고 다시 클릭을 가리키면 거기 해결 됩니다. X 축 일정 확인 하려면 지속적으로 Alt 키를 클릭 하 여 노드 이동 노드가 이동 책략. 만약 y 축 지속적인 이동 하는 동안 Shift 키를 누르면 계속 이동 하 게 하려는. 선택한 색상에 따라 다른 색상 노드를 삽입할 수 있습니다.</value>
   </data>

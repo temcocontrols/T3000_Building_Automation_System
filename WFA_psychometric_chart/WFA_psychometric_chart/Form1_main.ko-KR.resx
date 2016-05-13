@@ -122,10 +122,15 @@
   </data>
   <data name="button1.Text" xml:space="preserve">
     <value>그래프 새로 고침</value>
-    <comment>Previous text: Plot new graph</comment>
+  </data>
+  <data name="exitToolStripMenuItem.Text" xml:space="preserve">
+    <value>끝내기</value>
   </data>
   <data name="exportDataToolStripMenuItem.Text" xml:space="preserve">
     <value>데이터 내보내기</value>
+  </data>
+  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
+    <value>파일</value>
   </data>
   <data name="groupBox4.Text" xml:space="preserve">
     <value>다른 매개 변수 값</value>
@@ -133,41 +138,58 @@
   <data name="heatMapToolStripMenuItem.Text" xml:space="preserve">
     <value>열 지도</value>
   </data>
+  <data name="helpPsychometricChartToolStripMenuItem.Text" xml:space="preserve">
+    <value>심리 차트</value>
+  </data>
+  <data name="helpToolStripMenuItem.Text" xml:space="preserve">
+    <value>도움말</value>
+  </data>
   <data name="humiditySensorCalibrationToolStripMenuItem.Text" xml:space="preserve">
     <value>습도 챔버 교정</value>
   </data>
+  <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
+    <value>노드 삽입</value>
+  </data>
+  <data name="label2_DBT_units.Text" xml:space="preserve">
+    <value>정도 C</value>
+  </data>
   <data name="label21.Text" xml:space="preserve">
     <value>DBT:</value>
+    <comment>Previous text: DBT :</comment>
   </data>
   <data name="label23.Text" xml:space="preserve">
     <value>Sp. H:</value>
   </data>
   <data name="label24.Text" xml:space="preserve">
     <value>RH:</value>
+    <comment>Previous text: RH :</comment>
   </data>
   <data name="label25.Text" xml:space="preserve">
     <value>DP는:</value>
+    <comment>Previous text: DP :</comment>
   </data>
   <data name="label26.Text" xml:space="preserve">
     <value>H:</value>
+    <comment>Previous text: H :</comment>
   </data>
-  <data name="label27.Text" xml:space="preserve">
-    <value>X-코드:</value>
-  </data>
-  <data name="label29.Text" xml:space="preserve">
-    <value>Y-코드:</value>
+  <data name="label6_DP_Unit.Text" xml:space="preserve">
+    <value>정도 C</value>
   </data>
   <data name="optionToolStripMenuItem.Text" xml:space="preserve">
     <value>옵션</value>
   </data>
-  <data name="processDiagramToolStripMenuItem.Text" xml:space="preserve">
-    <value>프로세스 다이어그램</value>
+  <data name="printToolStripMenuItem.Text" xml:space="preserve">
+    <value>인쇄</value>
   </data>
   <data name="psychrometricCalculatorToolStripMenuItem.Text" xml:space="preserve">
-    <value>Psychrometric 계산기</value>
+    <value>심리 계산기</value>
+    <comment>Previous text: Psychrometric Calculator</comment>
   </data>
   <data name="realTimePlottingToolStripMenuItem.Text" xml:space="preserve">
     <value>실시간으로 플롯</value>
+  </data>
+  <data name="saveAsToolStripMenuItem.Text" xml:space="preserve">
+    <value>다른 이름으로 저장</value>
   </data>
   <data name="weatherServicesToolStripMenuItem.Text" xml:space="preserve">
     <value>날씨 서비스</value>
