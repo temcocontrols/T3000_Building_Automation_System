@@ -106,6 +106,16 @@ namespace WFA_psychometric_chart.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 
+        ///Enthalpy : .
+        /// </summary>
+        internal static string _Enthalpy {
+            get {
+                return ResourceManager.GetString("_Enthalpy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to                 Internet Connection Available.
         /// </summary>
         internal static string _Internet_Connection_Available {
@@ -161,15 +171,6 @@ namespace WFA_psychometric_chart.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Building Name can not be empty..
-        /// </summary>
-        internal static string Building_Name_can_not_be_empty {
-            get {
-                return ResourceManager.GetString("Building_Name_can_not_be_empty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Chose a path and file name.
         /// </summary>
         internal static string Chose_a_path_and_file_name {
@@ -203,6 +204,15 @@ namespace WFA_psychometric_chart.Properties {
         internal static string date_hour_minute_temperature_h {
             get {
                 return ResourceManager.GetString("date_hour_minute_temperature_h", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to db insertion : success !.
+        /// </summary>
+        internal static string db_insertion_success {
+            get {
+                return ResourceManager.GetString("db_insertion_success", resourceCulture);
             }
         }
         

@@ -132,6 +132,10 @@
   <data name="_75" xml:space="preserve">
     <value>75</value>
   </data>
+  <data name="_Enthalpy" xml:space="preserve">
+    <value>
+Enthalpy : </value>
+  </data>
   <data name="_Internet_Connection_Available" xml:space="preserve">
     <value>                Internet Connection Available</value>
   </data>
@@ -151,9 +155,6 @@
   <data name="Building_Information0" xml:space="preserve">
     <value>Building Information :,</value>
   </data>
-  <data name="Building_Name_can_not_be_empty" xml:space="preserve">
-    <value>Building Name can not be empty.</value>
-  </data>
   <data name="Chose_a_path_and_file_name" xml:space="preserve">
     <value>Chose a path and file name</value>
   </data>
@@ -162,6 +163,9 @@
   </data>
   <data name="date_hour_minute_temperature_h" xml:space="preserve">
     <value>date,hour,minute,temperature,humidity,</value>
+  </data>
+  <data name="db_insertion_success" xml:space="preserve">
+    <value>db insertion : success !</value>
   </data>
   <data name="Enter_a_valid_refrence_humidit" xml:space="preserve">
     <value>Enter a valid refrence humidity value in %</value>

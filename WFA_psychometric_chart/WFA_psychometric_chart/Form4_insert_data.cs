@@ -30,11 +30,11 @@ namespace WFA_psychometric_chart
 
         private void button1_Click(object sender, EventArgs e)
         {
-
-            if(tb_BuildingName.Text == "")
+            if(tb_building_name.Text == "")
             {
-                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Building_Name_can_not_be_empty);
+                MessageBox.Show("Please enter building name!");
             }
+
             else if (tb_country.Text == "")
             {
                 MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Enter_country_name);
@@ -51,7 +51,7 @@ namespace WFA_psychometric_chart
             }
             else
             {
-                string buildingName = tb_BuildingName.Text;
+                string buildingName = tb_building_name.Text;
                 string country = tb_country.Text;
                 string city = tb_city.Text;
                 string state = tb_state.Text;

@@ -29,24 +29,21 @@ namespace WFA_psychometric_chart
                 //lets grab from the textbox input.
                 double     temperature = Double.Parse(textBox1.Text.Trim());
                 double    humidity = Double.Parse(textBox2.Text.Trim());
-                double Patm = 1013;
-                //tb_atm_pressure.Text = Patm.ToString();
 
+
+                double Patm = 1013;
                 try
                 {
-                    if(tb_atm_pressure.Text != null)
-                    {
-                        Patm = double.Parse(tb_atm_pressure.Text);
-                    }
- 
+                    Patm = double.Parse(tb_atm_pressure.Text);
+                     
                 }catch(Exception ex)
                 {
-                    MessageBox.Show("Please enter valid atmospheric pressure");
+                    MessageBox.Show(ex.Message);
                 }
-                tb_atm_pressure.Text = Patm.ToString();
 
+                tb_atm_pressure.Text = Patm.ToString(); 
 
-                double A = 6.116441;
+                double      A = 6.116441;
                 double m = 7.591386;
                 double Tn = 240.7263;
                 double B = 621.9907;
@@ -97,7 +94,5 @@ namespace WFA_psychometric_chart
 
 
         }
-
-       
     }
 }

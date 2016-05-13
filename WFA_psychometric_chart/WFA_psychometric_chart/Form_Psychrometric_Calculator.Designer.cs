@@ -109,7 +109,7 @@
             this.groupBox1.Controls.Add(this.tb_atm_pressure);
             this.groupBox1.Controls.Add(this.textBox2);
             this.groupBox1.Controls.Add(this.textBox1);
-            this.groupBox1.ForeColor = System.Drawing.Color.DarkSlateGray;
+            this.groupBox1.ForeColor = System.Drawing.Color.SlateGray;
             resources.ApplyResources(this.groupBox1, "groupBox1");
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.TabStop = false;
@@ -117,115 +117,133 @@
             // unit_enthalpy
             // 
             resources.ApplyResources(this.unit_enthalpy, "unit_enthalpy");
+            this.unit_enthalpy.ForeColor = System.Drawing.Color.SlateGray;
             this.unit_enthalpy.Name = "unit_enthalpy";
             // 
             // unit_mixed_gas_ratio
             // 
             resources.ApplyResources(this.unit_mixed_gas_ratio, "unit_mixed_gas_ratio");
+            this.unit_mixed_gas_ratio.ForeColor = System.Drawing.Color.SlateGray;
             this.unit_mixed_gas_ratio.Name = "unit_mixed_gas_ratio";
             // 
             // unit_mol_mass_over_mol_wt
             // 
             resources.ApplyResources(this.unit_mol_mass_over_mol_wt, "unit_mol_mass_over_mol_wt");
+            this.unit_mol_mass_over_mol_wt.ForeColor = System.Drawing.Color.SlateGray;
             this.unit_mol_mass_over_mol_wt.Name = "unit_mol_mass_over_mol_wt";
             // 
             // unit_Pws
             // 
             resources.ApplyResources(this.unit_Pws, "unit_Pws");
+            this.unit_Pws.ForeColor = System.Drawing.Color.SlateGray;
             this.unit_Pws.Name = "unit_Pws";
             // 
             // unit_Tn
             // 
             resources.ApplyResources(this.unit_Tn, "unit_Tn");
+            this.unit_Tn.ForeColor = System.Drawing.Color.SlateGray;
             this.unit_Tn.Name = "unit_Tn";
             // 
             // unit_M
             // 
             resources.ApplyResources(this.unit_M, "unit_M");
+            this.unit_M.ForeColor = System.Drawing.Color.SlateGray;
             this.unit_M.Name = "unit_M";
             // 
             // unit_A
             // 
             resources.ApplyResources(this.unit_A, "unit_A");
+            this.unit_A.ForeColor = System.Drawing.Color.SlateGray;
             this.unit_A.Name = "unit_A";
             // 
             // unit_dp
             // 
             resources.ApplyResources(this.unit_dp, "unit_dp");
+            this.unit_dp.ForeColor = System.Drawing.Color.SlateGray;
             this.unit_dp.Name = "unit_dp";
             // 
             // unit_ap
             // 
             resources.ApplyResources(this.unit_ap, "unit_ap");
+            this.unit_ap.ForeColor = System.Drawing.Color.SlateGray;
             this.unit_ap.Name = "unit_ap";
             // 
             // unit_humidity
             // 
             resources.ApplyResources(this.unit_humidity, "unit_humidity");
+            this.unit_humidity.ForeColor = System.Drawing.Color.SlateGray;
             this.unit_humidity.Name = "unit_humidity";
             // 
             // unit_temp
             // 
             resources.ApplyResources(this.unit_temp, "unit_temp");
+            this.unit_temp.ForeColor = System.Drawing.Color.SlateGray;
             this.unit_temp.Name = "unit_temp";
             // 
             // label11
             // 
             resources.ApplyResources(this.label11, "label11");
-            this.label11.ForeColor = System.Drawing.Color.DarkSlateGray;
+            this.label11.ForeColor = System.Drawing.Color.SlateGray;
             this.label11.Name = "label11";
             // 
             // label10
             // 
             resources.ApplyResources(this.label10, "label10");
-            this.label10.ForeColor = System.Drawing.Color.DarkSlateGray;
+            this.label10.ForeColor = System.Drawing.Color.SlateGray;
             this.label10.Name = "label10";
             // 
             // label9
             // 
-            this.label9.ForeColor = System.Drawing.Color.DarkSlateGray;
+            this.label9.ForeColor = System.Drawing.Color.SlateGray;
             resources.ApplyResources(this.label9, "label9");
             this.label9.Name = "label9";
             // 
             // label8
             // 
-            this.label8.ForeColor = System.Drawing.Color.DarkSlateGray;
+            this.label8.ForeColor = System.Drawing.Color.SlateGray;
             resources.ApplyResources(this.label8, "label8");
             this.label8.Name = "label8";
             // 
             // label7
             // 
             resources.ApplyResources(this.label7, "label7");
+            this.label7.ForeColor = System.Drawing.Color.SlateGray;
             this.label7.Name = "label7";
             // 
             // label6
             // 
             resources.ApplyResources(this.label6, "label6");
+            this.label6.ForeColor = System.Drawing.Color.SlateGray;
             this.label6.Name = "label6";
             // 
             // label5
             // 
             resources.ApplyResources(this.label5, "label5");
+            this.label5.ForeColor = System.Drawing.Color.SlateGray;
             this.label5.Name = "label5";
             // 
             // label4
             // 
             resources.ApplyResources(this.label4, "label4");
+            this.label4.ForeColor = System.Drawing.Color.SlateGray;
             this.label4.Name = "label4";
             // 
             // label3
             // 
             resources.ApplyResources(this.label3, "label3");
+            this.label3.ForeColor = System.Drawing.Color.SlateGray;
             this.label3.Name = "label3";
             // 
             // label2
             // 
             resources.ApplyResources(this.label2, "label2");
+            this.label2.ForeColor = System.Drawing.Color.SlateGray;
             this.label2.Name = "label2";
             // 
             // label1
             // 
             resources.ApplyResources(this.label1, "label1");
+            this.label1.ForeColor = System.Drawing.Color.SlateGray;
             this.label1.Name = "label1";
             // 
             // textBox11

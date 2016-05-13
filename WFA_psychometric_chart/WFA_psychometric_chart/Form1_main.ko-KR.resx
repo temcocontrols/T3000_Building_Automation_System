@@ -182,7 +182,8 @@
     <value>인쇄</value>
   </data>
   <data name="psychrometricCalculatorToolStripMenuItem.Text" xml:space="preserve">
-    <value>심리 계산기</value>
+    <value>
+습공기 계산기</value>
     <comment>Previous text: Psychrometric Calculator</comment>
   </data>
   <data name="realTimePlottingToolStripMenuItem.Text" xml:space="preserve">

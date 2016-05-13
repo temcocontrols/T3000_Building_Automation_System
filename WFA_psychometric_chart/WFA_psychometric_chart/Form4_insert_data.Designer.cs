@@ -59,7 +59,7 @@
             this.label18 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
-            this.tb_BuildingName = new System.Windows.Forms.TextBox();
+            this.tb_building_name = new System.Windows.Forms.TextBox();
             this.label21 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -223,10 +223,10 @@
             resources.ApplyResources(this.label20, "label20");
             this.label20.Name = "label20";
             // 
-            // tb_BuildingName
+            // tb_building_name
             // 
-            resources.ApplyResources(this.tb_BuildingName, "tb_BuildingName");
-            this.tb_BuildingName.Name = "tb_BuildingName";
+            resources.ApplyResources(this.tb_building_name, "tb_building_name");
+            this.tb_building_name.Name = "tb_building_name";
             // 
             // label21
             // 
@@ -239,7 +239,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.label21);
             this.Controls.Add(this.label20);
-            this.Controls.Add(this.tb_BuildingName);
+            this.Controls.Add(this.tb_building_name);
             this.Controls.Add(this.label19);
             this.Controls.Add(this.label18);
             this.Controls.Add(this.label17);
@@ -309,7 +309,7 @@
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.Label label20;
-        private System.Windows.Forms.TextBox tb_BuildingName;
+        private System.Windows.Forms.TextBox tb_building_name;
         private System.Windows.Forms.Label label21;
     }
 }

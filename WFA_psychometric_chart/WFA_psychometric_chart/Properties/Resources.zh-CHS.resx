@@ -170,7 +170,7 @@
     <value>检测到错误</value>
   </data>
   <data name="Error_Ended" xml:space="preserve">
-    <value>建筑名称 ：</value>
+    <value>错误结束</value>
   </data>
   <data name="error0" xml:space="preserve">
     <value>错误</value>

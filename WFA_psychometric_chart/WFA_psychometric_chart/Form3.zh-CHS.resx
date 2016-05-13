@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="$this.Text" xml:space="preserve">
+    <value>天气服务</value>
+  </data>
   <data name="btn_help.Text" xml:space="preserve">
     <value>帮助</value>
   </data>
@@ -135,9 +138,6 @@
   </data>
   <data name="cb_hum_self_calib.Text" xml:space="preserve">
     <value>[勾选启用服务]</value>
-  </data>
-  <data name="$this.Text" xml:space="preserve">
-    <value>天气服务</value>
   </data>
   <data name="groupBox1.Text" xml:space="preserve">
     <value>建设位置</value>
@@ -254,7 +254,7 @@
     <value>连接错误问题？</value>
   </data>
   <data name="label42.Text" xml:space="preserve">
-    <value>建筑名称 ：</value>
+    <value>建筑名称</value>
   </data>
   <data name="label5.Text" xml:space="preserve">
     <value>邮编 ︰</value>

@@ -142,7 +142,8 @@
     <value>热图</value>
   </data>
   <data name="helpPsychometricChartToolStripMenuItem.Text" xml:space="preserve">
-    <value>焓湿图</value>
+    <value>
+焓湿图</value>
   </data>
   <data name="helpToolStripMenuItem.Text" xml:space="preserve">
     <value>帮助</value>
