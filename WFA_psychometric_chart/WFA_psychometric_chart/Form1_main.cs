@@ -1188,7 +1188,9 @@ namespace WFA_psychometric_chart
                    // MessageBox.Show("the path = " + pat_test);
                     string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
           */
-                    string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        
+                   /*     string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     string file = dir + @"\t_pg.txt";
                     string path1 = file;
                     string line1;
@@ -1219,6 +1221,9 @@ namespace WFA_psychometric_chart
                         }//close of while
 
                     }//close of using
+                 */
+                    temperature_value = t;
+                    pg_value_from_txtfile = pg;
 
                     double temperature = Math.Round(xVal);
                     double corres_pg_value = 0.000000;
