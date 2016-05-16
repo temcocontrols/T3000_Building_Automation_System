@@ -431,9 +431,9 @@ namespace WFA_psychometric_chart
             if (cb1_select_data.SelectedIndex > -1)
             {
                 //lets get the index parameter form the table...
-                index_selected = cb1_select_data.SelectedIndex + 1; //
+                //index_selected = cb1_select_data.SelectedIndex + 1; //
                 //MessageBox.Show("index = " + index_selected);
-
+                index_selected = temp_building_values[cb1_select_data.SelectedIndex].ID;//This is new configuration
                 //lets pull the vales offline values stored in db...
            //     string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
@@ -697,7 +697,7 @@ namespace WFA_psychometric_chart
                                     int count_col_table = 0;
                                     //lets check the data first...
                                     //step1.
-                                    string count_num_column = "select count(id) from tbl_weather_related_values ";
+                                    string count_num_column = "select count(id) from tbl_weather_related_values WHERE id='"+index_selected+"'";
                                     SQLiteCommand cmd1 = new SQLiteCommand(count_num_column, connection);
                                     reader = cmd1.ExecuteReader();
                                     while (reader.Read())
@@ -708,7 +708,7 @@ namespace WFA_psychometric_chart
                                  //   MessageBox.Show("count_col_table  =" + count_col_table);
                                     reader.Close();
                                     //step2. condition
-                                    if (count_col_table >= index_selected)
+                                    if (count_col_table >0)
                                     {
                                         //update previous value
 
@@ -736,9 +736,11 @@ namespace WFA_psychometric_chart
                                     else
                                     {
                                         //insert...
-                                        string sql_string = "insert into tbl_weather_related_values(location,distance_from_building,last_update_date,temp,humidity,bar_pressure,wind,direction,station_name) VALUES(@location_value,@distance_value,@last_value,@temp_value,@hum_value,@pressure_value,@wind_value,@direction_value,@station_name)";
+                                        string sql_string = "insert into tbl_weather_related_values(ID,location,distance_from_building,last_update_date,temp,humidity,bar_pressure,wind,direction,station_name) VALUES(@id_value,@location_value,@distance_value,@last_value,@temp_value,@hum_value,@pressure_value,@wind_value,@direction_value,@station_name)";
                                         SQLiteCommand command = new SQLiteCommand(sql_string, connection);
                                         command.CommandType = CommandType.Text;
+
+                                        command.Parameters.AddWithValue("@id_value", index_selected);
                                         command.Parameters.AddWithValue("@location_value", loc_value.ToString());
                                         command.Parameters.AddWithValue("@distance_value", d.ToString());
                                         command.Parameters.AddWithValue("@last_value", last_update_pulled.ToString());
@@ -771,15 +773,19 @@ namespace WFA_psychometric_chart
 
                                     //insert...
                                 //    MessageBox.Show("tempe= " + temp_adjust + " hum = " + hum_pulled);
-                                    string sql_query = "insert into tbl_historical_data(ID,date_current,hour_current,minute_current,temperature,humidity,station_name) VALUES(@id_value,@date_current,@hour_current,@minute_current,@temp_value,@hum_value,@station_name)";
+                                    string sql_query = "insert into tbl_historical_data(ID,date_current,hour_current,minute_current,distance_from_building,temperature,humidity,bar_pressure,wind,direction,station_name) VALUES(@id_value,@date_current,@hour_current,@minute_current,@distance_from_building_value,@temp_value,@hum_value,@bar_pressure_value,@wind_value,@direction_value,@station_name)";
                                     SQLiteCommand cmdx = new SQLiteCommand(sql_query, connection);
                                     cmdx.CommandType = CommandType.Text;
                                     cmdx.Parameters.AddWithValue("@id_value", index_selected);//this index selected identifies the location or building info...
                                     cmdx.Parameters.AddWithValue("@date_current", date.ToString());
                                     cmdx.Parameters.AddWithValue("@hour_current", hour.ToString());
                                     cmdx.Parameters.AddWithValue("@minute_current", minute.ToString());
+                                    cmdx.Parameters.AddWithValue("@distance_from_building_value", d.ToString());
                                     cmdx.Parameters.AddWithValue("@temp_value", temp_adjust.ToString());
                                     cmdx.Parameters.AddWithValue("@hum_value", hum_pulled.ToString());
+                                    cmdx.Parameters.AddWithValue("@bar_pressure_value", pressure_pulled.ToString());
+                                    cmdx.Parameters.AddWithValue("@wind_value", wind_speed_pulled.ToString());
+                                    cmdx.Parameters.AddWithValue("@direction_value", direction_pulled.ToString());
                                     cmdx.Parameters.AddWithValue("@station_name", cb_station_names.SelectedItem.ToString());
                                     cmdx.ExecuteNonQuery();
 
@@ -923,10 +929,23 @@ namespace WFA_psychometric_chart
 
         }
 
+        public class DataTypeTempBuildingValue
+        {
+            public int ID { get; set; }
+            public string country { get; set; }
+            public string  state{ get; set; }
+            public string city { get; set; }
+        }
+
+        //ArrayList temp_building_values = new ArrayList();
+        List<DataTypeTempBuildingValue> temp_building_values = new List<DataTypeTempBuildingValue>();
+
+
         public void fill_combobox()
         {
             cb1_select_data.Items.Clear();
             ArrayList stored_location = new ArrayList();
+            temp_building_values.Clear();//we need to clear the values for new items
             //while loading it should populate the field...
             //lets pull the vales offline values stored in db...
             //string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
@@ -953,14 +972,24 @@ namespace WFA_psychometric_chart
                 while (reader.Read())
                 {
                    
-                    string selecte_location = reader["id"].ToString()+","+reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
-                    stored_location.Add(selecte_location);
+                    //string selecte_location = reader["id"].ToString()+","+reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
+                //stored_location.Add(selecte_location);
+
+                temp_building_values.Add(new DataTypeTempBuildingValue {
+                    ID = int.Parse(reader["id"].ToString()),
+                    country = reader["country"].ToString(),
+                    state = reader["state"].ToString(),
+                    city = reader["city"].ToString()
+                });                
+
                 }
-                string s = "";
-                for (int i = 0; i < stored_location.Count; i++)
+                //string s = "";
+                for (int i = 0; i < temp_building_values.Count; i++)
                 {
-                    cb1_select_data.Items.Add(stored_location[i]);
-                    s += stored_location[i] + " , \n";
+
+                string tempValue = temp_building_values[i].ID+","+temp_building_values[i].country + "," + temp_building_values[i].state + "," + temp_building_values[i].city;
+                 cb1_select_data.Items.Add(tempValue);
+                    //s += stored_location[i] + " , \n";
                 }
                // MessageBox.Show("stored place = " + s);
                 comm.Dispose();    
@@ -1550,18 +1579,21 @@ namespace WFA_psychometric_chart
             //cb_station_names.Enabled = true;
             tb_station_distance.Text = "";
             cb_enable_disable.Checked = false;
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            index_selected = cb1_select_data.SelectedIndex + 1; //
+
+
+
+
+
+
+
+
+
+
+
+            //index_selected = cb1_select_data.SelectedIndex + 1; //
+            int cb_index_selected = cb1_select_data.SelectedIndex;
+            index_selected = temp_building_values[cb_index_selected].ID;
+
             get_stored_data();
             
             

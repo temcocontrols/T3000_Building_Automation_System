@@ -107,6 +107,7 @@
             this.rb1_excel.Name = "rb1_excel";
             this.rb1_excel.TabStop = true;
             this.rb1_excel.UseVisualStyleBackColor = true;
+
             // 
             // btnExtract
             // 

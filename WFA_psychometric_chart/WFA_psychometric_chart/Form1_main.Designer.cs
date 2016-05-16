@@ -30,48 +30,54 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1_main));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea12 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend12 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series397 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series398 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series399 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series400 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series401 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series402 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series403 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series404 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series405 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series406 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series407 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series408 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series409 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series410 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series411 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series412 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series413 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series414 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series415 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series416 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series417 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series418 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series419 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series420 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series421 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series422 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series423 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series424 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series425 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series426 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series427 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series428 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series429 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series430 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series431 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series432 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title12 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series8 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series11 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series13 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series14 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series15 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series16 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series17 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series18 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series19 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series20 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series21 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series22 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series23 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series24 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series25 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series26 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series27 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series28 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series29 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series30 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series31 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series32 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series33 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series34 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series35 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series36 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label5_H_unit = new System.Windows.Forms.Label();
+            this.label6_DP_Unit = new System.Windows.Forms.Label();
+            this.label4_RH_unit = new System.Windows.Forms.Label();
+            this.label3_Sp_H_unit = new System.Windows.Forms.Label();
+            this.label2_DBT_units = new System.Windows.Forms.Label();
+            this.label1_units = new System.Windows.Forms.Label();
             this.lb_enthalpy = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
             this.lb_DP = new System.Windows.Forms.Label();
@@ -90,22 +96,16 @@
             this.exportDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.psychrometricCalculatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.CMSinsertNode = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.insertNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveFD = new System.Windows.Forms.SaveFileDialog();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.label1_units = new System.Windows.Forms.Label();
-            this.label2_DBT_units = new System.Windows.Forms.Label();
-            this.label3_Sp_H_unit = new System.Windows.Forms.Label();
-            this.label4_RH_unit = new System.Windows.Forms.Label();
-            this.label5_H_unit = new System.Windows.Forms.Label();
-            this.label6_DP_Unit = new System.Windows.Forms.Label();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpPsychometricChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CMSinsertNode = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.insertNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveFD = new System.Windows.Forms.SaveFileDialog();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -115,163 +115,163 @@
             // chart1
             // 
             resources.ApplyResources(this.chart1, "chart1");
-            chartArea12.AxisX.LabelAutoFitMinFontSize = 5;
-            chartArea12.AxisY.LabelAutoFitMinFontSize = 5;
-            chartArea12.CursorX.Interval = 5D;
-            chartArea12.CursorY.Interval = 5D;
-            chartArea12.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea12);
-            legend12.Enabled = false;
-            legend12.Name = "Legend1";
-            this.chart1.Legends.Add(legend12);
+            chartArea1.AxisX.LabelAutoFitMinFontSize = 5;
+            chartArea1.AxisY.LabelAutoFitMinFontSize = 5;
+            chartArea1.CursorX.Interval = 5D;
+            chartArea1.CursorY.Interval = 5D;
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
             this.chart1.Name = "chart1";
-            series397.ChartArea = "ChartArea1";
-            series397.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series397.Legend = "Legend1";
-            series397.Name = "Series1";
-            series398.ChartArea = "ChartArea1";
-            series398.Legend = "Legend1";
-            series398.Name = "Series2";
-            series399.ChartArea = "ChartArea1";
-            series399.Legend = "Legend1";
-            series399.Name = "Series3";
-            series400.ChartArea = "ChartArea1";
-            series400.Legend = "Legend1";
-            series400.Name = "Series4";
-            series401.ChartArea = "ChartArea1";
-            series401.Legend = "Legend1";
-            series401.Name = "Series5";
-            series402.ChartArea = "ChartArea1";
-            series402.Legend = "Legend1";
-            series402.Name = "Series6";
-            series403.ChartArea = "ChartArea1";
-            series403.Legend = "Legend1";
-            series403.Name = "Series7";
-            series404.ChartArea = "ChartArea1";
-            series404.Legend = "Legend1";
-            series404.Name = "Series8";
-            series405.ChartArea = "ChartArea1";
-            series405.Legend = "Legend1";
-            series405.Name = "Line0";
-            series406.ChartArea = "ChartArea1";
-            series406.Legend = "Legend1";
-            series406.Name = "Line1";
-            series407.ChartArea = "ChartArea1";
-            series407.Legend = "Legend1";
-            series407.Name = "Line2";
-            series408.ChartArea = "ChartArea1";
-            series408.Legend = "Legend1";
-            series408.Name = "Line3";
-            series409.ChartArea = "ChartArea1";
-            series409.Legend = "Legend1";
-            series409.Name = "Line4";
-            series410.ChartArea = "ChartArea1";
-            series410.Legend = "Legend1";
-            series410.Name = "Line5";
-            series411.ChartArea = "ChartArea1";
-            series411.Legend = "Legend1";
-            series411.Name = "Line6";
-            series412.ChartArea = "ChartArea1";
-            series412.Legend = "Legend1";
-            series412.Name = "Line_r0";
-            series413.ChartArea = "ChartArea1";
-            series413.Legend = "Legend1";
-            series413.Name = "Line_r1";
-            series414.ChartArea = "ChartArea1";
-            series414.Legend = "Legend1";
-            series414.Name = "Line_r2";
-            series415.ChartArea = "ChartArea1";
-            series415.Legend = "Legend1";
-            series415.Name = "Line_r3";
-            series416.ChartArea = "ChartArea1";
-            series416.Legend = "Legend1";
-            series416.Name = "Line_r4";
-            series417.ChartArea = "ChartArea1";
-            series417.Legend = "Legend1";
-            series417.Name = "Line_r5";
-            series418.ChartArea = "ChartArea1";
-            series418.Legend = "Legend1";
-            series418.Name = "Line_b10";
-            series419.ChartArea = "ChartArea1";
-            series419.Legend = "Legend1";
-            series419.Name = "Line_b20";
-            series420.ChartArea = "ChartArea1";
-            series420.Legend = "Legend1";
-            series420.Name = "Line_b30";
-            series421.ChartArea = "ChartArea1";
-            series421.Legend = "Legend1";
-            series421.Name = "Line_b40";
-            series422.ChartArea = "ChartArea1";
-            series422.Legend = "Legend1";
-            series422.Name = "Line_b50";
-            series423.ChartArea = "ChartArea1";
-            series423.Legend = "Legend1";
-            series423.Name = "Line_b60";
-            series424.ChartArea = "ChartArea1";
-            series424.Legend = "Legend1";
-            series424.Name = "Line_b70";
-            series425.ChartArea = "ChartArea1";
-            series425.Legend = "Legend1";
-            series425.Name = "Line_b80";
-            series426.ChartArea = "ChartArea1";
-            series426.Legend = "Legend1";
-            series426.Name = "Line_b90";
-            series427.ChartArea = "ChartArea1";
-            series427.Legend = "Legend1";
-            series427.Name = "Line_b100";
-            series428.ChartArea = "ChartArea1";
-            series428.Legend = "Legend1";
-            series428.Name = "Line_b110";
-            series429.ChartArea = "ChartArea1";
-            series429.Legend = "Legend1";
-            series429.Name = "Line_b_straight";
-            series430.ChartArea = "ChartArea1";
-            series430.Legend = "Legend1";
-            series430.Name = "SeriesDBT_HR";
-            series431.ChartArea = "ChartArea1";
-            series431.Legend = "Legend1";
-            series431.Name = "SeriesDBT_enthalpy";
-            series432.ChartArea = "ChartArea1";
-            series432.Legend = "Legend1";
-            series432.Name = "Series_enthalpy_dew_point";
-            this.chart1.Series.Add(series397);
-            this.chart1.Series.Add(series398);
-            this.chart1.Series.Add(series399);
-            this.chart1.Series.Add(series400);
-            this.chart1.Series.Add(series401);
-            this.chart1.Series.Add(series402);
-            this.chart1.Series.Add(series403);
-            this.chart1.Series.Add(series404);
-            this.chart1.Series.Add(series405);
-            this.chart1.Series.Add(series406);
-            this.chart1.Series.Add(series407);
-            this.chart1.Series.Add(series408);
-            this.chart1.Series.Add(series409);
-            this.chart1.Series.Add(series410);
-            this.chart1.Series.Add(series411);
-            this.chart1.Series.Add(series412);
-            this.chart1.Series.Add(series413);
-            this.chart1.Series.Add(series414);
-            this.chart1.Series.Add(series415);
-            this.chart1.Series.Add(series416);
-            this.chart1.Series.Add(series417);
-            this.chart1.Series.Add(series418);
-            this.chart1.Series.Add(series419);
-            this.chart1.Series.Add(series420);
-            this.chart1.Series.Add(series421);
-            this.chart1.Series.Add(series422);
-            this.chart1.Series.Add(series423);
-            this.chart1.Series.Add(series424);
-            this.chart1.Series.Add(series425);
-            this.chart1.Series.Add(series426);
-            this.chart1.Series.Add(series427);
-            this.chart1.Series.Add(series428);
-            this.chart1.Series.Add(series429);
-            this.chart1.Series.Add(series430);
-            this.chart1.Series.Add(series431);
-            this.chart1.Series.Add(series432);
-            title12.Name = "Psychometric chart";
-            this.chart1.Titles.Add(title12);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series2";
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Series3";
+            series4.ChartArea = "ChartArea1";
+            series4.Legend = "Legend1";
+            series4.Name = "Series4";
+            series5.ChartArea = "ChartArea1";
+            series5.Legend = "Legend1";
+            series5.Name = "Series5";
+            series6.ChartArea = "ChartArea1";
+            series6.Legend = "Legend1";
+            series6.Name = "Series6";
+            series7.ChartArea = "ChartArea1";
+            series7.Legend = "Legend1";
+            series7.Name = "Series7";
+            series8.ChartArea = "ChartArea1";
+            series8.Legend = "Legend1";
+            series8.Name = "Series8";
+            series9.ChartArea = "ChartArea1";
+            series9.Legend = "Legend1";
+            series9.Name = "Line0";
+            series10.ChartArea = "ChartArea1";
+            series10.Legend = "Legend1";
+            series10.Name = "Line1";
+            series11.ChartArea = "ChartArea1";
+            series11.Legend = "Legend1";
+            series11.Name = "Line2";
+            series12.ChartArea = "ChartArea1";
+            series12.Legend = "Legend1";
+            series12.Name = "Line3";
+            series13.ChartArea = "ChartArea1";
+            series13.Legend = "Legend1";
+            series13.Name = "Line4";
+            series14.ChartArea = "ChartArea1";
+            series14.Legend = "Legend1";
+            series14.Name = "Line5";
+            series15.ChartArea = "ChartArea1";
+            series15.Legend = "Legend1";
+            series15.Name = "Line6";
+            series16.ChartArea = "ChartArea1";
+            series16.Legend = "Legend1";
+            series16.Name = "Line_r0";
+            series17.ChartArea = "ChartArea1";
+            series17.Legend = "Legend1";
+            series17.Name = "Line_r1";
+            series18.ChartArea = "ChartArea1";
+            series18.Legend = "Legend1";
+            series18.Name = "Line_r2";
+            series19.ChartArea = "ChartArea1";
+            series19.Legend = "Legend1";
+            series19.Name = "Line_r3";
+            series20.ChartArea = "ChartArea1";
+            series20.Legend = "Legend1";
+            series20.Name = "Line_r4";
+            series21.ChartArea = "ChartArea1";
+            series21.Legend = "Legend1";
+            series21.Name = "Line_r5";
+            series22.ChartArea = "ChartArea1";
+            series22.Legend = "Legend1";
+            series22.Name = "Line_b10";
+            series23.ChartArea = "ChartArea1";
+            series23.Legend = "Legend1";
+            series23.Name = "Line_b20";
+            series24.ChartArea = "ChartArea1";
+            series24.Legend = "Legend1";
+            series24.Name = "Line_b30";
+            series25.ChartArea = "ChartArea1";
+            series25.Legend = "Legend1";
+            series25.Name = "Line_b40";
+            series26.ChartArea = "ChartArea1";
+            series26.Legend = "Legend1";
+            series26.Name = "Line_b50";
+            series27.ChartArea = "ChartArea1";
+            series27.Legend = "Legend1";
+            series27.Name = "Line_b60";
+            series28.ChartArea = "ChartArea1";
+            series28.Legend = "Legend1";
+            series28.Name = "Line_b70";
+            series29.ChartArea = "ChartArea1";
+            series29.Legend = "Legend1";
+            series29.Name = "Line_b80";
+            series30.ChartArea = "ChartArea1";
+            series30.Legend = "Legend1";
+            series30.Name = "Line_b90";
+            series31.ChartArea = "ChartArea1";
+            series31.Legend = "Legend1";
+            series31.Name = "Line_b100";
+            series32.ChartArea = "ChartArea1";
+            series32.Legend = "Legend1";
+            series32.Name = "Line_b110";
+            series33.ChartArea = "ChartArea1";
+            series33.Legend = "Legend1";
+            series33.Name = "Line_b_straight";
+            series34.ChartArea = "ChartArea1";
+            series34.Legend = "Legend1";
+            series34.Name = "SeriesDBT_HR";
+            series35.ChartArea = "ChartArea1";
+            series35.Legend = "Legend1";
+            series35.Name = "SeriesDBT_enthalpy";
+            series36.ChartArea = "ChartArea1";
+            series36.Legend = "Legend1";
+            series36.Name = "Series_enthalpy_dew_point";
+            this.chart1.Series.Add(series1);
+            this.chart1.Series.Add(series2);
+            this.chart1.Series.Add(series3);
+            this.chart1.Series.Add(series4);
+            this.chart1.Series.Add(series5);
+            this.chart1.Series.Add(series6);
+            this.chart1.Series.Add(series7);
+            this.chart1.Series.Add(series8);
+            this.chart1.Series.Add(series9);
+            this.chart1.Series.Add(series10);
+            this.chart1.Series.Add(series11);
+            this.chart1.Series.Add(series12);
+            this.chart1.Series.Add(series13);
+            this.chart1.Series.Add(series14);
+            this.chart1.Series.Add(series15);
+            this.chart1.Series.Add(series16);
+            this.chart1.Series.Add(series17);
+            this.chart1.Series.Add(series18);
+            this.chart1.Series.Add(series19);
+            this.chart1.Series.Add(series20);
+            this.chart1.Series.Add(series21);
+            this.chart1.Series.Add(series22);
+            this.chart1.Series.Add(series23);
+            this.chart1.Series.Add(series24);
+            this.chart1.Series.Add(series25);
+            this.chart1.Series.Add(series26);
+            this.chart1.Series.Add(series27);
+            this.chart1.Series.Add(series28);
+            this.chart1.Series.Add(series29);
+            this.chart1.Series.Add(series30);
+            this.chart1.Series.Add(series31);
+            this.chart1.Series.Add(series32);
+            this.chart1.Series.Add(series33);
+            this.chart1.Series.Add(series34);
+            this.chart1.Series.Add(series35);
+            this.chart1.Series.Add(series36);
+            title1.Name = "Psychometric chart";
+            this.chart1.Titles.Add(title1);
             this.chart1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseClick);
             this.chart1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseDown);
             this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -304,6 +304,41 @@
             resources.ApplyResources(this.groupBox4, "groupBox4");
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.TabStop = false;
+            // 
+            // label5_H_unit
+            // 
+            resources.ApplyResources(this.label5_H_unit, "label5_H_unit");
+            this.label5_H_unit.Name = "label5_H_unit";
+            this.label5_H_unit.MouseHover += new System.EventHandler(this.label5_H_unit_MouseHover);
+            // 
+            // label6_DP_Unit
+            // 
+            resources.ApplyResources(this.label6_DP_Unit, "label6_DP_Unit");
+            this.label6_DP_Unit.Name = "label6_DP_Unit";
+            this.label6_DP_Unit.MouseHover += new System.EventHandler(this.label6_DP_Unit_MouseHover);
+            // 
+            // label4_RH_unit
+            // 
+            resources.ApplyResources(this.label4_RH_unit, "label4_RH_unit");
+            this.label4_RH_unit.Name = "label4_RH_unit";
+            this.label4_RH_unit.MouseHover += new System.EventHandler(this.label4_RH_unit_MouseHover);
+            // 
+            // label3_Sp_H_unit
+            // 
+            resources.ApplyResources(this.label3_Sp_H_unit, "label3_Sp_H_unit");
+            this.label3_Sp_H_unit.Name = "label3_Sp_H_unit";
+            this.label3_Sp_H_unit.MouseHover += new System.EventHandler(this.label3_Sp_H_unit_MouseHover);
+            // 
+            // label2_DBT_units
+            // 
+            resources.ApplyResources(this.label2_DBT_units, "label2_DBT_units");
+            this.label2_DBT_units.Name = "label2_DBT_units";
+            this.label2_DBT_units.MouseHover += new System.EventHandler(this.label2_DBT_units_MouseHover);
+            // 
+            // label1_units
+            // 
+            resources.ApplyResources(this.label1_units, "label1_units");
+            this.label1_units.Name = "label1_units";
             // 
             // lb_enthalpy
             // 
@@ -417,54 +452,6 @@
             resources.ApplyResources(this.menuStrip1, "menuStrip1");
             this.menuStrip1.Name = "menuStrip1";
             // 
-            // CMSinsertNode
-            // 
-            this.CMSinsertNode.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.insertNodeToolStripMenuItem});
-            this.CMSinsertNode.Name = "contextMenuStrip2";
-            resources.ApplyResources(this.CMSinsertNode, "CMSinsertNode");
-            // 
-            // insertNodeToolStripMenuItem
-            // 
-            this.insertNodeToolStripMenuItem.Name = "insertNodeToolStripMenuItem";
-            resources.ApplyResources(this.insertNodeToolStripMenuItem, "insertNodeToolStripMenuItem");
-            this.insertNodeToolStripMenuItem.Click += new System.EventHandler(this.insertNodeToolStripMenuItem_Click);
-            // 
-            // label1_units
-            // 
-            resources.ApplyResources(this.label1_units, "label1_units");
-            this.label1_units.Name = "label1_units";
-            // 
-            // label2_DBT_units
-            // 
-            resources.ApplyResources(this.label2_DBT_units, "label2_DBT_units");
-            this.label2_DBT_units.Name = "label2_DBT_units";
-            this.label2_DBT_units.MouseHover += new System.EventHandler(this.label2_DBT_units_MouseHover);
-            // 
-            // label3_Sp_H_unit
-            // 
-            resources.ApplyResources(this.label3_Sp_H_unit, "label3_Sp_H_unit");
-            this.label3_Sp_H_unit.Name = "label3_Sp_H_unit";
-            this.label3_Sp_H_unit.MouseHover += new System.EventHandler(this.label3_Sp_H_unit_MouseHover);
-            // 
-            // label4_RH_unit
-            // 
-            resources.ApplyResources(this.label4_RH_unit, "label4_RH_unit");
-            this.label4_RH_unit.Name = "label4_RH_unit";
-            this.label4_RH_unit.MouseHover += new System.EventHandler(this.label4_RH_unit_MouseHover);
-            // 
-            // label5_H_unit
-            // 
-            resources.ApplyResources(this.label5_H_unit, "label5_H_unit");
-            this.label5_H_unit.Name = "label5_H_unit";
-            this.label5_H_unit.MouseHover += new System.EventHandler(this.label5_H_unit_MouseHover);
-            // 
-            // label6_DP_Unit
-            // 
-            resources.ApplyResources(this.label6_DP_Unit, "label6_DP_Unit");
-            this.label6_DP_Unit.Name = "label6_DP_Unit";
-            this.label6_DP_Unit.MouseHover += new System.EventHandler(this.label6_DP_Unit_MouseHover);
-            // 
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -504,6 +491,19 @@
             this.helpPsychometricChartToolStripMenuItem.Name = "helpPsychometricChartToolStripMenuItem";
             resources.ApplyResources(this.helpPsychometricChartToolStripMenuItem, "helpPsychometricChartToolStripMenuItem");
             this.helpPsychometricChartToolStripMenuItem.Click += new System.EventHandler(this.helpPsychometricChartToolStripMenuItem_Click);
+            // 
+            // CMSinsertNode
+            // 
+            this.CMSinsertNode.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.insertNodeToolStripMenuItem});
+            this.CMSinsertNode.Name = "contextMenuStrip2";
+            resources.ApplyResources(this.CMSinsertNode, "CMSinsertNode");
+            // 
+            // insertNodeToolStripMenuItem
+            // 
+            this.insertNodeToolStripMenuItem.Name = "insertNodeToolStripMenuItem";
+            resources.ApplyResources(this.insertNodeToolStripMenuItem, "insertNodeToolStripMenuItem");
+            this.insertNodeToolStripMenuItem.Click += new System.EventHandler(this.insertNodeToolStripMenuItem_Click);
             // 
             // Form1_main
             // 

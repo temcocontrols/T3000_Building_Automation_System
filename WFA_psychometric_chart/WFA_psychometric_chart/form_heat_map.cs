@@ -31,8 +31,10 @@ namespace WFA_psychometric_chart
         private void form_heat_map_Load(object sender, EventArgs e)
         {
 
-            chart_plot();
-            
+            //chart_plot();
+            form1.plot_new_graph();
+
+
             //lets set the data time picker default values...
             dtp_From.MinDate = new DateTime(DateTime.Now.Year, 1, 1);
             dtp_To.MinDate = new DateTime(DateTime.Now.Year, 1, 1);
@@ -44,28 +46,38 @@ namespace WFA_psychometric_chart
             PullLocationInformation();//this is for loading location information
         }
 
+        public class DataTypeTempBuildingValue
+        {
+            public int ID { get; set; }
+            public string country { get; set; }
+            public string state { get; set; }
+            public string city { get; set; }
+        }
+
+        //ArrayList temp_building_values = new ArrayList();
+        List<DataTypeTempBuildingValue> temp_building_values = new List<DataTypeTempBuildingValue>();
+
+
+
         private void PullLocationInformation()
         {
             try
             {
-                /*This methods pulls the building location information..*/
                 cb1_select_data.Items.Clear();
                 ArrayList stored_location = new ArrayList();
-                //while loading it should populate the field...
-                //lets pull the vales offline values stored in db...
-                //              string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-                // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
+                temp_building_values.Clear();//we need to clear the values for new items
+                                             //while loading it should populate the field...
+                                             //lets pull the vales offline values stored in db...
+                                             //string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
-                //                string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+                //string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
 
                 //--changing all the database to the sqlite database...
                 string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
 
                 string connString = @"Data Source=" + databaseFile + ";Version=3;";
-
-
 
 
                 // MessageBox.Show("connection string = " + connString);
@@ -80,19 +92,31 @@ namespace WFA_psychometric_chart
                 while (reader.Read())
                 {
 
-                    string selecte_location = reader["id"].ToString() + "," + reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
-                    stored_location.Add(selecte_location);
+                    //string selecte_location = reader["id"].ToString()+","+reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
+                    //stored_location.Add(selecte_location);
+
+                    temp_building_values.Add(new DataTypeTempBuildingValue
+                    {
+                        ID = int.Parse(reader["id"].ToString()),
+                        country = reader["country"].ToString(),
+                        state = reader["state"].ToString(),
+                        city = reader["city"].ToString()
+                    });
+
                 }
-                string s = "";
-                for (int i = 0; i < stored_location.Count; i++)
+                //string s = "";
+                for (int i = 0; i < temp_building_values.Count; i++)
                 {
-                    cb1_select_data.Items.Add(stored_location[i]);
-                    s += stored_location[i] + " , \n";
+
+                    string tempValue = temp_building_values[i].ID + "," + temp_building_values[i].country + "," + temp_building_values[i].state + "," + temp_building_values[i].city;
+                    cb1_select_data.Items.Add(tempValue);
+                    //s += stored_location[i] + " , \n";
                 }
                 // MessageBox.Show("stored place = " + s);
                 comm.Dispose();
                 reader.Dispose();
                 connection.Close();
+
 
 
             }
@@ -146,6 +170,7 @@ namespace WFA_psychometric_chart
             DateTime fromDate = dtp_From.Value;
             DateTime toDate = dtp_To.Value;
 
+            
             //--Calling part here.....
             form1.heat_map_button_click(index_selected, fromDate, toDate);
 
@@ -177,7 +202,11 @@ namespace WFA_psychometric_chart
             //on change index it will select the index value or better known as selected index.
             try
             {
-                index_selected = cb1_select_data.SelectedIndex + 1; //is used to identify the location and data associated with it.
+                // index_selected = cb1_select_data.SelectedIndex + 1; //is used to identify the location and data associated with it.
+                //index_selected = cb1_select_data.SelectedIndex + 1; //
+                int cb_index_selected = cb1_select_data.SelectedIndex;
+                index_selected = temp_building_values[cb_index_selected].ID;
+
                 gb_select_date.Enabled = true;
 
             }

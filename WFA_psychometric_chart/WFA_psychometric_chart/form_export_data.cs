@@ -30,8 +30,12 @@ namespace WFA_psychometric_chart
              public string date { get; set; }
             public string hour{get; set;}
             public string minute { get; set; }
+            public string distance_from_building { get; set; }
             public double temp { get; set; }
             public double hum { get; set; }
+            public string bar_pressure { get; set; }
+            public string wind { get; set; }
+            public string direction { get; set; }
             public string station_name { get; set; }
 
         }
@@ -170,19 +174,27 @@ namespace WFA_psychometric_chart
                     oSheet.Cells[20, 1] = "Date";
                     oSheet.Cells[20, 2] = "Hour";
                     oSheet.Cells[20, 3] = "Minute";
-                    oSheet.Cells[20, 4] = "Temperature";
-                    oSheet.Cells[20, 5] = "Humidity";
-
-                    //now lets print the value in loop
-                    for (int i = 0; i < hist_temp_hum_list.Count; i++)
+                    oSheet.Cells[20, 4] = "Distance form building";                        
+                    oSheet.Cells[20, 5] = "Temperature";
+                    oSheet.Cells[20, 6] = "Humidity";
+                    oSheet.Cells[20, 7] = "Bar Pressure";
+                    oSheet.Cells[20, 8] = "Wind Speed";
+                    oSheet.Cells[20, 9] = "Wind Direction";
+                    oSheet.Cells[20, 10] = "Station Name";
+                        //now lets print the value in loop
+                        for (int i = 0; i < hist_temp_hum_list.Count; i++)
                     {
                         oSheet.Cells[21+i, 1] = hist_temp_hum_list[i].date.ToString();
                         oSheet.Cells[21+i, 2] = hist_temp_hum_list[i].hour.ToString();
                         oSheet.Cells[21+i, 3] = hist_temp_hum_list[i].minute.ToString();
-                        oSheet.Cells[21+i, 4] = hist_temp_hum_list[i].temp.ToString();
-                        oSheet.Cells[21+i, 5] = hist_temp_hum_list[i].hum.ToString();
-
-                    }
+                            oSheet.Cells[21 + i, 4] = hist_temp_hum_list[i].distance_from_building.ToString();
+                            oSheet.Cells[21+i, 5] = hist_temp_hum_list[i].temp.ToString();
+                        oSheet.Cells[21+i, 6] = hist_temp_hum_list[i].hum.ToString();
+                            oSheet.Cells[21 + i, 7] = hist_temp_hum_list[i].bar_pressure.ToString();
+                            oSheet.Cells[21 + i, 8] = hist_temp_hum_list[i].wind.ToString();
+                            oSheet.Cells[21 + i, 9] = hist_temp_hum_list[i].direction.ToString();
+                            oSheet.Cells[21 + i, 10] = hist_temp_hum_list[i].station_name.ToString();
+                        }
 
                     //now lets open the save dialog box and the save it there..
 
@@ -288,14 +300,14 @@ namespace WFA_psychometric_chart
 
             //now futher porcessing of the obtain data 
             string historicalData = "Historical Data,";
-            string historicalTopic = "date,hour,minute,temperature,humidity,";
+            string historicalTopic = "date,hour,minute,distance form building,temperature,humidity,bar pressure,wind speed,wind direction,station name ";
             sb.AppendLine(historicalData);
             sb.AppendLine(historicalTopic);
 
             for(int i = 0; i < hist_temp_hum_list.Count; i++)
             {
-                string historicalValue = hist_temp_hum_list[i].date + "," + hist_temp_hum_list[i].hour + "," + hist_temp_hum_list[i].minute + "," + hist_temp_hum_list[i].temp + "," + hist_temp_hum_list[i].hum+",";
-                sb.AppendLine(historicalValue);
+                string historicalValue = hist_temp_hum_list[i].date + "," + hist_temp_hum_list[i].hour + "," + hist_temp_hum_list[i].minute + ","+hist_temp_hum_list[i].distance_from_building+"," + hist_temp_hum_list[i].temp + "," + hist_temp_hum_list[i].hum+"," + hist_temp_hum_list[i].bar_pressure + "," + hist_temp_hum_list[i].wind+ "," + hist_temp_hum_list[i].direction+ "," + hist_temp_hum_list[i].station_name + ".";
+                    sb.AppendLine(historicalValue);
 
               }
 
@@ -353,13 +365,13 @@ namespace WFA_psychometric_chart
 
                 //now futher porcessing of the obtain data 
                 string historicalData = WFA_psychometric_chart.Properties.Resources.Historical_Data;
-                string historicalTopic = WFA_psychometric_chart.Properties.Resources.date_hour_minute_temperature_h;
+                string historicalTopic = "date,hour,minute,distance form building,temperature,humidity,bar pressure,wind speed,wind direction,station name ";
                 sb.AppendLine(historicalData);
                 sb.AppendLine(historicalTopic);
 
                 for (int i = 0; i < hist_temp_hum_list.Count; i++)
                 {
-                    string historicalValue = hist_temp_hum_list[i].date + "," + hist_temp_hum_list[i].hour + "," + hist_temp_hum_list[i].minute + "," + hist_temp_hum_list[i].temp + "," + hist_temp_hum_list[i].hum + ",";
+                    string historicalValue = hist_temp_hum_list[i].date + "," + hist_temp_hum_list[i].hour + "," + hist_temp_hum_list[i].minute + "," + hist_temp_hum_list[i].distance_from_building + "," + hist_temp_hum_list[i].temp + "," + hist_temp_hum_list[i].hum + "," + hist_temp_hum_list[i].bar_pressure + "," + hist_temp_hum_list[i].wind + "," + hist_temp_hum_list[i].direction + "," + hist_temp_hum_list[i].station_name + ".";
                     sb.AppendLine(historicalValue);
 
                 }
@@ -408,8 +420,12 @@ namespace WFA_psychometric_chart
                             date = reader1["date_current"].ToString(),
                             hour = reader1["hour_current"].ToString(),
                             minute = reader1["minute_current"].ToString(),
+                            distance_from_building = reader1["distance_from_building"].ToString(),
                             temp = double.Parse(reader1["temperature"].ToString()),
                             hum = double.Parse(reader1["humidity"].ToString()),
+                            bar_pressure = reader1["bar_pressure"].ToString(),
+                            wind = reader1["wind"].ToString(),
+                            direction = reader1["direction"].ToString(),
                             station_name = reader1["station_name"].ToString()
                         });
                 }//close of while loop       
@@ -546,26 +562,38 @@ namespace WFA_psychometric_chart
             PullLocationInformation();
 
         }
+        public class DataTypeTempBuildingValue
+        {
+            public int ID { get; set; }
+            public string country { get; set; }
+            public string state { get; set; }
+            public string city { get; set; }
+        }
+
+        //ArrayList temp_building_values = new ArrayList();
+        List<DataTypeTempBuildingValue> temp_building_values = new List<DataTypeTempBuildingValue>();
+
+
+
         private void PullLocationInformation()
         {
-            try {
-                /*This methods pulls the building location information..*/
+            try
+            {
                 cb1_select_data.Items.Clear();
                 ArrayList stored_location = new ArrayList();
-                //while loading it should populate the field...
-                //lets pull the vales offline values stored in db...
-                //              string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-                // string connString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dir + @"\T3000.mdb;Persist Security Info=True";
-                // string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+                temp_building_values.Clear();//we need to clear the values for new items
+                                             //while loading it should populate the field...
+                                             //lets pull the vales offline values stored in db...
+                                             //string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+                //string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
 
                 //--changing all the database to the sqlite database...
                 string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
 
                 string connString = @"Data Source=" + databaseFile + ";Version=3;";
-
-
 
 
                 // MessageBox.Show("connection string = " + connString);
@@ -580,19 +608,31 @@ namespace WFA_psychometric_chart
                 while (reader.Read())
                 {
 
-                    string selecte_location = reader["id"].ToString() + "," + reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
-                    stored_location.Add(selecte_location);
+                    //string selecte_location = reader["id"].ToString()+","+reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
+                    //stored_location.Add(selecte_location);
+
+                    temp_building_values.Add(new DataTypeTempBuildingValue
+                    {
+                        ID = int.Parse(reader["id"].ToString()),
+                        country = reader["country"].ToString(),
+                        state = reader["state"].ToString(),
+                        city = reader["city"].ToString()
+                    });
+
                 }
-                string s = "";
-                for (int i = 0; i < stored_location.Count; i++)
+                //string s = "";
+                for (int i = 0; i < temp_building_values.Count; i++)
                 {
-                    cb1_select_data.Items.Add(stored_location[i]);
-                    s += stored_location[i] + " , \n";
+
+                    string tempValue = temp_building_values[i].ID + "," + temp_building_values[i].country + "," + temp_building_values[i].state + "," + temp_building_values[i].city;
+                    cb1_select_data.Items.Add(tempValue);
+                    //s += stored_location[i] + " , \n";
                 }
                 // MessageBox.Show("stored place = " + s);
                 comm.Dispose();
                 reader.Dispose();
                 connection.Close();
+
 
 
             }
@@ -605,9 +645,12 @@ namespace WFA_psychometric_chart
         private void cb1_select_data_SelectedIndexChanged(object sender, EventArgs e)
         {
             //on change index it will select the index value or better known as selected index.
-            try { 
-            index_selected = cb1_select_data.SelectedIndex + 1; //is used to identify the location and data associated with it.
-            groupBox1.Enabled = true;
+            try {
+                //index_selected = cb1_select_data.SelectedIndex + 1; //is used to identify the location and data associated with it.
+                int cb_index_selected = cb1_select_data.SelectedIndex;
+                index_selected = temp_building_values[cb_index_selected].ID;
+
+                groupBox1.Enabled = true;
             groupBox2.Enabled = true;
             btnExtract.Enabled = true;
             MessageBox.Show("index selected = " + index_selected);
@@ -622,5 +665,7 @@ namespace WFA_psychometric_chart
       public void form_export_data_Disposed ( object sender, System.EventArgs e )
       {
       }
+
+     
     }
 }

@@ -127,7 +127,7 @@ namespace WFA_psychometric_chart
             chart1.Series.Add("Line_b100");
             chart1.Series.Add("Line_b110");
             chart1.Series.Add("Line_b_straight");
-            chart_plot();
+         //   chart_plot();
 
         }
         int map_loaded = 0;

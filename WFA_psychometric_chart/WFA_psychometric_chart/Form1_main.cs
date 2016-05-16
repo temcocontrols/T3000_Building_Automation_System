@@ -27,7 +27,7 @@ namespace WFA_psychometric_chart
             InitializeComponent();
           //this.Disposed += new System.EventHandler ( this.Form1_main_Disposed );
         }
-        //lets define the constanst..
+        //--lets define the constanst..
         double temperature, humidity, Patm, TDewpoint, A, m, Tn, B, Pws, X, h;
         int index = 0;
         ToolTip tp = new ToolTip();
@@ -45,19 +45,131 @@ namespace WFA_psychometric_chart
         ArrayList hum2_AL =  new ArrayList();
         Series series1xx = new Series("My Series values plot ");//this series is used by plot_on_graph_values() method...
         Series seriesLineIndicator = new Series("LineIndicator");//--This line indicator is temporary show the line in the chart for Node Movement.
+
+        //--This is the constant list that is being used by our program i.g :it contains t_pg.tx and t_pg1.txt values
+        //List<double,double> t_pg_list =  
+
+
+        ArrayList t = new ArrayList();//this stores the temperature(deg.cel)
+        ArrayList pg = new ArrayList();//this stores the saturated vapour pressure(kpa).
+
+
+        public void add_t_pg()
+        {
+            //Adding values in t and pg.
+            t.Add(0.01);pg.Add(0.61165);
+            t.Add(1.00);pg.Add(0.65709);
+            t.Add(2.00);pg.Add(0.70599);
+            t.Add(3.00);pg.Add(0.75808);
+            t.Add(4.00);pg.Add(0.81355);
+            t.Add(5.00);pg.Add(0.87258);
+            t.Add(6.00);pg.Add(0.93536);
+            t.Add(7.00);pg.Add(1.00210);
+            t.Add(8.00);pg.Add(1.07300);
+            t.Add(9.00);pg.Add(1.14830);
+            t.Add(10.00);pg.Add(1.22820);
+            t.Add(11.00);pg.Add(1.31300);
+            t.Add(12.00);pg.Add(1.40280);
+            t.Add(13.00);pg.Add(1.49810);
+            t.Add(14.00);pg.Add(1.59900);
+            t.Add(15.00);pg.Add(1.70580);
+            t.Add(16.00); pg.Add(1.81880);
+            t.Add(17.00);pg.Add(1.93840);
+            t.Add(18.00);pg.Add(2.06470);
+            t.Add(19.00);pg.Add(2.19830);
+            t.Add(20.00);pg.Add(2.33930);
+            t.Add(21.00);pg.Add(2.48820);
+            t.Add(22.00);pg.Add(2.64530);
+            t.Add(23.00);pg.Add(2.81110);
+            t.Add(24.00);pg.Add(2.98580);
+            t.Add(25.00);pg.Add(3.16990);
+            t.Add(26.00);pg.Add(3.36390);
+            t.Add(27.00);pg.Add(3.56810);
+            t.Add(28.00);pg.Add(3.78310);
+            t.Add(29.00);pg.Add(4.00920);
+            t.Add(30.00);pg.Add(4.24700);
+            t.Add(31.00);pg.Add(4.49690);
+            t.Add(32.00);pg.Add(4.75960);
+            t.Add(33.00);pg.Add(5.03540);
+            t.Add(34.00);pg.Add(5.32510);
+            t.Add(35.00);pg.Add(5.62900);
+            t.Add(36.00);pg.Add(5.94790);
+            t.Add(37.00);pg.Add(6.28230);
+            t.Add(38.00);pg.Add(6.63280);
+            t.Add(39.00);pg.Add(7.00020);
+            t.Add(40.00);pg.Add(7.38490);
+            t.Add(41.00);pg.Add(7.78780);
+            t.Add(42.00);pg.Add(8.20960);
+            t.Add(43.00);pg.Add(8.65080);
+            t.Add(44.00);pg.Add(9.11240);
+            t.Add(45.00); pg.Add(9.59500);
+            t.Add(46.00);pg.Add(10.09900);
+            t.Add(47.00);pg.Add(10.62700);
+            t.Add(48.00);pg.Add(11.17700);
+            t.Add(49.00);pg.Add(11.75200);
+            t.Add(50.00);pg.Add(12.35200);
+        }
+
+        int countIndexForChart = 0;
         public void plot_new_graph()
         {
 
-                        /*
-             steps:
-             * 1.set x and y axis in graph
-             * 2.plot red lines
-             * 3.plot green lines
-             * 4.plot wet bult curve red line.
-             * 5.
-             * 
-             */
+            /*
+              steps:
+              * 1.set x and y axis in graph
+              * 2.plot red lines
+              * 3.plot green lines
+              * 4.plot wet bult curve red line.
+              * 5.
+              * 
+              */
 
+            //--Lets clear the points and add them again so that we can draw new data on the chart.
+
+            //if(countIndexForChart>0)
+            //{
+            //    chart1.Series.Clear();                
+
+            //    chart1.Series.Add("Series1");
+            //chart1.Series.Add("Series2");
+            //chart1.Series.Add("Series3");
+            //chart1.Series.Add("Series4");
+            //chart1.Series.Add("Series5");
+            //chart1.Series.Add("Series6");
+            //chart1.Series.Add("Series7");
+            //chart1.Series.Add("Line0");
+            //chart1.Series.Add("Line1");
+            //chart1.Series.Add("Line2");
+            //chart1.Series.Add("Line3");
+            //chart1.Series.Add("Line4");
+            //chart1.Series.Add("Line5");
+            //chart1.Series.Add("Line6");
+            //chart1.Series.Add("Line_r0");
+            //chart1.Series.Add("Line_r1");
+            //chart1.Series.Add("Line_r2");
+            //chart1.Series.Add("Line_r3");
+            //chart1.Series.Add("Line_r4");
+            //chart1.Series.Add("Line_r5");
+            //chart1.Series.Add("Line_b10");
+            //chart1.Series.Add("Line_b20");
+            //chart1.Series.Add("Line_b30");
+            //chart1.Series.Add("Line_b40");
+            //chart1.Series.Add("Line_b50");
+            //chart1.Series.Add("Line_b60");
+            //chart1.Series.Add("Line_b70");
+            //chart1.Series.Add("Line_b80");
+            //chart1.Series.Add("Line_b90");
+            //chart1.Series.Add("Line_b100");
+            //chart1.Series.Add("Line_b110");
+            //chart1.Series.Add("Line_b_straight");
+            //chart1.Series.Add(series1xx);
+
+            //}
+
+
+            countIndexForChart = 1;
+
+            indexI = 0;//resetting the index value....
             //lets reset the chart1 value.
             //chart1 = null;
             map_loaded = 1;
@@ -95,8 +207,8 @@ namespace WFA_psychometric_chart
             chart1.ChartAreas[0].AxisX.Interval = 5;
             //we need to plot the chart so lets build an array where we can hold the data
             //form text file..
-            ArrayList t = new ArrayList();//this stores the temperature(deg.cel)
-            ArrayList pg = new ArrayList();//this stores the saturated vapour pressure(kpa).
+            
+
 
             //now lets read from the text file...
             string line1;
@@ -110,44 +222,49 @@ namespace WFA_psychometric_chart
            // MessageBox.Show("the path = " + pat_test);
             string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
             */
-            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string file = dir + @"\t_pg.txt";
-            string path1 = file;
 
-            // string path;
-            // path = System.IO.Path.GetDirectoryName(
-            //    System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
-
-            // MessageBox.Show(path);
-            //string  path1 = path + "\\t_pg.txt";
-            //MessageBox.Show(path1);
-            using (StreamReader st = new StreamReader(path1))
-            {
-                //int i = 0;
-                //string s = " ";
-                while ((line1 = st.ReadLine()) != null)
-                {
-                    //line.Skip(1);
+            
 
 
-                    string[] value = line1.Split(',');
-                    try
-                    {
-                        double temp1 = Double.Parse(value[0]);
-                        double temp2 = Double.Parse(value[1].Trim());
-                        //now lets add to temperature and pg array..
-                        t.Add(temp1);
-                        pg.Add(temp2);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
+
+            //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string file = dir + @"\t_pg.txt";
+            //string path1 = file;
+
+            //// string path;
+            //// path = System.IO.Path.GetDirectoryName(
+            ////    System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
+
+            //// MessageBox.Show(path);
+            ////string  path1 = path + "\\t_pg.txt";
+            ////MessageBox.Show(path1);
+            //using (StreamReader st = new StreamReader(path1))
+            //{
+            //    //int i = 0;
+            //    //string s = " ";
+            //    while ((line1 = st.ReadLine()) != null)
+            //    {
+            //        //line.Skip(1);
 
 
-                }//close of while
+            //        string[] value = line1.Split(',');
+            //        try
+            //        {
+            //            double temp1 = Double.Parse(value[0]);
+            //            double temp2 = Double.Parse(value[1].Trim());
+            //            //now lets add to temperature and pg array..
+            //            t.Add(temp1);
+            //            pg.Add(temp2);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            MessageBox.Show(ex.ToString());
+            //        }
 
-            }//close of using
+
+            //    }//close of while
+
+            //}//close of using
 
             //now lets test the value..
             string s = "";
@@ -179,6 +296,7 @@ namespace WFA_psychometric_chart
                 double y = wg_calc;
                 chart1.Series["Series1"].Points.AddXY(x, y);
 
+                
 
             }//close of for
         
@@ -264,6 +382,8 @@ namespace WFA_psychometric_chart
             ArrayList t1 = new ArrayList();//this stores the temperature(deg.cel)
             ArrayList pg1 = new ArrayList();//this stores the saturated vapour pressure(kpa).
 
+           
+
             //now lets read from the text file...
             string line2;
             //String[][] point_value= new String[][];
@@ -277,35 +397,76 @@ namespace WFA_psychometric_chart
             string path2 = System.IO.Path.Combine(pat_test, "t_pg1.txt");
             */
 
-            string file1 = dir + @"\t_pg1.txt";
-            string path2 = file1;
-            using (System.IO.StreamReader st = new System.IO.StreamReader(path2))
+            //string file1 = dir + @"\t_pg1.txt";
+            //string path2 = file1;
+            //using (System.IO.StreamReader st = new System.IO.StreamReader(path2))
+            //{
+            //    //int i = 0;
+            //    //string s = " ";
+            //    while ((line2 = st.ReadLine()) != null)
+            //    {
+            //        //line.Skip(1);
+
+
+            //        string[] value = line2.Split(',');
+            //        try
+            //        {
+            //            double temp1 = Double.Parse(value[0].ToString());
+            //            double temp2 = Double.Parse(value[1].ToString().Trim());
+            //            //now lets add to temperature and pg array..
+            //            t1.Add(temp1);
+            //            pg1.Add(temp2);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            MessageBox.Show(ex.ToString());
+            //        }
+
+
+            //    }//close of while
+
+            //}//close of using
+
+            for(int i = 0; i < t.Count; i++)
             {
-                //int i = 0;
-                //string s = " ";
-                while ((line2 = st.ReadLine()) != null)
+                if(double.Parse(t[i].ToString()) == 5.00)
                 {
-                    //line.Skip(1);
+                    t1.Add(t[i]);
+                    pg1.Add(pg[i]);
+                }
+                else if(double.Parse(t[i].ToString()) == 10.00)
+                {
+                    t1.Add(t[i]);
+                    pg1.Add(pg[i]);
+                }
+                else if (double.Parse(t[i].ToString()) == 15.00)
+                {
+                    t1.Add(t[i]);
+                    pg1.Add(pg[i]);
+                }
+                else if (double.Parse(t[i].ToString()) == 20.00)
+                {
+                    t1.Add(t[i]);
+                    pg1.Add(pg[i]);
+                }
+                else if (double.Parse(t[i].ToString()) == 25.00)
+                {
+                    t1.Add(t[i]);
+                    pg1.Add(pg[i]);
+                }
+                else if (double.Parse(t[i].ToString()) == 30.00)
+                {
+                    t1.Add(t[i]);
+                    pg1.Add(pg[i]);
+                }
+                else if (double.Parse(t[i].ToString()) == 35.00)
+                {
+                    t1.Add(t[i]);
+                    pg1.Add(pg[i]);
+                }
 
+            }//--CLOSE OF THE FOR LOOP 
 
-                    string[] value = line2.Split(',');
-                    try
-                    {
-                        double temp1 = Double.Parse(value[0].ToString());
-                        double temp2 = Double.Parse(value[1].ToString().Trim());
-                        //now lets add to temperature and pg array..
-                        t1.Add(temp1);
-                        pg1.Add(temp2);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-
-
-                }//close of while
-
-            }//close of using
 
             //this part is finished... now towards calcuation...
             ArrayList wg1 = new ArrayList();//saturation specific humidity...
@@ -446,6 +607,10 @@ namespace WFA_psychometric_chart
         
         private void Form1_Load(object sender, EventArgs e)
         {
+            //lets add the t and pg values
+            add_t_pg();//Calling this method add the value...
+
+
              //lets plot the graph as soon as the form loads.
             plot_new_graph();
 
@@ -454,6 +619,7 @@ namespace WFA_psychometric_chart
             chart1.Series.Add(series1xx);
             //--This is added for the process diagram part...
             chart1.Series.Add(series1);
+            chart1.Series.Add(series1_heat_map);
             chart1.Series.Add(seriesLineIndicator);//--This line indicator is for show temporary line for movement...
             //this is other part.
             //radioButton1.Checked = true;
@@ -509,7 +675,7 @@ namespace WFA_psychometric_chart
                 command1.ExecuteNonQuery();
 
                 //--next table historical data:tbl_historical_data
-                string sql2 = "create table tbl_historical_data (ID int ,date_current datetime,hour_current int,minute_current int,temperature varchar(255),humidity varchar(255),station_name varchar(255))";
+                string sql2 = "create table tbl_historical_data (ID INTEGER,date_current datetime,hour_current int,minute_current int,distance_from_building varchar(255),temperature varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))";
                 SQLiteCommand command2 = new SQLiteCommand(sql2, m_dbConnection);
                 command2.ExecuteNonQuery();
                 //--next table tbl_temp_himidity 
@@ -517,7 +683,7 @@ namespace WFA_psychometric_chart
                 SQLiteCommand command3 = new SQLiteCommand(sql3, m_dbConnection);
                 command3.ExecuteNonQuery();
                 //--next table weather related datas...
-                string sql4 = "create table tbl_weather_related_values (ID INTEGER PRIMARY KEY AUTOINCREMENT ,location varchar(255),distance_from_building varchar(255),last_update_date varchar(255),temp varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))";
+                string sql4 = "create table tbl_weather_related_values (ID INTEGER ,location varchar(255),distance_from_building varchar(255),last_update_date varchar(255),temp varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))";
                 SQLiteCommand command4 = new SQLiteCommand(sql4, m_dbConnection);
                 command4.ExecuteNonQuery();
 
@@ -624,7 +790,7 @@ namespace WFA_psychometric_chart
         /*This is the function that plots the graph 
          */
 
-
+        int indexI = 0;
         public void plot_on_graph_values(double dbt,double hr,double xval,double yval)
         {
             
@@ -636,22 +802,22 @@ namespace WFA_psychometric_chart
             series1xx.MarkerSize = 12;
             
             string label = "DBT=" + dbt + ",HR=" + hr;
-            series1xx.Label = label;
+
             //chart1.Series["SeriesDBT_HR" + index].;
             series1xx.Points.AddXY(xval, yval);
-            
+            series1xx.Points[indexI++].Label = label;
             //series1.Enabled = true;
 
         }
 
-        public int plot_by_DBT_HR(double DBT, double HR)
+        public int plot_by_DBT_HR(double DBT1, double HR)
         {
             /*           
              *We need to cal x-asis which is given by DBT 
              */
            // MessageBox.Show("reached here dbt=" + DBT + ", hr = " + HR);
-            int x_axis = (int)DBT;
-
+            int x_axis = (int)DBT1;
+            double DBT = (double)(int)(DBT1);
             //here the HR is  relative humidity like 20%,30% etc os phi = 0.3 for 30%
             double phi = HR;
             //we need to calculate the y-axis value 
@@ -664,44 +830,49 @@ namespace WFA_psychometric_chart
             
             string line1;
             //string path1 = "C:\\Users\\nischal\\Desktop\\t_pg.txt";
-           /* var pat_test = System.Environment.
-                            GetFolderPath(
-                                Environment.SpecialFolder.Desktop
-                            );
-           // MessageBox.Show("the path = " + pat_test);
-            string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
-            */
-            string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string file = dir + @"\t_pg.txt";
-            string path1 = file;
-          
-            using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
-            {
-        
-                while ((line1 = st.ReadLine()) != null)
-                {
-                    
-                    string[] value = line1.Split(',');
-                    try
-                    {
-                        double temp1 = Double.Parse(value[0]);
-                        double temp2 = Double.Parse(value[1]);
-                        //now lets add to temperature and pg array..                     
-                        temperature_value.Add(temp1);
-                        pg_value_from_txtfile.Add(temp2);
+            /* var pat_test = System.Environment.
+                             GetFolderPath(
+                                 Environment.SpecialFolder.Desktop
+                             );
+            // MessageBox.Show("the path = " + pat_test);
+             string path1 = System.IO.Path.Combine(pat_test, "t_pg.txt");
+             */
+            //string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            //string file = dir + @"\t_pg.txt";
+            //string path1 = file;
 
-                      
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
+            //using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
+            //{
+
+            //    while ((line1 = st.ReadLine()) != null)
+            //    {
+
+            //        string[] value = line1.Split(',');
+            //        try
+            //        {
+            //            double temp1 = Double.Parse(value[0]);
+            //            double temp2 = Double.Parse(value[1]);
+            //            //now lets add to temperature and pg array..                     
+            //            temperature_value.Add(temp1);
+            //            pg_value_from_txtfile.Add(temp2);
 
 
-                }//close of while
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            MessageBox.Show(ex.ToString());
+            //        }
 
-            }//close of using
-           
+
+            //    }//close of while
+
+            //}//--close of using
+
+            //--- we need to copy the values to the corresponding array list
+            temperature_value = t;
+            pg_value_from_txtfile = pg;
+
+
             //lets proceed futher..
             //double pg_value = Double.Parse(pg[i].ToString());
             //wg_calc = 622 * pg_value / (patm - pg_value);
@@ -2619,7 +2790,7 @@ namespace WFA_psychometric_chart
         ArrayList temperature_value = new ArrayList();
         ArrayList pg_value_from_txtfile = new ArrayList();
 
-        Series series1_heat_map = null;
+        Series series1_heat_map = new Series("Heat_map_series");
         int load_map_checker = 0;//checks weather to load a map or not
 
         private void label21_MouseHover(object sender, EventArgs e)
@@ -2699,21 +2870,35 @@ namespace WFA_psychometric_chart
 
         int index_series_heat_map = 0;//this index is used by  plot_on_graph_values method
 
-        int SeriesCount = 0;
+        //int SeriesCount = 0;
         public void heat_map_button_click(int index_selected_heat_map,DateTime from1,DateTime to1)
         {
 
-            if (SeriesCount > 0)
-            { 
-            chart1.Series.Remove(series1_heat_map);//--Removing the series that already exist...
+            //-- resetting chart series and plotting again..
+
+             //plot_new_graph();
+
+          //Series  series1_heat_map = new Series("My_Series_heat_map");//changed form "My Series"
+            //chart1.Series.Add(series1_heat_map);
+
+
+            if (chart1.Series.IndexOf(series1_heat_map)!= -1) 
+            {
+                //chart1.Series.Remove(series1_heat_map);//--Removing the series that already exist...
+                //chart1.Series.Add(series1_heat_map);
+
+                //    series1_heat_map.Points.Clear();//--This is for resetting the values ...
+                //    index_series_heat_map = 0;//--Resetting the index...
+                //series1.Points.Clear();
+                //chart1.Series.RemoveAt(chart1.Series.IndexOf(series1));
+                series1_heat_map.Points.Clear();//--We can clear all the poingt over here and add new one later..
+                index_series_heat_map = 0;//--Resetting the values of the series...
+
             }
-            SeriesCount = 1;
+            //SeriesCount = 1;
 
             //--lest reset soem values..
             hist_temp_hum_list.Clear();
-
-            series1_heat_map = new Series("My Series_heat_map");//changed form "My Series"
-
 
             //this  is going to plot the heat map...
             /*Steps:
@@ -2782,7 +2967,7 @@ namespace WFA_psychometric_chart
 
             if (hist_temp_hum_list.Count > 0)
             {
-                MessageBox.Show("value counted " + hist_temp_hum_list.Count);
+                //MessageBox.Show("value counted " + hist_temp_hum_list.Count);
                 //after we have the data we do the actual part of heat map plotting...
                 //setting up maximum and minimum value to use in color value calculation..
 
@@ -2811,44 +2996,53 @@ namespace WFA_psychometric_chart
                 //callin gthe method.
                 //lets increase th performance first... this below code if from plot_by_dbt_hr
 
+                //--Lets reset the values first and then re-add the values
+                //temperature_value.Clear();
+                //pg_value_from_txtfile.Clear();//--Clearing the part of the series
 
 
-                string line1;
 
-                string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                string file = dir + @"\t_pg.txt";
-                string path1 = file;
+                //string line1;
 
-                using (StreamReader st = new StreamReader(path1))
-                {
+                //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                //string file = dir + @"\t_pg.txt";
+                //string path1 = file;
 
-                    while ((line1 = st.ReadLine()) != null)
-                    {
+                //using (StreamReader st = new StreamReader(path1))
+                //{
 
-                        string[] value = line1.Split(',');
-                        try
-                        {
-                            double temp1 = Double.Parse(value[0]);
-                            double temp2 = Double.Parse(value[1]);
-                            //now lets add to temperature and pg array..                     
-                            temperature_value.Add(temp1);
-                            pg_value_from_txtfile.Add(temp2);
+                //    while ((line1 = st.ReadLine()) != null)
+                //    {
 
-
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.ToString());
-                        }
+                //        string[] value = line1.Split(',');
+                //        try
+                //        {
+                //            double temp1 = Double.Parse(value[0]);
+                //            double temp2 = Double.Parse(value[1]);
+                //            //now lets add to temperature and pg array..                     
+                //            temperature_value.Add(temp1);
+                //            pg_value_from_txtfile.Add(temp2);
 
 
-                    }//close of while
+                //        }
+                //        catch (Exception ex)
+                //        {
+                //            MessageBox.Show(ex.ToString());
+                //        }
 
-                }//close of using
+
+                //    }//close of while
+
+                //}//close of using
+
+                temperature_value = t;
+                pg_value_from_txtfile = pg;
+
+
 
                 //this series is used to add to the 
-                chart1.Series.Add(series1_heat_map);
-
+            //    chart1.Series.Add(series1_heat_map);
+              
 
 
                 for (int i = 0; i < hist_temp_hum_list.Count; i++)
@@ -2857,7 +3051,7 @@ namespace WFA_psychometric_chart
 
                 }
 
-                MessageBox.Show(Properties.Resources.Success_final);
+               // MessageBox.Show(Properties.Resources.Success_final);
             }//close of if
             else
             {
@@ -2893,7 +3087,13 @@ namespace WFA_psychometric_chart
             {
                 using (Graphics grp1 = this.CreateGraphics())
                 {
-                    
+
+                    int x1Axis = (int)(chart1.ChartAreas[0].Position.X + chart1.Width + 10);
+                    int y1Axis = (int)(chart1.ChartAreas[0].Position.Y + chart1.Height);
+
+                    int x2Axis = x1Axis + 15;
+                    int y2Axis = y1Axis;
+
                     double start = min_value;
 
                     double value = start;
@@ -2905,17 +3105,19 @@ namespace WFA_psychometric_chart
                     //decimal val = (Decimal)((value - min_value) / (max_value - min_value));
 
                     Pen pen1 = new Pen(Color.FromArgb(0, 255, 0));
-                    grp1.DrawRectangle(pen1, 958, 537, 15, 15);
-                    SolidBrush drawBrushGreen = new SolidBrush(Color.FromArgb(0, 255, 0));
-                    grp1.FillRectangle(drawBrushGreen, 958, 537, 15, 15);
+                    //grp1.DrawRectangle(pen1, 958, 537, 15, 15);
+                    grp1.DrawRectangle(pen1, x1Axis, y1Axis, 15, 15);
 
+                    SolidBrush drawBrushGreen = new SolidBrush(Color.FromArgb(0, 255, 0));
+                    //grp1.FillRectangle(drawBrushGreen, 958, 537, 15, 15);
+                    grp1.FillRectangle(drawBrushGreen, x1Axis, y1Axis, 15, 15);
 
                     String drawString = Math.Round(value,0).ToString();
                     // Create font and brush.
                     Font drawFont = new Font("Arial", 7);
                     SolidBrush drawBrush = new SolidBrush(Color.Black);
                     // Create point for upper-left corner of drawing.
-                    PointF drawPoint = new PointF(958-12, 520);//--537->520
+                    PointF drawPoint = new PointF(x1Axis-12, y1Axis);//--537->520
                     // Draw string to screen.
                     grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
                 }
@@ -2938,7 +3140,14 @@ namespace WFA_psychometric_chart
                     double temp_value = (max_value - min_value);
                     double increment = 0;
                     increment = temp_value / 50;
+                    int  x1Axis = (int)(chart1.Location.X + chart1.Width + 30);
+                    int y1Axis = (int)(chart1.Location.Y + chart1.Height);
 
+                    int x2Axis = x1Axis + 15;
+                    int y2Axis = y1Axis;
+
+
+                   // MessageBox.Show("X1 = " + x1Axis + ", y1   =" + y1Axis + ", x2 = " + x2Axis + " , y2 = " + y2Axis);
 
                     for (int i = 1; i <= 50; i++)
                     {
@@ -2949,8 +3158,8 @@ namespace WFA_psychometric_chart
                         int g = Convert.ToByte(255 * (1 - val));
                         int b = 0;
                         Pen pen1 = new Pen(Color.FromArgb(r, g, b));
-                        grp1.DrawLine(pen1, 958, 520 - i, 973, 520 - i);//--changed
-
+                        //grp1.DrawLine(pen1, 958, 520 - i, 973, 520 - i);//--changed
+                        grp1.DrawLine(pen1, x1Axis, y1Axis - i, x2Axis, y2Axis - i);//--changed
                         if (i == 0)
                         {
                             String drawString = Math.Round(value, 0).ToString();
@@ -2958,7 +3167,8 @@ namespace WFA_psychometric_chart
                             Font drawFont = new Font("Arial", 7);
                             SolidBrush drawBrush = new SolidBrush(Color.Black);
                             // Create point for upper-left corner of drawing.
-                            PointF drawPoint = new PointF(958-12, 520 - i); //--change
+                            //PointF drawPoint = new PointF(958-12, 520 - i); //--change
+                            PointF drawPoint = new PointF(x1Axis - 12, y1Axis - i); //--change
                             // Draw string to screen.
                             grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
                         }
@@ -2969,7 +3179,8 @@ namespace WFA_psychometric_chart
                             Font drawFont = new Font("Arial", 7);
                             SolidBrush drawBrush = new SolidBrush(Color.Black);
                             // Create point for upper-left corner of drawing.
-                            PointF drawPoint = new PointF(958-12, 520 - i);
+                            //PointF drawPoint = new PointF(958-12, 520 - i);
+                            PointF drawPoint = new PointF(x1Axis - 12, y1Axis - i); //--change
                             // Draw string to screen.
                             grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
                         }
@@ -2981,7 +3192,8 @@ namespace WFA_psychometric_chart
                             Font drawFont = new Font("Arial", 7);
                             SolidBrush drawBrush = new SolidBrush(Color.Black);
                             // Create point for upper-left corner of drawing.
-                            PointF drawPoint = new PointF(958-12, 520 - i);
+                            //PointF drawPoint = new PointF(958-12, 520 - i);
+                            PointF drawPoint = new PointF(x1Axis - 12, y1Axis - i); //--change
                             // Draw string to screen.
                             grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
                         }
@@ -2993,7 +3205,8 @@ namespace WFA_psychometric_chart
                             Font drawFont = new Font("Arial", 7);
                             SolidBrush drawBrush = new SolidBrush(Color.Black);
                             // Create point for upper-left corner of drawing.
-                            PointF drawPoint = new PointF(958-12, 520 - i);
+                            //PointF drawPoint = new PointF(958-12, 520 - i);
+                            PointF drawPoint = new PointF(x1Axis - 12, y1Axis - i); //--change
                             // Draw string to screen.
                             grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
                         }
@@ -3005,7 +3218,8 @@ namespace WFA_psychometric_chart
                             Font drawFont = new Font("Arial", 7);
                             SolidBrush drawBrush = new SolidBrush(Color.Black);
                             // Create point for upper-left corner of drawing.
-                            PointF drawPoint = new PointF(958-12, 520 - i);
+                            //PointF drawPoint = new PointF(958-12, 520 - i);
+                            PointF drawPoint = new PointF(x1Axis - 12, y1Axis - i); //--change
                             // Draw string to screen.
                             grp1.DrawString(drawString, drawFont, drawBrush, drawPoint);
                         }
@@ -3031,7 +3245,7 @@ namespace WFA_psychometric_chart
              */
             // MessageBox.Show("reached here dbt=" + DBT + ", hr = " + HR);
             int x_axis = (int)DBT;
-
+            
             //here the HR is  relative humidity like 20%,30% etc os phi = 0.3 for 30%
             double phi = HR;
             //we need to calculate the y-axis value 
@@ -3049,7 +3263,7 @@ namespace WFA_psychometric_chart
                 for (int i = 0; i < temperature_value.Count; i++)
                 {
                     ///x-axis contains the DBT
-                    if (DBT == Double.Parse(temperature_value[i].ToString()))
+                    if ((int)DBT == (int)Double.Parse(temperature_value[i].ToString()))
                     {
                         //if matched find the corresponding pg_value
                         pg_value = Double.Parse(pg_value_from_txtfile[i].ToString());
@@ -3066,11 +3280,13 @@ namespace WFA_psychometric_chart
             wg_calc = (622 * phi * pg_value / (patm - phi * pg_value));
             double y_axis = wg_calc;
 
+            //MessageBox.Show("Yaxis value  = " + y_axis);//--check
+
             plot_on_graph_values_heat_map(DBT, HR, x_axis, y_axis);
 
             //MessageBox.Show("reached series print" +series1.ToString());
 
-            index_heat_map++;
+            //index_heat_map++;
 
 
             return 0;
@@ -3086,7 +3302,7 @@ namespace WFA_psychometric_chart
             {
 
 
-                series1.ChartType = SeriesChartType.Point;
+                series1_heat_map.ChartType = SeriesChartType.Point;
                 int r, g, b;
 
                 if (max_value != min_value)
@@ -3110,12 +3326,12 @@ namespace WFA_psychometric_chart
                     b = 0;
                 }
 
-                series1.MarkerSize = 15;
+                series1_heat_map.MarkerSize = 15;
                 //string label = "DBT=" + dbt + ",HR=" + hr;
                 //series1.Label = label;
                 //chart1.Series["SeriesDBT_HR" + index].;
-                series1.Points.AddXY(xval, yval);
-                series1.Points[index_series_heat_map++].Color = Color.FromArgb(255, r, g, b);//blue
+                series1_heat_map.Points.AddXY(xval, yval);
+                series1_heat_map.Points[index_series_heat_map++].Color = Color.FromArgb(255, r, g, b);//blue
                                                                                     //series1.Enabled = true;
             }
             catch (Exception ex)
