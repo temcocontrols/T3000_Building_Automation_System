@@ -670,19 +670,19 @@ namespace WFA_psychometric_chart
                 SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
                 command.ExecuteNonQuery();
                 //--next table geo location value : tbl_geo_location_value
-                string sql1 = "create table tbl_geo_location_value (ID int ,longitude varchar(255),latitude varchar(255),elevation varchar(255))";
-                SQLiteCommand command1 = new SQLiteCommand(sql1, m_dbConnection);
-                command1.ExecuteNonQuery();
+                //string sql1 = "create table tbl_geo_location_value (ID int ,longitude varchar(255),latitude varchar(255),elevation varchar(255))";
+                //SQLiteCommand command1 = new SQLiteCommand(sql1, m_dbConnection);
+                //command1.ExecuteNonQuery();
 
                 //--next table historical data:tbl_historical_data
                 string sql2 = "create table tbl_historical_data (ID INTEGER,date_current datetime,hour_current int,minute_current int,distance_from_building varchar(255),temperature varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))";
                 SQLiteCommand command2 = new SQLiteCommand(sql2, m_dbConnection);
                 command2.ExecuteNonQuery();
                 //--next table tbl_temp_himidity 
-                string sql3 = "create table tbl_temp_humidity (temp int,humidity int)";
-                SQLiteCommand command3 = new SQLiteCommand(sql3, m_dbConnection);
-                command3.ExecuteNonQuery();
-                //--next table weather related datas...
+                //string sql3 = "create table tbl_temp_humidity (temp int,humidity int)";
+                //SQLiteCommand command3 = new SQLiteCommand(sql3, m_dbConnection);
+                //command3.ExecuteNonQuery();
+                ////--next table weather related datas...
                 string sql4 = "create table tbl_weather_related_values (ID INTEGER ,location varchar(255),distance_from_building varchar(255),last_update_date varchar(255),temp varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))";
                 SQLiteCommand command4 = new SQLiteCommand(sql4, m_dbConnection);
                 command4.ExecuteNonQuery();
@@ -1647,35 +1647,35 @@ namespace WFA_psychometric_chart
         }
 
 
-        private void button8_Click(object sender, EventArgs e)
-        {
-            //this is the database connection part...
+        //private void button8_Click(object sender, EventArgs e)
+        //{
+        //    //this is the database connection part...
             
-            //lets check if the data is present or not it the arraylist if present then only perfom the insert.
+        //    //lets check if the data is present or not it the arraylist if present then only perfom the insert.
 
-            if (temp_AL.Count > 0)
-            {
+        //    if (temp_AL.Count > 0)
+        //    {
 
-                int count = temp_AL.Count;
-                // the insertion part here...
+        //        int count = temp_AL.Count;
+        //        // the insertion part here...
 
-                for (int i = 0; i < count; i++)
-                {
+        //        for (int i = 0; i < count; i++)
+        //        {
 
-                    string q = "insert into tbl_temp_humidity(temperature,humidity)values ('" + double.Parse(temp_AL[i].ToString()) + " ',  '" + double.Parse(hum_AL[i].ToString()) + "')";
-                    insert_in_db(q);
+        //            string q = "insert into tbl_temp_humidity(temperature,humidity)values ('" + double.Parse(temp_AL[i].ToString()) + " ',  '" + double.Parse(hum_AL[i].ToString()) + "')";
+        //            insert_in_db(q);
 
-                }
+        //        }
 
-                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.db_insertion_success);
+        //        MessageBox.Show(WFA_psychometric_chart.Properties.Resources.db_insertion_success);
 
 
 
-            }//close of if
+        //    }//close of if
 
-            //btn_insert_values.Enabled = false;
+        //    //btn_insert_values.Enabled = false;
 
-        }
+        //}
 
         private void heatMapToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2301,38 +2301,40 @@ namespace WFA_psychometric_chart
             ArrayList temperature_value = new ArrayList();
             ArrayList pg_value_from_txtfile = new ArrayList();
 
-            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string file = dir + @"\t_pg.txt";
-            string path1 = file;
-            string line1;
+            //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //string file = dir + @"\t_pg.txt";
+            //string path1 = file;
+            //string line1;
 
-            using (StreamReader st = new StreamReader(path1))
-            {
+            //using (StreamReader st = new StreamReader(path1))
+            //{
 
-                while ((line1 = st.ReadLine()) != null)
-                {
+            //    while ((line1 = st.ReadLine()) != null)
+            //    {
 
-                    string[] value = line1.Split(',');
-                    try
-                    {
-                        double temp1 = Double.Parse(value[0]);
-                        double temp2 = Double.Parse(value[1]);
-                        //now lets add to temperature and pg array..                     
-                        temperature_value.Add(temp1);
-                        pg_value_from_txtfile.Add(temp2);
-
-
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
+            //        string[] value = line1.Split(',');
+            //        try
+            //        {
+            //            double temp1 = Double.Parse(value[0]);
+            //            double temp2 = Double.Parse(value[1]);
+            //            //now lets add to temperature and pg array..                     
+            //            temperature_value.Add(temp1);
+            //            pg_value_from_txtfile.Add(temp2);
 
 
-                }//close of while
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            MessageBox.Show(ex.ToString());
+            //        }
 
-            }//close of using
 
+            //    }//close of while
+
+            //}//close of using
+
+            temperature_value = t;
+            pg_value_from_txtfile = pg;
             double temperature = Math.Round(xVal);
             double corres_pg_value = 0.000000;
             for (int i = 0; i < temperature_value.Count; i++)
@@ -2491,37 +2493,39 @@ namespace WFA_psychometric_chart
                     ArrayList temperature_value = new ArrayList();
                     ArrayList pg_value_from_txtfile = new ArrayList();
 
-                    string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                    string file = dir + @"\t_pg.txt";
-                    string path1 = file;
-                    string line1;
+                    //string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    //string file = dir + @"\t_pg.txt";
+                    //string path1 = file;
+                    //string line1;
 
-                    using (StreamReader st = new StreamReader(path1))
-                    {
+                    //using (StreamReader st = new StreamReader(path1))
+                    //{
 
-                        while ((line1 = st.ReadLine()) != null)
-                        {
+                    //    while ((line1 = st.ReadLine()) != null)
+                    //    {
 
-                            string[] value = line1.Split(',');
-                            try
-                            {
-                                double temp1 = Double.Parse(value[0]);
-                                double temp2 = Double.Parse(value[1]);
-                                //now lets add to temperature and pg array..                     
-                                temperature_value.Add(temp1);
-                                pg_value_from_txtfile.Add(temp2);
-
-
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show(ex.ToString());
-                            }
+                    //        string[] value = line1.Split(',');
+                    //        try
+                    //        {
+                    //            double temp1 = Double.Parse(value[0]);
+                    //            double temp2 = Double.Parse(value[1]);
+                    //            //now lets add to temperature and pg array..                     
+                    //            temperature_value.Add(temp1);
+                    //            pg_value_from_txtfile.Add(temp2);
 
 
-                        }//close of while
+                    //        }
+                    //        catch (Exception ex)
+                    //        {
+                    //            MessageBox.Show(ex.ToString());
+                    //        }
 
-                    }//close of using
+
+                    //    }//close of while
+
+                    //}//close of using
+                    temperature_value = t;
+                    pg_value_from_txtfile = pg;
 
                     double temperature = (double)Math.Round((double)xVal);
                     double corres_pg_value = 0.000000;
@@ -2580,38 +2584,40 @@ namespace WFA_psychometric_chart
             ArrayList pg_value_from_txtfile = new ArrayList();
 
 
-            string line1;
-            string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string file = dir + @"\t_pg.txt";
-            string path1 = file;
+            //string line1;
+            //string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            //string file = dir + @"\t_pg.txt";
+            //string path1 = file;
 
-            using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
-            {
+            //using (System.IO.StreamReader st = new System.IO.StreamReader(path1))
+            //{
 
-                while ((line1 = st.ReadLine()) != null)
-                {
+            //    while ((line1 = st.ReadLine()) != null)
+            //    {
 
-                    string[] value = line1.Split(',');
-                    try
-                    {
-                        double temp1 = Double.Parse(value[0]);
-                        double temp2 = Double.Parse(value[1]);
-                        //now lets add to temperature and pg array..                     
-                        temperature_value.Add(temp1);
-                        pg_value_from_txtfile.Add(temp2);
-
-
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
+            //        string[] value = line1.Split(',');
+            //        try
+            //        {
+            //            double temp1 = Double.Parse(value[0]);
+            //            double temp2 = Double.Parse(value[1]);
+            //            //now lets add to temperature and pg array..                     
+            //            temperature_value.Add(temp1);
+            //            pg_value_from_txtfile.Add(temp2);
 
 
-                }//close of while
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            MessageBox.Show(ex.ToString());
+            //        }
 
-            }//close of using
 
+            //    }//close of while
+
+            //}//close of using
+
+            temperature_value = t;
+            pg_value_from_txtfile = pg;
             double patm = 101.235;//constant..we will make it take as input later...
             //double rair = 0.287;//rideburg constant i guess
             double wg_calc = 0;
@@ -2865,11 +2871,32 @@ namespace WFA_psychometric_chart
             Close();
         }
 
+        private void showComfortZoneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            /*
+             Show comfort zone is used to see the comfort zone in the code..
+             */
+             
+        }
+
+        public void ComfortZonePlot()
+        {
+            //--This file is used to show comfort zone in the chart
+
+
+
+
+        }
         private void helpPsychometricChartToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            try { 
             string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string file = dir + @"\PsychometricHelp.chm";
             Help.ShowHelp(this, file);
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
         }
 
