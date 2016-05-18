@@ -44,3 +44,6 @@
 **/*.OLBlck
 **/*.MNL
 **/*.MAX
+/WFA_psychometric_chart/T3000 Output_VS2015
+/WFA_psychometric_chart/T3000_Building_Automation_System
+/T3000 Output_VS2015
