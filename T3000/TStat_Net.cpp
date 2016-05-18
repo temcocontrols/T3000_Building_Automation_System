@@ -223,8 +223,8 @@ CString CTStat_Net::GetProductName()
     case PM_T34AO :
         strProductName="T3-4AO";
         break;
-    case PM_T322AI:
-        strProductName="T3-22I";
+    case PM_BEENY:
+        strProductName="Beeny";
         break;
     case PM_T38AI8AO6DO:
         strProductName="T3-8AI8AO6DO";
@@ -265,8 +265,7 @@ CString CTStat_Net::GetProductName()
         break;
     case PM_PM5E:
         strProductName="PM5E";
-        break;
-   
+        break;   
     case PM_TSTAT5F:
         strProductName="TStat5F";
         break;

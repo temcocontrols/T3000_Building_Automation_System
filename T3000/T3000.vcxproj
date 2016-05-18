@@ -109,7 +109,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>setupapi.lib;SqliteLib\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\T3000 Output\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -285,6 +285,7 @@
     <ClCompile Include="T3000.cpp" />
     <ClCompile Include="T3000DefaultView.cpp" />
     <ClCompile Include="T3000Doc.cpp" />
+    <ClCompile Include="T3000Option.cpp" />
     <ClCompile Include="T3000RegAddress.cpp" />
     <ClCompile Include="T3000TableView.cpp" />
     <ClCompile Include="T3000UpdateDlg.cpp" />
@@ -532,6 +533,7 @@
     <ClInclude Include="NewHumChamberView.h" />
     <ClInclude Include="ping.h" />
     <ClInclude Include="PressureSensorForm.h" />
+    <ClInclude Include="ProductModel.h" />
     <ClInclude Include="ProductRegisterListView.h" />
     <ClInclude Include="PVDlg.h" />
     <ClInclude Include="RegisterViewerDlg.h" />
@@ -541,6 +543,7 @@
     <ClInclude Include="StaticDlg.h" />
     <ClInclude Include="StatusbarCtrl.h" />
     <ClInclude Include="T3000DefaultView.h" />
+    <ClInclude Include="T3000Option.h" />
     <ClInclude Include="T3000UpdateDlg.h" />
     <ClInclude Include="T3000_Default_MainView.h" />
     <ClInclude Include="T3000_Help_Map.h" />

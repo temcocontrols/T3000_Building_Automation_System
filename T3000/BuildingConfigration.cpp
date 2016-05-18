@@ -35,7 +35,7 @@ CBuildingConfigration::CBuildingConfigration(CWnd* pParent /*=NULL*/)
     : CDialogEx(CBuildingConfigration::IDD, pParent)
 {
     m_bChanged=FALSE;
-	CString temp = GetExePath(true) + L"db_psychrometric_project.s3db";
+	CString temp = GetExePath(true) + L"Psychrometry\\db_psychrometric_project.s3db";
 	strcpy(m_sqlitepath,(CStringA)temp);
 }
 
@@ -895,9 +895,11 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 				CString SqlTemp;
 				SqlTemp.Format(_T("Update tbl_building_location set BuildingName = '%s' Where ID = %d "),cs_temp,sqlID);
 				
-				char charqltext[256];
+				char charqltext[1024];
 				 
-				strcpy( charqltext, (CStringA)SqlTemp);
+				memset(charqltext,0,1024);
+				WideCharToMultiByte( CP_ACP, 0, SqlTemp.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+
 				SqliteDB.execDML(charqltext);
 
 				 SqliteDB.close();
@@ -1112,9 +1114,10 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
 				CString SqlTemp;
 				SqlTemp.Format(_T("insert into tbl_building_location(ID,BuildingName) Values(%d,'%s') "),sqlID,BCTemp.MainBuildingName);
 
-				char charqltext[256];
+				char charqltext[1024];
 				 
-				strcpy( charqltext, (CStringA)SqlTemp);
+				memset(charqltext,0,1024);
+				WideCharToMultiByte( CP_ACP, 0, SqlTemp.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
 				SqliteDB.execDML(charqltext);
 				SqliteDB.close();
 				 
@@ -2087,10 +2090,13 @@ void CBuildingConfigration::OnNMRClickListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 void CBuildingConfigration::OnBuildingconfigSelect()
 {
     int count=m_building_config_list.GetRowCount();
+	
     if (m_curRow==count-1)
     {
         return;
     }
+
+	int ID = m_BuildNameLst.at(m_curRow).ID;
     CString m_select,m_strMainBuildingName;
     m_strMainBuildingName=m_building_config_list.GetItemText(m_curRow,BC_MAINNAME);
     m_select=m_building_config_list.GetItemText(m_curRow,m_curCol);
@@ -2109,6 +2115,25 @@ void CBuildingConfigration::OnBuildingconfigSelect()
         ado.m_pConnection->Execute(execute_str.GetString(),NULL,adCmdText);
         execute_str.Format(_T("update Building set Default_SubBuilding = -1 where  Main_BuildingName= '%s'"),m_strMainBuildingName);
         ado.m_pConnection->Execute(execute_str.GetString(),NULL,adCmdText);
+	    
+		CppSQLite3DB SqliteDB;
+		SqliteDB.open(m_sqlitepath);
+	 
+		execute_str = _T("update tbl_building_location set Selection = 0 where Selection = 1");
+
+		char charqltext[1024];
+		memset(charqltext,0,1024);
+		WideCharToMultiByte( CP_ACP, 0, execute_str.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+		SqliteDB.execDML(charqltext);
+
+		execute_str.Format(_T("update tbl_building_location set Selection = 1 where  ID = %d "),ID);
+
+		memset(charqltext,0,1024);
+		WideCharToMultiByte( CP_ACP, 0, execute_str.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+		SqliteDB.execDML(charqltext);
+
+		SqliteDB.close();
+
     }
     catch (_com_error *e)
     {
@@ -2207,6 +2232,22 @@ void CBuildingConfigration::OnBuildingconfigDelete()
         AfxMessageBox(_T("Operator Failed"));
     }
     ado.CloseConn();
+
+	int ID = m_BuildNameLst.at(m_curRow).ID;
+
+	CppSQLite3DB SqliteDB;
+	SqliteDB.open(m_sqlitepath);
+	CString execute_str;
+	execute_str.Format(_T("delete   from tbl_building_location where ID = %d"),ID);
+
+	char charqltext[1024];
+	memset(charqltext,0,1024);
+	WideCharToMultiByte( CP_ACP, 0, execute_str.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+	SqliteDB.execDML(charqltext);
+
+	SqliteDB.close();
+	 
+
     CString PathTemp;
     PathTemp=GetExePath(true)+buildingPath;
     buildingPath=PathTemp;
@@ -2256,18 +2297,7 @@ void CBuildingConfigration::OnBuildingconfigDelete()
 
 
 
-	CppSQLite3DB SqliteDB;
-	SqliteDB.open(m_sqlitepath);
-
-	CString SqlTemp;
-	SqlTemp.Format(_T("delete from tbl_building_location Where ID = %d "),sqlID);
-
-	char charqltext[256];
-
-	strcpy( charqltext, (CStringA)SqlTemp);
-	SqliteDB.execDML(charqltext);
-
-	SqliteDB.close();
+	
 
 
     m_bChanged=TRUE;
@@ -2371,7 +2401,7 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 				{
 					m_database_operator.m_pRecordset->PutCollect("street", (_variant_t)m_BuildNameLst.at(m_curRow).street);
 				}
-				if(!m_BuildNameLst.at(m_curRow).Zip!=-1)
+				if(m_BuildNameLst.at(m_curRow).Zip!=-1)
 				{
 					m_database_operator.m_pRecordset->PutCollect("Zip", (_variant_t)m_BuildNameLst.at(m_curRow).Zip);
 				}
@@ -2383,6 +2413,8 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 
 			 
 			CppSQLite3DB SqliteDB;
+			
+
 			SqliteDB.open(m_sqlitepath);
 			CString SqlText;
 			SqlText.Format(_T("Update tbl_building_location Set \
@@ -2404,9 +2436,11 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 			  m_BuildNameLst.at(m_curRow).Elevation,
 			  m_BuildNameLst.at(m_curRow).ID
 			  );
-			  char charqltext[256];
+			  char charqltext[1024];
 			 
-			  strcpy( charqltext, (CStringA)SqlText);
+			  memset(charqltext,0,1024);
+			  WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+
 			  SqliteDB.execDML(charqltext);
        SqliteDB.close();
 		 

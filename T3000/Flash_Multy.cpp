@@ -116,6 +116,7 @@ BOOL CFlash_Multy::OnInitDialog()
 		temp.strSN= m_flash_multy_list.GetItemText(i,FLASH_SERIAL_NUMBER);
 		temp.nID = m_flash_multy_list.GetItemText(i,FLASH_ID);
 		temp.ncomport = m_flash_multy_list.GetItemText(i,FLASH_COM_PORT);
+		temp.nBraudrate = m_flash_multy_list.GetItemText(i,FLASH_BAUDRATE);
 		temp.nIPaddress = m_flash_multy_list.GetItemText(i,FLASH_IPADDRESS);
 		temp.nipport = m_flash_multy_list.GetItemText(i,FLASH_IPPORT);
 		temp.devicename=m_flash_multy_list.GetItemText(i,FLASH_PRODUCT_NAME);
@@ -158,10 +159,10 @@ BOOL CFlash_Multy::OnInitDialog()
         flash_device.push_back(temp);
     }
 
-//     if(Check_Online_Thread != NULL)
-//         TerminateThread(Check_Online_Thread, 0);
-//     Check_Online_Thread=NULL;
-//     Check_Online_Thread =CreateThread(NULL,NULL,multy_check_online,this,NULL, NULL);
+     if(Check_Online_Thread != NULL)
+         TerminateThread(Check_Online_Thread, 0);
+     Check_Online_Thread=NULL;
+     Check_Online_Thread =CreateThread(NULL,NULL,multy_check_online,this,NULL, NULL);
     return TRUE;  // return TRUE unless you set the focus to a control
     // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -216,6 +217,7 @@ void CFlash_Multy::Initial_List()
     m_flash_multy_list.InsertColumn(FLASH_ID, _T("Panel ID"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_PRODUCT_NAME, _T("Name"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_COM_PORT, _T("Com"), 40, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+	m_flash_multy_list.InsertColumn(FLASH_BAUDRATE,_T("Braudrate"),40,ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_IPADDRESS, _T("IP"), 120, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_IPPORT, _T("Port"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_flash_multy_list.InsertColumn(FLASH_SUB_NOTE, _T("Is Sub"), 60, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -254,6 +256,7 @@ void CFlash_Multy::Initial_List()
         CString nID;
         CString nProductName;
         CString nComport;
+		CString nBraudrate;
         CString nIPAddress;
         CString nIP_Port;
         CString n_is_sub;
@@ -268,13 +271,14 @@ void CFlash_Multy::Initial_List()
         nID.Format(_T("%d"),pFrame->m_product.at(i).product_id);
         nProductName = GetProductName(pFrame->m_product.at(i).product_class_id);
         nproduct_id.Format(_T("%u"),(unsigned char)pFrame->m_product.at(i).product_class_id);
-        if(pFrame->m_product.at(i).BuildingInfo.strIp.IsEmpty())
-        {
-            nComport.Format(_T("%d"),pFrame->m_product.at(i).ncomport);
-            n_is_sub = _T("NO");
-            nIP_Port.Empty();
-            nIPAddress.Empty();
-        }
+		if(pFrame->m_product.at(i).protocol == 0)
+		{
+			nComport.Format(_T("%d"),pFrame->m_product.at(i).ncomport);
+			nBraudrate.Format(_T("%d"),pFrame->m_product.at(i).baudrate);
+			n_is_sub = _T("NO");
+			nIP_Port.Empty();
+			nIPAddress.Empty();
+		}
         else
         {
             nComport.Empty();
@@ -296,6 +300,7 @@ void CFlash_Multy::Initial_List()
         m_flash_multy_list.SetItemText(i,FLASH_ID,nID);
         m_flash_multy_list.SetItemText(i,FLASH_PRODUCT_NAME,nProductName);
         m_flash_multy_list.SetItemText(i,FLASH_COM_PORT,nComport);
+		m_flash_multy_list.SetItemText(i,FLASH_BAUDRATE,nBraudrate);
         m_flash_multy_list.SetItemText(i,FLASH_IPADDRESS,nIPAddress);
         m_flash_multy_list.SetItemText(i,FLASH_IPPORT,nIP_Port);
         m_flash_multy_list.SetItemText(i,FLASH_SUB_NOTE,n_is_sub);
@@ -708,6 +713,7 @@ void CFlash_Multy::OnBnClickedButtonStatrt()
         temp.strSN= m_flash_multy_list.GetItemText(i,FLASH_SERIAL_NUMBER);
         temp.nID = m_flash_multy_list.GetItemText(i,FLASH_ID);
         temp.ncomport = m_flash_multy_list.GetItemText(i,FLASH_COM_PORT);
+		temp.nBraudrate = m_flash_multy_list.GetItemText(i,FLASH_BAUDRATE);
         temp.nIPaddress = m_flash_multy_list.GetItemText(i,FLASH_IPADDRESS);
         temp.nipport = m_flash_multy_list.GetItemText(i,FLASH_IPPORT);
         temp.devicename=m_flash_multy_list.GetItemText(i,FLASH_PRODUCT_NAME);
@@ -851,6 +857,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
     CFlash_Multy *pParent = (CFlash_Multy *)lpVoid;
     int nflashdevicecount = (int)flash_device.size();
     int comport=0;
+	int braudrate = 0;
     BOOL IS_COM=TRUE;
     CString currentIp;
     int Port;
@@ -934,6 +941,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
         if (!flash_device.at(i).ncomport.IsEmpty())//说明是非串口设备
         {
             comport=_wtoi(flash_device.at(i).ncomport);
+			braudrate = _wtoi(flash_device.at(i).nBraudrate);
             IS_COM=TRUE;
         }
         else
@@ -949,6 +957,7 @@ DWORD WINAPI  CFlash_Multy::multy_isp_thread(LPVOID lpVoid)
             if (open_com(comport))
             {
                 is_connect_device=TRUE;
+				Change_BaudRate(braudrate);
             }
             else
             {
@@ -1127,6 +1136,7 @@ DWORD WINAPI  CFlash_Multy::multy_check_online(LPVOID lpVoid)
 
     int nflashdevicecount = (int)flash_device.size();
     int comport=0;
+	int braudrate = 19200;
     BOOL IS_COM=TRUE;
     CString currentIp;
     int Port;
@@ -1150,6 +1160,7 @@ DWORD WINAPI  CFlash_Multy::multy_check_online(LPVOID lpVoid)
         if (!flash_device.at(i).ncomport.IsEmpty())//说明是非串口设备
         {
             comport=_wtoi(flash_device.at(i).ncomport);
+			braudrate = _wtoi(flash_device.at(i).nBraudrate);
             IS_COM=TRUE;
         }
         else
@@ -1181,6 +1192,7 @@ DWORD WINAPI  CFlash_Multy::multy_check_online(LPVOID lpVoid)
             if (open_com(comport))
             {
                 is_connect_device=TRUE;
+				Change_BaudRate(braudrate);
             }
             else
             {
@@ -1214,10 +1226,10 @@ DWORD WINAPI  CFlash_Multy::multy_check_online(LPVOID lpVoid)
                     softrev = (float)DataBuffer[5]+((float)DataBuffer[4])/10;
 
                 }
-                else
-                {
-                    softrev = ((float)(DataBuffer[5]*256+ DataBuffer[4]))/10;
-                }
+				else
+				{
+					softrev = ((float)(DataBuffer[5]*256+ DataBuffer[4]))/10;
+				}
                 flash_device.at(i).software_rev  = softrev;
                 flash_device.at(i).online = true;
             }

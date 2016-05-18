@@ -931,7 +931,9 @@ BOOL Dowmloadfile::IsNetDevice(int DevType)
 		|| DevType == PM_NC
 		|| DevType == PM_CO2_NET
 		|| DevType == PM_MINIPANEL
-		|| DevType == PM_CM5)
+		|| DevType == PM_CM5
+		|| DevType == PM_T322AI
+		|| DevType == PM_T38AI8AO6DO)
 	{
 		return TRUE;
 	}

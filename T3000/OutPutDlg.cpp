@@ -5917,7 +5917,7 @@ void COutPutDlg::OnEnKillfocusDescriptedit()
 			strInName=g_strOutName7;
 			break;
 	}
-	if(strText.CompareNoCase(strInName)==0)
+	if(strText.Compare(strInName)==0)
 		return;
 		
 
@@ -8375,7 +8375,8 @@ BOOL COutPutDlg::Write_Model_Name(CString Name,int Address){
     BOOL ReturnValue=FALSE;
     CString fanname;
     fanname= GetTextFromReg(Address);
-    if (Name.CompareNoCase(fanname)==0)
+ 
+    if (Name.Compare(fanname)==0)
     {
        ReturnValue=FALSE; 
     }

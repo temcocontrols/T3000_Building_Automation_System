@@ -178,15 +178,15 @@ void CTStatInputView::Dump(CDumpContext& dc) const
 #endif
 #endif //_DEBUG
 void CTStatInputView::Fresh_One_Item(int row){
-    m_input_list.SetItemText(row,INPUT_FULL_LABLE,m_tstat_input_data.at(row).InputName.StrValue);
-    m_input_list.SetItemText(row,INPUT_AUTO_MANUAL,m_tstat_input_data.at(row).AM.StrValue);
-    m_input_list.SetItemText(row,INPUT_VALUE,m_tstat_input_data.at(row).Value.StrValue);
-    m_input_list.SetItemText(row,INPUT_UNITE,m_tstat_input_data.at(row).Unit.StrValue);
-    m_input_list.SetItemText(row,INPUT_RANGE,m_tstat_input_data.at(row).Range.StrValue);
-    m_input_list.SetItemText(row,INPUT_CAL,_T("Adjust..."));
-    m_input_list.SetItemText(row,TSTAT_INPUT_FITLER,m_tstat_input_data.at(row).Filter.StrValue);
-    m_input_list.SetItemText(row,TSTAT_INPUT_FUNCTION,m_tstat_input_data.at(row).Function.StrValue);
-    m_input_list.SetItemText(row,TSTAT_INPUT_CUST_FIELD,m_tstat_input_data.at(row).CustomTable.StrValue);
+    m_input_list.SetItemText(row,1,m_tstat_input_data.at(row).InputName.StrValue);
+    m_input_list.SetItemText(row,2,m_tstat_input_data.at(row).AM.StrValue);
+    m_input_list.SetItemText(row,3,m_tstat_input_data.at(row).Value.StrValue);
+    m_input_list.SetItemText(row,4,m_tstat_input_data.at(row).Unit.StrValue);
+    m_input_list.SetItemText(row,5,m_tstat_input_data.at(row).Range.StrValue);
+    m_input_list.SetItemText(row,6,_T("Adjust..."));
+    m_input_list.SetItemText(row,7,m_tstat_input_data.at(row).Filter.StrValue);
+    m_input_list.SetItemText(row,8,m_tstat_input_data.at(row).Function.StrValue);
+    m_input_list.SetItemText(row,9,m_tstat_input_data.at(row).CustomTable.StrValue);
 }
 LRESULT  CTStatInputView::InputMessageCallBack(WPARAM wParam, LPARAM lParam)
 {
@@ -270,15 +270,15 @@ LRESULT CTStatInputView::Fresh_Input_List(WPARAM wParam,LPARAM lParam)
     CString strTemp;
     //
     for(int i=0;i<(int)m_tstat_input_data.size();i++){
-        m_input_list.SetItemText(i,INPUT_FULL_LABLE,m_tstat_input_data.at(i).InputName.StrValue);
-        m_input_list.SetItemText(i,INPUT_AUTO_MANUAL,m_tstat_input_data.at(i).AM.StrValue);
-        m_input_list.SetItemText(i,INPUT_VALUE,m_tstat_input_data.at(i).Value.StrValue);
-        m_input_list.SetItemText(i,INPUT_UNITE,m_tstat_input_data.at(i).Unit.StrValue);
-        m_input_list.SetItemText(i,INPUT_RANGE,m_tstat_input_data.at(i).Range.StrValue);
-        m_input_list.SetItemText(i,INPUT_CAL,_T("Adjust..."));
-        m_input_list.SetItemText(i,TSTAT_INPUT_FITLER,m_tstat_input_data.at(i).Filter.StrValue);
-        m_input_list.SetItemText(i,TSTAT_INPUT_FUNCTION,m_tstat_input_data.at(i).Function.StrValue);
-        m_input_list.SetItemText(i,TSTAT_INPUT_CUST_FIELD,m_tstat_input_data.at(i).CustomTable.StrValue);
+        m_input_list.SetItemText(i,1,m_tstat_input_data.at(i).InputName.StrValue);
+        m_input_list.SetItemText(i,2,m_tstat_input_data.at(i).AM.StrValue);
+        m_input_list.SetItemText(i,3,m_tstat_input_data.at(i).Value.StrValue);
+        m_input_list.SetItemText(i,4,m_tstat_input_data.at(i).Unit.StrValue);
+        m_input_list.SetItemText(i,5,m_tstat_input_data.at(i).Range.StrValue);
+        m_input_list.SetItemText(i,6,_T("Adjust..."));
+        m_input_list.SetItemText(i,7,m_tstat_input_data.at(i).Filter.StrValue);
+        m_input_list.SetItemText(i,8,m_tstat_input_data.at(i).Function.StrValue);
+        m_input_list.SetItemText(i,9,m_tstat_input_data.at(i).CustomTable.StrValue);
     }
     m_input_list.GetFocus();
     return 0;  
@@ -293,7 +293,7 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	BOOL IS_SEND=FALSE;
 	_MessageWriteOneInfo_List  *pwrite_info = new _MessageWriteOneInfo_List;
 	pwrite_info->list_type=LIST_TYPE_INPUT_TSTAT;
-	if(Changed_SubItem == INPUT_FULL_LABLE)
+	if(Changed_SubItem == 1)
 	{
 		if (product_type==CS3000)
 		{
@@ -346,7 +346,7 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	   }
 
 	}
-	if(Changed_SubItem== INPUT_VALUE)//Manual + 模拟量
+	if(Changed_SubItem== 3)//Manual + 模拟量
 	{
 	   if (m_tstat_input_data.at(Changed_Item).Value.StrValue.CompareNoCase(New_CString)==0)
 	   {
@@ -390,7 +390,7 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	   pwrite_info->new_value=SendValue;
 	   IS_SEND=TRUE;
 	}
-	if (Changed_SubItem==INPUT_CAL)
+	if (Changed_SubItem==5)
 	{   
 	    if(New_CString.IsEmpty()||m_tstat_input_data.at(Changed_Item).Value.StrValue.CompareNoCase(New_CString)==0)
 	    {
@@ -428,7 +428,7 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 		pwrite_info->new_value=SendValue;
 		IS_SEND=TRUE;
 	}
-	if (Changed_SubItem == TSTAT_INPUT_FITLER)
+	if (Changed_SubItem == 6)
 	{
 		if (New_CString.IsEmpty()||m_tstat_input_data.at(Changed_Item).Filter.StrValue.CompareNoCase(New_CString)==0)
 		{
@@ -443,7 +443,7 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
         pwrite_info->new_value=SendValue;
 		IS_SEND=TRUE;
 	}
-	if (Changed_SubItem == TSTAT_INPUT_FUNCTION)
+	if (Changed_SubItem == 7)
 	{
 	     if (m_tstat_input_data.at(Changed_Item).Function.StrValue.CompareNoCase(New_CString)==0)
 	     {
@@ -467,7 +467,7 @@ LRESULT CTStatInputView::Fresh_Input_Item(WPARAM wParam,LPARAM lParam)
 	     IS_SEND = TRUE;
 	    
 	}
-	if (Changed_SubItem == INPUT_RANGE) 
+	if (Changed_SubItem == 5) 
 	{
 	  if (product_type==CS3000)
 	  {
@@ -543,7 +543,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
     CStringArray temparray;
     _MessageWriteOneInfo_List  *pwrite_info = new _MessageWriteOneInfo_List;
     pwrite_info->list_type=LIST_TYPE_INPUT_TSTAT;
-    if(lCol == INPUT_FULL_LABLE)
+    if(lCol == 1)
     {
         if (product_type==CS3000||lRow==8||lRow==9||lRow==10||lRow==11)
         {
@@ -553,7 +553,7 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
             //goto ENDCLICK;
         }   
     }
-    if (lCol == INPUT_VALUE)
+    if (lCol == 3)
     {
         if (product_type == T3000_6_ADDRESS)
         {
@@ -624,12 +624,14 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
             }
         }
     }
-    if (lCol == INPUT_UNITE)
+	//Unit
+    if (lCol == 4)
     {
         IS_SEND=FALSE;
         return;
     }
-    if (lCol == INPUT_RANGE) 
+	//Range
+    if (lCol == 5) 
     {
         if(m_tstat_input_data.at(lRow).Range.StrValue.CompareNoCase(NO_APPLICATION)==0){
             m_input_list.Set_Edit(false);
@@ -701,7 +703,8 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
         }
 
     }
-    if (lCol == INPUT_CAL)
+	//CAL
+    if (lCol == 6)
     {
 
         if (product_type != CS3000){
@@ -728,7 +731,8 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
         }
 
     }
-    if (lCol == INPUT_AUTO_MANUAL)
+	//AM
+    if (lCol == 2)
     {
         if (m_tstat_input_data.at(lRow).AM.StrValue.CompareNoCase(NO_APPLICATION)==0)
         {
@@ -781,26 +785,28 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 
     }
-    if (lCol == TSTAT_INPUT_CUST_FIELD)
-    {
-//         if (m_tstat_input_data.at(lRow).CustomTable.StrValue.CompareNoCase(NO_APPLICATION)==0)
-//         {
-//             IS_SEND=FALSE;
-//             return;
-//         }
-//         else if (m_tstat_input_data.at(lRow).CustomTable.StrValue.CompareNoCase(L"Custom1...")==0)
-//         {
-//            // CBuildTable1 Dlg(2);
-//           //  Dlg.DoModal();
-//         }
-//         else if (m_tstat_input_data.at(lRow).CustomTable.StrValue.CompareNoCase(L"Custom2...")==0)
-//         {
-//            // CBuildTable1 Dlg(3);
-//             //Dlg.DoModal();
-//         }
-
-    }
-    if (lCol == INPUT_FITLER)
+	//Custom Table
+     if (lCol == 9)
+     {
+ //         if (m_tstat_input_data.at(lRow).CustomTable.StrValue.CompareNoCase(NO_APPLICATION)==0)
+ //         {
+ //             IS_SEND=FALSE;
+ //             return;
+ //         }
+ //         else if (m_tstat_input_data.at(lRow).CustomTable.StrValue.CompareNoCase(L"Custom1...")==0)
+ //         {
+ //            // CBuildTable1 Dlg(2);
+ //           //  Dlg.DoModal();
+ //         }
+ //         else if (m_tstat_input_data.at(lRow).CustomTable.StrValue.CompareNoCase(L"Custom2...")==0)
+ //         {
+ //            // CBuildTable1 Dlg(3);
+ //             //Dlg.DoModal();
+ //         }
+ 
+     }
+	 //Filter
+    if (lCol == 8)
     {
         if(m_tstat_input_data.at(lRow).Filter.StrValue.CompareNoCase(NO_APPLICATION)==0){
             m_input_list.Set_Edit(false);
@@ -809,8 +815,8 @@ void CTStatInputView::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
         }
 
     }
-
-    if (lCol == TSTAT_INPUT_FUNCTION)
+	//Function
+    if (lCol == 8)
     { 
         if(m_tstat_input_data.at(lRow).Function.StrValue.CompareNoCase(NO_APPLICATION)==0){
             m_input_list.Set_Edit(false);
@@ -879,16 +885,16 @@ void CTStatInputView::Initial_ListFor_Tstat(){
     {
         m_input_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
         m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-        m_input_list.InsertColumn(INPUT_NUM, _T("NUM"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-        m_input_list.InsertColumn(INPUT_FULL_LABLE, _T("Full Label"), 140, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(INPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(INPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(INPUT_RANGE, _T("Range"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(INPUT_CAL, _T("Calibration"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(TSTAT_INPUT_FITLER, _T("Filter"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(TSTAT_INPUT_FUNCTION, _T("Function"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(TSTAT_INPUT_CUST_FIELD, _T("Custom Table"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(0, _T("NUM"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+        m_input_list.InsertColumn(1, _T("Full Label"), 140, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(2, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(3, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(4, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(5, _T("Range"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(6, _T("Calibration"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(7, _T("Filter"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(8, _T("Function"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(9, _T("Custom Table"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 
         CString strTemp;
         //m_input_list.DeleteAllItems();
@@ -907,14 +913,14 @@ void CTStatInputView::Initial_ListFor_Tstat(){
 
         for (int i=0;i<=1;i++)
         {
-            if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(INPUT_RANGE))
+            if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(5))
             {
                 ListCtrlEx::CStrList strlist;
                 for (int j=0;j<3;j++)
                 {
                     strlist.push_back(CS3000_INPUT_RANGE[j]);
                 }
-                m_input_list.SetCellStringList(i, INPUT_RANGE, strlist);		
+                m_input_list.SetCellStringList(i, 5, strlist);		
             }
         } 
     }
@@ -922,16 +928,16 @@ void CTStatInputView::Initial_ListFor_Tstat(){
     {
         m_input_list.ModifyStyle(0, LVS_SINGLESEL|LVS_REPORT|LVS_SHOWSELALWAYS);
         m_input_list.SetExtendedStyle(m_input_list.GetExtendedStyle()  |LVS_EX_GRIDLINES&(~LVS_EX_FULLROWSELECT));//Not allow full row select.
-        m_input_list.InsertColumn(INPUT_NUM, _T("NUM"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
-        m_input_list.InsertColumn(INPUT_FULL_LABLE, _T("Full Label"), 140, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(INPUT_AUTO_MANUAL, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(INPUT_VALUE, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(INPUT_UNITE, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(INPUT_RANGE, _T("Range"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(INPUT_CAL, _T("Calibration"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(TSTAT_INPUT_FITLER, _T("Filter"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(TSTAT_INPUT_FUNCTION, _T("Function"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-        m_input_list.InsertColumn(TSTAT_INPUT_CUST_FIELD, _T("Custom Table"), 0, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(0, _T("NUM"), 50, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
+        m_input_list.InsertColumn(1, _T("Full Label"), 140, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(2, _T("Auto/Manual"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(3, _T("Value"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(4, _T("Units"), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(5, _T("Range"), 100, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(6, _T("Calibration"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(7, _T("Filter"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(8, _T("Function"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+        m_input_list.InsertColumn(9, _T("Custom Table"), 0, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByString);
 
         CString strTemp;
         //m_input_list.DeleteAllItems();
@@ -950,14 +956,14 @@ void CTStatInputView::Initial_ListFor_Tstat(){
 
         for (int i=0;i<=7;i++)
         {
-            if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(TSTAT_INPUT_FUNCTION))
+            if(ListCtrlEx::ComboBox == m_input_list.GetColumnType(8))
             {
                 ListCtrlEx::CStrList strlist;
                 for (int j=0;j<(int)sizeof(INPUT_FUNS)/sizeof(INPUT_FUNS[0]);j++)
                 {
                     strlist.push_back(INPUT_FUNS[j]);
                 }
-                m_input_list.SetCellStringList(i, TSTAT_INPUT_FUNCTION, strlist);		
+                m_input_list.SetCellStringList(i, 8, strlist);		
             }
         }
 

@@ -672,6 +672,9 @@
     <ClCompile Include="SqliteLib\CppSQLite3.cpp">
       <Filter>SqliteLib</Filter>
     </ClCompile>
+    <ClCompile Include="T3000Option.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OutputTableDlg.htm">
@@ -1615,6 +1618,12 @@
     </ClInclude>
     <ClInclude Include="SqliteLib\CppSQLite3.h">
       <Filter>SqliteLib</Filter>
+    </ClInclude>
+    <ClInclude Include="ProductModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T3000Option.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

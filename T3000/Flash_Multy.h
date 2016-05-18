@@ -11,6 +11,7 @@ typedef struct
     CString devicename;
     CString strSN;
     CString ncomport;
+	CString nBraudrate;
     CString nIPaddress;
     CString nipport;
     bool	b_is_sub;
@@ -95,19 +96,20 @@ const int FLASH_SERIAL_NUMBER = 1;
 const int FLASH_ID = 2;
 const int FLASH_PRODUCT_NAME = 3;
 const int FLASH_COM_PORT = 4;
-const int FLASH_IPADDRESS = 5;
-const int FLASH_IPPORT = 6;
-const int FLASH_SUB_NOTE = 7;
-const int FLASH_ONLINE = 8;
-const int FLASH_CURRENT_FIRMWARE = 9;
-const int FLASH_FILE_REV = 10;
-const int FLASH_FILE_POSITION = 11;
-const int FLASH_CONFIG_FILE_POSITION = 12;
-const int FLASH_RESULTS = 13;
-const int FLASH_CONFIG_RESULTS = 14;
-const int FLASH_PRODUCT_ID = 15;
+const int FLASH_BAUDRATE = 5;
+const int FLASH_IPADDRESS = 6;
+const int FLASH_IPPORT = 7;
+const int FLASH_SUB_NOTE = 8;
+const int FLASH_ONLINE = 9;
+const int FLASH_CURRENT_FIRMWARE = 10;
+const int FLASH_FILE_REV = 11;
+const int FLASH_FILE_POSITION = 12;
+const int FLASH_CONFIG_FILE_POSITION = 13;
+const int FLASH_RESULTS = 14;
+const int FLASH_CONFIG_RESULTS = 15;
+const int FLASH_PRODUCT_ID = 16;
 
-const int FLASH_MAX_COUNT = 16;
+const int FLASH_MAX_COUNT = 17;
 
 
 

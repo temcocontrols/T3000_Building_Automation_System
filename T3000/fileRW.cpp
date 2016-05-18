@@ -22,7 +22,7 @@
 #define CO2NODE_VAR_NUM 15
 #define NET_WORK_CONTROLLER_NUM 24
 #define TSTAT26_VAR_NUM 163
-#define TSTAT26_VAR_NUM_TSTAT67 393
+#define TSTAT26_VAR_NUM_TSTAT67 392
 #define NET_WORK_DEFFERENT_TSTAT_FILE "NET WORK\n"
 #define INPUTCARD_NUM 24
 #define GROUP_NUM 40
@@ -488,7 +488,7 @@ _TCHAR * TSTATVAR_CONST_67[] = {                  //attention:该数组中的值，不要
 	_T("AUTO ONLY"),																																																																																						
 	_T("FACTORY DEFAULTS"),																																																																																						
 	_T("INFO BYTE"),																																																																																						
-	_T("BAUDRATE"),																																																																																						
+	//_T("BAUDRATE"),																																																																																						
 	_T("OVERRIDE TIMER"),																																																																																						
 	_T("OVERRIDE TIMER LEFT"),																																																																																						
 	_T("HEAT COOL CONFIG"),																																																																																						
@@ -1890,7 +1890,7 @@ void var_write_Tstat67(wofstream & out)
 		MODBUS_AUTO_ONLY	,
 		MODBUS_FACTORY_DEFAULTS	,
 		MODBUS_INFO_BYTE	,
-		MODBUS_BAUDRATE	,
+		//MODBUS_BAUDRATE	,
 		MODBUS_OVERRIDE_TIMER	,
 		MODBUS_OVERRIDE_TIMER_LEFT	,
 		MODBUS_HEAT_COOL_CONFIG	,
@@ -3560,8 +3560,64 @@ void write_input_output_var(wifstream & inf,float tstat_version,CStdioFile *p_lo
 		}
 	}
 	ado.CloseConn();
-}
 
+	while(!inf.eof())
+	{
+		inf.getline(buf,1024);
+		if (wcsstr(buf,_T("//Model Name Config"))!=NULL)
+			break; 
+	}
+
+}
+void write_TStatAllLabel(wifstream & inf,float tstat_version,CStdioFile *p_log_file,load_file_every_step *p_log_file_one_time)
+{
+	TCHAR buf[1024];	
+	int inputno=0;
+	int LabelNumber = 0;
+	CString strText;
+	while(!inf.eof())
+	{
+		inf.getline(buf,1024);
+		
+
+		if (wcsstr(buf,_T("//Model Name Config END"))!=NULL)
+			break; 
+		
+		TCHAR *temp=buf;
+		temp=wcsstr(temp,_T(":"));
+		temp++;	
+		strText.Format(_T("%s"),temp);
+
+
+// 		strText.TrimRight();
+// 		strText.TrimLeft();
+		unsigned char p[8];//input+input1
+		for(int i=0;i<8;i++)
+		{
+			if(i<strText.GetLength())
+				p[i]=strText.GetAt(i);
+			else
+				p[i]=0;
+		}
+
+		if (Write_Multi(g_tstat_id,p,737+4*LabelNumber,8)>0)
+		{
+		 
+		} 
+		else
+		{    int times = 5;
+			 while(--times>=0)
+			 {
+				if (Write_Multi(g_tstat_id,p,737+4*LabelNumber,8)>0)
+				break;
+			 }
+		}
+		  LabelNumber ++;
+		 
+		 
+	}
+	
+}
 int fan_number;
 
 void get_write_var_line(TCHAR *buf,float tstat_version,CStdioFile *p_log_file,load_file_every_step *p_log_file_one_time)
@@ -4331,7 +4387,7 @@ void Save2File_ForTwoFilesTSTAT67( TCHAR* fn )
 	var_write_Tstat67(out);
 	save_write_input_output(out);	
 	//_Twrite_to_file_a_line(out,_T("OK!"));//space
-	
+	save_write_TStatAllLabel(out);
 
 	return;
 
@@ -5273,6 +5329,7 @@ void LoadFile2Tstat67(load_file_every_step &load_file_one_time,TCHAR* fn,CStdioF
 			load_file_one_time.seven_step=true;
 			get_var_write_var(inf,tstat_version,p_log_file,&load_file_one_time);//////a line //////////// a line
 			write_input_output_var(inf,tstat_version,p_log_file,&load_file_one_time);
+			write_TStatAllLabel(inf,tstat_version,p_log_file,&load_file_one_time);
 		//	write_one(now_tstat_id,MODBUS_UPDATE_STATUS,143);//////
 			//reset 
 			//write_one(now_tstat_id,184,0);//184 register,to no restart,when you write the 185,118,121,128 register
@@ -7552,48 +7609,47 @@ _Twrite_to_file_a_line(out,_T("//Input Name Config"));//space
 		case 1:
 		{
 		str1=_T("Input1_Name: ");
-		str1+=m_tstat_input_data.at(1).InputName.StrValue;
+		str1+=m_tstat_input_data.at(0).InputName.StrValue;
 		_Twrite_to_file_a_line(out,str1);
 		}break;
 		case 2:
 			{
 				str1=_T("Input2_Name: ");
-				str1+=m_tstat_input_data.at(2).InputName.StrValue;
-
+				str1+=m_tstat_input_data.at(1).InputName.StrValue;
 				_Twrite_to_file_a_line(out,str1);
 			}break;
 		case 3:
 			{
 				str1=_T("Input3_Name: ");
-				str1+=m_tstat_input_data.at(3).InputName.StrValue;
+				str1+=m_tstat_input_data.at(2).InputName.StrValue;
 
 				_Twrite_to_file_a_line(out,str1);
 			}break;
 		case 4:
 			{
 				str1=_T("Input4_Name: ");
-				str1+=m_tstat_input_data.at(4).InputName.StrValue;
+				str1+=m_tstat_input_data.at(3).InputName.StrValue;
 
 				_Twrite_to_file_a_line(out,str1);
 			}break;
 		case 5:
 			{
 				str1=_T("Input5_Name: ");
-				str1+=m_tstat_input_data.at(5).InputName.StrValue;
+				str1+=m_tstat_input_data.at(4).InputName.StrValue;
 
 				_Twrite_to_file_a_line(out,str1);
 			}break;
 		case 6:
 			{
 				str1=_T("Input6_Name: ");
-				str1+=m_tstat_input_data.at(6).InputName.StrValue;
+				str1+=m_tstat_input_data.at(5).InputName.StrValue;
 
 				_Twrite_to_file_a_line(out,str1);
 			}break;
 		case 7:
 			{
 				str1=_T("Input7_Name: ");
-				str1+=m_tstat_input_data.at(7).InputName.StrValue;
+				str1+=m_tstat_input_data.at(6).InputName.StrValue;
 
 				_Twrite_to_file_a_line(out,str1);
 			}break;
@@ -7601,7 +7657,7 @@ _Twrite_to_file_a_line(out,_T("//Input Name Config"));//space
 		case 8:
 			{
 				str1=_T("Input8_Name: ");
-				str1+=m_tstat_input_data.at(8).InputName.StrValue;
+				str1+=m_tstat_input_data.at(7).InputName.StrValue;
 				_Twrite_to_file_a_line(out,str1);
 			}break;
 		 
@@ -7673,6 +7729,27 @@ int  m_crange,inoutputno;
  SetPaneString(1, strTips);
  }
 
+ void save_write_TStatAllLabel(wofstream & out)
+ {
+      CString str1;
+     _Twrite_to_file_a_line(out,_T("//Model Name Config"));//space
+	 str1=_T("Off Model_Name: ");
+	 str1+=GetTextFromReg(737);
+	 _Twrite_to_file_a_line(out,str1);
+	 str1=_T("Low Model_Name: ");
+	 str1+=GetTextFromReg(741);
+	 _Twrite_to_file_a_line(out,str1);
+	 str1=_T("Mid Model_Name: ");
+	 str1+=GetTextFromReg(745);
+	 _Twrite_to_file_a_line(out,str1);
+	 str1=_T("Hi Model_Name: ");
+	 str1+=GetTextFromReg(749);
+	 _Twrite_to_file_a_line(out,str1);
+	 str1=_T("Auto Model_Name: ");
+	 str1+=GetTextFromReg(753);
+	 _Twrite_to_file_a_line(out,str1);
+	 _Twrite_to_file_a_line(out,_T("//Model Name Config END"));
+ }
 #if 0
 CString Show_load_file_result_message(load_file_every_step temppp,bool show_message_dialog)
 {//true show message box ,false no 

@@ -393,6 +393,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
     ON_WM_MOVE()
     ON_COMMAND(ID_TOOL_BOOTLOADER, &CMainFrame::OnToolBootloader)
 	ON_COMMAND(ID_HELP_CHECKUPDATE, &CMainFrame::OnHelpCheckupdate)
+	ON_COMMAND(ID_TOOLS_PSYCHROMETRY, &CMainFrame::OnToolsPsychrometry)
+	ON_COMMAND(ID_TOOLS_OPTION, &CMainFrame::OnToolsOption)
 	END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -1061,8 +1063,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
     }
 
-    m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
-    m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
+        m_pFreshMultiRegisters = AfxBeginThread(_ReadMultiRegisters,this);
+        m_pFreshTree=AfxBeginThread(_FreshTreeView, this);
 
 #if 1
     nFlag = product_register_value[7];
@@ -5900,10 +5902,11 @@ void CMainFrame::SaveConfigFile()
         //	SaveBacnetConfigFile();
         return;
     }
-    int nret=0;
-    g_bEnableRefreshTreeView = FALSE;
-    int IDFlag=read_one(g_tstat_id,7);
-    product_register_value[7]=IDFlag;
+
+	int nret=0;
+	g_bEnableRefreshTreeView = FALSE;
+	int IDFlag=read_one(g_tstat_id,7);
+	product_register_value[7]=IDFlag;
     if(IDFlag<=0)
         return;
     float version=get_curtstat_version();
@@ -6708,8 +6711,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
     ado.OnInitADOConn();
 
     m_strCfgFilePath = g_strExePth + c_strCfgFileName;
-    m_cfgFileHandler.CreateConfigFile(m_strCfgFilePath);
-
+    //m_cfgFileHandler.CreateConfigFile(m_strCfgFilePath);
+	m_cfgFileHandler.CreateConfigFile();
     CString filename;
     CString flashmethod;
     CString id;
@@ -6721,17 +6724,17 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
     CString strTemp;
     CString subnote;
     CString subID;
-    m_cfgFileHandler.ReadFromCfgFileForAll(
-        filename,
-        flashmethod,
-        id,
-        comport,
-        BD,
-        ip,
-        ipport,
-        subnote,
-        subID
-    );
+	m_cfgFileHandler.ReadFromCfgFileForAll(
+		filename,
+		flashmethod,
+		id,
+		comport,
+		BD,
+		ip,
+		ipport,
+		subnote,
+		subID
+		);
 
 
 
@@ -7205,15 +7208,15 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
 
                 ip=product_Node.BuildingInfo.strIp;
                 ipport.Format(_T("%d"),product_Node.ncomport);
-                m_cfgFileHandler.WriteToCfgFile(filename,
-                                                _T("Ethernet"),
-                                                id,
-                                                comport,
-                                                BD,
-                                                ip,
-                                                ipport,
-                                                subnote,
-                                                subID);
+				m_cfgFileHandler.WriteToCfgFile(filename,
+					_T("Ethernet"),
+					id,
+					comport,
+					BD,
+					ip,
+					ipport,
+					subnote,
+					subID);
 
 #endif
                 //g_protocol = PROTOCOL_BACNET_IP;
@@ -7302,7 +7305,8 @@ void CMainFrame::DoConnectToANode( const HTREEITEM& hTreeItem )
                    // SetLastCommunicationType(1); //不可理解为什么要这么做，屏蔽 by 杜帆 06 03 31;
 
 
-
+					ip=product_Node.BuildingInfo.strIp;
+					ipport.Format(_T("%d"),product_Node.ncomport);
 
 //ISPTool Config
 #if 1
@@ -14970,4 +14974,20 @@ void CMainFrame::OnToolBootloader()
 {
       CBootFinderDlg dlg;
       dlg.DoModal ();
+}
+
+
+void CMainFrame::OnToolsPsychrometry()
+{
+	CString strHistotyFile=g_strExePth+_T("Psychrometry\\WFA_psychometric_chart.exe");
+	ShellExecute(NULL, _T("open"), strHistotyFile, NULL, NULL, SW_SHOWNORMAL);
+}
+
+#include "T3000Option.h"
+
+void CMainFrame::OnToolsOption()
+{
+	 CT3000Option dlg;
+	 dlg.DoModal();
+	 
 }

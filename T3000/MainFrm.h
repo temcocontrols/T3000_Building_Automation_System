@@ -544,4 +544,6 @@ public:
   // virtual void GetMessageString(UINT nID, CString& rMessage);
         afx_msg void OnToolBootloader();
 		afx_msg void OnHelpCheckupdate();
+		afx_msg void OnToolsPsychrometry();
+		afx_msg void OnToolsOption();
 };

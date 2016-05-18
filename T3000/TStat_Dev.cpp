@@ -258,6 +258,8 @@ CString CTStat_Dev::GetProductName()
 	case PM_HUM_R:
 	    strProductName="HUM-R";
 		break;
+	case PM_BEENY:
+		strProductName="Beeny";
 	default:
 		strProductName="TStat";
 		break;

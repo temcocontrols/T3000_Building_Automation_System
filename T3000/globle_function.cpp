@@ -35,6 +35,7 @@
 #include "BacnetRemotePoint.h"
 #include "rs485.h"
 #include "tlhelp32.h"
+#include "ProductModel.h"
 #define DELAY_TIME	 10	//MS
 #define Modbus_Serial	0
 #define	Modbus_TCP	1

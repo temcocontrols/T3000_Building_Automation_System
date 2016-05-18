@@ -19,6 +19,8 @@ public:
 	virtual ~CConfigFileHandler(void);
 
 	BOOL CreateConfigFile(const CString& strFilePath);
+
+	BOOL CreateConfigFile();
 	void SetConfigFilePath(const CString& strFilePath);
 		
 	void WriteTStatPageConfig(
@@ -35,9 +37,47 @@ public:
 		CString& strComPort,
 		CString& strBaudrate);
 
+	void WriteNCPageConfig(const CString& strFlashFileName,
+		const CString& strFlashType,
+		const CString& strIP,
+		const CString& strIPPort);
+	void ReadNCPageConfig(	CString& strFlashFileName,
+		CString& strFlashType,
+		CString& strIP,
+		CString& strIPPort);
 
 
+	void WriteLCPageConfig(const CString& strFlashFileName,
+		const CString& strFlashType,
+		const CString& strIP,
+		const CString& strIPPort,
+		 const CString& strMDBID);
+	
+		void ReadLCPageConfig(CString& strFlashFileName,
+		CString& strFlashType,
+		CString& strIP,
+		CString& strIPPort,
+		CString& strMDBID);
 
+	void SetParentWnd(CWnd* pParent);
+	
+	
+	//////////////////////////////////////////////////////////////////////////
+	// for product model 
+//	int GetProductModel(const CString& strPMFileName, map<int, CString>& szPMMap);
+
+	//////////////////////////////////////////////////////////////////////////
+	// for sn flash 
+	//void GetFlashSNParam(int &nHWVersion, int & nModelValue);
+	
+	void GetFlashSNParam(const CString& strFileName, int &nHWVersion, int & nModelValue);
+	void SaveFlashSNParam(const CString& strFileName, int &nHWVersion, int & nModelValue);
+
+	//////////////////////////////////////////////////////////////////////////
+	// for mac address file
+	void GetUnusedMacAddr(const CString& strFileName, BYTE* szMac);
+	void SetUsedMacAddr(const CString& strFileName, BYTE* szMac);
+	
 
 	void WriteToCfgFile(
 		const CString& HexFileName,
@@ -60,17 +100,26 @@ public:
 		CString& subnote,
 		CString& subID);
 
+		int GetFlashTimes();
+
 protected:
 	void WriteToCfgFile();
 	BOOL ReadFromCfgFile();
+	
+protected:
+	BOOL CreatePMFile(CStdioFile& file , const CString& strPMFileName);
+	//int ReadPMFile(CStdioFile& file,  map<int,CString>& szPMMap);
 
+	BOOL CreateFlashSNFile(CStdioFile& file, const CString& strFileName);
+	void ReadFlashSNFile(CStdioFile& file, int &nHWVersion, int & nModelValue);
 
 private:
 	CStdioFile*					m_pFile;
 	CString						m_strFilePath;
-	 
-	vector<CString>				m_szCfgFile;
-	CString						g_strExePath;
+	CWnd*						m_pParentWnd;
+	vector<CString>			m_szCfgFile;
 	
+	CString m_configfile_path;
+	CString m_ISPTool_Section;
 
 };

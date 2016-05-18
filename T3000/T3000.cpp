@@ -18,6 +18,7 @@
 #include "afxinet.h"
 #include "T3000DefaultView.h"
 #include "bado/BADO.h"
+#include "SqliteLib/CppSQLite3.h"
 const int g_versionNO=20160505;
 
 #ifdef _DEBUG
@@ -1382,6 +1383,85 @@ BOOL CT3000App::InitInstance()
 				CreateDirectory( g_achive_folder_temp_db, &attrib);
 			}
 
+			CppSQLite3DB SqliteDB;
+			CString tempDB = GetExePath(true) + L"Psychrometry\\db_psychrometric_project.s3db";
+			HANDLE hFind;
+			WIN32_FIND_DATA wfd;
+			hFind = FindFirstFile(tempDB, &wfd);
+			if (hFind==INVALID_HANDLE_VALUE)
+			{
+				char m_sqlitepath[256];
+				strcpy( m_sqlitepath, (CStringA)tempDB);
+				SqliteDB.open(m_sqlitepath);
+
+				CString SqlText;
+// 				SqlText = _T("create table tbl_building_location (ID INTEGER PRIMARY KEY AUTOINCREMENT ,\
+// 				country varchar(255),state varchar(255),city varchar(255),street varchar(255), \
+// 				ZIP int,longitude varchar(255),latitude varchar(255),elevation varchar(255),BuildingName VARCHAR( 255 )  UNIQUE)");
+				SqlText = _T("create table tbl_building_location (Selection int DEFAULT ( 0 ),ID INTEGER PRIMARY KEY AUTOINCREMENT ,country varchar(255),state varchar(255),city varchar(255),street varchar(255), ZIP int,longitude varchar(255),latitude varchar(255),elevation varchar(255),BuildingName VARCHAR(255))");
+				
+				char charqltext[1024];
+				memset(charqltext,0,1024);
+				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+				//sprintf(charqltext, "%s", CW2A(SqlText));
+				//strcpy( charqltext, (CStringA)SqlText);
+				
+				SqliteDB.execDML(charqltext);
+				 
+				 
+				SqlText =_T("create table tbl_geo_location_value (ID int ,longitude varchar(255),latitude varchar(255),elevation varchar(255))");
+				      // _T("create table tbl_geo_location_value (ID int ,longitude varchar(255),latitude varchar(255),elevation varchar(255))");
+				memset(charqltext,0,1024);
+				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+
+				SqliteDB.execDML(charqltext);
+				 
+// 				SqlText = _T("create table tbl_historical_data (ID int ,date_current datetime,hour_current int,minute_current int,temperature varchar(255),\
+// 					humidity varchar(255),station_name varchar(255))");
+				SqlText = _T("create table tbl_historical_data (ID INTEGER,date_current datetime,hour_current int,minute_current int,distance_from_building varchar(255),temperature varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))");
+				memset(charqltext,0,1024);
+				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+				SqliteDB.execDML(charqltext);
+				 
+				SqlText = L"create table tbl_weather_related_values (ID INTEGER PRIMARY KEY AUTOINCREMENT ,location varchar(255),distance_from_building varchar(255),last_update_date varchar(255),temp varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))";
+				memset(charqltext,0,1024);
+				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+
+				SqliteDB.execDML(charqltext);
+				 
+				SqlText = L"create table tbl_temp_humidity (temp int,humidity int)";
+				memset(charqltext,0,1024);
+				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+
+				SqliteDB.execDML(charqltext);
+
+
+				SqlText = L"Insert into tbl_building_location values(1,1,'China','','ShangHai','HongXinRoad,#35',200000,'121','31','3.5','DefaultBuilding')";
+				memset(charqltext,0,1024);
+				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+
+				SqliteDB.execDML(charqltext);
+
+				SqlText = L"create table tbl_language_option (ID int,language_id int)";
+				memset(charqltext,0,1024);
+				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+
+				SqliteDB.execDML(charqltext);
+
+				// 0:let user select a language 
+				//1:English
+				//2:Chinese
+				//3:Korean
+				SqlText = L"Insert into tbl_language_option values(1,0)";
+				memset(charqltext,0,1024);
+				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+
+				SqliteDB.execDML(charqltext);
+
+				SqliteDB.close();
+			}
+
+			FindClose(hFind);
 
 
 
@@ -1393,8 +1473,8 @@ BOOL CT3000App::InitInstance()
 #if 1//如果沒有T3000 的情況下
 
 			CString FilePath;
-			HANDLE hFind;//
-			WIN32_FIND_DATA wfd;//
+			//HANDLE hFind;//
+//			WIN32_FIND_DATA wfd;//
 			hFind = FindFirstFile(g_strDatabasefilepath, &wfd);//
 			if (hFind==INVALID_HANDLE_VALUE)//说明当前目录下无t3000.mdb
 			{
@@ -1720,28 +1800,28 @@ BOOL CT3000App::InitInstance()
 
 #endif
 
-		((CMainFrame*)m_pMainWnd)->InitViews();//
+		 ((CMainFrame*)m_pMainWnd)->InitViews();//
 		CString strTile;
 		strTile.Format(_T("T3000 Building Automation System"));
 		strTile+=CurrentT3000Version;
 		m_pMainWnd->SetWindowText(strTile);//
 		m_pMainWnd->ShowWindow(SW_SHOW);
 		m_pMainWnd->UpdateWindow();
-		// ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
+	   ((CMainFrame*)m_pMainWnd)->SwitchToPruductType(DLG_DIALOG_DEFAULT_BUILDING); 
 
-		m_szAppPath  = g_strExePth;
-		m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
-		CString g_configfile_path =g_strExePth + g_strStartInterface_config;
-		m_lastinterface= 19 ;//GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path); //由 杜帆 16-03-17屏蔽；进入不同的界面引起 T3000打开时报错。
-		g_selected_serialnumber=GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);
-		if (m_lastinterface!=19&&m_lastinterface!=24)
-		{
-			((CMainFrame*)m_pMainWnd)->SwitchToPruductType(m_lastinterface);
-		}
-		else
-		{
-			((CMainFrame*)m_pMainWnd)->SwitchToPruductType(19);
-		}
+// 		m_szAppPath  = g_strExePth;
+// 		m_szHelpFile = theApp.m_szAppPath + L"T3000_Help.chm";
+// 		CString g_configfile_path =g_strExePth + g_strStartInterface_config;
+// 		m_lastinterface= 19 ;//GetPrivateProfileInt(_T("T3000_START"),_T("Interface"),19,g_configfile_path); //由 杜帆 16-03-17屏蔽；进入不同的界面引起 T3000打开时报错。
+// 		g_selected_serialnumber=GetPrivateProfileInt(_T("T3000_START"),_T("SerialNumber"),0,g_configfile_path);
+// 		if (m_lastinterface!=19&&m_lastinterface!=24)
+// 		{
+// 			((CMainFrame*)m_pMainWnd)->SwitchToPruductType(m_lastinterface);
+// 		}
+// 		else
+// 		{
+// 			((CMainFrame*)m_pMainWnd)->SwitchToPruductType(19);
+// 		}
 
 
 	}

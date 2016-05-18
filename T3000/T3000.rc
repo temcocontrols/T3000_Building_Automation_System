@@ -2558,6 +2558,17 @@ BEGIN
     EDITTEXT        IDC_EDIT_BUILDINGNAME,66,9,126,14,ES_AUTOHSCROLL | ES_READONLY
 END
 
+IDD_DIALOG_OPTION DIALOGEX 0, 0, 189, 58
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Option"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,24,40,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,101,40,50,14
+    LTEXT           "Set Programe language to",IDC_STATIC,6,7,84,8
+    COMBOBOX        IDC_COMBO_LANGUAGE,97,5,88,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -3339,6 +3350,11 @@ BEGIN
         RIGHTMARGIN, 198
         TOPMARGIN, 7
         BOTTOMMARGIN, 212
+    END
+
+    IDD_DIALOG_OPTION, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 54
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -7703,21 +7719,19 @@ BEGIN
         MENUITEM "&Import...\tCtrl+I",          ID_FILE_IMPORTDATAFROMDATABASEFILE
         MENUITEM "E&xit",                       ID_APP_EXIT
     END
-    POPUP "&Tool"
+    POPUP "&Tools"
     BEGIN
         MENUITEM "&Connect \tCtrl+C",           ID_CONNECT2
         MENUITEM "Change Modbus ID",            ID_TOOL_EREASE_CHANGE_ID
         MENUITEM "Modubs Poll",                 ID_DATABASE_MBPOLL
         MENUITEM "Register Viewer",             ID_TOOL_REGISTERVIEWER
-        MENUITEM "Refresh Current Tstat(F8)",   ID_TOOL_FRESH
-        MENUITEM "Refresh Left Tree View(F3)",  ID_TOOL_FRESHLEFTTREEVIEW
         MENUITEM "Export Register List to xls", ID_FILE_EXPORTREGISETERSLIST1
         MENUITEM "Load firmware for a single device    [Ctrl+F2]", ID_TOOL_ISPTOOLFORONE
         MENUITEM "Load firmware for many devices [Ctrl+M]", ID_FILE_BATCHBURNHEX
-        MENUITEM "&DisConnect \tCtrl+D",        ID_DISCONNECT2
-        MENUITEM "S.N Repair Tool",             ID_TOOL_DETECTONLINEPRODUCTS
         MENUITEM "Flash SN",                    ID_TOOL_FLASHSN
-        MENUITEM "Bootloader",                  ID_TOOL_BOOTLOADER
+        MENUITEM "Psychrometry",                ID_TOOLS_PSYCHROMETRY
+        MENUITEM "Option",                      ID_TOOLS_OPTION
+        MENUITEM "&DisConnect \tCtrl+D",        ID_DISCONNECT2
     END
     POPUP "&View"
     BEGIN

@@ -263,6 +263,7 @@
 #define IDR_BUILDING_DB                 600
 #define IDR_T3000_NEW_DB1               601
 #define IDD_DIALOG_BUILDING_CONFIG      602
+#define IDD_DIALOG_OPTION               603
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -2007,6 +2008,7 @@
 #define IDC_EDIT_PACKET_ERROR_2         2172
 #define IDC_EDIT_BUILDINGNAME           2172
 #define IDC_EDIT_PACKET_ERROR_3         2173
+#define IDC_COMBO_LANGUAGE              2173
 #define IDC_EDIT_TIMEOUT_1              2174
 #define IDC_EDIT_TIMEOUT_2              2175
 #define IDC_EDIT_TIMEOUT_3              2176
@@ -2424,6 +2426,8 @@
 #define ID_CONTROL_MAIN                 34053
 #define ID_HELP_CHECKUPDATE             34053
 #define ID_FILE_EXPORTREGISETERSLIST1   34054
+#define ID_TOOLS_PSYCHROMETRY           34055
+#define ID_TOOLS_OPTION                 34056
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
 #define IDD_DIALOG_BACNET_OUTPUT        34907
@@ -2489,9 +2493,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        603
-#define _APS_NEXT_COMMAND_VALUE         34055
-#define _APS_NEXT_CONTROL_VALUE         2173
+#define _APS_NEXT_RESOURCE_VALUE        604
+#define _APS_NEXT_COMMAND_VALUE         34057
+#define _APS_NEXT_CONTROL_VALUE         2174
 #define _APS_NEXT_SYMED_VALUE           320
 #endif
 #endif
