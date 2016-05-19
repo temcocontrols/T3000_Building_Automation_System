@@ -17,11 +17,12 @@ namespace WFA_psychometric_chart
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-      //Show the language select dialog
-      MultiLang.SelectLanguage frmLang = new MultiLang.SelectLanguage() ;
-      frmLang.LoadSettingsAndShow() ;
-      frmLang.Dispose() ;
-      frmLang = null ;
+            //Show the language select dialog
+            MultiLang.SelectLanguage frmLang = new MultiLang.SelectLanguage();
+            //MessageBox.Show("frm lang" + frmLang);
+            frmLang.LoadSettingsAndShow();
+            frmLang.Dispose();
+            frmLang = null;
 
             Application.Run(new Form1_main());
         }

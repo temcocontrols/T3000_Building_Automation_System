@@ -66,7 +66,7 @@ namespace WFA_psychometric_chart
         {
             try
             {
-                cb1_select_data.Items.Clear();
+                //cb1_select_data.Items.Clear();
                 ArrayList stored_location = new ArrayList();
                 temp_building_values.Clear();//we need to clear the values for new items
                                              //while loading it should populate the field...
@@ -89,7 +89,7 @@ namespace WFA_psychometric_chart
                 SQLiteConnection connection = new SQLiteConnection(connString);
                 connection.Open();
                 SQLiteDataReader reader = null;
-                SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_building_location", connection);
+                SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_building_location where selection = 1", connection);
                 //command.Parameters.AddWithValue("@1", userName)
                 reader = comm.ExecuteReader();
                 while (reader.Read())
@@ -107,14 +107,16 @@ namespace WFA_psychometric_chart
                     });
 
                 }
-                //string s = "";
-                for (int i = 0; i < temp_building_values.Count; i++)
-                {
+                ////string s = "";
+                //for (int i = 0; i < temp_building_values.Count; i++)
+                //{
 
-                    string tempValue = temp_building_values[i].ID + "," + temp_building_values[i].country + "," + temp_building_values[i].state + "," + temp_building_values[i].city;
-                    cb1_select_data.Items.Add(tempValue);
-                    //s += stored_location[i] + " , \n";
-                }
+                //    string tempValue = temp_building_values[i].ID + "," + temp_building_values[i].country + "," + temp_building_values[i].state + "," + temp_building_values[i].city;
+                //  //  cb1_select_data.Items.Add(tempValue);
+                //    //s += stored_location[i] + " , \n";
+                //}
+
+                index_selected = temp_building_values[0].ID;
                 // MessageBox.Show("stored place = " + s);
                 comm.Dispose();
                 reader.Dispose();
@@ -267,13 +269,14 @@ namespace WFA_psychometric_chart
                           }
                       }//close of for..
 
-                      string test = null;
-                      for (int i = 0; i < temp_hist_temp_hum_list.Count; i++)
-                      {
-                          test += "Temp = "+temp_hist_temp_hum_list[i].temp + " , hum=  " + temp_hist_temp_hum_list[i].hum + ",date=" + temp_hist_temp_hum_list[i].date + ",hour=" + temp_hist_temp_hum_list[i].hour + "\n";
+                      //--Testing...
+                      //string test = null;
+                      //for (int i = 0; i < temp_hist_temp_hum_list.Count; i++)
+                      //{
+                      //    test += "Temp = "+temp_hist_temp_hum_list[i].temp + " , hum=  " + temp_hist_temp_hum_list[i].hum + ",date=" + temp_hist_temp_hum_list[i].date + ",hour=" + temp_hist_temp_hum_list[i].hour + "\n";
 
-                      }
-                      MessageBox.Show(WFA_psychometric_chart.Properties.Resources.after_filtering_the_values_of_ + test);
+                      //}
+                     // MessageBox.Show(WFA_psychometric_chart.Properties.Resources.after_filtering_the_values_of_ + test);
                     //now lets plot it in the graph
                       for (int x = 0; x < temp_hist_temp_hum_list.Count; x++)
                       {
@@ -366,8 +369,8 @@ namespace WFA_psychometric_chart
             try
             {
                 //index_selected = cb1_select_data.SelectedIndex + 1; //is used to identify the location and data associated with it.
-                int cb_index_selected = cb1_select_data.SelectedIndex;
-                index_selected = temp_building_values[cb_index_selected].ID;
+               // int cb_index_selected = cb1_select_data.SelectedIndex;
+                //index_selected = temp_building_values[cb_index_selected].ID;
 
                 gb_select_time_and_date.Enabled = true;
 

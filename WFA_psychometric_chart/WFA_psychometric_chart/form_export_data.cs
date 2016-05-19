@@ -433,12 +433,12 @@ namespace WFA_psychometric_chart
             }//close of database using statement 
 
             //test..printing.
-            string s = null;
-            for (int i = 0; i < hist_temp_hum_list.Count; i++)
-            {
-                s += hist_temp_hum_list[i].date + ", h =" + hist_temp_hum_list[i].hour + ",temp =" + hist_temp_hum_list[i].temp + ",station = " + hist_temp_hum_list[i].station_name + "\n";
-            }
-            MessageBox.Show("value of s = "+s);
+            //string s = null;
+            //for (int i = 0; i < hist_temp_hum_list.Count; i++)
+            //{
+            //    s += hist_temp_hum_list[i].date + ", h =" + hist_temp_hum_list[i].hour + ",temp =" + hist_temp_hum_list[i].temp + ",station = " + hist_temp_hum_list[i].station_name + "\n";
+            //}
+            //MessageBox.Show("value of s = "+s);
 
 
 
@@ -539,12 +539,12 @@ namespace WFA_psychometric_chart
             }//close of database using statement 
 
             //testing...
-            string s = null;
-            for (int i = 0; i < stationInfo.Count; i++)
-            {
-                s += stationInfo[i].location + ", distance =" + stationInfo[i].distance_from_building + ",direc =" + stationInfo[i].directioin + "\n";
-            }
-            MessageBox.Show("station info s value ="+s);
+            //string s = null;
+            //for (int i = 0; i < stationInfo.Count; i++)
+            //{
+            //    s += stationInfo[i].location + ", distance =" + stationInfo[i].distance_from_building + ",direc =" + stationInfo[i].directioin + "\n";
+            //}
+            //MessageBox.Show("station info s value ="+s);
 
         }
 
@@ -579,7 +579,7 @@ namespace WFA_psychometric_chart
         {
             try
             {
-                cb1_select_data.Items.Clear();
+                //cb1_select_data.Items.Clear();
                 ArrayList stored_location = new ArrayList();
                 temp_building_values.Clear();//we need to clear the values for new items
                                              //while loading it should populate the field...
@@ -602,7 +602,7 @@ namespace WFA_psychometric_chart
                 SQLiteConnection connection = new SQLiteConnection(connString);
                 connection.Open();
                 SQLiteDataReader reader = null;
-                SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_building_location", connection);
+                SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_building_location where selection = 1", connection);
                 //command.Parameters.AddWithValue("@1", userName)
                 reader = comm.ExecuteReader();
                 while (reader.Read())
@@ -620,20 +620,20 @@ namespace WFA_psychometric_chart
                     });
 
                 }
-                //string s = "";
-                for (int i = 0; i < temp_building_values.Count; i++)
-                {
+                ////string s = "";
+                //for (int i = 0; i < temp_building_values.Count; i++)
+                //{
 
-                    string tempValue = temp_building_values[i].ID + "," + temp_building_values[i].country + "," + temp_building_values[i].state + "," + temp_building_values[i].city;
-                    cb1_select_data.Items.Add(tempValue);
-                    //s += stored_location[i] + " , \n";
-                }
+                //    string tempValue = temp_building_values[i].ID + "," + temp_building_values[i].country + "," + temp_building_values[i].state + "," + temp_building_values[i].city;
+                //  //  cb1_select_data.Items.Add(tempValue);
+                //    //s += stored_location[i] + " , \n";
+                //}
+
+                index_selected = temp_building_values[0].ID;
                 // MessageBox.Show("stored place = " + s);
                 comm.Dispose();
                 reader.Dispose();
                 connection.Close();
-
-
 
             }
             catch (Exception ex)
@@ -642,23 +642,8 @@ namespace WFA_psychometric_chart
             }
         }
 
-        private void cb1_select_data_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //on change index it will select the index value or better known as selected index.
-            try {
-                //index_selected = cb1_select_data.SelectedIndex + 1; //is used to identify the location and data associated with it.
-                int cb_index_selected = cb1_select_data.SelectedIndex;
-                index_selected = temp_building_values[cb_index_selected].ID;
-
-                groupBox1.Enabled = true;
-            groupBox2.Enabled = true;
-            btnExtract.Enabled = true;
-            MessageBox.Show("index selected = " + index_selected);
-            }catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }            
-        }
+       
+        
 
        
 

@@ -39,12 +39,9 @@
             this.rb2_csv = new System.Windows.Forms.RadioButton();
             this.rb1_excel = new System.Windows.Forms.RadioButton();
             this.btnExtract = new System.Windows.Forms.Button();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.cb1_select_data = new System.Windows.Forms.ComboBox();
             this.saveFD = new System.Windows.Forms.SaveFileDialog();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -107,7 +104,6 @@
             this.rb1_excel.Name = "rb1_excel";
             this.rb1_excel.TabStop = true;
             this.rb1_excel.UseVisualStyleBackColor = true;
-
             // 
             // btnExtract
             // 
@@ -116,26 +112,10 @@
             this.btnExtract.UseVisualStyleBackColor = true;
             this.btnExtract.Click += new System.EventHandler(this.button1_Click);
             // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.cb1_select_data);
-            resources.ApplyResources(this.groupBox3, "groupBox3");
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.TabStop = false;
-            // 
-            // cb1_select_data
-            // 
-            this.cb1_select_data.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cb1_select_data.FormattingEnabled = true;
-            resources.ApplyResources(this.cb1_select_data, "cb1_select_data");
-            this.cb1_select_data.Name = "cb1_select_data";
-            this.cb1_select_data.SelectedIndexChanged += new System.EventHandler(this.cb1_select_data_SelectedIndexChanged);
-            // 
             // form_export_data
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.btnExtract);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -147,7 +127,6 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -164,8 +143,6 @@
         private System.Windows.Forms.RadioButton rb2_csv;
         private System.Windows.Forms.RadioButton rb1_excel;
         private System.Windows.Forms.Button btnExtract;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.ComboBox cb1_select_data;
         private System.Windows.Forms.SaveFileDialog saveFD;
     }
 }

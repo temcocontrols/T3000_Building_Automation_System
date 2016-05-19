@@ -32,7 +32,7 @@ namespace WFA_psychometric_chart
         {
             if(tb_building_name.Text == "")
             {
-                MessageBox.Show("Please enter building name!");
+                MessageBox.Show("Please enter building name!");       //MLHIDE
             }
 
             else if (tb_country.Text == "")

@@ -134,6 +134,26 @@ namespace WFA_psychometric_chart.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 
+        /// Please make sure you are connected to internet!.
+        /// </summary>
+        internal static string _Please_make_sure_you_are_conn {
+            get {
+                return ResourceManager.GetString("_Please_make_sure_you_are_conn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to                  start             end 
+        ///.
+        /// </summary>
+        internal static string _start_end {
+            get {
+                return ResourceManager.GetString("_start_end", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to  Your chart image will be saved as .
         /// </summary>
         internal static string _Your_chart_image_will_be_save {
@@ -271,6 +291,15 @@ namespace WFA_psychometric_chart.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enthalpy kj/kg dry air.
+        /// </summary>
+        internal static string Enthalpy_kj_kg_dry_air {
+            get {
+                return ResourceManager.GetString("Enthalpy_kj_kg_dry_air", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         internal static string Error {
@@ -307,6 +336,15 @@ namespace WFA_psychometric_chart.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to From :.
+        /// </summary>
+        internal static string From {
+            get {
+                return ResourceManager.GetString("From", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Help.
         /// </summary>
         internal static string Help {
@@ -321,6 +359,15 @@ namespace WFA_psychometric_chart.Properties {
         internal static string Historical_Data {
             get {
                 return ResourceManager.GetString("Historical_Data", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Historical Plot.
+        /// </summary>
+        internal static string Historical_Plot {
+            get {
+                return ResourceManager.GetString("Historical_Plot", resourceCulture);
             }
         }
         
@@ -406,6 +453,15 @@ namespace WFA_psychometric_chart.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please Enter proper pannel id field.
+        /// </summary>
+        internal static string Please_Enter_proper_pannel_id_ {
+            get {
+                return ResourceManager.GetString("Please_Enter_proper_pannel_id_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please enter value between 0-1%.
         /// </summary>
         internal static string Please_enter_value_between_0_1 {
@@ -451,6 +507,15 @@ namespace WFA_psychometric_chart.Properties {
         internal static string Please_pull_the_current_weathe {
             get {
                 return ResourceManager.GetString("Please_pull_the_current_weathe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please select a location .
+        /// </summary>
+        internal static string Please_select_a_location {
+            get {
+                return ResourceManager.GetString("Please_select_a_location", resourceCulture);
             }
         }
         
@@ -536,6 +601,15 @@ namespace WFA_psychometric_chart.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Refresh Building.
+        /// </summary>
+        internal static string Refresh_Building {
+            get {
+                return ResourceManager.GetString("Refresh_Building", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Refresh Graph.
         /// </summary>
         internal static string Refresh_Graph {
@@ -568,6 +642,24 @@ namespace WFA_psychometric_chart.Properties {
         internal static string Select_language {
             get {
                 return ResourceManager.GetString("Select_language", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select station name :.
+        /// </summary>
+        internal static string Select_station_name {
+            get {
+                return ResourceManager.GetString("Select_station_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Heat Map.
+        /// </summary>
+        internal static string Show_Heat_Map {
+            get {
+                return ResourceManager.GetString("Show_Heat_Map", resourceCulture);
             }
         }
         
@@ -645,6 +737,15 @@ namespace WFA_psychometric_chart.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to To :.
+        /// </summary>
+        internal static string To {
+            get {
+                return ResourceManager.GetString("To", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap u_arrow {
@@ -660,6 +761,15 @@ namespace WFA_psychometric_chart.Properties {
         internal static string value_inserted_successfully {
             get {
                 return ResourceManager.GetString("value_inserted_successfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wet bulb temp.
+        /// </summary>
+        internal static string Wet_bulb_temp {
+            get {
+                return ResourceManager.GetString("Wet_bulb_temp", resourceCulture);
             }
         }
         

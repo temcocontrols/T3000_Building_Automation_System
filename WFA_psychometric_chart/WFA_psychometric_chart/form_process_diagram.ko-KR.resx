@@ -120,6 +120,10 @@
   <data name="$this.Text" xml:space="preserve">
     <value>프로세스 다이어그램</value>
   </data>
+  <data name="chart1.Text" xml:space="preserve">
+    <value>
+차트 1</value>
+  </data>
   <data name="colorToolStripMenuItem.Text" xml:space="preserve">
     <value>색:</value>
   </data>

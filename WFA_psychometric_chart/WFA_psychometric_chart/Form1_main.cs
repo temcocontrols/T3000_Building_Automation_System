@@ -10,6 +10,9 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Data;
+using System.Xml;
+using System.Net;
 
 namespace WFA_psychometric_chart
 {
@@ -52,6 +55,11 @@ namespace WFA_psychometric_chart
 
         ArrayList t = new ArrayList();//this stores the temperature(deg.cel)
         ArrayList pg = new ArrayList();//this stores the saturated vapour pressure(kpa).
+
+
+
+        //--This is a global variable that is used by heat map 
+        int index_selected;
 
 
         public void add_t_pg()
@@ -300,7 +308,7 @@ namespace WFA_psychometric_chart
 
             }//close of for
         
-            chart1.Series["Series1"].Points[16].Label = "Wet bulb temp";
+            chart1.Series["Series1"].Points[16].Label = WFA_psychometric_chart.Properties.Resources.Wet_bulb_temp;
             chart1.Series["Series1"].Points[16].LabelBackColor = Color.Red;
             //chart1.Legends["wet_bulb_temp"].DockedToChartArea = "jjj";
 
@@ -578,7 +586,7 @@ namespace WFA_psychometric_chart
                 t_plot1 += 10;
                 if (t_plot1 == 60)
                 {
-                    chart1.Series["Line_b" + hval].Points[1].Label = "Enthalpy kj/kg dry air";
+                    chart1.Series["Line_b" + hval].Points[1].Label = WFA_psychometric_chart.Properties.Resources.Enthalpy_kj_kg_dry_air;
                 }
 
             }
@@ -600,6 +608,7 @@ namespace WFA_psychometric_chart
 
         private void button1_Click(object sender, EventArgs e)
         {
+            this.Invalidate();
             plot_new_graph();
 
         }
@@ -607,8 +616,14 @@ namespace WFA_psychometric_chart
         
         private void Form1_Load(object sender, EventArgs e)
         {
+            realTimePlottingToolStripMenuItem.Text = WFA_psychometric_chart.Properties.Resources.Historical_Plot;
             //lets add the t and pg values
             add_t_pg();//Calling this method add the value...
+
+            //--This is for label1 and label2
+            label1.Text = WFA_psychometric_chart.Properties.Resources.From;
+            label2.Text = WFA_psychometric_chart.Properties.Resources.To;
+            button2.Text = WFA_psychometric_chart.Properties.Resources.Show_Heat_Map;
 
 
              //lets plot the graph as soon as the form loads.
@@ -625,15 +640,7 @@ namespace WFA_psychometric_chart
             //radioButton1.Checked = true;
 
             string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            //string file = dir + @"\TestDir\TestFile.txt";
-            //con.ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
-            //change here..
-
-            //con.ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source="+dir+@"\T3000.mdb;Persist Security Info=True";
-            //this is sql connnection string..
-            //con.ConnectionString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
-            //cmd.Connection = con;
-
+            
             string databasePath1 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string databaseFile1 = databasePath1 + @"\db_psychrometric_project.s3db";
             if (File.Exists(databaseFile1))
@@ -645,7 +652,261 @@ namespace WFA_psychometric_chart
             //--sqlite new databse creation
             sqlite_database_creation();
             }
+            //--This is the heat map protion initial data setting
+            //lets set the data time picker default values...
+            dtp_From.MinDate = new DateTime(DateTime.Now.Year, 1, 1);
+            dtp_To.MinDate = new DateTime(DateTime.Now.Year, 1, 1);
+            dtp_From.MaxDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            dtp_To.MaxDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            dtp_From.Value = new DateTime(DateTime.Now.Year, 1, 1);
+            dtp_To.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            PullLocationInformation();//this is for loading location information
+
+
+
+            //--This part is for checking the database and update the lat,long,elevation values in database...
+            if (CheckLatLongAvailable() != true)
+            {
+                FillLatLongValueAutomatically();//--Fill the lat long values...
+              //  MessageBox.Show("show filllat");
+            }
+
+
         }
+        public bool CheckLatLongAvailable()
+        {
+            //--Lets do some connection checking and validating the data returned...
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+            bool returnValue = false;
+            string latValue = "";
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT * from tbl_building_location WHERE selection=1";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                //command.Parameters.AddWithValue("@index", index);
+                //command.Parameters.Add("@index",DbType.Int32).Value= index_selected;
+                // command.Parameters.AddWithValue("@index", index_selected);
+
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    //ListboxItems.Add(reader[1].ToString()+","+reader[2].ToString());
+                    latValue = reader["latitude"].ToString();
+                }
+            }
+            if (latValue != "")
+            {
+                returnValue = true;
+            }
+            else
+            {
+                returnValue = false;
+            }
+
+            //--This will be either true or false based on the check value..
+            return returnValue;
+        }
+        string latPulledValue, longPulledValue, elevationPulledValue;
+
+        double latVal, longVal;//--This is used for storing temporary lat long value...
+
+        public void FillLatLongValueAutomatically()
+        {
+
+            string country = null, state = null, city = null, street = null, zip = null;
+            //--This portion fill the lat,long and elevation value is not present in the database by users..
+            //--Lets do some connection checking and validating the data returned...
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT * from tbl_building_location WHERE selection=1";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    //ListboxItems.Add(reader[1].ToString()+","+reader[2].ToString());
+                    country = reader["country"].ToString();
+                    state = reader["state"].ToString();
+                    city = reader["city"].ToString();
+                    street = reader["street"].ToString();
+                    zip = reader["zip"].ToString();
+                }
+            }
+
+           // MessageBox.Show("Country = " + country + ",city " + city);
+
+            pull_data_online(country, state, city, street, zip);//--This will fill the online values form the database
+                                                                //--After pulling above we get three values we need to push it to database...
+
+            //--Upadating the table which has no values ...
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                string sql_string = "update tbl_building_location set  latitude=@latitude_value,longitude=@longitude_value,elevation=@elevation  where selection=1;";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+                command.Parameters.AddWithValue("@latitude_value", latPulledValue.ToString());
+                command.Parameters.AddWithValue("@longitude_value", longPulledValue.ToString());
+                command.Parameters.AddWithValue("@elevation", elevationPulledValue.ToString());
+                command.ExecuteNonQuery();
+            }
+
+
+        }
+
+
+
+        private void pull_data_online(string country1, string state1, string city1, string street1, string zip1)
+        {
+            //this function pulls the data from online devices...
+
+
+            /*
+            1.country,state,city,street,latitude,longitude,elev,zip
+            */
+            string country = country1;
+            string state = state1;
+            string city = city1;
+            string street = street1;
+            string zip = zip1;
+            int value;
+            if (int.TryParse(zip, out value))
+            {
+
+                if (country != "" && city != "")
+                {
+                    string join_string = "";
+                    if (state != "" && street != "")
+                    {
+                        join_string = country + "," + state + "," + city + "," + street;
+                    }
+                    else
+                    {
+                        join_string = country + "," + city;
+                    }
+
+                    //geo location code goes here..
+                    try
+                    {
+
+                        var address = join_string;
+
+
+
+                        string BingMapsKey = " AgMVAaLqK8vvJe6OTRRu57wu0x2zBX1bUaqSizo0QhE32fqEK5fN8Ek4wWmO4QR4";
+
+
+                        //Create REST Services geocode request using Locations API
+                        string geocodeRequest = "http://dev.virtualearth.net/REST/v1/Locations/" + address + "?o=xml&key=" + BingMapsKey;
+
+
+
+                        using (var wc = new WebClient())
+                        {
+                            string api_url = geocodeRequest;
+                     
+                            var data = wc.DownloadString(api_url);
+                            //  MessageBox.Show("string apic return =" + data);
+                            string xml_string = data.ToString();
+                            //MessageBox.Show(xml_string);
+
+
+                            //--Parsing the xml document int the c# application...                     
+                            //xml parsing...
+                            XmlDocument xml = new XmlDocument();
+                            xml.LoadXml(xml_string);
+
+                            ProcessResponse(xml);
+                            latPulledValue = latVal.ToString();//--Storing it in this variable to make it a string...
+                            longPulledValue = longVal.ToString();
+
+                            //MessageBox.Show("lat = " + latPulledValue + "long = " + longPulledValue);
+
+                            //--This is for the elevation part...
+                            string elevationAPI_URL = "http://dev.virtualearth.net/REST/v1/Elevation/List?pts=" + latVal + "," + longVal + "&key=AgMVAaLqK8vvJe6OTRRu57wu0x2zBX1bUaqSizo0QhE32fqEK5fN8Ek4wWmO4QR4&output=xml";
+
+                            var elevationData = wc.DownloadString(elevationAPI_URL);
+                           // MessageBox.Show("elev data = " + elevationData);
+                            //--Now lets do the parsing...
+                            //xml parsing...
+                            XmlDocument xmlElevation = new XmlDocument();
+                            xmlElevation.LoadXml(elevationData);
+                           elevationPulledValue =   elevationProcess(xmlElevation).ToString();//--This gives the elevation...
+                           // MessageBox.Show("Pulled elevation");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                        
+                    }
+                }//close of if...
+            }//close of if int try parse.
+            else
+            {
+                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_enter_a_valid_zip_numbe);
+            }
+
+        }
+        
+
+        //--Now lets process the elevation data....
+        double elev;
+        public double elevationProcess(XmlDocument locationsResponse)
+        {
+
+            //Create namespace manager
+            XmlNamespaceManager nsmgr = new XmlNamespaceManager(locationsResponse.NameTable);
+            nsmgr.AddNamespace("rest", "http://schemas.microsoft.com/search/local/ws/rest/v1");
+
+            //Get formatted addresses: Option 1
+            //Get all locations in the response and then extract the formatted address for each location
+            XmlNodeList locationElements = locationsResponse.SelectNodes("//rest:Elevations", nsmgr);
+            //Console.WriteLine("Show all formatted addresses: Option 1");
+            foreach (XmlNode location in locationElements)
+            {
+                //MessageBox.Show("Lat = "+location.SelectSingleNode(".//rest:Latitude", nsmgr).InnerText);
+                elev = double.Parse(location.SelectSingleNode(".//rest:int", nsmgr).InnerText);
+                //  MessageBox.Show("elev = " + elev);
+                //longVal = double.Parse(location.SelectSingleNode(".//rest:Longitude", nsmgr).InnerText);
+                //MessageBox.Show("Long = " + longVal);
+            }
+
+            return elev;
+        }
+
+        
+        public void ProcessResponse(XmlDocument locationsResponse)
+        {
+            //Create namespace manager
+            XmlNamespaceManager nsmgr = new XmlNamespaceManager(locationsResponse.NameTable);
+            nsmgr.AddNamespace("rest", "http://schemas.microsoft.com/search/local/ws/rest/v1");
+
+            //Get formatted addresses: Option 1
+            //Get all locations in the response and then extract the formatted address for each location
+            XmlNodeList locationElements = locationsResponse.SelectNodes("//rest:Location", nsmgr);
+            Console.WriteLine("Show all formatted addresses: Option 1");
+            foreach (XmlNode location in locationElements)
+            {
+                //MessageBox.Show("Lat = "+location.SelectSingleNode(".//rest:Latitude", nsmgr).InnerText);
+                latVal = double.Parse(location.SelectSingleNode(".//rest:Latitude", nsmgr).InnerText);
+               // MessageBox.Show("lat = " + latVal);
+                longVal = double.Parse(location.SelectSingleNode(".//rest:Longitude", nsmgr).InnerText);
+               // MessageBox.Show("Long = " + longVal);
+            }
+            //   Console.WriteLine();
+        }
+
 
 
         private void sqlite_database_creation()
@@ -666,7 +927,7 @@ namespace WFA_psychometric_chart
                 m_dbConnection.Open();
 
                 //--building location table : tbl_building_location
-                string sql = "create table tbl_building_location (ID INTEGER PRIMARY KEY AUTOINCREMENT ,country varchar(255),state varchar(255),city varchar(255),street varchar(255), ZIP int,longitude varchar(255),latitude varchar(255),elevation varchar(255),BuildingName varchar(255))";
+                string sql = "create table tbl_building_location (selection int,ID INTEGER PRIMARY KEY AUTOINCREMENT ,country varchar(255),state varchar(255),city varchar(255),street varchar(255), ZIP int,longitude varchar(255),latitude varchar(255),elevation varchar(255),BuildingName varchar(255))";
                 SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
                 command.ExecuteNonQuery();
                 //--next table geo location value : tbl_geo_location_value
@@ -682,6 +943,12 @@ namespace WFA_psychometric_chart
                 //string sql3 = "create table tbl_temp_humidity (temp int,humidity int)";
                 //SQLiteCommand command3 = new SQLiteCommand(sql3, m_dbConnection);
                 //command3.ExecuteNonQuery();
+
+                string sql3 = "create table tbl_language_option (ID int, language_id int)";
+                SQLiteCommand command3 = new SQLiteCommand(sql3, m_dbConnection);
+                command3.ExecuteNonQuery();
+                
+
                 ////--next table weather related datas...
                 string sql4 = "create table tbl_weather_related_values (ID INTEGER ,location varchar(255),distance_from_building varchar(255),last_update_date varchar(255),temp varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))";
                 SQLiteCommand command4 = new SQLiteCommand(sql4, m_dbConnection);
@@ -1677,13 +1944,13 @@ namespace WFA_psychometric_chart
 
         //}
 
-        private void heatMapToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            //lets add heat map form to the application ...
-            form_heat_map fm_hm = new form_heat_map(this);//--This is done because we are making the form1_main change the values to main form ie form1_main
-            fm_hm.Show();
+        //private void heatMapToolStripMenuItem_Click(object sender, EventArgs e)
+        //{
+        //    //lets add heat map form to the application ...
+        //    form_heat_map fm_hm = new form_heat_map(this);//--This is done because we are making the form1_main change the values to main form ie form1_main
+        //    fm_hm.Show();
 
-        }
+        //}
 
         private void exportDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2179,8 +2446,8 @@ namespace WFA_psychometric_chart
         
         private void humiditySensorCalibrationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Application_Form4 ap_f4 = new Application_Form4(this);
-            ap_f4.Show();
+            //Application_Form4 ap_f4 = new Application_Form4(this);
+            //ap_f4.Show();
 
 
         }
@@ -2265,7 +2532,7 @@ namespace WFA_psychometric_chart
 
                 string sequenceDetected = menuStripAllValues[incrementIndex - 1].name + " to " + menuStripAllValues[incrementIndex].name;
 
-                string tooltipString = "Sequence :  " + sequenceDetected + " \n" + "                 start             end \n" + "Temp         :" + Math.Round(menuStripAllValues[incrementIndex - 1].xVal, 2) + "               " + Math.Round(menuStripAllValues[incrementIndex].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
+                string tooltipString = "Sequence :  " + sequenceDetected + " \n" + WFA_psychometric_chart.Properties.Resources._start_end + "Temp         :" + Math.Round(menuStripAllValues[incrementIndex - 1].xVal, 2) + "               " + Math.Round(menuStripAllValues[incrementIndex].xVal, 2) + "\nHumidity :" + startHumidity1 + "           " + endHumidity1 + WFA_psychometric_chart.Properties.Resources._Enthalpy + startEnthalpy1 + "           " + endEnthalpy1 + "\nEnthalpy Change:" + enthalpyChange;
 
 
 
@@ -2887,6 +3154,108 @@ namespace WFA_psychometric_chart
 
 
         }
+
+        public class DataTypeTempBuildingValue
+        {
+            public int ID { get; set; }
+            public string country { get; set; }
+            public string state { get; set; }
+            public string city { get; set; }
+        }
+
+        //ArrayList temp_building_values = new ArrayList();
+        List<DataTypeTempBuildingValue> temp_building_values = new List<DataTypeTempBuildingValue>();
+
+
+        private void PullLocationInformation()
+        {
+            try
+            {
+                //cb1_select_data.Items.Clear();
+                ArrayList stored_location = new ArrayList();
+                temp_building_values.Clear();//we need to clear the values for new items
+                                             //while loading it should populate the field...
+                                             //lets pull the vales offline values stored in db...
+                                             //string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+                //string connString = @"Data Source=GREENBIRD;Initial Catalog=db_psychrometric_project;Integrated Security=True";
+
+
+                //--changing all the database to the sqlite database...
+                string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+                string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+
+                // MessageBox.Show("connection string = " + connString);
+
+
+                SQLiteConnection connection = new SQLiteConnection(connString);
+                connection.Open();
+                SQLiteDataReader reader = null;
+                SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_building_location where selection = 1", connection);
+                //command.Parameters.AddWithValue("@1", userName)
+                reader = comm.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    //string selecte_location = reader["id"].ToString()+","+reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
+                    //stored_location.Add(selecte_location);
+
+                    temp_building_values.Add(new DataTypeTempBuildingValue
+                    {
+                        ID = int.Parse(reader["id"].ToString()),
+                        country = reader["country"].ToString(),
+                        state = reader["state"].ToString(),
+                        city = reader["city"].ToString()
+                    });
+
+                }
+                ////string s = "";
+                //for (int i = 0; i < temp_building_values.Count; i++)
+                //{
+
+                //    string tempValue = temp_building_values[i].ID + "," + temp_building_values[i].country + "," + temp_building_values[i].state + "," + temp_building_values[i].city;
+                //  //  cb1_select_data.Items.Add(tempValue);
+                //    //s += stored_location[i] + " , \n";
+                //}
+
+                index_selected = temp_building_values[0].ID;
+                // MessageBox.Show("stored place = " + s);
+                comm.Dispose();
+                reader.Dispose();
+                connection.Close();
+
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+
+            //--this is heat map plot...
+            //initially resetting values to empty
+
+            //resetting ends...
+            DateTime fromDate = dtp_From.Value;
+            DateTime toDate = dtp_To.Value;
+
+
+            //--Calling part here.....
+            heat_map_button_click(index_selected, fromDate, toDate);
+
+
+
+
+        }
+
         private void helpPsychometricChartToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try { 

@@ -163,6 +163,9 @@
   <data name="enter_ZIP_number" xml:space="preserve">
     <value>우편 번호 입력</value>
   </data>
+  <data name="Enthalpy_kj_kg_dry_air" xml:space="preserve">
+    <value>엔탈피 KJ / kg 건조 공기</value>
+  </data>
   <data name="Error" xml:space="preserve">
     <value>오류</value>
   </data>
@@ -175,11 +178,17 @@
   <data name="error0" xml:space="preserve">
     <value>오류</value>
   </data>
+  <data name="From" xml:space="preserve">
+    <value>보낸 사람:</value>
+  </data>
   <data name="Help" xml:space="preserve">
     <value>도움말</value>
   </data>
   <data name="Historical_Data" xml:space="preserve">
     <value>기록 데이터</value>
+  </data>
+  <data name="Historical_Plot" xml:space="preserve">
+    <value>역사적 음모</value>
   </data>
   <data name="Humidity_in" xml:space="preserve">
     <value>습도 (%에서)</value>
@@ -254,6 +263,10 @@
   <data name="pulling" xml:space="preserve">
     <value>당기...</value>
   </data>
+  <data name="Refresh_Building" xml:space="preserve">
+    <value>새 위치 삽입</value>
+    <comment>Previous text: Add new location</comment>
+  </data>
   <data name="Refresh_Graph" xml:space="preserve">
     <value>그래프 새로 고침</value>
   </data>
@@ -265,6 +278,14 @@
   </data>
   <data name="Select_language" xml:space="preserve">
     <value>언어 선택</value>
+  </data>
+  <data name="Select_station_name" xml:space="preserve">
+    <value>역 이름:</value>
+    <comment>Previous text: Station name :</comment>
+  </data>
+  <data name="Show_Heat_Map" xml:space="preserve">
+    <value>계산</value>
+    <comment>Previous text: Calculate</comment>
   </data>
   <data name="Station_Information" xml:space="preserve">
     <value>역 정보:</value>
@@ -291,8 +312,15 @@
   <data name="Time_Status_Time_Error_Status" xml:space="preserve">
     <value>시간 상태 시간 오류 상태</value>
   </data>
+  <data name="To" xml:space="preserve">
+    <value>받는 사람:</value>
+  </data>
   <data name="value_inserted_successfully" xml:space="preserve">
     <value>성공적으로 삽입 값!</value>
+  </data>
+  <data name="Wet_bulb_temp" xml:space="preserve">
+    <value>
+습구 온도</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>예</value>

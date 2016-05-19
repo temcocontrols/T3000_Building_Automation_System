@@ -30,9 +30,9 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form3));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lb_building_name = new System.Windows.Forms.Label();
+            this.label42 = new System.Windows.Forms.Label();
             this.label40 = new System.Windows.Forms.Label();
-            this.label34 = new System.Windows.Forms.Label();
-            this.cb1_select_data = new System.Windows.Forms.ComboBox();
             this.tb_elev = new System.Windows.Forms.TextBox();
             this.tb_latitude = new System.Windows.Forms.TextBox();
             this.tb_longitude = new System.Windows.Forms.TextBox();
@@ -109,8 +109,6 @@
             this.label16 = new System.Windows.Forms.Label();
             this.tb_location = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.label42 = new System.Windows.Forms.Label();
-            this.lb_building_name = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -124,8 +122,6 @@
             this.groupBox1.Controls.Add(this.lb_building_name);
             this.groupBox1.Controls.Add(this.label42);
             this.groupBox1.Controls.Add(this.label40);
-            this.groupBox1.Controls.Add(this.label34);
-            this.groupBox1.Controls.Add(this.cb1_select_data);
             this.groupBox1.Controls.Add(this.tb_elev);
             this.groupBox1.Controls.Add(this.tb_latitude);
             this.groupBox1.Controls.Add(this.tb_longitude);
@@ -147,23 +143,20 @@
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.TabStop = false;
             // 
+            // lb_building_name
+            // 
+            resources.ApplyResources(this.lb_building_name, "lb_building_name");
+            this.lb_building_name.Name = "lb_building_name";
+            // 
+            // label42
+            // 
+            resources.ApplyResources(this.label42, "label42");
+            this.label42.Name = "label42";
+            // 
             // label40
             // 
             resources.ApplyResources(this.label40, "label40");
             this.label40.Name = "label40";
-            // 
-            // label34
-            // 
-            resources.ApplyResources(this.label34, "label34");
-            this.label34.Name = "label34";
-            // 
-            // cb1_select_data
-            // 
-            this.cb1_select_data.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cb1_select_data.FormattingEnabled = true;
-            resources.ApplyResources(this.cb1_select_data, "cb1_select_data");
-            this.cb1_select_data.Name = "cb1_select_data";
-            this.cb1_select_data.SelectedIndexChanged += new System.EventHandler(this.cb_event_on_index_change);
             // 
             // tb_elev
             // 
@@ -642,16 +635,6 @@
             resources.ApplyResources(this.label15, "label15");
             this.label15.Name = "label15";
             // 
-            // label42
-            // 
-            resources.ApplyResources(this.label42, "label42");
-            this.label42.Name = "label42";
-            // 
-            // lb_building_name
-            // 
-            resources.ApplyResources(this.lb_building_name, "lb_building_name");
-            this.lb_building_name.Name = "lb_building_name";
-            // 
             // Form3
             // 
             resources.ApplyResources(this, "$this");
@@ -659,6 +642,7 @@
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
+            this.MaximizeBox = false;
             this.Name = "Form3";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form3_ClosingForm);
             this.Load += new System.EventHandler(this.Form3_Load);
@@ -743,8 +727,6 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label32;
         private System.Windows.Forms.Label label33;
-        private System.Windows.Forms.ComboBox cb1_select_data;
-        private System.Windows.Forms.Label label34;
         private System.Windows.Forms.Label label35;
         private System.Windows.Forms.TextBox tb_current_offset_percent;
         private System.Windows.Forms.Label label31;

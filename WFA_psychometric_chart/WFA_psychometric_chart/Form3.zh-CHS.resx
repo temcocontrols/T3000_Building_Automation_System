@@ -128,7 +128,7 @@
   </data>
   <data name="button1.Text" xml:space="preserve">
     <value>插入新的位置</value>
-    <comment>Previous text: Insert new location</comment>
+    <comment>Previous text: Add new location</comment>
   </data>
   <data name="button4.Text" xml:space="preserve">
     <value>立即更新</value>
@@ -229,11 +229,9 @@
   <data name="label33.Text" xml:space="preserve">
     <value>m/秒</value>
   </data>
-  <data name="label34.Text" xml:space="preserve">
-    <value>选择一个位置 ︰</value>
-  </data>
   <data name="label36.Text" xml:space="preserve">
     <value>站名 ︰</value>
+    <comment>Previous text: Station name :</comment>
   </data>
   <data name="label37.Text" xml:space="preserve">
     <value>站的距离 ︰</value>

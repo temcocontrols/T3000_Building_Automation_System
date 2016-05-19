@@ -150,4 +150,7 @@
   <data name="label5.Text" xml:space="preserve">
     <value>색: </value>
   </data>
+  <data name="label6.Text" xml:space="preserve">
+    <value>색상을 변경하려면 클릭</value>
+  </data>
 </root>

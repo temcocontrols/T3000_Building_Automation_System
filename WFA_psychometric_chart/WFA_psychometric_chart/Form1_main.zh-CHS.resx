@@ -123,6 +123,10 @@
   <data name="button1.Text" xml:space="preserve">
     <value>刷新图表</value>
   </data>
+  <data name="button2.Text" xml:space="preserve">
+    <value>计算</value>
+    <comment>Previous text: Calculate</comment>
+  </data>
   <data name="chart1.Text" xml:space="preserve">
     <value>图表 1</value>
   </data>
@@ -135,11 +139,11 @@
   <data name="fileToolStripMenuItem.Text" xml:space="preserve">
     <value>文件</value>
   </data>
+  <data name="gb_select_date.Text" xml:space="preserve">
+    <value>热图</value>
+  </data>
   <data name="groupBox4.Text" xml:space="preserve">
     <value>不同的参数值</value>
-  </data>
-  <data name="heatMapToolStripMenuItem.Text" xml:space="preserve">
-    <value>热图</value>
   </data>
   <data name="helpPsychometricChartToolStripMenuItem.Text" xml:space="preserve">
     <value>
@@ -148,11 +152,18 @@
   <data name="helpToolStripMenuItem.Text" xml:space="preserve">
     <value>帮助</value>
   </data>
-  <data name="humiditySensorCalibrationToolStripMenuItem.Text" xml:space="preserve">
-    <value>湿度室的校准方法</value>
-  </data>
   <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>插入节点</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>从 :</value>
+  </data>
+  <data name="label1_units.Text" xml:space="preserve">
+    <value>单位(SI)</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>相对湿度 ︰</value>
+    <comment>Previous text: Relative Humidity:</comment>
   </data>
   <data name="label2_DBT_units.Text" xml:space="preserve">
     <value>℃</value>
@@ -209,6 +220,7 @@
   </data>
   <data name="realTimePlottingToolStripMenuItem.Text" xml:space="preserve">
     <value>实时绘制</value>
+    <comment>Previous text: Real Time Plotting</comment>
   </data>
   <data name="saveAsToolStripMenuItem.Text" xml:space="preserve">
     <value>另存为</value>

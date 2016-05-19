@@ -11,6 +11,7 @@ using System.Threading;
 using System.Text;
 using System.Xml;
 using System.Collections.Generic;
+using System.Data.SQLite;
 
 namespace MultiLang
 {
@@ -223,7 +224,11 @@ namespace MultiLang
 
                     // The rest of this logic is just to find the nearest match to the 
                     // current UI culture.
-                    // How well does this culture match?        
+                    // How well does this culture match?    
+
+                    //--lets print...
+                 //   MessageBox.Show("Cult = " + Cult);
+                        
                     if (SelectedCulture.Equals(Cult))
                     {
                         NewMatch = enumCultureMatch.Region;
@@ -261,13 +266,92 @@ namespace MultiLang
                     break;
             }
 
+            //event should be button pressed
+            btOK_Click(this, e);
+
         }
 
+
+        //--This function returns the values of the ID based on the data present in database...
+       public int DatabaseOperation()
+        {
+            int id_return = 1;
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+            
+            SQLiteConnection connection = new SQLiteConnection(connString);
+            connection.Open();
+            SQLiteDataReader reader = null;
+            SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_language_option where language_id = 1", connection);
+            //command.Parameters.AddWithValue("@1", userName)
+            reader = comm.ExecuteReader();
+            while (reader.Read())
+            {
+
+                //string selecte_location = reader["id"].ToString()+","+reader["country"].ToString() + "," + reader["state"].ToString() + "," + reader["city"].ToString();
+                //stored_location.Add(selecte_location);
+                id_return =int.Parse( reader["ID"].ToString());
+     
+            }
+           //  MessageBox.Show("id ret = " + id_return);
+            comm.Dispose();
+            reader.Dispose();
+            connection.Close();
+
+
+
+            return id_return;
+        }
+        string lstCultureSelected;//= "en-US";
         private void btOK_Click(object sender, System.EventArgs e)
         {
             if (lstCultures.SelectedItem != null)
             {
+                //--bbk This is changed based on the data available in the database..
+                //Steps: 
+                /*
+                1.Connect to the databse.
+                2. Get the id 
+                3. if id=1 english,id=2 chinese and id = 3 then korean
+                */
+                //--Connect to database
+                //"en-US", "zh-CHS", "ko-KR"
+
+                int returnValueDB = DatabaseOperation();
+                
+                if (returnValueDB == 1)
+                {
+                    lstCultureSelected = "en-US";
+                    // lstCultureSelected = "ko-KR";
+                    lstCultures.SelectedIndex = 0;
+
+
+                }
+                else if(returnValueDB == 2)
+                {
+                    lstCultureSelected = "zh-CHS";
+                    //lstCultures.SelectedIndex.Equals(2);
+                    lstCultures.SelectedIndex = 1;
+                }
+                else
+                {
+                   // lstCultureSelected = "en-US";
+                    lstCultureSelected = "ko-KR";
+                    // lstCultures.SelectedIndex.Equals(1);
+                    lstCultures.SelectedIndex = 2;
+                }
+
+
+               // lstCultures.Equals(lstCultureSelected);
+               // lstCultures.SelectedItem.Equals(lstCultureSelected);
                 SelectedCulture = (CultureInfo)lstCultures.SelectedItem;
+
+
+
+                // MessageBox.Show("lstCultures.SelectedItem= "+ lstCultures.SelectedItem);//--bbk
+
             }
             this.Close();
         }
@@ -286,5 +370,7 @@ namespace MultiLang
       public void SelectLanguage_Disposed ( object sender, System.EventArgs e )
       {
       }
+
+       
     }
 }

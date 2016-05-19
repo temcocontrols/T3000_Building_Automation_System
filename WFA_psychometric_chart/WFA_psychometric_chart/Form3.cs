@@ -111,7 +111,7 @@ namespace WFA_psychometric_chart
             }
             else
             {
-                MessageBox.Show("Please Enter proper pannel id field");
+                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_Enter_proper_pannel_id_);
             }
            
             //just a fix value for now..temp=25,hum=85
@@ -223,14 +223,14 @@ namespace WFA_psychometric_chart
                             cb_station_names.Items.Add(store_station_list[i].name);
 
                         }
-                        MessageBox.Show("values  = " + s);
+                       // MessageBox.Show("values  = " + s);
 
                     }//close of using webclient
 
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message+"\n Please make sure you are connected to internet!");
+                    MessageBox.Show(ex.Message+WFA_psychometric_chart.Properties.Resources._Please_make_sure_you_are_conn);
                     //cb_enable_disable.Enabled = false;
                     tb_location.Enabled = false;
                     tb_distance_from_build.Enabled = false;
@@ -331,10 +331,18 @@ namespace WFA_psychometric_chart
             else
             {
 
+                tb_max_adjust.Text = "";
+                tb_current_offset_percent.Text = "";
                 btn_help.Enabled = false;
                 tb_max_adjust.Enabled = false;
-               // tb_current_offset.Enabled = false;
+                // tb_current_offset.Enabled = false;
                 //btn_set_value.Enabled = false;
+
+                //Disposing the events
+                timer2.Stop();
+                timer2.Tick -= new EventHandler(timer2_Tick);
+
+                timer2.Dispose();
             }
 
 
@@ -362,7 +370,7 @@ namespace WFA_psychometric_chart
                 if (tb_latitude.Text == "" && tb_longitude.Text == "")
                 {
 
-                    string error_string = "Please select a location ";
+                    string error_string = WFA_psychometric_chart.Properties.Resources.Please_select_a_location;
                     MessageBox.Show(error_string, "error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     // MessageBox.Show("Please perform the follwing step first.\n 1.select a location \n 2.pull stored building data \n 3. get geo value(we need geo value)");
                 }
@@ -428,12 +436,12 @@ namespace WFA_psychometric_chart
         {
             //try
             //{
-            if (cb1_select_data.SelectedIndex > -1)
-            {
+           //f (cb1_select_data.SelectedIndex > -1)
+           //
                 //lets get the index parameter form the table...
                 //index_selected = cb1_select_data.SelectedIndex + 1; //
                 //MessageBox.Show("index = " + index_selected);
-                index_selected = temp_building_values[cb1_select_data.SelectedIndex].ID;//This is new configuration
+             // index_selected = temp_building_values[cb1_select_data.SelectedIndex].ID;//This is new configuration
                 //lets pull the vales offline values stored in db...
            //     string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
                 //string connString =@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\nischal\documents\visual studio 2013\Projects\WFA_psychometric_chart\WFA_psychometric_chart\T3000.mdb;Persist Security Info=True";
@@ -453,11 +461,11 @@ namespace WFA_psychometric_chart
                 {
                     connection.Open();
                     SQLiteDataReader reader = null;
-                    string queryString = "SELECT * from tbl_building_location WHERE ID=@index";
+                    string queryString = "SELECT * from tbl_building_location WHERE selection=1";
                     SQLiteCommand command = new SQLiteCommand(queryString, connection);
                     //command.Parameters.AddWithValue("@index", index);
                     //command.Parameters.Add("@index",DbType.Int32).Value= index_selected;
-                    command.Parameters.AddWithValue("@index", index_selected);
+                   // command.Parameters.AddWithValue("@index", index_selected);
                     reader = command.ExecuteReader();
                     while (reader.Read())
                     {
@@ -471,13 +479,16 @@ namespace WFA_psychometric_chart
                         tb_longitude.Text = reader["longitude"].ToString();
                         tb_elev.Text = reader["elevation"].ToString();
                         lb_building_name.Text = reader["BuildingName"].ToString();
+                        index_selected =int.Parse( reader["ID"].ToString()); //--This is added to check the select
                     }
                 }
-            }//close of if statement
-            else
-            {
-                MessageBox.Show("Please select an item.\n If you dont have a location then please insert first.");
-            }
+
+           
+        //}//close of if statement
+        //    else
+        //    {
+        //        MessageBox.Show("Please select an item.\n If you dont have a location then please insert first.");
+        //    }
 
             //catch (Exception ex)
             //{
@@ -923,8 +934,13 @@ namespace WFA_psychometric_chart
         {
             //This will help to insert the values...
 
-            Form4_insert_data f4 = new Form4_insert_data(this);
-            f4.Show();
+            //Form4_insert_data f4 = new Form4_insert_data(this);
+            //f4.Show();
+
+            //--This is now a refresh button that does the refresh things...
+            
+            get_stored_data();//--This get the latest changed data form db...
+
 
 
         }
@@ -943,7 +959,7 @@ namespace WFA_psychometric_chart
 
         public void fill_combobox()
         {
-            cb1_select_data.Items.Clear();
+           //b1_select_data.Items.Clear();
             ArrayList stored_location = new ArrayList();
             temp_building_values.Clear();//we need to clear the values for new items
             //while loading it should populate the field...
@@ -966,7 +982,7 @@ namespace WFA_psychometric_chart
             SQLiteConnection connection = new SQLiteConnection(connString);
                 connection.Open();
                 SQLiteDataReader reader = null;
-                SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_building_location", connection);
+                SQLiteCommand comm = new SQLiteCommand("SELECT * from tbl_building_location where selection = 1", connection);
                 //command.Parameters.AddWithValue("@1", userName)
                 reader = comm.ExecuteReader();
                 while (reader.Read())
@@ -988,7 +1004,8 @@ namespace WFA_psychometric_chart
                 {
 
                 string tempValue = temp_building_values[i].ID+","+temp_building_values[i].country + "," + temp_building_values[i].state + "," + temp_building_values[i].city;
-                 cb1_select_data.Items.Add(tempValue);
+                //b1_select_data.Items.Add(tempValue);
+               //b1_select_data.Items[0].Equals(tempValue;
                     //s += stored_location[i] + " , \n";
                 }
                // MessageBox.Show("stored place = " + s);
@@ -1004,9 +1021,236 @@ namespace WFA_psychometric_chart
 
         private void Form3_Load(object sender, EventArgs e)
         {
-            fill_combobox();
+            try { 
+
+            button1.Text = WFA_psychometric_chart.Properties.Resources.Refresh_Building;
+                label36.Text = WFA_psychometric_chart.Properties.Resources.Select_station_name;
+                //fill_combobox();
+
+                //--we need to check for the lat long value is present for particular selected items..
+                //--Before this we need to check for the available values..
+                // MessageBox.Show("enter");
+                //This part of the code should not be needed now because it is already present in main form
+
+                if (CheckLatLongAvailable() != true)
+                {
+                    FillLatLongValueAutomatically();//--Fill the lat long values...
+                    MessageBox.Show("show filllat");
+                }
+                //else
+                //{
+                //    //--if not true
+
+
+                // }
+
+                get_stored_data();//--This will get the selected data form the database...
+            cb_enable_disable.Enabled = true;
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
         }
+
+        //--This is for the checking weather lat and long value is available in database or not.
+        public bool CheckLatLongAvailable()
+        {
+            //--Lets do some connection checking and validating the data returned...
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+            bool returnValue = false;
+            string latValue = "";
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT * from tbl_building_location WHERE selection=1";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                //command.Parameters.AddWithValue("@index", index);
+                //command.Parameters.Add("@index",DbType.Int32).Value= index_selected;
+                // command.Parameters.AddWithValue("@index", index_selected);
+
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    //ListboxItems.Add(reader[1].ToString()+","+reader[2].ToString());
+                    latValue =   reader["latitude"].ToString();
+                }
+            }
+            if (latValue != "")
+            {
+                returnValue = true;
+            }
+            else
+            {
+                returnValue = false;
+            }
+
+            //--This will be either true or false based on the check value..
+            return returnValue;
+        }
+        string latPulledValue, longPulledValue, elevationPulledValue;
+
+        public void FillLatLongValueAutomatically()
+        {
+
+            string country = null, state=null, city=null, street=null, zip=null;
+            //--This portion fill the lat,long and elevation value is not present in the database by users..
+            //--Lets do some connection checking and validating the data returned...
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                SQLiteDataReader reader = null;
+                string queryString = "SELECT * from tbl_building_location WHERE selection=1";
+                SQLiteCommand command = new SQLiteCommand(queryString, connection);
+                //command.Parameters.AddWithValue("@index", index);
+                //command.Parameters.Add("@index",DbType.Int32).Value= index_selected;
+                // command.Parameters.AddWithValue("@index", index_selected);
+
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    //ListboxItems.Add(reader[1].ToString()+","+reader[2].ToString());
+                       country = reader["country"].ToString();
+                    state = reader["state"].ToString();
+                    city = reader["city"].ToString();
+                    street = reader["street"].ToString();
+                    zip =  reader["zip"].ToString();
+                }
+            }
+
+            MessageBox.Show("Country = "+country+",city "+city);
+
+            pull_data_online(country,state,city,street,zip);//--This will fill the online values form the database
+                                                            //--After pulling above we get three values we need to push it to database...
+
+            //--Upadating the table which has no values ...
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+                string sql_string = "update tbl_building_location set  latitude=@latitude_value,longitude=@longitude_value,elevation=@elevation  where selection=1;";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+                command.Parameters.AddWithValue("@latitude_value", latPulledValue.ToString());
+                command.Parameters.AddWithValue("@longitude_value", longPulledValue.ToString());
+                command.Parameters.AddWithValue("@elevation", elevationPulledValue.ToString());
+                command.ExecuteNonQuery();
+            }
+
+
+        }
+
+
+
+        private void pull_data_online(string country1,string state1,string city1,string street1,string zip1)
+        {
+            //this function pulls the data from online devices...
+
+
+            /*
+            1.country,state,city,street,latitude,longitude,elev,zip
+            */
+            string country = country1;
+            string state = state1;
+            string city = city1;
+            string street = street1;
+            string zip = zip1;
+            int value;
+            if (int.TryParse(zip, out value))
+            {
+
+                if (country != "" && city != "")
+                {
+                    string join_string = "";
+                    if (state != "" && street != "")
+                    {
+                        join_string = country + "," + state + "," + city + "," + street;
+                    }
+                    else
+                    {
+                        join_string = country + "," + city;
+                    }
+
+                    //geo location code goes here..
+                    try
+                    {
+
+                        var address = join_string;
+                        var requestUri = string.Format("http://maps.googleapis.com/maps/api/geocode/xml?address={0}&sensor=false", Uri.EscapeDataString(address));
+
+                        var request = WebRequest.Create(requestUri);
+                        var response = request.GetResponse();
+
+                        var xdoc = XDocument.Load(response.GetResponseStream());
+
+                        var result = xdoc.Element("GeocodeResponse").Element("result");
+                        //MessageBox.Show("result = " + result);
+                        var locationElement = result.Element("geometry").Element("location");
+                        var lat = locationElement.Element("lat");
+                        var lng = locationElement.Element("lng");
+
+                        double lat2 = Double.Parse(lat.Value);
+                        double lng2 = Double.Parse(lng.Value);
+                        latPulledValue = lat2.ToString();
+                        longPulledValue = lng2.ToString();
+
+                        //now lets go for the elevation calculation 
+                        //var latlng = lat2 + "," + lng2;
+                        //var reqUri = string.Format("https://maps.googleapis.com/maps/api/elevation/xml?locations='"+latlng+"'&key=AIzaSyB27paQGkpwaVGAd7wp0N6rcFkq5JEKeiQ");
+                        //MessageBox.Show("requrl= " + reqUri);
+                        //var req = WebRequest.Create(reqUri);
+                        //var resp = req.GetResponse();
+
+                        //var xdoc1 = XDocument.Load(resp.GetResponseStream());
+                        //MessageBox.Show("xdoc1= " + xdoc1);
+                        //var result1 = xdoc1.Element("elevation").Value;
+                        //MessageBox.Show("result1 = " + result1);
+                        double elevation = getElevation(lat2, lng2);
+                        //MessageBox.Show("elev= " + elevation);
+                       elevationPulledValue = elevation.ToString();
+                        //btn_insert_data.Enabled = true;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                       // btn_insert_data.Enabled = false;
+                        //tb_country.Text = "";
+                        //tb_city.Text = "";
+                        //tb_state.Text = "";
+                        //tb_street.Text = "";
+                        //tb_ZIP.Text = "";
+
+                    }
+
+
+
+                }//close of if...
+            }//close of if int try parse.
+            else
+            {
+                MessageBox.Show(WFA_psychometric_chart.Properties.Resources.Please_enter_a_valid_zip_numbe);
+            }
+
+        }
+
+        public double getElevation(double lat, double lng)
+        {
+            //https://developers.google.com/maps/documentation/elevation/intro
+            var request = (HttpWebRequest)WebRequest.Create(string.Format("https://maps.googleapis.com/maps/api/elevation/json?locations={0},{1}&key=AIzaSyB27paQGkpwaVGAd7wp0N6rcFkq5JEKeiQ", lat, lng));
+            var response = (HttpWebResponse)request.GetResponse();
+            var sr = new StreamReader(response.GetResponseStream() ?? new MemoryStream()).ReadToEnd();
+
+            var json = JObject.Parse(sr);
+            return (double)json.SelectToken("results[0].elevation");
+        }
+
 
         //private void button2_Click(object sender, EventArgs e)
         //{
@@ -1382,6 +1626,13 @@ namespace WFA_psychometric_chart
        double current_weather_hum = 0;
        //double temp_from_weather = 0;
        double total_percentage_change = 0;
+
+        //--This two values are constants always..
+        double initialHumOutDoorSensor = 0;
+        double initialHumWeatherSensor = 0;
+        double calibrationFactor = 0;
+
+        //--end
         public void adjust_hum_value()
         {
 
@@ -1403,36 +1654,77 @@ namespace WFA_psychometric_chart
                     else
                     {
                     
-                        if (adjusted_value == 0) { 
-                        //we need to compare the two values..
+                        //if (adjusted_value == 0) { 
+                        ////we need to compare the two values..
                          
-                         adjusted_value++;
-                        }
+                        // adjusted_value++;
+                        //}
                        
-                        double adjust_factor = Double.Parse(tb_max_adjust.Text);
-                        //adjusting by 1 degree up and down value.
-                        if (sensor_hum < current_weather_hum - 1)
-                        {
-                            //decrease the sensor humidity..
-                            sensor_hum += sensor_hum * adjust_factor/100;
+                        //double adjust_factor = Double.Parse(tb_max_adjust.Text);
+                        ////adjusting by 1 degree up and down value.
+                        //if (sensor_hum < current_weather_hum - 1)
+                        //{
+                        //    //decrease the sensor humidity..
+                        //    sensor_hum += sensor_hum * adjust_factor/100;
 
 
-                            total_percentage_change += adjust_factor;
-                            tb_current_offset_percent.Text = total_percentage_change.ToString();
-                        }
-                        else if (sensor_hum > current_weather_hum + 1)
-                        {
-                            sensor_hum -= sensor_hum * adjust_factor/100;
+                        //    total_percentage_change += adjust_factor;
+                        //    tb_current_offset_percent.Text = total_percentage_change.ToString();
+                        //}
+                        //else if (sensor_hum > current_weather_hum + 1)
+                        //{
+                        //    sensor_hum -= sensor_hum * adjust_factor/100;
 
-                            total_percentage_change -= adjust_factor;
-                            tb_current_offset_percent.Text = total_percentage_change.ToString();
-                        }
+                        //    total_percentage_change =(initialTempOutDoorSensor- sensor_hum) /initialTempOutDoorSensor*100;
+                        //    tb_current_offset_percent.Text = total_percentage_change.ToString();
+                        //}
 
                        // tb_current_offset.Text = sensor_hum.ToString();
                         /*percentage..*/
                         //double percent = (current_weather_hum - sensor_hum) / current_weather_hum * 100;
                         //tb_current_offset_percent.Text = percent.ToString();
                        
+                    //for out door humidity > weather humidity 
+                    if(initialHumOutDoorSensor > initialHumWeatherSensor)
+                        {
+                            //--Do this 
+
+                            sensor_hum -= sensor_hum * calibrationFactor / 100;
+                            total_percentage_change = (sensor_hum - initialHumOutDoorSensor) / initialHumOutDoorSensor * 100;
+                            tb_current_offset_percent.Text = total_percentage_change.ToString();
+
+//                            label34.Text = sensor_hum.ToString();
+
+                        }
+                        else if(initialHumOutDoorSensor < initialHumWeatherSensor)
+                        {
+
+                            sensor_hum += sensor_hum * calibrationFactor / 100;
+                            total_percentage_change = (sensor_hum - initialHumOutDoorSensor) / initialHumOutDoorSensor * 100;
+                            tb_current_offset_percent.Text = total_percentage_change.ToString();
+
+                            //--Test..
+                            //label34.Text = sensor_hum.ToString();                           
+
+                        }
+
+
+                      //--Stop condition
+                        if (sensor_hum < initialHumWeatherSensor + 1 && sensor_hum > initialHumWeatherSensor - 1)
+                        {
+                            //if sensor is around current weather condition..
+                           // MessageBox.Show("Stop pos ");
+                            timer2.Stop();
+                            timer2.Tick -= new EventHandler(timer2_Tick);
+                            timer2.Dispose();
+
+                        }
+
+
+
+
+
+
                     }
 
                 }
@@ -1452,15 +1744,20 @@ namespace WFA_psychometric_chart
             timer2.Tick += new EventHandler(timer2_Tick);
             timer2.Interval = 1000 * 3; // in miliseconds //2min * 30 = 60 min minute ie every 1 hour
 
-            if (sensor_hum > current_weather_hum + 1 && sensor_hum < current_weather_hum - 1)
+            if (sensor_hum < initialHumWeatherSensor + 1 && sensor_hum > initialHumWeatherSensor - 1)
             {
                 //if sensor is around current weather condition..
+               // MessageBox.Show("Stop pos ");
                 timer2.Stop();
+
+               
             }
-            else { 
+            else {
+
+               // MessageBox.Show("Start portion");
                 timer2.Start();
             }
-          
+           // MessageBox.Show("eND START");
         }
 
         
@@ -1484,11 +1781,16 @@ namespace WFA_psychometric_chart
                         if (tb_max_adjust.Text != "")
                         {
                             double x = double.Parse(tb_max_adjust.Text);
-                            if (x >= 0 && x <= 1)
+                            if (x > 0 && x <= 1)
                             {
                                 //temp_from_weather = double.Parse(tb_cw_temp.ToString());
                                 sensor_hum = Double.Parse(tb_hum_panel_value.Text);
                                 current_weather_hum = Double.Parse(tb_cw_hum.Text);
+
+                                //--Initializing intitials values.
+                                initialHumOutDoorSensor = sensor_hum;
+                                initialHumWeatherSensor = current_weather_hum;
+
                                 InitTimer2();
                             }
                             else
@@ -1539,60 +1841,51 @@ namespace WFA_psychometric_chart
 
         private void cb_event_on_index_change(object sender, EventArgs e)
         {
-            //fill_combobox();
-            cb_enable_disable.Enabled = false;
+           // //fill_combobox();
+           // cb_enable_disable.Enabled = false;
 
 
 
-            //dissable..
-            tb_location.Enabled = false;
-            tb_distance_from_build.Enabled = false;
-            tb_last_updated.Enabled = false;
-           // btn_pull_offline_data.Enabled = false;
-            //btn_update_now.Enabled = false;
-            tb_cw_barometer_value.Enabled = false;
-            tb_cw_direction.Enabled = false;
-            tb_cw_hum.Enabled = false;
-            tb_cw_temp.Enabled = false;
-            tb_cw_wind.Enabled = false;
-            cb_hum_self_calib.Enabled = false;
-            //btn_update_constantly.Enabled = false;
-            //dissable the second check box...
-            cb_hum_self_calib.Checked = false;
-            cb_station_names.Enabled = false;
-            tb_station_distance.Enabled = false;
+           // //dissable..
+           // tb_location.Enabled = false;
+           // tb_distance_from_build.Enabled = false;
+           // tb_last_updated.Enabled = false;
+           //// btn_pull_offline_data.Enabled = false;
+           // //btn_update_now.Enabled = false;
+           // tb_cw_barometer_value.Enabled = false;
+           // tb_cw_direction.Enabled = false;
+           // tb_cw_hum.Enabled = false;
+           // tb_cw_temp.Enabled = false;
+           // tb_cw_wind.Enabled = false;
+           // cb_hum_self_calib.Enabled = false;
+           // //btn_update_constantly.Enabled = false;
+           // //dissable the second check box...
+           // cb_hum_self_calib.Checked = false;
+           // cb_station_names.Enabled = false;
+           // tb_station_distance.Enabled = false;
 
 
 
-            tb_location.Text = "";
-            tb_distance_from_build.Text = "";
-            tb_last_updated.Text = "";
-            //btn_pull_offline_data.Enabled = true;
-            //btn_update_now.Enabled = true;//this will be true when user selects a station 
-            tb_cw_barometer_value.Text = "";
-            tb_cw_direction.Text = "";
-            tb_cw_hum.Text = "";
-            tb_cw_temp.Text = "";
-            tb_cw_wind.Text = "";
-            //cb_hum_self_calib.Enabled = true;
-            //btn_update_constantly.Enabled = true;//this will be true when user selects a station 
-            //cb_station_names.Enabled = true;
-            tb_station_distance.Text = "";
-            cb_enable_disable.Checked = false;
+           // tb_location.Text = "";
+           // tb_distance_from_build.Text = "";
+           // tb_last_updated.Text = "";
+           // //btn_pull_offline_data.Enabled = true;
+           // //btn_update_now.Enabled = true;//this will be true when user selects a station 
+           // tb_cw_barometer_value.Text = "";
+           // tb_cw_direction.Text = "";
+           // tb_cw_hum.Text = "";
+           // tb_cw_temp.Text = "";
+           // tb_cw_wind.Text = "";
+           // //cb_hum_self_calib.Enabled = true;
+           // //btn_update_constantly.Enabled = true;//this will be true when user selects a station 
+           // //cb_station_names.Enabled = true;
+           // tb_station_distance.Text = "";
+           // cb_enable_disable.Checked = false;
 
-
-
-
-
-
-
-
-
-
-
-            //index_selected = cb1_select_data.SelectedIndex + 1; //
-            int cb_index_selected = cb1_select_data.SelectedIndex;
-            index_selected = temp_building_values[cb_index_selected].ID;
+            
+           // //index_selected = cb1_select_data.SelectedIndex + 1; //
+           ////nt cb_index_selected = cb1_select_data.SelectedIndex;
+           // index_selected = temp_building_values[cb_index_selected].ID;
 
             get_stored_data();
             
@@ -1601,7 +1894,7 @@ namespace WFA_psychometric_chart
             
             
             
-            cb_enable_disable.Enabled = true;
+          //cb_enable_disable.Enabled = true;
 
 
 
@@ -1672,15 +1965,27 @@ namespace WFA_psychometric_chart
         private void tb_max_adjust_TextChanged(object sender, EventArgs e)
         {
            //this is where we are going to call the function ...
-            string a = tb_max_adjust.Text;
-            try
+           // string a = tb_max_adjust.Text;
+             try
             {
-                if (a.Length > 1)
+                calibrationFactor = double.Parse(tb_max_adjust.Text);
+
+
+                if (calibrationFactor <= 1 && calibrationFactor >0 )
                 {
-                    double x = double.Parse(a);
+                    //double x = double.Parse(a);
                     self_calibrate();
                 }
+                else
+                {
+                    //Dispose timer..
+                    //tb_max_adjust.Text = "";
+                    //tb_current_offset_percent.Text = "";
+                    timer2.Stop();
+                    timer2.Tick -= new EventHandler(timer2_Tick);
 
+                    timer2.Dispose();
+                }
 
 
 

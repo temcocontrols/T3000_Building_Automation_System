@@ -123,6 +123,14 @@
   <data name="button1.Text" xml:space="preserve">
     <value>그래프 새로 고침</value>
   </data>
+  <data name="button2.Text" xml:space="preserve">
+    <value>계산</value>
+    <comment>Previous text: Calculate</comment>
+  </data>
+  <data name="chart1.Text" xml:space="preserve">
+    <value>
+차트 1</value>
+  </data>
   <data name="exitToolStripMenuItem.Text" xml:space="preserve">
     <value>끝내기</value>
   </data>
@@ -132,11 +140,11 @@
   <data name="fileToolStripMenuItem.Text" xml:space="preserve">
     <value>파일</value>
   </data>
+  <data name="gb_select_date.Text" xml:space="preserve">
+    <value>열 지도</value>
+  </data>
   <data name="groupBox4.Text" xml:space="preserve">
     <value>다른 매개 변수 값</value>
-  </data>
-  <data name="heatMapToolStripMenuItem.Text" xml:space="preserve">
-    <value>열 지도</value>
   </data>
   <data name="helpPsychometricChartToolStripMenuItem.Text" xml:space="preserve">
     <value>심리 차트</value>
@@ -144,11 +152,18 @@
   <data name="helpToolStripMenuItem.Text" xml:space="preserve">
     <value>도움말</value>
   </data>
-  <data name="humiditySensorCalibrationToolStripMenuItem.Text" xml:space="preserve">
-    <value>습도 챔버 교정</value>
-  </data>
   <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
     <value>노드 삽입</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>에서 :</value>
+  </data>
+  <data name="label1_units.Text" xml:space="preserve">
+    <value>단위 (SI)</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>상대 습도:</value>
+    <comment>Previous text: Relative Humidity:</comment>
   </data>
   <data name="label2_DBT_units.Text" xml:space="preserve">
     <value>정도 C</value>
@@ -188,6 +203,7 @@
   </data>
   <data name="realTimePlottingToolStripMenuItem.Text" xml:space="preserve">
     <value>실시간으로 플롯</value>
+    <comment>Previous text: Real Time Plotting</comment>
   </data>
   <data name="saveAsToolStripMenuItem.Text" xml:space="preserve">
     <value>다른 이름으로 저장</value>

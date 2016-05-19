@@ -270,6 +270,7 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>89</StringID>
+    <Comment>Previous text: Real Time Plotting</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>90</StringID>
@@ -285,7 +286,7 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>94</StringID>
-    <Comment>Previous text: Insert new location</Comment>
+    <Comment>Previous text: Add new location</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>95</StringID>
@@ -773,6 +774,57 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>256</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>257</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>258</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>259</StringID>
+    <Comment>Previous text: Calculate</Comment>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>260</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>261</StringID>
+    <Comment>Previous text: Relative Humidity:</Comment>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>262</StringID>
+    <Comment>Previous text: Station name :</Comment>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>263</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>264</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>265</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>266</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>267</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>268</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>269</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>270</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>271</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>272</StringID>
   </GeneralIds>
   <Languages>
     <LanguageID>1033</LanguageID>
@@ -1323,7 +1375,7 @@
   <GeneralTexts>
     <StringID>89</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>Real Time Plotting</LanguageText>
+    <LanguageText>History Plot</LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
@@ -1353,7 +1405,7 @@
   <GeneralTexts>
     <StringID>94</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>Add new location</LanguageText>
+    <LanguageText>Refresh Building</LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
@@ -2788,7 +2840,7 @@
     <StringID>89</StringID>
     <LanguageID>4</LanguageID>
     <LanguageText>实时绘制</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>87</StringID>
@@ -3795,8 +3847,8 @@
   <GeneralTexts>
     <StringID>203</StringID>
     <LanguageID>1042</LanguageID>
-    <LanguageText>Psychrometric 계산기</LanguageText>
-    <Status>5</Status>
+    <LanguageText>심리 계산기</LanguageText>
+    <Status>2</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>77</StringID>
@@ -3934,7 +3986,7 @@
     <StringID>89</StringID>
     <LanguageID>1042</LanguageID>
     <LanguageText>실시간으로 플롯</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>87</StringID>
@@ -4748,6 +4800,239 @@ Enthalpy : </LanguageText>
     <LanguageID>1033</LanguageID>
     <LanguageText>db insertion : success !</LanguageText>
     <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>257</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>1013</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>258</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Show Comfort Zone</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>259</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>计算</LanguageText>
+    <Status>7</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>259</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Show Heat Map</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>259</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>계산</LanguageText>
+    <Status>7</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>260</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>From :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>261</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>相对湿度 ︰</LanguageText>
+    <Status>7</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>261</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>To :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>261</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>상대 습도:</LanguageText>
+    <Status>7</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>262</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>站名 ︰</LanguageText>
+    <Status>7</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>262</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Select station name :</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>262</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>역 이름:</LanguageText>
+    <Status>7</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>242</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>点击变色</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>242</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>색상을 변경하려면 클릭</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>55</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>
+차트 1</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>75</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>온도 (DBT) :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>75</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>温度 (DBT) :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>65</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>焓 :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>260</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>从 :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>260</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>에서 :</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>245</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>단위 (SI)</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>245</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>单位(SI)</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>263</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Please Enter proper pannel id field</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>264</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Please enter building name!</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>265</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Wet bulb temp</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>265</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>
+습구 온도</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>265</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>
+湿球温度</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>266</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Enthalpy kj/kg dry air</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>266</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>焓千焦/千克干空气</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>266</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>엔탈피 KJ / kg 건조 공기</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>267</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>                 start             end 
+</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>268</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Sequence :  </LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>269</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Dry Bulb Temperauter</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>270</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>
+ Please make sure you are connected to internet!</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>271</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Please select a location </LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>272</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Historical Plot</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>272</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>역사적 음모</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>272</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>历史情节</LanguageText>
+    <Status>2</Status>
   </GeneralTexts>
   <Properties>
     <Component>Form4_insert_data.cs</Component>
@@ -5903,7 +6188,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form3.cs</Component>
     <Name>label36.Text</Name>
-    <StringID>104</StringID>
+    <StringID>262</StringID>
     <Selected>true</Selected>
     <ResourceName>label36.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6343,7 +6628,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form1_main.cs</Component>
     <Name>label2.Text</Name>
-    <StringID>74</StringID>
+    <StringID>261</StringID>
     <Selected>true</Selected>
     <ResourceName>label2.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6351,7 +6636,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form1_main.cs</Component>
     <Name>label1.Text</Name>
-    <StringID>75</StringID>
+    <StringID>260</StringID>
     <Selected>true</Selected>
     <ResourceName>label1.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -6375,7 +6660,7 @@ Enthalpy : </LanguageText>
   <Properties>
     <Component>Form1_main.cs</Component>
     <Name>button2.Text</Name>
-    <StringID>77</StringID>
+    <StringID>259</StringID>
     <Selected>true</Selected>
     <ResourceName>button2.Text</ResourceName>
     <Hidden>false</Hidden>
@@ -8324,6 +8609,134 @@ Enthalpy : </LanguageText>
     <ResourceName>Refresh_Graph</ResourceName>
     <Hidden>false</Hidden>
   </Properties>
+  <Properties>
+    <Component>Form_Psychrometric_Calculator.cs</Component>
+    <Name>tb_atm_pressure.Text</Name>
+    <StringID>257</StringID>
+    <Selected>true</Selected>
+    <ResourceName>tb_atm_pressure.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>showComfortZoneToolStripMenuItem.Text</Name>
+    <StringID>258</StringID>
+    <Selected>true</Selected>
+    <ResourceName>showComfortZoneToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>gb_select_date.Text</Name>
+    <StringID>126</StringID>
+    <Selected>true</Selected>
+    <ResourceName>gb_select_date.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form_Psychrometric_Calculator.cs</Component>
+    <Name>tb_atm_pressure.Lines[0]</Name>
+    <StringID>257</StringID>
+    <Selected>true</Selected>
+    <ResourceName>tb_atm_pressure.Lines[0]</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Please_Enter_proper_pannel_id_</Name>
+    <StringID>263</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Please_Enter_proper_pannel_id_</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Refresh_Building</Name>
+    <StringID>94</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Refresh_Building</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Select_station_name</Name>
+    <StringID>262</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Select_station_name</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Wet_bulb_temp</Name>
+    <StringID>265</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Wet_bulb_temp</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Enthalpy_kj_kg_dry_air</Name>
+    <StringID>266</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Enthalpy_kj_kg_dry_air</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Show_Heat_Map</Name>
+    <StringID>259</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Show_Heat_Map</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>From</Name>
+    <StringID>53</StringID>
+    <Selected>true</Selected>
+    <ResourceName>From</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>To</Name>
+    <StringID>52</StringID>
+    <Selected>true</Selected>
+    <ResourceName>To</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>_start_end</Name>
+    <StringID>267</StringID>
+    <Selected>true</Selected>
+    <ResourceName>_start_end</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Please_select_a_location</Name>
+    <StringID>271</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Please_select_a_location</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>_Please_make_sure_you_are_conn</Name>
+    <StringID>270</StringID>
+    <Selected>true</Selected>
+    <ResourceName>_Please_make_sure_you_are_conn</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Resources.resx</Component>
+    <Name>Historical_Plot</Name>
+    <StringID>272</StringID>
+    <Selected>true</Selected>
+    <ResourceName>Historical_Plot</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
   <GeneralAttributes>
     <Name>XmlDatabaseVersion</Name>
     <TextValue>1</TextValue>
@@ -8331,7 +8744,7 @@ Enthalpy : </LanguageText>
   </GeneralAttributes>
   <GeneralAttributes>
     <Name>StatusHash</Name>
-    <TextValue>GRT1XL2rMl6OCEzngjuwYA5WUHI=</TextValue>
+    <TextValue>PrWGEPg8jzfx1DLxs9NTfvx7cu4=</TextValue>
     <NumValue>0</NumValue>
   </GeneralAttributes>
   <GeneralAttributes>

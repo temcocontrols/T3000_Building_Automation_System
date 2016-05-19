@@ -142,6 +142,14 @@ Enthalpy : </value>
   <data name="_Internet_Connection_Lost" xml:space="preserve">
     <value>                Internet Connection Lost:</value>
   </data>
+  <data name="_Please_make_sure_you_are_conn" xml:space="preserve">
+    <value>
+ Please make sure you are connected to internet!</value>
+  </data>
+  <data name="_start_end" xml:space="preserve">
+    <value>                 start             end 
+</value>
+  </data>
   <data name="_Your_chart_image_will_be_save" xml:space="preserve">
     <value> Your chart image will be saved as </value>
   </data>
@@ -185,6 +193,9 @@ Enthalpy : </value>
   <data name="enter_ZIP_number" xml:space="preserve">
     <value>enter ZIP number</value>
   </data>
+  <data name="Enthalpy_kj_kg_dry_air" xml:space="preserve">
+    <value>Enthalpy kj/kg dry air</value>
+  </data>
   <data name="Error" xml:space="preserve">
     <value>Error</value>
   </data>
@@ -197,11 +208,17 @@ Enthalpy : </value>
   <data name="error0" xml:space="preserve">
     <value>error</value>
   </data>
+  <data name="From" xml:space="preserve">
+    <value>From :</value>
+  </data>
   <data name="Help" xml:space="preserve">
     <value>Help</value>
   </data>
   <data name="Historical_Data" xml:space="preserve">
     <value>Historical Data,</value>
+  </data>
+  <data name="Historical_Plot" xml:space="preserve">
+    <value>Historical Plot</value>
   </data>
   <data name="Humidity_in" xml:space="preserve">
     <value>Humidity(in %)</value>
@@ -230,6 +247,9 @@ Enthalpy : </value>
   <data name="Please_enter_a_value_for_adjus" xml:space="preserve">
     <value>Please enter a value for adjustment factor</value>
   </data>
+  <data name="Please_Enter_proper_pannel_id_" xml:space="preserve">
+    <value>Please Enter proper pannel id field</value>
+  </data>
   <data name="Please_enter_value_between_0_1" xml:space="preserve">
     <value>Please enter value between 0-1%</value>
   </data>
@@ -248,6 +268,9 @@ Enthalpy : </value>
   </data>
   <data name="Please_pull_the_current_weathe" xml:space="preserve">
     <value>Please pull the current weather value first</value>
+  </data>
+  <data name="Please_select_a_location" xml:space="preserve">
+    <value>Please select a location </value>
   </data>
   <data name="Please_select_a_location_first" xml:space="preserve">
     <value>Please select a location first !</value>
@@ -276,6 +299,10 @@ Enthalpy : </value>
   <data name="pulling" xml:space="preserve">
     <value>pulling...</value>
   </data>
+  <data name="Refresh_Building" xml:space="preserve">
+    <value>Refresh Building</value>
+    <comment>Previous text: Add new location</comment>
+  </data>
   <data name="Refresh_Graph" xml:space="preserve">
     <value>Refresh Graph</value>
   </data>
@@ -287,6 +314,14 @@ Enthalpy : </value>
   </data>
   <data name="Select_language" xml:space="preserve">
     <value>Select language</value>
+  </data>
+  <data name="Select_station_name" xml:space="preserve">
+    <value>Select station name :</value>
+    <comment>Previous text: Station name :</comment>
+  </data>
+  <data name="Show_Heat_Map" xml:space="preserve">
+    <value>Show Heat Map</value>
+    <comment>Previous text: Calculate</comment>
   </data>
   <data name="Station_Information" xml:space="preserve">
     <value>Station Information :</value>
@@ -313,8 +348,14 @@ Enthalpy : </value>
   <data name="Time_Status_Time_Error_Status" xml:space="preserve">
     <value>Time Status                  Time                            Error Status</value>
   </data>
+  <data name="To" xml:space="preserve">
+    <value>To :</value>
+  </data>
   <data name="value_inserted_successfully" xml:space="preserve">
     <value>value inserted successfully!</value>
+  </data>
+  <data name="Wet_bulb_temp" xml:space="preserve">
+    <value>Wet bulb temp</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Yes</value>

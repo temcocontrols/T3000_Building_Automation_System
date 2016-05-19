@@ -39,11 +39,8 @@
             this.printMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFD = new System.Windows.Forms.SaveFileDialog();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.cb1_select_data = new System.Windows.Forms.ComboBox();
             this.gb_select_date = new System.Windows.Forms.GroupBox();
             this.menuStrip1.SuspendLayout();
-            this.groupBox3.SuspendLayout();
             this.gb_select_date.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -70,6 +67,7 @@
             resources.ApplyResources(this.dtp_From, "dtp_From");
             this.dtp_From.Name = "dtp_From";
             this.dtp_From.Value = new System.DateTime(2016, 1, 1, 0, 0, 0, 0);
+
             // 
             // dtp_To
             // 
@@ -104,21 +102,6 @@
             resources.ApplyResources(this.saveAsImageToolStripMenuItem, "saveAsImageToolStripMenuItem");
             this.saveAsImageToolStripMenuItem.Click += new System.EventHandler(this.saveAsImageToolStripMenuItem_Click);
             // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.cb1_select_data);
-            resources.ApplyResources(this.groupBox3, "groupBox3");
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.TabStop = false;
-            // 
-            // cb1_select_data
-            // 
-            this.cb1_select_data.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cb1_select_data.FormattingEnabled = true;
-            resources.ApplyResources(this.cb1_select_data, "cb1_select_data");
-            this.cb1_select_data.Name = "cb1_select_data";
-            this.cb1_select_data.SelectedIndexChanged += new System.EventHandler(this.cb1_select_data_SelectedIndexChanged);
-            // 
             // gb_select_date
             // 
             this.gb_select_date.Controls.Add(this.dtp_From);
@@ -135,7 +118,6 @@
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.gb_select_date);
-            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
@@ -144,7 +126,6 @@
             this.Load += new System.EventHandler(this.form_heat_map_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
             this.gb_select_date.ResumeLayout(false);
             this.gb_select_date.PerformLayout();
             this.ResumeLayout(false);
@@ -163,8 +144,6 @@
         private System.Windows.Forms.ToolStripMenuItem printMapToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsImageToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog saveFD;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.ComboBox cb1_select_data;
         private System.Windows.Forms.GroupBox gb_select_date;
     }
 }

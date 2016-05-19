@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="$this.Text" xml:space="preserve">
-    <value>Psychrometric 계산기</value>
+    <value>심리 계산기</value>
   </data>
   <data name="button2.Text" xml:space="preserve">
     <value>계산</value>
@@ -126,8 +126,14 @@
   <data name="groupBox1.Text" xml:space="preserve">
     <value>계산</value>
   </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>온도 (DBT) :</value>
+  </data>
   <data name="label10.Text" xml:space="preserve">
     <value>혼합된 가스 비율:</value>
+  </data>
+  <data name="label11.Text" xml:space="preserve">
+    <value>焓 :</value>
   </data>
   <data name="label2.Text" xml:space="preserve">
     <value>상대 습도:</value>

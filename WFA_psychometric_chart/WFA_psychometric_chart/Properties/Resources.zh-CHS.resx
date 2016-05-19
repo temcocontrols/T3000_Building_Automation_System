@@ -163,6 +163,9 @@
   <data name="enter_ZIP_number" xml:space="preserve">
     <value>输入 ZIP 编号</value>
   </data>
+  <data name="Enthalpy_kj_kg_dry_air" xml:space="preserve">
+    <value>焓千焦/千克干空气</value>
+  </data>
   <data name="Error" xml:space="preserve">
     <value>错误</value>
   </data>
@@ -175,11 +178,17 @@
   <data name="error0" xml:space="preserve">
     <value>错误</value>
   </data>
+  <data name="From" xml:space="preserve">
+    <value>从：</value>
+  </data>
   <data name="Help" xml:space="preserve">
     <value>帮助</value>
   </data>
   <data name="Historical_Data" xml:space="preserve">
     <value>历史数据</value>
+  </data>
+  <data name="Historical_Plot" xml:space="preserve">
+    <value>历史情节</value>
   </data>
   <data name="Humidity_in" xml:space="preserve">
     <value>湿度 （在 %）</value>
@@ -254,6 +263,10 @@
   <data name="pulling" xml:space="preserve">
     <value>拉......</value>
   </data>
+  <data name="Refresh_Building" xml:space="preserve">
+    <value>插入新的位置</value>
+    <comment>Previous text: Add new location</comment>
+  </data>
   <data name="Refresh_Graph" xml:space="preserve">
     <value>刷新图表</value>
   </data>
@@ -265,6 +278,14 @@
   </data>
   <data name="Select_language" xml:space="preserve">
     <value>选择语言</value>
+  </data>
+  <data name="Select_station_name" xml:space="preserve">
+    <value>站名 ︰</value>
+    <comment>Previous text: Station name :</comment>
+  </data>
+  <data name="Show_Heat_Map" xml:space="preserve">
+    <value>计算</value>
+    <comment>Previous text: Calculate</comment>
   </data>
   <data name="Station_Information" xml:space="preserve">
     <value>站的信息 ︰</value>
@@ -291,8 +312,15 @@
   <data name="Time_Status_Time_Error_Status" xml:space="preserve">
     <value>时间状态时间错误状态</value>
   </data>
+  <data name="To" xml:space="preserve">
+    <value>自：</value>
+  </data>
   <data name="value_inserted_successfully" xml:space="preserve">
     <value>成功插入的值 ！</value>
+  </data>
+  <data name="Wet_bulb_temp" xml:space="preserve">
+    <value>
+湿球温度</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>是</value>

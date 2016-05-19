@@ -117,32 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="cb1_select_data.IntegralHeight" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="cb1_select_data.Location" type="System.Drawing.Point, System.Drawing">
-    <value>16, 20</value>
-  </data>
-  <data name="cb1_select_data.Size" type="System.Drawing.Size, System.Drawing">
-    <value>194, 22</value>
-  </data>
-  <data name="cb1_select_data.TabIndex" type="System.Int32, mscorlib">
-    <value>25</value>
-  </data>
-  <data name="&gt;&gt;cb1_select_data.Name" xml:space="preserve">
-    <value>cb1_select_data</value>
-  </data>
-  <data name="&gt;&gt;cb1_select_data.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;cb1_select_data.Parent" xml:space="preserve">
-    <value>groupBox3</value>
-  </data>
-  <data name="&gt;&gt;cb1_select_data.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
   <data name="checkedListBox1.Items" xml:space="preserve">
     <value>Select all</value>
   </data>
@@ -218,12 +192,14 @@
   <data name="checkedListBox1.Items24" xml:space="preserve">
     <value>24</value>
   </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="checkedListBox1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>115, 20</value>
+    <value>98, 19</value>
   </data>
   <data name="checkedListBox1.Size" type="System.Drawing.Size, System.Drawing">
     <value>98, 94</value>
   </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="checkedListBox1.TabIndex" type="System.Int32, mscorlib">
     <value>24</value>
   </data>
@@ -243,7 +219,7 @@
     <value>True</value>
   </data>
   <data name="label9.Location" type="System.Drawing.Point, System.Drawing">
-    <value>23, 42</value>
+    <value>6, 41</value>
   </data>
   <data name="label9.Size" type="System.Drawing.Size, System.Drawing">
     <value>68, 14</value>
@@ -267,10 +243,10 @@
     <value>4</value>
   </data>
   <data name="dtp2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>115, 176</value>
+    <value>69, 167</value>
   </data>
   <data name="dtp2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>200, 20</value>
+    <value>156, 20</value>
   </data>
   <data name="dtp2.TabIndex" type="System.Int32, mscorlib">
     <value>22</value>
@@ -291,10 +267,10 @@
     <value />
   </data>
   <data name="dtp1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>115, 128</value>
+    <value>69, 119</value>
   </data>
   <data name="dtp1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>200, 20</value>
+    <value>156, 20</value>
   </data>
   <data name="dtp1.TabIndex" type="System.Int32, mscorlib">
     <value>21</value>
@@ -315,7 +291,7 @@
     <value>True</value>
   </data>
   <data name="label8.Location" type="System.Drawing.Point, System.Drawing">
-    <value>54, 182</value>
+    <value>8, 173</value>
   </data>
   <data name="label8.Size" type="System.Drawing.Size, System.Drawing">
     <value>24, 14</value>
@@ -342,7 +318,7 @@
     <value>True</value>
   </data>
   <data name="label7.Location" type="System.Drawing.Point, System.Drawing">
-    <value>54, 128</value>
+    <value>8, 119</value>
   </data>
   <data name="label7.Size" type="System.Drawing.Size, System.Drawing">
     <value>37, 14</value>
@@ -365,14 +341,11 @@
   <data name="&gt;&gt;label7.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="gb_select_time_and_date.Enabled" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
   <data name="gb_select_time_and_date.Location" type="System.Drawing.Point, System.Drawing">
-    <value>22, 81</value>
+    <value>12, 12</value>
   </data>
   <data name="gb_select_time_and_date.Size" type="System.Drawing.Size, System.Drawing">
-    <value>324, 225</value>
+    <value>259, 225</value>
   </data>
   <data name="gb_select_time_and_date.TabIndex" type="System.Int32, mscorlib">
     <value>27</value>
@@ -390,30 +363,6 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;gb_select_time_and_date.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="groupBox3.Location" type="System.Drawing.Point, System.Drawing">
-    <value>22, 13</value>
-  </data>
-  <data name="groupBox3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>324, 61</value>
-  </data>
-  <data name="groupBox3.TabIndex" type="System.Int32, mscorlib">
-    <value>28</value>
-  </data>
-  <data name="groupBox3.Text" xml:space="preserve">
-    <value>Select a location</value>
-  </data>
-  <data name="&gt;&gt;groupBox3.Name" xml:space="preserve">
-    <value>groupBox3</value>
-  </data>
-  <data name="&gt;&gt;groupBox3.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;groupBox3.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;groupBox3.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -423,7 +372,7 @@
     <value>6, 14</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>356, 327</value>
+    <value>290, 250</value>
   </data>
   <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 8.25pt</value>
