@@ -65,6 +65,7 @@ public:
 	afx_msg void OnBnClickedButtonLabelExit();
 	CStaticEx m_edit_icon2_path;
 	afx_msg void OnStnClickedEditIconPath2();
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };
 
 const int CHANGE_AUTO_MANUAL = 1;

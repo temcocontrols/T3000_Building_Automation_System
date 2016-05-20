@@ -308,6 +308,8 @@ public:
 	void  Show_Wait_Dialog_And_ReadBacnet();
 	static DWORD WINAPI  Send_Set_Config_Command_Thread(LPVOID lpVoid);
 	static DWORD WINAPI  Read_Bacnet_Thread(LPVOID lpVoid);
+	static DWORD WINAPI  Read_Modbus_10000(LPVOID lpVoid);
+	static DWORD WINAPI  Write_Modbus_10000(LPVOID lpVoid);
 	void OnMBP();
 	void SwitchToPruductType(int nIndex);
 	void OnFileOpen();
@@ -502,6 +504,7 @@ public:
 	CDialogInfo *m_pDialogInfo;
 public:
 	void Create_Thread_Read_Item(int n_item);
+	void Check_Local_TemcoUpdate();
     BOOL DownloadFromFTP();
 	static void CALLBACK _OnStatusCallBack(HINTERNET hInternet, DWORD dwContext, DWORD dwInternetStatus, 
 		LPVOID lpvStatusInformation, DWORD dwStatusInformationLength);
@@ -543,7 +546,7 @@ public:
     //    BOOL CheckNameFromDevice(CString NameFromDevice);
   // virtual void GetMessageString(UINT nID, CString& rMessage);
         afx_msg void OnToolBootloader();
-		afx_msg void OnHelpCheckupdate();
+		afx_msg void OnHelpUsingUpdate();
 		afx_msg void OnToolsPsychrometry();
 		afx_msg void OnToolsOption();
 };

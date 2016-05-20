@@ -725,6 +725,8 @@ typedef union
 		 uint8_t sd_exist;  // 1 -no    2- yes
 		 unsigned short modbus_port;
 		 unsigned char modbus_id;
+		 unsigned int object_instance ;
+		 unsigned int time_update_since_1970;
 	}reg;
 }Str_Setting_Info;
 

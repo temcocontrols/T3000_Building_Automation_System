@@ -208,6 +208,7 @@
     <ClCompile Include="CO2_View.cpp" />
     <ClCompile Include="ConfigFileHandler.cpp" />
     <ClCompile Include="Config_Routines.cpp" />
+    <ClCompile Include="ConnectRemoteServer.cpp" />
     <ClCompile Include="CustomSTable.cpp" />
     <ClCompile Include="BacnetView.cpp" />
     <ClCompile Include="DebugWindow.cpp" />
@@ -400,6 +401,7 @@
     <None Include="res\Select.ico" />
     <None Include="res\serialnum.ico" />
     <None Include="C:\Documents and Settings\lee\桌面\serialnum.ico" />
+    <None Include="res\sqlite3.dll" />
     <None Include="res\switch_off.ico" />
     <None Include="res\switch_on.ico" />
     <None Include="res\T3000.ico" />
@@ -510,6 +512,7 @@
     <ClInclude Include="CO2NetView.h" />
     <ClInclude Include="CO2_View.h" />
     <ClInclude Include="ConfigFileHandler.h" />
+    <ClInclude Include="ConnectRemoteServer.h" />
     <ClInclude Include="CustomSTable.h" />
     <ClInclude Include="DebugWindow.h" />
     <ClInclude Include="DetectOnlineDlg.h" />

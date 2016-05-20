@@ -40,6 +40,7 @@ void CBacnetSetting::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_DYNDNS_DOMAIN, m_dyndns_domain);
 	DDX_Control(pDX, IDC_EDIT_TIME_UPDATE, m_edit_ddns_update_time);
 	DDX_Control(pDX, IDC_EDIT_SETTING_PORT, m_edit_port);
+	DDX_Control(pDX, IDC_EDIT_SETTING_OBJ_INSTANCE, m_setting_obj_instance);
 }
 
 
@@ -84,7 +85,7 @@ BEGIN_MESSAGE_MAP(CBacnetSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK_SETTING_PAP, &CBacnetSetting::OnBnClickedCheckSettingPap)
 	ON_EN_KILLFOCUS(IDC_EDIT_SETTING_PORT, &CBacnetSetting::OnEnKillfocusEditSettingPort)
 	ON_BN_CLICKED(IDC_BUTTON_HEALTH, &CBacnetSetting::OnBnClickedButtonHealth)
-
+	ON_EN_KILLFOCUS(IDC_EDIT_SETTING_OBJ_INSTANCE, &CBacnetSetting::OnEnKillfocusEditSettingObjInstance)
 	ON_WM_HELPINFO()
 
 END_MESSAGE_MAP()
@@ -408,11 +409,26 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 					Device_Basic_Setting.reg.en_dyndns = 1;
 					((CButton *)GetDlgItem(IDC_CHECK_SETTING_DYNDNS))->SetCheck(false);
 				}
+				if((Device_Basic_Setting.reg.time_update_since_1970 < 1420041600)  || (Device_Basic_Setting.reg.time_update_since_1970 > 1735660800))
+				{
+					((CEdit *)GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(_T("N/A"));
+				}
+				else
+				{
+					CTime time_scaletime;
+					CString strTime;
+					time_t scale_time  = Device_Basic_Setting.reg.time_update_since_1970;
+					time_scaletime = scale_time;
+					strTime = time_scaletime.Format("%y/%m/%d %H:%M:%S");
+					((CEdit *)GetDlgItem(IDC_EDIT_SETTING_LAST_UPDATE_TIME))->SetWindowTextW(strTime);
+				}
 
+				
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->ResetContent();
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[0]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[1]);
 				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[2]);
+				((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->AddString(DDNS_Server_Name[3]);
 
 				if(Device_Basic_Setting.reg.dyndns_provider == 0)
 					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[0]);
@@ -420,6 +436,8 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[1]);
 				else if(Device_Basic_Setting.reg.dyndns_provider == 2)
 					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[2]);
+				else if(Device_Basic_Setting.reg.dyndns_provider == 3)
+					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(DDNS_Server_Name[3]);
 				else
 					((CComboBox *)GetDlgItem(IDC_COMBO_BACNET_SETTING_DDNS_SERVER))->SetWindowTextW(_T(""));
 
@@ -669,7 +687,11 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 				temp_mcu_version.Format(_T("%d.%d"),Device_Basic_Setting.reg.pro_info.firmware0_rev_main,Device_Basic_Setting.reg.pro_info.firmware0_rev_sub);
 				temp_bootloader_version.Format(_T("%d"),Device_Basic_Setting.reg.pro_info.bootloader_rev);
 			}
-			temp_serial_number.Format(_T("%u"),g_selected_serialnumber);
+			//temp_serial_number.Format(_T("%u"),g_selected_serialnumber);
+			if(  ((int)Device_Basic_Setting.reg.pro_info.firmware0_rev_main) *10   +  (int)Device_Basic_Setting.reg.pro_info.firmware0_rev_sub > 417)
+				temp_serial_number.Format(_T("%u"),Device_Basic_Setting.reg.n_serial_number);
+			else
+				temp_serial_number.Format(_T("%u"),g_selected_serialnumber);
 			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_HARDWARE_VERSION))->SetWindowTextW(temp_hw_version);
 			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_MCU_VERSION))->SetWindowTextW(temp_mcu_version);
 			((CEdit *)GetDlgItem(IDC_STATIC_SEETING_PIC_VERSION))->SetWindowTextW(temp_pic_version);
@@ -691,7 +713,7 @@ LRESULT CBacnetSetting::Fresh_Setting_UI(WPARAM wParam,LPARAM lParam)
 			CString temp_mstp_network;
 			CString temp_bip_network;
 			CString temp_modbus_id;
-			temp_object.Format(_T("%u"),g_bac_instance);
+			temp_object.Format(_T("%u"),Device_Basic_Setting.reg.object_instance);
 			temp_mac_address.Format(_T("%02x-%02x-%02x-%02x-%02x-%02x"),Device_Basic_Setting.reg.mac_addr[0],Device_Basic_Setting.reg.mac_addr[1],Device_Basic_Setting.reg.mac_addr[2],
 															Device_Basic_Setting.reg.mac_addr[3],Device_Basic_Setting.reg.mac_addr[4],Device_Basic_Setting.reg.mac_addr[5]);
 			temp_mac_address.MakeUpper();
@@ -762,7 +784,7 @@ BOOL CBacnetSetting::OnInitDialog()
 	hIcon = (HICON)::LoadImage(hInstResource, MAKEINTRESOURCE(IDI_ICON_OK), IMAGE_ICON, 24, 24, 0); 
 	((CButton *)GetDlgItem(IDC_BUTTON_BAC_IP_CHANGED))->SetIcon(hIcon);
 
- 
+
 	
 	return false;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -781,7 +803,8 @@ BOOL CBacnetSetting::PreTranslateMessage(MSG* pMsg)
 			(temp_focus_id == IDC_EDIT_DYNDNS_PASSWORD) ||
 			(temp_focus_id == IDC_EDIT_DYNDNS_DOMAIN) ||
 			(temp_focus_id == IDC_EDIT_TIME_UPDATE) ||
-			(temp_focus_id == IDC_EDIT_SETTING_PORT))
+			(temp_focus_id == IDC_EDIT_SETTING_PORT) ||
+			(temp_focus_id == IDC_EDIT_SETTING_OBJ_INSTANCE))
 		{
 			GetDlgItem(IDC_BUTTON_BAC_TEST)->SetFocus();
 		}
@@ -1341,6 +1364,8 @@ void CBacnetSetting::OnCbnSelchangeComboBacnetSettingDdnsServer()
 		Device_Basic_Setting.reg.dyndns_provider = 1;
 	else if(nSel == 2)
 		Device_Basic_Setting.reg.dyndns_provider = 2;
+	else if(nSel == 3)
+		Device_Basic_Setting.reg.dyndns_provider = 3;
 
 	CString temp_task_info;
 	temp_task_info.Format(_T("Change DDNS server to "));
@@ -1455,24 +1480,38 @@ void CBacnetSetting::OnBnClickedButtonHealth()
 }
 
 
-//void CBacnetSetting::HtmlHelp(DWORD_PTR dwData, UINT nCmd)
-//{
-//	// TODO: Add your specialized code here and/or call the base class
-//	if (g_protocol==PROTOCOL_BACNET_IP){
-//		HWND hWnd;
-//
-//		if(pHelpInfo->dwContextId > 0) hWnd = ::HtmlHelp((HWND)pHelpInfo->hItemHandle, 			
-//			theApp.m_szHelpFile, HH_HELP_CONTEXT, pHelpInfo->dwContextId);
-//		else
-//			hWnd =  ::HtmlHelp((HWND)pHelpInfo->hItemHandle, theApp.m_szHelpFile, 			
-//			HH_HELP_CONTEXT, IDH_TOPIC_6_10_ALARM_LOG);
-//		return (hWnd != NULL);
-//	}
-//	else{
-//		::HtmlHelp(NULL, theApp.m_szHelpFile, HH_HELP_CONTEXT, IDH_TOPIC_OVERVIEW);
-//	}
-//	CDialogEx::HtmlHelp(dwData, nCmd);
-//}
+void CBacnetSetting::OnEnKillfocusEditSettingObjInstance()
+{
+	// TODO: Add your control notification handler code here
+	CString temp_cstring;
+	m_setting_obj_instance.GetWindowTextW(temp_cstring);
+	unsigned int temp_obj_instance = unsigned int(_wtoi(temp_cstring));
+	if((temp_obj_instance >0) && (temp_obj_instance <= MAX_OBJ_INSTANCE) && (temp_obj_instance != Device_Basic_Setting.reg.object_instance))
+	{
+		CString temp_warning;
+		temp_warning.Format(_T("Do you really want to change the bacnet object instance to %u ?"),temp_obj_instance);
+		if(IDYES == MessageBox(temp_warning,_T("Notoce"),MB_YESNO))
+		{
+			unsigned int old_object_instance = Device_Basic_Setting.reg.object_instance;	//写之前先保存起来；写失败 恢复原值;
+			Device_Basic_Setting.reg.object_instance = (unsigned int)temp_obj_instance;
+			if(Write_Private_Data_Blocking(WRITE_SETTING_COMMAND,0,0) <= 0)
+			{
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change object instance failed!"));
+				Device_Basic_Setting.reg.object_instance = old_object_instance;
+				PostMessage(WM_FRESH_CM_LIST,READ_SETTING_COMMAND,NULL);
+			}
+			else
+			{
+				g_bac_instance = temp_obj_instance;
+				SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Change object instance success!"));
+			}
+		}
+		else
+		{
+			PostMessage(WM_FRESH_SETTING_UI,READ_SETTING_COMMAND,NULL);//这里调用 刷新线程重新刷新会方便一点;
+		}
+	}
+}
 
 
 BOOL CBacnetSetting::OnHelpInfo(HELPINFO* pHelpInfo)

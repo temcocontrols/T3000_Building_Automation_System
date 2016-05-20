@@ -1630,9 +1630,6 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     case WRITE_SETTING_COMMAND:
     {
         memcpy_s(SendBuffer + HEADER_LENGTH,sizeof(Str_Setting_Info),&Device_Basic_Setting,sizeof(Str_Setting_Info));
-        CString test_serial_number;
-        test_serial_number.Format(_T("Write Setting %u"),Device_Basic_Setting.reg.n_serial_number);
-        DFTrace(test_serial_number);
     }
     break;
     case WRITEPID_T3000:
@@ -1688,6 +1685,26 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
     break;
     }
 
+
+
+	if((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
+	{
+		CString total_char_test;
+		total_char_test = _T("Write : ");
+		char * temp_print_test = NULL;
+		temp_print_test = SendBuffer;
+		for (int i = 0; i< private_data_chunk.total_length ; i++)
+		{
+			CString temp_char_test;
+			temp_char_test.Format(_T("%02x"),(unsigned char)*temp_print_test);
+			temp_char_test.MakeUpper();
+			temp_print_test ++;
+			total_char_test = total_char_test + temp_char_test + _T(" ");
+		}
+		DFTrace(total_char_test);
+	}
+
+
     status =bacapp_parse_application_data(BACNET_APPLICATION_TAG_OCTET_STRING,(char *)&SendBuffer, &data_value);
     //ct_test(pTest, status == true);
     private_data_len =	bacapp_encode_application_data(&test_value[0], &data_value);
@@ -1701,6 +1718,10 @@ int WritePrivateData(uint32_t deviceid,unsigned char n_command,unsigned char sta
         g_llTxCount++;
         return Send_ConfirmedPrivateTransfer(&dest,&private_data);
     }
+	else
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Communication failed!"));
+	}
     return -2;
 }
 
@@ -1736,7 +1757,7 @@ int GetPrivateData_Blocking(uint32_t deviceid,uint8_t command,uint8_t start_inst
 			//	Sleep(SEND_COMMAND_DELAY_TIME);
         }
         while (temp_invoke_id<0);
-		TRACE(_T("Get Block Data z = %d\r\n"),z);
+	
         if(send_status)
         {
             for (int i=0; i<300; i++)
@@ -2268,7 +2289,7 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
 
 
 	CString total_char_test;
-	if(debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA)
+	if((debug_item_show == DEBUG_SHOW_BACNET_ALL_DATA) || (debug_item_show == DEBUG_SHOW_ALL))
 	{
 		char * temp_print_test = NULL;
 		temp_print_test = (char *)&Temp_CS.value;
@@ -3441,7 +3462,11 @@ int Bacnet_PrivateData_Handle(	BACNET_PRIVATE_TRANSFER_DATA * data,bool &end_fla
         Device_Basic_Setting.reg.modbus_port = (unsigned char)my_temp_point[1]<<8 | (unsigned char)my_temp_point[0];
         my_temp_point = my_temp_point + 2;
 		Device_Basic_Setting.reg.modbus_id = *(my_temp_point++);
-
+		Device_Basic_Setting.reg.object_instance = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+		my_temp_point = my_temp_point + 4;
+		Device_Basic_Setting.reg.time_update_since_1970 = ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+		my_temp_point = my_temp_point + 4;
+		
         return READ_SETTING_COMMAND;
     }
     break;
@@ -3763,6 +3788,7 @@ void local_handler_conf_private_trans_ack(
         g_llerrCount ++;
         return;
     }
+	bac_select_device_online = true;
     switch(receive_data_type)
     {
     case READ_REMOTE_POINT:
@@ -5142,7 +5168,210 @@ BOOL CheckForUpdate(
 
 
 
+typedef union
+{
+	uint8_t all[400];
+	struct 
+	{  
+		UCHAR command;
+		UCHAR command_reserve;
+		UCHAR length;
+		UCHAR length_reserve;
+		UCHAR serial_low;
+		UCHAR serial_low_reserve;
+		UCHAR serial_low_2;
+		UCHAR serial_low_2_reserve;
+		UCHAR serial_low_3;
+		UCHAR serial_low_3_reserve;
+		UCHAR serial_low_4;
+		UCHAR serial_low_4_reserve;
+		UCHAR product_id;
+		UCHAR product_id_reserve;
+		UCHAR modbus_id;
+		UCHAR modbus_id_reserve;
+		UCHAR ip_address_1;
+		UCHAR ip_address_1_reserve;
+		UCHAR ip_address_2;
+		UCHAR ip_address_2_reserve;
+		UCHAR ip_address_3;
+		UCHAR ip_address_3_reserve;
+		UCHAR ip_address_4;
+		UCHAR ip_address_4_reserve;
+		USHORT modbus_port;
+		USHORT sw_version;
+		USHORT hw_version;
+		unsigned int parent_serial_number;
+		UCHAR object_instance_2;
+		UCHAR object_instance_1;
+		UCHAR station_number;
+		char panel_name[20];
+		UCHAR object_instance_4;
+		UCHAR object_instance_3;
+	}reg;
+}Str_UPD_SCAN;
+#if 1
+int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
+{
+	refresh_net_device temp;
+	Str_UPD_SCAN temp_data;
+	memset(&temp_data,0,400);
+	unsigned char * my_temp_point = buffer;
+	temp_data.reg.command = *(my_temp_point++);
+	temp_data.reg.command_reserve = *(my_temp_point++);
 
+	temp_data.reg.length = *(my_temp_point++);
+	temp_data.reg.length_reserve = *(my_temp_point++);
+
+
+	temp_data.reg.serial_low = *(my_temp_point++);
+	temp_data.reg.serial_low_reserve = *(my_temp_point++);
+
+	temp_data.reg.serial_low_2 = *(my_temp_point++);
+	temp_data.reg.serial_low_2_reserve = *(my_temp_point++);
+
+	temp_data.reg.serial_low_3 = *(my_temp_point++);
+	temp_data.reg.serial_low_3_reserve = *(my_temp_point++);
+
+	temp_data.reg.serial_low_4 = *(my_temp_point++);
+	temp_data.reg.serial_low_4_reserve = *(my_temp_point++);
+
+	temp_data.reg.product_id =  *(my_temp_point++);
+	temp_data.reg.product_id_reserve =  *(my_temp_point++);
+
+
+	temp_data.reg.modbus_id =  *(my_temp_point++);
+	temp_data.reg.modbus_id_reserve =  *(my_temp_point++);
+
+	temp_data.reg.ip_address_1 =  *(my_temp_point++);
+	temp_data.reg.ip_address_1_reserve =  *(my_temp_point++);
+	temp_data.reg.ip_address_2 =  *(my_temp_point++);
+	temp_data.reg.ip_address_2_reserve =  *(my_temp_point++);
+	temp_data.reg.ip_address_3 =  *(my_temp_point++);
+	temp_data.reg.ip_address_3_reserve =  *(my_temp_point++);
+	temp_data.reg.ip_address_4 =  *(my_temp_point++);
+	temp_data.reg.ip_address_4_reserve =  *(my_temp_point++);
+
+	temp_data.reg.modbus_port =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+	my_temp_point= my_temp_point + 2;
+	temp_data.reg.sw_version =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+	my_temp_point= my_temp_point + 2;
+	temp_data.reg.hw_version =  ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+	my_temp_point= my_temp_point + 2;
+
+	temp_data.reg.parent_serial_number =  ((unsigned char)my_temp_point[3])<<24 | ((unsigned char)my_temp_point[2]<<16) | ((unsigned char)my_temp_point[1])<<8 | ((unsigned char)my_temp_point[0]);
+	my_temp_point= my_temp_point + 4;
+
+	temp_data.reg.object_instance_2 = *(my_temp_point++);
+	temp_data.reg.object_instance_1 = *(my_temp_point++);
+	temp_data.reg.station_number = *(my_temp_point++);
+	memcpy(temp_data.reg.panel_name,my_temp_point,20);
+	my_temp_point = my_temp_point + 20;
+	temp_data.reg.object_instance_4 = *(my_temp_point++);
+	temp_data.reg.object_instance_3 = *(my_temp_point++);
+
+
+	DWORD nSerial=temp_data.reg.serial_low + temp_data.reg.serial_low_2 *256+temp_data.reg.serial_low_3*256*256+temp_data.reg.serial_low_4*256*256*256;
+	CString nip_address;
+	nip_address.Format(_T("%u.%u.%u.%u"),temp_data.reg.ip_address_1,temp_data.reg.ip_address_2,temp_data.reg.ip_address_3,temp_data.reg.ip_address_4);
+	CString nproduct_name = GetProductName(temp_data.reg.product_id);
+	if(nproduct_name.IsEmpty())	//如果产品号 没定义过，不认识这个产品 就exit;
+	{
+		if (temp_data.reg.product_id<200)
+		{
+			return m_refresh_net_device_data.size();
+		}
+	}
+
+	temp.nport = temp_data.reg.modbus_port;
+	temp.sw_version = temp_data.reg.sw_version;
+	temp.hw_version = temp_data.reg.hw_version;
+	temp.ip_address = nip_address;
+	temp.product_id = temp_data.reg.product_id;
+	temp.modbusID = temp_data.reg.modbus_id;
+	temp.nSerial = nSerial;
+	temp.NetCard_Address=local_enthernet_ip;
+
+	temp.parent_serial_number = temp_data.reg.parent_serial_number ;
+
+	temp.object_instance = temp_data.reg.object_instance_1 + temp_data.reg.object_instance_2 *256+temp_data.reg.object_instance_3*256*256+temp_data.reg.object_instance_4*256*256*256;
+	temp.panal_number = temp_data.reg.station_number;
+
+
+
+
+	if((debug_item_show == DEBUG_SHOW_ALL) || (debug_item_show == DEBUG_SHOW_SCAN_ONLY))
+	{
+		g_Print.Format(_T("Serial = %u     ID = %d ,ip = %s  , Product name : %s ,obj = %u ,panel = %u"),nSerial,temp_data.reg.modbus_id,nip_address ,nproduct_name,temp.object_instance,temp.panal_number);
+		DFTrace(g_Print);
+	}
+
+
+
+
+	bool find_exsit = false;
+
+	for (int i=0; i<(int)m_refresh_net_device_data.size(); i++)
+	{
+		if(m_refresh_net_device_data.at(i).nSerial == nSerial)
+		{
+			find_exsit = true;
+			break;
+		}
+	}
+
+	if(!find_exsit)
+	{
+		m_refresh_net_device_data.push_back(temp);
+	}
+
+
+	char * temp_point = NULL;
+	refresh_net_label_info temp_label;
+	temp_point = temp_data.reg.panel_name;
+	if(( (unsigned char)temp_point[0] != 0xff) && ((unsigned char)temp_point[1] != 0xff) && ((unsigned char)temp_point[0] != 0x00))
+	{
+		memcpy(temp_label.label_name,&temp_point[0],20);
+		temp_point = temp_point + 20;
+		CString cs_temp_label;
+		MultiByteToWideChar( CP_ACP, 0, (char *)temp_label.label_name, (int)strlen((char *)temp_label.label_name)+1,
+			cs_temp_label.GetBuffer(MAX_PATH), MAX_PATH );
+		cs_temp_label.ReleaseBuffer();
+		if(cs_temp_label.GetLength() > 20)
+			cs_temp_label = cs_temp_label.Left(20);
+		temp_label.serial_number = (unsigned int)nSerial;
+		CString temp_serial_number;
+		temp_serial_number.Format(_T("%u"),temp_label.serial_number);
+		int need_to_write_into_device = GetPrivateProfileInt(temp_serial_number,_T("WriteFlag"),0,g_achive_device_name_path);
+		if(need_to_write_into_device == 0)
+		{
+			bool found_device = false;
+			bool found_device_new_name = false;
+			for (int i=0; i<m_refresh_net_device_data.size(); i++)
+			{
+				if(temp_label.serial_number == m_refresh_net_device_data.at(i).nSerial)
+				{
+					if(cs_temp_label.CompareNoCase( m_refresh_net_device_data.at(i).show_label_name) == 0)
+					{
+						found_device_new_name = false;
+					}
+					else
+					{
+						m_refresh_net_device_data.at(i).show_label_name = cs_temp_label;
+						found_device_new_name = true;
+					}
+					break;
+				}
+			}
+		}
+	}
+
+
+
+	return m_refresh_net_device_data.size();
+}
+#endif
+
+#if 0
 int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
 {
     int nLen=buffer[2]+buffer[3]*256;
@@ -5271,6 +5500,8 @@ int AddNetDeviceForRefreshList(BYTE* buffer, int nBufLen,  sockaddr_in& siBind)
     }
     return m_refresh_net_device_data.size();
 }
+
+#endif
 
 int GetHostAdaptersInfo(CString &IP_address_local)
 {
@@ -5573,7 +5804,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
         //   ::bind(h_Broad, (sockaddr*)&h_siBind,sizeof(h_siBind));
         if( -1 == bind(h_Broad,(SOCKADDR*)&h_siBind,sizeof(h_siBind)))//把网卡地址强行绑定到Socket
         {
-            goto END_SCAN;
+            goto END_REFRESH_SCAN;
         }
         int time_out=0;
         BOOL bTimeOut = FALSE;
@@ -5592,7 +5823,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
             if (nRet == SOCKET_ERROR)
             {
                 int  nError = WSAGetLastError();
-                goto END_SCAN;
+                goto END_REFRESH_SCAN;
                 return 0;
             }
             int nLen = sizeof(h_siBind);
@@ -5601,7 +5832,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
             if (nSelRet == SOCKET_ERROR)
             {
                 int nError = WSAGetLastError();
-                goto END_SCAN;
+                goto END_REFRESH_SCAN;
                 return 0;
             }
 
@@ -5745,7 +5976,7 @@ UINT RefreshNetWorkDeviceListByUDPFunc()
                 //g_llTxCount++;//不合理
             }
         }//end of while
-END_SCAN:
+END_REFRESH_SCAN:
 
         closesocket(h_Broad);
         h_Broad=NULL;
@@ -6571,6 +6802,109 @@ int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path)
     return 0;
 }
 
+
+int LoadMiniModbusConfigFile(LPCTSTR tem_read_path)
+{
+	CString FilePath;
+	FilePath.Format(_T("%s"),tem_read_path);
+	CFileFind temp_find;
+	if(!temp_find.FindFile(FilePath))
+		return -1;
+
+	CFile myfile(tem_read_path,CFile::modeRead);
+	char *pBuf;
+	DWORD dwFileLen;
+	dwFileLen=myfile.GetLength();
+	pBuf= new char[dwFileLen+1];
+	memset(pBuf,0,dwFileLen);
+	pBuf[dwFileLen]=0;
+	myfile.Read(pBuf,dwFileLen);     //MFC   CFile 类 很方便
+	myfile.Close();
+	//MessageBox(pBuf);
+	char * temp_point = pBuf;
+	if(temp_point[0] != 4)
+		return -1;
+	temp_point = temp_point + 1;
+
+	unsigned long temp_file_time;
+	memcpy(&temp_file_time,temp_point,4);
+
+	CTime temp_time_now = CTime::GetCurrentTime();
+	unsigned long temp_cur_long_time = temp_time_now.GetTime();
+
+	//如果485 的prg时间 是三天以前的  或者485文件的时间大于现在的时间，这个prg 文件 就不要了;
+	//if((temp_cur_long_time - temp_file_time > 259200) || (temp_file_time > temp_cur_long_time))
+	//{
+	//	return -1;
+	//}
+	temp_point = temp_point + 4;
+
+	unsigned short temp_buffer[50000];
+	memset(temp_buffer ,0,50000*2);
+
+	unsigned short write_buffer[200];
+
+	memcpy(temp_buffer,temp_point,dwFileLen-5);
+
+	memcpy(&Device_Basic_Setting.reg,temp_buffer,400); //Setting 的400个字节;
+	//g_progress_persent = (i+1)*100 / 32;	
+	int total_count = BAC_OUTPUT_ITEM_COUNT + BAC_INPUT_ITEM_COUNT;
+	int resent_count = 0;
+	for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+	{
+		memcpy( &m_Output_data.at(i),temp_buffer + 200 + i*23,sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+
+		memset(write_buffer,0,sizeof(write_buffer));
+		memcpy( write_buffer,&m_Output_data.at(i),sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+		for (int x=0;x<200;x++)
+		{
+			write_buffer[x] = htons(write_buffer[x]);
+		}
+		if(Write_Multi_org_short(g_tstat_id,write_buffer,10000 + 23 * i , 23, 10)> 0)
+		{
+			resent_count ++ ;
+			g_progress_persent = (resent_count*100) / total_count;	
+		}
+		else
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Write config file timeout!"));
+			g_progress_persent = 0;
+			return -1;
+		}
+		Sleep(10);
+	}
+	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Write  output OK!"));
+	for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
+	{
+		memcpy(&m_Input_data.at(j),temp_buffer + 200 + 23*64 + j*23,sizeof(Str_in_point)); //Input 46 个字节 ;
+
+		memset(write_buffer,0,sizeof(write_buffer));
+		memcpy( write_buffer,&m_Input_data.at(j),sizeof(Str_in_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+		for (int Z=0;Z<200;Z++)
+		{
+			write_buffer[Z] = htons(write_buffer[Z]);
+		}
+		if(Write_Multi_org_short(g_tstat_id,write_buffer,11472 + 23 * j , 23, 10)>0)
+		{
+			resent_count ++ ;
+			g_progress_persent = (resent_count*100) / total_count;	
+
+		}
+		else
+		{
+			SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Write config file timeout!"));
+			g_progress_persent = 0;
+			return -1;
+		}
+		Sleep(10);
+	}
+	SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Write input OK!"));
+	return 1;
+
+}
+
+
+
 int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path)
 {
 	CString FilePath;
@@ -6795,6 +7129,138 @@ int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path)
 
 
     return 0;
+}
+
+
+
+//第一个字节 版本
+//然后是 4个字节的 时间 如果时间太久了 也需要重新获取;
+int SaveModbusConfigFile(CString &SaveConfigFilePath)
+{
+	CString FilePath;
+	CStringArray temp_array1;
+
+
+	unsigned char  read_device_id = 0;
+	CMainFrame* pFrame=(CMainFrame*)(AfxGetApp()->m_pMainWnd);
+	read_device_id =  pFrame->m_product.at(selected_product_index).product_id;
+	if(read_device_id != g_tstat_id)
+		read_device_id = g_tstat_id;
+	SplitCStringA(temp_array1,SaveConfigFilePath,_T("."));
+	int temp_array_size=0;
+	temp_array_size = temp_array1.GetSize();
+	if(temp_array1.GetSize()<=1)
+	{
+		return -1;
+	}
+
+
+	int right_suffix = temp_array1.GetAt(temp_array_size - 1).GetLength();
+	int config_file_length = SaveConfigFilePath.GetLength();
+	if(config_file_length <= right_suffix)
+	{
+		return -1;
+	}
+	CFileFind tempfind;
+	if(tempfind.FindFile(SaveConfigFilePath))
+	{
+		DeleteFile(SaveConfigFilePath);
+	}
+
+
+	bool read_result = true;
+	unsigned int buffer_length = 3200;
+	unsigned short read_data_buffer[3200];
+	memset(read_data_buffer,0,sizeof(unsigned short)*3200);
+	//output 45 按46算  *64  + input 46  *64  需要读2944;
+	for(int i=0; i<32; i++)
+	{
+		//register_critical_section.Lock();
+		//int nStart = GetTickCount();
+		int itemp = 0;
+		itemp = Read_Multi(read_device_id,&read_data_buffer[i*100],9800+i*100,100,4);
+		if(itemp < 0 )
+		{
+			read_result = false;
+			break; 
+		}
+		else
+		{
+			g_progress_persent = (i+1)*100 / 32;	
+		}
+		Sleep(100);
+	}
+	if(read_result)
+	{
+		SetPaneString(BAC_SHOW_MISSION_RESULTS,_T("Read Inputs and Outputs OK!"));
+	}
+
+	Copy_Data_From_485_to_Bacnet(&read_data_buffer[0]);
+
+
+
+
+
+	char *npoint = (char *)read_data_buffer[0];
+	unsigned int bufferlength = 3200 * 2;
+
+
+
+
+
+	char temp_buffer[50000];
+	char * temp_point = NULL;
+	memset(temp_buffer ,0,50000);
+	//FilePath = SaveConfigFilePath.Left( config_file_length -  right_suffix);
+	//FilePath = FilePath + _T("ini");
+	temp_buffer[0] = 4;
+	temp_point = temp_buffer + 1;
+
+#pragma region get_time_area
+	CTime temp_save_prg_time = CTime::GetCurrentTime();
+	unsigned long prg_temp_long_time = temp_save_prg_time.GetTime();
+
+	memcpy(temp_buffer + 1,&prg_temp_long_time,4);
+
+#pragma endregion get_time_area
+
+	DWORD dwFileLen;
+	HANDLE hFile;
+	DWORD dWrites;
+	if(npoint != NULL)
+	{
+		memcpy(temp_buffer + 5,npoint,bufferlength);
+		temp_point = temp_point + bufferlength;
+		dwFileLen = temp_point - temp_buffer;
+		hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+		WriteFile(hFile,temp_buffer,dwFileLen,&dWrites,NULL);
+		CloseHandle(hFile);
+	}
+	else //第二个参数 如果是Null 就是update;
+	{
+		char temp_update_buffer[50000];
+		memset(temp_update_buffer,0,50000);
+
+		memcpy(temp_update_buffer,&Device_Basic_Setting.reg,400); //Setting 的400个字节;
+		for (int i=0;i<BAC_OUTPUT_ITEM_COUNT;i++)
+		{
+			memcpy(temp_update_buffer + 400 + i*(23*2), &m_Output_data.at(i),sizeof(Str_out_point));//因为Output 只有45个字节，两个byte放到1个 modbus的寄存器里面;
+		}
+
+		for (int j=0;j<BAC_INPUT_ITEM_COUNT;j++)
+		{
+			memcpy(temp_update_buffer + 400 + 23*2*64 + j*23*2,&m_Input_data.at(j),sizeof(Str_in_point)); //Input 46 个字节 ;
+		}
+		memcpy(temp_buffer + 5,temp_update_buffer,bufferlength);
+		temp_point = temp_point + bufferlength;
+		dwFileLen = bufferlength + 5;//这5个字节是 版本和时间 ;
+		hFile=CreateFile(SaveConfigFilePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+		WriteFile(hFile,temp_buffer,dwFileLen,&dWrites,NULL);
+		CloseHandle(hFile);
+	}
+
+
+	return true;
 }
 
 
@@ -10284,7 +10750,7 @@ int GetPictureBlockData_Blocking(uint32_t deviceid,int8_t nIndex, uint16_t ntota
 			//	Sleep(SEND_COMMAND_DELAY_TIME);
 		}
 		while (temp_invoke_id<0);
-		TRACE(_T("Get Block Data z = %d\r\n"),z);
+	
 		if(send_status)
 		{
 			for (int i=0; i<300; i++)
@@ -10448,6 +10914,13 @@ BOOL ShowBacnetView(unsigned char product_type)
 		return true;
 	else
 		return false;
+}
+
+//检测字穿是否全是数字;
+BOOL AllCharactorIsDigital(LPCTSTR lpszSrc)
+{
+	CString Src = lpszSrc;
+	return (Src ==  Src.SpanIncluding( _T("0123456789" ) ));
 }
 
 BOOL BinFileValidation(const CString& strFileName)

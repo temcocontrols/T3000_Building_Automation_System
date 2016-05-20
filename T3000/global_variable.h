@@ -2037,6 +2037,7 @@ int SEND_COMMAND_DELAY_TIME = 100;
 bool TCP_Server_Running = false; //开启TCP 服务器就将标志位置1;
 bool Gsm_communication = false;	//如果是通过GSM 读远程设备 许多地方要特殊处理;不能刷新太频繁;
 CString SaveConfigFilePath;
+CString LoadConfigFilePath;
 vector<ALL_LOCAL_SUBNET_NODE> g_Vector_Subnet;
 vector<ALL_LOCAL_SUBNET_NODE> g_Scan_Vector_Subnet;
 

@@ -13,7 +13,7 @@
 #include "BuildingConfigEditDlg.h"
 #include "SqliteLib/CppSQLite3.h"
 #include "globle_function.h"
-
+#include "ConnectRemoteServer.h"
 #include <ctime>
 #include <iostream>
 using namespace std;
@@ -28,7 +28,7 @@ const int INDEX_MODBUS_TCP = 1;
 const int INDEX_BACNET_MSTP = 2;
 const int INDEX_REMOTE_DEVICE = 3;
 const int INDEX_AUTO = 4;
-
+extern unsigned int try_connect_serial;
 
 
 CBuildingConfigration::CBuildingConfigration(CWnd* pParent /*=NULL*/)
@@ -84,7 +84,7 @@ BOOL CBuildingConfigration::OnInitDialog()
     m_building_config_list.InsertColumn(BC_ITEM, _T(""), 80, ListCtrlEx::Normal, LVCFMT_CENTER, ListCtrlEx::SortByDigit);
     m_building_config_list.InsertColumn(BC_MAINNAME, _T("Building"), 120, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_building_config_list.InsertColumn(BC_PROTOCOL, _T("Protocol"), 100, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
-    m_building_config_list.InsertColumn(BC_IPADDRESS, _T("IP / Domain / Tel#"), 150, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
+    m_building_config_list.InsertColumn(BC_IPADDRESS, _T("IP/Domain/Tel#/SerialNumber"), 150, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_building_config_list.InsertColumn(BC_IPPORT, _T("IP Port"), 80, ListCtrlEx::EditBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_building_config_list.InsertColumn(BC_COMPORT, _T("COM Port"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
     m_building_config_list.InsertColumn(BC_BAUDRATE, _T("Baud Rate"), 80, ListCtrlEx::ComboBox, LVCFMT_CENTER, ListCtrlEx::SortByString);
@@ -760,6 +760,10 @@ void CBuildingConfigration::Deal_BuildingPath()
     }
     ado.CloseConn();
 }
+
+
+
+
 LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM lParam)
 {
     CADO ado;
@@ -1310,6 +1314,29 @@ LRESULT CBuildingConfigration::Fresh_Building_Config_Item(WPARAM wParam,LPARAM l
     }
     else if(Changed_SubItem == BC_IPADDRESS)
     {
+		CString  temp_protocol = 	m_building_config_list.GetItemText(Changed_Item,BC_PROTOCOL);
+		if(temp_protocol.CompareNoCase(_T("Remote Device")) == 0 )
+		{
+			CString temp_serial_number = m_building_config_list.GetItemText(Changed_Item,BC_IPADDRESS);
+			temp_serial_number.Trim();
+			int input_length  =	temp_serial_number.GetLength();
+
+			bool  serial_is_all_digital = AllCharactorIsDigital(temp_serial_number);
+			if((input_length <=6) && (serial_is_all_digital))	//说明输入的全是数字，是序列号.
+			{
+				CString temp_message;
+				temp_message.Format(_T("Do you want to connect the remote device (serial number is %s)") ,temp_serial_number);
+				if(IDYES == MessageBox(temp_message,_T("Notice"),MB_YESNO | MB_ICONINFORMATION))
+				{
+					try_connect_serial =    _wtoi(temp_serial_number)  ;//  (unsigned int)atoi(temp_serial_number);
+					CConnectRemoteServer Connectdlg;
+					Connectdlg.DoModal();
+					return 0;
+				}
+			}
+
+		}
+
         if (dbpath.IsEmpty())
         {
             return 0;
@@ -2425,6 +2452,7 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 			 longitude = '%s' ,\
 			 latitude = '%s' ,\
 			 elevation = '%s' \
+			 ZIP = %d\
 			 where ID = %d \
 			  "),
 			  m_BuildNameLst.at(m_curRow).country,
@@ -2434,6 +2462,7 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 			  m_BuildNameLst.at(m_curRow).Longitude,
 			  m_BuildNameLst.at(m_curRow).Latitude,
 			  m_BuildNameLst.at(m_curRow).Elevation,
+			  m_BuildNameLst.at(m_curRow).Zip,
 			  m_BuildNameLst.at(m_curRow).ID
 			  );
 			  char charqltext[1024];

@@ -1134,6 +1134,7 @@ extern int SEND_COMMAND_DELAY_TIME ;
 extern bool TCP_Server_Running ;
 extern bool Gsm_communication ;	//如果是通过GSM 读远程设备 许多地方要特殊处理;不能刷新太频繁;
 extern CString SaveConfigFilePath;
+extern CString LoadConfigFilePath;
 extern vector<ALL_LOCAL_SUBNET_NODE> g_Vector_Subnet;
 extern vector<ALL_LOCAL_SUBNET_NODE> g_Scan_Vector_Subnet;
 extern vector<Reg_Infor> g_Vector_Write_Error;

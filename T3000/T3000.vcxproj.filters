@@ -669,6 +669,9 @@
     <ClCompile Include="BuildingConfigEditDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ConnectRemoteServer.cpp">
+      <Filter>Bacnet</Filter>
+    </ClCompile>
     <ClCompile Include="SqliteLib\CppSQLite3.cpp">
       <Filter>SqliteLib</Filter>
     </ClCompile>
@@ -936,6 +939,7 @@
     <None Include="res\unlock.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\sqlite3.dll" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TrendLogWnd.h">
@@ -1611,6 +1615,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BacnetSettingHealth.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectRemoteServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BuildingConfigEditDlg.h">

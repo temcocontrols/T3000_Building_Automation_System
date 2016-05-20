@@ -308,6 +308,14 @@ LRESULT CBacnetMonitor::Fresh_Monitor_Input_List(WPARAM wParam,LPARAM lParam)
 		m_monitor_input_list.SetItemText(4,1,System_Log[4]);
 		m_monitor_input_list.SetItemText(5,1,System_Log[5]);
 		m_monitor_input_list.SetItemText(6,1,System_Log[6]);
+
+		m_monitor_input_list.SetItemText(7,1,_T(""));
+		m_monitor_input_list.SetItemText(8,1,_T(""));
+		m_monitor_input_list.SetItemText(9,1,_T(""));
+		m_monitor_input_list.SetItemText(10,1,_T(""));
+		m_monitor_input_list.SetItemText(11,1,_T(""));
+		m_monitor_input_list.SetItemText(12,1,_T(""));
+		m_monitor_input_list.SetItemText(13,1,_T(""));
 		return 1;
 	}
 	for (int i=0;i<MAX_POINTS_IN_MONITOR;i++)

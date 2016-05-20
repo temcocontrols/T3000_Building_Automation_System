@@ -89,9 +89,9 @@ public:
 	CEdit m_edit_port;
 	afx_msg void OnEnKillfocusEditSettingPort();
 	afx_msg void OnBnClickedButtonHealth();
-
+	CEdit m_setting_obj_instance;
+	afx_msg void OnEnKillfocusEditSettingObjInstance();
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
-//	virtual void HtmlHelp(DWORD_PTR dwData, UINT nCmd = 0x000F);
 };
 
 

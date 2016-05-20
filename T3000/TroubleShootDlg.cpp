@@ -261,7 +261,7 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 		{
 			int  nError = WSAGetLastError();
 			ret= FALSE ;
-			goto END_SCAN;
+			goto END_CHANGEIP_SCAN;
 			
 		}
 		int nLen = sizeof(h_siBind);
@@ -273,7 +273,7 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 		{
 			int nError = WSAGetLastError();
 			ret= FALSE ;
-			goto END_SCAN;
+			goto END_CHANGEIP_SCAN;
 			
 		}
 
@@ -338,9 +338,9 @@ BOOL CTroubleShootDlg::ChangeNetDeviceIP(CString strIP){
 			MessageBox(_T("Fail!"));
 			 ret=FALSE;
 		}
-END_SCAN:
-	closesocket(h_scan_Broad);
-	h_scan_Broad=NULL;
+END_CHANGEIP_SCAN:
+		closesocket(h_scan_Broad);
+		h_scan_Broad=NULL;
 	//{
 
 	//	//SOCKET soAck =::socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
@@ -431,22 +431,7 @@ void CTroubleShootDlg::SetNode(tree_product product_Node){
 	m_net_product_node=product_Node;
 }
 
-#define  MY_COLOR_RED			Color(255,255,0,0)
-#define  MY_COLOR_BLACK_CHARACTER			Color(255,204,204,204)
-#define  BLACK_GROUND_START_X    10
-#define  BLACK_GROUND_START_Y    193
-#define  BLACK_GROUND_WIDTH      400
-#define  BLACK_GROUND_HEIGHT      40
 
-#define  BLACK_2_GROUND_START_X    (BLACK_GROUND_START_X  + BLACK_GROUND_WIDTH + 60)
-#define  BLACK_2_GROUND_START_Y    BLACK_GROUND_START_Y
-#define  BLACK_2_GROUND_WIDTH      180
-#define  BLACK_2_GROUND_HEIGHT      40
-
-#define BLACK_PC_GROUND_START_X		BLACK_GROUND_START_X
-#define BLACK_PC_GROUND_START_Y   ( BLACK_GROUND_START_Y + BLACK_GROUND_HEIGHT + 10 )
-#define BLACK_PC_GROUND_WIDTH      BLACK_GROUND_WIDTH
-#define BLACK_PC_GROUND_HEIGHT     BLACK_GROUND_HEIGHT
 
 void CTroubleShootDlg::OnPaint()
 {

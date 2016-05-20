@@ -1058,9 +1058,16 @@ void CBacnetGraphic::Draw_Graphic(HDC my_hdc)
 		int value_temp_length = Unit_value.GetLength();
 		pointF.X = (int)m_analogorignpoint.X - 38  - (value_temp_length-3)*4;	//动态调整 Y轴 显示的值 根据所带小数点的位数不同 调整位置;
 		
-		pointF.Y =  (int)m_analogorignpoint.Y+ i*(m_Y_ASIX_HIGHT/m_yscale) - 8;
-		mygraphics->DrawString(Unit_value, -1, &unitfont, pointF, &unit_brush);
-
+		if(i == m_yscale)	//如果是显示靠近原点的 Y值 因为与X轴的时间显示 有轻微重叠，所以特殊处理，稍微向上一点;
+		{
+			pointF.Y =  (int)m_analogorignpoint.Y+ i*(m_Y_ASIX_HIGHT/m_yscale) - 16;
+			mygraphics->DrawString(Unit_value, -1, &unitfont, pointF, &unit_brush);
+		}
+		else
+		{
+			pointF.Y =  (int)m_analogorignpoint.Y+ i*(m_Y_ASIX_HIGHT/m_yscale) - 8;
+			mygraphics->DrawString(Unit_value, -1, &unitfont, pointF, &unit_brush);
+		}
 	}
 	//****************************************************************
 	//画 Digital  的 横着的 两条线内 网格;

@@ -160,10 +160,12 @@ int Open_MonitorDataBase(WCHAR *DataSource);
 void Send_WhoIs_remote_ip(CString ipaddress);
 void SaveBacnetConfigFile(CString &SaveConfigFilePath);
 void SaveBacnetConfigFile_Cache(CString &SaveConfigFilePath);
+int SaveModbusConfigFile(CString &SaveConfigFilePath);
 void SaveModbusConfigFile_Cache(CString &SaveConfigFilePath,char *npoint,unsigned int bufferlength);
 int LoadBacnetConfigFile(bool write_to_device,LPCTSTR tem_read_path);
 int LoadBacnetConfigFile_Cache(LPCTSTR tem_read_path);
 int LoadModbusConfigFile_Cache(LPCTSTR tem_read_path);
+int LoadMiniModbusConfigFile(LPCTSTR tem_read_path);
 void Copy_Data_From_485_to_Bacnet(unsigned short *start_point);
 int handle_read_monitordata_ex(char *npoint,int nlength);
 int handle_read_pic_data_ex(char *npoint,int nlength);
@@ -217,4 +219,5 @@ int GetPictureBlockData_Blocking(uint32_t deviceid,int8_t nIndex, uint16_t ntota
 BOOL ShowBacnetView(unsigned char product_type);
 BOOL HexFileValidation(const CString& strFileName);
 BOOL BinFileValidation(const CString& strFileName);
+BOOL AllCharactorIsDigital(LPCTSTR lpszSrc);
 #endif

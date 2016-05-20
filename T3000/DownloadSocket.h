@@ -16,6 +16,7 @@ public:
 	HWND m_parent_hwnd;
 	int m_results;
 	virtual void OnClose(int nErrorCode);
+	bool is_connect;
 };
 
 #define DOWNLOAD_RESULTS_UNKNOW 1

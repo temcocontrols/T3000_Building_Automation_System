@@ -260,10 +260,12 @@
 #define IDR_MONITOR_DB1                 595
 #define IDD_DIALOG_BACNET_SETTING_HEALTH 596
 #define IDD_DIALOG_BOOTFINDER           597
+#define IDD_DIALOG_CONNECT_NEWFIRMWARE  598
 #define IDR_BUILDING_DB                 600
 #define IDR_T3000_NEW_DB1               601
 #define IDD_DIALOG_BUILDING_CONFIG      602
 #define IDD_DIALOG_OPTION               603
+#define IDR_SQLITE3DLL1                 604
 #define IDD_DIALOG_MULTY_FLASH          908
 #define IDD_DIALOG_DEBUG_TRACE          992
 #define IDD_DIALOG_DOWNLOAD_FILE        996
@@ -1852,6 +1854,7 @@
 #define IDC_STATIC_SETTING_TIME_ZONE    2038
 #define IDC_EDIT_CO2_VALUE              2039
 #define IDC_BUTTON_RESET                2039
+#define IDC_STATIC_SETTING_TIMER_SERVER2 2039
 #define IDC_EDIT1_TEST                  2040
 #define IDC_CHECK_ICON_AM               2041
 #define IDC_EDIT_CAL                    2041
@@ -2040,6 +2043,7 @@
 #define IDC_IPADDRESS_TEMCO_IP          5835
 #define IDC_EDIT_SETTING_MODBUS_ID      5835
 #define IDC_BUTTON_START_DOWNLOAD       5836
+#define IDC_EDIT_SETTING_LAST_UPDATE_TIME 5836
 #define IDC_EDIT_PRODUCT_ID             5837
 #define IDC_EDIT_PRODUCT_ID2            5838
 #define IDC_EDIT_PRODUCT_NAME           5838
@@ -2428,6 +2432,7 @@
 #define ID_FILE_EXPORTREGISETERSLIST1   34054
 #define ID_TOOLS_PSYCHROMETRY           34055
 #define ID_TOOLS_OPTION                 34056
+#define ID_HELP_USING_UPDATE            34904
 #define ID_DATABASE_BACNETTOOL          34905
 #define IDD_DIALOG_BACNET_PROGRAM       34906
 #define IDD_DIALOG_BACNET_OUTPUT        34907
@@ -2493,7 +2498,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        604
+#define _APS_NEXT_RESOURCE_VALUE        605
 #define _APS_NEXT_COMMAND_VALUE         34057
 #define _APS_NEXT_CONTROL_VALUE         2174
 #define _APS_NEXT_SYMED_VALUE           320

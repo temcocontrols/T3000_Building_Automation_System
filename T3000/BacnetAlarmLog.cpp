@@ -225,6 +225,20 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 			time_alarmtime = tempalarm_time;
 			temp_time = time_alarmtime.Format("%y/%m/%d %H:%M:%S");
 
+			if(m_alarmlog_data.at(i).acknowledged == 1)
+			{
+				m_alarmlog_list.SetItemText(i,ALARMLOG_DEL,ACK_UNACK[1]);
+			}
+			else
+				m_alarmlog_list.SetItemText(i,ALARMLOG_DEL,ACK_UNACK[0]);
+
+			if(m_alarmlog_data.at(i).restored == 1)
+			{
+				m_alarmlog_list.SetItemText(i,ALARMLOG_DEL,_T("Done"));
+			}
+			else
+				m_alarmlog_list.SetItemText(i,ALARMLOG_DEL,_T(""));
+
 		}
 		else
 		{
@@ -233,6 +247,9 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 			temp_message.Empty();
 			temp_item.Empty();
 			m_alarmlog_list.SetItemText(i,ALARMLOG_DEL,_T(""));
+			m_alarmlog_list.SetItemText(i,ALARMLOG_RES,_T(""));
+			m_alarmlog_list.SetItemText(i,ALARMLOG_ACK,_T(""));
+
 		}
 
 
@@ -258,6 +275,8 @@ LRESULT CBacnetAlarmLog::Fresh_Alarmlog_List(WPARAM wParam,LPARAM lParam)
 			m_alarmlog_list.SetItemText(i,ALARMLOG_MESSAGE,_T(""));
 			m_alarmlog_list.SetItemText(i,ALARMLOG_DEL,_T(""));
 		}
+
+
 
 		if(isFreshOne)
 		{
@@ -314,20 +333,63 @@ void CBacnetAlarmLog::OnClickListAlarmlog(NMHDR *pNMHDR, LRESULT *pResult)
 		return;
 	if(lRow<0)
 		return;
-
-	if(lCol != ALARMLOG_DEL)	
+	if(m_alarmlog_data.at(lRow).alarm != 1)
 		return;
 
-	if(m_alarmlog_data.at(lRow).ddelete == 1)	//如果已经是delete 了就不在变了;
-		return;
 	CString temp_task_info;
 	CString New_CString;
-	memcpy_s(&m_temp_alarmlog_data[lRow],sizeof(Alarm_point),&m_alarmlog_data.at(lRow),sizeof(Alarm_point));
 
-	m_alarmlog_data.at(lRow).ddelete = 1;
-	m_alarmlog_list.SetItemText(lRow,ALARMLOG_DEL,Yes_No[1]);
-	New_CString = Yes_No[1];
-	m_alarmlog_list.Set_Edit(false);
+	if(lCol == ALARMLOG_DEL)
+	{
+		if(m_alarmlog_data.at(lRow).ddelete == 1)	//如果已经是delete 了就不在变了;
+			return;
+		CString temp_task_info;
+		CString New_CString;
+		memcpy_s(&m_temp_alarmlog_data[lRow],sizeof(Alarm_point),&m_alarmlog_data.at(lRow),sizeof(Alarm_point));
+
+		m_alarmlog_data.at(lRow).ddelete = 1;
+		m_alarmlog_list.SetItemText(lRow,ALARMLOG_DEL,Yes_No[1]);
+		New_CString = Yes_No[1];
+		m_alarmlog_list.Set_Edit(false);
+	}
+	else if(lCol == ALARMLOG_ACK)
+	{
+		memcpy_s(&m_temp_alarmlog_data[lRow],sizeof(Alarm_point),&m_alarmlog_data.at(lRow),sizeof(Alarm_point));
+
+		if(m_alarmlog_data.at(lRow).acknowledged == 1)
+		{
+			m_alarmlog_data.at(lRow).acknowledged = 0;
+			m_alarmlog_list.SetItemText(lRow,ALARMLOG_ACK,ACK_UNACK[0]);
+			New_CString = _T("UNACK");
+		}
+		else
+		{
+			m_alarmlog_data.at(lRow).acknowledged = 1;
+			m_alarmlog_list.SetItemText(lRow,ALARMLOG_ACK,ACK_UNACK[1]);
+			New_CString = ACK_UNACK[1];
+		}	
+		m_alarmlog_list.Set_Edit(false);
+	}
+	else if(lCol == ALARMLOG_RES)
+	{
+		memcpy_s(&m_temp_alarmlog_data[lRow],sizeof(Alarm_point),&m_alarmlog_data.at(lRow),sizeof(Alarm_point));
+
+		if(m_alarmlog_data.at(lRow).restored == 0)
+		{
+			m_alarmlog_data.at(lRow).restored = 1;
+			m_alarmlog_list.SetItemText(lRow,ALARMLOG_RES,_T("Done"));
+		}
+		else
+		{
+			return;
+		}
+
+		m_alarmlog_list.Set_Edit(false);
+	}
+	else
+		return;
+
+
 
 	int cmp_ret = memcmp(&m_temp_alarmlog_data[lRow],&m_alarmlog_data.at(lRow),sizeof(Alarm_point));
 	if(cmp_ret!=0)

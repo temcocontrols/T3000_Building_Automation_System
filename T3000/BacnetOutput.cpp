@@ -831,6 +831,20 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		if(cs_temp.GetLength()>= STR_OUT_LABEL)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not higher than 8"),_T("Warning"));
+#pragma region note_what_do	
+			//如下所做的事 达到 ,在弹窗后 继续选中客户输入的部分 ，毛总的要求;
+			CRect list_rect,win_rect;
+			m_output_list.GetWindowRect(list_rect);
+			ScreenToClient(&list_rect);
+			::GetWindowRect(m_output_dlg_hwnd,win_rect);
+			m_output_list.Set_My_WindowRect(win_rect);
+			m_output_list.Set_My_ListRect(list_rect);
+
+			m_output_list.Get_clicked_mouse_position();
+#pragma endregion note_what_do
+
+
+
 			PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			return 0;
 		}
@@ -853,6 +867,17 @@ LRESULT CBacnetOutput::Fresh_Output_Item(WPARAM wParam,LPARAM lParam)
 		if(cs_temp.GetLength()>= STR_OUT_DESCRIPTION_LENGTH)	//长度不能大于结构体定义的长度;
 		{
 			MessageBox(_T("Length can not higher than 20"),_T("Warning"));
+#pragma region note_what_do	
+			//如下所做的事 达到 ,在弹窗后 继续选中客户输入的部分 ，毛总的要求;
+			CRect list_rect,win_rect;
+			m_output_list.GetWindowRect(list_rect);
+			ScreenToClient(&list_rect);
+			::GetWindowRect(m_output_dlg_hwnd,win_rect);
+			m_output_list.Set_My_WindowRect(win_rect);
+			m_output_list.Set_My_ListRect(list_rect);
+
+			m_output_list.Get_clicked_mouse_position();
+#pragma endregion note_what_do
 			PostMessage(WM_REFRESH_BAC_OUTPUT_LIST,NULL,NULL);
 			return 0;
 		}

@@ -6515,7 +6515,7 @@ int desvar(void)
  {
 	code++;
  }
- if (*code >= 0x82 && *code <= 0x9B)
+ if ((unsigned char)*code >= 0x82 && (unsigned char)*code <= 0x9B)
  {
 	long n;
   n = *((int *)(code+1));
@@ -6898,7 +6898,7 @@ int	desexpr(void)
  last_oper=0;
  while( !isdelimit(*code))         // && code < )
  {
-	switch (*code++) {
+	switch ((unsigned char)*code++) {
 		case PLUS:
 							 strcpy(oper," + ");
 							 par=1;
@@ -7035,7 +7035,7 @@ int	desexpr(void)
 							// code = ptimebuf+ *((int *)code);
 							 code = ptimebuf+ *((char *)code);//Fance Chagned
 							 code -= 3;
-							 while( *code != 0xff && code >= ptimebuf)
+							 while( ((unsigned char)*code) != 0xff && code >= ptimebuf)
 								 code--;
 							 if (code < ptimebuf) code = ptimebuf;
 							 else code += 6;
@@ -7053,7 +7053,7 @@ int	desexpr(void)
 //											if ( ind_line_array && line_array[ind_line_array-1][0]!=line)
 											 {
 												//line_array[ind_line_array][0] = (unsigned int)((long)FP_SEG(code)*16+(long)FP_OFF(code)-(long)(FP_SEG(pcode)*16+(long)FP_OFF(pcode)) + 2);
-												line_array[ind_line_array][0] = (unsigned int)((long)(*code)*16+(long)(*code)-(long)((*pcode)*16+(long)(*pcode)) + 2);
+												line_array[ind_line_array][0] = (unsigned int)((long)((unsigned char)*code)*16+(long)((unsigned char)*code)-(long)(((unsigned char)*pcode)*16+(long)((unsigned char)*pcode)) + 2);
 												memcpy(&line_array[ind_line_array++][1],code-3,2);
 											  }
 										code += 2;

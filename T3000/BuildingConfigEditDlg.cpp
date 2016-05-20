@@ -58,7 +58,11 @@ void CBuildingConfigEditDlg::OnBnClickedOk()
 {
 	 
 	 UpdateData(TRUE);
-
+	 if (m_strZip.IsEmpty())
+	 {
+		return ;
+	 }
+	 
 	 m_currentBuilding.MainBuildingName = m_strBuildingName;
 	 m_currentBuilding.city = m_strCity;
 	 m_currentBuilding.country = m_strCountryName;

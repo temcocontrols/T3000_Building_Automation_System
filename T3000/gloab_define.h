@@ -488,7 +488,7 @@ struct refresh_net_device
 	int nport;
 	float sw_version;
 	float hw_version;
-	unsigned short object_instance;
+	unsigned int object_instance;
 	unsigned char panal_number;
 	DWORD parent_serial_number;
 	CString NetCard_Address;
@@ -611,6 +611,12 @@ const CString Yes_No[] =
 {
 	_T("NO"),
 	_T("YES")
+};
+
+const CString ACK_UNACK[] = 
+{
+	_T(""),
+	_T("ACK")
 };
 
 const CString Digital_Units_Array[] = 
@@ -737,7 +743,7 @@ const CString Input_Analog_Units_Array[] =
 	  _T("Table 3"),
 	  _T("Table 4"),
 	  _T("Table 5"),
-	  _T("Speed Count")
+	  _T("High Speed Count")
 };
 
 const CString Output_Analog_Units_Array[] = 
@@ -826,7 +832,8 @@ const CString DDNS_Server_Name[] =
 {
 	_T("www.3322.org"),
 	_T("www.dyndns.com"),
-	_T("www.no-ip.com")
+	_T("www.no-ip.com"),
+	_T("newfirmware.com")
 };
 
 const CString Device_Serial_Port_Status[] =
@@ -1217,7 +1224,7 @@ const CString Program_Fonts[] =
 
 const CString JumperStatus[]=
 {
-	_T("Unused"),
+	_T("Thermistor Dry Contact"),
 	_T("4-20 ma"),//_T("4-20 ma / 0-24 V"),
 	_T("0-5 V"),
 	_T("0-10 V"),
@@ -1492,3 +1499,69 @@ const int REG_SCHEDULE_START_ADDRESS = REG_PRG_START_ADDRESS + LENGTH_MODBUS_PRG
 #define BAC_ALARMS    15
 #define BAC_WR_TIME   16
 #define BAC_AR_Y      17
+
+
+#define MAX_OBJ_INSTANCE  4194303
+
+
+#define  MY_COLOR_RED			Color(255,255,0,0)
+#define  MY_COLOR_BLACK_CHARACTER			Color(255,204,204,204)
+#define  BLACK_GROUND_START_X    10
+#define  BLACK_GROUND_START_Y    193
+#define  BLACK_GROUND_WIDTH      400
+#define  BLACK_GROUND_HEIGHT      40
+
+#define  BLACK_2_GROUND_START_X    (BLACK_GROUND_START_X  + BLACK_GROUND_WIDTH + 60)
+#define  BLACK_2_GROUND_START_Y    BLACK_GROUND_START_Y
+#define  BLACK_2_GROUND_WIDTH      180
+#define  BLACK_2_GROUND_HEIGHT      40
+
+#define BLACK_PC_GROUND_START_X		BLACK_GROUND_START_X
+#define BLACK_PC_GROUND_START_Y   ( BLACK_GROUND_START_Y + BLACK_GROUND_HEIGHT + 10 )
+#define BLACK_PC_GROUND_WIDTH      BLACK_GROUND_WIDTH
+#define BLACK_PC_GROUND_HEIGHT     BLACK_GROUND_HEIGHT
+
+
+//从机 发起的 FF 55 后面的 请求位;
+typedef enum
+{
+	SEND_MINIPANEL_INFO = 1,
+	GET_MINIPANEL_INFO = 2
+};
+
+
+//主机应答的FF 55 后面的命令位;
+typedef enum
+{
+	RECEIVE_DATA_LEBGTH_ERROR = 1,
+	RECEIVE_MINI_DATA = 2,
+	RECEIVE_UNKNOWN_COMMAND = 3,
+	RECEIVE_MINIPANEL_NOT_CONNECT_YET = 4,
+	RETURN_MINI_DATA = 5
+};
+
+#pragma pack(push) //保存对齐状态 
+#pragma pack(1)
+typedef struct
+{
+	unsigned int update_time;
+	unsigned int sn;
+
+	UCHAR	 product_id;
+	UINT object_instance;
+	UCHAR panel;
+	unsigned short modbus_port;
+	unsigned short bacnet_port;
+
+	char username[20];
+	char password[10];
+
+	unsigned int external_ip;
+	unsigned short external_tcp_port;
+
+}STR_For_T3000;
+
+#pragma pack(pop)//恢复对齐状态 
+
+
+

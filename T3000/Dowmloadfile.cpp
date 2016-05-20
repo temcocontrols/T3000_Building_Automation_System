@@ -174,10 +174,23 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 		}
 		
 
-
+		bool is_sub_device = false;
+		CString temp_deal_ip =	m_product_isp_auto_flash.BuildingInfo.strIp;
+		if(!temp_deal_ip.IsEmpty())
+		{
+			CStringArray temparray;
+			SplitCStringA(temparray,temp_deal_ip,_T("."));
+			if(temparray.GetSize()==4)
+			{
+				if(m_product_isp_auto_flash.note_parent_serial_number == 0)
+					is_sub_device  = false;
+				else
+					is_sub_device = true;
+			}
+		}
 
 		
-		bool is_net_device = (bool)IsNetDevice(m_product_isp_auto_flash.product_class_id);
+		//bool is_sub_device = (bool)IsNetDevice(m_product_isp_auto_flash.product_class_id);
 
 
 		WritePrivateProfileStringW(_T("Data"),_T("Command"),_T("1"),AutoFlashConfigPath);
@@ -226,7 +239,7 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 			  m_download_info.InsertString(m_download_info.GetCount(),temp_isp_info);
 
 			 WritePrivateProfileStringW(_T("Data"),_T("IPPort"),n_tcpport,AutoFlashConfigPath);
-			 if(is_net_device == false)
+			 if(is_sub_device)
 			 {
 				   WritePrivateProfileStringW(_T("Data"),_T("Subnote"),_T("1"),AutoFlashConfigPath);
 				   CString nsub_id;
@@ -383,43 +396,37 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 	{
 		CString show_error_message;
 		int file_error_type = (int)lParam;
+		bool download_failed = false;
 		switch(file_error_type)
 		{
 		case NO_MD5_FILE_EXSIT:
 			{
-				show_error_message.Format(_T("TEMCO server doesn't contain the file you needed"));
-				if(flash_multi_auto)
-				{
-					PostMessage(WM_CLOSE,NULL,NULL);
-				}
+				show_error_message.Format(_T("Sorry, the firmware update service is temporarily offline or your file cannot be found."));
+
+				m_download_info.InsertString(m_download_info.GetCount(),show_error_message);
+				m_download_info.SetTopIndex(m_download_info.GetCount()-1);
+
+				show_error_message.Format(_T(" Please navigate to this link and manually download the firmware:http://www.temcocontrols.com/ftp/firmware/"));
+				download_failed = true;
 			}
 			break;
 		case DOWNLOAD_FILE_ERROR:
 			{
 				show_error_message.Format(_T("Download file from server failed!"));
-				if(flash_multi_auto)
-				{
-					PostMessage(WM_CLOSE,NULL,NULL);
-				}
+				download_failed = true;
 			}
 
 			break;
 		case HOST_BUSY:
 			{
 				show_error_message.Format(_T("Host busy,please try again later!"));
-				if(flash_multi_auto)
-				{
-					PostMessage(WM_CLOSE,NULL,NULL);
-				}
+				download_failed = true;
 			}
 			break;
 		case DOWNLOAD_MD5_FAILED:
 			{
 				show_error_message.Format(_T("Check MD5 value failed!Please retry again!"));
-				if(flash_multi_auto)
-				{
-					PostMessage(WM_CLOSE,NULL,NULL);
-				}
+				download_failed = true;
 			}
 			break;
 		case DOWNLOAD_MD5_CHECK_PASS:
@@ -432,18 +439,32 @@ LRESULT Dowmloadfile::DownloadFileMessage(WPARAM wParam,LPARAM lParam)
 				 temp_show = temp_show + MD5_value;
 				 m_download_info.InsertString(m_download_info.GetCount(),temp_show);
 				 show_error_message.Format(_T("Check MD5 value with server Pass."));
+				 download_failed = false;
 			}
 			break;
 		default:
 			{
 				show_error_message.Format(_T("Unknown error,please try again later!"));
-				if(flash_multi_auto)
-				{
-					PostMessage(WM_CLOSE,NULL,NULL);
-				}
+				download_failed = true;
 			}
 			break;
 
+		}
+
+		if(download_failed)
+		{
+			if(flash_multi_auto)
+			{
+				PostMessage(WM_CLOSE,NULL,NULL);
+			}
+			else
+			{
+				if(MessageBox(_T("Do you want download firmware manually from website?"),_T("Download"),MB_YESNO) == IDYES)
+				{
+					ShellExecute(NULL, L"open", L"http://www.temcocontrols.com/ftp/firmware/", NULL, NULL, SW_SHOWNORMAL);
+				}
+
+			}
 		}
 		m_download_info.InsertString(m_download_info.GetCount(),show_error_message);
 		m_download_info.SetTopIndex(m_download_info.GetCount()-1);
@@ -715,7 +736,7 @@ BOOL Dowmloadfile::OnInitDialog()
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->AddString(_T("Bootloader"));
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->AddString(_T("Main Firmware"));
 	((CComboBox *)GetDlgItem(IDC_COMBO_UPDATE_TYPE))->SetCurSel(1);
-	((CEdit *)GetDlgItem(IDC_EDIT_SERVER_DOMAIN))->SetWindowText(_T("Temco Server"));
+	((CEdit *)GetDlgItem(IDC_EDIT_SERVER_DOMAIN))->SetWindowText(_T("Firmware Server"));
 		
 	wait_download_and_isp_finished = false;
 	CString temp_id;CString temp_name;
@@ -766,7 +787,8 @@ BOOL Dowmloadfile::OnInitDialog()
 		hostent* host = gethostbyname("newfirmware.com");
 		if(host == NULL)
 		{
-			MessageBox(_T("Connect Temco server failed.  \r\nPlease check your internet connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
+			if(!flash_multi_auto)
+				MessageBox(_T("Connect firmware server failed.  \r\nPlease check your internet connection!"),_T("Warning"),MB_OK | MB_ICONINFORMATION);
 			PostMessage(WM_CLOSE,NULL,NULL);
 			return TRUE;
 		}

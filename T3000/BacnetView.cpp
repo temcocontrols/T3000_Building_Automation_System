@@ -1,6 +1,26 @@
 ﻿// DialogCM5_BacNet.cpp : implementation file
 // DialogCM5 Bacnet programming by Fance 2013 05 01
 /*
+2016 - 05 - 19
+1. 修改Status bar 置顶的时候产生的 覆盖新窗口的问题;
+2. 增加 远程连接temco 服务器的功能 ，未完全测试通过;
+
+2016 - 05 - 11
+1.T3 -22i 1-11的input 增加 high speed count 功能.
+
+2016 - 05 - 10
+1.Bacnet Setting  中 加入time update 最后更新的时间.
+2.修复 input output 点击menu时 重新加载缓存文件 引起的 表格数据 异常.
+
+2016 - 05 - 04
+1.支持更改 object instance;改为4个字节
+2.重写 后台扫描函数;
+3.后台扫描自动删除重复序列号的 设备;
+
+2016 - 04 - 29
+1. 解决 Output table 宽度 显示 太长;
+2. Range 里面 ON/OFF 和 OFF/ON 用两个 radio button 来表示; 并且 修复 客户自定义的 在第一次的时候自动读取;
+
 2016 - 04 - 28
 1. 修改 Program 中 WAIT 函数 ;
 2. 修复ISP  误烧写 .
@@ -606,6 +626,7 @@ _Refresh_Info Bacnet_Refresh_Info;
 CString remote_ip_address;
 int bacnet_view_number = TYPE_INPUT;
 extern CString SaveConfigFilePath; //用来将资料存放至数据库，临时文件的存放目录;
+
 extern SOCKET my_sokect;
 extern bool show_user_list_window ;
 HANDLE connect_mstp_thread = NULL; // 当点击MSTP的设备时开启 连接的线程;
@@ -613,6 +634,10 @@ HANDLE read_rs485_thread = NULL; // RS485的设备 通用;
 
 int n_read_product_type = 0;
 int n_read_list_flag = -1;
+
+#define BAC_TIMER_2_WHOIS   2
+#define BAC_TIMER_3_CHECKALARM         3
+
 //#define WM_SEND_OVER     WM_USER + 1287
 // int m_Input_data_length;
 extern void  init_info_table( void );
@@ -1200,8 +1225,10 @@ LRESULT CDialogCM5_BacNet::BacnetView_Message_Handle(WPARAM wParam,LPARAM lParam
 					}
 					else
 					{
-						//Refresh the alarmlog list;
+						if(AlarmLog_Window->IsWindowVisible())
+							AlarmLog_Window->m_alarmlog_list.SetFocus();
 					}
+
 					//for (int i=0;i<WINDOW_TAB_COUNT;i++)
 					//{
 					//	pDialog[i]->ShowWindow(SW_HIDE);
@@ -1976,7 +2003,7 @@ void CDialogCM5_BacNet::Fresh()
 
 	//
 	//SetTimer(1,500,NULL);
-	SetTimer(2,60000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
+	SetTimer(BAC_TIMER_2_WHOIS,60000,NULL);//定时器2用于间隔发送 whois;不知道设备什么时候会被移除;
 	SetTimer(3,1000,NULL); //Check whether need  show Alarm dialog.
 #endif
 	BacNet_hwd = this->m_hWnd;
@@ -2034,16 +2061,16 @@ void CDialogCM5_BacNet::Fresh()
 	
 	if(ret)
 	{
-		int temp_instance;
+		unsigned int temp_instance;
 		int temp_mac;
 		int multy_ret = 0;
-		unsigned short temp_buffer[3];
+		unsigned short temp_buffer[5];
 
 			::PostMessage(MainFram_hwd,MY_RX_TX_COUNT,1,0);
 
-			memset(temp_buffer,0,3);
-			multy_ret = Read_Multi(g_tstat_id,temp_buffer,34,3);
+			memset(temp_buffer,0,5);
 
+			multy_ret = Read_Multi(g_tstat_id,temp_buffer,32,5,10);
 			if(multy_ret<=0)
 			{
 				pFrame->m_pTreeViewCrl->turn_item_image(selected_tree_item ,false);
@@ -2054,8 +2081,8 @@ void CDialogCM5_BacNet::Fresh()
 				return;
 			}
 
-			temp_instance = temp_buffer[1];
-			temp_mac = temp_buffer[2];
+			temp_instance =temp_buffer[0]*65536 + temp_buffer[3];
+			temp_mac = temp_buffer[4];
 			has_change_connect_ip = true;
 
 			if(pFrame->m_product.at(selected_product_index).product_class_id == PM_CM5)
@@ -2068,7 +2095,6 @@ void CDialogCM5_BacNet::Fresh()
 			{
 				int ret = 0;
 				ret = temp_buffer[0];
-				//ret = read_one(g_tstat_id,34,5);
 				if(ret == BIG_MINIPANEL)
 					bacnet_device_type = BIG_MINIPANEL;
 				else if(ret == SMALL_MINIPANEL)

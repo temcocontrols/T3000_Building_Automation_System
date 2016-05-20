@@ -16,6 +16,7 @@ char * receivefile_buffer = NULL;
 
 DownloadSocket::DownloadSocket(void)
 {
+	is_connect = false;
 }
 
 
@@ -185,6 +186,7 @@ void DownloadSocket::OnConnect(int nErrorCode)
 	{
 		SetDownloadResults(DOWNLOAD_RESULTS_UNKNOW);
 		PostMessage(m_parent_hwnd,WM_DOWNLOADFILE_MESSAGE,DOWNLOAD_CONNECT_SUCCESS,NULL);	//建立套接字,连接成功时就开始请求传输的文件;
+		is_connect = true;
 	}
 	else
 	{

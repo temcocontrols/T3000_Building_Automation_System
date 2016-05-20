@@ -1383,13 +1383,33 @@ BOOL CT3000App::InitInstance()
 				CreateDirectory( g_achive_folder_temp_db, &attrib);
 			}
 
-			CppSQLite3DB SqliteDB;
-			CString tempDB = GetExePath(true) + L"Psychrometry\\db_psychrometric_project.s3db";
 			HANDLE hFind;
 			WIN32_FIND_DATA wfd;
+
+			CString SqliteDLLPath=GetExePath(true)+L"sqlite3.dll";
+			hFind = FindFirstFile(SqliteDLLPath, &wfd);
+			if (hFind==INVALID_HANDLE_VALUE)
+			{
+
+				HRSRC hrSrc = FindResource(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_SQLITE3DLL1), _T("SQLITE3DLL"));   
+				HGLOBAL hGlobal = LoadResource(AfxGetResourceHandle(), hrSrc);   
+				LPVOID lpExe = LockResource(hGlobal);   
+				CFile file;
+				if(file.Open(SqliteDLLPath, CFile::modeCreate | CFile::modeWrite))    
+					file.Write(lpExe, (UINT)SizeofResource(AfxGetResourceHandle(), hrSrc));    
+				file.Close();    
+				::UnlockResource(hGlobal);   
+				::FreeResource(hGlobal);
+			}
+
+
+			CppSQLite3DB SqliteDB;
+			CString tempDB = GetExePath(true) + L"Psychrometry\\db_psychrometric_project.s3db";
+			
 			hFind = FindFirstFile(tempDB, &wfd);
 			if (hFind==INVALID_HANDLE_VALUE)
 			{
+				CreateDirectory(GetExePath(true)+L"Psychrometry\\");
 				char m_sqlitepath[256];
 				strcpy( m_sqlitepath, (CStringA)tempDB);
 				SqliteDB.open(m_sqlitepath);
@@ -1409,12 +1429,12 @@ BOOL CT3000App::InitInstance()
 				SqliteDB.execDML(charqltext);
 				 
 				 
-				SqlText =_T("create table tbl_geo_location_value (ID int ,longitude varchar(255),latitude varchar(255),elevation varchar(255))");
-				      // _T("create table tbl_geo_location_value (ID int ,longitude varchar(255),latitude varchar(255),elevation varchar(255))");
-				memset(charqltext,0,1024);
-				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+				//SqlText =_T("create table tbl_geo_location_value (ID int ,longitude varchar(255),latitude varchar(255),elevation varchar(255))");
+				//      // _T("create table tbl_geo_location_value (ID int ,longitude varchar(255),latitude varchar(255),elevation varchar(255))");
+				//memset(charqltext,0,1024);
+				//WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
 
-				SqliteDB.execDML(charqltext);
+				//SqliteDB.execDML(charqltext);
 				 
 // 				SqlText = _T("create table tbl_historical_data (ID int ,date_current datetime,hour_current int,minute_current int,temperature varchar(255),\
 // 					humidity varchar(255),station_name varchar(255))");
@@ -1429,11 +1449,11 @@ BOOL CT3000App::InitInstance()
 
 				SqliteDB.execDML(charqltext);
 				 
-				SqlText = L"create table tbl_temp_humidity (temp int,humidity int)";
-				memset(charqltext,0,1024);
-				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-
-				SqliteDB.execDML(charqltext);
+// 				SqlText = L"create table tbl_temp_humidity (temp int,humidity int)";
+// 				memset(charqltext,0,1024);
+// 				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+// 
+// 				SqliteDB.execDML(charqltext);
 
 
 				SqlText = L"Insert into tbl_building_location values(1,1,'China','','ShangHai','HongXinRoad,#35',200000,'121','31','3.5','DefaultBuilding')";
@@ -1448,21 +1468,31 @@ BOOL CT3000App::InitInstance()
 
 				SqliteDB.execDML(charqltext);
 
-				// 0:let user select a language 
-				//1:English
-				//2:Chinese
-				//3:Korean
-				SqlText = L"Insert into tbl_language_option values(1,0)";
+				 
+				SqlText = L"Insert into tbl_language_option values(1,1)";
 				memset(charqltext,0,1024);
 				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
 
 				SqliteDB.execDML(charqltext);
 
+				SqlText = L"Insert into tbl_language_option values(2,0)";
+				memset(charqltext,0,1024);
+				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+
+				SqliteDB.execDML(charqltext);
+
+
+				SqlText = L"Insert into tbl_language_option values(3,0)";
+				memset(charqltext,0,1024);
+				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+
+				SqliteDB.execDML(charqltext);
 				SqliteDB.close();
 			}
 
 			FindClose(hFind);
 
+			
 
 
 			g_strOrigDatabaseFilePath=g_strExePth+_T("T3000.mdb");//

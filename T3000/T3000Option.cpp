@@ -63,7 +63,7 @@ void CT3000Option::OnCbnSelchangeComboLanguage()
 
 	CString SqlText;
 	
-	SqlText.Format(_T("Update tbl_language_option set language_id = %d  where  ID = 1"),Lan_ID +1);
+	SqlText.Format(_T("Update tbl_language_option set language_id = 0  where  language_id = 1"));
 
 	char charqltext[1024];
 	memset(charqltext,0,1024);
@@ -71,6 +71,14 @@ void CT3000Option::OnCbnSelchangeComboLanguage()
 	 
 
 	SqliteDB.execDML(charqltext);
+
+	SqlText.Format(_T("Update tbl_language_option set language_id = 1  where  ID = %d"),Lan_ID+1);
+
+	memset(charqltext,0,1024);
+	WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
+
+	SqliteDB.execDML(charqltext);
+
 	SqliteDB.close();
 
 }

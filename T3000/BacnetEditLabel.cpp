@@ -92,6 +92,7 @@ BEGIN_MESSAGE_MAP(CBacnetEditLabel, CDialogEx)
 	ON_STN_CLICKED(IDC_EDIT_ICON_PATH, &CBacnetEditLabel::OnStnClickedEditIconPath)
 	ON_BN_CLICKED(IDC_BUTTON_LABEL_EXIT, &CBacnetEditLabel::OnBnClickedButtonLabelExit)
 	ON_STN_CLICKED(IDC_EDIT_ICON_PATH2, &CBacnetEditLabel::OnStnClickedEditIconPath2)
+	ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
 
 
@@ -784,7 +785,10 @@ void CBacnetEditLabel::FreshWindow(Bacnet_Label_Info &temp_info)
 					if(m_AutoManual.CompareNoCase(_T("M")) == 0)
 					{			
 						m_AutoManual = _T("Manual");	
-						m_edit_value.EnableWindow(true);
+						if(digital_status == 0)
+							m_edit_value.EnableWindow(true);
+						else
+							m_edit_value.EnableWindow(false);
 					}
 					else
 					{
@@ -1448,4 +1452,24 @@ void CBacnetEditLabel::OnStnClickedEditIconPath2()
 
 	}
 
+}
+
+
+void CBacnetEditLabel::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+	CRect edit_rect;
+	((CEdit *)GetDlgItem(IDC_EDIT_LABEL_VALUE))->GetWindowRect(edit_rect);
+	ScreenToClient(&edit_rect);
+	//TRACE(_T("%d %d %d %d\r\n"),edit_rect.left,edit_rect.top,edit_rect.right,edit_rect.bottom);
+	//TRACE(_T("%d %d\r\n"),point.x,point.y);
+	if((point.x > edit_rect.left) &&
+		(point.x < edit_rect.right) &&
+		(point.y > edit_rect.top) &&
+		(point.y < edit_rect.bottom))
+	{
+		PostMessage(WM_EDIT_CHANGE_VALUE,CHANGE_VALUE,NULL);
+	}
+
+	CDialogEx::OnLButtonDown(nFlags, point);
 }
