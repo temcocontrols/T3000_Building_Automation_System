@@ -24,6 +24,7 @@ CBuildingConfigEditDlg::CBuildingConfigEditDlg(CWnd* pParent /*=NULL*/)
 	m_strstate = _T("");
 	m_strstreet = _T("");
 	m_strZip = _T("");
+	m_strEngineeringUnits = _T("SI");
 }
 
 CBuildingConfigEditDlg::~CBuildingConfigEditDlg()
@@ -43,6 +44,7 @@ void CBuildingConfigEditDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_STATE, m_strstate);
 	DDX_Text(pDX, IDC_EDIT_STREET1, m_strstreet);
 	DDX_Text(pDX, IDC_EDIT_ZIP, m_strZip);
+	DDX_Text(pDX, IDC_EDIT_EUNITS, m_strEngineeringUnits);
 }
 
 
@@ -72,7 +74,7 @@ void CBuildingConfigEditDlg::OnBnClickedOk()
 	 m_currentBuilding.state = m_strstate;
 	 m_currentBuilding.street = m_strstreet;
 	 m_currentBuilding.Zip = _wtoi(m_strZip);
-
+	 m_currentBuilding.EngineeringUnits = m_strEngineeringUnits;
 	 CDialog::OnOK();
 }
 
@@ -87,7 +89,11 @@ void CBuildingConfigEditDlg::BoundDataUpdate()
 	m_strstate = m_currentBuilding.state;
 	m_strstreet = m_currentBuilding.street;
 	m_strZip.Format(_T("%d"),m_currentBuilding.Zip);
-
+	if(!m_currentBuilding.EngineeringUnits.IsEmpty())
+	{
+		m_strEngineeringUnits = m_currentBuilding.EngineeringUnits;
+	}
+	
 	UpdateData(FALSE);
 }
 BOOL CBuildingConfigEditDlg::OnInitDialog()

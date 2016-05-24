@@ -96,7 +96,7 @@ int CBinFileParser::GetBinFileBuffer(char* pFileBuf, int nFileBufLen)
 			Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
 		Temco_logo.ReleaseBuffer();
 		Temco_logo.MakeUpper();
-		if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0)
+		if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0&&Temco_logo.CompareNoCase(L"CO2")!=0)
 		{
 			//return NO_VERSION_INFO;
 			ret_find_in_0x100 = -1;

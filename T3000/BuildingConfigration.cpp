@@ -1514,7 +1514,11 @@ void CBuildingConfigration::LoadBuildingConfigDB()
 		else
 			temp_building.Zip=0;
 
-	 
+		temp_variant=m_building_pRs->GetCollect("EngineeringUnits");//
+		if(temp_variant.vt!=VT_NULL)
+			temp_building.EngineeringUnits=temp_variant;
+		else
+			temp_building.EngineeringUnits.Empty();
 
 	 
 
@@ -2322,11 +2326,6 @@ void CBuildingConfigration::OnBuildingconfigDelete()
         m_building_config_list.SetCellStringList(m_curRow, BC_COMPORT, strlist);
     }
 
-
-
-	
-
-
     m_bChanged=TRUE;
     // Fresh_List();
     //Initial_Building_List();
@@ -2386,7 +2385,6 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 		 
 		m_BuildNameLst.at(m_curRow) = dlg.m_currentBuilding;
 		CADO m_database_operator;
-		 
 
 		try
 		{
@@ -2432,6 +2430,10 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 				{
 					m_database_operator.m_pRecordset->PutCollect("Zip", (_variant_t)m_BuildNameLst.at(m_curRow).Zip);
 				}
+				if(!m_BuildNameLst.at(m_curRow).EngineeringUnits.IsEmpty())
+				{
+					m_database_operator.m_pRecordset->PutCollect("EngineeringUnits", (_variant_t)m_BuildNameLst.at(m_curRow).EngineeringUnits);
+				}
 				m_database_operator.m_pRecordset->Update();
 			}
 
@@ -2449,20 +2451,16 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 			 state = '%s' ,\
 			 city = '%s' ,\
 			 street = '%s' ,\
-			 longitude = '%s' ,\
-			 latitude = '%s' ,\
-			 elevation = '%s' \
-			 ZIP = %d\
+			 ZIP = %d ,\
+			 EngineeringUnits = '%s'\
 			 where ID = %d \
 			  "),
 			  m_BuildNameLst.at(m_curRow).country,
 			  m_BuildNameLst.at(m_curRow).state,
 			  m_BuildNameLst.at(m_curRow).city,
 			  m_BuildNameLst.at(m_curRow).street,
-			  m_BuildNameLst.at(m_curRow).Longitude,
-			  m_BuildNameLst.at(m_curRow).Latitude,
-			  m_BuildNameLst.at(m_curRow).Elevation,
 			  m_BuildNameLst.at(m_curRow).Zip,
+			  m_BuildNameLst.at(m_curRow).EngineeringUnits,
 			  m_BuildNameLst.at(m_curRow).ID
 			  );
 			  char charqltext[1024];
@@ -2471,7 +2469,8 @@ void CBuildingConfigration::OnNMDblclkListBuildingConfig(NMHDR *pNMHDR, LRESULT 
 			  WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
 
 			  SqliteDB.execDML(charqltext);
-       SqliteDB.close();
+
+				 SqliteDB.close();
 		 
 			AfxMessageBox(_T("Update Successfully"));
 

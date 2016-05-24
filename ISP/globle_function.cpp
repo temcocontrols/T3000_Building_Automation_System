@@ -456,7 +456,7 @@ CString GetProductName(int ModelID)
 		strProductName = "CO2 Node";
 		break;
 	case PM_T322AI:
-		strProductName="T3-22I";
+		strProductName="T322I";
 		break;
 	case PM_T38AI8AO6DO:
 		strProductName="T38IO";

@@ -19,7 +19,7 @@
 #include "T3000DefaultView.h"
 #include "bado/BADO.h"
 #include "SqliteLib/CppSQLite3.h"
-const int g_versionNO=20160505;
+const int g_versionNO=20160520;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -39,16 +39,11 @@ END_MESSAGE_MAP()
 CT3000App::CT3000App()
 {
  
-		m_bHiColorIcons = TRUE;
-		CurrentT3000Version=_T("    2016.05.05");
-		T3000_Version = 10429;
-//	}
-// 	catch (...)
-// 	{
-// 		
-// 		AfxMessageBox(_T("1111"));
-// 	}
-        m_lastinterface=19;
+	m_bHiColorIcons = TRUE;
+	CurrentT3000Version=_T("    2016.05.20");
+	T3000_Version = 10429;
+
+	m_lastinterface=19;
 }
 // The one and only CT3000App object
 CT3000App theApp;
@@ -115,8 +110,6 @@ BOOL CT3000App::RegisterOcx(LPCTSTR   OcxFileName)
 	{
 	//	AfxMessageBox(_T("false"));
 			return   FALSE;
-
-
 	}
 	
 }
@@ -1415,10 +1408,10 @@ BOOL CT3000App::InitInstance()
 				SqliteDB.open(m_sqlitepath);
 
 				CString SqlText;
-// 				SqlText = _T("create table tbl_building_location (ID INTEGER PRIMARY KEY AUTOINCREMENT ,\
-// 				country varchar(255),state varchar(255),city varchar(255),street varchar(255), \
-// 				ZIP int,longitude varchar(255),latitude varchar(255),elevation varchar(255),BuildingName VARCHAR( 255 )  UNIQUE)");
-				SqlText = _T("create table tbl_building_location (Selection int DEFAULT ( 0 ),ID INTEGER PRIMARY KEY AUTOINCREMENT ,country varchar(255),state varchar(255),city varchar(255),street varchar(255), ZIP int,longitude varchar(255),latitude varchar(255),elevation varchar(255),BuildingName VARCHAR(255))");
+ 
+				SqlText = _T("create table tbl_building_location (Selection int DEFAULT ( 0 ),ID INTEGER PRIMARY KEY AUTOINCREMENT ,country varchar(255),\
+				state varchar(255),city varchar(255),street varchar(255), ZIP int,longitude varchar(255),latitude varchar(255),elevation varchar(255),\
+				BuildingName VARCHAR(255),EngineeringUnits VARCHAR(255) )");
 				
 				char charqltext[1024];
 				memset(charqltext,0,1024);
@@ -1438,6 +1431,7 @@ BOOL CT3000App::InitInstance()
 				 
 // 				SqlText = _T("create table tbl_historical_data (ID int ,date_current datetime,hour_current int,minute_current int,temperature varchar(255),\
 // 					humidity varchar(255),station_name varchar(255))");
+
 				SqlText = _T("create table tbl_historical_data (ID INTEGER,date_current datetime,hour_current int,minute_current int,distance_from_building varchar(255),temperature varchar(255),humidity varchar(255),bar_pressure varchar(255),wind varchar(255),direction varchar(255),station_name varchar(255))");
 				memset(charqltext,0,1024);
 				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
@@ -1459,7 +1453,6 @@ BOOL CT3000App::InitInstance()
 				SqlText = L"Insert into tbl_building_location values(1,1,'China','','ShangHai','HongXinRoad,#35',200000,'121','31','3.5','DefaultBuilding')";
 				memset(charqltext,0,1024);
 				WideCharToMultiByte( CP_ACP, 0, SqlText.GetBuffer(), -1, charqltext, 1024, NULL, NULL );
-
 				SqliteDB.execDML(charqltext);
 
 				SqlText = L"create table tbl_language_option (ID int,language_id int)";
@@ -1981,6 +1974,7 @@ void CT3000App::PreLoadState()
 
 void CT3000App::LoadCustomState()
 {
+	
 }
 
 void CT3000App::SaveCustomState()

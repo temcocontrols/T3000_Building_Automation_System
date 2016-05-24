@@ -350,6 +350,8 @@
 #define IDC_EDIT48                      1035
 #define IDC_DTS7                        1035
 #define IDC_EDIT_FAN_LOW_NAME           1035
+#define IDC_EDIT_ZIP2                   1035
+#define IDC_EDIT_EUNITS                 1035
 #define IDC_FIRMWARV_EDIT               1036
 #define IDC_START_POINT                 1036
 #define IDC_EDIT49                      1036

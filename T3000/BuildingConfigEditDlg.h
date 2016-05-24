@@ -34,4 +34,5 @@ public:
 	virtual BOOL OnInitDialog();
 
 	void BoundDataUpdate();
+	CString m_strEngineeringUnits;
 };

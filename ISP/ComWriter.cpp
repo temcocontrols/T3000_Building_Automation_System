@@ -1602,7 +1602,7 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
         srtInfo.Format(_T("|ID %d: Programming lines %d to %d.(%d%%)"),m_ID,the_max_register_number_parameter_Finished+ii,the_max_register_number_parameter_Finished+ii+128,persentfinished);
         pWriter->OutPutsStatusInfo(srtInfo, TRUE);
 
-        SetResponseTime(20);
+         
 
         do
         {
@@ -1626,7 +1626,7 @@ int flash_a_tstat_RAM(BYTE m_ID,int section, unsigned int the_max_register_numbe
         }
         while(itemp<RETRY_TIMES);
 
-        SetResponseTime(60);
+         
 
         //srtInfo.Format(_T("Communication was interrupted.Tryiny connect agina!"));
         //pWriter->OutPutsStatusInfo(srtInfo, TRUE);
@@ -2140,7 +2140,10 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
 
 
     CString prodcutname=GetProductName(device_productID);
-
+	if (device_productID == 255 || device_productID == 0)
+	{
+		return TRUE;
+	}
 //     if(READ_SUCCESS != Get_HexFile_Information(m_hexbinfilepath.GetBuffer(),temp1,0x100))
 //     {
 //         //AfxMessageBox(_T("The hex file dones't contains Temco logo,Can't flash into our products!"));
@@ -2163,7 +2166,17 @@ BOOL CComWriter::UpdataDeviceInformation_ex(unsigned short device_productID)
     prodcutname.MakeUpper();
     hexproductname.MakeUpper();
 
+	CString Temco_logo;
+	MultiByteToWideChar( CP_ACP, 0, (char *)global_fileInfor.company,
+		(int)strlen(global_fileInfor.company)+1,
+		Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
+	Temco_logo.ReleaseBuffer();
+	Temco_logo.MakeUpper();
 
+	if (Temco_logo.Find(L"CO2")!=-1)
+	{
+		hexproductname = L"CO2";
+	}
 
     //   if (hexproductname.CompareNoCase(_T("CO3"))==0)
     //   {
@@ -2239,6 +2252,11 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
     }
     while (ret < 0);
 
+	if (Device_infor[7] == 255 || Device_infor[7] == 0)
+	{
+		return TRUE;
+	}
+	 
 
     CString prodcutname=GetProductName(Device_infor[7]);
 
@@ -2252,6 +2270,18 @@ BOOL CComWriter::UpdataDeviceInformation(int& ID)
     {
         hexproductname.AppendFormat(_T("%c"),global_fileInfor.product_name[i]);
     }
+	CString Temco_logo;
+	MultiByteToWideChar( CP_ACP, 0, (char *)global_fileInfor.company,
+		(int)strlen(global_fileInfor.company)+1,
+		Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
+	Temco_logo.ReleaseBuffer();
+	Temco_logo.MakeUpper();
+
+	if (Temco_logo.Find(L"CO2")!=-1)
+	{
+		hexproductname = Temco_logo;
+	}
+
     prodcutname.MakeLower();
 
 
@@ -2426,12 +2456,13 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
                         else
                         {
                             bool is_ok =  Change_BaudRate (115200);
+							SetResponseTime(10);
                         }
                         // Change_BaudRate (115200);
                     }
 
                 }
-
+				 
                 Sleep (500);
 
                 int m_ID=pWriter->m_szMdbIDs[i];
@@ -2794,7 +2825,7 @@ UINT flashThread_ForExtendFormatHexfile_RAM(LPVOID pParam)
             do
             {
 
-                if(-2==Write_One(pWriter->m_szMdbIDs[i],16,1))
+                if(Write_One(pWriter->m_szMdbIDs[i],16,1)<0)
                 {
                     ii++;
                 }

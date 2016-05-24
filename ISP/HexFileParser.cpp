@@ -75,7 +75,7 @@ int  CHexFileParser::GetHexFileBuffer(char* pBuf, int nLen)
 		Temco_logo.GetBuffer(MAX_PATH), MAX_PATH );
 	Temco_logo.ReleaseBuffer();		
 	Temco_logo.MakeUpper();
-	if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0)
+	if(Temco_logo.CompareNoCase(_T("TEMCO")) != 0&&Temco_logo.Find(L"CO2")==-1)
 	{
 		//return NO_VERSION_INFO;
 		nBufLen = -1;

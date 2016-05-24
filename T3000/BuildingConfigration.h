@@ -28,6 +28,7 @@ typedef struct Building_Config
 	CString Longitude;
 	CString Latitude ;
 	CString Elevation;
+	CString EngineeringUnits;
 };
 
 class CBuildingConfigration : public CDialogEx
