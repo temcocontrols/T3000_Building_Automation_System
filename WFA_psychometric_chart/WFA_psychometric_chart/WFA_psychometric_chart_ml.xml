@@ -617,12 +617,14 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>204</StringID>
+    <Comment>Previous text: No</Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>205</StringID>
   </GeneralIds>
   <GeneralIds>
     <StringID>206</StringID>
+    <Comment>Previous text: Connection Error Issue? </Comment>
   </GeneralIds>
   <GeneralIds>
     <StringID>207</StringID>
@@ -825,6 +827,15 @@
   </GeneralIds>
   <GeneralIds>
     <StringID>272</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>273</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>274</StringID>
+  </GeneralIds>
+  <GeneralIds>
+    <StringID>275</StringID>
   </GeneralIds>
   <Languages>
     <LanguageID>1033</LanguageID>
@@ -2067,7 +2078,7 @@
   <GeneralTexts>
     <StringID>204</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>No</LanguageText>
+    <LanguageText>GOOD</LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
@@ -2079,7 +2090,7 @@
   <GeneralTexts>
     <StringID>206</StringID>
     <LanguageID>1033</LanguageID>
-    <LanguageText>Connection Error Issue? </LanguageText>
+    <LanguageText>Connection :</LanguageText>
     <Status>1</Status>
   </GeneralTexts>
   <GeneralTexts>
@@ -2330,7 +2341,7 @@
     <StringID>204</StringID>
     <LanguageID>4</LanguageID>
     <LanguageText>否</LanguageText>
-    <Status>3</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>13</StringID>
@@ -3074,7 +3085,7 @@
     <StringID>206</StringID>
     <LanguageID>4</LanguageID>
     <LanguageText>连接错误问题？</LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>7</StringID>
@@ -3530,7 +3541,7 @@
     <StringID>204</StringID>
     <LanguageID>1042</LanguageID>
     <LanguageText>아니오</LanguageText>
-    <Status>3</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>13</StringID>
@@ -4208,7 +4219,7 @@
     <StringID>206</StringID>
     <LanguageID>1042</LanguageID>
     <LanguageText>연결 오류 문제? </LanguageText>
-    <Status>5</Status>
+    <Status>7</Status>
   </GeneralTexts>
   <GeneralTexts>
     <StringID>7</StringID>
@@ -5032,6 +5043,54 @@ Enthalpy : </LanguageText>
     <StringID>272</StringID>
     <LanguageID>4</LanguageID>
     <LanguageText>历史情节</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>273</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Node Grid View</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>274</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>Disconnect Line</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>275</StringID>
+    <LanguageID>1033</LanguageID>
+    <LanguageText>DataGridViewDisplay</LanguageText>
+    <Status>1</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>274</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>断开线</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>274</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>분리 라인</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>258</StringID>
+    <LanguageID>1042</LanguageID>
+    <LanguageText>안전 지대 를 표시</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>258</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>显示安乐窝</LanguageText>
+    <Status>2</Status>
+  </GeneralTexts>
+  <GeneralTexts>
+    <StringID>273</StringID>
+    <LanguageID>4</LanguageID>
+    <LanguageText>节点网格视图</LanguageText>
     <Status>2</Status>
   </GeneralTexts>
   <Properties>
@@ -8737,6 +8796,30 @@ Enthalpy : </LanguageText>
     <ResourceName>Historical_Plot</ResourceName>
     <Hidden>false</Hidden>
   </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>nodeGridViewToolStripMenuItem.Text</Name>
+    <StringID>273</StringID>
+    <Selected>true</Selected>
+    <ResourceName>nodeGridViewToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>Form1_main.cs</Component>
+    <Name>disconnectLineToolStripMenuItem.Text</Name>
+    <StringID>274</StringID>
+    <Selected>true</Selected>
+    <ResourceName>disconnectLineToolStripMenuItem.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
+  <Properties>
+    <Component>DataGridViewDisplay.cs</Component>
+    <Name>DataGridViewDisplay.Text</Name>
+    <StringID>275</StringID>
+    <Selected>true</Selected>
+    <ResourceName>$this.Text</ResourceName>
+    <Hidden>false</Hidden>
+  </Properties>
   <GeneralAttributes>
     <Name>XmlDatabaseVersion</Name>
     <TextValue>1</TextValue>
@@ -8744,7 +8827,7 @@ Enthalpy : </LanguageText>
   </GeneralAttributes>
   <GeneralAttributes>
     <Name>StatusHash</Name>
-    <TextValue>PrWGEPg8jzfx1DLxs9NTfvx7cu4=</TextValue>
+    <TextValue>oha0Gg228VmEHIV7fjvoBdblnf0=</TextValue>
     <NumValue>0</NumValue>
   </GeneralAttributes>
   <GeneralAttributes>

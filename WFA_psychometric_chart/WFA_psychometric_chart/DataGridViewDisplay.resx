@@ -117,104 +117,45 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="dataGridView1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 12</value>
+  </data>
+  <data name="dataGridView1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>553, 195</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="dataGridView1.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;dataGridView1.Name" xml:space="preserve">
+    <value>dataGridView1</value>
+  </data>
+  <data name="&gt;&gt;dataGridView1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;dataGridView1.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;dataGridView1.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>6, 13</value>
+  </data>
+  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
+    <value>585, 234</value>
+  </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>심리 측정 차트</value>
+    <value>DataGridViewDisplay</value>
   </data>
-  <data name="button1.Text" xml:space="preserve">
-    <value>그래프 새로 고침</value>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>DataGridViewDisplay</value>
   </data>
-  <data name="button2.Text" xml:space="preserve">
-    <value>계산</value>
-    <comment>Previous text: Calculate</comment>
-  </data>
-  <data name="chart1.Text" xml:space="preserve">
-    <value>
-차트 1</value>
-  </data>
-  <data name="disconnectLineToolStripMenuItem.Text" xml:space="preserve">
-    <value>분리 라인</value>
-  </data>
-  <data name="exitToolStripMenuItem.Text" xml:space="preserve">
-    <value>끝내기</value>
-  </data>
-  <data name="exportDataToolStripMenuItem.Text" xml:space="preserve">
-    <value>데이터 내보내기</value>
-  </data>
-  <data name="fileToolStripMenuItem.Text" xml:space="preserve">
-    <value>파일</value>
-  </data>
-  <data name="gb_select_date.Text" xml:space="preserve">
-    <value>열 지도</value>
-  </data>
-  <data name="groupBox4.Text" xml:space="preserve">
-    <value>다른 매개 변수 값</value>
-  </data>
-  <data name="helpPsychometricChartToolStripMenuItem.Text" xml:space="preserve">
-    <value>심리 차트</value>
-  </data>
-  <data name="helpToolStripMenuItem.Text" xml:space="preserve">
-    <value>도움말</value>
-  </data>
-  <data name="insertNodeToolStripMenuItem.Text" xml:space="preserve">
-    <value>노드 삽입</value>
-  </data>
-  <data name="label1.Text" xml:space="preserve">
-    <value>에서 :</value>
-  </data>
-  <data name="label1_units.Text" xml:space="preserve">
-    <value>단위 (SI)</value>
-  </data>
-  <data name="label2.Text" xml:space="preserve">
-    <value>상대 습도:</value>
-    <comment>Previous text: Relative Humidity:</comment>
-  </data>
-  <data name="label2_DBT_units.Text" xml:space="preserve">
-    <value>정도 C</value>
-  </data>
-  <data name="label21.Text" xml:space="preserve">
-    <value>DBT:</value>
-    <comment>Previous text: DBT :</comment>
-  </data>
-  <data name="label23.Text" xml:space="preserve">
-    <value>Sp. H:</value>
-  </data>
-  <data name="label24.Text" xml:space="preserve">
-    <value>RH:</value>
-    <comment>Previous text: RH :</comment>
-  </data>
-  <data name="label25.Text" xml:space="preserve">
-    <value>DP는:</value>
-    <comment>Previous text: DP :</comment>
-  </data>
-  <data name="label26.Text" xml:space="preserve">
-    <value>H:</value>
-    <comment>Previous text: H :</comment>
-  </data>
-  <data name="label6_DP_Unit.Text" xml:space="preserve">
-    <value>정도 C</value>
-  </data>
-  <data name="optionToolStripMenuItem.Text" xml:space="preserve">
-    <value>옵션</value>
-  </data>
-  <data name="printToolStripMenuItem.Text" xml:space="preserve">
-    <value>인쇄</value>
-  </data>
-  <data name="psychrometricCalculatorToolStripMenuItem.Text" xml:space="preserve">
-    <value>
-습공기 계산기</value>
-    <comment>Previous text: Psychrometric Calculator</comment>
-  </data>
-  <data name="realTimePlottingToolStripMenuItem.Text" xml:space="preserve">
-    <value>실시간으로 플롯</value>
-    <comment>Previous text: Real Time Plotting</comment>
-  </data>
-  <data name="saveAsToolStripMenuItem.Text" xml:space="preserve">
-    <value>다른 이름으로 저장</value>
-  </data>
-  <data name="showComfortZoneToolStripMenuItem.Text" xml:space="preserve">
-    <value>안전 지대 를 표시</value>
-  </data>
-  <data name="weatherServicesToolStripMenuItem.Text" xml:space="preserve">
-    <value>날씨 서비스</value>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

@@ -102,11 +102,8 @@
             this.btnShowLogFile = new System.Windows.Forms.Button();
             this.label41 = new System.Windows.Forms.Label();
             this.label30 = new System.Windows.Forms.Label();
-            this.label32 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.tb_last_updated = new System.Windows.Forms.TextBox();
-            this.tb_distance_from_build = new System.Windows.Forms.TextBox();
-            this.label16 = new System.Windows.Forms.Label();
             this.tb_location = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
@@ -564,11 +561,8 @@
             this.groupBox4.Controls.Add(this.btnShowLogFile);
             this.groupBox4.Controls.Add(this.label41);
             this.groupBox4.Controls.Add(this.label30);
-            this.groupBox4.Controls.Add(this.label32);
             this.groupBox4.Controls.Add(this.label17);
             this.groupBox4.Controls.Add(this.tb_last_updated);
-            this.groupBox4.Controls.Add(this.tb_distance_from_build);
-            this.groupBox4.Controls.Add(this.label16);
             this.groupBox4.Controls.Add(this.tb_location);
             this.groupBox4.Controls.Add(this.label15);
             resources.ApplyResources(this.groupBox4, "groupBox4");
@@ -597,11 +591,6 @@
             resources.ApplyResources(this.label30, "label30");
             this.label30.Name = "label30";
             // 
-            // label32
-            // 
-            resources.ApplyResources(this.label32, "label32");
-            this.label32.Name = "label32";
-            // 
             // label17
             // 
             resources.ApplyResources(this.label17, "label17");
@@ -612,17 +601,6 @@
             resources.ApplyResources(this.tb_last_updated, "tb_last_updated");
             this.tb_last_updated.Name = "tb_last_updated";
             this.tb_last_updated.ReadOnly = true;
-            // 
-            // tb_distance_from_build
-            // 
-            resources.ApplyResources(this.tb_distance_from_build, "tb_distance_from_build");
-            this.tb_distance_from_build.Name = "tb_distance_from_build";
-            this.tb_distance_from_build.ReadOnly = true;
-            // 
-            // label16
-            // 
-            resources.ApplyResources(this.label16, "label16");
-            this.label16.Name = "label16";
             // 
             // tb_location
             // 
@@ -700,8 +678,6 @@
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.TextBox tb_last_updated;
-        private System.Windows.Forms.TextBox tb_distance_from_build;
-        private System.Windows.Forms.Label label16;
         private System.Windows.Forms.TextBox tb_location;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label label19;
@@ -725,7 +701,6 @@
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label label32;
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.Label label35;
         private System.Windows.Forms.TextBox tb_current_offset_percent;

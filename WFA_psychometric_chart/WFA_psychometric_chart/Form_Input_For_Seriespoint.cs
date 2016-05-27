@@ -39,7 +39,7 @@ namespace WFA_psychometric_chart
             /*
             This set node should do two task 
             1. Insert a point by calling a function 
-            2. It should input the values in menuStripAllValues
+            2. It should input the values in menuStripNodeInfoValues
             */
             string source = tbSource.Text;
             string name = tbName.Text;

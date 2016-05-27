@@ -31,70 +31,29 @@ namespace WFA_psychometric_chart
           this.Disposed += new System.EventHandler ( this.Form3_Disposed );
         }
 
-        
+
+
+        string buildingNameStore;
+
+
         int index_selected = 0;
         int index_for_station_selected = 0;
-        //private void button3_Click(object sender, EventArgs e)
-        //{
-        //    //this will pull the following things from database..
-        //    /*
-        //     1.country,state,city,street,latitude,longitude,elev,zip
-        //     */
-        //    string country = tb_country.Text;
-        //    string state = tb_state.Text;
-        //    string city = tb_city.Text;
-        //    string street = tb_street.Text;
+       
+        //We need to store the data pulled into a List.
+        //--setting variable data...
+        public class DataTypeSettingList
+        {
+            public int id { get; set; }
+            public string buildingName { get; set; }
+            public int enabled { get; set; }
+            public string selectedStationName { get; set; }
+            public int indexSelected { get; set; }
 
-        //    if (country != "" && city != "")
-        //    {
-        //        string join_string = "";
-        //        if (state != "" && street != "")
-        //        {
-        //            join_string = country + "," + state + "," + city + "," + street;
-        //        }
-        //        else
-        //        {
-        //            join_string = country + "," + city;
-        //        }
+        }
+        List<DataTypeSettingList> settingList = new List<DataTypeSettingList>();
 
-        //        //geo location code goes here..
-        //        try
-        //        {
+        //--END OF THE setting variable data
 
-        //            var address = join_string;
-        //            var requestUri = string.Format("http://maps.googleapis.com/maps/api/geocode/xml?address={0}&sensor=false", Uri.EscapeDataString(address));
-
-        //            var request = WebRequest.Create(requestUri);
-        //            var response = request.GetResponse();
-
-        //            var xdoc = XDocument.Load(response.GetResponseStream());
-
-        //            var result = xdoc.Element("GeocodeResponse").Element("result");                   
-        //            var locationElement = result.Element("geometry").Element("location");
-        //            var lat = locationElement.Element("lat");
-        //            var lng = locationElement.Element("lng");
-        //            double lat2 = Double.Parse(lat.Value);
-        //            double lng2 = Double.Parse(lng.Value);
-        //            tb_latitude.Text = lat2.ToString();
-        //            tb_longitude.Text = lng2.ToString();
-                     
-
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            MessageBox.Show(ex.Message);
-        //        }
-
-
-
-
-
-
-        //    }//close of if...
-
-
-
-        //}
 
         private void button4_Click(object sender, EventArgs e)
         {
@@ -132,38 +91,38 @@ namespace WFA_psychometric_chart
         }
 
         List<station_data> store_station_list = new List<station_data>();
-        private void cb_enable_disable_CheckedChanged(object sender, EventArgs e)
+        
+        public void enabledClicked()
         {
-
 
             if (cb_enable_disable.Checked == true)
             {
                 try
                 {
-                store_station_list.Clear();
-                //enable all the text boxex..
-                tb_location.Enabled = true;
-                tb_distance_from_build.Enabled = true;
-                tb_last_updated.Enabled = true;
-               // btn_pull_offline_data.Enabled = true;
-                //btn_update_now.Enabled = true;//this will be true when user selects a station 
-                tb_cw_barometer_value.Enabled = true;
-                tb_cw_direction.Enabled = true;
-                tb_cw_hum.Enabled = true;
-                tb_cw_temp.Enabled = true;
-                tb_cw_wind.Enabled = true;
-                cb_hum_self_calib.Enabled = true;
-                //btn_update_constantly.Enabled = true;//this will be true when user selects a station 
-                cb_station_names.Enabled = true;
-                tb_station_distance.Enabled = true;
+                    store_station_list.Clear();
+                    //enable all the text boxex..
+                    tb_location.Enabled = true;
+                    // tb_distance_from_build.Enabled = true;
+                    tb_last_updated.Enabled = true;
+                    // btn_pull_offline_data.Enabled = true;
+                    //btn_update_now.Enabled = true;//this will be true when user selects a station 
+                    tb_cw_barometer_value.Enabled = true;
+                    tb_cw_direction.Enabled = true;
+                    tb_cw_hum.Enabled = true;
+                    tb_cw_temp.Enabled = true;
+                    tb_cw_wind.Enabled = true;
+                    cb_hum_self_calib.Enabled = true;
+                    //btn_update_constantly.Enabled = true;//this will be true when user selects a station 
+                    cb_station_names.Enabled = true;
+                    tb_station_distance.Enabled = true;
 
 
-                /*
-                 we should try to pull the data of the station names based on the location selected.
-                 * 1. Get lat lng value then pull 5 station name by parsing the json file form the openweathermap.org
-                 */
+                    /*
+                     we should try to pull the data of the station names based on the location selected.
+                     * 1. Get lat lng value then pull 5 station name by parsing the json file form the openweathermap.org
+                     */
 
-               
+
                     double lat = Double.Parse(tb_latitude.Text);
                     double lng = Double.Parse(tb_longitude.Text);
 
@@ -177,40 +136,40 @@ namespace WFA_psychometric_chart
                         string api_url = "http://api.openweathermap.org/data/2.5/station/find?mode=json&lat=" + lat + "&lon=" + lng + "&cnt=5&APPID=615afd606af791f572a1f92b27a68bcd";
                         //MessageBox.Show("api_url = " + api_url);
                         var data = wc.DownloadString(api_url);
-                       //its a test...                       
+                        //its a test...                       
                       //  MessageBox.Show("data = " + data);
                         //lets parse the data provided...
                         //and store it into dynamic list...
                         //lets reset the list first..
-                        
+
                         var jarray = JArray.Parse(data);
 
                         foreach (var result in jarray.Children<JObject>())
                         {
 
-                                if ((result["station"]["name"] != null) && (result["distance"] != null))
+                            if ((result["station"]["name"] != null) && (result["distance"] != null))
+                            {
+                                string station_name = result["station"]["name"].ToString();
+
+                                string station_distance = result["distance"].ToString();
+                                string station_id = result["station"]["id"].ToString();
+                                string latitude = result["station"]["coord"]["lat"].ToString();
+                                string longitude = result["station"]["coord"]["lon"].ToString();
+                                store_station_list.Add(new station_data
                                 {
-                                    string station_name = result["station"]["name"].ToString();
-
-                                    string station_distance = result["distance"].ToString();
-                                    string station_id = result["station"]["id"].ToString();
-                                    string latitude = result["station"]["coord"]["lat"].ToString();
-                                    string longitude = result["station"]["coord"]["lon"].ToString();
-                                    store_station_list.Add(new station_data
-                                    {
-                                        name = station_name,
-                                        distance = double.Parse(station_distance),
-                                        id= double.Parse(station_id),
-                                        lat = double.Parse(latitude),
-                                        lng = double.Parse(longitude)
+                                    name = station_name,
+                                    distance = double.Parse(station_distance),
+                                    id = double.Parse(station_id),
+                                    lat = double.Parse(latitude),
+                                    lng = double.Parse(longitude)
 
 
-                                    });
-                                }
+                                });
+                            }
 
 
 
-                           
+
                         }//close of foreach...
 
                         //lets print the values. if we are rightr
@@ -223,19 +182,27 @@ namespace WFA_psychometric_chart
                             cb_station_names.Items.Add(store_station_list[i].name);
 
                         }
-                       // MessageBox.Show("values  = " + s);
+                        // MessageBox.Show("values  = " + s);
 
                     }//close of using webclient
+
+
+                    //--This is for the setting ie if the building is selected and closed
+
+                    //CheckDataForSettings();
+
+
+
 
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message+WFA_psychometric_chart.Properties.Resources._Please_make_sure_you_are_conn);
+                    MessageBox.Show(ex.Message + WFA_psychometric_chart.Properties.Resources._Please_make_sure_you_are_conn);
                     //cb_enable_disable.Enabled = false;
                     tb_location.Enabled = false;
-                    tb_distance_from_build.Enabled = false;
+                    // tb_distance_from_build.Enabled = false;
                     tb_last_updated.Enabled = false;
-                  //  btn_pull_offline_data.Enabled = false;
+                    //  btn_pull_offline_data.Enabled = false;
                     //btn_update_now.Enabled = false;
                     tb_cw_barometer_value.Enabled = false;
                     tb_cw_direction.Enabled = false;
@@ -243,13 +210,13 @@ namespace WFA_psychometric_chart
                     tb_cw_temp.Enabled = false;
                     tb_cw_wind.Enabled = false;
                     cb_hum_self_calib.Enabled = false;
-                  //  btn_update_constantly.Enabled = false;
+                    //  btn_update_constantly.Enabled = false;
                     //dissable the second check box...
                     cb_hum_self_calib.Checked = false;
                     cb_station_names.Enabled = false;
                     tb_station_distance.Enabled = false;
                     cb_enable_disable.Checked = false;
-                    lbConnectionIssue.Text = "No";
+                    lbConnectionIssue.Text = "GOOD";
                     btnShowLogFile.Enabled = false;
 
 
@@ -263,17 +230,17 @@ namespace WFA_psychometric_chart
             {
                 //dissable..
                 tb_location.Enabled = false;
-                tb_distance_from_build.Enabled = false;
+                // tb_distance_from_build.Enabled = false;
                 tb_last_updated.Enabled = false;
-               // btn_pull_offline_data.Enabled = false;
+                // btn_pull_offline_data.Enabled = false;
                 //btn_update_now.Enabled = false;
                 tb_cw_barometer_value.Enabled = false;
                 tb_cw_direction.Enabled = false;
                 tb_cw_hum.Enabled = false;
                 tb_cw_temp.Enabled = false;
                 tb_cw_wind.Enabled = false;
-                cb_hum_self_calib.Enabled =false;
-              //  btn_update_constantly.Enabled = false;
+                cb_hum_self_calib.Enabled = false;
+                //  btn_update_constantly.Enabled = false;
                 //dissable the second check box...
                 cb_hum_self_calib.Checked = false;
                 cb_station_names.Enabled = false;
@@ -282,20 +249,20 @@ namespace WFA_psychometric_chart
 
 
                 tb_location.Text = "";
-                tb_distance_from_build.Text= "";
+                // tb_distance_from_build.Text= "";
                 tb_last_updated.Text = "";
                 //btn_pull_offline_data.Enabled = true;
                 //btn_update_now.Enabled = true;//this will be true when user selects a station 
                 tb_cw_barometer_value.Text = "";
                 tb_cw_direction.Text = "";
-                tb_cw_hum.Text= "";
+                tb_cw_hum.Text = "";
                 tb_cw_temp.Text = "";
                 tb_cw_wind.Text = "";
                 //cb_hum_self_calib.Enabled = true;
                 //btn_update_constantly.Enabled = true;//this will be true when user selects a station 
                 //cb_station_names.Enabled = true;
                 tb_station_distance.Text = "";
-                lbConnectionIssue.Text = "No";
+                lbConnectionIssue.Text = "GOOD";
                 btnShowLogFile.Enabled = false;
 
 
@@ -315,6 +282,155 @@ namespace WFA_psychometric_chart
 
 
         }
+
+        /// <summary>
+        /// This is the weather serivice pulling part now currently it has setting as well saved when ever the user closes the application and reopens it user can start for the previous settings.
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cb_enable_disable_CheckedChanged(object sender, EventArgs e)
+        {
+
+            enabledClicked();
+
+            ////--Later this will enabled when we have to add settings....
+            ////--If uncecked then we need to remove the settings or just make the setting null 
+            //if(cb_enable_disable.Enabled == false)
+            //{
+            //    //if this is false then we need to disable the added setting or update the settings..
+            //    //UpdateSettingIfPresent
+            //    //--If the data is present
+            //    if (UpdateSettingIfPresent() > 0)
+            //    {
+
+            //        //--We need to update the data...
+            //        updateSettingData(settingList[0].buildingName, 0, settingList[0].selectedStationName, settingList[0].indexSelected);
+
+            //    }
+
+
+
+            //}
+
+
+        }
+
+
+
+        public void updateSettingData(string buildingName,int enable,string selectedStName,int indexSelectedBuilding)
+        {
+            string bName = buildingName;
+            int en = enable;
+            string sSelName = selectedStName;
+            int ind = indexSelectedBuilding;
+
+
+            string databasePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile = databasePath + @"\db_psychrometric_project.s3db";
+
+            string connString = @"Data Source=" + databaseFile + ";Version=3;";
+
+            using (SQLiteConnection connection = new SQLiteConnection(connString))
+            {
+                connection.Open();
+
+                string sql_string = "update tbl_weather_settings set  buildingName=@buildValue,enabled=@enableValue,selectedStationName=@selValue,indexSelected=@indValue  where id = @idSelected;";
+                SQLiteCommand command = new SQLiteCommand(sql_string, connection);
+                command.CommandType = CommandType.Text;
+                command.Parameters.AddWithValue("@buildValue", buildingName.ToString());
+                command.Parameters.AddWithValue("@enableValue", enable);
+                command.Parameters.AddWithValue("@selValue", selectedStName.ToString());
+                command.Parameters.AddWithValue("@indValue", indexSelectedBuilding);
+
+                command.Parameters.AddWithValue("@idSelected", settingList[0].id);
+
+                //MessageBox.Show("selected value = " + cb_station_names.SelectedItem.ToString());
+
+                command.ExecuteNonQuery();
+
+
+            }
+
+
+        }
+
+
+
+        int countNumberDbReturn;
+
+        public int UpdateSettingIfPresent()
+        {
+
+            string databasePath22 = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFile22 = databasePath22 + @"\db_psychrometric_project.s3db";
+
+            string connString22 = @"Data Source=" + databaseFile22 + ";Version=3;";
+
+            using (SQLiteConnection connection22 = new SQLiteConnection(connString22))
+            {
+                connection22.Open();
+                SQLiteDataReader reader = null;
+                SQLiteCommand command22 = new SQLiteCommand("select * from tbl_weather_settings where buildingName=@buildingName", connection22);
+                command22.Parameters.AddWithValue("@buildingName", lb_building_name.Text);
+                reader = command22.ExecuteReader();
+                while (reader.Read())
+                {
+                   
+                    countNumberDbReturn = 1;
+
+                }
+            }
+
+
+            return countNumberDbReturn;
+
+        }
+
+
+        /// <summary>
+        /// This is used to check the data is present or not if present means that we need to select the settings..
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+
+        //variable is deleared in the top.
+        public void CheckSettingData()
+            {
+            string databasePathFFF = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string databaseFileFFF = databasePathFFF + @"\db_psychrometric_project.s3db";
+
+            string connStringFFF = @"Data Source=" + databaseFileFFF + ";Version=3;";
+
+            using (SQLiteConnection connectionFFF = new SQLiteConnection(connStringFFF))
+            {
+                connectionFFF.Open();
+                SQLiteDataReader reader = null;
+
+                SQLiteCommand command = new SQLiteCommand("select * from tbl_weather_settings WHERE buildingName='@buildingname'", connectionFFF);
+                command.Parameters.AddWithValue("@buildingname", buildingNameStore.ToString());
+                reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    settingList.Add(new DataTypeSettingList
+                    {
+                        id = int.Parse( reader["id"].ToString()),
+                        buildingName = reader["buildingName"].ToString(),
+                        enabled = int.Parse(reader["enabled"].ToString()),
+                        selectedStationName = reader["selectedStationName"].ToString(),
+                        indexSelected = int.Parse( reader["indexSelected"].ToString())
+                        
+
+                    });
+                    MessageBox.Show("Entereeeeee");
+                  
+                }
+                MessageBox.Show("value counted = " + settingList.Count);
+            }
+
+
+        }
+
 
         private void cb_hum_self_calib_CheckedChanged(object sender, EventArgs e)
         {
@@ -404,7 +520,7 @@ namespace WFA_psychometric_chart
                         {
                             //ListboxItems.Add(reader[1].ToString()+","+reader[2].ToString());
                             tb_location.Text = reader["location"].ToString();
-                            tb_distance_from_build.Text = reader["distance_from_building"].ToString();
+                           // tb_distance_from_build.Text = Math.Round(double.Parse(reader["distance_from_building"].ToString()), 2).ToString();
                             tb_last_updated.Text = reader["last_update_date"].ToString();
                             tb_cw_temp.Text = reader["temp"].ToString();
                             tb_cw_hum.Text = reader["humidity"].ToString();
@@ -479,8 +595,11 @@ namespace WFA_psychometric_chart
                         tb_longitude.Text = reader["longitude"].ToString();
                         tb_elev.Text = reader["elevation"].ToString();
                         lb_building_name.Text = reader["BuildingName"].ToString();
+                    buildingNameStore = reader["BuildingName"].ToString();//lets store the building name in a variable...
                         index_selected =int.Parse( reader["ID"].ToString()); //--This is added to check the select
                     }
+
+
                 }
 
            
@@ -509,18 +628,24 @@ namespace WFA_psychometric_chart
         int InternetAvailable = 0;//--not available
 
 
-            
-            public void update_now_function()
+
+
+        TimeSpan lastUpdateTimeDifference;//--This stores the last updated time..
+        string lastUpdateHourOrMinuteOrSecond = null;//--This is for storing only hours or minutes or seconds one parameter.
+
+
+
+        public void update_now_function()
         {
             /*
- steps:
- * 0.pull the lat and long value stored in the database
- * 1.pull the data form web 
- * 2.Parse the xml data
- * 3.insert data
- * 4.display data
- */
-            //MessageBox.Show("Starting......");
+         steps:
+         * 0.pull the lat and long value stored in the database
+         * 1.pull the data form web 
+         * 2.Parse the xml data
+         * 3.insert data
+         * 4.display data
+         */
+        //MessageBox.Show("Starting......");
 
             if (index_for_station_selected > -1)
             {
@@ -776,6 +901,51 @@ namespace WFA_psychometric_chart
                                     string minute = val[1].ToString();
 
 
+
+
+
+
+
+
+                                    //--Now lets take the current data and time ....
+
+                                    DateTime currentDT = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+
+                                    DateTime serverDateTime = DateTime.Parse(last_update_pulled);
+
+                                    lastUpdateTimeDifference = currentDT - serverDateTime;
+                                    // MessageBox.Show( "curr, server time "+currentDT+","+serverDateTime+ "last updated diffe= " + lastUpdateTimeDifference);
+
+
+                                    string[] datetimeSpanSplit = lastUpdateTimeDifference.ToString().Split(':');
+
+
+                                    if (double.Parse(datetimeSpanSplit[0].ToString()) != 0.0000)
+                                    {
+                                        //--Assumes the difference is of hours dont need minute and seconds 
+                                        lastUpdateHourOrMinuteOrSecond = datetimeSpanSplit[0].ToString() + " Hour ago";
+
+                                    }
+                                    else if (double.Parse(datetimeSpanSplit[1].ToString()) != 0.00)
+                                    {
+                                        //--Treats as there is minute difference not hours.
+                                        lastUpdateHourOrMinuteOrSecond = datetimeSpanSplit[1].ToString() + " Minute ago";
+
+                                    }
+                                    else
+                                    {
+                                        //--There is seconds difference...
+                                        lastUpdateHourOrMinuteOrSecond = datetimeSpanSplit[2].ToString() + " Seconds ago";
+
+                                    }
+
+
+
+
+
+
+
+
                                     // MessageBox.Show("date = " + date + " time = " + time);
                                     /*steps :
                                      1.insert the values in the given database.
@@ -783,7 +953,7 @@ namespace WFA_psychometric_chart
                                      */
 
                                     //insert...
-                                //    MessageBox.Show("tempe= " + temp_adjust + " hum = " + hum_pulled);
+                                    //    MessageBox.Show("tempe= " + temp_adjust + " hum = " + hum_pulled);
                                     string sql_query = "insert into tbl_historical_data(ID,date_current,hour_current,minute_current,distance_from_building,temperature,humidity,bar_pressure,wind,direction,station_name) VALUES(@id_value,@date_current,@hour_current,@minute_current,@distance_from_building_value,@temp_value,@hum_value,@bar_pressure_value,@wind_value,@direction_value,@station_name)";
                                     SQLiteCommand cmdx = new SQLiteCommand(sql_query, connection);
                                     cmdx.CommandType = CommandType.Text;
@@ -805,10 +975,53 @@ namespace WFA_psychometric_chart
 
 
                                 }//close o using..
+
+
+
+                             //   if (cb_station_names.SelectedIndex > 0) { 
+
+                               // //--Now lets update the setting data...
+                               // if (UpdateSettingIfPresent() > 0)
+                               // {
+                               //     //update the setting data already present...
+
+                               //     updateSettingData(lb_building_name.Text, 1, cb_station_names.SelectedText, cb_station_names.SelectedIndex);
+
+                               //     MessageBox.Show("Updateding");
+                               // }
+                               // else
+                               // {
+                               //     //--Insert the data in the database..
+                               //     using (SQLiteConnection connection = new SQLiteConnection(connString))
+                               //     {
+                               //         connection.Open();
+
+                               //         string sql_query = "insert into tbl_weather_settings(buildingName,enabled,selectedStationName,indexSelected) VALUES(@buildValue,@enableValue,@stationName,@indexSel)";
+                               //         SQLiteCommand cmdx = new SQLiteCommand(sql_query, connection);
+                               //         cmdx.CommandType = CommandType.Text;
+                               //         cmdx.Parameters.AddWithValue("@buildValue", lb_building_name.Text);
+                               //         cmdx.Parameters.AddWithValue("@enableValue", 1);
+                               //         cmdx.Parameters.AddWithValue("@stationName", cb_station_names.SelectedItem);
+                               //         cmdx.Parameters.AddWithValue("@indexSel", cb_station_names.SelectedIndex);
+                               //         cmdx.ExecuteNonQuery();
+                               //         //finally close the connection.
+                               //         connection.Close();
+                               //         MessageBox.Show("Updateding inse..");
+                               //     }//--Close of the using setting
+                               // }
+
+
+
+                               //// }//if selected index
+
+
+
+
+
                             }
                             catch (Exception ex)
                             {
-                                MessageBox.Show(ex.Message);
+                                MessageBox.Show("Connect to internet please : "+ex.Message);
 
 
 
@@ -827,8 +1040,11 @@ namespace WFA_psychometric_chart
                             pull_stored_weather_data();
 
 
+                            tb_last_updated.Text = lastUpdateHourOrMinuteOrSecond.ToString();
 
-                         // MessageBox.Show("success !");
+
+
+                            // MessageBox.Show("success !");
                         }
 
                     }//close of else...block for tb_latitude and tb_longitude..
@@ -905,7 +1121,7 @@ namespace WFA_psychometric_chart
 
                     }
 
-                    lbConnectionIssue.Text = WFA_psychometric_chart.Properties.Resources.Yes;
+                    lbConnectionIssue.Text = "FAIL";
                     btnShowLogFile.Enabled = true;
 
 
@@ -1037,15 +1253,49 @@ namespace WFA_psychometric_chart
                     FillLatLongValueAutomatically();//--Fill the lat long values...
                     MessageBox.Show("show filllat");
                 }
-                //else
+
+              get_stored_data();//--This will get the selected data form the database...
+              cb_enable_disable.Enabled = true;
+
+
+
+
+                //--This is for checking weather the data is present in the setting or not...
+                //MessageBox.Show("Before checksettingdata");
+                //MessageBox.Show(" BUILDING NAME STOREED" + buildingNameStore);
+                //CheckSettingData();
+                //MessageBox.Show("after checksettingdata");
+                //if (settingList.Count > 0)
                 //{
-                //    //--if not true
+                //    MessageBox.Show("Settinglist count inside ");
+                //    //--this means there is a match..
+                //    if (settingList[0].enabled == 1)
+                //    {
+                //        //--if the check was enabled previously...
+                //        //--We need to enable settings..
+                //        //--This will also triger an event..
+                //        cb_enable_disable.Enabled = true;
+                //        cb_enable_disable.Checked = true;
+
+                //        //after this we need to check for the indes selsecte.
+
+                //        int indexCB = settingList[0].indexSelected;
+                //        //--This show the item is selected or not..
+                //        //--I hope this will trigger the events..
+                //        cb_station_names.Enabled = true;
+                //        cb_station_names.SelectedIndex = indexCB;
+
+                //        on_select_index_change_event(cb_station_names, new EventArgs());//THis calls the event
+                //        MessageBox.Show("Reached here...form load");
+
+                //    }
+                //}
 
 
-                // }
 
-                get_stored_data();//--This will get the selected data form the database...
-            cb_enable_disable.Enabled = true;
+                //--Close of the setting things...
+
+
             }catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
@@ -1526,12 +1776,16 @@ namespace WFA_psychometric_chart
                                 connection.Close();
 
 
-
-
-
-
+                                
 
                             }//close o using..
+
+
+                        
+
+
+
+
                         }
                         catch (Exception ex)
                         {
@@ -1566,13 +1820,16 @@ namespace WFA_psychometric_chart
 
         }
 
-        private System.Windows.Forms.Timer timer1= new System.Windows.Forms.Timer();
+        private Timer timer1= new Timer();
         public void InitTimer()
         {
+            update_now_function();//First time calling the function..
             //timer1 = new System.Windows.Forms.Timer();
+            timer1.Start();
             timer1.Tick += new EventHandler(timer1_Tick);
             timer1.Interval = 1000 * 6; // in miliseconds //2min * 30 = 60 min minute ie every 1 hour
-            timer1.Start();
+           
+            
         }
 
         private void timer1_Tick(object sender, EventArgs e)

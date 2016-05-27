@@ -130,6 +130,9 @@
   <data name="chart1.Text" xml:space="preserve">
     <value>图表 1</value>
   </data>
+  <data name="disconnectLineToolStripMenuItem.Text" xml:space="preserve">
+    <value>断开线</value>
+  </data>
   <data name="exitToolStripMenuItem.Text" xml:space="preserve">
     <value>退出</value>
   </data>
@@ -208,6 +211,9 @@
   <data name="menuStrip1.Text" xml:space="preserve">
     <value>menustrip1</value>
   </data>
+  <data name="nodeGridViewToolStripMenuItem.Text" xml:space="preserve">
+    <value>节点网格视图</value>
+  </data>
   <data name="optionToolStripMenuItem.Text" xml:space="preserve">
     <value>选项</value>
   </data>
@@ -224,6 +230,9 @@
   </data>
   <data name="saveAsToolStripMenuItem.Text" xml:space="preserve">
     <value>另存为</value>
+  </data>
+  <data name="showComfortZoneToolStripMenuItem.Text" xml:space="preserve">
+    <value>显示安乐窝</value>
   </data>
   <data name="weatherServicesToolStripMenuItem.Text" xml:space="preserve">
     <value>天气服务</value>

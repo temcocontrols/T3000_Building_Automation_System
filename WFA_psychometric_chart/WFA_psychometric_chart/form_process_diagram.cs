@@ -841,7 +841,7 @@ namespace WFA_psychometric_chart
                 newSeries.ToolTip = tooltipString;
 
                 //newSeries.MarkerStyle = MarkerStyle.Circle;
-                //newSeries.Points.AddXY(menuStripAllValues[index - 1].xVal, menuStripAllValues[index].xVal, menuStripAllValues[index - 1].yVal, menuStripAllValues[index].yVal);
+                //newSeries.Points.AddXY(menuStripNodeInfoValues[index - 1].xVal, menuStripNodeInfoValues[index].xVal, menuStripNodeInfoValues[index - 1].yVal, menuStripNodeInfoValues[index].yVal);
                 newSeries.Points.Add(new DataPoint(menuStripAllValues[index - 1].xVal, menuStripAllValues[index - 1].yVal));
                 newSeries.Points.Add(new DataPoint(menuStripAllValues[index].xVal, menuStripAllValues[index].yVal));
                 chart1.Series.Add(newSeries);
@@ -1008,7 +1008,7 @@ namespace WFA_psychometric_chart
                     //Console.Write("xval = " + xValue + "yvalue = " + yValue);
                     if (menuStripAllValues.Count > 0)
                     {
-                        //foreach(var values in menuStripAllValues)
+                        //foreach(var values in menuStripNodeInfoValues)
 
                         for (int i = 0; i < menuStripAllValues.Count; i++)
                         {
@@ -1060,10 +1060,10 @@ namespace WFA_psychometric_chart
                             // MessageBox.Show(" alt is pressed for x axis constant");
 
 
-                            //menuStripAllValues[idSelected].xVal = xAxis1;
+                            //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
                             menuStripAllValues[idSelected].yVal = yAxis1;
 
-                            // label5.Text = "click past x =" + menuStripAllValues[idSelected].xVal + " y " + menuStripAllValues[idSelected].yVal;
+                            // label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
 
                             series1.Points.Clear();
                             for (int i = 1; i <= menuStripAllValues.Count - 1; i++)//-- this -1 is done because for three points we have two line series..
@@ -1071,7 +1071,7 @@ namespace WFA_psychometric_chart
                                 chart1.Series.Remove(chart1.Series["LineSeries" + i]);
                             }
                             //--this is redraw functionality
-                            //foreach(var values in menuStripAllValues)
+                            //foreach(var values in menuStripNodeInfoValues)
                             for (int x = 0; x < menuStripAllValues.Count; x++)
                             {
                                 string labelValue;
@@ -1120,9 +1120,9 @@ namespace WFA_psychometric_chart
                             // MessageBox.Show("shift  is pressed for y  axis constant");
 
                             menuStripAllValues[idSelected].xVal = xAxis1;
-                            //menuStripAllValues[idSelected].yVal = yAxis1;
+                            //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
 
-                            //label5.Text = "click past x =" + menuStripAllValues[idSelected].xVal + " y " + menuStripAllValues[idSelected].yVal;
+                            //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
 
                             series1.Points.Clear();
                             for (int i = 1; i <= menuStripAllValues.Count - 1; i++)//-- this -1 is done because for three points we have two line series..
@@ -1130,7 +1130,7 @@ namespace WFA_psychometric_chart
                                 chart1.Series.Remove(chart1.Series["LineSeries" + i]);
                             }
                             //--this is redraw functionality
-                            //foreach(var values in menuStripAllValues)
+                            //foreach(var values in menuStripNodeInfoValues)
                             for (int x = 0; x < menuStripAllValues.Count; x++)
                             {
                                 string labelValue;
@@ -1177,7 +1177,7 @@ namespace WFA_psychometric_chart
                             menuStripAllValues[idSelected].xVal = xAxis1;
                             menuStripAllValues[idSelected].yVal = yAxis1;
 
-                            //label5.Text = "click past x =" + menuStripAllValues[idSelected].xVal + " y " + menuStripAllValues[idSelected].yVal;
+                            //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
 
                             series1.Points.Clear();
                             for (int i = 1; i <= menuStripAllValues.Count - 1; i++)//-- this -1 is done because for three points we have two line series..
@@ -1185,7 +1185,7 @@ namespace WFA_psychometric_chart
                                 chart1.Series.Remove(chart1.Series["LineSeries" + i]);
                             }
                             //--this is redraw functionality
-                            //foreach(var values in menuStripAllValues)
+                            //foreach(var values in menuStripNodeInfoValues)
                             for (int x = 0; x < menuStripAllValues.Count; x++)
                             {
                                 string labelValue;
@@ -1266,10 +1266,10 @@ namespace WFA_psychometric_chart
 
 
 
-            //menuStripAllValues[idSelected].xVal = chart1.ChartAreas[0].AxisX.PixelPositionToValue(Location.X);
-            //menuStripAllValues[idSelected].yVal = chart1.ChartAreas[0].AxisY.PixelPositionToValue(Location.Y);
+            //menuStripNodeInfoValues[idSelected].xVal = chart1.ChartAreas[0].AxisX.PixelPositionToValue(Location.X);
+            //menuStripNodeInfoValues[idSelected].yVal = chart1.ChartAreas[0].AxisY.PixelPositionToValue(Location.Y);
 
-            //label5.Text = "Drag leave x ="+ menuStripAllValues[idSelected].xVal+" y "+ menuStripAllValues[idSelected].yVal;
+            //label5.Text = "Drag leave x ="+ menuStripNodeInfoValues[idSelected].xVal+" y "+ menuStripNodeInfoValues[idSelected].yVal;
 
             //series1.Points.Clear();
             //chart1.Invalidate();
@@ -1281,9 +1281,9 @@ namespace WFA_psychometric_chart
         {
             //-- drag over is triggered ... i love programming bhoj bahadure karki kathmandu Nepal(NEC 011)
 
-            //menuStripAllValues[idSelected ].xVal = xAxis1;
-            //menuStripAllValues[idSelected].yVal = yAxis1;
-            //label4.Text = "dragover x = " + menuStripAllValues[idSelected ].xVal + " y =" + menuStripAllValues[idSelected ].yVal;
+            //menuStripNodeInfoValues[idSelected ].xVal = xAxis1;
+            //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
+            //label4.Text = "dragover x = " + menuStripNodeInfoValues[idSelected ].xVal + " y =" + menuStripNodeInfoValues[idSelected ].yVal;
 
 
         }
@@ -1332,10 +1332,10 @@ namespace WFA_psychometric_chart
                         //MessageBox.Show(" alt is pressed for x axis constant");
 
 
-                        //menuStripAllValues[idSelected].xVal = xAxis1;
+                        //menuStripNodeInfoValues[idSelected].xVal = xAxis1;
                         menuStripAllValues[idSelected].yVal = yAxis1;
 
-                        //label5.Text = "click past x =" + menuStripAllValues[idSelected].xVal + " y " + menuStripAllValues[idSelected].yVal;
+                        //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
 
                         series1.Points.Clear();
                         for (int i = 1; i <= menuStripAllValues.Count - 1; i++)//-- this -1 is done because for three points we have two line series..
@@ -1343,7 +1343,7 @@ namespace WFA_psychometric_chart
                             chart1.Series.Remove(chart1.Series["LineSeries" + i]);
                         }
                         //--this is redraw functionality
-                        //foreach(var values in menuStripAllValues)
+                        //foreach(var values in menuStripNodeInfoValues)
                         for (int x = 0; x < menuStripAllValues.Count; x++)
                         {
                             string labelValue;
@@ -1392,9 +1392,9 @@ namespace WFA_psychometric_chart
                         //MessageBox.Show("shift  is pressed for y  axis constant");
 
                         menuStripAllValues[idSelected].xVal = xAxis1;
-                        //menuStripAllValues[idSelected].yVal = yAxis1;
+                        //menuStripNodeInfoValues[idSelected].yVal = yAxis1;
 
-                        //label5.Text = "click past x =" + menuStripAllValues[idSelected].xVal + " y " + menuStripAllValues[idSelected].yVal;
+                        //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
 
                         series1.Points.Clear();
                         for (int i = 1; i <= menuStripAllValues.Count - 1; i++)//-- this -1 is done because for three points we have two line series..
@@ -1402,7 +1402,7 @@ namespace WFA_psychometric_chart
                             chart1.Series.Remove(chart1.Series["LineSeries" + i]);
                         }
                         //--this is redraw functionality
-                        //foreach(var values in menuStripAllValues)
+                        //foreach(var values in menuStripNodeInfoValues)
                         for (int x = 0; x < menuStripAllValues.Count; x++)
                         {
                             string labelValue;
@@ -1448,7 +1448,7 @@ namespace WFA_psychometric_chart
                         menuStripAllValues[idSelected].xVal = xAxis1;
                         menuStripAllValues[idSelected].yVal = yAxis1;
 
-                        //label5.Text = "click past x =" + menuStripAllValues[idSelected].xVal + " y " + menuStripAllValues[idSelected].yVal;
+                        //label5.Text = "click past x =" + menuStripNodeInfoValues[idSelected].xVal + " y " + menuStripNodeInfoValues[idSelected].yVal;
 
                         series1.Points.Clear();
                         for (int i = 1; i <= menuStripAllValues.Count - 1; i++)//-- this -1 is done because for three points we have two line series..
@@ -1456,7 +1456,7 @@ namespace WFA_psychometric_chart
                             chart1.Series.Remove(chart1.Series["LineSeries" + i]);
                         }
                         //--this is redraw functionality
-                        //foreach(var values in menuStripAllValues)
+                        //foreach(var values in menuStripNodeInfoValues)
                         for (int x = 0; x < menuStripAllValues.Count; x++)
                         {
                             string labelValue;
@@ -1550,7 +1550,7 @@ namespace WFA_psychometric_chart
 
                 newSeries.ToolTip = tooltipString;
                 //newSeries.MarkerStyle = MarkerStyle.Circle;
-                //newSeries.Points.AddXY(menuStripAllValues[index - 1].xVal, menuStripAllValues[index].xVal, menuStripAllValues[index - 1].yVal, menuStripAllValues[index].yVal);
+                //newSeries.Points.AddXY(menuStripNodeInfoValues[index - 1].xVal, menuStripNodeInfoValues[index].xVal, menuStripNodeInfoValues[index - 1].yVal, menuStripNodeInfoValues[index].yVal);
                 newSeries.Points.Add(new DataPoint(menuStripAllValues[incrementIndex - 1].xVal, menuStripAllValues[incrementIndex - 1].yVal));
                 newSeries.Points.Add(new DataPoint(menuStripAllValues[incrementIndex].xVal, menuStripAllValues[incrementIndex].yVal));
                 chart1.Series.Add(newSeries);
