@@ -474,7 +474,7 @@ namespace WFA_psychometric_chart
             chart1.Series["Line_b_straight"].Points.Add(new DataPoint(25, 30));
             chart1.Series["Line_b_straight"].ChartType = SeriesChartType.Line;
             //chart1.Series["Line_b_straight"].Points[0].Label = "Enthalpy kj/kg dry air";
-        }
+        }   //--Close of plot new graph
         private void button1_Click(object sender, EventArgs e)
         {
             this.Invalidate();
@@ -2045,7 +2045,7 @@ namespace WFA_psychometric_chart
         public void ResettingLines()
         {
 
-            menuStripNodeLineInfoValues[indexOfPrevPointForLineMovement].nextNodeId = idOfNodeSelected ;
+            menuStripNodeLineInfoValues[indexOfPrevPointForLineMovement].nextNodeId = idOfNodeSelected;
 
         }
 
@@ -2755,7 +2755,7 @@ namespace WFA_psychometric_chart
                 //series1.Points[0].Color = colorValue;//blue
                 // MessageBox.Show("finally added xvalue = " + xval + " yvalue = " + yval);
                 series1.Points.AddXY(xval, yval);
-                string s = "source : " + tbSource + "\n Name : " + tbName + "\nLable : " + tbLabel;
+                string s = "source : " + tbSource + "\n Name : " + tbName + "\nLabel : " + tbLabel;
                 series1.Points[index].Color = colorValue;
                 series1.Points[index].ToolTip = s;
 
@@ -3111,6 +3111,14 @@ namespace WFA_psychometric_chart
 
 
         }
+
+        private void airHandlerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_handler formhandler = new Form_handler();
+            formhandler.Show();
+        }
+
+
 
         //ArrayList temp_building_values = new ArrayList();
         List<DataTypeTempBuildingValue> temp_building_values = new List<DataTypeTempBuildingValue>();

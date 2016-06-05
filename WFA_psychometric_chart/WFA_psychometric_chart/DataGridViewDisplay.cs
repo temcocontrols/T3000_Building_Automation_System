@@ -24,10 +24,10 @@ namespace WFA_psychometric_chart
             //--On load function...
             DataGridView();
         }
-      
+
         public void DataGridView()
         {
-            DataGridView dtv = new DataGridView();
+            //   DataGridView dtv = new DataGridView();
             //  DataTable dt = new DataTable();
 
 
@@ -73,10 +73,10 @@ namespace WFA_psychometric_chart
             if (form1.menuStripNodeInfoValues.Count > 0)
             {
 
-                for (int i = 0; i <form1.menuStripNodeInfoValues.Count; i++)
+                for (int i = 0; i < form1.menuStripNodeInfoValues.Count; i++)
                 {
                     // MessageBox.Show("ameo" + i);
-                 form1.enthalpyHumidityCalculatorForXYvalue(form1.menuStripNodeInfoValues[i].xVal,form1.menuStripNodeInfoValues[i].yVal);
+                    form1.enthalpyHumidityCalculatorForXYvalue(form1.menuStripNodeInfoValues[i].xVal, form1.menuStripNodeInfoValues[i].yVal);
                     string[] row = new string[5] { form1.menuStripNodeInfoValues[i].id.ToString(), form1.menuStripNodeInfoValues[i].xVal.ToString(), form1.humDataGridValue.ToString(), form1.enthalpyDataGridView.ToString(), form1.menuStripNodeInfoValues[i].label };
                     //  dtv.Rows.Add(row);
                     //dt.NewRow().Equals(row);
@@ -90,7 +90,7 @@ namespace WFA_psychometric_chart
             //dtv.AutoGenerateColumns = false;
             //dtv.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView1.Show();
-           // MessageBox.Show("dOING FINE");
+            // MessageBox.Show("dOING FINE");
             //}catch(Exception ex)
             //{
             //    MessageBox.Show(ex.Message);
